@@ -1,0 +1,102 @@
+%% ERD - 데이터베이스 스키마 (Mermaid erDiagram)
+%% 생성일: {meta.generated_at}
+%% 출처: ORM/ERD/운영DB 통합 (정합성 검증 완료)
+%% 신뢰도: {meta.confidence}
+
+erDiagram
+    %% ====================================
+    %% 사용자 도메인
+    %% ====================================
+    USERS {
+        UUID id PK
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR display_name
+        DATE birth_date
+        VARCHAR role
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    USER_PROFILES {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR phone
+        VARCHAR address
+        TIMESTAMP updated_at
+    }
+    
+    %% ====================================
+    %% 주문 도메인
+    %% ====================================
+    ORDERS {
+        UUID id PK
+        UUID user_id FK
+        NUMERIC total_amount
+        VARCHAR status
+        TIMESTAMP created_at
+        TIMESTAMP cancelled_at
+    }
+    
+    ORDER_ITEMS {
+        UUID id PK
+        UUID order_id FK
+        UUID product_id FK
+        INT quantity
+        NUMERIC unit_price
+    }
+    
+    ORDER_STATUS_HISTORY {
+        UUID id PK
+        UUID order_id FK
+        VARCHAR from_status
+        VARCHAR to_status
+        TIMESTAMP changed_at
+        UUID changed_by FK
+    }
+    
+    %% ====================================
+    %% 상품 도메인
+    %% ====================================
+    PRODUCTS {
+        UUID id PK
+        VARCHAR name
+        VARCHAR category
+        NUMERIC price
+        INT stock_quantity
+        BOOLEAN is_active
+        TIMESTAMP created_at
+    }
+    
+    %% ====================================
+    %% 결제 도메인
+    %% ====================================
+    PAYMENTS {
+        UUID id PK
+        UUID order_id FK
+        NUMERIC amount
+        VARCHAR method
+        VARCHAR status
+        VARCHAR external_payment_id
+        TIMESTAMP paid_at
+    }
+    
+    %% ====================================
+    %% 관계 (Relationships)
+    %% ====================================
+    USERS ||--o| USER_PROFILES : "has profile"
+    USERS ||--o{ ORDERS : "places"
+    USERS ||--o{ ORDER_STATUS_HISTORY : "changes by"
+    
+    ORDERS ||--|{ ORDER_ITEMS : "contains"
+    ORDERS ||--o{ ORDER_STATUS_HISTORY : "tracks"
+    ORDERS ||--|| PAYMENTS : "paid by"
+    
+    PRODUCTS ||--o{ ORDER_ITEMS : "ordered as"
+    
+    %% 관계 표기 범례:
+    %% ||--||  : 1:1 (둘 다 필수)
+    %% ||--o|  : 1:0..1
+    %% ||--|{  : 1:1..N (자식 필수)
+    %% ||--o{  : 1:0..N
+    %% }o--o{  : N:M

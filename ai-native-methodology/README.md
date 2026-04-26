@@ -1,0 +1,166 @@
+# AI-Native 개발 방법론 v1.1.1
+
+> 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
+> 
+> 본 v1.1은 **분석 단계(① Analyze)** 의 구현이다.
+>
+> **v1.1.1 갱신 (2026-04-26)**: PoC #01 finding F-003/F-006 해결 — 신뢰도 산정 공식 v1 추가.
+> 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
+
+---
+
+## 무엇을 하는가
+
+```
+[레거시 프로젝트]                     [7대 산출물]
+   소스 코드                       1. 아키텍처/의존성
+   ERD (있으면)                    2. 도메인 모델
+   ORM (있으면)         ──>        3. API 계약
+   운영 DB (있으면)                 4. DB 스키마
+   기획 문서 (있으면)               5. 비즈니스 규칙
+   디자인 명세 (있으면)             6. 안티패턴
+                                   7. UI/UX 명세
+```
+
+분석 결과는 **AI와 사람 모두가 읽을 수 있는 형식** (JSON Schema + Mermaid + Markdown).
+
+---
+
+## 시작하기
+
+### 사전 요구사항
+- Claude Code 설치
+- 분석 대상 레포 git clone
+- (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
+
+### 사용법 (예정)
+
+```bash
+# 레포에 plugin 설치
+cp -r plugin/.claude/* {분석대상레포}/.claude/
+
+# 분석 시작
+cd {분석대상레포}
+claude code
+
+# Phase 별로 실행
+/analyze-init      # 1단계: 인벤토리
+/analyze-db        # 2단계: DB + 정합성 검증
+/analyze-arch      # 3단계: 아키텍처
+/analyze-business-logic  # 4단계: 비즈니스 로직 (4영역 병렬)
+/analyze-api       # 5-1단계: API
+/analyze-ui        # 5-2단계: UI/UX
+/analyze-quality   # 6단계: 품질 통합
+```
+
+각 단계는 **사용자 승인 게이트** 후 다음 단계로 진행.
+
+---
+
+## 디렉토리 구조
+
+```
+ai-native-methodology/
+├── docs/                   사람이 읽는 가이드
+│   ├── methodology-v1.md
+│   ├── onboarding.md
+│   └── adr/                의사결정 기록
+├── methodology-spec/       Single Source of Truth
+│   ├── deliverables/       7대 산출물 명세
+│   ├── workflow/           7단계 워크플로우 명세
+│   ├── id-conventions.md
+│   └── 한국어-용어집.md
+├── schemas/                JSON Schema (계약)
+│   ├── meta-confidence.schema.json
+│   ├── architecture.schema.json
+│   ├── domain.schema.json
+│   ├── openapi-extension.schema.json
+│   ├── db-schema.schema.json
+│   ├── rules.schema.json
+│   ├── antipatterns.schema.json
+│   └── ui-spec.schema.json
+├── templates/              산출물 템플릿
+├── plugin/                 Claude Code 플러그인
+│   └── .claude/
+│       ├── skills/
+│       ├── agents/
+│       └── commands/
+├── examples/               PoC 결과
+│   └── poc-01-realworld/
+└── .claude-plugin/         사내 plugin 배포 설정
+```
+
+---
+
+## 7원칙 (헌법)
+
+1. **사상 명시**: Schema-First + Contract-First + DDD-Lite + FSD
+2. **Bottom-up Always**: Function → File → Module → System
+3. **Deterministic First, LLM Second**
+4. **File System as Memory** (단계 간 통신 = 파일)
+5. **Confidence as First-Class** (모든 산출물에 신뢰도 메타)
+6. **Human-in-the-loop** (단계마다 승인 게이트)
+7. **Single Source of Truth = Repo** (문서/플러그인은 레포 파생)
+8. **한국어 1차** (영어 약어 최소화, 산업 표준 예외)
+
+---
+
+## 현재 상태 (v1.1.0 스켈레톤)
+
+- ✅ §0~§15 plan.md 완성
+- ✅ 7대 산출물 JSON Schema 완성
+- ✅ 신뢰도 메타데이터 표준 완성
+- ✅ 디렉토리 구조 확정
+- ⏳ 마크다운/Mermaid 템플릿 (다음 단계)
+- ⏳ ADR 5개 초안 (다음 단계)
+- ⏳ 한국어 용어집 (다음 단계)
+- ⏳ Claude Code 플러그인 구현 (M3 단계)
+- ⏳ PoC 적용 (RealWorld example app, M4 단계)
+
+---
+
+## 사상적 기반
+
+| 사상 | 채택 | 출처 |
+|---|---|---|
+| Schema-First | 주축 | Microsoft TypeSpec, OpenAPI 산업 표준 |
+| Contract-First | API 영역 | Hazelcast, Technijian 등 산업 사례 |
+| DDD-Lite (B 강도) | 도메인 영역 | Eric Evans DDD, 풀 DDD 의도적 제외 |
+| FSD + Atomic Design | FE 영역 | Feature-Sliced Design, Brad Frost Atomic Design |
+
+명시적 제외:
+- Event Sourcing, CQRS, Saga, Anticorruption Layer
+- 비기능 요구사항(NFR) 측정
+- 테스트 코드 자동 분석
+
+---
+
+## 분석 입력 가변성
+
+```
+필수: 소스 코드
+선택: ERD / ORM / 운영 DB / 기획 문서 / 디자인 명세 / 설정 파일
+
+입력이 많을수록 신뢰도↑:
+- 소스만:                      평균 75%
+- 소스 + ERD:                  평균 85%
+- 소스 + ORM:                  평균 88%
+- 소스 + ORM + ERD + 운영DB:   평균 96%
+- 모든 입력:                   평균 98%
+```
+
+신뢰도 메타데이터를 모든 산출물에 명시 (`schemas/meta-confidence.schema.json`).
+
+---
+
+## 라이선스
+
+(사내 표준 — 외부 공개 시 결정)
+
+---
+
+## 기여
+
+- 변경 제안: GitHub Issue
+- 변경 적용: PR + ADR 작성
+- 방법론 자체 변경: ADR-XXX 신설 + plan.md 갱신

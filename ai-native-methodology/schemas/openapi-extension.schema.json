@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/openapi-extension.schema.json",
+  "title": "API 계약 확장 메타 (OpenAPI Extension)",
+  "description": "OpenAPI 3.1 yaml에 추가로 동반되는 우리 방법론 전용 메타. operationId 기반으로 도메인/규칙과 연결.",
+  "type": "object",
+  "required": ["meta", "openapi_file", "operations"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "openapi_file": {
+      "type": "string",
+      "description": "동반 OpenAPI 3.1 YAML 파일 경로 (예: api/openapi.yaml)"
+    },
+    "openapi_version": {
+      "type": "string",
+      "pattern": "^3\\.\\d+(\\.\\d+)?$",
+      "description": "OpenAPI 스펙 버전",
+      "default": "3.1.0"
+    },
+    "operations": {
+      "type": "array",
+      "description": "각 operationId에 대한 추가 메타데이터",
+      "items": {
+        "type": "object",
+        "required": ["operation_id"],
+        "properties": {
+          "operation_id": {
+            "type": "string",
+            "description": "OpenAPI operationId (예: createOrder)"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
+          },
+          "path": {
+            "type": "string",
+            "description": "경로 (예: /orders/{id})"
+          },
+          "related_use_case_id": {
+            "type": "string",
+            "description": "유스케이스 ID 매칭 (예: UC-ORDER-CREATE). 1:1 매핑 권장",
+            "pattern": "^UC-[A-Z0-9_-]+-[A-Z0-9_-]+$"
+          },
+          "related_rules": {
+            "type": "array",
+            "description": "이 API 호출 시 적용되는 비즈니스 규칙 ID 목록",
+            "items": {
+              "type": "string",
+              "pattern": "^BR-[A-Z0-9_-]+-\\d+$"
+            }
+          },
+          "affects_aggregates": {
+            "type": "array",
+            "description": "이 API가 변경하는 Aggregate Root ID 목록",
+            "items": {"type": "string"}
+          },
+          "reads_aggregates": {
+            "type": "array",
+            "description": "이 API가 조회하는 Aggregate Root ID 목록",
+            "items": {"type": "string"}
+          },
+          "auth_required": {
+            "type": "boolean"
+          },
+          "required_roles": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "필요 권한 (예: ADMIN, USER)"
+          },
+          "permission_expression": {
+            "type": "string",
+            "description": "권한 표현식 (예: @PreAuthorize 내용). Phase 4의 5.B/5.D에서 추출"
+          },
+          "external_dependencies": {
+            "type": "array",
+            "description": "이 API 처리 시 호출하는 외부 시스템 ID (architecture.json의 EXT-XXX)",
+            "items": {"type": "string"}
+          },
+          "ui_pages": {
+            "type": "array",
+            "description": "이 API를 호출하는 페이지 ID 목록 (ui-spec.json의 PAGE-XXX)",
+            "items": {"type": "string"}
+          },
+          "extracted_from": {
+            "type": "object",
+            "description": "추출 근거",
+            "properties": {
+              "controller_file": {"type": "string"},
+              "controller_class": {"type": "string"},
+              "controller_method": {"type": "string"},
+              "annotations_seen": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "감지된 어노테이션 (예: @PostMapping, @RequestMapping)"
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas_to_entities": {
+      "type": "array",
+      "description": "OpenAPI components.schemas와 도메인 엔티티의 매핑",
+      "items": {
+        "type": "object",
+        "required": ["openapi_schema", "entity_id"],
+        "properties": {
+          "openapi_schema": {
+            "type": "string",
+            "description": "OpenAPI components.schemas 이름 (예: OrderResponse)"
+          },
+          "entity_id": {
+            "type": "string",
+            "description": "도메인 엔티티 ID (예: E-ORDER-Order)"
+          },
+          "mapping_type": {
+            "type": "string",
+            "enum": ["direct", "dto_projection", "aggregate_view", "synthesized"]
+          }
+        }
+      }
+    }
+  }
+}

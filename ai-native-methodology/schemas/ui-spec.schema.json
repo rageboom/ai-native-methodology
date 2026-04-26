@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/ui-spec.schema.json",
+  "title": "UI/UX 명세 (UI/UX Specification)",
+  "description": "FE 영역 산출물. 페이지/사용자 흐름/컴포넌트 트리/디자인 토큰/사용자 시나리오. FSD + Atomic Design 호환.",
+  "type": "object",
+  "required": ["meta", "pages"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["react", "vue", "angular", "svelte", "next", "nuxt", "remix", "unknown"],
+      "description": "감지된 FE 프레임워크"
+    },
+    "design_system_approach": {
+      "type": "string",
+      "enum": ["atomic_design", "fsd", "feature_based", "mixed", "ad_hoc", "unknown"]
+    },
+    "pages": {
+      "type": "array",
+      "description": "페이지 인벤토리",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "route"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^PAGE-[A-Z0-9_-]+-\\d+$",
+            "description": "페이지 ID (예: PAGE-ORDER-001)"
+          },
+          "name": {
+            "type": "string",
+            "description": "페이지 이름 (예: '주문 목록')"
+          },
+          "route": {
+            "type": "string",
+            "description": "라우트 경로 (예: /orders, /orders/:id)"
+          },
+          "layout": {
+            "type": "string",
+            "description": "사용 레이아웃 (예: MainLayout, AuthLayout)"
+          },
+          "auth_required": {"type": "boolean"},
+          "required_roles": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "description": {"type": "string"},
+          "calls_apis": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "호출하는 API operationId 목록"
+          },
+          "related_use_cases": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "관련 유스케이스 ID"
+          },
+          "uses_components": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "사용 컴포넌트 ID 목록"
+          },
+          "source_file": {"type": "string"}
+        }
+      }
+    },
+    "user_flows": {
+      "type": "array",
+      "description": "사용자 흐름 (페이지 간 전이)",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "transitions"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FLOW-[A-Z0-9_-]+-\\d+$"
+          },
+          "name": {
+            "type": "string",
+            "description": "흐름 이름 (예: '주문 생성 흐름')"
+          },
+          "description": {"type": "string"},
+          "entry_page": {"type": "string"},
+          "exit_pages": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "transitions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["from", "to"],
+              "properties": {
+                "from": {"type": "string"},
+                "to": {"type": "string"},
+                "trigger": {
+                  "type": "string",
+                  "description": "전이 트리거 (예: '로그인 버튼 클릭', '결제 성공')"
+                },
+                "condition": {"type": "string"}
+              }
+            }
+          },
+          "diagram_file": {
+            "type": "string",
+            "description": "Mermaid flowchart 파일 경로"
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "컴포넌트 트리 (Atomic Design 또는 FSD)",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "level"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CMP-[A-Z0-9_-]+$"
+          },
+          "name": {"type": "string"},
+          "level": {
+            "type": "string",
+            "enum": [
+              "atom",
+              "molecule",
+              "organism",
+              "template",
+              "page",
+              "feature",
+              "entity",
+              "shared",
+              "widget",
+              "unknown"
+            ],
+            "description": "Atomic Design (atom~page) 또는 FSD (feature/entity/shared/widget) 레벨"
+          },
+          "description": {"type": "string"},
+          "uses_components": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "사용 하위 컴포넌트 ID"
+          },
+          "props_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_file": {"type": "string"},
+          "is_design_system": {
+            "type": "boolean",
+            "description": "디자인 시스템에 속한 컴포넌트인가"
+          }
+        }
+      }
+    },
+    "design_tokens": {
+      "type": "object",
+      "description": "디자인 토큰 (W3C Design Tokens 호환 권장)",
+      "properties": {
+        "extracted_from": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["tailwind_config", "css_variables", "styled_components_theme", "figma_export", "design_tokens_json", "scss_variables"]
+          }
+        },
+        "colors": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "spacing": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "typography": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "size": {"type": "string"},
+              "weight": {"type": ["string", "integer"]},
+              "line_height": {"type": "string"},
+              "family": {"type": "string"}
+            }
+          }
+        },
+        "shadows": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "borders": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        },
+        "consistency_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "디자인 시스템 일관성 점수. 낮으면 안티패턴(AP-FE-XXX)으로 등록"
+        }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "description": "사용자 시나리오 (end-to-end 사용자 경험)",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "steps"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^SCN-[A-Z0-9_-]+-\\d+$"
+          },
+          "name": {"type": "string"},
+          "actor": {
+            "type": "string",
+            "description": "사용자 유형 (예: '비로그인 사용자', '신규 가입자', '관리자')"
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["step", "action"],
+              "properties": {
+                "step": {"type": "integer"},
+                "action": {
+                  "type": "string",
+                  "description": "사용자 행동 (예: '상품 상세 페이지 진입')"
+                },
+                "page": {
+                  "type": "string",
+                  "description": "관련 페이지 ID"
+                },
+                "expected_result": {"type": "string"}
+              }
+            }
+          },
+          "related_use_cases": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "related_pages": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "related_apis": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "human_review_status": {
+            "type": "string",
+            "enum": ["pending", "confirmed", "needs_planner_review"],
+            "description": "기획자 검토 상태"
+          }
+        }
+      }
+    },
+    "diagram_files": {
+      "type": "object",
+      "properties": {
+        "site_map": {"type": "string"},
+        "user_flows": {"type": "string"},
+        "component_tree": {"type": "string"}
+      }
+    }
+  }
+}
