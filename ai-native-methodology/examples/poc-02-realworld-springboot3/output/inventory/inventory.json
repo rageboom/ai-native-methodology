@@ -1,0 +1,304 @@
+{
+  "$schema_ref": "https://ai-native-methodology/schemas/inventory.schema.json",
+  "meta": {
+    "generated_at": "2026-04-29T00:00:00Z",
+    "source_commit_sha": "93e018e9a769dadae5a80b922d649bd7c79545cd",
+    "methodology_version": "v1.1.2",
+    "inputs_used": [
+      "source_code",
+      "config_files",
+      "documentation",
+      "domain_context_md",
+      "postman_or_api_test",
+      "diagrams_other"
+    ],
+    "confidence": 0.93,
+    "confidence_breakdown": {
+      "directory_tree": {
+        "confidence": 0.98,
+        "element_count": 1,
+        "extraction_method": "deterministic"
+      },
+      "file_stats_loc": {
+        "confidence": 0.98,
+        "element_count": 92,
+        "extraction_method": "deterministic"
+      },
+      "package_manifests": {
+        "confidence": 0.98,
+        "element_count": 6,
+        "extraction_method": "deterministic"
+      },
+      "orm_detection": {
+        "confidence": 0.97,
+        "element_count": 4,
+        "extraction_method": "pattern_matching"
+      },
+      "stack_summary": {
+        "confidence": 0.92,
+        "element_count": 1,
+        "extraction_method": "llm_with_grounding"
+      },
+      "architecture_style_candidates": {
+        "confidence": 0.65,
+        "element_count": 3,
+        "extraction_method": "llm_with_grounding"
+      },
+      "modules_for_priority_analysis": {
+        "confidence": 0.92,
+        "element_count": 3,
+        "extraction_method": "llm_with_grounding"
+      }
+    },
+    "formula_version": "v1",
+    "applied_modifiers": [
+      {"name": "orm_full", "value": 0.10},
+      {"name": "domain_context_md", "value": 0.03},
+      {"name": "postman_or_api_test", "value": 0.05},
+      {"name": "diagrams_other", "value": 0.02}
+    ],
+    "applied_penalties": [],
+    "cap_applied": false,
+    "manual_override": false,
+    "human_review_required": [
+      {
+        "item_id": "architecture_style_candidates",
+        "reason": "Phase 1 cap 0.7. Pure Hexagonal 단정 회피 (Senior 정정 — core 모듈에 @Service/@Entity 사용). 확정은 Phase 3.",
+        "reviewer_role": "tech_lead"
+      }
+    ],
+    "llm_calls": 4,
+    "warnings": [
+      "core 모듈은 Spring 의존성 0 단언 정정됨 — 루트 build.gradle.kts §59~99 subprojects 블록이 모든 모듈에 spring-boot starter 강제. UserService.java 의 @Service / User.java 의 @Entity 실측. F-015 cross-validation 메인 정정 케이스 (PF-007 → F-044 격상 데이터).",
+      "architecture_style_candidates Phase 1 cap 0.7 적용. Pure Hexagonal 단정 회피.",
+      "loc_extraction_method=deterministic (cat | wc -l)."
+    ]
+  },
+  "repo": {
+    "name": "realworld-java21-springboot3",
+    "owner": "1chz",
+    "url": "https://github.com/1chz/realworld-java21-springboot3",
+    "branch": "main",
+    "license": "MIT",
+    "total_files": 119,
+    "total_loc": 4614,
+    "loc_extraction_method": "deterministic",
+    "build_tool": "gradle-kotlin-dsl",
+    "build_tool_version": {
+      "gradle_kotlin_dsl": true,
+      "version_catalog": "gradle/libs.versions.toml"
+    },
+    "primary_languages": [
+      {"lang": "java", "loc": 4614, "pct": 95.0},
+      {"lang": "kotlin_dsl", "loc": null, "pct": null, "note": "build scripts (kts) — LOC 미산정"},
+      {"lang": "yaml", "loc": null, "pct": null, "note": "application.yaml + libs.versions.toml"},
+      {"lang": "sql", "loc": null, "pct": null, "note": "schema.sql"}
+    ],
+    "modules": [
+      {
+        "id": "core",
+        "path": "module/core",
+        "kind": "library",
+        "depends_on": [],
+        "java_main": 22,
+        "java_test": 9,
+        "java_testFixtures": 4,
+        "loc_main": 1220,
+        "loc_test": 1369,
+        "loc_testFixtures": 56,
+        "annotations_observed": ["@Entity", "@Column", "@Id", "@Table", "@Service", "@RequiredArgsConstructor"],
+        "spring_dependent": true,
+        "spring_dependency_source": "root build.gradle.kts subprojects { plugins.apply(spring-boot) ; dependencies { implementation(spring-boot-starter) } }"
+      },
+      {
+        "id": "persistence",
+        "path": "module/persistence",
+        "kind": "library",
+        "depends_on": [
+          {"module": "core", "scope": "implementation"}
+        ],
+        "java_main": 17,
+        "java_test": 1,
+        "loc_main": 593,
+        "loc_test": 22,
+        "key_classes": ["*JpaRepository (Spring Data 인터페이스)", "*RepositoryAdapter (port 구현)", "ArticleSpecifications"]
+      },
+      {
+        "id": "api",
+        "path": "server/api",
+        "kind": "server-app",
+        "depends_on": [
+          {"module": "core", "scope": "compileOnly"},
+          {"module": "core", "scope": "testCompileOnly"},
+          {"module": "persistence", "scope": "runtimeOnly"}
+        ],
+        "java_main": 33,
+        "java_test": 6,
+        "loc_main": 1077,
+        "loc_test": 277,
+        "key_classes": ["*Controller (7개)", "AuthToken*", "SecurityConfiguration", "ApplicationExceptionHandler", "RealWorldApplication (main)"]
+      }
+    ]
+  },
+  "stack": {
+    "backend": {
+      "language": "Java 21",
+      "framework": "Spring Boot 3.3.0",
+      "framework_extras": [
+        "spring-boot-starter-web",
+        "spring-boot-starter-oauth2-resource-server",
+        "spring-boot-starter-data-jpa",
+        "spring-boot-starter-cache",
+        "spring-boot-p6spy 1.9.0",
+        "jakarta.persistence-api"
+      ],
+      "orm": [
+        {
+          "name": "Spring Data JPA (Hibernate, Jakarta Persistence 3.x)",
+          "confidence": 0.97,
+          "evidence": [
+            "spring-boot-starter-data-jpa (libs.versions.toml)",
+            "jakarta.persistence-api (compile dep)",
+            "@Entity / @Column / @Table / @Id (User.java 실측)",
+            "*JpaRepository (Spring Data 인터페이스 — module/persistence)",
+            "application.yaml spring.jpa.* (Phase 2 read 예정)"
+          ]
+        },
+        {
+          "name": "JPA Specifications",
+          "confidence": 0.95,
+          "evidence": [
+            "ArticleSpecifications.java (module/persistence)",
+            "JpaSpecificationExecutor extends 추정 (Phase 3 read)"
+          ]
+        },
+        {
+          "name": "Spring Cache + Caffeine",
+          "confidence": 0.95,
+          "evidence": [
+            "spring-boot-starter-cache (libs.versions.toml)",
+            "com.github.ben-manes.caffeine"
+          ]
+        },
+        {
+          "name": "p6spy SQL 모니터링",
+          "confidence": 0.95,
+          "evidence": [
+            "spring-boot-p6spy 1.9.0 (libs.versions.toml)"
+          ]
+        }
+      ],
+      "auth": {
+        "mechanism": "OAuth 2.0 Resource Server (JWT Bearer)",
+        "key_format": "RSA 비대칭 (app.key + app.pub)",
+        "decoder": "NimbusJwtDecoder (Spring Security 6 default — Phase 5 read 예정)",
+        "confidence": 0.95,
+        "evidence": [
+          "spring-boot-starter-oauth2-resource-server (server/api/build.gradle.kts)",
+          "server/api/src/main/resources/app.key",
+          "server/api/src/main/resources/app.pub",
+          "server/api/.../config/AuthToken*.java (4 클래스)"
+        ]
+      },
+      "db": "H2 (in-memory, MySQL mode) — 운영 DB 없음 (PoC 환경)",
+      "code_style": {
+        "tool": "Spotless 7.0.3",
+        "formatters": ["palantirJavaFormat (Java)", "ktlint (Kotlin DSL)"]
+      }
+    }
+  },
+  "architecture_style_candidates": [
+    {
+      "style": "modular_monolith",
+      "confidence": 0.65,
+      "evidence": [
+        "settings.gradle.kts: include(:module:core, :module:persistence, :realworld)",
+        "*Repository (interface in core) + *RepositoryAdapter (impl in persistence) — 명명 패턴",
+        "server/api: compileOnly(core) + runtimeOnly(persistence) — 컴파일 시점 의존 차단",
+        "DIP — persistence 가 core 의존, api 가 persistence runtimeOnly",
+        "Pure Hexagonal 아님: core 가 @Service/@Entity 사용, root subprojects 가 spring-boot 강제"
+      ]
+    },
+    {
+      "style": "hexagonal",
+      "confidence": 0.40,
+      "evidence": [
+        "Adapter 명명 패턴 (*RepositoryAdapter / SecurityPasswordEncoderAdapter)",
+        "core 가 Repository port (인터페이스) 정의",
+        "compileOnly + runtimeOnly 의존성 전략"
+      ]
+    },
+    {
+      "style": "layered",
+      "confidence": 0.30,
+      "evidence": [
+        "presentation (controller) → service → repository → entity 단방향 흐름",
+        "패키지 구조 module 단위 분리 외 명시적 layer 없음"
+      ]
+    }
+  ],
+  "modules_for_priority_analysis": [
+    {
+      "path": "module/core",
+      "reason": "도메인 모델 + Repository port 인터페이스 + Service — Phase 4 (도메인) 핵심 입력. 22 main 파일 / 1,220 LOC.",
+      "loc": 1220,
+      "file_count": 22
+    },
+    {
+      "path": "module/persistence",
+      "reason": "JPA Adapter + Specifications + JpaRepository — Phase 3 (architecture 의존성 방향) + Phase 6 (안티패턴) 입력. 17 main 파일 / 593 LOC.",
+      "loc": 593,
+      "file_count": 17
+    },
+    {
+      "path": "server/api",
+      "reason": "Controller (7) + Security Config (8) + JWT — Phase 5-1 (api) + Phase 6 (보안) 입력. 33 main 파일 / 1,077 LOC.",
+      "loc": 1077,
+      "file_count": 33
+    }
+  ],
+  "directory_tree_extraction": {
+    "method": "filesystem",
+    "truncated": false,
+    "total_entries": 119
+  },
+  "ground_truth_assets": {
+    "openapi_spec": {
+      "path": "api-docs/openapi.yaml",
+      "phase_5_1_input": true,
+      "note": "PoC #1 대비 강점 — Phase 5 에서 직접 작성하지 않아도 됨"
+    },
+    "postman_collection": {
+      "path": "api-docs/Conduit.postman_collection.json"
+    },
+    "api_test_script": {
+      "path": "api-docs/run-api-tests.sh"
+    },
+    "schema_sql": {
+      "path": "module/persistence/src/main/resources/schema.sql",
+      "phase_2_input": true
+    },
+    "design_principles": {
+      "path": "README.md §Considerations (12 항목)",
+      "note": "작성자 의도된 설계 원칙 — Phase 4/5/6 ground truth"
+    }
+  },
+  "comparison_with_poc_01": {
+    "domain_same": true,
+    "stack_family_same": true,
+    "deltas": {
+      "java": "11 → 21",
+      "spring_boot": "2.5.2 → 3.3.0",
+      "build_dsl": "groovy → kotlin",
+      "module_structure": "single → multi (core/persistence/api)",
+      "persistence_namespace": "javax → jakarta",
+      "auth_mechanism": "자체 JWT (HS256 21byte 하드코딩) → OAuth2 Resource Server + RSA 비대칭",
+      "cache": "없음 → Spring Cache + Caffeine",
+      "sql_monitoring": "없음 → p6spy",
+      "dynamic_query": "(없음) → JPA Specifications",
+      "code_style": "editorconfig + Sonar → Spotless palantir",
+      "test_fixtures": "src/test 만 → src/testFixtures source set"
+    },
+    "ground_truth_strength": "PoC #1 보다 강함 (openapi.yaml 직접 제공)"
+  }
+}

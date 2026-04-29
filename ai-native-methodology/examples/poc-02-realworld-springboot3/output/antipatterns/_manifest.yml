@@ -1,0 +1,191 @@
+manifest:
+  generated_at: "2026-04-29"
+  poc_id: "poc-02-realworld-springboot3"
+  phase: 6
+  phase_name: "anti-patterns final merge (quality)"
+  methodology_version: "v1.1.2"
+
+# 상위 phase 인계
+phase_4_input:
+  source: "../antipatterns-partial/antipatterns-partial.json"
+  consistency: "Phase 4 partial 6 AP → Phase 6 final 통합 (1 merged + 5 ID 정규화)"
+
+phase_5_input:
+  source: "../api/_manifest.yml.phase_6_handoff"
+  consistency: "Phase 5-1 candidate 8 AP → Phase 6 final 통합 (AP-API-001 critical 격상 + 7 유지)"
+
+phase_1_3_additional_input:
+  source: "../../findings/poc-findings.md (F-048 / F-068 / F-051 / F-053 / F-069)"
+  consistency: "Phase 1-3 누락 candidate 5 AP 신규 등록 (DEC-PHASE6-POC02-002)"
+
+# Phase 6 산출물 3종
+deliverables:
+  - file: "antipatterns.json"
+    purpose: "21 AP final + _id_normalization_mapping + _composite_view_metadata + _poc_01_cross_validation_summary"
+    schema: "schemas/antipatterns.schema.json (id pattern ^AP-[A-Z]+-\\d+$)"
+    confidence: 0.96
+    line_count: 588
+    antipatterns_count: 21
+    by_severity: "critical 3 / high 3 / medium 11 / low 4"
+  - file: "avoid-list.md"
+    purpose: "사람용 priority order (Critical/High/Medium/Low) + 4 composite view + 4 부록 (AP×REC / 검증 점검표 / 모범 사례 / PoC #01 매트릭스)"
+    confidence: 0.96
+    line_count: 397
+  - file: "_manifest.yml"
+    purpose: "Phase 6 매니페스트 (본 파일)"
+    confidence: 0.98
+
+# 결정적 처리 결과
+deterministic_results:
+  raw_fetch:
+    main_agent: 4   # antipatterns-partial + Phase 5-1 _manifest + PoC #01 antipatterns + poc-findings
+    sub_agent_document: 0  # 학습 데이터 권위 (RFC / OWASP / IDDD / Fowler / NIST / Tech Radar)
+    sub_agent_senior: 5    # antipatterns-partial + api/_manifest + poc-findings + PoC #01 antipatterns + avoid-list
+    sub_agent_case: 0      # 생략
+    total_research_lines: 640  # Document 260 + Senior 380
+  antipatterns_total: 21
+  antipatterns_critical: 3
+  antipatterns_high: 3
+  antipatterns_medium: 11
+  antipatterns_low: 4
+  composite_view_count: 4
+  poc_01_cross_validation_count: 15
+  poc_01_not_reproduced: 8     # 53%
+  poc_01_reproduced: 4          # 27%
+  poc_01_morphologically_reproduced: 3  # 20%
+  rate_limit_after_phase_6: 30  # 60 - 30
+
+# 5 핵심 결정 (research-phase6-poc02.md §4 / 윤주스 승인 2026-04-29)
+key_decisions:
+  - id: "DEC-PHASE6-POC02-001"
+    decision: "AP-API-001 critical 단일 등록 (Phase 5-1 정합)"
+    rationale: "F-070 + F-079 + F-085 단일 묶음 — RFC 7231 §4.2.2 + RFC 9110 §15.3 이중 결함. composite AP 등록 금지 (개별 결함 단위 표준), evidence 통합 + composite view §A 가독성 보전."
+    sources: ["Phase 5-1 DEC-001", "Senior §3", "Document §1.4"]
+  - id: "DEC-PHASE6-POC02-002"
+    decision: "Phase 1-3 누락 candidate 5건 등록 (★ critical 2건 + high 1건 + medium 2건)"
+    rationale: "F-048 critical (AP-DB-001 — TagJpaRepository 타입) + F-068 critical (AP-SECURITY-001 — RSA git commit / PoC #01 isomorphic) + F-051 high (AP-PERFORMANCE-001) + F-053 medium (AP-DOMAIN-003) + F-069 medium (AP-DB-003). 누락 시 PoC #02 산출물 핵심 가치 훼손."
+    sources: ["Senior §1.3 §2", "Document §1.1 §1.2"]
+  - id: "DEC-PHASE6-POC02-003"
+    decision: "ID 정규화 (multi-prefix → single)"
+    rationale: "schema id pattern ^AP-[A-Z]+-\\d+$ 강제 — Phase 4 partial multi-prefix (HEXAGONAL/CASCADE/SELF-FOLLOW/TITLE-UNIQUE) 정규화 6건. PoC #01 isomorphic. _id_normalization_mapping 표 명시."
+    sources: ["Document §5", "Senior §1.1"]
+  - id: "DEC-PHASE6-POC02-004"
+    decision: "composite view 4건 도입 (PoC #01 1건 → 4건 확장)"
+    rationale: "Hexagonal port-adapter 경계 (§B) + API 계약 결함 (§A) + JWT/Auth 보안 (§C — PoC #01 동형) + DB 데이터 무결성 (§D — PoC #02 신규 패턴화). 개별 AP 등록 거절 + avoid-list.md 가독성 섹션."
+    sources: ["Document §4", "Senior §5"]
+  - id: "DEC-PHASE6-POC02-005"
+    decision: "low candidate 3건 등록 (F-058/F-076/F-078)"
+    rationale: "AP-DOMAIN-004 (TOCTOU race-prone — educational) + AP-DOMAIN-005 (setTitle race) + AP-DOMAIN-006 (DRY editTitle/...). PoC #01 low 4건 분포 정합."
+    sources: ["Document §3", "Senior §1.4"]
+
+# 신뢰도 산정 (formula v1)
+confidence_calculation:
+  formula_version: "v1"
+  base: 0.75
+  modifiers:
+    orm_full: +0.05   # Spring Data JPA 3.x
+    domain_context_md: +0.03   # README §Considerations 12 항목
+    openapi_ground_truth: +0.07   # api-docs/openapi.yaml 802 line (PoC #01 +0.05 보다 강한 입력)
+    multi_module_arch: +0.02   # Hexagonal cross-validation 가치
+    cross_phase_aggregation: +0.03   # Phase 1~5-1 누적
+    poc_01_isomorphic_pattern: +0.02   # 15 AP cross-validation
+    schema_compliance_100: +0.01   # ^AP-[A-Z]+-\\d+$ 21/21
+  subtotal: 0.95
+  cross_validation_modifiers:
+    f015_3_consensus: +0.01   # Document + Senior 합의 (충돌 1건만)
+    f068_critical_evidence: 0.00   # PoC #01 isomorphic 강한 evidence (가산점 안전 적용)
+  raw_confidence: 0.96
+  per_area:
+    simple_merge_partial_to_final: 0.98
+    id_normalization: 0.98
+    phase_1_3_additional_candidate: 0.90
+    phase_5_candidate_merge: 0.95
+    low_candidate_decision: 0.85
+    composite_view_decision: 0.0   # human_review
+    tone_check: 0.95
+    poc_01_cross_validation: 0.92
+  expected_in_phase_0_manifest: 0.96
+  delta_from_phase_0: 0.00   # 정확 일치
+  poc_01_comparison: "0.96 (PoC #01) — 동급 ✅"
+
+# 명세 §5 + research-phase6 §9 승인 게이트 체크리스트
+approval_gate:
+  - check: "schema 검증 통과 (^AP-[A-Z]+-\\d+$ unique)"
+    status: "✅ 21/21"
+  - check: "tone check (비난 표현 0)"
+    status: "✅ — 모두 회피 후보 톤"
+  - check: "critical/high 5건 human_review_required 명시"
+    status: "✅ AP-API-001 / AP-DB-001 / AP-SECURITY-001 / AP-ARCH-001 / AP-PERFORMANCE-001"
+  - check: "composite view 별도 표기"
+    status: "✅ _composite_view_metadata 4건"
+  - check: "PoC #01 cross-validation 결과"
+    status: "✅ _poc_01_cross_validation_summary (비재현 53% / 재현 27% / 변형 재현 20%)"
+  - check: "_id_normalization_mapping 6건"
+    status: "✅ phase_4_partial + phase_5_candidate + phase_1_3_additional + low_candidate"
+  - check: "모든 AP finding_ref 양방향 cross-link"
+    status: "✅ 21/21"
+  - check: "PoC #02 산출물 6/7 도달 (UI/UX 제외 100%)"
+    status: "✅ — _phase_6_cross_validation.deliverables_completed = 6/7"
+
+# 5 핵심 결정 + 21 AP final + Phase 6 종료 (윤주스 2026-04-29 승인)
+user_decisions_2026_04_29:
+  scope_approval: "DEC-PHASE6-POC02-001 ~ 005 일괄 승인"
+  antipatterns_registration: "21 AP final (critical 3 / high 3 / medium 11 / low 4)"
+  composite_view_introduction: "4건 도입 (PoC #01 1건 → 4건 확장)"
+  poc_02_completion: "Phase 6 종료 → 7대 산출물 6/7 도달 (UI/UX 제외 100%)"
+
+# Findings (Phase 6 진행 중 발견 — 0건 / 모두 Phase 1-5 누적)
+findings_phase_6:
+  new_findings: 0   # Phase 6 = 분류/통합 작업 / 신규 발견 0
+  cross_validation_findings: |
+    - F-070 critical 격상 (Phase 5-1 결정) — Phase 6 단일 묶음 등록 (DEC-001)
+    - F-079 → F-070 merged (Phase 5-1 결정) — Phase 6 evidence 보강
+    - F-048/F-068/F-051/F-053/F-069 누락 등록 — DEC-002 (5건)
+    - F-058/F-076/F-078 low 등록 — DEC-005 (3건)
+
+# 누적 finding 통계 (Phase 6 종료 시 — 변동 없음)
+findings_cumulative:
+  poc_02_total: 43           # Phase 1~5-1 누적 / Phase 6 신규 0
+  cumulative_total: 76       # PoC #01 33 + PoC #02 43
+  closed: 10                 # PoC #01 10
+  promoted: 41               # PoC #01 10 + PoC #02 31
+  deferred: 18
+  rejected: 0
+  v120_bundles: 11           # A~K (Phase 4 J 신설 / Phase 5-1 신규 ADR 후보 묶음 G/H 보강)
+  threshold_status: "F-021 임계 76건 — 단 비중 분석으로 §8.1 정합 (PoC #02 종료 후 v1.2.0 합산 격상 / PoC #03 강제 분기 권고)"
+
+# 7대 산출물 도달 (PoC #02 종료)
+seven_deliverables_status:
+  1_architecture: "✅ Phase 3 (raw 0.92)"
+  2_domain: "✅ Phase 4 (raw 0.83)"
+  3_api: "✅ Phase 5-1 (raw 0.93 + ground truth)"
+  4_db: "✅ Phase 2 (raw 0.85)"
+  5_rules: "✅ Phase 4 (raw 0.83)"
+  6_antipatterns: "✅ Phase 6 (raw 0.96 — 본 산출)"
+  7_ui_ux: "❌ N/A (BE only — F-026 재현)"
+  deliverables_completed: 6
+  deliverables_total: 7
+  ui_ux_excluded_completion_rate: "100% (6/6)"
+
+# v1.2.0 격상 합산 데이터 (PoC #01 + PoC #02 종료 후)
+v120_bundle_status:
+  total_bundles: 11   # A~K
+  poc_01_data: "15 AP final + 33 finding (closed 10 / promoted 10 / deferred 13)"
+  poc_02_data: "21 AP final + 43 finding (closed 0 / promoted 31 / deferred 4 / candidate 8)"
+  cumulative_ap: 36   # PoC #01 15 + PoC #02 21
+  cumulative_finding: 76   # PoC #01 33 + PoC #02 43
+  bundles_with_external_validation:
+    - "묶음 A (cross-validation F-015) — F-044 보강 ★"
+    - "묶음 D (schema 진화 F-025) — multi-module 표현 + Hexagonal 모듈 분리"
+    - "묶음 G (OpenAPI x-extension ADR-007) — PoC #02 외부 검증 ✅"
+    - "묶음 H (Auth/Crypto 검증) — PoC #01 + PoC #02 isomorphic evidence 강력 ★★★"
+    - "묶음 J (Hexagonal port-adapter) — PoC #02 단독 신규 (F-075) ★"
+    - "묶음 K (multi-module Outside-in 모범 사례) — F-064/F-065/F-066 positive findings"
+
+# PoC #02 종료 — 다음 단계 (윤주스 결정 영역)
+next_actions:
+  - "PROGRESS-poc02-phase6.md T+1~ 시간순 마감"
+  - "findings/poc-findings.md Phase 6 KPI 평가 + 종료 통계 갱신"
+  - "memory 갱신 (project_poc02_workflow.md → 7대 산출물 6/7 도달 표기)"
+  - "다음 단계 결정 — 옵션 A (v1.2.0 합산 격상 진행) vs 옵션 B (PoC #03 진입 후 합산 격상)"
+  - "PoC #03 stack 결정 영역 (FastAPI / NestJS / Ktor 등)"

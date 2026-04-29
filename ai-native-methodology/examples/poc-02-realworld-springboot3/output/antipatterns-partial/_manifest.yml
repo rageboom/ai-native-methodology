@@ -1,0 +1,47 @@
+manifest:
+  generated_at: "2026-04-29"
+  poc_id: "poc-02-realworld-springboot3"
+  phase: 4
+  phase_name: "비즈니스 로직 — antipatterns-partial"
+  methodology_version: "v1.1.2"
+  caveat: "Phase 4 partial — Phase 6 에서 전체 통합 + severity 재산정"
+
+deliverables:
+  - file: "antipatterns-partial.json"
+    confidence: 0.83
+  - file: "_manifest.yml"
+    confidence: 0.95
+
+antipatterns_summary:
+  phase_4_count: 6
+  by_severity:
+    high: 3  # AP-API-IDEMPOTENCY-001 (F-070) / AP-HEXAGONAL-001 (F-071) / AP-DOMAIN-TITLE-UNIQUE-001 (F-052)
+    medium: 3  # AP-HEXAGONAL-002 (F-072) / AP-DB-CASCADE-001 (F-073) / AP-DOMAIN-SELF-FOLLOW-001 (F-074)
+  by_category:
+    API: 1
+    ARCH: 2
+    DB: 1
+    DOMAIN: 2
+
+phase_6_merge_targets:
+  phase_2_anti_patterns:
+    - "F-048 critical TagJpaRepository 타입 오류"
+    - "F-051 high EAGER + Specification + Pageable HHH000104"
+    - "F-052 high title unique over-constraint (이미 본 phase 등록 — 통합 필요)"
+    - "F-053 medium titleToSlug 8 함정"
+    - "F-054 medium email RFC 5321"
+    - "F-055 medium varchar 한국어"
+    - "F-056 medium password Argon2"
+    - "F-057 medium UUID + Integer 혼재"
+    - "F-058 low TOCTOU"
+  phase_3_anti_patterns:
+    - "F-059 medium boundary 도구 부재"
+    - "F-063 medium Split Package smell"
+    - "F-067 low Adapter package-private"
+  phase_4_partial:
+    - "AP-API-IDEMPOTENCY-001 high (F-070)"
+    - "AP-HEXAGONAL-001 high (F-071)"
+    - "AP-HEXAGONAL-002 medium (F-072)"
+    - "AP-DB-CASCADE-001 medium (F-073)"
+    - "AP-DOMAIN-SELF-FOLLOW-001 medium (F-074)"
+    - "AP-DOMAIN-TITLE-UNIQUE-001 high (F-052 — 본 phase 등록 / Phase 2 합산)"

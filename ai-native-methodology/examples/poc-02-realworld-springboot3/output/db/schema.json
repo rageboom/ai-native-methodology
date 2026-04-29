@@ -1,0 +1,313 @@
+{
+  "$schema_ref": "../../../../../schemas/db-schema.schema.json",
+  "meta": {
+    "generated_at": "2026-04-29T00:00:00Z",
+    "source_commit_sha": "93e018e9a769dadae5a80b922d649bd7c79545cd",
+    "source_branch": "main",
+    "extraction_env": "filesystem",
+    "methodology_version": "v1.1.2",
+    "formula_version": "v1",
+    "inputs_used": ["source_code", "orm"],
+    "applied_modifiers": [],
+    "applied_penalties": [
+      {"name": "single_source_only", "value": 0, "reason": "schema.sql 이 Hibernate auto-generated DDL (FK/UQ 제약명 100% NamingHelper hash 패턴) → 사실상 출처 1종 (ORM). 명세 §6 `테이블/컬럼 식별 소스만 0.85` 적용."}
+    ],
+    "raw_confidence": 0.85,
+    "cap_applied": false,
+    "manual_override": false,
+    "expected_confidence_average": 0.85,
+    "confidence_breakdown": {
+      "table_identification": {
+        "confidence": 0.98,
+        "element_count": 7,
+        "extraction_method": "deterministic"
+      },
+      "column_identification": {
+        "confidence": 0.95,
+        "element_count": 41,
+        "extraction_method": "deterministic"
+      },
+      "pk_identification": {
+        "confidence": 0.98,
+        "element_count": 7,
+        "extraction_method": "deterministic"
+      },
+      "fk_relationships": {
+        "confidence": 0.95,
+        "element_count": 9,
+        "extraction_method": "deterministic"
+      },
+      "unique_constraints": {
+        "confidence": 0.92,
+        "element_count": 6,
+        "extraction_method": "deterministic"
+      },
+      "consistency_check": {
+        "confidence": 0.50,
+        "element_count": 0,
+        "extraction_method": "deterministic",
+        "caveat": "출처 의존성 — schema.sql 이 ORM derivative. 정합성 검증 의미 약화 (DEC-PHASE2-POC02-001)"
+      },
+      "database_type_detection": {
+        "confidence": 0.95,
+        "element_count": 1,
+        "extraction_method": "pattern_matching"
+      }
+    },
+    "human_review_required": [
+      {
+        "item_id": "schema_sql_origin",
+        "reason": "schema.sql 의 9 FK + 3 UQ 제약명이 Hibernate `NamingHelper.generateHashedFkName` MD5 hash 패턴 (예: `fkmjgtny2i22jf4dqncmd436s0u`). schema.sql = ORM 자동 생성 derivative 확정. JPA Entity 가 SoT 단일.",
+        "reviewer_role": "tech_lead",
+        "status": "resolved (Auto Mode 자율 — DEC-PHASE2-POC02-001)"
+      },
+      {
+        "item_id": "PF-PHASE2-META-001",
+        "reason": "v1.1.2 §3.4 Decision Tree 가 'DDL 출처가 ORM auto-generated 인지 manual 작성인지' 분별 절차 부재 (Q3 누락). closed 항목 F-016 첫 외부 검증 한계 노출.",
+        "reviewer_role": "methodology_owner",
+        "status": "promoted (v1.2.0 격상 묶음 — finding-system closed→reopened 절차 정식화 권고)"
+      },
+      {
+        "item_id": "PF-P2-005",
+        "reason": "TagJpaRepository extends JpaRepository<Tag, Integer> 인데 Tag.@Id = String → 타입 파라미터 오류 critical. 현재 미발현 (findAll/saveAll 만 사용) 이지만 후속 개발자 findById(Integer) 추가 시 ClassCastException.",
+        "reviewer_role": "tech_lead",
+        "status": "promoted (사내 적용 시 1글자 fix 필수)"
+      }
+    ],
+    "llm_calls": 4,
+    "warnings": [
+      "schema.sql 출처 의존성 — Hibernate auto-generated derivative. 정합성 검증 의미 약화 (caveat 명시).",
+      "운영 DB / Migration 도구 / ERD 부재 → 입력 출처 사실상 1종 (ORM 단일).",
+      "Phase 6 합산 candidate 11건 — _manifest.yml findings_phase_2 참조."
+    ]
+  },
+  "database_type": "h2",
+  "database_type_runtime": "h2",
+  "database_mode": "MYSQL",
+  "schema_name": "PUBLIC",
+  "tables": [
+    {
+      "name": "users",
+      "description": "회원 (Auth + Profile aggregate root). User aggregate root.",
+      "related_entity_id": "E-USER-User",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"], "description": "Hibernate 6 GenerationType.UUID (Jakarta 3.1 신규)"},
+        {"name": "email", "type": "VARCHAR(30)", "nullable": false, "sources": ["orm", "migration"], "description": "UNIQUE — F-054 RFC 5321 위반 (권장 254/320)"},
+        {"name": "username", "type": "VARCHAR(30)", "nullable": false, "sources": ["orm", "migration"], "description": "UNIQUE — F-055 한국어 환경 부족"},
+        {"name": "password", "type": "VARCHAR(200)", "nullable": false, "sources": ["orm", "migration"], "description": "BCrypt 60자 충분 / Argon2 도입 시 부족 (F-056)"},
+        {"name": "bio", "type": "VARCHAR(500)", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "image_url", "type": "VARCHAR(200)", "nullable": true, "sources": ["orm", "migration"], "description": "URL 길이 부족 — 권장 2048 (CDN URL 환경)"},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "indexes": [
+        {"name": "uk_users_email_implicit", "columns": ["email"], "unique": true, "type": "btree"},
+        {"name": "uk_users_username_implicit", "columns": ["username"], "unique": true, "type": "btree"}
+      ],
+      "check_constraints": []
+    },
+    {
+      "name": "article",
+      "description": "Article aggregate root. RealWorld API 의 콘텐츠 단위.",
+      "related_entity_id": "E-ARTICLE-Article",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "INTEGER (identity)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"], "description": "GenerationType.IDENTITY"},
+        {"name": "author_id", "type": "UUID", "nullable": false, "sources": ["orm", "migration"], "description": "FK users(id) — F-057 PK FK 타입 혼재 (UUID 16byte + INT 4byte)"},
+        {"name": "slug", "type": "VARCHAR(50)", "nullable": false, "sources": ["orm", "migration"], "description": "UNIQUE — RealWorld spec 정합 (URL 식별자)"},
+        {"name": "title", "type": "VARCHAR(50)", "nullable": false, "sources": ["orm", "migration"], "description": "UNIQUE — F-052 over-constraint anti-pattern (RealWorld spec 미명세 / Medium/Velog/Brunch 어디도 없음). F-055 한국어 50자 부족."},
+        {"name": "description", "type": "VARCHAR(50)", "nullable": false, "sources": ["orm", "migration"], "description": "F-055 한국어 50자 부족"},
+        {"name": "content", "type": "VARCHAR(1000)", "nullable": false, "sources": ["orm", "migration"]},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]},
+        {"name": "updated_at", "type": "TIMESTAMP(6)", "nullable": true, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        {
+          "name": "fkmjgtny2i22jf4dqncmd436s0u",
+          "columns": ["author_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ],
+      "indexes": [
+        {"name": "uk_article_slug_implicit", "columns": ["slug"], "unique": true, "type": "btree"},
+        {"name": "uk_article_title_implicit", "columns": ["title"], "unique": true, "type": "btree", "caveat": "F-052 over-constraint"}
+      ],
+      "check_constraints": []
+    },
+    {
+      "name": "article_comment",
+      "description": "Article 의 댓글 (별도 Aggregate).",
+      "related_entity_id": "E-ARTICLE-ArticleComment",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "INTEGER (identity)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"]},
+        {"name": "article_id", "type": "INTEGER", "nullable": false, "sources": ["orm", "migration"]},
+        {"name": "author_id", "type": "UUID", "nullable": false, "sources": ["orm", "migration"]},
+        {"name": "content", "type": "VARCHAR(500)", "nullable": false, "sources": ["orm", "migration"]},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        {
+          "name": "fkghmocqkgqs5tkmucf5putw64t",
+          "columns": ["article_id"],
+          "references_table": "article",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "name": "fkr6n3iwt28icgmsn2bnargxqd1",
+          "columns": ["author_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ],
+      "check_constraints": []
+    },
+    {
+      "name": "article_tag",
+      "description": "Article ↔ Tag M:N 명시적 junction entity (Vlad/우형/카카오 권장 패턴 — @ManyToMany 회피).",
+      "related_entity_id": "E-ARTICLE-ArticleTag",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "INTEGER (identity)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"]},
+        {"name": "article_id", "type": "INTEGER", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "tag_name", "type": "VARCHAR(20)", "nullable": true, "sources": ["orm", "migration"], "description": "FK tag(name) — 자연키"},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        {
+          "name": "fkenqeees0y8hkm7x1p1ittuuye",
+          "columns": ["article_id"],
+          "references_table": "article",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "name": "fk27dk3xr3kdb606oobk5yn7m1c",
+          "columns": ["tag_name"],
+          "references_table": "tag",
+          "references_columns": ["name"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ],
+      "indexes": [
+        {"name": "uk6mf7aqqemxogkbdi5j1407ehg", "columns": ["article_id", "tag_name"], "unique": true, "type": "btree"}
+      ],
+      "check_constraints": []
+    },
+    {
+      "name": "article_favorite",
+      "description": "Article 의 favorite (좋아요) — 명시적 junction entity.",
+      "related_entity_id": "E-ARTICLE-ArticleFavorite",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "INTEGER (identity)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"]},
+        {"name": "article_id", "type": "INTEGER", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "user_id", "type": "UUID", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        {
+          "name": "fkb8vit5sr2sivwocuy4qxatn8c",
+          "columns": ["article_id"],
+          "references_table": "article",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "name": "fk8m1q6r31lmkejfp8l8eka6n93",
+          "columns": ["user_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ],
+      "indexes": [
+        {"name": "ukpatixq7onikvvq0vw8cg039fu", "columns": ["user_id", "article_id"], "unique": true, "type": "btree"}
+      ],
+      "check_constraints": []
+    },
+    {
+      "name": "tag",
+      "description": "Tag entity — String 자연키 PK (의도적 단순화). Stack Overflow 와 다른 패턴 (rename/merge 운영 기능 부재).",
+      "related_entity_id": "E-ARTICLE-Tag",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "name", "type": "VARCHAR(20)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"], "description": "자연키 PK. Tag entity setter 부재 → immutable (안전)"},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["name"],
+      "check_constraints": []
+    },
+    {
+      "name": "user_follow",
+      "description": "단방향 follow relationship (follower → following). RealWorld spec 정합.",
+      "related_entity_id": "E-USER-UserFollow",
+      "sources": ["orm", "migration"],
+      "columns": [
+        {"name": "id", "type": "INTEGER (identity)", "nullable": false, "is_primary_key": true, "sources": ["orm", "migration"]},
+        {"name": "follower_id", "type": "UUID", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "following_id", "type": "UUID", "nullable": true, "sources": ["orm", "migration"]},
+        {"name": "created_at", "type": "TIMESTAMP(6)", "nullable": false, "sources": ["orm", "migration"]}
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        {
+          "name": "fki9gqdjcgtclgypxp2krye61n7",
+          "columns": ["follower_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        },
+        {
+          "name": "fk474orxbed564dk0mvggvt4xon",
+          "columns": ["following_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "on_delete": "NO ACTION",
+          "on_update": "NO ACTION"
+        }
+      ],
+      "indexes": [
+        {"name": "ukp8vhuhxu2u1fm8qg7hvn4y1gs", "columns": ["follower_id", "following_id"], "unique": true, "type": "btree", "description": "DRIFT-002 (PoC #01) 비재현 — 단방향 의도가 schema 와 entity 양쪽에 명시"}
+      ],
+      "check_constraints": []
+    }
+  ],
+  "stored_procedures": [],
+  "views": [],
+  "consistency_report_file": "정합성-검증-보고서.md",
+  "diagram_files": {
+    "erd": "erd.mermaid"
+  },
+  "comparison_with_poc_01": {
+    "domain_same": true,
+    "stack_family_same": true,
+    "schema_deltas": {
+      "user_pk": "BIGSERIAL → UUID (Hibernate 6 GenerationType.UUID)",
+      "article_id": "BIGSERIAL → INTEGER identity",
+      "user_followings_pk": "복합 PK → 단일 surrogate id + UQ(follower, following)",
+      "user_email_unique": "DB unique 부재 → DB unique + JPA @Column unique=true (DRIFT-010 해소)",
+      "article_unique": "(author_id, slug) DDL 만 → JPA @Column unique=true. 단 title 추가 unique (over-constraint F-052)",
+      "embeddable_count": "7 → 0 (본 PoC entity 가 flat — VO 추출 가능성 Phase 4)",
+      "tag_design": "Tag(id BIGSERIAL, value UNIQUE) → Tag(name VARCHAR(20) PK) 자연키",
+      "junction_entity": "@ManyToMany 추정 → ArticleTag explicit junction entity (Vlad 권장)"
+    }
+  }
+}

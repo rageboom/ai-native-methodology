@@ -1,0 +1,94 @@
+{
+  "$schema_ref": "../../../../../schemas/antipatterns.schema.json",
+  "meta": {
+    "generated_at": "2026-04-29T00:00:00Z",
+    "phase": 4,
+    "phase_name": "antipatterns-partial — Phase 6 합산 대비",
+    "methodology_version": "v1.1.2",
+    "raw_confidence": 0.83,
+    "warnings": [
+      "본 산출은 Phase 4 partial — Phase 6 에서 전체 통합 + severity 재산정",
+      "Phase 1/2/3 에서 누적된 anti-pattern candidate 도 Phase 6 합산 대상"
+    ]
+  },
+  "antipatterns_partial": [
+    {
+      "id": "AP-API-IDEMPOTENCY-001",
+      "title": "favorite/unfavorite RFC 7231 idempotency 위반",
+      "severity": "high",
+      "category": "API",
+      "evidence_files": ["ArticleService.java:184-204"],
+      "violation": "RFC 7231 §4.2.2 — DELETE (unfavorite) idempotent MUST 위반. POST (favorite) 도 follow 와 의미 비대칭",
+      "consequence": "모바일 클라이언트 retry 정책 분기 → race condition 시 alert 폭증 (Senior production 사례)",
+      "fix": "favorite/unfavorite 모두 silent return + 200 OK (follow/unfollow 패턴 정합)",
+      "finding_ref": "F-070",
+      "industry_reference": ["GitHub PUT /user/starred (정합)", "Twitter POST favorites/create (2018 deprecated)"]
+    },
+    {
+      "id": "AP-HEXAGONAL-001",
+      "title": "UserRepositoryAdapter 가 도메인 검증 + encryptPassword 호출 (port-adapter 경계 위반)",
+      "severity": "high",
+      "category": "ARCH",
+      "evidence_files": ["UserRepositoryAdapter.java:65-83"],
+      "violation": "Wikipedia Hex Arch + Cockburn (2005) + Vernon IDDD Ch. 4 — adapter = protocol translation only. 본 PoC adapter 가 (1) email/username unique 도메인 검증 (2) PasswordEncoder 인자 흡수 + encryptPassword 호출 (3) TOCTOU race window",
+      "fix": "UserService.updateUserDetails 가 도메인 검증 + encryptPassword 호출, Adapter 는 단순 save 만",
+      "finding_ref": "F-071"
+    },
+    {
+      "id": "AP-HEXAGONAL-002",
+      "title": "ArticleRepositoryAdapter 가 multi-aggregate delete orchestration",
+      "severity": "medium",
+      "category": "ARCH",
+      "evidence_files": ["ArticleRepositoryAdapter.java:86-89"],
+      "violation": "adapter 가 multi-aggregate 삭제 orchestration (deleteByArticle comments → delete article) 들고 있음 + favorite/tag 미삭제 orphan row",
+      "fix": "ArticleService 가 multi-aggregate orchestration / Adapter 단순 save/delete",
+      "finding_ref": "F-072",
+      "related": "F-071 같은 줄기 (port-adapter 경계 misuse)"
+    },
+    {
+      "id": "AP-DB-CASCADE-001",
+      "title": "Article delete CASCADE 부재 + Service 부분 처리 → ArticleFavorite/ArticleTag orphan row",
+      "severity": "medium",
+      "category": "DB",
+      "evidence_files": ["schema.sql FK ON DELETE 미명시", "ArticleRepositoryAdapter.java:86-89"],
+      "violation": "FK 9건 모두 ON DELETE 미명시 (NO ACTION default) + Service 가 article_comment 만 명시 처리, article_tag/article_favorite 처리 부재",
+      "fix": "FK ON DELETE CASCADE 명시 OR Service 가 명시적 multi-step delete",
+      "finding_ref": "F-073",
+      "related": "F-072 (Adapter orchestration), AP-DB-001 (PoC #01 NO ACTION)"
+    },
+    {
+      "id": "AP-DOMAIN-SELF-FOLLOW-001",
+      "title": "self-follow 금지 코드 부재 (RealWorld 묵시 위반)",
+      "severity": "medium",
+      "category": "DOMAIN",
+      "evidence_files": ["UserRelationshipService.java:26-32"],
+      "violation": "follower == following 동등 검증 부재. self-follow 시 getFeeds() 자기 글 노출",
+      "fix": "UserRelationshipService.follow 에 follower.equals(following) 검증 추가",
+      "finding_ref": "F-074",
+      "poc_01_comparison": "PoC #01 동일 패턴 (BR-USER-FOLLOW-NO-SELF-001 promoted)"
+    },
+    {
+      "id": "AP-DOMAIN-TITLE-UNIQUE-001",
+      "title": "article.title varchar(50) unique over-constraint",
+      "severity": "high",
+      "category": "DOMAIN",
+      "evidence_files": ["schema.sql:9", "Article.java:40-41"],
+      "violation": "Medium/Velog/Brunch/WordPress/RealWorld spec 어디도 title 글로벌 unique 없음. 운영 출시 즉시 흔한 제목 등록 실패",
+      "fix": "title unique 제거 + slug unique 만 유지 (PoC #01 패턴)",
+      "finding_ref": "F-052"
+    }
+  ],
+  "antipatterns_partial_phase_4_count": 6,
+  "phase_6_handoff": {
+    "additional_candidates_to_merge": [
+      "F-048 critical TagJpaRepository<Tag, Integer> 타입 오류 (Phase 2)",
+      "F-051 high Article EAGER + Specification + Pageable HHH000104 (Phase 2)",
+      "F-053 medium titleToSlug 8 함정 (Phase 2)",
+      "F-058 low TOCTOU race-prone (Phase 2)",
+      "F-076 low Article.setTitle race",
+      "F-078 low DRY 위반 (editTitle/Description/Content)"
+    ],
+    "phase_1_2_3_anti_patterns": "11건 (Phase 2 7건 + Phase 3 4건)",
+    "expected_phase_6_total": "약 15~20건 (Phase 4 6건 + 기존 11건 통합 + 추가 candidate 6건)"
+  }
+}

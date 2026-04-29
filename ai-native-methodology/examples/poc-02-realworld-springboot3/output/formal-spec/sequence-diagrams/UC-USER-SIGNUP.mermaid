@@ -1,0 +1,82 @@
+%% PoC #02 — UC-USER-SIGNUP Sequence Diagram (Phase 4.5 Sprint 1)
+%% 일자: 2026-04-29
+%% Source of Truth: 코드 (UserService.signup + User constructor + UserRepositoryAdapter.save)
+%% Direction: B (코드 → L1) + A 통합 (rules.json BR-USER-EMAIL-UNIQUE-001)
+%% 관련 UC: UC-USER-SIGNUP / 관련 BR: BR-USER-EMAIL-UNIQUE-001 / BR-USER-USERNAME-UNIQUE-001 / BR-USER-PASSWORD-ENCRYPTED-001
+
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Controller as UserController
+    participant Service as UserService
+    participant Domain as User<br/>(domain entity)
+    participant Encoder as BCryptPasswordEncoder
+    participant Adapter as UserRepositoryAdapter
+    participant JPA as UserJpaRepository
+    participant DB as PostgreSQL/H2<br/>users 테이블
+
+    Client->>Controller: POST /api/users<br/>{email, username, password}
+    Controller->>Service: signup(UserRegistry)
+
+    rect rgb(255, 240, 230)
+        Note over Service,Adapter: ★ F-058 App pre-check (1중 race-prone)
+        Service->>Adapter: existsBy(email, username)
+        Adapter->>JPA: existsByEmailOrUsername(email, username)
+        JPA->>DB: SELECT 1 FROM users<br/>WHERE email=? OR username=?
+        DB-->>JPA: result
+        JPA-->>Adapter: boolean
+        Adapter-->>Service: boolean
+
+        alt 이미 존재
+            Service-->>Controller: throw IllegalArgumentException<br/>"email or username is already exists"
+            Controller-->>Client: 400 Bad Request
+        end
+    end
+
+    rect rgb(230, 240, 255)
+        Note over Service,Domain: 도메인 검증 (Refinement Type)
+        Service->>Domain: new User(email, username, password)
+
+        alt email == null or blank
+            Domain-->>Service: throw IAE "email must not be null or blank"
+        else username == null or blank
+            Domain-->>Service: throw IAE "username must not be null or blank"
+        else password == null or blank
+            Domain-->>Service: throw IAE "password must not be null or blank"
+        end
+
+        Domain-->>Service: User instance (unvalidated password)
+    end
+
+    rect rgb(230, 255, 230)
+        Note over Service,Encoder: BR-USER-PASSWORD-ENCRYPTED-001
+        Service->>Domain: requester.encryptPassword(passwordEncoder, plainPassword)
+        Domain->>Encoder: encode(plainPassword)
+        Encoder-->>Domain: $2a$... (BCrypt hash)
+        Note over Domain: User.password ← encrypted
+    end
+
+    rect rgb(255, 230, 240)
+        Note over Service,DB: ★ DB UQ 제약 (2중 race-safe)
+        Service->>Adapter: save(user)
+        Adapter->>JPA: save(user)
+        JPA->>DB: INSERT INTO users (...)<br/>VALUES (...)
+
+        alt UQ violation (race window)
+            DB-->>JPA: ConstraintViolationException
+            JPA-->>Adapter: DataIntegrityViolationException
+            Adapter-->>Service: 예외 (현재 코드 미처리)
+            Service-->>Controller: 500 Internal Error<br/>★ F-058 race window 결함
+        else INSERT 성공
+            DB-->>JPA: 1 row inserted
+            JPA-->>Adapter: User (persisted)
+            Adapter-->>Service: User
+            Service-->>Controller: User
+            Controller-->>Client: 201 Created<br/>{user: {email, username, ...}}
+        end
+    end
+
+    Note over Client,DB: ★ Race Safety 분석
+    Note over Client,DB: App existsBy 단독 = 1중 race-prone (F-058)
+    Note over Client,DB: DB UQ 단독 = 1중 race-safe (필수)
+    Note over Client,DB: 현재 = 2중 (App pre + DB UQ) 단 App 측 race window 무처리

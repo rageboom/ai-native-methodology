@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "generated_at": "2026-04-29T00:00:00Z",
+    "extraction_method": "deterministic",
+    "tools": ["find", "wc -l", "awk"],
+    "exclusions": [".git", "build", ".gradle", "gradle/wrapper"],
+    "source_commit_sha": "93e018e9a769dadae5a80b922d649bd7c79545cd"
+  },
+  "totals": {
+    "files": 119,
+    "java_files": 92,
+    "java_loc": 4614,
+    "java_bytes": 159300
+  },
+  "by_extension": {
+    "java": 92,
+    "kts": 5,
+    "md": 4,
+    "yaml": 3,
+    "txt": 1,
+    "toml": 1,
+    "sql": 1,
+    "sh": 1,
+    "pub": 1,
+    "properties": 1,
+    "png": 1,
+    "key": 1,
+    "json": 1,
+    "ico": 1,
+    "gitignore": 1
+  },
+  "by_module": {
+    "module/core": {
+      "kind": "library",
+      "depends_on": [],
+      "java_main": 22,
+      "java_test": 9,
+      "java_testFixtures": 4,
+      "loc_main": 1220,
+      "loc_test": 1369,
+      "loc_testFixtures": 56,
+      "total_java": 35,
+      "total_loc": 2645,
+      "package_root": "io.zhc1.realworld",
+      "subpackages": ["model", "service"]
+    },
+    "module/persistence": {
+      "kind": "library",
+      "depends_on": [{"module": "core", "scope": "implementation"}],
+      "java_main": 17,
+      "java_test": 1,
+      "java_testFixtures": 0,
+      "loc_main": 593,
+      "loc_test": 22,
+      "loc_testFixtures": 0,
+      "total_java": 18,
+      "total_loc": 615,
+      "package_root": "io.zhc1.realworld",
+      "subpackages": ["config", "persistence"]
+    },
+    "server/api": {
+      "kind": "server-app",
+      "depends_on": [
+        {"module": "core", "scope": "compileOnly"},
+        {"module": "core", "scope": "testCompileOnly"},
+        {"module": "persistence", "scope": "runtimeOnly"}
+      ],
+      "java_main": 33,
+      "java_test": 6,
+      "java_testFixtures": 0,
+      "loc_main": 1077,
+      "loc_test": 277,
+      "loc_testFixtures": 0,
+      "total_java": 39,
+      "total_loc": 1354,
+      "package_root": "io.zhc1.realworld",
+      "subpackages": ["api", "api.request", "api.response", "config", "mixin"]
+    }
+  },
+  "by_source_set_aggregated": {
+    "main": {"java_files": 72, "loc": 2890, "share_pct": 62.6},
+    "test": {"java_files": 16, "loc": 1668, "share_pct": 36.2},
+    "testFixtures": {"java_files": 4, "loc": 56, "share_pct": 1.2}
+  },
+  "module_avg_loc_per_file": {
+    "module/core_main": 55.5,
+    "module/persistence_main": 34.9,
+    "server/api_main": 32.6,
+    "comment": "core 모듈 main 평균이 가장 높음 (도메인 모델 = entity + service 의 boilerplate 비율 ↑)"
+  },
+  "non_java_assets": {
+    "ground_truth": {
+      "api-docs/openapi.yaml": "Phase 5-1 ground truth",
+      "api-docs/Conduit.postman_collection.json": "Phase 5-1 검증",
+      "api-docs/run-api-tests.sh": "E2E test 스크립트",
+      "module/persistence/src/main/resources/schema.sql": "Phase 2 ground truth"
+    },
+    "config": {
+      "server/api/src/main/resources/application.yaml": "Phase 2 read 필수",
+      "module/persistence/src/main/resources/application.yaml": "Phase 2 read 필수",
+      "gradle/libs.versions.toml": "version catalog"
+    },
+    "secrets": {
+      "server/api/src/main/resources/app.key": "RSA 비밀키 (Phase 6 보안 분석)",
+      "server/api/src/main/resources/app.pub": "RSA 공개키"
+    }
+  },
+  "comparison_with_poc_01": {
+    "poc_01_total_java_loc_estimate": "약 5,800 LOC (PoC #1 inventory.json — 추정)",
+    "poc_02_total_java_loc": 4614,
+    "delta_loc_pct": "약 -20%",
+    "interpretation": "본 레포가 PoC #1 보다 작음 — multi-module 설계로 boilerplate 제거 + JPA Specifications 로 동적 쿼리 일원화"
+  }
+}

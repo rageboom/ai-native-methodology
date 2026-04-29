@@ -1,0 +1,73 @@
+%% PoC #02 — DB ERD (Phase 2)
+%% 생성일: 2026-04-29
+%% 출처: schema.sql (Hibernate auto-generated derivative) + JPA Entity 7건 직접 read
+%% 통합 우선순위: ORM 단일 (DEC-PHASE2-POC02-001)
+%% DRIFT 0건 (출처 1종 — 정합성 검증 보고서 caveat 참조)
+%% PoC #01 비교: User PK BIGSERIAL → UUID / user_followings 복합 PK → user_follow surrogate id + UQ
+erDiagram
+    users ||--o{ article : "author (NO ACTION ⚠️)"
+    users ||--o{ article_comment : "author (NO ACTION ⚠️)"
+    users ||--o{ article_favorite : "user (NO ACTION ⚠️)"
+    users ||--o{ user_follow : "follower (NO ACTION ⚠️)"
+    users ||--o{ user_follow : "following (NO ACTION ⚠️)"
+
+    article ||--o{ article_comment : "article (NO ACTION ⚠️)"
+    article ||--o{ article_tag : "article (NO ACTION ⚠️)"
+    article ||--o{ article_favorite : "article (NO ACTION ⚠️)"
+
+    tag ||--o{ article_tag : "tag (NO ACTION ⚠️)"
+
+    users {
+        UUID id PK "Hibernate 6 GenerationType.UUID ★"
+        VARCHAR_30 email "UNIQUE — F-054 RFC 5321 위반"
+        VARCHAR_30 username "UNIQUE — F-055 한국어 부족"
+        VARCHAR_200 password "F-056 Argon2 도입 시 부족"
+        VARCHAR_500 bio "nullable"
+        VARCHAR_200 image_url "nullable — URL 길이 부족"
+        TIMESTAMP created_at "NOT NULL"
+    }
+
+    article {
+        INTEGER id PK "GenerationType.IDENTITY"
+        UUID author_id FK "NO ACTION ⚠️ / F-057 PK 타입 혼재"
+        VARCHAR_50 slug "UNIQUE — RealWorld spec 정합"
+        VARCHAR_50 title "UNIQUE — F-052 over-constraint ★"
+        VARCHAR_50 description "F-055 한국어 부족"
+        VARCHAR_1000 content "NOT NULL"
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    article_comment {
+        INTEGER id PK
+        INTEGER article_id FK "NO ACTION ⚠️"
+        UUID author_id FK "NO ACTION ⚠️"
+        VARCHAR_500 content "NOT NULL"
+        TIMESTAMP created_at
+    }
+
+    article_tag {
+        INTEGER id PK "explicit junction entity ★ (Vlad/우형 권장)"
+        INTEGER article_id FK "UQ(article_id, tag_name)"
+        VARCHAR_20 tag_name FK
+        TIMESTAMP created_at
+    }
+
+    article_favorite {
+        INTEGER id PK "explicit junction entity"
+        INTEGER article_id FK "UQ(user_id, article_id)"
+        UUID user_id FK
+        TIMESTAMP created_at
+    }
+
+    tag {
+        VARCHAR_20 name PK "자연키 (의도적 단순화)"
+        TIMESTAMP created_at
+    }
+
+    user_follow {
+        INTEGER id PK "DRIFT-002 (PoC #01) 비재현 — surrogate id + UQ"
+        UUID follower_id FK "UQ(follower_id, following_id)"
+        UUID following_id FK
+        TIMESTAMP created_at
+    }

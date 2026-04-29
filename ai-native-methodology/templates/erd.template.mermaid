@@ -8,77 +8,77 @@ erDiagram
     %% 사용자 도메인
     %% ====================================
     USERS {
-        UUID id PK
-        VARCHAR email UK
-        VARCHAR password_hash
-        VARCHAR display_name
-        DATE birth_date
-        VARCHAR role
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
+        uuid id PK
+        varchar email UK
+        varchar password_hash
+        varchar display_name
+        date birth_date
+        varchar role
+        timestamp created_at
+        timestamp updated_at
     }
     
     USER_PROFILES {
-        UUID id PK
-        UUID user_id FK
-        VARCHAR phone
-        VARCHAR address
-        TIMESTAMP updated_at
+        uuid id PK
+        uuid user_id FK
+        varchar phone
+        varchar address
+        timestamp updated_at
     }
     
     %% ====================================
     %% 주문 도메인
     %% ====================================
     ORDERS {
-        UUID id PK
-        UUID user_id FK
-        NUMERIC total_amount
-        VARCHAR status
-        TIMESTAMP created_at
-        TIMESTAMP cancelled_at
+        uuid id PK
+        uuid user_id FK
+        numeric total_amount
+        varchar status
+        timestamp created_at
+        timestamp cancelled_at
     }
     
     ORDER_ITEMS {
-        UUID id PK
-        UUID order_id FK
-        UUID product_id FK
-        INT quantity
-        NUMERIC unit_price
+        uuid id PK
+        uuid order_id FK
+        uuid product_id FK
+        int quantity
+        numeric unit_price
     }
     
     ORDER_STATUS_HISTORY {
-        UUID id PK
-        UUID order_id FK
-        VARCHAR from_status
-        VARCHAR to_status
-        TIMESTAMP changed_at
-        UUID changed_by FK
+        uuid id PK
+        uuid order_id FK
+        varchar from_status
+        varchar to_status
+        timestamp changed_at
+        uuid changed_by FK
     }
     
     %% ====================================
     %% 상품 도메인
     %% ====================================
     PRODUCTS {
-        UUID id PK
-        VARCHAR name
-        VARCHAR category
-        NUMERIC price
-        INT stock_quantity
-        BOOLEAN is_active
-        TIMESTAMP created_at
+        uuid id PK
+        varchar name
+        varchar category
+        numeric price
+        int stock_quantity
+        boolean is_active
+        timestamp created_at
     }
     
     %% ====================================
     %% 결제 도메인
     %% ====================================
     PAYMENTS {
-        UUID id PK
-        UUID order_id FK
-        NUMERIC amount
-        VARCHAR method
-        VARCHAR status
-        VARCHAR external_payment_id
-        TIMESTAMP paid_at
+        uuid id PK
+        uuid order_id FK
+        numeric amount
+        varchar method
+        varchar status
+        varchar external_payment_id
+        timestamp paid_at
     }
     
     %% ====================================
