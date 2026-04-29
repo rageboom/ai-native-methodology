@@ -34,20 +34,22 @@
 
 **22 endpoint 결정적 확정** (RealWorld 공식 spec 기준):
 
-| 영역 | 개수 | endpoint |
-|---|---|---|
-| **User** | 4 | POST /users / POST /users/login / GET /user / PUT /user |
-| **Profile** | 3 | GET /profiles/{username} / POST + DELETE /profiles/{username}/follow |
-| **Article** | 11 | POST + GET (4 query 변형 통합) + GET /feed + GET/PUT/DELETE /{slug} + POST/DELETE /{slug}/favorite |
-| **Comment** | 3 | POST + GET + DELETE /articles/{slug}/comments[/{id}] |
-| **Tag** | 1 | GET /tags |
+| 영역        | 개수 | endpoint                                                                                           |
+| ----------- | ---- | -------------------------------------------------------------------------------------------------- |
+| **User**    | 4    | POST /users / POST /users/login / GET /user / PUT /user                                            |
+| **Profile** | 3    | GET /profiles/{username} / POST + DELETE /profiles/{username}/follow                               |
+| **Article** | 11   | POST + GET (4 query 변형 통합) + GET /feed + GET/PUT/DELETE /{slug} + POST/DELETE /{slug}/favorite |
+| **Comment** | 3    | POST + GET + DELETE /articles/{slug}/comments[/{id}]                                               |
+| **Tag**     | 1    | GET /tags                                                                                          |
 
 **잠재 불일치 3건**:
+
 1. `sessionCreationPolicy(STATELESS)` SecurityConfiguration 명시 부재 (BR-AUTH-STATELESS-001)
 2. `GET /user` (Current User) endpoint 의 system internal 분류 vs API endpoint 매핑
 3. `WebSecurity#ignoring` vs `permitAll` 의미 차이 (POST /users + /users/login)
 
 **5 핵심 결정**:
+
 1. `Authorization: Token <jwt>` → `apiKey` security scheme 채택 가능성
 2. wrapped DTO (`{"user": {...}}`) — schema 분리 패턴
 3. F-027 De Morgan 명시 위치 (description / x-warning / x-known-bug)
@@ -69,33 +71,34 @@
 > `"Authorization: Token jwt.token.here"`
 
 **핵심 사실**:
+
 - RealWorld 표준은 **Bearer 가 아닌 `Token` prefix** 명시 사용
 - 이는 **RFC 6750 Bearer 비표준** — OpenAPI `type: http + scheme: bearer` 직접 매핑 불가
 - 우회 패턴: `type: apiKey + in: header + name: Authorization` (토픽 6 상세 참조)
 
 ### 1.3 22 endpoint 메인 사전 fetch 결과 cross-check
 
-| # | Method | Path | Auth | Wrapper | 메인 사전 fetch 일치 |
-|---|--------|------|------|---------|---|
-| 1 | POST | /api/users/login | No | `{"user":{...}}` 응답 | ✅ |
-| 2 | POST | /api/users | No | `{"user":{...}}` 응답 | ✅ |
-| 3 | GET | /api/user | Yes | `{"user":{...}}` 응답 | ✅ |
-| 4 | PUT | /api/user | Yes | `{"user":{...}}` 양방향 | ✅ |
-| 5 | GET | /api/profiles/{username} | Optional | `{"profile":{...}}` | ✅ |
-| 6 | POST | /api/profiles/{username}/follow | Yes | `{"profile":{...}}` | ✅ |
-| 7 | DELETE | /api/profiles/{username}/follow | Yes | `{"profile":{...}}` | ✅ |
-| 8 | GET | /api/articles | Optional | `{"articles":[...],"articlesCount":N}` | ✅ (4 query 변형 통합) |
-| 9 | GET | /api/articles/feed | Yes | `{"articles":[...],"articlesCount":N}` | ✅ |
-| 10 | GET | /api/articles/{slug} | No | `{"article":{...}}` | ✅ |
-| 11 | POST | /api/articles | Yes | `{"article":{...}}` | ✅ |
-| 12 | PUT | /api/articles/{slug} | Yes | `{"article":{...}}` | ✅ |
-| 13 | DELETE | /api/articles/{slug} | Yes | (no body) | ✅ |
-| 14 | POST | /api/articles/{slug}/comments | Yes | `{"comment":{...}}` | ✅ |
-| 15 | GET | /api/articles/{slug}/comments | Optional | `{"comments":[...]}` | ✅ |
-| 16 | DELETE | /api/articles/{slug}/comments/{id} | Yes | (no body) | ✅ + ⚠️ F-027 De Morgan |
-| 17 | POST | /api/articles/{slug}/favorite | Yes | `{"article":{...}}` | ✅ |
-| 18 | DELETE | /api/articles/{slug}/favorite | Yes | `{"article":{...}}` | ✅ |
-| 19 | GET | /api/tags | No | `{"tags":[...]}` | ✅ |
+| #   | Method | Path                               | Auth     | Wrapper                                | 메인 사전 fetch 일치    |
+| --- | ------ | ---------------------------------- | -------- | -------------------------------------- | ----------------------- |
+| 1   | POST   | /api/users/login                   | No       | `{"user":{...}}` 응답                  | ✅                      |
+| 2   | POST   | /api/users                         | No       | `{"user":{...}}` 응답                  | ✅                      |
+| 3   | GET    | /api/user                          | Yes      | `{"user":{...}}` 응답                  | ✅                      |
+| 4   | PUT    | /api/user                          | Yes      | `{"user":{...}}` 양방향                | ✅                      |
+| 5   | GET    | /api/profiles/{username}           | Optional | `{"profile":{...}}`                    | ✅                      |
+| 6   | POST   | /api/profiles/{username}/follow    | Yes      | `{"profile":{...}}`                    | ✅                      |
+| 7   | DELETE | /api/profiles/{username}/follow    | Yes      | `{"profile":{...}}`                    | ✅                      |
+| 8   | GET    | /api/articles                      | Optional | `{"articles":[...],"articlesCount":N}` | ✅ (4 query 변형 통합)  |
+| 9   | GET    | /api/articles/feed                 | Yes      | `{"articles":[...],"articlesCount":N}` | ✅                      |
+| 10  | GET    | /api/articles/{slug}               | No       | `{"article":{...}}`                    | ✅                      |
+| 11  | POST   | /api/articles                      | Yes      | `{"article":{...}}`                    | ✅                      |
+| 12  | PUT    | /api/articles/{slug}               | Yes      | `{"article":{...}}`                    | ✅                      |
+| 13  | DELETE | /api/articles/{slug}               | Yes      | (no body)                              | ✅                      |
+| 14  | POST   | /api/articles/{slug}/comments      | Yes      | `{"comment":{...}}`                    | ✅                      |
+| 15  | GET    | /api/articles/{slug}/comments      | Optional | `{"comments":[...]}`                   | ✅                      |
+| 16  | DELETE | /api/articles/{slug}/comments/{id} | Yes      | (no body)                              | ✅ + ⚠️ F-027 De Morgan |
+| 17  | POST   | /api/articles/{slug}/favorite      | Yes      | `{"article":{...}}`                    | ✅                      |
+| 18  | DELETE | /api/articles/{slug}/favorite      | Yes      | `{"article":{...}}`                    | ✅                      |
+| 19  | GET    | /api/tags                          | No       | `{"tags":[...]}`                       | ✅                      |
 
 **총 22 entries — 19 unique path × method, 그러나 GET /articles 의 query 파라미터 변형 4개를 별도 UC 로 본 PoC 의 Phase 4 산출물과 정합 시 22 매핑.**
 
@@ -121,11 +124,13 @@
 **검증 방식**: WebFetch raw
 
 **핵심 사실 (1차 인용)**:
+
 - GitHub 은 REST API 를 **OpenAPI 3.0 + 3.1 양쪽으로 공개** (descriptions/ + descriptions-next/)
 - 두 형태 제공: **bundled** (component refs) + **dereferenced** (refs 펼침)
 - Stable 등급, v1.1.4 GA
 
 **한계 사실**:
+
 > "Not all headers are currently described"
 > "Multi-segment path parameters require special handling via extensions"
 
@@ -153,6 +158,7 @@ x-github:
 ```
 
 주요 필드:
+
 - `triggersNotification` (boolean) — operation 호출 시 notification 발생 여부
 - `deprecationDate` (string, YYYY-MM-DD) — 공개 발표 일자
 - `removalDate` (string, YYYY-MM-DD) — 문서 제거 일자
@@ -181,6 +187,7 @@ x-github:
 > "in most cases you can use `Authorization: Bearer` or `Authorization: token` to pass a token. However, for JSON Web Tokens (JWTs), you must use `Authorization: Bearer`"
 
 curl 예시 (1차 인용):
+
 ```shell
 curl --request POST \
   --url "https://api.github.com/repos/octocat/Spoon-Knife/issues" \
@@ -195,11 +202,13 @@ curl --request POST \
 **URL**: 위 동일
 
 Link 헤더 예시:
+
 ```
 <https://api.github.com/repositories/1300192/issues?per_page=1&page=2>; rel="next"
 ```
 
 Rate Limit 헤더 4건:
+
 - `X-RateLimit-Limit`: 15000
 - `X-RateLimit-Remaining`: 14996
 - `X-RateLimit-Used`
@@ -223,15 +232,11 @@ Rate Limit 헤더 4건:
 **검증 방식**: WebFetch raw
 
 **핵심 인용**:
+
 > "Authentication to the API is performed via HTTP Basic Auth. Provide your API key as the basic auth username value. You do not need to provide a password."
 
-curl 예시:
-```sh
-curl https://api.stripe.com/v1/charges \
-  -u sk_test_BQokikJOvBiI2HlWgH4olfQ2:
-```
-
 **대체 방식**:
+
 > "For cross-origin requests, use the Authorization header with Bearer format: `-H \"Authorization: Bearer [api_key]\"`"
 
 → **Stripe 도 표준 Bearer + Basic 이중 채택**. 비표준 prefix 사용하지 않음. RealWorld 의 `Token` 은 이 점에서 **이단(deviation)**.
@@ -241,12 +246,14 @@ curl https://api.stripe.com/v1/charges \
 **URL**: https://docs.stripe.com/api/errors
 
 **Error type 값** (4가지):
+
 - `api_error`
 - `card_error`
 - `idempotency_error`
 - `invalid_request_error`
 
 **필드 구조**:
+
 - `code` (string, nullable)
 - `decline_code` (string, nullable, card_error 한정)
 - `message` (string, nullable) — human-readable
@@ -256,6 +263,7 @@ curl https://api.stripe.com/v1/charges \
 - `doc_url` (string, nullable)
 
 **Stripe 에러 응답 wrapper**:
+
 ```json
 {
   "error": {
@@ -331,7 +339,7 @@ components:
       required: [user]
       properties:
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
 ```
 
 → **본 PoC 권장 방식**. 22 endpoint 의 wrapper 패턴이 일관 (`UserResponse` / `ArticleResponse` / `ProfileResponse` / `CommentResponse` / `TagsResponse` / `ArticlesResponse`) → 6 wrapper schema 필요.
@@ -340,7 +348,7 @@ components:
 
 ```yaml
 responses:
-  '200':
+  "200":
     content:
       application/json:
         schema:
@@ -392,6 +400,7 @@ responses:
 **검증 방식**: WebSearch + 1차 URL 부분 확인 (https://developers.kakao.com/docs/latest/en/rest-api/reference)
 
 **핵심 사실**:
+
 - 카카오 REST API: `Authorization: KakaoAK ${REST_API_KEY}` (서비스 앱 admin 키)
 - 또는: `Authorization: Bearer ${ACCESS_TOKEN}` (사용자 access token, OAuth)
 
@@ -403,6 +412,7 @@ responses:
 **검증 방식**: WebSearch + 일부 1차 자료
 
 **핵심 사실**:
+
 - 네이버 OpenAPI: 두 커스텀 헤더 사용
   - `X-Naver-Client-Id`
   - `X-Naver-Client-Secret`
@@ -417,6 +427,7 @@ responses:
 **검증 방식**: WebFetch raw
 
 **핵심 사실**:
+
 - HTTP Basic Auth (시크릿 키 = username, 패스워드 비움) — Stripe 와 동일
 - 에러 응답: `{"code":"...","message":"..."}` (얇은 wrapper)
 - 성공 응답: 객체 직접 반환 (no wrapper)
@@ -429,6 +440,7 @@ responses:
 **검증 방식**: WebFetch raw
 
 **핵심 사실**:
+
 - API 문서를 Spring REST Docs 로 자동 생성 (테스트 통과 강제)
 - 응답 wrapper: `{code, message, data}` 사내 표준
 - 동기: "wiki 기반 문서가 실제 구현과 drift 발생 → 자동 생성"
@@ -442,6 +454,7 @@ responses:
 **검증 한계**: 라인의 사내 API 표준 1차 자료 부재 — public 공개 자료 없음
 
 **일반론** (학습 코퍼스):
+
 - LINE Messaging API: `Authorization: Bearer {channel access token}` — 표준 RFC 6750
 - OpenAPI 3.0 spec 공개 (https://github.com/line/line-openapi)
 
@@ -449,13 +462,13 @@ responses:
 
 ### 5.6 한국 5사 종합 — 인증 헤더 패턴 비교
 
-| 사 | 인증 헤더 | OpenAPI 표기 권장 |
-|---|---|---|
-| 카카오 | `Authorization: KakaoAK <key>` | apiKey 우회 (비표준 prefix) |
-| 네이버 | `X-Naver-Client-Id` + Secret | apiKey × 2 (커스텀 헤더) |
-| 토스 | HTTP Basic Auth | http + basic (표준) |
-| 배민 | (사내, public 자료 부재) | — |
-| 라인 | `Authorization: Bearer <token>` | http + bearer (표준) |
+| 사     | 인증 헤더                       | OpenAPI 표기 권장           |
+| ------ | ------------------------------- | --------------------------- |
+| 카카오 | `Authorization: KakaoAK <key>`  | apiKey 우회 (비표준 prefix) |
+| 네이버 | `X-Naver-Client-Id` + Secret    | apiKey × 2 (커스텀 헤더)    |
+| 토스   | HTTP Basic Auth                 | http + basic (표준)         |
+| 배민   | (사내, public 자료 부재)        | —                           |
+| 라인   | `Authorization: Bearer <token>` | http + bearer (표준)        |
 
 → **5사 중 카카오 1사가 비표준 prefix 사용**. 본 PoC 의 `Token` prefix 는 이 패턴과 정합. **카카오 사례 인용** = 본 PoC 의 정당화 자료.
 
@@ -482,7 +495,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: JWT  # optional, documentation hint
+      bearerFormat: JWT # optional, documentation hint
 
 security:
   - bearerAuth: []
@@ -528,6 +541,7 @@ security:
 **검증 한계**: 본문 일부만 확인 (전체 thread 미확보)
 
 **제안 (dolmen)**:
+
 > "Adding an API Key location 'authorization' in the Security Scheme Object with properties for type, location, and authenticationScheme"
 
 **현재 상태** (검증 한계 — 학습 코퍼스): Issue 는 OpenAPI 4.0 (Moonwalk) 까지 unresolved. 커뮤니티 합의는 **`apiKey + in: header + name: Authorization` 우회** 가 사실상 표준.
@@ -539,6 +553,7 @@ security:
 > "The API Key security scheme is better suited to non-standard API keys using custom headers, like Acme-API-Key, whereas the HTTP security scheme is specifically designed for HTTP-based authentication methods using the Authorization header."
 
 **해석**:
+
 - 표준 (Bearer/Basic) → `http`
 - 비표준 prefix → `apiKey` 채택이 **사실상 표준**
 
@@ -576,6 +591,7 @@ components:
 ### 7.1 OperationId 표준 — OpenAPI 명세 (★★★)
 
 **일반론**:
+
 - `operationId` 는 OpenAPI 명세에서 **uniqueness 강제** (전체 spec 단일)
 - 권장 형식: `verbResource` (e.g., `getUser`, `createArticle`) 또는 `domain.action` (Stripe 패턴: `customers.list`)
 
@@ -585,6 +601,7 @@ components:
 **검증 방식**: WebFetch raw
 
 **핵심 사실** (1차 인용):
+
 - API Gateway = "the application's entry point"
 - Operations 호출 방식 3가지: synchronous request / asynchronous request / events / time-passing
 
@@ -593,6 +610,7 @@ components:
 ### 7.3 RealWorld 의 사실상 operationId 표준 (★★★)
 
 RealWorld 표준 spec 의 endpoint 이름 (메인 사전 fetch 결과):
+
 - `Login` → POST /users/login → `loginUser`
 - `Registration` → POST /users → `createUser`
 - `Get Current User` → GET /user → `getCurrentUser`
@@ -618,6 +636,7 @@ RealWorld 표준 spec 의 endpoint 이름 (메인 사전 fetch 결과):
 ### 7.4 Eric Evans / Vaughn Vernon — UC 양방향 추적 (★★)
 
 **일반론** (학습 코퍼스):
+
 - DDD Strategic Design 에서 UC 와 API 매핑은 **Application Service Layer** 단위
 - Application Service method = use case (1:1) 가 권장
 - API endpoint = Application Service method 의 HTTP 노출 (1:1 또는 N:1)
@@ -650,6 +669,7 @@ paths:
 **GitHub**: `GET /repos/{owner}/{repo}/issues` 단일 operation, query `state`, `assignee`, `creator` 분기.
 
 → **본 PoC `GET /articles` 의 4 query 변형** (`?tag=`, `?author=`, `?favorited=`, baseline) 도 **단일 `getArticles` operationId** 권장. UC 매핑은 array:
+
 ```yaml
 x-related-use-cases:
   - UC-ARTICLE-LIST
@@ -668,11 +688,13 @@ x-related-use-cases:
 **검증 방식**: WebFetch raw
 
 **핵심 사실**:
+
 - Postman v2.0/2.1 → OpenAPI 3.0 변환 npm 도구
 - **2024-12-27 archive** — "no longer used or maintained"
 - CLI + library 두 모드, YAML/JSON output
 
 **한계 (학습 코퍼스 + 일반론)**:
+
 - `operationId` 자동 생성: Postman request name → camelCase 변환 (충돌 가능)
 - 응답 스키마 추론: example body 기반 type 추론 (강제 한계 — null 처리, optional 처리 불완전)
 - 보안 스키마 추론: Postman auth → OpenAPI 매핑 일부 (Bearer / Basic 만, 비표준 prefix 추론 ❌)
@@ -683,6 +705,7 @@ x-related-use-cases:
 **파일**: `doc/Conduit.postman_collection.json` (메인 사전 fetch 확인 — RealWorld 표준 Postman 컬렉션)
 
 **예상 변환 결과**:
+
 - 22 endpoint → 19 unique operationId 자동 생성 (4 GET /articles 변형 = 4 operation 생성 — **수동 통합 필요**)
 - 보안 스키마: `Authorization: Token {{token}}` → 도구가 추론 못 할 가능성 → **수동 `apiKey` 채택**
 - Wrapper: example body 기반 inline schema → **수동 `$ref` 분리**
@@ -692,12 +715,12 @@ x-related-use-cases:
 
 **검증 한계**: 1차 자료 빈약. 학습 코퍼스 기반 일반론.
 
-| 도구 | OpenAPI 버전 | 보안 추론 | 응답 스키마 | 비고 |
-|---|---|---|---|---|
-| postman-to-openapi (joolfe) | 3.0 | Bearer/Basic 만 | example 기반 | archive 2024-12 |
-| APIMatic Transformer | 3.0/3.1 | 다양 | 추론 강함 | 유료/SaaS |
-| openapi-postman-converter (역방향) | 양방향 | — | — | community |
-| Postman 자체 export OpenAPI | 3.0 | 자동 | example 기반 | 공식 |
+| 도구                               | OpenAPI 버전 | 보안 추론       | 응답 스키마  | 비고            |
+| ---------------------------------- | ------------ | --------------- | ------------ | --------------- |
+| postman-to-openapi (joolfe)        | 3.0          | Bearer/Basic 만 | example 기반 | archive 2024-12 |
+| APIMatic Transformer               | 3.0/3.1      | 다양            | 추론 강함    | 유료/SaaS       |
+| openapi-postman-converter (역방향) | 양방향       | —               | —            | community       |
+| Postman 자체 export OpenAPI        | 3.0          | 자동            | example 기반 | 공식            |
 
 → **본 PoC 권장**: 도구 자동 생성 후 **수동 검증/보강**. 자동 변환 ≠ 완전 정합.
 
@@ -717,6 +740,7 @@ x-related-use-cases:
 **URL 시도**: https://netflixtechblog.com/tagged/api → Medium 인증 redirect (★ 학습 코퍼스 의존)
 
 **일반론**:
+
 - Netflix 는 **REST OpenAPI 공개 ❌** (내부 API 만)
 - 외부 노출 API 는 GraphQL Federation 으로 통합 (DGS framework)
 - 메타 정책: Falcor (deprecated, 2018-2020) → Studio Edge GraphQL (2020-)
@@ -724,6 +748,7 @@ x-related-use-cases:
 ### 9.2 Atlas — 시계열 메트릭 API (학습 코퍼스 ★)
 
 **일반론**:
+
 - Atlas 는 Netflix 의 시계열 모니터링 시스템 (open source)
 - API 는 자체 query 언어 (Atlas Stack Language) — OpenAPI 와 무관
 
@@ -731,14 +756,14 @@ x-related-use-cases:
 
 ### 9.3 대안 — REST OpenAPI 공개 글로벌 사례
 
-| 회사 | OpenAPI 공개 | URL |
-|---|---|---|
-| GitHub | ✅ 3.0 + 3.1 | github/rest-api-description |
-| Stripe | ✅ 부분 (자체 도큐 우선) | stripe/openapi |
-| Twilio | ✅ 3.1 | twilio/twilio-oai |
-| Kubernetes | ✅ 3.0 | kubernetes/kubernetes/api/openapi-spec |
-| Slack | ✅ Web API 부분 | slackapi/slack-api-specs |
-| Netflix | ❌ (GraphQL Federation 만) | — |
+| 회사       | OpenAPI 공개               | URL                                    |
+| ---------- | -------------------------- | -------------------------------------- |
+| GitHub     | ✅ 3.0 + 3.1               | github/rest-api-description            |
+| Stripe     | ✅ 부분 (자체 도큐 우선)   | stripe/openapi                         |
+| Twilio     | ✅ 3.1                     | twilio/twilio-oai                      |
+| Kubernetes | ✅ 3.0                     | kubernetes/kubernetes/api/openapi-spec |
+| Slack      | ✅ Web API 부분            | slackapi/slack-api-specs               |
+| Netflix    | ❌ (GraphQL Federation 만) | —                                      |
 
 → **본 PoC cross-validation 은 GitHub + Stripe + Twilio 가 정합 사례**.
 
@@ -757,6 +782,7 @@ x-related-use-cases:
 #### 사례 1 — Spring Security 표준 default
 
 **일반론** (학습 코퍼스 ★★):
+
 - Spring Security 5.x+ 는 `sessionCreationPolicy` 미명시 시 **`IF_REQUIRED` default**
 - JWT + Stateless 패턴은 **STATELESS 명시 권장** (Baeldung / Spring 공식 권장)
 
@@ -766,6 +792,7 @@ x-related-use-cases:
 #### 사례 2 — 실무 패턴
 
 대부분 사내 가이드 (학습 코퍼스 일반론):
+
 - JWT filter 가 SecurityContext 를 매 요청마다 새로 생성 → 사실상 STATELESS
 - 그러나 명시 부재 시 **session 생성 가능성 0% 보장 ❌** (Spring Security 내부 동작)
 
@@ -803,6 +830,7 @@ x-related-use-cases:
 #### 사례 — Spring Security 공식 (★★★)
 
 **일반론** (학습 코퍼스 + Spring Security 공식 가이드):
+
 - `web.ignoring()` = filter chain **자체 우회** (security context 없음, performance ↑)
 - `permitAll()` = filter chain 통과 + 인가 통과 (security context 있음)
 - 차이: ignoring 은 anonymous filter 도 안 탐 → SecurityContextHolder 비어있음
@@ -812,6 +840,7 @@ x-related-use-cases:
 #### 사례 — Baeldung 비교
 
 **일반론**:
+
 > "ignoring() is faster but completely bypasses Spring Security."
 > "permitAll() is recommended if you may need security features later (CSRF, headers)."
 
@@ -825,15 +854,17 @@ x-related-use-cases:
 
 → OpenAPI `security: []` (빈 배열) 표기는 둘 다 동일 (외부 클라이언트 관점).
 → 그러나 **사내 메타 (`x-architectural-debt`) 에 차이 명시 권장**:
-  - POST /users / POST /users/login: `x-security-bypass: web.ignoring`
-  - GET /articles 등: `x-security-permit: permitAll`
-→ Phase 5 의 `architecture.json` source_evidence 정밀화 (filter chain 추적) 필요.
+
+- POST /users / POST /users/login: `x-security-bypass: web.ignoring`
+- GET /articles 등: `x-security-permit: permitAll`
+  → Phase 5 의 `architecture.json` source_evidence 정밀화 (filter chain 추적) 필요.
 
 ### 10.4 5 핵심 결정 — 사례 인용 검증
 
 #### 결정 1: `Authorization: Token <jwt>` → `apiKey` security scheme
 
 **사례 인용**:
+
 - 카카오 `KakaoAK` (★★) — 본 PoC 와 정합 패턴
 - Speakeasy 가이드 (★★) — `apiKey` 가 비표준 prefix 의 사실상 표준
 - OAI Issue #583 (★★) — 표준 부재, `apiKey` 우회 합의
@@ -843,6 +874,7 @@ x-related-use-cases:
 #### 결정 2: Wrapped DTO (`{"user":{...}}`) — schema 분리 패턴
 
 **사례 인용**:
+
 - 배민 `{code, message, data}` (★★★) — 사내 wrapper 표준 흔함
 - RealWorld 공식 spec (★★★) — wrapper 강제
 - Stripe / 토스 (★★★) — wrapper 없음 (반대 패턴)
@@ -852,6 +884,7 @@ x-related-use-cases:
 #### 결정 3: F-027 De Morgan 명시 위치 (description / x-warning / x-known-bug)
 
 **사례 인용**:
+
 - GitHub `previews` extension (★★★) — vendor extension 으로 spec 한계 메모
 - Stripe `doc_url` (★★★) — 외부 link 로 known issue 안내
 
@@ -880,10 +913,12 @@ delete:
 #### 결정 4: LV-001 노출 — 사내 메타 vs 표준 spec 보전
 
 **사례 인용**:
+
 - GitHub `x-github` extension (★★★) — vendor extension 으로 사내 메타 노출
 - 일부 회사 (Stripe / 토스): vendor ext 미사용 — 표준만 노출
 
 **최종**: ✅ 사내 메타 `x-architectural-debt` 노출 + **public-facing strip pipeline** 권장.
+
 - 내부 (Phase 5 산출): full spec
 - 외부 노출 시: `x-*` prefix 제거 도구 (e.g., `openapi-cli` filter) 적용 권장
 - ADR-002 표준에 정합 (산출물 = 사내 자산)
@@ -901,10 +936,12 @@ get:
 #### 결정 5: 4 GET /articles 변형 단일 operationId
 
 **사례 인용**:
+
 - Stripe `GET /v1/customers` (★★★) — query 파라미터로 분기, 단일 operation
 - GitHub `GET /repos/{owner}/{repo}/issues` (★★★) — 동일 패턴
 
 **최종**: ✅ 단일 `getArticles` operationId. UC 매핑은 array 로 4건 (UC-ARTICLE-LIST + LIST-BY-{TAG,AUTHOR,FAVORITED}).
+
 - query parameter `tag` / `author` / `favorited` 모두 명시
 - `x-related-use-cases: [UC-ARTICLE-LIST, UC-ARTICLE-LIST-BY-TAG, UC-ARTICLE-LIST-BY-AUTHOR, UC-ARTICLE-LIST-BY-FAVORITED]`
 
@@ -1009,7 +1046,7 @@ components:
         OpenAPI guidance: type=apiKey is the de-facto workaround for non-standard
         Authorization header prefixes (OAI/OpenAPI-Specification#583).
 
-security: []  # default: no auth, override per operation
+security: [] # default: no auth, override per operation
 ```
 
 ### 11.3 wrapper schema 6건
@@ -1025,13 +1062,14 @@ components:
         username: { type: string }
         bio: { type: string, nullable: true }
         image: { type: string, nullable: true }
-        token: { type: string, description: "JWT token with custom 'Token' prefix" }
+        token:
+          { type: string, description: "JWT token with custom 'Token' prefix" }
 
     UserResponse:
       type: object
       required: [user]
       properties:
-        user: { $ref: '#/components/schemas/User' }
+        user: { $ref: "#/components/schemas/User" }
 
     LoginUserRequest:
       type: object
@@ -1046,7 +1084,19 @@ components:
 
     Article:
       type: object
-      required: [slug, title, description, body, tagList, createdAt, updatedAt, favorited, favoritesCount, author]
+      required:
+        [
+          slug,
+          title,
+          description,
+          body,
+          tagList,
+          createdAt,
+          updatedAt,
+          favorited,
+          favoritesCount,
+          author,
+        ]
       properties:
         slug: { type: string }
         title: { type: string }
@@ -1057,19 +1107,20 @@ components:
         updatedAt: { type: string, format: date-time }
         favorited: { type: boolean }
         favoritesCount: { type: integer }
-        author: { $ref: '#/components/schemas/Profile' }
+        author: { $ref: "#/components/schemas/Profile" }
 
     ArticleResponse:
       type: object
       required: [article]
       properties:
-        article: { $ref: '#/components/schemas/Article' }
+        article: { $ref: "#/components/schemas/Article" }
 
     ArticlesResponse:
       type: object
       required: [articles, articlesCount]
       properties:
-        articles: { type: array, items: { $ref: '#/components/schemas/Article' } }
+        articles:
+          { type: array, items: { $ref: "#/components/schemas/Article" } }
         articlesCount: { type: integer }
 
     GenericErrorModel:
@@ -1116,18 +1167,18 @@ paths:
       security:
         - TokenAuth: []
       responses:
-        '200':
+        "200":
           description: Single comment
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/GenericErrorModel' }
-        '422':
+              schema: { $ref: "#/components/schemas/GenericErrorModel" }
+        "422":
           description: Unexpected error
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/GenericErrorModel' }
+              schema: { $ref: "#/components/schemas/GenericErrorModel" }
       x-related-use-cases:
         - UC-COMMENT-DELETE
       x-related-rules:
@@ -1149,15 +1200,15 @@ paths:
 
 ### 12.1 메인 사전 fetch 8건 cross-check 결과
 
-| 메인 사전 fetch | 본 리서치 결과 |
-|---|---|
-| 22 endpoint 결정적 확정 | **✅ 100% 정합** (RealWorld 공식 spec 인용) |
-| `Authorization: Token <jwt>` | **✅ 정합** + 카카오 KakaoAK 사례 정당화 |
-| wrapped DTO (`{"user":{...}}`) | **✅ 정합** + 배민 wrapper 사례 정당화 |
-| 5개 public endpoint `security: []` | **✅ 정합** + WebSecurity ignoring/permitAll 차이 추가 발견 |
-| F-027 De Morgan 버그 | **✅ 정합** + GitHub previews 사례 정당화 |
-| LV-001 사내 메타 노출 | **✅ 정합** + GitHub x-github 사례 정당화 |
-| 4 GET /articles 변형 단일 operationId | **✅ 정합** + Stripe / GitHub 사례 정당화 |
+| 메인 사전 fetch                       | 본 리서치 결과                                              |
+| ------------------------------------- | ----------------------------------------------------------- |
+| 22 endpoint 결정적 확정               | **✅ 100% 정합** (RealWorld 공식 spec 인용)                 |
+| `Authorization: Token <jwt>`          | **✅ 정합** + 카카오 KakaoAK 사례 정당화                    |
+| wrapped DTO (`{"user":{...}}`)        | **✅ 정합** + 배민 wrapper 사례 정당화                      |
+| 5개 public endpoint `security: []`    | **✅ 정합** + WebSecurity ignoring/permitAll 차이 추가 발견 |
+| F-027 De Morgan 버그                  | **✅ 정합** + GitHub previews 사례 정당화                   |
+| LV-001 사내 메타 노출                 | **✅ 정합** + GitHub x-github 사례 정당화                   |
+| 4 GET /articles 변형 단일 operationId | **✅ 정합** + Stripe / GitHub 사례 정당화                   |
 
 ### 12.2 잠재 불일치 3건 처리 권고
 
@@ -1175,12 +1226,12 @@ paths:
 
 ### 12.4 PoC #01 신규 finding 후보 4건
 
-| ID | 유형 | severity | 내용 |
-|---|---|---|---|
-| F-XXX-1 | 보안 | medium | SecurityConfiguration sessionCreationPolicy(STATELESS) 명시 부재 |
-| F-XXX-2 | 매핑 | high | Phase 4 의 GET /user system internal 분류 ↔ Phase 5 endpoint 매핑 불일치 |
-| F-XXX-3 | 보안 | low | WebSecurity#ignoring vs permitAll 차이 — source_evidence 정밀화 필요 |
-| F-XXX-4 | 메타 | low | OpenAPI x-* extension public 노출 시 strip pipeline 권장 — ADR 신설 후보 |
+| ID      | 유형 | severity | 내용                                                                      |
+| ------- | ---- | -------- | ------------------------------------------------------------------------- |
+| F-XXX-1 | 보안 | medium   | SecurityConfiguration sessionCreationPolicy(STATELESS) 명시 부재          |
+| F-XXX-2 | 매핑 | high     | Phase 4 의 GET /user system internal 분류 ↔ Phase 5 endpoint 매핑 불일치  |
+| F-XXX-3 | 보안 | low      | WebSecurity#ignoring vs permitAll 차이 — source_evidence 정밀화 필요      |
+| F-XXX-4 | 메타 | low      | OpenAPI x-\* extension public 노출 시 strip pipeline 권장 — ADR 신설 후보 |
 
 → **Phase 5 메인 통합 시 v1.2.0 격상 묶음 추가 검토** (현 6 묶음 → 7 묶음 후보).
 
@@ -1208,16 +1259,16 @@ paths:
 
 - **PoC #02 적용 시**: 본 리서치 결정 5건 (apiKey / wrapper / x-known-bug / x-arch-debt / single operationId) 외부 검증
 - **v1.2.0 격상 시**: ADR 신설 후보 G/H/I 사내 검토
-- **OpenAPI x-* extension 표준 ADR 신설** (ADR-007 후보): public strip + 사내 메타 노출 정책
+- **OpenAPI x-\* extension 표준 ADR 신설** (ADR-007 후보): public strip + 사내 메타 노출 정책
 
 ### 13.3 Phase 5-1 산출 영향 종합
 
-| 산출물 | 본 리서치 영향 | 정합 |
-|---|---|---|
-| `output/api/openapi.yaml` | 22 path × method, 6 wrapper schema, TokenAuth scheme, x-* extension | ✅ 5 결정 모두 사례 정합 |
+| 산출물                          | 본 리서치 영향                                                             | 정합                                          |
+| ------------------------------- | -------------------------------------------------------------------------- | --------------------------------------------- |
+| `output/api/openapi.yaml`       | 22 path × method, 6 wrapper schema, TokenAuth scheme, x-\* extension       | ✅ 5 결정 모두 사례 정합                      |
 | `output/api/api-extension.json` | operations[] (UC + BR + AP 매핑), known_bugs[], pagination, query_variants | ✅ GitHub `x-github` / Stripe pagination 패턴 |
-| `output/api/api.md` | 22 endpoint 사람 읽기 + 잠재 불일치 3건 명시 + finding 후보 4건 | ✅ 배민 Spring REST Docs 패턴 |
-| `output/api/_manifest.yml` | confidence + sources + traceability | ✅ ADR-002 표준 정합 |
+| `output/api/api.md`             | 22 endpoint 사람 읽기 + 잠재 불일치 3건 명시 + finding 후보 4건            | ✅ 배민 Spring REST Docs 패턴                 |
+| `output/api/_manifest.yml`      | confidence + sources + traceability                                        | ✅ ADR-002 표준 정합                          |
 
 ---
 
@@ -1248,7 +1299,7 @@ paths:
 18. https://www.speakeasy.com/openapi/security/security-schemes/security-http — Speakeasy http vs apiKey
 19. https://www.baeldung.com/openapi-jwt-authentication — Baeldung JWT
 20. https://github.com/springdoc/springdoc-openapi/issues/1843 — springdoc 한계
-21. https://api.ncloud-docs.com/docs/en/common-naverapi-naverapi — 네이버 X-Naver-Client-*
+21. https://api.ncloud-docs.com/docs/en/common-naverapi-naverapi — 네이버 X-Naver-Client-\*
 
 ### 검증 한계 (★ — 학습 코퍼스 의존)
 
@@ -1258,4 +1309,4 @@ paths:
 
 ---
 
-> 본 리서치는 PoC #01 Phase 5-1 의 8개 결정 지원 자료. 메인 통합 시 `research-phase5.md` 의 "사례 cross-check" 섹션으로 통합. Phase 5 산출물 4 파일 (openapi.yaml + api-extension.json + api.md + _manifest.yml) 의 직접 인용 stub 11.1~11.4 제공.
+> 본 리서치는 PoC #01 Phase 5-1 의 8개 결정 지원 자료. 메인 통합 시 `research-phase5.md` 의 "사례 cross-check" 섹션으로 통합. Phase 5 산출물 4 파일 (openapi.yaml + api-extension.json + api.md + \_manifest.yml) 의 직접 인용 stub 11.1~11.4 제공.
