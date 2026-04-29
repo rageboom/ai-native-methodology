@@ -1,0 +1,328 @@
+{
+  "$schema_ref": "../../../../../schemas/architecture.schema.json",
+  "meta": {
+    "generated_at": "2026-04-28T00:00:00Z",
+    "source_commit_sha": "56be3ced4f3134424ead5fcaf387b3aa640b9532",
+    "source_branch": "master",
+    "extraction_env": "web_fetch",
+    "methodology_version": "v1.1.2",
+    "formula_version": "v1",
+    "inputs_used": ["source_code", "domain_context_md"],
+    "applied_modifiers": [
+      {"name": "domain_context_md", "value": 0.03, "reason": "inputs/domain-context.md"}
+    ],
+    "applied_penalties": [
+      {"name": "no_operational_db", "value": -0.03, "reason": "외부 의존성 0건 환경 — 5.D 검증 한계"}
+    ],
+    "raw_confidence": 0.75,
+    "cap_applied": false,
+    "manual_override": false,
+    "expected_confidence_average": 0.91,
+    "confidence_breakdown": {
+      "module_identification": {"confidence": 0.98, "element_count": 10, "extraction_method": "deterministic"},
+      "dependency_graph": {"confidence": 0.92, "element_count": 19, "extraction_method": "pattern_matching", "note": "19건 import sampling (메인 9 + sub-agent 10)"},
+      "circular_dependency_detection": {"confidence": 0.95, "element_count": 1, "extraction_method": "deterministic"},
+      "external_dependencies": {"confidence": 0.95, "element_count": 0, "extraction_method": "deterministic", "note": "5.D 빈약 — 학습용 spec 한계"},
+      "module_responsibility": {"confidence": 0.85, "element_count": 10, "extraction_method": "llm_with_grounding"},
+      "architecture_style": {"confidence": 0.85, "element_count": 1, "extraction_method": "llm_with_grounding", "note": "5 차원 결정적 검증 + 카카오페이 회고 매칭"},
+      "layer_violation_detection": {"confidence": 0.85, "element_count": 1, "extraction_method": "pattern_matching"},
+      "module_table_mapping": {"confidence": 0.92, "element_count": 7, "extraction_method": "deterministic"}
+    },
+    "human_review_required": [
+      {
+        "item_id": "ARCH-STYLE-CONFIRMATION",
+        "reason": "Phase 1 candidate (Hexagonal/Clean 0.65, POJO 0.85) → Phase 3 확정 (Layered+Spring-DDD-Lite 0.85, Hexagonal 0.30, POJO 0.50). 큰 정정 트레이스 — 사용자 검증 필요.",
+        "reviewer_role": "tech_lead",
+        "status": "resolved",
+        "resolution_ref": "user_decisions[ARCH-STYLE]"
+      },
+      {
+        "item_id": "CIRCULAR-DOMAIN-001",
+        "reason": "domain/article ↔ domain/user 양방향 import. 알고리즘 관점 = 순환 (Spring Modulith / ArchUnit 자동 실패) / 도메인 의도 분기 = Phase 4 BC 결정 후 재산정.",
+        "reviewer_role": "tech_lead",
+        "status": "resolved",
+        "resolution_ref": "user_decisions[CIRCULAR-001]"
+      }
+    ],
+    "user_decisions": [
+      {
+        "id": "ARCH-STYLE",
+        "decided_at": "2026-04-28",
+        "decided_by": "윤주스 (TF Lead)",
+        "decision": "Phase 1 → Phase 3 정정 트레이스 승인 (Option A)",
+        "rationale": "5 차원 결정적 검증 (domain framework annotation / app→infra 직접 의존 / port 1건만 / port 정상 1건만 / Anemic vs Rich) + 외부 증거 (카카오페이 home Hexagonal 제거 회고 + 우형 Multi Module Hexagonal + Vernon IDDD) 모두 정정 방향 일치. 19건 raw fetch 100% (F-015 cross-validation 정착) 검증 신뢰도 높음.",
+        "impact": "architecture_style=layered (primary) + secondary_styles=[spring_flavored_ddd_lite 0.85, hexagonal_partial 0.30] 확정. phase_1_candidate_correction_trace 의 final 표시. Phase 6 안티패턴 LV-001 + LV-002 등록 강제.",
+        "research_ref": ".claude/researches/research-decisions-6.md §6"
+      },
+      {
+        "id": "CIRCULAR-001",
+        "decided_at": "2026-04-28",
+        "decided_by": "윤주스 (TF Lead)",
+        "decision": "ADR-006 default 적용 (Option A) — bc_status=undefined + medium + decision_required=true",
+        "rationale": "BC 미정의 모놀리스의 default = 'BC 결정 보류 + 도메인 행동 검증' 가장 안전. ADR-006 자체가 Provisional (PoC #02 후 재검토). 미리 same/different BC 결정하면 Phase 4 5.A 도메인 행동 검증 결과와 충돌 → 재작업 위험. Drotbohm 1차 사료 (Discussion #493) + ArchUnit FreezingArchRule 산업 표준 정합.",
+        "impact": "circular_dependencies[CIRCULAR-001] 에 v1.1.2 새 필드 추가 (bc_status=undefined, bc_assignment_explicit=false, documented_decision=false, severity=medium, decision_required=true, decision_owner=domain_expert, phase_4_routing=true). Phase 4 5.A BC 정의 + User.writeCommentToArticle() 도메인 행동 검증 라우팅.",
+        "research_ref": ".claude/researches/research-decisions-6.md §5",
+        "phase_4_followup": "User ↔ Article BC 정의 + 도메인 행동 검증 (User.writeCommentToArticle() 등 양방향 메서드) + Aggregate 경계 결정",
+        "phase_4_resolution": {
+          "decided_at": "2026-04-28",
+          "decision": "same_bc 단일 BC-CONTENT 확정 (3원칙 승인)",
+          "rationale": "Phase 4 5.A 도메인 행동 검증 결과 — User.writeArticle/writeCommentToArticle/favoriteArticle/removeArticle/removeCommentByUser/updateArticle 등 5+ cross-aggregate 행동. 같은 BC 내 도메인 협력. 분리 BC 는 over-engineering (Vernon Aggregate per BC + 카카오페이 여신코어 DDD + senior §1 결정 매트릭스 #1). 3-agent 합의 (document/case/senior) + F-015 cross-validation 8/8 정합.",
+          "impact": "bc_status undefined → same_bc / severity medium → low / decision_required true → false / phase_4_routing true → false / bc_assignment_explicit false → true / documented_decision false → true. domain.json bounded_contexts[BC-CONTENT] 단일 BC 표현 + Aggregate 3개 (User/Article/Tag).",
+          "research_ref": ".claude/researches/research-phase4.md §1 결정 #1 + §6 액션 A1"
+        }
+      }
+    ],
+    "warnings": [
+      "import 전수 fetch 미수행 — 19건 sampling. 나머지 (90 java files - 19) 의존성은 추론 (E).",
+      "Phase 1 candidate (Hexagonal/Clean 0.65, POJO 0.85) → Phase 3 확정 (0.30 / 0.50) — 큰 정정. F-024 finding 등록.",
+      "architecture_style enum 한계 — 'layered' 만 선택 가능. 실제는 'Layered + Spring-flavored DDD-Lite' hybrid. F-025 finding.",
+      "양방향 도메인 import (domain/article ↔ domain/user) 알고리즘 관점 = 순환. 도메인 의도 분기 = Phase 4 검증 후. F-023 finding (high).",
+      "domain/ 가 Spring framework 직접 의존 (@Service / @Transactional / @Entity / PasswordEncoder). source-info.md 'POJO' ground truth 와 부분 차이. F-022 finding.",
+      "외부 의존성 0건 (HTTP 클라이언트 / Kafka / SDK 부재). 5.D 빈약 — 학습용 spec 한계. F-026 finding.",
+      "F-015 cross-validation 사전 적용 — 19건 raw fetch 100%, 0% 오차."
+    ],
+    "phase_1_candidate_correction_trace": {
+      "_note": "F-024 finding 의 살아있는 사례. 사용자 승인 완료 (2026-04-28, user_decisions[ARCH-STYLE]).",
+      "approval_status": "approved",
+      "approved_at": "2026-04-28",
+      "approved_by": "윤주스 (TF Lead)",
+      "phase_1_candidates": {
+        "Hexagonal/Clean (영향)": {"phase_1": 0.65, "phase_3": 0.30, "delta": -0.35, "status": "❌ refuted", "evidence": ["LV-001 (app→infra 직접)", "framework leak (LV-002)", "port 1건만"]},
+        "POJO domain 강조": {"phase_1": 0.85, "phase_3": 0.50, "delta": -0.35, "status": "⚠️ corrected", "evidence": ["@Service/@Transactional/@Entity 직접 import", "PasswordEncoder in domain"]},
+        "Layered (보강)": {"phase_1": 0.55, "phase_3": "absorbed_into_primary", "status": "✅ promoted", "evidence": ["5 차원 결정적 검증 통과", "카카오페이 회고 매칭", "우형 Multi Module 패턴", "카카오뱅크 Spring Modulith 사례"]}
+      },
+      "phase_3_primary": "Layered + Spring-flavored DDD-Lite (confidence 0.85)",
+      "phase_6_routing": ["AP-ARCH-LAYER-VIOLATION-001 (LV-001)", "AP-DOMAIN-FRAMEWORK-LEAK-001 (LV-002)"]
+    }
+  },
+  "system_name": "RealWorld Spring Boot (Conduit)",
+  "architecture_style": "layered",
+  "_architecture_style_note": "schema enum 한계 (F-025) — 실제 hybrid: 'Layered + Spring-flavored DDD-Lite' (0.85). secondary_styles 보조 필드 사용.",
+  "secondary_styles": [
+    {"style": "spring_flavored_ddd_lite", "confidence": 0.85, "evidence": ["@Embedded 7개 (3-level nesting)", "Aggregate 후보: User/Article", "POJO 도메인 의도 (단 Spring annotation 직접 사용)", "Repository 인터페이스 패턴"]},
+    {"style": "hexagonal_partial", "confidence": 0.30, "evidence": ["domain/jwt 인터페이스 + infrastructure/jwt 구현 (1건만 port-style)", "UserFindService interface 발견 (1건만)", "application → infrastructure 직접 의존 (Hexagonal 부정)"]}
+  ],
+  "modules": [
+    {
+      "id": "MOD-APP-ARTICLE",
+      "name": "application-article (REST 어댑터)",
+      "path": "src/main/java/io/github/raeperd/realworld/application/article",
+      "layer": "presentation",
+      "responsibility": "Article + Comment REST 컨트롤러, DTO/Model 변환",
+      "loc": 384,
+      "file_count": 9,
+      "_bytes": 13430,
+      "related_bounded_context": "BC-ARTICLE"
+    },
+    {
+      "id": "MOD-APP-USER",
+      "name": "application-user (REST 어댑터)",
+      "path": "src/main/java/io/github/raeperd/realworld/application/user",
+      "layer": "presentation",
+      "responsibility": "User + Profile REST 컨트롤러, DTO/Model 변환",
+      "loc": 265,
+      "file_count": 7,
+      "_bytes": 9286,
+      "related_bounded_context": "BC-USER"
+    },
+    {
+      "id": "MOD-APP-SECURITY",
+      "name": "application-security (인증 어댑터)",
+      "path": "src/main/java/io/github/raeperd/realworld/application/security",
+      "layer": "presentation",
+      "responsibility": "Spring Security 통합 (JWT Filter / Provider / Configuration)",
+      "loc": 199,
+      "file_count": 3,
+      "_bytes": 6990,
+      "related_bounded_context": "BC-AUTH (cross-cutting)"
+    },
+    {
+      "id": "MOD-APP-TAG",
+      "name": "application-tag (REST 어댑터)",
+      "path": "src/main/java/io/github/raeperd/realworld/application/tag",
+      "layer": "presentation",
+      "responsibility": "Tag REST 컨트롤러",
+      "loc": 28,
+      "file_count": 2,
+      "_bytes": 1010,
+      "related_bounded_context": "BC-ARTICLE (sub)"
+    },
+    {
+      "id": "MOD-APP-CROSS",
+      "name": "application-cross-cutting",
+      "path": "src/main/java/io/github/raeperd/realworld/application",
+      "layer": "cross-cutting",
+      "responsibility": "WebMvcConfiguration (CORS, MVC 설정)",
+      "loc": 16,
+      "file_count": 1,
+      "_bytes": 591,
+      "related_bounded_context": null
+    },
+    {
+      "id": "MOD-DOMAIN-ARTICLE",
+      "name": "domain-article",
+      "path": "src/main/java/io/github/raeperd/realworld/domain/article",
+      "layer": "domain",
+      "responsibility": "Article Aggregate Root + ArticleContents/ArticleTitle Embeddable + Comment/Tag sub-domain. 핵심 비즈니스 로직 (Article 1순위 ground truth).",
+      "loc": 616,
+      "file_count": 12,
+      "_bytes": 21579,
+      "related_bounded_context": "BC-ARTICLE"
+    },
+    {
+      "id": "MOD-DOMAIN-USER",
+      "name": "domain-user",
+      "path": "src/main/java/io/github/raeperd/realworld/domain/user",
+      "layer": "domain",
+      "responsibility": "User Aggregate Root + Profile/Email/Password/UserName/Image Embeddable + UserFindService (port-style interface 1건). User+Profile 흐름.",
+      "loc": 480,
+      "file_count": 12,
+      "_bytes": 16814,
+      "related_bounded_context": "BC-USER"
+    },
+    {
+      "id": "MOD-DOMAIN-JWT",
+      "name": "domain-jwt",
+      "path": "src/main/java/io/github/raeperd/realworld/domain/jwt",
+      "layer": "domain",
+      "responsibility": "JWT Payload + Serializer/Deserializer interface (port). cross-cutting JWT 도메인 추상화.",
+      "loc": 14,
+      "file_count": 3,
+      "_bytes": 495,
+      "related_bounded_context": "BC-AUTH"
+    },
+    {
+      "id": "MOD-INFRA-JWT",
+      "name": "infrastructure-jwt",
+      "path": "src/main/java/io/github/raeperd/realworld/infrastructure/jwt",
+      "layer": "infrastructure",
+      "responsibility": "HmacSHA256JWTService (JWT 자체 구현 — Base64URL/HmacSHA256/JWTConfiguration). domain/jwt port 의 adapter.",
+      "loc": 178,
+      "file_count": 5,
+      "_bytes": 6253,
+      "related_bounded_context": "BC-AUTH"
+    },
+    {
+      "id": "MOD-INFRA-REPO",
+      "name": "infrastructure-repository",
+      "path": "src/main/java/io/github/raeperd/realworld/infrastructure/repository",
+      "layer": "infrastructure",
+      "responsibility": "SpringDataJPAConfiguration (@EnableJpaAuditing 등 JPA 설정).",
+      "loc": 8,
+      "file_count": 1,
+      "_bytes": 270,
+      "related_bounded_context": null
+    }
+  ],
+  "dependencies": [
+    {"from": "MOD-APP-ARTICLE", "to": "MOD-DOMAIN-ARTICLE", "type": "import", "weight": 8, "violates_layer": false, "_note": "정상 — application → domain"},
+    {"from": "MOD-APP-ARTICLE", "to": "MOD-DOMAIN-USER", "type": "import", "weight": 3, "violates_layer": false, "_note": "정상 — UserName VO 사용"},
+    {"from": "MOD-APP-ARTICLE", "to": "MOD-INFRA-JWT", "type": "import", "weight": 2, "violates_layer": true, "_note": "⚠️ Hexagonal 부정 — RestController 가 UserJWTPayload 직접 의존. Layered 인정 핵심 증거."},
+    {"from": "MOD-APP-USER", "to": "MOD-DOMAIN-USER", "type": "import", "weight": 8, "violates_layer": false},
+    {"from": "MOD-APP-USER", "to": "MOD-INFRA-JWT", "type": "import", "weight": 1, "violates_layer": true, "_note": "MOD-APP-ARTICLE 와 동일 패턴"},
+    {"from": "MOD-APP-SECURITY", "to": "MOD-DOMAIN-JWT", "type": "import", "weight": 3, "violates_layer": false, "_note": "정상 — JWTDeserializer interface 의존"},
+    {"from": "MOD-APP-TAG", "to": "MOD-DOMAIN-ARTICLE", "type": "import", "weight": 2, "violates_layer": false, "_note": "tag 는 article 하위"},
+    {"from": "MOD-DOMAIN-ARTICLE", "to": "MOD-DOMAIN-USER", "type": "import", "weight": 5, "violates_layer": false, "_note": "Article.author = User. 정상 cross-aggregate 참조."},
+    {"from": "MOD-DOMAIN-USER", "to": "MOD-DOMAIN-ARTICLE", "type": "import", "weight": 4, "violates_layer": false, "_circular_with": "MOD-DOMAIN-ARTICLE", "_note": "⚠️ User.writeCommentToArticle() 등 행동 — 양방향 cross-aggregate. F-023."},
+    {"from": "MOD-DOMAIN-ARTICLE", "to": "MOD-DOMAIN-JWT", "type": "import", "weight": 1, "violates_layer": false, "_note": "(추정 E) — 메인 검증에서 미확인"},
+    {"from": "MOD-INFRA-JWT", "to": "MOD-DOMAIN-JWT", "type": "import", "weight": 4, "violates_layer": false, "_note": "정상 — port 구현 (Hexagonal 흔적)"},
+    {"from": "MOD-INFRA-JWT", "to": "MOD-DOMAIN-USER", "type": "import", "weight": 2, "violates_layer": false, "_note": "HmacSHA256JWTService 가 User Entity 직접 의존 — port 인터페이스 부재"},
+    {"from": "MOD-INFRA-REPO", "to": "(spring data jpa)", "type": "import", "weight": 2, "violates_layer": false, "_note": "외부 라이브러리만 의존"}
+  ],
+  "circular_dependencies": [
+    {
+      "id": "CIRCULAR-001",
+      "modules": ["MOD-DOMAIN-ARTICLE", "MOD-DOMAIN-USER"],
+      "detection": {
+        "algorithm": "tarjan_scc",
+        "scc_size": 2,
+        "import_count": 9,
+        "tools_view": {
+          "spring_modulith_verify": "would_fail",
+          "archunit_slices_beFreeOfCycles": "would_fail",
+          "tarjan_scc": "detected"
+        }
+      },
+      "bc_status": "same_bc",
+      "bc_assignment_explicit": true,
+      "documented_decision": true,
+      "severity": "low",
+      "decision_required": false,
+      "decision_owner": "domain_expert",
+      "phase_4_routing": false,
+      "antipattern_id": null,
+      "_evidence": [
+        "User.java imports Article / ArticleContents / ArticleUpdateRequest / Comment",
+        "Article.java imports User / Comment",
+        "양쪽 모두 5+ 회 import — 강한 양방향"
+      ],
+      "_algorithm_view": "Spring Modulith verify() / ArchUnit slices().beFreeOfCycles() / Tarjan SCC = 자동 실패 (high 가능). same_bc 결정으로 도메인 의도 합법화 (low 격하).",
+      "_domain_intent_view": "Phase 4 검증 결과 — User ↔ Article 5+ cross-aggregate 행동 (writeArticle/writeCommentToArticle/favoriteArticle/removeArticle/removeCommentByUser/updateArticle 등). 같은 BC 내 도메인 협력 — 분리 BC 가 over-engineering (Vernon Aggregate per BC + 카카오페이 여신코어 DDD).",
+      "_decision_phase_3": "ADR-006 default 적용 (윤주스 2026-04-28) — bc_status=undefined + medium + decision_required + Phase 4 라우팅. F-023 closed (v1.1.2).",
+      "_decision_phase_4": "Phase 4 5.A 도메인 행동 검증 결과 → bc_status=same_bc 확정 (윤주스 2026-04-28 3원칙 승인). 단일 BC-CONTENT 로 통합 (BC-ARTICLE + BC-USER → BC-CONTENT). severity medium → low 격하. decision_required=false (해소).",
+      "_phase_3_provisional_severity": "low (보고서 §1.4 잠정)",
+      "_phase_3_initial_severity": "medium (ADR-006 default 표 적용)",
+      "_phase_4_resolution_severity": "low (same_bc 결정 — 도메인 협력 합법화)",
+      "_severity_change_reason": "Phase 4 검증으로 bc_status=undefined → same_bc 전환 → ADR-006 분류 표 medium → low 자동 격하.",
+      "user_decision_ref": "meta.user_decisions[CIRCULAR-001]",
+      "phase_4_validation_checklist": [
+        "✅ User 와 Article 의 BC 정의 (same / different) — same_bc 결정",
+        "✅ User.writeCommentToArticle() 등 양방향 메서드의 도메인 의도 검증 — 5+ cross-aggregate 행동 (도메인 협력 강함)",
+        "✅ ORM cascade (REMOVE / PERSIST) 가 양방향을 강제하는가 — Article+Comment {PERSIST,REMOVE} 강한 same aggregate signal / User+followingUsers REMOVE 약한 same aggregate signal",
+        "✅ Aggregate 경계 결정 — User Aggregate / Article Aggregate (Comment 흡수) / Tag Aggregate (약함). 단일 BC-CONTENT 내 3 Aggregate."
+      ],
+      "phase_4_documented_at": "2026-04-28",
+      "phase_4_documented_in": [
+        "output/domain/domain.json bounded_contexts[BC-CONTENT]",
+        "output/domain/domain.md §1.1 BC-CONTENT (단일 통합 BC)",
+        "research-phase4.md §1 결정 #1 + §6 액션 A1"
+      ]
+    }
+  ],
+  "external_dependencies": [],
+  "_external_dependencies_note": "5.D 외부 의존성 0건 — RealWorld 학습용 spec 한계. HTTP 클라이언트 (RestTemplate / WebClient / OkHttp) / Kafka / RabbitMQ / AWS SDK / Stripe / Twilio 모두 부재. 사내 진짜 PoC 시 별도 검증 필요. F-026.",
+  "module_table_mapping": {
+    "_note": "Phase 2 7 테이블 → 모듈 매핑. Phase 4 BC 후보 입력.",
+    "BC-ARTICLE": {
+      "modules": ["MOD-DOMAIN-ARTICLE", "MOD-APP-ARTICLE", "MOD-APP-TAG"],
+      "tables": ["articles", "articles_tags", "article_favorites", "comments", "tags"],
+      "phase_4_aggregate_candidates": ["Article", "Comment", "Tag"]
+    },
+    "BC-USER": {
+      "modules": ["MOD-DOMAIN-USER", "MOD-APP-USER"],
+      "tables": ["users", "user_followings"],
+      "phase_4_aggregate_candidates": ["User"]
+    },
+    "BC-AUTH": {
+      "modules": ["MOD-DOMAIN-JWT", "MOD-INFRA-JWT", "MOD-APP-SECURITY"],
+      "tables": [],
+      "phase_4_aggregate_candidates": [],
+      "_note": "cross-cutting — DB 영속성 없음, JWT 토큰만 처리"
+    }
+  },
+  "layer_violations": [
+    {
+      "id": "LV-001",
+      "description": "MOD-APP-ARTICLE → MOD-INFRA-JWT 직접 의존 (UserJWTPayload import)",
+      "files": ["application/article/ArticleRestController.java", "application/user/UserRestController.java (추정)"],
+      "severity": "medium",
+      "type": "presentation_to_infrastructure_direct",
+      "_routing": "Phase 6 안티패턴 (AP-ARCH-LAYER-VIOLATION-001) 후보",
+      "_note": "Hexagonal 미달성 핵심 증거. presentation 이 application/usecase 거치지 않고 infrastructure 직접 의존."
+    },
+    {
+      "id": "LV-002",
+      "description": "domain/ 패키지 가 Spring framework annotation 직접 사용 (@Service / @Transactional / @Entity / PasswordEncoder import)",
+      "files": ["domain/article/ArticleService.java", "domain/user/UserService.java", "domain/article/Article.java", "domain/user/User.java"],
+      "severity": "medium",
+      "type": "framework_leak_into_domain",
+      "_routing": "Phase 6 안티패턴 (AP-DOMAIN-FRAMEWORK-LEAK-001) 후보",
+      "_note": "Pure POJO 미달성. 한국 SI 에서 거의 100% 발생 패턴 (Senior §1). source-info.md ground truth 와 부분 차이. F-022."
+    }
+  ],
+  "diagram_files": {
+    "module_overview": "architecture.mermaid",
+    "dependency_graph": "dependency-graph.mermaid",
+    "circular_dependencies_md": "circular-dependencies.md"
+  }
+}

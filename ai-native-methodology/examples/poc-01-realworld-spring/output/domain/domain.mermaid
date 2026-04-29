@@ -1,0 +1,134 @@
+classDiagram
+    %% BC-CONTENT (단일 통합 BC) — CIRCULAR-001 same_bc 결정
+    %% Aggregate Roots: User / Article / Comment / Tag
+    %% @Embeddable VOs: Email / Password / Profile / UserName / Image / ArticleContents / ArticleTitle
+
+    class User {
+        <<Aggregate Root>>
+        +Long id
+        +Email email
+        +Password password
+        +Profile profile
+        +Set~User~ followingUsers
+        +Set~Article~ favoriteArticles
+        +writeArticle()
+        +writeCommentToArticle()
+        +favoriteArticle()
+        +unfavoriteArticle()
+        +followUser()
+        +unfollowUser()
+        +updateUser()
+        +updateArticle()
+        +removeArticle()
+        +removeCommentByUser()
+    }
+
+    class Email {
+        <<Value Object>>
+        +String address
+    }
+
+    class Password {
+        <<Value Object>>
+        +String encoded
+        +matches() bool
+    }
+
+    class Profile {
+        <<Value Object>>
+        +UserName userName
+        +Image image
+        +String bio
+        +boolean following @Transient
+    }
+
+    class UserName {
+        <<Value Object>>
+        +String name
+    }
+
+    class Image {
+        <<Value Object>>
+        +String address
+    }
+
+    class Article {
+        <<Aggregate Root>>
+        +Long id
+        +User author
+        +ArticleContents contents
+        +List~Comment~ comments
+        +Set~User~ userFavorited
+        +Instant createdAt
+        +Instant updatedAt
+        +addComment()
+        +removeCommentByUser()
+        +updateArticle()
+        +afterUserFavoritesArticle()
+    }
+
+    class ArticleContents {
+        <<Value Object>>
+        +ArticleTitle title
+        +String slug
+        +String description
+        +String body
+        +Set~Tag~ tags
+    }
+
+    class ArticleTitle {
+        <<Value Object>>
+        +String title
+    }
+
+    class Comment {
+        <<Aggregate Root (사실상 Article 일부)>>
+        +Long id
+        +Article article
+        +User author
+        +String body
+        +Instant createdAt
+        +Instant updatedAt
+    }
+
+    class Tag {
+        <<Aggregate Root (약함)>>
+        +Long id
+        +String name
+    }
+
+    %% BC-AUTH cross-cutting
+    class UserJWTPayload {
+        <<Value Object>>
+        +Long id
+        +String email
+    }
+
+    class HmacSHA256JWTService {
+        <<Domain Service>>
+        +serialize()
+        +deserialize()
+    }
+
+    %% Composition (@Embedded)
+    User *-- Email : @Embedded
+    User *-- Password : @Embedded
+    User *-- Profile : @Embedded
+    Profile *-- UserName : @Embedded
+    Profile *-- Image : @Embedded
+    Article *-- ArticleContents : @Embedded
+    ArticleContents *-- ArticleTitle : @Embedded
+
+    %% Cross-aggregate refs (CIRCULAR-001 same_bc)
+    Article --> User : author
+    User --> Article : favoriteArticles
+    User --> User : followingUsers (directional)
+    Article --> Comment : comments cascade={PERSIST,REMOVE}
+    Comment --> Article : article
+    Comment --> User : author
+    Article --> Tag : tags ManyToMany (F-017)
+    Article --> User : userFavorited (Set)
+
+    %% BC-AUTH cross-cutting (LV-001)
+    UserJWTPayload ..> User : (LV-001 — application/article import)
+    HmacSHA256JWTService ..> UserJWTPayload : produces

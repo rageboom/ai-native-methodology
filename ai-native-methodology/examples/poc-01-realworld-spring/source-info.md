@@ -7,34 +7,43 @@
 
 ## 분석 대상
 
-| 항목 | 값 |
-|---|---|
-| 레포 URL | https://github.com/raeperd/realworld-springboot-java |
-| 작성자 | RaeCheol Park (raeperd) |
-| 라이선스 | MIT |
-| Stars | 225 (2026-04-26 기준) |
-| Forks | 94 |
-| 마지막 commit | (web_fetch에서 확인 필요 — Phase 1) |
+| 항목 | 값 | 출처 |
+|---|---|---|
+| 레포 URL | https://github.com/raeperd/realworld-springboot-java | 1차 |
+| 작성자 | RaeCheol Park (raeperd) | 1차 |
+| 라이선스 | MIT | 1차 |
+| Stars | 225 (2026-04-26 기준) | 1차 |
+| Forks | 94 | 1차 |
+| **기본 브랜치** | **`master`** ⚠️ (main 아님) | D 재검증 (2026-04-27) |
+| 마지막 commit | (Phase 1 실행 시 기록) | - |
 
 ---
 
-## 기술 스택 (READMEㆍTopic 기반 1차 추정)
+## 기술 스택 (Phase 1 D 재검증 — 2026-04-27)
 
-| 영역 | 기술 |
-|---|---|
-| **언어** | Java 11 (GitHub Topic `java11`) |
-| **빌드** | Gradle (Groovy) — `build.gradle`, `settings.gradle` |
-| **프레임워크** | Spring Boot |
-| **웹** | Spring Web (REST) |
-| **인증** | Spring Security + JWT (자체 구현, 3rd party 없음) |
-| **ORM** | Spring Data JPA |
-| **DB** | (Phase 2에서 확인 — application.properties) |
-| **테스트** | JUnit + JaCoCo (커버리지 100% 추구) |
-| **CI** | GitHub Actions, SonarCloud |
-| **배포** | Docker (Jib Gradle 플러그인) |
-| **유틸** | Lombok (도메인 패키지 외에서만) |
+| 영역 | 기술 | 신뢰도 | 출처 |
+|---|---|---|---|
+| **언어** | **Java 11** | 0.98 | build.gradle 실측 ✅ |
+| **빌드** | Gradle (Groovy) — `build.gradle` 1,720 bytes | 0.98 | raw fetch ✅ |
+| **프레임워크** | **Spring Boot 2.5.2** ⚠️ | 0.98 | build.gradle 실측 (이전 추정 2.7.x → 정정) |
+| **웹** | Spring Web (REST) | 0.95 | starter-web 의존성 |
+| **인증** | Spring Security + JWT (자체 구현) | 0.95 | starter-security + JWT 라이브러리 부재 |
+| **ORM** | Spring Data JPA (단일) | 0.95 | starter-data-jpa + mybatis 부재 |
+| **DB** | (Phase 2 — application.properties) | - | - |
+| **테스트** | JUnit + JaCoCo (커버리지 100% 추구) | 0.85 | README + JaCoCo plugin |
+| **CI** | GitHub Actions, SonarCloud | 0.85 | .github 디렉토리 |
+| **배포** | Docker (Jib Gradle 플러그인) | 0.85 | Jib plugin (build.gradle) |
+| **유틸** | **Lombok 사용** (io.freefair.lombok 5.3.3.3) | 0.95 | build.gradle 직접 fetch ✅ |
+| **추가 plugin** | jacoco / editorconfig / sonarqube / jib | 0.95 | build.gradle |
+| **검증/테스트** | starter-validation / mockito-inline 3.12.1 / spring-security-test | 0.95 | build.gradle |
+| **DB (개발용)** | H2 (runtimeOnly) | 0.95 | build.gradle |
+| **그룹/버전** | io.github.raeperd / 2.1.1 | 0.98 | build.gradle |
 
-⚠️ **신뢰도**: README + Topic 기반. Phase 1에서 build.gradle 직접 확인 필요.
+⚠️ **Phase 1 실측 보정 사항** (2026-04-27):
+- 기본 브랜치: `master` (main 아님) ✅
+- Spring Boot: **2.5.2** (2.7.x 추정 → 정정) ✅
+- Lombok: **사용** (io.freefair.lombok plugin) — D 에이전트 1차 "미사용" 보고는 오류, 원래 source-info 의 "도메인 외" 표현이 더 정확
+- Tree entries: **170** (D 에이전트 1차 "93" 보고는 오류 — F-015 후보)
 
 ---
 

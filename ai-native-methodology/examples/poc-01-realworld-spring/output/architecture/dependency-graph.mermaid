@@ -1,0 +1,57 @@
+%% RealWorld Spring Boot — Module Dependency Graph (Phase 3)
+%% 생성일: 2026-04-28
+%% 출처: 19건 import raw fetch + Phase 1/2 인계
+%% 표기: 화살표 = 의존 방향, 가중치 = import 횟수, 점선 = layer violation
+graph LR
+    AppArt["MOD-APP-ARTICLE"]
+    AppUsr["MOD-APP-USER"]
+    AppSec["MOD-APP-SECURITY"]
+    AppTag["MOD-APP-TAG"]
+    AppCross["MOD-APP-CROSS"]
+
+    DomArt["MOD-DOMAIN-ARTICLE"]
+    DomUsr["MOD-DOMAIN-USER"]
+    DomJwt["MOD-DOMAIN-JWT"]
+
+    InfJwt["MOD-INFRA-JWT"]
+    InfRepo["MOD-INFRA-REPO"]
+
+    %% Layered 정상 의존 (presentation → domain)
+    AppArt -->|w=8| DomArt
+    AppArt -->|w=3| DomUsr
+    AppUsr -->|w=8| DomUsr
+    AppSec -->|w=3| DomJwt
+    AppTag -->|w=2| DomArt
+
+    %% Layer Violation (presentation → infrastructure 직접)
+    AppArt -.->|w=2 ⚠️ LV-001| InfJwt
+    AppUsr -.->|w=1 ⚠️ LV-001| InfJwt
+
+    %% Domain cross-aggregate (양방향 — CIRCULAR-001 / F-023)
+    DomArt ==>|w=5| DomUsr
+    DomUsr ==>|w=4 ⚠️ 양방향| DomArt
+
+    %% Infrastructure → Domain
+    InfJwt -->|w=4 port 구현| DomJwt
+    InfJwt -->|w=2 Entity 직접| DomUsr
+
+    %% Cross-cutting
+    AppCross -->|MVC 설정| Spring["Spring framework"]
+    InfRepo -->|JPA 설정| Spring
+
+    %% Domain → Spring framework (LV-002 / F-022)
+    DomArt -.->|@Service @Entity @Transactional| Spring
+    DomUsr -.->|@Service @Entity PasswordEncoder| Spring
+
+    %% External
+    External["external_dependencies<br/>(HTTP / Kafka / SDK)<br/>= 0건 (F-026)"]
+
+    classDef domain fill:#fff3cd,stroke:#856404
+    classDef infra fill:#d1ecf1,stroke:#0c5460
+    classDef app fill:#d4edda,stroke:#155724
+    classDef warn fill:#f8d7da,stroke:#721c24
+
+    class DomArt,DomUsr,DomJwt domain
+    class InfJwt,InfRepo infra
+    class AppArt,AppUsr,AppSec,AppTag,AppCross app
+    class Spring,External warn

@@ -1,0 +1,54 @@
+%% RealWorld Spring Boot — C4 Level 3 Component Diagram (Phase 3)
+%% 생성일: 2026-04-28
+%% 출처: 19건 import raw fetch (메인 9 + sub-agent 10)
+%% 아키텍처 스타일: Layered + Spring-flavored DDD-Lite (0.85)
+%% Phase 1 candidate (Hexagonal 0.65, POJO 0.85) → Phase 3 정정 (0.30, 0.50)
+flowchart TB
+    subgraph PRESENTATION["presentation/ (application/)"]
+        AppArt["MOD-APP-ARTICLE<br/>9 files / 384 LOC<br/>Article + Comment REST"]
+        AppUsr["MOD-APP-USER<br/>7 files / 265 LOC<br/>User + Profile REST"]
+        AppSec["MOD-APP-SECURITY<br/>3 files / 199 LOC<br/>Spring Security + JWT Filter"]
+        AppTag["MOD-APP-TAG<br/>2 files / 28 LOC"]
+        AppCross["MOD-APP-CROSS<br/>WebMvcConfiguration"]
+    end
+
+    subgraph DOMAIN["domain/ (Spring-flavored DDD-Lite)"]
+        DomArt["MOD-DOMAIN-ARTICLE<br/>12 files / 616 LOC<br/>⭐ Article 1순위<br/>@Embedded ArticleContents"]
+        DomUsr["MOD-DOMAIN-USER<br/>12 files / 480 LOC<br/>@Embedded Profile (3-level)"]
+        DomJwt["MOD-DOMAIN-JWT<br/>3 files / 14 LOC<br/>JWT Payload + Serializer interface"]
+    end
+
+    subgraph INFRASTRUCTURE["infrastructure/"]
+        InfJwt["MOD-INFRA-JWT<br/>5 files / 178 LOC<br/>HmacSHA256JWTService<br/>(JWT 자체 구현)"]
+        InfRepo["MOD-INFRA-REPO<br/>1 file / 8 LOC<br/>SpringDataJPAConfiguration"]
+    end
+
+    %% 정상 의존 방향 (Layered)
+    AppArt --> DomArt
+    AppArt --> DomUsr
+    AppUsr --> DomUsr
+    AppSec --> DomJwt
+    AppTag --> DomArt
+
+    %% Layer Violation (LV-001) — Hexagonal 부정 핵심 증거
+    AppArt -.->|⚠️ LV-001| InfJwt
+    AppUsr -.->|⚠️ LV-001| InfJwt
+
+    %% domain ↔ domain 양방향 (CIRCULAR-001 — F-023)
+    DomArt <-->|⚠️ CIRCULAR-001<br/>5↔4 imports| DomUsr
+
+    %% infrastructure → domain (port 구현)
+    InfJwt --> DomJwt
+    InfJwt -.->|User Entity 직접 의존| DomUsr
+
+    %% Spring framework leak (LV-002 — F-022)
+    DomArt -.->|@Service @Transactional @Entity| Spring["Spring framework"]
+    DomUsr -.->|PasswordEncoder| Spring
+
+    %% External
+    External["external_dependencies<br/>= 0 건<br/>(F-026)"]
+
+    style DomArt fill:#fff3cd
+    style DomUsr fill:#fff3cd
+    style Spring fill:#f8d7da
+    style External fill:#e2e3e5

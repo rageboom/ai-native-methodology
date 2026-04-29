@@ -52,8 +52,76 @@ flowchart TB
 
 - **모듈 식별**: 디렉토리 + 패키지 구조
 - **import/require 그래프**: AST에서 결정적 추출
-- **순환 의존성**: Tarjan SCC 알고리즘
+- **순환 의존성 검출**: Tarjan SCC 알고리즘 (탐지 단계 — 결정적)
 - **외부 호출 지점**: 알려진 HTTP 클라이언트 패턴 매칭
+
+#### 3.1.1 순환 의존성 처리 단계 (v1.1.2 — F-023)
+
+탐지 (결정적) + 분류 (도메인 의도) 의 hybrid. ADR-006 (Cycle 처리 default 정책, provisional) 참조.
+
+```
+Step 1. Tarjan SCC 알고리즘 (자동, 결정적)
+        → 순환 컴포넌트 검출
+
+Step 2. BC 분류 — 다음 3개 필드로 산정:
+        - bc_status: same | different | undefined
+          · same      = 같은 Bounded Context 안 cross-aggregate (cascade 우회 등)
+          · different = 다른 BC 간 양방향 (안티패턴 의심)
+          · undefined = BC 미정의 (Phase 4 진입 전 결정 필요)
+        - bc_assignment_explicit: true | false
+          · 코드/문서에 BC 할당이 명시되었는가?
+        - documented_decision: true | false
+          · ADR 또는 design doc 에 결정 문서가 있는가?
+
+Step 3. severity 자동 산정 (decision_required 페어링):
+
+        | bc_status   | bc_assignment_explicit | severity | decision_required |
+        |-------------|------------------------|----------|-------------------|
+        | same        | true                   | low      | false             |
+        | same        | false                  | low      | true (BC 명시 권고) |
+        | different   | true                   | high     | false             |
+        | different   | false                  | medium   | true              |
+        | undefined   | *                      | medium   | true (default)    |
+
+Step 4. 도구 정책 분기:
+        - Spring Modulith verify() / ArchUnit `slices().beFreeOfCycles()` 활성:
+          → 도메인 의도 무관 자동 high (빌드 차단)
+        - 위 도구 미활성 + ArchUnit FreezingArchRule 패턴:
+          → 기존 cycle = baseline 수용, 신규 cycle 만 차단
+
+Step 5. decision_required=true 인 경우 Phase 4 라우팅:
+        → phase_4_routing=true + decision_owner=domain_expert
+```
+
+> 💡 **default 정책 근거** (ADR-006):
+> - `bc_status=undefined` → severity=**medium**, decision_required=**true**
+> - 근거: ArchUnit FreezingArchRule (신규만 차단) 산업 표준, Drotbohm Discussion #493 ("DAG is key... but interface inversion") 1차 사료.
+> - "domain-legitimate cycle" 자동 분류는 산업 도구 어디에도 없음 → "decision_required → interface inversion" 휴리스틱 권장.
+
+> 📚 schema 어휘: 산업 표준 도구 (Spring Modulith / ArchUnit / Vernon IDDD) 어디도 "intent" enum 미사용. v1.1.2 는 **3값 bc_status + 2 boolean** 채택 (ADR-006).
+
+#### 3.1.2 산출 형식 (architecture.json)
+
+`circular_dependencies[]` 항목당:
+
+```yaml
+circular_dependencies:
+  - id: CIRCULAR-001
+    modules: [domain.article, domain.user]
+    detection:
+      algorithm: tarjan_scc
+    bc_status: undefined        # same | different | undefined
+    bc_assignment_explicit: false
+    documented_decision: false
+    severity: medium            # 위 표 기반 자동 산정
+    decision_required: true
+    decision_owner: domain_expert
+    decision_deadline: "Phase 4 진입 전"
+    phase_4_routing: true
+    antipattern_id: AP-ARCH-006  # 발견 시
+```
+
+> ⚠️ v1.1.1 산출물의 `circular_dependencies[]` 는 옵셔널 신규 필드 형식이라 호환됨. v1.1.2 진입 시 `meta.warnings` 에 "v1.1.2 분기 가이드 적용 시 재산정 권장" 추가.
 
 ### 3.2 LLM 처리
 

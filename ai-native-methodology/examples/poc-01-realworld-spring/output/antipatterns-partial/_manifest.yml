@@ -1,0 +1,135 @@
+manifest:
+  generated_at: "2026-04-28"
+  poc_id: "poc-01-realworld-spring"
+  phase: 4
+  phase_name: "antipatterns-partial (Phase 4 partial — Phase 6 merge 대기)"
+  methodology_version: "v1.1.2"
+
+# 상위 phase 인계
+phase_4_input:
+  source: "../domain/_manifest.yml + ../rules/_manifest.yml"
+  consistency: "BR ↔ AP 이중 등록 정합 (BR-USER-EMAIL-001+002 ↔ AP-DOMAIN-002 / BR-COMMENT-DELETE-001 ↔ AP-DOMAIN-001 / BR-AUTH-JWT-001+002 ↔ AP-SECURITY-001)"
+
+# Phase 4 산출물 2종
+deliverables:
+  - file: "antipatterns-partial.json"
+    purpose: "AI용 안티패턴 partial (antipatterns.schema.json 준수)"
+    schema: "schemas/antipatterns.schema.json ✅ (id pattern 한계 — 짧은 ID 사용 + descriptive name)"
+    confidence: 0.82
+    partial: true
+    next_phase_action: "Phase 6 antipatterns.json merge"
+  - file: "_manifest.yml"
+    purpose: "Phase 4 antipatterns-partial 매니페스트 (본 파일)"
+    confidence: 0.98
+
+# 결정적 처리 결과
+deterministic_results:
+  total_ap: 6
+  by_category:
+    DOMAIN: 2
+    SECURITY: 1
+    ARCH: 2
+    DB: 1
+  by_severity:
+    critical: 2
+    high: 1
+    medium: 3
+  forced_register: 2   # LV-001/LV-002 ARCH-STYLE 후속
+  inherited: 1   # DRIFT-007 Phase 2 → AP-DB-001
+  promoted_from_drift: 1   # DRIFT-010 medium → AP-DOMAIN-002 high
+
+# ID 매핑 (research-phase4 풀네임 → schema-compliant 짧은 ID)
+id_mapping:
+  AP-DOMAIN-LOGIC-BUG-001: "AP-DOMAIN-001"
+  AP-CONFIG-HARDCODED-SECRET-001: "AP-SECURITY-001"
+  AP-VALIDATION-MISSING-EMAIL-UNIQUE-001: "AP-DOMAIN-002"
+  AP-ARCH-LAYER-VIOLATION-001: "AP-ARCH-001"
+  AP-DOMAIN-FRAMEWORK-LEAK-001: "AP-ARCH-002"
+  AP-DB-CASCADE-MISSING-001: "AP-DB-001"
+
+# Phase 4 핵심 AP (등록 결과)
+key_antipatterns:
+  - id: "AP-DOMAIN-001"
+    severity: critical
+    name: "Comment De Morgan 버그"
+    finding_origin: "F-027 신규"
+    related_br: ["BR-COMMENT-DELETE-001"]
+  - id: "AP-SECURITY-001"
+    severity: critical
+    name: "JWT SECRET 하드코딩 + 길이 부족 (RFC 7515 §5.2.2)"
+    related_br: ["BR-AUTH-JWT-001", "BR-AUTH-JWT-002"]
+  - id: "AP-DOMAIN-002"
+    severity: high
+    name: "email/username unique 이중 부재 (DRIFT-010 격상)"
+    severity_origin: "DRIFT-010 medium → high (App+DB 이중 부재 Phase 4 검증 결과)"
+    related_br: ["BR-USER-EMAIL-001", "BR-USER-USERNAME-001"]
+  - id: "AP-ARCH-001"
+    severity: medium
+    name: "presentation → infrastructure 직접 (LV-001)"
+    forced_register: true
+    source: "ARCH-STYLE 정정 트레이스"
+  - id: "AP-ARCH-002"
+    severity: medium
+    name: "domain → Spring framework leak (LV-002)"
+    forced_register: true
+    source: "ARCH-STYLE 정정 트레이스"
+  - id: "AP-DB-001"
+    severity: medium
+    name: "FK ON DELETE 정책 부재 (DRIFT-007 인계)"
+    inherited_from: "Phase 2 DRIFT-007"
+
+# Phase 6 추가 후보 (partial 단계에서 메모만)
+phase_6_additional_candidates:
+  - id_candidate: "AP-PERFORMANCE-001"
+    name: "Article+Comment EAGER N+1 후보"
+    severity_estimate: medium
+    evidence: "Article.author/userFavorited/comments + Comment.article/author 모두 EAGER fetch"
+  - id_candidate: "AP-DOMAIN-003"
+    name: "F-017 ArticleContents.tags @ManyToMany in @Embeddable (JPA 비주류)"
+    severity_estimate: low
+  - id_candidate: "AP-DOMAIN-004"
+    name: "F-028 User.equals/hashCode mutable email 의존"
+    severity_estimate: low
+
+# 사용자 결정 6건 후속 처리
+user_decision_followup:
+  DRIFT-002: "AP 영향 없음"
+  DRIFT-003: "AP 영향 없음"
+  DRIFT-007: "AP-DB-001 등록 (medium, NO ACTION)"
+  DRIFT-010: "AP-DOMAIN-002 등록 (medium → high 격상)"
+  CIRCULAR-001: "AP 영향 없음 (same_bc 결정으로 AP-ARCH-CIRCULAR-DOMAIN-001 부적용)"
+  ARCH-STYLE: "AP-ARCH-001 + AP-ARCH-002 강제 등록"
+
+# 명세 §5 + research-phase4 §6 승인 게이트
+approval_gate:
+  - check: "antipatterns-partial.json schema 검증"
+    status: "✅ (id pattern 한계는 _manifest.yml id_mapping 으로 보완)"
+  - check: "BR ↔ AP 이중 등록 정합"
+    status: "✅ 4건 (BR-USER-EMAIL-001/USERNAME-001 ↔ AP-DOMAIN-002, BR-COMMENT-DELETE-001 ↔ AP-DOMAIN-001, BR-AUTH-JWT-001/002 ↔ AP-SECURITY-001)"
+  - check: "Phase 6 merge gate 명시 (next_phase_action)"
+    status: "✅ partial=true + next_phase_action=Phase 6 merge"
+  - check: "F-027/F-028 신규 finding 기록"
+    status: "✅ (F-027 AP-DOMAIN-001 / F-028 phase_6_additional_candidates AP-DOMAIN-004)"
+  - check: "F-015 cross-validation"
+    status: "✅ document/case/senior 3-agent 합의"
+
+# Phase 6 진입 시 인계
+phase_6_handoff:
+  rule: "Phase 4 partial IDs MUST all appear in Phase 6 final"
+  partial_ids: ["AP-DOMAIN-001", "AP-SECURITY-001", "AP-DOMAIN-002", "AP-ARCH-001", "AP-ARCH-002", "AP-DB-001"]
+  evaluate_additional:
+    - "AP-PERFORMANCE-001 (EAGER N+1)"
+    - "AP-DOMAIN-003 (F-017 EMBEDDABLE-COLLECTION)"
+    - "AP-DOMAIN-004 (F-028 EQUALS-MUTABILITY)"
+  cross_check_required:
+    - "BR vs AP 이중 등록 — Phase 6 final 에서 모든 BR human_review_required 가 AP 와 매칭되는지"
+    - "DRIFT-007 (AP-DB-001) 사내 severity high 격상 메모"
+  schema_limitation_note: "antipatterns.schema.json id pattern (^AP-[A-Z]+-\\d+$) 한계 — F-025 와 유사 케이스 (v1.2.0 격상 후보)"
+
+# 다음 단계
+next_actions:
+  - "architecture.json CIRCULAR-001 same_bc 갱신"
+  - "db/schema.json DRIFT-010 격상 갱신"
+  - "findings/poc-findings.md F-027~F-033 추가"
+  - "RESUME.md / CLAUDE.md / PROGRESS-poc01-phase4.md 시간순 갱신"
+  - "Phase 5 진입 (UC 25 → OpenAPI 매핑) — 윤주스 승인 대기"

@@ -153,19 +153,45 @@ modules_for_priority_analysis:
 
 ---
 
-## 6. 신뢰도
+## 6. 신뢰도 (v1.1.2 갱신)
 
-이 phase는 **결정적 처리가 95% 이상**이라 신뢰도 가장 높음.
+이 phase는 **결정적 처리가 95% 이상**이라 신뢰도 가장 높음. v1.1.2 부터 **결정성 (Determinism) 축**으로 분류 (F-009).
 
-| 영역 | 신뢰도 |
-|---|---|
-| 디렉토리 트리 | 1.0 |
-| 파일 통계 | 1.0 |
-| 패키지 매니페스트 파싱 | 1.0 |
-| ORM 자동 감지 | 0.95 (혼재 케이스 일부 누락 가능) |
-| 스택 종합 요약 | 0.9 (LLM) |
-| 아키텍처 스타일 추론 | 0.7 (LLM) |
-| 분석 우선순위 추천 | 0.7 (LLM) |
+### 6.1 결정성 (Determinism) 축
+
+- **deterministic**: 동일 입력 → 동일 출력 (git commit hash, AST 파싱, 파일 stat)
+- **snapshot-based**: 시점 snapshot 의존 (Trees API + commit SHA, 호출 시점 따라 truncated 가능)
+- **heuristic / stateful**: 추정 또는 호출 시점/순서 의존 (byte/35 LOC 추정 등)
+- **pattern_matching**: 정해진 패턴 매칭 (ORM 단서, import 그래프 외)
+- **llm_with_grounding**: 입력 grounding 가진 LLM 추론
+- **llm_code_only**: 코드 외 입력 없는 LLM 추론
+
+### 6.2 항목별 신뢰도 (단일 표 + caveat)
+
+| 항목 | 신뢰도 | 결정성 tier | 환경 caveat |
+|---|---|---|---|
+| 디렉토리 트리 | 1.0 | deterministic / snapshot-based | web_fetch + Trees API: 7MB/100k entries 한계 시 truncated → `inventory.directory_tree_extraction.truncated=true` 명시 + 신뢰도 0.85 감점 |
+| 파일 통계 (byte) | 1.0 | deterministic | — |
+| LOC | 1.0 / 0.55 | deterministic (cloc/tokei) / heuristic (byte/35) | byte/35 추정은 본질적으로 stochastic. `inventory.repo.loc_extraction_method` 명시 의무 |
+| 패키지 매니페스트 | 1.0 | deterministic | — |
+| ORM 자동 감지 | 0.85~0.95 | pattern_matching | 4단서 (어노테이션 + import + 의존성 + 설정파일) 점검 시 0.95. 단서 부족 시 감점 |
+| 스택 종합 요약 | 0.9 | llm_with_grounding | grounding 입력 부재 시 0.7 로 감점 |
+| 아키텍처 스타일 추론 | 0.7 | llm_with_grounding | Phase 1 한계로 cap 0.7. 최종 분류는 Phase 3 으로 유보 |
+| 분석 우선순위 추천 | 0.7 | llm_with_grounding | LLM 추정 — 사용자 검토 필수 |
+
+### 6.3 warnings 의무화
+
+환경 종속 또는 추정 항목은 `inventory.meta.warnings` 에 명시 의무:
+
+```yaml
+warnings:
+  - "LOC 산출 method=heuristic_byte_per_35 (web_fetch 환경, raw fetch 불가)"
+  - "directory_tree_extraction.truncated=true (Trees API 100k entries 초과, 일부 디렉토리 누락 가능)"
+  - "ORM 단서 2/4 만 충족 (의존성 + 어노테이션 — import + 설정파일 부재)"
+```
+
+> 💡 산업 사례: SonarCloud 의 WARNING 배지 패턴과 동일 (분류 변경 X, caveat 컬럼만).
+> 🚫 안티 패턴: "환경별로 표 자체를 분리" — DRY 위반 + enum 폭발 + 산업 표준 0건.
 
 ---
 

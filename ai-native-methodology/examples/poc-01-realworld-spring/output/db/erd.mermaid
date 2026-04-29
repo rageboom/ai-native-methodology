@@ -1,0 +1,66 @@
+%% RealWorld Spring Boot — DB ERD (Phase 2)
+%% 생성일: 2026-04-27
+%% 출처: schema.sql DDL (master @ 56be3ce) + JPA Entity 11건 raw fetch
+%% 통합 우선순위: DDL > JPA (ddl-auto=none + 운영 DB 부재)
+%% DRIFT 8건 — 정합성-검증-보고서.md 참조
+erDiagram
+    users ||--o{ user_followings : "follower (CASCADE)"
+    users ||--o{ user_followings : "followee (CASCADE)"
+    users ||--o{ articles : "author (NO ACTION ⚠️ DRIFT-007)"
+    users ||--o{ comments : "author (CASCADE)"
+    users ||--o{ article_favorites : "user (CASCADE)"
+
+    articles ||--o{ comments : "article (CASCADE)"
+    articles ||--o{ articles_tags : "article (CASCADE)"
+    articles ||--o{ article_favorites : "article (CASCADE)"
+
+    tags ||--o{ articles_tags : "tag (CASCADE)"
+
+    users {
+        BIGSERIAL id PK
+        VARCHAR_100 name "NOT NULL — UserName VO"
+        VARCHAR_1024 bio "nullable — Profile.bio"
+        VARCHAR_1024 image "nullable — Image VO"
+        VARCHAR_255 email "NOT NULL — Email VO ⚠️ DRIFT-010 unique 부재"
+        VARCHAR_255 password "NOT NULL — Password VO"
+    }
+
+    user_followings {
+        BIGINT follower_id PK,FK
+        BIGINT followee_id PK,FK
+    }
+
+    articles {
+        BIGSERIAL id PK
+        BIGINT author_id FK "⚠️ DRIFT-007 ON DELETE 부재"
+        VARCHAR_255 title "NOT NULL — ArticleContents.ArticleTitle"
+        VARCHAR_255 slug "NOT NULL — UNIQUE per author (DRIFT-003 JPA 부재)"
+        VARCHAR_255 description "NOT NULL — ArticleContents"
+        VARCHAR body "NOT NULL — no length ⚠️ DRIFT-004"
+        TIMESTAMP created_at "DEFAULT NOW() — @CreatedDate"
+        TIMESTAMP updated_at "DEFAULT NOW() — @LastModifiedDate"
+    }
+
+    tags {
+        BIGSERIAL id PK
+        VARCHAR_255 value "NOT NULL UNIQUE"
+    }
+
+    articles_tags {
+        BIGINT article_id PK,FK
+        BIGINT tag_id PK,FK
+    }
+
+    article_favorites {
+        BIGINT article_id PK,FK
+        BIGINT user_id PK,FK
+    }
+
+    comments {
+        BIGSERIAL id PK
+        BIGINT author_id FK
+        BIGINT article_id FK
+        VARCHAR body "NOT NULL — no length"
+        TIMESTAMP created_at "DEFAULT NOW()"
+        TIMESTAMP updated_at "DEFAULT NOW() ⚠️ RealWorld spec Update 부재"
+    }

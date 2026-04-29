@@ -101,20 +101,55 @@ sequenceDiagram
 | 인덱스 | ERD/DB | `index_only_in_db` |
 | 기본값 | ORM/ERD/DB | `default_mismatch` |
 
-### 3.4 통합 우선순위
+### 3.4 통합 우선순위 (v1.1.2 갱신 — F-016)
 
-출처 간 불일치 시 어느 것을 신뢰할지:
+출처 간 불일치 시 어느 것을 신뢰할지. **도구 무관 원칙 + Decision Tree** (산업 권위 자료 7/7 매트릭스 반대 → 원칙 표준 채택).
+
+#### 원칙 (도구 무관)
+
+1. **운영 환경의 자동 schema 변경 금지** (Hibernate `ddl-auto=update/create`, Flyway baseline 자동 등 모두 적용)
+2. **DDL 변경은 versioned + reviewable + reversible** (Atlasgo 4원칙 차용)
+3. **ORM 의 schema 책임은 "검증 (validate)" 까지로 한정** — 변경은 마이그레이션 도구 또는 DDL 파일
+
+#### Decision Tree (도구 선택)
 
 ```
-운영 DB (실제 동작) > ORM (코드 의도) > ERD (문서)
+Q1. 마이그레이션 도구 (Flyway/Liquibase) 도입 가능?
+  ├─ Yes → ddl-auto=validate + 마이그레이션 도구가 SoT
+  │         우선순위: 운영 DB > 마이그레이션 도구 > ORM > ERD
+  └─ No  → ddl-auto=none (운영) 또는 create-drop (테스트 한정)
+            ↓
+            Q2. 운영 DB 존재?
+              ├─ Yes → 우선순위: 운영 DB > DDL 파일 > ORM > ERD
+              └─ No  → 우선순위: DDL 파일 > ORM > ERD (RealWorld 케이스)
+```
+
+#### 기본 정책
+
+```
+운영 DB (실제 동작) > 마이그레이션 도구 / DDL 파일 > ORM (코드 의도) > ERD (문서)
 ```
 
 이유:
 - **운영 DB**: 실제로 데이터가 있는 곳 — 가장 정확
-- **ORM**: 코드 변경 시 같이 변경됨 — 두 번째로 정확
+- **마이그레이션 도구 / DDL 파일**: versioned + reviewable — 변경 이력 추적 가능
+- **ORM**: 코드 변경 시 같이 변경됨 — 두 번째로 정확하지만 자체 변경 책임은 없음
 - **ERD**: 자주 갱신 안 됨 — 가장 오래됨
 
 단, 사용자가 별도 지정 가능 (예: ERD를 SoT로).
+
+#### 부록 A — Hibernate `ddl-auto` enum 값 reference
+
+| 값 | 동작 | 운영 사용 |
+|---|---|---|
+| `none` | 무동작 | ✅ 권장 (마이그레이션 도구 없을 때) |
+| `validate` | 검증만 (불일치 시 startup fail) | ✅ Flyway/Liquibase 와 함께 권장 |
+| `update` | additive ALTER (drop 안 함) | ❌ **위험** (운영 schema 자동 변경) |
+| `create` | DROP + CREATE | ❌ **데이터 손실** |
+| `create-drop` | startup CREATE, shutdown DROP | ❌ (테스트 한정) |
+
+> 💡 시니어 일화: "운영에 `ddl-auto=update` 가 들어가서 새벽 2시에 콜 받음" — 도구 무관 원칙이 카드사 사례를 일반화.
+> 📚 산업 권위: Vlad Mihalcea / Stripe migrations / Atlasgo / Quesma 모두 매트릭스 대신 **원칙 + 도구 선택** 패턴 채택.
 
 ---
 

@@ -97,19 +97,70 @@
     },
     "circular_dependencies": {
       "type": "array",
-      "description": "감지된 순환 의존성 (안티패턴 #6에도 등록됨)",
+      "description": "감지된 순환 의존성 (안티패턴 #6에도 등록됨). v1.1.2 부터 BC 분류 + decision_required 페어 (F-023, ADR-006).",
       "items": {
         "type": "object",
         "required": ["modules", "severity"],
         "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CIRCULAR-[0-9]+$",
+            "description": "순환 의존성 ID (예: CIRCULAR-001)"
+          },
           "modules": {
             "type": "array",
             "items": {"type": "string"},
             "minItems": 2
           },
+          "detection": {
+            "type": "object",
+            "description": "탐지 단계 메타. 결정적.",
+            "properties": {
+              "algorithm": {
+                "type": "string",
+                "enum": ["tarjan_scc", "kosaraju_scc", "other"],
+                "default": "tarjan_scc"
+              }
+            }
+          },
+          "bc_status": {
+            "type": "string",
+            "enum": ["same", "different", "undefined"],
+            "description": "Bounded Context 분류. same = 같은 BC 내 cross-aggregate / different = 다른 BC 간 양방향 / undefined = BC 미정의 (default). v1.1.2 신설 (ADR-006)."
+          },
+          "bc_assignment_explicit": {
+            "type": "boolean",
+            "default": false,
+            "description": "코드/문서에 BC 할당이 명시되었는가? false 인 경우 decision_required 권고."
+          },
+          "documented_decision": {
+            "type": "boolean",
+            "default": false,
+            "description": "ADR 또는 design doc 에 결정 문서가 있는가?"
+          },
           "severity": {
             "type": "string",
-            "enum": ["high", "medium", "low"]
+            "enum": ["high", "medium", "low"],
+            "description": "phase-3-arch.md §3.1.1 표 기반 자동 산정. BC 미정의 default = medium."
+          },
+          "decision_required": {
+            "type": "boolean",
+            "default": false,
+            "description": "Phase 4 진입 전 결정이 필요한가? severity 와 페어링 (ArchUnit FreezingArchRule 패턴)."
+          },
+          "decision_owner": {
+            "type": "string",
+            "enum": ["domain_expert", "tech_lead", "architect", "any"],
+            "description": "결정 권한자. decision_required=true 시 권고."
+          },
+          "decision_deadline": {
+            "type": "string",
+            "description": "결정 마감 (예: 'Phase 4 진입 전')."
+          },
+          "phase_4_routing": {
+            "type": "boolean",
+            "default": false,
+            "description": "Phase 4 (도메인 모델) 로 라우팅할지 여부. decision_required=true 와 보통 동행."
           },
           "antipattern_id": {
             "type": "string",

@@ -1,0 +1,765 @@
+openapi: 3.1.0
+info:
+  title: RealWorld Conduit API
+  description: |
+    RealWorld 표준 백엔드 API (Conduit). Spring Boot 2.5.2 + JPA + JWT 자체 구현.
+
+    **PoC #01 분석 산출물** — AI-Native 개발 방법론 v1.1.2 Phase 5-1 (API 계약).
+
+    ## 인증
+    `Authorization: Token <jwt>` 헤더 사용 (RFC 6750 비표준 — RealWorld 표준).
+    `apiKey` security scheme 으로 OpenAPI 매핑.
+
+    ## 알려진 결함 (사내 적용 시 즉시 수정 필수)
+    - **F-027 critical** — `DELETE /articles/{slug}/comments/{id}` De Morgan 법칙 위반 (의도 OR ≠ 동작 AND).
+      `Article.java:86`. 댓글 삭제 거의 불가능. AP-DOMAIN-001 참조.
+    - **AP-SECURITY-001 critical** — JWT SECRET 21byte 하드코딩 (RFC 7515 §10.1 위반).
+    - **AP-DOMAIN-002 high** — email/username unique 제약 App+DB+JPA 3중 부재.
+    - **AP-ARCH-001 medium (LV-001)** — application 이 infrastructure 직접 import. api-extension.json 의 `x-architectural-debt` 참조.
+
+  version: 1.0.0
+  contact:
+    name: PoC #01 분석 (AI-Native 방법론)
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/api
+    description: Local development (Spring Boot 2.5.2 / H2 인메모리)
+
+tags:
+  - name: User and Authentication
+    description: 사용자 등록 / 로그인 / 현재 사용자 조회·갱신
+  - name: Profile
+    description: 프로필 조회 / 팔로우·언팔로우
+  - name: Article
+    description: 게시글 CRUD / 피드 / 즐겨찾기
+  - name: Comment
+    description: 댓글 작성·조회·삭제
+  - name: Tag
+    description: 태그 목록
+
+# ──────────────────────────────────────────────────────────────────
+# Paths (22 endpoint / 19 operationId — 4 GET /articles 변형은 단일)
+# ──────────────────────────────────────────────────────────────────
+paths:
+  # User and Authentication
+  /users:
+    post:
+      tags: [User and Authentication]
+      operationId: CreateUser
+      summary: Register a new user
+      description: |
+        신규 사용자 등록. JWT 발급 후 `UserResponse` 반환.
+
+        **보안 메모**: SecurityConfiguration 의 `WebSecurity#ignoring(/users)` 로 filter 자체 우회 (CSRF/security headers 미적용).
+        Spring Security 6+ 권고는 `permitAll`. F-036 / AP-SECURITY-CONFIG-WEBSEC-IGNORING-001 참조.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUserRequest'
+      responses:
+        '200':
+          description: 등록 성공 (RealWorld 원본 — @ResponseStatus 부재로 default 200)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+
+  /users/login:
+    post:
+      tags: [User and Authentication]
+      operationId: Login
+      summary: Existing user login
+      description: |
+        이메일 + 비밀번호로 로그인. 성공 시 JWT 발급.
+
+        **보안 메모**: `WebSecurity#ignoring(/users/login)` 적용 (F-036 동일).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+
+  /user:
+    get:
+      tags: [User and Authentication]
+      operationId: GetCurrentUser
+      summary: Get current user
+      description: |
+        JWT 토큰으로 현재 사용자 정보 조회.
+
+        **Phase 4 분류 정정**: F-035 — Phase 4 domain.json UC-CONTENT-USER-FIND-BY-ID 의 `system_internal=true` 오분류.
+        본 endpoint 가 명시적 API operation. domain.json 갱신 필요.
+      responses:
+        '200':
+          description: 현재 사용자 정보
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+    put:
+      tags: [User and Authentication]
+      operationId: UpdateCurrentUser
+      summary: Update current user
+      description: 현재 사용자의 프로필 갱신 (email / username / password / image / bio).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: 갱신 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+
+  # Profile
+  /profiles/{username}:
+    get:
+      tags: [Profile]
+      operationId: GetProfileByUsername
+      summary: Get a profile of a user
+      description: 사용자명으로 프로필 조회 (public — BR-AUTH-PUBLIC-001).
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/UsernamePathParam'
+      responses:
+        '200':
+          description: 프로필 정보
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /profiles/{username}/follow:
+    post:
+      tags: [Profile]
+      operationId: FollowUserByUsername
+      summary: Follow a user
+      parameters:
+        - $ref: '#/components/parameters/UsernamePathParam'
+      responses:
+        '200':
+          description: 팔로우 후 프로필
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+    delete:
+      tags: [Profile]
+      operationId: UnfollowUserByUsername
+      summary: Unfollow a user
+      parameters:
+        - $ref: '#/components/parameters/UsernamePathParam'
+      responses:
+        '200':
+          description: 언팔로우 후 프로필
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+  # Article
+  /articles:
+    get:
+      tags: [Article]
+      operationId: GetArticles
+      summary: Get recent articles globally
+      description: |
+        전체 공개 게시글 조회. 4가지 필터 (tag / author / favorited) 통합 + 페이지네이션.
+
+        **UC 매핑** (4건 통합):
+        - UC-CONTENT-ARTICLE-LIST (필터 없음)
+        - UC-CONTENT-ARTICLE-LIST-BY-TAG (`tag` 파라미터)
+        - UC-CONTENT-ARTICLE-LIST-BY-AUTHOR (`author` 파라미터)
+        - UC-CONTENT-ARTICLE-LIST-BY-FAVORITED (`favorited` 파라미터)
+
+        ⚠️ **사내 적용 권고**: `limit` 의 maximum cap 추가 (DoS 방지 — Senior 영역 5).
+        RealWorld 원본은 cap 없음. AP-PERFORMANCE-001 candidate 참조.
+      security: []
+      parameters:
+        - name: tag
+          in: query
+          required: false
+          schema: {type: string}
+          description: 태그 필터 (UC-CONTENT-ARTICLE-LIST-BY-TAG)
+        - name: author
+          in: query
+          required: false
+          schema: {type: string}
+          description: 작성자명 필터 (UC-CONTENT-ARTICLE-LIST-BY-AUTHOR)
+        - name: favorited
+          in: query
+          required: false
+          schema: {type: string}
+          description: 즐겨찾기한 사용자명 필터 (UC-CONTENT-ARTICLE-LIST-BY-FAVORITED)
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, default: 20, minimum: 1}
+          description: 페이지 크기 (RealWorld 기본 20). 사내 적용 시 maximum 100 cap 권고.
+        - name: offset
+          in: query
+          required: false
+          schema: {type: integer, default: 0, minimum: 0}
+          description: 오프셋 (RealWorld 기본 0).
+      responses:
+        '200':
+          description: 게시글 목록 + 총 개수
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleArticlesResponse'
+    post:
+      tags: [Article]
+      operationId: CreateArticle
+      summary: Create an article
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewArticleRequest'
+      responses:
+        '200':
+          description: 작성된 게시글
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+
+  /articles/feed:
+    get:
+      tags: [Article]
+      operationId: GetArticlesFeed
+      summary: Get recent articles from users you follow
+      description: 팔로우 중인 사용자의 최근 게시글 (BR-USER-FOLLOW-001 적용).
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema: {type: integer, default: 20, minimum: 1}
+        - name: offset
+          in: query
+          required: false
+          schema: {type: integer, default: 0, minimum: 0}
+      responses:
+        '200':
+          description: 피드 게시글 목록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleArticlesResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+
+  /articles/{slug}:
+    get:
+      tags: [Article]
+      operationId: GetArticle
+      summary: Get an article
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      responses:
+        '200':
+          description: 게시글 단건
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+    put:
+      tags: [Article]
+      operationId: UpdateArticle
+      summary: Update an article
+      description: 게시글 수정 (BR-ARTICLE-AUTHOR-001 — 작성자만 수정 가능).
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateArticleRequest'
+      responses:
+        '200':
+          description: 수정된 게시글
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+    delete:
+      tags: [Article]
+      operationId: DeleteArticle
+      summary: Delete an article
+      description: 게시글 삭제 (BR-ARTICLE-AUTHOR-002 — 작성자만 삭제 가능).
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      responses:
+        '200':
+          description: 삭제 성공 (RealWorld 원본 — @ResponseStatus 부재로 default 200, 표준은 204)
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  /articles/{slug}/favorite:
+    post:
+      tags: [Article]
+      operationId: CreateArticleFavorite
+      summary: Favorite an article
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      responses:
+        '200':
+          description: 즐겨찾기 후 게시글
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+    delete:
+      tags: [Article]
+      operationId: DeleteArticleFavorite
+      summary: Unfavorite an article
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      responses:
+        '200':
+          description: 즐겨찾기 해제 후 게시글
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+
+  # Comment
+  /articles/{slug}/comments:
+    get:
+      tags: [Comment]
+      operationId: GetArticleComments
+      summary: Get comments for an article
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      responses:
+        '200':
+          description: 댓글 목록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MultipleCommentsResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+    post:
+      tags: [Comment]
+      operationId: CreateArticleComment
+      summary: Create a comment for an article
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCommentRequest'
+      responses:
+        '200':
+          description: 작성된 댓글
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '422':
+          $ref: '#/components/responses/GenericErrorModelResponse'
+
+  /articles/{slug}/comments/{id}:
+    delete:
+      tags: [Comment]
+      operationId: DeleteArticleComment
+      summary: Delete a comment for an article
+      description: |
+        ⚠️⚠️⚠️ **F-027 KNOWN BUG (critical)** — De Morgan 법칙 위반 ⚠️⚠️⚠️
+
+        **위치**: `domain/article/Article.java:86`
+        **AP**: AP-DOMAIN-001 (critical)
+        **BR**: BR-COMMENT-DELETE-001 (rule_conflicts 1건)
+
+        **의도** (BR-COMMENT-DELETE-001 명세):
+        ```
+        comment.author == loginUser  OR  article.author == loginUser
+        ```
+        → 댓글 작성자 **또는** 게시글 작성자가 삭제 가능
+
+        **실제 동작** (Article.java:86 De Morgan 변환 오류):
+        ```java
+        if (comment.getAuthor() != loginUser && article.getAuthor() != loginUser) { return; }
+        ```
+        → 댓글 작성자 **그리고** 게시글 작성자가 **모두** 일치해야만 삭제
+        → 댓글 작성자 ≠ 게시글 저자인 일반 케이스에서 **삭제 불가**
+
+        **사내 적용 시 필수 조치**:
+        1. `Article.java:86` 의 `&&` 를 `||` 로 즉시 변경
+        2. BR-COMMENT-DELETE-001 의 의도 재확인 (도메인 전문가)
+        3. 회귀 테스트 추가 (작성자 ≠ 저자 케이스)
+      parameters:
+        - $ref: '#/components/parameters/SlugPathParam'
+        - name: id
+          in: path
+          required: true
+          schema: {type: integer}
+          description: 댓글 ID
+      responses:
+        '200':
+          description: 삭제 시도 (⚠️ F-027 동작 — 작성자 ≠ 저자 케이스에서 silent skip)
+        '401':
+          $ref: '#/components/responses/UnauthorizedResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+      x-warning:
+        type: known-bug
+        severity: critical
+        finding_id: F-027
+        related_anti_pattern: AP-DOMAIN-001
+        related_rule: BR-COMMENT-DELETE-001
+        summary: De Morgan 법칙 위반 — 의도 OR vs 동작 AND
+      x-known-bug:
+        id: F-027
+        severity: critical
+        location: domain/article/Article.java:86
+        intended_logic: 'comment.getAuthor() == loginUser OR article.getAuthor() == loginUser'
+        actual_logic: '!(comment.getAuthor() != loginUser AND article.getAuthor() != loginUser)'
+        impact: '댓글 삭제 거의 불가 (작성자 ≠ 게시글 저자 케이스에서 silent fail)'
+        recommendation: 'BR-COMMENT-DELETE-001 의도대로 OR 변경 + 회귀 테스트'
+        related_anti_pattern: AP-DOMAIN-001
+        related_rule: BR-COMMENT-DELETE-001
+
+  # Tag
+  /tags:
+    get:
+      tags: [Tag]
+      operationId: GetTags
+      summary: Get tags
+      description: 태그 목록 조회 (public).
+      security: []
+      responses:
+        '200':
+          description: 태그 목록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagsResponse'
+
+# ──────────────────────────────────────────────────────────────────
+# Components
+# ──────────────────────────────────────────────────────────────────
+components:
+  securitySchemes:
+    TokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: |
+        RealWorld 표준 JWT 인증 — `Authorization: Token <jwt>` 헤더.
+
+        **비표준 메모**: RFC 6750 의 `Bearer` 가 아닌 `Token` prefix.
+        Spring Security `JWTFilter` 가 `Token ` prefix 를 stripping 후 JWT 파싱 (사내 자체 구현).
+
+        ⚠️ **사내 적용 시 권고**:
+        - 표준 `Bearer` 마이그레이션 (RFC 6750)
+        - Spring Security `OAuth2ResourceServerConfigurer.jwt()` 사용
+        - JWT SECRET 256bit (HS256) + 환경변수 분리 (현재 21byte 하드코딩 — AP-SECURITY-001 critical)
+
+  parameters:
+    SlugPathParam:
+      name: slug
+      in: path
+      required: true
+      schema: {type: string}
+      description: 게시글 slug (URL friendly title)
+    UsernamePathParam:
+      name: username
+      in: path
+      required: true
+      schema: {type: string}
+      description: 사용자명
+
+  responses:
+    UnauthorizedResponse:
+      description: 인증 실패 (JWT 누락 / invalid)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorModel'
+    ForbiddenResponse:
+      description: 권한 부족 (작성자가 아닌 사용자의 수정/삭제 시도)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorModel'
+    NotFoundResponse:
+      description: 리소스 없음
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorModel'
+    GenericErrorModelResponse:
+      description: 검증 실패 또는 일반 에러
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericErrorModel'
+
+  schemas:
+    # ───── Inner Schemas (Phase 4 domain.json Aggregate 와 동일 명명) ─────
+    User:
+      type: object
+      required: [email, token, username, bio, image]
+      properties:
+        email: {type: string, format: email}
+        token:
+          type: string
+          description: JWT 토큰 (응답에만 포함 — 사내 적용 시 분리 권고)
+        username: {type: string}
+        bio: {type: string, nullable: true}
+        image: {type: string, nullable: true}
+
+    Profile:
+      type: object
+      required: [username, bio, image, following]
+      properties:
+        username: {type: string}
+        bio: {type: string, nullable: true}
+        image: {type: string, nullable: true}
+        following: {type: boolean}
+
+    Article:
+      type: object
+      required: [slug, title, description, body, tagList, createdAt, updatedAt, favorited, favoritesCount, author]
+      properties:
+        slug: {type: string}
+        title: {type: string}
+        description: {type: string}
+        body: {type: string}
+        tagList:
+          type: array
+          items: {type: string}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+        favorited: {type: boolean}
+        favoritesCount: {type: integer}
+        author:
+          $ref: '#/components/schemas/Profile'
+
+    Comment:
+      type: object
+      required: [id, createdAt, updatedAt, body, author]
+      properties:
+        id: {type: integer}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+        body: {type: string}
+        author:
+          $ref: '#/components/schemas/Profile'
+
+    GenericErrorModel:
+      type: object
+      required: [errors]
+      properties:
+        errors:
+          type: object
+          required: [body]
+          properties:
+            body:
+              type: array
+              items: {type: string}
+
+    # ───── Wrapper Request Schemas ─────
+    NewUserRequest:
+      type: object
+      required: [user]
+      properties:
+        user:
+          type: object
+          required: [username, email, password]
+          properties:
+            username: {type: string}
+            email: {type: string, format: email}
+            password: {type: string, format: password}
+
+    LoginUserRequest:
+      type: object
+      required: [user]
+      properties:
+        user:
+          type: object
+          required: [email, password]
+          properties:
+            email: {type: string, format: email}
+            password: {type: string, format: password}
+
+    UpdateUserRequest:
+      type: object
+      required: [user]
+      properties:
+        user:
+          type: object
+          properties:
+            email: {type: string, format: email}
+            username: {type: string}
+            password: {type: string, format: password}
+            image: {type: string}
+            bio: {type: string}
+
+    NewArticleRequest:
+      type: object
+      required: [article]
+      properties:
+        article:
+          type: object
+          required: [title, description, body]
+          properties:
+            title: {type: string}
+            description: {type: string}
+            body: {type: string}
+            tagList:
+              type: array
+              items: {type: string}
+
+    UpdateArticleRequest:
+      type: object
+      required: [article]
+      properties:
+        article:
+          type: object
+          properties:
+            title: {type: string}
+            description: {type: string}
+            body: {type: string}
+
+    NewCommentRequest:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          type: object
+          required: [body]
+          properties:
+            body: {type: string}
+
+    # ───── Wrapper Response Schemas ─────
+    UserResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+
+    ProfileResponse:
+      type: object
+      required: [profile]
+      properties:
+        profile:
+          $ref: '#/components/schemas/Profile'
+
+    ArticleResponse:
+      type: object
+      required: [article]
+      properties:
+        article:
+          $ref: '#/components/schemas/Article'
+
+    MultipleArticlesResponse:
+      type: object
+      required: [articles, articlesCount]
+      properties:
+        articles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Article'
+        articlesCount: {type: integer}
+
+    CommentResponse:
+      type: object
+      required: [comment]
+      properties:
+        comment:
+          $ref: '#/components/schemas/Comment'
+
+    MultipleCommentsResponse:
+      type: object
+      required: [comments]
+      properties:
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+
+    TagsResponse:
+      type: object
+      required: [tags]
+      properties:
+        tags:
+          type: array
+          items: {type: string}
+
+# Default security applies to all operations unless overridden by `security: []`
+security:
+  - TokenAuth: []

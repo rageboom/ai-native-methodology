@@ -1,8 +1,12 @@
 manifest:
   generated_at: "2026-04-26"
+  updated_at: "2026-04-27"   # D 재검증 결과 반영
   poc_id: "poc-01-realworld-spring"
   target_repo: "raeperd/realworld-springboot-java"
   target_repo_url: "https://github.com/raeperd/realworld-springboot-java"
+  target_branch: "master"     # ⚠️ D 재검증: main 아님
+  extraction_env: "web_fetch" # F-009 환경 명시
+  methodology_version: "v1.1.1"
 
 # 입력 가용성 (필수 + 선택)
 inputs_detected:

@@ -1,0 +1,535 @@
+{
+  "$schema_ref": "../../../../../schemas/domain.schema.json",
+  "meta": {
+    "generated_at": "2026-04-28T00:00:00Z",
+    "source_commit_sha": "56be3ced4f3134424ead5fcaf387b3aa640b9532",
+    "source_branch": "master",
+    "extraction_env": "git_clone",
+    "methodology_version": "v1.1.2",
+    "formula_version": "v1",
+    "inputs_used": ["source_code", "orm", "domain_context_md"],
+    "applied_modifiers": [
+      {"name": "orm_full", "value": 0.10, "reason": "Spring Data JPA + Entity 7 raw fetch + @Embeddable 7 검증"},
+      {"name": "domain_context_md", "value": 0.03, "reason": "inputs/domain-context.md"}
+    ],
+    "applied_penalties": [
+      {"name": "no_operational_db", "value": -0.03, "reason": "Phase 4 5.D 외부 의존성 0건 + 5.B FE 부재 — N영역 부재 패널티 (F-026/F-029)"}
+    ],
+    "raw_confidence": 0.83,
+    "cap_applied": false,
+    "manual_override": false,
+    "expected_confidence_average": 0.83,
+    "confidence_breakdown": {
+      "bounded_context_identification": {"confidence": 0.85, "element_count": 2, "extraction_method": "llm_with_grounding", "note": "CIRCULAR-001 same_bc 결정 기반 BC-CONTENT 단일화 + BC-AUTH cross-cutting"},
+      "aggregate_root_extraction": {"confidence": 0.85, "element_count": 3, "extraction_method": "pattern_matching", "note": "User / Article / Comment Aggregate Root — Spring Data JpaRepository 1:1"},
+      "value_object_extraction": {"confidence": 0.92, "element_count": 7, "extraction_method": "deterministic", "note": "@Embeddable 7개 (Email/Password/Profile/UserName/Image/ArticleContents/ArticleTitle) 결정적 추출"},
+      "entity_extraction": {"confidence": 0.95, "element_count": 5, "extraction_method": "deterministic", "note": "@Entity 5개 (User/Article/Comment/Tag + 내부)"},
+      "use_case_extraction": {"confidence": 0.85, "element_count": 25, "extraction_method": "pattern_matching", "note": "Service public method 1:1 = UC 25개 (Command 11 / Query 14)"},
+      "ubiquitous_language": {"confidence": 0.80, "element_count": 22, "extraction_method": "llm_with_grounding"},
+      "repository_extraction": {"confidence": 0.95, "element_count": 4, "extraction_method": "deterministic"},
+      "invariant_extraction": {"confidence": 0.70, "element_count": 8, "extraction_method": "llm_with_grounding", "note": "domain_context_md + Service 검증 코드 보조"}
+    },
+    "human_review_required": [
+      {
+        "item_id": "BR-USER-EMAIL-UNIQUE-001",
+        "reason": "DRIFT-010 격상 — App+DB 양쪽 unique 검증 부재. 도메인 의도 명확하나 구현 부재. 사내 적용 시 추가 필수.",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001",
+        "reason": "Comment.removeCommentByUser De Morgan 버그 (Article.java:86). RealWorld spec '댓글 작성자만 삭제' / 코드 동작 'article 작성자 AND comment 작성자' 모두 충족 시만 삭제 — 의도와 동작 불일치. F-027 신규.",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-USER-FOLLOW-NO-SELF-001",
+        "reason": "self-follow 금지 RealWorld spec 묵시 — 코드에 명시 부재 (Profile.follow 검증 없음).",
+        "reviewer_role": "domain_expert"
+      }
+    ],
+    "user_decisions_inherited": [
+      "DRIFT-002 (단방향 follow) → BR-USER-FOLLOW-DIRECTIONAL-001 + Aggregate User.followingUsers 단방향",
+      "DRIFT-003 (권장만) → 도메인 영향 없음",
+      "DRIFT-007 (NO ACTION 유지) → AP-DB-CASCADE-MISSING-001 (antipatterns-partial)",
+      "DRIFT-010 (Phase 4 검증) → 검증 결과 격상 — App+DB 이중 부재 → BR + AP 이중 등록",
+      "CIRCULAR-001 (ADR-006 default → Phase 4 결정) → bc_status=same_bc 단일 BC-CONTENT (severity medium → low)",
+      "ARCH-STYLE (Layered+Spring-DDD-Lite) → LV-001/LV-002 antipattern 강제 등록"
+    ],
+    "warnings": [
+      "Phase 4 5.B FE 영역 부재 (BE only — RealWorld spec) → 5.B 산출 0건. F-026 / F-029 발현.",
+      "Phase 4 5.D 외부 의존성 0건 (build.gradle 검증) → 5.D 산출 0건. F-026 발현.",
+      "Phase 4 5.C 빈약 (application.properties 8 lines) → 추출 BR 2건 (JWT EXPIRE / SECRET-LENGTH).",
+      "CIRCULAR-001 알고리즘 순환 (User ↔ Article) — same_bc 결정으로 도메인 의도 합법화 (medium → low).",
+      "Comment.removeCommentByUser (Article.java:86) De Morgan 버그 — BR (의도) ≠ actual_behavior (구현). F-027 신규.",
+      "User.equals/hashCode 가 mutable email 의존 — JPA Set 멤버십 위험 (F-028 deferred).",
+      "F-015 cross-validation 적용 — 메인 raw fetch + 3 sub-agent 검증 (8/8 일치)."
+    ],
+    "applied_v112_changes": [
+      "ADR-006 (CIRCULAR-001 default) Phase 4 라우팅 적용 결과: bc_status=same_bc 단일 BC-CONTENT.",
+      "phase-2-db.md §3.4 DDL_over_JPA Phase 2 적용 → DRIFT-010 App+DB 이중 부재 격상 근거.",
+      "phase-1-init.md §6 결정성 표 → Phase 4 Service raw fetch 결정적 추출 적용 (UC 25 / VO 7)."
+    ]
+  },
+  "ubiquitous_language": [
+    {"term": "글", "term_en": "Article", "definition": "사용자가 작성한 게시물. 제목/슬러그/본문/태그/즐겨찾기/댓글/생성·수정 시각 포함.", "synonyms": ["post"], "anti_definition": "Comment 와 다름 (Comment 는 Article 에 종속)"},
+    {"term": "댓글", "term_en": "Comment", "definition": "특정 Article 에 달리는 짧은 본문. 작성자(User) + 본문 + 생성·수정 시각.", "synonyms": [], "anti_definition": "Article 본문과 분리 — 자체 ID 보유"},
+    {"term": "사용자", "term_en": "User", "definition": "RealWorld 가입자. email/password/Profile(name/bio/image) + 팔로잉 + 즐겨찾기 + 작성 글/댓글.", "synonyms": [], "anti_definition": "Author/Profile 와 다름 — User 가 가장 큰 단위"},
+    {"term": "프로필", "term_en": "Profile", "definition": "User 의 표시 정보 묶음 (UserName + Image + bio). 다른 사용자가 보는 관점에서 follow/following 여부 포함 (@Transient).", "synonyms": [], "anti_definition": "User 와 같지 않음 — Profile 은 User 의 @Embedded VO + viewer 관점 계산"},
+    {"term": "팔로우", "term_en": "Follow", "definition": "단방향 관계 — A 가 B 를 follow 하면 A 의 feed 에 B 의 글이 노출. B 는 A 를 follow 하지 않을 수 있음 (asymmetric).", "synonyms": ["following"], "anti_definition": "양방향 friend 가 아님. self-follow 불가."},
+    {"term": "즐겨찾기", "term_en": "Favorite", "definition": "User 가 Article 에 표시하는 좋아요. favorited_count 집계 + viewer 관점 favorited 표시.", "synonyms": ["like"], "anti_definition": "Follow 와 다름 — 대상이 User 가 아니라 Article."},
+    {"term": "태그", "term_en": "Tag", "definition": "Article 에 부여되는 자유 텍스트 라벨. ManyToMany — 여러 Article 이 같은 Tag 공유. 재사용 시 reloadAllTagsIfAlreadyPresent.", "synonyms": [], "anti_definition": "카테고리(고정 enum)와 다름 — 사용자가 자유 입력."},
+    {"term": "슬러그", "term_en": "Slug", "definition": "Article 의 URL 친화 식별자. 작성자별 unique. 제목에서 자동 생성 가능.", "synonyms": [], "anti_definition": "ID(BIGSERIAL) 와 다름 — Slug 는 자연어 식별자"},
+    {"term": "피드", "term_en": "Feed", "definition": "내가 follow 하는 사용자들의 Article 시간 역순 목록.", "synonyms": [], "anti_definition": "전체 Article 목록(global)과 다름"},
+    {"term": "전역 글 목록", "term_en": "Global Articles", "definition": "전체 사용자의 Article 시간 역순 목록 (옵션 필터: tag / author / favorited)."},
+    {"term": "토큰", "term_en": "JWT Token", "definition": "Authorization: Token <jwt> 헤더로 전송되는 인증 토큰. UserJWTPayload (id+email) 직렬화. HmacSHA256 + 2시간 만료.", "synonyms": ["bearer"], "anti_definition": "session cookie 와 다름 — STATELESS"},
+    {"term": "비밀번호", "term_en": "Password", "definition": "BCrypt 로 해시된 사용자 비밀번호. plain text 저장 금지 — Password VO 가 BCryptPasswordEncoder.matches() 검증.", "synonyms": [], "anti_definition": "plain text 가 아님"},
+    {"term": "이메일", "term_en": "Email", "definition": "사용자 이메일 주소 — User.equals/hashCode 의 식별자. RealWorld spec: unique.", "synonyms": [], "anti_definition": "ID 가 아님 — 변경 가능 식별자 (F-028 deferred 위험)"},
+    {"term": "Aggregate Root", "term_en": "Aggregate Root", "definition": "트랜잭션 일관성 단위의 진입점. User / Article / Comment 가 본 시스템의 Root.", "synonyms": [], "anti_definition": "Profile/Email/UserName 는 VO — Root 아님"},
+    {"term": "Bounded Context", "term_en": "Bounded Context", "definition": "도메인 모델이 일관된 의미를 갖는 경계. 본 시스템은 BC-CONTENT 단일 + BC-AUTH cross-cutting.", "synonyms": ["BC"], "anti_definition": "패키지/모듈과 동일하지 않음 — 의미 경계"},
+    {"term": "VO", "term_en": "Value Object", "definition": "ID 없이 값으로 식별되는 불변 객체. @Embeddable 로 표현 (Email/Password/Profile/UserName/Image/ArticleContents/ArticleTitle).", "synonyms": ["Embeddable"], "anti_definition": "Entity 가 아님 — equals/hashCode 가 모든 필드 기반"},
+    {"term": "회원가입", "term_en": "Sign Up", "definition": "User + Email + Password (해시) + Profile 생성. email/username unique 검증 의도 (구현 부재 — DRIFT-010).", "synonyms": ["registration"]},
+    {"term": "로그인", "term_en": "Login", "definition": "email + password 검증 → JWT 토큰 발급. STATELESS — 세션 부재.", "synonyms": ["sign in"]},
+    {"term": "STATELESS", "term_en": "Stateless API", "definition": "서버가 세션을 보관하지 않음. JWT 가 인증 컨텍스트 전체를 운반.", "synonyms": [], "anti_definition": "form-login session 모델과 다름"},
+    {"term": "감사", "term_en": "Auditing", "definition": "@CreatedDate / @LastModifiedDate 자동 기록. JPA Auditing 활성화 (Article + Comment).", "synonyms": ["audit log"]},
+    {"term": "BC-CONTENT", "term_en": "Content Bounded Context", "definition": "User + Article + Comment + Tag 를 포함하는 단일 BC. CIRCULAR-001 same_bc 결정 결과.", "synonyms": ["통합 콘텐츠 BC"]},
+    {"term": "BC-AUTH", "term_en": "Auth Bounded Context", "definition": "JWT 토큰 발급/검증 cross-cutting BC. 영속성 없음.", "synonyms": []}
+  ],
+  "bounded_contexts": [
+    {
+      "id": "BC-CONTENT",
+      "name": "콘텐츠 (User + Article + Comment + Tag 통합)",
+      "description": "RealWorld 의 핵심 BC. User ↔ Article 양방향 도메인 협력 (User.writeArticle / writeCommentToArticle / favoriteArticle 등) 으로 CIRCULAR-001 same_bc 결정 (윤주스 2026-04-28). 전형적 monolith Bounded Context — User 가 별도 BC 가 아닌 콘텐츠 협력의 일부.",
+      "related_modules": ["MOD-DOMAIN-ARTICLE", "MOD-DOMAIN-USER", "MOD-APP-ARTICLE", "MOD-APP-USER", "MOD-APP-TAG"],
+      "aggregates": [
+        {
+          "root_entity_id": "E-CONTENT-User",
+          "members": ["E-CONTENT-User", "VO-CONTENT-Email", "VO-CONTENT-Password", "VO-CONTENT-Profile", "VO-CONTENT-UserName", "VO-CONTENT-Image"],
+          "invariants": [
+            {
+              "description": "User.email 은 시스템 전역에서 unique (도메인 의도) — 구현 부재 (DRIFT-010 격상). BR-USER-EMAIL-UNIQUE-001.",
+              "enforced_by": "service_check",
+              "evidence": [
+                {"file": "domain/user/UserService.java", "line": 22, "_note": "signUp() 직접 save — existsByEmail / try-catch 부재"},
+                {"file": "src/main/resources/schema.sql", "line": 1, "_note": "users.email UNIQUE 부재"}
+              ]
+            },
+            {
+              "description": "User.password 는 BCrypt 해시로만 저장 (plain text 금지) — BR-AUTH-PASSWORD-BCRYPT-001.",
+              "enforced_by": "service_check",
+              "evidence": [
+                {"file": "application/security/SecurityConfiguration.java", "line": 59}
+              ]
+            },
+            {
+              "description": "User 가 자기 자신을 follow 할 수 없음 (RealWorld spec 묵시) — 코드 미명시 (BR human_review).",
+              "enforced_by": "unknown",
+              "evidence": [
+                {"file": "domain/user/Profile.java", "line": 1, "_note": "follow 메서드 self check 부재"}
+              ]
+            },
+            {
+              "description": "User.followingUsers 는 단방향 (A→B 와 B→A 독립) — DRIFT-002.",
+              "enforced_by": "orm_constraint",
+              "evidence": [
+                {"file": "domain/user/User.java", "line": 1, "_note": "OneToMany cascade=REMOVE join_table user_followings"}
+              ]
+            }
+          ],
+          "transaction_boundary": true,
+          "consistency": "strong",
+          "_cascade_signal": "User+followingUsers REMOVE — 약한 same aggregate (Vernon No Cascade 위반 후보)",
+          "_aggregate_signal": "User Aggregate 는 follow + 자기 정보(@Embedded Profile) 까지. Article 은 cross-aggregate 참조."
+        },
+        {
+          "root_entity_id": "E-CONTENT-Article",
+          "members": ["E-CONTENT-Article", "VO-CONTENT-ArticleContents", "VO-CONTENT-ArticleTitle", "E-CONTENT-Comment", "E-CONTENT-Tag"],
+          "invariants": [
+            {
+              "description": "Article 작성자(author) 만 수정/삭제 가능 — BR-ARTICLE-AUTHOR-ONLY-EDIT-001 / DELETE-001.",
+              "enforced_by": "entity_method",
+              "evidence": [
+                {"file": "domain/user/User.java", "line": 62, "_note": "writeArticle() 만 author=this 로 생성"},
+                {"file": "domain/article/ArticleService.java", "line": 1, "_note": "deleteArticleByAuthor 권한 체크"}
+              ]
+            },
+            {
+              "description": "Article + Comment 는 동일 트랜잭션 — cascade={PERSIST, REMOVE} (강한 same aggregate signal).",
+              "enforced_by": "orm_constraint",
+              "evidence": [
+                {"file": "domain/article/Article.java", "line": 1, "_note": "@OneToMany(mappedBy=article, cascade={PERSIST,REMOVE})"}
+              ]
+            },
+            {
+              "description": "Comment 삭제 권한 — RealWorld spec 'comment 작성자 또는 article 작성자' / 실제 코드 'AND' De Morgan 버그 (Article.java:86). BR ≠ actual_behavior. F-027 신규.",
+              "enforced_by": "entity_method",
+              "evidence": [
+                {"file": "domain/article/Article.java", "line": 86, "_note": "if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) throw IllegalAccessError — De Morgan = NOT (article 작성자 AND comment 작성자) — 두 조건 동시 충족 시만 통과"}
+              ]
+            },
+            {
+              "description": "Article.@CreatedDate / @LastModifiedDate 자동 기록 — BR-DOMAIN-AUDITING-001.",
+              "enforced_by": "orm_constraint",
+              "evidence": [
+                {"file": "domain/article/Article.java", "line": 1}
+              ]
+            }
+          ],
+          "transaction_boundary": true,
+          "consistency": "strong",
+          "_cascade_signal": "Article+Comment {PERSIST,REMOVE} = same aggregate (강함). Article.userFavorited PERSIST = Vernon 'No Cascade' 위반 후보 (Phase 6 검토)."
+        },
+        {
+          "root_entity_id": "E-CONTENT-Tag",
+          "members": ["E-CONTENT-Tag"],
+          "invariants": [
+            {
+              "description": "Tag 는 reloadAllTagsIfAlreadyPresent 로 재사용 — 같은 이름 Tag 중복 생성 금지.",
+              "enforced_by": "service_check",
+              "evidence": [
+                {"file": "domain/article/TagService.java", "line": 1}
+              ]
+            }
+          ],
+          "transaction_boundary": false,
+          "consistency": "eventual",
+          "_aggregate_signal": "Tag 는 약한 Aggregate — reference data 성격. Article ↔ Tag ManyToMany 가 ArticleContents.@Embeddable collection (F-017 발현)."
+        }
+      ],
+      "entities": [
+        {
+          "id": "E-CONTENT-User",
+          "name": "User",
+          "description": "RealWorld 사용자 Aggregate Root. @Embedded Email/Password/Profile + followingUsers + favoriteArticles. cross-aggregate 행동 다수 (writeArticle/writeCommentToArticle/favoriteArticle).",
+          "is_aggregate_root": true,
+          "attributes": [
+            {"name": "id", "type": "Long", "is_id": true, "nullable": false},
+            {"name": "email", "type": "Email", "value_object_ref": "VO-CONTENT-Email", "nullable": false},
+            {"name": "password", "type": "Password", "value_object_ref": "VO-CONTENT-Password", "nullable": false},
+            {"name": "profile", "type": "Profile", "value_object_ref": "VO-CONTENT-Profile", "nullable": false},
+            {"name": "followingUsers", "type": "Set<User>", "nullable": false, "default": "[]"},
+            {"name": "favoriteArticles", "type": "Set<Article>", "nullable": false, "default": "[]"}
+          ],
+          "behaviors": [
+            {"method_name": "writeArticle", "description": "새 Article 생성 (author=this) — cross-aggregate factory.", "related_use_cases": ["UC-CONTENT-ARTICLE-CREATE"], "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-EDIT-001"]},
+            {"method_name": "writeCommentToArticle", "description": "Article 에 Comment 작성 (author=this).", "related_use_cases": ["UC-CONTENT-COMMENT-CREATE"]},
+            {"method_name": "favoriteArticle", "description": "Article 즐겨찾기 등록 (이중 갱신: User.favoriteArticles + Article.userFavorited).", "related_use_cases": ["UC-CONTENT-ARTICLE-FAVORITE"]},
+            {"method_name": "unfavoriteArticle", "description": "Article 즐겨찾기 해제.", "related_use_cases": ["UC-CONTENT-ARTICLE-UNFAVORITE"]},
+            {"method_name": "followUser", "description": "단방향 follow (followingUsers.add).", "related_use_cases": ["UC-CONTENT-PROFILE-FOLLOW"], "related_rules": ["BR-USER-FOLLOW-DIRECTIONAL-001", "BR-USER-FOLLOW-NO-SELF-001"]},
+            {"method_name": "unfollowUser", "description": "follow 해제.", "related_use_cases": ["UC-CONTENT-PROFILE-UNFOLLOW"]},
+            {"method_name": "updateUser", "description": "User 정보 갱신 (email/password/profile).", "related_use_cases": ["UC-CONTENT-USER-UPDATE"]},
+            {"method_name": "updateArticle", "description": "본인 작성 Article 수정 (author 권한 체크).", "related_use_cases": ["UC-CONTENT-ARTICLE-UPDATE"], "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-EDIT-001"]},
+            {"method_name": "removeArticle", "description": "본인 작성 Article 삭제 (author 권한 체크).", "related_use_cases": ["UC-CONTENT-ARTICLE-DELETE"], "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-DELETE-001"]},
+            {"method_name": "removeCommentByUser", "description": "Comment 삭제 권한 위임 (Article.removeCommentByUser 호출).", "related_use_cases": ["UC-CONTENT-COMMENT-DELETE"], "related_rules": ["BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001"]},
+            {"method_name": "afterUserFavoritesArticle", "description": "Article 측 즐겨찾기 카운터 갱신 콜백."},
+            {"method_name": "afterUserUnfavoritesArticle", "description": "Article 측 즐겨찾기 카운터 차감 콜백."}
+          ],
+          "persisted_to": "users"
+        },
+        {
+          "id": "E-CONTENT-Article",
+          "name": "Article",
+          "description": "RealWorld 게시물 Aggregate Root. @Embedded ArticleContents (안에 ArticleTitle + tags ManyToMany F-017) + author(User) + comments + userFavorited Set<User>.",
+          "is_aggregate_root": true,
+          "attributes": [
+            {"name": "id", "type": "Long", "is_id": true, "nullable": false},
+            {"name": "author", "type": "User", "nullable": false},
+            {"name": "contents", "type": "ArticleContents", "value_object_ref": "VO-CONTENT-ArticleContents", "nullable": false},
+            {"name": "comments", "type": "List<Comment>", "nullable": false, "default": "[]"},
+            {"name": "userFavorited", "type": "Set<User>", "nullable": false, "default": "[]"},
+            {"name": "createdAt", "type": "Instant"},
+            {"name": "updatedAt", "type": "Instant"}
+          ],
+          "behaviors": [
+            {"method_name": "addComment", "description": "Comment 추가 (cascade PERSIST).", "related_use_cases": ["UC-CONTENT-COMMENT-CREATE"]},
+            {"method_name": "removeCommentByUser", "description": "Comment 삭제 (Article.java:86 De Morgan 버그 — F-027).", "related_use_cases": ["UC-CONTENT-COMMENT-DELETE"], "related_rules": ["BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001"]},
+            {"method_name": "updateArticle", "description": "ArticleUpdateRequest 적용.", "related_use_cases": ["UC-CONTENT-ARTICLE-UPDATE"]},
+            {"method_name": "afterUserFavoritesArticle", "description": "userFavorited.add — 즐겨찾기 등록 콜백."},
+            {"method_name": "updateFavoriteByUser", "description": "User 측 favorite 변동 동기화."}
+          ],
+          "persisted_to": "articles"
+        },
+        {
+          "id": "E-CONTENT-Comment",
+          "name": "Comment",
+          "description": "Article 의 sub-aggregate — 작성자/본문/생성·수정 시각.",
+          "is_aggregate_root": true,
+          "attributes": [
+            {"name": "id", "type": "Long", "is_id": true, "nullable": false},
+            {"name": "article", "type": "Article", "nullable": false},
+            {"name": "author", "type": "User", "nullable": false},
+            {"name": "body", "type": "String", "nullable": false},
+            {"name": "createdAt", "type": "Instant"},
+            {"name": "updatedAt", "type": "Instant"}
+          ],
+          "behaviors": [],
+          "persisted_to": "comments",
+          "_aggregate_root_note": "기술적으로 Comment 도 JpaRepository<CommentRepository> 보유 → Aggregate Root 후보. 단 Article.removeCommentByUser 만이 정식 진입점 — 사실상 Article Aggregate 의 일부 운영. v1.2.0 격상 시 single-vs-multi root 가이드 보강 후보."
+        },
+        {
+          "id": "E-CONTENT-Tag",
+          "name": "Tag",
+          "description": "Article 분류 라벨. ManyToMany — 재사용 (TagService.reloadAllTagsIfAlreadyPresent).",
+          "is_aggregate_root": true,
+          "attributes": [
+            {"name": "id", "type": "Long", "is_id": true, "nullable": false},
+            {"name": "name", "type": "String", "nullable": false}
+          ],
+          "behaviors": [],
+          "persisted_to": "tags"
+        }
+      ],
+      "value_objects": [
+        {
+          "id": "VO-CONTENT-Email",
+          "name": "Email",
+          "description": "User.email VO. equals/hashCode 가 mutable address 의존 (F-028 deferred 위험).",
+          "attributes": [
+            {"name": "address", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "domain/user/Email.java", "line": 1}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-Password",
+          "name": "Password",
+          "description": "BCrypt 해시 비밀번호 VO. matches(plain, encoder) 검증 메서드 보유.",
+          "attributes": [
+            {"name": "encoded", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "domain/user/Password.java", "line": 1}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-Profile",
+          "name": "Profile",
+          "description": "User 표시 정보 (UserName + Image + bio). @Transient following — viewer 관점 계산.",
+          "attributes": [
+            {"name": "userName", "type": "UserName"},
+            {"name": "image", "type": "Image"},
+            {"name": "bio", "type": "String"},
+            {"name": "following", "type": "boolean", "_transient": true, "_note": "@Transient — viewer 관점 계산"}
+          ],
+          "evidence": [
+            {"file": "domain/user/Profile.java", "line": 1, "_note": "1-level nested @Embedded"}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-UserName",
+          "name": "UserName",
+          "description": "User name VO (2-level nested in Profile).",
+          "attributes": [
+            {"name": "name", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "domain/user/UserName.java", "line": 1}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-Image",
+          "name": "Image",
+          "description": "Image URL VO (2-level nested in Profile).",
+          "attributes": [
+            {"name": "address", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "domain/user/Image.java", "line": 1}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-ArticleContents",
+          "name": "ArticleContents",
+          "description": "Article 본문 묶음 (ArticleTitle + body + description + tags). tags 가 @ManyToMany in @Embeddable — JPA 비주류 패턴 (F-017 발현).",
+          "attributes": [
+            {"name": "title", "type": "ArticleTitle"},
+            {"name": "slug", "type": "String"},
+            {"name": "description", "type": "String"},
+            {"name": "body", "type": "String"},
+            {"name": "tags", "type": "Set<Tag>", "_jpa_pattern": "@JoinTable @ManyToMany — F-017"}
+          ],
+          "evidence": [
+            {"file": "domain/article/ArticleContents.java", "line": 1, "_note": "1-level nested @Embeddable"}
+          ]
+        },
+        {
+          "id": "VO-CONTENT-ArticleTitle",
+          "name": "ArticleTitle",
+          "description": "Article title VO (2-level nested in ArticleContents).",
+          "attributes": [
+            {"name": "title", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "domain/article/ArticleTitle.java", "line": 1}
+          ]
+        }
+      ],
+      "repositories": [
+        {
+          "id": "R-CONTENT-UserRepository",
+          "manages_aggregate": "E-CONTENT-User",
+          "implementation_class": "domain/user/UserRepository.java",
+          "interface": "Spring Data JpaRepository<User, Long>"
+        },
+        {
+          "id": "R-CONTENT-ArticleRepository",
+          "manages_aggregate": "E-CONTENT-Article",
+          "implementation_class": "domain/article/ArticleRepository.java",
+          "interface": "Spring Data JpaRepository<Article, Long>"
+        },
+        {
+          "id": "R-CONTENT-CommentRepository",
+          "manages_aggregate": "E-CONTENT-Comment",
+          "implementation_class": "domain/article/CommentRepository.java",
+          "interface": "Spring Data JpaRepository<Comment, Long>"
+        },
+        {
+          "id": "R-CONTENT-TagRepository",
+          "manages_aggregate": "E-CONTENT-Tag",
+          "implementation_class": "domain/article/TagRepository.java",
+          "interface": "Spring Data JpaRepository<Tag, Long>"
+        }
+      ],
+      "domain_services": [
+        {
+          "id": "DS-CONTENT-UserService",
+          "name": "UserService",
+          "description": "User Aggregate orchestration (signUp/login/findByX/updateUser).",
+          "operations": [
+            {"method_name": "signUp", "description": "User 생성 — DRIFT-010 격상 (existsByEmail 부재).", "related_rules": ["BR-USER-EMAIL-UNIQUE-001", "BR-USER-USERNAME-UNIQUE-001"]},
+            {"method_name": "login", "description": "email + password 검증 → UserService.findByEmail + Password.matches.", "related_rules": ["BR-AUTH-PASSWORD-BCRYPT-001"]},
+            {"method_name": "findById", "description": "Query — User 조회"},
+            {"method_name": "findByUsername", "description": "Query — UserName 조회"},
+            {"method_name": "updateUser", "description": "User 정보 갱신"}
+          ]
+        },
+        {
+          "id": "DS-CONTENT-ArticleService",
+          "name": "ArticleService",
+          "description": "Article Aggregate orchestration.",
+          "operations": [
+            {"method_name": "createNewArticle", "description": "Article 생성"},
+            {"method_name": "getArticles", "description": "필터형 Query"},
+            {"method_name": "getFeedByUserId", "description": "내 피드 Query"},
+            {"method_name": "getArticleFavoritedByUsername", "description": "즐겨찾기 별 Query"},
+            {"method_name": "getArticlesByAuthorName", "description": "작성자 별 Query"},
+            {"method_name": "getArticlesByTag", "description": "Tag 별 Query"},
+            {"method_name": "getArticleBySlug", "description": "Slug 단건 Query"},
+            {"method_name": "updateArticle", "description": "Article 수정 (author 권한)", "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-EDIT-001"]},
+            {"method_name": "favoriteArticle", "description": "즐겨찾기 토글 등록"},
+            {"method_name": "unfavoriteArticle", "description": "즐겨찾기 토글 해제"},
+            {"method_name": "deleteArticleBySlug", "description": "Article 삭제 (author 권한)", "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-DELETE-001"]}
+          ]
+        },
+        {
+          "id": "DS-CONTENT-CommentService",
+          "name": "CommentService",
+          "description": "Comment 진입점 — Article.removeCommentByUser 위임.",
+          "operations": [
+            {"method_name": "createComment", "description": "Comment 생성"},
+            {"method_name": "getComments", "description": "Query — Article 별 댓글"},
+            {"method_name": "deleteCommentById", "description": "Comment 삭제 — Article.java:86 De Morgan 버그 발현 (F-027)", "related_rules": ["BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001"]}
+          ]
+        },
+        {
+          "id": "DS-CONTENT-ProfileService",
+          "name": "ProfileService",
+          "description": "Profile viewing + follow/unfollow.",
+          "operations": [
+            {"method_name": "viewProfile", "description": "Profile 조회 (viewer 관점)"},
+            {"method_name": "followAndViewProfile", "description": "follow + 조회 한 번에"},
+            {"method_name": "unfollowAndViewProfile", "description": "unfollow + 조회 한 번에"}
+          ]
+        },
+        {
+          "id": "DS-CONTENT-TagService",
+          "name": "TagService",
+          "description": "Tag 재사용 메커니즘.",
+          "operations": [
+            {"method_name": "findAll", "description": "Tag 목록 Query"},
+            {"method_name": "reloadAllTagsIfAlreadyPresent", "description": "내부 — Tag 재사용 처리 (Article 저장 직전)"}
+          ]
+        }
+      ],
+      "use_cases": [
+        {"id": "UC-CONTENT-USER-SIGNUP", "name": "회원가입", "actor": "Anonymous", "description": "email + password + name 으로 User 생성. JWT 발급.", "preconditions": ["email/username unique (의도)"], "postconditions": ["users row 생성", "JWT 반환"], "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "POST /users", "related_rules": ["BR-USER-EMAIL-UNIQUE-001", "BR-USER-USERNAME-UNIQUE-001", "BR-AUTH-PASSWORD-BCRYPT-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-USER-LOGIN", "name": "로그인", "actor": "Anonymous", "description": "email + password 검증 후 JWT 발급.", "preconditions": ["사용자 가입 완료"], "postconditions": ["JWT 반환"], "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "POST /users/login", "related_rules": ["BR-AUTH-PASSWORD-BCRYPT-001", "BR-AUTH-STATELESS-001", "BR-AUTH-JWT-EXPIRE-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-USER-FIND-BY-ID", "name": "현재 사용자 조회", "actor": "Authenticated User", "description": "JWT 토큰으로 현재 사용자 정보 조회 (GET /user). Phase 5-1 cross-validation 으로 system_internal=true 오분류 정정 — F-035.", "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "GET /user", "related_openapi_operation_id": "GetCurrentUser", "_kind": "query", "_phase5_correction": {"finding_id": "F-035", "phase": "5-1", "previous_classification": {"actor": "System", "description": "내부 조회 — JWT 검증 후 컨텍스트 로드.", "system_internal": true}, "corrected_classification": {"actor": "Authenticated User", "system_internal": false, "is_explicit_api_endpoint": true}, "rationale": "RealWorld 공식 spec + UserApi.java cross-check 결과 GET /user 가 명시적 API endpoint."}},
+        {"id": "UC-CONTENT-USER-FIND-BY-USERNAME", "name": "사용자 조회 (이름)", "actor": "Authenticated User", "description": "Profile 조회 시 사용.", "related_aggregate": "E-CONTENT-User", "_kind": "query"},
+        {"id": "UC-CONTENT-USER-UPDATE", "name": "사용자 정보 수정", "actor": "Authenticated User", "description": "email/password/profile 부분 수정.", "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "PUT /user", "_kind": "command"},
+        {"id": "UC-CONTENT-PROFILE-VIEW", "name": "프로필 조회", "actor": "Anonymous|Authenticated", "description": "username 기준 Profile 조회 — viewer 관점 following 표기.", "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "GET /profiles/{username}", "_kind": "query"},
+        {"id": "UC-CONTENT-PROFILE-FOLLOW", "name": "팔로우", "actor": "Authenticated User", "description": "단방향 follow.", "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "POST /profiles/{username}/follow", "related_rules": ["BR-USER-FOLLOW-DIRECTIONAL-001", "BR-USER-FOLLOW-NO-SELF-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-PROFILE-UNFOLLOW", "name": "언팔로우", "actor": "Authenticated User", "description": "follow 해제.", "related_aggregate": "E-CONTENT-User", "related_api_operation_id": "DELETE /profiles/{username}/follow", "_kind": "command"},
+        {"id": "UC-CONTENT-ARTICLE-CREATE", "name": "글 작성", "actor": "Authenticated User", "description": "User.writeArticle — Article + Tag 생성.", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "POST /articles", "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-EDIT-001", "BR-DOMAIN-AUDITING-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-ARTICLE-LIST", "name": "전역 글 목록", "actor": "Anonymous|Authenticated", "description": "필터(tag/author/favorited) + 페이지네이션.", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "GET /articles", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-FEED", "name": "내 피드 조회", "actor": "Authenticated User", "description": "내가 follow 하는 사용자들의 글.", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "GET /articles/feed", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-LIST-BY-FAVORITED", "name": "특정 사용자가 즐겨찾은 글 목록", "actor": "Anonymous|Authenticated", "related_aggregate": "E-CONTENT-Article", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-LIST-BY-AUTHOR", "name": "특정 작성자 글 목록", "actor": "Anonymous|Authenticated", "related_aggregate": "E-CONTENT-Article", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-LIST-BY-TAG", "name": "특정 태그 글 목록", "actor": "Anonymous|Authenticated", "related_aggregate": "E-CONTENT-Article", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-VIEW", "name": "글 단건 조회", "actor": "Anonymous|Authenticated", "description": "slug 기준.", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "GET /articles/{slug}", "_kind": "query"},
+        {"id": "UC-CONTENT-ARTICLE-UPDATE", "name": "글 수정", "actor": "Authenticated User (작성자)", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "PUT /articles/{slug}", "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-EDIT-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-ARTICLE-FAVORITE", "name": "글 즐겨찾기 등록", "actor": "Authenticated User", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "POST /articles/{slug}/favorite", "_kind": "command"},
+        {"id": "UC-CONTENT-ARTICLE-UNFAVORITE", "name": "글 즐겨찾기 해제", "actor": "Authenticated User", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "DELETE /articles/{slug}/favorite", "_kind": "command"},
+        {"id": "UC-CONTENT-ARTICLE-DELETE", "name": "글 삭제", "actor": "Authenticated User (작성자)", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "DELETE /articles/{slug}", "related_rules": ["BR-ARTICLE-AUTHOR-ONLY-DELETE-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-COMMENT-CREATE", "name": "댓글 작성", "actor": "Authenticated User", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "POST /articles/{slug}/comments", "_kind": "command"},
+        {"id": "UC-CONTENT-COMMENT-LIST", "name": "댓글 목록", "actor": "Anonymous|Authenticated", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "GET /articles/{slug}/comments", "_kind": "query"},
+        {"id": "UC-CONTENT-COMMENT-LIST-BY-USER", "name": "사용자별 댓글 목록", "actor": "System", "related_aggregate": "E-CONTENT-Comment", "_kind": "query"},
+        {"id": "UC-CONTENT-COMMENT-DELETE", "name": "댓글 삭제", "actor": "Authenticated User (작성자|article 작성자 — 의도)", "description": "RealWorld spec 의도 (OR) ≠ 코드 동작 (AND De Morgan F-027).", "related_aggregate": "E-CONTENT-Article", "related_api_operation_id": "DELETE /articles/{slug}/comments/{id}", "related_rules": ["BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001"], "_kind": "command"},
+        {"id": "UC-CONTENT-TAG-LIST", "name": "전역 태그 목록", "actor": "Anonymous|Authenticated", "related_aggregate": "E-CONTENT-Tag", "related_api_operation_id": "GET /tags", "_kind": "query"}
+      ]
+    },
+    {
+      "id": "BC-AUTH",
+      "name": "인증 (cross-cutting JWT)",
+      "description": "JWT 발급/검증 BC. 영속성 0건 (사용자/권한 데이터는 BC-CONTENT 의 User Aggregate 가 보유). HmacSHA256 + 2시간 만료 + STATELESS.",
+      "related_modules": ["MOD-DOMAIN-JWT", "MOD-INFRA-JWT", "MOD-APP-SECURITY"],
+      "aggregates": [],
+      "entities": [],
+      "value_objects": [
+        {
+          "id": "VO-AUTH-UserJWTPayload",
+          "name": "UserJWTPayload",
+          "description": "JWT payload — id + email. UserService.findById 로 컨텍스트 로드.",
+          "attributes": [
+            {"name": "id", "type": "Long"},
+            {"name": "email", "type": "String"}
+          ],
+          "evidence": [
+            {"file": "infrastructure/jwt/UserJWTPayload.java", "line": 1, "_layer_violation": "LV-001 — application/article 직접 import"}
+          ]
+        }
+      ],
+      "domain_services": [
+        {
+          "id": "DS-AUTH-JWTService",
+          "name": "HmacSHA256JWTService",
+          "description": "JWT 직렬화/역직렬화 (HmacSHA256 + Base64URL).",
+          "operations": [
+            {"method_name": "serialize", "description": "UserJWTPayload → JWT String"},
+            {"method_name": "deserialize", "description": "JWT String → UserJWTPayload (서명/만료 검증)"}
+          ]
+        }
+      ],
+      "use_cases": [],
+      "_invariants_cross_cutting": [
+        "JWT SECRET 길이 ≥ 256 bit (HMAC-SHA256 RFC 7515 §5.2.2) — BR-AUTH-JWT-SECRET-LENGTH-001 (위반: 21 byte)",
+        "JWT 만료 시간 명시 (RFC 7519 exp claim) — BR-AUTH-JWT-EXPIRE-001 (구현: 2시간 매직 넘버)",
+        "STATELESS — csrf disable + formLogin disable (SecurityConfiguration) — BR-AUTH-STATELESS-001",
+        "공개 endpoint: GET /profiles/* /articles/** /tags/**, POST /users /users/login — BR-AUTH-PUBLIC-ENDPOINTS-001"
+      ]
+    }
+  ],
+  "diagram_files": {
+    "class_diagram": "domain.mermaid",
+    "aggregate_overview": "domain.mermaid"
+  },
+  "v12_reserved": {
+    "context_map_relationships": null,
+    "subdomain_classification": null
+  },
+  "_phase_4_5_areas": {
+    "5.A_db_logic": {"status": "completed", "br_count": 11, "uc_count": 25, "vo_count": 7, "aggregate_count": 3},
+    "5.B_fe_logic": {"status": "skipped", "reason": "FE absent (BE only) — F-026 / F-029 발현"},
+    "5.C_config_policy": {"status": "sparse", "br_count": 2, "evidence": ["application.properties 8 lines", "JWTConfiguration 매직 넘버 3건"], "_findings": ["AP-CONFIG-HARDCODED-SECRET-001 critical"]},
+    "5.D_external_dep": {"status": "zero_dependencies", "reason": "self-contained JWT — F-026 발현 사례", "external_count": 0}
+  }
+}
