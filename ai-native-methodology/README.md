@@ -1,10 +1,12 @@
-# AI-Native 개발 방법론 v1.2.2
+# AI-Native 개발 방법론 v1.2.3
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
 >
 > 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
 >
-> **v1.2.2 갱신 (2026-04-30)**: 묶음 M-P2-3 5건 일괄 처리 PATCH — 본체 갭 7건 모두 closed. **api.template.md / phase-flow.mermaid+json / ADR-009 (다이어그램 신뢰 모델) / db-schema.template.md / meta-confidence.template.yml**. 본체가 ADR-008 (이중 렌더링 사상) 100% 정합 달성 → 사실상 v1.3 진입 가능 상태.
+> **v1.2.3 갱신 (2026-04-30)**: PoC #03 종결 후 본체 격상 PATCH — 묶음 C+I+H+K 4건 일괄. **★ Phase 4.5 cross-link 의무화 (openapi-extension + antipatterns schema)** + **★ AP-PERFORMANCE 3 PoC 권위 정식 격상** + **★ Positive finding 패턴 schema 화 (severity:positive + learning_effect_type 4종)** + **★ Lifecycle BR 패턴 (decision_tables required 분리 + br_type enum + current_state_note)**. drift-validator false positive 60% → 0%. v1.3.0 정식 release 진입 직전 상태.
+>
+> **v1.2.2**: 묶음 M-P2-3 5건 PATCH — 본체 갭 7건 모두 closed.
 >
 > v1.2.1 — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema 강제. 진짜 도구 실 실행 Sprint 5 carry-over.
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.

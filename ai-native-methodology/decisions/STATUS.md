@@ -3,13 +3,14 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★ **B Phase 4.5 풍부화** — BR coverage 33% → 66.7% / 12 BR 자동 검증 통과 / dmn-check schema 보강 / 신뢰도 0.87)
+**기준일**: 2026-04-30 (★★★ **v1.2.3 PATCH — 본체 격상** / 본체 갭 closure 11건 / schema 4건 / 명세 본체 3건 / v1.3.0 release 직전)
 
 ---
 
 ## 방법론 본체 버전
 
-- **★ v1.2.2 PATCH 격상 완료** — 묶음 M-P2-3 5건: api.template.md / phase-flow.mermaid+json / ADR-009 (다이어그램 신뢰 모델) / db-schema.template.md / meta-confidence.template.yml. 본체 갭 7건 모두 closed → ADR-008 (이중 렌더링) 본체 100% 정합.
+- **★★★ v1.2.3 PATCH 격상 완료 (현재)** — ★ 사용자 방향 재정렬 ("PoC 산출물 ❌ / 본체 격상 ✅"). 묶음 C+I+H+K 4건. **★ Phase 4.5 cross-link 의무화 schema (openapi-extension + antipatterns)** + **★ AP-PERFORMANCE 3 PoC 권위 격상** + **★ Positive finding 패턴 (severity:positive + learning_effect_type 4종 + status:logged)** + **★ Lifecycle BR 패턴 (decision_tables required 분리 + br_type enum + current_state_note)**. 본체 갭 closure 7 → 11. v1.3.0 release 진입 직전.
+- v1.2.2 PATCH — 묶음 M-P2-3 5건 (본체 갭 7건 모두 closed).
 - **v1.2.1 PATCH** — drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 강제.
 - **v1.2.0 MINOR** — 14 묶음 (A~M+P) 통합. ADR-008 + Phase 4.5 정식 + finding-system schema + migration-cautions 의무.
 - v1.1.2 PATCH (high 4건 closed) → v1.2.0 흡수
