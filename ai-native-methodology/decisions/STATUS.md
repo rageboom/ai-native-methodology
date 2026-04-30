@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★★ **v1.2.3 PATCH — 본체 격상** / 본체 갭 closure 11건 / schema 4건 / 명세 본체 3건 / v1.3.0 release 직전)
+**기준일**: 2026-05-01 (★★★ **v1.2.3 LMNO 종결** / 본체 갭 closure 15건 / 도구 unit test 25 → 37 / 신규 도구 formal-spec-link-validator / PoC #03 BR 100% / Sprint 5 환경 의존 만 잔여)
 
 ---
 
