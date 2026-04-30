@@ -1,4 +1,5 @@
-// Corpus self-test — 의미 동일 2쌍 + 의미 다름 2쌍 = 4쌍 (Sprint 4 1차 / 풀 20쌍 Sprint 5 carry-over).
+// Corpus self-test — A 보강 후 10쌍 (★ Sprint 4 4쌍 → A 보강 +6쌍 = 10쌍).
+// 다음 단계 (Sprint 5+) — 20쌍 까지 확장 (현재 carry-over).
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
@@ -55,4 +56,46 @@ test('sequence equiv → 0 breaking', () => {
 test('sequence drift → ≥1 breaking', () => {
   const s = runSequence('sequence-drift-01');
   assert.ok(s.breaking >= 1, `expected breaking≥1, got ${JSON.stringify(s)}`);
+});
+
+// ★ A-2 corpus 확장 (compound state 매칭 + 변종 화살표)
+
+test('★ state-machine compound equiv → 0 breaking (★ A-1 transitionFuzzyMatch 검증)', () => {
+  const s = runStateMachine('state-machine-equiv-02-compound');
+  assert.equal(s.breaking, 0, `expected breaking=0 (compound 매칭), got ${JSON.stringify(s)}`);
+});
+
+test('★ state-machine self-loop on compound → 0 breaking (★ A-1 case 5 검증)', () => {
+  const s = runStateMachine('state-machine-equiv-03-self-loop');
+  assert.equal(s.breaking, 0, `expected breaking=0 (self-loop), got ${JSON.stringify(s)}`);
+});
+
+test('★ state-machine drift missing-state → ≥1 breaking', () => {
+  const s = runStateMachine('state-machine-drift-02-missing-state');
+  assert.ok(s.breaking >= 1, `expected breaking≥1, got ${JSON.stringify(s)}`);
+});
+
+test('★ state-machine drift missing-compound → ≥1 breaking', () => {
+  const s = runStateMachine('state-machine-drift-03-missing-compound');
+  assert.ok(s.breaking >= 1, `expected breaking≥1, got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence -x fail-arrow → 0 breaking (★ A-3 F-155 검증)', () => {
+  const s = runSequence('sequence-equiv-02-fail-arrow');
+  assert.equal(s.breaking, 0, `expected breaking=0 (-x 화살표 인식), got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence -)/--)  async-arrow → 0 breaking (★ A-3 F-155 검증)', () => {
+  const s = runSequence('sequence-equiv-03-async');
+  assert.equal(s.breaking, 0, `expected breaking=0 (async 화살표 인식), got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence drift missing-actor → ≥1 breaking', () => {
+  const s = runSequence('sequence-drift-02-missing-actor');
+  assert.ok(s.breaking >= 1, `expected breaking≥1, got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence drift label-mismatch → ≥1 non-breaking', () => {
+  const s = runSequence('sequence-drift-03-label-mismatch');
+  assert.ok(s['non-breaking'] >= 1 || s.breaking >= 1, `expected drift detected, got ${JSON.stringify(s)}`);
 });

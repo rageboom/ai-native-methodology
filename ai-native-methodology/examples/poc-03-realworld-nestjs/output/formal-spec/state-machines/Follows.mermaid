@@ -60,7 +60,9 @@ stateDiagram-v2
 
     Following --> ValidatingUnfollow: unfollow 요청
     ValidatingUnfollow --> CheckingSelf_Id: present 통과
+    ValidatingUnfollow --> Following: reject_null<br/>follower or username not provided
     CheckingSelf_Id --> DeletingFollow: 자기 자신 ❌
+    CheckingSelf_Id --> Following: reject_self_id<br/>★ F-144 차원 불일치
 
     DeletingFollow --> Not_Following: repository.delete(_follows)
 

@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★★ **v1.3 격상 데이터 완비** — 통합 보고서 + DEC 종결 / 사내 적용 시작 가능 시점 명시)
+**기준일**: 2026-04-30 (★★★ **A drift-validator quality 격상** — F-154/F-155 closed / breaking 0 / exit 0 / 신뢰도 0.85)
 
 ---
 

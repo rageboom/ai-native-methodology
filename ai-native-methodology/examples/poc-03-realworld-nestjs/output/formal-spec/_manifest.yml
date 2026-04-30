@@ -51,8 +51,8 @@ artifact_count:
 # 신뢰도 (★ Senior 의사결정 5 ❌ 권고 반영 — D5 / 본 세션 자동 검증 후 +7p)
 # ----------------------------------------------------------------------
 trust_level:
-  raw_confidence: 0.80  # 70 + 10 — drift + dmn 실행 +10p / 다이어그램 보강 +3p / drift 진짜 drift 0 (도구 한계만) 패널티 회수
-  current_step: 3  # ★ ADR-009 단계 3 — 자동 검증 통과 ✅ (drift 진짜 drift 0 + dmn 0)
+  raw_confidence: 0.85  # 70 + 15 — drift + dmn 실행 +10p / 다이어그램 보강 +3p / ★ A drift-validator 보강 (false positive 0%) +5p / Phase 4.5+2 outer transition 4건 +3p / drift breaking 0 + exit 0 ★
+  current_step: 3.5  # ★★ ADR-009 단계 3+ — 자동 검증 완전 통과 + 도구 자체 quality 격상
   validation_history:
     - { step: "1차 작성", at: "2026-04-30", actor: "AI (메인 raw fetch)", tool_type: "ai_main" }
     - { step: "Sub-agent 3 병렬 (NestJS 7 + OSS 사례 + Senior)", at: "2026-04-30", tool_type: "ai_subagent_lightweight" }
@@ -114,17 +114,24 @@ cross_validation:
           info: 44
           errors: 0
           exit_code: 1
-        after_diagram_fix:  # ★ Phase 4.5+1 종결
+        after_diagram_fix:  # Phase 4.5+1
           pairs: 9
           breaking: 8
           non_breaking: 2
           info: 47
           errors: 0
-          exit_code: 1   # 도구 한계만 남음 (F-117 + F-155)
-        manual_classification:
-          true_drift: 0   # ★ 8 → 0 ✅ (Phase 4.5+1 다이어그램 보강 종결)
-          tool_limitation: 8   # F-117 transitionFuzzyMatch 재발 → F-154 (Sprint 5 carry-over)
-          false_positive_ratio_after_fix: 1.00   # ★ 100% 도구 한계 (진짜 drift 0)
+          exit_code: 1
+        after_tool_quality_boost:  # ★★ A drift-validator 보강 + Phase 4.5+2 종결
+          pairs: 9
+          breaking: 0  # ✅
+          non_breaking: 2
+          info: 47
+          errors: 0
+          exit_code: 0  # ★ CI 통과
+        manual_classification_final:
+          true_drift: 0   # ★★ 8 → 0 ✅
+          tool_limitation: 0  # ★★★ 12 → 8 → 0 ✅ (A 보강 — false positive 60% → 0%)
+          a_quality_boost_summary: "★★★ A drift-validator 보강 — transitionFuzzyMatch (compound state inner) + corpus 4 → 14 (10/10 통과) + sequence -x/-)/--) 변종 화살표 인식. F-154 + F-155 closed."
     - id: decision-table-validator
       real_tool: true
       tool_version: "0.1.0"
@@ -210,12 +217,14 @@ findings_added_this_phase:
     source: "decision-table BR-USER-LOGIN-VERIFY-001.md §4-C"
   - id: F-154
     severity: medium
-    summary: "★ drift-validator transitionFuzzyMatch 한계 재발 — compound state 안 sub-state transition 이 outer 로 elide 못 됨 (12/20 = 60% false positive). F-117 재발 입증 → Sprint 5 보완 우선순위 격상 ★★"
+    summary: "★ drift-validator transitionFuzzyMatch 한계 재발 — compound state 안 sub-state transition 이 outer 로 elide 못 됨 (12/20 = 60% false positive). F-117 재발 입증 → ★★ A 보강 후 closed ✅"
     source: "validation .validation/SUMMARY.md §1.5 + drift-result.json"
+    status: "closed (★★ A drift-validator 보강 — 60% → 0%)"
   - id: F-155
     severity: low
-    summary: "drift-validator sequence diagram `-x`/`-)` 변종 화살표 미인식 — UC-USER-DELETE Controller-AuthMiddleware false positive"
+    summary: "drift-validator sequence diagram `-x`/`-)` 변종 화살표 미인식 — UC-USER-DELETE Controller-AuthMiddleware false positive → ★ A 보강 후 closed ✅"
     source: "validation .validation/SUMMARY.md §1.5"
+    status: "closed (★ A drift-validator 보강 — sequence 변종 인식)"
   - id: F-156
     severity: low
     summary: "decision-table JSON current_state 가 한국어 prefix + 부가 설명 사용 → schema enum 위반 (6 BR 모두 동일 / 본 세션 fix 완료)"

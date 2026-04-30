@@ -16,16 +16,16 @@
 
 ### 1.1 정량
 
-| 항목 | 1차 (Phase 4.5) | 2차 (Phase 4.5+1 다이어그램 보강 후) ✅ |
-|---|---|---|
-| pair 수 | 9 | 9 |
-| breaking | 20 | **8** (-12) |
-| non-breaking | 2 | 2 |
-| info | 44 | 47 (+3) |
-| errors | 0 | 0 |
-| exit code | 1 | 1 (도구 한계만 남음) |
-| **진짜 drift** | **8** | **0 ✅** |
-| **도구 한계** | 12 | 8 (감소) |
+| 항목 | 1차 (Phase 4.5) | 2차 (Phase 4.5+1) | 3차 (★ A drift-validator 보강 + Phase 4.5+2) ✅ |
+|---|---|---|---|
+| pair 수 | 9 | 9 | 9 |
+| breaking | 20 | 8 (-12) | **0** ✅ (-8) |
+| non-breaking | 2 | 2 | 2 |
+| info | 44 | 47 (+3) | 47 |
+| errors | 0 | 0 | 0 |
+| exit code | 1 | 1 | **0** ✅ |
+| **진짜 drift** | 8 | 0 ✅ | **0** ✅ |
+| **도구 한계 (false positive)** | 12 (60%) | 8 | **0** ✅ (★ A 보강 후) |
 
 ### 1.2 짝별 결과
 
@@ -186,7 +186,9 @@ phase_45_plus_1_diagram_fix:
 - ✅ Phase 4.5 자동 검증 종결 (drift + dmn 첫 외부 적용)
 - ✅ dmn-check 6 enum 위반 즉시 fix
 - ✅ **drift-validator 진짜 drift 8건 → 0 (Phase 4.5+1 다이어그램 보강 종결 ★)**
-- ⏳ 도구 한계 8건 = F-154/F-155 finding + Sprint 5 carry-over (transitionFuzzyMatch 보완)
-- ★ 신뢰도 0.70 → 0.77 → **0.80** (+10p / 단계 2 → 2.5 → **단계 3 도달 ✅**)
+- ✅ **★★ A drift-validator 보강 (transitionFuzzyMatch + corpus 4 → 14 + sequence -x/-) 변종) → 도구 한계 12 → 0 ✅**
+- ✅ **★★ Phase 4.5+2 outer reject transition 4건 추가 → breaking 4 → 0 ✅**
+- ✅ **★ exit code 1 → 0 (★ CI 통과)**
+- ★ 신뢰도 0.70 → 0.77 → 0.80 → **0.85** (+15p / 단계 2 → 2.5 → 3 → **★★ 단계 3+ 도달 ✅**)
 
 **End of validation summary.**

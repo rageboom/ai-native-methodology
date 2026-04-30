@@ -22,8 +22,9 @@ export function detectDiagramType(text) {
 export function normalizeStateMachine(text) {
   const lines = text.split('\n').map(stripComment);
   const states = new Set();
-  const transitions = []; // { from, to, event }
+  const transitions = []; // { from, to, event, parent }
   const compoundStates = new Set();
+  const stateAncestors = new Map(); // sub-state id → [ancestor ids] (가장 가까운 → root 순)
   const notes = []; // { target, text }
   let initial = null;
 
@@ -33,6 +34,17 @@ export function normalizeStateMachine(text) {
   let inNote = false;
   let noteTarget = null;
   let noteBuf = [];
+
+  const recordAncestry = (childId) => {
+    if (currentParent === null) return; // root 직속 — ancestry 없음
+    if (!stateAncestors.has(childId)) stateAncestors.set(childId, []);
+    const list = stateAncestors.get(childId);
+    // 가까운 → root 순. parentStack 의 reverse + currentParent.
+    const chain = [currentParent, ...parentStack.slice().reverse().filter((p) => p !== null)];
+    for (const a of chain) {
+      if (!list.includes(a)) list.push(a);
+    }
+  };
 
   for (let raw of lines) {
     if (isBlank(raw)) continue;
@@ -67,6 +79,8 @@ export function normalizeStateMachine(text) {
       const id = normalizeId(stateOpen[1]);
       compoundStates.add(id);
       states.add(id);
+      // 자기 자신의 ancestry 도 등록 (current depth)
+      recordAncestry(id);
       parentStack.push(currentParent);
       currentParent = id;
       depth++;
@@ -90,8 +104,14 @@ export function normalizeStateMachine(text) {
       }
       const from = fromRaw === '[*]' ? `__entry__${currentParent ?? 'root'}` : normalizeId(fromRaw);
       const to = toRaw === '[*]' ? `__exit__${currentParent ?? 'root'}` : normalizeId(toRaw);
-      if (fromRaw !== '[*]') states.add(from);
-      if (toRaw !== '[*]') states.add(to);
+      if (fromRaw !== '[*]') {
+        states.add(from);
+        recordAncestry(from);
+      }
+      if (toRaw !== '[*]') {
+        states.add(to);
+        recordAncestry(to);
+      }
       transitions.push({ from, to, event: normalizeLabel(eventRaw), parent: currentParent });
       continue;
     }
@@ -102,6 +122,7 @@ export function normalizeStateMachine(text) {
     initial,
     states: Array.from(states).sort(),
     compound_states: Array.from(compoundStates).sort(),
+    state_ancestors: stateAncestors,  // ★ NEW — sub-state id → [ancestor ids]
     transitions: transitions.map((t) => ({ ...t })).sort(byTransition),
     notes,
   };
@@ -154,6 +175,24 @@ export function normalizeSequence(text) {
     const ret = line.match(/^(\w+)\s*-->>\s*(\w+)\s*:\s*(.*)$/);
     if (ret) {
       messages.push({ from: normalizeId(ret[1]), to: normalizeId(ret[2]), sync: 'return', label: normalizeLabel(ret[3]) });
+      continue;
+    }
+    // ★ NEW (F-155): sync fail -x  (호출 실패 / 중단된 호출)
+    const syncFail = line.match(/^(\w+)\s*-x\s*(\w+)\s*:\s*(.*)$/);
+    if (syncFail) {
+      messages.push({ from: normalizeId(syncFail[1]), to: normalizeId(syncFail[2]), sync: 'sync', label: normalizeLabel(syncFail[3]), variant: 'fail' });
+      continue;
+    }
+    // ★ NEW (F-155): async open arrow -)
+    const asyncOpen = line.match(/^(\w+)\s*-\)\s*(\w+)\s*:\s*(.*)$/);
+    if (asyncOpen) {
+      messages.push({ from: normalizeId(asyncOpen[1]), to: normalizeId(asyncOpen[2]), sync: 'sync', label: normalizeLabel(asyncOpen[3]), variant: 'async' });
+      continue;
+    }
+    // ★ NEW (F-155): dotted async --)
+    const asyncDotted = line.match(/^(\w+)\s*--\)\s*(\w+)\s*:\s*(.*)$/);
+    if (asyncDotted) {
+      messages.push({ from: normalizeId(asyncDotted[1]), to: normalizeId(asyncDotted[2]), sync: 'return', label: normalizeLabel(asyncDotted[3]), variant: 'async' });
       continue;
     }
   }

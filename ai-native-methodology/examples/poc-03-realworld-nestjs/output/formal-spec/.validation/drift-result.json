@@ -1,7 +1,7 @@
 {
   "totals": {
     "pairs": 9,
-    "breaking": 8,
+    "breaking": 0,
     "non-breaking": 2,
     "info": 47,
     "errors": 0
@@ -12,7 +12,7 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\Article.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 1,
+        "breaking": 0,
         "non-breaking": 0,
         "info": 18
       },
@@ -124,16 +124,6 @@
           "kind": "state.extra-in-mermaid",
           "mermaid": "slugifyrandom",
           "message": "mermaid state \"slugifyrandom\" not in JSON (likely sub-state of a compound) — informational"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "creating",
-            "to": "creating",
-            "event": "author_auto"
-          },
-          "message": "JSON transition creating -[author_auto]-> creating not represented in mermaid"
         }
       ]
     },
@@ -142,7 +132,7 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\Follows.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 2,
+        "breaking": 0,
         "non-breaking": 0,
         "info": 10
       },
@@ -206,26 +196,6 @@
           "kind": "state.extra-in-mermaid",
           "mermaid": "rejectedselfid",
           "message": "mermaid state \"rejectedselfid\" not in JSON (likely sub-state of a compound) — informational"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "checkingselfid",
-            "to": "following",
-            "event": "reject_self_id"
-          },
-          "message": "JSON transition checkingselfid -[reject_self_id]-> following not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "validatingunfollow",
-            "to": "following",
-            "event": "reject_null"
-          },
-          "message": "JSON transition validatingunfollow -[reject_null]-> following not represented in mermaid"
         }
       ]
     },
@@ -234,7 +204,7 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\User.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 4,
+        "breaking": 0,
         "non-breaking": 0,
         "info": 19
       },
@@ -352,46 +322,6 @@
           "kind": "state.extra-in-mermaid",
           "mermaid": "usernotfound",
           "message": "mermaid state \"usernotfound\" not in JSON (likely sub-state of a compound) — informational"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "checkingduplicate",
-            "to": "anonymous",
-            "event": "duplicate_found"
-          },
-          "message": "JSON transition checkingduplicate -[duplicate_found]-> anonymous not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "hashingpassword",
-            "to": "persistinguser",
-            "event": "argon2_hash"
-          },
-          "message": "JSON transition hashingpassword -[argon2_hash]-> persistinguser not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "persistinguser",
-            "to": "anonymous",
-            "event": "race_race_window"
-          },
-          "message": "JSON transition persistinguser -[race_race_window]-> anonymous not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "persistinguser",
-            "to": "hashingpassword",
-            "event": "before_insert_hook"
-          },
-          "message": "JSON transition persistinguser -[before_insert_hook]-> hashingpassword not represented in mermaid"
         }
       ]
     },
@@ -441,23 +371,11 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\sequence-diagrams\\UC-USER-DELETE.mermaid",
       "diagram_type": "sequence",
       "summary": {
-        "breaking": 1,
+        "breaking": 0,
         "non-breaking": 0,
         "info": 0
       },
-      "diffs": [
-        {
-          "severity": "breaking",
-          "kind": "message.missing-in-mermaid",
-          "json": {
-            "from": "controller",
-            "to": "authmiddleware",
-            "sync": "sync",
-            "label": "( 호출 안 됨 — f-140)"
-          },
-          "message": "JSON message controller-sync->authmiddleware not in mermaid"
-        }
-      ]
+      "diffs": []
     },
     {
       "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\sequence-diagrams\\UC-USER-LOGIN.json",

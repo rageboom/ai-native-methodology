@@ -1,0 +1,5 @@
+stateDiagram-v2
+    [*] --> draft
+    draft --> validating: SUBMIT
+    validating --> approved: PASS
+    approved --> [*]

@@ -88,11 +88,54 @@ function stateMatches(a, b) {
 }
 
 function transitionFuzzyMatch(t, m, mNorm) {
-  // 직접 매칭
+  // case 1: 직접 매칭
   if (stateMatches(t.from, m.from) && stateMatches(t.to, m.to)) return true;
-  // composite state 의 sub-transition: JSON to=parent / mermaid to=child of parent
-  // 본 방법론 컨벤션: composite 의 [*] --> firstSub 또는 child --> [*] 가 outer transition 으로 elide 됨
-  // Heuristic: t.from 또는 t.to 가 mermaid 의 compound_states 에 속하고, 매칭되는 m 이 그 sub-tree 안에 있는지.
+
+  // ★ F-154 fix — compound state inner transition 매칭
+  const fromCompound = mNorm.compound_states.includes(t.from);
+  const toCompound = mNorm.compound_states.includes(t.to);
+
+  // case 2: t.from = compound, m 이 t.from sub-tree 의 외부로 나가는 transition
+  // (e.g. JSON: persistingArticle -[insert_ok]-> published_count0
+  //       mermaid: SaveAttempt --> Persisted (sub-state) ... 또는 InsertingRow --> Published_Count0)
+  if (fromCompound) {
+    if (isOrSubstateOf(m.from, t.from, mNorm) && stateMatches(t.to, m.to)) return true;
+  }
+
+  // case 3: t.to = compound, m 이 t.to sub-tree 로 진입하는 transition
+  if (toCompound) {
+    if (stateMatches(t.from, m.from) && isOrSubstateOf(m.to, t.to, mNorm)) return true;
+  }
+
+  // case 4: t.from + t.to 둘 다 compound — sub-tree → sub-tree
+  if (fromCompound && toCompound) {
+    if (isOrSubstateOf(m.from, t.from, mNorm) && isOrSubstateOf(m.to, t.to, mNorm)) return true;
+  }
+
+  // case 5: self-loop on compound — JSON: X -[event]-> X (X compound)
+  // mermaid 에서 X 안의 sub-state 사이 transition 으로 표현 가능
+  if (t.from === t.to && fromCompound) {
+    if (isOrSubstateOf(m.from, t.from, mNorm) && isOrSubstateOf(m.to, t.from, mNorm)) return true;
+  }
+
+  // case 6: t.from = compound, m.parent 가 t.from 인 inner transition (외부 진입 ❌, 내부 흐름)
+  // 단, t.to 가 compound 안의 일부 또는 외부면 case 2/4 에서 잡힘. 여기서는 inner-only.
+  // ★ JSON 의 BEFORE_INSERT_HOOK 처럼 compound 안의 sub-state 흐름을 outer 로 elide 한 경우 대응
+  if (fromCompound && m.parent && stateMatches(m.parent, t.from)) {
+    if (stateMatches(t.to, m.to) || isOrSubstateOf(m.to, t.to, mNorm)) return true;
+  }
+
+  return false;
+}
+
+// ★ NEW — stateId 가 ancestorId 자체이거나 그 sub-state 인지
+function isOrSubstateOf(stateId, ancestorId, mNorm) {
+  if (stateMatches(stateId, ancestorId)) return true;
+  const ancestors = mNorm.state_ancestors?.get(stateId);
+  if (!ancestors) return false;
+  for (const a of ancestors) {
+    if (stateMatches(a, ancestorId)) return true;
+  }
   return false;
 }
 

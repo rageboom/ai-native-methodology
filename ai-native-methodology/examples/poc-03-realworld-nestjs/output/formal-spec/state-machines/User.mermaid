@@ -28,6 +28,7 @@ stateDiagram-v2
 
     ValidatingSignup --> CheckingDuplicate: DTO 검증 통과
     CheckingDuplicate --> PersistingUser: 중복 없음
+    CheckingDuplicate --> Anonymous: duplicate_found<br/>★ F-120 critical race-prone
     ValidatingSignup --> Anonymous: 400 → Client 재시도
 
     state PersistingUser {
@@ -38,6 +39,7 @@ stateDiagram-v2
     }
 
     PersistingUser --> Registered: User 반환
+    PersistingUser --> Anonymous: race_race_window<br/>★★ DB UQ 부재 / 정합성 손실
 
     Registered --> Authenticated: jwt.sign({email, exp: now+60days})
 
