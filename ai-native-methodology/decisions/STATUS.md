@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★★ **PoC #03 전체 종결** — 7대 산출물 6/7 / 11 AP / 사내 표준 v1.3 격상 데이터 완비)
+**기준일**: 2026-04-30 (★★★ **v1.3 격상 데이터 완비** — 통합 보고서 + DEC 종결 / 사내 적용 시작 가능 시점 명시)
 
 ---
 
@@ -128,7 +128,10 @@ poc03_artifacts_progress: 6/7            # ★★ 7대 산출물 종결 — UI/U
 # ★★★ 3 PoC 통합 (사내 표준 v1.3 격상 데이터 완비)
 all_3_pocs_complete: ✅
 cumulative_ap_3_pocs: 47   # PoC #01 15 + PoC #02 21 + PoC #03 11
-v13_promotion_data_status: "★★★ 완비"
+v13_promotion_data_status: "★★★ 완비 — 통합 보고서 docs/v1.3-promotion-report.md + DEC-v1.3-격상-데이터-완비"
+v13_promotion_candidates_count: 6  # AP-PERFORMANCE / Positive finding / NestJS 4 ADR / Phase 4.5 cross-link / migration-cautions NestJS / §8.1 정식
+saa_application_ready: ✅  # ★★ 사내 적용 시작 가능 시점 v1.2.2
+v13_release_blocker: "Sprint 5 진입 의무 (★ 환경 의존)"
 ci_workflow_files: 1       # .github/workflows/drift-check.yml (drift + static dual mode)
 ```
 
