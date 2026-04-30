@@ -1,0 +1,40 @@
+manifest:
+  generated_at: "2026-04-30"
+  poc_id: "poc-03-realworld-nestjs"
+  phase: "4 (5.C antipatterns-partial)"
+  methodology_version: "v1.2.2"
+
+deliverables:
+  - { file: "antipatterns-partial.json", confidence: 0.80 }
+
+raw_confidence:
+  current: 0.80
+  cap: null
+  note: "Phase 6 합산 시 정식 격상"
+
+trust_level:
+  current: 0.80
+  current_step: 1
+
+ap_candidate_count: 8
+ap_candidate_critical: 2  # AP-DB-001 / AP-AUTH-NEST-001
+ap_candidate_high: 1
+ap_candidate_medium: 4
+ap_candidate_low: 1
+
+key_decisions:
+  - id: "DEC-PHASE4-PoC03-010"
+    title: "8 AP 후보 식별 (★★ critical 2 / high 1 / medium 4 / low 1)"
+    auto_mode_applied: true
+  - id: "DEC-PHASE4-PoC03-011"
+    title: "★★ AP-AUTH-NEST-001 critical 신규 — F-140 + F-118 + F-119 composite"
+    rationale: "PoC #01 (JWT 21byte) / PoC #02 (RSA git commit) 과 다른 형태 — auth scope + 검증 무방어"
+    auto_mode_applied: true
+  - id: "DEC-PHASE4-PoC03-012"
+    title: "★ AP-PERFORMANCE-001 medium → high 격상 후보 (3 PoC 재현 권위)"
+    rationale: "PoC #01 단독 → PoC #02 재현 → PoC #03 재현 = v1.3 격상 강한 권위"
+    auto_mode_applied: true
+
+next_actions:
+  - "5.D ui-domain 산출 (RealWorld 빈약 caveat)"
+  - "Phase 4.5 진입 — 5 BR 형식화 (★★ BR-USER-DELETE-AUTH-001 critical 포함)"

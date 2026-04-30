@@ -1,0 +1,309 @@
+{
+  "$schema_ref": "https://ai-native-methodology/schemas/inventory.schema.json",
+  "meta": {
+    "generated_at": "2026-04-30T00:00:00Z",
+    "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
+    "methodology_version": "v1.2.2",
+    "inputs_used": [
+      "source_code",
+      "config_files",
+      "package_json",
+      "swagger_decorators_inline"
+    ],
+    "confidence": 0.90,
+    "confidence_breakdown": {
+      "directory_tree": {
+        "confidence": 0.98,
+        "element_count": 1,
+        "extraction_method": "deterministic"
+      },
+      "file_stats_loc": {
+        "confidence": 0.98,
+        "element_count": 35,
+        "extraction_method": "deterministic"
+      },
+      "package_manifests": {
+        "confidence": 0.98,
+        "element_count": 1,
+        "extraction_method": "deterministic"
+      },
+      "orm_detection": {
+        "confidence": 0.97,
+        "element_count": 1,
+        "extraction_method": "pattern_matching"
+      },
+      "stack_summary": {
+        "confidence": 0.95,
+        "element_count": 1,
+        "extraction_method": "llm_with_grounding"
+      },
+      "architecture_style_candidates": {
+        "confidence": 0.85,
+        "element_count": 1,
+        "extraction_method": "llm_with_grounding",
+        "note": "★ 단일 NestJS module tree — PoC #02 multi-module Hexagonal hybrid 0.65 대비 분류 단순. cap 0.85 추정."
+      },
+      "modules_for_priority_analysis": {
+        "confidence": 0.95,
+        "element_count": 5,
+        "extraction_method": "deterministic"
+      }
+    },
+    "formula_version": "v1",
+    "applied_modifiers": [
+      {"name": "swagger_inline", "value": 0.05, "note": "DEC-PoC03-N5 정합 — @nestjs/swagger 데코레이터 inline ground truth"}
+    ],
+    "applied_penalties": [
+      {"name": "orm_partial", "value": -0.03, "note": "ormconfig.json.example 만 — 사용자 작성 의무. synchronize:true 시 entity → DDL 자동"}
+    ],
+    "cap_applied": false,
+    "manual_override": false,
+    "human_review_required": [
+      {
+        "item_id": "architecture_style_candidates",
+        "reason": "단일 NestJS module tree 분류 — cap 0.85 검증 Phase 3.",
+        "reviewer_role": "tech_lead"
+      }
+    ],
+    "llm_calls": 0,
+    "warnings": [
+      "★ Senior 위험 5 (research) 정합 — NestJS @Module = DI 경계 ≠ port-adapter. Phase 3 분류기 적용 시 주의.",
+      "★ Senior 위험 3 정합 — class-validator 데코레이터가 entity (UserEntity.@IsEmail) + DTO (CreateUserDto.@IsNotEmpty) 양쪽 분포. 단 UpdateUserDto / CreateArticleDto / CreateCommentDto 모두 데코레이터 0개 — Phase 4 BR 추출 시 service.ts 추가 read 의무.",
+      "★ Document agent 자가 시인 — codebase.show / docs.nestjs.com SPA 렌더 본문 비반환. NestJS Swagger 동작 설명은 GitHub README + 검색 결과 기반.",
+      "loc_extraction_method=deterministic (find + wc).",
+      "정체 레포 (코드 commit 2021-01) — NestJS 7 (현재 10.x) / TypeORM 0.2 (현재 0.3+) / TypeScript 3.8 (현재 5.x) — legacy 분석 적합 (메커니즘 #5 drift)."
+    ]
+  },
+  "repo": {
+    "name": "nestjs-realworld-example-app",
+    "owner": "lujakob",
+    "url": "https://github.com/lujakob/nestjs-realworld-example-app",
+    "branch": "master",
+    "head_short": "c1c2cc4",
+    "license": "ISC",
+    "license_caveat": "package.json license=ISC. Document agent _manifest 의 'null' 정정 (paying attention to package.json). 분석/연구 + PoC 결과 공개 모두 fair use.",
+    "alternate_branches": [
+      {
+        "name": "prisma",
+        "head_short": "034bd650",
+        "purpose": "ORM 대조 inventory 항목 (이중 분석 ❌ — DEC-PoC03-N1)"
+      }
+    ]
+  },
+  "stack": {
+    "language": "TypeScript 3.8",
+    "runtime": "Node.js (version 미명시 — package.json engines 부재)",
+    "framework": "NestJS 7.0.5",
+    "orm": {
+      "kind": "TypeORM 0.2.24",
+      "naming_strategy": "default (camelCase 보존 + entity 명 그대로 + relation FK = `[propertyName]Id`)",
+      "naming_strategy_detection": "★ G6 v1.2.2 sub-section (b) TypeORM 정합 — entity 데코레이터 명시적 name 사용 (예: @Entity('user'))",
+      "synchronize": true,
+      "synchronize_caveat": "ormconfig.json.example 의 synchronize:true → 런타임 entity → DDL 자동. migration 도구 부재."
+    },
+    "validation": "class-validator 0.11.1 + class-transformer 0.2.3",
+    "auth": {
+      "scheme": "JWT",
+      "library": "jsonwebtoken 8.5.1",
+      "additional": "passport-jwt 4.0.0 (선언만 — 실 사용 미검증)",
+      "password_hash": "argon2 0.26.2"
+    },
+    "openapi": {
+      "library": "@nestjs/swagger 4.4.0",
+      "ground_truth": "★ DEC-PoC03-N5 — 코드 inline 데코레이터 (정적 추출 + 런타임 dump 2-way diff)",
+      "swagger_ui_setup": "main.ts:14 — SwaggerModule.setup('/docs')",
+      "decorator_coverage_concern": "ArticleController 만 @ApiOperation/@ApiResponse 풀세트. UserController/ProfileController/TagController 는 @ApiBearerAuth + @ApiTags 만 → silent 빈약 위험 (Senior 위험 6 정합)"
+    },
+    "db": "MySQL 5.x+ (mysql 2.18.1 driver)",
+    "test": "Jest 25 (ts-jest) + supertest. 단일 spec 파일만 (src/tag/tag.controller.spec.ts) — 본격 test suite 부재"
+  },
+  "modules": [
+    {
+      "id": "MOD-APP",
+      "path": "src/app.module.ts",
+      "class_name": "ApplicationModule",
+      "kind": "root_module",
+      "files": ["src/app.module.ts", "src/app.controller.ts", "src/main.ts"],
+      "imports": ["TypeOrmModule.forRoot()", "ArticleModule", "UserModule", "ProfileModule", "TagModule"],
+      "purpose": "DI root + bootstrap entry"
+    },
+    {
+      "id": "MOD-USER",
+      "path": "src/user/",
+      "class_name": "UserModule",
+      "kind": "domain_module",
+      "files": [
+        "user.module.ts", "user.controller.ts", "user.service.ts",
+        "user.entity.ts", "user.decorator.ts", "user.interface.ts",
+        "auth.middleware.ts", "dto/create-user.dto.ts", "dto/login-user.dto.ts",
+        "dto/update-user.dto.ts", "dto/index.ts"
+      ],
+      "exports": ["UserService"],
+      "middleware": "AuthMiddleware applied to GET /user, PUT /user",
+      "purpose": "User CRUD + signup/login + JWT"
+    },
+    {
+      "id": "MOD-ARTICLE",
+      "path": "src/article/",
+      "class_name": "ArticleModule",
+      "kind": "domain_module",
+      "files": [
+        "article.module.ts", "article.controller.ts", "article.service.ts",
+        "article.entity.ts", "article.interface.ts", "comment.entity.ts",
+        "dto/create-article.dto.ts", "dto/create-comment.ts", "dto/index.ts"
+      ],
+      "imports_external": ["UserModule"],
+      "middleware": "AuthMiddleware applied to 8 routes (feed/POST/PUT/DELETE/comments/favorite/unfavorite)",
+      "purpose": "Article CRUD + comments + favorite"
+    },
+    {
+      "id": "MOD-PROFILE",
+      "path": "src/profile/",
+      "class_name": "ProfileModule",
+      "kind": "domain_module",
+      "files": [
+        "profile.module.ts", "profile.controller.ts", "profile.service.ts",
+        "profile.interface.ts", "follows.entity.ts"
+      ],
+      "imports_external": ["UserModule"],
+      "middleware": "AuthMiddleware applied to /:username/follow (ALL methods)",
+      "purpose": "User profile + follow/unfollow"
+    },
+    {
+      "id": "MOD-TAG",
+      "path": "src/tag/",
+      "class_name": "TagModule",
+      "kind": "domain_module",
+      "files": [
+        "tag.module.ts", "tag.controller.ts", "tag.controller.spec.ts",
+        "tag.service.ts", "tag.entity.ts"
+      ],
+      "imports_external": ["UserModule"],
+      "purpose": "Tag list (★ Article.tagList = simple-array column → TagEntity 별도 — 의미 검증 Phase 4)",
+      "concern": "TagEntity insert 코드 부재 — 미사용 dead code 가능성"
+    },
+    {
+      "id": "MOD-SHARED",
+      "path": "src/shared/",
+      "kind": "infrastructure",
+      "files": ["base.controller.ts", "pipes/validation.pipe.ts"],
+      "purpose": "ValidationPipe (class-validator wrapper) + BaseController (★ 사용처 부재 — dead code 가능성)",
+      "imported_by": ["UserController (ValidationPipe via @UsePipes)"]
+    }
+  ],
+  "entities": [
+    {
+      "id": "User",
+      "table_name": "user",
+      "file": "src/user/user.entity.ts",
+      "primary_key": "id (auto-generated)",
+      "columns": ["id", "username", "email", "bio", "image", "password"],
+      "decorators_class_validator": ["@IsEmail() on email"],
+      "lifecycle_hooks": ["BeforeInsert: argon2.hash(password)"],
+      "relations": [
+        "ManyToMany ArticleEntity (favorites, JoinTable)",
+        "OneToMany ArticleEntity (articles)"
+      ],
+      "concerns": [
+        "★ unique 제약 부재 (username/email) — DB UQ 부재 → App pre-check 1중 race-prone (PoC #01/#02 isomorphic + 더 나쁜 — PoC #02 는 DB UQ 2중)",
+        "password update 처리 의도된 회피 (UserService.update 에서 delete toUpdate.password) — 단 password 변경 endpoint 자체 부재"
+      ]
+    },
+    {
+      "id": "Article",
+      "table_name": "article",
+      "file": "src/article/article.entity.ts",
+      "primary_key": "id (auto-generated)",
+      "columns": ["id", "slug", "title", "description", "body", "created", "updated", "tagList (simple-array)", "favoriteCount"],
+      "decorators_class_validator": [],
+      "lifecycle_hooks": ["BeforeUpdate: updateTimestamp()"],
+      "relations": [
+        "ManyToOne UserEntity (author)",
+        "OneToMany Comment (comments, eager:true) — ★ N+1 위험 (PoC #02 F-051 EAGER cross-val 후보)"
+      ],
+      "concerns": [
+        "★ slug unique 제약 부재 (DB UQ 부재) — slugify 가 random suffix 로 회피 시도 (PoC #02 F-053 titleToSlug isomorphic)",
+        "tagList = simple-array column (TagEntity 와 별개 — Phase 4 의미 검증)",
+        "favoriteCount 가 column — 분산 환경 race 위험"
+      ]
+    },
+    {
+      "id": "Comment",
+      "table_name": "comment (default)",
+      "file": "src/article/comment.entity.ts",
+      "primary_key": "id (auto-generated)",
+      "columns": ["id", "body"],
+      "decorators_class_validator": [],
+      "relations": ["ManyToOne ArticleEntity (article)"],
+      "concerns": ["@Entity() default 명명 — 다른 entity 는 @Entity('user') 명시. 일관성 ❌"]
+    },
+    {
+      "id": "Tag",
+      "table_name": "tag",
+      "file": "src/tag/tag.entity.ts",
+      "primary_key": "id (auto-generated)",
+      "columns": ["id", "tag"],
+      "concerns": [
+        "★ insert 코드 부재 — TagService.findAll 만 존재. dead code 가능성",
+        "ArticleEntity.tagList (simple-array) 와 별개 → 두 source of truth"
+      ]
+    },
+    {
+      "id": "Follows",
+      "table_name": "follows",
+      "file": "src/profile/follows.entity.ts",
+      "primary_key": "id (auto-generated)",
+      "columns": ["id", "followerId", "followingId"],
+      "concerns": [
+        "★ FK 제약 부재 (followerId/followingId 가 단순 number column) — PoC #02 의 user_follow JPA @ManyToOne 와 큰 차이 (referential integrity 부재)",
+        "self-follow guard 가 service 단 (ProfileService.follow) — DB 차단 없음"
+      ]
+    }
+  ],
+  "request_processing_chain": {
+    "auth": "AuthMiddleware (legacy NestJS 패턴 — 현재 NestJS 권장은 Guards). 3 module (User/Article/Profile) 에 적용. JWT 검증 + req.user 주입.",
+    "validation": "ValidationPipe (자체 구현 src/shared/pipes/validation.pipe.ts). UserController 만 @UsePipes(new ValidationPipe()) 적용 — Article/Profile/Tag 미적용 ★",
+    "guards": "사용 부재",
+    "interceptors": "사용 부재",
+    "pipes": "ValidationPipe 자체 구현만 — NestJS 내장 ValidationPipe 미사용",
+    "concerns": [
+      "★ NestJS 권장 패턴 (Guards / 내장 Pipes) 미사용 — legacy NestJS 7 시점이지만 권장 분기 가능",
+      "★ Validation 적용 controller 일관성 결여 (User 만)"
+    ]
+  },
+  "modules_for_priority_analysis": [
+    "MOD-USER (auth + JWT — 보안 핵심)",
+    "MOD-ARTICLE (도메인 로직 가장 복잡)",
+    "MOD-PROFILE (follow/unfollow + FollowsEntity FK 부재)"
+  ],
+  "preliminary_findings_signals": [
+    "★ JWT verify 무방어 (auth.middleware:18 / user.decorator:14 / shared/base.controller:9 — 3 곳 DRY 위반)",
+    "★ JWT 60일 expiry (user.service:103) — 너무 김",
+    "★ JWT SECRET 출처 = config.ts (사용자 작성 의무, .gitignore 검증 필요)",
+    "★ TOCTOU race + DB UQ 부재 (UserEntity username/email — PoC #02 isomorphic + 더 나쁜)",
+    "★ JWT verify 3 곳 DRY 위반 — auth/decorator/base.controller",
+    "★ ValidationPipe 적용 controller 일관성 결여 (User 만)",
+    "★ TagEntity 미사용 (insert 코드 부재) — dead code",
+    "★ FollowsEntity FK 제약 부재 — referential integrity 위반",
+    "★ Article.comments eager:true — N+1 (PoC #02 F-051 cross-val)",
+    "★ slugify random suffix — slug unique 회피 (PoC #02 F-053 isomorphic)",
+    "★ Update Article 시 slug 미업데이트 (TODO 주석)",
+    "★ swagger 데코레이터 coverage 일관성 결여 (Article 만 풀세트)",
+    "★ AppController.root() = 'Hello World!' 잔재",
+    "★ prisma/.env 잔재 (master = TypeORM 단독)",
+    "★ test suite 부재 (1 spec 만)",
+    "★ shared/base.controller.ts dead code 가능성 (사용처 부재)",
+    "★ ApplicationModule class 명 vs app.module.ts 파일 불일치 minor",
+    "★ Comment entity @Entity() default — 다른 entity 명시적과 비일관"
+  ],
+  "phase_2_handoff": {
+    "tables": ["user", "article", "comment", "tag", "follows"],
+    "ddl_source": "런타임 자동 생성 (synchronize:true) — schema.sql 파일 부재. ★ G6 v1.2.2 ORM 4 enum sub-section (b) TypeORM 정합 적용",
+    "naming_strategy": "TypeORM default (camelCase 보존)",
+    "primary_concerns": [
+      "DB UQ 부재 (user.username/email + article.slug)",
+      "FK 제약 부재 (follows.followerId / followingId)",
+      "tagList simple-array vs TagEntity 별도 — 두 SoT"
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+# Phase 2 매니페스트 — PoC #03 NestJS db
+# ★ G6 v1.2.2 ORM sub-section (b) TypeORM 첫 외부 사용 — 적합성 finding 평가
+
+manifest:
+  generated_at: "2026-04-30"
+  poc_id: "poc-03-realworld-nestjs"
+  phase: "2"
+  phase_name: "db (스키마 + 정합성 검증)"
+  methodology_version: "v1.2.2"
+  actor: "AI (Claude Opus 4.7) — 메인 직접"
+
+upstream_handoff:
+  - source: "../inventory/_manifest.yml"
+    consistency: "✅ Phase 1 인계 정합 (5 entity / TypeORM 0.2 default naming / synchronize:true / 운영 DB 부재)"
+
+deliverables:
+  - file: "schema.json"
+    purpose: "AI 눈 — 5 entity → schema 추출 (★ G6 sub-section (b) algorithm)"
+    schema: "schemas/db-schema.schema.json"
+    confidence: 0.80
+  - file: "schema.sql"
+    purpose: "DDL — TypeORM default naming 알고리즘 추정"
+    confidence: 0.75
+    caveat: "synchronize:true 자동 생성 결과의 실제 산출 검증 불가 (Sprint 5 carry-over)"
+  - file: "erd.mermaid"
+    purpose: "사람 눈 — ERD + ★ FK 부재 / 두 SoT / dead code 시각화"
+    confidence: 0.92
+  - file: "정합성-검증-보고서.md"
+    purpose: "사람 눈 — ★ G6 v1.2.2 첫 외부 사용 / F-120 critical 확정"
+    confidence: 0.92
+  - file: "_manifest.yml"
+    purpose: "본 매니페스트"
+    confidence: 0.95
+
+raw_confidence:
+  current: 0.80
+  cap: null
+  delta: "-0.05 (PoC #02 0.85 대비) — 운영 DB 부재 패널티"
+
+trust_level:
+  current: 0.80
+  current_step: 1
+  validation_history:
+    - {step: "1차 작성", at: "2026-04-30", actor: "AI", tool_type: "ai_subagent", note: "메인 직접 entity grep + TypeORM 알고리즘 적용"}
+  next_validation: "Sprint 5 carry-over — nest start + SHOW CREATE TABLE 5종 물증 의무"
+
+cross_validation:
+  performed: false
+  note: "Phase 2 = cross-validation 의무 X (Phase 4.5+ 부터). 단 G6 sub-section (b) 알고리즘 적용 = automated_tool 단계 근접"
+  simulation_only: false
+
+inputs:
+  - source: "src/**/*.entity.ts"
+    type: "orm_meta"
+    files: 5
+    confidence_contribution: "+70%p"
+  - source: "ormconfig.json.example"
+    type: "orm_config"
+    confidence_contribution: "+5%p"
+  - source: "(부재)"
+    type: "operational_db"
+    confidence_contribution: "-5%p (penalty)"
+
+known_limitations:
+  - "★ schema.sql = algorithm-extracted (메커니즘 #4 형식 한계). 실 prod DDL 검증 carry-over."
+  - "★ junction table 명명 (user_entity_favorites_article_entity) 추정 — 실 검증 의무"
+  - "★ TypeORM 0.2 default FK 명명 알고리즘 (현재 0.3+ 변경 가능) — 본 PoC 0.2 시점 기준"
+  - "★ implicit FK column 의 nullable=true default — orphan article 가능 (Phase 6 finding 합산)"
+  - "운영 DB 미접근 — F-120 critical 확정은 entity 데코 grep 수준 (UQ 부재 확실 ✅)"
+
+deterministic_results:
+  raw_fetch:
+    main_agent: "5 entity 데코 + relation grep + ormconfig 검증"
+  table_count: 6
+  table_count_explicit: 5
+  table_count_junction: 1
+  column_count_total: 27
+  fk_explicit_count: 3
+  fk_implicit_count: 2
+  fk_missing_count: 2
+  unique_constraint_count: 0
+  primary_key_count: 6
+  consistency_violations:
+    - {name: "DB UQ 부재 (F-120)", severity: critical, count: 4, columns: ["user.username", "user.email", "article.slug", "tag.tag"]}
+    - {name: "FK 부재 (F-121)", severity: high, count: 2, columns: ["follows.followerId", "follows.followingId"]}
+    - {name: "varchar(255) 잠재 부족 (F-133)", severity: medium, count: 2, columns: ["article.body", "comment.body"]}
+
+key_decisions:
+  - id: "DEC-PHASE2-PoC03-001"
+    title: "schema.sql = ORM derivative (algorithm-extracted) — G6 sub-section (b) 정합"
+    decision: "synchronize:true → entity 데코 + TypeORM default naming 알고리즘 추정. 실 prod DDL 검증 = Sprint 5 carry-over (5종 물증 의무)."
+    auto_mode_applied: true
+  - id: "DEC-PHASE2-PoC03-002"
+    title: "F-120 critical 확정 — DB UQ 0건 + race-prone"
+    decision: "Phase 1 promoted 격상 → Phase 2 확정. PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (1중 vs 2중)"
+    rationale: "★★ cross-val 강한 권위 데이터 (사내 적용 시 즉시 수정)"
+    auto_mode_applied: true
+  - id: "DEC-PHASE2-PoC03-003"
+    title: "F-121 high 확정 — FollowsEntity FK 부재"
+    decision: "@ManyToOne 부재 → referential integrity 부재. PoC #02 user_follow JPA @ManyToOne 본질적 차이"
+    auto_mode_applied: true
+  - id: "DEC-PHASE2-PoC03-004"
+    title: "Phase 2 신규 finding 5건 등록 (F-120 확정 + F-121 확정 + F-133 + F-134 + F-135)"
+    decision: "Phase 1 의 18 signals 중 4건 Phase 2 검증 → 확정 + 신규 3건"
+    auto_mode_applied: true
+  - id: "DEC-PHASE2-PoC03-005"
+    title: "★ G6 v1.2.2 외부 사용 적합성 — 적합 + 보강 후보"
+    decision: "sub-section (b) TypeORM 첫 외부 사용. 적합 ✅. 보강 후보: @Entity() default 비일관 검증 절차 추가 (F-134 패턴 일반화)"
+    auto_mode_applied: true
+
+approval_gate:
+  - check: "schema.json schema 검증 (db-schema.schema.json 정합)"
+    status: "✅ deterministic + algorithm"
+  - check: "이중 렌더링 정합 (.json + .sql + .mermaid + .md 동시 산출)"
+    status: "✅ schema.json + schema.sql + erd.mermaid + 정합성-검증-보고서.md + _manifest.yml"
+  - check: "★ G6 v1.2.2 sub-section (b) TypeORM 외부 사용"
+    status: "✅ 적합 — 보강 후보 1건 (@Entity() default 비일관 검증)"
+  - check: "F-120 critical 확정"
+    status: "✅ entity 데코 unique:true 부재 grep 검증"
+  - check: "Auto Mode 적용 결정 5건"
+    status: "✅ DEC-PHASE2-PoC03-001~005"
+
+downstream_handoff:
+  - "★ AP-DB-001 (가칭) critical Phase 6 등록 후보 — F-120 + F-121 + F-133 묶음"
+  - "★ AP-PERFORMANCE-001 (가칭) medium Phase 6 — F-124 + F-135"
+  - "Phase 3 architecture: 5 모듈 + DI 그래프 (User → Article ManyToMany favorites + ArticleModule imports UserModule → 잠재 circular 검증)"
+  - "Phase 4: 5 entity → 4 Aggregate Root 후보 (User / Article / Comment 가 Article 의 일부 / Tag dead code / Follows = User 일부?)"
+  - "Phase 4.5: BR-USER-USERNAME-UNIQUE / BR-USER-EMAIL-UNIQUE / BR-FOLLOWS-PAIR-UNIQUE / BR-FOLLOWS-NO-SELF / BR-ARTICLE-SLUG-UNIQUE 모두 race-prone — formal-spec.schema decision-table 으로 노출 의무"
+
+findings_phase:
+  - id: "F-120"
+    title: "★★ DB UQ 0건 — user/article/tag race-prone (확정)"
+    severity: "critical"
+    status: "promoted (Phase 1 등록 → Phase 2 확정)"
+    cross_val_signal: "★★ PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (1중 vs 2중)"
+  - id: "F-121"
+    title: "★★ FollowsEntity FK 부재 — referential integrity 부재 (확정)"
+    severity: "high"
+    status: "promoted (Phase 1 등록 → Phase 2 확정)"
+  - id: "F-133"
+    title: "★ article.body / comment.body varchar(255) — text 권장 (신규)"
+    severity: "medium"
+    status: "promoted"
+    proposed_fix: "@Column({type: 'text'})"
+  - id: "F-134"
+    title: "★ Comment @Entity() default — 다른 entity 명시 (비일관 / 신규)"
+    severity: "low"
+    status: "candidate"
+    proposed_fix: "@Entity('comment')"
+  - id: "F-135"
+    title: "★ favoriteCount column counter — 분산 race 위험 (신규)"
+    severity: "medium"
+    status: "promoted"
+    proposed_fix: "별 테이블 (article_favorite) 또는 DB atomic increment + 비관적 lock"
+  - id: "F-136"
+    title: "★ G6 v1.2.2 보강 후보 — @Entity() default 비일관 검증 절차 부재"
+    severity: "low"
+    status: "candidate"
+    note: "★ G6 외부 사용 시 발견된 메타 finding (재귀적 자가 검증)"
+    proposed_fix: "templates/db-schema.template.md §2.1 일반 원칙 5번 추가 — entity table 명 명시 일관성 검증 의무"
+
+cumulative_statistics:
+  poc_phase1_phase2_total: 21    # Phase 1 15 + Phase 2 6 (F-120 / F-121 확정 카운트 X)
+  poc_phase2_new: 6              # F-120 확정 + F-121 확정 + F-133 + F-134 + F-135 + F-136
+  poc_phase2_promoted: 4         # F-120 / F-121 / F-133 / F-135
+  poc_phase2_candidate: 2        # F-134 / F-136
+  cumulative_total: 138          # PoC #01 33 + #02 43 + Sprint 4.5/4 41 + PoC #03 P1 15 + P2 6
+  threshold_status: |
+    F-021 임계 138건. Phase 2 신규 6건 = 5~15 건강 범위.
+    cross-val 강함 — F-120 ★★ + F-121 PoC #02 isomorphic.
+    G6 v1.2.2 외부 사용 적합성 입증 (보강 후보 1건 — F-136).
+
+phase_kpi:
+  - "✅ Phase 2 신규 finding 6건 (5~15 건강 범위)"
+  - "★★ F-120 critical 확정 — PoC #02 AP-DOMAIN-002 cross-val (isomorphic + 더 나쁜)"
+  - "★★ F-121 high 확정 — TypeORM relation 부재 (PoC #02 JPA @ManyToOne 차이)"
+  - "★ G6 v1.2.2 sub-section (b) TypeORM 외부 사용 적합 — F-136 보강 후보 1건"
+  - "★ TypeScript 타입 시스템 정적 차단 — F-048 (PoC #02 TagJpaRepository 타입 오류) 비재현 = 학습 효과"
+  - "★★★ no-simulation 정합 — 운영 DB 부재 정직 표기 + algorithm-extracted 명시"
+
+next_actions:
+  - "Phase 3 (arch) 진입 — 5 모듈 + DI 그래프 + circular (UserModule ↔ ArticleModule favorites)"
+  - "Phase 3 cap 0.85 검증 (Phase 1 추정)"
+  - "Phase 6 합산 시 AP-DB-001 critical (F-120 + F-121 + F-133) 단일 등록 후보"
+  - "Sprint 5 carry-over: 사용자 환경 MySQL setup + 5종 물증 검증"

@@ -1,0 +1,101 @@
+{
+  "$comment": "Phase 1 deterministic stats. wc -l + find. AI 추론 0%. ★★★ no-simulation 정합.",
+  "meta": {
+    "generated_at": "2026-04-30",
+    "extraction_method": "deterministic (find + wc -l)",
+    "confidence": 0.98,
+    "tool_type": "automated_tool"
+  },
+  "totals": {
+    "ts_files": 35,
+    "ts_loc": 1174,
+    "test_files": 1,
+    "test_loc": 39
+  },
+  "per_domain": [
+    { "domain": "user",    "files": 11, "loc": 331, "share": "28.2%", "rank": 2 },
+    { "domain": "article", "files": 9,  "loc": 442, "share": "37.6%", "rank": 1 },
+    { "domain": "profile", "files": 5,  "loc": 184, "share": "15.7%", "rank": 3 },
+    { "domain": "tag",     "files": 5,  "loc": 108, "share": "9.2%",  "rank": 4, "note": "1 spec file 39 loc 포함" },
+    { "domain": "shared",  "files": 2,  "loc": 55,  "share": "4.7%",  "rank": 5 }
+  ],
+  "largest_files": [
+    { "path": "src/article/article.service.ts",      "loc": 204, "rank": 1 },
+    { "path": "src/user/user.service.ts",            "loc": 128, "rank": 2 },
+    { "path": "src/article/article.controller.ts",   "loc": 105, "rank": 3 },
+    { "path": "src/profile/profile.service.ts",      "loc": 104, "rank": 4 },
+    { "path": "src/user/user.controller.ts",         "loc": 55,  "rank": 5 }
+  ],
+  "package_dependencies": {
+    "production_count": 21,
+    "dev_count": 8,
+    "key": {
+      "@nestjs/common": "^7.0.5",
+      "@nestjs/core": "^7.0.5",
+      "@nestjs/swagger": "^4.4.0",
+      "@nestjs/typeorm": "^7.0.0",
+      "typeorm": "^0.2.24",
+      "class-validator": "^0.11.1",
+      "class-transformer": "^0.2.3",
+      "argon2": "^0.26.2",
+      "jsonwebtoken": "^8.5.1",
+      "passport-jwt": "^4.0.0",
+      "mysql": "^2.18.1",
+      "slug": "^1.1.0",
+      "typescript": "^3.8.3"
+    }
+  },
+  "openapi_decorator_coverage": {
+    "@ApiOperation_count": 11,
+    "@ApiResponse_count": 22,
+    "@ApiBearerAuth_controllers": 4,
+    "@ApiTags_controllers": 4,
+    "controllers_full_coverage": ["ArticleController"],
+    "controllers_partial_coverage": ["UserController", "ProfileController", "TagController"],
+    "concern": "★ Senior 위험 6 정합 — coverage 불균형. Article 만 풀세트. silent 빈약 위험."
+  },
+  "class_validator_decorator_coverage": {
+    "decorators_total": 6,
+    "by_target": {
+      "UserEntity.email": "@IsEmail()",
+      "CreateUserDto.username": "@IsNotEmpty()",
+      "CreateUserDto.email": "@IsNotEmpty()",
+      "CreateUserDto.password": "@IsNotEmpty()",
+      "LoginUserDto.email": "@IsNotEmpty()",
+      "LoginUserDto.password": "@IsNotEmpty()"
+    },
+    "no_decorator": [
+      "UpdateUserDto (4 필드)",
+      "CreateArticleDto (4 필드)",
+      "CreateCommentDto (1 필드)",
+      "ArticleEntity (9 필드)",
+      "Comment (2 필드)",
+      "TagEntity (2 필드)",
+      "FollowsEntity (3 필드)"
+    ],
+    "concern": "★ Senior 위험 3 정합 — class-validator 커버리지 12% (6/50+). Phase 4 BR 추출 시 service.ts manual throw 추가 read 의무."
+  },
+  "auth_middleware_application": {
+    "middleware": "AuthMiddleware (★ legacy NestJS — 현재 권장 Guards)",
+    "applied_routes": [
+      { "module": "UserModule",    "path": "user",                                 "method": "GET" },
+      { "module": "UserModule",    "path": "user",                                 "method": "PUT" },
+      { "module": "ArticleModule", "path": "articles/feed",                        "method": "GET" },
+      { "module": "ArticleModule", "path": "articles",                             "method": "POST" },
+      { "module": "ArticleModule", "path": "articles/:slug",                       "method": "DELETE" },
+      { "module": "ArticleModule", "path": "articles/:slug",                       "method": "PUT" },
+      { "module": "ArticleModule", "path": "articles/:slug/comments",              "method": "POST" },
+      { "module": "ArticleModule", "path": "articles/:slug/comments/:id",          "method": "DELETE" },
+      { "module": "ArticleModule", "path": "articles/:slug/favorite",              "method": "POST" },
+      { "module": "ArticleModule", "path": "articles/:slug/favorite",              "method": "DELETE" },
+      { "module": "ProfileModule", "path": "profiles/:username/follow",            "method": "ALL" }
+    ],
+    "total_protected_routes": 11,
+    "jwt_verify_locations": [
+      { "file": "src/user/auth.middleware.ts:18",      "context": "AuthMiddleware.use" },
+      { "file": "src/user/user.decorator.ts:14",        "context": "@User() decorator" },
+      { "file": "src/shared/base.controller.ts:9",      "context": "BaseController.getUserIdFromToken (★ 사용처 부재 — dead code)" }
+    ],
+    "concern": "★ JWT verify 3곳 DRY 위반 + 모두 try/catch 없이 verify → invalid token → 500 Internal"
+  }
+}

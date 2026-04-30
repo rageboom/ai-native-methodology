@@ -29,18 +29,49 @@
 
 ### 2.1 schema.sql 출처 분별 (ORM derivative vs 수동)
 
-ORM (Hibernate / JPA) 의 `auto-generated DDL` vs 사람 작성 DDL 구분 알고리즘:
+> **v1.2.2 갱신** (Senior 위험 1 ★critical): ORM 별 naming strategy 가 본질적으로 다름. ORM 4 enum + 일반 원칙 분리.
 
-| 표지 | ORM derivative 패턴 | 수동 작성 패턴 |
-|---|---|---|
-| FK 명명 | `fk` + 25자 base35 lowercase (Hibernate `NamingHelper#generateHashedFkName`) | `fk_{table}_{ref}` 의미적 |
-| UQ 명명 | `uk` + 25자 base35 lowercase | `uk_{table}_{column}` 의미적 |
-| 컬럼 순서 | Java field 선언 순서 | 사람이 의도한 순서 (PK → FK → 데이터) |
-| 주석 | 부재 또는 자동 생성 | 사람 의도 주석 |
+#### 일반 원칙 (모든 ORM 공통)
 
-→ ORM derivative 확정 시 schema.sql 은 별도 출처 자격 X. ORM 메타가 ground truth.
+ORM auto-generated DDL 은 다음 표지로 분별:
+1. **명명 규칙 일관성** — 사람 의도는 비일관 (의미적 prefix), 자동 생성은 일관 (알고리즘적)
+2. **컬럼 순서** — 사람 의도는 PK→FK→데이터 / 자동 생성은 클래스 field 선언 순서
+3. **주석** — 사람 의도는 비즈니스 의미 / 자동 생성은 부재 또는 자동
+4. **migration 도구 부재** — DDL 직접 산출 = ORM 자동 생성 강한 시그널
 
-(F-050 분별 절차 정합)
+#### ORM 별 sub-section
+
+##### (a) Hibernate / JPA (Java)
+- FK 명명: `fk` + **25자 base35 lowercase** (`NamingHelper#generateHashedFkName` MD5 hash)
+- UQ 명명: `uk` + 25자 base35 lowercase
+- 알고리즘: `prefix("fk") + base35( MD5("table" + tableName + "references" + refTable + "column" + sortedColumns) )`
+- 출처: `org.hibernate.boot.model.naming.NamingHelper`
+- PoC #02 사례 — F-050 분별 절차 정합
+
+##### (b) TypeORM (Node/TypeScript)
+- 명명: **camelCase 보존 + entity 명 그대로 + relation FK 시 `[propertyName]Id`** (해시 ❌)
+- FK 명명: `FK_{table}_{column}` 또는 `IDX_{...}` (camelCase 변환 없음)
+- 컬럼: `@Column` 데코레이터의 explicit name 우선 / 없으면 property 이름 그대로
+- 출처: `typeorm/src/naming-strategy/DefaultNamingStrategy.ts`
+- 주의: `snake_case` 변환은 **`SnakeNamingStrategy`** 적용 시만 (사용자 명시) → strategy 추출 의무
+
+##### (c) Prisma (Node/TypeScript)
+- **`@map` 명시 의무화** — derivative 자체 회피. `model User { @@map("users") }`
+- 사람 작성 schema.prisma → DDL 자동 생성 = **사람이 명시한 것만** (해시 ❌)
+- 분별 어렵 (의미적 명명 흔함) — `prisma migrate` 산출 SQL 의 timestamp prefix 가 표지
+
+##### (d) SQLAlchemy (Python)
+- `naming_convention` dict 기반 — 사용자 정의 가능 (`Base.metadata = MetaData(naming_convention={...})`)
+- default: `pk_{table_name}` / `fk_{table_name}_{referred_table_name}` (의미적)
+- 추출 의무: `MetaData.naming_convention` 값
+
+##### (e) 기타 (MikroORM / Sequelize / Mongoose / Bun ORM)
+- 본 template 적용 시 사용자가 ORM 별 naming strategy 추출 후 sub-section 신규 추가 권장
+- 일반 원칙 4종 적용 가능
+
+→ **ORM derivative 확정 시 schema.sql / migration SQL 은 별도 출처 자격 X**. ORM 메타가 ground truth.
+
+(F-050 분별 절차 정합 — Hibernate 외 ORM 적용 시 본 v1.2.2 갱신 절차)
 
 ### 2.2 정합 위반 / critical (있을 시)
 

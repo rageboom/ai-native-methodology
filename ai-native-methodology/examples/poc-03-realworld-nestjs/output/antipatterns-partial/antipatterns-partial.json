@@ -1,0 +1,92 @@
+{
+  "$schema_ref": "../../../../../schemas/antipatterns.schema.json",
+  "meta": {
+    "generated_at": "2026-04-30T00:00:00Z",
+    "phase": "4 (5.C antipatterns-partial)",
+    "methodology_version": "v1.2.2",
+    "raw_confidence": 0.80,
+    "note": "★ partial — Phase 6 합산 시 정식 격상. 본 phase = Phase 1~4 finding 23+6+2+6 = 37건 + Phase 4 신규 6건 → 43 총. AP 가칭 후보 식별만."
+  },
+  "ap_candidates": [
+    {
+      "ap_candidate_id": "AP-DB-001-poc03 (가칭)",
+      "severity_proposed": "critical",
+      "category": "DB",
+      "title": "DB UQ + FK 제약 부재 (race-prone) — composite 결함",
+      "related_findings": ["F-120", "F-121", "F-133", "F-135"],
+      "cross_val_signal": "★★ PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (1중 vs 2중)",
+      "phase_6_action": "★★ 단일 critical 등록 + composite view (DB 데이터 무결성)"
+    },
+    {
+      "ap_candidate_id": "AP-AUTH-NEST-001-poc03 (가칭) ★★",
+      "severity_proposed": "critical",
+      "category": "SECURITY",
+      "title": "Auth scope 결여 (AuthMiddleware 적용 누락) + JWT verify 무방어 + 60일 expiry composite",
+      "related_findings": ["F-140", "F-118", "F-119"],
+      "cross_val_signal": "★★ AP-SECURITY 변형 — PoC #01 (JWT 21byte) / PoC #02 (RSA git commit) 과 다른 형태 (auth scope + 검증 무방어)",
+      "phase_6_action": "★★ critical 단일 등록 후보"
+    },
+    {
+      "ap_candidate_id": "AP-VALIDATION-001-poc03 (가칭)",
+      "severity_proposed": "high",
+      "category": "VALIDATION",
+      "title": "class-validator coverage 12% + ValidationPipe 일관성 결여 + service manual throw 분산",
+      "related_findings": ["F-128", "F-127", "F-143", "F-144"],
+      "cross_val_signal": "★ Senior 위험 3 정량 입증 — PoC #02 Bean Validation 풍부 패턴과 본질적 차이",
+      "phase_6_action": "high 단일 등록 후보"
+    },
+    {
+      "ap_candidate_id": "AP-PERFORMANCE-001-poc03 (가칭)",
+      "severity_proposed": "medium",
+      "category": "PERFORMANCE",
+      "title": "EAGER 로딩 + race column counter",
+      "related_findings": ["F-124", "F-135"],
+      "cross_val_signal": "★ PoC #02 AP-PERFORMANCE-001 (F-051) cross-val 재현 (medium → high 격상 후보)",
+      "phase_6_action": "v1.2.x 합산 시 medium → high 격상 후보 (PoC #01+#02+#03 3 PoC 권위)"
+    },
+    {
+      "ap_candidate_id": "AP-DOMAIN-001-poc03 (가칭)",
+      "severity_proposed": "medium",
+      "category": "DOMAIN",
+      "title": "Tag dead code + tagList 두 SoT + Aggregate 모호",
+      "related_findings": ["F-122", "F-123", "F-139"],
+      "cross_val_signal": "PoC #02 미발견 — NestJS / TypeORM simple-array 특이 패턴",
+      "phase_6_action": "medium 등록 — 사내 적용 시 Tag 처리 결정 의무"
+    },
+    {
+      "ap_candidate_id": "AP-DOMAIN-002-poc03 (가칭)",
+      "severity_proposed": "medium",
+      "category": "DOMAIN",
+      "title": "도메인 경계 약함 — cross-module entity InjectRepository",
+      "related_findings": ["F-137", "F-138"],
+      "cross_val_signal": "★ PoC #02 J 묶음 (Hexagonal port-adapter) 반대 패턴 — NestJS 단일 module 본질",
+      "phase_6_action": "medium 등록 + composite view (Hexagonal port-adapter 가이드 보강 후보)"
+    },
+    {
+      "ap_candidate_id": "AP-API-001-poc03 (가칭)",
+      "severity_proposed": "medium",
+      "category": "API",
+      "title": "swagger 데코 coverage 불균형 + Article controller 만 풀세트",
+      "related_findings": ["F-129"],
+      "cross_val_signal": "Senior 위험 6 정합 — silent 빈약 위험 / PoC #02 spec/runtime drift 와 다른 형태",
+      "phase_6_action": "Phase 5-1 swagger 정적 추출 + 런타임 dump 2-way diff 시 finding 추가 가능"
+    },
+    {
+      "ap_candidate_id": "AP-CODE-QUALITY-001-poc03 (가칭)",
+      "severity_proposed": "low",
+      "category": "CODE_QUALITY",
+      "title": "JWT verify 3곳 DRY 위반 + AuthMiddleware legacy + dead code (BaseController, prisma/.env)",
+      "related_findings": ["F-118", "F-130", "F-131"],
+      "phase_6_action": "low 등록"
+    }
+  ],
+  "ap_candidate_count": 8,
+  "promoted_findings_count": 18,
+  "candidate_findings_count": 9,
+  "finding_total_phase1_to_phase4": 27,
+  "concerns": [
+    "★★ PoC #03 critical 2건 (AP-DB-001 / AP-AUTH-NEST-001) — 사내 적용 시 즉시 수정 의무",
+    "★ Phase 6 합산 시 PoC #01+#02+#03 3 PoC 권위로 v1.3 격상 데이터 충분 평가",
+    "★ AP-PERFORMANCE-001 medium → high 격상 후보 (3 PoC 재현 권위)"
+  ]
+}

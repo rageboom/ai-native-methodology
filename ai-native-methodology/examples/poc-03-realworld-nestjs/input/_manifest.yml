@@ -1,0 +1,148 @@
+# Phase 0 입력 매니페스트 — PoC #03 NestJS
+# v1.2.2 신규 template (meta-confidence.template.yml) 첫 외부 사용 ★
+
+manifest:
+  generated_at: "2026-04-30"
+  poc_id: "poc-03-realworld-nestjs"
+  phase: "0"
+  phase_name: "입력 정리 (Input Preparation)"
+  methodology_version: "v1.2.2"
+  actor: "AI (Claude Opus 4.7)"
+
+# 분석 대상
+target:
+  repo: "lujakob/nestjs-realworld-example-app"
+  url: "https://github.com/lujakob/nestjs-realworld-example-app"
+  branch: "master"
+  head_commit: "c1c2cc4e448b279ff083272df1ac50d20c3304fa"
+  head_short: "c1c2cc4"
+  last_code_commit: "2021-01-18 (정체 / legacy 분석 적합)"
+  star_count: 3346
+  fork_count: 704
+  license: null  # 분석/연구 fair use. PoC 결과 공개 시 명기 의무
+  source_path: "examples/poc-03-realworld-nestjs/source/nestjs-realworld-example-app"
+  alternate_branch:
+    name: "prisma"
+    head: "034bd650cd8b9afaca77d09872f4e40b853f142a"
+    note: "ORM 대조 inventory 항목 (이중 분석 ❌ — DEC-PoC03-N1 정합)"
+
+# 입력 종류 (Phase 1~6 신뢰도 기여)
+inputs:
+  - source: "source/nestjs-realworld-example-app"
+    type: "source_code"
+    required: true
+    files: 35  # TS files in src/
+    size: "148K"
+    confidence_contribution: "+70%p (베이스라인)"
+    note: "단일 NestJS module tree / 5 도메인 (article / profile / shared / tag / user)"
+  - source: "source/nestjs-realworld-example-app/package.json"
+    type: "dependency_manifest"
+    required: true
+    confidence_contribution: "+10%p"
+    extracted:
+      nestjs_core: "^7.0.5"
+      nestjs_swagger: "^4.4.0"
+      nestjs_typeorm: "^7.0.0"
+      typeorm: "^0.2.24"
+      class_validator: "^0.11.1"
+      jwt: "(추후 phase 1 검증)"
+  - source: "source/nestjs-realworld-example-app/ormconfig.json.example"
+    type: "orm_config"
+    required: false
+    confidence_contribution: "+5%p"
+    note: "TypeORM 설정 — DB 연결/엔티티 위치"
+  - source: "(없음)"
+    type: "erd"
+    required: false
+    confidence_contribution: 0
+    note: "별도 ERD 미제공 (PoC #02 동일 패턴)"
+  - source: "(없음)"
+    type: "operational_db"
+    required: false
+    confidence_contribution: 0
+    note: "MySQL — 본 환경에서 실제 DB 미접근 (PoC #02 H2 대비 — DEC-PoC03-N4 + 5종 물증 정합)"
+  - source: "@nestjs/swagger 데코레이터 (코드 내장)"
+    type: "openapi_source"
+    required: true
+    confidence_contribution: "+10%p"
+    note: "★ Phase 5-1 ground truth — 정적 추출 + 런타임 dump 2-way diff (DEC-PoC03-N5)"
+
+# 출처 매트릭스 (Phase 2 db 입력 — G6 v1.2.2 ORM 4 enum 정합)
+db_source_matrix:
+  orm_meta:
+    present: true
+    location: "src/**/*.entity.ts (추후 Phase 1 검증)"
+    orm_kind: "TypeORM 0.2"  # G6 sub-section (b)
+    naming_strategy_extraction_required: true
+    note: "TypeORM default = camelCase 보존 + entity 명 그대로. SnakeNamingStrategy 적용 시 사용자 명시 추출 의무"
+  ddl_file:
+    present: false
+    note: "TypeORM `synchronize: true` 시 런타임 자동 생성. migration 도구 부재 추정"
+  migration_files:
+    present: "(추후 Phase 1 검증)"
+    location_candidate: "src/migrations/ 또는 별도 디렉토리"
+  erd: { present: false }
+  operational_db: { present: false }
+
+# 본 PoC 핵심 차별 (PoC #01/#02 대비)
+distinct_from_prior_pocs:
+  - "stack: Node + TypeScript (PoC #01/#02 = Java + JVM)"
+  - "framework: NestJS (PoC #01 = Spring Boot 2.5 / PoC #02 = Spring Boot 3.3 multi-module Hexagonal)"
+  - "ORM: TypeORM (PoC #01/#02 = JPA/Hibernate)"
+  - "module: 단일 NestJS module tree (PoC #02 = multi-module hybrid)"
+  - "OpenAPI 출처: @nestjs/swagger 데코레이터 (PoC #02 = 사용자 작성 yaml)"
+  - "validation: class-validator (PoC #01/#02 = Bean Validation — isomorphic 95% 재사용)"
+  - "정체 레포 = legacy 분석 적합 (PoC #02 = 정체 / 동일)"
+
+# 입력 검증 (phase 0 종료 조건)
+input_validation_checklist:
+  - check: "분석 대상 git clone 완료"
+    status: "✅ source/nestjs-realworld-example-app/"
+  - check: "HEAD commit pin"
+    status: "✅ c1c2cc4 (master HEAD = research 추정 일치)"
+  - check: "license 확인 + caveat 명기"
+    status: "✅ null — 분석/연구 fair use / 결과 공개 시 명기 의무"
+  - check: "alternate ORM branch (prisma) inventory 항목 등록"
+    status: "✅ 034bd650 / 이중 분석 ❌"
+  - check: "package.json 기본 메타 추출"
+    status: "✅ NestJS 7 + TypeORM 0.2 + @nestjs/swagger 4.4 + class-validator 0.11"
+  - check: "디렉토리 구조 1차 (src/ 5 도메인 + prisma/.env 잔재 확인)"
+    status: "✅ src 35 files 148K / prisma/ = .env 만 (master 는 TypeORM 단독)"
+
+# Phase 1 진입 시 인계
+phase_1_handoff:
+  - "src/ 5 도메인 (article / profile / shared / tag / user) — Bounded Context 후보"
+  - "단일 NestJS module tree — Phase 3 architecture 분류 시 NestJS Module ≠ port-adapter (Senior 위험 5)"
+  - "TypeORM 0.2 — entity 위치 검증 + naming strategy 추출"
+  - "@nestjs/swagger 4.4 — Phase 5-1 ground truth 출처 (DEC-PoC03-N5)"
+  - "class-validator 0.11 — Phase 4 BR 추출 source (DTO 단독 — Senior 위험 3)"
+
+# 알려진 한계 (ADR-009 §1.1 6 메커니즘 정합)
+known_limitations:
+  - "정체 레포 (2021-01) — 최신 NestJS 패턴 (10.x) 미반영. 메커니즘 #5 drift 자체"
+  - "license 부재 — fair use 가정"
+  - "운영 DB 접근 부재 — schema.sql ground truth 추출 한계 (메커니즘 #3 SoT 함정 회피 필요)"
+  - "본 환경 Node/Semgrep/eslint 가용성 추후 Phase 5-1+ 진입 시 확인 (시뮬 절대 금지)"
+
+# 신뢰도 메타 (ADR-009 정합)
+raw_confidence:
+  current: 0.95           # phase 0 = 입력 정리만 / 결정적 작업
+  cap: null               # phase 0 cap 없음
+trust_level:
+  current: 0.95
+  current_step: 1          # 1차 작성
+  validation_history:
+    - {step: "1차 작성", at: "2026-04-30", actor: "AI", tool_type: "ai_subagent"}
+  next_validation: "Phase 1 inventory 진입 시 stack-detection.md 검증"
+
+# Cross-validation (phase 0 = 결정적 / 시뮬 거부 정합)
+cross_validation:
+  performed: false
+  note: "Phase 0 = 입력 매니페스트 작성 단계 — cross-validation 의무 X (Phase 1+ 부터)"
+  simulation_only: false
+
+# 다음 단계
+next_actions:
+  - "Phase 1 (init) 진입"
+  - "inventory.json + tree.md + stack-detection.md + stats.json 산출"
+  - "본 환경 Phase 1 sub-plan 작성 (`.claude/plans/plan-phase1-poc03.md`)"

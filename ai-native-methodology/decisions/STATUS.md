@@ -27,7 +27,8 @@
 | C-Sprint 4 | drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 + PoC #02 자가 검증 (★ 7+3 finding 자동 검출) | ✅ |
 | **묶음 M-P2-3** | 본체 갭 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yml | ✅ **본 세션** |
 | **C-Sprint 5** | (carry-over — 환경 의존) static tool 실 실행 1회 + drift-validator transitionFuzzyMatch 보완 + corpus 4쌍→20쌍 + ADR-010 격상 | ⏳ 환경 준비 후 |
-| **시퀀스 B** | PoC #03 (다른 stack — round-trip 검증 ❌, 분석 정확도/일반화만) | ⏳ **다음** |
+| **시퀀스 B — PoC #03 NestJS** | Phase 0~4 종결 (Phase 4.5+ carry) | 🔄 **진행 중** |
+| 시퀀스 B Phase 4.5+ | Phase 4.5 형식 명세 (★ drift-validator + decision-table-validator 첫 외부 검증) → 5-1 → 6 | ⏳ **다음** |
 
 ---
 

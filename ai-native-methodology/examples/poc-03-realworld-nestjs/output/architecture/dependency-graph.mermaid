@@ -1,0 +1,26 @@
+%% PoC #03 NestJS — Module 의존성 그래프 (DI 의존)
+%% Phase 3 / 2026-04-30
+%% circular = 0건 / cross-module entity 사용 = 3건 (★ 도메인 경계 약함)
+
+graph LR
+    APP[ApplicationModule<br/>root]
+
+    APP -.imports.-> USER[UserModule<br/>exports: UserService]
+    APP -.imports.-> ARTICLE[ArticleModule]
+    APP -.imports.-> PROFILE[ProfileModule]
+    APP -.imports.-> TAG[TagModule]
+
+    %% Sub-module dependencies on UserModule
+    ARTICLE -.imports UserModule.-> USER
+    PROFILE -.imports UserModule.-> USER
+    TAG -.imports UserModule formal only.-> USER
+
+    %% Cross-module entity DI (TypeOrmModule.forFeature) — ★ 도메인 경계 약함
+    ARTICLE -.forFeature.-> UserEntity[UserEntity / user 도메인]:::cross
+    ARTICLE -.forFeature.-> FollowsEntity[FollowsEntity / profile 도메인]:::cross
+    PROFILE -.forFeature.-> UserEntity
+
+    %% File-level cross-module imports
+    USER -.file-level uses ValidationPipe.-> SHARED[shared/<br/>★ Module 미등록]
+
+    classDef cross fill:#fff3cd,stroke:#856404,stroke-width:2px
