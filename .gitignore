@@ -3,6 +3,9 @@ node_modules/
 *.log
 npm-debug.log*
 
+# Cloned source (PoC analysis only — re-clone via git)
+ai-native-methodology/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp/
+
 # Tool output
 tools/static-runner/out/
 *.sarif
