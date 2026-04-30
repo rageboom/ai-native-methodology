@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-USER-SIGNUP",
+  "rendered_mermaid_path": "./UC-USER-SIGNUP.mermaid",
+  "source_of_truth": "code+natural_language",
+  "direction": "B+A",
+  "evidence_files": [
+    {"path": "core/domain/src/main/java/io/zhc1/realworld/model/UserService.java", "lines": "signup method"},
+    {"path": "core/domain/src/main/java/io/zhc1/realworld/model/User.java", "lines": "constructor"},
+    {"path": "server/persistence/src/main/java/io/zhc1/realworld/persistence/UserRepositoryAdapter.java", "lines": "save"}
+  ],
+  "related_brs": [
+    "BR-USER-EMAIL-UNIQUE-001",
+    "BR-USER-USERNAME-UNIQUE-001",
+    "BR-USER-PASSWORD-ENCRYPTED-001"
+  ],
+  "actors": [
+    {"id": "Client", "type": "user"},
+    {"id": "Controller", "type": "controller", "name": "UserController"},
+    {"id": "Service", "type": "service", "name": "UserService"},
+    {"id": "Domain", "type": "domain", "name": "User"},
+    {"id": "Encoder", "type": "external", "name": "BCryptPasswordEncoder"},
+    {"id": "Adapter", "type": "repository", "name": "UserRepositoryAdapter"},
+    {"id": "JPA", "type": "repository", "name": "UserJpaRepository"},
+    {"id": "DB", "type": "external", "name": "PostgreSQL/H2 users 테이블"}
+  ],
+  "messages": [
+    {"from": "Client", "to": "Controller", "label": "POST /api/users {email, username, password}", "sync": "sync"},
+    {"from": "Controller", "to": "Service", "label": "signup(UserRegistry)", "sync": "sync"},
+
+    {"from": "Service", "to": "Adapter", "label": "existsBy(email, username)", "sync": "sync", "guard": "★ F-058 App pre-check (1중 race-prone)"},
+    {"from": "Adapter", "to": "JPA", "label": "existsByEmailOrUsername(email, username)", "sync": "sync"},
+    {"from": "JPA", "to": "DB", "label": "SELECT 1 FROM users WHERE email=? OR username=?", "sync": "sync"},
+    {"from": "DB", "to": "JPA", "label": "result", "sync": "return"},
+    {"from": "JPA", "to": "Adapter", "label": "boolean", "sync": "return"},
+    {"from": "Adapter", "to": "Service", "label": "boolean", "sync": "return"},
+    {"from": "Service", "to": "Controller", "label": "throw IAE 'email or username is already exists'", "sync": "return", "guard": "이미 존재"},
+    {"from": "Controller", "to": "Client", "label": "400 Bad Request", "sync": "return", "guard": "이미 존재 분기"},
+
+    {"from": "Service", "to": "Domain", "label": "new User(email, username, password)", "sync": "sync", "guard": "도메인 검증 (Refinement Type)"},
+    {"from": "Domain", "to": "Service", "label": "throw IAE 'X must not be null or blank'", "sync": "return", "guard": "null/blank 시"},
+    {"from": "Domain", "to": "Service", "label": "User instance (unvalidated password)", "sync": "return", "guard": "검증 통과"},
+
+    {"from": "Service", "to": "Domain", "label": "requester.encryptPassword(passwordEncoder, plainPassword)", "sync": "sync", "guard": "BR-USER-PASSWORD-ENCRYPTED-001"},
+    {"from": "Domain", "to": "Encoder", "label": "encode(plainPassword)", "sync": "sync"},
+    {"from": "Encoder", "to": "Domain", "label": "$2a$... (BCrypt hash)", "sync": "return"},
+
+    {"from": "Service", "to": "Adapter", "label": "save(user)", "sync": "sync", "guard": "★ DB UQ 제약 (2중 race-safe)"},
+    {"from": "Adapter", "to": "JPA", "label": "save(user)", "sync": "sync"},
+    {"from": "JPA", "to": "DB", "label": "INSERT INTO users (...)", "sync": "sync"},
+
+    {"from": "DB", "to": "JPA", "label": "ConstraintViolationException", "sync": "return", "guard": "UQ violation (race window)"},
+    {"from": "JPA", "to": "Adapter", "label": "DataIntegrityViolationException", "sync": "return"},
+    {"from": "Adapter", "to": "Service", "label": "예외 (현재 코드 미처리)", "sync": "return"},
+    {"from": "Service", "to": "Controller", "label": "500 Internal Error ★ F-058 race window 결함", "sync": "return"},
+
+    {"from": "DB", "to": "JPA", "label": "1 row inserted", "sync": "return", "guard": "INSERT 성공"},
+    {"from": "JPA", "to": "Adapter", "label": "User (persisted)", "sync": "return"},
+    {"from": "Adapter", "to": "Service", "label": "User", "sync": "return"},
+    {"from": "Service", "to": "Controller", "label": "User", "sync": "return"},
+    {"from": "Controller", "to": "Client", "label": "201 Created {user: {...}}", "sync": "return"}
+  ],
+  "race_safety_analysis": {
+    "app_existsby_alone": "1중 race-prone (F-058)",
+    "db_uq_alone": "1중 race-safe (필수)",
+    "current_state": "2중 (App pre + DB UQ) — 단 App 측 race window 무처리"
+  },
+  "findings": [
+    {"id": "F-058", "summary": "App pre-check TOCTOU race-prone — race window 시 500 error"}
+  ]
+}

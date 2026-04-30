@@ -77,6 +77,10 @@
             "type": "string",
             "description": "권장 대안 (재구현 시 어떻게 바꿀지)"
           },
+          "migration_advice": {
+            "type": "string",
+            "description": "신규 시스템 구축 시 회피 가이드. v1.2.0 신설 (묶음 P / DEC-2026-04-29-안티패턴-마이그레이션-가이드 α). recommended_alternative 와 별도 — 'how to avoid in greenfield' 관점."
+          },
           "related_rules_to_extract": {
             "type": "array",
             "items": {"type": "string"},

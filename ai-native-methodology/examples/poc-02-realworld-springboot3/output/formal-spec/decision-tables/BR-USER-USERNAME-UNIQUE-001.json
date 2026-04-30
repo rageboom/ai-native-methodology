@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-USER-USERNAME-UNIQUE-001",
+  "trigger": "POST /api/users (signup) 또는 PUT /api/user (updateUserDetails) 시 username 입력 검증",
+  "condition": "username 필드 입력 — null/blank/길이 30 초과/중복 가능",
+  "action": "username 검증 + 중복 차단 (EMAIL isomorphic — existsByEmailOrUsername 공유)",
+  "expected_result": "고유한 username 만 저장 — null/blank 또는 중복 시 거부",
+  "rejection_method": "throw IllegalArgumentException (Domain — User constructor:54) 또는 DataIntegrityViolationException (DB UQ)",
+  "verification_location": "Domain (User constructor:54) + Service/Adapter (existsByEmailOrUsername:51 — EMAIL 과 메서드 공유) + DB (schema.sql UNIQUE)",
+  "http_status": 400,
+  "error_message": "username must not be null or blank / email or username already exists",
+  "current_state": "partial",
+  "rendered_md_path": "./BR-USER-USERNAME-UNIQUE-001.md",
+  "natural_language_gap": {
+    "explicit": [
+      "username 중복 차단"
+    ],
+    "missing_drift_1": [
+      "race_safety 항목 누락 (EMAIL 과 isomorphic 정책인데 명시 비대칭) — F-091 low"
+    ]
+  },
+  "related_findings": [
+    "F-091",
+    "F-058",
+    "F-071",
+    "F-055"
+  ],
+  "isomorphic_with": "BR-USER-EMAIL-UNIQUE-001",
+  "isomorphic_diff": [
+    "메시지 결합 'email or username already exists' (i18n/UX 분기 불가 — Sprint 1.5 #6)",
+    "한국어 환경 caveat F-055 (varchar 30 부족)"
+  ]
+}

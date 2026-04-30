@@ -1,0 +1,56 @@
+%% Phase 4.5 — <AggregateRoot> State Machine 템플릿
+%% Source of Truth: domain.json (lifecycle_states) + rules.json (BR-*)
+%% 작성 가이드: methodology-spec/deliverables/04-5-형식명세.md §2.2
+
+stateDiagram-v2
+    [*] --> <InitialState>: <초기 진입 트리거>
+
+    <InitialState> --> <ValidatingState>: <event_name>(<args>) 요청
+
+    state <ValidatingState> {
+        [*] --> CheckingCondition1
+        CheckingCondition1 --> CheckingCondition2: <조건1 통과>
+        CheckingCondition1 --> Rejected_Reason1: <조건1 위반> ★ BR-<RuleId>-001<br/>(거부 방식 / 검증 위치 명시 의무)
+        CheckingCondition2 --> Persisting: <조건2 통과>
+        CheckingCondition2 --> NoOp_Idempotent: <중복 요청> ★ BR-<RuleId>-002<br/>(silent return)
+    }
+
+    state Persisting {
+        [*] --> SavingToDB
+        SavingToDB --> <SuccessState>: INSERT/UPDATE 정합
+        SavingToDB --> Rejected_DBConstraint: UQ/CHECK 위반
+    }
+
+    <ValidatingState> --> Persisting: <조건 모두 통과>
+    <ValidatingState> --> <InitialState>: NoOp 또는 Rejected → 결과 반환
+
+    <SuccessState> --> <ValidatingState>: <역방향 이벤트>(<args>)
+    <SuccessState> --> [*]
+
+    note left of Rejected_Reason1
+        ★ BR-<RuleId>-001 형식화 결단
+        ──────────────────────────────────
+        rules.json 자연어 (예시):
+          given: <조건>
+          when:  <트리거>
+          then:  거부
+        ──────────────────────────────────
+        ⚠️ 자연어 미명시 (형식화 시 결단):
+        1. 거부 방식? (Exception / return / no-op)
+        2. 검증 위치? (Domain / Service / Adapter)
+        3. HTTP status?
+        4. 에러 메시지?
+        ──────────────────────────────────
+        본 형식화 결단:
+        1. <Exception type>
+        2. <위치>
+        3. <status code>
+        4. "<message>"
+    end note
+
+    note right of NoOp_Idempotent
+        ★ BR-<RuleId>-002 (idempotency)
+        RFC 7231 §4.2.2 정합
+        - 이미 동일 상태에서 같은 요청
+        - silent return (변경 없음)
+    end note

@@ -1,0 +1,76 @@
+%% PoC #02 — User Following 관계 FSM (Phase 4.5 Sprint 2)
+%% 일자: 2026-04-29
+%% Source of Truth: 자연어 명세 (rules.json BR-USER-FOLLOW-*) — Direction A 단방향
+%% ★ F-074 단방향 round-trip 검증 케이스 — 코드 부재로 시작
+%% 관련 BR: BR-USER-FOLLOW-NO-SELF-001 / BR-USER-FOLLOW-DIRECTIONAL-001 / BR-USER-FOLLOW-IDEMPOTENT-001
+
+stateDiagram-v2
+    [*] --> NotFollowing: 초기 상태 (A→B 관계 없음)
+
+    NotFollowing --> Validating: follow(A, B) 요청
+
+    state Validating {
+        [*] --> CheckingSelfFollow
+        CheckingSelfFollow --> CheckingExistence: A.id ≠ B.id
+        CheckingSelfFollow --> Rejected_SelfFollow: A.id == B.id ★ BR-USER-FOLLOW-NO-SELF-001<br/>(F-074 — 자연어 명시 / 코드 부재)
+        CheckingExistence --> Persisting: !isFollowing(A, B)
+        CheckingExistence --> NoOp_Idempotent: isFollowing(A, B) ★ BR-USER-FOLLOW-IDEMPOTENT-001<br/>(silent return)
+    }
+
+    state Persisting {
+        [*] --> SavingToDB
+        SavingToDB --> Following: INSERT (follower_id=A, following_id=B)<br/>UQ(follower_id, following_id) ✅
+        SavingToDB --> Rejected_DBConstraint: UQ 위반 (race window)<br/>★ self-follow 시 DB 차단 ❌ (UQ scope 부족)
+    }
+
+    Validating --> Persisting: A ≠ B 이고 미-follow
+    Validating --> NotFollowing: NoOp_Idempotent 또는 Rejected_SelfFollow → Client 결과
+
+    Following --> Validating: unfollow(A, B) 요청
+
+    Following --> Validating: follow(A, B) 재요청
+    note right of Validating
+        BR-USER-FOLLOW-IDEMPOTENT-001
+        이미 Following 상태에서 follow 재호출
+        → silent return (RFC 7231 §4.2.2 idempotent ✅)
+    end note
+
+    state Unfollow {
+        [*] --> CheckingFollowing
+        CheckingFollowing --> Removing: isFollowing(A, B) = true
+        CheckingFollowing --> NoOp_NotFollowing: isFollowing(A, B) = false<br/>(silent return)
+        Removing --> NotFollowing: DELETE WHERE follower=A, following=B
+    }
+
+    NotFollowing --> [*]
+
+    note left of Rejected_SelfFollow
+        ★ F-074 자연어 명세
+        rules.json BR-USER-FOLLOW-NO-SELF-001:
+          given: follower == following
+          when:  follow 호출
+          then:  거부
+        ──────────────────────────────────────
+        ⚠️ 자연어 미명시 영역 (형식화 시 결단 필요):
+        1. 거부 방식? (Exception vs return vs no-op)
+        2. 검증 위치? (Service / Domain / DB)
+        3. HTTP status? (400 vs 422)
+        4. 에러 메시지?
+        ──────────────────────────────────────
+        본 형식화 결단 (Sprint 2):
+        1. IllegalArgumentException (PoC #02 정합)
+        2. UserFollow 생성자 (Domain — 가장 강력)
+        3. 400 Bad Request
+        4. "follower and following must be different"
+    end note
+
+    note right of Rejected_DBConstraint
+        ⚠️ 자연어가 안 말한 위험
+        UQ(follower_id, following_id) 가
+        self-follow 차단 ❌
+        (A→A 도 unique key 1건이면 통과)
+        ──────────────────────────────
+        권고:
+        - Domain 검증 (UserFollow 생성자)
+        - 또는 DB CHECK (follower_id ≠ following_id)
+    end note

@@ -18,6 +18,8 @@
 | `openapi-extension.schema.json` | Phase 5.1 API 확장 | OpenAPI x-* 필드 |
 | `ui-spec.schema.json` | Phase 5.2 UI 명세 | `ui-spec.json` |
 | `antipatterns.schema.json` | Phase 6 안티패턴 | `antipatterns.json` |
+| `finding-system.schema.json` | Finding 등록·처리 (모든 phase) | `findings/poc-findings.{json,md}` |
+| `formal-spec.schema.json` | Phase 4.5 형식 명세 (state/sequence/decision-table/invariants/property) | `formal-spec/*.{json,mermaid,md,ts}` |
 
 ---
 

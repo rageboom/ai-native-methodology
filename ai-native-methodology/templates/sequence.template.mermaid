@@ -1,0 +1,66 @@
+%% Phase 4.5 — UC-<UseCase> Sequence Diagram 템플릿
+%% Source of Truth: domain.json (use_cases) + 코드 (Service/Controller/Repository)
+%% 작성 가이드: methodology-spec/deliverables/04-5-형식명세.md §2.3
+
+sequenceDiagram
+    autonumber
+    actor Client
+    participant Controller as <Controller name>
+    participant Service as <Service name>
+    participant Domain as <AggregateRoot> (생성자/메서드)
+    participant Repository as <Repository name><br/>(Adapter)
+    participant DB
+    %% 외부 API 가 있으면 추가:
+    %% participant External as <External Service>
+
+    rect rgb(200, 230, 255)
+        Note over Client,DB: ★ UC-<UseCase> (<HTTP method> <path>)
+        Client->>Controller: <HTTP method> <path><br/>(Auth: <user>)
+        Controller->>Service: <method>(<args>)
+
+        alt BR-<RuleId>-IDEMPOTENT (중복 요청)
+            Service->>Repository: existsBy(<args>)
+            Repository->>DB: SELECT EXISTS(...)
+            DB-->>Repository: true
+            Repository-->>Service: true
+            Service-->>Controller: void (NoOp silent)
+            Controller-->>Client: 200 OK
+        else 신규 요청
+            Service->>Repository: existsBy(<args>)
+            DB-->>Repository: false
+            Repository-->>Service: false
+
+            alt BR-<RuleId>-VALIDATION (입력 검증)
+                Service->>Domain: new <AggregateRoot>(<args>)
+                Domain->>Domain: invariant check
+                Domain-->>Service: throw IAE<br/>"<error message>"
+                Service-->>Controller: IAE propagate
+                Controller-->>Client: 400 Bad Request
+            else 정상 (검증 통과)
+                Service->>Domain: new <AggregateRoot>(<args>)
+                Domain-->>Service: 인스턴스
+                Service->>Repository: save(<entity>)
+                Repository->>DB: INSERT/UPDATE
+
+                alt UQ/CHECK 충돌 (race window)
+                    DB-->>Repository: DataIntegrityViolation
+                    Repository-->>Service: 미처리 propagate
+                    Service-->>Controller: 500 Internal Error<br/>★ AP-* 후보
+                    Controller-->>Client: 500
+                else 정상
+                    DB-->>Repository: OK
+                    Repository-->>Service: void
+                    Service-->>Controller: void
+                    Controller-->>Client: 201 Created
+                end
+            end
+        end
+    end
+
+    Note right of Service
+        ★ Phase 4.5 형식화 결단:
+        - 검증 위치: Domain (생성자)
+        - 거부 방식: IllegalArgumentException
+        - HTTP: 400 (검증) / 500 (race) / 201 (정상)
+        - race window 처리: catch + silent or 5xx
+    end Note

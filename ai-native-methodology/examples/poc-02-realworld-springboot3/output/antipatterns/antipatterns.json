@@ -10,39 +10,140 @@
     "phase": "6",
     "phase_name": "안티패턴 통합 (quality)",
     "poc_id": "poc-02-realworld-springboot3",
-    "inputs_used": ["source_code", "orm", "config_files", "domain_context_md", "openapi_ground_truth", "phase_4_partial", "phase_5_candidate", "phase_1_3_additional_candidate"],
+    "inputs_used": [
+      "source_code",
+      "orm",
+      "config_files",
+      "domain_context_md",
+      "openapi_ground_truth",
+      "phase_4_partial",
+      "phase_5_candidate",
+      "phase_1_3_additional_candidate"
+    ],
     "applied_modifiers": [
-      {"name": "orm_full", "value": 0.05, "reason": "Spring Data JPA 3.x"},
-      {"name": "domain_context_md", "value": 0.03, "reason": "README §Considerations 12 항목"},
-      {"name": "openapi_ground_truth", "value": 0.07, "reason": "api-docs/openapi.yaml 802 line 사용자 작성 (PoC #01 +0.05 보다 강한 입력)"},
-      {"name": "multi_module_arch", "value": 0.02, "reason": "core/persistence/api 모듈 분리 — Hexagonal cross-validation 가치"},
-      {"name": "cross_phase_aggregation", "value": 0.03, "reason": "Phase 1~5-1 누적 검증 — Phase 6 부가"},
-      {"name": "poc_01_isomorphic_pattern", "value": 0.02, "reason": "PoC #01 15 AP cross-validation (비재현 53% / 재현 27% / 변형 재현 20%)"},
-      {"name": "schema_compliance_100", "value": 0.01, "reason": "id pattern ^AP-[A-Z]+-\\d+$ 단일 prefix 21/21 정합"}
+      {
+        "name": "orm_full",
+        "value": 0.05,
+        "reason": "Spring Data JPA 3.x"
+      },
+      {
+        "name": "domain_context_md",
+        "value": 0.03,
+        "reason": "README §Considerations 12 항목"
+      },
+      {
+        "name": "openapi_ground_truth",
+        "value": 0.07,
+        "reason": "api-docs/openapi.yaml 802 line 사용자 작성 (PoC #01 +0.05 보다 강한 입력)"
+      },
+      {
+        "name": "multi_module_arch",
+        "value": 0.02,
+        "reason": "core/persistence/api 모듈 분리 — Hexagonal cross-validation 가치"
+      },
+      {
+        "name": "cross_phase_aggregation",
+        "value": 0.03,
+        "reason": "Phase 1~5-1 누적 검증 — Phase 6 부가"
+      },
+      {
+        "name": "poc_01_isomorphic_pattern",
+        "value": 0.02,
+        "reason": "PoC #01 15 AP cross-validation (비재현 53% / 재현 27% / 변형 재현 20%)"
+      },
+      {
+        "name": "schema_compliance_100",
+        "value": 0.01,
+        "reason": "id pattern ^AP-[A-Z]+-\\d+$ 단일 prefix 21/21 정합"
+      }
     ],
     "applied_penalties": [
-      {"name": "no_operational_db", "value": -0.03, "reason": "5.B FE 부재 + 5.D 0건 (BE only)"}
+      {
+        "name": "no_operational_db",
+        "value": -0.03,
+        "reason": "5.B FE 부재 + 5.D 0건 (BE only)"
+      }
     ],
     "raw_confidence": 0.96,
     "cap_applied": false,
     "manual_override": false,
     "expected_confidence_average": 0.95,
     "confidence_breakdown": {
-      "simple_merge_partial_to_final": {"confidence": 0.98, "element_count": 6, "extraction_method": "deterministic", "note": "Phase 4 partial → Phase 6 final 결정적 통합"},
-      "id_normalization": {"confidence": 0.98, "element_count": 6, "extraction_method": "deterministic", "note": "multi-prefix candidate → single prefix"},
-      "phase_1_3_additional_candidate": {"confidence": 0.90, "element_count": 5, "extraction_method": "deterministic", "note": "F-048 critical + F-068 critical + F-051 high + F-053 medium + F-069 medium"},
-      "phase_5_candidate_merge": {"confidence": 0.95, "element_count": 8, "extraction_method": "deterministic", "note": "Phase 5-1 _manifest.yml.phase_6_handoff 정합"},
-      "low_candidate_decision": {"confidence": 0.85, "element_count": 3, "extraction_method": "llm_inference", "note": "F-058/F-076/F-078 등록 결정 (PoC #01 low 4건 분포 정합)"},
-      "composite_view_decision": {"confidence": 0.0, "element_count": 4, "extraction_method": "human_review", "note": "Document 거절 채택 + 4 composite view 가독성 보전 (PoC #01 1건 → 4건 확장)"},
-      "tone_check": {"confidence": 0.95, "element_count": 21, "extraction_method": "deterministic", "note": "비난 표현 0 — 모두 회피 후보 톤"},
-      "poc_01_cross_validation": {"confidence": 0.92, "element_count": 15, "extraction_method": "deterministic", "note": "비재현 8 + 재현 4 + 변형 재현 3"}
+      "simple_merge_partial_to_final": {
+        "confidence": 0.98,
+        "element_count": 6,
+        "extraction_method": "deterministic",
+        "note": "Phase 4 partial → Phase 6 final 결정적 통합"
+      },
+      "id_normalization": {
+        "confidence": 0.98,
+        "element_count": 6,
+        "extraction_method": "deterministic",
+        "note": "multi-prefix candidate → single prefix"
+      },
+      "phase_1_3_additional_candidate": {
+        "confidence": 0.9,
+        "element_count": 5,
+        "extraction_method": "deterministic",
+        "note": "F-048 critical + F-068 critical + F-051 high + F-053 medium + F-069 medium"
+      },
+      "phase_5_candidate_merge": {
+        "confidence": 0.95,
+        "element_count": 8,
+        "extraction_method": "deterministic",
+        "note": "Phase 5-1 _manifest.yml.phase_6_handoff 정합"
+      },
+      "low_candidate_decision": {
+        "confidence": 0.85,
+        "element_count": 3,
+        "extraction_method": "llm_inference",
+        "note": "F-058/F-076/F-078 등록 결정 (PoC #01 low 4건 분포 정합)"
+      },
+      "composite_view_decision": {
+        "confidence": 0.0,
+        "element_count": 4,
+        "extraction_method": "human_review",
+        "note": "Document 거절 채택 + 4 composite view 가독성 보전 (PoC #01 1건 → 4건 확장)"
+      },
+      "tone_check": {
+        "confidence": 0.95,
+        "element_count": 21,
+        "extraction_method": "deterministic",
+        "note": "비난 표현 0 — 모두 회피 후보 톤"
+      },
+      "poc_01_cross_validation": {
+        "confidence": 0.92,
+        "element_count": 15,
+        "extraction_method": "deterministic",
+        "note": "비재현 8 + 재현 4 + 변형 재현 3"
+      }
     },
     "human_review_required": [
-      {"item_id": "AP-API-001", "reason": "spec/runtime drift critical — F-070+F-079+F-085 묶음. 사내 적용 시 즉시 idempotent 정렬 (Profile pattern). RFC 7231 §4.2.2 + RFC 9110 §15.3 위반.", "reviewer_role": "tech_lead"},
-      {"item_id": "AP-DB-001", "reason": "TagJpaRepository<Tag, Integer> 타입 오류 critical — runtime ClassCastException 잠복. Tag entity @Id String 인데 Repository<_, Integer> 선언. 1글자 fix (Integer → String) 필수.", "reviewer_role": "tech_lead"},
-      {"item_id": "AP-SECURITY-001", "reason": "RSA private key git commit critical — PoC #01 AP-SECURITY-001 isomorphic. git filter-repo + key rotation + Vault/KMS 분리 즉시 필요. OWASP A02 + CWE-321/798.", "reviewer_role": "tech_lead"},
-      {"item_id": "AP-ARCH-001", "reason": "UserRepositoryAdapter Hexagonal 경계 위반 high — Vernon IDDD Ch.4 명시 위반. Service 도메인 검증 + Adapter 단순 save 책임 분리 필수.", "reviewer_role": "tech_lead"},
-      {"item_id": "AP-PERFORMANCE-001", "reason": "EAGER + Specification + Pageable HHH000104 high — Hibernate in-memory pagination fallback. Vlad Mihalcea 권위 + 토스 SLASH 회고 정합. LAZY + JOIN FETCH 마이그레이션 필요.", "reviewer_role": "tech_lead"}
+      {
+        "item_id": "AP-API-001",
+        "reason": "spec/runtime drift critical — F-070+F-079+F-085 묶음. 사내 적용 시 즉시 idempotent 정렬 (Profile pattern). RFC 7231 §4.2.2 + RFC 9110 §15.3 위반.",
+        "reviewer_role": "tech_lead"
+      },
+      {
+        "item_id": "AP-DB-001",
+        "reason": "TagJpaRepository<Tag, Integer> 타입 오류 critical — runtime ClassCastException 잠복. Tag entity @Id String 인데 Repository<_, Integer> 선언. 1글자 fix (Integer → String) 필수.",
+        "reviewer_role": "tech_lead"
+      },
+      {
+        "item_id": "AP-SECURITY-001",
+        "reason": "RSA private key git commit critical — PoC #01 AP-SECURITY-001 isomorphic. git filter-repo + key rotation + Vault/KMS 분리 즉시 필요. OWASP A02 + CWE-321/798.",
+        "reviewer_role": "tech_lead"
+      },
+      {
+        "item_id": "AP-ARCH-001",
+        "reason": "UserRepositoryAdapter Hexagonal 경계 위반 high — Vernon IDDD Ch.4 명시 위반. Service 도메인 검증 + Adapter 단순 save 책임 분리 필수.",
+        "reviewer_role": "tech_lead"
+      },
+      {
+        "item_id": "AP-PERFORMANCE-001",
+        "reason": "EAGER + Specification + Pageable HHH000104 high — Hibernate in-memory pagination fallback. Vlad Mihalcea 권위 + 토스 SLASH 회고 정합. LAZY + JOIN FETCH 마이그레이션 필요.",
+        "reviewer_role": "tech_lead"
+      }
     ],
     "warnings": [
       "AP-API-001 critical 격상 (Phase 5-1 high → Phase 6 critical) — F-070+F-079+F-085 묶음 spec/runtime drift 이중 결함.",
@@ -85,12 +186,32 @@
       ],
       "occurrences": 3,
       "recommended_alternative": "// favorite/unfavorite — Profile pattern 적용 (REC-API-IDEMPOTENCY-001)\npublic void favorite(User user, Article article) {\n    if (article.isFavoritedBy(user)) return;  // silent return (idempotent)\n    article.addFavorite(user);\n}\npublic void unfavorite(User user, Article article) {\n    if (!article.isFavoritedBy(user)) return;\n    article.removeFavorite(user);\n}\n\n// login — @ResponseStatus(HttpStatus.OK) 명시 또는 default 200 유지\n@ResponseStatus(HttpStatus.OK)\n@PostMapping(LOGIN_URL)\npublic UsersResponse login(...)",
-      "related_rules_to_extract": ["BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001 → BR-ARTICLE-FAVORITE-IDEMPOTENT-001 정정"],
-      "related_modules": ["MOD-CORE-ARTICLE", "MOD-API-FAVORITE", "MOD-API-USER"],
+      "related_rules_to_extract": [
+        "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001 → BR-ARTICLE-FAVORITE-IDEMPOTENT-001 정정"
+      ],
+      "related_modules": [
+        "MOD-CORE-ARTICLE",
+        "MOD-API-FAVORITE",
+        "MOD-API-USER"
+      ],
       "detected_by": "human_review",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["api", "idempotency", "spec-runtime-drift", "rfc-7231", "rfc-9110", "f-070", "f-079", "f-085", "phase5-promoted", "phase6-merged", "critical", "composite-api-contract"]
+      "tags": [
+        "api",
+        "idempotency",
+        "spec-runtime-drift",
+        "rfc-7231",
+        "rfc-9110",
+        "f-070",
+        "f-079",
+        "f-085",
+        "phase5-promoted",
+        "phase6-merged",
+        "critical",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) idempotent endpoint 는 OpenAPI spec 작성 단계부터 200 OK 명시 + same-state 시 silent return 패턴 강제 (Profile follow/unfollow 패턴 표준). (2) login 등 resource creation 의미가 모호한 endpoint 는 @ResponseStatus 명시 의무. (3) CI 에 spec/runtime drift 검증 (rest-assured contract test 또는 Pact) 의무. (4) RFC 7231 §4.2.2 (idempotency) + RFC 9110 §15.3 (status code) 팀 학습 + ADR 등록."
     },
     {
       "id": "AP-DB-001",
@@ -116,11 +237,24 @@
       "occurrences": 1,
       "recommended_alternative": "// 1글자 fix\ninterface TagJpaRepository extends JpaRepository<Tag, String> {}\n\n// 검증 강화 (선택): ArchUnit 또는 Spring Data JPA 3.5 cross-check 도입\n// 또는 사내 표준 ide inspector — generic type-id mismatch 검증",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-PERSISTENCE-TAG"],
+      "related_modules": [
+        "MOD-PERSISTENCE-TAG"
+      ],
       "detected_by": "static_analysis",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["db", "spring-data-jpa", "type-safety", "runtime-classcast", "f-048", "phase2-senior-discovered", "f-044-pattern", "owasp-a04", "critical"]
+      "tags": [
+        "db",
+        "spring-data-jpa",
+        "type-safety",
+        "runtime-classcast",
+        "f-048",
+        "phase2-senior-discovered",
+        "f-044-pattern",
+        "owasp-a04",
+        "critical"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) Spring Data JPA Repository 선언 시 entity @Id 타입과 generic ID 타입 cross-check 필수 (예: TagJpaRepository<Tag, String>). (2) ArchUnit 또는 사내 IDE inspection rule 도입 — generic-id mismatch CI 차단. (3) JpaRepositoryFactorySupport 의 lazy validation 함정 인지 + PR 체크리스트에 명시. (4) 신규 Repository PR 시 type-safety 검증 단계 의무화."
     },
     {
       "id": "AP-SECURITY-001",
@@ -147,12 +281,33 @@
       ],
       "occurrences": 3,
       "recommended_alternative": "// 1단계 — git history 정리 (즉시 실행)\ngit filter-repo --path server/api/src/main/resources/app.key --invert-paths\ngit filter-repo --path server/api/src/main/resources/app.pub --invert-paths\n// + 강제 push (모든 fork 에서 history 영구 정리)\n\n// 2단계 — key rotation (compromise 가정)\nopenssl genrsa -out new_app.key 2048\nopenssl rsa -in new_app.key -pubout -out new_app.pub\n\n// 3단계 — application.yaml 환경변수 ref\nsecurity:\n  key:\n    private: ${SECURITY_KEY_PRIVATE_PEM}\n    public: ${SECURITY_KEY_PUBLIC_PEM}\n\n// 4단계 — 운영: AWS Parameter Store / HashiCorp Vault / GCP Secret Manager 분리\n// 5단계 — Spring Security 6 OAuth2 Resource Server 권고\nspring.security.oauth2.resourceserver.jwt.public-key-location=${JWT_PUBLIC_KEY_LOCATION}",
-      "related_rules_to_extract": ["BR-AUTH-JWT-001", "BR-AUTH-JWT-002"],
-      "related_modules": ["MOD-API-SECURITY", "MOD-INFRA-SECRETS"],
+      "related_rules_to_extract": [
+        "BR-AUTH-JWT-001",
+        "BR-AUTH-JWT-002"
+      ],
+      "related_modules": [
+        "MOD-API-SECURITY",
+        "MOD-INFRA-SECRETS"
+      ],
       "detected_by": "static_analysis",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["security", "cryptographic-failures", "git-leak", "rsa-key", "f-068", "phase3-senior-discovered", "owasp-a02", "cwe-321", "cwe-798", "tech-radar-hold-vol30", "poc-01-isomorphic", "critical", "composite-jwt-auth"]
+      "tags": [
+        "security",
+        "cryptographic-failures",
+        "git-leak",
+        "rsa-key",
+        "f-068",
+        "phase3-senior-discovered",
+        "owasp-a02",
+        "cwe-321",
+        "cwe-798",
+        "tech-radar-hold-vol30",
+        "poc-01-isomorphic",
+        "critical",
+        "composite-jwt-auth"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) RSA/JWT key 는 절대 git commit 금지 — pre-commit hook (gitleaks / detect-secrets) 의무. (2) AWS Parameter Store / HashiCorp Vault / GCP Secret Manager 분리 표준 (환경변수 ${KEY_*} 로 ref). (3) Spring Security 6 OAuth2 Resource Server 권고 + jwt.public-key-location 환경변수. (4) GitHub Secret Scanning 활성화 + 정기 audit (3개월). (5) classpath:*.key 형태 절대 금지 — ADR 등록 + PR template 체크. (6) NIST SP 800-57 + OWASP A02:2021 + CWE-321/798 팀 학습."
     },
     {
       "id": "AP-ARCH-001",
@@ -170,12 +325,28 @@
       ],
       "occurrences": 1,
       "recommended_alternative": "// AS-IS (회피 후보) — UserRepositoryAdapter\n@Override\npublic User updateUserDetails(...) {\n    // 도메인 검증 흡수\n    if (existsByEmail(email)) throw new EmailAlreadyExistsException();\n    user.encryptPassword(password, passwordEncoder);  // adapter 가 PasswordEncoder 사용\n    return userJpaRepository.save(user);\n}\n\n// TO-BE (정상 — UserService 가 도메인 검증)\n@Service\npublic class UserService {\n    public User updateUserDetails(...) {\n        if (userRepository.existsByEmail(email)) {\n            throw new EmailAlreadyExistsException();\n        }\n        user.encryptPassword(password, passwordEncoder);\n        return userRepository.save(user);  // adapter 단순 save\n    }\n}\n\n// UserRepositoryAdapter 단순 위임\n@Override\npublic User save(User user) {\n    return userJpaRepository.save(user);\n}",
-      "related_rules_to_extract": ["BR-USER-EMAIL-UNIQUE-001", "BR-USER-USERNAME-UNIQUE-001"],
-      "related_modules": ["MOD-PERSISTENCE-USER", "MOD-CORE-USER"],
+      "related_rules_to_extract": [
+        "BR-USER-EMAIL-UNIQUE-001",
+        "BR-USER-USERNAME-UNIQUE-001"
+      ],
+      "related_modules": [
+        "MOD-PERSISTENCE-USER",
+        "MOD-CORE-USER"
+      ],
       "detected_by": "static_analysis",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "human_review_status": "pending",
-      "tags": ["arch", "hexagonal", "port-adapter", "vernon-iddd", "f-071", "phase4-promoted", "high", "composite-hexagonal-boundary"]
+      "tags": [
+        "arch",
+        "hexagonal",
+        "port-adapter",
+        "vernon-iddd",
+        "f-071",
+        "phase4-promoted",
+        "high",
+        "composite-hexagonal-boundary"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) Hexagonal/Onion 채택 시 port-adapter 경계 책임 분리 ADR 등록 — Adapter 는 단순 DB 매핑만, 도메인 검증은 Service 또는 Aggregate Root 의무. (2) Vernon IDDD Ch.4 (Architecture) 팀 학습. (3) ArchUnit dependency rule 로 Adapter → Domain 검증 호출 차단. (4) PR 리뷰 체크리스트에 'Adapter 가 비즈니스 로직 포함하는가?' 항목."
     },
     {
       "id": "AP-DOMAIN-001",
@@ -200,12 +371,26 @@
       ],
       "occurrences": 2,
       "recommended_alternative": "-- DB schema\nALTER TABLE articles DROP CONSTRAINT uq_articles_title;\nALTER TABLE articles ALTER COLUMN title TYPE VARCHAR(255);  -- 한국어 환경 보강\n\n// JPA — Article.java\n@Column(name = \"title\", length = 255, nullable = false)\nprivate String title;\n\n// slug 만 unique 유지\n@Column(name = \"slug\", length = 255, nullable = false, unique = true)\nprivate String slug;",
-      "related_rules_to_extract": ["BR-ARTICLE-TITLE-UNIQUE-001 제거", "BR-ARTICLE-SLUG-UNIQUE-001 유지"],
-      "related_modules": ["MOD-CORE-ARTICLE", "MOD-PERSISTENCE-ARTICLE"],
+      "related_rules_to_extract": [
+        "BR-ARTICLE-TITLE-UNIQUE-001 제거",
+        "BR-ARTICLE-SLUG-UNIQUE-001 유지"
+      ],
+      "related_modules": [
+        "MOD-CORE-ARTICLE",
+        "MOD-PERSISTENCE-ARTICLE"
+      ],
       "detected_by": "static_analysis",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["domain", "over-constraint", "title-unique", "f-052", "phase4-promoted", "high"]
+      "tags": [
+        "domain",
+        "over-constraint",
+        "title-unique",
+        "f-052",
+        "phase4-promoted",
+        "high"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) DB 컬럼 길이 제약 결정 시 비즈니스 요구 vs 표준 한계 (varchar 255 또는 TEXT) 명시. (2) UNIQUE 제약 추가 전 비즈니스 의미 검토 — 'title 이 정말 globally unique 인가?' (3) PoC 단계에서 sample data 충돌 빈도 측정. (4) 후속 마이그레이션 비용 (ALTER COLUMN UNIQUE 제거 = downtime 위험) 사전 계산."
     },
     {
       "id": "AP-PERFORMANCE-001",
@@ -229,11 +414,29 @@
       "occurrences": 2,
       "recommended_alternative": "// LAZY default + JOIN FETCH 명시\n@OneToMany(mappedBy = \"article\", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)\nprivate Set<ArticleTag> articleTags = new HashSet<>();\n\n// Repository — @EntityGraph 또는 명시적 JOIN FETCH\n@EntityGraph(attributePaths = {\"articleTags\", \"articleTags.tag\"})\n@Query(\"SELECT a FROM Article a WHERE a.slug = :slug\")\nOptional<Article> findBySlugWithTags(@Param(\"slug\") String slug);\n\n// 또는 두 단계 쿼리 (페이징 + 별도 fetch)\nPage<Long> articleIds = articleJpaRepository.findIds(spec, pageable);\nList<Article> articles = articleJpaRepository.findByIdsWithTags(articleIds.getContent());",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-CORE-ARTICLE", "MOD-PERSISTENCE-ARTICLE"],
+      "related_modules": [
+        "MOD-CORE-ARTICLE",
+        "MOD-PERSISTENCE-ARTICLE"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.92,
       "human_review_status": "pending",
-      "tags": ["performance", "n-plus-one", "jpa", "eager", "specification", "pageable", "hhh000104", "vlad-mihalcea", "f-051", "phase2-promoted", "tech-radar-hold-vol32", "high", "poc-01-promoted-from-medium"]
+      "tags": [
+        "performance",
+        "n-plus-one",
+        "jpa",
+        "eager",
+        "specification",
+        "pageable",
+        "hhh000104",
+        "vlad-mihalcea",
+        "f-051",
+        "phase2-promoted",
+        "tech-radar-hold-vol32",
+        "high",
+        "poc-01-promoted-from-medium"
+      ],
+      "migration_advice": "신규 시스템 설계 시: (1) JPA fetch 전략 default LAZY + 명시적 JOIN FETCH 패턴 표준 (Vlad Mihalcea 권위). (2) Specification + Pageable + EAGER 조합 절대 금지 — HHH000104 in-memory pagination fallback 발생. (3) p6spy 또는 datasource-proxy 로 dev 환경 query 모니터링 의무. (4) Hibernate query plan cache + statistics 활성화 + threshold alert. (5) 토스 SLASH '게시판 도메인의 N+1 회고' 사례 팀 학습."
     },
     {
       "id": "AP-API-002",
@@ -257,11 +460,25 @@
       "occurrences": 2,
       "recommended_alternative": "// 표준 권고 (사내 신규)\n@DeleteMapping(\"/api/articles/{slug}\")\n@ResponseStatus(HttpStatus.NO_CONTENT)  // 204\nvoid deleteArticle(...) { ... }\n\n@DeleteMapping(\"/api/articles/{slug}/comments/{id}\")\n@ResponseStatus(HttpStatus.NO_CONTENT)  // 204\nvoid deleteComment(...) { ... }\n\n// 본 PoC 한정: RealWorld 호환성 유지 — default 200 인정",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-ARTICLE", "MOD-API-COMMENT"],
+      "related_modules": [
+        "MOD-API-ARTICLE",
+        "MOD-API-COMMENT"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["api", "http-status", "rfc-9110", "consistency", "f-083", "phase5-promoted", "low", "poc-01-recurrence-f-040", "composite-api-contract"]
+      "tags": [
+        "api",
+        "http-status",
+        "rfc-9110",
+        "consistency",
+        "f-083",
+        "phase5-promoted",
+        "low",
+        "poc-01-recurrence-f-040",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: DELETE 성공 응답은 RFC 9110 §15.3.5 권고대로 204 No Content (body 없음) 표준. OpenAPI spec 작성 시 200/204 일관성 ADR 등록."
     },
     {
       "id": "AP-API-003",
@@ -281,11 +498,25 @@
       "occurrences": 1,
       "recommended_alternative": "// Spring path 권고\n@RequestMapping(\"/api/v1/articles\")\n\n// OpenAPI\nservers:\n  - url: https://api.example.com/v1\n  - url: https://staging.example.com/v1\n\n// Accept header 권고 (선택)\nAccept: application/vnd.realworld.v1+json",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-*"],
+      "related_modules": [
+        "MOD-API-*"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["api", "versioning", "openapi", "deprecation", "f-082", "phase5-promoted", "tech-radar-hold-vol31", "medium", "poc-01-recurrence-f-038", "composite-api-contract"]
+      "tags": [
+        "api",
+        "versioning",
+        "openapi",
+        "deprecation",
+        "f-082",
+        "phase5-promoted",
+        "tech-radar-hold-vol31",
+        "medium",
+        "poc-01-recurrence-f-038",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: API 버저닝 (info.version + servers + path /v1) 첫 release 부터 의무. CI 에 spec breaking change 검증 (oasdiff) 도입."
     },
     {
       "id": "AP-API-004",
@@ -309,12 +540,27 @@
       ],
       "occurrences": 1,
       "recommended_alternative": "// openapi.yaml — maximum 명시\nlimitParam:\n  schema:\n    type: integer\n    minimum: 1\n    default: 20\n    maximum: 50  # runtime cap 정합\n\n// Spring Bean Validation @Max\n@GetMapping(\"/api/articles\")\nMultipleArticlesResponse getArticles(@RequestParam @Max(50) int limit, ...) { ... }",
-      "related_rules_to_extract": ["BR-PAGINATION-SIZE-CAP-50-001"],
-      "related_modules": ["MOD-API-ARTICLE"],
+      "related_rules_to_extract": [
+        "BR-PAGINATION-SIZE-CAP-50-001"
+      ],
+      "related_modules": [
+        "MOD-API-ARTICLE"
+      ],
       "detected_by": "pattern_match",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "human_review_status": "pending",
-      "tags": ["api", "owasp-api4", "rate-limit", "pagination", "spec-drift", "f-080", "phase5-promoted", "medium", "composite-api-contract"]
+      "tags": [
+        "api",
+        "owasp-api4",
+        "rate-limit",
+        "pagination",
+        "spec-drift",
+        "f-080",
+        "phase5-promoted",
+        "medium",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: limit/page 파라미터에 maximum cap 명시 (예: max=100) — OWASP API4:2023 Unrestricted Resource Consumption 회피. CI 에 OpenAPI maximum 검증 rule."
     },
     {
       "id": "AP-API-005",
@@ -334,11 +580,24 @@
       "occurrences": 2,
       "recommended_alternative": "// PATCH (application/merge-patch+json — RFC 7396)\n@PatchMapping(value = \"/api/articles/{slug}\", consumes = \"application/merge-patch+json\")\nSingleArticleResponse updateArticle(...) {\n    article.applyMergePatch(request);  // null field 무시\n    return new SingleArticleResponse(...);\n}\n\n// 또는 UserController — @PatchMapping(\"/api/user\")",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-USER", "MOD-API-ARTICLE"],
+      "related_modules": [
+        "MOD-API-USER",
+        "MOD-API-ARTICLE"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.88,
       "human_review_status": "pending",
-      "tags": ["api", "http-method", "rfc-5789", "rfc-7396", "f-086", "phase5-promoted", "medium", "composite-api-contract"]
+      "tags": [
+        "api",
+        "http-method",
+        "rfc-5789",
+        "rfc-7396",
+        "f-086",
+        "phase5-promoted",
+        "medium",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: 부분 갱신은 RFC 5789 PATCH 사용 — PUT 은 전체 replace 의미 보존. PUT/PATCH 선택 ADR 등록."
     },
     {
       "id": "AP-API-006",
@@ -358,11 +617,23 @@
       "occurrences": 1,
       "recommended_alternative": "// Application Service 도입\n@Service\npublic class FavoriteArticleUseCase {\n    private final UserService userService;\n    private final ArticleService articleService;\n\n    @Transactional\n    public ArticleDetails execute(UUID userId, String slug) {\n        var user = userService.getUser(userId);\n        var article = articleService.getArticle(slug);\n        articleService.favorite(user, article);\n        return articleService.getArticleDetails(user, article);\n    }\n}\n\n// Controller 단순화\n@PostMapping(\"/api/articles/{slug}/favorite\")\nSingleArticleResponse like(AuthToken token, @PathVariable String slug) {\n    return new SingleArticleResponse(favoriteArticleUseCase.execute(token.userId(), slug));\n}",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-FAVORITE", "MOD-CORE-USECASE"],
+      "related_modules": [
+        "MOD-API-FAVORITE",
+        "MOD-CORE-USECASE"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["api", "application-service", "vernon-iddd-ch13", "controller-orchestration", "phase5-senior-discovered", "medium", "composite-api-contract"]
+      "tags": [
+        "api",
+        "application-service",
+        "vernon-iddd-ch13",
+        "controller-orchestration",
+        "phase5-senior-discovered",
+        "medium",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: Controller 는 단일 Application Service 호출만 (Vernon IDDD Application Service Pattern). multi-service orchestration 은 Application Service 또는 Saga 도입."
     },
     {
       "id": "AP-API-008",
@@ -382,11 +653,22 @@
       "occurrences": 1,
       "recommended_alternative": "// Option A — server-side internal call (권장)\n@PostMapping(\"/api/users\")\n@ResponseStatus(HttpStatus.CREATED)\nUsersResponse signup(@RequestBody SignupRequest request) {\n    var userRegistry = new UserRegistry(...);\n    userService.signup(userRegistry);\n\n    // 직접 login 호출 (redirect X)\n    var user = userService.login(request.user().email(), request.user().password());\n    var authToken = bearerTokenProvider.createAuthToken(user);\n    return UsersResponse.from(user, authToken);\n}\n\n// Option B — client redirect (별도 호출)\n// 1) POST /api/users → 201 (token X)\n// 2) client 가 POST /api/users/login → 200 + token",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-USER"],
+      "related_modules": [
+        "MOD-API-USER"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.88,
       "human_review_status": "pending",
-      "tags": ["api", "redirect", "rest-principle", "f-087", "phase5-senior-discovered", "medium", "composite-api-contract"]
+      "tags": [
+        "api",
+        "redirect",
+        "rest-principle",
+        "f-087",
+        "phase5-senior-discovered",
+        "medium",
+        "composite-api-contract"
+      ],
+      "migration_advice": "신규 시스템 설계 시: signup 후 login 자동 흐름은 internal call (Service-to-Service) 또는 redirect (3xx) 명시 — ModelAndView leak 금지. OpenAPI spec 에 redirect 명시 의무."
     },
     {
       "id": "AP-ARCH-002",
@@ -405,11 +687,25 @@
       "occurrences": 1,
       "recommended_alternative": "// AS-IS (회피 후보) — ArticleRepositoryAdapter\n@Override\npublic void delete(Article article) {\n    articleCommentJpaRepository.deleteByArticle(article);  // multi-aggregate orchestration\n    articleJpaRepository.delete(article);\n    // ArticleFavorite / ArticleTag 누락\n}\n\n// TO-BE (정상) — ArticleService 가 orchestration\n@Service\npublic class ArticleService {\n    @Transactional\n    public void delete(Article article) {\n        articleCommentService.deleteAllByArticle(article);\n        articleFavoriteService.deleteAllByArticle(article);\n        articleTagService.deleteAllByArticle(article);\n        articleRepository.delete(article);\n    }\n}",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-PERSISTENCE-ARTICLE", "MOD-CORE-ARTICLE"],
+      "related_modules": [
+        "MOD-PERSISTENCE-ARTICLE",
+        "MOD-CORE-ARTICLE"
+      ],
       "detected_by": "static_analysis",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["arch", "hexagonal", "port-adapter", "multi-aggregate", "vernon-iddd-ch13", "f-072", "phase4-promoted", "medium", "composite-hexagonal-boundary"]
+      "tags": [
+        "arch",
+        "hexagonal",
+        "port-adapter",
+        "multi-aggregate",
+        "vernon-iddd-ch13",
+        "f-072",
+        "phase4-promoted",
+        "medium",
+        "composite-hexagonal-boundary"
+      ],
+      "migration_advice": "신규 시스템 설계 시: Adapter 의 multi-aggregate orchestration 금지 — Application Service 또는 Domain Event 사용. ArchUnit rule 로 Adapter 의 multi-repository 호출 차단."
     },
     {
       "id": "AP-DB-002",
@@ -432,11 +728,24 @@
       "occurrences": 2,
       "recommended_alternative": "-- Option A: DB CASCADE\nALTER TABLE article_favorites ADD CONSTRAINT fk_article_favorites_article\n    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE;\nALTER TABLE article_tags ADD CONSTRAINT fk_article_tags_article\n    FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE;\n\n-- Option B: Service 명시적 multi-step delete (AP-ARCH-002 fix 와 합산)",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-PERSISTENCE-ARTICLE"],
+      "related_modules": [
+        "MOD-PERSISTENCE-ARTICLE"
+      ],
       "detected_by": "static_analysis",
       "confidence": 0.88,
       "human_review_status": "pending",
-      "tags": ["db", "fk", "cascade", "orphan-row", "f-073", "phase4-promoted", "medium", "poc-01-recurrence-ap-db-001", "composite-data-integrity"]
+      "tags": [
+        "db",
+        "fk",
+        "cascade",
+        "orphan-row",
+        "f-073",
+        "phase4-promoted",
+        "medium",
+        "poc-01-recurrence-ap-db-001",
+        "composite-data-integrity"
+      ],
+      "migration_advice": "신규 시스템 설계 시: parent-child entity 삭제 시 ON DELETE CASCADE 명시 또는 Service 의 transactional cleanup 표준. orphan row 검증 nightly job 의무."
     },
     {
       "id": "AP-DB-003",
@@ -456,11 +765,23 @@
       "occurrences": 1,
       "recommended_alternative": "// Subquery 사용 (권장)\npublic static Specification<Article> hasFavoritedUsername(String favoritedUsername) {\n    return (root, query, cb) -> {\n        if (favoritedUsername == null) return cb.conjunction();\n        Subquery<UUID> subquery = query.subquery(UUID.class);\n        Root<ArticleFavorite> favoriteRoot = subquery.from(ArticleFavorite.class);\n        subquery.select(favoriteRoot.get(\"article\").get(\"id\"))\n                .where(cb.equal(favoriteRoot.get(\"user\").get(\"username\"), favoritedUsername));\n        return root.get(\"id\").in(subquery);\n    };\n}\n\n// 또는 query.distinct(true) 명시 (Cartesian 회피 차선)",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-PERSISTENCE-ARTICLE"],
+      "related_modules": [
+        "MOD-PERSISTENCE-ARTICLE"
+      ],
       "detected_by": "human_review",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["db", "jpa-specifications", "cartesian-product", "criteria-api", "f-069", "phase3-senior-discovered", "medium", "composite-data-integrity"]
+      "tags": [
+        "db",
+        "jpa-specifications",
+        "cartesian-product",
+        "criteria-api",
+        "f-069",
+        "phase3-senior-discovered",
+        "medium",
+        "composite-data-integrity"
+      ],
+      "migration_advice": "신규 시스템 설계 시: JPA Specification 사용 시 fetch join + distinct 조합 금지 — Cartesian product 위험. EXPLAIN ANALYZE 로 query plan 사전 검증."
     },
     {
       "id": "AP-DOMAIN-002",
@@ -478,12 +799,25 @@
       ],
       "occurrences": 1,
       "recommended_alternative": "@Transactional\npublic void follow(User follower, User following) {\n    if (follower.equals(following)) {\n        throw new IllegalArgumentException(\"cannot follow yourself\");\n    }\n    if (userRelationshipRepository.exists(follower, following)) return;\n    userRelationshipRepository.save(new UserFollow(follower, following));\n}",
-      "related_rules_to_extract": ["BR-USER-FOLLOW-NO-SELF-001"],
-      "related_modules": ["MOD-CORE-FOLLOW"],
+      "related_rules_to_extract": [
+        "BR-USER-FOLLOW-NO-SELF-001"
+      ],
+      "related_modules": [
+        "MOD-CORE-FOLLOW"
+      ],
       "detected_by": "static_analysis",
-      "confidence": 0.90,
+      "confidence": 0.9,
       "human_review_status": "pending",
-      "tags": ["domain", "follow", "self-follow", "f-074", "phase4-promoted", "medium", "poc-01-recurrence-br-user-follow-no-self"]
+      "tags": [
+        "domain",
+        "follow",
+        "self-follow",
+        "f-074",
+        "phase4-promoted",
+        "medium",
+        "poc-01-recurrence-br-user-follow-no-self"
+      ],
+      "migration_advice": "신규 시스템 설계 시: relationship/follow 등 self-reference 가능 도메인은 Aggregate Root invariant 로 self-reference 차단 (Domain 검증 가장 강력) + DB CHECK 보강. RealWorld 같은 spec 묵시 영역은 ADR 명시."
     },
     {
       "id": "AP-DOMAIN-003",
@@ -501,11 +835,23 @@
       "occurrences": 1,
       "recommended_alternative": "// Locale.ROOT + NFKD 정규화 + collision retry\nprivate static String titleToSlug(String title) {\n    String normalized = Normalizer.normalize(title, Normalizer.Form.NFKD)\n            .replaceAll(\"\\\\p{InCombiningDiacriticalMarks}+\", \"\");\n    String slug = normalized.toLowerCase(Locale.ROOT)\n            .replaceAll(\"[^a-z0-9\\\\s-]\", \"\")\n            .replaceAll(\"\\\\s+\", \"-\")\n            .replaceAll(\"-+\", \"-\");\n    return slug;\n}\n\n// collision retry (Service 단)\nprivate String generateUniqueSlug(String title) {\n    String slug = titleToSlug(title);\n    int suffix = 0;\n    while (articleRepository.existsBySlug(slug)) {\n        suffix++;\n        slug = titleToSlug(title) + \"-\" + suffix;\n    }\n    return slug;\n}",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-CORE-ARTICLE"],
+      "related_modules": [
+        "MOD-CORE-ARTICLE"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["domain", "slug", "locale", "unicode", "collision", "f-053", "phase2-promoted", "medium"]
+      "tags": [
+        "domain",
+        "slug",
+        "locale",
+        "unicode",
+        "collision",
+        "f-053",
+        "phase2-promoted",
+        "medium"
+      ],
+      "migration_advice": "신규 시스템 설계 시: slug/identifier 생성은 ICU4J 또는 표준 transliteration 라이브러리 사용 (Locale/Unicode/collision 8 함정 회피). UNIQUE 충돌 시 fallback 전략 (suffix counter) 의무."
     },
     {
       "id": "AP-API-007",
@@ -523,11 +869,22 @@
       "occurrences": 5,
       "recommended_alternative": "# 단순 제거 (operationId 기반 자동 명명)\n# 또는 OpenAPI Generator config 사용",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-API-*"],
+      "related_modules": [
+        "MOD-API-*"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.95,
       "human_review_status": "pending",
-      "tags": ["api", "openapi-extension", "legacy", "swagger-codegen-v2", "f-081", "phase5-promoted-demoted", "low"]
+      "tags": [
+        "api",
+        "openapi-extension",
+        "legacy",
+        "swagger-codegen-v2",
+        "f-081",
+        "phase5-promoted-demoted",
+        "low"
+      ],
+      "migration_advice": "신규 시스템 설계 시: OpenAPI 3.x 만 사용 — swagger 2.x x-codegen-* legacy artifact 제거. spec 작성 시 lint rule 로 차단."
     },
     {
       "id": "AP-DOMAIN-004",
@@ -545,11 +902,22 @@
       "occurrences": 1,
       "recommended_alternative": "// race-safe pattern (권장)\ntry {\n    return userRepository.save(user);\n} catch (DataIntegrityViolationException e) {\n    throw new EmailAlreadyExistsException(...);  // race-condition graceful handling\n}\n\n// 또는 application-level + DB constraint 양쪽 조합 (current PoC) — race window 인정",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-CORE-USER"],
+      "related_modules": [
+        "MOD-CORE-USER"
+      ],
       "detected_by": "pattern_match",
       "confidence": 0.85,
       "human_review_status": "pending",
-      "tags": ["domain", "toctou", "race-condition", "f-058", "phase2-candidate", "low", "educational"]
+      "tags": [
+        "domain",
+        "toctou",
+        "race-condition",
+        "f-058",
+        "phase2-candidate",
+        "low",
+        "educational"
+      ],
+      "migration_advice": "신규 시스템 설계 시: existsBy + insert 패턴은 race window 존재 — DB UNIQUE 제약 의무 (race-safe) + Service catch ConstraintViolation. App pre-check 단독 금지."
     },
     {
       "id": "AP-DOMAIN-005",
@@ -567,11 +935,23 @@
       "occurrences": 1,
       "recommended_alternative": "// 메소드 이름 변경 (단순 setter 의미 명확화)\npublic void rename(String newTitle, ArticleRepository repository) {\n    // 또는 Service 레벨 race 처리\n}\n\n// race-safe pattern: try-catch DataIntegrityViolationException (Service 레벨)",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-CORE-ARTICLE"],
+      "related_modules": [
+        "MOD-CORE-ARTICLE"
+      ],
       "detected_by": "pattern_match",
-      "confidence": 0.80,
+      "confidence": 0.8,
       "human_review_status": "pending",
-      "tags": ["domain", "toctou", "race-condition", "mysterious-name", "f-076", "phase4-candidate", "low", "fowler-refactoring"]
+      "tags": [
+        "domain",
+        "toctou",
+        "race-condition",
+        "mysterious-name",
+        "f-076",
+        "phase4-candidate",
+        "low",
+        "fowler-refactoring"
+      ],
+      "migration_advice": "신규 시스템 설계 시: setter 기반 mutation 금지 — Aggregate Root 의 method 로 의미 명시 (예: rename, retitle). optimistic locking (@Version) 보강."
     },
     {
       "id": "AP-DOMAIN-006",
@@ -590,21 +970,68 @@
       "occurrences": 3,
       "recommended_alternative": "// Article aggregate 에 응집\npublic class Article {\n    public void edit(User requester, EditCommand command) {\n        if (!isAuthor(requester)) throw new IllegalAccessError();\n        if (command.title() != null) this.title = command.title();\n        if (command.description() != null) this.description = command.description();\n        if (command.body() != null) this.body = command.body();\n        this.updatedAt = LocalDateTime.now();\n    }\n}\n\n// ArticleService 단순화\npublic Article edit(User requester, Article article, EditCommand command) {\n    article.edit(requester, command);\n    return articleRepository.save(article);\n}",
       "related_rules_to_extract": [],
-      "related_modules": ["MOD-CORE-ARTICLE"],
+      "related_modules": [
+        "MOD-CORE-ARTICLE"
+      ],
       "detected_by": "human_review",
       "confidence": 0.88,
       "human_review_status": "pending",
-      "tags": ["domain", "duplicated-code", "dry", "fowler-refactoring", "f-078", "phase4-candidate", "low"]
+      "tags": [
+        "domain",
+        "duplicated-code",
+        "dry",
+        "fowler-refactoring",
+        "f-078",
+        "phase4-candidate",
+        "low"
+      ],
+      "migration_advice": "신규 시스템 설계 시: editTitle/editDescription/editContent 등 유사 메서드는 단일 update 메서드 + DTO 또는 Builder 패턴으로 통합. Duplicated Code 회피."
     }
   ],
   "summary": {
     "by_category": {
-      "API": {"count": 8, "by_severity": {"critical": 1, "medium": 5, "low": 2}},
-      "DB": {"count": 3, "by_severity": {"critical": 1, "medium": 2}},
-      "SECURITY": {"count": 1, "by_severity": {"critical": 1}},
-      "ARCH": {"count": 2, "by_severity": {"high": 1, "medium": 1}},
-      "DOMAIN": {"count": 6, "by_severity": {"high": 1, "medium": 2, "low": 3}},
-      "PERFORMANCE": {"count": 1, "by_severity": {"high": 1}}
+      "API": {
+        "count": 8,
+        "by_severity": {
+          "critical": 1,
+          "medium": 5,
+          "low": 2
+        }
+      },
+      "DB": {
+        "count": 3,
+        "by_severity": {
+          "critical": 1,
+          "medium": 2
+        }
+      },
+      "SECURITY": {
+        "count": 1,
+        "by_severity": {
+          "critical": 1
+        }
+      },
+      "ARCH": {
+        "count": 2,
+        "by_severity": {
+          "high": 1,
+          "medium": 1
+        }
+      },
+      "DOMAIN": {
+        "count": 6,
+        "by_severity": {
+          "high": 1,
+          "medium": 2,
+          "low": 3
+        }
+      },
+      "PERFORMANCE": {
+        "count": 1,
+        "by_severity": {
+          "high": 1
+        }
+      }
     },
     "total_count": 21,
     "critical_count": 3,
@@ -650,27 +1077,48 @@
     "composite_api_contract_pattern": {
       "name": "API 계약 결함 종합 점검",
       "rationale": "Document 권고 (개별 결함 단위 분류 표준) 채택 — 복합 AP 등록 거절. 가독성 보존을 위해 avoid-list.md `## API 계약 결함 종합 점검` 섹션에서 6 AP cross-link.",
-      "linked_antipatterns": ["AP-API-001", "AP-API-002", "AP-API-003", "AP-API-004", "AP-API-005", "AP-API-008"],
+      "linked_antipatterns": [
+        "AP-API-001",
+        "AP-API-002",
+        "AP-API-003",
+        "AP-API-004",
+        "AP-API-005",
+        "AP-API-008"
+      ],
       "shared_remediation": "OpenAPI x-extension 도입 (PoC #01 ADR-007) + REC-API-IDEMPOTENCY/VERSIONING/PROBLEM-DETAILS/PATCH 묶음 + RFC 7231/9110/5789/7807 권고 일괄"
     },
     "composite_hexagonal_boundary_pattern": {
       "name": "Hexagonal port-adapter 경계 종합 점검",
       "rationale": "PoC #02 신규 — Hexagonal 도입 부산물 안티패턴 묶음. Document 권고 채택 (Vernon IDDD Ch.4 + Ch.13 명시 권위).",
-      "linked_antipatterns": ["AP-ARCH-001", "AP-ARCH-002"],
-      "linked_findings": ["F-075 (메타 — v1.2.0 묶음 J 격상)"],
+      "linked_antipatterns": [
+        "AP-ARCH-001",
+        "AP-ARCH-002"
+      ],
+      "linked_findings": [
+        "F-075 (메타 — v1.2.0 묶음 J 격상)"
+      ],
       "shared_remediation": "Service 가 도메인 검증 + multi-aggregate orchestration / Adapter 단순 save/delete only / ArchUnit slices().byMatching 검증 추가"
     },
     "composite_jwt_auth_pattern": {
       "name": "JWT/Auth 보안 종합 점검",
       "rationale": "PoC #01 동형 패턴 — RealWorld stack 의 공통 JWT/Auth 결함 카테고리. Thoughtworks Tech Radar Hold 'Hand-rolled authentication' 누적 evidence.",
-      "linked_antipatterns": ["AP-SECURITY-001", "AP-API-006"],
-      "linked_findings": ["F-084 (Token apiKey 비표준 — REC only)"],
+      "linked_antipatterns": [
+        "AP-SECURITY-001",
+        "AP-API-006"
+      ],
+      "linked_findings": [
+        "F-084 (Token apiKey 비표준 — REC only)"
+      ],
       "shared_remediation": "Spring Security 6 OAuth2 Resource Server + Bearer JWT (RFC 6750) + Vault/KMS 분리 + git filter-repo + key rotation"
     },
     "composite_data_integrity_pattern": {
       "name": "데이터 무결성 종합 점검",
       "rationale": "PoC #02 신규 — DB 카테고리 패턴화 (PoC #01 단일 AP-DB-001 → PoC #02 3건).",
-      "linked_antipatterns": ["AP-DB-001", "AP-DB-002", "AP-DB-003"],
+      "linked_antipatterns": [
+        "AP-DB-001",
+        "AP-DB-002",
+        "AP-DB-003"
+      ],
       "shared_remediation": "Repository generic cross-check (TagJpaRepository fix) + ON DELETE CASCADE 명시 + JPA Specifications distinct/Subquery + JOIN type 명시"
     }
   },
@@ -678,10 +1126,29 @@
     "total_drift_count_phase_2": 9,
     "promoted_count": 2,
     "promoted": [
-      {"drift_id": "DRIFT-007", "ap_id": "AP-DB-002", "severity": "medium", "note": "PoC #01 AP-DB-001 isomorphic"},
-      {"drift_id": "DRIFT-010", "ap_id": "implicit (race-prone TOCTOU)", "severity": "medium", "note": "AP-DOMAIN-004 candidate evidence"}
+      {
+        "drift_id": "DRIFT-007",
+        "ap_id": "AP-DB-002",
+        "severity": "medium",
+        "note": "PoC #01 AP-DB-001 isomorphic"
+      },
+      {
+        "drift_id": "DRIFT-010",
+        "ap_id": "implicit (race-prone TOCTOU)",
+        "severity": "medium",
+        "note": "AP-DOMAIN-004 candidate evidence"
+      }
     ],
-    "no_action_drift": ["DRIFT-001", "DRIFT-002", "DRIFT-003", "DRIFT-004", "DRIFT-005", "DRIFT-006", "DRIFT-008", "DRIFT-009"],
+    "no_action_drift": [
+      "DRIFT-001",
+      "DRIFT-002",
+      "DRIFT-003",
+      "DRIFT-004",
+      "DRIFT-005",
+      "DRIFT-006",
+      "DRIFT-008",
+      "DRIFT-009"
+    ],
     "rationale": "Phase 2/4 결정으로 NO ACTION 또는 권장만 결정된 7건은 추가 격상 불필요."
   },
   "_phase_6_cross_validation": {

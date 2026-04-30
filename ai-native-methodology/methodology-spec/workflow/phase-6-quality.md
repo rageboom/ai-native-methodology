@@ -153,10 +153,26 @@ flowchart TB
 
 ```
 .ai-analysis/output/antipatterns/
-├── antipatterns.json        # AI용 (통합)
-├── avoid-list.md            # 사람용 체크리스트
+├── antipatterns.json        # AI용 (통합 + migration_advice 필드 — v1.2.0 묶음 P α)
+├── avoid-list.md            # 사람용 체크리스트 (기존 시스템 fix 가이드)
+├── migration-cautions.md    # ★ 신규 시스템 회피 가이드 (v1.2.0 묶음 P β — 의무 산출물)
 └── composite-patterns.md    # 복합 패턴 별도 (가독성)
 ```
+
+### 6.0 migration-cautions.md 의무 산출물 (v1.2.0 묶음 P β)
+
+**근거**: DEC-2026-04-29-안티패턴-마이그레이션-가이드 + ★★★ 본 방법론 가치 명세 (코드 → 형식 명세 + **위험 기록** 한 방향 추출기) 정합.
+
+**구조**:
+- 카테고리별 신규 시스템 회피 가이드 (API / DB / Security / Architecture / Domain / Performance)
+- design 단계 / CI 단계 / Review 단계 체크리스트
+- severity 기반 적용 우선순위
+- antipatterns.json `migration_advice` 필드 (α) 의 사람 친화적 통합
+
+**avoid-list.md 와의 차이**:
+- avoid-list.md = "기존 시스템에서 발견된 패턴 + 즉시 fix"
+- migration-cautions.md = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
+
 
 ### 6.1 avoid-list.md 예시
 

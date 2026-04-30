@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/formal-spec.schema.json",
+  "title": "Formal Spec (형식 명세)",
+  "description": "Phase 4.5 산출물. 자연어 빈약성 (44%) 보완 + AI 코드 생성 정확도 (60% → 90%) 향상. v1.2.0 신설 (묶음 L). PoC #02 C-Sprint 1+1.5+2 정량 입증. ADR-008 (이중 렌더링) + ADR-009 (다이어그램 신뢰 모델) 정합.",
+  "type": "object",
+  "required": ["meta", "state_machines", "sequences", "decision_tables", "invariants", "property_tests"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "state_machines": {
+      "type": "array",
+      "description": "Aggregate Root 별 상태/전이/이벤트/가드. XState 호환.",
+      "items": {
+        "type": "object",
+        "required": ["aggregate_root", "id", "initial", "states"],
+        "properties": {
+          "aggregate_root": {
+            "type": "string",
+            "description": "Aggregate Root 이름 (domain.json 정합)."
+          },
+          "id": {
+            "type": "string",
+            "description": "FSM 식별자. 예: User-Account, User-Following."
+          },
+          "initial": {
+            "type": "string",
+            "description": "초기 상태."
+          },
+          "states": {
+            "type": "object",
+            "description": "상태 객체. 키: 상태명. 값: { on: { 이벤트: 다음상태 또는 객체 } }",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "on": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {"type": "string"},
+                      {
+                        "type": "object",
+                        "properties": {
+                          "target": {"type": "string"},
+                          "guard": {"type": "string"},
+                          "actions": {"type": "array", "items": {"type": "string"}}
+                        }
+                      }
+                    ]
+                  }
+                },
+                "type": {"type": "string", "enum": ["final", "history", "compound"]}
+              }
+            }
+          },
+          "rendered_mermaid_path": {
+            "type": "string",
+            "description": "이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로."
+          }
+        }
+      }
+    },
+    "sequences": {
+      "type": "array",
+      "description": "Use Case 오케스트레이션. actor / message / sync / guard 구조.",
+      "items": {
+        "type": "object",
+        "required": ["uc_id", "actors", "messages"],
+        "properties": {
+          "uc_id": {
+            "type": "string",
+            "pattern": "^UC-[A-Z0-9_-]+$",
+            "description": "Use Case ID. 예: UC-USER-SIGNUP, UC-USER-FOLLOW."
+          },
+          "actors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["id", "type"],
+              "properties": {
+                "id": {"type": "string"},
+                "type": {"type": "string", "enum": ["user", "controller", "service", "domain", "repository", "external", "system"]}
+              }
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["from", "to", "label"],
+              "properties": {
+                "from": {"type": "string"},
+                "to": {"type": "string"},
+                "label": {"type": "string"},
+                "sync": {"type": "string", "enum": ["sync", "async", "return"]},
+                "guard": {"type": "string"}
+              }
+            }
+          },
+          "rendered_mermaid_path": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decision_tables": {
+      "type": "array",
+      "description": "BR 의사결정 테이블. 자연어 빈약성 9 항목 보완 핵심.",
+      "items": {
+        "type": "object",
+        "required": ["br_id", "trigger", "condition", "action", "expected_result"],
+        "properties": {
+          "br_id": {
+            "type": "string",
+            "pattern": "^BR-[A-Z0-9_-]+-[0-9]+$",
+            "description": "BR ID (rules.json 정합)."
+          },
+          "trigger": {
+            "type": "string",
+            "description": "언제 발생. 예: HTTP endpoint, 이벤트, 스케줄."
+          },
+          "condition": {
+            "type": "string",
+            "description": "입력 조건."
+          },
+          "action": {
+            "type": "string",
+            "description": "수행 액션."
+          },
+          "expected_result": {
+            "type": "string",
+            "description": "기대 결과."
+          },
+          "rejection_method": {
+            "type": "string",
+            "description": "거부 방식 — 자연어 누락 빈번. 예: 'throw IllegalArgumentException', 'return Optional.empty()', 'HTTP 400 with error body'."
+          },
+          "verification_location": {
+            "type": "string",
+            "description": "검증 위치 — 자연어 누락 빈번. 예: 'Domain Aggregate Root invariant', 'Service layer', 'Adapter', 'DB CHECK constraint'."
+          },
+          "http_status": {
+            "type": "integer",
+            "description": "API 영역 BR 의 HTTP status code."
+          },
+          "error_code": {
+            "type": "string",
+            "description": "에러 코드 (사내 표준)."
+          },
+          "error_message": {
+            "type": "string",
+            "description": "사용자 노출 메시지."
+          },
+          "current_state": {
+            "type": "string",
+            "enum": ["complete", "partial", "absent", "needs_review"],
+            "description": "코드 구현 상태. absent 는 단방향 round-trip 후보."
+          },
+          "rendered_md_path": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "invariants": {
+      "type": "array",
+      "description": "Aggregate Root 의 실행 가능 invariant (TypeScript 또는 Java).",
+      "items": {
+        "type": "object",
+        "required": ["aggregate_root", "file_path"],
+        "properties": {
+          "aggregate_root": {"type": "string"},
+          "file_path": {
+            "type": "string",
+            "description": "invariants/<AggregateRoot>.ts 또는 .java"
+          },
+          "language": {
+            "type": "string",
+            "enum": ["typescript", "java"]
+          },
+          "invariant_count": {
+            "type": "integer",
+            "description": "이 파일에 정의된 invariant 개수."
+          },
+          "related_brs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^BR-[A-Z0-9_-]+-[0-9]+$"}
+          }
+        }
+      }
+    },
+    "property_tests": {
+      "type": "array",
+      "description": "fast-check (TS) 또는 jqwik (Java) property-based tests.",
+      "items": {
+        "type": "object",
+        "required": ["aggregate_root", "file_path"],
+        "properties": {
+          "aggregate_root": {"type": "string"},
+          "file_path": {"type": "string"},
+          "language": {
+            "type": "string",
+            "enum": ["typescript", "java"]
+          },
+          "framework": {
+            "type": "string",
+            "enum": ["fast-check", "jqwik", "hypothesis", "scalacheck"]
+          },
+          "property_count": {"type": "integer"},
+          "executed": {
+            "type": "boolean",
+            "description": "실제 실행 여부. false 시 신뢰도 -5%p 패널티."
+          }
+        }
+      }
+    },
+    "generated_code": {
+      "type": "array",
+      "description": "단방향 round-trip 산출물 (코드 부재 BR — F-074 패턴).",
+      "items": {
+        "type": "object",
+        "required": ["br_id", "file_path", "purpose"],
+        "properties": {
+          "br_id": {"type": "string"},
+          "file_path": {"type": "string"},
+          "purpose": {
+            "type": "string",
+            "enum": ["fix", "augmentation", "constraint"]
+          },
+          "language": {"type": "string"},
+          "lines_added": {"type": "integer"}
+        }
+      }
+    },
+    "cross_validation": {
+      "type": "object",
+      "description": "Cross-validation 메타 (의무 — DEC-priority2 H).",
+      "required": ["performed", "validators"],
+      "properties": {
+        "performed": {
+          "type": "boolean",
+          "description": "수행 여부. false 시 산출물 미완 — Phase 5-1 진입 차단 권고."
+        },
+        "validators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "real_tool"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["senior_engineer_subagent", "static_analyzer_subagent", "external_tool", "user", "main_agent"]
+              },
+              "real_tool": {
+                "type": "boolean",
+                "description": "★★★ DEC-static-tool-실행-의무화 정합. true: 진짜 외부 도구 (Semgrep/PMD/SpotBugs/Daikon/CodeQL). false: AI persona 시뮬 — -5%p 패널티 의무."
+              },
+              "tool_name": {"type": "string"},
+              "version": {"type": "string"},
+              "findings_discovered": {"type": "integer"}
+            }
+          }
+        },
+        "double_hits": {
+          "type": "integer",
+          "description": "Senior + Static 양쪽 발견 finding 수 (★★ 격상 후보)."
+        },
+        "drift_detected": {
+          "type": "integer",
+          "description": "이중 렌더링 drift (.json ↔ .mermaid 불일치) 수."
+        }
+      }
+    }
+  }
+}

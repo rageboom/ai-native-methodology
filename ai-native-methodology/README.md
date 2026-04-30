@@ -1,10 +1,10 @@
-# AI-Native 개발 방법론 v1.1.1
+# AI-Native 개발 방법론 v1.2.0
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
-> 
-> 본 v1.1은 **분석 단계(① Analyze)** 의 구현이다.
 >
-> **v1.1.1 갱신 (2026-04-26)**: PoC #01 finding F-003/F-006 해결 — 신뢰도 산정 공식 v1 추가.
+> 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
+>
+> **v1.2.0 갱신 (2026-04-30)**: PoC #01 + #02 누적 결과로 MINOR 격상 — Phase 4.5 형식 명세 정식 도입 (★★★) + ADR-008 이중 렌더링 사상 + finding-system schema 정식화 + antipatterns migration_advice + migration-cautions.md 의무 산출물 격상. 14 묶음 통합.
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
 
 ---
@@ -105,17 +105,27 @@ ai-native-methodology/
 
 ---
 
-## 현재 상태 (v1.1.0 스켈레톤)
+## 현재 상태 (v1.2.0 — Phase 4.5 형식 명세 정식 도입)
+
+### v1.x 누적 (2026-04-26 ~ 2026-04-30)
 
 - ✅ §0~§15 plan.md 완성
-- ✅ 7대 산출물 JSON Schema 완성
-- ✅ 신뢰도 메타데이터 표준 완성
-- ✅ 디렉토리 구조 확정
-- ⏳ 마크다운/Mermaid 템플릿 (다음 단계)
-- ⏳ ADR 5개 초안 (다음 단계)
-- ⏳ 한국어 용어집 (다음 단계)
-- ⏳ Claude Code 플러그인 구현 (M3 단계)
-- ⏳ PoC 적용 (RealWorld example app, M4 단계)
+- ✅ 7대 산출물 + 형식 명세 JSON Schema 11개 완성 (formal-spec / finding-system 신설)
+- ✅ ADR 7개 (001~006 + 008) — ADR-007 OpenAPI x-extension 별도, ADR-009 v1.2.x 후속
+- ✅ Phase 4.5 형식 명세 정식 도입 (state-machine + sequence + decision-table + invariants + property-test)
+- ✅ 한국어 용어집
+- ✅ PoC #01 (RealWorld Spring Boot 2.5) Phase 0~6 종결
+- ✅ PoC #02 (1chz/realworld-java21-springboot3 — SB 3.3 / Java 21 / Multi-module Hexagonal) Phase 1~6 + Phase 4.5 4 sprint 종결
+- ✅ 이중 렌더링 사상 (ADR-008) 정식 등록
+- ✅ migration-cautions.md 의무 산출물 격상
+
+### v1.2.x 후속 (Sprint 4 / 다음)
+
+- ⏳ Drift 자동 검증 CI 도구 (묶음 N)
+- ⏳ 진짜 외부 도구 의무화 (Semgrep / PMD / SpotBugs / Daikon / CodeQL — 묶음 O)
+- ⏳ 본체 갭 P2-3 5건 (api.template.md / phase-flow.mermaid / ADR-009 / db-schema.template.md / meta-confidence.template)
+- ⏳ Claude Code 플러그인 구현
+- ⏳ PoC #03 (다른 stack — FastAPI / NestJS / Ktor)
 
 ---
 

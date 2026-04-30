@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-USER-FOLLOW-NO-SELF-001",
+  "trigger": "POST /api/profiles/{username}/follow 시 follower.id == following.id 검사",
+  "condition": "self-follow 시도 (follower == following)",
+  "action": "거부 (자연어 명시 / 코드 부재 ★ F-074)",
+  "expected_result": "self-follow 차단 — 400 Bad Request",
+  "rejection_method": "throw IllegalArgumentException (Domain — UserFollow 생성자 ★ Sprint 2 형식화 결단)",
+  "verification_location": "Domain (UserFollow 생성자 ★ NEW — F-074 fix) + DB CHECK (★ Sprint 2 cross-validation 격상 권고 — chk_user_follow_no_self)",
+  "http_status": 400,
+  "error_message": "follower and following must be different",
+  "current_state": "absent",
+  "rendered_md_path": "./BR-USER-FOLLOW-NO-SELF-001.md",
+  "round_trip_pattern": "F-074 단방향 (Direction A — 자연어 → 형식 → 코드 / Sprint 1 self-reference 함정 회피)",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44,
+    "explicit_items": [
+      "트리거",
+      "액션",
+      "기대 결과",
+      "현재 상태"
+    ],
+    "missing_items": [
+      "거부 방식 (Exception vs return vs no-op)",
+      "검증 위치 (Service / Domain / DB / Repository)",
+      "HTTP status (400 vs 422)",
+      "에러 메시지",
+      "unfollow 일관성 (self 의 unfollow 도 silent?)"
+    ]
+  },
+  "formalization_decisions": [
+    {
+      "item": "거부 방식",
+      "decision": "IllegalArgumentException",
+      "rationale": "PoC #02 기존 패턴 정합"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "Domain (UserFollow 생성자) + DB CHECK 보강",
+      "rationale": "Hexagonal 정합 + 3중 안전망 (Hibernate byte buddy 우회 / SQL 직접 INSERT 방어)"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "400 (RealWorld 관행 / RFC 9110 §15.5.21 422 가 더 적합하나 관행 우선)",
+      "rationale": "Sprint 2 cross-validation 정정"
+    },
+    {
+      "item": "에러 메시지",
+      "decision": "follower and following must be different",
+      "rationale": "PoC #02 영문 패턴 정합"
+    },
+    {
+      "item": "unfollow 일관성",
+      "decision": "silent (애초에 isFollowing=false 라 자동 NoOp)",
+      "rationale": "기존 idempotent 패턴 정합"
+    }
+  ],
+  "related_findings": [
+    "F-074",
+    "F-088",
+    "F-089",
+    "F-090"
+  ],
+  "code_generation_result": {
+    "userfollow_constructor_added_lines": 4,
+    "db_check_constraint_added_lines": 1,
+    "total_code_change": "1글자 변경급 — 형식화 → 작은 코드 + 강한 invariant"
+  }
+}

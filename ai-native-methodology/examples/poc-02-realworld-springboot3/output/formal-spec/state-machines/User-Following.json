@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/state_machines/items",
+  "aggregate_root": "UserFollow",
+  "id": "User-Following",
+  "initial": "notFollowing",
+  "rendered_mermaid_path": "./User-Following.mermaid",
+  "source_of_truth": "natural_language",
+  "direction": "A",
+  "round_trip_pattern": "F-074 단방향 (코드 부재 → 자연어 → 형식 → 코드 생성)",
+  "evidence_files": [
+    {"path": "ai-native-methodology/examples/poc-02-realworld-springboot3/output/rules/rules.json", "note": "BR-USER-FOLLOW-NO-SELF-001 자연어 명세"},
+    {"path": "ai-native-methodology/examples/poc-02-realworld-springboot3/output/formal-spec/generated-code/UserFollow-with-self-check.java", "note": "Direction D 코드 생성 결과"}
+  ],
+  "related_brs": [
+    "BR-USER-FOLLOW-NO-SELF-001",
+    "BR-USER-FOLLOW-DIRECTIONAL-001",
+    "BR-USER-FOLLOW-IDEMPOTENT-001"
+  ],
+  "states": {
+    "notFollowing": {
+      "on": {
+        "FOLLOW": "validating"
+      }
+    },
+    "validating": {
+      "type": "compound",
+      "on": {
+        "PASS_NEW_FOLLOW": "persisting",
+        "REJECT_SELF_FOLLOW": {
+          "target": "notFollowing",
+          "actions": ["throwIAE_SelfFollow"],
+          "guard": "follower.id == followee.id ★ BR-USER-FOLLOW-NO-SELF-001 (F-074 — 자연어 명시 / 코드 부재)"
+        },
+        "NO_OP_IDEMPOTENT": {
+          "target": "notFollowing",
+          "actions": ["silentReturn"],
+          "guard": "isFollowing(A, B) == true ★ BR-USER-FOLLOW-IDEMPOTENT-001"
+        }
+      }
+    },
+    "persisting": {
+      "type": "compound",
+      "on": {
+        "INSERT_OK": "following",
+        "REJECT_DB_CONSTRAINT": {
+          "target": "notFollowing",
+          "actions": ["propagate500"],
+          "guard": "UQ 위반 (race window) — UQ 만으로 self-follow 차단 ❌"
+        }
+      }
+    },
+    "following": {
+      "on": {
+        "UNFOLLOW": "unfollow",
+        "FOLLOW_AGAIN": {"target": "validating", "guard": "재요청 → idempotent silent return"}
+      }
+    },
+    "unfollow": {
+      "type": "compound",
+      "on": {
+        "DELETE_OK": "notFollowing",
+        "NO_OP_NOT_FOLLOWING": {"target": "notFollowing", "actions": ["silentReturn"], "guard": "isFollowing == false (idempotent)"}
+      }
+    }
+  },
+  "natural_language_gap_quantified": {
+    "explicit_in_natural": 4,
+    "total_decision_points": 9,
+    "coverage_percent": 44,
+    "explicit": ["트리거", "액션", "기대 결과", "현재 상태"],
+    "missing": ["거부 방식", "검증 위치", "HTTP status", "에러 메시지", "unfollow 일관성"]
+  },
+  "formalization_decisions": [
+    {"item": "거부 방식", "decision": "IllegalArgumentException throw"},
+    {"item": "검증 위치", "decision": "Domain (UserFollow 생성자)"},
+    {"item": "HTTP status", "decision": "400 Bad Request (RealWorld 관행)"},
+    {"item": "에러 메시지", "decision": "follower and following must be different"},
+    {"item": "unfollow 일관성", "decision": "self 의 unfollow 도 silent (애초에 isFollowing=false)"}
+  ],
+  "findings": [
+    {"id": "F-074", "summary": "UserFollow self-follow 검증 부재 (자연어 명시 / 코드 부재)"},
+    {"id": "F-088", "summary": "UserFollow 생성자 self-follow 검사 부재 (high)"},
+    {"id": "F-089", "summary": "DB UQ(follower_id, following_id) 가 self-follow 차단 못함 (medium)"},
+    {"id": "F-097", "summary": "UserRelationshipService @Transactional 부재 (high — Senior + Static 양쪽 발견)"}
+  ]
+}
