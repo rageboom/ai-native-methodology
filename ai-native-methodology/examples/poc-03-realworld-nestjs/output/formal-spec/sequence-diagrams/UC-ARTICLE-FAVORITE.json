@@ -1,0 +1,66 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-ARTICLE-FAVORITE",
+  "rendered_mermaid_path": "./UC-ARTICLE-FAVORITE.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "evidence_files": [
+    {"path": "src/article/article.controller.ts"},
+    {"path": "src/article/article.service.ts", "lines": "140-170 favorite/unFavorite"},
+    {"path": "src/article/article.entity.ts", "lines": "favoriteCount column"}
+  ],
+  "related_brs": [
+    "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+    "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001"
+  ],
+  "actors": [
+    {"id": "Authenticated", "type": "user"},
+    {"id": "AuthMiddleware", "type": "middleware"},
+    {"id": "Controller", "type": "controller", "name": "ArticleController"},
+    {"id": "Service", "type": "service", "name": "ArticleService"},
+    {"id": "UserRepo", "type": "repository"},
+    {"id": "ArticleRepo", "type": "repository"},
+    {"id": "DB", "type": "external", "name": "MySQL"}
+  ],
+  "messages": [
+    {"from": "Authenticated", "to": "AuthMiddleware", "label": "POST /api/articles/:slug/favorite", "sync": "sync"},
+    {"from": "AuthMiddleware", "to": "Controller", "label": "req.user 주입", "sync": "sync"},
+    {"from": "Controller", "to": "Service", "label": "favorite(req.user.id, slug)", "sync": "sync"},
+
+    {"from": "Service", "to": "UserRepo", "label": "findOne({where: {id: userId}, relations: ['favorites']})", "sync": "sync"},
+    {"from": "UserRepo", "to": "DB", "label": "SELECT user + JOIN favorites", "sync": "sync"},
+    {"from": "DB", "to": "UserRepo", "label": "user with favorites[]", "sync": "return"},
+    {"from": "UserRepo", "to": "Service", "label": "user", "sync": "return"},
+
+    {"from": "Service", "to": "ArticleRepo", "label": "findOne({where: {slug}, relations: ['comments']})", "sync": "sync", "guard": "★ F-124 N+1 — eager comments"},
+    {"from": "ArticleRepo", "to": "DB", "label": "SELECT article + comments eager", "sync": "sync"},
+    {"from": "DB", "to": "ArticleRepo", "label": "article with comments[]", "sync": "return"},
+    {"from": "ArticleRepo", "to": "Service", "label": "article", "sync": "return"},
+
+    {"from": "Service", "to": "Service", "label": "isNewFavorite = !user.favorites.find(a => a.id === article.id)", "sync": "sync", "guard": "★ App 1중 check"},
+
+    {"from": "Service", "to": "Service", "label": "if (isNewFavorite) { user.favorites.push(article); article.favoriteCount++; }", "sync": "sync", "guard": "★★ F-135 race window — 두 동시 favorite 모두 isNewFavorite=true 통과"},
+
+    {"from": "Service", "to": "UserRepo", "label": "save(user)", "sync": "sync"},
+    {"from": "UserRepo", "to": "DB", "label": "UPDATE user_entity_favorites_article_entity (M:N) + UPDATE article SET favoriteCount=?", "sync": "sync"},
+    {"from": "DB", "to": "UserRepo", "label": "★★ race window 시 favoriteCount += 2 (count != favorites.length)", "sync": "return"},
+
+    {"from": "Service", "to": "ArticleRepo", "label": "save(article)", "sync": "sync"},
+    {"from": "ArticleRepo", "to": "DB", "label": "UPDATE article SET favoriteCount=?", "sync": "sync"},
+
+    {"from": "Service", "to": "Controller", "label": "article (with favorited:true)", "sync": "return"},
+    {"from": "Controller", "to": "Authenticated", "label": "200 OK", "sync": "return"}
+  ],
+  "race_safety_analysis": {
+    "app_idempotent_check": "isNewFavorite (App 1중)",
+    "db_protection": "★ FOR UPDATE 부재 + transaction 명시 부재",
+    "race_window": "★★ F-135 critical — 두 동시 favorite 시 양쪽 isNewFavorite=true 통과 → favoriteCount 2회 증가 / favorites.length 1회 증가 → 단조성 위반",
+    "monotonicity_invariant": "★ favoriteCount == favorites.length (App level만 / DB level 보장 부재)",
+    "industry_standard_violation": "권장: SELECT FOR UPDATE + transaction 또는 atomic UPDATE article SET count = count + 1 WHERE NOT EXISTS (SELECT 1 FROM favorites WHERE ...)"
+  },
+  "findings": [
+    {"id": "F-135", "summary": "★★ critical — favoriteCount race window (App 1중 isNewFavorite check)"},
+    {"id": "F-124", "summary": "★ comments eager:true — N+1 (PoC #02 F-051 cross-val 재현)"},
+    {"id": "F-151", "summary": "신규 — favoriteCount == favorites.length 단조성 invariant App level만 보장"}
+  ]
+}

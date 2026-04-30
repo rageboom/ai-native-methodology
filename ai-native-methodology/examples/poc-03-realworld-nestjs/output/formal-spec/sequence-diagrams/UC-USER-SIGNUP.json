@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-USER-SIGNUP",
+  "rendered_mermaid_path": "./UC-USER-SIGNUP.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "evidence_files": [
+    {"path": "src/user/user.controller.ts", "lines": "32-43 create"},
+    {"path": "src/user/user.service.ts", "lines": "39-77 create"},
+    {"path": "src/user/user.entity.ts", "lines": "@BeforeInsert hashPassword 30-32"},
+    {"path": "src/user/dto/create-user.dto.ts"}
+  ],
+  "related_brs": [
+    "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+    "BR-USER-PASSWORD-HASH-001",
+    "BR-USER-EMAIL-FORMAT-001",
+    "BR-USER-USERNAME-NOT-BLANK-001"
+  ],
+  "actors": [
+    {"id": "Client", "type": "user"},
+    {"id": "ValidationPipe", "type": "framework", "name": "src/shared/pipes/validation.pipe.ts"},
+    {"id": "Controller", "type": "controller", "name": "UserController"},
+    {"id": "Service", "type": "service", "name": "UserService"},
+    {"id": "QueryBuilder", "type": "orm", "name": "TypeORM createQueryBuilder"},
+    {"id": "Entity", "type": "domain", "name": "UserEntity (@BeforeInsert)"},
+    {"id": "Argon2", "type": "external", "name": "argon2.hash"},
+    {"id": "Repository", "type": "repository", "name": "Repository<UserEntity>"},
+    {"id": "DB", "type": "external", "name": "MySQL user 테이블 (★ UQ 부재)"},
+    {"id": "JWT", "type": "external", "name": "jsonwebtoken jwt.sign"}
+  ],
+  "messages": [
+    {"from": "Client", "to": "ValidationPipe", "label": "POST /api/users {user: CreateUserDto}", "sync": "sync"},
+    {"from": "ValidationPipe", "to": "Controller", "label": "validate(CreateUserDto) — @IsNotEmpty", "sync": "sync", "guard": "DTO 단독 검증 (★ class-validator coverage 12%)"},
+    {"from": "Controller", "to": "Service", "label": "create(dto)", "sync": "sync"},
+
+    {"from": "Service", "to": "QueryBuilder", "label": "createQueryBuilder('user').where(username).orWhere(email).getOne()", "sync": "sync", "guard": "★ F-120 App pre-check 1중 (DB UQ 부재)"},
+    {"from": "QueryBuilder", "to": "DB", "label": "SELECT * FROM user WHERE username=? OR email=?", "sync": "sync"},
+    {"from": "DB", "to": "QueryBuilder", "label": "row | null", "sync": "return"},
+    {"from": "QueryBuilder", "to": "Service", "label": "UserEntity | null", "sync": "return"},
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 'Username and email must be unique.' 400", "sync": "return", "guard": "row 존재"},
+    {"from": "Controller", "to": "Client", "label": "400 Bad Request", "sync": "return"},
+
+    {"from": "Service", "to": "Entity", "label": "newUser = new UserEntity(username, email, password)", "sync": "sync", "guard": "row 부재"},
+    {"from": "Service", "to": "Service", "label": "validate(newUser)", "sync": "sync", "guard": "★ class-validator @IsEmail 만 (UserEntity 데코)"},
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 400 (validation errors)", "sync": "return", "guard": "@IsEmail fail"},
+
+    {"from": "Service", "to": "Repository", "label": "save(newUser)", "sync": "sync", "guard": "★★ DB UQ 부재 = 0중 race-safe"},
+    {"from": "Repository", "to": "Entity", "label": "@BeforeInsert hashPassword()", "sync": "sync"},
+    {"from": "Entity", "to": "Argon2", "label": "argon2.hash(this.password)", "sync": "sync"},
+    {"from": "Argon2", "to": "Entity", "label": "$argon2id$... hash", "sync": "return"},
+    {"from": "Entity", "to": "Repository", "label": "(this.password ← hash)", "sync": "return"},
+    {"from": "Repository", "to": "DB", "label": "INSERT INTO user (username, email, password, ...)", "sync": "sync"},
+
+    {"from": "DB", "to": "Repository", "label": "★ 양쪽 INSERT 모두 성공 가능 (race window)", "sync": "return", "guard": "★★ F-120 — DB UQ 부재"},
+    {"from": "DB", "to": "Repository", "label": "1 row inserted", "sync": "return", "guard": "정상 분기"},
+    {"from": "Repository", "to": "Service", "label": "UserEntity (persisted)", "sync": "return"},
+
+    {"from": "Service", "to": "JWT", "label": "jwt.sign({email, exp: now + 60 days}, SECRET)", "sync": "sync", "guard": "BR-USER-JWT-EXPIRY-001 ★ 60일 (F-119)"},
+    {"from": "JWT", "to": "Service", "label": "token", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "{user: {email, username, bio, image, token}}", "sync": "return"},
+    {"from": "Controller", "to": "Client", "label": "201 Created", "sync": "return"}
+  ],
+  "race_safety_analysis": {
+    "app_pre_check_alone": "★ F-120 critical — App 1중 race-prone",
+    "db_uq_alone": "★★ DB UQ 자체 부재 — 0중 race-safe",
+    "current_state": "0중 race-safe (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+    "industry_standard_violation": "OSS Sairyss DDD-Hexagon = 'DB UQ 단독 + catch QueryFailedError → ConflictException' 정설"
+  },
+  "findings": [
+    {"id": "F-120", "summary": "★★ critical — App 1중 race-prone (DB UQ 자체 부재)"},
+    {"id": "F-119", "summary": "JWT 60일 expiry"},
+    {"id": "F-145", "summary": "신규 — DB UQ 추가 + 409 status 격상 권고 (industry 정설)"}
+  ]
+}

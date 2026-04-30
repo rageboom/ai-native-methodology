@@ -1,0 +1,63 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-USER-LOGIN",
+  "rendered_mermaid_path": "./UC-USER-LOGIN.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "rationale": "★ Senior 권고 D1+D3 추가 — JWT 발급 흐름이 NestJS Passport ↔ Spring Security cross-platform 핵심 검증 데이터 (PoC #02 UC-USER-LOGIN 부재 → 첫 비교 데이터)",
+  "evidence_files": [
+    {"path": "src/user/user.controller.ts", "lines": "45-58 login"},
+    {"path": "src/user/user.service.ts", "lines": "21-35 findOne / 103-110 generateJWT"},
+    {"path": "src/user/dto/login-user.dto.ts"}
+  ],
+  "related_brs": [
+    "BR-USER-LOGIN-VERIFY-001",
+    "BR-USER-JWT-EXPIRY-001",
+    "BR-USER-PASSWORD-NOT-BLANK-001"
+  ],
+  "actors": [
+    {"id": "Client", "type": "user"},
+    {"id": "ValidationPipe", "type": "framework"},
+    {"id": "Controller", "type": "controller", "name": "UserController"},
+    {"id": "Service", "type": "service", "name": "UserService"},
+    {"id": "Repository", "type": "repository", "name": "Repository<UserEntity>"},
+    {"id": "DB", "type": "external", "name": "MySQL user"},
+    {"id": "Argon2", "type": "external", "name": "argon2.verify"},
+    {"id": "JWT", "type": "external", "name": "jwt.sign"}
+  ],
+  "messages": [
+    {"from": "Client", "to": "ValidationPipe", "label": "POST /api/users/login {user: LoginUserDto}", "sync": "sync"},
+    {"from": "ValidationPipe", "to": "Controller", "label": "@IsNotEmpty 검증", "sync": "sync"},
+    {"from": "Controller", "to": "Service", "label": "findOne({email, password: plain})", "sync": "sync", "guard": "★ NestJS Passport ❌ — manual auth"},
+
+    {"from": "Service", "to": "Repository", "label": "findOne({where: {email}})", "sync": "sync"},
+    {"from": "Repository", "to": "DB", "label": "SELECT * FROM user WHERE email=?", "sync": "sync"},
+    {"from": "DB", "to": "Repository", "label": "row | null", "sync": "return"},
+    {"from": "Repository", "to": "Service", "label": "UserEntity | null", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 'User not found' 401", "sync": "return", "guard": "row null"},
+    {"from": "Controller", "to": "Client", "label": "401 Unauthorized", "sync": "return"},
+
+    {"from": "Service", "to": "Argon2", "label": "argon2.verify(user.password, plainPassword)", "sync": "sync"},
+    {"from": "Argon2", "to": "Service", "label": "boolean", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 'User not found' 401", "sync": "return", "guard": "★ verify=false → 메시지가 password mismatch 도 포괄 (모호 — F-150 신규)"},
+    {"from": "Controller", "to": "Client", "label": "401 Unauthorized", "sync": "return"},
+
+    {"from": "Service", "to": "JWT", "label": "jwt.sign({email, exp: now+60days})", "sync": "sync", "guard": "★ F-118 / F-119 verify 무방어 + 60일"},
+    {"from": "JWT", "to": "Service", "label": "token", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "{user: {email, username, bio, image, token}}", "sync": "return"},
+    {"from": "Controller", "to": "Client", "label": "200 OK", "sync": "return"}
+  ],
+  "cross_platform_diff": {
+    "poc02_spring_security": "Spring Security UsernamePasswordAuthenticationToken + AuthenticationManager + UserDetailsService — framework-managed",
+    "poc03_nestjs_manual": "★ NestJS Passport ❌ — manual findOne + argon2.verify (★ AP-AUTH-NEST-001 critical 후보)",
+    "industry_standard_violation": "NestJS 7 권장 = @nestjs/passport + passport-jwt + JwtAuthGuard (학습 코퍼스 합의)"
+  },
+  "findings": [
+    {"id": "F-118", "summary": "JWT verify 3곳 try/catch 부재 + DRY 위반"},
+    {"id": "F-119", "summary": "JWT 60일 expiry"},
+    {"id": "F-150", "summary": "신규 — 'User not found' 메시지가 password mismatch 도 포괄 (정보 노출 회피 의도일 수 있으나 별도 메시지 권고)"}
+  ]
+}

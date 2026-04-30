@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-USER-DELETE",
+  "rendered_mermaid_path": "./UC-USER-DELETE.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "evidence_files": [
+    {"path": "src/user/user.controller.ts", "lines": "39 @Delete /:slug"},
+    {"path": "src/user/user.service.ts", "lines": "85-90 delete"},
+    {"path": "src/user/user.module.ts", "lines": "17 forRoutes ★ DELETE 누락"},
+    {"path": "src/user/auth.middleware.ts"}
+  ],
+  "related_brs": [
+    "BR-USER-DELETE-AUTH-001"
+  ],
+  "actors": [
+    {"id": "Anyone", "type": "user", "comment": "★★ F-140 critical — anonymous 도 가능"},
+    {"id": "Controller", "type": "controller", "name": "UserController"},
+    {"id": "AuthMiddleware", "type": "middleware", "name": "★ MISSING (forRoutes DELETE 누락)"},
+    {"id": "Service", "type": "service", "name": "UserService"},
+    {"id": "Repository", "type": "repository", "name": "Repository<UserEntity>"},
+    {"id": "DB", "type": "external", "name": "MySQL user"}
+  ],
+  "messages": [
+    {"from": "Anyone", "to": "Controller", "label": "DELETE /api/users/:slug (★ slug param 사용)", "sync": "sync", "guard": "★★ Auth 부재"},
+
+    {"from": "Controller", "to": "AuthMiddleware", "label": "(★ 호출 안 됨 — F-140)", "sync": "sync", "guard": "★★ user.module.ts forRoutes DELETE 누락"},
+    {"from": "AuthMiddleware", "to": "Controller", "label": "(★ 무관 — bypass)", "sync": "return"},
+
+    {"from": "Controller", "to": "Service", "label": "delete({email: req.params.slug})", "sync": "sync", "guard": "★ slug → email mapping (param naming 혼란)"},
+
+    {"from": "Service", "to": "Repository", "label": "delete({email})", "sync": "sync"},
+    {"from": "Repository", "to": "DB", "label": "DELETE FROM user WHERE email=?", "sync": "sync"},
+    {"from": "DB", "to": "Repository", "label": "affected: 0 | 1", "sync": "return"},
+    {"from": "Repository", "to": "Service", "label": "DeleteResult", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "result", "sync": "return", "guard": "★ 소유권 검증 부재 — 누구나 누구나 삭제 가능"},
+    {"from": "Controller", "to": "Anyone", "label": "200 OK (★ silent — affected:0 도 200)", "sync": "return"}
+  ],
+  "auth_scope_analysis": {
+    "auth_middleware_applied": "★ user.module.ts forRoutes 에 DELETE 누락",
+    "ownership_check": "★★ 부재 — req.user.email !== req.params.slug 체크 부재 (자체가 req.user 없음)",
+    "actor_can_be": "anonymous (Auth bypass) → cascade 영향: articles / favorites / follows / comments 모두 orphan",
+    "industry_standard_violation": "NestJS 7+ 권장 = @UseGuards(JwtAuthGuard) + ownership check (NestJS 공식 sub-agent §1)"
+  },
+  "findings": [
+    {"id": "F-140", "summary": "★★ critical — UC-USER-DELETE 가 AuthMiddleware 미적용 (user.module.ts forRoutes DELETE 누락)"},
+    {"id": "F-146", "summary": "신규 — 소유권 검증 부재 (자기 자신만 삭제 가능 보장 부재)"},
+    {"id": "F-152", "summary": "신규 — slug parameter 가 실제로 email 사용 (param naming 혼란)"}
+  ]
+}

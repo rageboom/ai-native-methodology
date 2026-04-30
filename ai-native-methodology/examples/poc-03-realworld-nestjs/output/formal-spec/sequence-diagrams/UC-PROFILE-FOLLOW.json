@@ -1,0 +1,68 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
+  "uc_id": "UC-PROFILE-FOLLOW",
+  "rendered_mermaid_path": "./UC-PROFILE-FOLLOW.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "evidence_files": [
+    {"path": "src/profile/profile.controller.ts"},
+    {"path": "src/profile/profile.service.ts", "lines": "30-65 follow / 67-90 unFollow"},
+    {"path": "src/profile/follows.entity.ts"}
+  ],
+  "related_brs": [
+    "BR-FOLLOWS-NO-SELF-001",
+    "BR-FOLLOWS-PAIR-UNIQUE-001",
+    "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001"
+  ],
+  "actors": [
+    {"id": "Authenticated", "type": "user"},
+    {"id": "AuthMiddleware", "type": "middleware"},
+    {"id": "Controller", "type": "controller", "name": "ProfileController"},
+    {"id": "Service", "type": "service", "name": "ProfileService"},
+    {"id": "UserRepo", "type": "repository", "name": "Repository<UserEntity>"},
+    {"id": "FollowsRepo", "type": "repository", "name": "Repository<FollowsEntity>"},
+    {"id": "DB", "type": "external", "name": "MySQL"}
+  ],
+  "messages": [
+    {"from": "Authenticated", "to": "AuthMiddleware", "label": "POST /api/profiles/:username/follow", "sync": "sync"},
+    {"from": "AuthMiddleware", "to": "Controller", "label": "req.user 주입", "sync": "sync"},
+    {"from": "Controller", "to": "Service", "label": "follow(req.user.email, req.params.username)", "sync": "sync"},
+
+    {"from": "Service", "to": "Service", "label": "if (!followerEmail || !username)", "sync": "sync", "guard": "BR-FOLLOWER-OR-USERNAME-PRESENT-001"},
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 'follower or username not provided' 400", "sync": "return", "guard": "null"},
+
+    {"from": "Service", "to": "UserRepo", "label": "findOne({where: {email: followerEmail}})", "sync": "sync"},
+    {"from": "UserRepo", "to": "DB", "label": "SELECT * FROM user WHERE email=?", "sync": "sync"},
+    {"from": "DB", "to": "UserRepo", "label": "follower row", "sync": "return"},
+    {"from": "UserRepo", "to": "Service", "label": "follower: UserEntity", "sync": "return"},
+
+    {"from": "Service", "to": "UserRepo", "label": "findOne({where: {username}})", "sync": "sync"},
+    {"from": "UserRepo", "to": "DB", "label": "SELECT * FROM user WHERE username=?", "sync": "sync"},
+    {"from": "DB", "to": "UserRepo", "label": "following row", "sync": "return"},
+    {"from": "UserRepo", "to": "Service", "label": "following: UserEntity", "sync": "return"},
+
+    {"from": "Service", "to": "Service", "label": "if (follower.email === following.email)", "sync": "sync", "guard": "★ F-144 — email 비교 (Domain 검증 ❌)"},
+    {"from": "Service", "to": "Controller", "label": "throw HttpException 'FollowerEmail and FollowingId cannot be equal' 400", "sync": "return", "guard": "self"},
+
+    {"from": "Service", "to": "FollowsRepo", "label": "findOne({where: {followerId, followingId}})", "sync": "sync"},
+    {"from": "FollowsRepo", "to": "DB", "label": "SELECT * FROM follows WHERE followerId=? AND followingId=?", "sync": "sync"},
+    {"from": "DB", "to": "FollowsRepo", "label": "_follows: FollowsEntity | null", "sync": "return"},
+
+    {"from": "Service", "to": "FollowsRepo", "label": "save(new FollowsEntity(followerId, followingId))", "sync": "sync", "guard": "★ if (!_follows) — App 1중 idempotent"},
+    {"from": "FollowsRepo", "to": "DB", "label": "INSERT INTO follows", "sync": "sync"},
+    {"from": "DB", "to": "FollowsRepo", "label": "★★ FK 부재 (F-121) + UQ pair 부재 → race window 시 중복 row 잠입", "sync": "return"},
+
+    {"from": "Service", "to": "Controller", "label": "{profile: {...}}", "sync": "return"},
+    {"from": "Controller", "to": "Authenticated", "label": "200 OK", "sync": "return"}
+  ],
+  "consistency_analysis": {
+    "follow_self_check": "follower.email === following.email (string)",
+    "unfollow_self_check": "★ F-144 — followerId === followingId (number) — 차원 불일치",
+    "domain_invariant": "★ 부재 — Service 만 검증, Domain (FollowsEntity 생성자) 검증 ❌"
+  },
+  "findings": [
+    {"id": "F-144", "summary": "★ self-check 차원 불일치 — follow=email / unFollow=id"},
+    {"id": "F-121", "summary": "★ FK 부재 + UQ pair 부재 — race window 시 중복 row"},
+    {"id": "F-147", "summary": "신규 — Domain invariant (FollowsEntity 생성자 검증) 부재 — Sairyss DDD-Hexagon 위반"}
+  ]
+}

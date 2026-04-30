@@ -1,0 +1,42 @@
+%% PoC #03 — UC-USER-DELETE Sequence Diagram (Phase 4.5)
+%% ★★ F-140 critical — AuthMiddleware 미적용으로 anonymous 삭제 가능
+%% 일자: 2026-04-30
+%% Source of Truth: 코드 (src/user/user.{controller,service,module}.ts + auth.middleware.ts)
+%% Direction: B (코드 → L1)
+
+sequenceDiagram
+    autonumber
+    actor Anyone as Anyone<br/>★★ anonymous 가능
+    participant Controller as UserController
+    participant AuthMiddleware as AuthMiddleware<br/>★ MISSING<br/>(forRoutes DELETE 누락)
+    participant Service as UserService
+    participant Repository as Repository<UserEntity>
+    participant DB as MySQL user
+
+    Anyone->>Controller: DELETE /api/users/:slug<br/>(★ slug param = email)
+
+    rect rgb(255, 200, 200)
+        Note over Controller,AuthMiddleware: ★★ F-140 critical — Auth bypass
+        Controller-xAuthMiddleware: (★ 호출 안 됨)
+        AuthMiddleware-->>Controller: (★ 무관 — bypass)
+    end
+
+    Controller->>Service: delete({email: req.params.slug})
+
+    rect rgb(255, 240, 230)
+        Note over Service,DB: 소유권 검증 부재 (req.user 없음)
+        Service->>Repository: delete({email})
+        Repository->>DB: DELETE FROM user WHERE email=?
+        DB-->>Repository: affected: 0 | 1
+        Repository-->>Service: DeleteResult
+    end
+
+    Service-->>Controller: result
+    Controller-->>Anyone: 200 OK<br/>(★ silent — affected:0 도 200)
+
+    Note over Anyone,DB: ★★ Cascade 영향 (F-140 사내 적용 시 즉시 수정 의무)
+    Note over Anyone,DB: articles.author_id → orphan
+    Note over Anyone,DB: favorites → orphan
+    Note over Anyone,DB: follows.followerId/followingId → orphan (FK 부재 F-121)
+    Note over Anyone,DB: comments → orphan
+    Note over Anyone,DB: industry 정설: @UseGuards(JwtAuthGuard) + ownership check

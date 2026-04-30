@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-FOLLOWS-PAIR-UNIQUE-001",
+  "trigger": "POST /api/profiles/:username/follow",
+  "condition": "(followerId, followingId) pair 가 follows 에 이미 존재",
+  "action": "if (!_follows) save (App 1중 idempotent)",
+  "expected_result": "중복 follow X (idempotent)",
+  "rejection_method": "service if 분기 (silent skip)",
+  "verification_location": "★ Service 1중 / DB UQ pair 부재 / FK 부재 (F-121)",
+  "http_status": 200,
+  "error_message": "(silent — 중복 시 200 OK)",
+  "current_state": "★ partial — App 1중 race-prone (DB UQ pair + FK 자체 부재)",
+  "rendered_md_path": "./BR-FOLLOWS-PAIR-UNIQUE-001.md",
+  "round_trip_pattern": "B (코드 → 형식)",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44,
+    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "missing_items": [
+      "거부 방식 (silent skip vs 409 Conflict)",
+      "검증 위치 (Service / DB UQ pair / FK)",
+      "HTTP status (200 silent vs 409)",
+      "에러 메시지 (현재 부재)",
+      "race window 처리 (현재 = undefined behavior)"
+    ]
+  },
+  "formalization_decisions": [
+    {"item": "거부 방식", "decision": "App pre-check 제거 + DB UQ pair + catch QueryFailedError → silent (idempotent)", "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe + idempotent 보장"},
+    {"item": "검증 위치", "decision": "DB UQ (followerId, followingId) + FK 양쪽 user.id 참조", "rationale": "★ F-121 fix — race-safe"},
+    {"item": "HTTP status", "decision": "200 (idempotent — 기존 정합) / 409 ❌ (idempotent semantic 위반)", "rationale": "RealWorld API 관행 + REST idempotent"},
+    {"item": "에러 메시지", "decision": "(silent — 메시지 부재 정합)", "rationale": "idempotent endpoint"},
+    {"item": "race window 처리", "decision": "★★ DB UQ pair 추가 + catch → silent skip", "rationale": "현재 = race window 시 중복 row 잠입"}
+  ],
+  "related_findings": ["F-121", "F-148"]
+}

@@ -1,0 +1,64 @@
+%% PoC #03 — UC-ARTICLE-FAVORITE Sequence Diagram (Phase 4.5)
+%% ★★ F-135 critical — favoriteCount race window
+%% 일자: 2026-04-30
+%% Source of Truth: 코드 (src/article/article.service.ts:140-170)
+%% Direction: B (코드 → L1)
+
+sequenceDiagram
+    autonumber
+    actor Authenticated
+    participant AuthMiddleware
+    participant Controller as ArticleController
+    participant Service as ArticleService
+    participant UserRepo
+    participant ArticleRepo
+    participant DB as MySQL
+
+    Authenticated->>AuthMiddleware: POST /api/articles/:slug/favorite
+    AuthMiddleware->>Controller: req.user 주입
+    Controller->>Service: favorite(req.user.id, slug)
+
+    rect rgb(255, 240, 230)
+        Note over Service,DB: User + favorites 로드
+        Service->>UserRepo: findOne(userId, relations:['favorites'])
+        UserRepo->>DB: SELECT user + JOIN favorites
+        DB-->>UserRepo: user with favorites[]
+        UserRepo-->>Service: user
+
+        Note over Service,ArticleRepo: ★ F-124 — eager comments N+1
+        Service->>ArticleRepo: findOne({where:{slug}, relations:['comments']})
+        ArticleRepo->>DB: SELECT article + comments eager
+        DB-->>ArticleRepo: article with comments[]
+        ArticleRepo-->>Service: article
+    end
+
+    rect rgb(255, 200, 200)
+        Note over Service,Service: ★★ F-135 critical — favoriteCount race window
+        Service->>Service: isNewFavorite =<br/>!user.favorites.find(a => a.id === article.id)
+
+        alt isNewFavorite = true
+            Note over Service: ★★ 두 동시 favorite 모두 isNewFavorite=true 통과<br/>(App 1중 check / DB FOR UPDATE 부재)
+            Service->>Service: user.favorites.push(article)<br/>article.favoriteCount++
+        else 이미 favorited
+            Note over Service: silent skip (idempotent)
+        end
+    end
+
+    rect rgb(255, 230, 240)
+        Note over Service,DB: 단조성 위반 가능
+        Service->>UserRepo: save(user)
+        UserRepo->>DB: UPDATE user_favorites M:N
+        Service->>ArticleRepo: save(article)
+        ArticleRepo->>DB: UPDATE article SET favoriteCount=?
+
+        alt race window
+            Note over DB: ★★ favoriteCount += 2<br/>favorites.length += 1<br/>★ 단조성 invariant 위반
+        end
+    end
+
+    Service-->>Controller: article (favorited:true)
+    Controller-->>Authenticated: 200 OK
+
+    Note over Authenticated,DB: ★ INV — favoriteCount == favorites.length
+    Note over Authenticated,DB: App level 보장만 / DB level FOR UPDATE 부재
+    Note over Authenticated,DB: 권장: atomic UPDATE WHERE NOT EXISTS / FOR UPDATE

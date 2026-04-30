@@ -1,0 +1,85 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/state_machines/items",
+  "aggregate_root": "Follows",
+  "id": "Follows",
+  "initial": "not_following",
+  "rendered_mermaid_path": "./Follows.mermaid",
+  "source_of_truth": "code",
+  "direction": "B",
+  "evidence_files": [
+    {"path": "src/profile/profile.service.ts"},
+    {"path": "src/profile/follows.entity.ts"},
+    {"path": "src/profile/profile.controller.ts"}
+  ],
+  "related_brs": [
+    "BR-FOLLOWS-NO-SELF-001",
+    "BR-FOLLOWS-PAIR-UNIQUE-001",
+    "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001"
+  ],
+  "states": {
+    "not_following": {
+      "on": {
+        "FOLLOW_REQUEST": {"target": "validatingFollow", "actions": ["startFollowFlow"]},
+        "UNFOLLOW_REQUEST": {"target": "not_following", "actions": ["silent NoOp (deleteIndex < 0)"], "guard": "기존 idempotent 패턴"}
+      }
+    },
+    "validatingFollow": {
+      "type": "compound",
+      "on": {
+        "PRESENT_PASS": "checkingSelf",
+        "REJECT_NULL": {"target": "not_following", "actions": ["throw HttpException 'follower or username not provided'"], "guard": "follower==null OR username==null"}
+      }
+    },
+    "checkingSelf": {
+      "type": "compound",
+      "on": {
+        "NOT_SELF": "checkingPairUnique",
+        "REJECT_SELF": {"target": "not_following", "actions": ["throw HttpException 'FollowerEmail and FollowingId cannot be equal'"], "guard": "★ F-144 — follower.email == following.email (이메일 비교)"}
+      }
+    },
+    "checkingPairUnique": {
+      "type": "compound",
+      "on": {
+        "NEW_PAIR": "persistingFollow",
+        "ALREADY_FOLLOWING": {"target": "following", "actions": ["silent skip (idempotent)"], "guard": "if (!_follows) save — App 1중"}
+      }
+    },
+    "persistingFollow": {
+      "type": "compound",
+      "on": {
+        "INSERT_OK": "following",
+        "RACE_WINDOW": {"target": "following", "actions": ["★★ FK 부재 (F-121) + UQ pair 부재 → 양쪽 row INSERT 성공 = 중복 follows row"], "guard": "★ App 1중 + DB 0중"}
+      }
+    },
+    "following": {
+      "on": {
+        "UNFOLLOW_REQUEST": {"target": "validatingUnfollow", "actions": ["startUnfollowFlow"]},
+        "FOLLOW_REQUEST_DUP": {"target": "following", "actions": ["silent skip — idempotent"]}
+      }
+    },
+    "validatingUnfollow": {
+      "type": "compound",
+      "on": {
+        "PRESENT_PASS": "checkingSelfId",
+        "REJECT_NULL": {"target": "following", "actions": ["throw HttpException 'follower or username not provided'"]}
+      }
+    },
+    "checkingSelfId": {
+      "type": "compound",
+      "on": {
+        "NOT_SELF_ID": "deletingFollow",
+        "REJECT_SELF_ID": {"target": "following", "actions": ["throw HttpException 'FollowerId and FollowingId cannot be equal'"], "guard": "★ F-144 일관성 결여 — follow=email 비교 / unFollow=id 비교 / 검증 차원 불일치"}
+      }
+    },
+    "deletingFollow": {
+      "on": {
+        "DELETE_OK": {"target": "not_following", "actions": ["repository.delete(_follows)"]}
+      }
+    }
+  },
+  "findings": [
+    {"id": "F-121", "summary": "★★ FK 부재 (followerId / followingId 가 user.id 참조 ❌) + (followerId, followingId) UQ pair 부재"},
+    {"id": "F-144", "summary": "★ self-check 차원 불일치 — follow = email 비교 / unFollow = id 비교 (Domain invariant 부재)"},
+    {"id": "F-138", "summary": "FollowsEntity 위치 모호 — profile/ vs user/ (Aggregate Root 약함)"}
+  ]
+}

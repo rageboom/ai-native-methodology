@@ -28,7 +28,9 @@
 | **묶음 M-P2-3** | 본체 갭 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yml | ✅ **본 세션** |
 | **C-Sprint 5** | (carry-over — 환경 의존) static tool 실 실행 1회 + drift-validator transitionFuzzyMatch 보완 + corpus 4쌍→20쌍 + ADR-010 격상 | ⏳ 환경 준비 후 |
 | **시퀀스 B — PoC #03 NestJS** | Phase 0~4 종결 (Phase 4.5+ carry) | 🔄 **진행 중** |
-| 시퀀스 B Phase 4.5+ | Phase 4.5 형식 명세 (★ drift-validator + decision-table-validator 첫 외부 검증) → 5-1 → 6 | ⏳ **다음** |
+| **시퀀스 B Phase 4.5 산출** | 5 산출물 37 파일 (state-machine 6 + sequence 12 + decision-table 12 + invariants 3 + property 3 + manifest 1) + PROGRESS — D1~D6 권고 안 채택 (BR 6 / AR 3 / UC 6 / Sairyss antipattern 권고 / 신뢰도 70-77% / false negative 우선) | ✅ **본 세션 (2026-04-30)** |
+| 시퀀스 B Phase 4.5 검증 | drift-validator + decision-table-validator 자동 실행 + DEC 종결 + finding F-145~F-153 통합 | ⏳ **carry-over (다음 세션)** |
+| 시퀀스 B Phase 5-1 + 6 | api (openapi.yaml + extension) → antipatterns final (8 candidate → 정식 + composite view) | ⏳ Phase 4.5 검증 후 |
 
 ---
 

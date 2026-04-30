@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+  "trigger": "POST /api/users (signup) — username 또는 email 입력",
+  "condition": "username 또는 email 이 DB user 테이블에 이미 존재 (race window 가능)",
+  "action": "App pre-check (createQueryBuilder username OR email) → DB INSERT (★ DB UQ 자체 부재)",
+  "expected_result": "중복 시 400 'Username and email must be unique.' (현재) / 권장 = 409 Conflict (RFC 9110 §15.5.10)",
+  "rejection_method": "throw HttpException 400 (Service 단)",
+  "verification_location": "Service (UserService.create:47) ★ App 1중 / Domain ❌ / DB ❌ (UQ 부재 — F-120)",
+  "http_status": 400,
+  "error_message": "Username and email must be unique.",
+  "current_state": "★ partial — App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+  "rendered_md_path": "./BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
+  "round_trip_pattern": "B (코드 → 형식) — 자연어 빈약 보완",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44,
+    "explicit_items": ["트리거", "액션", "기대 결과", "현재 상태"],
+    "missing_items": [
+      "거부 방식 (HttpException vs return null vs throw 의 차이)",
+      "검증 위치 (Service / Domain / DB UQ — 본 PoC = Service only)",
+      "HTTP status (400 vs 409 — RFC 9110 §15.5.10 권장 409)",
+      "에러 메시지 분리 (username vs email 별 차이 fail)",
+      "race window 처리 (현재 = undefined behavior)"
+    ]
+  },
+  "formalization_decisions": [
+    {"item": "거부 방식", "decision": "throw HttpException 400 (현재) / 권장 = 409 ConflictException", "rationale": "RealWorld API 관행 + RFC 9110 권장"},
+    {"item": "검증 위치", "decision": "현재 Service 만 / 권장 = DB UQ 단독 + catch QueryFailedError → ConflictException", "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe"},
+    {"item": "HTTP status", "decision": "400 (현재) / 권장 = 409", "rationale": "RFC 9110 §15.5.10 — 정확한 의미"},
+    {"item": "에러 메시지", "decision": "분리 권장 — 'Username already exists' / 'Email already exists' / 'Both already exist'", "rationale": "Senior Engineer ★ medium (PoC #02 Sprint 1.5 동일 발견)"},
+    {"item": "race window 처리", "decision": "★★ DB UQ 추가 + catch + ConflictException 변환", "rationale": "현재 = undefined behavior (F-120 critical)"}
+  ],
+  "related_findings": ["F-120", "F-145", "F-150"]
+}
