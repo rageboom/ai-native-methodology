@@ -9,7 +9,8 @@
   "verification_location": "★ Service 1중 / DB UQ pair 부재 / FK 부재 (F-121)",
   "http_status": 200,
   "error_message": "(silent — 중복 시 200 OK)",
-  "current_state": "★ partial — App 1중 race-prone (DB UQ pair + FK 자체 부재)",
+  "current_state": "partial",
+  "current_state_note": "★ App 1중 race-prone (DB UQ pair + FK 자체 부재)",
   "rendered_md_path": "./BR-FOLLOWS-PAIR-UNIQUE-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {

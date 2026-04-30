@@ -9,7 +9,8 @@
   "verification_location": "Service (UserService.create:47) ★ App 1중 / Domain ❌ / DB ❌ (UQ 부재 — F-120)",
   "http_status": 400,
   "error_message": "Username and email must be unique.",
-  "current_state": "★ partial — App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+  "current_state": "partial",
+  "current_state_note": "★ App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
   "rendered_md_path": "./BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
   "round_trip_pattern": "B (코드 → 형식) — 자연어 빈약 보완",
   "natural_language_gap_quantified": {

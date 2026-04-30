@@ -44,15 +44,132 @@
 
 **총 36 + manifest = 37 파일 ✅** (D1+D3 권고 정합 — 원안 33 → 37 확장).
 
-### [14:00 KST] 본 세션 종결 + carry-over 명시
+### [14:00 KST] 직전 세션 종결 + carry-over 명시
 
-- ★ **drift-validator + decision-table-validator 자동 실행 carry-over** (다음 세션)
+- ★ **drift-validator + decision-table-validator 자동 실행 carry-over** (다음 세션) — ✅ **2026-04-30 후속 세션에서 종결**
 - ★ Static tool 환경 부재 (Semgrep/typescript-eslint/OSV-Scanner) — Sprint 5 carry-over
 - 사용자 명시: "여기까지 일단 작업 끝내고 이어서 가능한가" → carry-over 절차 정리
 
 ---
 
-## ★ 다음 세션 재개점 (carry-over)
+## 2026-04-30 (후속 세션 — carry-over Step 1~3 종결)
+
+### [재개 후 30분] 4원칙 1단계 — plan 작성
+
+- 본 plan: `.claude/plans/plan-poc03-phase4.5-validation.md` ✅
+- scope: drift + dmn 자동 실행 + finding 통합 + DEC 종결. 다이어그램 mermaid 보강은 별 carry-over (Phase 4.5+1) 로 push (K3 권고 부분 변경).
+
+### [재개 후 35분] 4원칙 2단계 — research 생략 (가벼운 sub-agent 전략 / K1 권고 채택)
+
+- 본 단계 = 자동 실행 + 결과 분류 → 새 설계 ❌ → research 불필요
+- memory `feedback_lightweight_sub_agent.md` 정합
+
+### [재개 후 40분] 4원칙 3단계 — 일괄 승인 (K1~K6)
+
+- K1~K5: 권고 채택 ✅
+- K6: Sprint 5 carry-over 유지 ✅ (transitionFuzzyMatch 보완)
+
+### [재개 후 50분] 4원칙 4단계 — Step A~F 실행
+
+- **Step A** — `npm install` × 2 (drift + dmn) ✅ + unit test 13/13 통과
+- **Step B** — drift-validator 실행 (9 짝) ✅
+  - **결과**: 20 breaking / 2 non-breaking / 44 info / exit code 1
+  - 분류: 진짜 drift 8건 (다이어그램 보강 carry-over) + 도구 한계 12건 (F-117 재발 = F-154 신규)
+- **Step C** — decision-table-validator 실행 (6 BR) ✅
+  - **1차**: 6 breaking (모두 current_state enum 위반)
+  - **fix**: 6 BR JSON 의 current_state → 순수 enum 값 ("partial" / "absent") + current_state_note 신규 필드
+  - **2차 ✅**: 0 breaking / 0 non-breaking / 0 info / exit code 0
+- **Step D** — 결과 분류 ✅ (`output/formal-spec/.validation/SUMMARY.md`)
+- **Step E** — 신규 finding F-154/F-155/F-156 등록 ✅
+- **Step F** — `_manifest.yml` 갱신 ✅ (trust_level 0.70 → 0.77 / current_step 2 → 2.5 / cross_validation status executed / exit_criteria 갱신)
+- **Step G** — DEC 작성 (다음 단계)
+- **Step H** — STATUS.md 갱신 (다음 단계)
+
+---
+
+## ★ 신규 finding (F-154 ~ F-156)
+
+| ID | severity | 핵심 |
+|---|---|---|
+| **F-154** | medium | drift-validator transitionFuzzyMatch 한계 재발 — 60% false positive (★★ Sprint 5 보완 우선순위 격상 핵심 데이터) |
+| **F-155** | low | drift sequence `-x`/`-)` 변종 화살표 미인식 |
+| **F-156** | low | decision-table current_state 한국어 prefix → enum 위반 (6 BR 모두 / fix 완료) |
+
+---
+
+## ★ 신뢰도 변동
+
+| 시점 | 값 | 단계 | 변동 사유 |
+|---|---|---|---|
+| 직전 세션 종결 | 0.70 | 단계 2 | drift + dmn carry-over (-10p) |
+| 본 세션 종결 | **0.77** | **단계 2.5** | drift + dmn 실행 +10p / drift breaking 1+ -3p (다이어그램 보강 carry-over) |
+| Phase 4.5+1 종결 후 (예상) | 0.80 | 단계 3 | 다이어그램 8건 보강 |
+| Sprint 5 종결 후 (예상) | 0.85 | 단계 3+ | 진짜 static tool + transitionFuzzyMatch 보완 |
+
+---
+
+## 결정 / 블로커 / 교훈 (본 세션 추가)
+
+### 결정
+
+- ★ 다이어그램 mermaid 보강 (진짜 drift 8건) = **별 carry-over (Phase 4.5+1)** 로 push (K3 권고 부분 변경)
+- ★ current_state enum fix = 본 세션 즉시 (1줄 fix)
+
+### 블로커
+
+- 없음 (모든 도구 정상 작동)
+
+### 교훈 (Lessons Learned)
+
+- ★★ **drift-validator 60% false positive** = compound state 안 sub-state transition 매칭 한계 노출. 본 PoC 의 다이어그램이 nested compound state 표현 풍부 → 도구 한계 격상 입증.
+- ★★ **dmn-check enum 위반 자동 검출 ROI** ★ = 6 BR 모두 한국어 prefix 사용 (PoC #02 동일 패턴 의심) → schema 검증 자동화 본 검증 도구의 핵심 가치.
+- ★ Mermaid mermaid 측이 sub-state 풍부 표현 vs JSON 의 compound state 표기 = 의도된 패턴이나 도구 매칭은 한계 → corpus 4 → 20쌍 확장 필요 (Sprint 5 carry-over).
+
+---
+
+## ★ 다음 세션 재개점 (carry-over — 1차 종결 후 신규)
+
+### Phase 5-1 (api) 진입
+
+```
+output/api/
+├── openapi.yaml
+├── api-extension.json
+├── api.md
+└── _manifest.yml
+```
+
+### Phase 4.5+1 (다이어그램 보강 — 진짜 drift 8건 fix)
+
+| 파일 | 보강 |
+|---|---|
+| Article.mermaid | `state PersistingArticle { ... }` 블록 + 3 self-loop |
+| User.mermaid | `state ValidatingLogin { ... }` 블록 |
+| Follows.mermaid | following self-loop (follow_request_dup) |
+| UC-ARTICLE-CREATE.mermaid | service self-message |
+| UC-USER-SIGNUP.mermaid | entity-return arrow |
+
+### Sprint 5 (환경 의존 — 사용자 환경 변동 시)
+
+- transitionFuzzyMatch 보완 (F-154) — corpus 4쌍 → 20쌍 확장 + ADR-010 격상
+- Semgrep/typescript-eslint/OSV-Scanner 진짜 실행 (1회)
+
+---
+
+## ★ 직전 세션 carry-over 진행 표 (1차 → 본 세션)
+
+| Step | 기존 carry-over | 본 세션 |
+|---|---|---|
+| Step 1 — drift + dmn 실행 | 다음 세션 | ✅ 종결 |
+| Step 2 — finding 등록 + manifest | 다음 세션 | ✅ 종결 (F-154/155/156 + manifest 갱신) |
+| Step 3 — DEC + STATUS | 다음 세션 | ⏳ 진행 중 |
+| Step 4 — Phase 5-1 진입 준비 | 다음 세션 | ⏳ Phase 4.5 종결 후 |
+
+---
+
+## (★ 1차 carry-over — 본 세션 처리 완료 ✅)
+
+### Step 1 — drift-validator + decision-table-validator 실행
 
 ### Step 1 — drift-validator + decision-table-validator 실행
 

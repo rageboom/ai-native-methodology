@@ -20,6 +20,7 @@
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
 |---|---|---|---|---|
+| [★★ DEC-2026-04-30-poc03-phase45-종결](DEC-2026-04-30-poc03-phase45-종결.md) | 2026-04-30 | poc / methodology | 승인 (★★ Phase 4.5 종결) | PoC #03 NestJS Phase 4.5 형식 명세 (37 파일) + drift-validator + decision-table-validator **첫 외부 검증** 종결. drift 9 짝 / 20 breaking → 진짜 8 + 도구 한계 12 (F-117 재발 = **F-154 ★ Sprint 5 우선순위 격상**). dmn 6 → 0 (enum fix). 신뢰도 0.70 → 0.77 (단계 2 → 2.5). 다이어그램 보강 = Phase 4.5+1 carry-over. |
 | [★ DEC-2026-04-30-m-p2-3-종결](DEC-2026-04-30-m-p2-3-종결.md) | 2026-04-30 | methodology | 승인 (v1.2.2 PATCH) | 본체 갭 5건 일괄 처리 — api.template.md / phase-flow.mermaid+json / **ADR-009 (다이어그램 신뢰 모델 + 도구 종류 enum 7종 ★★★)** / db-schema.template.md / meta-confidence.template.yml. **본체 갭 7건 모두 closed** → ADR-008 본체 100% 정합. |
 | [★ DEC-2026-04-30-sprint-4-종결](DEC-2026-04-30-sprint-4-종결.md) | 2026-04-30 | methodology / poc-tooling | 승인 | C-Sprint 4 종결. 묶음 N+O 인프라 100% 산출 (drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 강제). PoC #02 자가 검증 → 11 신규 finding (F-107~F-117). 진짜 도구 실 실행 Sprint 5 carry-over. |
 | [★★★ DEC-2026-04-30-v1.2.0-격상](DEC-2026-04-30-v1.2.0-격상.md) | 2026-04-30 | methodology | 승인 (★★★ MINOR 격상) | v1.1.2 → v1.2.0 MINOR 격상. 14 묶음 통합 (A~M + P). ADR-008 + Phase 4.5 정식 + finding-system schema + migration-cautions.md 의무. N+O Sprint 4 후속. |

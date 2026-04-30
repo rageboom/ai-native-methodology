@@ -9,7 +9,8 @@
   "verification_location": "(★ AuthMiddleware 미적용 / Service 단 소유권 ❌ / Domain ❌)",
   "http_status": 200,
   "error_message": "(없음)",
-  "current_state": "★★ absent (F-140 critical 신규)",
+  "current_state": "absent",
+  "current_state_note": "★★ F-140 critical 신규 (AuthMiddleware 미적용)",
   "rendered_md_path": "./BR-USER-DELETE-AUTH-001.md",
   "round_trip_pattern": "A (자연어 → 형식 → 코드 권장) — 코드 부재",
   "natural_language_gap_quantified": {

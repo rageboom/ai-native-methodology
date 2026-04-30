@@ -9,7 +9,8 @@
   "verification_location": "★ follow = email 비교 (string) / unFollow = id 비교 (number) — F-144 차원 불일치",
   "http_status": 400,
   "error_message": "FollowerEmail and FollowingId cannot be equal / FollowerId and FollowingId cannot be equal",
-  "current_state": "★ partial — Service 1중 (Domain 부재 + DB CHECK 부재)",
+  "current_state": "partial",
+  "current_state_note": "★ Service 1중 (Domain 부재 + DB CHECK 부재)",
   "rendered_md_path": "./BR-FOLLOWS-NO-SELF-001.md",
   "round_trip_pattern": "B+A (코드 + 자연어 빈약 보완)",
   "natural_language_gap_quantified": {

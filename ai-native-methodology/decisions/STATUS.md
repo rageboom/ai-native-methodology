@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (v1.2.2 PATCH 종결 ✅ — 본체 갭 7건 모두 closed)
+**기준일**: 2026-04-30 (★★ PoC #03 Phase 4.5 종결 + drift/dmn 첫 외부 검증 ✅)
 
 ---
 
@@ -28,9 +28,10 @@
 | **묶음 M-P2-3** | 본체 갭 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yml | ✅ **본 세션** |
 | **C-Sprint 5** | (carry-over — 환경 의존) static tool 실 실행 1회 + drift-validator transitionFuzzyMatch 보완 + corpus 4쌍→20쌍 + ADR-010 격상 | ⏳ 환경 준비 후 |
 | **시퀀스 B — PoC #03 NestJS** | Phase 0~4 종결 (Phase 4.5+ carry) | 🔄 **진행 중** |
-| **시퀀스 B Phase 4.5 산출** | 5 산출물 37 파일 (state-machine 6 + sequence 12 + decision-table 12 + invariants 3 + property 3 + manifest 1) + PROGRESS — D1~D6 권고 안 채택 (BR 6 / AR 3 / UC 6 / Sairyss antipattern 권고 / 신뢰도 70-77% / false negative 우선) | ✅ **본 세션 (2026-04-30)** |
-| 시퀀스 B Phase 4.5 검증 | drift-validator + decision-table-validator 자동 실행 + DEC 종결 + finding F-145~F-153 통합 | ⏳ **carry-over (다음 세션)** |
-| 시퀀스 B Phase 5-1 + 6 | api (openapi.yaml + extension) → antipatterns final (8 candidate → 정식 + composite view) | ⏳ Phase 4.5 검증 후 |
+| 시퀀스 B Phase 4.5 산출 | 5 산출물 37 파일 (state-machine 6 + sequence 12 + decision-table 12 + invariants 3 + property 3 + manifest 1) + PROGRESS — D1~D6 권고 안 채택 (BR 6 / AR 3 / UC 6 / Sairyss antipattern 권고 / 신뢰도 70-77% / false negative 우선) | ✅ (2026-04-30 직전 세션) |
+| **시퀀스 B Phase 4.5 검증** | drift-validator (9 짝 / 20 breaking → 진짜 8 + 도구 한계 12) + decision-table-validator (6 → 0 enum fix) + DEC 종결 + finding F-145~**F-156** 통합 (★ F-154 transitionFuzzyMatch 60% false positive — F-117 재발 입증) + 신뢰도 0.70 → 0.77 (단계 2 → 2.5) | ✅ **본 세션 (2026-04-30)** |
+| 시퀀스 B Phase 4.5+1 | 다이어그램 mermaid 보강 (진짜 drift 8건 — Article persistingArticle / User validatingLogin compound + Article/Follows self-loop + sequence 2건) | ⏳ **carry-over (다음 세션)** |
+| 시퀀스 B Phase 5-1 + 6 | api (openapi.yaml + extension) → antipatterns final (8 candidate → 정식 + composite view) | ⏳ Phase 4.5+1 후 |
 
 ---
 
@@ -87,32 +88,36 @@
 
 ---
 
-## 누적 통계 (C-Sprint 4 종결 시점)
+## 누적 통계 (PoC #03 Phase 4.5 검증 종결 시점 / 2026-04-30)
 
 ```yaml
-finding_total: 117         # +11 (Sprint 4 신규 F-107~F-117)
+finding_total: 158         # 117 + PoC #03 29 (Phase 0~4) + Phase 4.5 산출 9 (F-145~F-153) + Phase 4.5 검증 3 (F-154~F-156)
 finding_closed: 10
 finding_promoted: 41
 finding_deferred: 18
-finding_candidate: 19      # +11 (Sprint 4 신규)
+finding_candidate: 60      # +41 (PoC #03 + Phase 4.5)
 finding_merged: 1
 finding_rejected: 0
-finding_phase45_new: 41    # Sprint 1.5 11 + Sprint 2 19 + Sprint 4 11
+finding_phase45_new: 53    # 41 (PoC #02 시퀀스 C) + 12 (PoC #03 Phase 4.5 형식화 9 + 검증 3)
 
-ap_total: 36
+ap_total: 36              # PoC #03 final (Phase 6) 후 +8~12 예상
 ap_with_migration_advice: 21
 
-formal_spec_artifacts: 29  # +1 SPRINT-4-REPORT.md
+formal_spec_artifacts: 69  # 29 (PoC #02 + sprint) + 40 (PoC #03 — 37 + .validation 3)
 methodology_body_tools_added: 3  # drift-validator + decision-table-validator + static-runner
 
 v120_bundles: 16           # A~P
 v120_bundles_ready: 16     # ★ A~P 전체 — Sprint 4 N+O 인프라 산출 완료
-이중_렌더링_정합_검증_도구: ✅   # drift-validator 자동화 / Sprint 3 수동 한계 노출 (F-117)
-이중_렌더링_드리프트_자동검출: state-machine 7 breaking + decision-table 3 non-breaking
-신뢰도_정직표기: 80-87%    # 시뮬 패널티 유지 (실 static tool Sprint 5 carry-over)
+이중_렌더링_정합_검증_도구: ✅   # drift-validator 자동화 / 본 세션 PoC #03 첫 외부 적용 ★
+이중_렌더링_드리프트_자동검출: PoC #02 → state-machine 7 breaking / PoC #03 → state-machine 17 breaking + sequence 3 breaking
+신뢰도_정직표기:
+  poc03_phase45: 0.77     # 단계 2.5 (자동 검증 부분 통과)
+  poc02_phase6: 0.96
+  방법론_본체: 80-87%      # 시뮬 패널티 유지 (실 static tool Sprint 5 carry-over)
 신뢰도_목표_after_sprint5: 90-95%  # 진짜 Semgrep/PMD 1회 실행 시
 
 unit_tests_passing: 17/17  # drift-validator 6 + dmn-check 7 + static-runner 4
+poc03_validation_first_external_application: ✅  # ★★ 본 세션 — drift 60% false positive (F-117 재발 = F-154) + dmn 5종 0 hit (BR 표 모두 통과)
 ci_workflow_files: 1       # .github/workflows/drift-check.yml (drift + static dual mode)
 ```
 

@@ -9,7 +9,8 @@
   "verification_location": "Service.generateJWT 1곳 + auth.middleware.ts verify 3곳 (DRY 위반)",
   "http_status": 503,
   "error_message": "(uncaught throw → 500/503)",
-  "current_state": "★★ partial — verify 무방어 + 60일 + refresh 부재 + blacklist 부재",
+  "current_state": "partial",
+  "current_state_note": "★★ verify 무방어 + 60일 + refresh 부재 + blacklist 부재",
   "rendered_md_path": "./BR-USER-JWT-EXPIRY-001.md",
   "round_trip_pattern": "Decision Table 형식 — 만료/갱신/블랙리스트 3차원 (Senior 권고)",
   "natural_language_gap_quantified": {

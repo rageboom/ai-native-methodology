@@ -9,7 +9,8 @@
   "verification_location": "UserService.findOne — Repository findOne + argon2.verify",
   "http_status": 401,
   "error_message": "User not found",
-  "current_state": "★ partial — 메시지 모호 (★ F-150) + Passport ❌ (manual auth)",
+  "current_state": "partial",
+  "current_state_note": "★ 메시지 모호 (★ F-150) + Passport ❌ (manual auth)",
   "rendered_md_path": "./BR-USER-LOGIN-VERIFY-001.md",
   "round_trip_pattern": "B + Senior 권고 D1 (cross-platform 핵심 검증 데이터)",
   "natural_language_gap_quantified": {

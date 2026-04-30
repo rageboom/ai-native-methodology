@@ -1,0 +1,106 @@
+{
+  "totals": {
+    "tables": 6,
+    "breaking": 6,
+    "non-breaking": 0,
+    "info": 0
+  },
+  "results": [
+    {
+      "base": "BR-FOLLOWS-NO-SELF-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-FOLLOWS-NO-SELF-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-FOLLOWS-NO-SELF-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★ partial — Service 1중 (Domain 부재 + DB CHECK 부재)",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-FOLLOWS-NO-SELF-001.json"
+        }
+      ],
+      "tables_found": 5
+    },
+    {
+      "base": "BR-FOLLOWS-PAIR-UNIQUE-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-FOLLOWS-PAIR-UNIQUE-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-FOLLOWS-PAIR-UNIQUE-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★ partial — App 1중 race-prone (DB UQ pair + FK 자체 부재)",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-FOLLOWS-PAIR-UNIQUE-001.json"
+        }
+      ],
+      "tables_found": 2
+    },
+    {
+      "base": "BR-USER-DELETE-AUTH-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-DELETE-AUTH-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-DELETE-AUTH-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★★ absent (F-140 critical 신규)",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-USER-DELETE-AUTH-001.json"
+        }
+      ],
+      "tables_found": 3
+    },
+    {
+      "base": "BR-USER-JWT-EXPIRY-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-JWT-EXPIRY-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-JWT-EXPIRY-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★★ partial — verify 무방어 + 60일 + refresh 부재 + blacklist 부재",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-USER-JWT-EXPIRY-001.json"
+        }
+      ],
+      "tables_found": 3
+    },
+    {
+      "base": "BR-USER-LOGIN-VERIFY-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-LOGIN-VERIFY-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-LOGIN-VERIFY-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★ partial — 메시지 모호 (★ F-150) + Passport ❌ (manual auth)",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-USER-LOGIN-VERIFY-001.json"
+        }
+      ],
+      "tables_found": 4
+    },
+    {
+      "base": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+      "mdPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
+      "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\decision-tables\\BR-USER-USERNAME-EMAIL-UNIQUE-001.json",
+      "findings": [
+        {
+          "severity": "breaking",
+          "kind": "json.invalid-enum",
+          "field": "current_state",
+          "value": "★ partial — App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+          "message": "current_state must be one of: complete, partial, absent",
+          "location": "BR-USER-USERNAME-EMAIL-UNIQUE-001.json"
+        }
+      ],
+      "tables_found": 2
+    }
+  ]
+}
