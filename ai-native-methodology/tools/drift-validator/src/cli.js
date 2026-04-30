@@ -8,6 +8,7 @@ import { join, basename, extname, dirname, relative } from 'node:path';
 import { detectDiagramType, normalizeStateMachine, normalizeSequence } from './normalize-mermaid.js';
 import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson } from './normalize-json.js';
 import { compareStateMachine, compareSequence, summarize } from './compare.js';
+import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from './baseline.js';
 
 function findPairs(dir) {
   const pairs = [];
@@ -77,14 +78,23 @@ function processOne({ jsonPath, mermaidPath }) {
   };
 }
 
+function getArgValue(args, name) {
+  const idx = args.indexOf(name);
+  if (idx === -1) return null;
+  return args[idx + 1];
+}
+
 function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error('usage: drift-validator <dir-or-file> [--json]');
+    console.error('usage: drift-validator <dir-or-file> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
     process.exit(2);
   }
   const target = args[0];
   const jsonOut = args.includes('--json');
+  const baselinePath = getArgValue(args, '--baseline');
+  const ratchet = args.includes('--ratchet');
+  const writeBaselinePath = getArgValue(args, '--write-baseline');
 
   let pairs = [];
   let st;
@@ -101,6 +111,7 @@ function main() {
 
   const results = pairs.map(processOne);
   const totals = { pairs: results.length, breaking: 0, 'non-breaking': 0, info: 0, errors: 0 };
+  let allDiffs = [];
   for (const r of results) {
     if (r.error) totals.errors++;
     if (r.summary) {
@@ -108,10 +119,37 @@ function main() {
       totals['non-breaking'] += r.summary['non-breaking'];
       totals.info += r.summary.info;
     }
+    if (Array.isArray(r.diffs)) allDiffs.push(...r.diffs);
+  }
+
+  // ★ ADR-010 baseline + ratchet 처리
+  let baselineReport = null;
+  if (writeBaselinePath) {
+    writeBaseline(writeBaselinePath, allDiffs);
+    if (!jsonOut) console.log(`\n★ baseline written → ${writeBaselinePath} (${allDiffs.length} findings)`);
+  }
+  if (baselinePath) {
+    const baseline = readBaseline(baselinePath);
+    const classified = classifyAgainstBaseline(allDiffs, baseline);
+    if (ratchet) {
+      const check = ratchetCheck(classified);
+      baselineReport = { mode: 'ratchet', baseline_path: baselinePath, ...check };
+      if (!jsonOut) {
+        console.log(`\n★ baseline + ratchet — grandfathered: ${check.grandfathered_count} / novel: ${check.novel_count} / blocked: ${check.blocked_count}`);
+        if (check.blocked_count > 0) {
+          console.log('  ★ blocked findings:');
+          for (const f of check.blocked.slice(0, 10)) {
+            console.log(`    - [${f.severity}] ${f.kind}${f.message ? ' — ' + f.message.slice(0, 80) : ''}`);
+          }
+        }
+      }
+    } else {
+      baselineReport = { mode: 'classify', baseline_path: baselinePath, grandfathered_count: classified.grandfathered.length, novel_count: classified.novel.length };
+    }
   }
 
   if (jsonOut) {
-    console.log(JSON.stringify({ totals, results }, null, 2));
+    console.log(JSON.stringify({ totals, results, baselineReport }, null, 2));
   } else {
     console.log(`drift-validator — ${results.length} pair(s) compared`);
     console.log(`  breaking: ${totals.breaking}  non-breaking: ${totals['non-breaking']}  info: ${totals.info}  errors: ${totals.errors}`);
@@ -130,6 +168,10 @@ function main() {
     }
   }
 
+  // ★ ratchet mode 시 exit code = blocked > 0 ? 1 : 0
+  if (ratchet && baselineReport) {
+    process.exit(baselineReport.blocked_count > 0 ? 1 : 0);
+  }
   process.exit(totals.breaking > 0 || totals.errors > 0 ? 1 : 0);
 }
 

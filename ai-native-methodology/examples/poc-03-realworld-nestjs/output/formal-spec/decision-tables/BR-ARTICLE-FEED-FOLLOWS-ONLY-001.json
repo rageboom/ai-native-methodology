@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001",
+  "br_type": "api",
+  "trigger": "GET /api/articles/feed",
+  "condition": "user.follows 가 빈 배열",
+  "action": "return {articles: [], articlesCount: 0}",
+  "expected_result": "follow 없으면 빈 feed",
+  "rejection_method": "—",
+  "verification_location": "src/article/article.service.ts:75",
+  "http_status": 200,
+  "error_message": null,
+  "current_state": "complete",
+  "rendered_md_path": "./BR-ARTICLE-FEED-FOLLOWS-ONLY-001.md",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44
+  }
+}

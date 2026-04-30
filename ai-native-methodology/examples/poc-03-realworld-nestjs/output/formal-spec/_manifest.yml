@@ -46,21 +46,22 @@ artifacts:
 artifact_count:
   state_machines: 6
   sequence_diagrams: 12
-  decision_tables: 24  # ★ B 보강 — 6 BR (12 file) → 12 BR (24 file)
+  decision_tables: 36  # ★★ O 보강 — 12 BR (24 file) → 18 BR (36 file) / 100% coverage
   invariants: 3
   property_tests: 3
-  validation_results: 3  # .validation/{drift-result.json, dmn-check-result.json, SUMMARY.md}
-  total: 51   # ★ +12 (B 추가 6 BR × 2 file)
-  expected: 52
+  validation_results: 3
+  baseline_files: 1   # ★ ADR-010 — drift-baseline.json (49 grandfathered findings)
+  total: 64   # ★ +13 (O 추가 6 BR × 2 file + baseline 1)
+  expected: 65
   carry_over_drift_validator_results: false
-  br_formalization_coverage: "★ 12/18 = 66.7% (B 보강 전 6/18 = 33%)"
+  br_formalization_coverage: "★★★ 18/18 = 100% (O 종결)"
 
 # ----------------------------------------------------------------------
 # 신뢰도 (★ Senior 의사결정 5 ❌ 권고 반영 — D5 / 본 세션 자동 검증 후 +7p)
 # ----------------------------------------------------------------------
 trust_level:
-  raw_confidence: 0.87  # 0.85 + ★ B Phase 4.5 풍부화 (BR coverage 33% → 66.7% / 12 BR 자동 검증 통과 / dmn-check schema 보강) +2p
-  current_step: 3.5  # ★★ ADR-009 단계 3+ — 자동 검증 완전 통과 + 도구 자체 quality 격상 + Phase 4.5 풍부화
+  raw_confidence: 0.89  # 0.87 + ★ O 종결 (BR coverage 66.7% → 100% / 18 BR 자동 검증 통과 / ADR-010 baseline 등재) +2p
+  current_step: 3.7  # ★★★ ADR-009 단계 3+ — BR 100% / 도구 quality + Phase 4.5 풍부화 + baseline 등재
   validation_history:
     - { step: "1차 작성", at: "2026-04-30", actor: "AI (메인 raw fetch)", tool_type: "ai_main" }
     - { step: "Sub-agent 3 병렬 (NestJS 7 + OSS 사례 + Senior)", at: "2026-04-30", tool_type: "ai_subagent_lightweight" }

@@ -1,0 +1,399 @@
+{
+  "generated_at": "2026-04-30",
+  "source_commit_sha": "unknown",
+  "findings_count": 49,
+  "findings": [
+    {
+      "fingerprint": "594313278fc6d059",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "applychanges",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "4aee4b2424b2ef47",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "applydone",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "345e44f828790f8a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "assigningauthor",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "1c996bcc5b888c20",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingdeleteindex",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "bbd204ce5238a967",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingnewfavorite",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "4f4be1ca4e30027c",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "countdec",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "30b9e4a6d63fd90a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "countinc",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "5811554b598e57c6",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "idempotentskip",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "0af273c10d02aa9f",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "idempotentskipu",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "3804f7f830873f41",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "idle0",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "18c7d17f98761884",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "idleany",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "d88d9dc9c9e9326a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "idlen",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cc49b56bf787a18a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "insertingrow",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "f7827f7d0cc5251d",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "persisted",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "46316885b08bfe25",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "racedoubleinc",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "fec7c1496908bfeb",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "saveattempt",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "12bd0c6fa69bc0c9",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "slugcollision",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cb3de14022463215",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "slugifyrandom",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cc1b83e26b29e2fd",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "appprecheck",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "5d733ffa0a4085dd",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingpresent",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "7a1db0ff58bc822c",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingpresentu",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "d6198c6ced03b776",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "compareemail",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "d95d3a51b8718227",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "compareid",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cc49b56bf787a18a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "insertingrow",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "dbf23b1f24b8e86d",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectednotprovided",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "1731bd7b079223ba",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectednotprovidedu",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "e66b1cf2afdd282c",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedselfemail",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "e2e651884d9cd598",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedselfid",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "40a42fda4a4f1d27",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "applied",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "eed3bd7546fc8088",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "applying",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "39891576120ce9c9",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "argon2verify",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "f02fdc52af88898a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingdtoempty",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "69738255636da62e",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "checkingemailformat",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "50ff0f9bfeea86d2",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "findinguserbyemail",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cc49b56bf787a18a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "insertingrow",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "b83044b88149d35f",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "jwtissued",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "b60f9f49e50c5322",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "notduplicate",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "f7827f7d0cc5251d",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "persisted",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "f3ff60862a7d3a71",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "querybuildercheck",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "cad18123cab26dc8",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedalreadyunique",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "54d5fd1bb670cb1a",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejecteddtoblank",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "ac51188093f20b01",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedemailformat",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "b630ec429bccec3b",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedmismatch",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "22f94b77b2aa6c5c",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedracewindow",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "1fd0c59aa60b6a19",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "rejectedupdate",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "a845714e3c20529e",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "userfound",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "7271a6113f422c5c",
+      "kind": "state.extra-in-mermaid",
+      "severity": "info",
+      "json": null,
+      "mermaid": "usernotfound",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "550cc84284c97a4a",
+      "kind": "message.label-drift",
+      "severity": "non-breaking",
+      "json": "race window 시 favoritecount += 2 (count != favorites.length)",
+      "mermaid": "user with favorites[]",
+      "grandfathered": true
+    },
+    {
+      "fingerprint": "7273f31c327a88b2",
+      "kind": "message.label-drift",
+      "severity": "non-breaking",
+      "json": "양쪽 insert 모두 성공 가능 (race window)",
+      "mermaid": "1 row inserted",
+      "grandfathered": true
+    }
+  ]
+}

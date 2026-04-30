@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-ARTICLE-AUTHOR-AUTO-001",
+  "br_type": "domain_invariant",
+  "trigger": "POST /api/articles (create)",
+  "condition": "create 호출",
+  "action": "author = userRepository.findOne(userId)",
+  "expected_result": "author 자동 매핑 (Aggregate invariant)",
+  "rejection_method": null,
+  "verification_location": "src/article/article.service.ts:211",
+  "http_status": null,
+  "error_message": null,
+  "current_state": "complete",
+  "rendered_md_path": "./BR-ARTICLE-AUTHOR-AUTO-001.md",
+  "natural_language_gap_quantified": {
+    "explicit": 3,
+    "total": 9,
+    "coverage_percent": 33
+  }
+}

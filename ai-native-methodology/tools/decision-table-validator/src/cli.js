@@ -8,6 +8,7 @@ import { join, basename, extname, relative } from 'node:path';
 import { parseMarkdownTables } from './parse-md-table.js';
 import { checkDecisionTable } from './dmn-check.js';
 import { checkJsonSanity } from './json-sanity.js';
+import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../drift-validator/src/baseline.js';
 
 function findTargets(dir) {
   const out = [];
@@ -59,11 +60,23 @@ function summarize(findings) {
   return out;
 }
 
+function getArgValue(args, name) {
+  const idx = args.indexOf(name);
+  if (idx === -1) return null;
+  return args[idx + 1];
+}
+
 function main() {
   const args = process.argv.slice(2);
-  if (args.length === 0) { console.error('usage: decision-table-validator <dir> [--json]'); process.exit(2); }
+  if (args.length === 0) {
+    console.error('usage: decision-table-validator <dir> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
+    process.exit(2);
+  }
   const target = args[0];
   const jsonOut = args.includes('--json');
+  const baselinePath = getArgValue(args, '--baseline');
+  const ratchet = args.includes('--ratchet');
+  const writeBaselinePath = getArgValue(args, '--write-baseline');
 
   let st;
   try { st = statSync(target); } catch { console.error(`path not found: ${target}`); process.exit(2); }
@@ -82,15 +95,41 @@ function main() {
 
   const results = targets.map(processOne);
   const totals = { tables: results.length, breaking: 0, 'non-breaking': 0, info: 0 };
+  let allFindings = [];
   for (const r of results) {
     const s = summarize(r.findings);
     totals.breaking += s.breaking;
     totals['non-breaking'] += s['non-breaking'];
     totals.info += s.info;
+    if (Array.isArray(r.findings)) allFindings.push(...r.findings);
+  }
+
+  // ★ ADR-010 baseline + ratchet 처리
+  let baselineReport = null;
+  if (writeBaselinePath) {
+    writeBaseline(writeBaselinePath, allFindings);
+    if (!jsonOut) console.log(`\n★ baseline written → ${writeBaselinePath} (${allFindings.length} findings)`);
+  }
+  if (baselinePath) {
+    const baseline = readBaseline(baselinePath);
+    const classified = classifyAgainstBaseline(allFindings, baseline);
+    if (ratchet) {
+      const check = ratchetCheck(classified);
+      baselineReport = { mode: 'ratchet', baseline_path: baselinePath, ...check };
+      if (!jsonOut) {
+        console.log(`\n★ baseline + ratchet — grandfathered: ${check.grandfathered_count} / novel: ${check.novel_count} / blocked: ${check.blocked_count}`);
+        if (check.blocked_count > 0) {
+          console.log('  ★ blocked findings:');
+          for (const f of check.blocked.slice(0, 10)) {
+            console.log(`    - [${f.severity}] ${f.kind}${f.message ? ' — ' + f.message.slice(0, 80) : ''}`);
+          }
+        }
+      }
+    }
   }
 
   if (jsonOut) {
-    console.log(JSON.stringify({ totals, results }, null, 2));
+    console.log(JSON.stringify({ totals, results, baselineReport }, null, 2));
   } else {
     console.log(`decision-table-validator — ${results.length} markdown table file(s)`);
     console.log(`  breaking: ${totals.breaking}  non-breaking: ${totals['non-breaking']}  info: ${totals.info}`);
@@ -106,6 +145,10 @@ function main() {
     }
   }
 
+  // ★ ratchet mode exit
+  if (ratchet && baselineReport) {
+    process.exit(baselineReport.blocked_count > 0 ? 1 : 0);
+  }
   process.exit(totals.breaking > 0 ? 1 : 0);
 }
 

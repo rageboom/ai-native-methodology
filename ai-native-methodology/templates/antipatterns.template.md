@@ -21,9 +21,11 @@
 
 | severity | 건수 | 의미 |
 |---|---|---|
+| critical | {n_critical} | ★★★ 즉시 수정 의무 (production blocker / OWASP A01-A10) |
 | high | {n_high} | 재구현 시 우선 처리 (보안/데이터 손실 위험) |
 | medium | {n_medium} | 재구현 시 함께 정상화 권장 |
 | low | {n_low} | 시간 여유 시 정상화 |
+| positive | {n_positive} | ★★ 모범 사례 등재 (★ v1.2.3 신설 — cross-PoC 학습 효과 입증) |
 
 ---
 

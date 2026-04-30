@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-USER-USERNAME-NOT-BLANK-001",
+  "br_type": "api",
+  "trigger": "POST /api/users (signup)",
+  "condition": "username 필드 입력",
+  "action": "@IsNotEmpty (CreateUserDto)",
+  "expected_result": "blank 시 400 BadRequest",
+  "rejection_method": "ValidationPipe + class-validator → HttpException",
+  "verification_location": "src/user/dto/create-user.dto.ts:5 @IsNotEmpty",
+  "http_status": 400,
+  "error_message": "username should not be empty",
+  "current_state": "complete",
+  "rendered_md_path": "./BR-USER-USERNAME-NOT-BLANK-001.md",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44
+  }
+}

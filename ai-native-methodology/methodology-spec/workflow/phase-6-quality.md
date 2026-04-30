@@ -159,7 +159,7 @@ flowchart TB
 └── composite-patterns.md    # 복합 패턴 별도 (가독성)
 ```
 
-### 6.0 migration-cautions.md 의무 산출물 (v1.2.0 묶음 P β)
+### 6.0 migration-cautions.md 의무 산출물 (v1.2.0 묶음 P β / ★ v1.2.3 NestJS 변형 + 사내 도입 정책 보강)
 
 **근거**: DEC-2026-04-29-안티패턴-마이그레이션-가이드 + ★★★ 본 방법론 가치 명세 (코드 → 형식 명세 + **위험 기록** 한 방향 추출기) 정합.
 
@@ -168,10 +168,75 @@ flowchart TB
 - design 단계 / CI 단계 / Review 단계 체크리스트
 - severity 기반 적용 우선순위
 - antipatterns.json `migration_advice` 필드 (α) 의 사람 친화적 통합
+- **★ Platform-specific 변형 섹션 (v1.2.3 신설)** — 분석 대상 stack 별 함정 + 학습 효과 입증 표
+- **★ 사내 도입 quality gate 정책 (v1.2.3 신설 / ADR-010 정합)** — Baseline + Ratchet 패턴
 
 **avoid-list.md 와의 차이**:
 - avoid-list.md = "기존 시스템에서 발견된 패턴 + 즉시 fix"
 - migration-cautions.md = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
+
+#### 6.0.1 ★ Platform-specific 변형 섹션 (v1.2.3 신설)
+
+**의무**: stack 별 함정과 학습 효과를 본 섹션에 등재. PoC #03 NestJS 정합 패턴.
+
+```markdown
+## NestJS 특이 패턴 (PoC #03 정합 — ADR-NEST-001~004)
+
+### NestJS 학습 효과 (★ 자연 회피 — 비재현)
+| 패턴 | 이전 PoC negative | NestJS 결과 |
+|---|---|---|
+| Bearer JWT | Token apiKey 비표준 (F-084) | ★ addBearerAuth() 표준 ✅ (F-161 positive) |
+| 307 internal redirect | ModelAndView leak (F-087) | NestJS 미사용 |
+| TS generic | Java erasure (F-048) | TypeScript 정적 차단 |
+
+### NestJS 함정 (★ 신규 — design 단계 의무 적용)
+- @Controller() 빈 prefix → @Controller('users') 의무
+- @Post default 201 → @HttpCode 명시 의무 (ADR-NEST-003)
+- @Delete default 200 → @HttpCode(204) 의무 (ADR-NEST-003)
+- AuthMiddleware forRoutes 분산 → JwtAuthGuard 글로벌 (ADR-NEST-001)
+- TypeORM eager:true → eager:false default + 명시적 fetch (ADR-NEST-004)
+- Math.random() suffix slug → DB UQ + nanoid (ADR-NEST-004)
+
+### 적용 ADR
+- ADR-NEST-001 Auth-scope
+- ADR-NEST-002 Validation
+- ADR-NEST-003 HttpCode
+- ADR-NEST-004 TypeORM-Integrity
+```
+
+신규 platform 분석 시 동일 패턴으로 변형 섹션 등재 의무 — Spring Boot / FastAPI / Ktor 등.
+
+#### 6.0.2 ★ 사내 도입 quality gate 정책 (v1.2.3 신설 / ADR-010 정합)
+
+**의무**: Baseline + Ratchet 패턴 등재. 사내 legacy 도입 시 결함 폭증으로 차단되지 않도록.
+
+```markdown
+## 사내 도입 시 quality gate 정책 (ADR-010 정합)
+
+### Baseline 도입 의무
+- 본 방법론 도구 (drift-validator + dmn-check + static-runner) 첫 분석 결과 baseline 등재
+- `.ai-native-methodology/baseline.yml` git 추적 의무
+- 현존 결함 = grandfathered (CI 통과)
+
+### Ratchet 정책
+- baseline 외 신규 결함 = CI fail (점진 격상)
+- baseline 결함 fix → fingerprint 자동 제거 (한 방향)
+- severity 격상 시 baseline 갱신 의무
+
+### Severity 별 강도
+- **critical**: 즉시 차단 (baseline 등재 ❌ — production blocker)
+- **high**: 신규 차단 / baseline grandfathered
+- **medium**: 신규 차단 / baseline grandfathered
+- **low**: 신규 경고만 / baseline grandfathered
+- **positive**: 등재만 (모범 사례)
+
+### Quarterly review
+- baseline 결함 감소율 정량
+- severity 격상 시 즉시 갱신
+- 2년 자동 expiry
+```
+
+→ ADR-010 (Baseline + Ratchet) 정합. Slack/GitLab/Dropbox/Figma/Shopify 산업 표준.
 
 
 ### 6.1 avoid-list.md 예시

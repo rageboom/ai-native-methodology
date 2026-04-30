@@ -42,6 +42,30 @@ npx drift-validator <dir> --json
 
 exit code: `0` (no breaking) / `1` (breaking ≥ 1 또는 error) / `2` (usage error).
 
+## ★ Baseline + Ratchet (v1.2.3 — ADR-010 정합)
+
+레거시 도입 시 결함 폭증 차단 회피 + 점진 격상.
+
+```bash
+# ① baseline 생성 (legacy 첫 분석 시)
+npx drift-validator <dir> --write-baseline .ai-native-methodology/drift-baseline.json
+
+# ② ratchet mode (CI)
+npx drift-validator <dir> --baseline .ai-native-methodology/drift-baseline.json --ratchet
+# → exit 0 if novel-blocked = 0
+# → exit 1 if novel-blocked >= 1
+
+# ③ 분류 only (블로킹 ❌)
+npx drift-validator <dir> --baseline .ai-native-methodology/drift-baseline.json
+```
+
+severity 별 강도 (ADR-010 §2.3):
+| severity | baseline 등재 | novel 차단 |
+|---|---|---|
+| critical | ❌ (즉시 차단) | ✅ |
+| breaking / high / medium | ✅ | ✅ |
+| low / info | ✅ | ❌ (경고만) |
+
 ## 구현 노트
 
 ### Sprint 4 30-min spike 결과
