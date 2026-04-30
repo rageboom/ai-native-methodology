@@ -1,10 +1,22 @@
 # ADR-006: 순환 의존성 처리 default 정책 (Cycle Handling Default)
 
-- 상태: **잠정 승인 (Provisional)** — PoC #02 완료 후 재검토
-- 일자: 2026-04-28
-- 결정자: 윤주스 (TF Lead)
-- 관련: ADR-001, ADR-004, schemas/architecture.schema.json, methodology-spec/workflow/phase-3-arch.md §3.1.1
-- revisit_at: PoC #02 (마이크로서비스 분석) 완료 시점
+- 상태: **승인 (Final / v1.2.3)** — ★ provisional → final 격상 (3 PoC 검증 후)
+- 일자: 2026-04-28 (provisional) / 2026-04-30 (final 격상)
+- 결정자: 윤주스 (TF Lead, Auto Mode 위임)
+- 관련: ADR-001, ADR-004, schemas/architecture.schema.json, methodology-spec/workflow/phase-3-arch.md §3.1.1, DEC-2026-04-30-v1.2.3-본체-격상
+
+---
+
+## ★ Final 격상 근거 (2026-04-30)
+
+3 PoC 검증 결과:
+- **PoC #01** (Spring Boot 2.5 / 단일 module) — CIRCULAR-001 (domain/article ↔ domain/user) 검출 ✅
+- **PoC #02** (Spring Boot 3.3 / Hexagonal multi-module) — CIRCULAR 0건 (★ Hexagonal 분리 효과 입증)
+- **PoC #03** (NestJS / 단일 module tree) — CIRCULAR 0건 (★ TypeScript import 정적 차단 효과)
+
+**hybrid (탐지 결정적 + 분류 BC 분기 + decision_required) default 가 3 platform 모두 정합** ✅. revisit 사유 없음 → final 격상.
+
+★ 3 PoC 가 알고리즘 단일 default 의 적용 가능성을 입증 — provisional 의 "단일 PoC 과적합 회피" 원래 우려 해소.
 
 ---
 

@@ -30,6 +30,32 @@
 
 ---
 
+## ★★ Platform-Agnostic 입증 (3 PoC 통합 / v1.2.3 정식 등재)
+
+본 방법론은 **3 platform PoC** 검증으로 platform-agnostic 임을 입증:
+
+| PoC | platform | 산출 | 신뢰도 |
+|---|---|---|---|
+| **PoC #01** | Java + Spring Boot 2.5 (CRUD) | 7대 산출물 6/7 / 15 AP / 33 finding | 0.96 |
+| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 7대 산출물 6/7 / 21 AP / 43 finding | 0.96 |
+| **PoC #03** | TypeScript + NestJS + TypeORM | 7대 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94 |
+
+→ ★ 3 platform 모두 7대 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
+
+### Cross-PoC 학습 효과 (★ §8.1 정합 — 단일 PoC 과적합 회피)
+
+| 분류 | 건수 | 사례 |
+|---|---|---|
+| **★ 재현** (보편 결함) | 6 | EAGER N+1 (★ 3 PoC) / API drift / DB UQ / PUT vs PATCH / versioning / limit cap |
+| **★ 변형 재현** | 3 | RSA git commit → Auth scope / Token apiKey 부분 / De Morgan 학습 효과 |
+| **★★ 비재현 학습 효과 (positive finding)** | 3 | **NestJS Bearer 표준** ✅ / 307 redirect / TS generic 정적 차단 |
+
+→ **균형 분포** = §8.1 단일 PoC 과적합 회피 정합 ★. **본 방법론 적용 가능 platform** = Java/Spring + TypeScript/NestJS 입증 완료.
+
+상세: [`docs/v1.3-promotion-report.md`](./docs/v1.3-promotion-report.md) — 3 PoC 통합 보고서 (격상 후보 6 + 사내 적용 ROI 견적).
+
+---
+
 ## 시작하기
 
 ### 사전 요구사항
@@ -94,9 +120,10 @@ ai-native-methodology/
 │   ├── decision-table-validator/ dmn-check 5종 (duplicate/conflict/gap/overlap/type)
 │   └── static-runner/           Semgrep/PMD/SpotBugs plugin host + 5종 물증 + lint-no-simulation
 ├── decisions/              결정 로그 (역시간순 / INDEX.md / STATUS.md)
-├── examples/               PoC 결과
-│   ├── poc-01-realworld-spring/
-│   └── poc-02-realworld-springboot3/
+├── examples/               PoC 결과 (★ 3 platform 검증)
+│   ├── poc-01-realworld-spring/        ★ Java + Spring Boot 2.5 (CRUD)
+│   ├── poc-02-realworld-springboot3/   ★ Java + Spring Boot 3.3 + Hexagonal
+│   └── poc-03-realworld-nestjs/        ★ TypeScript + NestJS + TypeORM (★★ platform-agnostic 입증)
 └── .claude-plugin/         사내 plugin 배포 설정
 
 # 레포 루트 (본 디렉토리 외부)
