@@ -23,30 +23,41 @@
 
 ---
 
-## CI 검증 (TODO — v1.3.0 도입 예정)
+## CI 검증
 
-> v1.1.2 시점: schema 게시 only. 자동 검증 미도입.
-> 산업 사례: Backstage 가 비슷한 진화 경로를 거침 (schema 게시 → CI 검증 추가).
+### v1.2.1 (현재) — Phase 4.5 자동 검증 도구 도입 ✅
 
-### v1.1.2 임시 정책
-
-산출물 생성 시 **수동으로** schema 검증 권장:
+`tools/drift-validator/` + `tools/decision-table-validator/` + `tools/static-runner/` 신설. `.github/workflows/drift-check.yml` 이중 모드 (PR diff-aware + nightly full + manual).
 
 ```bash
-# JSON Schema 검증 도구 예시 (ajv-cli)
+# 본 산출물 schema 정합 + drift + dmn-check 5종 자동 검증
+node ai-native-methodology/tools/drift-validator/src/cli.js <output-dir>
+node ai-native-methodology/tools/decision-table-validator/src/cli.js <output-dir>
+```
+
+### v1.2.1 — `formal-spec.schema.json` 5종 물증 강제 ★
+
+`cross_validation.validators[]` 의 `real_tool: true` 시 **5종 물증 if/then 의무**:
+- `tool_version` / `tool_stdout_path` / `tool_stderr_path` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command`
+
+`real_tool: false` 시 `simulation_reason` 의무. `simulation_only: true` 시 자동 fail.
+
+→ `tools/static-runner/lint-no-simulation.sh` 가 grep 보강 (이중 안전망).
+
+### v1.3+ 후속 (TODO)
+
+- 7대 산출물 + meta-confidence schema 의 CI 자동 검증 (ajv-cli 또는 jsonschema)
+- pre-commit hook
+- 참고: Backstage Catalog Entity 검증 모델
+
+### 수동 검증 (현재 / fallback)
+
+```bash
 npx ajv validate \
   -s schemas/inventory.schema.json \
   -d output/inventory/inventory.json \
   -r schemas/meta-confidence.schema.json
 ```
-
-### v1.3.0 도입 예정
-
-- pre-commit hook 또는 GitHub Action 으로 산출물 schema 자동 검증
-- 검증 실패 시 산출물 머지 차단
-- 참고: Backstage Catalog Entity 검증 모델 (https://backstage.io/docs/features/software-catalog/descriptor-format)
-
-> ⚠️ schema 게시 only 의 위험: OpenAPI 3.0 → 3.1 마이그레이션이 7년 걸린 사례가 있음 (2017~2024). v1.3.0 까지의 격차가 길어지지 않도록 주의.
 
 ---
 

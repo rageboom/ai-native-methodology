@@ -1,0 +1,104 @@
+{
+  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.2.2 신설 (묶음 M-P2-3 #4). drift-validator 의 향후 phase-flow 비교기 (v1.3+) 입력 호환.",
+  "id": "phase-flow",
+  "version": "1.2.2",
+  "rendered_mermaid_path": "./phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "0",
+      "name": "입력 정리",
+      "spec_file": "phase-0-입력정리.md",
+      "depends_on": [],
+      "inputs": ["source_code", "erd_optional", "orm_optional", "design_docs_optional"],
+      "outputs": ["_manifest.yml"]
+    },
+    {
+      "id": "1",
+      "name": "init",
+      "spec_file": "phase-1-init.md",
+      "depends_on": ["0"],
+      "inputs": ["_manifest.yml"],
+      "outputs": ["inventory.json", "tree.md", "stack-detection.md", "stats.json"]
+    },
+    {
+      "id": "2",
+      "name": "db",
+      "spec_file": "phase-2-db.md",
+      "depends_on": ["1"],
+      "inputs": ["inventory.json"],
+      "outputs": ["schema.json", "schema.sql", "erd.mermaid", "정합성-검증-보고서.md"]
+    },
+    {
+      "id": "3",
+      "name": "arch",
+      "spec_file": "phase-3-arch.md",
+      "depends_on": ["1", "2"],
+      "inputs": ["inventory.json", "schema.json"],
+      "outputs": ["architecture.json", "architecture.mermaid", "architecture.md", "dependency-graph.mermaid", "circular-dependencies.md"]
+    },
+    {
+      "id": "4",
+      "name": "비즈니스 로직 (4영역 병렬)",
+      "spec_file": "phase-4-비즈니스로직.md",
+      "depends_on": ["1", "2", "3"],
+      "parallel_areas": ["5.A rules", "5.B domain", "5.C antipatterns-partial", "5.D ui-domain"],
+      "outputs": ["domain.json", "domain.mermaid", "domain.md", "rules.json", "rules.md", "antipatterns-partial.json"]
+    },
+    {
+      "id": "4.5",
+      "name": "formal-spec (★ v1.2.0 신설)",
+      "spec_file": "phase-4-5-formal-spec.md",
+      "depends_on": ["4"],
+      "inputs": ["domain.json", "rules.json", "code_evidence"],
+      "outputs": ["state-machines/*.json", "state-machines/*.mermaid", "sequence-diagrams/*.json", "sequence-diagrams/*.mermaid", "decision-tables/*.json", "decision-tables/*.md", "invariants/*.ts", "property-tests/*.spec.ts"],
+      "automated_validation": ["drift-validator", "decision-table-validator"],
+      "introduced": "v1.2.0",
+      "automation_added": "v1.2.1"
+    },
+    {
+      "id": "5-1",
+      "name": "api",
+      "spec_file": "phase-5-1-api.md",
+      "depends_on": ["4", "4.5"],
+      "outputs": ["openapi.yaml", "api.md", "api-extension.json"]
+    },
+    {
+      "id": "5-2",
+      "name": "ui",
+      "spec_file": "phase-5-2-ui.md",
+      "depends_on": ["3", "4"],
+      "outputs": ["ui-spec.json", "ui-spec.md", "ui-spec.mermaid"]
+    },
+    {
+      "id": "6",
+      "name": "quality (안티패턴 통합)",
+      "spec_file": "phase-6-quality.md",
+      "depends_on": ["4", "4.5", "5-1", "5-2"],
+      "outputs": ["antipatterns.json", "avoid-list.md", "migration-cautions.md"],
+      "migration_cautions_introduced": "v1.2.0"
+    }
+  ],
+  "cross_cutting": {
+    "findings": {
+      "schema": "schemas/finding-system.schema.json",
+      "location": "findings/poc-findings.md",
+      "applies_to": ["all phases"]
+    },
+    "decisions": {
+      "location": "decisions/",
+      "index": "decisions/INDEX.md",
+      "status_snapshot": "decisions/STATUS.md"
+    },
+    "meta_confidence": {
+      "schema": "schemas/meta-confidence.schema.json",
+      "template": "templates/meta-confidence.template.yml",
+      "applies_to": ["all phase outputs"],
+      "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
+    }
+  },
+  "version_milestones": {
+    "v1.2.0": ["Phase 4.5 정식 도입 (묶음 L)", "ADR-008 이중 렌더링", "finding-system schema", "migration-cautions 의무"],
+    "v1.2.1": ["drift-validator + decision-table-validator + static-runner 도구 산출", "drift-check.yml CI", "Phase 4.5 cross_validation 5종 물증 if/then"],
+    "v1.2.2": ["묶음 M-P2-3 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template"]
+  }
+}

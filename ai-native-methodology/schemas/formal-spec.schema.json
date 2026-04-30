@@ -254,13 +254,63 @@
               },
               "real_tool": {
                 "type": "boolean",
-                "description": "★★★ DEC-static-tool-실행-의무화 정합. true: 진짜 외부 도구 (Semgrep/PMD/SpotBugs/Daikon/CodeQL). false: AI persona 시뮬 — -5%p 패널티 의무."
+                "description": "★★★ DEC-static-tool-실행-의무화 정합. true: 진짜 외부 도구 (Semgrep/PMD/SpotBugs/Daikon/CodeQL) → 5종 물증 의무. false: AI persona 시뮬 → simulation_reason 의무 + -5%p 패널티."
+              },
+              "simulation_reason": {
+                "type": "string",
+                "description": "real_tool=false 시 의무 — 시뮬 사용 사유 (예: 환경 부재, CI 미통합). lint-no-simulation.sh 가 grep 검증."
               },
               "tool_name": {"type": "string"},
-              "version": {"type": "string"},
+              "tool_version": {
+                "type": "string",
+                "description": "물증 #1 — 진짜 도구 실행 시 의무 (e.g., semgrep --version 결과)."
+              },
+              "tool_stdout_path": {
+                "type": "string",
+                "description": "물증 #2 — raw stdout 로그 경로. real_tool=true 시 의무."
+              },
+              "tool_stderr_path": {
+                "type": "string",
+                "description": "물증 #3 — raw stderr 로그 경로. real_tool=true 시 의무."
+              },
+              "invocation_timestamp": {
+                "type": "string",
+                "format": "date-time",
+                "description": "물증 #4 — 명령 실행 ISO timestamp. real_tool=true 시 의무."
+              },
+              "duration_ms": {
+                "type": "integer",
+                "description": "물증 #4b — 실행 소요시간 ms. real_tool=true 시 의무."
+              },
+              "result_hash": {
+                "type": "string",
+                "description": "물증 #5 — SARIF 결과 SHA256 hash. real_tool=true 시 의무. 결과 위조 차단."
+              },
+              "reproduction_command": {
+                "type": "string",
+                "description": "물증 #6 — 사용자가 재현 가능한 전체 명령. real_tool=true 시 의무."
+              },
               "findings_discovered": {"type": "integer"}
-            }
+            },
+            "allOf": [
+              {
+                "if": {"properties": {"real_tool": {"const": true}}},
+                "then": {
+                  "required": ["tool_name", "tool_version", "tool_stdout_path", "tool_stderr_path", "invocation_timestamp", "duration_ms", "result_hash", "reproduction_command"]
+                }
+              },
+              {
+                "if": {"properties": {"real_tool": {"const": false}}},
+                "then": {
+                  "required": ["simulation_reason"]
+                }
+              }
+            ]
           }
+        },
+        "simulation_only": {
+          "type": "boolean",
+          "description": "★★★ Sprint 4 묶음 O — validators 전체가 시뮬인 경우 자동 fail. lint-no-simulation.sh enforcement."
         },
         "double_hits": {
           "type": "integer",

@@ -20,6 +20,8 @@
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
 |---|---|---|---|---|
+| [★ DEC-2026-04-30-m-p2-3-종결](DEC-2026-04-30-m-p2-3-종결.md) | 2026-04-30 | methodology | 승인 (v1.2.2 PATCH) | 본체 갭 5건 일괄 처리 — api.template.md / phase-flow.mermaid+json / **ADR-009 (다이어그램 신뢰 모델 + 도구 종류 enum 7종 ★★★)** / db-schema.template.md / meta-confidence.template.yml. **본체 갭 7건 모두 closed** → ADR-008 본체 100% 정합. |
+| [★ DEC-2026-04-30-sprint-4-종결](DEC-2026-04-30-sprint-4-종결.md) | 2026-04-30 | methodology / poc-tooling | 승인 | C-Sprint 4 종결. 묶음 N+O 인프라 100% 산출 (drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 강제). PoC #02 자가 검증 → 11 신규 finding (F-107~F-117). 진짜 도구 실 실행 Sprint 5 carry-over. |
 | [★★★ DEC-2026-04-30-v1.2.0-격상](DEC-2026-04-30-v1.2.0-격상.md) | 2026-04-30 | methodology | 승인 (★★★ MINOR 격상) | v1.1.2 → v1.2.0 MINOR 격상. 14 묶음 통합 (A~M + P). ADR-008 + Phase 4.5 정식 + finding-system schema + migration-cautions.md 의무. N+O Sprint 4 후속. |
 | [DEC-2026-04-30-M-묶음-갭-식별](DEC-2026-04-30-M-묶음-갭-식별.md) | 2026-04-30 | methodology | 승인 | 방법론 본체 이중 렌더링 갭 7건 (P1 2 + P2 3 + P3 2) 공식 식별. P1 Sprint 3 병행 / P2-3 v1.2.0 묶음 M 일괄. |
 | [★★★ DEC-2026-04-29-round-trip-스코프-아웃](DEC-2026-04-29-round-trip-스코프-아웃.md) | 2026-04-29 | methodology | 승인 (★★★ 가치 재정의) | round-trip (산출물 → 신규 시스템) 검증 영구 scope 제외. 본 방법론 = "코드 → 형식 명세 + 위험 기록" 한 방향 추출기. |

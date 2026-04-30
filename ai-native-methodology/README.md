@@ -1,10 +1,12 @@
-# AI-Native 개발 방법론 v1.2.0
+# AI-Native 개발 방법론 v1.2.2
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
 >
 > 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
 >
-> **v1.2.0 갱신 (2026-04-30)**: PoC #01 + #02 누적 결과로 MINOR 격상 — Phase 4.5 형식 명세 정식 도입 (★★★) + ADR-008 이중 렌더링 사상 + finding-system schema 정식화 + antipatterns migration_advice + migration-cautions.md 의무 산출물 격상. 14 묶음 통합.
+> **v1.2.2 갱신 (2026-04-30)**: 묶음 M-P2-3 5건 일괄 처리 PATCH — 본체 갭 7건 모두 closed. **api.template.md / phase-flow.mermaid+json / ADR-009 (다이어그램 신뢰 모델) / db-schema.template.md / meta-confidence.template.yml**. 본체가 ADR-008 (이중 렌더링 사상) 100% 정합 달성 → 사실상 v1.3 진입 가능 상태.
+>
+> v1.2.1 — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema 강제. 진짜 도구 실 실행 Sprint 5 carry-over.
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
 
 ---
@@ -85,10 +87,40 @@ ai-native-methodology/
 │       ├── skills/
 │       ├── agents/
 │       └── commands/
+├── tools/                  ★ v1.2.1 신설 — Phase 4.5 자동 검증 도구
+│   ├── drift-validator/        .json ↔ .mermaid 의미 동일성 (state + sequence)
+│   ├── decision-table-validator/ dmn-check 5종 (duplicate/conflict/gap/overlap/type)
+│   └── static-runner/           Semgrep/PMD/SpotBugs plugin host + 5종 물증 + lint-no-simulation
+├── decisions/              결정 로그 (역시간순 / INDEX.md / STATUS.md)
 ├── examples/               PoC 결과
-│   └── poc-01-realworld/
+│   ├── poc-01-realworld-spring/
+│   └── poc-02-realworld-springboot3/
 └── .claude-plugin/         사내 plugin 배포 설정
+
+# 레포 루트 (본 디렉토리 외부)
+.github/workflows/drift-check.yml   ★ v1.2.1 — 이중 모드 (PR diff-aware + nightly full)
 ```
+
+## 검증 도구 사용 (v1.2.1)
+
+```bash
+# 1. drift validator — Phase 4.5 산출 후 자가 검증 (의무)
+npx --prefix ai-native-methodology/tools/drift-validator . \
+  drift-validator examples/poc-XX/output/formal-spec/
+
+# 2. decision-table validator — dmn-check 5종
+node ai-native-methodology/tools/decision-table-validator/src/cli.js \
+  examples/poc-XX/output/formal-spec/decision-tables/
+
+# 3. static-runner — 진짜 외부 도구 (★★★ 시뮬 절대 금지)
+node ai-native-methodology/tools/static-runner/src/cli.js \
+  --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
+
+# 4. lint-no-simulation — 5종 물증 + simulation_only 차단
+bash ai-native-methodology/tools/static-runner/src/lint-no-simulation.sh ./out
+```
+
+CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manual dispatch).
 
 ---
 
@@ -105,25 +137,25 @@ ai-native-methodology/
 
 ---
 
-## 현재 상태 (v1.2.0 — Phase 4.5 형식 명세 정식 도입)
+## 현재 상태 (v1.2.1 — 묶음 N+O 인프라 100% 산출)
 
 ### v1.x 누적 (2026-04-26 ~ 2026-04-30)
 
 - ✅ §0~§15 plan.md 완성
 - ✅ 7대 산출물 + 형식 명세 JSON Schema 11개 완성 (formal-spec / finding-system 신설)
-- ✅ ADR 7개 (001~006 + 008) — ADR-007 OpenAPI x-extension 별도, ADR-009 v1.2.x 후속
+- ✅ ADR 8개 (001~006 + 008 + **009 신규** v1.2.2) — ADR-007 OpenAPI x-extension 별도 / ADR-010 baseline+ratchet Sprint 5 carry-over
 - ✅ Phase 4.5 형식 명세 정식 도입 (state-machine + sequence + decision-table + invariants + property-test)
-- ✅ 한국어 용어집
-- ✅ PoC #01 (RealWorld Spring Boot 2.5) Phase 0~6 종결
-- ✅ PoC #02 (1chz/realworld-java21-springboot3 — SB 3.3 / Java 21 / Multi-module Hexagonal) Phase 1~6 + Phase 4.5 4 sprint 종결
+- ✅ PoC #01 + #02 종결 — Phase 1~6 + Phase 4.5 4 sprint
 - ✅ 이중 렌더링 사상 (ADR-008) 정식 등록
 - ✅ migration-cautions.md 의무 산출물 격상
+- ✅ **v1.2.1 — drift-validator + decision-table-validator + static-runner 3종 도구 + drift-check.yml CI + 5종 물증 schema 강제**
+- ✅ **v1.2.2 — 본체 갭 7건 모두 closed**: api.template.md / phase-flow.mermaid+json / ADR-009 / db-schema.template.md / meta-confidence.template.yml
+- ✅ PoC #02 자가 검증 → 11 신규 finding (F-107~F-117) 자동 검출
 
-### v1.2.x 후속 (Sprint 4 / 다음)
+### v1.2.x → v1.3 후속
 
-- ⏳ Drift 자동 검증 CI 도구 (묶음 N)
-- ⏳ 진짜 외부 도구 의무화 (Semgrep / PMD / SpotBugs / Daikon / CodeQL — 묶음 O)
-- ⏳ 본체 갭 P2-3 5건 (api.template.md / phase-flow.mermaid / ADR-009 / db-schema.template.md / meta-confidence.template)
+- ⏳ **Sprint 5 carry-over** — static tool 실 실행 1회 (Semgrep+PMD) / drift-validator transitionFuzzyMatch 보완 / corpus 4쌍→20쌍 / ADR-010 (baseline+ratchet)
+- ⏳ 본체 갭 P2-3 5건 (api.template.md / phase-flow.mermaid / db-schema.template.md / meta-confidence.template)
 - ⏳ Claude Code 플러그인 구현
 - ⏳ PoC #03 (다른 stack — FastAPI / NestJS / Ktor)
 

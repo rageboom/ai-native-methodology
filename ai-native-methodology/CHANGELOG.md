@@ -9,7 +9,149 @@
 
 ---
 
-## [v1.2.0] — 2026-04-30 ⭐ 현재
+## [v1.2.2] — 2026-04-30 ⭐ 현재 (PATCH)
+
+### 트리거
+
+DEC-2026-04-30-M-묶음-갭-식별 의 P2-3 5건 일괄 처리. v1.2.0 격상 시점 "묶음 M 일괄" 로 미뤄졌던 본체 갭. **본체가 ADR-008 (이중 렌더링 사상) 을 100% 따르지 못하던 상태 해소** — 이제 본체도 PoC 산출물처럼 단일 진실 + AI 눈 + 사람 눈 의무 정합.
+
+### 변경 사항
+
+#### Added (추가)
+
+**`templates/api.template.md`** (G3 — P2 #3)
+- `templates/api.template.yaml` (AI 눈) 의 사람 눈 짝.
+- PoC #01 / #02 `api.md` 형식 표준화 — endpoint heatmap + UC ↔ op 매핑 + RFC 위반 인덱스 + AP/finding 인덱스 + 변경 권고 우선순위.
+
+**`methodology-spec/workflow/phase-flow.mermaid` + `phase-flow.json`** (G4 — P2 #4)
+- 9 phase (0~6 + 4.5) + 산출물 의존 그래프 + Phase 4.5 도입 위치 시각화.
+- `.json` 짝 (drift-validator 의 향후 phase-flow 비교기 v1.3+ 호환). 본 sprint 에서는 drift-validator 미인식 — Sprint 6 후속.
+
+**`docs/adr/ADR-009-다이어그램-신뢰-모델.md`** (G5 — P2 #5) ★
+- DEC-2026-04-29-다이어그램-신뢰-모델 + memory `feedback_diagram_trust_model.md` 정식 ADR 격상.
+- **7단계 + 8단계 (이론적 100%) 신뢰도 정량 표** — 1차 작성 60-70% / cross-validation 75-85% / **★ v1.2.1 자동 도구 78-85% 단계 신설** / 시뮬 패널티 80-87% / 진짜 도구 85-92% / property test 90-95% / 사람 95%+ / 형식 증명 100%.
+- **★★★ 도구 종류 enum 7종** — `ai_subagent` / `ai_persona_simulation` / `automated_tool` / `real_static_tool` / `property_test` / `human_review` / `formal_proof`. AI persona vs 진짜 도구 절대 동일 신뢰도 표기 ❌.
+- ADR-008 과 짝 — 사상 (왜 두 렌더링) / 정량 (어디까지 믿나).
+- 본 방법론 차별 자산 — 외부 사례 부재 (테크기업 사례 research fetch 실패).
+
+**`templates/db-schema.template.md`** (G6 — P3 #6)
+- `erd.template.mermaid` (사람 눈 다이어그램) + `schema.json/sql` (AI 눈) 의 보고서 짝.
+- PoC #02 `정합성-검증-보고서.md` 형식 표준화 — 출처 매트릭스 + ORM derivative vs 수동 분별 (F-050) + 정합성 5종 + Race Safety + AP/finding 인덱스.
+
+**`templates/meta-confidence.template.yml`** (G7 — P3 #7)
+- `schemas/meta-confidence.schema.json` (AI 눈) 의 사람 눈 짝.
+- **dbt-score / Backstage EntityMeta 모델 차용** (Document agent research): `trust_level` (current % + current_step + validation_history[]) + `tool_type` enum (ADR-009 정합).
+- PoC #02 `_manifest.yml` 형식 통합. 5종 물증 cross_validation 예시 주석 포함 (formal-spec.schema 정합).
+
+#### Updated (갱신)
+
+- `README.md` — v1.2.1 → v1.2.2 헤더 + ADR-009 명시
+- `decisions/STATUS.md` — 묶음 M 7/7 완료 (P1 Sprint 3 + P2-3 본 sprint)
+- `decisions/INDEX.md` — DEC-m-p2-3-종결 entry
+
+### 현재 상태
+
+- **본체 갭 7건 모두 closed** (P1 2건 Sprint 3 + P2-3 5건 본 sprint)
+- ADR 8개: 001~006 + 008 + **009 신규**
+- v1.2.x 묶음: A~P 16건 ready ✅ + M 7/7 ✅ — **사실상 v1.3 진입 가능 상태**
+- 신뢰도 정직 표기: 80-87% (시뮬 패널티 유지 / Sprint 5 진짜 도구 carry-over)
+
+### Carry-over
+
+1. **Sprint 5** — static-runner 진짜 실행 1회 / drift-validator transitionFuzzyMatch 보완 / corpus 4쌍→20쌍 / ADR-010 (baseline+ratchet)
+2. **Sprint 6** — drift-validator phase-flow 비교기 (v1.3+)
+3. **시퀀스 B** — PoC #03 진입 (다른 stack)
+
+---
+
+## [v1.2.1] — 2026-04-30 (PATCH)
+
+### 트리거
+
+C-Sprint 4 종결 — 묶음 N+O 인프라 산출. v1.2.0 의 14/16 묶음 ready 에서 **16/16 ready** 로 격상. 진짜 외부 도구 실 실행은 환경 부재로 Sprint 5 carry-over (★★★ no-simulation 정책 정합).
+
+| 묶음 | 영역 |
+|---|---|
+| **N** | Drift 자동 검증 도구 (CI) — drift-validator + decision-table-validator + drift-check.yml |
+| **O** | 진짜 외부 도구 실행 의무화 — static-runner Plugin host + 5종 물증 schema enforcement + lint-no-simulation.sh |
+
+→ 시퀀스 C 종결. 시퀀스 B (PoC #03) 또는 Sprint 5 (carry-over) 진입 가능.
+
+### 변경 사항
+
+#### Added (추가)
+
+**도구 3종 신설 (`tools/`)**
+
+- `tools/drift-validator/` — `.json ↔ .mermaid` 의미 동일성 자동 검증 (state-machine + sequence). 정규식 fallback (★ 30분 spike 결과 `@mermaid-js/parser` v1.1.0 미지원 입증). oasdiff 식 항목별 diff list + severity (`breaking`/`non-breaking`/`info`). corpus 4쌍 self-test (Sprint 5 → 20쌍 확장 carry-over). 6/6 unit test pass.
+- `tools/decision-table-validator/` — dmn-check 5종 (duplicate / conflict / gap / overlap / type) + JSON sanity (formal-spec.schema 정합). `red6/dmn-check` Apache 2.0 알고리즘 차용. 7/7 test pass.
+- `tools/static-runner/` — Semgrep / PMD / SpotBugs / Daikon / CodeQL plugin host. **5종 물증 schema enforcement** + `lint-no-simulation.sh` 차단 룰. 4/4 test pass. Sprint 4 1차: Semgrep + PMD plugin (SpotBugs/Daikon/CodeQL plugin skeleton 만 — Sprint 5+ carry-over).
+
+총 17/17 unit test pass.
+
+**CI workflow 신설**
+
+- `.github/workflows/drift-check.yml` — 이중 모드 (PR diff-aware `SEMGREP_BASELINE_REF=main` / nightly full / manual dispatch). action 핀 (`actions/setup-java@v5` Temurin 21 + `actions/setup-node@v6`). SARIF Code Scanning upload + 30일 evidence artifact 보존.
+
+#### Changed (변경)
+
+**`schemas/formal-spec.schema.json` — `cross_validation` 5종 물증 의무화**
+
+`validators[]` 항목에:
+- `real_tool: true` 시 7 필드 (`tool_version` / `tool_stdout_path` / `tool_stderr_path` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command`) **JSON Schema if/then allOf 강제**
+- `real_tool: false` 시 `simulation_reason` 의무
+- `simulation_only: true` 시 자동 fail
+
+→ DEC-2026-04-29-static-tool-실행-의무화 enforcement 자동화.
+
+#### Validated (검증)
+
+**PoC #02 자가 검증 (★ Sprint 4 본질적 가치)**
+
+drift-validator + decision-table-validator 를 PoC #02 formal-spec 디렉토리에 적용:
+- state-machine 2건: **7 breaking** + 0 non-breaking + 24 info
+- sequence 2건: 0 breaking
+- decision-table 6건: 0 breaking + **3 non-breaking** (interpretive drift)
+
+→ Sprint 3 가 "drift 0" 으로 보고했던 산출물에서 **10건 자동 검출**. 수동 검증 한계 노출 = 묶음 N (Drift CI) 의 강한 ROI 정량 입증.
+
+#### Findings (신규)
+
+**Sprint 4 신규 finding 11건** (F-107~F-117) — `examples/poc-02-realworld-springboot3/output/formal-spec/SPRINT-4-REPORT.md` 정리.
+
+| 분류 | 건수 | 핵심 |
+|---|---:|---|
+| state-machine structural drift (high) | 4 | F-107 / F-109 / F-110 / F-112 |
+| state-machine 추상화 layer (medium) | 3 | F-108 / F-111 / F-113 |
+| decision-table interpretive (low) | 3 | F-114 / F-115 / F-116 |
+| 메타 finding (medium) ★ | 1 | F-117 — Sprint 3 "drift 0" 수동 한계 노출 |
+
+#### Carry-over → Sprint 5
+
+1. static-runner Semgrep + PMD 1회 실 실행 (사용자 환경 설치 또는 CI 위임 후) — 신뢰도 80-87% → 90-95% 격상 가능
+2. drift-validator transitionFuzzyMatch 보완 (composite state inner transition) — F-108/F-110/F-111 false positive 제거
+3. corpus 4쌍 → 20쌍 확장
+4. ADR-010 (baseline + ratchet) 격상 — 운영 표준 (Slack/GitLab/Dropbox/Figma/Shopify 사례 정합)
+
+### 신뢰도 표기 (정직 유지)
+
+- 시뮬 패널티 적용 시 80-87% (현재 — 본 환경 Java/Semgrep/PMD 부재)
+- 진짜 도구 1회 실행 시 90-95% 목표 (Sprint 5 carry-over)
+
+★★★ no-simulation 정책 정합 — 시뮬 결과를 신뢰도 90-95% 근거로 절대 사용 금지.
+
+### 결정 / 보고서
+
+- `decisions/DEC-2026-04-30-sprint-4-종결.md`
+- `decisions/STATUS.md` 갱신 (v120_bundles_ready: 16/16)
+- `decisions/INDEX.md` 갱신
+- `examples/poc-02-realworld-springboot3/output/formal-spec/SPRINT-4-REPORT.md`
+- `examples/poc-02-realworld-springboot3/.claude/SESSION-WRAPUP-2026-04-30-sprint4.md`
+- `ai-native-methodology/.claude/plans/plan-c-sprint-4.md` + `.claude/researches/research-c-sprint-4.md`
+
+---
+
+## [v1.2.0] — 2026-04-30 (MINOR)
 
 ### 트리거
 

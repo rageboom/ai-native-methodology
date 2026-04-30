@@ -1,0 +1,111 @@
+%% AI-Native 방법론 — Phase 흐름 + 산출물 의존 그래프
+%% v1.2.2 신설 (묶음 M-P2-3 #4 — DEC-2026-04-30-M-묶음-갭-식별 P2 #4)
+%% 사람 눈 (mermaid). AI 눈 짝: phase-flow.json (drift-validator 호환).
+%% ADR-008 (이중 렌더링 사상) 정합.
+
+flowchart TB
+    %% ═════════════ Phase 0 (입력) ═════════════
+    subgraph P0["Phase 0 — 입력 정리"]
+        direction LR
+        P0_IN["소스 (필수)<br/>+ ERD / ORM / 기획 (선택)"]
+        P0_OUT["_manifest.yml (입력)"]
+        P0_IN --> P0_OUT
+    end
+
+    %% ═════════════ Phase 1 ═════════════
+    subgraph P1["Phase 1 — init"]
+        direction LR
+        P1_OUT["inventory.json<br/>tree.md + stack-detection.md<br/>stats.json"]
+    end
+
+    %% ═════════════ Phase 2 ═════════════
+    subgraph P2["Phase 2 — db"]
+        direction LR
+        P2_OUT["schema.json + schema.sql<br/>erd.mermaid<br/>정합성-검증-보고서.md"]
+    end
+
+    %% ═════════════ Phase 3 ═════════════
+    subgraph P3["Phase 3 — arch"]
+        direction LR
+        P3_OUT["architecture.json<br/>architecture.mermaid + .md<br/>dependency-graph.mermaid<br/>circular-dependencies.md"]
+    end
+
+    %% ═════════════ Phase 4 (4영역 병렬) ═════════════
+    subgraph P4["Phase 4 — 비즈니스 로직 (4영역 병렬)"]
+        direction TB
+        P4A["5.A rules<br/>(BR 추출)"]
+        P4B["5.B domain<br/>(Aggregate Root)"]
+        P4C["5.C antipatterns-partial<br/>(부분 추출)"]
+        P4D["5.D ui-domain<br/>(UI 도메인)"]
+        P4_OUT["domain.json + domain.mermaid + .md<br/>rules.json + rules.md<br/>antipatterns-partial.json"]
+        P4A --> P4_OUT
+        P4B --> P4_OUT
+        P4C --> P4_OUT
+        P4D --> P4_OUT
+    end
+
+    %% ═════════════ Phase 4.5 (★ v1.2.0 신설 / v1.2.1 자동 검증) ═════════════
+    subgraph P45["Phase 4.5 — 형식 명세 (★ v1.2.0)"]
+        direction LR
+        P45_OUT["state-machines/*.json + .mermaid<br/>sequence-diagrams/*.json + .mermaid<br/>decision-tables/*.json + .md<br/>invariants/*.ts<br/>property-tests/*.spec.ts"]
+        P45_VAL["★ v1.2.1 자동 검증<br/>drift-validator + decision-table-validator"]
+        P45_OUT --> P45_VAL
+    end
+
+    %% ═════════════ Phase 5 (병렬) ═════════════
+    subgraph P5_1["Phase 5-1 — api"]
+        P5_1_OUT["openapi.yaml + api.md<br/>api-extension.json"]
+    end
+    subgraph P5_2["Phase 5-2 — ui"]
+        P5_2_OUT["ui-spec.json + ui-spec.md + .mermaid"]
+    end
+
+    %% ═════════════ Phase 6 ═════════════
+    subgraph P6["Phase 6 — quality (안티패턴 통합)"]
+        direction LR
+        P6_OUT["antipatterns.json<br/>avoid-list.md<br/>migration-cautions.md (★ v1.2.0)"]
+    end
+
+    %% ═════════════ Cross-cutting (모든 phase) ═════════════
+    subgraph CC["Cross-cutting"]
+        direction LR
+        CC_FIND["findings/poc-findings.md<br/>(F-NNN — finding-system schema)"]
+        CC_DEC["decisions/<br/>(DEC-YYYY-MM-DD-* / INDEX.md / STATUS.md)"]
+        CC_META["_manifest.yml per phase<br/>(meta-confidence + cross_validation)"]
+    end
+
+    %% ═════════════ 의존 그래프 ═════════════
+    P0 --> P1
+    P1 --> P2
+    P1 --> P3
+    P2 --> P3
+    P1 --> P4
+    P2 --> P4
+    P3 --> P4
+    P4 --> P45
+    P4 --> P5_1
+    P45 --> P5_1
+    P4 --> P5_2
+    P3 --> P5_2
+    P5_1 --> P6
+    P5_2 --> P6
+    P45 --> P6
+    P4 --> P6
+
+    %% 산출물 cross-cutting
+    P1 -.-> CC_FIND
+    P2 -.-> CC_FIND
+    P3 -.-> CC_FIND
+    P4 -.-> CC_FIND
+    P45 -.-> CC_FIND
+    P5_1 -.-> CC_FIND
+    P5_2 -.-> CC_FIND
+    P6 -.-> CC_FIND
+
+    %% Style
+    classDef new45 fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef quality fill:#d4edda,stroke:#155724,stroke-width:2px
+    classDef cross fill:#e2e3e5,stroke:#383d41
+    class P45 new45
+    class P6 quality
+    class CC cross
