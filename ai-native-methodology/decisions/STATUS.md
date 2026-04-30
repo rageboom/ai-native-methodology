@@ -9,7 +9,15 @@
 
 ## 방법론 본체 버전
 
-- **★★★ v1.2.3 PATCH 격상 완료 (현재)** — ★ 사용자 방향 재정렬 ("PoC 산출물 ❌ / 본체 격상 ✅"). 묶음 C+I+H+K 4건. **★ Phase 4.5 cross-link 의무화 schema (openapi-extension + antipatterns)** + **★ AP-PERFORMANCE 3 PoC 권위 격상** + **★ Positive finding 패턴 (severity:positive + learning_effect_type 4종 + status:logged)** + **★ Lifecycle BR 패턴 (decision_tables required 분리 + br_type enum + current_state_note)**. 본체 갭 closure 7 → 11. v1.3.0 release 진입 직전.
+- **★★★ v1.2.3 PATCH 격상 완료 (현재)** — ★ 사용자 방향 재정렬 ("PoC 산출물 ❌ / 본체 격상 ✅"). **7 묶음 통합** (C+I+H+K + R+D+§8.1).
+  - C: Phase 4.5 cross-link 의무화 schema
+  - I: AP-PERFORMANCE 3 PoC 권위 격상
+  - H: Positive finding 패턴 schema (severity:positive + learning_effect_type 4종 + status:logged)
+  - K: Lifecycle BR 패턴 (decision_tables required 분리 + br_type enum + current_state_note)
+  - **R: NestJS 4 ADR 신설** (Auth-scope / Validation / HttpCode / TypeORM-Integrity)
+  - **D: ADR-006 final 격상 + ADR-010 (Baseline + Ratchet) 신규**
+  - **§8.1 cross-platform 입증 정식 등재** (README "Platform-Agnostic 입증" 섹션)
+  - 본체 갭 closure 7 → 11. ADR 9 → 13개 (★ ADR-NEST 4 + ADR-010 1). v1.3.0 release 진입 직전.
 - v1.2.2 PATCH — 묶음 M-P2-3 5건 (본체 갭 7건 모두 closed).
 - **v1.2.1 PATCH** — drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 강제.
 - **v1.2.0 MINOR** — 14 묶음 (A~M+P) 통합. ADR-008 + Phase 4.5 정식 + finding-system schema + migration-cautions 의무.
