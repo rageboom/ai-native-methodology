@@ -1,0 +1,655 @@
+openapi: 3.0.1
+info:
+  title: NestJS Realworld Example App
+  description: |
+    The Realworld API description.
+
+    ★ Static extraction from `@nestjs/swagger` decorators + `@Controller` / DTO + interface.
+    Source: lujakob/nestjs-realworld-example-app HEAD c1c2cc4 (2021-01-18).
+
+    NOT generated from `nest start` (runtime). Runtime ground-truth diff = Sprint 5 carry-over.
+  version: '1.0'
+servers:
+  - url: /api
+    description: Global prefix (main.ts setGlobalPrefix('api')) / ★ no /v1 (F-159)
+
+# ----------------------------------------------------------------------
+# Tags (controller decorator @ApiTags)
+# ----------------------------------------------------------------------
+tags:
+  - name: user
+    description: User authentication + profile (UserController)
+  - name: articles
+    description: Article + comments + favorites (ArticleController)
+  - name: profiles
+    description: Profile follow / unfollow (ProfileController)
+  - name: tags
+    description: Tag list (TagController)
+
+# ----------------------------------------------------------------------
+# Paths — 21 endpoints
+# ----------------------------------------------------------------------
+paths:
+  # ====================== UserController (5) =========================
+  /user:
+    get:
+      tags: [user]
+      summary: Get current user
+      operationId: GetCurrentUser
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '401':
+          description: Unauthorized (AuthMiddleware applied)
+    put:
+      tags: [user]
+      summary: Update current user
+      operationId: UpdateCurrentUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user: { $ref: '#/components/schemas/UpdateUserDto' }
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '401':
+          description: Unauthorized
+      x-method-semantic-issue:
+        rfc: 'RFC 5789 (PATCH 권고)'
+        evaluation: 'PUT 부분 갱신 — UpdateUserDto 모든 필드 optional → PATCH application/merge-patch+json 권고 (F-160)'
+
+  /users:
+    post:
+      tags: [user]
+      summary: Sign up new user
+      operationId: CreateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user: { $ref: '#/components/schemas/CreateUserDto' }
+      responses:
+        '201':
+          description: Created (NestJS @Post default)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '400':
+          description: '@IsNotEmpty validation failed OR username/email duplicate'
+
+  /users/{slug}:
+    delete:
+      tags: [user]
+      summary: Delete user (★★ F-140 + F-164 — slug parameter is actually email)
+      operationId: DeleteUser
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+          description: '★ F-152 — slug param is actually email (param naming confusion)'
+      responses:
+        '200':
+          description: Deleted
+        '401':
+          description: 'Should require auth (★★ F-140 critical — AuthMiddleware NOT applied)'
+      x-security-defect:
+        finding: 'F-140 critical'
+        evidence: 'src/user/user.module.ts:17 forRoutes — DELETE method missing'
+        rfc: 'OWASP API5 (Broken Function Level Authorization)'
+
+  /users/login:
+    post:
+      tags: [user]
+      summary: Login
+      operationId: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user: { $ref: '#/components/schemas/LoginUserDto' }
+      responses:
+        '201':
+          description: 'Login OK (NestJS @Post default 201 — RFC 9110 §15.3.2 위반: 신규 자원 미생성)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UserResponse' }
+        '401':
+          description: |
+            Invalid credentials (★ F-150 'User not found' message — 모호 / OWASP A07 user enumeration)
+      x-spec-runtime-drift:
+        rfc: 'RFC 9110 §15.3.2 (201 Created 신규 자원 URI 시만)'
+        evaluation: '★ login 신규 자원 ❌ → 200 OK 권고 (PoC #02 F-085 isomorphic / F-158 묶음)'
+      x-rate-limit:
+        finding: 'F-153 medium — @nestjs/throttler 미적용 (OWASP A04 brute force)'
+
+  # ====================== ArticleController (11) ====================
+  /articles:
+    get:
+      tags: [articles]
+      summary: Get all articles
+      operationId: GetArticles
+      parameters:
+        - in: query
+          name: tag
+          schema: { type: string }
+        - in: query
+          name: author
+          schema: { type: string }
+        - in: query
+          name: favorited
+          schema: { type: string }
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+          description: '★ no maximum cap (PoC #02 F-080 isomorphic — OWASP API4)'
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: List of articles
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticlesResponse' }
+    post:
+      tags: [articles]
+      summary: Create article
+      operationId: CreateArticle
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                article: { $ref: '#/components/schemas/CreateArticleDto' }
+      responses:
+        '201':
+          description: 'Article created (★ F-053 변형 — slug = slugify + Math.random) / ApiResponse 201 ✅'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleResponse' }
+        '403':
+          description: Forbidden (ApiResponse decorator only)
+
+  /articles/feed:
+    get:
+      tags: [articles]
+      summary: Get article feed (followed users)
+      operationId: GetArticleFeed
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, default: 0 }
+      responses:
+        '200':
+          description: Article feed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticlesResponse' }
+        '403':
+          description: Forbidden (ApiResponse decorator only)
+
+  /articles/{slug}:
+    get:
+      tags: [articles]
+      summary: Get single article
+      operationId: GetArticle
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Article
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleResponse' }
+    put:
+      tags: [articles]
+      summary: Update article (★★ F-164 critical — no @User auth check)
+      operationId: UpdateArticle
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                article: { $ref: '#/components/schemas/CreateArticleDto' }
+      responses:
+        '201':
+          description: 'Article updated (ApiResponse 201 — RFC 9110 §6.5 권고 200)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleResponse' }
+      x-method-semantic-issue:
+        rfc: 'RFC 5789 — PATCH 권고 + RFC 9110 §6.5 — Update success 200'
+        evaluation: 'PUT + ApiResponse 201 + no auth — 3중 결함 (F-160 + F-158 + F-164)'
+      x-security-defect:
+        finding: 'F-164 critical — @User decorator 부재 → AuthMiddleware 미적용 + 권한 0'
+        evidence: 'src/article/article.controller.ts:60 update method'
+      x-todo-comment:
+        location: 'article.controller.ts:61'
+        evidence: '// Todo: update slug also when title gets changed'
+        finding: 'F-126 — slug 미업데이트'
+    delete:
+      tags: [articles]
+      summary: Delete article (★★ F-164 critical — no @User auth check)
+      operationId: DeleteArticle
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: 'Article deleted (★★ ApiResponse 201 — RFC 9110 §15.3.5 위반: DELETE 204)'
+      x-spec-runtime-drift:
+        rfc: 'RFC 9110 §15.3.5 (DELETE → 204 No Content 권고)'
+        evaluation: '★★ ApiResponse 201 / NestJS DELETE 기본 200 / RFC 권고 204 — 3중 위반 (F-158 묶음)'
+      x-security-defect:
+        finding: 'F-164 critical — auth 부재'
+
+  /articles/{slug}/comments:
+    get:
+      tags: [articles]
+      summary: Get comments
+      operationId: GetArticleComments
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Comments list
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CommentsResponse' }
+    post:
+      tags: [articles]
+      summary: Add comment (★★ F-164 critical — no @User auth check)
+      operationId: AddArticleComment
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment: { $ref: '#/components/schemas/CreateCommentDto' }
+      responses:
+        '201':
+          description: 'Comment created (ApiResponse 201 ✅)'
+      x-security-defect:
+        finding: 'F-164 critical — auth 부재 (anonymous comment 가능)'
+
+  /articles/{slug}/comments/{id}:
+    delete:
+      tags: [articles]
+      summary: Delete comment (★★ F-164 critical — no @User auth check)
+      operationId: DeleteArticleComment
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '201':
+          description: '★★ ApiResponse 201 — RFC 9110 §15.3.5 위반 + auth 부재 (F-158 + F-164)'
+      x-spec-runtime-drift:
+        rfc: 'RFC 9110 §15.3.5'
+        evaluation: 'ApiResponse 201 / DELETE 권고 204'
+      x-security-defect:
+        finding: 'F-164 critical — anonymous 가 누구의 comment 든 삭제 가능'
+
+  /articles/{slug}/favorite:
+    post:
+      tags: [articles]
+      summary: Favorite article
+      operationId: FavoriteArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: '★ ApiResponse 201 — POST favorite 정합 (★ F-135 race window 별 결함)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleResponse' }
+      x-idempotency-issue:
+        rfc: 'RFC 7231 §4.2.2 (POST 비-idempotent 자체는 OK 그러나 사용 패턴이 toggle)'
+        evaluation: 'PoC #02 F-070 isomorphic — toggle 의도이나 POST/DELETE 분리 OK / 본질 위반 ❌'
+      x-race-window:
+        finding: 'F-135 critical — favoriteCount race (App 1중 isNewFavorite check)'
+    delete:
+      tags: [articles]
+      summary: Unfavorite article
+      operationId: UnfavoriteArticle
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: '★★ ApiResponse 201 — RFC 9110 §15.3.5 위반 (DELETE 권고 204) + favorite/unfavorite ApiResponse 통일성 (F-158 묶음)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ArticleResponse' }
+      x-spec-runtime-drift:
+        rfc: 'RFC 9110 §15.3.5'
+        evaluation: 'ApiResponse 201 / DELETE 권고 204 + favoriteCount-- race (F-135)'
+
+  # ====================== ProfileController (3) =====================
+  /profiles/{username}:
+    get:
+      tags: [profiles]
+      summary: Get profile by username
+      operationId: GetProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileResponse' }
+
+  /profiles/{username}/follow:
+    post:
+      tags: [profiles]
+      summary: Follow user
+      operationId: FollowUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: 'Followed (★ F-144 self-check email 비교 / F-121 FK + UQ pair 부재)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileResponse' }
+        '400':
+          description: '''follower or username not provided'' OR ''FollowerEmail and FollowingId cannot be equal'''
+      x-formal-spec-link:
+        decision_table: 'BR-FOLLOWS-NO-SELF-001 + BR-FOLLOWS-PAIR-UNIQUE-001'
+        state_machine: 'Follows.json'
+        sequence_diagram: 'UC-PROFILE-FOLLOW.mermaid'
+    delete:
+      tags: [profiles]
+      summary: Unfollow user (★ F-144 dimensional inconsistency — uses id 비교 instead of email)
+      operationId: UnfollowUser
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 'Unfollowed (NestJS DELETE default 200 — RFC 권고 204)'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileResponse' }
+        '400':
+          description: '''FollowerId and FollowingId cannot be equal'' (★ F-144 — id 비교 / follow=email 비교 차원 불일치)'
+
+  # ====================== TagController (1) =========================
+  /tags:
+    get:
+      tags: [tags]
+      summary: Get all tags
+      operationId: GetTags
+      responses:
+        '200':
+          description: Tags list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Tag' }
+      x-auth-scope-mismatch:
+        finding: 'F-163 medium — @ApiBearerAuth 데코 적용 vs 실 endpoint 인증 불요 (인지 불일치)'
+
+  # ====================== AppController (1) =========================
+  /:
+    get:
+      summary: Hello World root
+      operationId: Root
+      responses:
+        '200':
+          description: 'Hello World!'
+          content:
+            text/plain:
+              schema: { type: string }
+
+# ----------------------------------------------------------------------
+# Components
+# ----------------------------------------------------------------------
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        ★ Bearer JWT 표준 (★ PoC #02 Token apiKey 비표준 F-084 비재현 = 학습 효과 / F-161 positive)
+        그러나 verify 무방어 (F-118 try/catch 부재) + 60일 expiry (F-119) + refresh 부재 (F-149)
+
+  schemas:
+    # ----- Request DTO (class-validator) -----
+    CreateUserDto:
+      type: object
+      required: [username, email, password]
+      properties:
+        username:
+          type: string
+          description: '@IsNotEmpty (★ class-validator coverage 12% — 본 DTO 만 validator 적용)'
+        email:
+          type: string
+          description: '@IsNotEmpty (★ @IsEmail 부재 — UserEntity 데코로만 검증 / F-128)'
+        password:
+          type: string
+          description: '@IsNotEmpty (★ length / strength validator 부재 — F-128)'
+
+    UpdateUserDto:
+      type: object
+      description: '★ F-162 — 모든 필드 optional + 0 validator (★ F-143 UserService.update validate 미호출 합산)'
+      properties:
+        username: { type: string }
+        email: { type: string }
+        bio: { type: string }
+        image: { type: string }
+
+    LoginUserDto:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          description: '@IsNotEmpty'
+        password:
+          type: string
+          description: '@IsNotEmpty (★ F-150 — User not found 메시지 모호 / OWASP A07)'
+
+    CreateArticleDto:
+      type: object
+      description: '★ F-162 — 0 validator (★ F-128 합산)'
+      required: [title, description, body]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        body: { type: string }
+        tagList:
+          type: array
+          items: { type: string }
+
+    CreateCommentDto:
+      type: object
+      description: '★ F-162 — 0 validator + ★ F-164 anonymous 가능'
+      required: [body]
+      properties:
+        body: { type: string }
+
+    # ----- Response Output (interface) -----
+    UserData:
+      type: object
+      properties:
+        email: { type: string }
+        token: { type: string, description: 'Bearer JWT (★ 60일 expiry — F-119)' }
+        username: { type: string }
+        bio: { type: string, nullable: true }
+        image: { type: string, nullable: true }
+
+    UserResponse:
+      type: object
+      properties:
+        user: { $ref: '#/components/schemas/UserData' }
+
+    ProfileData:
+      type: object
+      properties:
+        username: { type: string }
+        bio: { type: string, nullable: true }
+        image: { type: string, nullable: true }
+        following: { type: boolean, description: '★ App level 계산 (Domain invariant 부재 F-147)' }
+
+    ProfileResponse:
+      type: object
+      properties:
+        profile: { $ref: '#/components/schemas/ProfileData' }
+
+    Author:
+      type: object
+      properties:
+        username: { type: string }
+        bio: { type: string, nullable: true }
+        image: { type: string, nullable: true }
+        following: { type: boolean }
+
+    Article:
+      type: object
+      properties:
+        slug:
+          type: string
+          description: '★ F-053 변형 — slug = slugify(title) + Math.random().toString(36).substring(7)'
+        title: { type: string }
+        description: { type: string }
+        body: { type: string }
+        tagList:
+          type: array
+          items: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        favorited: { type: boolean }
+        favoritesCount:
+          type: integer
+          description: '★ F-135 race window — App 1중 isNewFavorite check'
+        author: { $ref: '#/components/schemas/Author' }
+
+    ArticleResponse:
+      type: object
+      properties:
+        article: { $ref: '#/components/schemas/Article' }
+
+    ArticlesResponse:
+      type: object
+      properties:
+        articles:
+          type: array
+          items: { $ref: '#/components/schemas/Article' }
+        articlesCount: { type: integer }
+
+    Comment:
+      type: object
+      properties:
+        id: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+        body: { type: string }
+        author: { $ref: '#/components/schemas/Author' }
+
+    CommentsResponse:
+      type: object
+      properties:
+        comments:
+          type: array
+          items: { $ref: '#/components/schemas/Comment' }
+
+    Tag:
+      type: object
+      description: 'TagEntity 직접 노출 (★ Sairyss DDD-Hexagon 위반 — Repository 결과 직접 반환)'
+      properties:
+        id: { type: integer }
+        name: { type: string }
+
+    GenericError:
+      type: object
+      description: '★ F-118 + F-150 — HttpException 형식 (RFC 7807 미준수 — REC-API-PROBLEM-DETAILS)'
+      properties:
+        statusCode: { type: integer }
+        message: { type: string }
+        errors:
+          type: object
+          description: '★ login: {User: '' not found''} 형식'

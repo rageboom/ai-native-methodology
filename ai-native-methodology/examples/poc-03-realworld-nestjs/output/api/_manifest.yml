@@ -1,0 +1,279 @@
+manifest:
+  generated_at: "2026-04-30"
+  poc_id: "poc-03-realworld-nestjs"
+  phase: "5-1"
+  phase_name: "api (API 계약)"
+  methodology_version: "v1.2.2"
+
+# 상위 phase 인계
+phase_3_input:
+  source: "../architecture/_manifest.yml"
+  consistency: "1 module tree (5 도메인) / 21 endpoint × 5 controller 매핑 정합"
+
+phase_4_input:
+  source: "../domain/_manifest.yml + ../rules/_manifest.yml + ../antipatterns-partial/_manifest.yml"
+  consistency: |
+    UC 20 → 20 operationId 매핑 ✅ (★ Root system_internal 정당)
+    BR 12/18 → endpoint 매핑 ✅ (validation 4 + policy 5 + auth 3)
+    AP partial 8 → 본 phase 의 spec/runtime drift 4 candidate 합산 = 12
+
+phase_4_5_input:
+  source: "../formal-spec/_manifest.yml"
+  consistency: |
+    state-machine 3 → operation 21 매핑 ✅ (User/Follows/Article 모두 cross-link)
+    sequence 6 → 6 operation 직접 매핑 (UC-USER-{SIGNUP,LOGIN,DELETE} + UC-PROFILE-FOLLOW + UC-ARTICLE-{CREATE,FAVORITE})
+    decision-table 6 → 6 BR x-formal-spec-link 직접 참조
+
+# Phase 5-1 산출물 4종
+deliverables:
+  - file: "openapi.yaml"
+    purpose: "정적 추출 spec (★ runtime ground truth 부재 — Sprint 5 carry-over)"
+    schema: "OpenAPI 3.0.1 spec compliant"
+    confidence: 0.90  # PoC #02 1.00 ground truth 대비 -10p (정적 추출만)
+    operations: 21
+    paths: 15  # paths
+    components_schemas: 14
+    components_securitySchemes: 1  # bearerAuth (★ http bearer JWT 표준)
+    note: "DEC-PoC03-N5 정합 — @nestjs/swagger 자동생성 vs 정적 추출 본질 동등 caveat"
+  - file: "api-extension.json"
+    purpose: "AI 분석 메타 (operations 21 + composes_uc + breaks_br + spec_runtime_drift + x-security-defect + x-formal-spec-link)"
+    schema: "schemas/openapi-extension.schema.json (ADR-007)"
+    confidence: 0.92
+    operations: 21
+  - file: "api.md"
+    purpose: "사람용 요약 + 21 op heatmap + RFC 위반 인덱스 + 12 REC-API-* + cross-PoC 학습 효과 통계"
+    confidence: 0.92
+  - file: "_manifest.yml"
+    purpose: "Phase 5-1 매니페스트 (본 파일)"
+    confidence: 0.95
+
+# 결정적 처리 결과
+deterministic_results:
+  raw_fetch:
+    main_agent: 14         # 5 controller + 5 module + 4 DTO/interface
+    sub_agent: 0           # 가벼운 sub-agent 전략 (K1 권고 — research.md 생략)
+    poc_02_cross_ref: 5    # openapi.yaml + api-extension.json + _manifest.yml + Phase 4.5 + DEC
+    phase_4_5_cross_link: 13  # 3 state-machine + 6 sequence + 6 decision-table -- 다이어그램 참조
+  endpoint_count: 21
+  operation_id_count: 21
+  use_case_mapped_one_to_one: 20
+  use_case_system_internal: 1   # Root only
+  business_rule_mapped: 12
+  components_schemas: 14
+  components_securitySchemes: 1
+  rate_limit_after_phase_5_1: "(★ 가벼운 sub-agent 전략 효과 / 본 phase 기준 N/A)"
+
+# 7 핵심 결정 (K1~K6 + D7)
+key_decisions:
+  - id: "DEC-PHASE51-POC03-K1"
+    decision: "research.md 생략 (가벼운 sub-agent 전략)"
+    rationale: "본 단계 = 결정적 추출 + cross-link / 새 설계 ❌ → research 불필요 (memory feedback_lightweight_sub_agent.md 정합)"
+  - id: "DEC-PHASE51-POC03-K2"
+    decision: "Ground truth = 정적 추출만 (런타임 dump = Sprint 5 carry-over)"
+    rationale: "★ DEC-PoC03-N5 정합 — nest start 환경 부재 / 시뮬 ❌ 위반 회피 / 신뢰도 -3p 정직 표기"
+  - id: "DEC-PHASE51-POC03-K3"
+    decision: "finding 등록 — F-157~F-166 10건 (본 phase)"
+    rationale: "Phase 5-1 산출 시점 즉시 등록 / Phase 6 격상 데이터 / 누적 finding 168 도달"
+  - id: "DEC-PHASE51-POC03-K4"
+    decision: "Phase 6 AP candidate preview — 4 신규 + 8 직전 = 12 → 10 composite"
+    rationale: "manifest.yml api-extension.json phase_6_ap_candidates 사전 표기 / Phase 6 사용자 결단 영역"
+  - id: "DEC-PHASE51-POC03-K5"
+    decision: "DEC 단일 통합 (Phase 5-1 종결)"
+    rationale: "DEC-2026-04-30-poc03-phase51-종결.md 단일 문서 / 본 phase 결정 7건 통합"
+  - id: "DEC-PHASE51-POC03-K6"
+    decision: "F-161 positive finding 등록 (Bearer 표준 ✅)"
+    rationale: "★ PoC #02 F-084 비재현 = NestJS 학습 효과 입증 데이터 / negative-only finding 관행 깸"
+  - id: "DEC-PHASE51-POC03-D7"
+    decision: "★★★ F-164 critical 신규 등록 — Article 4 endpoint Auth 부재"
+    rationale: "★ openapi.yaml 작성 중 추가 발견 / @User decorator 부재 + AuthMiddleware 미적용 → anonymous 호출 가능 / OWASP API5 BOLA 정합"
+
+# 신뢰도 산정 (formula v1)
+confidence_calculation:
+  formula_version: "v1"
+  base: 0.75
+  modifiers:
+    orm_full: +0.10
+    domain_context_md: +0.03
+    openapi_static_extraction: +0.04   # ★ runtime ground truth 부재 (PoC #02 +0.07 → +0.04 / -3p)
+    diagrams_other: +0.02              # Phase 4.5 다이어그램 보강 후
+    no_operational_db: -0.03
+  subtotal: 0.91
+  cross_validation_modifiers:
+    poc02_isomorphic_consensus: +0.02   # 5 재현 + 2 비재현 (F-084 비재현 = 학습 효과)
+    static_only_caveat: -0.03           # ★ runtime ground truth 부재
+  raw_confidence: 0.90
+  per_area:
+    endpoint_identification: 0.95   # 정적 추출 (PoC #02 1.00 ground truth 대비)
+    request_response_schema: 0.90
+    error_codes: 0.65               # GenericError 단일 / RFC 7807 미준수
+    auth_authorization: 0.75        # ★★ F-140 + F-164 critical 5건 (★ -점)
+    operation_to_uc_mapping: 0.95
+    spec_runtime_drift_detection: 0.95   # F-158 5 op detection
+  expected_in_phase_0_manifest: 0.92
+  delta_from_phase_0: -0.02   # ★ runtime 부재로 expected 보다 -2p
+
+# 명세 §5 + 검증 게이트 체크리스트
+approval_gate:
+  - check: "openapi.yaml lint 통과 (수동 — spectral 미실행)"
+    status: "✅ 정적 추출 자가 검증 (spec 3.0.1 호환)"
+  - check: "모든 operationId unique"
+    status: "✅ 21/21"
+  - check: "DTO 스키마 = JSON Schema 호환"
+    status: "✅ class DTO → openapi schema 정합"
+  - check: "에러 응답 표준화 (4xx/5xx)"
+    status: "⚠️ GenericError 단일 — RFC 7807 권고 (REC-API-PROBLEM-DETAILS-001)"
+  - check: "x-related-findings 매핑 = 사용자 검토"
+    status: "✅ api-extension.json 21/21 op"
+  - check: "x-formal-spec-link Phase 4.5 cross-link"
+    status: "✅ 6 BR + 3 state-machine + 6 sequence 참조"
+  - check: "Bearer auth 검증"
+    status: "✅ http bearer JWT 표준 (★ F-161 positive)"
+  - check: "Auth scope 검증"
+    status: "❌ ★★ F-140 + F-164 critical 5건 — Phase 6 즉시 fix 의무"
+  - check: "Swagger UI 렌더링 검증"
+    status: "🔄 manual (Sprint 5 carry-over)"
+
+# Findings (Phase 5-1 진행 중 발견 — F-157 ~ F-166)
+findings_phase_5_1:
+  - id: "F-157"
+    severity: "low"
+    title: "@Controller() 빈 prefix (UserController) — controller path inconsistency"
+    proposed_fix: "REC-CONTROLLER-PREFIX-001"
+    status: "promoted"
+    sources: ["src/user/user.controller.ts:16"]
+  - id: "F-158"
+    severity: "high"
+    title: "ApiResponse status drift — 5 op (login 201 + Article DELETE/POST/PUT 201) — RFC 9110 §15.3.5/§6.5/§15.3.2 다중 위반"
+    proposed_fix: "REC-API-IDEMPOTENCY-001"
+    status: "promoted"
+    sources: ["article.controller.ts (10 ApiResponse)", "user.controller.ts:43 (NestJS @Post default)"]
+    poc_02_isomorphic: "F-070 + F-083 + F-085 합산 (재현)"
+  - id: "F-159"
+    severity: "medium"
+    title: "API versioning 부재 — setGlobalPrefix('api') 단일"
+    proposed_fix: "REC-API-VERSIONING-001"
+    status: "promoted"
+    sources: ["main.ts:8"]
+    poc_02_isomorphic: "F-082 재현"
+  - id: "F-160"
+    severity: "medium"
+    title: "PUT 부분 갱신 — UpdateUser + UpdateArticle / RFC 5789 PATCH 권고"
+    proposed_fix: "REC-API-PATCH-001"
+    status: "promoted"
+    sources: ["user.controller.ts:26", "article.controller.ts:60"]
+    poc_02_isomorphic: "F-086 재현"
+  - id: "F-161"
+    severity: "positive"
+    title: "★★ Bearer JWT 표준 준수 ✅ — main.ts addBearerAuth() + ApiBearerAuth 데코"
+    status: "logged (positive)"
+    sources: ["main.ts:15", "user.controller.ts:14"]
+    poc_02_relation: "F-084 비재현 = NestJS 학습 효과 입증 ★"
+  - id: "F-162"
+    severity: "high"
+    title: "DTO validation 빈약 — UpdateUserDto / CreateArticleDto / CreateCommentDto 0 validator (OWASP API1)"
+    proposed_fix: "REC-VALIDATION-001"
+    status: "promoted"
+    sources: ["src/user/dto/update-user.dto.ts", "src/article/dto/create-article.dto.ts", "(CreateCommentDto inferred)"]
+    cumul_with: "F-128 (★ class-validator coverage 12%)"
+  - id: "F-163"
+    severity: "medium"
+    title: "TagController @ApiBearerAuth 데코 vs 인증 불요 endpoint 인지 불일치"
+    proposed_fix: "REC-CONTROLLER-PREFIX-001 변형"
+    status: "promoted"
+    sources: ["src/tag/tag.controller.ts:10-12"]
+  - id: "F-164"
+    severity: "critical"
+    title: "★★★ Article 4 endpoint Auth 부재 — update / delete / createComment / deleteComment 가 @User decorator 없이 anonymous 호출 가능"
+    proposed_fix: "REC-AUTH-001 + REC-OWNERSHIP-001"
+    status: "promoted"
+    sources: ["src/article/article.controller.ts:60, 69, 77, 85"]
+    cumul_with: "F-140 (★★ DELETE /users/:slug)"
+    owasp: "API5 (Broken Function Level Authorization)"
+  - id: "F-165"
+    severity: "medium"
+    title: "GET /articles limit no maximum cap — OWASP API4"
+    proposed_fix: "REC-API-LIMIT-CAP-001"
+    status: "promoted"
+    sources: ["article.controller.ts:25"]
+    poc_02_isomorphic: "F-080 재현"
+  - id: "F-166"
+    severity: "low"
+    title: "TagController TagEntity 직접 노출 — Sairyss DDD-Hexagon 위반"
+    proposed_fix: "REC-CONTROLLER-PREFIX-001 변형 + DTO 변환"
+    status: "promoted"
+    sources: ["tag.controller.ts:18"]
+
+# 누적 finding 통계 (본 phase 종결 후)
+findings_cumulative:
+  poc_03_phase_5_1_new: 10        # F-157 ~ F-166
+  poc_03_phase_5_1_promoted: 9    # F-161 positive 제외
+  poc_03_phase_5_1_positive: 1    # ★ F-161
+  poc_03_total: 49                # Phase 0~4: 29 + Phase 4.5: 12 + Phase 5-1: 10 - 2 (F-128/F-140 cumul into F-162/F-164 — 중복 포함 / 본 카운트는 별 ID 기준)
+  cumulative_total: 168           # PoC #01 33 + PoC #02 43 + 시퀀스 C/Sprint 4: 41 + PoC #03: 49 + 본 Phase 4.5 추가 2
+
+  # ★ Phase 6 진입 시 데이터
+  ap_partial_count: 8             # Phase 4 산출
+  ap_phase_5_1_candidate: 4       # AP-AUTH-NEST-001 (cumul) / AP-API-001 (high) / AP-API-002 / AP-API-003 / AP-VALIDATION-001 (cumul)
+  ap_total_phase_6_input: 12      # 8 + 4
+  ap_composite_view_target: 10    # 일부 묶음 후 / Phase 6 사용자 결단 영역
+
+# Phase 6 진입 시 인계
+phase_6_handoff:
+  partial_count: 8                # Phase 4 산출 (★ critical 2 + high 1 + medium 4 + low 1)
+  candidate_count: 4              # Phase 5-1 발굴 (★★★ critical 1 / high 1 / medium 2)
+  expected_final_count: 12        # 8 + 4 → 10 composite
+  candidates_phase_5_1:
+    - id: "AP-AUTH-NEST-001-EXTENDED"
+      severity: critical
+      source: "F-140 + F-164 + F-118 + F-119 + F-150 (cumul 5)"
+      description: "★★★ NestJS Passport 미사용 + Auth scope 결여 — DELETE /users + Article 4 endpoint + JWT verify 무방어 + login 모호"
+    - id: "AP-API-001"
+      severity: high
+      source: "F-158 (5 op 합산)"
+      description: "spec/runtime status code drift — NestJS default + ApiResponse decorator + RFC 9110 다중 위반"
+    - id: "AP-API-002"
+      severity: medium
+      source: "F-159 + F-165"
+      description: "API quota + versioning 부재 (PoC #02 AP-API-003 + AP-API-004 isomorphic)"
+    - id: "AP-API-003"
+      severity: medium
+      source: "F-160"
+      description: "PUT vs PATCH (UpdateUser + UpdateArticle / PoC #02 AP-API-005 isomorphic)"
+    - id: "AP-VALIDATION-001"
+      severity: high
+      source: "F-128 + F-127 + F-143 + F-162 (cumul 4)"
+      description: "class-validator coverage 12% — OWASP API1"
+
+# PoC #02 cross-validation 결과
+poc_02_cross_validation:
+  reproduced:
+    - "F-082 (versioning) → F-159"
+    - "F-080 (limit no cap) → F-165"
+    - "F-083 (DELETE 200) → F-158 묶음"
+    - "F-085 (POST status drift) → F-158 묶음"
+    - "F-086 (PUT vs PATCH) → F-160"
+  non_reproduced_learning_effects:
+    - "F-084 (Token apiKey 비표준) → ★★ F-161 positive (Bearer 표준 ✅)"
+    - "F-087 (307 internal redirect) → ❌ NestJS framework 차이"
+  poc_03_unique:
+    - "F-140 + F-164 (★★★ NestJS Auth scope 결여)"
+    - "F-144 (dimensional inconsistency follow=email / unFollow=id)"
+    - "F-126 (TODO slug 미업데이트)"
+    - "F-053 변형 (Math.random suffix slug)"
+
+# 다음 단계
+next_actions:
+  - "DEC-2026-04-30-poc03-phase51-종결.md 작성"
+  - "STATUS.md + INDEX.md 갱신"
+  - "PROGRESS-poc03-phase4.5.md → 본 파일 별 PROGRESS 또는 합산"
+  - "Phase 6 진입 — antipatterns final (8 partial + 4 candidate = 12 → 10 composite)"
+  - "Phase 6 후 PoC #03 7대 산출물 6/7 (UI/UX 만 N/A)"
+
+# 정직 표기 (★★★ no-simulation 정합)
+honesty_disclosure:
+  - "★ runtime ground truth 부재 — 정적 추출만 (-3p / Sprint 5 carry-over)"
+  - "★ spectral / vacuum / openapi-changes 미실행 (-2p / Sprint 5 carry-over)"
+  - "★ Auth 동작 실 확인 부재 (서버 미가동) — 정적 분석 + cross-validation 만"
+  - "★★★ F-164 critical 5 endpoint 식별 — 본 phase 산출 시 추가 발견 (★ openapi.yaml 작성 중 결정적 분석으로 노출)"
+  - "★★ F-161 positive — Bearer 표준 ✅ (PoC #02 F-084 비재현 = NestJS 학습 효과 입증 데이터)"
+  - "★ 가벼운 sub-agent 전략 — research.md 생략 (K1 권고 채택 / Phase 4~6 영역 정합)"

@@ -1,0 +1,602 @@
+{
+  "$schema": "../../../../schemas/openapi-extension.schema.json",
+  "meta": {
+    "generated_at": "2026-04-30",
+    "generator": "ai-native-methodology v1.2.2",
+    "phase": "5-1",
+    "phase_name": "API 계약",
+    "poc_id": "poc-03-realworld-nestjs",
+    "raw_confidence": 0.90,
+    "confidence_formula_version": "v1",
+    "deterministic_extraction": true,
+    "ground_truth_source": "static — @nestjs/swagger decorator + @Controller + DTO + interface (HEAD c1c2cc4)",
+    "ground_truth_caveat": "★ 본 환경 nest start 불가 → runtime ground truth dump = Sprint 5 carry-over (DEC-PoC03-N5)",
+    "human_review_required": true,
+    "review_reasons": [
+      "★★ F-164 critical 신규 — Article 4 endpoint (update / delete / createComment / deleteComment) @User decorator 부재 → AuthMiddleware 미적용 + 권한 0",
+      "F-157~F-163 7건 신규 등록",
+      "F-161 positive — Bearer 표준 ✅ (PoC #02 F-084 비재현 = 학습 효과)",
+      "Phase 6 AP candidate 4 추가 (Phase 4 8 + 본 phase 4 = 12)"
+    ]
+  },
+
+  "openapi_file": "openapi.yaml",
+  "openapi_version": "3.0.1",
+
+  "operations": [
+    {
+      "operation_id": "GetCurrentUser",
+      "method": "GET",
+      "path": "/user",
+      "composes_uc": ["UC-USER-GET"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": [],
+      "reads_aggregates": ["User"],
+      "auth_required": true,
+      "auth_mechanism": "AuthMiddleware (forRoutes user GET)",
+      "extracted_from": {
+        "controller_file": "src/user/user.controller.ts:21-24",
+        "controller_class": "UserController",
+        "controller_method": "findMe",
+        "annotations_seen": ["@Get('user')", "@User('email')", "@ApiBearerAuth()"]
+      },
+      "x-related-findings": ["F-118"]
+    },
+    {
+      "operation_id": "UpdateCurrentUser",
+      "method": "PUT",
+      "path": "/user",
+      "composes_uc": ["UC-USER-UPDATE"],
+      "related_rules": ["BR-USER-USERNAME-EMAIL-UNIQUE-001"],
+      "breaks_br": ["BR-USER-USERNAME-EMAIL-UNIQUE-001 (★ F-143 — validate 미호출)"],
+      "affects_aggregates": ["User"],
+      "auth_required": true,
+      "auth_mechanism": "AuthMiddleware (forRoutes user PUT)",
+      "extracted_from": {
+        "controller_file": "src/user/user.controller.ts:26-29",
+        "controller_class": "UserController",
+        "controller_method": "update",
+        "annotations_seen": ["@Put('user')", "@User('id')", "@Body('user')"]
+      },
+      "x-method-semantic-issue": {
+        "rfc": "RFC 5789 (PATCH 권고)",
+        "evaluation": "PUT + UpdateUserDto 모든 필드 optional → PATCH application/merge-patch+json 권고",
+        "finding": "F-160 medium",
+        "phase_6_candidate": "AP-API-003 (PoC #02 F-086 isomorphic)"
+      },
+      "x-related-findings": ["F-143", "F-160"]
+    },
+    {
+      "operation_id": "CreateUser",
+      "method": "POST",
+      "path": "/users",
+      "composes_uc": ["UC-USER-SIGNUP"],
+      "related_rules": [
+        "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+        "BR-USER-PASSWORD-HASH-001",
+        "BR-USER-EMAIL-FORMAT-001",
+        "BR-USER-USERNAME-NOT-BLANK-001"
+      ],
+      "breaks_br": [
+        "BR-USER-USERNAME-EMAIL-UNIQUE-001 (★ F-120 critical — DB UQ 부재 / App 1중 race-prone)"
+      ],
+      "affects_aggregates": ["User"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/user/user.controller.ts:31-35",
+        "controller_class": "UserController",
+        "controller_method": "create",
+        "annotations_seen": ["@UsePipes(new ValidationPipe())", "@Post('users')", "@Body('user')"]
+      },
+      "x-formal-spec-link": {
+        "decision_table": "BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
+        "state_machine": "User.json (anonymous → validatingSignup → checkingDuplicate → persistingUser → registered)",
+        "sequence_diagram": "UC-USER-SIGNUP.mermaid"
+      },
+      "x-related-findings": ["F-120", "F-145", "F-150"]
+    },
+    {
+      "operation_id": "DeleteUser",
+      "method": "DELETE",
+      "path": "/users/{slug}",
+      "composes_uc": ["UC-USER-DELETE"],
+      "related_rules": ["BR-USER-DELETE-AUTH-001"],
+      "breaks_br": ["BR-USER-DELETE-AUTH-001 (★★ F-140 critical — 코드 부재 = absent)"],
+      "affects_aggregates": ["User"],
+      "auth_required": true,
+      "auth_mechanism": "★★ MISSING (F-140 critical)",
+      "extracted_from": {
+        "controller_file": "src/user/user.controller.ts:37-40",
+        "controller_class": "UserController",
+        "controller_method": "delete",
+        "annotations_seen": ["@Delete('users/:slug')", "@Param()"]
+      },
+      "x-security-defect": {
+        "finding": "F-140 critical",
+        "owasp": "OWASP API5 (Broken Function Level Authorization)",
+        "evidence": "src/user/user.module.ts:17 forRoutes — DELETE method missing",
+        "industry_standard_violation": "NestJS 7+ 권장 = @UseGuards(JwtAuthGuard) + ownership check",
+        "phase_6_candidate": "AP-AUTH-NEST-001 critical"
+      },
+      "x-formal-spec-link": {
+        "decision_table": "BR-USER-DELETE-AUTH-001.md (current_state: absent)",
+        "sequence_diagram": "UC-USER-DELETE.mermaid"
+      },
+      "x-related-findings": ["F-140", "F-146", "F-152"]
+    },
+    {
+      "operation_id": "Login",
+      "method": "POST",
+      "path": "/users/login",
+      "composes_uc": ["UC-USER-LOGIN"],
+      "related_rules": ["BR-USER-LOGIN-VERIFY-001", "BR-USER-PASSWORD-HASH-001"],
+      "breaks_br": [],
+      "affects_aggregates": [],
+      "reads_aggregates": ["User"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/user/user.controller.ts:42-54",
+        "controller_class": "UserController",
+        "controller_method": "login",
+        "annotations_seen": ["@UsePipes(new ValidationPipe())", "@Post('users/login')", "@Body('user')"]
+      },
+      "spec_runtime_drift": {
+        "drift_type": "status_code",
+        "spec_status": 201,
+        "runtime_status": 201,
+        "evidence_runtime": "user.controller.ts:43 @Post (NestJS default 201)",
+        "rfc_authority": "RFC 9110 §15.3.2 (201 Created — 신규 자원 URI 시만)",
+        "evaluation": "★ login 신규 자원 ❌ → 200 OK 권고 (★ PoC #02 F-085 isomorphic)",
+        "finding": "F-158 high (cross-PoC isomorphic ★)",
+        "phase_6_candidate": "AP-API-001 high"
+      },
+      "x-formal-spec-link": {
+        "decision_table": "BR-USER-LOGIN-VERIFY-001.md",
+        "sequence_diagram": "UC-USER-LOGIN.mermaid"
+      },
+      "x-related-findings": ["F-118", "F-150", "F-153", "F-158"]
+    },
+    {
+      "operation_id": "GetArticles",
+      "method": "GET",
+      "path": "/articles",
+      "composes_uc": ["UC-ARTICLE-LIST"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": [],
+      "reads_aggregates": ["Article"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:22-27",
+        "controller_class": "ArticleController",
+        "controller_method": "findAll",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 200", "@Get()", "@Query()"]
+      },
+      "x-limit-no-cap": {
+        "rfc": "OWASP API4 (Lack of Resources & Rate Limiting)",
+        "evaluation": "limit query — no maximum cap (PoC #02 F-080 isomorphic ★)",
+        "finding": "F-165 medium (재현)"
+      },
+      "x-related-findings": ["F-124", "F-165"]
+    },
+    {
+      "operation_id": "GetArticleFeed",
+      "method": "GET",
+      "path": "/articles/feed",
+      "composes_uc": ["UC-ARTICLE-FEED"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": [],
+      "reads_aggregates": ["Article", "Follows"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ AuthMiddleware 미적용 — implicit 보호만)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:30-36",
+        "controller_class": "ArticleController",
+        "controller_method": "getFeed",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 200", "@ApiResponse 403", "@Get('feed')", "@User('id')", "@Query()"]
+      }
+    },
+    {
+      "operation_id": "GetArticle",
+      "method": "GET",
+      "path": "/articles/{slug}",
+      "composes_uc": ["UC-ARTICLE-GET"],
+      "related_rules": [],
+      "breaks_br": [],
+      "reads_aggregates": ["Article"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:38-41",
+        "controller_class": "ArticleController",
+        "controller_method": "findOne",
+        "annotations_seen": ["@Get(':slug')", "@Param('slug')"]
+      }
+    },
+    {
+      "operation_id": "GetArticleComments",
+      "method": "GET",
+      "path": "/articles/{slug}/comments",
+      "composes_uc": ["UC-COMMENT-LIST"],
+      "related_rules": [],
+      "breaks_br": [],
+      "reads_aggregates": ["Article"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:43-46",
+        "controller_class": "ArticleController",
+        "controller_method": "findComments",
+        "annotations_seen": ["@Get(':slug/comments')", "@Param('slug')"]
+      }
+    },
+    {
+      "operation_id": "CreateArticle",
+      "method": "POST",
+      "path": "/articles",
+      "composes_uc": ["UC-ARTICLE-CREATE"],
+      "related_rules": ["BR-ARTICLE-SLUG-AUTO-001", "BR-ARTICLE-AUTHOR-AUTO-001"],
+      "breaks_br": [
+        "BR-ARTICLE-SLUG-AUTO-001 (★ F-053 변형 — Math.random suffix / DB UQ 부재)"
+      ],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ AuthMiddleware 미적용 — implicit 보호)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:48-54",
+        "controller_class": "ArticleController",
+        "controller_method": "create",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201", "@ApiResponse 403", "@Post()", "@User('id')", "@Body('article')"]
+      },
+      "x-formal-spec-link": {
+        "sequence_diagram": "UC-ARTICLE-CREATE.mermaid",
+        "state_machine": "Article.json (creating → persistingArticle → published_count0)"
+      },
+      "x-related-findings": ["F-053-variant", "F-120-slug", "F-162"]
+    },
+    {
+      "operation_id": "UpdateArticle",
+      "method": "PUT",
+      "path": "/articles/{slug}",
+      "composes_uc": ["UC-ARTICLE-UPDATE"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "★★ MISSING (F-164 critical — @User decorator 부재)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:56-63",
+        "controller_class": "ArticleController",
+        "controller_method": "update",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201", "@ApiResponse 403", "@Put(':slug')", "@Param()", "@Body('article')"]
+      },
+      "x-security-defect": {
+        "finding": "★★ F-164 critical (신규)",
+        "owasp": "OWASP API5 (Broken Function Level Authorization)",
+        "evidence": "@User decorator 부재 + AuthMiddleware 미적용 → anonymous 가 임의 article 수정 가능",
+        "industry_standard_violation": "NestJS 7+ 권장 = @UseGuards(JwtAuthGuard) + ownership check (article.author.id === req.user.id)",
+        "phase_6_candidate": "AP-AUTH-NEST-001 critical (cumul)"
+      },
+      "x-method-semantic-issue": {
+        "rfc": "RFC 5789 (PATCH 권고)",
+        "evaluation": "PUT 부분 갱신 + ApiResponse 201 (RFC 9110 §6.5 권고 200)",
+        "finding": "F-160 + F-158 묶음"
+      },
+      "x-todo-comment": {
+        "evidence": "// Todo: update slug also when title gets changed (article.controller.ts:61)",
+        "finding": "F-126"
+      },
+      "x-related-findings": ["F-126", "F-158", "F-160", "F-164"]
+    },
+    {
+      "operation_id": "DeleteArticle",
+      "method": "DELETE",
+      "path": "/articles/{slug}",
+      "composes_uc": ["UC-ARTICLE-DELETE"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "★★ MISSING (F-164 critical)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:65-71",
+        "controller_class": "ArticleController",
+        "controller_method": "delete",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201 description='deleted'", "@ApiResponse 403", "@Delete(':slug')", "@Param()"]
+      },
+      "spec_runtime_drift": {
+        "drift_type": "status_code",
+        "spec_status": 201,
+        "runtime_status": 200,
+        "evidence_spec": "article.controller.ts:66 @ApiResponse({status: 201, description: 'deleted'})",
+        "evidence_runtime": "NestJS @Delete default = 200",
+        "rfc_authority": "RFC 9110 §15.3.5 (DELETE → 204 No Content 권고)",
+        "evaluation": "★★ 3중 결함 — ApiResponse decorator 201 + runtime 200 + RFC 권고 204 (★ PoC #02 F-083 + F-085 합산 isomorphic)",
+        "finding": "F-158 high",
+        "phase_6_candidate": "AP-API-001 high"
+      },
+      "x-security-defect": {
+        "finding": "F-164 critical (신규)",
+        "evidence": "@User decorator 부재 → anonymous 가 임의 article 삭제 가능"
+      },
+      "x-related-findings": ["F-158", "F-164"]
+    },
+    {
+      "operation_id": "AddArticleComment",
+      "method": "POST",
+      "path": "/articles/{slug}/comments",
+      "composes_uc": ["UC-COMMENT-CREATE"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "★★ MISSING (F-164 critical)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:73-79",
+        "controller_class": "ArticleController",
+        "controller_method": "createComment",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201", "@ApiResponse 403", "@Post(':slug/comments')", "@Param('slug')", "@Body('comment')"]
+      },
+      "x-security-defect": {
+        "finding": "F-164 critical",
+        "evidence": "@User decorator 부재 → anonymous comment 가능",
+        "owasp": "OWASP API5"
+      },
+      "x-related-findings": ["F-162", "F-164"]
+    },
+    {
+      "operation_id": "DeleteArticleComment",
+      "method": "DELETE",
+      "path": "/articles/{slug}/comments/{id}",
+      "composes_uc": ["UC-COMMENT-DELETE"],
+      "related_rules": [],
+      "breaks_br": [],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "★★ MISSING (F-164 critical)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:81-88",
+        "controller_class": "ArticleController",
+        "controller_method": "deleteComment",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201 description='deleted'", "@ApiResponse 403", "@Delete(':slug/comments/:id')", "@Param()"]
+      },
+      "spec_runtime_drift": {
+        "drift_type": "status_code",
+        "spec_status": 201,
+        "runtime_status": 200,
+        "rfc_authority": "RFC 9110 §15.3.5 (DELETE → 204 권고)",
+        "evaluation": "DeleteArticle 동형 결함 (F-158 묶음)",
+        "finding": "F-158 high"
+      },
+      "x-security-defect": {
+        "finding": "F-164 critical — anonymous 가 누구의 comment 든 삭제 가능",
+        "industry_standard_violation": "ownership check 부재 (delete only own comment)"
+      },
+      "x-related-findings": ["F-158", "F-164"]
+    },
+    {
+      "operation_id": "FavoriteArticle",
+      "method": "POST",
+      "path": "/articles/{slug}/favorite",
+      "composes_uc": ["UC-ARTICLE-FAVORITE"],
+      "related_rules": ["BR-ARTICLE-FAVORITE-IDEMPOTENT-001"],
+      "breaks_br": ["BR-ARTICLE-FAVORITE-IDEMPOTENT-001 (★ F-135 race window — App 1중 isNewFavorite check)"],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ implicit 보호)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:90-96",
+        "controller_class": "ArticleController",
+        "controller_method": "favorite",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201 'favorited'", "@ApiResponse 403", "@Post(':slug/favorite')", "@User('id')", "@Param('slug')"]
+      },
+      "x-race-window": {
+        "finding": "F-135 critical",
+        "evaluation": "favoriteCount race — App 1중 isNewFavorite check / DB level FOR UPDATE 부재",
+        "phase_6_candidate": "AP-DB-001 critical (cumul)"
+      },
+      "x-formal-spec-link": {
+        "sequence_diagram": "UC-ARTICLE-FAVORITE.mermaid"
+      },
+      "x-related-findings": ["F-135", "F-151"]
+    },
+    {
+      "operation_id": "UnfavoriteArticle",
+      "method": "DELETE",
+      "path": "/articles/{slug}/favorite",
+      "composes_uc": ["UC-ARTICLE-UNFAVORITE"],
+      "related_rules": ["BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001"],
+      "breaks_br": [],
+      "affects_aggregates": ["Article"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ implicit 보호)",
+      "extracted_from": {
+        "controller_file": "src/article/article.controller.ts:98-104",
+        "controller_class": "ArticleController",
+        "controller_method": "unFavorite",
+        "annotations_seen": ["@ApiOperation", "@ApiResponse 201 'unfavorited'", "@ApiResponse 403", "@Delete(':slug/favorite')", "@User('id')", "@Param('slug')"]
+      },
+      "spec_runtime_drift": {
+        "drift_type": "status_code",
+        "spec_status": 201,
+        "runtime_status": 200,
+        "rfc_authority": "RFC 9110 §15.3.5 (DELETE → 204 권고)",
+        "evaluation": "★ ApiResponse 201 + DELETE / favorite 와 통일성 (F-158 묶음 / PoC #02 F-070 isomorphic)",
+        "finding": "F-158 high"
+      },
+      "x-related-findings": ["F-135", "F-158"]
+    },
+    {
+      "operation_id": "GetProfile",
+      "method": "GET",
+      "path": "/profiles/{username}",
+      "composes_uc": ["UC-PROFILE-GET"],
+      "related_rules": [],
+      "breaks_br": [],
+      "reads_aggregates": ["User", "Follows"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ implicit 보호)",
+      "extracted_from": {
+        "controller_file": "src/profile/profile.controller.ts:18-21",
+        "controller_class": "ProfileController",
+        "controller_method": "getProfile",
+        "annotations_seen": ["@Get(':username')", "@User('id')", "@Param('username')"]
+      }
+    },
+    {
+      "operation_id": "FollowUser",
+      "method": "POST",
+      "path": "/profiles/{username}/follow",
+      "composes_uc": ["UC-PROFILE-FOLLOW"],
+      "related_rules": ["BR-FOLLOWS-NO-SELF-001", "BR-FOLLOWS-PAIR-UNIQUE-001"],
+      "breaks_br": [
+        "BR-FOLLOWS-NO-SELF-001 (★ F-144 self-check email 비교 / Domain invariant 부재 F-147)",
+        "BR-FOLLOWS-PAIR-UNIQUE-001 (★ F-121 FK + UQ pair 부재)"
+      ],
+      "affects_aggregates": ["Follows"],
+      "auth_required": true,
+      "auth_mechanism": "@User('email') decorator (★ id 통일 안 됨 — F-144)",
+      "extracted_from": {
+        "controller_file": "src/profile/profile.controller.ts:23-26",
+        "controller_class": "ProfileController",
+        "controller_method": "follow",
+        "annotations_seen": ["@Post(':username/follow')", "@User('email')", "@Param('username')"]
+      },
+      "x-formal-spec-link": {
+        "decision_table": "BR-FOLLOWS-NO-SELF-001.md + BR-FOLLOWS-PAIR-UNIQUE-001.md",
+        "state_machine": "Follows.json",
+        "sequence_diagram": "UC-PROFILE-FOLLOW.mermaid"
+      },
+      "x-related-findings": ["F-121", "F-144", "F-147", "F-148"]
+    },
+    {
+      "operation_id": "UnfollowUser",
+      "method": "DELETE",
+      "path": "/profiles/{username}/follow",
+      "composes_uc": ["UC-PROFILE-UNFOLLOW"],
+      "related_rules": ["BR-FOLLOWS-NO-SELF-001"],
+      "breaks_br": [
+        "BR-FOLLOWS-NO-SELF-001 (★★ F-144 dimensional inconsistency — uses id 비교 instead of email)"
+      ],
+      "affects_aggregates": ["Follows"],
+      "auth_required": true,
+      "auth_mechanism": "@User('id') decorator (★ follow=email / unFollow=id — F-144 차원 불일치)",
+      "extracted_from": {
+        "controller_file": "src/profile/profile.controller.ts:28-31",
+        "controller_class": "ProfileController",
+        "controller_method": "unFollow",
+        "annotations_seen": ["@Delete(':username/follow')", "@User('id')", "@Param('username')"]
+      },
+      "x-method-semantic-issue": {
+        "rfc": "RFC 9110 §15.3.5 (DELETE → 204 권고)",
+        "evaluation": "NestJS DELETE default 200 — 권고 204 미준수 (F-158 묶음)",
+        "finding": "F-158 high"
+      },
+      "x-related-findings": ["F-144", "F-147", "F-158"]
+    },
+    {
+      "operation_id": "GetTags",
+      "method": "GET",
+      "path": "/tags",
+      "composes_uc": ["UC-TAG-LIST"],
+      "related_rules": [],
+      "breaks_br": [],
+      "reads_aggregates": ["Tag"],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/tag/tag.controller.ts:17-19",
+        "controller_class": "TagController",
+        "controller_method": "findAll",
+        "annotations_seen": ["@ApiBearerAuth()", "@ApiTags('tags')", "@Get()"]
+      },
+      "x-auth-scope-mismatch": {
+        "finding": "F-163 medium",
+        "evaluation": "@ApiBearerAuth 데코 vs 실 endpoint 인증 불요 — Swagger UI 인지 불일치"
+      },
+      "x-leaky-abstraction": {
+        "finding": "F-166 low (신규)",
+        "evaluation": "TagEntity 직접 노출 — Sairyss DDD-Hexagon 위반 (Repository 결과 → DTO 변환 부재)"
+      },
+      "x-related-findings": ["F-163", "F-166"]
+    },
+    {
+      "operation_id": "Root",
+      "method": "GET",
+      "path": "/",
+      "composes_uc": [],
+      "related_rules": [],
+      "auth_required": false,
+      "extracted_from": {
+        "controller_file": "src/app.controller.ts",
+        "controller_class": "AppController",
+        "controller_method": "root",
+        "annotations_seen": ["@Get()"]
+      },
+      "x-system-internal": "Hello World endpoint — UC 미매핑 정당"
+    }
+  ],
+
+  "summary": {
+    "total_operations": 21,
+    "auth_required": 16,
+    "auth_via_AuthMiddleware": 2,
+    "auth_via_User_decorator": 10,
+    "auth_MISSING_critical": 5,
+    "spec_runtime_drift_count": 5,
+    "rfc_violations": {
+      "RFC_5789_PUT_vs_PATCH": 2,
+      "RFC_9110_15_3_5_DELETE_vs_204": 5,
+      "RFC_9110_15_3_2_201_misuse": 1,
+      "OWASP_API4_no_limit_cap": 1,
+      "OWASP_API5_BOLA": 5,
+      "OWASP_A04_no_rate_limit": 1,
+      "OWASP_A07_user_enumeration": 1
+    }
+  },
+
+  "cross_validation_with_poc_02": {
+    "isomorphic_findings": [
+      {"poc_02": "F-082 (API versioning 부재)", "poc_03": "F-159", "relation": "★ 재현 — `setGlobalPrefix('api')` 단일 / no /v1"},
+      {"poc_02": "F-083 (DELETE 200 vs 204)", "poc_03": "F-158 묶음", "relation": "★ 재현 (변형) — ApiResponse 201 추가 결함"},
+      {"poc_02": "F-085 (POST status drift)", "poc_03": "F-158 (login 201)", "relation": "★ 재현 — login NestJS default 201"},
+      {"poc_02": "F-086 (PUT vs PATCH)", "poc_03": "F-160", "relation": "★ 재현 — UpdateUser + UpdateArticle"},
+      {"poc_02": "F-080 (limit no cap OWASP API4)", "poc_03": "F-165", "relation": "★ 재현 — GetArticles limit"}
+    ],
+    "non_reproduced_learning_effects": [
+      {"poc_02": "F-084 (Token apiKey 비표준)", "poc_03_result": "★★ 비재현 = Bearer 표준 ✅", "evidence": "main.ts addBearerAuth() / openapi.yaml securitySchemes.bearerAuth (http bearer JWT)", "finding": "F-161 positive"},
+      {"poc_02": "F-087 (307 internal redirect)", "poc_03_result": "❌ 비재현", "evidence": "NestJS 가 ModelAndView 미사용 / framework 차이 학습 효과"}
+    ],
+    "poc_03_unique_findings": [
+      {"id": "F-140 + F-164 (★★)", "summary": "Article 4 endpoint + DELETE /users 가 auth scope 0 — NestJS Passport 미사용 → AP-AUTH-NEST-001 critical 후보 (PoC #02 = Spring Security framework-managed → 재현 ❌)"},
+      {"id": "F-144 (dimensional inconsistency)", "summary": "follow=email / unFollow=id 검증 차원 불일치 — Domain invariant 부재"},
+      {"id": "F-126 (TODO slug)", "summary": "Update article 시 slug 미업데이트 (TODO 주석)"},
+      {"id": "F-053 변형", "summary": "slug = slugify + Math.random suffix — DB UQ 부재로 정합성 손실 가능"}
+    ]
+  },
+
+  "phase_6_ap_candidates": [
+    {"id": "AP-AUTH-NEST-001", "severity": "critical", "source": "F-140 + F-164 + F-118 + F-119 + F-150 (cumul 5)", "description": "★★ NestJS Passport 미사용 + Auth scope 결여 — DELETE /users + Article 4 endpoint + JWT verify 무방어 + login 'User not found' 모호"},
+    {"id": "AP-API-001", "severity": "high", "source": "F-158 (login 201 + Delete article 201 + ApiResponse decorator drift / 5 op 합산)", "description": "spec/runtime status code drift — NestJS default + ApiResponse decorator + RFC 9110 §15.3.5/§6.5/§15.3.2 다중 위반"},
+    {"id": "AP-API-002", "severity": "medium", "source": "F-159", "description": "API versioning 부재 (PoC #02 AP-API-003 isomorphic)"},
+    {"id": "AP-API-003", "severity": "medium", "source": "F-160", "description": "PUT vs PATCH (UpdateUser + UpdateArticle / PoC #02 AP-API-005 isomorphic)"},
+    {"id": "AP-VALIDATION-001", "severity": "high", "source": "F-128 + F-127 + F-143 + F-162 (cumul 4)", "description": "class-validator coverage 12% — UpdateUserDto / CreateArticleDto / CreateCommentDto 0 validator + UserService.update validate 미호출"},
+    {"id": "AP-DB-001", "severity": "critical", "source": "F-120 + F-121 + F-133 + F-135 (cumul 4)", "description": "DB UQ + FK 부재 + race window — User UQ + Follows UQ pair + slug UQ + favoriteCount race"},
+    {"id": "AP-PERFORMANCE-001", "severity": "high", "source": "F-124 + F-135", "description": "EAGER N+1 + favorite race"},
+    {"id": "AP-DOMAIN-001", "severity": "medium", "source": "F-122 + F-123 + F-139 + F-147", "description": "Domain invariant 부재 — FollowsEntity 생성자 / Tag aggregate 약함"},
+    {"id": "AP-DOMAIN-002", "severity": "medium", "source": "F-137 + F-138", "description": "Bounded context 경계 약함"},
+    {"id": "AP-CODE-QUALITY-001", "severity": "low", "source": "F-118 + F-130 + F-131 + F-166", "description": "DRY 위반 (verify 3곳) + leaky abstraction (TagEntity 직접 노출)"}
+  ],
+
+  "phase_5_1_new_findings": [
+    {"id": "F-157", "severity": "low", "summary": "★ @Controller() 빈 prefix (UserController) — controller path inconsistency"},
+    {"id": "F-158", "severity": "high", "summary": "★ ApiResponse status drift — Article DELETE/POST 의 ApiResponse 201 vs RFC 9110 §15.3.5 권고 204 + login NestJS default 201 (★ PoC #02 F-070 + F-083 + F-085 isomorphic 묶음)"},
+    {"id": "F-159", "severity": "medium", "summary": "★ API versioning 부재 — `setGlobalPrefix('api')` 단일 (★ PoC #02 F-082 isomorphic)"},
+    {"id": "F-160", "severity": "medium", "summary": "★ PUT 부분 갱신 — UpdateUser + UpdateArticle / RFC 5789 PATCH 권고 (★ PoC #02 F-086 isomorphic)"},
+    {"id": "F-161", "severity": "positive", "summary": "★★ Bearer JWT 표준 준수 ✅ — main.ts addBearerAuth() + ApiBearerAuth 데코 (★ PoC #02 F-084 비재현 = 학습 효과)"},
+    {"id": "F-162", "severity": "high", "summary": "★ DTO validation 빈약 — UpdateUserDto / CreateArticleDto / CreateCommentDto 0 validator (★ F-128 합산 OWASP API1)"},
+    {"id": "F-163", "severity": "medium", "summary": "★ TagController @ApiBearerAuth 데코 vs 인증 불요 endpoint 인지 불일치"},
+    {"id": "F-164", "severity": "critical", "summary": "★★★ Article 4 endpoint Auth 부재 — update / delete / createComment / deleteComment 가 @User decorator 없이 anonymous 호출 가능 (★★ F-140 확장)"},
+    {"id": "F-165", "severity": "medium", "summary": "GET /articles limit no cap — OWASP API4 (★ PoC #02 F-080 isomorphic)"},
+    {"id": "F-166", "severity": "low", "summary": "TagController TagEntity 직접 노출 — Sairyss DDD-Hexagon 위반 (Repository → DTO 변환 부재)"}
+  ]
+}

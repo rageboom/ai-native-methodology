@@ -20,6 +20,7 @@
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
 |---|---|---|---|---|
+| [★★ DEC-2026-04-30-poc03-phase51-종결](DEC-2026-04-30-poc03-phase51-종결.md) | 2026-04-30 | poc / methodology | 승인 (★★ Phase 5-1 종결) | PoC #03 Phase 5-1 (api) 종결. 21 endpoint 정적 추출 + Phase 4.5 cross-link 9/21 + 신규 finding F-157~F-166 10건 (★★★ **F-164 critical 신규 — Article 4 endpoint Auth 부재** + ★★ F-161 positive Bearer 표준 ✅ = PoC #02 F-084 비재현 학습 효과). 신뢰도 0.90 / 7대 산출물 5/7 / Phase 6 만 남음. |
 | [★★ DEC-2026-04-30-poc03-phase45-종결](DEC-2026-04-30-poc03-phase45-종결.md) | 2026-04-30 | poc / methodology | 승인 (★★ Phase 4.5 + 4.5+1 종결) | PoC #03 NestJS Phase 4.5 형식 명세 (37 파일) + drift-validator + decision-table-validator **첫 외부 검증** 종결 + Phase 4.5+1 다이어그램 보강 (진짜 drift 8 → 0 ✅). drift 9 짝 / breaking 20 → 8 (도구 한계만 남음). dmn 6 → 0 (enum fix). 신뢰도 0.70 → 0.77 → **0.80** (단계 2 → 2.5 → ★ **단계 3 자동 검증 통과 ✅**). F-154 (★ Sprint 5 transitionFuzzyMatch 우선순위 격상). |
 | [★ DEC-2026-04-30-m-p2-3-종결](DEC-2026-04-30-m-p2-3-종결.md) | 2026-04-30 | methodology | 승인 (v1.2.2 PATCH) | 본체 갭 5건 일괄 처리 — api.template.md / phase-flow.mermaid+json / **ADR-009 (다이어그램 신뢰 모델 + 도구 종류 enum 7종 ★★★)** / db-schema.template.md / meta-confidence.template.yml. **본체 갭 7건 모두 closed** → ADR-008 본체 100% 정합. |
 | [★ DEC-2026-04-30-sprint-4-종결](DEC-2026-04-30-sprint-4-종결.md) | 2026-04-30 | methodology / poc-tooling | 승인 | C-Sprint 4 종결. 묶음 N+O 인프라 100% 산출 (drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 강제). PoC #02 자가 검증 → 11 신규 finding (F-107~F-117). 진짜 도구 실 실행 Sprint 5 carry-over. |
