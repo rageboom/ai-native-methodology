@@ -1,0 +1,421 @@
+{
+  "$schema_ref": "../../../../../schemas/antipatterns.schema.json",
+  "meta": {
+    "generated_at": "2026-04-30T00:00:00Z",
+    "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
+    "source_branch": "master",
+    "extraction_env": "git_clone (re-cloned for Phase 5-1)",
+    "methodology_version": "v1.2.2",
+    "formula_version": "v1",
+    "phase": "6",
+    "phase_name": "안티패턴 통합 (quality)",
+    "poc_id": "poc-03-realworld-nestjs",
+    "inputs_used": [
+      "source_code",
+      "orm",
+      "config_files",
+      "package_json",
+      "phase_4_partial",
+      "phase_4_5_formal_spec",
+      "phase_5_candidate"
+    ],
+    "applied_modifiers": [
+      {"name": "orm_full", "value": 0.05, "reason": "TypeORM 0.2 (G6 enum)"},
+      {"name": "domain_context_md", "value": 0.03, "reason": "research-poc03 + Sairyss reference"},
+      {"name": "openapi_static_extraction", "value": 0.04, "reason": "★ runtime ground truth 부재 (PoC #02 +0.07 → +0.04)"},
+      {"name": "phase_4_5_formal_spec_cross_link", "value": 0.04, "reason": "★★ Phase 4.5 cross-link 9/21 op 입증"},
+      {"name": "cross_phase_aggregation", "value": 0.03, "reason": "Phase 1~5-1 누적 검증"},
+      {"name": "poc_01_02_isomorphic_pattern", "value": 0.03, "reason": "★ 5 재현 + 2 비재현 (Bearer 학습 효과 ★) — §8.1 cross-platform 입증"},
+      {"name": "schema_compliance_100", "value": 0.01, "reason": "id pattern ^AP-[A-Z]+-\\d+$ 11/11 정합"}
+    ],
+    "applied_penalties": [
+      {"name": "no_operational_db", "value": -0.03, "reason": "MySQL 운영 DB 미접근 + nest start 부재"},
+      {"name": "static_only_caveat", "value": -0.03, "reason": "★ Phase 5-1 정적 추출만 (-3p)"}
+    ],
+    "raw_confidence": 0.94,
+    "cap_applied": false,
+    "manual_override": false,
+    "expected_confidence_average": 0.93,
+    "human_review_required": true,
+    "human_review_reasons": [
+      "★★★ AP-AUTH-NEST-001 critical (5 endpoint cumul) — 사내 적용 시 즉시 수정 의무",
+      "★ AP-DB-001 critical — DB UQ + FK + race window 4건 cumul",
+      "★ AP-PERFORMANCE-001 medium → high 격상 (PoC #01+#02+#03 3 PoC 재현 권위)",
+      "★ Phase 4.5 cross-link 9 op = 방법론 본질 가치 입증 데이터",
+      "★ F-161 positive (Bearer 표준) = NestJS 학습 효과 입증 ★"
+    ]
+  },
+
+  "antipatterns": [
+    {
+      "id": "AP-AUTH-NEST-001",
+      "category": "SECURITY",
+      "severity": "critical",
+      "title": "NestJS Auth scope 결여 — 5 endpoint anonymous 호출 가능 + JWT verify 무방어 + login 메시지 모호",
+      "description": "AuthMiddleware (UserModule.forRoutes) 가 user GET/PUT 만 적용. DELETE /users/:slug + Article 4 endpoint (update/delete/createComment/deleteComment) 가 anonymous 호출 가능. JWT verify 가 try/catch 부재로 만료 시 503/uncaught throw. login error 'User not found' 가 user 부재/password 불일치 양쪽 포괄 (OWASP A07 user enumeration).",
+      "evidence_files": [
+        {"path": "src/user/user.module.ts:17 forRoutes — DELETE method missing"},
+        {"path": "src/article/article.controller.ts:60,69,77,85 — @User decorator 부재"},
+        {"path": "src/user/auth.middleware.ts — try/catch 부재"},
+        {"path": "src/user/user.controller.ts:48 — 'User not found' 모호 메시지"}
+      ],
+      "finding_refs": ["F-140", "F-164", "F-118", "F-119", "F-150"],
+      "rfc_owasp_authority": "OWASP API5 (Broken Function Level Authorization) + OWASP A07 (Identification and Authentication Failures) + OWASP A04 (Insecure Design)",
+      "industry_standard_violation": "NestJS 7+ 권장 = @nestjs/passport + LocalStrategy + JwtStrategy + @UseGuards(JwtAuthGuard) + ownership check",
+      "migration_advice": {
+        "design": "@nestjs/passport 도입 + LocalStrategy + JwtStrategy + JwtAuthGuard 글로벌 적용 (또는 endpoint 별 @UseGuards). ownership check Service 단 의무 (req.user.id === target).",
+        "ci": "supertest E2E — 익명 요청에 대한 401 검증 + ownership 검증 (다른 user 의 자원 수정/삭제 시도 → 403)",
+        "team_training": "OWASP API Security Top 10 + NestJS Authentication 공식 docs"
+      },
+      "cross_poc_validation": {
+        "poc_01": "AP-SECURITY-001 (JWT 21byte critical) — 변형 재현 (★ JWT 자체 약점 / PoC #03 = scope 결여)",
+        "poc_02": "AP-SECURITY-001 (RSA git commit critical) — 변형 재현 (★ key management / PoC #03 = scope 결여)",
+        "poc_03_unique": "★★ Auth scope 결여 — 3 PoC 모두 SECURITY critical 동형 영역 ✅"
+      }
+    },
+    {
+      "id": "AP-DB-001",
+      "category": "DB",
+      "severity": "critical",
+      "title": "DB UQ + FK 부재 + race window — User username/email + Article slug + Follows pair + favoriteCount race",
+      "description": "DB level race-safety 보장 부재. 4 영역 결함 cumul: User username/email UQ 부재 (App pre-check 1중 / race-prone), Follows (followerId, followingId) UQ pair 부재 + FK user.id 참조 부재 (orphan row 가능), Article slug UQ 부재 (Math.random suffix 의존), favoriteCount race window (App 1중 isNewFavorite check / DB FOR UPDATE 부재).",
+      "evidence_files": [
+        {"path": "src/user/user.entity.ts — @Column 만 / @Unique 부재"},
+        {"path": "src/profile/follows.entity.ts — followerId/followingId Column 단순 / FK 부재"},
+        {"path": "src/article/article.entity.ts — slug Column / UQ 부재"},
+        {"path": "src/article/article.service.ts — favorite isNewFavorite check 후 push (App 1중)"}
+      ],
+      "finding_refs": ["F-120", "F-121", "F-133", "F-135"],
+      "rfc_owasp_authority": "Sairyss DDD-Hexagon 정설 + Codd 1970 (Relational Model: 무결성 제약은 DB level)",
+      "industry_standard_violation": "DB UQ 단독 + catch QueryFailedError → ConflictException (race-safe + idempotent)",
+      "migration_advice": {
+        "design": "TypeORM @Index({unique: true}) + @JoinColumn FK + @Check constraint (CHECK follower_id <> following_id) + transactional FOR UPDATE 또는 atomic INCREMENT",
+        "ci": "테이블 SHOW CREATE TABLE 검증 + DB UQ 충돌 시뮬레이션 E2E (concurrent INSERT 동시 발사) + race window 측정",
+        "team_training": "Joe Celko's SQL for Smarties §UNIQUE constraint + Vlad Mihalcea High-Performance Java Persistence §16 (Optimistic Locking)"
+      },
+      "cross_poc_validation": {
+        "poc_02": "★★ AP-DOMAIN-002 (race-prone unique) — isomorphic + 더 나쁨 (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+        "poc_03_addition": "★ FK 자체 부재 (PoC #02 는 FK 있음 / PoC #03 은 FK 도 부재) + favoriteCount race"
+      }
+    },
+    {
+      "id": "AP-API-001",
+      "category": "API",
+      "severity": "high",
+      "title": "spec/runtime status code drift — NestJS default + ApiResponse decorator + RFC 9110 다중 위반 (5 op)",
+      "description": "5 op 가 spec/runtime drift: login NestJS @Post default 201 (RFC 9110 §15.3.2 신규 자원 ❌ → 200 권고), Article DELETE/POST/PUT 의 @ApiResponse 데코 201 (RFC 9110 §15.3.5 권고 204 / RFC 9110 §6.5 권고 200 위반). Spec/runtime drift 동시.",
+      "evidence_files": [
+        {"path": "src/user/user.controller.ts:43 — @Post('users/login') (NestJS 201 default)"},
+        {"path": "src/article/article.controller.ts:65,68 — @ApiResponse status:201 description:'deleted'"},
+        {"path": "src/article/article.controller.ts:81,85 — @ApiResponse status:201 description:'deleted'"},
+        {"path": "src/article/article.controller.ts:97,99 — @ApiResponse status:201 description:'unfavorited'"}
+      ],
+      "finding_refs": ["F-158"],
+      "rfc_owasp_authority": "RFC 9110 §15.3.2 (201 Created — 신규 자원 URI 시만) + §15.3.5 (DELETE → 204) + §6.5 (Update success 200)",
+      "industry_standard_violation": "GitHub API / Stripe API / Twitter API 모두 DELETE → 204 + login → 200 + Update → 200",
+      "migration_advice": {
+        "design": "@HttpCode(200) login + @HttpCode(204) DELETE + @ApiResponse status 정정 의무. NestJS @Post 의 default 201 함정 ADR 등록.",
+        "ci": "supertest 또는 Jest spec/runtime drift 검증 — ApiResponse decorator vs 실 status assertion",
+        "team_training": "RFC 9110 (HTTP Semantics) + NestJS HttpCode 공식 docs"
+      },
+      "cross_poc_validation": {
+        "poc_02": "★ AP-API-001 (favorite RFC 7231 §4.2.2) + F-085 (login status drift) + F-083 (DELETE 200) — isomorphic 합산 ★ 재현"
+      }
+    },
+    {
+      "id": "AP-VALIDATION-001",
+      "category": "VALIDATION",
+      "severity": "high",
+      "title": "class-validator coverage 12% — UpdateUserDto / CreateArticleDto / CreateCommentDto 0 validator + UserService.update validate 미호출",
+      "description": "class-validator 데코레이터가 50+ 필드 중 6 필드만 적용 (12%). UpdateUserDto / CreateArticleDto / CreateCommentDto 가 0 validator. UserService.update 가 validate(newUser) 미호출 → @IsEmail 우회 가능. follow self-check email vs unFollow self-check id 차원 불일치 (Domain invariant 부재).",
+      "evidence_files": [
+        {"path": "src/user/dto/create-user.dto.ts — @IsNotEmpty 3개"},
+        {"path": "src/user/dto/update-user.dto.ts — 0 validator"},
+        {"path": "src/article/dto/create-article.dto.ts — 0 validator"},
+        {"path": "src/user/user.service.ts:67 update — validate 미호출"},
+        {"path": "src/profile/profile.service.ts — follow=email / unFollow=id 차원 불일치"}
+      ],
+      "finding_refs": ["F-128", "F-127", "F-143", "F-144", "F-162"],
+      "rfc_owasp_authority": "OWASP API1 (Broken Object Level Authorization — mass assignment 잠재)",
+      "industry_standard_violation": "Bean Validation + class-validator 의 표준 = 모든 input DTO + entity field validator + Domain invariant constructor enforcement",
+      "migration_advice": {
+        "design": "DTO 모든 필드 @IsNotEmpty / @IsString / @IsEmail / @MaxLength 의무 + ValidationPipe global (main.ts app.useGlobalPipes(new ValidationPipe())) + Domain Aggregate constructor invariant (FollowsEntity 생성자 throw if followerId === followingId)",
+        "ci": "supertest negative test 의무 — empty / null / overflow / invalid email 등 boundary 케이스 + ArchUnit 동등 (controller 가 ValidationPipe 적용 검증)",
+        "team_training": "Sairyss DDD-Hexagon README §5 (Domain Invariants) + class-validator docs"
+      },
+      "cross_poc_validation": {
+        "poc_02": "PoC #02 = Bean Validation 풍부 (UserCreateRequest 7+ validator) — ★★ 학습 효과 반대 (PoC #03 부족 식별)"
+      }
+    },
+    {
+      "id": "AP-PERFORMANCE-001",
+      "category": "PERFORMANCE",
+      "severity": "high",
+      "title": "EAGER N+1 + favoriteCount race window — 3 PoC 재현 권위 (medium → high 격상 ★)",
+      "description": "@OneToMany comments eager:true → article list/find 시 N+1 쿼리. favoriteCount = favorites.length App level 보장 / DB level FOR UPDATE 부재 → 동시 favorite 시 count 2회 증가 race window. 3 PoC (PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124+F-135) 모두 재현 → ★★ medium → high 격상 권위 충분.",
+      "evidence_files": [
+        {"path": "src/article/article.entity.ts — @OneToMany comments eager:true"},
+        {"path": "src/article/article.service.ts favorite — isNewFavorite check + push + favoriteCount++ (App 1중)"}
+      ],
+      "finding_refs": ["F-124", "F-135"],
+      "rfc_owasp_authority": "Vlad Mihalcea High-Performance Java Persistence §3.4 (LazyInitializationException 회피 위해 EAGER 의 안티패턴) + Joe Celko §Concurrency",
+      "industry_standard_violation": "Spring Data JPA + Hibernate 정설 = LAZY default + @EntityGraph/@Query fetch join 명시 + @Version optimistic lock 또는 atomic UPDATE counter",
+      "migration_advice": {
+        "design": "TypeORM @OneToMany eager:false default + 명시적 relations: ['comments'] / favoriteCount = atomic UPDATE COUNT(*) 또는 @Version optimistic lock + transaction FOR UPDATE",
+        "ci": "JPA query log + count 분석 (N+1 검출) + race window 시뮬레이션 (k6 concurrent favorite)",
+        "team_training": "Hibernate Tips & Tricks (Vlad Mihalcea) + TypeORM eager loading 함정 ADR"
+      },
+      "cross_poc_validation": {
+        "poc_01": "F-006 EAGER N+1 ✅ 재현",
+        "poc_02": "F-051 EAGER N+1 ✅ 재현 (medium → high 격상 후보)",
+        "poc_03": "F-124 EAGER + F-135 race window ★ 재현 + 추가 결함",
+        "promotion_authority": "★★ 3 PoC 재현 권위 — v1.3 격상 시 high 격상 정식 데이터"
+      }
+    },
+    {
+      "id": "AP-API-002",
+      "category": "API",
+      "severity": "medium",
+      "title": "API versioning 부재 + GET /articles limit no maximum cap (OWASP API4)",
+      "description": "main.ts setGlobalPrefix('api') 단일 / no /v1 → backward compatibility 미보장. GetArticles limit query parameter 가 maximum cap 부재 → DB overload 가능 (OWASP API4: Lack of Resources & Rate Limiting).",
+      "evidence_files": [
+        {"path": "src/main.ts:8 setGlobalPrefix('api')"},
+        {"path": "src/article/article.controller.ts:25 @Query() — no validator"},
+        {"path": "src/article/article.service.ts findAll — limit 사용 (max 검증 부재)"}
+      ],
+      "finding_refs": ["F-159", "F-165"],
+      "rfc_owasp_authority": "OWASP API4 (Unrestricted Resource Consumption) + Stripe API 가이드라인 (versioning)",
+      "industry_standard_violation": "URI versioning (/v1) 또는 header versioning + limit max cap (예: 50)",
+      "migration_advice": {
+        "design": "setGlobalPrefix('api/v1') + @Query @Type(() => Number) @Max(50) limit",
+        "ci": "OpenAPI breaking change 검증 (oasdiff) + load test 가 limit max 초과 시 400 검증",
+        "team_training": "Stripe API Versioning + OWASP API Top 10"
+      },
+      "cross_poc_validation": {
+        "poc_02": "AP-API-003 (versioning) + AP-API-004 (limit cap) ★ 재현"
+      }
+    },
+    {
+      "id": "AP-API-003",
+      "category": "API",
+      "severity": "medium",
+      "title": "PUT 부분 갱신 — UpdateUser + UpdateArticle (RFC 5789 PATCH 권고)",
+      "description": "PUT /api/user (UpdateUserDto 모든 필드 optional) + PUT /api/articles/:slug (CreateArticleDto reuse) 이 부분 갱신 의도 / RFC 5789 PATCH 권고 위반. PUT 은 RFC 9110 §9.3.4 entity replacement 의미.",
+      "evidence_files": [
+        {"path": "src/user/user.controller.ts:26-29 PUT user"},
+        {"path": "src/article/article.controller.ts:59-63 PUT :slug"}
+      ],
+      "finding_refs": ["F-160"],
+      "rfc_owasp_authority": "RFC 5789 (PATCH Method for HTTP) + RFC 9110 §9.3.4 (PUT semantics)",
+      "industry_standard_violation": "GitHub API / Stripe API 모두 부분 갱신은 PATCH (application/merge-patch+json or json-patch+json)",
+      "migration_advice": {
+        "design": "@Patch(':slug') + application/merge-patch+json content type + UpdateArticleDto 분리 (CreateArticleDto reuse 금지)",
+        "ci": "OpenAPI spec 검증 + supertest method assertion",
+        "team_training": "RFC 5789 + RFC 7396 (JSON Merge Patch)"
+      },
+      "cross_poc_validation": {
+        "poc_02": "AP-API-005 (UpdateUser + UpdateArticle PUT) ★ 재현"
+      }
+    },
+    {
+      "id": "AP-DOMAIN-001",
+      "category": "DOMAIN",
+      "severity": "medium",
+      "title": "Domain invariant 부재 — FollowsEntity 생성자 + Tag aggregate dead + slug 미업데이트 TODO",
+      "description": "FollowsEntity 생성자 invariant 부재 (followerId === followingId 검증 ❌). Tag aggregate 가 dead (TagController findAll 만 / 다른 곳 미사용). Article update 시 slug 미업데이트 (article.controller.ts:61 TODO 주석).",
+      "evidence_files": [
+        {"path": "src/profile/follows.entity.ts — 생성자 invariant 부재"},
+        {"path": "src/tag/tag.service.ts — findAll 1 endpoint / Aggregate Root 모호"},
+        {"path": "src/article/article.controller.ts:61 // Todo: update slug also when title gets changed"}
+      ],
+      "finding_refs": ["F-122", "F-123", "F-126", "F-139", "F-147"],
+      "rfc_owasp_authority": "Sairyss DDD-Hexagon (Aggregate invariant constructor) + Vernon IDDD §10 (Aggregate)",
+      "industry_standard_violation": "Aggregate constructor 가 invariant 검증 의무 (Eric Evans DDD Blue Book §5)",
+      "migration_advice": {
+        "design": "FollowsEntity 생성자 throw if followerId === followingId + Tag Aggregate 책임 명시 (aggregate root vs supporting entity 결정) + Article setTitle 시 slug regenerate",
+        "ci": "ArchUnit 또는 ts-morph rule — Aggregate constructor invariant 적용 검증",
+        "team_training": "Eric Evans DDD §5 (A Model Expressed in Software) + Sairyss DDD-Hexagon"
+      },
+      "cross_poc_validation": {
+        "poc_02": "★★ double_hit — BR-USER-FOLLOW-NO-SELF-001 코드 부재 (PoC #02) ↔ 코드 존재 + 차원 불일치 (PoC #03)"
+      }
+    },
+    {
+      "id": "AP-DOMAIN-002",
+      "category": "DOMAIN",
+      "severity": "medium",
+      "title": "Bounded Context 경계 약함 — cross-module entity InjectRepository (NestJS 단일 module 본질)",
+      "description": "ProfileModule 이 UserEntity Repository 직접 InjectRepository → BC 경계 위반 (Profile 이 User domain 침투). FollowsEntity 위치 모호 (profile/ vs user/).",
+      "evidence_files": [
+        {"path": "src/profile/profile.service.ts — InjectRepository(UserEntity)"},
+        {"path": "src/profile/follows.entity.ts — 위치 모호 (profile 이지만 User-Following 관계)"}
+      ],
+      "finding_refs": ["F-137", "F-138"],
+      "rfc_owasp_authority": "Vernon IDDD §2 (Bounded Context) + NestJS Module 가이드",
+      "industry_standard_violation": "Bounded Context = entity 직접 참조 ❌ / inter-context = Anti-Corruption Layer 또는 Domain Event",
+      "migration_advice": {
+        "design": "UserService 추상 (interface) export → ProfileModule 이 import (Hexagonal port-adapter / NestJS Module forFeature 대신 Service injection)",
+        "ci": "ts-morph rule — cross-module @InjectRepository 차단",
+        "team_training": "Vernon IDDD §13 (Integrating Bounded Contexts) + Sairyss DDD-Hexagon README"
+      },
+      "cross_poc_validation": {
+        "poc_02": "★ J 묶음 (Hexagonal port-adapter) 반대 패턴 — PoC #02 = multi-module Hexagonal / PoC #03 = 단일 module 함정"
+      }
+    },
+    {
+      "id": "AP-CODE-QUALITY-001",
+      "category": "CODE_QUALITY",
+      "severity": "low",
+      "title": "JWT verify 3곳 DRY 위반 + AuthMiddleware legacy + dead code (BaseController, prisma/.env 잔재) + TagEntity 직접 노출",
+      "description": "auth.middleware.ts 가 verify 3곳 (findMe / update / 그외) DRY 위반. BaseController 가 dead (사용 0). prisma/ 디렉토리에 .env 잔재 (master 는 TypeORM 단독). TagController 가 TagEntity 직접 노출 (Sairyss DDD-Hexagon 위반 — Repository 결과 → DTO 변환 부재).",
+      "evidence_files": [
+        {"path": "src/user/auth.middleware.ts — verify 3곳"},
+        {"path": "src/shared/base.controller.ts — empty"},
+        {"path": "prisma/.env — master 무관 잔재"},
+        {"path": "src/tag/tag.controller.ts:18 — TagEntity[] 반환"}
+      ],
+      "finding_refs": ["F-118", "F-130", "F-131", "F-166"],
+      "rfc_owasp_authority": "Robert C. Martin Clean Code §G5 (Duplication) + DDD-Hexagon (Output DTO 분리)",
+      "industry_standard_violation": "단일 책임 원칙 + DRY + 출력 DTO 변환 (Repository entity 직접 노출 금지)",
+      "migration_advice": {
+        "design": "JwtAuthGuard 단일 책임 (verify 1곳) + dead code 삭제 + TagEntity → TagDto 변환 (id+name 만 노출)",
+        "ci": "ESLint dead code rule (no-unused-vars) + ts-morph TagEntity 노출 차단",
+        "team_training": "Clean Code §G5 + DDD-Hexagon Output DTO 패턴"
+      },
+      "cross_poc_validation": {
+        "poc_01": "AP-CODE-QUALITY 영역 부분 재현"
+      }
+    },
+    {
+      "id": "AP-CONTROLLER-001",
+      "category": "API",
+      "severity": "low",
+      "title": "Controller path inconsistency — @Controller() 빈 prefix (UserController) + TagController @ApiBearerAuth 인지 불일치",
+      "description": "UserController 가 @Controller() 빈 prefix 사용 (다른 controller 는 @Controller('articles') 등) → path 가 controller 내 분산 (user / users / users/:slug / users/login). TagController 가 @ApiBearerAuth() 데코 적용하나 실 endpoint 인증 불요 (Swagger UI 인지 불일치).",
+      "evidence_files": [
+        {"path": "src/user/user.controller.ts:16 @Controller()"},
+        {"path": "src/tag/tag.controller.ts:10-12 @ApiBearerAuth() @ApiTags('tags')"}
+      ],
+      "finding_refs": ["F-157", "F-163"],
+      "rfc_owasp_authority": "NestJS Controller convention",
+      "industry_standard_violation": "controller-level base path consistency",
+      "migration_advice": {
+        "design": "@Controller('users') + path 정리 (login → @Post('login')) + TagController @ApiBearerAuth 제거 (또는 endpoint 별 적용)",
+        "ci": "ts-morph rule — @Controller decorator 빈 prefix 차단",
+        "team_training": "NestJS Controller 공식 docs"
+      },
+      "cross_poc_validation": "PoC #02 미발견 — NestJS 특이 패턴"
+    }
+  ],
+  "antipatterns_count": 11,
+  "by_severity": {
+    "critical": 2,
+    "high": 3,
+    "medium": 4,
+    "low": 2
+  },
+
+  "_composite_view_metadata": [
+    {
+      "view_id": "§A. NestJS Auth scope 결여 (★★★ critical)",
+      "ap_refs": ["AP-AUTH-NEST-001"],
+      "summary": "5 endpoint anonymous 호출 + JWT verify 무방어 + login 모호. Phase 4.5 cross-link: BR-USER-DELETE-AUTH-001 (current_state: absent) + BR-USER-LOGIN-VERIFY-001 + BR-USER-JWT-EXPIRY-001",
+      "fix_priority": 1
+    },
+    {
+      "view_id": "§B. DB 데이터 무결성 (★★ critical + high)",
+      "ap_refs": ["AP-DB-001", "AP-PERFORMANCE-001"],
+      "summary": "DB UQ + FK + race window. PoC #02 isomorphic + 더 나쁨. Phase 4.5 cross-link: BR-USER-USERNAME-EMAIL-UNIQUE-001 + BR-FOLLOWS-PAIR-UNIQUE-001 + BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+      "fix_priority": 2
+    },
+    {
+      "view_id": "§C. API 계약 결함 (high + 2 medium)",
+      "ap_refs": ["AP-API-001", "AP-API-002", "AP-API-003"],
+      "summary": "spec/runtime drift + versioning + PUT vs PATCH. PoC #02 5 isomorphic 합산 재현 ★",
+      "fix_priority": 3
+    },
+    {
+      "view_id": "§D. Domain 경계 약함 (2 medium)",
+      "ap_refs": ["AP-DOMAIN-001", "AP-DOMAIN-002"],
+      "summary": "Aggregate invariant 부재 + BC 경계 약함. PoC #02 J 묶음 반대 패턴 (단일 module 함정)",
+      "fix_priority": 4
+    }
+  ],
+
+  "_id_normalization_mapping": {
+    "phase_4_partial_to_phase_6": [
+      {"from": "AP-DB-001-poc03 (가칭)", "to": "AP-DB-001"},
+      {"from": "AP-AUTH-NEST-001-poc03 (가칭) ★★", "to": "AP-AUTH-NEST-001"},
+      {"from": "AP-VALIDATION-001-poc03 (가칭)", "to": "AP-VALIDATION-001"},
+      {"from": "AP-PERFORMANCE-001-poc03 (가칭)", "to": "AP-PERFORMANCE-001"},
+      {"from": "AP-DOMAIN-001-poc03 (가칭)", "to": "AP-DOMAIN-001"},
+      {"from": "AP-DOMAIN-002-poc03 (가칭)", "to": "AP-DOMAIN-002"},
+      {"from": "AP-API-001-poc03 (가칭)", "to": "AP-API-001 (재정의 — Phase 5-1 발견 결합)"},
+      {"from": "AP-CODE-QUALITY-001-poc03 (가칭)", "to": "AP-CODE-QUALITY-001"}
+    ],
+    "phase_5_1_candidate_to_phase_6": [
+      {"from": "AP-API-002 candidate (versioning + quota)", "to": "AP-API-002"},
+      {"from": "AP-API-003 candidate (PUT vs PATCH)", "to": "AP-API-003"},
+      {"from": "AP-CONTROLLER-001 신규 (F-157 + F-163)", "to": "AP-CONTROLLER-001"}
+    ],
+    "merged_or_dropped": [
+      {"action": "AP-AUTH-NEST-001 cumul 격상", "rationale": "F-164 critical 추가 (Phase 5-1) + F-150 추가 → 5 endpoint cumul critical"},
+      {"action": "AP-PERFORMANCE-001 medium → high 격상", "rationale": "★ 3 PoC 재현 권위 (PoC #01 + #02 + #03)"}
+    ]
+  },
+
+  "_cross_poc_validation_summary": {
+    "poc_01_15_ap_validation": {
+      "reproduced": ["AP-PERFORMANCE-001 (EAGER N+1)"],
+      "morphologically_reproduced": ["AP-SECURITY (PoC #01 JWT 21byte → PoC #03 Auth scope 결여)", "AP-DB (PoC #01 UQ → PoC #03 UQ + FK + race)"],
+      "not_reproduced_learning": ["AP-DOMAIN-001 (De Morgan critical) — TypeScript 정적 차단 학습 효과"]
+    },
+    "poc_02_21_ap_validation": {
+      "reproduced": [
+        "AP-API-001 (idempotency RFC 7231) → AP-API-001 변형",
+        "AP-API-003 (versioning) → AP-API-002",
+        "AP-API-004 (limit cap) → AP-API-002",
+        "AP-API-005 (PUT vs PATCH) → AP-API-003",
+        "AP-PERFORMANCE-001 (EAGER) → AP-PERFORMANCE-001",
+        "AP-DOMAIN-002 (race-prone unique) → AP-DB-001"
+      ],
+      "morphologically_reproduced": [
+        "AP-SECURITY-001 (RSA git commit) → AP-AUTH-NEST-001 (auth scope) — variant"
+      ],
+      "not_reproduced_learning_effect": [
+        "AP-API-008 (307 internal redirect) — NestJS framework 차이 (ModelAndView 미사용)",
+        "AP-API-007 (x-codegen swagger 2.x legacy) — @nestjs/swagger 4.x 자동 생성"
+      ],
+      "F-084_token_apikey_to_F-161_bearer_standard": "★★ 학습 효과 입증 ✅ — NestJS addBearerAuth() 표준 (PoC #02 Token apiKey 비표준 비재현)"
+    },
+    "poc_03_unique": [
+      "AP-AUTH-NEST-001 ★★ (NestJS Passport 미사용 + Auth scope 결여 — 5 endpoint critical)",
+      "AP-CONTROLLER-001 (NestJS @Controller() 빈 prefix 함정)",
+      "F-144 (dimensional inconsistency follow=email / unFollow=id)",
+      "F-126 (TODO slug 미업데이트)"
+    ]
+  },
+
+  "_phase_4_5_cross_link_summary": {
+    "ap_with_phase_4_5_link": [
+      {"ap": "AP-AUTH-NEST-001", "links": ["BR-USER-DELETE-AUTH-001 (absent)", "BR-USER-LOGIN-VERIFY-001 (partial)", "BR-USER-JWT-EXPIRY-001 (partial)", "User.json state-machine"]},
+      {"ap": "AP-DB-001", "links": ["BR-USER-USERNAME-EMAIL-UNIQUE-001", "BR-FOLLOWS-PAIR-UNIQUE-001", "Follows.json state-machine", "Article.json state-machine"]},
+      {"ap": "AP-VALIDATION-001", "links": ["BR-FOLLOWS-NO-SELF-001 (★ F-144 차원 불일치)"]},
+      {"ap": "AP-DOMAIN-001", "links": ["BR-FOLLOWS-NO-SELF-001 (Domain invariant 부재)", "FollowsEntity 생성자"]}
+    ],
+    "ap_without_phase_4_5_link": [
+      "AP-API-001 / AP-API-002 / AP-API-003 / AP-DOMAIN-002 / AP-PERFORMANCE-001 / AP-CODE-QUALITY-001 / AP-CONTROLLER-001",
+      "→ Phase 4.5 의 형식 명세 영역 vs Phase 5-1/6 의 API/Performance 영역 = 자연스러운 분리"
+    ]
+  },
+
+  "_positive_findings_logged": [
+    {
+      "id": "F-161",
+      "title": "★★ Bearer JWT 표준 준수 ✅",
+      "evidence": "main.ts:15 addBearerAuth() + ApiBearerAuth 데코",
+      "cross_poc_value": "★ PoC #02 F-084 (Token apiKey 비표준) 비재현 = NestJS framework 학습 효과 입증",
+      "v13_promotion_candidate": "★ positive finding 패턴 정식 도입 후보 (memory feedback_positive_finding_pattern.md 신규)"
+    }
+  ]
+}

@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★ PoC #03 Phase 5-1 종결 — 7대 산출물 5/7 / F-164 critical 신규 / Bearer 학습 효과 ★)
+**기준일**: 2026-04-30 (★★★ **PoC #03 전체 종결** — 7대 산출물 6/7 / 11 AP / 사내 표준 v1.3 격상 데이터 완비)
 
 ---
 
@@ -32,7 +32,8 @@
 | 시퀀스 B Phase 4.5 검증 | drift-validator (9 짝 / 20 breaking → 진짜 8 + 도구 한계 12) + decision-table-validator (6 → 0 enum fix) + DEC 종결 + finding F-145~**F-156** 통합 (★ F-154 transitionFuzzyMatch 60% false positive — F-117 재발 입증) + 신뢰도 0.70 → 0.77 (단계 2 → 2.5) | ✅ (2026-04-30 본 세션) |
 | **시퀀스 B Phase 4.5+1** | **다이어그램 mermaid 보강 (진짜 drift 8 → 0 ✅) — Article persistingArticle compound + User validatingLogin compound + Article 3 self-loop + Follows self-loop + sequence 2 message** + drift 재실행 (breaking 20 → 8 / 진짜 drift 0 / 도구 한계 100%) + 신뢰도 0.77 → **0.80** (★ 단계 3 자동 검증 통과 도달 ✅) | ✅ **본 세션 (2026-04-30)** |
 | **시퀀스 B Phase 5-1** | **api 산출 4종 — openapi.yaml (21 endpoint / 14 schemas / Bearer JWT) + api-extension.json (★ Phase 4.5 cross-link 9/21) + api.md (12 REC-API-*) + _manifest. ★★★ F-164 critical 신규 (Article 4 endpoint Auth 부재) + F-161 positive (Bearer 표준 ✅ = PoC #02 F-084 학습 효과) + F-157~F-166 10건. 신뢰도 0.90 / 7대 산출물 5/7** | ✅ **본 세션 (2026-04-30)** |
-| 시퀀스 B Phase 6 | antipatterns final (12 candidate → 10 composite view + migration_advice) | ⏳ **다음 (★ PoC #03 종결까지 1단계)** |
+| **시퀀스 B Phase 6** | **antipatterns final 4종 — antipatterns.json (11 AP / critical 2 + high 3 + medium 4 + low 2) + avoid-list.md + ★ migration-cautions.md (NestJS 특이 8 함정 + 학습 효과 3건) + _manifest. 4 composite view + Phase 4.5 cross-link 4/11 AP + ★★ F-161 positive (Bearer 학습 효과) + AP-PERFORMANCE-001 medium → high 격상 (3 PoC 재현). 신뢰도 0.94 / 7대 산출물 6/7** | ✅ **본 세션 (2026-04-30)** |
+| **★★★ PoC #03 종결** | **★★ 전체 7대 산출물 6/7 도달** (UI/UX 만 N/A) — 사내 표준 v1.3 격상 데이터 완비 | ✅ **본 세션 (2026-04-30)** |
 
 ---
 
@@ -121,7 +122,13 @@ unit_tests_passing: 17/17  # drift-validator 6 + dmn-check 7 + static-runner 4
 poc03_validation_first_external_application: ✅  # ★★ 본 세션 — drift 60% false positive (F-117 재발 = F-154) + dmn 5종 0 hit (BR 표 모두 통과)
 poc03_phase_45_plus_1_diagram_fix: ✅  # ★★ 다이어그램 보강 8건 — 진짜 drift 0 도달 + 도구 한계 100% (Sprint 5 carry-over)
 poc03_phase_5_1_api_complete: ✅       # ★★ 21 endpoint + Phase 4.5 cross-link 9/21 + F-164 critical (★★★ Article 4 endpoint Auth 부재 신규)
-poc03_artifacts_progress: 5/7           # 7대 산출물 — UI/UX 만 N/A / Phase 6 만 남음
+poc03_phase_6_antipatterns_complete: ✅  # ★★★ 11 AP + 4 composite view + Phase 4.5 cross-link 4/11 + F-161 positive
+poc03_artifacts_progress: 6/7            # ★★ 7대 산출물 종결 — UI/UX 만 N/A / BE only
+
+# ★★★ 3 PoC 통합 (사내 표준 v1.3 격상 데이터 완비)
+all_3_pocs_complete: ✅
+cumulative_ap_3_pocs: 47   # PoC #01 15 + PoC #02 21 + PoC #03 11
+v13_promotion_data_status: "★★★ 완비"
 ci_workflow_files: 1       # .github/workflows/drift-check.yml (drift + static dual mode)
 ```
 
