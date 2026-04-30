@@ -27,6 +27,13 @@ artifacts:
     BR-FOLLOWS-PAIR-UNIQUE-001: { json: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.json", md: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.md" }
     BR-USER-JWT-EXPIRY-001: { json: "./decision-tables/BR-USER-JWT-EXPIRY-001.json", md: "./decision-tables/BR-USER-JWT-EXPIRY-001.md" }
     BR-USER-LOGIN-VERIFY-001: { json: "./decision-tables/BR-USER-LOGIN-VERIFY-001.json", md: "./decision-tables/BR-USER-LOGIN-VERIFY-001.md" }
+    # ★ B 추가 6 BR (Phase 4.5 풍부화)
+    BR-USER-EMAIL-FORMAT-001: { json: "./decision-tables/BR-USER-EMAIL-FORMAT-001.json", md: "./decision-tables/BR-USER-EMAIL-FORMAT-001.md" }
+    BR-USER-PASSWORD-HASH-001: { json: "./decision-tables/BR-USER-PASSWORD-HASH-001.json", md: "./decision-tables/BR-USER-PASSWORD-HASH-001.md" }
+    BR-ARTICLE-SLUG-AUTO-001: { json: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.json", md: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.md" }
+    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.json", md: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.md" }
+    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.json", md: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.md" }
+    BR-ARTICLE-COMMENT-EAGER-001: { json: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.json", md: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.md" }
   invariants:
     User: "./invariants/User.ts"
     Follows: "./invariants/Follows.ts"
@@ -39,20 +46,21 @@ artifacts:
 artifact_count:
   state_machines: 6
   sequence_diagrams: 12
-  decision_tables: 12
+  decision_tables: 24  # ★ B 보강 — 6 BR (12 file) → 12 BR (24 file)
   invariants: 3
   property_tests: 3
   validation_results: 3  # .validation/{drift-result.json, dmn-check-result.json, SUMMARY.md}
-  total: 39
-  expected: 40  # _manifest.yml 자체 포함
-  carry_over_drift_validator_results: false  # ★ 본 세션 실행 완료
+  total: 51   # ★ +12 (B 추가 6 BR × 2 file)
+  expected: 52
+  carry_over_drift_validator_results: false
+  br_formalization_coverage: "★ 12/18 = 66.7% (B 보강 전 6/18 = 33%)"
 
 # ----------------------------------------------------------------------
 # 신뢰도 (★ Senior 의사결정 5 ❌ 권고 반영 — D5 / 본 세션 자동 검증 후 +7p)
 # ----------------------------------------------------------------------
 trust_level:
-  raw_confidence: 0.85  # 70 + 15 — drift + dmn 실행 +10p / 다이어그램 보강 +3p / ★ A drift-validator 보강 (false positive 0%) +5p / Phase 4.5+2 outer transition 4건 +3p / drift breaking 0 + exit 0 ★
-  current_step: 3.5  # ★★ ADR-009 단계 3+ — 자동 검증 완전 통과 + 도구 자체 quality 격상
+  raw_confidence: 0.87  # 0.85 + ★ B Phase 4.5 풍부화 (BR coverage 33% → 66.7% / 12 BR 자동 검증 통과 / dmn-check schema 보강) +2p
+  current_step: 3.5  # ★★ ADR-009 단계 3+ — 자동 검증 완전 통과 + 도구 자체 quality 격상 + Phase 4.5 풍부화
   validation_history:
     - { step: "1차 작성", at: "2026-04-30", actor: "AI (메인 raw fetch)", tool_type: "ai_main" }
     - { step: "Sub-agent 3 병렬 (NestJS 7 + OSS 사례 + Senior)", at: "2026-04-30", tool_type: "ai_subagent_lightweight" }
@@ -173,7 +181,15 @@ natural_language_gap:
     BR-FOLLOWS-PAIR-UNIQUE-001: 0.44
     BR-USER-JWT-EXPIRY-001: 0.44
     BR-USER-LOGIN-VERIFY-001: 0.44
-  validation: "★ Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 33-44%"
+    # ★ B 보강 6 BR
+    BR-USER-EMAIL-FORMAT-001: 0.44
+    BR-USER-PASSWORD-HASH-001: 0.44   # ★ lifecycle hook BR — F-141 critical 노출
+    BR-ARTICLE-SLUG-AUTO-001: 0.44    # ★ F-053-variant + F-120 + F-126 합산
+    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: 0.44   # ★ F-135 critical 노출
+    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: 0.44
+    BR-ARTICLE-COMMENT-EAGER-001: 0.33   # ★ lifecycle/EAGER BR — 자연어 가장 빈약 (3/9)
+  poc_03_average_after_b: 0.42   # 12 BR 평균 (PoC #02 0.44 와 isomorphic)
+  validation: "★ Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 33-44% / ★★ corpus 6 → 12 BR 확장 후 자연어 빈약성 일관성 입증"
 
 # ----------------------------------------------------------------------
 # 신규 finding (Phase 4.5 도출 — drift-validator 결과 합산 후 최종)

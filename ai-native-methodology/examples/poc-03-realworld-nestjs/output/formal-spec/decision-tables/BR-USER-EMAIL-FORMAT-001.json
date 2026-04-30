@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-USER-EMAIL-FORMAT-001",
+  "trigger": "POST /api/users (signup) / PUT /api/user (update)",
+  "condition": "email 필드 입력 시 RFC 5322 형식 검증",
+  "action": "@IsEmail (UserEntity decorator) — class-validator validate(newUser)",
+  "expected_result": "RFC 5322 위반 시 400 (signup 만) / update 시 ★ 검증 우회 (F-143 critical)",
+  "rejection_method": "ValidationPipe + class-validator → HttpException (signup) / ❌ 우회 (update)",
+  "verification_location": "src/user/user.entity.ts:13 @IsEmail + UserService.create:62 validate() (★ update:67 validate 미호출 — F-143)",
+  "http_status": 400,
+  "error_message": "validation errors (class-validator default)",
+  "current_state": "partial",
+  "current_state_note": "★ signup 만 검증 / ★★ F-143 update 검증 우회 가능 (UpdateUserDto 0 validator + UserService.update validate 미호출)",
+  "rendered_md_path": "./BR-USER-EMAIL-FORMAT-001.md",
+  "round_trip_pattern": "B (코드 → 형식)",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44,
+    "explicit_items": ["트리거", "조건", "액션", "현재 상태"],
+    "missing_items": [
+      "거부 방식 (signup vs update — 비대칭)",
+      "검증 위치 (Entity 데코 vs Service 호출 — 두 곳 의존)",
+      "HTTP status (400 통일성)",
+      "에러 메시지 (★ class-validator default vs 사내 표준)",
+      "update 시 검증 정책 (★★ F-143 — 우회 가능 vs validate(newUser) 호출 의무)"
+    ]
+  },
+  "formalization_decisions": [
+    {"item": "거부 방식", "decision": "ValidationPipe + class-validator HttpException 400", "rationale": "NestJS 표준 / signup 정합"},
+    {"item": "검증 위치", "decision": "★ UserEntity @IsEmail (현재) + ★★ UpdateUserDto @IsEmail 의무 (F-143 fix)", "rationale": "★ DTO 단독 검증 의무 — Entity 데코는 비-validation 책임 (Sairyss DDD-Hexagon 정설)"},
+    {"item": "HTTP status", "decision": "400 (validation errors)", "rationale": "RFC 9110 §15.5.1 정합"},
+    {"item": "에러 메시지", "decision": "★ class-validator default + customMessages 권고", "rationale": "OWASP A07 (사용자 enumeration 회피 — email format error vs duplicate error 구분)"},
+    {"item": "update 시 검증 정책", "decision": "★★ UserService.update 가 validate(newUser) 호출 + UpdateUserDto @IsEmail 적용 (F-143 fix)", "rationale": "★★ 신규 입력 boundary = 검증 의무 / signup-only 비대칭 ❌"}
+  ],
+  "related_findings": ["F-143", "F-128"]
+}

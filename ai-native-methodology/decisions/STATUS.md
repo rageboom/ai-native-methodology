@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-04-30 (★★★ **A drift-validator quality 격상** — F-154/F-155 closed / breaking 0 / exit 0 / 신뢰도 0.85)
+**기준일**: 2026-04-30 (★★ **B Phase 4.5 풍부화** — BR coverage 33% → 66.7% / 12 BR 자동 검증 통과 / dmn-check schema 보강 / 신뢰도 0.87)
 
 ---
 

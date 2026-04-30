@@ -1,0 +1,37 @@
+{
+  "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
+  "br_id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+  "trigger": "POST /api/articles/:slug/favorite",
+  "condition": "user.favorites 에 이미 article 이 존재하는가",
+  "action": "isNewFavorite check → 신규만 push + favoriteCount++",
+  "expected_result": "중복 favorite 무효 / favoriteCount 단조 증가 invariant",
+  "rejection_method": "service if 분기 (silent skip — idempotent)",
+  "verification_location": "src/article/article.service.ts:147 isNewFavorite",
+  "http_status": 201,
+  "error_message": null,
+  "current_state": "partial",
+  "current_state_note": "★★ App 1중 idempotent / DB level race window — F-135 critical (★ favoriteCount = favorites.length 단조성 보장 부재)",
+  "rendered_md_path": "./BR-ARTICLE-FAVORITE-IDEMPOTENT-001.md",
+  "round_trip_pattern": "B (코드 → 형식)",
+  "natural_language_gap_quantified": {
+    "explicit": 4,
+    "total": 9,
+    "coverage_percent": 44,
+    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "missing_items": [
+      "거부 방식 (silent skip vs 409 Conflict)",
+      "검증 위치 (App 1중 / DB FOR UPDATE 부재)",
+      "HTTP status (201 idempotent vs 200 권고)",
+      "에러 메시지 (silent — 빈약)",
+      "★★ race window 처리 (★ F-135 critical)"
+    ]
+  },
+  "formalization_decisions": [
+    {"item": "거부 방식", "decision": "★ App pre-check 제거 + DB UQ pair (user_id, article_id) + catch QueryFailedError → silent skip (idempotent)", "rationale": "★ Sairyss DDD-Hexagon — race-safe + idempotent 동시 보장"},
+    {"item": "검증 위치", "decision": "★★ DB UQ pair + atomic UPDATE counter (★ F-135 fix)", "rationale": "★★ App 1중 isNewFavorite check → 동시 favorite 시 둘 다 isNewFavorite=true 통과 → favoriteCount 2회 증가 race"},
+    {"item": "HTTP status", "decision": "200 (idempotent — RFC 9110 §15.3.1 정합) — NestJS @Post default 201 ❌ → @HttpCode(200) 권고", "rationale": "★ AP-API-001 합산 (F-158)"},
+    {"item": "favoriteCount 보장", "decision": "★★ atomic UPDATE article SET favoriteCount = favoriteCount + 1 (DB level) + @Version optimistic lock 또는 FOR UPDATE", "rationale": "★★ F-135 fix — App 1중 → DB 1중 격상"},
+    {"item": "race window 처리", "decision": "★★ DB UQ pair (user_id, article_id) + atomic counter — App 1중 isNewFavorite check 제거", "rationale": "★★ industry 정설 = race-safe pattern"}
+  ],
+  "related_findings": ["F-135", "F-151", "F-158"]
+}
