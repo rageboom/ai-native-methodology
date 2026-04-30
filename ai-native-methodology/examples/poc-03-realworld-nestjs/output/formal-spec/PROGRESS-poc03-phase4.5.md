@@ -162,8 +162,55 @@ output/api/
 |---|---|---|
 | Step 1 — drift + dmn 실행 | 다음 세션 | ✅ 종결 |
 | Step 2 — finding 등록 + manifest | 다음 세션 | ✅ 종결 (F-154/155/156 + manifest 갱신) |
-| Step 3 — DEC + STATUS | 다음 세션 | ⏳ 진행 중 |
-| Step 4 — Phase 5-1 진입 준비 | 다음 세션 | ⏳ Phase 4.5 종결 후 |
+| Step 3 — DEC + STATUS | 다음 세션 | ✅ 종결 (DEC + STATUS + INDEX 갱신) |
+| **Phase 4.5+1 — 다이어그램 보강 8건** | **다음 세션 carry-over** | ✅ **본 세션 흡수 — 진짜 drift 8 → 0** |
+| Step 4 — Phase 5-1 진입 준비 | 다음 세션 | ⏳ 다음 세션 |
+
+---
+
+## 2026-04-30 (Phase 4.5+1 다이어그램 보강 — 본 세션 추가 흡수)
+
+### 사용자 1번 옵션 (다이어그램 보강) 채택 — 즉시 실행
+
+- 본래 계획: Phase 4.5+1 = 다음 세션 carry-over
+- 사용자 결단: 1번 옵션 = 본 세션 흡수
+- 시간 소요: ~25분
+
+### 8건 보강 내역
+
+| # | 다이어그램 | 보강 |
+|---|---|---|
+| 1 | Article.mermaid | `state PersistingArticle { state InsertingRow { ... } }` 블록 추가 (compound nesting) |
+| 2 | User.mermaid | `state ValidatingLogin { ... }` 블록 추가 |
+| 3-5 | Article.mermaid | published_count0 self-loop 2 (add_comment / get) + published_countN self-loop 1 (favorite_dup) |
+| 6 | Follows.mermaid | following self-loop (follow_request_dup) |
+| 7 | UC-ARTICLE-CREATE.mermaid | `Note over Service` → `Service->>Service` self-arrow 변환 |
+| 8 | UC-USER-SIGNUP.mermaid | `Note over Entity` → `Entity-->>Repository` return arrow 변환 |
+
+### drift-validator 재실행 결과
+
+```
+1차: breaking 20 / non-breaking 2 / info 44 / EXIT 1
+2차: breaking 8 ✅ / non-breaking 2 / info 47 / EXIT 1 (도구 한계만)
+```
+
+→ **breaking -12 / 진짜 drift 8 → 0 ✅ / 도구 한계만 8건 (F-117 재발 = F-154 / F-155)**.
+
+### 신뢰도 변동
+
+```yaml
+0.77 → 0.80
+변동:
+  진짜 drift 8 → 0 (다이어그램 보강 +3p)
+  drift breaking 1+ -3p 패널티 회수 (도구 한계 100% 명시)
+  total: +3p
+단계: 2.5 → 3 ★ (자동 검증 통과 ✅)
+```
+
+### 교훈 추가
+
+- ★★ **다이어그램 보강 ROI 즉시 입증** — 8건 fix 만으로 진짜 drift 0 도달 + 도구 한계 12 → 8 동반 감소 (compound state nesting 명시 시 일부 transition 매칭 회복 ★ 부수 효과).
+- ★ **사용자 1번 옵션 결단** = scope IN 으로 흡수 가능 정합성 입증 (직전 plan 의 K3 부분 변경 = "별 carry-over" 가 사실은 본 세션 흡수 가능 했음).
 
 ---
 

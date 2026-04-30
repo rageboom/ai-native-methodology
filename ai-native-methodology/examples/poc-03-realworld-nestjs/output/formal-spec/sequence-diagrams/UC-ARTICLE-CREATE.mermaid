@@ -26,7 +26,7 @@ sequenceDiagram
         Slugify-->>Service: slug-base
         Service->>Random: Math.random().toString(36).substring(7)
         Random-->>Service: abc12 (5 chars / 36^5 ≈ 60M)
-        Note over Service: slug = slug-base + '-' + abc12
+        Service->>Service: slug = slug-base + '-' + abc12
     end
 
     rect rgb(230, 240, 255)

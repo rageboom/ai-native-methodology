@@ -1,8 +1,9 @@
 # Phase 4.5 자동 검증 결과 — PoC #03 NestJS
 
-> **일자**: 2026-04-30
+> **일자**: 2026-04-30 (Phase 4.5 + 4.5+1 통합)
 > **도구**: drift-validator v0.1.0 + decision-table-validator v0.1.0
 > **Source**: `output/formal-spec/.validation/{drift-result,dmn-check-result}.json`
+> **이력**: 1차 (2026-04-30 Phase 4.5) → 2차 (2026-04-30 Phase 4.5+1 다이어그램 보강 후)
 > **재현 명령**:
 > ```
 > node ai-native-methodology/tools/drift-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/
@@ -15,14 +16,16 @@
 
 ### 1.1 정량
 
-| 항목 | 값 |
-|---|---|
-| pair 수 (.json ↔ .mermaid) | 9 |
-| breaking | **20** |
-| non-breaking | 2 |
-| info | 44 |
-| errors (parse) | 0 |
-| exit code | 1 |
+| 항목 | 1차 (Phase 4.5) | 2차 (Phase 4.5+1 다이어그램 보강 후) ✅ |
+|---|---|---|
+| pair 수 | 9 | 9 |
+| breaking | 20 | **8** (-12) |
+| non-breaking | 2 | 2 |
+| info | 44 | 47 (+3) |
+| errors | 0 | 0 |
+| exit code | 1 | 1 (도구 한계만 남음) |
+| **진짜 drift** | **8** | **0 ✅** |
+| **도구 한계** | 12 | 8 (감소) |
 
 ### 1.2 짝별 결과
 
@@ -45,20 +48,22 @@
 | **진짜 drift** (mermaid 보강 의무) | **~8** | ★ carry-over (Phase 4.5+1 다이어그램 보강) |
 | **도구 한계** (F-117 transitionFuzzyMatch 재발) | **~12** | F-154 신규 finding + Sprint 5 carry-over |
 
-### 1.4 진짜 drift (8건 — 다이어그램 보강 carry-over)
+### 1.4 진짜 drift (8건 → 0건 ✅ Phase 4.5+1 종결)
 
-| # | Diff | 다이어그램 | 보강 안 |
-|---|---|---|---|
-| 1 | state.compound.missing — `persistingArticle` | Article.mermaid | `state PersistingArticle { ... }` 블록 추가 |
-| 2 | state.compound.missing — `validatingLogin` | User.mermaid | `state ValidatingLogin { ... }` 블록 추가 |
-| 3 | transition.missing — `published_count0 -[add_comment]-> published_count0` | Article.mermaid | self-loop 추가 |
-| 4 | transition.missing — `published_count0 -[get]-> published_count0` | Article.mermaid | self-loop 추가 |
-| 5 | transition.missing — `published_countN -[favorite_dup]-> published_countN` | Article.mermaid | self-loop 추가 |
-| 6 | transition.missing — `following -[follow_request_dup]-> following` | Follows.mermaid | self-loop 추가 |
-| 7 | message.missing — `service-sync->service` | UC-ARTICLE-CREATE.mermaid | self-message 추가 |
-| 8 | message.missing — `entity-return->repository` | UC-USER-SIGNUP.mermaid | return arrow 추가 |
+| # | Diff | 다이어그램 | 보강 | 상태 |
+|---|---|---|---|---|
+| 1 | state.compound.missing — `persistingArticle` | Article.mermaid | `state PersistingArticle { state InsertingRow { ... } }` 블록 추가 | ✅ |
+| 2 | state.compound.missing — `validatingLogin` | User.mermaid | `state ValidatingLogin { ... }` 블록 추가 | ✅ |
+| 3 | transition.missing — `published_count0 -[add_comment]-> published_count0` | Article.mermaid | self-loop 추가 | ✅ |
+| 4 | transition.missing — `published_count0 -[get]-> published_count0` | Article.mermaid | self-loop 추가 | ✅ |
+| 5 | transition.missing — `published_countN -[favorite_dup]-> published_countN` | Article.mermaid | self-loop 추가 | ✅ |
+| 6 | transition.missing — `following -[follow_request_dup]-> following` | Follows.mermaid | self-loop 추가 | ✅ |
+| 7 | message.missing — `service-sync->service` | UC-ARTICLE-CREATE.mermaid | Note → `Service->>Service` self-arrow 변환 | ✅ |
+| 8 | message.missing — `entity-return->repository` | UC-USER-SIGNUP.mermaid | Note → `Entity-->>Repository` return arrow 변환 | ✅ |
 
-### 1.5 도구 한계 (12건 — F-154 finding 등록)
+→ **8/8 fix 완료 ✅** (Phase 4.5+1 종결).
+
+### 1.5 도구 한계 (1차 12건 → 2차 8건 — F-154 finding 등록 / Sprint 5 carry-over)
 
 전부 **F-117 transitionFuzzyMatch 한계 재발** ★. compound state 안의 sub-state transition 이 outer transition 으로 elide / 매칭 못 됨.
 
@@ -153,29 +158,35 @@
 
 ---
 
-## 5. 신뢰도 변동 (D5 권고 정합)
+## 5. 신뢰도 변동 (D5 권고 정합 + Phase 4.5+1)
 
 ```yaml
-before_validation: 0.70
-after_validation:
+phase_45_validation:
+  before: 0.70
   drift-validator 실행 (carry-over 해소): +5
   decision-table-validator 실행 (carry-over 해소): +5
   drift breaking ≥ 1 (진짜 drift 8건 carry-over): -3
-  current_state enum fix 완료: 0  # dmn breaking 0 도달
   total: +7
-after: 0.77  # 70 + 7
+  after: 0.77  # 단계 2.5
+
+phase_45_plus_1_diagram_fix:
+  before: 0.77
+  진짜 drift 8 → 0 (다이어그램 mermaid 보강): +3
+  drift breaking 1+ -3p 패널티 회수: 0  # 진짜 drift 0 = 도구 한계 100% 명시
+  total: +3
+  after: 0.80  # 단계 3 (★ 자동 검증 통과 ✅)
 ```
 
-→ **0.77 (단계 2.5 = 자동 검증 부분 통과 — ADR-009 단계 3 도달까지는 다이어그램 보강 carry-over)**.
+→ **0.80 (★ ADR-009 단계 3 자동 검증 통과 ✅ 도달)**.
 
 ---
 
 ## 6. 결론
 
-- ✅ Phase 4.5 자동 검증 1차 완료
+- ✅ Phase 4.5 자동 검증 종결 (drift + dmn 첫 외부 적용)
 - ✅ dmn-check 6 enum 위반 즉시 fix
-- ⏳ drift-validator 진짜 drift 8건 = 다이어그램 보강 carry-over (Phase 4.5+1)
-- ⏳ 도구 한계 12건 = F-154/F-155 finding + Sprint 5 carry-over
-- ★ 신뢰도 0.70 → 0.77 (+7p / 단계 2 → 단계 2.5)
+- ✅ **drift-validator 진짜 drift 8건 → 0 (Phase 4.5+1 다이어그램 보강 종결 ★)**
+- ⏳ 도구 한계 8건 = F-154/F-155 finding + Sprint 5 carry-over (transitionFuzzyMatch 보완)
+- ★ 신뢰도 0.70 → 0.77 → **0.80** (+10p / 단계 2 → 2.5 → **단계 3 도달 ✅**)
 
 **End of validation summary.**

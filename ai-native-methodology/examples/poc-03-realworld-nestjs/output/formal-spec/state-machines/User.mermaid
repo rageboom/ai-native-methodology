@@ -41,6 +41,12 @@ stateDiagram-v2
 
     Registered --> Authenticated: jwt.sign({email, exp: now+60days})
 
+    state ValidatingLogin {
+        [*] --> FindingUserByEmail
+        FindingUserByEmail --> UserFound: findOne({email}) 성공
+        FindingUserByEmail --> UserNotFound: row 없음 → 401 'User not found'
+    }
+
     ValidatingLogin --> VerifyingPassword: findOne({email}) 성공
     ValidatingLogin --> Anonymous: throw 401 'User not found'
 

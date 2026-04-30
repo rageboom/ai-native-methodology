@@ -1,9 +1,9 @@
 {
   "totals": {
     "pairs": 9,
-    "breaking": 20,
+    "breaking": 8,
     "non-breaking": 2,
-    "info": 44,
+    "info": 47,
     "errors": 0
   },
   "results": [
@@ -12,17 +12,11 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\Article.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 9,
+        "breaking": 1,
         "non-breaking": 0,
         "info": 18
       },
       "diffs": [
-        {
-          "severity": "breaking",
-          "kind": "state.missing-in-mermaid",
-          "json": "persistingarticle",
-          "message": "JSON state \"persistingarticle\" not found in mermaid (or no fuzzy match)"
-        },
         {
           "severity": "info",
           "kind": "state.extra-in-mermaid",
@@ -133,12 +127,6 @@
         },
         {
           "severity": "breaking",
-          "kind": "state.compound.missing-in-mermaid",
-          "json": "persistingarticle",
-          "message": "JSON compound state \"persistingarticle\" not declared as composite in mermaid"
-        },
-        {
-          "severity": "breaking",
           "kind": "transition.missing-in-mermaid",
           "json": {
             "from": "creating",
@@ -146,66 +134,6 @@
             "event": "author_auto"
           },
           "message": "JSON transition creating -[author_auto]-> creating not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "creating",
-            "to": "persistingarticle",
-            "event": "slugify_random"
-          },
-          "message": "JSON transition creating -[slugify_random]-> persistingarticle not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "persistingarticle",
-            "to": "publishedcount0",
-            "event": "insert_ok"
-          },
-          "message": "JSON transition persistingarticle -[insert_ok]-> publishedcount0 not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "persistingarticle",
-            "to": "publishedcount0",
-            "event": "slug_collision"
-          },
-          "message": "JSON transition persistingarticle -[slug_collision]-> publishedcount0 not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "publishedcount0",
-            "to": "publishedcount0",
-            "event": "add_comment"
-          },
-          "message": "JSON transition publishedcount0 -[add_comment]-> publishedcount0 not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "publishedcount0",
-            "to": "publishedcount0",
-            "event": "get"
-          },
-          "message": "JSON transition publishedcount0 -[get]-> publishedcount0 not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
-            "from": "publishedcountn",
-            "to": "publishedcountn",
-            "event": "favorite_dup"
-          },
-          "message": "JSON transition publishedcountn -[favorite_dup]-> publishedcountn not represented in mermaid"
         }
       ]
     },
@@ -214,7 +142,7 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\Follows.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 3,
+        "breaking": 2,
         "non-breaking": 0,
         "info": 10
       },
@@ -293,16 +221,6 @@
           "severity": "breaking",
           "kind": "transition.missing-in-mermaid",
           "json": {
-            "from": "following",
-            "to": "following",
-            "event": "follow_request_dup"
-          },
-          "message": "JSON transition following -[follow_request_dup]-> following not represented in mermaid"
-        },
-        {
-          "severity": "breaking",
-          "kind": "transition.missing-in-mermaid",
-          "json": {
             "from": "validatingunfollow",
             "to": "following",
             "event": "reject_null"
@@ -316,9 +234,9 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\state-machines\\User.mermaid",
       "diagram_type": "state-machine",
       "summary": {
-        "breaking": 5,
+        "breaking": 4,
         "non-breaking": 0,
-        "info": 16
+        "info": 19
       },
       "diffs": [
         {
@@ -350,6 +268,12 @@
           "kind": "state.extra-in-mermaid",
           "mermaid": "checkingemailformat",
           "message": "mermaid state \"checkingemailformat\" not in JSON (likely sub-state of a compound) — informational"
+        },
+        {
+          "severity": "info",
+          "kind": "state.extra-in-mermaid",
+          "mermaid": "findinguserbyemail",
+          "message": "mermaid state \"findinguserbyemail\" not in JSON (likely sub-state of a compound) — informational"
         },
         {
           "severity": "info",
@@ -418,10 +342,16 @@
           "message": "mermaid state \"rejectedupdate\" not in JSON (likely sub-state of a compound) — informational"
         },
         {
-          "severity": "breaking",
-          "kind": "state.compound.missing-in-mermaid",
-          "json": "validatinglogin",
-          "message": "JSON compound state \"validatinglogin\" not declared as composite in mermaid"
+          "severity": "info",
+          "kind": "state.extra-in-mermaid",
+          "mermaid": "userfound",
+          "message": "mermaid state \"userfound\" not in JSON (likely sub-state of a compound) — informational"
+        },
+        {
+          "severity": "info",
+          "kind": "state.extra-in-mermaid",
+          "mermaid": "usernotfound",
+          "message": "mermaid state \"usernotfound\" not in JSON (likely sub-state of a compound) — informational"
         },
         {
           "severity": "breaking",
@@ -470,23 +400,11 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\sequence-diagrams\\UC-ARTICLE-CREATE.mermaid",
       "diagram_type": "sequence",
       "summary": {
-        "breaking": 1,
+        "breaking": 0,
         "non-breaking": 0,
         "info": 0
       },
-      "diffs": [
-        {
-          "severity": "breaking",
-          "kind": "message.missing-in-mermaid",
-          "json": {
-            "from": "service",
-            "to": "service",
-            "sync": "sync",
-            "label": "slug = slug-base + '-' + abc12"
-          },
-          "message": "JSON message service-sync->service not in mermaid"
-        }
-      ]
+      "diffs": []
     },
     {
       "jsonPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\sequence-diagrams\\UC-ARTICLE-FAVORITE.json",
@@ -557,7 +475,7 @@
       "mermaidPath": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\ai-native-methodology\\examples\\poc-03-realworld-nestjs\\output\\formal-spec\\sequence-diagrams\\UC-USER-SIGNUP.mermaid",
       "diagram_type": "sequence",
       "summary": {
-        "breaking": 1,
+        "breaking": 0,
         "non-breaking": 1,
         "info": 0
       },
@@ -568,17 +486,6 @@
           "json": "양쪽 insert 모두 성공 가능 (race window)",
           "mermaid": "1 row inserted",
           "message": "message label drift between json and mermaid (from=db, to=repository)"
-        },
-        {
-          "severity": "breaking",
-          "kind": "message.missing-in-mermaid",
-          "json": {
-            "from": "entity",
-            "to": "repository",
-            "sync": "return",
-            "label": "(this.password ← hash)"
-          },
-          "message": "JSON message entity-return->repository not in mermaid"
         }
       ]
     }

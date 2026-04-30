@@ -17,14 +17,18 @@ stateDiagram-v2
         AssigningAuthor --> InsertingRow: author = findOne(userId)<br/>BR-AUTHOR-AUTO
     }
 
-    state InsertingRow {
-        [*] --> SaveAttempt
-        SaveAttempt --> Persisted: INSERT OK
-        SaveAttempt --> SlugCollision: ★ F-120<br/>slug UQ 부재<br/>random suffix 충돌 시<br/>undefined behavior
+    state PersistingArticle {
+        [*] --> InsertingRow
+        state InsertingRow {
+            [*] --> SaveAttempt
+            SaveAttempt --> Persisted: INSERT OK
+            SaveAttempt --> SlugCollision: ★ F-120<br/>slug UQ 부재<br/>random suffix 충돌 시<br/>undefined behavior
+        }
     }
 
+    Creating --> PersistingArticle: slugify_random / persist 진입
     Creating --> Published_Count0: persist OK
-    InsertingRow --> Published_Count0: 정상 INSERT
+    PersistingArticle --> Published_Count0: insert_ok / slug_collision (둘 다 진입)
 
     state Published_Count0 {
         [*] --> Idle0
@@ -32,6 +36,8 @@ stateDiagram-v2
         Idle0: comments eager loaded ★ F-124 N+1
     }
 
+    Published_Count0 --> Published_Count0: add_comment (self-loop)
+    Published_Count0 --> Published_Count0: get<br/>★ F-124 — comments eager:true → N+1
     Published_Count0 --> Favoring: POST /favorite
     Published_Count0 --> Updating: PUT /:slug
     Published_Count0 --> Deleted: DELETE /:slug
@@ -52,6 +58,7 @@ stateDiagram-v2
         IdleN: ★ INV — favoriteCount = favorites.length<br/>(App level 만 보장 / DB level 부재)
     }
 
+    Published_CountN --> Published_CountN: favorite_dup<br/>silent skip (isNewFavorite=false)
     Published_CountN --> Unfavoring: DELETE /favorite
     Published_CountN --> Favoring: 추가 favorite (dup → idempotent)
     Published_CountN --> Updating: PUT /:slug

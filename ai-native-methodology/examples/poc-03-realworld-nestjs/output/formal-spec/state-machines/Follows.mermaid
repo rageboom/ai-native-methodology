@@ -43,6 +43,7 @@ stateDiagram-v2
     ValidatingFollow --> Not_Following: 400
     CheckingSelf_Email --> Not_Following: 400 (self-follow 차단)
 
+    Following --> Following: follow_request_dup<br/>silent skip (idempotent)
     Following --> ValidatingUnfollow: DELETE /follow
 
     state ValidatingUnfollow {

@@ -51,7 +51,7 @@ sequenceDiagram
         Repository->>Entity: @BeforeInsert hashPassword()
         Entity->>Argon2: argon2.hash(this.password)
         Argon2-->>Entity: $argon2id$... hash
-        Note over Entity: this.password ← hash
+        Entity-->>Repository: (this.password ← hash)
     end
 
     rect rgb(255, 230, 240)
