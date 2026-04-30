@@ -101,7 +101,7 @@ confidence_calculation:
   cross_validation_modifiers:
     poc02_isomorphic_consensus: +0.02   # 5 재현 + 2 비재현 (F-084 비재현 = 학습 효과)
     static_only_caveat: -0.03           # ★ runtime ground truth 부재
-  raw_confidence: 0.90
+  raw_confidence: 0.91   # ★ +0.01 (★★★ spectral 실 실행 2026-05-01 — 24 warnings / 0 errors / exit 0)
   per_area:
     endpoint_identification: 0.95   # 정적 추출 (PoC #02 1.00 ground truth 대비)
     request_response_schema: 0.90
@@ -271,9 +271,26 @@ next_actions:
 
 # 정직 표기 (★★★ no-simulation 정합)
 honesty_disclosure:
-  - "★ runtime ground truth 부재 — 정적 추출만 (-3p / Sprint 5 carry-over)"
-  - "★ spectral / vacuum / openapi-changes 미실행 (-2p / Sprint 5 carry-over)"
+  - "★ runtime ground truth 부재 — 정적 추출만 (-3p / Sprint 5 carry-over 유지)"
+  - "★★★ spectral 실 실행 (2026-05-01) — 24 warnings / 0 errors / exit 0 ✅ Sprint 5 carry-over -2p 해소 / ADR-009 단계 4 도달"
+  - "★ vacuum / openapi-changes 미실행 — Sprint 6 carry-over"
   - "★ Auth 동작 실 확인 부재 (서버 미가동) — 정적 분석 + cross-validation 만"
   - "★★★ F-164 critical 5 endpoint 식별 — 본 phase 산출 시 추가 발견 (★ openapi.yaml 작성 중 결정적 분석으로 노출)"
   - "★★ F-161 positive — Bearer 표준 ✅ (PoC #02 F-084 비재현 = NestJS 학습 효과 입증 데이터)"
   - "★ 가벼운 sub-agent 전략 — research.md 생략 (K1 권고 채택 / Phase 4~6 영역 정합)"
+
+# ★ Sprint 5 부분 종결 (2026-05-01)
+sprint_5_partial_completion:
+  date: "2026-05-01"
+  tool: "@stoplight/spectral-cli"
+  result: "24 warnings / 0 errors / exit 0"
+  artifacts:
+    - "tools/spectral-runner/.spectral.yaml (extends spectral:oas)"
+    - "examples/poc-03/output/api/.validation/spectral-result.json"
+    - "examples/poc-03/output/api/.validation/SUMMARY.md"
+  carry_over_remaining:
+    - "Semgrep (★ Python+Java 환경 부재)"
+    - "PMD (★ Java 환경 부재)"
+    - "OSV-Scanner (★ Go binary)"
+    - "vacuum / openapi-changes (★ Sprint 6)"
+  adr_009_step_reached: 4   # ★ 단계 4 (진짜 도구 1회 실행) 첫 도달

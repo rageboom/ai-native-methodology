@@ -9,7 +9,82 @@
 
 ---
 
-## [v1.2.3] — 2026-04-30 ⭐ 현재 (PATCH)
+## [v1.3.0] — 2026-05-01 ⭐ 현재 (MINOR ★★★)
+
+### 트리거
+
+3 PoC (Spring Boot 2.5 / Spring Boot 3.3 Hexagonal / NestJS) 종결 후 본 방법론이 **platform-agnostic 임이 입증된 시점** + **★★★ no-simulation 정책 첫 실현 (spectral 실 실행)** + 격상 후보 6건 모두 적용 + Sprint 5 Node 도구 부분 종결.
+
+> **본 release = 사내 표준으로 격상**. 사내 legacy 시스템 분석 + 신규 시스템 구축 가이드 제공 가능. 신뢰도 85-92% 도달 (단계 4 — 진짜 도구 1회 실행 ★).
+
+### 변경 사항
+
+#### Added (추가) — v1.2.3 PATCH 흡수 + Sprint 5 부분
+
+**v1.2.3 PATCH 흡수** (★ 본 MINOR 에 통합):
+- 묶음 C (Phase 4.5 cross-link 의무화 schema)
+- 묶음 I (AP-PERFORMANCE 3 PoC 권위 격상)
+- 묶음 H (Positive finding 패턴 schema — severity:positive + learning_effect_type 4종 + status:logged)
+- 묶음 K (Lifecycle BR 패턴 — decision_tables required 분리 + br_type enum + current_state_note)
+- 묶음 R (NestJS 4 ADR — Auth-scope / Validation / HttpCode / TypeORM-Integrity)
+- 묶음 D (ADR-006 final 격상 + ADR-010 Baseline + Ratchet 신규)
+- §8.1 cross-platform 입증 정식 등재 (README "Platform-Agnostic 입증" 섹션)
+
+**v1.2.3 후속 LMNO** (★ 본 MINOR 에 통합):
+- 묶음 L (migration-cautions.md NestJS 변형 + 사내 도입 quality gate 정책)
+- 묶음 M (ADR-010 baseline+ratchet 도구 implementation — drift + dmn 에 `--baseline` / `--ratchet` / `--write-baseline`)
+- 묶음 N (formal-spec-link-validator 신규 도구 — Phase 4.5 cross-link enforcement)
+- 묶음 O (PoC #03 BR formalization 100% — 18/18)
+
+**★★★ Sprint 5 Node 도구 부분 종결 (2026-05-01 — 본 release 트리거)**:
+- `tools/spectral-runner/` — `@stoplight/spectral-cli` wrapper 신설
+- PoC #03 openapi.yaml 자가 적용 — **24 warnings / 0 errors / exit 0** ✅
+- ★ 본 방법론 ★★★ no-simulation 정책 첫 실현 (drift/dmn 자체 도구 + spectral 진짜 외부 도구)
+- ★ ADR-009 단계 4 (진짜 도구 1회 실행) 첫 도달
+- 신뢰도 80-87% → **85-92%** 도달 가능 시점
+
+### 정량
+
+| 측정 | v1.2.2 → v1.3.0 |
+|---|---|
+| 본체 갭 closure | 7 → **15** |
+| ADR 수 | 9 → **13** (NEST 4 + 010 1) |
+| schema 갱신 | — → **4건** (C/H/K + finding-system) |
+| 명세 본체 갱신 | — → **4건** (06 / finding-system / phase-4-5 / phase-6) |
+| 도구 수 | 3 → **5** (★ formal-spec-link-validator + spectral-runner 신규) |
+| 도구 unit test | 17 → **37** |
+| PoC #03 BR coverage | — → **100%** (18/18) |
+| PoC #03 신뢰도 | — → **0.91** (★ 단계 4) |
+| 본 방법론 시뮬 패널티 신뢰도 | 80-87% | **85-92%** (★ spectral 실행 후) |
+
+### v1.3.0 release 의 의미
+
+- **★ 본 방법론 = 사내 표준 채택 가능 시점** — 3 PoC platform-agnostic 입증 + 진짜 도구 검증 + 12 묶음 본체 갭 closure
+- **★ 사내 legacy 시스템 분석 + 신규 시스템 구축 가이드 제공 가능** — `docs/v1.3-promotion-report.md` §5.3 정합
+- **★ ROI 견적**: 소규모 5x / 중규모 7x / 대규모 12x
+
+### Migration Guide (v1.2.x → v1.3.0)
+
+본 v1.3.0 은 **하위 호환** (★ 모든 schema 변경 = optional 신규 필드 또는 null 허용 확장).
+
+권장:
+1. `api-extension.json` operations[] 에 `formal_spec_links` 추가 (선택 — coverage 정량 추적 가능)
+2. `antipatterns.json` antipatterns[] 에 `formal_spec_links` 추가 (선택)
+3. `finding-system.schema` 의 `severity:positive` + `status:logged` 활용 (cross-PoC 학습 효과 입증)
+4. Lifecycle BR 시 `br_type: lifecycle` + `http_status: null` (★ K 묶음 정합)
+5. 사내 도입 시 ADR-010 baseline + ratchet 의무 적용
+6. 신규 NestJS 프로젝트 — ADR-NEST-001~004 의무
+
+### Carry-over → v1.3.x (★ 후속 PATCH)
+
+1. **Sprint 5 잔여** — Semgrep (Python+Java 환경) / PMD (Java) / OSV-Scanner (Go binary) 실 실행 — ★ 환경 변동 시
+2. **Sprint 6** — vacuum / openapi-changes / corpus 14쌍 → 20쌍 / drift-validator phase-flow 비교기
+3. **묶음 P 보강** — migration-cautions Spring Boot 변형 / FastAPI 변형 (★ 4번째 PoC 진입 시)
+4. **사내 적용** — 첫 사내 legacy 분석 시 baseline 등재 + 분기별 review
+
+---
+
+## [v1.2.3] — 2026-04-30 (PATCH — ★ v1.3.0 에 흡수)
 
 ### 트리거
 

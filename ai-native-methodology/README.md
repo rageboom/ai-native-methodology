@@ -1,12 +1,12 @@
-# AI-Native 개발 방법론 v1.2.3
+# AI-Native 개발 방법론 v1.3.0 ★★★
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
 >
 > 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
 >
-> **v1.2.3 갱신 (2026-04-30)**: PoC #03 종결 후 본체 격상 PATCH — 묶음 C+I+H+K 4건 일괄. **★ Phase 4.5 cross-link 의무화 (openapi-extension + antipatterns schema)** + **★ AP-PERFORMANCE 3 PoC 권위 정식 격상** + **★ Positive finding 패턴 schema 화 (severity:positive + learning_effect_type 4종)** + **★ Lifecycle BR 패턴 (decision_tables required 분리 + br_type enum + current_state_note)**. drift-validator false positive 60% → 0%. v1.3.0 정식 release 진입 직전 상태.
+> **★★★ v1.3.0 release (2026-05-01)**: 3 PoC platform-agnostic 입증 + 11 묶음 본체 갭 closure + ★ Sprint 5 Node 도구 부분 종결 (spectral 실 실행 — 24 warnings / 0 errors / exit 0) + ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% 도달 (★ ADR-009 단계 4). **사내 표준 채택 가능 시점 도달**.
 >
-> **v1.2.2**: 묶음 M-P2-3 5건 PATCH — 본체 갭 7건 모두 closed.
+> **주요 격상**: Phase 4.5 cross-link 의무화 schema / AP-PERFORMANCE 3 PoC 권위 격상 / Positive finding 패턴 / Lifecycle BR / NestJS 4 ADR / ADR-010 Baseline+Ratchet / formal-spec-link-validator 도구.
 >
 > v1.2.1 — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema 강제. 진짜 도구 실 실행 Sprint 5 carry-over.
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.

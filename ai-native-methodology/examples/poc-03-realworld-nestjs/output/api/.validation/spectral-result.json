@@ -1,0 +1,506 @@
+(node:4440) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[
+	{
+		"code": "info-contact",
+		"path": [
+			"info"
+		],
+		"message": "Info object must have \"contact\" object.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 1,
+				"character": 5
+			},
+			"end": {
+				"line": 10,
+				"character": 16
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/user",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 34,
+				"character": 8
+			},
+			"end": {
+				"line": 47,
+				"character": 60
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/user",
+			"put"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 48,
+				"character": 8
+			},
+			"end": {
+				"line": 72,
+				"character": 110
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/users",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 75,
+				"character": 9
+			},
+			"end": {
+				"line": 94,
+				"character": 82
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/users/{slug}",
+			"delete"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 97,
+				"character": 11
+			},
+			"end": {
+				"line": 115,
+				"character": 63
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/users/login",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 118,
+				"character": 9
+			},
+			"end": {
+				"line": 143,
+				"character": 79
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 147,
+				"character": 8
+			},
+			"end": {
+				"line": 173,
+				"character": 69
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 174,
+				"character": 9
+			},
+			"end": {
+				"line": 195,
+				"character": 61
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/feed",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 198,
+				"character": 8
+			},
+			"end": {
+				"line": 218,
+				"character": 61
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 221,
+				"character": 8
+			},
+			"end": {
+				"line": 235,
+				"character": 68
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}",
+			"put"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 236,
+				"character": 8
+			},
+			"end": {
+				"line": 268,
+				"character": 37
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}",
+			"delete"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 269,
+				"character": 11
+			},
+			"end": {
+				"line": 285,
+				"character": 43
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}/comments",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 288,
+				"character": 8
+			},
+			"end": {
+				"line": 302,
+				"character": 69
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}/comments",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 303,
+				"character": 9
+			},
+			"end": {
+				"line": 324,
+				"character": 66
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}/comments/{id}",
+			"delete"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 327,
+				"character": 11
+			},
+			"end": {
+				"line": 347,
+				"character": 67
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}/favorite",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 350,
+				"character": 9
+			},
+			"end": {
+				"line": 371,
+				"character": 83
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/articles/{slug}/favorite",
+			"delete"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 372,
+				"character": 11
+			},
+			"end": {
+				"line": 391,
+				"character": 84
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/profiles/{username}",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 395,
+				"character": 8
+			},
+			"end": {
+				"line": 411,
+				"character": 68
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/profiles/{username}/follow",
+			"post"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 414,
+				"character": 9
+			},
+			"end": {
+				"line": 436,
+				"character": 53
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/profiles/{username}/follow",
+			"delete"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 437,
+				"character": 11
+			},
+			"end": {
+				"line": 455,
+				"character": 114
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/tags",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 459,
+				"character": 8
+			},
+			"end": {
+				"line": 472,
+				"character": 83
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-description",
+		"path": [
+			"paths",
+			"/",
+			"get"
+		],
+		"message": "Operation \"description\" must be present and non-empty string.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 476,
+				"character": 8
+			},
+			"end": {
+				"line": 484,
+				"character": 36
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "operation-tags",
+		"path": [
+			"paths",
+			"/",
+			"get"
+		],
+		"message": "Operation must have non-empty \"tags\" array.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 476,
+				"character": 8
+			},
+			"end": {
+				"line": 484,
+				"character": 36
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	},
+	{
+		"code": "oas3-unused-component",
+		"path": [
+			"components",
+			"schemas",
+			"GenericError"
+		],
+		"message": "Potentially unused component has been detected.",
+		"severity": 1,
+		"range": {
+			"start": {
+				"line": 646,
+				"character": 17
+			},
+			"end": {
+				"line": 654,
+				"character": 59
+			}
+		},
+		"source": "c:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/ai-native-methodology/examples/poc-03-realworld-nestjs/output/api/openapi.yaml"
+	}
+]

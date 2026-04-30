@@ -3,13 +3,14 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-01 (★★★ **v1.2.3 LMNO 종결** / 본체 갭 closure 15건 / 도구 unit test 25 → 37 / 신규 도구 formal-spec-link-validator / PoC #03 BR 100% / Sprint 5 환경 의존 만 잔여)
+**기준일**: 2026-05-01 (★★★ **v1.3.0 MINOR release ✅** / 사내 표준 채택 가능 시점 / spectral 실 실행 24 warnings/0 errors / no-simulation 정책 첫 실현 / 신뢰도 85-92% / ADR-009 단계 4)
 
 ---
 
 ## 방법론 본체 버전
 
-- **★★★ v1.2.3 PATCH 격상 완료 (현재)** — ★ 사용자 방향 재정렬 ("PoC 산출물 ❌ / 본체 격상 ✅"). **7 묶음 통합** (C+I+H+K + R+D+§8.1).
+- **★★★ v1.3.0 MINOR release (2026-05-01) ✅ 현재** — 사내 표준 채택 가능 시점 도달. **11 묶음 통합** (C+I+H+K + R+D+§8.1 + L+M+N+O) + Sprint 5 Node 도구 부분 종결 (spectral). ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% (★ ADR-009 단계 4 — 진짜 도구 1회 실행).
+- v1.2.3 PATCH (★ v1.3.0 에 흡수) — 본체 격상 7 묶음 (C+I+H+K + R+D+§8.1).
   - C: Phase 4.5 cross-link 의무화 schema
   - I: AP-PERFORMANCE 3 PoC 권위 격상
   - H: Positive finding 패턴 schema (severity:positive + learning_effect_type 4종 + status:logged)
