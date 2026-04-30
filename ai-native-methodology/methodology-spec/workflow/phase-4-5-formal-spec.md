@@ -110,6 +110,22 @@ flowchart TB
 8. **에러 메시지** (사용자 노출)
 9. **현재 상태** (코드 부재/부분/완전)
 
+#### 3.3.1 BR 분류 (★ v1.2.3 신설 — `br_type` enum)
+
+API 영역 외 BR 도 형식화 가능. `br_type` 으로 분류하면 항목 5/7/8 (rejection_method / http_status / error_message) 의 `null` 의도 부재가 자동 인정 (★ DEC-2026-04-30-B-phase45-enrichment).
+
+| `br_type` | 의미 | null 허용 필드 | 예시 |
+|---|---|---|---|
+| **api** | HTTP endpoint 트리거 BR | (없음 — 모두 의무) | BR-USER-DELETE-AUTH / BR-USER-LOGIN-VERIFY |
+| **lifecycle** | Entity lifecycle hook 트리거 (@BeforeInsert 등) | rejection_method, http_status, error_message | BR-USER-PASSWORD-HASH-001 (@BeforeInsert) |
+| **domain_invariant** | Aggregate Root 생성자 / setter invariant | http_status, error_message | BR-FOLLOWS-NO-SELF-001 일부 |
+| **performance** | EAGER / N+1 / 캐시 정책 | rejection_method, http_status, error_message | BR-ARTICLE-COMMENT-EAGER-001 |
+| **security** | 보안 정책 (rate limit / brute force 방어) | http_status (다양함) | BR-USER-LOGIN-RATE-LIMIT |
+
+★ **항목 9 (현재 상태) 정직 표기**:
+- `current_state` enum: `complete` / `partial` / `absent` / `needs_review` 만
+- ★ 부가 설명은 `current_state_note` 별도 필드 사용 (★ PoC #03 F-156 fix — 한국어 prefix enum 위반 회피)
+
 ### 3.4 Invariants — 도메인 불변식
 
 Aggregate Root 의 invariant 를 TypeScript 로 산출 (실행 가능 명세).

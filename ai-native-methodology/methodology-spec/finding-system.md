@@ -58,15 +58,43 @@ severity 는 **영향 범위 × 차단 강도** 로 결정.
 
 | severity | 기준 | 예시 |
 |---|---|---|
-| **high** | 모든 산출물 또는 복수 phase 영향 / 표준화 시급 / 우회 시 불일치 위험 | F-003 (신뢰도 산정 공식 부재 — 7대 산출물 전부) / F-007 (inventory schema 부재) / F-016 (ddl-auto 분기 부재) / F-023 (SCC 도메인 의도 분기 부재) |
-| **medium** | 단일 phase 영향 / 우회 가능 / 명세 보강 권장 | F-008 (LOC 환산식) / F-017 (@Embeddable collection 라우팅) / F-022 (POJO ground truth 차이) / F-024 (5%/20% 임계) |
-| **low** | 환경 의존 / 케이스별 무시 가능 / 옵셔널 | F-001 (git clone 대체) / F-018 (drift 0건 처리) / F-019 (운영 DB 부재) / F-026 (외부 의존성 0건 신뢰도) |
+| **critical** | 즉시 수정 의무 / production blocker | PoC #02 AP-API-001 / PoC #03 F-140 + F-164 (Auth scope 결여) |
+| **high** | 모든 산출물 또는 복수 phase 영향 / 표준화 시급 / 우회 시 불일치 위험 | F-003 / F-007 / F-016 / F-023 |
+| **medium** | 단일 phase 영향 / 우회 가능 / 명세 보강 권장 | F-008 / F-017 / F-022 / F-024 |
+| **low** | 환경 의존 / 케이스별 무시 가능 / 옵셔널 | F-001 / F-018 / F-019 / F-026 |
+| **★ positive** ★ | **학습 효과 입증 / 모범 사례** — cross-PoC 비재현 (★ v1.2.3 신설) | **F-161 (★ Bearer 표준 = NestJS 학습 효과 — PoC #02 F-084 비재현)** |
+
+### 4.1 Positive finding 패턴 (★ v1.2.3 신설)
+
+**정의**: 이전 PoC 의 negative finding 이 본 PoC 에서 **자연 회피된** 경우 등재.
+
+**조건**:
+- ★ 이전 PoC 에 동형 negative finding 존재 (cross-PoC 검증 필수)
+- ★ 본 PoC 가 framework / 언어 / 팀 학습 효과로 자연 회피
+- ★ 시뮬 ❌ — 코드/main.ts/package.json 명시적 evidence 의무
+
+**4 학습 효과 분류** (`positive_finding_meta.learning_effect_type`):
+| 분류 | 의미 | 사례 |
+|---|---|---|
+| **framework_natural_avoidance** | Framework 가 자연 회피 | F-161 — NestJS `addBearerAuth()` 표준 |
+| **language_static_block** | 언어가 정적 차단 | F-048 비재현 — TypeScript generic 정적 차단 |
+| **platform_difference** | platform 자체 차이 | F-087 비재현 — NestJS 가 `ModelAndView` 미사용 |
+| **team_learning** | 동일 팀의 학습 결과 | (PoC #2 → PoC #3 동일 팀 사내 적용 시) |
+
+**처리**:
+- status: `logged` (★ v1.2.3 신설 — promoted/closed 아닌 별도 분류)
+- ★ migration-cautions.md 에 "모범 사례" 섹션 등재 의무
+- ★ v1.3 본체 격상 후보 표시 (`v13_promotion_candidate: true`)
+
+**ROI**:
+- ★ 단일 PoC 과적합 회피 (§8.1) 의 적극적 입증 = "비재현 = 학습 효과" 정량화
+- ★ 사내 적용 시 framework / language 선택 가이드 (PoC #03 → 사내 NestJS 도입 권고 근거)
 
 ---
 
 ## 5. 처리 (Disposition) 4 옵션
 
-finding 을 처리한다 = **다음 PoC 에서 어떻게 다룰지 결정한다**. 4 옵션.
+finding 을 처리한다 = **다음 PoC 에서 어떻게 다룰지 결정한다**. 5 옵션 (★ v1.2.3 logged 신설).
 
 | 처분 | 의미 | 명세 영향 | 다음 PoC 효과 |
 |---|---|---|---|
@@ -74,6 +102,7 @@ finding 을 처리한다 = **다음 PoC 에서 어떻게 다룰지 결정한다*
 | **promoted** | "지금은 안 고치지만 v1.2/v1.3 후보" | NO (백로그 등재) | 같은 finding 재발 가능 — 등재만 |
 | **rejected** | "이건 명세 책임이 아님" + 사유 명시 | NO (사유 보존) | 다음 PoC 에서 같은 finding 올라와도 무시 근거 |
 | **deferred** | "PoC 데이터 더 필요 — revisit_at 명시" | NO (관찰 모드) | 단일 PoC 과적합 회피 |
+| **★ logged** ★ | **positive finding (학습 효과) 등재 — v1.2.3 신설** | **YES** (migration-cautions.md "모범 사례") | **★ 사내 적용 시 framework/language 선택 가이드** |
 
 ### 5.1 closed 의 정식 반영 채널
 

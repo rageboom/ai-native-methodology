@@ -96,6 +96,27 @@
                 "description": "감지된 어노테이션 (예: @PostMapping, @RequestMapping)"
               }
             }
+          },
+          "formal_spec_links": {
+            "type": "object",
+            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치 정식 입증). PoC #03 자발적 입증 9/21 op (43%) → schema 의무화 (optional but recommended).",
+            "properties": {
+              "decision_tables": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 decision-table BR 파일 경로 (예: ../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.md)"
+              },
+              "state_machines": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 state-machine 파일 경로 (예: ../formal-spec/state-machines/User.json)"
+              },
+              "sequence_diagrams": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 sequence-diagram 파일 경로 (예: ../formal-spec/sequence-diagrams/UC-USER-LOGIN.json)"
+              }
+            }
           }
         }
       }

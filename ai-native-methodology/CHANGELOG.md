@@ -9,7 +9,96 @@
 
 ---
 
-## [v1.2.2] — 2026-04-30 ⭐ 현재 (PATCH)
+## [v1.2.3] — 2026-04-30 ⭐ 현재 (PATCH)
+
+### 트리거
+
+PoC #03 NestJS 종결 후 **본체 갭 4건 정식 해소** — 본체 도구/schema/명세를 PoC #03 검증 결과로 격상. 본 PATCH 는 **PoC 산출물 작업이 아닌 본 방법론 본체 격상** 에 집중 (사용자 명시 — quality 격상 방향 재정렬).
+
+| 묶음 | 영역 |
+|---|---|
+| **C** | Phase 4.5 cross-link 의무화 schema (openapi-extension + antipatterns) |
+| **I** | AP-PERFORMANCE-001 medium → high 정식 격상 (★ 3 PoC 권위) |
+| **H** | Positive finding 패턴 schema 화 (★ severity:positive + status:logged + positive_finding_meta) |
+| **K** | Lifecycle BR 패턴 본체 schema 반영 (★ formal-spec.schema decision_tables required 분리) |
+
+이전 A 묶음 (drift-validator quality boost) + B 묶음 (Phase 4.5 풍부화) 의 본체 보강분도 본 PATCH 에서 정식화.
+
+### 변경 사항
+
+#### Added (추가)
+
+**★ Phase 4.5 cross-link 의무화 (★★ 묶음 C)**
+
+- `schemas/openapi-extension.schema.json` operations[] 에 `formal_spec_links` 필드 추가 (decision_tables / state_machines / sequence_diagrams).
+- `schemas/antipatterns.schema.json` antipatterns[] 에 `formal_spec_links` 필드 추가 (decision_tables / state_machines / sequence_diagrams / invariants).
+- 자발적 입증: PoC #03 9/21 op (43%) + 4/11 AP (36%) cross-link → schema 의무화 (optional but recommended).
+- ★ ADR-008 (이중 렌더링) + Phase 4.5 본질 가치 정식 입증 데이터.
+
+**★ Positive Finding 패턴 (★ 묶음 H)**
+
+- `schemas/finding-system.schema.json` `severity` enum 에 `positive` 추가 / `status` enum 에 `logged` 추가.
+- 신규 필드 `positive_finding_meta`:
+  - `previous_poc_finding` — 이전 PoC negative finding ID
+  - `current_poc_evidence` — 현 PoC positive 증거
+  - `learning_effect_type` enum 4종 (framework_natural_avoidance / language_static_block / platform_difference / team_learning)
+  - `v13_promotion_candidate` — v1.3 본체 격상 후보 표시
+- `methodology-spec/finding-system.md` §4 + §5 갱신 — positive finding 패턴 + 4 학습 효과 분류 + logged 처분 신설.
+- 사례: PoC #03 F-161 (Bearer 표준 = NestJS framework_natural_avoidance) — PoC #02 F-084 비재현.
+- ★ 단일 PoC 과적합 회피 (§8.1) 의 적극적 입증 = "비재현 = 학습 효과" 정량화.
+
+**★ Lifecycle BR 패턴 (★ 묶음 K)**
+
+- `schemas/formal-spec.schema.json` `decision_tables` items 갱신:
+  - `required` 분리 — always (br_id/trigger/condition/action/expected_result/verification_location/current_state) vs api (rejection_method/http_status/error_message).
+  - `rejection_method`/`http_status`/`error_message` 타입 `["string", "null"]` / `["integer", "null"]` (lifecycle BR null 허용).
+  - 신규 필드 `current_state_note` (★ 한국어 prefix enum 위반 회피 — F-156 fix).
+  - 신규 필드 `br_type` enum (api / lifecycle / domain_invariant / performance / security).
+- `methodology-spec/workflow/phase-4-5-formal-spec.md` §3.3.1 신설 — BR 분류 + null 허용 필드 + current_state_note 정식.
+- 사례: PoC #03 BR-USER-PASSWORD-HASH-001 (@BeforeInsert) / BR-ARTICLE-COMMENT-EAGER-001 (eager loading).
+
+#### Changed (변경)
+
+**★ AP-PERFORMANCE-001 medium → high 정식 격상 (★ 묶음 I)**
+
+- `methodology-spec/deliverables/06-안티패턴.md` §5.5 신설:
+  - Severity 격상 정책 (★ 3 PoC 재현 = medium → high 자동 격상)
+  - 정식 격상 사례 표 (AP-PERFORMANCE-001)
+  - severity inflation 회피 패턴 (단일 PoC = 격상 ❌, 2 PoC = 권위 표기, 3 PoC = 격상 ✅)
+- 근거: PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124 = 3 PoC 재현 권위.
+
+**드리프트 / DMN 도구 보강 (★ 이전 묶음 A + B 본체 반영)**
+
+- `tools/drift-validator/src/normalize-mermaid.js` — `state_ancestors` Map 추가 (sub-state ancestry 추적).
+- `tools/drift-validator/src/compare.js` — `transitionFuzzyMatch` 6 case 확장 (compound state inner / sub-tree / self-loop / m.parent).
+- `tools/drift-validator/corpus/` — 4쌍 → 14쌍 (★ Sprint 5 carry-over 70% 진척).
+- `tools/decision-table-validator/src/json-sanity.js` — REQUIRED_ALWAYS / REQUIRED_IF_API 분리 (★ 묶음 K 의 도구 측 fix).
+
+#### Validated (검증)
+
+- drift-validator unit test 6 → 14 (모두 통과).
+- PoC #03 자가 재검증 — drift breaking 20 → 8 → 0 ✅ / dmn 12 BR 0 breaking + 8 info (lifecycle null 의도) ✅.
+- false positive 60% → 0% (★ ADR-009 단계 3+ 도달).
+
+### 현재 상태
+
+- **본체 갭 11건 closed** (v1.2.2 7건 + v1.2.3 4건).
+- ADR 9개: 001~006 + 008 + 009 (변동 없음 — 본 PATCH 는 schema/명세 본체 격상).
+- 신뢰도 정직 표기: 80-87% 유지 (시뮬 패널티 / Sprint 5 carry-over).
+- PoC #03 신뢰도 0.87 (단계 3+).
+- v1.3.0 정식 release 진입 직전 상태 도달.
+
+### Carry-over → v1.3.0
+
+1. **Sprint 5** — F-156 (한국어 prefix) 외 잔여 환경 의존 (Semgrep/PMD/spectral)
+2. **묶음 R 신설** — NestJS 4 ADR (Auth / Validation / HttpCode / TypeORM) — DEC-v1.3-격상-데이터-완비 §2.1 #3
+3. **묶음 D** — ADR provisional → final 격상 + ADR-010 (baseline + ratchet)
+4. **§8.1 정식 등재** — 3 PoC cross-platform 입증 데이터 README/overview 등재
+5. **migration-cautions NestJS 변형 추가** — 묶음 P 보강
+
+---
+
+## [v1.2.2] — 2026-04-30 (PATCH)
 
 ### 트리거
 

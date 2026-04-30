@@ -109,6 +109,32 @@
           "tags": {
             "type": "array",
             "items": {"type": "string"}
+          },
+          "formal_spec_links": {
+            "type": "object",
+            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치). PoC #03 자발적 입증 4/11 AP (36%) — composite AP 가 BR/state-machine 직접 참조하면 신뢰도 +5%p. optional but recommended.",
+            "properties": {
+              "decision_tables": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 BR decision-table 파일 (예: ../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.md)"
+              },
+              "state_machines": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 state-machine 파일 (예: ../formal-spec/state-machines/User.json)"
+              },
+              "sequence_diagrams": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 sequence-diagram 파일"
+              },
+              "invariants": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "관련 invariant 파일 (예: ../formal-spec/invariants/User.ts)"
+              }
+            }
           }
         }
       }

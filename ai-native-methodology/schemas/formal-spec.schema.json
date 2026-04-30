@@ -106,10 +106,10 @@
     },
     "decision_tables": {
       "type": "array",
-      "description": "BR 의사결정 테이블. 자연어 빈약성 9 항목 보완 핵심.",
+      "description": "BR 의사결정 테이블. 자연어 빈약성 9 항목 보완 핵심. ★ v1.2.3 — required 필드 분리 (always vs api). lifecycle hook BR / 비-API BR 의 http_status/error_message 등은 null 의도 부재 허용 (★ DEC-2026-04-30-B-phase45-enrichment 정합).",
       "items": {
         "type": "object",
-        "required": ["br_id", "trigger", "condition", "action", "expected_result"],
+        "required": ["br_id", "trigger", "condition", "action", "expected_result", "verification_location", "current_state"],
         "properties": {
           "br_id": {
             "type": "string",
@@ -118,11 +118,11 @@
           },
           "trigger": {
             "type": "string",
-            "description": "언제 발생. 예: HTTP endpoint, 이벤트, 스케줄."
+            "description": "언제 발생. 예: HTTP endpoint, 이벤트, 스케줄, lifecycle hook."
           },
           "condition": {
             "type": "string",
-            "description": "입력 조건."
+            "description": "입력 조건. 빈 string 또는 '—' = 무조건 적용 (lifecycle hook BR 등)."
           },
           "action": {
             "type": "string",
@@ -133,32 +133,41 @@
             "description": "기대 결과."
           },
           "rejection_method": {
-            "type": "string",
-            "description": "거부 방식 — 자연어 누락 빈번. 예: 'throw IllegalArgumentException', 'return Optional.empty()', 'HTTP 400 with error body'."
+            "type": ["string", "null"],
+            "description": "★ v1.2.3 — null 허용 (lifecycle hook BR 등 거부 의미 없음). API 영역 BR 의 거부 방식 — 자연어 누락 빈번."
           },
           "verification_location": {
             "type": "string",
-            "description": "검증 위치 — 자연어 누락 빈번. 예: 'Domain Aggregate Root invariant', 'Service layer', 'Adapter', 'DB CHECK constraint'."
+            "description": "검증 위치 — 자연어 누락 빈번. 예: 'Domain Aggregate Root invariant', 'Service layer', 'Adapter', 'DB CHECK constraint', 'Entity lifecycle hook'."
           },
           "http_status": {
-            "type": "integer",
-            "description": "API 영역 BR 의 HTTP status code."
+            "type": ["integer", "null"],
+            "description": "★ v1.2.3 — null 허용 (lifecycle / 비-API BR). API 영역 BR 의 HTTP status code."
           },
           "error_code": {
-            "type": "string",
-            "description": "에러 코드 (사내 표준)."
+            "type": ["string", "null"],
+            "description": "에러 코드 (사내 표준). lifecycle BR 시 null."
           },
           "error_message": {
-            "type": "string",
-            "description": "사용자 노출 메시지."
+            "type": ["string", "null"],
+            "description": "★ v1.2.3 — null 허용 (lifecycle BR / silent skip). 사용자 노출 메시지."
           },
           "current_state": {
             "type": "string",
             "enum": ["complete", "partial", "absent", "needs_review"],
             "description": "코드 구현 상태. absent 는 단방향 round-trip 후보."
           },
+          "current_state_note": {
+            "type": "string",
+            "description": "★ v1.2.3 — current_state 부가 설명. enum 위반 회피 (★ PoC #03 F-156 패턴 — 한국어 prefix 분리). 'partial' / 'absent' 만 enum 으로, 부가 설명은 본 필드."
+          },
           "rendered_md_path": {
             "type": "string"
+          },
+          "br_type": {
+            "type": "string",
+            "enum": ["api", "lifecycle", "domain_invariant", "performance", "security"],
+            "description": "★ v1.2.3 — BR 분류. lifecycle = http_status/error_message null 허용. domain_invariant = entity 생성자 기반. v1.3 격상 시 enum 추가 가능."
           }
         }
       }

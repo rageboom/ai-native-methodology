@@ -52,8 +52,8 @@
     },
     "severity": {
       "type": "string",
-      "enum": ["low", "medium", "high", "critical"],
-      "description": "영향 범위 × 차단 강도. low: 환경 의존/케이스별 무시 가능. medium: 단일 phase 영향/우회 가능. high: 모든 산출물 또는 복수 phase 영향/표준화 시급. critical: 즉시 수정 의무 (PoC #02 AP-API-001 등) — v1.2.0 추가."
+      "enum": ["low", "medium", "high", "critical", "positive"],
+      "description": "영향 범위 × 차단 강도. low: 환경 의존/케이스별 무시 가능. medium: 단일 phase 영향/우회 가능. high: 모든 산출물 또는 복수 phase 영향/표준화 시급. critical: 즉시 수정 의무 (PoC #02 AP-API-001 등) — v1.2.0 추가. ★ positive: 학습 효과 입증 / 모범 사례 — cross-PoC 비재현 (이전 PoC 결함이 본 PoC 에서 자연 회피) — v1.2.3 신설 (★ PoC #03 F-161 Bearer 표준 패턴 / DEC-2026-04-30-poc03-phase6-종결 정합)."
     },
     "proposed_fix": {
       "type": "string",
@@ -83,8 +83,32 @@
     },
     "status": {
       "type": "string",
-      "enum": ["open", "candidate", "promoted", "closed", "deferred", "rejected", "merged"],
-      "description": "현재 상태. open: 등록만. candidate: Phase 진행 중 후보 (PoC #02 도입 — F-079 등). promoted: 다음 MINOR 후보 등재. closed: 명세 정식 반영. deferred: PoC 데이터 추가 필요 (revisit_at 명시 권장). rejected: 명세 책임 밖. merged: 다른 finding 으로 통합 (PoC #02 F-079 → F-070)."
+      "enum": ["open", "candidate", "promoted", "closed", "deferred", "rejected", "merged", "logged"],
+      "description": "현재 상태. open: 등록만. candidate: Phase 진행 중 후보 (PoC #02 도입). promoted: 다음 MINOR 후보 등재. closed: 명세 정식 반영. deferred: PoC 데이터 추가 필요. rejected: 명세 책임 밖. merged: 다른 finding 으로 통합. ★ logged: positive finding 등재 — 학습 효과 입증 (★ v1.2.3 신설 / F-161 패턴)."
+    },
+    "positive_finding_meta": {
+      "type": "object",
+      "description": "★ v1.2.3 신설 — severity:positive 시 사용. cross-PoC 학습 효과 정량 입증.",
+      "properties": {
+        "previous_poc_finding": {
+          "type": "string",
+          "pattern": "^F-[0-9]{3}$",
+          "description": "이전 PoC 의 negative finding ID (예: F-084 PoC #02 Token apiKey 비표준)."
+        },
+        "current_poc_evidence": {
+          "type": "string",
+          "description": "현 PoC 의 positive 증거 (예: 'main.ts addBearerAuth() 표준 — Bearer 표준 자연 적용')."
+        },
+        "learning_effect_type": {
+          "type": "string",
+          "enum": ["framework_natural_avoidance", "language_static_block", "platform_difference", "team_learning"],
+          "description": "학습 효과 분류. framework_natural_avoidance: NestJS 가 자연히 회피 (F-161). language_static_block: TypeScript 가 정적 차단 (F-048 비재현). platform_difference: framework 자체 차이 (307 redirect 비재현). team_learning: 동일 팀의 학습 결과."
+        },
+        "v13_promotion_candidate": {
+          "type": "boolean",
+          "description": "v1.3 본체 격상 후보 여부 — true 면 묶음 R / migration-cautions 보강 등재."
+        }
+      }
     },
     "resolution": {
       "type": "object",
