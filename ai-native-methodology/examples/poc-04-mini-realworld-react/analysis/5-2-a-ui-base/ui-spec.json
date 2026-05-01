@@ -1,0 +1,206 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/ui-spec.schema.json (★ Stage 3-1 확장 4 필드 검증 시점)",
+  "meta": {
+    "poc_id": "poc-04-mini",
+    "phase": "5-2-a-ui-base",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "framework_detected": "react",
+    "framework_neutrality_target": "★ IR L4 Presentation = framework-neutral (component-tree 보조 / Screen+Journey 우선 / ADR-FE-006 명제 2)"
+  },
+  "pages": [
+    {
+      "id": "PAGE-LOGIN",
+      "name": "Login",
+      "route": "/login",
+      "auth_required": false,
+      "redirect_if_authenticated": "/settings",
+      "primary_purpose": "기존 사용자 인증",
+      "scenarios": ["SCN-LOGIN-SUCCESS", "SCN-LOGIN-FAIL-VALIDATION", "SCN-LOGIN-FAIL-AUTH"],
+      "data_dependencies": [],
+      "form_actions": [
+        {
+          "action_id": "ACTION-USER-LOGIN",
+          "method": "POST",
+          "validation_source": "Zod (LoginBody from openapi.yaml /users/login.requestBody)",
+          "validation_extraction": "★ deliverable 14 form-validation-spec § BR-FE-LOGIN-* 자동 추출 시점"
+        }
+      ],
+      "framework_neutral_metric": {
+        "framework_specific_imports": ["react-router (Form / Link / useActionData / useNavigation)"],
+        "ir_react_idioms_in_spec": 0
+      }
+    },
+    {
+      "id": "PAGE-HOME",
+      "name": "Home / Articles Feed",
+      "route": "/",
+      "auth_required": false,
+      "primary_purpose": "글로벌/개인/태그 별 article feed 표시",
+      "scenarios": [
+        "SCN-HOME-VIEW-GLOBAL",
+        "SCN-HOME-VIEW-PERSONAL",
+        "SCN-HOME-VIEW-TAG",
+        "SCN-HOME-FAVORITE-TOGGLE",
+        "SCN-HOME-PAGINATE"
+      ],
+      "data_dependencies": [
+        {"source": "GET /articles", "operation_id": "GetArticles", "binding": "global feed"},
+        {"source": "GET /articles/feed", "operation_id": "GetArticlesFeed", "binding": "personal feed (auth)"},
+        {"source": "GET /tags", "operation_id": "GetTags", "binding": "sidebar"}
+      ],
+      "url_state": {
+        "search_params": ["limit", "offset", "feed", "tag"],
+        "validation_source": "★ Zod-mini (home.state.ts) — PaginationSchema + HomeArticleFilterSchema",
+        "validation_extraction": "★ deliverable 14 § URL state validation BR — 신규 패턴 (URL params도 BR 자동 추출 시점)"
+      },
+      "child_routes": [
+        {"path": "articles/:slug/favorite-toggle", "auth_required": true, "method": "POST"}
+      ],
+      "framework_neutral_metric": {
+        "framework_specific_imports": ["react (Suspense)", "react-router (Await / Link / useFetcher / useLoaderData / useLocation)"],
+        "ir_react_idioms_in_spec": 0,
+        "optimistic_update_pattern_detected": true
+      }
+    },
+    {
+      "id": "PAGE-ARTICLE",
+      "name": "Article Detail",
+      "route": "/article/:slug",
+      "auth_required": false,
+      "primary_purpose": "단일 article + 댓글 표시 + 상호작용 (favorite/follow/edit/delete + comment CRUD)",
+      "scenarios": [
+        "SCN-ARTICLE-VIEW",
+        "SCN-ARTICLE-FAVORITE-TOGGLE",
+        "SCN-ARTICLE-FOLLOW-AUTHOR-TOGGLE",
+        "SCN-ARTICLE-EDIT-NAV",
+        "SCN-ARTICLE-DELETE",
+        "SCN-COMMENT-CREATE",
+        "SCN-COMMENT-DELETE"
+      ],
+      "data_dependencies": [
+        {"source": "GET /articles/{slug}", "operation_id": "GetArticle"},
+        {"source": "GET /articles/{slug}/comments", "operation_id": "GetArticleComments"}
+      ],
+      "child_routes": [
+        {"path": "favorite-toggle", "auth_required": true, "method": "POST"},
+        {"path": "follow-toggle", "auth_required": true, "method": "POST"},
+        {"path": "delete", "auth_required": true, "method": "DELETE"},
+        {"path": "comments", "auth_required": true, "method": "POST"},
+        {"path": "comments/:id", "auth_required": true, "method": "DELETE"}
+      ],
+      "form_actions": [
+        {
+          "action_id": "ACTION-COMMENT-CREATE",
+          "method": "POST",
+          "validation_source": "Zod (NewComment) + HTML5 native (textarea required)",
+          "validation_extraction": "★ deliverable 14"
+        }
+      ],
+      "framework_neutral_metric": {
+        "framework_specific_imports": ["react (Suspense)", "react-router (Await / Link / useFetcher / useLoaderData / useParams)"],
+        "ir_react_idioms_in_spec": 0,
+        "optimistic_update_pattern_detected": true
+      }
+    }
+  ],
+  "components": [
+    {
+      "id": "CMP-FORM-INPUT-FIELD",
+      "level": "atom",
+      "framework_neutral": true,
+      "purpose": "form input field with label + error display",
+      "instances": ["LoginPage email/password", "RegisterPage username/email/password", "EditorPage title/description/body/tags"],
+      "props_ir": {
+        "name": "string",
+        "type": "enum [text, email, password, textarea]",
+        "placeholder": "string",
+        "required": "boolean",
+        "auto_complete": "string optional"
+      }
+    },
+    {
+      "id": "CMP-FAVORITE-BUTTON",
+      "level": "molecule",
+      "framework_neutral": false,
+      "framework_coupling_reason": "★ react-router useFetcher + optimistic update pattern (★ ADR-FE-006 §2.3 — 신규 스택 결정 후 재분해 의무)",
+      "purpose": "favorite/unfavorite article + optimistic count update",
+      "instances": ["HomeFavoriteButton", "FavoriteArticleButton (article page)"],
+      "state_machine_id": "SM-FAVORITE-TOGGLE"
+    },
+    {
+      "id": "CMP-FOLLOW-BUTTON",
+      "level": "molecule",
+      "framework_neutral": false,
+      "framework_coupling_reason": "★ react-router useFetcher + optimistic update pattern",
+      "purpose": "follow/unfollow author + optimistic state",
+      "instances": ["FollowAuthorButton (article page)"],
+      "state_machine_id": "SM-FOLLOW-TOGGLE"
+    },
+    {
+      "id": "CMP-FEED-TAB-NAVIGATION",
+      "level": "molecule",
+      "framework_neutral": true,
+      "purpose": "Personal/Global/Tag feed switch (URL search params)",
+      "instances": ["HomeFeed § feed-toggle"],
+      "state_dependency": "URL searchParams (limit/offset/feed/tag)",
+      "state_machine_id": "SM-FEED-NAVIGATION"
+    },
+    {
+      "id": "CMP-PAGINATION",
+      "level": "molecule",
+      "framework_neutral": true,
+      "purpose": "page offset navigation (URL state)",
+      "instances": ["HomeArticleListPagination"]
+    },
+    {
+      "id": "CMP-ARTICLE-PREVIEW-CARD",
+      "level": "organism",
+      "framework_neutral": true,
+      "purpose": "article preview card (author / date / favorite count / title / description / tags)",
+      "instances": ["HomeArticlePreviewCard"]
+    },
+    {
+      "id": "CMP-ASYNC-ERROR-CARD",
+      "level": "molecule",
+      "framework_neutral": true,
+      "purpose": "Suspense fallback for failed async data load",
+      "instances": ["AsyncErrorCard (HomeFeedError / SidebarError / ArticleContentError / CommentsListError)"]
+    },
+    {
+      "id": "CMP-SPINNER",
+      "level": "atom",
+      "framework_neutral": true,
+      "purpose": "loading indicator",
+      "instances": ["Spinner"]
+    },
+    {
+      "id": "CMP-ERROR-MESSAGES",
+      "level": "atom",
+      "framework_neutral": true,
+      "purpose": "form validation error messages list",
+      "instances": ["ErrorMessages (LoginPage / RegisterPage / SettingsPage / EditorPage / Article CreateComment)"]
+    },
+    {
+      "id": "CMP-GLOBAL-PROGRESS-BAR",
+      "level": "molecule",
+      "framework_neutral": false,
+      "framework_coupling_reason": "★ react-router useNavigation + use-fake-progress.ts (DOM-side animation hook)",
+      "purpose": "global page transition progress bar",
+      "instances": ["GlobalProgressBar"]
+    }
+  ],
+  "summary": {
+    "pages_count": 3,
+    "scenarios_count": 14,
+    "components_count": 10,
+    "components_framework_neutral": 7,
+    "components_framework_coupled": 3,
+    "framework_neutrality_score_components": 0.70,
+    "framework_neutrality_score_pages": 1.0,
+    "ir_react_idioms_in_spec": 0,
+    "optimistic_update_patterns_detected": 2,
+    "url_state_validation_pattern_detected": true,
+    "form_validation_sources": ["Zod (orval auto-gen)", "Zod-mini (URL params)", "HTML5 native"]
+  }
+}

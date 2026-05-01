@@ -1,0 +1,44 @@
+phase: 5-2-b-state
+poc_id: poc-04-mini
+captured_at: 2026-05-02
+captured_by: real
+artifacts:
+  - state-map.json
+  - state-map.mermaid
+  - _manifest.yml
+ir_layer_mapping:
+  L2_Interaction:
+    - state-map.json (5 SM = SCXML+XState 호환)
+    - state-map.mermaid (★ 이중 렌더링 / drift-validator 검증)
+five_truths_coverage:
+  server_cache: ✅ (2 SM — favorite-toggle / follow-toggle)
+  client_global: △ 약식 (auth-storage / userContext)
+  url: ✅ (1 SM — feed-navigation)
+  form: ✅ (2 SM — login-form / comment-form)
+  dom: △ 부분 (optimistic count computation)
+state_machines:
+  - SM-LOGIN-FORM (form / 6 states)
+  - SM-FEED-NAVIGATION (url / 3 states)
+  - SM-FAVORITE-TOGGLE (server_cache + dom / 4 states / ★ optimistic)
+  - SM-FOLLOW-TOGGLE (server_cache + dom / 4 states / ★ optimistic)
+  - SM-COMMENT-FORM (form / 3 states / ★ resetKey pattern)
+framework_neutrality_metric:
+  format: "XState JSON 단일 진실 + SCXML subset"
+  ir_react_idioms_in_spec: 0
+  framework_neutrality_score: 1.00
+validation_br_for_deliverable_14:
+  count: 9
+  examples:
+    - "operation enum [favorite, unfavorite] (2 SM)"
+    - "operation enum [follow, unfollow]"
+    - "username required + non-empty"
+    - "body required + non-empty (comment)"
+    - "URL: limit int ≥1 ≤100 default 10"
+    - "URL: offset int ≥0 default 0"
+    - "URL: feed optional 'personal'"
+    - "URL: tag optional non-empty trimmed"
+no_simulation_compliance:
+  static_tool_simulated: false
+  ai_persona_used: false
+  evidence: "★ 모든 SM = INPUT/src 직접 read (login.ui / home.ui / home.state / article.ui)"
+next_phase: 5-2-c-visual
