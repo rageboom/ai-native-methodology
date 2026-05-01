@@ -271,6 +271,47 @@ Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback
 - **Stage 4 mini-PoC** — RealWorld React fork (1주 fail-fast) + Playwright/axe-core/ICU/Semgrep 진짜 실행 / ★ ADR-FE-006 IR 4계층 정합도 검증 의무 (React 관용구 IR 잔존 finding 등록)
 - **Stage 7-pre** — 외부 LLM 검증 빈틈 #1 (Zod/Yup/RHF → BR fe_validation 자동 추출) + #2 (TypeScript .d.ts 산출 — 별도 deliverable 14 검토)
 
+### ★★★ Stage 7-pre 종결 (2026-05-01 본 세션)
+
+★★★ **외부 LLM 검증 빈틈 5/5 = 100% 해소 / release 전 마지막 quality 격상**. DEC-2026-05-01-v1.4-Stage-7-pre-종결.md.
+
+#### Phase 별 산출 (4 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-005 매개체 12 → ★ **13** (Zod 추가) + plan-v14-stage-7-pre.md | `3a7df3e` (2 file / 256 ins) |
+| **B** | form-validation-spec.schema + type-spec.schema 신설 + rules.schema source_format/auto_extracted 확장 | `9c5b8d1` (3 file / 448 ins) |
+| **C+D** | deliverable 14 (form-validation-spec) / 15 (type-spec) 신설 + ADR-FE-006 §5.2 carry → resolved + phase-5-2-b §3.1 form_state cross-link 보강 | `adabe10` (4 file / 356 ins) |
+| **F** | DEC-Stage-7-pre-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 외부 LLM 검증 빈틈 5/5 = 100% 해소
+
+| # | 빈틈 | Stage | 산출 |
+|---|---|---|---|
+| 1 | Zod / Yup / RHF rules → BR 자동 추출 | ★ Stage 7-pre | deliverable 14 + form-validation-spec.schema + ADR-FE-005 §2.1.1 |
+| 2 | TypeScript .d.ts 산출 절차 | ★ Stage 7-pre | deliverable 15 + type-spec.schema + framework_neutrality_score |
+| 3 | "프레임워크 중립 IR" 사상 명시화 | Stage 6 | ADR-FE-006 신설 |
+| 4 | Component 분해 framework-coupling 위험 | Stage 6 | ADR-FE-006 §2.3 + deliverable 7 §6.5 |
+| 5 | Screen+Journey 우선 / Component 후순위 | Stage 6 | ADR-FE-006 §2.2 + deliverable 7 §6.5 |
+
+#### ADR-FE-005 매개체 12 → 13 (Zod 추가)
+
+| 매개체 | 채택 근거 |
+|---|---|
+| ★ Zod (#13) | Schema-First validation de facto / TypeScript-first / runtime + static type 양쪽 / `z.object()` / `.refine()` → rules.json fe_validation BR 자동 등록 |
+
+#### 사용자 7 요구사항 7/7 = 100% 도달 유지 + 강화
+
+- 요구 1 강화 — Zod / TS 타입 자동 추출 = 신규 시스템 즉시 활용
+- 요구 4 강화 — form_validation BR 자동 등록 (auto_extracted=true 분리 운영)
+- 요구 1/2/3/4/5/6/7 = 100% 유지
+
+#### 다음 trigger
+
+- **Stage 4 mini-PoC** — RealWorld React fork (1주 fail-fast) + ts-morph + Playwright + axe-core + ICU + Semgrep 진짜 실행 / 신뢰도 0.75+ 도달 / ★ ADR-FE-006 IR 4계층 정합도 검증
+- **Stage 5** 본격 PoC #04 — 9 deliverable (7~15) + a11y + i18n + static-security + legacy + form-validation + type-spec
+- **Stage 7** v1.4.0 MINOR release 결단 (Stage 5 검증 후)
+
 ### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
 
 - Semgrep / PMD / OSV-Scanner 환경 의존
