@@ -151,6 +151,16 @@ recommended_alternative: |
 related:
   business_rules: [BR-ORDER-PRICE-001, BR-ORDER-PRICE-002]
   affected_modules: [MOD-ORDER]
+
+# ★ v1.2.3 신설 — Phase 4.5 cross-link (composite AP 권장)
+formal_spec_links:
+  decision_tables:
+    - "../formal-spec/decision-tables/BR-ORDER-PRICE-001.md"
+    - "../formal-spec/decision-tables/BR-ORDER-PRICE-002.md"
+  state_machines:
+    - "../formal-spec/state-machines/Order.json"
+  invariants:
+    - "../formal-spec/invariants/Order.ts"
 ```
 
 - [ ] 결정 완료

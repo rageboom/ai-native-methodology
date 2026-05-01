@@ -18,6 +18,7 @@ Controller/Router에서 **OpenAPI 3.1 명세를 추출**하고, 산출물 간 ID
 | 소스 코드 (BE) | Controller, Router 어노테이션 |
 | Phase 1 inventory | BE 프레임워크 정보 |
 | Phase 4 결과 | 도메인 모델 (UC), 비즈니스 규칙 (BR), 외부 의존성 (5.D inbound webhook) |
+| **Phase 4.5 결과** ★ v1.2.3 | **decision-tables (BR ↔ API request/response 매핑) + sequence diagrams (API 호출 흐름) + state-machines (entity 상태 전이)**. `formal_spec_links` (`openapi-extension.schema.json`) 로 cross-link 의무 — request/response schema 가 formal-spec 의 decision-tables 와 매핑 가능해야 함. |
 | Phase 2 schema | DTO ↔ DB 컬럼 정합성 (있으면) |
 
 ---

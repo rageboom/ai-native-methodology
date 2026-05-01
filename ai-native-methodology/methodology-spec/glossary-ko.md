@@ -63,6 +63,11 @@
 | Bottom-up | 상향식 | |
 | Single Source of Truth (SoT) | 단일 진실 원천 | |
 | Feature Flag | 기능 플래그 | |
+| no-simulation 정책 | 시뮬레이션 절대 금지 정책 | ★ v1.3.0 — Static tool simulation 금지 / 진짜 외부 도구 실 실행 의무 (ADR-009 단계 4) |
+| baseline + ratchet | 기준선 + 라쳇 | ★ v1.2.3 (ADR-010) — drift / dmn 도구의 회귀 방지 패턴 (`--baseline` / `--ratchet` / `--write-baseline`) |
+| formal-spec-link | 형식 명세 cross-link | ★ v1.2.3 (묶음 N) — Phase 4.5 산출물 간 참조 무결성 (decision_tables / state_machines / sequence_diagrams / invariants) |
+| severity:positive | 모범 사례 등재 | ★ v1.2.3 (묶음 H) — finding-system schema 신규 severity. cross-PoC 학습 효과 입증 (`learning_effect_type`: framework_natural_avoidance / language_static_block / platform_difference / team_learning) |
+| composite AP | 복합 안티패턴 | 여러 BR/state 결합 결함 (단일 패턴 매칭 불가). 등록 거절 + avoid-list.md 가독성 우선 |
 
 ---
 

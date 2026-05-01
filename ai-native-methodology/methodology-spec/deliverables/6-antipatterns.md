@@ -140,6 +140,30 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 
 ---
 
+## 5.6 ★ Phase 4.5 cross-link (formal_spec_links · v1.2.3 신설)
+
+ADR-008 (이중 렌더링) + Phase 4.5 형식 명세 본질 가치 — composite AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p (PoC #03 36% 자발적 입증 — 4/11 AP).
+
+**의무 vs 선택**: 현재 **선택 (optional but recommended)**. composite AP 만 적용 권장.
+
+### 5.6.1 schema 구조 (`antipatterns.schema.json` line 113~138)
+
+```yaml
+formal_spec_links:
+  decision_tables: ["../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.md"]
+  state_machines:  ["../formal-spec/state-machines/User.json"]
+  sequence_diagrams: ["../formal-spec/sequences/login-flow.json"]
+  invariants:      ["../formal-spec/invariants/User.ts"]
+```
+
+### 5.6.2 적용 기준
+
+- ✅ **composite AP** (여러 BR/state 결합 결함) — link 권장
+- ✅ AP 자체가 state-machine 위반 사례 — state_machines link 의무
+- ⚠️ 단순 패턴 매칭 AP (N+1 등) — link 불필요 (자료 비대 회피)
+
+---
+
 ## 6. 검증 체크리스트
 
 ```
@@ -149,6 +173,7 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 □ 감지 방법 명시 (detection_method)
 □ recommendation 필수 기재
 □ confidence < 0.70이면 human_review_required 표기
+□ composite AP 는 formal_spec_links 기재 (선택 — §5.6)
 □ 다른 산출물에서 발견된 AP가 모두 통합됨 (Phase 6)
 ```
 
