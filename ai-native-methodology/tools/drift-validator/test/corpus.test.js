@@ -99,3 +99,12 @@ test('★ sequence drift label-mismatch → ≥1 non-breaking', () => {
   const s = runSequence('sequence-drift-03-label-mismatch');
   assert.ok(s['non-breaking'] >= 1 || s.breaking >= 1, `expected drift detected, got ${JSON.stringify(s)}`);
 });
+
+// ★ v1.4 Stage 3-1 Phase E1 시범 — FE state-map corpus (deliverable 8)
+// drift-validator FE 적용 첫 시범. state-map.schema.json machine.states 가 XState 호환이므로
+// 기존 normalize-json/normalize-mermaid 로직 그대로 적용 가능.
+
+test('★ FE state-map equiv → 0 breaking (★ v1.4 Stage 3-1 Phase E1 시범)', () => {
+  const s = runStateMachine('state-map-fe-equiv-01');
+  assert.equal(s.breaking, 0, `expected breaking=0 (FE state-map), got ${JSON.stringify(s)}`);
+});
