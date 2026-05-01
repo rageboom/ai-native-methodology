@@ -38,7 +38,7 @@ schemas/
 
 methodology-spec/
 ├── workflow/phase-4-5-formal-spec.md (Sprint 3 #1)
-└── deliverables/04-5-형식명세.md (Sprint 3 #1)
+└── deliverables/4-5-formal-spec.md (Sprint 3 #1)
 
 templates/
 ├── formal-spec.template.md (Sprint 3 #1)
@@ -129,7 +129,7 @@ examples/poc-02-realworld-springboot3/output/antipatterns/
 | 영역 | 파일 | 핵심 내용 |
 |---|---|---|
 | workflow | phase-4-5-formal-spec.md | 5 산출물 처리 / Cross-validation 의무 / Static tool 의무 (DEC-static-tool) / 자연어 빈약성 정량 (44% / 100%) |
-| deliverables | 04-5-형식명세.md | 5 산출물 매트릭스 / 신뢰도 등급 / 흔한 함정 4건 |
+| deliverables | 4-5-formal-spec.md | 5 산출물 매트릭스 / 신뢰도 등급 / 흔한 함정 4건 |
 | schema | formal-spec.schema.json | 5 산출물 sub-schema + cross_validation 메타 (real_tool 의무 / double_hits / drift_detected) |
 | templates | formal-spec.template.md + state-machine.template.mermaid + sequence.template.mermaid + decision-table.template.md | 5 산출물 작성 가이드 + Mermaid 예시 + 9 항목 표 |
 

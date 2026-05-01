@@ -137,7 +137,7 @@ findings_phase_1:
     severity: low
     title: "p6spy production 활성화 가이드 부재"
     spec_gap: "phase-6-quality.md 에 SQL 모니터링 도구의 production vs development-only 구분 가이드 없음. Tech Radar Hold 등급 (Case Researcher 보고)."
-    proposed_fix: "v1.2 후보 — phase-6-quality.md 또는 06-안티패턴.md 보강"
+    proposed_fix: "v1.2 후보 — phase-6-quality.md 또는 6-antipatterns.md 보강"
     status: deferred
   - finding_id: F-046
     severity: low

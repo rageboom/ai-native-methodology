@@ -97,7 +97,7 @@ ADR-001에서 DDD-Lite를 채택했지만 **강도(어디까지 적용할지)** 
 ## 영향 범위
 
 - `schemas/domain.schema.json`: B 기준으로 이미 작성됨, `v12_reserved` 필드로 확장 여지
-- `methodology-spec/deliverables/02-도메인-모델.md`: B 강도로 명시
+- `methodology-spec/deliverables/2-domain.md`: B 강도로 명시
 - `templates/domain.template.md`: B 강도 템플릿
 - v1.2 ADR 후보: "Context Map 추가" (사내 MSA 분석 시 작성 예정)
 

@@ -35,7 +35,7 @@
 | C-Sprint 2 | BR 5건 형식화 + cross-validation 의무 + F-074 우선 | ✅ |
 | C-Sprint 3 | Phase 4.5 정식 명세화 + JSON 짝 + α+β + M-P1 병행 | ✅ |
 | C-Sprint 4 | drift-validator + decision-table-validator + static-runner + drift-check.yml + Phase 4.5 schema 5종 물증 + PoC #02 자가 검증 (★ 7+3 finding 자동 검출) | ✅ |
-| **묶음 M-P2-3** | 본체 갭 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yml | ✅ **본 세션** |
+| **묶음 M-P2-3** | 본체 갭 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yaml | ✅ **본 세션** |
 | **C-Sprint 5** | (carry-over — 환경 의존) static tool 실 실행 1회 + drift-validator transitionFuzzyMatch 보완 + corpus 4쌍→20쌍 + ADR-010 격상 | ⏳ 환경 준비 후 |
 | **시퀀스 B — PoC #03 NestJS** | Phase 0~4 종결 (Phase 4.5+ carry) | 🔄 **진행 중** |
 | 시퀀스 B Phase 4.5 산출 | 5 산출물 37 파일 (state-machine 6 + sequence 12 + decision-table 12 + invariants 3 + property 3 + manifest 1) + PROGRESS — D1~D6 권고 안 채택 (BR 6 / AR 3 / UC 6 / Sairyss antipattern 권고 / 신뢰도 70-77% / false negative 우선) | ✅ (2026-04-30 직전 세션) |
@@ -173,7 +173,7 @@ ci_workflow_files: 1       # .github/workflows/drift-check.yml (drift + static d
 | **J** | Hexagonal port-adapter 가이드 | **PoC #02 단독 신규** (F-075) |
 | **K** | multi-module Outside-in 모범 사례 | **PoC #02 신규** (F-064/F-065/F-066 positive findings) |
 | **★ L** | **Phase 4.5 형식화 정식 도입 (ADR-008/009)** | **C-Sprint 1~3 누적 ✅ 100% — 정식 명세화 완료** |
-| **M** | 방법론 본체 이중 렌더링 갭 해소 | **★ 갭 7건 모두 closed ✅** (P1 2건 Sprint 3 + P2-3 5건 v1.2.2) — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yml |
+| **M** | 방법론 본체 이중 렌더링 갭 해소 | **★ 갭 7건 모두 closed ✅** (P1 2건 Sprint 3 + P2-3 5건 v1.2.2) — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yaml |
 | **N** | Drift 자동 검증 도구 (CI) | **Sprint 4 적용 ✅** (drift-validator + decision-table-validator + drift-check.yml + 17/17 test pass + PoC #02 자가 검증으로 7+3 finding 자동 검출) |
 | **O** | 진짜 외부 도구 실행 의무화 (★★★) | **Sprint 4 인프라 적용 ✅** (static-runner Plugin host + Semgrep/PMD plugin + 5종 물증 schema enforcement + lint-no-simulation.sh). 실행은 Sprint 5 carry-over (Java/Semgrep/PMD 환경 부재) |
 | **P** | 안티패턴 migration_advice + migration-cautions.md | **Sprint 3 적용 ✅** |

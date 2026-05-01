@@ -84,7 +84,7 @@ const handleSubmit = async () => {
 
 ### 3.3 컴포넌트 트리
 
-Atomic Design vs FSD 자동 감지 (07-UI-UX-명세.md §6 참조):
+Atomic Design vs FSD 자동 감지 (7-ui-ux.md §6 참조):
 
 ```mermaid
 flowchart TB

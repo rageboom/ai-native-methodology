@@ -99,7 +99,7 @@ ai-native-methodology/
 │   ├── deliverables/       7대 산출물 명세
 │   ├── workflow/           7단계 워크플로우 명세
 │   ├── id-conventions.md
-│   └── 한국어-용어집.md
+│   └── glossary-ko.md
 ├── schemas/                JSON Schema (계약)
 │   ├── meta-confidence.schema.json
 │   ├── architecture.schema.json
@@ -178,7 +178,7 @@ CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manua
 - ✅ 이중 렌더링 사상 (ADR-008) 정식 등록
 - ✅ migration-cautions.md 의무 산출물 격상
 - ✅ **v1.2.1 — drift-validator + decision-table-validator + static-runner 3종 도구 + drift-check.yml CI + 5종 물증 schema 강제**
-- ✅ **v1.2.2 — 본체 갭 7건 모두 closed**: api.template.md / phase-flow.mermaid+json / ADR-009 / db-schema.template.md / meta-confidence.template.yml
+- ✅ **v1.2.2 — 본체 갭 7건 모두 closed**: api.template.md / phase-flow.mermaid+json / ADR-009 / db-schema.template.md / meta-confidence.template.yaml
 - ✅ PoC #02 자가 검증 → 11 신규 finding (F-107~F-117) 자동 검출
 
 ### v1.2.x → v1.3 후속

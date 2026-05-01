@@ -110,7 +110,7 @@ DRIFT-001: column_only_in_db (severity: high)
 
 ## 4. 톤 점검 (자동)
 
-ADR-002 §책임 분담 + 06-안티패턴 §2 톤 정책에 따라:
+ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라:
 
 ```mermaid
 flowchart TB

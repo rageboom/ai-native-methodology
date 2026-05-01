@@ -7,7 +7,7 @@
     {
       "id": "0",
       "name": "입력 정리",
-      "spec_file": "phase-0-입력정리.md",
+      "spec_file": "phase-0-input.md",
       "depends_on": [],
       "inputs": ["source_code", "erd_optional", "orm_optional", "design_docs_optional"],
       "outputs": ["_manifest.yml"]
@@ -39,7 +39,7 @@
     {
       "id": "4",
       "name": "비즈니스 로직 (4영역 병렬)",
-      "spec_file": "phase-4-비즈니스로직.md",
+      "spec_file": "phase-4-business-logic.md",
       "depends_on": ["1", "2", "3"],
       "parallel_areas": ["5.A rules", "5.B domain", "5.C antipatterns-partial", "5.D ui-domain"],
       "outputs": ["domain.json", "domain.mermaid", "domain.md", "rules.json", "rules.md", "antipatterns-partial.json"]
@@ -91,7 +91,7 @@
     },
     "meta_confidence": {
       "schema": "schemas/meta-confidence.schema.json",
-      "template": "templates/meta-confidence.template.yml",
+      "template": "templates/meta-confidence.template.yaml",
       "applies_to": ["all phase outputs"],
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     }

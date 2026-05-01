@@ -149,7 +149,7 @@
 
 **4원칙 1단계 (plan-phase6.md)**:
 - methodology-spec/workflow/phase-6-quality.md 전수 조사
-- methodology-spec/deliverables/06-안티패턴.md 전수 조사
+- methodology-spec/deliverables/6-antipatterns.md 전수 조사
 - output/antipatterns-partial/* 검증
 - F-015 cross-validation 사전 적용
 

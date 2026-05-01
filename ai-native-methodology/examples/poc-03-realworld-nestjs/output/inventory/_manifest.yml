@@ -1,5 +1,5 @@
 # Phase 1 매니페스트 — PoC #03 NestJS init
-# ★ G7 meta-confidence.template.yml v1.2.2 첫 외부 사용 (정합 검증 대상)
+# ★ G7 meta-confidence.template.yaml v1.2.2 첫 외부 사용 (정합 검증 대상)
 
 manifest:
   generated_at: "2026-04-30"
@@ -138,7 +138,7 @@ approval_gate:
     status: "✅ deterministic + grounded"
   - check: "이중 렌더링 정합 (.json + .md 동시 산출)"
     status: "✅ inventory.json + tree.md + stack-detection.md + stats.json + _manifest.yml"
-  - check: "★ G7 meta-confidence.template.yml 외부 사용 적합성"
+  - check: "★ G7 meta-confidence.template.yaml 외부 사용 적합성"
     status: "✅ 본 _manifest.yml 적용 — finding 후보: tool_type 에 'main_agent' 항목 부재 (template 자체 finding) / cross_validation.note 필드 추가 필요"
   - check: "★ G6 v1.2.2 ORM sub-section (b) TypeORM 외부 사용"
     status: "✅ stack-detection.md + Phase 2 인계 — 적합. 다른 ORM 추가 시 sub-section 신설 가이드 정합."
@@ -239,7 +239,7 @@ findings_phase:
   - id: "F-132"
     title: "★ G7 meta-confidence template 적용 시 발견 — tool_type enum 에 'main_agent' 항목 부재"
     severity: "low"
-    proposed_fix: "templates/meta-confidence.template.yml 의 tool_type_enum 에 'main_agent' (메인 agent 직접 read) 추가 또는 'ai_subagent' 가 main 도 포괄함을 명시"
+    proposed_fix: "templates/meta-confidence.template.yaml 의 tool_type_enum 에 'main_agent' (메인 agent 직접 read) 추가 또는 'ai_subagent' 가 main 도 포괄함을 명시"
     status: "candidate"
     note: "★ 본 PoC #03 가 v1.2.2 template 외부 검증 → finding (재귀적 자가 검증)"
 

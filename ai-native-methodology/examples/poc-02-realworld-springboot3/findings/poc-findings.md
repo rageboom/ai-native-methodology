@@ -142,7 +142,7 @@ severity: low
 status: deferred
 
 description: |
-  phase-6-quality.md 또는 06-안티패턴.md 에 SQL 모니터링 도구 (p6spy / datasource-proxy 등) 의
+  phase-6-quality.md 또는 6-antipatterns.md 에 SQL 모니터링 도구 (p6spy / datasource-proxy 등) 의
   production vs development-only 사용 가이드 부재.
 
 context: |

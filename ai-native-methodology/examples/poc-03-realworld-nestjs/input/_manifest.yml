@@ -1,5 +1,5 @@
 # Phase 0 입력 매니페스트 — PoC #03 NestJS
-# v1.2.2 신규 template (meta-confidence.template.yml) 첫 외부 사용 ★
+# v1.2.2 신규 template (meta-confidence.template.yaml) 첫 외부 사용 ★
 
 manifest:
   generated_at: "2026-04-30"

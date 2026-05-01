@@ -135,7 +135,7 @@
 
 ### F-132: ★ G7 meta-confidence template 보강 후보 (메타 finding) low CANDIDATE
 
-- **위치**: `templates/meta-confidence.template.yml`
+- **위치**: `templates/meta-confidence.template.yaml`
 - **결함**: `tool_type` enum 에 `main_agent` (메인 agent 직접 read) 항목 부재 — `ai_subagent` 가 main 도 포괄함을 명시 필요
 - **proposed_fix**: enum 에 `main_agent` 추가 또는 `ai_subagent` 정의 명시
 - **note**: ★ v1.2.2 template 외부 검증 → 재귀적 자가 finding

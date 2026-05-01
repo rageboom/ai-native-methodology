@@ -59,7 +59,7 @@ duration: 약 2일 (2026-04-30 ~ 2026-05-01)
 | 본체 갭 closure | 7 | **15건** |
 | ADR 수 | 9 (001~006 + 008 + 009) | **13개** (+ NEST-001~004 + 010 + 006 final) |
 | schema 갱신 | — | **4건** (openapi-extension / antipatterns / finding-system / formal-spec) |
-| 명세 본체 갱신 | — | **4건** (06-안티패턴 / finding-system / phase-4-5 / phase-6) |
+| 명세 본체 갱신 | — | **4건** (6-antipatterns / finding-system / phase-4-5 / phase-6) |
 | 도구 수 | 3 | **5개** (+ formal-spec-link-validator + spectral-runner) |
 | 도구 unit test | 17 | **37** |
 | PoC #03 BR coverage | 0% | **100%** (18/18) |

@@ -148,7 +148,7 @@ findings_phase_2:
   - id: "F-017"
     title: "@Embeddable 안 collection (@JoinTable @ManyToMany) 의 도메인 모델 라우팅 가이드 부재"
     severity: "medium"
-    proposed_fix: "v1.2 후보 — phase-2-db.md §3.1 또는 04-DB-스키마.md §3.1 보강"
+    proposed_fix: "v1.2 후보 — phase-2-db.md §3.1 또는 4-db-schema.md §3.1 보강"
     status: "정식 등록 예정"
   - id: "F-018"
     title: "drift report severity=high 0건 처리 표준 부재"

@@ -177,4 +177,4 @@ BC-AUTH (cross-cutting)
 - 산출물: `domain.json` / `domain.mermaid` / `use-cases.md` / `ubiquitous-language.md`
 - 입력: `.claude/researches/research-phase4.md` (메인 통합) + 3 sub-agent
 - 결정: `output/architecture/architecture.json` (CIRCULAR-001 / ARCH-STYLE) + `output/db/schema.json` (DRIFT 4건)
-- 명세: `methodology-spec/workflow/phase-4-비즈니스로직.md`, `docs/adr/ADR-004-DDD-Lite-강도.md`, `docs/adr/ADR-006-순환의존성-처리-default.md`
+- 명세: `methodology-spec/workflow/phase-4-business-logic.md`, `docs/adr/ADR-004-DDD-Lite-강도.md`, `docs/adr/ADR-006-순환의존성-처리-default.md`

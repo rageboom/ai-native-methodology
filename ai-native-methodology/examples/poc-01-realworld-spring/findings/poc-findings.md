@@ -25,7 +25,7 @@ context: |
   하지만 명세에는 이 케이스가 없음.
 
 spec_gap: |
-  workflow/phase-0-입력정리.md §3 처리 흐름에 다음 추가 필요:
+  workflow/phase-0-input.md §3 처리 흐름에 다음 추가 필요:
   - "환경 제약 시 대체 방법 (web_fetch, GitHub API 등)"
   - "선택적 fetch 시 우선순위 가이드"
 
@@ -34,14 +34,14 @@ decision_made: |
   source-info.md에 핵심 파일 우선순위 명시.
 
 severity: low
-proposed_fix: phase-0-입력정리.md §3에 "환경 제약 케이스" 절 추가
+proposed_fix: phase-0-input.md §3에 "환경 제약 케이스" 절 추가
 
 # ===== 해결 결과 (2026-04-27 closed) =====
 resolution:
   status: closed
   resolved_at: 2026-04-27
   resolution_method: |
-    phase-0-입력정리.md §3.3 "환경 제약 케이스 (PoC F-001 관련)" 절로 정식 반영:
+    phase-0-input.md §3.3 "환경 제약 케이스 (PoC F-001 관련)" 절로 정식 반영:
     - "git clone이 불가능한 환경 (예: Claude Code 환경)"
     - "web_fetch로 핵심 파일만 선택적 가져오기"
     - "GitHub API로 디렉토리 구조 조회"
@@ -69,7 +69,7 @@ context: |
   그걸 미리 기록해두지 않으면 후속 phase에서 누락 가능.
 
 spec_gap: |
-  workflow/phase-0-입력정리.md §4.1 산출물에 source-info.md 추가:
+  workflow/phase-0-input.md §4.1 산출물에 source-info.md 추가:
   - 분석 대상 레포 메타정보
   - ground truth 자료 인덱스
   - 1차 추정 기술 스택 (Phase 1에서 확인)
@@ -79,14 +79,14 @@ decision_made: |
   명세 갱신 후보로 기록.
 
 severity: medium
-proposed_fix: phase-0-입력정리.md §4.1에 source-info.md 명시 + 표준 형식 정의
+proposed_fix: phase-0-input.md §4.1에 source-info.md 명시 + 표준 형식 정의
 
 # ===== 해결 결과 (2026-04-27 closed) =====
 resolution:
   status: closed
   resolved_at: 2026-04-27
   resolution_method: |
-    phase-0-입력정리.md §4.3 "source-info.md 형식 (PoC F-002에서 추가)" 절로 정식 반영:
+    phase-0-input.md §4.3 "source-info.md 형식 (PoC F-002에서 추가)" 절로 정식 반영:
     - 분석 대상 레포 URL/언어/프레임워크/라이선스 표준 형식
     - Ground Truth 자료 인덱스
     - 산출물 §4.1 파일 구성에 source-info.md 명시
@@ -565,7 +565,7 @@ context: |
   Phase 4 5.A 진입 시 도메인 모델 결정 필요.
 
 spec_gap: |
-  phase-2-db.md §3.1 또는 04-DB-스키마.md §3.1 에 "Embeddable 안 collection" 케이스 가이드 추가:
+  phase-2-db.md §3.1 또는 4-db-schema.md §3.1 에 "Embeddable 안 collection" 케이스 가이드 추가:
   - Option A/B/C 의 선택 기준
   - 명세 §3.1 의 "@Embeddable → Phase 4 라우팅" 의 세부 분기
 
@@ -575,7 +575,7 @@ decision_made: |
   embeddable_routing_to_phase4 에 ArticleContents.contains_collection: true + finding_ref: F-017 명시.
 
 severity: medium
-proposed_fix: v1.2 후보 — phase-2-db.md §3.1 또는 04-DB-스키마.md §3.1 + ADR-004 (DDD-Lite) 보강
+proposed_fix: v1.2 후보 — phase-2-db.md §3.1 또는 4-db-schema.md §3.1 + ADR-004 (DDD-Lite) 보강
 status: deferred
 
 # ===== 처분 결과 (2026-04-28 deferred) =====
@@ -1200,7 +1200,7 @@ proposed_fix:
   - rules.schema.json 에 actual_behavior 보조 필드 (optional) 추가
   - antipatterns.schema.json 에 related_intent_br 강제 (잠재 버그 카테고리)
   - finding-system.md §X 잠재 버그 처분 절차 신설
-  - phase-4-비즈니스로직.md §3 BR 추출 시 De Morgan / boolean 검증 함정 가이드 추가
+  - phase-4-business-logic.md §3 BR 추출 시 De Morgan / boolean 검증 함정 가이드 추가
 research_ref: ".claude/researches/research-phase4.md §6 액션 A3"
 disposition: promoted
 disposition_target: v1.2.0
@@ -1229,7 +1229,7 @@ description: |
     - cascade 동작 예측 불가
   Vernon IDDD §10.6 / Hibernate Best Practices 권장: id 기반 equals/hashCode (또는 immutable VO).
 proposed_fix:
-  - phase-4-비즈니스로직.md §3 5.A 함정 가이드 보강 (mutable VO 의 equals/hashCode 위험)
+  - phase-4-business-logic.md §3 5.A 함정 가이드 보강 (mutable VO 의 equals/hashCode 위험)
   - PoC #02/#03 데이터 누적 후 재평가 (단일 PoC 과적합 회피)
 research_ref: "senior-phase4.md §2 잠재 위험"
 disposition: deferred
@@ -1255,14 +1255,14 @@ description: |
   본 PoC: 5.B (FE) 부재 + 5.D (외부 의존성) 0건 + 5.C 빈약 (8 lines).
   5.A 만 가중 (BR 11/13) → 평균 신뢰도 0.83 (명세 §6 가이드 ~0.70 초과).
   현재 명세:
-    - phase-4-비즈니스로직.md §6 평균 ~0.70 가이드 (lock-in 부재)
+    - phase-4-business-logic.md §6 평균 ~0.70 가이드 (lock-in 부재)
     - 4영역 부재 시 가중치 재계산 공식 부재
     - F-026 (5.D 0건) 와 별도 — N영역 일반화 필요
 proposed_fix:
-  - phase-4-비즈니스로직.md §6 4영역 가중치 표 + 부재 시 재계산 공식 (예: weighted_avg(present_areas))
+  - phase-4-business-logic.md §6 4영역 가중치 표 + 부재 시 재계산 공식 (예: weighted_avg(present_areas))
   - meta-confidence.schema.json 에 phase_4_areas_present 보조 필드 (5A/5B/5C/5D)
   - F-026 deferred 와 통합 v1.2.0 묶음 처리
-research_ref: "research-phase4.md §6 A6 + §7 phase-4-비즈니스로직 §6 평가"
+research_ref: "research-phase4.md §6 A6 + §7 phase-4-business-logic §6 평가"
 disposition: promoted
 disposition_target: v1.2.0
 ```
@@ -1291,7 +1291,7 @@ description: |
   현재 domain.schema.json aggregates[] 에 cascade_signal 표준 필드 부재.
 proposed_fix:
   - domain.schema.json aggregates[].cascade_signal: enum[strong_same, weak_same, no_cascade_violation, independent_ref]
-  - phase-4-비즈니스로직.md §3 5.A cascade 매트릭스 4단계 가이드
+  - phase-4-business-logic.md §3 5.A cascade 매트릭스 4단계 가이드
   - 다른 ORM (TypeORM / Sequelize / EF Core) 에서도 적용 검증 필요
 research_ref: "document-phase4.md §A1 cascade 매트릭스"
 disposition: deferred
@@ -1350,7 +1350,7 @@ description: |
     - extraction_rule (service_method_1to1) 명시 부재
 proposed_fix:
   - domain.schema.json use_cases[].kind enum[command, query] 추가
-  - phase-4-비즈니스로직.md §3 추출 규칙 (Service method 1:1) 명시
+  - phase-4-business-logic.md §3 추출 규칙 (Service method 1:1) 명시
 research_ref: "document-phase4.md §4 + research-phase4.md §2"
 disposition: deferred
 disposition_target: PoC #02/#03 후 v1.2.0
@@ -1429,7 +1429,7 @@ disposition_target: PoC #02/#03 후 v1.2.0 (F-017 묶음)
 | **C. severity 표준** | drift severity 0건 처리 | F-018 | phase-2-db.md §4.2 |
 | **D. schema 진화** | architecture_style hybrid | F-025 | schemas/architecture.schema.json (Option C) |
 | **E. quality-extraction** ⭐ Phase 4 신규 | 잠재 버그 BR/AP 이중 등록 표준 | **F-027** | rules.schema.json (actual_behavior) + antipatterns.schema.json (related_intent_br) + finding-system.md §X |
-| **F. 신뢰도 공식 보강** ⭐ Phase 4 신규 | 4영역 부재 시 가중치 재계산 | **F-029** + F-026 (deferred 묶음) | phase-4-비즈니스로직.md §6 + meta-confidence.schema.json |
+| **F. 신뢰도 공식 보강** ⭐ Phase 4 신규 | 4영역 부재 시 가중치 재계산 | **F-029** + F-026 (deferred 묶음) | phase-4-business-logic.md §6 + meta-confidence.schema.json |
 
 ### 처분 분류 트레이스 (finding-system.md §8 적용 결과 — 2026-04-28)
 

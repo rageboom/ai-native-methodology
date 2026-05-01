@@ -166,4 +166,4 @@ private static final String SECRET = "SOME_SIGNATURE_SECRET";  // 21 byte = 168 
 - 산출물: `rules.json` / 본 파일
 - 입력: `.claude/researches/research-phase4.md` §3 + senior-phase4 §1.A/§1.C
 - 결정: `output/architecture/architecture.json` (ARCH-STYLE/CIRCULAR-001) + `output/db/schema.json` (DRIFT 4건)
-- 명세: `methodology-spec/workflow/phase-4-비즈니스로직.md`, `methodology-spec/finding-system.md`
+- 명세: `methodology-spec/workflow/phase-4-business-logic.md`, `methodology-spec/finding-system.md`

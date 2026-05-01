@@ -35,7 +35,7 @@ DEC-2026-04-30-M-묶음-갭-식별 (Sprint 3 식별) 의 P2-3 5건. P1 2건 (fin
 | **G4** | `phase-flow.mermaid` + `phase-flow.json` 짝 | `methodology-spec/workflow/` | mermaid ~50~80 라인 + json ~40 라인 (이중 렌더링 정합) |
 | **G5** | `docs/adr/ADR-009-다이어그램-신뢰-모델.md` | `docs/adr/` | ~150~200 라인 (DEC + memory 통합 격상) |
 | **G6** | `db-schema.template.md` | `templates/` | ~60~100 라인 (erd.template.mermaid 의 사람 눈 짝) |
-| **G7** | `meta-confidence.template.yml` | `templates/` | ~40~60 라인 (schema 의 사람 눈 짝 + PoC #01/#02 _manifest.yml 통합) |
+| **G7** | `meta-confidence.template.yaml` | `templates/` | ~40~60 라인 (schema 의 사람 눈 짝 + PoC #01/#02 _manifest.yml 통합) |
 
 ### 부수 산출물
 
@@ -108,7 +108,7 @@ DEC-2026-04-30-M-묶음-갭-식별 (Sprint 3 식별) 의 P2-3 5건. P1 2건 (fin
 
 **제안**: **(A)** — PoC #02 의 형식이 이미 충분히 정련됨 (Hexagonal multi-module 환경에서도 동작). 항목: (1) 메타 (2) 테이블 인벤토리 (3) 정합성 검증 5종 (4) ORM ↔ schema.sql 출처 분별 (F-050 정합) (5) 안티패턴 인덱스 (6) finding 인덱스.
 
-### DEC-MP-05 — meta-confidence.template.yml 양식 (G7)
+### DEC-MP-05 — meta-confidence.template.yaml 양식 (G7)
 
 **옵션**:
 - (A) **PoC #01/#02 _manifest.yml 합집합 표준화** ★ 권장
@@ -125,7 +125,7 @@ DEC-2026-04-30-M-묶음-갭-식별 (Sprint 3 식별) 의 P2-3 5건. P1 2건 (fin
 - [ ] `methodology-spec/workflow/phase-flow.mermaid` + `phase-flow.json` 짝 산출 + drift-validator 자가 검증 (`structural drift 0`)
 - [ ] `docs/adr/ADR-009-다이어그램-신뢰-모델.md` 산출 + Sprint 1.5~4 누적 데이터 + v1.2.1 자동 도구 단계 통합
 - [ ] `templates/db-schema.template.md` 산출 + PoC #02 정합성-검증-보고서 형식 정합
-- [ ] `templates/meta-confidence.template.yml` 산출 + schema + PoC `_manifest.yml` 정합
+- [ ] `templates/meta-confidence.template.yaml` 산출 + schema + PoC `_manifest.yml` 정합
 - [ ] CHANGELOG `[v1.2.2]` entry — M-P2-3 5건 적용
 - [ ] README v1.2.1 → v1.2.2 + ADR-009 명시
 - [ ] STATUS.md — 묶음 M 7/7 완료 표기
