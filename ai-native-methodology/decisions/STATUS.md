@@ -54,7 +54,8 @@
 | v1.4.0-dev Stage 1 | research × 3 (공식/산업/Senior) — 9Q × 27 답 + 진단 보고서 + Stage 2 Gate 입력 12 결정 | ✅ (2026-05-01) |
 | **v1.4.0-dev Stage 2** | Gate 1/2/3 × 4 = 12 결정 모두 Senior 권고 채택 / Stage 3-1 진입 자료 확정 | ✅ (2026-05-01) |
 | **v1.4.0-dev Stage 3-1** | 본체 격상 1차 — ADR-FE-001/002/005 신설 + ADR-009 §2.4 갱신 + state-map/visual-manifest schema 신설 + ui-spec.schema 확장 + deliverable 8/9 신설 + 7 보강 + phase-5-2 분할 (a/b/c) + ★ drift-validator FE corpus 14→15 pass + ★ formal-spec-link-validator FE 진단 (Stage 3-2 carry). cross-check 1차 사료 권고 3건 반영 (DTCG 정확한 인용 / WCAG 2.2 ratchet / ICU MF2 단계). | ✅ (2026-05-01) |
-| **★★★ v1.4.0-dev Stage 3-2** | 본체 격상 2차 — ADR-FE-003 신설 + ADR-001 §명시적 제외 갱신 + a11y-spec/i18n-spec/static-security-spec/legacy-spectrum schema 신설 + rules.schema 확장 + deliverable 10/11/12/13 신설 + migration-cautions-fe 신설 + phase-6 보강 + ★ formal-spec-link-validator FE 모드 확장 (4→8 pass). G2-1+G2-2+G2-4 정식 반영. Strangler Pattern 채택. schema if/then 강제 4 영역 (a11y/i18n/security/legacy). | ✅ **본 세션 (2026-05-01)** |
+| **★★★ v1.4.0-dev Stage 3-2** | 본체 격상 2차 — ADR-FE-003 신설 + ADR-001 §명시적 제외 갱신 + a11y-spec/i18n-spec/static-security-spec/legacy-spectrum schema 신설 + rules.schema 확장 + deliverable 10/11/12/13 신설 + migration-cautions-fe 신설 + phase-6 보강 + ★ formal-spec-link-validator FE 모드 확장 (4→8 pass). G2-1+G2-2+G2-4 정식 반영. Strangler Pattern 채택. schema if/then 강제 4 영역 (a11y/i18n/security/legacy). | ✅ (2026-05-01) |
+| **★ methodology-spec doc 압축 정비** | LLM hot path 정보 농도 격상 — deliverables 1~9 + 4-5 (`8cf8a4d` -533) + workflow phase-0~5-1 (`474d36c` -244) + phase-5-2-a/b (`412d117` -60) + phase-5-2-c/5-2-ui/6 (`9b1c45c` -114) + 잔여 4 파일 (`68ae3df` -18). 누적 5404 → 4422 line (-18% / -982 line). 검증: cross-reference 1건 + ADR 인용 4 파일 보강. ★ 압축 ROI 분류 — placeholder 견본 (templates) 원복 / 사람 hot path (ADR/decisions) 미진행 결정. | ✅ **본 세션 (2026-05-01)** |
 
 ---
 
