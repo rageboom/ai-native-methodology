@@ -112,7 +112,7 @@
           },
           "formal_spec_links": {
             "type": "object",
-            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치). PoC #03 자발적 입증 4/11 AP (36%) — composite AP 가 BR/state-machine 직접 참조하면 신뢰도 +5%p. optional but recommended.",
+            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치). v1.3.x → v1.4 시점부터 카테고리 conditional required: DOMAIN / API / FE 의무, 그 외 선택. (ARCH / DB / PERFORMANCE 등 정적 구조·성능 결함은 BR/state 와 무관하므로 강제 시 boilerplate 양산 회피)",
             "properties": {
               "decision_tables": {
                 "type": "array",
@@ -136,7 +136,22 @@
               }
             }
           }
-        }
+        },
+        "allOf": [
+          {
+            "$comment": "★ v1.4 격상 — formal_spec_links 카테고리별 conditional required. DOMAIN / API / FE 카테고리는 BR/state-machine 직결 → 의무. ARCH / DB / PERFORMANCE / SECURITY / 그 외는 BR 무관 → 선택 (강제 시 boilerplate 양산). PoC #03 36% 자발적 입증 + §8.1 단일 PoC 과적합 회피 정합. 적용 시점 = v1.4 신규 PoC 부터 (기존 PoC #01~03 산출물은 v1.3.x release 보존).",
+            "if": {
+              "properties": {
+                "category": {
+                  "enum": ["DOMAIN", "API", "FE"]
+                }
+              }
+            },
+            "then": {
+              "required": ["formal_spec_links"]
+            }
+          }
+        ]
       }
     },
     "summary": {

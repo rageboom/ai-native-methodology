@@ -140,13 +140,27 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 
 ---
 
-## 5.6 ★ Phase 4.5 cross-link (formal_spec_links · v1.2.3 신설)
+## 5.6 ★ Phase 4.5 cross-link (formal_spec_links · v1.2.3 신설 / v1.4 conditional required)
 
-ADR-008 (이중 렌더링) + Phase 4.5 형식 명세 본질 가치 — composite AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p (PoC #03 36% 자발적 입증 — 4/11 AP).
+ADR-008 (이중 렌더링) + Phase 4.5 형식 명세 본질 가치 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p (PoC #03 36% 자발적 입증 — 4/11 AP).
 
-**의무 vs 선택**: 현재 **선택 (optional but recommended)**. composite AP 만 적용 권장.
+### 5.6.1 의무 vs 선택 (★ v1.4 conditional required)
 
-### 5.6.1 schema 구조 (`antipatterns.schema.json` line 113~138)
+| category | formal_spec_links | 근거 |
+|---|---|---|
+| **DOMAIN** | **의무** | BR/state-machine 직결 (Anemic Domain / God Class 등) |
+| **API** | **의무** | decision_table 직결 (versioning / PUT vs PATCH 등) |
+| **FE** | **의무** | BR validation 누락 = decision_table 직결 |
+| ARCH | 선택 | 정적 구조 결함, BR 무관 (순환의존성 / Layer 위반) |
+| DB | 선택 | DB 정합성 결함, BR 무관 (drift / naming) |
+| PERFORMANCE | 선택 | 성능 패턴, BR 무관 (N+1 / EAGER) |
+| SECURITY / CONFIG / EXTERNAL / TESTABILITY / MAINTAINABILITY | 선택 | 카테고리별 판단 |
+
+**적용 시점**: v1.4 신규 PoC 부터. v1.3.x 시점 PoC #01~03 산출물은 release 보존 (기존 schema validation 통과).
+
+§8.1 정합 (단일 PoC 과적합 회피) — PoC #03 36% 자발적 입증은 **부분 의무화 (high-coupling 카테고리만)** 근거로 충분. 전면 의무화는 PoC #04+ 추가 입증 후 재검토.
+
+### 5.6.2 schema 구조 (`antipatterns.schema.json` line 113~138 + allOf if-then)
 
 ```yaml
 formal_spec_links:
@@ -156,11 +170,11 @@ formal_spec_links:
   invariants:      ["../formal-spec/invariants/User.ts"]
 ```
 
-### 5.6.2 적용 기준
+### 5.6.3 적용 기준
 
-- ✅ **composite AP** (여러 BR/state 결합 결함) — link 권장
-- ✅ AP 자체가 state-machine 위반 사례 — state_machines link 의무
-- ⚠️ 단순 패턴 매칭 AP (N+1 등) — link 불필요 (자료 비대 회피)
+- ✅ **DOMAIN / API / FE** AP — link 의무
+- ✅ **composite AP** (여러 BR/state 결합 결함) — 모든 4종 link 권장
+- ⚠️ ARCH / DB / PERFORMANCE / 단순 패턴 매칭 AP — link 불필요 (자료 비대 회피)
 
 ---
 
@@ -173,7 +187,8 @@ formal_spec_links:
 □ 감지 방법 명시 (detection_method)
 □ recommendation 필수 기재
 □ confidence < 0.70이면 human_review_required 표기
-□ composite AP 는 formal_spec_links 기재 (선택 — §5.6)
+□ DOMAIN / API / FE 카테고리 AP는 formal_spec_links 기재 (의무 — §5.6 / v1.4+)
+□ 그 외 카테고리 (ARCH / DB / PERFORMANCE 등) AP는 formal_spec_links 선택
 □ 다른 산출물에서 발견된 AP가 모두 통합됨 (Phase 6)
 ```
 
