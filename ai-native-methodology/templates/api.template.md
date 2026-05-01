@@ -67,6 +67,20 @@ UC-{ID}-{NAME}   ↔  {operationId} ({METHOD} {path})
 
 복합 UC (1 op → N UC) 또는 system_internal (UC 미매핑) 명시.
 
+### 3.1 ★ Phase 4.5 cross-link (formal_spec_links)
+
+API 카테고리는 `openapi-extension.schema.json` allOf if-then 으로 **formal_spec_links 의무** (★ v1.3.1 — DOMAIN/API/FE 카테고리 conditional required). 각 operation 별로 BR decision-table / state-machine / sequence-diagram 직결 표기.
+
+```yaml
+# api-extension.json operations[].formal_spec_links 예시 (template/openapi-extension.template.json 참조)
+{operationId}:
+  decision_tables: ["../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.md"]
+  state_machines:  ["../formal-spec/state-machines/User.json"]
+  sequence_diagrams: ["../formal-spec/sequence-diagrams/UC-USER-DELETE.json"]
+```
+
+→ Phase 5-1 input 의 Phase 4.5 의존 정합 (`workflow/phase-5-1-api.md` §2). request/response schema 가 formal-spec decision-tables 와 매핑 가능해야 함.
+
 ---
 
 ## 4. RFC 위반 / 비표준 인덱스
