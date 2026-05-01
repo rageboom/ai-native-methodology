@@ -1,7 +1,7 @@
 # JSON Schemas (방법론 산출물)
 
-> 7대 산출물 + 메타 + 인벤토리 schema.
-> JSON Schema Draft 2020-12.
+> 11 schema = 메타 (meta-confidence) + 인벤토리 (inventory) + 7대 산출물 (architecture / domain / openapi-extension / db-schema / rules / antipatterns / ui-spec) + Phase 4.5 (formal-spec) + Finding 시스템 (finding-system).
+> JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
 
 ---
 

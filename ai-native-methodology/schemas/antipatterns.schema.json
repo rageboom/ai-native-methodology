@@ -112,7 +112,7 @@
           },
           "formal_spec_links": {
             "type": "object",
-            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치). v1.3.x → v1.4 시점부터 카테고리 conditional required: DOMAIN / API / FE 의무, 그 외 선택. (ARCH / DB / PERFORMANCE 등 정적 구조·성능 결함은 BR/state 와 무관하므로 강제 시 boilerplate 양산 회피)",
+            "description": "Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치). 도입: v1.2.3 (선택). 부분 의무화: v1.3.1 후속 commit `3af78e5` (2026-05-01) — DOMAIN / API / FE 카테고리 의무 (allOf if-then 참조). 적용 범위: v1.4 신규 PoC 부터. v1.3.x release 시점 PoC #01~03 산출물은 release 보존 (재검증 없음). 상세 결정 근거: deliverables/6-antipatterns.md §5.6 + §8.1 단일 PoC 과적합 회피 정합.",
             "properties": {
               "decision_tables": {
                 "type": "array",
