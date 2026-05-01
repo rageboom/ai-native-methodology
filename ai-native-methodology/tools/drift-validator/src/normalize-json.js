@@ -6,6 +6,12 @@ const normalizeLabel = (s) => stripDecor(String(s)).toLowerCase();
 
 export function detectArtifactType(json) {
   if (!json || typeof json !== 'object') return 'unknown';
+  // ★ Sprint 5+ Phase B — phase-flow 우선 검출 (state-machine 시그니처와 충돌 없음 — phase-flow 는 phases/depends_on 키)
+  if (Array.isArray(json.phases) && json.phases.length > 0
+      && typeof json.phases[0]?.id !== 'undefined'
+      && Array.isArray(json.phases[0]?.depends_on)) {
+    return 'phase-flow';
+  }
   if (json.states && typeof json.states === 'object') return 'state-machine';
   if (Array.isArray(json.actors) && Array.isArray(json.messages)) return 'sequence';
   if (json.br_id || json.condition) return 'decision-table';

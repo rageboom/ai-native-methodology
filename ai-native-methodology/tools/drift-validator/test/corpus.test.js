@@ -8,6 +8,8 @@ import { dirname, join } from 'node:path';
 import { detectDiagramType, normalizeStateMachine, normalizeSequence } from '../src/normalize-mermaid.js';
 import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson } from '../src/normalize-json.js';
 import { compareStateMachine, compareSequence, summarize } from '../src/compare.js';
+import { normalizePhaseFlow, normalizePhaseFlowJson } from '../src/normalize-phase-flow.js';
+import { comparePhaseFlow } from '../src/compare-phase-flow.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const corpus = (name) => ({
@@ -26,6 +28,12 @@ function runSequence(name) {
   const jsonNorm = normalizeSequenceJson(c.json);
   const mermaidNorm = normalizeSequence(c.mermaid);
   return summarize(compareSequence({ jsonNorm, mermaidNorm }));
+}
+function runPhaseFlow(name) {
+  const c = corpus(name);
+  const jsonNorm = normalizePhaseFlowJson(c.json);
+  const mermaidNorm = normalizePhaseFlow(c.mermaid);
+  return summarize(comparePhaseFlow({ jsonNorm, mermaidNorm }));
 }
 
 test('detectDiagramType picks stateDiagram', () => {
@@ -139,4 +147,25 @@ test('★ FE state-map form equiv → 0 breaking (Sprint 5+ A1 / form_state 5진
 test('★ FE state-map drift missing-error → ≥1 breaking (Sprint 5+ A1)', () => {
   const s = runStateMachine('state-map-fe-drift-01-missing-error');
   assert.ok(s.breaking >= 1, `expected breaking≥1 (FE state drift — timedOut 누락), got ${JSON.stringify(s)}`);
+});
+
+// ★ Sprint 5+ Phase B — phase-flow 비교기 (methodology-spec/workflow/phase-flow.{json,mermaid} 짝)
+
+test('★ detectArtifactType picks phase-flow', () => {
+  assert.equal(detectArtifactType({ phases: [{ id: '0', depends_on: [] }] }), 'phase-flow');
+});
+
+test('★ detectDiagramType picks phase-flow (flowchart + subgraph P*)', () => {
+  const txt = 'flowchart TB\n  subgraph P0[Phase 0]\n  end\n  subgraph P1[Phase 1]\n  end\n  P0 --> P1';
+  assert.equal(detectDiagramType(txt), 'phase-flow');
+});
+
+test('★ phase-flow equiv → 0 breaking (Sprint 5+ B / 3 phase + 2 deps)', () => {
+  const s = runPhaseFlow('phase-flow-equiv-01');
+  assert.equal(s.breaking, 0, `expected breaking=0 (phase-flow), got ${JSON.stringify(s)}`);
+});
+
+test('★ phase-flow drift missing-dep → ≥1 breaking (Sprint 5+ B)', () => {
+  const s = runPhaseFlow('phase-flow-drift-01-missing-dep');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (P0→P2 dep 누락), got ${JSON.stringify(s)}`);
 });

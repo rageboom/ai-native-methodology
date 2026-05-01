@@ -8,6 +8,8 @@ import { join, basename, extname, dirname, relative } from 'node:path';
 import { detectDiagramType, normalizeStateMachine, normalizeSequence } from './normalize-mermaid.js';
 import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson } from './normalize-json.js';
 import { compareStateMachine, compareSequence, summarize } from './compare.js';
+import { normalizePhaseFlowJson, normalizePhaseFlow } from './normalize-phase-flow.js';
+import { comparePhaseFlow } from './compare-phase-flow.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from './baseline.js';
 
 function findPairs(dir) {
@@ -66,6 +68,11 @@ function processOne({ jsonPath, mermaidPath }) {
     jsonNorm = normalizeSequenceJson(json);
     mermaidNorm = normalizeSequence(mermaidText);
     diffs = compareSequence({ jsonNorm, mermaidNorm });
+  } else if (jsonType === 'phase-flow') {
+    // ★ Sprint 5+ Phase B — phase-flow 비교기 (methodology-spec/workflow/phase-flow.{json,mermaid} 짝)
+    jsonNorm = normalizePhaseFlowJson(json);
+    mermaidNorm = normalizePhaseFlow(mermaidText);
+    diffs = comparePhaseFlow({ jsonNorm, mermaidNorm, jsonPath, mermaidPath });
   } else {
     return { jsonPath, mermaidPath, diagram_type: jsonType, diffs: [], note: 'comparator-not-implemented (e.g., decision-table — use decision-table-validator)' };
   }

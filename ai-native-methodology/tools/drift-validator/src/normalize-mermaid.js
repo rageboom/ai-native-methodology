@@ -10,11 +10,17 @@ const normalizeLabel = (s) => stripDecor(stripBr(s)).toLowerCase();
 
 export function detectDiagramType(text) {
   const lines = text.split('\n').map(stripComment);
+  let hasFlowchart = false;
+  let phaseSubgraphCount = 0;
   for (const line of lines) {
     const t = line.trim();
     if (t.startsWith('stateDiagram')) return 'state-machine';
     if (t.startsWith('sequenceDiagram')) return 'sequence';
+    // ★ Sprint 5+ Phase B — phase-flow 검출 (flowchart + subgraph P{X} ≥ 2)
+    if (/^flowchart\b/i.test(t)) hasFlowchart = true;
+    if (/^subgraph\s+P[\w_]*(\s|\[|$)/.test(t)) phaseSubgraphCount++;
   }
+  if (hasFlowchart && phaseSubgraphCount >= 2) return 'phase-flow';
   return 'unknown';
 }
 
