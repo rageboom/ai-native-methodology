@@ -1,19 +1,18 @@
 # Finding System — 명세 빈틈 기록·처리 체계
 
-> Status: **DRAFT (자산화 대기)** — PoC #01 운영 경험에서 도출. v1.2.0 또는 별도 ADR 로 정식화 후보.
-> Source: 2026-04-28 대화 (PoC #01 v1.1.2 격상 직후).
+> **사상**: dogfooding — PoC 가 명세를 따라가다 막히는 모든 지점을 즉시 기록·분류·처리하여 명세 견고화
 
 ---
 
 ## 1. 목적
 
-본 방법론은 **dogfooding** 으로 진화한다. PoC 가 명세를 따라가다 막히는 모든 지점이 "명세 빈틈". 이를 즉시 기록·분류·처리하여 명세를 견고화하는 체계가 Finding System.
+본 방법론은 dogfooding 으로 진화한다. PoC 가 명세를 따라가다 막히는 지점 = "명세 빈틈". 이를 즉시 기록·분류·처리하는 체계가 Finding System.
 
 ---
 
 ## 2. Finding 의 정의
 
-PoC 진행 중 발견되는 **명세 빈틈**. 다음 3 조건을 동시에 만족할 때 finding 으로 등록한다.
+PoC 진행 중 발견되는 **명세 빈틈**. 다음 3 조건 동시 만족 시 finding 등록:
 
 ```yaml
 finding 등록 조건 (AND):
@@ -22,7 +21,7 @@ finding 등록 조건 (AND):
   3. 우회 결정 기록됨 — decision_made 로 "본 PoC 는 이렇게 갔다" 기록
 ```
 
-3 조건을 만족하지 않으면 finding 이 아니라 **그냥 작업 노트** (plan.md / research.md 에 기록).
+3 조건 미충족 시 finding 이 아니라 **그냥 작업 노트** (plan.md / research.md 에 기록).
 
 ---
 
@@ -44,7 +43,7 @@ proposed_fix: <서술>        # 어떻게 고치면 좋을까
 
 # 처리 후 추가
 resolution:
-  status: closed | promoted | rejected | deferred
+  status: closed | promoted | rejected | deferred | logged
   resolved_at: YYYY-MM-DD
   resolution_method: |
   followup: []
@@ -54,26 +53,27 @@ resolution:
 
 ## 4. Severity 기준
 
-severity 는 **영향 범위 × 차단 강도** 로 결정.
+severity = **영향 범위 × 차단 강도**.
 
 | severity | 기준 | 예시 |
 |---|---|---|
-| **critical** | 즉시 수정 의무 / production blocker | PoC #02 AP-API-001 / PoC #03 F-140 + F-164 (Auth scope 결여) |
+| **critical** | 즉시 수정 의무 / production blocker | Auth scope 결여 / API 보안 취약점 |
 | **high** | 모든 산출물 또는 복수 phase 영향 / 표준화 시급 / 우회 시 불일치 위험 | F-003 / F-007 / F-016 / F-023 |
 | **medium** | 단일 phase 영향 / 우회 가능 / 명세 보강 권장 | F-008 / F-017 / F-022 / F-024 |
 | **low** | 환경 의존 / 케이스별 무시 가능 / 옵셔널 | F-001 / F-018 / F-019 / F-026 |
-| **★ positive** ★ | **학습 효과 입증 / 모범 사례** — cross-PoC 비재현 (★ v1.2.3 신설) | **F-161 (★ Bearer 표준 = NestJS 학습 효과 — PoC #02 F-084 비재현)** |
+| **★ positive** | **학습 효과 입증 / 모범 사례** — cross-PoC 비재현 | F-161 (Bearer 표준 = NestJS 학습 효과 / PoC #02 F-084 비재현) |
 
-### 4.1 Positive finding 패턴 (★ v1.2.3 신설)
+### 4.1 Positive finding 패턴
 
 **정의**: 이전 PoC 의 negative finding 이 본 PoC 에서 **자연 회피된** 경우 등재.
 
 **조건**:
-- ★ 이전 PoC 에 동형 negative finding 존재 (cross-PoC 검증 필수)
-- ★ 본 PoC 가 framework / 언어 / 팀 학습 효과로 자연 회피
-- ★ 시뮬 ❌ — 코드/main.ts/package.json 명시적 evidence 의무
+- 이전 PoC 에 동형 negative finding 존재 (cross-PoC 검증 필수)
+- 본 PoC 가 framework / 언어 / 팀 학습 효과로 자연 회피
+- 시뮬 ❌ — 코드/main.ts/package.json 명시적 evidence 의무
 
 **4 학습 효과 분류** (`positive_finding_meta.learning_effect_type`):
+
 | 분류 | 의미 | 사례 |
 |---|---|---|
 | **framework_natural_avoidance** | Framework 가 자연 회피 | F-161 — NestJS `addBearerAuth()` 표준 |
@@ -82,34 +82,34 @@ severity 는 **영향 범위 × 차단 강도** 로 결정.
 | **team_learning** | 동일 팀의 학습 결과 | (PoC #2 → PoC #3 동일 팀 사내 적용 시) |
 
 **처리**:
-- status: `logged` (★ v1.2.3 신설 — promoted/closed 아닌 별도 분류)
-- ★ migration-cautions.md 에 "모범 사례" 섹션 등재 의무
-- ★ v1.3 본체 격상 후보 표시 (`v13_promotion_candidate: true`)
+- status: `logged` (promoted/closed 아닌 별도 분류)
+- migration-cautions.md 에 "모범 사례" 섹션 등재 의무
+- 본체 격상 후보 표시 (`v13_promotion_candidate: true`)
 
 **ROI**:
-- ★ 단일 PoC 과적합 회피 (§8.1) 의 적극적 입증 = "비재현 = 학습 효과" 정량화
-- ★ 사내 적용 시 framework / language 선택 가이드 (PoC #03 → 사내 NestJS 도입 권고 근거)
+- 단일 PoC 과적합 회피 (§8.1) 의 적극적 입증 = "비재현 = 학습 효과" 정량화
+- 사내 적용 시 framework / language 선택 가이드
 
 ---
 
-## 5. 처리 (Disposition) 4 옵션
+## 5. 처리 (Disposition) 5 옵션
 
-finding 을 처리한다 = **다음 PoC 에서 어떻게 다룰지 결정한다**. 5 옵션 (★ v1.2.3 logged 신설).
+finding 처리 = **다음 PoC 에서 어떻게 다룰지 결정**.
 
 | 처분 | 의미 | 명세 영향 | 다음 PoC 효과 |
 |---|---|---|---|
-| **closed** | 명세 본체/스키마/템플릿/ADR 에 정식 반영 | YES (즉시 갱신) | **재발 차단** |
+| **closed** | 명세 본체/스키마/템플릿/ADR 에 정식 반영 | YES (즉시 갱신) | 재발 차단 |
 | **promoted** | "지금은 안 고치지만 v1.2/v1.3 후보" | NO (백로그 등재) | 같은 finding 재발 가능 — 등재만 |
 | **rejected** | "이건 명세 책임이 아님" + 사유 명시 | NO (사유 보존) | 다음 PoC 에서 같은 finding 올라와도 무시 근거 |
 | **deferred** | "PoC 데이터 더 필요 — revisit_at 명시" | NO (관찰 모드) | 단일 PoC 과적합 회피 |
-| **★ logged** ★ | **positive finding (학습 효과) 등재 — v1.2.3 신설** | **YES** (migration-cautions.md "모범 사례") | **★ 사내 적용 시 framework/language 선택 가이드** |
+| **★ logged** | **positive finding (학습 효과) 등재** | YES (migration-cautions.md "모범 사례") | 사내 적용 시 framework/language 선택 가이드 |
 
 ### 5.1 closed 의 정식 반영 채널
 
 - **명세 본체**: `methodology-spec/workflow/phase-N-*.md` 또는 `deliverables/NN-*.md` 절 추가
 - **스키마**: `schemas/*.schema.json` 필드/enum 보강
 - **템플릿**: `templates/*.template.{json,md}` 신설/갱신
-- **ADR**: 의사결정이 동반될 때 `docs/adr/ADR-NNN-*.md` 신설
+- **ADR**: 의사결정 동반 시 `docs/adr/ADR-NNN-*.md` 신설
 - **CHANGELOG**: PATCH (v1.1.x) / MINOR (v1.2.0) / MAJOR (v2.0.0) 표기
 
 ---
@@ -122,12 +122,12 @@ finding 을 처리한다 = **다음 PoC 에서 어떻게 다룰지 결정한다*
 - sub-agent 도 명세 참조로 일관 행동
 
 ### 6.2 closed 의 위험 (단일 PoC 과적합)
-- 단일 PoC 의 환경 특수성 (예: H2 + ddl-auto=none + Lombok) 이 **명세에 박힘**
+- 단일 PoC 의 환경 특수성 (예: H2 + ddl-auto=none + Lombok) 이 명세에 박힘
 - 다른 도메인 PoC (예: NestJS + TypeORM + Redis) 에서 부적합 가능
 - **해결**: high 만 즉시 closed, medium/low 는 PoC 2~3 회 누적 후 패턴 확정 시 closed
 
 ### 6.3 promoted/deferred 의 효과
-- 명세 진화의 **데이터 축적**
+- 명세 진화의 데이터 축적
 - 같은 finding 이 PoC #02/#03 에서 재현 → "진짜 빈틈" 증명
 - 재현 안 됨 → PoC #01 특수성 → reject 근거
 
@@ -143,7 +143,7 @@ finding 누적 임계:
   20건+  : 명세 자체 부실 의심 (PoC 정지 + 격상 검토)
 ```
 
-**F-021 의 의미**: finding 은 많을수록 좋은 게 아니다. 누적 = 명세가 PoC 마다 막힌다는 신호. 20+ 도달 시 **PoC 진행보다 명세 격상이 ROI 높음**.
+**의미**: finding 은 많을수록 좋은 게 아니다. 누적 = 명세가 PoC 마다 막힌다는 신호. 20+ 도달 시 **PoC 진행보다 명세 격상이 ROI 높음**.
 
 PoC #01 사례: 18건 누적 시 임계 근접 → Option A (PoC 정지 + v1.1.2 격상) → high 4건 closed → 잔여 10건 promote/defer 분류.
 
@@ -151,7 +151,7 @@ PoC #01 사례: 18건 누적 시 임계 근접 → Option A (PoC 정지 + v1.1.2
 
 ## 8. 처리 우선순위 결정 프레임
 
-PoC 종료 시점에 잔여 finding 처리 결정. 다음 트리.
+PoC 종료 시점에 잔여 finding 처리 결정:
 
 ```
 Q1. severity 가 무엇인가?
@@ -179,7 +179,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 
 ---
 
-## 9. PoC #01 처리 결과 (참고)
+## 9. PoC #01 처리 결과 (참고 사례)
 
 ```
 총 18건:
@@ -193,23 +193,3 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 ```
 
 → Phase 4 진입과 잔여 finding 처리는 **분리**. 잔여는 백로그 등재 후 PoC #02 누적 데이터로 처리.
-
----
-
-## 10. v1.2.0 격상 시 자산화 후보
-
-본 문서를 정식 자산화할 때 다음 위치 중 선택:
-
-- **A. methodology-spec/finding-system.md** (현재 위치, 본체로 승격)
-- **B. docs/adr/ADR-NNN-finding-system.md** (의사결정 기록 형식)
-- **C. methodology-spec/process/finding-system.md** (process/ 디렉토리 신설)
-
-v1.2.0 시점에 PoC #02 데이터 추가 후 결정 권장.
-
----
-
-## 11. 변경 이력
-
-| 일자 | 버전 | 변경 |
-|---|---|---|
-| 2026-04-28 | DRAFT | PoC #01 v1.1.2 격상 직후 메타 정리. 자산화 대기. |

@@ -1,7 +1,6 @@
 # ID 표준 (산출물 간 추적성)
 
-> 본 문서는 7대 산출물에서 사용하는 **ID 명명 규칙**이다.
-> ID를 통해 산출물 간 교차 참조가 가능하다.
+> 7대 산출물 ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능.
 
 ---
 
@@ -57,7 +56,7 @@ flowchart LR
   related_entities: [E-ORDER-Order]
   related_apis: [cancelOrder]
 
-# API에서 비즈니스 규칙 참조
+# API 에서 비즈니스 규칙 참조
 paths:
   /orders/{id}/cancel:
     post:

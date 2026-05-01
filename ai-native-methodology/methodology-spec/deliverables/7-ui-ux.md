@@ -20,7 +20,7 @@
 | **#8 state-map** | 분산 상태 5 진실 + state machine (동적 행동) |
 | **#9 visual-manifest** | snapshot PNG (시각 진실 — binary 진실 모델) |
 
-→ 3 산출물이 짝. 본 산출물은 정적 구조만 담당.
+→ 3 산출물이 짝. ADR-FE-002 §2.2 매트릭스 정합 + ADR-002 (책임 분담 원칙). 본 산출물은 정적 구조만 담당.
 
 ---
 
@@ -58,7 +58,7 @@ output/ui/
 | 사용자 시나리오 | 페이지 흐름 + 인증 + API 호출 패턴 | LLM 추론 | 0.60 |
 
 **입력**: FE 소스 + 라우팅 설정 + Tailwind config / theme + (선택) Storybook
-**평균 신뢰도** (drift-validator 적용 후): ~80% (FE 코드 품질에 진폭)
+**평균 신뢰도** (drift-validator 적용 후 / ADR-009 §2.4.1 정합): ~80% (FE 코드 품질에 진폭)
 
 ### 3.2 framework 감지 enum (Tier 1~4)
 
@@ -164,6 +164,8 @@ shared/     공유 (UI Kit, Lib, API)
 
 ## 7. 디자인 토큰 형식 (DTCG 2025.10)
 
+### 7.1 DTCG Design Tokens Format Module 2025.10
+
 - **spec URL** (★ 고정): https://www.designtokens.org/TR/2025.10/format/
 - **status**: Final Community Group Report (★ W3C Standard ❌ — ADR-FE-005 §2.2.1 명시 의무)
 - **publication**: 2025-10-28
@@ -196,7 +198,7 @@ typography:
     $type: typography
 ```
 
-`design_tokens` 필드 의무:
+### 7.2 ui-spec.schema.json `design_tokens` 필드 의무
 
 ```yaml
 design_tokens:

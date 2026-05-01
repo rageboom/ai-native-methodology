@@ -1,7 +1,7 @@
-# Migration Cautions — FE 영역 가이드 (★ v1.4 신설)
+# Migration Cautions — FE 영역 가이드
 
-> **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + ★ 위험 기록 한 방향 추출기) FE 적용 + ADR-FE-001 (Tier 1~4 spectrum) + ADR-FE-003 (Strangler Pattern) + DEC-Stage-2-Gate G2-1 (a11y / i18n / 정적보안 v1.4 포함)
-> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.md` (BE) + `output/antipatterns/migration-cautions-fe.md` (FE — Stage 5+)
+> **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + 위험 기록 한 방향 추출기) FE 적용 + ADR-FE-001 (Tier 1~4 spectrum) + ADR-FE-003 (Strangler Pattern)
+> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.md` (BE) + `migration-cautions-fe.md` (FE)
 > **생성 phase**: Phase 6 (`/analyze-quality`) — FE 산출물 (deliverable 7~13) 통합 후
 
 ---
@@ -10,7 +10,7 @@
 
 **답하는 질문**: "신규 FE 시스템 구축 시 본 분석에서 발견한 위험을 어떻게 회피하나?"
 
-**소비자**: 사용자가 신규 FE 시스템 구축 시 design / CI / Review 단계의 차단 가이드.
+**AI 재구현 시 활용**: design / CI / Review 단계의 차단 가이드
 
 ### 1.1 BE migration-cautions 와의 분담
 
@@ -42,7 +42,7 @@
 
 ### A-1. server cache ↔ client state mirror 금지
 
-**근거 deliverable**: #8 state-map §12.1 (race condition)
+**근거**: #8 state-map §9.1 (race condition)
 
 **design 단계**:
 - ✅ TanStack Query / SWR 의 cache = 진실 / Zustand 등 client state = derived 만
@@ -54,7 +54,7 @@
 
 ### A-2. URL state 진실 보존
 
-**근거 deliverable**: #8 state-map §12.3 (split brain)
+**근거**: #8 state-map §9.3 (split brain)
 
 **design 단계**:
 - ✅ 새로고침 시 복원되어야 하는 state = URL 진실 (router params / query string)
@@ -62,7 +62,7 @@
 
 ### A-3. over-globalization 금지
 
-**근거 deliverable**: #8 state-map §12.4
+**근거**: #8 state-map §9.4
 
 **design 단계**:
 - ✅ scope 우선순위: component < feature < global
@@ -73,9 +73,9 @@
 
 ## 4. B — visual baseline drift 회피
 
-### B-1. flaky test 차단 (★ Stage 4 mini-PoC 검증 의무)
+### B-1. flaky test 차단
 
-**근거 deliverable**: #9 visual-manifest §12.1
+**근거**: #9 visual-manifest §10.1
 
 **design 단계**:
 - ✅ Playwright `await page.waitForLoadState('networkidle')` 의무
@@ -103,7 +103,7 @@
 
 ### C-1. WCAG 2.1-AA baseline 의무 (★ build block)
 
-**근거 deliverable**: #10 a11y-spec §4
+**근거**: #10 a11y-spec §4
 
 **design 단계**:
 - ✅ **WCAG 2.1-AA = baseline** (fail 시 critical / build block)
@@ -131,9 +131,9 @@
 
 ## 6. D — i18n MF2 runtime preview 회피
 
-### D-1. ★ MF1 폴백 의무 (★ cross-check 권고 #3)
+### D-1. ★ MF1 폴백 의무
 
-**근거 deliverable**: #11 i18n-spec §4 + ADR-FE-005 §2.2.3
+**근거**: #11 i18n-spec §4 + ADR-FE-005 §2.2.3
 
 **design 단계**:
 - ✅ MF2 사용 시 MF1 폴백 병기 의무
@@ -157,7 +157,7 @@
 
 ### E-1. dangerouslySetInnerHTML / v-html / bypassSecurityTrustHtml 차단
 
-**근거 deliverable**: #12 static-security-spec §9.1
+**근거**: #12 static-security-spec §9.1
 
 **design 단계**:
 - ✅ 사용자 input 직접 렌더링 ❌ — DOMPurify sanitize 의무
@@ -195,7 +195,7 @@
 
 ### F-1. ★ big_bang rewrite 절대 금지
 
-**근거 deliverable**: #13 legacy-spectrum §11.4 + ADR-FE-003 §3
+**근거**: #13 legacy-spectrum §11.4 + ADR-FE-003 §3
 
 **design 단계**:
 - ✅ 산업 사례 (Martin Fowler / Sam Newman) 모두 strangle 권고
@@ -207,11 +207,11 @@
 - ✅ Tier 1 + 2 혼재 시 mixed_breakdown 의무 (LOC / file_count 비율)
 - ✅ 진실 source 1개 일원화 (window.__INITIAL_STATE__ + data-* 동시 사용 금지)
 
-### F-3. ★ Tier 4 (JSP) BE/FE 통합 — Stage 6 ADR-FE-004 carry
+### F-3. ★ Tier 4 (JSP) BE/FE 통합 (ADR-FE-004 carry)
 
 **design 단계**:
 - ✅ tier_4_be_fe_split_carry=true 의무
-- ✅ JSP 분석 = BE controller model attribute 통합 (Stage 6 정식 처리)
+- ✅ JSP 분석 = BE controller model attribute 통합
 
 ---
 
@@ -275,7 +275,7 @@
 | Security | E | OWASP API Security ↔ FE 정적보안 |
 | Architecture | F | strangle = micro-frontend / edge proxy |
 | Domain | A / D | rules.schema fe_validation / fe_authorization / fe_a11y / fe_i18n cross-link |
-| Performance | (운영 NFR — v1.5 carry) | LCP / CLS = ADR-001 §명시적 제외 갱신 정합 |
+| Performance | (운영 NFR — v1.5 carry) | LCP / CLS = ADR-001 §명시적 제외 정합 |
 
 → Phase 6 산출 시 BE migration-cautions + FE migration-cautions 양쪽 의무.
 
