@@ -1,28 +1,21 @@
 # 산출물 #4.5: 형식 명세 (Formal Spec)
 
-> 본 문서는 형식 명세 산출물의 **표준 명세**다.
-> 사상: 이중 렌더링 (ADR-008) + 자연어 빈약성 보완 + AI 코드 생성 정확도 향상
-> 관련 schema: `schemas/formal-spec.schema.json`
-> 관련 template: `templates/formal-spec.template.md` 외 4건
-> 관련 workflow: `workflow/phase-4-5-formal-spec.md`
-> 신설: v1.2.0 (묶음 L) — PoC #02 C-Sprint 1+1.5+2 누적 검증 정식 격상
+> **사상**: 이중 렌더링 (ADR-008 — AI 눈 JSON + 사람 눈 mermaid) + 자연어 빈약성 보완 (자연어 60% → 형식 90%)
+> **schema**: `schemas/formal-spec.schema.json` · **template**: `templates/formal-spec.template.md` 외 4건
+> **생성 phase**: Phase 4.5 (`workflow/phase-4-5-formal-spec.md`)
 
 ---
 
 ## 1. 목적
 
-**이 산출물이 답하는 질문**:
-- "이 시스템의 Aggregate Root 생애주기는?" (state)
-- "Use Case 의 호출 순서는?" (sequence)
-- "BR 의 분기는 모두 처리되는가?" (decision table)
-- "도메인 invariant 는 실행 가능한가?" (invariants)
-- "모든 입력에서 invariant 가 성립하는가?" (property test)
+**답하는 질문** (5종):
+- Aggregate Root 생애주기는? (state-machine)
+- Use Case 호출 순서는? (sequence-diagram)
+- BR 분기는 모두 처리되는가? (decision-table)
+- 도메인 invariant 는 실행 가능한가? (invariants)
+- 모든 입력에서 invariant 가 성립하는가? (property-test)
 
-**소비자**:
-- AI 코드 생성기 (자연어 60% → 형식 90%)
-- BE 개발자 (구현 분기/예외 처리)
-- QA (Property test → 자동 케이스 생성)
-- 신규 시스템 구축자 (산출물 5종 직접 입력)
+**AI 재구현 시 활용**: 자연어 60% → 형식 90% 정확도 향상 / Property test → 자동 케이스 생성
 
 ---
 
@@ -137,7 +130,7 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 ---
 
-## 4. 검증 체크리스트 (v1.2.1 갱신)
+## 4. 검증 체크리스트
 
 ```
 [ 자동 — 도구 실행 ]
@@ -150,7 +143,7 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 □ 5 산출물 모두 작성 (이중 렌더링 정합 100%)
 □ Cross-validation 완료 (Senior + Static — 진짜 도구 우선)
 □ Static tool 시뮬레이션 사용 시 cross_validation.simulation_reason 명시 + 신뢰도 -5%p 패널티
-□ 자동 도구 미실행 시 -5%p 추가 (v1.2.1 신규)
+□ 자동 도구 미실행 시 -5%p 추가
 □ Drift 검출 시 finding 등록 (cross_validation.double_hit 표기 / structural vs interpretive 분류)
 □ Property test 실행 가능 / 통과
 □ generated-code 단방향 round-trip 검증 (코드 부재 BR 시)
@@ -168,15 +161,12 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 ## 5. 산출물 간 참조
 
-```mermaid
-flowchart LR
-    R4["#4 도메인 + #5 BR\n(Phase 4)"] -.입력.-> F["#4.5 형식 명세\n(Phase 4.5)"]
-    F -.실행 가능 명세.-> CG["AI 코드 생성"]
-    F -.invariant 검증.-> AP["#6 안티패턴"]
-    F -.x-rules 참조.-> API["#3 API 계약"]
-    
-    style F fill:#fff3cd,stroke:#856404,stroke-width:3px
-```
+| 방향 | 의미 |
+|---|---|
+| #4 DOM + #5 RULES → #4.5 FORMAL | Phase 4 산출물 입력 |
+| FORMAL → AI 코드 생성 | 실행 가능 명세 |
+| FORMAL → #6 AP | invariant 검증 결과 |
+| FORMAL → #3 API | x-rules 참조 |
 
 ---
 
@@ -184,22 +174,22 @@ flowchart LR
 
 ### 6.1 자연어 빈약성 자기-시인 누락
 - 증상: rules.json 의 자연어로 충분하다고 착각
-- 대응: F-074 패턴 — 자연어 9 항목 점검 (44% / 100% 정량) → 5+ 항목 누락 시 형식화 필수
+- 대응: 자연어 9 항목 점검 (44% / 100% 정량) → 5+ 항목 누락 시 형식화 필수
 
-### 6.2 Self-reference 함정 (Sprint 1 발견)
+### 6.2 Self-reference 함정
 - 증상: 코드 → 형식 → 코드 재생성 = 자명한 100%
 - 대응: 코드 부재 BR 선택 → 자연어 → 형식 → 코드 생성 (단방향)
 
 ### 6.3 Static tool 시뮬레이션 (★★★)
 - 증상: AI sub-agent 에 "Static Analyzer persona" 부여
-- 대응: DEC-static-tool-실행-의무화 — 진짜 도구 의무. 시뮬 시 `cross_validation.simulation_reason` 명시 + -5%p 패널티.
-- **v1.2.1 enforcement**: `tools/static-runner/lint-no-simulation.sh` 가 CI 단계에서 5종 물증 누락 + simulation_only:true 자동 fail.
+- 대응: 진짜 도구 의무. 시뮬 시 `cross_validation.simulation_reason` 명시 + -5%p 패널티
+- **enforcement**: `tools/static-runner/lint-no-simulation.sh` 가 CI 단계에서 5종 물증 누락 + simulation_only:true 자동 fail
 
 ### 6.4 이중 렌더링 갭
 - 증상: .mermaid 만 / .json 만 작성
-- 대응: ADR-008 강제 — 양쪽 의무. drift 검증 (Sprint 3 #2 정합 100% 목표).
-- **v1.2.1 enforcement**: `tools/drift-validator/` + `tools/decision-table-validator/` 가 자동 검증. **수동 검증 한계 노출** ★ — Sprint 3 가 "drift 0" 으로 보고했던 PoC #02 산출물에서 자동 도구가 7 breaking + 3 non-breaking 발견 (F-117 메타 finding).
+- 대응: ADR-008 강제 — 양쪽 의무
+- **enforcement**: `tools/drift-validator/` + `tools/decision-table-validator/` 자동 검증 (수동 점검은 한계 — drift 0 보고했던 산출물에서 자동 도구가 7 breaking + 3 non-breaking 발견 사례 있음)
 
-### 6.5 자동 도구 미실행 (v1.2.1 신규)
+### 6.5 자동 도구 미실행
 - 증상: drift-validator / decision-table-validator 안 돌리고 "수동 점검 OK" 로 종결
-- 대응: Phase 4.5 종료 조건에 자동 실행 결과 첨부 의무. 미실행 시 신뢰도 -5%p.
+- 대응: Phase 4.5 종료 조건에 자동 실행 결과 첨부 의무. 미실행 시 신뢰도 -5%p

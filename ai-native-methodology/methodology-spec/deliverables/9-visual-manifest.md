@@ -1,37 +1,29 @@
 # 산출물 #9: Visual Manifest (시각 산출 매니페스트)
 
-> 본 문서는 Visual Manifest 산출물의 **표준 명세**다.
-> 사상: ADR-FE-002 §2.3 (★ visual 예외 — binary 진실 모델) + ADR-FE-005 (Playwright + axe-core 채택) + ADR-009 §2.4.2 (binary trust path)
-> 관련 schema: `schemas/visual-manifest.schema.json`
-> ⭐ v1.4 신설 산출물 (사용자 요구 3 — "UI visible 차원" 정면 해소)
+> **사상**: binary 진실 모델 (ADR-FE-002 §2.3 — JSON / mermaid 모두 진실 아님, snapshot PNG 가 진실) + Playwright + axe-core 진짜 실행 (ADR-FE-005)
+> **schema**: `schemas/visual-manifest.schema.json`
+> **생성 phase**: Phase 5-2-c (`/analyze-visual`)
 
 ---
 
 ## 1. 목적
 
-**이 산출물이 답하는 질문**: "이 화면이 실제로 어떻게 보이는가?"
+**답하는 질문**: "이 화면이 실제로 어떻게 보이는가?"
 
-**소비자**:
-- 디자이너 (baseline 승인 권한)
-- PM / 기획자 (요구 3 — visible 검증)
-- FE 개발자 (재구현 시 시각 비교 baseline)
-- AI 재구현 시 (snapshot diff 통과를 코드 생성 종료 조건으로 사용)
-- a11y 검증자 (axe-core inline 결과 활용)
+**AI 재구현 시 활용**: snapshot diff 통과를 코드 생성 종료 조건으로 / a11y 위반 inline 결과 활용
 
-### 1.1 ★ binary 진실 모델 (ADR-FE-002 §2.3)
+### 1.1 binary 진실 모델 (다른 산출물과 구분)
 
 ADR-008 의 이중 렌더링 사상 (AI 눈 + 사람 눈) 은 visual 영역에서 **불완전 적용**:
 - AI 눈 = `visual-manifest.json` (메타 + path + hash)
-- 사람 눈 = ❌ mermaid 표현 불가능 / ✅ Storybook static + GitHub PNG 직접 렌더
-- **★ 진실 = snapshot PNG (binary)** — JSON 도 mermaid 도 진실 아님
+- 사람 눈 = ❌ mermaid 표현 불가 / ✅ Storybook static + GitHub PNG 직접 렌더
+- **진실 = snapshot PNG (binary)** — JSON 도 mermaid 도 진실 아님
 
-→ 다른 6 산출물과 다른 trust path. drift-validator 적용 ❌ / Playwright snapshot diff ✅.
+→ drift-validator 적용 ❌ / Playwright snapshot diff ✅ (다른 6 산출물과 다른 trust path).
 
 ---
 
 ## 2. 형식
-
-### 2.1 파일 구성
 
 ```
 output/visual/
@@ -49,7 +41,7 @@ output/visual/
 └── _manifest.yml
 ```
 
-### 2.2 viewport matrix 정책
+### 2.1 viewport matrix 정책 (snapshot 일관성 진실 모델)
 
 ```yaml
 viewport_matrix:
@@ -59,9 +51,7 @@ viewport_matrix:
   - {label: mobile-landscape, width: 667, height: 375,  dpr: 2.0}
 ```
 
-→ 매트릭스 정의 의무 (snapshot 일관성 진실 모델).
-
-### 2.3 locale matrix (선택 — i18n 영향 검증)
+### 2.2 locale matrix (선택 — i18n 영향 검증)
 
 ```yaml
 locale_matrix:
@@ -74,20 +64,24 @@ locale_matrix:
 
 ## 3. 추출 범위
 
-### 3.1 추출 대상
+### 3.1 추출 대상 (출처 / 도구 / 신뢰도)
 
-| 항목 | 출처 | 도구 |
-|---|---|---|
-| snapshot PNG | 실제 페이지 렌더 + 캡처 | ★ Playwright `toHaveScreenshot()` 또는 Percy / Chromatic |
-| snapshot_hash | SHA-256 of PNG | (계산 — 결정적) |
-| a11y_violations inline | axe-core 진짜 실행 | ★ axe-core `axe.run()` |
-| viewport coverage | viewport_matrix × pages | (계산) |
+| 항목 | 출처 | 도구 | 신뢰도 (단계 5 / 6 / 7) |
+|---|---|---|---|
+| snapshot PNG | 실제 페이지 렌더 + 캡처 | Playwright `toHaveScreenshot()` 또는 Percy / Chromatic | 85-92% / 90-95% / 95%+ |
+| snapshot_hash | SHA-256 of PNG | (계산 — 결정적) | — |
+| a11y_violations inline | axe-core 진짜 실행 | axe-core `axe.run()` | — |
+| viewport coverage | viewport_matrix × pages | (계산) | — |
+
+**입력**: FE 빌드 + dev server
+**단계**: 5=진짜 도구 실행 / 6=baseline diff 0 도달 / 7=디자이너 리뷰 통과
+**simulation 시 -5%p 패널티 + simulation_reason 의무**
 
 ### 3.2 미추출 (의도적)
 
 - 화면 동영상 / 인터랙션 녹화 — Stage 5+ 검토
 - 픽셀 단위 디자인 명세 (Figma 영역) — round-trip scope 제외
-- 운영 perf 메트릭 (LCP / CLS) — ADR-001 §명시적 제외
+- 운영 perf 메트릭 (LCP / CLS) — ADR-001 명시적 제외
 
 ---
 
@@ -116,7 +110,7 @@ visual_truth_model:
 
 ---
 
-## 5. ★ no-simulation 정책 강제 (ADR-FE-002 §2.3 정합)
+## 5. no-simulation 정책 강제
 
 본 산출물은 **진짜 도구 실행 의무**:
 
@@ -137,8 +131,6 @@ captured_by enum:
   - result_hash            # 결과 종합 hash
 ```
 
-→ ADR-009 §2.2.1 FE 도구 enum + DEC-static-tool-실행-의무화 정합.
-
 → schema 의 `if/then` 강제 (visual-manifest.schema.json `allOf`).
 
 ---
@@ -157,7 +149,7 @@ stateDiagram-v2
 ```
 
 **상태 의미**:
-- `match` — baseline 일치 ✅
+- `match` — baseline 일치
 - `drift` — 차이 발견 (사람 검토 필요)
 - `baseline_new` — 신규 snapshot (baseline 없음)
 - `baseline_pending_approval` — 사람 승인 대기
@@ -180,53 +172,7 @@ cross_links:
 
 ---
 
-## 8. 추출 흐름
-
-```mermaid
-flowchart TB
-    SRC["FE 빌드 + dev server"]
-
-    SRC --> P5_2_c["Phase 5-2-c (visual)"]
-
-    P5_2_c --> S1["★ Playwright 진짜 실행<br/>(snapshot 캡처)"]
-    P5_2_c --> S2["★ axe-core 진짜 실행<br/>(a11y 검증)"]
-    P5_2_c --> S3["SHA-256 hash 계산"]
-    P5_2_c --> S4["baseline 비교 (있을 시)"]
-
-    S1 --> O1["snapshots/*/*.png"]
-    S2 --> O2["a11y violations inline"]
-    S3 --> O3["snapshot_hash"]
-    S4 --> O4["diff_status"]
-
-    O1 & O2 & O3 & O4 --> M["visual-manifest.json"]
-
-    M -.|drift-validator ❌|.-> X["semantic 비교 ❌"]
-    M --> H["사람 검토<br/>(baseline 승인)"]
-
-    style P5_2_c fill:#d4edda
-    style S1 fill:#d1ecf1
-    style S2 fill:#d1ecf1
-    style X fill:#f8d7da,stroke-dasharray:5
-```
-
----
-
-## 9. 신뢰도 (★ ADR-009 §2.4.2 binary trust path)
-
-| 단계 | 조건 | 신뢰도 |
-|---|---|---|
-| 1-2-3 | (mermaid 검증 불가) | ❌ N/A |
-| 5 | Playwright/Percy/Chromatic 진짜 실행 | 85-92% |
-| 6 | snapshot baseline + diff 0건 도달 | 90-95% |
-| 7 | 사람 디자이너 리뷰 통과 | 95%+ |
-
-→ 다른 6 산출물과 다른 trust path (mermaid 단계 1~3 ❌).
-
-★ simulation 시 -5%p 패널티 + simulation_reason 의무.
-
----
-
-## 10. 검증 체크리스트
+## 8. 검증 체크리스트
 
 ```
 □ schema 검증 (visual-manifest.schema.json) 통과
@@ -246,53 +192,35 @@ flowchart TB
 
 ---
 
-## 11. 산출물 간 참조
+## 9. 산출물 간 참조
 
-```mermaid
-flowchart LR
-    VM["Visual Manifest<br/>(deliverable 9)"]
-    UI["UI/UX 명세<br/>(deliverable 7)"]
-    SM["State Map<br/>(deliverable 8)"]
-
-    VM -.|renders|.-> UI
-    VM -.|captures_state|.-> SM
-    VM -.|baseline 비교|.-> VM2[Playwright/Percy<br/>진짜 도구]
-
-    style VM fill:#fff3cd,stroke:#856404,stroke-width:3px
-    style VM2 fill:#d1ecf1
-```
-
-→ ADR-FE-002 §2.3 (visual 예외) 정합.
+| 방향 | 의미 |
+|---|---|
+| VM → UI | renders page |
+| VM → SM | captures_state (FSM) |
+| VM → 외부 도구 | baseline 비교 (Playwright/Percy 진짜 실행) |
+| drift-validator → VM | ❌ 적용 안 함 (semantic 비교 불가) |
 
 ---
 
-## 12. 흔한 함정
+## 10. 흔한 함정
 
-### 12.1 flaky test
+### 10.1 flaky test
 - 증상: 동일 페이지 2회 캡처 시 hash 다름 (애니메이션 / 폰트 로딩 race)
 - 대응: `await page.waitForLoadState('networkidle')` + `mask` region 또는 `disable_animations`
 
-### 12.2 dynamic content (시간 / 사용자명)
+### 10.2 dynamic content (시간 / 사용자명)
 - 증상: 매 캡처마다 timestamp / 랜덤 데이터로 hash 변경
 - 대응: mock data 고정 + masked region (Playwright `mask` 옵션)
 
-### 12.3 font drift
+### 10.3 font drift
 - 증상: 폰트 로딩 안 된 상태에서 캡처
 - 대응: `document.fonts.ready` 대기 + 폰트 미리 로드
 
-### 12.4 viewport 변경 누락
+### 10.4 viewport 변경 누락
 - 증상: viewport_matrix 변경 시 baseline 일괄 갱신 누락
 - 대응: viewport_matrix 변경 = baseline 전체 재캡처 + 재승인 강제
 
-### 12.5 simulation 누락
+### 10.5 simulation 누락
 - 증상: 진짜 Playwright 환경 부재 시 시뮬 캡처
-- 대응: simulation_reason 명시 + Stage 4+ carry / -5%p 패널티 표기
-
----
-
-## 13. 다음
-
-- Phase 6 (`/analyze-quality`) 에서 AP-FE-VISUAL-XXX 안티패턴 등록 (예: 폰트 로딩 race / inline style 난무)
-- Stage 3-2 — a11y deliverable 신설 시 a11y_violations 분리 / WCAG 2.2-AA ratchet path 정식화
-- Stage 4 mini-PoC = Playwright + axe-core 진짜 실행 1회 → 단계 5 (85-92%) 도달 검증 (★ no-simulation 정책 첫 FE 실현)
-- Stage 5 본격 PoC #04 = baseline 50+ snapshot + diff 0건 도달 → 단계 6 (90-95%)
+- 대응: simulation_reason 명시 + carry-over / -5%p 패널티 표기
