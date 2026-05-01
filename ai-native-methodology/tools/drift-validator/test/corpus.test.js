@@ -1,5 +1,5 @@
-// Corpus self-test — A 보강 후 10쌍 (★ Sprint 4 4쌍 → A 보강 +6쌍 = 10쌍).
-// 다음 단계 (Sprint 5+) — 20쌍 까지 확장 (현재 carry-over).
+// Corpus self-test — Sprint 5+ carry-over Phase A 종결 후 19쌍 / 21 test.
+// 진척: Sprint 4 4쌍 → A 보강 (DEC-A) +10쌍 = 14쌍 → ★ Sprint 5+ Phase A +6쌍 = 19쌍 (state-machine 8 + sequence 8 + state-map-fe 3).
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
@@ -107,4 +107,36 @@ test('★ sequence drift label-mismatch → ≥1 non-breaking', () => {
 test('★ FE state-map equiv → 0 breaking (★ v1.4 Stage 3-1 Phase E1 시범)', () => {
   const s = runStateMachine('state-map-fe-equiv-01');
   assert.equal(s.breaking, 0, `expected breaking=0 (FE state-map), got ${JSON.stringify(s)}`);
+});
+
+// ★ Sprint 5+ carry-over Phase A — corpus 14 → 19쌍 (+6 신규)
+
+test('★ state-machine multi-trigger equiv → 0 breaking (Sprint 5+ A1)', () => {
+  const s = runStateMachine('state-machine-equiv-04-multi-trigger');
+  assert.equal(s.breaking, 0, `expected breaking=0 (multi-trigger), got ${JSON.stringify(s)}`);
+});
+
+test('★ state-machine drift extra-event → ≥1 breaking (Sprint 5+ A1)', () => {
+  const s = runStateMachine('state-machine-drift-04-extra-event');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (mermaid 에 missing transition), got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence multi-actor equiv → 0 breaking (Sprint 5+ A1 / 4 actor 양방향)', () => {
+  const s = runSequence('sequence-equiv-04-multi-actor');
+  assert.equal(s.breaking, 0, `expected breaking=0 (multi-actor), got ${JSON.stringify(s)}`);
+});
+
+test('★ sequence drift extra-message → ≥1 breaking (Sprint 5+ A1)', () => {
+  const s = runSequence('sequence-drift-04-extra-message');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (mermaid 에 missing message), got ${JSON.stringify(s)}`);
+});
+
+test('★ FE state-map form equiv → 0 breaking (Sprint 5+ A1 / form_state 5진실 #4)', () => {
+  const s = runStateMachine('state-map-fe-equiv-02-form');
+  assert.equal(s.breaking, 0, `expected breaking=0 (form_state), got ${JSON.stringify(s)}`);
+});
+
+test('★ FE state-map drift missing-error → ≥1 breaking (Sprint 5+ A1)', () => {
+  const s = runStateMachine('state-map-fe-drift-01-missing-error');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (FE state drift — timedOut 누락), got ${JSON.stringify(s)}`);
 });
