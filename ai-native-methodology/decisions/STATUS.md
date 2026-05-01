@@ -3,13 +3,14 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-01 (★★★ **v1.3.0 MINOR release ✅** / 사내 표준 채택 가능 시점 / spectral 실 실행 24 warnings/0 errors / no-simulation 정책 첫 실현 / 신뢰도 85-92% / ADR-009 단계 4)
+**기준일**: 2026-05-01 (★ **v1.4.0-dev 라인 진입 / FE 트랙 Stage 0 종결** / freeze 해제 / v1.3.0 MINOR + v1.3.1 PATCH 보존)
 
 ---
 
 ## 방법론 본체 버전
 
-- **★★★ v1.3.0 MINOR release (2026-05-01) ✅ 현재** — 사내 표준 채택 가능 시점 도달. **11 묶음 통합** (C+I+H+K + R+D+§8.1 + L+M+N+O) + Sprint 5 Node 도구 부분 종결 (spectral). ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% (★ ADR-009 단계 4 — 진짜 도구 1회 실행).
+- **★ v1.4.0-dev 라인 진입 (2026-05-01) — Stage 0 종결 ✅ 현재** — FE 트랙 정식 시작. 사용자 진단 "FE 분석 방법이 없잖아" → research-first. 8 Stage 분할 (0 freeze 해제 + 트랙 진입 / 1 research × 3 / 2 사용자 승인 3 sub-gate / 3 본체 격상 / 4 mini-PoC fail-fast / 5 본격 PoC #04 / 6 BE/FE 분리 정책 / 7 v1.4.0 release). 외부 plan = `~/.claude/plans/be-foamy-jellyfish.md` (3 에이전트 점검 v2). DEC-2026-05-01-v1.4-FE-트랙-진입.
+- **★★★ v1.3.0 MINOR release (2026-05-01) ✅ 보존** — 사내 표준 채택 가능 시점 도달. **11 묶음 통합** (C+I+H+K + R+D+§8.1 + L+M+N+O) + Sprint 5 Node 도구 부분 종결 (spectral). ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% (★ ADR-009 단계 4 — 진짜 도구 1회 실행).
 - v1.2.3 PATCH (★ v1.3.0 에 흡수) — 본체 격상 7 묶음 (C+I+H+K + R+D+§8.1).
   - C: Phase 4.5 cross-link 의무화 schema
   - I: AP-PERFORMANCE 3 PoC 권위 격상
@@ -43,7 +44,9 @@
 | **시퀀스 B Phase 4.5+1** | **다이어그램 mermaid 보강 (진짜 drift 8 → 0 ✅) — Article persistingArticle compound + User validatingLogin compound + Article 3 self-loop + Follows self-loop + sequence 2 message** + drift 재실행 (breaking 20 → 8 / 진짜 drift 0 / 도구 한계 100%) + 신뢰도 0.77 → **0.80** (★ 단계 3 자동 검증 통과 도달 ✅) | ✅ **본 세션 (2026-04-30)** |
 | **시퀀스 B Phase 5-1** | **api 산출 4종 — openapi.yaml (21 endpoint / 14 schemas / Bearer JWT) + api-extension.json (★ Phase 4.5 cross-link 9/21) + api.md (12 REC-API-*) + _manifest. ★★★ F-164 critical 신규 (Article 4 endpoint Auth 부재) + F-161 positive (Bearer 표준 ✅ = PoC #02 F-084 학습 효과) + F-157~F-166 10건. 신뢰도 0.90 / 7대 산출물 5/7** | ✅ **본 세션 (2026-04-30)** |
 | **시퀀스 B Phase 6** | **antipatterns final 4종 — antipatterns.json (11 AP / critical 2 + high 3 + medium 4 + low 2) + avoid-list.md + ★ migration-cautions.md (NestJS 특이 8 함정 + 학습 효과 3건) + _manifest. 4 composite view + Phase 4.5 cross-link 4/11 AP + ★★ F-161 positive (Bearer 학습 효과) + AP-PERFORMANCE-001 medium → high 격상 (3 PoC 재현). 신뢰도 0.94 / 7대 산출물 6/7** | ✅ **본 세션 (2026-04-30)** |
-| **★★★ PoC #03 종결** | **★★ 전체 7대 산출물 6/7 도달** (UI/UX 만 N/A) — 사내 표준 v1.3 격상 데이터 완비 | ✅ **본 세션 (2026-04-30)** |
+| **★★★ PoC #03 종결** | **★★ 전체 7대 산출물 6/7 도달** (UI/UX 만 N/A) — 사내 표준 v1.3 격상 데이터 완비 | ✅ (2026-04-30) |
+| v1.3.0 MINOR + v1.3.1 PATCH release | 사내 표준 채택 가능 시점 도달 / D3.2 파일명 컨벤션 정리 (12 rename, c72d29c) | ✅ (2026-05-01 보존) |
+| **★ v1.4.0-dev Stage 0** | freeze 해제 + FE 트랙 진입 + 8 Stage 분할 합의 + plan/DEC/STATUS/INDEX/CHANGELOG/memory | ✅ **본 세션 (2026-05-01)** |
 
 ---
 

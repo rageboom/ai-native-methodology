@@ -9,7 +9,70 @@
 
 ---
 
-## [v1.3.1] — 2026-05-01 ⭐ 현재 (PATCH — 파일명 컨벤션 정리)
+## [v1.4.0-dev] — 2026-05-01 ⭐ 현재 (MINOR — FE 트랙 진입 / Stage 0 종결)
+
+### 트리거
+
+v1.3.1 PATCH 종결 후 사용자 결정 — **freeze 해제 + FE 트랙 정식 시작 + v1.4.0-dev 라인 진입**. 본 release 라인 = ① BE 한정 (v1.x) → BE+FE 양 트랙 (v1.4+) 격상 ② 사용자 진단 "FE 분석 방법이 없잖아" 에 대한 research-first 응답.
+
+### Stage 0 산출 (본 세션)
+
+| # | 산출 | 위치 |
+|---|---|---|
+| 1 | plan-v1.4-fe-track.md | `ai-native-methodology/.claude/plans/` (4원칙 1단계 정식 산출) |
+| 2 | DEC-2026-05-01-v1.4-FE-트랙-진입.md | `ai-native-methodology/decisions/` |
+| 3 | STATUS.md 갱신 | 방법론 본체 버전 + 시퀀스 진행률 |
+| 4 | INDEX.md 갱신 | 승인 결정 표에 본 DEC 등재 |
+| 5 | CHANGELOG.md (본 entry) | v1.4.0-dev 라인 신설 |
+| 6 | memory 신설 + 갱신 | project_v140_fe_track / project_v130_release_status / project_adoption_workspace + MEMORY.md |
+| 7 | git commit | Stage 0 종결 단일 commit |
+
+### 변경 사항
+
+**없음** (메타 작업만). 방법론 본체 / schema / 도구 / PoC 변경 0. 본 release line 의 본격 변경은 Stage 3 (본체 격상) 부터 시작.
+
+### 큰 뭉텅이 (Stage) 분할 — 사용자 요구 6번 정식 반영
+
+| Stage | 목적 |
+|---|---|
+| Stage 0 ✅ | freeze 해제 + 트랙 진입 |
+| Stage 1 | research × 3 (공식문서 / 테크기업 / Senior FE) — 9Q 답 도출 |
+| Stage 2 | 사용자 승인 (3 sub-gate — 핵심 구조 / 보강 범위 / 검증 전략) |
+| Stage 3 | 본체 격상 — deliverable 재설계 + 산출물↔테스트 매개체 채택 |
+| Stage 4 | mini-PoC 검증 (1주 fail-fast) |
+| Stage 5 | 본격 PoC #04 (RealWorld FE) |
+| Stage 6 | BE/FE 분리 운영 정책 정식화 (횡단) |
+| Stage 7 | v1.4.0 MINOR release 결단 |
+
+각 Stage 종료 시 commit + DEC + STATUS 갱신 (사용자 요구 7번 — 발전 과정 가시화 의무).
+
+### 외부 plan 짝
+
+`~/.claude/plans/be-foamy-jellyfish.md` (사용자 승인본 / 3 에이전트 점검 v2). 본 레포 plan (`.claude/plans/plan-v1.4-fe-track.md`) 은 작업용 짝.
+
+### 트랙 차이 (BE v1.x → FE v1.4)
+
+| 차원 | BE 트랙 (v1.0~v1.3) | FE 트랙 (v1.4) |
+|---|---|---|
+| 시작 가정 | modern stack (Spring/SpringBoot/NestJS) 명확 | spectrum 결정부터 (legacy jQuery ~ modern React) |
+| 진입 순서 | 명세 → 도구 → PoC | research → 명세 재설계 → mini-PoC → 본격 PoC |
+| 핵심 빈틈 | 신뢰도 정직 표기 | 산출물↔테스트 자동 도출 / visible 차원 / 분산 상태 / 이벤트 / 렌더링 |
+| 분리 정책 | 단일 BE 관점 | BE/FE 분리 운영 (Stage 6) — JS 풀스택 / JSP 혼재 예외 |
+
+### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
+
+- Semgrep / PMD / OSV-Scanner 환경 의존
+- vacuum / openapi-changes / corpus 14→20쌍 / drift-validator phase-flow 비교기 / ADR-010 baseline mode wrapper
+
+본 v1.4 FE 트랙과 **병행 가능**. 우선순위 충돌 없음.
+
+### adoption workspace 영향
+
+`ai-native-methodology-adoption/` 의 "원본 클론 변경 X" 가정은 본 release 진입으로 깨짐. v1.3.1 시점 dist (`dist/internal-v1.3/`) 는 그대로 보존. 향후 v1.4.0 정식 release 시 신규 dist (`dist/internal-v1.4/`) 빌드 가능. 동기화 정책 갱신은 별도 작업 (본 release scope 외부).
+
+---
+
+## [v1.3.1] — 2026-05-01 ⭐ release 보존 (PATCH — 파일명 컨벤션 정리)
 
 ### 트리거
 
