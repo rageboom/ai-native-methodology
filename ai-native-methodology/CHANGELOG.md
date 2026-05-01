@@ -9,7 +9,45 @@
 
 ---
 
-## [v1.4.0-dev] — 2026-05-01 ⭐ 현재 (MINOR — FE 트랙 진입 / Stage 0 종결)
+## [v1.4.0-dev] — 2026-05-02 ⭐ 현재 (MINOR — FE 트랙 / Stage 4 mini-PoC 종결)
+
+### Stage 4 (2026-05-02 / 본 세션) — RealWorld React fork 1주 fail-fast mini-PoC
+
+**분석 대상**: `yurisldk/realworld-react-fsd` HEAD `963b303` (★ 527 stars / FSD 약식 3 layer / Zod / TanStack Query / react-router v7 / orval+OpenAPI 자동 생성)
+
+**산출 (Day 1~6 / 6 commit)**:
+- `examples/poc-04-mini-realworld-react/` 워크스페이스 (★ INPUT 의도적 .gitignore — clone --depth 1)
+- analysis/0-init/ — tree.md / inventory.json / stack-detection.md (Tier 1 Modern SPA / Scenario A 분리)
+- analysis/5-2-a-ui-base/ — ui-spec.json (3 page / 14 SCN / 10 CMP) + scenarios.md + component-tree.mermaid
+- analysis/5-2-b-state/ — state-map.json (5 SM SCXML+XState 호환) + state-map.mermaid
+- analysis/5-2-c-visual/ — visual-manifest.json + 2 snapshot (Playwright Chromium 진짜 실행)
+- analysis/6-quality/ — a11y-spec / i18n-spec / static-security-spec / form-validation-spec (★ 85 validation / 72 BR 자동 등록) / type-spec (★ ts-morph 진짜 실행)
+- ir-4layer-matrix.md (★ ★ ★ overall_framework_neutrality_score 0.99 / target 0.90)
+- confidence-meta.yaml (★ 0.85 / ADR-009 단계 4)
+- 4 finding (F-FE-001~004 / 모두 candidate / mini scope 정합)
+- DEC-Stage-4-mini-PoC-종결.md
+
+**★★★★ no-simulation 정책 단계 4 도달**:
+1. ts-morph 24 — 70 file / 46 type / framework_neutrality_score 1.0 / react_idiom_ratio 0.0011
+2. Playwright + Chromium — 2 viewport visual baseline (binary 진실)
+3. @axe-core/playwright 4.10 — WCAG 2.2 AA / 1 unique violation (html-has-lang)
+
+**★★★ Stage 5 진입 자격 충족** (research G5 5 자격 모두 충족):
+- 사상 정합 ✅ 비협상 충족 / IR 0.99 ✅ / 도구 3종 ✅ / finding 4건 ✅ / 신뢰도 0.85 ✅
+- carry 2건 (Semgrep 환경 + drift-validator FE) — Senior 재분류 시 ≤ 2 (★ i18n = 적용 대상 부재 ≠ carry)
+
+**★ §8.1 정합 strict** — Stage 4 finding 4건 모두 candidate / **본체 격상 0건** / Stage 5 + adoption 합산 후 격상.
+
+**★ 핵심 발견**:
+- ★ URL params validation 신규 패턴 (Zod-mini home.state.ts) — ★ deliverable 14 의미 확장 시점 (★ Stage 5 schema 확장 후보)
+- ★ JWT localStorage XSS = PoC #01/02 isomorphic 변형 (3 PoC isomorphic — adoption 합산 시 본체 antipattern 후보)
+- ★ React Router v7 Form action 패턴 (RHF/Formik 미사용)
+- ★ orval auto-gen Zod from OpenAPI 3.0.1 = ADR-FE-005 매개체 #4 + #13 통합 검증 ✅
+- ★ drift-validator FE 모드 부재 = 본체 도구 격상 후보 (F-FE-004)
+
+---
+
+## [v1.4.0-dev] — 2026-05-01 (MINOR — FE 트랙 진입 / Stage 0 종결)
 
 ### 트리거
 
