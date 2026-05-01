@@ -1,0 +1,34 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/i18n-spec.schema.json (★ Stage 3-2)",
+  "meta": {
+    "poc_id": "poc-04-mini",
+    "phase": "6-quality",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "package.json deps grep + 코드 grep",
+    "status": "N/A"
+  },
+  "i18n_status": {
+    "applied": false,
+    "evidence": [
+      "package.json deps 에 react-intl / react-i18next / @formatjs/* / @lingui/* 부재",
+      "INPUT/src 코드 hardcoded 영문 문자열 (login.ui.tsx 'Sign in' / register / settings 등)"
+    ]
+  },
+  "icu_messageformat": {
+    "applied": false,
+    "mf_version": "N/A"
+  },
+  "deliverable_11_compliance": {
+    "applicable": false,
+    "carry_to_stage_5": true,
+    "carry_reason": "★ 본 fork 가 i18n 미적용 — Stage 5 본격 PoC #04 시 i18n 적용 fork 또는 사내 SaaS 검증",
+    "research_alignment": "★ research §6.2 결단 — i18n carry 가능 / fork 가 i18n 미사용 시 N/A 명시"
+  },
+  "summary": {
+    "applicable": false,
+    "translations_count": 0,
+    "icu_patterns_count": 0,
+    "deliverable_status": "N/A — Stage 5 carry"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/visual-manifest.schema.json (★ Stage 3-1)",
+  "meta": {
+    "poc_id": "poc-04-mini",
+    "phase": "5-2-c-visual",
+    "captured_at": "2026-05-01",
+    "captured_by": "real",
+    "tool": "@playwright/test (chromium headless)",
+    "tool_version": "1.49+",
+    "target_url": "https://demo.realworld.io/",
+    "target_note": "★ demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 시각 산출 isomorphic)"
+  },
+  "snapshots": [
+    {
+      "page_id": "PAGE-HOME",
+      "url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "desktop",
+        "width": 1280,
+        "height": 720
+      },
+      "snapshot_path": "snapshot/home-desktop.png",
+      "snapshot_size_bytes": 17194,
+      "snapshot_hash_sha256": "7ab67791b804ccd574528fb347069d66f2ba203287b49db877cceb1b1e4ef173",
+      "load_time_ms": 1183,
+      "captured_at": "2026-05-01T23:43:34.902Z"
+    },
+    {
+      "page_id": "PAGE-HOME",
+      "url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "mobile",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/home-mobile.png",
+      "snapshot_size_bytes": 15599,
+      "snapshot_hash_sha256": "304139a72dc8111b9db8a5969cfab54cd9b409824a7196aa3858df53dbcb6448",
+      "load_time_ms": 1361,
+      "captured_at": "2026-05-01T23:43:36.641Z"
+    }
+  ],
+  "summary": {
+    "total_snapshots": 2,
+    "viewports": [
+      "desktop",
+      "mobile"
+    ],
+    "pages_covered": 1
+  },
+  "deliverable_9_compliance": {
+    "playwright_real_run": true,
+    "simulation_used": false,
+    "binary_truth_captured": true
+  }
+}

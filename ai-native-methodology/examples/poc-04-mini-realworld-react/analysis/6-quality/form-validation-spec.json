@@ -1,0 +1,1119 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/form-validation-spec.schema.json (★ Stage 7-pre)",
+  "meta": {
+    "poc_id": "poc-04-mini",
+    "phase": "6-quality",
+    "captured_at": "2026-05-01",
+    "captured_by": "real",
+    "tool": "ts-morph + yaml + regex",
+    "tool_version": "ts-morph 24 / yaml 2.5",
+    "sources_analyzed": [
+      "INPUT/openapi.yaml (★ orval+Zod auto-gen via OpenAPI 3.0.1)",
+      "INPUT/src/pages/home/home.state.ts (★ Zod-mini URL params — 신규 패턴)",
+      "INPUT/src/pages/login/login.ui.tsx (HTML5 native fallback)",
+      "INPUT/src/pages/register/register.ui.tsx",
+      "INPUT/src/pages/settings/settings.ui.tsx",
+      "INPUT/src/pages/editor/editor.ui.tsx",
+      "INPUT/src/pages/article/article.ui.tsx"
+    ]
+  },
+  "source_libraries": [
+    {
+      "library": "zod",
+      "version": "4.3.6",
+      "detected": true,
+      "source": "package.json"
+    },
+    {
+      "library": "zod-mini",
+      "detected": true,
+      "source": "src/pages/home/home.state.ts (zod/mini import)"
+    },
+    {
+      "library": "orval",
+      "version": "8.3.0",
+      "detected": true,
+      "source": "package.json + orval.config.ts"
+    },
+    {
+      "library": "html5_native",
+      "detected": true,
+      "source": "form input attributes (required/type/autoComplete)"
+    }
+  ],
+  "validations": [
+    {
+      "id": "F-VAL-LoginUser-email",
+      "schema_name": "LoginUser",
+      "field_name": "email",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-LoginUser-password",
+      "schema_name": "LoginUser",
+      "field_name": "password",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewUser-username",
+      "schema_name": "NewUser",
+      "field_name": "username",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewUser-email",
+      "schema_name": "NewUser",
+      "field_name": "email",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewUser-password",
+      "schema_name": "NewUser",
+      "field_name": "password",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-User-email",
+      "schema_name": "User",
+      "field_name": "email",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-User-username",
+      "schema_name": "User",
+      "field_name": "username",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-User-bio",
+      "schema_name": "User",
+      "field_name": "bio",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": [
+        {
+          "kind": "nullable"
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-User-image",
+      "schema_name": "User",
+      "field_name": "image",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-User-token",
+      "schema_name": "User",
+      "field_name": "token",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUser-email",
+      "schema_name": "UpdateUser",
+      "field_name": "email",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUser-password",
+      "schema_name": "UpdateUser",
+      "field_name": "password",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUser-username",
+      "schema_name": "UpdateUser",
+      "field_name": "username",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUser-bio",
+      "schema_name": "UpdateUser",
+      "field_name": "bio",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUser-image",
+      "schema_name": "UpdateUser",
+      "field_name": "image",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Profile-username",
+      "schema_name": "Profile",
+      "field_name": "username",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Profile-bio",
+      "schema_name": "Profile",
+      "field_name": "bio",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": [
+        {
+          "kind": "nullable"
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-Profile-image",
+      "schema_name": "Profile",
+      "field_name": "image",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Profile-following",
+      "schema_name": "Profile",
+      "field_name": "following",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "boolean",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-slug",
+      "schema_name": "Article",
+      "field_name": "slug",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-title",
+      "schema_name": "Article",
+      "field_name": "title",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-description",
+      "schema_name": "Article",
+      "field_name": "description",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-body",
+      "schema_name": "Article",
+      "field_name": "body",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-tagList",
+      "schema_name": "Article",
+      "field_name": "tagList",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-createdAt",
+      "schema_name": "Article",
+      "field_name": "createdAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-updatedAt",
+      "schema_name": "Article",
+      "field_name": "updatedAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-favorited",
+      "schema_name": "Article",
+      "field_name": "favorited",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "boolean",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-favoritesCount",
+      "schema_name": "Article",
+      "field_name": "favoritesCount",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "integer",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Article-author",
+      "schema_name": "Article",
+      "field_name": "author",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewArticle-title",
+      "schema_name": "NewArticle",
+      "field_name": "title",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewArticle-description",
+      "schema_name": "NewArticle",
+      "field_name": "description",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewArticle-body",
+      "schema_name": "NewArticle",
+      "field_name": "body",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewArticle-tagList",
+      "schema_name": "NewArticle",
+      "field_name": "tagList",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateArticle-title",
+      "schema_name": "UpdateArticle",
+      "field_name": "title",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateArticle-description",
+      "schema_name": "UpdateArticle",
+      "field_name": "description",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateArticle-body",
+      "schema_name": "UpdateArticle",
+      "field_name": "body",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateArticle-tagList",
+      "schema_name": "UpdateArticle",
+      "field_name": "tagList",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": false,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Comment-id",
+      "schema_name": "Comment",
+      "field_name": "id",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "integer",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Comment-createdAt",
+      "schema_name": "Comment",
+      "field_name": "createdAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Comment-updatedAt",
+      "schema_name": "Comment",
+      "field_name": "updatedAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Comment-body",
+      "schema_name": "Comment",
+      "field_name": "body",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-Comment-author",
+      "schema_name": "Comment",
+      "field_name": "author",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewComment-body",
+      "schema_name": "NewComment",
+      "field_name": "body",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-GenericErrorModel-errors",
+      "schema_name": "GenericErrorModel",
+      "field_name": "errors",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "object",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-LoginUserRequest-user",
+      "schema_name": "LoginUserRequest",
+      "field_name": "user",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewUserRequest-user",
+      "schema_name": "NewUserRequest",
+      "field_name": "user",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateUserRequest-user",
+      "schema_name": "UpdateUserRequest",
+      "field_name": "user",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewArticleRequest-article",
+      "schema_name": "NewArticleRequest",
+      "field_name": "article",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UpdateArticleRequest-article",
+      "schema_name": "UpdateArticleRequest",
+      "field_name": "article",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-NewCommentRequest-comment",
+      "schema_name": "NewCommentRequest",
+      "field_name": "comment",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-slug",
+      "schema_name": "ArticlePreview",
+      "field_name": "slug",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-title",
+      "schema_name": "ArticlePreview",
+      "field_name": "title",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-description",
+      "schema_name": "ArticlePreview",
+      "field_name": "description",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-tagList",
+      "schema_name": "ArticlePreview",
+      "field_name": "tagList",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-createdAt",
+      "schema_name": "ArticlePreview",
+      "field_name": "createdAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-updatedAt",
+      "schema_name": "ArticlePreview",
+      "field_name": "updatedAt",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "string",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-favorited",
+      "schema_name": "ArticlePreview",
+      "field_name": "favorited",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "boolean",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-favoritesCount",
+      "schema_name": "ArticlePreview",
+      "field_name": "favoritesCount",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "integer",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ArticlePreview-author",
+      "schema_name": "ArticlePreview",
+      "field_name": "author",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-UserResponse-user",
+      "schema_name": "UserResponse",
+      "field_name": "user",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-ProfileResponse-profile",
+      "schema_name": "ProfileResponse",
+      "field_name": "profile",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-SingleArticleResponse-article",
+      "schema_name": "SingleArticleResponse",
+      "field_name": "article",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-MultipleArticlesResponse-articles",
+      "schema_name": "MultipleArticlesResponse",
+      "field_name": "articles",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-MultipleArticlesResponse-articlesCount",
+      "schema_name": "MultipleArticlesResponse",
+      "field_name": "articlesCount",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "integer",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-SingleCommentResponse-comment",
+      "schema_name": "SingleCommentResponse",
+      "field_name": "comment",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "unknown",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-MultipleCommentsResponse-comments",
+      "schema_name": "MultipleCommentsResponse",
+      "field_name": "comments",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-TagsResponse-tags",
+      "schema_name": "TagsResponse",
+      "field_name": "tags",
+      "source": "openapi.yaml § components.schemas",
+      "source_format": "openapi_3_0_1_to_zod_via_orval",
+      "type": "array",
+      "required": true,
+      "rules": []
+    },
+    {
+      "id": "F-VAL-URL-OffsetSchema",
+      "schema_name": "OffsetSchema",
+      "field_name": "offset",
+      "source": "src/pages/home/home.state.ts",
+      "source_format": "zod_mini",
+      "scope": "url_params",
+      "rules": [
+        {
+          "kind": "int"
+        },
+        {
+          "kind": "min",
+          "value": 0,
+          "inclusive": true
+        },
+        {
+          "kind": "max",
+          "value": "Number.MAX_SAFE_INTEGER",
+          "inclusive": true
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-URL-LimitSchema",
+      "schema_name": "LimitSchema",
+      "field_name": "limit",
+      "source": "src/pages/home/home.state.ts",
+      "source_format": "zod_mini",
+      "scope": "url_params",
+      "rules": [
+        {
+          "kind": "int"
+        },
+        {
+          "kind": "max",
+          "value": "MAX_LIMIT",
+          "inclusive": true
+        },
+        {
+          "kind": "min",
+          "value": "1",
+          "inclusive": true
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-URL-NonEmptyStringSchema",
+      "schema_name": "NonEmptyStringSchema",
+      "field_name": "nonemptystring",
+      "source": "src/pages/home/home.state.ts",
+      "source_format": "zod_mini",
+      "scope": "url_params",
+      "rules": [
+        {
+          "kind": "min_length",
+          "value": 1
+        },
+        {
+          "kind": "trim"
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-URL-PaginationSchema",
+      "schema_name": "PaginationSchema",
+      "field_name": "pagination",
+      "source": "src/pages/home/home.state.ts",
+      "source_format": "zod_mini",
+      "scope": "url_params",
+      "rules": [
+        {
+          "kind": "default",
+          "value": "DEFAULT_LIMIT"
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-URL-HomeArticleFilterSchema",
+      "schema_name": "HomeArticleFilterSchema",
+      "field_name": "homearticlefilter",
+      "source": "src/pages/home/home.state.ts",
+      "source_format": "zod_mini",
+      "scope": "url_params",
+      "rules": [
+        {
+          "kind": "default",
+          "value": "undefined"
+        },
+        {
+          "kind": "enum",
+          "values": [
+            "personal"
+          ]
+        },
+        {
+          "kind": "optional"
+        }
+      ]
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-LOGIN-email",
+      "page_id": "PAGE-LOGIN",
+      "field_name": "email",
+      "tag": "input",
+      "source": "src\\pages\\login\\login.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "email"
+        },
+        {
+          "kind": "email"
+        }
+      ],
+      "meta": {
+        "placeholder": "Email",
+        "autoComplete": "email"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-LOGIN-password",
+      "page_id": "PAGE-LOGIN",
+      "field_name": "password",
+      "tag": "input",
+      "source": "src\\pages\\login\\login.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "password"
+        }
+      ],
+      "meta": {
+        "placeholder": "Password",
+        "autoComplete": "current-password"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-REGISTER-username",
+      "page_id": "PAGE-REGISTER",
+      "field_name": "username",
+      "tag": "input",
+      "source": "src\\pages\\register\\register.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "text"
+        }
+      ],
+      "meta": {
+        "placeholder": "Username",
+        "autoComplete": "username"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-REGISTER-email",
+      "page_id": "PAGE-REGISTER",
+      "field_name": "email",
+      "tag": "input",
+      "source": "src\\pages\\register\\register.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "email"
+        },
+        {
+          "kind": "email"
+        }
+      ],
+      "meta": {
+        "placeholder": "Email",
+        "autoComplete": "email"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-REGISTER-password",
+      "page_id": "PAGE-REGISTER",
+      "field_name": "password",
+      "tag": "input",
+      "source": "src\\pages\\register\\register.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "password"
+        }
+      ],
+      "meta": {
+        "placeholder": "Password",
+        "autoComplete": "new-password"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-SETTINGS-image",
+      "page_id": "PAGE-SETTINGS",
+      "field_name": "image",
+      "tag": "input",
+      "source": "src\\pages\\settings\\settings.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "type",
+          "value": "url"
+        },
+        {
+          "kind": "url"
+        }
+      ],
+      "meta": {
+        "placeholder": "URL of profile picture",
+        "autoComplete": "photo"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-SETTINGS-username",
+      "page_id": "PAGE-SETTINGS",
+      "field_name": "username",
+      "tag": "input",
+      "source": "src\\pages\\settings\\settings.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "text"
+        }
+      ],
+      "meta": {
+        "placeholder": "Username",
+        "autoComplete": "username"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-SETTINGS-email",
+      "page_id": "PAGE-SETTINGS",
+      "field_name": "email",
+      "tag": "input",
+      "source": "src\\pages\\settings\\settings.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        },
+        {
+          "kind": "type",
+          "value": "email"
+        },
+        {
+          "kind": "email"
+        }
+      ],
+      "meta": {
+        "placeholder": "Email",
+        "autoComplete": "email"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-SETTINGS-password",
+      "page_id": "PAGE-SETTINGS",
+      "field_name": "password",
+      "tag": "input",
+      "source": "src\\pages\\settings\\settings.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "type",
+          "value": "password"
+        }
+      ],
+      "meta": {
+        "placeholder": "New Password",
+        "autoComplete": "new-password"
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-EDITOR-title",
+      "page_id": "PAGE-EDITOR",
+      "field_name": "title",
+      "tag": "input",
+      "source": "src\\pages\\editor\\editor.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "type",
+          "value": "text"
+        }
+      ],
+      "meta": {
+        "placeholder": "Article Title",
+        "autoComplete": null
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-EDITOR-description",
+      "page_id": "PAGE-EDITOR",
+      "field_name": "description",
+      "tag": "input",
+      "source": "src\\pages\\editor\\editor.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "type",
+          "value": "text"
+        }
+      ],
+      "meta": {
+        "placeholder": "What",
+        "autoComplete": null
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-EDITOR-tagList",
+      "page_id": "PAGE-EDITOR",
+      "field_name": "tagList",
+      "tag": "input",
+      "source": "src\\pages\\editor\\editor.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "type",
+          "value": "text"
+        }
+      ],
+      "meta": {
+        "placeholder": "Enter tags",
+        "autoComplete": null
+      }
+    },
+    {
+      "id": "F-VAL-HTML5-PAGE-ARTICLE-body",
+      "page_id": "PAGE-ARTICLE",
+      "field_name": "body",
+      "tag": "textarea",
+      "source": "src\\pages\\article\\article.ui.tsx",
+      "source_format": "html5_native",
+      "scope": "form",
+      "rules": [
+        {
+          "kind": "required"
+        }
+      ],
+      "meta": {
+        "placeholder": "Write a comment...",
+        "autoComplete": null
+      }
+    }
+  ],
+  "summary": {
+    "total_validations": 85,
+    "per_source": {
+      "openapi_3_0_1_to_zod_via_orval": 67,
+      "zod_mini_url_params": 5,
+      "html5_native": 13
+    },
+    "br_auto_extraction_count": 72,
+    "url_params_validation_pattern_detected": true
+  },
+  "deliverable_14_compliance": {
+    "zod_real_extraction": true,
+    "simulation_used": false,
+    "url_params_validation_pattern_extension": "★ 신규 패턴 발견 — form 만이 아닌 URL search params 도 BR 자동 추출 시점 (★ Stage 5 deliverable 14 schema 확장 후보)",
+    "adr_fe_005_match": "★ 매개체 #4 (OAS+MSW) + #13 (Zod) 통합 검증 ✅"
+  }
+}

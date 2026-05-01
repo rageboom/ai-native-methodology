@@ -1,0 +1,479 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/type-spec.schema.json (★ Stage 7-pre)",
+  "meta": {
+    "poc_id": "poc-04-mini",
+    "phase": "6-quality",
+    "captured_at": "2026-05-01",
+    "captured_by": "real",
+    "tool": "ts-morph",
+    "tool_version": "24.0.0",
+    "tsconfig": "INPUT/tsconfig.json",
+    "analyzed_files": 63
+  },
+  "types": [
+    {
+      "id": "T-UserLinksProps",
+      "kind": "type_alias",
+      "name": "UserLinksProps",
+      "declaration": "type UserLinksProps = {\r\n  user: UserResponse['user'];\r\n};",
+      "source_file": "src/app/app-layout.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-AppLoaderData",
+      "kind": "type_alias",
+      "name": "AppLoaderData",
+      "declaration": "export type AppLoaderData = Awaited<ReturnType<typeof appLoader>>;",
+      "source_file": "src/app/app.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ArticlePageLoaderData",
+      "kind": "type_alias",
+      "name": "ArticlePageLoaderData",
+      "declaration": "export type ArticlePageLoaderData = Awaited<ReturnType<typeof articlePageLoader>>;",
+      "source_file": "src/pages/article/article.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ArticleContentProps",
+      "kind": "type_alias",
+      "name": "ArticleContentProps",
+      "declaration": "type ArticleContentProps = {\r\n  article: SingleArticleResponse['article'];\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ArticleActionsBlockProps",
+      "kind": "type_alias",
+      "name": "ArticleActionsBlockProps",
+      "declaration": "type ArticleActionsBlockProps = {\r\n  article: SingleArticleResponse['article'];\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-FollowAuthorButtonProps",
+      "kind": "type_alias",
+      "name": "FollowAuthorButtonProps",
+      "declaration": "type FollowAuthorButtonProps = {\r\n  username: string;\r\n  following: boolean;\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-FavoriteArticleButtonProps",
+      "kind": "type_alias",
+      "name": "FavoriteArticleButtonProps",
+      "declaration": "type FavoriteArticleButtonProps = {\r\n  favorited: boolean;\r\n  favoritesCount: number;\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-CommentsListProps",
+      "kind": "type_alias",
+      "name": "CommentsListProps",
+      "declaration": "type CommentsListProps = {\r\n  commentsData: MultipleCommentsResponse;\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-DeleteCommentButtonProps",
+      "kind": "type_alias",
+      "name": "DeleteCommentButtonProps",
+      "declaration": "type DeleteCommentButtonProps = {\r\n  slug: string;\r\n  id: number;\r\n};",
+      "source_file": "src/pages/article/article.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-EditorPageLoaderData",
+      "kind": "type_alias",
+      "name": "EditorPageLoaderData",
+      "declaration": "export type EditorPageLoaderData = Awaited<ReturnType<typeof editorPageLoader>>;",
+      "source_file": "src/pages/editor/editor.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-EditorFormProps",
+      "kind": "type_alias",
+      "name": "EditorFormProps",
+      "declaration": "type EditorFormProps = {\r\n  article?: SingleArticleResponse['article'];\r\n};",
+      "source_file": "src/pages/editor/editor.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomePageLoaderData",
+      "kind": "type_alias",
+      "name": "HomePageLoaderData",
+      "declaration": "export type HomePageLoaderData = Awaited<ReturnType<typeof homePageLoader>>;",
+      "source_file": "src/pages/home/home.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeSearchParams",
+      "kind": "type_alias",
+      "name": "HomeSearchParams",
+      "declaration": "export type HomeSearchParams = {\r\n  limit: number;\r\n  offset: number;\r\n  feed?: 'personal';\r\n  tag?: string;\r\n};",
+      "source_file": "src/pages/home/home.state.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeNavigation",
+      "kind": "type_alias",
+      "name": "HomeNavigation",
+      "declaration": "type HomeNavigation = {\r\n  isTagActive: boolean;\r\n  isPersonalActive: boolean;\r\n  isGlobalActive: boolean;\r\n  tag: string | null;\r\n};",
+      "source_file": "src/pages/home/home.state.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeArticlesListProps",
+      "kind": "type_alias",
+      "name": "HomeArticlesListProps",
+      "declaration": "type HomeArticlesListProps = {\r\n  articles: MultipleArticlesResponse['articles'];\r\n  articlesCount: MultipleArticlesResponse['articlesCount'];\r\n  searchParams: GetArticlesParams;\r\n};",
+      "source_file": "src/pages/home/home.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeArticlePreviewCardProps",
+      "kind": "type_alias",
+      "name": "HomeArticlePreviewCardProps",
+      "declaration": "type HomeArticlePreviewCardProps = {\r\n  article: ArticlePreview;\r\n};",
+      "source_file": "src/pages/home/home.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeFavoriteButtonProps",
+      "kind": "type_alias",
+      "name": "HomeFavoriteButtonProps",
+      "declaration": "type HomeFavoriteButtonProps = {\r\n  article: ArticlePreview;\r\n};",
+      "source_file": "src/pages/home/home.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-HomeArticleListPaginationProps",
+      "kind": "type_alias",
+      "name": "HomeArticleListPaginationProps",
+      "declaration": "type HomeArticleListPaginationProps = {\r\n  searchParams: GetArticlesParams;\r\n  articlesCount: number;\r\n};",
+      "source_file": "src/pages/home/home.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-TagListProps",
+      "kind": "type_alias",
+      "name": "TagListProps",
+      "declaration": "type TagListProps = {\r\n  tags: string[];\r\n  searchParams: HomeSearchParams;\r\n};",
+      "source_file": "src/pages/home/home.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfilePageLoaderData",
+      "kind": "type_alias",
+      "name": "ProfilePageLoaderData",
+      "declaration": "export type ProfilePageLoaderData = Awaited<ReturnType<typeof profilePageLoader>>;",
+      "source_file": "src/pages/profile/profile.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileSearchParams",
+      "kind": "type_alias",
+      "name": "ProfileSearchParams",
+      "declaration": "type ProfileSearchParams = {\r\n  limit: number;\r\n  offset: number;\r\n  author?: string;\r\n  favorited?: string;\r\n};",
+      "source_file": "src/pages/profile/profile.state.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileNavigation",
+      "kind": "type_alias",
+      "name": "ProfileNavigation",
+      "declaration": "type ProfileNavigation = {\r\n  isAuthorFeedActive: boolean;\r\n  isFavoritedFeedActive: boolean;\r\n};",
+      "source_file": "src/pages/profile/profile.state.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileInfoProps",
+      "kind": "type_alias",
+      "name": "ProfileInfoProps",
+      "declaration": "type ProfileInfoProps = {\r\n  profile: ProfileResponse['profile'];\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileFollowButtonProps",
+      "kind": "type_alias",
+      "name": "ProfileFollowButtonProps",
+      "declaration": "type ProfileFollowButtonProps = {\r\n  profile: ProfileResponse['profile'];\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileArticlesListProps",
+      "kind": "type_alias",
+      "name": "ProfileArticlesListProps",
+      "declaration": "type ProfileArticlesListProps = {\r\n  articles: MultipleArticlesResponse['articles'];\r\n  articlesCount: MultipleArticlesResponse['articlesCount'];\r\n  searchParams: GetArticlesParams;\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileArticlePreviewCardProps",
+      "kind": "type_alias",
+      "name": "ProfileArticlePreviewCardProps",
+      "declaration": "type ProfileArticlePreviewCardProps = {\r\n  article: ArticlePreview;\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileFavoriteButtonProps",
+      "kind": "type_alias",
+      "name": "ProfileFavoriteButtonProps",
+      "declaration": "type ProfileFavoriteButtonProps = {\r\n  article: ArticlePreview;\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ProfileArticleListPaginationProps",
+      "kind": "type_alias",
+      "name": "ProfileArticleListPaginationProps",
+      "declaration": "type ProfileArticleListPaginationProps = {\r\n  searchParams: GetArticlesParams;\r\n  articlesCount: number;\r\n};",
+      "source_file": "src/pages/profile/profile.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-SettingsPageLoaderData",
+      "kind": "type_alias",
+      "name": "SettingsPageLoaderData",
+      "declaration": "export type SettingsPageLoaderData = Awaited<ReturnType<typeof settingsPageLoader>>;",
+      "source_file": "src/pages/settings/settings.loader.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ErrorFields",
+      "kind": "type_alias",
+      "name": "ErrorFields",
+      "declaration": "export type ErrorFields = Record<string, string[]>;",
+      "source_file": "src/shared/api/action-result.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ActionResult",
+      "kind": "type_alias",
+      "name": "ActionResult",
+      "declaration": "export type ActionResult<TSuccess extends object = Record<string, never>> =\r\n  | ({ ok: true } & TSuccess)\r\n  | { ok: false; errors: ErrorFields };",
+      "source_file": "src/shared/api/action-result.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ApiTransportError",
+      "kind": "interface",
+      "name": "ApiTransportError",
+      "properties": [
+        {
+          "name": "status",
+          "type": "number",
+          "optional": true,
+          "readonly": false
+        },
+        {
+          "name": "info",
+          "type": "Info",
+          "optional": true,
+          "readonly": false
+        },
+        {
+          "name": "headers",
+          "type": "Headers",
+          "optional": true,
+          "readonly": false
+        }
+      ],
+      "source_file": "src/shared/api/auth-fetch.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ValidationIssue",
+      "kind": "type_alias",
+      "name": "ValidationIssue",
+      "declaration": "type ValidationIssue = {\r\n  path: PropertyKey[];\r\n  message: string;\r\n};",
+      "source_file": "src/shared/api/validateSchema.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-SafeParseResult",
+      "kind": "type_alias",
+      "name": "SafeParseResult",
+      "declaration": "type SafeParseResult<TParsed> =\r\n  | { success: true; data: TParsed }\r\n  | { success: false; error: { issues: ValidationIssue[] } };",
+      "source_file": "src/shared/api/validateSchema.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-SafeParseSchema",
+      "kind": "type_alias",
+      "name": "SafeParseSchema",
+      "declaration": "type SafeParseSchema<TParsed> = {\r\n  safeParse(data: unknown): SafeParseResult<TParsed>;\r\n};",
+      "source_file": "src/shared/api/validateSchema.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-CommentCreateActionData",
+      "kind": "type_alias",
+      "name": "CommentCreateActionData",
+      "declaration": "export type CommentCreateActionData = typeof commentCreateAction;",
+      "source_file": "src/pages/article/actions/comment-create.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ArticleCreateActionData",
+      "kind": "type_alias",
+      "name": "ArticleCreateActionData",
+      "declaration": "export type ArticleCreateActionData = typeof articleCreateAction;",
+      "source_file": "src/pages/editor/actions/article-create.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ArticleUpdateActionData",
+      "kind": "type_alias",
+      "name": "ArticleUpdateActionData",
+      "declaration": "export type ArticleUpdateActionData = typeof articleUpdateAction;",
+      "source_file": "src/pages/editor/actions/article-update.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UserLoginActionData",
+      "kind": "type_alias",
+      "name": "UserLoginActionData",
+      "declaration": "export type UserLoginActionData = typeof userLoginAction;",
+      "source_file": "src/pages/login/actions/user-login.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UserRegisterActionData",
+      "kind": "type_alias",
+      "name": "UserRegisterActionData",
+      "declaration": "export type UserRegisterActionData = typeof userRegisterAction;",
+      "source_file": "src/pages/register/actions/user-register.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UserLogoutActionData",
+      "kind": "type_alias",
+      "name": "UserLogoutActionData",
+      "declaration": "export type UserLogoutActionData = typeof userLogoutAction;",
+      "source_file": "src/pages/settings/actions/user-logout.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UserUpdateActionData",
+      "kind": "type_alias",
+      "name": "UserUpdateActionData",
+      "declaration": "export type UserUpdateActionData = typeof userUpdateAction;",
+      "source_file": "src/pages/settings/actions/user-update.action.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-AsyncErrorCardProps",
+      "kind": "type_alias",
+      "name": "AsyncErrorCardProps",
+      "declaration": "type AsyncErrorCardProps = {\r\n  title: string;\r\n  fallbackMessage: string;\r\n};",
+      "source_file": "src/shared/ui/async-error-card/async-error-card.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-ErrorMessagesProps",
+      "kind": "type_alias",
+      "name": "ErrorMessagesProps",
+      "declaration": "type ErrorMessagesProps = {\r\n  errors: ErrorFields;\r\n};",
+      "source_file": "src/shared/ui/error-messages/error-messages.ui.tsx",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UseFakeProgressOptions",
+      "kind": "interface",
+      "name": "UseFakeProgressOptions",
+      "properties": [
+        {
+          "name": "isAnimating",
+          "type": "boolean",
+          "optional": false,
+          "readonly": false
+        },
+        {
+          "name": "animationDuration",
+          "type": "number",
+          "optional": true,
+          "readonly": false
+        },
+        {
+          "name": "incrementDuration",
+          "type": "number",
+          "optional": true,
+          "readonly": false
+        },
+        {
+          "name": "minimum",
+          "type": "number",
+          "optional": true,
+          "readonly": false
+        }
+      ],
+      "source_file": "src/shared/ui/global-progress-bar/use-fake-progress.ts",
+      "react_coupled": false
+    },
+    {
+      "id": "T-UseFakeProgressReturn",
+      "kind": "interface",
+      "name": "UseFakeProgressReturn",
+      "properties": [
+        {
+          "name": "progress",
+          "type": "number",
+          "optional": false,
+          "readonly": false
+        },
+        {
+          "name": "isFinished",
+          "type": "boolean",
+          "optional": false,
+          "readonly": false
+        },
+        {
+          "name": "animationDuration",
+          "type": "number",
+          "optional": false,
+          "readonly": false
+        }
+      ],
+      "source_file": "src/shared/ui/global-progress-bar/use-fake-progress.ts",
+      "react_coupled": false
+    }
+  ],
+  "summary": {
+    "total_types": 46,
+    "per_kind": {
+      "interface": 3,
+      "type_alias": 43,
+      "enum": 0,
+      "class": 0
+    },
+    "react_coupled_types": 0,
+    "framework_neutrality_score": 1
+  },
+  "react_idiom_baseline": {
+    "total_identifiers": 4438,
+    "total_react_idioms": 5,
+    "react_idiom_ratio": 0.0011,
+    "per_idiom": {
+      "useState": 3,
+      "useEffect": 2,
+      "useContext": 0,
+      "useReducer": 0,
+      "useMemo": 0,
+      "useCallback": 0,
+      "props.children": 0,
+      "React.FC": 0,
+      "JSX.Element": 0
+    },
+    "note": "★ Stage 4 = baseline 측정 (★ Stage 5 ratchet 정식화 / G3 결단)"
+  },
+  "deliverable_15_compliance": {
+    "ts_morph_real_run": true,
+    "simulation_used": false,
+    "framework_neutrality_metric_computed": true
+  }
+}
