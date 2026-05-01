@@ -168,10 +168,15 @@
 - `methodology-spec/deliverables/7-ui-ux.md` §6 보강 — component 분해 framework-coupling 위험 명시 + Screen+Journey 우선 명시
 - `methodology-spec/be-fe-separation.md` 신설 — Scenario × IR 4계층 매트릭스 inline
 
-### 5.2 carry-over (Stage 7-pre)
+### 5.2 carry-over → ★ resolved (Stage 7-pre 종결 / 2026-05-01)
 
-- 빈틈 #1 — Zod / Yup / React Hook Form rules → BR 자동 추출 절차 (별도 deliverable 또는 8 보강)
-- 빈틈 #2 — TypeScript .d.ts 산출 절차 (별도 deliverable 14 신설 검토)
+★ **Stage 7-pre 종결로 carry 해소**:
+- 빈틈 #1 (Zod / Yup / RHF rules → BR 자동 추출) → ★ deliverable 14 (form-validation-spec) 신설 / form-validation-spec.schema.json + ADR-FE-005 §2.1.1 Zod 매개체 13 추가 / rules.schema source_format enum + auto_extracted boolean 추가
+- 빈틈 #2 (TypeScript .d.ts 산출 절차) → ★ deliverable 15 (type-spec) 신설 / type-spec.schema.json + framework_neutrality_score 정량 metric
+
+→ ★ 외부 LLM 검증 빈틈 5/5 = 100% 해소.
+
+DEC-2026-05-01-v1.4-Stage-7-pre-종결 참조.
 
 ### 5.3 Stage 4 mini-PoC 검증
 

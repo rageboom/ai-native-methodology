@@ -41,6 +41,11 @@ state_sources:
   - {source_type: dom_state,    detected: false}  # 라이브러리 없으면 useRef 직접
 ```
 
+★ **form_state 진실 추출 시 deliverable 14 (form-validation-spec) cross-link 의무** (★ Stage 7-pre 신설):
+- form_state library = react_hook_form / formik / native form 감지 시 form-validation-spec 산출 의무
+- form-validation-spec → rules.json `category=fe_validation` BR 자동 등록
+- state-map.machines.cross_links 의 `link_type=validates` 가 BR-FE-* 참조
+
 ### 3.2 machine 추출
 
 | 추출 단계 | 출처 | 결정적/LLM |
