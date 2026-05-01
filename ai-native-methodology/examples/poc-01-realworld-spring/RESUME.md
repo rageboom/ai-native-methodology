@@ -183,7 +183,7 @@ F-021 임계 결정: **Option A 채택** (PoC 정지 + v1.1.2 격상). high seve
 | F-016 | ✅ phase-2-db.md §3.4 원칙 + Decision Tree + 부록 (산업 권위 7/7 매트릭스 반대) |
 | F-023 | ✅ phase-3-arch.md §3.1.1 hybrid 분기 + ADR-006 (Provisional) + architecture.schema.json `circular_dependencies[]` 보강 (3값 bc_status + 2 boolean) |
 
-**작업 산출물**: methodology-v1.1/.claude/plans/plan-v112.md + researches/{document,senior,case-{f007,f009,f016,f023},research}-v112.md + PROGRESS-v112.md (시간순 진행 로그).
+**작업 산출물** (v1.1.2 1차 사료, batch 1.5 commit 이후 폐기 / git history 참조): plan-v112 + 4 case (f007/009/016/023) + document/senior/research-v112 + PROGRESS-v112 (시간순 진행 로그).
 
 **다음**: Phase 4 진입 — 갱신 명세 적용 + DRIFT 4건 + CIRCULAR-001 + ARCH-STYLE 사용자 결정 6건.
 

@@ -1,7 +1,7 @@
 # PoC #01 Findings — 명세 빈틈 기록
 
 > 본 문서는 PoC 진행 중 발견된 **명세 빈틈을 즉시 기록**한다.
-> 종료 시 plan-methodology-v1.1.md §15 Lessons Learned로 통합.
+> 종료 시 v1.1 plan §15 Lessons Learned로 통합 (완료 — git history 참조, batch 1.5 commit 이후 폐기).
 
 ---
 

@@ -157,5 +157,5 @@ case research (8개 시스템 조사) 결과:
 - Spring Modulith Discussion #493 (Oliver Drotbohm)
 - ArchUnit FreezingArchRule documentation
 - Vaughn Vernon, "Implementing Domain-Driven Design", Ch.4
-- methodology-v1.1/.claude/researches/case-v112-f023.md (1차 사료 검증)
-- methodology-v1.1/.claude/researches/research-v112.md §2 (통합 결정)
+- v1.1 research case-v112-f023 (1차 사료 검증) — git history 참조 (commit `c72d29c` 이전 `methodology-v1.1/.claude/`)
+- v1.1 research research-v112 §2 (통합 결정) — git history 참조

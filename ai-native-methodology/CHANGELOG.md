@@ -630,12 +630,14 @@ PoC #01 (RealWorld Spring Boot) Phase 0~3 완료 + **F-021 누적 finding 임계
 
 #### Documentation (문서)
 
-- `methodology-v1.1/.claude/plans/plan-v112.md` — 1원칙 산출물 (변경 계획)
-- `methodology-v1.1/.claude/researches/document-v112.md` — 공식문서 24개 출처
-- `methodology-v1.1/.claude/researches/senior-v112.md` — 시니어 의견
-- `methodology-v1.1/.claude/researches/case-v112-{f007,f009,f016,f023}.md` — 사례 (분리 재실행)
-- `methodology-v1.1/.claude/researches/research-v112.md` — 통합 (Q1~Q9 결정 매트릭스)
-- `methodology-v1.1/.claude/PROGRESS-v112.md` — 진행 로그 (시간순)
+> ※ v1.1.2 작업 산출물 (`methodology-v1.1/.claude/`) 은 batch 1.5 (commit `c72d29c` 이후) 에서 폐기. 1차 사료는 git history 에서 조회 가능.
+
+- `plan-v112.md` — 1원칙 산출물 (변경 계획)
+- `researches/document-v112.md` — 공식문서 24개 출처
+- `researches/senior-v112.md` — 시니어 의견
+- `researches/case-v112-{f007,f009,f016,f023}.md` — 사례 (분리 재실행)
+- `researches/research-v112.md` — 통합 (Q1~Q9 결정 매트릭스)
+- `PROGRESS-v112.md` — 진행 로그 (시간순)
 
 ### Migration Guide (이전 사용자용)
 

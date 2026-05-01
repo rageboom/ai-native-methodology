@@ -11,7 +11,7 @@
 
 - read 자산: `output/rules/rules.json` (BR 18건) / `output/domain/domain.json` (AR 5개) / `output/inventory/stack-detection.md` / `output/antipatterns-partial/...`
 - read 방법론 명세: `methodology-spec/workflow/phase-4-5-formal-spec.md` / `tools/drift-validator/README.md` / `examples/poc-02-realworld-springboot3/output/formal-spec/...`
-- 산출: `.claude/plans/plan-poc03-phase4.5.md`
+- 산출: `.claude/plans/plan-poc03-phase4.5.md` (★ batch 1.5 commit 이후 폐기, git history 참조)
   - 형식화 BR 5건 / AR 3개 / UC 5개 (초안) → 33 산출 파일 (예상)
   - 위험 5건 식별 + 4원칙 적용 절차 확정
 
