@@ -3,13 +3,14 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-01 (★ **v1.4.0-dev 라인 / FE 트랙 Stage 3-1 종결** / 본체 격상 16+ 항목 적용 / freeze 해제 / v1.3.0 MINOR + v1.3.1 PATCH 보존)
+**기준일**: 2026-05-01 (★ **v1.4.0-dev 라인 / FE 트랙 Stage 3-2 종결** / 본체 격상 누적 28+ 항목 적용 / freeze 해제 / v1.3.0 MINOR + v1.3.1 PATCH 보존)
 
 ---
 
 ## 방법론 본체 버전
 
-- **★★★ v1.4.0-dev 라인 (2026-05-01) — Stage 3-1 종결 ✅ 현재** — 본체 격상 16+ 항목 적용 (ADR 4 + schema 3 + deliverable 3 + workflow 4 + 도구 시범 1). ★ 사상 기둥 3 (ADR-FE-001/002/005) + ★ 정량 모델 격상 (ADR-009 §2.4) + ★ no-simulation 정책 강화 (visual schema 강제). 사용자 7 요구사항 6/7 = 100% 도달. cross-check 권고 3건 반영 (DTCG / WCAG 2.2 / ICU MF2). drift-validator FE corpus 14→**15 pass**. DEC-2026-05-01-v1.4-Stage-3-1-종결.
+- **★★★ v1.4.0-dev 라인 (2026-05-01) — Stage 3-2 종결 ✅ 현재** — 본체 격상 2차 12+ 항목 적용 (ADR 2 + schema 5 + deliverable 4 + migration-cautions-fe + phase-6 보강 + 도구 확장 1). ★ G2-1 (a11y/i18n/정적보안 v1.4 포함) + G2-2 (legacy Tier 1~4 + Strangler) + G2-4 (ADR-001 §명시적 제외 갱신 — 운영 NFR 좁힘) 모두 정식 반영. ★ schema if/then 강제 패턴 4 영역 적용 (a11y / i18n / static-security / legacy). ★ formal-spec-link-validator FE 모드 4→**8 pass** (BE 회귀 0). 사용자 7 요구사항 6/7 = 100% 도달. DEC-2026-05-01-v1.4-Stage-3-2-종결.
+- **v1.4.0-dev Stage 3-1 (2026-05-01) ✅** — 본체 격상 16+ 항목 (ADR 4 + schema 3 + deliverable 3 + workflow 4 + 도구 시범 1). ★ 사상 기둥 3 (ADR-FE-001/002/005) + ★ 정량 모델 격상 (ADR-009 §2.4) + ★ no-simulation 정책 강화 (visual schema 강제). cross-check 권고 3건 반영 (DTCG / WCAG 2.2 / ICU MF2). drift-validator FE corpus 14→15 pass. DEC-2026-05-01-v1.4-Stage-3-1-종결.
 - **v1.4.0-dev Stage 2 (2026-05-01) ✅** — Gate 1/2/3 × 4 = **12 결정 모두 Senior 권고 채택**. spectrum (Modern+jQuery+JSP 예외) / 시나리오 B-Lite / schema 분리 / 매개체 12 / 비기능 a11y+i18n+정적보안 v1.4 / legacy Tier 1~4 / BE/FE 분리 + ADR-FE-004 / ADR-001 갱신 / mini-PoC Stage 3-1 후 / PoC RealWorld only / 신뢰도 0.80 / Sprint mini 1주 + 본격 4-6. DEC-2026-05-01-v1.4-Stage-2-Gate-결단.
 - **v1.4.0-dev Stage 1 (2026-05-01) ✅** — research × 3 (공식문서 / 산업 / Senior) 완료. 3 에이전트 합의: Scenario B-Lite / 권위 매개체 12 채택 / 빈틈 Top 5. DEC-2026-05-01-v1.4-Stage-1-research-종결.
 - **v1.4.0-dev Stage 0 (2026-05-01) ✅** — FE 트랙 정식 시작. 사용자 진단 "FE 분석 방법이 없잖아" → research-first. 8 Stage 분할. 외부 plan = `~/.claude/plans/be-foamy-jellyfish.md` (3 에이전트 점검 v2). DEC-2026-05-01-v1.4-FE-트랙-진입.
@@ -52,7 +53,8 @@
 | v1.4.0-dev Stage 0 | freeze 해제 + FE 트랙 진입 + 8 Stage 분할 합의 + plan/DEC/STATUS/INDEX/CHANGELOG/memory | ✅ (2026-05-01) |
 | v1.4.0-dev Stage 1 | research × 3 (공식/산업/Senior) — 9Q × 27 답 + 진단 보고서 + Stage 2 Gate 입력 12 결정 | ✅ (2026-05-01) |
 | **v1.4.0-dev Stage 2** | Gate 1/2/3 × 4 = 12 결정 모두 Senior 권고 채택 / Stage 3-1 진입 자료 확정 | ✅ (2026-05-01) |
-| **★★★ v1.4.0-dev Stage 3-1** | 본체 격상 1차 — ADR-FE-001/002/005 신설 + ADR-009 §2.4 갱신 + state-map/visual-manifest schema 신설 + ui-spec.schema 확장 + deliverable 8/9 신설 + 7 보강 + phase-5-2 분할 (a/b/c) + ★ drift-validator FE corpus 14→15 pass + ★ formal-spec-link-validator FE 진단 (Stage 3-2 carry). cross-check 1차 사료 권고 3건 반영 (DTCG 정확한 인용 / WCAG 2.2 ratchet / ICU MF2 단계). | ✅ **본 세션 (2026-05-01)** |
+| **v1.4.0-dev Stage 3-1** | 본체 격상 1차 — ADR-FE-001/002/005 신설 + ADR-009 §2.4 갱신 + state-map/visual-manifest schema 신설 + ui-spec.schema 확장 + deliverable 8/9 신설 + 7 보강 + phase-5-2 분할 (a/b/c) + ★ drift-validator FE corpus 14→15 pass + ★ formal-spec-link-validator FE 진단 (Stage 3-2 carry). cross-check 1차 사료 권고 3건 반영 (DTCG 정확한 인용 / WCAG 2.2 ratchet / ICU MF2 단계). | ✅ (2026-05-01) |
+| **★★★ v1.4.0-dev Stage 3-2** | 본체 격상 2차 — ADR-FE-003 신설 + ADR-001 §명시적 제외 갱신 + a11y-spec/i18n-spec/static-security-spec/legacy-spectrum schema 신설 + rules.schema 확장 + deliverable 10/11/12/13 신설 + migration-cautions-fe 신설 + phase-6 보강 + ★ formal-spec-link-validator FE 모드 확장 (4→8 pass). G2-1+G2-2+G2-4 정식 반영. Strangler Pattern 채택. schema if/then 강제 4 영역 (a11y/i18n/security/legacy). | ✅ **본 세션 (2026-05-01)** |
 
 ---
 

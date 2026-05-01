@@ -159,7 +159,66 @@ Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback
 - Stage 3-2 — a11y / i18n / 정적보안 deliverable + legacy 산출물 3종 + ADR-FE-003 + ADR-001 §명시적 제외 갱신 + migration-cautions-fe.md + rules.schema.json br_type fe_validation enum 확장 + formal-spec-link-validator FE 적용 (Stage 3-1 carry)
 - Stage 4 mini-PoC — RealWorld React fork (1주 fail-fast) + Playwright + axe-core 진짜 실행 1회 (★ no-simulation 정책 첫 FE 실현) + ui-spec / state-map / visual-manifest 1 page × 2 viewport 검증 + drift-validator FE 본격 적용 + 신뢰도 0.75+ 도달 검증
 
-추정 분량: 2~4 세션. 다음 trigger = 사용자 Stage 3-1 진입 승인.
+추정 분량: 2~4 세션.
+
+### ★★★ Stage 3-2 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 2차 12+ 항목 적용**. DEC-2026-05-01-v1.4-Stage-3-2-종결.md.
+
+#### Phase 별 산출 (5 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-003 (legacy spectrum + Strangler Pattern) 신설 + ADR-001 §명시적 제외 갱신 (운영 NFR 좁힘) + plan-v14-stage-3-2.md | `4d8eb18` (3 file / 794 ins) |
+| **B** | a11y-spec / i18n-spec / static-security-spec / legacy-spectrum schema 신설 + rules.schema FE category 4종 확장 | `deefd62` (5 file / 771 ins) |
+| **C+D** | deliverable 10 (a11y) / 11 (i18n) / 12 (static-security) / 13 (legacy-spectrum) 신설 + migration-cautions-fe.md 신설 + phase-6-quality 보강 | `3feb8fd` (6 file / 913 ins) |
+| **E** | formal-spec-link-validator FE 모드 확장 (`--mode=be|fe|both`) + 4→**8 pass** ✅ (BE 회귀 0) | `64fd5b0` (4 file / 271 ins) |
+| **F** | DEC-Stage-3-2-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### G2 결단 정식 반영 (Stage 2 Gate)
+
+- **G2-1** (a11y/i18n/정적보안 v1.4) — deliverable 10/11/12 신설 + schema 3종
+- **G2-2** (legacy Tier 1~4) — ADR-FE-003 + deliverable 13 + legacy-spectrum schema
+- **G2-4** (ADR-001 §명시적 제외) — "비기능 측정" → ★ "운영 NFR 측정" 좁힘 + 정적 NFR v1.4 포함
+
+#### Strangler Fig Pattern 채택 (Martin Fowler 2004)
+
+- 산업 사례 (Fowler / Sam Newman) 정합 — rewrite ❌ / strangle ✅
+- 4 approach 명시 + ★ schema enum `big_bang_rewrite_not_recommended`
+
+#### Cross-check 권고 3건 schema 강제 (Stage 3-1 carry)
+
+- DTCG `spec_source` URL 고정 + `spec_status=community_group_report`
+- WCAG 2.1-AA baseline + 2.2-AA ratchet (a11y-spec.schema)
+- ICU MF2 사용 시 ★ MF1 폴백 의무 (i18n-spec.schema if/then 강제)
+
+#### no-simulation 정책 schema 강제 4 영역
+
+| schema | if/then |
+|---|---|
+| a11y-spec | captured_by ∈ real → 5종 물증 의무 |
+| i18n-spec | mf2_used=true → mf1_fallback_present 의무 |
+| static-security-spec | captured_by ∈ real → 5종 물증 의무 + runtime_check_required 표기 |
+| legacy-spectrum | primary_tier=mixed → mixed_breakdown 의무 |
+
+#### 사용자 7 요구사항 진척도 (Stage 3-2 종결)
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% (axe-core / ICU / Semgrep 추가) |
+| 2. AI + 사람 동시 이해 | ★ 100% (schema 5 + deliverable 4 신설) |
+| 3. UI visible 차원 | ★ 100% (Stage 3-1 도달 유지) |
+| 4. 비즈니스 로직 동일 | ★ 100% (rules.schema FE category 4종 확장) |
+| 5. BE/FE 분리 운영 | ⏳ Stage 6 (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% (Phase A~F commit 단위) |
+| 7. 모든 단계 기록 | ★ 100% (5 commit + DEC) |
+
+→ ★ 6/7 = 100% 도달 유지 (Stage 3-1 동일).
+
+### Stage 4 + Stage 6 진입 자료
+
+- **Stage 4 mini-PoC** — Playwright + axe-core + ICU runtime + Semgrep/ESLint security 진짜 실행 (★ no-simulation 정책 첫 FE 본격 실현)
+- **Stage 6 ADR-FE-004** — BE/FE 분리 운영 정책 정식 (요구 5 = 100% 도달) / methodology-spec/be-fe-separation.md / Tier 4 (JSP) BE/FE 통합 산출 정식
 
 ### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
 
