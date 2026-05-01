@@ -75,6 +75,30 @@
             "enum": ["5.A_db_logic", "5.B_fe_logic", "5.C_config_policy", "5.D_external_dep", "multiple"],
             "description": "Phase 4 어느 영역에서 추출되었는가"
           },
+          "source_format": {
+            "type": "string",
+            "enum": [
+              "zod",
+              "yup",
+              "joi",
+              "react_hook_form",
+              "class_validator",
+              "ajv",
+              "vest",
+              "manual",
+              "spring_validator",
+              "javax_validation"
+            ],
+            "description": "★ v1.4 Stage 7-pre 신규. fe_validation BR 의 추출 source library (form-validation-spec.schema.json 정합). category=fe_validation 시 권장. BE 영역 (spring_validator / javax_validation) 도 cover."
+          },
+          "auto_extracted": {
+            "type": "boolean",
+            "description": "★ v1.4 Stage 7-pre 신규. true 시 form-validation-spec 또는 class-validator decorator 등으로 부터 자동 추출됨. false 시 사람 작성 / LLM 추론."
+          },
+          "auto_extraction_source_id": {
+            "type": "string",
+            "description": "★ v1.4 Stage 7-pre 신규. auto_extracted=true 시 source 산출물 ID (예: F-VAL-LOGIN-EMAIL-001)."
+          },
           "source_evidence": {
             "type": "array",
             "description": "추출 근거 (파일 + 라인)",
