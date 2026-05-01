@@ -1,0 +1,80 @@
+# confidence-meta.yaml — Stage 4 mini-PoC 신뢰도
+# ★ ADR-009 단계 모델 적용
+
+poc_id: poc-04-mini
+phase: stage-4-종결
+captured_at: 2026-05-02
+captured_by: real
+
+# ★★ 신뢰도 산출 (ADR-009 §2.4 정량 모델)
+
+base_confidence: 0.70   # Phase 6 종결 base
+
+increments:
+  - factor: "★ 진짜 도구 3종 실행 (ts-morph + Playwright + axe-core)"
+    delta: +0.10
+    reason: "★ ADR-009 단계 4 — no-simulation 정책 정합 / 단계 3 (자동 검증 통과) 도달 후 단계 4 (진짜 외부 도구) 첫 실행"
+  - factor: "★ form-validation-spec 진짜 추출 (★ Stage 7-pre deliverable 14 핵심 입증)"
+    delta: +0.05
+    reason: "★ 85 validation / 72 BR 자동 등록 / OpenAPI 67 + Zod-mini URL 5 + HTML5 13 / 신규 deliverable 첫 외부 적용"
+  - factor: "★ IR 4계층 정합도 0.99 (★ ADR-FE-006 명제 1/2/3 정합)"
+    delta: +0.05
+    reason: "★ react_idiom_count_in_IR = 0 / framework_neutrality_score 0.99 / baseline 9%p 초과"
+  - factor: "★ formal-spec-link-validator FE 6/6 인식"
+    delta: +0.02
+    reason: "★ 본체 도구 첫 외부 적용 / Stage 3-2 보강 정합"
+
+decrements:
+  - factor: "Semgrep 진짜 실행 부재 (carry)"
+    delta: -0.05
+    reason: "★ no-simulation 정책 패널티 / Windows 환경 부재 / 사용자 위임 명시"
+  - factor: "drift-validator state-map schema 미지원"
+    delta: -0.02
+    reason: "★ V1 검증 부분 부재 (★ V2 IR 4계층 매트릭스로 우회 검증) / 본체 도구 격상 후보"
+
+raw_confidence: 0.85    # 0.70 + 0.10 + 0.05 + 0.05 + 0.02 - 0.05 - 0.02
+
+# ★★★ 단계 평가 (ADR-009)
+adr_009_stage:
+  current: 4
+  description: "★ 진짜 외부 도구 1회 실행 (★ no-simulation 정책 충족)"
+  next_target: 5   # ★ Stage 5 본격 PoC #04 (multiple PoC 합산)
+
+# ★ Stage 5 진입 자격 (research G5)
+stage_5_eligibility:
+  사상_정합: ✅ 충족 (round-trip ❌ / framework-neutral 100% / 이중 렌더링)
+  IR_정합도: ✅ 0.99 (target 0.90)
+  도구_3종: ✅ ts-morph + Playwright + axe-core
+  finding: ✅ 4건 (target ≤ 10)
+  신뢰도: ✅ 0.85 (target 0.75+)
+  carry_items: 3
+  carry_재분류:
+    - i18n: "★ 적용 대상 부재 (carry ❌)"
+    - semgrep: "★ 환경 carry ✅"
+    - drift_validator: "★ 본체 도구 carry ✅ — Stage 5 + adoption 합산 후 격상"
+  실_carry: 2
+  결단: "★ ★ Stage 5 진입 ✅ (★ Senior 권고 B 옵션 / 사상 정합 비협상 충족)"
+
+# 정합
+no_simulation_compliance:
+  static_tool_simulated: false
+  ai_persona_used: false
+  evidence: "★ ts-morph + Playwright + axe-core 3종 진짜 실행 / Semgrep carry + grep fallback 명시 / drift-validator + formal-spec-link-validator 본체 도구 진짜 실행"
+section_8_1_compliance:
+  단일_poc_과적합_회피: ✅
+  본체_격상_금지: ✅ (★ Stage 4 finding 본체 격상 ❌ 절대)
+  patterns_검증_carry: "★ Stage 5 PoC #04 + adoption 트랙 합산 후 본체 격상 평가"
+adr_fe_006_compliance:
+  명제_1_framework_neutral: ✅ 100%
+  명제_2_screen_journey_priority: ✅ 정합
+  명제_3_4계층_매핑: ✅ 100%
+
+# 사용자 7 요구사항 검증
+user_7_requirements_verified:
+  1_산출물_마이그_테스트: "✅ form-validation-spec 자동 추출 1회 입증 (★ deliverable 14)"
+  2_AI_사람_동시이해: "✅ 이중 렌더링 정합 검증 (state-map.json + state-map.mermaid 짝 / formal-spec-link-validator FE 6/6)"
+  3_UI_visible: "✅ visual-manifest.json + 2 snapshot 진짜 baseline (★ deliverable 9)"
+  4_비즈니스로직_동일: "✅ state-map 5 SM (SCXML+XState 호환) + 9 BR 추출"
+  5_BE_FE_분리: "✅ Scenario A 분리 default 적용 (★ ADR-FE-004) / openapi.yaml 분리 ground truth"
+  6_큰_뭉텅이_승인제: "✅ Stage 4 진입 시 G1~G5 일괄 승인 적용"
+  7_모든_단계_기록: "✅ Day 1~5 commit 5건 + 4 finding 등록 + ir-4layer-matrix.md"
