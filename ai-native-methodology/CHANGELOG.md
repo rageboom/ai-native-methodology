@@ -312,12 +312,52 @@ Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback
 - **Stage 5** 본격 PoC #04 — 9 deliverable (7~15) + a11y + i18n + static-security + legacy + form-validation + type-spec
 - **Stage 7** v1.4.0 MINOR release 결단 (Stage 5 검증 후)
 
-### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
+### ★★★ BE Sprint 5+ carry-over 종결 (환경 무관 부분 / 2026-05-01 본 세션)
 
-- Semgrep / PMD / OSV-Scanner 환경 의존
-- vacuum / openapi-changes / corpus 14→20쌍 / drift-validator phase-flow 비교기 / ADR-010 baseline mode wrapper
+★★★ **drift-validator v0.1.0 → v0.2.0 / 3 도구 unit test 53/53 pass / 본체 phase-flow drift 0 자가 입증**. DEC-2026-05-01-Sprint-5-carryover-종결.md.
 
-본 v1.4 FE 트랙과 **병행 가능**. 우선순위 충돌 없음.
+#### Phase 별 산출 (4 commit + 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | corpus 14 → 19쌍 (+6 신규 / multi-trigger / extra-event / multi-actor / extra-message / FE form / FE missing-error) + corpus.test.js +6 test (15 → 21) | `7b9d4b2` (14 file / +437) |
+| **B** | drift-validator phase-flow 비교기 신설 — normalize-phase-flow.js + compare-phase-flow.js + cli.js 분기 + corpus 2쌍 + 4 test | `1ab6d14` (10 file / +316) |
+| **C** | tools/_shared/baseline.js 공용 이동 + drift-validator/src/baseline.js re-export shim + DTV cli.js import path 갱신 + DTV baseline.test.js 신설 (4 test) + drift-validator v0.1.0 → ★ v0.2.0 | `8545e47` (6 file / +203 / -112) |
+| **D** | static-runner SARIF→finding 어댑터 (sarif-to-finding.js) + cli.js --baseline/--ratchet/--write-baseline 통합 + baseline-mode.test.js (5 test) | `f82e6fa` (4 file / +209) |
+| **F** | DEC-Sprint-5-carryover-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### ★ 정량 결과
+
+| 도구 | 보강 전 | 보강 후 |
+|---|---|---|
+| drift-validator | v0.1.0 / 23 test | ★ **v0.2.0 / 33 test** (corpus 25 + baseline 8) |
+| decision-table-validator | 7 test | ★ **11 test** (+4 baseline) |
+| static-runner | 4 test | ★ **9 test** (+5 baseline-mode) |
+| **3 도구 합계** | 34 test | ★★ **53/53 pass** ✅ |
+
+#### ★★★ 본체 SSOT 자가 검증 (★ 핵심)
+
+```
+$ node tools/drift-validator/src/cli.js methodology-spec/workflow/phase-flow.json
+[phase-flow] 0 breaking / 0 non-breaking / 0 info ✅
+```
+
+→ 본체 phase-flow.json + phase-flow.mermaid 짝 정합도 **drift 0** 입증. v1.4 quality 격상 강한 데이터.
+
+#### ★ ADR-010 §2.5 정합 도달
+
+| 도구 | 단계 | baseline 통합 |
+|---|---|---|
+| drift-validator | ADR-009 §2.1 단계 3 | ✅ |
+| decision-table-validator | 단계 3 | ✅ |
+| static-runner | 단계 5 (Semgrep/PMD) | ✅ (★ 진짜 실행 자체는 환경 의존) |
+
+### Sprint 6 carry-over (★ 환경 의존만 잔여)
+
+- Semgrep / PMD / OSV-Scanner 진짜 실행 1회 (★ Java 환경 필요)
+- vacuum / openapi-changes 외부 도구 통합 (별도 작업)
+
+본 v1.4 FE 트랙 + Sprint 5+ carry-over 와 **독립 병행 가능**.
 
 ### adoption workspace 영향
 
