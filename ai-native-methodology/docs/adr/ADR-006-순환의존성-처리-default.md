@@ -121,13 +121,18 @@ case research (8개 시스템 조사) 결과:
 - "domain-legitimate cycle" 자동 분류는 산업 도구 어디에도 없음 → 전적으로 사람 결정에 의존
 - v1.2 Context Map 도입 시 분류 자동화 가능성 (현재는 LLM 추론으로도 부정확)
 
-### Provisional 사유
+<details>
+<summary>원래 Provisional 사유 (★ v1.2.3 final 격상으로 해소 — 역사 보존)</summary>
 
-본 ADR 은 **PoC #01 (모놀리스, BC 미정의) 단일 케이스**에 기반. 다음 사례에서 재검토 필요:
+본 ADR 은 v1.1 시점 **PoC #01 (모놀리스, BC 미정의) 단일 케이스**에 기반했었음. 당시 다음 사례에서 재검토 필요로 분류:
 - PoC #02 (마이크로서비스): BC 가 모듈 경계와 일치 → bc_status=different default 가 더 적합할 수 있음
 - 사내 멀티 도메인 시스템: 도메인 분리 강제 정책 (different = always high)
 
-→ `revisit_at: PoC #02 완료 시점` 명시.
+→ 당시 `revisit_at: PoC #02 완료 시점` 명시.
+
+**해소** (2026-04-30, v1.2.3 final 격상): PoC #02 + PoC #03 검증 완료 (line 10~19) — hybrid default 가 3 platform 모두 정합 입증. revisit 사유 해소.
+
+</details>
 
 ---
 

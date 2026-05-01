@@ -82,14 +82,16 @@ drift-validator --baseline .ai-native-methodology/baseline.yml --ratchet
 
 ### 2.5 본 방법론 도구 적용
 
+★ 본 정책 (baseline + ratchet) 은 **ADR-009 §2.1 단계 3 (자동 검증 도구 — drift-validator / decision-table-validator)** 와 함께 작동. 단계 3 도구의 기본 동작 + ratchet mode 추가 → 신규 결함만 차단 / 기존 baseline 결함은 건수만 추적. 단계 5 (진짜 외부 도구 — Semgrep / PMD) 도 동일 패턴으로 적용 가능.
+
 ```bash
-# drift-validator
+# drift-validator (ADR-009 §2.1 단계 3 + ratchet)
 node tools/drift-validator/src/cli.js <dir> --baseline .ai-native-methodology/drift-baseline.yml --ratchet
 
-# decision-table-validator
+# decision-table-validator (ADR-009 §2.1 단계 3 + ratchet)
 node tools/decision-table-validator/src/cli.js <dir> --baseline .ai-native-methodology/dmn-baseline.yml --ratchet
 
-# static-runner (Semgrep / PMD)
+# static-runner (ADR-009 §2.1 단계 5 — 진짜 외부 도구 Semgrep / PMD)
 node tools/static-runner/src/cli.js --baseline-mode ratchet
 ```
 
