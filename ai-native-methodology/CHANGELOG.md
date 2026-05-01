@@ -220,6 +220,57 @@ Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback
 - **Stage 4 mini-PoC** — Playwright + axe-core + ICU runtime + Semgrep/ESLint security 진짜 실행 (★ no-simulation 정책 첫 FE 본격 실현)
 - **Stage 6 ADR-FE-004** — BE/FE 분리 운영 정책 정식 (요구 5 = 100% 도달) / methodology-spec/be-fe-separation.md / Tier 4 (JSP) BE/FE 통합 산출 정식
 
+### ★★★ Stage 6 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 8 항목 + 사용자 요구 7/7 = 100% 도달 = v1.4 본체 quality 격상 완성**. DEC-2026-05-01-v1.4-Stage-6-종결.md.
+
+#### Phase 별 산출 (3 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-004 (BE/FE 분리 3 Scenario) + ★ ADR-FE-006 (framework-neutral IR — 외부 LLM 검증 정면 대응) 신설 + plan-v14-stage-6.md + STATUS 압축 정비 이력 등재 | `5650e1f` (4 file / 683 ins) |
+| **B** | be-fe-separation.md 신설 + ADR-FE-001 §6 / ADR-FE-003 §2.4 carry → resolved + deliverable 7 §6.5 보강 + phase-0 §3.4 보강 + legacy-spectrum.schema tier_4_be_fe_handling enum | `2fafd52` (6 file / 235 ins / 9 del) |
+| **F** | DEC-Stage-6-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 핵심 결단
+
+- **3 Scenario** (ADR-FE-004) — A 분리 default (사용자 사내 React+TS+TanStack 정합) / B JS 풀스택 (Next.js / Nuxt / Remix / Astro) / C JSP (Tier 4 통합)
+- **★ framework-neutral IR 사상** (ADR-FE-006) — 외부 LLM 검증 정면 대응 / IR 4계층 매트릭스 (L1 Domain / L2 Interaction / L3 Contract / L4 Presentation) 정식 매핑 / Screen+Journey 우선 / Component 분해 framework-coupling 위험
+- **Stage 3-1/3-2 carry 종결** — Tier 4 (JSP) BE/FE 통합 산출 절차 정식
+
+#### 외부 LLM 검증 빈틈 5건 처리
+
+| # | 빈틈 | 처리 |
+|---|---|---|
+| 1 | Zod / Yup / RHF rules → BR 자동 추출 절차 | ❌ Stage 7-pre carry |
+| 2 | TypeScript .d.ts 산출 절차 | ❌ Stage 7-pre carry |
+| 3 | "프레임워크 중립 IR" 사상 명시화 | ✅ ★ ADR-FE-006 신설 |
+| 4 | Component 분해 framework-coupling 위험 | ✅ ADR-FE-006 §2.3 + deliverable 7 §6.5 |
+| 5 | Screen+Journey 우선 / Component 후순위 | ✅ ADR-FE-006 §2.2 + deliverable 7 §6.5 |
+
+#### ★★★ 사용자 7 요구사항 7/7 = 100% 도달 (★ v1.4 본체 quality 격상 완성)
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% |
+| 2. AI + 사람 동시 이해 | ★ 100% |
+| 3. UI visible 차원 | ★ 100% |
+| 4. 비즈니스 로직 동일 | ★ 100% |
+| **5. BE/FE 분리 운영** | ★ **100% NEW** (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% |
+| 7. 모든 단계 기록 | ★ 100% |
+
+→ ★★★ **7/7 = 100% 완성 / Stage 7 v1.4.0 release 진입 자격 도달**.
+
+#### FE 영역 ADR 6 개 누적 (Stage 3-1/3-2/6)
+
+- ADR-FE-001 (FE 추출기 가정) / 002 (이중 렌더링 FE) / 003 (legacy + Strangler) / 004 (BE/FE 분리) / 005 (권위 매개체 12) / ★ 006 (framework-neutral IR)
+
+### Stage 4 + Stage 7-pre 진입 자료
+
+- **Stage 4 mini-PoC** — RealWorld React fork (1주 fail-fast) + Playwright/axe-core/ICU/Semgrep 진짜 실행 / ★ ADR-FE-006 IR 4계층 정합도 검증 의무 (React 관용구 IR 잔존 finding 등록)
+- **Stage 7-pre** — 외부 LLM 검증 빈틈 #1 (Zod/Yup/RHF → BR fe_validation 자동 추출) + #2 (TypeScript .d.ts 산출 — 별도 deliverable 14 검토)
+
 ### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
 
 - Semgrep / PMD / OSV-Scanner 환경 의존
