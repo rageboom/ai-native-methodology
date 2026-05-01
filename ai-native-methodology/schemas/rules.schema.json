@@ -30,8 +30,19 @@
           },
           "category": {
             "type": "string",
-            "enum": ["validation", "policy", "calculation", "authorization", "workflow", "integration"],
-            "description": "규칙 분류"
+            "enum": [
+              "validation",
+              "policy",
+              "calculation",
+              "authorization",
+              "workflow",
+              "integration",
+              "fe_validation",
+              "fe_authorization",
+              "fe_a11y",
+              "fe_i18n"
+            ],
+            "description": "규칙 분류. ★ v1.4 Stage 3-2 — FE 영역 4종 추가 (fe_validation / fe_authorization / fe_a11y / fe_i18n). state-map.json `validates` cross-link 정합 + a11y-spec / i18n-spec cross-link."
           },
           "bounded_context": {
             "type": "string",
