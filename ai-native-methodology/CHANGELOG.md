@@ -107,6 +107,58 @@ Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback
 - ★ 보강: 7-ui-ux.md (legacy Tier 1~4 fallback) + ui-spec.schema.json (event_handlers / api_calls / suspense_boundary / framework enum 확장)
 - ★ 도구 시범: drift-validator FE 적용 (state-map.json ↔ state-map.mermaid) / formal-spec-link-validator FE cross-link
 
+### ★★★ Stage 3-1 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 16+ 항목 적용**. DEC-2026-05-01-v1.4-Stage-3-1-종결.md.
+
+#### Phase 별 산출 (5 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-001/002/005 신설 + ADR-009 갱신 + plan-v14-stage-3-1.md | `6639df7` (5 file / 1267 ins) |
+| **B** | state-map.schema + visual-manifest.schema 신설 + ui-spec.schema 확장 | `c82d545` (3 file / 788 ins) |
+| **C+D** | deliverable 8/9 신설 + 7 보강 + phase-5-2 a/b/c 분할 + 기존 stub | `d2e12b4` (7 file / 1269 ins / 202 del) |
+| **E1** | drift-validator FE corpus 1쌍 + test 14→**15 pass** | `9c0729c` (3 file / 26 ins) |
+| **E2** | formal-spec-link-validator FE 진단 (★ 도구 확장 carry — Stage 3-2 또는 Sprint 5+) | (read-only) |
+| **F** | DEC-Stage-3-1-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 사상 기둥 3 (★ ADR-FE 시리즈)
+
+- **ADR-FE-001** (FE 추출기 가정) — spectrum Tier 1~4 cover + 한 방향 추출 사상 + BE Phase 0~6 ↔ FE Phase 0~6 매핑
+- **ADR-FE-002** (이중 렌더링 FE 적용) — ADR-008 의 FE 영역 적용 + ★ visual 예외 (binary 진실 모델)
+- **ADR-FE-005** (권위 매개체 12 채택) — sub-agent cross-check 1차 사료 검증 완료
+
+#### Cross-check 권고 3건 반영 (옵션 Y)
+
+1. DTCG 정확한 인용 — "Final Community Group Report" 명시 + spec URL 고정
+2. WCAG 2.1 AA + ★ 2.2 AA ratchet path 명시 (ADR-010 baseline+ratchet 정합)
+3. ICU MF2 채택 단계 (spec stable / runtime preview) + MF1 폴백 병기
+
+#### no-simulation 정책 강화
+
+- visual-manifest.schema.json `captured_by` enum — `simulation` 시 -5%p 패널티 + `simulation_reason` 의무 (★ schema if/then 강제)
+- ADR-009 §2.2.1 FE 도구 enum 신설 — `playwright_real` / `axe_core_real` / `storybook_csf_real` / `msw_handler_check` / `percy_real` / `chromatic_real`
+- phase-5-2-c-visual.md §3.2 — Playwright + axe-core 진짜 실행 의무 절차
+
+#### 사용자 7 요구사항 진척도
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% (ADR-FE-005) |
+| 2. AI + 사람 동시 이해 | ★ 100% (ADR-FE-002 + schema 3 + deliverable 3) |
+| 3. UI visible 차원 | ★ 100% (deliverable 9 + schema B2 + workflow D3) |
+| 4. 비즈니스 로직 동일 | ★ 100% (deliverable 8 + schema B1 + workflow D2) |
+| 5. BE/FE 분리 운영 | ⏳ Stage 6 (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% (Phase A~F commit 단위 분할) |
+| 7. 모든 단계 기록 | ★ 100% (5 commit + DEC) |
+
+→ ★ 6/7 = 100% (요구 5 = Stage 6 carry).
+
+### Stage 3-2 + Stage 4 진입 자료
+
+- Stage 3-2 — a11y / i18n / 정적보안 deliverable + legacy 산출물 3종 + ADR-FE-003 + ADR-001 §명시적 제외 갱신 + migration-cautions-fe.md + rules.schema.json br_type fe_validation enum 확장 + formal-spec-link-validator FE 적용 (Stage 3-1 carry)
+- Stage 4 mini-PoC — RealWorld React fork (1주 fail-fast) + Playwright + axe-core 진짜 실행 1회 (★ no-simulation 정책 첫 FE 실현) + ui-spec / state-map / visual-manifest 1 page × 2 viewport 검증 + drift-validator FE 본격 적용 + 신뢰도 0.75+ 도달 검증
+
 추정 분량: 2~4 세션. 다음 trigger = 사용자 Stage 3-1 진입 승인.
 
 ### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
