@@ -1,15 +1,28 @@
 #!/usr/bin/env node
 // formal-spec-link-validator CLI
-// 사용: node src/cli.js <api-extension.json | antipatterns.json | dir>
-//        --json (JSON 출력)
+// 사용: node src/cli.js <api-extension.json | antipatterns.json | FE artifact | dir> [--json] [--mode=be|fe|both]
 //
-// 검증: formal_spec_links 의 모든 link 가 실제 파일 존재 + br_id pattern 정합
+// 검증:
+//   --mode=be (default) — formal_spec_links 의 모든 link 가 실제 파일 존재 + br_id pattern 정합
+//   --mode=fe (★ v1.4 Stage 3-2) — FE 산출물의 cross_links[] 형식 검증 (to_artifact / link_type / to_id pattern)
+//   --mode=both — BE + FE 양쪽 검증
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, dirname, relative } from 'node:path';
-import { checkLinks, summarize } from './check-links.js';
+import { checkLinks, checkFeCrossLinks, summarize } from './check-links.js';
 
-function findTargets(dir) {
+const BE_TARGETS = new Set(['api-extension.json', 'antipatterns.json']);
+const FE_TARGETS = new Set([
+  'ui-spec.json',
+  'state-map.json',
+  'visual-manifest.json',
+  'a11y-spec.json',
+  'i18n-spec.json',
+  'static-security-spec.json',
+  'legacy-spectrum.json',
+]);
+
+function findTargets(dir, mode) {
   const out = [];
   let entries;
   try { entries = readdirSync(dir); } catch { return out; }
@@ -19,19 +32,20 @@ function findTargets(dir) {
     try { st = statSync(full); } catch { continue; }
     if (st.isDirectory()) {
       if (name === 'node_modules' || name.startsWith('.')) continue;
-      // 재귀
-      out.push(...findTargets(full));
+      out.push(...findTargets(full, mode));
       continue;
     }
-    // api-extension.json + antipatterns.json
-    if (name === 'api-extension.json' || name === 'antipatterns.json') {
-      out.push(full);
+    if (mode === 'be' || mode === 'both') {
+      if (BE_TARGETS.has(name)) out.push(full);
+    }
+    if (mode === 'fe' || mode === 'both') {
+      if (FE_TARGETS.has(name)) out.push(full);
     }
   }
   return out;
 }
 
-function processOne(path) {
+function processBe(path) {
   const text = readFileSync(path, 'utf-8');
   let json;
   try { json = JSON.parse(text); }
@@ -53,6 +67,7 @@ function processOne(path) {
   return {
     file: path,
     file_type: fileType,
+    mode: 'be',
     items_count: items.length,
     linked_items_count: linkedItemCount,
     cross_link_coverage: items.length > 0 ? Math.round((linkedItemCount / items.length) * 100) : 0,
@@ -61,26 +76,83 @@ function processOne(path) {
   };
 }
 
+function processFe(path) {
+  const text = readFileSync(path, 'utf-8');
+  let json;
+  try { json = JSON.parse(text); }
+  catch (e) { return { file: path, error: `JSON parse error: ${e.message}`, findings: [] }; }
+
+  const fileType = basename(path).replace('.json', '');
+  // FE 산출물의 cross_links 는 top-level 또는 자식 배열에 위치 — 모두 수집.
+  const allCrossLinks = [];
+  if (Array.isArray(json.cross_links)) {
+    allCrossLinks.push(...json.cross_links.map(l => ({ container: 'top', link: l })));
+  }
+  // state-map.json 의 machines[].cross_links / resources[].cross_links 등 자식 배열도 검사.
+  for (const key of ['machines', 'snapshots', 'violations', 'findings', 'resources', 'pages', 'components']) {
+    if (!Array.isArray(json[key])) continue;
+    for (const item of json[key]) {
+      if (Array.isArray(item.cross_links)) {
+        allCrossLinks.push(...item.cross_links.map(l => ({ container: key, link: l })));
+      }
+    }
+  }
+
+  const allFindings = [];
+  for (const { link } of allCrossLinks) {
+    const fs = checkFeCrossLinks({ source: { type: 'fe-artifact', file: path, item: { cross_links: [link] } } });
+    for (const f of fs) allFindings.push(f);
+  }
+
+  return {
+    file: path,
+    file_type: fileType,
+    mode: 'fe',
+    cross_links_count: allCrossLinks.length,
+    findings: allFindings,
+    summary: summarize(allFindings),
+  };
+}
+
+function processOne(path, mode) {
+  const name = basename(path);
+  if (BE_TARGETS.has(name)) return processBe(path);
+  if (FE_TARGETS.has(name)) return processFe(path);
+  // 사용자가 명시적으로 path 를 지정한 경우 → mode 따라 처리
+  if (mode === 'fe') return processFe(path);
+  return processBe(path);
+}
+
+function parseMode(args) {
+  for (const a of args) {
+    if (a === '--mode=fe') return 'fe';
+    if (a === '--mode=be') return 'be';
+    if (a === '--mode=both') return 'both';
+  }
+  return 'be'; // default — BE 호환 보존
+}
+
 function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error('usage: formal-spec-link-validator <file-or-dir> [--json]');
+    console.error('usage: formal-spec-link-validator <file-or-dir> [--json] [--mode=be|fe|both]');
     process.exit(2);
   }
-  const target = args[0];
+  const target = args.find(a => !a.startsWith('--')) ?? args[0];
   const jsonOut = args.includes('--json');
+  const mode = parseMode(args);
 
   let st;
   try { st = statSync(target); } catch { console.error(`path not found: ${target}`); process.exit(2); }
 
   let files;
   if (st.isDirectory()) {
-    files = findTargets(target);
+    files = findTargets(target, mode);
   } else {
     files = [target];
   }
 
-  const results = files.map(processOne);
+  const results = files.map(p => processOne(p, mode));
   const totals = { files: results.length, breaking: 0, 'non-breaking': 0, info: 0, errors: 0 };
   let totalLinkedItems = 0;
   let totalItems = 0;
@@ -109,8 +181,12 @@ function main() {
         console.log(`\n[ERR] ${rel}\n      ${r.error}`);
         continue;
       }
-      console.log(`\n[${r.file_type}] ${rel}`);
-      console.log(`  ${r.linked_items_count}/${r.items_count} items have formal_spec_links (${r.cross_link_coverage}%)`);
+      console.log(`\n[${r.mode ?? 'be'}/${r.file_type}] ${rel}`);
+      if (r.mode === 'fe') {
+        console.log(`  cross_links: ${r.cross_links_count}`);
+      } else {
+        console.log(`  ${r.linked_items_count}/${r.items_count} items have formal_spec_links (${r.cross_link_coverage}%)`);
+      }
       for (const f of r.findings.slice(0, 30)) {
         console.log(`  - [${f.severity}] ${f.kind}${f.message ? ' — ' + f.message : ''}`);
       }
