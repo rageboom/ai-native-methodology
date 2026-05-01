@@ -1,9 +1,8 @@
 # Phase 5-2-c: visual (시각 산출 명세 추출)
 
-> 본 문서는 Phase 5-2-c (`/analyze-visual`) 의 명세다. ★ v1.4 Stage 3-1 신설.
-> 짝: `phase-5-2-a-ui-base.md` (UI 기본) / `phase-5-2-b-state.md` (분산 상태)
-> deliverable: `9-visual-manifest.md` (관련 schema: `visual-manifest.schema.json`)
-> ADR: ADR-FE-002 §2.3 (★ visual 예외 — binary 진실) + ADR-FE-005 (Playwright + axe-core) + ADR-009 §2.4.2 (binary trust path)
+> **명령어**: `/analyze-visual` · **deliverable**: #9 visual-manifest (`visual-manifest.schema.json`)
+> **짝**: `phase-5-2-a-ui-base.md` (UI 기본) / `phase-5-2-b-state.md` (분산 상태)
+> **사상**: binary 진실 모델 (ADR-FE-002 §2.3 — JSON / mermaid 모두 진실 아님, snapshot PNG 가 진실) + Playwright + axe-core 진짜 실행 (ADR-FE-005)
 
 ---
 
@@ -11,11 +10,9 @@
 
 FE 코드의 **시각 산출** (snapshot PNG + a11y 검증 결과) 추출.
 
-사용자 요구 3 ("UI visible 차원") 정면 해소.
-
-⚠️ **본 Phase 는 ★ binary 진실 모델** (ADR-FE-002 §2.3):
+⚠️ 본 Phase 는 **binary 진실 모델**:
 - 다른 6 산출물 = JSON 진실 + drift-validator 적용 ✅
-- 본 phase = **★ snapshot PNG (binary) 진실 + drift-validator ❌ / Playwright snapshot diff ✅**
+- 본 phase = **snapshot PNG (binary) 진실 + drift-validator ❌ / Playwright snapshot diff ✅**
 
 ---
 
@@ -32,39 +29,18 @@ FE 코드의 **시각 산출** (snapshot PNG + a11y 검증 결과) 추출.
 
 ---
 
-## 3. 처리
+## 3. 처리 흐름
 
-```mermaid
-flowchart TB
-    BUILD["FE 빌드 + dev server"]
+| 단계 | 작업 | 도구 |
+|---|---|---|
+| S1 | snapshot 캡처 (viewport matrix × pages) | Playwright `toHaveScreenshot()` |
+| S2 | a11y 검증 | axe-core `axe.run()` per page |
+| S3 | SHA-256 hash 계산 | (계산 — 결정적) |
+| S4 | baseline 비교 (있을 시) | pixel diff + threshold |
+| S5 | visual-manifest.json 통합 | — |
+| S6 | drift-validator ❌ (semantic 비교 불가) / 사람 검토 (baseline 승인) | — |
 
-    BUILD --> P5_2_c["Phase 5-2-c"]
-
-    P5_2_c --> S1["★ Playwright 진짜 실행<br/>(toHaveScreenshot + viewport matrix)"]
-    P5_2_c --> S2["★ axe-core 진짜 실행<br/>(axe.run() per page)"]
-
-    S1 --> H1["SHA-256 hash 계산"]
-    S1 --> B1["baseline 비교 (있을 시)"]
-
-    H1 --> M["visual-manifest.json"]
-    B1 --> M
-    S2 --> M
-
-    M --> R1["snapshots/desktop/*.png"]
-    M --> R2["snapshots/tablet/*.png"]
-    M --> R3["snapshots/mobile-portrait/*.png"]
-    M --> R4["snapshots/mobile-landscape/*.png"]
-
-    M -.|drift-validator ❌|.-> X["semantic 비교 ❌"]
-    M --> H["사람 검토<br/>(baseline 승인)"]
-
-    style S1 fill:#d1ecf1
-    style S2 fill:#d1ecf1
-    style X fill:#f8d7da,stroke-dasharray:5
-    style H fill:#fff3cd
-```
-
-### 3.1 viewport matrix 정의 (★ 의무)
+### 3.1 viewport matrix 정의 (의무)
 
 ```yaml
 viewport_matrix:
@@ -74,7 +50,7 @@ viewport_matrix:
   - {label: mobile-landscape, width: 667, height: 375,  dpr: 2.0}
 ```
 
-### 3.2 ★★★ no-simulation 정책 강제 (ADR-FE-002 §2.3)
+### 3.2 no-simulation 정책 강제 (★★★)
 
 본 Phase 는 **진짜 도구 실행 의무**:
 
@@ -105,13 +81,11 @@ const { AxeBuilder } = require('@axe-core/playwright');
 
 await page.goto(pageUrl);
 const results = await new AxeBuilder({ page })
-    .withTags(['wcag21aa', 'wcag22aa'])  // ★ ADR-FE-005 §2.2.2 ratchet path
+    .withTags(['wcag21aa', 'wcag22aa'])  // ADR-FE-005 §2.2.2 ratchet path
     .analyze();
 ```
 
 → `a11y_violations[]` inline 저장. `wcag_level` enum (`2.1-AA` / `2.2-AA`) 명시.
-
-★ Stage 3-2 a11y deliverable 신설 시 별도 산출물로 분리 검토.
 
 ### 3.4 baseline 관리
 
@@ -165,7 +139,7 @@ stateDiagram-v2
 
 ---
 
-## 6. 신뢰도 (★ ADR-009 §2.4.2 binary trust path)
+## 6. 신뢰도 (ADR-009 §2.4.2 binary trust path)
 
 | 단계 | 조건 | 신뢰도 |
 |---|---|---|
@@ -174,13 +148,13 @@ stateDiagram-v2
 | 6 | snapshot baseline + diff 0건 도달 | 90-95% |
 | 7 | 사람 디자이너 리뷰 통과 | 95%+ |
 
-★ simulation 시 -5%p 패널티.
+simulation 시 -5%p 패널티.
 
 ---
 
 ## 7. 흔한 함정
 
-deliverable 9 §12 정합:
+deliverable 9 §10 정합:
 - flaky test (애니메이션 / 폰트 race)
 - dynamic content (timestamp / random)
 - font drift (폰트 로딩 안 됨)
@@ -191,18 +165,7 @@ deliverable 9 §12 정합:
 
 ---
 
-## 8. ★ Stage 4 mini-PoC 진입 시 첫 검증
-
-ADR-FE-002 §5.4 + DEC-Stage-2 G3-1 정합:
-- Stage 3-1 종결 후 Stage 4 mini-PoC 진입
-- RealWorld React fork 1개 / Playwright + axe-core 진짜 실행 1회
-- ★ no-simulation 정책 첫 FE 실현 (BE Sprint 5 spectral 진짜 실행 패턴 정합)
-- 신뢰도 0.75+ 도달 검증 (단계 5)
-
----
-
-## 9. 다음
+## 8. 다음
 
 - Phase 6 (`/analyze-quality`) AP-FE-VISUAL-* 안티패턴 등록
-- Stage 3-2 a11y deliverable 신설 시 a11y_violations 분리
-- Stage 4 mini-PoC = 진짜 도구 실행 검증 / 단계 5 도달
+- (Stage 4+) mini-PoC = 진짜 도구 실행 검증 / 단계 5 도달
