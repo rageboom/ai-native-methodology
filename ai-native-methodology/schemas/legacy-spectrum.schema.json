@@ -190,7 +190,16 @@
         },
         "★ tier_4_be_fe_split_carry": {
           "type": "boolean",
-          "description": "★ primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무. ADR-FE-004 (BE/FE 분리 + JSP 예외) Stage 6 carry-over 명시."
+          "description": "★ DEPRECATED (Stage 6 종결). primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무 — Stage 6 종결로 carry-over resolved. 신규 산출물은 tier_4_be_fe_handling 사용 권장."
+        },
+        "tier_4_be_fe_handling": {
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "scenario_c_integrated",
+            "legacy_carry_over_resolved_v14"
+          ],
+          "description": "★ v1.4 Stage 6 신설 — Tier 4 (JSP / Thymeleaf / ERB) 처리 정책. ADR-FE-004 §2.4 + be-fe-separation.md §5 정합. not_applicable=Tier 4 부재 / scenario_c_integrated=Scenario C 통합 산출 (BE Spring controller + JSP 통합 분석) / legacy_carry_over_resolved_v14=v1.4 carry-over resolved 명시."
         },
         "captured_by": {
           "type": "string",

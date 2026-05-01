@@ -1,9 +1,9 @@
 # ADR-FE-003: legacy spectrum 정책 — Tier 2/3/4 추출 정책 + Strangler 패턴
 
 - 상태: 승인됨 (Accepted)
-- 일자: 2026-05-01
+- 일자: 2026-05-01 / **갱신 2026-05-01 (Stage 6 — §2.4 Tier 4 carry → resolved)**
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001 (사상적 기반), ADR-FE-001 (FE 추출기 가정 — 짝), ADR-FE-002 (이중 렌더링 FE 적용), ADR-FE-004 (BE/FE 분리 운영 — Stage 6), DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G2-2 legacy Tier 1~4)
+- 관련: ADR-001 (사상적 기반), ADR-FE-001 (FE 추출기 가정 — 짝), ADR-FE-002 (이중 렌더링 FE 적용), ADR-FE-004 (BE/FE 분리 운영 — Tier 4 정식), ADR-FE-006 (framework-neutral IR), DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G2-2 legacy Tier 1~4), DEC-2026-05-01-v1.4-Stage-6-종결 (carry 종결)
 
 > **본 ADR 의 위치** — ADR-FE-001 §3.1 매트릭스의 **Tier 2/3/4 (jQuery / Vanilla / JSP) 추출 정책의 상세**. ADR-FE-001 = spectrum 가정 / ADR-FE-003 (본) = Tier 2/3/4 추출 절차 + 마이그레이션 패턴.
 
@@ -92,7 +92,9 @@ detection_signals:
   - api_calls: fetch / XMLHttpRequest 흩어짐 — LLM 추론 의무
 ```
 
-### 2.4 Tier 4 (server-side template) — ★ Stage 6 ADR-FE-004 예외
+### 2.4 Tier 4 (server-side template) — ★ Stage 6 ADR-FE-004 정식 (resolved)
+
+> **★ Stage 6 종결 (2026-05-01)** — 본 §2.4 carry 종결. ADR-FE-004 §2.4 (Tier 4 통합 산출 절차 정식) + `methodology-spec/be-fe-separation.md` §5 정식 정의.
 
 ```yaml
 detection_signals:

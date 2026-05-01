@@ -1,9 +1,9 @@
 # ADR-FE-001: FE 추출기 가정 — spectrum cover Tier 1~4 + 한 방향 추출 사상
 
 - 상태: 승인됨 (Accepted)
-- 일자: 2026-05-01
+- 일자: 2026-05-01 / **갱신 2026-05-01 (Stage 6 — §6 Tier 4 carry → resolved)**
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001 (사상적 기반), ADR-002 (7대 산출물), ADR-008 (이중 렌더링 사상), ADR-FE-002 (이중 렌더링 FE 적용 — 짝), ADR-FE-005 (권위 매개체 12 채택), DEC-2026-05-01-v1.4-FE-트랙-진입, DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G1-1)
+- 관련: ADR-001 (사상적 기반), ADR-002 (7대 산출물), ADR-008 (이중 렌더링 사상), ADR-FE-002 (이중 렌더링 FE 적용 — 짝), ADR-FE-004 (BE/FE 분리 — Tier 4 예외 정식), ADR-FE-005 (권위 매개체 12 채택), ADR-FE-006 (framework-neutral IR — 짝), DEC-2026-05-01-v1.4-FE-트랙-진입, DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G1-1), DEC-2026-05-01-v1.4-Stage-6-종결 (carry 종결)
 
 > **본 ADR 의 위치** — v1.4 FE 트랙의 **사상 기둥 1**. ADR-001 (Schema-First+Contract-First+DDD-Lite+FSD) 의 §FSD 영역을 FE 코드 spectrum 전체로 확장한다. ADR-FE-002/005 와 짝.
 
@@ -154,16 +154,21 @@ flowchart LR
 
 ---
 
-## 6. ★ Tier 4 (JSP) 예외 — Stage 6 ADR-FE-004 carry
+## 6. ★ Tier 4 (JSP) 예외 — ★ Stage 6 ADR-FE-004 정식 종결 (resolved)
 
 JSP / Thymeleaf / ERB 의 server-side template 은 **BE 와 FE 가 통합 산출**:
 - 라우팅 = BE Spring MVC `@RequestMapping`
 - 렌더링 = JSP (FE 영역) + 백엔드 데이터 (BE 영역)
 - DOM 조작 = (있으면) jQuery / vanilla JS
 
-→ **BE/FE 분리 운영 정책의 예외**. Stage 6 ADR-FE-004 에서 정식 명세 (Stage 3-1 범위 밖).
+→ **BE/FE 분리 운영 정책의 예외 = Scenario C** (★ ADR-FE-004 §2 정식 정의).
 
-본 ADR 에서는 Tier 4 = "BE 와 통합 산출 / 별도 ADR" 만 명시.
+★ **Stage 6 종결 (2026-05-01)** — 본 §6 carry 종결:
+- ADR-FE-004 (BE/FE 분리 운영 정책) Scenario C 정식 채택
+- `methodology-spec/be-fe-separation.md` §5 Tier 4 통합 산출 절차 정식
+- `legacy-spectrum.schema.json` `tier_4_be_fe_handling` enum 신설 (`scenario_c_integrated` / `legacy_carry_over_resolved_v14`)
+
+본 ADR §3.1 매트릭스의 "Tier 4 → 7대 산출물 3/7 + Stage 6 ADR-FE-004 BE/FE 분리 예외" = ★ 정식 절차 결정 (Stage 6 종결).
 
 ---
 

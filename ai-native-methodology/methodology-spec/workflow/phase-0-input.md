@@ -59,6 +59,21 @@ git clone 이 불가능한 환경 (예: web-only):
 - GitHub API 로 디렉토리 구조 조회
 - **우선순위**: build 설정 → 소스 코드 (핵심 도메인) → 설정 파일
 
+### 3.4 ★ Scenario detection (BE/FE 분리 운영 — ADR-FE-004 정합)
+
+| signal | A 분리 | B JS 풀스택 | C JSP |
+|---|---|---|---|
+| package.json + 별도 BE repo / pom.xml | ✅ | — | (조건부) |
+| package.json deps: next / nuxt / remix / @astrojs / solid-start / sveltekit | — | ✅ | — |
+| has_api_routes_dir (pages/api/ / app/api/ / server/api/) | — | ✅ | — |
+| 파일 확장자 .jsp / .thymeleaf / .erb | — | — | ✅ |
+| BE template engine (spring-boot-starter-thymeleaf / jstl) | — | — | ✅ |
+| **default when unclear** | ✅ | — | — |
+
+→ 본 detection 으로 `_manifest.yml` 의 `scenario` 필드 자동 결정. mixed 케이스 (Tier 1+2+4 등) = 사용자 confirm 의무.
+
+→ Scenario 별 산출 명령 차이 + IR 4계층 매트릭스 = `methodology-spec/be-fe-separation.md` 참조.
+
 ---
 
 ## 4. 출력
@@ -96,6 +111,13 @@ formula_version: "v1"
 applied_modifiers:
   - { input: domain_context_md, bonus: 0.03 }
 applied_penalties: []
+
+# ★ v1.4 Stage 6 신설 — BE/FE 분리 운영 Scenario (ADR-FE-004)
+scenario: A   # A 분리 default / B JS 풀스택 / C JSP
+scenario_signals:
+  - { signal: package_json_present, detected: true }
+  - { signal: separate_be_repo, detected: true }
+  - { signal: jsp_template_files, detected: false }
 ```
 
 ### 4.3 source-info.md 형식

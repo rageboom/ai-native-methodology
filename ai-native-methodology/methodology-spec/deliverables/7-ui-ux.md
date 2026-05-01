@@ -160,6 +160,29 @@ shared/     공유 (UI Kit, Lib, API)
 | Tier 3 (Vanilla JS) | 모듈 패턴 + IIFE 단위 | `legacy_widget` 또는 `legacy_template` | 0.50~0.60 |
 | Tier 4 (JSP / Thymeleaf) | template fragment + include 그래프 | `legacy_template` | 0.50~0.55 |
 
+### 6.5 ★ Screen+Journey 우선 / Component 분해 후순위 (★ ADR-FE-006 정합)
+
+본 component-tree 산출물은 **L4 Presentation 보조 산출물** (★ ADR-FE-006 명제 2 / IR 4계층 매트릭스):
+
+| 우선 단위 | 비고 |
+|---|---|
+| ★ **Screen** (PAGE-XXX) | framework-neutral / 신규 스택 즉시 활용 가능 |
+| ★ **Journey** (SCN-XXX) | framework-neutral / 사용자 시나리오 즉시 활용 |
+| ★ **State machine** (FSM-FE-XXX) | SCXML+XState — framework-neutral |
+| Component (CMP-XXX) | ★ **보조** — Atomic/FSD 분해는 framework-coupling 위험 ↑ |
+
+**★ Component 분해 framework-coupling 위험**:
+- Atomic Design (Brad Frost) — React/Vue/Angular 모두 적용 가능 / 단 atom/molecule 경계는 분해자 주관
+- FSD (Feature-Sliced Design) — React 진영 산업 표준 / 다른 framework 정합도 ↓
+- 사용자 사내 환경 (★ React+TS+TanStack) → 신규 스택 (Vue / Solid / Astro) 이식 시 component 재분해 의무
+
+**★ 권고**:
+- ✅ Screen + Journey + state-map = **신규 시스템 즉시 활용** (framework-neutral)
+- ⚠️ Component-tree = **참고용** / 신규 스택 정해진 후 그 스택의 관용구로 재분해 의무
+- ✅ design-tokens (DTCG) = framework-neutral / 즉시 활용
+
+→ ADR-FE-006 §2.2 IR 4계층 매트릭스 정합.
+
 ---
 
 ## 7. 디자인 토큰 형식 (DTCG 2025.10)
