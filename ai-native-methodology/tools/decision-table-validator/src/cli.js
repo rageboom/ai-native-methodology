@@ -8,7 +8,7 @@ import { join, basename, extname, relative } from 'node:path';
 import { parseMarkdownTables } from './parse-md-table.js';
 import { checkDecisionTable } from './dmn-check.js';
 import { checkJsonSanity } from './json-sanity.js';
-import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../drift-validator/src/baseline.js';
+import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../_shared/baseline.js';
 
 function findTargets(dir) {
   const out = [];

@@ -5,6 +5,6 @@
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": { "decision-table-validator": "./src/cli.js" },
-  "scripts": { "test": "node --test test/dmn-check.test.js" },
+  "scripts": { "test": "node --test test/dmn-check.test.js test/baseline.test.js" },
   "license": "UNLICENSED"
 }
