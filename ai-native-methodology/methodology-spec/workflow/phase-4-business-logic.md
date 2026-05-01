@@ -1,16 +1,14 @@
 # Phase 4: 비즈니스 로직 추출 (4영역 병렬)
 
-> 본 문서는 Phase 4 (`/analyze-business-logic`)의 명세다.
-> v1.1 핵심 변경: "Cross-Cutting" 폐기, **4개 영역 병렬 추출**로 대체.
-> 관련: plan.md §5, ADR-004 (DDD-Lite B)
+> **명령어**: `/analyze-business-logic` · **사상**: 4영역 병렬 추출 (DB / FE / 설정 / 외부) · ADR-004 (DDD-Lite B)
 
 ---
 
 ## 1. 목적
 
-비즈니스 로직을 **4개 영역에서 병렬로 추출**하여 도메인 모델(#2), 비즈니스 규칙(#5), 안티패턴(#6)의 **핵심 내용**을 생성한다.
+비즈니스 로직을 **4개 영역에서 병렬로 추출**하여 도메인 모델(#2), 비즈니스 규칙(#5), 안티패턴(#6) 의 핵심 내용을 생성한다.
 
-이 단계가 답하는 질문:
+**답하는 질문**:
 - 어떤 도메인 엔티티와 유스케이스가 있는가?
 - 어떤 비즈니스 규칙/정책이 코드에 있는가?
 - 어디에 안티패턴이 있는가?
@@ -31,26 +29,6 @@
 
 ## 3. 4개 영역 — 병렬 추출
 
-```mermaid
-flowchart TB
-    BL["Phase 4: 비즈니스 로직 추출"]
-    
-    BL --> A["5.A — DB 영역"]
-    BL --> B["5.B — FE 코드 영역"]
-    BL --> C["5.C — 설정/환경 영역"]
-    BL --> D["5.D — 외부 의존성"]
-    
-    A --> Merge["통합 → domain/ + rules/ + antipatterns/"]
-    B --> Merge
-    C --> Merge
-    D --> Merge
-    
-    style A fill:#d4edda
-    style B fill:#fff3cd
-    style C fill:#d1ecf1
-    style D fill:#f8d7da
-```
-
 ### 3.1 영역 5.A — DB 영역
 
 **추출 대상**:
@@ -66,7 +44,7 @@ flowchart TB
 **산출 매핑**:
 - ORM 메서드 → 도메인 모델 (#2)
 - SQL CASE/WHERE → 비즈니스 규칙 (#5)
-- N+1, SQL에 정책 박힘 → 안티패턴 (#6)
+- N+1, SQL 에 정책 박힘 → 안티패턴 (#6)
 
 ### 3.2 영역 5.B — FE 코드 영역
 
@@ -85,7 +63,7 @@ flowchart TB
 ### 3.3 영역 5.C — 설정/환경 정책
 
 **추출 대상**:
-- application.yml/properties의 매직 넘버
+- application.yml/properties 의 매직 넘버
 - 환경별 정책 차이 (dev/staging/prod)
 - Feature Flag 시스템
 - 환경 변수의 비즈니스 의미
@@ -128,12 +106,12 @@ flowchart TB
 └── state-diagrams/
 
 .ai-analysis/output/antipatterns/      # 안티패턴 (#6) — 부분
-├── antipatterns-partial.json          # Phase 6에서 전체 통합
+├── antipatterns-partial.json          # Phase 6 에서 전체 통합
 ```
 
 ---
 
-## 5. 승인 게이트 기준
+## 5. 승인 게이트
 
 ```
 □ domain.json schema 검증 통과
@@ -166,18 +144,18 @@ flowchart TB
 ## 7. 흔한 함정
 
 ### 7.1 Anemic Domain Model 무시
-- 증상: Service에 모든 로직, Entity는 DTO 수준
+- 증상: Service 에 모든 로직, Entity 는 DTO 수준
 - 대응: AP-DOMAIN-ANEMIC 등록 + 도메인 로직 위치 기록
 
 ### 7.2 FE 영역 건너뛰기
-- 증상: BE만 분석하고 FE validation 무시
+- 증상: BE 만 분석하고 FE validation 무시
 - 결과: FE-BE 검증 불일치 미발견
 - 대응: FE 소스 있으면 5.B 필수 진행
 
 ### 7.3 매직 넘버의 의도 과신
-- 증상: `MAX_RETRY=3`의 이유를 LLM이 추론
+- 증상: `MAX_RETRY=3` 의 이유를 LLM 이 추론
 - 결과: 실제 이유와 다를 수 있음
-- 대응: 모든 매직 넘버 BR에 human_review_required=true
+- 대응: 모든 매직 넘버 BR 에 `human_review_required=true`
 
 ### 7.4 외부 의존성 누락
 - 증상: REST 호출만 추적하고 SDK/gRPC 누락
@@ -187,4 +165,4 @@ flowchart TB
 
 ## 8. 다음 단계
 
-Phase 5-1 (`/analyze-api`) + Phase 5-2 (`/analyze-ui`) 병렬 진입.
+Phase 4.5 (`/analyze-formal-spec`) → Phase 5-1 (`/analyze-api`) + Phase 5-2 (`/analyze-ui-base` + `/analyze-state` + `/analyze-visual`) 병렬 진입.

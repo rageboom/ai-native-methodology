@@ -1,13 +1,12 @@
 # Phase 5-1: api (API 계약 추출)
 
-> 본 문서는 Phase 5-1 (`/analyze-api`)의 명세다.
-> Phase 5-2 (UI)와 **병렬 실행 가능**.
+> **명령어**: `/analyze-api` · Phase 5-2 (UI) 와 **병렬 실행 가능**
 
 ---
 
 ## 1. 목적
 
-Controller/Router에서 **OpenAPI 3.1 명세를 추출**하고, 산출물 간 ID 매핑 (operationId ↔ UC, x-related-rules)을 완성한다.
+Controller/Router 에서 **OpenAPI 3.1 명세 추출**, 산출물 간 ID 매핑 (operationId ↔ UC, x-related-rules) 완성.
 
 ---
 
@@ -18,39 +17,20 @@ Controller/Router에서 **OpenAPI 3.1 명세를 추출**하고, 산출물 간 ID
 | 소스 코드 (BE) | Controller, Router 어노테이션 |
 | Phase 1 inventory | BE 프레임워크 정보 |
 | Phase 4 결과 | 도메인 모델 (UC), 비즈니스 규칙 (BR), 외부 의존성 (5.D inbound webhook) |
-| **Phase 4.5 결과** ★ v1.2.3 | **decision-tables (BR ↔ API request/response 매핑) + sequence diagrams (API 호출 흐름) + state-machines (entity 상태 전이)**. `formal_spec_links` (`openapi-extension.schema.json`) 로 cross-link 의무 — request/response schema 가 formal-spec 의 decision-tables 와 매핑 가능해야 함. |
+| Phase 4.5 결과 | decision-tables (BR ↔ API request/response 매핑) + sequence diagrams + state-machines. `formal_spec_links` (`openapi-extension.schema.json`) cross-link 의무 |
 | Phase 2 schema | DTO ↔ DB 컬럼 정합성 (있으면) |
 
 ---
 
-## 3. 처리
+## 3. 처리 흐름
 
-```mermaid
-flowchart TB
-    Code["BE 소스 코드"]
-    
-    Code --> Det["결정적 추출"]
-    Det --> D1["엔드포인트 (path/method)"]
-    Det --> D2["DTO 클래스 → JSON Schema"]
-    Det --> D3["에러 핸들러 → 에러 응답"]
-    Det --> D4["@PreAuthorize → security"]
-    
-    Det --> LLM["LLM 보강"]
-    LLM --> L1["operationId 생성/추출"]
-    LLM --> L2["UC 매핑 (의미 매칭)"]
-    LLM --> L3["x-related-rules 매핑"]
-    
-    L1 & L2 & L3 --> Merge["통합"]
-    
-    Merge --> Webhook["5.D inbound webhook 합치기"]
-    
-    Webhook --> Out["openapi.yaml + api-extension.json"]
-    
-    style Det fill:#d4edda
-    style LLM fill:#fff3cd
-```
+| 단계 | 작업 | 결정성 |
+|---|---|---|
+| 결정적 추출 | 엔드포인트 (path/method) / DTO → JSON Schema / 에러 핸들러 → 에러 응답 / `@PreAuthorize` → security | 결정적 (AST) |
+| LLM 보강 | operationId 생성 / UC 매핑 (의미 매칭) / x-related-rules 매핑 | LLM |
+| 통합 | 결정적 + LLM 결과 합치기 + 5.D inbound webhook 합치기 | — |
 
-### 3.1 프레임워크별 추출
+### 3.1 프레임워크별 추출 단서
 
 | 프레임워크 | 단서 |
 |---|---|
@@ -91,7 +71,7 @@ paths:
 
 ```
 □ openapi.yaml 표준 lint 통과 (spectral 등)
-□ 모든 operationId가 unique
+□ 모든 operationId 가 unique
 □ DTO 스키마 = JSON Schema 호환
 □ 에러 응답 표준화 (4xx/5xx)
 □ x-related-use-cases 매핑 = 사용자 검토
@@ -121,9 +101,9 @@ paths:
 - 증상: `@Operation` 등이 없어 추출 어려움
 - 대응: 메서드명/파라미터로 LLM 추론 + 신뢰도↓
 
-### 7.2 description에 비즈니스 정책
-- 증상: API description에 정책 글로 박힘
-- 대응: 정책은 BR로 분리 + x-related-rules로만 참조
+### 7.2 description 에 비즈니스 정책
+- 증상: API description 에 정책 글로 박힘
+- 대응: 정책은 BR 로 분리 + `x-related-rules` 로만 참조
 
 ### 7.3 동적 라우팅
 - 증상: 런타임에 라우트 등록 (예: 플러그인 시스템)
@@ -132,10 +112,10 @@ paths:
 
 ### 7.4 GraphQL/gRPC 혼재
 - 증상: REST API + GraphQL 함께 사용
-- 대응: v1.1은 REST 우선. GraphQL은 별도 산출물로 추가 (v1.2)
+- 대응: REST 우선. GraphQL 은 별도 산출물 (v1.2+)
 
 ---
 
 ## 8. 다음
 
-Phase 6 (`/analyze-quality`) 진입 (Phase 5-2와 합쳐서).
+Phase 6 (`/analyze-quality`) 진입 (Phase 5-2 와 합쳐서).

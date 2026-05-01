@@ -1,16 +1,14 @@
 # Phase 0: 입력 정리 (Input Preparation)
 
-> 본 문서는 Phase 0의 명세다.
-> 유일하게 **사용자가 수동으로 진행**하는 단계.
-> 자동화 명령어 없음 — 사용자가 직접 준비.
+> 유일하게 **사용자가 수동으로 진행**하는 단계. 자동화 명령어 없음.
 
 ---
 
 ## 1. 목적
 
-분석 대상 레포와 부가 자료를 **정리·정돈**하여 후속 phase가 사용할 수 있게 한다.
+분석 대상 레포와 부가 자료를 정리·정돈하여 후속 phase 가 사용할 수 있게 한다.
 
-이 단계가 답하는 질문:
+**답하는 질문**:
 - 어떤 소스를 분석할 것인가?
 - 추가로 제공할 자료는 무엇인가? (ERD, 운영DB, 기획서 등)
 - 자료의 형식과 위치는?
@@ -26,7 +24,7 @@
 | 운영 DB 메타 | INFORMATION_SCHEMA SQL | 선택 |
 | 기획 문서 | Markdown, Notion export, PDF | 선택 |
 | 디자인 명세 | Figma JSON, design-tokens | 선택 |
-| 도메인 컨텍스트 | domain-context.md (LLM grounding용) | 선택 (권장) |
+| 도메인 컨텍스트 | domain-context.md (LLM grounding 용) | 선택 (권장) |
 | API 테스트 | Postman collection, 요청/응답 샘플 | 선택 |
 
 ---
@@ -54,11 +52,11 @@
 3. 가용한 자료를 해당 하위 디렉토리에 배치
 4. (권장) `domain-context.md` 작성 — 비즈니스 영역, 핵심 흐름, 용어 등
 
-### 3.3 환경 제약 케이스 (PoC F-001 관련)
+### 3.3 환경 제약 케이스
 
-git clone이 불가능한 환경 (예: Claude Code 환경):
-- web_fetch로 핵심 파일만 선택적 가져오기
-- GitHub API로 디렉토리 구조 조회
+git clone 이 불가능한 환경 (예: web-only):
+- web_fetch 로 핵심 파일만 선택적 가져오기
+- GitHub API 로 디렉토리 구조 조회
 - **우선순위**: build 설정 → 소스 코드 (핵심 도메인) → 설정 파일
 
 ---
@@ -69,8 +67,8 @@ git clone이 불가능한 환경 (예: Claude Code 환경):
 
 ```
 .ai-analysis/inputs/
-├── _manifest.yml                  # 입력 매니페스트 (Phase 1이 참조)
-├── source-info.md                 # 분석 대상 메타정보 (PoC F-002에서 추가)
+├── _manifest.yml                  # 입력 매니페스트 (Phase 1 이 참조)
+├── source-info.md                 # 분석 대상 메타정보
 └── (입력 파일들)
 ```
 
@@ -86,21 +84,21 @@ source:
 inputs:
   source_code: true
   erd: false
-  orm: auto_detect         # Phase 1에서 자동 감지
+  orm: auto_detect         # Phase 1 에서 자동 감지
   operational_db: false
   planning_docs: false
   design_specs: false
   domain_context_md: true
   postman_or_api_test: false
 
-expected_confidence_average: 0.78   # ADR-003 공식 v1로 산정
+expected_confidence_average: 0.78   # ADR-003 공식 v1 로 산정
 formula_version: "v1"
 applied_modifiers:
   - { input: domain_context_md, bonus: 0.03 }
 applied_penalties: []
 ```
 
-### 4.3 source-info.md 형식 (PoC F-002에서 추가)
+### 4.3 source-info.md 형식
 
 ```markdown
 # 분석 대상 정보
@@ -114,7 +112,7 @@ applied_penalties: []
 
 ---
 
-## 5. 승인 게이트 기준
+## 5. 승인 게이트
 
 ```
 □ .ai-analysis/inputs/ 디렉토리 생성 완료
@@ -130,8 +128,8 @@ applied_penalties: []
 
 ## 6. 신뢰도
 
-이 phase는 사용자 수동 작업이므로 신뢰도 산정 대상이 아님.
-다만, **입력의 양과 질이 후속 phase의 신뢰도를 결정**한다 (ADR-003 §6).
+이 phase 는 사용자 수동 작업이므로 신뢰도 산정 대상이 아님.
+다만 **입력의 양과 질이 후속 phase 의 신뢰도를 결정** (ADR-003 §6).
 
 ---
 

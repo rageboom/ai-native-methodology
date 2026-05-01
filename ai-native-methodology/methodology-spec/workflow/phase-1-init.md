@@ -1,20 +1,19 @@
 # Phase 1: init (인벤토리)
 
-> 본 문서는 Phase 1 (`/analyze-init`)의 명세다.
-> 분석 워크플로우의 **첫 자동화 단계**.
+> **명령어**: `/analyze-init` · 분석 워크플로우의 **첫 자동화 단계**
 
 ---
 
 ## 1. 목적
 
-분석 대상 레포의 **구조·스택·규모**를 파악하여 후속 phase가 사용할 메타정보를 생성한다.
+분석 대상 레포의 **구조·스택·규모**를 파악하여 후속 phase 가 사용할 메타정보를 생성한다.
 
-이 단계가 답하는 질문:
+**답하는 질문**:
 - 이 레포는 어떤 언어/프레임워크로 작성되었나?
 - 디렉토리 구조는?
-- ORM은 무엇을 사용하는가?
+- ORM 은 무엇을 사용하는가?
 - 규모는 (LOC, 파일 수)?
-- 어떤 입력이 추가로 들어왔나? (Phase 0 결과 manifest화)
+- 어떤 입력이 추가로 들어왔나? (Phase 0 결과 manifest 화)
 
 ---
 
@@ -22,40 +21,27 @@
 
 | 입력 | 출처 | 필수/선택 |
 |---|---|---|
-| 분석 대상 레포 | git clone된 디렉토리 | 필수 |
-| `.ai-analysis/inputs/` | Phase 0이 정돈 | 필수 |
+| 분석 대상 레포 | git clone 된 디렉토리 | 필수 |
+| `.ai-analysis/inputs/` | Phase 0 이 정돈 | 필수 |
 | 패키지 매니페스트 | package.json, pom.xml, build.gradle, requirements.txt 등 | 자동 감지 |
 
 ---
 
-## 3. 처리
+## 3. 처리 흐름
 
-### 3.1 결정적 처리 (LLM 없음)
+| 단계 | 입력 | 작업 | 결정성 |
+|---|---|---|---|
+| S1 | 분석 대상 레포 | 디렉토리 트리 추출 | 결정적 |
+| S2 | 분석 대상 레포 | 파일 통계 (언어 분포, LOC) | 결정적 |
+| S3 | 패키지 매니페스트 | 의존성 파싱 | 결정적 |
+| S4 | 소스 코드 | ORM 자동 감지 (4단서 패턴) | 패턴 매칭 |
+| S5 | S1~S4 통합 결과 | LLM 스택 추론·요약 | LLM with grounding |
 
-```mermaid
-flowchart TB
-    Start["분석 대상 레포"]
-    
-    Start --> S1["디렉토리 트리 추출"]
-    Start --> S2["파일 통계<br/>(언어 분포, LOC)"]
-    Start --> S3["패키지 매니페스트 파싱"]
-    Start --> S4["ORM 자동 감지"]
-    
-    S1 & S2 & S3 & S4 --> Det["결정적 결과 통합"]
-    
-    Det --> LLM["LLM: 스택 추론·요약"]
-    
-    LLM --> Out["산출물"]
-    
-    style Det fill:#d4edda
-    style LLM fill:#fff3cd
-```
-
-### 3.2 ORM 자동 감지 패턴
+### 3.1 ORM 자동 감지 패턴
 
 | 언어/프레임워크 | 감지 단서 |
 |---|---|
-| Spring Data JPA | `@Entity`, `JpaRepository`, `pom.xml`의 `spring-data-jpa` |
+| Spring Data JPA | `@Entity`, `JpaRepository`, `pom.xml` 의 `spring-data-jpa` |
 | Hibernate | `@Entity`, `hibernate.cfg.xml` |
 | MyBatis | `*.xml` mapper, `@Mapper` |
 | jOOQ | `org.jooq` import, generated DSL classes |
@@ -67,10 +53,10 @@ flowchart TB
 
 복수 ORM 감지 가능 (예: JPA + MyBatis 혼재).
 
-### 3.3 LLM 보강 영역
+### 3.2 LLM 보강 영역
 
 - 스택 종합 요약 (예: "Spring Boot 3.x + JPA + React 18 + PostgreSQL")
-- 아키텍처 패턴 후보 추론 (Layered, Hexagonal 등)
+- 아키텍처 패턴 후보 추론 (Layered, Hexagonal 등 — Phase 1 에선 0.7 cap, Phase 3 에서 확정)
 - 분석 권장 모듈 우선순위 (큰 모듈/핵심 도메인 추정)
 
 ---
@@ -113,7 +99,7 @@ stack:
   backend:
     language: Java 17
     framework: Spring Boot 3.2.x
-    orm: 
+    orm:
       - name: JPA/Hibernate
         confidence: 1.0
       - name: MyBatis
@@ -124,7 +110,7 @@ stack:
     framework: React 18
     state: TanStack Query + Zustand
     ui_library_indicators: [tailwindcss, shadcn/ui]
-  
+
 architecture_style_candidates:
   - style: Layered
     confidence: 0.7
@@ -138,7 +124,7 @@ modules_for_priority_analysis:
 
 ---
 
-## 5. 승인 게이트 기준
+## 5. 승인 게이트
 
 ```
 □ inventory.json schema 검증 통과
@@ -149,15 +135,13 @@ modules_for_priority_analysis:
 □ 입력 manifest = Phase 0 정돈과 정합
 ```
 
-승인 후 Phase 2 진입.
-
 ---
 
-## 6. 신뢰도 (v1.1.2 갱신)
+## 6. 신뢰도 (결정성 축)
 
-이 phase는 **결정적 처리가 95% 이상**이라 신뢰도 가장 높음. v1.1.2 부터 **결정성 (Determinism) 축**으로 분류 (F-009).
+이 phase 는 **결정적 처리가 95% 이상**이라 신뢰도 가장 높음.
 
-### 6.1 결정성 (Determinism) 축
+### 6.1 결정성 (Determinism) tier
 
 - **deterministic**: 동일 입력 → 동일 출력 (git commit hash, AST 파싱, 파일 stat)
 - **snapshot-based**: 시점 snapshot 의존 (Trees API + commit SHA, 호출 시점 따라 truncated 가능)
@@ -166,17 +150,17 @@ modules_for_priority_analysis:
 - **llm_with_grounding**: 입력 grounding 가진 LLM 추론
 - **llm_code_only**: 코드 외 입력 없는 LLM 추론
 
-### 6.2 항목별 신뢰도 (단일 표 + caveat)
+### 6.2 항목별 신뢰도
 
-| 항목 | 신뢰도 | 결정성 tier | 환경 caveat |
+| 항목 | 신뢰도 | tier | 환경 caveat |
 |---|---|---|---|
-| 디렉토리 트리 | 1.0 | deterministic / snapshot-based | web_fetch + Trees API: 7MB/100k entries 한계 시 truncated → `inventory.directory_tree_extraction.truncated=true` 명시 + 신뢰도 0.85 감점 |
+| 디렉토리 트리 | 1.0 | deterministic / snapshot-based | web_fetch + Trees API: 7MB/100k entries 한계 시 truncated → `inventory.directory_tree_extraction.truncated=true` 명시 + 0.85 감점 |
 | 파일 통계 (byte) | 1.0 | deterministic | — |
-| LOC | 1.0 / 0.55 | deterministic (cloc/tokei) / heuristic (byte/35) | byte/35 추정은 본질적으로 stochastic. `inventory.repo.loc_extraction_method` 명시 의무 |
+| LOC | 1.0 / 0.55 | deterministic (cloc/tokei) / heuristic (byte/35) | byte/35 추정은 stochastic. `inventory.repo.loc_extraction_method` 명시 의무 |
 | 패키지 매니페스트 | 1.0 | deterministic | — |
 | ORM 자동 감지 | 0.85~0.95 | pattern_matching | 4단서 (어노테이션 + import + 의존성 + 설정파일) 점검 시 0.95. 단서 부족 시 감점 |
-| 스택 종합 요약 | 0.9 | llm_with_grounding | grounding 입력 부재 시 0.7 로 감점 |
-| 아키텍처 스타일 추론 | 0.7 | llm_with_grounding | Phase 1 한계로 cap 0.7. 최종 분류는 Phase 3 으로 유보 |
+| 스택 종합 요약 | 0.9 | llm_with_grounding | grounding 입력 부재 시 0.7 |
+| 아키텍처 스타일 추론 | 0.7 | llm_with_grounding | Phase 1 한계로 cap 0.7. 최종 분류는 Phase 3 에서 |
 | 분석 우선순위 추천 | 0.7 | llm_with_grounding | LLM 추정 — 사용자 검토 필수 |
 
 ### 6.3 warnings 의무화
@@ -190,17 +174,14 @@ warnings:
   - "ORM 단서 2/4 만 충족 (의존성 + 어노테이션 — import + 설정파일 부재)"
 ```
 
-> 💡 산업 사례: SonarCloud 의 WARNING 배지 패턴과 동일 (분류 변경 X, caveat 컬럼만).
-> 🚫 안티 패턴: "환경별로 표 자체를 분리" — DRY 위반 + enum 폭발 + 산업 표준 0건.
-
 ---
 
 ## 7. 흔한 함정
 
 ### 7.1 monorepo 미감지
-- 증상: lerna, nx, pnpm workspace 등 monorepo를 단일 레포처럼 처리
+- 증상: lerna, nx, pnpm workspace 등 monorepo 를 단일 레포처럼 처리
 - 결과: 모듈 분석이 평면화
-- 대응: monorepo 감지 시 사용자에게 "어느 sub-repo부터?" 질문
+- 대응: monorepo 감지 시 사용자에게 "어느 sub-repo 부터?" 질문
 
 ### 7.2 generated 코드 포함
 - 증상: `target/`, `build/`, `node_modules/`, `dist/` 등 자동 생성물까지 통계
@@ -208,12 +189,12 @@ warnings:
 - 대응: `.gitignore` 자동 적용 + 추가 제외 패턴 (`generated/`, `__generated__/`)
 
 ### 7.3 binary/asset 언어로 카운트
-- 증상: 이미지/PDF 등이 "텍스트 파일"로 잘못 분류
+- 증상: 이미지/PDF 등이 "텍스트 파일" 로 잘못 분류
 - 대응: 언어 감지 라이브러리 (linguist 등) 사용
 
 ### 7.4 ORM 혼재 무시
 - 증상: JPA + MyBatis 혼재인데 하나만 감지
-- 결과: Phase 2.5에서 SQL 분석 누락
+- 결과: Phase 2.5 에서 SQL 분석 누락
 - 대응: 복수 ORM 감지 명시 + 각 사용 비율 표기
 
 ---
@@ -221,5 +202,3 @@ warnings:
 ## 8. 다음 단계
 
 Phase 2 (`/analyze-db`) 진입.
-
-> 💡 v1.0과 다른 점: v1.0은 `init → arch → db` 순서였으나, **v1.1은 `init → db → arch`**. ERD가 있을 때 효율적이고, 없어도 ORM 자동 감지로 DB 구조부터 파악 가능 (research v1.1 Round 12).
