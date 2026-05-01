@@ -51,13 +51,15 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 핵심 디렉토리
 
-- `ai-native-methodology/methodology-spec/` — 방법론 명세
-- `ai-native-methodology/docs/adr/` — ADR-001~005 + ADR-007 (OpenAPI x-extension) + ADR-008/009 (Phase 4.5)
+- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 8 + glossary-ko + finding-system + id-conventions)
+- `ai-native-methodology/docs/adr/` — ADR-001~006 + ADR-008/009 (Phase 4.5) + ADR-010 (baseline+ratchet) + ADR-NEST-001~004 (NestJS 정책) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
 - `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태)
-- `ai-native-methodology/schemas/` — JSON Schema
-- `ai-native-methodology/templates/` — 산출물 템플릿
-- `ai-native-methodology/examples/poc-01-realworld-spring/` — PoC #01 ✅ 종료
-- `ai-native-methodology/examples/poc-02-realworld-springboot3/` — PoC #02 ✅ 종료
+- `ai-native-methodology/schemas/` — JSON Schema (12종)
+- `ai-native-methodology/templates/` — 산출물 템플릿 (19종)
+- `ai-native-methodology/tools/` — Node CLI 검증 도구 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner)
+- `ai-native-methodology/examples/poc-01-realworld-spring/` — PoC #01 (Java/Spring Boot 2.5) ✅ 종료
+- `ai-native-methodology/examples/poc-02-realworld-springboot3/` — PoC #02 (Java/Spring Boot 3.3 Hexagonal) ✅ 종료
+- `ai-native-methodology/examples/poc-03-realworld-nestjs/` — PoC #03 (TypeScript/NestJS) ✅ 종료 (★ platform-agnostic 입증)
 
 ## 정착 패턴 (메서드론 자산화)
 
@@ -65,8 +67,11 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 - **가벼운 sub-agent** — Phase 3 대비 ~10배 단축. (memory `feedback_lightweight_sub_agent.md`)
 - **Composite View** — 복합 AP 등록 거절 + avoid-list.md 가독성. PoC #01 1건 → PoC #02 4건. (memory `feedback_composite_view_pattern.md`)
 - **F-021 finding 임계** — 누적 5~15건 건강 / 20+ 명세 부실 의심. (memory `feedback_finding_threshold.md`)
+- **★★★ no-simulation 정책 첫 실현 (v1.3.0)** — 자체 도구 (drift / dmn) + 진짜 외부 도구 (spectral) 양쪽 검증 시 ADR-009 단계 4 도달. 신뢰도 -5%p 패널티 회피 / 환경별 carry-over 분류 의무. (memory `feedback_no_simulation_realized.md`)
+- **본체 격상 vs PoC 산출물 분리 원칙** — quality 격상 시 schemas/methodology-spec/docs/adr/tools 본체 격상이 examples/poc-XX/ 산출물 작업보다 우선. (★ v1.3.0 release 트리거, memory `feedback_methodology_body_priority.md`)
 
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (현재 v1.3.1 PATCH)
+- `ai-native-methodology/docs/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적)

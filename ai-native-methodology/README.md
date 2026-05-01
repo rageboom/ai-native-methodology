@@ -1,14 +1,13 @@
-# AI-Native 개발 방법론 v1.3.0 ★★★
+# AI-Native 개발 방법론 v1.3.1 ★★★
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
 >
 > 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
 >
+> **현재**: v1.3.1 PATCH (2026-05-01) — D3.2 원본 파일명 컨벤션 정리 (12 rename + 33 cross-link). dist 와 동기화 / 한국어 → 영어 + 1자리 prefix + .yml→.yaml 일관.
+>
 > **★★★ v1.3.0 release (2026-05-01)**: 3 PoC platform-agnostic 입증 + 11 묶음 본체 갭 closure + ★ Sprint 5 Node 도구 부분 종결 (spectral 실 실행 — 24 warnings / 0 errors / exit 0) + ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% 도달 (★ ADR-009 단계 4). **사내 표준 채택 가능 시점 도달**.
 >
-> **주요 격상**: Phase 4.5 cross-link 의무화 schema / AP-PERFORMANCE 3 PoC 권위 격상 / Positive finding 패턴 / Lifecycle BR / NestJS 4 ADR / ADR-010 Baseline+Ratchet / formal-spec-link-validator 도구.
->
-> v1.2.1 — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema 강제. 진짜 도구 실 실행 Sprint 5 carry-over.
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
 
 ---
@@ -63,27 +62,36 @@
 - 분석 대상 레포 git clone
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 
-### 사용법 (예정)
+### 사용법 (현재 — manual)
+
+본 방법론 사용 시 Claude Code 세션에서 `methodology-spec/workflow/phase-*.md` 를 phase 별로 차례로 적용. 각 phase 산출물은 `examples/poc-XX/output/` 구조 참조.
 
 ```bash
-# 레포에 plugin 설치
-cp -r plugin/.claude/* {분석대상레포}/.claude/
+# 분석 대상 레포 clone
+git clone <legacy-repo>
 
-# 분석 시작
-cd {분석대상레포}
+# Claude Code 세션 시작 + methodology-spec 컨텍스트 로드
+cd <legacy-repo>
 claude code
-
-# Phase 별로 실행
-/analyze-init      # 1단계: 인벤토리
-/analyze-db        # 2단계: DB + 정합성 검증
-/analyze-arch      # 3단계: 아키텍처
-/analyze-business-logic  # 4단계: 비즈니스 로직 (4영역 병렬)
-/analyze-api       # 5-1단계: API
-/analyze-ui        # 5-2단계: UI/UX
-/analyze-quality   # 6단계: 품질 통합
+# → methodology-spec/workflow/phase-0-input.md 부터 순차 적용
 ```
 
-각 단계는 **사용자 승인 게이트** 후 다음 단계로 진행.
+**각 단계는 사용자 승인 게이트** 후 다음 단계로 진행 (Work Principles 4원칙).
+
+### 사용법 (예정 — D5 carry-over)
+
+slash command + skill 로 패키징하는 작업 (D5) 진행 중. 완료 후 다음 형태:
+
+```bash
+/analyze-init   # phase-1   인벤토리
+/analyze-db     # phase-2   DB
+/analyze-arch   # phase-3   아키텍처
+/analyze-bl     # phase-4   비즈니스 로직 (4영역 병렬)
+/analyze-fs     # phase-4-5 형식 명세 (★ no-simulation)
+/analyze-api    # phase-5-1 API
+/analyze-ui     # phase-5-2 UI/UX
+/analyze-q      # phase-6   품질 통합
+```
 
 ---
 
@@ -91,16 +99,16 @@ claude code
 
 ```
 ai-native-methodology/
-├── docs/                   사람이 읽는 가이드
-│   ├── methodology-v1.md
-│   ├── onboarding.md
-│   └── adr/                의사결정 기록
+├── docs/
+│   ├── adr/                ADR 13종 (001~006 + 008/009/010 + NEST-001~004) ※ 007 부재 — openapi-extension.schema.json 으로 대체
+│   └── v1.3-promotion-report.md
 ├── methodology-spec/       Single Source of Truth
-│   ├── deliverables/       7대 산출물 명세
-│   ├── workflow/           7단계 워크플로우 명세
+│   ├── deliverables/       7대 산출물 명세 (1-architecture ~ 7-ui-ux)
+│   ├── workflow/           phase-0 ~ phase-6 + phase-flow.json
+│   ├── finding-system.md
 │   ├── id-conventions.md
 │   └── glossary-ko.md
-├── schemas/                JSON Schema (계약)
+├── schemas/                JSON Schema 12종 (계약)
 │   ├── meta-confidence.schema.json
 │   ├── architecture.schema.json
 │   ├── domain.schema.json
@@ -108,27 +116,29 @@ ai-native-methodology/
 │   ├── db-schema.schema.json
 │   ├── rules.schema.json
 │   ├── antipatterns.schema.json
-│   └── ui-spec.schema.json
-├── templates/              산출물 템플릿
-├── plugin/                 Claude Code 플러그인
-│   └── .claude/
-│       ├── skills/
-│       ├── agents/
-│       └── commands/
-├── tools/                  ★ v1.2.1 신설 — Phase 4.5 자동 검증 도구
-│   ├── drift-validator/        .json ↔ .mermaid 의미 동일성 (state + sequence)
+│   ├── ui-spec.schema.json
+│   ├── inventory.schema.json
+│   ├── formal-spec.schema.json
+│   ├── finding-system.schema.json
+│   └── README.md
+├── templates/              산출물 템플릿 19종 (md / mermaid / json / yaml)
+├── tools/                  Node CLI 검증 도구 5종
+│   ├── drift-validator/         .json ↔ .mermaid 의미 동일성 + baseline / ratchet (ADR-010)
 │   ├── decision-table-validator/ dmn-check 5종 (duplicate/conflict/gap/overlap/type)
-│   └── static-runner/           Semgrep/PMD/SpotBugs plugin host + 5종 물증 + lint-no-simulation
-├── decisions/              결정 로그 (역시간순 / INDEX.md / STATUS.md)
-├── examples/               PoC 결과 (★ 3 platform 검증)
-│   ├── poc-01-realworld-spring/        ★ Java + Spring Boot 2.5 (CRUD)
-│   ├── poc-02-realworld-springboot3/   ★ Java + Spring Boot 3.3 + Hexagonal
-│   └── poc-03-realworld-nestjs/        ★ TypeScript + NestJS + TypeORM (★★ platform-agnostic 입증)
-└── .claude-plugin/         사내 plugin 배포 설정
+│   ├── formal-spec-link-validator/ Phase 4.5 cross-link 검증 (★ v1.3 신규)
+│   ├── spectral-runner/          OpenAPI spectral lint wrapper (★★★ no-simulation 진짜 외부 도구)
+│   └── static-runner/            Semgrep/PMD/SpotBugs plugin host + lint-no-simulation
+├── decisions/              결정 로그 (역시간순 / INDEX.md / STATUS.md / 25 DEC)
+└── examples/               PoC 결과 (★ 3 platform 검증)
+    ├── poc-01-realworld-spring/        ★ Java + Spring Boot 2.5 (CRUD)
+    ├── poc-02-realworld-springboot3/   ★ Java + Spring Boot 3.3 + Hexagonal
+    └── poc-03-realworld-nestjs/        ★ TypeScript + NestJS + TypeORM (★★ platform-agnostic 입증)
 
 # 레포 루트 (본 디렉토리 외부)
 .github/workflows/drift-check.yml   ★ v1.2.1 — 이중 모드 (PR diff-aware + nightly full)
 ```
+
+※ inner repo 의 `plugin/` 및 `.claude-plugin/` 빈 dir 은 D5 carry-over (Claude Code skill / slash command 패키징 작업) 용 placeholder.
 
 ## 검증 도구 사용 (v1.2.1)
 
@@ -166,27 +176,29 @@ CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manua
 
 ---
 
-## 현재 상태 (v1.2.1 — 묶음 N+O 인프라 100% 산출)
+## 현재 상태 (v1.3.1 PATCH — 사내 표준 채택 가능 시점)
 
-### v1.x 누적 (2026-04-26 ~ 2026-04-30)
+### v1.x 누적 (2026-04-26 ~ 2026-05-01)
 
 - ✅ §0~§15 plan.md 완성
-- ✅ 7대 산출물 + 형식 명세 JSON Schema 11개 완성 (formal-spec / finding-system 신설)
-- ✅ ADR 8개 (001~006 + 008 + **009 신규** v1.2.2) — ADR-007 OpenAPI x-extension 별도 / ADR-010 baseline+ratchet Sprint 5 carry-over
+- ✅ 7대 산출물 + 형식 명세 JSON Schema 11종 + meta-confidence = 12종
+- ✅ ADR 13종 (001~006 + 008 + 009 + 010 + NEST-001~004) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
 - ✅ Phase 4.5 형식 명세 정식 도입 (state-machine + sequence + decision-table + invariants + property-test)
-- ✅ PoC #01 + #02 종결 — Phase 1~6 + Phase 4.5 4 sprint
-- ✅ 이중 렌더링 사상 (ADR-008) 정식 등록
-- ✅ migration-cautions.md 의무 산출물 격상
-- ✅ **v1.2.1 — drift-validator + decision-table-validator + static-runner 3종 도구 + drift-check.yml CI + 5종 물증 schema 강제**
-- ✅ **v1.2.2 — 본체 갭 7건 모두 closed**: api.template.md / phase-flow.mermaid+json / ADR-009 / db-schema.template.md / meta-confidence.template.yaml
-- ✅ PoC #02 자가 검증 → 11 신규 finding (F-107~F-117) 자동 검출
+- ✅ **3 PoC 종결 — platform-agnostic 입증** (Spring Boot 2.5 + Spring Boot 3.3 Hexagonal + NestJS) / 6 격상 후보 모두 본체 적용
+- ✅ 이중 렌더링 사상 (ADR-008) + migration-cautions.md 의무 산출물
+- ✅ **v1.2.1** — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema
+- ✅ **v1.2.2** — 본체 갭 7건 closed (api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yaml)
+- ✅ **v1.2.3** — 본체 갭 8건 추가 closed (C/I/H/K + R/D + §8.1) + LMNO 4묶음 종결
+- ✅ **v1.3.0** ★★★ — Sprint 5 spectral 실 실행 (24 warnings / 0 errors / exit 0) + ★★★ no-simulation 정책 첫 실현 + formal-spec-link-validator 신규 + ADR-NEST-001~004 + ADR-010 baseline+ratchet + 신뢰도 85-92% (★ ADR-009 단계 4)
+- ✅ **v1.3.1** PATCH — D3.2 원본 파일명 컨벤션 정리 (12 rename + 33 cross-link, dist 동기화)
 
-### v1.2.x → v1.3 후속
+### v1.3.x → v1.4 후속
 
-- ⏳ **Sprint 5 carry-over** — static tool 실 실행 1회 (Semgrep+PMD) / drift-validator transitionFuzzyMatch 보완 / corpus 4쌍→20쌍 / ADR-010 (baseline+ratchet)
-- ⏳ 본체 갭 P2-3 5건 (api.template.md / phase-flow.mermaid / db-schema.template.md / meta-confidence.template)
-- ⏳ Claude Code 플러그인 구현
-- ⏳ PoC #03 (다른 stack — FastAPI / NestJS / Ktor)
+- ⏳ **Sprint 5 잔여 carry-over** — Semgrep / PMD / OSV-Scanner 진짜 실행 (★ 환경 변동 시)
+- ⏳ **Sprint 6** (Node 환경 가능) — vacuum / openapi-changes / corpus 14→20쌍 / drift-validator phase-flow 비교기 / ADR-010 baseline mode wrapper
+- ⏳ **D5** — Claude Code skill + slash command 패키징
+- ⏳ **v1.4 candidate** — 4번째 PoC (FastAPI / Ktor / Rust / Go)
+- ⏳ **adoption FE 트랙** — React+TS+TanStack Query+Zustand+Axios PoC #04
 
 ---
 
