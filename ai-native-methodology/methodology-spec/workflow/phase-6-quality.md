@@ -24,6 +24,10 @@ Phase 1~5 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈
 | Phase 4 | 4영역 부분 안티패턴 |
 | Phase 5-1 | API 안티패턴 후보 |
 | Phase 5-2 | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c) |
+| ★ deliverable 10 | a11y-spec.json (★ v1.4 — WCAG 2.1+2.2 ratchet) |
+| ★ deliverable 11 | i18n-spec.json (★ v1.4 — ICU MF1+MF2 / MF1 폴백) |
+| ★ deliverable 12 | static-security-spec.json (★ v1.4 — XSS / CSRF / CSP) |
+| ★ deliverable 13 | legacy-spectrum.json (★ v1.4 — Tier 1~4 + Strangler) |
 
 ---
 
@@ -116,11 +120,14 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ```
 .ai-analysis/output/antipatterns/
-├── antipatterns.json        # AI용 (통합 + migration_advice 필드)
-├── avoid-list.md            # 사람용 체크리스트 (기존 시스템 fix 가이드)
-├── migration-cautions.md    # ★ 신규 시스템 회피 가이드 (의무 산출물)
-└── composite-patterns.md    # 복합 패턴 별도 (가독성)
+├── antipatterns.json           # AI용 (통합 + migration_advice 필드)
+├── avoid-list.md               # 사람용 체크리스트 (기존 시스템 fix 가이드)
+├── migration-cautions.md       # ★ 신규 시스템 회피 가이드 (BE 영역 의무)
+├── migration-cautions-fe.md    # ★ v1.4 신규 — FE 영역 회피 가이드 (의무, FE 분석 시)
+└── composite-patterns.md       # 복합 패턴 별도 (가독성)
 ```
+
+★ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-cautions-fe.md` 본체 spec 정합. 카테고리 7종 (state 5 진실 / visual baseline / a11y baseline+ratchet / i18n MF1 폴백 / 정적보안 / legacy 4 Tier strangle / quality gate FE).
 
 ### 6.1 migration-cautions.md 의무 산출물
 
