@@ -9,7 +9,8 @@
 
 ## 방법론 본체 버전
 
-- **★ v1.4.0-dev 라인 진입 (2026-05-01) — Stage 0 종결 ✅ 현재** — FE 트랙 정식 시작. 사용자 진단 "FE 분석 방법이 없잖아" → research-first. 8 Stage 분할 (0 freeze 해제 + 트랙 진입 / 1 research × 3 / 2 사용자 승인 3 sub-gate / 3 본체 격상 / 4 mini-PoC fail-fast / 5 본격 PoC #04 / 6 BE/FE 분리 정책 / 7 v1.4.0 release). 외부 plan = `~/.claude/plans/be-foamy-jellyfish.md` (3 에이전트 점검 v2). DEC-2026-05-01-v1.4-FE-트랙-진입.
+- **★ v1.4.0-dev 라인 (2026-05-01) — Stage 1 종결 ✅ 현재** — FE 트랙 research × 3 완료 (공식문서 / 산업 / Senior). **3 에이전트 합의: Scenario B-Lite (단계 분할) / 권위 매개체 12 채택 / 빈틈 Top 5 / 사용자 7 요구 100% 반영 가능**. Stage 2 진입 자료 12 결정 완비 (Gate 1/2/3 × 4). DEC-2026-05-01-v1.4-Stage-1-research-종결.
+- **v1.4.0-dev Stage 0 (2026-05-01) ✅** — FE 트랙 정식 시작. 사용자 진단 "FE 분석 방법이 없잖아" → research-first. 8 Stage 분할. 외부 plan = `~/.claude/plans/be-foamy-jellyfish.md` (3 에이전트 점검 v2). DEC-2026-05-01-v1.4-FE-트랙-진입.
 - **★★★ v1.3.0 MINOR release (2026-05-01) ✅ 보존** — 사내 표준 채택 가능 시점 도달. **11 묶음 통합** (C+I+H+K + R+D+§8.1 + L+M+N+O) + Sprint 5 Node 도구 부분 종결 (spectral). ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% (★ ADR-009 단계 4 — 진짜 도구 1회 실행).
 - v1.2.3 PATCH (★ v1.3.0 에 흡수) — 본체 격상 7 묶음 (C+I+H+K + R+D+§8.1).
   - C: Phase 4.5 cross-link 의무화 schema
@@ -46,7 +47,8 @@
 | **시퀀스 B Phase 6** | **antipatterns final 4종 — antipatterns.json (11 AP / critical 2 + high 3 + medium 4 + low 2) + avoid-list.md + ★ migration-cautions.md (NestJS 특이 8 함정 + 학습 효과 3건) + _manifest. 4 composite view + Phase 4.5 cross-link 4/11 AP + ★★ F-161 positive (Bearer 학습 효과) + AP-PERFORMANCE-001 medium → high 격상 (3 PoC 재현). 신뢰도 0.94 / 7대 산출물 6/7** | ✅ **본 세션 (2026-04-30)** |
 | **★★★ PoC #03 종결** | **★★ 전체 7대 산출물 6/7 도달** (UI/UX 만 N/A) — 사내 표준 v1.3 격상 데이터 완비 | ✅ (2026-04-30) |
 | v1.3.0 MINOR + v1.3.1 PATCH release | 사내 표준 채택 가능 시점 도달 / D3.2 파일명 컨벤션 정리 (12 rename, c72d29c) | ✅ (2026-05-01 보존) |
-| **★ v1.4.0-dev Stage 0** | freeze 해제 + FE 트랙 진입 + 8 Stage 분할 합의 + plan/DEC/STATUS/INDEX/CHANGELOG/memory | ✅ **본 세션 (2026-05-01)** |
+| v1.4.0-dev Stage 0 | freeze 해제 + FE 트랙 진입 + 8 Stage 분할 합의 + plan/DEC/STATUS/INDEX/CHANGELOG/memory | ✅ (2026-05-01) |
+| **★ v1.4.0-dev Stage 1** | research × 3 (공식/산업/Senior) — 9Q × 27 답 + 진단 보고서 + Stage 2 Gate 입력 12 결정 | ✅ **본 세션 (2026-05-01)** |
 
 ---
 

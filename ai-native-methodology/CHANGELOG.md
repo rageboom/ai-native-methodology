@@ -59,6 +59,35 @@ v1.3.1 PATCH 종결 후 사용자 결정 — **freeze 해제 + FE 트랙 정식 
 | 핵심 빈틈 | 신뢰도 정직 표기 | 산출물↔테스트 자동 도출 / visible 차원 / 분산 상태 / 이벤트 / 렌더링 |
 | 분리 정책 | 단일 BE 관점 | BE/FE 분리 운영 (Stage 6) — JS 풀스택 / JSP 혼재 예외 |
 
+### Stage 1 산출 (research × 3 — 2026-05-01 본 세션)
+
+| # | 산출 | 위치 | 분량 |
+|---|---|---|---|
+| 1 | research-official-v1.4-fe.md | `.claude/plans/` | ~2,400 단어 / 1차 사료 ≥ 25개 |
+| 2 | research-industry-v1.4-fe.md | `.claude/plans/` | ~2,800 단어 / 1차 사료 다중 |
+| 3 | research-senior-v1.4-fe.md | `.claude/plans/` | ~3,500 단어 / 9Q 모두 강한 답 |
+| 4 | research-v1.4-fe-summary.md (★ 진단 보고서) | `.claude/plans/` | 통합 + Stage 2 Gate 입력 12 결정 |
+| 5 | DEC-2026-05-01-v1.4-Stage-1-research-종결.md | `decisions/` | Stage 1 종결 결단 |
+
+### Stage 1 핵심 합의 (3 에이전트)
+
+- ★ 격상 시나리오 = **Scenario B-Lite (단계 분할)** — Senior 권고 + 산업/공식 정합
+- ★ legacy cover (jQuery/Vanilla/MPA/JSP) **v1.4 포함** — 사용자 진단 직접 대응
+- ★ visual-manifest deliverable 신설 (사용자 요구 3번 visible 정면 해소)
+- ★ state-map deliverable 신설 + W3C SCXML 채택 (분산 상태 5 진실)
+- ★ 권위 매개체 12 통합 채택 (CEM/SCXML/DTCG/MSW+OAS/axe-core/.d.ts/CSF/Playwright/WCAG 2.1/WAI-ARIA 1.2/ICU MF/Pact)
+- ★ a11y + i18n v1.4 포함 (산출물↔테스트 자동 도출)
+
+### 본체 빈틈 진단 (Stage 3 격상 작업 항목)
+
+Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback 부재 / 권위 매개체 격상 미반영 / 신뢰도 단계 모델 부재. 세부 21건 (`research-v1.4-fe-summary.md` §3).
+
+### Stage 2 진입 자료 (사용자 결단 12 항목)
+
+- Gate 1 (핵심 구조) 4 결정: spectrum / 시나리오 (B-Lite) / schema 분리 / 매개체 12 채택
+- Gate 2 (보강 범위) 4 결정: 비기능 v1.4 (a11y+i18n+정적보안) / legacy Tier 1~4 / BE/FE 분리 / ADR-001 §명시적 제외 갱신
+- Gate 3 (검증 전략) 4 결정: mini-PoC 진입 (Stage 3-1 후 즉시) / PoC #04 (RealWorld only) / 신뢰도 0.80 / Sprint 4-6
+
 ### Sprint 5/6 carry-over (BE 트랙 잔여 — 별개 sub-track)
 
 - Semgrep / PMD / OSV-Scanner 환경 의존
