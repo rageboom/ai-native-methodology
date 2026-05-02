@@ -41,6 +41,12 @@ const EXCLUDE_BASENAMES = new Set([
   '.npmrc',
 ]);
 
+// ★ ★ ★ v1.4.3 follow-up F1 fix — templates/adoption/ 은 ★ dist root 의 CLAUDE.md + ADOPTION-README.md 로 별칭 복사됨 / 원본은 dist 에서 제외 의무
+// (Agent 4 발견 — 의도 명세에 명시되었으나 walk() 가 templates/ 통째로 복사하면서 templates/adoption/ 까지 포함되는 bug)
+const EXCLUDE_REL_PATHS = new Set([
+  join('templates', 'adoption').replaceAll(sep, '/'),  // POSIX-style for compare
+]);
+
 // ★ Official 보강 — Windows long-path (>260) 검증
 const WINDOWS_PATH_LIMIT = 260;
 
@@ -63,13 +69,23 @@ function runVersionCheck() {
   }
 }
 
-function* walk(dir, base = dir) {
+function* walk(dir, base = dir, includeName = '') {
   const entries = readdirSync(dir, { withFileTypes: true });
   for (const entry of entries) {
     if (EXCLUDE_BASENAMES.has(entry.name)) continue;
     const full = join(dir, entry.name);
-    if (entry.isDirectory()) yield* walk(full, base);
-    else if (entry.isFile()) yield { full, rel: relative(base, full) };
+    if (entry.isDirectory()) {
+      // ★ v1.4.3 follow-up F1 fix — INCLUDE 진입점 기준 rel path 가 EXCLUDE_REL_PATHS 매칭 시 skip
+      const relFromWorkspace = `${includeName}/${relative(base, full).replaceAll(sep, '/')}`;
+      if (EXCLUDE_REL_PATHS.has(relFromWorkspace)) {
+        console.log(`[build-plugin] ★ skip excluded path: ${relFromWorkspace}`);
+        continue;
+      }
+      yield* walk(full, base, includeName);
+    } else if (entry.isFile()) {
+      const rel = relative(base, full).replaceAll(sep, '/');
+      yield { full, rel };
+    }
   }
 }
 
@@ -143,8 +159,8 @@ async function build() {
       continue;
     }
 
-    // 디렉토리 — walk 로 파일 단위 복사 (★ EXCLUDE_BASENAMES 적용)
-    for (const { full: srcFile, rel: relPath } of walk(src)) {
+    // 디렉토리 — walk 로 파일 단위 복사 (★ EXCLUDE_BASENAMES + EXCLUDE_REL_PATHS 적용)
+    for (const { full: srcFile, rel: relPath } of walk(src, src, item)) {
       const dstFile = join(dst, relPath);
       if (!DRY_RUN) {
         mkdirSync(resolve(dstFile, '..'), { recursive: true });
@@ -182,13 +198,14 @@ async function build() {
   }
 
   // ★ Industry 보강 2 — CHECKSUMS.txt SHA256 manifest (Shopify CLI v3.50+)
+  // ★ ★ v1.4.3 follow-up F2 fix — sort 을 ★ rel path 기반으로 (★ supply chain 관행 / 사람 inspect 친화 / hash 기반 ❌)
   if (!DRY_RUN && checksumEntries.length > 0) {
+    const sorted = [...checksumEntries].sort((a, b) => a.rel.localeCompare(b.rel));
     const lines = [];
-    for (const { rel, full } of checksumEntries) {
+    for (const { rel, full } of sorted) {
       const hex = await sha256(full);
       lines.push(`${hex}  ${rel}`);
     }
-    lines.sort();
     writeFileSync(join(target, 'CHECKSUMS.txt'), lines.join('\n') + '\n', 'utf-8');
     fileCount++;
   }

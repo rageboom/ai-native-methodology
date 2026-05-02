@@ -51,15 +51,21 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 핵심 디렉토리
 
-- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 8 + glossary-ko + finding-system + id-conventions)
-- `ai-native-methodology/docs/adr/` — ADR-001~006 + ADR-008/009 (Phase 4.5) + ADR-010 (baseline+ratchet) + ADR-NEST-001~004 (NestJS 정책) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
+- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 1~15 + glossary-ko + finding-system + id-conventions + lifecycle-contract)
+- `ai-native-methodology/docs/adr/` — ADR-001~010 (BE) + ADR-FE-001~007 (FE) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
 - `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태)
-- `ai-native-methodology/schemas/` — JSON Schema (12종)
-- `ai-native-methodology/templates/` — 산출물 템플릿 (19종)
-- `ai-native-methodology/tools/` — Node CLI 검증 도구 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner)
+- `ai-native-methodology/schemas/` — JSON Schema (13종 — BE 5 + FE 8)
+- `ai-native-methodology/templates/` — 산출물 템플릿 (★ analysis/ + design/test/implement/planning placeholder + ★ adoption/ — 사내 적용 진입점 customization)
+- `ai-native-methodology/tools/` — Node CLI 검증 도구 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner) — ★ 자체 package.json 독립 유지
+- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json + marketplace.json) / Claude Code plugin 시스템 진입점
+- `ai-native-methodology/agents/` + `skills/` + `hooks/` + `flows/` — plugin 자산 (★ install 후 자연어 prompt 매칭 / lifecycle stage organize)
+- `ai-native-methodology/scripts/` — build-plugin.js + version-check.js (★ v1.4.3 도입 / build artifact `dist/internal-v<version>/` 추출)
 - `ai-native-methodology/examples/poc-01-realworld-spring/` — PoC #01 (Java/Spring Boot 2.5) ✅ 종료
 - `ai-native-methodology/examples/poc-02-realworld-springboot3/` — PoC #02 (Java/Spring Boot 3.3 Hexagonal) ✅ 종료
 - `ai-native-methodology/examples/poc-03-realworld-nestjs/` — PoC #03 (TypeScript/NestJS) ✅ 종료 (★ platform-agnostic 입증)
+- `ai-native-methodology/examples/poc-04-full-realworld-react/` — PoC #04 (TypeScript/React FSD / yurisldk fork) ✅ 종료 (★ FE 트랙 + §8.1 strict 검증대 통과)
+- `ai-native-methodology/archive/` — 진화 history (★ v1.0~v1.1.2 metadata)
+- `ai-native-methodology/docs/adoption/` — 사내 적용 작업 archive (★ v1.4.3 흡수 / 14차 결단 retract trace)
 
 ## 정착 패턴 (메서드론 자산화)
 
@@ -72,6 +78,8 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 참고
 
-- `ai-native-methodology/README.md` — 방법론 소개
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (현재 v1.3.1 PATCH)
+- `ai-native-methodology/README.md` — 방법론 소개 (★ v1.4.x plugin install 가이드 포함)
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ 현재 **v1.4.3 PATCH** — adoption 폐기 + workspace 단일 통합 + build script 1차 도입)
 - `ai-native-methodology/docs/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적)
+- `ai-native-methodology/docs/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template)
+- `ai-native-methodology/docs/adoption/lessons-learned-2026-05-02.md` — ★ 14차 결단 1일 retract Lessons Learned

@@ -38,3 +38,29 @@ Rename-Item -Path "C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodo
 ```
 
 ★ 30일 cooldown 후 사용자 수동 검토 + 삭제 결정.
+
+## ★ 사용자 결단 carry (★ v1.4.3 follow-up 검증 결과)
+
+다음 2 자산은 ★ 사용자 결단 영역 (★ silent loss 가능성 / 보존 vs 폐기 결단):
+
+### F4 — `adoption/CLAUDE.md` (root / 73 line)
+
+- **내용**: adoption 폴더 자체의 작업 컨텍스트 진입점 (휘발성 진행 상태 참조 + 절대 우선순위 + no-simulation 정책 인라인)
+- **현재 처리**: ★ 폐기 분류 (Plan §D2 / "stale")
+- **재검증 결과** (★ v1.4.3 follow-up Agent 1): ★ "미묘한 가치" — 사내 적용 초기 작업 가이드 + workspace 외부 컨테이너 CLAUDE.md 와 ★ 다른 layer (작업 메타 vs 본체 진화 컨텍스트)
+- **결단 옵션**:
+  - (a) 폐기 — 현 plan 유지 / 가치 미미 가정
+  - (b) `docs/adoption/ADOPTION-ROOT-CONTEXT.md` 흡수 — 사내 적용 시 작업 진입점 가이드 가치 보존
+
+### F5 — `adoption/legacy-analyzer/.claude/` (4 metadata)
+
+- **내용**: 사용자 (FE Lead) 의 별도 도구 진입점 계획서 — "AI-Native Legacy Analyzer" / harness-engineering-study 의 입구 / 100K+ LOC legacy → 명세·계약·ADR 초안 자동 생성 / 3계층 구조 (skills / commands / agents / output) / Tree-sitter 어댑터 + 점진 실행
+- **현재 처리**: ★ 외부 이관 carry / `harness-engineering-study/` 별도 레포 권고 (★ Plan §D2)
+- **재검증 결과** (★ v1.4.3 follow-up Agent 1): ★ 별도 도구 계획서 / workspace 와 무관 / 단 ★ 사용자 자체 자산 손실 risk 명시 의무
+- **결단 옵션**:
+  - (a) 외부 이관 (Plan §D2 유지) — `C:\...\AI\harness-engineering-study\` 별도 레포 init / 사용자 별도 트리거
+  - (b) workspace `archive/legacy-analyzer-plans/` 흡수 — 진화 trace 보존 + 외부 이관 trigger 까지 보관소
+
+### 결단 trigger
+
+★ 사용자가 다음 세션 시작 시 (b) 결단 시 워크스페이스 흡수 / (a) 결단 시 외부 이관 + adoption/CLAUDE.md (F4) 폐기 진행. ★ 결단 부재 시 ★ Phase B 진입 자격 평가 시점에 강제 결단 의무.
