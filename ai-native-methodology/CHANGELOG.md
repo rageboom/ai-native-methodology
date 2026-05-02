@@ -9,7 +9,97 @@
 
 ---
 
-## [v1.4.2] — 2026-05-02 ⭐ 현재 (★ ★ PATCH release — AP-FE-SECURITY-001 진짜 도구 직접 confirm + custom rule 첫 실현 + drift-check.yml CI ratchet)
+## [v1.4.3] — 2026-05-02 ⭐ 현재 (★ ★ ★ PATCH release — adoption 폐기 + workspace 단일 통합 + build script 1차 도입)
+
+### ★ ★ 14차 결단 (DEC-2026-05-02-plugin-first) 1일 retract
+
+★ "본체 = plugin source / adoption/dist = artifact" 분리 워크스페이스 발상 → ★ ★ ★ retract.
+
+**사유** (★ Industry 사례 + Senior 권고):
+- adoption/dist artifact 발상 = ★ 단일 source-of-truth 위배
+- frontmatter provenance + build script 만으로 동등 효과 + sync 부담 ↓
+- Babel/Yarn/Sentry 3 사례 동일 lesson — "별도 dist sync 비용 > 통합 비용"
+
+### ★ ★ ★ adoption 폐기 + 자산 흡수
+
+`ai-native-methodology-adoption/` → `.deprecated-2026-05-02/` rename (★ 30일 cooldown 후 사용자 수동 검토 / 자동 삭제 ❌).
+
+**흡수 자산 (★ Agent 4 발견 — 사용자 직접 편집)**:
+- `templates/adoption/CLAUDE.md` ← `adoption/dist/internal-v1.3/CLAUDE.md` (★ 정책 23 inline / NestJS 4 + Spring 5 PoC #02 추출)
+- `templates/adoption/README.md` ← `adoption/dist/internal-v1.3/README.md` (★ 사내 진입점 READ FIRST)
+- `archive/methodology-v1.1/` ← `adoption/methodology-v1.1/` (13 metadata)
+- `docs/adoption/v1.3-plan.md` ← `adoption/work/plan.md` (340 라인)
+- `docs/adoption/v1.3-status.md` ← `adoption/work/STATUS.md` (58 라인)
+- `docs/adoption/v1.3-decisions-index.md` ← `adoption/work/decisions/INDEX.md` (42 라인)
+- `docs/adoption/lessons-learned-2026-05-02.md` (★ 신규 / Senior 보강 §4)
+- `docs/adoption/README.md` (★ 진입점)
+
+**폐기 (변경 0 또는 placeholder)**:
+- `adoption/ai-native-methodology/` v1.3.0 클론 (★ workspace v1.4.3 superset)
+- `adoption/dist/internal-v1.3/` 나머지 (★ build script 가 dist/internal-v1.4.3/ 로 대체)
+- `adoption/work/research/` (★ 빈 placeholder)
+- `adoption/poc-fe-04-realworld-react/` (★ 실 산출물 0 / workspace examples/poc-04-full-realworld-react/ 가 superset)
+
+**외부 이관 carry**: `adoption/legacy-analyzer/` → `harness-engineering-study/` (★ 사용자 결단 / lock 으로 본 commit 자동 미실행)
+
+### ★ ★ ★ Build script 1차 도입 (★ Phase A)
+
+**신규 자산**:
+- `package.json` (★ workspace root / private:true / devDeps only / scripts.build/build:check/version:check/build:diff-check)
+- `scripts/build-plugin.js` (★ Official + Industry + Senior 보강 7건 반영)
+  - explicit allow-list (★ VSCode `vsce` node_modules 사고 회피)
+  - try/catch + Windows long-path (>260) 검증 (★ Official `fs.cpSync` Stability "1 - Experimental")
+  - `../` traversal 금지 / self-contained 보장
+  - SHA256 manifest `CHECKSUMS.txt` (★ Industry — Shopify CLI v3.50+)
+  - templates/adoption/CLAUDE.md + README.md → dist root 동시 복사 (★ Agent 4 발견)
+  - dry-run mode (`--check`)
+- `scripts/version-check.js` (★ plugin.json + CHANGELOG + package.json 3 source 정합 / source-of-truth = plugin.json)
+- `.gitignore` 신규 (`/dist/` `node_modules/` `package-lock.json`)
+
+**Phase A 운영**:
+- workspace `marketplace.json` `"source": "./"` ★ 그대로 유지 (★ v1.4.2 install 회귀 0)
+- `dist/internal-v1.4.3/` = 부가 출력 (★ install 메커니즘 영향 0)
+
+**Phase B carry** (★ 사내 marketplace push 직전):
+- marketplace.json `"source"` `"./"` → `"./dist/internal-v1.4.3/"` 전환
+- `.github/workflows/release.yml` CI build 자동화 + dist 커밋 강제 gate
+- `${CLAUDE_PLUGIN_DATA}` tool node_modules survive update 패턴
+- 사내 ADR 1호 신설 (★ Anthropic 공식 build 정책 부재 → 사내 표준 정착)
+
+### ★ Lessons Learned (★ memory 자산화 후보)
+
+1. **결단 cadence ≥ 24h cooling-off** (★ general — 다른 plugin 적용 가능)
+   - 14차 결단 → 본 plan retract = 1일 (★ 너무 빠름)
+   - plan.md 비용 > revert 비용 역전 risk
+2. **별도 dist workspace 운영 sync 비용 함정** (★ general)
+3. **사용자 직접 편집 silent loss risk** (★ Agent 4 / general — adoption 폐기 시 dist customization 식별 의무)
+4. **본 retract 자체 = 본 워크스페이스 specific** (★ §8.1 일반화 ❌ / 본체 자산화 ❌)
+
+### Plugin sync (★ feedback_methodology_body_priority 정합)
+
+- `.claude-plugin/plugin.json` version 1.4.2 → **1.4.3**
+- `package.json` 신규 / version 1.4.3 정합
+- ★ tool 5종 자체 `tools/<name>/package.json` 독립 유지 (★ npm workspaces ❌)
+
+### release note + DEC + tag
+
+- `decisions/DEC-2026-05-02-adoption-폐기-build-step-신설.md` (★ 신규 / D1~D7 결단 묶음)
+- `docs/adoption/lessons-learned-2026-05-02.md` (★ 신규 / Senior 보강)
+- git tag `v1.4.3`
+
+### carry 갱신 (★ v1.4.2 5건 → v1.4.3 7건)
+
+- ✅ resolved: adoption 폐기 (★ 본 commit) / build script 1차 도입 (★ Phase A)
+- ⏳ adoption 폴더 rename (★ lock 으로 자동 실행 실패 / 사용자 수동 처리 carry)
+- ⏳ legacy-analyzer 외부 이관 (★ 사용자 결단 / git filter-repo subtree extract carry)
+- ⏳ Phase B build artifact 사내 marketplace push (carry)
+- ⏳ release.yml CI build 자동화 (carry)
+- ⏳ 결단 cadence ≥ 24h cooling-off memory 자산화 (★ 즉시)
+- 보존: sarif severity / RSA+JWT 길이 custom rule / F-FE-006 / i18n / v1.5
+
+---
+
+## [v1.4.2] — 2026-05-02 (★ ★ PATCH release — AP-FE-SECURITY-001 진짜 도구 직접 confirm + custom rule 첫 실현 + drift-check.yml CI ratchet)
 
 ### ★ ★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm (★ implicit 목표 종결)
 

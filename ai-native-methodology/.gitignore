@@ -1,0 +1,9 @@
+# build artifacts (★ Phase A — scripts/build-plugin.js 산출 / Phase B 진입 시 git 추적 결단)
+/dist/
+
+# node
+node_modules/
+package-lock.json
+
+# tool 5종 자체 출력 (★ tools/<name>/out/ 등)
+tools/**/out/
