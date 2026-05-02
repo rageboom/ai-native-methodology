@@ -9,7 +9,44 @@
 
 ---
 
-## [v1.4.0-dev] — 2026-05-02 ⭐ 현재 (MINOR — FE 트랙 / Stage 4 mini-PoC 종결)
+## [v1.4.0-dev] — 2026-05-02 ⭐ 현재 (MINOR — FE 트랙 / Stage 5 본격 PoC #04 종결 / ★ Stage 7 진입 자격)
+
+### Stage 5 본격 PoC #04 (2026-05-02 / 본 세션) — 4 Sprint × 5 sprint 게이트
+
+**분석 대상**: yurisldk/realworld-react-fsd HEAD `963b303` (★ Stage 4 와 동일 코드 / 산출물 재사용 ❌ / Senior strict)
+
+**★ ★ ★ ★ ★ §8.1 strict 정합 검증대 ★ 첫 통과**:
+- AP-FE-SECURITY-001 (★ ★ ★ ★ 4 PoC isomorphic / Java + Hexagonal + NestJS + React) 본체 격상
+- AP-FE-OPTIMISTIC-DRY (★ 3 컴포넌트 isomorphic) 본체 격상
+- ★ ADR-FE-007 신설 (★ 본체 antipattern 카탈로그 첫 등재)
+
+**★ 본체 격상 3건**:
+- drift-validator FE 모드 신설 (★ Sprint 5-3 / F-FE-004 closed)
+- schema-validator (Ajv 8) 신설 (★ Sprint 5-3 / 본체 신규 도구)
+- ADR-FE-007 (★ Sprint 5-4 / 본체 antipattern 카탈로그)
+
+**★ 진짜 도구 6종 + Semgrep carry** (★ no-simulation 단계 5 도달):
+- ts-morph + Playwright + @axe-core/playwright + drift-validator FE + schema-validator + formal-spec-link FE
+- Semgrep ⏳ Docker 부재 carry
+
+**★ Sprint 산출**:
+- Sprint 5-1: fork 결단 (★ G1 D 자동) + Phase 0
+- Sprint 5-2: Phase 5-1 api (19 op + 25 schemas) + 5-2-a (8 page / 33 SCN / 13 CMP) + 5-2-b (9 SM) + form-validation 90/77 BR + ★ URL params 2 page isomorphic 정식화
+- Sprint 5-3: ★ 본체 도구 2건 + Playwright 32 snapshot + axe 16 scan + Phase 6 quality 6 AP + ★ ★ ★ ★ G4 strict 임계 도달 (JWT 4 PoC / Optimistic 3 컴포넌트)
+- Sprint 5-4: V1 + V2 + ★ ★ ADR-FE-007 신설 + rules 80 BR + confidence 0.92
+- Sprint 5-5: Stage 5 종결 + ★ Stage 7 release 진입 자격 7/7 평가
+
+**★ Finding 6건**: F-FE-001~006 (모두 candidate or 본체 격상).
+
+**★ ★ Stage 7 v1.4.0 MINOR release 진입 자격 7/7 충족** + 4 명시 carry-over:
+- Semgrep Docker (사용자 위임)
+- F-FE-006 산출물 schema 정합 (270+ violation / 부분 resolve)
+- deliverable 11 i18n-spec (★ G1 D 결단 / adoption 트랙 합산)
+- v1.5 carry — drift-validator FE 본격 비교 + URL params validation schema 확장
+
+---
+
+## [v1.4.0-dev] — 2026-05-02 (MINOR — FE 트랙 / Stage 4 mini-PoC 종결)
 
 ### Stage 4 (2026-05-02 / 본 세션) — RealWorld React fork 1주 fail-fast mini-PoC
 
