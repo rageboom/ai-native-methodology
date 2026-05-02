@@ -1,6 +1,6 @@
 {
   "name": "ai-native-methodology",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "Legacy 코드 → 7대 산출물 + finding + antipatterns + migration-cautions 한 방향 추출기. SDLC analysis stage 자동화 — Phase 0~6 + Phase 5 BE/FE/DB 분기 + 횡단 a11y/i18n/security/legacy.",
   "author": {
     "name": "AIMD",
