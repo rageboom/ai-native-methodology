@@ -1,0 +1,43 @@
+phase: 5-2-b-state
+poc_id: poc-04-full
+stage: "5"
+sprint: "5-2"
+captured_at: 2026-05-02
+captured_by: real
+artifacts:
+  - state-map.json
+  - _manifest.yml
+ir_layer_mapping:
+  L2_Interaction:
+    - state-map.json (★ 9 SM — Stage 4 5 → Stage 5 9)
+five_truths_coverage:
+  server_cache: ✅ 2 SM (favorite-toggle / follow-toggle)
+  client_global: △ 약식 (auth-storage / userContext middleware)
+  url: ✅ 2 SM (Home + Profile feed-navigation isomorphic)
+  form: ✅ 5 SM (Login + Register + Settings + Editor + Comment)
+  dom: △ 부분
+state_machines:
+  - SM-LOGIN-FORM
+  - SM-REGISTER-FORM (★ Stage 5 신규)
+  - SM-FEED-NAVIGATION-HOME
+  - SM-FEED-NAVIGATION-PROFILE (★ Stage 5 신규 / Home 와 isomorphic)
+  - SM-FAVORITE-TOGGLE (★ 3 컴포넌트 isomorphic)
+  - SM-FOLLOW-TOGGLE (★ 2 컴포넌트 isomorphic)
+  - SM-COMMENT-FORM
+  - SM-EDITOR-FORM (★ Stage 5 신규 / dual-use Create/Update)
+  - SM-SETTINGS-FORM (★ Stage 5 신규)
+isomorphic_machines_validated:
+  - "Feed Navigation: Home + Profile (★ ★ ★ deliverable 14 schema 확장 후보 정식화 시점)"
+  - "Favorite Toggle: 3 컴포넌트"
+  - "Follow Toggle: 2 컴포넌트"
+framework_neutrality_metric:
+  format: "XState JSON 단일 진실 + SCXML subset"
+  ir_react_idioms_in_spec: 0
+  framework_neutrality_score: 1.00
+validation_br_for_deliverable_14:
+  count: 14
+no_simulation_compliance:
+  static_tool_simulated: false
+  ai_persona_used: false
+  evidence: "★ 모든 SM = src 직접 read (8 page + state.ts 2 + actions/ 14)"
+next_phase: 5-2-c-visual + 6-quality (Sprint 5-3)

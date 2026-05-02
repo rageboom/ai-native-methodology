@@ -1,0 +1,1044 @@
+{
+  "$schema_origin": "OpenAPI 3.0.1",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-2",
+    "phase": "5-1-api",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "yaml parser direct",
+    "source": "INPUT/openapi.yaml"
+  },
+  "api_meta": {
+    "title": "RealWorld Conduit API",
+    "version": "1.0.0",
+    "openapi": "3.0.1",
+    "servers": [
+      {
+        "url": "https://api.realworld.io/api"
+      }
+    ],
+    "tags": [
+      "Articles",
+      "Comments",
+      "Favorites",
+      "Profile",
+      "Tags",
+      "User and Authentication"
+    ]
+  },
+  "operations": [
+    {
+      "operation_id": "Login",
+      "path": "/users/login",
+      "method": "POST",
+      "tags": [
+        "User and Authentication"
+      ],
+      "summary": "Existing user login",
+      "description": "Login for existing user",
+      "auth_required": false,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/LoginUserRequest"
+      },
+      "responses": [
+        {
+          "status": "200",
+          "description": "User",
+          "schema_ref": "#/components/schemas/UserResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "operation_id": "CreateUser",
+      "path": "/users",
+      "method": "POST",
+      "tags": [
+        "User and Authentication"
+      ],
+      "summary": null,
+      "description": "Register a new user",
+      "auth_required": false,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/NewUserRequest"
+      },
+      "responses": [
+        {
+          "status": "201",
+          "description": "User",
+          "schema_ref": "#/components/schemas/UserResponse"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "operation_id": "GetCurrentUser",
+      "path": "/user",
+      "method": "GET",
+      "tags": [
+        "User and Authentication"
+      ],
+      "summary": "Get current user",
+      "description": "Gets the currently logged-in user",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "User",
+          "schema_ref": "#/components/schemas/UserResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "operation_id": "UpdateCurrentUser",
+      "path": "/user",
+      "method": "PUT",
+      "tags": [
+        "User and Authentication"
+      ],
+      "summary": "Update current user",
+      "description": "Updated user information for current user",
+      "auth_required": true,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/UpdateUserRequest"
+      },
+      "responses": [
+        {
+          "status": "200",
+          "description": "User",
+          "schema_ref": "#/components/schemas/UserResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "operation_id": "GetProfileByUsername",
+      "path": "/profiles/{username}",
+      "method": "GET",
+      "tags": [
+        "Profile"
+      ],
+      "summary": "Get a profile",
+      "description": "Get a profile of a user of the system. Auth is optional",
+      "auth_required": false,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Profile",
+          "schema_ref": "#/components/schemas/ProfileResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Username of the profile to get"
+        }
+      ]
+    },
+    {
+      "operation_id": "FollowUserByUsername",
+      "path": "/profiles/{username}/follow",
+      "method": "POST",
+      "tags": [
+        "Profile"
+      ],
+      "summary": "Follow a user",
+      "description": "Follow a user by username",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Profile",
+          "schema_ref": "#/components/schemas/ProfileResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Username of the profile you want to follow"
+        }
+      ]
+    },
+    {
+      "operation_id": "UnfollowUserByUsername",
+      "path": "/profiles/{username}/follow",
+      "method": "DELETE",
+      "tags": [
+        "Profile"
+      ],
+      "summary": "Unfollow a user",
+      "description": "Unfollow a user by username",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Profile",
+          "schema_ref": "#/components/schemas/ProfileResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Username of the profile you want to unfollow"
+        }
+      ]
+    },
+    {
+      "operation_id": "GetArticlesFeed",
+      "path": "/articles/feed",
+      "method": "GET",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Get recent articles from users you follow",
+      "description": "Get most recent articles from users you follow. Use query parameters to limit. Auth is required",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Multiple articles",
+          "schema_ref": "#/components/schemas/MultipleArticlesResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "offset",
+          "in": "query",
+          "required": true,
+          "schema_type": "integer",
+          "description": "The number of items to skip before starting to collect the result set."
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": true,
+          "schema_type": "integer",
+          "description": "The numbers of items to return."
+        }
+      ]
+    },
+    {
+      "operation_id": "GetArticles",
+      "path": "/articles",
+      "method": "GET",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Get recent articles globally",
+      "description": "Get most recent articles globally. Use query parameters to filter results. Auth is optional",
+      "auth_required": false,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Multiple articles",
+          "schema_ref": "#/components/schemas/MultipleArticlesResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "tag",
+          "in": "query",
+          "required": false,
+          "schema_type": "string",
+          "description": "Filter by tag"
+        },
+        {
+          "name": "author",
+          "in": "query",
+          "required": false,
+          "schema_type": "string",
+          "description": "Filter by author (username)"
+        },
+        {
+          "name": "favorited",
+          "in": "query",
+          "required": false,
+          "schema_type": "string",
+          "description": "Filter by favorites of a user (username)"
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": true,
+          "schema_type": "integer",
+          "description": "The number of items to skip before starting to collect the result set."
+        },
+        {
+          "name": "limit",
+          "in": "query",
+          "required": true,
+          "schema_type": "integer",
+          "description": "The numbers of items to return."
+        }
+      ]
+    },
+    {
+      "operation_id": "CreateArticle",
+      "path": "/articles",
+      "method": "POST",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Create an article",
+      "description": "Create an article. Auth is required",
+      "auth_required": true,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/NewArticleRequest"
+      },
+      "responses": [
+        {
+          "status": "201",
+          "description": "Single article",
+          "schema_ref": "#/components/schemas/SingleArticleResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    },
+    {
+      "operation_id": "GetArticle",
+      "path": "/articles/{slug}",
+      "method": "GET",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Get an article",
+      "description": "Get an article. Auth not required",
+      "auth_required": false,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Single article",
+          "schema_ref": "#/components/schemas/SingleArticleResponse"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article to get"
+        }
+      ]
+    },
+    {
+      "operation_id": "UpdateArticle",
+      "path": "/articles/{slug}",
+      "method": "PUT",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Update an article",
+      "description": "Update an article. Auth is required",
+      "auth_required": true,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/UpdateArticleRequest"
+      },
+      "responses": [
+        {
+          "status": "200",
+          "description": "Single article",
+          "schema_ref": "#/components/schemas/SingleArticleResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article to update"
+        }
+      ]
+    },
+    {
+      "operation_id": "DeleteArticle",
+      "path": "/articles/{slug}",
+      "method": "DELETE",
+      "tags": [
+        "Articles"
+      ],
+      "summary": "Delete an article",
+      "description": "Delete an article. Auth is required",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "204",
+          "description": "No content",
+          "schema_ref": null
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article to delete"
+        }
+      ]
+    },
+    {
+      "operation_id": "GetArticleComments",
+      "path": "/articles/{slug}/comments",
+      "method": "GET",
+      "tags": [
+        "Comments"
+      ],
+      "summary": "Get comments for an article",
+      "description": "Get the comments for an article. Auth is optional",
+      "auth_required": false,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Multiple comments",
+          "schema_ref": "#/components/schemas/MultipleCommentsResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article that you want to get comments for"
+        }
+      ]
+    },
+    {
+      "operation_id": "CreateArticleComment",
+      "path": "/articles/{slug}/comments",
+      "method": "POST",
+      "tags": [
+        "Comments"
+      ],
+      "summary": "Create a comment for an article",
+      "description": "Create a comment for an article. Auth is required",
+      "auth_required": true,
+      "request_body": {
+        "required": true,
+        "content_types": [
+          "application/json"
+        ],
+        "schema_ref": "#/components/schemas/NewCommentRequest"
+      },
+      "responses": [
+        {
+          "status": "200",
+          "description": "Single comment",
+          "schema_ref": "#/components/schemas/SingleCommentResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article that you want to create a comment for"
+        }
+      ]
+    },
+    {
+      "operation_id": "DeleteArticleComment",
+      "path": "/articles/{slug}/comments/{id}",
+      "method": "DELETE",
+      "tags": [
+        "Comments"
+      ],
+      "summary": "Delete a comment for an article",
+      "description": "Delete a comment for an article. Auth is required",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "204",
+          "description": "No content",
+          "schema_ref": null
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article that you want to delete a comment for"
+        },
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema_type": "integer",
+          "description": "ID of the comment you want to delete"
+        }
+      ]
+    },
+    {
+      "operation_id": "CreateArticleFavorite",
+      "path": "/articles/{slug}/favorite",
+      "method": "POST",
+      "tags": [
+        "Favorites"
+      ],
+      "summary": "Favorite an article",
+      "description": "Favorite an article. Auth is required",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Single article",
+          "schema_ref": "#/components/schemas/SingleArticleResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article that you want to favorite"
+        }
+      ]
+    },
+    {
+      "operation_id": "DeleteArticleFavorite",
+      "path": "/articles/{slug}/favorite",
+      "method": "DELETE",
+      "tags": [
+        "Favorites"
+      ],
+      "summary": "Unfavorite an article",
+      "description": "Unfavorite an article. Auth is required",
+      "auth_required": true,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Single article",
+          "schema_ref": "#/components/schemas/SingleArticleResponse"
+        },
+        {
+          "status": "401",
+          "description": "Unauthorized",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "slug",
+          "in": "path",
+          "required": true,
+          "schema_type": "string",
+          "description": "Slug of the article that you want to unfavorite"
+        }
+      ]
+    },
+    {
+      "operation_id": "GetTags",
+      "path": "/tags",
+      "method": "GET",
+      "tags": [
+        "Tags"
+      ],
+      "summary": "Get tags",
+      "description": "Get tags. Auth not required",
+      "auth_required": false,
+      "request_body": null,
+      "responses": [
+        {
+          "status": "200",
+          "description": "Tags",
+          "schema_ref": "#/components/schemas/TagsResponse"
+        },
+        {
+          "status": "422",
+          "description": "Unexpected error",
+          "schema_ref": "#/components/schemas/GenericErrorModel"
+        }
+      ],
+      "parameters": []
+    }
+  ],
+  "schemas": [
+    {
+      "name": "LoginUser",
+      "type": "object",
+      "property_count": 2,
+      "required": [
+        "email",
+        "password"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewUser",
+      "type": "object",
+      "property_count": 3,
+      "required": [
+        "email",
+        "password",
+        "username"
+      ],
+      "composition": null
+    },
+    {
+      "name": "User",
+      "type": "object",
+      "property_count": 5,
+      "required": [
+        "email",
+        "image",
+        "token",
+        "username"
+      ],
+      "composition": null
+    },
+    {
+      "name": "UpdateUser",
+      "type": "object",
+      "property_count": 5,
+      "required": [],
+      "composition": null
+    },
+    {
+      "name": "Profile",
+      "type": "object",
+      "property_count": 4,
+      "required": [
+        "following",
+        "image",
+        "username"
+      ],
+      "composition": null
+    },
+    {
+      "name": "Article",
+      "type": "object",
+      "property_count": 10,
+      "required": [
+        "author",
+        "body",
+        "createdAt",
+        "description",
+        "favorited",
+        "favoritesCount",
+        "slug",
+        "tagList",
+        "title",
+        "updatedAt"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewArticle",
+      "type": "object",
+      "property_count": 4,
+      "required": [
+        "body",
+        "description",
+        "title"
+      ],
+      "composition": null
+    },
+    {
+      "name": "UpdateArticle",
+      "type": "object",
+      "property_count": 4,
+      "required": [],
+      "composition": null
+    },
+    {
+      "name": "Comment",
+      "type": "object",
+      "property_count": 5,
+      "required": [
+        "author",
+        "body",
+        "createdAt",
+        "id",
+        "updatedAt"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewComment",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "body"
+      ],
+      "composition": null
+    },
+    {
+      "name": "GenericErrorModel",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "errors"
+      ],
+      "composition": null
+    },
+    {
+      "name": "LoginUserRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "user"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewUserRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "user"
+      ],
+      "composition": null
+    },
+    {
+      "name": "UpdateUserRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "user"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewArticleRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "article"
+      ],
+      "composition": null
+    },
+    {
+      "name": "UpdateArticleRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "article"
+      ],
+      "composition": null
+    },
+    {
+      "name": "NewCommentRequest",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "comment"
+      ],
+      "composition": null
+    },
+    {
+      "name": "ArticlePreview",
+      "type": "object",
+      "property_count": 9,
+      "required": [
+        "author",
+        "createdAt",
+        "description",
+        "favorited",
+        "favoritesCount",
+        "slug",
+        "tagList",
+        "title",
+        "updatedAt"
+      ],
+      "composition": null
+    },
+    {
+      "name": "UserResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "user"
+      ],
+      "composition": null
+    },
+    {
+      "name": "ProfileResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "profile"
+      ],
+      "composition": null
+    },
+    {
+      "name": "SingleArticleResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "article"
+      ],
+      "composition": null
+    },
+    {
+      "name": "MultipleArticlesResponse",
+      "type": "object",
+      "property_count": 2,
+      "required": [
+        "articles",
+        "articlesCount"
+      ],
+      "composition": null
+    },
+    {
+      "name": "SingleCommentResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "comment"
+      ],
+      "composition": null
+    },
+    {
+      "name": "MultipleCommentsResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "comments"
+      ],
+      "composition": null
+    },
+    {
+      "name": "TagsResponse",
+      "type": "object",
+      "property_count": 1,
+      "required": [
+        "tags"
+      ],
+      "composition": null
+    }
+  ],
+  "summary": {
+    "total_operations": 19,
+    "operations_per_method": {
+      "POST": 6,
+      "GET": 7,
+      "PUT": 2,
+      "DELETE": 4
+    },
+    "operations_per_tag": {
+      "User and Authentication": 4,
+      "Profile": 3,
+      "Articles": 6,
+      "Comments": 3,
+      "Favorites": 2,
+      "Tags": 1
+    },
+    "operations_auth_required": 12,
+    "schemas_count": 25
+  }
+}

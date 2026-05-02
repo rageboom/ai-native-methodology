@@ -1,0 +1,21 @@
+{
+  "name": "poc-04-mini-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "★ Stage 4 mini-PoC 진짜 도구 실행 환경 (★ INPUT 변경 ❌ — 별도 isolated)",
+  "type": "module",
+  "scripts": {
+    "extract:types": "node extract-types.mjs",
+    "extract:zod": "node extract-zod-validations.mjs",
+    "run:axe": "node run-axe.mjs",
+    "run:playwright": "node run-playwright-visual.mjs"
+  },
+  "dependencies": {
+    "ts-morph": "^24.0.0",
+    "yaml": "^2.8.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
+    "@playwright/test": "^1.59.1"
+  }
+}
