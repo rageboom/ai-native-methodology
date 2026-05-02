@@ -1,6 +1,6 @@
 {
   "name": "ai-native-methodology",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "private": true,
   "type": "module",
   "description": "AI-Native Development Methodology — workspace root (build orchestrator). Tools 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner) 자체 package.json 독립 유지 (★ no npm workspaces).",

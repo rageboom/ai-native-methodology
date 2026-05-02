@@ -120,6 +120,13 @@
       },
       "cross_poc_validation": {
         "poc_02": "★ AP-API-001 (favorite RFC 7231 §4.2.2) + F-085 (login status drift) + F-083 (DELETE 200) — isomorphic 합산 ★ 재현"
+      },
+      "static_rule_link": {
+        "rule_path": "tools/static-runner/rules/error-mapping-missing.yml",
+        "rule_id": "internal.be.api.error-mapping-nestjs-delete-201-decorator-drift",
+        "introduced_in": "v1.4.5-pre",
+        "scope": "@Delete + @ApiResponse({status: 201}) decorator drift 자동 회귀. ★ article.controller.ts:65,68 + 81,85 + 97,99 ★ 4 op 정확 매칭. login @Post default 201 (RFC 9110 §15.3.2) = ★ 별 mechanism / pattern-not-inside @HttpCode 의 정확한 Semgrep 표현 한계 → ts-morph carry (v1.5+).",
+        "carry": "ts-morph NestJS @HttpCode + @Post + @ApiResponse 결합 decorator semantic 분석 (v1.5+ 진입 시점)"
       }
     },
     {

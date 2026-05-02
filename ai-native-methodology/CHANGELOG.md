@@ -9,7 +9,62 @@
 
 ---
 
-## [v1.4.4] — 2026-05-02 ⭐ 현재 (★ ★ ★ PATCH — manifest SSOT 정식 승격 + skills-axis 명세 + drift-validator 3-way 검증)
+## [v1.4.5] — 2026-05-03 ⭐ 현재 (★ ★ PATCH — error-mapping AP-API-001 자동 회귀 도구 BE 트랙 첫 진입 + NestJS decorator drift sub-rule)
+
+### ★ ★ ★ 배경 — 6 갭 카탈로그 옵션 2 진입 (★ Tier 1 #1 / negative-space corroboration)
+
+직전 conversation 에서 ★ 분석 stage 산출물 ★ 갭 카탈로그 식별 (6 갭 × 5 Tier). Tier 1 #1 = error-mapping (★ ★ AP-API-001 critical / 4 PoC 모두 contract 부재 = ★ ★ ★ negative-space corroboration 자연 충족). 옵션 2′ (Spring rule + no release / commit `b87cec5`) 종결 후 ★ 옵션 2 (v1.4.5 PATCH / NestJS rule + AP-API-001 base 정합) 사용자 결단 진입.
+
+### ★ ★ 산출
+
+#### `tools/static-runner/rules/error-mapping-missing.yml` v1.4.4-pre → v1.4.5-pre 보강
+
+**(1) Spring rule** (★ v1.4.4-pre 보존 / b87cec5 commit) — `internal.be.api.error-mapping-generic-exception-in-service`. @Service / @RestController / @Controller / @Component 안의 IllegalArgumentException / IllegalStateException / RuntimeException throw detect. PoC #02 ArticleService:184 정확 매칭 + Phase 4.5 round-trip 재생성 코드 exclude.
+
+**(2) NestJS sub-rule** (★ ★ v1.4.5-pre 신규) — `internal.be.api.error-mapping-nestjs-delete-201-decorator-drift`. `@Delete` + `@ApiResponse({status: 201, ...})` 결합 detect (decorator 순서 양방향 + async 변형 = 4 분기). PoC #03 article.controller.ts:65,68 + 81,85 + 97,99 ★ 4 op 정확 매칭. RFC 9110 §15.3.5 위반 (DELETE → 204 권고).
+
+**(3) NestJS fixture** — `error-mapping-missing.ts` (3 positive + 3 negative case / Semgrep --test 1/1 ✅ pass).
+
+#### AP-API-001 cross-PoC base 정합
+
+PoC #02 + PoC #03 ap.json 양쪽에 `static_rule_link` 필드 추가:
+
+| PoC | mechanism | rule | status |
+|---|---|---|---|
+| PoC #01 (Spring 2.5) | @ExceptionHandler 부재 | (★ negative space / 신뢰도 0.65) | ★ 향후 carry |
+| PoC #02 (Spring 3.3 Hexagonal) | throw new IllegalArgumentException | error-mapping-generic-exception-in-service | ✅ 자동 회귀 |
+| PoC #03 (NestJS) | @Delete + @ApiResponse 201 decorator drift | error-mapping-nestjs-delete-201-decorator-drift | ✅ 자동 회귀 |
+| PoC #04 (React FSD) | 해당 없음 (FE) | — | — |
+
+→ ★ ★ ★ §8.1 strict 평가: ★ patterns ≥ 2 PoC isomorphic + 2 framework (Spring + NestJS) 자연 충족 / 단 본체 ADR-BE-002 (negative-space corroboration 패턴 정식화) 격상 = ★ v1.5.0 MINOR carry.
+
+### ★ ★ ★ b87cec5 (옵션 2′) 흡수
+
+본 v1.4.5 = b87cec5 commit (★ no release) 의 ★ 정식 release 통합. b87cec5 자체는 ★ no release / 본체 commit 만 / a144b5a 패턴 정합 / `--extra-rules error-mapping-missing.yml` CI body scan 통합.
+
+### ★ ★ 검증
+
+- ✅ Semgrep 1.161.0 진짜 실행 (★ pip 채널 / Python 3.14 / no-simulation 정책 정합)
+- ✅ Spring rule fixture --test 1/1 pass (★ 5 positive + 5 negative)
+- ✅ NestJS sub-rule fixture --test 1/1 pass (★ 3 positive + 3 negative)
+- ✅ body scan (970 files / 2 Code rules) → ★ 0 false positive
+- ✅ 4 tool 회귀: static-runner 11/11 + drift-validator 36/36 + formal-spec-link-validator 8/8 + decision-table-validator 11/11 = ★ ★ 66/66 pass
+
+### ★ ★ carry — v1.5.0 MINOR (사용자 결단 영역)
+
+- ★ ★ ★ ts-morph NestJS @HttpCode + @Post + @ApiResponse decorator semantic 분석 (★ Semgrep pattern-not-inside 한계 보완)
+- ★ ★ ★ ADR-BE-002 negative-space corroboration 패턴 정식화 (★ ADR-FE-007 변형)
+- ★ schemas/error-mapping-spec.schema.json 신규 (formal-spec deliverable)
+- ★ skills/analysis/phase-5-error-mapping/SKILL.md 신규
+- ★ drift-validator BE corpus 2 pair (error-mapping-equiv-01 + drift-01)
+
+### ★ Cooling-off 적용 ❌ (★ memory `feedback_decision_cadence_24h_cooling_off.md` 정합)
+
+본 PATCH = ★ ★ additive only (rule 1 신규 + 기존 rule fixture 보강 + ap.json static_rule_link 추가 + version bump). 본체 구조 변경 0 / 디렉토리 rename 0 / cross-reference 치환 0 / ADR 신설 0 / schema 신설 0 → ★ ★ ★ 즉시 진행 정합 (★ a144b5a + b87cec5 cadence 입증).
+
+---
+
+## [v1.4.4] — 2026-05-02 (★ ★ ★ PATCH — manifest SSOT 정식 승격 + skills-axis 명세 + drift-validator 3-way 검증)
 
 ### ★ ★ ★ plan-v144-manifest-ssot.md 진행 결과 (a — Senior 의 NOW/v2.0 분할 권고의 NOW 부분)
 
