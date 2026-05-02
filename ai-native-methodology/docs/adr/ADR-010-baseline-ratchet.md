@@ -115,6 +115,8 @@ node tools/static-runner/src/cli.js --baseline-mode ratchet
 - ★ Sprint 5+ 환경 변동 시 — Semgrep + PMD 실 실행 후 baseline 도입 시연
 - ★ 사내 신규 적용 시 — 첫 분석 결과 baseline 등재 + 분기별 review
 - ★ unit test — drift-validator + decision-table-validator + static-runner baseline mode 회귀 검증
+- ★ ★ **v1.4.1 (2026-05-02) — 외부 적용 첫 입증** — PoC #04 full Semgrep p/owasp-top-ten 진짜 실행 / baseline 첫 작성 (0 findings, source_commit_sha=963b3035) + ratchet dry trial pass (exit 0)
+- ★ ★ ★ **v1.4.2 (2026-05-02) — drift-check.yml CI 통합 + §2.3 정책 첫 운영 입증** — PoC #04 full FE 트랙 신규 step (`--baseline --ratchet --extra-rules`) 추가 / ratchet dry trial: baseline 0 → novel 1 (★ AP-FE-SECURITY-001 custom rule 매칭) → blocked 1 → exit_code **1** = ★ §2.3 "critical/high = production blocker" 정책 ★ 첫 실 fail trigger 입증
 
 ## 5. 본 방법론 적용
 
