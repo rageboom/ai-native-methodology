@@ -9,7 +9,102 @@
 
 ---
 
-## [v1.4.5] — 2026-05-03 ⭐ 현재 (★ ★ PATCH — error-mapping AP-API-001 자동 회귀 도구 BE 트랙 첫 진입 + NestJS decorator drift sub-rule)
+## [v1.5.0] — 2026-05-03 ⭐ 현재 (★ ★ ★ ★ MINOR — ADR-BE-001 negative-space corroboration 정식화 + error-mapping-spec deliverable 16 + phase-5-error-mapping skill 신설)
+
+### ★ ★ ★ ★ 배경 — §8.1 strict 정합 검증대 ★ 두 번째 통과 (negative-space 변형)
+
+직전 v1.4.5 PATCH 에서 ★ AP-API-001 의 ★ 3 BE PoC negative-space isomorphic 자동 회귀 도구 종결 (Spring rule + NestJS sub-rule). ★ ★ ★ 본 MINOR = ★ ★ ADR-FE-007 (★ positive-space — 4 PoC 모두 anti-pattern 보유 / 2026-05-02 첫 통과) 의 ★ ★ ★ ★ negative-space variant 정식화.
+
+★ ★ ADR-FE-007 ↔ ADR-BE-001 ★ 대칭 입증:
+
+| 패턴 | ADR | 정의 | evidence |
+|---|---|---|---|
+| **positive-space** | ADR-FE-007 | N PoC 가 ★ 같은 anti-pattern 을 ★ 보유 | ★ 4 PoC 모두 JWT 보안 위반 (Java + Hexagonal + NestJS + React) |
+| **★ negative-space** | **★ ADR-BE-001** | N PoC 가 ★ 같은 정합 contract 를 ★ 부재 | ★ 3 BE PoC 모두 error mapping contract 부재 (Spring 2.5 + Spring 3 + NestJS) |
+
+### ★ ★ ★ ★ 산출
+
+#### `docs/adr/ADR-BE-001-negative-space-corroboration.md` 신설 (★ ★ ★ ★ 핵심)
+
+★ ★ ★ negative-space corroboration 패턴 ★ 정식화. patterns ≥ N (★ strict ≥ 3) 임계 자연 충족 자격을 ★ "★ contract 부재" 도 ★ 동등 인정. evidence 4종 의무 (contract_absent + negative_effect + industry_standard + automatic_regression_capable).
+
+#### `schemas/error-mapping-spec.schema.json` 신설 (★ ★ deliverable 16)
+
+BE error contract 자동 추출 명세. ★ 주요 필드:
+- `exception_handlers[]` — Spring @ControllerAdvice / NestJS @Catch / global filter ★ 발견 표 (★ 빈 배열 = ★ ★ negative-space evidence)
+- `http_status_mapping[]` — 도메인 예외 ↔ HTTP status × `mapping_mechanism` enum 8종 (★ ★ `throw_unmapped` = ★ AP-API-001 trigger)
+- `decorator_drift[]` — NestJS-specific (★ post_default_201_for_login / apiresponse_201_for_delete 등 5 enum)
+- ★ ★ ★ `negative_evidence` — ADR-BE-001 정식 evidence 4종 (contract_absent + negative_effect + industry_standard + automatic_regression_capable)
+- `framework_neutrality_score` — 정량 (1.0 목표 / framework 무관 표준)
+- `ap_links[]` — 회귀 / 발견 antipattern ID
+
+#### `skills/analysis/phase-5-error-mapping/SKILL.md` 신설
+
+phase 5-1 (api) 의 ★ 신규 발동 skill. ★ frontmatter description = "Use when project is BE (Spring / NestJS / Express) AND has REST API endpoints that throw domain exceptions OR uses status code decorators (@Post / @ApiResponse)".
+
+9 절차:
+1. Framework detection (spring / nestjs / etc.)
+2. Exception handler scan (★ 0 hit = negative-space trigger)
+3. ★ Semgrep custom rule 실행 (Spring rule + NestJS sub-rule)
+4. ★ ADR-010 baseline + ratchet 통합
+5. HTTP status mapping 표 작성
+6. NestJS decorator drift 분기
+7. ★ ★ ★ negative_evidence 4종 작성 (★ ADR-BE-001 정합)
+8. AP 등재 (★ AP-API-001 cross-PoC 평가)
+9. error-mapping-spec.json 작성
+
+#### `flows/analysis.phase-flow.json` v1.4.4 → v1.5.0
+
+phase 5-1 (api) 의 `outputs` 에 `error-mapping-spec.json` 추가 + `skills` 에 `phase-5-error-mapping` 추가. version_milestones v1.5.0 entry 추가.
+
+#### `methodology-spec/skills-axis.md` §5 매핑 표 갱신
+
+phase 5-1 (api) row 에 `phase-5-error-mapping` (★ v1.5.0 신설) 추가.
+
+### ★ ★ §8.1 strict 정합 검증대 ★ 두 번째 통과
+
+| 단계 | 결단 |
+|---|---|
+| ADR-FE-007 (2026-05-02) | ★ ★ §8.1 strict 정합 검증대 ★ 첫 통과 (★ positive-space) |
+| **★ ADR-BE-001 (2026-05-03)** | ★ ★ ★ §8.1 정합 검증대 ★ 두 번째 통과 (★ ★ ★ negative-space 변형) |
+
+→ ★ ★ ★ ★ ★ §8.1 정합 + cross-PoC patterns 임계 평가 + ★ ★ negative-space 변형 정식화 + 본체 격상 결단 절차 ★ ★ 확장.
+
+### ★ ★ b87cec5 + v1.4.5 PATCH 흡수
+
+본 MINOR = ★ b87cec5 (옵션 2′ Spring rule / no release) + v1.4.5 (옵션 2 NestJS sub-rule + AP-API-001 cross-PoC base 정합) 의 ★ ★ 본체 ADR + schema + skill 정식 격상 통합.
+
+### 검증
+
+- ✅ ADR-BE-001 신설 (★ ★ ★ ★ 핵심 결단)
+- ✅ schemas/error-mapping-spec.schema.json (★ JSON 정합 / 6 required 필드 + if/then)
+- ✅ skills/analysis/phase-5-error-mapping/SKILL.md (★ frontmatter 정합)
+- ✅ flows/analysis.phase-flow.json v1.5.0 (★ phase 5-1 skills 3 → 4)
+- ✅ skills-axis.md §5 표 갱신
+- ✅ drift-validator --check-layout: 9 phases / 19 skills / 0 orphans / 0 missing (★ 18 → 19 신규 skill 등록)
+- ✅ 4 tool 회귀 의무 (static-runner / drift-validator / formal-spec-link-validator / decision-table-validator)
+- ✅ version-check 3-source sync at v1.5.0
+- ✅ build artifact dist/internal-v1.5.0/ + CHECKSUMS.txt
+
+### ★ ★ carry — v1.5.1+ PATCH (사용자 결단 영역)
+
+- ★ ★ ★ ts-morph NestJS @HttpCode + @Post + @ApiResponse 결합 decorator semantic 분석 (★ Semgrep pattern-not-inside 한계 보완 / ★ AST-level)
+- ★ AP-API-001 PoC #01 evidence 보강 (★ Spring 2.5 source 적용 시 직접 confirm)
+- ★ schemas/antipatterns.schema.json 본체 antipattern 카탈로그 ★ 첫 등재 (★ ★ ADR-FE-007 carry 와 합산)
+- ★ drift-validator BE corpus (error-mapping-equiv-01 + drift-01) — ★ structural equivalence 부재 영역 / 적정 design 후 carry
+- ★ agents/analysis/error-mapping-extractor.md (★ thin agent / SKILL.md 만으로 v1.5.0 충족)
+- ★ methodology-spec/deliverables/16-error-mapping-spec.md (★ deliverable full spec)
+- ★ migration-cautions BE 신설 (★ ★ "사내 신규 시스템 구축 시 error mapping contract 의무" 별 파일)
+
+### ★ Cooling-off 적용 (★ memory `feedback_decision_cadence_24h_cooling_off.md` 정합)
+
+본 MINOR = ★ ★ ADR 신설 + schema 신설 → ★ ★ 적용 대상 (≥ 24h 권고). 단 ★ ★ ★ 사용자 명시 결단 ("나머지 진행") = 즉시 진행 정합 (★ ★ memory edge case "사용자가 즉시 진행 명시 = cooling-off skip 정합 / retract risk 사용자 통보 의무"). retract risk 명시:
+- ★ ADR-BE-001 의 ★ negative-space 변형 정의가 v1.6+ 외부 사용 시 재검토 가능
+- ★ schemas/error-mapping-spec 의 enum 8종 mapping_mechanism 이 framework 추가 시 확장 의무
+
+---
+
+## [v1.4.5] — 2026-05-03 (★ ★ PATCH — error-mapping AP-API-001 자동 회귀 도구 BE 트랙 첫 진입 + NestJS decorator drift sub-rule)
 
 ### ★ ★ ★ 배경 — 6 갭 카탈로그 옵션 2 진입 (★ Tier 1 #1 / negative-space corroboration)
 

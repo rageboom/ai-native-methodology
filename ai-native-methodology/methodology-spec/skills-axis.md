@@ -90,7 +90,7 @@ aspect skill 4종 (`aspect-a11y` / `aspect-i18n` / `aspect-static-security` / `a
 | 3 (arch) | phase-3-arch.md | phase-2-architecture |
 | 4 (business-logic) | phase-4-business-logic.md | phase-3-domain, phase-4-rules, phase-5-form-validation |
 | 4.5 (formal-spec) | phase-4-5-formal-spec.md | phase-4-5-cross-validation |
-| 5-1 (api) | phase-5-1-api.md | phase-5-openapi, phase-5-rules |
+| 5-1 (api) | phase-5-1-api.md | phase-5-openapi, phase-5-rules, **phase-5-error-mapping** (★ v1.5.0 신설) |
 | 5-2 (ui) | phase-5-2-ui.md | phase-5-state-map, phase-5-visual-manifest, phase-5-type-spec |
 | 6 (quality) | phase-6-quality.md | phase-6-quality |
 | **cross-cutting (aspects)** | (없음) | aspect-a11y, aspect-i18n, aspect-static-security, aspect-legacy |
