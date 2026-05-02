@@ -1,0 +1,46 @@
+phase: 0-init
+poc_id: poc-04-full
+stage: "5"
+sprint: "5-1"
+analysis_target:
+  repo: yurisldk/realworld-react-fsd
+  git_head: 963b30358f70753765c872b6dac3045e963aa15d
+  pushed_at: 2026-04-25T20:41:13Z
+  cloned_at: 2026-05-02
+  ★_stage_4_mini_cross_reference:
+    workspace: examples/poc-04-mini-realworld-react/
+    shared_input: true
+    artifacts_reused: false      # ★ Senior strict 정합
+captured_by: real
+captured_method: file-system-direct + curl-github-api
+artifacts:
+  - tree.md
+  - inventory.json
+  - stack-detection.md
+  - _manifest.yml
+no_simulation_compliance:
+  static_tool_simulated: false
+  ai_persona_used: false
+  evidence: "★ 모든 사실 = package.json / openapi.yaml / orval.config.ts / src 직접 read"
+classification_summary:
+  spectrum_tier: 1
+  scenario: "A"
+  fsd_compliance: "약식 3 layer"
+  authority_carriers_detected_v2: 7   # ★ Stage 5 진짜 검증 매개체
+  state_truths_detected: 5
+  i18n: false                          # ★ G1 D carry
+  zod_orval_pattern: true
+stage_5_obligatory_deliverable_count: 11
+stage_5_carry: [11_i18n_spec]
+stage_5_partial: [2_domain, 13_legacy_spectrum]
+stage_5_n_a: [4_db_schema]
+stage_5_본체_도구_격상_carry_to_sprint_5_3:
+  - drift_validator_FE_mode (after patterns ≥ 2)
+  - schema_validator_Ajv_8 (★ 신설)
+findings_phase_0: 0
+confidence_phase_0: 0.85    # ★ Stage 4 baseline 정합
+next_phase: "★ Sprint 5-1 종결 + 사용자 승인 게이트 → Sprint 5-2 진입"
+research_g1_d_결단:
+  reason: "★ Senior B strict 충돌 — RealWorld + i18n 활성 fork 부재 (3/3 합의 + GitHub 검색 0 hit) → ★ yurisldk 재선정 + 산출물 재사용 ❌ + i18n carry (★ Stage 7 release note)"
+  approval_at: 2026-05-02
+  user_command: "권고 다 따라줘 + 진행 해줘"
