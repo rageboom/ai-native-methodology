@@ -1,0 +1,70 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/rules.schema.json",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-4",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "form-validation-spec.json (★ Sprint 5-2 자동 추출) + manual"
+  },
+  "rules_summary": {
+    "total_br": 80,
+    "auto_extracted": 77,
+    "manual_authored": 3,
+    "by_category": {
+      "fe_validation": 77,
+      "fe_authorization": 2,
+      "fe_flow": 1
+    },
+    "by_source_format": {
+      "openapi_3_0_1_to_zod_via_orval": 67,
+      "zod_mini": 10,
+      "html5_native": 13
+    }
+  },
+  "rules_auto_extracted_reference": "★ form-validation-spec.json 의 90 validations / 77 BR auto-registered (★ Sprint 5-2)",
+  "rules_manual_authored": [
+    {
+      "id": "BR-FE-AUTH-REQUIRED-001",
+      "category": "fe_authorization",
+      "source_format": "manual",
+      "auto_extracted": false,
+      "given": ["사용자가 인증 필요 라우트 접근 (Settings / Editor / Article delete / favorite / follow / comment)"],
+      "when": ["loadUserMiddleware 가 token 부재 또는 invalid 검출"],
+      "then": ["★ requireAuthMiddleware 강제 401 또는 redirect /login"],
+      "evidence": "src/shared/lib/react-router/requireAuthMiddleware.ts + redirectIfAuthenticatedMiddleware.ts"
+    },
+    {
+      "id": "BR-FE-AUTH-OWNERSHIP-001",
+      "category": "fe_authorization",
+      "source_format": "manual",
+      "auto_extracted": false,
+      "given": ["사용자가 article 페이지 또는 댓글 표시"],
+      "when": ["isAuthor (article author === currentUser) 또는 currentUser === comment author"],
+      "then": ["★ Edit / Delete 버튼 표시 의무 / 비작성자 표시 ❌"],
+      "evidence": "src/pages/article/article.ui.tsx § ArticleActionsBlock + DeleteCommentButton"
+    },
+    {
+      "id": "BR-FE-FLOW-DELETE-REDIRECT-001",
+      "category": "fe_flow",
+      "source_format": "manual",
+      "auto_extracted": false,
+      "given": ["사용자가 article delete 성공"],
+      "when": ["server delete 응답"],
+      "then": ["★ ★ redirect to / 의무 (★ ★ ★ F-FE-001 발견 violation — 본 fork = redirect 부재 / 회피 의무)"],
+      "evidence": "★ AP-FE-FLOW-INCOMPLETE-ARTICLE-DELETE 등록 / 본 fork 의 actions/article-delete.action.ts 갱신 권고"
+    }
+  ],
+  "deliverable_5_compliance": {
+    "form_validation_auto_integration": true,
+    "manual_br_authored": true,
+    "category_separation": true,
+    "auto_extracted_flag": true
+  },
+  "★_cross_link_targets": {
+    "form-validation-spec.json": "★ 77 BR auto-extracted_to_br link",
+    "ui-spec.pages.form_actions": "★ 5 form / Login + Register + Settings + Editor + Comment",
+    "antipatterns.json": "★ AP-FE-FLOW-INCOMPLETE-ARTICLE-DELETE / AP-FE-EDITOR-MISSING-HTML5-VALIDATION"
+  }
+}
