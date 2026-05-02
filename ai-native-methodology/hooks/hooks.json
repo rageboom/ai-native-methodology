@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '[ai-native-methodology] Plugin loaded. Read CLAUDE.md for the 23 policies + 4원칙 + ★★★ no-simulation. Stage = analysis (v1.4.x default). See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.'",
+            "command": "echo \"[ai-native-methodology] Plugin loaded. Read CLAUDE.md for the 23 policies + 4원칙 + no-simulation. Stage = analysis (v1.4.x default). See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.\"",
             "statusMessage": "Loading AI-Native methodology context..."
           }
         ]

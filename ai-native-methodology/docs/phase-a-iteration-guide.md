@@ -15,32 +15,55 @@
 
 ---
 
-## 1. Plugin install (marketplace 부재 시)
+## 1. Plugin install (Phase A.0 진입 자격)
 
-★ Phase B 미진입 = `marketplace.json` 부재 = local path 또는 git URL 직접 등록.
+★ Phase B (사내 marketplace 정식 배포) 미진입 = local path 또는 git URL 직접 등재.
 
-### 1.1 Local path install (★ 권장 — Phase A iteration 빠른 cadence)
+### 1.0 ★ ★ 사전 의무 — `marketplace.json` 부재 시 차단 (★ F-PA-007 / Phase A.0 진입 자격)
+
+`<plugin-dir>/.claude-plugin/marketplace.json` 부재 = `claude plugin marketplace add` fail. Phase B 가정과 다름 (★ marketplace.json 은 Phase A.0 자격).
+
+본 레포 = ★ ★ ★ 이미 작성 완료 (v1.4.2 commit 29f040e+ 후속).
+
+### 1.1 Local path install (★ 권장 / 본 세션 검증 완료)
 
 ```bash
-# Claude Code 세션에서:
-/plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
-/plugin install ai-native-methodology@ai-native-methodology
+# Claude Code CLI 또는 in-session slash command — 둘 다 작동:
+claude plugin marketplace add /c/Users/<USER>/path/to/ai-native-methodology/ai-native-methodology
+claude plugin install ai-native-methodology@ai-native-methodology
+claude plugin list   # 검증
 ```
 
-★ 두 번째 인자 (`@ai-native-methodology`) = marketplace 명 = directory 명 기본값.
+★ ★ marketplace.json 의 plugin source 표기 = ★ `"./"` (★ trailing slash 의무 / `"."` 단순 문자열은 v2.1.126 미지원 — F-PA-008).
 
-### 1.2 Git URL install (사내 git 사용 시)
+★ 두 번째 인자 (`@ai-native-methodology`) = marketplace 명 (= directory 명 기본값).
+
+### 1.2 Git URL install (사내 git 사용 시 / Phase B carry)
 
 ```bash
-/plugin marketplace add https://<사내-git>/aimd/ai-native-methodology.git
-/plugin install ai-native-methodology@ai-native-methodology
+claude plugin marketplace add https://<사내-git>/aimd/ai-native-methodology.git
+claude plugin install ai-native-methodology@ai-native-methodology
 ```
 
-### 1.3 Reload + 확인
+### 1.3 확인
 
 ```bash
+claude plugin list
+# 표시 예:
+#   ai-native-methodology@ai-native-methodology
+#   Version: 1.4.2
+#   Scope: user
+#   Status: ✔ enabled
+```
+
+### 1.4 in-session slash command (대안)
+
+Claude Code 세션 안에서:
+```
+/plugin                                                  # 대화형 plugin manager
+/plugin marketplace add <local-path-or-git-url>
+/plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
-/plugin                  # 대화형 plugin manager — Installed 탭에 ai-native-methodology v1.4.2 표시
 ```
 
 ---

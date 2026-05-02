@@ -22,7 +22,7 @@
 
 ---
 
-## ★ 사전 마찰점 발견 (1건 / 즉시 fix)
+## ★ 사전 마찰점 발견 (3건 / 모두 즉시 fix — 사용자 plugin install 명령 시도 중 라이브 발견)
 
 ### F-PA-001 — drift-validator `--plugin-mode --recently-edited` 옵션 부재
 
@@ -39,6 +39,54 @@
   - **즉시 fix**: `hooks/hooks.json` command → `node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output 2>&1 || true` (★ user project cwd `.aimd/output/` 에 짝 발견 시 drift 체크 / 부재 시 silent fail-soft)
   - **Phase A.1 carry**: drift-validator graceful 모드 격상 (★ `.aimd/output` 부재 시 silent exit 0 + `--plugin-mode` + `--recently-edited` 신설)
 - **Confidence**: high
+
+### F-PA-007 — marketplace.json 부재 (★ Phase A 진입 자체 차단)
+
+- **Type**: bug (★ documentation gap)
+- **Severity**: ★ ★ ★ critical (★ Phase B carry 로 분류했으나 실은 Phase A 진입 의무)
+- **Phase A iteration**: 0 (★ 사용자 `claude plugin marketplace add` 명령 시도 중 발견)
+- **Date**: 2026-05-02
+- **Reproduction**: `claude plugin marketplace add /local/path/to/plugin-dir` → `Failed to add marketplace: Marketplace file not found at <plugin-dir>/.claude-plugin/marketplace.json`
+- **Expected**: phase-a-iteration-guide.md §1.1 의 명령이 그대로 작동
+- **Actual**: marketplace.json 파일 부재 = local path 등록도 차단 (★ Phase B carry 가정 무효)
+- **Plugin asset 영향**: `.claude-plugin/marketplace.json` (★ 신규 파일)
+- **본체 영향**: 없음
+- **Action**: ★ 즉시 fix — minimal marketplace.json 작성 (name + owner + plugins[] / source 표기 핵심)
+- **★ 메타 lesson**: Phase B carry 로 분류했던 marketplace.json 이 ★ Phase A self-iteration 진입 의무 = ★ Phase A/B 경계 재분류 필요. release.yml + LICENSE + InfoSec 등은 여전히 Phase B 이지만 marketplace.json 은 Phase A.0 (★ Phase A 시작 자격) 으로 격상.
+- **Confidence**: high
+
+### F-PA-008 — marketplace.json source `"."` (단순 문자열) v2.1.126 미지원
+
+- **Type**: bug (★ documentation gap / Claude Code version compatibility)
+- **Severity**: ★ ★ high
+- **Phase A iteration**: 0 (★ F-PA-007 fix 직후 install 명령 재시도 중 발견)
+- **Date**: 2026-05-02
+- **Reproduction**: marketplace.json 의 plugin source = `"."` (단순 문자열 / claude-code-guide 1차 답변 권장) → `claude plugin install` 시 `Failed to install plugin: This plugin uses a source type your Claude Code version does not support. Update Claude Code and try again.`
+- **Expected**: `"."` 또는 `"./"` 어느쪽이든 작동
+- **Actual**: Claude Code v2.1.126 에서 `"."` 미지원 / `"./"` 만 지원 (★ trailing slash 의무 / claude-code-guide 2차 답변에서 정정)
+- **Plugin asset 영향**: `.claude-plugin/marketplace.json` (source 필드)
+- **본체 영향**: 없음
+- **Action**: ★ 즉시 fix — `"source": "."` → `"source": "./"`. marketplace remove + re-add + install 재시도 → ★ ★ ★ 성공 (`Successfully installed plugin: ai-native-methodology@ai-native-methodology / Version: 1.4.2 / Scope: user / Status: ✔ enabled`)
+- **★ 메타 lesson**: 1차 source 표기 시 trailing slash 정합 의무 — 가이드 §1.1 example 보강 필요
+- **Confidence**: high
+
+---
+
+## ★ ★ ★ Plugin install 성공 (2026-05-02 / 본 세션)
+
+```
+$ claude plugin list
+Installed plugins:
+
+  ❯ ai-native-methodology@ai-native-methodology
+    Version: 1.4.2
+    Scope: user
+    Status: ✔ enabled
+```
+
+★ ★ Phase A.0 진입 자격 (Phase A self-iteration 시작 가능 상태) ★ 도달.
+
+★ ★ ★ 단, 본 세션은 plugin install **이전** 시작된 세션이라 SessionStart hook 메시지 미표시 — ★ 사용자가 새 Claude Code 세션 시작 시 hook 검증 가능 (F-PA-002 후보 메커니즘 검증 영역).
 
 ---
 
