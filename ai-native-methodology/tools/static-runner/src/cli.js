@@ -3,10 +3,17 @@
 // 환경 부재 시 PluginEnvironmentMissing throw → exit 3 ("환경 부재 — 사용자 위임" 정직 신호).
 
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
 import { PLUGINS, PluginEnvironmentMissing, REQUIRED_EVIDENCE } from './runner.js';
 import { readSarifFindings } from './sarif-to-finding.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../_shared/baseline.js';
+
+function detectGitSha(targetDir) {
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: targetDir, encoding: 'utf-8', timeout: 5000 }).trim();
+  } catch { return 'unknown'; }
+}
 
 function parseArgs(argv) {
   const opts = { plugins: [], target: null, output: null, ruleset: null, extra: [], baseline: null, ratchet: false, writeBaseline: null };
@@ -74,8 +81,9 @@ function main() {
 
   let baselineReport = null;
   if (opts.writeBaseline) {
-    writeBaseline(opts.writeBaseline, allFindings);
-    console.log(`\n★ baseline written → ${opts.writeBaseline} (${allFindings.length} findings)`);
+    const sha = detectGitSha(opts.target);
+    writeBaseline(opts.writeBaseline, allFindings, sha);
+    console.log(`\n★ baseline written → ${opts.writeBaseline} (${allFindings.length} findings, source_commit_sha=${sha.slice(0, 12)})`);
   }
   if (opts.baseline) {
     const baseline = readBaseline(opts.baseline);

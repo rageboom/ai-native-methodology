@@ -3,7 +3,7 @@
 // ★★★ no-simulation 정책: 환경 부재 시 LLM 추론으로 대체 절대 금지 — 명시적 "환경 부재" 보고만 허용.
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync, mkdirSync, statSync } from 'node:fs';
+import { writeFileSync, mkdirSync, statSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 
@@ -68,7 +68,7 @@ export class Plugin {
     let resultHash = null;
     try {
       const h = createHash('sha256');
-      h.update(require('node:fs').readFileSync(sarifPath));
+      h.update(readFileSync(sarifPath));
       resultHash = h.digest('hex');
     } catch { /* SARIF not produced — handled by caller */ }
 

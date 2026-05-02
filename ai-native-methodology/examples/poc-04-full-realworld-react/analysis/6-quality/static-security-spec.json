@@ -2,17 +2,47 @@
   "$schema_origin": "ai-native-methodology/schemas/static-security-spec.schema.json",
   "meta": {
     "poc_id": "poc-04-full",
-    "stage": "5",
-    "sprint": "5-3",
+    "stage": "5+",
+    "sprint": "v1.4-carry-1-Semgrep-종결",
     "phase": "6-quality",
     "captured_at": "2026-05-02",
-    "captured_by": "real (★ Semgrep carry — Docker 환경 부재)",
-    "tool_primary": "Semgrep CLI Docker (★ G2 결단)",
-    "tool_primary_status": "carry_to_user (★ Docker 부재 / WSL2 또는 Linux runner 위임)",
-    "tool_fallback": "grep -E (Stage 4 패턴 재실행)"
+    "captured_by": "real (★ Semgrep pip 채널 진짜 실행 ✅ / Docker 가정 깨짐)",
+    "tool_primary": "Semgrep CLI 1.161.0 (★ pip 채널 / Python 3.14 공식 지원)",
+    "tool_primary_status": "done (★ ★ carry 1 종결 / ADR-009 단계 5+ 도달)",
+    "tool_fallback": "grep -E (Stage 4 패턴 — 본 carry 종결로 fallback 불필요)"
+  },
+  "real_run": {
+    "command": "semgrep scan --config p/owasp-top-ten --sarif --sarif-output <path> <target>",
+    "tool_version": "1.161.0",
+    "ruleset": "p/owasp-top-ten",
+    "rules_loaded": 544,
+    "rules_run": 76,
+    "files_scanned": 66,
+    "files_ignored": 2,
+    "duration_ms": 6293,
+    "findings_count": 0,
+    "result_hash": "90c17f648d1fbca638c6f711e0efb022a29e82a344be8adb2c5a745ef987f5b8",
+    "evidence_path": "semgrep-output/static-runner.evidence.json",
+    "sarif_path": "semgrep-output/semgrep.sarif",
+    "stdout_path": "semgrep-output/semgrep.stdout.log",
+    "stderr_path": "semgrep-output/semgrep.stderr.log",
+    "invocation_timestamp": "2026-05-02T06:35:23.113Z",
+    "source_commit_sha": "963b30358f70753765c872b6dac3045e963aa15d"
+  },
+  "baseline": {
+    "path": "semgrep-baseline.json",
+    "generated_at": "2026-05-02",
+    "findings_count": 0,
+    "ratchet_dry_trial": {
+      "grandfathered": 0,
+      "novel": 0,
+      "blocked": 0,
+      "exit_code": 0,
+      "result": "✅ pass — ADR-010 외부 적용 첫 입증 (PoC #04 full)"
+    }
   },
   "rules_applied_via_grep": [
-    {"rule_id": "OWASP-A03-XSS-dangerouslySetInnerHTML", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A03-XSS-dangerouslySetInnerHTML", "matches": 0, "result": "✅ pass", "note": "Stage 5 1차 grep 산출 보존"},
     {"rule_id": "OWASP-A03-XSS-innerHTML", "matches": 0, "result": "✅ pass"},
     {"rule_id": "OWASP-A03-eval", "matches": 0, "result": "✅ pass"},
     {"rule_id": "OWASP-A03-document-write", "matches": 0, "result": "✅ pass"},
@@ -21,7 +51,7 @@
     {
       "rule_id": "OWASP-A02-jwt-localStorage",
       "matches": 1,
-      "result": "⚠ ★ ★ ★ ★ 4 PoC isomorphic 본체 격상 후보",
+      "result": "⚠ ★ ★ ★ ★ 4 PoC isomorphic 본체 격상 후보 (★ Stage 5 시점 기록 보존)",
       "violations": [
         {
           "id": "F-FE-003-stage5-confirm",
@@ -35,19 +65,43 @@
       ]
     }
   ],
+  "★_semgrep_real_run_분석": {
+    "★_implicit_목표_미달": "★ ★ Semgrep p/owasp-top-ten (76 rules) 으로 AP-FE-SECURITY-JWT-LOCALSTORAGE 직접 매칭 ★ 0건 — 룰 매칭 실패 입증",
+    "★_실패_근거": "Semgrep `react-jwt-in-localstorage` 룰 pattern = (a) jwt_decode 임포트 + (b) localStorage.setItem(jwt_decode(...))의 2단계 매칭. yurisldk/realworld-react-fsd 의 src/shared/api/auth-storage.ts:20 = window.localStorage.setItem(TOKEN_STORAGE_KEY, token) (raw token 저장 / jwt_decode 임포트 0건) → 룰 trigger 조건 불충족.",
+    "★_grep_fallback_정합": "Stage 5 1차 grep 패턴 `localStorage.setItem.*token` 은 raw 매칭 가능 → 1건 발견 / Semgrep 정밀 매칭 (jwt_decode + setItem) 보다 광범위 패턴이 본 AP detection 에 정합. 즉 Semgrep p/owasp-top-ten 이 본 AP 에 대한 silver bullet 아님.",
+    "★_carry_분리": {
+      "carry_1_명목_종결": "✅ Semgrep 진짜 실행 + SARIF + 5종 물증 + baseline 첫 작성 + ratchet dry trial 모두 통과",
+      "carry_2_implicit_미달_별도_carry": "AP-FE-SECURITY-JWT-LOCALSTORAGE custom Semgrep rule 작성 — `localStorage.setItem($KEY, $VAL)` where $KEY ~= /token|jwt|auth/i / 일정 v1.4.2 PATCH 또는 v1.5",
+      "carry_3_baseline_운영_별도_carry": "drift-check.yml CI 통합 (★ ratchet 모드 default / novel finding 차단) / 일정 v1.4.2 또는 adoption 트랙"
+    }
+  },
   "summary": {
     "rules_total": 7,
     "passes": 6,
     "warnings": 1,
     "high_violations": 1,
-    "★_4_poc_isomorphic_violations": 1
+    "★_4_poc_isomorphic_violations": 1,
+    "★_semgrep_real_run_findings": 0,
+    "★_baseline_first_write": true,
+    "★_ratchet_dry_trial_pass": true
   },
   "deliverable_12_compliance": {
-    "semgrep_real_run": false,
-    "semgrep_carry_reason": "★ Docker 부재 (Stage 4 + Stage 5 동일) / 사용자 위임 의무",
+    "semgrep_real_run": true,
+    "semgrep_carry_reason": null,
     "grep_fallback_real_run": true,
     "simulation_used": false,
-    "★_4_poc_isomorphic_본체_격상_후보": "AP-FE-SECURITY-JWT-LOCALSTORAGE",
-    "no_simulation_penalty": "★ -5%p 신뢰도 패널티 (Semgrep carry)"
-  }
+    "★_4_poc_isomorphic_본체_격상_후보": "AP-FE-SECURITY-JWT-LOCALSTORAGE (★ ADR-FE-007 신설 → ★ 본체 격상 종결)",
+    "no_simulation_penalty": null,
+    "★_carry_1_종결_상태": "✅ done (2026-05-02 / v1.4.1 PATCH)",
+    "★_본체_도구_격상_부수_산출": [
+      "static-runner/runner.js:71 result_hash 정상화 (require → readFileSync) — ★★★ no-simulation 정책 핵심 필드 위조 차단 효과 복구",
+      "static-runner/cli.js detectGitSha 함수 신설 + writeBaseline 호출 시 source_commit_sha 정확 전달 — ratchet reproducibility 강화"
+    ]
+  },
+  "★_lessons_learned": [
+    "★ release note 의 carry 환경 가정 (Docker only) 이 채널 다양성 (pip/pipx/uv) 검증 누락 — carry 명시 시 환경 옵션 전수 조사 의무 (★ 신규 패턴)",
+    "★ Senior 추정 finding 20~75 / FP 40~60% 가 over-estimate — RealWorld FSD 코드 품질 우수 (★ FSD 학습 효과)",
+    "★ Semgrep p/owasp-top-ten 단독으로는 4 PoC isomorphic JWT XSS 매칭 불가 — custom rule 별도 필요 (★ silver bullet 부재 입증)",
+    "★ 진짜 도구 첫 실행 = 본체 도구 bug 2건 발견 (★ 본체 격상 1건 부수 산출) — ★ no-simulation 정책 첫 적용 = 본체 도구 가치 입증 패턴 정합"
+  ]
 }

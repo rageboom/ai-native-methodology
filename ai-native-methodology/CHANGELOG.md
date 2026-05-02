@@ -9,7 +9,68 @@
 
 ---
 
-## [v1.4.0] — 2026-05-02 ⭐ 현재 (★ ★ ★ ★ ★ MINOR release — FE 트랙 정식 진입 / §8.1 strict 검증대 첫 통과)
+## [v1.4.1] — 2026-05-02 ⭐ 현재 (★ PATCH release — release 같은 날 carry 1 즉시 종결 + 본체 도구 bug fix 1건)
+
+### ★ ★ Semgrep 진짜 실행 (★ release note carry 1 종결)
+
+★ ★ research 검증 결과 Python 3.14 = Semgrep 1.161.0 ★ 공식 지원 (PyPI classifier `Python :: 3.14` / pyproject.toml `>=3.10` / glom #11460 closed) → ★ release note §4.1 carry 가정 (Docker only) ★ 결정적으로 깨짐 → release 같은 날 carry 1 즉시 종결.
+
+**PoC #04 full INPUT/src/ 진짜 실행**:
+- command: `semgrep scan --config p/owasp-top-ten --sarif --sarif-output <path> <target>`
+- env: Python 3.14.1 / Semgrep 1.161.0 / pip 채널 / Windows 11 Pro / Windows tmp PermissionError (issue #11403) 재현 안 됨 (1.161.0 fix 가능성 입증)
+- ruleset: `p/owasp-top-ten` (544 rules loaded / 76 rules run / 66 files / 2 ignored)
+- duration: 6293 ms / findings: 0 / result_hash: SHA256 정상값 / source_commit_sha: 정상값
+- 5종 물증 7 필드 모두 정상
+
+**baseline 첫 작성 + ratchet dry trial**:
+- grandfathered 0 / novel 0 / blocked 0 / exit_code 0
+- ★ ★ ADR-010 외부 적용 첫 입증 (PoC #04 full)
+
+**★ Implicit 목표 미달 → carry 2 신규 분리**:
+- Semgrep `react-jwt-in-localstorage` 룰 = (a) jwt_decode 임포트 + (b) localStorage.setItem(jwt_decode(...))의 2단계
+- yurisldk fork `auth-storage.ts:20` = `window.localStorage.setItem(TOKEN_STORAGE_KEY, token)` (raw token / `jwt_decode` 임포트 0건) → 룰 trigger 조건 불충족 → ★ AP-FE-SECURITY-JWT-LOCALSTORAGE 직접 매칭 0건
+- → carry 2 신규 (custom Semgrep rule 작성 / v1.4.2 또는 v1.5)
+- → carry 3 신규 (drift-check.yml CI 통합 ratchet 모드 default / v1.4.2 또는 adoption)
+
+### ★ ★ ★ 본체 도구 격상 — static-runner 0.1.0 → 0.1.1 (★ bug fix patch)
+
+본 carry 의 첫 진짜 실행 = ★ 본체 도구 bug 2건 발견. ★ ★ ★ no-simulation 정책 첫 적용 = 도구 자체 가치 검증 효과 동반 입증 ★.
+
+- **Bug 1** — `tools/static-runner/src/runner.js:71` `require('node:fs').readFileSync(sarifPath)` ESM 환경 throw → catch silently swallow → `result_hash: null` (★ ★ ★ no-simulation 정책 핵심 필드 위조 차단 효과 깨짐)
+  - Fix: `import { readFileSync, ... } from 'node:fs'` 추가 + `h.update(readFileSync(sarifPath))`
+- **Bug 2** — `tools/static-runner/src/cli.js` `writeBaseline` 호출 시 `sourceCommitSha` 인자 누락 → `'unknown'` 기본값 (★ ratchet reproducibility 깨짐)
+  - Fix: `detectGitSha(targetDir)` 함수 신설 + `git rev-parse HEAD` 추출 후 전달
+- 검증: 9/9 unit test pass / 재실행 시 evidence.json `result_hash` SHA256 정상값 + `source_commit_sha` 정상값
+
+### 신뢰도 단계 강화
+
+- 진짜 도구 6 → **7종** (+ Semgrep)
+- -5%p 패널티 제거
+- PoC #04 full Phase 6 신뢰도 0.92 → 0.92~0.95 (단계 5 강화)
+
+### ★ Lessons Learned
+
+1. ★ release note carry 환경 가정 (Docker only) ★ 채널 다양성 (pip/pipx/uv) 검증 누락 패턴 → memory `feedback_carry_environment_assumption.md` 신규
+2. ★ ★ ★ no-simulation 정책 첫 적용 = 도구 자체 가치 검증 (본체 도구 bug 발견)
+3. ★ Senior research 추정 over-estimate 입증 (RealWorld FSD 0 findings)
+4. ★ Silver bullet 부재 입증 (Semgrep p/owasp-top-ten 단독으로 4 PoC isomorphic JWT XSS 매칭 불가)
+
+### release note + DEC + tag
+
+- `docs/v1.4.1-release-note.md` (★ 신규)
+- DEC-2026-05-02-v1.4.1-Semgrep-carry-종결
+- git tag `v1.4.1`
+
+### carry 갱신
+
+- v1.4.0 carry 4건 → v1.4.1 carry 5건 (3 보존 + 2 신규)
+  - **resolved**: Semgrep 진짜 실행 ✅
+  - **신규**: AP-FE-SECURITY-JWT-LOCALSTORAGE custom rule / drift-check.yml CI ratchet
+  - **보존**: F-FE-006 / i18n / v1.5
+
+---
+
+## [v1.4.0] — 2026-05-02 (★ ★ ★ ★ ★ MINOR release — FE 트랙 정식 진입 / §8.1 strict 검증대 첫 통과)
 
 ### ★ ★ Stage 7 v1.4.0 MINOR release (2026-05-02 / 본 세션)
 

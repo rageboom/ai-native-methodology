@@ -1,0 +1,25 @@
+{
+  "cross_validation": {
+    "real_tool": true,
+    "simulation_only": false,
+    "runs": [
+      {
+        "plugin": "semgrep",
+        "exit_code": 0,
+        "sarif_path": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.sarif",
+        "evidence": {
+          "tool_stdout_path": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.stdout.log",
+          "tool_stderr_path": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.stderr.log",
+          "tool_version": "1.161.0",
+          "invocation_timestamp": "2026-05-02T06:35:23.113Z",
+          "duration_ms": 6293,
+          "result_hash": "90c17f648d1fbca638c6f711e0efb022a29e82a344be8adb2c5a745ef987f5b8",
+          "reproduction_command": "semgrep scan --config p/owasp-top-ten --sarif --sarif-output ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.sarif ai-native-methodology\\examples\\poc-04-full-realworld-react\\INPUT\\src"
+        }
+      }
+    ],
+    "environment_missing": [],
+    "findings_count": 0,
+    "baseline_report": null
+  }
+}
