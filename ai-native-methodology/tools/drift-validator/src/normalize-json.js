@@ -12,10 +12,33 @@ export function detectArtifactType(json) {
       && Array.isArray(json.phases[0]?.depends_on)) {
     return 'phase-flow';
   }
+  // ★ v1.4 Stage 5 Sprint 5-3 Phase A — FE state-map (state_machines[] 배열) 검출
+  // F-FE-004 (Stage 4 mini-PoC) 본체 도구 한계 closed.
+  if (Array.isArray(json.state_machines) && json.state_machines.length > 0
+      && typeof json.state_machines[0]?.id !== 'undefined'
+      && typeof json.state_machines[0]?.states === 'object') {
+    return 'state-map-fe';
+  }
   if (json.states && typeof json.states === 'object') return 'state-machine';
   if (Array.isArray(json.actors) && Array.isArray(json.messages)) return 'sequence';
   if (json.br_id || json.condition) return 'decision-table';
   return 'unknown';
+}
+
+// ★ FE state-map → individual state-machines 분해 (★ 본격 비교는 v1.5 carry / Stage 5 = detection + count 만)
+export function normalizeStateMapFe(json) {
+  const machines = (json.state_machines ?? []).map((sm) => ({
+    id: normalizeId(sm.id),
+    purpose: sm.purpose ? stripDecor(sm.purpose) : null,
+    initial_state: sm.initial_state ? normalizeId(sm.initial_state) : null,
+    five_truths: Array.isArray(sm.five_truths) ? sm.five_truths : [],
+    state_count: Object.keys(sm.states ?? {}).length,
+  }));
+  return {
+    type: 'state-map-fe',
+    machine_count: machines.length,
+    machines: machines.sort((a, b) => a.id.localeCompare(b.id)),
+  };
 }
 
 // state-machine: states.<id>.on.<EVENT> = "target" | { target, actions, guard }

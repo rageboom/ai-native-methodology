@@ -1,0 +1,489 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/visual-manifest.schema.json",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-3",
+    "phase": "5-2-c-visual",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "@playwright/test (chromium headless) + ADR-FE-002 4 viewport",
+    "target_url": "https://demo.realworld.io",
+    "target_note": "★ demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 8 page 시각 산출 isomorphic 검증)"
+  },
+  "snapshots": [
+    {
+      "page_id": "PAGE-HOME",
+      "page_path": "/",
+      "actual_url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-HOME-desktop.png",
+      "snapshot_size_bytes": 18508,
+      "snapshot_hash_sha256": "30106fa0ae17bb52bfe23bc9d257fbbfa1079a92a8fe35b74541e43abdb95f37",
+      "captured_at": "2026-05-02T02:16:19.835Z"
+    },
+    {
+      "page_id": "PAGE-HOME",
+      "page_path": "/",
+      "actual_url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-HOME-tablet.png",
+      "snapshot_size_bytes": 17194,
+      "snapshot_hash_sha256": "af83af0dab41114775436ae5be766a0a04f7a7249db735b2f77706091f5b80ca",
+      "captured_at": "2026-05-02T02:16:21.593Z"
+    },
+    {
+      "page_id": "PAGE-HOME",
+      "page_path": "/",
+      "actual_url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-HOME-mobile-portrait.png",
+      "snapshot_size_bytes": 15700,
+      "snapshot_hash_sha256": "748abffb82b86871aef6820f97be35f88e00733bc83a5ee25ad7994219fb2509",
+      "captured_at": "2026-05-02T02:16:23.009Z"
+    },
+    {
+      "page_id": "PAGE-HOME",
+      "page_path": "/",
+      "actual_url": "https://demo.realworld.io/",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-HOME-mobile-landscape.png",
+      "snapshot_size_bytes": 15246,
+      "snapshot_hash_sha256": "b65762bdc69c6e945e3e4fa6b272dd35cc633c8421c35ad6adfaa58fb53da4cd",
+      "captured_at": "2026-05-02T02:16:24.670Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "page_path": "/login",
+      "actual_url": "https://demo.realworld.io/login",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-LOGIN-desktop.png",
+      "snapshot_size_bytes": 18636,
+      "snapshot_hash_sha256": "a79e2c217a51afbdf47814941c9bceceeaac8bbda07c32ef8787e9a56a78863a",
+      "captured_at": "2026-05-02T02:16:25.767Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "page_path": "/login",
+      "actual_url": "https://demo.realworld.io/login",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-LOGIN-tablet.png",
+      "snapshot_size_bytes": 17129,
+      "snapshot_hash_sha256": "3a6f02788ca5d7cd293675ba35b16dfcd3734f0cb9e854c87bb85deaf6952b5c",
+      "captured_at": "2026-05-02T02:16:27.109Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "page_path": "/login",
+      "actual_url": "https://demo.realworld.io/login",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-LOGIN-mobile-portrait.png",
+      "snapshot_size_bytes": 15489,
+      "snapshot_hash_sha256": "e540e4fe7fd857cf44411c175795c0cae5bbe582039980ca6cd97672bc9fb651",
+      "captured_at": "2026-05-02T02:16:28.225Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "page_path": "/login",
+      "actual_url": "https://demo.realworld.io/login",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-LOGIN-mobile-landscape.png",
+      "snapshot_size_bytes": 14114,
+      "snapshot_hash_sha256": "059df18498c7df40a47c45b537126b6d01e1b8b66548e9244a3d94794b708648",
+      "captured_at": "2026-05-02T02:16:29.902Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "page_path": "/register",
+      "actual_url": "https://demo.realworld.io/register",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-REGISTER-desktop.png",
+      "snapshot_size_bytes": 18784,
+      "snapshot_hash_sha256": "e56da3a7f7c096037d6bbb9c238668a8ad76dcfaeab2710a24aa8c50898c1493",
+      "captured_at": "2026-05-02T02:16:31.134Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "page_path": "/register",
+      "actual_url": "https://demo.realworld.io/register",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-REGISTER-tablet.png",
+      "snapshot_size_bytes": 16629,
+      "snapshot_hash_sha256": "e12d8a0aa7495a25287cc82d40c223a55a58bb9107145c001ef7aa10badbf759",
+      "captured_at": "2026-05-02T02:16:32.510Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "page_path": "/register",
+      "actual_url": "https://demo.realworld.io/register",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-REGISTER-mobile-portrait.png",
+      "snapshot_size_bytes": 15792,
+      "snapshot_hash_sha256": "abdb59a7960b34894c8de4055a0a6df0cc2459e558b86567ec9f88b8ba9669ad",
+      "captured_at": "2026-05-02T02:16:33.907Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "page_path": "/register",
+      "actual_url": "https://demo.realworld.io/register",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-REGISTER-mobile-landscape.png",
+      "snapshot_size_bytes": 13983,
+      "snapshot_hash_sha256": "a8b157da843ab32cd620c2a7d935f0df765760301d236fff2f317d446648b517",
+      "captured_at": "2026-05-02T02:16:35.603Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "page_path": "/article/Welcome-to-RealWorld-project-1",
+      "actual_url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-ARTICLE-desktop.png",
+      "snapshot_size_bytes": 18239,
+      "snapshot_hash_sha256": "895560f59901e1dbf26a2bcf709da054e12c1a61161a2290ea69c0ea75d3f6ae",
+      "captured_at": "2026-05-02T02:16:36.700Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "page_path": "/article/Welcome-to-RealWorld-project-1",
+      "actual_url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-ARTICLE-tablet.png",
+      "snapshot_size_bytes": 17451,
+      "snapshot_hash_sha256": "a215c99fb266a83b6c0a4b041951023813276c613aa04e2834020ea7528c845d",
+      "captured_at": "2026-05-02T02:16:38.142Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "page_path": "/article/Welcome-to-RealWorld-project-1",
+      "actual_url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-ARTICLE-mobile-portrait.png",
+      "snapshot_size_bytes": 15638,
+      "snapshot_hash_sha256": "ef4638feb9c87fdb56798984864998ce4ed415c96087fd3652d6dfd9b972064c",
+      "captured_at": "2026-05-02T02:16:39.205Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "page_path": "/article/Welcome-to-RealWorld-project-1",
+      "actual_url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-ARTICLE-mobile-landscape.png",
+      "snapshot_size_bytes": 13900,
+      "snapshot_hash_sha256": "98490b1965e8291214a1aa913a320870cf25ff3e04a3d32bd48bb7b988ae314e",
+      "captured_at": "2026-05-02T02:16:40.668Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "page_path": "/profile/eric-simons",
+      "actual_url": "https://demo.realworld.io/profile/eric-simons",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-PROFILE-desktop.png",
+      "snapshot_size_bytes": 19865,
+      "snapshot_hash_sha256": "ca5411358055d40ab0247032b2666b503f25af5e84b93823bc2822acd574d0e6",
+      "captured_at": "2026-05-02T02:16:41.749Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "page_path": "/profile/eric-simons",
+      "actual_url": "https://demo.realworld.io/profile/eric-simons",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-PROFILE-tablet.png",
+      "snapshot_size_bytes": 17143,
+      "snapshot_hash_sha256": "5a5278012645095ea11c2bbd92759b3f0523e57b50f88c81d0c435816071c7ad",
+      "captured_at": "2026-05-02T02:16:43.093Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "page_path": "/profile/eric-simons",
+      "actual_url": "https://demo.realworld.io/profile/eric-simons",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-PROFILE-mobile-portrait.png",
+      "snapshot_size_bytes": 15675,
+      "snapshot_hash_sha256": "acf62337d8bc1ee7c0d7f58f0e5dd785ebd98b3d8d2454a0c75e7f5cfd1185d9",
+      "captured_at": "2026-05-02T02:16:44.171Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "page_path": "/profile/eric-simons",
+      "actual_url": "https://demo.realworld.io/profile/eric-simons",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-PROFILE-mobile-landscape.png",
+      "snapshot_size_bytes": 13741,
+      "snapshot_hash_sha256": "21d3b0795d73cb08c45800b88a6d5a8ad23f7f4b1bf2bee297f0db551e974c32",
+      "captured_at": "2026-05-02T02:16:45.652Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "page_path": "/editor",
+      "actual_url": "https://demo.realworld.io/editor",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-EDITOR-desktop.png",
+      "snapshot_size_bytes": 19673,
+      "snapshot_hash_sha256": "05bd4dcfc9038cc517fd7ccff0d438b3c3346de3092b9e153e1f684ad9963467",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:46.752Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "page_path": "/editor",
+      "actual_url": "https://demo.realworld.io/editor",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-EDITOR-tablet.png",
+      "snapshot_size_bytes": 17316,
+      "snapshot_hash_sha256": "a51505405405a299f06d5408ffa05630963f01e23030cff7c0dafcab163ea183",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:48.241Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "page_path": "/editor",
+      "actual_url": "https://demo.realworld.io/editor",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-EDITOR-mobile-portrait.png",
+      "snapshot_size_bytes": 16181,
+      "snapshot_hash_sha256": "4c6deb3d3faec694eb40a6071bfa03ba5f343282cd5e10dc8de10208433c7805",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:49.489Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "page_path": "/editor",
+      "actual_url": "https://demo.realworld.io/editor",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-EDITOR-mobile-landscape.png",
+      "snapshot_size_bytes": 13862,
+      "snapshot_hash_sha256": "0e32d4269ec201de7a5e991f9d2c460ddcdf7ecf0df6a53b9430632e8cb5a505",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:50.852Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "page_path": "/settings",
+      "actual_url": "https://demo.realworld.io/settings",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-SETTINGS-desktop.png",
+      "snapshot_size_bytes": 19558,
+      "snapshot_hash_sha256": "873fddbc0d702680ab34dc617f4851f663e735cc957bbbd8a1a39c56c247fb0a",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:51.916Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "page_path": "/settings",
+      "actual_url": "https://demo.realworld.io/settings",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-SETTINGS-tablet.png",
+      "snapshot_size_bytes": 17270,
+      "snapshot_hash_sha256": "2653ec9cf01de3578b644e7e6e3e1fc2194d41046388716aad3613a088e36bf9",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:53.425Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "page_path": "/settings",
+      "actual_url": "https://demo.realworld.io/settings",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-SETTINGS-mobile-portrait.png",
+      "snapshot_size_bytes": 16706,
+      "snapshot_hash_sha256": "614e0dc57f1cbd16b558e4295631cbfe44c9cda79b60063e821ef7b37496a90c",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:54.490Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "page_path": "/settings",
+      "actual_url": "https://demo.realworld.io/settings",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-SETTINGS-mobile-landscape.png",
+      "snapshot_size_bytes": 14057,
+      "snapshot_hash_sha256": "51b0a97961ea3acf4d12b0b3d4286903b43d9daed40b8766a957a216f17fe677",
+      "auth_redirect_observed": false,
+      "captured_at": "2026-05-02T02:16:55.837Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "page_path": "/this-route-does-not-exist-12345",
+      "actual_url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "snapshot_path": "snapshot/PAGE-404-desktop.png",
+      "snapshot_size_bytes": 18840,
+      "snapshot_hash_sha256": "6b9bb8e309dbdb43aab1905b7f421fd7ae8180b1721dd301121d13382882a306",
+      "captured_at": "2026-05-02T02:16:56.815Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "page_path": "/this-route-does-not-exist-12345",
+      "actual_url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "snapshot_path": "snapshot/PAGE-404-tablet.png",
+      "snapshot_size_bytes": 17296,
+      "snapshot_hash_sha256": "02c99e0352fda4312f476ddfe6be0a339f6e7ce4290ac151c806f59ca1f0d82a",
+      "captured_at": "2026-05-02T02:16:58.142Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "page_path": "/this-route-does-not-exist-12345",
+      "actual_url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "viewport": {
+        "name": "mobile-portrait",
+        "width": 375,
+        "height": 667
+      },
+      "snapshot_path": "snapshot/PAGE-404-mobile-portrait.png",
+      "snapshot_size_bytes": 15694,
+      "snapshot_hash_sha256": "c8f2c6dfb0f7e916909c8ce4b98be957dd2b429ef27582d3b47e6e77d9037806",
+      "captured_at": "2026-05-02T02:16:59.354Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "page_path": "/this-route-does-not-exist-12345",
+      "actual_url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "viewport": {
+        "name": "mobile-landscape",
+        "width": 667,
+        "height": 375
+      },
+      "snapshot_path": "snapshot/PAGE-404-mobile-landscape.png",
+      "snapshot_size_bytes": 14197,
+      "snapshot_hash_sha256": "52a0d42fc3bb74a5fe16ae86cdb27aca94cdd73941ad4c79be3c97b577c0455f",
+      "captured_at": "2026-05-02T02:17:00.984Z"
+    }
+  ],
+  "summary": {
+    "pages_count": 8,
+    "viewports_count": 4,
+    "total_snapshots_target": 32,
+    "total_snapshots_captured": 32,
+    "auth_redirect_observed_count": 0,
+    "stage_4_mini_diff": {
+      "stage_4": 2,
+      "stage_5": 32
+    }
+  },
+  "deliverable_9_compliance": {
+    "playwright_real_run": true,
+    "simulation_used": false,
+    "adr_fe_002_4_viewport": true,
+    "binary_truth_captured": true
+  }
+}

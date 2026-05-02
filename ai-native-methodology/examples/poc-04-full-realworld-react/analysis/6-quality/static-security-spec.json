@@ -1,0 +1,53 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/static-security-spec.schema.json",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-3",
+    "phase": "6-quality",
+    "captured_at": "2026-05-02",
+    "captured_by": "real (★ Semgrep carry — Docker 환경 부재)",
+    "tool_primary": "Semgrep CLI Docker (★ G2 결단)",
+    "tool_primary_status": "carry_to_user (★ Docker 부재 / WSL2 또는 Linux runner 위임)",
+    "tool_fallback": "grep -E (Stage 4 패턴 재실행)"
+  },
+  "rules_applied_via_grep": [
+    {"rule_id": "OWASP-A03-XSS-dangerouslySetInnerHTML", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A03-XSS-innerHTML", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A03-eval", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A03-document-write", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A03-window-location-direct", "matches": 0, "result": "✅ pass"},
+    {"rule_id": "OWASP-A05-process-env-exposure", "matches": 0, "result": "✅ pass"},
+    {
+      "rule_id": "OWASP-A02-jwt-localStorage",
+      "matches": 1,
+      "result": "⚠ ★ ★ ★ ★ 4 PoC isomorphic 본체 격상 후보",
+      "violations": [
+        {
+          "id": "F-FE-003-stage5-confirm",
+          "severity": "high",
+          "file": "src/shared/api/auth-storage.ts",
+          "lines": [12, 20, 28],
+          "rationale": "★ ★ ★ Stage 4 mini-PoC F-FE-003 (medium) → Stage 5 본격 ★ severity 격상 (high) — 4 PoC isomorphic ★ ★ 본체 antipattern 격상 결단 의뢰 시점",
+          "antipattern_id": "AP-FE-SECURITY-JWT-LOCALSTORAGE",
+          "★_4_poc_isomorphic": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "rules_total": 7,
+    "passes": 6,
+    "warnings": 1,
+    "high_violations": 1,
+    "★_4_poc_isomorphic_violations": 1
+  },
+  "deliverable_12_compliance": {
+    "semgrep_real_run": false,
+    "semgrep_carry_reason": "★ Docker 부재 (Stage 4 + Stage 5 동일) / 사용자 위임 의무",
+    "grep_fallback_real_run": true,
+    "simulation_used": false,
+    "★_4_poc_isomorphic_본체_격상_후보": "AP-FE-SECURITY-JWT-LOCALSTORAGE",
+    "no_simulation_penalty": "★ -5%p 신뢰도 패널티 (Semgrep carry)"
+  }
+}

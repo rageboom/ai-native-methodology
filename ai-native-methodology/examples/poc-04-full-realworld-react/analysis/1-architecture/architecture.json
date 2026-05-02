@@ -1,0 +1,47 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/architecture.schema.json",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-3",
+    "phase": "1-architecture",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "ts-morph + manual analysis"
+  },
+  "fsd_layers": [
+    {"layer": "app", "files": 4, "purpose": "★ React app bootstrap + router + layout + global loader"},
+    {"layer": "pages", "files": 8, "slices": ["article", "editor", "home", "login", "page-404", "profile", "register", "settings"], "purpose": "★ FSD slice (★ 약식 — entities/features/widgets 흡수)"},
+    {"layer": "shared", "sub_layers": ["api", "lib", "ui"], "files": {"api": 6, "lib": 7, "ui": 5}, "purpose": "★ 공통 utility / api client / UI atoms"}
+  ],
+  "missing_layers": ["entities", "features", "widgets", "processes"],
+  "missing_layers_compliance": "★ FSD 약식 (3 layer) / pages 가 features+entities 흡수 / shared/api/generated 가 entities 부분 흡수",
+  "dependency_graph": {
+    "tool": "dependency-cruiser (★ INPUT/package.json scripts.graph 명시)",
+    "circular_dependencies": "★ Stage 5 carry (★ dependency-cruiser 진짜 실행 vs 본 분석에서는 직접 grep)",
+    "import_relationships": [
+      {"from": "app/", "to": ["pages/", "shared/"], "type": "imports"},
+      {"from": "pages/", "to": ["shared/api/", "shared/lib/", "shared/ui/"], "type": "imports"},
+      {"from": "shared/", "to": [], "type": "no inter-layer imports", "compliance": "★ FSD layer dependency 정합"}
+    ]
+  },
+  "module_count": {
+    "files": 64,
+    "ts_files": 49,
+    "tsx_files": 15
+  },
+  "key_modules": [
+    {"id": "MOD-ROUTER", "path": "src/app/browser-router.tsx", "responsibility": "★ react-router v7 createBrowserRouter + 8 page route + 5 middleware + ErrorBoundary"},
+    {"id": "MOD-AUTH-FETCH", "path": "src/shared/api/auth-fetch.ts", "responsibility": "★ orval mutator (Bearer token 자동 주입)"},
+    {"id": "MOD-AUTH-STORAGE", "path": "src/shared/api/auth-storage.ts", "responsibility": "★ JWT localStorage (★ F-FE-003 isomorphic)"},
+    {"id": "MOD-QUERY-CLIENT", "path": "src/shared/api/queryClient.ts", "responsibility": "★ TanStack Query client + 5 진실 #1 server cache"},
+    {"id": "MOD-VALIDATE-SCHEMA", "path": "src/shared/api/validateSchema.ts", "responsibility": "★ generic SafeParseSchema (Zod 호환)"},
+    {"id": "MOD-USER-CONTEXT", "path": "src/shared/lib/react-router/userContext.ts", "responsibility": "★ 5 진실 #2 Client global (auth user)"},
+    {"id": "MOD-MIDDLEWARES", "path": "src/shared/lib/react-router/", "responsibility": "★ 5 middleware (loadUser / requireAuth / redirectIfAuthenticated 등)"}
+  ],
+  "summary": {
+    "fsd_compliance": "약식 3 layer / 100% slice 명명 정합 (kebab-case + segment)",
+    "circular_dependencies_count": "★ carry (dependency-cruiser 진짜 실행)",
+    "module_count": 64
+  }
+}

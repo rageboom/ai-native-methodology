@@ -1,0 +1,518 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/a11y-spec.schema.json",
+  "meta": {
+    "poc_id": "poc-04-full",
+    "stage": "5",
+    "sprint": "5-3",
+    "phase": "6-quality",
+    "captured_at": "2026-05-02",
+    "captured_by": "real",
+    "tool": "@axe-core/playwright 4.10",
+    "wcag_tags": [
+      "wcag2a",
+      "wcag2aa",
+      "wcag21aa",
+      "wcag22aa"
+    ]
+  },
+  "scans": [
+    {
+      "page_id": "PAGE-HOME",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:19.962Z"
+    },
+    {
+      "page_id": "PAGE-HOME",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:23.133Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/login",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:25.888Z"
+    },
+    {
+      "page_id": "PAGE-LOGIN",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/login",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:28.346Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/register",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:31.260Z"
+    },
+    {
+      "page_id": "PAGE-REGISTER",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/register",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:34.029Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:36.828Z"
+    },
+    {
+      "page_id": "PAGE-ARTICLE",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/article/Welcome-to-RealWorld-project-1",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:39.326Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/profile/eric-simons",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:41.871Z"
+    },
+    {
+      "page_id": "PAGE-PROFILE",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/profile/eric-simons",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:44.295Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/editor",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:46.871Z"
+    },
+    {
+      "page_id": "PAGE-EDITOR",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/editor",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:49.608Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/settings",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:52.041Z"
+    },
+    {
+      "page_id": "PAGE-SETTINGS",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/settings",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:54.610Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "viewport": "desktop",
+      "url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:56.933Z"
+    },
+    {
+      "page_id": "PAGE-404",
+      "viewport": "mobile-portrait",
+      "url": "https://demo.realworld.io/this-route-does-not-exist-12345",
+      "violations_count": 1,
+      "passes_count": 6,
+      "incomplete_count": 0,
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "tags": [
+            "cat.language",
+            "wcag2a",
+            "wcag311",
+            "TTv5",
+            "TT11.a",
+            "EN-301-549",
+            "EN-9.3.1.1",
+            "ACT",
+            "RGAAv4",
+            "RGAA-8.3.1"
+          ],
+          "help": "<html> element must have a lang attribute",
+          "help_url": "https://dequeuniversity.com/rules/axe/4.11/html-has-lang?application=playwright",
+          "nodes_count": 1
+        }
+      ],
+      "timestamp": "2026-05-02T02:16:59.473Z"
+    }
+  ],
+  "summary": {
+    "total_scans": 16,
+    "pages_scanned": 8,
+    "viewports_per_page": 2,
+    "total_violations": 16,
+    "unique_violation_rules": 1,
+    "stage_4_mini_diff": {
+      "stage_4_pages": 1,
+      "stage_5_pages": 8,
+      "stage_4_unique": 1
+    }
+  },
+  "deliverable_10_compliance": {
+    "axe_core_real_run": true,
+    "simulation_used": false,
+    "wcag_2_2_aa_applied": true,
+    "stage_5_full_pages_coverage": true
+  }
+}

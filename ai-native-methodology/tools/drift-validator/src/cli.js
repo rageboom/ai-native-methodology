@@ -6,7 +6,7 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, extname, dirname, relative } from 'node:path';
 import { detectDiagramType, normalizeStateMachine, normalizeSequence } from './normalize-mermaid.js';
-import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson } from './normalize-json.js';
+import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson, normalizeStateMapFe } from './normalize-json.js';
 import { compareStateMachine, compareSequence, summarize } from './compare.js';
 import { normalizePhaseFlowJson, normalizePhaseFlow } from './normalize-phase-flow.js';
 import { comparePhaseFlow } from './compare-phase-flow.js';
@@ -50,7 +50,11 @@ function processOne({ jsonPath, mermaidPath }) {
   const jsonType = detectArtifactType(json);
   const mermaidType = detectDiagramType(mermaidText);
 
-  if (jsonType !== mermaidType || jsonType === 'unknown') {
+  // ★ v1.4 Stage 5 Sprint 5-3 Phase A — FE state-map mermaid 는 stateDiagram-v2 로 'state-machine' detect / FE 모드는 detection only
+  const typesMatch = jsonType === mermaidType
+    || (jsonType === 'state-map-fe' && mermaidType === 'state-machine');
+
+  if (!typesMatch || jsonType === 'unknown') {
     return {
       jsonPath, mermaidPath,
       diagram_type: { json: jsonType, mermaid: mermaidType },
@@ -73,6 +77,18 @@ function processOne({ jsonPath, mermaidPath }) {
     jsonNorm = normalizePhaseFlowJson(json);
     mermaidNorm = normalizePhaseFlow(mermaidText);
     diffs = comparePhaseFlow({ jsonNorm, mermaidNorm, jsonPath, mermaidPath });
+  } else if (jsonType === 'state-map-fe') {
+    // ★ v1.4 Stage 5 Sprint 5-3 Phase A — FE state-map detection (★ F-FE-004 closed)
+    // 본격 비교 = v1.5 carry / Stage 5 = detection + machine_count 일치 검사 만
+    jsonNorm = normalizeStateMapFe(json);
+    mermaidNorm = { type: 'state-map-fe', mermaid_text_length: mermaidText.length };
+    diffs = [{
+      severity: 'info',
+      kind: 'state-map-fe.detection-only',
+      json: { machine_count: jsonNorm.machine_count },
+      mermaid: { mermaid_present: true },
+      message: `FE state-map detected (${jsonNorm.machine_count} machines) — full comparison v1.5 carry / Stage 5 = detection only`
+    }];
   } else {
     return { jsonPath, mermaidPath, diagram_type: jsonType, diffs: [], note: 'comparator-not-implemented (e.g., decision-table — use decision-table-validator)' };
   }
