@@ -1,4 +1,5 @@
 ---
+name: industry-case-researcher
 description: Research how tech companies (FAANG, scale-ups, OSS projects) have solved the same problem. Use during 4원칙 §2 to ground decisions in real-world precedent. Apply 가벼운 sub-agent 전략 from Phase 4~6 — Case skip, time cap, priority reads only.
 tools: WebSearch, WebFetch, Grep, Read
 model: sonnet

@@ -104,10 +104,15 @@ Installed plugins:
 - **Reproduction**: 사용자가 자연어 prompt ("이 코드베이스 분석 시작") 입력 → 의도한 `phase-0-input` skill 자동 발동?
 - **Actual (★ 사용자 검증)**: 다른 skill 발동 또는 미발동 시 description 정밀화 carry
 
-### F-PA-004 후보 — Agent frontmatter Claude Code spec 정합
+### F-PA-004 후보 — Agent frontmatter Claude Code spec 정합 (★ ★ resolved / 2026-05-02 별도 conversation)
 
 - **Reproduction**: `agents/_base/senior-engineer/senior-engineer.md` 가 Claude Code subagent 시스템에서 정상 인식?
-- **Actual (★ 사용자 검증)**: name 필드 부재 또는 다른 spec 차이 시 carry
+- **★ ★ 결과**: ★ static check 결과 — 3 agent 모두 frontmatter `name` 필드 ★ 부재. research (claude-code-guide) §1 의 "name 필드 의무 + 파일명 매칭" 권고 정합 ❌.
+- **★ ★ 즉시 fix 적용 (별도 conversation)**:
+  - `agents/_base/industry-case-researcher/industry-case-researcher.md` — `name: industry-case-researcher` 추가
+  - `agents/_base/official-docs-checker/official-docs-checker.md` — `name: official-docs-checker` 추가
+  - `agents/_base/senior-engineer/senior-engineer.md` — `name: senior-engineer` 추가
+- **status**: ★ resolved (★ 사용자 dynamic 검증 시 추가 마찰 가능 — agents 디렉토리 nesting 자체는 별도 검증 의무)
 
 ### F-PA-005 후보 — Bash 도구 cwd 가정 (plugin root vs user project)
 
@@ -145,3 +150,69 @@ Installed plugins:
 ---
 
 **End of Phase A iteration 0 pre-flight report.**
+
+---
+
+## ★ Post-flight 보강 (★ 2026-05-02 별도 conversation 신규 발견 / iter 0 commit 후)
+
+> ★ 본 섹션 = ★ iter 0 종결 후 별도 conversation 에서 lightweight research × 3 진행 중 ★ static check 추가 발견. iter 0 commit `29f040e` 의 hooks.json fix 후에도 ★ 잔존하는 마찰점.
+
+### F-PA-009 — PostToolUse hook **매 Write/Edit 마다 Node startup** (medium)
+
+- **Type**: performance / UX
+- **Severity**: medium (★ 매 호출 200-500ms 지연 / 사용자 작업 마찰 / 모든 plugin 사용자 영향)
+- **Phase A iteration**: 0 post-flight
+- **Date**: 2026-05-02
+- **Reproduction**: 사용자 plugin install 후 임의 파일 Write/Edit → PostToolUse hook trigger → `node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output 2>&1 || true` 매번 Node startup
+- **Expected**: drift 검증 의도가 있는 경우만 trigger (예: `.aimd/output/` 내부 Write 만)
+- **Actual**: matcher `"Write|Edit"` = tool-level 만 / path-level filter 없음 → ★ 모든 Write/Edit trigger
+- **Root cause**: Claude Code hook matcher = tool name 단위 (path 단위 ❌) — 매 호출 trigger 불가피
+- **fix 후보**:
+  - (A) ★ hook command 내부 path check — `[ -d .aimd/output ] && node ... || exit 0` (POSIX) / Windows 호환 분기 의무
+  - (B) ★ hook 제거 — drift 검증을 manual skill 호출 (`apply-baseline-ratchet` 또는 신설 `validate-drift` skill) 으로 이전 / on-demand 검증
+  - (C) hook 유지 + Node script 내부 fast-path — readdirSync 미존재 시 즉시 exit (★ 현재도 try/catch 로 처리되지만 Node startup 자체 200-500ms 비용 잔존)
+- **권장**: ★ ★ (B) — manual skill 호출로 이전. drift 검증은 사용자 의도된 시점만 / 매 Write/Edit UX 마찰 0.
+- **Phase A.1 carry 후보**: hook 재설계 결단 (B 채택 시 hooks.json PostToolUse 제거)
+- **Confidence**: high
+
+### F-PA-010 — PostToolUse `|| true` silent error masking (medium / no-simulation 정책 위배)
+
+- **Type**: bug (★ silent failure / no-simulation 정책 위배)
+- **Severity**: medium (★ ★ ★ no-simulation 정책 핵심 위배 — 도구 결과 위조 효과)
+- **Phase A iteration**: 0 post-flight
+- **Date**: 2026-05-02
+- **Reproduction**: 사용자 `.aimd/output/` 내부에 ★ ★ 진짜 drift 가 발생한 .json/.mermaid 짝 Write/Edit → drift-validator exit 1 → `2>&1 || true` 가 stderr+stdout 모두 마스킹 → 사용자 무지각
+- **Expected**: drift 발견 시 사용자에게 명시적 경고 표시 (statusMessage 또는 stderr)
+- **Actual**: silent fail / 사용자가 drift 발생 자체 인지 ❌
+- **★ 메타 lesson**: ★ ★ ★ v1.4.1 carry-1 의 `result_hash: null` bug 동급 패턴 — silent fail = no-simulation 정책 핵심 (★ ★ 도구 결과 위조 차단) 위배
+- **Root cause**: iter 0 commit `29f040e` 의 hook command 변경 시 `|| true` ★ 보존. 의도 = ".aimd/output 부재 시 silent fail-soft" 였으나 ★ ★ 실제 drift 발생 시도 같이 silent fail.
+- **fix**: F-PA-009 (B) 채택 시 자동 해소 (manual skill 호출 시 stderr 자연 노출). F-PA-009 (A) 채택 시 path check + drift 발견 시 stderr 조건부 노출 의무.
+- **Confidence**: high
+
+---
+
+## ★ Post-flight 결과 진술
+
+- **iter 0 자체 fix** = F-PA-001 / F-PA-007 / F-PA-008 (★ 3건 / install 성공 도달)
+- **별도 conversation 즉시 fix** = F-PA-004 후보 resolved (agents 3종 name 필드)
+- **신규 마찰점 등재** = F-PA-009 (medium / Node startup 마찰) + F-PA-010 (medium / silent fail)
+- **사용자 self-iteration #1 검증 영역 잔존** = F-PA-002 / F-PA-003 / F-PA-005 / F-PA-006 (4건 / 사용자 검증 대기)
+
+→ ★ ★ iter 1 진입 자격 = ★ F-PA-009/010 결단 (manual skill 이전 vs path check 보강) + 사용자 self-iteration 검증 4건 진행 후 평가.
+
+---
+
+## ★ ★ ★ 메타 lesson (★ 2026-05-02 본 conversation slop 발견)
+
+★ ★ ★ ★ ★ 별도 conversation 에서 본 plan-phase-a-self-iteration.md + iter#1 friction-findings.md ★ duplicate 작업 → ★ ★ revert + salvage 진행.
+
+★ ★ slop 원인:
+- 본 conversation 시작 시 `git log --oneline -30` 만 보고 commit `f223880` 까지만 인지
+- ★ memory + STATUS + INDEX 어디에도 iter 0 commit (`520166d` / `29f040e` / `ebb9a0d` / 같은 날 17:18-17:58) ★ 미반영
+- ★ 다른 세션 commit 인지 의무 검사 누락
+
+★ ★ 해소 (본 conversation salvage):
+- duplicate revert (plan + iter#1 디렉토리)
+- 가치 있는 부분 keep (★ research-phase-a-summary.md / agents 3종 name 필드 fix)
+- 신규 발견 통합 (★ F-PA-009 / F-PA-010 본 섹션)
+- ★ memory 신규 등재 의무 — "다른 세션 commit 인지 / git log 깊이 검사 / memory + STATUS 동기화"

@@ -1,4 +1,5 @@
 ---
+name: official-docs-checker
 description: Cross-check main agent's claims against official documentation and primary sources. Use during 4원칙 §2 to defeat training-corpus dependency. Pattern F-015 cross-validation — main raw fetch → sub-agent cross-check on independent fetch.
 tools: Read, Grep, WebFetch, WebSearch
 model: sonnet
