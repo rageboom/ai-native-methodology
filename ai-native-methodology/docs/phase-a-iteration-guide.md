@@ -80,20 +80,29 @@ phase 0 input 부터 가자.
 
 ## 4. PostToolUse hook 검증
 
-Claude 가 어떤 파일 Write 또는 Edit 후 (예: `.aimd/phase-0-input.json` 작성):
+Claude 가 어떤 파일 Write 또는 Edit 후 (예: `.aimd/output/inventory.json` 작성):
 
 ★ ★ hooks.json 의 PostToolUse trigger:
 ```
-[hook] node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js --plugin-mode --recently-edited
+[hook] node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output 2>&1 || true
 ```
 
 ★ ★ ★ 검증 항목:
-- `${CLAUDE_PLUGIN_ROOT}` 변수 해석 정상? (★ Claude Code 자동 치환)
-- drift-validator `--plugin-mode` 옵션 존재? (★ tools/drift-validator/src/cli.js 확인)
-- `--recently-edited` 옵션 존재?
-- exit code 0 (drift 0) 또는 정상 진단 출력?
+- `${CLAUDE_PLUGIN_ROOT}` 변수 해석 정상? (★ Claude Code 자동 치환 / 미해석 시 ENOENT — F-PA-002 후보)
+- user project cwd 에 `.aimd/output/` 디렉토리 존재 시 — drift-validator 가 정상 실행 + json/mermaid 짝 발견 → drift 체크
+- `.aimd/output/` 부재 시 — `path not found` → exit 2 → `|| true` 로 무시 (★ silent fail-soft)
+- drift ≥ 1 시 — Claude Code 가 hook 출력 표시 (★ 사용자 인지 가능)
 
 ★ ★ 위 4건 중 하나라도 실패 = ★ 마찰점 finding (★ 도구 격상 trigger 가능성 높음).
+
+### 4.1 ★ 도구 격상 carry — drift-validator graceful 모드
+
+본 hook command 는 ★ 단순 fail-soft 패턴. 본격 hook 통합 = drift-validator 격상 carry:
+- ★ `.aimd/output` 부재 시 silent exit 0 (★ "path not found" stderr 출력 안 함)
+- ★ `--plugin-mode` 옵션 신설 — 점진/빠른 hook 반응 모드 (recently edited 파일만 비교)
+- ★ `--recently-edited` 옵션 신설 — git 또는 mtime 기반 최근 N분 파일 필터
+
+→ ★ Phase A.1 carry 등재 (★ feedback_methodology_body_priority — 본체 도구 격상 후 plugin sync).
 
 ---
 
@@ -178,6 +187,7 @@ git commit -m "Phase A iteration N — <대상 프로젝트> / 마찰점 X건 / 
 | carry | 분류 | 사유 |
 |---|---|---|
 | `tools/*/cli.mjs` MCP wrapper | Phase A.1 | 현재 standalone CLI (`src/cli.js`) 직접 호출 fallback / MCP 미사용 |
+| **★ drift-validator graceful 모드 + `--plugin-mode` + `--recently-edited`** | Phase A.1 | ★ ★ ★ F-PA-001 즉시 fix 시 발견 / 본체 도구 격상 후 hooks.json command 강화 |
 | `adoption/dist/internal-v1.4/` 빌드 | Phase B | release.yml 자동화 후 |
 | `marketplace.json` | Phase B | 사내 marketplace 진입점 |
 | LICENSE 정식 | Phase B | 현재 placeholder |

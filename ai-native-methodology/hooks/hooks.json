@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js --plugin-mode --recently-edited 2>&1 || true",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output 2>&1 || true",
             "statusMessage": "Validating dual-rendering drift..."
           }
         ]
