@@ -211,6 +211,12 @@
         "critical",
         "composite-api-contract"
       ],
+      "static_rule_link": {
+        "rule_path": "tools/static-runner/rules/error-mapping-missing.yml",
+        "rule_id": "internal.be.api.error-mapping-generic-exception-in-service",
+        "introduced_in": "v1.4.4-pre",
+        "scope": "Spring @Service / @RestController / @Controller / @Component 안의 IllegalArgumentException / IllegalStateException / RuntimeException throw 자동 회귀. ★ ArticleService.java:184 evidence 정확 매칭 / login 의 @ResponseStatus 201 drift 는 별 mechanism (decorator drift) → carry."
+      },
       "migration_advice": "신규 시스템 설계 시: (1) idempotent endpoint 는 OpenAPI spec 작성 단계부터 200 OK 명시 + same-state 시 silent return 패턴 강제 (Profile follow/unfollow 패턴 표준). (2) login 등 resource creation 의미가 모호한 endpoint 는 @ResponseStatus 명시 의무. (3) CI 에 spec/runtime drift 검증 (rest-assured contract test 또는 Pact) 의무. (4) RFC 7231 §4.2.2 (idempotency) + RFC 9110 §15.3 (status code) 팀 학습 + ADR 등록."
     },
     {

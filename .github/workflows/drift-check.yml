@@ -101,7 +101,8 @@ jobs:
             --output tools/static-runner/out \
             --ruleset p/owasp-top-ten \
             --extra-rules tools/static-runner/rules/jwt-secret-weak.yml \
-            --extra-rules tools/static-runner/rules/rsa-private-key-commit.yml
+            --extra-rules tools/static-runner/rules/rsa-private-key-commit.yml \
+            --extra-rules tools/static-runner/rules/error-mapping-missing.yml
 
       # ★ v1.4.2 PATCH — PoC #04 full FE 트랙 (★ custom rule + ratchet 모드 default).
       # 의의: ADR-010 §2.3 정합 — critical/high severity 신규 결함 = CI fail (production blocker).
