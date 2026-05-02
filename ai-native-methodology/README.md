@@ -1,12 +1,14 @@
-# AI-Native 개발 방법론 v1.3.1 ★★★
+# AI-Native 개발 방법론 v1.4.2 ★ ★ ★ ★ ★ ★ ★
 
 > 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
 >
-> 본 v1.x 는 **분석 단계 (① Analyze)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기.
+> 본 v1.4.x 는 **분석 단계 (analysis stage)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기. 다른 SDLC stage (planning / design / test / implement) = v2.0+ scope (placeholder).
 >
-> **현재**: v1.3.1 PATCH (2026-05-01) — D3.2 원본 파일명 컨벤션 정리 (12 rename + 33 cross-link). dist 와 동기화 / 한국어 → 영어 + 1자리 prefix + .yml→.yaml 일관.
+> **현재**: v1.4.2 PATCH (2026-05-02) — ★ ★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm + custom Semgrep rule 첫 실현 + drift-check.yml CI ratchet 통합 (ADR-010 §2.3 첫 운영 입증). 같은 날 v1.4.0 → v1.4.1 → v1.4.2 = 3 release cadence.
 >
-> **★★★ v1.3.0 release (2026-05-01)**: 3 PoC platform-agnostic 입증 + 11 묶음 본체 갭 closure + ★ Sprint 5 Node 도구 부분 종결 (spectral 실 실행 — 24 warnings / 0 errors / exit 0) + ★★★ no-simulation 정책 첫 실현. 신뢰도 85-92% 도달 (★ ADR-009 단계 4). **사내 표준 채택 가능 시점 도달**.
+> **★ ★ ★ ★ ★ ★ ★ v1.4.0 MINOR release (2026-05-02)**: FE 트랙 정식 진입 + §8.1 strict 검증대 첫 통과. ADR-FE 7건 (★ ADR-FE-007 본체 antipattern 카탈로그 첫 등재 / AP-FE-SECURITY-001 4 PoC isomorphic) + schemas 13종 + tools 6종 + 4 PoC. 진짜 도구 6종 + IR 0.99 + 신뢰도 0.92 (ADR-009 단계 5).
+>
+> **★ ★ ★ Plugin-first 사내 배포 자산** (DEC-2026-05-02 14~15차 결단): `.claude-plugin/` + `agents/` + `skills/analysis/` 18 + `hooks/` + `flows/` 채움. Phase A self-iteration 진입 가능. Phase B (사내 배포) 진입 전 의무 단계 = `docs/phase-a-iteration-guide.md` 참고.
 >
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
 
@@ -58,40 +60,53 @@
 ## 시작하기
 
 ### 사전 요구사항
-- Claude Code 설치
-- 분석 대상 레포 git clone
+- Claude Code 설치 (★ plugin 시스템 지원)
+- 분석 대상 사내 legacy 프로젝트 git clone
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
+- (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 
-### 사용법 (현재 — manual)
+### 사용법 — Plugin install (★ v1.4.x — Phase A self-iteration)
 
-본 방법론 사용 시 Claude Code 세션에서 `methodology-spec/workflow/phase-*.md` 를 phase 별로 차례로 적용. 각 phase 산출물은 `examples/poc-XX/output/` 구조 참조.
-
-```bash
-# 분석 대상 레포 clone
-git clone <legacy-repo>
-
-# Claude Code 세션 시작 + methodology-spec 컨텍스트 로드
-cd <legacy-repo>
-claude code
-# → methodology-spec/workflow/phase-0-input.md 부터 순차 적용
-```
-
-**각 단계는 사용자 승인 게이트** 후 다음 단계로 진행 (Work Principles 4원칙).
-
-### 사용법 (예정 — D5 carry-over)
-
-slash command + skill 로 패키징하는 작업 (D5) 진행 중. 완료 후 다음 형태:
+Phase B (사내 marketplace 배포) 미진입 = local path 또는 git URL 직접 등록.
 
 ```bash
-/analyze-init   # phase-1   인벤토리
-/analyze-db     # phase-2   DB
-/analyze-arch   # phase-3   아키텍처
-/analyze-bl     # phase-4   비즈니스 로직 (4영역 병렬)
-/analyze-fs     # phase-4-5 형식 명세 (★ no-simulation)
-/analyze-api    # phase-5-1 API
-/analyze-ui     # phase-5-2 UI/UX
-/analyze-q      # phase-6   품질 통합
+# Claude Code 세션에서:
+/plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
+/plugin install ai-native-methodology@ai-native-methodology
+/reload-plugins
+/plugin                  # 대화형 manager — Installed 탭에 v1.4.2 확인
 ```
+
+★ 분석 대상 사내 legacy 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 (★ "Plugin loaded. Read CLAUDE.md...") 표시 시 정상 작동.
+
+### Phase A self-iteration (★ Phase B 진입 전 의무 단계)
+
+본 v1.4.x = ★ Phase A self-iteration 단계. 사용자가 본인 사내 legacy 프로젝트 1개에서 plugin 직접 돌려 마찰점 검출 → plugin 즉시 수정 → 재시도 (4원칙 §4 정합).
+
+★ ★ ★ 상세 절차 + 마찰점 finding template + 재시도 cadence: **[`docs/phase-a-iteration-guide.md`](./docs/phase-a-iteration-guide.md)**.
+
+### 사용법 — skill description trigger (★ install 후 자동)
+
+Claude 가 코드베이스 시그널 자동 감지 → skill 자동 발동 (slash command 불필요):
+
+| 자연어 prompt 예시 | 발동 skill |
+|---|---|
+| "이 코드베이스 분석 시작" | `phase-0-input` |
+| "inventory 추출해줘" | `phase-1-inventory` |
+| "아키텍처 분석" | `phase-2-architecture` |
+| "도메인 모델 추출" | `phase-3-domain` |
+| "비즈니스 규칙 추출" | `phase-4-rules` |
+| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) |
+| "DB schema + ERD" | `phase-5-schema-erd` (DB) |
+| "antipattern 정리" | `phase-6-quality` |
+
+★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 (예: `package.json` 에 react / `pom.xml` 에 spring-boot) 자동 매칭.
+
+**각 skill 진입 시 사용자 승인 게이트** (Work Principles 4원칙).
+
+### 사용법 — manual (★ plugin 미사용 / fallback)
+
+`methodology-spec/workflow/phase-*.md` 직접 차례로 적용. PoC 산출물은 `examples/poc-XX/output/` 구조 참조.
 
 ---
 
@@ -138,7 +153,15 @@ ai-native-methodology/
 .github/workflows/drift-check.yml   ★ v1.2.1 — 이중 모드 (PR diff-aware + nightly full)
 ```
 
-※ inner repo 의 `plugin/` 및 `.claude-plugin/` 빈 dir 은 D5 carry-over (Claude Code skill / slash command 패키징 작업) 용 placeholder.
+※ ★ v1.4.x — Plugin 자산 채움 (DEC-2026-05-02 14~15차 결단):
+- `.claude-plugin/plugin.json` (v1.4.2)
+- `agents/_base/` 3종 (senior / official-docs / industry-case) + 5 stage 디렉토리
+- `skills/_base/` 3 (apply-template / log-finding / apply-baseline-ratchet) + `skills/analysis/` 18 + 4 stage placeholder
+- `hooks/hooks.json` (SessionStart + PostToolUse Write/Edit drift-validator)
+- `flows/analysis.phase-flow.{json,mermaid}` (재배치)
+- `templates/analysis/` (21 templates 이동)
+- `methodology-spec/lifecycle-contract.md` (SDLC stage 간 data contract)
+- `.mcp.json` placeholder (cli.mjs MCP wrapper = Phase A.1 carry)
 
 ## 검증 도구 사용 (v1.2.1)
 
