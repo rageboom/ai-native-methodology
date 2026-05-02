@@ -3,14 +3,15 @@
 // 디렉토리 내 *.json + 동일 basename *.mermaid 짝을 자동 발견 후 비교.
 // 출력: oasdiff-style diff list. exit code: 0 (no breaking) / 1 (breaking found).
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, basename, extname, dirname, relative } from 'node:path';
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { join, basename, extname, dirname, relative, resolve } from 'node:path';
 import { detectDiagramType, normalizeStateMachine, normalizeSequence } from './normalize-mermaid.js';
 import { detectArtifactType, normalizeStateMachineJson, normalizeSequenceJson, normalizeStateMapFe } from './normalize-json.js';
 import { compareStateMachine, compareSequence, summarize } from './compare.js';
 import { normalizePhaseFlowJson, normalizePhaseFlow } from './normalize-phase-flow.js';
 import { comparePhaseFlow } from './compare-phase-flow.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from './baseline.js';
+import { checkPhaseSkills, summarizeLayoutCheck } from './check-phase-skills.js';
 
 function findPairs(dir) {
   const pairs = [];
@@ -107,10 +108,44 @@ function getArgValue(args, name) {
   return args[idx + 1];
 }
 
+function findWorkspaceRoot(start) {
+  let cur = resolve(start);
+  for (let i = 0; i < 12; i++) {
+    if (existsSync(join(cur, 'flows/analysis.phase-flow.json'))) return cur;
+    const parent = dirname(cur);
+    if (parent === cur) break;
+    cur = parent;
+  }
+  return null;
+}
+
 function main() {
   const args = process.argv.slice(2);
+
+  // ★ v1.4.4 신설 — manifest ↔ workflow ↔ skills 3-way layout 검증 모드
+  if (args.includes('--check-layout')) {
+    const targetArg = args.find((a) => !a.startsWith('--')) ?? process.cwd();
+    const workspaceRoot = findWorkspaceRoot(targetArg);
+    if (!workspaceRoot) {
+      console.error(`[--check-layout] could not locate workspace root (flows/analysis.phase-flow.json) from: ${targetArg}`);
+      process.exit(2);
+    }
+    const result = checkPhaseSkills(workspaceRoot);
+    const jsonOut = args.includes('--json');
+    if (jsonOut) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(summarizeLayoutCheck(result));
+      for (const d of result.diffs) {
+        console.log(`  - [${d.severity}] ${d.kind} — ${d.message}`);
+      }
+    }
+    process.exit(result.ok ? 0 : 1);
+  }
+
   if (args.length === 0) {
     console.error('usage: drift-validator <dir-or-file> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
+    console.error('       drift-validator --check-layout [<workspace-root>] [--json]   ★ v1.4.4 — manifest ↔ workflow ↔ skills 3-way layout 검증');
     process.exit(2);
   }
   const target = args[0];

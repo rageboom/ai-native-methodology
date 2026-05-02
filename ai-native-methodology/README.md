@@ -65,16 +65,55 @@
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 
-### 사용법 — Plugin install (★ v1.4.x — Phase A self-iteration)
+### 사용법 — Plugin install (★ v1.4.x — 2 시나리오)
+
+본 plugin install 은 **편집자 / 배포 수신자** 2가지 시나리오. `marketplace.json` 의 `"source": "./"` 가 등록한 폴더 자체를 plugin root 로 지정하므로, 워크스페이스든 dist artifact 든 동일 메커니즘.
 
 Phase B (사내 marketplace 배포) 미진입 = local path 또는 git URL 직접 등록.
+
+#### A. 편집자 — 워크스페이스 직접 등록 (★ Phase A self-iteration)
+
+본 repo 를 clone 하여 plugin 본체를 직접 수정하며 돌리는 시나리오. 워크스페이스 path 그대로 등록.
 
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에 v1.4.2 확인
+/plugin                  # 대화형 manager — Installed 탭에 현재 버전 확인
+```
+
+#### B. 배포 수신자 — dist artifact 등록 (★ 사내 동료 받는 경로)
+
+빌드된 artifact (`dist/internal-v<version>/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
+
+```bash
+# 받은 dist 폴더를 임의 위치에 풀기:
+#   ~/claude-plugins/ai-native-methodology-v<version>/
+#   ├── .claude-plugin/{plugin.json, marketplace.json}
+#   ├── agents/ skills/ hooks/ flows/ templates/ tools/ methodology-spec/ schemas/
+#   ├── CHANGELOG.md / README.md / CLAUDE.md / ADOPTION-README.md
+#   └── CHECKSUMS.txt   ← SHA256 manifest (무결성 검증용)
+
+# Claude Code 세션에서:
+/plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
+/plugin install ai-native-methodology@ai-native-methodology
+/reload-plugins
+```
+
+★ `CHECKSUMS.txt` 로 무결성 검증 — 배포자가 별도 채널 (사내 wiki / Slack pin) 으로 hash 제공 시 대조 권장.
+
+#### 빌드 (★ A → B artifact 생성)
+
+편집자가 dist artifact 를 새로 만들 때:
+
+```bash
+# version 갱신 시 3-way sync 의무 (★ source-of-truth = .claude-plugin/plugin.json — ADR-010)
+#   .claude-plugin/plugin.json.version  ↔  CHANGELOG.md 첫 ## [vX.Y.Z]  ↔  package.json.version
+npm run version:check       # 3-way sync 검증 단독
+npm run build               # version-check 강제 → dist/internal-v<version>/ 생성 + CHECKSUMS.txt
+npm run build:check         # dry-run (file count 만 출력)
+npm run build:diff-check    # build 후 git diff exit-code 0 검증 (CI 용)
 ```
 
 ★ 분석 대상 사내 legacy 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 (★ "Plugin loaded. Read CLAUDE.md...") 표시 시 정상 작동.
@@ -89,18 +128,20 @@ Phase B (사내 marketplace 배포) 미진입 = local path 또는 git URL 직접
 
 Claude 가 코드베이스 시그널 자동 감지 → skill 자동 발동 (slash command 불필요):
 
-| 자연어 prompt 예시 | 발동 skill |
-|---|---|
-| "이 코드베이스 분석 시작" | `phase-0-input` |
-| "inventory 추출해줘" | `phase-1-inventory` |
-| "아키텍처 분석" | `phase-2-architecture` |
-| "도메인 모델 추출" | `phase-3-domain` |
-| "비즈니스 규칙 추출" | `phase-4-rules` |
-| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) |
-| "DB schema + ERD" | `phase-5-schema-erd` (DB) |
-| "antipattern 정리" | `phase-6-quality` |
+| 자연어 prompt 예시 | 발동 skill | manifest phase ID |
+|---|---|---|
+| "이 코드베이스 분석 시작" | `phase-0-input` | 0 |
+| "inventory 추출해줘" | `phase-1-inventory` | 1 |
+| "아키텍처 분석" | `phase-2-architecture` | 3 (arch) |
+| "도메인 모델 추출" | `phase-3-domain` | 4 (business-logic) |
+| "비즈니스 규칙 추출" | `phase-4-rules` | 4 |
+| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) | 5-1 (api) |
+| "DB schema + ERD" | `phase-5-schema-erd` (DB) | 2 (db) |
+| "antipattern 정리" | `phase-6-quality` | 6 |
 
-★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 (예: `package.json` 에 react / `pom.xml` 에 spring-boot) 자동 매칭.
+★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 (예: `package.json` 에 react / `pom.xml` 에 spring-boot) 자동 매칭. cross_cutting (phase 무관).
+
+★ ★ ★ **skills 디렉토리의 phase 번호 ≠ manifest phase ID** — skills 의 phase-N prefix 는 산출물 번호 그룹 axis (예: `phase-2-architecture` 는 산출물 #2 / manifest phase 3 의 skill). 정책 명문 = [`methodology-spec/skills-axis.md`](./methodology-spec/skills-axis.md). SSOT = `flows/analysis.phase-flow.json` (★ v1.4.4 정식 승격). drift-validator `--check-layout` 으로 3-way 정합 강제 (CI ratchet `.github/workflows/drift-check.yml`).
 
 **각 skill 진입 시 사용자 승인 게이트** (Work Principles 4원칙).
 

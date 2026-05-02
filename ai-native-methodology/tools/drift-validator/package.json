@@ -1,6 +1,6 @@
 {
   "name": "@ai-native-methodology/drift-validator",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Drift validator — single source of truth, dual rendering (.mermaid <-> .json) semantic equivalence checker. Output: oasdiff-style diff list + severity.",
   "type": "module",
   "engines": {
@@ -10,7 +10,7 @@
     "drift-validator": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test test/corpus.test.js test/baseline.test.js",
+    "test": "node --test test/corpus.test.js test/baseline.test.js test/check-phase-skills.test.js",
     "spike": "node src/spike-mermaid-parser.js"
   },
   "dependencies": {

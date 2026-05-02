@@ -51,7 +51,8 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 핵심 디렉토리
 
-- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 1~15 + glossary-ko + finding-system + id-conventions + lifecycle-contract)
+- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 1~15 + glossary-ko + finding-system + id-conventions + lifecycle-contract + ★ skills-axis — phase ID 와 skills 디렉토리 axis 분리 정책 / v1.4.4 신설)
+- `ai-native-methodology/flows/analysis.phase-flow.json` — ★ ★ ★ phase 순서 + 의존 그래프 + skills 매핑의 단일 SSOT (★ v1.4.4 정식 승격 / drift-validator 3-way 검증 강제 / `methodology-spec/skills-axis.md` 정합)
 - `ai-native-methodology/docs/adr/` — ADR-001~010 (BE) + ADR-FE-001~007 (FE) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
 - `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태)
 - `ai-native-methodology/schemas/` — JSON Schema (13종 — BE 5 + FE 8)

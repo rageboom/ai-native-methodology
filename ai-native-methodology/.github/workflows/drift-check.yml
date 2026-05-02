@@ -1,0 +1,53 @@
+name: drift-check
+
+# ★ v1.4.4 신설 — manifest ↔ workflow ↔ skills 3-way layout 검증 + drift-validator test suite + build artifact freshness 강제.
+# plan-v144-manifest-ssot.md / methodology-spec/skills-axis.md 정합.
+
+on:
+  pull_request:
+    paths:
+      - 'flows/**'
+      - 'methodology-spec/**'
+      - 'skills/**'
+      - 'agents/**'
+      - 'tools/drift-validator/**'
+      - 'scripts/**'
+      - '.claude-plugin/**'
+      - 'CHANGELOG.md'
+      - 'package.json'
+  push:
+    branches: [main]
+
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # 1. version-check 3-way sync (★ source-of-truth = .claude-plugin/plugin.json — ADR-010)
+      - name: version-check (plugin.json ↔ CHANGELOG ↔ package.json)
+        run: npm run version:check
+
+      # 2. drift-validator deps + test suite
+      - name: drift-validator — install deps
+        working-directory: tools/drift-validator
+        run: npm install --no-audit --no-fund
+
+      - name: drift-validator — test suite
+        working-directory: tools/drift-validator
+        run: npm test
+
+      # 3. ★ v1.4.4 신설 — manifest ↔ workflow ↔ skills 3-way layout 검증
+      # (skills-axis.md 정합 / 0 orphan + 0 missing 의무)
+      - name: drift-validator — 3-way layout check
+        run: node tools/drift-validator/src/cli.js --check-layout
+
+      # 4. build:diff-check (★ dist artifact stale 차단)
+      - name: build:diff-check (dist freshness vs source)
+        run: npm run build:diff-check

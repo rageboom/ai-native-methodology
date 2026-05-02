@@ -9,7 +9,88 @@
 
 ---
 
-## [v1.4.3] — 2026-05-02 ⭐ 현재 (★ ★ ★ PATCH release — adoption 폐기 + workspace 단일 통합 + build script 1차 도입)
+## [v1.4.4] — 2026-05-02 ⭐ 현재 (★ ★ ★ PATCH — manifest SSOT 정식 승격 + skills-axis 명세 + drift-validator 3-way 검증)
+
+### ★ ★ ★ plan-v144-manifest-ssot.md 진행 결과 (a — Senior 의 NOW/v2.0 분할 권고의 NOW 부분)
+
+**배경** — 직전 conversation 에서 "Phase 4.5 → 5 정수 재매김" 사용자 제안 → 3 에이전트 병렬 토론 (Official + Industry + Senior) → 6 결단 거리 정리 → Senior 메타 권고 = "rename (b) 은 v2.0 carry / NOW (a) 는 manifest SSOT 정식 승격 + drift fix + validator 강제 만". §8.1 단일 PoC 과적합 회피 정책상 본 rename 의 PoC corroboration = 0 건 / v2.0 design/test stage PoC 진입 시 자연 충족 (★ 본 plugin 의 정책이 본 plugin 자신의 변경을 차단하는 메타 정합).
+
+**측정 가능한 finding (★ 본 PATCH 의 정당화 근거)**:
+- `flows/analysis.phase-flow.json` version `v1.2.2` (plugin 현재 v1.4.3 — stale)
+- v1.4 FE 트랙 신규 skill 4개 (`phase-5-form-validation` / `-state-map` / `-type-spec` / `-visual-manifest`) manifest 미등록
+- skills 디렉토리의 phase 번호 = ★ 산출물 번호 prefix axis (manifest phase ID 와 다른 의미체계) — 정책 명문 부재로 drift 위험 누적
+
+### ★ ★ ★ 산출물
+
+#### manifest 정식 SSOT 승격 — `flows/analysis.phase-flow.json`
+
+`v1.2.2 → v1.4.4`. 9 phase 보존 + 각 phase 에 `skills` 배열 필드 신설 (manifest ↔ skills 매핑 명시).
+
+매핑 (skill 디렉토리명 → manifest phase ID):
+| skill 디렉토리 | manifest phase ID | 비고 |
+|---|---|---|
+| `phase-0-input` | 0 | |
+| `phase-1-inventory` | 1 | |
+| `phase-5-schema-erd` | 2 (db) | ★ skills 의 phase-5 prefix = 산출물 #5-b (DB schema) axis |
+| `phase-2-architecture` | 3 (arch) | ★ skills phase-2 = 산출물 #2 |
+| `phase-3-domain`, `phase-4-rules`, `phase-5-form-validation` | 4 (business-logic) | 4 sub-area |
+| `phase-4-5-cross-validation` | 4.5 (formal-spec) | |
+| `phase-5-openapi`, `phase-5-rules` | 5-1 (api) | |
+| `phase-5-state-map`, `phase-5-visual-manifest`, `phase-5-type-spec` | 5-2 (ui) | |
+| `phase-6-quality` | 6 | |
+| `aspect-a11y`, `aspect-i18n`, `aspect-static-security`, `aspect-legacy` | cross_cutting | ★ `cross_cutting.aspects.skills` 신설 |
+
+#### `methodology-spec/skills-axis.md` 신설 (★ D-D=D1)
+
+phase ID 와 skills 디렉토리 axis 분리 정책 명문. 향후 신규 skill 추가 절차 / 신규 phase ID 추가 절차 (★ MAJOR change — v2.0 carry) 정책화.
+
+#### drift-validator 0.2.0 → 0.3.0 — 3-way layout 검증 추가
+
+- `tools/drift-validator/src/check-phase-skills.js` 신규 module
+- `tools/drift-validator/src/cli.js` `--check-layout` flag 추가
+- `tools/drift-validator/test/check-phase-skills.test.js` 신규 test (3 case)
+- 검증 항목 4종:
+  1. manifest.phases[].spec_file → workflow/ 안에 존재
+  2. manifest.phases[].skills[] → skills/analysis/ 안에 SKILL.md 보유
+  3. cross_cutting.aspects.skills[] → skills/analysis/ 안에 SKILL.md 보유
+  4. 역방향 — disk skill 모두 manifest 등록 (★ orphan 0 의무)
+- 본 워크스페이스 검증: `✅ 9 phases / 18 skills declared / 0 orphans / 0 missing`
+- 36 test pass (★ 신규 3 + 기존 33)
+
+#### CI ratchet — `.github/workflows/drift-check.yml` 신설
+
+PR + main push 시 자동 실행 4 step:
+1. version-check 3-way sync (plugin.json ↔ CHANGELOG ↔ package.json)
+2. drift-validator deps + test suite
+3. drift-validator `--check-layout` (3-way 정합 / 0 orphan + 0 missing 의무)
+4. `npm run build:diff-check` (dist artifact freshness)
+
+### ★ ★ ★ b (rename) carry — v2.0 진입 시점
+
+본 PATCH 의 ★ 비포함 ★:
+- file/디렉토리 rename — 0건
+- phase 번호 체계 변경 — 0건
+- workflow / skills / deliverables 의 phase 인용 변경 — 0건
+- PoC 산출물 안 "Phase 4.5" 인용 — 보존 (★ §8.1 corroboration evidence)
+
+b 의 plan.md 는 v2.0 design/test stage PoC 진입 시 작성 — Senior 권고 ("v2.0 schema 변경 window 에 묶이므로 migration tax 0").
+
+### ★ ★ ★ Lessons Learned (★ a 의 사전 가정 검증)
+
+- ★ plan.md F-1 "manifest = workflow 정합" → ✅ 입증 (`flows/analysis.phase-flow.json` 의 phase id 배열 ↔ `methodology-spec/workflow/phase-*.md` 파일명 1:1)
+- ★ plan.md F-2 "manifest stale (v1.2.2)" → ✅ 입증 + 본 PATCH 에서 v1.4.4 갱신
+- ★ plan.md F-3 "drift-validator 절반 깔려 있음" → ✅ 입증 (`normalize-phase-flow.js:15-16, 117-129`) + 신규 layout 검증은 별도 module 로 분리 (책임 분리)
+- ★ plan.md F-4 "skills 가 다른 axis" → ✅ 정확 — skills 의 phase 번호 = 산출물 번호 prefix (★ 의도된 axis / 일부는 진짜 drift)
+- ★ "drift-check.yml 강화" 가 plan 본문에 적혔으나 실제는 ★ 신설 (CHANGELOG v1.2.1 entry 의 "drift-check.yml CI" 는 plan 단계 정의만 / 실 구현 부재) — Senior 가 짚은 "측정 가능한 drift" 의 또 한 갈래
+
+### Carry-over (변경 없음)
+
+- v1.4.2 §6 신규 carry (JWT secret weak / RSA private key Semgrep custom rule) → ✅ 종결 유지 (a144b5a)
+- adoption 폐기 + workspace 단일 통합 + dist build script (v1.4.3) → ✅ 유지
+
+---
+
+## [v1.4.3] — 2026-05-02 (★ ★ ★ PATCH release — adoption 폐기 + workspace 단일 통합 + build script 1차 도입)
 
 ### ★ ★ 14차 결단 (DEC-2026-05-02-plugin-first) 1일 retract
 
