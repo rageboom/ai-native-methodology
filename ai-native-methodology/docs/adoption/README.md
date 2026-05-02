@@ -39,28 +39,27 @@ Rename-Item -Path "C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodo
 
 ★ 30일 cooldown 후 사용자 수동 검토 + 삭제 결정.
 
-## ★ 사용자 결단 carry (★ v1.4.3 follow-up 검증 결과)
+## ★ ★ 사용자 결단 carry — OFF 결단 (2026-05-02 / DEC-2026-05-02-adoption-carry-OFF)
 
-다음 2 자산은 ★ 사용자 결단 영역 (★ silent loss 가능성 / 보존 vs 폐기 결단):
+★ ★ ★ 사용자 명시 결단 (2026-05-02): "이제 adoption 은 신경 안써도 됨 이 프로젝트만 신경 쓸거야"
 
-### F4 — `adoption/CLAUDE.md` (root / 73 line)
+→ ★ adoption 영역 carry 전체 OFF / workspace 본체 (`ai-native-methodology/`) 단일 focus.
 
-- **내용**: adoption 폴더 자체의 작업 컨텍스트 진입점 (휘발성 진행 상태 참조 + 절대 우선순위 + no-simulation 정책 인라인)
-- **현재 처리**: ★ 폐기 분류 (Plan §D2 / "stale")
-- **재검증 결과** (★ v1.4.3 follow-up Agent 1): ★ "미묘한 가치" — 사내 적용 초기 작업 가이드 + workspace 외부 컨테이너 CLAUDE.md 와 ★ 다른 layer (작업 메타 vs 본체 진화 컨텍스트)
-- **결단 옵션**:
-  - (a) 폐기 — 현 plan 유지 / 가치 미미 가정
-  - (b) `docs/adoption/ADOPTION-ROOT-CONTEXT.md` 흡수 — 사내 적용 시 작업 진입점 가이드 가치 보존
+### 처리 요약
 
-### F5 — `adoption/legacy-analyzer/.claude/` (4 metadata)
+| 항목 | 이전 (v1.4.3 follow-up) | 본 결단 후 |
+|---|---|---|
+| F4 — `adoption/CLAUDE.md` 폐기 vs 흡수 | carry / 강제 결단 의무 | ★ **OFF** (본 프로젝트 backlog 제거) |
+| F5 — `adoption/legacy-analyzer/.claude/` 외부 이관 vs 흡수 | carry / 강제 결단 의무 | ★ **OFF** (본 프로젝트 backlog 제거) |
+| `ai-native-methodology-adoption/` rename | carry / 사용자 lock 해제 후 직접 | ★ **사용자 자체 영역** (본 프로젝트 작업 ❌) |
+| `harness-engineering-study/` 외부 레포 init | F5 (a) 결단 시 trigger | ★ **OFF** (외부 작업 / 본 프로젝트 무관) |
 
-- **내용**: 사용자 (FE Lead) 의 별도 도구 진입점 계획서 — "AI-Native Legacy Analyzer" / harness-engineering-study 의 입구 / 100K+ LOC legacy → 명세·계약·ADR 초안 자동 생성 / 3계층 구조 (skills / commands / agents / output) / Tree-sitter 어댑터 + 점진 실행
-- **현재 처리**: ★ 외부 이관 carry / `harness-engineering-study/` 별도 레포 권고 (★ Plan §D2)
-- **재검증 결과** (★ v1.4.3 follow-up Agent 1): ★ 별도 도구 계획서 / workspace 와 무관 / 단 ★ 사용자 자체 자산 손실 risk 명시 의무
-- **결단 옵션**:
-  - (a) 외부 이관 (Plan §D2 유지) — `C:\...\AI\harness-engineering-study\` 별도 레포 init / 사용자 별도 트리거
-  - (b) workspace `archive/legacy-analyzer-plans/` 흡수 — 진화 trace 보존 + 외부 이관 trigger 까지 보관소
+### 유지되는 것 (★ 폐기 ❌)
 
-### 결단 trigger
+- `templates/adoption/{CLAUDE,README}.md` — ★ build script 가 dist root 의 `CLAUDE.md` + `ADOPTION-README.md` 로 별칭 복사 / 폐기 시 plugin install 회귀
+- `archive/methodology-v1.1/` — v1.0~v1.1.2 진화 metadata
+- `docs/adoption/{v1.3-plan,v1.3-status,v1.3-decisions-index,lessons-learned-2026-05-02,README}.md` — frozen archive
 
-★ 사용자가 다음 세션 시작 시 (b) 결단 시 워크스페이스 흡수 / (a) 결단 시 외부 이관 + adoption/CLAUDE.md (F4) 폐기 진행. ★ 결단 부재 시 ★ Phase B 진입 자격 평가 시점에 강제 결단 의무.
+### 재진입 조건
+
+★ 사용자 명시 retract 결단 시에만 재진입. 본 결단 = ★ ★ 24h cooling-off 면제 (자산 변경 0 / 방향 선언 / plan.md 비용 작음). 상세: [`../../decisions/DEC-2026-05-02-adoption-carry-OFF.md`](../../decisions/DEC-2026-05-02-adoption-carry-OFF.md).
