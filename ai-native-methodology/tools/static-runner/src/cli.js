@@ -16,13 +16,14 @@ function detectGitSha(targetDir) {
 }
 
 function parseArgs(argv) {
-  const opts = { plugins: [], target: null, output: null, ruleset: null, extra: [], baseline: null, ratchet: false, writeBaseline: null };
+  const opts = { plugins: [], target: null, output: null, ruleset: null, extraRules: [], extra: [], baseline: null, ratchet: false, writeBaseline: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--plugin') opts.plugins.push(argv[++i]);
     else if (a === '--target') opts.target = argv[++i];
     else if (a === '--output') opts.output = argv[++i];
     else if (a === '--ruleset') opts.ruleset = argv[++i];
+    else if (a === '--extra-rules') opts.extraRules.push(argv[++i]);
     else if (a === '--baseline') opts.baseline = argv[++i];
     else if (a === '--ratchet') opts.ratchet = true;
     else if (a === '--write-baseline') opts.writeBaseline = argv[++i];
@@ -34,7 +35,7 @@ function parseArgs(argv) {
 function main() {
   const opts = parseArgs(process.argv.slice(2));
   if (!opts.target || !opts.output || opts.plugins.length === 0) {
-    console.error('usage: static-runner --plugin <semgrep|pmd> --target <dir> --output <dir> [--ruleset <id>] [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]');
+    console.error('usage: static-runner --plugin <semgrep|pmd> --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]');
     process.exit(2);
   }
 
@@ -63,6 +64,7 @@ function main() {
       targetDir: opts.target,
       outputDir: opts.output,
       ruleset: opts.ruleset,
+      extraRules: opts.extraRules,
       extraArgs: opts.extra,
     });
     summary.runs.push(run);

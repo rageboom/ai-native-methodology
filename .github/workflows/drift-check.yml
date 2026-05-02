@@ -91,7 +91,7 @@ jobs:
         working-directory: ai-native-methodology/tools/static-runner
         run: npm install --no-audit --no-fund
 
-      - name: run Semgrep (diff-aware on PR / full on schedule)
+      - name: run Semgrep on body (diff-aware on PR / full on schedule)
         working-directory: ai-native-methodology
         run: |
           mkdir -p tools/static-runner/out
@@ -100,6 +100,21 @@ jobs:
             --target . \
             --output tools/static-runner/out \
             --ruleset p/owasp-top-ten
+
+      # ★ v1.4.2 PATCH — PoC #04 full FE 트랙 (★ custom rule + ratchet 모드 default).
+      # 의의: ADR-010 §2.3 정합 — critical/high severity 신규 결함 = CI fail (production blocker).
+      # baseline (semgrep-baseline.json) = v1.4.1 시점 0 findings 첫 작성. novel 1+ = blocked.
+      - name: run Semgrep on PoC #04 full (★ FE 트랙 / custom rule + ratchet)
+        working-directory: ai-native-methodology
+        run: |
+          node tools/static-runner/src/cli.js \
+            --plugin semgrep \
+            --target examples/poc-04-full-realworld-react/INPUT/src \
+            --output examples/poc-04-full-realworld-react/analysis/6-quality/semgrep-output \
+            --ruleset p/owasp-top-ten \
+            --extra-rules tools/static-runner/rules/jwt-localstorage.yml \
+            --baseline examples/poc-04-full-realworld-react/analysis/6-quality/semgrep-baseline.json \
+            --ratchet
 
       - name: run PMD on Java targets (PoC examples)
         working-directory: ai-native-methodology

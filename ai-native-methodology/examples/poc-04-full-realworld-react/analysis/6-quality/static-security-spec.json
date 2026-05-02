@@ -3,42 +3,68 @@
   "meta": {
     "poc_id": "poc-04-full",
     "stage": "5+",
-    "sprint": "v1.4-carry-1-Semgrep-종결",
+    "sprint": "v1.4-carry-2-3-종결 (★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm 도달)",
     "phase": "6-quality",
     "captured_at": "2026-05-02",
-    "captured_by": "real (★ Semgrep pip 채널 진짜 실행 ✅ / Docker 가정 깨짐)",
+    "captured_by": "real (★ Semgrep pip 채널 + ★ ★ custom rule + ratchet 모드 default)",
     "tool_primary": "Semgrep CLI 1.161.0 (★ pip 채널 / Python 3.14 공식 지원)",
-    "tool_primary_status": "done (★ ★ carry 1 종결 / ADR-009 단계 5+ 도달)",
-    "tool_fallback": "grep -E (Stage 4 패턴 — 본 carry 종결로 fallback 불필요)"
+    "tool_primary_status": "done (★ ★ carry 1+2+3 모두 종결 / ADR-009 단계 5+ 강화)",
+    "tool_fallback": "grep -E (Stage 4 패턴 — 본 carry 종결로 fallback 불필요)",
+    "version_chain": [
+      "v1.4.0 (Stage 5 본격 / Semgrep grep fallback / -5%p 패널티)",
+      "v1.4.1 (★ Semgrep pip 채널 진짜 실행 / 0 findings / -5%p 패널티 제거)",
+      "v1.4.2 (★ ★ ★ custom rule 1건 신설 / AP-FE-SECURITY-001 직접 confirm / drift-check.yml CI ratchet)"
+    ]
   },
   "real_run": {
-    "command": "semgrep scan --config p/owasp-top-ten --sarif --sarif-output <path> <target>",
+    "command": "semgrep scan --config p/owasp-top-ten --config <custom-rule.yml> --sarif --sarif-output <path> <target>",
     "tool_version": "1.161.0",
     "ruleset": "p/owasp-top-ten",
-    "rules_loaded": 544,
-    "rules_run": 76,
+    "custom_rules": ["ai-native-methodology/tools/static-runner/rules/jwt-localstorage.yml"],
+    "rules_loaded": 545,
+    "rules_run": 77,
     "files_scanned": 66,
     "files_ignored": 2,
-    "duration_ms": 6293,
-    "findings_count": 0,
-    "result_hash": "90c17f648d1fbca638c6f711e0efb022a29e82a344be8adb2c5a745ef987f5b8",
+    "duration_ms": 6191,
+    "findings_count": 1,
+    "blocking_findings_count": 1,
     "evidence_path": "semgrep-output/static-runner.evidence.json",
     "sarif_path": "semgrep-output/semgrep.sarif",
     "stdout_path": "semgrep-output/semgrep.stdout.log",
     "stderr_path": "semgrep-output/semgrep.stderr.log",
-    "invocation_timestamp": "2026-05-02T06:35:23.113Z",
-    "source_commit_sha": "963b30358f70753765c872b6dac3045e963aa15d"
+    "★_v1.4.1_baseline_run": {
+      "rules_run": 76,
+      "findings_count": 0,
+      "result_hash": "90c17f648d1fbca638c6f711e0efb022a29e82a344be8adb2c5a745ef987f5b8",
+      "invocation_timestamp": "2026-05-02T06:35:23.113Z",
+      "보존": "★ baseline 첫 작성 시점 (v1.4.1) / 차후 재실행 시 v1.4.2 갱신본 사용"
+    }
   },
   "baseline": {
     "path": "semgrep-baseline.json",
     "generated_at": "2026-05-02",
     "findings_count": 0,
-    "ratchet_dry_trial": {
+    "★_v1.4.2_ratchet_trial_with_custom_rule": {
+      "grandfathered": 0,
+      "novel": 1,
+      "blocked": 1,
+      "exit_code": 1,
+      "blocked_finding": {
+        "rule_id": "ai-native-methodology.tools.static-runner.rules.internal.fe.security.jwt-localstorage",
+        "file": "src/shared/api/auth-storage.ts",
+        "line": 20,
+        "severity_in_sarif_adapter": "medium",
+        "rule_yaml_severity": "HIGH",
+        "★_severity_변환_검토_carry": "★ 본 plan 의 sarif-to-finding 어댑터가 HIGH → medium 변환 / ADR-010 §2.3 정합 검토 별도 carry"
+      },
+      "★_의의": "★ ★ ★ ADR-010 §2.3 의 'novel critical/high = production blocker' 정책 ★ 첫 입증 — CI fail trigger 정상 작동 / drift-check.yml 통합 자격"
+    },
+    "★_v1.4.1_initial_dry_trial": {
       "grandfathered": 0,
       "novel": 0,
       "blocked": 0,
       "exit_code": 0,
-      "result": "✅ pass — ADR-010 외부 적용 첫 입증 (PoC #04 full)"
+      "보존": "★ baseline 첫 작성 시점 (v1.4.1) / custom rule 없는 상태 / ADR-010 외부 적용 첫 입증"
     }
   },
   "rules_applied_via_grep": [
@@ -66,13 +92,26 @@
     }
   ],
   "★_semgrep_real_run_분석": {
-    "★_implicit_목표_미달": "★ ★ Semgrep p/owasp-top-ten (76 rules) 으로 AP-FE-SECURITY-JWT-LOCALSTORAGE 직접 매칭 ★ 0건 — 룰 매칭 실패 입증",
-    "★_실패_근거": "Semgrep `react-jwt-in-localstorage` 룰 pattern = (a) jwt_decode 임포트 + (b) localStorage.setItem(jwt_decode(...))의 2단계 매칭. yurisldk/realworld-react-fsd 의 src/shared/api/auth-storage.ts:20 = window.localStorage.setItem(TOKEN_STORAGE_KEY, token) (raw token 저장 / jwt_decode 임포트 0건) → 룰 trigger 조건 불충족.",
-    "★_grep_fallback_정합": "Stage 5 1차 grep 패턴 `localStorage.setItem.*token` 은 raw 매칭 가능 → 1건 발견 / Semgrep 정밀 매칭 (jwt_decode + setItem) 보다 광범위 패턴이 본 AP detection 에 정합. 즉 Semgrep p/owasp-top-ten 이 본 AP 에 대한 silver bullet 아님.",
-    "★_carry_분리": {
-      "carry_1_명목_종결": "✅ Semgrep 진짜 실행 + SARIF + 5종 물증 + baseline 첫 작성 + ratchet dry trial 모두 통과",
-      "carry_2_implicit_미달_별도_carry": "AP-FE-SECURITY-JWT-LOCALSTORAGE custom Semgrep rule 작성 — `localStorage.setItem($KEY, $VAL)` where $KEY ~= /token|jwt|auth/i / 일정 v1.4.2 PATCH 또는 v1.5",
-      "carry_3_baseline_운영_별도_carry": "drift-check.yml CI 통합 (★ ratchet 모드 default / novel finding 차단) / 일정 v1.4.2 또는 adoption 트랙"
+    "★_v1.4.2_implicit_목표_종결": "★ ★ ★ ★ ★ AP-FE-SECURITY-001 (FE applies_to localStorage 저장) 진짜 도구 직접 confirm 도달 (★ 1건 / auth-storage.ts:20)",
+    "★_custom_rule_pattern": {
+      "id": "internal.fe.security.jwt-localstorage",
+      "pattern_branches": [
+        "localStorage.setItem(\"$KEY\", $VAL) + metavariable-regex $KEY ~= (?i)(token|jwt|auth|access|bearer|session)",
+        "localStorage.setItem($KEY, $VAL) + 동일 regex (★ identifier branch)",
+        "window.localStorage.setItem(\"$KEY\", $VAL) + 동일 regex (★ window. prefix branch)",
+        "window.localStorage.setItem($KEY, $VAL) + 동일 regex (★ identifier + window. branch)"
+      ],
+      "★_4_pattern_branches_근거": "★ 실 코드 (yurisldk fork auth-storage.ts:20) = window.localStorage.setItem(TOKEN_STORAGE_KEY, token) — string literal vs identifier × bare vs window. prefix 4 분기 의무 (★ Phase A → B → C 점진 발견)"
+    },
+    "★_v1.4.1_시점_분석_보존": {
+      "implicit_목표_미달": "★ ★ Semgrep p/owasp-top-ten 단독 (76 rules) 으로 AP-FE-SECURITY-001 직접 매칭 ★ 0건",
+      "근거": "Semgrep `react-jwt-in-localstorage` 룰 pattern = jwt_decode 임포트 + localStorage.setItem(jwt_decode(...))의 2단계. yurisldk fork = jwt_decode 임포트 0건 → trigger 조건 불충족",
+      "★_silver_bullet_부재_입증": "★ p/owasp-top-ten 단독으로 4 PoC isomorphic AP 매칭 불가 → custom rule 작성 의무 (★ v1.4.2 종결)"
+    },
+    "★_carry_종결_상태": {
+      "carry_1": "✅ resolved (v1.4.1 — Semgrep pip 채널 진짜 실행)",
+      "carry_2": "✅ resolved (v1.4.2 — custom rule 작성 + AP-FE-SECURITY-001 직접 confirm)",
+      "carry_3": "✅ resolved (v1.4.2 — drift-check.yml CI ratchet 모드 default 통합)"
     }
   },
   "summary": {
@@ -81,27 +120,36 @@
     "warnings": 1,
     "high_violations": 1,
     "★_4_poc_isomorphic_violations": 1,
-    "★_semgrep_real_run_findings": 0,
+    "★_semgrep_real_run_findings": 1,
     "★_baseline_first_write": true,
-    "★_ratchet_dry_trial_pass": true
+    "★_ratchet_dry_trial_pass": true,
+    "★_ratchet_with_custom_rule_blocked_count": 1,
+    "★_ap_fe_security_001_direct_confirm": true
   },
   "deliverable_12_compliance": {
     "semgrep_real_run": true,
     "semgrep_carry_reason": null,
     "grep_fallback_real_run": true,
     "simulation_used": false,
-    "★_4_poc_isomorphic_본체_격상_후보": "AP-FE-SECURITY-JWT-LOCALSTORAGE (★ ADR-FE-007 신설 → ★ 본체 격상 종결)",
+    "★_4_poc_isomorphic_본체_격상_후보": "AP-FE-SECURITY-001 (★ ADR-FE-007 / ★ v1.4.2 진짜 도구 직접 confirm 도달)",
     "no_simulation_penalty": null,
     "★_carry_1_종결_상태": "✅ done (2026-05-02 / v1.4.1 PATCH)",
+    "★_carry_2_종결_상태": "✅ done (2026-05-02 / v1.4.2 PATCH / custom rule jwt-localstorage.yml)",
+    "★_carry_3_종결_상태": "✅ done (2026-05-02 / v1.4.2 PATCH / drift-check.yml CI ratchet 모드)",
     "★_본체_도구_격상_부수_산출": [
-      "static-runner/runner.js:71 result_hash 정상화 (require → readFileSync) — ★★★ no-simulation 정책 핵심 필드 위조 차단 효과 복구",
-      "static-runner/cli.js detectGitSha 함수 신설 + writeBaseline 호출 시 source_commit_sha 정확 전달 — ratchet reproducibility 강화"
+      "v1.4.1 — static-runner/runner.js:71 result_hash 정상화 (require → readFileSync) — ★★★ no-simulation 정책 핵심 필드 위조 차단 효과 복구",
+      "v1.4.1 — static-runner/cli.js detectGitSha 함수 신설 + writeBaseline 호출 시 source_commit_sha 정확 전달 — ratchet reproducibility 강화",
+      "v1.4.2 — static-runner/cli.js + runner.js --extra-rules 옵션 신규 (★ multi-config 지원 / Semgrep --config 멀티 정합 / Sprint 4 README 의 사내 custom rule 첫 실현 자격)"
     ]
   },
   "★_lessons_learned": [
-    "★ release note 의 carry 환경 가정 (Docker only) 이 채널 다양성 (pip/pipx/uv) 검증 누락 — carry 명시 시 환경 옵션 전수 조사 의무 (★ 신규 패턴)",
-    "★ Senior 추정 finding 20~75 / FP 40~60% 가 over-estimate — RealWorld FSD 코드 품질 우수 (★ FSD 학습 효과)",
-    "★ Semgrep p/owasp-top-ten 단독으로는 4 PoC isomorphic JWT XSS 매칭 불가 — custom rule 별도 필요 (★ silver bullet 부재 입증)",
-    "★ 진짜 도구 첫 실행 = 본체 도구 bug 2건 발견 (★ 본체 격상 1건 부수 산출) — ★ no-simulation 정책 첫 적용 = 본체 도구 가치 입증 패턴 정합"
+    "★ v1.4.1 — release note carry 환경 가정 (Docker only) 채널 다양성 검증 누락 패턴 (memory feedback_carry_environment_assumption.md 신규)",
+    "★ v1.4.1 — Senior 추정 over-estimate (RealWorld FSD 0 findings)",
+    "★ v1.4.1 — Semgrep p/owasp-top-ten 단독 silver bullet 부재 입증 → custom rule 별도 필요",
+    "★ v1.4.1 — 진짜 도구 첫 실행 = 본체 도구 bug 2건 발견 (★★★ no-simulation 정책 = 도구 가치 검증 효과 동반)",
+    "★ ★ v1.4.2 — custom rule pattern 점진 발견 패턴 (★ Phase A → B → C 4 분기 점진 보강): string literal vs identifier × bare vs window. prefix → ★ 실 코드 = 4 분기 의무 입증",
+    "★ ★ v1.4.2 — Semgrep 자동 --rewrite-rule-ids default ON 실측 (★ Official research Q4 carry 해소): SARIF ruleId = `<cwd-relative-path>.<rule-id>` (예: `ai-native-methodology.tools.static-runner.rules.internal.fe.security.jwt-localstorage`)",
+    "★ ★ v1.4.2 — sarif-to-finding 어댑터의 severity 변환 (HIGH → medium) 검토 필요 carry (★ 본 carry 의 결단 외부 / ADR-010 §2.3 정합 검토 별도)",
+    "★ ★ v1.4.2 — Sprint 4 README 의 '사내 custom rule (별도)' carry 첫 실현 — 1년 가까이 carry-over 된 long-tail 작업 같은 날 종결 패턴"
   ]
 }

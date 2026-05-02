@@ -9,7 +9,107 @@
 
 ---
 
-## [v1.4.1] — 2026-05-02 ⭐ 현재 (★ PATCH release — release 같은 날 carry 1 즉시 종결 + 본체 도구 bug fix 1건)
+## [v1.4.2] — 2026-05-02 ⭐ 현재 (★ ★ PATCH release — AP-FE-SECURITY-001 진짜 도구 직접 confirm + custom rule 첫 실현 + drift-check.yml CI ratchet)
+
+### ★ ★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm (★ implicit 목표 종결)
+
+★ ★ ★ v1.4.0 carry 1 의 implicit 목표 (★ 4 PoC isomorphic AP-FE-SECURITY-001 진짜 도구 직접 confirm) ★ 완전 종결.
+
+흐름:
+- v1.4.0: Semgrep grep fallback 1건 매칭 (-5%p 패널티)
+- v1.4.1: Semgrep p/owasp-top-ten 진짜 실행 / 0 findings (★ implicit 미달 / `react-jwt-in-localstorage` = jwt_decode 임포트 부재)
+- ★ ★ v1.4.2: ★ custom rule 작성 → 직접 매칭 1건 (★ implicit 종결)
+
+매칭 결과:
+- ruleId: `ai-native-methodology.tools.static-runner.rules.internal.fe.security.jwt-localstorage`
+- file: `INPUT/src/shared/api/auth-storage.ts:20`
+- 코드: `window.localStorage.setItem(TOKEN_STORAGE_KEY, token)` (raw JWT 저장)
+
+### ★ ★ ★ Custom Semgrep rule 첫 실현 (★ Sprint 4 long-tail carry 종결)
+
+`tools/static-runner/rules/jwt-localstorage.yml` (★ 신규):
+- id: `internal.fe.security.jwt-localstorage` (★ fully qualified slug / `--rewrite-rule-ids` default ON 실측 정합)
+- severity: `HIGH` (★ canonical / Official research Q1 갱신 정합)
+- languages: `[js, ts]`
+- pattern-either 4 분기 (★ Phase A → B → C 점진 발견):
+  1. `localStorage.setItem("$KEY", $VAL)` + metavariable-regex
+  2. `localStorage.setItem($KEY, $VAL)` + metavariable-regex (identifier branch)
+  3. `window.localStorage.setItem("$KEY", $VAL)` + metavariable-regex (★ window. prefix)
+  4. `window.localStorage.setItem($KEY, $VAL)` + metavariable-regex (★ window. + identifier)
+- metavariable-regex: `(?i)(token|jwt|auth|access|bearer|session)`
+- metadata: cwe CWE-922 / owasp [A02:2021, A07:2021] / references / category security
+
+`tools/static-runner/rules/jwt-localstorage.ts` (★ 신규 — Semgrep convention `<rule>.<ext>` / `.test.<ext>` ❌ 실측 정정):
+- 7 positive + 3 negative cases
+- 검증: `cd rules && semgrep --test --config jwt-localstorage.yml jwt-localstorage.ts` → **1/1 pass** ✅
+- ★ Windows 한국어 환경 `PYTHONUTF8=1` 의무 (yml 한글 message cp949 decode bug 회피 / Linux CI 환경 무관)
+
+★ Sprint 4 README 의 "사내 custom rule (★ 별도)" 1년 가까이 carry-over → ★ ★ v1.4.2 첫 실현.
+
+### ★ ★ ★ 본체 도구 격상 — static-runner 0.1.1 → 0.1.2 (★ feature add patch)
+
+**Feature**: `--extra-rules <path>` 옵션 신규 (멀티 지정 가능)
+- `runner.js` `Plugin.run()` + `SemgrepPlugin.mandatoryArgs` 갱신 — `extraRules.flatMap(r => ['--config', r])`
+- `cli.js` `--extra-rules` 옵션 추가
+- Semgrep `--config` 멀티 정합 (★ Official research Q2 입증)
+- unit test 9 → 11 pass (★ +2 신규: extraRules emits multi --config / empty default)
+
+### ★ ★ ★ drift-check.yml CI ratchet 통합 (★ ADR-010 §2.3 첫 운영 입증)
+
+PoC #04 full FE 트랙 신규 step:
+```yaml
+- name: run Semgrep on PoC #04 full (★ FE 트랙 / custom rule + ratchet)
+  run: |
+    node tools/static-runner/src/cli.js \
+      --plugin semgrep \
+      --target examples/poc-04-full-realworld-react/INPUT/src \
+      --output examples/poc-04-full-realworld-react/analysis/6-quality/semgrep-output \
+      --ruleset p/owasp-top-ten \
+      --extra-rules tools/static-runner/rules/jwt-localstorage.yml \
+      --baseline examples/poc-04-full-realworld-react/analysis/6-quality/semgrep-baseline.json \
+      --ratchet
+```
+
+ratchet dry trial 검증:
+- baseline = 0 findings
+- novel = 1
+- blocked = 1
+- exit_code = **1** (★ CI fail trigger ✅)
+
+→ ★ ★ ★ ADR-010 §2.3 "novel critical/high = production blocker" 정책 ★ 첫 운영 입증.
+
+### ★ Official research Q4 carry 해소
+
+★ Semgrep `--rewrite-rule-ids` default ON 실측 — SARIF ruleId = `<cwd-relative-path>.<rule-id>` (★ default ON / 자동 prefix 부여 / fully qualified slug 권고 정합).
+
+다른 carry 3건 보존:
+- (i) metadata `cwe`/`owasp`/`references` 공식 schema (★ registry mirror 권고)
+- (ii) JS/TS `// ruleid:` prefix 공식 (★ 통용 패턴 채택)
+- (iii) SARIF `ruleId` 1:1 매핑 단언 텍스트 (★ example 입증 / 단언 부재)
+
+### release note + DEC + tag
+
+- `docs/v1.4.2-release-note.md` (★ 신규)
+- DEC-2026-05-02-v1.4.2-carry-2-3-종결
+- git tag `v1.4.2`
+
+### carry 갱신 (★ v1.4.1 5건 → v1.4.2 5건 = 3 보존 + 2 신규)
+
+- ✅ resolved (v1.4.2): carry 2 (custom rule) + carry 3 (CI ratchet)
+- ★ 신규: sarif-to-finding 어댑터 severity 변환 (HIGH → medium) 검토 / RSA git commit + JWT 길이 custom rule
+- 보존: F-FE-006 / i18n / v1.5
+
+### ★ Lessons Learned
+
+1. ★ Custom rule pattern 점진 발견 패턴 (Phase A → B → C 4 분기 보강)
+2. ★ Semgrep `--rewrite-rule-ids` default ON 실측 (research carry 해소)
+3. ★ sarif-to-finding 어댑터 severity 변환 검토 carry
+4. ★ Sprint 4 long-tail carry 같은 날 종결 패턴
+5. ★ ★ 같은 날 v1.4.0 + v1.4.1 + v1.4.2 = 빠른 carry resolve cadence 입증
+
+---
+
+## [v1.4.1] — 2026-05-02 (★ PATCH release — release 같은 날 carry 1 즉시 종결 + 본체 도구 bug fix 1건)
 
 ### ★ ★ Semgrep 진짜 실행 (★ release note carry 1 종결)
 

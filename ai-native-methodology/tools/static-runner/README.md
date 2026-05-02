@@ -53,11 +53,29 @@ bash src/lint-no-simulation.sh <dir-with-evidence-or-manifest>
 
 CI step 으로 통합 (Sprint 4 `.github/workflows/drift-check.yml` 정합).
 
-## 1차 plugin 범위 (Sprint 4)
+## 1차 plugin 범위 (Sprint 4 + ★ v1.4.2 갱신)
 
-- ✅ `semgrep` — `p/owasp-top-ten` ruleset 1차 + 사내 RSA git commit / JWT 길이 custom rule (별도)
+- ✅ `semgrep` — `p/owasp-top-ten` ruleset 1차 (★ v1.4.1 pip 채널 진짜 실행 종결) + ★ ★ ★ 사내 custom rule (★ v1.4.2 첫 실현 — `rules/jwt-localstorage.yml`)
+- ⏳ 사내 custom rule 추가 (RSA git commit / JWT secret 길이) — v1.4.3 또는 v1.5 carry
 - ✅ `pmd` — `rulesets/java/quickstart.xml` 1차
 - ⏳ `spotbugs` / `daikon` / `codeql` — v1.2.x 또는 v1.3 후속. plugin 인터페이스 (`Plugin` 클래스) 만 산출.
+
+### ★ v1.4.2 — `--extra-rules` 옵션 신규
+
+```bash
+node ai-native-methodology/tools/static-runner/src/cli.js \
+  --plugin semgrep \
+  --target <dir> \
+  --output <dir> \
+  --ruleset p/owasp-top-ten \
+  --extra-rules ai-native-methodology/tools/static-runner/rules/jwt-localstorage.yml
+```
+
+- 멀티 지정 가능 (`--extra-rules <r1> --extra-rules <r2>`)
+- Semgrep `--config` 멀티 정합 (★ Semgrep 공식 CLI reference)
+- ★ rule id `internal.fe.security.<name>` fully qualified slug 권고 (★ `--rewrite-rule-ids` default ON 실측 — SARIF ruleId 안정)
+- rule + test pair 의무: `rules/<name>.yml` + `rules/<name>.{js,ts}` (★ Semgrep convention — test fixture 명명은 `<rule>.<ext>` / `.test.<ext>` ❌ 실측 정정)
+- 검증: `cd rules && semgrep --test --config <name>.yml <name>.{js,ts}` (★ Windows 한국어 환경 `PYTHONUTF8=1` 의무 — yml 한글 message cp949 decode bug 회피)
 
 ## Noise 관리 (ADR-010 후보 — baseline + ratchet)
 

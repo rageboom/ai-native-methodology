@@ -43,13 +43,13 @@ export class Plugin {
     }
   }
 
-  run({ targetDir, outputDir, ruleset, extraArgs }) {
+  run({ targetDir, outputDir, ruleset, extraRules, extraArgs }) {
     mkdirSync(outputDir, { recursive: true });
     const stdoutPath = join(outputDir, `${this.name}.stdout.log`);
     const stderrPath = join(outputDir, `${this.name}.stderr.log`);
     const sarifPath = join(outputDir, `${this.name}.sarif`);
 
-    const args = this.mandatoryArgs({ targetDir, sarifPath, ruleset, extraArgs });
+    const args = this.mandatoryArgs({ targetDir, sarifPath, ruleset, extraRules, extraArgs });
     const reproductionCommand = `${this.executable} ${args.join(' ')}`;
     const t0 = Date.now();
     let exitCode = 0;
@@ -89,9 +89,10 @@ export const SemgrepPlugin = new Plugin({
   name: 'semgrep',
   executable: 'semgrep',
   versionArgs: ['--version'],
-  mandatoryArgs: ({ targetDir, sarifPath, ruleset, extraArgs = [] }) => [
+  mandatoryArgs: ({ targetDir, sarifPath, ruleset, extraRules = [], extraArgs = [] }) => [
     'scan',
     '--config', ruleset ?? 'p/owasp-top-ten',
+    ...extraRules.flatMap(r => ['--config', r]),
     '--sarif',
     '--sarif-output', sarifPath,
     ...extraArgs,

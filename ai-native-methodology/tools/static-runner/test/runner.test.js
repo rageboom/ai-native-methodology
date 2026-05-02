@@ -35,3 +35,23 @@ test('SemgrepPlugin args include --sarif and ruleset', () => {
   assert.ok(args.includes('--sarif'));
   assert.ok(args.includes('p/owasp-top-ten'));
 });
+
+test('SemgrepPlugin extraRules emits --config per rule (★ v1.4.2 / multi-config)', () => {
+  const args = SemgrepPlugin.mandatoryArgs({
+    targetDir: '/x',
+    sarifPath: '/y/out.sarif',
+    ruleset: 'p/owasp-top-ten',
+    extraRules: ['rules/jwt-localstorage.yml', 'rules/foo.yml'],
+  });
+  // ruleset + 2 extraRules = 3 --config flags
+  const configCount = args.filter(a => a === '--config').length;
+  assert.equal(configCount, 3);
+  assert.ok(args.includes('rules/jwt-localstorage.yml'));
+  assert.ok(args.includes('rules/foo.yml'));
+});
+
+test('SemgrepPlugin extraRules empty default — no extra --config', () => {
+  const args = SemgrepPlugin.mandatoryArgs({ targetDir: '/x', sarifPath: '/y/out.sarif', ruleset: 'p/x' });
+  const configCount = args.filter(a => a === '--config').length;
+  assert.equal(configCount, 1);
+});

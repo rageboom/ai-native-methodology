@@ -11,15 +11,34 @@
           "tool_stdout_path": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.stdout.log",
           "tool_stderr_path": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.stderr.log",
           "tool_version": "1.161.0",
-          "invocation_timestamp": "2026-05-02T06:35:23.113Z",
-          "duration_ms": 6293,
-          "result_hash": "90c17f648d1fbca638c6f711e0efb022a29e82a344be8adb2c5a745ef987f5b8",
-          "reproduction_command": "semgrep scan --config p/owasp-top-ten --sarif --sarif-output ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.sarif ai-native-methodology\\examples\\poc-04-full-realworld-react\\INPUT\\src"
+          "invocation_timestamp": "2026-05-02T07:27:46.271Z",
+          "duration_ms": 6194,
+          "result_hash": "c4553327bbaa0e7d2c945b680a8f68d80d2af0409a02f7a77d881bf5770b0b1a",
+          "reproduction_command": "semgrep scan --config p/owasp-top-ten --config ai-native-methodology/tools/static-runner/rules/jwt-localstorage.yml --sarif --sarif-output ai-native-methodology\\examples\\poc-04-full-realworld-react\\analysis\\6-quality\\semgrep-output\\semgrep.sarif ai-native-methodology/examples/poc-04-full-realworld-react/INPUT/src"
         }
       }
     ],
     "environment_missing": [],
-    "findings_count": 0,
-    "baseline_report": null
+    "findings_count": 1,
+    "baseline_report": {
+      "mode": "ratchet",
+      "baseline_path": "ai-native-methodology/examples/poc-04-full-realworld-react/analysis/6-quality/semgrep-baseline.json",
+      "grandfathered_count": 0,
+      "novel_count": 1,
+      "blocked_count": 1,
+      "pass": false,
+      "blocked": [
+        {
+          "kind": "ai-native-methodology.tools.static-runner.rules.internal.fe.security.jwt-localstorage",
+          "severity": "medium",
+          "file": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\INPUT\\src\\shared\\api\\auth-storage.ts",
+          "line": 20,
+          "message": "JWT/auth token 을 localStorage 에 저장 — XSS 공격 표면.\n★ ADR-FE-007 / AP-FE-SECURITY-001 / OWASP A02 + A07.\n권고: httpOnly + Secure + SameSite=Lax cookie + CSP 강화.\n",
+          "plugin": "semgrep oss",
+          "sarif_run_index": 0,
+          "fingerprint": "4144d56a6f9f53dd"
+        }
+      ]
+    }
   }
 }
