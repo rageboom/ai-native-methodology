@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-02 (★ ★ ★ ★ **v1.4.3 PATCH release** / ★ ★ ★ 14차 결단 (DEC-2026-05-02-plugin-first) 1일 retract + adoption 분리 워크스페이스 폐기 + workspace 단일 통합 + build script 1차 도입 (★ Phase A) / git tag v1.4.3 / ★ 같은 날 v1.4.0 + v1.4.1 + v1.4.2 + v1.4.3 = 4 release / 직전 보존 / ★ ★ 본 세션 후속 결단 — DEC-2026-05-02-adoption-carry-OFF / 사용자 명시 "adoption 신경 안 씀 / workspace 본체 단일 focus" / F4+F5+rename carry = 본 프로젝트 backlog 제거 / no release / no tag)
+**기준일**: 2026-05-02 (★ ★ ★ ★ **v1.4.3 PATCH release** / ★ ★ ★ 14차 결단 (DEC-2026-05-02-plugin-first) 1일 retract + adoption 분리 워크스페이스 폐기 + workspace 단일 통합 + build script 1차 도입 (★ Phase A) / git tag v1.4.3 / ★ 같은 날 v1.4.0 + v1.4.1 + v1.4.2 + v1.4.3 = 4 release / 직전 보존 / ★ ★ 본 세션 후속 결단 — DEC-2026-05-02-adoption-carry-OFF / 사용자 명시 "adoption 신경 안 씀 / workspace 본체 단일 focus" / F4+F5+rename carry = 본 프로젝트 backlog 제거 / no release / no tag / ★ ★ 본 세션 후속 commit 2건 — be0f1b1 (4 stage 추상화 골격 / 5 영역 매트릭스 + lifecycle-contract 보강) + DEC-2026-05-02-jwt-rsa-custom-rule (v1.4.2 §6 신규 carry 2건 종결 / 2 custom rule + drift-check.yml CI 통합 / no release))
 
 ---
 
