@@ -157,7 +157,7 @@ Installed plugins:
 
 > ★ 본 섹션 = ★ iter 0 종결 후 별도 conversation 에서 lightweight research × 3 진행 중 ★ static check 추가 발견. iter 0 commit `29f040e` 의 hooks.json fix 후에도 ★ 잔존하는 마찰점.
 
-### F-PA-009 — PostToolUse hook **매 Write/Edit 마다 Node startup** (medium)
+### F-PA-009 — PostToolUse hook **매 Write/Edit 마다 Node startup** (medium / ★ ★ resolved 2026-05-02)
 
 - **Type**: performance / UX
 - **Severity**: medium (★ 매 호출 200-500ms 지연 / 사용자 작업 마찰 / 모든 plugin 사용자 영향)
@@ -167,15 +167,14 @@ Installed plugins:
 - **Expected**: drift 검증 의도가 있는 경우만 trigger (예: `.aimd/output/` 내부 Write 만)
 - **Actual**: matcher `"Write|Edit"` = tool-level 만 / path-level filter 없음 → ★ 모든 Write/Edit trigger
 - **Root cause**: Claude Code hook matcher = tool name 단위 (path 단위 ❌) — 매 호출 trigger 불가피
-- **fix 후보**:
-  - (A) ★ hook command 내부 path check — `[ -d .aimd/output ] && node ... || exit 0` (POSIX) / Windows 호환 분기 의무
-  - (B) ★ hook 제거 — drift 검증을 manual skill 호출 (`apply-baseline-ratchet` 또는 신설 `validate-drift` skill) 으로 이전 / on-demand 검증
-  - (C) hook 유지 + Node script 내부 fast-path — readdirSync 미존재 시 즉시 exit (★ 현재도 try/catch 로 처리되지만 Node startup 자체 200-500ms 비용 잔존)
-- **권장**: ★ ★ (B) — manual skill 호출로 이전. drift 검증은 사용자 의도된 시점만 / 매 Write/Edit UX 마찰 0.
-- **Phase A.1 carry 후보**: hook 재설계 결단 (B 채택 시 hooks.json PostToolUse 제거)
+- **★ ★ 결단 + fix 적용 (β / B 채택)**:
+  - hooks/hooks.json PostToolUse 섹션 ★ 제거
+  - drift 검증 책임 이전 → `phase-4-5-cross-validation` skill §1 "이중 렌더링 정합 (ADR-008) — drift-validator 자동 호출" (★ 이미 정합)
+  - flows/README.md "drift-validator 자동 호출" 섹션 갱신 — PostToolUse → on-demand 명시
+- **status**: ★ resolved
 - **Confidence**: high
 
-### F-PA-010 — PostToolUse `|| true` silent error masking (medium / no-simulation 정책 위배)
+### F-PA-010 — PostToolUse `|| true` silent error masking (medium / ★ ★ resolved 2026-05-02)
 
 - **Type**: bug (★ silent failure / no-simulation 정책 위배)
 - **Severity**: medium (★ ★ ★ no-simulation 정책 핵심 위배 — 도구 결과 위조 효과)
@@ -185,20 +184,25 @@ Installed plugins:
 - **Expected**: drift 발견 시 사용자에게 명시적 경고 표시 (statusMessage 또는 stderr)
 - **Actual**: silent fail / 사용자가 drift 발생 자체 인지 ❌
 - **★ 메타 lesson**: ★ ★ ★ v1.4.1 carry-1 의 `result_hash: null` bug 동급 패턴 — silent fail = no-simulation 정책 핵심 (★ ★ 도구 결과 위조 차단) 위배
-- **Root cause**: iter 0 commit `29f040e` 의 hook command 변경 시 `|| true` ★ 보존. 의도 = ".aimd/output 부재 시 silent fail-soft" 였으나 ★ ★ 실제 drift 발생 시도 같이 silent fail.
-- **fix**: F-PA-009 (B) 채택 시 자동 해소 (manual skill 호출 시 stderr 자연 노출). F-PA-009 (A) 채택 시 path check + drift 발견 시 stderr 조건부 노출 의무.
+- **★ ★ 결단 + fix 적용 (β / F-PA-009 (B) 동반)**: PostToolUse hook 자체 제거로 자연 해소. on-demand `phase-4-5-cross-validation` skill 호출 시 stderr 자연 노출.
+- **status**: ★ resolved
 - **Confidence**: high
 
 ---
 
-## ★ Post-flight 결과 진술
+## ★ Post-flight 결과 진술 (★ ★ 갱신 2026-05-02 / β 결단 후)
 
 - **iter 0 자체 fix** = F-PA-001 / F-PA-007 / F-PA-008 (★ 3건 / install 성공 도달)
-- **별도 conversation 즉시 fix** = F-PA-004 후보 resolved (agents 3종 name 필드)
-- **신규 마찰점 등재** = F-PA-009 (medium / Node startup 마찰) + F-PA-010 (medium / silent fail)
+- **별도 conversation 즉시 fix** = F-PA-004 후보 ★ resolved (agents 3종 name 필드)
+- **★ ★ 신규 발견 + 즉시 fix (β 결단)** = F-PA-009 ★ resolved (PostToolUse hook 제거 / drift 검증 → phase-4-5-cross-validation skill 이전) + F-PA-010 ★ resolved (silent fail / 자연 해소)
 - **사용자 self-iteration #1 검증 영역 잔존** = F-PA-002 / F-PA-003 / F-PA-005 / F-PA-006 (4건 / 사용자 검증 대기)
 
-→ ★ ★ iter 1 진입 자격 = ★ F-PA-009/010 결단 (manual skill 이전 vs path check 보강) + 사용자 self-iteration 검증 4건 진행 후 평가.
+→ ★ ★ iter 1 진입 자격 = ★ F-PA-009/010 ★ resolved (β 결단) + 사용자 self-iteration 검증 4건 진행 후 평가.
+
+**★ 본체 영향**:
+- `hooks/hooks.json` PostToolUse 섹션 제거 (SessionStart 만 유지)
+- `flows/README.md` "drift-validator 자동 호출" 섹션 갱신 (PostToolUse → on-demand phase-4-5 skill)
+- `skills/analysis/phase-4-5-cross-validation/SKILL.md` §1 ★ 변경 ❌ (이미 정합)
 
 ---
 
