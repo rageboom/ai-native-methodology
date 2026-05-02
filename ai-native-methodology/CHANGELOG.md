@@ -9,7 +9,34 @@
 
 ---
 
-## [v1.4.0-dev] — 2026-05-02 ⭐ 현재 (MINOR — FE 트랙 / Stage 5 본격 PoC #04 종결 / ★ Stage 7 진입 자격)
+## [v1.4.0] — 2026-05-02 ⭐ 현재 (★ ★ ★ ★ ★ MINOR release — FE 트랙 정식 진입 / §8.1 strict 검증대 첫 통과)
+
+### ★ ★ Stage 7 v1.4.0 MINOR release (2026-05-02 / 본 세션)
+
+★ ★ ★ ★ ★ ★ **사내 표준 v1.3.1 → v1.4.0 격상** = ★ ★ FE 트랙 정식 진입 + ★ §8.1 strict 정합 검증대 ★ 첫 통과.
+
+**release 자격 7/7 충족** (★ Senior +2):
+1. 사상 정합 ✅
+2. IR 4계층 ratchet 0.99 ✅ (target 0.95 / 4%p 초과)
+3. 진짜 도구 6종 ✅ (Semgrep carry)
+4. finding 6 ✅ (5~15 건강)
+5. 신뢰도 0.92 ✅ (target 0.90 / ADR-009 단계 5)
+6. ★ ★ ★ 본체 격상 결단 ✅ (ADR-FE-007 신설 / 2건)
+7. ADR carry 0 / 4 명시 carry-over ✅
+
+**release note**: `docs/v1.4-release-note.md`
+
+**4 명시 carry-over**:
+- Semgrep CLI Docker 진짜 실행 (사용자 위임 / Linux runner)
+- F-FE-006 산출물 schema 270+ violation (Stage 6+ resolve)
+- deliverable 11 i18n-spec (G1 D / adoption 합산)
+- v1.5 carry — drift-validator FE 본격 비교 + URL params validation schema 확장
+
+**git tag**: `v1.4.0`
+
+---
+
+## [v1.4.0-dev] — 2026-05-02 (MINOR — FE 트랙 / Stage 5 본격 PoC #04 종결 / ★ Stage 7 진입 자격)
 
 ### Stage 5 본격 PoC #04 (2026-05-02 / 본 세션) — 4 Sprint × 5 sprint 게이트
 
