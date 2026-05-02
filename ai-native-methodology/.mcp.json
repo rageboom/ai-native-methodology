@@ -1,0 +1,5 @@
+{
+  "mcpServers": {
+    "_comment": "MCP servers for AI-Native methodology tools. Stage = analysis (v1.4.x). Tools 6종: drift-validator / decision-table-validator / formal-spec-link-validator / schema-validator / spectral-runner / static-runner. cli.mjs MCP wrapper 작성은 Phase A.1 후반부 별도 task — 현재는 SKILL 안에서 Bash 로 standalone CLI (src/cli.js) 직접 호출 fallback. MCP wrapper 작성 완료 시 아래 mcpServers 채움."
+  }
+}
