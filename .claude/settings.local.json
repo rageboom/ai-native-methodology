@@ -6,7 +6,8 @@
       "WebSearch",
       "WebFetch",
       "Write(/Users/sangcl/Documents/Development/Study/ai-native-methodology/ai-native-methodology/examples/poc-01-realworld-spring/**)",
-      "Bash(mkdir -p *)"
+      "Bash(mkdir -p *)",
+      "Bash(git *)"
     ]
   }
 }
