@@ -6,7 +6,9 @@
 
 ## 미해결 결정 (open-question / 검토중 / 보류)
 
-(없음 — 본 세션 모두 결단 완료)
+| ID | 일자 | 카테고리 | 상태 | 요약 |
+|---|---|---|---|---|
+| v2.0 정체성 결단 (구현 수준) | 2026-05-05 | methodology / lifecycle-contract / 사용자 결단 carry | 보류 (★ 24h cooling-off / 다음 세션 prerequisite) | ★ `docs/v1.4-evaluation-report.md` 산출 결과. lifecycle-contract.md `§가치 경계 충돌 deferral` 의 v2.0 결단 — (i-soft) AI 가 사람 코드 작성 단계별 가이드 / (i-strict) AI 가 산출물→코드 자동 생성 / (iii) 구현 빼고 설계까지만. ★ 동반 carry: `plugin/` 디렉토리 의도 확인 + use case 4종 (legacy/신규/수정/버그) entry flow 시작 시점 (Q3 결정 ✅ 별도 entry flow 신설). ★ memory `feedback_decision_cadence_24h_cooling_off.md` + `feedback_session_handoff_drift.md` 정합. |
 
 ## 진행중 결정
 

@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-05 (★ ★ ★ ★ ★ **v1.5.0 MINOR release** / ★ ★ ★ ADR-BE-001 negative-space corroboration 정식화 = ★ §8.1 strict 정합 검증대 ★ 두 번째 통과 (★ ADR-FE-007 positive-space 와 대칭) / git tag v1.5.0 / ★ 2026-05-03 같은 날 b87cec5 (옵션 2′ no release) + v1.4.5 PATCH (옵션 2 / NestJS sub-rule + AP-API-001 cross-PoC base 정합) + v1.5.0 MINOR (★ 옵션 3 / ADR-BE-001 + schemas/error-mapping-spec + skills/phase-5-error-mapping) = ★ 3 commit cadence / ★ ★ 직전 release line v1.4.x 5건 모두 보존)
+**기준일**: 2026-05-05 (★ ★ **v1.4 프로젝트 적합성 평가 보고서 산출** / `docs/v1.4-evaluation-report.md` (713 line) — Plan mode + Explore agent 3종 병렬 + AskUserQuestion 4차 / ★ 결과: 본 레포 v1.5.0 ↔ 사용자 의도 (AI-Native SDLC plugin) **구조적 정합** 입증 / ★ v2.0 결단 carry 정식 등재 — (1) 구현 수준 (i-soft / i-strict / iii) / (2) `plugin/` 디렉토리 의도 확인 / (3) use case 4종 entry flow 시작 / 24h cooling-off 정합 / ★ 직전 v1.5.0 MINOR release (2026-05-03 / 98998d5) — ADR-BE-001 negative-space corroboration 정식화 + §8.1 strict 정합 검증대 두 번째 통과 보존)
 
 ---
 
