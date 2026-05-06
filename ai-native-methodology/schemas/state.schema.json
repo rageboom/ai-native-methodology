@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/state.schema.json",
+  "title": "Chain Harness Driver State",
+  "description": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver 의 사용자 프로젝트별 영속 state. .aimd/state.json single source of runtime truth. ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration) 정합. sdlc-4stage-flow.json 의 stages enum 과 정합 (drift-validator --check-state-flow-consistency 가 회귀).",
+  "type": "object",
+  "required": ["version", "project_id", "current_chain", "stage_progress", "blocked"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string",
+      "description": "참조 schema 상대 경로 (관행)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "★ Senior F5 — schema migration policy 의 versioning. forward-only / 직전 1버전 호환. breaking 시 사용자 명시 confirm."
+    },
+    "project_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "사용자 프로젝트 식별자 (init 시 결정 — 보통 디렉토리 basename)."
+    },
+    "current_chain": {
+      "type": "string",
+      "enum": ["analysis", "planning", "spec", "test", "implement", "revisit_pending"],
+      "description": "★ sdlc-4stage-flow.json stages 와 정합. drift-validator --check-state-flow-consistency 가 build-time 검증."
+    },
+    "current_phase": {
+      "type": "string",
+      "pattern": "^P\\d+(\\.\\d+)*$",
+      "description": "현 chain 내부의 phase ID (P*.* 형식)."
+    },
+    "stage_progress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analysis", "planning", "spec", "test", "implement"],
+      "properties": {
+        "analysis": { "$ref": "#/$defs/StageRecord" },
+        "planning": { "$ref": "#/$defs/StageRecord" },
+        "spec": { "$ref": "#/$defs/StageRecord" },
+        "test": { "$ref": "#/$defs/StageRecord" },
+        "implement": { "$ref": "#/$defs/StageRecord" }
+      }
+    },
+    "last_gate": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["id", "stage", "decision", "decision_at"],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "enum": ["#1", "#2", "#3", "#4"],
+              "description": "ADR-CHAIN-002 gate ID"
+            },
+            "stage": {
+              "type": "string",
+              "enum": ["planning", "spec", "test", "implement"]
+            },
+            "decision": {
+              "type": "string",
+              "enum": ["go", "stop", "revisit"]
+            },
+            "decision_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "validator_findings": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "critical": { "type": "integer", "minimum": 0 },
+                "high": { "type": "integer", "minimum": 0 },
+                "medium": { "type": "integer", "minimum": 0 },
+                "low": { "type": "integer", "minimum": 0 },
+                "info": { "type": "integer", "minimum": 0 }
+              }
+            },
+            "intervention_log_path": {
+              "type": "string",
+              "description": "★ ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .aimd/output/intervention-log.jsonl"
+            }
+          }
+        }
+      ]
+    },
+    "pending_revisit": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["target_stage", "detected_at", "confidence_loc"],
+          "additionalProperties": false,
+          "properties": {
+            "target_stage": {
+              "type": "string",
+              "enum": ["analysis", "planning", "spec", "test"]
+            },
+            "detected_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "confidence_loc": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "★ Senior F4 — non-comment LOC threshold (≥ 5 의무). 미만은 자동 ignore 되어 pending_revisit 에 등록 안 됨."
+            },
+            "changed_paths": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "user_decision": {
+              "type": "string",
+              "enum": ["pending", "go", "ignore"]
+            }
+          }
+        }
+      ]
+    },
+    "blocked": {
+      "type": "boolean",
+      "description": "★ ADR-CHAIN-005 §3 trio (i) — true 시 모든 후속 chain-driver 명령이 비대화형 exit 2 반환."
+    },
+    "block_reason": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "string",
+          "enum": [
+            "validator_critical",
+            "validator_high",
+            "coverage_threshold",
+            "evidence_missing",
+            "schema_migration_required",
+            "state_corrupt",
+            "user_stop"
+          ]
+        }
+      ]
+    },
+    "lock_holder_pid": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "integer", "minimum": 1 }
+      ],
+      "description": "★ Senior F3 — single-writer 가정. 5분 mtime 초과 시 자동 해제."
+    },
+    "lock_acquired_at": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "revisit_ignore_globs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "★ Senior F4 — 사용자 학습 누적 ignore globs (`**/*.md`, `**/*.test.*` only-touch 등). chain-revisit-detector confidence score 보정용.",
+      "default": []
+    },
+    "intervention_log_path": {
+      "type": "string",
+      "description": "프로젝트별 intervention log 경로. 기본 = .aimd/output/intervention-log.jsonl",
+      "default": ".aimd/output/intervention-log.jsonl"
+    }
+  },
+  "$defs": {
+    "StageRecord": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "complete", "blocked", "revisit_pending"]
+        },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "gate_decision": {
+          "type": "string",
+          "enum": ["go", "stop", "revisit"]
+        },
+        "git_baseline_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{7,40}$",
+          "description": "★ Senior F4 — chain stage 진입 시 git HEAD SHA 기록. revisit-detect 가 baseline..HEAD diff 산출 시 deterministic source."
+        }
+      }
+    }
+  }
+}

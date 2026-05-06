@@ -3,22 +3,24 @@
   "id": "sdlc-4stage-flow",
   "version": "2.0.0-dev",
   "rendered_mermaid_path": "./sdlc-4stage-flow.mermaid",
-  "harness_status": "scaffolding",
+  "harness_status": "harness-complete",
   "harness_status_meta": {
     "$comment": "DEC-2026-05-06-harness-호칭-엄밀화 정합. enum: 'scaffolding' (sub-plan-1~4 종결 / 사양 + validator + skills) | 'harness-incomplete' (sub-plan-5 진행 중) | 'harness-complete' (sub-plan-5 종결 / 5 요소 보유) | 'harness-validated' (sub-plan-6 + ≥ 2 PoC corroboration / §8.1 strict 입증).",
-    "current": "scaffolding",
+    "current": "harness-complete",
+    "transitioned_at": "2026-05-06",
+    "transitioned_by": "DEC-2026-05-06-sub-plan-5-종결 + ADR-CHAIN-005",
     "transitions": {
-      "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증)",
+      "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증) — ★ ★ ★ ACHIEVED 2026-05-06",
       "harness-complete -> harness-validated": "sub-plan-6 종결 (PoC #05 e2e cycle pass + §8.1 strict 7/7)"
     },
     "five_required_elements": [
-      { "id": 1, "name": "Driver / Orchestrator", "status": "missing", "implementation_target": "tools/chain-driver/ (sub-plan-5)" },
-      { "id": 2, "name": "State 영속", "status": "missing", "implementation_target": ".aimd/state.json (schemas/state.schema.json / sub-plan-5)" },
-      { "id": 3, "name": "Mechanical gate", "status": "missing", "implementation_target": "driver block until validator pass (sub-plan-5)" },
-      { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "missing", "implementation_target": "hooks/PostToolUse + UserPromptSubmit (sub-plan-5)" },
-      { "id": 5, "name": "Chain-revisit detector", "status": "missing", "implementation_target": "tools/chain-driver/ + git diff (sub-plan-5 / sub-plan-3 carry resolved)" }
+      { "id": 1, "name": "Driver / Orchestrator", "status": "complete", "implementation_target": "tools/chain-driver/ (workspace 12번째 / cli + 6 module / 60 unit test)" },
+      { "id": 2, "name": "State 영속", "status": "complete", "implementation_target": ".aimd/state.json + schemas/state.schema.json + atomic write CAS (state-store.js)" },
+      { "id": 3, "name": "Mechanical gate", "status": "complete", "implementation_target": "trio enforcement: state.blocked + cli exit 2 + PreToolUse permissionDecision=deny (gate-eval.js + hooks-bridge.js)" },
+      { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "complete", "implementation_target": "hooks/hooks.json UserPromptSubmit + PreToolUse (★ D21' suppressOutput=true / additionalContext 차단 문구)" },
+      { "id": 5, "name": "Chain-revisit detector", "status": "complete", "implementation_target": "tools/chain-driver/src/revisit-detect.js (git diff --numstat + LOC threshold + ignore-globs)" }
     ],
-    "simulation_risk_until_complete": "★ ★ ★ LLM 이 'gate 통과한 척' / 'RED 확인한 척' 가능 — ★★★ no-simulation 정책의 enforcement 누락. mechanical gate (요소 #3) 도달 시점에 봉쇄."
+    "simulation_risk_until_complete": "★ ★ ★ harness-complete 도달 — mechanical gate trio + D21' suppressOutput 으로 LLM 양심 의존 → 코드 enforcement 전환 완료. (sub-plan-6 의 PoC corroboration 으로 §8.1 strict 입증 잔존.)"
   },
   "stages": [
     {

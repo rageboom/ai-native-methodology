@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/intervention-log.schema.json",
+  "title": "Chain Harness Intervention Log Entry (JSONL)",
+  "description": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver 가 사용자 결단 / mechanical gate / revisit detect 를 누적 기록하는 JSONL append-only log 의 1 entry schema. ADR-CHAIN-005 §8 (observability) 정합. .aimd/output/intervention-log.jsonl. 월별 rotation → .aimd/output/archive/yyyy-mm.jsonl.",
+  "type": "object",
+  "required": ["timestamp", "event_type", "actor"],
+  "additionalProperties": false,
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "gate_decision",
+        "trio_block",
+        "revisit_detect",
+        "revisit_decision",
+        "schema_migration",
+        "state_recovery",
+        "skill_invoke",
+        "validator_run"
+      ]
+    },
+    "actor": {
+      "type": "string",
+      "enum": ["user", "driver", "llm", "validator", "hook"]
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["analysis", "planning", "spec", "test", "implement", "revisit_pending"]
+    },
+    "decision": {
+      "type": "string",
+      "description": "event_type=gate_decision 시 go|stop|revisit:<stage>; revisit_decision 시 go|ignore; trio_block 시 layer (i|ii|iii)."
+    },
+    "validator_findings_ref": {
+      "type": "string",
+      "description": "validator_run 시 finding 파일 경로 (SARIF / JSON)."
+    },
+    "skill_id": {
+      "type": "string",
+      "description": "skill_invoke 시 skill 식별자 (skills/<chain>/<name>)."
+    },
+    "exit_code": {
+      "type": "integer",
+      "description": "ADR-CHAIN-005 §7 exit code matrix. 0=ok, 1=blocked-by-gate, 2=invariant-violation, 3=usage-error, 4=state-corrupt."
+    },
+    "from_version": {
+      "type": "string",
+      "description": "schema_migration event 시 source state version."
+    },
+    "to_version": {
+      "type": "string",
+      "description": "schema_migration event 시 target state version."
+    },
+    "changed_paths_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "revisit_detect 시 git diff 변경 파일 수."
+    },
+    "confidence_loc": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "revisit_detect 시 non-comment LOC. < 5 미만은 자동 ignore + log only."
+    },
+    "message": {
+      "type": "string",
+      "description": "사용자 친화 메시지 (CLI stderr 출력과 정합)."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Claude Code session_id (hooks input 으로 부터 전달 시)."
+    }
+  }
+}

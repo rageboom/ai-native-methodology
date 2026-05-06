@@ -1,12 +1,37 @@
 {
+  "$comment": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver hooks 통합. ADR-CHAIN-005 §3 (mechanical gate trio (iii)) + §4 (D21' suppressOutput=true / stderr only) 정합. UserPromptSubmit + PreToolUse + SessionStart 3 event 활용.",
   "hooks": {
     "SessionStart": [
       {
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[ai-native-methodology] Plugin loaded. Read CLAUDE.md for the 23 policies + 4원칙 + no-simulation. Stage = analysis (v1.4.x default). See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.\"",
-            "statusMessage": "Loading AI-Native methodology context..."
+            "command": "echo \"[ai-native-methodology] Plugin loaded. v2.0 chain harness ready (sub-plan-5 ✅). Read CLAUDE.md for 23 policies + 4원칙 + no-simulation. Skill 진입 = /aimd-next or /aimd-stage <name>. See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.\"",
+            "statusMessage": "Loading AI-Native methodology context (chain harness ready)..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "(planning|기획|spec|명세|behavior|test|테스트|implement|구현)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
+            "$comment": "★ D21' 정합 — suppressOutput=true 응답 + stderr 만 사용자 콘솔 노출. additionalContext 에 'LLM SHALL NOT auto-invoke' 차단 문구 동봉. LLM 양심 의존 회피."
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
+            "$comment": "★ ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .aimd/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단."
           }
         ]
       }

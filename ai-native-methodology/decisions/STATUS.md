@@ -3,9 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness scaffolding** ¹ — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ ★ ★ ★ sub-plan-3a + 3b + 4 종결 / **next: sub-plan-5 (chain harness driver — 호칭 자격 확보)**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness** ¹ — sub-plan-5 종결 / **harness-complete 도달** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-5-종결 + ADR-CHAIN-005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ ★ ★ ★ sub-plan-3a + 3b + 4 + **5** 종결 / **next: sub-plan-6 (PoC + §8.1 strict + v2.0.0 release)**)
 
-> ¹ ★ ★ ★ **호칭 엄밀화** (DEC-2026-05-06-harness-호칭-엄밀화 / 2026-05-06): 현 단계 = **chain harness scaffolding** (사양 + validator + skills + flows + agents + schemas / harness 부품). **chain harness** 정식 호칭 = sub-plan-5 종결 후 (driver + state.json + mechanical gate + skill auto-invoke + chain-revisit-detector 5 요소 보유 시점). §8.1 strict 입증 = sub-plan-6 (PoC corroboration). 역사 기록 (DEC / ADR / commit / sub-plan 종결) 의 "chain harness" 표현은 보존 (당시 호칭).
+> ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-5-종결 / 2026-05-06): 현 단계 = **chain harness** (정식 호칭) — 5 요소 모두 코드 enforcement (driver + state.json + mechanical gate trio + D21' skill auto-invoke + chain-revisit-detector). sub-plan-5 종결로 scaffolding → harness-complete 전환. §8.1 strict 입증 = sub-plan-6 (PoC corroboration / harness-complete → harness-validated).
 
 ## ★ ★ ★ v2.0 진행 (sub-plan 6 sprint)
 
@@ -16,9 +16,71 @@
 | **M+3a** | **sub-plan-3a (chain validator + workspace)** | 4 신규 chain validator + 기존 6 도구 chain 모드 확장 + npm workspace + chain-check.yml + ADR-CHAIN-004 + ★ ★ **110 unit test pass** | ✅ DEC-2026-05-06-sub-plan-3a-종결 |
 | **M+3b** | **sub-plan-3b (test-impl-pass-validator)** | ★ ★ ★ test-impl-pass-validator 신설 (5 framework adapter / result_hash SARIF Appendix F / --allow-execute / flaky retry / 25 unit test) + test-cmd.schema 신설 + flaky_retries_count schema 보강 + chain-check.yml gate #3-4 활성 + workspace **135 unit test pass** | ✅ DEC-2026-05-06-sub-plan-3b-종결 |
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
-| **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ 5 요소 본격 구현 — `tools/chain-driver/` (driver loop + state machine) + `schemas/state.schema.json` + chain-revisit-detector + mechanical gate enforcement + skill auto-invoke (hooks/PostToolUse + UserPromptSubmit) + hooks/hooks.json 확장. ★ ★ DEC-2026-05-06-harness-호칭-엄밀화 정합 — 본 sprint 종결 후 "chain harness" 호칭 정식 자격. | 🔜 next |
-| M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + ★ chain-revisit-detector (sub-plan-3 carry) + go/stop UX | ⏳ |
-| M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | ⏳ |
+| **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 (cli + 6 module + 7 test file / 60 unit test) + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json (UserPromptSubmit + PreToolUse / D21' suppressOutput=true) + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass** (138 → +60). | ✅ DEC-2026-05-06-sub-plan-5-종결 |
+| M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | 🔜 next |
+
+## ★ ★ ★ ★ ★ sub-plan-5 종결 (2026-05-06) — chain harness 호칭 전환
+
+**5 요소 모두 코드 enforcement 도달** (DEC-2026-05-06-sub-plan-5-종결 + ADR-CHAIN-005):
+
+1. ✅ **Driver / Orchestrator** — `tools/chain-driver/` workspace 12번째 (cli + 6 module: state-store / stage-graph / invoke-skill / gate-eval / revisit-detect / hooks-bridge)
+2. ✅ **State 영속** — `schemas/state.schema.json` + state-store.js (atomic write tmp+fdatasync+rename / CAS version compare / Windows fallback / lock 5분 stale auto-release / forward-only migration)
+3. ✅ **Mechanical gate** — gate-eval.js + cli `next` — trio 차단: (i) state.blocked 영속 / (ii) cli exit 2 + 동일 메시지 / (iii) PreToolUse permissionDecision=deny. Auto Mode 도 critical/high 위반 시 user 'go' 거부.
+4. ✅ **자동 전이 (skill auto-invoke)** — hooks/hooks.json (UserPromptSubmit + PreToolUse) → cli `hooks-bridge`. ★ D21' suppressOutput=true + additionalContext 차단 문구 ("LLM SHALL NOT auto-invoke") / stderr only / LLM 컨텍스트 격리.
+5. ✅ **Chain-revisit detector** — revisit-detect.js (`git diff --numstat baseline..HEAD` + path-to-chain whitelist 9 pattern + LOC threshold ≥ 5 + revisit_ignore_globs 학습)
+
+### Senior critique (sub-plan-5-research §F) 흡수
+
+- **F1 BLOCKER** ✅ D21 retract → D21' (hooks stdout LLM context 재주입 차단)
+- **F2~F5 HIGH** ✅ trio enforcement / state CAS / revisit LOC threshold / forward-only migration
+- **F6~F7 MED** ✅ tmp recovery + intervention-log schema / exit code matrix + dry-run
+- **F8 MED** ⏳ sp5-c7 carry (drift `--check-state-flow-consistency`)
+- **F9~F10 LOW** ✅ module ≤ 250 LOC / hooks-contract.test.js 5 case
+
+### unit test 회귀 (198 / 12 workspace)
+
+| 도구 | 직전 (sub-plan-4) | 현재 (sub-plan-5) |
+|---|---|---|
+| drift-validator | 44 | 44 |
+| decision-table-validator | 11 | 11 |
+| formal-spec-link-validator | 15 | 15 |
+| static-runner | 16 | 16 |
+| schema-validator | 5 | 5 |
+| planning-extraction-validator | 5 | 5 |
+| chain-coverage-validator | 6 | 6 |
+| spec-test-link-validator | 5 | 5 |
+| traceability-matrix-builder | 6 | 6 |
+| test-impl-pass-validator | 25 | 25 |
+| **chain-driver** | — | ★ ★ ★ **60** |
+| **합계** | **138** | ★ ★ ★ ★ ★ **198** |
+
+★ master plan §release 자격 80+ → 138 → ★ ★ ★ **198 pass** (sub-plan-5 D24 162+ + Senior F10 165+ 모두 +33 초과 충족).
+
+### no-simulation 정책 강화
+
+- LLM "gate 통과한 척" → trio (i+ii+iii) 봉쇄
+- LLM "RED/GREEN 확인한 척" → gate-eval `tests_failed` 자동 검증 (test=0 강제, impl>0 거부)
+- LLM "권고 skill 즉시 invoke" → D21' suppressOutput=true + additionalContext 차단 문구로 LLM 컨텍스트 격리
+
+### chain harness 호칭 전환
+
+| 시점 | 호칭 | 자격 |
+|---|---|---|
+| sub-plan-4 종결 | chain harness scaffolding | 사양 + validator + skills + flows + agents + schemas (부품) |
+| **★ ★ ★ sub-plan-5 종결 (현재)** | **chain harness** | **5 요소 모두 코드 enforcement 도달** |
+| sub-plan-6 종결 | chain harness validated | + ≥ 2 PoC corroboration / §8.1 strict 7/7 |
+
+### Carry (sub-plan-5)
+
+- sp5-c1 tree-sitter semantic diff (v2.x)
+- sp5-c2 다중 사용자 driver state 동시성 (v2.x)
+- sp5-c3 hooks 진짜 LLM auto-invoke (v2.x / D21 옵션 B)
+- sp5-c4 intervention-log dashboard (sub-plan-6)
+- sp5-c5 driver e2e cycle PoC #05 (sub-plan-6)
+- sp5-c6 Auto Mode 차단 임계 분포 분석 (sub-plan-6)
+- ★ sp5-c7 신설 — drift-validator `--check-state-flow-consistency` (sub-plan-6)
+
+---
 
 ## ★ ★ ★ sub-plan-4 종결 (2026-05-06)
 

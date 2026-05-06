@@ -1,0 +1,14 @@
+{
+  "name": "@ai-native-methodology/chain-driver",
+  "version": "0.1.0",
+  "description": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver (5 요소 본격 구현). state.json + atomic write CAS + mechanical gate trio + skill auto-invoke (D21' / suppressOutput) + chain-revisit-detector. ADR-CHAIN-005 정합. harness 호칭 자격 확보.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "chain-driver": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/state-store.test.js test/stage-graph.test.js test/invoke-skill.test.js test/gate-eval.test.js test/revisit-detect.test.js test/hooks-bridge.test.js test/hooks-contract.test.js"
+  },
+  "license": "UNLICENSED"
+}

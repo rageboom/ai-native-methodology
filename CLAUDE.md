@@ -25,13 +25,13 @@ OUTPUT chain (★ v2.0 i-strict):
 USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 ```
 
-**SDLC 4단계 chain harness** ¹ (DEC-2026-05-06-v2.0-i-strict-채택). round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract). harness 외부 자동 코드 생성 ❌.
+**SDLC 4단계 chain harness** ¹ (DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-5-종결 + ADR-CHAIN-005). round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract). harness 외부 자동 코드 생성 ❌.
 
-> ¹ ★ ★ ★ **호칭 엄밀화** (DEC-2026-05-06-harness-호칭-엄밀화):
-> - **현 단계 (sub-plan-1~4 종결)** = `chain harness scaffolding` (사양 + validator + skills + flows + agents + schemas / harness 부품).
-> - **sub-plan-5 종결 후** = `chain harness` 정식 호칭 (driver + state.json + mechanical gate + skill auto-invoke + chain-revisit-detector 5 요소 보유).
-> - **sub-plan-6 종결 + v2.0.0 release** = `chain harness` (★ §8.1 strict 입증 / ≥ 2 PoC corroboration).
-> - 5 요소 부재 시 시뮬 위험 잔존 — LLM 이 "gate 통과한 척" / "RED 확인한 척" 가능 (★★★ no-simulation 정책의 enforcement 누락 / 양심 의존).
+> ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-5-종결 / 2026-05-06):
+> - **sub-plan-1~4 종결** = `chain harness scaffolding` (사양 + validator + skills + flows + agents + schemas / 부품) — 역사 기록 보존.
+> - **★ ★ ★ sub-plan-5 종결 (현재)** = `chain harness` 정식 호칭 — 5 요소 모두 코드 enforcement 도달 (driver `tools/chain-driver/` + state.json + mechanical gate trio + D21' skill auto-invoke + chain-revisit-detector). 198 unit test pass.
+> - **sub-plan-6 종결 + v2.0.0 release** = `chain harness validated` (★ §8.1 strict 입증 / ≥ 2 PoC corroboration).
+> - ★ no-simulation 정책 enforcement 도달 — LLM "gate 통과한 척" / "RED/GREEN 한 척" / "skill 즉시 invoke" 모두 trio (state.blocked + cli exit 2 + PreToolUse deny) + D21' (suppressOutput=true) 로 봉쇄. (PoC corroboration 잔존.)
 
 ★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
 
@@ -85,7 +85,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 - `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태)
 - `ai-native-methodology/schemas/` — JSON Schema (13종 — BE 5 + FE 8)
 - `ai-native-methodology/templates/` — 산출물 템플릿 (★ analysis/ + design/test/implement/planning placeholder + ★ adoption/ — 사내 적용 진입점 customization)
-- `ai-native-methodology/tools/` — Node CLI 검증 도구 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner) — ★ 자체 package.json 독립 유지
+- `ai-native-methodology/tools/` — Node CLI 도구 12종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner / schema-validator / planning-extraction-validator / chain-coverage-validator / spec-test-link-validator / traceability-matrix-builder / test-impl-pass-validator / ★ ★ ★ chain-driver — sub-plan-5 / harness 5 요소 enforcement) — ★ 자체 package.json 독립 + npm workspace
 - `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json + marketplace.json) / Claude Code plugin 시스템 진입점
 - `ai-native-methodology/agents/` + `skills/` + `hooks/` + `flows/` — plugin 자산 (★ install 후 자연어 prompt 매칭 / lifecycle stage organize)
 - `ai-native-methodology/scripts/` — build-plugin.js + version-check.js (★ v1.4.3 도입 / build artifact `dist/internal-v<version>/` 추출)
