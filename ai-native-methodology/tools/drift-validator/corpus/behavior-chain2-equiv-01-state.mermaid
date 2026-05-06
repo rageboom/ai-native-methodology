@@ -1,0 +1,5 @@
+stateDiagram-v2
+    [*] --> guest
+    guest --> authenticated: login
+    authenticated --> guest: logout
+    authenticated --> guest: expire

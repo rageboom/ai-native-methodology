@@ -8,6 +8,6 @@
     "static-runner": "./src/cli.js",
     "static-lint-no-simulation": "./src/lint-no-simulation.sh"
   },
-  "scripts": { "test": "node --test test/runner.test.js test/baseline-mode.test.js" },
+  "scripts": { "test": "node --test test/runner.test.js test/baseline-mode.test.js test/lint-chain.test.js" },
   "license": "UNLICENSED"
 }

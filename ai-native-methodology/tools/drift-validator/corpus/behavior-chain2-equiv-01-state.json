@@ -1,0 +1,8 @@
+{
+  "id": "BHV-USER-001",
+  "initial": "guest",
+  "states": {
+    "guest": { "on": { "LOGIN": "authenticated" } },
+    "authenticated": { "on": { "LOGOUT": "guest", "EXPIRE": "guest" } }
+  }
+}

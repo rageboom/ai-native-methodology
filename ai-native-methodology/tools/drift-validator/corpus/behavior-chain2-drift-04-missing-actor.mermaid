@@ -1,0 +1,6 @@
+sequenceDiagram
+    actor Author
+    participant ArticleAPI
+
+    Author->>ArticleAPI: POST /articles
+    ArticleAPI-->>Author: 201-created

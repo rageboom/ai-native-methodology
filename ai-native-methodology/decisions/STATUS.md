@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ sub-plan-3a 4 신규 도구 partial commit / **clear 후 재개 의무**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ ★ sub-plan-3a 종결 / **next: sub-plan-3b (test-impl-pass-validator)**)
 
 ## ★ ★ ★ v2.0 진행 (sub-plan 6 sprint)
 
@@ -11,33 +11,66 @@
 |---|---|---|---|
 | M+1 | sub-plan-1 (scope) | DEC 3 + lifecycle-contract / CLAUDE.md / skills-axis / agents / STATUS / INDEX | ✅ commit `b466e51` |
 | M+2 | sub-plan-2 (schemas + deliverables + ADR) | 6 schema + 6 deliverable + 3 신규 ADR + 3 ADR v2 + UC-* 통일 | ✅ commit `811ea45` |
-| **M+3a** | **sub-plan-3a (4 chain validator)** | planning-extraction / chain-coverage / spec-test-link / traceability-matrix-builder (★ 4 도구 22 test pass) | 🔄 ★ partial / 본 commit / 잔여 = 기존 6 도구 chain 모드 확장 + chain-check.yml + workspace + ADR-CHAIN-004 + verification |
-| M+3b | sub-plan-3b (test-impl-pass-validator) | ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) 선행 후 진입 | ⏳ carry |
+| **M+3a** | **sub-plan-3a (chain validator + workspace)** | 4 신규 chain validator + 기존 6 도구 chain 모드 확장 + npm workspace + chain-check.yml + ADR-CHAIN-004 + ★ ★ **110 unit test pass** | ✅ DEC-2026-05-06-sub-plan-3a-종결 |
+| **M+3b** | **sub-plan-3b (test-impl-pass-validator)** | ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) prerequisite 해결 → ★ 진입 가능 | 🔜 next |
 | M+4 | sub-plan-4 (skills + flows) | 14 skill + agents 갱신 + 5 flow + sdlc-4stage-flow.json | ⏳ |
 | M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + ★ chain-revisit-detector (sub-plan-3 carry) + go/stop UX | ⏳ |
 | M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | ⏳ |
 
-## ★ ★ sub-plan-3 결단 (2026-05-06 / clear 직전 보존)
+## ★ ★ sub-plan-3a 종결 (2026-05-06)
 
-**사용자 결단 cluster** (sub-plan-3-research.md ★ ★ ★ Senior blocker 3건 해결):
-- Blocker 1 (D9 invocation matrix) — **Aider 패턴** = 사용자 명시 `.aimd/config/test-cmd.json` + phase-1-inventory 자동 추론 + override
-- Blocker 2 (test-impl-pass 5 sub-spec) — **Senior + Industry default 모두 적용** (result_hash 정규화 SARIF Appendix F / timeout 600s / flaky retry 2 / `--allow-execute` / coverage threshold 책임 분리)
+**9 항목 모두 통과** (DEC-2026-05-06-sub-plan-3a-종결):
+
+1. ✅ npm workspace root (10 도구 단일 workspace / S1)
+2. ✅ drift-validator chain 2 corpus 5쌍 신규 (BHV-* state-machine + sequence)
+3. ✅ formal-spec-link-validator `--chain-mode` (planning ↔ behavior ↔ acceptance ↔ test ↔ impl backward link + ID pattern)
+4. ✅ static-runner lint-no-simulation.sh chain 3/4 evidence 7 필드 + impl-spec source_files commit_hash 의무
+5. ✅ schema-validator 6 chain schema 자동 등록 + Ajv 8 if/then 지원 (5 신규 test)
+6. ✅ chain-check.yml 별도 워크플로우 (★ S2 / workflow_dispatch only / 4 gate step)
+7. ✅ --dry-run 의미 3 조합 명문화 (4 신규 도구 README / S3)
+8. ✅ ADR-CHAIN-004 신설 (Test Runner Invocation Contract / Aider 패턴 / 5 정책)
+9. ✅ unit test ★ 88 → **110 pass** / 0 fail / 9 workspace (master plan H §release 자격 80+ → 38%p 초과 달성)
+
+### unit test 회귀 (110/110)
+
+| 도구 | 직전 | 현재 |
+|---|---|---|
+| drift-validator | 36 | 41 |
+| decision-table-validator | 11 | 11 |
+| formal-spec-link-validator | 8 | 15 |
+| static-runner | 11 | 16 |
+| schema-validator | 0 | 5 |
+| spectral-runner | 0 | 0 (passthrough) |
+| planning-extraction-validator | 5 | 5 |
+| chain-coverage-validator | 6 | 6 |
+| spec-test-link-validator | 5 | 5 |
+| traceability-matrix-builder | 6 | 6 |
+| **합계** | **88** | **110** |
+
+## ★ ★ sub-plan-3 carry (sub-plan-3b 진입 시)
+
+**사용자 결단 cluster** (sub-plan-3-research.md ★ ★ ★ Senior blocker 3건):
+- Blocker 1 (D9 invocation matrix) — ✅ **ADR-CHAIN-004 채택** (Aider 패턴 / `.aimd/config/test-cmd.json` + phase-1-inventory 자동 추론 + override)
+- Blocker 2 (test-impl-pass 5 sub-spec) — sub-plan-3b 진입 시점 적용 (Senior + Industry default 모두)
 - Blocker 3 (chain-revisit-detector) — **sub-plan-5 (hooks) carry**
-- 보강 5건 (S1~S5) **전부 적용** + 3a/3b 분할 (★ 본 sub-plan-3a = 4 도구 + 6 기존 확장 / sub-plan-3b = test-impl-pass / sub-plan-5 = revisit-detector)
 
-## ★ ★ clear 후 재개 의무 (다음 세션)
+### sub-plan-3b carry 항목
 
-1. **plan + research 보존**: `~/.claude/plans/sub-plan-3-tools.md` + `~/.claude/plans/sub-plan-3-research.md` + master plan + sub-plan-1/2 plan 모두 보존
-2. **남은 sub-plan-3a 작업**:
-   - npm workspace root 설정 (S1)
-   - 기존 6 도구 chain 모드 확장 (drift-validator chain corpus / formal-spec-link-validator `--chain-mode` / static-runner chain 4 lint / schema-validator 6 신규 schema 등록)
-   - `chain-check.yml` 별도 워크플로우 신설 (S2 — drift-check.yml 오염 ❌ / `if: false` gate + workflow_dispatch only)
-   - `--dry-run` 의미 명문 (S3)
-   - ADR-CHAIN-004 (Test Runner Invocation Contract) 신설
-   - unit test 53 → 80+ 의무 (현 22 test 추가 / 53 + 22 = 75 → 추가 5+ 의무)
-   - sub-plan-3a 종결 commit + sub-plan-3b carry 등재
-3. **검증 회귀 baseline** (현 시점): drift 36 / dmn 11 / formal-spec-link 8 / static-runner 11 = 66 + 4 신규 도구 22 = **88 unit test pass**
-4. **commit history**: `b466e51` (sub-plan-1) → `811ea45` (sub-plan-2) → 본 commit (sub-plan-3a partial) → 다음 (sub-plan-3a 종결)
+| # | 항목 | 비고 |
+|---|---|---|
+| sp3b-1 | `test-impl-pass-validator` 신규 도구 (★ 진짜 runner / 5종 물증 7 필드 / SARIF 2.1.0 / result_hash 정규화) | ADR-CHAIN-004 §5 정합 |
+| sp3b-2 | `schemas/test-cmd.schema.json` 신설 (ADR-CHAIN-004 §1) | — |
+| sp3b-3 | `--allow-execute` flag + sandbox 정책 (Senior Blocker 2) | — |
+| sp3b-4 | flaky retry policy per-test cap 2 + `flaky_retries_count` 필드 | Playwright 정합 |
+| sp3b-5 | coverage threshold 검증 (chain-coverage-validator 책임 분리) | — |
+| sp3b-6 | JUnit XML / pytest JSON output adapter | Official research |
+| sp3-c1 | mermaid graph view ≥ 100 cell subgraph 분할 정책 | sub-plan-3b 또는 sub-plan-6 |
+| sp3-c2 | chain-revisit-detector AI ML 정확도 개선 | v2.x carry |
+| sp3-c3 | CI 본격 활성 (PoC #05 데이터 후) | sub-plan-6 |
+
+### commit history (★ 4단계 누적)
+
+`b466e51` (sub-plan-1) → `811ea45` (sub-plan-2) → `ccb3f0a` (sub-plan-3a partial) → 본 commit (sub-plan-3a 종결).
 
 ## ★ ★ v2.0 carry (master plan §K)
 

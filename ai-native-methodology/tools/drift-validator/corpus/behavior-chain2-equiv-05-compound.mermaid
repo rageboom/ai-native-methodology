@@ -1,0 +1,9 @@
+stateDiagram-v2
+    [*] --> empty
+    empty --> active: add_item
+    state active {
+        [*] --> draft
+        draft --> checkout: proceed
+        checkout --> paid: pay
+    }
+    active --> empty: clear

@@ -1,0 +1,14 @@
+{
+  "uc_id": "BHV-ARTICLE-004",
+  "actors": [
+    {"id": "Author", "type": "user"},
+    {"id": "ArticleAPI", "type": "controller"},
+    {"id": "DB", "type": "external"}
+  ],
+  "messages": [
+    {"from": "Author", "to": "ArticleAPI", "label": "POST /articles", "sync": "sync"},
+    {"from": "ArticleAPI", "to": "DB", "label": "insert", "sync": "sync"},
+    {"from": "DB", "to": "ArticleAPI", "label": "id", "sync": "return"},
+    {"from": "ArticleAPI", "to": "Author", "label": "201-created", "sync": "return"}
+  ]
+}

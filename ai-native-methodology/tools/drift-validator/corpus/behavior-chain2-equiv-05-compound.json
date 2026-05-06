@@ -1,0 +1,16 @@
+{
+  "id": "BHV-CART-005",
+  "initial": "empty",
+  "states": {
+    "empty": { "on": { "ADD_ITEM": "active" } },
+    "active": {
+      "initial": "draft",
+      "states": {
+        "draft": { "on": { "PROCEED": "checkout" } },
+        "checkout": { "on": { "PAY": "paid" } },
+        "paid": {}
+      },
+      "on": { "CLEAR": "empty" }
+    }
+  }
+}

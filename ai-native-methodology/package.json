@@ -3,12 +3,27 @@
   "version": "1.5.0",
   "private": true,
   "type": "module",
-  "description": "AI-Native Development Methodology — workspace root (build orchestrator). Tools 5종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner) 자체 package.json 독립 유지 (★ no npm workspaces).",
+  "description": "AI-Native Development Methodology — workspace root (build orchestrator + ★ v2.0 chain harness 11 tools workspace). chain validator 4종 + 기존 6 도구 + 1 placeholder + spectral-runner = 단일 npm workspace (★ S1 / dep drift 회피 / 도구별 package.json 독립 유지).",
+  "workspaces": [
+    "tools/drift-validator",
+    "tools/decision-table-validator",
+    "tools/formal-spec-link-validator",
+    "tools/spectral-runner",
+    "tools/static-runner",
+    "tools/schema-validator",
+    "tools/planning-extraction-validator",
+    "tools/chain-coverage-validator",
+    "tools/spec-test-link-validator",
+    "tools/traceability-matrix-builder"
+  ],
   "scripts": {
     "build": "node scripts/build-plugin.js",
     "build:check": "node scripts/build-plugin.js --check",
     "version:check": "node scripts/version-check.js",
-    "build:diff-check": "node scripts/build-plugin.js && git diff --exit-code -- .claude-plugin agents skills hooks flows tools templates methodology-spec schemas CHANGELOG.md README.md"
+    "build:diff-check": "node scripts/build-plugin.js && git diff --exit-code -- .claude-plugin agents skills hooks flows tools templates methodology-spec schemas CHANGELOG.md README.md",
+    "test": "npm run test --workspaces --if-present",
+    "test:tools": "npm run test --workspaces --if-present",
+    "test:chain": "npm run test --workspace=tools/planning-extraction-validator --workspace=tools/chain-coverage-validator --workspace=tools/spec-test-link-validator --workspace=tools/traceability-matrix-builder"
   },
   "engines": {
     "node": ">=18.0.0"

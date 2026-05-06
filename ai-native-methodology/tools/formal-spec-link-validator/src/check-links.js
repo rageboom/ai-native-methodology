@@ -1,5 +1,6 @@
 // formal_spec_links 검증 — link 가 실제 파일을 가리키는지 + 가리키는 산출물의 br_id/aggregate_root 가 정합한지.
 // ★ v1.4 Stage 3-2 — FE cross_links[] 형식 추가 인식 (--mode=fe).
+// ★ ★ v2.0 sub-plan-3a — chain-mode 추가 (--chain-mode): planning ↔ behavior ↔ acceptance ↔ test ↔ impl link 검증.
 
 import { readFileSync, statSync } from 'node:fs';
 import { dirname, resolve, basename } from 'node:path';
@@ -156,4 +157,198 @@ export function checkFeCrossLinks({ source }) {
   }
 
   return findings;
+}
+
+// ★ ★ v2.0 sub-plan-3a — chain-mode 검증.
+// chain 산출물 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec /
+//   traceability-matrix) 내부의 backward link path (derivation_source.*_path /
+//   cross_links.to_analysis_artifacts[] / item-level *_ref) 가 실제 파일을 가리키는지 검증.
+//
+// 검증 항목:
+//   - chain.dead-reference (breaking) — path 가 실재 파일/디렉토리 아님
+//   - chain.backward-link.missing (breaking) — derivation_source 의 의무 path 부재 (schema 가
+//     이미 required 강제하지만, runtime 추가 안전장치)
+//   - chain.id-pattern-mismatch (non-breaking) — UC-* / BHV-* / AC-* / TC-* / IMPL-* pattern 위반
+//
+// chain 단계는 path/ID 만 검증 — semantic coverage (UC→BHV 1:N 등) 은 chain-coverage-validator 책임.
+
+const CHAIN_ARTIFACT_BY_NAME = {
+  'planning-spec.json': 'planning-spec',
+  'behavior-spec.json': 'behavior-spec',
+  'acceptance-criteria.json': 'acceptance-criteria',
+  'test-spec.json': 'test-spec',
+  'impl-spec.json': 'impl-spec',
+  'traceability-matrix.json': 'traceability-matrix',
+};
+
+// derivation_source 내부의 path 필드 — chain 단계별 의무 backward link.
+const CHAIN_DERIVATION_PATHS = {
+  'planning-spec':       [],  // planning 은 chain 1차 — analysis 만 backward (cross_links 별도)
+  'behavior-spec':       ['planning_spec_path'],
+  'acceptance-criteria': ['behavior_spec_path', 'planning_spec_path'],
+  'test-spec':           ['acceptance_criteria_path', 'behavior_spec_path'],
+  'impl-spec':           ['test_spec_path', 'behavior_spec_path'],
+  'traceability-matrix': [],  // matrix 는 derivation_source 가 별도 — items 단위로 검증
+};
+
+const ID_PATTERN = {
+  UC:   /^UC-[A-Z0-9_-]+-\d+$/,
+  BHV:  /^BHV-[A-Z0-9_-]+-\d+$/,
+  AC:   /^AC-[A-Z0-9_-]+-\d+$/,
+  TC:   /^TC-[A-Z0-9_-]+-\d+$/,
+  IMPL: /^IMPL-[A-Z0-9_-]+-\d+$/,
+};
+
+function pushDeadIfMissing(findings, source, baseDir, p, kind, extra = {}) {
+  if (!p) return;
+  let resolvedPath;
+  try {
+    resolvedPath = resolve(baseDir, p);
+    statSync(resolvedPath);
+  } catch {
+    findings.push({
+      severity: 'breaking',
+      kind,
+      link: p,
+      source_file: source.file,
+      message: `${kind}: "${p}" not found (resolved: ${resolvedPath ?? p})`,
+      ...extra,
+    });
+  }
+}
+
+function pushIdMismatch(findings, source, prefix, id, where) {
+  const pat = ID_PATTERN[prefix];
+  if (!pat) return;
+  if (!pat.test(id)) {
+    findings.push({
+      severity: 'non-breaking',
+      kind: 'chain.id-pattern-mismatch',
+      source_file: source.file,
+      where,
+      expected_pattern: pat.source,
+      actual: id,
+      message: `${where}: "${id}" does not match ${prefix}-* pattern`,
+    });
+  }
+}
+
+/**
+ * chain 산출물 link 검증.
+ * source: { type: 'chain', file: string, artifact: enum, json: object }
+ * baseDir: source file 의 dirname
+ */
+export function checkChainLinks({ source, baseDir }) {
+  const findings = [];
+  const { artifact, json } = source;
+
+  // 1) derivation_source path 검증 (chain backward link 의무)
+  const requiredPaths = CHAIN_DERIVATION_PATHS[artifact] ?? [];
+  const ds = json.derivation_source ?? {};
+  for (const key of requiredPaths) {
+    const p = ds[key];
+    if (!p) {
+      findings.push({
+        severity: 'breaking',
+        kind: 'chain.backward-link.missing',
+        source_file: source.file,
+        where: `derivation_source.${key}`,
+        message: `${artifact}: derivation_source.${key} required but missing`,
+      });
+      continue;
+    }
+    pushDeadIfMissing(findings, source, baseDir, p, 'chain.dead-reference', { where: `derivation_source.${key}` });
+  }
+
+  // analysis_artifacts (planning + behavior 양쪽)
+  if (Array.isArray(ds.analysis_artifacts)) {
+    for (const p of ds.analysis_artifacts) {
+      pushDeadIfMissing(findings, source, baseDir, p, 'chain.dead-reference', { where: 'derivation_source.analysis_artifacts[]' });
+    }
+  }
+
+  // 2) cross_links.to_analysis_artifacts (planning / behavior)
+  const crossAna = json.cross_links?.to_analysis_artifacts;
+  if (Array.isArray(crossAna)) {
+    for (const p of crossAna) {
+      pushDeadIfMissing(findings, source, baseDir, p, 'chain.dead-reference', { where: 'cross_links.to_analysis_artifacts[]' });
+    }
+  }
+
+  // 3) item-level path/ref 검증 (artifact 별 분기)
+  switch (artifact) {
+    case 'planning-spec':
+      for (const uc of (json.use_cases ?? [])) {
+        if (uc.id) pushIdMismatch(findings, source, 'UC', uc.id, `use_cases[id=${uc.id}]`);
+      }
+      break;
+    case 'behavior-spec':
+      for (const bhv of (json.behaviors ?? [])) {
+        if (bhv.id) pushIdMismatch(findings, source, 'BHV', bhv.id, `behaviors[id=${bhv.id}]`);
+        for (const uc of (bhv.use_case_refs ?? [])) {
+          pushIdMismatch(findings, source, 'UC', uc, `behaviors[${bhv.id}].use_case_refs[]`);
+        }
+        for (const ac of (bhv.acceptance_criteria_refs ?? [])) {
+          pushIdMismatch(findings, source, 'AC', ac, `behaviors[${bhv.id}].acceptance_criteria_refs[]`);
+        }
+        for (const k of ['state_transition_ref', 'decision_table_ref', 'sequence_ref']) {
+          if (bhv[k]) pushDeadIfMissing(findings, source, baseDir, bhv[k], 'chain.dead-reference', { where: `behaviors[${bhv.id}].${k}` });
+        }
+      }
+      break;
+    case 'acceptance-criteria':
+      for (const ac of (json.criteria ?? [])) {
+        if (ac.id) pushIdMismatch(findings, source, 'AC', ac.id, `criteria[id=${ac.id}]`);
+        if (ac.behavior_ref) pushIdMismatch(findings, source, 'BHV', ac.behavior_ref, `criteria[${ac.id}].behavior_ref`);
+        if (ac.use_case_ref) pushIdMismatch(findings, source, 'UC', ac.use_case_ref, `criteria[${ac.id}].use_case_ref`);
+        for (const tc of (ac.test_case_refs ?? [])) {
+          pushIdMismatch(findings, source, 'TC', tc, `criteria[${ac.id}].test_case_refs[]`);
+        }
+      }
+      break;
+    case 'test-spec':
+      for (const tc of (json.test_cases ?? [])) {
+        if (tc.id) pushIdMismatch(findings, source, 'TC', tc.id, `test_cases[id=${tc.id}]`);
+        if (tc.ac_ref) pushIdMismatch(findings, source, 'AC', tc.ac_ref, `test_cases[${tc.id}].ac_ref`);
+        if (tc.bhv_ref) pushIdMismatch(findings, source, 'BHV', tc.bhv_ref, `test_cases[${tc.id}].bhv_ref`);
+        if (tc.impl_module_ref) pushIdMismatch(findings, source, 'IMPL', tc.impl_module_ref, `test_cases[${tc.id}].impl_module_ref`);
+        if (tc.source_file) pushDeadIfMissing(findings, source, baseDir, tc.source_file, 'chain.dead-reference', { where: `test_cases[${tc.id}].source_file` });
+      }
+      // test_invocation_evidence.test_runner_stdout_path
+      if (json.test_invocation_evidence?.test_runner_stdout_path) {
+        pushDeadIfMissing(findings, source, baseDir, json.test_invocation_evidence.test_runner_stdout_path, 'chain.dead-reference', { where: 'test_invocation_evidence.test_runner_stdout_path' });
+      }
+      break;
+    case 'impl-spec':
+      for (const im of (json.impl_modules ?? [])) {
+        if (im.id) pushIdMismatch(findings, source, 'IMPL', im.id, `impl_modules[id=${im.id}]`);
+        for (const tc of (im.tc_refs ?? [])) {
+          pushIdMismatch(findings, source, 'TC', tc, `impl_modules[${im.id}].tc_refs[]`);
+        }
+        for (const bhv of (im.bhv_refs ?? [])) {
+          pushIdMismatch(findings, source, 'BHV', bhv, `impl_modules[${im.id}].bhv_refs[]`);
+        }
+        for (const sf of (im.source_files ?? [])) {
+          pushDeadIfMissing(findings, source, baseDir, sf, 'chain.dead-reference', { where: `impl_modules[${im.id}].source_files[]` });
+        }
+      }
+      if (json.test_invocation_evidence?.test_runner_stdout_path) {
+        pushDeadIfMissing(findings, source, baseDir, json.test_invocation_evidence.test_runner_stdout_path, 'chain.dead-reference', { where: 'test_invocation_evidence.test_runner_stdout_path' });
+      }
+      break;
+    case 'traceability-matrix':
+      // matrix 는 derived_from + items 의 4 chain ID 정합 검증.
+      for (const row of (json.rows ?? [])) {
+        for (const [field, prefix] of [['uc_id', 'UC'], ['bhv_id', 'BHV'], ['ac_id', 'AC'], ['tc_id', 'TC'], ['impl_id', 'IMPL']]) {
+          if (row[field]) pushIdMismatch(findings, source, prefix, row[field], `rows[].${field}`);
+        }
+      }
+      break;
+  }
+
+  return findings;
+}
+
+export function detectChainArtifact(filename) {
+  return CHAIN_ARTIFACT_BY_NAME[filename] ?? null;
 }

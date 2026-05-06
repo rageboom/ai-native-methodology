@@ -1,5 +1,6 @@
-// Corpus self-test — Sprint 5+ carry-over Phase A 종결 후 19쌍 / 21 test.
+// Corpus self-test — ★ v2.0 sub-plan-3a 후 24쌍 / 41 test.
 // 진척: Sprint 4 4쌍 → A 보강 (DEC-A) +10쌍 = 14쌍 → ★ Sprint 5+ Phase A +6쌍 = 19쌍 (state-machine 8 + sequence 8 + state-map-fe 3).
+//      → ★ ★ v2.0 sub-plan-3a +5쌍 = 24쌍 (chain 2 behavior-spec BHV-* state-machine + sequence drift).
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { readFileSync } from 'node:fs';
@@ -168,4 +169,33 @@ test('★ phase-flow equiv → 0 breaking (Sprint 5+ B / 3 phase + 2 deps)', () 
 test('★ phase-flow drift missing-dep → ≥1 breaking (Sprint 5+ B)', () => {
   const s = runPhaseFlow('phase-flow-drift-01-missing-dep');
   assert.ok(s.breaking >= 1, `expected breaking≥1 (P0→P2 dep 누락), got ${JSON.stringify(s)}`);
+});
+
+// ★ ★ v2.0 sub-plan-3a — chain 2 behavior-spec corpus (BHV-* state-machine + sequence drift)
+// Phase 4.5 자산 reuse — behavior-spec 의 state_transition_ref / sequence_ref 가 가리키는
+// .aimd/output/formal-spec/{state-machines,sequences}/{id}.{json,mermaid} 짝의 의미 동치 검증.
+
+test('★ chain2 BHV state-machine equiv → 0 breaking (sub-plan-3a)', () => {
+  const s = runStateMachine('behavior-chain2-equiv-01-state');
+  assert.equal(s.breaking, 0, `expected breaking=0 (BHV-USER-001), got ${JSON.stringify(s)}`);
+});
+
+test('★ chain2 BHV state-machine drift missing-transition → ≥1 breaking (sub-plan-3a)', () => {
+  const s = runStateMachine('behavior-chain2-drift-02-missing-transition');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (BHV-ORDER-002 REJECT 누락), got ${JSON.stringify(s)}`);
+});
+
+test('★ chain2 BHV sequence equiv → 0 breaking (sub-plan-3a / 4 actor)', () => {
+  const s = runSequence('behavior-chain2-equiv-03-sequence');
+  assert.equal(s.breaking, 0, `expected breaking=0 (BHV-LOGIN-003), got ${JSON.stringify(s)}`);
+});
+
+test('★ chain2 BHV sequence drift missing-actor → ≥1 breaking (sub-plan-3a)', () => {
+  const s = runSequence('behavior-chain2-drift-04-missing-actor');
+  assert.ok(s.breaking >= 1, `expected breaking≥1 (BHV-ARTICLE-004 DB 누락), got ${JSON.stringify(s)}`);
+});
+
+test('★ chain2 BHV compound state-machine equiv → 0 breaking (sub-plan-3a / cart 5상태)', () => {
+  const s = runStateMachine('behavior-chain2-equiv-05-compound');
+  assert.equal(s.breaking, 0, `expected breaking=0 (BHV-CART-005 compound), got ${JSON.stringify(s)}`);
 });

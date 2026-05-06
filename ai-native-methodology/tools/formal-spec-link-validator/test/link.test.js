@@ -3,7 +3,7 @@ import { strict as assert } from 'node:assert';
 import { mkdtempSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { checkLinks, checkFeCrossLinks, summarize } from '../src/check-links.js';
+import { checkLinks, checkFeCrossLinks, checkChainLinks, detectChainArtifact, summarize } from '../src/check-links.js';
 
 function setupFixture() {
   const dir = mkdtempSync(join(tmpdir(), 'fsl-test-'));
@@ -150,4 +150,139 @@ test('★ FE cross_links — 부재 → 0 finding (optional)', () => {
     source: { type: 'fe-artifact', file: '/tmp/x.json', item: {} },
   });
   assert.equal(findings.length, 0);
+});
+
+// ★ ★ v2.0 sub-plan-3a — chain-mode 검증 (planning ↔ behavior ↔ acceptance ↔ test ↔ impl)
+
+function setupChainFixture() {
+  const dir = mkdtempSync(join(tmpdir(), 'fsl-chain-'));
+  // analysis 산출물 reference 대상
+  writeFileSync(join(dir, 'rules.json'), '{}\n');
+  writeFileSync(join(dir, 'planning-spec.json'), '{}\n');
+  writeFileSync(join(dir, 'behavior-spec.json'), '{}\n');
+  writeFileSync(join(dir, 'acceptance-criteria.json'), '{}\n');
+  writeFileSync(join(dir, 'test-spec.json'), '{}\n');
+  mkdirSync(join(dir, 'src'), { recursive: true });
+  writeFileSync(join(dir, 'src', 'user.controller.ts'), '// stub\n');
+  writeFileSync(join(dir, 'src', 'user.test.ts'), '// stub\n');
+  return dir;
+}
+
+test('★ chain detectChainArtifact — 6 artifact 인식', () => {
+  assert.equal(detectChainArtifact('planning-spec.json'), 'planning-spec');
+  assert.equal(detectChainArtifact('behavior-spec.json'), 'behavior-spec');
+  assert.equal(detectChainArtifact('acceptance-criteria.json'), 'acceptance-criteria');
+  assert.equal(detectChainArtifact('test-spec.json'), 'test-spec');
+  assert.equal(detectChainArtifact('impl-spec.json'), 'impl-spec');
+  assert.equal(detectChainArtifact('traceability-matrix.json'), 'traceability-matrix');
+  assert.equal(detectChainArtifact('foo.json'), null);
+});
+
+test('★ chain behavior-spec — derivation_source.planning_spec_path 부재 → ≥1 breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: { analysis_artifacts: ['./rules.json'] },
+      behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'], acceptance_criteria_refs: ['AC-USER-001'] }],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'behavior-spec.json'), artifact: 'behavior-spec', json }, baseDir: dir });
+    const s = summarize(findings);
+    assert.ok(s.breaking >= 1, `expected ≥1 breaking (planning_spec_path missing), got ${JSON.stringify(s)}`);
+    assert.ok(findings.some(f => f.kind === 'chain.backward-link.missing'), `expected chain.backward-link.missing, got ${JSON.stringify(findings)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ chain behavior-spec — 정합 link → 0 breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: {
+        planning_spec_path: './planning-spec.json',
+        analysis_artifacts: ['./rules.json'],
+      },
+      behaviors: [
+        { id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'], acceptance_criteria_refs: ['AC-USER-001'] },
+      ],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'behavior-spec.json'), artifact: 'behavior-spec', json }, baseDir: dir });
+    const s = summarize(findings);
+    assert.equal(s.breaking, 0, `expected 0 breaking, got ${JSON.stringify(s)} ${JSON.stringify(findings)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ chain behavior-spec — id pattern mismatch → ≥1 non-breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: { planning_spec_path: './planning-spec.json', analysis_artifacts: ['./rules.json'] },
+      behaviors: [
+        { id: 'BHV-USER-001', use_case_refs: ['INVALID-FORMAT'], acceptance_criteria_refs: ['AC-USER-001'] },
+      ],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'behavior-spec.json'), artifact: 'behavior-spec', json }, baseDir: dir });
+    const s = summarize(findings);
+    assert.ok(s['non-breaking'] >= 1, `expected ≥1 non-breaking, got ${JSON.stringify(s)}`);
+    assert.ok(findings.some(f => f.kind === 'chain.id-pattern-mismatch'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ chain test-spec — source_file dead-reference → ≥1 breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: {
+        acceptance_criteria_path: './acceptance-criteria.json',
+        behavior_spec_path: './behavior-spec.json',
+      },
+      test_cases: [
+        { id: 'TC-USER-001', ac_ref: 'AC-USER-001', bhv_ref: 'BHV-USER-001', type: 'unit', framework: 'jest', source_file: './src/MISSING.test.ts', expected_outcome: 'pass' },
+      ],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'test-spec.json'), artifact: 'test-spec', json }, baseDir: dir });
+    const s = summarize(findings);
+    assert.ok(s.breaking >= 1, `expected ≥1 breaking (dead source_file), got ${JSON.stringify(s)}`);
+    assert.ok(findings.some(f => f.kind === 'chain.dead-reference' && f.where.includes('source_file')));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ chain impl-spec — source_files 정합 + tc_refs UC-pattern mismatch → 0 breaking + ≥1 non-breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: {
+        test_spec_path: './test-spec.json',
+        behavior_spec_path: './behavior-spec.json',
+      },
+      impl_modules: [
+        { id: 'IMPL-USER-001', tc_refs: ['UC-WRONG-001'], bhv_refs: ['BHV-USER-001'], framework: 'nestjs', source_files: ['./src/user.controller.ts'], commit_hash: 'abc123' },
+      ],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'impl-spec.json'), artifact: 'impl-spec', json }, baseDir: dir });
+    const s = summarize(findings);
+    assert.equal(s.breaking, 0, `expected 0 breaking (source_files exist), got ${JSON.stringify(s)} ${JSON.stringify(findings)}`);
+    assert.ok(s['non-breaking'] >= 1, `expected ≥1 non-breaking (tc_refs UC-* not TC-*), got ${JSON.stringify(s)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ chain traceability-matrix — rows ID pattern 검증', () => {
+  const json = {
+    rows: [
+      { uc_id: 'UC-USER-001', bhv_id: 'BHV-USER-001', ac_id: 'AC-USER-001', tc_id: 'TC-USER-001', impl_id: 'IMPL-USER-001' },
+      { uc_id: 'INVALID', bhv_id: 'BHV-USER-001' },  // 1 mismatch
+    ],
+  };
+  const findings = checkChainLinks({ source: { type: 'chain', file: '/tmp/traceability-matrix.json', artifact: 'traceability-matrix', json }, baseDir: '/tmp' });
+  const s = summarize(findings);
+  assert.equal(s.breaking, 0);
+  assert.ok(s['non-breaking'] >= 1, `expected ≥1 non-breaking (UC-* mismatch), got ${JSON.stringify(s)}`);
 });
