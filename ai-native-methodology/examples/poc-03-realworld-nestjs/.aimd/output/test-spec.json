@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T18:15:00Z",
+    "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.80,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "behavior_spec_path": ".aimd/output/behavior-spec.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-USER-SIGNUP-001",
+      "ac_ref": "AC-USER-SIGNUP-001",
+      "bhv_ref": "BHV-USER-SIGNUP-001",
+      "type": "unit",
+      "framework": "jest",
+      "framework_status": "active",
+      "source_file": "examples/poc-03-realworld-nestjs/source/test/user/user.service.spec.ts (★ retrofit dry-run / 본 파일 미작성 / 진짜 test 미실행)",
+      "source_evidence": "describe('UserService.create — duplicate email/username') { it('should throw on duplicate'); }",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "(not run / retrofit dry-run)",
+        "test_runner_stdout_path": "(not generated)",
+        "invocation_timestamp": "2026-05-06T18:15:00Z",
+        "duration_ms": 0,
+        "pass_count": 0,
+        "fail_count": 1,
+        "skip_count": 0,
+        "reproduction_command": "(retrofit dry-run — see retrofit-note.md)",
+        "result_hash": "sha256:d6dc78a6f20412dc4c95eb61a1519f732869b08f5e140553fb687249769ca08c",
+        "report_format": "jest_json",
+        "flaky_retries_count": 0
+      }
+    },
+    {
+      "id": "TC-USER-LOGIN-001",
+      "ac_ref": "AC-USER-LOGIN-001",
+      "bhv_ref": "BHV-USER-LOGIN-001",
+      "type": "unit",
+      "framework": "jest",
+      "framework_status": "active",
+      "source_file": "examples/poc-03-realworld-nestjs/source/test/user/user.service.spec.ts (★ retrofit dry-run)",
+      "source_evidence": "describe('UserService.findOne — login') { it('should return user + JWT'); }",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "(not run / retrofit dry-run)",
+        "test_runner_stdout_path": "(not generated)",
+        "invocation_timestamp": "2026-05-06T18:15:00Z",
+        "duration_ms": 0,
+        "pass_count": 0,
+        "fail_count": 1,
+        "skip_count": 0,
+        "reproduction_command": "(retrofit dry-run — see retrofit-note.md)",
+        "result_hash": "sha256:d6dc78a6f20412dc4c95eb61a1519f732869b08f5e140553fb687249769ca08c",
+        "report_format": "jest_json",
+        "flaky_retries_count": 0
+      }
+    }
+  ],
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1.0,
+      "by_business_rule": 1.0,
+      "by_use_case": 1.0,
+      "threshold": 0.85,
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 1.0,
+        "medium": 1.0,
+        "low": 1.0
+      }
+    },
+    "test_pass_rate": 0.0
+  },
+  "chain_attempt": {
+    "attempt_n": 1,
+    "retry_cap": 3,
+    "revisit_count": 0
+  }
+}

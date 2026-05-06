@@ -1,0 +1,43 @@
+{
+  "$comment": "★ PoC #05 — Use Cases. chain 1 planning-spec.use_cases 의 source.",
+  "project_id": "poc-05-sample-user-register",
+  "use_cases": [
+    {
+      "id": "UC-USER-001",
+      "title": "신규 사용자 등록 (register)",
+      "trigger": "POST /users",
+      "actor": "anonymous",
+      "primary_outcome": "user.id 반환 (201 Created)",
+      "alternatives": [
+        { "id": "UC-USER-001-A1", "title": "이메일 중복", "outcome": "409 Conflict (BR-USER-DATA-001)" },
+        { "id": "UC-USER-001-A2", "title": "비밀번호 < 8자", "outcome": "400 Bad Request (BR-USER-VALIDATION-001)" }
+      ],
+      "related_rules": ["BR-USER-DATA-001", "BR-USER-VALIDATION-001"],
+      "source_grounded_evidence": {
+        "file": "source/src/user.legacy.ts",
+        "line_range": "10-15",
+        "function_name": "register"
+      }
+    },
+    {
+      "id": "UC-USER-002",
+      "title": "로그인 (login)",
+      "trigger": "POST /users/login",
+      "actor": "anonymous",
+      "primary_outcome": "user 반환 (200 OK)",
+      "alternatives": [
+        { "id": "UC-USER-002-A1", "title": "사용자 없음", "outcome": "401 Unauthorized" },
+        { "id": "UC-USER-002-A2", "title": "비밀번호 불일치", "outcome": "401 Unauthorized" }
+      ],
+      "related_rules": [],
+      "source_grounded_evidence": {
+        "file": "source/src/user.legacy.ts",
+        "line_range": "17-22",
+        "function_name": "login"
+      }
+    }
+  ],
+  "aggregates": [
+    { "name": "User", "use_case_refs": ["UC-USER-001", "UC-USER-002"] }
+  ]
+}

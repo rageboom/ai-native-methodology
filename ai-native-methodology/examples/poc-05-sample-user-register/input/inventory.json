@@ -1,0 +1,24 @@
+{
+  "$comment": "★ PoC #05 sample-user-register — analysis stage (chain 0) 산출 / chain 1 (planning) 입력. minimum scope.",
+  "project_id": "poc-05-sample-user-register",
+  "language": "TypeScript",
+  "stack_signals": [
+    "package.json: vitest",
+    "package.json: typescript",
+    "no framework (pure Node ESM)"
+  ],
+  "framework": "none-pure-node",
+  "test_runner_inferred": "vitest",
+  "source_files": [
+    "source/src/user.legacy.ts"
+  ],
+  "loc_total": 22,
+  "modules": [
+    {
+      "name": "user.legacy",
+      "exports": ["register", "login"],
+      "loc": 22,
+      "antipatterns_flagged": ["AP-USER-001", "AP-USER-002", "AP-USER-003"]
+    }
+  ]
+}

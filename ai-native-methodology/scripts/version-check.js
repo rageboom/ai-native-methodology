@@ -22,7 +22,8 @@ function readChangelogVersion() {
   const path = join(WORKSPACE, 'CHANGELOG.md');
   const text = readFileSync(path, 'utf-8');
   // ★ 첫 ## [vX.Y.Z] 헤더 parse
-  const match = text.match(/^##\s*\[v?(\d+\.\d+\.\d+)\]/m);
+  // ★ semver pre-release tag (-rc.X / -alpha.X / -beta.X / -rc1) 허용
+  const match = text.match(/^##\s*\[v?(\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?)\]/m);
   if (!match) {
     throw new Error(`[version-check] ★ CHANGELOG.md 첫 '## [vX.Y.Z]' 헤더 부재`);
   }

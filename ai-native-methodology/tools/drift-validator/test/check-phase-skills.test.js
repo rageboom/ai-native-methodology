@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { checkPhaseSkills, summarizeLayoutCheck, checkChainStageLayout, summarizeChainLayoutCheck } from '../src/check-phase-skills.js';
+import { checkPhaseSkills, summarizeLayoutCheck, checkChainStageLayout, summarizeChainLayoutCheck, checkStateFlowConsistency, summarizeStateFlowConsistency } from '../src/check-phase-skills.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -76,4 +76,34 @@ test('★ summarizeChainLayoutCheck — pass/fail 메시지 정합', () => {
 
   const fail = { ok: false, diffs: [{ severity: 'breaking', kind: 'x' }], counts: {} };
   assert.match(summarizeChainLayoutCheck(fail), /chain layout check failed/);
+});
+
+// ★ ★ ★ sub-plan-6 (sp5-c7 / Senior F8) — state.schema.json ↔ sdlc-4stage-flow.json 정합 검증
+
+test('★ state-flow consistency — current workspace 정합 ok (★ enum vs flow stages)', () => {
+  const result = checkStateFlowConsistency(WORKSPACE);
+  if (!result.ok) {
+    console.error('[state-flow] findings:');
+    for (const d of result.diffs) {
+      console.error(`  - [${d.severity}] ${d.kind}: ${d.message}`);
+    }
+  }
+  assert.equal(result.ok, true, 'state.schema enum must match sdlc-4stage-flow stages');
+  assert.equal(result.counts.flow_stages, 5, '5 flow stages (analysis/planning/spec/test/implement)');
+  assert.equal(result.counts.enum_strict_stages, 5, '5 enum strict stages (excluding revisit_pending)');
+});
+
+test('★ state-flow consistency — workspace 부재 → breaking diff', () => {
+  const result = checkStateFlowConsistency('/nonexistent/path/xyz');
+  assert.equal(result.ok, false);
+  assert.ok(result.diffs.length >= 1);
+  assert.match(result.diffs[0].kind, /missing/);
+});
+
+test('★ summarizeStateFlowConsistency — pass/fail 메시지 정합', () => {
+  const ok = { ok: true, diffs: [], counts: { enum_strict_stages: 5, flow_stages: 5, state_extra_values: 1 } };
+  assert.match(summarizeStateFlowConsistency(ok), /state-flow consistency passed/);
+  assert.match(summarizeStateFlowConsistency(ok), /5 flow stages/);
+  const fail = { ok: false, diffs: [{ severity: 'breaking', kind: 'x' }], counts: {} };
+  assert.match(summarizeStateFlowConsistency(fail), /state-flow consistency failed/);
 });

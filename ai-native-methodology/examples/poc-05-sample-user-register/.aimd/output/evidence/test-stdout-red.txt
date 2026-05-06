@@ -1,0 +1,1 @@
+JSON report written to /Users/sangcl/Documents/Development/Study/ai-native-methodology/ai-native-methodology/examples/poc-05-sample-user-register/.aimd/output/evidence/vitest-red.json

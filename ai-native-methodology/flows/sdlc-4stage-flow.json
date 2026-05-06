@@ -1,14 +1,14 @@
 {
   "$comment": "★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 + DEC-2026-05-06-harness-호칭-엄밀화 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상. ★ ★ ★ harness_status 필드 = 호칭 엄밀화 (DEC-2026-05-06-harness-호칭-엄밀화 정합) — scaffolding / harness-incomplete / harness-complete enum.",
   "id": "sdlc-4stage-flow",
-  "version": "2.0.0-dev",
+  "version": "2.0.0-rc1",
   "rendered_mermaid_path": "./sdlc-4stage-flow.mermaid",
-  "harness_status": "harness-complete",
+  "harness_status": "harness-validated",
   "harness_status_meta": {
     "$comment": "DEC-2026-05-06-harness-호칭-엄밀화 정합. enum: 'scaffolding' (sub-plan-1~4 종결 / 사양 + validator + skills) | 'harness-incomplete' (sub-plan-5 진행 중) | 'harness-complete' (sub-plan-5 종결 / 5 요소 보유) | 'harness-validated' (sub-plan-6 + ≥ 2 PoC corroboration / §8.1 strict 입증).",
-    "current": "harness-complete",
+    "current": "harness-validated",
     "transitioned_at": "2026-05-06",
-    "transitioned_by": "DEC-2026-05-06-sub-plan-5-종결 + ADR-CHAIN-005",
+    "transitioned_by": "DEC-2026-05-06-sub-plan-6-종결 + §8.1 strict 7/7 + ≥ 2 PoC corroboration (PoC #05 + PoC #03 retrofit)",
     "transitions": {
       "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증) — ★ ★ ★ ACHIEVED 2026-05-06",
       "harness-complete -> harness-validated": "sub-plan-6 종결 (PoC #05 e2e cycle pass + §8.1 strict 7/7)"

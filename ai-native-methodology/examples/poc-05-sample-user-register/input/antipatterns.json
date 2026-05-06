@@ -1,0 +1,31 @@
+{
+  "$comment": "★ PoC #05 — antipatterns 도출 (analysis stage). chain 2 (spec) avoid-list 자료.",
+  "project_id": "poc-05-sample-user-register",
+  "antipatterns": [
+    {
+      "id": "AP-USER-001",
+      "title": "이메일 중복 검사 누락",
+      "applies_to": "register()",
+      "category": "data-integrity",
+      "severity": "high",
+      "evidence_loc": "source/src/user.legacy.ts:10-15"
+    },
+    {
+      "id": "AP-USER-002",
+      "title": "비밀번호 길이 검증 누락",
+      "applies_to": "register()",
+      "category": "input-validation",
+      "severity": "medium",
+      "evidence_loc": "source/src/user.legacy.ts:10-15"
+    },
+    {
+      "id": "AP-USER-003",
+      "title": "비밀번호 plaintext 비교",
+      "applies_to": "login()",
+      "category": "security",
+      "severity": "critical",
+      "evidence_loc": "source/src/user.legacy.ts:20-21",
+      "carry_to": "v2.x — chain 4 impl 시 bcrypt/argon2 의무 (본 PoC scope OUT — 시간 비용 절제 / chain harness 검증대 본질이 아님)"
+    }
+  ]
+}

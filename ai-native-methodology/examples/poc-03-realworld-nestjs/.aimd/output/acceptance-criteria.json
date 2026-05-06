@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T18:10:00Z",
+    "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.85,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "criteria": [
+    {
+      "id": "AC-USER-SIGNUP-001",
+      "description": "이메일/사용자명 중복 가입 시 4xx 응답.",
+      "behavior_ref": "BHV-USER-SIGNUP-001",
+      "use_case_ref": "UC-USER-SIGNUP-001",
+      "gherkin": {
+        "given": ["기존에 email='alice@example.com' / username='alice' 으로 가입된 사용자가 존재한다"],
+        "when": "동일 email 또는 동일 username 으로 POST /api/users 호출",
+        "then": ["UnauthorizedException (또는 ConflictException) 이 발생한다", "users 저장소 크기는 변하지 않는다"],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-SIGNUP-001"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-USER-LOGIN-001",
+      "description": "올바른 자격증명 → JWT 반환 / 불일치 → 401.",
+      "behavior_ref": "BHV-USER-LOGIN-001",
+      "use_case_ref": "UC-USER-LOGIN-001",
+      "gherkin": {
+        "given": ["email='alice@example.com' / password='secret123' 으로 가입된 사용자가 존재한다"],
+        "when": "동일 자격증명으로 POST /api/users/login 호출",
+        "then": ["응답 body 에 token 필드 존재", "user.email == 'alice@example.com'"],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-LOGIN-001"],
+      "gate_required": true
+    }
+  ]
+}

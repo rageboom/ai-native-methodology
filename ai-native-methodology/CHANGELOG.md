@@ -9,7 +9,93 @@
 
 ---
 
-## [v1.5.0] — 2026-05-03 ⭐ 현재 (★ ★ ★ ★ MINOR — ADR-BE-001 negative-space corroboration 정식화 + error-mapping-spec deliverable 16 + phase-5-error-mapping skill 신설)
+## [v2.0.0-rc1] — 2026-05-06 ⭐ 현재 (★ ★ ★ ★ ★ MAJOR PRERELEASE — chain harness validated / SDLC 4단계 i-strict / ≥ 2 PoC corroboration / §8.1 7/7 통과)
+
+> **★ MAJOR bump 정당성** (semver §8): chain harness 가 v1.x 산출물 (한 방향 7대 추출기) 의 paradigm 을 대체. v1.x skill 호출 → v2.x chain-driven slash command (`/aimd-next`, `/aimd-stage`) 로 전환. 사용자 workflow backward-incompatible → MAJOR.
+> **★ -rc1 prerelease** (Senior F4 흡수 / 14차 retract pattern 차단): sub-plan-5 commit 같은 날 final tag ❌ / rc1 → 24h+ 후 final.
+> **청자**: 사내 onboarding + 외부 plugin install user. migration guide → `docs/MIGRATION-v1-to-v2.md`.
+
+### Highlights — chain harness validated (5 요소 코드 enforcement)
+
+| 요소 | 구현 | sub-plan |
+|---|---|---|
+| Driver / Orchestrator | `tools/chain-driver/` workspace 12번째 (cli + 6 module / 60 unit test) | sub-plan-5 |
+| State 영속 | `schemas/state.schema.json` + atomic write CAS + Windows fallback | sub-plan-5 |
+| Mechanical gate trio | (i) state.blocked + (ii) cli exit 2 + (iii) PreToolUse permissionDecision=deny | sub-plan-5 |
+| Skill auto-invoke (D21') | `hooks/hooks.json` UserPromptSubmit + PreToolUse / suppressOutput=true / additionalContext 차단 문구 | sub-plan-5 |
+| Chain-revisit detector | `revisit-detect.js` git diff --numstat + LOC threshold + ignore-globs | sub-plan-5 |
+
+### What's new
+
+- **SDLC 4단계 chain harness** (DEC-2026-05-06-v2.0-i-strict-채택): chain 1 planning → chain 2 spec (behavior + acceptance + 7대 통합) → chain 3 test (RED) → chain 4 impl (GREEN / 100% test pass).
+- **chain validator 4종** (sub-plan-3a/3b): planning-extraction / chain-coverage / spec-test-link / test-impl-pass-validator.
+- **chain skill 13** (sub-plan-4): _base 2 + planning 3 + spec 3 + test 3 + implement 2.
+- **chain stage flow 5** (sub-plan-4): {analysis,planning,spec,test,implement}.phase-flow.{json,mermaid} + sdlc-4stage-flow.{json,mermaid} 통합 SSOT.
+- **5 ADR-CHAIN** (sub-plan-2 + sub-plan-5): chain-4-stage-enforcement / go-stop-gate / revisit-loop / test-runner-invocation-contract / driver-state-machine.
+- **release-readiness.js** (sub-plan-6): §8.1 strict 7/7 자동 검사 + 9 self-test (Senior F3 — file presence ❌ / content-aware delegated tool).
+- **drift-validator `--check-state-flow-consistency`** (sub-plan-6 / sp5-c7): state.schema enum ↔ sdlc-4stage-flow stages 정합 build-time 검증.
+
+### PoC corroboration (≥ 2)
+
+| PoC | Scope | Status |
+|---|---|---|
+| **PoC #05 sample-user-register** | chain 1~4 e2e single-cycle (2 UC + 2 BR + 2 TC + 2 IMPL / vitest 6/6 pass) | ★ ★ ★ corroboration #1 |
+| **PoC #03 NestJS retrofit** | chain 1~2 + chain 3 RED dry-run (2 UC subset / signup + login) | corroboration #2 |
+
+### §8.1 strict 7/7 (release gate)
+
+```
+✅ 1. poc_corroboration: 2 PoC
+✅ 2. real_tool_evidence: 5종 물증 7 필드 (10 fields) all present / sha256 valid
+✅ 3. validators_violation: 4 validators all 0 critical/high
+✅ 4. chain_coverage: 1.0 / threshold 0.85
+✅ 5. adr_registry: 5 ADR-CHAIN 모두 status: 승인됨 + 결정 section
+✅ 6. matrix_greenness: forward=1 / backward=1 / cells=2 / green=2
+✅ 7. e2e_cycle_pass: pass=6 / fail=0 (chain 4 GREEN)
+```
+
+### Breaking changes
+
+1. **Workflow paradigm**: v1.x = `/init` → 7대 산출물 → 끝. v2.0 = `chain-driver init` → 4 stage gate. v1.x skill 직접 호출 시 mechanical gate trio 가 차단할 수 있음.
+2. **state.json 영속 의무**: 사용자 프로젝트에 `.aimd/state.json` 자동 생성 (chain-driver init). v1.x = 영속 state 없음.
+3. **PreToolUse hook**: `.aimd/output/**` 대상 Write/Edit 시 driver 가 차단 가능 (state.blocked=true 일 때).
+4. **harness 호칭**: "한 방향 추출기" ❌ → "SDLC 4단계 chain harness". README + plugin.json description 변경.
+
+### Migration
+
+`docs/MIGRATION-v1-to-v2.md` 참조.
+
+### unit test 회귀 (210 = 201 workspace + 9 release-readiness)
+
+| 영역 | v1.5.0 | v2.0.0-rc1 |
+|---|---|---|
+| drift-validator | 44 | **47** (+3 state-flow) |
+| 그 외 10 도구 | 94 | 94 |
+| chain-driver | — | **60** (sub-plan-5 신설) |
+| **workspace 합계** | 138 | **★ 201** |
+| release-readiness self-test | — | **9** |
+| **총 합계** | 138 | **★ ★ ★ ★ ★ 210** |
+
+### Carry (v2.0.x → v2.1+)
+
+- sp6-c1 RealWorld scale e2e (PoC #03 진짜 jest + impl) — v2.1+
+- sp6-c2 intervention-log dashboard — v2.1+
+- sp6-c3 Auto Mode 차단 임계 분포 분석 — v2.1+
+- sp6-c4 PoC #04 retrofit (FE 트랙) — v2.1+ (★ v2.0 = BE-only corroboration / Senior F7)
+- sp6-c5 tree-sitter semantic diff (sp5-c1) — v2.x
+- sp6-c6 다중 사용자 driver state 동시성 (sp5-c2) — v2.x
+- sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
+- sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
+
+### v2.0.0-rc1 → v2.0.0 final
+
+- **동일 commit 같은 날 final tag ❌** (Senior F4 / 14차 retract pattern 차단).
+- final = 2026-05-07 이후 + clean clone 1회 PoC #05 e2e 재실행 통과 시.
+- v2.0.1 trigger 명문화 (Senior F7): release-readiness regress 1+ / Senior HIGH 1+ / 7일 carry > 3.
+
+---
+
+## [v1.5.0] — 2026-05-03 (★ ★ ★ ★ MINOR — ADR-BE-001 negative-space corroboration 정식화 + error-mapping-spec deliverable 16 + phase-5-error-mapping skill 신설)
 
 ### ★ ★ ★ ★ 배경 — §8.1 strict 정합 검증대 ★ 두 번째 통과 (negative-space 변형)
 

@@ -11,7 +11,7 @@ import { compareStateMachine, compareSequence, summarize } from './compare.js';
 import { normalizePhaseFlowJson, normalizePhaseFlow } from './normalize-phase-flow.js';
 import { comparePhaseFlow } from './compare-phase-flow.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from './baseline.js';
-import { checkPhaseSkills, summarizeLayoutCheck, checkChainStageLayout, summarizeChainLayoutCheck } from './check-phase-skills.js';
+import { checkPhaseSkills, summarizeLayoutCheck, checkChainStageLayout, summarizeChainLayoutCheck, checkStateFlowConsistency, summarizeStateFlowConsistency } from './check-phase-skills.js';
 
 function findPairs(dir) {
   const pairs = [];
@@ -143,6 +143,27 @@ function main() {
     process.exit(result.ok ? 0 : 1);
   }
 
+  // ★ ★ ★ v2.0 sub-plan-6 (sp5-c7 carry / Senior F8) — state.schema.json ↔ sdlc-4stage-flow.json 정합 검증
+  if (args.includes('--check-state-flow-consistency')) {
+    const targetArg = args.find((a) => !a.startsWith('--')) ?? process.cwd();
+    const workspaceRoot = findWorkspaceRoot(targetArg);
+    if (!workspaceRoot) {
+      console.error(`[--check-state-flow-consistency] could not locate workspace root from: ${targetArg}`);
+      process.exit(2);
+    }
+    const result = checkStateFlowConsistency(workspaceRoot);
+    const jsonOut = args.includes('--json');
+    if (jsonOut) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      console.log(summarizeStateFlowConsistency(result));
+      for (const d of result.diffs) {
+        console.log(`  - [${d.severity}] ${d.kind} — ${d.message}`);
+      }
+    }
+    process.exit(result.ok ? 0 : 1);
+  }
+
   // ★ ★ v2.0 sub-plan-4 신설 — chain stage layout 검증 모드
   if (args.includes('--check-chain-layout')) {
     const targetArg = args.find((a) => !a.startsWith('--')) ?? process.cwd();
@@ -168,6 +189,7 @@ function main() {
     console.error('usage: drift-validator <dir-or-file> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
     console.error('       drift-validator --check-layout [<workspace-root>] [--json]   ★ v1.4.4 — manifest ↔ workflow ↔ skills 3-way layout 검증');
     console.error('       drift-validator --check-chain-layout [<workspace-root>] [--json]   ★ ★ v2.0 sub-plan-4 — chain stage layout 검증');
+    console.error('       drift-validator --check-state-flow-consistency [<workspace-root>] [--json]   ★ ★ ★ v2.0 sub-plan-6 — state.schema enum ↔ sdlc-4stage-flow stages 정합');
     process.exit(2);
   }
   const target = args[0];

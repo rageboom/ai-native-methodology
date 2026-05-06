@@ -53,7 +53,8 @@ const WINDOWS_PATH_LIMIT = 260;
 function readPluginVersion() {
   const pluginJsonPath = join(WORKSPACE, '.claude-plugin', 'plugin.json');
   const data = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
-  if (!data.version || !/^\d+\.\d+\.\d+$/.test(data.version)) {
+  // ★ semver pre-release tag (e.g. 2.0.0-rc1) 허용 — sub-plan-6 v2.0.0-rc1 정합
+  if (!data.version || !/^\d+\.\d+\.\d+(-[A-Za-z0-9.-]+)?$/.test(data.version)) {
     throw new Error(`invalid plugin.json version: ${data.version}`);
   }
   return data.version;

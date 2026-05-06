@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T16:00:00Z",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "domain_context_md"],
+    "confidence": 0.95,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "source/src/user.legacy.ts"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "사용자 가입 + 인증 (이메일 기반) — PoC sample 도메인 / RealWorld scale ❌",
+    "stakeholders": ["end-user", "auth-team"],
+    "success_criteria": [
+      "이메일 중복 가입 차단율 100%",
+      "비밀번호 길이 < 8자 거부율 100%",
+      "올바른 인증 정보로 로그인 성공률 100%"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-USER-001",
+      "name": "신규 사용자 등록",
+      "description": "POST /users — 이메일/비밀번호로 신규 사용자 등록. 이메일 중복 시 409 / 비밀번호 < 8자 시 400.",
+      "actors": ["anonymous"],
+      "preconditions": ["요청에 email + password 포함"],
+      "postconditions": ["users 저장소에 신규 user 1건 추가"],
+      "acceptance_criteria_refs": ["AC-USER-001"],
+      "source_grounded_evidence": [
+        "source/src/user.legacy.ts:10-15 (function register)"
+      ]
+    },
+    {
+      "id": "UC-USER-002",
+      "name": "로그인",
+      "description": "POST /users/login — 이메일/비밀번호 일치 시 user 반환 / 불일치 시 401.",
+      "actors": ["anonymous"],
+      "preconditions": ["요청에 email + password 포함"],
+      "postconditions": ["일치 시 user 객체 반환"],
+      "acceptance_criteria_refs": ["AC-USER-002"],
+      "source_grounded_evidence": [
+        "source/src/user.legacy.ts:17-22 (function login)"
+      ]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-USER-DATA-001",
+      "reasoning": "이메일 = 시스템 내 사용자 식별자 / 중복 허용 시 인증 / 인가 충돌. 데이터 무결성 의무.",
+      "source_grounded_evidence": "source/src/user.legacy.ts:10-15 — register() 가 중복 검사 미수행 (legacy 결함)"
+    },
+    {
+      "br_id": "BR-USER-VALIDATION-001",
+      "reasoning": "비밀번호 8자 미만 = 무차별 공격 취약 / 산업 표준 (NIST SP 800-63B 권고).",
+      "source_grounded_evidence": "source/src/user.legacy.ts:10-15 — register() 가 length 검증 미수행 (legacy 결함)"
+    }
+  ],
+  "out_of_scope": [
+    "비밀번호 해시 (AP-USER-003 / bcrypt/argon2 — v2.x carry / 본 PoC scope OUT)",
+    "JWT 발급 (별개 도메인)",
+    "이메일 인증 메일 발송 (별개 도메인)"
+  ],
+  "risks_and_constraints": [
+    "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무",
+    "in-memory store (테스트 전용) — production = DB 정합 의무"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json"
+    ]
+  }
+}

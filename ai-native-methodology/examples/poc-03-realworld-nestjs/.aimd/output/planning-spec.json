@@ -1,0 +1,73 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T18:00:00Z",
+    "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "domain_context_md"],
+    "confidence": 0.85,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "output/rules/rules.json",
+      "output/domain/domain.json",
+      "output/inventory/inventory.json"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "RealWorld NestJS — User identity + auth + JWT (★ chain 1~2 retrofit subset / signup + login 만)",
+    "stakeholders": ["end-user", "auth-team"],
+    "success_criteria": [
+      "이메일 중복 가입 차단율 100%",
+      "올바른 자격증명으로 로그인 성공률 100%"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-USER-SIGNUP-001",
+      "name": "Signup",
+      "description": "POST /api/users — 신규 사용자 등록. 이메일/사용자명 중복 시 4xx.",
+      "actors": ["Anonymous"],
+      "preconditions": [],
+      "postconditions": ["users 테이블에 신규 row 1건"],
+      "acceptance_criteria_refs": ["AC-USER-SIGNUP-001"],
+      "source_grounded_evidence": [
+        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.create)"
+      ]
+    },
+    {
+      "id": "UC-USER-LOGIN-001",
+      "name": "Login",
+      "description": "POST /api/users/login — 이메일/비밀번호 일치 시 user + JWT 반환.",
+      "actors": ["Anonymous"],
+      "preconditions": [],
+      "postconditions": ["JWT 발급 / user 객체 반환"],
+      "acceptance_criteria_refs": ["AC-USER-LOGIN-001"],
+      "source_grounded_evidence": [
+        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.findOne + generateJWT)"
+      ]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+      "reasoning": "이메일/사용자명 = 시스템 식별자 / 중복 시 인증 충돌. RealWorld 명세 의무.",
+      "source_grounded_evidence": "output/rules/rules.json BR-USER-USERNAME-EMAIL-UNIQUE-001 + output/db/schema.json users UNIQUE constraint"
+    }
+  ],
+  "out_of_scope": [
+    "UC-USER-FIND-CURRENT / UC-USER-UPDATE / UC-USER-DELETE (★ 본 retrofit subset OUT — sub-plan-6 시간 제약)",
+    "Article / Comment / Tag / Profile bounded context (★ retrofit subset OUT)"
+  ],
+  "risks_and_constraints": [
+    "70~80% 자동화 한계 — gate별 사용자 검토 의무",
+    "본 PoC = chain 1~2 + chain 3 RED dry-run / chain 4 GREEN 미실행 (sub-plan-6 D26' 정합 / corroboration #2 자격)"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "examples/poc-03-realworld-nestjs/output/rules/rules.json",
+      "examples/poc-03-realworld-nestjs/output/domain/domain.json"
+    ]
+  }
+}

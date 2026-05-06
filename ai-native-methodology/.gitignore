@@ -7,3 +7,8 @@ package-lock.json
 
 # tool 5종 자체 출력 (★ tools/<name>/out/ 등)
 tools/**/out/
+
+# ★ ★ ★ chain harness driver runtime state (PoC 별 영속 / sub-plan-5+)
+examples/**/.aimd/state.json
+examples/**/.aimd/state.json.tmp
+examples/**/.aimd/output/intervention-log.jsonl

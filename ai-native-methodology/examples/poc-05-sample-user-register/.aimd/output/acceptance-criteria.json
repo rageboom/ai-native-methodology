@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T16:35:00Z",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.95,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "criteria": [
+    {
+      "id": "AC-USER-001",
+      "description": "이메일 중복 등록 시 409 Conflict (BR-USER-DATA-001).",
+      "behavior_ref": "BHV-USER-001",
+      "use_case_ref": "UC-USER-001",
+      "gherkin": {
+        "given": [
+          "기존에 email='alice@example.com' 으로 가입된 사용자가 존재한다"
+        ],
+        "when": "동일 email='alice@example.com' / password='secret123' 으로 register 호출",
+        "then": [
+          "EmailDuplicateError 가 발생한다",
+          "users 저장소 크기는 변하지 않는다"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-001"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-USER-002",
+      "description": "올바른 자격증명으로 login 시 user 객체 반환 / 불일치 시 401.",
+      "behavior_ref": "BHV-USER-002",
+      "use_case_ref": "UC-USER-002",
+      "gherkin": {
+        "given": [
+          "email='alice@example.com' / password='secret123' 으로 가입된 사용자가 존재한다"
+        ],
+        "when": "동일 email + 동일 password 로 login 호출",
+        "then": [
+          "user 객체가 반환된다 (id !== null)",
+          "user.email == 'alice@example.com'"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-002"],
+      "gate_required": true
+    }
+  ]
+}

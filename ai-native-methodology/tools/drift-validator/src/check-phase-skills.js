@@ -283,3 +283,91 @@ export function summarizeChainLayoutCheck(result) {
   const breaking = diffs.filter((d) => d.severity === 'breaking').length;
   return `❌ chain layout check failed — ${breaking} breaking / ${diffs.length} total findings`;
 }
+
+// ★ ★ ★ sub-plan-6 (sp5-c7 carry / Senior F8) — state.schema.json `current_chain` enum
+//     ↔ flows/sdlc-4stage-flow.json `stages[].id` 정합 build-time 검증.
+const STATE_SCHEMA_PATH = 'schemas/state.schema.json';
+const SDLC_FLOW_PATH = 'flows/sdlc-4stage-flow.json';
+const STATE_EXTRA_VALUES = ['revisit_pending']; // not a stage; runtime-only state
+
+export function checkStateFlowConsistency(workspaceRoot) {
+  const diffs = [];
+
+  const schemaPath = join(workspaceRoot, STATE_SCHEMA_PATH);
+  const flowPath = join(workspaceRoot, SDLC_FLOW_PATH);
+  if (!existsSync(schemaPath)) {
+    diffs.push({
+      severity: 'breaking',
+      kind: 'state-flow.missing-state-schema',
+      message: `${STATE_SCHEMA_PATH} not found (sub-plan-5 신설 / sub-plan-6 검증 의무)`,
+    });
+    return summary(diffs, 0, 0);
+  }
+  if (!existsSync(flowPath)) {
+    diffs.push({
+      severity: 'breaking',
+      kind: 'state-flow.missing-sdlc-flow',
+      message: `${SDLC_FLOW_PATH} not found`,
+    });
+    return summary(diffs, 0, 0);
+  }
+  const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+  const flow = JSON.parse(readFileSync(flowPath, 'utf-8'));
+
+  const enumValues = schema?.properties?.current_chain?.enum;
+  if (!Array.isArray(enumValues)) {
+    diffs.push({
+      severity: 'breaking',
+      kind: 'state-flow.no-current-chain-enum',
+      message: 'state.schema.json properties.current_chain.enum missing or not an array',
+    });
+    return summary(diffs, 0, 0);
+  }
+  const flowStageIds = (flow?.stages || []).map((s) => s.id);
+
+  const stageStrict = enumValues.filter((v) => !STATE_EXTRA_VALUES.includes(v));
+  const enumSet = new Set(stageStrict);
+  const flowSet = new Set(flowStageIds);
+
+  for (const v of enumSet) {
+    if (!flowSet.has(v)) {
+      diffs.push({
+        severity: 'breaking',
+        kind: 'state-flow.enum-not-in-flow',
+        message: `state.schema enum value '${v}' has no matching flow stage`,
+      });
+    }
+  }
+  for (const id of flowSet) {
+    if (!enumSet.has(id)) {
+      diffs.push({
+        severity: 'breaking',
+        kind: 'state-flow.flow-stage-not-in-enum',
+        message: `flow stage id '${id}' missing from state.schema enum`,
+      });
+    }
+  }
+
+  return summary(diffs, enumSet.size, flowSet.size);
+
+  function summary(diffs, enumCount, flowCount) {
+    return {
+      ok: diffs.length === 0,
+      diffs,
+      counts: {
+        enum_strict_stages: enumCount,
+        flow_stages: flowCount,
+        state_extra_values: STATE_EXTRA_VALUES.length,
+      },
+    };
+  }
+}
+
+export function summarizeStateFlowConsistency(result) {
+  const { ok, diffs, counts } = result;
+  if (ok) {
+    return `✅ state-flow consistency passed — ${counts.flow_stages} flow stages / ${counts.enum_strict_stages} enum stages match / +${counts.state_extra_values} runtime-only enum values (e.g. revisit_pending)`;
+  }
+  const breaking = diffs.filter((d) => d.severity === 'breaking').length;
+  return `❌ state-flow consistency failed — ${breaking} breaking / ${diffs.length} total findings`;
+}
