@@ -27,6 +27,7 @@ const INCLUDE = [
   'templates',
   'methodology-spec',
   'schemas',
+  'guides',                  // ★ ★ cleanup round 2-C — 사용자 journey 자산
   'CHANGELOG.md',
   'CHANGELOG-HISTORY.md',
   'README.md',

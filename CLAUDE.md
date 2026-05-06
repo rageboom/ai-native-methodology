@@ -106,8 +106,9 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 참고
 
-- `ai-native-methodology/README.md` — 방법론 소개 (★ v1.4.x plugin install 가이드 포함)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ 현재 **v1.4.3 PATCH** — adoption 폐기 + workspace 단일 통합 + build script 1차 도입)
+- `ai-native-methodology/README.md` — 방법론 소개 (★ v2.0.0-rc1 plugin install 가이드 + 시나리오 A/B/C)
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ ★ 현재 **v2.0.0-rc1 chain harness validated** — sub-plan-6 종결 + cleanup round 1/2-A/2-B/2-B 후속/2-C/2-D)
+- `ai-native-methodology/guides/` — ★ ★ 사용자 journey 자산 (cleanup round 2-C 신설 / getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
 - `ai-native-methodology/archive/v1.3-adoption/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적 / cleanup round 1 격리)
 - `ai-native-methodology/archive/phase-a-iteration/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template / cleanup round 1 격리 / v2.0 chain harness paradigm 후 outdated)
 - `ai-native-methodology/archive/v1.3-adoption/lessons-learned-2026-05-02.md` — ★ 14차 결단 1일 retract Lessons Learned (cleanup round 1 격리)

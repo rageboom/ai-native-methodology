@@ -87,6 +87,30 @@
 - sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
 - sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
 
+### Cleanup round 2-C / 2-D (2026-05-06 / DEC-2026-05-06-cleanup-round-2-C-D / journey 자산 + project root sync)
+
+★ ★ ★ cleanup round 2 series **마지막 단계**.
+
+**Round 2-C** = `guides/` 디렉토리 신설 (5 file):
+- `getting-started.md` (시나리오 A/B/C + 10분 walkthrough)
+- `chain-harness-guide.md` (chain-driver mental model + state.json + 5 요소)
+- `common-errors.md` (FAQ 14건)
+- `first-prompt-cookbook.md` (자연어 → skill 34 매핑)
+- `guides/README.md` (navigation)
+
+**Round 2-D** = project root `CLAUDE.md` v1.4.3 → v2.0.0-rc1 라벨 sync + guides/ 추가 (LLM 자동 컨텍스트 / dist 미포함).
+
+dist 251 → **256** files (+5) / shasum 255 OK. build-plugin.js INCLUDE 에 'guides' 추가.
+
+**cleanup round 2 series 종결** — 사용자 진짜 의도 ("정돈 + 각 폴더 visible + journey friction 해소") 모두 정합:
+- 1 (`80cb783`) — docs/ archive 격리
+- 2-A (`b25a8ad`) — paradigm sync (327 → 241)
+- 2-B (`307f55b`) — 10 신설 (★ 사용자 진짜 핵심)
+- 2-B 후속 (`8b7effe`) — 9 도구 표준화 + 10 placeholder
+- 2-C/2-D (현재) — journey 자산 + project root sync
+
+**Carry (v2.1+)**: CHANGELOG 추가 격리 / guides 보강 / mermaid 시각화 / v2.0.0 final tag.
+
 ### Cleanup round 2-B 후속 (2026-05-06 / DEC-2026-05-06-cleanup-round-2-B-followup / 표준화 + placeholder 정돈)
 
 ★ ★ Round 2-B 후속 — (1) 9 도구 README 표준 schema 통일 (Purpose / When / In / Out / Exit / Siblings / 참조) / (2) 10 placeholder README 정돈 / (3) schemas/README 갱신 (11 → **29 schema**).
