@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// build-plugin.js — workspace source → dist/internal-v<version>/ plugin artifact 추출
+// build-plugin.js — workspace source → dist/ai-native-methodology-v<version>/ plugin artifact 추출
 // ★ 본 plan (warm-brewing-moth.md) Phase 3 — Official Docs / Industry Case / Senior Engineer 토론 보강 7건 반영
 // usage:
 //   node scripts/build-plugin.js              # build (★ dist 생성)
@@ -120,7 +120,7 @@ function sha256(filePath) {
 async function build() {
   const version = readPluginVersion();
   const distRoot = join(WORKSPACE, 'dist');
-  const target = join(distRoot, `internal-v${version}`);
+  const target = join(distRoot, `ai-native-methodology-v${version}`);
 
   console.log(`[build-plugin] workspace: ${WORKSPACE}`);
   console.log(`[build-plugin] target:    ${target}`);

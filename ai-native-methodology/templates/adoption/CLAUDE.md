@@ -1,11 +1,11 @@
 <!--
 provenance:
   source: ai-native-methodology / templates/adoption/CLAUDE.md
-  build_script: scripts/build-plugin.js → dist/internal-v<version>/CLAUDE.md (alias)
+  build_script: scripts/build-plugin.js → dist/ai-native-methodology-v<version>/CLAUDE.md (alias)
   사용자_직접_편집: true (정책 inline)
   status: active (★ v2.0.0-rc1 chain harness paradigm 정합)
   notes: |
-    본 파일은 사내 적용 시 build script 가 dist/internal-v<version>/CLAUDE.md 로 별칭 복사하는 진입점.
+    본 파일은 사내 적용 시 build script 가 dist/ai-native-methodology-v<version>/CLAUDE.md 로 별칭 복사하는 진입점.
     workspace 본체 CLAUDE.md (외부 컨테이너) 와 별도 — plugin install 후 LLM 자동 컨텍스트 전용 customization.
 -->
 

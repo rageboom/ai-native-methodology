@@ -19,6 +19,25 @@
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
 
+## ★ cleanup round 2-E (2026-05-06) — build artifact path 정합
+
+DEC-2026-05-06-cleanup-round-2-E.
+
+`dist/internal-v<version>/` → **`dist/ai-native-methodology-v<version>/`** (사용자 명시 결단 / v1.4.3 시점 prefix 가 v2.0 paradigm + plugin user 환경 path 와 stale).
+
+| 영역 | before | after |
+|---|---|---|
+| build artifact path | `dist/internal-v2.0.0-rc1/` | `dist/ai-native-methodology-v2.0.0-rc1/` |
+| plugin user 환경 path 정합 | ❌ | ✅ (`~/claude-plugins/ai-native-methodology-v<version>/` 일치) |
+| dist file count | 256 | 256 (변경 0 / path rename) |
+| shasum | — | 255 OK |
+
+7 자산 갱신 (build-plugin.js + README + guides/common-errors + templates/adoption/CLAUDE + templates/README + project root CLAUDE) / historical (archive + DEC + CHANGELOG entry) 보존.
+
+★ no release / no tag / v2.0.0 final 자격 영향 ❌.
+
+---
+
 ## ★ ★ ★ cleanup round 2-C / 2-D (2026-05-06) — journey 자산 + project root sync (★ cleanup round 2 series 종결)
 
 DEC-2026-05-06-cleanup-round-2-C-D.

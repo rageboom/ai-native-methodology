@@ -77,7 +77,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 
 #### B. 배포 수신자 — dist artifact 등록 (사내 동료)
 
-빌드된 artifact (`dist/internal-v2.0.0-rc1/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
+빌드된 artifact (`dist/ai-native-methodology-v2.0.0-rc1/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
 
 ```bash
 # 받은 dist 폴더를 임의 위치에 풀기:
@@ -168,7 +168,7 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 ## 디렉토리 구조 (dist artifact 기준)
 
 ```
-dist/internal-v2.0.0-rc1/
+dist/ai-native-methodology-v2.0.0-rc1/
 ├── .claude-plugin/
 │   ├── plugin.json                   v2.0.0-rc1 manifest
 │   └── marketplace.json              source: "./" (자기완결)

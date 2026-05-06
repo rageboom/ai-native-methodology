@@ -109,7 +109,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 ### Q12. CHECKSUMS.txt 무결성 검증 fail
 
 ```bash
-cd dist/internal-v2.0.0-rc1
+cd dist/ai-native-methodology-v2.0.0-rc1
 shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 # → 어느 파일 hash mismatch 인지 확인
 ```

@@ -87,6 +87,16 @@
 - sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
 - sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
 
+### Cleanup round 2-E (2026-05-06 / DEC-2026-05-06-cleanup-round-2-E / build path 정합)
+
+★ 사용자 명시 결단 — `dist/internal-v<version>/` → **`dist/ai-native-methodology-v<version>/`**.
+
+v1.4.3 시점 `internal-` prefix 가 v2.0 paradigm + plugin user 환경 path (`~/claude-plugins/ai-native-methodology-v<version>/`) 와 stale. paradigm change cascading drift 추가 회수.
+
+7 자산 갱신: `scripts/build-plugin.js` (line 2 + 123) / `README.md` (line 80, 171) / `guides/common-errors.md` / `templates/adoption/CLAUDE.md` / `templates/README.md` / project root `CLAUDE.md`. historical (archive + DEC-historical + CHANGELOG entry) 보존.
+
+dist 256 files (변경 0 / path rename) / shasum -c 255 OK.
+
 ### Cleanup round 2-C / 2-D (2026-05-06 / DEC-2026-05-06-cleanup-round-2-C-D / journey 자산 + project root sync)
 
 ★ ★ ★ cleanup round 2 series **마지막 단계**.

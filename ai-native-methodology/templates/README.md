@@ -29,7 +29,7 @@
 
 | 파일 | dist root 별칭 |
 |---|---|
-| `templates/adoption/CLAUDE.md` | `dist/internal-v<version>/CLAUDE.md` (★ build script auto copy) |
+| `templates/adoption/CLAUDE.md` | `dist/ai-native-methodology-v<version>/CLAUDE.md` (★ build script auto copy) |
 
 ★ build-plugin.js 가 본 파일을 dist root CLAUDE.md 로 alias 복사. plugin install 후 매 Claude Code 세션 자동 로드. 사내 적용 정책 23 inline (chain harness 5 요소 + 검증 도구 12 + NestJS 4 + Spring 5).
 

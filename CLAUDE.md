@@ -88,7 +88,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 - `ai-native-methodology/tools/` — Node CLI 도구 12종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner / schema-validator / planning-extraction-validator / chain-coverage-validator / spec-test-link-validator / traceability-matrix-builder / test-impl-pass-validator / ★ ★ ★ chain-driver — sub-plan-5 / harness 5 요소 enforcement) — ★ 자체 package.json 독립 + npm workspace
 - `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json + marketplace.json) / Claude Code plugin 시스템 진입점
 - `ai-native-methodology/agents/` + `skills/` + `hooks/` + `flows/` — plugin 자산 (★ install 후 자연어 prompt 매칭 / lifecycle stage organize)
-- `ai-native-methodology/scripts/` — build-plugin.js + version-check.js (★ v1.4.3 도입 / build artifact `dist/internal-v<version>/` 추출)
+- `ai-native-methodology/scripts/` — build-plugin.js + version-check.js (★ v1.4.3 도입 / build artifact `dist/ai-native-methodology-v<version>/` 추출 / cleanup round 2-E `internal-` prefix 제거 → plugin user 환경 path 정합)
 - `ai-native-methodology/examples/poc-01-realworld-spring/` — PoC #01 (Java/Spring Boot 2.5) ✅ 종료
 - `ai-native-methodology/examples/poc-02-realworld-springboot3/` — PoC #02 (Java/Spring Boot 3.3 Hexagonal) ✅ 종료
 - `ai-native-methodology/examples/poc-03-realworld-nestjs/` — PoC #03 (TypeScript/NestJS) ✅ 종료 (★ platform-agnostic 입증)
