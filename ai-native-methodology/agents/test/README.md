@@ -44,9 +44,9 @@ chain 3 (test) = **acceptance-criteria 기반 실 test 코드 자동 생성** (R
 
 ## skills
 
-- `skills/test/generate-test-spec/` ★ sub-plan-4 신설 (chain 3 main)
-- `skills/test/run-test-evidence/` ★ sub-plan-4 신설 (실 runner 5종 물증)
-- `skills/test/verify-coverage/` ★ sub-plan-4 신설 (coverage ≥ 0.85)
+- `skills/test/generate-test-spec/` ★ sub-plan-4 채움 ✅ (chain 3 main)
+- `skills/test/run-test-evidence/` ★ sub-plan-4 채움 ✅ (실 runner 5종 물증)
+- `skills/test/verify-coverage/` ★ sub-plan-4 채움 ✅ (coverage ≥ 0.85)
 
 ## chain harness 정합 (★ v2.0)
 

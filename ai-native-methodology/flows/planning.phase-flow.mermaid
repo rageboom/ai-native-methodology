@@ -1,0 +1,52 @@
+%% ★ ★ v2.0 chain 1 (planning) phase flow — 사람 눈 (mermaid)
+%% AI 눈 짝: planning.phase-flow.json (drift-validator 호환)
+%% ADR-008 v2 §10 (chain 단계 이중 렌더링) + ADR-CHAIN-001 정합
+
+flowchart TB
+    subgraph C1["★ Chain 1 — planning (legacy single-case)"]
+        direction TB
+
+        P10["P1.0 — input 검증<br/>analysis 7대 + 8 FE + finding + AP + migration"]
+        P11["P1.1 — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
+        P12["P1.2 — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
+        P13["P1.3 — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
+        P14["★ ★ ★ P1.4 — gate #1 (사용자 결단)<br/>invoke-go-stop-gate / cluster 5~6"]
+
+        P10 --> P11
+        P10 --> P12
+        P11 --> P13
+        P12 --> P13
+        P13 --> P14
+    end
+
+    subgraph IN["analysis stage 산출물 (input)"]
+        direction LR
+        IN_OUT["7대 BE + 8 FE 산출물<br/>+ Phase 4.5 (state-machine / sequence / decision-table)<br/>+ finding + antipatterns + migration-cautions"]
+    end
+
+    subgraph OUT["chain 1 산출물"]
+        direction LR
+        OUT_JSON["planning-spec.json (deliverable 17)"]
+        OUT_MD["planning-spec.md (사람 눈 / ADR-008 v2)"]
+    end
+
+    subgraph NEXT["chain 2 (spec) 진입"]
+        N1["compose-behavior-spec skill<br/>spec.phase-flow.json"]
+    end
+
+    IN --> P10
+    P13 --> OUT_JSON
+    P13 --> OUT_MD
+    P14 -->|"go"| NEXT
+    P14 -.->|"stop"| STOP["sprint 중단 / carry"]
+    P14 -.->|"revisit:analysis"| IN
+
+    %% Style
+    classDef chain1 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
+    classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef out fill:#d4edda,stroke:#155724,stroke-width:2px
+    classDef stop fill:#f8d7da,stroke:#721c24
+    class C1 chain1
+    class P14 gate
+    class OUT out
+    class STOP stop

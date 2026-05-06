@@ -44,9 +44,9 @@ chain 2 (spec) = **planning-spec + analysis 7대 산출물 통합 → executable
 
 ## skills
 
-- `skills/spec/compose-behavior-spec/` ★ sub-plan-4 신설 (chain 2 main)
-- `skills/spec/derive-acceptance-criteria/` ★ sub-plan-4 신설 (Gherkin BDD AC-*)
-- `skills/spec/integrate-7대-deliverables/` ★ sub-plan-4 신설 (cross-link 강제)
+- `skills/spec/compose-behavior-spec/` ★ sub-plan-4 채움 ✅ (chain 2 main)
+- `skills/spec/derive-acceptance-criteria/` ★ sub-plan-4 채움 ✅ (Gherkin BDD AC-*)
+- `skills/spec/integrate-7대-deliverables/` ★ sub-plan-4 채움 ✅ (cross-link 강제)
 
 ## 검증 도구
 

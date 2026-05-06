@@ -1,0 +1,81 @@
+{
+  "$comment": "★ ★ v2.0 chain 2 (spec) phase flow — AI 눈 짝 (spec.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. planning-spec + analysis 7대/Phase 4.5 통합 → behavior-spec + acceptance-criteria 산출. UC → BHV → AC 1:N forward link 의무.",
+  "id": "spec-phase-flow",
+  "version": "2.0.0-dev",
+  "stage": "spec",
+  "chain": 2,
+  "rendered_mermaid_path": "./spec.phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "P2.0",
+      "name": "input 통합 (planning + analysis)",
+      "depends_on": [],
+      "inputs": ["planning-spec.json", "behavior-spec input candidates"],
+      "outputs": ["integrated_input"],
+      "skills": ["compose-behavior-spec"],
+      "skills_dir": "skills/spec/"
+    },
+    {
+      "id": "P2.1",
+      "name": "behavior-spec 합성 (BHV-*)",
+      "depends_on": ["P2.0"],
+      "inputs": ["planning-spec.use_cases", "Phase 4.5 산출물"],
+      "outputs": ["behavior-spec.json (behaviors[])"],
+      "skills": ["compose-behavior-spec"],
+      "skills_dir": "skills/spec/"
+    },
+    {
+      "id": "P2.2",
+      "name": "acceptance-criteria 분해 (AC-*)",
+      "depends_on": ["P2.1"],
+      "inputs": ["behavior-spec.json"],
+      "outputs": ["acceptance-criteria.json (criteria[])"],
+      "skills": ["derive-acceptance-criteria"],
+      "skills_dir": "skills/spec/"
+    },
+    {
+      "id": "P2.3",
+      "name": "7대 산출물 cross-link 통합",
+      "depends_on": ["P2.1", "P2.2"],
+      "inputs": ["behavior-spec.json", "analysis 산출물 path"],
+      "outputs": ["behavior-spec.cross_links.to_analysis_artifacts[]"],
+      "skills": ["integrate-7대-deliverables"],
+      "skills_dir": "skills/spec/"
+    },
+    {
+      "id": "P2.4",
+      "name": "behavior-diagrams 통합 렌더 + 검증",
+      "depends_on": ["P2.1", "P2.2", "P2.3"],
+      "inputs": ["behavior-spec.json", "acceptance-criteria.json"],
+      "outputs": ["behavior-spec.md", "behavior-diagrams.mermaid", "acceptance-criteria.md"],
+      "skills": ["compose-behavior-spec"],
+      "skills_dir": "skills/spec/",
+      "automated_validation": ["chain-coverage-validator", "drift-validator", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"]
+    },
+    {
+      "id": "P2.5",
+      "name": "go/stop gate #2",
+      "depends_on": ["P2.4"],
+      "inputs": ["behavior-spec.json", "acceptance-criteria.json", "validator_findings"],
+      "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
+      "skills": ["invoke-go-stop-gate"],
+      "skills_dir": "skills/_base/",
+      "gate": "#2"
+    }
+  ],
+  "cross_cutting": {
+    "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator", "spectral-runner (OpenAPI)"],
+    "ratchet_threshold": 0.85,
+    "no_simulation": true,
+    "verifiable_required": true
+  },
+  "previous_chain": {
+    "id": "planning",
+    "flow_file": "planning.phase-flow.json"
+  },
+  "next_chain": {
+    "id": "test",
+    "flow_file": "test.phase-flow.json",
+    "gate_decision": "go"
+  }
+}

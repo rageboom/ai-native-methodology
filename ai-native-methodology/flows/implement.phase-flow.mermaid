@@ -1,0 +1,69 @@
+%% ★ ★ ★ v2.0 chain 4 (implement) phase flow — 사람 눈 (mermaid)
+%% AI 눈 짝: implement.phase-flow.json (drift-validator 호환)
+%% ADR-008 v2 §10 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합 / i-strict 정통
+
+flowchart TB
+    subgraph C4["★ ★ ★ Chain 4 — implement (GREEN 의무 / i-strict)"]
+        direction TB
+
+        P40["P4.0 — input 통합<br/>test-spec + behavior + arch + schema + api + inventory"]
+        P41["P4.1 — IMPL-* 모듈 분해"]
+        P42["★ ★ ★ P4.2 — 실 impl 코드 generate<br/>controller / service / repository / migration<br/>★ AI 자동 ≥ 80% / 사용자 검토 ≤ 20%"]
+        P43["P4.3 — git commit + commit_hash 채움"]
+        P44["★ ★ ★ P4.4 — GREEN 검증 (진짜 runner / 100% pass)<br/>verify-test-pass + run-test-evidence<br/>★ test-impl-pass-validator (--allow-execute)"]
+        P45["P4.5 — static-runner 6종 + chain-strict lint<br/>★ lint-no-simulation chain-strict"]
+        P46["P4.6 — traceability-matrix 최종 갱신<br/>★ red_count == 0 의무"]
+        P47["★ ★ ★ P4.7 — gate #4 (final / 사용자 결단)<br/>invoke-go-stop-gate"]
+
+        P40 --> P41
+        P41 --> P42
+        P42 --> P43
+        P43 --> P44
+        P44 --> P45
+        P44 --> P46
+        P45 --> P47
+        P46 --> P47
+    end
+
+    subgraph IN["chain 3 (test) + analysis"]
+        IN_OUT["test-spec.json + 실 test 코드 (RED)<br/>+ behavior + acceptance + arch + schema + api + inventory<br/>+ .aimd/config/test-cmd.json"]
+    end
+
+    subgraph OUT["chain 4 산출물"]
+        direction LR
+        OUT_IS["impl-spec.json (deliverable 21)<br/>★ test_pass_evidence.fail_count: 0"]
+        OUT_CODE["실 impl 코드 (GREEN — 모든 test 100% pass)<br/>+ commit_hash 의무"]
+        OUT_MAT["traceability-matrix.{json,md,mermaid}<br/>★ red_count == 0"]
+    end
+
+    subgraph REL["release 자격 평가 (sub-plan-6)"]
+        R1["§2 진짜 도구 5종 물증 ✅"]
+        R2["§3 0 violation ✅"]
+        R3["§4 coverage ≥ 0.85 ✅"]
+        R4["§1 ≥ 2 PoC corroboration (sub-plan-6)"]
+        R5["§5~§7 (PoC #05 e2e cycle)"]
+    end
+
+    IN --> P40
+    P42 --> OUT_CODE
+    P44 --> OUT_IS
+    P46 --> OUT_MAT
+    P47 -->|"go"| REL
+    P47 -.->|"stop"| STOP["release 보류 / carry"]
+    P47 -.->|"revisit:test"| IN
+    P47 -.->|"revisit:spec"| RS["chain 2"]
+    P47 -.->|"revisit:planning"| RP["chain 1"]
+
+    classDef chain4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef out fill:#d4edda,stroke:#155724,stroke-width:2px
+    classDef stop fill:#f8d7da,stroke:#721c24
+    classDef green fill:#d4edda,stroke:#155724,stroke-width:3px
+    classDef rel fill:#cce5ff,stroke:#004085,stroke-width:2px
+    class C4 chain4
+    class P47 gate
+    class P42 green
+    class P44 green
+    class OUT out
+    class STOP stop
+    class REL rel

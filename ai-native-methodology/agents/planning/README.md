@@ -41,9 +41,9 @@ chain 1 (planning) = **legacy 분석 결과로부터 비즈니스 의도 추출*
 
 ## skills
 
-- `skills/planning/extract-from-legacy/` ★ sub-plan-4 신설 (chain 1 main)
-- `skills/planning/decompose-use-cases/` ★ sub-plan-4 신설
-- `skills/planning/identify-business-intent/` ★ sub-plan-4 신설
+- `skills/planning/extract-from-legacy/` ★ sub-plan-4 채움 ✅ (chain 1 main)
+- `skills/planning/decompose-use-cases/` ★ sub-plan-4 채움 ✅
+- `skills/planning/identify-business-intent/` ★ sub-plan-4 채움 ✅
 
 ## v2.x carry
 

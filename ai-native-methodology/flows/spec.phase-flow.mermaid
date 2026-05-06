@@ -1,0 +1,54 @@
+%% ★ ★ v2.0 chain 2 (spec) phase flow — 사람 눈 (mermaid)
+%% AI 눈 짝: spec.phase-flow.json (drift-validator 호환)
+%% ADR-008 v2 §10 + ADR-CHAIN-001 정합
+
+flowchart TB
+    subgraph C2["★ Chain 2 — spec"]
+        direction TB
+
+        P20["P2.0 — input 통합<br/>planning-spec + Phase 4.5 + 7대"]
+        P21["P2.1 — behavior-spec 합성 (BHV-*)<br/>compose-behavior-spec / 1 UC = 1+ BHV"]
+        P22["P2.2 — acceptance-criteria 분해 (AC-*)<br/>derive-acceptance-criteria / Gherkin BDD"]
+        P23["P2.3 — 7대 cross-link 통합<br/>integrate-7대-deliverables"]
+        P24["P2.4 — behavior-diagrams 통합 + 검증<br/>★ chain-coverage-validator + drift + dmn + formal-link"]
+        P25["★ ★ ★ P2.5 — gate #2 (사용자 결단)<br/>invoke-go-stop-gate"]
+
+        P20 --> P21
+        P21 --> P22
+        P21 --> P23
+        P22 --> P24
+        P23 --> P24
+        P24 --> P25
+    end
+
+    subgraph IN["chain 1 (planning) + analysis"]
+        IN_OUT["planning-spec.json<br/>+ 7대 + 8 FE + Phase 4.5 + finding"]
+    end
+
+    subgraph OUT["chain 2 산출물"]
+        direction LR
+        OUT_BHV["behavior-spec.json (deliverable 18)"]
+        OUT_AC["acceptance-criteria.json (deliverable 19)"]
+        OUT_MD["behavior-spec.md + behavior-diagrams.mermaid<br/>acceptance-criteria.md"]
+    end
+
+    subgraph NEXT["chain 3 (test) 진입"]
+        N1["generate-test-spec skill"]
+    end
+
+    IN --> P20
+    P24 --> OUT_BHV
+    P24 --> OUT_AC
+    P24 --> OUT_MD
+    P25 -->|"go"| NEXT
+    P25 -.->|"stop"| STOP["sprint 중단"]
+    P25 -.->|"revisit:planning"| IN
+
+    classDef chain2 fill:#fff8e1,stroke:#ef6c00,stroke-width:3px
+    classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef out fill:#d4edda,stroke:#155724,stroke-width:2px
+    classDef stop fill:#f8d7da,stroke:#721c24
+    class C2 chain2
+    class P25 gate
+    class OUT out
+    class STOP stop

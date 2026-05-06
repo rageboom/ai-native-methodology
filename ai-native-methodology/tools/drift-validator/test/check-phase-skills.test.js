@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { fileURLToPath } from 'node:url';
 import { resolve, dirname } from 'node:path';
-import { checkPhaseSkills, summarizeLayoutCheck } from '../src/check-phase-skills.js';
+import { checkPhaseSkills, summarizeLayoutCheck, checkChainStageLayout, summarizeChainLayoutCheck } from '../src/check-phase-skills.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -44,4 +44,36 @@ test('summarizeLayoutCheck — pass/fail 메시지 정합', () => {
   };
   assert.match(summarizeLayoutCheck(failResult), /layout check failed/);
   assert.match(summarizeLayoutCheck(failResult), /1 breaking/);
+});
+
+// ★ ★ v2.0 sub-plan-4 — chain stage layout 검증 test
+
+test('★ ★ chain stage layout — current workspace 정합 ok (4 stages / 0 orphan)', () => {
+  const result = checkChainStageLayout(WORKSPACE);
+  if (!result.ok) {
+    console.error('[chain-stage-layout] findings:');
+    for (const d of result.diffs) {
+      console.error(`  - [${d.severity}] ${d.kind}: ${d.message}`);
+    }
+  }
+  assert.equal(result.ok, true, 'chain stage layout must be consistent');
+  assert.equal(result.counts.chain_stages, 4, '4 chain stages (planning/spec/test/implement)');
+  assert.ok(result.counts.phases_checked >= 20, `≥ 20 phases (got ${result.counts.phases_checked})`);
+  assert.ok(result.counts.skills_declared >= 13, `≥ 13 chain skills declared (got ${result.counts.skills_declared})`);
+});
+
+test('★ chain stage layout — workspace 부재 → diffs', () => {
+  const result = checkChainStageLayout('/nonexistent/path/xyz');
+  assert.equal(result.ok, false);
+  assert.ok(result.diffs.length >= 1, 'expected ≥ 1 diff (sdlc-4stage-flow + 4 chain flow missing)');
+});
+
+test('★ summarizeChainLayoutCheck — pass/fail 메시지 정합', () => {
+  const ok = { ok: true, diffs: [], counts: { chain_stages: 4, phases_checked: 26, skills_declared: 13 } };
+  assert.match(summarizeChainLayoutCheck(ok), /chain layout check passed/);
+  assert.match(summarizeChainLayoutCheck(ok), /4 stages/);
+  assert.match(summarizeChainLayoutCheck(ok), /26 phases/);
+
+  const fail = { ok: false, diffs: [{ severity: 'breaking', kind: 'x' }], counts: {} };
+  assert.match(summarizeChainLayoutCheck(fail), /chain layout check failed/);
 });

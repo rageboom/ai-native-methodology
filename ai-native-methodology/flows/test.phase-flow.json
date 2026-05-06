@@ -1,0 +1,93 @@
+{
+  "$comment": "★ ★ v2.0 chain 3 (test) phase flow — AI 눈 짝 (test.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합. acceptance-criteria 기반 실 test 코드 자동 generate (RED 의무 / impl 부재 가정 모든 test fail).",
+  "id": "test-phase-flow",
+  "version": "2.0.0-dev",
+  "stage": "test",
+  "chain": 3,
+  "rendered_mermaid_path": "./test.phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "P3.0",
+      "name": "framework 추론 (inventory + .aimd/config/test-cmd)",
+      "depends_on": [],
+      "inputs": ["acceptance-criteria.json", "behavior-spec.json", "inventory.json", ".aimd/config/test-cmd.json"],
+      "outputs": ["framework_resolved", "test_cmd_resolved"],
+      "skills": ["generate-test-spec"],
+      "skills_dir": "skills/test/",
+      "adr_ref": "ADR-CHAIN-004"
+    },
+    {
+      "id": "P3.1",
+      "name": "TC-* 분해 (1 AC = 1 TC)",
+      "depends_on": ["P3.0"],
+      "inputs": ["acceptance-criteria.criteria[]"],
+      "outputs": ["test-spec.json (test_cases[])"],
+      "skills": ["generate-test-spec"],
+      "skills_dir": "skills/test/"
+    },
+    {
+      "id": "P3.2",
+      "name": "실 test 코드 generate (RED 의무)",
+      "depends_on": ["P3.1"],
+      "inputs": ["test-spec.test_cases", "behavior-spec.property_tests"],
+      "outputs": ["test source files (jest/vitest/junit5/pytest 등)"],
+      "skills": ["generate-test-spec"],
+      "skills_dir": "skills/test/",
+      "expected_outcome": "all_fail"
+    },
+    {
+      "id": "P3.3",
+      "name": "AC.test_case_refs backward 채움",
+      "depends_on": ["P3.2"],
+      "inputs": ["test-spec.json", "acceptance-criteria.json"],
+      "outputs": ["acceptance-criteria.criteria[].test_case_refs[]"],
+      "skills": ["generate-test-spec"],
+      "skills_dir": "skills/test/"
+    },
+    {
+      "id": "P3.4",
+      "name": "RED 검증 + evidence (5종 물증 7 필드)",
+      "depends_on": ["P3.2", "P3.3"],
+      "inputs": ["test source files", ".aimd/config/test-cmd.json"],
+      "outputs": ["test-spec.test_invocation_evidence (RED / fail_count > 0)"],
+      "skills": ["run-test-evidence"],
+      "skills_dir": "skills/test/",
+      "automated_validation": ["test-impl-pass-validator (--allow-execute / expected: all_fail)", "schema-validator", "spec-test-link-validator", "lint-no-simulation (chain-strict)"]
+    },
+    {
+      "id": "P3.5",
+      "name": "coverage 측정 (3 metric 분리)",
+      "depends_on": ["P3.4"],
+      "inputs": ["test-spec.json", "acceptance-criteria.json"],
+      "outputs": ["test-spec.coverage_summary"],
+      "skills": ["verify-coverage"],
+      "skills_dir": "skills/test/"
+    },
+    {
+      "id": "P3.6",
+      "name": "go/stop gate #3",
+      "depends_on": ["P3.4", "P3.5"],
+      "inputs": ["test-spec.json", "validator_findings"],
+      "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
+      "skills": ["invoke-go-stop-gate"],
+      "skills_dir": "skills/_base/",
+      "gate": "#3"
+    }
+  ],
+  "cross_cutting": {
+    "validators": ["test-impl-pass-validator", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
+    "ratchet_threshold": 0.85,
+    "expected_outcome_chain3": "all_fail (RED 의무)",
+    "no_simulation": true,
+    "allow_execute_required": true
+  },
+  "previous_chain": {
+    "id": "spec",
+    "flow_file": "spec.phase-flow.json"
+  },
+  "next_chain": {
+    "id": "implement",
+    "flow_file": "implement.phase-flow.json",
+    "gate_decision": "go"
+  }
+}

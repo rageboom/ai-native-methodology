@@ -1,0 +1,172 @@
+{
+  "$comment": "★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상.",
+  "id": "sdlc-4stage-flow",
+  "version": "2.0.0-dev",
+  "rendered_mermaid_path": "./sdlc-4stage-flow.mermaid",
+  "stages": [
+    {
+      "id": "analysis",
+      "name": "Analysis (1차 input)",
+      "chain": 0,
+      "depends_on": [],
+      "sub_flow": "analysis.phase-flow.json",
+      "outputs_summary": ["7대 BE 산출물", "8 FE 산출물", "Phase 4.5 형식 명세", "finding-system", "antipatterns", "migration-cautions"],
+      "skills_dir": "skills/analysis/",
+      "introduced": "v1.0 (legacy)",
+      "gate": null,
+      "user_review_pct": "≤ 15"
+    },
+    {
+      "id": "planning",
+      "name": "Planning (chain 1)",
+      "chain": 1,
+      "depends_on": ["analysis"],
+      "sub_flow": "planning.phase-flow.json",
+      "outputs_summary": ["planning-spec.json (deliverable 17)", "planning-spec.md"],
+      "skills_dir": "skills/planning/",
+      "introduced": "v2.0",
+      "gate": "#1",
+      "user_review_pct": "≤ 20",
+      "ai_automation_pct": "≥ 80"
+    },
+    {
+      "id": "spec",
+      "name": "Spec (chain 2)",
+      "chain": 2,
+      "depends_on": ["planning"],
+      "sub_flow": "spec.phase-flow.json",
+      "outputs_summary": ["behavior-spec.json (deliverable 18)", "acceptance-criteria.json (deliverable 19)", "behavior-spec.md", "behavior-diagrams.mermaid"],
+      "skills_dir": "skills/spec/",
+      "introduced": "v2.0",
+      "gate": "#2",
+      "user_review_pct": "≤ 15",
+      "ai_automation_pct": "≥ 85"
+    },
+    {
+      "id": "test",
+      "name": "Test (chain 3 / RED 의무)",
+      "chain": 3,
+      "depends_on": ["spec"],
+      "sub_flow": "test.phase-flow.json",
+      "outputs_summary": ["test-spec.json (deliverable 20)", "실 test 코드", "5종 물증 7 필드"],
+      "skills_dir": "skills/test/",
+      "introduced": "v2.0",
+      "gate": "#3",
+      "user_review_pct": "≤ 15",
+      "ai_automation_pct": "≥ 85",
+      "expected_outcome": "all_fail"
+    },
+    {
+      "id": "implement",
+      "name": "Implement (chain 4 / GREEN 의무 / i-strict)",
+      "chain": 4,
+      "depends_on": ["test"],
+      "sub_flow": "implement.phase-flow.json",
+      "outputs_summary": ["impl-spec.json (deliverable 21)", "실 impl 코드 + commit_hash", "test_pass_evidence (fail_count: 0)", "traceability-matrix.{json,md,mermaid}"],
+      "skills_dir": "skills/implement/",
+      "introduced": "v2.0",
+      "gate": "#4",
+      "user_review_pct": "≤ 15",
+      "ai_automation_pct": "≥ 85",
+      "expected_outcome": "all_pass",
+      "test_pass_rate_required": 1.0
+    }
+  ],
+  "revisit_edges": [
+    { "from": "planning",  "to": "analysis",  "trigger": "revisit:analysis"  },
+    { "from": "spec",      "to": "planning",  "trigger": "revisit:planning"  },
+    { "from": "test",      "to": "spec",      "trigger": "revisit:spec"      },
+    { "from": "implement", "to": "test",      "trigger": "revisit:test"      },
+    { "from": "implement", "to": "spec",      "trigger": "revisit:spec"      },
+    { "from": "implement", "to": "planning",  "trigger": "revisit:planning"  },
+    { "from": "implement", "to": "analysis",  "trigger": "revisit:analysis (★ rare / 가장 큰 cycle)" }
+  ],
+  "gates": [
+    {
+      "id": "#1",
+      "stage": "planning",
+      "validators": ["planning-extraction-validator", "schema-validator"],
+      "skill": "skills/_base/invoke-go-stop-gate"
+    },
+    {
+      "id": "#2",
+      "stage": "spec",
+      "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
+      "skill": "skills/_base/invoke-go-stop-gate"
+    },
+    {
+      "id": "#3",
+      "stage": "test",
+      "validators": ["test-impl-pass-validator (expected: all_fail)", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
+      "skill": "skills/_base/invoke-go-stop-gate"
+    },
+    {
+      "id": "#4",
+      "stage": "implement",
+      "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
+      "skill": "skills/_base/invoke-go-stop-gate"
+    }
+  ],
+  "cross_cutting": {
+    "no_simulation": {
+      "policy": "DEC-2026-04-29-static-tool-실행-의무화",
+      "enforcement": ["lint-no-simulation (chain-strict)", "test-impl-pass-validator --allow-execute", "static-runner real plugin (★ 진짜 도구 7종)"]
+    },
+    "double_rendering": {
+      "policy": "ADR-008 v2 §10",
+      "applies_to": ["all chain stage 산출물 (json + md + mermaid)"]
+    },
+    "round_trip": {
+      "policy": "DEC-2026-05-06-round-trip-부분-허용",
+      "scope": "chain harness gate 안에서 정식 허용 / 외부 자동 코드 생성 ❌"
+    },
+    "cooling_off": {
+      "policy": "DEC-2026-05-06-cooling-off-정책-폐기",
+      "scope": "24h cooling-off 폐기 / go/stop gate 가 동등 효과"
+    },
+    "traceability": {
+      "policy": "DO-178C / IEC 62304 bidirectional",
+      "tool": "tools/traceability-matrix-builder",
+      "schema": "schemas/traceability-matrix.schema.json",
+      "skill": "skills/_base/build-traceability-matrix"
+    },
+    "ratchet": {
+      "policy": "ADR-010 v2 §2.6",
+      "thresholds": {
+        "1차_baseline": 0.85,
+        "1+_PoC": 0.90,
+        "2+_PoC": 0.95
+      },
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 0.95,
+        "medium": 0.90,
+        "low": 0.85
+      }
+    },
+    "chain_revisit_detector": {
+      "scope": "sub-plan-5 (hooks) carry — 자동 영향 범위 추출 + 사용자 prompt"
+    }
+  },
+  "release_eligibility": {
+    "policy": "§8.1 strict 7/7",
+    "items": [
+      { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "sub-plan-6 PoC #05 + PoC #03 retrofit" },
+      { "id": 2, "name": "진짜 도구 5종 물증 보존", "data_source": "test-impl-pass-validator (chain 3-4)" },
+      { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "11 chain validator + drift-check.yml + chain-check.yml" },
+      { "id": 4, "name": "모든 chain stage coverage ≥ 0.85", "data_source": "chain-coverage-validator + spec-test-link-validator + verify-coverage skill" },
+      { "id": 5, "name": "ADR-CHAIN-001~004 + ADR-008/009/010 v2 등재", "data_source": "docs/adr/ (sub-plan-1~3 종결)" },
+      { "id": 6, "name": "traceability-matrix 100% greenness", "data_source": "PoC #05 (sub-plan-6)" },
+      { "id": 7, "name": "sample legacy 1 cycle e2e pass (1 BR + 1 UC + 1 TC + 1 IMPL)", "data_source": "PoC #05 (sub-plan-6)" }
+    ]
+  },
+  "implemented_in": {
+    "sub_plan_1": "scope (DEC + lifecycle-contract + skills-axis chain stage 신설)",
+    "sub_plan_2": "schemas (planning/behavior/acceptance/test/impl/traceability) + deliverables 17~22 + ADR-CHAIN-001~003",
+    "sub_plan_3a": "11 chain validator + ADR-CHAIN-004 + chain-check.yml + npm workspace + 110 unit test",
+    "sub_plan_3b": "test-impl-pass-validator + test-cmd.schema + 5 framework adapter + 135 unit test",
+    "sub_plan_4": "★ 본 sdlc-4stage-flow + 14 신규 skill + agents 정식 채움 + 4 chain stage flow",
+    "sub_plan_5": "hooks 확장 + chain-revisit-detector + go/stop UX (carry)",
+    "sub_plan_6": "PoC #05 + v2.0.0 release (carry)"
+  }
+}

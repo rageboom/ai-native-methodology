@@ -40,8 +40,8 @@ chain 4 (implement) = **test-spec 기반 실 impl 코드 자동 생성** (GREEN 
 
 ## skills
 
-- `skills/implement/generate-impl-spec/` ★ sub-plan-4 신설 (chain 4 main)
-- `skills/implement/verify-test-pass/` ★ sub-plan-4 신설 (진짜 runner / 100% pass)
+- `skills/implement/generate-impl-spec/` ★ sub-plan-4 채움 ✅ (chain 4 main)
+- `skills/implement/verify-test-pass/` ★ sub-plan-4 채움 ✅ (진짜 runner / 100% pass)
 
 ## 가치 경계 (★ v2.0 갱신)
 

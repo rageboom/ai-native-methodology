@@ -1,0 +1,105 @@
+{
+  "$comment": "★ ★ ★ v2.0 chain 4 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통.",
+  "id": "implement-phase-flow",
+  "version": "2.0.0-dev",
+  "stage": "implement",
+  "chain": 4,
+  "rendered_mermaid_path": "./implement.phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "P4.0",
+      "name": "input 통합 (test-spec + behavior + arch + schema + api)",
+      "depends_on": [],
+      "inputs": ["test-spec.json", "behavior-spec.json", "acceptance-criteria.json", "architecture.json", "schema.json", "api-extension.json", "inventory.json"],
+      "outputs": ["impl_module_plan"],
+      "skills": ["generate-impl-spec"],
+      "skills_dir": "skills/implement/"
+    },
+    {
+      "id": "P4.1",
+      "name": "IMPL-* 모듈 분해",
+      "depends_on": ["P4.0"],
+      "inputs": ["test-spec.test_cases", "architecture.json"],
+      "outputs": ["impl-spec.impl_modules[]"],
+      "skills": ["generate-impl-spec"],
+      "skills_dir": "skills/implement/"
+    },
+    {
+      "id": "P4.2",
+      "name": "실 impl 코드 generate (★ i-strict 정통)",
+      "depends_on": ["P4.1"],
+      "inputs": ["impl-spec.impl_modules"],
+      "outputs": ["controller / service / repository / migration 코드 (framework 별)"],
+      "skills": ["generate-impl-spec"],
+      "skills_dir": "skills/implement/",
+      "ai_automation_pct": "≥ 80",
+      "user_review_pct": "≤ 20"
+    },
+    {
+      "id": "P4.3",
+      "name": "git commit + commit_hash 채움",
+      "depends_on": ["P4.2"],
+      "inputs": ["generated impl code"],
+      "outputs": ["impl-spec.impl_modules[].commit_hash"],
+      "skills": ["generate-impl-spec"],
+      "skills_dir": "skills/implement/"
+    },
+    {
+      "id": "P4.4",
+      "name": "★ ★ ★ GREEN 검증 (진짜 runner / 100% pass)",
+      "depends_on": ["P4.3"],
+      "inputs": ["impl 코드", ".aimd/config/test-cmd.json"],
+      "outputs": ["impl-spec.test_pass_evidence (fail_count: 0 의무)"],
+      "skills": ["verify-test-pass", "run-test-evidence"],
+      "skills_dir": "skills/implement/",
+      "expected_outcome": "all_pass (★ chain 4 GREEN 의무)"
+    },
+    {
+      "id": "P4.5",
+      "name": "static-runner 6종 + chain-strict lint",
+      "depends_on": ["P4.4"],
+      "inputs": ["impl 코드", "test_pass_evidence"],
+      "outputs": ["impl-spec.test_pass_evidence.linter_output_path", "impl-spec.test_pass_evidence.coverage_report_path"],
+      "skills": ["verify-test-pass"],
+      "skills_dir": "skills/implement/",
+      "automated_validation": ["lint-no-simulation (chain-strict)", "static-runner (6 plugin)", "schema-validator"]
+    },
+    {
+      "id": "P4.6",
+      "name": "traceability-matrix 최종 갱신",
+      "depends_on": ["P4.4", "P4.5"],
+      "inputs": ["planning + behavior + acceptance + test + impl-spec"],
+      "outputs": ["traceability-matrix.{json,md,mermaid} (★ red_count == 0)"],
+      "skills": ["build-traceability-matrix"],
+      "skills_dir": "skills/_base/",
+      "automated_validation": ["traceability-matrix-builder"]
+    },
+    {
+      "id": "P4.7",
+      "name": "go/stop gate #4 (final)",
+      "depends_on": ["P4.4", "P4.5", "P4.6"],
+      "inputs": ["impl-spec.json", "matrix.json", "validator_findings"],
+      "outputs": ["chain-intervention-log.jsonl", "go (release 자격) | stop | revisit"],
+      "skills": ["invoke-go-stop-gate"],
+      "skills_dir": "skills/_base/",
+      "gate": "#4"
+    }
+  ],
+  "cross_cutting": {
+    "validators": ["test-impl-pass-validator", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
+    "ratchet_threshold": 0.85,
+    "test_pass_rate_required": 1.0,
+    "expected_outcome_chain4": "all_pass (GREEN 의무)",
+    "no_simulation": true,
+    "allow_execute_required": true,
+    "commit_hash_required": true
+  },
+  "previous_chain": {
+    "id": "test",
+    "flow_file": "test.phase-flow.json"
+  },
+  "release_eligibility": {
+    "scope": "§8.1 strict 7/7 (sub-plan-6 시점)",
+    "data_partial": ["§2 진짜 도구 5종 물증", "§3 0 violation", "§4 chain coverage ≥ 0.85"]
+  }
+}

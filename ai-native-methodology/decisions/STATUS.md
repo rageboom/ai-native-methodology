@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ ★ ★ sub-plan-3a + 3b 종결 / **next: sub-plan-4 (skills + flows)**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ ★ ★ ★ sub-plan-3a + 3b + 4 종결 / **next: sub-plan-5 (hooks + harness)**)
 
 ## ★ ★ ★ v2.0 진행 (sub-plan 6 sprint)
 
@@ -13,9 +13,48 @@
 | M+2 | sub-plan-2 (schemas + deliverables + ADR) | 6 schema + 6 deliverable + 3 신규 ADR + 3 ADR v2 + UC-* 통일 | ✅ commit `811ea45` |
 | **M+3a** | **sub-plan-3a (chain validator + workspace)** | 4 신규 chain validator + 기존 6 도구 chain 모드 확장 + npm workspace + chain-check.yml + ADR-CHAIN-004 + ★ ★ **110 unit test pass** | ✅ DEC-2026-05-06-sub-plan-3a-종결 |
 | **M+3b** | **sub-plan-3b (test-impl-pass-validator)** | ★ ★ ★ test-impl-pass-validator 신설 (5 framework adapter / result_hash SARIF Appendix F / --allow-execute / flaky retry / 25 unit test) + test-cmd.schema 신설 + flaky_retries_count schema 보강 + chain-check.yml gate #3-4 활성 + workspace **135 unit test pass** | ✅ DEC-2026-05-06-sub-plan-3b-종결 |
-| **M+4** | **sub-plan-4 (skills + flows)** | 14 skill + agents 갱신 + 5 flow + sdlc-4stage-flow.json | 🔜 next |
+| **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
+| **M+5** | **sub-plan-5 (hooks + harness)** | hooks.json 확장 + chain-revisit-detector + go/stop UX 입증 | 🔜 next |
 | M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + ★ chain-revisit-detector (sub-plan-3 carry) + go/stop UX | ⏳ |
 | M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | ⏳ |
+
+## ★ ★ ★ sub-plan-4 종결 (2026-05-06)
+
+**10 항목 모두 통과** (DEC-2026-05-06-sub-plan-4-종결):
+
+1. ✅ 2 _base skills (build-traceability-matrix + invoke-go-stop-gate)
+2. ✅ 3 planning skills (extract-from-legacy / decompose-use-cases / identify-business-intent)
+3. ✅ 3 spec skills (★ skills/spec/ 신규 디렉토리 / compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables)
+4. ✅ 3 test skills (generate-test-spec / run-test-evidence / verify-coverage)
+5. ✅ 2 implement skills (generate-impl-spec / verify-test-pass)
+6. ✅ agents/{planning,spec,test,implement}/README placeholder → 정식 채움 ✅
+7. ✅ 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid})
+8. ✅ ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} 통합 SSOT (stages + revisit_edges + 4 gate + cross_cutting + release_eligibility)
+9. ✅ drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans / 0 missing)
+10. ✅ DEC-2026-05-06-sub-plan-4-종결 + STATUS / INDEX 갱신
+
+### unit test 회귀 (138/138 / 11 workspace)
+
+| 도구 | 직전 (3b) | 현재 (sub-plan-4) |
+|---|---|---|
+| drift-validator | 41 | **44** (+3 chain layout) |
+| 그 외 10 도구 | 94 | 94 |
+| **합계** | **135** | **★ 138** |
+
+★ master plan H §release 자격 80+ → ★ ★ **138 pass = 73%p 초과 달성**.
+
+### chain stage 운영 인터페이스 정식 등재
+
+| 영역 | 수량 | 위치 |
+|---|---|---|
+| chain skill | ★ **13** | skills/{_base,planning,spec,test,implement}/ |
+| chain stage flow | ★ **4** | flows/{planning,spec,test,implement}.phase-flow.{json,mermaid} |
+| master SSOT | ★ **1** | flows/sdlc-4stage-flow.{json,mermaid} |
+| chain agent README (정식 채움) | ★ **4** | agents/{planning,spec,test,implement}/README.md |
+
+★ skills-axis chain stage axis 정책 (★ §4 v2.0 신설) 운영 입증 — 디렉토리 분리 ❌ + SKILL.md 본문 분기 + manifest SSOT + drift-validator 자동 회귀.
+
+---
 
 ## ★ ★ ★ sub-plan-3b 종결 (2026-05-06)
 
@@ -103,29 +142,29 @@
 | sp3-c2 | chain-revisit-detector AI ML 정확도 개선 | v2.x carry |
 | sp3-c3 | CI 본격 활성 (PoC #05 데이터 후) | sub-plan-6 |
 
-### commit history (★ 5단계 누적)
+### commit history (★ 6단계 누적)
 
-`b466e51` (sub-plan-1) → `811ea45` (sub-plan-2) → `ccb3f0a` (sub-plan-3a partial) → `edbdd4d` (sub-plan-3a 종결) → 본 commit (sub-plan-3b 종결).
+`b466e51` (sub-plan-1) → `811ea45` (sub-plan-2) → `ccb3f0a` (sub-plan-3a partial) → `edbdd4d` (sub-plan-3a 종결) → `c364c05` (sub-plan-3b 종결) → 본 commit (sub-plan-4 종결).
 
-## ★ ★ sub-plan-4 진입 prerequisite (★ 다음 sprint)
+## ★ ★ sub-plan-5 진입 prerequisite (★ 다음 sprint)
 
 | # | 항목 | 상태 |
 |---|---|---|
 | 1 | ADR-CHAIN-001~004 | ✅ 4건 등재 |
-| 2 | 7 신규 schema (planning/behavior/acceptance/test/impl/traceability + test-cmd) | ✅ 등재 |
-| 3 | 11 chain validator | ✅ unit test 135 |
+| 2 | 7 신규 schema | ✅ 등재 |
+| 3 | 11 chain validator | ✅ unit test 138 |
 | 4 | chain-check.yml CI infra | ✅ gate #1~#4 모두 step 정의 |
+| 5 | 13 chain skill + 5 chain flow + 4 chain agent | ✅ (sub-plan-4) |
 
-### sub-plan-4 carry (skills + flows / sub-plan-4 진입 시)
+### sub-plan-5 carry (hooks + harness)
 
 | # | 항목 | 비고 |
 |---|---|---|
-| sp4-1 | 14 신규 skill SKILL.md (planning 3 + spec 3 + test 3 + implement 2 + _base 2 + design 1 placeholder) | master plan §B |
-| sp4-2 | agents/{planning,test,implement}/README.md placeholder → 정식 정의 | — |
-| sp4-3 | agents/spec/README.md 신규 | — |
-| sp4-4 | flows/{planning,spec,test,implement}.phase-flow.{json,mermaid} 신규 5 flow | — |
-| sp4-5 | flows/sdlc-4stage-flow.{json,mermaid} 신규 통합 (stages + revisit_edges) | ★ master plan SSOT |
-| sp4-6 | drift-validator phase-flow corpus 추가 (sdlc-4stage 검증) | sub-plan-3a corpus reuse |
+| sp5-1 | hooks/hooks.json 확장 (PostToolUse + PreToolUse + UserPromptSubmit) | master plan §B |
+| sp5-2 | chain-revisit-detector 구현 (path-to-chain whitelist + 사용자 prompt) | sub-plan-3 carry |
+| sp5-3 | go/stop gate UX 입증 (자연어 prompt → skill 매칭 → cluster 결단) | sub-plan-4 skill 운영 |
+| sp5-4 | intervention_log 분석 dashboard prototype | sub-plan-5 또는 sub-plan-6 |
+| sp5-5 | hooks 의 skill auto-invoke (gate 자동 호출 / Auto Mode 호환) | — |
 
 ## ★ ★ v2.0 carry (master plan §K)
 

@@ -1,0 +1,67 @@
+{
+  "$comment": "★ ★ v2.0 chain 1 (planning) phase flow — AI 눈 짝 (planning.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. analysis stage 산출물 입력 → planning-spec.{json,md} 산출. 1차 = legacy single-case (use case 4종 분기 = v2.1+ K-1 carry).",
+  "id": "planning-phase-flow",
+  "version": "2.0.0-dev",
+  "stage": "planning",
+  "chain": 1,
+  "rendered_mermaid_path": "./planning.phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "P1.0",
+      "name": "input 검증",
+      "depends_on": [],
+      "inputs": ["analysis_outputs", "finding_system", "antipatterns", "migration_cautions"],
+      "outputs": ["analysis_completeness_check"],
+      "skills": ["extract-from-legacy"],
+      "skills_dir": "skills/planning/"
+    },
+    {
+      "id": "P1.1",
+      "name": "use_cases 분해",
+      "depends_on": ["P1.0"],
+      "inputs": ["domain.json", "rules.json", "api-extension.json", "state-machines/*.json"],
+      "outputs": ["use_cases[]"],
+      "skills": ["decompose-use-cases"],
+      "skills_dir": "skills/planning/"
+    },
+    {
+      "id": "P1.2",
+      "name": "business_rules_intent 추출",
+      "depends_on": ["P1.0", "P1.1"],
+      "inputs": ["rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
+      "outputs": ["business_rules_intent[]"],
+      "skills": ["identify-business-intent"],
+      "skills_dir": "skills/planning/"
+    },
+    {
+      "id": "P1.3",
+      "name": "planning-spec 합성 + 검증",
+      "depends_on": ["P1.1", "P1.2"],
+      "inputs": ["use_cases", "business_rules_intent", "business_intent"],
+      "outputs": ["planning-spec.json", "planning-spec.md"],
+      "skills": ["extract-from-legacy"],
+      "skills_dir": "skills/planning/",
+      "automated_validation": ["planning-extraction-validator", "schema-validator"]
+    },
+    {
+      "id": "P1.4",
+      "name": "go/stop gate #1",
+      "depends_on": ["P1.3"],
+      "inputs": ["planning-spec.json", "validator_findings"],
+      "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
+      "skills": ["invoke-go-stop-gate"],
+      "skills_dir": "skills/_base/",
+      "gate": "#1"
+    }
+  ],
+  "cross_cutting": {
+    "validators": ["planning-extraction-validator", "schema-validator", "formal-spec-link-validator (--chain-mode)"],
+    "no_simulation": true,
+    "source_grounded_required": true
+  },
+  "next_chain": {
+    "id": "spec",
+    "flow_file": "spec.phase-flow.json",
+    "gate_decision": "go"
+  }
+}
