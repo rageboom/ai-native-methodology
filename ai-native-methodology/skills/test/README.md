@@ -1,31 +1,58 @@
-# skills/test/ — placeholder (☐ 미래 lifecycle 확장)
+# skills/test/ — chain 3 (test stage / RED 의무)
 
-현재 채움 없음. v2.0+ scope.
+본 디렉토리 = chain harness 3 단계 / **test-spec + 실 test code (RED 의무)**. AC-* (Gherkin BDD) 를 TC-* (test case) 로 분해 + 실 test code 작성 + 실패 입증 (impl 부재 / 의도적 실패).
 
-## 향후 채움 후보 (v2.0)
+## 호출 cadence
 
-- `generate-contract-test` — openapi.yaml + rules.json → contract test 코드
-- `generate-unit-test-spec` — domain.json + state-map.json → unit test plan
-- `generate-e2e-spec` — 7대 산출물 → E2E test scenario
-- `verify-coverage` — test 코드 ↔ 산출물 cross-link 검증
+- **trigger**: chain 2 (spec) gate #2 통과 후 (chain-coverage-validator AC ≥ 0.85)
+- **자연어**: "test spec 생성 RED" / "test code 작성"
+- **chain-driver**: `next` 진입 시 자동 호출
 
-## 5 영역 매트릭스 — test stage
+## skill 3종 (sub-plan-4 채움 ✅)
 
-| 영역 | 강도 | 설명 |
-|---|---|---|
-| 기획 | ❌ | 적용 안 됨 |
-| 디자인 | 약 | visual-regression test / a11y test (axe) |
-| FE | 강 | unit / component / E2E test |
-| BE | 강 | unit / integration / contract test |
-| DB | 강 | schema migration test / fixture / 데이터 정합 |
-| 공통 | 강 | 7대 산출물 cross-link 검증 / coverage 추적 |
+| skill | 역할 |
+|---|---|
+| [`generate-test-spec/`](./generate-test-spec/) | AC-* → TC-* 분해 (test-spec.{json,md} 산출 / `test-spec.schema.json` 정합) |
+| [`run-test-evidence/`](./run-test-evidence/) | ★ 진짜 test runner 호출 (5종 물증 / RED 의무 / no-simulation) |
+| [`verify-coverage/`](./verify-coverage/) | AC→TC link coverage ≥ 0.85 검증 |
 
-## 기술 스택 분기 정책
+## RED 의무 (★ ★ ★ no-simulation 정책)
 
-기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용 / v2.0 진입 시 SKILL.md 신설 시점에 적용 / 본 추상화 단계는 정책 선언만). 테스트 stack 후보: Jest / Vitest / Playwright / Cypress / JUnit / pytest / RSpec / Mocha + chai / Supertest / Testcontainers.
+chain 3 종결 시 다음 모두 검증:
+- 실 test code 작성됨 (mock ❌ / placeholder ❌)
+- 실 test runner 호출됨 (jest / vitest / junit5 / pytest)
+- **모든 test fail** (impl 부재 / 의도적 실패) — RED 입증
+- 5종 물증 (`result_hash` / `test_count` / `framework` / `flaky_retries_count` / `source_commit_sha`)
 
-## 인터페이스 (lifecycle-contract.md §분석→테스트)
+LLM "test 작성한 척 / RED 확인한 척" 시뮬레이션 차단 (D21' + mechanical gate trio).
 
-- input (분석→테스트): rules.json + openapi.yaml + schema.json + 7대 산출물
-- 산출물 (테스트→구현): test-plan.json + contract-test 코드 + E2E spec
-- ★ 사용자 시나리오 6번 (2026-05-02) — "테스트 코드 만드는 부분은 아직 안되어 있지만 추상화만". 본 추상화 단계 = 골격 placeholder 만 / `methodology-spec/lifecycle-contract.md` §가치 경계 충돌 deferral 참조
+## gate #3 (다음 stage 진입 자격)
+
+[`../../tools/spec-test-link-validator/`](../../tools/spec-test-link-validator/) 자동 호출:
+- AC→TC link coverage ≥ 0.85 의무
+- RED 입증 (모든 test fail)
+- 위반 시 state.blocked=true / cli exit 2 / chain 4 진입 차단
+
+## 산출물
+
+- `<project>/.aimd/output/test-spec.{json,md}` — TC-* 명세
+- `<project>/.aimd/output/test/` — 실 test code (jest / vitest / etc)
+- `<project>/.aimd/output/test/result_hash.json` — 5종 물증
+
+## 기술 스택 분기
+
+각 SKILL.md 본문에서 framework 분기 (jest / vitest / junit5 / pytest / mocha / cargo / 기타). chain 3 의 framework 결정 = `<project>/.aimd/config/test-cmd.json` (★ test-cmd.schema.json 정합).
+
+## Sibling
+
+- [`../spec/`](../spec/) — chain 2 / 본 stage 의 input (AC-*)
+- [`../implement/`](../implement/) — chain 4 / 본 stage 의 output 활용 (TC → IMPL)
+- [`../_base/invoke-go-stop-gate/`](../_base/invoke-go-stop-gate/) — gate #3 호출
+
+## 참조
+
+- [`../../methodology-spec/deliverables/20-test-spec.md`](../../methodology-spec/deliverables/20-test-spec.md) — test-spec 명세
+- [`../../schemas/test-spec.schema.json`](../../schemas/test-spec.schema.json) — schema
+- [`../../schemas/test-cmd.schema.json`](../../schemas/test-cmd.schema.json) — test runner 명세
+- ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-004 (test-runner-invocation-contract)
+- DEC-2026-05-06-sub-plan-4-종결 — 3 skill 정식 채움 record

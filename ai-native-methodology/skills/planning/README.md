@@ -1,29 +1,48 @@
-# skills/planning/ — placeholder (☐ 미래 lifecycle 확장)
+# skills/planning/ — chain 1 (planning stage / legacy → planning-spec)
 
-현재 채움 없음. 본 v1.4.x 가치 명세 = analysis stage only. 기획 stage 는 v2.0+ scope.
+본 디렉토리 = chain harness 1 단계 / **legacy 분석 결과 → planning-spec 추출** (1차 single-case = legacy-extraction 모드).
 
-## 향후 채움 후보 (v2.0)
+## 호출 cadence
 
-- `extract-prd` — 이해관계자 인터뷰 노트 / 도메인 문서 → PRD 추출
-- `decompose-story` — Epic → Story 분해
-- `domain-priority` — 도메인 영역별 분석 우선순위 결정 (analysis stage 진입 input)
+- **trigger**: analysis stage 종결 후 / chain harness 진입 시 첫 stage
+- **자연어**: "기획 단계 시작" / "use case 분해" / "비즈니스 의도 식별"
+- **chain-driver**: `init <project>` 후 첫 `next`
 
-## 5 영역 매트릭스 — planning stage
+## skill 3종 (sub-plan-4 채움 ✅)
 
-| 영역 | 강도 | 설명 |
-|---|---|---|
-| 기획 | 강 | stage 의 핵심 — PRD / story / domain-priority |
-| 디자인 | 강 | wireframe 1차 그림 / 정보 구조 / 사용자 여정 |
-| FE | 약 | 화면 단위 우선순위 / FE 영역 분량 추정 |
-| BE | 약 | 도메인 영역별 BE API 우선순위 |
-| DB | 약 | 도메인 entity 1차 식별 |
-| 공통 | 약 | 비즈니스 우선순위 / 이해관계자 align |
+| skill | 역할 |
+|---|---|
+| [`extract-from-legacy/`](./extract-from-legacy/) | analysis 7대 산출물 → planning-spec 1차 추출 |
+| [`decompose-use-cases/`](./decompose-use-cases/) | UC-* 분해 (use case granularity) |
+| [`identify-business-intent/`](./identify-business-intent/) | 비즈니스 의도 식별 (domain priority + intent-tag) |
 
-## 기술 스택 분기 정책
+## v2.0 paradigm 정합
 
-기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용 / v2.0 진입 시 SKILL.md 신설 시점에 적용 / 본 추상화 단계는 정책 선언만).
+★ ★ ★ DEC-2026-05-06-v2.0-i-strict-채택 / DEC-2026-05-06-round-trip-부분-허용:
+- chain 1 = analysis 자산 (7대 산출물) 위에서 시작
+- "1차 single-case = legacy-extraction" 명시
+- AI 자동 ≥ 85% / 사용자 검토 ≤ 15% / gate #1 통과 의무
+- 70~80% 한계 명시 잔존
 
-## 인터페이스 (lifecycle-contract.md §기획→분석)
+## gate #1 (다음 stage 진입 자격)
 
-- 산출물 (기획→분석): PRD / story / domain-priority.json
-- ★ 기획 stage = legacy 코드 부재 영역 / 사용자 별도 입력 (`methodology-spec/lifecycle-contract.md` §기획→분석 참조)
+[`../../tools/planning-extraction-validator/`](../../tools/planning-extraction-validator/) 자동 호출:
+- planning-spec source-grounded coverage ≥ 0.80 의무
+- 위반 시 state.blocked=true / cli exit 2 / chain 2 진입 차단
+
+## 산출물
+
+- `<project>/.aimd/output/planning-spec.{json,md}` — UC-* + 비즈니스 의도 + domain priority
+
+## Sibling
+
+- [`../analysis/`](../analysis/) — analysis stage / 본 stage 의 input (7대 산출물)
+- [`../spec/`](../spec/) — chain 2 / 본 stage 의 output 활용 (UC → BHV)
+- [`../_base/invoke-go-stop-gate/`](../_base/invoke-go-stop-gate/) — gate #1 호출
+
+## 참조
+
+- [`../../methodology-spec/deliverables/17-planning-spec.md`](../../methodology-spec/deliverables/17-planning-spec.md) — planning-spec 명세
+- [`../../schemas/planning-spec.schema.json`](../../schemas/planning-spec.schema.json) — schema
+- ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-002 (go-stop-gate)
+- DEC-2026-05-06-sub-plan-4-종결 — 3 skill 정식 채움 record

@@ -1,8 +1,10 @@
-# agents/design/ — placeholder (☐ 미래 lifecycle 확장)
+# agents/design/ — v2.x carry (chain harness 4 stage 외)
 
-현재 채움 없음. v2.0+ scope.
+★ ★ v2.0.0-rc1 chain harness validated 의 4 stage = **planning / spec / test / implement**. design stage = chain 2 (spec) 와 차별화 시점 carry → **v2.x lifecycle 확장 결단 시 채움**.
 
-## 향후 채움 trigger (v2.0 lifecycle 확장 결단 시)
+★ design 영역 자산은 analysis stage 안에 부분적으로 포함됨 — `methodology-spec/deliverables/7-ui-ux.md` (FE+디자인 cross-cutting) + `8-state-map.md` (FE 동적) + `9-visual-manifest.md` (Playwright snapshot) + ADR-FE-002 (DTCG 2025.10) + ADR-FE-005 (권위 매개체 13). chain 2 spec 진입 시 본 자산 통합 가능.
+
+## 향후 채움 trigger (v2.x lifecycle 확장 결단 시)
 
 - **UX** — 사용자 여정 / 정보 구조 / 인터랙션 모델
 - **visual-designer** — DTCG token / 시각 시스템 정합

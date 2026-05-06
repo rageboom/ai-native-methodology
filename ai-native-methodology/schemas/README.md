@@ -1,69 +1,95 @@
-# JSON Schemas (방법론 산출물)
+# JSON Schemas (★ v2.0.0-rc1 chain harness validated)
 
-> 11 schema = 메타 (meta-confidence) + 인벤토리 (inventory) + 7대 산출물 (architecture / domain / openapi-extension / db-schema / rules / antipatterns / ui-spec) + Phase 4.5 (formal-spec) + Finding 시스템 (finding-system).
-> JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
+> **29 schema** = chain v2 (6) + state 영속 (3) + analysis BE 5 + analysis FE 8 + cross-cutting 4 + 메타 + 유틸. JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
 
 ---
 
-## 목록
+## chain harness v2.0 (6 + 3)
 
-| Schema | 용도 | 대응 산출물 |
+| Schema | 대응 산출물 | 사용 위치 |
 |---|---|---|
-| `meta-confidence.schema.json` | 모든 산출물 공통 메타 | meta 섹션 |
-| `inventory.schema.json` | Phase 1 인벤토리 | `inventory.json` |
-| `db-schema.schema.json` | Phase 2 DB 스키마 | `schema.json` |
-| `architecture.schema.json` | Phase 3 아키텍처 | `architecture.json` |
-| `domain.schema.json` | Phase 4 5.B 도메인 | `domain.json` |
-| `rules.schema.json` | Phase 4 5.A 비즈니스 규칙 | `rules.json` |
-| `openapi-extension.schema.json` | Phase 5.1 API 확장 | OpenAPI x-* 필드 |
-| `ui-spec.schema.json` | Phase 5.2 UI 명세 | `ui-spec.json` |
-| `antipatterns.schema.json` | Phase 6 안티패턴 | `antipatterns.json` |
-| `finding-system.schema.json` | Finding 등록·처리 (모든 phase) | `findings/poc-findings.{json,md}` |
-| `formal-spec.schema.json` | Phase 4.5 형식 명세 (state/sequence/decision-table/invariants/property) | `formal-spec/*.{json,mermaid,md,ts}` |
+| `planning-spec.schema.json` | chain 1 / planning-spec | `tools/planning-extraction-validator/` (gate #1) |
+| `behavior-spec.schema.json` | chain 2 / behavior-spec (BHV-* executable contract) | `tools/chain-coverage-validator/` (gate #2) |
+| `acceptance-criteria.schema.json` | chain 2 / Gherkin BDD AC-* | `tools/chain-coverage-validator/` |
+| `test-spec.schema.json` | chain 3 / TC-* (RED 의무) | `tools/spec-test-link-validator/` (gate #3) |
+| `impl-spec.schema.json` | chain 4 / IMPL-* (GREEN / 100% pass) | `tools/test-impl-pass-validator/` (gate #4) |
+| `traceability-matrix.schema.json` | release / UC→BHV→AC→TC→IMPL+commit_hash | `tools/traceability-matrix-builder/` |
+| `state.schema.json` | chain-driver state 영속 | `tools/chain-driver/src/state-store.js` |
+| `intervention-log.schema.json` | 사용자 결단 로그 (single-writer JSONL) | `tools/chain-driver/src/intervention-log.js` |
+| `test-cmd.schema.json` | test runner 호출 명세 (framework / cmd / args / cwd) | `tools/test-impl-pass-validator/` |
+
+## Analysis stage — BE 5 + FE 8
+
+| Schema | 대응 산출물 | 트랙 |
+|---|---|---|
+| `architecture.schema.json` | Phase 3 architecture | BE/FE |
+| `domain.schema.json` | Phase 4 domain | BE |
+| `db-schema.schema.json` | Phase 2 DB schema | BE |
+| `openapi-extension.schema.json` | Phase 5-1 API 확장 (x-* fields) | BE |
+| `rules.schema.json` | Phase 4 business-rules | BE/FE |
+| `ui-spec.schema.json` | Phase 5-2 UI 명세 | FE |
+| `state-map.schema.json` | Phase 5-2-b state machine | FE |
+| `visual-manifest.schema.json` | Phase 5-2-c Playwright snapshot | FE |
+| `form-validation-spec.schema.json` | Phase 5 form validation (Zod / Yup / RHF / etc 9종) | FE |
+| `type-spec.schema.json` | Phase 5 TypeScript type-spec (ts-morph) | FE |
+| `error-mapping-spec.schema.json` | Phase 5 error mapping (v1.5.0 신설) | BE |
+
+## Cross-cutting — aspect 4
+
+| Schema | 대응 산출물 |
+|---|---|
+| `a11y-spec.schema.json` | aspect / a11y (WCAG 2.2 AA) |
+| `i18n-spec.schema.json` | aspect / i18n |
+| `static-security-spec.schema.json` | aspect / 정적 보안 |
+| `legacy-spectrum.schema.json` | legacy Tier 1~4 + Strangler |
+
+## 공통 메타 + 유틸
+
+| Schema | 용도 |
+|---|---|
+| `meta-confidence.schema.json` | 모든 산출물 공통 메타 (신뢰도 0.0~0.98 + source 명시) |
+| `inventory.schema.json` | Phase 1 인벤토리 |
+| `formal-spec.schema.json` | Phase 4.5 형식 명세 (state-machine / sequence / decision-table / invariants / property-test / cross_validation) |
+| `antipatterns.schema.json` | Phase 6 antipatterns (avoid-list + migration_advice) |
+| `finding-system.schema.json` | finding 등록·분류·처리 (모든 phase / chain stage) |
 
 ---
 
-## CI 검증
+## 검증 도구
 
-### v1.2.1 (현재) — Phase 4.5 자동 검증 도구 도입 ✅
-
-`tools/drift-validator/` + `tools/decision-table-validator/` + `tools/static-runner/` 신설. `.github/workflows/drift-check.yml` 이중 모드 (PR diff-aware + nightly full + manual).
+[`../tools/schema-validator/`](../tools/schema-validator/) (Ajv 8 strict mode) 가 chain v2 6 schema 자동 등록 + if/then 강제. CI 통합 = `.github/workflows/drift-check.yml`.
 
 ```bash
-# 본 산출물 schema 정합 + drift + dmn-check 5종 자동 검증
-node ai-native-methodology/tools/drift-validator/src/cli.js <output-dir>
-node ai-native-methodology/tools/decision-table-validator/src/cli.js <output-dir>
+node tools/schema-validator/src/cli.js <output-dir>
 ```
 
-### v1.2.1 — `formal-spec.schema.json` 5종 물증 강제 ★
-
-`cross_validation.validators[]` 의 `real_tool: true` 시 **5종 물증 if/then 의무**:
-- `tool_version` / `tool_stdout_path` / `tool_stderr_path` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command`
-
-`real_tool: false` 시 `simulation_reason` 의무. `simulation_only: true` 시 자동 fail.
+★ ★ ★ **5종 물증 if/then 의무** (`formal-spec.schema.json` + `test-spec.schema.json` + `impl-spec.schema.json`):
+- `cross_validation.validators[]` 의 `real_tool: true` 시 `tool_version` / `tool_stdout_path` / `tool_stderr_path` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command` 모두 의무
+- `real_tool: false` 시 `simulation_reason` 의무 (단 `simulation_only: true` 시 자동 fail / no-simulation 정책)
 
 → `tools/static-runner/lint-no-simulation.sh` 가 grep 보강 (이중 안전망).
 
-### v1.3+ 후속 (TODO)
+## 작성 규칙
 
-- 7대 산출물 + meta-confidence schema 의 CI 자동 검증 (ajv-cli 또는 jsonschema)
-- pre-commit hook
-- 참고: Backstage Catalog Entity 검증 모델
+- `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식
+- 외부 참조 = 상대 경로 (`./meta-confidence.schema.json`)
+- 모든 enum 값 = ADR 또는 phase-*.md 본문과 정합
+- 신규 필드 = 옵셔널 default (호환성 유지)
+- `additionalProperties: false` 의무 (실수 차단)
 
-### 수동 검증 (현재 / fallback)
+## 수동 검증 (fallback)
 
 ```bash
 npx ajv validate \
-  -s schemas/inventory.schema.json \
-  -d output/inventory/inventory.json \
+  -s schemas/planning-spec.schema.json \
+  -d output/.aimd/planning-spec.json \
   -r schemas/meta-confidence.schema.json
 ```
 
----
+## 참조
 
-## 작성 규칙
-
-- `$id` 는 `https://ai-native-methodology/schemas/{name}.schema.json` 형식
-- 외부 참조는 상대 경로 (`./meta-confidence.schema.json`)
-- 모든 enum 값은 ADR 또는 phase-*.md 본문과 정합
-- 신규 필드는 옵셔널이 기본 (호환성 유지)
+- [`../README.md`](../README.md) — plugin user 진입점
+- [`../tools/README.md`](../tools/README.md) — 12 도구 cadence + 각 도구가 검증하는 schema
+- [`../methodology-spec/README.md`](../methodology-spec/README.md) — phase × deliverable × schema 매트릭스
+- ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-004 (test-runner-invocation-contract)
+- DEC-2026-05-06-sub-plan-2-종결 — chain v2 6 schema 신설 record

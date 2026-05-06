@@ -1,9 +1,21 @@
-# templates/test/ — placeholder (☐ v2.0+ lifecycle 확장)
+# templates/test/ — chain 3 (test stage) template
 
-현재 채움 없음. v1.4.x 가치 명세 = analysis stage only.
+★ v2.0.0-rc1 chain harness validated. chain 3 (test / RED 의무) 의 test-spec template placeholder. sub-plan-4 일부 채움 / 미채움 부분 = v2.x carry.
 
-## 향후 채움 후보 (v2.0)
+## 본 디렉토리 자산
+
+현재 디렉토리 자체 template 채움은 사용자 프로젝트마다 framework 분기 (jest / vitest / junit5 / pytest / mocha 등) 가 달라 일률적 template 부재. 대신:
+
+- `<project>/.aimd/config/test-cmd.json` (★ `schemas/test-cmd.schema.json` 정합) — test runner 명세
+- 실 test code = chain 3 skill (`run-test-evidence`) 가 생성
+
+## 향후 채움 후보
 
 - `test-plan.template.json`
 - `contract-test.template.ts` (openapi.yaml + rules.json → contract test)
 - `e2e-spec.template.md`
+
+## 참조
+
+- [`../../skills/test/`](../../skills/test/) — chain 3 skill 3종 (sub-plan-4 채움)
+- [`../../methodology-spec/deliverables/20-test-spec.md`](../../methodology-spec/deliverables/20-test-spec.md)

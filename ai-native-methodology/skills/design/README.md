@@ -1,8 +1,10 @@
-# skills/design/ — placeholder (☐ 미래 lifecycle 확장)
+# skills/design/ — v2.x carry (chain harness 4 stage 외)
 
-현재 채움 없음. v2.0+ scope.
+★ ★ v2.0.0-rc1 chain harness validated 의 4 stage = **planning / spec / test / implement**. design stage = chain 2 (spec) 와 차별화 시점 carry → **v2.x lifecycle 확장 결단 시 채움**.
 
-## 향후 채움 후보 (v2.0)
+★ design 영역 자산은 analysis stage 의 FE 트랙 (`skills/analysis/phase-5-state-map` / `phase-5-visual-manifest` / `phase-5-form-validation` / `phase-5-type-spec`) 에 부분 포함됨. chain 2 spec 진입 시 본 자산 통합 가능.
+
+## 향후 채움 후보 (v2.x lifecycle 확장 결단 시)
 
 - `extract-wireframe` — 분석 산출물 (state-map / visual-manifest) → wireframe spec
 - `generate-dtcg-token` — design token 추출 (DTCG 표준)

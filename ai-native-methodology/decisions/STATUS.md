@@ -19,6 +19,29 @@
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
 
+## ★ ★ cleanup round 2-B 후속 (2026-05-06) — 9 도구 표준화 + 10 placeholder 정돈 + schemas/README 갱신
+
+DEC-2026-05-06-cleanup-round-2-B-followup.
+
+| 영역 | 처리 |
+|---|---|
+| 9 도구 README 표준 schema 통일 | Purpose / When / In / Out / Exit / Siblings / 참조 (cleanup round 2-B 신설 4 도구 README 와 동일 형식) |
+| 10 placeholder README 정돈 | (1) skills/{test,planning,implement} 활성 채움 / (2) skills/design + agents/design + templates/design = v2.x carry / (3) agents/analysis 활성 + templates/{test,planning,implement} lifecycle 정합 |
+| schemas/README 갱신 | 11 → **29 schema** (chain v2 6 + state 3 + BE 5 + FE 8 + cross-cutting 4 + 메타 + 유틸) / 5종 물증 if/then 의무 + Ajv 8 strict mode |
+| dist file count | 251 (변경 없음 / 모두 갱신) |
+| 변경 file 수 | 20 (9 tool + 10 placeholder + 1 schemas/README) |
+| Sibling cross-link 그래프 | ★ 각 도구 README 4+ sibling 명시 |
+
+stale 메시지 제거 ("v1.4.x analysis only" / "v2.0+ scope" → v2.0.0-rc1 chain harness validated 정합).
+
+**Carry (Round 2-C / 2-D)**:
+- 2-C: 사용자 journey 자산 신설 (getting-started / chain-harness-guide / common-errors / first-prompt-cookbook)
+- 2-D: project root CLAUDE.md sync + v1.4.0-dev 3 entry CHANGELOG-HISTORY 추가 격리 검토
+
+★ no release / no tag / v2.0.0-rc1 → final 자격 영향 ❌.
+
+---
+
 ## ★ ★ ★ cleanup round 2-B (2026-05-06) — 각 폴더 README 정돈 / 사용자 진짜 핵심
 
 DEC-2026-05-06-cleanup-round-2-B.

@@ -1,35 +1,60 @@
-# skills/implement/ — placeholder (☐ 미래 lifecycle 확장)
+# skills/implement/ — chain 4 (impl stage / GREEN 의무)
 
-현재 채움 없음. v2.0+ scope.
+본 디렉토리 = chain harness 4 단계 / **impl-spec + 실 impl code (GREEN / 100% test pass)**. TC-* (test case) 를 통과하는 IMPL-* 작성. RED → GREEN 전환.
 
-## 향후 채움 후보 (v2.0)
+## 호출 cadence
 
-- `refactor-by-spec` — legacy 코드 + 7대 산출물 → 신규 시스템 구현 가이드
-- `generate-from-rules` — rules.json + openapi.yaml → API 핸들러 scaffold
+- **trigger**: chain 3 (test) gate #3 통과 후 (RED 입증 + AC→TC ≥ 0.85)
+- **자연어**: "impl spec 생성 GREEN" / "impl 코드 작성"
+- **chain-driver**: `next` 진입 시 자동 호출
 
-## 5 영역 매트릭스 — implement stage
+## skill 2종 (sub-plan-4 채움 ✅)
 
-| 영역 | 강도 | 설명 |
-|---|---|---|
-| 기획 | ❌ | 적용 안 됨 |
-| 디자인 | 약 | DTCG token 코드 적용 / component 시각 정합 |
-| FE | 강 | UI / state / route / form / a11y / i18n 코드 |
-| BE | 강 | controller / service / repository / domain / migration 코드 |
-| DB | 강 | schema migration / seed / index / 정합 제약 |
-| 공통 | 강 | logging / observability / CI/CD / build artifact |
+| skill | 역할 |
+|---|---|
+| [`generate-impl-spec/`](./generate-impl-spec/) | TC-* → IMPL-* 분해 + 실 impl code 작성 (impl-spec.{json,md} 산출 / `impl-spec.schema.json` 정합) |
+| [`verify-test-pass/`](./verify-test-pass/) | ★ 진짜 test runner 호출 + 100% test pass + result_hash 정규화 |
 
-## 기술 스택 분기 정책
+## GREEN 의무 (★ ★ ★ no-simulation 정책 핵심)
 
-기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용 / v2.0 진입 시 SKILL.md 신설 시점에 적용 / 본 추상화 단계는 정책 선언만). 구현 stack 후보: Spring Boot / NestJS / Express / FastAPI / Rails / React / Vue / Svelte / Solid / Next.js / Nuxt / Prisma / TypeORM / JPA / SQLAlchemy / Mongoose.
+chain 4 종결 시 다음 모두 검증:
+- 실 impl code 작성됨 (mock ❌ / placeholder ❌)
+- chain 3 의 test code 그대로 재호출 (test 변경 ❌)
+- **모든 test pass (100%)** — GREEN 입증
+- 5종 물증 + result_hash deterministic (sha256 / framework_neutral / order 비결정 차단)
 
-## 인터페이스 (lifecycle-contract.md §테스트→구현)
+LLM "impl 작성한 척 / GREEN 확인한 척" 시뮬레이션 차단 — `--allow-execute` 의무 + shell injection 차단 (DEC-2026-05-06-sub-plan-3b-종결).
 
-- input (테스트→구현): test-plan + contract-test 코드 / 산출물 7종
-- 산출물 (구현→배포): production code / 빌드 artifact
-- ★ 사용자 시나리오 6번 (2026-05-02) — "구현부분은 없고". 본 추상화 단계 = 골격 placeholder 만 / `methodology-spec/lifecycle-contract.md` §가치 경계 충돌 deferral 참조
+## v2.0 paradigm 정합 — round-trip 부분 허용
 
-## 가치 경계 (★★★ 본 방법론 가치 명세)
+★ ★ DEC-2026-05-06-round-trip-부분-허용 — chain harness gate 안에서 round-trip (산출물 → 신규 코드 자동 생성) 정식 허용. 단:
+- gate #4 의 100% test pass 통과 의무
+- AI 자동 ≥ 85% / 사용자 검토 ≤ 15%
+- 70~80% 한계 명시 잔존
 
-`legacy 코드 → 7대 산출물 한 방향 추출기 / round-trip 영구 scope 제외` (CLAUDE.md ★★★).
+## gate #4 (release 진입 자격)
 
-본 방법론 산출물은 신규 시스템 구축 시 **입력 자료**. 산출물 → 코드 자동 생성 같은 round-trip 은 영구 scope 외부. implement skills 는 **사람이 신규 시스템을 만들 때 산출물을 가이드로 활용** 하는 보조 도구일 뿐, 산출물 자체를 검증하는 round-trip 은 아님.
+[`../../tools/test-impl-pass-validator/`](../../tools/test-impl-pass-validator/) 자동 호출:
+- 진짜 test runner 실행 (jest / vitest / junit5 / pytest / `--allow-execute` 의무)
+- 100% test pass / fail 0
+- result_hash 정규화 (sha256 / SARIF Appendix F 정합)
+- flaky retry per-test cap 2 (Playwright 정합)
+
+## 산출물
+
+- `<project>/.aimd/output/impl-spec.{json,md}` — IMPL-* 명세
+- `<project>/.aimd/output/impl/` — 실 impl code (Spring / NestJS / React / etc)
+- `<project>/.aimd/output/test/result_hash.json` — GREEN 5종 물증
+
+## Sibling
+
+- [`../test/`](../test/) — chain 3 / 본 stage 의 input (TC-*)
+- [`../_base/build-traceability-matrix/`](../_base/build-traceability-matrix/) — release matrix (UC→BHV→AC→TC→IMPL+commit_hash)
+
+## 참조
+
+- [`../../methodology-spec/deliverables/21-impl-spec.md`](../../methodology-spec/deliverables/21-impl-spec.md) — impl-spec 명세
+- [`../../schemas/impl-spec.schema.json`](../../schemas/impl-spec.schema.json) — schema
+- ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-004 (test-runner-invocation-contract)
+- DEC-2026-05-06-sub-plan-4-종결 — 2 skill 정식 채움 record
+- DEC-2026-05-06-round-trip-부분-허용 — chain 4 round-trip 정식 허용 결단

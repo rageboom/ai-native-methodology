@@ -87,6 +87,22 @@
 - sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
 - sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
 
+### Cleanup round 2-B 후속 (2026-05-06 / DEC-2026-05-06-cleanup-round-2-B-followup / 표준화 + placeholder 정돈)
+
+★ ★ Round 2-B 후속 — (1) 9 도구 README 표준 schema 통일 (Purpose / When / In / Out / Exit / Siblings / 참조) / (2) 10 placeholder README 정돈 / (3) schemas/README 갱신 (11 → **29 schema**).
+
+| 영역 | 처리 |
+|---|---|
+| 9 도구 표준 schema | chain-coverage / decision-table / drift / formal-spec-link / planning-extraction / spec-test-link / spectral / static / traceability |
+| 10 placeholder | skills/{test,planning,implement} 활성 / skills/design + agents/design + templates/design v2.x carry / agents/analysis + templates/{test,planning,implement} lifecycle 정합 |
+| schemas/README | chain v2 6 + state 3 + BE 5 + FE 8 + cross-cutting 4 + 메타 |
+| dist file | 251 (변경 없음) |
+| 변경 file | 20 |
+
+stale 메시지 제거 ("v1.4.x analysis only" → v2.0.0-rc1 chain harness validated 정합) / Sibling cross-link 그래프 완성. shasum 250 OK.
+
+**Carry**: Round 2-C (사용자 journey 자산) + Round 2-D (project root CLAUDE sync).
+
 ### Cleanup round 2-B (2026-05-06 / DEC-2026-05-06-cleanup-round-2-B / 각 폴더 README 정돈)
 
 ★ ★ ★ 사용자 reframe 2차 ("각 폴더 자산 정돈 + 참조 + 호출 visible") **핵심 의도 정합** — 부재 README 10 신설 (6 폴더 + 4 도구). 표준 schema (Purpose / When / In / Out / Exit / Siblings / 참조) 통일.
