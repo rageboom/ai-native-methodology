@@ -105,27 +105,38 @@ export function atomicWrite(finalPath, contentString) {
 
 // CAS write: read-time version 일치 확인 → +1 → write.
 // `mutator(state)` returns updated state OR throws to abort.
-export function writeStateCAS(projectRoot, mutator) {
+//
+// ★ Senior F5#1 chaos test 발견 — caller 가 외부에서 read 한 시점의 baseline 을
+//   `options.expectedVersion` 으로 전달하면, mutator 호출 시점의 disk 값과 비교하여
+//   외부 race 를 detect. 미전달 시 함수 내부 read 만으로 best-effort CAS (단일 process 정합).
+export function writeStateCAS(projectRoot, mutator, options = {}) {
   const path = statePath(projectRoot);
   const before = existsSync(path) ? readState(projectRoot) : null;
   const baselineVersion = before ? before.version : CURRENT_STATE_VERSION;
+
+  // ★ Strict CAS — caller-supplied expectedVersion vs disk before mutator runs.
+  if (options.expectedVersion !== undefined && before
+      && before.version !== options.expectedVersion) {
+    throw new StateCorruptError(
+      `CAS conflict — caller expected version ${options.expectedVersion} but disk has ${before.version} (external write detected)`
+    );
+  }
 
   const next = mutator(before ? structuredClone(before) : null);
   if (!next || typeof next !== 'object') {
     throw new Error('mutator must return state object');
   }
 
-  // CAS check — between read and write, if file changed, abort.
+  // ★ Re-check after mutator — defends against in-flight concurrent writes.
   if (existsSync(path)) {
     const current = readState(projectRoot);
     if (current.version !== baselineVersion) {
       throw new StateCorruptError(
-        `CAS conflict — read version ${baselineVersion} but current is ${current.version}`
+        `CAS conflict — baseline ${baselineVersion} but disk advanced to ${current.version} during mutator`
       );
     }
   }
 
-  // bump patch version on every write (CAS counter)
   next.version = bumpVersion(next.version || baselineVersion);
   atomicWrite(path, JSON.stringify(next, null, 2) + '\n');
   return next;

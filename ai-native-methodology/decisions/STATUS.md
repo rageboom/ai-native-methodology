@@ -75,6 +75,14 @@
 - final = 2026-05-07~ + clean clone 1회 PoC #05 e2e 재실행 통과 시
 - v2.0.1 hot-fix trigger: release-readiness regress 1+ / Senior HIGH 1+ / 7일 carry > 3건
 
+### ★ ★ ★ sp6-c8 chaos test 진행 (2026-05-06 / Senior F5)
+
+- ✅ **CAS race detection** — writeStateCAS 에 `options.expectedVersion` 추가 (caller-supplied baseline). 진짜 버그 (함수 내부 read 만으로 외부 race 미검출) 발견 + fix.
+- ✅ **intervention-log JSONL** single-writer 가정 하 small/large line 정합 입증 (다중 writer = sp6-c6 carry).
+- ✅ **interrupted mid-stage recovery** — `recoverTmpFiles` 검증 + `initState` 재실행 거부 + CLI exit 4 surface.
+- 8 chaos test 추가 (chain-driver 60 → **68**) / workspace 201 → **209** / total 210 → **218**.
+- ★ Senior F5#1 sp6-c8 carry → resolved (release block 부재 / fix in-place / v2.0.0 final 자격 강화).
+
 ---
 
 ## ★ ★ ★ ★ ★ sub-plan-5 종결 (2026-05-06) — chain harness 호칭 전환
