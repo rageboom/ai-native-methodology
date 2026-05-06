@@ -75,6 +75,15 @@
 - final = 2026-05-07~ + clean clone 1회 PoC #05 e2e 재실행 통과 시
 - v2.0.1 hot-fix trigger: release-readiness regress 1+ / Senior HIGH 1+ / 7일 carry > 3건
 
+### ★ ★ ★ sp6-c4 PoC #04 mini FE retrofit 진행 (2026-05-06 / Senior F7 부분 closure)
+
+- ✅ chain 1~2 + chain 3 RED dry-run (PAGE-LOGIN 1 use case subset / Zod validation BR-FE)
+- ✅ schema-validator 4 file ✅ / chain-coverage 0 findings (UC→BHV 100% / BHV→AC 100%)
+- ✅ traceability-matrix 1 cell / forward=0% (impl OUT) / backward=100%
+- **§8.1 #1 corroboration 3 PoC** 인식 (release-readiness): poc-03 BE retrofit / **poc-04 FE retrofit (신규)** / poc-05 BE e2e
+- Senior F7 (v2.0 = BE-only) 부분 closure → "BE e2e + BE retrofit + FE retrofit"
+- sp6-c4 carry → resolved (v2.1+ → v2.0.x 안에서 처리)
+
 ### ★ ★ ★ sp6-c8 chaos test 진행 (2026-05-06 / Senior F5)
 
 - ✅ **CAS race detection** — writeStateCAS 에 `options.expectedVersion` 추가 (caller-supplied baseline). 진짜 버그 (함수 내부 read 만으로 외부 race 미검출) 발견 + fix.

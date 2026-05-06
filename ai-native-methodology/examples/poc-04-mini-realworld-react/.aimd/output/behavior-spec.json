@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T19:05:00Z",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "design_specs", "diagrams_other"],
+    "confidence": 0.80,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "planning_spec_path": ".aimd/output/planning-spec.json",
+    "analysis_artifacts": [
+      "analysis/5-2-a-ui-base/ui-spec.json",
+      "analysis/6-quality/form-validation-spec.json"
+    ]
+  },
+  "behaviors": [
+    {
+      "id": "BHV-FE-LOGIN-001",
+      "name": "FE Login behavior",
+      "description": "사용자 자격증명 입력 → Zod 검증 → POST /api/users/login → 성공 시 navigate('/settings') / 실패 시 form error.",
+      "use_case_refs": ["UC-FE-LOGIN-001"],
+      "br_refs": ["BR-FE-LOGIN-VALIDATION-001"],
+      "preconditions": [
+        "form.email is non-empty string",
+        "form.password is non-empty string"
+      ],
+      "postconditions": [
+        "성공: localStorage.set('token', jwt) + redirect to /settings",
+        "실패: form.errors.root = '잘못된 이메일 또는 비밀번호'"
+      ],
+      "invariants": [
+        "auth_required=false 페이지에서만 진입 가능 (이미 인증된 사용자는 /settings 리다이렉트)"
+      ],
+      "acceptance_criteria_refs": ["AC-FE-LOGIN-001"],
+      "source_grounded_evidence": [
+        "analysis/5-2-a-ui-base/ui-spec.json PAGE-LOGIN + ACTION-USER-LOGIN"
+      ]
+    }
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "analysis/5-2-a-ui-base/ui-spec.json",
+      "analysis/6-quality/form-validation-spec.json"
+    ]
+  }
+}
