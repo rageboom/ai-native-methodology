@@ -1,10 +1,20 @@
-# agents/implement/ — placeholder (☐ 미래 lifecycle 확장)
+# agents/implement/ — chain 4 (구현) stage agent (★ v2.0 / i-strict)
 
-현재 채움 없음. v2.0+ scope.
+★ ★ ★ v2.0 SDLC 4단계 chain harness 의 chain 4 stage / **i-strict 정통** (AI 자동 impl 코드 생성 + 사용자 검토). DEC-2026-05-06-v2.0-i-strict-채택 정합. master plan `~/.claude/plans/a-stateful-gadget.md`.
 
-## 향후 채움 trigger (v2.0 lifecycle 확장 결단 시)
+## 역할
 
-- **full-stack-implementer** — spec → 구현 코드 생성 / refactor-by-spec
+chain 4 (implement) = **test-spec 기반 실 impl 코드 자동 생성** (GREEN 의무 — 모든 test 100% pass). 산출물 = `impl-spec.{json,md}` (deliverable 21 / sub-plan-2 신설) + 실 impl 코드 + production artifact.
+
+★ ★ ★ **no-simulation 강화** — test-impl-pass-validator 진짜 runner 호출 / 5종 물증 7 필드 + impl_test_pass_rate (100% 의무) + coverage_report + linter.
+
+## agent persona (sub-plan-4 정식 채움)
+
+| persona | 역할 |
+|---|---|
+| **full-stack-implementer** | spec → 구현 코드 자동 생성 / refactor-by-spec |
+| **test-pass-verifier** ★ v2.0 신설 | 진짜 runner 실행 / 100% pass 검증 / 5종 물증 보존 |
+| **revisit-detector** ★ v2.0 신설 | impl 변경 시 spec/test 영향 자동 감지 → chain-revisit-detector 통합 → 사용자 prompt |
 
 ## 5 영역 매트릭스 — implement stage
 
@@ -19,14 +29,29 @@
 
 ## 기술 스택 분기 정책
 
-기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용 / v2.0 진입 시 SKILL.md 신설 시점에 적용 / 본 추상화 단계는 정책 선언만). 구현 stack 후보: Spring Boot / NestJS / Express / FastAPI / Rails / React / Vue / Svelte / Solid / Next.js / Nuxt / Prisma / TypeORM / JPA / SQLAlchemy / Mongoose.
+기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용). 구현 stack 후보: Spring Boot / NestJS / Express / FastAPI / Rails / React / Vue / Svelte / Solid / Next.js / Nuxt / Prisma / TypeORM / JPA / SQLAlchemy / Mongoose.
 
-## 인터페이스 (lifecycle-contract.md §테스트→구현)
+## 인터페이스 (lifecycle-contract.md §chain 4)
 
-- input (테스트→구현): test-plan + contract-test 코드 / 산출물 7종
-- 산출물 (구현→배포): production code / 빌드 artifact
-- ★ 사용자 시나리오 6번 (2026-05-02) — "구현부분은 없고". 본 추상화 단계 = 골격 placeholder 만 / ★ `methodology-spec/lifecycle-contract.md` §가치 경계 충돌 deferral 참조
+- input (test → implement): test-spec.json + 실 test 코드 (RED) + behavior-spec + 7대 산출물
+- 산출물 (implement → 종결): impl-spec.json + 실 impl 코드 (GREEN / 100% test pass) + 5종 물증 + production artifact
+- ★ ★ ★ go/stop gate #4 (사용자 검토 / ADR-CHAIN-002 정합)
+- ★ ★ ★ test-impl-pass-validator 의무: 진짜 runner 호출 / 모든 TC-* pass / coverage_report ≥ 0.85
 
-## 가치 경계
+## skills
 
-본 방법론 ★★★ 가치 명세 = "legacy 코드 → 7대 산출물 한 방향 추출기 / round-trip 영구 scope 제외". 구현 stage 는 신규 시스템 구축 단계 — 본 방법론 산출물을 **입력 자료** 로 활용. 산출물 → 코드 자동 생성 같은 round-trip 은 영구 scope 외부.
+- `skills/implement/generate-impl-spec/` ★ sub-plan-4 신설 (chain 4 main)
+- `skills/implement/verify-test-pass/` ★ sub-plan-4 신설 (진짜 runner / 100% pass)
+
+## 가치 경계 (★ v2.0 갱신)
+
+★ ★ ★ **chain harness 안에서 round-trip 정식 허용** (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract):
+
+| 영역 | scope |
+|---|---|
+| 산출물 → 신규 코드 자동 생성 (chain 4 안) | ✅ 허용 |
+| AI 시뮬 (구현 정확성 시뮬) | ❌ no-simulation 강화 (5종 물증 7 필드) |
+| harness 외부 자동 코드 생성 | ❌ scope 외 |
+| 70~80% 한계 | ★ 명시 잔존 (gate #4 ≤ 15%) |
+
+★ ★ Lessons Learned 14차 retract pattern (단일 source-of-truth 위배) 회피 — research-first / Babel/Yarn/Sentry 사례 사전 검토 / 6 sub-plan 분할 진입.

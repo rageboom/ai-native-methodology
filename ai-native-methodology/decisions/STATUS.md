@@ -3,7 +3,38 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-05 (★ ★ **v1.4 프로젝트 적합성 평가 보고서 산출** / `docs/v1.4-evaluation-report.md` (713 line) — Plan mode + Explore agent 3종 병렬 + AskUserQuestion 4차 / ★ 결과: 본 레포 v1.5.0 ↔ 사용자 의도 (AI-Native SDLC plugin) **구조적 정합** 입증 / ★ v2.0 결단 carry 정식 등재 — (1) 구현 수준 (i-soft / i-strict / iii) / (2) `plugin/` 디렉토리 의도 확인 / (3) use case 4종 entry flow 시작 / 24h cooling-off 정합 / ★ 직전 v1.5.0 MINOR release (2026-05-03 / 98998d5) — ADR-BE-001 negative-space corroboration 정식화 + §8.1 strict 정합 검증대 두 번째 통과 보존)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 (DEC-2026-04-29 partial retract) + DEC-2026-05-06-cooling-off-정책-폐기 / 사용자 명시 결단 ("A로 하고 싶다") / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate go/stop + revisit loop (자동 감지 + 사용자 결단) / 1차 single-case (legacy 재구축) / use case 4종 분기 = v2.1+ carry / 70~80% 한계 명시 잔존 (gate별 사용자 검토 ≤15%) / master plan `~/.claude/plans/a-stateful-gadget.md` / γ hybrid sequencing 6 sub-plan 분할 / sub-plan-1 (scope) ★ 본 세션 진행 중)
+
+## ★ ★ ★ v2.0 진행 (sub-plan 6 sprint)
+
+| Sprint | Sub-plan | 산출 | 상태 |
+|---|---|---|---|
+| **M+1** | sub-plan-1 (scope) | DEC + i-strict + lifecycle-contract / CLAUDE.md / skills-axis / agents / STATUS / INDEX 갱신 | 🔄 본 세션 진행 중 |
+| M+2 | sub-plan-2 (schemas + deliverables + ADR) | 6 schema + 6 deliverable + 3 신규 ADR + 3 ADR v2 | ⏳ |
+| M+3 | sub-plan-3 (tools) | 6 신규 도구 + 기존 6 chain 모드 / unit test 53 → 80+ | ⏳ |
+| M+4 | sub-plan-4 (skills + flows) | 14 skill + agents 갱신 + 5 flow + sdlc-4stage-flow.json | ⏳ |
+| M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + chain-revisit-detector / go/stop UX | ⏳ |
+| M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | ⏳ |
+
+## ★ ★ v2.0 carry (master plan §K)
+
+| # | 항목 | 시점 |
+|---|---|---|
+| K-1 | use case 4종 entry flow 분기 | v2.1+ |
+| K-2 | impl 70~80% 한계 closure 옵션 B | v2.x |
+| K-3 | design stage skill 본격 채움 | v2.x |
+| K-4 | external orchestrator integration | v2.x |
+| K-5 | impl runner multi-framework parallel | v2.x |
+| K-6 | tools/ node_modules 경량화 | v2.0.0 후 |
+| K-7 | 기술 스택 분기 디렉토리 | (영구 — SKILL.md 본문 분기) |
+| K-8 | adoption 외부 워크스페이스 | (영구 — DEC-2026-05-02-adoption-carry-OFF) |
+| K-9 | `plugin/` 디렉토리 의도 확인 | sub-plan 진행 중 별도 결단 시 |
+
+---
+
+## ★ ★ 직전 진행 (2026-05-05 ~ 5-3 / 보존)
+
+★ 2026-05-05 v1.4 프로젝트 적합성 평가 보고서 산출 (`docs/v1.4-evaluation-report.md` 713 line) + v2.0 결단 carry 등재. ★ 직전 v1.5.0 MINOR release (2026-05-03 / 98998d5) — ADR-BE-001 negative-space corroboration 정식화 + §8.1 strict 정합 검증대 두 번째 통과 보존.
 
 ---
 

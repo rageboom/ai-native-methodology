@@ -76,9 +76,29 @@ aspect skill 4종 (`aspect-a11y` / `aspect-i18n` / `aspect-static-security` / `a
 
 ## 4. 신규 phase ID 추가 절차 (★ MAJOR change)
 
-신규 manifest phase ID 추가 = phase 의존 그래프 변경 = **본체 구조 변경**. 24h cooling-off + 사용자 명시 결단 + ≥2 PoC corroboration 의무.
+신규 manifest phase ID 추가 = phase 의존 그래프 변경 = **본체 구조 변경**. 사용자 명시 결단 + ≥2 PoC corroboration 의무. (★ 24h cooling-off 의무는 DEC-2026-05-06-cooling-off-정책-폐기 로 제거)
 
-본 명세는 v2.0 schema 변경 window 에서 다룬다. v1.4.x 안에서는 ❌.
+★ ★ ★ **v2.0 schema 변경 window 시작 (2026-05-06)** — DEC-2026-05-06-v2.0-i-strict-채택 으로 chain 4단계 SDLC harness 정식 채택. 본 window 안에서:
+
+- ✅ 6 신규 schema 신설 허용 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix — sub-plan-2)
+- ✅ ★ chain stage axis 신설 — `flows/sdlc-4stage-flow.json` (★ sub-plan-4 신설 / stages + revisit_edges + sub_flow 통합)
+- ✅ chain stage 별 manifest phase-flow 신설 — `flows/{planning,spec,test,implement}.phase-flow.json`
+- ✅ skills 디렉토리 chain stage axis 확장 — `skills/{planning,spec,test,implement}/` (★ sub-plan-4)
+- ★ window 마감 = v2.0.0 정식 release 시점 / 그 후 v2.x = add only
+
+기존 `analysis.phase-flow.json` 의 9 phase = ★ 그대로 보존 / sdlc-4stage-flow.json 의 stages[analysis].sub_flow 로 흡수.
+
+### chain stage axis (★ v2.0 신설)
+
+| chain | stage | flow file | skills 디렉토리 | 산출물 |
+|---|---|---|---|---|
+| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis/phase-0-input/ | inventory + tree |
+| 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning/ (★ 채움) | planning-spec |
+| 1 sub | analysis | analysis.phase-flow.json | skills/analysis/ (현 19) | 7대 + 8 FE 산출물 |
+| 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec/ (★ 신설) | behavior-spec / acceptance-criteria |
+| 3 | test | test.phase-flow.json (★ 신설) | skills/test/ (★ 채움) | test-spec + 실 test 코드 (RED) |
+| 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement/ (★ 채움) | impl-spec + 실 impl 코드 (GREEN) |
+| cross | traceability | (sdlc-4stage-flow.json cross_cutting) | skills/_base/build-traceability-matrix/ | traceability-matrix |
 
 ## 5. 매핑 현황 (v1.4.4 시점)
 

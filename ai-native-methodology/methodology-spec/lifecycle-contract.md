@@ -1,35 +1,49 @@
 # Lifecycle Contract — SDLC 단계 간 산출물 인터페이스
 
-본 문서는 본 방법론의 lifecycle stage 간 **data contract** 를 정의. 현재 채워진 부분은 분석 stage 와 그 입출력 인터페이스만. 다른 stage 는 v2.0+ scope (placeholder).
+본 문서는 본 방법론의 lifecycle stage 간 **data contract** 를 정의. ★ ★ ★ **v2.0 = SDLC 4단계 chain harness 정식 채택** (DEC-2026-05-06-v2.0-i-strict-채택). 본 v1.5.x 가 채운 부분 = analysis stage. v2.0 sub-plan-1 ~ sub-plan-6 진행 중 다른 stage 정식 채움.
 
-## 본 방법론 가치 명세 (CLAUDE.md ★★★)
-
-```
-INPUT:  legacy 코드베이스
-OUTPUT: 7대 산출물 + finding + antipatterns + migration-cautions
-USE:    사람이 신규 시스템 구축 시 입력 자료 / 회피 가이드
-```
-
-**한 방향 추출기**. round-trip 검증 영구 scope 제외. 따라서 lifecycle stage 의 다른 부분 (planning / design / test / implement) 은 본 방법론의 산출물을 **입력 자료** 로 활용하는 보조 도구. 산출물 → 코드 자동 생성 같은 round-trip 은 영구 scope 외부.
-
-## SDLC stage 흐름
+## 본 방법론 가치 명세 (★ v2.0 / CLAUDE.md ★★★)
 
 ```
-기획 (planning)  →  분석 (analysis ★ 현재) →  설계 (design)  →  테스트 (test)  →  구현 (implement)
-   ☐ v2.0           ★ v1.4.x                    ☐ v2.0           ☐ v2.0          ☐ v2.0
+INPUT (1차 = legacy single-case):  legacy 코드베이스
+  ↓ analysis stage (chain 1단계 = 현 v1.5.x 자산)
+  ↓
+OUTPUT chain:
+  [CHAIN 1] planning-spec     ── go/stop gate #1
+  [CHAIN 2] behavior-spec + acceptance-criteria + 7대 산출물 통합  ── go/stop gate #2
+  [CHAIN 3] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+  [CHAIN 4] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+  ↓
+USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceability-matrix
 ```
 
-## 5 영역 axis (★ 사용자 시나리오 2026-05-02)
+**SDLC 4단계 chain harness**. round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / partial retract of DEC-2026-04-29-round-trip-스코프-아웃). harness 외부 자동 코드 생성 = ❌ scope 외부.
+
+★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌ 명시.
+
+## SDLC stage 흐름 (★ v2.0)
+
+```
+기획 (planning)  →  분석 (analysis)  →  스펙 (spec)  →  테스트 (test)  →  구현 (implement)
+   ★ v2.0            ★ v1.5.x         ★ v2.0          ★ v2.0           ★ v2.0
+   chain 1           chain 1 sub      chain 2         chain 3           chain 4
+```
+
+★ design stage = ★ v2.x carry (1차 = analysis 자산 deliverable 7~9 reuse / sub-plan 분할 정책 정합).
+★ 1차 구현 (v2.0.0) = legacy single-case (use case 4종 분기 = v2.1+ carry K-1).
+
+## 5 영역 axis (★ 사용자 시나리오 2026-05-02 / ★ v2.0 갱신)
 
 매 stage 가 5 영역 (`기획 / 디자인 / FE / BE / DB`) 을 다른 강도로 다룸. 강 = stage 의 핵심 / 약 = 부수 / ❌ = 적용 안 됨.
 
 | Stage | 기획 | 디자인 | FE | BE | DB | 공통 |
 |---|---|---|---|---|---|---|
-| **planning** ☐ v2.0 | 강 | 강 | 약 | 약 | 약 | 약 |
-| **analysis** ★ v1.4.x | ❌ | 약 (deliverable 7~9) | 강 | 강 | 강 | 강 |
-| **design** ☐ v2.0 | 약 | 강 | 강 | 약 | 약 | 약 |
-| **test** ☐ v2.0 | ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
-| **implement** ☐ v2.0 (★ 가치 경계 외부 / §가치 경계 충돌 deferral 참조) | ❌ | 약 | 강 | 강 | 강 | 강 |
+| **planning (chain 1)** ★ v2.0 | 강 | 강 | 약 | 약 | 약 | 약 |
+| **analysis (chain 1 sub)** ★ v1.5.x | ❌ | 약 (deliverable 7~9) | 강 | 강 | 강 | 강 |
+| **spec (chain 2)** ★ v2.0 | 약 | 약 | 강 | 강 | 강 | 강 |
+| **design** ☐ v2.x carry | 약 | 강 | 강 | 약 | 약 | 약 |
+| **test (chain 3)** ★ v2.0 | ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
+| **implement (chain 4)** ★ v2.0 (i-strict / chain harness 안에서 round-trip 정식 허용) | ❌ | 약 | 강 | 강 | 강 | 강 |
 
 각 stage 의 5 영역 매트릭스 상세 = `agents/{stage}/README.md` + `skills/{stage}/README.md` cross-link.
 
@@ -41,12 +55,19 @@ USE:    사람이 신규 시스템 구축 시 입력 자료 / 회피 가이드
 
 ## 단계 간 인터페이스 (data contract)
 
-### 기획 → 분석 (☐ v2.0)
+### chain 1 (기획) — planning stage (★ v2.0)
 
-input (분석 stage 가 받음):
-- PRD.md (product requirement document)
-- story.json / story.md (epic / story decomposition)
-- domain-priority.json (도메인 영역별 분석 우선순위)
+★ ★ 1차 구현 (v2.0.0) = **legacy 시스템 재구축 single-case** (사용자 답변 1번 정합). use case 4종 분기 (legacy/신규/수정/버그) = v2.1+ carry K-1.
+
+★ 1차 input (analysis stage 가 받은 산출물 → planning stage 가 받음):
+- 7대 산출물 + 8 FE 산출물 (analysis stage 산출 / `<user-project>/.aimd/output/`)
+- finding-system 누적
+- antipatterns + migration-cautions
+
+★ 후속 carry (use case 4종 별 input 분기 / v2.1+):
+- (a) legacy 재구축: 위 (1차 정의)
+- (b) 신규 PRD: 사용자 작성 PRD.md / story.json
+- (c) 수정 / (d) 버그: 위 + change-set spec
 
 ★ 5 영역 강도 (planning stage):
 
@@ -54,11 +75,80 @@ input (분석 stage 가 받음):
 |---|---|---|---|---|---|
 | 강 | 강 | 약 | 약 | 약 | 약 |
 
-★ 기획 stage = ★ legacy 코드 부재 영역 (PRD / wireframe = 구두 자료 또는 별도 시스템). 본 방법론은 ★ 사용자 별도 입력으로 받아 활용만.
+산출물 (planning stage 가 만듦):
+- **planning-spec.json** (deliverable 17 / `schemas/planning-spec.schema.json` ★ sub-plan-2 신설)
+- **planning-spec.md** (이중 렌더링 / ADR-008 v2 정합)
 
-스키마: v2.0 시점에 `schemas/planning-output.schema.json` 신설.
+기존 placeholder (v2.0 carry 였던 PRD / story / domain-priority) = ★ planning-spec.json 의 sub-section 으로 흡수 (1차 = legacy-extraction 모드 / 후속 use case 분기 시 source_format 분기 정책).
 
-### 분석 → 설계 (★ 현재 채움 = 7대 산출물 + 8 FE 산출물)
+### chain 2 (스펙) — spec stage (★ v2.0 / ★ ★ ★ "현 7대 + 신규 추가" 사용자 답변 3 정합)
+
+input (spec stage 가 받음):
+- planning-spec.json
+- analysis stage 7대 + 8 FE 산출물 (1~15 + 4.5)
+- finding-system 누적
+
+★ 5 영역 강도 (spec stage):
+
+| 기획 | 디자인 | FE | BE | DB | 공통 |
+|---|---|---|---|---|---|
+| 약 | 약 | 강 | 강 | 강 | 강 |
+
+산출물 (spec stage 가 만듦):
+- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — Phase 4.5 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수
+- **acceptance-criteria.json + .md** (deliverable 19 / `schemas/acceptance-criteria.schema.json` ★ sub-plan-2 신설) — Gherkin (Given/When/Then) BDD 정합 / verifiable=true 의무 / MoSCoW (must/should/nice)
+- **현 7대 산출물 통합** (변경 ❌) — behavior-spec.cross_links 가 모든 7대 산출물 reference (cross-link coverage 강제)
+
+★ ★ chain-coverage-validator (★ sub-plan-3 신설) = AC-* / BHV-* / UC-* 정합 ≥ 0.85 ratchet.
+
+### chain 3 (테스트) — test stage (★ v2.0)
+
+input (test stage 가 받음):
+- behavior-spec.json + acceptance-criteria.json
+- analysis stage 산출물 1~15
+- (carry) component-spec.json / DTCG token (★ design stage v2.x carry)
+
+★ 5 영역 강도 (test stage):
+
+| 기획 | 디자인 | FE | BE | DB | 공통 |
+|---|---|---|---|---|---|
+| ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
+
+산출물 (test stage 가 만듦):
+- **test-spec.json + .md** (deliverable 20 / `schemas/test-spec.schema.json` ★ sub-plan-2 신설) — TC-* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / framework (jest/vitest/junit/pytest/playwright)
+- **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 3 종결 시 모든 test fail / impl 부재)
+- **5종 물증 7 필드** (★ ★ ★ no-simulation 강화 — runner_version + stdout + stderr + timestamp + pass/fail count + duration + reproduction + result_hash)
+
+★ ★ ★ spec-test-link-validator (★ sub-plan-3 신설) = AC→TC 1:N 정합 + framework match (phase-1-inventory) + coverage ≥ 0.85.
+
+### chain 4 (구현) — implement stage (★ v2.0 / i-strict / ★ ★ ★ chain harness 안에서 round-trip 정식 허용)
+
+input (implement stage 가 받음):
+- test-spec.json + 실 test 코드 (RED)
+- behavior-spec.json
+- 7대 산출물
+
+★ 5 영역 강도 (implement stage):
+
+| 기획 | 디자인 | FE | BE | DB | 공통 |
+|---|---|---|---|---|---|
+| ❌ | 약 | 강 | 강 | 강 | 강 |
+
+산출물 (implement stage 가 만듦):
+- **impl-spec.json + .md** (deliverable 21 / `schemas/impl-spec.schema.json` ★ sub-plan-2 신설) — IMPL-* / framework / source_files / commit_hash
+- **실 impl 코드** (사용자 프로젝트) — GREEN 의무 (모든 test 100% pass)
+- **5종 물증 7 필드** (★ ★ ★ no-simulation — chain 3 의 5종 물증 + impl_test_pass_rate 100% + coverage_report + linter)
+- **production code + 빌드 artifact**
+
+★ ★ ★ test-impl-pass-validator (★ sub-plan-3 신설) = ★ ★ 진짜 runner 호출 / 100% pass / 5종 물증 7 필드 / chain harness 의 ★ ★ ★ 핵심 enforcement.
+
+★ ★ **70~80% 한계** = ★ 명시 잔존 / gate #4 사용자 검토 ≤ 15% / 100% 자동화 ❌ 명시 (DEC-2026-05-06-round-trip-부분-허용 정합).
+
+### cross-cutting — traceability-matrix (deliverable 22 / ★ v2.0 / `schemas/traceability-matrix.schema.json` ★ sub-plan-2 신설)
+
+매 chain stage 종결 시 갱신 의무. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link. coverage ≥ 0.85 ratchet (ADR-010 v2 정합).
+
+### 분석 → 스펙 (★ v2.0 / 현 v1.5.x analysis 자산 = chain 2 spec stage 의 input / "현 7대 + 신규 추가" 정합)
 
 본 v1.4.x 가 채우는 핵심 인터페이스. 분석 stage 출력 = 다음 단계의 입력.
 
@@ -116,101 +206,81 @@ input (분석 stage 가 받음):
 │       └── tool-runs/               # 진짜 도구 raw 출력 보존
 ```
 
-### 분석 → 설계 ↔ 설계 → 테스트 (☐ v2.0)
+### design stage (☐ v2.x carry / 1차 = analysis 자산 reuse)
 
-#### design stage 5 영역 강도
+design stage = ★ v2.x carry (1차 v2.0.0 = analysis 자산 deliverable 7~9 reuse / 분리 ❌). master plan §K-3 carry 정합.
 
-| 기획 | 디자인 | FE | BE | DB | 공통 |
-|---|---|---|---|---|---|
-| 약 | 강 | 강 | 약 | 약 | 약 |
-
-★ design stage 기존 자산 (analysis stage 안에 일부 포함됨 / v2.0 분리 carry):
+design stage 기존 자산 (analysis stage 안에 일부 포함됨 / v2.x carry 시 분리):
 - `deliverables/7-ui-ux.md` (★ FE+디자인 cross-cutting)
 - `deliverables/8-state-map.md` (★ FE 동적 행동)
 - `deliverables/9-visual-manifest.md` (★ Playwright snapshot binary 진실)
 - `docs/adr/ADR-FE-002.md` (★ DTCG 2025.10 W3C spec)
 - `docs/adr/ADR-FE-005.md` (★ 권위 매개체 13)
 
-design stage 산출물 (v2.0 시점에 정식 분리):
+design stage 산출물 (v2.x 시점에 정식 분리 시):
 - wireframe spec
 - component-spec.json
 - DTCG token (`design-tokens.json` + `design-tokens.md` 이중 렌더링)
 
-#### test stage 입출력
+## 가치 경계 충돌 deferral (★ resolved 2026-05-06 / DEC-2026-05-06-v2.0-i-strict-채택)
 
-input (테스트 stage 가 받음):
-- 분석 stage 산출물 7~15 전부
-- (v2.0 추가) component-spec.json / wireframe / DTCG token
+★ ★ ★ **resolved 2026-05-06**.
 
-★ 5 영역 강도 (test stage):
+원본 deferral (2026-05-02 시점):
+- 본 방법론 가치 명세 = "한 방향 추출기 / round-trip 영구 scope 제외"
+- vs 사용자 시나리오 6번 = "구현부분은 없고 테스트 코드 만드는 부분은 아직 안되어 있지만 추상화만 해놓자" → ★ v2.0 carry 신호
+- 두 옵션: (i) round-trip 부분 허용 / (ii) 영구 scope 보존
 
-| 기획 | 디자인 | FE | BE | DB | 공통 |
-|---|---|---|---|---|---|
-| ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
+**2026-05-06 사용자 결단**: (i-strict) 채택 = ★ ★ ★ **(i) round-trip 부분 허용**.
 
-산출물 (테스트 stage 가 만듦):
-- test-plan.json
-- contract-test 코드
-- E2E spec
+상세:
+- 사용자 진술 (2026-05-06): "분석해서 산출물 내고 그걸로 스팩문서 만들고 테스트 코드 만들고 그걸 기준으로 코드를 구현하는걸 목적으로 해... A로 하고 싶다."
+- DEC-2026-05-06-v2.0-i-strict-채택 (★ 본 deferral resolve trigger)
+- DEC-2026-05-06-round-trip-부분-허용 (★ DEC-2026-04-29 partial retract / 4 항목 중 2 retract / 2 보존)
 
-스키마: v2.0 시점에 `schemas/test-plan.schema.json` 신설.
+retract 영역 (chain harness 안에서 정식 허용):
+- ✅ 산출물 → 신규 코드 자동 생성 (chain 4단계)
+- ✅ "신규 시스템 자동 생성" 주장 (chain 통과 시)
+- ✅ round-trip 정확도 정량 측정 (test coverage / impl test pass rate)
 
-★ 사용자 시나리오 6번 (2026-05-02) — "테스트 코드 만드는 부분은 아직 안되어 있지만 추상화만 해놓자". 본 추상화 단계 = 골격 placeholder 만 / v2.0 진입 시 실 채움 (★ §가치 경계 충돌 deferral 참조).
+보존 영역:
+- ❌ AI 시뮬 (no-simulation 동일 / 강화 — chain 단계 5종 물증 7 필드)
+- ✅ F-074 단방향 round-trip (CHAIN 1 → CHAIN 2 흡수)
+- ✅ 70~80% 한계 인정 (명시 잔존 / gate별 사용자 검토 ≤ 15%)
+- ✅ §8.1 strict ≥ 2 PoC corroboration (cooling-off 폐기 / strict 임계 보존)
 
-### 테스트 → 구현 (☐ v2.0)
+## Runtime 메커니즘 (현재 v1.5.x vs v2.0)
 
-input (구현 stage 가 받음):
-- 분석 stage 산출물 + 설계 산출물 + 테스트 산출물
-
-★ 5 영역 강도 (implement stage):
-
-| 기획 | 디자인 | FE | BE | DB | 공통 |
-|---|---|---|---|---|---|
-| ❌ | 약 | 강 | 강 | 강 | 강 |
-
-산출물 (구현 stage 가 만듦):
-- production code
-- 빌드 artifact
-
-★ 본 방법론은 산출물을 **입력 자료** 로만 활용. round-trip 검증 (산출물 ↔ 구현 정합 자동 검증) 은 영구 scope 외부.
-
-★ 사용자 시나리오 6번 (2026-05-02) — "구현 부분은 없고". 본 추상화 단계 = 골격 placeholder 만 / ★ §가치 경계 충돌 deferral 참조.
-
-## 가치 경계 충돌 deferral (★ 사용자 시나리오 2026-05-02)
-
-본 방법론 가치 명세 (CLAUDE.md ★★★) = "legacy 코드 → 7대 산출물 한 방향 추출기 / round-trip 영구 scope 제외".
-
-→ test / implement stage 는 본 가치 외부.
-
-그러나 사용자 시나리오 (2026-05-02 / 본 plan = `~/.claude/plans/humble-wiggling-dolphin.md`) = ★ "구현부분은 없고 테스트 코드 만드는 부분은 아직 안되어 있지만 추상화만 해놓자" → ★ v2.0 carry 신호 (★ "지금까지" / "아직" 시간 부사 = 미래 채움 의도).
-
-★ 두 신호 충돌 = ★ 사용자 추후 명시 결단 영역. 본 추상화 단계 = ★ 골격 placeholder 만 (lifecycle-contract.md + 8 README 갱신만 / SKILL.md 신설 ❌ / template 신설 ❌ / schema 신설 ❌).
-
-v2.0 진입 시 ★ 사용자 명시 결단 의무:
-- (i) round-trip 부분 허용 — implement / test stage 정식 채움 + 가치 경계 갱신
-- (ii) 영구 scope 보존 — implement / test stage = 사람이 산출물을 입력 자료로 활용 (자동 round-trip ❌) / skill 채움도 "사람 가이드" 만
-
-## Runtime 메커니즘 (현재 vs v2.0)
-
-### 현재 (v1.4.x — analysis stage only)
+### 현재 (v1.5.x — analysis stage)
 
 - skill description trigger: 코드베이스 시그널 기반 자동 발동
 - formal-spec-link-validator: cross-link 정합 (분석 stage 내부)
 - drift-validator: 이중 렌더링 정합 (.json ↔ .mermaid)
 - decision-table-validator: DMN 5-check
 - spectral-runner: OpenAPI 정합
-- static-runner: 외부 정적 분석 hook (Semgrep / PMD / SpotBugs)
+- static-runner: 외부 정적 분석 hook (Semgrep / PMD / SpotBugs / 진짜 도구 7종)
+- schema-validator: Ajv 8 (FE 트랙)
 
-### v2.0+ carry-over (lifecycle 확장 시)
+### v2.0 (★ chain 4단계 harness)
 
-- G1: `.aimd/state.json` (사용자 프로젝트 stage 추적)
-- G2: stage-aware hook routing (`hooks/{analysis,test,implement}.json`)
-- enter-stage skill (`/methodology:enter-stage:{analysis,test,implement}`)
-- lifecycle-contract-validator (단계 간 prerequisite 검증)
+★ ★ master plan `~/.claude/plans/a-stateful-gadget.md` §H sequencing 정합:
 
-자세한 내용: 본 plan 의 14차 결단 + carry-over C.8.
+- **chain stage axis** (`flows/sdlc-4stage-flow.json` ★ sub-plan-4 신설) — stages + revisit_edges + sub_flow 통합
+- **6 신규 도구** (★ sub-plan-3) — planning-extraction-validator / chain-coverage-validator / spec-test-link-validator / **test-impl-pass-validator** (★ ★ ★ 진짜 runner 호출) / traceability-matrix-builder / chain-revisit-detector
+- **6 신규 schema** (★ sub-plan-2) — planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
+- **3 신규 ADR + 3 ADR v2 확장** (★ sub-plan-2) — ADR-CHAIN-001 / ADR-CHAIN-002 (go/stop gate UX) / ADR-CHAIN-003 (revisit loop) + ADR-008/009/010 v2
+- **14 신규 skill + 4 agent 갱신 + 5 flow** (★ sub-plan-4)
+- **hooks 확장** (★ sub-plan-5) — PostToolUse / PreToolUse / UserPromptSubmit
+- **`.aimd/state.json`** (사용자 프로젝트 chain stage 추적 / sub-plan-5)
+
+### v2.x carry
+
+- design stage 본격 채움 (carry K-3)
+- use case 4종 entry flow 분기 (carry K-1)
+- chain 5단계 (사후 review/refactor) 옵션 B (carry K-2)
 
 ## 변경 이력
 
 - v1.4.0 (2026-05-02): 본 문서 신설 (plan 13~14차 결단). 분석 stage 인터페이스 채움. 다른 stage placeholder.
-- v1.4.4-pre (2026-05-02): 사용자 시나리오 (2026-05-02) — 추상화 골격 보강. ★ 5 영역 axis 6 enum 확장 (`공통 / BE / FE / DB / 기획 / 디자인`) + ★ 5 영역 × 5 stage 강도 매트릭스 + 각 stage placeholder § 강도 표 추가 + ★ §가치 경계 충돌 deferral § 신설 + ★ 기술 스택 분기 axis 정책 선언. 본체 schemas / ADR 진입 ❌ / SKILL.md 신설 ❌. plan = `~/.claude/plans/humble-wiggling-dolphin.md`.
+- v1.4.4-pre (2026-05-02): 사용자 시나리오 — 추상화 골격 보강. 5 영역 axis 6 enum + 매트릭스 + §가치 경계 충돌 deferral § 신설 + 기술 스택 분기 axis 정책 선언.
+- ★ ★ ★ **v2.0-pre (2026-05-06)**: ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** (DEC-2026-05-06-v2.0-i-strict-채택). §가치 경계 충돌 deferral resolved (i-strict 채택). chain 1~4 단계 input/output contract 정식 채움. 1차 = legacy single-case 명시 / use case 4종 분기 = v2.1+ carry. round-trip 부분 허용 (DEC-2026-05-06-round-trip-부분-허용). 70~80% 한계 명시 잔존. master plan = `~/.claude/plans/a-stateful-gadget.md`.

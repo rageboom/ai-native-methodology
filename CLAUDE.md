@@ -10,17 +10,28 @@
 **품질 1순위 + 재작업 최소화 2순위**. 속도/quick win/컨텍스트 신선도 후순위.
 격상/처분/순서 결정 시 §8.1 단일 PoC 과적합 회피 강제 적용. (memory `feedback_quality_priority.md`)
 
-## ★★★ 본 방법론 가치 명세
+## ★★★ 본 방법론 가치 명세 (★ v2.0 / 2026-05-06 갱신)
 
 ```
-INPUT:  legacy 코드베이스
-OUTPUT: 7대 산출물 + finding + antipatterns + migration-cautions
-USE:    사람이 신규 시스템 구축 시 입력 자료 / 회피 가이드
+INPUT (1차 = legacy single-case):  legacy 코드베이스
+  ↓ analysis stage (chain 1단계 = 현 v1.5.x 자산)
+  ↓
+OUTPUT chain (★ v2.0 i-strict):
+  [CHAIN 1] planning-spec     ── go/stop gate #1
+  [CHAIN 2] behavior-spec + acceptance-criteria + 7대 산출물 통합  ── go/stop gate #2
+  [CHAIN 3] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+  [CHAIN 4] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+  ↓
+USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 ```
 
-**"코드 → 형식 명세 + 위험 기록" 한 방향 추출기**. round-trip 검증은 **영구 scope 제외**.
+**SDLC 4단계 chain harness** (DEC-2026-05-06-v2.0-i-strict-채택). round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract). harness 외부 자동 코드 생성 ❌.
 
-### 산출물 이식성 5종
+★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
+
+★ ★ revisit loop (자동 감지 + 사용자 결단): chain-revisit-detector → 사용자 prompt → go/stop. stop 시 임의 stage jump.
+
+### 산출물 이식성 5종 (★ chain 2 단계 통합 / 변경 ❌)
 
 | 산출물 | 활용도 |
 |---|---|
@@ -28,7 +39,18 @@ USE:    사람이 신규 시스템 구축 시 입력 자료 / 회피 가이드
 | schema.json + erd.mermaid | ★★★ 입력 + DB 타입 매핑 (RDB 내 90% 무관) |
 | antipatterns.json + migration-cautions.md | ★★★ 회피 목록 (패턴 단위 무관) |
 
-(memory `project_methodology_scope.md`)
+### v2.0 신규 chain 산출물 6종 (★ sub-plan-2 신설 carry)
+
+| 산출물 | chain | 역할 |
+|---|---|---|
+| planning-spec.{json,md} | 1 | legacy 분석 결과 → 비즈니스 의도 추출 (1차 single-case) |
+| behavior-spec.{json,md} | 2 | Phase 4.5 + planning use_cases 통합 BHV-* (executable contract) |
+| acceptance-criteria.{json,md} | 2 | Gherkin BDD AC-* / verifiable 의무 / MoSCoW |
+| test-spec.{json,md} | 3 | TC-* + 실 test 코드 + 5종 물증 (RED) |
+| impl-spec.{json,md} | 4 | IMPL-* + 실 impl 코드 + 100% test pass (GREEN) |
+| traceability-matrix.{json,md,mermaid} | cross | UC→BHV→AC→TC→IMPL forward+backward link |
+
+(memory `project_methodology_scope.md` / master plan `~/.claude/plans/a-stateful-gadget.md`)
 
 ## ★★★ Static Tool 시뮬레이션 절대 금지
 

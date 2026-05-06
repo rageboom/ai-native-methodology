@@ -4,9 +4,29 @@
 |---|---|
 | 결정자 | 윤주스 (TF Lead) |
 | 일자 | 2026-04-29 |
-| 상태 | 승인 (★★★ 본 방법론 가치 재정의) |
+| 상태 | ★ ★ **승인 (PARTIAL RETRACTED 2026-05-06)** — DEC-2026-05-06-round-trip-부분-허용 로 4 항목 중 2 retract / 2 보존. v2.0 SDLC 4단계 chain harness 안에서 round-trip 정식 허용. 본문 = 역사 기록으로 보존. |
 | 카테고리 | methodology |
-| 관련 | DEC-2026-04-29-round-trip-미검증-인지 (해소), DEC-2026-04-29-priority2-결단 (F-074 단방향만 유지), memory/project_round_trip_unvalidated.md, memory/project_methodology_scope.md (신규) |
+| 관련 | DEC-2026-05-06-round-trip-부분-허용 (★ partial retract DEC), DEC-2026-05-06-v2.0-i-strict-채택 (★ trigger), DEC-2026-04-29-round-trip-미검증-인지 (해소), DEC-2026-04-29-priority2-결단 (F-074 단방향만 유지), memory/project_round_trip_unvalidated.md, memory/project_methodology_scope.md |
+
+---
+
+## ★ ★ Partial Retract 공지 (2026-05-06)
+
+**본 DEC 는 2026-05-06 DEC-2026-05-06-round-trip-부분-허용 로 partial retract 됨.**
+
+| 영역 | 본 DEC (2026-04-29) | 갱신 (2026-05-06) |
+|---|---|---|
+| 산출물 → 신규 코드 자동 생성 | ❌ 영구 외 | ✅ chain 4단계 harness gate 안에서만 |
+| "신규 시스템 자동 생성" 주장 | ❌ | ✅ chain 4단계 통과 시 정식 주장 가능 |
+| round-trip 정확도 정량 측정 | ❌ | ✅ test coverage / impl test pass rate |
+| AI 시뮬 (no-simulation) | ❌ | ❌ ★ ★ ★ 동일 / 강화 (chain 단계 5종 물증) |
+| 70~80% 한계 인정 | ✅ | ✅ ★ 명시 잔존 (gate별 사용자 검토 ≤15%) |
+| F-074 단방향 round-trip | ✅ | ✅ (CHAIN 1 → CHAIN 2 흡수) |
+| §8.1 strict ≥2 PoC corroboration | ✅ | ✅ |
+
+상세: DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-05-06-v2.0-i-strict-채택 / `~/.claude/plans/a-stateful-gadget.md`.
+
+본 DEC 본문 = ★ 역사 기록 / 결정 시점 맥락 보존.
 
 ---
 

@@ -1,11 +1,22 @@
-# agents/test/ — placeholder (☐ 미래 lifecycle 확장)
+# agents/test/ — chain 3 (테스트) stage agent (★ v2.0)
 
-현재 채움 없음. v2.0+ scope.
+★ ★ v2.0 SDLC 4단계 chain harness 의 chain 3 stage. DEC-2026-05-06-v2.0-i-strict-채택 정합. master plan `~/.claude/plans/a-stateful-gadget.md`.
 
-## 향후 채움 trigger (v2.0 lifecycle 확장 결단 시)
+★ ★ ★ **i-strict 채택**: AI 자동 test 코드 생성 + 사용자 검토. round-trip = chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용).
 
-- **QA-architect** — 테스트 전략 (unit / integration / contract / E2E) 분포 결정
-- **test-engineer** — 테스트 코드 작성 / fixture 설계
+## 역할
+
+chain 3 (test) = **acceptance-criteria 기반 실 test 코드 자동 생성** (RED 의무 — chain 3 종결 시 모든 test fail / impl 부재). 산출물 = `test-spec.{json,md}` (deliverable 20 / sub-plan-2 신설) + 실 test 코드.
+
+★ ★ ★ **no-simulation 강화** — test-runner 진짜 호출 의무 / 5종 물증 7 필드 (runner_version + stdout_path + stderr_path + timestamp + pass/fail count + duration_ms + reproduction_command + result_hash).
+
+## agent persona (sub-plan-4 정식 채움)
+
+| persona | 역할 |
+|---|---|
+| **QA-architect** | 테스트 전략 (unit / integration / contract / e2e / property) 분포 결정 / acceptance-criteria → TC-* 분해 |
+| **test-engineer** | 실 test 코드 작성 / fixture 설계 / framework 선택 (phase-1-inventory stack 정합) |
+| **coverage-auditor** ★ v2.0 신설 | spec-test-link-validator 결과 분석 / coverage threshold ≥ 0.85 ratchet (ADR-010 v2) |
 
 ## 5 영역 매트릭스 — test stage
 
@@ -16,14 +27,29 @@
 | FE | 강 | unit / component / E2E test (Jest / Vitest / Playwright / Cypress) |
 | BE | 강 | unit / integration / contract test (JUnit / pytest / Mocha / Supertest) |
 | DB | 강 | schema migration test / fixture / 데이터 정합 |
-| 공통 | 강 | 7대 산출물 cross-link 검증 / coverage 추적 |
+| 공통 | 강 | acceptance-criteria cross-link 검증 / coverage 추적 |
 
 ## 기술 스택 분기 정책
 
-기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용 / v2.0 진입 시 SKILL.md 신설 시점에 적용 / 본 추상화 단계는 정책 선언만). 테스트 stack 후보: Jest / Vitest / Playwright / Cypress / JUnit / pytest / RSpec / Mocha + chai / Supertest / Testcontainers.
+기술 스택별 차이는 SKILL.md 본문 분기로 표현 (★ analysis stage `phase-1-inventory` 패턴 차용). 테스트 stack 후보: Jest / Vitest / Playwright / Cypress / JUnit / pytest / RSpec / Mocha + chai / Supertest / Testcontainers.
 
-## 인터페이스 (lifecycle-contract.md §분석→테스트)
+★ phase-1-inventory.json stack 시그널 → spec-test-link-validator framework match 자동 검증.
 
-- input (분석→테스트): rules.json + openapi.yaml + schema.json + 7대 산출물
-- 산출물 (테스트→구현): test-plan.json + contract-test 코드 + E2E spec
-- ★ 사용자 시나리오 6번 (2026-05-02) — "테스트 코드 만드는 부분은 아직 안되어 있지만 추상화만". 본 추상화 단계 = 골격 placeholder 만 / v2.0 진입 시 실 채움 (★ `methodology-spec/lifecycle-contract.md` §가치 경계 충돌 deferral 참조)
+## 인터페이스 (lifecycle-contract.md §chain 3)
+
+- input (spec → test): behavior-spec.json + acceptance-criteria.json + 7대 산출물
+- 산출물 (test → implement): test-spec.json + 실 test 코드 (RED) + 5종 물증
+- ★ ★ ★ go/stop gate #3 (사용자 검토 / ADR-CHAIN-002 정합)
+- ★ ★ ★ test-impl-pass-validator 진짜 runner 실행 의무 (chain 3 = RED 의무 — 모든 test fail / impl 부재)
+
+## skills
+
+- `skills/test/generate-test-spec/` ★ sub-plan-4 신설 (chain 3 main)
+- `skills/test/run-test-evidence/` ★ sub-plan-4 신설 (실 runner 5종 물증)
+- `skills/test/verify-coverage/` ★ sub-plan-4 신설 (coverage ≥ 0.85)
+
+## chain harness 정합 (★ v2.0)
+
+★ ★ DEC-2026-05-06-round-trip-부분-허용 partial retract 정합 — round-trip = chain harness gate 안에서 정식 허용. test 자동 생성은 ★ ★ test-impl-pass-validator 진짜 runner 호출 + 5종 물증 7 필드로 시뮬 위험 봉쇄.
+
+★ 70~80% 한계 명시 잔존: gate #3 사용자 검토 ≤ 15%. test-spec 자동 생성 ≥ 85%. 100% 자동화 ❌.
