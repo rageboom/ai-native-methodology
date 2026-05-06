@@ -28,6 +28,7 @@ const INCLUDE = [
   'methodology-spec',
   'schemas',
   'CHANGELOG.md',
+  'CHANGELOG-HISTORY.md',
   'README.md',
 ];
 
@@ -39,6 +40,13 @@ const EXCLUDE_BASENAMES = new Set([
   '.claude',
   'out',
   '.npmrc',
+  // ★ ★ cleanup round 2-A — workspace developer only (plugin user runtime 호출 path 0)
+  'test',
+  'tests',
+  '__tests__',
+  'corpus',
+  'fixtures',
+  'coverage',
 ]);
 
 // ★ ★ ★ v1.4.3 follow-up F1 fix — templates/adoption/ 은 ★ dist root 의 CLAUDE.md + ADOPTION-README.md 로 별칭 복사됨 / 원본은 dist 에서 제외 의무
@@ -178,22 +186,15 @@ async function build() {
     }
   }
 
-  // ★ ★ ★ Agent 4 발견 반영 — templates/adoption/ 의 CLAUDE.md + README.md 를 dist root 로 동시 복사
+  // ★ ★ ★ Agent 4 발견 반영 — templates/adoption/ 의 CLAUDE.md 를 dist root 로 별칭 복사
   // (사내 적용 진입점 — build script 가 dist 자체에 customization 노출)
+  // ★ ★ cleanup round 2-A — ADOPTION-README.md 별칭 복사 비활성 (단일 entry-point 정합 / dist 본체 README.md 만 / 사용자 결단 (a) 정합)
   if (!DRY_RUN) {
     const adoptionClaude = join(WORKSPACE, 'templates', 'adoption', 'CLAUDE.md');
-    const adoptionReadme = join(WORKSPACE, 'templates', 'adoption', 'README.md');
     if (existsSync(adoptionClaude)) {
       const dst = join(target, 'CLAUDE.md');
       cpSync(adoptionClaude, dst);
       checksumEntries.push({ rel: 'CLAUDE.md', full: dst });
-      fileCount++;
-    }
-    if (existsSync(adoptionReadme)) {
-      // ★ 본체 README.md 가 이미 복사되어 있을 수 있으므로 ADOPTION-README.md 로 별칭
-      const dst = join(target, 'ADOPTION-README.md');
-      cpSync(adoptionReadme, dst);
-      checksumEntries.push({ rel: 'ADOPTION-README.md', full: dst });
       fileCount++;
     }
   }

@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ **cleanup round 1 직후** — DEC-2026-05-06-cleanup-round-1 / docs/ 9 파일 archive 격리 + link rot 11건 차단 / **next: v2.0.0 final (2026-05-07~)**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ **cleanup round 1 + 2-A 직후** — docs/ 9 파일 archive 격리 + plugin artifact paradigm sync (327 → 241 / -86) + CHANGELOG split / **next: v2.0.0 final (2026-05-07~) + cleanup round 2-B (각 폴더 README 정돈)**)
 
 > ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06): 현 단계 = **chain harness validated** — §8.1 strict 7/7 + ≥ 2 PoC corroboration. sub-plan-1~4 = scaffolding / sub-5 = harness-complete / sub-6 = harness-validated. v2.0.0-rc1 prerelease (Senior F4 / 24h+ 후 final / 같은 날 final tag ❌).
 
@@ -18,6 +18,39 @@
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
+
+## ★ ★ ★ cleanup round 2-A (2026-05-06) — plugin artifact paradigm sync + 자산 정돈
+
+DEC-2026-05-06-cleanup-round-2-A.
+
+| 영역 | before | after |
+|---|---|---|
+| dist files | 327 | **241** (-86 / -26%) |
+| paradigm version (CLAUDE/README/marketplace) | v1.3.0 / v1.4.2 / v1.x stale | ★ all **v2.0.0-rc1** |
+| `CHANGELOG.md` | 1865 line | **1060 line** (v1.4+ 만) + `CHANGELOG-HISTORY.md` 820 line (신규) |
+| dist 안 test/corpus/fixtures | 80+ files | **0** (workspace developer only) |
+| `ADOPTION-README.md` (dist root) | 1 (별칭) | 0 (단일 entry-point 정합) |
+| paradigm 명시 | "한 방향 추출기" 만 | chain harness 4 stage + analysis 범위 한정 |
+
+**갱신된 자산** (7 항목 / 1 신규):
+- `marketplace.json` — description chain harness 정합
+- `templates/adoption/CLAUDE.md` (dist root alias) — v2.0.0-rc1 rewrite (chain 4 stage + 12 도구 + 5 요소 mechanical enforcement + 자연어 prompt → skill 표)
+- `README.md` — v2.0.0-rc1 rewrite (시나리오 A/B/C + dist 실제 디렉토리 구조 + 12 도구 호출 cmd)
+- `flows/README.md` — sdlc-4stage SSOT 명시
+- `scripts/build-plugin.js` — EXCLUDE_BASENAMES + INCLUDE 갱신 + ADOPTION-README 별칭 비활성
+- `CHANGELOG.md` — split (v1.4+ 만)
+- `CHANGELOG-HISTORY.md` — 신규 (v1.0~v1.3.1 archive)
+
+**검증**: version-check ✅ / build 241 files ✅ / shasum -c 240 OK ✅ / EXCLUDE 0 hit ✅ / INCLUDE 정합 ✅.
+
+**Carry (Round 2-B / 2-C / 2-D)**:
+- 2-B (★ ★ 각 폴더 README 정돈) — agents/skills/hooks/flows/tools/templates/methodology-spec/schemas — **사용자 진짜 핵심** "각 폴더 자산 정돈 + 참조 + 호출 visible"
+- 2-C (사용자 journey 자산) — getting-started / chain-harness-guide / common-errors / first-prompt-cookbook
+- 2-D (선택) — project root CLAUDE.md sync + v1.4.0-dev 3 entry 압축
+
+★ no release / no tag / 본체 commit 만 / v2.0.0-rc1 → v2.0.0 final 자격 영향 ❌.
+
+---
 
 ## ★ ★ cleanup round 1 (2026-05-06) — docs/ 9 파일 archive 격리
 

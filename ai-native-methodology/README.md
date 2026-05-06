@@ -1,107 +1,99 @@
-# AI-Native 개발 방법론 v1.4.2 ★ ★ ★ ★ ★ ★ ★
+# AI-Native 개발 방법론 v2.0.0-rc1 ★ ★ ★ ★ ★
 
-> 사내 표준 AI 기반 개발 방법론. 레거시 분석부터 재구현·운영까지의 라이프사이클을 표준화한다.
+> 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 기획 → 스펙 → 테스트 → 구현** SDLC 4단계 chain harness.
 >
-> 본 v1.4.x 는 **분석 단계 (analysis stage)** 의 구현 — "코드 → 형식 명세 + 위험 기록" 한 방향 추출기. 다른 SDLC stage (planning / design / test / implement) = v2.0+ scope (placeholder).
+> **현재**: v2.0.0-rc1 (2026-05-06) — ★ ★ ★ ★ ★ chain harness validated / §8.1 strict 7/7 통과 / ≥ 2 PoC corroboration / 218 unit test pass / sub-plan 1~6 모두 종결 / **next: v2.0.0 final** (2026-05-07~ clean clone PoC #05 e2e 재실행 통과 시).
 >
-> **현재**: v1.4.2 PATCH (2026-05-02) — ★ ★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm + custom Semgrep rule 첫 실현 + drift-check.yml CI ratchet 통합 (ADR-010 §2.3 첫 운영 입증). 같은 날 v1.4.0 → v1.4.1 → v1.4.2 = 3 release cadence.
+> ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness 4 gate + revisit loop + 70~80% 한계 명시.
 >
-> **★ ★ ★ ★ ★ ★ ★ v1.4.0 MINOR release (2026-05-02)**: FE 트랙 정식 진입 + §8.1 strict 검증대 첫 통과. ADR-FE 7건 (★ ADR-FE-007 본체 antipattern 카탈로그 첫 등재 / AP-FE-SECURITY-001 4 PoC isomorphic) + schemas 13종 + tools 6종 + 4 PoC. 진짜 도구 6종 + IR 0.99 + 신뢰도 0.92 (ADR-009 단계 5).
->
-> **★ ★ ★ Plugin-first 사내 배포 자산** (DEC-2026-05-02 14~15차 결단): `.claude-plugin/` + `agents/` + `skills/analysis/` 18 + `hooks/` + `flows/` 채움. Phase A self-iteration 진입 가능. Phase B (사내 배포) 진입 전 의무 단계 = `archive/phase-a-iteration/phase-a-iteration-guide.md` 참고 (★ v2.0 chain harness paradigm 후 outdated — historical reference).
->
-> 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
+> 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v1.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v1.3 이전).
 
 ---
 
 ## 무엇을 하는가
 
 ```
-[레거시 프로젝트]                     [7대 산출물]
-   소스 코드                       1. 아키텍처/의존성
-   ERD (있으면)                    2. 도메인 모델
-   ORM (있으면)         ──>        3. API 계약
-   운영 DB (있으면)                 4. DB 스키마
-   기획 문서 (있으면)               5. 비즈니스 규칙
-   디자인 명세 (있으면)             6. 안티패턴
-                                   7. UI/UX 명세
+INPUT (1차 = legacy single-case):
+  legacy 코드베이스 (소스 / ERD / ORM / 운영 DB / 기획 문서 / 디자인 명세)
+
+  ↓ analysis stage (chain 1 진입 전 / 한 방향 추출)
+  ↓
+[CHAIN 1] planning-spec               ── go/stop gate #1
+  ↓
+[CHAIN 2] behavior-spec
+        + acceptance-criteria
+        + 7대 산출물 통합              ── go/stop gate #2
+  ↓
+[CHAIN 3] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+  ↓
+[CHAIN 4] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+  ↓
+OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_hash)
 ```
 
-분석 결과는 **AI와 사람 모두가 읽을 수 있는 형식** (JSON Schema + Mermaid + Markdown).
+★ AI 자동화 ≥ 85% / 사람 검토 (gate별) ≤ 15% / **70~80% 한계 명시 잔존** (DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용).
 
 ---
 
-## ★★ Platform-Agnostic 입증 (3 PoC 통합 / v1.2.3 정식 등재)
+## ★ ★ chain harness validated 자격 (§8.1 strict 7/7)
 
-본 방법론은 **3 platform PoC** 검증으로 platform-agnostic 임을 입증:
+```
+✅ 1. poc_corroboration: 2 PoC (poc-05 + poc-03 retrofit + poc-04 mini FE)
+✅ 2. real_tool_evidence: 5종 물증 7 필드 all present / sha256 valid
+✅ 3. validators_violation: 4 validators 0 critical/high
+✅ 4. chain_coverage: 1.0 / threshold 0.85
+✅ 5. adr_registry: 5 ADR-CHAIN status: 승인됨 + 결정 section
+✅ 6. matrix_greenness: forward=1 / backward=1 / cells=2 / green=2
+✅ 7. e2e_cycle_pass: pass=6 / fail=0 (vitest 1.6.1 chain 4 GREEN)
+```
 
-| PoC | platform | 산출 | 신뢰도 |
-|---|---|---|---|
-| **PoC #01** | Java + Spring Boot 2.5 (CRUD) | 7대 산출물 6/7 / 15 AP / 33 finding | 0.96 |
-| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 7대 산출물 6/7 / 21 AP / 43 finding | 0.96 |
-| **PoC #03** | TypeScript + NestJS + TypeORM | 7대 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94 |
-
-→ ★ 3 platform 모두 7대 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
-
-### Cross-PoC 학습 효과 (★ §8.1 정합 — 단일 PoC 과적합 회피)
-
-| 분류 | 건수 | 사례 |
-|---|---|---|
-| **★ 재현** (보편 결함) | 6 | EAGER N+1 (★ 3 PoC) / API drift / DB UQ / PUT vs PATCH / versioning / limit cap |
-| **★ 변형 재현** | 3 | RSA git commit → Auth scope / Token apiKey 부분 / De Morgan 학습 효과 |
-| **★★ 비재현 학습 효과 (positive finding)** | 3 | **NestJS Bearer 표준** ✅ / 307 redirect / TS generic 정적 차단 |
-
-→ **균형 분포** = §8.1 단일 PoC 과적합 회피 정합 ★. **본 방법론 적용 가능 platform** = Java/Spring + TypeScript/NestJS 입증 완료.
-
-상세: [`archive/v1.3-adoption/v1.3-promotion-report.md`](./archive/v1.3-adoption/v1.3-promotion-report.md) — 3 PoC 통합 보고서 (격상 후보 6 + 사내 적용 ROI 견적 / cleanup round 1 격리).
+★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + sample chain 4 e2e (PoC #01~#05).
 
 ---
 
 ## 시작하기
 
 ### 사전 요구사항
+
 - Claude Code 설치 (★ plugin 시스템 지원)
 - 분석 대상 사내 legacy 프로젝트 git clone
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
+- Node ≥ 18 (chain-driver / 12 workspace tool 실행)
 
-### 사용법 — Plugin install (★ v1.4.x — 2 시나리오)
+### 사용법 — Plugin install (★ v2.0.0-rc1)
 
-본 plugin install 은 **편집자 / 배포 수신자** 2가지 시나리오. `marketplace.json` 의 `"source": "./"` 가 등록한 폴더 자체를 plugin root 로 지정하므로, 워크스페이스든 dist artifact 든 동일 메커니즘.
+#### A. 편집자 — 워크스페이스 직접 등록 (Phase A self-iteration)
 
-Phase B (사내 marketplace 배포) 미진입 = local path 또는 git URL 직접 등록.
-
-#### A. 편집자 — 워크스페이스 직접 등록 (★ Phase A self-iteration)
-
-본 repo 를 clone 하여 plugin 본체를 직접 수정하며 돌리는 시나리오. 워크스페이스 path 그대로 등록.
+본 repo 를 clone 하여 plugin 본체를 직접 수정. 워크스페이스 path 그대로 등록.
 
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에 현재 버전 확인
+/plugin                  # 대화형 manager — Installed 탭에서 v2.0.0-rc1 확인
 ```
 
-#### B. 배포 수신자 — dist artifact 등록 (★ 사내 동료 받는 경로)
+#### B. 배포 수신자 — dist artifact 등록 (사내 동료)
 
-빌드된 artifact (`dist/internal-v<version>/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
+빌드된 artifact (`dist/internal-v2.0.0-rc1/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
 
 ```bash
 # 받은 dist 폴더를 임의 위치에 풀기:
-#   ~/claude-plugins/ai-native-methodology-v<version>/
+#   ~/claude-plugins/ai-native-methodology-v2.0.0-rc1/
 #   ├── .claude-plugin/{plugin.json, marketplace.json}
 #   ├── agents/ skills/ hooks/ flows/ templates/ tools/ methodology-spec/ schemas/
-#   ├── CHANGELOG.md / README.md / CLAUDE.md / ADOPTION-README.md
-#   └── CHECKSUMS.txt   ← SHA256 manifest (무결성 검증용)
+#   ├── CHANGELOG.md / CHANGELOG-HISTORY.md / README.md / CLAUDE.md
+#   └── CHECKSUMS.txt   ← SHA256 manifest (무결성 검증)
 
 # Claude Code 세션에서:
-/plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
+/plugin marketplace add /absolute/path/to/ai-native-methodology-v2.0.0-rc1
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
 ```
 
-★ `CHECKSUMS.txt` 로 무결성 검증 — 배포자가 별도 채널 (사내 wiki / Slack pin) 으로 hash 제공 시 대조 권장.
+★ `CHECKSUMS.txt` 로 무결성 검증 — 배포자가 별도 채널 (사내 wiki / Slack pin) 으로 hash 제공 시 대조.
 
 #### 빌드 (★ A → B artifact 생성)
 
@@ -114,121 +106,127 @@ npm run version:check       # 3-way sync 검증 단독
 npm run build               # version-check 강제 → dist/internal-v<version>/ 생성 + CHECKSUMS.txt
 npm run build:check         # dry-run (file count 만 출력)
 npm run build:diff-check    # build 후 git diff exit-code 0 검증 (CI 용)
+npm run release:check       # §8.1 strict 7/7 자동 검사
+npm run test                # workspace 12 tool unit test (218 test pass)
 ```
 
-★ 분석 대상 사내 legacy 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 (★ "Plugin loaded. Read CLAUDE.md...") 표시 시 정상 작동.
+★ 분석 대상 사내 legacy 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 (★ "v2.0 chain harness ready") 표시 시 정상 작동.
 
-### Phase A self-iteration (★ Phase B 진입 전 의무 단계)
+### 사용법 — chain harness 진입 시나리오
 
-본 v1.4.x = ★ Phase A self-iteration 단계. 사용자가 본인 사내 legacy 프로젝트 1개에서 plugin 직접 돌려 마찰점 검출 → plugin 즉시 수정 → 재시도 (4원칙 §4 정합).
+#### 시나리오 A — Analysis stage 만 (legacy 분석 / chain 1 미진입)
 
-★ ★ ★ 상세 절차 + 마찰점 finding template + 재시도 cadence: **[`archive/phase-a-iteration/phase-a-iteration-guide.md`](./archive/phase-a-iteration/phase-a-iteration-guide.md)** (★ v2.0 chain harness paradigm 후 outdated — historical reference).
+자연어 prompt → skill 자동 발동:
 
-### 사용법 — skill description trigger (★ install 후 자동)
+| 자연어 prompt | 발동 skill |
+|---|---|
+| "이 코드베이스 분석 시작" | `phase-0-input` |
+| "inventory 추출해줘" | `phase-1-inventory` |
+| "아키텍처 분석" | `phase-2-architecture` |
+| "도메인 모델 추출" | `phase-3-domain` |
+| "비즈니스 규칙 추출" | `phase-4-rules` |
+| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) |
+| "DB schema + ERD" | `phase-5-schema-erd` (DB) |
+| "antipattern 정리" | `phase-6-quality` |
 
-Claude 가 코드베이스 시그널 자동 감지 → skill 자동 발동 (slash command 불필요):
+★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 자동 매칭. cross_cutting (phase 무관).
 
-| 자연어 prompt 예시 | 발동 skill | manifest phase ID |
-|---|---|---|
-| "이 코드베이스 분석 시작" | `phase-0-input` | 0 |
-| "inventory 추출해줘" | `phase-1-inventory` | 1 |
-| "아키텍처 분석" | `phase-2-architecture` | 3 (arch) |
-| "도메인 모델 추출" | `phase-3-domain` | 4 (business-logic) |
-| "비즈니스 규칙 추출" | `phase-4-rules` | 4 |
-| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) | 5-1 (api) |
-| "DB schema + ERD" | `phase-5-schema-erd` (DB) | 2 (db) |
-| "antipattern 정리" | `phase-6-quality` | 6 |
+#### 시나리오 B — chain harness e2e (★ v2.0 paradigm)
 
-★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 (예: `package.json` 에 react / `pom.xml` 에 spring-boot) 자동 매칭. cross_cutting (phase 무관).
+```
+1. chain-driver init <project>      → state.json 초기화
+2. "기획 단계 시작"                  → extract-from-legacy / decompose-use-cases / identify-business-intent
+   → planning-spec.{json,md} 산출
+   → gate #1 (planning-extraction-validator) 통과
+3. "behavior spec / acceptance criteria 도출"
+   → compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables
+   → behavior-spec + acceptance-criteria + 7대 통합
+   → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85) 통과
+4. "test spec 생성 RED 의무"
+   → generate-test-spec / run-test-evidence / verify-coverage
+   → test-spec + 실 test code (RED — 실패 입증 / impl 부재)
+   → gate #3 (spec-test-link-validator / AC→TC ≥ 0.85 + RED) 통과
+5. "impl spec 생성 GREEN 의무"
+   → generate-impl-spec / verify-test-pass
+   → impl-spec + 실 impl code (GREEN / 100% test pass)
+   → gate #4 (test-impl-pass-validator / 실 test runner / 100% pass) 통과
+6. "traceability matrix"
+   → _base/build-traceability-matrix
+   → UC→BHV→AC→TC→IMPL+commit_hash matrix 산출
+```
 
-★ ★ ★ **skills 디렉토리의 phase 번호 ≠ manifest phase ID** — skills 의 phase-N prefix 는 산출물 번호 그룹 axis (예: `phase-2-architecture` 는 산출물 #2 / manifest phase 3 의 skill). 정책 명문 = [`methodology-spec/skills-axis.md`](./methodology-spec/skills-axis.md). SSOT = `flows/analysis.phase-flow.json` (★ v1.4.4 정식 승격). drift-validator `--check-layout` 으로 3-way 정합 강제 (CI ratchet `.github/workflows/drift-check.yml`).
+★ ★ ★ **Mechanical gate trio** — (i) state.blocked + (ii) cli exit 2 + (iii) PreToolUse permissionDecision=deny. LLM "통과한 척" 시뮬레이션 ❌ enforcement.
 
-**각 skill 진입 시 사용자 승인 게이트** (Work Principles 4원칙).
+★ ★ ★ **Chain-revisit detector** — git diff 기반 skill auto-invoke / state.blocked 전환 가능.
 
-### 사용법 — manual (★ plugin 미사용 / fallback)
+#### 시나리오 C — manual fallback (plugin 미사용)
 
-`methodology-spec/workflow/phase-*.md` 직접 차례로 적용. PoC 산출물은 `examples/poc-XX/output/` 구조 참조.
+`methodology-spec/workflow/phase-*.md` + `methodology-spec/lifecycle-contract.md` 직접 차례로 적용.
 
 ---
 
-## 디렉토리 구조
+## 디렉토리 구조 (dist artifact 기준)
 
 ```
-ai-native-methodology/
-├── docs/
-│   ├── adr/                ADR 13종 (001~006 + 008/009/010 + NEST-001~004) ※ 007 부재 — openapi-extension.schema.json 으로 대체
-│   └── (★ v1.X release-note + ADR 만 / 과거 보고서는 archive/ 로 격리)
-├── archive/
-│   ├── methodology-v1.1/   v1.1 분기점 metadata
-│   ├── v1.3-adoption/      v1.3 사내 적용 작업 + v1.3-promotion-report (cleanup round 1 격리)
-│   ├── v1.4-evaluation/    v1.4-evaluation-report (cleanup round 1 격리)
-│   └── phase-a-iteration/  Phase A self-iteration 가이드 (v2.0 후 outdated)
-├── methodology-spec/       Single Source of Truth
-│   ├── deliverables/       7대 산출물 명세 (1-architecture ~ 7-ui-ux)
-│   ├── workflow/           phase-0 ~ phase-6 + phase-flow.json
-│   ├── finding-system.md
+dist/internal-v2.0.0-rc1/
+├── .claude-plugin/
+│   ├── plugin.json                   v2.0.0-rc1 manifest
+│   └── marketplace.json              source: "./" (자기완결)
+├── CLAUDE.md                         ★ 사내 적용 정책 23 inline (자동 로드)
+├── README.md                         ← 본 파일 (plugin user 진입점)
+├── CHANGELOG.md                      v1.4+ 최근 release entry
+├── CHANGELOG-HISTORY.md              v1.3 이전 archive
+├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
+│
+├── agents/                           5 chain agent (planning/spec/test/implement/analysis) + _base 3
+├── skills/                           ★ 13 chain skill + analysis 18 + _base 5
+│   ├── _base/                        invoke-go-stop-gate / build-traceability-matrix / log-finding / apply-template / apply-baseline-ratchet
+│   ├── analysis/                     phase-0~6 + aspect 4 (a11y/i18n/static-security/legacy)
+│   ├── planning/                     extract-from-legacy / decompose-use-cases / identify-business-intent
+│   ├── spec/                         compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables
+│   ├── test/                         generate-test-spec / run-test-evidence / verify-coverage
+│   └── implement/                    generate-impl-spec / verify-test-pass
+├── hooks/
+│   └── hooks.json                    UserPromptSubmit + PreToolUse (chain-driver hooks-bridge / D21' suppressOutput=true)
+├── flows/                            13 file (5 chain stage flow + sdlc-4stage SSOT + analysis flow)
+│   ├── sdlc-4stage-flow.{json,mermaid}     ★ ★ ★ chain harness master SSOT
+│   ├── analysis.phase-flow.{json,mermaid}  v1.x 자산 (chain 1 진입 전)
+│   └── {planning,spec,test,implement}.phase-flow.{json,mermaid}
+│
+├── tools/                            ★ 12 workspace tool (npm workspace / 218 unit test)
+│   ├── chain-driver/                 ★ harness driver (cli + 6 module / 60+8 chaos test)
+│   ├── drift-validator/              .json ↔ .md/.mermaid 동일성 + chain layout + state-flow consistency
+│   ├── decision-table-validator/     dmn-check 5종
+│   ├── formal-spec-link-validator/   Phase 4.5 cross-link
+│   ├── spectral-runner/              OpenAPI lint (★ 진짜 외부 도구)
+│   ├── static-runner/                Semgrep / PMD / SpotBugs plugin host + custom rules
+│   ├── schema-validator/             chain 산출물 6 schema 검증
+│   ├── planning-extraction-validator/ chain 1 / source-grounded ≥ 0.80
+│   ├── chain-coverage-validator/     chain 2 / UC→BHV→AC ≥ 0.85
+│   ├── spec-test-link-validator/     chain 3 / AC→TC ≥ 0.85
+│   ├── test-impl-pass-validator/     chain 4 / 100% pass + result_hash 정규화
+│   └── traceability-matrix-builder/  release matrix
+│
+├── templates/                        analysis 22 + chain placeholder + adoption alias source
+│
+├── methodology-spec/                 ★ Single Source of Truth
+│   ├── workflow/                     phase-0 ~ phase-6 + 4.5
+│   ├── deliverables/                 1-architecture ~ 7-ui-ux + chain v2 (planning/behavior/acceptance/test/impl/matrix)
+│   ├── lifecycle-contract.md         SDLC stage 간 data contract
+│   ├── skills-axis.md                ★ phase ID ↔ skills 디렉토리 axis 분리 정책
+│   ├── glossary-ko.md
 │   ├── id-conventions.md
-│   └── glossary-ko.md
-├── schemas/                JSON Schema 12종 (계약)
-│   ├── meta-confidence.schema.json
-│   ├── architecture.schema.json
-│   ├── domain.schema.json
-│   ├── openapi-extension.schema.json
-│   ├── db-schema.schema.json
-│   ├── rules.schema.json
-│   ├── antipatterns.schema.json
-│   ├── ui-spec.schema.json
-│   ├── inventory.schema.json
-│   ├── formal-spec.schema.json
-│   ├── finding-system.schema.json
-│   └── README.md
-├── templates/              산출물 템플릿 19종 (md / mermaid / json / yaml)
-├── tools/                  Node CLI 검증 도구 5종
-│   ├── drift-validator/         .json ↔ .mermaid 의미 동일성 + baseline / ratchet (ADR-010)
-│   ├── decision-table-validator/ dmn-check 5종 (duplicate/conflict/gap/overlap/type)
-│   ├── formal-spec-link-validator/ Phase 4.5 cross-link 검증 (★ v1.3 신규)
-│   ├── spectral-runner/          OpenAPI spectral lint wrapper (★★★ no-simulation 진짜 외부 도구)
-│   └── static-runner/            Semgrep/PMD/SpotBugs plugin host + lint-no-simulation
-├── decisions/              결정 로그 (역시간순 / INDEX.md / STATUS.md / 25 DEC)
-└── examples/               PoC 결과 (★ 3 platform 검증)
-    ├── poc-01-realworld-spring/        ★ Java + Spring Boot 2.5 (CRUD)
-    ├── poc-02-realworld-springboot3/   ★ Java + Spring Boot 3.3 + Hexagonal
-    └── poc-03-realworld-nestjs/        ★ TypeScript + NestJS + TypeORM (★★ platform-agnostic 입증)
-
-# 레포 루트 (본 디렉토리 외부)
-.github/workflows/drift-check.yml   ★ v1.2.1 — 이중 모드 (PR diff-aware + nightly full)
+│   ├── finding-system.md
+│   └── be-fe-separation.md
+│
+└── schemas/                          ★ 19+ JSON Schema (BE 5 + FE 8 + chain v2 6 + state + intervention-log)
+    ├── chain v2: planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
+    ├── state.schema.json             chain-driver state 영속
+    ├── intervention-log.schema.json  사용자 결단 로그
+    └── (BE/FE 공통 13종 — meta-confidence / architecture / domain / api / db / rules / antipatterns / ui / inventory / formal-spec / finding-system / etc)
 ```
 
-※ ★ v1.4.x — Plugin 자산 채움 (DEC-2026-05-02 14~15차 결단):
-- `.claude-plugin/plugin.json` (v1.4.2)
-- `agents/_base/` 3종 (senior / official-docs / industry-case) + 5 stage 디렉토리
-- `skills/_base/` 3 (apply-template / log-finding / apply-baseline-ratchet) + `skills/analysis/` 18 + 4 stage placeholder
-- `hooks/hooks.json` (SessionStart + PostToolUse Write/Edit drift-validator)
-- `flows/analysis.phase-flow.{json,mermaid}` (재배치)
-- `templates/analysis/` (21 templates 이동)
-- `methodology-spec/lifecycle-contract.md` (SDLC stage 간 data contract)
-- `.mcp.json` placeholder (cli.mjs MCP wrapper = Phase A.1 carry)
-
-## 검증 도구 사용 (v1.2.1)
-
-```bash
-# 1. drift validator — Phase 4.5 산출 후 자가 검증 (의무)
-npx --prefix ai-native-methodology/tools/drift-validator . \
-  drift-validator examples/poc-XX/output/formal-spec/
-
-# 2. decision-table validator — dmn-check 5종
-node ai-native-methodology/tools/decision-table-validator/src/cli.js \
-  examples/poc-XX/output/formal-spec/decision-tables/
-
-# 3. static-runner — 진짜 외부 도구 (★★★ 시뮬 절대 금지)
-node ai-native-methodology/tools/static-runner/src/cli.js \
-  --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
-
-# 4. lint-no-simulation — 5종 물증 + simulation_only 차단
-bash ai-native-methodology/tools/static-runner/src/lint-no-simulation.sh ./out
-```
-
-CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manual dispatch).
+★ workspace 본체 (`docs/` / `archive/` / `decisions/` / `examples/` / `scripts/`) 는 dist 미포함 (개발 자산 / build script EXCLUDE).
 
 ---
 
@@ -239,51 +237,41 @@ CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manua
 3. **Deterministic First, LLM Second**
 4. **File System as Memory** (단계 간 통신 = 파일)
 5. **Confidence as First-Class** (모든 산출물에 신뢰도 메타)
-6. **Human-in-the-loop** (단계마다 승인 게이트)
+6. **Human-in-the-loop** (chain harness gate 4 + revisit loop)
 7. **Single Source of Truth = Repo** (문서/플러그인은 레포 파생)
 8. **한국어 1차** (영어 약어 최소화, 산업 표준 예외)
 
 ---
 
-## 현재 상태 (v1.3.1 PATCH — 사내 표준 채택 가능 시점)
+## 검증 도구 사용 (12 workspace tool / npm workspace)
 
-### v1.x 누적 (2026-04-26 ~ 2026-05-01)
+```bash
+# Chain harness driver (★ v2.0 진입)
+node tools/chain-driver/src/cli.js init <project>
+node tools/chain-driver/src/cli.js next         # next stage 진입 / blocked 면 exit 2
+node tools/chain-driver/src/cli.js state        # 현재 stage / blocked 여부
 
-- ✅ §0~§15 plan.md 완성
-- ✅ 7대 산출물 + 형식 명세 JSON Schema 11종 + meta-confidence = 12종
-- ✅ ADR 13종 (001~006 + 008 + 009 + 010 + NEST-001~004) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
-- ✅ Phase 4.5 형식 명세 정식 도입 (state-machine + sequence + decision-table + invariants + property-test)
-- ✅ **3 PoC 종결 — platform-agnostic 입증** (Spring Boot 2.5 + Spring Boot 3.3 Hexagonal + NestJS) / 6 격상 후보 모두 본체 적용
-- ✅ 이중 렌더링 사상 (ADR-008) + migration-cautions.md 의무 산출물
-- ✅ **v1.2.1** — drift-validator + decision-table-validator + static-runner + drift-check.yml CI + 5종 물증 schema
-- ✅ **v1.2.2** — 본체 갭 7건 closed (api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template.yaml)
-- ✅ **v1.2.3** — 본체 갭 8건 추가 closed (C/I/H/K + R/D + §8.1) + LMNO 4묶음 종결
-- ✅ **v1.3.0** ★★★ — Sprint 5 spectral 실 실행 (24 warnings / 0 errors / exit 0) + ★★★ no-simulation 정책 첫 실현 + formal-spec-link-validator 신규 + ADR-NEST-001~004 + ADR-010 baseline+ratchet + 신뢰도 85-92% (★ ADR-009 단계 4)
-- ✅ **v1.3.1** PATCH — D3.2 원본 파일명 컨벤션 정리 (12 rename + 33 cross-link, dist 동기화)
+# Phase 4.5 검증 (analysis stage)
+node tools/drift-validator/src/cli.js {산출물 경로}/formal-spec/
+node tools/decision-table-validator/src/cli.js {산출물 경로}/formal-spec/decision-tables/
+node tools/formal-spec-link-validator/src/cli.js {산출물 경로}/formal-spec/
 
-### v1.3.x → v1.4 후속
+# Chain harness validator (gate #1~#4)
+node tools/planning-extraction-validator/src/cli.js   # gate #1
+node tools/chain-coverage-validator/src/cli.js        # gate #2
+node tools/spec-test-link-validator/src/cli.js        # gate #3
+node tools/test-impl-pass-validator/src/cli.js --allow-execute  # gate #4 (실 test runner)
+node tools/traceability-matrix-builder/src/cli.js     # release
 
-- ⏳ **Sprint 5 잔여 carry-over** — Semgrep / PMD / OSV-Scanner 진짜 실행 (★ 환경 변동 시)
-- ⏳ **Sprint 6** (Node 환경 가능) — vacuum / openapi-changes / corpus 14→20쌍 / drift-validator phase-flow 비교기 / ADR-010 baseline mode wrapper
-- ⏳ **D5** — Claude Code skill + slash command 패키징
-- ⏳ **v1.4 candidate** — 4번째 PoC (FastAPI / Ktor / Rust / Go)
-- ⏳ **adoption FE 트랙** — React+TS+TanStack Query+Zustand+Axios PoC #04
+# 외부 도구 (★★★ no-simulation 의무)
+cd tools/spectral-runner && npx spectral lint <openapi.yaml>
+node tools/static-runner/src/cli.js --plugin semgrep --target ./src --output ./out
 
----
+# Schema 검증 (모든 chain 산출물)
+node tools/schema-validator/src/cli.js
+```
 
-## 사상적 기반
-
-| 사상 | 채택 | 출처 |
-|---|---|---|
-| Schema-First | 주축 | Microsoft TypeSpec, OpenAPI 산업 표준 |
-| Contract-First | API 영역 | Hazelcast, Technijian 등 산업 사례 |
-| DDD-Lite (B 강도) | 도메인 영역 | Eric Evans DDD, 풀 DDD 의도적 제외 |
-| FSD + Atomic Design | FE 영역 | Feature-Sliced Design, Brad Frost Atomic Design |
-
-명시적 제외:
-- Event Sourcing, CQRS, Saga, Anticorruption Layer
-- 비기능 요구사항(NFR) 측정
-- 테스트 코드 자동 분석
+CI 자동화 = `.github/workflows/drift-check.yml` (PR / nightly / manual dispatch).
 
 ---
 
@@ -305,6 +293,23 @@ CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manua
 
 ---
 
+## 사상적 기반
+
+| 사상 | 채택 | 출처 |
+|---|---|---|
+| Schema-First | 주축 | Microsoft TypeSpec, OpenAPI 산업 표준 |
+| Contract-First | API 영역 | Hazelcast, Technijian 등 산업 사례 |
+| DDD-Lite (B 강도) | 도메인 영역 | Eric Evans DDD, 풀 DDD 의도적 제외 |
+| FSD + Atomic Design | FE 영역 | Feature-Sliced Design, Brad Frost Atomic Design |
+| chain harness (i-strict) | SDLC paradigm | Aider 패턴 + DEC-2026-05-06-v2.0-i-strict-채택 |
+
+명시적 제외:
+- Event Sourcing, CQRS, Saga, Anticorruption Layer
+- 비기능 요구사항(NFR) 측정
+- 테스트 코드 자동 분석 (단 chain 3 실 test code 산출은 의무)
+
+---
+
 ## 라이선스
 
 (사내 표준 — 외부 공개 시 결정)
@@ -314,5 +319,8 @@ CI 자동화는 `.github/workflows/drift-check.yml` 참조 (PR / nightly / manua
 ## 기여
 
 - 변경 제안: GitHub Issue
-- 변경 적용: PR + ADR 작성
-- 방법론 자체 변경: ADR-XXX 신설 + plan.md 갱신
+- 변경 적용: PR + ADR 작성 (ADR-CHAIN-001~005 + ADR-001~010 + ADR-FE-001~007)
+- 방법론 자체 변경: ADR/DEC 신설 → plan.md 갱신 → §8.1 strict 검증대 통과
+- chain harness scaffolding (sub-plan-1~4) → harness-complete (sub-5) → harness-validated (sub-6) 로 호칭 전환 명세 (DEC-2026-05-06-sub-plan-5 + DEC-2026-05-06-sub-plan-6-종결)
+
+→ 변경 이력: [CHANGELOG.md](./CHANGELOG.md) (v1.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v1.3 이전).

@@ -1,19 +1,29 @@
-# flows/ — Sub-stage 순서 명세 (G6)
+# flows/ — SDLC stage 순서 명세 (★ v2.0 chain harness validated)
 
-각 lifecycle stage 의 sub-stage / phase 흐름을 DAG (`.json` + `.mermaid` 이중 렌더링) 으로 정의. drift-validator v0.2.0 가 `.json ↔ .mermaid` 의미 동등성 자동 검증 (drift 0 자가 입증).
+각 lifecycle stage 의 sub-stage / phase 흐름을 DAG (`.json` + `.mermaid` 이중 렌더링) 으로 정의. drift-validator 가 `.json ↔ .mermaid` 의미 동등성 자동 검증 (drift 0 자가 입증).
 
-## 채워진 흐름 (★ 현재)
+## ★ ★ ★ Master SSOT (v2.0 진입점)
 
-- `analysis.phase-flow.json` + `analysis.phase-flow.mermaid` — 분석 stage 의 Phase 0 → 1 → 2 → 3 → 4 → 4.5 → 5 (BE/FE/DB 분기) → 6 흐름
-  - 본체 v0.2.0 자산 그대로 재배치 (G6, plan 11차 결단)
-  - `methodology-spec/workflow/phase-flow.{json,mermaid}` 에서 이동 — 파일명만 변경
+- **`sdlc-4stage-flow.{json,mermaid}`** — ★ ★ ★ chain harness 4 stage 통합 SSOT (planning → spec → test → impl + cross_cutting analysis stage / 4 gate + revisit_edges + release_eligibility)
+  - **plugin user 의 v2.0 진입 우선순위 = 1순위** (chain-driver init / next 가 본 SSOT 참조)
+  - schemas/state.schema.json 의 stage enum ↔ stages 정합 자동 검증 (drift-validator `--check-state-flow-consistency`)
 
-## 미채움 흐름 (☐ v2.0+ lifecycle 확장)
+## Chain stage 4종 (★ v2.0 채워짐)
 
-- `planning.phase-flow.{json,mermaid}` — 기획 stage 흐름
-- `design.phase-flow.{json,mermaid}` — 설계 stage 흐름
-- `test.phase-flow.{json,mermaid}` — 테스트 stage 흐름
-- `implement.phase-flow.{json,mermaid}` — 구현 stage 흐름
+- `planning.phase-flow.{json,mermaid}` — chain 1 / planning-spec 추출
+- `spec.phase-flow.{json,mermaid}` — chain 2 / behavior + acceptance + 7대 통합
+- `test.phase-flow.{json,mermaid}` — chain 3 / test-spec + 실 test code (RED)
+- `implement.phase-flow.{json,mermaid}` — chain 4 / impl-spec + 실 impl code (GREEN)
+
+## Cross-cutting (analysis stage / chain 1 진입 전)
+
+- `analysis.phase-flow.{json,mermaid}` — analysis stage 의 Phase 0 → 1 → 2 → 3 → 4 → 4.5 → 5 (BE/FE/DB 분기) → 6 흐름
+  - **chain 1 (planning) 의 INPUT 으로 사용** — legacy 코드 → 7대 산출물 한 방향 추출
+  - v1.x 자산 그대로 v2.0 chain 1 진입 전 단계로 흡수
+
+## 미채움 흐름 (☐ v2.x+ lifecycle 확장)
+
+- `design.phase-flow.{json,mermaid}` — 설계 stage 흐름 (★ chain 2 와 차별화 시점 carry)
 
 자세한 인터페이스: `methodology-spec/lifecycle-contract.md`
 
