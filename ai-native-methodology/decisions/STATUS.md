@@ -3,18 +3,41 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 (DEC-2026-04-29 partial retract) + DEC-2026-05-06-cooling-off-정책-폐기 / 사용자 명시 결단 ("A로 하고 싶다") / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate go/stop + revisit loop (자동 감지 + 사용자 결단) / 1차 single-case (legacy 재구축) / use case 4종 분기 = v2.1+ carry / 70~80% 한계 명시 잔존 (gate별 사용자 검토 ≤15%) / master plan `~/.claude/plans/a-stateful-gadget.md` / γ hybrid sequencing 6 sub-plan 분할 / sub-plan-1 (scope) ★ 본 세션 진행 중)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0 SDLC 4단계 chain harness 정식 채택** — DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop / 1차 single-case (legacy 재구축) / 70~80% 한계 명시 잔존 / master plan `~/.claude/plans/a-stateful-gadget.md` γ hybrid 6 sub-plan / ★ ★ sub-plan-3a 4 신규 도구 partial commit / **clear 후 재개 의무**)
 
 ## ★ ★ ★ v2.0 진행 (sub-plan 6 sprint)
 
 | Sprint | Sub-plan | 산출 | 상태 |
 |---|---|---|---|
-| **M+1** | sub-plan-1 (scope) | DEC + i-strict + lifecycle-contract / CLAUDE.md / skills-axis / agents / STATUS / INDEX 갱신 | 🔄 본 세션 진행 중 |
-| M+2 | sub-plan-2 (schemas + deliverables + ADR) | 6 schema + 6 deliverable + 3 신규 ADR + 3 ADR v2 | ⏳ |
-| M+3 | sub-plan-3 (tools) | 6 신규 도구 + 기존 6 chain 모드 / unit test 53 → 80+ | ⏳ |
+| M+1 | sub-plan-1 (scope) | DEC 3 + lifecycle-contract / CLAUDE.md / skills-axis / agents / STATUS / INDEX | ✅ commit `b466e51` |
+| M+2 | sub-plan-2 (schemas + deliverables + ADR) | 6 schema + 6 deliverable + 3 신규 ADR + 3 ADR v2 + UC-* 통일 | ✅ commit `811ea45` |
+| **M+3a** | **sub-plan-3a (4 chain validator)** | planning-extraction / chain-coverage / spec-test-link / traceability-matrix-builder (★ 4 도구 22 test pass) | 🔄 ★ partial / 본 commit / 잔여 = 기존 6 도구 chain 모드 확장 + chain-check.yml + workspace + ADR-CHAIN-004 + verification |
+| M+3b | sub-plan-3b (test-impl-pass-validator) | ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) 선행 후 진입 | ⏳ carry |
 | M+4 | sub-plan-4 (skills + flows) | 14 skill + agents 갱신 + 5 flow + sdlc-4stage-flow.json | ⏳ |
-| M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + chain-revisit-detector / go/stop UX | ⏳ |
+| M+5 | sub-plan-5 (hooks + harness) | hooks.json 확장 + ★ chain-revisit-detector (sub-plan-3 carry) + go/stop UX | ⏳ |
 | M+6 | sub-plan-6 (PoC + release) | PoC #05 + PoC #03 retrofit / §8.1 7/7 통과 / v2.0.0 release | ⏳ |
+
+## ★ ★ sub-plan-3 결단 (2026-05-06 / clear 직전 보존)
+
+**사용자 결단 cluster** (sub-plan-3-research.md ★ ★ ★ Senior blocker 3건 해결):
+- Blocker 1 (D9 invocation matrix) — **Aider 패턴** = 사용자 명시 `.aimd/config/test-cmd.json` + phase-1-inventory 자동 추론 + override
+- Blocker 2 (test-impl-pass 5 sub-spec) — **Senior + Industry default 모두 적용** (result_hash 정규화 SARIF Appendix F / timeout 600s / flaky retry 2 / `--allow-execute` / coverage threshold 책임 분리)
+- Blocker 3 (chain-revisit-detector) — **sub-plan-5 (hooks) carry**
+- 보강 5건 (S1~S5) **전부 적용** + 3a/3b 분할 (★ 본 sub-plan-3a = 4 도구 + 6 기존 확장 / sub-plan-3b = test-impl-pass / sub-plan-5 = revisit-detector)
+
+## ★ ★ clear 후 재개 의무 (다음 세션)
+
+1. **plan + research 보존**: `~/.claude/plans/sub-plan-3-tools.md` + `~/.claude/plans/sub-plan-3-research.md` + master plan + sub-plan-1/2 plan 모두 보존
+2. **남은 sub-plan-3a 작업**:
+   - npm workspace root 설정 (S1)
+   - 기존 6 도구 chain 모드 확장 (drift-validator chain corpus / formal-spec-link-validator `--chain-mode` / static-runner chain 4 lint / schema-validator 6 신규 schema 등록)
+   - `chain-check.yml` 별도 워크플로우 신설 (S2 — drift-check.yml 오염 ❌ / `if: false` gate + workflow_dispatch only)
+   - `--dry-run` 의미 명문 (S3)
+   - ADR-CHAIN-004 (Test Runner Invocation Contract) 신설
+   - unit test 53 → 80+ 의무 (현 22 test 추가 / 53 + 22 = 75 → 추가 5+ 의무)
+   - sub-plan-3a 종결 commit + sub-plan-3b carry 등재
+3. **검증 회귀 baseline** (현 시점): drift 36 / dmn 11 / formal-spec-link 8 / static-runner 11 = 66 + 4 신규 도구 22 = **88 unit test pass**
+4. **commit history**: `b466e51` (sub-plan-1) → `811ea45` (sub-plan-2) → 본 commit (sub-plan-3a partial) → 다음 (sub-plan-3a 종결)
 
 ## ★ ★ v2.0 carry (master plan §K)
 
