@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/planning-spec.schema.json",
+  "title": "Planning Spec (chain 1 / 기획문서)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 chain 1 stage 산출물. legacy 분석 결과 → 비즈니스 의도 추출 (1차 single-case). DEC-2026-05-06-v2.0-i-strict-채택 정합. ID 컨벤션: methodology-spec/id-conventions.md.",
+  "type": "object",
+  "required": ["meta", "derivation_source", "business_intent", "use_cases"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "description": "본 planning-spec 의 출처. 1차 = legacy-extraction 만 / use case 4종 분기는 v2.1+ carry K-1.",
+      "required": ["type", "source_artifacts"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["legacy-extraction", "new-prd", "modification", "bugfix"],
+          "description": "기획 input 출처. 1차 v2.0.0 = legacy-extraction only / 다른 enum 은 v2.1+ carry K-1"
+        },
+        "source_artifacts": {
+          "type": "array",
+          "description": "본 planning-spec 추출에 사용된 analysis stage 산출물 경로 (rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5)",
+          "items": {"type": "string"},
+          "minItems": 1
+        }
+      }
+    },
+    "business_intent": {
+      "type": "object",
+      "description": "비즈니스 의도 — 도메인 목적 / 이해관계자 / 성공 기준",
+      "required": ["domain_purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "domain_purpose": {"type": "string", "description": "도메인의 비즈니스 목적 한 줄"},
+        "stakeholders": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "이해관계자 목록"
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "성공 기준 (KPI / 정성)"
+        }
+      }
+    },
+    "use_cases": {
+      "type": "array",
+      "description": "유스케이스 목록. analysis stage domain.json 의 UC-* 를 chain 2 forward link 가능한 형태로 정리",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "acceptance_criteria_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "유스케이스 ID (★ id-conventions canonical / 예: UC-USER-001)"
+          },
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "actors": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "postconditions": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "acceptance_criteria_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$"
+            },
+            "minItems": 1,
+            "description": "★ chain 2 forward link 의무 (sub-plan-3 chain-coverage-validator 강제)"
+          },
+          "source_grounded_evidence": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "★ no-simulation — analysis 산출물 + 코드 경로 (예: src/user/UserService.java:45-60). source-grounded 의무 (B7 14차 retract 차단)"
+          }
+        }
+      },
+      "minItems": 1
+    },
+    "business_rules_intent": {
+      "type": "array",
+      "description": "★ analysis stage 의 BR-* 별 intent reasoning. BR-INTENT-* prefix 폐기 (Senior B1) — 본 필드 = analysis BR-* 의 backward link",
+      "items": {
+        "type": "object",
+        "required": ["br_id", "reasoning", "source_grounded_evidence"],
+        "additionalProperties": false,
+        "properties": {
+          "br_id": {
+            "type": "string",
+            "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$",
+            "description": "analysis stage rules.json 의 BR-* (★ backward link)"
+          },
+          "reasoning": {
+            "type": "string",
+            "description": "왜 이 규칙인가 자연어 reasoning"
+          },
+          "source_grounded_evidence": {
+            "type": "string",
+            "description": "★ source-grounded 의무 (예: src/user/UserValidator.java:23 + git blame author)"
+          }
+        }
+      }
+    },
+    "out_of_scope": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "본 chain 에서 제외 영역"
+    },
+    "risks_and_constraints": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "위험 / 제약 (e.g., 70~80% 한계 / 라이선스 / 인프라 제약)"
+    },
+    "cross_links": {
+      "type": "object",
+      "description": "★ DO-178C bidirectional traceability 차용",
+      "additionalProperties": false,
+      "properties": {
+        "to_analysis_artifacts": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "backward link to analysis 산출물 (rules.json / domain.json / 7대 산출물)"
+        }
+      }
+    }
+  }
+}

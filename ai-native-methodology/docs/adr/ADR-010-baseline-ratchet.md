@@ -134,7 +134,79 @@ node tools/static-runner/src/cli.js --baseline-mode ratchet
 - Figma TypeScript strict ratchet
 - Shopify Sorbet `srb tc --strict-files`
 - Stripe internal "baseline + ratchet" 표준
+- DEC-2026-05-06-v2.0-i-strict-채택 (★ §2.6 v2 확장 trigger)
+- DO-178C / IEC 62304 (★ §2.6 severity_floor 차용)
 
 ---
 
-**End of ADR-010.**
+## §2.6 v2 확장 — coverage ratchet baseline (2026-05-06)
+
+★ ★ ★ DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §2 정합. v2.0 chain 4단계 chain coverage ratchet 정책 신설.
+
+### chain coverage ratchet baseline
+
+```yaml
+chain_coverage_ratchet:
+  v2.0.0 (initial):
+    link_coverage: 0.85
+    test_pass_rate: 1.0 (chain 4 GREEN 의무 / fixed)
+    line_coverage: optional (정보용)
+    branch_coverage: optional (정보용)
+  v2.1+:
+    link_coverage: 0.90 (★ ≥ 2 PoC sustained 0.90 입증 후 auto-promotion)
+    test_pass_rate: 1.0
+  v3.0+:
+    link_coverage: 0.95
+    test_pass_rate: 1.0
+```
+
+### severity_floor (★ DO-178C DAL A 차용)
+
+link_coverage threshold 보다 더 강한 floor:
+
+| severity | floor |
+|---|---|
+| critical | 1.0 (★ ★ ★ DO-178C DAL A — uncovered 분석 의무) |
+| high | 0.95 |
+| medium | 0.90 |
+| low | 0.85 (initial baseline) |
+
+severity_floor 미달 시 즉시 차단 (ratchet 와 별개 / regression 자동 차단).
+
+### ratchet rule (★ §8.1 strict 정합)
+
+- baseline 산출 시 0.85 미만은 grandfathered (단 critical AC-* 미달 = 즉시 차단)
+- 신규 AC-* 추가 시 즉시 0.85 의무
+- ratchet 갱신 (0.85 → 0.90 → 0.95) = ★ ★ 사용자 명시 결단 의무
+- ratchet 갱신 prerequisite: ★ §8.1 strict ≥ 2 PoC corroboration sustained pass
+
+### chain_attempt retry cap (★ Industry research 정합)
+
+AI code gen SOTA pass rate (60~88%) gap 봉쇄:
+- `chain_attempt.retry_cap` default 3 (★ test-spec / impl-spec schema 의무)
+- retry_cap 초과 시 자동 chain abort + 4 원칙 §4 (Revert + Lessons Learned) 적용
+- retry_cap 사용자 갱신 = §8.1 strict 의무
+
+### 70~80% 한계 명시 잔존 (★ master plan §J.2 옵션 A)
+
+- AI 자동화 ≥ 85% / 사용자 검토 ≤ 15% / 100% 자동화 ❌ 명시
+- impl-spec.human_review.gate_4_intervention_pct ≤ 0.30 schema 의무
+
+### baseline 도구 통합 (sub-plan-3)
+
+본 ADR §2.5 의 baseline + ratchet pattern 을 chain 6 신규 도구 모두 적용:
+- planning-extraction-validator
+- chain-coverage-validator
+- spec-test-link-validator
+- test-impl-pass-validator
+- traceability-matrix-builder
+- chain-revisit-detector
+
+기존 6 도구 (drift / decision-table / formal-spec-link / spectral / static / schema-validator) baseline pattern 그대로 유지 + chain 모드 확장.
+
+### 변경 이력 추가
+- 2026-05-06: §2.6 신설 — chain 4단계 coverage ratchet baseline (DEC-2026-05-06-v2.0-i-strict-채택 / ADR-CHAIN-001 §2 정합).
+
+---
+
+**End of ADR-010 (★ v2 §2.6 확장 포함).**

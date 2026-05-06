@@ -70,8 +70,8 @@
         "properties": {
           "uc_id": {
             "type": "string",
-            "pattern": "^UC-[A-Z0-9_-]+$",
-            "description": "Use Case ID. 예: UC-USER-SIGNUP, UC-USER-FOLLOW."
+            "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "Use Case ID (★ v2.0 통일 / id-conventions canonical / 예: UC-USER-001, UC-USER-003 / 기존 이름 형식 (UC-USER-SIGNUP) = sub-plan-6 migration carry)."
           },
           "actors": {
             "type": "array",

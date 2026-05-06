@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/behavior-spec.schema.json",
+  "title": "Behavior Spec (chain 2 / 동작 명세)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 chain 2 stage 핵심 산출물. Phase 4.5 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수. executable behavioral contract. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "type": "object",
+  "required": ["meta", "derivation_source", "behaviors"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "required": ["planning_spec_path", "analysis_artifacts"],
+      "additionalProperties": false,
+      "properties": {
+        "planning_spec_path": {
+          "type": "string",
+          "description": "본 behavior-spec 추출의 planning-spec.json 경로 (chain 1 backward link)"
+        },
+        "analysis_artifacts": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "analysis stage 산출물 경로 (rules.json / domain.json / openapi.yaml / 8 FE 산출물 / Phase 4.5)"
+        }
+      }
+    },
+    "behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "description": "BHV-* 목록. 각 BHV 는 ≥ 1 UC-* backward link + ≥ 1 AC-* forward link 의무",
+      "items": {
+        "type": "object",
+        "required": ["id", "use_case_refs", "acceptance_criteria_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "Behavior ID (예: BHV-USER-001)"
+          },
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "use_case_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$"},
+            "minItems": 1,
+            "description": "★ planning-spec backward link 의무 (chain-coverage-validator 강제)"
+          },
+          "br_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$"},
+            "description": "analysis stage rules.json BR-* backward link"
+          },
+          "preconditions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "formal expressions (e.g., \"user.status == ACTIVE\")"
+          },
+          "postconditions": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "invariants": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "state_transition_ref": {
+            "type": "string",
+            "description": "Phase 4.5 state-machine.json 경로 (.aimd/output/formal-spec/state-machines/{id}.json)"
+          },
+          "decision_table_ref": {
+            "type": "string",
+            "description": "Phase 4.5 decision-table.json 경로"
+          },
+          "sequence_ref": {
+            "type": "string",
+            "description": "Phase 4.5 sequence.json 경로"
+          },
+          "property_tests": {
+            "type": "array",
+            "description": "★ property-based test stub (fast-check / Hypothesis / jqwik) — Industry research 권고",
+            "items": {
+              "type": "object",
+              "required": ["property", "framework"],
+              "additionalProperties": false,
+              "properties": {
+                "property": {"type": "string", "description": "검증 property 자연어 또는 코드"},
+                "framework": {"type": "string", "enum": ["fast-check", "hypothesis", "jqwik", "quickcheck", "proptest", "other"]},
+                "framework_status": {
+                  "type": "string",
+                  "enum": ["active", "maintenance", "deprecated"],
+                  "description": "★ Industry — jqwik 같은 maintenance mode 경고 (B3)"
+                },
+                "arbitrary_stub": {"type": "string", "description": "fast-check arbitrary 구조 stub"}
+              }
+            }
+          },
+          "acceptance_criteria_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$"},
+            "minItems": 1,
+            "description": "★ forward link 의무 (chain-coverage-validator 강제)"
+          },
+          "source_grounded_evidence": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "★ no-simulation — analysis 산출물 / 코드 경로"
+          }
+        }
+      }
+    },
+    "cross_links": {
+      "type": "object",
+      "description": "★ DO-178C bidirectional + analysis 7대 산출물 통합 (사용자 답변 3 정합)",
+      "additionalProperties": false,
+      "properties": {
+        "to_analysis_artifacts": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ 7대 산출물 reference 의무 — chain-coverage-validator 가 모두 reference 강제 (사용자 답변 3 \"현 7대 + 신규 추가\" 정합)"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/test-spec.schema.json",
+  "title": "Test Spec (chain 3 / 테스트 명세 + 실 test 코드 메타)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 chain 3 stage 산출물. acceptance-criteria 기반 실 test 코드 자동 생성 (RED 의무). 5종 물증 7 필드 (★ no-simulation 강화). DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "type": "object",
+  "required": ["meta", "derivation_source", "test_cases", "coverage"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "required": ["acceptance_criteria_path", "behavior_spec_path"],
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_criteria_path": {"type": "string"},
+        "behavior_spec_path": {"type": "string"}
+      }
+    },
+    "test_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "ac_ref", "bhv_ref", "type", "framework", "source_file", "expected_outcome"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "ac_ref": {
+            "type": "string",
+            "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "★ chain 2 backward link"
+          },
+          "bhv_ref": {
+            "type": "string",
+            "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["unit", "integration", "contract", "e2e", "property", "mutation", "security", "load"],
+            "description": "★ B4 — 5 → 8 enum 확장 (mutation/security/load 추가 / Senior 권고)"
+          },
+          "framework": {
+            "type": "string",
+            "description": "★ B3 open enum — 사내 stack 추가 시 schema 변경 ❌ / hint = jest/vitest/jasmine/mocha/junit5/pytest/rspec/gotest/playwright/cypress/supertest/testcontainers 등"
+          },
+          "framework_status": {
+            "type": "string",
+            "enum": ["active", "maintenance", "deprecated"],
+            "default": "active",
+            "description": "★ Industry — jqwik maintenance mode 경고 (B3)"
+          },
+          "source_file": {
+            "type": "string",
+            "description": "실 test 코드 파일 경로 (예: src/test/java/UserSignupTest.java)"
+          },
+          "source_evidence": {
+            "type": "string",
+            "description": "★ no-simulation — test 코드 excerpt (≤ 500 char) / 실 코드가 source_file 에 존재함을 입증"
+          },
+          "expected_outcome": {
+            "type": "string",
+            "enum": ["pass", "fail"],
+            "description": "★ chain 3 RED 의무 = 'fail' (impl 부재 / chain 4 GREEN 시 'pass' 격상)"
+          },
+          "impl_module_ref": {
+            "type": "string",
+            "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "★ chain 4 forward link (chain 3 RED 시 미정 / chain 4 GREEN 시 채움)"
+          },
+          "test_run_evidence": {
+            "type": "object",
+            "description": "★ no-simulation 5종 물증 7 필드 (B5 정합 / 정규화)",
+            "required": ["test_runner_version", "test_runner_stdout_path", "invocation_timestamp", "duration_ms", "pass_count", "fail_count", "skip_count", "reproduction_command", "result_hash", "report_format"],
+            "additionalProperties": false,
+            "properties": {
+              "test_runner_version": {"type": "string", "description": "★ 실 runner --version 출력 (예: jest 29.7.0)"},
+              "test_runner_stdout_path": {"type": "string", "description": "stdout dump 경로 (불변 보존)"},
+              "test_runner_stderr_path": {"type": "string", "description": "★ B5 optional / non-empty if present"},
+              "invocation_timestamp": {"type": "string", "format": "date-time"},
+              "duration_ms": {"type": "integer", "minimum": 0},
+              "pass_count": {"type": "integer", "minimum": 0},
+              "fail_count": {"type": "integer", "minimum": 0},
+              "skip_count": {"type": "integer", "minimum": 0},
+              "reproduction_command": {
+                "oneOf": [
+                  {"type": "string"},
+                  {"type": "array", "items": {"type": "string"}, "minItems": 1}
+                ],
+                "description": "★ B5 array 허용 — multi-step 명령 (e.g., docker compose up && pytest)"
+              },
+              "result_hash": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$",
+                "description": "★ B5 정규화 — hash 대상 = stdout 의 (timestamp+duration_ms 제외 / sorted test names + pass/fail/skip count)"
+              },
+              "report_format": {
+                "type": "string",
+                "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml"],
+                "description": "★ B5 — SARIF 2.1.0 (OASIS / GitHub Code Scanning native) 우선 권고"
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "★ Blocker 2 해결안 — 3 metric 분리",
+      "required": ["link_coverage"],
+      "additionalProperties": false,
+      "properties": {
+        "link_coverage": {
+          "type": "object",
+          "description": "AC-* / BHV-* / UC-* 가 ≥ 1 TC-* 에 ref 되는 비율 (chain 정합 의무)",
+          "required": ["by_acceptance_criteria", "threshold"],
+          "additionalProperties": false,
+          "properties": {
+            "by_acceptance_criteria": {"type": "number", "minimum": 0, "maximum": 1},
+            "by_business_rule": {"type": "number", "minimum": 0, "maximum": 1},
+            "by_use_case": {"type": "number", "minimum": 0, "maximum": 1},
+            "threshold": {
+              "type": "number",
+              "minimum": 0.85,
+              "maximum": 0.95,
+              "description": "★ ADR-010 v2 ratchet 0.85 → 0.90 → 0.95"
+            },
+            "severity_floor": {
+              "type": "object",
+              "description": "★ DO-178C DAL A 차용 (Official research 권고)",
+              "additionalProperties": false,
+              "properties": {
+                "critical": {"type": "number", "const": 1.0},
+                "high": {"type": "number", "minimum": 0.95, "maximum": 1.0},
+                "medium": {"type": "number", "minimum": 0.90, "maximum": 1.0},
+                "low": {"type": "number", "minimum": 0.85, "maximum": 1.0}
+              }
+            }
+          }
+        },
+        "test_pass_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "★ chain 3 = 0.0 (RED 의무) / chain 4 = 1.0 (GREEN 의무 / gate #4) — 본 schema 는 chain 3 단계 / chain 4 는 impl-spec 에서 1.0 의무"
+        },
+        "line_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "★ optional secondary metric (LCOV / JaCoCo)"
+        },
+        "branch_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "★ optional secondary metric"
+        }
+      }
+    },
+    "chain_attempt": {
+      "type": "object",
+      "description": "★ Industry research — retry cap (SOTA pass rate gap 봉쇄)",
+      "additionalProperties": false,
+      "properties": {
+        "attempt_n": {"type": "integer", "minimum": 1},
+        "retry_cap": {"type": "integer", "minimum": 1, "default": 3},
+        "revisit_count": {"type": "integer", "minimum": 0, "default": 0}
+      }
+    }
+  }
+}

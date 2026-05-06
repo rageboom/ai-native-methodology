@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/impl-spec.schema.json",
+  "title": "Impl Spec (chain 4 / 구현 명세 + 실 impl 코드 메타)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 chain 4 stage 산출물 (i-strict 정통). test-spec 기반 실 impl 코드 자동 생성 (GREEN 의무 / 100% test pass). ★ ★ ★ chain 4 single source-of-truth = 본 impl-spec.json (B7 14차 retract 차단). 실 코드 = 산출물 ❌ (commit_hash 만 보존). DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "type": "object",
+  "required": ["meta", "derivation_source", "modules", "test_pass_evidence", "coverage", "human_review"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "required": ["test_spec_path", "behavior_spec_path"],
+      "additionalProperties": false,
+      "properties": {
+        "test_spec_path": {"type": "string"},
+        "behavior_spec_path": {"type": "string"}
+      }
+    },
+    "modules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "tc_refs", "bhv_refs", "framework", "source_files", "commit_hash"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "tc_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$"},
+            "minItems": 1,
+            "description": "★ chain 3 backward link 의무"
+          },
+          "bhv_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$"},
+            "minItems": 1,
+            "description": "★ chain 2 backward link"
+          },
+          "framework": {
+            "type": "string",
+            "description": "★ B3 open enum — phase-1-inventory stack 정합 (예: spring-boot-3 / nestjs-10 / express-4 / fastapi-0.110 / rails-7 / react-18)"
+          },
+          "source_files": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+            "description": "실 impl 코드 파일 경로 (★ commit_hash 로 결정성 보장)"
+          },
+          "commit_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$",
+            "description": "★ B7 14차 retract 차단 — 실 코드 = 산출물 ❌ / commit_hash 만 본 산출물에 보존 / git 으로 결정적 trace"
+          },
+          "source_evidence": {
+            "type": "string",
+            "description": "★ no-simulation — 실 코드 excerpt (≤ 500 char) / commit_hash 의 source_files 와 sha 일치 의무"
+          }
+        }
+      }
+    },
+    "test_pass_evidence": {
+      "type": "object",
+      "description": "★ ★ ★ chain 4 GREEN 의무 — 진짜 runner 100% pass 입증. 5종 물증 7 필드 (B5 정규화)",
+      "required": ["test_runner_version", "test_runner_stdout_path", "invocation_timestamp", "duration_ms", "pass_count", "fail_count", "skip_count", "reproduction_command", "result_hash", "report_format"],
+      "additionalProperties": false,
+      "properties": {
+        "test_runner_version": {"type": "string"},
+        "test_runner_stdout_path": {"type": "string"},
+        "test_runner_stderr_path": {"type": "string", "description": "★ B5 optional"},
+        "invocation_timestamp": {"type": "string", "format": "date-time"},
+        "duration_ms": {"type": "integer", "minimum": 0},
+        "pass_count": {"type": "integer", "minimum": 0},
+        "fail_count": {"type": "integer", "const": 0, "description": "★ chain 4 GREEN 의무 — 0 만 허용"},
+        "skip_count": {"type": "integer", "minimum": 0},
+        "reproduction_command": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          ]
+        },
+        "result_hash": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+        "report_format": {
+          "type": "string",
+          "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml"]
+        },
+        "coverage_report_path": {"type": "string", "description": "LCOV / JaCoCo / Cobertura 경로"},
+        "linter_output_path": {"type": "string", "description": "★ static-runner 6종 결과 (Semgrep / PMD / SpotBugs / etc.)"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["link_coverage", "test_pass_rate"],
+      "additionalProperties": false,
+      "properties": {
+        "link_coverage": {
+          "type": "object",
+          "required": ["by_acceptance_criteria", "threshold"],
+          "additionalProperties": false,
+          "properties": {
+            "by_acceptance_criteria": {"type": "number", "minimum": 0, "maximum": 1},
+            "by_business_rule": {"type": "number", "minimum": 0, "maximum": 1},
+            "by_use_case": {"type": "number", "minimum": 0, "maximum": 1},
+            "threshold": {"type": "number", "minimum": 0.85, "maximum": 0.95},
+            "severity_floor": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "critical": {"type": "number", "const": 1.0},
+                "high": {"type": "number", "minimum": 0.95, "maximum": 1.0},
+                "medium": {"type": "number", "minimum": 0.90, "maximum": 1.0},
+                "low": {"type": "number", "minimum": 0.85, "maximum": 1.0}
+              }
+            }
+          }
+        },
+        "test_pass_rate": {
+          "type": "number",
+          "const": 1.0,
+          "description": "★ chain 4 GREEN 의무 (1.0 fixed)"
+        },
+        "line_coverage": {"type": "number", "minimum": 0, "maximum": 1},
+        "branch_coverage": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "human_review": {
+      "type": "object",
+      "description": "★ Blocker 2 해결안 — 70~80% 한계 schema 수용 (master plan §J.2 옵션 A 정합)",
+      "required": ["gate_4_intervention_pct"],
+      "additionalProperties": false,
+      "properties": {
+        "gate_4_intervention_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.30,
+          "description": "★ ★ ★ 70~80% 한계 명시 — 사용자 검토 ≤ 30% (정량 boundary)"
+        },
+        "intervention_log": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "사용자 결단 trace (gate #4 go/stop 결단 이유)"
+        }
+      }
+    },
+    "chain_attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "attempt_n": {"type": "integer", "minimum": 1},
+        "retry_cap": {"type": "integer", "minimum": 1, "default": 3},
+        "revisit_count": {"type": "integer", "minimum": 0, "default": 0}
+      }
+    }
+  }
+}

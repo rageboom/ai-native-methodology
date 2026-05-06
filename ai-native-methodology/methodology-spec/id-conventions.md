@@ -1,6 +1,8 @@
 # ID 표준 (산출물 간 추적성)
 
-> 7대 산출물 ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능.
+> 7대 산출물 + ★ v2.0 chain 4단계 산출물 ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능. 단일 source-of-truth (★ 14차 retract pattern 차단).
+
+★ ★ ★ **v2.0 갱신 (2026-05-06)**: chain 4단계 산출물 ID 추가 + UC-* 3 형식 충돌 통일 (DEC-2026-05-06-v2.0-i-strict-채택 정합 / sub-plan-2 §D1 결단).
 
 ---
 
@@ -15,52 +17,127 @@ flowchart LR
     SCN["SCN-{도메인}-{번호}\n사용자 시나리오"] -->|호출| UC
     PAGE["PAGE-{도메인}-{번호}\n페이지"] -->|구성| SCN
     AP_ID["AP-{카테고리}-{이름}-{번호}\n안티패턴"] -.회피.-> ARCH["아키텍처"]
+
+    UC ==> BHV["BHV-{도메인}-{번호}\nbehavior"]
+    BHV ==> AC["AC-{도메인}-{번호}\nacceptance criteria"]
+    AC ==> TC["TC-{도메인}-{번호}\ntest case"]
+    TC ==> IMPL["IMPL-{도메인}-{번호}\nimpl module"]
 ```
+
+(굵은 화살표 ==> 는 ★ v2.0 chain forward link / 모든 link 는 backward 도 의무)
 
 ---
 
 ## ID 형식 표
 
-| 산출물 | ID 형식 | 예시 |
-|---|---|---|
-| 엔티티 | `E-{도메인}-{이름}` | `E-ORDER-Order`, `E-USER-User` |
-| 유스케이스 | `UC-{도메인}-{번호}` | `UC-ORDER-001`, `UC-USER-003` |
-| 비즈니스 규칙 | `BR-{도메인}-{이름}-{번호}` | `BR-ORDER-CANCEL-001` |
-| 안티패턴 | `AP-{카테고리}-{이름}-{번호}` | `AP-DB-N-PLUS-ONE-001` |
-| 페이지 | `PAGE-{도메인}-{번호}` | `PAGE-ORDER-001` |
-| 사용자 시나리오 | `SCN-{도메인}-{번호}` | `SCN-ORDER-001` |
-| Bounded Context | `BC-{도메인}` | `BC-ORDER`, `BC-USER` |
-| 정합성 불일치 | `DRIFT-{번호}` | `DRIFT-001` |
-| PoC Finding | `F-{번호}` | `F-003` |
-| API operationId | `{camelCase 동사+명사}` | `createOrder`, `getUsers` |
-| DB 테이블 | `{snake_case}` | `orders`, `order_items` |
+### 기존 (analysis stage)
+
+| 산출물 | ID 형식 | 예시 | schema/source |
+|---|---|---|---|
+| 엔티티 | `E-{도메인}-{이름}` | `E-ORDER-Order`, `E-USER-User` | domain.schema |
+| **유스케이스** | **`UC-{도메인}-{3자리 번호}`** ★ | **`UC-ORDER-001`, `UC-USER-003`** ★ | domain.schema + formal-spec.schema (★ v2.0 통일) |
+| 비즈니스 규칙 | `BR-{도메인}-{이름}-{번호}` | `BR-ORDER-CANCEL-001` | rules.schema |
+| 안티패턴 | `AP-{카테고리}-{이름}-{번호}` | `AP-DB-N-PLUS-ONE-001` | antipatterns.schema |
+| 페이지 | `PAGE-{도메인}-{번호}` | `PAGE-ORDER-001` | ui-spec.schema |
+| 사용자 시나리오 | `SCN-{도메인}-{번호}` | `SCN-ORDER-001` | ui-spec.schema |
+| Bounded Context | `BC-{도메인}` | `BC-ORDER`, `BC-USER` | architecture.schema |
+| 정합성 불일치 | `DRIFT-{번호}` | `DRIFT-001` | finding system |
+| Finding | `F-{번호}` | `F-003` (BE) / `F-FE-001` (FE) | finding.schema |
+| API operationId | `{camelCase 동사+명사}` | `createOrder`, `getUsers` | openapi |
+| DB 테이블 | `{snake_case}` | `orders`, `order_items` | db-schema.schema |
+
+### ★ v2.0 chain 4단계 산출물 (sub-plan-2 신설)
+
+| 산출물 | ID 형식 | 예시 | schema |
+|---|---|---|---|
+| **Behavior** | `BHV-{도메인}-{3자리 번호}` | `BHV-ORDER-001` | behavior-spec.schema |
+| **Acceptance Criteria** | `AC-{도메인}-{3자리 번호}` | `AC-ORDER-001` | acceptance-criteria.schema |
+| **Test Case** | `TC-{도메인}-{3자리 번호}` | `TC-ORDER-001` | test-spec.schema |
+| **Impl Module** | `IMPL-{도메인}-{3자리 번호}` | `IMPL-ORDER-001` | impl-spec.schema |
+
+★ planning-spec 의 use_cases 는 기존 UC-* 차용 (analysis stage UC-* 와 동일 namespace / backward link).
+★ BR-INTENT-* prefix ❌ — rules.schema 의 BR-* 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).
 
 ---
 
-## 규칙
+## 규칙 (★ v2.0 갱신)
 
-1. **도메인**: 대문자 (ORDER, USER, PRODUCT 등)
-2. **번호**: 3자리 (001, 002, ...)
-3. **카테고리** (안티패턴): DB, ARCH, DOMAIN, API, FE, VALIDATION, CONFIG
-4. **이름**: 대문자 + 하이픈 (CANCEL, N-PLUS-ONE 등)
-5. **고유성**: 같은 유형 내에서 ID 중복 금지
+1. **도메인**: 대문자 (ORDER, USER, PRODUCT 등). domain.json `aggregates[].name` 정합.
+2. **번호**: 3자리 (001, 002, ...) — ★ ★ ★ v2.0 통일 / 이름 형식 (CANCEL, CREATE 등) 폐기.
+3. **카테고리** (안티패턴): DB, ARCH, DOMAIN, API, FE, VALIDATION, CONFIG, SECURITY, PERFORMANCE
+4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합).
+5. **고유성**: 같은 유형 내에서 ID 중복 금지.
+6. **★ v2.0 chain link 의무**: BHV-* 가 ≥ 1 UC-* backward / AC-* 가 ≥ 1 BHV-* backward / TC-* 가 ≥ 1 AC-* backward / IMPL-* 가 ≥ 1 TC-* backward (chain-coverage-validator 강제 / sub-plan-3 신설).
 
 ---
 
-## 교차 참조 예시
+## ★ v2.0 마이그레이션 (sub-plan-6 carry)
+
+기존 PoC 산출물 (`UC-USER-SIGNUP` / `UC-ORDER-CREATE` 등 이름 형식) → **sub-plan-6 PoC #05 시점 일괄 migration carry**:
+- 변환 규칙: `UC-{도메인}-{이름}` → `UC-{도메인}-{순차 번호}` + `name: "{이름}"` 필드 보존
+- finding 시스템에 migration log 등재 (`F-MIG-UC-001` 등)
+- analysis stage 산출물 4 PoC 모두 일괄 변환 (PoC #01 / #02 / #03 / #04)
+
+---
+
+## 교차 참조 예시 (★ v2.0)
 
 ```yaml
-# 비즈니스 규칙에서 다른 산출물 참조
+# Analysis stage (기존)
 - id: BR-ORDER-CANCEL-001
   related_use_cases: [UC-ORDER-002]
   related_entities: [E-ORDER-Order]
   related_apis: [cancelOrder]
+  intent:    # ★ v2.0 신규 (rules.schema 확장 / B1 Senior 권고)
+    reasoning: "..."
+    source_grounded_evidence: "src/order/OrderService.java:45-60"
 
-# API 에서 비즈니스 규칙 참조
-paths:
-  /orders/{id}/cancel:
-    post:
-      operationId: cancelOrder
-      x-related-rules: [BR-ORDER-CANCEL-001]
-      x-related-use-cases: [UC-ORDER-002]
+# v2.0 chain (신규)
+- id: BHV-ORDER-001
+  use_case_refs: [UC-ORDER-002]    # backward
+  br_refs: [BR-ORDER-CANCEL-001]
+  acceptance_criteria_refs: [AC-ORDER-001, AC-ORDER-002]    # forward
+
+- id: AC-ORDER-001
+  bhv_ref: BHV-ORDER-001    # backward
+  uc_ref: UC-ORDER-002
+  test_case_refs: [TC-ORDER-001]    # forward
+  severity: must    # MoSCoW
+  verifiable: true   # ★ ≥ 1 TC-* forward link 의무 / B2 Senior 권고
+  gherkin:
+    given: ["주문이 PAID 상태"]
+    when: "사용자가 취소 요청"
+    then: ["주문 상태가 CANCELLED"]
+
+- id: TC-ORDER-001
+  ac_ref: AC-ORDER-001    # backward
+  bhv_ref: BHV-ORDER-001
+  type: integration
+  framework: junit5
+  source_file: src/test/java/order/OrderCancelTest.java
+  impl_module_ref: IMPL-ORDER-001    # forward
+
+- id: IMPL-ORDER-001
+  tc_refs: [TC-ORDER-001, TC-ORDER-002]    # backward
+  bhv_refs: [BHV-ORDER-001]
+  framework: spring-boot-3
+  source_files: [src/main/java/order/OrderCancelService.java]
+  test_pass_evidence:    # ★ no-simulation 5종 물증 7 필드
+    test_runner_version: "junit-jupiter-5.10.0"
+    test_runner_stdout_path: ".aimd/output/runs/2026-05-06T12-00/stdout.log"
+    invocation_timestamp: "2026-05-06T12:00:00Z"
+    duration_ms: 4523
+    pass_count: 12
+    fail_count: 0
+    skip_count: 0
+    reproduction_command: ["./gradlew test --tests OrderCancelTest"]
+    result_hash: "sha256:..."   # 정규화 (timestamp+duration 제외 / sorted test names)
 ```
+
+---
+
+## 검증
+
+- `tools/drift-validator/` 에서 ID pattern 회귀 검증
+- `tools/chain-coverage-validator/` (sub-plan-3 신설) 에서 chain link 의무 검증
+- `schemas/{domain,rules,formal-spec,planning-spec,behavior-spec,acceptance-criteria,test-spec,impl-spec}.schema.json` 에서 pattern enforce

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/acceptance-criteria.schema.json",
+  "title": "Acceptance Criteria (chain 2 / 합격 기준)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 chain 2 stage 산출물. Gherkin BDD 형식. AC-* 가 ≥ 1 BHV-* + ≥ 1 UC-* backward + ≥ 1 TC-* forward link 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "type": "object",
+  "required": ["meta", "derivation_source", "criteria"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "required": ["behavior_spec_path", "planning_spec_path"],
+      "additionalProperties": false,
+      "properties": {
+        "behavior_spec_path": {"type": "string"},
+        "planning_spec_path": {"type": "string"}
+      }
+    },
+    "criteria": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "behavior_ref", "use_case_ref", "gherkin", "severity", "verifiable"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "Acceptance Criteria ID (예: AC-USER-001)"
+          },
+          "description": {"type": "string"},
+          "behavior_ref": {
+            "type": "string",
+            "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "★ chain 2 backward link 의무 (chain-coverage-validator 강제)"
+          },
+          "use_case_ref": {
+            "type": "string",
+            "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "★ chain 1 backward link 의무"
+          },
+          "gherkin": {
+            "type": "object",
+            "description": "★ Cucumber Gherkin 표준 (사실상 표준 / Official research) — Given/When/Then 평문",
+            "required": ["given", "when", "then"],
+            "additionalProperties": false,
+            "properties": {
+              "given": {
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 1,
+                "description": "전제 조건 (Given clause)"
+              },
+              "when": {
+                "type": "string",
+                "description": "행위 (When clause)"
+              },
+              "then": {
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 1,
+                "description": "결과 검증 (Then clause)"
+              },
+              "tags": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "★ ADR-008 이중 렌더링 — severity 자동 매핑 tag (@must / @should / @nice)"
+              }
+            }
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["must", "should", "nice"],
+            "description": "MoSCoW severity (★ Senior B6 ADR-CHAIN-001 정합)"
+          },
+          "verifiable": {
+            "type": "boolean",
+            "description": "★ B2 정의 명문 — verifiable=true ⇔ ≥ 1 TC-* forward link + automated_runnable=true. false 면 schema validation fail"
+          },
+          "automated_runnable": {
+            "type": "boolean",
+            "default": false,
+            "description": "automated runner 로 실행 가능 여부 (B2)"
+          },
+          "test_case_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$"},
+            "description": "★ chain 3 forward link (chain-coverage-validator 강제)"
+          },
+          "gate_required": {
+            "type": "boolean",
+            "default": false,
+            "description": "★ Industry — verifiable=true AC 만 chain 4 impl 진입 허용 (Aider /ask↔/code 정합)"
+          }
+        },
+        "if": {
+          "properties": {"verifiable": {"const": true}}
+        },
+        "then": {
+          "required": ["test_case_refs", "automated_runnable"],
+          "properties": {
+            "test_case_refs": {"minItems": 1},
+            "automated_runnable": {"const": true}
+          }
+        }
+      }
+    }
+  }
+}

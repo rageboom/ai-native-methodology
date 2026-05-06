@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/traceability-matrix.schema.json",
+  "title": "Traceability Matrix (cross-cutting)",
+  "description": "v2.0 SDLC 4단계 chain harness 의 cross-cutting 산출물. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link 매트릭스. ★ DO-178C bidirectional traceability + IEC 62304 차용 (Official research 권고). 매 chain stage gate 종결 시 갱신 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "type": "object",
+  "required": ["meta", "matrix", "coverage_summary"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+    },
+    "matrix": {
+      "type": "array",
+      "minItems": 1,
+      "description": "각 cell = end-to-end chain trace (UC → BHV → AC → TC → IMPL + commit_hash)",
+      "items": {
+        "type": "object",
+        "required": ["use_case_id", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "use_case_id": {
+            "type": "string",
+            "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "behavior_id": {
+            "type": "string",
+            "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "acceptance_id": {
+            "type": "string",
+            "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "test_id": {
+            "type": "string",
+            "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "impl_id": {
+            "type": "string",
+            "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$"
+          },
+          "impl_commit_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{40}$",
+            "description": "★ git commit hash 결정적 trace"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["green", "yellow", "red"],
+            "description": "green = 모든 link 채움 + chain 4 통과 / yellow = 부분 link / red = critical link 끊김"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low"],
+            "description": "AC-* severity_floor 매핑 (DO-178C DAL A 차용)"
+          },
+          "gaps": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "끊긴 link 또는 missing element 목록 (e.g., 'TC-* 부재' / 'IMPL-* commit_hash 부재')"
+          }
+        }
+      }
+    },
+    "coverage_summary": {
+      "type": "object",
+      "required": ["forward_coverage", "backward_coverage", "threshold"],
+      "additionalProperties": false,
+      "properties": {
+        "forward_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "planning → impl 쪽 chain 정합 % (UC → ... → IMPL link 채움 비율)"
+        },
+        "backward_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "impl → planning 쪽 chain 정합 %"
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0.85,
+          "maximum": 0.95,
+          "description": "★ ADR-010 v2 ratchet 0.85 → 0.90 → 0.95"
+        },
+        "severity_floor": {
+          "type": "object",
+          "description": "★ DO-178C DAL A 차용 — critical=1.0 강제",
+          "additionalProperties": false,
+          "properties": {
+            "critical": {"type": "number", "const": 1.0},
+            "high": {"type": "number", "minimum": 0.95, "maximum": 1.0},
+            "medium": {"type": "number", "minimum": 0.90, "maximum": 1.0},
+            "low": {"type": "number", "minimum": 0.85, "maximum": 1.0}
+          }
+        },
+        "green_count": {"type": "integer", "minimum": 0},
+        "yellow_count": {"type": "integer", "minimum": 0},
+        "red_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "rendered_paths": {
+      "type": "object",
+      "description": "★ ADR-008 v2 이중 렌더링 — .json + .md + .mermaid",
+      "additionalProperties": false,
+      "properties": {
+        "markdown_path": {"type": "string", "description": "matrix.md 경로"},
+        "mermaid_path": {"type": "string", "description": "matrix.mermaid 경로 (graph view / ≥ 100 cell 분할 정책 = sub-plan-3 carry sp2-c4)"}
+      }
+    }
+  }
+}
