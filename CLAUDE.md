@@ -25,7 +25,13 @@ OUTPUT chain (★ v2.0 i-strict):
 USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 ```
 
-**SDLC 4단계 chain harness** (DEC-2026-05-06-v2.0-i-strict-채택). round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract). harness 외부 자동 코드 생성 ❌.
+**SDLC 4단계 chain harness** ¹ (DEC-2026-05-06-v2.0-i-strict-채택). round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / DEC-2026-04-29 partial retract). harness 외부 자동 코드 생성 ❌.
+
+> ¹ ★ ★ ★ **호칭 엄밀화** (DEC-2026-05-06-harness-호칭-엄밀화):
+> - **현 단계 (sub-plan-1~4 종결)** = `chain harness scaffolding` (사양 + validator + skills + flows + agents + schemas / harness 부품).
+> - **sub-plan-5 종결 후** = `chain harness` 정식 호칭 (driver + state.json + mechanical gate + skill auto-invoke + chain-revisit-detector 5 요소 보유).
+> - **sub-plan-6 종결 + v2.0.0 release** = `chain harness` (★ §8.1 strict 입증 / ≥ 2 PoC corroboration).
+> - 5 요소 부재 시 시뮬 위험 잔존 — LLM 이 "gate 통과한 척" / "RED 확인한 척" 가능 (★★★ no-simulation 정책의 enforcement 누락 / 양심 의존).
 
 ★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
 

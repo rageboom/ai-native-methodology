@@ -1,8 +1,25 @@
 {
-  "$comment": "★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상.",
+  "$comment": "★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 + DEC-2026-05-06-harness-호칭-엄밀화 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상. ★ ★ ★ harness_status 필드 = 호칭 엄밀화 (DEC-2026-05-06-harness-호칭-엄밀화 정합) — scaffolding / harness-incomplete / harness-complete enum.",
   "id": "sdlc-4stage-flow",
   "version": "2.0.0-dev",
   "rendered_mermaid_path": "./sdlc-4stage-flow.mermaid",
+  "harness_status": "scaffolding",
+  "harness_status_meta": {
+    "$comment": "DEC-2026-05-06-harness-호칭-엄밀화 정합. enum: 'scaffolding' (sub-plan-1~4 종결 / 사양 + validator + skills) | 'harness-incomplete' (sub-plan-5 진행 중) | 'harness-complete' (sub-plan-5 종결 / 5 요소 보유) | 'harness-validated' (sub-plan-6 + ≥ 2 PoC corroboration / §8.1 strict 입증).",
+    "current": "scaffolding",
+    "transitions": {
+      "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증)",
+      "harness-complete -> harness-validated": "sub-plan-6 종결 (PoC #05 e2e cycle pass + §8.1 strict 7/7)"
+    },
+    "five_required_elements": [
+      { "id": 1, "name": "Driver / Orchestrator", "status": "missing", "implementation_target": "tools/chain-driver/ (sub-plan-5)" },
+      { "id": 2, "name": "State 영속", "status": "missing", "implementation_target": ".aimd/state.json (schemas/state.schema.json / sub-plan-5)" },
+      { "id": 3, "name": "Mechanical gate", "status": "missing", "implementation_target": "driver block until validator pass (sub-plan-5)" },
+      { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "missing", "implementation_target": "hooks/PostToolUse + UserPromptSubmit (sub-plan-5)" },
+      { "id": 5, "name": "Chain-revisit detector", "status": "missing", "implementation_target": "tools/chain-driver/ + git diff (sub-plan-5 / sub-plan-3 carry resolved)" }
+    ],
+    "simulation_risk_until_complete": "★ ★ ★ LLM 이 'gate 통과한 척' / 'RED 확인한 척' 가능 — ★★★ no-simulation 정책의 enforcement 누락. mechanical gate (요소 #3) 도달 시점에 봉쇄."
+  },
   "stages": [
     {
       "id": "analysis",
