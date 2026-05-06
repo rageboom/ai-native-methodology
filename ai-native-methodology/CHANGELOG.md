@@ -87,6 +87,22 @@
 - sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
 - sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
 
+### Cleanup round 2-B (2026-05-06 / DEC-2026-05-06-cleanup-round-2-B / 각 폴더 README 정돈)
+
+★ ★ ★ 사용자 reframe 2차 ("각 폴더 자산 정돈 + 참조 + 호출 visible") **핵심 의도 정합** — 부재 README 10 신설 (6 폴더 + 4 도구). 표준 schema (Purpose / When / In / Out / Exit / Siblings / 참조) 통일.
+
+| 영역 | before | after |
+|---|---|---|
+| dist files | 241 | **251** (+10) |
+| 부재 README | 10 | **0** |
+| 도달 path "각 폴더 정돈 / 참조 / 호출" | ❌ | ✅ |
+
+**6 폴더 README 신설**: `tools/` ★ 12 도구 cadence table / `methodology-spec/` ★ phase × deliverable × schema 매트릭스 / `agents/` / `skills/` / `hooks/` / `templates/`
+
+**4 도구 README 신설**: `chain-driver/` ★ 5 요소 enforcement / `_shared/` / `schema-validator/` / `test-impl-pass-validator/` ★ no-simulation 핵심
+
+**Carry**: Round 2-B 후속 (9 도구 표준화 + 10 placeholder 정돈) + Round 2-C (journey 자산) + Round 2-D (project root CLAUDE).
+
 ### Cleanup round 2-A (2026-05-06 / DEC-2026-05-06-cleanup-round-2-A / plugin artifact 정돈)
 
 ★ ★ ★ v2.0.0-rc1 build artifact paradigm sync — 사용자 reframe 2회 ("정돈 ≠ 다이어트" → "각 폴더 정돈 + 참조 + 호출 visible") 후 3 agent 병렬 (UX / SSOT / journey) 으로 **8 카테고리** 식별. 본 round = Critical 5 (paradigm sync + CHANGELOG split + dist tools noise + flows SSOT + ADOPTION-README 처분).

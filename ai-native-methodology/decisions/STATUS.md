@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ **cleanup round 1 + 2-A 직후** — docs/ 9 파일 archive 격리 + plugin artifact paradigm sync (327 → 241 / -86) + CHANGELOG split / **next: v2.0.0 final (2026-05-07~) + cleanup round 2-B (각 폴더 README 정돈)**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ ★ **cleanup round 1 + 2-A + 2-B 직후** — docs/ 9 파일 archive 격리 + plugin artifact paradigm sync + 각 폴더 README 정돈 10 신설 (327 → 251 / 사용자 의도 "각 폴더 정돈 + 참조 + 호출 visible" 정합) / **next: v2.0.0 final (2026-05-07~) + Round 2-B 후속 (9 도구 표준화 + 10 placeholder 정돈)**)
 
 > ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06): 현 단계 = **chain harness validated** — §8.1 strict 7/7 + ≥ 2 PoC corroboration. sub-plan-1~4 = scaffolding / sub-5 = harness-complete / sub-6 = harness-validated. v2.0.0-rc1 prerelease (Senior F4 / 24h+ 후 final / 같은 날 final tag ❌).
 
@@ -18,6 +18,34 @@
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
+
+## ★ ★ ★ cleanup round 2-B (2026-05-06) — 각 폴더 README 정돈 / 사용자 진짜 핵심
+
+DEC-2026-05-06-cleanup-round-2-B.
+
+| 영역 | before | after |
+|---|---|---|
+| dist files | 241 | **251** (+10 신설) |
+| 부재 폴더 README | 6 | 0 (★ 모두 채움) |
+| 부재 도구 README | 4 | 0 (★ 모두 채움) |
+| 도달 path "각 폴더 자산 어떻게 정돈?" | ❌ | ✅ |
+| 도달 path "어디서 참조됨?" | ❌ | ✅ (각 README "참조" / "Sibling" 섹션) |
+| 도달 path "언제 호출됨?" | ❌ | ✅ (각 README "When to call" / "호출 cadence") |
+
+**6 폴더 README 신설**: tools/ (★ 12 도구 cadence table) / methodology-spec/ (★ phase × deliverable × schema 매트릭스) / agents/ / skills/ / hooks/ / templates/
+
+**4 도구 README 신설**: chain-driver/ (★ 5 요소 enforcement) / _shared/ / schema-validator/ / test-impl-pass-validator/ (★ no-simulation 핵심)
+
+표준 schema 통일 = Purpose / When / In / Out / Exit / Siblings / 참조.
+
+**Carry (Round 2-B 후속 + 2-C / 2-D)**:
+- Round 2-B 후속: 9 도구 README 표준 schema 통일 + 10 placeholder (agents/{design,analysis} + skills/{design,test,planning,implement} + templates/{design,test,planning,implement}) 정돈 + schemas/README 갱신 검토
+- Round 2-C: 사용자 journey 자산 신설 (getting-started / chain-harness-guide / common-errors / first-prompt-cookbook)
+- Round 2-D: project root CLAUDE.md sync
+
+★ no release / no tag / v2.0.0 final 자격 영향 ❌.
+
+---
 
 ## ★ ★ ★ cleanup round 2-A (2026-05-06) — plugin artifact paradigm sync + 자산 정돈
 
