@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / **next: v2.0.0 final (2026-05-07~)**)
+**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ **cleanup round 1 직후** — DEC-2026-05-06-cleanup-round-1 / docs/ 9 파일 archive 격리 + link rot 11건 차단 / **next: v2.0.0 final (2026-05-07~)**)
 
 > ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06): 현 단계 = **chain harness validated** — §8.1 strict 7/7 + ≥ 2 PoC corroboration. sub-plan-1~4 = scaffolding / sub-5 = harness-complete / sub-6 = harness-validated. v2.0.0-rc1 prerelease (Senior F4 / 24h+ 후 final / 같은 날 final tag ❌).
 
@@ -18,6 +18,36 @@
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
+
+## ★ ★ cleanup round 1 (2026-05-06) — docs/ 9 파일 archive 격리
+
+DEC-2026-05-06-cleanup-round-1.
+
+| 영역 | before | after |
+|---|---|---|
+| `docs/` | 39 | **30** (-9 archive 이동) |
+| `archive/` | 13 | **22** (+9 격리 / `v1.3-adoption/` 6 + `v1.4-evaluation/` 1 + `phase-a-iteration/` 2) |
+| 가독성 | 활성 + 폐기 혼재 | 활성만 ★ |
+
+**B 진행 (9 파일 git mv)**:
+- `docs/adoption/{README,v1.3-plan,v1.3-status,v1.3-decisions-index,lessons-learned-2026-05-02}.md` (5) → `archive/v1.3-adoption/`
+- `docs/v1.3-promotion-report.md` → `archive/v1.3-adoption/`
+- `docs/v1.4-evaluation-report.md` → `archive/v1.4-evaluation/`
+- `docs/phase-a-iteration-{guide,0-preflight}.md` (2) → `archive/phase-a-iteration/`
+- `rmdir docs/adoption/`
+
+**Link rot 차단 (11건 갱신)**: project root `CLAUDE.md` 4 + `README.md` 4 + `STATUS.md` 2 + `flows/README.md` 1 = 활성 hub 옛 경로 → archive 경로.
+
+**Skip per 사용자**:
+- A. PoC 진행 로그 17 (PROGRESS / SESSION-WRAPUP) — "poc 쪽은 신경 안써도 됨"
+- C. PoC plan-phase 13 — A 와 동상
+
+**Carry (cleanup round 2 / v2.0.0 final 후)**:
+- E. 4 hub (CLAUDE / STATUS / CHANGELOG / INDEX) v2.0 정보 3중 누적 통합
+
+★ no release / no tag / 본체 commit 만 / v2.0.0-rc1 → final 자격에 영향 ❌.
+
+---
 
 ## ★ ★ ★ ★ ★ sub-plan-6 종결 (2026-05-06) — chain harness validated / v2.0.0-rc1
 
@@ -342,7 +372,7 @@
 
 ## ★ ★ 직전 진행 (2026-05-05 ~ 5-3 / 보존)
 
-★ 2026-05-05 v1.4 프로젝트 적합성 평가 보고서 산출 (`docs/v1.4-evaluation-report.md` 713 line) + v2.0 결단 carry 등재. ★ 직전 v1.5.0 MINOR release (2026-05-03 / 98998d5) — ADR-BE-001 negative-space corroboration 정식화 + §8.1 strict 정합 검증대 두 번째 통과 보존.
+★ 2026-05-05 v1.4 프로젝트 적합성 평가 보고서 산출 (`archive/v1.4-evaluation/v1.4-evaluation-report.md` 713 line / cleanup round 1 격리) + v2.0 결단 carry 등재. ★ 직전 v1.5.0 MINOR release (2026-05-03 / 98998d5) — ADR-BE-001 negative-space corroboration 정식화 + §8.1 strict 정합 검증대 두 번째 통과 보존.
 
 ---
 
@@ -508,7 +538,7 @@ poc03_artifacts_progress: 6/7            # ★★ 7대 산출물 종결 — UI/U
 # ★★★ 3 PoC 통합 (사내 표준 v1.3 격상 데이터 완비)
 all_3_pocs_complete: ✅
 cumulative_ap_3_pocs: 47   # PoC #01 15 + PoC #02 21 + PoC #03 11
-v13_promotion_data_status: "★★★ 완비 — 통합 보고서 docs/v1.3-promotion-report.md + DEC-v1.3-격상-데이터-완비"
+v13_promotion_data_status: "★★★ 완비 — 통합 보고서 archive/v1.3-adoption/v1.3-promotion-report.md (cleanup round 1 격리) + DEC-v1.3-격상-데이터-완비"
 v13_promotion_candidates_count: 6  # AP-PERFORMANCE / Positive finding / NestJS 4 ADR / Phase 4.5 cross-link / migration-cautions NestJS / §8.1 정식
 saa_application_ready: ✅  # ★★ 사내 적용 시작 가능 시점 v1.2.2
 v13_release_blocker: "Sprint 5 진입 의무 (★ 환경 의존)"

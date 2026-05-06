@@ -87,6 +87,23 @@
 - sp6-c7 hooks 진짜 LLM auto-invoke (sp5-c3) — v2.x
 - sp6-c8 chain-driver chaos test (Senior F5 — CAS race / JSONL concurrency / mid-stage SIGINT) — v2.0.x
 
+### Cleanup round 1 (2026-05-06 / DEC-2026-05-06-cleanup-round-1 / B-only)
+
+★ ★ v2.0.0-rc1 직후 사용자 명시 요청 정리 — `docs/` 활성 + 폐기 혼재 → 9 파일 `archive/` 격리.
+
+| 영역 | before | after |
+|---|---|---|
+| `docs/` | 39 | **30** (-9) |
+| `archive/` | 13 | **22** (+9 / `v1.3-adoption/` 6 + `v1.4-evaluation/` 1 + `phase-a-iteration/` 2) |
+
+- **B-only**: `docs/adoption/*` 5 + `docs/v1.3-promotion-report.md` + `docs/v1.4-evaluation-report.md` + `docs/phase-a-iteration-{guide,0-preflight}.md` 9 파일 git mv (rename / git history 보존) + `rmdir docs/adoption/`
+- **Link rot 차단** 11건: project root `CLAUDE.md` 4 + `README.md` 4 + `STATUS.md` 2 + `flows/README.md` 1
+- **Skip per 사용자**: A (PoC 진행 로그 17) + C (plan-phase 13) — "poc 쪽은 신경 안써도 됨"
+- **Historical 보존**: DEC-* 안 옛 경로 / archive 자체 ref / CHANGELOG entry / .claude/ 작업 로그 = 갱신 ❌
+- **Carry (cleanup round 2)**: 4 hub (CLAUDE/STATUS/CHANGELOG/INDEX) v2.0 정보 3중 누적 통합 (별도 라운드 / v2.0.0 final 후)
+
+★ no release / no tag / 본체 commit 만 / release-readiness 7/7 무관 / v2.0.0 final 자격 영향 ❌.
+
 ### v2.0.0-rc1 → v2.0.0 final
 
 - **동일 commit 같은 날 final tag ❌** (Senior F4 / 14차 retract pattern 차단).

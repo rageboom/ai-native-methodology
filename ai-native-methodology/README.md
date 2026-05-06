@@ -8,7 +8,7 @@
 >
 > **★ ★ ★ ★ ★ ★ ★ v1.4.0 MINOR release (2026-05-02)**: FE 트랙 정식 진입 + §8.1 strict 검증대 첫 통과. ADR-FE 7건 (★ ADR-FE-007 본체 antipattern 카탈로그 첫 등재 / AP-FE-SECURITY-001 4 PoC isomorphic) + schemas 13종 + tools 6종 + 4 PoC. 진짜 도구 6종 + IR 0.99 + 신뢰도 0.92 (ADR-009 단계 5).
 >
-> **★ ★ ★ Plugin-first 사내 배포 자산** (DEC-2026-05-02 14~15차 결단): `.claude-plugin/` + `agents/` + `skills/analysis/` 18 + `hooks/` + `flows/` 채움. Phase A self-iteration 진입 가능. Phase B (사내 배포) 진입 전 의무 단계 = `docs/phase-a-iteration-guide.md` 참고.
+> **★ ★ ★ Plugin-first 사내 배포 자산** (DEC-2026-05-02 14~15차 결단): `.claude-plugin/` + `agents/` + `skills/analysis/` 18 + `hooks/` + `flows/` 채움. Phase A self-iteration 진입 가능. Phase B (사내 배포) 진입 전 의무 단계 = `archive/phase-a-iteration/phase-a-iteration-guide.md` 참고 (★ v2.0 chain harness paradigm 후 outdated — historical reference).
 >
 > 자세한 내용은 [CHANGELOG.md](./CHANGELOG.md) 참조.
 
@@ -53,7 +53,7 @@
 
 → **균형 분포** = §8.1 단일 PoC 과적합 회피 정합 ★. **본 방법론 적용 가능 platform** = Java/Spring + TypeScript/NestJS 입증 완료.
 
-상세: [`docs/v1.3-promotion-report.md`](./docs/v1.3-promotion-report.md) — 3 PoC 통합 보고서 (격상 후보 6 + 사내 적용 ROI 견적).
+상세: [`archive/v1.3-adoption/v1.3-promotion-report.md`](./archive/v1.3-adoption/v1.3-promotion-report.md) — 3 PoC 통합 보고서 (격상 후보 6 + 사내 적용 ROI 견적 / cleanup round 1 격리).
 
 ---
 
@@ -122,7 +122,7 @@ npm run build:diff-check    # build 후 git diff exit-code 0 검증 (CI 용)
 
 본 v1.4.x = ★ Phase A self-iteration 단계. 사용자가 본인 사내 legacy 프로젝트 1개에서 plugin 직접 돌려 마찰점 검출 → plugin 즉시 수정 → 재시도 (4원칙 §4 정합).
 
-★ ★ ★ 상세 절차 + 마찰점 finding template + 재시도 cadence: **[`docs/phase-a-iteration-guide.md`](./docs/phase-a-iteration-guide.md)**.
+★ ★ ★ 상세 절차 + 마찰점 finding template + 재시도 cadence: **[`archive/phase-a-iteration/phase-a-iteration-guide.md`](./archive/phase-a-iteration/phase-a-iteration-guide.md)** (★ v2.0 chain harness paradigm 후 outdated — historical reference).
 
 ### 사용법 — skill description trigger (★ install 후 자동)
 
@@ -157,7 +157,12 @@ Claude 가 코드베이스 시그널 자동 감지 → skill 자동 발동 (slas
 ai-native-methodology/
 ├── docs/
 │   ├── adr/                ADR 13종 (001~006 + 008/009/010 + NEST-001~004) ※ 007 부재 — openapi-extension.schema.json 으로 대체
-│   └── v1.3-promotion-report.md
+│   └── (★ v1.X release-note + ADR 만 / 과거 보고서는 archive/ 로 격리)
+├── archive/
+│   ├── methodology-v1.1/   v1.1 분기점 metadata
+│   ├── v1.3-adoption/      v1.3 사내 적용 작업 + v1.3-promotion-report (cleanup round 1 격리)
+│   ├── v1.4-evaluation/    v1.4-evaluation-report (cleanup round 1 격리)
+│   └── phase-a-iteration/  Phase A self-iteration 가이드 (v2.0 후 outdated)
 ├── methodology-spec/       Single Source of Truth
 │   ├── deliverables/       7대 산출물 명세 (1-architecture ~ 7-ui-ux)
 │   ├── workflow/           phase-0 ~ phase-6 + phase-flow.json

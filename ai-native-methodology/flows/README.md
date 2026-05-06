@@ -21,7 +21,7 @@
 
 **호출 시점** = `phase-4-5-cross-validation` skill 진입 시 (★ Phase 4.5 = 이중 렌더링 정합 검증 단계). skill SKILL.md §1 "이중 렌더링 정합 (ADR-008) — drift-validator 자동 호출" 정합.
 
-**★ 이전 (deprecated)**: PostToolUse hook 매 Write/Edit 마다 자동 호출 — ★ F-PA-009 (매 호출 200-500ms 마찰) + F-PA-010 (`|| true` silent fail / no-simulation 정책 위배) 발견 후 ★ ★ 제거 (★ docs/phase-a-iteration-0-preflight.md §Post-flight 참고).
+**★ 이전 (deprecated)**: PostToolUse hook 매 Write/Edit 마다 자동 호출 — ★ F-PA-009 (매 호출 200-500ms 마찰) + F-PA-010 (`|| true` silent fail / no-simulation 정책 위배) 발견 후 ★ ★ 제거 (★ archive/phase-a-iteration/phase-a-iteration-0-preflight.md §Post-flight 참고 / cleanup round 1 격리).
 
 **현재 (v1.4.2 + iter 0 post-flight)**: on-demand 검증. drift 발견 시 stderr 자연 노출 / silent fail 0.
 
