@@ -103,6 +103,12 @@
                 "type": "string",
                 "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml"],
                 "description": "★ B5 — SARIF 2.1.0 (OASIS / GitHub Code Scanning native) 우선 권고"
+              },
+              "flaky_retries_count": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "description": "★ ★ ADR-CHAIN-004 §5 — Playwright 정합 per-test cap 2. 본 필드 = 실제 retry 발생 횟수 누적 (정상 1회 통과 = 0). 3회+ retry = 진짜 fail / fail_count 증가."
               }
             }
           }

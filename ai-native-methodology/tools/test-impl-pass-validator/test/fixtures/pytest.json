@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 1,
+    "error": 0,
+    "total": 5
+  },
+  "tests": [
+    { "nodeid": "tests/test_user.py::test_login_success", "outcome": "passed" },
+    { "nodeid": "tests/test_user.py::test_login_empty_password", "outcome": "passed" },
+    { "nodeid": "tests/test_article.py::test_create_ok", "outcome": "passed" },
+    { "nodeid": "tests/test_article.py::test_create_missing_title", "outcome": "passed" },
+    { "nodeid": "tests/test_article.py::test_create_auth_pending", "outcome": "skipped" }
+  ]
+}

@@ -91,7 +91,13 @@
           "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml"]
         },
         "coverage_report_path": {"type": "string", "description": "LCOV / JaCoCo / Cobertura 경로"},
-        "linter_output_path": {"type": "string", "description": "★ static-runner 6종 결과 (Semgrep / PMD / SpotBugs / etc.)"}
+        "linter_output_path": {"type": "string", "description": "★ static-runner 6종 결과 (Semgrep / PMD / SpotBugs / etc.)"},
+        "flaky_retries_count": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "★ ★ ADR-CHAIN-004 §5 — Playwright per-test cap 2 정합. 실제 retry 발생 횟수 누적 (chain 4 GREEN 의무 = fail_count 0 이지만 retry 발생 시 본 필드로 trace)"
+        }
       }
     },
     "coverage": {

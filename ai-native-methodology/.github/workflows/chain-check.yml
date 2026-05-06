@@ -84,10 +84,35 @@ jobs:
             echo "[chain-check] test-spec.json not found — skipped"
           fi
 
-      # ★ Gate #3+#4 — sub-plan-3b carry (test-impl-pass-validator 진짜 runner)
-      - name: gate#3-4 — test-impl-pass-validator (sub-plan-3b carry)
+      # ★ ★ ★ Gate #3+#4 — test-impl-pass-validator (★ sub-plan-3b 활성)
+      # ADR-CHAIN-004 정합 — `.aimd/config/test-cmd.json` 우선 / inventory 추론 / --test-cmd override.
+      # CI 자동화 시 --allow-execute 의무 (사용자 명시 동의).
+      - name: gate#3-4 — test-impl-pass-validator (dry-run only / CI 안전)
+        working-directory: tools/test-impl-pass-validator
         run: |
-          echo "[chain-check] test-impl-pass-validator carry → sub-plan-3b (ADR-CHAIN-004 후 진입)"
+          if [ -d "${{ github.workspace }}/${{ inputs.target_dir }}" ]; then
+            # ★ CI 단계 = dry-run only (config 검증 / 실제 실행 ❌).
+            # 진짜 실행 = 사용자 환경 (PoC #05 sub-plan-6 시점) + workflow_dispatch input 확장.
+            node src/cli.js \
+              --project "${{ github.workspace }}" \
+              --inventory "${{ github.workspace }}/${{ inputs.target_dir }}/inventory.json" \
+              --dry-run --json || true
+          else
+            echo "[chain-check] target_dir not found — gate#3-4 skipped"
+          fi
+
+      - name: gate#3-4 — test-impl-pass-validator (real exec / opt-in)
+        if: ${{ inputs.strict == 'true' }}
+        working-directory: tools/test-impl-pass-validator
+        run: |
+          if [ -f "${{ github.workspace }}/.aimd/config/test-cmd.json" ]; then
+            node src/cli.js \
+              --project "${{ github.workspace }}" \
+              --allow-execute --json
+          else
+            echo "[chain-check] .aimd/config/test-cmd.json 부재 — strict mode 진입 ❌"
+            exit 1
+          fi
 
       # ★ Gate #4 — impl → done
       - name: gate#4 — static-runner --chain-strict

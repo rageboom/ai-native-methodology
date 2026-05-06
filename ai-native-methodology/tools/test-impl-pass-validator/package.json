@@ -1,0 +1,14 @@
+{
+  "name": "@ai-native-methodology/test-impl-pass-validator",
+  "version": "0.1.0",
+  "description": "★ ★ ★ v2.0 sub-plan-3b — chain 4 (impl → done) gate validator. 진짜 test runner shell 호출 (jest/vitest/junit5/pytest) + 100% pass 의무 + 5종 물증 7 필드 schema 강제 + result_hash 정규화 (SARIF Appendix F). ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) 정합. ★★★ no-simulation 정책 chain 4 단계 핵심 enforcement.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "test-impl-pass-validator": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/result-hash.test.js test/adapter.test.js test/cli.test.js"
+  },
+  "license": "UNLICENSED"
+}

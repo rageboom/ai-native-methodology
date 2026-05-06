@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "numTotalTests": 3,
+  "numPassedTests": 3,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "testResults": [
+    {
+      "name": "/x/user.test.js",
+      "assertionResults": [
+        { "fullName": "user login validates email", "status": "passed" },
+        { "fullName": "user login rejects empty password", "status": "passed" }
+      ]
+    },
+    {
+      "name": "/x/article.test.js",
+      "assertionResults": [
+        { "fullName": "article create returns 201", "status": "passed" }
+      ]
+    }
+  ]
+}

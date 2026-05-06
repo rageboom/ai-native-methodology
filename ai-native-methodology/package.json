@@ -14,7 +14,8 @@
     "tools/planning-extraction-validator",
     "tools/chain-coverage-validator",
     "tools/spec-test-link-validator",
-    "tools/traceability-matrix-builder"
+    "tools/traceability-matrix-builder",
+    "tools/test-impl-pass-validator"
   ],
   "scripts": {
     "build": "node scripts/build-plugin.js",
@@ -23,7 +24,7 @@
     "build:diff-check": "node scripts/build-plugin.js && git diff --exit-code -- .claude-plugin agents skills hooks flows tools templates methodology-spec schemas CHANGELOG.md README.md",
     "test": "npm run test --workspaces --if-present",
     "test:tools": "npm run test --workspaces --if-present",
-    "test:chain": "npm run test --workspace=tools/planning-extraction-validator --workspace=tools/chain-coverage-validator --workspace=tools/spec-test-link-validator --workspace=tools/traceability-matrix-builder"
+    "test:chain": "npm run test --workspace=tools/planning-extraction-validator --workspace=tools/chain-coverage-validator --workspace=tools/spec-test-link-validator --workspace=tools/traceability-matrix-builder --workspace=tools/test-impl-pass-validator"
   },
   "engines": {
     "node": ">=18.0.0"

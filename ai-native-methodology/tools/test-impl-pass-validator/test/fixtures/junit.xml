@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites tests="4" failures="1" errors="0" skipped="1">
+  <testsuite name="com.example.UserTest" tests="2" failures="0">
+    <testcase classname="com.example.UserTest" name="testLoginSuccess" time="0.012"/>
+    <testcase classname="com.example.UserTest" name="testLoginEmptyEmail" time="0.008"/>
+  </testsuite>
+  <testsuite name="com.example.ArticleTest" tests="2" failures="1" skipped="1">
+    <testcase classname="com.example.ArticleTest" name="testCreateOk" time="0.020"/>
+    <testcase classname="com.example.ArticleTest" name="testCreateMissingTitle" time="0.014">
+      <failure type="AssertionError" message="expected 400 got 500">at line 42</failure>
+    </testcase>
+    <testcase classname="com.example.ArticleTest" name="testCreateAuthFlaky" time="0.030">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>
