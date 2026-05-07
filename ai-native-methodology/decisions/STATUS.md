@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-07 (★ **v2.1.1 PATCH release** — DEC-2026-05-07-v2.1.1-ratchet-trend / phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved / `_shared/baseline.js` coverageTrendCheck 신설 + characterization-coverage-validator `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test / unit test 228 → **232** / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.1 / build `ai-native-methodology-v2.1.1/` 264 files / git tag v2.1.1 / chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌ / **carry 잔존: C-v2.1.0-1~4, 6~7**)
+**기준일**: 2026-05-07~08 (★ ★ **PoC #07 prelim 진행 중** — DEC-2026-05-08-poc-07-prelim-신설 / EFI-WEB capital 모듈 다중책임 3752 LOC / corroboration #3 + ★ 신규 deliverable #24 (SQL Inventory) 10 컬럼 placeholder 측정 / Day 0 skeleton 완료 / Day 1 = capital source 가용성 사용자 의뢰 대기 / 외부 조언 (Opus 4.7) 흡수 / 사용자 D9+D11 결단 / 본체 격상 ❌ — carry 3 신규 (`C-v2.2.0-sql-{inventory,schema,tool}`) 의무 / 4축 metric (§3-A + §3-B + phase 4.7 + ★ SQL Inventory))
+
+**v2.1.1 PATCH release** (2026-05-07 / DEC-2026-05-07-v2.1.1-ratchet-trend / phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved / `_shared/baseline.js` coverageTrendCheck 신설 + characterization-coverage-validator `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test / unit test 228 → **232** / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.1 / build `ai-native-methodology-v2.1.1/` 264 files / git tag v2.1.1 / chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌ / **carry 잔존: C-v2.1.0-1~4, 6~7**)
 
 **v2.1.0 MINOR release** (2026-05-07 / 같은 날 — DEC-2026-05-07-v2.1.0-release / phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration (PoC #06 Spring 4.1 Legacy 17/18=94% + PoC #03 NestJS Modern retrofit 30/30=100%) / 본체 자산 6 + workflow + ADR / unit test 218 → 228 (+10 / characterization-coverage-validator 신설 workspace 13번째) / Senior cooling-off (a) 즉시 final / chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만)
 

@@ -12,6 +12,7 @@
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
 |---|---|---|---|---|
+| [★ ★ DEC-2026-05-08-poc-07-prelim-신설](DEC-2026-05-08-poc-07-prelim-신설.md) | 2026-05-07~08 | methodology / PoC 등재 (prelim) / corroboration #3 / 신규 deliverable #24 (SQL Inventory) placeholder 측정 | 진행중 (★ Day 0 skeleton 완료 / Day 1 = capital source 가용성 사용자 의뢰 대기) | ★ ★ v2.1.1 PATCH 후 첫 PoC. EFI-WEB **capital** 모듈 (3752 LOC = exchange × ~10배 / 다중책임) 측정. 외부 조언 (Opus 4.7) 흡수 — ★ ★ ★ 신규 deliverable #24 (SQL Inventory) 10 컬럼 placeholder (★ 외부 6 + 본 추가 4 / 사용자 D9 결단). 사용자 D11 결단 (b) ≥ 2 PoC 후 v2.2.0 → 본 PoC 본체 격상 ❌ / carry 3 신규 (`C-v2.2.0-sql-{inventory,schema,tool}`) 의무. scope 명시적 제외: chain 3 영역 (Testcontainers / MockMvc / DBUnit) → `C-PoC07-1~3` carry. ★ 4축 metric: §3-A (다중책임 50% ± 10%p) + §3-B (chain 1 통과) + phase 4.7 (≥ 80%) + ★ SQL Inventory (자동 ≥ 50%). plan = `~/.claude/plans/d7-1-d7-2-peaceful-whistle.md`. |
 | [★★★ DEC-2026-04-30-v1.2.3-본체-격상](DEC-2026-04-30-v1.2.3-본체-격상.md) | 2026-04-30 | methodology | 승인 (★★★ v1.2.3 PATCH — 본체 4 묶음) | ★★ 사용자 방향 재정렬 — PoC 산출물 ❌ / 본체 격상 ✅. 묶음 C (Phase 4.5 cross-link schema 의무화) + I (AP-PERFORMANCE 3 PoC 격상 정책) + H (Positive finding 패턴 schema + learning_effect_type 4종) + K (Lifecycle BR null 허용 + br_type enum + current_state_note). 본체 갭 closure 7 → 11. v1.3.0 release 진입 직전 상태. |
 | [DEC-2026-04-29-phase-4-5-형식화-후보](DEC-2026-04-29-phase-4-5-형식화-후보.md) | 2026-04-29 | methodology | 진행중 (옵션 C 시범) | rules.json L0 자연어 한계. L1~L2 형식화 도입. ADR-008 후보. |
 
