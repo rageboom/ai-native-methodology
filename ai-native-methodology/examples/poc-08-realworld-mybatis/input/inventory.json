@@ -1,0 +1,163 @@
+{
+  "$comment": "★ PoC #08 Day 1 — mybatis/jpetstore-6 reference webapp analysis. ★ paradigm-cross corroboration #1 (MEDIUM 자격 / 본 방법론 일반화 axis). chain 1 (planning) 입력 / plan §3-A 자동화율 측정 데이터. 정탐 (research-poc-08-jpetstore6.md) 흡수 + 본 session 실측 corroboration.",
+  "project_id": "poc-08-realworld-mybatis",
+  "language": "Java",
+  "language_version": "17",
+  "stack_signals": [
+    "Spring 6.2.18 (★ Modern / Spring Boot ❌ — 의도적 선택 / WAR + ServletContextListener)",
+    "★ Stripes 1.6.0 (NOT Spring MVC) — ActionBean + @DefaultHandler + convention default routing (★ 정탐 §정정: @HandlesEvent + @UrlBinding ❌ / @DefaultHandler + 메서드 이름 = event)",
+    "MyBatis 3.5.19 — XML mapper 단독 (annotation mapper ❌)",
+    "MyBatis-Spring 3.0.5 — SqlSessionTemplate / @MapperScan",
+    "JSP 20 file (Account 5 + Cart 2 + Catalog 6 + Order 4 + Common 3)",
+    "HSQLDB (test) + MySQL/Oracle/Postgres (production schema script 제공)",
+    "JUnit 5.13.4 + Mockito 5.18.0 + AssertJ — ★ ★ Test 18 class (★ PoC #06+#07 = 0 vs 본 PoC = 18 / 적대성 flip)",
+    "Maven (pom.xml) + WAR packaging",
+    "Docker (Dockerfile + docker-compose.yaml — Tomcat 9-jdk17 + HSQLDB + JNDI DataSource)",
+    "Apache Commons FileUpload (이미지 ❌ / Stripes 자체 multipart)"
+  ],
+  "framework": "spring-6.2-stripes-1.6-mybatis-3.5-jsp",
+  "test_runner_inferred": "JUnit 5.13.4 + Mockito 5.18.0 (★ ★ pom.xml 명시 / 18 test class 존재 / surefire/failsafe plugin)",
+  "source_files": [
+    "source/src/main/java/org/mybatis/jpetstore/domain/{Account,Cart,CartItem,Category,Item,LineItem,Order,Product,Sequence}.java (9 files)",
+    "source/src/main/java/org/mybatis/jpetstore/mapper/{Account,Category,Item,LineItem,Order,Product,Sequence}Mapper.java (7 interfaces)",
+    "source/src/main/java/org/mybatis/jpetstore/service/{Account,Catalog,Order}Service.java (3 services)",
+    "source/src/main/java/org/mybatis/jpetstore/web/actions/{AbstractActionBean,Account,Cart,Catalog,Order}ActionBean.java (5 actions / 1 abstract + 4 concrete)",
+    "source/src/main/resources/org/mybatis/jpetstore/mapper/*.xml (7 mapper XML / 25 SQL operations)",
+    "source/src/main/resources/database/jpetstore-{hsqldb,mysql,oracle,postgres}-{schema,dataload}.sql (★ 4 RDBMS schema script)",
+    "source/src/main/webapp/WEB-INF/jsp/**/*.jsp (20 JSP)",
+    "source/src/test/java/org/mybatis/jpetstore/**/*.java (18 test class)"
+  ],
+  "loc_total": 9234,
+  "loc_breakdown": {
+    "java_main": 2555,
+    "sql_xml": 2476,
+    "jsp": 1472,
+    "java_test": 2731,
+    "$comment_loc": "test 제외 production = 6503. test ratio = 2731/9234 = 29.6% (★ ★ healthy)"
+  },
+  "modules": [
+    {
+      "name": "domain (9 entity)",
+      "type": "Domain Entity (Anemic)",
+      "loc_estimate": 350,
+      "entities": ["Account", "Cart", "CartItem", "Category", "Item", "LineItem", "Order", "Product", "Sequence"],
+      "antipatterns_flagged": [
+        "AP-PETSTORE-001 (Anemic Domain Model — entity = getter/setter only / behavior in service)"
+      ]
+    },
+    {
+      "name": "mapper (7 interface + 7 XML)",
+      "type": "MyBatis Mapper (XML 단독)",
+      "loc_estimate_interface": 250,
+      "loc_xml": 2476,
+      "interfaces": ["AccountMapper", "CategoryMapper", "ItemMapper", "LineItemMapper", "OrderMapper", "ProductMapper", "SequenceMapper"],
+      "sql_op_count": 25,
+      "sql_op_breakdown": {
+        "AccountMapper": {"select": 2, "insert": 3, "update": 3, "delete": 0, "total": 8},
+        "CategoryMapper": {"select": 2, "insert": 0, "update": 0, "delete": 0, "total": 2},
+        "ItemMapper": {"select": 3, "insert": 0, "update": 1, "delete": 0, "total": 4},
+        "LineItemMapper": {"select": 1, "insert": 1, "update": 0, "delete": 0, "total": 2},
+        "OrderMapper": {"select": 2, "insert": 2, "update": 0, "delete": 0, "total": 4},
+        "ProductMapper": {"select": 3, "insert": 0, "update": 0, "delete": 0, "total": 3},
+        "SequenceMapper": {"select": 1, "insert": 0, "update": 1, "delete": 0, "total": 2}
+      },
+      "dynamic_sql_tags": {
+        "<bind>": 4,
+        "<if>": 0,
+        "<choose>": 0,
+        "<when>": 0,
+        "<foreach>": 0,
+        "<trim>": 0,
+        "<where>": 0,
+        "<set>": 0,
+        "$comment": "★ ★ ★ standard MyBatis 3 / dynamic SQL surface 매우 작음 (4 <bind> only) → ★ paradigm-cross corroboration **non-isomorphic in the hard direction** / iBATIS 2 evolved-tag ceiling 입증 ❌ 솔직"
+      },
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "service (3 service)",
+      "type": "Application Service (Anemic 위임)",
+      "loc_estimate": 350,
+      "services": ["AccountService", "CatalogService", "OrderService"],
+      "antipatterns_flagged": [
+        "AP-PETSTORE-002 (Anemic Service — single mapper pass-through)"
+      ]
+    },
+    {
+      "name": "web.actions (5 ActionBean)",
+      "type": "Stripes ActionBean (Controller)",
+      "loc_estimate": 1605,
+      "actions": [
+        {"name": "AccountActionBean", "endpoint_count": 7, "events": ["newAccountForm", "newAccount", "editAccountForm", "editAccount", "signonForm", "signon", "signoff"]},
+        {"name": "CartActionBean", "endpoint_count": 3, "events": ["addItemToCart", "removeItemFromCart", "updateCartQuantities"]},
+        {"name": "CatalogActionBean", "endpoint_count": 5, "events": ["viewMain", "viewCategory", "viewProduct", "viewItem", "searchProducts"]},
+        {"name": "OrderActionBean", "endpoint_count": 4, "events": ["listOrders", "newOrderForm", "newOrder", "viewOrder"]}
+      ],
+      "endpoint_count_total": 19,
+      "antipatterns_flagged": [
+        "AP-PETSTORE-003 (Stripes convention default — @HandlesEvent + @UrlBinding 부재 / 메서드 이름 = event 암묵 contract / paradigm 학습 cost)"
+      ]
+    }
+  ],
+  "external_dependencies": {
+    "internal_modules": ["domain → service → mapper (3-tier 표준 Spring)"],
+    "external_systems": [
+      "MailService (★ 정탐 §1.6 / OrderService 의 sendOrderConfirmation? 본 session 미read 검증 / Day 2 carry)",
+      "★ ★ external system ❌ — Modern stack 정합 / PoC #06+#07 (LIVE_SQL.SGERP / IFRS schema) 와 큰 차이"
+    ],
+    "reverse_dependencies": "확인 보류 (★ ActionBean → Service → Mapper 단방향 / 역참조 ❌ 가능성 ↑)"
+  },
+  "database": {
+    "tables": [
+      {"name": "supplier", "role": "공급사 마스터"},
+      {"name": "signon", "role": "로그인 (username/password)"},
+      {"name": "account", "role": "사용자 계정 (이메일/이름/주소)"},
+      {"name": "profile", "role": "사용자 선호 (langpref/favcategory)"},
+      {"name": "bannerdata", "role": "favcategory 별 배너"},
+      {"name": "orders", "role": "주문 헤더"},
+      {"name": "orderstatus", "role": "주문 상태"},
+      {"name": "lineitem", "role": "주문 line item"},
+      {"name": "category", "role": "카테고리 마스터"},
+      {"name": "product", "role": "상품 마스터"},
+      {"name": "item", "role": "상품 SKU"},
+      {"name": "inventory", "role": "재고"}
+    ],
+    "table_count": 12,
+    "external_sp_function": [],
+    "external_sp_count": 0,
+    "$comment_db": "★ ★ ★ Stored Procedure ❌ / external schema ❌ / Modern stack 정합. 4 RDBMS schema script 제공 (HSQLDB/MySQL/Oracle/Postgres). PoC #06+#07 (11 external SP / 17 tables 다중 schema) 와 큰 차이 → ★ phase 4.8 sql-inventory paradigm-cross **floor 입증** (외부 SP 의존 없는 standard MyBatis 3 환경)"
+  },
+  "phase_3a_automation_measurement": {
+    "$comment": "★ plan §3-A 자동화율 측정 — Modern stack jpetstore-6 (vs PoC #06 38.75% 단일책임 / PoC #07 53.8% 다중책임)",
+    "auto_extracted_fields": {
+      "endpoint_count": "✅ grep 'public Resolution|public ForwardResolution' (19 = 7+3+5+4)",
+      "sql_id_count": "✅ grep '<select|<insert|<update|<delete' (25)",
+      "dependent_tables": "✅ regex FROM/JOIN/UPDATE/INSERT (12 unique)",
+      "mybatis3_dynamic_branches": "✅ grep '<bind|<if|<choose|<foreach' (4 = bind only)",
+      "loc_breakdown": "✅ wc -l",
+      "test_class_count": "✅ find src/test (18)",
+      "stripes_action_handlers": "✅ grep 'public Resolution|ForwardResolution' per ActionBean (19 events)",
+      "mapper_namespace": "✅ grep '<mapper namespace=' (7 fully qualified)"
+    },
+    "manual_fields": {
+      "module_role_classification": "❌ 매뉴얼 (4 BC = catalog/account/cart/order)",
+      "antipatterns_flagged": "❌ 매뉴얼 + LLM cross-check (Anemic Domain + Anemic Service + Stripes convention)",
+      "table_role": "❌ LLM ~80% (자연어 description / pet store 도메인 단순)",
+      "external_dependencies_internal": "❌ import 분석 (자동 가능 / 본 PoC = 단일 모듈 구조 trivially clear)"
+    },
+    "estimated_ratio": {
+      "auto_count": 8,
+      "manual_count": 4,
+      "ratio": "8/12 = 66.7%",
+      "comparison": "★ ★ vs PoC #06 38.75% (+27.9%p) / vs PoC #07 53.8% (+12.9%p) — ★ ★ Modern stack + 단순 도메인 → 자동 추출 ↑ (★ ★ 가설 R2 입증 — Modern + 작은 책임 = 자동화율 ↑↑)",
+      "plan_3a_estimation": "62~72% — 실측 66.7% → ★ ★ 추정 정합 (in range / pass)"
+    }
+  },
+  "scope_constraint": {
+    "$comment": "★ R1 시간 cap 정합 — 본 PoC = analysis 4종 + sql-inventory + phase 4.7 + chain 1 만. chain 2~4 명시적 제외 (★ §8.1 strict).",
+    "core_modules": ["domain (9)", "mapper (7 + 7 XML)", "service (3)", "web.actions (5 / 19 endpoint)"],
+    "core_endpoint_count": 19,
+    "core_sql_count": 25,
+    "phase_4_7_uc_count": "5~7 핵심 (catalog 검색 + cart add/remove + order checkout + signon)"
+  }
+}

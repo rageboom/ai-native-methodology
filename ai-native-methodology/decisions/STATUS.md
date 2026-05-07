@@ -5,6 +5,8 @@
 
 **기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
 
+★ ★ ★ **본 session 2026-05-07 진행 (β 결단 흡수)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수 → **PoC #08 (jpetstore-6) 보류 해제 + Day 1 진입** (DEC-2026-05-07-poc-08-보류-해제.md / source clone + analysis 4종 / 본 session ✅). 다음 단계 (Day 1.5~3.5 + PoC #09 prelim + PoC #10 prelim + v2.2.0 final 결단) = ★ 별도 session 자동 진행 carry. PoC #11 (사용자 결단 α 우선순위 #1) source 위임 대기 = 보존 / source 도착 시 우선순위 #1 복귀.
+
 **v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
 
 **★ ★ research-v220 후 결단 흡수**:
@@ -69,13 +71,16 @@
 - ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
 - v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단
 
-**Day 0 진입 (★ 본 session 2026-05-07) — PoC #08 (jpetstore-6) ★ 보류**:
+**Day 0~1 진입 — PoC #08 (jpetstore-6) ★ ★ 보류 해제 + Day 1 ✅ (2026-05-07 / 본 session)**:
 - ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-08-prelim-신설.md`
 - ✅ skeleton — `examples/poc-08-realworld-mybatis/{source,input,sql-inventory,characterization}/` + README
 - ✅ INDEX entry / STATUS prelim 진입 표시 / 사용자 confirm 2건 resolved
 - ✅ commit `a27dfb0` (Day 0) + `a60404c` (Day 0.5 정탐 흡수)
 - ✅ plan 2차 + research 자산화 (★ 3 sub-agent 병렬 정탐 통합)
-- ⏸ **★ ★ 보류 (사용자 결단 (α) 2026-05-07)** — Day 0+0.5 자산 보존 / PoC #11 (EFI-WEB billing) 종결 후 진입 의무
+- ✅ **★ ★ 보류 해제 (사용자 결단 (β) 2026-05-07 / "우선순위 2, 3, 4, 후속 연달아 다 진행" / 본 session)** — DEC-2026-05-07-poc-08-보류-해제.md
+- ✅ **Day 1 진입** — source clone (jpetstore-6 from `mybatis/jpetstore-6` GitHub) + sub-tree 정리 + 실측 정탐 + analysis 4종 (rules.json 8 BR / domain.json 19 UC / antipatterns.json 8 AP / inventory.json)
+- ★ Day 1 실측 vs 정탐 corroboration: 24 Java + 18 test (정탐 17 → +1) + 7 mapper XML + **25 SQL** + **19 endpoint** + 4 BC + 12 DB tables + LOC 9234. Stripes annotation = ★ 정탐 부정확 흡수 (`@HandlesEvent` + `@UrlBinding` ❌ / 실제 = `@DefaultHandler` + convention default). dynamic SQL = `<bind>` 4 만 / 그 외 0 (standard MyBatis 3). 8 AP 中 ★ 1 critical (평문 password) + 1 high (Order N+1 fetch).
+- ⏳ Day 1.5 (sql-inventory 11 컬럼) + Day 2 (phase 4.7) + Day 3 (chain 1) + Day 3.5 (REPORT) = ★ 별도 session 자동 진행 carry (C-v2.2.0-6a 진행)
 
 **Day 0 진입 (★ 본 session 2026-05-07) — PoC #11 (EFI-WEB billing) ★ 우선**:
 - ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-11-prelim-신설.md` (★ 사용자 결단 (α) 정합)
