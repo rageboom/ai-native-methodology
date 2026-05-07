@@ -107,7 +107,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개 (★ v2.1.0 plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ 현재 **v2.1.0 phase 4.7 characterization 본체 격상** — DEC-2026-05-07-v2.1.0-release / chain harness validated 정식 v2.0.0 보존)
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ 현재 **v2.2.0-rc1 PRERELEASE — phase 4.8 sql-inventory 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final trigger / chain harness validated 정식 v2.0.0 + v2.1.0 phase 4.7 + v2.1.1 ratchet trend 모두 보존)
 - `ai-native-methodology/guides/` — ★ ★ 사용자 journey 자산 (cleanup round 2-C 신설 / getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
 - `ai-native-methodology/archive/v1.3-adoption/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적 / cleanup round 1 격리)
 - `ai-native-methodology/archive/phase-a-iteration/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template / cleanup round 1 격리 / v2.0 chain harness paradigm 후 outdated)

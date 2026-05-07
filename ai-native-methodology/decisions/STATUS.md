@@ -3,7 +3,42 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-08 (★ ★ ★ ★ **PoC #07 정식 등재 + Day 3.5 종결** — DEC-2026-05-08-poc-07-종결 / EFI-WEB capital 모듈 다중책임 chain 1 측정 / 4축 모두 pass [§3-A 53.8% + §3-B 0 findings UC 94.1% + phase 4.7 Day 2.5 후 100% + SQL Inventory 66.7% corroboration #2] / ★ ★ ★ phase 4.7 단일 prompt 양 spectrum 동작 입증 강화 [3 spectrum: Modern 100% + Legacy 단일 94% + Legacy 다중 100%] / ★ ★ SATD KL-SATD ×4 / ★ AP isomorphic 5 (Spring 4.1 + iBATIS 2 spectrum sub-rule 자격) / ★ 다중책임 신규 AP 5 / ★ ratchet baseline write 첫 진입 [v2.1.1 PATCH production 첫 사용] / 본체 격상 ❌ — carry 3 신규 [`C-v2.2.0-sql-{inventory, schema, tool}`] **★ ★ ★ ★ v2.2.0 본체 격상 trigger 자격 충족** [≥ 2 PoC isomorphic 충족] + spectrum sub-rule carry 1 + 도메인 carry 3 + chain 3 carry 3 / no release)
+**기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
+
+**v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
+
+**★ ★ research-v220 후 결단 흡수**:
+- ★ ★ ★ Senior STOP signal (paradigm-cross 부재) → v2.2.0-rc1 prerelease + 7d minimum cooling-off + Modern ORM PoC #08 carry C-v2.2.0-6
+- ★ Agent 1 (공식 docs) 빈틈 4건 모두 흡수 → statement_type 11번째 컬럼 + patterns_extension_v3 carry + iBATIS 2 전용 enum carry + Feathers/Gartner TIME 인용 ADR 명문화
+- ★ Big-tech (Agent 2) 권고 흡수 → "Why not AWS SCT" 차별화 절 + 자체 baseline 정립 + Gartner TIME 12번째 컬럼 carry
+
+**★ 본체 격상 자산 7 + workflow** (v2.2.0-rc1):
+1. ✅ `methodology-spec/deliverables/24-sql-inventory.md` (★ #23 사용 / #24 신규)
+2. ✅ `schemas/sql-inventory.schema.json` (★ 31번째 schema)
+3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 13 → 14 (`sql_inventory` 추가)
+4. ✅ `skills/analysis/phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
+5. ✅ `tools/sql-inventory-extractor/` (★ workspace 14번째 / 10 unit test)
+6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v2.1.0 → v2.2.0-rc1 (phase 4.8 entry)
+7. ✅ `methodology-spec/workflow/phase-4-8-sql-inventory.md`
+8. ✅ `docs/adr/ADR-CHAIN-007-phase-4-8-sql-inventory.md`
+
+**release commit cadence (C1~C7)**:
+- C1 (`f64e0b2`) — deliverable 24 + schema 31번째 + meta-confidence enum
+- C2 (`4d87416`) — skill phase-4-8-sql-inventory
+- C3 (`?`) — tool sql-inventory-extractor + 10 unit test + workspace 14번째
+- C4 (`7b39cfb`) — flow + ADR-CHAIN-007 + workflow
+- C5 (`4b26d0e`) — version bump + build + CHANGELOG
+- C6 (현재) — DEC + STATUS + INDEX
+- C7 — git tag v2.2.0-rc1 (★ prerelease)
+
+**★ ★ ★ v2.2.0 final 격상 trigger 의무**:
+- ★ Modern ORM PoC #08 (★ MyBatis 3 annotation 또는 JPA QueryDSL 또는 TypeORM raw SQL spectrum / 14d cap)
+- 7d minimum cooling-off (2026-05-08 ~ 2026-05-15)
+- ★ 별도 session + 사용자 결단
+
+---
+
+**★ PoC #07 정식 등재 + Day 3.5 종결** (2026-05-08 / DEC-2026-05-08-poc-07-종결 / EFI-WEB capital 모듈 다중책임 chain 1 측정 / 4축 모두 pass)
 
 **v2.1.1 PATCH release** (2026-05-07 / DEC-2026-05-07-v2.1.1-ratchet-trend / phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved / `_shared/baseline.js` coverageTrendCheck 신설 + characterization-coverage-validator `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test / unit test 228 → **232** / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.1 / build `ai-native-methodology-v2.1.1/` 264 files / git tag v2.1.1 / chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌ / **carry 잔존: C-v2.1.0-1~4, 6~7** / ★ ratchet trend production 첫 사용 = PoC #07 capital `.aimd/baseline/characterization-coverage.json` 2026-05-08)
 
