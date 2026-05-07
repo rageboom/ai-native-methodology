@@ -3,9 +3,53 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-07~08 (★ ★ ★ **PoC #06 SQL Inventory retrofit 완료 (corroboration #1)** + ★ ★ **PoC #07 prelim 진행 중** — DEC-2026-05-08-poc-06-sql-inventory-retrofit + DEC-2026-05-08-poc-07-prelim-신설 / 신규 deliverable #24 (SQL Inventory) 10 컬럼 placeholder 양 PoC 적용 의도 / PoC #06 exchange retrofit = corroboration #1 (자동 추출 외부 6 컬럼 = 4/6 = 66.7% pass) / PoC #07 capital = corroboration #2 (★ source 가용성 사용자 의뢰 대기) / ≥ 2 PoC isomorphic 자격 자격 / 외부 조언 (Opus 4.7) 흡수 / 사용자 D9+D11 결단 / 본체 격상 ❌ — carry 3 신규 (`C-v2.2.0-sql-{inventory,schema,tool}`) PoC #07 종결 후 trigger)
+**기준일**: 2026-05-08 (★ ★ ★ ★ **PoC #07 정식 등재 + Day 3.5 종결** — DEC-2026-05-08-poc-07-종결 / EFI-WEB capital 모듈 다중책임 chain 1 측정 / 4축 모두 pass [§3-A 53.8% + §3-B 0 findings UC 94.1% + phase 4.7 Day 2.5 후 100% + SQL Inventory 66.7% corroboration #2] / ★ ★ ★ phase 4.7 단일 prompt 양 spectrum 동작 입증 강화 [3 spectrum: Modern 100% + Legacy 단일 94% + Legacy 다중 100%] / ★ ★ SATD KL-SATD ×4 / ★ AP isomorphic 5 (Spring 4.1 + iBATIS 2 spectrum sub-rule 자격) / ★ 다중책임 신규 AP 5 / ★ ratchet baseline write 첫 진입 [v2.1.1 PATCH production 첫 사용] / 본체 격상 ❌ — carry 3 신규 [`C-v2.2.0-sql-{inventory, schema, tool}`] **★ ★ ★ ★ v2.2.0 본체 격상 trigger 자격 충족** [≥ 2 PoC isomorphic 충족] + spectrum sub-rule carry 1 + 도메인 carry 3 + chain 3 carry 3 / no release)
 
-**v2.1.1 PATCH release** (2026-05-07 / DEC-2026-05-07-v2.1.1-ratchet-trend / phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved / `_shared/baseline.js` coverageTrendCheck 신설 + characterization-coverage-validator `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test / unit test 228 → **232** / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.1 / build `ai-native-methodology-v2.1.1/` 264 files / git tag v2.1.1 / chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌ / **carry 잔존: C-v2.1.0-1~4, 6~7**)
+**v2.1.1 PATCH release** (2026-05-07 / DEC-2026-05-07-v2.1.1-ratchet-trend / phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved / `_shared/baseline.js` coverageTrendCheck 신설 + characterization-coverage-validator `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test / unit test 228 → **232** / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.1 / build `ai-native-methodology-v2.1.1/` 264 files / git tag v2.1.1 / chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌ / **carry 잔존: C-v2.1.0-1~4, 6~7** / ★ ratchet trend production 첫 사용 = PoC #07 capital `.aimd/baseline/characterization-coverage.json` 2026-05-08)
+
+**★ ★ ★ ★ PoC #07 정식 등재 + 종결** (2026-05-08 / DEC-2026-05-08-poc-07-종결 / EFI-WEB capital 모듈 / Spring 4.1 + iBATIS 2 + JSP / **3752 Java LOC + 1757 sqlmap LOC + 87 endpoint + 71 SQL operations** / 다중책임)
+
+**4축 측정 결과 (사용자 D10 = 3/4 pass + 미달 1축 carry / 실제 = 4/4 pass)**:
+
+| 축 | metric | PoC #06 baseline | **PoC #07 측정** | 자격 |
+|---|---|---|---|---|
+| §3-A 자동화율 | 평균 auto_ratio | 38.75% | **53.8%** (+15%p) | ✅ pass (in range 50% ± 10%p) |
+| §3-B 설계 자동화율 | planning-extraction-validator | (없음) | **0 findings / UC coverage 94.1%** | ✅ pass |
+| phase 4.7 acceptance oracle | named_classified_ratio | 94% (D2 후) | **87.5% Day 2 / 100% Day 2.5** | ✅ pass (≥ 80%) |
+| ★ SQL Inventory coverage | auto extraction ratio | 66.7% (PoC #06 retrofit) | **66.7%** (corroboration #2 isomorphic) | ✅ pass (≥ 50%) |
+
+**★ ★ ★ phase 4.7 두 번째 적용 — 단일 prompt 양 spectrum 동작 입증 강화 (3 spectrum)**:
+
+| spectrum | named_classified_ratio (D2.5 후) |
+|---|---|
+| Modern (PoC #03 NestJS retrofit) | 30/30 = 100% |
+| Legacy 단일책임 (PoC #06 exchange) | 17/18 = 94% |
+| **Legacy 다중책임 (PoC #07 capital)** | **27/27 = 100%** |
+
+→ ★ ★ ★ ★ ★ DEC-CHAIN-006 §결정 §2 "단일 prompt 양 spectrum 동작" 정합 강화.
+
+**★ ★ ★ SQL Inventory ≥ 2 PoC isomorphic 자격 충족 (★ v2.2.0 본체 격상 trigger 자격)**:
+
+| metric | corroboration #1 (PoC #06) | corroboration #2 (PoC #07) | 정합 |
+|---|---|---|---|
+| 외부 6 컬럼 자동화 | 4/6 = 66.7% | 4/6 = 66.7% | ★ scale 무관 isomorphic |
+| 본 추가 4 컬럼 + patterns_extension_v2 | ✅ | ✅ | ✅ schema isomorphic |
+| AP-{X}-011/012 신규 등재 | AP-EXCHANGE-011 (0건) | AP-CAPITAL-012 (0건) | ★ ★ Spring 4.1 + iBATIS 2 spectrum 공통 |
+
+**carry 신규 (★ ★ v2.2.0 본체 격상 trigger 자격 충족 / ≥ 2 PoC isomorphic)**:
+- **C-v2.2.0-sql-inventory** — `methodology-spec/deliverables/24-sql-inventory.md` 신설
+- **C-v2.2.0-sql-schema** — `schemas/sql-inventory.schema.json` 신설
+- **C-v2.2.0-sql-tool** — `tools/sql-inventory-extractor/` 신설 (workspace 14번째)
+- C-v2.2.0-spring41-ibatis2-subrule (≥ 2 PoC corroboration 자격 충족)
+- C-v2.2.0-phase-4-7-multiresponsibility-subrule (단일 PoC / ≥ 2 다중책임 PoC 후 trigger)
+- C-domain-PoC07-1~3 (도메인 expert IFRS 회계 담당자 재검증)
+- C-PoC07-1~3 (chain 3 영역 — Testcontainers / MockMvc / DBUnit)
+
+**★ ratchet baseline write 첫 진입** — `examples/poc-07-efiweb-capital-spring41/.aimd/baseline/characterization-coverage.json` (coverage_strategy: ratchet / coverage_ratio: 0.4375 / v2.1.1 PATCH production 첫 사용 케이스).
+
+**no release / no tag** — D11 (b) ≥ 2 PoC isomorphic 후 v2.2.0 본체 격상 별도 plan + 사용자 결단.
+
+
 
 **v2.1.0 MINOR release** (2026-05-07 / 같은 날 — DEC-2026-05-07-v2.1.0-release / phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration (PoC #06 Spring 4.1 Legacy 17/18=94% + PoC #03 NestJS Modern retrofit 30/30=100%) / 본체 자산 6 + workflow + ADR / unit test 218 → 228 (+10 / characterization-coverage-validator 신설 workspace 13번째) / Senior cooling-off (a) 즉시 final / chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만)
 

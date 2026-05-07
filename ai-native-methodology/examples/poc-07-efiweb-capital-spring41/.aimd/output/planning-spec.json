@@ -1,0 +1,310 @@
+{
+  "meta": {
+    "generated_at": "2026-05-08T11:00:00Z",
+    "methodology_version": "v2.1.1",
+    "inputs_used": ["source_code", "operational_db", "characterization"],
+    "confidence": 0.78,
+    "formula_version": "v1",
+    "confidence_breakdown": {
+      "use_cases": 0.85,
+      "business_rules_intent": 0.80,
+      "out_of_scope": 0.95,
+      "risks_and_constraints": 0.75
+    },
+    "$comment": "★ ★ confidence 0.78 — Legacy 다중책임 + Stored Procedure 본문 미확인 + 도메인 expert 인터뷰 carry / Modern PoC #03 (0.95) vs Legacy 단일책임 PoC #06 (0.85) 대비 ↓ 정합."
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "sql-inventory/sql-inventory.json",
+      "characterization/snapshots/UC-CAPITAL-001-comBasicInfo.json",
+      "characterization/snapshots/UC-CAPITAL-002-IfrsComINSetSave.json",
+      "characterization/snapshots/UC-CAPITAL-006-IfrsERPINListSave.json",
+      "characterization/snapshots/UC-CAPITAL-008-IfrsLoadSaveData.json",
+      "characterization/snapshots/UC-CAPITAL-010-insertCapitalVrify.json",
+      "characterization/snapshots/UC-CAPITAL-011-IfrsWeekReport1.json",
+      "characterization/snapshots/UC-CAPITAL-013-IfrsWeekReport10.json",
+      "characterization/intent-vs-bug.md",
+      "characterization/coverage.json",
+      "source/java/web/CapitalController.java",
+      "source/java/service/impl/CapitalServiceImpl.java",
+      "source/java/service/impl/CapitalDAO.java",
+      "source/sqlmap/capital.xml"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "EFI-WEB IFRS 회계 시스템의 자본 일보 (Capital Daily Report) 작성 / 검토 / 결재 — 다중 법인 × 다중 자금 source (ERP/CMS/NonERP) 통합 자본 보고. 주간 자금조달내역 + 환율 가중 + verify lock workflow.",
+    "stakeholders": [
+      "ifrs_admin (회계 운영자 / 자본 보고 작성)",
+      "ifrs_planner (회계 담당자 / 검증 + 결재)",
+      "DBA (Stored Procedure 본문 + external schema 운영)",
+      "system_architect (cross-module / cross-system 의존 관리)"
+    ],
+    "success_criteria": [
+      "자본 일보 작성 + 결재 lock 흐름 회계 정합 (verify 후 수정 차단 / IFRS 표준)",
+      "ERP / CMS / NonERP 3 source 통합 정확도 = 회계 sub-total 일치",
+      "주간보고 환율 가중 평균 정확도 (cramt × EXCHANGE_RATE / 1,000,000)",
+      "★ phase 4.7 acceptance oracle = D2.5 후 27/27 = 100% 명확 분류 (다중책임 spectrum 자격)"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-CAPITAL-001",
+      "name": "법인 기초정보 조회",
+      "description": "GET /ifrs/capital/comBasicInfoListAjax — TB_COMPANY 의 자본 보고 대상 법인 (CAPITAL_YN='Y' OR CMS_USE_YN='Y') 우선 정렬 조회.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["session USER_ID 인증"],
+      "postconditions": ["법인 list (CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO ORDER) 반환"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-001"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-001-comBasicInfo.json",
+        "source/sqlmap/capital.xml:7-19 (selectComBasicInfoList)",
+        "source/java/web/CapitalController.java:163-168 (comBasicInfoListAjax)"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-002",
+      "name": "법인 기본정보 갱신",
+      "description": "POST /ifrs/capital/IfrsComINSetSave — TB_COMPANY 의 capital_curr_cd 갱신 + Stored Procedure (_IFRSCapitalSetCom) 호출. ★ 단일 트랜잭션 의무 (atomicity).",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["comNo + capitalCurrCd 입력"],
+      "postconditions": ["TB_COMPANY 갱신 + ERP setup 완료 (단일 단위 of work)"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-002"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-002-IfrsComINSetSave.json",
+        "source/sqlmap/capital.xml:20-29 + 60-64",
+        "source/java/web/CapitalController.java:179-188"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-006",
+      "name": "ERP 입금 List 일괄 등록",
+      "description": "POST /ifrs/capital/IfrsERPINListSave — Stored Procedure (_IFRSCapitalList) 호출로 ERP 입금 데이터 batch 등록. CompanySeq + sType + sDate 3 키 의무.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["CompanySeq + sType + sDate + ERP source 데이터 입력"],
+      "postconditions": ["TB_CAPITAL_LIST 의 sType=1 row 다수 INSERT (SP 본문 carry)"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-006"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-006-IfrsERPINListSave.json",
+        "source/sqlmap/capital.xml:339-350 (insertERPINList SP)"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-008",
+      "name": "자금일보 임시 저장 / 저장 / 초기화",
+      "description": "POST /ifrs/capital/IfrsLoadSaveData — saveType R/B/A 3 분기 state machine. R = TB_CAPITAL_ASSET / B = TB_CAPITAL_ASSET_BAK read / ★ A = IfrsCapitalDeleteAjax 별도 endpoint 라우팅 (D2 결단 b 권고).",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["comNo + sdate2 + SaveType 입력"],
+      "postconditions": ["R/B 시 row list 반환 / A 시 IfrsCapitalDeleteAjax 라우팅"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-008"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-008-IfrsLoadSaveData.json",
+        "source/sqlmap/capital.xml:503-518 (selectLoadSaveData iBATIS dynamic) + 519-528 (IfrsCapitalDeleteAjax)",
+        "decisions/DEC-2026-05-08-poc-07-domain-결단.md §2.1"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-010",
+      "name": "자본 검증 결재 lock",
+      "description": "POST /ifrs/capital/insertCapitalVrify — TB_CAPITAL_VRIFY INSERT + lifecycle state DRAFT → APPROVED → LOCKED. ★ verify 후 수정 차단 의무 (D2 결단 a 권고 / IFRS 회계 정합).",
+      "actors": ["ifrs_planner"],
+      "preconditions": ["session USER_ID + comNo + vrifyDate"],
+      "postconditions": ["TB_CAPITAL_VRIFY INSERT (com_no + vrify_date 복합 unique) + workflow LOCKED"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-010"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-010-insertCapitalVrify.json",
+        "source/sqlmap/capital.xml:1371 (insertCapitalVrify)",
+        "source/java/web/CapitalController.java:875-893",
+        "decisions/DEC-2026-05-08-poc-07-domain-결단.md §2.2"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-011",
+      "name": "자금일보 주간보고 1 (자금조달내역)",
+      "description": "POST /ifrs/capital/IfrsWeekReport1 — sType 1+2+3 UNION ALL + TB_DAY_EXCHANGE 환율 가중 평균 cramt + 전주 마지막 영업일 잔액 (basicBalance) 자동 fetch. ★ Service 2회 호출 패턴 (★ N+1 단일 query 마이그레이션 의무).",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["companyseq + sdate + edate + serdate + curr 입력"],
+      "postconditions": ["weekReport list + previousWeekEndDate + basicBalance 반환"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-011"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-011-IfrsWeekReport1.json",
+        "source/sqlmap/capital.xml:686-749 (IfrsWeekReport1 UNION ALL 3)",
+        "source/java/web/CapitalController.java:1659-1695"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-013",
+      "name": "주간보고 10 (SAC ledger 보통예금 ERP 조회)",
+      "description": "POST /ifrs/capital/IfrsWeekReport10 — Stored Procedure (★ XML 인라인 String parameter / 다중책임 spectrum 신규 AP) + DEAD parameter (comNo) 처분 의무.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["comNo + sdate + edate + sType 입력"],
+      "postconditions": ["SAC ledger 보통예금 잔액 반환"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-013"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-CAPITAL-013-IfrsWeekReport10.json",
+        "source/java/web/CapitalController.java:1769-1785 (xmlDocument 인라인 / comNo DEAD)",
+        "input/antipatterns.json AP-CAPITAL-005 + AP-CAPITAL-006"
+      ]
+    },
+    {
+      "id": "UC-CAPITAL-003",
+      "name": "Capital Std 조회 (★ carry — external schema)",
+      "description": "GET /ifrs/capital/IfrsCapitalStdAjax — sType=1 / IFRS_CAPITALSTD external schema 의존. ★ ★ planning carry — DBA-read C-domain-PoC07-1 충족 후 진입.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry — external schema 의존 / 본 PoC scope OUT"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-003"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-003"]
+    },
+    {
+      "id": "UC-CAPITAL-004",
+      "name": "Capital Biz 조회 (★ carry — external schema / UC-003 동반)",
+      "description": "GET /ifrs/capital/IfrsCapitalBizAjax — sType=2 / UC-003 동반 처분.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-004"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-004"]
+    },
+    {
+      "id": "UC-CAPITAL-005",
+      "name": "ERP 보통예금 입금 List 조회 (★ carry — UC-006 cover 로 대표)",
+      "description": "GET /ifrs/capital/IfrsERPINListAjax — sub-domain B SP 호출 패턴은 UC-006 cover 로 대표.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-005"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-005"]
+    },
+    {
+      "id": "UC-CAPITAL-007",
+      "name": "ERP 출금 List 조회 (★ carry — SGERP cross-system)",
+      "description": "GET /ifrs/capital/IfrsERPOUTListAjax — SGERP cross-system 호출 / Day 1 시간 cap.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-007"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-007"]
+    },
+    {
+      "id": "UC-CAPITAL-009",
+      "name": "Save / Load 보고서 데이터 (★ carry — UC-008 dynamic 분기 cover 로 대표)",
+      "description": "POST /ifrs/capital/IfrsLoadSaveDataForReport — non-ERP source 다음 PoC.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-009"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-009"]
+    },
+    {
+      "id": "UC-CAPITAL-012",
+      "name": "주간보고 4 (★ carry — UC-011 weekly 패턴 cover 로 대표)",
+      "description": "POST /ifrs/capital/IfrsWeekReport4 — UC-011 weekly 패턴 cover.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-012"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-012"]
+    },
+    {
+      "id": "UC-CAPITAL-014",
+      "name": "주간보고 11 (★ carry — UC-011 cover 로 대표)",
+      "description": "POST /ifrs/capital/IfrsWeekReport11 — userId 추가 ICM-11763 patch / UC-011 cover.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-014"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-014"]
+    },
+    {
+      "id": "UC-CAPITAL-015",
+      "name": "주간보고 13/14 (★ carry — UC-013 XML 인라인 패턴 cover 로 대표)",
+      "description": "POST /ifrs/capital/IfrsWeekReport13/14 — XML 인라인 패턴은 UC-013 cover.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-015"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-015"]
+    },
+    {
+      "id": "UC-CAPITAL-016",
+      "name": "주간 환율 List (★ carry — UC-011 cross-module cover 로 대표)",
+      "description": "POST /ifrs/capital/IfrsWeekRate / IfrsWeekRateList — TB_CAPITAL_LIST_RATE 단순 read / TB_DAY_EXCHANGE cross-module 의존은 UC-011 cover.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["★ carry"],
+      "postconditions": ["★ carry"],
+      "acceptance_criteria_refs": ["AC-CAPITAL-016"],
+      "source_grounded_evidence": ["input/domain.json UC-CAPITAL-016"]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-CAPITAL-001",
+      "reasoning": "TB_COMPANY 의 CAPITAL_YN / CMS_USE_YN flag 정렬 = 자본 보고 대상 법인 우선 표시 (회계 운영자 효율). IFRS 다중 법인 회계 정합.",
+      "source_grounded_evidence": "source/sqlmap/capital.xml:7-19 — order by CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO"
+    },
+    {
+      "br_id": "BR-CAPITAL-005",
+      "reasoning": "자금일보 saveType R/B/A 3 분기 state machine — 정식저장(R) / 임시저장(B) / 초기화(A). ★ D2 결단 b — saveType=A 는 selectLoadSaveData 가 아닌 IfrsCapitalDeleteAjax 별도 endpoint 라우팅 정합. 새 시스템 = Controller/Service 명시 라우팅 의무.",
+      "source_grounded_evidence": "source/java/web/CapitalController.java:763 (자조 코멘트) + source/sqlmap/capital.xml:503-528 (selectLoadSaveData R/B + IfrsCapitalDeleteAjax 별도)"
+    },
+    {
+      "br_id": "BR-CAPITAL-006",
+      "reasoning": "전주 마지막 영업일 잔액 (basicBalance) 자동 fetch = 자금일보 일관성 핵심 (전주 → 금주 잔액 추적). 2020.10.30 patch (NPE 회피) 정합 / 그러나 String→Double parseDouble 자체는 BigDecimal 마이그레이션 의무 (회계 데이터).",
+      "source_grounded_evidence": "source/java/web/CapitalController.java:1666-1690"
+    },
+    {
+      "br_id": "BR-CAPITAL-008",
+      "reasoning": "Capital Verify lock = 결재 후 임시저장 차단 / IFRS 표준 정합 (감사 추적). ★ D2 결단 a — workflow state machine (DRAFT → SUBMITTED → APPROVED → LOCKED) 명시 의무.",
+      "source_grounded_evidence": "source/sqlmap/capital.xml:1354 (selectCapitalVrify) + 1371 (insertCapitalVrify) + decisions/DEC-2026-05-08-poc-07-domain-결단.md §2.2"
+    },
+    {
+      "br_id": "BR-CAPITAL-009",
+      "reasoning": "TB_DAY_EXCHANGE cross-module 환율 가중 = IFRS 외화→원화 환산 정합. ★ 그러나 직접 SQL access = DDD bounded context 위반 → 새 시스템 = exchange micro-service API 또는 Anti-Corruption Layer 의무.",
+      "source_grounded_evidence": "source/sqlmap/capital.xml:743-749 (IfrsWeekReport1 LEFT JOIN TB_DAY_EXCHANGE)"
+    }
+  ],
+  "out_of_scope": [
+    "★ chain 3 영역 (DAO + DB 통합 테스트 / Testcontainers) — C-PoC07-1 carry",
+    "★ chain 3 영역 (MockMvc Replay 테스트) — C-PoC07-2 carry",
+    "★ chain 3/4 영역 (DBUnit / @Sql 픽스처) — C-PoC07-3 carry",
+    "다중 모듈 (51K LOC 전체) — capital 모듈 한정 / billing / employee / etc. = scope OUT",
+    "Stored Procedure 본문 (_IFRSCapitalList + _IFRSCapitalSetCom + _SACCashBookList_IFRS 등) — DBA + proc-body C-data-PoC07-1 carry",
+    "external schema (LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD) — DBA-read C-domain-PoC07-1 carry",
+    "Mail (E. sub-domain) / canvasUpload + 이미지 base64 인라인 (BR-CAPITAL-012 / AP-CAPITAL-007) — 다음 PoC carry",
+    "10 carry UC (UC-CAPITAL-003/004/005/007/009/012/014/015/016) — Day 1 시간 cap"
+  ],
+  "risks_and_constraints": [
+    "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무 (CLAUDE.md 정합)",
+    "★ ★ 다중책임 모듈 = SATD ↑↑ (4건 self_recognized — 단일책임 PoC #06 1건 대비 ×4) → 새 시스템 재구현 시 SATD 우선 처리 의무",
+    "★ Spring 4.1 + iBATIS 2 spectrum = sql-inventory 외부 6 컬럼 자동화 4/6 = 66.7% / 매뉴얼 2 + 본 추가 4 = 6 컬럼 carry",
+    "★ ★ ★ 본체 격상 ❌ — 사용자 D11 결단 (b) ≥ 2 PoC isomorphic 후 v2.2.0 (★ §8.1 strict 의무 / 14차 retract 회피)",
+    "★ Stored Procedure 본문 비가시성 = chain 3/4 진입 시 SP 마이그레이션 결단 의무 (Java 측 vs DB 측)",
+    "TB_DAY_EXCHANGE cross-module 직접 의존 = service boundary 분리 검토 의무 (architect carry)"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json"
+    ],
+    "to_characterization": [
+      "characterization/snapshots/ (7 snapshot)",
+      "characterization/intent-vs-bug.md (27 분류 / Day 2.5 후 100%)",
+      "characterization/coverage.json (★ ratchet baseline write 첫 진입)"
+    ],
+    "to_decisions": [
+      "decisions/DEC-2026-05-08-poc-07-prelim-신설.md",
+      "decisions/DEC-2026-05-08-poc-07-domain-결단.md"
+    ],
+    "to_sql_inventory": [
+      "sql-inventory/sql-inventory.json (10 컬럼 + patterns_extension_v2)",
+      "sql-inventory/raw-grep.txt"
+    ]
+  }
+}

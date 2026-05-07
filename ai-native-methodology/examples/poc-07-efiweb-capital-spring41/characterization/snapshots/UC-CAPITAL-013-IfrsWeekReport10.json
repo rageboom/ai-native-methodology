@@ -1,0 +1,70 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-013 주간보고 10 (sub-domain G). ★ ★ ★ XML 인라인 String 인라인 + DEAD parameter (comNo) 핵심 AP. capital 만 발생 (PoC #06 isomorphic ❌).",
+  "snapshot_id": "SNAP-UC-CAPITAL-013",
+  "use_case": "UC-CAPITAL-013",
+  "endpoint": "POST /ifrs/capital/IfrsWeekReport10",
+  "controller_method": "CapitalController.IfrsWeekReport10",
+  "service_method": "CapitalService.IfrsWeekReport10",
+  "sql_id": "CapitalDAO.IfrsWeekReport10 (★ Stored Procedure / xmlDocument String 입력)",
+  "layer": "integration",
+  "data_source_status": "★ ★ 실 DB 환경 부재 + Stored Procedure body 미확인 + XML schema 부재 = 다중 DBA carry",
+  "scenarios": [
+    {
+      "id": "SCN-CAPITAL-013-001",
+      "name": "★ AP 시나리오 — XML 인라인 String 생성 + DEAD parameter (comNo) 처리",
+      "given": {
+        "request_params": {
+          "comNo": "001",
+          "sdate": "20260507",
+          "edate": "20260514",
+          "sType": "10"
+        }
+      },
+      "when": "★ ★ Controller line 1769~1785: String comNo = request.getParameter(\"comNo\"); String xmlDocument = \"<root>...</root>\"; (★ ★ comNo 변수 파싱 후 xmlDocument String 안에 미포함 / Service 호출 param 에도 ❌); capitalService.IfrsWeekReport10(param);",
+      "then": {
+        "expected_SP_invocation": "★ Stored Procedure 호출 — xmlDocument 가 SP parameter 로 전달 / 내용은 보고서 형식 정의",
+        "comNo_DEAD_parameter": "★ ★ ★ comNo 파싱 후 어디에도 사용 ❌ → AP-CAPITAL-006 명백 / 의도 ↔ 실제 drift",
+        "xml_inline_AP": "★ ★ Java String 으로 XML 인라인 작성 = AP-CAPITAL-005 — DTO + JAXB / Jackson XmlMapper 으로 마이그레이션 의무",
+        "_SQL_injection_risk": "★ Java String concatenation 으로 XML 작성 시 escape 처리 부재 가능 / SP 입력 검증 의무"
+      },
+      "intent_classification": [
+        { "rule": "BR-CAPITAL-015", "type": "intent", "note": "주간보고 sType=10 = SAC ledger / 보통예금 ERP 조회 (sub-domain G 핵심)" },
+        { "rule": "AP-CAPITAL-005", "type": "bug", "note": "XML 인라인 String = 데이터 모델 부재 / SQL injection 위험" },
+        { "rule": "AP-CAPITAL-006", "type": "bug", "note": "DEAD parameter (comNo) = 의도 ↔ 실제 drift" }
+      ],
+      "behavior_to_preserve": [
+        "주간보고 sType=10 의 비즈니스 의도 (SAC ledger 보통예금 조회) — intent",
+        "Stored Procedure 호출 패턴 — DBA 검증 후 정합 시 보존"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ ★ AP-CAPITAL-005 — XML String 인라인 = 데이터 모델 부재. 새 시스템 = DTO + Jackson XmlMapper 또는 SP signature 변경 (XML → JSON 또는 normalized parameters)",
+        "★ ★ AP-CAPITAL-006 — comNo DEAD parameter (line 1767 파싱 후 미사용) → 사용 의도면 SP param 추가 / 미사용 의도면 제거",
+        "★ ★ AP-CAPITAL-001 (God Controller / 2536 LOC) 직접 영향 — 새 시스템 = WeeklyReportController 분리 의무"
+      ]
+    },
+    {
+      "id": "SCN-CAPITAL-013-002",
+      "name": "★ likely bug — exception 처리 부재 시 logger printStackTrace",
+      "given": "(SP 실패 또는 NullPointerException)",
+      "when": "(★ Controller 의 catch block 에 e.printStackTrace() — line 1480 / 2315 패턴)",
+      "then": {
+        "expected_log_output": "★ stderr 에 stack trace 출력 / slf4j Logger 미사용 (line 63 의 LOGGER 인스턴스 무시)",
+        "_AP_link": "AP-CAPITAL-010 — logger 미사용"
+      },
+      "behavior_likely_bug": [
+        "★ AP-CAPITAL-010 — printStackTrace 사용 / 새 시스템 = LOGGER.error(\"...\", e) 의무"
+      ],
+      "intent_classification": [{ "rule": "AP-CAPITAL-010", "type": "bug" }]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-CAPITAL-015 (Asset list 다단계 sub-domain G 핵심)"],
+    "bug": ["AP-CAPITAL-005 (XML 인라인)", "AP-CAPITAL-006 (DEAD parameter)", "AP-CAPITAL-010 (logger 미사용)", "AP-CAPITAL-001 (God Controller)"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-CAPITAL-013"],
+    "brs_covered": ["BR-CAPITAL-015"],
+    "aps_intersected": ["AP-CAPITAL-001", "AP-CAPITAL-005", "AP-CAPITAL-006", "AP-CAPITAL-010"]
+  }
+}

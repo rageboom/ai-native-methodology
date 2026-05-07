@@ -1,0 +1,58 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-001 법인 기초정보 조회 (sub-domain A. ComBasicInfo). 단순 read 진입점.",
+  "snapshot_id": "SNAP-UC-CAPITAL-001",
+  "use_case": "UC-CAPITAL-001",
+  "endpoint": "GET /ifrs/capital/comBasicInfoListAjax",
+  "controller_method": "CapitalController.comBasicInfoListAjax",
+  "service_method": "CapitalService.selectComBasicInfoListAjax",
+  "sql_id": "CapitalDAO.selectComBasicInfoList",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재 — TB_COMPANY 정렬 결과는 코드 + iBATIS XML 분석 기반 추정",
+  "scenarios": [
+    {
+      "id": "SCN-CAPITAL-001-001",
+      "name": "happy path — 자본 보고 대상 법인 list 정렬 조회",
+      "given": {
+        "request_params": "(없음 — 전체 법인)",
+        "session_user": { "USER_ID": "ifrs_admin_01" },
+        "TB_COMPANY_initial_state": [
+          { "COM_NO": "001", "COM_NM": "smilegate", "CAPITAL_YN": "Y", "CMS_USE_YN": "Y" },
+          { "COM_NO": "002", "COM_NM": "stove", "CAPITAL_YN": "Y", "CMS_USE_YN": "N" },
+          { "COM_NO": "003", "COM_NM": "rpg", "CAPITAL_YN": "N", "CMS_USE_YN": "Y" },
+          { "COM_NO": "004", "COM_NM": "publishing", "CAPITAL_YN": "N", "CMS_USE_YN": "N" }
+        ]
+      },
+      "when": "Map param = IfrsUtil.parameterToHm(request); capitalService.selectComBasicInfoListAjax(param); → return jsonView",
+      "then": {
+        "expected_response_list_order": [
+          "001 (CAPITAL_YN=Y, CMS_USE_YN=Y / 정렬 1)",
+          "002 (CAPITAL_YN=Y, CMS_USE_YN=N / 정렬 2)",
+          "003 (CAPITAL_YN=N, CMS_USE_YN=Y / 정렬 3)",
+          "004 (CAPITAL_YN=N, CMS_USE_YN=N / 정렬 4)"
+        ],
+        "order_clause": "ORDER BY CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO",
+        "_note": "BR-CAPITAL-001 — 자본 보고 대상 법인 (CAPITAL_YN='Y' OR CMS_USE_YN='Y') 우선 정렬"
+      },
+      "intent_classification": [
+        { "rule": "BR-CAPITAL-001", "type": "intent", "note": "법인별 capital_yn / cms_use_yn 분류 = 회계 정합" }
+      ],
+      "behavior_to_preserve": [
+        "TB_COMPANY 의 CAPITAL_YN + CMS_USE_YN 두 flag 정렬 (BR-CAPITAL-001)",
+        "Map<String,Object> 결과 (현재 형식 / 새 시스템 = DTO 매핑 의무)"
+      ],
+      "behavior_likely_bug": [
+        "★ AP-CAPITAL-002 — Map<String,Object> 강제 캐스팅 / type safety 부재 (새 시스템 DTO 의무)"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-CAPITAL-001 (capital_yn / cms_use_yn 분류)"],
+    "bug": ["AP-CAPITAL-002 (Map + 강제 캐스팅)"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-CAPITAL-001"],
+    "brs_covered": ["BR-CAPITAL-001"],
+    "aps_intersected": ["AP-CAPITAL-002"]
+  }
+}

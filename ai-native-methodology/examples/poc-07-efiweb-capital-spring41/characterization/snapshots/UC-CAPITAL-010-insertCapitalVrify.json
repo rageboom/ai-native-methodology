@@ -1,0 +1,82 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-010 자본 검증 결재 lock (sub-domain I. Comment+Verify). ★ ★ approval workflow 핵심 + try-catch 정식 처리.",
+  "snapshot_id": "SNAP-UC-CAPITAL-010",
+  "use_case": "UC-CAPITAL-010",
+  "endpoint": "POST /ifrs/capital/insertCapitalVrify",
+  "controller_method": "CapitalController.insertCapitalVrify",
+  "service_method": "CapitalService.insertCapitalVrify",
+  "sql_id": "CapitalDAO.insertCapitalVrify (INSERT INTO TB_CAPITAL_VRIFY)",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재",
+  "scenarios": [
+    {
+      "id": "SCN-CAPITAL-010-001",
+      "name": "happy path — 자본 보고 검증 (lock 등록)",
+      "given": {
+        "request_params": { "comNo": "001", "vrifyDate": "20260507" },
+        "session_user": { "USER_ID": "ifrs_admin_01" }
+      },
+      "when": "Map<String, Object> param = IfrsUtil.parameterToHm(request); param.put(\"insId\", IfrsUtil.getSession(request).get(\"USER_ID\").toString()); capitalService.insertCapitalVrify(param); model.addAttribute(\"success\", \"Y\");",
+      "then": {
+        "expected_TB_CAPITAL_VRIFY_after": { "COM_NO": "001", "VRIFY_DATE": "20260507", "INS_ID": "ifrs_admin_01" },
+        "expected_response": "{ \"success\": \"Y\" }",
+        "_BR_link": "BR-CAPITAL-008 — verify lock = 결재 후 임시저장 차단 트리거"
+      },
+      "intent_classification": [
+        { "rule": "BR-CAPITAL-008", "type": "intent", "note": "결재 lock = 회계 data 보호 (감사 정합)" }
+      ],
+      "behavior_to_preserve": [
+        "verify 후 INS_ID (USER_ID) 저장 — 감사 추적 (intent)",
+        "session USER_ID → param.insId 자동 추가 (intent — 감사 의무)"
+      ],
+      "behavior_likely_bug": [
+        "★ AP-CAPITAL-002 (Map 캐스팅)"
+      ]
+    },
+    {
+      "id": "SCN-CAPITAL-010-002",
+      "name": "★ likely bug — exception 시 success/fail 두 attribute 동시 add 가능성",
+      "given": { "request_params": "(invalid)" },
+      "when": "try { ... insertCapitalVrify(param); model.addAttribute(\"success\", \"Y\"); } catch (Exception e) { model.addAttribute(\"fail\", \"N\"); ... }",
+      "then": {
+        "expected_response": "{ \"fail\": \"N\" } 단독 (정상 throw / catch)",
+        "_validation_concern": "★ 그러나 success 가 시간 차로 add 되고 catch 의 fail 도 add 되면 두 키 모두 → 클라이언트 분기 모호 (코드 review 결과 = 정상 흐름이지만 모범 사례 ❌)"
+      },
+      "intent_classification": [
+        { "rule": "(try-catch 응답 형식)", "type": "bug", "note": "응답 contract 일관성 부재 = 명백한 폐해" }
+      ],
+      "behavior_likely_bug": [
+        "★ try-catch 응답 형식 일관성 — 새 시스템 = ResponseEntity<ResultDto> + status code (200/4xx/5xx) 분리 의무"
+      ]
+    },
+    {
+      "id": "SCN-CAPITAL-010-003",
+      "name": "★ ambiguous — verify 후 수정 가능 여부",
+      "given": { "state": "이미 vrify 등록된 자본 보고 / 수정 시도" },
+      "when": "(Controller 별도 분기 없음 — DB unique constraint 또는 application 검증 부재 / 같은 com_no + vrify_date 두 번째 호출)",
+      "then": {
+        "expected_behavior": "★ ambiguous — DB constraint 의존 / 또는 selectCapitalVrify 결과를 Controller 가 미리 검증해야 하는지 결단 부재",
+        "_BR_link": "BR-CAPITAL-008 domain_carry — verify 후 수정 가능 여부 planner 결단 의무"
+      },
+      "intent_classification": [
+        { "rule": "BR-CAPITAL-008", "type": "ambiguous", "note": "★ verify 후 수정 정책 모호 — IFRS 회계 담당자 결단 의무" }
+      ],
+      "behavior_to_preserve": [
+        "(★ ambiguous — D2 결단 의뢰 의무 / Day 2.5 DEC-도메인-결단 작성 후 갱신)"
+      ],
+      "behavior_likely_bug": [
+        "★ ambiguous 영역에서 코드만으로는 lock 동작 명시 부재 — 새 시스템 재구현 시 workflow state machine (DRAFT → SUBMITTED → APPROVED → LOCKED) 명시 의무"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-CAPITAL-008 (verify lock)"],
+    "bug": ["AP-CAPITAL-002"],
+    "ambiguous": ["BR-CAPITAL-008 verify 후 수정 정책"]
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-CAPITAL-010"],
+    "brs_covered": ["BR-CAPITAL-008"],
+    "aps_intersected": ["AP-CAPITAL-002"]
+  }
+}

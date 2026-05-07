@@ -1,0 +1,213 @@
+{
+  "$comment": "★ phase 4.7 (characterization) coverage matrix — capital 모듈 / 다중책임 spectrum. 핵심 6 UC cover / 10 UC carry (Day 1 시간 cap 정합). ★ ★ ratchet + trend_required=true / legacy 첫 진입 baseline write.",
+  "project_id": "poc-07-efiweb-capital-spring41",
+  "snapshot_count": 7,
+  "scenario_count": 13,
+  "coverage_target": 0.80,
+  "coverage_minimum_legacy": 0.30,
+  "coverage_strategy": "ratchet",
+  "trend_required": true,
+  "matrix": [
+    {
+      "uc": "UC-CAPITAL-001",
+      "controller_method": "comBasicInfoListAjax",
+      "service_method": "selectComBasicInfoListAjax",
+      "sql_id": "selectComBasicInfoList",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-001 / 1 scenario (happy path 정렬)"],
+      "scope_decision": "covered (★ 핵심)"
+    },
+    {
+      "uc": "UC-CAPITAL-002",
+      "controller_method": "IfrsComINSetSave",
+      "service_method": "insertComINSetList",
+      "sql_id": "updateComCapitalInfo + insertComINSetList (SP _IFRSCapitalSetCom)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-002 / 2 scenario (happy + 부분 commit likely bug)"],
+      "scope_decision": "covered (★ 핵심 — atomicity bug)"
+    },
+    {
+      "uc": "UC-CAPITAL-003",
+      "controller_method": "IfrsCapitalStdAjax",
+      "service_method": "selectCapitalStdAjax",
+      "sql_id": "selectCapitalStdAjax (external IFRS_CAPITALSTD)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — external schema 의존 / DBA-read carry C-domain-PoC07-1"
+    },
+    {
+      "uc": "UC-CAPITAL-004",
+      "controller_method": "IfrsCapitalBizAjax",
+      "service_method": "selectCapitalBizAjax",
+      "sql_id": "selectCapitalBizAjax (external IFRS_CAPITALSTD)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — external schema 의존 / UC-003 와 동반 처분"
+    },
+    {
+      "uc": "UC-CAPITAL-005",
+      "controller_method": "IfrsERPINListAjax",
+      "service_method": "selectIfrsERPINList",
+      "sql_id": "selectIfrsERPINList",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — Day 1 시간 cap / sub-domain B SP 호출 패턴은 UC-006 cover 로 대표"
+    },
+    {
+      "uc": "UC-CAPITAL-006",
+      "controller_method": "IfrsERPINListSave",
+      "service_method": "insertERPINList",
+      "sql_id": "insertERPINList (SP _IFRSCapitalList)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-006 / 1 scenario (happy + SP 호출 + System.out.print AP)"],
+      "scope_decision": "covered (★ SP 다중 호출 대표)"
+    },
+    {
+      "uc": "UC-CAPITAL-007",
+      "controller_method": "IfrsERPOUTListAjax",
+      "service_method": "selectIfrsERPOUTList",
+      "sql_id": "selectIfrsERPOUTList",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — SGERP cross-system 호출 / Day 1 시간 cap"
+    },
+    {
+      "uc": "UC-CAPITAL-008",
+      "controller_method": "IfrsLoadSaveData",
+      "service_method": "selectLoadSaveData",
+      "sql_id": "selectLoadSaveData (iBATIS dynamic <isEqual>) + IfrsCapitalDeleteAjax",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-008 / 3 scenario (R + B + ★ ambiguous A)"],
+      "scope_decision": "covered (★ 핵심 — state machine + ambiguous BR-CAPITAL-005)"
+    },
+    {
+      "uc": "UC-CAPITAL-009",
+      "controller_method": "IfrsLoadSaveDataForReport",
+      "service_method": "selectLoadSaveDataForReport + selectLoadNonErpSaveData",
+      "sql_id": "selectLoadSaveDataForReport",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — UC-008 dynamic 분기 패턴 cover 로 대표 / non-ERP source 다음 PoC"
+    },
+    {
+      "uc": "UC-CAPITAL-010",
+      "controller_method": "selectCapitalVrify + insertCapitalVrify",
+      "service_method": "insertCapitalVrify",
+      "sql_id": "insertCapitalVrify (TB_CAPITAL_VRIFY)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-010 / 3 scenario (happy + try-catch + ★ ambiguous verify 후 수정)"],
+      "scope_decision": "covered (★ 핵심 — approval workflow + ambiguous BR-CAPITAL-008)"
+    },
+    {
+      "uc": "UC-CAPITAL-011",
+      "controller_method": "IfrsWeekReport1",
+      "service_method": "IfrsWeekReport1 + IfrsPreviousWeekEndDate",
+      "sql_id": "IfrsWeekReport1 (UNION ALL 3 + TB_DAY_EXCHANGE)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-011 / 1 scenario (★ Service 2회 호출 + 환율 가중 + Double parsing patch)"],
+      "scope_decision": "covered (★ 핵심 — cross-module 의존 + N+1 query)"
+    },
+    {
+      "uc": "UC-CAPITAL-012",
+      "controller_method": "IfrsWeekReport4",
+      "service_method": "IfrsWeekReport4",
+      "sql_id": "IfrsWeekReport4",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — UC-011 weekly report 1 패턴 cover 로 대표"
+    },
+    {
+      "uc": "UC-CAPITAL-013",
+      "controller_method": "IfrsWeekReport10",
+      "service_method": "IfrsWeekReport10",
+      "sql_id": "IfrsWeekReport10 (★ XML 인라인 String SP)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-CAPITAL-013 / 2 scenario (★ ★ AP-CAPITAL-005 XML 인라인 + AP-CAPITAL-006 DEAD parameter + AP-CAPITAL-010 logger)"],
+      "scope_decision": "covered (★ ★ ★ 다중책임 신규 AP — capital 만 발생 / PoC #06 isomorphic ❌)"
+    },
+    {
+      "uc": "UC-CAPITAL-014",
+      "controller_method": "IfrsWeekReport11",
+      "service_method": "IfrsWeekReport11",
+      "sql_id": "IfrsWeekReport11",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — UC-011 weekly report cover 로 대표"
+    },
+    {
+      "uc": "UC-CAPITAL-015",
+      "controller_method": "IfrsWeekReport13 + IfrsWeekReport14",
+      "service_method": "IfrsWeekReport13 + IfrsWeekReport14",
+      "sql_id": "IfrsWeekReport13/14 (★ XML 인라인 String SP / SAC ledger)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — UC-013 XML 인라인 패턴 cover 로 대표 / SAC ledger 본문은 다음 PoC"
+    },
+    {
+      "uc": "UC-CAPITAL-016",
+      "controller_method": "IfrsWeekRate + IfrsWeekRateList",
+      "service_method": "IfrsWeekRate + IfrsWeekRateList",
+      "sql_id": "IfrsWeekRate (TB_CAPITAL_LIST_RATE)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — TB_CAPITAL_LIST_RATE 단순 read / TB_DAY_EXCHANGE cross-module 의존 (BR-CAPITAL-009) 의 핵심은 UC-011 IfrsWeekReport1 SNAP 로 cover (★ source 검증 결과 IfrsWeekRate 자체는 TB_CAPITAL_LIST_RATE 만 read)"
+    }
+  ],
+  "coverage_summary": {
+    "ucs_total": 16,
+    "ucs_covered": 7,
+    "uc_coverage_ratio": "0.4375 (7/16)",
+    "service_methods_total_unique": 14,
+    "service_methods_covered": 7,
+    "service_method_coverage_ratio": "0.50 (7/14)",
+    "sql_ids_total_unique": 14,
+    "sql_ids_covered": 7,
+    "sql_coverage_ratio": "0.50 (7/14)",
+    "weighted_coverage": "0.48 (UC + service + sql 평균)",
+    "threshold_target": "≥ 0.80 (PoC #05 정합 / coverage_target)",
+    "threshold_status": "★ 미달 (-0.36) — Day 1 시간 cap (5h) 내 핵심 7 UC 만 / 나머지 9 UC carry. ★ ★ ★ legacy_minimum 0.30 ≤ 0.48 ✅ + ratchet 기준 → ★ baseline write 후 다음 회차 향상 의무",
+    "remediation": [
+      "★ Day 3 chain 1 planning-spec 진입 시 cover된 6 UC 만 use_cases 추출 의무",
+      "다음 PoC 또는 PoC #07 follow-up 시 UC-003/004 (external IFRS_CAPITALSTD) DBA-read 후 등재 → coverage 0.50+ 자격",
+      "★ phase 4.7 본체 schema 의 carry note 정합 — 다중책임 모듈 단일 PoC = 0.30~0.50 도 정합 (ratchet trend 기반)"
+    ]
+  },
+  "ratchet_baseline_write": {
+    "$comment": "★ ★ ★ v2.1.1 PATCH 도입 ratchet trend 첫 진입 케이스 — legacy 모듈 baseline write. 다음 회차 (PoC #07 follow-up 또는 다른 다중책임 PoC) 시 baseline + trend positive 의무.",
+    "baseline_uc_coverage": 0.4375,
+    "baseline_service_coverage": 0.50,
+    "baseline_sql_coverage": 0.50,
+    "baseline_weighted": 0.48,
+    "baseline_named_classified_ratio_day2_initial": 0.926,
+    "baseline_named_classified_ratio_day25_post_d2": 1.000,
+    "baseline_self_recognized_count": 4,
+    "trend_check_target": "다음 회차 ≥ baseline + 0.05 (ratchet 기준 / 자동 검증)"
+  },
+  "phase_4_7_second_application_findings": {
+    "$comment": "PoC #07 의 phase 4.7 두 번째 적용 (다중책임 spectrum) 에서 발견한 추가 carry 사항. PoC #06 의 F-PHASE7-001~004 는 본체 v2.1.0 carry note 로 흡수됨.",
+    "F-PHASE7-PoC07-1": "★ ★ 다중책임 spectrum 에서도 named_classified_ratio Day 2 초안만으로도 0.926 (≥ 0.80) — phase 4.7 단일 prompt 양 spectrum 동작 입증 강화 (Modern + Legacy 단일책임 + Legacy 다중책임 = 3 spectrum).",
+    "F-PHASE7-PoC07-2": "★ ★ self_recognized SATD = 다중책임 → ×4 신호 (4 BR/AP / KL-SATD 외부 권위 정합) — sub-rule 자격: 'self_recognized count ≥ 3 시 다중책임 모듈 의심' 자격 측정.",
+    "F-PHASE7-PoC07-3": "★ Stored Procedure 다수 호출 + cross-domain 직접 의존 = 다중책임 spectrum 의 핵심 신호 — chain 3/4 마이그레이션 시 service boundary 분리 의무 (ADR carry).",
+    "F-PHASE7-PoC07-4": "★ ★ XML 인라인 String 패턴 (AP-CAPITAL-005) = 다중책임 spectrum 의 신규 AP — PoC #06 isomorphic ❌ (단일책임 모듈에는 부재). 새 시스템 = DTO + Jackson XmlMapper 또는 SP signature 변경. ≥ 2 다중책임 PoC 후 본체 carry note 검토 자격.",
+    "F-PHASE7-PoC07-5": "★ AP-CAPITAL-012 (공유 SQL 조각 부재) = 양 PoC isomorphic (PoC #06 AP-EXCHANGE-011 + PoC #07 AP-CAPITAL-012 = 모두 0건) — Spring 4.1 + iBATIS 2 spectrum sub-rule 자격 강화 (Day 1.6 v2 흡수 증명)."
+  },
+  "acceptance_oracle_status": {
+    "$comment": "★ Day 2 초안 → Day 2.5 D2 결단 후 갱신 의무.",
+    "day_2_initial": {
+      "intent": 9,
+      "bug": 12,
+      "self_recognized": 4,
+      "ambiguous": 2,
+      "named_classified_ratio": "25/27 = 0.926"
+    },
+    "day_2_5_post_d2_decision": {
+      "intent": 10,
+      "bug": 13,
+      "self_recognized": 4,
+      "ambiguous": 0,
+      "named_classified_ratio": "★ 27/27 = 1.000 (+0.074)",
+      "remaining_ambiguous": [],
+      "_note": "★ ★ ★ 다중책임 spectrum 에서도 D2 결단 후 100% 명확 분류 도달 — phase 4.7 단일 prompt 양 spectrum 동작 입증 강화"
+    }
+  }
+}

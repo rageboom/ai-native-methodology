@@ -1,0 +1,62 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-011 자금일보 주간보고 1 (sub-domain G. WeeklyReport). ★ ★ ★ Service 2회 호출 + 전주 마지막 날짜 + cross-module exchange 환율 (TB_DAY_EXCHANGE) + Double parsing patch 핵심.",
+  "snapshot_id": "SNAP-UC-CAPITAL-011",
+  "use_case": "UC-CAPITAL-011",
+  "endpoint": "POST /ifrs/capital/IfrsWeekReport1",
+  "controller_method": "CapitalController.IfrsWeekReport1",
+  "service_method": "CapitalService.IfrsWeekReport1 + IfrsPreviousWeekEndDate",
+  "sql_id": "CapitalDAO.IfrsWeekReport1 (UNION ALL × 3 / TB_CAPITAL_LIST + TB_CAPITAL_ASSET + TB_DAY_EXCHANGE) + IfrsPreviousWeekEndDate",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재 — UNION ALL 3 결과는 SQL XML 분석 기반 추정",
+  "scenarios": [
+    {
+      "id": "SCN-CAPITAL-011-001",
+      "name": "happy path — 자금조달내역 주간보고 (sType=1+2+3 UNION + 환율 가중)",
+      "given": {
+        "request_params": {
+          "companyseq": "001",
+          "sdate": "20260501",
+          "edate": "20260507",
+          "serdate": "20260424",
+          "sType": "",
+          "curr": "USD"
+        },
+        "TB_DAY_EXCHANGE_initial_state": "(USD 환율 row 다수 / EXCHANGE_RATE 1300.50 추정)"
+      },
+      "when": "Map param = IfrsUtil.parameterToHm(request); Map IfrsWeekReport1 = capitalService.IfrsWeekReport1(param); String previousWeekEndDate = capitalService.IfrsPreviousWeekEndDate(param); → 전주 마지막 날짜 계산 → param 갱신 → 다시 IfrsWeekReport1(param) 호출 (★ 2회 호출);",
+      "then": {
+        "step_1_initial_call": "IfrsWeekReport1(param) → sType 1+2+3 UNION + 환율 가중 평균 cramt 결과",
+        "step_2_previous_week_call": "IfrsPreviousWeekEndDate(param) → 전주 마지막 영업일 (예: 20260424) 반환 / null 시 sdate default",
+        "step_3_basic_balance_calc": "★ if (!list.isEmpty() && null != list.get(0).get(\"cramt\")) basicBalance = Double.parseDouble(list.get(0).get(\"cramt\").toString()); else basicBalance = 0.0;",
+        "expected_response": "{ list: { weekReport: [...] }, previousWeekEndDate: 20260424, basicBalance: <Double> }",
+        "transaction_scope": "★ 명시 부재 — read 전용 / 트랜잭션 boundary 모호"
+      },
+      "intent_classification": [
+        { "rule": "BR-CAPITAL-006", "type": "intent", "note": "전주 마지막 영업일 잔액 자동 fetch = 자금일보 핵심" },
+        { "rule": "BR-CAPITAL-009", "type": "intent", "note": "TB_DAY_EXCHANGE cross-module 의존 = 환율 가중 의무 (회계 정합)" }
+      ],
+      "behavior_to_preserve": [
+        "전주 영업일 잔액 자동 fetch (BR-CAPITAL-006 / intent)",
+        "환율 가중 평균 cramt 계산 (BR-CAPITAL-009 / intent — IFRS 정합)",
+        "patch 2020.10.30 김승희 — null 시 0.0 default (NPE 회피 / intent)",
+        "sType 1 (CAPITAL_LIST) + 2 (CAPITAL_LIST 별도 grouping) + 3 (CAPITAL_ASSET 가중 마이너스 8) UNION ALL"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ Service 2회 호출 — 첫 호출 / 전주 마지막 날짜 fetch / 다시 호출 → N+1 query 패턴 + 트랜잭션 boundary 모호. 새 시스템 = 단일 query (sub-query) + read-only @Transactional 의무",
+        "★ AP-CAPITAL-011 (cross-domain 직접 의존 / TB_DAY_EXCHANGE) — module boundary 위반",
+        "★ String → Double parseDouble 강제 캐스팅 (BR-CAPITAL-006 patch / 새 시스템 = BigDecimal 회계 정합 의무)",
+        "★ AP-CAPITAL-004 (NOLOCK) — 회계 데이터 Dirty Read 위험"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-CAPITAL-006 (전주 잔액 fetch)", "BR-CAPITAL-009 (환율 가중)"],
+    "bug": ["Service 2회 호출 (N+1)", "AP-CAPITAL-011 (cross-module)", "Double parseDouble (BigDecimal 의무)", "AP-CAPITAL-004 (NOLOCK)"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-CAPITAL-011"],
+    "brs_covered": ["BR-CAPITAL-006", "BR-CAPITAL-009"],
+    "aps_intersected": ["AP-CAPITAL-004", "AP-CAPITAL-011"]
+  }
+}
