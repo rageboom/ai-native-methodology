@@ -32,10 +32,39 @@
 - C7 ✅ git tag v2.2.0-rc1 (★ prerelease / `3e973ce` 기준 / Tagger Rageboom 2026-05-07)
 - C8 (현재) — plan/research 4건 자산화 + STATUS C7 ✅
 
-**★ ★ ★ v2.2.0 final 격상 trigger 의무**:
-- ★ Modern ORM PoC #08 (★ MyBatis 3 annotation 또는 JPA QueryDSL 또는 TypeORM raw SQL spectrum / 14d cap)
-- 7d minimum cooling-off (2026-05-08 ~ 2026-05-15)
-- ★ 별도 session + 사용자 결단
+**★ ★ ★ v2.2.0 final 격상 trigger 의무 (★ ★ ★ 사용자 결단 수합 2026-05-07)**:
+
+★ ★ ★ 사용자 결단 = "우선 순위 대로 다 진행". paradigm-cross corroboration carry C-v2.2.0-6 = ★ 분해 (3 PoC 단계화):
+
+| 우선순위 | PoC | stack | 14d cap | paradigm 거리 (vs iBATIS 2 XML) | 사내 정합 | trigger 자격 |
+|---|---|---|---|---|---|---|
+| #1 | **PoC #08** | **MyBatis 3 XML** (★ source = `mybatis/jpetstore-6` 공식 reference webapp) | 14d | ★ 작음 (직계 후속 / XML) | ❌ (★ ★ 사용자 정정 2026-05-07: 사내 = iBATIS 2 단일 / MyBatis ❌) | ★ ★ weak corroboration (★ 본 방법론 일반화 자격 입증 용 / sub-rule 자격) |
+| #2 | **PoC #09** | **TypeORM raw SQL** (TS / Node.js / `query()` + `createQueryBuilder()`) | 14d | ★★★ 강 (Java→TS / paradigm + platform-cross) | ❌ (사내 ❌) | ★ ★ ★ paradigm-cross 자격 ★ 강 corroboration / **★ v2.2.0 final 격상 trigger 핵심 #1** |
+| #3 | PoC #10 | JPA QueryDSL (Java / type-safe builder DSL) | 14d | ★★ 중간 (DSL builder) | ❓ | DSL builder paradigm 보강 / v2.3.0 minor trigger |
+
+→ ★ ★ **reasonable assumption** (사용자 confirm 의무): v2.2.0 final 격상 = **PoC #08 + PoC #09 둘 다 종결 후** (사내 정합 + paradigm-cross 자격 ★ 강 합산). **PoC #10 = v2.3.0 minor 별도** (DSL builder 추가 paradigm 보강).
+→ 또는 v3.0.0 paradigm shift = ★ 모두 종결 후 일괄 release (option β / 6주+ release lag 수용 의지 사용자 confirm 시).
+
+**개별 carry 분해**:
+- C-v2.2.0-6a (★ PoC #08 MyBatis 3 / 14d cap / 사내 정합)
+- C-v2.2.0-6b (★ PoC #09 TypeORM raw SQL / 14d cap / ★ paradigm + platform-cross ★ 강 corroboration / v2.2.0 final 격상 trigger 핵심)
+- C-v2.2.0-6c (PoC #10 JPA QueryDSL / 14d cap / v2.3.0 minor trigger)
+
+**진입 정책**:
+- 7d minimum cooling-off (2026-05-08 ~ 2026-05-15) — v2.2.0 final 격상 결단 ❌ within. PoC 진입 자체는 cooling-off 와 별개.
+- ★ 각 PoC = 별도 session + plan/research + 사용자 정식 결단 (4원칙 1~3원칙)
+- ★ ★ PoC #08 사용자 confirm 2건 ★ resolved (2026-05-07): (i) 사내 양식 = ★ source 자체로 자동 처리 (jpetstore-6 = XML 위주) (ii) source = ★ (b) `mybatis/jpetstore-6` 공식 reference webapp
+- ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
+- v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단
+
+**Day 0 진입 (★ 본 session 2026-05-07)**:
+- ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-08-prelim-신설.md`
+- ✅ skeleton — `examples/poc-08-realworld-mybatis/{source,input,sql-inventory,characterization}/` + README
+- ✅ INDEX entry (line 24 v2.2.0-rc1 prerelease 직후 / paradigm-cross carry 직접 후속)
+- ✅ STATUS prelim 진입 표시 (본 영역)
+- ✅ 사용자 confirm 2건 resolved (★ source = (b) jpetstore-6 / 양식 = XML 자동 / 사용자 정정 흡수)
+- ⏳ Day 0.5~ = 별도 session 첫 plan + research + Day 1 jpetstore-6 source clone 진입
+- ★ 본 session commit ❌ (사용자 명시 시)
 
 ---
 
