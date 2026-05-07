@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/sql-inventory.schema.json",
+  "title": "SQL Inventory — phase 4.8 SQL 단위 11 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy)",
+  "description": "Deliverable #24 (★ v2.2.0-rc1 신설). ADR-CHAIN-007 phase 4.8 정합. Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 5 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags). ≥ 2 PoC isomorphic (★ scale-cross / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum).",
+  "x-spec-source": {
+    "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004)",
+    "feathers_characterization": "https://michaelfeathers.silvrback.com/characterization-testing",
+    "gartner_time": "https://www.leanix.net/en/blog/application-modernization-assessment",
+    "aws_map": "https://aws.noventiq.com/blogs/aws-migration-accelerator-program-map-assessment-cloud-migration-guide",
+    "mybatis_sqlmap_xml": "https://mybatis.org/mybatis-3/sqlmap-xml.html",
+    "mybatis_dynamic_sql": "https://mybatis.org/mybatis-3/dynamic-sql.html",
+    "ibatis2_developer_guide": "https://ibatis.apache.org/docs/java/pdf/iBATIS-SqlMaps-2_en.pdf",
+    "sonar_mybatis": "https://github.com/donhui/sonar-mybatis",
+    "schemaspy_6_0": "https://schemaspy.readthedocs.io/en/v6.0.0/configuration.html",
+    "render_claude_code_2025": "https://render.com/blog/ai-coding-agents-benchmark"
+  },
+  "type": "object",
+  "required": ["meta_confidence", "summary", "extraction_automation", "inventory"],
+  "additionalProperties": false,
+  "properties": {
+    "$comment": { "type": "string" },
+    "project_id": { "type": "string" },
+    "spectrum": {
+      "type": "string",
+      "description": "예: 'Spring 4.1 + iBATIS 2 / Legacy 적대성 4중 / 단일책임' / 'NestJS + TypeORM Modern (carry — Modern ORM PoC #08)'"
+    },
+    "corroboration_role": {
+      "type": "string",
+      "description": "예: '★ scale-cross corroboration #1 / Spring 4.1 + iBATIS 2 단일책임' / 'paradigm-cross carry — C-v2.2.0-6'"
+    },
+    "meta_confidence": { "$ref": "./meta-confidence.schema.json" },
+    "summary": { "$ref": "#/$defs/summary" },
+    "extraction_automation": { "$ref": "#/$defs/extractionAutomation" },
+    "inventory": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/sqlRecord" }
+    },
+    "patterns_extension_v2": { "$ref": "#/$defs/patternsExtensionV2" },
+    "phase_4_7_corroboration_role": {
+      "type": "object",
+      "description": "★ phase 4.7 cross-link role 명시 — corroboration #1/#2/#3 또는 N/A.",
+      "additionalProperties": true
+    },
+    "external_advice_absorption": {
+      "type": "object",
+      "description": "Opus 4.7 외부 조언 6 항목 흡수 매핑 (optional).",
+      "additionalProperties": true
+    },
+    "retrofit_purpose": {
+      "type": "string",
+      "description": "PoC retrofit 단계 산출 시 목적 명시 (예: 'corroboration #1 사실 확보 위해 PoC #06 6 SQL retrofit 적용')."
+    },
+    "carry_inventory_56_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "★ 시간 cap 정합 / 일부 record 만 cover / 나머지 carry summary."
+    }
+  },
+  "$defs": {
+    "sqlRecord": {
+      "type": "object",
+      "required": ["sql_id", "mapper_xml", "business_meaning", "dependent_tables", "intent_vs_bug_classification", "confidence"],
+      "additionalProperties": true,
+      "$comment": "★ additionalProperties: true — 사용자/PoC retrofit 단계 자연어 finding 용 (예: 'note' / 'cross-module-source' 등). 핵심 필드는 required + 명시 정의 / 향후 사용자 확장 친화.",
+      "properties": {
+        "sql_id": {
+          "type": "string",
+          "description": "★ 외부 6 / DAO.method 또는 mapper namespace.id (예: 'ExchangeDAO.selectExchangeList' / 'capital.selectLoadSaveData')."
+        },
+        "mapper_xml": {
+          "type": "string",
+          "description": "★ 외부 6 / XML 파일 path 또는 'inline' (Spring JDBC) / 'jpa' (JPA Repository) / 'typeorm' (TypeORM) / 'prisma' ($queryRaw)."
+        },
+        "mapper_xml_line": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "string", "description": "예: '1285 + 1292' (다중 위치 자연어)." }
+          ]
+        },
+        "statement_type": {
+          "type": "string",
+          "enum": ["PREPARED", "CALLABLE", "STATEMENT"],
+          "default": "PREPARED",
+          "description": "★ ★ Agent 1 강 권고 흡수 (MyBatis 14 표준 속성) — PREPARED (default / 일반 SQL) / CALLABLE (★ Stored Procedure 호출 / S_ExRateMigration / S_* prefix) / STATEMENT (드물게 사용)."
+        },
+        "called_from_screen": {
+          "type": "string",
+          "description": "★ 외부 6 / JSP recursive trace / Modern 시 'N/A — REST API only'."
+        },
+        "business_meaning": {
+          "type": "string",
+          "description": "★ 외부 6 / LLM ~70% + 도메인 expert 검증 carry."
+        },
+        "dynamic_branch": {
+          "type": "array",
+          "description": "★ 외부 6 / iBATIS dynamic tags + SQL CASE WHEN.",
+          "items": {
+            "type": "object",
+            "required": ["tag", "branch_count"],
+            "additionalProperties": true,
+            "properties": {
+              "tag": {
+                "type": "string",
+                "description": "예: '<isNotEmpty property=\"currCd\">' / 'SQL CASE WHEN (12 분기)' / iBATIS 2 전용 '<dynamic>' / '<iterate>' / '<isPropertyAvailable>' (carry C-v2.2.0-7)."
+              },
+              "line": {
+                "oneOf": [
+                  { "type": "integer", "minimum": 1 },
+                  { "type": "string", "description": "예: '다수' / '여러 위치'" }
+                ]
+              },
+              "branch_count": {
+                "oneOf": [
+                  { "type": "integer", "minimum": 1 },
+                  { "type": "string", "description": "예: '다수' (정확 count 부재)." }
+                ]
+              },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "dependent_tables": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ 외부 6 / FROM/JOIN regex / SchemaSpy 검증 가능."
+        },
+        "uc_link": {
+          "type": "string",
+          "description": "★ 본 추가 / planning-spec UC ID 또는 'N/A — supplementary' (cross-module 의존 시)."
+        },
+        "intent_vs_bug_classification": {
+          "type": "string",
+          "description": "★ 본 추가 / characterization-spec.json 4 분류 자연어 (intent / bug / ambiguous / self_recognized 키워드 ≥ 1 의무). 예: 'intent (BR-EXCHANGE-002 정합) + bug 동반 (AP-EXCHANGE-006)'."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "★ 본 추가 / meta-confidence 단계별 가중. carry_flags 에 'external_call_out_of_scope' 또는 'DBA-read' 시 ≤ 0.80 의무 (validator if/then)."
+        },
+        "carry_flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "DBA-read",
+              "proc-body",
+              "external_call_out_of_scope",
+              "domain-expert-review",
+              "domain-expert",
+              "scope-decision-carry",
+              "cross-domain",
+              "DRY-violation"
+            ]
+          },
+          "description": "★ 본 추가 / scope_decision 명시 enum. PoC #07 추가 (cross-domain / domain-expert / DRY-violation)."
+        },
+        "scope_decision": {
+          "type": "string",
+          "description": "예: 'covered' / 'carry — 시간 cap 정합' / 'out_of_scope'."
+        },
+        "patterns": {
+          "$ref": "#/$defs/patternObject",
+          "description": "★ optional / Legacy iBATIS 한정 / patterns_extension_v2 nested per record."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "carry_flags": {
+                "type": "array",
+                "contains": {
+                  "type": "string",
+                  "enum": ["external_call_out_of_scope", "DBA-read"]
+                }
+              }
+            },
+            "required": ["carry_flags"]
+          },
+          "then": {
+            "properties": {
+              "confidence": { "type": "number", "maximum": 0.80 }
+            },
+            "$comment": "★ external_call_out_of_scope 또는 DBA-read carry 시 confidence ≤ 0.80 의무."
+          }
+        }
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total_sql_operations", "by_type"],
+      "additionalProperties": true,
+      "properties": {
+        "total_sql_operations": { "type": "integer", "minimum": 0 },
+        "by_type": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 },
+          "description": "예: {select: 41, update: 4, insert: 9, delete: 3, procedure: 14}."
+        },
+        "dependent_tables_unique": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "external_calls_count": { "type": "integer", "minimum": 0 },
+        "external_calls": { "type": "array", "items": { "type": "string" } },
+        "dynamic_branch_count": { "type": "integer", "minimum": 0 },
+        "self_recognized_count": { "type": "integer", "minimum": 0 },
+        "intent_count": { "type": "integer", "minimum": 0 },
+        "bug_count": { "type": "integer", "minimum": 0 },
+        "ambiguous_count": { "type": "integer", "minimum": 0 },
+        "covered_in_this_poc": { "type": "integer", "minimum": 0 },
+        "carry": { "type": "integer", "minimum": 0 },
+        "coverage_ratio": {
+          "type": "string",
+          "description": "예: '15/71 = 21.1%' / scope_decision: carry 자연어 명시."
+        }
+      }
+    },
+    "extractionAutomation": {
+      "type": "object",
+      "required": ["auto_extracted_columns", "manual_columns", "auto_ratio_external_6"],
+      "additionalProperties": true,
+      "properties": {
+        "auto_extracted_columns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "manual_columns": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "auto_ratio_external_6": {
+          "type": "string",
+          "pattern": "^\\d+/6 = \\d+(\\.\\d+)?% ?",
+          "description": "★ 외부 6 컬럼 (sql_id / mapper_xml / called_from_screen / business_meaning / dynamic_branch / dependent_tables) 자동/수동 비율. 예: '4/6 = 66.7% (≥ 50% pass)'."
+        },
+        "auto_ratio_external_7": {
+          "type": "string",
+          "description": "★ statement_type 추가 후 비율 (예: '5/7 = 71.4%')."
+        },
+        "auto_ratio_total_11": {
+          "type": "string",
+          "description": "11 컬럼 전체 자동/수동 비율 (참고 / 본 추가 4 컬럼은 metadata)."
+        },
+        "comparison_to_prior_poc": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "이전 PoC 와의 비교 (poc_06_auto_ratio / poc_07_auto_ratio / delta / note)."
+        }
+      }
+    },
+    "patternsExtensionV2": {
+      "type": "object",
+      "description": "★ optional / Legacy iBATIS 한정 / 4 패턴 nested. patterns_extension_v3 (cache / discriminator / typeHandler) carry C-v2.2.0-3.",
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": { "type": "string" },
+        "user_decision": { "type": "string" },
+        "aggregate_metrics": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "pattern_1_dynamic_branch": { "type": "object", "additionalProperties": true },
+            "pattern_2_calculation_formula": { "type": "object", "additionalProperties": true },
+            "pattern_3_result_mapping": { "type": "object", "additionalProperties": true },
+            "pattern_4_shared_sql_fragments": { "type": "object", "additionalProperties": true }
+          }
+        },
+        "core_record_extension": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "patternObject": {
+      "type": "object",
+      "description": "★ per record nested patterns (optional / Legacy 한정).",
+      "additionalProperties": true
+    }
+  }
+}

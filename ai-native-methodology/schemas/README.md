@@ -40,6 +40,12 @@
 |---|---|---|
 | `characterization-spec.schema.json` | Deliverable #23 / phase 4.7 / 의도 vs 버그 4분류 + Given/When/Then snapshot acceptance oracle + ratchet coverage | BE/FE 공통 (≥ 2 PoC corroboration: PoC #06 Legacy + PoC #03 Modern) |
 
+## Phase 4.8 — sql-inventory (★ v2.2.0-rc1 신설)
+
+| Schema | 대응 산출물 | 트랙 |
+|---|---|---|
+| `sql-inventory.schema.json` | Deliverable #24 / phase 4.8 / SQL 단위 11 컬럼 인벤토리 (외부 6 + statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags) + extraction_automation + patterns_extension_v2 (optional Legacy) | BE/RDB 한정 (★ ★ ≥ 2 PoC scale-cross corroboration: PoC #06 단일책임 + PoC #07 다중책임 / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6) |
+
 ## Cross-cutting — aspect 4
 
 | Schema | 대응 산출물 |

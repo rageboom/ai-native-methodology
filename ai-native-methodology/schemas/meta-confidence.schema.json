@@ -39,7 +39,8 @@
           "domain_context_md",
           "postman_or_api_test",
           "diagrams_other",
-          "characterization"
+          "characterization",
+          "sql_inventory"
         ]
       },
       "minItems": 1,
