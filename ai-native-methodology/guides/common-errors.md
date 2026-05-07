@@ -27,7 +27,7 @@
 
 ### Q3. README v1.4.2 / CLAUDE v1.3.0 / plugin.json v2.0.0-rc1 — 어느 게 맞나?
 
-★ ★ cleanup round 2-A 직전 (2026-05-06 b25a8ad commit 전) build 받은 사용자만 해당. 본 commit 이후 = 모두 v2.0.0-rc1 정합.
+★ ★ cleanup round 2-A 직전 (2026-05-06 b25a8ad commit 전) build 받은 사용자만 해당. 본 commit 이후 = 모두 v2.0.0 정합 (★ v2.0.0 final 2026-05-07~).
 
 **해결**: 최신 dist artifact 재다운로드 + reinstall.
 
@@ -104,12 +104,12 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 ### Q11. dist artifact size — file count 너무 많지 않나?
 
-★ cleanup round 2 후 v2.0.0-rc1 = **251 files**. workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE. 추가 정돈 carry = round 2-D + Round 2-C 후속.
+★ cleanup round 2 series 종결 후 v2.0.0 = **256 files**. workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE / guides/ 5 자산 + 각 폴더 README 정합 / paradigm v2.0.0 정식.
 
 ### Q12. CHECKSUMS.txt 무결성 검증 fail
 
 ```bash
-cd dist/ai-native-methodology-v2.0.0-rc1
+cd dist/ai-native-methodology-v2.0.0
 shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 # → 어느 파일 hash mismatch 인지 확인
 ```

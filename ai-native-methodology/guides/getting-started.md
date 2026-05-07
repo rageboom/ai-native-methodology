@@ -1,4 +1,4 @@
-# Getting Started — 10분 walkthrough (★ v2.0.0-rc1 chain harness validated)
+# Getting Started — 10분 walkthrough (★ ★ ★ v2.0.0 chain harness validated 정식 release)
 
 본 가이드 = plugin install 직후 첫 100 line. 사용자가 자기 legacy 코드 분석 + chain harness 진입까지 10분.
 
@@ -6,7 +6,7 @@
 
 ```bash
 # Claude Code 세션에서:
-/plugin marketplace add /absolute/path/to/ai-native-methodology-v2.0.0-rc1
+/plugin marketplace add /absolute/path/to/ai-native-methodology-v2.0.0
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
 ```
@@ -17,7 +17,7 @@
 
 ```bash
 # version-check
-/plugin                  # 대화형 manager — Installed 탭 / v2.0.0-rc1 확인
+/plugin                  # 대화형 manager — Installed 탭 / v2.0.0 확인
 ```
 
 본 plugin install 후 dist root 에 다음 자산 만남:
