@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.0.0",
-  "description": "★ ★ ★ v2.0 — SDLC 4단계 chain harness (legacy → planning → spec → test → impl). chain harness validated (5 요소 코드 enforcement + 218 unit test + ≥ 2 PoC corroboration / clean clone 재실행 통과). 1차 single-case = legacy-extraction 모드 / round-trip = chain harness gate 안에서 정식 허용 / 70~80% 한계 명시 잔존.",
+  "version": "2.1.0",
+  "description": "★ ★ ★ v2.1 — SDLC 4단계 chain harness + ★ phase 4.7 characterization 본체 격상 (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration). chain harness validated (5 요소 코드 enforcement + 228 unit test). 1차 single-case = legacy-extraction 모드 / round-trip = chain harness gate 안에서 정식 허용 / 70~80% 한계 명시 잔존.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

@@ -9,7 +9,89 @@
 
 ---
 
-## [v2.0.0] — 2026-05-07 ⭐ 현재 (★ ★ ★ ★ ★ ★ MAJOR FINAL release — chain harness validated / SDLC 4단계 i-strict / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과)
+## [v2.1.0] — 2026-05-07 ⭐ 현재 (★ ★ MINOR — phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration)
+
+> **★ ★ MINOR** — v2.0.0 MAJOR FINAL release (2026-05-07 / 같은 날) 직후 phase 4.7 본체 격상. ≥ 2 PoC corroboration 사실 확보 (PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern retrofit / DEC-2026-05-07-poc-06-종결 + DEC-2026-05-07-poc-07-poc03-phase7-retrofit) → 본체 자산 6 + workflow spec 1 격상. chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만.
+
+### v2.1.0 본체 격상 자산 (6 + 1 workflow)
+
+| 자산 | 위치 | 의도 |
+|---|---|---|
+| deliverable | `methodology-spec/deliverables/23-characterization-spec.md` | 산출물 23 (★ #16~22 사용 중 / 23 신규) |
+| schema | `schemas/characterization-spec.schema.json` (★ 30번째) | 4 sub-schema (snapshot + scenario + intentVsBug + coverage) + if/then 강제 |
+| meta-confidence enum | `schemas/meta-confidence.schema.json` `inputs_used` 12 → 13 | `characterization` 추가 |
+| skill | `skills/analysis/phase-4-7-characterization/SKILL.md` | 단일 prompt 양 spectrum (skills 19 → 20 / Cursor/Cline/Aider 표준) |
+| tool | `tools/characterization-coverage-validator/` (★ workspace 13번째) | 8 검증 + 10 unit test |
+| flow | `flows/analysis.phase-flow.{json,mermaid}` v1.5.0 → v2.1.0 | phase 4.7 entry + 5-x depends_on 갱신 |
+| workflow spec | `methodology-spec/workflow/phase-4-7-characterization.md` | drift-validator 3-way 회귀 통과 |
+| ADR | `docs/adr/ADR-CHAIN-006-phase-4-7-characterization.md` | 4 정책 명문화 (위치 + 단일 prompt + 4분류 + ratchet) |
+
+### 외부 권위 (research-v210 §4 / 12종)
+
+- Michael Feathers, *Working Effectively with Legacy Code* (2004) §13 — Characterization Test
+- Gojko Adzic, *Specification by Example* (2011) — Given/When/Then BDD
+- Cucumber Gherkin Reference (Feature / Scenario / Tag 표준)
+- Maldonado & Shihab (2015) — Self-Admitted Technical Debt (SATD/KL-SATD)
+- Springer SQJ 2024 — KL-SATD ↔ SonarQube 학술
+- PIT (PITest) / Stryker Mutator — coverage threshold 80% 산업 표준
+- BullseyeCoverage — minimum coverage gate (80% line + 70% branch)
+- jest-coverage-ratchet (npm) — legacy ratchet pattern
+- Cursor / Cline / Aider — 단일 prompt + context retrieval / 분기 ❌
+
+### research 빈틈 3건 흡수 (D6 = a / 모두 흡수)
+
+1. ★ Modern PoC self_recognized = 0 정합 (`schemas/characterization-spec.schema.json` description 명시)
+2. ★ ratchet schema 분리 (`coverage_target` + `coverage_minimum_legacy` + `coverage_strategy` enum)
+3. ★ Gherkin tag 표준 dual encoding (snapshot scenario `feature` + `tags` optional 필드)
+
+### ≥ 2 PoC corroboration (★ §8.1 strict)
+
+| PoC | spectrum | 명확 분류 비율 | self_recognized | ambiguous |
+|---|---|---|---|---|
+| **PoC #06** (Spring 4.1 + iBATIS) | Legacy 적대성 4중 | 17/18 = 94% (D2 후) | 1 (AP-007 자조) | 1 (DBA carry) |
+| **PoC #03 retrofit** (NestJS Modern) | Modern | 30/30 = 100% | 0 (자연 부재) | 0 |
+
+### unit test 회귀 (218 → 228)
+
+| workspace | 직전 (v2.0.0) | 현재 (v2.1.0) |
+|---|---|---|
+| drift-validator | 47 | 47 (변경 없음 / phase 4.7 entry 자동 인식) |
+| chain-driver | 68 | 68 |
+| 그 외 10 도구 | 94 | 94 |
+| ★ characterization-coverage-validator | — | **10** (★ 신설) |
+| **workspace 합계** | 209 | ★ 219 |
+| release-readiness self-test | 9 | 9 |
+| **총 합계** | 218 | ★ ★ **228** |
+
+### Carry (v2.1.x patch / v2.x)
+
+| ID | 항목 | trigger |
+|---|---|---|
+| C-v2.1.0-1 | snapshot Gherkin (.feature) 변환 출력 | v2.1.x patch / 사용자 finding |
+| C-v2.1.0-2 | Modern 환경 명확 비율 ≥ 95% 자동 detect | v2.2+ |
+| C-v2.1.0-3 | acceptance oracle threshold dashboard | v2.x |
+| C-v2.1.0-4 | F-PHASE7-001~004 일반화 검토 (≥ 3 PoC corroboration 후) | ≥ 3 PoC corroboration |
+| C-v2.1.0-5 | ratchet `trend_required=true` 자동 검증 (baseline.js 통합) | v2.1.x patch |
+| C-v2.1.0-6 | ts-morph + 실 환경 (DB) snapshot 자동 추출 | v2.x |
+| C-v2.1.0-7 | sub-rule 추가 (Spring Boot 3 / FastAPI / Express 등 다른 spectrum) | 사용자 PoC corroboration |
+
+### 진입 자격 (사용자 결단 D6 = (a) / Senior cooling-off (a) 즉시 final)
+
+| 자격 | 충족 |
+|---|---|
+| ≥ 2 PoC corroboration | ✅ PoC #06 + PoC #03 retrofit |
+| 명시 carry | ✅ C-v2.1.0-1~7 |
+| 본체 격상 자산 | ✅ 6 + 1 workflow |
+| unit test 회귀 통과 | ✅ 219 workspace + 9 release = 228 |
+| build dist | ✅ ai-native-methodology-v2.1.0/ |
+| release-readiness 7/7 | ✅ |
+| chain harness 5 요소 변경 | ❌ (analysis stage 내부만 / scope 작음) |
+
+★ release / git tag `v2.1.0` 의무.
+
+---
+
+## [v2.0.0] — 2026-05-07 (★ ★ ★ ★ ★ ★ MAJOR FINAL release — chain harness validated / SDLC 4단계 i-strict / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과)
 
 > **★ ★ ★ MAJOR FINAL** — 2026-05-06 v2.0.0-rc1 prerelease 후 24h+ cooling-off (Senior F4 요구사항) 통과. clean clone (`/tmp/aimd-clean-clone.*/`) 환경에서 npm install + npm test (218 pass) + release:check 7/7 ✅ + PoC #05 vitest 6/6 GREEN 모두 통과 → final tag 자격 충족.
 
