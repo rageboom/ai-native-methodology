@@ -1,0 +1,205 @@
+{
+  "$comment": "★ PoC #07 prelim — capital 모듈 도메인 추출. ★ ★ 다중책임 → UC ↑ (vs PoC #06 exchange 7 UC). 시간 cap 정합 — 핵심 sub-domain (A + B + D + G) 만 본격 / C/E/F/H/I/J/K = scope_decision: carry.",
+  "project_id": "poc-07-efiweb-capital-spring41",
+  "domain_layer": "L0 (자연어) — Capital 자본 일보 도메인 (다중책임 / IFRS 회계)",
+  "use_cases": [
+    {
+      "id": "UC-CAPITAL-001",
+      "name": "법인 기초정보 조회 (comBasicInfo)",
+      "endpoint": "/ifrs/capital/comBasicInfo",
+      "sql_ids": ["selectComBasicInfoList"],
+      "sub_domain": "A. ComBasicInfo",
+      "scope_decision": "covered (★ 핵심)"
+    },
+    {
+      "id": "UC-CAPITAL-002",
+      "name": "법인 기본정보 갱신 (updateComCapitalInfo)",
+      "endpoint": "/ifrs/capital/IfrsComINSetSave",
+      "sql_ids": ["updateComCapitalInfo", "insertComINSetList"],
+      "sub_domain": "A. ComBasicInfo",
+      "scope_decision": "covered (★ 핵심)"
+    },
+    {
+      "id": "UC-CAPITAL-003",
+      "name": "Capital Std 조회 (CompanySeq + sType=1 / IFRS_CAPITALSTD external schema 의존)",
+      "endpoint": "/ifrs/capital/IfrsCapitalStdAjax",
+      "sql_ids": ["selectCapitalStdAjax"],
+      "sub_domain": "B. CapitalStd/Biz/ERP",
+      "scope_decision": "covered",
+      "note": "★ external schema (LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD) 의존 / DBA-read carry"
+    },
+    {
+      "id": "UC-CAPITAL-004",
+      "name": "Capital Biz 조회 (sType=2 / IFRS_CAPITALSTD external schema)",
+      "endpoint": "/ifrs/capital/IfrsCapitalBizAjax",
+      "sql_ids": ["selectCapitalBizAjax"],
+      "sub_domain": "B. CapitalStd/Biz/ERP",
+      "scope_decision": "covered"
+    },
+    {
+      "id": "UC-CAPITAL-005",
+      "name": "ERP 보통예금 입금 List 조회 (자금일보 자금조달내역 작성)",
+      "endpoint": "/ifrs/capital/IfrsERPINListAjax",
+      "sql_ids": ["selectIfrsERPINList"],
+      "sub_domain": "B. CapitalStd/Biz/ERP",
+      "scope_decision": "covered"
+    },
+    {
+      "id": "UC-CAPITAL-006",
+      "name": "ERP 입금 등록 일괄 저장 (insertERPINList)",
+      "endpoint": "/ifrs/capital/IfrsERPINListSave",
+      "sql_ids": ["insertERPINList", "IfrsWEEKINListSave"],
+      "sub_domain": "B. CapitalStd/Biz/ERP",
+      "scope_decision": "covered",
+      "note": "★ Stored Procedure 다중 호출 / proc-body carry"
+    },
+    {
+      "id": "UC-CAPITAL-007",
+      "name": "ERP 출금 List 조회 (capital withdraw / SAC ledger)",
+      "endpoint": "/ifrs/capital/IfrsERPOUTListAjax",
+      "sql_ids": ["selectIfrsERPOUTList"],
+      "sub_domain": "B. CapitalStd/Biz/ERP",
+      "scope_decision": "covered",
+      "note": "★ SGERP cross-system 호출"
+    },
+    {
+      "id": "UC-CAPITAL-008",
+      "name": "Save / Load 데이터 (자금일보 임시 저장)",
+      "endpoint": "/ifrs/capital/IfrsLoadSaveData",
+      "sql_ids": ["selectLoadSaveData", "IfrsCapitalDeleteAjax"],
+      "sub_domain": "D. SaveLoad",
+      "scope_decision": "covered (★ 핵심)"
+    },
+    {
+      "id": "UC-CAPITAL-009",
+      "name": "Save / Load 보고서 데이터 (selectLoadSaveDataForReport / non-ERP)",
+      "endpoint": "/ifrs/capital/IfrsLoadSaveDataForReport",
+      "sql_ids": ["selectLoadSaveDataForReport", "selectLoadNonErpSaveData"],
+      "sub_domain": "D. SaveLoad",
+      "scope_decision": "covered"
+    },
+    {
+      "id": "UC-CAPITAL-010",
+      "name": "★ Capital Verify (자본 검증 / 결재 lock)",
+      "endpoint": "/ifrs/capital/selectCapitalVrify, /ifrs/capital/insertCapitalVrify",
+      "sql_ids": ["selectCapitalVrify", "insertCapitalVrify"],
+      "sub_domain": "I. Comment+Verify",
+      "scope_decision": "covered (★ 핵심 verify)"
+    },
+    {
+      "id": "UC-CAPITAL-011",
+      "name": "★ ★ 자금일보 주간보고 1 (IfrsWeekReport1 — 자금조달내역 / cramt)",
+      "endpoint": "/ifrs/capital/IfrsWeekReport1",
+      "sql_ids": ["IfrsWeekReport1", "IfrsPreviousWeekEndDate"],
+      "sub_domain": "G. WeeklyReport (★ 핵심)",
+      "scope_decision": "covered",
+      "note": "★ 전주 마지막 날짜 잔액 가져오기 / sType=3 / Double parsing 으로 String→Double 변환 (★ AP 시그널 - List<Map> 강제 캐스팅)"
+    },
+    {
+      "id": "UC-CAPITAL-012",
+      "name": "주간보고 4 (IfrsWeekReport4 / List<Map> 결과)",
+      "endpoint": "/ifrs/capital/IfrsWeekReport4",
+      "sql_ids": ["IfrsWeekReport4"],
+      "sub_domain": "G. WeeklyReport",
+      "scope_decision": "covered"
+    },
+    {
+      "id": "UC-CAPITAL-013",
+      "name": "★ 주간보고 10 (IfrsWeekReport10 — ★ XML 인라인 String / SAC ledger / 보통예금 ERP 조회)",
+      "endpoint": "/ifrs/capital/IfrsWeekReport10",
+      "sql_ids": ["IfrsWeekReport10"],
+      "sub_domain": "G. WeeklyReport",
+      "scope_decision": "covered",
+      "note": "★ ★ AP-CAPITAL-005 — xmlDocument String 인라인 (Controller 1769~1785) / 데이터 모델 부재 / DEAD parameter (comNo 파싱 후 미사용)"
+    },
+    {
+      "id": "UC-CAPITAL-014",
+      "name": "주간보고 11 (저장 / userId 추가 ICM-11763 patch 2022-03-15)",
+      "endpoint": "/ifrs/capital/IfrsWeekReport11",
+      "sql_ids": ["IfrsWeekReport11"],
+      "sub_domain": "G. WeeklyReport",
+      "scope_decision": "covered"
+    },
+    {
+      "id": "UC-CAPITAL-015",
+      "name": "주간보고 13/14 (IfrsWeekReport13/14 — XML 인라인 / SAC ledger 잔액)",
+      "endpoint": "/ifrs/capital/IfrsWeekReport13, /ifrs/capital/IfrsWeekReport14",
+      "sql_ids": ["IfrsWeekReport13", "IfrsWeekReport14"],
+      "sub_domain": "G. WeeklyReport",
+      "scope_decision": "covered",
+      "note": "★ AP-CAPITAL-005 동일 / System.out.print(AssetList) line 1852 (★ AP-CAPITAL-010 logger 미사용 / SATD)"
+    },
+    {
+      "id": "UC-CAPITAL-016",
+      "name": "주간 환율 List (IfrsWeekRate, IfrsWeekRateList — TB_DAY_EXCHANGE 의존 / cross-domain)",
+      "endpoint": "/ifrs/capital/IfrsWeekRate, /ifrs/capital/IfrsWeekRateList",
+      "sql_ids": ["IfrsWeekRate", "IfrsWeekRateList"],
+      "sub_domain": "G. WeeklyReport",
+      "scope_decision": "covered",
+      "note": "★ ★ cross-domain 의존 (TB_DAY_EXCHANGE = exchange 모듈 / PoC #06 selectDayExchangeList 와 isomorphic)"
+    },
+    {
+      "id": "UC-CAPITAL-017+",
+      "name": "★ ~14 추가 핵심 endpoint (UC-CAPITAL-017 ~ ~030 / Asset / CapitalReport / CapitalReport1~4 / CapitalAccountAction / CapitalDepositAction / CapitalWithdrawAction / mailList / saveMail / etc)",
+      "scope_decision": "★ 부분 cover (Day 1.5 시간 cap 정합)",
+      "note": "추가 cover 의무 시 PoC #07 carry 또는 본격 Day 1 +2h"
+    }
+  ],
+  "aggregates": [
+    {
+      "name": "CapitalReport (자본 일보)",
+      "root_table": "TB_CAPITAL_LIST",
+      "supporting_tables": ["TB_CAPITAL_LIST_COPY", "TB_CAPITAL_LIST_IMGSRC", "TB_CAPITAL_LIST_USERSET"],
+      "ucs": ["UC-CAPITAL-008", "UC-CAPITAL-009"]
+    },
+    {
+      "name": "CapitalAsset (자산)",
+      "root_table": "TB_CAPITAL_ASSET",
+      "supporting_tables": ["TB_CAPITAL_ASSET_BAK"],
+      "ucs": ["UC-CAPITAL-017+ (carry)"]
+    },
+    {
+      "name": "WeeklyReport (주간보고)",
+      "root_table": "TB_WEEK_CALENDAR",
+      "supporting_tables": ["TB_WEEK_CALENDAR_ROW", "TB_HOLIDAY"],
+      "ucs": ["UC-CAPITAL-011", "UC-CAPITAL-012", "UC-CAPITAL-013", "UC-CAPITAL-014", "UC-CAPITAL-015", "UC-CAPITAL-016"]
+    },
+    {
+      "name": "CapitalVerify (검증)",
+      "root_table": "TB_CAPITAL_VRIFY",
+      "ucs": ["UC-CAPITAL-010"]
+    },
+    {
+      "name": "CompanyMaster (회사 마스터)",
+      "root_table": "TB_COMPANY",
+      "supporting_tables": ["TB_DEPARTMENT"],
+      "ucs": ["UC-CAPITAL-001", "UC-CAPITAL-002"]
+    }
+  ],
+  "external_systems": [
+    {
+      "name": "ERP (LIVE_SQL.SGERP.dbo)",
+      "type": "Cross-system DB schema",
+      "sps_called": ["sg_SACAccRemPrintQuery", "_IFRSCapitalSetCom", "_IFRSCapitalSetAcc", "SG_SACCashOnQuery_Capital", "_SACLedgerQueryAccBalance", "SG_SACLedgerQueryAccRemBalance_Capital", "_SACLedgerQueryAccRemBalance", "_SACAccRemForQuery"],
+      "carry_flag": "DBA-read"
+    },
+    {
+      "name": "IFRS schema (IFRS.dbo / external)",
+      "type": "External schema",
+      "sps_called": ["_IFRSCapitalList", "_IFRSCapitalListAsset", "_IFRSWeekList"],
+      "carry_flag": "DBA-read + proc-body"
+    },
+    {
+      "name": "Mail (JavaMailSender / SMTP)",
+      "type": "Email delivery",
+      "carry_flag": "scope ❌ (E. Mail = carry)"
+    }
+  ],
+  "domain_meta_confidence": {
+    "ucs_total": 30,
+    "ucs_covered_in_this_poc": 16,
+    "ucs_carry": 14,
+    "coverage_ratio": "16/30 = 53.3% (★ 시간 cap 정합 / 사용자 D10 3/4 pass 정합)",
+    "$comment": "★ ★ ★ 다중책임 → UC ↑↑ (vs PoC #06 exchange 7 UC) — 시간 cap 정합 위해 핵심 sub-domain (A + B + D + G + I) 16 UC 만 본격."
+  }
+}

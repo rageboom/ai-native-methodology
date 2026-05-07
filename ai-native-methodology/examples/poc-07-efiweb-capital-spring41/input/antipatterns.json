@@ -1,0 +1,140 @@
+{
+  "$comment": "★ PoC #07 prelim — capital 모듈 AP 추출. ★ ★ 다중책임 → AP ↑ (vs PoC #06 10 AP). 핵심 ~10 AP cover.",
+  "project_id": "poc-07-efiweb-capital-spring41",
+  "antipatterns": [
+    {
+      "id": "AP-CAPITAL-001",
+      "title": "★ ★ Controller 비대 (God Controller / 2536 LOC / 87 endpoint)",
+      "natural_language": "CapitalController = 2536 LOC × 87 endpoint 단일 클래스 — Single Responsibility Principle 명백 위반. 11 sub-domain 도메인 혼재 (A~K)",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": ["CapitalController.java (전체)"],
+      "modern_alternative": "★ sub-domain 분리 (CapitalReportController / CapitalAssetController / WeeklyReportController / MailController / etc) + DDD bounded context",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "AP-EXCHANGE-002 (Anemic Service) 와 isomorphic — Service 비대 vs Controller 비대"
+    },
+    {
+      "id": "AP-CAPITAL-002",
+      "title": "Map<String,Object> + 강제 캐스팅 / type safety 부재",
+      "natural_language": "request → Map param 패턴 (IfrsUtil.parameterToHm) + Map<String, Object> 결과 + (Double)/(String) 강제 캐스팅. 구조 변경 시 runtime fail",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["CapitalController.java 전체 endpoint"],
+      "modern_alternative": "★ DTO + Bean Validation + record (Java 16+) 또는 Spring DataBinder",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "AP-EXCHANGE-001 (Map + 강제 캐스팅) 동일 패턴"
+    },
+    {
+      "id": "AP-CAPITAL-003",
+      "title": "Anemic Service / 단순 위임 패턴",
+      "natural_language": "CapitalServiceImpl 의 60 method = 대부분 capitalDAO.method(param) 단순 위임. 비즈니스 로직 = Controller / DAO / SQL 분산",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["CapitalServiceImpl.java"],
+      "modern_alternative": "★ Domain Service + Application Service 분리 / Aggregate Root behavior in domain",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "AP-EXCHANGE-002 (Anemic Service) 정합"
+    },
+    {
+      "id": "AP-CAPITAL-004",
+      "title": "WITH(NOLOCK) 무차별 사용",
+      "natural_language": "capital.xml 다수 SELECT 에 WITH(NOLOCK) — Dirty Read 위험. 회계 데이터 (자본 보고) 에 특히 위험",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["capital.xml (다수 SELECT)"],
+      "modern_alternative": "★ READ_COMMITTED_SNAPSHOT / Optimistic Concurrency Control",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "AP-EXCHANGE-004 동일 패턴"
+    },
+    {
+      "id": "AP-CAPITAL-005",
+      "title": "★ ★ XML 인라인 String 생성 (xmlDocument)",
+      "natural_language": "★ IfrsWeekReport10 + IfrsWeekReport13 + IfrsWeekReport14 + IfrsAssetListAjax3+4+6 등 — Java String 으로 XML 인라인 작성 → SP 파라미터 전달. 데이터 모델 부재 / SQL injection 위험 / XML escape 처리 부재",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": ["CapitalController.java:1769-1785 (IfrsWeekReport10) + 1829-1846 (IfrsWeekReport13) + Asset 영역"],
+      "modern_alternative": "★ DTO + JAXB / Jackson XmlMapper / 또는 DB 측 SP signature 변경 (XML → JSON 또는 normalized parameters)",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "★ ★ ★ 신규 — PoC #06 에 없던 패턴 (★ exchange 단일책임 vs capital ERP cross-system 의존 차이)",
+      "domain_carry": "★ DBA — SP signature 의 XML 입력 의무 검증"
+    },
+    {
+      "id": "AP-CAPITAL-006",
+      "title": "DEAD parameter (comNo 파싱 후 미사용)",
+      "natural_language": "★ IfrsWeekReport10 + IfrsWeekReport13 — request.getParameter(\"comNo\") 파싱 / xmlDocument 안에 미포함 / Service 호출 param 에도 ❌. comNo 사용 의도 ↔ 실제 ❌ drift",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["CapitalController.java:1767 + 1827"],
+      "modern_alternative": "★ 사용하지 않는 parameter 제거 / 또는 의도 정합 시 SP 호출 param 에 추가",
+      "is_likely_bug": true
+    },
+    {
+      "id": "AP-CAPITAL-007",
+      "title": "이미지 base64 인라인 / DB 비대",
+      "natural_language": "★ canvasUpload + ajax_canvasUpload_proc → 이미지 binary 를 base64 String 으로 변환 → TB_CAPITAL_LIST_IMGSRC 저장. DB 비대 (수백 KB ~ MB per row) + IO 비용 + 백업/복원 비용 ↑",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["CapitalController.java:921-1046"],
+      "modern_alternative": "★ S3 (또는 사내 object storage) + DB 에는 URL 만 저장 + presigned URL 패턴",
+      "is_likely_bug": true
+    },
+    {
+      "id": "AP-CAPITAL-008",
+      "title": "★ // TODO Auto-generated method stub (★ self_recognized SATD)",
+      "natural_language": "★ CapitalServiceImpl.java:687 // TODO Auto-generated method stub — IDE Eclipse 자동 생성 후 미구현 그대로 commit. 실제 method body ❌ → runtime NoOp 또는 NPE 위험",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["CapitalServiceImpl.java:687"],
+      "modern_alternative": "★ method 제거 또는 정식 구현 + UnsupportedOperationException 명시 의무",
+      "is_likely_bug": true,
+      "is_self_recognized": true,
+      "note": "★ ★ ★ SATD per Maldonado & Shihab 2015 — KL-SATD keyword 'TODO Auto-generated' 정합"
+    },
+    {
+      "id": "AP-CAPITAL-009",
+      "title": "★ ★ ★ 슈퍼크리에이티브 메일수신 유저 임시처리 (4회 중복 SATD)",
+      "natural_language": "★ ★ ★ CapitalController.java:1289 + 1299 + 1329 + 1456 — 4 위치에 중복 //슈퍼크리에이티브 메일수신 유저 임시처리 자조 코멘트. 특정 사용자 (슈퍼크리에이티브) 에 대한 hardcoded 분기 로직 / business rule 정식화 부재",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["CapitalController.java:1289 + 1299 + 1329 + 1456"],
+      "modern_alternative": "★ 메일 수신 user enum + audit log + 정식 dept_special_case 테이블",
+      "is_likely_bug": true,
+      "is_self_recognized": true,
+      "note": "★ ★ ★ SATD per Maldonado & Shihab — KL-SATD keyword '임시처리' 정합 / 4회 중복 = 다중책임 SATD 신호"
+    },
+    {
+      "id": "AP-CAPITAL-010",
+      "title": "★ logger 미사용 / e.printStackTrace() + System.out.print",
+      "natural_language": "★ CapitalController.java:1480 + 2315 — // TODO Auto-generated catch block e.printStackTrace(); / line 1852 System.out.print(AssetList). slf4j Logger 인스턴스 (line 63) 있으나 미사용",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["CapitalController.java:1480 + 1852 + 2315"],
+      "modern_alternative": "★ slf4j Logger.error / debug 사용 + try-catch 의 정식 처리",
+      "is_likely_bug": true,
+      "is_self_recognized": true,
+      "note": "★ SATD + 12-Factor / Logger 부재"
+    },
+    {
+      "id": "AP-CAPITAL-011",
+      "title": "Cross-domain 직접 의존 (TB_DAY_EXCHANGE / exchange 모듈)",
+      "natural_language": "IfrsWeekRate / IfrsWeekRateList — exchange 모듈의 TB_DAY_EXCHANGE 직접 SQL access. module boundary 위반",
+      "evidence_strength": "medium",
+      "severity": "medium",
+      "applies_to": ["capital.xml:1285-1297"],
+      "modern_alternative": "★ exchange micro-service API 호출 또는 명시적 Anti-Corruption Layer",
+      "is_likely_bug_partial": true,
+      "is_likely_bug": false,
+      "note": "★ DDD bounded context 위반 / 새 시스템 = service boundary 분리"
+    }
+  ],
+  "antipatterns_meta_confidence": {
+    "ap_total": 11,
+    "ap_likely_bug": 9,
+    "ap_self_recognized": 3,
+    "ap_intent": 0,
+    "ap_ambiguous": 0,
+    "isomorphic_to_poc06_count": 4,
+    "novel_for_capital_count": 7,
+    "$comment": "★ 다중책임 → 신규 AP 7건 (★ AP-001 비대 + AP-005 XML 인라인 + AP-006 DEAD param + AP-007 image base64 + AP-009 SATD 4회 + AP-010 logger 부재 + AP-011 cross-domain)"
+  }
+}

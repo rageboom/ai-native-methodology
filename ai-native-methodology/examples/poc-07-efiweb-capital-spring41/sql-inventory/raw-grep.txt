@@ -1,0 +1,225 @@
+# PoC #07 SQL Inventory raw-grep — capital.xml (★ corroboration #2 / 다중책임 spectrum)
+# 2026-05-08 / DEC-2026-05-08-poc-07-prelim-신설
+# 자동 추출 (★ ≥ 50% / 외부 6 컬럼 기준 4/6 = 66.7% pass / PoC #06 정합)
+
+## 전체 통계 (★ vs PoC #06 비교)
+
+| metric | PoC #06 exchange | PoC #07 capital | 배수 |
+|---|---|---|---|
+| Total SQL operations | 6 | **71** | ★ 11.8× |
+| select | 4 | 41 | 10× |
+| update | 1 | 4 | 4× |
+| insert | 0 | 9 | ∞ |
+| delete | 0 | 3 | ∞ |
+| procedure | 1 | 14 | 14× |
+| iBATIS dynamic branch | 1 | **27** | ★ 27× |
+| dependent tables | 3 | **17** | ★ 5.7× |
+| External SP/Function calls | 2 | **다수** (LIVE_SQL.SGERP.dbo / IFRS.dbo / ERP cross-system) | ★ ↑↑ |
+| self_recognized (SATD) | 1 | **11+** | ★ 11× |
+
+★ ★ ★ 다중책임 모듈 = SATD ↑ + dynamic branch ↑ + cross-system 호출 ↑ 모두 입증.
+
+## 1. sql_id (★ 자동 / namespace + id grep) — 71 entry
+
+namespace: CapitalDAO (ifrs.capital)
+
+### Sub-domain 분류 (★ 본 PoC scope 핵심 영역 표기)
+
+#### A. Company Basic Info (3 SQL / 핵심 ★)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 7    | select   | selectComBasicInfoList        |
+| 20   | update   | updateComCapitalInfo          |
+| 1410 | select   | selectCapitalCompanyList      |
+
+#### B. Capital Std/Biz/ERP 연동 (~12 SQL / 핵심 ★)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 30   | select   | selectCapitalStdAjax          |
+| 38   | select   | selectCapitalBizAjax          |
+| 51   | procedure| selectErpAccountList          |
+| 60   | procedure| insertComINSetList            |
+| 65   | select   | selectIfrsERPINList           |
+| 253  | select   | selectIfrsERPINList2          |
+| 302  | select   | selectERPINSetList            |
+| 323  | procedure| insertERPINSetList            |
+| 328  | select   | selectCMSINSetList            |
+| 347  | procedure| insertERPINList               |
+| 360  | procedure| IfrsWEEKINListSave            |
+| 371  | procedure| selectIfrsERPOUTList          |
+| 377  | select   | selectIfrsERPMaxAjax          |
+| 389  | select   | selectERPINReport             |
+
+#### C. Capital Asset (5 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 458  | procedure| selectAssetListAjax1          |
+| 468  | procedure| selectAssetListAjax3          |
+| 485  | procedure| selectAssetListAjax4          |
+| 498  | procedure| insertAssetINSetList          |
+| 1649 | procedure| selectAssetListAjax6          |
+| 1715 | select   | selectAssetListAjax7          |
+
+#### D. Save/Load Data (5 SQL / 핵심 ★)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 503  | select   | selectLoadSaveData            |
+| 518  | delete   | IfrsCapitalDeleteAjax         |
+| 1581 | select   | selectLoadNonErpSaveData      |
+| 1638 | insert   | setFcmmnLog                   |
+| 1654 | select   | selectLoadSaveDataForReport   |
+
+#### E. Mail (10 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 532  | insert   | saveMail                      |
+| 576  | select   | selectMail                    |
+| 583  | select   | selectDeptCd                  |
+| 592  | select   | selectDeptMail                |
+| 633  | insert   | insertSendMail                |
+| 1323 | select   | mailsendlogAjax               |
+
+#### F. Calendar/Holiday (3 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 601  | select   | holyday                       |
+| 624  | select   | week                          |
+| 752  | select   | weekList                      |
+| 672  | select   | IfrsPreviousWeekEndDate       |
+
+#### G. ★ ★ Weekly Report (IfrsWeekReport1~14 — 14 SQL / 핵심 ★)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 686  | select   | IfrsWeekReport1               |
+| 761  | select   | IfrsWeekReport2               |
+| 822  | select   | IfrsWeekReport3               |
+| 882  | select   | IfrsWeekReport4               |
+| 982  | select   | IfrsWeekReportCms             |
+| 1118 | select   | IfrsWeekReport5               |
+| 1142 | select   | IfrsWeekReport6               |
+| 1111 | select   | IfrsWeekReport7               |
+| 1150 | insert   | IfrsWeekReport8               |
+| 1183 | select   | IfrsWeekReport9               |
+| 1206 | procedure| IfrsWeekReport10              |
+| 1212 | insert   | IfrsWeekReport11              |
+| 1245 | select   | IfrsWeekReport12              |
+| 1307 | procedure| IfrsWeekReport13              |
+| 1317 | procedure| IfrsWeekReport14              |
+| 1285 | select   | IfrsWeekRate                  |
+| 1292 | select   | IfrsWeekRateList              |
+
+#### H. Capital History (4 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 1438 | select   | selectCapitalHistory          |
+| 1457 | insert   | insertCapitalHistory          |
+| 1484 | update   | deleteCapitalHistory          |
+| 1492 | update   | updateCapitalHistory          |
+
+#### I. Comment + Verify (4 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 1253 | insert   | insertCapitalComment          |
+| 1354 | select   | selectCapitalVrify            |
+| 1371 | insert   | insertCapitalVrify            |
+| 1387 | select   | getComment                    |
+
+#### J. Graph Setting (4 SQL / 매뉴얼 carry)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 1501 | delete   | deleteUserSet                 |
+| 1508 | insert   | insertCompanyGraphSetting     |
+| 1527 | update   | updateCompanyGraphSetting     |
+| 1539 | delete   | deleteCompanyGraphSetting     |
+| 1545 | select   | selectCompanyGraphSetting     |
+
+#### K. ETC (8 SQL / 매뉴얼 carry — Day exchange / Erp Yn / Last save 등)
+| line | type     | id                            |
+|------|----------|-------------------------------|
+| 1428 | select   | selectDayExchangeList         |
+| 1563 | select   | selectErpYn                   |
+| 1570 | select   | selectLastSaveSdate           |
+
+★ Sub-domain 11 (A~K) 분류. 핵심 (A + B + D + G) = 핵심 39 SQL / 매뉴얼 (C + E + F + H + I + J + K) = carry 32 SQL.
+
+## 5. Dynamic branch (★ 자동 / 27 detected)
+
+iBATIS dynamic tags 27 branches detected. 핵심 sub-domain 별 분포 (★ Day 1.5 통계):
+- IfrsWeekReport (G): ~10+ dynamic branches (★ 다중 분기 / 다중책임 입증)
+- ERP 연동 (B): ~5 dynamic branches
+- Save/Load (D): ~3 dynamic branches
+- 그 외: ~9 dynamic branches
+
+★ ★ exchange 의 1 dynamic vs capital 의 27 dynamic = ★ 다중책임 → 분기 ↑ 가설 입증.
+
+## 6. dependent_tables (★ 자동 / 17 unique)
+
+17 unique tables:
+- ★ 핵심: TB_CAPITAL_LIST / TB_CAPITAL_LIST_COPY / TB_CAPITAL_LIST_IMGSRC / TB_CAPITAL_LIST_USERSET (4)
+- ★ Asset: TB_CAPITAL_ASSET / TB_CAPITAL_ASSET_BAK (2)
+- ★ Master: TB_COMPANY / TB_COMPANY_GRAPH_SETTING / TB_DEPARTMENT (3)
+- ★ Verify: TB_CAPITAL_VRIFY / TB_CAPITAL_COMMENT (2)
+- ★ Calendar: TB_HOLIDAY / TB_WEEK_CALENDAR / TB_WEEK_CALENDAR_ROW (3)
+- ★ FCMMN: TB_FCMMN_LOG (1)
+- ★ Cross-domain: TB_DAY_EXCHANGE (1) — exchange 모듈 의존
+- ★ External (capital 외부): IFRS.dbo.TB_CAPITAL_LIST (1)
+
+## ★ External calls (cross-system / out-of-scope)
+
+ERP 시스템 (LIVE_SQL.SGERP.dbo / SGERP.dbo) 호출:
+- `LIVE_SQL.SGERP.dbo.sg_SACAccRemPrintQuery` (line 53)
+- `LIVE_SQL.SGERP.dbo._IFRSCapitalSetCom` (line 62 / IFRS prefix 외부)
+- `LIVE_SQL.SGERP.dbo._IFRSCapitalSetAcc` (line 325)
+- `IFRS.dbo._IFRSCapitalList` (line 349)
+- `IFRS.dbo._IFRSWeekList` (line 362)
+- `LIVE_SQL.SGERP.dbo.SG_SACCashOnQuery_Capital` (line 373)
+- `LIVE_SQL.SGERP.dbo._SACLedgerQueryAccBalance` (line 460)
+- `LIVE_SQL.SGERP.dbo.SG_SACLedgerQueryAccRemBalance_Capital` (line 471)
+- `LIVE_SQL.SGERP.dbo._SACLedgerQueryAccRemBalance` (line 474)
+- `LIVE_SQL.SGERP.dbo._SACAccRemForQuery` (line 487)
+- `IFRS.dbo._IFRSCapitalListAsset` (line 500)
+- 그 외 sub-system
+
+★ ★ ★ ERP cross-system 의존 = ★ ★ exchange 의 FN_Get_ExcRate / S_ExRateMigration 와 isomorphic — 같은 spectrum (외부 시스템 의존 패턴) 입증.
+
+## ★ self_recognized (SATD per Maldonado & Shihab 2015)
+
+총 11 자조 코멘트:
+- `CapitalServiceImpl.java:687` — `// TODO Auto-generated method stub`
+- `CapitalController.java:763` — `// saveType = R 는 저장, B는 임시저장 ,A는 초기화`
+- `CapitalController.java:939` — `// ,로 구분하여 뒷 부분 이미지 데이터를 임시저장`
+- `CapitalController.java:981` — `// ,로 구분하여 뒷 부분 이미지 데이터를 임시저장`
+- `CapitalController.java:1289` — `//슈퍼크리에이티브 메일수신 유저 임시처리` ★
+- `CapitalController.java:1299` — `//슈퍼크리에이티브 메일수신 유저 임시처리` ★
+- `CapitalController.java:1329` — `//슈퍼크리에이티브 메일수신 유저 임시처리` ★
+- `CapitalController.java:1456` — `//슈퍼크리에이티브 메일수신 유저 임시처리` ★
+- `CapitalController.java:1480` — `// TODO Auto-generated catch block e.printStackTrace();`
+- `CapitalController.java:2294` — `// ,로 구분하여 뒷 부분 이미지 데이터를 임시저장`
+- `CapitalController.java:2315` — `// TODO Auto-generated catch block e.printStackTrace();`
+
+★ ★ 핵심 SATD pattern:
+1. "임시저장" / "임시처리" — 중복 4회 (★ 슈퍼크리에이티브 / 메일 수신 user) → bug 자동 처분
+2. `// TODO Auto-generated method stub` — IDE 자동 생성 후 미구현 → bug
+3. `e.printStackTrace()` 만 — 로깅 없음 → bug
+
+## ★ 자동 추출 결과 요약 (외부 6 컬럼 기준)
+
+| 컬럼 | 자동? | 추출 결과 (capital) |
+|---|---|---|
+| 1. sql_id | ✅ grep | 71 entry / 11 sub-domain |
+| 2. mapper_xml | ✅ | capital.xml |
+| 3. called_from_screen | ❌ 수동 | Controller 87 endpoint → JSP 추적 의무 (★ 핵심 sub-domain ~15 만 cover / 나머지 carry) |
+| 4. business_meaning | ❌ 수동 (LLM ~70%) | 자연어 요약 (★ 핵심 ~15 만 cover) |
+| 5. dynamic_branch | ✅ grep | 27 branches |
+| 6. dependent_tables | ✅ regex | 17 unique tables |
+
+★ 자동 추출 비율 = 4/6 = **66.7%** ≥ 50% pass (PoC #06 정합).
+
+## 자동 추출 본 추가 columns (★ 7~10)
+
+| 컬럼 | 자동? | 자료 |
+|---|---|---|
+| 7. uc_link | ❌ | UC-CAPITAL-* (Controller 87 endpoint mapping / Day 1 매뉴얼) |
+| 8. intent_vs_bug_classification | ❌ | phase 4.7 분류표 (Day 2 매뉴얼) |
+| 9. confidence | — | meta-confidence 단계 5 = 70~95% |
+| 10. carry_flags | — | DBA-read / proc-body / external_call_out_of_scope / cross-domain (TB_DAY_EXCHANGE) |

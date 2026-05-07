@@ -1,0 +1,1758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="CapitalDAO">
+ 
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	
+	<select id="selectComBasicInfoList" resultClass="egovMap">
+		/* CapitalDAO.selectComBasicInfoList */
+		select 
+			COM_NO, 
+			COM_NM, 
+			COM_NM_EN, 
+			CURR_CD, 
+			CAPITAL_YN, 
+			CMS_USE_YN 
+		from ifrs.dbo.tb_company WITH(NOLOCK)
+		order by CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO
+	</select>
+	
+	<update id="updateComCapitalInfo" parameterClass="HashMap">
+		/* CapitalDAO.updateComCapitalInfo */
+		update tb_company
+		set	  capital_yn = 'Y'
+			  ,capital_curr_cd = #capitalCurrCd#
+			  ,cms_use_yn = #cmsUseYn#		
+		where com_no = #comNo#
+	</update>
+	 
+	
+	<select id="selectCapitalStdAjax" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectCapitalStdAjax */
+		<![CDATA[
+			select * from LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD WITH(NOLOCK) where CompanySeq = #comNo# and sType=#sType#
+		]]>
+	</select>
+	
+	
+	<select id="selectCapitalBizAjax" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectCapitalBizAjax */
+		<![CDATA[
+			select CompanySeq, TaxNo, TaxName from LIVE_SQL.SGERP.dbo._TDATaxUnit WITH(NOLOCK) where CompanySeq = #comNo#;
+		]]>
+	</select>
+	
+		
+	<parameterMap id="selectErpAccountListMap" class="HashMap">
+	  	<parameter property="xmlDocument"  	mode="IN" />
+	  	<parameter property="comNo"  		mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectErpAccountList" parameterMap="selectErpAccountListMap" resultClass="egovMap">
+		/* CapitalDAO.selectErpAccountList */
+	  	EXEC LIVE_SQL.SGERP.dbo.sg_SACAccRemPrintQuery  ?, 2, 1014916, '', ?, 1, 1, 10895
+	</procedure>
+	
+	<parameterMap id="insertComINSetListMap" class="HashMap">
+	  	<parameter property="xml" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="insertComINSetList" parameterMap="insertComINSetListMap" resultClass="egovMap">
+		/* CapitalDAO.insertComINSetList */
+	  	EXEC ifrs.dbo._IFRSCapitalSetCom  ?
+	</procedure>
+	
+	<select id="selectIfrsERPINList" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectIfrsERPINList */
+		<![CDATA[
+		SELECT *
+		  FROM (
+				SELECT  A.CompanySeq
+					  , A.SlipMstSeq
+					  , A.SlipMstID
+					  , A.AccDate
+					  , A.SlipNo
+					  , A.RegEmpSeq
+					  , A.RegDeptSeq
+					  , A.RegAccDate
+					  , B.SlipID
+					  , B.RowNo
+					  , B.AccSeq
+					  , B.DrAmt
+/*					  , CASE WHEN C.AccNo = '1110102' OR C.AccNo = '1110108' OR C.AccNo = '1110110' OR C.AccNo = '1110114' OR C.AccNo = '1110313' THEN B.DrAmt ELSE B.CrAmt END	AS CrAmt */
+					  , B.DrAmt		AS CrAmt	/* ICM-12337 : 계정번호에 따른 차변/대변 표시 로직 제거, 차변금액을 대변금액로 표시 ( 2022-06-02 - 김연준 ) */
+					  , B.DrForAmt
+					  , B.CrForAmt
+					  , B.CurrSeq
+					  , B.ExRate
+					  , B.DivExRate
+					  , B.Summary
+					  , B.CoCustSeq
+					  , C.AccNo
+					  , C.AccName
+					  , ''			AS RemSeq
+					  , ''			AS RemValSeq
+					  , D.DATA		AS RemSeqName1
+					  , D.BANKNAME	AS RemSeqName2
+					  , 'N'			AS linkvalue
+				  FROM SGERP.dbo._TACSlip AS A WITH(NOLOCK)
+				  LEFT JOIN SGERP.dbo._TACSlipRow AS B WITH(NOLOCK)
+						 ON A.CompanySeq = B.CompanySeq
+						AND A.SlipMstSeq = B.SlipMstSeq
+				  LEFT JOIN SGERP.dbo._TDAAccount AS C WITH(NOLOCK)
+						 ON B.CompanySeq = C.CompanySeq
+						AND B.AccSeq = C.AccSeq
+				  LEFT JOIN (
+							SELECT *
+							  FROM (
+									SELECT  G.CompanySeq
+										  , G.SlipSeq
+										  , (G.DATA1 + G.DATA2 + G.DATA3 + G.DATA4)	AS DATA
+										  , G.BANKNAME
+									  FROM (
+											SELECT R.*
+											  FROM (
+													SELECT  A.CompanySeq
+														  , A.SlipSeq
+														  , ISNULL(C.RemSeqName1, '')	AS DATA1
+														  , ''							AS DATA2
+														  , ''							AS DATA3
+														  , ''							AS DATA4
+														  , ISNULL(E.MinorName, '')		AS BANKNAME
+													  FROM SGERP.dbo._TACSlipRow AS A WITH(NOLOCK)
+													 INNER JOIN SGERP.dbo._TACSlipRem AS B WITH(NOLOCK)
+															 ON A.CompanySeq = B.CompanySeq
+															AND A.SlipSeq = B.SlipSeq
+															AND B.RemSeq = 1002
+													  LEFT JOIN SGERP.dbo._IFRSRemListView AS C WITH(NOLOCK)
+															 ON B.CompanySeq = C.CompanySeq
+															AND B.RemSeq = C.RemSeq
+															AND B.RemValSeq = C.RemSeqVal
+															AND C.RemSeq = 1004
+													  LEFT JOIN SGERP.dbo._TDABank AS D WITH(NOLOCK)
+															 ON C.CompanySeq = D.CompanySeq
+															AND C.RemSeqName2 = D.BankSeq
+													  LEFT JOIN SGERP.dbo._TDAUMinor AS E WITH(NOLOCK)
+															 ON D.CompanySeq = E.CompanySeq
+															AND D.BankHQ = E.MinorSeq
+													 WHERE A.AccDate = #sdate#
+													   AND A.CompanySeq = #comNo#
+
+													 UNION ALL
+
+													SELECT  A.CompanySeq
+														  , A.SlipSeq
+														  , ''							AS DATA1
+														  , ISNULL(C.RemSeqName1, '')	AS DATA2
+														  , ''							AS DATA3
+														  , ''							AS DATA4
+														  , ISNULL(E.MinorName, '')		AS BANKNAME
+													  FROM SGERP.dbo._TACSlipRow AS A WITH(NOLOCK)
+													 INNER JOIN SGERP.dbo._TACSlipRem AS B WITH(NOLOCK)
+															 ON A.CompanySeq = B.CompanySeq
+															AND A.SlipSeq = B.SlipSeq
+															AND B.RemSeq = 1004
+													  LEFT JOIN SGERP.dbo._IFRSRemListView AS C WITH(NOLOCK)
+															 ON B.CompanySeq = C.CompanySeq
+															AND B.RemSeq = C.RemSeq
+															AND B.RemValSeq = C.RemSeqVal
+															AND C.RemSeq = 1004
+													  LEFT JOIN SGERP.dbo._TDABank AS D WITH(NOLOCK)
+															 ON C.CompanySeq = D.CompanySeq
+															AND C.RemSeqName2 = D.BankSeq
+													  LEFT JOIN SGERP.dbo._TDAUMinor AS E WITH(NOLOCK)
+															 ON D.CompanySeq = E.CompanySeq
+															AND D.BankHQ = E.MinorSeq
+													 WHERE A.AccDate = #sdate#
+													   AND A.CompanySeq = #comNo#
+
+													 UNION ALL
+
+													SELECT  A.CompanySeq
+														  , A.SlipSeq
+														  , ''							AS DATA1
+														  , ''							AS DATA2
+														  , ISNULL(C.RemSeqName1, '')	AS DATA3
+														  , ''							AS DATA4
+														  , ISNULL(E.MinorName, '')		AS BANKNAME
+													  FROM SGERP.dbo._TACSlipRow AS A WITH(NOLOCK)
+													 INNER JOIN SGERP.dbo._TACSlipRem AS B WITH(NOLOCK)
+															 ON A.CompanySeq = B.CompanySeq
+															AND A.SlipSeq = B.SlipSeq
+															AND B.RemSeq = 1006
+													  LEFT JOIN SGERP.dbo._IFRSRemListView AS C WITH(NOLOCK)
+															 ON B.CompanySeq = C.CompanySeq
+															AND B.RemSeq = C.RemSeq
+															AND B.RemValSeq = C.RemSeqVal
+															AND C.RemSeq = 1004
+													  LEFT JOIN SGERP.dbo._TDABank AS D WITH(NOLOCK)
+															 ON C.CompanySeq = D.CompanySeq
+															AND C.RemSeqName2 = D.BankSeq
+													  LEFT JOIN SGERP.dbo._TDAUMinor AS E WITH(NOLOCK)
+															 ON D.CompanySeq = E.CompanySeq
+															AND D.BankHQ = E.MinorSeq
+													 WHERE A.AccDate = #sdate#
+													   AND A.CompanySeq = #comNo#
+
+													 UNION ALL
+
+													SELECT  A.CompanySeq
+														  , A.SlipSeq
+														  , ''							AS DATA1
+														  , ''							AS DATA2
+														  , ''							AS DATA3
+														  , ISNULL(C.RemSeqName1, '')	AS DATA4
+														  , ISNULL(E.MinorName, '')		AS BANKNAME
+													  FROM SGERP.dbo._TACSlipRow AS A WITH(NOLOCK)
+													 INNER JOIN SGERP.dbo._TACSlipRem AS B WITH(NOLOCK)
+															 ON A.CompanySeq = B.CompanySeq
+															AND A.SlipSeq = B.SlipSeq
+															AND B.RemSeq = 1017
+													  LEFT JOIN SGERP.dbo._IFRSRemListView AS C WITH(NOLOCK)
+															 ON B.CompanySeq = C.CompanySeq
+															AND B.RemSeq = C.RemSeq
+															AND B.RemValSeq = C.RemSeqVal
+															AND C.RemSeq = 1004
+													  LEFT JOIN SGERP.dbo._TDABank AS D WITH(NOLOCK)
+															 ON C.CompanySeq = D.CompanySeq
+															AND C.RemSeqName2 = D.BankSeq
+													  LEFT JOIN SGERP.dbo._TDAUMinor AS E WITH(NOLOCK)
+															 ON D.CompanySeq = E.CompanySeq
+															AND D.BankHQ = E.MinorSeq
+													 WHERE A.AccDate = #sdate#
+													   AND A.CompanySeq = #comNo#
+									  ) R
+									 GROUP BY  R.CompanySeq
+											 , R.SlipSeq
+											 , R.DATA1
+											 , R.DATA2
+											 , R.DATA3
+											 , R.DATA4
+											 , R.BANKNAME
+								  ) G
+							  ) H
+							 WHERE H.DATA != ''
+				  ) D
+						 ON A.CompanySeq = D.CompanySeq
+						AND B.SlipSeq = D.SlipSeq
+				 INNER JOIN SGERP.dbo.IFRS_CAPITALSTD AS G WITH(NOLOCK)
+						 ON A.CompanySeq = G.CompanySeq
+						AND G.sType = 1
+						AND C.AccNo = G.sData
+		  ) T1
+		 WHERE T1.CompanySeq = #comNo#
+		   AND T1.AccDate = #sdate#
+		   AND T1.CrAmt != 0
+		 ORDER BY T1.CrAmt DESC
+		]]>
+	</select>
+	
+	
+	
+	
+	<select id="selectIfrsERPINList2" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectIfrsERPINList2 */
+		<![CDATA[
+       SELECT
+          A.CompanySeq,
+					A.SlipMstSeq,
+					A.SlipMstID,
+					A.AccDate,
+					A.SlipNo,
+					A.RegEmpSeq,
+					A.RegDeptSeq,
+					A.RegAccDate,
+					B.SlipID,
+					B.RowNo,
+					B.AccSeq,
+          			B.AccSeq as accseq2,
+					B.DrAmt,
+					CASE WHEN C.AccNo = '1111560' OR C.AccNo = '1111532' THEN B.DrAmt ELSE B.CrAmt END AS domamt,
+					B.DrForAmt,
+					B.CrForAmt,
+					B.CurrSeq,
+					B.ExRate,
+					B.DivExRate,
+					B.Summary as Summary,
+          B.Summary as Summary2,
+					B.CoCustSeq,
+					C.AccNo,
+          CASE WHEN C.AccNo = '1111532' THEN '여비교통비' ELSE '전도금' END AS AccName,
+          CASE WHEN C.AccNo = '1111532' THEN '여비교통비' ELSE '전도금' END AS AccName2,
+		      '' as RemSeq,
+					D.RemValSeq,
+          D.RemValSeq as RemValSeq1,
+		  		'거래처' as remname1,
+         E.RemSeqName1 as remvalname1,          
+          E.RemSeq,
+          E.RemSeqVal,
+          E.RemSeqName1,
+          E.RemSeqName2,
+		      'N' as linkvalue                
+				 FROM SGERP.dbo._TACSlip A WITH(NOLOCK)
+				LEFT JOIN SGERP.dbo._TACSlipRow B WITH(NOLOCK) ON B.CompanySeq = A.CompanySeq AND A.SlipMstSeq = B.SlipMstSeq
+				LEFT JOIN SGERP.dbo._TDAAccount C WITH(NOLOCK) ON C.CompanySeq = A.CompanySeq AND B.AccSeq = C.AccSeq
+        LEFT JOIN SGERP.dbo._TACSlipRem D WITH(NOLOCK) ON A.CompanySeq = D.CompanySeq AND B.SlipSeq = D.SlipSeq
+        LEFT JOIN SGERP.dbo._IFRSRemListView E WITH(NOLOCK) ON A.CompanySeq = E.CompanySeq AND D.RemSeq = E.RemSeq AND D.RemValSeq = E.RemSeqVal
+        WHERE A.CompanySeq = #comNo# AND A.AccDate = #sdate# AND (C.AccNo = '1111532' OR C.AccNo = '1111560')
+		]]>
+	</select>
+	
+	
+	<select id="selectERPINSetList" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectERPINSetList */
+		<![CDATA[
+			select * from (
+			select 
+				AccSeq, 
+				AccNo, 
+				AccName,  
+				CASE WHEN ISNULL(B.sType,0) = 0 THEN 'N' ELSE 'Y' END as sType 
+			from SGERP.dbo._TDAAccount A WITH(NOLOCK)
+			left join SGERP.dbo.IFRS_CAPITALSTD B WITH(NOLOCK) on A.CompanySeq = B.CompanySeq AND A.AccNo = B.sData AND B.sType = 1
+			where A.CompanySeq = #comNo#) T1 where T1.sType = #sType# order by T1.sType desc, T1.AccNo;
+		]]>
+	</select>
+	
+	<parameterMap id="insertERPINSetListMap" class="HashMap">
+	  	<parameter property="CompanySeq" mode="IN" />
+	  	<parameter property="sType" mode="IN" />
+	  	<parameter property="xml" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="insertERPINSetList" parameterMap="insertERPINSetListMap" resultClass="egovMap">
+		/* CapitalDAO.insertERPINSetList */
+	  	EXEC LIVE_SQL.SGERP.dbo._IFRSCapitalSetAcc  ?, ?, ?
+	</procedure>
+	
+	<select id="selectCMSINSetList" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectCMSINSetList */
+		<![CDATA[
+		select * from (
+		select B.BankName, A.BankAccNo, A.BankAccName, CASE WHEN ISNULL(C.sType,0) = 0 THEN 'N' ELSE 'Y' END as sType from SGERP.dbo._TDABankAcc A WITH(NOLOCK)
+		left join SGERP.dbo._TDABank B WITH(NOLOCK) on B.CompanySeq = #comNo# AND A.BankSeq = B.BankSeq
+		left join SGERP.dbo.IFRS_CAPITALSTD C WITH(NOLOCK) on C.CompanySeq = #comNo# AND A.BankAccNo = C.sData AND C.sType = #sType1#
+		where A.CompanySeq = #comNo#) T1 where T1.sType = #sType# order by T1.sType desc, T1.BankName, T1.BankAccNo;
+		]]>
+	</select>
+	
+	<parameterMap id="insertERPINListMap" class="HashMap">
+	  	<parameter property="CompanySeq" mode="IN" />
+	  	<parameter property="sType" mode="IN" />
+	  	<parameter property="sDate" mode="IN" />
+	  	<parameter property="xml" mode="IN" />
+	  	<parameter property="SaveType" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="insertERPINList" parameterMap="insertERPINListMap" resultClass="egovMap">
+		/* CapitalDAO.insertERPINList */
+	  	EXEC IFRS.dbo._IFRSCapitalList  ?, ?, ?, ?, ?
+	</procedure>
+	
+	
+	<parameterMap id="IfrsWEEKINListSaveMap" class="HashMap">
+	  	<parameter property="companylist" mode="IN" />
+	  	<parameter property="datevalue" mode="IN" />
+	  	<parameter property="textarea" mode="IN" />
+	  	<parameter property="xml" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="IfrsWEEKINListSave" parameterMap="IfrsWEEKINListSaveMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWEEKINListSave */
+	  	EXEC IFRS.dbo._IFRSWeekList  ?, ?, ?, ?
+	</procedure>
+	
+	
+	<parameterMap id="selectIfrsERPOUTListMap" class="HashMap">
+	  	<parameter property="xmlDocument" mode="IN" />
+	  	<parameter property="comNo" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectIfrsERPOUTList" parameterMap="selectIfrsERPOUTListMap" resultClass="egovMap">
+		/* CapitalDAO.selectIfrsERPOUTList */
+	  	EXEC LIVE_SQL.SGERP.dbo.SG_SACCashOnQuery_Capital  ?, 2, 7960, '', ?, 1, 1, 9617
+	</procedure>
+	
+	
+	<select id="selectIfrsERPMaxAjax" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectIfrsERPMaxAjax */
+		<![CDATA[
+		select top 1 C.AccName, B.Summary from SGERP.dbo._TACSlip A WITH(NOLOCK)
+		inner join SGERP.dbo._TACSlipRow B WITH(NOLOCK) on A.CompanySeq = B.CompanySeq and A.SlipMstSeq = B.SlipMstSeq
+		inner join SGERP.dbo._TDAAccount C WITH(NOLOCK) on A.CompanySeq = C.CompanySeq and B.AccSeq = C.AccSeq
+		where A.CompanySeq=#comNo# and A.SlipMstSeq=#SlipMstSeq#
+		order by DrAmt desc
+		]]>
+	</select>
+				
+		
+	<select id="selectERPINReport" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectERPINReport */
+		<isEqual property="SaveType" compareValue="R">
+		select * from IFRS.dbo.TB_CAPITAL_LIST WITH(NOLOCK)
+			where  1=1 AND
+			   <isEqual property="sType" compareValue="1">
+				sType=1 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="11">
+				sType=11 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="2">
+				sType=2 and
+			   </isEqual>
+			   	<isEqual property="sType" compareValue="22">
+				sType=22 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="ALL">
+				sType like '%' and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="111">
+				(sType=1 or sType=2) and 
+			   </isEqual>
+			   <isEqual property="sType" compareValue="222">
+				(sType=11 or sType=22) and
+			   </isEqual>
+				companyseq=#comNo# and  				 
+				sDate=#sdate# order by sType DESC, cramt DESC;
+		</isEqual>
+		
+		<isEqual property="SaveType" compareValue="B">
+		select * from IFRS.dbo.TB_CAPITAL_LIST_BAK WITH(NOLOCK)
+			where  1=1 AND
+			   <isEqual property="sType" compareValue="1">
+				sType=1 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="11">
+				sType=11 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="2">
+				sType=2 and
+			   </isEqual>
+			   	<isEqual property="sType" compareValue="22">
+				sType=22 and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="ALL">
+				sType like '%' and
+			   </isEqual>
+			   <isEqual property="sType" compareValue="111">
+				(sType=1 or sType=2) and 
+			   </isEqual>
+			   <isEqual property="sType" compareValue="222">
+				(sType=11 or sType=22) and
+			   </isEqual>
+				companyseq=#comNo# and  				 
+				sDate=#sdate# order by sType DESC, cramt DESC;
+		</isEqual>
+				   			   		   	
+	</select>
+	
+	
+	
+	
+	
+	<parameterMap id="selectAssetListAjax1Map" class="HashMap">
+	  	<parameter property="xmlDocument" mode="IN" />
+	  	<parameter property="comNo" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectAssetListAjax1" parameterMap="selectAssetListAjax1Map" resultClass="egovMap">
+		/* CapitalDAO.selectAssetListAjax1 */
+	  	EXEC LIVE_SQL.SGERP.dbo._SACLedgerQueryAccBalance  ?, 2, 1291, '', ?, 1, 1, 300192
+	</procedure>
+	
+	<parameterMap id="selectAssetListAjax3Map" class="HashMap">
+	  	<parameter property="xmlDocument" mode="IN" />
+	  	<parameter property="comNo" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectAssetListAjax3" parameterMap="selectAssetListAjax3Map" resultClass="egovMap" remapResults="true">
+		/* CapitalDAO.selectAssetListAjax3 */
+	<isEqual property="comNo" compareValue="5">
+		EXEC LIVE_SQL.SGERP.dbo.SG_SACLedgerQueryAccRemBalance_Capital  #xmlDocument#, 2, 1291, '', #comNo#, 1, 1, 300196
+	</isEqual>
+	<isNotEqual property="comNo" compareValue="5">
+		EXEC LIVE_SQL.SGERP.dbo._SACLedgerQueryAccRemBalance  #xmlDocument#, 2, 1291, '', #comNo#, 1, 1, 300196
+	</isNotEqual>
+	
+	  	
+	</procedure>
+	
+	<parameterMap id="selectAssetListAjax4Map" class="HashMap">
+	  	<parameter property="xmlDocument" mode="IN" />
+	  	<parameter property="comNo" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectAssetListAjax4" parameterMap="selectAssetListAjax4Map" resultClass="egovMap">
+		/* CapitalDAO.selectAssetListAjax4 */
+	  	EXEC LIVE_SQL.SGERP.dbo._SACAccRemForQuery  ?, 2, 1316, '', ?, 1, 1, 387
+	</procedure>
+	
+
+	<parameterMap id="insertAssetINListMap" class="HashMap">
+	  	<parameter property="companyseq" mode="IN" />
+	  	<parameter property="sdate" mode="IN" />
+	  	<parameter property="xml" mode="IN" />
+	  	<parameter property="SaveType" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="insertAssetINSetList" parameterMap="insertAssetINListMap" resultClass="egovMap">
+		/* CapitalDAO.insertAssetINSetList */
+	  	EXEC IFRS.dbo._IFRSCapitalListAsset  ?, ?, ?, ?
+	</procedure>
+
+	<select id="selectLoadSaveData" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectLoadSaveData */
+		<isEqual property="SaveType" compareValue="R">
+		<![CDATA[		
+		select * from TB_CAPITAL_ASSET WITH(NOLOCK) where companyseq = #comNo# and sdate = #sdate2#;
+		]]>
+		</isEqual>
+		
+		<isEqual property="SaveType" compareValue="B">
+		<![CDATA[		
+		select * from TB_CAPITAL_ASSET_BAK WITH(NOLOCK) where companyseq = #comNo# and sdate = #sdate2#;
+		]]>
+		</isEqual>
+	</select>
+	
+	<delete id="IfrsCapitalDeleteAjax" parameterClass="HashMap">
+		/* CapitalDAO.IfrsCapitalDeleteAjax */
+		<![CDATA[
+			DELETE FROM TB_CAPITAL_LIST	
+			WHERE companyseq = #CompanySeq#	
+			AND sDate >= #sdate# AND sDate <= #edate#;
+			
+			DELETE FROM TB_CAPITAL_ASSET	
+			WHERE companyseq = #CompanySeq#	
+			AND sdate >= #sdate# AND sdate <= #edate#;	
+		]]>
+	</delete>
+	
+	
+	<insert id="saveMail" parameterClass="HashMap">
+		/* CapitalDAO.saveMail */
+		MERGE INTO IfrsMailList A
+		USING (
+				SELECT 	#companyseq# AS companyseq
+			  ) B
+		   ON (A.companyseq = B.companyseq)
+	 	 WHEN MATCHED THEN
+	 	  UPDATE SET  
+				fromuser=#fromuser#, 
+				fromuser_id=#fromuser_id#, 
+				touser=#touser#, 
+				touser_id=#touser_id#, 
+				attuser=#attuser#, 
+				attuser_id=#attuser_id#,
+				bccuser=#bccuser#, 
+				bccuser_id=#bccuser_id#	 	  
+	 	 WHEN NOT MATCHED THEN
+		  INSERT 
+			(
+		   		companyseq, 
+		   		fromuser, 
+		   		fromuser_id, 
+		   		touser, 
+		   		touser_id, 
+		   		attuser, 
+		   		attuser_id,
+		   		bccuser, 
+		   		bccuser_id
+		     )
+		 	VALUES
+		 	(
+		   		#companyseq#, 
+		   		#fromuser#, 
+		   		#fromuser_id#, 
+		   		#touser#, 
+		   		#touser_id#, 
+		   		#attuser#, 
+		   		#attuser_id#,
+		   		#bccuser#, 
+		   		#bccuser_id#
+		 	);
+	</insert>
+	
+	<select id="selectMail" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectMail */
+		<![CDATA[		
+		select * from IfrsMailList WITH(NOLOCK) where companyseq = #companyseq#;
+		]]>
+	</select>
+	
+	<select id="selectDeptCd" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectDeptCd */
+		<![CDATA[		
+			select * from FIM.dbo.TB_DEPARTMENT WITH(NOLOCK) where DEPT_MAIL_ID like #deptmail# 			
+			AND DEPT_STATUS = 'Y';
+		]]>
+		<!--AND USE_FG = 'Y';-->
+	</select>
+	
+	<select id="selectDeptMail" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectDeptMail */
+		<![CDATA[		
+			SELECT A.LOGON_ID from FIM.dbo.TB_USER A WITH(NOLOCK)
+			INNER JOIN FIM.dbo.TB_DEPARTMENT B WITH(NOLOCK) on A.DEPT_CD = B.DEPT_CD
+			WHERE B.DEPT_CD_PATH like '%'+#deptmail#+'%' AND A.USE_FG = '1';
+		]]>
+	</select>
+	
+	<select id="holyday" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.holyday */
+		<![CDATA[		
+			 SELECT
+			CASE WHEN 
+			(SELECT
+			 COUNT(T1.HOLYPARAM) AS CNT
+			FROM
+			(SELECT
+			   REPLACE(CONVERT(CHAR(10),BASEDATE, 120),'-','') AS HOLYDAY,
+			  CASE WHEN DATEPART(DW, BASEDATE ) = '1' OR 
+			  DATEPART(DW, BASEDATE ) = '7' THEN 'Y' ELSE 'N' END AS HOLYPARAM
+			FROM SGWORK.dbo.TB_HOLIDAY WITH(NOLOCK)  
+			WHERE COM_CD = 'H0000000') T1
+			WHERE T1.HOLYDAY = #serdate#) > 0
+			OR
+			 (SELECT
+			  CASE WHEN DATEPART(DW, #serdate# ) = '1' OR 
+			  DATEPART(DW, #serdate# ) = '7'
+			 THEN 'Y' ELSE 'N' END AS HOLYPARAM) = 'Y' THEN 'Y' ELSE 'N' END AS HOLYPARAM
+		]]>
+	</select>
+	
+	<select id="week" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.week */
+		<![CDATA[				
+			SELECT B.* FROM SGERPMA.dbo.TB_WEEK_CALENDAR_ROW A WITH(NOLOCK)
+			LEFT JOIN SGERPMA.dbo.TB_WEEK_CALENDAR B WITH(NOLOCK) ON A.Y = B.E_YEAR AND A.M = B.E_MONTH AND A.W = B.E_WEEK
+			WHERE A.BASEDATE = #serdate#	
+		]]>
+	</select>
+	
+	<insert id="insertSendMail" parameterClass="HashMap">
+		/* CapitalDAO.insertSendMail */
+		INSERT INTO IFRS.DBO.ALERT_QUEUE
+		  ( CREATE_DATE,
+		    UPDATE_DATE,
+		    SEND_DATE,
+		    ALERT_STATUS,
+		    ALERT_TYPE,
+		    from_id,
+		    FROM_NAME,
+		    FROM_MAIL,
+		    TO_ID,
+		    TO_MAIL,
+		    ALERT_SUBJECT,
+		    ALERT_MESSAGE,
+		    APP_TYPE,
+		    APP_ID,
+		    PRIORITY
+		  )
+		VALUES
+		  ( GETDATE(),
+		    GETDATE(),
+		    GETUTCDATE(),
+		    #alertStatus#,
+		    #alertType#,
+		    #fromId#,
+		    #fromName#,
+		    #fromMail#,
+		    #toId#,
+		    #toMail#,
+		    #alertSubject#,
+		    #alertMessage#,
+		    #appType#,
+		    #appId#,
+		    #priority#
+		  )
+	</insert>
+	
+	
+	<select id="IfrsPreviousWeekEndDate" parameterClass="HashMap" resultClass="String">
+		/* CapitalDAO.IfrsPreviousWeekEndDate */
+	    <![CDATA[	
+		   SELECT MAX(SDATE) sDate 
+			 FROM TB_CAPITAL_ASSET A WITH(NOLOCK)
+			 LEFT OUTER JOIN SGERPMA.dbo.TB_WEEK_CALENDAR_ROW B WITH(NOLOCK) ON A.SDATE = B.BASEDATE
+			WHERE STYPE = 8
+			  AND COMPANYSEQ = 2 
+			  AND CONVERT(NVARCHAR(8), DATEADD(DAY,-7, #sdate#), 112) <= SDATE AND SDATE < #sdate#
+			  AND B.WN NOT IN ('토', '일')	
+		]]>
+	</select>
+
+
+	<select id="IfrsWeekReport1" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport1 */
+		<![CDATA[		
+			SELECT companyseq
+	             , sType
+	             , sDate
+	             , cramt * ISNULL(T.EXCHANGE_RATE, 1) / 1000000 AS cramt
+			  FROM (		
+				SELECT A.companyseq,
+					   A.sType,
+					   A.sDate,
+					   sum(cramt) as cramt
+				  FROM IFRS.dbo.TB_CAPITAL_LIST A WITH(NOLOCK)
+				  LEFT OUTER JOIN SGERPMA.dbo.TB_WEEK_CALENDAR_ROW B  WITH(NOLOCK)ON A.sDate = B.BASEDATE
+				 WHERE A.sType = 1 AND A.sDate >= #sdate# and A.sDate <= #edate# AND B.WN != '토' AND B.WN !='일'
+				   AND A.COMPANYSEQ = #companyseq#
+				 GROUP BY A.companyseq,A.sType,A.sDate
+				UNION ALL			
+				SELECT A.companyseq,
+					   A.sType,
+					   A.sDate,
+					   sum(cramt) as cramt
+				  FROM IFRS.dbo.TB_CAPITAL_LIST A WITH(NOLOCK)
+				  LEFT OUTER JOIN SGERPMA.dbo.TB_WEEK_CALENDAR_ROW B WITH(NOLOCK) ON A.sDate = B.BASEDATE
+				 WHERE A.sType = 2 AND A.sDate >= #sdate# and A.sDate <= #edate#  AND B.WN != '토' AND B.WN !='일'
+				   AND A.COMPANYSEQ = #companyseq#
+				 GROUP BY A.companyseq,A.sType,A.sDate
+				UNION ALL
+				SELECT T1.COMPANYSEQ, 
+				  	   '3' AS sType,
+				       T1.sDate,
+				  	   SUM(T1.SUM4) AS SUM4  
+				    FROM (SELECT COMPANYSEQ,
+				    			 SDATE,
+				    			 SUM(SUM4) AS SUM4 
+				  		    FROM TB_CAPITAL_ASSET WITH(NOLOCK)
+				  		   WHERE SDATE >= #serdate# AND SDATE <= #edate# 
+				  		     AND STYPE != 8
+				  		     AND COMPANYSEQ = #companyseq#
+				  		   GROUP BY COMPANYSEQ,SDATE
+				  		  UNION ALL
+				  		  SELECT COMPANYSEQ,
+				  			     SDATE,
+				  			     SUM(SUM4) * -1 AS SUM4 
+				  	        FROM TB_CAPITAL_ASSET WITH(NOLOCK)
+				  		   WHERE SDATE >= #serdate# AND SDATE <= #edate# 
+ 				  		     AND STYPE = 8 
+				  		     AND SDATA1 LIKE '담보제공금액'
+				  		     AND COMPANYSEQ = #companyseq#
+				  		   GROUP BY COMPANYSEQ,SDATE) T1
+		  		 	LEFT OUTER JOIN SGERPMA.dbo.TB_WEEK_CALENDAR_ROW B WITH(NOLOCK) ON T1.SDATE = B.BASEDATE
+           		   WHERE B.WN NOT IN ('토', '일')
+		       	   GROUP BY T1.COMPANYSEQ, T1.SDATE 
+		       	  ) Z
+			LEFT OUTER JOIN (SELECT ISNULL(EXCHANGE_RATE, 1) AS EXCHANGE_RATE, CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT 
+               				   FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+             				  WHERE CURR_CD = #curr#
+              				 ) T ON T.REGIST_DT = Z.sDate
+			WHERE Z.companyseq = #companyseq#
+		]]>
+			<isNotEmpty property="sType">
+		 	  AND Z.sType = #sType# 
+			</isNotEmpty>
+			ORDER BY Z.sDate, Z.companyseq, Z.sType 
+	</select>
+	
+	<select id="weekList" parameterClass="HashMap" resultClass="String">
+		/* CapitalDAO.weekList */
+		<![CDATA[				
+			SELECT BASEDATE 
+			  FROM SGERPMA.dbo.TB_WEEK_CALENDAR_ROW WITH(NOLOCK)
+			 WHERE BASEDATE >= #serdate# AND BASEDATE <= #edate#
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport2" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport2 */
+		<![CDATA[
+		WITH reportData (comNm, currCd, Jumin_Biz_No, incom_Amt, out_Amt, bal_Money, Tran_Dd) AS (
+				SELECT TB.comNm
+                     , TB.currCd
+                     , TB.Jumin_Biz_No
+                     , SUM(TB.incom_Amt)   AS incom_Amt
+                     , SUM(TB.out_Amt)  AS out_Amt
+                     , SUM(TB.bal_Money) AS bal_Money
+                     , #registDt# AS Tran_Dd
+                  FROM (
+				  SELECT 사업자.Headsubaff_Corp_Nm          AS comNm
+                       , 계좌.Cur_Cd                        AS currCd
+                       , SUM(CASE WHEN 상세.Tran_Dd != #registDt# THEN 0 ELSE Isnull(상세.Incom_Amt,0) END) AS incom_Amt 
+                       , SUM(CASE WHEN 상세.Tran_Dd != #registDt# THEN 0 ELSE Isnull(상세.Out_Amt,0) END) AS out_Amt 
+                       , SUM(Isnull(상세.Bal_Money,0)) AS bal_Money
+                       , 사업자.Jumin_Biz_No AS Jumin_Biz_No 
+                    FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Head_Offic_Subcom_Affil_Com AS 사업자  WITH(NOLOCK)
+                   INNER JOIN [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Acct_Consol_Inf_Mgr   AS 계좌  WITH(NOLOCK) ON 사업자.Jumin_Biz_No = 계좌.Jumin_Biz_No
+                    LEFT OUTER JOIN (
+                                     SELECT Acct_Uniqid 
+                                          , MAX(Tran_Dd) AS 거래일자
+                                       FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Tr_Summ_Inf WITH(NOLOCK)
+                                      WHERE Tran_Dd <= #registDt#
+                                   GROUP BY Acct_Uniqid
+                                 ) AS 요약 ON 계좌.Acct_Uniqid = 요약.Acct_Uniqid
+                 LEFT OUTER JOIN [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Tr_Summ_Inf AS 상세  WITH(NOLOCK) ON 요약.Acct_Uniqid = 상세.Acct_Uniqid AND 요약.거래일자 = 상세.Tran_Dd
+                 LEFT OUTER JOIN (
+                                  SELECT Acct_Uniqid
+                                    FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Acct_Consol_Inf_Mgr WITH(NOLOCK)
+                                   WHERE Acct_Uniqid NOT IN (SELECT Stridno FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Auth_Mgr WITH(NOLOCK) WHERE Struser_Id = 'SGCMSSC')
+                                 ) AS 계좌권한all ON 계좌.Acct_Uniqid = 계좌권한all.Acct_Uniqid
+                WHERE 1=1 
+                  AND 사업자.Del_Yn != 'Y'
+                  AND 계좌.Del_Yn != 'Y'
+                  AND Isnull(계좌권한all.Acct_Uniqid, '') != ''
+                GROUP BY 사업자.Jumin_Biz_No ,사업자.Headsubaff_Corpgb , 계좌.Cur_Cd, Isnull(계좌.H_Fin_Cd, 계좌.Fin_Cd) , 
+                		 사업자.Headsubaff_Corp_Nm, 계좌.ACCT_NO 
+             ) TB
+              WHERE 1 = 1	/* [ICM-10717] 싱가포르 법인 4사 예외 처리 제거 ( 2021.11.30 : 김연준 ) */
+/*              AND TB.Jumin_Biz_No IN ('0490004133', '0490004132', '0490004131', '0400000319') */	/* [ICM-9994] PI 법인번호 추가 ( 0400000319 : PI, 0490004131 : SAM, 0490004132 : SGIG, 0490004133 : SGWW ) ( 2021.10.19 : 김연준 ) */
+              GROUP BY TB.comNm, TB.currCd, TB.Jumin_Biz_No) 
+			   SELECT A.CURR_CD
+                    , C.incom_Amt * ISNULL(EXCHANGE_RATE, 1) / 1000000 AS incom_Amt
+                    , C.out_Amt * ISNULL(EXCHANGE_RATE, 1) / 1000000 AS out_Amt
+                    , C.bal_Money * ISNULL(EXCHANGE_RATE, 1) / 1000000 AS bal_Money
+                    , C.Tran_Dd AS sDate
+                 FROM dbo.TB_COMPANY_BASE_INFO A WITH(NOLOCK)
+                INNER JOIN dbo.TB_COMPANY B WITH(NOLOCK) ON A.COM_NO = B.COM_NO
+                 LEFT OUTER JOIN reportData C WITH(NOLOCK) ON B.cms_company_no = C.Jumin_Biz_No AND A.CURR_CD = C.currCd
+                 LEFT OUTER JOIN (SELECT EXCHANGE_RATE, CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT
+                 					FROM dbo.TB_DAY_EXCHANGE  WITH(NOLOCK)
+                 				   WHERE CURR_CD = #curr#) D ON D.REGIST_DT = C.Tran_Dd 
+                WHERE A.COM_NO = #companyseq#
+                  AND A.CURR_CD = #curr#
+                  AND A.USE_YN = 'Y'
+                  AND B.CMS_YN = 'Y'
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport3" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport3 */
+		<![CDATA[
+		SELECT companyseq,
+			   COM_NM_EN,
+			   sDate,
+			   sType,
+			   cramt / 100000000 AS cramt,
+			   accname,
+			   remseqname1,
+			   summary,
+			   CURR_CD AS currCd
+          FROM(
+			SELECT T.companyseq,
+				   T.COM_NM_EN,
+				   T.sDate,
+				   T.sType,
+				   SUM(T.cramt) * ISNULL(T.EXCHANGE_RATE, 1) AS cramt,
+				   (T.accname) AS accname, 
+				   (T.remseqname1) AS remseqname1, 
+				   (T.summary) AS summary,
+				   T.CURR_CD
+			  FROM (SELECT A.sType, 
+			  			   A.companyseq, 
+			  			   B.COM_NM_EN,
+			  			   A.sDate, 
+			  			   A.accno, 
+			  			   A.accname, 
+			  			   A.remname1, 
+			  			   A.remseqname1, 
+			  			   A.summary, 
+			  			   A.cramt,
+			  			   C.EXCHANGE_RATE,
+			  			   C.CURR_CD
+					  FROM TB_CAPITAL_LIST A WITH(NOLOCK)
+					  LEFT OUTER JOIN TB_COMPANY B WITH(NOLOCK) ON A.companyseq = B.COM_NO
+					  LEFT OUTER JOIN (SELECT EXCHANGE_RATE, 
+					  						  CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT,
+					  						  CURR_CD
+				         				 FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+				         				WHERE CURR_CD = #curr#) C ON C.REGIST_DT = A.sDate 
+					 WHERE (STYPE = 1 OR STYPE = 2)
+					   AND SDATE >= #serdate# 
+          	   		   AND SDATE <= #edate# 
+          	   		   AND COMPANYSEQ = #companyseq#) T
+					group by 
+					T.companyseq,
+					T.COM_NM_EN,
+					T.sDate,
+					T.sType,
+					T.accname, 
+					T.remseqname1,
+					T.summary,
+					T.EXCHANGE_RATE,
+					T.CURR_CD) Z
+		WHERE Z.cramt >= 100000000
+		ORDER BY Z.companyseq, Z.sDate, Z.sType DESC, Z.cramt DESC 
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport4" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport4 */
+		<![CDATA[
+		SELECT Z.docNo,
+			   Z.companyseq,
+			   Z.sType,  
+			   Z.sDate, 
+			   Z.accname, 
+			   Z.remseqname1, 
+			   Z.summary, 
+			   Z.cramt, 
+			   Z.comNmEn, 
+			   Z.CURR_CD, 
+			   Z.comOrder
+		  FROM ( SELECT T.docNo,
+		  			 	T.companyseq,
+		  				T.sType, 
+		  				T.sDate, 
+		  				T.accname, 
+		  				T.remseqname1, 
+		  				T.summary, 
+		  				T.cramt, 
+		  				T.comNmEn, 
+		  				T1.CURR_CD, 
+		  				T.comOrder
+		           FROM TB_CAPITAL_LIST_COPY T WITH(NOLOCK)
+	               LEFT OUTER JOIN (SELECT EXCHANGE_RATE,
+	              						   CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT,
+	              						   CURR_CD
+	              					  FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+	              					 WHERE CURR_CD = #curr#) T1 ON T1.REGIST_DT = T.sDate 
+	              WHERE T.companyseq = #companyseq#
+	              	AND	T.sDate >= #serdate#  AND T.sDate <= #edate# 
+	                AND T.delYn = 'N'
+	           UNION ALL
+	           SELECT '' AS docNo,
+	           		  companyseq,
+					  sType,
+					  sDate,
+					  accname,
+					  remseqname1,
+					  summary,
+					  CONVERT(VARCHAR, cramt / 100000000) AS cramt,
+					  COM_NM_EN,
+					  CURR_CD AS currCd,
+					  COM_ORDER AS comOrder
+		        FROM ( SELECT X.companyseq,
+						      X.sType,
+						      X.sDate,
+						      SUM(X.cramt) * ISNULL(X.EXCHANGE_RATE, 1) AS cramt,
+						      (X.accname) AS accname, 
+						      (X.remseqname1) AS remseqname1, 
+						      (X.summary) AS summary,
+						      X.COM_NM_EN,
+						      X.CURR_CD,
+						      X.COM_ORDER
+					    FROM ( SELECT T.DocNo, 
+					  			      T.sType, 
+					  			      T.companyseq, 
+					  			      T1.COM_NM_EN,
+					  			      T.sDate, 
+					  			      T.accno, 
+					  			      T.accname, 
+					  			      T.remname1, 
+					  			      T.remseqname1, 
+					  			      T.summary, 
+					  			      T.cramt,
+					  			      T2.EXCHANGE_RATE,
+					  			      T2.CURR_CD,
+					  			      T3.COM_ORDER
+							  	 FROM TB_CAPITAL_LIST T
+							  	 LEFT OUTER JOIN TB_COMPANY T1 WITH(NOLOCK) ON T.companyseq = T1.COM_NO
+							  	 LEFT OUTER JOIN (SELECT EXCHANGE_RATE, 
+							  						  	 CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT,
+							  						  	 CURR_CD
+						         				 	FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+						         				   WHERE CURR_CD = #curr#) T2 ON T2.REGIST_DT = T.sDate 
+						         INNER JOIN dbo.TB_COMPANY_BASE_INFO T3 WITH(NOLOCK) ON T1.COM_NO = T3.COM_NO AND T3.USE_YN = 'Y'
+								WHERE (sType = 1 OR sType = 2)
+							   	  AND sDate >= #serdate# 
+		          	   		      AND sDate <= #edate# 
+		          	   		      AND companyseq = #companyseq#
+		          	   		      AND sDate NOT IN (SELECT sDate
+                                                		  FROM TB_CAPITAL_LIST_COPY WITH(NOLOCK)
+                                               		 WHERE sDate >= #serdate#  AND sDate <= #edate#)) X
+							group by 
+							X.companyseq,
+							X.COM_NM_EN,
+							X.sDate,
+							X.sType,
+							X.accname, 
+							X.remseqname1,
+							X.summary,
+							X.EXCHANGE_RATE,
+							X.CURR_CD,
+							X.COM_ORDER) Y
+			    WHERE Y.cramt >= 100000000) Z
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReportCms" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReportCms */
+		<![CDATA[
+		WITH reportData (comNm, currCd, Jumin_Biz_No,incom_Amt, out_Amt, bal_Money, Tran_Dd) AS (
+				SELECT TB.comNm
+                     , TB.currCd
+                     , TB.Jumin_Biz_No
+                     , SUM(TB.incom_Amt)   AS incom_Amt
+                     , SUM(TB.out_Amt)  AS out_Amt
+                     , SUM(TB.bal_Money) AS bal_Money
+                     , #registDt# AS Tran_Dd
+                  FROM (
+				  SELECT 사업자.Headsubaff_Corp_Nm          AS comNm
+                       , 계좌.Cur_Cd                        AS currCd
+                       , SUM(CASE WHEN 상세.Tran_Dd != #registDt# THEN 0 ELSE Isnull(상세.Incom_Amt,0) END) AS incom_Amt 
+                       , SUM(CASE WHEN 상세.Tran_Dd != #registDt# THEN 0 ELSE Isnull(상세.Out_Amt,0) END) AS out_Amt 
+                       , SUM(Isnull(상세.Bal_Money,0)) AS bal_Money
+                       , 사업자.Jumin_Biz_No AS Jumin_Biz_No 
+                    FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Head_Offic_Subcom_Affil_Com AS 사업자  WITH(NOLOCK)
+                   INNER JOIN [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Acct_Consol_Inf_Mgr   AS 계좌  WITH(NOLOCK) ON 사업자.Jumin_Biz_No = 계좌.Jumin_Biz_No
+                    LEFT OUTER JOIN (
+                                     SELECT Acct_Uniqid 
+                                          , MAX(Tran_Dd) AS 거래일자
+                                       FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Tr_Summ_Inf WITH(NOLOCK)
+                                      WHERE Tran_Dd <= #registDt#
+                                   GROUP BY Acct_Uniqid
+                                 ) AS 요약 ON 계좌.Acct_Uniqid = 요약.Acct_Uniqid
+                 LEFT OUTER JOIN [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Tr_Summ_Inf AS 상세  WITH(NOLOCK) ON 요약.Acct_Uniqid = 상세.Acct_Uniqid AND 요약.거래일자 = 상세.Tran_Dd
+                 LEFT OUTER JOIN (
+                                  SELECT Acct_Uniqid
+                                    FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Acct_Consol_Inf_Mgr WITH(NOLOCK)
+                                   WHERE Acct_Uniqid NOT IN (SELECT Stridno FROM [INHOUSEPLUS].[INHOUSEPLUS].[dbo].Auth_Mgr WITH(NOLOCK) WHERE Struser_Id = 'SGCMSSC')
+                                 ) AS 계좌권한all ON 계좌.Acct_Uniqid = 계좌권한all.Acct_Uniqid
+                WHERE 1=1 
+                  AND 사업자.Del_Yn != 'Y'
+                  AND 계좌.Del_Yn != 'Y'
+                  AND Isnull(계좌권한all.Acct_Uniqid, '') != ''
+                GROUP BY 사업자.Jumin_Biz_No ,사업자.Headsubaff_Corpgb , 계좌.Cur_Cd, Isnull(계좌.H_Fin_Cd, 계좌.Fin_Cd) , 
+                		 사업자.Headsubaff_Corp_Nm, 계좌.ACCT_NO 
+             ) TB
+              WHERE 1 = 1	/* [ICM-10717] 싱가포르 법인 4사 예외 처리 제거 ( 2021.11.30 : 김연준 ) */
+/*              AND TB.Jumin_Biz_No IN ('0490004133', '0490004132', '0490004131', '0400000319') */	/* [ICM-9994] PI 법인번호 추가 ( 0400000319 : PI, 0490004131 : SAM, 0490004132 : SGIG, 0490004133 : SGWW ) ( 2021.10.19 : 김연준 ) */
+              GROUP BY TB.comNm, TB.currCd, TB.Jumin_Biz_No) 
+			SELECT Z.docNo,
+				   Z.companyseq,
+				   Z.sType,  
+				   Z.sDate, 
+				   Z.accname, 
+				   Z.remseqname1, 
+				   Z.summary, 
+				   Z.cramt, 
+				   Z.comNmEn, 
+				   Z.CURR_CD, 
+				   Z.comOrder
+			  FROM ( SELECT T.docNo,
+			  			 	T.companyseq,
+			  				T.sType, 
+			  				T.sDate, 
+			  				T.accname, 
+			  				T.remseqname1, 
+			  				T.summary, 
+			  				T.cramt, 
+			  				T.comNmEn, 
+			  				T1.CURR_CD, 
+			  				T.comOrder
+			           FROM TB_CAPITAL_LIST_COPY T WITH(NOLOCK)
+		               LEFT OUTER JOIN (SELECT EXCHANGE_RATE,
+		              						   CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT,
+		              						   CURR_CD
+		              					  FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+		              					 WHERE CURR_CD = #curr#) T1 ON T1.REGIST_DT = T.sDate 
+		              WHERE T.companyseq = #companyseq#
+		              	AND	T.sDate = #registDt#
+		                AND T.delYn = 'N'
+				  UNION ALL
+				  SELECT '' AS docNo,
+				  		 T.COM_NO,
+				  		 '1' AS sType,
+				  		 T2.Tran_Dd AS sDate, 
+				  		 '' AS accname, 
+				  		 '' AS remseqname1, 
+				  		 '' AS summary,
+				  		 T2.incom_Amt * ISNULL(EXCHANGE_RATE, 1) / 1000000 AS incom_Amt,
+				  		 T1.COM_NM_EN,
+				  		 T.CURR_CD,
+				  		 T.COM_ORDER
+	                FROM dbo.TB_COMPANY_BASE_INFO T WITH(NOLOCK)
+	               INNER JOIN dbo.TB_COMPANY T1 WITH(NOLOCK) ON T.COM_NO = T1.COM_NO
+	                LEFT OUTER JOIN reportData T2 WITH(NOLOCK) ON T1.cms_company_no = T2.Jumin_Biz_No AND T.CURR_CD = T2.currCd
+	                LEFT OUTER JOIN (SELECT EXCHANGE_RATE, CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT
+	               	  				   FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+	                 				   WHERE CURR_CD = #curr#) T3 ON T3.REGIST_DT = T2.Tran_Dd 
+	                WHERE T.COM_NO = #companyseq#
+	                  AND T.CURR_CD = #curr#
+	                  AND T.USE_YN = 'Y'
+	                  AND T1.CMS_YN = 'Y'
+	                  AND ISNULL(T2.incom_Amt, 0) > 0
+	                  AND T2.Tran_Dd NOT IN (SELECT sDate
+                                   		  	   FROM TB_CAPITAL_LIST_COPY WITH(NOLOCK)
+                                  		 	  WHERE sDate = #registDt#)
+				  UNION ALL
+				  SELECT '' AS docNo,
+				  		 T.COM_NO,
+				  		 '2' AS sType,
+				  		 T2.Tran_Dd AS sDate, 
+				  		 '' AS accname, 
+				  		 '' AS remseqname1, 
+				  		 '' AS summary,
+				  		 T2.out_Amt * ISNULL(EXCHANGE_RATE, 1) / 1000000 AS out_Amt,
+				  		 T1.COM_NM_EN,
+				  		 T.CURR_CD,
+				  		 T.COM_ORDER
+	                FROM dbo.TB_COMPANY_BASE_INFO T WITH(NOLOCK)
+	               INNER JOIN dbo.TB_COMPANY T1 WITH(NOLOCK) ON T.COM_NO = T1.COM_NO
+	                LEFT OUTER JOIN reportData T2 WITH(NOLOCK) ON T1.cms_company_no = T2.Jumin_Biz_No AND T.CURR_CD = T2.currCd 
+	                LEFT OUTER JOIN (SELECT EXCHANGE_RATE, CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT
+	               	  				   FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK)
+	                 				   WHERE CURR_CD = #curr#) T3 ON T3.REGIST_DT = T2.Tran_Dd 
+	                WHERE T.COM_NO = #companyseq#
+	                  AND T.CURR_CD = #curr#
+	                  AND T.USE_YN = 'Y'
+	                  AND T1.CMS_YN = 'Y'
+	                  AND ISNULL(T2.out_Amt, 0) > 0
+	                  AND T2.Tran_Dd NOT IN (SELECT sDate
+                                   		  	   FROM TB_CAPITAL_LIST_COPY WITH(NOLOCK)
+                                  		 	  WHERE sDate = #registDt#)) Z
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport7" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport7 */
+		<![CDATA[				
+			select top 1 * from TB_CAPITAL_LIST_WEEK WITH(NOLOCK) where companylist = #companylist# and datevalue = #datevalue#;
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport5" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport5 */
+		<![CDATA[				
+			select
+			 A.DocNo, 
+			 CASE WHEN A.sType = 2 THEN '입금' ELSE '출금' END AS sType,
+			 A.companyseq, 
+			 B.COM_NM_EN,
+			 A.sDate, 
+			 A.accno, 
+			 A.accname, 
+			 A.remname1, 
+			 A.remseqname1, 
+			 A.summary, 
+			 A.cramt * ISNULL(C.EXCHANGE_RATE, 1) AS cramt
+			from TB_CAPITAL_LIST A WITH(NOLOCK)
+			left join TB_COMPANY B WITH(NOLOCK) on A.companyseq = B.COM_NO
+			LEFT OUTER JOIN (SELECT EXCHANGE_RATE, CONVERT(int,CONVERT(char(8), CONVERT(date, REGIST_DT),112)) AS REGIST_DT
+	         				   FROM dbo.TB_DAY_EXCHANGE WITH(NOLOCK) 
+	         				  WHERE CURR_CD = #curr#) C ON C.REGIST_DT = A.sDate
+			where A.sDate = #sdate# and (A.sType = 2 or A.sType = 1)  and companyseq = #companyseq# order by A.sDate, A.sType
+		]]>
+	</select>
+	
+	<select id="IfrsWeekReport6" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport6 */
+		<![CDATA[				
+			select COM_NM_EN from TB_COMPANY WITH(NOLOCK) where COM_NO = #companylist#
+		]]>
+	</select>
+		
+		
+	<insert id="IfrsWeekReport8" parameterClass="HashMap">
+		/* CapitalDAO.IfrsWeekReport8 */
+		MERGE INTO TB_CAPITAL_LIST_USERSET A
+		USING (
+				SELECT #sYear# AS sYear, #sMonth# AS sMonth, #week# AS week
+			  ) B
+		   ON (A.sYear = B.sYear AND A.sMonth = B.sMonth AND A.week = B.week)
+	 	 WHEN MATCHED THEN
+	 	  UPDATE SET  
+	 	  		sYear = #sYear#,
+				sMonth = #sMonth#,
+				week = #week#,
+				companylist = #companylist#, 
+				weekly = #weekly#
+	 	 WHEN NOT MATCHED THEN
+		  INSERT 
+			(
+				sYear,
+				sMonth,
+				week,
+		   		weekly,
+		   		companylist
+		     )
+		 	VALUES
+		 	(
+		 		#sYear#,
+				#sMonth#,
+				#week#,
+		   		#weekly#, 
+          		#companylist#
+		 	);
+	</insert>
+	
+	<select id="IfrsWeekReport9" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport9 */
+		<![CDATA[				
+			SELECT * 
+			  FROM TB_CAPITAL_LIST_USERSET  WITH(NOLOCK)
+		]]>
+			<isNotEmpty property="flag" >
+				<isEqual property="flag" compareValue="D">
+				 WHERE weekly = #weekly#
+				</isEqual>
+				<isEqual property="flag" compareValue="W">
+				  WHERE sYear = #sYear#
+					AND sMonth = #sMonth#
+					AND week = #week#
+				</isEqual>
+			</isNotEmpty>
+	</select>
+	
+	<parameterMap id="IfrsWeekReport10Map" class="HashMap">
+	  	<parameter property="xmlDocument"  	mode="IN" />
+	  	<parameter property="comNo"  		mode="IN" />
+	</parameterMap>
+	
+	<procedure id="IfrsWeekReport10" parameterMap="IfrsWeekReport10Map" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport10 */
+	  	EXEC LIVE_SQL.SGERP.dbo.sg_SACAccRemPrintQuery  ?, 2, 1014916, '', ?, 1, 1, 10895
+	</procedure>
+	
+	
+	<insert id="IfrsWeekReport11" parameterClass="HashMap">
+		/* CapitalDAO.IfrsWeekReport11 */
+		MERGE INTO TB_CAPITAL_LIST_IMGSRC A
+		USING (
+				SELECT 	#companyseq# AS companyseq, #stype# AS stype, #sdate# AS sdate
+			  ) B
+		   ON (A.companyseq = B.companyseq and A.stype = B.stype and A.sdate = B.sdate)
+	 	 WHEN MATCHED THEN
+	 	  UPDATE SET  
+				imgsrc	= #imgsrc#,
+				UPT_ID	= #registId#,		/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 수정자 ID 추가 ( 2022-03-15 : 김연준 ) */
+				UPT_DT	= GETDATE()			/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 수정일자 추가 ( 2022-03-15 : 김연준 ) */
+	 	 WHEN NOT MATCHED THEN
+		  INSERT 
+			(
+		   		companyseq, 
+          		stype,
+		   		sdate,
+		   		imgsrc,
+		   		INS_ID,		/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 등록자 ID 추가 ( 2022-03-15 : 김연준 ) */
+		   		INS_DT		/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 등록일자 추가 ( 2022-03-15 : 김연준 ) */
+		     )
+		 	VALUES
+		 	(
+		   		#companyseq#, 
+          		#stype#, 
+          		#sdate#,
+          		#imgsrc#,
+          		#registId#,		/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 등록자 ID 추가 ( 2022-03-15 : 김연준 ) */
+          		GETDATE()		/* ICM-11763 : 예적금 현황작성 / 현금출납장 작성 저장시 등록일자 추가 ( 2022-03-15 : 김연준 ) */
+		 	);
+	</insert>
+
+	<select id="IfrsWeekReport12" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport12 */
+		<![CDATA[				
+			select  * from TB_CAPITAL_LIST_IMGSRC WITH(NOLOCK) where companyseq = #companyseq# and sdate = #sdate#;
+		]]>
+	</select>
+	
+	
+	<insert id="insertCapitalComment" parameterClass="HashMap">
+		/* CapitalDAO.insertCapitalComment */
+		MERGE INTO TB_CAPITAL_COMMENT A
+		USING (
+		    SELECT #companyseq# AS COMPANYSEQ, #datevalue# AS DATE_VALUE
+		) B 
+		   ON (A.COMPANYSEQ = B.COMPANYSEQ AND A.DATE_VALUE = B.DATE_VALUE)
+		WHEN MATCHED THEN
+			UPDATE SET  
+				COMPANYSEQ = #companyseq#,
+				COMMENT = #comment#
+		WHEN NOT MATCHED THEN			
+			INSERT 
+			(
+				  COMPANYSEQ
+				, COMMENT
+				, DATE_VALUE
+				, USE_YN
+				, REGIST_ID
+				, REGIST_DT
+			)
+			VALUES 
+			(
+				  #companyseq#
+				, #comment#
+				, #datevalue#
+				, 'Y'
+				, #registId#
+				, GETDATE()
+			);
+	</insert>
+	
+	<select id="IfrsWeekRate" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekRate */
+		<![CDATA[				
+			select  * from TB_CAPITAL_LIST_RATE WITH(NOLOCK) where companylist = #companylist# and datevalue = #datevalue#
+		]]>
+	</select>
+	
+	<select id="IfrsWeekRateList" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekRateList */
+		<![CDATA[				
+			select  datevalue, currCd, max(rate) as rate from TB_CAPITAL_LIST_RATE WITH(NOLOCK)
+			where datevalue = #datevalue#
+			group by datevalue, currCd
+		]]>
+	</select>
+	
+	
+	<parameterMap id="IfrsWeekReport13Map" class="HashMap">
+	  	<parameter property="xmlDocument"  	mode="IN" />
+	  	<parameter property="comNo"  		mode="IN" />
+	</parameterMap>
+	
+	<procedure id="IfrsWeekReport13" parameterMap="IfrsWeekReport13Map" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport13 */
+	  	EXEC LIVE_SQL.SGERP.dbo._SACCashBookList_IFRS  ?, 2, 3012, '', ?, 1, 1, 300178
+	</procedure>
+	
+	<parameterMap id="IfrsWeekReport14Map" class="HashMap">
+	  	<parameter property="xmlDocument"  	mode="IN" />
+	  	<parameter property="comNo"  		mode="IN" />
+	</parameterMap>
+	
+	<procedure id="IfrsWeekReport14" parameterMap="IfrsWeekReport13Map" resultClass="egovMap">
+		/* CapitalDAO.IfrsWeekReport14 */
+	  	EXEC LIVE_SQL.SGERP.dbo._SACCashBookSumList  ?, 2, 3012, '', ?, 1, 1, 300178
+	</procedure>
+
+
+	<select id="mailsendlogAjax" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.mailsendlogAjax */
+		<![CDATA[				
+		select
+		  T1.CREATE_DATE, 
+		  T2.USER_NM AS FromNm,
+		  T1.FROM_ID, 
+		  T1.FROM_MAIL, 
+		  T3.USER_NM AS ToNm,
+		  T1.TO_ID, 
+		  T1.TO_MAIL, 
+		  T1.ALERT_SUBJECT, 
+		  T1.ERR_MSG
+		from
+		(select 
+		  convert(int, convert(char(8), CREATE_DATE, 112)) AS CREATE_DATE,
+		  FROM_ID,
+		  FROM_MAIL,
+		  TO_ID,
+		  TO_MAIL,
+		  ALERT_SUBJECT,
+		  '성공' AS ERR_MSG 
+		  from IFRS.DBO.ALERT_QUEUE WITH(NOLOCK)
+		  where convert(int, convert(char(8), CREATE_DATE, 112)) = #sdate# and FROM_NAME = 'EFIS' 
+		  ) T1
+		  left join FIM.dbo.TB_USER T2 WITH(NOLOCK) ON T1.FROM_ID = T2.LOGON_ID
+		  left join FIM.dbo.TB_USER T3 WITH(NOLOCK) ON T1.TO_ID = T3.LOGON_ID
+		  order by T1.CREATE_DATE  
+		]]>
+	</select>
+	
+	<select id="selectCapitalVrify" parameterClass="HashMap" resultClass="String">
+		/* CapitalDAO.selectCapitalVrify */
+		SELECT CASE WHEN COUNT(VRIFY_DATE) > 0 
+					THEN 'Y'  
+					ELSE 'N' 
+				END VRIFY_YN 
+		  FROM TB_CAPITAL_VRIFY WITH(NOLOCK)
+		 WHERE 1=1
+		  <isEqual prepend="AND" property="comNo" compareValue="null">
+		  	COM_NO = '2'
+		  </isEqual>
+		  <isNotEqual prepend="AND" property="comNo" compareValue="null">
+		  	COM_NO = #comNo#
+		  </isNotEqual>
+		 AND VRIFY_DATE = #vrifyDate#
+	</select>
+	
+	<insert id="insertCapitalVrify" parameterClass="HashMap">
+		/* CapitalDAO.insertCapitalVrify */
+		INSERT INTO TB_CAPITAL_VRIFY (COM_NO, 
+									  VRIFY_DATE, 
+									  INS_ID, 
+									  INS_DT, 
+									  UPT_ID, 
+									  UPT_DT) 
+			  VALUES (#comNo#, 
+			  		  #vrifyDate#, 
+			  		  #insId#, 
+			  		  GETDATE(), 
+			  		  #insId#, 
+			  		  GETDATE())
+	</insert>
+	
+	<select id="getComment" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.getComment */
+        WITH BASIC(COMMENT, DATEVALUE) AS (
+		  SELECT COMMENT, DATE_VALUE AS DATEVALUE
+		    FROM TB_CAPITAL_COMMENT WITH(NOLOCK)
+		   WHERE COMPANYSEQ = #companyseq#
+		    AND DATE_VALUE = #weekly#
+		),
+		PREV(COMMENT, DATEVALUE) AS (
+		   SELECT TOP(1) COMMENT, DATE_VALUE AS DATEVALUE
+		    FROM TB_CAPITAL_COMMENT WITH(NOLOCK)
+		   WHERE COMPANYSEQ = #companyseq#
+		   ORDER BY COMMENT_SEQ DESC
+		)
+		SELECT DISTINCT TB.COMMENT
+		     , TB.DATEVALUE
+		  FROM (
+		        SELECT COMMENT,DATEVALUE FROM BASIC
+		         UNION ALL
+		        SELECT COMMENT,DATEVALUE FROM PREV
+        ) TB
+	</select>
+	
+	<select id="selectCapitalCompanyList" resultClass="egovMap">
+		/* CapitalDAO.selectCapitalCompanyList */
+		SELECT A.COM_BASE_SEQ
+             , A.SECTION_TYPE
+             , A.COM_NO
+             , A.COM_NICK_NM
+             , A.CURR_CD
+             , A.COM_ORDER
+             , B.CMS_YN
+             , B.CMS_COMPANY_NM
+             , B.COM_NM
+             , B.COM_NM_EN
+          FROM dbo.TB_COMPANY_BASE_INFO A WITH(NOLOCK) 
+         INNER JOIN dbo.TB_COMPANY B WITH(NOLOCK) ON A.COM_NO = B.COM_NO
+		 WHERE A.USE_YN = 'Y'
+	     ORDER BY A.COM_ORDER ASC
+	</select>
+	
+	<select id="selectDayExchangeList" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectDayExchangeList */
+		<![CDATA[	
+			SELECT EXCHANGE_RATE AS rate, CURR_CD, REGIST_DT
+			  FROM TB_DAY_EXCHANGE WITH(NOLOCK)
+			 WHERE REGIST_DT >= #serdate# AND REGIST_DT <= #edate#
+			   AND CURR_CD = #curr#
+		]]>
+	</select>
+	
+	<select id="selectCapitalHistory" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectCapitalHistory */
+        SELECT DocNo AS docNo
+             , sType
+             , companyseq
+             , sDate
+             , accname
+             , remseqname1
+             , summary
+             , cramt
+             , comNmEn
+             , comOrder
+          FROM TB_CAPITAL_LIST_COPY WITH(NOLOCK)
+         WHERE companyseq = #companyseq#
+           AND sType = #sType#
+           AND sDate = #sDate#
+           AND delYn = 'N'
+	</select>
+	
+	<insert id="insertCapitalHistory" parameterClass="HashMap">
+		/* CapitalDAO.insertCapitalHistory */
+        INSERT INTO TB_CAPITAL_LIST_COPY (
+               sType
+             , companyseq
+             , sDate
+             , accname
+             , remseqname1
+             , summary
+             , cramt
+             , comNmEn
+             , comOrder
+             , delYn
+        ) VALUES (
+               #sType#
+             , #companyseq#
+             , #sDate#
+             , #accname#
+             , #remseqname1#
+             , #summary#
+             , #cramt#
+             , #comNmEn#
+             , #comOrder#
+             , 'N'
+        )
+	</insert>
+	
+	<update id="deleteCapitalHistory" parameterClass="HashMap">
+		/* CapitalDAO.deleteCapitalHistory */
+        UPDATE TB_CAPITAL_LIST_COPY SET
+         delYn = 'Y'
+         WHERE sDate = #sDate#
+           AND DocNo = #docNo#
+	</update>
+	
+	<update id="updateCapitalHistory" parameterClass="HashMap">
+		/* CapitalDAO.updateCapitalHistory */
+        UPDATE TB_CAPITAL_LIST_COPY SET
+             cramt = #cramt#
+           , sType = #sType#
+           , summary = #summary#
+         WHERE DocNo = #docNo#
+	</update>
+	
+	<delete id="deleteUserSet" parameterClass="HashMap">
+		/* CapitalDAO.deleteUserSet */
+		DELETE FROM TB_CAPITAL_LIST_USERSET WHERE sYear = #sYear# AND sMonth = #sMonth# AND week = #week#
+	</delete>
+	
+	
+	<!-- CompanyCapitalGraph -->
+	<insert id="insertCompanyGraphSetting" parameterClass="HashMap">
+		/* CapitalDAO.insertCompanyGraphSetting */
+	    INSERT INTO TB_COMPANY_GRAPH_SETTING (
+			   COM_NO
+		      ,MAX_AMT
+		      <!-- SPLIT_CNT -->
+			  ,SPLIT_INTERVAL <!-- ICM-8579, 21.05.25 박주연, 차트 변경으로 간격 갯수 대신 간격을 받는 것으로 변경 -->
+		      ,INS_ID
+		      ,INS_DT		
+		) VALUES (
+		       #comNo#
+			  ,#maxAmt#
+			  <!--,#splitCnt#-->
+			  ,#splitInterval#
+			  ,#userId#
+			  ,GETDATE()
+		)
+	</insert>
+	
+	<update id="updateCompanyGraphSetting" parameterClass="HashMap">
+		/* CapitalDAO.updateCompanyGraphSetting */
+		UPDATE TB_COMPANY_GRAPH_SETTING
+		   SET MAX_AMT   = #maxAmt#
+		      <!--,SPLIT_CNT = #splitCnt# -->
+			  ,SPLIT_INTERVAL = #splitInterval#
+		      ,UPD_ID    = #userId#
+		      ,UPD_DT    = GETDATE()
+		      
+		 WHERE COM_NO    = #comNo#
+	</update>
+	
+	<delete id="deleteCompanyGraphSetting" parameterClass="HashMap">
+		/* CapitalDAO.deleteCompanyGraphSetting */
+		DELETE TB_COMPANY_GRAPH_SETTING
+ 		 WHERE COM_NO = #comNo#
+	</delete>
+	
+	<select id="selectCompanyGraphSetting" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectCompanyGraphSetting */
+        SELECT COM_NO              
+			  ,COM_NO AS COM_NO_OLD /* 수정 변경 용도  */ 
+		      ,MAX_AMT
+		      <!--,SPLIT_CNT-->
+			  ,SPLIT_INTERVAL
+		      
+          FROM TB_COMPANY_GRAPH_SETTING WITH(NOLOCK)
+          
+         WHERE 1 = 1 
+         <isNotEmpty property="comNo" >
+           AND COM_NO = #comNo#
+         </isNotEmpty>
+         
+         ORDER BY MAX_AMT DESC
+	</select>
+	
+	<select id="selectErpYn" parameterClass="HashMap" resultClass="String">
+		/* CapitalDAO.selectErpYn */
+	    <![CDATA[	
+		  SELECT COM_DIV FROM TB_COMPANY WITH(NOLOCK) WHERE COM_NO = ISNULL(#comNo#, 0)
+		]]>
+	</select>
+	
+	<select id="selectLastSaveSdate" parameterClass="HashMap" resultClass="String">
+		/* CapitalDAO.selectLastSaveSdate */
+	    <![CDATA[	
+		  SELECT ISNULL(MAX(sdate),'') as sdate 
+			FROM TB_CAPITAL_ASSET WITH(NOLOCK)
+			WHERE 1=1
+			AND companyseq = #comNo#
+			AND sdate <= #sdate#
+		]]>
+	</select>
+	
+	<select id="selectLoadNonErpSaveData" parameterClass="HashMap" resultClass="egovMap" remapResults="true" >
+		/* CapitalDAO.selectLoadNonErpSaveData */
+		<isEqual property="SaveType" compareValue="R">
+		<![CDATA[		
+		SELECT
+			DocNo,
+			stype,
+			companyseq,
+			sdate,
+			sdata1,
+			sdata2,
+			sdata3,
+			sdata4,
+			sdata5,
+			sum4 as sum1,
+			0 as sum2,
+			0as sum3,
+			sum4,
+			sum5,
+			sum6,
+			sum7,
+			sum8,
+			sum9,
+			INS_ID,
+			INS_DT
+		FROM TB_CAPITAL_ASSET WITH(NOLOCK)
+		WHERE companyseq = #comNo# and sdate = #sdate2#
+		]]>
+		</isEqual>
+		
+		<isEqual property="SaveType" compareValue="B">
+		<![CDATA[		
+		SELECT
+			DocNo,
+			stype,
+			companyseq,
+			sdate,
+			sdata1,
+			sdata2,
+			sdata3,
+			sdata4,
+			sdata5,
+			sum4 as sum1,
+			0 as sum2,
+			0as sum3,
+			sum4,
+			sum5,
+			sum6,
+			sum7,
+			sum8,
+			sum9
+		FROM TB_CAPITAL_ASSET_BAK WITH(NOLOCK)
+		WHERE companyseq = #comNo# and sdate = #sdate2#
+		]]>
+		</isEqual>
+	</select>
+	
+	<insert id="setFcmmnLog" parameterClass="HashMap">
+		/* CapitalDAO.setFcmmnLog */
+		INSERT INTO FIM.dbo.TB_FCMMN_LOG ( SYSTEM_CD,	LEVEL,	REG_DATE,	LOG_JSON,	REQ_URI )
+		VALUES ( #systemCd#, #level#, GETDATE(), #logJson#, #reqUri# )
+	</insert>
+	
+	<parameterMap id="selectAssetListAjax6Map" class="HashMap">
+	  	<parameter property="xmlDocument" mode="IN" />
+	  	<parameter property="comNo" mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectAssetListAjax6" parameterMap="selectAssetListAjax6Map" resultClass="egovMap">
+		/* CapitalDAO.selectAssetListAjax6 */
+		EXEC LIVE_SQL.SGERP.dbo.SG_SACLedgerQueryAccRemBalance_Capital  ?, 2, 1291, '', ?, 1, 1, 300196
+	</procedure>
+	
+	<select id="selectLoadSaveDataForReport" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectLoadSaveDataForReport */
+		SELECT  B.DocNo
+			  , B.stype
+			  , B.companyseq
+			  , B.sdate
+			  , B.sdata1
+			  , B.sdata2
+			  , B.sdata3
+			  , B.sdata4
+			  , B.sdata5
+			  , B.sdata6
+			  , B.summary
+			  , B.sum1
+			  , B.sum2
+			  , B.sum3
+			  , B.sum4
+		  FROM (
+				SELECT  A.DocNo
+					  , A.stype
+					  , A.companyseq
+					  , A.sdate
+					  , CASE
+							WHEN A.stype BETWEEN 3 AND 7 THEN A.sdata2
+							WHEN A.stype = 9 THEN A.sdata2
+							ELSE A.sdata1
+						END sdata1
+					  , CASE
+							WHEN A.stype BETWEEN 3 AND 7 THEN A.sdata3
+							WHEN A.stype = 9 THEN A.sdata3
+							WHEN A.stype = 10 THEN A.sdata2
+							ELSE ''
+						END sdata2
+					  , CASE
+							WHEN A.stype = 10 THEN A.sdata3
+							ELSE ''
+						END sdata3
+					  , CASE
+							WHEN A.stype = 10 THEN A.sdata4
+							ELSE ''
+						END sdata4
+					  , CASE
+							WHEN A.stype = 10 THEN A.sdata5
+							ELSE ''
+						END sdata5
+					  , CASE
+							WHEN A.stype = 10 THEN A.sdata6
+							ELSE ''
+						END sdata6
+					  , A.sum1
+					  , A.sum2
+					  , A.sum3
+					  , A.sum4
+					  , A.summary
+				  FROM TB_CAPITAL_ASSET AS A WITH(NOLOCK)
+				 WHERE A.companyseq = #comNo#
+				   AND A.sdate = #sdate2#
+		  ) B
+		 ORDER BY  B.DocNo
+	</select>
+	
+	<select id="selectAssetListAjax7" parameterClass="HashMap" resultClass="egovMap">
+		/* CapitalDAO.selectAssetListAjax7 */
+		SELECT  A.CompanySeq
+			  , A.AccDate
+			  , A.SlipID
+			  , A.AccSeq
+			  , B.AccName
+			  , C.BankName	AS RemValName1
+			  , C.BankAccNo
+			  , A.Summary
+			  , A.CrAmt
+		  FROM SGERP.dbo._TACSlipRow AS A WITH(NOLOCK)
+		  LEFT JOIN SGERP.dbo._TDAAccount AS B WITH(NOLOCK)
+				 ON A.CompanySeq = B.CompanySeq
+				AND A.AccSeq = B.AccSeq
+		 INNER JOIN (
+					SELECT  A.CompanySeq
+						  , A.SlipSeq
+						  , B.BankSeq
+						  , D.MinorName		AS BankName
+						  , B.BankAccSeq
+						  , B.BankAccNo
+					  FROM SGERP.dbo._TACSlipRem AS A WITH(NOLOCK)
+					 INNER JOIN SGERP.dbo._TDABankAcc AS B WITH(NOLOCK)
+							 ON A.CompanySeq = B.CompanySeq
+							AND A.RemValSeq = B.BankAccSeq
+					  LEFT JOIN SGERP.dbo._TDABank AS C WITH(NOLOCK)
+							 ON B.CompanySeq = C.CompanySeq
+							AND B.BankSeq = C.BankSeq
+					  LEFT JOIN SGERP.dbo._TDAUMinor AS D WITH(NOLOCK)
+							 ON C.CompanySeq = D.CompanySeq
+							AND C.BankHQ = D.MinorSeq
+					 WHERE A.RemSeq = 1004
+		  ) C
+				 ON A.CompanySeq = C.CompanySeq
+				AND A.SlipSeq = C.SlipSeq
+		 WHERE A.CompanySeq = #comNo#
+		   AND A.AccDate = #sdate#
+		   AND A.AccSeq IN ( 10, 333, 61, 11, 619, 12, 57, 13, 58, 106, 121, 445, 725 )
+		   AND A.CrAmt > 0
+		 ORDER BY  A.AccDate, A.SlipID
+	</select>
+	
+</sqlMap>
