@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.1.0",
-  "description": "★ ★ ★ v2.1 — SDLC 4단계 chain harness + ★ phase 4.7 characterization 본체 격상 (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration). chain harness validated (5 요소 코드 enforcement + 228 unit test). 1차 single-case = legacy-extraction 모드 / round-trip = chain harness gate 안에서 정식 허용 / 70~80% 한계 명시 잔존.",
+  "version": "2.1.1",
+  "description": "★ ★ ★ v2.1.1 PATCH — phase 4.7 characterization ratchet trend baseline 자동 검증 (C-v2.1.0-5 carry resolved / _shared/baseline.js coverageTrendCheck 신설 + characterization-coverage-validator --coverage-baseline + --write-coverage-baseline flag + 4 unit test). chain harness validated (5 요소 코드 enforcement + 232 unit test). v2.1.0 phase 4.7 본체 격상 보존 / v2.0.0 chain harness validated 보존.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

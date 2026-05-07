@@ -122,13 +122,20 @@ node ../../tools/schema-validator/src/cli.js .aimd/output/characterization/
 # Expect: characterization-spec.json valid + ratchet if/then + ambiguous if/then 모두 통과
 ```
 
-### 9. characterization-coverage-validator 실행 (★ v2.1.0 신설)
+### 9. characterization-coverage-validator 실행 (★ v2.1.0 신설 / v2.1.1 ratchet trend 보강)
 
 ```bash
+# 기본 (absolute 또는 ratchet 첫 측정)
 node ../../tools/characterization-coverage-validator/src/cli.js \
   --target .aimd/output/characterization/ \
   --threshold 0.80
-# Expect: snapshot 4 필수 필드 / intent_classification.type enum / named_classified_ratio ≥ 0.80 / coverage strategy 검증 통과
+
+# ★ v2.1.1 ratchet trend 자동 검증 (coverage_strategy=ratchet + trend_required=true 인 경우)
+node ../../tools/characterization-coverage-validator/src/cli.js \
+  --target .aimd/output/characterization/ \
+  --coverage-baseline .aimd/baseline/characterization-coverage.json \
+  [--write-coverage-baseline]    # legacy 첫 진입 시 / trend pass 후 갱신 시
+# Expect: snapshot 4 필수 필드 / intent_classification.type enum / named_classified_ratio ≥ 0.80 / coverage strategy 검증 통과 / ratchet trend ≥ baseline (regression 차단)
 ```
 
 ## 산출물

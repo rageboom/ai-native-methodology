@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { writeFileSync, readFileSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { validateCharacterization } from '../src/validator.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -80,4 +82,93 @@ test('coverage_strategy enum invalid value detected', () => {
   // 'absolute' is valid in this fixture; just verify no false positive
   const strategyBad = r.findings.filter(f => f.kind === 'coverage.strategy_invalid');
   assert.equal(strategyBad.length, 0);
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// ★ v2.1.0 carry C-v2.1.0-5 — ratchet trend baseline 자동 검증
+// ─────────────────────────────────────────────────────────────────────
+
+test('★ ratchet trend — first run (no baseline) → pass + recommend write', () => {
+  const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-test-'));
+  const baselinePath = join(tmpDir, 'no-such-baseline.json');
+  try {
+    const r = validateCharacterization(fx('valid-ratchet'), 0.80, {
+      coverageBaselinePath: baselinePath,
+      writeBaseline: false,
+    });
+    const trendNeg = r.findings.filter(f => f.kind === 'coverage.trend_negative_ratchet');
+    assert.equal(trendNeg.length, 0, 'first run should not block on trend');
+    assert.ok(r.summary.coverage_trend, 'coverage_trend summary should be set');
+    assert.equal(r.summary.coverage_trend.reason, 'no_baseline_first_run');
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('★ ratchet trend — current ≥ baseline → pass (positive or flat)', () => {
+  const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-test-'));
+  const baselinePath = join(tmpDir, 'baseline.json');
+  // valid-ratchet 의 actual = 1/2 = 0.50
+  // baseline = 0.40 → delta +0.10 → trend positive
+  writeFileSync(baselinePath, JSON.stringify({
+    generated_at: '2026-05-01',
+    coverage_ratio: 0.40,
+    coverage_strategy: 'ratchet',
+    project_id: 'test-fixture-ratchet'
+  }));
+  try {
+    const r = validateCharacterization(fx('valid-ratchet'), 0.80, {
+      coverageBaselinePath: baselinePath,
+      writeBaseline: false,
+    });
+    const trendNeg = r.findings.filter(f => f.kind === 'coverage.trend_negative_ratchet');
+    assert.equal(trendNeg.length, 0, 'positive trend should not block');
+    assert.equal(r.summary.coverage_trend.reason, 'trend_positive');
+    assert.ok(r.summary.coverage_trend.delta > 0);
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('★ ratchet trend — current < baseline → high finding (regression block)', () => {
+  const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-test-'));
+  const baselinePath = join(tmpDir, 'baseline.json');
+  // valid-ratchet 의 actual = 1/2 = 0.50
+  // baseline = 0.70 → delta -0.20 → trend negative → block
+  writeFileSync(baselinePath, JSON.stringify({
+    generated_at: '2026-05-01',
+    coverage_ratio: 0.70,
+    coverage_strategy: 'ratchet',
+    project_id: 'test-fixture-ratchet'
+  }));
+  try {
+    const r = validateCharacterization(fx('valid-ratchet'), 0.80, {
+      coverageBaselinePath: baselinePath,
+      writeBaseline: false,
+    });
+    const trendNeg = r.findings.filter(f => f.kind === 'coverage.trend_negative_ratchet');
+    assert.equal(trendNeg.length, 1, 'negative trend should produce 1 finding');
+    assert.equal(trendNeg[0].severity, 'high');
+    assert.ok(trendNeg[0].delta < 0);
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('★ ratchet baseline write — --write-coverage-baseline 옵션 시 baseline file 생성', () => {
+  const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-test-'));
+  const baselinePath = join(tmpDir, 'new-baseline.json');
+  try {
+    const r = validateCharacterization(fx('valid-ratchet'), 0.80, {
+      coverageBaselinePath: baselinePath,
+      writeBaseline: true,
+    });
+    assert.equal(r.summary.coverage_baseline_written, baselinePath);
+    assert.ok(existsSync(baselinePath), 'baseline file should be written');
+    const written = JSON.parse(readFileSync(baselinePath, 'utf8'));
+    assert.equal(written.coverage_strategy, 'ratchet');
+    assert.equal(written.coverage_ratio, 0.5);
+  } finally {
+    rmSync(tmpDir, { recursive: true, force: true });
+  }
 });

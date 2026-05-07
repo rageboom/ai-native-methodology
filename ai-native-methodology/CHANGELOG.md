@@ -9,7 +9,59 @@
 
 ---
 
-## [v2.1.0] — 2026-05-07 ⭐ 현재 (★ ★ MINOR — phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration)
+## [v2.1.1] — 2026-05-07 ⭐ 현재 (★ PATCH — phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved)
+
+> **★ PATCH** — v2.1.0 carry C-v2.1.0-5 즉시 resolve. `coverage_strategy=ratchet` + `trend_required=true` 시 이전 측정 (baseline) 비교 자동 검증 신설. chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌.
+
+### 변경 사항
+
+**`tools/_shared/baseline.js` 확장** (★ findings-based ratchet 와 분리된 coverage trend 함수 3종):
+- `readCoverageBaseline(path)` — baseline JSON read / 부재 시 null
+- `writeCoverageBaseline(path, { coverage_ratio, coverage_strategy, project_id })` — baseline write
+- `coverageTrendCheck(currentRatio, baseline, { tolerance: 0.01 })` — current ≥ baseline 검증 (단조 비감소 / tolerance ε=0.01 fluctuation 흡수)
+
+**`tools/characterization-coverage-validator/` v0.1.0 → v0.1.1**:
+- `--coverage-baseline <path>` flag 신규 (이전 측정 baseline 비교)
+- `--write-coverage-baseline` flag 신규 (legacy 첫 진입 또는 trend pass 후)
+- `coverage_strategy=ratchet` + `trend_required=true` 시 baseline 비교 자동 실행
+- finding 신규: `coverage.trend_negative_ratchet` (high / current < baseline = regression block)
+
+**unit test 회귀 (228 → 232)**:
+
+| workspace | v2.1.0 | v2.1.1 |
+|---|---|---|
+| characterization-coverage-validator | 10 | **14** (★ +4 ratchet trend) |
+| 그 외 12 workspace | 209 | 209 |
+| release-readiness self-test | 9 | 9 |
+| **합계** | 228 | **232** |
+
+신규 4 unit test:
+1. ★ ratchet trend — first run (no baseline) → pass + recommend write
+2. ★ ratchet trend — current ≥ baseline → pass (positive 또는 flat)
+3. ★ ratchet trend — current < baseline → high finding (regression block)
+4. ★ ratchet baseline write — `--write-coverage-baseline` 옵션 file 생성
+
+### Carry 갱신
+
+- ✅ ~~C-v2.1.0-5 ratchet trend_required=true 자동 검증~~ → ★ ★ resolved
+- (기타 carry C-v2.1.0-1~4, 6~7 보존)
+
+### 진입 자격 (v2.1.1 PATCH)
+
+| 자격 | 충족 |
+|---|---|
+| scope 작음 | ✅ tool 1개 + _shared 1개 (≤ 100 line code) |
+| chain harness 5 요소 변경 | ❌ |
+| 본체 schema 변경 | ❌ (CLI flag + validator option 만) |
+| unit test 회귀 통과 | ✅ 232 / 0 fail |
+| version-check 3 source sync v2.1.1 | ✅ |
+| 14차 retract 위험 | ↓ (carry resolve / 기존 자산 변경 ❌) |
+
+★ release / git tag `v2.1.1` 의무.
+
+---
+
+## [v2.1.0] — 2026-05-07 (★ ★ MINOR — phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration)
 
 > **★ ★ MINOR** — v2.0.0 MAJOR FINAL release (2026-05-07 / 같은 날) 직후 phase 4.7 본체 격상. ≥ 2 PoC corroboration 사실 확보 (PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern retrofit / DEC-2026-05-07-poc-06-종결 + DEC-2026-05-07-poc-07-poc03-phase7-retrofit) → 본체 자산 6 + workflow spec 1 격상. chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만.
 

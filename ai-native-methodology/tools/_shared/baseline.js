@@ -121,3 +121,78 @@ export function ratchetCheck({ grandfathered, novel }) {
     blocked,
   };
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// ★ v2.1.0 carry C-v2.1.0-5 — Coverage trend baseline (phase 4.7 ratchet 자동 검증)
+// findings-based ratchet 와 다른 단일 metric (coverage_ratio) trend 정합성 검증.
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * coverage baseline 파일 read.
+ * 형식: { generated_at, source_commit_sha, coverage_ratio, coverage_strategy, project_id }
+ * 부재 시 null 반환 (★ legacy 진입 첫 측정 = baseline 없음 정합 / pass).
+ */
+export function readCoverageBaseline(path) {
+  if (!path || !existsSync(path)) return null;
+  const text = readFileSync(path, 'utf-8');
+  try { return JSON.parse(text); }
+  catch (e) { throw new Error(`coverage baseline parse error: ${e.message}`); }
+}
+
+/**
+ * coverage baseline 작성.
+ */
+export function writeCoverageBaseline(path, { coverage_ratio, coverage_strategy, project_id, source_commit_sha = 'unknown' }) {
+  const data = {
+    generated_at: new Date().toISOString().split('T')[0],
+    source_commit_sha,
+    project_id: project_id ?? null,
+    coverage_strategy,
+    coverage_ratio,
+  };
+  writeFileSync(path, JSON.stringify(data, null, 2));
+  return data;
+}
+
+/**
+ * ★ ratchet trend check — current coverage ≥ baseline coverage 검증.
+ *   baseline 없음 = 첫 측정 → pass + recommend write
+ *   current < baseline = trend negative → fail (block)
+ *   current >= baseline = trend positive (또는 equal / 단조 비감소) → pass
+ *
+ * @param {number} currentRatio — 현재 측정 coverage_ratio
+ * @param {object|null} baseline — readCoverageBaseline 결과
+ * @param {object} options — { tolerance: 0.01 } (소수점 fluctuation 흡수 / default ε=0.01)
+ */
+export function coverageTrendCheck(currentRatio, baseline, { tolerance = 0.01 } = {}) {
+  if (baseline === null) {
+    return {
+      pass: true,
+      reason: 'no_baseline_first_run',
+      message: 'baseline 없음 — 첫 측정 (--write-coverage-baseline 권장)',
+      current: currentRatio,
+      baseline: null,
+      delta: null,
+    };
+  }
+  const baselineRatio = typeof baseline === 'number' ? baseline : (baseline.coverage_ratio ?? 0);
+  const delta = currentRatio - baselineRatio;
+  if (delta < -tolerance) {
+    return {
+      pass: false,
+      reason: 'trend_negative',
+      message: `coverage regressed: current ${(currentRatio * 100).toFixed(1)}% < baseline ${(baselineRatio * 100).toFixed(1)}% (delta -${(Math.abs(delta) * 100).toFixed(1)}%p / tolerance ${(tolerance * 100).toFixed(1)}%p)`,
+      current: currentRatio,
+      baseline: baselineRatio,
+      delta,
+    };
+  }
+  return {
+    pass: true,
+    reason: delta < 0 ? 'trend_within_tolerance' : (delta === 0 ? 'trend_flat' : 'trend_positive'),
+    message: `coverage trend ✅ — current ${(currentRatio * 100).toFixed(1)}% vs baseline ${(baselineRatio * 100).toFixed(1)}% (delta ${delta >= 0 ? '+' : ''}${(delta * 100).toFixed(1)}%p)`,
+    current: currentRatio,
+    baseline: baselineRatio,
+    delta,
+  };
+}

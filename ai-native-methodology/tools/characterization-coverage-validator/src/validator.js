@@ -11,6 +11,7 @@
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -19,7 +20,8 @@ export function loadJson(path) {
 const VALID_TYPE = new Set(['intent', 'bug', 'ambiguous', 'self_recognized']);
 const VALID_STRATEGY = new Set(['absolute', 'ratchet']);
 
-export function validateCharacterization(targetDir, threshold = 0.80) {
+export function validateCharacterization(targetDir, threshold = 0.80, options = {}) {
+  const { coverageBaselinePath = null, writeBaseline = false } = options;
   const findings = [];
   const summary = {
     snapshot_count: 0,
@@ -233,7 +235,30 @@ export function validateCharacterization(targetDir, threshold = 0.80) {
             message: `coverage ${(summary.actual_coverage_ratio * 100).toFixed(1)}% < ratchet minimum ${(min * 100).toFixed(0)}%`
           });
         }
-        // trend_required = true 시 별도 trend 검증은 baseline 통합 carry (★ v2.1.x)
+        // ★ v2.1.0 carry C-v2.1.0-5 — trend_required = true 시 baseline 비교 자동 검증
+        if (coverage.trend_required === true && coverageBaselinePath !== null) {
+          const baseline = readCoverageBaseline(coverageBaselinePath);
+          const trend = coverageTrendCheck(summary.actual_coverage_ratio, baseline);
+          summary.coverage_trend = trend;
+          if (!trend.pass) {
+            findings.push({
+              kind: 'coverage.trend_negative_ratchet',
+              severity: 'high',
+              actual: trend.current,
+              baseline: trend.baseline,
+              delta: trend.delta,
+              message: trend.message
+            });
+          }
+          if (writeBaseline) {
+            writeCoverageBaseline(coverageBaselinePath, {
+              coverage_ratio: summary.actual_coverage_ratio,
+              coverage_strategy: summary.coverage_strategy,
+              project_id: coverage.project_id ?? entry?.project_id ?? null,
+            });
+            summary.coverage_baseline_written = coverageBaselinePath;
+          }
+        }
       }
     }
   }

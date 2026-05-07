@@ -15,7 +15,9 @@
 ```bash
 node src/cli.js \
   --target .aimd/output/characterization/ \
-  [--threshold 0.80] [--dry-run] [--json]
+  [--threshold 0.80] \
+  [--coverage-baseline <path>] [--write-coverage-baseline] \
+  [--dry-run] [--json]
 ```
 
 검증 대상:
@@ -23,6 +25,11 @@ node src/cli.js \
 - `<target>/coverage.json` (matrix + coverage_strategy if/then)
 - `<target>/intent-vs-bug.md` (★ ambiguous_carry grep)
 - `<target>/characterization-spec.json` (★ entry / 통합 — 선택)
+
+★ **v2.1.1 신규 (C-v2.1.0-5 carry resolve)** — ratchet trend baseline 자동 검증:
+- `--coverage-baseline <path>` — 이전 측정 baseline JSON 비교
+- `--write-coverage-baseline` — 현재 측정을 baseline 으로 기록 (legacy 첫 진입 또는 trend pass 후)
+- `coverage_strategy=ratchet` + `trend_required=true` + `--coverage-baseline` 모두 충족 시 trend negative (current < baseline) 자동 차단
 
 ## Outputs
 
@@ -39,6 +46,7 @@ node src/cli.js \
 | `coverage.ratchet_minimum_missing` | high | ratchet 시 coverage_minimum_legacy 누락 |
 | `coverage.below_target_absolute` | high | absolute 시 actual < coverage_target |
 | `coverage.below_minimum_ratchet` | high | ratchet 시 actual < coverage_minimum_legacy |
+| `coverage.trend_negative_ratchet` | high | ★ v2.1.1 — ratchet + trend_required + baseline 제공 시 current < baseline (regression block) |
 | `classification.named_ratio_below_threshold` | high | named_classified_ratio < threshold (default 0.80) |
 | `classification.ambiguous_carry_missing` | critical | ambiguous > 0 인데 ambiguous_carry 명시 부재 (entry 또는 intent-vs-bug.md grep) |
 | `snapshot.code_only_carry_recommended` | medium | data_source_status='code_only' — 도메인 expert carry 권장 |
@@ -70,9 +78,9 @@ node src/cli.js \
 
 ## Carry
 
-- baseline + ratchet trend 자동 검증 (★ trend_required = true 시 이전 측정 비교) = `_shared/baseline.js` reuse / v2.1.x patch
-- snapshot Gherkin (.feature) 변환 출력 = v2.x carry
-- ts-morph + 실 환경 (DB) snapshot 자동 추출 = v2.x carry
+- ✅ ~~baseline + ratchet trend 자동 검증~~ → ★ ★ v2.1.1 resolved (`_shared/baseline.js` `readCoverageBaseline` / `writeCoverageBaseline` / `coverageTrendCheck` 신설 + `--coverage-baseline` + `--write-coverage-baseline` flag + 4 unit test)
+- snapshot Gherkin (.feature) 변환 출력 = v2.x carry (C-v2.1.0-1)
+- ts-morph + 실 환경 (DB) snapshot 자동 추출 = v2.x carry (C-v2.1.0-6)
 
 ## ★★★ no-simulation 정합
 

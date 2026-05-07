@@ -1,0 +1,11 @@
+{
+  "matrix": [
+    { "uc": "UC-X-001", "snapshot": "✅", "covered_by": ["SNAP-UC-X-001"] },
+    { "uc": "UC-X-002", "snapshot": "❌", "scope_decision": "carry — legacy" }
+  ],
+  "coverage_target": 0.80,
+  "coverage_minimum_legacy": 0.40,
+  "coverage_strategy": "ratchet",
+  "trend_required": true,
+  "project_id": "test-fixture-ratchet"
+}
