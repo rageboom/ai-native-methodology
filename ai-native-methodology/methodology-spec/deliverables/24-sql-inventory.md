@@ -262,4 +262,4 @@ cross_links:
 | **★ C-v2.2.0-6** | **★ ★ ★ Modern ORM PoC #08 (★ paradigm-cross corroboration)** — MyBatis 3 annotation 또는 JPA QueryDSL 또는 TypeORM raw SQL spectrum / 14d cap | ★ Senior STOP signal 흡수 / **★ v2.2.0 final 격상 trigger** |
 | C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification enum | v2.2.x patch / 사용자 finding |
 | C-v2.2.0-8 | Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼) | v2.3+ / 사내 적용 시 |
-| C-v2.2.0-9 | "Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강 | v2.2.0 final 시 |
+| ~~C-v2.2.0-9~~ | ~~"Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강~~ | ✅ **resolved** (rc1 시점 §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료) |

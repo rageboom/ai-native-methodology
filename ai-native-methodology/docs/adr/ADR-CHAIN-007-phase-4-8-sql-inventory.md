@@ -159,7 +159,7 @@ PoC #07 D12 (b) nested patterns object 패턴. 4 패턴 (dynamic_branch / calcul
 | C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 |
 | C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification enum | v2.2.x patch |
 | C-v2.2.0-8 | Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼) | v2.3+ |
-| C-v2.2.0-9 | "Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강 | v2.2.0 final 시 |
+| ~~C-v2.2.0-9~~ | ~~"Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강~~ | ✅ **resolved** (rc1 시점 deliverable §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료) |
 
 ---
 

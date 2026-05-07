@@ -81,6 +81,9 @@
 - C-domain-PoC07-1~3 (도메인 expert IFRS 회계 담당자 재검증)
 - C-PoC07-1~3 (chain 3 영역 — Testcontainers / MockMvc / DBUnit)
 
+**carry resolved (2026-05-07 / C9 closure)**:
+- ~~C-v2.2.0-9~~ "Why not AWS SCT" 차별화 절 → ✅ rc1 시점 deliverable §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료 (★ trigger "v2.2.0 final 시" 사실상 implicit 처리 완료 / 추가 보강 ❌)
+
 **★ ratchet baseline write 첫 진입** — `examples/poc-07-efiweb-capital-spring41/.aimd/baseline/characterization-coverage.json` (coverage_strategy: ratchet / coverage_ratio: 0.4375 / v2.1.1 PATCH production 첫 사용 케이스).
 
 **no release / no tag** — D11 (b) ≥ 2 PoC isomorphic 후 v2.2.0 본체 격상 별도 plan + 사용자 결단.
