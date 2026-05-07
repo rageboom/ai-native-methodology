@@ -1,6 +1,6 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.0.0-rc1",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "description": "AI-Native Development Methodology — workspace root (build orchestrator + ★ v2.0 chain harness 12 tools workspace). chain validator 4종 + 기존 6 도구 + spectral-runner + ★ ★ ★ chain-driver (sub-plan-5 / harness 5 요소 enforcement) = 단일 npm workspace (★ S1 / dep drift 회피 / 도구별 package.json 독립 유지).",

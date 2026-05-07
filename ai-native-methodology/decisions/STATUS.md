@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-06 (★ ★ ★ ★ ★ **v2.0.0-rc1 chain harness validated** ¹ — sub-plan-6 종결 / §8.1 strict 7/7 ✅ / ≥ 2 PoC corroboration ✅ / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / sub-plan-3a + 3b + 4 + 5 + **6** 모두 종결 / ★ ★ ★ **cleanup round 1 + 2-A + 2-B + 2-B 후속 + 2-C/2-D 모두 종결** — docs/ archive 격리 + paradigm sync + 각 폴더 README 정돈 + 9 도구 표준화 + 10 placeholder 정돈 + guides/ journey 자산 4 신설 + project root CLAUDE sync (327 → 256 / 사용자 의도 "각 폴더 정돈 + 참조 + 호출 + journey friction 해소" 모두 정합) / **next: v2.0.0 final (2026-05-07~)**)
+**기준일**: 2026-05-07 (★ ★ ★ ★ ★ ★ **v2.0.0 MAJOR FINAL release** ¹ — DEC-2026-05-07-v2.0.0-final / chain harness validated 정식 / git tag v2.0.0 / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / 218 unit test pass / §8.1 strict 7/7 ✅ / 3 PoC corroboration ✅ / cleanup round 1 + 2-A ~ 2-E 모두 종결 (327 → 256 files / paradigm v2.0.0 정합 / journey 자산 4 신설 / build path `ai-native-methodology-v2.0.0/`) / **carry: round 2~4 후속 (CHANGELOG split + mermaid + guides self-review)**)
 
 > ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06): 현 단계 = **chain harness validated** — §8.1 strict 7/7 + ≥ 2 PoC corroboration. sub-plan-1~4 = scaffolding / sub-5 = harness-complete / sub-6 = harness-validated. v2.0.0-rc1 prerelease (Senior F4 / 24h+ 후 final / 같은 날 final tag ❌).
 
@@ -18,6 +18,38 @@
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
+
+## ★ ★ ★ ★ ★ ★ v2.0.0 MAJOR FINAL release (2026-05-07)
+
+DEC-2026-05-07-v2.0.0-final.
+
+| 검증 항목 | 결과 |
+|---|---|
+| clean clone 추출 (`/tmp/aimd-clean-clone.*/`) | ✅ git archive |
+| `npm install` (12 workspace) | ✅ 83 packages / 0 vulnerabilities |
+| `version-check` (3 source) | ✅ all v2.0.0-rc1 → v2.0.0 |
+| `npm test` 218 pass | ✅ chain-driver 68 + 그 외 |
+| `release:check --target v2.0.0` (clean clone) | ✅ §8.1 strict **7/7** / "release-ready" |
+| PoC #05 vitest e2e | ✅ **6/6 GREEN** |
+| Senior F4 24h+ cooling-off | ✅ rc1 (2026-05-06) → final (2026-05-07) |
+| 본체 환경 release:check 재검증 | ✅ 7/7 |
+| build dist | ✅ 256 files / shasum 255 OK / `dist/ai-native-methodology-v2.0.0/` |
+
+**v2.0.0 final 자격 7/7**:
+1. ✅ chain harness 5 요소 enforcement (sub-plan-5)
+2. ✅ ≥ 2 PoC corroboration (3 = poc-03 + poc-04 + poc-05)
+3. ✅ §8.1 strict 7/7
+4. ✅ 218 unit test pass
+5. ✅ clean clone 재실행 통과
+6. ✅ Senior F4 24h+ cooling-off
+7. ✅ cleanup round 1 ~ 2-E 모두 종결
+
+**git tag**: `v2.0.0` ★ 의무.
+
+**v2.0.0 → v2.0.x patch trigger** (Senior F7 정합):
+- release-readiness regress 1+ / Senior HIGH 1+ / 7일 carry > 3건 / 사용자 finding burst
+
+---
 
 ## ★ cleanup round 2-E (2026-05-06) — build artifact path 정합
 

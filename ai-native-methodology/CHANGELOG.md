@@ -9,7 +9,45 @@
 
 ---
 
-## [v2.0.0-rc1] — 2026-05-06 ⭐ 현재 (★ ★ ★ ★ ★ MAJOR PRERELEASE — chain harness validated / SDLC 4단계 i-strict / ≥ 2 PoC corroboration / §8.1 7/7 통과)
+## [v2.0.0] — 2026-05-07 ⭐ 현재 (★ ★ ★ ★ ★ ★ MAJOR FINAL release — chain harness validated / SDLC 4단계 i-strict / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과)
+
+> **★ ★ ★ MAJOR FINAL** — 2026-05-06 v2.0.0-rc1 prerelease 후 24h+ cooling-off (Senior F4 요구사항) 통과. clean clone (`/tmp/aimd-clean-clone.*/`) 환경에서 npm install + npm test (218 pass) + release:check 7/7 ✅ + PoC #05 vitest 6/6 GREEN 모두 통과 → final tag 자격 충족.
+
+### Final tag 진입 검증 (2026-05-07 / DEC-2026-05-07-v2.0.0-final)
+
+| 검증 항목 | 결과 |
+|---|---|
+| clean clone npm install | ✅ 83 packages / 0 vulnerabilities |
+| version-check (3 source) | ✅ 모든 source v2.0.0-rc1 정합 (이후 v2.0.0 sync) |
+| npm test (12 workspace) | ✅ chain-driver 68 + 그 외 → 218 pass |
+| release:check §8.1 strict 7/7 | ✅ "v2.0.0 = release-ready" |
+| PoC #05 vitest e2e | ✅ 6/6 GREEN (chain 4 enforcement 정합) |
+| Senior F4 24h+ cooling-off | ✅ rc1 (2026-05-06) → final (2026-05-07) |
+
+★ ★ rc1 entry 의 모든 highlights (chain harness validated 5 요소 / SDLC 4단계 / §8.1 7/7 / breaking changes / Migration / unit test 회귀 / Carry) = v2.0.0 final 에서도 유지. 본 entry = final tag 진입 record + 검증 결과.
+
+### 변경 사항 (rc1 → final)
+
+- `plugin.json` / `package.json` / 본 CHANGELOG version: `2.0.0-rc1` → **`2.0.0`**
+- `plugin.json` description: 198 unit test → **218 unit test** (실측 정합) + clean clone 재실행 통과 명시
+- build artifact: `dist/ai-native-methodology-v2.0.0/` (★ cleanup round 2-E path)
+
+### v2.0.0 → v2.0.x patch 정책 (Senior F7 정합)
+
+v2.0.x patch trigger:
+- release-readiness regress 1+
+- Senior HIGH 1+
+- 7일 carry > 3건
+- 사용자 finding burst (guides 보강 / common-errors 추가 등)
+
+### Carry (v2.0.x / v2.1+)
+
+- v2.0.x: 본 release 에 누락된 작은 정돈 (cleanup round 2-F/G/H carry)
+- v2.1+: chain-revisit-detector 진짜 LLM auto-invoke / tree-sitter semantic diff / 다중 사용자 driver state 동시성
+
+---
+
+## [v2.0.0-rc1] — 2026-05-06 (★ ★ ★ ★ ★ MAJOR PRERELEASE — chain harness validated / SDLC 4단계 i-strict / ≥ 2 PoC corroboration / §8.1 7/7 통과)
 
 > **★ MAJOR bump 정당성** (semver §8): chain harness 가 v1.x 산출물 (한 방향 7대 추출기) 의 paradigm 을 대체. v1.x skill 호출 → v2.x chain-driven slash command (`/aimd-next`, `/aimd-stage`) 로 전환. 사용자 workflow backward-incompatible → MAJOR.
 > **★ -rc1 prerelease** (Senior F4 흡수 / 14차 retract pattern 차단): sub-plan-5 commit 같은 날 final tag ❌ / rc1 → 24h+ 후 final.
