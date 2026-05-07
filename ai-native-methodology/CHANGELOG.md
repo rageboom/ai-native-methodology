@@ -9,7 +9,80 @@
 
 ---
 
-## [v2.1.1] — 2026-05-07 ⭐ 현재 (★ PATCH — phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved)
+## [v2.2.0-rc1] — 2026-05-08 ⭐ 현재 (★ ★ ★ PRERELEASE — phase 4.8 sql-inventory 본체 격상 prerelease / Senior STOP signal 흡수)
+
+> **★ ★ ★ PRERELEASE** — v2.2.0 final 격상 ★ trigger 자격 ❌ (★ paradigm-cross corroboration 부재 / PoC #06+#07 모두 Spring 4.1 + iBATIS 2 = scale-cross only). Modern ORM PoC #08 (carry C-v2.2.0-6) 종결 후 v2.2.0 final 별도 결단. ★ ★ 7d minimum cooling-off (★ Senior 권고 흡수 / 24h ❌).
+
+### 변경 사항
+
+**phase 4.8 (sql-inventory) 정식 단계 신설** (★ ADR-CHAIN-007):
+- analysis stage 내부 / phase 4.7 후 / phase 5-1 + 5-2 전 / RDB 한정 sub-phase
+- 11 컬럼 = 외부 6 (Opus 4.7 외부 조언 / sql_id / mapper_xml / called_from_screen / business_meaning / dynamic_branch / dependent_tables) + ★ statement_type (★ Agent 1 강 권고 흡수 / MyBatis 14 표준 속성 / SP 식별 의무) + 본 추가 4 (uc_link / intent_vs_bug_classification / confidence / carry_flags)
+- extraction_automation metric 의무 (외부 6 컬럼 자동화 ≥ 50% pass / PoC #06+#07 baseline 4/6 = 66.7%)
+- carry_flags enum 8종 / external_call_out_of_scope 또는 DBA-read 시 confidence ≤ 0.80 if/then 의무
+- patterns_extension_v2 = optional / Legacy iBATIS 한정 (PoC #07 D12 (b) nested patterns object)
+- patterns_extension_v3 (cache / discriminator / typeHandler) = C-v2.2.0-3 carry
+
+**본체 격상 자산 7 + workflow**:
+1. `methodology-spec/deliverables/24-sql-inventory.md` (★ #23 사용 / #24 신규)
+2. `schemas/sql-inventory.schema.json` (★ 31번째 schema)
+3. `schemas/meta-confidence.schema.json` `inputs_used` enum 13 → 14 (`sql_inventory` 추가)
+4. `skills/analysis/phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
+5. `tools/sql-inventory-extractor/` (★ workspace 14번째 / 10 unit test)
+6. `flows/analysis.phase-flow.{json,mermaid}` v2.1.0 → v2.2.0-rc1 (phase 4.8 entry)
+7. `methodology-spec/workflow/phase-4-8-sql-inventory.md`
+8. `docs/adr/ADR-CHAIN-007-phase-4-8-sql-inventory.md` (★ 5 정책 명문화 + 외부 권위 19종 footnote)
+
+**unit test 회귀 (232 → 233 / +1)**:
+
+| workspace | v2.1.1 | v2.2.0-rc1 |
+|---|---|---|
+| sql-inventory-extractor | (없음) | **10** (★ 신설 / valid PoC #06+#07 + 5 invalid case) |
+| 그 외 13 workspace | 232 | 223 (재계산 결과) |
+| **합계** | 232 | **233** |
+
+★ workspace-wide `npm test --workspaces` 233 모두 pass / 0 fail.
+
+★ drift-validator `--check-layout`: ★ 11 phases / 21 skills / 0 orphans / 0 missing ✅.
+
+### 결단 의뢰 흡수 (research §B / D1=b / D7=α / D8=a / D4=b)
+
+★ **Senior STOP signal** (★ ★ ★ paradigm-cross corroboration 부재) 흡수:
+- (a) v2.2.0 final 격상 ❌ → ★ ★ v2.2.0-rc1 prerelease ★ 7d minimum cooling-off
+- (b) Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger
+- (c) ADR-CHAIN-007 본문에 paradigm gap 우려 + PoC #08 의무 명문화
+
+★ **Agent 1 (공식 docs) 빈틈 4건** 모두 흡수:
+- statement_type 11번째 컬럼 (★ MyBatis 14 표준 속성)
+- patterns_extension_v3 carry note (cache / discriminator / typeHandler)
+- iBATIS 2 전용 dynamic 태그 enum carry (C-v2.2.0-7)
+- ADR 본문에 Feathers + Gartner TIME + AWS MAP 인용 명문화
+
+★ **Big-tech (Agent 2)** 권고:
+- "Why not AWS SCT" 차별화 절 (deliverable §1.2)
+- ★ "SQL-level Inventory = 본 방법론 고유 contribution" 명시
+
+### chain harness 5 요소 변경 ❌
+
+analysis stage 내부 phase 추가만 — chain 1~4 driver / state schema / hooks / SDLC flow 변경 ❌.
+
+### 미해결 (★ v2.2.0 final / v2.x carry)
+
+| ID | 항목 | trigger |
+|---|---|---|
+| **C-v2.2.0-6** | **★ ★ ★ Modern ORM PoC #08 (paradigm-cross corroboration)** | ★ v2.2.0 final 격상 trigger / 7d minimum 후 |
+| C-v2.2.0-1 | Modern 환경 NoSQL/Prisma 정합 검증 | ≥ 1 Modern PoC 후 |
+| C-v2.2.0-2 | sql-inventory baseline ratchet | v2.2.x patch / 사용 시 |
+| C-v2.2.0-3 | patterns_extension_v3 (cache / discriminator / typeHandler) | ≥ 2 Legacy PoC 후 |
+| C-v2.2.0-4 | sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 | 별도 plan |
+| C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 |
+| C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification | v2.2.x patch |
+| C-v2.2.0-8 | Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼) | v2.3+ |
+| C-v2.2.0-9 | "Why not AWS SCT" 차별화 절 §1 motivation 보강 | v2.2.0 final 시 |
+
+---
+
+## [v2.1.1] — 2026-05-07 (★ PATCH — phase 4.7 ratchet trend baseline 자동 검증 / C-v2.1.0-5 carry resolved)
 
 > **★ PATCH** — v2.1.0 carry C-v2.1.0-5 즉시 resolve. `coverage_strategy=ratchet` + `trend_required=true` 시 이전 측정 (baseline) 비교 자동 검증 신설. chain harness 5 요소 변경 ❌ / 본체 schema 변경 ❌.
 
