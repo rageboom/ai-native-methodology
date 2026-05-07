@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="ExchangeDAO">
+ 
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	<!-- 환율 조회 -->	
+	<select id="selectExchangeList" parameterClass="HashMap" resultClass="egovMap">
+		SELECT M.*
+		FROM (
+		    select c.CURR_CD, c.CURR_NM, c.SORT_NO, 'E' as GUBUN
+		           ,e.MON1 	,e.MON2  ,e.MON3
+		           ,e.MON4 	,e.MON5  ,e.MON6
+		           ,e.MON7 	,e.MON8  ,e.MON9
+		           ,e.MON10 ,e.MON11 ,e.MON12
+		    from TB_CURRENCY c WITH(NOLOCK)
+		      left join TB_EXCHANGE e WITH(NOLOCK) ON c.CURR_CD = e.CURR_CD AND e.GUBUN = 'E' AND e.YEAR = #year#
+		    UNION ALL  
+		    select c.CURR_CD, c.CURR_NM, c.SORT_NO, 'A' as GUBUN
+		           ,e.MON1 ,e.MON2 ,e.MON3
+		           ,e.MON4 ,e.MON5 ,e.MON6
+		           ,e.MON7 ,e.MON8 ,e.MON9
+		           ,e.MON10 ,e.MON11 ,e.MON12
+		    from TB_CURRENCY c WITH(NOLOCK)
+		      left join TB_EXCHANGE e WITH(NOLOCK) ON c.CURR_CD = e.CURR_CD AND e.GUBUN = 'A' AND e.YEAR = #year#   
+		  ) M  
+		WHERE 1=1
+		<isNotEmpty property="currCd">
+		AND CURR_CD = #currCd#
+		</isNotEmpty>  
+		ORDER BY M.SORT_NO, GUBUN DESC  
+	</select>
+	
+	
+	
+	<update id="updateExchange" parameterClass="HashMap">
+		MERGE TB_EXCHANGE AS A      
+		USING 
+			( SELECT #currCd# as CURR_CD, 
+					#gubun# as GUBUN,
+					#year# as YEAR, 
+					#mon1# as MON1,
+					#mon2# as MON2,
+					#mon3# as MON3,
+					#mon4# as MON4,
+					#mon5# as MON5,
+					#mon6# as MON6,
+					#mon7# as MON7,
+					#mon8# as MON8,
+					#mon9# as MON9,
+					#mon10# as MON10,
+					#mon11# as MON11,
+					#mon12# as MON12
+			) AS B      
+		ON A.CURR_CD = B.CURR_CD AND A.YEAR = B.YEAR AND A.GUBUN = B.GUBUN
+		WHEN MATCHED THEN
+		    UPDATE
+		    SET  A.MON1 = B.MON1
+		    	,A.MON2 = B.MON2
+		    	,A.MON3 = B.MON3
+		    	,A.MON4 = B.MON4
+		    	,A.MON5 = B.MON5
+		    	,A.MON6 = B.MON6
+		    	,A.MON7 = B.MON7
+		    	,A.MON8 = B.MON8
+		    	,A.MON9 = B.MON9
+		    	,A.MON10 = B.MON10
+		    	,A.MON11 = B.MON11
+		    	,A.MON12 = B.MON12
+		WHEN NOT MATCHED THEN
+		    INSERT (CURR_CD, GUBUN, YEAR, MON1, MON2, MON3, MON4, MON5, MON6, MON7, MON8, MON9, MON10, MON11, MON12)
+		    VALUES (B.CURR_CD, B.GUBUN, B.YEAR, B.MON1, B.MON2, B.MON3, B.MON4, B.MON5, B.MON6, B.MON7, B.MON8, B.MON9, B.MON10, B.MON11, B.MON12);
+	</update>  
+	
+	<!-- 기말, 평균 환율 정보 등록되어 있는지 확인. 아래 SQL은 환율관리 페이지만 생각하고 설계한 폐해라 할 수 있다 ㅋ  -->
+	<select id="selectCheckExcRate" parameterClass="HashMap" resultClass="int">
+		SELECT COUNT(*)
+		FROM (
+		    SELECT CASE WHEN '01' = #month# THEN MON1 
+		                WHEN '02' = #month# THEN MON2
+		                WHEN '03' = #month# THEN MON3
+		                WHEN '04' = #month# THEN MON4
+		                WHEN '05' = #month# THEN MON5
+		                WHEN '06' = #month# THEN MON6
+		                WHEN '07' = #month# THEN MON7
+		                WHEN '08' = #month# THEN MON8
+		                WHEN '09' = #month# THEN MON9
+		                WHEN '10' = #month# THEN MON10
+		                WHEN '11' = #month# THEN MON11
+		                WHEN '12' = #month# THEN MON12
+		           END AS EXC_RATE   
+		    FROM TB_EXCHANGE WITH(NOLOCK)
+		    WHERE CURR_CD = #currCd#
+		    AND [YEAR] = #year#
+		    AND GUBUN IN ('E', 'A')
+		) M
+		WHERE EXC_RATE != 0
+	</select>
+	
+	
+	<!-- 통화별 월별 환율 -->
+	<select id="selectExchangeRate" parameterClass="HashMap" resultClass="double">
+		select ifrs.dbo.FN_Get_ExcRate(#year#, #nMonth#, #currCd#, #excGubun#)
+	</select>
+	
+	
+	<parameterMap id="insertExchangeRateMigrationMap" class="HashMap">
+	  	<parameter property="year"  	mode="IN" />
+	  	<parameter property="result"  	mode="OUT"  jdbcType="VARCHAR" javaType="String"/>
+	</parameterMap>
+	
+	<procedure id="insertExchangeRateMigration" parameterMap="insertExchangeRateMigrationMap" resultClass="egovMap">
+	    /* insertExchangeRateMigration */
+	    
+	  	EXEC IFRS.dbo.S_ExRateMigration ?, ? 
+	</procedure>
+	
+	<select id="selectDayExchangeList" parameterClass="HashMap" resultClass="egovMap">
+		/* selectDayExchangeList */
+	
+		select CONVERT(VARCHAR(10), REGIST_DT, 23) REGIST_DT
+		     , FORMAT(EXCHANGE_RATE , CASE WHEN CURR_CD = 'VND' THEN '##0.0000' ELSE '##0.00' END) AS EXCHANGE_RATE 
+		  from TB_DAY_EXCHANGE WITH(NOLOCK)
+		 where CURR_CD = #currCd#
+		   and CONVERT(VARCHAR(6), REGIST_DT, 112) LIKE #yyyyMM# + '%'
+		 order by REGIST_DT asc
+	</select>
+	
+</sqlMap>

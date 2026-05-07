@@ -1,0 +1,141 @@
+{
+  "$comment": "★ PoC #06 prelim — Antipatterns. Spring 4.1 + iBATIS 2 + 표준프레임워크(eGov) 빈약 corpus 영역 / false negative ↑ 명시 / 본 PoC 가 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 evidence 후보.",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "antipatterns": [
+    {
+      "id": "AP-EXCHANGE-001",
+      "title": "Map<String, Object> + 강제 캐스팅 (Type Safety 부재)",
+      "applies_to": "ExchangeController.* / ExchangeServiceImpl.updateExchange",
+      "category": "type-safety",
+      "severity": "high",
+      "evidence_loc": "source/java/web/ExchangeController.java:37,52,70,85,96,136 / source/java/service/impl/ExchangeServiceImpl.java:42-55",
+      "pattern": "Spring 4.1 + iBATIS 2 시대 — DTO 클래스 부재 → request 파라미터를 IfrsUtil.parameterToHm() 로 Map 변환 후 (String[]) param.get('mon1_arr') 강제 캐스팅. NullPointerException + ClassCastException 위험.",
+      "modern_alternative": "@ModelAttribute DTO + Bean Validation (JSR-303) / SpringDoc OpenAPI",
+      "carry_to": "carry 1순위 본체 AP seed (Spring 4.x corpus)"
+    },
+    {
+      "id": "AP-EXCHANGE-002",
+      "title": "Anemic Service (단순 DAO 위임 / 비즈니스 로직 부재)",
+      "applies_to": "ExchangeServiceImpl.{selectExchangeList, insertExchangeRateMigration, selectDayExchangeList, selectCheckExcRate}",
+      "category": "architecture",
+      "severity": "medium",
+      "evidence_loc": "source/java/service/impl/ExchangeServiceImpl.java:21-34, 79-82",
+      "pattern": "Service 클래스가 DAO 메서드를 1:1 위임만 함. 트랜잭션/검증/도메인 로직 부재 → Service Layer 의 존재 의의 불명확. updateExchange (12개월 배열 파싱) 1개 메서드만 비즈니스 로직 보유.",
+      "modern_alternative": "Application Service + Domain Service 분리 (DDD) / Service 가 도메인 로직 담당",
+      "carry_to": "carry 1순위 본체 AP seed"
+    },
+    {
+      "id": "AP-EXCHANGE-003",
+      "title": "Controller 에 Excel 출력 로직 직접 포함 (View/Controller 책임 혼재)",
+      "applies_to": "ExchangeController.downloadDayExchangeExcel",
+      "category": "architecture",
+      "severity": "medium",
+      "evidence_loc": "source/java/web/ExchangeController.java:94-120",
+      "pattern": "Controller 가 IFRSExcelView 직접 조작 + setFilename/setSheetName/setSeparatorPre 등 setter 호출 + listToEXCEL 호출. 26 라인 / 메서드 중 가장 큰 책임. View 계층 책임 침범.",
+      "modern_alternative": "Spring MVC View Resolver 패턴 / @ResponseBody + ExcelView Bean / 또는 별도 ExcelExportService",
+      "carry_to": "carry 1순위 본체 AP seed"
+    },
+    {
+      "id": "AP-EXCHANGE-004",
+      "title": "WITH(NOLOCK) 무차별 사용 (Dirty Read 위험)",
+      "applies_to": "exchange.xml 의 SELECT 4개 (selectExchangeList × 2 / selectCheckExcRate / selectDayExchangeList)",
+      "category": "data-integrity",
+      "severity": "high",
+      "evidence_loc": "source/sqlmap/exchange.xml:16,24,92,123",
+      "pattern": "MSSQL READ_UNCOMMITTED 힌트 (WITH(NOLOCK)) 를 모든 SELECT 에 적용. 읽기 성능 ↑ but 트랜잭션 진행 중 row (커밋 전 / 롤백 가능) 도 읽음 → 환율 조회 중 inconsistent state 가능.",
+      "modern_alternative": "READ_COMMITTED_SNAPSHOT 격리 수준 + 명시적 트랜잭션 스코프",
+      "carry_to": "carry 1순위 본체 AP seed (한국 SI 빈도 ↑)"
+    },
+    {
+      "id": "AP-EXCHANGE-005",
+      "title": "iBATIS 2 sql-map #...# 인라인 (deprecated)",
+      "applies_to": "exchange.xml 전체",
+      "category": "framework-version",
+      "severity": "medium",
+      "evidence_loc": "source/sqlmap/exchange.xml:17,29,39-53,79-94,103,124-125",
+      "pattern": "iBATIS 2.x sql-map-2.dtd / parameterClass=HashMap / #param# 인라인. iBATIS 3 → MyBatis 에서 ${...} (인라인) vs #{...} (PreparedStatement) 명시 분리됨. 본 코드는 PreparedStatement 안전하지만 syntax deprecated.",
+      "modern_alternative": "MyBatis 3 + @Mapper interface + #{...} parameter binding",
+      "carry_to": "carry 2순위 (iBATIS 2 XML 파서 본체 격상)"
+    },
+    {
+      "id": "AP-EXCHANGE-006",
+      "title": "TB_EXCHANGE.MON1~MON12 정규화 부재 (1NF 위반)",
+      "applies_to": "TB_EXCHANGE 테이블 + 모든 SELECT/MERGE",
+      "category": "database-design",
+      "severity": "medium",
+      "evidence_loc": "source/sqlmap/exchange.xml:11-15, 19-23, 36-72, 79-94",
+      "pattern": "월별 환율을 row 단위가 아닌 컬럼 단위 (MON1~MON12) 로 저장. 13번째 월 (윤달/조정월) 추가 시 schema migration 필요 + 모든 SQL 변경 필요. 정규화 (TB_EXCHANGE_MONTHLY: CURR_CD, YEAR, GUBUN, MONTH, RATE) 의 정합.",
+      "modern_alternative": "TB_EXCHANGE_MONTHLY (CURR_CD, YEAR, GUBUN, MONTH, RATE) — 1NF 정합",
+      "carry_to": "★ 본 AP 는 의도 가능성 ↑ — IFRS 연간 환율표는 12개월 정합. phase 4.7 intent-vs-bug 분류 carry.",
+      "intent_vs_bug": "★ 분간 어려움 (BR-EXCHANGE-005 와 동일 영역)"
+    },
+    {
+      "id": "AP-EXCHANGE-007",
+      "title": "SQL 자조 코멘트 (자체 인지된 기술부채 / 처리 부재)",
+      "applies_to": "exchange.xml selectCheckExcRate",
+      "category": "tech-debt",
+      "severity": "low",
+      "evidence_loc": "source/sqlmap/exchange.xml:75",
+      "pattern": "원본 SQL 주석: '<!-- 기말, 평균 환율 정보 등록되어 있는지 확인. 아래 SQL은 환율관리 페이지만 생각하고 설계한 폐해라 할 수 있다 ㅋ -->'. 작성자가 설계 한계를 자체 인지했지만 처리 ❌ 상태로 10년 누적.",
+      "modern_alternative": "리팩터링 + 결정표(DMN) 기반 GUBUN 별 검증 분리",
+      "carry_to": "(없음 — 자체 인지된 기술부채 / 본 PoC 의 intent-vs-bug 분류표 1차 후보)"
+    },
+    {
+      "id": "AP-EXCHANGE-008",
+      "title": "Stored Procedure 비즈니스 로직 (S_ExRateMigration)",
+      "applies_to": "exchange.xml insertExchangeRateMigration / IFRS.dbo.S_ExRateMigration",
+      "category": "architecture",
+      "severity": "medium",
+      "evidence_loc": "source/sqlmap/exchange.xml:107-116",
+      "pattern": "환율 마이그레이션 비즈니스 로직이 MSSQL Stored Procedure 안에 위치. 코드/DB 책임 분산 → 코드 관리 어려움 (DDL 버전관리 + Java 동시) + 단위 테스트 ❌ + 도메인 로직 가시성 ↓.",
+      "modern_alternative": "Application Service 에 비즈니스 로직 + JPA/MyBatis 로 단순 CRUD",
+      "carry_to": "(intent — 외부 환율 데이터 일괄 가져오기는 DB 작업이 정합 가능성 ↑)"
+    },
+    {
+      "id": "AP-EXCHANGE-009",
+      "title": "12 String[] 배열 파싱 (OCP 위반)",
+      "applies_to": "ExchangeServiceImpl.updateExchange",
+      "category": "code-quality",
+      "severity": "low",
+      "evidence_loc": "source/java/service/impl/ExchangeServiceImpl.java:42-72",
+      "pattern": "mon1Arr ~ mon12Arr 12개 String[] 변수 + replaceAll 12회 반복. AP-EXCHANGE-006 (1NF 위반) 의 직접 결과 — 데이터 모델이 1NF 면 단순 List<MonthRate> 1개로 처리 가능.",
+      "modern_alternative": "List<MonthRate> { month: int, rate: BigDecimal } + Stream.map.replaceAll",
+      "carry_to": "AP-EXCHANGE-006 동일"
+    },
+    {
+      "id": "AP-EXCHANGE-010",
+      "title": "Reserved keyword 컬럼 ([YEAR]) 사용",
+      "applies_to": "exchange.xml selectCheckExcRate",
+      "category": "database-design",
+      "severity": "low",
+      "evidence_loc": "source/sqlmap/exchange.xml:94",
+      "pattern": "TB_EXCHANGE.YEAR 컬럼이 SQL reserved keyword. SELECT 시 [YEAR] 로 대괄호 escape 필수. 다른 SELECT (selectExchangeList) 에서는 e.YEAR 로 alias 의존 → 일관성 부재.",
+      "modern_alternative": "RATE_YEAR 등 reserved 회피 컬럼명",
+      "carry_to": "(없음)"
+    }
+  ],
+  "phase_3a_automation_measurement": {
+    "$comment": "antipatterns.json 자동화율 측정 — Spring 4.1 + iBATIS 2 corpus 빈약 영역 / plan §3-A 추정 35% 정합 여부.",
+    "auto_extractable_fields": [
+      "evidence_loc (grep / line range)",
+      "AP.id (코드 패턴 grep — Map cast / WITH NOLOCK / etc)"
+    ],
+    "auto_extractable_count": 2,
+    "manual_required_fields": [
+      "AP.title 자연어",
+      "AP.pattern 자연어 설명",
+      "AP.modern_alternative (현대 패턴 추천)",
+      "AP.severity 평가",
+      "AP.category 분류",
+      "AP.intent_vs_bug 판단 (★ phase 4.7 의무 영역)",
+      "AP.carry_to (본체 AP seed 후보 분류)"
+    ],
+    "manual_required_count": 7,
+    "auto_ratio": "22% (2 / 9) — plan §3-A 추정 35% 보다 -13%p / 박한 이유: Spring 4.1 + iBATIS 2 + eGov 한국 상용 corpus 빈약",
+    "note": "★ 본 측정이 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 직접 evidence. ≥2 PoC corroboration 강제 — 사내 다른 legacy Java 1개 더 필요.",
+    "ap_count": 10,
+    "ap_count_estimate_per_module": "~10 / 모듈당 (exchange 345 LOC 기준). 51K LOC 전체 = 1500+ AP 추정 (단 단일책임 ↑ 모듈일수록 AP 밀도 ↓).",
+    "intent_vs_bug_분간_어려운_AP": ["AP-EXCHANGE-006", "AP-EXCHANGE-008"],
+    "intent_vs_bug_carry": "phase 4.7 (Day 2) 의무 영역"
+  }
+}

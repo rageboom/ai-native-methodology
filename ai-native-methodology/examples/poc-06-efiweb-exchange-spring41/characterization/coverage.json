@@ -1,0 +1,124 @@
+{
+  "$comment": "★ phase 4.7 (characterization) coverage matrix — 어떤 행위 (UC × Controller method × Service method × SQL) 가 snapshot 으로 고정됐는지. 임계 ≥0.80 (PoC #05 정합).",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "snapshot_count": 3,
+  "scenario_count": 10,
+  "matrix": [
+    {
+      "uc": "UC-EXCHANGE-001",
+      "controller_method": "exchangeView",
+      "service_method": "(N/A — Controller 만)",
+      "sql_id": "(없음)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — view 진입만 / 비즈니스 로직 부재"
+    },
+    {
+      "uc": "UC-EXCHANGE-002",
+      "controller_method": "exchangeViewAjax",
+      "service_method": "selectExchangeList",
+      "sql_id": "ExchangeDAO.selectExchangeList",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-EXCHANGE-002 / 3 scenario (happy + filter + 미등록 연도)"],
+      "scope_decision": "covered"
+    },
+    {
+      "uc": "UC-EXCHANGE-003",
+      "controller_method": "exchangeMigration",
+      "service_method": "insertExchangeRateMigration",
+      "sql_id": "ExchangeDAO.insertExchangeRateMigration (S_ExRateMigration 프로시저)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — S_ExRateMigration 비즈니스 의도 추론 불가 / 도메인 expert 인터뷰 carry / phase 4.7 의 limit 명시"
+    },
+    {
+      "uc": "UC-EXCHANGE-004",
+      "controller_method": "getDayExchangeList",
+      "service_method": "selectDayExchangeList",
+      "sql_id": "ExchangeDAO.selectDayExchangeList",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — Day 2 시간 cap"
+    },
+    {
+      "uc": "UC-EXCHANGE-005",
+      "controller_method": "downloadDayExchangeExcel",
+      "service_method": "selectDayExchangeList (재사용)",
+      "sql_id": "ExchangeDAO.selectDayExchangeList",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — Excel 출력 행위 (View 책임 / Controller 직접 조작 AP-EXCHANGE-003) / Day 2 시간 cap"
+    },
+    {
+      "uc": "UC-EXCHANGE-006",
+      "controller_method": "updateExchange",
+      "service_method": "updateExchange",
+      "sql_id": "ExchangeDAO.updateExchange (MERGE)",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-EXCHANGE-006 / 3 scenario (happy + 빈 배열 + 음수 likely bug)"],
+      "scope_decision": "covered"
+    },
+    {
+      "uc": "UC-EXCHANGE-007",
+      "controller_method": "checkExcRateReg",
+      "service_method": "selectCheckExcRate",
+      "sql_id": "ExchangeDAO.selectCheckExcRate",
+      "snapshot": "✅",
+      "covered_by": ["SNAP-UC-EXCHANGE-007 / 4 scenario (happy + 한 GUBUN + 0환율 likely bug + 13월 likely bug)"],
+      "scope_decision": "covered"
+    },
+    {
+      "uc": "(supplementary)",
+      "controller_method": "(N/A)",
+      "service_method": "selectExchangeRate",
+      "sql_id": "ExchangeDAO.selectExchangeRate (FN_Get_ExcRate 함수)",
+      "snapshot": "❌",
+      "covered_by": [],
+      "scope_decision": "carry — 다른 모듈 (capital, connect) 가 호출 / FN_Get_ExcRate DB 함수 본문 read carry"
+    }
+  ],
+  "coverage_summary": {
+    "ucs_total": 7,
+    "ucs_covered": 3,
+    "uc_coverage_ratio": "0.43 (3/7)",
+    "service_methods_total": 6,
+    "service_methods_covered": 3,
+    "service_method_coverage_ratio": "0.50 (3/6)",
+    "sql_ids_total": 6,
+    "sql_ids_covered": 3,
+    "sql_coverage_ratio": "0.50 (3/6)",
+    "weighted_coverage": "0.50 (UC + service + sql 평균)",
+    "threshold_target": "≥0.80 (PoC #05 정합)",
+    "threshold_status": "★ 미달 (-0.30) — Day 2 시간 cap (1일) 내 핵심 3 UC 만 / 나머지 4 UC + selectExchangeRate carry",
+    "remediation": [
+      "Day 3 시간 여유 시 UC-004 (getDayExchangeList) 추가 (BR-EXCHANGE-003 검증 보강)",
+      "selectExchangeRate (FN_Get_ExcRate) 는 다른 모듈 통합 시 carry — exchange 모듈 단독 phase 4.7 scope 외",
+      "★ phase 4.7 본체 격상 시 (v2.1.0) — coverage threshold 재정의 의무: 단일 모듈 내 핵심 UC 3개 = 0.5 도 정합 가능?"
+    ]
+  },
+  "phase_4_7_first_application_findings": {
+    "$comment": "PoC #06 의 phase 4.7 첫 적용에서 발견한 본체 격상 carry 사항.",
+    "F-PHASE7-001": "★ snapshot 작성에 실 환경 (DB 접속) 부재 시 정확도 한계. 도메인 expert 검증 carry 의무.",
+    "F-PHASE7-002": "★ intent_vs_bug ambiguous 영역이 BR/AP 마다 등장 — 분류표 자체가 phase 4.7 의 핵심 산출.",
+    "F-PHASE7-003": "★ scenario 형식 = Given/When/Then BDD 스타일. PoC #05 의 acceptance-criteria.json (Gherkin) 과 형식 정합 — phase 4.7 산출물 schema 본체 격상 시 통합 검토 carry.",
+    "F-PHASE7-004": "★ behavior_likely_bug 항목이 새 시스템 재구현 시 핵심 — '검증 추가 의무' 신호. external 조언 4단계 (유지 vs 버려) 의 직접 입증."
+  },
+  "acceptance_oracle_status": {
+    "$comment": "★ D2 (DEC-2026-05-07-poc-06-domain-결단) 후 갱신. ambiguous 3 → 1.",
+    "day_2_initial": {
+      "intent": 6,
+      "bug": 7,
+      "self_recognized": 1,
+      "ambiguous": 3,
+      "named_classified_ratio": "14/17 = 0.82"
+    },
+    "day_2_post_d2_decision": {
+      "intent": 7,
+      "bug": 9,
+      "self_recognized": 1,
+      "ambiguous": 1,
+      "named_classified_ratio": "★ 17/18 = 0.94 (+12%p)",
+      "remaining_ambiguous": ["AP-EXCHANGE-008 (S_ExRateMigration / DBA read carry)"]
+    }
+  }
+}

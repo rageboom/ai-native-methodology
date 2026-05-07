@@ -1,0 +1,162 @@
+{
+  "$comment": "★ PoC #06 prelim — Use Cases. 7 Controller endpoint 기반 추출. chain 1 planning-spec.use_cases 의 source.",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "use_cases": [
+    {
+      "id": "UC-EXCHANGE-001",
+      "title": "연간 환율 관리 화면 진입",
+      "trigger": "GET /ifrs/exchange/exchangeView?year=YYYY",
+      "actor": "ifrs-user (인증된 회계 담당자 — 추정)",
+      "primary_outcome": "환율 관리 JSP 렌더 + thisYear/year 모델 attribute",
+      "alternatives": [
+        { "id": "UC-EXCHANGE-001-A1", "title": "year 파라미터 부재", "outcome": "thisYear (DateUtil.getTodayString('yyyy')) 사용" }
+      ],
+      "related_rules": [],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "34-46",
+        "function_name": "exchangeView"
+      }
+    },
+    {
+      "id": "UC-EXCHANGE-002",
+      "title": "연간 통화별 12개월 환율 조회 (Ajax)",
+      "trigger": "POST /ifrs/exchange/exchangeViewAjax",
+      "actor": "ifrs-user",
+      "primary_outcome": "TB_CURRENCY 전체 통화 × {기말(E), 평균(A)} × 12개월 환율 list (jsonView)",
+      "alternatives": [
+        { "id": "UC-EXCHANGE-002-A1", "title": "currCd 파라미터 지정", "outcome": "해당 통화만 필터" }
+      ],
+      "related_rules": ["BR-EXCHANGE-006"],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "49-59",
+        "function_name": "exchangeViewAjax"
+      }
+    },
+    {
+      "id": "UC-EXCHANGE-003",
+      "title": "연간 환율 외부 마이그레이션",
+      "trigger": "POST /ifrs/exchange/exchangeMigration",
+      "actor": "ifrs-user (관리자 — 추정 / 도메인 expert 검증 필요)",
+      "primary_outcome": "S_ExRateMigration 저장 프로시저 실행 + result 메시지 반환 (외부 시스템 환율 데이터 일괄 가져오기 추정)",
+      "alternatives": [],
+      "related_rules": [],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "68-80",
+        "function_name": "exchangeMigration"
+      },
+      "note": "★ S_ExRateMigration 의 정확한 비즈니스 의도는 코드만으로 추론 불가 — 도메인 expert 인터뷰 carry / phase 4.7 intent-vs-bug 분류표 후보"
+    },
+    {
+      "id": "UC-EXCHANGE-004",
+      "title": "통화·월별 일일 환율 조회",
+      "trigger": "GET /ifrs/exchange/getDayExchangeList?currCd=...&yyyyMM=...",
+      "actor": "ifrs-user",
+      "primary_outcome": "일자별 환율 list (TB_DAY_EXCHANGE)",
+      "alternatives": [],
+      "related_rules": ["BR-EXCHANGE-003"],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "83-92",
+        "function_name": "getDayExchangeList"
+      }
+    },
+    {
+      "id": "UC-EXCHANGE-005",
+      "title": "통화·월별 일일 환율 엑셀 다운로드",
+      "trigger": "GET /ifrs/exchange/downloadDayExchangeExcel?currCd=...&yyyyMM=...",
+      "actor": "ifrs-user",
+      "primary_outcome": "Excel 파일 (header [고시일, 환율] / sheet 명 = 화폐단위(currCd) yyyy-MM)",
+      "alternatives": [],
+      "related_rules": ["BR-EXCHANGE-003"],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "94-120",
+        "function_name": "downloadDayExchangeExcel"
+      }
+    },
+    {
+      "id": "UC-EXCHANGE-006",
+      "title": "연간 환율 일괄 입력/수정",
+      "trigger": "POST /ifrs/exchange/updateExchange (currCd_arr[], gubun_arr[], mon1_arr[]~mon12_arr[])",
+      "actor": "ifrs-user (관리자 — 추정)",
+      "primary_outcome": "TB_EXCHANGE MERGE (통화 × 기말/평균 × 12개월 일괄) + sessionId 기록",
+      "alternatives": [
+        { "id": "UC-EXCHANGE-006-A1", "title": "환율값에 천단위 콤마 포함", "outcome": "콤마 자동 제거 후 저장 (BR-EXCHANGE-004)" }
+      ],
+      "related_rules": ["BR-EXCHANGE-004", "BR-EXCHANGE-005", "BR-EXCHANGE-006"],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "133-144",
+        "function_name": "updateExchange"
+      }
+    },
+    {
+      "id": "UC-EXCHANGE-007",
+      "title": "특정 통화·월의 환율 등록 여부 확인",
+      "trigger": "GET /ifrs/exchange/checkExcRateReg?currCd=...&year=...&month=...",
+      "actor": "ifrs-user",
+      "primary_outcome": "기말(E) + 평균(A) 두 GUBUN 모두 등록 시 'Y' / 그 외 'N'",
+      "alternatives": [
+        { "id": "UC-EXCHANGE-007-A1", "title": "한 GUBUN 만 등록", "outcome": "'N' (BR-EXCHANGE-002)" }
+      ],
+      "related_rules": ["BR-EXCHANGE-002"],
+      "source_grounded_evidence": {
+        "file": "source/java/web/ExchangeController.java",
+        "line_range": "157-168",
+        "function_name": "checkExcRateReg"
+      }
+    }
+  ],
+  "aggregates": [
+    {
+      "id": "AGG-EXCHANGE-RATE",
+      "title": "연간 환율 (TB_EXCHANGE)",
+      "key": ["CURR_CD", "YEAR", "GUBUN"],
+      "fields": ["MON1", "MON2", "MON3", "MON4", "MON5", "MON6", "MON7", "MON8", "MON9", "MON10", "MON11", "MON12"],
+      "note": "★ MON1~MON12 정규화 부재 — AP-EXCHANGE-006 / 다만 row 단위 12개월 한 번에 보는 IFRS 회계 정합성 의도 가능성 ↑ (intent-vs-bug 분류 carry)"
+    },
+    {
+      "id": "AGG-DAY-EXCHANGE",
+      "title": "일일 환율 (TB_DAY_EXCHANGE)",
+      "key": ["CURR_CD", "REGIST_DT"],
+      "fields": ["EXCHANGE_RATE"]
+    },
+    {
+      "id": "AGG-CURRENCY",
+      "title": "통화 마스터 (TB_CURRENCY)",
+      "key": ["CURR_CD"],
+      "fields": ["CURR_NM", "SORT_NO"]
+    }
+  ],
+  "external_systems": [
+    {
+      "id": "EXT-EXCHANGE-MIGRATION",
+      "title": "외부 환율 마이그레이션 (S_ExRateMigration 프로시저)",
+      "interface": "MSSQL Stored Procedure",
+      "note": "★ 의도 코드만으로 추론 불가 — 한국은행/외환은행 공시 환율 일괄 가져오기 추정 / 도메인 expert 인터뷰 carry"
+    }
+  ],
+  "phase_3a_automation_measurement": {
+    "$comment": "domain.json 자동화율 측정.",
+    "auto_extractable_fields": [
+      "use_case.trigger (@RequestMapping value 추출)",
+      "use_case.function_name + line_range (Java AST)",
+      "aggregates.key/fields (sql-map XML SELECT/MERGE 컬럼)",
+      "external_systems (sql-map procedure 호출)"
+    ],
+    "auto_extractable_count": 4,
+    "manual_required_fields": [
+      "use_case.title 자연어 (Korean — Spring 코드에 한국어 주석 ❌)",
+      "use_case.actor (도메인 expert 추정)",
+      "use_case.primary_outcome 자연어",
+      "use_case.alternatives (if/else 분기 추론 — 일부 자동화 가능)",
+      "external_systems.note (의도 추론)"
+    ],
+    "manual_required_count": 5,
+    "auto_ratio": "44% (4 / 9) — plan §3-B 추정 75% 보다 -31%p / 단 plan §3-B 는 chain 1 planning 의도 추출 / domain.json 자체는 plan §3-A 분석에 속함",
+    "note": "★ domain.json 의 use_case 자체 추출은 plan §3-A 의 'rules.json (BR) 55%' 에 가까움 — 자연어 description 비중 ↑."
+  }
+}

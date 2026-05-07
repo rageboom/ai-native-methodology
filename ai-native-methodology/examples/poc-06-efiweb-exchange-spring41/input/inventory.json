@@ -1,0 +1,170 @@
+{
+  "$comment": "★ PoC #06 prelim — EFI-WEB exchange 모듈 analysis stage (chain 0) 산출 / chain 1 (planning) 입력. legacy single-case mode. 본 문서는 사람 작성 (analysis 자동화 도구 부재 — Day 1 plan §3-A 자동화율 50% 추정 측정 데이터).",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "language": "Java",
+  "language_version": "1.8",
+  "stack_signals": [
+    "Spring 4.1.2 (Boot ❌)",
+    "Spring Security 2.0.4",
+    "표준프레임워크(eGov) 3.6.0 — EgovComAbstractDAO 상속",
+    "iBATIS 2.x — sql-map-2.dtd / parameterClass=HashMap / #param# 인라인",
+    "Maven WAR + web.xml + context-*.xml 10종 (전 프로젝트 범위)",
+    "JSP + AUIGrid (한국 상용) — view 트랙",
+    "MSSQL — TB_EXCHANGE / TB_DAY_EXCHANGE / TB_CURRENCY / FN_Get_ExcRate (함수) / S_ExRateMigration (프로시저)"
+  ],
+  "framework": "spring-mvc-4.1-jsp-ibatis2",
+  "test_runner_inferred": "junit 4.8.1 (★ 환경 부재 / src/test ❌ / @Test 0건)",
+  "source_files": [
+    "source/java/web/ExchangeController.java",
+    "source/java/service/ExchangeService.java",
+    "source/java/service/impl/ExchangeServiceImpl.java",
+    "source/java/service/impl/ExchangeDAO.java",
+    "source/sqlmap/exchange.xml",
+    "source/jsp/exchangeView.jsp",
+    "source/message/exchange_ko.properties",
+    "source/message/exchange_en.properties"
+  ],
+  "loc_total": 530,
+  "loc_breakdown": {
+    "java": 345,
+    "sql_xml": 130,
+    "jsp": "측정 보류 (Day 2 phase 4.7 단계)",
+    "properties": "측정 보류"
+  },
+  "modules": [
+    {
+      "name": "exchange.web.ExchangeController",
+      "type": "Spring MVC Controller",
+      "exports": [
+        "exchangeView",
+        "exchangeViewAjax",
+        "exchangeMigration",
+        "getDayExchangeList",
+        "downloadDayExchangeExcel",
+        "updateExchange",
+        "checkExcRateReg"
+      ],
+      "endpoint_count": 7,
+      "loc": 172,
+      "antipatterns_flagged": ["AP-EXCHANGE-001", "AP-EXCHANGE-003"]
+    },
+    {
+      "name": "exchange.service.ExchangeService",
+      "type": "Spring Service Interface",
+      "exports": [
+        "selectExchangeList",
+        "insertExchangeRateMigration",
+        "selectDayExchangeList",
+        "updateExchange",
+        "selectCheckExcRate",
+        "selectExchangeRate"
+      ],
+      "loc": 26,
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "exchange.service.impl.ExchangeServiceImpl",
+      "type": "Spring Service Impl",
+      "exports": ["(implements ExchangeService — 6 method)"],
+      "loc": 93,
+      "antipatterns_flagged": ["AP-EXCHANGE-002", "AP-EXCHANGE-009"]
+    },
+    {
+      "name": "exchange.service.impl.ExchangeDAO",
+      "type": "iBATIS DAO (extends EgovComAbstractDAO)",
+      "exports": [
+        "selectExchangeList",
+        "insertExchangeRateMigration",
+        "selectDayExchangeList",
+        "updateExchange",
+        "selectCheckExcRate",
+        "selectExchangeRate"
+      ],
+      "loc": 57,
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "sqlmap/exchange.xml",
+      "type": "iBATIS 2 sql-map",
+      "exports": [
+        "selectExchangeList (SELECT join TB_CURRENCY + TB_EXCHANGE)",
+        "updateExchange (MERGE TB_EXCHANGE)",
+        "selectCheckExcRate (SELECT TB_EXCHANGE / 12개월 CASE WHEN)",
+        "selectExchangeRate (FN_Get_ExcRate 함수 호출)",
+        "insertExchangeRateMigration (S_ExRateMigration 프로시저 호출)",
+        "selectDayExchangeList (SELECT TB_DAY_EXCHANGE)"
+      ],
+      "loc": 130,
+      "antipatterns_flagged": ["AP-EXCHANGE-004", "AP-EXCHANGE-005", "AP-EXCHANGE-006", "AP-EXCHANGE-007", "AP-EXCHANGE-008"]
+    }
+  ],
+  "external_dependencies": {
+    "internal_packages": [
+      "smilegate.ifrs.cmm.util (DateUtil, IFRSExcelView, IfrsUtil, StringUtil)",
+      "smilegate.ifrs.egov.service.impl.EgovComAbstractDAO"
+    ],
+    "external_libraries": [
+      "Spring Framework 4.1.2 (@Controller, @Service, @Repository, @Resource, @Autowired, @RequestMapping)",
+      "iBATIS 2.x (sql-map XML / EgovComAbstractDAO list/select/update)",
+      "Servlet API (HttpServletRequest, HttpSession, HttpServletResponse)",
+      "Java EE javax.annotation (@Resource)"
+    ],
+    "database": {
+      "tables": [
+        "TB_EXCHANGE (CURR_CD, YEAR, GUBUN E or A, MON1~MON12) — 기말/평균 환율 12개월 배열 저장",
+        "TB_DAY_EXCHANGE (CURR_CD, REGIST_DT, EXCHANGE_RATE) — 일일 환율",
+        "TB_CURRENCY (CURR_CD, CURR_NM, SORT_NO) — 통화 마스터"
+      ],
+      "functions": [
+        "ifrs.dbo.FN_Get_ExcRate(year, nMonth, currCd, excGubun) → double — 특정 통화/월/기준의 환율 조회"
+      ],
+      "procedures": [
+        "IFRS.dbo.S_ExRateMigration(year IN, result OUT VARCHAR) — 연간 환율 마이그레이션 (외부 시스템 연동 추정)"
+      ]
+    },
+    "reverse_dependencies": [
+      "smilegate.ifrs.connect.web.ConHistoryController — ExchangeService import",
+      "smilegate.ifrs.connect.web.ConnectController — ExchangeService import"
+    ]
+  },
+  "test_assets": {
+    "test_count": 0,
+    "test_framework": "(부재)",
+    "coverage": "0%",
+    "note": "★ EFI-WEB 전체 src/test 부재 / @Test 어노테이션 0건 / chain 3 RED→GREEN baseline 부재 / phase 4.7 (characterization) 첫 적용 의무 영역"
+  },
+  "documentation_assets": {
+    "javadoc": "일부 — 메서드 위 /** ... */ 4개 (환율등록 / 환율 수정 / 환율 정보 등록 여부 체크 / 환율조회) / 외부 ADR/spec 부재",
+    "sql_comments": "한 줄 — selectCheckExcRate 위 자조 코멘트 (★ 자체 인지된 기술부채)",
+    "readme": "EFI-WEB 전체 README 1줄"
+  },
+  "domain_estimate": "IFRS 회계 표준의 외화환산 차이 (foreign exchange difference) 처리. 기말환율(E) = B/S 외화 자산/부채 평가, 평균환율(A) = P/L 외화거래 인식. 일일환율 = 실시간/추적 참고. 연간 12개월 환율표 일괄 등록 + 마이그레이션 + 외화 → 원화 환산 시 사용.",
+  "single_responsibility_score": "very-high",
+  "single_responsibility_evidence": [
+    "역의존 = connect 모듈 2개만 (ConHistoryController + ConnectController)",
+    "내부 의존 = cmm util 4종 + egov base DAO 만",
+    "DB 테이블 = 3개로 격리",
+    "Controller-Service-DAO 3계층 — 추가 책임 혼재 ❌"
+  ],
+  "phase_3a_automation_measurement": {
+    "$comment": "plan §3-A 자동화율 50% 추정의 사실 확인. 본 inventory.json 은 사람이 코드 read 후 정리. 자동 도구 (예: drift-validator phase 1 inventory) 없이 작성. 실측 자동화율 = (자동 가능 항목) / (전체 항목).",
+    "auto_extractable_fields": [
+      "language (.java extension)",
+      "loc (wc -l)",
+      "endpoint_count (@RequestMapping grep)",
+      "imports / external_dependencies (import statement parse)",
+      "DB tables (sql-map XML resultClass / SELECT FROM grep)",
+      "reverse_dependencies (grep ExchangeService import)"
+    ],
+    "auto_extractable_count": 6,
+    "manual_required_fields": [
+      "domain_estimate (IFRS 도메인 지식 — 사람 또는 도메인 expert)",
+      "single_responsibility_score (정성 평가)",
+      "antipatterns_flagged (Spring 4.1 + iBATIS corpus 빈약 — 자동 false negative ↑)",
+      "stored_procedure 의도 (S_ExRateMigration — code 만으로 추론 불가)"
+    ],
+    "manual_required_count": 4,
+    "auto_ratio": "60% (6 / 10) — plan §3-A 추정 50% 보다 +10%p (단일책임 모듈 + 명확한 3계층 구조 보너스)",
+    "note": "★ 본 모듈이 단일책임/명확/소규모라 자동화율이 추정보다 높음. capital (3752 LOC / 다중책임) 같은 모듈에서는 추정 50% 가 맞을 가능성 ↑."
+  }
+}

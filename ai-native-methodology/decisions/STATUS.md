@@ -248,6 +248,25 @@ DEC-2026-05-06-cleanup-round-1.
 |---|---|---|
 | **PoC #05 sample-user-register** (★ corroboration #1 / e2e 단독 책임) | 2 UC + 2 BR + 2 TC + 2 IMPL / vitest 1.6.1 / RED→GREEN | ★ ★ ★ chain 1~4 e2e GREEN / matrix 100% / 5종 물증 정합 |
 | **PoC #03 NestJS retrofit** (corroboration #2) | chain 1~2 + chain 3 RED dry-run / signup + login subset | retrofit 정합 / chain 1~3 schema + validator pass |
+| **PoC #04 mini FE retrofit** (corroboration #3) | chain 1~2 + chain 3 RED dry-run / PAGE-LOGIN 1 UC subset / Zod | retrofit 정합 / chain 1~3 schema + validator pass / FE 트랙 |
+| **★ PoC #06 efiweb-exchange-spring41** (corroboration #4 / 신규 axis — chain 1 + phase 4.7) | chain 1 PASS (validator 0 findings + 100% UC) + ★ phase 4.7 (characterization) 정식 첫 적용 (94% acceptance oracle / D2 후) | ★ ★ 4중 적대성 (Spring 4.1.2 Boot❌ + iBATIS 2 + JSP 248 + 테스트 0) 환경에서 chain 1 + phase 4.7 정합 입증. plan §3-A 38.75% / §3-B 75% 사실 확보. DEC-2026-05-07-poc-06-종결 + DEC-2026-05-07-poc-06-domain-결단. |
+| **★ ★ ★ PoC #03 NestJS phase 4.7 retrofit** (corroboration #5 / phase 4.7 ≥2 PoC 충족 #2) | characterization 3 자산 (intent-vs-bug + snapshot signup + coverage) | ★ ★ Modern NestJS spectrum 입증 (30/30 = 100% 명확) — PoC #06 Legacy + PoC #03 Modern 두 spectrum 으로 phase 4.7 v2.1.0 본체 격상 자격 ★ 사실 확보. DEC-2026-05-07-poc-07-poc03-phase7-retrofit. |
+
+### ★ PoC #06 종결 (2026-05-07 / DEC-2026-05-07-poc-06-종결 / prelim → 정식)
+
+EFI-WEB 사내 IFRS 회계 시스템 `smilegate.ifrs.exchange` 모듈 한정 평가. v2.0.0 final release 후 첫 PoC. ★ 신규 axis (적대성 + phase 4.7 corroboration).
+
+| 항목 | 내용 |
+|---|---|
+| 모듈 | smilegate.ifrs.exchange (345 Java LOC + 130 SQL XML / 7 Controller endpoint / 3 DB 테이블 + 1 함수 + 1 프로시저) |
+| 적대성 | 4중 극상 (Spring 4.1.2 Boot❌ + iBATIS 2 + JSP 248 + 테스트 0) — PoC #01~#05 어떤 것보다 검증 스택에서 멂 |
+| scope | analysis 4종 + ★ phase 4.7 (characterization / 정식 단계 첫 적용) + chain 1 만 |
+| 측정 결과 | (a) §3-A 38.75% (단일책임 정합 / 다중책임 -10%p 가능) (b) §3-B **75% 정합** (validator PASS) (c) **phase 4.7 82% acceptance oracle** |
+| 산출 | input 4종 / characterization 5종 (snapshot 3 + coverage + intent-vs-bug) / .aimd/output planning-spec.{json,md} / REPORT-day3-measurement.md / PROGRESS-2026-05-07.md |
+| 시간 | 4.5시간 (plan 추정 3~4일 대비 ~5배 빠름) |
+| Finding | F-PHASE7-001~004 (phase 4.7 본질) + carry 13종 (C-1~C-13) |
+| §8.1 명시 | ★ 본 PoC 1개 결과로 본체 격상 결단 ❌ / phase 4.7 v2.1.0 격상 = ≥2 PoC corroboration 후 (PoC #07 또는 retrofit) |
+| 위치 | `examples/poc-06-efiweb-exchange-spring41/` |
 
 ### Senior critique (sub-plan-6-research §F) 흡수
 

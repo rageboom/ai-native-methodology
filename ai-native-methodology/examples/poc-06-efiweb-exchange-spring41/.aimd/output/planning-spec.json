@@ -1,0 +1,225 @@
+{
+  "meta": {
+    "generated_at": "2026-05-07T02:30:00Z",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "orm", "design_specs", "test_code", "documentation"],
+    "_inputs_used_evidence": {
+      "source_code": "source/java/**/*.java + source/jsp/* — 345 Java LOC + JSP",
+      "orm": "source/sqlmap/exchange.xml — iBATIS 2 sql-map (130 LOC)",
+      "design_specs": "input/rules.json + input/domain.json + input/antipatterns.json + input/inventory.json (analysis 4종)",
+      "test_code": "characterization/snapshots/UC-EXCHANGE-{002,006,007}.json — phase 4.7 golden snapshot 3종 (★ characterization 본질은 enum 부재 — carry C-9 / phase 4.7 본체 격상 v2.1.0 시 enum 'characterization' 추가 후보)",
+      "documentation": "characterization/intent-vs-bug.md + characterization/coverage.json"
+    },
+    "confidence": 0.75,
+    "confidence_reasoning": "★ plan §3-B 추정 75% 정합. 7 UC + 7 BR 추출 가능 (★ +) / 도메인 expert (IFRS 회계 담당자) 검증 carry 3건 (★ -). characterization (phase 4.7) 산출 cross-link 로 ambiguous 영역 명시 (★ +).",
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "characterization/snapshots/UC-EXCHANGE-002-selectExchangeList.json",
+      "characterization/snapshots/UC-EXCHANGE-006-updateExchange.json",
+      "characterization/snapshots/UC-EXCHANGE-007-checkExcRateReg.json",
+      "characterization/coverage.json",
+      "characterization/intent-vs-bug.md",
+      "source/java/web/ExchangeController.java",
+      "source/java/service/ExchangeService.java",
+      "source/java/service/impl/ExchangeServiceImpl.java",
+      "source/java/service/impl/ExchangeDAO.java",
+      "source/sqlmap/exchange.xml"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "IFRS 회계 표준의 외화환산 차이 (foreign exchange difference) 처리. 연간 통화별 환율 (기말환율 E + 평균환율 A) 마스터 관리 + 외화 → 원화 환산 시 다른 모듈에 환율 제공. 일일 환율 조회/엑셀 다운로드 보조 기능.",
+    "stakeholders": [
+      "ifrs-user (회계 담당자) — 환율 조회/입력/엑셀 다운로드",
+      "ifrs-admin (관리자 추정) — 환율 마이그레이션 (S_ExRateMigration / 외부 시스템 연동)",
+      "downstream-modules (capital, connect 등) — selectExchangeRate 호출 의존"
+    ],
+    "success_criteria": [
+      "기말(E) + 평균(A) 두 GUBUN 모두 등록되어야 회계 인식 완성 (BR-EXCHANGE-002)",
+      "KRW 환율 = 1 고정 (기준 통화 / BR-EXCHANGE-001)",
+      "외화 → 원화 환산 시 currCd 별 정확한 환율 적용 (BR-EXCHANGE-007)",
+      "12개월 환율 일괄 입력 + 천단위 콤마 자동 제거 UX (BR-EXCHANGE-004 + BR-EXCHANGE-005)"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-EXCHANGE-001",
+      "name": "연간 환율 관리 화면 진입",
+      "description": "GET /ifrs/exchange/exchangeView?year=YYYY — 회계 담당자가 환율 관리 화면 진입. year 파라미터 부재 시 thisYear 사용.",
+      "actors": ["ifrs-user"],
+      "preconditions": ["인증된 세션 존재 — IfrsUtil.getSession 의무"],
+      "postconditions": ["환율 관리 JSP 렌더 + thisYear/year 모델 attribute"],
+      "acceptance_criteria_refs": ["(carry — chain 2 진입 시 AC-EXCHANGE-001 등재)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:34-46 (function exchangeView)"
+      ]
+    },
+    {
+      "id": "UC-EXCHANGE-002",
+      "name": "연간 통화별 12개월 환율 조회 (Ajax)",
+      "description": "POST /ifrs/exchange/exchangeViewAjax — 특정 연도의 모든 통화 × 기말(E)+평균(A) × 12개월 환율 list. currCd 옵션으로 단일 통화 필터.",
+      "actors": ["ifrs-user"],
+      "preconditions": ["year 파라미터 (필수 추정 — sql-map 의 #year# 강제)"],
+      "postconditions": ["TB_CURRENCY × {E, A} × 12 month 환율 list (jsonView)"],
+      "acceptance_criteria_refs": ["(carry)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:49-59 (function exchangeViewAjax)",
+        "source/sqlmap/exchange.xml:8-32 (selectExchangeList SQL UNION ALL E + A)",
+        "characterization/snapshots/UC-EXCHANGE-002-selectExchangeList.json (3 scenario / golden snapshot)"
+      ]
+    },
+    {
+      "id": "UC-EXCHANGE-003",
+      "name": "연간 환율 외부 마이그레이션",
+      "description": "POST /ifrs/exchange/exchangeMigration — 외부 시스템 (한국은행/외환은행 추정) 환율 데이터 일괄 가져오기. S_ExRateMigration 저장 프로시저 실행.",
+      "actors": ["ifrs-admin (추정)"],
+      "preconditions": ["year 파라미터", "관리자 권한 (추정 — 인가 검증 부재 / AP-EXCHANGE-001 영역)"],
+      "postconditions": ["TB_EXCHANGE 갱신 + result 메시지 반환"],
+      "acceptance_criteria_refs": ["(carry — 도메인 expert 인터뷰 후)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:68-80 (function exchangeMigration)",
+        "source/sqlmap/exchange.xml:107-116 (procedure S_ExRateMigration)"
+      ],
+      "note": "★ S_ExRateMigration 의 정확한 비즈니스 로직은 코드만으로 추론 불가 — phase 4.7 ambiguous AP-EXCHANGE-008 영역 / 도메인 expert + DB 함수 본문 read carry."
+    },
+    {
+      "id": "UC-EXCHANGE-004",
+      "name": "통화·월별 일일 환율 조회",
+      "description": "GET /ifrs/exchange/getDayExchangeList?currCd=...&yyyyMM=... — 특정 통화·월의 일자별 환율 list. VND 는 소수 4자리 / 그 외 2자리 표시 (BR-EXCHANGE-003).",
+      "actors": ["ifrs-user"],
+      "preconditions": ["currCd + yyyyMM 파라미터"],
+      "postconditions": ["TB_DAY_EXCHANGE 일자별 환율 list (jsonView)"],
+      "acceptance_criteria_refs": ["(carry)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:83-92 (function getDayExchangeList)",
+        "source/sqlmap/exchange.xml:118-127 (selectDayExchangeList SQL FORMAT)"
+      ]
+    },
+    {
+      "id": "UC-EXCHANGE-005",
+      "name": "통화·월별 일일 환율 엑셀 다운로드",
+      "description": "GET /ifrs/exchange/downloadDayExchangeExcel — UC-EXCHANGE-004 결과를 IFRSExcelView 로 Excel 출력. sheet 명 = 화폐단위(currCd) yyyy-MM.",
+      "actors": ["ifrs-user"],
+      "preconditions": ["currCd + yyyyMM 파라미터"],
+      "postconditions": ["Excel 파일 응답 (header [고시일, 환율])"],
+      "acceptance_criteria_refs": ["(carry)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:94-120 (function downloadDayExchangeExcel)"
+      ],
+      "note": "★ AP-EXCHANGE-003 (Controller 에 Excel 출력 로직 직접 포함) 영역 — 새 시스템 ExcelExportService 분리 의무."
+    },
+    {
+      "id": "UC-EXCHANGE-006",
+      "name": "연간 환율 일괄 입력/수정",
+      "description": "POST /ifrs/exchange/updateExchange — N 통화 × {기말, 평균} × 12개월 환율 일괄 입력 (TB_EXCHANGE MERGE). 천단위 콤마 자동 제거. sessionId 기록.",
+      "actors": ["ifrs-admin (추정)"],
+      "preconditions": ["year + currCd_arr[] + gubun_arr[] + mon1_arr[]~mon12_arr[]", "인증 세션 (IfrsUtil.getSession)"],
+      "postconditions": ["TB_EXCHANGE MERGE (matched UPDATE / not matched INSERT)"],
+      "acceptance_criteria_refs": ["(carry)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:133-144 (function updateExchange)",
+        "source/java/service/impl/ExchangeServiceImpl.java:38-76 (12개월 배열 파싱)",
+        "source/sqlmap/exchange.xml:36-73 (MERGE TB_EXCHANGE)",
+        "characterization/snapshots/UC-EXCHANGE-006-updateExchange.json (3 scenario / ★ 음수 환율 likely bug 명시)"
+      ]
+    },
+    {
+      "id": "UC-EXCHANGE-007",
+      "name": "특정 통화·월의 환율 등록 여부 확인",
+      "description": "GET /ifrs/exchange/checkExcRateReg?currCd=...&year=...&month=... — 기말(E) + 평균(A) 둘 다 0이 아닌 값으로 등록 시 'Y' / 그 외 'N'. cnt == 2 strict.",
+      "actors": ["ifrs-user"],
+      "preconditions": ["currCd + year + month 파라미터"],
+      "postconditions": ["{ excRateReg: 'Y' | 'N' } (jsonView)"],
+      "acceptance_criteria_refs": ["(carry)"],
+      "source_grounded_evidence": [
+        "source/java/web/ExchangeController.java:157-168 (function checkExcRateReg)",
+        "source/sqlmap/exchange.xml:76-98 (selectCheckExcRate SQL CASE WHEN month → MON1~MON12)",
+        "characterization/snapshots/UC-EXCHANGE-007-checkExcRateReg.json (4 scenario / ★ 0환율 + 13월 likely bug 명시)"
+      ]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-EXCHANGE-001",
+      "reasoning": "KRW (원화) 는 IFRS 보고 기준 통화 — 외화→원화 환산 시 KRW 자체는 환산 불필요. selectExchangeRate 의 if 분기로 DB 호출 회피 = 도메인 정합 + 성능 최적.",
+      "source_grounded_evidence": "source/java/service/impl/ExchangeServiceImpl.java:85-90 — if('KRW'.equals(currCd)) return 1; (intent_vs_bug 분류 = intent)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-002",
+      "reasoning": "IFRS B/S (외화 자산/부채 평가) 와 P/L (외화거래 인식) 동시에 평가하려면 기말환율(E) + 평균환율(A) 둘 다 필요. 한 GUBUN 만 있으면 회계 인식 미완.",
+      "source_grounded_evidence": "source/sqlmap/exchange.xml:76-98 — cnt == 2 strict + EXC_RATE != 0 (intent_vs_bug = intent)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-003",
+      "reasoning": "VND (베트남 동) 환율 단위가 매우 작음 (1원 ≈ 18 VND). 소수 2자리만 표시하면 정밀도 손실 → 4자리 표시 의무.",
+      "source_grounded_evidence": "source/sqlmap/exchange.xml:118-127 — FORMAT(EXCHANGE_RATE , CASE WHEN CURR_CD = 'VND' THEN '##0.0000' ELSE '##0.00' END) (intent_vs_bug = intent)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-004",
+      "reasoning": "UI 에서 사람이 1,300.50 같은 천단위 콤마 형식으로 환율 입력. Service 가 콤마 자동 제거 후 저장 → UX 친화 + DB 는 numeric 형식 유지.",
+      "source_grounded_evidence": "source/java/service/impl/ExchangeServiceImpl.java:61-72 — mon[N]Arr[i].replaceAll(',', '') 12회 반복 (intent_vs_bug = intent)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-005",
+      "reasoning": "★ ambiguous — IFRS 연간 환율표는 12개월 한 번에 보는 표 형식이 표준 (intent 가능성 ↑) vs DB 정규화 (1NF) 위반 + 13번째 월 추가 시 schema migration 폐해 (bug 가능성). characterization/intent-vs-bug.md §3.1 참조 — 도메인 expert 결단 carry. **잠정 결단: bug** (자조 코멘트 자체 인지 신호).",
+      "source_grounded_evidence": "source/sqlmap/exchange.xml:36-73 (TB_EXCHANGE MON1~MON12 일괄 MERGE) + AP-EXCHANGE-006 + AP-EXCHANGE-007 (자조 코멘트)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-006",
+      "reasoning": "TB_EXCHANGE.GUBUN 컬럼으로 기말환율(E) / 평균환율(A) row 단위 분리. IFRS B/S vs P/L 회계 기준 필수. PRIMARY KEY = (CURR_CD, YEAR, GUBUN).",
+      "source_grounded_evidence": "source/sqlmap/exchange.xml:8-32 — UNION ALL of GUBUN='E' + GUBUN='A' (intent_vs_bug = intent)"
+    },
+    {
+      "br_id": "BR-EXCHANGE-007",
+      "reasoning": "외화 → 원화 환산 산식의 기본 — 다른 모듈 (capital, connect 등) 이 ExchangeService.selectExchangeRate(year, month, currCd, gubun) 호출 → DB 함수 FN_Get_ExcRate 가 환율 반환.",
+      "source_grounded_evidence": "source/sqlmap/exchange.xml:102-104 — SELECT ifrs.dbo.FN_Get_ExcRate(...). FN 본문 read carry — 정확한 산식 미확인 (intent_vs_bug = intent / 산식 자체 정합 carry)"
+    }
+  ],
+  "out_of_scope": [
+    "★ chain 2~4 (현 PoC #06 prelim 은 chain 1 만 측정)",
+    "다른 모듈 (capital, billing, bod 등) — exchange 단일책임만",
+    "FN_Get_ExcRate DB 함수 본문 (carry C-data-1)",
+    "S_ExRateMigration 비즈니스 의도 + 외부 시스템 spec (carry C-domain-2)",
+    "TB_EXCHANGE 의 트랜잭션 isolation 수준 (carry C-data-2)",
+    "JSP UI/UX (PoC #04 React FSD 와 별개 트랙)",
+    "AUIGrid / 다음에디터 한국 상용 라이브러리 (corpus 빈약 본질 한계)",
+    "전체 51K LOC 마이그레이션 (chain harness scope 외 / OpenRewrite 시퀀스)"
+  ],
+  "risks_and_constraints": [
+    "★ Spring 4.1 + iBATIS 2 + 표준프레임워크 corpus 빈약 — AP-EXCHANGE-001~010 자동 추출 자동화율 22% (plan §3-A 35% 추정 -13%p)",
+    "★ IFRS 회계 도메인 지식 무게 ↑ — rules.json 자연어 description 비중 ↑ / 자동화율 29% (plan §3-A 55% 추정 -26%p)",
+    "★ ambiguous 3종 (BR-EXCHANGE-005 + AP-EXCHANGE-006/008/009 동반) — 도메인 expert 결단 의무 / chain 2 진입 ❌ (이 결단 전까지)",
+    "★ 실 DB 환경 (MSSQL) 부재 — characterization snapshot 정확도 한계 / 도메인 expert 검증 carry",
+    "70~80% 자동화 한계 잔존 (chain harness 정신) — gate #1~#4 사용자 검토 의무",
+    "테스트 0 환경 — chain 3 RED→GREEN baseline 부재 / Spring 4.1 test context 부팅 휴리스틱 corpus 빈약"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json"
+    ],
+    "to_characterization_artifacts": [
+      "characterization/snapshots/*.json (3 UC × 10 scenario)",
+      "characterization/coverage.json (UC coverage 0.43)",
+      "characterization/intent-vs-bug.md (14 명확 + 3 ambiguous = 82% acceptance oracle 적용 가능)"
+    ],
+    "to_phase7_findings": [
+      "F-PHASE7-001 (실 환경 부재 정확도 한계)",
+      "F-PHASE7-002 (intent_vs_bug ambiguous 영역 분류표 핵심)",
+      "F-PHASE7-003 (Given/When/Then BDD 형식 = chain 2 acceptance-criteria.json 정합)",
+      "F-PHASE7-004 (behavior_likely_bug = 새 시스템 검증 추가 의무 신호)"
+    ],
+    "to_carry_decisions": [
+      "carry C-1 (Spring 4.x AP seed 본체 격상 — evidence 1 PoC 확보 / ≥2 PoC 의무)",
+      "carry C-3 (phase 4.7 v2.1.0 본체 격상 — 1 PoC corroboration 확보)"
+    ]
+  }
+}

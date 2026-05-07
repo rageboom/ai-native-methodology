@@ -1,0 +1,99 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-002 selectExchangeList (연간 통화별 12개월 환율 조회 Ajax). 실 DB 환경 부재 → 코드 + IFRS 회계 도메인 추정 기반 작성 / 도메인 expert 검증 carry.",
+  "snapshot_id": "SNAP-UC-EXCHANGE-002",
+  "use_case": "UC-EXCHANGE-002",
+  "endpoint": "POST /ifrs/exchange/exchangeViewAjax",
+  "controller_method": "ExchangeController.exchangeViewAjax",
+  "service_method": "ExchangeService.selectExchangeList",
+  "sql_id": "ExchangeDAO.selectExchangeList",
+  "layer": "integration (Controller → Service → DAO → SQL)",
+  "data_source_status": "★ 실 DB 환경 부재 (MSSQL 미접속 / TB_EXCHANGE 가상 데이터)",
+  "scenarios": [
+    {
+      "id": "SCN-002-001",
+      "name": "happy path — 특정 연도 전체 통화 조회",
+      "given": {
+        "request_params": { "year": "2025" },
+        "TB_CURRENCY_state": [
+          { "CURR_CD": "KRW", "CURR_NM": "원", "SORT_NO": 0 },
+          { "CURR_CD": "USD", "CURR_NM": "미국 달러", "SORT_NO": 1 },
+          { "CURR_CD": "EUR", "CURR_NM": "유로", "SORT_NO": 2 },
+          { "CURR_CD": "VND", "CURR_NM": "베트남 동", "SORT_NO": 3 }
+        ],
+        "TB_EXCHANGE_state": [
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "E", "MON1": 1300.50, "MON2": 1310.00, "MON3": 1305.30, "MON4": 1290.00, "MON5": 1295.00, "MON6": 1300.00, "MON7": 1310.00, "MON8": 1320.00, "MON9": 1315.00, "MON10": 1305.00, "MON11": 1300.00, "MON12": 1295.00 },
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "A", "MON1": 1295.30, "MON2": 1305.10, "MON3": 1300.40, "MON4": 1287.50, "MON5": 1292.50, "MON6": 1297.50, "MON7": 1305.00, "MON8": 1315.00, "MON9": 1310.00, "MON10": 1300.00, "MON11": 1295.00, "MON12": 1290.00 },
+          { "CURR_CD": "VND", "YEAR": "2025", "GUBUN": "E", "MON1": 0.0541, "MON2": 0.0540, "MON3": 0.0539, "MON4": 0.0540, "MON5": 0.0541, "MON6": 0.0542, "MON7": 0.0543, "MON8": 0.0544, "MON9": 0.0545, "MON10": 0.0546, "MON11": 0.0547, "MON12": 0.0548 }
+        ]
+      },
+      "when": "Map param = IfrsUtil.parameterToHm(request); List<Map> list = exchangeService.selectExchangeList(param);",
+      "then": {
+        "expected_list": [
+          { "CURR_CD": "KRW", "CURR_NM": "원", "SORT_NO": 0, "GUBUN": "E", "MON1": null, "MON2": null, "_other_months": "all null", "_note": "TB_EXCHANGE 미등록 → LEFT JOIN MON 컬럼 NULL" },
+          { "CURR_CD": "KRW", "CURR_NM": "원", "SORT_NO": 0, "GUBUN": "A", "MON1": null, "_note": "동일" },
+          { "CURR_CD": "USD", "CURR_NM": "미국 달러", "SORT_NO": 1, "GUBUN": "E", "MON1": 1300.50, "MON12": 1295.00 },
+          { "CURR_CD": "USD", "CURR_NM": "미국 달러", "SORT_NO": 1, "GUBUN": "A", "MON1": 1295.30, "MON12": 1290.00 },
+          { "CURR_CD": "EUR", "CURR_NM": "유로", "SORT_NO": 2, "GUBUN": "E", "MON1": null, "_other_months": "all null" },
+          { "CURR_CD": "EUR", "CURR_NM": "유로", "SORT_NO": 2, "GUBUN": "A", "MON1": null },
+          { "CURR_CD": "VND", "CURR_NM": "베트남 동", "SORT_NO": 3, "GUBUN": "E", "MON1": 0.0541, "MON12": 0.0548 },
+          { "CURR_CD": "VND", "CURR_NM": "베트남 동", "SORT_NO": 3, "GUBUN": "A", "MON1": null }
+        ],
+        "ordering": "ORDER BY SORT_NO, GUBUN DESC — 즉 SORT_NO 오름차순 후 E (먼저) → A (나중)",
+        "list_size_formula": "TB_CURRENCY 통화 수 × 2 (E + A) = 4 × 2 = 8 row"
+      },
+      "intent_classification": [
+        { "rule": "BR-EXCHANGE-006", "type": "intent", "note": "기말(E)/평균(A) 분리 — IFRS B/S vs P/L 정합" }
+      ],
+      "behavior_to_preserve": "list 항상 GUBUN E + A 쌍으로 반환 (단일 GUBUN 결과 ❌)"
+    },
+    {
+      "id": "SCN-002-002",
+      "name": "filter — 특정 통화만 조회",
+      "given": {
+        "request_params": { "year": "2025", "currCd": "USD" },
+        "TB_CURRENCY_state": "(SCN-002-001 동일)",
+        "TB_EXCHANGE_state": "(SCN-002-001 동일)"
+      },
+      "when": "Map param = IfrsUtil.parameterToHm(request); List<Map> list = exchangeService.selectExchangeList(param);",
+      "then": {
+        "expected_list": [
+          { "CURR_CD": "USD", "CURR_NM": "미국 달러", "SORT_NO": 1, "GUBUN": "E", "MON1": 1300.50 },
+          { "CURR_CD": "USD", "CURR_NM": "미국 달러", "SORT_NO": 1, "GUBUN": "A", "MON1": 1295.30 }
+        ],
+        "list_size": 2,
+        "sql_clause_added": "AND CURR_CD = #currCd# (isNotEmpty)"
+      },
+      "intent_classification": [
+        { "rule": "(implicit filter)", "type": "intent" }
+      ]
+    },
+    {
+      "id": "SCN-002-003",
+      "name": "edge case — 미등록 연도",
+      "given": {
+        "request_params": { "year": "2099" },
+        "TB_EXCHANGE_state": "TB_EXCHANGE 에 YEAR=2099 row 0개"
+      },
+      "when": "Map param = ...; List<Map> list = exchangeService.selectExchangeList(param);",
+      "then": {
+        "expected_list": "(통화 수) × 2 row, 모두 MON1~MON12 = NULL",
+        "list_empty": false,
+        "_note": "LEFT JOIN 으로 통화는 항상 보임 / 환율은 NULL"
+      },
+      "intent_classification": [
+        { "rule": "BR-EXCHANGE-002 (간접)", "type": "intent", "note": "미등록 = NULL → checkExcRateReg 가 'N' 반환" }
+      ],
+      "behavior_to_preserve": "미등록 연도라도 list 비어있지 ❌ — 통화 마스터 항상 표시"
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-EXCHANGE-006 (E/A 분리)", "ORDER BY SORT_NO, GUBUN DESC — 화면 표시 순서 의도"],
+    "bug": [],
+    "ambiguous": ["TB_CURRENCY 의 KRW (원화) 도 list 에 포함 — 환산 불필요한 KRW 가 화면에 보일 필요? (BR-EXCHANGE-001 KRW=1 고정 vs 화면 일관성)"]
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-EXCHANGE-002"],
+    "brs_covered": ["BR-EXCHANGE-006"],
+    "aps_intersected": ["AP-EXCHANGE-001 (Map 캐스팅)", "AP-EXCHANGE-004 (NOLOCK)"]
+  }
+}

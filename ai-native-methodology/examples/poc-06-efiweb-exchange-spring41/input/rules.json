@@ -1,0 +1,130 @@
+{
+  "$comment": "★ PoC #06 prelim — Business Rules. legacy 코드 분석 결과 추출. chain 1 planning-spec.business_rules_intent 의 source. ★ 일부 BR 은 의도 vs 누적 버그 분간 어려움 — phase 4.7 (characterization) intent-vs-bug 분류표에서 결정.",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "business_rules": [
+    {
+      "id": "BR-EXCHANGE-001",
+      "title": "원화 (KRW) 환율 = 1 고정",
+      "type": "domain_invariant",
+      "description": "selectExchangeRate 호출 시 currCd='KRW' 이면 DB 조회 없이 1.0 반환. 외화 → 원화 환산 시 KRW 자체는 환산 불필요 (회계 기준 통화).",
+      "current_state_note": "ExchangeServiceImpl.selectExchangeRate 의 if 분기에서 직접 1 반환 — DB 호출 회피.",
+      "source_grounded_evidence": {
+        "file": "source/java/service/impl/ExchangeServiceImpl.java",
+        "line_range": "85-90",
+        "grep_query": "KRW.*equals",
+        "grep_hit_count": 1
+      },
+      "severity": "high",
+      "intent_vs_bug": "intent (의도된 비즈니스 규칙 — IFRS 회계 기준 통화)"
+    },
+    {
+      "id": "BR-EXCHANGE-002",
+      "title": "환율 등록 완료 조건 = 기말(E) + 평균(A) 두 GUBUN 모두 등록",
+      "type": "completeness_invariant",
+      "description": "특정 통화·연·월의 환율이 '등록 완료' 로 인정되려면 기말환율(GUBUN='E') + 평균환율(GUBUN='A') 둘 다 0이 아닌 값으로 존재해야 한다. checkExcRateReg 가 cnt == 2 일 때만 'Y' 반환.",
+      "current_state_note": "selectCheckExcRate SQL 의 GUBUN IN ('E', 'A') + EXC_RATE != 0 + COUNT(*) == 2 검증.",
+      "source_grounded_evidence": {
+        "file": "source/sqlmap/exchange.xml",
+        "line_range": "76-98",
+        "grep_query": "cnt == 2",
+        "grep_hit_count": 1
+      },
+      "severity": "high",
+      "intent_vs_bug": "intent (IFRS B/S + P/L 평가 시 두 환율 동시 의무)"
+    },
+    {
+      "id": "BR-EXCHANGE-003",
+      "title": "VND (베트남 동) 일일 환율 소수점 4자리 / 그 외 2자리 표시",
+      "type": "presentation_format",
+      "description": "selectDayExchangeList 결과의 EXCHANGE_RATE 출력 시 currCd='VND' 이면 '##0.0000' / 그 외는 '##0.00' 포맷.",
+      "current_state_note": "exchange.xml selectDayExchangeList SQL FORMAT(EXCHANGE_RATE, CASE WHEN ...) 분기.",
+      "source_grounded_evidence": {
+        "file": "source/sqlmap/exchange.xml",
+        "line_range": "118-127",
+        "grep_query": "VND.*0.0000",
+        "grep_hit_count": 1
+      },
+      "severity": "medium",
+      "intent_vs_bug": "intent (VND 환율 단위가 매우 작아 소수 정밀도 필요 — 실무 정합)"
+    },
+    {
+      "id": "BR-EXCHANGE-004",
+      "title": "환율 입력 시 천단위 콤마(,) 자동 제거",
+      "type": "input_normalization",
+      "description": "updateExchange 호출 시 mon1_arr[] ~ mon12_arr[] 의 각 값에서 콤마 제거 후 DB 저장. UI 에서 사람이 1,300.50 같은 형식으로 입력해도 1300.50 으로 저장.",
+      "current_state_note": "ExchangeServiceImpl.updateExchange 의 mon[N]Arr[i].replaceAll(',', '') 12회 반복.",
+      "source_grounded_evidence": {
+        "file": "source/java/service/impl/ExchangeServiceImpl.java",
+        "line_range": "61-72",
+        "grep_query": "replaceAll.*,",
+        "grep_hit_count": 12
+      },
+      "severity": "low",
+      "intent_vs_bug": "intent (UX 친화 — 사람이 천단위 콤마로 입력 가능)"
+    },
+    {
+      "id": "BR-EXCHANGE-005",
+      "title": "연간 환율은 12개월 일괄 단위 입력",
+      "type": "data_granularity",
+      "description": "환율 입력은 항상 한 통화·한 GUBUN·한 연도에 대해 12개월 (MON1~MON12) 일괄. 단일 월 단독 입력 API ❌. TB_EXCHANGE 테이블도 row 1개 = 12개월.",
+      "current_state_note": "TB_EXCHANGE 컬럼 MON1~MON12 / updateExchange MERGE 시 12 컬럼 동시 업데이트.",
+      "source_grounded_evidence": {
+        "file": "source/sqlmap/exchange.xml",
+        "line_range": "36-73",
+        "grep_query": "MON1.*MON12",
+        "grep_hit_count": 1
+      },
+      "severity": "medium",
+      "intent_vs_bug": "★ 분간 어려움 — IFRS 연간 환율표 일괄 등록 정합 (intent) vs DB 정규화 부재 폐해 (bug). phase 4.7 carry."
+    },
+    {
+      "id": "BR-EXCHANGE-006",
+      "title": "기말환율(E) / 평균환율(A) 분리 관리",
+      "type": "domain_classification",
+      "description": "TB_EXCHANGE.GUBUN 컬럼으로 기말환율(E) 과 평균환율(A) 를 row 단위 분리. 기말 = B/S 외화 자산/부채 평가용 (보고일 시점 환율). 평균 = P/L 외화거래 인식용 (회기 평균 환율).",
+      "current_state_note": "TB_EXCHANGE PRIMARY KEY = (CURR_CD, YEAR, GUBUN). selectExchangeList 가 GUBUN='E' / 'A' UNION ALL.",
+      "source_grounded_evidence": {
+        "file": "source/sqlmap/exchange.xml",
+        "line_range": "8-32",
+        "grep_query": "GUBUN.*E.*A",
+        "grep_hit_count": 1
+      },
+      "severity": "high",
+      "intent_vs_bug": "intent (IFRS B/S vs P/L 회계 기준)"
+    },
+    {
+      "id": "BR-EXCHANGE-007",
+      "title": "외화 → 원화 환산 시 currCd 별 환율 적용 (FN_Get_ExcRate)",
+      "type": "calculation_rule",
+      "description": "다른 모듈 (capital, connect 등) 이 외화를 원화로 환산 시 ExchangeService.selectExchangeRate(year, month, currCd, gubun) 호출 → DB 함수 FN_Get_ExcRate 가 환율 반환.",
+      "current_state_note": "ExchangeServiceImpl.selectExchangeRate → ExchangeDAO.selectExchangeRate → SELECT ifrs.dbo.FN_Get_ExcRate(...).",
+      "source_grounded_evidence": {
+        "file": "source/sqlmap/exchange.xml",
+        "line_range": "102-104",
+        "grep_query": "FN_Get_ExcRate",
+        "grep_hit_count": 1
+      },
+      "severity": "high",
+      "intent_vs_bug": "intent (FN_Get_ExcRate 의 정확한 산식은 DB 함수 본문 미확인 — phase 4.7 carry)"
+    }
+  ],
+  "phase_3a_automation_measurement": {
+    "$comment": "rules.json 자동화율 측정.",
+    "auto_extractable_fields": [
+      "BR.id (코드 if/elseif 분기 자동 grep — 일부)",
+      "source_grounded_evidence (line_range / grep_query / grep_hit_count)",
+      "severity (코드 라벨 ❌ / 수동)"
+    ],
+    "auto_extractable_count": 2,
+    "manual_required_fields": [
+      "BR.title 자연어 (Korean / IFRS 도메인 지식)",
+      "BR.description 자연어 + 회계 의도",
+      "BR.type 분류 (domain_invariant / completeness_invariant / presentation_format / input_normalization / data_granularity / domain_classification / calculation_rule)",
+      "BR.intent_vs_bug 판단",
+      "BR.severity"
+    ],
+    "manual_required_count": 5,
+    "auto_ratio": "29% (2 / 7) — plan §3-A 'rules.json (BR) 55%' 추정 보다 -26%p / ★ 큰 갭 발견",
+    "note": "★ rules.json 자동화율이 추정보다 박한 이유: (a) IFRS 회계 도메인 의도 추출이 자연어 무거움 (b) BR 의 intent_vs_bug 판단은 도메인 expert 의무 — phase 4.7 (characterization) 가 필수임을 사실로 입증. 외부 조언 정합."
+  }
+}

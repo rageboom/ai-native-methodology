@@ -1,0 +1,100 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-007 checkExcRateReg (특정 통화·월의 환율 등록 여부 확인). cnt == 2 면 'Y' / else 'N'.",
+  "snapshot_id": "SNAP-UC-EXCHANGE-007",
+  "use_case": "UC-EXCHANGE-007",
+  "endpoint": "GET /ifrs/exchange/checkExcRateReg",
+  "controller_method": "ExchangeController.checkExcRateReg",
+  "service_method": "ExchangeService.selectCheckExcRate",
+  "sql_id": "ExchangeDAO.selectCheckExcRate",
+  "layer": "integration",
+  "scenarios": [
+    {
+      "id": "SCN-007-001",
+      "name": "happy path — 기말(E) + 평균(A) 둘 다 등록",
+      "given": {
+        "request_params": { "currCd": "USD", "year": "2025", "month": "01" },
+        "TB_EXCHANGE_state": [
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "E", "MON1": 1300.50 },
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "A", "MON1": 1295.30 }
+        ]
+      },
+      "when": "int cnt = exchangeService.selectCheckExcRate(param); model.addAttribute('excRateReg', cnt == 2 ? 'Y' : 'N');",
+      "then": {
+        "sql_inner_select": [
+          { "EXC_RATE": 1300.50, "_match": "GUBUN='E' MON1" },
+          { "EXC_RATE": 1295.30, "_match": "GUBUN='A' MON1" }
+        ],
+        "sql_outer_count": 2,
+        "expected_response": { "excRateReg": "Y" }
+      },
+      "intent_classification": [
+        { "rule": "BR-EXCHANGE-002", "type": "intent", "note": "E + A 두 GUBUN 모두 등록 의무 — IFRS B/S + P/L 동시" }
+      ],
+      "behavior_to_preserve": "cnt == 2 일 때만 'Y' (cnt == 1 은 'N')"
+    },
+    {
+      "id": "SCN-007-002",
+      "name": "한 GUBUN 만 등록 → 'N'",
+      "given": {
+        "request_params": { "currCd": "USD", "year": "2025", "month": "01" },
+        "TB_EXCHANGE_state": [
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "E", "MON1": 1300.50 }
+        ]
+      },
+      "when": "(동일)",
+      "then": {
+        "sql_outer_count": 1,
+        "expected_response": { "excRateReg": "N" }
+      },
+      "behavior_to_preserve": "한 GUBUN = 'N' (cnt == 2 strict)"
+    },
+    {
+      "id": "SCN-007-003",
+      "name": "★ likely bug — 환율 0 등록",
+      "given": {
+        "request_params": { "currCd": "USD", "year": "2025", "month": "01" },
+        "TB_EXCHANGE_state": [
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "E", "MON1": 0 },
+          { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "A", "MON1": 0 }
+        ]
+      },
+      "when": "(동일)",
+      "then": {
+        "sql_inner_select": [{ "EXC_RATE": 0 }, { "EXC_RATE": 0 }],
+        "sql_outer_filter": "WHERE EXC_RATE != 0 → 0 row",
+        "sql_outer_count": 0,
+        "expected_response": { "excRateReg": "N" }
+      },
+      "intent_classification": [
+        { "rule": "BR-EXCHANGE-002 (확장)", "type": "intent", "note": "EXC_RATE != 0 조건 — 0 = 미등록 동치" }
+      ],
+      "behavior_to_preserve": "0 환율 = 미등록 (UI 가 빈 input 을 0 으로 INSERT 하면 등록 미완 신호)",
+      "behavior_likely_bug": [
+        "★ EXC_RATE = NULL (LEFT JOIN 미등록) 와 EXC_RATE = 0 (등록 후 0) 동치 처리 — 의도 vs 우연한 정합 ❌ 명시 부재 / 새 시스템에서 명시화 필요"
+      ]
+    },
+    {
+      "id": "SCN-007-004",
+      "name": "edge case — 잘못된 month (13월 등)",
+      "given": { "request_params": { "currCd": "USD", "year": "2025", "month": "13" } },
+      "when": "(동일)",
+      "then": {
+        "sql_inner_select": "★ CASE WHEN 모든 분기 미해당 → EXC_RATE = NULL",
+        "sql_outer_count": 0,
+        "expected_response": { "excRateReg": "N" }
+      },
+      "behavior_to_preserve": "(★ 검증 부재 — month=13 도 'N' 으로 그냥 통과 / 새 시스템에서 month 1~12 검증 의무)",
+      "intent_classification": [{ "rule": "(검증 부재)", "type": "bug" }]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-EXCHANGE-002 (E + A 모두 등록 의무)", "EXC_RATE != 0 = 미등록 동치"],
+    "bug": ["NULL vs 0 동치 처리 명시 부재", "month 1~12 검증 부재", "★ AP-EXCHANGE-007 자조 코멘트 자체 — '환율관리 페이지만 생각하고 설계한 폐해' 자체 인지"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-EXCHANGE-007"],
+    "brs_covered": ["BR-EXCHANGE-002"],
+    "aps_intersected": ["AP-EXCHANGE-007 (자조 코멘트 / 자체 인지된 기술부채)"]
+  }
+}
