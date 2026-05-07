@@ -1,9 +1,10 @@
 # DEC-2026-05-07-poc-08-prelim-신설
 
 > **카테고리**: methodology / PoC 등재 / paradigm-cross corroboration #1 / v2.2.0 final 격상 trigger placeholder
-> **상태**: 진행중 (★ prelim — 별도 session 첫 plan + research + Day 0 진입 의무)
-> **일자**: 2026-05-07 (skeleton + 사용자 결단 수합) / Day 0.5~ (별도 session)
+> **상태**: ⏸ **보류 (★ ★ 사용자 결단 (α) 2026-05-07 / PoC #11 EFI-WEB billing 우선 진입 후 보류 해제 의무)** — Day 0 + Day 0.5 자산 보존 (commit `a27dfb0` + `a60404c`)
+> **일자**: 2026-05-07 (skeleton + Day 0+0.5 종결 + 사용자 결단 (α) 흡수)
 > **선행**: DEC-2026-05-08-v2.2.0-rc1-prerelease (★ paradigm-cross carry C-v2.2.0-6 origin)
+> **후속**: DEC-2026-05-07-poc-11-prelim-신설 (★ ★ 사용자 결단 (α) 정합 / EFI-WEB billing 우선)
 
 ---
 

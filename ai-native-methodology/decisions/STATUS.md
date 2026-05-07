@@ -32,7 +32,19 @@
 - C7 ✅ git tag v2.2.0-rc1 (★ prerelease / `3e973ce` 기준 / Tagger Rageboom 2026-05-07)
 - C8 (현재) — plan/research 4건 자산화 + STATUS C7 ✅
 
-**★ ★ ★ v2.2.0 final 격상 trigger 의무 (★ ★ ★ 사용자 결단 수합 2026-05-07)**:
+**★ ★ ★ v2.2.0 final 격상 trigger 의무 + 사내 ROI axis 분리 (★ ★ ★ ★ 사용자 결단 (α) 2026-05-07)**:
+
+★ ★ ★ ★ **사용자 결단 (α) 2026-05-07 = "EFI-WEB 가장 우선순위 높다"** → **PoC 우선순위 재정렬**:
+- ★ **PoC #11 (EFI-WEB billing) = 우선 진입** (사내 ROI axis / scale + domain-cross / paradigm-cross 자격 ❌ → v2.2.0 final 격상 trigger 와 별도)
+- **PoC #08 (jpetstore-6) = 보류** (Day 0+0.5 commit `a27dfb0` + `a60404c` 자산 보존 / 후순위 진입)
+- **PoC #09 (TypeORM raw SQL) = 별도 axis 후속** (★ v2.2.0 final 격상 trigger 핵심 / paradigm-cross strong)
+
+**axis 분리** (★ 본 방법론 일반화 vs 사내 ROI):
+
+| axis | 목표 | PoC | 자격 |
+|---|---|---|---|
+| **사내 ROI axis** (★ 사용자 우선) | 사내 적용 직접 검증 + scale/domain-cross + sub-rule 강화 | PoC #06+#07+**#11** = 3 사내 PoC isomorphic | C-v2.2.0-spring41-ibatis2-subrule resolve trigger |
+| **본 방법론 일반화 axis** (★ paradigm-cross corroboration / Senior STOP) | 여러 ORM/프레임워크 동작 입증 | PoC #08 (MEDIUM) + PoC #09 (strong) + PoC #10 | v2.2.0 final 격상 trigger / C-v2.2.0-6 resolve |
 
 ★ ★ ★ 사용자 결단 = "우선 순위 대로 다 진행". paradigm-cross corroboration carry C-v2.2.0-6 = ★ 분해 (3 PoC 단계화):
 
@@ -57,16 +69,20 @@
 - ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
 - v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단
 
-**Day 0 진입 (★ 본 session 2026-05-07)**:
+**Day 0 진입 (★ 본 session 2026-05-07) — PoC #08 (jpetstore-6) ★ 보류**:
 - ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-08-prelim-신설.md`
 - ✅ skeleton — `examples/poc-08-realworld-mybatis/{source,input,sql-inventory,characterization}/` + README
-- ✅ INDEX entry (line 24 v2.2.0-rc1 prerelease 직후 / paradigm-cross carry 직접 후속)
-- ✅ STATUS prelim 진입 표시 (본 영역)
-- ✅ 사용자 confirm 2건 resolved (★ source = (b) jpetstore-6 / 양식 = XML 자동 / 사용자 정정 흡수)
-- ✅ commit `a27dfb0` — PoC #08 Day 0 prelim (4 files / 263 insertions)
-- ✅ plan 1차 → 2차 (★ 정탐 흡수) — `~/.claude/plans/c-poc-08-jpetstore6.md`
-- ✅ research 자산화 (★ 3 sub-agent 병렬 정탐 통합) — `~/.claude/plans/research-poc-08-jpetstore6.md`
-- ⏳ Day 0.5~ = 별도 session 4원칙 3원칙 사용자 승인 → Day 1 jpetstore-6 git clone + analysis 4종 진입
+- ✅ INDEX entry / STATUS prelim 진입 표시 / 사용자 confirm 2건 resolved
+- ✅ commit `a27dfb0` (Day 0) + `a60404c` (Day 0.5 정탐 흡수)
+- ✅ plan 2차 + research 자산화 (★ 3 sub-agent 병렬 정탐 통합)
+- ⏸ **★ ★ 보류 (사용자 결단 (α) 2026-05-07)** — Day 0+0.5 자산 보존 / PoC #11 (EFI-WEB billing) 종결 후 진입 의무
+
+**Day 0 진입 (★ 본 session 2026-05-07) — PoC #11 (EFI-WEB billing) ★ 우선**:
+- ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-11-prelim-신설.md` (★ 사용자 결단 (α) 정합)
+- ✅ skeleton — `examples/poc-11-efiweb-billing-spring41/{source,input,sql-inventory,characterization}/` + README
+- ✅ plan 1차 — `~/.claude/plans/d-poc-11-billing.md`
+- ⏳ Day 0.5~ = 별도 session 첫 진입 — ★ ★ **사용자 source 위임 의무** (billing 모듈 ~257 LOC) + plan 2차 + 4원칙 3원칙 승인 → Day 1 진입
+- ⏳ Day 1~3.5 = ★ 14~18h (~2~3일 실측 / 14d cap ★ 충분 여유)
 
 **★ 정탐 결과 흡수** (★ ★ paradigm-cross weak → MEDIUM 강화 + 신규 carry 4건):
 - §3-A 자동화율 expectation: **62~72%** (PoC #06 38.75% / #07 53.8% 대비 ↑↑)
