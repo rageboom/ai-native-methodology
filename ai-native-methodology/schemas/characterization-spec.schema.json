@@ -1,0 +1,299 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/characterization-spec.schema.json",
+  "title": "Characterization Spec — phase 4.7 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle",
+  "description": "Deliverable #23 (v2.1.0 신설). ★ ADR-CHAIN-006 phase 4.7 정합. Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context + SATD/KL-SATD (Maldonado & Shihab 2015) 합성. ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern.",
+  "x-spec-source": {
+    "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004) §13",
+    "gojko_sbe_2011": "https://gojko.net/2020/03/17/sbe-10-years.html",
+    "cucumber_gherkin": "https://cucumber.io/docs/gherkin/reference/",
+    "satd_kl_satd_2015": "https://link.springer.com/article/10.1007/s11219-023-09655-z",
+    "pit_stryker_thresholds": "https://qaskills.sh/blog/mutation-testing-stryker-guide",
+    "bullseye_coverage_min": "https://www.bullseye.com/minimum.html",
+    "ratchet_legacy": "https://ecosystem4engineering.substack.com/p/strategies-for-dealing-with-low-code"
+  },
+  "type": "object",
+  "required": ["meta_confidence", "snapshots", "intent_vs_bug", "coverage"],
+  "additionalProperties": false,
+  "properties": {
+    "meta_confidence": { "$ref": "./meta-confidence.schema.json" },
+    "$comment": { "type": "string" },
+    "snapshots": {
+      "type": "array",
+      "minItems": 1,
+      "description": "★ Given/When/Then BDD 형식 snapshot 배열. 1 UC 당 1 snapshot 권장.",
+      "items": { "$ref": "#/$defs/snapshot" }
+    },
+    "intent_vs_bug": { "$ref": "#/$defs/intentVsBug" },
+    "coverage": { "$ref": "#/$defs/coverage" }
+  },
+  "$defs": {
+    "snapshot": {
+      "type": "object",
+      "required": ["snapshot_id", "use_case", "scenarios"],
+      "additionalProperties": false,
+      "properties": {
+        "snapshot_id": {
+          "type": "string",
+          "pattern": "^SNAP-",
+          "description": "예: 'SNAP-UC-USER-SIGNUP-001'."
+        },
+        "use_case": {
+          "type": "string",
+          "pattern": "^UC-",
+          "description": "★ planning-spec UC ↔ link 의무."
+        },
+        "feature": {
+          "type": "string",
+          "description": "(★ Cucumber Gherkin Feature 정합 / optional) 상위 그룹핑 이름."
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "예: 'POST /api/users'."
+        },
+        "controller_method": {
+          "type": "string"
+        },
+        "service_method": {
+          "type": "string"
+        },
+        "sql_id": {
+          "type": "string",
+          "description": "(Legacy iBATIS / MyBatis 시) sqlmap ID."
+        },
+        "layer": {
+          "type": "string",
+          "enum": ["unit", "integration", "e2e"],
+          "description": "snapshot 검증 layer."
+        },
+        "data_source_status": {
+          "type": "string",
+          "enum": ["real_db", "real_environment", "code_only", "domain_expert_interview", "carry"],
+          "description": "★ no-simulation 정책 — code_only 시 도메인 expert carry 의무."
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "description": "1 UC 당 happy + edge 1~2 + likely_bug 1~2 권장 (PoC #06 = 3~4 / PoC #03 = 3 정합).",
+          "items": { "$ref": "#/$defs/scenario" }
+        }
+      }
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["id", "name", "given", "when", "then", "intent_classification"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^SCN-",
+          "description": "예: 'SCN-SIGNUP-001'."
+        },
+        "name": {
+          "type": "string",
+          "description": "scenario 의 자연어 제목."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^@" },
+          "description": "(★ Gherkin tag 표준 / optional / dual encoding traceability) 예: ['@happy', '@bug', '@AP-DB-001']."
+        },
+        "given": {
+          "type": "object",
+          "description": "★ 사전 조건 (request_body + state_before 등). 자유 형식 / 핵심 = 재현 가능성."
+        },
+        "when": {
+          "type": "string",
+          "description": "★ 행위 — endpoint / method 호출 흐름."
+        },
+        "then": {
+          "type": "object",
+          "description": "★ 기대 결과 — expected_response + state_after + validators_passed 등."
+        },
+        "intent_classification": {
+          "type": "array",
+          "minItems": 1,
+          "description": "★ ★ ★ 4 분류 핵심. rule + type 매핑.",
+          "items": {
+            "type": "object",
+            "required": ["rule", "type"],
+            "additionalProperties": false,
+            "properties": {
+              "rule": {
+                "type": "string",
+                "description": "rules.json BR 또는 antipatterns.json AP ID (예: 'BR-USER-EMAIL-FORMAT-001' / 'AP-DB-001')."
+              },
+              "type": {
+                "type": "string",
+                "enum": ["intent", "bug", "ambiguous", "self_recognized"],
+                "description": "★ 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (SATD/KL-SATD per Maldonado & Shihab 2015)."
+              },
+              "reason": {
+                "type": "string",
+                "description": "분류 근거 (선택 / 권장)."
+              }
+            }
+          }
+        },
+        "behavior_to_preserve": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ 새 시스템에서도 동일 동작 보존 의무 항목."
+        },
+        "behavior_likely_bug": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ 새 시스템에서 의도적 다른 결과 (modern_alternative)."
+        }
+      },
+      "if": {
+        "properties": {
+          "intent_classification": {
+            "contains": {
+              "properties": { "type": { "const": "ambiguous" } }
+            }
+          }
+        }
+      },
+      "then": {
+        "required": ["behavior_likely_bug"],
+        "$comment": "ambiguous 분류 시 behavior_likely_bug 또는 behavior_to_preserve 둘 중 최소 하나 명시 의무 — 본 if/then 은 likely_bug 우선 권장."
+      }
+    },
+    "intentVsBug": {
+      "type": "object",
+      "required": ["br_total", "ap_total", "named_classified_ratio"],
+      "additionalProperties": false,
+      "properties": {
+        "br_total": { "type": "integer", "minimum": 0 },
+        "br_intent": { "type": "integer", "minimum": 0 },
+        "br_bug": { "type": "integer", "minimum": 0 },
+        "br_ambiguous": { "type": "integer", "minimum": 0 },
+        "br_self_recognized": { "type": "integer", "minimum": 0 },
+        "ap_total": { "type": "integer", "minimum": 0 },
+        "ap_intent": { "type": "integer", "minimum": 0 },
+        "ap_bug": { "type": "integer", "minimum": 0 },
+        "ap_ambiguous": { "type": "integer", "minimum": 0 },
+        "ap_self_recognized": { "type": "integer", "minimum": 0 },
+        "named_classified_ratio": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "★ (intent + bug + self_recognized) / (br_total + ap_total) 비율. ambiguous 미포함. ≥ 0.80 권장 (default threshold)."
+        },
+        "self_recognized_grep_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "★ TODO / FIXME / HACK / XXX / '폐해' 등 grep 결과 건수. 0 도 정합 (Modern 스택 자연 부재 / PoC #03 retrofit 입증)."
+        },
+        "ambiguous_carry": {
+          "type": "array",
+          "description": "★ ambiguous 분류 항목의 도메인 expert carry 명시 의무.",
+          "items": {
+            "type": "object",
+            "required": ["rule_id", "carry_owner", "carry_reason"],
+            "additionalProperties": false,
+            "properties": {
+              "rule_id": { "type": "string" },
+              "carry_owner": {
+                "type": "string",
+                "enum": ["domain_expert", "tech_lead", "dba", "planner", "qa", "any"]
+              },
+              "carry_reason": { "type": "string" }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "br_ambiguous": { "type": "integer", "minimum": 1 } } },
+          "then": { "required": ["ambiguous_carry"], "$comment": "br_ambiguous ≥ 1 시 ambiguous_carry 의무." }
+        },
+        {
+          "if": { "properties": { "ap_ambiguous": { "type": "integer", "minimum": 1 } } },
+          "then": { "required": ["ambiguous_carry"], "$comment": "ap_ambiguous ≥ 1 시 ambiguous_carry 의무." }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["matrix", "coverage_target", "coverage_strategy"],
+      "additionalProperties": false,
+      "properties": {
+        "matrix": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["uc", "snapshot"],
+            "additionalProperties": false,
+            "properties": {
+              "uc": { "type": "string" },
+              "controller_method": { "type": "string" },
+              "service_method": { "type": "string" },
+              "sql_id": { "type": "string" },
+              "scope": { "type": "string" },
+              "snapshot": {
+                "type": "string",
+                "enum": ["✅", "❌"],
+                "description": "★ snapshot 작성 여부."
+              },
+              "covered_by": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "scope_decision": {
+                "type": "string",
+                "description": "covered / carry / out_of_scope 등 결단 명시."
+              }
+            }
+          }
+        },
+        "coverage_summary": {
+          "type": "object",
+          "description": "ratio 집계 — UC / service / sql / 가중치 등.",
+          "additionalProperties": true
+        },
+        "coverage_target": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.80,
+          "description": "★ default 0.80 (PIT/Stryker/BullseyeCoverage 산업 표준)."
+        },
+        "coverage_minimum_legacy": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "default": 0.40,
+          "description": "★ ratchet 진입점 (legacy 시). PoC #06 단일 모듈 0.43 정합."
+        },
+        "coverage_strategy": {
+          "type": "string",
+          "enum": ["absolute", "ratchet"],
+          "default": "absolute",
+          "description": "★ absolute = actual ≥ coverage_target / ratchet = actual ≥ coverage_minimum_legacy + trend positive."
+        },
+        "trend_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "★ ratchet 시 true 의무 — 이전 측정 대비 단조 비감소 검증."
+        },
+        "threshold_status": {
+          "type": "string",
+          "description": "★ 통과 / 미달 / ratchet 통과 등 자연어 명시."
+        },
+        "remediation": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "미달 시 remediation 항목."
+        }
+      },
+      "if": { "properties": { "coverage_strategy": { "const": "ratchet" } } },
+      "then": {
+        "required": ["coverage_minimum_legacy", "trend_required"],
+        "properties": { "trend_required": { "const": true } },
+        "$comment": "ratchet 선택 시 coverage_minimum_legacy 명시 + trend_required = true 의무."
+      }
+    }
+  }
+}

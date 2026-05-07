@@ -38,7 +38,8 @@
           "documentation",
           "domain_context_md",
           "postman_or_api_test",
-          "diagrams_other"
+          "diagrams_other",
+          "characterization"
         ]
       },
       "minItems": 1,

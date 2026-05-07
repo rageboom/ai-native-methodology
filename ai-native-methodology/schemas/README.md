@@ -1,6 +1,6 @@
-# JSON Schemas (★ v2.0.0-rc1 chain harness validated)
+# JSON Schemas (★ v2.1.0 phase 4.7 characterization 본체 격상)
 
-> **29 schema** = chain v2 (6) + state 영속 (3) + analysis BE 5 + analysis FE 8 + cross-cutting 4 + 메타 + 유틸. JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
+> **30 schema** = chain v2 (6) + state 영속 (3) + analysis BE 5 + analysis FE 8 + cross-cutting 4 + ★ characterization 1 (v2.1.0 신설) + 메타 + 유틸. JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
 
 ---
 
@@ -33,6 +33,12 @@
 | `form-validation-spec.schema.json` | Phase 5 form validation (Zod / Yup / RHF / etc 9종) | FE |
 | `type-spec.schema.json` | Phase 5 TypeScript type-spec (ts-morph) | FE |
 | `error-mapping-spec.schema.json` | Phase 5 error mapping (v1.5.0 신설) | BE |
+
+## Phase 4.7 — characterization (★ v2.1.0 신설)
+
+| Schema | 대응 산출물 | 트랙 |
+|---|---|---|
+| `characterization-spec.schema.json` | Deliverable #23 / phase 4.7 / 의도 vs 버그 4분류 + Given/When/Then snapshot acceptance oracle + ratchet coverage | BE/FE 공통 (≥ 2 PoC corroboration: PoC #06 Legacy + PoC #03 Modern) |
 
 ## Cross-cutting — aspect 4
 
