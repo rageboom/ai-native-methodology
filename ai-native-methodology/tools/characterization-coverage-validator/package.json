@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/characterization-coverage-validator",
+  "version": "0.1.0",
+  "description": "v2.1.0 phase 4.7 (characterization) coverage + intent-vs-bug 4분류 + ratchet schema 정합 validator. workspace 13번째.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "characterization-coverage-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

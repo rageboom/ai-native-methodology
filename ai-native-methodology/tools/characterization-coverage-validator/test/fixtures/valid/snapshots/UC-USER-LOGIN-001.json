@@ -1,0 +1,17 @@
+{
+  "snapshot_id": "SNAP-UC-USER-LOGIN-001",
+  "use_case": "UC-USER-LOGIN-001",
+  "endpoint": "POST /api/users/login",
+  "scenarios": [
+    {
+      "id": "SCN-LOGIN-001",
+      "name": "happy",
+      "given": {},
+      "when": "POST /api/users/login",
+      "then": { "status": 200 },
+      "intent_classification": [
+        { "rule": "BR-USER-PASSWORD-NOT-BLANK-001", "type": "intent" }
+      ]
+    }
+  ]
+}

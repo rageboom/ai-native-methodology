@@ -1,0 +1,37 @@
+{
+  "snapshot_id": "SNAP-UC-USER-SIGNUP-001",
+  "use_case": "UC-USER-SIGNUP-001",
+  "feature": "User Signup",
+  "endpoint": "POST /api/users",
+  "controller_method": "UserController.create",
+  "service_method": "UserService.create",
+  "layer": "integration",
+  "data_source_status": "real_db",
+  "scenarios": [
+    {
+      "id": "SCN-SIGNUP-001",
+      "name": "happy path",
+      "tags": ["@happy", "@intent"],
+      "given": { "request_body": { "email": "alice@example.com", "username": "alice", "password": "Pw!" } },
+      "when": "POST /api/users",
+      "then": { "expected_response": { "status": 201 } },
+      "intent_classification": [
+        { "rule": "BR-USER-EMAIL-FORMAT-001", "type": "intent" },
+        { "rule": "BR-USER-USERNAME-NOT-BLANK-001", "type": "intent" }
+      ],
+      "behavior_to_preserve": ["validation 의무"]
+    },
+    {
+      "id": "SCN-SIGNUP-002",
+      "name": "duplicate username — App pre-check",
+      "tags": ["@bug"],
+      "given": { "request_body": { "username": "alice", "email": "alice2@example.com" } },
+      "when": "POST /api/users",
+      "then": { "expected_response": { "status": 400 } },
+      "intent_classification": [
+        { "rule": "AP-DB-001", "type": "bug" }
+      ],
+      "behavior_likely_bug": ["DB UQ 부재 race window"]
+    }
+  ]
+}

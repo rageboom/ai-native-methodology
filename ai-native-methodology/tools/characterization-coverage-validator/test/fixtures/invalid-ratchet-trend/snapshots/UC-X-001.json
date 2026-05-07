@@ -1,0 +1,14 @@
+{
+  "snapshot_id": "SNAP-UC-X-001",
+  "use_case": "UC-X-001",
+  "scenarios": [
+    {
+      "id": "SCN-X-001",
+      "name": "minimal valid scenario for ratchet test",
+      "given": {},
+      "when": "...",
+      "then": {},
+      "intent_classification": [{ "rule": "BR-X-001", "type": "intent" }]
+    }
+  ]
+}

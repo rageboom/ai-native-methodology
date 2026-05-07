@@ -1,0 +1,5 @@
+{
+  "matrix": [{ "uc": "UC-X-001", "snapshot": "✅" }],
+  "coverage_target": 0.80,
+  "coverage_strategy": "absolute"
+}

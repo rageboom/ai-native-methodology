@@ -1,0 +1,10 @@
+{
+  "snapshot_id": "SNAP-UC-X-001",
+  "use_case": "UC-X-001",
+  "scenarios": [
+    {
+      "id": "SCN-X-001",
+      "name": "missing then field"
+    }
+  ]
+}
