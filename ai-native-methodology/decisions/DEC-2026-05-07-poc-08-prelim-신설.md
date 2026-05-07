@@ -15,9 +15,15 @@ v2.2.0-rc1 prerelease (phase 4.8 sql-inventory 본체 격상) 의 ★ paradigm-c
 
 ★ ★ ★ ★ **사용자 정정 2026-05-07**: "MyBatis 는 내가 잘못 넣은 것 같다" → ★ 사내 = iBATIS 2 단일 / MyBatis ❌ 가 fact (EFI-WEB stack 정합). 따라서 **PoC #08 의 의미 재정합**:
 - **(이전)** 사내 마이그레이션 신 stack 정합 + weak~medium paradigm-cross
-- **(현재)** 사내 정합 ❌ + 본 방법론 일반화 자격 입증 + MyBatis 3 spectrum sub-rule 자격 + weak corroboration
+- **(현재)** 사내 정합 ❌ + 본 방법론 일반화 자격 입증 + MyBatis 3 spectrum sub-rule 자격 + ★ ★ **MEDIUM corroboration** (★ 정탐 흡수 weak → medium 강화)
 
-★ ★ **PoC source 결정** (사용자 결단 2026-05-07): **(b) `mybatis/jpetstore-6`** 공식 reference webapp (XML 위주 / Spring MVC + MyBatis XML / pet store 비즈니스 도메인 / ~수천 LOC / 14d cap 안전 / OSS 일반화 자격 ★ 강).
+★ ★ **PoC source 결정** (사용자 결단 2026-05-07): **(b) `mybatis/jpetstore-6`** 공식 reference webapp.
+
+★ ★ ★ **정탐 흡수 (3 sub-agent 병렬 / 본 session 2026-05-07 / `research-poc-08-jpetstore6.md`)**:
+- stack: ★ Spring 6.2.18 + Stripes 1.6.0 (NOT Spring MVC) + MyBatis 3.5.19 + Java 17 + JSP 20 + ★ ★ Test 17 classes / 7 mapper / 25 SQL / pet store 4 BC (catalog/account/cart/order)
+- paradigm-cross 자격 = ★ ★ MEDIUM 강화: standard-MyBatis floor 입증 / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직
+- 4축 metric expectation: §3-A 62~72% / §3-B ≥ 90% / phase 4.7 oracle 88~95% / SQL Inventory 75~83%
+- 적대성 5축 ★ ↓↓ vs PoC #06+#07 baseline (Test 17 = hostility 축 flip extreme→friendly)
 
 PoC #08 **prelim** 등재 — 정식 PoC #08 등재는 별도 session 첫 plan + research + Day 0~7.5 측정 종료 + 4축 metric (3/4 이상 pass) 결과 기반 별도 결단 (종결 조건 §8).
 
@@ -64,17 +70,30 @@ PoC #08 **prelim** 등재 — 정식 PoC #08 등재는 별도 session 첫 plan +
 
 본 PoC 의미 = (1) paradigm-cross corroboration #1 사실 확보 + (2) MyBatis 3 spectrum 측정 사실 + (3) 사내 마이그레이션 신 stack 정합 입증.
 
-## 6. ★ paradigm 거리 (vs PoC #06+#07 iBATIS 2 XML)
+## 6. ★ paradigm 거리 (vs PoC #06+#07 iBATIS 2 XML / ★ 정탐 흡수)
 
-| dimension | iBATIS 2 (PoC #06+#07) | MyBatis 3 (PoC #08) | paradigm 거리 |
+| dimension | iBATIS 2 (PoC #06+#07) | jpetstore-6 (★ 정탐) | paradigm 거리 |
 |---|---|---|---|
-| Mapper 양식 | XML SqlMap (`<dynamic>` / `<iterate>` / `isXxx`) | XML Mapper (`<if>/<choose>/<foreach>`) + annotation (`@Select` 등) | ★ 작음 (XML) / ★★ 중간 (annotation) |
-| dynamic SQL | iBATIS 2 전용 태그군 | MyBatis 3 표준화 (OGNL) | ★★ 표준화 차이 |
-| `statementType` 표준 컬럼 | ❌ (인식 ❌) | ✅ 표준 | ★★ |
-| Spring stack | Spring 4.1 (Boot ❌) | Spring Boot 3.x 가능 | ★★★ |
-| 테스트 | 0개 | unit + integration 기대 | ★★★ |
+| Mapper 양식 | XML SqlMap (`<dynamic>` / `<iterate>` / `isXxx`) | XML Mapper (`<if>/<choose>/<foreach>` + `<bind>` OGNL) | ★★ medium (XML continuity 5/6 reuse / dynamic SQL vocabulary 완전 교체) |
+| Dynamic SQL surface | iBATIS 2 evolved tags (15+) | ★ ★ 매우 작음 (4 `<bind>` only / 0 `<if>/<choose>/<foreach>/<trim>`) | ★ corroboration **non-isomorphic in the hard direction** — evolved-tag ceiling 입증 ❌ |
+| `statementType` 표준 컬럼 | ❌ | ✅ 표준 (★ 단 jpetstore-6 = 0 mapper 명시 사용 / default PREPARED) | ★★ default-injection 의무 |
+| API + config | SqlMapClient / sqlMapConfig.xml | SqlSession / mybatis-config.xml | ★★ rename |
+| Spring stack | Spring 4.1.2 (Boot ❌) | ★ Spring 6.2.18 + Stripes 1.6.0 (Boot ❌ / `@HandlesEvent`) | ★★★ Stripes drag 예상 외 risk |
+| 테스트 | 0개 | ★ 17 test classes (JUnit Jupiter 6 / Mockito 5 / AssertJ / Selenide) | ★★★ hostility 축 flip extreme→friendly |
+| 도메인 | 회계 IFRS (capital / exchange) | pet store (catalog / account / cart / order 4 BC) | ★★ trivially deterministic risk (oracle 신호 약화) |
 
-→ ★ paradigm-cross corroboration **자격 강도 = weak ~ medium**. 사내 정합 ★ 강함은 보존.
+→ ★ ★ paradigm-cross corroboration **자격 강도 = MEDIUM** (★ 정탐 흡수 weak → medium 강화). standard-MyBatis floor 입증 ✅ / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직.
+
+## 6-1. ★ 정탐 흡수 Risks (★ 14d cap 정합)
+
+| risk | 추정 | impact |
+|---|---|---|
+| Java 17 compatibility | ✅ low | — |
+| Spring 6 + Stripes (Boot ❌) | ⚠️ medium (Phase 1/2 framework discovery) | +0.5d |
+| ★ ★ **Stripes framework drag** (★ 예상 외) | ⚠️ medium-high (`@HandlesEvent` + `@UrlBinding` ≠ `@Controller`) | +1~2d / sub-rule carry |
+| Test 17 classes | ✅ inverted (chain 3 신호 ★) | -1d 가속 |
+| ★ ★ **Domain ambiguity-deficit** | ⚠️ real (pet store CRUD trivially / D2 trivially empty) | DEC 명시 의무 / oracle 100% 의미 약화 |
+| SQL Inventory MyBatis 3 idiom gap | ⚠️ low-medium (`<cache>/<resultMap>/<association>/<collection>` / nested-result aliasing) | carry 등재 (C-poc-08-mybatis3-schema-gap) |
 
 ## 7. ★ Day 0 사용자 confirm 2건 ★ resolved (2026-05-07)
 

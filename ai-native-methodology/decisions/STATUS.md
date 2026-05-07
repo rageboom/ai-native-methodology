@@ -38,7 +38,7 @@
 
 | 우선순위 | PoC | stack | 14d cap | paradigm 거리 (vs iBATIS 2 XML) | 사내 정합 | trigger 자격 |
 |---|---|---|---|---|---|---|
-| #1 | **PoC #08** | **MyBatis 3 XML** (★ source = `mybatis/jpetstore-6` 공식 reference webapp) | 14d | ★ 작음 (직계 후속 / XML) | ❌ (★ ★ 사용자 정정 2026-05-07: 사내 = iBATIS 2 단일 / MyBatis ❌) | ★ ★ weak corroboration (★ 본 방법론 일반화 자격 입증 용 / sub-rule 자격) |
+| #1 | **PoC #08** | **MyBatis 3 XML** (★ ★ source = `mybatis/jpetstore-6` ★ Spring 6.2.18 + Stripes 1.6.0 + MyBatis 3.5.19 + Java 17 + Test 17 classes / 7 mapper / 25 SQL / pet store 4 BC) | 14d | ★★ medium (XML continuity 5/6 reuse / iBATIS 2 evolved tag 부재 + annotation 별도) | ❌ (★ ★ 사용자 정정 2026-05-07: 사내 = iBATIS 2 단일 / MyBatis ❌) | ★ ★ ★ MEDIUM corroboration (★ ★ 정탐 흡수 weak → medium 강화 / standard-MyBatis floor 입증 / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직) |
 | #2 | **PoC #09** | **TypeORM raw SQL** (TS / Node.js / `query()` + `createQueryBuilder()`) | 14d | ★★★ 강 (Java→TS / paradigm + platform-cross) | ❌ (사내 ❌) | ★ ★ ★ paradigm-cross 자격 ★ 강 corroboration / **★ v2.2.0 final 격상 trigger 핵심 #1** |
 | #3 | PoC #10 | JPA QueryDSL (Java / type-safe builder DSL) | 14d | ★★ 중간 (DSL builder) | ❓ | DSL builder paradigm 보강 / v2.3.0 minor trigger |
 
@@ -63,8 +63,18 @@
 - ✅ INDEX entry (line 24 v2.2.0-rc1 prerelease 직후 / paradigm-cross carry 직접 후속)
 - ✅ STATUS prelim 진입 표시 (본 영역)
 - ✅ 사용자 confirm 2건 resolved (★ source = (b) jpetstore-6 / 양식 = XML 자동 / 사용자 정정 흡수)
-- ⏳ Day 0.5~ = 별도 session 첫 plan + research + Day 1 jpetstore-6 source clone 진입
-- ★ 본 session commit ❌ (사용자 명시 시)
+- ✅ commit `a27dfb0` — PoC #08 Day 0 prelim (4 files / 263 insertions)
+- ✅ plan 1차 → 2차 (★ 정탐 흡수) — `~/.claude/plans/c-poc-08-jpetstore6.md`
+- ✅ research 자산화 (★ 3 sub-agent 병렬 정탐 통합) — `~/.claude/plans/research-poc-08-jpetstore6.md`
+- ⏳ Day 0.5~ = 별도 session 4원칙 3원칙 사용자 승인 → Day 1 jpetstore-6 git clone + analysis 4종 진입
+
+**★ 정탐 결과 흡수** (★ ★ paradigm-cross weak → MEDIUM 강화 + 신규 carry 4건):
+- §3-A 자동화율 expectation: **62~72%** (PoC #06 38.75% / #07 53.8% 대비 ↑↑)
+- SQL Inventory coverage expectation: **75~83%** (66.7% baseline ↑ / statementType 11번째 default-injection + namespace FQCN 100% + dynamic_branches `<bind>` extractable)
+- phase 4.7 named_classified_ratio expectation: 88~95% Day 1 / 100% 가능 (★ ★ pet store CRUD trivially deterministic / D2 trivially empty risk = oracle 신호 약화 의무 명시)
+- 적대성 5축: PoC #06+#07 baseline ★ ↓↓ (Spring 6 modern / MyBatis 3 standard / Test 17 / 다중책임 4 BC)
+- ★ ★ 신규 risks: (a) Stripes framework drag (예상 외 / `@HandlesEvent` + `@UrlBinding` ≠ Spring `@Controller` / +1~2d) (b) Domain ambiguity-deficit (★ phase 4.7 oracle 신호 약화 risk)
+- ★ 신규 carry 4건: C-poc-08-{stripes-adapter, mybatis3-schema-gap, domain-ambiguity-deficit, chain3-retrofit}
 
 ---
 
