@@ -25,11 +25,12 @@
 **release commit cadence (C1~C7)**:
 - C1 (`f64e0b2`) — deliverable 24 + schema 31번째 + meta-confidence enum
 - C2 (`4d87416`) — skill phase-4-8-sql-inventory
-- C3 (`?`) — tool sql-inventory-extractor + 10 unit test + workspace 14번째
+- C3 (`e4b0143`) — tool sql-inventory-extractor + 10 unit test + workspace 14번째
 - C4 (`7b39cfb`) — flow + ADR-CHAIN-007 + workflow
 - C5 (`4b26d0e`) — version bump + build + CHANGELOG
-- C6 (현재) — DEC + STATUS + INDEX
-- C7 — git tag v2.2.0-rc1 (★ prerelease)
+- C6 (`3e973ce`) — DEC + STATUS + INDEX + CLAUDE.md
+- C7 ✅ git tag v2.2.0-rc1 (★ prerelease / `3e973ce` 기준 / Tagger Rageboom 2026-05-07)
+- C8 (현재) — plan/research 4건 자산화 + STATUS C7 ✅
 
 **★ ★ ★ v2.2.0 final 격상 trigger 의무**:
 - ★ Modern ORM PoC #08 (★ MyBatis 3 annotation 또는 JPA QueryDSL 또는 TypeORM raw SQL spectrum / 14d cap)
