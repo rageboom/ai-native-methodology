@@ -3,7 +3,7 @@
   "version": "2.1.1",
   "private": true,
   "type": "module",
-  "description": "AI-Native Development Methodology — workspace root (build orchestrator + ★ v2.1 chain harness 13 tools workspace). chain validator 4종 + 기존 6 도구 + spectral-runner + ★ ★ ★ chain-driver (sub-plan-5 / harness 5 요소 enforcement) + ★ characterization-coverage-validator (v2.1.0 phase 4.7 본체 격상) = 단일 npm workspace (★ S1 / dep drift 회피 / 도구별 package.json 독립 유지).",
+  "description": "AI-Native Development Methodology — workspace root (build orchestrator + ★ v2.2 chain harness 14 tools workspace). chain validator 4종 + 기존 6 도구 + spectral-runner + ★ ★ ★ chain-driver (sub-plan-5 / harness 5 요소 enforcement) + ★ characterization-coverage-validator (v2.1.0 phase 4.7 본체 격상) + ★ ★ sql-inventory-extractor (v2.2.0-rc1 phase 4.8 본체 격상) = 단일 npm workspace (★ S1 / dep drift 회피 / 도구별 package.json 독립 유지).",
   "workspaces": [
     "tools/drift-validator",
     "tools/decision-table-validator",
@@ -17,7 +17,8 @@
     "tools/traceability-matrix-builder",
     "tools/test-impl-pass-validator",
     "tools/chain-driver",
-    "tools/characterization-coverage-validator"
+    "tools/characterization-coverage-validator",
+    "tools/sql-inventory-extractor"
   ],
   "scripts": {
     "build": "node scripts/build-plugin.js",

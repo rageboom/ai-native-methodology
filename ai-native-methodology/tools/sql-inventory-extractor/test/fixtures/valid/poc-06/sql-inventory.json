@@ -1,0 +1,244 @@
+{
+  "$comment": "★ ★ ★ PoC #06 SQL Inventory retrofit (★ corroboration #1 / DEC-2026-05-08-poc-06-sql-inventory-retrofit). 외부 조언 (Opus 4.7) 6 컬럼 + 본 방법론 정합 4 컬럼 = 10 컬럼 placeholder. 본체 schema 격상 ❌ — ≥ 2 PoC isomorphic 후 v2.2.0 carry (C-v2.2.0-sql-inventory).",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "retrofit_purpose": "SQL Inventory deliverable #24 후보 corroboration #1 사실 확보 — PoC #07 capital = corroboration #2 (★ source 도착 시).",
+  "spectrum": "Spring 4.1.2 + iBATIS 2.x / Legacy 적대성 4중 / 단일책임 모듈 (vs PoC #07 capital 다중책임 예상)",
+  "meta_confidence": {
+    "generated_at": "2026-05-08T00:00:00Z",
+    "methodology_version": "v2.1.1",
+    "confidence": 0.85,
+    "inputs_used": ["source_code", "characterization", "documentation"],
+    "applied_modifiers": [],
+    "applied_penalties": [],
+    "warnings": [
+      "★ DB 함수 (FN_Get_ExcRate) + Stored Procedure (S_ExRateMigration) 본문 부재 — DBA read carry",
+      "★ called_from_screen 컬럼 = JSP recursive trace 의존 / 자동화율 0%"
+    ]
+  },
+  "extraction_automation": {
+    "$comment": "★ 외부 조언 6 컬럼 기준 자동/수동 비율 — 본 추가 4 컬럼 (uc_link / intent_vs_bug_classification / confidence / carry_flags) 은 metadata 라 자동화 비율 산정에서 분리.",
+    "auto_extracted_columns": ["sql_id", "mapper_xml", "dynamic_branch", "dependent_tables"],
+    "manual_columns": ["called_from_screen", "business_meaning"],
+    "auto_ratio_external_6": "4/6 = 66.7% (★ ≥ 50% pass)",
+    "auto_ratio_total_10": "4/10 = 40% (참고 / 본 추가 4 컬럼은 metadata)"
+  },
+  "summary": {
+    "total_sql_operations": 6,
+    "by_type": { "select": 4, "update": 1, "procedure": 1 },
+    "dependent_tables_unique": ["TB_CURRENCY", "TB_EXCHANGE", "TB_DAY_EXCHANGE"],
+    "external_calls": ["FN_Get_ExcRate (DB function)", "S_ExRateMigration (DB procedure)"],
+    "dynamic_branch_count": 1,
+    "self_recognized_count": 1,
+    "intent_count": 4,
+    "bug_count": 0,
+    "ambiguous_count": 1
+  },
+  "patterns_extension_v2": {
+    "$comment": "★ ★ ★ 외부 조언 v2 (Opus 4.7 / 4-Layer + 4 iBatis 패턴) 흡수 — 사용자 D12 결단 (b) nested patterns object. corroboration #1 (PoC #06 retrofit) ↔ corroboration #2 (PoC #07 capital) isomorphic 의무.",
+    "schema_version": "v2 (Day 1.6 / 2026-05-08)",
+    "user_decision": "D12 = (b) nested patterns object",
+    "aggregate_metrics": {
+      "pattern_1_dynamic_branch": {
+        "description": "iBATIS 2 dynamic tags",
+        "count": 1,
+        "auto_grep": "✅ 100%",
+        "decision_table_candidate": "★ phase 4.5 formal-spec / decision-table 영역 정합",
+        "core_examples": [
+          { "sql_id": "selectExchangeList", "tags": ["<isNotEmpty property=\"currCd\">"], "branch_count": 1, "line": 28, "br_link": "BR-EXCHANGE-002 currCd 분기" }
+        ]
+      },
+      "pattern_2_calculation_formula": {
+        "description": "SQL 함수 (MSSQL → CASE WHEN/FORMAT)",
+        "count": 2,
+        "auto_grep": "✅ 100%",
+        "domain_formula_candidate": "★ 도메인 공식 reference",
+        "core_examples": [
+          { "function": "CASE WHEN (12 분기 / 월별)", "context": "CASE WHEN '01'=#month# THEN MON1 ... WHEN '12'=#month# THEN MON12 END", "line": 79, "sql_id": "selectCheckExcRate", "ap_link": "AP-EXCHANGE-007 (★ 자조 폐해)" },
+          { "function": "FORMAT (VND vs 그 외)", "context": "FORMAT(EXCHANGE_RATE, CASE WHEN CURR_CD='VND' THEN '##0.0000' ELSE '##0.00' END)", "line": 122, "sql_id": "selectDayExchangeList", "br_link": "BR-EXCHANGE-003 VND 4자리 정밀도" }
+        ],
+        "mssql_specific": "DECODE 부재 → CASE WHEN/FORMAT 대체"
+      },
+      "pattern_3_result_mapping": {
+        "description": "resultClass + parameterClass + parameterMap",
+        "result_class_count": 5,
+        "parameter_class_count": 5,
+        "parameter_map_count": 1,
+        "auto_grep": "✅ 100%",
+        "unique_result_classes": ["egovMap", "int", "double"],
+        "core_examples": [
+          { "type": "resultClass", "value": "egovMap", "count": 3, "lines": [8, 112, 118] },
+          { "type": "resultClass", "value": "int", "count": 1, "line": 76, "sql_id": "selectCheckExcRate" },
+          { "type": "resultClass", "value": "double", "count": 1, "line": 102, "sql_id": "selectExchangeRate" },
+          { "type": "parameterMap", "value": "insertExchangeRateMigrationMap", "line": 107, "note": "★ Stored Procedure IN/OUT" }
+        ]
+      },
+      "pattern_4_shared_sql_fragments": {
+        "description": "iBATIS 2 <sql id=\"\"> + <include refid=\"\"> 공유 SQL 조각",
+        "count": 0,
+        "auto_grep": "✅ 100% — 0 결과 자체가 finding",
+        "cross_cutting_candidate": "★ ★ ★ 0건 = ★ ★ AP-EXCHANGE-011 신규 등재 / corroboration #2 PoC #07 = 0 동일 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule isomorphic 자격",
+        "ap_link": "AP-EXCHANGE-011 (★ Day 1.6 antipatterns.json 신규 등재 / D13 = (α) 결단)"
+      }
+    },
+    "core_record_extension": {
+      "$comment": "★ 6 SQL record 모두 patterns object 예시 — 본 PoC = 단일책임 / scale 작음 / 모두 cover 가능.",
+      "examples": [
+        {
+          "sql_id": "ExchangeDAO.selectExchangeList",
+          "patterns": {
+            "dynamic_branch": [{ "tag": "<isNotEmpty property=\"currCd\">", "branch_count": 1, "line": 28 }],
+            "calculation_formula": [],
+            "result_mapping": { "type": "resultClass", "value": "egovMap", "line": 8 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.updateExchange",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [],
+            "result_mapping": { "type": "parameterClass", "value": "HashMap", "line": 36, "note": "★ MERGE / 12 컬럼 INSERT or UPDATE" },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectCheckExcRate",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "CASE WHEN (12 분기)", "line": 79, "ap_link": "AP-EXCHANGE-007 자조 / SATD" }],
+            "result_mapping": { "type": "resultClass", "value": "int", "line": 76 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectExchangeRate",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "FN_Get_ExcRate (DB function wrapper)", "line": 103, "carry_flags": ["DBA-read", "external_call_out_of_scope"] }],
+            "result_mapping": { "type": "resultClass", "value": "double", "line": 102 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.insertExchangeRateMigration",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [],
+            "result_mapping": { "type": "parameterMap", "value": "insertExchangeRateMigrationMap", "line": 107, "note": "★ year IN / result OUT" },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectDayExchangeList",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "FORMAT (VND 4자리 vs 그 외 2자리)", "line": 122, "br_link": "BR-EXCHANGE-003" }, { "function": "CONVERT (datetime)", "line": 121 }],
+            "result_mapping": { "type": "resultClass", "value": "egovMap", "line": 118 },
+            "shared_sql_fragments": []
+          }
+        }
+      ]
+    }
+  },
+  "inventory": [
+    {
+      "sql_id": "ExchangeDAO.selectExchangeList",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 8,
+      "called_from_screen": "exchange/exchangeView (JSP) → /ifrs/exchange/exchangeViewAjax (Controller)",
+      "business_meaning": "★ E (기말환율) + A (평균환율) 두 GUBUN 을 UNION ALL 한 통화별 12개월 환율표 조회 — IFRS B/S + P/L 평가 데이터",
+      "dynamic_branch": [
+        { "tag": "<isNotEmpty property=\"currCd\">", "line": 28, "branch_count": 1 }
+      ],
+      "dependent_tables": ["TB_CURRENCY", "TB_EXCHANGE"],
+      "uc_link": "UC-EXCHANGE-002 (selectExchangeList)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-002 IFRS 정합) + bug 동반 (AP-EXCHANGE-006 1NF 위반 / D2 결단)",
+      "confidence": 0.90,
+      "carry_flags": []
+    },
+    {
+      "sql_id": "ExchangeDAO.updateExchange",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 36,
+      "called_from_screen": "exchange/exchangeView (JSP / 환율 입력) → /ifrs/exchange/updateExchange (Controller)",
+      "business_meaning": "12개월 환율 일괄 등록/갱신 — MERGE (matched UPDATE / not matched INSERT) 패턴 / 통화×년도×GUBUN 단위",
+      "dynamic_branch": [],
+      "dependent_tables": ["TB_EXCHANGE"],
+      "uc_link": "UC-EXCHANGE-006 (updateExchange)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-005 12개월 일괄 입력 UX) + bug 동반 (AP-EXCHANGE-006 정규화 위반 / D2 결단)",
+      "confidence": 0.85,
+      "carry_flags": []
+    },
+    {
+      "sql_id": "ExchangeDAO.selectCheckExcRate",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 76,
+      "called_from_screen": "exchange/exchangeView (JSP / 등록 확인) → /ifrs/exchange/checkExcRateReg (Controller)",
+      "business_meaning": "특정 통화×년도×월의 환율 (E + A 두 GUBUN) 등록 여부 확인 — 12개 월별 CASE WHEN 으로 컬럼 선택",
+      "dynamic_branch": [
+        { "tag": "SQL CASE WHEN (12 분기)", "line": 79, "branch_count": 12, "note": "iBATIS dynamic ❌ / SQL 자체 분기 / AP-EXCHANGE-007 동반" }
+      ],
+      "dependent_tables": ["TB_EXCHANGE"],
+      "uc_link": "UC-EXCHANGE-007 (checkExcRateReg)",
+      "intent_vs_bug_classification": "self_recognized (★ AP-EXCHANGE-007 자조 코멘트 line 75 \"환율관리 페이지만 생각하고 설계한 폐해라 할 수 있다 ㅋ\" / SATD per Maldonado & Shihab 2015 / bug 자동 처분)",
+      "confidence": 0.95,
+      "carry_flags": []
+    },
+    {
+      "sql_id": "ExchangeDAO.selectExchangeRate",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 102,
+      "called_from_screen": "(★ N/A — 다른 모듈 [capital / connect 등] 이 호출 / exchange 화면 직접 ❌)",
+      "business_meaning": "★ ★ 외화→원화 환산 환율 조회 — DB 함수 FN_Get_ExcRate(year, month, currCd, excGubun) wrapper. capital / connect 모듈이 IFRS 외화환산에 사용",
+      "dynamic_branch": [],
+      "dependent_tables": [],
+      "uc_link": "(★ supplementary / capital 등 cross-module 의존)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-007 외화→원화 환산 산식 / 회계 기본)",
+      "confidence": 0.80,
+      "carry_flags": ["external_call_out_of_scope", "DBA-read"]
+    },
+    {
+      "sql_id": "ExchangeDAO.insertExchangeRateMigration",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 112,
+      "called_from_screen": "exchange/exchangeView (JSP / 마이그레이션 버튼) → /ifrs/exchange/exchangeMigration (Controller)",
+      "business_meaning": "★ ★ ambiguous — 외부 시스템 (한국은행 / 외환은행 추정) 환율 데이터 일괄 가져오기 / DB Stored Procedure S_ExRateMigration 본문 read carry (DBA 의존)",
+      "dynamic_branch": [],
+      "dependent_tables": [],
+      "uc_link": "UC-EXCHANGE-003 (exchangeMigration)",
+      "intent_vs_bug_classification": "ambiguous (★ AP-EXCHANGE-008 보존 / DBA 결단 carry per DEC-2026-05-07-poc-06-domain-결단 §3.2)",
+      "confidence": 0.65,
+      "carry_flags": ["DBA-read", "proc-body", "external_call_out_of_scope"]
+    },
+    {
+      "sql_id": "ExchangeDAO.selectDayExchangeList",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "mapper_xml_line": 118,
+      "called_from_screen": "exchange/exchangeView (JSP / 일일 환율 조회) → /ifrs/exchange/getDayExchangeList (Controller / Excel 다운로드 재사용)",
+      "business_meaning": "통화별 월별 일일 환율 조회 — VND 4자리 / 그 외 2자리 소수 정밀도 (BR-EXCHANGE-003 정합)",
+      "dynamic_branch": [
+        { "tag": "SQL CASE WHEN (VND vs 그 외)", "line": 122, "branch_count": 2, "note": "iBATIS dynamic ❌ / SQL FORMAT 함수 분기" }
+      ],
+      "dependent_tables": ["TB_DAY_EXCHANGE"],
+      "uc_link": "UC-EXCHANGE-004 (getDayExchangeList) / UC-EXCHANGE-005 (downloadDayExchangeExcel 재사용)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-003 VND 4자리 정밀도)",
+      "confidence": 0.90,
+      "carry_flags": []
+    }
+  ],
+  "phase_4_7_corroboration_role": {
+    "purpose": "★ ★ ★ 신규 deliverable #24 (SQL Inventory) v2.2.0 본체 격상 자격 = ≥ 2 PoC isomorphic 충족",
+    "poc_06_role": "corroboration #1 — exchange 단일책임 / 6 SQL 작업 / dynamic_branch 1 + CASE WHEN 14 / self_recognized 1 / ambiguous 1",
+    "poc_07_role": "★ corroboration #2 (★ capital source 도착 시 / 다중책임 예상 / dynamic_branch ↑ 예상)",
+    "v2_2_0_carry": "본체 격상 = PoC #07 종결 후 ≥ 2 PoC isomorphic 자격 입증 시 (★ §8.1 strict 의무)"
+  },
+  "external_advice_absorption": {
+    "$comment": "Opus 4.7 외부 조언 6 항목 본 PoC 한정 흡수 결과.",
+    "advice_1_sql_inventory_6_columns": "✅ 본 산출 자체 + 본 추가 4 컬럼 = 10",
+    "advice_2_ibatis_xml_first_class": "✅ mapper_xml + business_meaning 컬럼 자연 흡수",
+    "advice_3_dao_db_integration_test": "scope ❌ — chain 3 영역 / C-PoC07-1 carry",
+    "advice_4_mockmvc_replay": "scope ❌ — chain 3 영역 / C-PoC07-2 carry",
+    "advice_5_dbunit_fixture": "scope ❌ — chain 3/4 영역 / C-PoC07-3 carry",
+    "advice_6_tool_version_guide": "✅ inventory.json stack_signals 자동 추출 (PoC #06 기존)"
+  }
+}

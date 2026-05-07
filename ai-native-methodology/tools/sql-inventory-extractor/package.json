@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/sql-inventory-extractor",
+  "version": "0.1.0",
+  "description": "v2.2.0-rc1 phase 4.8 (sql-inventory) 11 컬럼 검증 + extraction_automation + carry_flags enum + statement_type enum + confidence if/then validator. workspace 14번째.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "sql-inventory-extractor": "./src/cli.js" },
+  "scripts": { "test": "node --test test/extractor.test.js" },
+  "license": "UNLICENSED"
+}
