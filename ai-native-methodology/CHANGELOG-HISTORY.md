@@ -5,6 +5,440 @@
 
 Semantic Versioning 준수 — v1.0~v1.3.1 진화 history.
 
+## [v1.4.0-dev] — 2026-05-02 (MINOR — FE 트랙 / Stage 5 본격 PoC #04 종결 / ★ Stage 7 진입 자격)
+
+### Stage 5 본격 PoC #04 (2026-05-02 / 본 세션) — 4 Sprint × 5 sprint 게이트
+
+**분석 대상**: yurisldk/realworld-react-fsd HEAD `963b303` (★ Stage 4 와 동일 코드 / 산출물 재사용 ❌ / Senior strict)
+
+**★ ★ ★ ★ ★ §8.1 strict 정합 검증대 ★ 첫 통과**:
+- AP-FE-SECURITY-001 (★ ★ ★ ★ 4 PoC isomorphic / Java + Hexagonal + NestJS + React) 본체 격상
+- AP-FE-OPTIMISTIC-DRY (★ 3 컴포넌트 isomorphic) 본체 격상
+- ★ ADR-FE-007 신설 (★ 본체 antipattern 카탈로그 첫 등재)
+
+**★ 본체 격상 3건**:
+- drift-validator FE 모드 신설 (★ Sprint 5-3 / F-FE-004 closed)
+- schema-validator (Ajv 8) 신설 (★ Sprint 5-3 / 본체 신규 도구)
+- ADR-FE-007 (★ Sprint 5-4 / 본체 antipattern 카탈로그)
+
+**★ 진짜 도구 6종 + Semgrep carry** (★ no-simulation 단계 5 도달):
+- ts-morph + Playwright + @axe-core/playwright + drift-validator FE + schema-validator + formal-spec-link FE
+- Semgrep ⏳ Docker 부재 carry
+
+**★ Sprint 산출**:
+- Sprint 5-1: fork 결단 (★ G1 D 자동) + Phase 0
+- Sprint 5-2: Phase 5-1 api (19 op + 25 schemas) + 5-2-a (8 page / 33 SCN / 13 CMP) + 5-2-b (9 SM) + form-validation 90/77 BR + ★ URL params 2 page isomorphic 정식화
+- Sprint 5-3: ★ 본체 도구 2건 + Playwright 32 snapshot + axe 16 scan + Phase 6 quality 6 AP + ★ ★ ★ ★ G4 strict 임계 도달 (JWT 4 PoC / Optimistic 3 컴포넌트)
+- Sprint 5-4: V1 + V2 + ★ ★ ADR-FE-007 신설 + rules 80 BR + confidence 0.92
+- Sprint 5-5: Stage 5 종결 + ★ Stage 7 release 진입 자격 7/7 평가
+
+**★ Finding 6건**: F-FE-001~006 (모두 candidate or 본체 격상).
+
+**★ ★ Stage 7 v1.4.0 MINOR release 진입 자격 7/7 충족** + 4 명시 carry-over:
+- Semgrep Docker (사용자 위임)
+- F-FE-006 산출물 schema 정합 (270+ violation / 부분 resolve)
+- deliverable 11 i18n-spec (★ G1 D 결단 / adoption 트랙 합산)
+- v1.5 carry — drift-validator FE 본격 비교 + URL params validation schema 확장
+
+---
+
+## [v1.4.0-dev] — 2026-05-02 (MINOR — FE 트랙 / Stage 4 mini-PoC 종결)
+
+### Stage 4 (2026-05-02 / 본 세션) — RealWorld React fork 1주 fail-fast mini-PoC
+
+**분석 대상**: `yurisldk/realworld-react-fsd` HEAD `963b303` (★ 527 stars / FSD 약식 3 layer / Zod / TanStack Query / react-router v7 / orval+OpenAPI 자동 생성)
+
+**산출 (Day 1~6 / 6 commit)**:
+- `examples/poc-04-mini-realworld-react/` 워크스페이스 (★ INPUT 의도적 .gitignore — clone --depth 1)
+- analysis/0-init/ — tree.md / inventory.json / stack-detection.md (Tier 1 Modern SPA / Scenario A 분리)
+- analysis/5-2-a-ui-base/ — ui-spec.json (3 page / 14 SCN / 10 CMP) + scenarios.md + component-tree.mermaid
+- analysis/5-2-b-state/ — state-map.json (5 SM SCXML+XState 호환) + state-map.mermaid
+- analysis/5-2-c-visual/ — visual-manifest.json + 2 snapshot (Playwright Chromium 진짜 실행)
+- analysis/6-quality/ — a11y-spec / i18n-spec / static-security-spec / form-validation-spec (★ 85 validation / 72 BR 자동 등록) / type-spec (★ ts-morph 진짜 실행)
+- ir-4layer-matrix.md (★ ★ ★ overall_framework_neutrality_score 0.99 / target 0.90)
+- confidence-meta.yaml (★ 0.85 / ADR-009 단계 4)
+- 4 finding (F-FE-001~004 / 모두 candidate / mini scope 정합)
+- DEC-Stage-4-mini-PoC-종결.md
+
+**★★★★ no-simulation 정책 단계 4 도달**:
+1. ts-morph 24 — 70 file / 46 type / framework_neutrality_score 1.0 / react_idiom_ratio 0.0011
+2. Playwright + Chromium — 2 viewport visual baseline (binary 진실)
+3. @axe-core/playwright 4.10 — WCAG 2.2 AA / 1 unique violation (html-has-lang)
+
+**★★★ Stage 5 진입 자격 충족** (research G5 5 자격 모두 충족):
+- 사상 정합 ✅ 비협상 충족 / IR 0.99 ✅ / 도구 3종 ✅ / finding 4건 ✅ / 신뢰도 0.85 ✅
+- carry 2건 (Semgrep 환경 + drift-validator FE) — Senior 재분류 시 ≤ 2 (★ i18n = 적용 대상 부재 ≠ carry)
+
+**★ §8.1 정합 strict** — Stage 4 finding 4건 모두 candidate / **본체 격상 0건** / Stage 5 + adoption 합산 후 격상.
+
+**★ 핵심 발견**:
+- ★ URL params validation 신규 패턴 (Zod-mini home.state.ts) — ★ deliverable 14 의미 확장 시점 (★ Stage 5 schema 확장 후보)
+- ★ JWT localStorage XSS = PoC #01/02 isomorphic 변형 (3 PoC isomorphic — adoption 합산 시 본체 antipattern 후보)
+- ★ React Router v7 Form action 패턴 (RHF/Formik 미사용)
+- ★ orval auto-gen Zod from OpenAPI 3.0.1 = ADR-FE-005 매개체 #4 + #13 통합 검증 ✅
+- ★ drift-validator FE 모드 부재 = 본체 도구 격상 후보 (F-FE-004)
+
+---
+
+## [v1.4.0-dev] — 2026-05-01 (MINOR — FE 트랙 진입 / Stage 0 종결)
+
+### 트리거
+
+v1.3.1 PATCH 종결 후 사용자 결정 — **freeze 해제 + FE 트랙 정식 시작 + v1.4.0-dev 라인 진입**. 본 release 라인 = ① BE 한정 (v1.x) → BE+FE 양 트랙 (v1.4+) 격상 ② 사용자 진단 "FE 분석 방법이 없잖아" 에 대한 research-first 응답.
+
+### Stage 0 산출 (본 세션)
+
+| # | 산출 | 위치 |
+|---|---|---|
+| 1 | plan-v1.4-fe-track.md | `ai-native-methodology/.claude/plans/` (4원칙 1단계 정식 산출) |
+| 2 | DEC-2026-05-01-v1.4-FE-트랙-진입.md | `ai-native-methodology/decisions/` |
+| 3 | STATUS.md 갱신 | 방법론 본체 버전 + 시퀀스 진행률 |
+| 4 | INDEX.md 갱신 | 승인 결정 표에 본 DEC 등재 |
+| 5 | CHANGELOG.md (본 entry) | v1.4.0-dev 라인 신설 |
+| 6 | memory 신설 + 갱신 | project_v140_fe_track / project_v130_release_status / project_adoption_workspace + MEMORY.md |
+| 7 | git commit | Stage 0 종결 단일 commit |
+
+### 변경 사항
+
+**없음** (메타 작업만). 방법론 본체 / schema / 도구 / PoC 변경 0. 본 release line 의 본격 변경은 Stage 3 (본체 격상) 부터 시작.
+
+### 큰 뭉텅이 (Stage) 분할 — 사용자 요구 6번 정식 반영
+
+| Stage | 목적 |
+|---|---|
+| Stage 0 ✅ | freeze 해제 + 트랙 진입 |
+| Stage 1 | research × 3 (공식문서 / 테크기업 / Senior FE) — 9Q 답 도출 |
+| Stage 2 | 사용자 승인 (3 sub-gate — 핵심 구조 / 보강 범위 / 검증 전략) |
+| Stage 3 | 본체 격상 — deliverable 재설계 + 산출물↔테스트 매개체 채택 |
+| Stage 4 | mini-PoC 검증 (1주 fail-fast) |
+| Stage 5 | 본격 PoC #04 (RealWorld FE) |
+| Stage 6 | BE/FE 분리 운영 정책 정식화 (횡단) |
+| Stage 7 | v1.4.0 MINOR release 결단 |
+
+각 Stage 종료 시 commit + DEC + STATUS 갱신 (사용자 요구 7번 — 발전 과정 가시화 의무).
+
+### 외부 plan 짝
+
+`~/.claude/plans/be-foamy-jellyfish.md` (사용자 승인본 / 3 에이전트 점검 v2). 본 레포 plan (`.claude/plans/plan-v1.4-fe-track.md`) 은 작업용 짝.
+
+### 트랙 차이 (BE v1.x → FE v1.4)
+
+| 차원 | BE 트랙 (v1.0~v1.3) | FE 트랙 (v1.4) |
+|---|---|---|
+| 시작 가정 | modern stack (Spring/SpringBoot/NestJS) 명확 | spectrum 결정부터 (legacy jQuery ~ modern React) |
+| 진입 순서 | 명세 → 도구 → PoC | research → 명세 재설계 → mini-PoC → 본격 PoC |
+| 핵심 빈틈 | 신뢰도 정직 표기 | 산출물↔테스트 자동 도출 / visible 차원 / 분산 상태 / 이벤트 / 렌더링 |
+| 분리 정책 | 단일 BE 관점 | BE/FE 분리 운영 (Stage 6) — JS 풀스택 / JSP 혼재 예외 |
+
+### Stage 1 산출 (research × 3 — 2026-05-01 본 세션)
+
+| # | 산출 | 위치 | 분량 |
+|---|---|---|---|
+| 1 | research-official-v1.4-fe.md | `.claude/plans/` | ~2,400 단어 / 1차 사료 ≥ 25개 |
+| 2 | research-industry-v1.4-fe.md | `.claude/plans/` | ~2,800 단어 / 1차 사료 다중 |
+| 3 | research-senior-v1.4-fe.md | `.claude/plans/` | ~3,500 단어 / 9Q 모두 강한 답 |
+| 4 | research-v1.4-fe-summary.md (★ 진단 보고서) | `.claude/plans/` | 통합 + Stage 2 Gate 입력 12 결정 |
+| 5 | DEC-2026-05-01-v1.4-Stage-1-research-종결.md | `decisions/` | Stage 1 종결 결단 |
+
+### Stage 1 핵심 합의 (3 에이전트)
+
+- ★ 격상 시나리오 = **Scenario B-Lite (단계 분할)** — Senior 권고 + 산업/공식 정합
+- ★ legacy cover (jQuery/Vanilla/MPA/JSP) **v1.4 포함** — 사용자 진단 직접 대응
+- ★ visual-manifest deliverable 신설 (사용자 요구 3번 visible 정면 해소)
+- ★ state-map deliverable 신설 + W3C SCXML 채택 (분산 상태 5 진실)
+- ★ 권위 매개체 12 통합 채택 (CEM/SCXML/DTCG/MSW+OAS/axe-core/.d.ts/CSF/Playwright/WCAG 2.1/WAI-ARIA 1.2/ICU MF/Pact)
+- ★ a11y + i18n v1.4 포함 (산출물↔테스트 자동 도출)
+
+### 본체 빈틈 진단 (Stage 3 격상 작업 항목)
+
+Top 5: 분산 상태 deliverable 부재 / 시각 산출 부재 / legacy fallback 부재 / 권위 매개체 격상 미반영 / 신뢰도 단계 모델 부재. 세부 21건 (`research-v1.4-fe-summary.md` §3).
+
+### Stage 2 진입 자료 (사용자 결단 12 항목)
+
+- Gate 1 (핵심 구조) 4 결정: spectrum / 시나리오 (B-Lite) / schema 분리 / 매개체 12 채택
+- Gate 2 (보강 범위) 4 결정: 비기능 v1.4 (a11y+i18n+정적보안) / legacy Tier 1~4 / BE/FE 분리 / ADR-001 §명시적 제외 갱신
+- Gate 3 (검증 전략) 4 결정: mini-PoC 진입 (Stage 3-1 후 즉시) / PoC #04 (RealWorld only) / 신뢰도 0.80 / Sprint 4-6
+
+### ★★ Stage 2 종결 (2026-05-01 본 세션)
+
+★★ **12 결정 모두 Senior 권고 (Recommended) 채택**. DEC-2026-05-01-v1.4-Stage-2-Gate-결단.md.
+
+| Gate | 결정 4건 |
+|---|---|
+| **G1** 핵심 구조 | spectrum (Modern+jQuery+JSP 예외) / **Scenario B-Lite** / schema 분리+Phase 4.5 cross-link / 매개체 **12 통합 채택** |
+| **G2** 보강 범위 | 비기능 (a11y+i18n+정적보안 v1.4 / 운영 NFR v1.5) / legacy Tier 1~4 / BE/FE 분리 default + JS풀스택+JSP ADR 예외 / ADR-001 갱신 |
+| **G3** 검증 전략 | mini-PoC Stage 3-1 후 즉시 / PoC #04 RealWorld only / 신뢰도 **0.80** / Sprint mini 1주 + 본격 4-6 |
+
+### Stage 3-1 진입 자료 (작업 항목 확정)
+
+- ★ 신설: deliverable 8 (state-map) + 9 (visual-manifest) + state-map.schema.json + visual-manifest.schema.json
+- ★ 분할: phase-5-2 → phase-5-2-a/b/c
+- ★ ADR 신설: ADR-FE-001 (FE 추출기 가정 + spectrum) / ADR-FE-002 (이중 렌더링 FE 적용 + visual 예외) / ADR-FE-005 (매개체 12 채택)
+- ★ ADR 갱신: ADR-009 (FE 신뢰도 단계 1~5)
+- ★ 보강: 7-ui-ux.md (legacy Tier 1~4 fallback) + ui-spec.schema.json (event_handlers / api_calls / suspense_boundary / framework enum 확장)
+- ★ 도구 시범: drift-validator FE 적용 (state-map.json ↔ state-map.mermaid) / formal-spec-link-validator FE cross-link
+
+### ★★★ Stage 3-1 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 16+ 항목 적용**. DEC-2026-05-01-v1.4-Stage-3-1-종결.md.
+
+#### Phase 별 산출 (5 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-001/002/005 신설 + ADR-009 갱신 + plan-v14-stage-3-1.md | `6639df7` (5 file / 1267 ins) |
+| **B** | state-map.schema + visual-manifest.schema 신설 + ui-spec.schema 확장 | `c82d545` (3 file / 788 ins) |
+| **C+D** | deliverable 8/9 신설 + 7 보강 + phase-5-2 a/b/c 분할 + 기존 stub | `d2e12b4` (7 file / 1269 ins / 202 del) |
+| **E1** | drift-validator FE corpus 1쌍 + test 14→**15 pass** | `9c0729c` (3 file / 26 ins) |
+| **E2** | formal-spec-link-validator FE 진단 (★ 도구 확장 carry — Stage 3-2 또는 Sprint 5+) | (read-only) |
+| **F** | DEC-Stage-3-1-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 사상 기둥 3 (★ ADR-FE 시리즈)
+
+- **ADR-FE-001** (FE 추출기 가정) — spectrum Tier 1~4 cover + 한 방향 추출 사상 + BE Phase 0~6 ↔ FE Phase 0~6 매핑
+- **ADR-FE-002** (이중 렌더링 FE 적용) — ADR-008 의 FE 영역 적용 + ★ visual 예외 (binary 진실 모델)
+- **ADR-FE-005** (권위 매개체 12 채택) — sub-agent cross-check 1차 사료 검증 완료
+
+#### Cross-check 권고 3건 반영 (옵션 Y)
+
+1. DTCG 정확한 인용 — "Final Community Group Report" 명시 + spec URL 고정
+2. WCAG 2.1 AA + ★ 2.2 AA ratchet path 명시 (ADR-010 baseline+ratchet 정합)
+3. ICU MF2 채택 단계 (spec stable / runtime preview) + MF1 폴백 병기
+
+#### no-simulation 정책 강화
+
+- visual-manifest.schema.json `captured_by` enum — `simulation` 시 -5%p 패널티 + `simulation_reason` 의무 (★ schema if/then 강제)
+- ADR-009 §2.2.1 FE 도구 enum 신설 — `playwright_real` / `axe_core_real` / `storybook_csf_real` / `msw_handler_check` / `percy_real` / `chromatic_real`
+- phase-5-2-c-visual.md §3.2 — Playwright + axe-core 진짜 실행 의무 절차
+
+#### 사용자 7 요구사항 진척도
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% (ADR-FE-005) |
+| 2. AI + 사람 동시 이해 | ★ 100% (ADR-FE-002 + schema 3 + deliverable 3) |
+| 3. UI visible 차원 | ★ 100% (deliverable 9 + schema B2 + workflow D3) |
+| 4. 비즈니스 로직 동일 | ★ 100% (deliverable 8 + schema B1 + workflow D2) |
+| 5. BE/FE 분리 운영 | ⏳ Stage 6 (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% (Phase A~F commit 단위 분할) |
+| 7. 모든 단계 기록 | ★ 100% (5 commit + DEC) |
+
+→ ★ 6/7 = 100% (요구 5 = Stage 6 carry).
+
+### Stage 3-2 + Stage 4 진입 자료
+
+- Stage 3-2 — a11y / i18n / 정적보안 deliverable + legacy 산출물 3종 + ADR-FE-003 + ADR-001 §명시적 제외 갱신 + migration-cautions-fe.md + rules.schema.json br_type fe_validation enum 확장 + formal-spec-link-validator FE 적용 (Stage 3-1 carry)
+- Stage 4 mini-PoC — RealWorld React fork (1주 fail-fast) + Playwright + axe-core 진짜 실행 1회 (★ no-simulation 정책 첫 FE 실현) + ui-spec / state-map / visual-manifest 1 page × 2 viewport 검증 + drift-validator FE 본격 적용 + 신뢰도 0.75+ 도달 검증
+
+추정 분량: 2~4 세션.
+
+### ★★★ Stage 3-2 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 2차 12+ 항목 적용**. DEC-2026-05-01-v1.4-Stage-3-2-종결.md.
+
+#### Phase 별 산출 (5 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-003 (legacy spectrum + Strangler Pattern) 신설 + ADR-001 §명시적 제외 갱신 (운영 NFR 좁힘) + plan-v14-stage-3-2.md | `4d8eb18` (3 file / 794 ins) |
+| **B** | a11y-spec / i18n-spec / static-security-spec / legacy-spectrum schema 신설 + rules.schema FE category 4종 확장 | `deefd62` (5 file / 771 ins) |
+| **C+D** | deliverable 10 (a11y) / 11 (i18n) / 12 (static-security) / 13 (legacy-spectrum) 신설 + migration-cautions-fe.md 신설 + phase-6-quality 보강 | `3feb8fd` (6 file / 913 ins) |
+| **E** | formal-spec-link-validator FE 모드 확장 (`--mode=be|fe|both`) + 4→**8 pass** ✅ (BE 회귀 0) | `64fd5b0` (4 file / 271 ins) |
+| **F** | DEC-Stage-3-2-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### G2 결단 정식 반영 (Stage 2 Gate)
+
+- **G2-1** (a11y/i18n/정적보안 v1.4) — deliverable 10/11/12 신설 + schema 3종
+- **G2-2** (legacy Tier 1~4) — ADR-FE-003 + deliverable 13 + legacy-spectrum schema
+- **G2-4** (ADR-001 §명시적 제외) — "비기능 측정" → ★ "운영 NFR 측정" 좁힘 + 정적 NFR v1.4 포함
+
+#### Strangler Fig Pattern 채택 (Martin Fowler 2004)
+
+- 산업 사례 (Fowler / Sam Newman) 정합 — rewrite ❌ / strangle ✅
+- 4 approach 명시 + ★ schema enum `big_bang_rewrite_not_recommended`
+
+#### Cross-check 권고 3건 schema 강제 (Stage 3-1 carry)
+
+- DTCG `spec_source` URL 고정 + `spec_status=community_group_report`
+- WCAG 2.1-AA baseline + 2.2-AA ratchet (a11y-spec.schema)
+- ICU MF2 사용 시 ★ MF1 폴백 의무 (i18n-spec.schema if/then 강제)
+
+#### no-simulation 정책 schema 강제 4 영역
+
+| schema | if/then |
+|---|---|
+| a11y-spec | captured_by ∈ real → 5종 물증 의무 |
+| i18n-spec | mf2_used=true → mf1_fallback_present 의무 |
+| static-security-spec | captured_by ∈ real → 5종 물증 의무 + runtime_check_required 표기 |
+| legacy-spectrum | primary_tier=mixed → mixed_breakdown 의무 |
+
+#### 사용자 7 요구사항 진척도 (Stage 3-2 종결)
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% (axe-core / ICU / Semgrep 추가) |
+| 2. AI + 사람 동시 이해 | ★ 100% (schema 5 + deliverable 4 신설) |
+| 3. UI visible 차원 | ★ 100% (Stage 3-1 도달 유지) |
+| 4. 비즈니스 로직 동일 | ★ 100% (rules.schema FE category 4종 확장) |
+| 5. BE/FE 분리 운영 | ⏳ Stage 6 (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% (Phase A~F commit 단위) |
+| 7. 모든 단계 기록 | ★ 100% (5 commit + DEC) |
+
+→ ★ 6/7 = 100% 도달 유지 (Stage 3-1 동일).
+
+### Stage 4 + Stage 6 진입 자료
+
+- **Stage 4 mini-PoC** — Playwright + axe-core + ICU runtime + Semgrep/ESLint security 진짜 실행 (★ no-simulation 정책 첫 FE 본격 실현)
+- **Stage 6 ADR-FE-004** — BE/FE 분리 운영 정책 정식 (요구 5 = 100% 도달) / methodology-spec/be-fe-separation.md / Tier 4 (JSP) BE/FE 통합 산출 정식
+
+### ★★★ Stage 6 종결 (2026-05-01 본 세션)
+
+★★★ **본체 격상 8 항목 + 사용자 요구 7/7 = 100% 도달 = v1.4 본체 quality 격상 완성**. DEC-2026-05-01-v1.4-Stage-6-종결.md.
+
+#### Phase 별 산출 (3 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-004 (BE/FE 분리 3 Scenario) + ★ ADR-FE-006 (framework-neutral IR — 외부 LLM 검증 정면 대응) 신설 + plan-v14-stage-6.md + STATUS 압축 정비 이력 등재 | `5650e1f` (4 file / 683 ins) |
+| **B** | be-fe-separation.md 신설 + ADR-FE-001 §6 / ADR-FE-003 §2.4 carry → resolved + deliverable 7 §6.5 보강 + phase-0 §3.4 보강 + legacy-spectrum.schema tier_4_be_fe_handling enum | `2fafd52` (6 file / 235 ins / 9 del) |
+| **F** | DEC-Stage-6-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 핵심 결단
+
+- **3 Scenario** (ADR-FE-004) — A 분리 default (사용자 사내 React+TS+TanStack 정합) / B JS 풀스택 (Next.js / Nuxt / Remix / Astro) / C JSP (Tier 4 통합)
+- **★ framework-neutral IR 사상** (ADR-FE-006) — 외부 LLM 검증 정면 대응 / IR 4계층 매트릭스 (L1 Domain / L2 Interaction / L3 Contract / L4 Presentation) 정식 매핑 / Screen+Journey 우선 / Component 분해 framework-coupling 위험
+- **Stage 3-1/3-2 carry 종결** — Tier 4 (JSP) BE/FE 통합 산출 절차 정식
+
+#### 외부 LLM 검증 빈틈 5건 처리
+
+| # | 빈틈 | 처리 |
+|---|---|---|
+| 1 | Zod / Yup / RHF rules → BR 자동 추출 절차 | ❌ Stage 7-pre carry |
+| 2 | TypeScript .d.ts 산출 절차 | ❌ Stage 7-pre carry |
+| 3 | "프레임워크 중립 IR" 사상 명시화 | ✅ ★ ADR-FE-006 신설 |
+| 4 | Component 분해 framework-coupling 위험 | ✅ ADR-FE-006 §2.3 + deliverable 7 §6.5 |
+| 5 | Screen+Journey 우선 / Component 후순위 | ✅ ADR-FE-006 §2.2 + deliverable 7 §6.5 |
+
+#### ★★★ 사용자 7 요구사항 7/7 = 100% 도달 (★ v1.4 본체 quality 격상 완성)
+
+| 요구 | 도달 |
+|---|---|
+| 1. 산출물 → 마이그+테스트 기반 | ★ 100% |
+| 2. AI + 사람 동시 이해 | ★ 100% |
+| 3. UI visible 차원 | ★ 100% |
+| 4. 비즈니스 로직 동일 | ★ 100% |
+| **5. BE/FE 분리 운영** | ★ **100% NEW** (ADR-FE-004) |
+| 6. 큰 뭉텅이 승인제 | ★ 100% |
+| 7. 모든 단계 기록 | ★ 100% |
+
+→ ★★★ **7/7 = 100% 완성 / Stage 7 v1.4.0 release 진입 자격 도달**.
+
+#### FE 영역 ADR 6 개 누적 (Stage 3-1/3-2/6)
+
+- ADR-FE-001 (FE 추출기 가정) / 002 (이중 렌더링 FE) / 003 (legacy + Strangler) / 004 (BE/FE 분리) / 005 (권위 매개체 12) / ★ 006 (framework-neutral IR)
+
+### Stage 4 + Stage 7-pre 진입 자료
+
+- **Stage 4 mini-PoC** — RealWorld React fork (1주 fail-fast) + Playwright/axe-core/ICU/Semgrep 진짜 실행 / ★ ADR-FE-006 IR 4계층 정합도 검증 의무 (React 관용구 IR 잔존 finding 등록)
+- **Stage 7-pre** — 외부 LLM 검증 빈틈 #1 (Zod/Yup/RHF → BR fe_validation 자동 추출) + #2 (TypeScript .d.ts 산출 — 별도 deliverable 14 검토)
+
+### ★★★ Stage 7-pre 종결 (2026-05-01 본 세션)
+
+★★★ **외부 LLM 검증 빈틈 5/5 = 100% 해소 / release 전 마지막 quality 격상**. DEC-2026-05-01-v1.4-Stage-7-pre-종결.md.
+
+#### Phase 별 산출 (4 commit + 본 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | ADR-FE-005 매개체 12 → ★ **13** (Zod 추가) + plan-v14-stage-7-pre.md | `3a7df3e` (2 file / 256 ins) |
+| **B** | form-validation-spec.schema + type-spec.schema 신설 + rules.schema source_format/auto_extracted 확장 | `9c5b8d1` (3 file / 448 ins) |
+| **C+D** | deliverable 14 (form-validation-spec) / 15 (type-spec) 신설 + ADR-FE-006 §5.2 carry → resolved + phase-5-2-b §3.1 form_state cross-link 보강 | `adabe10` (4 file / 356 ins) |
+| **F** | DEC-Stage-7-pre-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### 외부 LLM 검증 빈틈 5/5 = 100% 해소
+
+| # | 빈틈 | Stage | 산출 |
+|---|---|---|---|
+| 1 | Zod / Yup / RHF rules → BR 자동 추출 | ★ Stage 7-pre | deliverable 14 + form-validation-spec.schema + ADR-FE-005 §2.1.1 |
+| 2 | TypeScript .d.ts 산출 절차 | ★ Stage 7-pre | deliverable 15 + type-spec.schema + framework_neutrality_score |
+| 3 | "프레임워크 중립 IR" 사상 명시화 | Stage 6 | ADR-FE-006 신설 |
+| 4 | Component 분해 framework-coupling 위험 | Stage 6 | ADR-FE-006 §2.3 + deliverable 7 §6.5 |
+| 5 | Screen+Journey 우선 / Component 후순위 | Stage 6 | ADR-FE-006 §2.2 + deliverable 7 §6.5 |
+
+#### ADR-FE-005 매개체 12 → 13 (Zod 추가)
+
+| 매개체 | 채택 근거 |
+|---|---|
+| ★ Zod (#13) | Schema-First validation de facto / TypeScript-first / runtime + static type 양쪽 / `z.object()` / `.refine()` → rules.json fe_validation BR 자동 등록 |
+
+#### 사용자 7 요구사항 7/7 = 100% 도달 유지 + 강화
+
+- 요구 1 강화 — Zod / TS 타입 자동 추출 = 신규 시스템 즉시 활용
+- 요구 4 강화 — form_validation BR 자동 등록 (auto_extracted=true 분리 운영)
+- 요구 1/2/3/4/5/6/7 = 100% 유지
+
+#### 다음 trigger
+
+- **Stage 4 mini-PoC** — RealWorld React fork (1주 fail-fast) + ts-morph + Playwright + axe-core + ICU + Semgrep 진짜 실행 / 신뢰도 0.75+ 도달 / ★ ADR-FE-006 IR 4계층 정합도 검증
+- **Stage 5** 본격 PoC #04 — 9 deliverable (7~15) + a11y + i18n + static-security + legacy + form-validation + type-spec
+- **Stage 7** v1.4.0 MINOR release 결단 (Stage 5 검증 후)
+
+### ★★★ BE Sprint 5+ carry-over 종결 (환경 무관 부분 / 2026-05-01 본 세션)
+
+★★★ **drift-validator v0.1.0 → v0.2.0 / 3 도구 unit test 53/53 pass / 본체 phase-flow drift 0 자가 입증**. DEC-2026-05-01-Sprint-5-carryover-종결.md.
+
+#### Phase 별 산출 (4 commit + 메타)
+
+| Phase | 산출 | commit |
+|---|---|---|
+| **A** | corpus 14 → 19쌍 (+6 신규 / multi-trigger / extra-event / multi-actor / extra-message / FE form / FE missing-error) + corpus.test.js +6 test (15 → 21) | `7b9d4b2` (14 file / +437) |
+| **B** | drift-validator phase-flow 비교기 신설 — normalize-phase-flow.js + compare-phase-flow.js + cli.js 분기 + corpus 2쌍 + 4 test | `1ab6d14` (10 file / +316) |
+| **C** | tools/_shared/baseline.js 공용 이동 + drift-validator/src/baseline.js re-export shim + DTV cli.js import path 갱신 + DTV baseline.test.js 신설 (4 test) + drift-validator v0.1.0 → ★ v0.2.0 | `8545e47` (6 file / +203 / -112) |
+| **D** | static-runner SARIF→finding 어댑터 (sarif-to-finding.js) + cli.js --baseline/--ratchet/--write-baseline 통합 + baseline-mode.test.js (5 test) | `f82e6fa` (4 file / +209) |
+| **F** | DEC-Sprint-5-carryover-종결 + STATUS / INDEX / CHANGELOG / memory | (본 commit) |
+
+#### ★ 정량 결과
+
+| 도구 | 보강 전 | 보강 후 |
+|---|---|---|
+| drift-validator | v0.1.0 / 23 test | ★ **v0.2.0 / 33 test** (corpus 25 + baseline 8) |
+| decision-table-validator | 7 test | ★ **11 test** (+4 baseline) |
+| static-runner | 4 test | ★ **9 test** (+5 baseline-mode) |
+| **3 도구 합계** | 34 test | ★★ **53/53 pass** ✅ |
+
+#### ★★★ 본체 SSOT 자가 검증 (★ 핵심)
+
+```
+$ node tools/drift-validator/src/cli.js methodology-spec/workflow/phase-flow.json
+[phase-flow] 0 breaking / 0 non-breaking / 0 info ✅
+```
+
+→ 본체 phase-flow.json + phase-flow.mermaid 짝 정합도 **drift 0** 입증. v1.4 quality 격상 강한 데이터.
+
+#### ★ ADR-010 §2.5 정합 도달
+
+| 도구 | 단계 | baseline 통합 |
+|---|---|---|
+| drift-validator | ADR-009 §2.1 단계 3 | ✅ |
+| decision-table-validator | 단계 3 | ✅ |
+| static-runner | 단계 5 (Semgrep/PMD) | ✅ (★ 진짜 실행 자체는 환경 의존) |
+
+### Sprint 6 carry-over (★ 환경 의존만 잔여)
+
+- Semgrep / PMD / OSV-Scanner 진짜 실행 1회 (★ Java 환경 필요)
+- vacuum / openapi-changes 외부 도구 통합 (별도 작업)
+
+본 v1.4 FE 트랙 + Sprint 5+ carry-over 와 **독립 병행 가능**.
+
+### adoption workspace 영향
+
+`ai-native-methodology-adoption/` 의 "원본 클론 변경 X" 가정은 본 release 진입으로 깨짐. v1.3.1 시점 dist (`dist/internal-v1.3/`) 는 그대로 보존. 향후 v1.4.0 정식 release 시 신규 dist (`dist/internal-v1.4/`) 빌드 가능. 동기화 정책 갱신은 별도 작업 (본 release scope 외부).
+
+---
+
+
+---
+
 ---
 
 ## [v1.3.1] — 2026-05-01 ⭐ release 보존 (PATCH — 파일명 컨벤션 정리)
