@@ -4,6 +4,7 @@
 > ★ **prelim 단계** — chain 1 만 측정 (chain 2~4 미진입). v2.1.1 PATCH (ratchet trend) 후 첫 PoC.
 > ★ **corroboration #3** = Spring 4.1 + iBATIS 2 같은 spectrum 강화 (PoC #06 exchange 단일책임 38.75% vs PoC #07 capital 다중책임 ~50% 비교 사실 확보)
 > ★ **신규 deliverable #24 후보 (SQL Inventory) 측정** — Opus 4.7 외부 조언 (★ 외부 6 + 본 추가 4 = 10 컬럼) 본 PoC 한정 placeholder
+> ★ ★ ★ **SQL Inventory corroboration #2** (★ DEC-2026-05-08-poc-06-sql-inventory-retrofit 가 #1 / capital 도착 시 #2 자연 충족 → §8.1 strict ≥ 2 PoC isomorphic 자격)
 
 ## 의도
 
