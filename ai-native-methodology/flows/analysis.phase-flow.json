@@ -1,7 +1,7 @@
 {
-  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v2.1.0 MINOR — ★ phase 4.7 (characterization) 정식 단계 신설 (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern). 각 phase 에 skills 디렉토리 매핑 명시 (★ skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
+  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v2.2.0-rc1 MINOR — ★ phase 4.8 (sql-inventory) 정식 단계 신설 (SQL 단위 11 컬럼 인벤토리 / ADR-CHAIN-007 / ≥ 2 PoC scale-cross corroboration: PoC #06 단일책임 + PoC #07 다중책임 / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6 / v2.2.0 final trigger). v2.1.0 phase 4.7 (characterization) 동시 보존. drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
   "id": "phase-flow",
-  "version": "2.1.0",
+  "version": "2.2.0-rc1",
   "rendered_mermaid_path": "./phase-flow.mermaid",
   "phases": [
     {
@@ -73,10 +73,22 @@
       "skills": ["phase-4-7-characterization"]
     },
     {
+      "id": "4.8",
+      "name": "sql-inventory (★ v2.2.0-rc1 신설 — SQL 단위 11 컬럼 인벤토리 + extraction_automation)",
+      "spec_file": "phase-4-8-sql-inventory.md",
+      "depends_on": ["1", "4", "4.7"],
+      "inputs": ["inventory.json", "rules.json", "antipatterns.json", "characterization-spec.json"],
+      "outputs": ["sql-inventory.json", "sql-inventory.md", "raw-grep.txt"],
+      "automated_validation": ["sql-inventory-extractor", "schema-validator"],
+      "introduced": "v2.2.0-rc1",
+      "rdb_only": true,
+      "skills": ["phase-4-8-sql-inventory"]
+    },
+    {
       "id": "5-1",
       "name": "api",
       "spec_file": "phase-5-1-api.md",
-      "depends_on": ["4", "4.5", "4.7"],
+      "depends_on": ["4", "4.5", "4.7", "4.8"],
       "outputs": ["openapi.yaml", "api.md", "api-extension.json", "error-mapping-spec.json"],
       "skills": ["phase-5-openapi", "phase-5-rules", "phase-5-error-mapping"]
     },
@@ -127,6 +139,7 @@
     "v1.2.2": ["묶음 M-P2-3 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template"],
     "v1.4.4": ["manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md)", "각 phase 에 skills 매핑 명시", "cross_cutting.aspects 신설 (aspect skill 4종)", "skills-axis.md 명세 신설", "drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제"],
     "v1.5.0": ["★ ★ ★ ADR-BE-001 negative-space corroboration 정식화 (★ ADR-FE-007 positive-space variant)", "schemas/error-mapping-spec.schema.json 신설 (deliverable 16)", "skills/analysis/phase-5-error-mapping/ 신설 (★ phase 5-1 api 추가 skill)", "★ AP-API-001 자동 회귀 도구 본체 격상 (Spring + NestJS 양 framework)"],
-    "v2.1.0": ["★ ★ phase 4.7 (characterization) 정식 단계 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle", "ADR-CHAIN-006 phase 4.7 정식 도입 (Michael Feathers Characterization Testing + Specification by Example + SATD/KL-SATD)", "deliverable 23 (characterization-spec) + schemas/characterization-spec.schema.json 신설 (★ 30번째 schema)", "skills/analysis/phase-4-7-characterization/ 신설 (★ skills 19 → 20 / 단일 prompt 양 spectrum)", "tools/characterization-coverage-validator/ 신설 (★ workspace 13번째 / 10 unit test)", "meta-confidence.schema.json inputs_used enum 12 → 13 (characterization 추가)", "★ ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern"]
+    "v2.1.0": ["★ ★ phase 4.7 (characterization) 정식 단계 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle", "ADR-CHAIN-006 phase 4.7 정식 도입 (Michael Feathers Characterization Testing + Specification by Example + SATD/KL-SATD)", "deliverable 23 (characterization-spec) + schemas/characterization-spec.schema.json 신설 (★ 30번째 schema)", "skills/analysis/phase-4-7-characterization/ 신설 (★ skills 19 → 20 / 단일 prompt 양 spectrum)", "tools/characterization-coverage-validator/ 신설 (★ workspace 13번째 / 10 unit test)", "meta-confidence.schema.json inputs_used enum 12 → 13 (characterization 추가)", "★ ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern"],
+    "v2.2.0-rc1": ["★ ★ phase 4.8 (sql-inventory) 정식 단계 신설 — SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase", "ADR-CHAIN-007 phase 4.8 정식 도입 (Michael Feathers + Gartner TIME framework + AWS MAP + Opus 4.7 외부 조언)", "deliverable 24 (sql-inventory) + schemas/sql-inventory.schema.json 신설 (★ 31번째 schema)", "skills/analysis/phase-4-8-sql-inventory/ 신설 (★ skills 20 → 21 / 단일 prompt 양 spectrum)", "tools/sql-inventory-extractor/ 신설 (★ workspace 14번째 / 10 unit test)", "meta-confidence.schema.json inputs_used enum 13 → 14 (sql_inventory 추가)", "★ ★ ≥ 2 PoC scale-cross corroboration: PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum / 4/6=66.7% 동일 isomorphic)", "★ ★ ★ paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6 (★ Senior STOP signal 흡수 / v2.2.0 final trigger / 7d minimum prerelease)", "★ Agent 1 강 권고 흡수 — statement_type 11번째 컬럼 (PREPARED/CALLABLE/STATEMENT)"]
   }
 }

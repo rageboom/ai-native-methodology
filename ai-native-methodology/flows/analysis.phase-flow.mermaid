@@ -1,7 +1,7 @@
 %% AI-Native 방법론 — Phase 흐름 + 산출물 의존 그래프
-%% v2.1.0 — ★ phase 4.7 (characterization) 정식 단계 신설 (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
+%% v2.2.0-rc1 — ★ phase 4.8 (sql-inventory) 정식 단계 신설 (★ SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6)
 %% 사람 눈 (mermaid). AI 눈 짝: phase-flow.json (drift-validator 호환).
-%% ADR-008 (이중 렌더링 사상) + ADR-CHAIN-006 (phase 4.7 정식 도입) 정합.
+%% ADR-008 (이중 렌더링 사상) + ADR-CHAIN-006 (phase 4.7) + ADR-CHAIN-007 (phase 4.8 정식 도입) 정합.
 
 flowchart TB
     %% ═════════════ Phase 0 (입력) ═════════════
@@ -60,6 +60,14 @@ flowchart TB
         P47_OUT --> P47_VAL
     end
 
+    %% ═════════════ Phase 4.8 (★ v2.2.0-rc1 신설 — SQL 인벤토리 / RDB 한정) ═════════════
+    subgraph P48["Phase 4.8 — sql-inventory (★ v2.2.0-rc1 / RDB 한정)"]
+        direction LR
+        P48_OUT["sql-inventory.json (11 컬럼)<br/>sql-inventory.md<br/>raw-grep.txt"]
+        P48_VAL["★ v2.2.0-rc1 자동 검증<br/>sql-inventory-extractor"]
+        P48_OUT --> P48_VAL
+    end
+
     %% ═════════════ Phase 5 (병렬) ═════════════
     subgraph P5_1["Phase 5-1 — api"]
         P5_1_OUT["openapi.yaml + api.md<br/>api-extension.json"]
@@ -93,9 +101,13 @@ flowchart TB
     P4 --> P45
     P4 --> P47
     P45 --> P47
+    P1 --> P48
+    P4 --> P48
+    P47 --> P48
     P4 --> P5_1
     P45 --> P5_1
     P47 --> P5_1
+    P48 --> P5_1
     P4 --> P5_2
     P3 --> P5_2
     P47 --> P5_2
