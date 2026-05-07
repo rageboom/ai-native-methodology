@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-07 (★ ★ ★ ★ ★ ★ **v2.0.0 MAJOR FINAL release** ¹ — DEC-2026-05-07-v2.0.0-final / chain harness validated 정식 / git tag v2.0.0 / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 70~80% 한계 명시 잔존 / 218 unit test pass / §8.1 strict 7/7 ✅ / 3 PoC corroboration ✅ / cleanup round 1 + 2-A ~ 2-E 모두 종결 (327 → 256 files / paradigm v2.0.0 정합 / journey 자산 4 신설 / build path `ai-native-methodology-v2.0.0/`) / **carry: round 2~4 후속 (CHANGELOG split + mermaid + guides self-review)**)
+**기준일**: 2026-05-07 (★ ★ ★ ★ **v2.1.0 MINOR release** — DEC-2026-05-07-v2.1.0-release / phase 4.7 (characterization) 본체 격상 / 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle / ADR-CHAIN-006 / ≥ 2 PoC corroboration (PoC #06 Spring 4.1 Legacy 17/18=94% + PoC #03 NestJS Modern retrofit 30/30=100%) / 본체 자산 6 + workflow + ADR / unit test 218 → **228** (+10 / characterization-coverage-validator 신설 workspace 13번째) / §8.1 strict 7/7 ✅ / 3 source version sync v2.1.0 / build `ai-native-methodology-v2.1.0/` 264 files / git tag v2.1.0 / Senior cooling-off (a) 즉시 final / chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만 / 70~80% 한계 명시 잔존 / **carry: C-v2.1.0-1~7**)
+
+**v2.0.0 MAJOR FINAL release** ¹ (2026-05-07 / 같은 날 — DEC-2026-05-07-v2.0.0-final / chain harness validated 정식 / git tag v2.0.0 / clean clone 재실행 통과 / Senior F4 24h+ cooling-off 통과 / chain 1 planning-spec → chain 2 behavior-spec + acceptance-criteria + 7대 통합 → chain 3 test-spec + 실 test (RED) → chain 4 impl-spec + 실 impl (GREEN / 100% test pass) / 4 gate + revisit loop + ★ ★ ★ chain-driver mechanical enforcement / 218 unit test pass / §8.1 strict 7/7 ✅ / 3 PoC corroboration ✅ / cleanup round 1 + 2-A ~ 2-E 모두 종결 (327 → 256 files / paradigm v2.0.0 정합))
 
 > ¹ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06): 현 단계 = **chain harness validated** — §8.1 strict 7/7 + ≥ 2 PoC corroboration. sub-plan-1~4 = scaffolding / sub-5 = harness-complete / sub-6 = harness-validated. v2.0.0-rc1 prerelease (Senior F4 / 24h+ 후 final / 같은 날 final tag ❌).
 
@@ -18,6 +20,54 @@
 | **M+4** | **sub-plan-4 (skills + flows)** | ★ ★ ★ 13 chain skill 신설 (_base 2 + planning 3 + spec 3 + test 3 + implement 2 / skills/spec 신규 디렉토리) + 4 chain stage flow ({planning,spec,test,implement}.phase-flow.{json,mermaid}) + ★ ★ ★ flows/sdlc-4stage-flow.{json,mermaid} (master plan SSOT — stages + revisit_edges + 4 gate + cross_cutting + release_eligibility) + agents 4 README placeholder → 정식 채움 ✅ + drift-validator `--check-chain-layout` flag + 3 신규 unit test (★ 4 stages / 26 phases / 13 skills / 0 orphans) + workspace **138 unit test pass** | ✅ DEC-2026-05-06-sub-plan-4-종결 |
 | **M+5** | **sub-plan-5 (chain harness driver — 호칭 자격 확보)** | ★ ★ ★ ★ ★ 5 요소 모두 본격 구현 — tools/chain-driver/ workspace 12번째 + schemas/state.schema.json + intervention-log.schema.json + ADR-CHAIN-005 + hooks/hooks.json + flows/sdlc-4stage-flow.json `harness_status`: scaffolding → harness-complete + workspace **198 unit test pass**. | ✅ DEC-2026-05-06-sub-plan-5-종결 |
 | **M+6** | **sub-plan-6 (PoC + §8.1 strict + v2.0.0-rc1 prerelease)** | ★ ★ ★ ★ ★ PoC #05 sample-user-register e2e (vitest 6/6 GREEN) + PoC #03 NestJS retrofit (chain 1~3 RED dry-run) + scripts/release-readiness.js (§8.1 7/7 자동 검사 + 9 self-test) + drift `--check-state-flow-consistency` + MIGRATION-v1-to-v2.md + version 1.5.0 → 2.0.0-rc1 + flows harness_status: harness-complete → **harness-validated** + workspace **210 test** (201 + 9 release-readiness). | ✅ DEC-2026-05-06-sub-plan-6-종결 |
+
+## ★ ★ ★ ★ v2.1.0 MINOR release (2026-05-07 / 같은 날 v2.0.0 final 후)
+
+DEC-2026-05-07-v2.1.0-release.
+
+★ ★ phase 4.7 (characterization) 본체 격상. ≥ 2 PoC corroboration 사실 확보 (PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern retrofit) → 본체 6 자산 + workflow + ADR 격상.
+
+| 검증 항목 | 결과 |
+|---|---|
+| `npm test --workspaces` 219 pass / 0 fail (★ +10 vs v2.0.0) | ✅ characterization-coverage-validator 10 신설 / drift-validator 47 변경 없음 / phase 4.7 entry 자동 인식 |
+| release-readiness §8.1 strict 7/7 (target v2.1.0) | ✅ "v2.1.0 = release-ready" |
+| version-check 3 source sync at v2.1.0 | ✅ plugin.json + package.json + CHANGELOG |
+| build dist `ai-native-methodology-v2.1.0/` | ✅ 264 files / shasum 263 OK |
+| chain harness 5 요소 변경 ❌ | ✅ analysis stage 내부 phase 추가만 |
+
+**v2.1.0 본체 격상 자산 (6 + 1 workflow + 1 ADR)**:
+1. ✅ `methodology-spec/deliverables/23-characterization-spec.md` (★ #16~22 사용 중 / 23 신규)
+2. ✅ `schemas/characterization-spec.schema.json` (★ 30번째 schema)
+3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 12 → 13 (`characterization` 추가)
+4. ✅ `skills/analysis/phase-4-7-characterization/SKILL.md` (★ skills 19 → 20)
+5. ✅ `tools/characterization-coverage-validator/` (★ workspace 13번째 / 10 unit test)
+6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v1.5.0 → v2.1.0 (phase 4.7 entry + 5-x depends_on 갱신)
+7. ✅ `methodology-spec/workflow/phase-4-7-characterization.md` (drift-validator 3-way 회귀 통과)
+8. ✅ `docs/adr/ADR-CHAIN-006-phase-4-7-characterization.md` (4 정책 명문화)
+
+**release commit cadence (C1~C7)**:
+- C1 (`21d0e4f`) — deliverable + schema + meta-confidence
+- C2 (`8a48fb7`) — skill
+- C3 (`0209381`) — tool + 10 unit test + workspace 13번째
+- C4+5 (`eb4f0e2`) — flow + ADR + workflow + version + CHANGELOG
+- C6 (현재) — DEC + STATUS + INDEX
+- C7 — git tag `v2.1.0`
+
+**v2.1.x patch trigger (Senior F7 정합)**: release-readiness regress 1+ / Senior HIGH 1+ / 7일 carry > 3건 / 사용자 finding burst.
+
+**Carry (v2.1.x patch / v2.x)**:
+
+| ID | 항목 | trigger |
+|---|---|---|
+| C-v2.1.0-1 | snapshot Gherkin (.feature) 변환 출력 | v2.1.x patch / 사용자 finding |
+| C-v2.1.0-2 | Modern 환경 명확 비율 ≥ 95% 자동 detect | v2.2+ |
+| C-v2.1.0-3 | acceptance oracle threshold dashboard | v2.x |
+| C-v2.1.0-4 | F-PHASE7-001~004 일반화 검토 (≥ 3 PoC corroboration 후) | ≥ 3 PoC corroboration |
+| C-v2.1.0-5 | ratchet `trend_required=true` 자동 검증 (baseline.js 통합) | v2.1.x patch |
+| C-v2.1.0-6 | ts-morph + 실 환경 (DB) snapshot 자동 추출 | v2.x |
+| C-v2.1.0-7 | sub-rule 추가 (Spring Boot 3 / FastAPI / Express 등 다른 spectrum) | 사용자 PoC corroboration |
+
+---
 
 ## ★ ★ ★ ★ ★ ★ v2.0.0 MAJOR FINAL release (2026-05-07)
 
