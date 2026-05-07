@@ -77,6 +77,37 @@ node tools/chain-driver/src/cli.js state
 node tools/chain-driver/src/cli.js next
 ```
 
+### 3.5 State transition 시각화 (★ stateDiagram-v2)
+
+```mermaid
+stateDiagram-v2
+    [*] --> analysis: chain-driver init
+    analysis --> planning: 7대 산출물 종결
+    planning --> spec: gate #1 pass<br/>(planning-extraction-validator)
+    spec --> test: gate #2 pass<br/>(chain-coverage-validator)
+    test --> implement: gate #3 pass<br/>(spec-test-link-validator + RED 입증)
+    implement --> done: gate #4 pass<br/>(test-impl-pass-validator + GREEN 100%)
+    done --> [*]: traceability-matrix release
+
+    planning --> blocked: gate #1 finding
+    spec --> blocked: gate #2 finding
+    test --> blocked: gate #3 finding
+    implement --> blocked: gate #4 finding
+
+    blocked --> planning: user fix + next
+    blocked --> spec: user fix + next
+    blocked --> test: user fix + next
+    blocked --> implement: user fix + next
+
+    note right of blocked
+        state.blocked=true (atomic CAS)
+        cli exit 2
+        PreToolUse permissionDecision=deny
+    end note
+```
+
+★ state name = `state.schema.json` enum 정합 (planning / spec / test / implement / done / blocked).
+
 ## 4. Mechanical gate trio (★ ★ ★ no-simulation enforcement)
 
 ```
@@ -171,6 +202,34 @@ $ chain-driver revisit-detect
 [chain-driver] revisit 감지 / chain 1 → 현재 chain 4
 [chain-driver] 사용자 prompt: revisit / stop ?
 ```
+
+### D. RED → GREEN 전환 시각화 (★ sequenceDiagram)
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as chain-driver
+    participant V as gate validator
+    participant T as test runner
+
+    Note over U,T: chain 3 (test stage / RED 의무)
+    U->>C: "test spec 생성 RED"
+    C->>V: spec-test-link-validator (gate #3)
+    V->>T: 진짜 test runner 호출 (--allow-execute)
+    T-->>V: pass=0 / fail=N (★ ★ RED 입증)
+    V-->>C: 5종 물증 + result_hash sha256
+    C-->>U: gate #3 pass / next stage = implement
+
+    Note over U,T: chain 4 (impl stage / GREEN 100% 의무)
+    U->>C: "impl spec 생성 GREEN"
+    C->>V: test-impl-pass-validator (gate #4)
+    V->>T: 진짜 test runner 재실행 (test code 변경 ❌)
+    T-->>V: pass=N / fail=0 (★ ★ GREEN 100%)
+    V-->>C: 5종 물증 + result_hash deterministic
+    C-->>U: gate #4 pass / done
+```
+
+★ ★ ★ chain 3 의 test code = chain 4 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.
 
 ## 9. 막혔을 때
 
