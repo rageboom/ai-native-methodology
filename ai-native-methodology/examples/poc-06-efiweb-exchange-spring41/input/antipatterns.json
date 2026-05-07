@@ -112,6 +112,18 @@
       "pattern": "TB_EXCHANGE.YEAR 컬럼이 SQL reserved keyword. SELECT 시 [YEAR] 로 대괄호 escape 필수. 다른 SELECT (selectExchangeList) 에서는 e.YEAR 로 alias 의존 → 일관성 부재.",
       "modern_alternative": "RATE_YEAR 등 reserved 회피 컬럼명",
       "carry_to": "(없음)"
+    },
+    {
+      "id": "AP-EXCHANGE-011",
+      "title": "★ ★ ★ 공유 SQL 조각 부재 / iBATIS2 <sql id> + <include refid> 미사용 / 모듈성 ↓",
+      "applies_to": "exchange.xml (전체 129 LOC)",
+      "category": "design",
+      "severity": "medium",
+      "evidence_loc": "source/sqlmap/exchange.xml grep '<sql\\s+id=' = 0 / grep '<include\\s+refid=' = 0",
+      "pattern": "★ ★ exchange.xml 의 <sql id=\"\"> 정의 0건 + <include refid=\"\"> 호출 0건. 단일책임 모듈 (6 SQL) 라 중복 영향 ↓ 이지만 ★ Spring 4.1 + iBATIS 2 spectrum 공통 패턴 — 양 PoC 모두 0건 (corroboration #1 + #2 isomorphic).",
+      "modern_alternative": "MyBatis 3 마이그레이션 시 <sql id=\"\"> 공유 조각 + <include refid=\"\"> 호출",
+      "carry_to": "★ ★ AP-CAPITAL-012 (corroboration #2) → ≥ 2 PoC isomorphic 자격 자격 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule 자격",
+      "external_advice_origin": "Opus 4.7 (사용자 turn 시 Pattern 4 = 공유 SQL 조각 = 횡단 관심사) — Day 1.6 흡수 / 사용자 D13 = (α) 결단 / corroboration #1 isomorphic 의무"
     }
   ],
   "phase_3a_automation_measurement": {

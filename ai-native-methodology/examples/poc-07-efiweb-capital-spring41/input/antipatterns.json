@@ -125,16 +125,30 @@
       "is_likely_bug_partial": true,
       "is_likely_bug": false,
       "note": "★ DDD bounded context 위반 / 새 시스템 = service boundary 분리"
+    },
+    {
+      "id": "AP-CAPITAL-012",
+      "title": "★ ★ ★ 공유 SQL 조각 부재 / iBATIS2 <sql id> + <include refid> 미사용 / 모듈성 ↓",
+      "natural_language": "★ ★ capital.xml 1757 LOC × 71 SQL operation 안에 <sql id=\"\"> 정의 0건 + <include refid=\"\"> 호출 0건 — 공유 SQL 조각 mechanism (iBATIS 2 표준 기능) 전혀 미사용. 결과 = WHERE 절 / SELECT 컬럼 list / JOIN clause 등 중복 재사용 ❌. 71 SQL 의 평균 LOC = ~25 LOC / 중복 패턴 다수 (예: 'WHERE CompanySeq = #comNo# AND sType = #sType#' / 'INNER JOIN SGERP.dbo.IFRS_CAPITALSTD' / '<isEqual property=\"SaveType\">' 등)",
+      "source": "capital.xml grep '<sql\\s+id=' = 0 / grep '<include\\s+refid=' = 0",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["capital.xml (전체 1757 LOC)"],
+      "modern_alternative": "★ MyBatis 3 마이그레이션 시 <sql id=\"\"> 공유 조각 + <include refid=\"\"> 호출로 중복 제거 / 또는 QueryDSL / jOOQ 같은 type-safe SQL builder",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06": "★ ★ AP-EXCHANGE-011 (corroboration #1 / PoC #06 retrofit) — 양 PoC = 0건 / Spring 4.1 + iBATIS 2 spectrum 전반 패턴",
+      "external_advice_origin": "Opus 4.7 (사용자 turn 시 다른 Claude CLI 의견 / Pattern 4 = 공유 SQL 조각 = 횡단 관심사) — Day 1.6 흡수 / 사용자 D13 = (α) 결단",
+      "carry_link": "C-v2.2.0-sql-inventory-extended (★ schema 본체 격상 시 patterns.shared_sql_fragments 컬럼 정식 + iBATIS 2 spectrum sub-rule 추가)"
     }
   ],
   "antipatterns_meta_confidence": {
-    "ap_total": 11,
-    "ap_likely_bug": 9,
+    "ap_total": 12,
+    "ap_likely_bug": 10,
     "ap_self_recognized": 3,
     "ap_intent": 0,
     "ap_ambiguous": 0,
-    "isomorphic_to_poc06_count": 4,
+    "isomorphic_to_poc06_count": 5,
     "novel_for_capital_count": 7,
-    "$comment": "★ 다중책임 → 신규 AP 7건 (★ AP-001 비대 + AP-005 XML 인라인 + AP-006 DEAD param + AP-007 image base64 + AP-009 SATD 4회 + AP-010 logger 부재 + AP-011 cross-domain)"
+    "$comment": "★ 다중책임 → 신규 AP 7건 + ★ ★ Day 1.6 외부 조언 v2 흡수 신규 1건 (AP-CAPITAL-012 / iBATIS2 공유 SQL 조각 미사용 / corroboration #1+#2 isomorphic)"
   }
 }

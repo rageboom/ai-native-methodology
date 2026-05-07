@@ -33,6 +33,113 @@
     "bug_count": 0,
     "ambiguous_count": 1
   },
+  "patterns_extension_v2": {
+    "$comment": "★ ★ ★ 외부 조언 v2 (Opus 4.7 / 4-Layer + 4 iBatis 패턴) 흡수 — 사용자 D12 결단 (b) nested patterns object. corroboration #1 (PoC #06 retrofit) ↔ corroboration #2 (PoC #07 capital) isomorphic 의무.",
+    "schema_version": "v2 (Day 1.6 / 2026-05-08)",
+    "user_decision": "D12 = (b) nested patterns object",
+    "aggregate_metrics": {
+      "pattern_1_dynamic_branch": {
+        "description": "iBATIS 2 dynamic tags",
+        "count": 1,
+        "auto_grep": "✅ 100%",
+        "decision_table_candidate": "★ phase 4.5 formal-spec / decision-table 영역 정합",
+        "core_examples": [
+          { "sql_id": "selectExchangeList", "tags": ["<isNotEmpty property=\"currCd\">"], "branch_count": 1, "line": 28, "br_link": "BR-EXCHANGE-002 currCd 분기" }
+        ]
+      },
+      "pattern_2_calculation_formula": {
+        "description": "SQL 함수 (MSSQL → CASE WHEN/FORMAT)",
+        "count": 2,
+        "auto_grep": "✅ 100%",
+        "domain_formula_candidate": "★ 도메인 공식 reference",
+        "core_examples": [
+          { "function": "CASE WHEN (12 분기 / 월별)", "context": "CASE WHEN '01'=#month# THEN MON1 ... WHEN '12'=#month# THEN MON12 END", "line": 79, "sql_id": "selectCheckExcRate", "ap_link": "AP-EXCHANGE-007 (★ 자조 폐해)" },
+          { "function": "FORMAT (VND vs 그 외)", "context": "FORMAT(EXCHANGE_RATE, CASE WHEN CURR_CD='VND' THEN '##0.0000' ELSE '##0.00' END)", "line": 122, "sql_id": "selectDayExchangeList", "br_link": "BR-EXCHANGE-003 VND 4자리 정밀도" }
+        ],
+        "mssql_specific": "DECODE 부재 → CASE WHEN/FORMAT 대체"
+      },
+      "pattern_3_result_mapping": {
+        "description": "resultClass + parameterClass + parameterMap",
+        "result_class_count": 5,
+        "parameter_class_count": 5,
+        "parameter_map_count": 1,
+        "auto_grep": "✅ 100%",
+        "unique_result_classes": ["egovMap", "int", "double"],
+        "core_examples": [
+          { "type": "resultClass", "value": "egovMap", "count": 3, "lines": [8, 112, 118] },
+          { "type": "resultClass", "value": "int", "count": 1, "line": 76, "sql_id": "selectCheckExcRate" },
+          { "type": "resultClass", "value": "double", "count": 1, "line": 102, "sql_id": "selectExchangeRate" },
+          { "type": "parameterMap", "value": "insertExchangeRateMigrationMap", "line": 107, "note": "★ Stored Procedure IN/OUT" }
+        ]
+      },
+      "pattern_4_shared_sql_fragments": {
+        "description": "iBATIS 2 <sql id=\"\"> + <include refid=\"\"> 공유 SQL 조각",
+        "count": 0,
+        "auto_grep": "✅ 100% — 0 결과 자체가 finding",
+        "cross_cutting_candidate": "★ ★ ★ 0건 = ★ ★ AP-EXCHANGE-011 신규 등재 / corroboration #2 PoC #07 = 0 동일 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule isomorphic 자격",
+        "ap_link": "AP-EXCHANGE-011 (★ Day 1.6 antipatterns.json 신규 등재 / D13 = (α) 결단)"
+      }
+    },
+    "core_record_extension": {
+      "$comment": "★ 6 SQL record 모두 patterns object 예시 — 본 PoC = 단일책임 / scale 작음 / 모두 cover 가능.",
+      "examples": [
+        {
+          "sql_id": "ExchangeDAO.selectExchangeList",
+          "patterns": {
+            "dynamic_branch": [{ "tag": "<isNotEmpty property=\"currCd\">", "branch_count": 1, "line": 28 }],
+            "calculation_formula": [],
+            "result_mapping": { "type": "resultClass", "value": "egovMap", "line": 8 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.updateExchange",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [],
+            "result_mapping": { "type": "parameterClass", "value": "HashMap", "line": 36, "note": "★ MERGE / 12 컬럼 INSERT or UPDATE" },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectCheckExcRate",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "CASE WHEN (12 분기)", "line": 79, "ap_link": "AP-EXCHANGE-007 자조 / SATD" }],
+            "result_mapping": { "type": "resultClass", "value": "int", "line": 76 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectExchangeRate",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "FN_Get_ExcRate (DB function wrapper)", "line": 103, "carry_flags": ["DBA-read", "external_call_out_of_scope"] }],
+            "result_mapping": { "type": "resultClass", "value": "double", "line": 102 },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.insertExchangeRateMigration",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [],
+            "result_mapping": { "type": "parameterMap", "value": "insertExchangeRateMigrationMap", "line": 107, "note": "★ year IN / result OUT" },
+            "shared_sql_fragments": []
+          }
+        },
+        {
+          "sql_id": "ExchangeDAO.selectDayExchangeList",
+          "patterns": {
+            "dynamic_branch": [],
+            "calculation_formula": [{ "function": "FORMAT (VND 4자리 vs 그 외 2자리)", "line": 122, "br_link": "BR-EXCHANGE-003" }, { "function": "CONVERT (datetime)", "line": 121 }],
+            "result_mapping": { "type": "resultClass", "value": "egovMap", "line": 118 },
+            "shared_sql_fragments": []
+          }
+        }
+      ]
+    }
+  },
   "inventory": [
     {
       "sql_id": "ExchangeDAO.selectExchangeList",
