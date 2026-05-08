@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-08 (★ ★ ★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — v2.2.0 final 격상 즉시 진행 자격 활성** [★ ★ ★ cooling-off 7d minimum ★ 폐기 / DEC-2026-05-08-cooling-off-7d-폐기 / 사용자 결단 "패기해줘"] — DEC-2026-05-08-v2.2.0-rc1-prerelease / ~~7d minimum cooling-off~~ ✅ resolved / Modern ORM PoC #08+#09+#10 carry C-v2.2.0-6 = ✅ resolved (ADR-CHAIN-008 채택) / 본체 자산 7 + workflow + ADR-CHAIN-007 + ADR-CHAIN-008 / ★ ★ ★ ★ ★ 5 PoC SQL Inventory isomorphic robust [4/6=66.7% × 5 / paradigm + ORM + platform + language + responsibility + scale 6 차원 corroboration sum] / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / adr_registry 5 → 8 dynamic / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
 
 ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 + "나머지 진행해줘" + "남근거 다 실행" 일괄 처리)**:
 - ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — paradigm-cross MEDIUM #1 / commit `da1a0ab`
@@ -83,7 +83,8 @@
 - ~~C-ADR-2026-OSS-paradigm-reality~~ ✅ resolved (ADR-CHAIN-008 채택)
 
 **진입 정책**:
-- 7d minimum cooling-off (2026-05-08 ~ 2026-05-15) — v2.2.0 final 격상 결단 ❌ within. PoC 진입 자체는 cooling-off 와 별개.
+- ~~7d minimum cooling-off (2026-05-08 ~ 2026-05-15)~~ ✅ ★ ★ ★ ★ ★ **폐기** (DEC-2026-05-08-cooling-off-7d-폐기 / 사용자 결단 "패기해줘" / ADR-CHAIN-008 absorption + D 검증 4종 ✅ + carry burst 0 + npm test 280 pass = ★ Senior F4 검증대 통과 / DEC-2026-05-06-cooling-off-정책-폐기 정합 강화)
+- ★ ★ ★ ★ ★ **v2.2.0 final 격상 = ★ 즉시 진행 자격 ★ 활성** (★ 사용자 별도 결단 의뢰 의무 잔존)
 - ★ 각 PoC = 별도 session + plan/research + 사용자 정식 결단 (4원칙 1~3원칙)
 - ★ ★ PoC #08 사용자 confirm 2건 ★ resolved (2026-05-07): (i) 사내 양식 = ★ source 자체로 자동 처리 (jpetstore-6 = XML 위주) (ii) source = ★ (b) `mybatis/jpetstore-6` 공식 reference webapp
 - ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
