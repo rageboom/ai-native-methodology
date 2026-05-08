@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.2.0-rc1",
-  "description": "★ ★ ★ v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease (★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger). SQL 단위 11 컬럼 인벤토리 (외부 6 + statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags) + extraction_automation + RDB 한정 sub-phase + ADR-CHAIN-007 + ≥ 2 PoC scale-cross corroboration (PoC #06 단일책임 + PoC #07 다중책임). workspace 14번째 (sql-inventory-extractor / 10 unit test) + 233 total tests. chain harness validated 보존 / v2.1.x 모두 보존.",
+  "version": "2.2.0",
+  "description": "★ ★ ★ ★ ★ v2.2.0 MINOR FINAL — phase 4.8 (sql-inventory) 본체 격상 + ADR-CHAIN-008 paradigm-cross 정책 완화 ('MEDIUM × ≥ 5 PoC = strong'). 5 PoC SQL Inventory isomorphic robust (66.7% × 5 / paradigm + ORM + platform + language + responsibility + scale 6 차원). SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase + ADR-CHAIN-007 + ADR-CHAIN-008. workspace 14번째 (sql-inventory-extractor / 10 unit test) + 233 unit test (280 total with _shared) + adr_registry dynamic 검사 (5→8 ADR-CHAIN). chain harness validated 보존 / v2.1.x 모두 보존 / cooling-off 영구 폐기.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

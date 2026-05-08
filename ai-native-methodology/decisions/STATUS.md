@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-08 (★ ★ ★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — v2.2.0 final 격상 즉시 진행 자격 활성** [★ ★ ★ cooling-off 7d minimum ★ 폐기 / DEC-2026-05-08-cooling-off-7d-폐기 / 사용자 결단 "패기해줘"] — DEC-2026-05-08-v2.2.0-rc1-prerelease / ~~7d minimum cooling-off~~ ✅ resolved / Modern ORM PoC #08+#09+#10 carry C-v2.2.0-6 = ✅ resolved (ADR-CHAIN-008 채택) / 본체 자산 7 + workflow + ADR-CHAIN-007 + ADR-CHAIN-008 / ★ ★ ★ ★ ★ 5 PoC SQL Inventory isomorphic robust [4/6=66.7% × 5 / paradigm + ORM + platform + language + responsibility + scale 6 차원 corroboration sum] / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / adr_registry 5 → 8 dynamic / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-08 (★ ★ ★ ★ ★ ★ ★ **v2.2.0 MINOR FINAL release** — DEC-2026-05-08-v2.2.0-final / phase 4.8 sql-inventory + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기 / 5 PoC SQL Inventory isomorphic robust [4/6=66.7% × 5 / paradigm + ORM + platform + language + responsibility + scale 6 차원 corroboration sum] / 본체 자산 7 + workflow + ADR-CHAIN-007 + ADR-CHAIN-008 / unit test 232 → 233 [+1 / sql-inventory-extractor 10 신설 workspace 14번째 / 280 total with _shared] / §8.1 strict 7/7 ✅ / adr_registry 5 → 8 dynamic / build `ai-native-methodology-v2.2.0/` 272 files / 271 CHECKSUMS OK / git tag v2.2.0 / chain harness 5 요소 변경 ❌)
 
 ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 + "나머지 진행해줘" + "남근거 다 실행" 일괄 처리)**:
 - ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — paradigm-cross MEDIUM #1 / commit `da1a0ab`

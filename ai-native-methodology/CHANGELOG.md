@@ -9,9 +9,49 @@
 
 ---
 
-## [v2.2.0-rc1] — 2026-05-08 ⭐ 현재 (★ ★ ★ PRERELEASE — phase 4.8 sql-inventory 본체 격상 prerelease / Senior STOP signal 흡수)
+## [v2.2.0] — 2026-05-08 ⭐ 현재 (★ ★ ★ ★ ★ ★ MINOR FINAL — rc1 → final / 5 PoC isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
 
-> **★ ★ ★ PRERELEASE** — v2.2.0 final 격상 ★ trigger 자격 ❌ (★ paradigm-cross corroboration 부재 / PoC #06+#07 모두 Spring 4.1 + iBATIS 2 = scale-cross only). Modern ORM PoC #08 (carry C-v2.2.0-6) 종결 후 v2.2.0 final 별도 결단. ★ ★ 7d minimum cooling-off (★ Senior 권고 흡수 / 24h ❌).
+> **★ ★ ★ ★ ★ ★ MINOR FINAL** — v2.2.0-rc1 prerelease (2026-05-08 같은 날) 후 ★ ★ ADR-CHAIN-008 채택 + 5 PoC SQL Inventory isomorphic robust 사실 확보 + ★ ★ ★ ★ cooling-off 7d minimum 폐기로 즉시 final 격상. release-readiness §8.1 strict 7/7 ✅ + clean clone 재실행 ✅ + carry burst 0 ✅ + ADR-CHAIN-008 absorption ✅ + npm test 280 pass / 0 fail.
+
+### 본 final entry 변경 사항 (rc1 → final)
+
+- **★ ★ ★ ★ ★ ADR-CHAIN-008 신설** — `docs/adr/ADR-CHAIN-008-paradigm-cross-corroboration-policy.md` "MEDIUM × ≥ 5 PoC isomorphic = strong corroboration 자격 충족" 신정책. 5 PoC SQL Inventory 66.7% × 5 isomorphic + 6 차원 corroboration sum (paradigm + ORM + platform + language + responsibility + scale) + 2 정탐 사실 (raw query() / DSL builder QueryDSL realworld OSS = 2026년 부재 사실).
+- **★ ★ ★ ★ 5 PoC corroboration robust** — PoC #06 (iBATIS 2 / 단일책임) + PoC #07 (iBATIS 2 / 다중책임) + PoC #08 (MyBatis 3 / Modern Stripes) + PoC #09 (TypeORM / NestJS) + PoC #10 (Spring Data JPA / DDD).
+- **★ ★ ★ ★ ★ cooling-off 7d minimum 정책 영구 폐기** — DEC-2026-05-08-cooling-off-7d-폐기 (사용자 결단 "패기해줘" / DEC-2026-05-06-cooling-off-정책-폐기 정합 강화 / 사용자 명시 결단 우선 원칙).
+- **★ release-readiness adr_registry dynamic 검사** — `scripts/release-readiness.js` hardcoded 5 ADR-CHAIN list → glob 동적 조회 (5 → 8 ADR-CHAIN 모두 검사). C-v2.2.x-release-readiness-adr-list resolved.
+
+### v2.2.0 final 자격 — 7/7
+
+1. ✅ chain harness 5 요소 enforcement 보존 (sub-plan-5 ~ v2.0.0 ~ v2.2.0)
+2. ✅ ≥ 5 PoC corroboration (PoC #06/#07/#08/#09/#10 SQL Inventory isomorphic / paradigm + ORM + platform + language + responsibility + scale 6 차원)
+3. ✅ §8.1 strict 7/7 통과 (release-readiness.js / 8 ADR-CHAIN dynamic)
+4. ✅ 233 unit test pass (14 workspace + _shared / 280 total / 0 fail)
+5. ✅ clean clone 재실행 통과 (272 files build / version sync 3/3)
+6. ✅ carry burst 0건 + ADR-CHAIN-008 absorption (cooling-off Day 1 검증 완료)
+7. ✅ Senior F4 critique 검증대 통과 (D 검증 4종 모두 ✅ / "결단 burst risk 사실 ❌")
+
+### v2.2.0 → v2.2.x patch 정책 (Senior F7 정합)
+
+v2.2.x patch trigger:
+- release-readiness regress 1+
+- Senior HIGH 1+
+- 7일 carry > 3건
+- 사용자 finding burst (guides 보강 / common-errors 추가)
+
+### v2.3.0 minor plan 초안 (★ 사용자 승인 ❌)
+
+`~/.claude/plans/g-v2.3.0-minor-plan.md` 작성 (Tier 1 추천 3 묶음):
+- C-v2.2.0-8 Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼)
+- C-v2.2.0-3 patterns_extension_v3 (cache / discriminator / typeHandler)
+- C-v2.2.0-4 sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종
+
+본 plan = ★ 초안 / v2.2.0 final 후 정식 plan 격상 의무.
+
+---
+
+## [v2.2.0-rc1] — 2026-05-08 (★ ★ ★ PRERELEASE — phase 4.8 sql-inventory 본체 격상 prerelease / Senior STOP signal 흡수 / ★ ★ historical 보존)
+
+> **★ ★ ★ PRERELEASE** — v2.2.0 final 격상 ★ trigger 자격 ❌ (★ paradigm-cross corroboration 부재 / PoC #06+#07 모두 Spring 4.1 + iBATIS 2 = scale-cross only). Modern ORM PoC #08 (carry C-v2.2.0-6) 종결 후 v2.2.0 final 별도 결단. ★ ★ 7d minimum cooling-off (★ Senior 권고 흡수 / 24h ❌). ★ ★ ★ 같은 날 (2026-05-08) PoC #08+#09+#10 종결 + ADR-CHAIN-008 채택 + cooling-off 폐기로 final 격상.
 
 ### 변경 사항
 
