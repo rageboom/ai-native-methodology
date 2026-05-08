@@ -5,7 +5,14 @@
 
 **기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
 
-★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 흡수 / PoC #08 Day 1~3.5 일괄 종결)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수 → **PoC #08 (jpetstore-6) Day 1.5~3.5 종결** (DEC-2026-05-07-poc-08-종결.md / 4축 모두 pass). ★ ★ ★ ★ paradigm-cross corroboration #1 MEDIUM 자격 사실 확보 (★ 3 PoC isomorphic / SQL Inventory 4/6=66.7%). 본체 격상 ❌ (★ §8.1 strict / PoC #09 TypeORM raw SQL ★ paradigm-cross strong 의무). 다음 단계 (PoC #09 prelim + PoC #10 prelim + v2.2.0 final 결단) = ★ 별도 session 자동 진행 carry. PoC #11 (사용자 결단 α 우선순위 #1) source 위임 대기 = 보존.
+★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 일괄 처리)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수:
+- ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — DEC-2026-05-07-poc-08-종결 / 4축 모두 pass / paradigm-cross MEDIUM #1 사실 확보 / commit `da1a0ab`
+- ✅ **PoC #09 (TypeORM raw SQL) prelim 신설** — DEC-2026-05-08-poc-09-prelim-신설 / ★ ★ ★ ★ v2.2.0 final 격상 trigger **핵심** / paradigm + platform-cross strong / 본 session prelim DEC + skeleton + plan 1차
+- ✅ **PoC #10 (JPA QueryDSL) prelim 신설** — DEC-2026-05-08-poc-10-prelim-신설 / ★ v2.3.0 minor trigger / DSL builder paradigm / 본 session prelim DEC + skeleton + plan 1차
+- ⏳ **v2.2.0 final 격상 결단** = PoC #09 종결 후 (PoC #08 MEDIUM + PoC #09 strong 합산) / cooling-off 7d minimum 후 (2026-05-15+) / ★ 별도 session 자동 진행 carry
+- ⏳ **PoC #11 (EFI-WEB billing)** = 사용자 결단 (α) 우선순위 #1 / source 위임 도착 시 우선순위 복귀
+
+★ ★ §8.1 strict 본체 격상 ❌ (★ paradigm-cross strong 의무 = PoC #09 핵심).
 
 **v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
 
