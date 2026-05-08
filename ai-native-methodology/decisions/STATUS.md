@@ -62,23 +62,25 @@
 | axis | 목표 | PoC | 자격 |
 |---|---|---|---|
 | **사내 ROI axis** (★ 사용자 우선) | 사내 적용 직접 검증 + scale/domain-cross + sub-rule 강화 | PoC #06+#07+**#11** = 3 사내 PoC isomorphic | C-v2.2.0-spring41-ibatis2-subrule resolve trigger |
-| **본 방법론 일반화 axis** (★ paradigm-cross corroboration / Senior STOP) | 여러 ORM/프레임워크 동작 입증 | PoC #08 (MEDIUM) + PoC #09 (strong) + PoC #10 | v2.2.0 final 격상 trigger / C-v2.2.0-6 resolve |
+| **본 방법론 일반화 axis** (★ ~~paradigm-cross corroboration / Senior STOP~~ → ★ ADR-CHAIN-008 정책 완화) | 여러 ORM/프레임워크 동작 입증 | PoC #08 + PoC #09 + PoC #10 (★ 5 PoC isomorphic / 모두 MEDIUM 측정) | ✅ resolved (★ ★ MEDIUM × 5 PoC isomorphic = strong 자격 / v2.2.0 final 격상 trigger 활성) |
 
-★ ★ ★ 사용자 결단 = "우선 순위 대로 다 진행". paradigm-cross corroboration carry C-v2.2.0-6 = ★ 분해 (3 PoC 단계화):
+★ ★ ★ 사용자 결단 = "우선 순위 대로 다 진행". paradigm-cross corroboration carry C-v2.2.0-6 = ★ 분해 (3 PoC 단계화) — ★ ★ ★ ★ ★ **ADR-CHAIN-008 (2026-05-08) 채택 후 모두 resolved / historical 기록 보존**:
 
-| 우선순위 | PoC | stack | 14d cap | paradigm 거리 (vs iBATIS 2 XML) | 사내 정합 | trigger 자격 |
-|---|---|---|---|---|---|---|
-| #1 | **PoC #08** | **MyBatis 3 XML** (★ ★ source = `mybatis/jpetstore-6` ★ Spring 6.2.18 + Stripes 1.6.0 + MyBatis 3.5.19 + Java 17 + Test 17 classes / 7 mapper / 25 SQL / pet store 4 BC) | 14d | ★★ medium (XML continuity 5/6 reuse / iBATIS 2 evolved tag 부재 + annotation 별도) | ❌ (★ ★ 사용자 정정 2026-05-07: 사내 = iBATIS 2 단일 / MyBatis ❌) | ★ ★ ★ MEDIUM corroboration (★ ★ 정탐 흡수 weak → medium 강화 / standard-MyBatis floor 입증 / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직) |
-| #2 | **PoC #09** | **TypeORM raw SQL** (TS / Node.js / `query()` + `createQueryBuilder()`) | 14d | ★★★ 강 (Java→TS / paradigm + platform-cross) | ❌ (사내 ❌) | ★ ★ ★ paradigm-cross 자격 ★ 강 corroboration / **★ v2.2.0 final 격상 trigger 핵심 #1** |
-| #3 | PoC #10 | JPA QueryDSL (Java / type-safe builder DSL) | 14d | ★★ 중간 (DSL builder) | ❓ | DSL builder paradigm 보강 / v2.3.0 minor trigger |
+| 우선순위 | PoC | stack | 14d cap | paradigm 거리 (vs iBATIS 2 XML) | 사내 정합 | trigger 자격 | ★ resolved 상태 |
+|---|---|---|---|---|---|---|---|
+| #1 | **PoC #08** | **MyBatis 3 XML** (★ ★ source = `mybatis/jpetstore-6` ★ Spring 6.2.18 + Stripes 1.6.0 + MyBatis 3.5.19 + Java 17 + Test 17 classes / 7 mapper / 25 SQL / pet store 4 BC) | 14d | ★★ medium (XML continuity 5/6 reuse / iBATIS 2 evolved tag 부재 + annotation 별도) | ❌ (★ ★ 사용자 정정 2026-05-07: 사내 = iBATIS 2 단일 / MyBatis ❌) | ★ ★ ★ MEDIUM corroboration (★ ★ 정탐 흡수 weak → medium 강화 / standard-MyBatis floor 입증 / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직) | ✅ Day 1~3.5 종결 (commit `da1a0ab`) |
+| #2 | **PoC #09** | **TypeORM raw SQL** (TS / Node.js / `query()` + `createQueryBuilder()`) | 14d | ★★★ 강 (Java→TS / paradigm + platform-cross) | ❌ (사내 ❌) | ★ ~~paradigm-cross 자격 ★ 강~~ → ★ ★ ★ MEDIUM 측정 (raw query() OSS 부재 정탐 사실 정합) | ✅ Day 1~3.5 종결 (commit `2af3772`) / raw query() strong ❌ 솔직 |
+| #3 | PoC #10 | Spring Data JPA method name derived (★ reframe / DSL builder QueryDSL ❌) | 14d | ★★ 중간 | ❓ | ★ ★ ★ MEDIUM corroboration / ~~v2.3.0 minor trigger~~ | ✅ Day 1~3.5 종결 (commit `759cdf1`) / v2.3.0 minor trigger ❌ |
 
-→ ★ ★ **reasonable assumption** (사용자 confirm 의무): v2.2.0 final 격상 = **PoC #08 + PoC #09 둘 다 종결 후** (사내 정합 + paradigm-cross 자격 ★ 강 합산). **PoC #10 = v2.3.0 minor 별도** (DSL builder 추가 paradigm 보강).
-→ 또는 v3.0.0 paradigm shift = ★ 모두 종결 후 일괄 release (option β / 6주+ release lag 수용 의지 사용자 confirm 시).
+→ ~~v2.2.0 final 격상 = PoC #08 + PoC #09 둘 다 종결 후~~ → ★ ★ ★ ★ ★ ADR-CHAIN-008 채택 (2026-05-08) — **5 PoC + 2 정탐 사실 + 6 차원 corroboration sum = MEDIUM × ≥ 5 PoC isomorphic = strong 자격 충족** 신정책 → v2.2.0 final 격상 trigger 활성 (cooling-off 7d minimum 후 2026-05-15+ 별도 결단).
 
-**개별 carry 분해**:
-- C-v2.2.0-6a (★ PoC #08 MyBatis 3 / 14d cap / 사내 정합)
-- C-v2.2.0-6b (★ PoC #09 TypeORM raw SQL / 14d cap / ★ paradigm + platform-cross ★ 강 corroboration / v2.2.0 final 격상 trigger 핵심)
-- C-v2.2.0-6c (PoC #10 JPA QueryDSL / 14d cap / v2.3.0 minor trigger)
+**개별 carry 분해 (★ historical 기록 / ADR-CHAIN-008 채택 후 모두 resolved)**:
+- ~~C-v2.2.0-6a~~ ✅ resolved (PoC #08 종결 / MEDIUM × 5 PoC 합산)
+- ~~C-v2.2.0-6b~~ ✅ resolved (PoC #09 종결 / raw query() strong ❌ → MEDIUM × 5 PoC 합산)
+- ~~C-v2.2.0-6c~~ ✅ resolved (PoC #10 종결 / DSL builder QueryDSL OSS 부재 정탐 사실)
+- ~~C-paradigm-cross-strong-raw-sql~~ ✅ obsolete (ADR-CHAIN-008 §1 신정책)
+- ~~C-paradigm-cross-DSL-builder-querydsl~~ ✅ obsolete (ADR-CHAIN-008 §1 신정책)
+- ~~C-ADR-2026-OSS-paradigm-reality~~ ✅ resolved (ADR-CHAIN-008 채택)
 
 **진입 정책**:
 - 7d minimum cooling-off (2026-05-08 ~ 2026-05-15) — v2.2.0 final 격상 결단 ❌ within. PoC 진입 자체는 cooling-off 와 별개.
@@ -166,6 +168,12 @@
 
 **carry resolved (2026-05-07 / C9 closure)**:
 - ~~C-v2.2.0-9~~ "Why not AWS SCT" 차별화 절 → ✅ rc1 시점 deliverable §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료 (★ trigger "v2.2.0 final 시" 사실상 implicit 처리 완료 / 추가 보강 ❌)
+
+**★ ★ ★ ★ ★ carry resolved (2026-05-08 / ADR-CHAIN-008 채택 후 4건)**:
+- ~~C-v2.2.0-6~~ ✅ resolved (★ Modern ORM PoC #08+#09+#10 종결 + 5 PoC isomorphic 합산 / paradigm-cross MEDIUM 자격 충족)
+- ~~C-paradigm-cross-strong-raw-sql~~ ✅ obsolete (ADR-CHAIN-008 §1 신정책 / 2026년 OSS 부재 사실 정탐)
+- ~~C-paradigm-cross-DSL-builder-querydsl~~ ✅ obsolete (ADR-CHAIN-008 §1 신정책 / 2026년 OSS 부재 사실 정탐)
+- ~~C-ADR-2026-OSS-paradigm-reality~~ ✅ resolved (ADR-CHAIN-008 채택)
 
 **★ ratchet baseline write 첫 진입** — `examples/poc-07-efiweb-capital-spring41/.aimd/baseline/characterization-coverage.json` (coverage_strategy: ratchet / coverage_ratio: 0.4375 / v2.1.1 PATCH production 첫 사용 케이스).
 

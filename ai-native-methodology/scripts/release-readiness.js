@@ -153,20 +153,23 @@ function check4_chainCoverage() {
 
 function check5_adrRegistry() {
   // Senior F3 — file presence ❌ / content-aware (상태 + decision-cluster).
-  const required = [
-    'docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md',
-    'docs/adr/ADR-CHAIN-002-go-stop-gate.md',
-    'docs/adr/ADR-CHAIN-003-revisit-loop.md',
-    'docs/adr/ADR-CHAIN-004-test-runner-invocation-contract.md',
-    'docs/adr/ADR-CHAIN-005-driver-state-machine.md',
-  ];
+  // ★ 동적 조회 (ADR-CHAIN-* glob) — 신규 ADR 추가 시 검사 자동 흡수 (C-v2.2.x-release-readiness-adr-list resolved).
+  const adrDir = join(ROOT, 'docs/adr');
+  const required = readdirSync(adrDir)
+    .filter((f) => /^ADR-CHAIN-\d{3}-.+\.md$/.test(f))
+    .sort()
+    .map((f) => `docs/adr/${f}`);
+  if (required.length < 5) {
+    return {
+      id: 'adr_registry',
+      pass: false,
+      detail: `expected ≥ 5 ADR-CHAIN files / found ${required.length}`,
+      delegated_to: 'content-aware regex (status + decision-cluster) — file presence 단독 검사 ❌',
+    };
+  }
   const failures = [];
   for (const rel of required) {
     const path = join(ROOT, rel);
-    if (!existsSync(path)) {
-      failures.push(`${rel}: missing`);
-      continue;
-    }
     const text = readFileSync(path, 'utf-8');
     // content-aware check (file presence ❌ — Senior F3 흡수).
     if (!/상태:\s*승인됨|^- 상태: 승인/m.test(text)) {
@@ -180,7 +183,7 @@ function check5_adrRegistry() {
     id: 'adr_registry',
     pass: failures.length === 0,
     detail: failures.length === 0
-      ? `5 ADR-CHAIN files all accepted + have 'decision' section`
+      ? `${required.length} ADR-CHAIN files all accepted + have 'decision' section`
       : failures.join(' | '),
     delegated_to: 'content-aware regex (status + decision-cluster) — file presence 단독 검사 ❌',
   };
