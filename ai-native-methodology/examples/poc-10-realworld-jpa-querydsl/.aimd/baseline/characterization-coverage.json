@@ -1,0 +1,7 @@
+{
+  "generated_at": "2026-05-08",
+  "source_commit_sha": "unknown",
+  "project_id": "poc-10-realworld-jpa-querydsl",
+  "coverage_strategy": "ratchet",
+  "coverage_ratio": 0.30434782608695654
+}

@@ -1,0 +1,9 @@
+{
+  "$comment": "★ PoC #10 raeperd AP — DDD + Modern Java / 적대성 ★ ↓↓ / 2 AP만 (★ ★ vs PoC #08 8 AP / Modern + DDD = 가장 클린).",
+  "project_id": "poc-10-realworld-jpa-querydsl",
+  "antipatterns": [
+    {"id": "AP-RAE-001", "title": "★ Spring Data JPA method name derived query — 긴 method name (★ 코드 가독성)", "natural_language": "ArticleRepository.findAllByContentsTagsContains / deleteArticleByAuthorAndContentsTitleSlug — method name = SQL 자동 생성 paradigm but ★ 매우 긴 method name → 가독성 ↓ / refactoring resistance", "evidence_strength": "medium", "severity": "low", "modern_alternative": "★ Specification API (Criteria Builder) 또는 QueryDSL 도입 시 가독성 ↑ / dynamic query 처리 ↑", "is_likely_bug": false, "isomorphic_to_poc06_07_08_09": "★ ❌ novel (Spring Data JPA paradigm specific)"},
+    {"id": "AP-RAE-002", "title": "★ ★ N+1 risk — Spring Data JPA Lazy fetch default", "natural_language": "★ findAllByContentsTagsContains 등 Article fetch 시 user / tag / comment lazy load = N+1 risk. ★ JPQL @EntityGraph 또는 fetch join 명시 부재 시 발생.", "evidence_strength": "medium", "severity": "medium", "modern_alternative": "★ @EntityGraph 또는 fetch join 명시 / 또는 dto projection", "is_likely_bug": true, "isomorphic_to_poc06_07_08_09": "★ ★ ★ N+1 일반 패턴 = PoC #08 AP-006 isomorphic / paradigm-cross AP 일반성 입증 강화"}
+  ],
+  "summary": {"total_ap": 2, "critical": 0, "high": 0, "medium": 1, "low": 1, "likely_bug_count": 1, "isomorphic_to_poc06_07_08_09_count": 1, "novel_ap_count": 1, "$comment_summary": "★ ★ ★ Modern + DDD + Spring Data JPA = 가장 클린 / 2 AP / vs PoC #08 8 AP / vs PoC #09 4 AP. AP isomorphic = N+1 (5 PoC 공통 일반성)."}
+}

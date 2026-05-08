@@ -1,0 +1,56 @@
+{
+  "meta": {"generated_at": "2026-05-08T00:00:00Z", "methodology_version": "v2.2.0-rc1", "inputs_used": ["source_code", "documentation", "characterization", "sql_inventory"], "confidence": 0.85, "formula_version": "v1", "$comment": "★ confidence 0.85 — Modern + DDD + Spring Data JPA / vs PoC #09 0.88 → ★ -0.03 (★ method derived query logical inference 의존)"},
+  "derivation_source": {"type": "legacy-extraction", "source_artifacts": ["input/{rules,domain,antipatterns,inventory}.json", "sql-inventory/sql-inventory.json", "characterization/{snapshots/7, intent-vs-bug.md, coverage.json}", "source/src/main/java/io/github/raeperd/realworld/* (★ DDD 3-layer / 89 java files / 2387 LOC)"]},
+  "business_intent": {
+    "domain_purpose": "Realworld Conduit (Medium-clone blog) — Modern Java + Spring Boot + Spring Data JPA + DDD Clean Architecture + Embedded VO. ★ ★ method name derived query paradigm reference webapp.",
+    "stakeholders": ["reader / writer / admin / developer (★ DDD + Spring Data JPA 학습자)"],
+    "success_criteria": [
+      "REST API 정합 (4 BC 표준 CRUD)",
+      "★ ★ Spring Data JPA method name derived query paradigm 입증",
+      "★ DDD Aggregate (Article + Comment cascade) + Embedded VO (Title.slug / Profile.userName)",
+      "★ phase 4.7 acceptance oracle = 7/7 = 100% (Modern Java DDD)",
+      "★ ★ ★ paradigm-cross MEDIUM #3 사실 확보 (★ DSL builder QueryDSL ❌ 솔직 / 본 방법론 일반화 자격 만)",
+      "★ ★ AP-RAE-002 N+1 risk (Lazy fetch) — 새 시스템 @EntityGraph 또는 dto projection 의무"
+    ]
+  },
+  "use_cases": [
+    {"id": "UC-RAE-001", "name": "사용자 등록 + JWT", "description": "POST /users", "actors": ["shopper"], "preconditions": [], "postconditions": ["user INSERT + JWT"], "acceptance_criteria_refs": ["AC-RAE-001"], "source_grounded_evidence": ["snapshots/UC-RAE-001-register.json", "UserRestController"]},
+    {"id": "UC-RAE-002", "name": "로그인", "description": "POST /users/login", "actors": ["registered_user"], "preconditions": [], "postconditions": ["JWT"], "acceptance_criteria_refs": ["AC-RAE-002"], "source_grounded_evidence": ["UserRestController"]},
+    {"id": "UC-RAE-003", "name": "현재 사용자", "description": "GET /user", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["UserRO"], "acceptance_criteria_refs": ["AC-RAE-003"], "source_grounded_evidence": ["UserRestController"]},
+    {"id": "UC-RAE-004", "name": "사용자 갱신", "description": "PUT /user", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["user UPDATE"], "acceptance_criteria_refs": ["AC-RAE-004"], "source_grounded_evidence": ["UserRestController"]},
+    {"id": "UC-RAE-005", "name": "Profile 조회", "description": "GET /profiles/{username}", "actors": ["shopper"], "preconditions": [], "postconditions": ["ProfileRO"], "acceptance_criteria_refs": ["AC-RAE-005"], "source_grounded_evidence": ["ProfileRestController"]},
+    {"id": "UC-RAE-006", "name": "Follow", "description": "POST /profiles/{username}/follow", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["follow INSERT"], "acceptance_criteria_refs": ["AC-RAE-006"], "source_grounded_evidence": ["snapshots/UC-RAE-006-follow.json"]},
+    {"id": "UC-RAE-007", "name": "Unfollow", "description": "DELETE /profiles/{username}/follow", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["follow DELETE"], "acceptance_criteria_refs": ["AC-RAE-007"], "source_grounded_evidence": ["ProfileRestController"]},
+    {"id": "UC-RAE-008", "name": "★ Article 작성 (DDD Aggregate + slug)", "description": "POST /articles", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["article + tag cascade"], "acceptance_criteria_refs": ["AC-RAE-008"], "source_grounded_evidence": ["snapshots/UC-RAE-008-articleCreate.json"], "linked_brs": ["BR-RAE-003", "BR-RAE-004"]},
+    {"id": "UC-RAE-009", "name": "Article 목록 (basic)", "description": "GET /articles", "actors": ["shopper"], "preconditions": [], "postconditions": ["Page<Article>"], "acceptance_criteria_refs": ["AC-RAE-009"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-010", "name": "★ ★ ★ Article 목록 (author / method name derived core)", "description": "GET /articles?author=", "actors": ["shopper"], "preconditions": [], "postconditions": ["Page<Article> by author"], "acceptance_criteria_refs": ["AC-RAE-010"], "source_grounded_evidence": ["snapshots/UC-RAE-010-articleByAuthor.json"], "linked_brs": ["BR-RAE-002"]},
+    {"id": "UC-RAE-011", "name": "★ ★ Article 목록 (tag / M:N method name derived)", "description": "GET /articles?tag=", "actors": ["shopper"], "preconditions": [], "postconditions": ["Page<Article> by tag"], "acceptance_criteria_refs": ["AC-RAE-011"], "source_grounded_evidence": ["snapshots/UC-RAE-011-articleByTag.json"], "linked_brs": ["BR-RAE-002"]},
+    {"id": "UC-RAE-012", "name": "Article 목록 (favorited)", "description": "GET /articles?favorited=", "actors": ["shopper"], "preconditions": [], "postconditions": ["Page<Article>"], "acceptance_criteria_refs": ["AC-RAE-012"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-013", "name": "★ Article feed (★ N+1 risk)", "description": "GET /articles/feed", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["Page<Article> from follows"], "acceptance_criteria_refs": ["AC-RAE-013"], "source_grounded_evidence": ["snapshots/UC-RAE-013-feed.json"], "modernization_note": "★ ★ AP-RAE-002 / @EntityGraph 의무"},
+    {"id": "UC-RAE-014", "name": "단일 Article", "description": "GET /articles/{slug}", "actors": ["shopper"], "preconditions": [], "postconditions": ["Article"], "acceptance_criteria_refs": ["AC-RAE-014"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-015", "name": "Article 갱신", "description": "PUT /articles/{slug}", "actors": ["registered_user"], "preconditions": ["JWT + 본인"], "postconditions": ["article UPDATE"], "acceptance_criteria_refs": ["AC-RAE-015"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-016", "name": "Article 삭제", "description": "DELETE /articles/{slug}", "actors": ["registered_user"], "preconditions": ["JWT + 본인"], "postconditions": ["article DELETE"], "acceptance_criteria_refs": ["AC-RAE-016"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-017", "name": "Favorite", "description": "POST /articles/{slug}/favorite", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["favorite_article INSERT"], "acceptance_criteria_refs": ["AC-RAE-017"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-018", "name": "Unfavorite", "description": "DELETE /articles/{slug}/favorite", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["favorite_article DELETE"], "acceptance_criteria_refs": ["AC-RAE-018"], "source_grounded_evidence": ["ArticleRestController"]},
+    {"id": "UC-RAE-019", "name": "★ Comment 작성 (DDD cascade)", "description": "POST /articles/{slug}/comments", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["comment INSERT cascade"], "acceptance_criteria_refs": ["AC-RAE-019"], "source_grounded_evidence": ["snapshots/UC-RAE-019-comment.json"], "linked_brs": ["BR-RAE-004"]},
+    {"id": "UC-RAE-020", "name": "Comment 목록", "description": "GET /articles/{slug}/comments", "actors": ["shopper"], "preconditions": [], "postconditions": ["List<Comment>"], "acceptance_criteria_refs": ["AC-RAE-020"], "source_grounded_evidence": ["CommentRestController"]},
+    {"id": "UC-RAE-021", "name": "Comment 삭제", "description": "DELETE /articles/{slug}/comments/{id}", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["comment DELETE"], "acceptance_criteria_refs": ["AC-RAE-021"], "source_grounded_evidence": ["CommentRestController"]},
+    {"id": "UC-RAE-022", "name": "Tag 목록", "description": "GET /tags", "actors": ["shopper"], "preconditions": [], "postconditions": ["List<Tag>"], "acceptance_criteria_refs": ["AC-RAE-022"], "source_grounded_evidence": ["TagRestController"]},
+    {"id": "UC-RAE-023", "name": "Tag 자동 생성 (Article 작성)", "description": "(internal)", "actors": ["registered_user"], "preconditions": [], "postconditions": ["tag INSERT (★ Article cascade)"], "acceptance_criteria_refs": ["AC-RAE-023"], "source_grounded_evidence": ["ArticleService"]}
+  ],
+  "business_rules": [
+    {"id": "BR-RAE-001", "statement": "User 등록 시 JWT 발급", "applies_to": ["UC-RAE-001"], "br_type": "authentication", "is_intent": true},
+    {"id": "BR-RAE-002", "statement": "★ ★ Article 검색 = Spring Data JPA method name derived (4 분기)", "applies_to": ["UC-RAE-009", "UC-RAE-010", "UC-RAE-011", "UC-RAE-012"], "br_type": "dynamic_search", "is_intent": true},
+    {"id": "BR-RAE-003", "statement": "Article slug = URL-safe title 변환 (Embedded VO)", "applies_to": ["UC-RAE-008"], "br_type": "id_generation", "is_intent": true},
+    {"id": "BR-RAE-004", "statement": "Comment / Favorite cascade (DDD Aggregate)", "applies_to": ["UC-RAE-008", "UC-RAE-019"], "br_type": "aggregate", "is_intent": true},
+    {"id": "BR-RAE-005", "statement": "Profile follow uniqueness", "applies_to": ["UC-RAE-006"], "br_type": "uniqueness", "is_intent": true}
+  ],
+  "out_of_scope": ["★ admin UI 부재", "★ ★ chain 2~4 본격 진입 (§8.1 strict)", "★ QueryDSL 도입 (★ 본 PoC reframe — DSL builder ❌)"],
+  "risks_and_constraints": [
+    {"id": "R-001", "type": "performance", "severity": "medium", "description": "★ ★ AP-RAE-002 N+1 risk on Lazy fetch / @EntityGraph 의무"},
+    {"id": "R-002", "type": "design", "severity": "low", "description": "AP-RAE-001 긴 method name 가독성 ↓"}
+  ],
+  "phase_4_7_acceptance_oracle": {"named_classified_ratio_day2": "7/7 = 100%", "intent_count": 6, "bug_count": 1, "ambiguous_count": 0, "self_recognized_count": 0, "spectrum_role": "★ Modern Java + DDD + Spring Data JPA — DEC-CHAIN-006 §2 spectrum 6번째 적용"},
+  "sql_inventory_summary": {"total_sql_operations": 12, "auto_ratio_external_6": "4/6 = 66.7%", "isomorphic_with": ["PoC #06 (66.7%)", "PoC #07 (66.7%)", "PoC #08 (66.7%)", "PoC #09 (66.7%)"], "paradigm_cross_role": "★ ★ ★ MEDIUM #3 / Spring Data JPA method name derived query / DSL builder QueryDSL ❌ 솔직 / ★ ★ ★ ★ ★ 5 PoC isomorphic robust 입증"},
+  "cross_links": {"to_analysis_artifacts": ["input/rules.json (5 BR)", "input/domain.json (23 UC / 4 BC)", "input/antipatterns.json (2 AP)", "input/inventory.json (89 java + 23 endpoint + 7 tables)", "sql-inventory/sql-inventory.json (12 SQL × 11 컬럼)", "characterization/snapshots/ (7 snapshot)", "characterization/intent-vs-bug.md", "characterization/coverage.json (30.4%)"]}
+}

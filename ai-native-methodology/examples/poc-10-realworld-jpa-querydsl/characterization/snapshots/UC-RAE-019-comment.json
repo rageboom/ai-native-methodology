@@ -1,0 +1,11 @@
+{
+  "$comment": "★ phase 4.7 snapshot — UC-RAE-019 Comment 작성 (★ DDD Aggregate cascade).",
+  "snapshot_id": "SNAP-UC-RAE-019",
+  "use_case": "UC-RAE-019",
+  "endpoint": "POST /articles/{slug}/comments",
+  "controller_method": "CommentRestController.postComment",
+  "scenarios": [
+    {"id": "SCN-RAE-019-001", "name": "happy path — Comment cascade (★ Article Aggregate)", "given": {"slug": "hello-world", "body": "Great!"}, "when": "Article 조회 → comment 신규 추가 → cascade save", "then": {"expected_db_state_after": ["comment row 신규 (★ DDD Aggregate cascade)"]}, "intent_classification": [{"rule": "BR-RAE-004", "type": "intent", "note": "DDD Aggregate cascade"}]}
+  ],
+  "intent_vs_bug_summary": {"intent": ["BR-RAE-004"], "bug": [], "ambiguous": [], "self_recognized": []}
+}

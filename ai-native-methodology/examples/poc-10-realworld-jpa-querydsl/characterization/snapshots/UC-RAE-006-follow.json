@@ -1,0 +1,11 @@
+{
+  "$comment": "★ phase 4.7 snapshot — UC-RAE-006 Follow (★ uniqueness check).",
+  "snapshot_id": "SNAP-UC-RAE-006",
+  "use_case": "UC-RAE-006",
+  "endpoint": "POST /profiles/{username}/follow",
+  "controller_method": "ProfileRestController.follow",
+  "scenarios": [
+    {"id": "SCN-RAE-006-001", "name": "happy path — follow 신규", "given": {"username": "bob", "current_user": "alice"}, "when": "Follow uniqueness check + save", "then": {"expected_db_state_after": ["follow row 신규 (alice → bob)"]}, "intent_classification": [{"rule": "BR-RAE-005", "type": "intent", "note": "uniqueness + relation save"}]}
+  ],
+  "intent_vs_bug_summary": {"intent": ["BR-RAE-005"], "bug": [], "ambiguous": [], "self_recognized": []}
+}
