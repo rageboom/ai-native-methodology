@@ -19,6 +19,8 @@
 
 ★ ★ §8.1 strict 본체 격상 ❌. ★ ★ Senior STOP signal 강화 (★ 2 carry 사용자 결단 의존).
 
+★ ★ ★ ★ ★ **본 session 추가 진행 (Auto Mode (A) 결단)**: PoC #12 (raw query()) + PoC #13 (DSL builder QueryDSL) prelim 일괄 신설 (DEC-2026-05-08-poc-12-13-prelim-신설). ★ ★ ★ ★ 2 추가 정탐 결과 = ★ ★ realworld OSS 부재 사실 확보 → ★ ★ ★ ★ ★ (B) 정책 완화 회귀 추천 / 사용자 결단 의무 (A1 source 결정 + Day 1~3.5 vs A2 (B) 정책 완화 vs A3 v3.0 보류). 신규 carry C-ADR-2026-OSS-paradigm-reality (★ ADR 신설 의무).
+
 **v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
 
 **★ ★ research-v220 후 결단 흡수**:
