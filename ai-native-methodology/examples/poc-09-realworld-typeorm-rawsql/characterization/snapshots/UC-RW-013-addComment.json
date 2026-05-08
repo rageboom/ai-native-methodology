@@ -1,0 +1,21 @@
+{
+  "$comment": "★ phase 4.7 snapshot — UC-RW-013 Comment 추가 (★ TypeORM cascade relation).",
+  "snapshot_id": "SNAP-UC-RW-013",
+  "use_case": "UC-RW-013",
+  "endpoint": "POST /articles/:slug/comments",
+  "controller_method": "ArticleController.createComment",
+  "service_method": "ArticleService.addComment (★ commentRepository.save + article.comments.push + article.save)",
+  "sql_id": "ArticleService.addComment (logical INSERT comment + UPDATE article cascade)",
+  "layer": "integration",
+  "scenarios": [
+    {
+      "id": "SCN-RW-013-001",
+      "name": "happy path — Comment 신규 추가 (cascade)",
+      "given": {"request_body": {"comment": {"body": "Great article!"}}, "article": "slug='hello-world' 존재"},
+      "when": "articleRepository.findOne(slug) → comment 신규 + body 설정 → article.comments.push → commentRepository.save + articleRepository.save",
+      "then": {"expected_db_state_after": ["comment row 신규", "article.comments cascade 갱신"]},
+      "intent_classification": [{"rule": "BR-RW-006", "type": "intent", "note": "TypeORM cascade relation 정합"}]
+    }
+  ],
+  "intent_vs_bug_summary": {"intent": ["BR-RW-006 cascade"], "bug": [], "ambiguous": [], "self_recognized": []}
+}

@@ -1,0 +1,61 @@
+{
+  "$comment": "★ PoC #09 Day 1 — nestjs-realworld AP. Modern stack 정합 / 적대성 ↓↓ vs PoC #06+#07. 4 AP만 (★ vs PoC #08 8 AP / Modern Node.js = 더 클린).",
+  "project_id": "poc-09-realworld-typeorm-rawsql",
+  "antipatterns": [
+    {
+      "id": "AP-RW-001",
+      "title": "★ DELETE users/:slug — :slug 가 username 의미 (REST URL convention 부정합)",
+      "natural_language": "UserController.delete(@Param('slug') params) — URL 의 :slug 가 실제로는 :username 를 의미. REST 표준 = /users/:username 또는 /users/:userId. ★ ★ 의도된 design 또는 개발자 typo.",
+      "evidence_strength": "medium",
+      "severity": "low",
+      "applies_to": ["user.controller.ts:37"],
+      "modern_alternative": "★ /users/:username 명시 또는 :id 표준",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07_08": "★ ❌ (novel / Modern API design 미세한 issue)"
+    },
+    {
+      "id": "AP-RW-002",
+      "title": "★ ★ ★ ArticleService.findAll — `where('1 = 1')` placeholder (★ corroborate iBATIS 2 dynamic SQL paradigm)",
+      "natural_language": "createQueryBuilder + .where('1 = 1') + 4 conditional .andWhere — ★ ★ ★ TypeORM dynamic SQL paradigm. iBATIS 2 `<dynamic prepend=\"WHERE\">` + `<isNotEmpty>` 와 isomorphic. but `1=1` placeholder = ★ ★ smell — 모범 = builder 의 첫 .where(condition) + .andWhere chain.",
+      "evidence_strength": "high",
+      "severity": "low",
+      "applies_to": ["article.service.ts:32"],
+      "modern_alternative": "★ first conditional .where + chained .andWhere (without 1=1 placeholder)",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07_08": "★ ★ paradigm-cross corroboration #2 isomorphic — iBATIS 2 `<dynamic>` 변종 / paradigm shift Java→TS robust 입증"
+    },
+    {
+      "id": "AP-RW-003",
+      "title": "★ ★ Article favorite — UserRepository.save + ArticleRepository.save 분리 (★ 트랜잭션 boundary 부재)",
+      "natural_language": "ArticleService.favorite — user.favorites.push(article) + article.favoriteCount++ + 2 separate save 호출. ★ @Transactional 부재 / 부분 commit risk (favoriteCount 증가했는데 user.favorites push 실패 시 inconsistent).",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["article.service.ts:131-145"],
+      "modern_alternative": "★ NestJS @Transaction 또는 TypeORM EntityManager.transaction() 의무",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06_07_08": "★ ★ ★ PoC #07 BR-CAPITAL-003 (단일 트랜잭션 부재) 와 isomorphic — paradigm-cross 에서도 같은 anti-pattern 발견 = ★ AP 일반성 입증"
+    },
+    {
+      "id": "AP-RW-004",
+      "title": "★ Profile follow self-check 늦은 검증 (DB call 후)",
+      "natural_language": "ProfileService.follow — userRepository.findOne x2 (followingUser + followerUser) 후 followingUser.email === followerEmail 비교. ★ 비교 자체는 input 단계 가능 (DB call 전) → 불필요한 DB call.",
+      "evidence_strength": "medium",
+      "severity": "low",
+      "applies_to": ["profile.service.ts:50-60"],
+      "modern_alternative": "★ controller 또는 service 첫 줄 input validation (followerEmail === username 또는 followingUser 단일 fetch 후 비교)",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07_08": "★ ❌ novel"
+    }
+  ],
+  "summary": {
+    "total_ap": 4,
+    "critical": 0,
+    "high": 0,
+    "medium": 1,
+    "low": 3,
+    "likely_bug_count": 1,
+    "isomorphic_to_poc06_07_08_count": 2,
+    "novel_ap_count": 2,
+    "$comment_summary": "★ ★ ★ Modern Node.js stack 정합 → 적대성 ↓↓ / 4 AP / critical/high 0 / medium 1 (트랜잭션 boundary) / low 3. isomorphic 2 (dynamic SQL paradigm + 트랜잭션 부재) / novel 2. ★ vs PoC #08 8 AP (★ critical 평문 password / high N+1 fetch) / Modern stack 본질 차이."
+  }
+}

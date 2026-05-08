@@ -5,14 +5,16 @@
 
 **기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
 
-★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 일괄 처리)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수:
-- ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — DEC-2026-05-07-poc-08-종결 / 4축 모두 pass / paradigm-cross MEDIUM #1 사실 확보 / commit `da1a0ab`
-- ✅ **PoC #09 (TypeORM raw SQL) prelim 신설** — DEC-2026-05-08-poc-09-prelim-신설 / ★ ★ ★ ★ v2.2.0 final 격상 trigger **핵심** / paradigm + platform-cross strong / 본 session prelim DEC + skeleton + plan 1차
-- ✅ **PoC #10 (JPA QueryDSL) prelim 신설** — DEC-2026-05-08-poc-10-prelim-신설 / ★ v2.3.0 minor trigger / DSL builder paradigm / 본 session prelim DEC + skeleton + plan 1차
-- ⏳ **v2.2.0 final 격상 결단** = PoC #09 종결 후 (PoC #08 MEDIUM + PoC #09 strong 합산) / cooling-off 7d minimum 후 (2026-05-15+) / ★ 별도 session 자동 진행 carry
-- ⏳ **PoC #11 (EFI-WEB billing)** = 사용자 결단 (α) 우선순위 #1 / source 위임 도착 시 우선순위 복귀
+★ ★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 일괄 처리)** — 사용자 결단 (β) + "나머지 진행해줘":
+- ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — DEC-2026-05-07-poc-08-종결 / 4축 모두 pass / paradigm-cross MEDIUM #1 / commit `da1a0ab`
+- ✅ **PoC #09 (TypeORM / lujakob nestjs-realworld) Day 1~3.5 종결** — DEC-2026-05-08-poc-09-종결 / 4축 모두 pass / ★ ★ paradigm + platform-cross MEDIUM #2 사실 / ★ ★ ★ ★ raw query() strong 입증 ❌ 솔직 (★ pure realworld OSS 희소)
+- ✅ **PoC #10 (JPA QueryDSL) prelim 신설** — DEC-2026-05-08-poc-10-prelim-신설 / 별도 session
+- ✅ **★ ★ ★ ★ ★ 4 PoC SQL Inventory isomorphic 자격 사실 확보** (66.7% × 4 / paradigm + platform shift robust)
+- ⏳ **★ ★ ★ v2.2.0 final 격상 trigger ❌** (★ Senior STOP signal 정합 / PoC #08 MEDIUM + PoC #09 MEDIUM = 여전히 MEDIUM / strong corroboration 의무 vs 실측)
+- ⏳ **★ ★ ★ ★ 신규 carry C-paradigm-cross-strong-raw-sql** = ★ 사용자 결단 의무 (i) raw query() OSS 검색 vs (ii) MEDIUM 2 PoC = 격상 자격 정책 완화 vs (iii) v3.0 일괄
+- ⏳ **PoC #11 (EFI-WEB billing)** = 사용자 결단 (α) 우선순위 #1 / source 위임 도착 시 복귀
 
-★ ★ §8.1 strict 본체 격상 ❌ (★ paradigm-cross strong 의무 = PoC #09 핵심).
+★ ★ §8.1 strict 본체 격상 ❌. ★ Senior STOP signal 강화.
 
 **v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
 
