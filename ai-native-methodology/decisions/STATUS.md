@@ -5,7 +5,7 @@
 
 **기준일**: 2026-05-08 (★ ★ ★ ★ **v2.2.0-rc1 PRERELEASE — phase 4.8 (sql-inventory) 본체 격상 prerelease** — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ Senior STOP signal 흡수 / 7d minimum cooling-off / Modern ORM PoC #08 carry C-v2.2.0-6 = v2.2.0 final 격상 trigger / 본체 자산 7 + workflow + ADR-CHAIN-007 / ★ ★ scale-cross corroboration 입증 [PoC #06 단일책임 + PoC #07 다중책임 / 4/6=66.7% 동일 isomorphic] / ★ paradigm-cross = ★ Modern ORM PoC #08 carry / unit test 232 → **233** [+1 / sql-inventory-extractor 10 신설 workspace 14번째] / §8.1 strict 7/7 ✅ / build `ai-native-methodology-v2.2.0-rc1/` 272 files / chain harness 5 요소 변경 ❌)
 
-★ ★ ★ **본 session 2026-05-07 진행 (β 결단 흡수)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수 → **PoC #08 (jpetstore-6) 보류 해제 + Day 1 진입** (DEC-2026-05-07-poc-08-보류-해제.md / source clone + analysis 4종 / 본 session ✅). 다음 단계 (Day 1.5~3.5 + PoC #09 prelim + PoC #10 prelim + v2.2.0 final 결단) = ★ 별도 session 자동 진행 carry. PoC #11 (사용자 결단 α 우선순위 #1) source 위임 대기 = 보존 / source 도착 시 우선순위 #1 복귀.
+★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 흡수 / PoC #08 Day 1~3.5 일괄 종결)** — 사용자 결단 (β) "우선순위 2, 3, 4, 후속 연달아 다 진행" 흡수 → **PoC #08 (jpetstore-6) Day 1.5~3.5 종결** (DEC-2026-05-07-poc-08-종결.md / 4축 모두 pass). ★ ★ ★ ★ paradigm-cross corroboration #1 MEDIUM 자격 사실 확보 (★ 3 PoC isomorphic / SQL Inventory 4/6=66.7%). 본체 격상 ❌ (★ §8.1 strict / PoC #09 TypeORM raw SQL ★ paradigm-cross strong 의무). 다음 단계 (PoC #09 prelim + PoC #10 prelim + v2.2.0 final 결단) = ★ 별도 session 자동 진행 carry. PoC #11 (사용자 결단 α 우선순위 #1) source 위임 대기 = 보존.
 
 **v2.2.0-rc1 PRERELEASE** (2026-05-08 / 같은 날 — DEC-2026-05-08-v2.2.0-rc1-prerelease / ★ ★ ★ ★ phase 4.8 (sql-inventory) 본체 격상 prerelease / SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / ADR-CHAIN-007 / ★ ★ scale-cross corroboration ✅ + paradigm-cross ❌ → ★ Modern ORM PoC #08 carry / 본체 자산 7 + workflow + ADR / unit test 232 → 233 (+1 / sql-inventory-extractor workspace 14번째) / Senior cooling-off (b) v2.2.0-rc1 prerelease 7d minimum / chain harness 5 요소 변경 ❌)
 
@@ -71,16 +71,23 @@
 - ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
 - v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단
 
-**Day 0~1 진입 — PoC #08 (jpetstore-6) ★ ★ 보류 해제 + Day 1 ✅ (2026-05-07 / 본 session)**:
-- ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-08-prelim-신설.md`
-- ✅ skeleton — `examples/poc-08-realworld-mybatis/{source,input,sql-inventory,characterization}/` + README
-- ✅ INDEX entry / STATUS prelim 진입 표시 / 사용자 confirm 2건 resolved
-- ✅ commit `a27dfb0` (Day 0) + `a60404c` (Day 0.5 정탐 흡수)
-- ✅ plan 2차 + research 자산화 (★ 3 sub-agent 병렬 정탐 통합)
-- ✅ **★ ★ 보류 해제 (사용자 결단 (β) 2026-05-07 / "우선순위 2, 3, 4, 후속 연달아 다 진행" / 본 session)** — DEC-2026-05-07-poc-08-보류-해제.md
-- ✅ **Day 1 진입** — source clone (jpetstore-6 from `mybatis/jpetstore-6` GitHub) + sub-tree 정리 + 실측 정탐 + analysis 4종 (rules.json 8 BR / domain.json 19 UC / antipatterns.json 8 AP / inventory.json)
-- ★ Day 1 실측 vs 정탐 corroboration: 24 Java + 18 test (정탐 17 → +1) + 7 mapper XML + **25 SQL** + **19 endpoint** + 4 BC + 12 DB tables + LOC 9234. Stripes annotation = ★ 정탐 부정확 흡수 (`@HandlesEvent` + `@UrlBinding` ❌ / 실제 = `@DefaultHandler` + convention default). dynamic SQL = `<bind>` 4 만 / 그 외 0 (standard MyBatis 3). 8 AP 中 ★ 1 critical (평문 password) + 1 high (Order N+1 fetch).
-- ⏳ Day 1.5 (sql-inventory 11 컬럼) + Day 2 (phase 4.7) + Day 3 (chain 1) + Day 3.5 (REPORT) = ★ 별도 session 자동 진행 carry (C-v2.2.0-6a 진행)
+**Day 0~3.5 종결 — PoC #08 (jpetstore-6) ★ ★ ★ ★ 정식 등재 + 종결 (2026-05-07~08)**:
+- ✅ Day 0 (commit `a27dfb0`) — DEC prelim + skeleton
+- ✅ Day 0.5 (commit `a60404c`) — plan 2차 + research 자산화 (★ 3 sub-agent 병렬 정탐)
+- ✅ Day 1 (commit `6d96218`) — 보류 해제 + source clone (141 files) + analysis 4종 (8 BR + 19 UC + 8 AP)
+- ✅ **Day 1.5~3.5 (★ 본 session 종결)** — sql-inventory 11 컬럼 (25 SQL × 0 findings / 66.7%) + phase 4.7 (6 snapshot + intent-vs-bug + coverage / 100%) + D2.5 결단 + chain 1 planning-spec (UC 100% / 0 findings) + ratchet baseline write + REPORT + DEC 종결
+- ★ ★ ★ ★ **4축 모두 pass**:
+  - §3-A 자동화율 = **66.7%** (+27.9%p vs PoC #06 / R2 가설 입증)
+  - §3-B chain 1 UC **100%** + 0 findings
+  - phase 4.7 oracle = **16/16 = 100%** (D2 즉시 / D2.5 변동 없이 유지)
+  - SQL Inventory = **4/6 = 66.7%** (★ ★ 3 PoC isomorphic / paradigm shift robust)
+- ★ ★ ★ paradigm-cross corroboration #1 MEDIUM 자격 사실 확보 = standard-MyBatis floor 입증 / evolved-tag ceiling + annotation paradigm 입증 ❌ 솔직 (non-isomorphic in the hard direction)
+- ★ AP isomorphic 5 (Anemic 2 + N+1 2 + HashMap) + novel 3 (★ critical 평문 password + Stripes convention + 자체 sequence)
+- ★ SATD 0건 (Modern OSS reference 정합 / vs PoC #07 11 SATD)
+- ★ ★ DEC-CHAIN-006 §2 "spectrum 4번째 적용 강화" (Modern + Stripes paradigm)
+- ★ ★ ★ **본체 격상 ❌** (§8.1 strict / paradigm-cross strong 의무 = PoC #09 TypeORM raw SQL ★ 핵심)
+- carry resolved 3 + 잔존 4 + 신규 3
+- DEC-2026-05-07-poc-08-종결.md 등재
 
 **Day 0 진입 (★ 본 session 2026-05-07) — PoC #11 (EFI-WEB billing) ★ 우선**:
 - ✅ DEC prelim — `decisions/DEC-2026-05-07-poc-11-prelim-신설.md` (★ 사용자 결단 (α) 정합)

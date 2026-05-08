@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "generated_at": "2026-05-07T11:00:00Z",
+    "methodology_version": "v2.2.0-rc1",
+    "inputs_used": ["source_code", "documentation", "characterization", "sql_inventory"],
+    "confidence": 0.92,
+    "formula_version": "v1",
+    "confidence_breakdown": {
+      "use_cases": 0.95,
+      "business_rules_intent": 0.90,
+      "out_of_scope": 0.95,
+      "risks_and_constraints": 0.88
+    },
+    "$comment": "★ ★ confidence 0.92 — Modern stack + 단순 도메인 + reference webapp = ↑↑ vs PoC #06 (0.85) + PoC #07 (0.78) Legacy. ★ paradigm-cross MEDIUM 자격 정합."
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "sql-inventory/sql-inventory.json",
+      "characterization/snapshots/UC-PETSTORE-002-newAccount.json",
+      "characterization/snapshots/UC-PETSTORE-006-signon.json",
+      "characterization/snapshots/UC-PETSTORE-008-addItemToCart.json",
+      "characterization/snapshots/UC-PETSTORE-015-searchProducts.json",
+      "characterization/snapshots/UC-PETSTORE-018-newOrder.json",
+      "characterization/snapshots/UC-PETSTORE-019-viewOrder.json",
+      "characterization/intent-vs-bug.md",
+      "characterization/coverage.json",
+      "source/src/main/java/org/mybatis/jpetstore/web/actions/AccountActionBean.java",
+      "source/src/main/java/org/mybatis/jpetstore/web/actions/CartActionBean.java",
+      "source/src/main/java/org/mybatis/jpetstore/web/actions/CatalogActionBean.java",
+      "source/src/main/java/org/mybatis/jpetstore/web/actions/OrderActionBean.java",
+      "source/src/main/java/org/mybatis/jpetstore/service/AccountService.java",
+      "source/src/main/java/org/mybatis/jpetstore/service/CatalogService.java",
+      "source/src/main/java/org/mybatis/jpetstore/service/OrderService.java",
+      "source/src/main/resources/org/mybatis/jpetstore/mapper/*.xml (7 mapper / 25 SQL)"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "Pet Store 전자상거래 reference webapp (★ MyBatis 공식 reference) — 4 BC (catalog/account/cart/order) 표준 CRUD + multi-RDBMS (HSQLDB/MySQL/Oracle/Postgres) 호환. Modern Spring 6 + MyBatis 3.5 + Stripes 1.6 stack 학습 자료.",
+    "stakeholders": [
+      "shopper (구매자 / 카탈로그 탐색 + 장바구니 + 주문)",
+      "registered_user (계정 보유자 / 주문 이력 + 선호도)",
+      "system_admin (재고 + 카테고리 마스터 운영 / ★ jpetstore-6 기본 admin UI 제공 ❌)",
+      "developer (★ ★ MyBatis 학습자 — reference webapp 본질)"
+    ],
+    "success_criteria": [
+      "표준 CRUD 4 BC 정합 (Account/Catalog/Cart/Order)",
+      "5 단계 주문 단일 트랜잭션 atomic 보장 (BR-PETSTORE-004)",
+      "★ ★ phase 4.7 acceptance oracle = D2 후 16/16 = 100% 명확 분류 (Modern stack 정합)",
+      "★ paradigm-cross corroboration #1 MEDIUM 자격 사실 확보 (iBATIS 2 → MyBatis 3 / Spring 4 → 6)",
+      "★ ★ ★ 새 시스템 권고: Spring Boot + Spring MVC (Stripes paradigm shift) + Spring Security PasswordEncoder (★ AP-004 평문 password 차단) + JPA/QueryDSL 또는 MyBatis annotation (XML 단독 → 양식 진화)"
+    ]
+  },
+  "use_cases": [
+    { "id": "UC-PETSTORE-001", "name": "신규 계정 폼 표시", "description": "GET /account/NewAccount — form view (no service call)", "actors": ["shopper"], "preconditions": [], "postconditions": ["NewAccountForm.jsp 렌더"], "acceptance_criteria_refs": ["AC-PETSTORE-001"], "source_grounded_evidence": ["AccountActionBean.newAccountForm()"] },
+    { "id": "UC-PETSTORE-002", "name": "신규 계정 등록", "description": "POST /account/newAccount — ACCOUNT + PROFILE + SIGNON 3 테이블 단일 트랜잭션 insert", "actors": ["shopper"], "preconditions": ["username 미존재"], "postconditions": ["3 테이블 atomic insert / signonForm 또는 viewMain redirect"], "acceptance_criteria_refs": ["AC-PETSTORE-002"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-002-newAccount.json", "AccountService.insertAccount", "AccountMapper.xml insertAccount/insertProfile/insertSignon"] },
+    { "id": "UC-PETSTORE-003", "name": "계정 정보 수정 폼", "description": "GET /account/editAccountForm — getAccountByUsername 으로 현재 정보 fetch", "actors": ["registered_user"], "preconditions": ["session authenticated"], "postconditions": ["EditAccountForm.jsp 현재 정보 pre-fill"], "acceptance_criteria_refs": ["AC-PETSTORE-003"], "source_grounded_evidence": ["AccountActionBean.editAccountForm", "AccountMapper.xml getAccountByUsername"] },
+    { "id": "UC-PETSTORE-004", "name": "계정 정보 갱신", "description": "POST /account/editAccount — ACCOUNT + PROFILE 항상 갱신 / SIGNON 은 password 입력 시만 (Optional 분기)", "actors": ["registered_user"], "preconditions": ["session authenticated"], "postconditions": ["조건부 3 테이블 갱신 (atomic 트랜잭션)"], "acceptance_criteria_refs": ["AC-PETSTORE-004"], "source_grounded_evidence": ["AccountService.updateAccount (Optional<password> 분기)", "AccountMapper.xml updateAccount/updateProfile/updateSignon"] },
+    { "id": "UC-PETSTORE-005", "name": "로그인 폼 표시", "description": "GET /account/signonForm — form view", "actors": ["shopper"], "preconditions": [], "postconditions": ["SignonForm.jsp 렌더"], "acceptance_criteria_refs": ["AC-PETSTORE-005"], "source_grounded_evidence": ["AccountActionBean.signonForm"] },
+    { "id": "UC-PETSTORE-006", "name": "★ 로그인 (★ ★ 평문 password 검증 / critical bug)", "description": "POST /account/signon — getAccountByUsernameAndPassword 평문 비교 (★ AP-PETSTORE-004 critical 동반)", "actors": ["registered_user"], "preconditions": ["username/password 입력"], "postconditions": ["session.account 설정 / viewMain redirect"], "acceptance_criteria_refs": ["AC-PETSTORE-006"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-006-signon.json", "AccountMapper.xml getAccountByUsernameAndPassword (★ 평문)"], "modernization_note": "★ ★ ★ 새 시스템 = Spring Security + bcrypt PasswordEncoder 의무" },
+    { "id": "UC-PETSTORE-007", "name": "로그아웃", "description": "POST /account/signoff — session.invalidate", "actors": ["registered_user"], "preconditions": ["session authenticated"], "postconditions": ["session destroy / viewMain redirect"], "acceptance_criteria_refs": ["AC-PETSTORE-007"], "source_grounded_evidence": ["AccountActionBean.signoff"] },
+    { "id": "UC-PETSTORE-008", "name": "장바구니 상품 추가", "description": "POST /cart/addItemToCart — Cart session bean (DB persistence ❌) 에 lineItem 추가 + 재고 확인", "actors": ["shopper"], "preconditions": ["workingItemId 입력"], "postconditions": ["Cart session 갱신 / Cart.jsp"], "acceptance_criteria_refs": ["AC-PETSTORE-008"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-008-addItemToCart.json", "CartActionBean.addItemToCart", "ItemMapper.xml getItem + getInventoryQuantity"] },
+    { "id": "UC-PETSTORE-009", "name": "장바구니 상품 제거", "description": "POST /cart/removeItemFromCart — session Cart 에서 lineItem 제거", "actors": ["shopper"], "preconditions": ["Cart 에 itemId 존재"], "postconditions": ["Cart session 갱신"], "acceptance_criteria_refs": ["AC-PETSTORE-009"], "source_grounded_evidence": ["CartActionBean.removeItemFromCart"] },
+    { "id": "UC-PETSTORE-010", "name": "장바구니 수량 갱신", "description": "POST /cart/updateCartQuantities — form bulk update", "actors": ["shopper"], "preconditions": ["Cart non-empty"], "postconditions": ["lineItem 수량 일괄 갱신"], "acceptance_criteria_refs": ["AC-PETSTORE-010"], "source_grounded_evidence": ["CartActionBean.updateCartQuantities"] },
+    { "id": "UC-PETSTORE-011", "name": "메인 페이지 표시", "description": "GET /catalog/viewMain — Main.jsp + getCategoryList", "actors": ["shopper"], "preconditions": [], "postconditions": ["Main.jsp 렌더"], "acceptance_criteria_refs": ["AC-PETSTORE-011"], "source_grounded_evidence": ["CatalogActionBean.viewMain", "CategoryMapper.xml getCategoryList"] },
+    { "id": "UC-PETSTORE-012", "name": "카테고리 보기", "description": "GET /catalog/viewCategory — getCategory + getProductListByCategory", "actors": ["shopper"], "preconditions": ["categoryId 입력"], "postconditions": ["Category.jsp 상품 목록"], "acceptance_criteria_refs": ["AC-PETSTORE-012"], "source_grounded_evidence": ["CatalogActionBean.viewCategory", "CategoryMapper.xml getCategory", "ProductMapper.xml getProductListByCategory"] },
+    { "id": "UC-PETSTORE-013", "name": "상품 보기", "description": "GET /catalog/viewProduct — getProduct + getItemListByProduct", "actors": ["shopper"], "preconditions": ["productId 입력"], "postconditions": ["Product.jsp 아이템 목록"], "acceptance_criteria_refs": ["AC-PETSTORE-013"], "source_grounded_evidence": ["CatalogActionBean.viewProduct", "ProductMapper.xml getProduct", "ItemMapper.xml getItemListByProduct"] },
+    { "id": "UC-PETSTORE-014", "name": "아이템 보기", "description": "GET /catalog/viewItem — getItem (3 테이블 join / 재고 포함)", "actors": ["shopper"], "preconditions": ["itemId 입력"], "postconditions": ["Item.jsp 상세 + 재고"], "acceptance_criteria_refs": ["AC-PETSTORE-014"], "source_grounded_evidence": ["CatalogActionBean.viewItem", "ItemMapper.xml getItem"] },
+    { "id": "UC-PETSTORE-015", "name": "★ 상품 검색 (N+1 검색 / AP-005)", "description": "GET /catalog/searchProducts — keyword.split 후 매 keyword 별 SQL 호출 (★ ★ N+1)", "actors": ["shopper"], "preconditions": ["keyword 입력"], "postconditions": ["aggregate Product list / SearchProducts.jsp"], "acceptance_criteria_refs": ["AC-PETSTORE-015"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-015-searchProducts.json", "CatalogService.searchProductList", "ProductMapper.xml searchProductList"], "modernization_note": "★ MyBatis `<foreach>` 단일 SQL OR 또는 FULL TEXT SEARCH 권장" },
+    { "id": "UC-PETSTORE-016", "name": "주문 목록 조회", "description": "GET /order/listOrders — 사용자별 주문 목록 (ORDER BY ORDERDATE)", "actors": ["registered_user"], "preconditions": ["session authenticated"], "postconditions": ["ListOrders.jsp 주문 목록"], "acceptance_criteria_refs": ["AC-PETSTORE-016"], "source_grounded_evidence": ["OrderActionBean.listOrders", "OrderMapper.xml getOrdersByUsername"] },
+    { "id": "UC-PETSTORE-017", "name": "신규 주문 폼", "description": "GET /order/newOrderForm — Cart → Order pre-fill", "actors": ["registered_user"], "preconditions": ["Cart non-empty"], "postconditions": ["NewOrderForm.jsp 주소+카드 폼"], "acceptance_criteria_refs": ["AC-PETSTORE-017"], "source_grounded_evidence": ["OrderActionBean.newOrderForm"] },
+    { "id": "UC-PETSTORE-018", "name": "★ ★ 주문 등록 (5 단계 단일 트랜잭션 / N+1 update + sequence race)", "description": "POST /order/newOrder — sequence + N×inventory + order + status + N×lineItem 5 단계 atomic", "actors": ["registered_user"], "preconditions": ["Cart non-empty + ship/bill 입력"], "postconditions": ["5 단계 atomic insert / ViewOrder.jsp"], "acceptance_criteria_refs": ["AC-PETSTORE-018"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-018-newOrder.json", "OrderService.insertOrder (@Transactional)", "Sequence/Item/Order/LineItem Mapper"], "modernization_note": "★ DB native sequence dialect 분기 + nested resultMap 또는 batch insert 권장" },
+    { "id": "UC-PETSTORE-019", "name": "★ ★ 주문 상세 조회 (N+1 fetch / AP-006)", "description": "GET /order/viewOrder — order + lineItems + N×item + N×inventory (★ ★ 1+1+2N SQL)", "actors": ["registered_user"], "preconditions": ["orderId 입력 + 사용자 권한"], "postconditions": ["ViewOrder.jsp 상세"], "acceptance_criteria_refs": ["AC-PETSTORE-019"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-019-viewOrder.json", "OrderService.getOrder (@Transactional / N+1)", "Order/LineItem/Item Mapper"], "modernization_note": "★ ★ ★ MyBatis nested resultMap 또는 단일 JOIN 의무 (N+1 차단)" }
+  ],
+  "business_rules": [
+    { "id": "BR-PETSTORE-001", "statement": "Account 생성 시 ACCOUNT + PROFILE + SIGNON 3 테이블 단일 트랜잭션 insert (atomicity 의무)", "applies_to": ["UC-PETSTORE-002"], "br_type": "transaction", "is_intent": true },
+    { "id": "BR-PETSTORE-002", "statement": "Account 갱신 시 password Optional 분기 — length > 0 만 SIGNON 갱신", "applies_to": ["UC-PETSTORE-004"], "br_type": "conditional_update", "is_intent": true },
+    { "id": "BR-PETSTORE-003", "statement": "Product 검색 = keyword whitespace split + lowercase + LIKE 양쪽 wildcard / multi-keyword aggregation (★ N+1 동반 / D2.5 결단 = bug 격상)", "applies_to": ["UC-PETSTORE-015"], "br_type": "search", "is_intent": false, "is_likely_bug": true, "modernization_note": "MyBatis `<foreach>` 단일 SQL OR 의무" },
+    { "id": "BR-PETSTORE-004", "statement": "Order 생성 = sequence + N×inventory + orderHeader + orderStatus + N×lineItem 5 단계 단일 트랜잭션", "applies_to": ["UC-PETSTORE-018"], "br_type": "transaction", "is_intent": true },
+    { "id": "BR-PETSTORE-005", "statement": "Order 조회 = order + lineItems + N×item + N×inventory fetch chaining (★ ★ N+1 / bug)", "applies_to": ["UC-PETSTORE-019"], "br_type": "fetch_chain", "is_intent": false, "is_likely_bug": true, "modernization_note": "nested resultMap 또는 단일 JOIN 의무" },
+    { "id": "BR-PETSTORE-006", "statement": "★ ★ ★ 평문 password — signon 테이블 평문 저장 + 평문 비교 (★ critical 보안 bug)", "applies_to": ["UC-PETSTORE-006", "UC-PETSTORE-002", "UC-PETSTORE-004"], "br_type": "authentication", "is_intent": false, "is_likely_bug": true, "modernization_note": "★ ★ ★ Spring Security + bcrypt/argon2 PasswordEncoder 의무" },
+    { "id": "BR-PETSTORE-007", "statement": "favcategory 기반 banner 표시 (Profile.favcategory → bannerdata)", "applies_to": ["UC-PETSTORE-002", "UC-PETSTORE-003", "UC-PETSTORE-004"], "br_type": "personalization", "is_intent": true },
+    { "id": "BR-PETSTORE-008", "statement": "DB native sequence ❌ — 자체 sequence 테이블 + UPDATE 후 SELECT race condition risk (D2.5 결단 = ambiguous 유지 / multi-RDBMS 호환 의도 + race risk 동반)", "applies_to": ["UC-PETSTORE-018"], "br_type": "id_generation", "is_intent": true, "is_likely_bug": true, "modernization_note": "DB native sequence dialect 분기 또는 UUID v4 / Snowflake ID 권장" }
+  ],
+  "out_of_scope": [
+    "admin UI (★ jpetstore-6 = customer-facing 만 / admin 부재)",
+    "결제 처리 (★ ★ credit card 정보는 ORDERS 에 저장 만 / 실제 결제 게이트웨이 호출 ❌)",
+    "재고 보충 / SKU 관리 (★ INVENTORY 차감만 / 보충 흐름 부재)",
+    "supplier 관리 (★ supplier 테이블 존재 / actions 부재)",
+    "추천 엔진 / 유사 상품 (★ Modern e-commerce 표준 기능 부재)",
+    "다국어 (★ Profile.langpref 저장만 / i18n message 미구현)",
+    "★ ★ Stripes paradigm 마이그레이션 흐름 (★ 새 시스템 Spring MVC 권장 / 본 PoC = 측정만 / chain 2~4 carry)"
+  ],
+  "risks_and_constraints": [
+    { "id": "R-001", "type": "security", "severity": "critical", "description": "★ ★ ★ 평문 password 저장 + 평문 비교 (BR-006 / AP-004) — production 차단 의무" },
+    { "id": "R-002", "type": "performance", "severity": "high", "description": "★ ★ Order 조회 N+1 fetch (1+1+2N SQL / lineItem 수에 비례)" },
+    { "id": "R-003", "type": "performance", "severity": "medium", "description": "Product 검색 N+1 (keyword 수에 비례)" },
+    { "id": "R-004", "type": "concurrency", "severity": "medium", "description": "Sequence race condition (UPDATE 후 SELECT non-atomic / multi-RDBMS 호환 의도)" },
+    { "id": "R-005", "type": "design", "severity": "medium", "description": "Anemic Domain + Anemic Service (DDD 위반 / PoC #06+#07 isomorphic 강화)" },
+    { "id": "R-006", "type": "paradigm", "severity": "low", "description": "Stripes convention default routing — 학습 cost (★ 새 시스템 Spring MVC 명시 권장)" },
+    { "id": "R-007", "type": "schema", "severity": "low", "description": "ORDERSTATUS LINENUM = ORDERID duplicate (★ schema design ambiguous / 단일 status row 의도)" },
+    { "id": "R-008", "type": "type-safety", "severity": "low", "description": "HashMap<String,Object> parameter 부분 사용 (★ insertOrder 내부) — DTO 권장" }
+  ],
+  "phase_4_7_acceptance_oracle": {
+    "$comment": "★ ★ paradigm-cross corroboration #1 / 4번째 phase 4.7 spectrum 적용",
+    "named_classified_ratio_day2": "16/16 = 100%",
+    "named_classified_ratio_day2_5_after": "16/16 = 100% (분류 변동 / 명시 자격 유지)",
+    "intent_count": 5,
+    "bug_count": 9,
+    "ambiguous_count": 2,
+    "self_recognized_count": 0,
+    "spectrum_role": "★ Modern + Stripes paradigm — DEC-CHAIN-006 §결정 §2 'spectrum 4번째 적용 강화'"
+  },
+  "sql_inventory_summary": {
+    "total_sql_operations": 25,
+    "auto_ratio_external_6": "4/6 = 66.7%",
+    "isomorphic_with": ["PoC #06 (66.7%)", "PoC #07 (66.7%)"],
+    "paradigm_cross_role": "★ corroboration #1 / iBATIS 2 → MyBatis 3 paradigm shift / MEDIUM 자격"
+  },
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json (8 BR / BR-PETSTORE-001~008)",
+      "input/domain.json (19 UC / 4 BC / UC-PETSTORE-001~019)",
+      "input/antipatterns.json (8 AP / AP-PETSTORE-001~008)",
+      "input/inventory.json (24 Java + 18 test + 7 mapper + 25 SQL + 19 endpoint + 12 tables + LOC 9234)",
+      "sql-inventory/sql-inventory.json (25 SQL × 11 컬럼 / paradigm-cross MEDIUM #1)",
+      "characterization/snapshots/ (6 snapshot / 8 scenario)",
+      "characterization/intent-vs-bug.md (16 항목 분류 / D2.5 결단 후 100%)",
+      "characterization/coverage.json (matrix 19 UC / coverage 31.6% / ratchet baseline)"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-006 로그인 (★ ★ ★ 평문 password 비교 / BR-PETSTORE-006 / AP-PETSTORE-004 critical bug).",
+  "snapshot_id": "SNAP-UC-PETSTORE-006",
+  "use_case": "UC-PETSTORE-006",
+  "endpoint": "POST /account/signon.action (Stripes convention)",
+  "controller_method": "AccountActionBean.signon",
+  "service_method": "AccountService.getAccount(username, password)",
+  "sql_id": "AccountMapper.getAccountByUsernameAndPassword",
+  "layer": "integration",
+  "data_source_status": "★ HSQLDB test data — AccountMapperTest 존재",
+  "scenarios": [
+    {
+      "id": "SCN-PETSTORE-006-001",
+      "name": "happy path — 정확한 username/password 로 로그인",
+      "given": {
+        "request_params": { "username": "j2ee", "password": "j2ee" },
+        "ACCOUNT_state": "USERID='j2ee' 존재 + SIGNON.USERNAME='j2ee' / PASSWORD='j2ee' (★ ★ 평문)"
+      },
+      "when": "AccountActionBean.signon() → AccountService.getAccount('j2ee', 'j2ee') → SQL: SELECT ... WHERE ACCOUNT.USERID = #{param1} AND SIGNON.PASSWORD = #{param2}",
+      "then": {
+        "expected_response": "Account 객체 반환 / session 에 account 저장 / Resolution = redirect to viewMain",
+        "expected_session_state": "session.authenticated=true / account=Account(j2ee, ...)"
+      },
+      "intent_classification": [
+        { "rule": "BR-PETSTORE-006", "type": "bug", "note": "★ ★ ★ 평문 password 비교 (AP-PETSTORE-004) — 보안 critical" }
+      ],
+      "behavior_likely_bug": [
+        "★ ★ ★ AP-PETSTORE-004 — 평문 password 비교 (해시 ❌) — production 차단 의무"
+      ]
+    },
+    {
+      "id": "SCN-PETSTORE-006-002",
+      "name": "edge — 잘못된 password — Account null 반환 (no row)",
+      "given": {
+        "request_params": { "username": "j2ee", "password": "wrong" }
+      },
+      "when": "AccountService.getAccount('j2ee', 'wrong') → SQL no match",
+      "then": {
+        "expected_response": "Account null 또는 empty result / Stripes ValidationError / signonForm 으로 redirect"
+      },
+      "intent_classification": [
+        { "rule": "BR-PETSTORE-006", "type": "intent", "note": "잘못된 인증 거부 = 정합" }
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-PETSTORE-006 인증 거부 (잘못된 case)"],
+    "bug": ["AP-PETSTORE-004 평문 password (critical)"],
+    "ambiguous": [],
+    "self_recognized": []
+  }
+}

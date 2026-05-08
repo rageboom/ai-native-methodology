@@ -1,0 +1,53 @@
+{
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-008 장바구니 상품 추가 (★ session-only Cart / DB persistence ❌).",
+  "snapshot_id": "SNAP-UC-PETSTORE-008",
+  "use_case": "UC-PETSTORE-008",
+  "endpoint": "POST /cart/addItemToCart.action",
+  "controller_method": "CartActionBean.addItemToCart",
+  "service_method": "(★ ★ direct mapper 호출 / Service 부재 — Cart = session-only)",
+  "sql_id": "ItemMapper.getItem + getInventoryQuantity",
+  "layer": "controller",
+  "data_source_status": "Cart = session bean (CartActionBean @SessionScope) / DB persistence ❌",
+  "scenarios": [
+    {
+      "id": "SCN-PETSTORE-008-001",
+      "name": "happy path — 신규 itemId 장바구니 추가",
+      "given": {
+        "request_params": { "workingItemId": "EST-1" },
+        "session_state": "Cart 비어있음 또는 EST-1 미존재"
+      },
+      "when": "CartActionBean.addItemToCart() → catalogService.isItemInStock(EST-1) → Cart.addItem(item, isInStock)",
+      "then": {
+        "expected_session_state": "Cart 에 EST-1 신규 lineItem 추가 (quantity=1 / unitPrice=item.listPrice)",
+        "expected_response": "ForwardResolution to Cart.jsp"
+      },
+      "intent_classification": [
+        { "rule": "intent — Cart session 관리", "type": "intent", "note": "session-only cart = 표준 e-commerce 패턴" }
+      ],
+      "behavior_to_preserve": [
+        "Cart session-only persistence (DB ❌)",
+        "재고 확인 (getInventoryQuantity) 후 lineItem 추가"
+      ]
+    },
+    {
+      "id": "SCN-PETSTORE-008-002",
+      "name": "edge — 이미 장바구니에 있는 itemId 추가 시 수량 증가",
+      "given": {
+        "session_state": "Cart 에 EST-1 (quantity=1) 존재"
+      },
+      "when": "CartActionBean.addItemToCart(workingItemId=EST-1)",
+      "then": {
+        "expected_session_state": "Cart EST-1 quantity=2 (incrementQuantity)"
+      },
+      "intent_classification": [
+        { "rule": "intent — 동일 item 수량 증가", "type": "intent", "note": "표준 cart 동작" }
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["Cart session 관리", "재고 확인 후 추가"],
+    "bug": [],
+    "ambiguous": [],
+    "self_recognized": []
+  }
+}

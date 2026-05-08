@@ -1,0 +1,7 @@
+{
+  "generated_at": "2026-05-07",
+  "source_commit_sha": "unknown",
+  "project_id": "poc-08-realworld-mybatis",
+  "coverage_strategy": "ratchet",
+  "coverage_ratio": 0.3157894736842105
+}

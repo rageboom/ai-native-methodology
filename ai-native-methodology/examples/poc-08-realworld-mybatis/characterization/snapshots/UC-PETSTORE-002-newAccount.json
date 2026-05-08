@@ -1,0 +1,66 @@
+{
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-002 신규 계정 등록 (3 테이블 단일 트랜잭션 / BR-PETSTORE-001).",
+  "snapshot_id": "SNAP-UC-PETSTORE-002",
+  "use_case": "UC-PETSTORE-002",
+  "endpoint": "POST /account/newAccount.action (Stripes convention)",
+  "controller_method": "AccountActionBean.newAccount",
+  "service_method": "AccountService.insertAccount (★ @Transactional)",
+  "sql_id": "AccountMapper.insertAccount + insertProfile + insertSignon",
+  "layer": "integration",
+  "data_source_status": "★ HSQLDB test data (jpetstore-hsqldb-data.sql) — Mapper test class 존재 (AccountMapperTest)",
+  "scenarios": [
+    {
+      "id": "SCN-PETSTORE-002-001",
+      "name": "happy path — 신규 사용자 등록 (3 테이블 atomic insert)",
+      "given": {
+        "request_params": {
+          "username": "newuser01",
+          "password": "secret123",
+          "email": "newuser@example.com",
+          "firstName": "New",
+          "lastName": "User",
+          "phone": "555-1234",
+          "address1": "100 Main St",
+          "city": "Springfield",
+          "state": "IL",
+          "zip": "62701",
+          "country": "USA",
+          "languagePreference": "english",
+          "favouriteCategoryId": "DOGS",
+          "listOption": true,
+          "bannerOption": true
+        },
+        "ACCOUNT_initial_state": "newuser01 미존재"
+      },
+      "when": "AccountActionBean.newAccount() → AccountService.insertAccount(account) → 3 mapper insert 단일 트랜잭션",
+      "then": {
+        "expected_db_state_after": [
+          "ACCOUNT row 신규 (USERID='newuser01' / EMAIL/FIRSTNAME/LASTNAME/주소 등 12 컬럼)",
+          "PROFILE row 신규 (USERID='newuser01' / LANGPREF='english' / FAVCATEGORY='DOGS' / MYLISTOPT=1 / BANNEROPT=1) — `<bind>` boolean → 1/0",
+          "SIGNON row 신규 (USERNAME='newuser01' / PASSWORD='secret123' / ★ ★ 평문)"
+        ],
+        "expected_response": "Resolution = redirect to signonForm 또는 catalog viewMain",
+        "transaction_boundary": "★ Spring @Transactional / 3 insert 모두 commit 또는 모두 rollback"
+      },
+      "intent_classification": [
+        { "rule": "BR-PETSTORE-001", "type": "intent", "note": "단일 트랜잭션 atomic 보장 = 회원가입 정합" },
+        { "rule": "BR-PETSTORE-007", "type": "intent", "note": "favcategory + langpref personalization" },
+        { "rule": "BR-PETSTORE-006", "type": "bug", "note": "★ ★ ★ 평문 password 저장 (AP-PETSTORE-004) — production 보안 critical" }
+      ],
+      "behavior_to_preserve": [
+        "@Transactional atomic 보장 (BR-PETSTORE-001)",
+        "`<bind>` boolean → 1/0 변환 (PROFILE)",
+        "favcategory + langpref personalization (BR-PETSTORE-007)"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ AP-PETSTORE-004 — 평문 password 저장 (signon 테이블 schema 변경 의무 / bcrypt 도입)"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-PETSTORE-001 단일 트랜잭션", "BR-PETSTORE-007 personalization"],
+    "bug": ["AP-PETSTORE-004 평문 password"],
+    "ambiguous": [],
+    "self_recognized": []
+  }
+}
