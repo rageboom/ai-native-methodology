@@ -9,7 +9,50 @@
 
 ---
 
-## [v2.3.0-rc1] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ MINOR PRERELEASE Phase 1 — schema 12번째 컬럼 `migration_priority` P0~P3 + ADR-CHAIN-009 Gartner TIME SQL 단위 보류)
+## [v2.3.0] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ MINOR FINAL — Phase 1 + Phase 2 일괄 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-010)
+
+> **★ ★ ★ ★ ★ ★ ★ MINOR FINAL** — v2.3.0-rc1 prerelease (같은 날 2026-05-12 / commit `de1bae1` / git tag `v2.3.0-rc1`) 후 Phase 2 작업 종결 → final 격상. 옵션 D (REVISE 완전 흡수) Phase 1 + Phase 2 일괄 자산화. release-readiness §8.1 strict 7/7 ✅ + npm test 237 pass (284 total with _shared) / 0 fail.
+
+### Phase 2 변경 사항 (v2.3.0-rc1 → v2.3.0)
+
+- **★ ★ ★ ★ ★ ★ ADR-CHAIN-010 신설** — `docs/adr/ADR-CHAIN-010-patterns-extension-v3-and-sub-rule.md` "patterns_extension_v3 정식 도입 (MyBatis 3 advanced features 한정) + Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule 자산화". MyBatis 3 cache / discriminator / typeHandler 공식 docs 정합 + PoC #06+#07 AP 5종 isomorphic 사실.
+- **★ ★ ★ ★ ★ sub-rule 신설** — `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` (신규 sub-rules/ 디렉토리). 5 AP isomorphic 명세: Map<String,Object> 강제 캐스팅 + Anemic Service + WITH(NOLOCK) 무차별 + 공유 SQL 조각 부재 + 자조 SATD (KL-SATD). ≥ 2 PoC + 단일+다중책임 spectrum corroboration = **단계 5 신뢰도** 자격.
+- **★ ★ ★ ★ patterns_extension_v3 schema 신설** — `schemas/sql-inventory.schema.json` `patternsExtensionV3` $def + root-level `patterns_extension_v3` reference. 3 패턴 nested (pattern_5_cache + pattern_6_discriminator + pattern_7_typeHandler). **optional / MyBatis 3+ 한정** (iBATIS 2 단독 stack 부적합).
+- **★ deliverable 24-sql-inventory.md 보강** — 제목 + 사상 절 + §6.1 patterns_extension_v3 정식 (3 패턴 + iBATIS 2 비호환 비교) + §13 carry 표 C-v2.2.0-3 / C-v2.2.0-4 resolved 마킹.
+- **★ 신규 fixture + test 1** — `valid/with-patterns-extension-v3/sql-inventory.json` (cache + discriminator + typeHandler aggregate_metrics 예시) + 1 신규 test (patterns_extension_v3 optional / 회귀 ❌ 검증).
+- **★ unit test 236 → 237** (+1 / sql-inventory-extractor 13 → 14 / 284 total with _shared).
+
+### v2.3.0 final 자격 — 8/8
+
+1. ✅ chain harness 5 요소 enforcement 보존 (v2.0~v2.3 일관)
+2. ✅ schema patterns_extension_v3 + migration_priority 양쪽 추가 + backward-compat 회귀 fixture 통과 (PoC #06+#07 11 컬럼 row test pass)
+3. ✅ ADR-CHAIN-009 + ADR-CHAIN-010 신설 + dynamic 검사 통과 (8 → 10 ADR-CHAIN)
+4. ✅ unit test 회귀 0 fail (237 pass / 14 workspace)
+5. ✅ deliverable 24 + sub-rule deliverable 정합 갱신
+6. ✅ ≥ 5 PoC corroboration 보존 (PoC #06+#07+#08+#09+#10 SQL Inventory isomorphic)
+7. ✅ release-readiness §8.1 strict 7/7
+8. ✅ build artifact dist/ai-native-methodology-v2.3.0/ 273+ files / CHECKSUMS OK
+
+### resolved carry (Phase 2 / ADR-CHAIN-010 정합)
+
+- ~~C-v2.2.0-3 patterns_extension_v3~~ ✅ resolved (schema 정식 도입 / Phase 3 Modern PoC corroboration carry)
+- ~~C-v2.2.0-4 Spring 4.1 + iBATIS 2 sub-rule~~ ✅ resolved (`spring41-ibatis2-isomorphic.md` 신설 / 단계 5 신뢰도)
+
+### 별도 sprint carry (v2.4 / v3.0)
+
+- ★ C-v2.3.0-gartner-time-application-level — `methodology-spec/deliverables/application-portfolio-time.md` 신설 후보 (Gartner TIME application portfolio 별도 deliverable / ADR-CHAIN-009 §2)
+
+### 잔존 carry (v2.2.x patch / v2.x)
+
+- C-v2.2.0-1 (NoSQL/Prisma) → paradigm shift / v3.0 후보
+- C-v2.2.0-2 (sql-inventory baseline ratchet) → v2.2.x patch
+- C-v2.2.0-5 (다중책임 spectrum) → PoC #11 종결 후
+- C-v2.2.0-7 (iBATIS 2 전용 dynamic 태그 sub-classification) → v2.2.x patch
+- PoC #11 (EFI-WEB billing) source 위임 대기
+
+---
+
+## [v2.3.0-rc1] — 2026-05-12 (★ ★ ★ ★ ★ ★ MINOR PRERELEASE Phase 1 — schema 12번째 컬럼 `migration_priority` P0~P3 + ADR-CHAIN-009 Gartner TIME SQL 단위 보류)
 
 > **★ ★ ★ ★ ★ ★ MINOR Phase 1 PRERELEASE** — v2.3.0 minor sprint 옵션 D (REVISE 완전 흡수 / Senior critique 권고 100% 채택) 정합. Phase 1 = schema 12번째 컬럼 + 회귀 fixture + ADR-CHAIN-009. Phase 2 (patterns_extension_v3 + Spring 4.1 + iBATIS 2 sub-rule) = 별도 session 후속 carry.
 

@@ -1,6 +1,6 @@
-# 산출물 #24: SQL Inventory (★ v2.2.0-rc1 신설 — SQL 단위 인벤토리 11 컬럼 / ★ v2.3.0-rc1 — `migration_priority` 12번째 컬럼 추가 + RDB 한정 sub-phase)
+# 산출물 #24: SQL Inventory (★ v2.2.0-rc1 신설 — SQL 단위 인벤토리 11 컬럼 / ★ v2.3.0-rc1 Phase 1 — `migration_priority` 12번째 컬럼 추가 / ★ v2.3.0 Phase 2 — patterns_extension_v3 정식 도입 + Spring 4.1 + iBATIS 2 sub-rule + RDB 한정 sub-phase)
 
-> **사상**: ADR-CHAIN-007 phase 4.8 정식 도입 + ADR-CHAIN-008 paradigm-cross 정책 완화 (5 PoC isomorphic) + **★ ADR-CHAIN-009 Gartner TIME SQL 단위 보류 / `migration_priority` P0~P3 대체 채택** + Michael Feathers Characterization Testing (2004) "production = its own specification" + AWS Migration Acceleration Program (MAP) Assess phase
+> **사상**: ADR-CHAIN-007 phase 4.8 정식 도입 + ADR-CHAIN-008 paradigm-cross 정책 완화 (5 PoC isomorphic) + **★ ADR-CHAIN-009 Gartner TIME SQL 단위 보류 / `migration_priority` P0~P3 대체** + **★ ★ ADR-CHAIN-010 patterns_extension_v3 정식 도입 (MyBatis 3+ 한정) + Spring 4.1 + iBATIS 2 spectrum sub-rule 자산화** + Michael Feathers Characterization Testing (2004) "production = its own specification" + AWS Migration Acceleration Program (MAP) Assess phase
 > **schema**: `schemas/sql-inventory.schema.json` (★ 31번째 schema)
 > **생성 phase**: Phase 4.8 (★ phase 4.7 characterization 후 / phase 5-1 + 5-2 전 / RDB 한정 sub-phase)
 > **≥ 5 PoC isomorphic** (★ scale + paradigm + ORM + platform + language + responsibility-cross MEDIUM × 5 robust strong / ADR-CHAIN-008): PoC #06+#07 (Spring 4.1 + iBATIS 2) + PoC #08 (MyBatis 3) + PoC #09 (TypeORM) + PoC #10 (Spring Data JPA) — 외부 6 컬럼 자동화 4/6 = 66.7% × 5 (모두 동일 / scale + paradigm 무관 isomorphic)
@@ -141,13 +141,19 @@ PoC #07 D12 결단 (b) nested patterns object 패턴. ★ optional / Legacy iBAT
 | pattern_3_result_mapping | resultClass + parameterClass + parameterMap | ✅ MyBatis sqlmap-xml.html | ✅ 100% |
 | pattern_4_shared_sql_fragments | iBATIS `<sql id>` + `<include refid>` | ✅ MyBatis sqlmap-xml.html | ✅ 100% |
 
-### 6.1 ★ patterns_extension_v3 carry (Agent 1 빈틈 #2)
+### 6.1 ★ ★ patterns_extension_v3 정식 (★ v2.3.0 Phase 2 / ADR-CHAIN-010)
 
-| 패턴 (carry) | 정의 | trigger |
-|---|---|---|
-| pattern_5_cache (carry) | namespace-level useCache / cache-ref 파급 | C-v2.2.0-3 (≥ 2 Legacy PoC patterns 변형 후) |
-| pattern_6_discriminator (carry) | 조건부 result mapping | C-v2.2.0-3 |
-| pattern_7_typeHandler (carry) | Java↔JDBC 타입 매핑 | C-v2.2.0-3 |
+★ ★ MyBatis 3+ advanced features 한정 / optional. iBATIS 2 단독 stack 부적합 (별도 axis / patterns_extension_v2 사용).
+
+| 패턴 | MyBatis 3 정의 | 자동 추출 | iBATIS 2 비호환 |
+|---|---|---|---|
+| pattern_5_cache | `<cache>` namespace 단위 second-level cache + `<cache-ref>` + `@CacheNamespace` | ✅ 80%+ | iBATIS 2 = `<cacheModel>` (API 비호환) |
+| pattern_6_discriminator | `<discriminator>` ResultMap inheritance / column + javaType 필수 | ✅ 95%+ | iBATIS 2 = 부재 (subMap 수동 분기) |
+| pattern_7_typeHandler | `<typeHandler>` + `TypeHandler<T>` (generic) + `@MappedTypes` / `@MappedJdbcTypes` | ✅ 90%+ | iBATIS 2 = `TypeHandlerCallback` (generic ❌) |
+
+★ schema $def: `patternsExtensionV3` (root-level reference `patterns_extension_v3` / optional).
+
+★ ★ 자격: PoC #06+#07 = iBATIS 2 단독 stack / patterns_extension_v3 corroboration ❌ → ★ Phase 3 carry (Modern PoC MyBatis 3 measurement / PoC #08 spectrum 정합 expectation 90~95%).
 
 ### 6.2 ★ iBATIS 2 전용 dynamic 태그 carry (Agent 1 빈틈 #3)
 
@@ -273,8 +279,8 @@ cross_links:
 |---|---|---|
 | C-v2.2.0-1 | Modern 환경 NoSQL/Prisma 정합 검증 | ≥ 1 Modern PoC 후 |
 | C-v2.2.0-2 | sql-inventory baseline ratchet (characterization-coverage-validator mirror) | v2.2.x patch / 사용 시 |
-| C-v2.2.0-3 | patterns_extension_v3 (cache / discriminator / typeHandler) | ★ v2.3.0 Phase 2 carry / 본 v2.3.0-rc1 scope ❌ |
-| C-v2.2.0-4 | sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 본체 sub-rule 격상 | ★ v2.3.0 Phase 2 carry / 본 v2.3.0-rc1 scope ❌ |
+| ~~C-v2.2.0-3~~ | ~~patterns_extension_v3 (cache / discriminator / typeHandler)~~ | ✅ **resolved by ADR-CHAIN-010** (v2.3.0 Phase 2 / schema $defs/patternsExtensionV3 정식 도입 / Phase 3 Modern PoC corroboration carry) |
+| ~~C-v2.2.0-4~~ | ~~sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 본체 sub-rule 격상~~ | ✅ **resolved by ADR-CHAIN-010** (v2.3.0 Phase 2 / `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` 신설 / 단계 5 신뢰도 자격) |
 | C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 (PoC #11 종결 후) |
 | ~~**★ C-v2.2.0-6**~~ | ~~**★ ★ ★ Modern ORM PoC #08 (★ paradigm-cross corroboration)**~~ | ✅ **resolved** (ADR-CHAIN-008 채택 / 5 PoC isomorphic robust strong / v2.2.0 final 격상 완료 commit `8941726`) |
 | C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification enum | v2.2.x patch / 사용자 finding |

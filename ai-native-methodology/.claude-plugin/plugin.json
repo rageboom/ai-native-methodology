@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.3.0-rc1",
-  "description": "★ ★ ★ ★ ★ ★ v2.3.0-rc1 MINOR Phase 1 — SQL Inventory schema 12번째 컬럼 (migration_priority P0~P3) + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / abstract granularity mismatch / application-level 별도 deliverable carry). Senior critique REVISE 완전 흡수 + Big-tech first-mover 신호 보존 (AWS SCT / Oracle SQL Dev / Liquibase 모두 SQL 단위 priority 컬럼 부재). 회귀 fixture 의무 통과 (기존 11 컬럼 row backward-compat ✅). sql-inventory-extractor 13 unit test (10 → +3) + 236 unit test (workspace) + 283 total with _shared. chain harness validated 보존 / Phase 2 carry: patterns_extension_v3 + Spring 4.1 + iBATIS 2 sub-rule.",
+  "version": "2.3.0",
+  "description": "★ ★ ★ ★ ★ ★ ★ v2.3.0 MINOR FINAL — Phase 1 (migration_priority P0~P3 + ADR-CHAIN-009 Gartner TIME SQL 단위 보류) + Phase 2 (patterns_extension_v3 cache/discriminator/typeHandler MyBatis 3+ + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-010). Senior critique REVISE 완전 흡수 + Big-tech first-mover 신호 보존. 회귀 fixture 통과 (기존 11 컬럼 row backward-compat ✅). sql-inventory-extractor 14 unit test (10 → +4) + 237 unit test (workspace) + 284 total with _shared. chain harness validated 보존 / 별도 sprint carry: C-v2.3.0-gartner-time-application-level.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

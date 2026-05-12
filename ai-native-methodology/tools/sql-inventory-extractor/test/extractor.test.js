@@ -1,4 +1,4 @@
-// sql-inventory-extractor unit tests (★ workspace 14번째 / 13 tests / ★ v2.3.0-rc1 +3 migration_priority)
+// sql-inventory-extractor unit tests (★ workspace 14번째 / 14 tests / ★ v2.3.0-rc1 +3 migration_priority / ★ v2.3.0 Phase 2 +1 patterns_extension_v3)
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
@@ -92,4 +92,14 @@ test('★ invalid — migration_priority enum (PX) violation → critical findin
   const r = validateSqlInventory(join(FIX, 'invalid', 'bad-migration-priority'));
   assert.ok(r.findings.some(f => f.kind === 'record.migration_priority_invalid' && f.severity === 'critical'),
     'migration_priority=PX → critical finding 의무 (ADR-CHAIN-009)');
+});
+
+// ★ ★ v2.3.0 Phase 2 — patterns_extension_v3 (ADR-CHAIN-010) 1 신규 test
+
+test('★ valid — patterns_extension_v3 (cache / discriminator / typeHandler) → no finding (optional MyBatis 3+)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'with-patterns-extension-v3'));
+  assert.equal(r.summary.critical, 0, JSON.stringify(r.findings));
+  assert.equal(r.summary.high, 0, JSON.stringify(r.findings));
+  assert.equal(r.summary.inventory_count, 2);
+  // patterns_extension_v3 = optional / validator 차원 검증 ❌ / schema 차원에서 처리 / 본 test = 회귀 ❌ 의무.
 });

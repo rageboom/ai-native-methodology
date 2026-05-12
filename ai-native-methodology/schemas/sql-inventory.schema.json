@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/sql-inventory.schema.json",
-  "title": "SQL Inventory — phase 4.8 SQL 단위 12 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy)",
-  "description": "Deliverable #24 (★ v2.2.0-rc1 신설 / ★ v2.3.0-rc1 migration_priority 12번째 컬럼 추가). ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 (★ Gartner TIME SQL 단위 보류 / migration_priority P0~P3 대체) 정합. Michael Feathers Characterization Testing (2004) + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 6 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags + migration_priority). ≥ 2 PoC isomorphic (★ scale-cross + paradigm + ORM + platform-cross MEDIUM × 5 PoC robust strong / ADR-CHAIN-008): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum) + PoC #08+#09+#10 Modern.",
+  "title": "SQL Inventory — phase 4.8 SQL 단위 12 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy) + patterns_extension_v3 (optional MyBatis 3+)",
+  "description": "Deliverable #24 (★ v2.2.0-rc1 신설 / ★ v2.3.0-rc1 Phase 1 migration_priority 12번째 컬럼 추가 / ★ v2.3.0 Phase 2 patterns_extension_v3 신설). ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / migration_priority 대체) + ADR-CHAIN-010 (patterns_extension_v3 정식 도입 / MyBatis 3 advanced features 한정) 정합. Michael Feathers Characterization Testing (2004) + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 6 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags + migration_priority). ≥ 2 PoC isomorphic (★ scale-cross + paradigm + ORM + platform-cross MEDIUM × 5 PoC robust strong / ADR-CHAIN-008): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum) + PoC #08+#09+#10 Modern.",
   "x-spec-source": {
     "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004)",
     "feathers_characterization": "https://michaelfeathers.silvrback.com/characterization-testing",
@@ -38,6 +38,7 @@
       "items": { "$ref": "#/$defs/sqlRecord" }
     },
     "patterns_extension_v2": { "$ref": "#/$defs/patternsExtensionV2" },
+    "patterns_extension_v3": { "$ref": "#/$defs/patternsExtensionV3" },
     "phase_4_7_corroboration_role": {
       "type": "object",
       "description": "★ phase 4.7 cross-link role 명시 — corroboration #1/#2/#3 또는 N/A.",
@@ -286,6 +287,41 @@
       "type": "object",
       "description": "★ per record nested patterns (optional / Legacy 한정).",
       "additionalProperties": true
+    },
+    "patternsExtensionV3": {
+      "type": "object",
+      "description": "★ ★ v2.3.0 Phase 2 신설 / optional / MyBatis 3+ advanced features 한정 / 3 패턴 nested. ADR-CHAIN-010 정합. iBATIS 2 단독 stack 부적합 (별도 axis / patterns_extension_v2 사용).",
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": { "type": "string", "description": "예: 'v3 (2026-05-12)'" },
+        "user_decision": { "type": "string", "description": "예: '옵션 D Phase 2 / ADR-CHAIN-010'" },
+        "aggregate_metrics": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "pattern_5_cache": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "MyBatis 3 <cache> namespace 단위 second-level cache + <cache-ref> 공유 + @CacheNamespace 어노테이션. 예: { count: 3, namespaces: ['UserMapper', 'OrderMapper'], cache_ref_count: 1 }."
+            },
+            "pattern_6_discriminator": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "MyBatis 3 <discriminator> ResultMap inheritance mapping. column + javaType 필수. 예: { count: 2, column: 'role', java_type: 'String', case_count: 3 }."
+            },
+            "pattern_7_typeHandler": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "MyBatis 3 <typeHandler> 설정 / TypeHandler<T> 구현체 / @MappedTypes / @MappedJdbcTypes. iBATIS 2 TypeHandlerCallback 비호환. 예: { count: 4, handlers: ['JsonTypeHandler', 'EnumTypeHandler'], mapped_types: ['JsonNode', 'OrderStatus'] }."
+            }
+          }
+        },
+        "core_record_extension": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "★ per record patterns_extension_v3 예시 (cache_namespace / discriminator_column / typeHandler_class 등)."
+        }
+      }
     }
   }
 }

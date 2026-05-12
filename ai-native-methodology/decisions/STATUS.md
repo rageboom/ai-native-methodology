@@ -3,27 +3,29 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ **v2.3.0-rc1 MINOR Phase 1 PRERELEASE** — DEC-2026-05-12-v2.3.0-scope-결단 / 옵션 D (REVISE 완전 흡수) / schema 12번째 컬럼 `migration_priority` P0~P3 + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / abstract granularity mismatch) / Senior critique 100% 흡수 + Big-tech first-mover 신호 보존 / 회귀 fixture 통과 (backward-compat ✅) / unit test 233 → 236 [+3 / sql-inventory-extractor 10 → 13 / 283 total with _shared] / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ ★ **v2.3.0 MINOR FINAL release** — DEC-2026-05-12-v2.3.0-final / Phase 1 + Phase 2 일괄 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-009 + ADR-CHAIN-010 / git tag v2.3.0 / chain harness 5 요소 변경 ❌)
 
+**v2.3.0-rc1 prerelease 보존** (2026-05-12 같은 날 / commit `de1bae1` / git tag `v2.3.0-rc1` / Phase 1 single)
 **v2.2.0 MINOR FINAL release 보존** (2026-05-08 / commit `8941726` / git tag `v2.2.0` / DEC-2026-05-08-v2.2.0-final / 5 PoC SQL Inventory isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
 
 ---
 
-★ ★ ★ ★ ★ ★ **본 session 2026-05-12 진행 (v2.3.0 minor sprint Phase 1)**:
+★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-12 진행 (v2.3.0 minor sprint Phase 1 + Phase 2 일괄)**:
 
 - ✅ **4원칙 1원칙** — plan 정식 격상 (`~/.claude/plans/g-v2.3.0-minor-plan.md` / 사용자 승인 Tier 1+2 = 3 항목 묶음)
 - ✅ **4원칙 2원칙** — research 자산화 (`~/.claude/plans/g-v2.3.0-minor-research.md` / 3 sub-agent 병렬 / 가벼운 sub-agent 전략)
 - ✅ **4원칙 3원칙** — 사용자 결단 옵션 D (Senior critique REVISE 완전 흡수)
-- ✅ **Phase 1 산출 7/7** — DEC + ADR-CHAIN-009 + schema 12번째 컬럼 + validator + 2 신규 fixture + 3 신규 test + deliverable §1.1+§1.2+§3+§4+§13 갱신 + version bump (plugin.json + package.json + sql-inventory-extractor + CHANGELOG)
+- ✅ **Phase 1 산출 7/7** — DEC + ADR-CHAIN-009 + schema 12번째 컬럼 + validator + 2 신규 fixture + 3 신규 test + deliverable §1.1+§1.2+§3+§4+§13 갱신 + version bump
+- ✅ **v2.3.0-rc1 prerelease** — commit `de1bae1` + git tag `v2.3.0-rc1` (build 272 files / CHECKSUMS 271 OK)
+- ✅ **Phase 2 산출 6/6** — ADR-CHAIN-010 + sub-rule deliverable (`methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` / 신규 디렉토리) + schema patterns_extension_v3 + deliverable 24 보강 + 신규 fixture 1 + 신규 test 1 + version bump rc1 → final
 - ✅ **회귀 fixture 통과** — 기존 PoC #06+#07 11 컬럼 row test pass (backward-compat 의무 ✅)
-- ✅ **workspace test 236 pass** (47+11+15+16+5+5+6+5+6+25+68+14+13 / 0 fail)
-- ⏳ build + release-readiness 검증 (Step 7)
+- ✅ **workspace test 237 pass** (47+11+15+16+5+5+6+5+6+25+68+14+14 / 0 fail)
+- ✅ **release-readiness §8.1 strict 7/7** (ADR-CHAIN 10 dynamic 인식)
 
-### Phase 2 carry (별도 session)
+### resolved by 본 session
 
-- C-v2.2.0-3 patterns_extension_v3 (cache / discriminator / typeHandler)
-- C-v2.2.0-4 Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule 자산화
-- v2.3.0-rc2 → final 격상
+- ~~C-v2.2.0-3~~ patterns_extension_v3 → ✅ ADR-CHAIN-010
+- ~~C-v2.2.0-4~~ Spring 4.1 + iBATIS 2 spectrum sub-rule → ✅ ADR-CHAIN-010
 
 ### 별도 sprint carry (v2.4 / v3.0)
 

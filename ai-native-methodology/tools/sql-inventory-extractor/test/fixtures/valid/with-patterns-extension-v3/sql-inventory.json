@@ -1,0 +1,65 @@
+{
+  "$comment": "★ v2.3.0 Phase 2 신규 fixture / patterns_extension_v3 (cache / discriminator / typeHandler) / ADR-CHAIN-010 정합 / MyBatis 3+ Modern stack 가정",
+  "meta_confidence": {
+    "generated_at": "2026-05-12T00:00:00Z",
+    "methodology_version": "v2.3.0",
+    "confidence": 0.90,
+    "inputs_used": ["source_code"]
+  },
+  "summary": {
+    "total_sql_operations": 2,
+    "by_type": { "select": 2 }
+  },
+  "extraction_automation": {
+    "auto_extracted_columns": ["sql_id", "mapper_xml", "dynamic_branch", "dependent_tables"],
+    "manual_columns": ["called_from_screen", "business_meaning"],
+    "auto_ratio_external_6": "4/6 = 66.7% (≥ 50% pass)"
+  },
+  "inventory": [
+    {
+      "sql_id": "UserMapper.selectByRole",
+      "mapper_xml": "src/main/resources/mappers/UserMapper.xml",
+      "statement_type": "PREPARED",
+      "business_meaning": "★ role discriminator 기반 user 조회 / MyBatis 3 advanced",
+      "dependent_tables": ["users"],
+      "intent_vs_bug_classification": "intent (role inheritance mapping)",
+      "confidence": 0.92,
+      "migration_priority": "P3"
+    },
+    {
+      "sql_id": "OrderMapper.selectByStatus",
+      "mapper_xml": "src/main/resources/mappers/OrderMapper.xml",
+      "statement_type": "PREPARED",
+      "business_meaning": "★ typeHandler 기반 OrderStatus enum 매핑",
+      "dependent_tables": ["orders"],
+      "intent_vs_bug_classification": "intent (typeHandler 매핑)",
+      "confidence": 0.90,
+      "migration_priority": "P3"
+    }
+  ],
+  "patterns_extension_v3": {
+    "schema_version": "v3 (2026-05-12)",
+    "user_decision": "옵션 D Phase 2 / ADR-CHAIN-010",
+    "aggregate_metrics": {
+      "pattern_5_cache": {
+        "count": 2,
+        "namespaces": ["UserMapper", "OrderMapper"],
+        "cache_ref_count": 1,
+        "auto_grep": "✅ 80%+"
+      },
+      "pattern_6_discriminator": {
+        "count": 1,
+        "column": "role",
+        "java_type": "String",
+        "case_count": 3,
+        "auto_grep": "✅ 95%+"
+      },
+      "pattern_7_typeHandler": {
+        "count": 2,
+        "handlers": ["JsonTypeHandler", "OrderStatusTypeHandler"],
+        "mapped_types": ["JsonNode", "OrderStatus"],
+        "auto_grep": "✅ 90%+"
+      }
+    }
+  }
+}
