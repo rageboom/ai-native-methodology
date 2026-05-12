@@ -1,0 +1,34 @@
+{
+  "_meta": {
+    "purpose": "마크다운 정본 ↔ Confluence 페이지 매핑. 본 폴더 = 정본 / Confluence = 발행 채널.",
+    "rule": "Confluence 직접 편집 금지. 항상 마크다운 수정 → 재업로드 → ingest_pages 재색인 순서.",
+    "space": "AITF",
+    "parent_chain": "AI Native 개발 방법론 (697298343) → 종합 브리핑 (702650185) → 하위 3종"
+  },
+  "pages": {
+    "01-main.md": {
+      "page_id": "702650185",
+      "title": "AI-Native 개발 방법론 — 종합 브리핑",
+      "parent_id": "697298343",
+      "url": "https://wiki.smilegate.net/pages/viewpage.action?pageId=702650185"
+    },
+    "02-first-5min.md": {
+      "page_id": "702650188",
+      "title": "동료의 첫 5분 — 사용 시나리오",
+      "parent_id": "702650185",
+      "url": "https://wiki.smilegate.net/pages/viewpage.action?pageId=702650188"
+    },
+    "03-14-tools.md": {
+      "page_id": "702650191",
+      "title": "14개 검증 도구 역할표",
+      "parent_id": "702650185",
+      "url": "https://wiki.smilegate.net/pages/viewpage.action?pageId=702650191"
+    },
+    "04-version-history.md": {
+      "page_id": "702650196",
+      "title": "버전별 진화사 (한 페이지씩)",
+      "parent_id": "702650185",
+      "url": "https://wiki.smilegate.net/pages/viewpage.action?pageId=702650196"
+    }
+  }
+}
