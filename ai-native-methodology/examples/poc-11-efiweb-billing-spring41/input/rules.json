@@ -1,0 +1,102 @@
+{
+  "$comment": "★ PoC #11 — billing 모듈 BR 추출. ★ 작은 단일책임 → BR 적음 expected (vs PoC #07 capital ~15 BR). 핵심 ~8 BR + likely_bug 분류.",
+  "project_id": "poc-11-efiweb-billing-spring41",
+  "business_rules": [
+    {
+      "id": "BR-BILLING-001",
+      "title": "년도 + 법인 선택 후 12개월 데이터 확정 목록 조회",
+      "natural_language": "사용자가 년도 + 법인번호 선택 → 해당 년도의 1~12월 데이터 확정 이력 조회. recursive CTE 로 12 row 강제 생성 (월별 row 누락 ❌).",
+      "source": "billing.xml:8-29 (selectDataConfirmList / WITH MONTH_INFO recursive CTE)",
+      "evidence_strength": "high",
+      "br_type": "query",
+      "is_intent": true
+    },
+    {
+      "id": "BR-BILLING-002",
+      "title": "★ ★ ★ 데이터 확정처리 = delete + insert 4 SQL 비트랜잭션 (likely bug)",
+      "natural_language": "saveDataConfirm 4 SQL operation (selectConfirmDataCount + delete + insert + insertHistory + insertHistoryData) = @Transactional ❌ / 비원자성. ERP 데이터 ↔ 자체 DB 동기화 실패 시 부분 commit 위험.",
+      "source": "BillingServiceImpl.saveDataConfirm (BillingServiceImpl.java:31-42) — @Transactional 어노테이션 ❌",
+      "evidence_strength": "high",
+      "br_type": "transaction",
+      "is_intent": false,
+      "is_likely_bug": true,
+      "domain_carry": "★ 결제 도메인 expert — 부분 commit 시 정합성 영향 정탐 의무"
+    },
+    {
+      "id": "BR-BILLING-003",
+      "title": "데이터 확정 = 기존 데이터 삭제 후 재삽입 (full overwrite)",
+      "natural_language": "saveDataConfirm 시 if(insertCount > 0) → delete + insert (★ 기존 row 전체 삭제 후 SGERPMA.dbo.TB_RG_RESULTS 에서 다시 복사). 변경 추적 ❌ / 이력은 TB_SGMA_CONFIRM_HIS 에만 기록.",
+      "source": "BillingServiceImpl.saveDataConfirm + billing.xml deleteConfirmData + insertConfirmData",
+      "evidence_strength": "high",
+      "br_type": "data_overwrite",
+      "is_intent": true,
+      "domain_carry": "★ 결제 도메인 expert — full overwrite 정책 의도 확인"
+    },
+    {
+      "id": "BR-BILLING-004",
+      "title": "ERP 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 가 없으면 저장 skip",
+      "natural_language": "selectConfirmDataCount 가 0 = ERP 결과 데이터 부재 → delete + insert skip + model.addAttribute('insertCount', 0). JSP doSave alert '관리회계 집계 데이터가 존재하지 않습니다.' 안내.",
+      "source": "BillingServiceImpl.saveDataConfirm:34 + dataConfirm.jsp:109-111",
+      "evidence_strength": "high",
+      "br_type": "validation",
+      "is_intent": true
+    },
+    {
+      "id": "BR-BILLING-005",
+      "title": "★ ★ 시작년도 2015 hardcoded (magic year)",
+      "natural_language": "dataConfirm.jsp 년도 select option = currYear - 2015 (★ 2015 hardcoded). 매년 자동 +1 / 2015 = 시스템 시작 년도 추정 / time-sensitive.",
+      "source": "dataConfirm.jsp:159 (c:forEach begin='0' end='${currYear - 2015}')",
+      "evidence_strength": "high",
+      "br_type": "configuration",
+      "is_intent": true,
+      "is_likely_bug": false,
+      "domain_carry": "★ 결제 도메인 expert — 2015 의미 확인 (시스템 가동 시점?)"
+    },
+    {
+      "id": "BR-BILLING-006",
+      "title": "★ ★ ★ 법인 COM_NO == 2 hardcoded (특정 법인만 노출)",
+      "natural_language": "법인 select option = userService.getCompanyList(auth) 결과 중 ★ COM_NO == 2 만 노출. userService 가 권한별 법인 목록 반환하지만 본 화면 = 특정 법인 (2번) 만 데이터 확정 대상.",
+      "source": "dataConfirm.jsp:169 (c:if test='${list.COM_NO == 2}')",
+      "evidence_strength": "high",
+      "br_type": "filtering",
+      "is_intent": false,
+      "is_likely_bug": true,
+      "domain_carry": "★ ★ 결제 도메인 expert — 법인 2 = 어떤 법인? 다른 법인 확정 처리 부재 의도?"
+    },
+    {
+      "id": "BR-BILLING-007",
+      "title": "히스토리 PK = SCOPE_IDENTITY (selectKey iBATIS 2 evolved tag)",
+      "natural_language": "insertConfirmHistory 시 <selectKey> = SCOPE_IDENTITY() → hisNo property 자동 채움. 후속 insertConfirmHistoryData = #hisNo# FK 참조.",
+      "source": "billing.xml:31-38 (insertConfirmHistory + <selectKey resultClass='int' keyProperty='hisNo'>)",
+      "evidence_strength": "high",
+      "br_type": "audit",
+      "is_intent": true
+    },
+    {
+      "id": "BR-BILLING-008",
+      "title": "외부 BI Qlik Sense 임베드 (datacafe.smilegate.net)",
+      "natural_language": "qlikView 화면 = iframe src='https://datacafe.smilegate.net/sense/app/{appid}/sheet/{sheet}/state/analysis'. appid + sheet 동적 파라미터 (request.getParameter) / 메뉴별 분기.",
+      "source": "qlikView.jsp:17 + BillingController.qlikView (115-125)",
+      "evidence_strength": "high",
+      "br_type": "external_integration",
+      "is_intent": true,
+      "domain_carry": "★ Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)"
+    }
+  ],
+  "br_summary": {
+    "total": 8,
+    "by_intent": {"intent": 6, "likely_bug": 2, "ambiguous": 0},
+    "by_evidence": {"high": 8, "medium": 0, "low": 0},
+    "by_type": {
+      "query": 1,
+      "transaction": 1,
+      "data_overwrite": 1,
+      "validation": 1,
+      "configuration": 1,
+      "filtering": 1,
+      "audit": 1,
+      "external_integration": 1
+    },
+    "domain_carry_count": 5
+  }
+}

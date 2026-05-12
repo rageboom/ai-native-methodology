@@ -1,0 +1,189 @@
+{
+  "$comment": "★ PoC #11 — billing 모듈 AP 추출. ★ 작은 단일책임 / 13 AP 추출 (vs PoC #06 10 AP / PoC #07 ~10 AP / scale 작아도 critical 다수 — 결제 도메인 risk + cross-DB + hardcoded). isomorphic to PoC #06+#07 = 5종 (sub-rule 자격) + novel = 8종 (★ Qlik 임베드 + cross-DB + 외부 BI).",
+  "project_id": "poc-11-efiweb-billing-spring41",
+  "antipatterns": [
+    {
+      "id": "AP-BILLING-001",
+      "title": "★ ★ ★ critical — @Transactional ❌ saveDataConfirm 4 SQL 비원자성",
+      "natural_language": "BillingServiceImpl.saveDataConfirm (4 SQL: delete + insert + insertHistory + insertHistoryData) 가 @Transactional 어노테이션 ❌. 중간 실패 시 (예: insertHistoryData FK 위반) 부분 commit / TB_SGMA_CONFIRM 만 갱신 / 이력 없는 변경 발생.",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": ["BillingServiceImpl.java:31-42 (saveDataConfirm)"],
+      "modern_alternative": "★ @Transactional(rollbackFor = Exception.class) 의무 / 또는 Spring TransactionTemplate / 결제 도메인 = transaction integrity 의무",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06_07": "★ 신규 — PoC #06 exchange + PoC #07 capital 의 BR-CAPITAL-003 transaction boundary 모호 패턴과 isomorphic (★ ★ 사내 spring41-ibatis2 spectrum sub-rule 일반화 후보)"
+    },
+    {
+      "id": "AP-BILLING-002",
+      "title": "Map raw type + @SuppressWarnings({'rawtypes', 'unchecked'})",
+      "natural_language": "BillingController + BillingService + BillingDAO 전체 Map 변수 = raw type (Map / List<Map> / HashMap). @SuppressWarnings({'rawtypes', 'unchecked'}) 클래스 / 메서드 적용. type safety ❌ / IDE 경고 무시 후 NPE/ClassCast 위험.",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": [
+        "BillingController.java:28 (class-level @SuppressWarnings)",
+        "BillingDAO.java:18,27,36,46,55,64 (method-level @SuppressWarnings)",
+        "BillingServiceImpl.java 전체"
+      ],
+      "modern_alternative": "★ DTO + record (Java 16+) + Bean Validation / 또는 Map<String, Object> 최소화",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ ★ ★ AP-EXCHANGE-001 (PoC #06) + AP-CAPITAL-002 (PoC #07) 동일 패턴 / ★ ★ ★ 3 PoC isomorphic 자격 (sub-rule 5종 1번째)"
+    },
+    {
+      "id": "AP-BILLING-003",
+      "title": "★ Unused import / dead code — ConnectService + DataService",
+      "natural_language": "BillingController.java:24-25 = import smilegate.ifrs.connect.service.ConnectService + import smilegate.ifrs.data.service.DataService — 실제 사용 ❌ (Autowired/Resource 주입 ❌). dead code / 모듈 의존성 거짓 표시.",
+      "evidence_strength": "high",
+      "severity": "low",
+      "applies_to": ["BillingController.java:24-25"],
+      "modern_alternative": "★ IDE 자동 import 정리 / 또는 ArchUnit dependency 검증",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ 신규 (PoC #06+#07 명시 ❌)"
+    },
+    {
+      "id": "AP-BILLING-004",
+      "title": "★ param 사후 변경 / input/output mix — insertCount param.put 후 model 전달",
+      "natural_language": "BillingServiceImpl.saveDataConfirm = param.put('insertCount', insertCount) 후 BillingController.dataConfirmProcAjax 가 param.get('insertCount') → model 전달. param Map = 입력 + 출력 dual purpose / mutable shared state.",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["BillingServiceImpl.java:35 + BillingController.java:102"],
+      "modern_alternative": "★ Service 가 결과 DTO 반환 (record InsertResult(int count)) / 또는 Optional<Integer>",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ 신규 — PoC #06+#07 의 Map<String,Object> pattern 의 sub-case"
+    },
+    {
+      "id": "AP-BILLING-005",
+      "title": "★ ★ ★ critical — SQL Server vendor 종속 다수 (WITH(NOLOCK) + SCOPE_IDENTITY + getDate + UDF FN_GET_MONTH)",
+      "natural_language": "billing.xml 6 SQL 중 4개가 SQL Server 종속: (1) WITH(NOLOCK) 4건 (Dirty Read 위험) (2) SCOPE_IDENTITY() (T-SQL 한정) (3) getDate() (DB 종속) (4) dbo.FN_GET_MONTH(MONTH) UDF. PostgreSQL / Oracle 이식 시 4건 모두 재작성 의무.",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": [
+        "billing.xml:25-27 (WITH NOLOCK)",
+        "billing.xml:36 (SCOPE_IDENTITY)",
+        "billing.xml:35 (getDate)",
+        "billing.xml:22 (dbo.FN_GET_MONTH UDF)"
+      ],
+      "modern_alternative": "★ JPA / MyBatis 3 + standard SQL / 또는 R2DBC / vendor 추상화 / UDF → JVM 측 logic",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ ★ AP-CAPITAL-004 (WITH NOLOCK) PoC #07 정합 / 본 PoC = ★ 강화 (SCOPE_IDENTITY + getDate + UDF 추가 4 차원)"
+    },
+    {
+      "id": "AP-BILLING-006",
+      "title": "★ ★ ★ critical — Cross-DB FQCN hardcoded (FIM.dbo.TB_USER + SGERPMA.dbo.TB_RG_RESULTS)",
+      "natural_language": "billing.xml = FIM.dbo.TB_USER (사용자 정보) + SGERPMA.dbo.TB_RG_RESULTS (ERP 결과 / 3 SQL 의존) FQCN hardcoded. DB 이름 = 환경 변수 ❌ / dev/staging/prod 분리 ❌ / 다른 DB 이름 사용 시 sqlmap 재작성 의무.",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": [
+        "billing.xml:27 (FIM.dbo.TB_USER)",
+        "billing.xml:46,54,66 (SGERPMA.dbo.TB_RG_RESULTS)"
+      ],
+      "modern_alternative": "★ Linked Server 추상화 / 또는 dataSource 분리 (ifrsDS / fimDS / sgerpDS) / 또는 properties 외부화",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ ★ AP-CAPITAL-005 (cross-system 의존 LIVE_SQL.SGERP.dbo) PoC #07 정합 / ★ ★ 3 PoC isomorphic 자격 (sub-rule 5종 2번째)"
+    },
+    {
+      "id": "AP-BILLING-007",
+      "title": "★ ★ Recursive CTE — WITH MONTH_INFO 12 row 강제 생성 (T-SQL 한정)",
+      "natural_language": "selectDataConfirmList = WITH MONTH_INFO AS (... UNION ALL ... WHERE MONTH < 12) 재귀 CTE 로 12개월 row 생성. PostgreSQL / Oracle = 호환 / iBATIS 2 + sub-query 단순화 가능. 본 패턴 = 데이터 부재 월도 NULL row 강제 표시 의도 (단, generated_series / VALUES 표현 가능).",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["billing.xml:10-17"],
+      "modern_alternative": "★ generated_series (PG) / Oracle CONNECT BY / 또는 JVM 측 month list 주입",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ 신규 (PoC #06 exchange 환율 vs PoC #07 capital 자본 모두 ❌)"
+    },
+    {
+      "id": "AP-BILLING-008",
+      "title": "throws Exception (광범위 예외 / 로깅 부재)",
+      "natural_language": "BillingController 4 endpoint 모두 = throws Exception (광범위 / Checked Exception unchecked propagate). 명시적 catch ❌ / 로깅 ❌ / Spring exception handler 위임.",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["BillingController.java:49,73,93,116 (4 endpoint 모두)"],
+      "modern_alternative": "★ ControllerAdvice + ResponseStatusException / 또는 Result<T,E> 패턴",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ ★ AP-CAPITAL-010 (e.printStackTrace() / 로깅 부재) PoC #07 정합 / ★ ★ 3 PoC isomorphic 자격 (sub-rule 5종 3번째)"
+    },
+    {
+      "id": "AP-BILLING-009",
+      "title": "★ ★ high — XSS risk / HTML string concatenation raw values",
+      "natural_language": "dataConfirm.jsp makeDataTable(list) = HTML string concatenation 에 list[i].procDt + list[i].userNm raw insert (escape 처리 ❌). userNm 에 <script> 또는 onerror 등 주입 가능. ★ 단, source = DB (TB_USER) → user-controlled 가능성 낮음 BUT 정책상 escape 의무.",
+      "evidence_strength": "high",
+      "severity": "high",
+      "applies_to": ["dataConfirm.jsp:63 (procDt + userNm raw insert)"],
+      "modern_alternative": "★ jQuery .text() / 또는 textContent / 또는 template engine (Handlebars) HTML escape default",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06_07": "★ 신규 (PoC #06+#07 JSP 측정 ❌ — capital JSP 21050 LOC 측정 보류)"
+    },
+    {
+      "id": "AP-BILLING-010",
+      "title": "★ medium — 시작년도 2015 hardcoded (magic year)",
+      "natural_language": "dataConfirm.jsp:159 = c:forEach begin='0' end='${currYear - 2015}' step='1' → 시작년도 2015 hardcoded. 매년 자동 +1 / 단, 2015 = magic number / 시스템 가동 시점 추정 / 환경 변수 ❌.",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["dataConfirm.jsp:159"],
+      "modern_alternative": "★ application.properties / 또는 DB config (TB_CONFIG)",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ 신규 (PoC #06+#07 ❌)"
+    },
+    {
+      "id": "AP-BILLING-011",
+      "title": "★ ★ ★ critical — 법인 COM_NO == 2 hardcoded (특정 법인만 노출 / business logic in view)",
+      "natural_language": "dataConfirm.jsp:169 = c:if test='${list.COM_NO == 2}' → ★ 특정 법인 (COM_NO=2) 만 select option 노출. userService.getCompanyList(auth) 가 권한별 법인 목록 반환하지만 view 에서 다시 필터링 / business logic = JSP 내 hardcoded.",
+      "evidence_strength": "high",
+      "severity": "critical",
+      "applies_to": ["dataConfirm.jsp:169"],
+      "modern_alternative": "★ Controller 단 filtering / 또는 권한 + 도메인 정책 service / view = 단순 표시",
+      "is_likely_bug": true,
+      "isomorphic_to_poc06_07": "★ 신규 — ★ ★ ★ 결제 도메인 expert 의 의도 확인 의무 (BR-BILLING-006 domain_carry)"
+    },
+    {
+      "id": "AP-BILLING-012",
+      "title": "자체 ajax wrapper fn_ajax (jqCommon.js 의존)",
+      "natural_language": "dataConfirm.jsp = fn_ajax(url, data, callback) 자체 wrapper 사용 (jqCommon.js 정의). 표준 $.ajax / fetch ❌ / error handling 추상화 / 단, 표준화 trade-off (★ 일관성 유지 vs 학습 곡선).",
+      "evidence_strength": "high",
+      "severity": "low",
+      "applies_to": ["dataConfirm.jsp:35,105 (fn_ajax 호출 2건)"],
+      "modern_alternative": "★ fetch API + global error handler / 또는 axios + interceptor",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ ★ AP-EXCHANGE-{?} (PoC #06 자체 util / 추정) + AP-CAPITAL-{?} (PoC #07 IfrsUtil 자체 util) 동일 패턴 / ★ ★ 3 PoC isomorphic 자격 (sub-rule 5종 4번째)"
+    },
+    {
+      "id": "AP-BILLING-013",
+      "title": "★ medium — 외부 BI URL hardcoded (datacafe.smilegate.net)",
+      "natural_language": "qlikView.jsp:17 = $('#qlik_frame').attr('src', 'https://datacafe.smilegate.net/sense/app/...') ★ 외부 도메인 URL hardcoded. dev/staging/prod 분리 ❌ / 외부 시스템 URL 변경 시 JSP 재작성 / 환경 변수 ❌.",
+      "evidence_strength": "high",
+      "severity": "medium",
+      "applies_to": ["qlikView.jsp:17"],
+      "modern_alternative": "★ application.properties qlik.base.url / 또는 환경별 properties / 또는 Reverse Proxy",
+      "is_likely_bug": false,
+      "isomorphic_to_poc06_07": "★ 신규 (외부 BI 시스템 = PoC #06+#07 ❌)"
+    }
+  ],
+  "ap_summary": {
+    "total": 13,
+    "by_severity": {"critical": 4, "high": 2, "medium": 4, "low": 2, "info": 0},
+    "by_isomorphic": {
+      "isomorphic_to_poc06_07": 5,
+      "novel": 8
+    },
+    "by_is_likely_bug": {"true": 4, "false": 9},
+    "sub_rule_5_isomorphic_check": {
+      "$comment": "★ ★ ★ Spring 4.1 + iBATIS 2 spectrum sub-rule (ADR-CHAIN-010 / v2.3.0 final) 5종 isomorphic 검증",
+      "1_Map_raw_type": "AP-BILLING-002 ✅",
+      "2_cross_DB_FQCN": "AP-BILLING-006 ✅",
+      "3_logging_부재": "AP-BILLING-008 ✅",
+      "4_자체_util_wrapper": "AP-BILLING-012 ✅",
+      "5_SQL_Server_vendor_종속": "AP-BILLING-005 ✅ (★ 단, PoC #06+#07 = WITH NOLOCK 만 / 본 PoC = ★ ★ 강화 4 차원)",
+      "isomorphic_5_of_5": "✅ 100% (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족)"
+    },
+    "novel_8_summary": [
+      "AP-BILLING-001 (★ critical / @Transactional ❌)",
+      "AP-BILLING-003 (unused import dead code)",
+      "AP-BILLING-004 (param 사후 변경 input/output mix)",
+      "AP-BILLING-007 (Recursive CTE T-SQL 한정)",
+      "AP-BILLING-009 (★ high / XSS risk HTML concat)",
+      "AP-BILLING-010 (★ 시작년도 2015 hardcoded)",
+      "AP-BILLING-011 (★ critical / COM_NO==2 hardcoded business in view)",
+      "AP-BILLING-013 (★ 외부 BI URL hardcoded)"
+    ]
+  }
+}

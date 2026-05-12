@@ -1,0 +1,244 @@
+{
+  "$comment": "★ ★ ★ ★ PoC #11 SQL Inventory (★ ★ ★ corroboration #3 사내 PoC isomorphic / 3 사내 PoC = PoC #06 exchange + PoC #07 capital + PoC #11 billing / 66.7% × 3 robust 자격 확보). 외부 6 + 본 추가 6 = 12 컬럼 (★ v2.3.0 migration_priority 12번째 포함). 6 SQL operation 전수 cover (★ 작은 단일책임 / scale-cross floor / vs PoC #07 71 SQL 의 21.1% cover).",
+  "project_id": "poc-11-efiweb-billing-spring41",
+  "spectrum": "Spring 4.1.2 + iBATIS 2.x + egov (egovframework.rte) / Legacy 적대성 5중 (★ Qlik 외부 BI + cross-DB 3개 강화) / ★ 작은 단일책임 모듈 (vs PoC #06 단일 / PoC #07 다중)",
+  "corroboration_role": "★ ★ ★ corroboration #3 (사내 PoC) — PoC #06 exchange (단일책임 / 6 SQL) + PoC #07 capital (다중책임 / 71 SQL) + 본 PoC #11 billing (작은 단일책임 / 6 SQL) → ★ ★ ★ 3 사내 PoC SQL Inventory isomorphic robust 자격 충족 (sub-rule resolve trigger / C-v2.2.0-spring41-ibatis2-subrule)",
+  "meta_confidence": {
+    "generated_at": "2026-05-12T00:00:00Z",
+    "methodology_version": "v2.3.1",
+    "confidence": 0.85,
+    "inputs_used": ["source_code", "characterization"],
+    "applied_modifiers": [
+      { "name": "small_scope_full_coverage", "value": 0.05, "reason": "★ 6 SQL 전수 cover / scope_decision: covered 6/6 = 100%" },
+      { "name": "in_place_read_정책_첫_적용", "value": 0.0, "reason": "★ in-place read 정책 (DEC-2026-05-12) 본 PoC 첫 적용 / source 사본 ❌ / confidence 영향 ❌ (★ 동일 read)" }
+    ],
+    "applied_penalties": [],
+    "warnings": [
+      "★ cross-DB FIM.dbo.TB_USER + SGERPMA.dbo.TB_RG_RESULTS schema 본문 부재 — DBA-read carry 4 SQL (selectDataConfirmList + selectConfirmDataCount + insertConfirmHistoryData + insertConfirmData)",
+      "★ business_meaning 컬럼 = 결제 도메인 expert 검증 carry (BR-BILLING-002/005/006 domain_carry)",
+      "★ dbo.FN_GET_MONTH UDF 본문 부재 — DBA-read carry 1 SQL (selectDataConfirmList)"
+    ]
+  },
+  "extraction_automation": {
+    "$comment": "★ 외부 조언 6 컬럼 기준 자동/수동 비율 — PoC #06 + PoC #07 corroboration isomorphic 측정 (★ ★ ★ 3 사내 PoC 자격)",
+    "auto_extracted_columns": ["sql_id", "mapper_xml", "dynamic_branch", "dependent_tables"],
+    "manual_columns": ["called_from_screen", "business_meaning"],
+    "auto_ratio_external_6": "4/6 = 66.7% (★ ★ ★ 3 사내 PoC isomorphic robust / PoC #06 + PoC #07 + 본 PoC 모두 동일 4/6)",
+    "auto_ratio_total_12": "5/12 = 41.7% (★ statement_type + dynamic_branch + dependent_tables + mapper_xml + sql_id 자동 / 나머지 7 = LLM + domain expert + 자연어)",
+    "comparison_to_poc06_07": {
+      "poc06_auto_ratio": "66.7% (4/6 / 단일책임 6 SQL)",
+      "poc07_auto_ratio": "66.7% (4/6 / 다중책임 71 SQL)",
+      "poc11_auto_ratio": "66.7% (4/6 / 작은 단일책임 6 SQL)",
+      "delta": "0%p × 3 PoC",
+      "note": "★ ★ ★ 3 사내 PoC SQL Inventory isomorphic robust — 외부 6 컬럼 자동화 비율 = scale 무관 + paradigm 동일 무관 (★ ADR-CHAIN-010 sub-rule spring41-ibatis2 spectrum 적용 강화)"
+    },
+    "baseline_ratchet": {
+      "$comment": "★ v2.1.1 ratchet trend baseline + v2.3.1 sql-inventory ratchet baseline mirror — 첫 baseline write",
+      "auto_ratio_baseline": 0.667,
+      "auto_ratio_current": 0.667,
+      "trend": "stable (★ 3 사내 PoC robust)",
+      "baseline_file": ".aimd/baseline/sql-inventory-coverage.json"
+    }
+  },
+  "summary": {
+    "total_sql_operations": 6,
+    "by_type": { "select": 2, "update": 0, "insert": 3, "delete": 1, "procedure": 0 },
+    "dependent_tables_unique": 5,
+    "external_calls_count": 0,
+    "dynamic_branch_count": 1,
+    "self_recognized_count": 0,
+    "covered_in_this_poc": 6,
+    "carry": 0,
+    "coverage_ratio": "6/6 = 100% (★ 작은 scope / 전수 cover)"
+  },
+  "patterns_extension_v2": {
+    "$comment": "★ Legacy iBATIS 2 패턴 — PoC #06+#07 정합. 본 PoC = ★ 작은 scope / standard SQL 패턴 dominant.",
+    "schema_version": "v2",
+    "aggregate_metrics": {
+      "pattern_1_dynamic_branch": {
+        "description": "iBATIS 2 dynamic tags + SQL CASE WHEN",
+        "count": 0,
+        "auto_grep": "✅ 100% — tag pattern grep",
+        "note": "★ ★ billing.xml = standard SQL dominant / 조건 분기 ❌ / ★ <selectKey> 1건 = PK 생성 메커니즘 (dynamic 분기 ❌)"
+      },
+      "pattern_2_calculation_formula": {
+        "description": "SQL 함수 (MSSQL ISNULL/COALESCE/CASE WHEN/CONVERT)",
+        "count": 4,
+        "auto_grep": "✅ 100% — pure regex",
+        "core_examples": [
+          { "function": "ROW_NUMBER() OVER", "context": "ROW_NUMBER() OVER(Partition by A.YEAR, A.MONTH ORDER BY A.YEAR, A.MONTH, B.PROC_DT)", "line": 19, "sql_id": "selectDataConfirmList" },
+          { "function": "COUNT() OVER", "context": "COUNT(*) OVER(Partition by A.YEAR, A.MONTH) AS ROW_COUNT", "line": 20, "sql_id": "selectDataConfirmList" },
+          { "function": "CONVERT (datetime → CHAR(8))", "context": "CONVERT(CHAR(8), B.PROC_DT, 2) AS PROC_DT", "line": 18, "sql_id": "selectDataConfirmList" },
+          { "function": "dbo.FN_GET_MONTH UDF", "context": "dbo.FN_GET_MONTH(MONTH) AS MONTH", "line": 22, "sql_id": "selectDataConfirmList", "carry_flag": "DBA-read" }
+        ],
+        "mssql_specific": "ROW_NUMBER/COUNT OVER + CONVERT + dbo.UDF (★ ★ 4 차원 T-SQL 종속)"
+      },
+      "pattern_3_result_mapping": {
+        "description": "resultClass + parameterClass 매핑",
+        "result_class_count": 2,
+        "parameter_class_count": 6,
+        "parameter_map_count": 0,
+        "auto_grep": "✅ 100% — XML attribute parsing",
+        "unique_result_classes": ["egovMap", "int"],
+        "unique_parameter_classes": ["HashMap"],
+        "note": "★ ★ egovMap typeAlias = egovframework.rte.psl.dataaccess.util.EgovMap (★ egov 표준 type)"
+      },
+      "pattern_4_shared_sql_fragments": {
+        "description": "<sql id=...> + <include refid=...>",
+        "count": 0,
+        "auto_grep": "✅ 100%",
+        "note": "★ billing.xml = <sql>/<include> ❌ / DRY 위반 ❌ (단, 작은 scope = 자연 / 다중 SQL 동일 WHERE 절 3건 = duplication AP)"
+      },
+      "self_recognized_special": {
+        "description": "★ ★ iBATIS 2 evolved tag <selectKey> — PK 생성 메커니즘 (dynamic 분기 ❌ / 별도 분류)",
+        "count": 1,
+        "core_examples": [
+          { "tag": "<selectKey resultClass=\"int\" keyProperty=\"hisNo\">", "context": "SCOPE_IDENTITY() / insertConfirmHistory 후 hisNo 자동 채움", "line": 32, "sql_id": "insertConfirmHistory" }
+        ]
+      },
+      "duplication_DRY_violation": {
+        "$comment": "★ ★ ★ 신규 patterns / DRY violation",
+        "description": "★ WHERE COMPANYSEQ=#companySeq# AND DIST_MONTH=#distYear# + #distMonth# = 3 SQL 동일 (insertConfirmHistoryData / selectConfirmDataCount / insertConfirmData / deleteConfirmData)",
+        "count": 4,
+        "duplicated_pattern": "WHERE COMPANYSEQ = #companySeq# AND DIST_MONTH = #distYear# + #distMonth#",
+        "modern_alternative": "★ <sql id=\"whereCompanyMonth\"> + <include> / 또는 service layer 단 검증 후 SQL 단순화"
+      }
+    }
+  },
+  "inventory": [
+    {
+      "sql_id": "BillingDAO.selectDataConfirmList",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 8,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmListAjax (BillingController.dataConfirmListAjax)",
+      "business_meaning": "년도 + 법인 선택 후 1~12월 데이터 확정 이력 조회. recursive CTE (WITH MONTH_INFO) 12 row 강제 생성 + LEFT OUTER JOIN (TB_SGMA_CONFIRM_HIS + cross-DB FIM.dbo.TB_USER) / 월별 row 누락 ❌. ROW_NUMBER + COUNT OVER window function.",
+      "dynamic_branch": [],
+      "dependent_tables": ["TB_SGMA_CONFIRM_HIS", "FIM.dbo.TB_USER", "dbo.FN_GET_MONTH (UDF)"],
+      "uc_link": "UC-BILLING-002",
+      "intent_vs_bug_classification": "intent (BR-BILLING-001 12개월 강제 표시) + bug 동반 (★ AP-BILLING-005 SQL Server vendor 종속 4 차원 / AP-BILLING-006 cross-DB FQCN / AP-BILLING-007 recursive CTE T-SQL 한정)",
+      "confidence": 0.75,
+      "carry_flags": ["DBA-read", "cross-domain"],
+      "scope_decision": "covered (★ 핵심 / 화면 진입)",
+      "migration_priority": "P2",
+      "$migration_priority_reason": "★ read-only / 데이터 변경 ❌ / 단, T-SQL 종속 4 차원 (recursive CTE + ROW_NUMBER + CONVERT + UDF + WITH NOLOCK) / 환자 시 복잡 ↑ — 중기 (P2)"
+    },
+    {
+      "sql_id": "BillingDAO.insertConfirmHistory",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 31,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmProcAjax (BillingController.dataConfirmProcAjax → saveDataConfirm)",
+      "business_meaning": "데이터 확정 이력 헤더 등록. SCOPE_IDENTITY 로 hisNo (PK) 자동 채움 → 후속 insertConfirmHistoryData 의 FK 참조.",
+      "dynamic_branch": [
+        {
+          "tag": "<selectKey resultClass=\"int\" keyProperty=\"hisNo\">",
+          "tag_type": "other",
+          "line": 32,
+          "branch_count": 1,
+          "note": "★ iBATIS 2 evolved tag / PK 생성 메커니즘 (dynamic 조건 분기 ❌ / tag_type enum 26종 중 'other' 분류)"
+        }
+      ],
+      "dependent_tables": ["TB_SGMA_CONFIRM_HIS"],
+      "uc_link": "UC-BILLING-003",
+      "intent_vs_bug_classification": "intent (BR-BILLING-007 SCOPE_IDENTITY PK 생성) + bug 동반 (★ AP-BILLING-001 @Transactional ❌ / 4 SQL 비원자성 일부)",
+      "confidence": 0.85,
+      "carry_flags": [],
+      "scope_decision": "covered (★ critical / 트랜잭션 일부)",
+      "migration_priority": "P1",
+      "$migration_priority_reason": "★ SCOPE_IDENTITY portability ❌ (T-SQL 한정 / PG = RETURNING / Oracle = sequence + currval) + non-transactional → 단기 (P1)"
+    },
+    {
+      "sql_id": "BillingDAO.insertConfirmHistoryData",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 40,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmProcAjax (BillingController.dataConfirmProcAjax → saveDataConfirm)",
+      "business_meaning": "데이터 확정 이력 상세 등록. cross-DB SGERPMA.dbo.TB_RG_RESULTS 에서 SELECT → TB_SGMA_CONFIRM_HIS_DATA INSERT (INSERT FROM SELECT). hisNo FK 의존.",
+      "dynamic_branch": [],
+      "dependent_tables": ["TB_SGMA_CONFIRM_HIS_DATA", "SGERPMA.dbo.TB_RG_RESULTS"],
+      "uc_link": "UC-BILLING-003",
+      "intent_vs_bug_classification": "intent (BR-BILLING-003 full overwrite) + bug 동반 (★ AP-BILLING-001 @Transactional ❌ / AP-BILLING-006 cross-DB FQCN hardcoded)",
+      "confidence": 0.75,
+      "carry_flags": ["DBA-read", "cross-domain"],
+      "scope_decision": "covered (★ ★ critical / 트랜잭션 핵심 / cross-DB)",
+      "migration_priority": "P0",
+      "$migration_priority_reason": "★ ★ critical — cross-DB FQCN + non-transactional + INSERT 핵심 데이터 무결성 risk → 즉시 (P0)"
+    },
+    {
+      "sql_id": "BillingDAO.selectConfirmDataCount",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 51,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmProcAjax (BillingController.dataConfirmProcAjax → saveDataConfirm)",
+      "business_meaning": "★ pre-check — ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) row 존재 여부 확인. count > 0 시 → delete + insert + insertHistory + insertHistoryData 실행 / count = 0 시 → JSP alert.",
+      "dynamic_branch": [],
+      "dependent_tables": ["SGERPMA.dbo.TB_RG_RESULTS"],
+      "uc_link": "UC-BILLING-003",
+      "intent_vs_bug_classification": "intent (BR-BILLING-004 ERP 데이터 부재 시 skip) + bug 동반 (★ AP-BILLING-005 WITH NOLOCK + AP-BILLING-006 cross-DB)",
+      "confidence": 0.75,
+      "carry_flags": ["DBA-read"],
+      "scope_decision": "covered",
+      "migration_priority": "P1",
+      "$migration_priority_reason": "★ cross-DB + WITH NOLOCK Dirty Read risk + pre-check race condition (★ TOCTOU) → 단기 (P1)"
+    },
+    {
+      "sql_id": "BillingDAO.insertConfirmData",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 60,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmProcAjax (BillingController.dataConfirmProcAjax → saveDataConfirm)",
+      "business_meaning": "★ ★ 데이터 확정 본문 등록 (insertConfirmHistoryData 와 isomorphic). cross-DB SGERPMA.dbo.TB_RG_RESULTS 에서 SELECT → TB_SGMA_CONFIRM INSERT. deleteConfirmData 후 즉시 실행 (사이 race condition 가능).",
+      "dynamic_branch": [],
+      "dependent_tables": ["TB_SGMA_CONFIRM", "SGERPMA.dbo.TB_RG_RESULTS"],
+      "uc_link": "UC-BILLING-003",
+      "intent_vs_bug_classification": "intent (BR-BILLING-003 full overwrite 본문) + bug 동반 (★ AP-BILLING-001 @Transactional ❌ / AP-BILLING-006 cross-DB / ★ ★ DRY violation insertConfirmHistoryData 와 SELECT clause 동일)",
+      "confidence": 0.80,
+      "carry_flags": ["DBA-read", "cross-domain", "DRY-violation"],
+      "scope_decision": "covered (★ ★ critical / 트랜잭션 핵심 / cross-DB)",
+      "migration_priority": "P0",
+      "$migration_priority_reason": "★ ★ critical — cross-DB FQCN + non-transactional + INSERT 핵심 데이터 + DRY violation → 즉시 (P0)"
+    },
+    {
+      "sql_id": "BillingDAO.deleteConfirmData",
+      "mapper_xml": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "mapper_xml_line": 71,
+      "statement_type": "PREPARED",
+      "called_from_screen": "dataConfirm.jsp → /ifrs/billing/dataConfirmProcAjax (BillingController.dataConfirmProcAjax → saveDataConfirm)",
+      "business_meaning": "★ ★ 데이터 확정 본문 삭제 (insertConfirmData 직전 호출 / full overwrite 의 delete 단계). WHERE COMPANYSEQ + DIST_MONTH 조건.",
+      "dynamic_branch": [],
+      "dependent_tables": ["TB_SGMA_CONFIRM"],
+      "uc_link": "UC-BILLING-003",
+      "intent_vs_bug_classification": "intent (BR-BILLING-003 full overwrite 의 delete) + bug 동반 (★ ★ ★ AP-BILLING-001 @Transactional ❌ / delete 후 insert 실패 시 데이터 손실 critical)",
+      "confidence": 0.85,
+      "carry_flags": [],
+      "scope_decision": "covered (★ ★ ★ critical / 데이터 손실 risk)",
+      "migration_priority": "P0",
+      "$migration_priority_reason": "★ ★ ★ critical — non-transactional + DELETE 후 INSERT 실패 = 데이터 손실 / 회복 ❌ → 즉시 (P0)"
+    }
+  ],
+  "phase_4_7_corroboration_role": {
+    "$comment": "★ phase 4.7 cross-link — chain 1 진입 후 별도 작성 / 본 SQL Inventory 의 intent_vs_bug_classification 4 분류 키워드 (intent / bug / ambiguous / self_recognized) = phase 4.7 corroboration 의 입력",
+    "role": "corroboration #3 사내 PoC isomorphic (★ ★ ★ 3 사내 PoC)",
+    "phase_4_7_status": "pending — Day 2.0 작업 (★ phase 4.7 characterization 별도 작성)"
+  },
+  "migration_priority_summary": {
+    "$comment": "★ v2.3.0 12번째 컬럼 migration_priority P0~P3 — billing 6 SQL 단위 분포",
+    "P0": 3,
+    "P1": 2,
+    "P2": 1,
+    "P3": 0,
+    "P0_ratio": "3/6 = 50% (★ critical 데이터 무결성 SQL 다수 / @Transactional ❌ + cross-DB FQCN + delete-then-insert)",
+    "implication": "★ ★ billing 모듈 modernization = ★ ★ @Transactional 도입 + cross-DB 추상화 + Optional<DTO> 결과 의무 (50% P0 = 단기 immediate 의무)"
+  },
+  "sub_rule_5_isomorphic_check": {
+    "$comment": "★ ★ ★ Spring 4.1 + iBATIS 2 spectrum sub-rule (ADR-CHAIN-010 / v2.3.0 final) 5종 isomorphic 검증 = PoC #11 ★ ★ ★ 3 사내 PoC 자격",
+    "AP-BILLING-002 Map raw type ✅ isomorphic": "PoC #06 + PoC #07 정합",
+    "AP-BILLING-005 SQL Server vendor 종속 ✅ isomorphic (★ 강화 4 차원)": "PoC #06 + PoC #07 WITH NOLOCK 정합 / 본 PoC = SCOPE_IDENTITY + getDate + UDF 추가",
+    "AP-BILLING-006 cross-DB FQCN ✅ isomorphic": "PoC #07 LIVE_SQL.SGERP.dbo 정합 / 본 PoC = FIM + SGERPMA",
+    "AP-BILLING-008 logging 부재 ✅ isomorphic": "PoC #06 + PoC #07 정합",
+    "AP-BILLING-012 자체 util wrapper ✅ isomorphic": "PoC #06 + PoC #07 정합 (jqCommon.js fn_ajax / IfrsUtil)",
+    "isomorphic_5_of_5": "✅ 100% — ★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족",
+    "resolve_trigger": "★ ★ C-v2.2.0-spring41-ibatis2-subrule resolve 자격 충족 (★ Day 3.5 종결 시 정식 resolve)"
+  }
+}

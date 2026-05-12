@@ -3,7 +3,47 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ **v2.3.1 PATCH release** — DEC-2026-05-12-v2.3.1-patch / C-v2.2.0-2 baseline ratchet + C-v2.2.0-7 tag_type enum / no new ADR / git tag v2.3.1 / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-12 (★ ★ ★ **PoC #11 (EFI-WEB billing) Day 0.5 진입** — DEC-2026-05-12-in-place-read-정책-채택 / source path 위임 + LOC 정탐 + plan 2차 작성 + Day 1 진입 승인)
+
+**v2.3.1 PATCH release 보존** (같은 날 2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-12 PoC #11 Day 0.5 진입 (★ 사용자 결단 α #1 진입 + 결단 β 정책 변경)**:
+
+- ✅ **origin push 동기화** — main + 3 tag (v2.3.0-rc1 / v2.3.0 / v2.3.1) origin 동기화 (4 commits / `8941726..bc48477`)
+- ✅ **사용자 결단 (β) 흡수** — "복사하지말고 해당 프로젝트 들어가서 읽었으면 좋겠어" → in-place read 정책 채택
+- ✅ **DEC-2026-05-12-in-place-read-정책-채택 등재** — 사본 패턴 폐기 + 사내 PoC 정합 의무
+- ✅ **source path 위임** — `/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs` (사내 EFI-WEB 코드베이스)
+- ✅ **billing 모듈 LOC 정탐** — 7 file / 257 Java + 77 sqlmap + 269 JSP = **603 LOC** (★ PoC #06 345 vs PoC #07 5509+ 사이 / scale-cross floor)
+- ✅ **plan 2차 작성** — `~/.claude/plans/d-poc-11-billing-2.md` (19절 / ~310 lines / in-place 정책 + 정탐 결과 + Day 1~3.5 시퀀스 + ★ §5-A+§5-B+§19 R1 revisit)
+- ✅ **4원칙 3원칙 사용자 승인** — plan 2차 + Day 1 본 session 즉시 진입
+- ✅ **Day 1.0 source 7 file in-place read** — BillingController + Service IF + Impl + DAO + billing.xml + dataConfirm.jsp + qlikView.jsp
+- ✅ **Day 1.1 analysis 4종 작성** — rules.json (8 BR) + domain.json (4 UC / 2 BC) + antipatterns.json (13 AP / 5종 isomorphic + 8종 novel) + inventory.json (Spring 4.1+iBATIS 2+egov + cross-DB 3 / Qlik BI)
+- ✅ **Day 1.5 SQL Inventory 11+1 컬럼 + §3-A 측정**:
+  - SQL Inventory 6 SQL / **auto_ratio_external_6 = 66.7%** (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족) / validator 0 findings pass / migration_priority P0×3+P1×2+P2×1
+  - §3-A 자동화율 = **52.5%** (★ inventory 70% + domain 50% + rules 50% + antipatterns 40%) — ★ ★ ★ plan 2차 expectation 25~40% +12.5%p ★ 초과
+- ✅ **★ ★ ★ R1 가설 ★ ★ 반증 사실 확보** — DEC-2026-05-12-r1-가설-revisit 등재 (★ critical methodology finding)
+- ⏳ **Day 2.0~3.5** — phase 4.7 + chain 1 + REPORT + DEC 종결 (★ ★ 사용자 결단 의뢰 진행)
+
+### 신규 정탐 (★ 본 session)
+
+- ★ ★ **egovframework** layer 발견 (`src/main/resources/egovframework/sqlmap/ifrs/billing.xml`) — 행정안전부 전자정부 표준 프레임워크 / Spring 4.1 + iBATIS 2 위 추가 layer / PoC #06+#07 동일 가능성 (Day 1 검증 의무)
+- ★ **Qlik BI 연동** 신규 차원 (qlikView.jsp 60 LOC) — PoC #06+#07 미보유 spectrum
+- billing 모듈 = Spring 4.1 standard 3-layer (Controller + Service IF + Service Impl + DAO + sqlmap + JSP)
+
+### resolved by 본 session
+
+- ~~C-in-place-read-policy~~ ✅ DEC-2026-05-12-in-place-read-정책-채택
+
+### 신규 carry
+
+- C-poc-11-source-디렉토리-cleanup — `examples/poc-11-efiweb-billing-spring41/source/{java,sqlmap,jsp,message}/` 4 빈 디렉토리 (낮은 우선순위 / Day 3.5 종결 시 일괄)
+- C-egovframework-sub-rule — egov 표준 프레임워크 layer / Day 1 정탐 후 결정 / sub-rule patterns_extension_v3 후보
+- ★ ★ ★ **C-r1-hypothesis-revisit** (critical) — R1 가설 ★ 반증 사실 / R1' 새 가설 정립 / 본체 methodology 영향 = Day 3.5 종결 시 별도 결단 의무
+- ★ ★ **C-automation-ceiling-paradigm** — sub-rule patterns_extension_v3 보강 후보 (paradigm 별 ceiling 53~55% 명시)
+
+---
+
+★ ★ ★ ★ ★ ★ **이전 session 2026-05-12 v2.3.1 PATCH release**:
 
 **v2.3.0 MINOR FINAL release 보존** (같은 날 2026-05-12 / commit `fd603bd` / git tag `v2.3.0` / Phase 1 + Phase 2 / ADR-CHAIN-009 + ADR-CHAIN-010)
 

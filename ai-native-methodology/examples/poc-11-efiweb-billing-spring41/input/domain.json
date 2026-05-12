@@ -1,0 +1,97 @@
+{
+  "$comment": "★ PoC #11 — billing 모듈 도메인 추출. ★ 작은 단일책임 / 2 sub-domain (DataConfirm + QlikView). 시간 cap 정합 — 4 endpoint 모두 covered. domain-cross axis = ★ 결제 / 청구 (vs PoC #06 자본 환율 + PoC #07 자본 환산).",
+  "project_id": "poc-11-efiweb-billing-spring41",
+  "domain_layer": "L0 (자연어) — Billing (결제 / 청구 / 데이터 확정) 도메인 / IFRS 회계 시스템 일부",
+  "bounded_contexts": [
+    {
+      "name": "DataConfirm (데이터 확정처리)",
+      "description": "★ 월별 ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 를 자체 DB (TB_SGMA_CONFIRM + history) 로 복사 / 확정. 확정 후 ERP 결과 변경 ↔ 자체 DB 변경 절연.",
+      "aggregates": [
+        "TB_SGMA_CONFIRM (확정 데이터 본문)",
+        "TB_SGMA_CONFIRM_HIS (확정 이력 헤더 / hisNo SCOPE_IDENTITY PK)",
+        "TB_SGMA_CONFIRM_HIS_DATA (확정 이력 상세 / hisNo FK)"
+      ],
+      "endpoints": 3
+    },
+    {
+      "name": "QlikView (Qlik Sense BI 임베드)",
+      "description": "외부 BI 시스템 (datacafe.smilegate.net Qlik Sense) iframe 임베드 / appid + sheet 동적 파라미터로 메뉴별 dashboard 분기.",
+      "aggregates": [],
+      "endpoints": 1
+    }
+  ],
+  "use_cases": [
+    {
+      "id": "UC-BILLING-001",
+      "name": "데이터 확정처리 화면 조회 (dataConfirm)",
+      "endpoint": "/ifrs/billing/dataConfirm",
+      "sql_ids": [],
+      "sub_domain": "A. DataConfirm",
+      "scope_decision": "covered (★ 핵심 / 화면 진입)",
+      "preconditions": ["사용자 인증 + 권한 (authMap)"],
+      "postconditions": ["currYear + companyList(권한별 법인 목록) 모델"]
+    },
+    {
+      "id": "UC-BILLING-002",
+      "name": "데이터 확정 목록 조회 AJAX (dataConfirmListAjax)",
+      "endpoint": "/ifrs/billing/dataConfirmListAjax",
+      "sql_ids": ["BillingDAO.selectDataConfirmList"],
+      "sub_domain": "A. DataConfirm",
+      "scope_decision": "covered (★ 핵심 / 12개월 row 강제 생성 recursive CTE)",
+      "preconditions": ["year + comNo + comNm 파라미터"],
+      "postconditions": ["12개월 row (procDt + userNm + companySeq) → JSON 응답"]
+    },
+    {
+      "id": "UC-BILLING-003",
+      "name": "★ ★ ★ 데이터 확정처리 실행 AJAX (dataConfirmProcAjax)",
+      "endpoint": "/ifrs/billing/dataConfirmProcAjax",
+      "sql_ids": [
+        "BillingDAO.selectConfirmDataCount",
+        "BillingDAO.deleteConfirmData",
+        "BillingDAO.insertConfirmData",
+        "BillingDAO.insertConfirmHistory",
+        "BillingDAO.insertConfirmHistoryData"
+      ],
+      "sub_domain": "A. DataConfirm",
+      "scope_decision": "covered (★ ★ critical / 4 SQL 비트랜잭션 BR-BILLING-002)",
+      "preconditions": ["distYear + distMonth + companySeq 파라미터", "ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 존재"],
+      "postconditions": [
+        "insertCount > 0 시 = delete (TB_SGMA_CONFIRM) + insert (TB_SGMA_CONFIRM from TB_RG_RESULTS) + insertHistory (TB_SGMA_CONFIRM_HIS / SCOPE_IDENTITY hisNo) + insertHistoryData (TB_SGMA_CONFIRM_HIS_DATA from TB_RG_RESULTS)",
+        "insertCount = 0 시 = skip + JSP alert"
+      ],
+      "transaction_concern": "★ ★ ★ @Transactional ❌ / 4 SQL 비원자성 / 부분 commit 위험"
+    },
+    {
+      "id": "UC-BILLING-004",
+      "name": "Qlik View 임베드 (qlikView)",
+      "endpoint": "/ifrs/billing/qlikView",
+      "sql_ids": [],
+      "sub_domain": "B. QlikView",
+      "scope_decision": "covered (★ 외부 BI 단순 wrapper)",
+      "preconditions": ["menuNm + appid + sheet 파라미터 (메뉴별 분기)"],
+      "postconditions": ["iframe src = datacafe.smilegate.net/sense/app/{appid}/sheet/{sheet}/state/analysis"]
+    }
+  ],
+  "uc_summary": {
+    "total": 4,
+    "covered": 4,
+    "covered_ratio": 1.0,
+    "sub_domains": {
+      "A. DataConfirm": 3,
+      "B. QlikView": 1
+    },
+    "endpoint_coverage": "4/4 = 100%"
+  },
+  "cross_system_dependencies": [
+    "FIM.dbo.TB_USER — 사용자 마스터 (read only / 확정 처리자 이름 표시)",
+    "SGERPMA.dbo.TB_RG_RESULTS — ERP 결과 데이터 (read only / 확정 처리 source)",
+    "datacafe.smilegate.net — Qlik Sense BI (외부 / iframe)"
+  ],
+  "domain_glossary": {
+    "데이터 확정": "ERP 결과 데이터를 자체 IFRS DB 로 복사 / 확정 후 ERP 변경 ↔ 자체 DB 절연",
+    "법인": "회사 (COM_NO / COMPANYSEQ / 본 화면은 ★ COM_NO == 2 만 노출)",
+    "회계월": "DIST_MONTH (★ string concat DIST_YEAR + DIST_MONTH 패턴 / 예: '202405')",
+    "확정이력": "TB_SGMA_CONFIRM_HIS (header) + TB_SGMA_CONFIRM_HIS_DATA (detail) / SCOPE_IDENTITY hisNo PK-FK 관계",
+    "Qlik Sense": "외부 BI 시스템 (datacafe.smilegate.net) / 데이터 dashboard 임베드"
+  }
+}
