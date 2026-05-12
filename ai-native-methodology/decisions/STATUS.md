@@ -3,7 +3,33 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-08 (★ ★ ★ ★ ★ ★ ★ **v2.2.0 MINOR FINAL release** — DEC-2026-05-08-v2.2.0-final / phase 4.8 sql-inventory + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기 / 5 PoC SQL Inventory isomorphic robust [4/6=66.7% × 5 / paradigm + ORM + platform + language + responsibility + scale 6 차원 corroboration sum] / 본체 자산 7 + workflow + ADR-CHAIN-007 + ADR-CHAIN-008 / unit test 232 → 233 [+1 / sql-inventory-extractor 10 신설 workspace 14번째 / 280 total with _shared] / §8.1 strict 7/7 ✅ / adr_registry 5 → 8 dynamic / build `ai-native-methodology-v2.2.0/` 272 files / 271 CHECKSUMS OK / git tag v2.2.0 / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ **v2.3.0-rc1 MINOR Phase 1 PRERELEASE** — DEC-2026-05-12-v2.3.0-scope-결단 / 옵션 D (REVISE 완전 흡수) / schema 12번째 컬럼 `migration_priority` P0~P3 + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / abstract granularity mismatch) / Senior critique 100% 흡수 + Big-tech first-mover 신호 보존 / 회귀 fixture 통과 (backward-compat ✅) / unit test 233 → 236 [+3 / sql-inventory-extractor 10 → 13 / 283 total with _shared] / chain harness 5 요소 변경 ❌)
+
+**v2.2.0 MINOR FINAL release 보존** (2026-05-08 / commit `8941726` / git tag `v2.2.0` / DEC-2026-05-08-v2.2.0-final / 5 PoC SQL Inventory isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-12 진행 (v2.3.0 minor sprint Phase 1)**:
+
+- ✅ **4원칙 1원칙** — plan 정식 격상 (`~/.claude/plans/g-v2.3.0-minor-plan.md` / 사용자 승인 Tier 1+2 = 3 항목 묶음)
+- ✅ **4원칙 2원칙** — research 자산화 (`~/.claude/plans/g-v2.3.0-minor-research.md` / 3 sub-agent 병렬 / 가벼운 sub-agent 전략)
+- ✅ **4원칙 3원칙** — 사용자 결단 옵션 D (Senior critique REVISE 완전 흡수)
+- ✅ **Phase 1 산출 7/7** — DEC + ADR-CHAIN-009 + schema 12번째 컬럼 + validator + 2 신규 fixture + 3 신규 test + deliverable §1.1+§1.2+§3+§4+§13 갱신 + version bump (plugin.json + package.json + sql-inventory-extractor + CHANGELOG)
+- ✅ **회귀 fixture 통과** — 기존 PoC #06+#07 11 컬럼 row test pass (backward-compat 의무 ✅)
+- ✅ **workspace test 236 pass** (47+11+15+16+5+5+6+5+6+25+68+14+13 / 0 fail)
+- ⏳ build + release-readiness 검증 (Step 7)
+
+### Phase 2 carry (별도 session)
+
+- C-v2.2.0-3 patterns_extension_v3 (cache / discriminator / typeHandler)
+- C-v2.2.0-4 Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule 자산화
+- v2.3.0-rc2 → final 격상
+
+### 별도 sprint carry (v2.4 / v3.0)
+
+- C-v2.3.0-gartner-time-application-level — `methodology-spec/deliverables/application-portfolio-time.md` 신설 후보 (★ ADR-CHAIN-009 §2)
+
+---
 
 ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-07~08 종결 (β 결단 + "나머지 진행해줘" + "남근거 다 실행" 일괄 처리)**:
 - ✅ **PoC #08 (jpetstore-6) Day 1~3.5 종결** — paradigm-cross MEDIUM #1 / commit `da1a0ab`
@@ -11,13 +37,13 @@
 - ✅ **PoC #10 (raeperd Spring Data JPA) Day 1~3.5 종결 (★ ★ reframe)** — DSL builder QueryDSL ❌ 솔직 → Spring Data JPA method name derived paradigm 측정 / paradigm-cross MEDIUM #3 / v2.3.0 minor trigger ❌
 - ✅ **★ ★ ★ ★ ★ ★ 5 PoC SQL Inventory isomorphic 자격 사실 확보** (66.7% × 5 / iBATIS 2 + MyBatis 3 + TypeORM + Spring Data JPA / paradigm + ORM + platform-cross 모두 robust 강 입증)
 - ✅ **★ ★ ★ ★ ★ N+1 AP = 5 PoC 공통 일반성 robust 입증**
-- ⏳ **★ ★ ★ v2.2.0 final 격상 trigger ❌** (★ Senior STOP signal / PoC #08+#09+#10 모두 MEDIUM corroboration / strong 의무 vs 실측)
-- ⏳ **★ ★ ★ ★ 신규 carry 2** = ★ 사용자 결단 의무
-  - C-paradigm-cross-strong-raw-sql (★ raw query() OSS 검색 vs 정책 완화 vs v3.0)
-  - C-paradigm-cross-DSL-builder-querydsl (★ DSL builder OSS 검색 vs 정책 완화 vs v3.0)
+- ~~⏳ **★ ★ ★ v2.2.0 final 격상 trigger ❌** (★ Senior STOP signal / PoC #08+#09+#10 모두 MEDIUM corroboration / strong 의무 vs 실측)~~ ✅ **resolved 2026-05-08** — ADR-CHAIN-008 신정책 (MEDIUM × ≥ 5 PoC = strong) + cooling-off 폐기 + v2.2.0 MINOR FINAL release (commit `8941726`)
+- ~~⏳ **★ ★ ★ ★ 신규 carry 2** = ★ 사용자 결단 의무~~ ✅ **resolved 2026-05-08** (ADR-CHAIN-008 §1 신정책 / 2026년 realworld OSS 부재 사실 정탐 흡수 → 둘 다 obsolete)
+  - ~~C-paradigm-cross-strong-raw-sql~~ ✅ obsolete
+  - ~~C-paradigm-cross-DSL-builder-querydsl~~ ✅ obsolete
 - ⏳ **PoC #11 (EFI-WEB billing)** = 사용자 결단 α 우선순위 #1 / source 위임 도착 시 복귀
 
-★ ★ §8.1 strict 본체 격상 ❌. ★ ★ Senior STOP signal 강화 (★ 2 carry 사용자 결단 의존).
+~~★ ★ §8.1 strict 본체 격상 ❌. ★ ★ Senior STOP signal 강화 (★ 2 carry 사용자 결단 의존).~~ ✅ **superseded** by Auto Mode (B) 결단 + ADR-CHAIN-008 + v2.2.0 MINOR FINAL release (line 24+ 참조 / commit `8941726`).
 
 ★ ★ ★ ★ ★ **본 session 추가 진행 (Auto Mode (A) 결단)**: PoC #12 (raw query()) + PoC #13 (DSL builder QueryDSL) prelim 일괄 신설 (DEC-2026-05-08-poc-12-13-prelim-신설). ★ ★ ★ ★ 2 추가 정탐 결과 = ★ ★ realworld OSS 부재 사실 확보.
 
@@ -72,7 +98,7 @@
 | #2 | **PoC #09** | **TypeORM raw SQL** (TS / Node.js / `query()` + `createQueryBuilder()`) | 14d | ★★★ 강 (Java→TS / paradigm + platform-cross) | ❌ (사내 ❌) | ★ ~~paradigm-cross 자격 ★ 강~~ → ★ ★ ★ MEDIUM 측정 (raw query() OSS 부재 정탐 사실 정합) | ✅ Day 1~3.5 종결 (commit `2af3772`) / raw query() strong ❌ 솔직 |
 | #3 | PoC #10 | Spring Data JPA method name derived (★ reframe / DSL builder QueryDSL ❌) | 14d | ★★ 중간 | ❓ | ★ ★ ★ MEDIUM corroboration / ~~v2.3.0 minor trigger~~ | ✅ Day 1~3.5 종결 (commit `759cdf1`) / v2.3.0 minor trigger ❌ |
 
-→ ~~v2.2.0 final 격상 = PoC #08 + PoC #09 둘 다 종결 후~~ → ★ ★ ★ ★ ★ ADR-CHAIN-008 채택 (2026-05-08) — **5 PoC + 2 정탐 사실 + 6 차원 corroboration sum = MEDIUM × ≥ 5 PoC isomorphic = strong 자격 충족** 신정책 → v2.2.0 final 격상 trigger 활성 (cooling-off 7d minimum 후 2026-05-15+ 별도 결단).
+→ ~~v2.2.0 final 격상 = PoC #08 + PoC #09 둘 다 종결 후~~ → ★ ★ ★ ★ ★ ADR-CHAIN-008 채택 (2026-05-08) — **5 PoC + 2 정탐 사실 + 6 차원 corroboration sum = MEDIUM × ≥ 5 PoC isomorphic = strong 자격 충족** 신정책 → ~~v2.2.0 final 격상 trigger 활성 (cooling-off 7d minimum 후 2026-05-15+ 별도 결단)~~ ✅ **resolved 2026-05-08** — cooling-off 영구 폐기 (commit `f78be2b`) + v2.2.0 MINOR FINAL release (commit `8941726` / git tag `v2.2.0` / DEC-2026-05-08-v2.2.0-final).
 
 **개별 carry 분해 (★ historical 기록 / ADR-CHAIN-008 채택 후 모두 resolved)**:
 - ~~C-v2.2.0-6a~~ ✅ resolved (PoC #08 종결 / MEDIUM × 5 PoC 합산)
@@ -84,11 +110,11 @@
 
 **진입 정책**:
 - ~~7d minimum cooling-off (2026-05-08 ~ 2026-05-15)~~ ✅ ★ ★ ★ ★ ★ **폐기** (DEC-2026-05-08-cooling-off-7d-폐기 / 사용자 결단 "패기해줘" / ADR-CHAIN-008 absorption + D 검증 4종 ✅ + carry burst 0 + npm test 280 pass = ★ Senior F4 검증대 통과 / DEC-2026-05-06-cooling-off-정책-폐기 정합 강화)
-- ★ ★ ★ ★ ★ **v2.2.0 final 격상 = ★ 즉시 진행 자격 ★ 활성** (★ 사용자 별도 결단 의뢰 의무 잔존)
+- ~~★ ★ ★ ★ ★ **v2.2.0 final 격상 = ★ 즉시 진행 자격 ★ 활성** (★ 사용자 별도 결단 의뢰 의무 잔존)~~ ✅ **resolved 2026-05-08** — commit `8941726` / git tag `v2.2.0` / DEC-2026-05-08-v2.2.0-final 종결
 - ★ 각 PoC = 별도 session + plan/research + 사용자 정식 결단 (4원칙 1~3원칙)
 - ★ ★ PoC #08 사용자 confirm 2건 ★ resolved (2026-05-07): (i) 사내 양식 = ★ source 자체로 자동 처리 (jpetstore-6 = XML 위주) (ii) source = ★ (b) `mybatis/jpetstore-6` 공식 reference webapp
 - ★ ★ ★ 사용자 정정 (2026-05-07): "MyBatis 는 내가 잘못 넣은 것 같다" → 사내 = iBATIS 2 단일 / MyBatis ❌ → PoC #08 사내 정합 ❌ / 본 방법론 일반화 자격 입증 용 + sub-rule 자격 + weak corroboration
-- v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단
+- ~~v2.2.0 final 격상 timing (PoC #08 + PoC #09 합산 / 또는 PoC #09 단독 / 또는 v3.0 일괄) = PoC #08 종결 시점 사용자 결단~~ ✅ **resolved 2026-05-08** — ADR-CHAIN-008 채택 후 5 PoC (#06+#07+#08+#09+#10) 합산 자격 충족 → v2.2.0 MINOR FINAL 격상 (commit `8941726`)
 
 **Day 0~3.5 종결 — PoC #08 (jpetstore-6) ★ ★ ★ ★ 정식 등재 + 종결 (2026-05-07~08)**:
 - ✅ Day 0 (commit `a27dfb0`) — DEC prelim + skeleton
@@ -159,10 +185,10 @@
 | AP-{X}-011/012 신규 등재 | AP-EXCHANGE-011 (0건) | AP-CAPITAL-012 (0건) | ★ ★ Spring 4.1 + iBATIS 2 spectrum 공통 |
 
 **carry 신규 (★ ★ v2.2.0 본체 격상 trigger 자격 충족 / ≥ 2 PoC isomorphic)**:
-- **C-v2.2.0-sql-inventory** — `methodology-spec/deliverables/24-sql-inventory.md` 신설
-- **C-v2.2.0-sql-schema** — `schemas/sql-inventory.schema.json` 신설
-- **C-v2.2.0-sql-tool** — `tools/sql-inventory-extractor/` 신설 (workspace 14번째)
-- C-v2.2.0-spring41-ibatis2-subrule (≥ 2 PoC corroboration 자격 충족)
+- ~~**C-v2.2.0-sql-inventory** — `methodology-spec/deliverables/24-sql-inventory.md` 신설~~ ✅ **resolved 2026-05-08** (v2.2.0-rc1 commit `f64e0b2`)
+- ~~**C-v2.2.0-sql-schema** — `schemas/sql-inventory.schema.json` 신설~~ ✅ **resolved 2026-05-08** (v2.2.0-rc1 commit `f64e0b2` / 31번째 schema)
+- ~~**C-v2.2.0-sql-tool** — `tools/sql-inventory-extractor/` 신설 (workspace 14번째)~~ ✅ **resolved 2026-05-08** (v2.2.0-rc1 commit `e4b0143` / 10 unit test)
+- C-v2.2.0-spring41-ibatis2-subrule (≥ 2 PoC corroboration 자격 충족 / PoC #11 종결 후 trigger)
 - C-v2.2.0-phase-4-7-multiresponsibility-subrule (단일 PoC / ≥ 2 다중책임 PoC 후 trigger)
 - C-domain-PoC07-1~3 (도메인 expert IFRS 회계 담당자 재검증)
 - C-PoC07-1~3 (chain 3 영역 — Testcontainers / MockMvc / DBUnit)

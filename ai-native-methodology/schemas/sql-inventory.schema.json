@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/sql-inventory.schema.json",
-  "title": "SQL Inventory — phase 4.8 SQL 단위 11 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy)",
-  "description": "Deliverable #24 (★ v2.2.0-rc1 신설). ADR-CHAIN-007 phase 4.8 정합. Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 5 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags). ≥ 2 PoC isomorphic (★ scale-cross / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum).",
+  "title": "SQL Inventory — phase 4.8 SQL 단위 12 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy)",
+  "description": "Deliverable #24 (★ v2.2.0-rc1 신설 / ★ v2.3.0-rc1 migration_priority 12번째 컬럼 추가). ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 (★ Gartner TIME SQL 단위 보류 / migration_priority P0~P3 대체) 정합. Michael Feathers Characterization Testing (2004) + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 6 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags + migration_priority). ≥ 2 PoC isomorphic (★ scale-cross + paradigm + ORM + platform-cross MEDIUM × 5 PoC robust strong / ADR-CHAIN-008): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum) + PoC #08+#09+#10 Modern.",
   "x-spec-source": {
     "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004)",
     "feathers_characterization": "https://michaelfeathers.silvrback.com/characterization-testing",
@@ -164,6 +164,11 @@
         "patterns": {
           "$ref": "#/$defs/patternObject",
           "description": "★ optional / Legacy iBATIS 한정 / patterns_extension_v2 nested per record."
+        },
+        "migration_priority": {
+          "type": "string",
+          "enum": ["P0", "P1", "P2", "P3"],
+          "description": "★ 본 추가 (v2.3.0-rc1) / 12번째 컬럼 / SQL 단위 modernization priority. P0=즉시(critical/차단 risk) / P1=短期(3개월 이내/high) / P2=中期(6~12개월/medium) / P3=후순위(12개월+/low or maintain). Gartner TIME (application portfolio 단위) 와 분리 axis — ADR-CHAIN-009 정합. optional — 기존 11 컬럼 row backward-compat 의무."
         }
       },
       "allOf": [

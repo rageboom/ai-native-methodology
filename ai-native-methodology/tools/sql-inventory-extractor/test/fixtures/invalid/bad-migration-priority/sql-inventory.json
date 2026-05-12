@@ -1,0 +1,25 @@
+{
+  "$comment": "★ invalid fixture — migration_priority enum 외 값 (PX) / ADR-CHAIN-009 정합 검증",
+  "meta_confidence": {
+    "generated_at": "2026-05-12T00:00:00Z",
+    "confidence": 0.85,
+    "inputs_used": ["source_code"]
+  },
+  "summary": { "total_sql_operations": 1, "by_type": { "select": 1 } },
+  "extraction_automation": {
+    "auto_extracted_columns": ["sql_id"],
+    "manual_columns": [],
+    "auto_ratio_external_6": "4/6 = 66.7%"
+  },
+  "inventory": [
+    {
+      "sql_id": "FooDAO.select",
+      "mapper_xml": "source/sqlmap/foo.xml",
+      "business_meaning": "★ 잘못된 migration_priority",
+      "dependent_tables": ["TB_FOO"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.80,
+      "migration_priority": "PX"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
-# 산출물 #24: SQL Inventory (★ v2.2.0-rc1 신설 — SQL 단위 인벤토리 11 컬럼 + RDB 한정 sub-phase)
+# 산출물 #24: SQL Inventory (★ v2.2.0-rc1 신설 — SQL 단위 인벤토리 11 컬럼 / ★ v2.3.0-rc1 — `migration_priority` 12번째 컬럼 추가 + RDB 한정 sub-phase)
 
-> **사상**: ADR-CHAIN-007 phase 4.8 정식 도입 + Michael Feathers Characterization Testing (2004) "production = its own specification" + Gartner TIME framework alignment (Tolerate / Invest / Migrate / Eliminate) + AWS Migration Acceleration Program (MAP) Assess phase
+> **사상**: ADR-CHAIN-007 phase 4.8 정식 도입 + ADR-CHAIN-008 paradigm-cross 정책 완화 (5 PoC isomorphic) + **★ ADR-CHAIN-009 Gartner TIME SQL 단위 보류 / `migration_priority` P0~P3 대체 채택** + Michael Feathers Characterization Testing (2004) "production = its own specification" + AWS Migration Acceleration Program (MAP) Assess phase
 > **schema**: `schemas/sql-inventory.schema.json` (★ 31번째 schema)
 > **생성 phase**: Phase 4.8 (★ phase 4.7 characterization 후 / phase 5-1 + 5-2 전 / RDB 한정 sub-phase)
-> **≥ 2 PoC isomorphic** (★ scale-cross 입증 / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6 v2.2.0 final trigger): PoC #06 (단일책임 6 SQL) + PoC #07 (다중책임 71 SQL) — 외부 6 컬럼 자동화 4/6 = 66.7% (양 PoC 동일 / scale 무관 isomorphic)
+> **≥ 5 PoC isomorphic** (★ scale + paradigm + ORM + platform + language + responsibility-cross MEDIUM × 5 robust strong / ADR-CHAIN-008): PoC #06+#07 (Spring 4.1 + iBATIS 2) + PoC #08 (MyBatis 3) + PoC #09 (TypeORM) + PoC #10 (Spring Data JPA) — 외부 6 컬럼 자동화 4/6 = 66.7% × 5 (모두 동일 / scale + paradigm 무관 isomorphic)
 
 ---
 
@@ -20,7 +20,7 @@
 
 - ★ Michael Feathers, *Working Effectively with Legacy Code* (2004) — "production = its own specification"
 - ★ Wikipedia *Characterization test* — "actual behavior > 의도된 behavior"
-- ★ Gartner *TIME framework* (Tolerate / Invest / Migrate / Eliminate) — Functional fit + Technical fit 2축
+- ★ ~~Gartner *TIME framework* (Tolerate / Invest / Migrate / Eliminate)~~ → ★ ★ ★ **SQL 단위 보류** (ADR-CHAIN-009 / 2026-05-12) — application portfolio 단위와 abstract granularity mismatch / 본 deliverable §4 12번째 컬럼은 `migration_priority` P0~P3 채택 (Gartner TIME 미사용 / application-level Gartner TIME = v2.4/v3.0 별도 deliverable carry).
 - ★ AWS Migration Acceleration Program (MAP) — Assess / Mobilize / Migrate / Modernize 4 phase
 - ★ Opus 4.7 외부 조언 (사용자 turn 시 별도 CLI 의견) — SQL 인벤토리 6 컬럼 + iBatis XML = 1차 산출물
 
@@ -32,8 +32,12 @@
 | SchemaSpy | schema-level metadata HTML/CSV | ★ 본 = SQL 단위 business intent + dynamic_branch + carry_flags |
 | sonar-mybatis | namespace+id grep + dynamic if 검출 | ★ 본 = phase 4.7 cross-link (uc_link / intent_vs_bug_classification) 강화 |
 | MyBatis Migrations changelog | (ID, APPLIED_AT, DESCRIPTION) | ★ 본 = 변경 추적 ❌ / 인벤토리 자체 |
+| Oracle SQL Developer Migration Workbench | technical complexity classification | ★ 본 = SQL-level + `migration_priority` P0~P3 (★ first-mover / 도구 부재) |
+| Liquibase changelog | changelog 추적 | ★ 본 = SQL-level 인벤토리 + migration priority |
 
 → ★ ★ **본 방법론 SQL Inventory = SQL-level + business intent + cross-link 의 ★ 고유 contribution** (Big-tech / Agent 2 입증 — Stripe / Shopify / AWS MAP / Gartner TIME 모두 application-level 또는 schema-level / SQL-level 인벤토리 ★ 공개 표준 부재).
+
+→ ★ ★ ★ **`migration_priority` SQL 단위 axis = first-mover** (★ v2.3.0-rc1 / 2026-05-12 research / Agent 2): SQL Inventory 도구 (AWS SCT / Oracle SQL Dev Migration Workbench / Liquibase) 모두 TIME 컬럼 부재 사실. 본 방법론은 application portfolio 수준 Gartner TIME 과 분리 axis 채택 (ADR-CHAIN-009).
 
 ---
 
@@ -62,6 +66,7 @@ output/sql-inventory/
 | intent_vs_bug_classification | characterization-spec.json 분류 reference | cross-link | 80~95% |
 | confidence | meta-confidence 단계별 가중 | 자동 | 90% |
 | carry_flags | DBA-read / external_call_out_of_scope / domain-expert-review enum | 매뉴얼 | 90% |
+| **migration_priority** (★ v2.3.0-rc1) | P0/P1/P2/P3 (AP severity + carry_flags + paradigm risk → 분류) | LLM + 매뉴얼 | 70~85% (★ classification 매뉴얼 / ADR-CHAIN-009) |
 
 **입력**: rules.json (phase 4) + antipatterns.json (phase 6) + characterization-spec.json (phase 4.7) + 코드 (mapper XML + DAO + Controller + JSP)
 **no-simulation 정책**: simulation 시 -5%p 패널티 / 도메인 expert 인터뷰 carry 필수.
@@ -76,7 +81,7 @@ output/sql-inventory/
 
 ---
 
-## 4. ★ 11 컬럼 명세
+## 4. ★ 12 컬럼 명세 (★ v2.3.0-rc1 migration_priority 12번째 추가)
 
 | # | 컬럼 | 출처 | 자동? | 설명 |
 |---|---|---|---|---|
@@ -91,8 +96,20 @@ output/sql-inventory/
 | 9 | intent_vs_bug_classification | 본 추가 | ❌ cross-link | characterization 4 분류 자연어 (예: `'intent (BR-002 정합) + bug 동반 (AP-006)'`) |
 | 10 | confidence | 본 추가 | ✅ 자동 | meta-confidence 단계별 가중 [0.0, 1.0] |
 | 11 | carry_flags | 본 추가 | ❌ 매뉴얼 | enum: `DBA-read` / `proc-body` / `external_call_out_of_scope` / `domain-expert-review` / `scope-decision-carry` |
+| **12** | **migration_priority** (★ v2.3.0-rc1 / ADR-CHAIN-009) | 본 추가 | ❌ classification 매뉴얼 | enum: `P0` 즉시(critical/차단) / `P1` 短期(3개월/high) / `P2` 中期(6~12개월/medium) / `P3` 후순위(12개월+/low or maintain). **★ optional** (기존 11 컬럼 row backward-compat 의무). Gartner TIME (application portfolio 단위) 와 분리 axis. |
 
-★ ★ 자동 추출 비율 (외부 6 컬럼 + statement_type) = **5/7 = 71.4%** (★ Agent 1 권고 흡수 후 / PoC #06+#07 = 4/6 = 66.7% baseline 정합 강화).
+★ ★ 자동 추출 비율 (외부 6 컬럼 + statement_type) = **5/7 = 71.4%** (★ Agent 1 권고 흡수 후 / PoC #06+#07 = 4/6 = 66.7% baseline 정합 강화). ★ migration_priority 는 classification metadata (자동화 비율 산정 제외 / 본 추가 5 컬럼과 동일 axis).
+
+### 4.1 ★ ★ ★ migration_priority 분류 가이드 (ADR-CHAIN-009 정합)
+
+| enum | trigger (분류 신호) | 예시 |
+|---|---|---|
+| `P0` 즉시 | critical bug / critical AP 동반 / external_call_out_of_scope + DBA-read 동반 / paradigm 위반 / 평문 password 등 보안 핵심 risk | AP-EXCHANGE-006 (정규화 위반) + critical 평문 password 등 |
+| `P1` 短期 (3개월) | high AP 동반 / N+1 / dynamic SQL 복잡도 高 / business 핵심 hot path | AP-EXCHANGE-007 (자조 SATD) + N+1 fetch |
+| `P2` 中期 (6~12개월) | medium AP / refactoring 후보 / patterns_extension 충돌 / Anemic Domain | AP-EXCHANGE-008 (ambiguous) + Anemic 등 |
+| `P3` 후순위 (12개월+) | low AP / 단순 CRUD / maintain only | 단순 SELECT / INSERT |
+
+**no-simulation 정합**: classification 은 도메인 expert 결단 의무 (LLM 추정 시 carry_flags 에 `domain-expert-review` 명시 + confidence ≤ 0.85 자동 의무).
 
 ---
 
@@ -256,10 +273,11 @@ cross_links:
 |---|---|---|
 | C-v2.2.0-1 | Modern 환경 NoSQL/Prisma 정합 검증 | ≥ 1 Modern PoC 후 |
 | C-v2.2.0-2 | sql-inventory baseline ratchet (characterization-coverage-validator mirror) | v2.2.x patch / 사용 시 |
-| C-v2.2.0-3 | patterns_extension_v3 (cache / discriminator / typeHandler) | ≥ 2 Legacy PoC patterns 변형 후 |
-| C-v2.2.0-4 | sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 본체 sub-rule 격상 | 본 plan 종결 후 별도 plan |
-| C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 |
-| **★ C-v2.2.0-6** | **★ ★ ★ Modern ORM PoC #08 (★ paradigm-cross corroboration)** — MyBatis 3 annotation 또는 JPA QueryDSL 또는 TypeORM raw SQL spectrum / 14d cap | ★ Senior STOP signal 흡수 / **★ v2.2.0 final 격상 trigger** |
+| C-v2.2.0-3 | patterns_extension_v3 (cache / discriminator / typeHandler) | ★ v2.3.0 Phase 2 carry / 본 v2.3.0-rc1 scope ❌ |
+| C-v2.2.0-4 | sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 본체 sub-rule 격상 | ★ v2.3.0 Phase 2 carry / 본 v2.3.0-rc1 scope ❌ |
+| C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 (PoC #11 종결 후) |
+| ~~**★ C-v2.2.0-6**~~ | ~~**★ ★ ★ Modern ORM PoC #08 (★ paradigm-cross corroboration)**~~ | ✅ **resolved** (ADR-CHAIN-008 채택 / 5 PoC isomorphic robust strong / v2.2.0 final 격상 완료 commit `8941726`) |
 | C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification enum | v2.2.x patch / 사용자 finding |
-| C-v2.2.0-8 | Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼) | v2.3+ / 사내 적용 시 |
+| ~~C-v2.2.0-8~~ | ~~Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼)~~ | ✅ **reframe by ADR-CHAIN-009** (Gartner TIME SQL 단위 보류 → `migration_priority` P0~P3 대체 채택 / v2.3.0-rc1 12번째 컬럼) |
 | ~~C-v2.2.0-9~~ | ~~"Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강~~ | ✅ **resolved** (rc1 시점 §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료) |
+| ★ **C-v2.3.0-gartner-time-application-level** | Gartner TIME application portfolio 별도 deliverable 후보 (`methodology-spec/deliverables/application-portfolio-time.md`) | v2.4 / v3.0 sprint (★ ADR-CHAIN-009 §2 분리 axis carry) |

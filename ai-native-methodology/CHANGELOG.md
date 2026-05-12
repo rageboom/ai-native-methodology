@@ -9,7 +9,52 @@
 
 ---
 
-## [v2.2.0] — 2026-05-08 ⭐ 현재 (★ ★ ★ ★ ★ ★ MINOR FINAL — rc1 → final / 5 PoC isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
+## [v2.3.0-rc1] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ MINOR PRERELEASE Phase 1 — schema 12번째 컬럼 `migration_priority` P0~P3 + ADR-CHAIN-009 Gartner TIME SQL 단위 보류)
+
+> **★ ★ ★ ★ ★ ★ MINOR Phase 1 PRERELEASE** — v2.3.0 minor sprint 옵션 D (REVISE 완전 흡수 / Senior critique 권고 100% 채택) 정합. Phase 1 = schema 12번째 컬럼 + 회귀 fixture + ADR-CHAIN-009. Phase 2 (patterns_extension_v3 + Spring 4.1 + iBATIS 2 sub-rule) = 별도 session 후속 carry.
+
+### 변경 사항 (v2.2.0 → v2.3.0-rc1)
+
+- **★ ★ ★ ★ ★ schema 12번째 컬럼 신설** — `schemas/sql-inventory.schema.json` `sqlRecord.properties.migration_priority` enum P0/P1/P2/P3 추가. **optional 의무** (기존 11 컬럼 row backward-compat 강제 / Senior critique 흡수). title + description 갱신 (11 → 12 컬럼).
+- **★ ★ ★ ★ ★ ★ ADR-CHAIN-009 신설** — `docs/adr/ADR-CHAIN-009-gartner-time-sql-level-deferral.md` "Gartner TIME SQL 단위 보류 사유 / abstract granularity mismatch + `migration_priority` P0~P3 대체 채택 / application portfolio 수준 별도 deliverable carry". Senior critique 100% 흡수 + Big-tech first-mover 신호 보존.
+- **★ ★ deliverable 24-sql-inventory.md 보강** — §1.1 Gartner TIME 보류 명시 / §1.2 "Why not AWS SCT" 차별화 절 +2 도구 (Oracle SQL Dev / Liquibase) + `migration_priority` first-mover 입증 / §3 추출 범위 +1 컬럼 / §4 11 → 12 컬럼 명세 + §4.1 분류 가이드 (P0~P3 trigger 예시) / §13 carry 표 갱신 (C-v2.2.0-8 reframe + C-v2.3.0-gartner-time-application-level 신규).
+- **★ sql-inventory-extractor validator 보강** — `tools/sql-inventory-extractor/src/validator.js` migration_priority enum 검증 추가 (`record.migration_priority_invalid` critical finding) + summary distribution { P0, P1, P2, P3, unspecified } 통계 + 검증 #8 신설 명세.
+- **★ unit test 회귀 fixture 2종 신설** — `valid/with-migration-priority/sql-inventory.json` (P0~P3 mixed + unspecified) + `invalid/bad-migration-priority/sql-inventory.json` (PX). 3 신규 test (backward-compat / valid recognition / invalid critical).
+- **★ ★ unit test 233 → 236** (+3 / sql-inventory-extractor 10 → 13 / 280 → 283 total with _shared).
+- **★ ★ ★ ★ Senior critique REVISE 완전 흡수** — (a) Gartner TIME = application portfolio 단위 / SQL 단위 abstract granularity mismatch / `migration_priority` 자연 axis 대체 (b) 14차 retract burst risk 회피 (2-phase split — Phase 1 + Phase 2) (c) ADR-CHAIN-009 신설 의무 (d) 회귀 fixture 사전 작성 의무. plan + research 2원칙 자산화 (`g-v2.3.0-minor-plan.md` + `g-v2.3.0-minor-research.md`).
+- **★ ★ Big-tech first-mover 신호 흡수** — SQL Inventory 도구 (AWS SCT / Oracle SQL Dev Migration Workbench / Liquibase) 모두 TIME 컬럼 부재 사실. `migration_priority` SQL 단위 axis = 본 방법론 first-mover (Gartner TIME application portfolio 분리).
+
+### v2.3.0-rc1 자격 — Phase 1 산출 6/6
+
+1. ✅ chain harness 5 요소 enforcement 보존 (v2.0~v2.3 일관)
+2. ✅ schema 12번째 컬럼 추가 + backward-compat 회귀 fixture 통과 (기존 PoC #06+#07 11 컬럼 row test pass)
+3. ✅ ADR-CHAIN-009 신설 + 결정 section 검증
+4. ✅ unit test 회귀 0 fail (236 pass / 14 workspace)
+5. ✅ deliverable 24 §3+§4+§13 정합 갱신
+6. ✅ ≥ 5 PoC corroboration 보존 (PoC #06+#07+#08+#09+#10 SQL Inventory isomorphic)
+
+### Phase 2 carry (별도 session)
+
+- C-v2.2.0-3 patterns_extension_v3 (cache / discriminator / typeHandler)
+- C-v2.2.0-4 Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule 자산화
+- ADR-CHAIN-010 (optional / ADR-008 sub-extension 흡수 가능)
+- v2.3.0-rc2 → final 격상
+
+### 별도 sprint carry (v2.4 / v3.0)
+
+- **★ C-v2.3.0-gartner-time-application-level** (★ 신규) — `methodology-spec/deliverables/application-portfolio-time.md` 신설 후보 (Gartner TIME application portfolio 별도 deliverable / SQL 단위와 axis 분리).
+
+### 잔존 carry (v2.2.x patch / v2.x)
+
+- C-v2.2.0-1 (NoSQL/Prisma) → paradigm shift / v3.0 후보
+- C-v2.2.0-2 (sql-inventory baseline ratchet) → v2.2.x patch
+- C-v2.2.0-5 (다중책임 spectrum) → PoC #11 종결 후
+- C-v2.2.0-7 (iBATIS 2 전용 dynamic 태그 sub-classification) → v2.2.x patch
+- PoC #11 (EFI-WEB billing) source 위임 대기
+
+---
+
+## [v2.2.0] — 2026-05-08 (★ ★ ★ ★ ★ ★ MINOR FINAL — rc1 → final / 5 PoC isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
 
 > **★ ★ ★ ★ ★ ★ MINOR FINAL** — v2.2.0-rc1 prerelease (2026-05-08 같은 날) 후 ★ ★ ADR-CHAIN-008 채택 + 5 PoC SQL Inventory isomorphic robust 사실 확보 + ★ ★ ★ ★ cooling-off 7d minimum 폐기로 즉시 final 격상. release-readiness §8.1 strict 7/7 ✅ + clean clone 재실행 ✅ + carry burst 0 ✅ + ADR-CHAIN-008 absorption ✅ + npm test 280 pass / 0 fail.
 

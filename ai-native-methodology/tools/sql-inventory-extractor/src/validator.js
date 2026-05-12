@@ -1,5 +1,5 @@
 // sql-inventory-extractor core
-// 검증 (★ ADR-CHAIN-007 phase 4.8 정합):
+// 검증 (★ ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 migration_priority 정합):
 //   1. inventory[].sql_id + mapper_xml + business_meaning + dependent_tables + intent_vs_bug_classification + confidence 의무
 //   2. inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT] (★ default PREPARED / Agent 1 강 권고)
 //   3. inventory[].carry_flags ⊂ enum 8종
@@ -7,6 +7,7 @@
 //   5. inventory[].carry_flags 에 external_call_out_of_scope 또는 DBA-read 시 confidence ≤ 0.80 (★ if/then)
 //   6. inventory[].intent_vs_bug_classification 본문에 (intent / bug / ambiguous / self_recognized) 4 분류 키워드 ≥ 1
 //   7. extraction_automation.auto_ratio_external_6 형식 검증 + threshold ≥ 0.50 (default)
+//   8. ★ inventory[].migration_priority (optional) ∈ [P0, P1, P2, P3] (★ v2.3.0-rc1 / ADR-CHAIN-009 / backward-compat 의무)
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -28,6 +29,7 @@ const VALID_CARRY_FLAGS = new Set([
 ]);
 const HIGH_CONFIDENCE_BLOCKING_FLAGS = new Set(['external_call_out_of_scope', 'DBA-read']);
 const INTENT_KEYWORDS = ['intent', 'bug', 'ambiguous', 'self_recognized'];
+const VALID_MIGRATION_PRIORITY = new Set(['P0', 'P1', 'P2', 'P3']);
 
 export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
   const findings = [];
@@ -39,7 +41,8 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
     medium: 0,
     auto_ratio_external_6: null,
     statement_type_distribution: { PREPARED: 0, CALLABLE: 0, STATEMENT: 0 },
-    carry_flags_count: 0
+    carry_flags_count: 0,
+    migration_priority_distribution: { P0: 0, P1: 0, P2: 0, P3: 0, unspecified: 0 }
   };
 
   // 1. sql-inventory.json read
@@ -163,6 +166,22 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
           message: `${path}.intent_vs_bug_classification 본문에 (intent / bug / ambiguous / self_recognized) 4 분류 키워드 ≥ 1 의무`
         });
       }
+    }
+
+    // ★ migration_priority enum (optional / ADR-CHAIN-009)
+    if (rec.migration_priority !== undefined) {
+      if (!VALID_MIGRATION_PRIORITY.has(rec.migration_priority)) {
+        findings.push({
+          kind: 'record.migration_priority_invalid',
+          severity: 'critical',
+          path,
+          message: `${path}.migration_priority='${rec.migration_priority}' invalid (must be P0|P1|P2|P3 per ADR-CHAIN-009)`
+        });
+      } else {
+        summary.migration_priority_distribution[rec.migration_priority] += 1;
+      }
+    } else {
+      summary.migration_priority_distribution.unspecified += 1;
     }
   }
 
