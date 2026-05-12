@@ -8,9 +8,12 @@
 //   6. inventory[].intent_vs_bug_classification 본문에 (intent / bug / ambiguous / self_recognized) 4 분류 키워드 ≥ 1
 //   7. extraction_automation.auto_ratio_external_6 형식 검증 + threshold ≥ 0.50 (default)
 //   8. ★ inventory[].migration_priority (optional) ∈ [P0, P1, P2, P3] (★ v2.3.0-rc1 / ADR-CHAIN-009 / backward-compat 의무)
+//   9. ★ inventory[].dynamic_branch[].tag_type (optional) ∈ enum (★ v2.3.1 PATCH / C-v2.2.0-7 / iBATIS 2 + MyBatis 3 + SQL native sub-classification)
+//  10. ★ extraction_automation.auto_ratio_external_6 baseline ratchet trend (★ v2.3.1 PATCH / C-v2.2.0-2 / characterization-coverage-validator mirror)
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -30,8 +33,27 @@ const VALID_CARRY_FLAGS = new Set([
 const HIGH_CONFIDENCE_BLOCKING_FLAGS = new Set(['external_call_out_of_scope', 'DBA-read']);
 const INTENT_KEYWORDS = ['intent', 'bug', 'ambiguous', 'self_recognized'];
 const VALID_MIGRATION_PRIORITY = new Set(['P0', 'P1', 'P2', 'P3']);
+const VALID_TAG_TYPE = new Set([
+  // iBATIS 2 dynamic tags (C-v2.2.0-7 / ADR-CHAIN-008 spectrum sub-classification)
+  'ibatis2:dynamic', 'ibatis2:iterate',
+  'ibatis2:isNull', 'ibatis2:isNotNull',
+  'ibatis2:isEmpty', 'ibatis2:isNotEmpty',
+  'ibatis2:isEqual', 'ibatis2:isNotEqual',
+  'ibatis2:isGreaterThan', 'ibatis2:isGreaterEqual',
+  'ibatis2:isLessThan', 'ibatis2:isLessEqual',
+  'ibatis2:isPropertyAvailable', 'ibatis2:isNotPropertyAvailable',
+  'ibatis2:isParameterPresent', 'ibatis2:isNotParameterPresent',
+  // MyBatis 3 dynamic tags
+  'mybatis3:if', 'mybatis3:choose-when', 'mybatis3:choose-otherwise',
+  'mybatis3:where', 'mybatis3:set', 'mybatis3:trim',
+  'mybatis3:foreach', 'mybatis3:bind',
+  // SQL native + other
+  'sql:case_when',
+  'other'
+]);
 
-export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
+export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, options = {}) {
+  const { coverageBaselinePath = null, writeBaseline = false } = options;
   const findings = [];
   const summary = {
     inventory_count: 0,
@@ -42,7 +64,9 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
     auto_ratio_external_6: null,
     statement_type_distribution: { PREPARED: 0, CALLABLE: 0, STATEMENT: 0 },
     carry_flags_count: 0,
-    migration_priority_distribution: { P0: 0, P1: 0, P2: 0, P3: 0, unspecified: 0 }
+    migration_priority_distribution: { P0: 0, P1: 0, P2: 0, P3: 0, unspecified: 0 },
+    tag_type_distribution: {},
+    ratchet_trend: null
   };
 
   // 1. sql-inventory.json read
@@ -183,6 +207,25 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
     } else {
       summary.migration_priority_distribution.unspecified += 1;
     }
+
+    // ★ dynamic_branch[].tag_type enum (optional / v2.3.1 PATCH / C-v2.2.0-7)
+    if (Array.isArray(rec.dynamic_branch)) {
+      for (let j = 0; j < rec.dynamic_branch.length; j++) {
+        const db = rec.dynamic_branch[j];
+        if (db.tag_type !== undefined) {
+          if (!VALID_TAG_TYPE.has(db.tag_type)) {
+            findings.push({
+              kind: 'record.tag_type_invalid',
+              severity: 'critical',
+              path: `${path}.dynamic_branch[${j}]`,
+              message: `${path}.dynamic_branch[${j}].tag_type='${db.tag_type}' invalid (must be in enum / iBATIS 2 + MyBatis 3 + sql:* + other / C-v2.2.0-7)`
+            });
+          } else {
+            summary.tag_type_distribution[db.tag_type] = (summary.tag_type_distribution[db.tag_type] ?? 0) + 1;
+          }
+        }
+      }
+    }
   }
 
   // 4. extraction_automation 검증
@@ -222,6 +265,34 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50) {
         }
       }
     }
+  }
+
+  // ★ ratchet trend (★ v2.3.1 PATCH / C-v2.2.0-2 / characterization-coverage-validator mirror)
+  if (coverageBaselinePath && summary.auto_ratio_external_6 !== null) {
+    const baseline = readCoverageBaseline(coverageBaselinePath);
+    const trend = coverageTrendCheck(summary.auto_ratio_external_6, baseline);
+    summary.ratchet_trend = trend;
+    if (!trend.pass) {
+      findings.push({
+        kind: 'extraction_automation.ratchet_trend_negative',
+        severity: 'high',
+        message: `auto_ratio_external_6 ratchet trend negative — ${trend.message}`
+      });
+    }
+    if (writeBaseline) {
+      writeCoverageBaseline(coverageBaselinePath, {
+        coverage_ratio: summary.auto_ratio_external_6,
+        coverage_strategy: 'ratchet',
+        project_id: entry.project_id ?? null
+      });
+    }
+  } else if (writeBaseline && coverageBaselinePath && summary.auto_ratio_external_6 !== null) {
+    // write-only path (baseline 부재 + write 의무)
+    writeCoverageBaseline(coverageBaselinePath, {
+      coverage_ratio: summary.auto_ratio_external_6,
+      coverage_strategy: 'ratchet',
+      project_id: entry.project_id ?? null
+    });
   }
 
   return finalize(findings, summary);

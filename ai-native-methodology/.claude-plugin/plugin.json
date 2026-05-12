@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.3.0",
-  "description": "★ ★ ★ ★ ★ ★ ★ v2.3.0 MINOR FINAL — Phase 1 (migration_priority P0~P3 + ADR-CHAIN-009 Gartner TIME SQL 단위 보류) + Phase 2 (patterns_extension_v3 cache/discriminator/typeHandler MyBatis 3+ + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-010). Senior critique REVISE 완전 흡수 + Big-tech first-mover 신호 보존. 회귀 fixture 통과 (기존 11 컬럼 row backward-compat ✅). sql-inventory-extractor 14 unit test (10 → +4) + 237 unit test (workspace) + 284 total with _shared. chain harness validated 보존 / 별도 sprint carry: C-v2.3.0-gartner-time-application-level.",
+  "version": "2.3.1",
+  "description": "★ ★ ★ ★ ★ ★ v2.3.1 PATCH — C-v2.2.0-2 baseline ratchet (auto_ratio_external_6 trend / characterization-coverage-validator mirror / --coverage-baseline + --write-coverage-baseline flags) + C-v2.2.0-7 dynamic_branch.tag_type sub-classification enum (iBATIS 2 16종 + MyBatis 3 8종 + sql:case_when + other). v2.3.0 MINOR FINAL 보존 (Phase 1+2 / ADR-CHAIN-009 + ADR-CHAIN-010 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum sub-rule). sql-inventory-extractor 18 unit test (14 → +4) + 241 unit test (workspace) + 288 total with _shared. chain harness validated 보존.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

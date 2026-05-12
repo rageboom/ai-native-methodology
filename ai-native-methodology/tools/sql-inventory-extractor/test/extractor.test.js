@@ -1,4 +1,4 @@
-// sql-inventory-extractor unit tests (★ workspace 14번째 / 14 tests / ★ v2.3.0-rc1 +3 migration_priority / ★ v2.3.0 Phase 2 +1 patterns_extension_v3)
+// sql-inventory-extractor unit tests (★ workspace 14번째 / 18 tests / ★ v2.3.0-rc1 +3 migration_priority / ★ v2.3.0 Phase 2 +1 patterns_extension_v3 / ★ v2.3.1 PATCH +4 [tag_type valid/invalid + ratchet pass/fail])
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
@@ -102,4 +102,37 @@ test('★ valid — patterns_extension_v3 (cache / discriminator / typeHandler) 
   assert.equal(r.summary.high, 0, JSON.stringify(r.findings));
   assert.equal(r.summary.inventory_count, 2);
   // patterns_extension_v3 = optional / validator 차원 검증 ❌ / schema 차원에서 처리 / 본 test = 회귀 ❌ 의무.
+});
+
+// ★ ★ v2.3.1 PATCH — tag_type enum (C-v2.2.0-7) + baseline ratchet (C-v2.2.0-2) 4 신규 test
+
+test('★ valid — dynamic_branch.tag_type (ibatis2 + mybatis3 + sql:case_when) recognized + no finding', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'with-tag-type'));
+  assert.equal(r.summary.critical, 0, JSON.stringify(r.findings));
+  assert.equal(r.summary.high, 0, JSON.stringify(r.findings));
+  assert.equal(r.summary.tag_type_distribution['ibatis2:isNotEmpty'], 1);
+  assert.equal(r.summary.tag_type_distribution['sql:case_when'], 1);
+  assert.equal(r.summary.tag_type_distribution['mybatis3:if'], 1);
+  assert.equal(r.summary.tag_type_distribution['mybatis3:foreach'], 1);
+});
+
+test('★ invalid — dynamic_branch.tag_type enum (unknown:tag) violation → critical finding', () => {
+  const r = validateSqlInventory(join(FIX, 'invalid', 'bad-tag-type'));
+  assert.ok(r.findings.some(f => f.kind === 'record.tag_type_invalid' && f.severity === 'critical'),
+    'tag_type=unknown:tag → critical finding 의무 (C-v2.2.0-7)');
+});
+
+test('★ ratchet trend positive — PoC #06 (auto_ratio 0.667) vs baseline 0.667 → no finding', () => {
+  const baseline = join(FIX, 'baselines', 'poc-06-baseline.json');
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, { coverageBaselinePath: baseline });
+  assert.equal(r.summary.high, 0, `ratchet trend pass 의무: ${JSON.stringify(r.findings)}`);
+  assert.equal(r.summary.ratchet_trend.pass, true);
+});
+
+test('★ ratchet trend negative — PoC #06 (auto_ratio 0.667) vs baseline 0.85 → high finding', () => {
+  const baseline = join(FIX, 'baselines', 'regressed-baseline.json');
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, { coverageBaselinePath: baseline });
+  assert.ok(r.findings.some(f => f.kind === 'extraction_automation.ratchet_trend_negative' && f.severity === 'high'),
+    'ratchet trend negative (0.667 < 0.85) → high finding 의무 (C-v2.2.0-2)');
+  assert.equal(r.summary.ratchet_trend.pass, false);
 });

@@ -1,0 +1,7 @@
+{
+  "generated_at": "2026-05-08",
+  "source_commit_sha": "test-regressed",
+  "project_id": "poc-06-efiweb-exchange-spring41",
+  "coverage_strategy": "ratchet",
+  "coverage_ratio": 0.85
+}

@@ -1,0 +1,44 @@
+{
+  "$comment": "★ v2.3.1 PATCH fixture / dynamic_branch.tag_type sub-classification / C-v2.2.0-7",
+  "meta_confidence": {
+    "generated_at": "2026-05-12T00:00:00Z",
+    "methodology_version": "v2.3.1",
+    "confidence": 0.90,
+    "inputs_used": ["source_code"]
+  },
+  "summary": {
+    "total_sql_operations": 2,
+    "by_type": { "select": 2 }
+  },
+  "extraction_automation": {
+    "auto_extracted_columns": ["sql_id", "mapper_xml", "dynamic_branch", "dependent_tables"],
+    "manual_columns": ["called_from_screen", "business_meaning"],
+    "auto_ratio_external_6": "4/6 = 66.7%"
+  },
+  "inventory": [
+    {
+      "sql_id": "ExchangeDAO.selectByCurrCd",
+      "mapper_xml": "source/sqlmap/exchange.xml",
+      "business_meaning": "★ iBATIS 2 isNotEmpty 분기 + SQL CASE WHEN 분기",
+      "dependent_tables": ["TB_EXCHANGE"],
+      "dynamic_branch": [
+        { "tag": "<isNotEmpty property=\"currCd\">", "tag_type": "ibatis2:isNotEmpty", "branch_count": 1, "line": 28 },
+        { "tag": "SQL CASE WHEN (12 분기)", "tag_type": "sql:case_when", "branch_count": 12, "line": 79 }
+      ],
+      "intent_vs_bug_classification": "intent (이중 분기)",
+      "confidence": 0.90
+    },
+    {
+      "sql_id": "OrderMapper.selectByStatus",
+      "mapper_xml": "src/main/resources/mappers/OrderMapper.xml",
+      "business_meaning": "★ MyBatis 3 if + foreach 분기",
+      "dependent_tables": ["orders"],
+      "dynamic_branch": [
+        { "tag": "<if test=\"status != null\">", "tag_type": "mybatis3:if", "branch_count": 1, "line": 10 },
+        { "tag": "<foreach collection=\"ids\" item=\"id\">", "tag_type": "mybatis3:foreach", "branch_count": 1, "line": 14 }
+      ],
+      "intent_vs_bug_classification": "intent (status filter)",
+      "confidence": 0.95
+    }
+  ]
+}

@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ ★ **v2.3.0 MINOR FINAL release** — DEC-2026-05-12-v2.3.0-final / Phase 1 + Phase 2 일괄 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-009 + ADR-CHAIN-010 / git tag v2.3.0 / chain harness 5 요소 변경 ❌)
+**기준일**: 2026-05-12 (★ ★ ★ ★ ★ ★ **v2.3.1 PATCH release** — DEC-2026-05-12-v2.3.1-patch / C-v2.2.0-2 baseline ratchet + C-v2.2.0-7 tag_type enum / no new ADR / git tag v2.3.1 / chain harness 5 요소 변경 ❌)
+
+**v2.3.0 MINOR FINAL release 보존** (같은 날 2026-05-12 / commit `fd603bd` / git tag `v2.3.0` / Phase 1 + Phase 2 / ADR-CHAIN-009 + ADR-CHAIN-010)
 
 **v2.3.0-rc1 prerelease 보존** (2026-05-12 같은 날 / commit `de1bae1` / git tag `v2.3.0-rc1` / Phase 1 single)
 **v2.2.0 MINOR FINAL release 보존** (2026-05-08 / commit `8941726` / git tag `v2.2.0` / DEC-2026-05-08-v2.2.0-final / 5 PoC SQL Inventory isomorphic robust + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기)
@@ -26,6 +28,8 @@
 
 - ~~C-v2.2.0-3~~ patterns_extension_v3 → ✅ ADR-CHAIN-010
 - ~~C-v2.2.0-4~~ Spring 4.1 + iBATIS 2 spectrum sub-rule → ✅ ADR-CHAIN-010
+- ~~C-v2.2.0-2~~ sql-inventory baseline ratchet → ✅ v2.3.1 PATCH (auto_ratio_external_6 trend flag)
+- ~~C-v2.2.0-7~~ iBATIS 2 dynamic 태그 sub-classification → ✅ v2.3.1 PATCH (tag_type enum 26종)
 
 ### 별도 sprint carry (v2.4 / v3.0)
 

@@ -278,12 +278,12 @@ cross_links:
 | ID | 항목 | trigger |
 |---|---|---|
 | C-v2.2.0-1 | Modern 환경 NoSQL/Prisma 정합 검증 | ≥ 1 Modern PoC 후 |
-| C-v2.2.0-2 | sql-inventory baseline ratchet (characterization-coverage-validator mirror) | v2.2.x patch / 사용 시 |
+| ~~C-v2.2.0-2~~ | ~~sql-inventory baseline ratchet (characterization-coverage-validator mirror)~~ | ✅ **resolved by v2.3.1 PATCH** (auto_ratio_external_6 ratchet flag + `_shared/baseline.js` 재사용) |
 | ~~C-v2.2.0-3~~ | ~~patterns_extension_v3 (cache / discriminator / typeHandler)~~ | ✅ **resolved by ADR-CHAIN-010** (v2.3.0 Phase 2 / schema $defs/patternsExtensionV3 정식 도입 / Phase 3 Modern PoC corroboration carry) |
 | ~~C-v2.2.0-4~~ | ~~sub-rule Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 본체 sub-rule 격상~~ | ✅ **resolved by ADR-CHAIN-010** (v2.3.0 Phase 2 / `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` 신설 / 단계 5 신뢰도 자격) |
 | C-v2.2.0-5 | sub-rule 다중책임 spectrum (AP-CAPITAL-005~011) | ≥ 2 다중책임 PoC 후 (PoC #11 종결 후) |
 | ~~**★ C-v2.2.0-6**~~ | ~~**★ ★ ★ Modern ORM PoC #08 (★ paradigm-cross corroboration)**~~ | ✅ **resolved** (ADR-CHAIN-008 채택 / 5 PoC isomorphic robust strong / v2.2.0 final 격상 완료 commit `8941726`) |
-| C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification enum | v2.2.x patch / 사용자 finding |
+| ~~C-v2.2.0-7~~ | ~~iBATIS 2 전용 dynamic 태그 sub-classification enum~~ | ✅ **resolved by v2.3.1 PATCH** (`dynamic_branch.items.tag_type` enum 26종 / iBATIS 2 16종 + MyBatis 3 8종 + sql:case_when + other) |
 | ~~C-v2.2.0-8~~ | ~~Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼)~~ | ✅ **reframe by ADR-CHAIN-009** (Gartner TIME SQL 단위 보류 → `migration_priority` P0~P3 대체 채택 / v2.3.0-rc1 12번째 컬럼) |
 | ~~C-v2.2.0-9~~ | ~~"Why not AWS SCT" 차별화 절 deliverable §1 motivation 보강~~ | ✅ **resolved** (rc1 시점 §1.2 4 도구 비교 표 + Big-tech 입증 흡수 완료) |
 | ★ **C-v2.3.0-gartner-time-application-level** | Gartner TIME application portfolio 별도 deliverable 후보 (`methodology-spec/deliverables/application-portfolio-time.md`) | v2.4 / v3.0 sprint (★ ADR-CHAIN-009 §2 분리 axis carry) |

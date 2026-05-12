@@ -9,7 +9,43 @@
 
 ---
 
-## [v2.3.0] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ MINOR FINAL — Phase 1 + Phase 2 일괄 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-010)
+## [v2.3.1] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ PATCH — C-v2.2.0-2 baseline ratchet + C-v2.2.0-7 tag_type enum / no ADR / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ ★ ★ PATCH** — v2.3.0 MINOR FINAL (같은 날 commit `fd603bd`) 후 내부 2 carry resolve. v2.2.x 잔존 carry 정리 / v2.3.x patch level (no new ADR / sub-rule deliverable / schema 본질 변경 ❌). release-readiness §8.1 strict 7/7 ✅ + npm test 241 pass (288 total with _shared) / 0 fail.
+
+### 변경 사항 (v2.3.0 → v2.3.1)
+
+- **★ ★ ★ ★ C-v2.2.0-2 baseline ratchet resolved** — `tools/sql-inventory-extractor/src/{validator,cli}.js` 에 baseline ratchet 통합 (characterization-coverage-validator mirror / `_shared/baseline.js` `coverageTrendCheck` 재사용). flag `--coverage-baseline <path>` + `--write-coverage-baseline` 신설. metric = `extraction_automation.auto_ratio_external_6`. current < baseline → `extraction_automation.ratchet_trend_negative` high finding.
+- **★ ★ ★ ★ C-v2.2.0-7 dynamic_branch.tag_type sub-classification enum resolved** — `schemas/sql-inventory.schema.json` `dynamic_branch.items.tag_type` optional enum 신설 (iBATIS 2 dynamic 16종 + MyBatis 3 dynamic 8종 + `sql:case_when` + `other` = 26종). validator `record.tag_type_invalid` critical finding + `summary.tag_type_distribution` 통계.
+- **★ 신규 fixture 4종** — `valid/with-tag-type/` + `invalid/bad-tag-type/` + `baselines/poc-06-baseline.json` (ratchet pass) + `baselines/regressed-baseline.json` (ratchet fail).
+- **★ unit test 237 → 241** (+4 / sql-inventory-extractor 14 → 18 / 288 total with _shared).
+- **★ deliverable 24-sql-inventory.md §13 carry 표 갱신** — C-v2.2.0-2 / C-v2.2.0-7 resolved 마킹.
+
+### v2.3.1 PATCH 자격 — 6/6
+
+1. ✅ chain harness 5 요소 enforcement 보존
+2. ✅ schema backward-compat (tag_type optional / 기존 fixture 회귀 ❌)
+3. ✅ no new ADR (patch level)
+4. ✅ unit test 회귀 0 fail (241 pass / 14 workspace)
+5. ✅ release-readiness §8.1 strict 7/7
+6. ✅ build artifact CHECKSUMS OK
+
+### resolved carry
+
+- ~~C-v2.2.0-2 sql-inventory baseline ratchet (characterization-coverage-validator mirror)~~ ✅ resolved (auto_ratio_external_6 ratchet flag + high finding)
+- ~~C-v2.2.0-7 iBATIS 2 전용 dynamic 태그 sub-classification enum~~ ✅ resolved (dynamic_branch.tag_type enum 26종)
+
+### 잔존 carry
+
+- C-v2.2.0-1 (NoSQL/Prisma) → paradigm shift / v3.0 후보
+- C-v2.2.0-5 (다중책임 spectrum) → PoC #11 종결 후
+- ★ C-v2.3.0-gartner-time-application-level → 별도 sprint v2.4 / v3.0
+- ★ Phase 3 (patterns_extension_v3 Modern PoC corroboration) → Modern PoC MyBatis 3 source 필요
+- PoC #11 (EFI-WEB billing) source 위임 대기
+
+---
+
+## [v2.3.0] — 2026-05-12 (★ ★ ★ ★ ★ ★ ★ MINOR FINAL — Phase 1 + Phase 2 일괄 / patterns_extension_v3 + Spring 4.1+iBATIS 2 spectrum AP isomorphic 5종 sub-rule + ADR-CHAIN-010)
 
 > **★ ★ ★ ★ ★ ★ ★ MINOR FINAL** — v2.3.0-rc1 prerelease (같은 날 2026-05-12 / commit `de1bae1` / git tag `v2.3.0-rc1`) 후 Phase 2 작업 종결 → final 격상. 옵션 D (REVISE 완전 흡수) Phase 1 + Phase 2 일괄 자산화. release-readiness §8.1 strict 7/7 ✅ + npm test 237 pass (284 total with _shared) / 0 fail.
 

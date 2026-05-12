@@ -104,7 +104,26 @@
             "properties": {
               "tag": {
                 "type": "string",
-                "description": "예: '<isNotEmpty property=\"currCd\">' / 'SQL CASE WHEN (12 분기)' / iBATIS 2 전용 '<dynamic>' / '<iterate>' / '<isPropertyAvailable>' (carry C-v2.2.0-7)."
+                "description": "예: '<isNotEmpty property=\"currCd\">' / 'SQL CASE WHEN (12 분기)' / iBATIS 2 전용 '<dynamic>' / '<iterate>' / '<isPropertyAvailable>'."
+              },
+              "tag_type": {
+                "type": "string",
+                "enum": [
+                  "ibatis2:dynamic", "ibatis2:iterate",
+                  "ibatis2:isNull", "ibatis2:isNotNull",
+                  "ibatis2:isEmpty", "ibatis2:isNotEmpty",
+                  "ibatis2:isEqual", "ibatis2:isNotEqual",
+                  "ibatis2:isGreaterThan", "ibatis2:isGreaterEqual",
+                  "ibatis2:isLessThan", "ibatis2:isLessEqual",
+                  "ibatis2:isPropertyAvailable", "ibatis2:isNotPropertyAvailable",
+                  "ibatis2:isParameterPresent", "ibatis2:isNotParameterPresent",
+                  "mybatis3:if", "mybatis3:choose-when", "mybatis3:choose-otherwise",
+                  "mybatis3:where", "mybatis3:set", "mybatis3:trim",
+                  "mybatis3:foreach", "mybatis3:bind",
+                  "sql:case_when",
+                  "other"
+                ],
+                "description": "★ v2.3.1 PATCH (C-v2.2.0-7) / optional sub-classification — iBATIS 2 dynamic tag (16종) + MyBatis 3 dynamic tag (8종) + SQL native (case_when) + other. tag (자연어) 와 tag_type (정형 enum) 양방향 link 의무."
               },
               "line": {
                 "oneOf": [
