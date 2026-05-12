@@ -22,7 +22,12 @@
   - SQL Inventory 6 SQL / **auto_ratio_external_6 = 66.7%** (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족) / validator 0 findings pass / migration_priority P0×3+P1×2+P2×1
   - §3-A 자동화율 = **52.5%** (★ inventory 70% + domain 50% + rules 50% + antipatterns 40%) — ★ ★ ★ plan 2차 expectation 25~40% +12.5%p ★ 초과
 - ✅ **★ ★ ★ R1 가설 ★ ★ 반증 사실 확보** — DEC-2026-05-12-r1-가설-revisit 등재 (★ critical methodology finding)
-- ⏳ **Day 2.0~3.5** — phase 4.7 + chain 1 + REPORT + DEC 종결 (★ ★ 사용자 결단 의뢰 진행)
+- ✅ **★ ★ ★ ★ sub-rule v1.1 본체 보강** — DEC-2026-05-12-sub-rule-v1.1-갱신 (PoC #11 Day 2.0~3.5 suspend 후 본체 우선 / 사용자 결단 정합):
+  - ★ KL-SATD 인용 정정 (Korean Language → Keyword-Labeled / SQJ 2024 DOI)
+  - ★ §3 ≥ 3 사내 PoC isomorphic 표 강화 (scale-cross 3 spectrum)
+  - ★ ★ §X 신규 — automation ceiling R1' (Zhang ICSE 2025 + LongCodeBench 외부 권위 STRONG / 정량 ceiling = original empirical finding)
+  - 4원칙 1+2+3 완료 (plan h + research + 사용자 결단 γ)
+- ⏳ **Day 2.0~3.5** — PoC #11 phase 4.7 + chain 1 + REPORT + DEC 종결 (★ ★ 본체 보강 완료 후 사용자 결단 의뢰 / Day 3.5 carry resolve: C-poc-11-0-satd-해석-정정)
 
 ### 신규 정탐 (★ 본 session)
 
@@ -33,13 +38,18 @@
 ### resolved by 본 session
 
 - ~~C-in-place-read-policy~~ ✅ DEC-2026-05-12-in-place-read-정책-채택
+- ~~**C-r1-hypothesis-revisit**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ ★ §X 등재로 resolved)
+- ~~**C-automation-ceiling-paradigm**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ §X 등재로 resolved)
+- ~~**KL-SATD 인용 오류**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ §AP-005 정정 / Agent 1 research 기반)
+- ~~**iBATIS 2 dynamic tag sub-classification carry**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ v2.3.1 PATCH 정합 / §6 갱신)
+- ~~**C-v2.2.0-spring41-ibatis2-subrule**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족 / sub-rule v1.1 강 등급)
 
 ### 신규 carry
 
 - C-poc-11-source-디렉토리-cleanup — `examples/poc-11-efiweb-billing-spring41/source/{java,sqlmap,jsp,message}/` 4 빈 디렉토리 (낮은 우선순위 / Day 3.5 종결 시 일괄)
 - C-egovframework-sub-rule — egov 표준 프레임워크 layer / Day 1 정탐 후 결정 / sub-rule patterns_extension_v3 후보
-- ★ ★ ★ **C-r1-hypothesis-revisit** (critical) — R1 가설 ★ 반증 사실 / R1' 새 가설 정립 / 본체 methodology 영향 = Day 3.5 종결 시 별도 결단 의무
-- ★ ★ **C-automation-ceiling-paradigm** — sub-rule patterns_extension_v3 보강 후보 (paradigm 별 ceiling 53~55% 명시)
+- **C-poc-11-0-satd-해석-정정** (★ Day 3.5 PoC #11 종결 시 / "Modern OSS reference 정합" 결론 ❌ / single-case strict 미부합 명시 / Agent 1 cross-validation 기반)
+- **C-r1-prime-자격-Modern-corroboration** (★ Modern stack sub-rule 본격 자산화 시 R1' Modern ceiling ~60~67% 명문화)
 
 ---
 

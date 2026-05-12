@@ -9,7 +9,74 @@
 
 ---
 
-## [v2.3.1] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ ★ ★ PATCH — C-v2.2.0-2 baseline ratchet + C-v2.2.0-7 tag_type enum / no ADR / chain harness 5 요소 변경 ❌)
+## [v2.3.2] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ PATCH — sub-rule v1.0 → v1.1 minor 갱신 / KL-SATD 인용 정정 + R1' automation ceiling 신설 + 외부 권위 보강 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ PATCH** — v2.3.1 PATCH (같은 날 commit `bc48477`) 후 PoC #11 Day 0.5~1.5 종결 + 본체 sub-rule 보강. v2.3.x patch level (no new ADR / sub-rule 본문 보강만 / schema 변경 ❌). 사용자 결단 정합 — PoC #11 Day 1.5 R1 가설 ★ 반증 critical finding → 본체 methodology R1' 검토 우선 (PoC #11 Day 2.0~3.5 suspend).
+
+### 변경 사항 (v2.3.1 → v2.3.2)
+
+#### ★ ★ ★ PoC #11 (EFI-WEB billing) Day 0.5~1.5 종결
+
+- **★ ★ ★ DEC-2026-05-12-in-place-read-정책-채택** — source 사본 패턴 → in-place read 정책 변경. 사내 PoC 정합 의무 / 외부 OSS PoC 는 clone 보존. PoC #11 첫 적용 (`source_root_absolute: /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs`).
+- **billing 모듈 정탐** — 7 file / 257 Java + 77 sqlmap + 269 JSP = 603 LOC / Spring 4.1 + iBATIS 2 + egov + Qlik BI 외부 임베드 + cross-DB 3개 (ifrs + FIM + SGERPMA).
+- **analysis 4종 + SQL Inventory** — 8 BR + 4 UC + 13 AP (★ 5종 isomorphic + 8종 novel) + 6 SQL × 12 컬럼 / validator 0 findings / **auto_ratio 66.7%** (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족) / migration_priority P0×3+P1×2+P2×1.
+- **§3-A 자동화율 = 52.5%** — ★ ★ plan 2차 expectation 25~40% **+12.5%p 초과**.
+
+#### ★ ★ ★ ★ DEC-2026-05-12-r1-가설-revisit (★ critical methodology finding)
+
+- ★ ★ ★ R1 가설 (scale ↓ → 자동화율 ↓) ★ ★ **반증** 사실 확보 (3 사내 PoC: 38.75% / 52.5% / 53.8% / scale 분포 vs 자동화율 분포 ★ 불일치).
+- ★ ★ ★ R1' (revised) 새 가설 — **Spring 4.1+iBATIS 2 paradigm = analysis 단계 §3-A automation ceiling ~53~55%** (★ 3 사내 PoC isomorphic / scale 무관).
+- paradigm modernization 시 ceiling 돌파 evidence: PoC #08 = 66.7% / PoC #09 = 63.6%.
+
+#### ★ ★ ★ ★ DEC-2026-05-12-sub-rule-v1.1-갱신 (sub-rule 본문 보강)
+
+`methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` v1.0 → **v1.1 minor 갱신**:
+
+1. ★ ★ ★ **§AP-005 KL-SATD 인용 정정** (★ critical) — "Korean Language" → "**Keyword-Labeled**" / Software Quality Journal 2024 (DOI 10.1007/s11219-023-09655-z) / Maldonado 2015 = IEEE 7th MTD workshop / 5 SATD type 분류 정확화.
+2. **§3 ≥ 2 PoC → ≥ 3 사내 PoC isomorphic 표 강화** — scale-cross 3 spectrum (작은 단일 + 단일 + 다중책임) / 5 AP 중 2종 3 PoC + 3종 2 PoC corroboration.
+3. **§4 신뢰도 단계 5 강 (90~95%) 신설** — ≥ 3 사내 PoC + ≥ 3 spectrum + R1' original empirical finding 보강.
+4. ★ ★ **§X 신규 절 — automation ceiling R1'** — 3 사내 PoC 측정 사실 + R1 ★ 반증 + R1' 정립 + ★ ★ ★ 외부 권위 STRONG 보강 (Zhang ICSE 2025 DUR 70~90% vs 9~18% + LongCodeBench Claude 3.5 32K→256K 29%→3% + Context Length Alone Hurts + Gartner 2025) + ★ ★ original empirical finding 라벨 + paradigm modernization 시 ceiling 돌파 5 PoC 사실.
+5. **§6 carry 갱신** — iBATIS 2 dynamic tag sub-classification carry ✅ resolved.
+6. **§7 참조 추가** — SQJ 2024 + Zhang ICSE 2025 + LongCodeBench + Context Length + Gartner 2025 + DEC 3건 + PoC #11 산출.
+
+#### 4원칙 정합 (★ ★ ★ ★)
+
+- **1원칙 plan** — `~/.claude/plans/h-r1-revisit-본체-검토.md` (4 자산 전수 조사 / 13절)
+- **2원칙 research** — `~/.claude/plans/h-r1-revisit-research.md` (3 light sub-agent F-015 cross-validation / KL-SATD 인용 오류 + R1' STRONG 외부 권위 발견)
+- **3원칙 사용자 결단** — γ ("sub-rule v1.1 일괄 / §X 만 / WebFetch skip / PATCH v2.3.2 즉시 release")
+- **4원칙 Lessons Learned** — 4건
+
+### v2.3.2 PATCH 자격 — 6/6
+
+1. ✅ chain harness 5 요소 enforcement 보존
+2. ✅ schema backward-compat (★ schema 변경 ❌)
+3. ✅ no new ADR (patch level)
+4. ✅ ≥ 3 사내 PoC isomorphic 자격 사실 (PoC #06+#11+#07)
+5. ✅ release-readiness §8.1 strict 7/7
+6. ✅ unit test 회귀 0 fail (★ tools 변경 ❌ / 기존 241 pass 보존)
+
+### resolved (★ ★ ★ 6)
+
+- C-in-place-read-policy
+- C-r1-hypothesis-revisit (★ critical)
+- C-automation-ceiling-paradigm
+- KL-SATD 인용 오류 (★ Agent 1 F-015 cross-validation)
+- iBATIS 2 dynamic tag sub-classification carry
+- C-v2.2.0-spring41-ibatis2-subrule (★ ★ ★ 3 사내 PoC isomorphic)
+
+### 잔존 carry
+
+- C-v2.2.0-1 (NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level
+- ★ C-poc-11-0-satd-해석-정정 (★ Day 3.5)
+- C-poc-11-source-디렉토리-cleanup
+- C-egovframework-sub-rule
+- C-r1-prime-자격-Modern-corroboration
+- PoC #11 Day 2.0~3.5 (★ ★ 본 release 후 별도 결단)
+
+---
+
+## [v2.3.1] — 2026-05-12 (★ ★ ★ ★ ★ ★ PATCH — C-v2.2.0-2 baseline ratchet + C-v2.2.0-7 tag_type enum / no ADR / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ ★ ★ PATCH** — v2.3.0 MINOR FINAL (같은 날 commit `fd603bd`) 후 내부 2 carry resolve. v2.2.x 잔존 carry 정리 / v2.3.x patch level (no new ADR / sub-rule deliverable / schema 본질 변경 ❌). release-readiness §8.1 strict 7/7 ✅ + npm test 241 pass (288 total with _shared) / 0 fail.
 
