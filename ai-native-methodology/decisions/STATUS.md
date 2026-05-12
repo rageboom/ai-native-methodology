@@ -27,7 +27,11 @@
   - ★ §3 ≥ 3 사내 PoC isomorphic 표 강화 (scale-cross 3 spectrum)
   - ★ ★ §X 신규 — automation ceiling R1' (Zhang ICSE 2025 + LongCodeBench 외부 권위 STRONG / 정량 ceiling = original empirical finding)
   - 4원칙 1+2+3 완료 (plan h + research + 사용자 결단 γ)
-- ⏳ **Day 2.0~3.5** — PoC #11 phase 4.7 + chain 1 + REPORT + DEC 종결 (★ ★ 본체 보강 완료 후 사용자 결단 의뢰 / Day 3.5 carry resolve: C-poc-11-0-satd-해석-정정)
+- ✅ **★ ★ ★ ★ PoC #11 Day 2.0~3.5 정식 등재 + 종결** — DEC-2026-05-12-poc-11-종결 / 4축 4/4 pass / 3 사내 PoC isomorphic 자격 ★ 충족 / R1 가설 ★ 반증 critical finding:
+  - phase 4.7 = 4 snapshot + 6 scenario + ratchet baseline write + 14/15 = 93.3% (★ Day 2.5 ambiguous BR-BILLING-006 유지 / 사용자 결단 δ)
+  - chain 1 planning-spec = 0 findings + UC coverage 100% (planning-extraction-validator pass)
+  - REPORT-day3-measurement.md 작성
+  - C-v2.2.0-spring41-ibatis2-subrule ✅ resolved (★ 3 사내 PoC isomorphic 자격 충족)
 
 ### 신규 정탐 (★ 본 session)
 
@@ -44,12 +48,16 @@
 - ~~**iBATIS 2 dynamic tag sub-classification carry**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ v2.3.1 PATCH 정합 / §6 갱신)
 - ~~**C-v2.2.0-spring41-ibatis2-subrule**~~ ✅ DEC-2026-05-12-sub-rule-v1.1-갱신 (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족 / sub-rule v1.1 강 등급)
 
-### 신규 carry
+### 신규 carry (★ ★ PoC #11 Day 3.5 종결 후)
 
-- C-poc-11-source-디렉토리-cleanup — `examples/poc-11-efiweb-billing-spring41/source/{java,sqlmap,jsp,message}/` 4 빈 디렉토리 (낮은 우선순위 / Day 3.5 종결 시 일괄)
-- C-egovframework-sub-rule — egov 표준 프레임워크 layer / Day 1 정탐 후 결정 / sub-rule patterns_extension_v3 후보
-- **C-poc-11-0-satd-해석-정정** (★ Day 3.5 PoC #11 종결 시 / "Modern OSS reference 정합" 결론 ❌ / single-case strict 미부합 명시 / Agent 1 cross-validation 기반)
-- **C-r1-prime-자격-Modern-corroboration** (★ Modern stack sub-rule 본격 자산화 시 R1' Modern ceiling ~60~67% 명문화)
+- ★ ★ ★ **C-domain-PoC11-1** (★ critical / 결제 도메인 expert / BR-BILLING-006 ambiguous COM_NO==2 hardcoded 재검증 의무)
+- ★ ★ C-domain-PoC11-2 (BR-BILLING-005 시작년도 2015 의미 확인)
+- ★ C-domain-PoC11-3 (Qlik Sense appid/sheet 운영 체계 expert)
+- ★ ★ C-poc-11-0-satd-해석-정정 (★ Agent 1 cross-validation 기반 / single-case + 잠복 기간 미경과 해석 명시)
+- ★ C-poc-11-source-디렉토리-cleanup (낮은 우선순위)
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화 시)
+- C-PoC07-1~3 (chain 3 영역 / billing 도 동일 carry 정합)
+- C-r1-prime-자격-Modern-corroboration (★ Modern stack sub-rule 자산화 시 R1' Modern ceiling ~60~67% 명문화)
 
 ---
 

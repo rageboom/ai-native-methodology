@@ -1,0 +1,50 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-BILLING-001 데이터 확정처리 화면 진입 (sub-domain A. DataConfirm). ★ thin endpoint — 화면 진입 + 권한 모델 + COM_NO==2 hardcoded filter.",
+  "snapshot_id": "SNAP-UC-BILLING-001",
+  "use_case": "UC-BILLING-001",
+  "endpoint": "GET /ifrs/billing/dataConfirm",
+  "controller_method": "BillingController.dataConfirm",
+  "service_method": "(none — userService.getCompanyList 만 호출)",
+  "sql_id": "(none — UserService 측 SQL)",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재 — Stripes 없음 + JSP 동적 권한 분기 / authMap 외부 의존",
+  "scenarios": [
+    {
+      "id": "SCN-BILLING-001-001",
+      "name": "happy path — 데이터 확정처리 화면 진입 (인증된 사용자)",
+      "given": {
+        "session": { "AUTH_TYPE": "ADMIN", "COM_NO": "2", "EKP_USER_ID": "USR001" },
+        "authMap": { "typeGb": "P", "rbacId": "RBAC-BILLING", "authUseYn": "Y", "writeAuth": "W" }
+      },
+      "when": "GET /ifrs/billing/dataConfirm → BillingController.dataConfirm: currYear = DateUtil.getTodayString('yyyy') / param = {authType, comNo} / model.addAttribute('currYear', currYear) + model.addAttribute('companyList', userService.getCompanyList(param))",
+      "then": {
+        "view_name": "billing/dataConfirm",
+        "model_attrs": { "currYear": "2026", "companyList": "[권한별 법인 목록]" },
+        "jsp_render": "★ ★ JSP dataConfirm.jsp = c:forEach (currYear - 2015) 12 year option + c:if (list.COM_NO == 2) 법인 select option (★ AP-BILLING-011 critical / 1 법인만 노출)",
+        "_BR_link": "BR-BILLING-005 (시작년도 2015 hardcoded) + BR-BILLING-006 (★ critical / 법인 COM_NO==2 hardcoded)"
+      },
+      "intent_classification": [
+        { "rule": "BR-BILLING-005", "type": "intent", "note": "시작년도 2015 hardcoded — 시스템 가동 시점 추정 (★ ★ 결제 도메인 expert 검증 carry)" },
+        { "rule": "BR-BILLING-006", "type": "ambiguous", "note": "★ ★ ★ 법인 COM_NO==2 hardcoded — 의도? 버그? = 결제 도메인 expert D2.5 결단 의무" }
+      ],
+      "behavior_to_preserve": [
+        "currYear + 시작년도 2015 차이만큼 year select 생성 (intent / 단, hardcoded 의도 expert 검증)",
+        "userService.getCompanyList 권한 분기 (intent — 표준 권한 모델)"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ ★ AP-BILLING-011 (COM_NO==2 hardcoded JSP 내 business logic) — 새 시스템 = controller filtering / 또는 권한 service 단 의무",
+        "AP-BILLING-010 (시작년도 2015 hardcoded magic year) — 새 시스템 = configuration 의무"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["currYear + DateUtil 자동 산출", "권한 모델 분기 (authMap 7 속성)"],
+    "bug": ["AP-BILLING-010 (시작년도 2015 hardcoded)", "AP-BILLING-011 (COM_NO==2 hardcoded)"],
+    "ambiguous": ["BR-BILLING-006 의도 vs 버그 (★ D2.5 결제 도메인 expert)"]
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-BILLING-001"],
+    "brs_covered": ["BR-BILLING-005", "BR-BILLING-006"],
+    "aps_intersected": ["AP-BILLING-010", "AP-BILLING-011"]
+  }
+}

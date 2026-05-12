@@ -1,0 +1,99 @@
+{
+  "$comment": "★ ★ ★ phase 4.7 (characterization) golden snapshot — UC-BILLING-003 데이터 확정처리 실행 AJAX (sub-domain A. DataConfirm). ★ ★ ★ critical 핵심 — 4 SQL 비트랜잭션 + delete-then-insert race + cross-DB FQCN.",
+  "snapshot_id": "SNAP-UC-BILLING-003",
+  "use_case": "UC-BILLING-003",
+  "endpoint": "POST /ifrs/billing/dataConfirmProcAjax",
+  "controller_method": "BillingController.dataConfirmProcAjax",
+  "service_method": "BillingService.saveDataConfirm → 5 BillingDAO method 순차 호출",
+  "sql_id": "selectConfirmDataCount → deleteConfirmData → insertConfirmData → insertConfirmHistory → insertConfirmHistoryData (billing.xml:51 → 71 → 60 → 31 → 40)",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재 — TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA + cross-DB SGERPMA.dbo.TB_RG_RESULTS 본문 미확인 (DBA-read carry)",
+  "scenarios": [
+    {
+      "id": "SCN-BILLING-003-001",
+      "name": "happy path — ERP 결과 존재 + 첫 확정 (insertCount > 0 / 기존 row 0)",
+      "given": {
+        "request_params": { "distYear": "2025", "distMonth": "01", "companySeq": "2" },
+        "session_state": { "EKP_USER_ID": "USR001" },
+        "SGERPMA_TB_RG_RESULTS_state": "[2025-01 결제 결과 1500 row 존재]",
+        "TB_SGMA_CONFIRM_state": "[2025-01 row 0 (첫 확정)]"
+      },
+      "when": "POST → param + procId = 'USR001' → billingService.saveDataConfirm(param) → 5 SQL 순차: (1) selectConfirmDataCount → insertCount = 1500 (2) if(insertCount > 0) (3) deleteConfirmData (TB_SGMA_CONFIRM WHERE COMPANYSEQ=2 AND DIST_MONTH='202501' → 0 row 삭제) (4) insertConfirmData (TB_SGMA_CONFIRM INSERT FROM SGERPMA.dbo.TB_RG_RESULTS / 1500 row) (5) insertConfirmHistory (TB_SGMA_CONFIRM_HIS / SCOPE_IDENTITY hisNo=42) (6) insertConfirmHistoryData (TB_SGMA_CONFIRM_HIS_DATA / 1500 row / hisNo=42 FK)",
+      "then": {
+        "TB_SGMA_CONFIRM_after": "[1500 row / 2025-01 / companySeq=2]",
+        "TB_SGMA_CONFIRM_HIS_after": "[+1 row / hisNo=42 / procId=USR001 / procDt=getDate()]",
+        "TB_SGMA_CONFIRM_HIS_DATA_after": "[+1500 row / hisNo=42 FK]",
+        "model_attrs": { "insertCount": 1500 },
+        "json_response": "{ insertCount: 1500 } → JSP doSave alert '처리되었습니다.'",
+        "_BR_link": "BR-BILLING-002 (4 SQL 비트랜잭션) + BR-BILLING-003 (full overwrite) + BR-BILLING-004 (ERP 부재 시 skip) + BR-BILLING-007 (SCOPE_IDENTITY)"
+      },
+      "intent_classification": [
+        { "rule": "BR-BILLING-003", "type": "intent", "note": "full overwrite 의도 (delete + insert 명백)" },
+        { "rule": "BR-BILLING-004", "type": "intent", "note": "ERP 부재 시 skip 의도 (selectConfirmDataCount pre-check)" },
+        { "rule": "BR-BILLING-007", "type": "intent", "note": "SCOPE_IDENTITY PK 자동 채움" },
+        { "rule": "BR-BILLING-002", "type": "bug", "note": "★ ★ ★ critical — 4 SQL 비트랜잭션 (★ @Transactional ❌)" }
+      ],
+      "behavior_to_preserve": [
+        "selectConfirmDataCount 0 시 → 후속 SQL 4건 skip (intent / BR-BILLING-004)",
+        "insertConfirmHistory + insertConfirmHistoryData = audit 이력 (intent)",
+        "delete-then-insert full overwrite 패턴 (intent / 단, atomic 의무 추가)"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ ★ critical — AP-BILLING-001 @Transactional ❌ / 5 SQL 비원자성 / 중간 실패 시 부분 commit 데이터 무결성 critical risk",
+        "★ ★ AP-BILLING-006 (cross-DB FQCN SGERPMA.dbo.TB_RG_RESULTS)",
+        "★ AP-BILLING-005 (SQL Server vendor 종속 / SCOPE_IDENTITY)",
+        "★ AP-BILLING-004 (param 사후 변경 / input/output mix)"
+      ]
+    },
+    {
+      "id": "SCN-BILLING-003-002",
+      "name": "★ ★ ★ critical bug — insertHistoryData 실패 시 부분 commit",
+      "given": {
+        "request_params": { "distYear": "2025", "distMonth": "02", "companySeq": "2" },
+        "external_state": "★ ★ TB_SGMA_CONFIRM_HIS_DATA constraint 위반 (예: structure_header_id NULL not allowed) → step 6 실패"
+      },
+      "when": "saveDataConfirm 진입 / step 1~5 = ✅ commit / step 6 (insertConfirmHistoryData) = ❌ SQLException",
+      "then": {
+        "step_3_TB_SGMA_CONFIRM_delete": "✅ commit (기존 2025-02 row 삭제)",
+        "step_4_TB_SGMA_CONFIRM_insert": "✅ commit (신규 row insert)",
+        "step_5_TB_SGMA_CONFIRM_HIS_insert": "✅ commit (hisNo=43 / procDt=getDate)",
+        "step_6_TB_SGMA_CONFIRM_HIS_DATA_insert": "❌ rollback ❌ (no @Transactional)",
+        "result_state": "★ ★ ★ inconsistent — TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS 갱신 / TB_SGMA_CONFIRM_HIS_DATA 누락 (★ 이력 본문 부재 history orphan)",
+        "_validation_missing": "@Transactional 부재 + try-catch rollback 부재 / Spring exception → JSP error / 단, DB 상태 일관성 ❌"
+      },
+      "behavior_to_preserve": "(★ 부분 commit 자체는 보존 ❌ — 새 시스템에서 의도된 atomicity + rollback 의무)",
+      "intent_classification": [
+        { "rule": "(atomicity 부재)", "type": "bug", "note": "★ ★ ★ critical / 4 SQL → 5 SQL 비원자성 데이터 무결성 위협" }
+      ]
+    },
+    {
+      "id": "SCN-BILLING-003-003",
+      "name": "happy alt — ERP 데이터 부재 시 skip",
+      "given": {
+        "request_params": { "distYear": "2025", "distMonth": "13", "companySeq": "2" },
+        "SGERPMA_TB_RG_RESULTS_state": "[2025-13 결제 결과 0 row (★ 차월 미발생)]"
+      },
+      "when": "saveDataConfirm → selectConfirmDataCount → insertCount = 0 → if(0 > 0) false → skip 4 SQL",
+      "then": {
+        "tables_state": "★ no change (모든 TB_SGMA_CONFIRM* 변경 없음)",
+        "model_attrs": { "insertCount": 0 },
+        "json_response": "{ insertCount: 0 } → JSP doSave alert '관리회계 집계 데이터가 존재하지 않습니다.'",
+        "_BR_link": "BR-BILLING-004"
+      },
+      "intent_classification": [
+        { "rule": "BR-BILLING-004", "type": "intent" }
+      ],
+      "behavior_to_preserve": ["count 0 시 skip + 사용자 안내 alert (intent)"]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-BILLING-002 (full overwrite)", "BR-BILLING-004 (ERP 부재 skip)", "BR-BILLING-007 (SCOPE_IDENTITY)"],
+    "bug": ["★ ★ ★ AP-BILLING-001 critical (@Transactional ❌)", "AP-BILLING-006 (cross-DB)", "AP-BILLING-005 (vendor 종속)", "AP-BILLING-004 (param mix)"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-BILLING-003"],
+    "brs_covered": ["BR-BILLING-002", "BR-BILLING-003", "BR-BILLING-004", "BR-BILLING-007"],
+    "aps_intersected": ["AP-BILLING-001", "AP-BILLING-004", "AP-BILLING-005", "AP-BILLING-006"]
+  }
+}

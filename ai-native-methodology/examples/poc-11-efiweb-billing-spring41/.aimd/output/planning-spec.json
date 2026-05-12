@@ -1,0 +1,211 @@
+{
+  "meta": {
+    "generated_at": "2026-05-12T16:30:00Z",
+    "methodology_version": "v2.3.2",
+    "inputs_used": ["source_code", "characterization", "sql_inventory"],
+    "confidence": 0.82,
+    "formula_version": "v1",
+    "confidence_breakdown": {
+      "use_cases": 0.90,
+      "business_rules_intent": 0.80,
+      "out_of_scope": 0.95,
+      "risks_and_constraints": 0.78
+    },
+    "$comment": "★ ★ confidence 0.82 — Legacy 작은 단일책임 + cross-DB SP 본문 미확인 + 결제 도메인 expert carry (BR-BILLING-006 ambiguous 유지). vs PoC #06 단일 (0.85) + PoC #07 다중 (0.78) 사이 / scale 작아 use_cases 자동 추출 정확도 ↑ (0.90)."
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_handling": "★ ★ ★ in-place read (DEC-2026-05-12-in-place-read-정책-채택 / 사본 ❌)",
+    "source_root_absolute": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs",
+    "source_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "sql-inventory/sql-inventory.json",
+      "characterization/snapshots/UC-BILLING-001-dataConfirm.json",
+      "characterization/snapshots/UC-BILLING-002-dataConfirmListAjax.json",
+      "characterization/snapshots/UC-BILLING-003-dataConfirmProcAjax.json",
+      "characterization/snapshots/UC-BILLING-004-qlikView.json",
+      "characterization/intent-vs-bug.md",
+      "characterization/coverage.json",
+      "[source absolute] src/main/java/smilegate/ifrs/billing/web/BillingController.java",
+      "[source absolute] src/main/java/smilegate/ifrs/billing/service/BillingService.java",
+      "[source absolute] src/main/java/smilegate/ifrs/billing/service/impl/BillingServiceImpl.java",
+      "[source absolute] src/main/java/smilegate/ifrs/billing/service/impl/BillingDAO.java",
+      "[source absolute] src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "[source absolute] src/main/webapp/WEB-INF/jsp/billing/dataConfirm.jsp",
+      "[source absolute] src/main/webapp/WEB-INF/jsp/billing/qlikView.jsp"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "EFI-WEB IFRS 회계 시스템의 결제 / 청구 (Billing) 모듈 — ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 의 월별 데이터 확정 처리. 확정 후 ERP 결과 변경 ↔ 자체 IFRS DB (TB_SGMA_CONFIRM*) 절연 + 확정 이력 (TB_SGMA_CONFIRM_HIS 헤더 + TB_SGMA_CONFIRM_HIS_DATA 상세) 기록. 부가 = Qlik Sense 외부 BI dashboard 임베드 (qlikView).",
+    "stakeholders": [
+      "ifrs_admin (회계 운영자 / 데이터 확정 처리)",
+      "billing_expert (★ 결제 도메인 담당자 / BR-BILLING-006 의도 검증 carry C-domain-PoC11-1)",
+      "DBA (★ cross-DB FQCN FIM + SGERPMA / dbo.FN_GET_MONTH UDF / cross-DB 운영)",
+      "qlik_admin (Qlik Sense 운영 / appid + sheet 관리)"
+    ],
+    "success_criteria": [
+      "월별 데이터 확정 = ERP 결과 → 자체 DB 복사 (full overwrite) + atomicity 의무 (★ 새 시스템 = @Transactional 의무)",
+      "12개월 row 강제 표시 (recursive CTE / 누락 ❌)",
+      "확정 이력 = SCOPE_IDENTITY hisNo PK-FK 관계 (TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA)",
+      "★ phase 4.7 acceptance oracle = D2.5 후 14/15 = 93.3% (★ 1 ambiguous BR-BILLING-006 carry 유지)",
+      "외부 BI Qlik Sense 메뉴별 dashboard 임베드 (★ URL 환경 변수 의무)"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-BILLING-001",
+      "name": "데이터 확정처리 화면 진입",
+      "description": "GET /ifrs/billing/dataConfirm — currYear + 권한별 companyList 모델 전달. JSP dataConfirm.jsp 렌더 (year select 12 + 법인 select / ★ COM_NO==2 hardcoded filter).",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["session 인증 + authMap 권한 (★ 7 속성)"],
+      "postconditions": ["currYear + companyList 모델 → JSP 렌더 / year select (currYear-2015)+1 option / 법인 select COM_NO==2 만 노출 (★ ambiguous BR-BILLING-006)"],
+      "acceptance_criteria_refs": ["AC-BILLING-001"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-001-dataConfirm.json",
+        "[source absolute] BillingController.java:48-62 (dataConfirm method)",
+        "[source absolute] dataConfirm.jsp:159 (currYear-2015) + :169 (COM_NO==2)"
+      ]
+    },
+    {
+      "id": "UC-BILLING-002",
+      "name": "데이터 확정 목록 조회 AJAX",
+      "description": "POST /ifrs/billing/dataConfirmListAjax — year + comNo 기반 12개월 데이터 확정 이력 조회. recursive CTE (WITH MONTH_INFO) 12 row 강제 생성 + LEFT OUTER JOIN TB_SGMA_CONFIRM_HIS + cross-DB LEFT OUTER JOIN FIM.dbo.TB_USER + ROW_NUMBER/COUNT OVER window function + UDF dbo.FN_GET_MONTH.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["year + comNo + comNm 파라미터 + ★ FIM.dbo.TB_USER 접근 가능"],
+      "postconditions": ["12개월 row (YEAR + MONTH + COM_NO + COMPANYSEQ + PROC_ID + USER_NM + PROC_DT + ROW_NUM + ROW_COUNT) JSON 응답"],
+      "acceptance_criteria_refs": ["AC-BILLING-002"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-002-dataConfirmListAjax.json",
+        "[source absolute] BillingController.java:72-82 (dataConfirmListAjax)",
+        "[source absolute] billing.xml:8-29 (selectDataConfirmList)"
+      ]
+    },
+    {
+      "id": "UC-BILLING-003",
+      "name": "데이터 확정처리 실행 AJAX (★ ★ ★ critical / 4 SQL 비트랜잭션)",
+      "description": "POST /ifrs/billing/dataConfirmProcAjax — saveDataConfirm 5 SQL 순차 호출 (pre-check selectConfirmDataCount + count > 0 시 delete + insert + insertHistory + insertHistoryData). ★ ★ ★ @Transactional ❌ / 부분 commit 데이터 무결성 critical risk. cross-DB SGERPMA.dbo.TB_RG_RESULTS 의존.",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["distYear + distMonth + companySeq + session EKP_USER_ID + ★ SGERPMA.dbo.TB_RG_RESULTS row 존재 (없으면 skip)"],
+      "postconditions": ["count > 0 시 TB_SGMA_CONFIRM full overwrite (delete + insert / full overwrite) + audit history (TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA / SCOPE_IDENTITY hisNo FK) / count = 0 시 skip + JSP alert"],
+      "acceptance_criteria_refs": ["AC-BILLING-003"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-003-dataConfirmProcAjax.json",
+        "[source absolute] BillingController.java:92-105 (dataConfirmProcAjax)",
+        "[source absolute] BillingServiceImpl.java:31-42 (saveDataConfirm / ★ @Transactional ❌)",
+        "[source absolute] billing.xml:31-75 (5 SQL)"
+      ]
+    },
+    {
+      "id": "UC-BILLING-004",
+      "name": "Qlik View 임베드 (외부 BI)",
+      "description": "GET /ifrs/billing/qlikView — menuNm + appid + sheet 파라미터 + ModelAndView wrapper. JSP qlikView.jsp = iframe src = datacafe.smilegate.net/sense/app/{appid}/sheet/{sheet}/state/analysis (★ URL hardcoded).",
+      "actors": ["ifrs_admin"],
+      "preconditions": ["menuNm + appid + sheet 파라미터"],
+      "postconditions": ["외부 BI Qlik Sense dashboard iframe 임베드 (★ appid + sheet 메뉴별 분기)"],
+      "acceptance_criteria_refs": ["AC-BILLING-004"],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-004-qlikView.json",
+        "[source absolute] BillingController.java:115-125 (qlikView)",
+        "[source absolute] qlikView.jsp:17 (iframe src hardcoded)"
+      ]
+    }
+  ],
+  "business_rules": {
+    "intent": [
+      "BR-BILLING-001 (12개월 강제 생성 recursive CTE)",
+      "BR-BILLING-003 (full overwrite delete + insert)",
+      "BR-BILLING-004 (ERP 부재 시 skip + JSP alert)",
+      "BR-BILLING-005 (시작년도 2015 hardcoded / ★ 결제 도메인 expert carry C-domain-PoC11-2)",
+      "BR-BILLING-007 (SCOPE_IDENTITY PK 자동 채움)",
+      "BR-BILLING-008 (외부 BI Qlik Sense 임베드)"
+    ],
+    "likely_bug": [
+      "★ ★ ★ BR-BILLING-002 (★ critical / @Transactional ❌ saveDataConfirm 4 SQL 비원자성 / ★ AP-BILLING-001 critical link)"
+    ],
+    "ambiguous": [
+      "★ ★ ★ BR-BILLING-006 (★ ★ COM_NO==2 hardcoded JSP filter / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1)"
+    ]
+  },
+  "out_of_scope": [
+    "chain 2 (behavior-spec) + chain 3 (test-spec / 실 test 코드 RED) + chain 4 (impl-spec / 실 impl 코드 GREEN) (★ PoC #06+#07 패턴 정합 / chain 1 만 본격)",
+    "다중 모듈 (51K LOC 전체 / 본 PoC = billing 한정)",
+    "본체 격상 = sub-rule v1.1 적용 ✅ (★ v2.3.2 PATCH commit `ba3ed82` / DEC-2026-05-12-sub-rule-v1.1-갱신)",
+    "Testcontainers / MockMvc / DBUnit (chain 3 영역 / C-PoC07-1~3 carry 정합)",
+    "★ paradigm-cross 자격 ❌ (Spring 4.1+iBATIS 2 동일 / PoC #08+#09 Modern stack 영역)",
+    "cross-DB FIM + SGERPMA 본문 (★ DBA-read carry)"
+  ],
+  "risks_and_constraints": {
+    "critical": [
+      "★ ★ ★ AP-BILLING-001 (@Transactional ❌ saveDataConfirm 4 SQL 비원자성) — 새 시스템 migration 시 @Transactional(rollbackFor=Exception.class) + try-catch 의무",
+      "★ ★ ★ AP-BILLING-005 (SQL Server vendor 종속 4 차원) — PostgreSQL/Oracle 이식 시 SCOPE_IDENTITY → RETURNING / WITH NOLOCK → isolation level / dbo.FN_GET_MONTH → JVM logic / getDate → CURRENT_TIMESTAMP 재작성 의무",
+      "★ ★ ★ AP-BILLING-006 (cross-DB FQCN FIM + SGERPMA hardcoded) — 새 시스템 = dataSource 분리 (ifrsDS / fimDS / sgerpDS) 또는 Linked Server 추상화 의무",
+      "★ ★ ★ AP-BILLING-011 (★ ambiguous BR-BILLING-006 COM_NO==2 hardcoded) — 결제 도메인 expert 결단 carry"
+    ],
+    "high": [
+      "AP-BILLING-009 (XSS risk HTML concat / makeDataTable raw insert) — jQuery .text() 또는 template engine 의무",
+      "★ DRY violation (4 SQL WHERE 절 동일 / patterns_extension_v2 등재) — <sql id> + <include refid> 또는 service 단 추상화 의무"
+    ],
+    "medium": [
+      "AP-BILLING-004 (param 사후 변경 input/output mix)",
+      "AP-BILLING-007 (recursive CTE T-SQL 한정)",
+      "AP-BILLING-008 (logging 부재 / throws Exception 광범위)",
+      "AP-BILLING-010 (시작년도 2015 hardcoded magic year)",
+      "AP-BILLING-013 (외부 BI URL hardcoded)"
+    ],
+    "low": [
+      "AP-BILLING-002 (Map raw type / @SuppressWarnings)",
+      "AP-BILLING-003 (unused import ConnectService + DataService / dead code)",
+      "AP-BILLING-012 (자체 ajax wrapper fn_ajax)"
+    ]
+  },
+  "migration_priority_summary": {
+    "$comment": "★ v2.3.0 12번째 컬럼 migration_priority P0~P3 — 6 SQL 단위 분포",
+    "P0": ["BillingDAO.insertConfirmHistoryData", "BillingDAO.insertConfirmData", "BillingDAO.deleteConfirmData"],
+    "P1": ["BillingDAO.insertConfirmHistory", "BillingDAO.selectConfirmDataCount"],
+    "P2": ["BillingDAO.selectDataConfirmList"],
+    "P3": [],
+    "implication": "★ ★ 50% P0 (3/6) = 단기 immediate 의무 / @Transactional 도입 + cross-DB 추상화 + Optional<DTO> 결과 의무"
+  },
+  "planning_validator_pass": {
+    "expected_uc_coverage": "4/4 = 100%",
+    "expected_findings": "0 critical + 0 high",
+    "expected_planning_extraction_validator": "★ pass (★ 본 chain 1 산출 = §3-B 자격 ★ 충족 / 0 findings + UC coverage ≥ 90%)"
+  },
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json"
+    ],
+    "to_characterization": [
+      "characterization/snapshots/ (4 snapshot)",
+      "characterization/intent-vs-bug.md (15 분류 / Day 2.5 후 14/15 = 93.3% / 1 ambiguous BR-BILLING-006 유지)",
+      "characterization/coverage.json (★ ratchet baseline write / 100% UC coverage)"
+    ],
+    "to_sql_inventory": [
+      "sql-inventory/sql-inventory.json (6 SQL × 12 컬럼 / 66.7% auto / ★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족)"
+    ],
+    "to_source": [
+      "[in-place absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/ (4 Java)",
+      "[in-place absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml",
+      "[in-place absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/ (2 JSP)"
+    ],
+    "to_decisions": [
+      "decisions/DEC-2026-05-12-in-place-read-정책-채택.md (★ source 처리 정책)",
+      "decisions/DEC-2026-05-12-r1-가설-revisit.md (★ critical / R1 → R1')",
+      "decisions/DEC-2026-05-12-sub-rule-v1.1-갱신.md (★ ★ v2.3.2 PATCH origin)",
+      "decisions/DEC-2026-05-07-poc-11-prelim-신설.md (★ prelim 등재)"
+    ]
+  },
+  "$3_axis_alignment": {
+    "$comment": "★ ★ 4축 metric 통합 정합 (Day 3.0 시점 / Day 3.5 종결 시 정리)",
+    "axis_1_§3_A_자동화율": "★ 52.5% (★ R1 가설 반증 / R1' Spring 4.1+iBATIS 2 paradigm ceiling ~53~55% 정합)",
+    "axis_2_§3_B_chain_1": "★ ★ 4 UC × 100% covered + 0 critical findings expected",
+    "axis_3_phase_4_7_oracle": "★ ★ 14/15 = 93.3% Day 2 + D2.5 ambiguous 유지 보존 / pass ≥ 80% threshold",
+    "axis_4_SQL_Inventory_coverage": "★ ★ ★ 66.7% (★ ★ ★ 3 사내 PoC isomorphic 자격 ★ 충족 / sub-rule v1.1 강 등급)"
+  }
+}

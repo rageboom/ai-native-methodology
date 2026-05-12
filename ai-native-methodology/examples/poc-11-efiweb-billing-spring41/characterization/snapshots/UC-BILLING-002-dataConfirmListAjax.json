@@ -1,0 +1,53 @@
+{
+  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-BILLING-002 데이터 확정 목록 조회 AJAX (sub-domain A. DataConfirm). ★ ★ recursive CTE 12 row + cross-DB FIM.dbo.TB_USER + LEFT OUTER JOIN dual + ROW_NUMBER/COUNT OVER + UDF dbo.FN_GET_MONTH.",
+  "snapshot_id": "SNAP-UC-BILLING-002",
+  "use_case": "UC-BILLING-002",
+  "endpoint": "POST /ifrs/billing/dataConfirmListAjax",
+  "controller_method": "BillingController.dataConfirmListAjax",
+  "service_method": "BillingService.getDataConfirmList → BillingDAO.selectDataConfirmList",
+  "sql_id": "BillingDAO.selectDataConfirmList (billing.xml:8-29)",
+  "layer": "integration",
+  "data_source_status": "★ 실 DB 환경 부재 — TB_SGMA_CONFIRM_HIS + FIM.dbo.TB_USER + dbo.FN_GET_MONTH UDF 본문 미확인 (DBA-read carry)",
+  "scenarios": [
+    {
+      "id": "SCN-BILLING-002-001",
+      "name": "happy path — 12개월 row 강제 생성 + 확정 이력 join",
+      "given": {
+        "request_params": { "year": "2025", "comNo": "2", "comNm": "법인2" },
+        "TB_SGMA_CONFIRM_HIS_state": "[2025-01 ~ 2025-06 = procDt 존재 (6 row) / 2025-07~12 = 미확정 (0 row)]",
+        "FIM_TB_USER_state": "USR001 → '홍길동'"
+      },
+      "when": "POST → param = IfrsUtil.parameterToHm(request) → billingService.getDataConfirmList(param) → BillingDAO.list('BillingDAO.selectDataConfirmList', param) → SQL: WITH MONTH_INFO recursive CTE (1~12) + LEFT OUTER JOIN TB_SGMA_CONFIRM_HIS + LEFT OUTER JOIN FIM.dbo.TB_USER + ROW_NUMBER + COUNT OVER",
+      "then": {
+        "result_list_size": 12,
+        "result_columns": ["YEAR", "MONTH", "COM_NO", "COMPANYSEQ", "PROC_ID", "USER_NM", "PROC_DT", "ROW_NUM", "ROW_COUNT"],
+        "result_pattern": "★ ★ 1~6월 = 확정 이력 row 출력 / 7~12월 = LEFT OUTER JOIN NULL row (★ procDt + userNm = null)",
+        "json_response": "{ list: [12 row], status: success }",
+        "_BR_link": "BR-BILLING-001 (12개월 강제 생성 recursive CTE)"
+      },
+      "intent_classification": [
+        { "rule": "BR-BILLING-001", "type": "intent", "note": "월별 row 누락 ❌ 의도 (recursive CTE 명백)" }
+      ],
+      "behavior_to_preserve": [
+        "12개월 row 강제 생성 (월별 데이터 부재 시도 null row 표시)",
+        "확정 이력자 (PROC_ID) → 사용자 이름 (USER_NM) 매핑",
+        "동일 월 다중 확정 이력 시 ROW_NUMBER + ROW_COUNT window function (★ 최근 procDt 식별 가능)"
+      ],
+      "behavior_likely_bug": [
+        "★ ★ AP-BILLING-005 (★ critical / SQL Server vendor 종속 4 차원 / recursive CTE + ROW_NUMBER + CONVERT + UDF)",
+        "★ ★ AP-BILLING-006 (★ critical / cross-DB FQCN FIM.dbo.TB_USER hardcoded)",
+        "★ AP-BILLING-007 (recursive CTE T-SQL 한정 / PostgreSQL/Oracle 이식 시 generated_series 또는 CONNECT BY 재작성 의무)"
+      ]
+    }
+  ],
+  "intent_vs_bug_summary": {
+    "intent": ["BR-BILLING-001 (12개월 강제 생성)"],
+    "bug": ["AP-BILLING-005 (vendor 종속)", "AP-BILLING-006 (cross-DB)", "AP-BILLING-007 (T-SQL recursive)"],
+    "ambiguous": []
+  },
+  "phase_4_7_coverage_contribution": {
+    "ucs_covered": ["UC-BILLING-002"],
+    "brs_covered": ["BR-BILLING-001"],
+    "aps_intersected": ["AP-BILLING-005", "AP-BILLING-006", "AP-BILLING-007"]
+  }
+}
