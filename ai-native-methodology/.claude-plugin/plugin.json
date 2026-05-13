@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.3.2",
-  "description": "★ ★ ★ ★ v2.3.2 PATCH — sub-rule `spring41-ibatis2-isomorphic.md` v1.0 → v1.1 minor 갱신 (★ KL-SATD 인용 정정 Korean Language → Keyword-Labeled SQJ 2024 / 3 사내 PoC isomorphic 표 강화 PoC #11 corroboration #3 추가 / 신뢰도 단계 5 강 신설 / §X automation ceiling R1' 신규 + 외부 권위 STRONG 보강 Zhang ICSE 2025 + LongCodeBench arxiv) + DEC 3건 (in-place read 정책 + r1 가설 revisit + sub-rule v1.1 갱신). PoC #11 Day 0.5~1.5 종결 (in-place read 정책 첫 적용 / 3 사내 PoC SQL Inventory 66.7% × 3 robust / R1 가설 반증 finding). v2.3.1 PATCH 보존 (baseline ratchet + tag_type enum). v2.3.0 MINOR FINAL 보존 (Phase 1+2 / ADR-CHAIN-009 + ADR-CHAIN-010). chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌ / chain harness 5 요소 변경 ❌.",
+  "version": "2.3.3",
+  "description": "★ ★ ★ ★ v2.3.3 PATCH — R1' automation ceiling 본체 명문화 (3 layer 가치 명세 axis 분리 / CLAUDE.md + README.md + memory project_methodology_scope.md) + sub-rule `spring41-ibatis2-isomorphic.md` v1.1 → v1.1.1 PATCH (★ Agent 1 F-015 인용 정정 3건: Zhang → Wang et al. / LongCodeBench 2026 → 2025 / Not All Code 제거 + ★ Agent 2 외부 권위 보강 3건: AWS SCT Functions 66.4% 자릿수 정합 + Amazon Q 36~80% + ThoughtWorks Tech Radar Vol.32~34 GenAI for forward engineering chain harness 사상 isomorphic + §X-C-2 신설) + ★ ★ industry first paradigm-cross axis quantification (original empirical finding) — Legacy ~53~55% (3 사내 PoC) + Modern ~60~67% (3 OSS PoC). DEC 2건 (신설 DEC-2026-05-13-r1-prime-본체-명문화 + 갱신 DEC-2026-05-12-r1-가설-revisit §5 resolved). v2.3.2 PATCH (sub-rule v1.0 → v1.1 minor) + v2.3.1 PATCH (baseline ratchet + tag_type enum) + v2.3.0 MINOR FINAL (Phase 1+2 / ADR-CHAIN-009 + ADR-CHAIN-010) 모두 보존. chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌ / chain harness 5 요소 변경 ❌.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

@@ -9,7 +9,96 @@
 
 ---
 
-## [v2.3.2] — 2026-05-12 ⭐ 현재 (★ ★ ★ ★ PATCH — sub-rule v1.0 → v1.1 minor 갱신 / KL-SATD 인용 정정 + R1' automation ceiling 신설 + 외부 권위 보강 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+## [v2.3.3] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH — R1' automation ceiling 본체 명문화 (3 layer 가치 명세 axis 분리) + sub-rule v1.1 → v1.1.1 PATCH (인용 정정 + 외부 권위 보강) / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ PATCH** — v2.3.2 PATCH (2026-05-12 commit `ba3ed82` / sub-rule v1.0 → v1.1 minor) 후 잔존 carry **C-r1-prime-자격-Modern-corroboration** 흡수. v2.3.x patch level (no new ADR / 본문 보강 + sub-rule patch / schema 변경 ❌). 사용자 결단 정합 — DEC-2026-05-12-r1-가설-revisit §5 "본체 methodology 영향 = Day 3.5 종결 시 별도 결단 의무" 약속 종결.
+
+### 변경 사항 (v2.3.2 → v2.3.3)
+
+#### ★ ★ ★ DEC-2026-05-13-r1-prime-본체-명문화 (★ R1' axis 본체 명문화 / industry first paradigm-cross axis quantification)
+
+- **★ ★ ★ 3 layer 본체 가치 명세 갱신**:
+  - `CLAUDE.md` L36~ — chain harness 전체 70~80% axis + analysis §3-A automation axis paradigm 별 ceiling 표 (Legacy ~53~55% 3 사내 PoC + Modern ~60~67% 3 OSS PoC) + metric semantics 차이 명시 + 외부 권위 cross-link
+  - `ai-native-methodology/README.md` L34~ — 외부 facing 동일 패턴 + Modern OSS 한정 명시 + sub-rule §X 참조
+  - `~/.claude/projects/.../memory/project_methodology_scope.md` "scope OUT" 절 — R1' 5항 보강 (paradigm 별 ceiling + metric semantics + 외부 권위 + original empirical finding + 출처)
+- **★ ★ R1' (revised) 정량 ceiling 본체 명시** — Spring 4.1 + iBATIS 2 (Legacy) ~53~55% / Modern (MyBatis 3 / TypeORM / Spring Data JPA) ~60~67% / **6 PoC 사실 robust** (Legacy 3 사내 + Modern 3 OSS / ADR-CHAIN-008 정합).
+- **★ ★ ★ industry first paradigm-cross axis quantification (original empirical finding)** 명시 — 외부 권위 부재 영역 / 본 사내 6 PoC 6 차원 corroboration (paradigm + ORM + platform + language + responsibility + scale).
+
+#### ★ ★ sub-rule v1.1 → v1.1.1 PATCH (`spring41-ibatis2-isomorphic.md`)
+
+- **★ ★ ★ Agent 1 F-015 cross-validation 인용 정정 3건**:
+  - "Zhang et al. ICSE 2025" → ★ **Wang et al. ICSE 2025** (First author = Chong Wang NTU / Zhang 공저자 3번째 / arxiv 2406.09834v3 / DOI 10.1109/ICSE55347.2025.00245)
+  - "LongCodeBench 2026" → **2025** (v1=2025-05 / v3=2025-10 / First author = Stefano Rando)
+  - "Not All Code Is Equal" arxiv 2601.21894 → ★ **인용 제거** (Agent 1 검증 실패 가능성 / 별도 sprint carry C-not-all-code-검증)
+- **★ ★ Agent 2 외부 권위 보강 (§X-C-2 신설 / Big-tech industry isomorphic corroboration 표)**:
+  - ★ ★ AWS Schema Conversion Tool (Functions **66.4%** 자릿수 정합 / Stored Proc 76.8%)
+  - ★ ★ Amazon Q Developer Code Transformation (Novacomp 80% / 보험사 36% / OSS 62 app 85% higher success / acceptance 60%+)
+  - ★ ★ ★ ThoughtWorks Tech Radar Vol.32~34 (2025~2026.04) "GenAI for forward engineering" + "Spec-driven development for legacy" — ★ ★ ★ chain harness 사상 **isomorphic**
+- **★ ★ Agent 1 추가 권위 후보 2건**: "Beyond Synthetic Benchmarks" (arxiv 2510.26130 / 2025) + "Where Do LLMs Still Struggle?" (arxiv 2511.04355 / 2025)
+- **★ ★ Modern OSS 한정 명시** (Agent 3 REVISE #1 흡수 / §X-E 측정 환경 컬럼 + 본문 한 줄)
+- **★ ★ metric semantics 차이 명시** (Agent 3 강화 흡수 / §X-F.3 "metric 분모 자체 다름")
+
+#### ★ ★ DEC 신설 + 갱신 병행
+
+- **신설**: `DEC-2026-05-13-r1-prime-본체-명문화` (★ version bump trigger DEC / 4원칙 cycle 정합 / Agent 3 ACCEPT)
+- **갱신**: `DEC-2026-05-12-r1-가설-revisit` 상태 `진행중` → `승인` / §5 본체 영향 표 5행 ✅ resolved 갱신
+
+#### ★ ★ Agent 3 Senior critique 흡수 (ACCEPT 5 + REVISE 2)
+
+- ACCEPT: axis 분리 정당성 / 본체 vs sub-rule layer 정합 / §8.1 strict / PATCH v2.3.3 자격 / DEC 신설+갱신 병행
+- REVISE #1 (Modern OSS 한정) ✅ 흡수 — 3 layer + sub-rule §X-E
+- REVISE #2 (결단 burst 24h cooling) ★ ★ 정신만 흡수 / 형식 권고 ❌ (DEC-2026-05-06 + DEC-2026-05-08 cooling-off 영구 폐기 정합 / 사용자 명시 결단 우선)
+
+#### 4원칙 cycle 산출
+
+- 1원칙 plan `~/.claude/plans/i-r1-prime-ceiling-본체.md` (10절 / scope IN 13항 + scope OUT 6항)
+- 2원칙 research `~/.claude/plans/i-r1-prime-research.md` (3 sub-agent 병렬 / 가벼운 sub-agent 전략 / 시간 cap 10분/agent / 실측 ~76~80초/agent)
+- 3원칙 사용자 결단 4 question 묶음 (★ 풍성한 옵션 4건 모두 채택)
+- 4원칙 Lessons Learned 4건 (LL-i-1~4 / 가벼운 sub-agent + Senior critique + scope creep + cooling-off 정합)
+
+#### resolved carry
+
+- ★ ★ ★ C-r1-prime-자격-Modern-corroboration ✅ resolved
+- DEC-2026-05-12-r1-가설-revisit §5 본체 영향 5행 모두 ✅ resolved
+- Zhang → Wang 인용 정정 ✅ resolved (sub-rule v1.1.1 + DEC + plan)
+- LongCodeBench 2026 → 2025 정정 ✅ resolved (sub-rule v1.1.1 + DEC)
+- Modern OSS 한정 명시 부재 ✅ resolved (3 layer + sub-rule §X-E)
+- metric semantics 차이 명시 부재 ✅ resolved (3 layer + sub-rule §X-F.3)
+
+#### 신규 carry
+
+- ★ C-not-all-code-검증 (★ Agent 1 F-015 / arxiv 2601.21894 별도 검증 후 인용 재개 vs 영구 제거)
+- ★ ★ C-모던-stack-사내-측정 (★ critical / Agent 3 REVISE #1 / 사내 Modern stack PoC 진입 시 ceiling 재측정 의무)
+
+#### 잔존 carry
+
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화)
+- C-domain-PoC11-1~3 (★ 결제 도메인 expert 위임)
+- C-PoC07-1~3 (★ chain 3 영역 retrofit)
+- C-poc-11-0-satd-해석-정정 (★ Agent 1 cross-validation 흡수 잔존)
+- C-poc-11-source-디렉토리-cleanup (★ 낮은 우선)
+- C-v2.2.0-1 (★ NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level (별도 sprint)
+
+#### PATCH 자격 7/7 (★ §8.1 strict)
+
+- chain harness 5 요소 변경 ❌ (chain-driver / planning-extraction-validator / chain-coverage-validator / spec-test-link-validator / traceability-matrix-builder 보존)
+- schema backward-compat 회귀 ❌ (schema 변경 ❌ → 회귀 fixture 변동 ❌)
+- no new ADR (DEC 자격 자연)
+- workspace unit test 보존 (schema ❌ + tool ❌)
+- §8.1 strict 7/7 expected (`--target v2.3.3`)
+- ≥ 6 PoC corroboration (Legacy 3 사내 + Modern 3 OSS / ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정합 ★ 강화)
+- build dist + CHECKSUMS OK expected
+
+#### Version Bump (3 source sync)
+
+- `.claude-plugin/plugin.json` 2.3.2 → 2.3.3
+- `package.json` 2.3.2 → 2.3.3
+- `scripts/version-check.js` 자동 verify (no source 자체 / plugin.json + CHANGELOG header check)
+
+---
+
+## [v2.3.2] — 2026-05-12 (★ ★ ★ ★ PATCH — sub-rule v1.0 → v1.1 minor 갱신 / KL-SATD 인용 정정 + R1' automation ceiling 신설 + 외부 권위 보강 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ PATCH** — v2.3.1 PATCH (같은 날 commit `bc48477`) 후 PoC #11 Day 0.5~1.5 종결 + 본체 sub-rule 보강. v2.3.x patch level (no new ADR / sub-rule 본문 보강만 / schema 변경 ❌). 사용자 결단 정합 — PoC #11 Day 1.5 R1 가설 ★ 반증 critical finding → 본체 methodology R1' 검토 우선 (PoC #11 Day 2.0~3.5 suspend).
 

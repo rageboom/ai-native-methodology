@@ -33,7 +33,16 @@ USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 > - **★ ★ ★ ★ ★ sub-plan-6 (현재) / v2.0.0-rc1** = `chain harness validated` — §8.1 strict 7/7 ✅ + ≥ 2 PoC corroboration ✅ (PoC #05 e2e + PoC #03 retrofit) / 210 test pass.
 > - ★ no-simulation 정책 enforcement 완성 — trio (state.blocked + cli exit 2 + PreToolUse deny) + D21' (suppressOutput=true) + release-readiness content-aware (file presence ❌) 로 양심 의존 차단.
 
-★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
+★ ★ ★ **70~80% 한계 = 명시 잔존** (★ **chain harness 전체 자동화 axis** / process 통과율 metric). AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
+
+★ ★ ★ **analysis 단계 §3-A automation = 별도 axis** (★ R1' / DEC-2026-05-13-r1-prime-본체-명문화 / 6 PoC 사실 / sub-rule `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X 정합):
+
+| paradigm | analysis §3-A ceiling | corroboration | ★ 측정 환경 |
+|---|---|---|---|
+| Spring 4.1 + iBATIS 2 (Legacy) | **~53~55%** | ★ 3 사내 PoC isomorphic (PoC #06+#07+#11) | 사내 EFI-WEB |
+| Modern (MyBatis 3 / TypeORM / Spring Data JPA) | **~60~67%** | ★ 3 OSS PoC corroboration (PoC #08+#09+#10) | ★ ★ **OSS 한정 / 사내 Modern 재측정 의무** |
+
+★ ★ chain harness 70~80% axis 와 analysis §3-A automation axis = ★ ★ **별도 metric** (★ metric 분모 자체 다름 / chain harness = chain 1~4 통합 gate 통과율 / §3-A = analysis 단방향 추출률 / 외부 인용 시 axis 혼동 회피 의무). 외부 권위: Wang ICSE 2025 + LongCodeBench 2025 + AWS SCT 자릿수 정합 + ThoughtWorks "GenAI for forward engineering" isomorphic 사상.
 
 ★ ★ revisit loop (자동 감지 + 사용자 결단): chain-revisit-detector → 사용자 prompt → go/stop. stop 시 임의 stage jump.
 
@@ -107,7 +116,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개 (★ v2.1.0 plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ ★ ★ ★ 현재 **v2.2.0 MINOR FINAL — phase 4.8 sql-inventory + ADR-CHAIN-008 paradigm-cross 정책 완화 + cooling-off 영구 폐기** — DEC-2026-05-08-v2.2.0-final / ★ ★ ★ ★ ★ 5 PoC SQL Inventory isomorphic robust [66.7% × 5 / 6 차원 corroboration sum: paradigm + ORM + platform + language + responsibility + scale] / ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 신정책 / git tag v2.2.0 / chain harness validated 정식 v2.0.0 + v2.1.0 phase 4.7 + v2.1.1 ratchet trend 모두 보존)
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력 (★ ★ ★ ★ ★ ★ ★ 현재 **v2.3.3 PATCH — R1' automation ceiling 본체 명문화 (axis 분리 명시) + sub-rule v1.1 → v1.1.1 (인용 정정 Wang/LongCodeBench 2025/Not All Code 제거 + 외부 권위 보강 AWS SCT/Amazon Q/ThoughtWorks)** — DEC-2026-05-13-r1-prime-본체-명문화 / ★ ★ ★ ★ industry first paradigm-cross axis quantification / 6 PoC 사실 robust / chain harness 5 요소 변경 ❌ / schema 변경 ❌ / git tag v2.3.3 expected. v2.3.2 PATCH (sub-rule v1.0 → v1.1) + v2.3.1 PATCH (baseline ratchet + tag_type enum) + v2.3.0 MINOR FINAL (Phase 1+2 / ADR-CHAIN-009 + ADR-CHAIN-010) + v2.2.0 MINOR FINAL (phase 4.8 sql-inventory + ADR-CHAIN-008 + cooling-off 영구 폐기) 모두 보존 / chain harness validated v2.0.0 + v2.1.0 phase 4.7 + v2.1.1 ratchet trend 보존)
 - `ai-native-methodology/guides/` — ★ ★ 사용자 journey 자산 (cleanup round 2-C 신설 / getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
 - `ai-native-methodology/archive/v1.3-adoption/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적 / cleanup round 1 격리)
 - `ai-native-methodology/archive/phase-a-iteration/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template / cleanup round 1 격리 / v2.0 chain harness paradigm 후 outdated)

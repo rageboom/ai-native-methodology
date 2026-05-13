@@ -1,11 +1,12 @@
 # Sub-Rule: Spring 4.1 + iBATIS 2 Spectrum AP Isomorphic 5종
 
 > ★ ★ ★ v2.3.0 Phase 2 신설 (v1.0) → ★ ★ ★ ★ v1.1 갱신 (2026-05-12 / DEC-2026-05-12-sub-rule-v1.1-갱신) — PoC #11 (billing / 작은 단일책임) corroboration #3 추가 + KL-SATD 인용 정정 + §X automation ceiling R1' 신설.
+> ★ ★ **v1.1.1 PATCH** (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화) — Agent 1 F-015 cross-validation 인용 정정 3건 (Zhang → **Wang et al.** / LongCodeBench **2025** (2026 ❌) / "Not All Code Is Equal" 검증 carry 분리) + Agent 2 외부 권위 보강 (AWS SCT + Amazon Q + ThoughtWorks isomorphic corroboration 3건) + §X-C-2 신설.
 > **trigger**: Spring 4.x + iBATIS 2.x stack 분석 시 본 5종 우선 후보 AP.
 > **자격 (v1.1)**: ≥ 3 사내 PoC isomorphic (PoC #06 단일책임 + PoC #07 다중책임 + ★ PoC #11 작은 단일책임 spectrum) — ★ scale-cross 3 spectrum 충족 (v1.0 ≥ 2 PoC → v1.1 ≥ 3 사내 PoC 강화).
 > **schema 참조**: `schemas/antipatterns.schema.json` AP-* 정합.
 > **ADR**: ADR-CHAIN-010 (Spring 4.1 + iBATIS 2 spectrum sub-rule 정식 자산화 / v1.0 origin).
-> **version**: v1.1 (sub-rule 본문 보강 / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌).
+> **version**: v1.1.1 (PATCH / 인용 정정 + 외부 권위 보강 / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌ / 본체 v2.3.3 PATCH 정합).
 
 ---
 
@@ -135,8 +136,10 @@
 | Modern stack sub-rule (Spring 5+ / MyBatis 3 / JPA / TypeORM) | ≥ 2 Modern PoC isomorphic (PoC #08+#09+#10 분석 후) | ⏳ open (5 PoC SQL Inventory 66.7% × 5 robust 사실 / sub-rule 본격 자산화 carry) |
 | 다중책임 spectrum 강화 (AP-CAPITAL-005~011 단일 PoC) | ≥ 2 다중책임 PoC isomorphic 후 | ⏳ open (★ PoC #11 = ★ 작은 단일책임 / NOT 다중 → carry 자격 ❌ / 다음 다중책임 PoC = EFI-WEB connect / contract / bod 후보) |
 | ~~iBATIS 2 전용 dynamic 태그 sub-classification~~ | ~~v2.2.x patch / 사용자 finding~~ | ✅ **resolved 2026-05-12** (v2.3.1 PATCH commit `bc48477` / `dynamic_branch.tag_type` enum 26종) |
-| **★ ★ R1' automation ceiling 외부 권위 정량 비교 (★ v1.1 신규)** | Spring 4.1+iBATIS 2 specific academic 권위 출현 시 (★ 현재 ❌ / paradigm class 추상화 인용만 가능) | ⏳ open (★ Zhang ICSE 2025 + LongCodeBench 외부 권위 = paradigm 방향성 + scope 효과 정합 / 정량 ceiling 53~55% = original empirical finding 유지) |
+| **★ ★ R1' automation ceiling 외부 권위 정량 비교 (★ v1.1 신규)** | Spring 4.1+iBATIS 2 specific academic 권위 출현 시 (★ 현재 ❌ / paradigm class 추상화 인용만 가능) | ⏳ open (★ Wang ICSE 2025 + LongCodeBench 2025 + AWS SCT + Amazon Q + ThoughtWorks 외부 권위 = paradigm 방향성 + scope 효과 + 자릿수 sanity 정합 / 정량 ceiling 53~55% = ★ ★ ★ original empirical finding (industry first) 유지) |
 | **★ ★ PoC #11 0 SATD 해석 정정 (★ v1.1 신규 carry)** | PoC #11 Day 3.5 종결 시 | ⏳ open (★ "Modern OSS reference 정합" 단순 결론 ❌ / single-case + 작은 모듈 + 잠복 기간 미경과 해석 명시 / `examples/poc-11-efiweb-billing-spring41/input/` + `sql-inventory.json` 갱신) |
+| **★ ★ C-not-all-code-검증 (★ v1.1.1 신규 carry)** | arxiv 2601.21894 "Not All Code Is Equal" 별도 검증 후 sub-rule §X-C 재인용 vs 영구 제거 | ⏳ open (★ Agent 1 F-015 cross-validation 결과 = 2601 prefix = 2026-01 / arxiv ID 정확 확인 불가 / v1.1.1 ★ 인용 제거 / 별도 sprint 검증) |
+| **★ ★ ★ Modern stack 사내 측정 carry (★ v1.1.1 신규 critical)** | 사내 Modern stack (MyBatis 3 / TypeORM / Spring Data JPA / Prisma) PoC 진입 시 | ⏳ open (★ ★ Modern ceiling ~60~67% = 3 OSS PoC 한정 / 사내 Modern 측정 ❌ — Agent 3 Senior critique REVISE #1 / 외부 인용자 "OSS-only" 한정 인지 의무 / 본체 가치 명세 명시 의무 cross-link CLAUDE.md + README + memory) |
 
 ---
 
@@ -170,8 +173,8 @@
 
 **R1' 방향성 (legacy paradigm < modern paradigm automation)** = ★ ★ ★ STRONG 외부 권위 정합:
 
-1. ★ ★ ★ **Zhang et al. ICSE 2025** "How and Why LLMs Use Deprecated APIs in Code Completion? An Empirical Study" (arxiv 2406.09834v3)
-   - DUR (Deprecated Usage Rate): legacy/outdated 컨텍스트 = **70~90%** vs up-to-date 컨텍스트 = **9~18%** (★ ★ ★ ~60~70%p gap)
+1. ★ ★ ★ **Wang et al. ICSE 2025** "How and Why LLMs Use Deprecated APIs in Code Completion? An Empirical Study" (arxiv 2406.09834v3 / DOI 10.1109/ICSE55347.2025.00245 / ★ v1.1.1 정정: First author = Chong Wang (NTU) / Zhang 공저자 3번째)
+   - DUR (Deprecated Usage Rate): outdated functions (𝒪) **70~90%** vs up-to-date (𝒰) **9~18%** / overall **25~38%** 범위 (★ ★ ★ ~60~70%p gap)
    - "LLMs lack explicit mechanisms to distinguish between obsolete and current APIs"
    - ★ ★ ★ **iBATIS 2 = 2009 EOL** 정확 적용 — 본 사내 §3-A LLM 의 AP 식별 + mapper XML 의미 해석 시 동일 메커니즘 작동
 
@@ -182,42 +185,61 @@
 
 **R1' "작은 scope → 자동화율 ↑" (trivially deterministic)** = ★ ★ ★ STRONG 외부 권위 정합:
 
-3. ★ ★ ★ **LongCodeBench** (arxiv 2505.07897v3 / 2026) "Evaluating Coding LLMs at 1M Context Windows"
-   - Claude 3.5 Sonnet LongSWE-Bench 정확도: **32K context = 29% → 256K context = 3%** (★ ★ ★ 급락)
+3. ★ ★ ★ **LongCodeBench** (arxiv 2505.07897 / ★ v1.1.1 정정: 2025 / v1=2025-05 / v3=2025-10 — "2026" 오표기 정정) "Evaluating Coding LLMs at 1M Context Windows"
+   - Claude 3.5 Sonnet LongSWE-Bench 정확도: **29% → 3%** (★ ★ ★ context length ↑ → 급락)
    - Qwen2.5 = 70.2% → 40%
    - "LLMs display much lower accuracy on code benchmarks than text benchmarks"
 
-4. ★ **Context Length Alone Hurts** (arxiv 2510.05381v1)
+4. ★ **Context Length Alone Hurts** (arxiv 2510.05381v1 / EMNLP 2025 Findings / First author = Yufeng Du)
    - retrieval 완벽해도 input 길이만으로 성능 **13.9~85% 저하**
 
-5. ★ **"Not All Code Is Equal"** (arxiv 2601.21894)
-   - absolute structural complexity 가 LLM 추론에 dominant / code length + 복잡도 결합 효과
+5. ★ **"Beyond Synthetic Benchmarks: Evaluating LLM Performance on Real-World Class-Level Code Generation"** (arxiv 2510.26130 / 2025 / ★ v1.1.1 신규 보강 — Agent 1 추가 권위 후보)
+   - synthetic benchmark vs real-world framework integration 갭 명시 (★ R1' "legacy framework 통합 = synthetic benchmark 외 영역" 보강 적합)
+
+6. ★ **"Where Do LLMs Still Struggle?"** (arxiv 2511.04355 / 2025 / ★ v1.1.1 신규 보강 — Agent 1 추가 권위 후보)
+   - code generation benchmark 한계 in-depth 분석 (R1' "ceiling 존재" 방향성 보강)
+
+(★ v1.1 인용 "Not All Code Is Equal" arxiv 2601.21894 = ★ Agent 1 F-015 cross-validation 검증 실패 가능성 (2601 prefix = 2026-01 / arxiv ID 정확 확인 carry) → ★ v1.1.1 ★ 인용 제거 / 별도 검증 후 인용 carry C-not-all-code-검증)
 
 ### X-D. ★ ★ original empirical finding 명시 (외부 권위 부재 영역)
 
-- ★ ★ ★ R1' **정량 ceiling (Spring 4.1+iBATIS 2 ~53~55% / Modern ~63~67%)** = ★ ★ 외부 권위 부재 / **original empirical finding**
-  - 본 사내 5 PoC isomorphic 6 차원 corroboration (paradigm + ORM + platform + language + responsibility + scale) = ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정책 정합
+- ★ ★ ★ R1' **정량 ceiling (Spring 4.1+iBATIS 2 ~53~55% / Modern ~60~67%)** = ★ ★ 외부 권위 부재 / **original empirical finding (industry first paradigm-cross axis quantification)**
+  - 본 사내 6 PoC isomorphic 6 차원 corroboration (paradigm + ORM + platform + language + responsibility + scale) = ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정책 정합
   - Spring 4.1 + iBATIS 2 specific academic ❌ — **legacy ORM-less SQL mapper paradigm class** 추상화 후 인용 가능
 - ★ R1' **counterexample (PoC #07 다중책임 5509 LOC > PoC #06 단일 345 LOC / 큰 scope 자동화율 ↑)** = ★ 외부 권위 부재 / original finding
   - 본 사내 가설: "다중책임 분기 양 ↑ → 자동 grep 누적 효과 ↑" (★ 5 PoC × 단일 paradigm 표본 한정)
 
+### X-C-2. ★ ★ ★ Big-tech industry isomorphic corroboration (★ v1.1.1 신규 / Agent 2 정탐)
+
+★ paradigm-cross axis 정량 측정 = academic + industry 모두 부재 / **자릿수 sanity check 가능**:
+
+| 권위 | axis | 정량 | R1' 비교 |
+|---|---|---|---|
+| ★ ★ **AWS SCT** (Schema Conversion Tool / Oracle→PostgreSQL heterogeneous) | 객체 종류 axis | Tables 100% / Views 94.5% / Stored Proc **76.8%** / Functions **66.4%** / Triggers 74.2% | ★ ★ ★ Modern ceiling 60~67% vs AWS SCT Functions **66.4%** ★ 자릿수 정합 / Stored Proc 76.8% = Modern upper bound 정합 |
+| ★ ★ **Amazon Q Developer Code Transformation** (Java 버전 axis) | Java 버전 axis | Novacomp 자체 코드 **80%** / 대형 보험사 4 app **36%** / 일반 productivity **20~40%** 시간 단축 / OSS 62 large app **85% higher success rate** / AI 추천 acceptance **60%+** | ★ ★ 본 R1' 자릿수 (50~80%) 정합 / Amazon Q paradigm 별 자동화율 차이 published ❌ |
+| ★ ★ ★ **ThoughtWorks Tech Radar Vol.32~34** (2025~2026.04) | 사상 axis | "GenAI for forward engineering" 신 기법 등재 (legacy → 의도 추출 → 모던 재생성) + "Spec-driven development for legacy" | ★ ★ ★ 본 chain harness (planning → behavior → test → impl) 와 **isomorphic 사상** / paradigm 별 자동화율 정량 ❌ |
+
+→ ★ ★ ★ **본 R1' = industry first paradigm-cross axis quantification (original empirical finding)** — Big-tech / 권위 분석사 어디도 "paradigm 별 자동화율 ceiling" 정량 발표 없음. 자릿수 정합 sanity check ✅.
+
 ### X-E. paradigm modernization 시 ceiling 돌파 (★ 5 PoC SQL Inventory robust 정합)
 
-| PoC | paradigm | §3-A 자동화율 | 출처 |
-|---|---|---|---|
-| PoC #06 + #11 + #07 (Spring 4.1 + iBATIS 2) | Legacy | **38.75% ~ 53.8%** (ceiling ~53~55%) | 본 sub-rule §X-A |
-| PoC #08 jpetstore-6 | MyBatis 3 Modern (Spring 6) | **66.7%** | DEC-2026-05-07-poc-08-종결 |
-| PoC #09 lujakob | NestJS + TypeORM Modern | **63.6%** | DEC-2026-05-08-poc-09-종결 |
-| PoC #10 raeperd | Spring Data JPA Modern | **60%** | DEC-2026-05-08-poc-10-종결 |
+| PoC | paradigm | §3-A 자동화율 | 출처 | ★ 측정 환경 |
+|---|---|---|---|---|
+| PoC #06 + #11 + #07 (Spring 4.1 + iBATIS 2) | Legacy | **38.75% ~ 53.8%** (ceiling ~53~55%) | 본 sub-rule §X-A | ★ 사내 EFI-WEB |
+| PoC #08 jpetstore-6 | MyBatis 3 Modern (Spring 6) | **66.7%** | DEC-2026-05-07-poc-08-종결 | ★ ★ OSS 한정 |
+| PoC #09 lujakob | NestJS + TypeORM Modern | **63.6%** | DEC-2026-05-08-poc-09-종결 | ★ ★ OSS 한정 |
+| PoC #10 raeperd | Spring Data JPA Modern | **60%** | DEC-2026-05-08-poc-10-종결 | ★ ★ OSS 한정 |
 
-→ ★ ★ ★ Legacy ceiling **~53~55%** vs Modern ceiling **~60~67%** (★ ~10%p gap / 5 PoC 사실 robust).
+→ ★ ★ ★ Legacy ceiling **~53~55%** vs Modern ceiling **~60~67%** (★ ~10%p gap / 6 PoC 사실 robust).
+
+★ ★ **Modern ceiling = OSS PoC 3건 한정** (★ ★ v1.1.1 신규 명시 / Agent 3 REVISE #1 흡수). 사내 Modern stack 측정 ❌ — 사내 적용 시 ★ 재측정 의무 (carry C-모던-stack-사내-측정 / 외부 인용자 "OSS-only" 한정 인지 의무).
 
 ### X-F. ★ ★ 실용 함의
 
 1. ★ Spring 4.1+iBATIS 2 stack analysis = §3-A 자동화율 ★ 35~55% expectation (★ scale 무관 / responsibility 무관 / paradigm 종속)
-2. ★ ★ migration target stack 결정 시 = Modern stack 이전 = §3-A 자동화율 ★ +10%p expectation
-3. ★ ★ ★ 70~80% 한계 (★ chain harness 전체 자동화 axis / CLAUDE.md L18 / project_methodology_scope memory "70~80% 한계 명시 잔존") 와 ★ **별도 axis** (★ 본 §X = analysis 단계 §3-A automation / 별도 metric)
-4. ★ ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정책 = ★ 본 R1' 가설에도 정합 적용 가능 (5 PoC isomorphic 6 차원 corroboration 보강)
+2. ★ ★ migration target stack 결정 시 = Modern stack 이전 = §3-A 자동화율 ★ +10%p expectation (★ Modern = OSS 한정 / 사내 재측정 의무)
+3. ★ ★ ★ 70~80% 한계 (★ **chain harness 전체 자동화 axis** / process 통과율 metric / gate 의무 ≤ 15% 사용자 검토 / CLAUDE.md / project_methodology_scope memory) 와 ★ ★ **별도 axis** (★ 본 §X = **analysis 단계 §3-A automation axis** / artifact 추출률 metric / paradigm 종속 ceiling). ★ ★ ★ **metric 분모 자체 다름** — chain harness axis 분모 = chain 1~4 통합 gate 통과량 / §3-A axis 분모 = analysis 단계 LLM ↔ rule.json 단방향 추출 row count (★ v1.1.1 신규 metric semantics 차이 명시 / Agent 3 강화 흡수).
+4. ★ ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정책 = ★ 본 R1' 가설에도 정합 적용 가능 (6 PoC isomorphic 6 차원 corroboration 보강 / ★ ★ industry first paradigm-cross axis quantification)
 
 ### X-G. ★ R1' carry (★ Day 3.5 PoC #11 종결 시 결단)
 
@@ -247,12 +269,22 @@
 - PoC #11 antipatterns.json (AP-BILLING-002/005 / ★ 3 사내 PoC isomorphic 자격 사실)
 - PoC #11 inventory.json (★ `phase_3a_automation_measurement` / §3-A 자동화율 52.5% 측정)
 - PoC #11 sql-inventory.json (★ ★ ★ corroboration #3 사내 PoC / 66.7% × 3 robust)
-- ★ ★ ★ **Zhang et al. ICSE 2025** "How and Why LLMs Use Deprecated APIs" (arxiv 2406.09834v3) — R1' paradigm 방향 외부 권위 STRONG
-- ★ ★ ★ **LongCodeBench** (arxiv 2505.07897v3) — R1' scope 효과 외부 권위 STRONG
-- ★ **Context Length Alone Hurts** (arxiv 2510.05381v1) — input 길이 단독 변수
 - ★ **Software Quality Journal 2024** (DOI 10.1007/s11219-023-09655-z) — Keyword-Labeled SATD (KL-SATD) 정확 정의 출처 (★ §AP-005 인용 정정)
 - Maldonado & Shihab 2015 "Detecting and quantifying different types of self-admitted technical debt" (IEEE 7th MTD workshop / 5 SATD type) — ★ §AP-005 인용 정정 후 정확 표현
 - ★ Gartner Application Innovation Summit 2025 (Moderne.ai recap) — paradigm modernization 후행 권위
 - DEC-2026-05-08-poc-{08,09,10}-종결 (★ Modern paradigm ceiling 돌파 evidence)
 - F-015 cross-validation 패턴 (memory `feedback_sub_agent_validation.md`)
 - 가벼운 sub-agent 전략 (memory `feedback_lightweight_sub_agent.md`)
+
+### ★ ★ v1.1.1 PATCH 신규 / 정정 (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화)
+
+- ★ ★ ★ **DEC-2026-05-13-r1-prime-본체-명문화** (★ v1.1.1 PATCH origin / 본체 CLAUDE.md + README + memory 3 layer R1' axis 분리 명문화)
+- ★ ★ ★ **Wang et al. ICSE 2025** (★ Agent 1 F-015 정정 / Zhang → Wang / First author = Chong Wang NTU / 공저자 3번째 Zhang / arxiv 2406.09834v3 / DOI 10.1109/ICSE55347.2025.00245) — R1' paradigm 방향 외부 권위 STRONG
+- ★ ★ ★ **LongCodeBench** (arxiv 2505.07897 / ★ Agent 1 정정 / 발표년도 2025 / v1=2025-05 / v3=2025-10 / First author = Stefano Rando) — R1' scope 효과 외부 권위 STRONG
+- ★ **Context Length Alone Hurts** (arxiv 2510.05381v1 / EMNLP 2025 Findings / First author = Yufeng Du) — input 길이 단독 변수
+- ★ **Beyond Synthetic Benchmarks** (arxiv 2510.26130 / 2025 / ★ v1.1.1 신규 추가) — synthetic benchmark vs real-world framework 갭
+- ★ **Where Do LLMs Still Struggle?** (arxiv 2511.04355 / 2025 / ★ v1.1.1 신규 추가) — code generation benchmark 한계
+- ★ ★ **AWS Schema Conversion Tool** (★ v1.1.1 신규 추가 / Agent 2 isomorphic corroboration) — Stored Proc 76.8% / Functions 66.4% 자릿수 정합
+- ★ ★ **Amazon Q Developer Code Transformation** (★ v1.1.1 신규 추가 / Agent 2) — Novacomp 80% / 보험사 36% / paradigm 별 정량 ❌
+- ★ ★ ★ **ThoughtWorks Tech Radar Vol.32~34** (2025~2026.04 / ★ v1.1.1 신규 추가 / Agent 2) — "GenAI for forward engineering" + "Spec-driven development for legacy" / ★ ★ ★ chain harness 사상 isomorphic
+- ~~"Not All Code Is Equal" (arxiv 2601.21894)~~ — ★ v1.1.1 인용 ★ 제거 (Agent 1 F-015 cross-validation 검증 실패 가능성 / 별도 sprint carry C-not-all-code-검증)

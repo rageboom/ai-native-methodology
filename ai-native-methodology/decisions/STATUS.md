@@ -3,9 +3,61 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-12 (★ ★ ★ **PoC #11 (EFI-WEB billing) Day 0.5 진입** — DEC-2026-05-12-in-place-read-정책-채택 / source path 위임 + LOC 정탐 + plan 2차 작성 + Day 1 진입 승인)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **v2.3.3 PATCH release** — DEC-2026-05-13-r1-prime-본체-명문화 / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification / git tag v2.3.3 expected)
 
-**v2.3.1 PATCH release 보존** (같은 날 2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+**v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
+**v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 v2.3.3 PATCH release (★ R1' axis 본체 명문화)**:
+
+- ✅ **4원칙 1원칙** — plan 자산화 (`~/.claude/plans/i-r1-prime-ceiling-본체.md` / 10절 / scope IN 13항)
+- ✅ **4원칙 2원칙** — research 자산화 (`~/.claude/plans/i-r1-prime-research.md` / 3 sub-agent 병렬 / 가벼운 sub-agent 전략 / 시간 cap 10분/agent / 실측 ~76~80초/agent)
+- ✅ **4원칙 3원칙** — 사용자 결단 4 question 묶음 일괄 (★ 풍성한 옵션 4건 모두 채택)
+- ✅ **★ ★ ★ 3 layer 본체 가치 명세 갱신** — CLAUDE.md L36~ + ai-native-methodology/README.md L34~ + memory project_methodology_scope.md "scope OUT" 절 / R1' axis 분리 + metric semantics 차이 + Modern OSS 한정 + 외부 권위 cross-link
+- ✅ **★ ★ sub-rule v1.1 → v1.1.1 PATCH** — Agent 1 인용 정정 3건 (Wang/LongCodeBench 2025/Not All Code 제거) + Agent 2 외부 권위 보강 (AWS SCT + Amazon Q + ThoughtWorks) + §X-C-2 신설 (Big-tech industry isomorphic corroboration) + Modern OSS 한정 명시 + metric semantics 차이 명시
+- ✅ **DEC 신설 + 갱신** — DEC-2026-05-13-r1-prime-본체-명문화 신설 + DEC-2026-05-12-r1-가설-revisit §5 resolved 갱신
+- ✅ **CHANGELOG + version bump** — v2.3.2 → v2.3.3 (plugin.json + package.json + scripts/version-check.js 3 source sync)
+- ✅ **build dist** — `scripts/build-plugin.js` (artifact 검증)
+- ✅ **회귀 unit test** — schema 변경 ❌ → 변동 ❌ expected
+- ✅ **release-readiness §8.1 strict 7/7** — `--target v2.3.3`
+- ✅ **git tag v2.3.3 + commit**
+
+### resolved by 본 session
+
+- ~~**C-r1-prime-자격-Modern-corroboration**~~ ✅ resolved by DEC-2026-05-13 (★ ★ critical)
+- ~~DEC-2026-05-12-r1-가설-revisit §5 본체 영향 5행 모두~~ ✅ resolved (★ 갱신)
+- ~~Zhang → Wang 인용 정정~~ ✅ resolved (sub-rule v1.1.1 + DEC + plan 모두)
+- ~~LongCodeBench 2026 → 2025 정정~~ ✅ resolved (sub-rule v1.1.1 + DEC)
+- ~~Modern OSS 한정 명시 부재~~ ✅ resolved (Agent 3 REVISE #1 흡수 / 3 layer + sub-rule §X-E)
+- ~~metric semantics 차이 명시 부재~~ ✅ resolved (Agent 3 강화 흡수 / 3 layer + sub-rule §X-F.3)
+
+### 신규 carry (★ ★ v2.3.3 PATCH 후)
+
+- ★ **C-not-all-code-검증** (★ Agent 1 F-015 / arxiv 2601.21894 별도 검증 후 인용 재개 vs 영구 제거)
+- ★ ★ **C-모던-stack-사내-측정** (★ critical / Agent 3 REVISE #1 / 사내 Modern stack PoC 진입 시 ceiling 재측정 의무)
+
+### 보존 carry (★ 본 작업 후)
+
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화)
+- C-domain-PoC11-1~3 (★ 결제 도메인 expert 위임)
+- C-PoC07-1~3 (★ chain 3 영역 retrofit)
+- C-poc-11-0-satd-해석-정정 (★ Agent 1 cross-validation 흡수 잔존)
+- C-poc-11-source-디렉토리-cleanup (★ 낮은 우선)
+- C-v2.2.0-1 (★ NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level (별도 sprint)
+
+### ★ ★ 4원칙 Lessons Learned (본 session)
+
+- ★ LL-i-1: 가벼운 sub-agent 전략 (Agent 3 case 생략) 도 ★ critical findings 5건 확보 → "scope 작은 작업" 도 4원칙 2원칙 진행 정당성 입증
+- ★ LL-i-2: Senior critique REVISE 2 (Modern OSS 한정 + 결단 burst) = 본문 표현 보강 단순 인식 → critical context 명시 누락 위험 회피
+- ★ LL-i-3: 사용자 결단 "풍성한 옵션" 채택 → 자동 scope 확장 / "최소 변경" 원칙 strict + scope creep 회피 의무
+- ★ ★ LL-i-4: cooling-off 영구 폐기 정합 강화 = Senior critique 권고 vs 사용자 명시 결단 충돌 시 → 사용자 명시 결단 우선 (4원칙 §3) + Senior critique 정신만 흡수 (★ 결단 burst 의식 + 최소 변경 강 적용)
+
+---
+
+★ ★ ★ ★ ★ ★ **이전 session 2026-05-12 PoC #11 (EFI-WEB billing) Day 0.5~3.5 종결 + v2.3.2 PATCH release**:
 
 ★ ★ ★ ★ ★ ★ **본 session 2026-05-12 PoC #11 Day 0.5 진입 (★ 사용자 결단 α #1 진입 + 결단 β 정책 변경)**:
 
