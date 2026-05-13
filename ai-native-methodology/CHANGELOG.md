@@ -9,7 +9,103 @@
 
 ---
 
-## [v2.3.5] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 4차 — PoC #11 chain 2 4 UC 종결 / 첫 realworld 사내 PoC chain 2 실증 / characterization mode / 5 BHV + 12 AC + traceability partial / chain harness validated v2.3.5 강 강화 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+## [v2.3.6] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 6차 — tools/findings-aggregator 신설 + chain-driver next --findings 자동 입력 정식 통합 + "양심 의존 차단" 정책 완전 실현 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ PATCH session 6차** — v2.3.5 PATCH (commit `bbe27ab` / chain 2 4 UC 종결) + session 5차 (commit `852e7f7` / chain-driver retroactive gate) 후 ★ ★ critical carry **C-chain-driver-findings-integration** 즉시 진입. v2.3.x patch level (★ chain-driver 외부 자산 신설만 / chain harness 5 요소 변경 ❌ / schema ❌ / no new ADR).
+
+### 변경 사항 (v2.3.5 → v2.3.6)
+
+#### ★ ★ ★ DEC-2026-05-13-chain-driver-findings-integration-v2.3.6 (★ 양심 의존 차단 완전 실현)
+
+- **trigger**: session 5차 critical lesson LL-i-14 — chain-driver retroactive gate 통과 ✅ / 단 ★ `--findings <path>` 옵션 ❌ = 암묵 0 findings 가정 pass = ★ 양심 의존 잔존 패턴
+- **사용자 결단**: ★ "1" = C-chain-driver-findings-integration 즉시 진입 + 4 question 결단 흡수 (★ Q1 (a) script 신설 / Q2 PATCH v2.3.6 / Q3 chain 3 진입 시 자연 적용 / 모두 추천 채택)
+
+#### ★ ★ tools/findings-aggregator 신설 (★ workspace 15번째 등록)
+
+- `package.json` (`@ai-native-methodology/findings-aggregator` v0.1.0)
+- `src/aggregator.js` — 핵심 로직 (transformPlanningExtraction + transformChainCoverage + transformSchemaValidator + transformTestImplPass + transformGeneric + mergeFindings + aggregateForStage / **DI pattern**)
+- `src/cli.js` — CLI 진입점 (`--target` + `--stage` + `--output` + `--dry-run` + `--json` / exit code 0/1/2/3)
+- `test/aggregator.test.js` — ★ **24 unit test pass ✅** (★ stage 4 + transform 5 + merge 4 + dispatch 4 + aggregate 5 + REQUIRED_VALIDATORS_PER_STAGE 정합 검증)
+
+#### ★ chain-driver gate-eval.js findings shape 정합
+
+```json
+{
+  "critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0,
+  "coverage_pct": 1.0, "coverage_threshold": 0.85,
+  "evidence_missing": [],
+  "tests_total": null, "tests_passed": null, "tests_failed": null,
+  "sources": { "<validator>": { "status": "ok|skipped|error", ... } }
+}
+```
+
+★ `sources` field = aggregator 자체 보강 (★ 추적 의무 / validator 별 status + findings 별도 기록 / 양심 의존 차단 + 디버깅 정합).
+
+#### ★ ★ ★ ★ PoC #11 spec stage 정식 통합 실증
+
+```bash
+$ node tools/findings-aggregator/src/cli.js --target examples/poc-11-efiweb-billing-spring41 --stage spec
+# → findings-spec.json 자동 생성 (critical 0 + high 0 + coverage 1.0)
+
+$ node tools/chain-driver/src/cli.js next examples/poc-11-efiweb-billing-spring41 \
+    --findings examples/poc-11-efiweb-billing-spring41/.aimd/output/findings-spec.json \
+    --user-decision go --dry-run
+# → blocked=false / decision="go-eligible" / reasons=[]
+```
+
+★ ★ ★ "양심 의존 차단" 정책 완전 실현 (★ validator 사후 통과 + chain-driver gate 정식 통과 양쪽 cross-link 자동 정합).
+
+#### ★ chain harness 5 요소 변경 ❌ + backward-compat 보존
+
+- chain-driver 자체 코드 수정 ❌ (★ 5 요소 모두 보존)
+- chain-driver next `--findings` 옵션 = optional 보존 (★ 기존 동작 보존 / "--findings 없음 = 암묵 0" 자격 보존)
+- ★ ★ adoption guide + workflow + skills 안 findings-aggregator 사용 의무 명문화 = ★ 신규 carry C-adoption-findings-aggregator-workflow (★ 별도 sprint PATCH 자격)
+
+#### REQUIRED_VALIDATORS_PER_STAGE (★ chain-driver gate-eval.js 정합)
+
+| stage | validators |
+|---|---|
+| planning | planning-extraction-validator + schema-validator |
+| spec | chain-coverage-validator + drift-validator + formal-spec-link-validator + schema-validator |
+| test | test-impl-pass-validator + spec-test-link-validator + schema-validator |
+| implement | test-impl-pass-validator + static-runner + traceability-matrix-builder |
+
+#### resolved carry 1
+
+- ★ ★ ★ C-chain-driver-findings-integration (★ critical / 양심 의존 잔존 패턴 제거)
+
+#### 신규 carry 1
+
+- ★ C-adoption-findings-aggregator-workflow (★ adoption guide + workflow + skills 안 findings-aggregator 사용 의무 명문화)
+
+#### 보존 carry (★ 본 작업 후)
+
+- ★ C-chain-driver-state-retroactive-all-PoC (PoC #03~#10 + PoC #11 chain 3+4)
+- ★ ★ ★ C-stack-결단-chain-3-4-plan (critical)
+- ★ ★ C-OSS-Modern-chain-2-4-PoC08 (critical / ≥ 2 realworld 자격 trigger)
+- ★ ★ C-모던-stack-사내-측정 (critical)
+- ★ C-schema-br-pattern-fix
+- 그 외 (C-egovframework-sub-rule + C-domain-PoC11-1~3 + C-PoC07-1~3 + C-v2.2.0-1 + C-v2.3.0-gartner)
+
+#### Lessons Learned 3건 신규
+
+- ★ ★ ★ LL-i-16: "양심 의존 차단" 완전 실현 자산 (★ chain-driver 외부 자산 = chain harness 5 요소 보존 + PATCH 자격 정합)
+- ★ ★ LL-i-17: 외부 자산 vs 내부 통합 결단 정합 (★ (a) findings-aggregator 외부 = 권고 정합 / Agent 3 정신)
+- ★ LL-i-18: DI test 정합 (★ aggregateForStage DI pattern / mock runValidator unit test / 24/24 pass)
+
+#### PATCH v2.3.6 자격 7/7
+
+- chain harness 5 요소 변경 ❌ + schema ❌ + no new ADR + workspace test 보존 + 신규 24 test + §8.1 strict 7/7 expected + ≥ 6 PoC 보존 + chain-driver findings 통합 실증 + build OK
+
+#### Version Bump (3 source sync)
+
+- `.claude-plugin/plugin.json` 2.3.5 → 2.3.6
+- `package.json` 2.3.5 → 2.3.6 + workspace 15번째 (findings-aggregator) 등록
+- `scripts/version-check.js` 자동 verify
+
+---
+
+## [v2.3.5] — 2026-05-13 (★ ★ ★ ★ PATCH session 4차 — PoC #11 chain 2 4 UC 종결 / 첫 realworld 사내 PoC chain 2 실증 / characterization mode / 5 BHV + 12 AC + traceability partial / chain harness validated v2.3.5 강 강화 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ PATCH session 4차** — v2.3.4 PATCH (같은 날 commit `e298bb4` / Agent 1 F-015 finding 정정) + session 3차 commit `d32a6aa` (chain 2 UC #1 partial 자산화) 직후 ★ "진행" 사용자 결단 흡수 → chain 2 UC #2 + UC #3 (★ critical) + UC #4 종결 + traceability partial + DEC v2.3.5 신설 + PATCH release. ★ Q1 결단 정합 ("chain 2 종결 후 PATCH v2.3.5" / MINOR v2.4.0 ❌ / Agent 3 STOP signal 6 정합 / sample ≠ realworld).
 

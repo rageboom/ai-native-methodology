@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.3.5",
-  "description": "★ ★ ★ ★ v2.3.5 PATCH session 4차 — PoC #11 EFI-WEB billing chain 2 4 UC 종결 (★ chain 2 첫 realworld 사내 PoC 실증 / 5 BHV + 12 AC + traceability partial / characterization mode Michael Feathers 2004 정합 / AC-BILLING-008 critical TDD intent 정면 위배 정합) + chain harness validated v2.3.5 강화 (★ chain 2 영역 sample → realworld). DEC 신설 DEC-2026-05-13-poc-11-chain-2-종결-v2.3.5. ★ Agent 3 Senior critique STOP signal 6 흡수 (sample ≠ realworld / v2.4.0 MINOR ❌ / PATCH 자격 / ≥ 2 realworld 자격 trigger = C-OSS-Modern-chain-2-4-PoC08 carry). v2.3.4 PATCH (F-015 finding 정정) + v2.3.3 PATCH (R1' axis 본체 명문화) + v2.3.2 + v2.3.1 + v2.3.0 MINOR + v2.2.0 MINOR 모두 보존. chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌ / chain harness 5 요소 변경 ❌.",
+  "version": "2.3.6",
+  "description": "★ ★ ★ ★ v2.3.6 PATCH session 6차 — tools/findings-aggregator 신설 (★ workspace 15번째 / @ai-native-methodology/findings-aggregator v0.1.0 / 24 unit test pass) + chain-driver next --findings 자동 입력 정식 통합 (★ stage 4 별 REQUIRED_VALIDATORS_PER_STAGE 정합 / transform 5 함수 / DI pattern aggregateForStage) + ★ ★ ★ \"양심 의존 차단\" 정책 완전 실현 (★ validator 자동 cross-link / chain-driver gate-eval.js findings shape 정합). PoC #11 spec stage 정식 통합 실증 ✅. DEC 신설 DEC-2026-05-13-chain-driver-findings-integration-v2.3.6. resolved C-chain-driver-findings-integration / 신규 C-adoption-findings-aggregator-workflow. chain harness 5 요소 변경 ❌ (chain-driver 외부 자산 / Agent 3 정신 정합). v2.3.5 PATCH (chain 2 4 UC 종결) + v2.3.4 + v2.3.3 + v2.3.2 + v2.3.1 + v2.3.0 MINOR + v2.2.0 MINOR 모두 보존. chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"

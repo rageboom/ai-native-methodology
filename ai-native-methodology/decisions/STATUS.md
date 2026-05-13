@@ -3,9 +3,11 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **session 5차 — chain-driver retroactive gate 정식 통과** — 사용자 질문 "chain1→2 검증 과정?" → ★ critical 발견 (chain-driver state.json 모든 PoC 부재) → ★ ★ PoC #11 chain-driver init + 2 next 실행 → ★ planning + spec stage complete + gate_decision="go" / chain harness validated v2.3.5 자격 정합 강화 / no release / state.json + intervention-log.jsonl = .gitignore 정합)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **session 6차 — v2.3.6 PATCH release — tools/findings-aggregator 신설 + chain-driver next --findings 자동 입력 정식 통합 + "양심 의존 차단" 정책 완전 실현** — 24 unit test pass / PoC #11 spec stage 정식 실증 / chain harness 5 요소 변경 ❌ / DEC-2026-05-13-chain-driver-findings-integration-v2.3.6 신설)
 
-**v2.3.5 PATCH release 보존** (★ session 4차 / commit `bbe27ab` / git tag `v2.3.5` / origin push ✅)
+**v2.3.6 PATCH release** (★ session 6차 / commit pending / git tag v2.3.6 pending)
+**v2.3.5 PATCH release 보존** (★ session 4차 / commit `bbe27ab` / git tag `v2.3.5` / origin push ✅ / chain 2 4 UC 종결)
+**v2.3.4 PATCH release 보존** (★ session 2차 / commit `e298bb4` / git tag `v2.3.4` / F-015 finding 정정)
 
 **v2.3.4 PATCH release 보존** (★ session 2차 / 2026-05-13 / commit `e298bb4` / git tag `v2.3.4` / origin push ✅ / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH)
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
