@@ -76,7 +76,11 @@
       "Bash(python3)",
       "Bash(node tools/schema-validator/src/cli.js examples/poc-01-realworld-spring/output/rules/rules.json --json)",
       "Bash(python3 -c \"import sys, json; d=json.load\\(sys.stdin\\); r=d['results'][0]; print\\('PoC #01:', 'VALID' if r['valid'] else f'INVALID — {len\\(r[\\\\\"errors\\\\\"]\\)} errors:', json.dumps\\([e['message'] for e in r.get\\('errors',[]\\)][:3], ensure_ascii=False\\)\\)\")",
-      "Bash(node tools/schema-validator/src/cli.js examples/poc-05-sample-user-register/input/rules.json --json)"
+      "Bash(node tools/schema-validator/src/cli.js examples/poc-05-sample-user-register/input/rules.json --json)",
+      "Bash(npm install *)",
+      "Bash(node tools/br-cross-consistency-validator/src/cli.js --target examples/poc-05-sample-user-register/input/rules.json)",
+      "Bash(node tools/br-cross-consistency-validator/src/cli.js --target examples/poc-11-efiweb-billing-spring41/input/rules.json)",
+      "Bash(node tools/br-cross-consistency-validator/src/cli.js --target examples/poc-01-realworld-spring/output/rules/rules.json)"
     ]
   }
 }

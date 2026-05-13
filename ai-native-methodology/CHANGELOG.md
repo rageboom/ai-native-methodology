@@ -9,7 +9,76 @@
 
 ---
 
-## [v2.3.7] — 2026-05-13 ⭐ 현재 (★ ★ ★ PATCH session 7차 — rules.schema.json BR pattern 4토막 strict 정합 + id-conventions.md enforcement label 강화 / chain harness 5 요소 변경 ❌ / no new ADR)
+## [unreleased] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ ★ v2.4.0 MINOR sub-plan §1 종결 — ADR-CHAIN-011 BR dual representation paradigm 본격 작성 + br-cross-consistency-validator workspace 16번째 신설 + threshold spike critical 발견 / chain harness 5 요소 변경 ❌ / no release / no version bump / 다음 session sub-plan §2)
+
+> **★ ★ ★ ★ ★ session 8차** — v2.4.0-rc1 자격 (session 7차 / commit `a24a892` / dual representation 사상 신설) 직후 사용자 결단 "A (v2.4.0 MINOR 진입)" + sub-agent 토론 권장 결단. ★ 4원칙 2원칙 3 sub-agent 병렬 (Agent 1 공식문서 / Agent 2 빅테크 / Agent 3 Senior critique) 시행 + Senior STOP signal 1 + REVISE 5 흡수 + 시행 순서 통합안 (c→d→a부분) 채택. 본 session = sub-plan §1 (ADR + validator scaffolding + Layer 1 결정적 구현 + threshold spike). schema 변경 + 11 PoC 마이그레이션 + chain-driver 통합 + release = sub-plan §2~§3 다음 session+.
+
+### ★ ★ session 8차 변경 사항 (★ no version bump / no release)
+
+#### ★ ★ ★ ★ ADR-CHAIN-011 본격 작성 — BR dual representation paradigm
+
+`docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` 신설:
+
+- 6갈래 drift 사실 + 사상 발전 history (v1.x GWT → v2.0 source-grounded → v2.1 characterization → v2.3 natural_language → v2.4.0 dual) 명문화
+- ★ ★ 외부 사례 자릿수 정합:
+  - **JSON Schema anyOf** 공식 권장 (oneOf 비권장)
+  - **Gherkin description** = runtime 무시 (★ 본 방법론 paradigm 다름 — 양쪽 executable)
+  - **★ ★ ★ ★ Adzic SBE 10년 자기 폐기** — 본 ADR 핵심 위험 신호 최강 (cross-validator 없으면 동일 폐기 보장)
+  - **DMN description + FEEL** = paradigm 정합 (★ OMG spec 도 cross-consistency 강제 부재 → 본 방법론 보강)
+  - **GitHub Spec Kit (90K star)** = dual + cross-validation 미구현 (★ 본 방법론 original empirical 자격)
+  - **DMN L1+L3 ladder** = 단계 진화 / 본 방법론 = co-existence 동시 보존 (paradigm 다름 / 신규성)
+  - **AWS SCT + Conduktor + Solace** = validator-first migration 빅테크 정합
+- ★ ★ dual representation paradigm + Layer 1 결정적 + Layer 2 LLM advisory + threshold ≥ 0.85 empirical hypothesis
+- ★ ★ ★ PoC #04 FE if/then 분기 결정 (단일 schema 유지 / nested anyOf 회피 / Agent 1 F1 함정 정합)
+- ★ chain 1 gate 통합 + release-readiness §8.1 strict 7/7→8/8 격상 사상 (★ ★ MINOR bump 부적격 가능성 명시 / v2.5.0 분리 검토 carry)
+- ★ ADR-008 이중 렌더링 사상의 BR 영역 확장 + F-015 cross-validation schema 내재화
+- ★ LL-i-22~24 (session 7차) + LL-i-26 (Adzic) + LL-i-27 (industry 공백)
+- 시행 paradigm = sub-plan §1 (본 session) + §2 (다음) + §3 (그 다음)
+
+#### ★ ★ ★ ★ tools/br-cross-consistency-validator workspace 16번째 신설
+
+`tools/br-cross-consistency-validator/`:
+
+- package.json (★ workspace 16번째 / v0.1.0)
+- src/cli.js + src/validator.js + src/deterministic.js + src/llm.js
+- test/validator.test.js (★ ★ ★ 22/22 test pass)
+- Layer 1 결정적: 두 표현 ≥ 1 의무 / keyword overlap (intersection / max) / structure 검증 (given 안 결과 키워드 ❌ + when 안 전제 키워드 ❌) / BR id 4토막 strict
+- Layer 2 LLM advisory: ★ placeholder + interface 정의 (★ Static Tool 시뮬레이션 금지 정책 정합 / 다음 session 실 구현)
+- severity-weighted deterministic_score 산정 + overall_threshold 0.85
+- workspace root package.json `workspaces` array 16번째 등록 (★ description "v2.4 chain harness 16 tools workspace" 갱신)
+
+#### ★ ★ ★ ★ ★ threshold spike critical 발견 — `tools/br-cross-consistency-validator/SPIKE-2026-05-13-threshold-distribution.md`
+
+- 11 PoC × 107 BR 일괄 측정 결과 — ★ ★ **두 표현 동시 보유 BR = 0 건 / 모든 PoC** = overlap_distribution 측정 자체 ★ ★ 불가능
+- ★ ★ ★ ≥ 0.85 hypothesis confirm 자료 ★ 부재 (★ Senior critique R2 정합 강력 / magic number 거부)
+- 6갈래 drift 직접 검증:
+  - PoC #01 GWT 풍부 → ✅ pass / score 1.0
+  - PoC #02 condition+description + PoC #03 trigger+condition+action → ★ ★ ★ validator + schema 매핑 부재 신규 발견
+  - PoC #04 FE → rules array 자체 부재 (★ if/then 분기 carry 정합)
+  - PoC #05+#06 description → representation_missing
+  - PoC #07~#11 natural_language → ⚠️ id_pattern_violation 43건 (★ v2.3.7 enforcement 정합)
+- ★ ★ ADR-CHAIN-011 §5.4 patch (★ spike 결과 반영 + 신규 carry 2건 + deterministic_score 산정 anomaly 명시)
+
+### ★ ★ 신규 carry (session 8차)
+
+- ★ ★ ★ C-threshold-spike-revisit (★ critical / sub-plan §2 후 재spike)
+- ★ ★ ★ C-poc-02-03-schema-mapping (★ critical / PoC #02 condition+description + PoC #03 trigger+condition+action 매핑 부재)
+- ★ ★ C-br-cross-validator-Layer2-LLM-impl (★ sub-plan §2)
+- ★ ★ C-deterministic-score-formula-revisit (★ sub-plan §2 후)
+
+### ★ ★ 다음 session = sub-plan §2
+
+- schema top-level 재설계 (project_id + business_rules)
+- PoC #04 FE if/then 분기 본격 구현
+- 1~2 PoC pilot 마이그레이션 (PoC #01 BE + PoC #04 FE 권장 / §8.1 strict 정합)
+- drift-validator + br-cross-consistency-validator 양쪽 통과 확인
+- 잔여 9 PoC 마이그레이션
+- Layer 2 LLM 본격 구현
+- ★ ★ ★ ★ 사용자 의도 — "마이너 release 자격 도달 시 배포 작업" / sub-plan §2 종결 → sub-plan §3 (chain 1 gate 통합 + release-readiness 격상 검토) → v2.4.0 MINOR release (★ ★ v2.5.0 분리 검토 carry 정합 / Senior STOP signal 정합)
+
+---
+
+## [v2.3.7] — 2026-05-13 (★ ★ ★ PATCH session 7차 — rules.schema.json BR pattern 4토막 strict 정합 + id-conventions.md enforcement label 강화 / chain harness 5 요소 변경 ❌ / no new ADR)
 
 > **★ ★ ★ PATCH session 7차** — v2.3.6 PATCH (session 6차 / findings-aggregator) 직후 session 4차 발견 critical schema mismatch **C-schema-br-pattern-fix** 즉시 진입. v2.3.x patch level (★ schema enforcement 1줄 + description 정합 3건 / chain harness 5 요소 변경 ❌ / no new ADR).
 

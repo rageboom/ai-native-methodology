@@ -1,0 +1,236 @@
+// br-cross-consistency-validator unit test
+// ★ ADR-CHAIN-011 정합 / Plan N §8 정합 (≥ 15 case)
+
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { validateRulesDoc, validateRulesDocStrict, OVERALL_THRESHOLD } from '../src/validator.js';
+import { extractKeywords, keywordOverlap, validateBR, resetFindingSeq } from '../src/deterministic.js';
+
+test('Layer 1: BR with natural_language only — valid', () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-EMAIL-001',
+    name: '이메일 유일성',
+    natural_language: '사용자 등록 시 이메일은 시스템 내 유일해야 함',
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.total, 1);
+  assert.equal(r.stats.with_natural_language, 1);
+  assert.equal(r.stats.with_gwt, 0);
+  assert.equal(r.findings.length, 0);
+  assert.equal(r.summary.gate_status, 'pass');
+});
+
+test('Layer 1: BR with GWT only — valid', () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-EMAIL-002',
+    name: '이메일 유일성',
+    given: ['사용자가 회원가입 페이지에 진입'],
+    when: ['이메일을 입력하고 제출'],
+    then: ['중복 시 409 Conflict 응답'],
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.with_gwt, 1);
+  assert.equal(r.findings.length, 0);
+  assert.equal(r.summary.gate_status, 'pass');
+});
+
+test('Layer 1: BR with both — valid (keyword overlap ≥ 0.5)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-ORDER-CANCEL-001',
+    name: '주문 취소',
+    natural_language: '주문 상태가 결제완료일 때 사용자가 취소 요청하면 환불 처리됨',
+    given: ['주문 상태가 결제완료'],
+    when: ['사용자가 취소 요청'],
+    then: ['환불 처리됨'],
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.with_both, 1);
+  assert.equal(r.findings.length, 0, `findings: ${JSON.stringify(r.findings)}`);
+  assert.equal(r.summary.gate_status, 'pass');
+});
+
+test('Layer 1: BR with both representations missing — critical finding', () => {
+  const doc = { business_rules: [{
+    id: 'BR-NULL-EMPTY-001',
+    name: '빈 BR',
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.ok(r.findings.some(f => f.rule === 'representation_missing'));
+  assert.ok(r.findings.some(f => f.severity === 'critical'));
+});
+
+test('Layer 1: keyword mismatch < threshold — medium finding', () => {
+  const doc = { business_rules: [{
+    id: 'BR-MISMATCH-DRIFT-001',
+    name: '키워드 불일치',
+    natural_language: '결제 모듈은 신용카드만 지원',
+    given: ['전혀 다른 영역 인증 토큰'],
+    when: ['세션 만료'],
+    then: ['리다이렉트 로그인'],
+  }]};
+  const r = validateRulesDoc(doc, { keywordThreshold: 0.5 });
+  const kwFinding = r.findings.find(f => f.rule === 'keyword_mismatch');
+  assert.ok(kwFinding, 'keyword_mismatch finding 발생 의무');
+  assert.equal(kwFinding.severity, 'medium');
+  assert.ok(kwFinding.overlap_score < 0.5);
+});
+
+test('Layer 1: BR id 4토막 위반 — medium finding (v2.3.7 enforcement)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-INVALID-3SEG', // ★ 3토막 위반
+    name: '잘못된 ID',
+    natural_language: '잘못된 ID pattern test',
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.ok(r.findings.some(f => f.rule === 'id_pattern_violation'));
+});
+
+test('Layer 1: BR id 4토막 정합 — finding 부재', () => {
+  const doc = { business_rules: [{
+    id: 'BR-BILLING-INVOICE-001',
+    name: '청구서 발행',
+    natural_language: '청구서는 매월 말일 발행됨',
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.findings.filter(f => f.rule === 'id_pattern_violation').length, 0);
+});
+
+test('Layer 1: BR id 5토막 자연 허용 (4토막+ strict)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-AUTH-LOGIN-001',
+    name: '로그인 인증',
+    natural_language: '로그인 시 OAuth 토큰 검증',
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.findings.filter(f => f.rule === 'id_pattern_violation').length, 0);
+});
+
+test('Layer 1: structure 위반 — given 안 결과 키워드 (low finding)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-STRUCT-BAD-001',
+    name: 'structure 위반 given',
+    natural_language: 'given 안에 응답이 들어간 잘못된 구조',
+    given: ['응답을 반환하고 저장 완료'], // ★ then 키워드만 / given 키워드 부재
+    when: ['시도'],
+    then: ['처리'],
+  }]};
+  const r = validateRulesDoc(doc);
+  // ★ 구조 위반 finding 검출
+  const structFinding = r.findings.find(f => f.rule === 'structure_given_has_result_keyword');
+  assert.ok(structFinding, 'structure_given_has_result_keyword finding 의무');
+  assert.equal(structFinding.severity, 'low');
+});
+
+test('Layer 1: structure 위반 — when 안 전제 키워드 (low finding)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-STRUCT-BAD-002',
+    name: 'structure 위반 when',
+    natural_language: 'when 안에 존재 키워드 잘못된 구조',
+    given: ['주어진 상태'],
+    when: ['사용자가 존재한다고 가정'], // ★ given 키워드 / when 키워드 부재
+    then: ['응답'],
+  }]};
+  const r = validateRulesDoc(doc);
+  const structFinding = r.findings.find(f => f.rule === 'structure_when_has_precondition_keyword');
+  assert.ok(structFinding, 'structure_when_has_precondition_keyword finding 의무');
+  assert.equal(structFinding.severity, 'low');
+});
+
+test('Layer 1: 여러 BR — stats aggregation', () => {
+  const doc = { business_rules: [
+    { id: 'BR-A-X-001', name: 'A', natural_language: '첫번째 BR' },
+    { id: 'BR-A-X-002', name: 'B', given: ['있다'], when: ['호출'], then: ['반환'] },
+    { id: 'BR-A-X-003', name: 'C', natural_language: '셋째', given: ['있다'], when: ['호출'], then: ['반환'] },
+  ]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.total, 3);
+  assert.equal(r.stats.with_natural_language, 2);
+  assert.equal(r.stats.with_gwt, 2);
+  assert.equal(r.stats.with_both, 1);
+});
+
+test('Layer 1: extractKeywords — Korean + English mix', () => {
+  const keywords = extractKeywords('사용자 등록 시 email is unique');
+  assert.ok(keywords.has('사용자'));
+  assert.ok(keywords.has('등록'));
+  assert.ok(keywords.has('email'));
+  assert.ok(keywords.has('unique'));
+  // stopword 제거
+  assert.ok(!keywords.has('is'));
+});
+
+test('Layer 1: keywordOverlap — perfect overlap', () => {
+  const a = new Set(['주문', '취소', '환불']);
+  const b = new Set(['주문', '취소', '환불']);
+  const { score, common } = keywordOverlap(a, b);
+  assert.equal(score, 1);
+  assert.equal(common.size, 3);
+});
+
+test('Layer 1: keywordOverlap — no overlap', () => {
+  const a = new Set(['주문', '취소']);
+  const b = new Set(['결제', '환불']);
+  const { score, common } = keywordOverlap(a, b);
+  assert.equal(score, 0);
+  assert.equal(common.size, 0);
+});
+
+test('Layer 1: keywordOverlap — empty set', () => {
+  const { score } = keywordOverlap(new Set(), new Set(['a']));
+  assert.equal(score, 0);
+});
+
+test('Layer 1: overlap_distribution stats (★ threshold spike 기반 자료)', () => {
+  const doc = { business_rules: [
+    { id: 'BR-A-X-001', name: 'A', natural_language: '주문 취소 환불',
+      given: ['주문'], when: ['취소'], then: ['환불'] },
+    { id: 'BR-A-X-002', name: 'B', natural_language: '결제 완료',
+      given: ['결제'], when: ['완료'], then: ['저장'] },
+  ]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.overlap_distribution.count, 2);
+  assert.ok(r.overlap_distribution.mean >= 0);
+  assert.ok(r.overlap_distribution.mean <= 1);
+});
+
+test('Layer 1: deterministic_score 산정 (★ overall threshold 0.85)', () => {
+  // ★ 모든 BR 정상 → score = 1
+  const doc = { business_rules: [
+    { id: 'BR-A-X-001', name: 'A', natural_language: '깨끗한 BR' },
+  ]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.summary.deterministic_consistency_score, 1);
+  assert.equal(r.summary.gate_status, 'pass');
+  assert.equal(r.summary.overall_threshold, OVERALL_THRESHOLD);
+});
+
+test('Layer 1: critical finding → gate_status fail (★ deterministic 패널티)', () => {
+  const doc = { business_rules: [{ id: 'BR-X-Y-001', name: 'A' }]};  // ★ 두 표현 모두 부재 = critical
+  const r = validateRulesDoc(doc);
+  assert.equal(r.summary.gate_status, 'fail');
+});
+
+test('Layer 1: top-level "rules" (v1.x 호환 모드)', () => {
+  const doc = { rules: [{ id: 'BR-LEGACY-COMPAT-001', name: '레거시', natural_language: 'v1.x 호환' }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.total, 1);
+});
+
+test('Layer 2: strict 옵션 시 placeholder skipped', async () => {
+  const doc = { business_rules: [{ id: 'BR-X-Y-001', name: 'A', natural_language: '테스트' }]};
+  const r = await validateRulesDocStrict(doc);
+  assert.equal(r.summary.llm_status, 'placeholder');
+  assert.equal(r.summary.llm_consistency_score, null);
+});
+
+test('Layer 2: 비 strict 모드 → llm_score null 유지', () => {
+  const doc = { business_rules: [{ id: 'BR-X-Y-001', name: 'A', natural_language: '테스트' }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.summary.llm_consistency_score, null);
+});
+
+test('top-level 부재 (★ business_rules/rules 모두 없음) — total 0', () => {
+  const doc = { meta: { confidence: 0.5 } };
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.total, 0);
+});

@@ -1,0 +1,14 @@
+{
+  "name": "@ai-native-methodology/br-cross-consistency-validator",
+  "version": "0.1.0",
+  "description": "★ ★ ★ v2.4.0 MINOR sub-plan §1 — rules.json BR 안 두 표현 (natural_language + given/when/then) 의 의미적 정합 cross-validation 검증 도구. Layer 1 결정적 (100% 정확 / 두 표현 의무 + keyword overlap + structure + BR id 4토막) + Layer 2 LLM advisory (★ --strict 옵션 / 신뢰도 ≤ 0.85 / Static Tool 시뮬레이션 금지 정책 정합). ★ industry 공백 채우는 original 기여 (GitHub Spec Kit / AWS Q / DMN / Drools / Spectral 모두 cross-consistency rule 부재). ADR-CHAIN-011 정합.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "br-cross-consistency-validator": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/validator.test.js"
+  },
+  "license": "UNLICENSED"
+}
