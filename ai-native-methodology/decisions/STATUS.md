@@ -3,9 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **session 4차 — v2.3.5 PATCH release — PoC #11 chain 2 4 UC 종결** — 5 BHV + 12 AC + traceability partial + characterization mode + DEC-2026-05-13-poc-11-chain-2-종결-v2.3.5 신설 + chain harness validated v2.3.5 강화 / ★ ★ ★ chain 2 첫 realworld 사내 PoC 실증)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **session 5차 — chain-driver retroactive gate 정식 통과** — 사용자 질문 "chain1→2 검증 과정?" → ★ critical 발견 (chain-driver state.json 모든 PoC 부재) → ★ ★ PoC #11 chain-driver init + 2 next 실행 → ★ planning + spec stage complete + gate_decision="go" / chain harness validated v2.3.5 자격 정합 강화 / no release / state.json + intervention-log.jsonl = .gitignore 정합)
 
-**v2.3.5 PATCH release** (★ session 4차 / commit pending / git tag v2.3.5 pending)
+**v2.3.5 PATCH release 보존** (★ session 4차 / commit `bbe27ab` / git tag `v2.3.5` / origin push ✅)
 
 **v2.3.4 PATCH release 보존** (★ session 2차 / 2026-05-13 / commit `e298bb4` / git tag `v2.3.4` / origin push ✅ / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH)
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
@@ -70,6 +70,38 @@
 - ★ ★ chain 2 4 UC 모두 종결 → PATCH v2.3.5 release 결단 (★ Q1 정합)
 - ★ ★ ★ chain 3 + chain 4 진입 전 = ★ stack 결단 plan 신설 (C-stack-결단-chain-3-4-plan)
 - ★ ★ ★ chain 2~4 본격 종결 후 = ★ PoC #08 chain 2~4 후속 sprint (C-OSS-Modern-chain-2-4-PoC08) = ≥ 2 realworld PoC 자격 → v2.4.0 MINOR 자격 trigger
+
+---
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 5차 — chain-driver retroactive gate 정식 통과 (★ critical lesson "양심 의존 차단" 정합 강화)**:
+
+- ✅ **사용자 질문 "chain1→2 검증 과정?"** — ★ critical 발견 trigger
+- ✅ **솔직 보고** — chain-driver state.json 모든 PoC (PoC #11 + PoC #03~#10) ★ ★ ★ 부재 사실 / validator 사후 검증 ✅ / chain-driver state machine ❌ 양심 의존 패턴 가능성 보고
+- ✅ **사용자 결단** — "즉시 chain-driver init + gate retroactive 실행 (추천)"
+- ✅ **PoC #11 chain-driver init + 2 next 실행**: analysis → planning (go) + spec (go) gate 정식 통과 / state.json 작성 / planning + spec stage_progress="complete"
+- ✅ **.gitignore 정책 확인** — `examples/**/.aimd/state.json` + `intervention-log.jsonl` = ★ git ignored (★ "PoC 별 영속 / 사용자 local runtime artifact" 정합 / sub-plan-5+ 결단)
+- ✅ **★ ★ "양심 의존 차단" 정책 정정 자산화** — chain-driver tool 직접 실행 = ★ "양심 의존" 차단 / state.json git 공유 ❌ = local runtime / ★ session 5차 = ★ "양심 의존 → tool 정식 실행" 전환 ✅
+
+### ★ ★ critical lesson
+
+- ★ ★ chain-driver next = `--findings <path>` 옵션 ❌ = validator findings 자동 입력 ❌ → 암묵 0 findings 가정으로 pass (★ 양심 의존 잔존 패턴)
+- ★ 단 실 validator (chain-coverage + planning-extraction + schema + release-readiness §8.1 strict) 모두 ✅ = cross-link 자연 정합
+
+### 신규 carry (★ session 5차)
+
+- ★ ★ **C-chain-driver-findings-integration** (★ critical / chain-driver next --findings 옵션 정식 통합 / validator JSON 자동 변환 + 입력 의무)
+- ★ **C-chain-driver-state-retroactive-all-PoC** (★ 다른 PoC chain-driver retroactive 실행 의무)
+
+### Lessons Learned 신규 (★ session 5차)
+
+- ★ ★ ★ LL-i-14 (★ critical): "양심 의존 차단" 정책 = chain-driver tool 직접 실행 의무 / state.json git ignored = local runtime / validator 사후 + chain-driver retroactive 통과 = 양심 의존 → tool 정식 통과 전환 / --findings 옵션 통합 carry
+- ★ ★ ★ LL-i-15 (★ critical): 사용자 질문 = critical 발견 trigger / 정직 솔직 보고 의무
+
+### /doctor figma plugin warning (★ session 5차 추가)
+
+- informational warning / 작동 영향 ❌ / 사용자 결단 (a) 무시
 
 ---
 
