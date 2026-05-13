@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "generated_at": "2026-05-13T22:00:00Z",
+    "methodology_version": "v2.3.4",
+    "inputs_used": ["source_code", "domain_context_md", "design_specs"],
+    "confidence": 0.85,
+    "formula_version": "v1",
+    "confidence_breakdown": {
+      "behaviors_uc_mapping": { "confidence": 0.90, "note": "UC #1 1:1 BHV 매핑 / 자동 추출 정확 (planning-spec.json 4 UC 명확)" },
+      "br_alignment": { "confidence": 0.85, "note": "BR-BILLING-005 + BR-BILLING-006 description+invariants 매핑 / br_refs schema pattern 미정합 (rules.json 형식 vs schema 불일치 carry 신설)" },
+      "preconditions_postconditions": { "confidence": 0.85, "note": "source-grounded evidence (BillingController + JSP) 정확 / 결제 도메인 expert carry C-domain-PoC11-1+2 잔존" },
+      "invariants_characterization_mode": { "confidence": 0.80, "note": "★ ★ characterization mode 결단 (b) 정합 / Michael Feathers 2004 정합 / 단 TDD intent 위배 정합 명시" }
+    },
+    "$comment": "★ ★ PoC #11 chain 2 UC #1 한정 (UC-BILLING-001 / 데이터 확정처리 화면 진입). ★ ★ ★ characterization mode 명시 (사용자 결단 Q3 = (b) / 현 behavior 보존 / bug fix ❌). BR-BILLING-005 (시작년도 2015) + BR-BILLING-006 (★ ambiguous COM_NO==2) = ★ as-is 보존 invariants 명시. ★ Agent 3 Senior critique signal 3+4 흡수 / scope UC #1 만 / multi-day cap 의 1 session. vs PoC #11 chain 1 confidence 0.82 + behavior_uc_mapping 자동 ↑ (0.90)."
+  },
+  "derivation_source": {
+    "planning_spec_path": ".aimd/output/planning-spec.json",
+    "analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "sql-inventory/sql-inventory.json",
+      "characterization/snapshots/UC-BILLING-001-dataConfirm.json"
+    ]
+  },
+  "behaviors": [
+    {
+      "id": "BHV-BILLING-001",
+      "name": "데이터 확정처리 화면 진입 + year/법인 select 동작",
+      "description": "★ ★ ★ characterization mode (사용자 결단 Q3 = (b) / 현 behavior 보존 / bug fix ❌). 회계 운영자가 인증 + 권한 보유 상태에서 데이터 확정처리 화면에 진입 시, 시스템은 (1) 현재 연도 (currYear) 를 계산 + (2) currYear-2015+1 개의 연도 select 옵션 생성 + (3) ★ COM_NO==2 hardcoded filter 로 1개 법인 옵션 노출 + (4) JSP dataConfirm.jsp 렌더. ★ Better Gherkin 사상 정합 (Cucumber.io 공식) — Describe Behavior NOT Implementation.",
+      "use_case_refs": ["UC-BILLING-001"],
+      "br_refs": [],
+      "preconditions": [
+        "session 인증 완료 (★ ifrs_admin role)",
+        "authMap 권한 (★ 7 속성) 존재",
+        "currYear = system year accessor 정상 동작"
+      ],
+      "postconditions": [
+        "currYear 모델 attribute 전달 ('currYear' key)",
+        "companyList 모델 attribute 전달 ('companyList' key)",
+        "year select option count == (currYear - 2015) + 1 (★ BR-BILLING-005)",
+        "법인 select option count == 1 (★ COM_NO==2 hardcoded filter / BR-BILLING-006 ambiguous → characterization mode 보존)",
+        "JSP dataConfirm.jsp 렌더 (HTTP 200)"
+      ],
+      "invariants": [
+        "★ ★ characterization mode invariant — BR-BILLING-005 시작년도 2015 = ★ as-is 보존 (★ 사용자 결단 Q3 = (b) / 결제 도메인 expert 결단 carry C-domain-PoC11-2 = chain 4 GREEN test 시 bug 보존 의무)",
+        "★ ★ characterization mode invariant — BR-BILLING-006 COM_NO==2 hardcoded filter = ★ as-is 보존 (★ 사용자 결단 Q3 = (b) / 결제 도메인 expert 결단 carry C-domain-PoC11-1 = chain 4 GREEN test 시 bug 보존 의무 / TDD intent 정면 위배 정합)",
+        "year select option order = ASC (시간순)",
+        "★ ★ 새 시스템 마이그레이션 시 = ★ invariants 정정 의무 (★ chain 3+4 stack 결단 plan carry C-stack-결단-chain-3-4-plan)"
+      ],
+      "property_tests": [],
+      "acceptance_criteria_refs": [
+        "AC-BILLING-001",
+        "AC-BILLING-002",
+        "AC-BILLING-003"
+      ],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-001-dataConfirm.json",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/web/BillingController.java:48-62 (dataConfirm method)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/dataConfirm.jsp:159 (currYear-2015 / year select)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/dataConfirm.jsp:169 (COM_NO==2 hardcoded / 법인 select)"
+      ]
+    }
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/rules.json",
+      "input/domain.json",
+      "input/antipatterns.json",
+      "input/inventory.json",
+      "sql-inventory/sql-inventory.json"
+    ]
+  }
+}

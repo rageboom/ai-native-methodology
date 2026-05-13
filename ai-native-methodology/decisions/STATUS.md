@@ -3,11 +3,75 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **v2.3.4 PATCH release** — DEC-2026-05-13-not-all-code-인용-복원 / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH / git tag v2.3.4 expected / ★ session 2차)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **session 3차 — B sprint chain 2 UC #1 partial 자산화** — k-plan + 3 sub-agent research + chain 2 UC #1 1 BHV + 3 AC + characterization mode + ★ ★ Agent 3 STOP signal 2 + REVISE 5 흡수 / ★ ★ release ❌ / no version bump / chain 2 자산화 commit 만)
 
-**v2.3.3 PATCH release 보존** (★ ★ ★ ★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ 2026-05-13 / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
+**v2.3.4 PATCH release 보존** (★ session 2차 / 2026-05-13 / commit `e298bb4` / git tag `v2.3.4` / origin push ✅ / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH)
+**v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 3차 — B sprint chain 2 UC #1 partial 자산화 (★ ★ Agent 3 STOP 2 + REVISE 5 흡수)**:
+
+- ✅ **B 본격 진입** — 사용자 결단 "풀가동 해줘" → 4원칙 3원칙 4 question 결단 (Q1 PoC #11 사내 ROI / Q2 4 stage 풀가동 / Q3 3 sub-agent / Q4 chain 2 본 session)
+- ✅ **자산 전수 조사** — PoC #11 chain 1 planning-spec 보유 + PoC #05 sample chain 2 모범 예시 + chain 2 schema (behavior-spec + acceptance-criteria)
+- ✅ **3 sub-agent 병렬 research** — Agent 1 공식문서 (Gherkin/SBE/MoSCoW/Use Case 2.0 + ★ Spring 4.1+iBATIS 2+egov chain 2 OSS 사례 부재 = original empirical finding 자격) + Agent 2 Big-tech (★ GitHub Spec Kit 90K star = chain harness ★ 4단계 동형 / Amazon Q SWE-bench 66% R1' Modern 자릿수 정합 / TDAD arxiv 2603.17973 chain 3 RED→4 GREEN 권위) + Agent 3 Senior critique (★ ★ STOP 2 + REVISE 5)
+- ✅ **★ ★ Agent 3 Senior critique 흡수** — STOP signal 2 (cycle feasibility + v2.4.0 자격 부재) + REVISE 5 (PoC #08 carry + Legacy stack + expert 게이트 + scope UC #1 + 결단 burst) ★ 메인 cross-check 검증 (★ ADR-CHAIN-008 + PoC #05 = 4 file = sample ≠ realworld 정확)
+- ✅ **4 question 사용자 결단** — Q1 PATCH v2.3.5 (chain 2 종결 후) / Q2 UC #1 만 본 session / Q3 (b) characterization mode 현 behavior 보존 / Q4 carry 2건 신설 (C-stack-결단-chain-3-4-plan + C-OSS-Modern-chain-2-4-PoC08)
+- ✅ **k-plan 작성** — `~/.claude/plans/k-poc-11-chain-2-plan.md` (8절 / chain 2 UC #1 한정 / characterization mode 명시 / scope OUT 명확)
+- ✅ **★ ★ chain 2 UC #1 자산화 (4 file)** — `examples/poc-11-efiweb-billing-spring41/.aimd/output/`:
+  - `behavior-spec.json` (★ 1 BHV-BILLING-001 / UC #1 → BHV 1:1 / 3 AC forward / characterization mode invariants 명시 / schema strict ✅)
+  - `behavior-spec.md` (★ 사람 읽기 / 두 렌더링 / characterization mode 사상 + schema mismatch carry 명시)
+  - `acceptance-criteria.json` (★ 3 AC-BILLING-001/002/003 / Gherkin BDD / must×2 + should×1 / verifiable=true + test_case_refs TC-* placeholder / schema strict ✅)
+  - `acceptance-criteria.md` (★ Gherkin .feature 렌더 / Better Gherkin 사상 정합)
+- ✅ **chain-coverage-validator 검증** — ★ ★ 4 high findings expected (UC #2~#4 no BHV / coverage 0.25 < 0.85 threshold) — ★ ★ 본 session = UC #1 만 결단 정합 사실 (Agent 3 signal 4 정합)
+- ✅ **planning-extraction-validator 검증** — 0 findings + use_case coverage = 1 ✅
+- ✅ **schema-validator 검증** — behavior-spec ✅ + acceptance-criteria ✅ (★ schema strict pass)
+- ✅ **★ critical schema pattern mismatch 발견** — rules.json BR ID 형식 (`BR-BILLING-005` 3 segment) vs behavior-spec.schema.json `br_refs` pattern (`^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 4 segment) 불일치 → ★ ★ br_refs 빈 array + carry C-schema-br-pattern-fix 신설 / BR 매핑 fact = description + invariants + source_grounded_evidence 자연 보존
+
+### resolved by 본 session (★ session 3차)
+
+- C-r1-prime-자격-Modern-corroboration (★ session 1차 v2.3.3 / 보존)
+- C-not-all-code-검증 (★ session 2차 v2.3.4 / 보존)
+- C-poc-11-0-satd-해석-정정 (★ session 2차 / 보존)
+- C-poc-11-source-디렉토리-cleanup (★ session 2차 / 보존)
+
+### 신규 carry (★ ★ session 3차)
+
+- ★ ★ ★ **C-stack-결단-chain-3-4-plan** (★ critical / Agent 3 signal 5 STOP / chain 3+4 진입 전 4원칙 1원칙 재실행 의무 / option (i) Legacy / (ii) Modern 마이그레이션 / (iii) characterization 만 결단)
+- ★ ★ **C-OSS-Modern-chain-2-4-PoC08** (★ critical / Agent 3 signal 6 STOP / PoC #08 jpetstore-6 chain 2~4 후속 sprint = ≥ 2 realworld PoC corroboration 자격 trigger / v2.4.0 MINOR 자격 활성)
+- ★ **C-schema-br-pattern-fix** (★ chain 2 발견 / behavior-spec.json br_refs schema pattern vs rules.json 형식 불일치 / 본 PoC + PoC #06+#07 모두 정합 / 별도 sprint = schema 수정 또는 rules.json 형식 정합 결단)
+- ★ ★ **C-chain-2-UC-2-3-4-진입** (★ chain 2 다음 session / 본 session UC #1 만 / UC #2 + UC #3 (★ ★ critical BHV-BILLING-003) + UC #4 진입)
+- ★ **C-PoC-11-chain-2-PATCH-v2.3.5-trigger** (★ chain 2 4 UC 모두 종결 후 PATCH v2.3.5 release 결단 / 사용자 결단 Q1 정합)
+
+### 보존 carry (★ 본 작업 후)
+
+- ★ ★ C-모던-stack-사내-측정 (★ critical / Agent 3 REVISE #1 / 사내 Modern stack PoC)
+- ★ ★ C-사내-chain-2-4 (★ ★ resolved partial — 본 session = PoC #11 chain 2 UC #1 진입)
+- ★ ★ C-egovframework-chain-2-4 (★ ★ resolved partial — 본 session = PoC #11 chain 2 UC #1 진입)
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화)
+- C-domain-PoC11-1~3 (★ 결제 도메인 expert 위임)
+- C-PoC07-1~3 (★ chain 3 영역 retrofit / ★ B sprint 안 자연 흡수 후보)
+- C-v2.2.0-1 (★ NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level (별도 sprint)
+
+### ★ ★ 4원칙 Lessons Learned (본 session 3차 신규)
+
+- ★ LL-i-8 (★ ★ critical / Agent 3 Senior critique = STOP signal 2건 + REVISE 5건 = ★ ★ critical) — "풀가동" 사용자 결단 직후 Senior critique = STOP signal 발견 → ★ ★ 사용자 결단 ★ 100% Agent 3 권고 흡수 = 4원칙 §3 + Agent 3 정신 정합 (★ 사용자 명시 결단 + Senior critique 양쪽 모두 정합 가능)
+- ★ LL-i-9 (★ chain 2 schema mismatch 발견) — rules.json 형식 vs behavior-spec.schema.json br_refs pattern 불일치 = ★ ★ ★ PoC #11 chain 2 첫 적용 시 발견 / ★ ★ ★ 본 발견 자체 = PoC 가치 / chain 2 첫 적용 = ★ ★ ★ critical lesson = 본 방법론 schema fix 의무
+- ★ LL-i-10 (★ chain 2 = paradigm-agnostic 정합 사실 확인) — Legacy Spring 4.1 + iBATIS 2 + egov stack 안에서도 chain 2 (behavior + AC) 작성 자체는 ★ ★ feasible / paradigm-agnostic 정합 ✅ (★ chain 3+4 = stack 결단 의무 / chain 2 ❌)
+
+### ★ ★ ★ 다음 step
+
+- ★ ★ ★ chain 2 다음 session = UC #2 (조회 계열 / dataConfirmListAjax) + UC #3 (★ ★ ★ critical BHV-BILLING-003 atomicity / expert 게이트 의무) + UC #4 (Qlik View)
+- ★ ★ chain 2 4 UC 모두 종결 → PATCH v2.3.5 release 결단 (★ Q1 정합)
+- ★ ★ ★ chain 3 + chain 4 진입 전 = ★ stack 결단 plan 신설 (C-stack-결단-chain-3-4-plan)
+- ★ ★ ★ chain 2~4 본격 종결 후 = ★ PoC #08 chain 2~4 후속 sprint (C-OSS-Modern-chain-2-4-PoC08) = ≥ 2 realworld PoC 자격 → v2.4.0 MINOR 자격 trigger
+
+---
+
+★ ★ ★ ★ ★ ★ **이전 session 2026-05-13 session 2차 v2.3.4 PATCH release**:
 
 ---
 

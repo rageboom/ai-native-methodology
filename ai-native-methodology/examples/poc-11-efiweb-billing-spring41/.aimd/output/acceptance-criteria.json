@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "generated_at": "2026-05-13T22:15:00Z",
+    "methodology_version": "v2.3.4",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.85,
+    "formula_version": "v1",
+    "$comment": "★ ★ PoC #11 chain 2 UC #1 한정 acceptance-criteria (★ BHV-BILLING-001 / 3 AC / characterization mode). ★ schema severity enum = must/should/nice / verifiable=true ⇔ test_case_refs ≥ 1 + automated_runnable=true 강제. ★ ★ ★ Agent 1 Cucumber.io Better Gherkin 사상 정합 (Describe Behavior NOT Implementation / Declarative > Imperative / Then = observable output only). ★ ★ test_case_refs TC-* = chain 3 placeholder (★ chain 3 진입 시 실 test 코드 RED 작성)."
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "criteria": [
+    {
+      "id": "AC-BILLING-001",
+      "description": "★ 인증 + 권한 보유 회계 운영자가 데이터 확정처리 화면에 진입 시, 시스템은 currYear + companyList 모델을 전달 + HTTP 200 + JSP 렌더.",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          "★ 회계 운영자 (ifrs_admin) 가 인증 완료 + authMap 권한 7 속성 보유 상태이다",
+          "currYear = 시스템 현재 연도 accessor 정상 동작 상태이다"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          "currYear 모델 attribute 가 응답에 포함된다",
+          "companyList 모델 attribute 가 응답에 포함된다",
+          "HTTP 200 응답을 받는다",
+          "JSP dataConfirm 화면이 렌더링된다"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-001"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-002",
+      "description": "★ year select option count = (currYear - 2015) + 1 (★ BR-BILLING-005 / characterization mode 시작년도 2015 hardcoded as-is 보존).",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          "★ 회계 운영자가 인증 + 권한 보유 상태이다",
+          "★ 시스템 현재 연도 currYear = 2026 이다"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          "★ year select option count == 12 (= 2026 - 2015 + 1) 가 표시된다",
+          "year select option 의 첫 옵션 값 = 2015 이다",
+          "year select option 의 마지막 옵션 값 = 2026 이다",
+          "year select option 순서 = 시간순 (ASC) 이다"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-005"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-002"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-003",
+      "description": "★ ★ characterization mode — 법인 select option count = 1 (★ ★ COM_NO==2 hardcoded filter / BR-BILLING-006 ambiguous → as-is 보존 / ★ ★ ★ TDD intent 정면 위배 정합 / 결제 도메인 expert carry C-domain-PoC11-1).",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          "★ 회계 운영자가 인증 + 권한 보유 상태이다",
+          "★ ★ 시스템에 다수 법인 (COM_NO ∈ {1, 2, 3, ...}) 이 등록되어 있다 — 본 검증 시 ★ ★ characterization mode (현 behavior 보존)"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          "★ ★ 법인 select option count == 1 (★ COM_NO==2 hardcoded filter 보존)",
+          "★ 표시된 법인의 COM_NO == 2 이다",
+          "★ ★ 다른 COM_NO (COM_NO != 2) 의 법인은 노출되지 않는다"
+        ],
+        "tags": ["@should", "@chain2", "@characterization-mode", "@BR-BILLING-006-ambiguous", "@domain-expert-carry"]
+      },
+      "severity": "should",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-003"],
+      "gate_required": true
+    }
+  ]
+}
