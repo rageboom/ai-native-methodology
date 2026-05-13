@@ -150,6 +150,84 @@ test('★ chain — Ajv 8 if/then/else 지원 (acceptance-criteria verifiable=tr
   }
 });
 
+test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invalid)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      rules: [
+        {
+          id: 'BR-BILLING-005',
+          name: '청구 규칙',
+          given: ['청구 발생'],
+          when: ['고객 미납'],
+          then: ['연체 처리'],
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(result.valid, false, `3토막 BR-BILLING-005 should fail (v2.3.7 enforcement): ${JSON.stringify(result)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      rules: [
+        {
+          id: 'BR-USER-DATA-001',
+          name: '사용자 데이터 규칙',
+          given: ['신규 가입'],
+          when: ['이메일 중복'],
+          then: ['409 응답'],
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(result.valid, true, `4토막 BR-USER-DATA-001 should pass: ${JSON.stringify(result)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      rules: [
+        {
+          id: 'BR-ARTICLE-AUTHOR-EDIT-ONLY-001',
+          name: '작성자 수정 전용',
+          given: ['게시글 존재'],
+          when: ['타인이 수정 시도'],
+          then: ['403 응답'],
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(result.valid, true, `5토막 BR-ARTICLE-AUTHOR-EDIT-ONLY-001 should pass: ${JSON.stringify(result)}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('★ chain — schema-validator --json 출력 schema 매칭 정합 (6 chain artifact 자동 인식)', () => {
   const dir = tmp();
   try {

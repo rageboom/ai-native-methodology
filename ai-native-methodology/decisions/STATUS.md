@@ -3,9 +3,10 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **session 6차 — v2.3.6 PATCH release — tools/findings-aggregator 신설 + chain-driver next --findings 자동 입력 정식 통합 + "양심 의존 차단" 정책 완전 실현** — 24 unit test pass / PoC #11 spec stage 정식 실증 / chain harness 5 요소 변경 ❌ / DEC-2026-05-13-chain-driver-findings-integration-v2.3.6 신설)
+**기준일**: 2026-05-13 (★ ★ ★ **session 7차 — v2.3.7 PATCH release — rules.schema.json BR pattern 4토막 strict 정합 + id-conventions.md enforcement label 강화** — 8/8 schema-validator test pass / 6 PoC 일시 fail 허용 carry / chain harness 5 요소 변경 ❌ / DEC-2026-05-13-BR-id-4-segment-enforcement-v2.3.7 신설)
 
-**v2.3.6 PATCH release** (★ session 6차 / commit pending / git tag v2.3.6 pending)
+**v2.3.7 PATCH release** (★ session 7차 / commit pending / git tag v2.3.7 pending)
+**v2.3.6 PATCH release 보존** (★ session 6차 / commit pending / git tag v2.3.6 pending / findings-aggregator)
 **v2.3.5 PATCH release 보존** (★ session 4차 / commit `bbe27ab` / git tag `v2.3.5` / origin push ✅ / chain 2 4 UC 종결)
 **v2.3.4 PATCH release 보존** (★ session 2차 / commit `e298bb4` / git tag `v2.3.4` / F-015 finding 정정)
 
@@ -13,6 +14,43 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ **본 session 2026-05-13 session 7차 — v2.3.7 PATCH release — BR ID 4토막 schema enforcement**:
+
+- ✅ **사용자 점검 질의** "지금 우리 프로젝트 점검" → 프로젝트 현황 / 산출물 / 검증 절차 / 한계 carry 보고
+- ✅ **사용자 결단** "BR 표기법 도메인-카테고리-번호로 하자" → 4토막 정식 표준 채택
+- ✅ **영향 범위 조사** — id-conventions.md 가 이미 4토막 정식 표준 명시 사실 확보 (★ 표준 vs schema enforcement 분리 잔존 패턴 발견) / 11 PoC rules.json BR 형식 전수 조사 (정합 5 + 위반 6)
+- ✅ **사용자 결단 2 question** — Q1 (a) PoC #11 즉시 재라벨 + 5 PoC carry / Q2 (a) PoC #11 카테고리 = 도메인 전문가 위임
+- ✅ **4원칙 plan** `~/.claude/plans/l-br-id-4-segment-enforcement.md` (7절) + "Plan 원안 승인 + 즉시 착수" 결단
+- ✅ **schema enforcement 변경**:
+  - `rules.schema.json` BR pattern → `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` (4토막+ strict / 5토막+ 자연 허용)
+  - `domain.schema.json` + `state-map.schema.json` + `meta-confidence.schema.json` description 예시 4토막 정합
+  - `id-conventions.md` § 규칙 4 항목 ★ ★ v2.3.7 enforcement label + 신규 마이그레이션 carry 절 (영향 6 PoC 명시)
+- ✅ **schema-validator unit test 3 신규** — 3토막 fail / 4토막 pass / 5토막 pass / ★ **8/8 pass ✅**
+- ✅ **★ ★ 6 PoC 일시 fail 허용 carry 명시** — PoC #11 (BILLING) + PoC #06 (EXCHANGE) + PoC #07 (CAPITAL) + PoC #08 (PETSTORE) + PoC #09 (RW) + PoC #10 (RAE)
+
+### resolved by 본 session (★ session 7차)
+
+- ★ **C-schema-br-pattern-fix** (★ session 3차 발견 trigger)
+
+### 신규 carry (★ ★ session 7차)
+
+- ★ ★ **C-rules-BR-id-relabel-PoC-11** (★ critical / 도메인 전문가 위임 / chain 3+4 진입 전 결단 의무 후보)
+- ★ **C-rules-BR-id-relabel-5PoC** (★ PoC #06+#07+#08+#09+#10 일괄 재라벨 별도 sprint)
+
+### Lessons Learned 신규 (★ session 7차)
+
+- ★ **LL-i-19** (★ "id-conventions 표준 vs schema enforcement 3 layer 정합 의무"): 문서 명시 + schema 강제 + unit test 검증 = 3 layer 정합 의무 / 향후 동일 패턴 (UC/BHV/AC ID) 점검 의무
+- ★ ★ **LL-i-20** (★ "schema strict 화 → 기존 PoC fail = 표준 enforcement 자연 결과 / 도메인 전문가 위임 = F-015 한계 회피")
+- ★ **LL-i-21** (★ "scope 최소화 + 영향 정직 보고 정합" — plan 6 schema → 실제 1 strict + 3 description 정합 축소)
+
+### ★ ★ 다음 step
+
+- ★ ★ **C-rules-BR-id-relabel-PoC-11** = 도메인 전문가 결단 sprint (★ PoC #11 chain 3+4 진입 전 의무)
+- ★ **C-rules-BR-id-relabel-5PoC** = 별도 sprint (★ v2.4.0 MINOR 자격 잠재)
+- ★ §8.1 strict 검증 + build + git tag v2.3.7 (★ 본 session 마무리)
 
 ---
 

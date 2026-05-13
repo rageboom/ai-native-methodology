@@ -9,7 +9,109 @@
 
 ---
 
-## [v2.3.6] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 6차 — tools/findings-aggregator 신설 + chain-driver next --findings 자동 입력 정식 통합 + "양심 의존 차단" 정책 완전 실현 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+## [v2.3.7] — 2026-05-13 ⭐ 현재 (★ ★ ★ PATCH session 7차 — rules.schema.json BR pattern 4토막 strict 정합 + id-conventions.md enforcement label 강화 / chain harness 5 요소 변경 ❌ / no new ADR)
+
+> **★ ★ ★ PATCH session 7차** — v2.3.6 PATCH (session 6차 / findings-aggregator) 직후 session 4차 발견 critical schema mismatch **C-schema-br-pattern-fix** 즉시 진입. v2.3.x patch level (★ schema enforcement 1줄 + description 정합 3건 / chain harness 5 요소 변경 ❌ / no new ADR).
+
+### 변경 사항 (v2.3.6 → v2.3.7)
+
+#### ★ ★ DEC-2026-05-13-BR-id-4-segment-enforcement-v2.3.7 (★ id-conventions 표준 정합)
+
+- **trigger**: session 4차 (PoC #11 chain 2 4 UC 종결) 발견 schema mismatch — rules.schema (3토막+ 자유) vs behavior-spec br_refs (4토막+ strict) 불일치 + id-conventions.md § 규칙 4 항목 = ★ 이미 4토막 (`BR-{도메인}-{이름}-{번호}`) 정식 표준 명시 사실 (★ 표준 vs schema enforcement 분리 잔존 패턴 발견)
+- **사용자 결단**: "BR 표기법 도메인-카테고리-번호로 하자" + 2 question 결단 (Q1 (a) PoC #11 즉시 재라벨 + 5 PoC carry / Q2 (a) 도메인 전문가 위임)
+
+#### ★ schemas/rules.schema.json BR pattern 4토막+ strict
+
+```diff
+- "pattern": "^BR-[A-Z0-9_-]+-\\d+$",
+- "description": "규칙 ID (예: BR-ORDER-007)"
++ "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$",
++ "description": "규칙 ID (★ 4토막 strict: BR-{도메인}-{이름}-{번호} / 예: BR-ORDER-CANCEL-001 / v2.3.7 enforcement)"
+```
+
+★ 5토막+ 자연 허용 (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001` ✅ / `[A-Z0-9_-]+` hyphen 매칭 정합).
+
+#### ★ 3 schema description 예시 정합
+
+| schema | 변경 |
+|---|---|
+| `domain.schema.json:181` | `BR-ORDER-007` → `BR-ORDER-CANCEL-001` |
+| `state-map.schema.json:269` | `BR-AUTH-001` → `BR-AUTH-JWT-001` |
+| `meta-confidence.schema.json:159` | `BR-ORDER-007` → `BR-ORDER-CANCEL-001` |
+
+#### ★ ★ methodology-spec/id-conventions.md enforcement 강화
+
+- § 규칙 4 항목 → ★ ★ **"v2.3.7 enforcement" label 명문화** (schema-level strict pattern 명시 / 3토막 ❌ + 5토막+ ✅)
+- § "★ ★ v2.3.7 BR 4토막 enforcement 마이그레이션 carry" 신규 절 (영향 6 PoC 명시 + 재라벨 규칙 + 일시 허용 carry)
+
+#### ★ schema-validator unit test 3 신규
+
+`tools/schema-validator/test/chain-schemas.test.js`:
+
+- `★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invalid)` ✅
+- `★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)` ✅
+- `★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용` ✅
+
+★ **8/8 pass ✅** (전 8 test pass / 5 existing + 3 신규).
+
+#### ★ ★ 6 PoC schema-validator 일시 fail 허용 carry
+
+| PoC | 현재 ID 형식 | carry |
+|---|---|---|
+| **#11 (사내 EFI-WEB Billing)** | `BR-BILLING-005` | **C-rules-BR-id-relabel-PoC-11** (★ critical / 도메인 전문가 위임) |
+| #06 (사내 EFI-WEB Exchange) | `BR-EXCHANGE-001` | C-rules-BR-id-relabel-5PoC |
+| #07 (사내 EFI-WEB Capital) | `BR-CAPITAL-001` | C-rules-BR-id-relabel-5PoC |
+| #08 (OSS jpetstore) | `BR-PETSTORE-001` | C-rules-BR-id-relabel-5PoC |
+| #09 (OSS TypeORM raw SQL) | `BR-RW-001` | C-rules-BR-id-relabel-5PoC |
+| #10 (OSS JPA + QueryDSL) | `BR-RAE-001` | C-rules-BR-id-relabel-5PoC |
+
+★ 재라벨 sprint 종결 후 → fail → pass 전환 의무.
+
+#### ★ chain harness 5 요소 변경 ❌
+
+- chain-driver 자체 코드 수정 ❌
+- 5 요소 (state.blocked + cli exit 2 + PreToolUse deny + suppressOutput + content-aware) 모두 보존
+- ★ 본 변경 = analysis stage 산출물 schema 영역 / chain harness scope 외부
+
+#### resolved carry 1
+
+- ★ **C-schema-br-pattern-fix** (★ session 3차 발견 trigger)
+
+#### 신규 carry 2
+
+- ★ ★ **C-rules-BR-id-relabel-PoC-11** (★ critical / 도메인 전문가 위임)
+- ★ **C-rules-BR-id-relabel-5PoC** (★ PoC #06+#07+#08+#09+#10 별도 sprint)
+
+#### 보존 carry (★ 본 작업 후)
+
+- ★ ★ ★ C-stack-결단-chain-3-4-plan (critical)
+- ★ ★ C-OSS-Modern-chain-2-4-PoC08 (critical / ≥ 2 realworld trigger)
+- ★ ★ C-모던-stack-사내-측정 (critical)
+- ★ C-chain-driver-state-retroactive-all-PoC
+- ★ C-adoption-findings-aggregator-workflow
+- 그 외 (C-egovframework-sub-rule + C-domain-PoC11-1~3 + C-PoC07-1~3 + C-v2.2.0-1 + C-v2.3.0-gartner)
+
+#### Lessons Learned 3건 신규
+
+- ★ **LL-i-19** (★ "id-conventions 표준 vs schema enforcement 3 layer 정합 의무": 문서 명시 + schema 강제 + unit test 검증 = 3 layer / 향후 동일 패턴 점검 의무)
+- ★ ★ **LL-i-20** (★ "schema strict 화 → 기존 PoC fail = 표준 enforcement 자연 결과" / 도메인 전문가 위임 = F-015 한계 회피 정합)
+- ★ **LL-i-21** (★ "scope 최소화 + 영향 정직 보고 정합" — plan 6 schema → 실제 1 strict + 3 description 정합 축소)
+
+#### PATCH v2.3.7 자격 7/7
+
+- chain harness 5 요소 변경 ❌ + schema PATCH 자격 + no new ADR + workspace test 보존 + 3 신규 test + §8.1 strict 검증 예정 + ≥ 6 PoC 보존 + build 검증 예정
+
+#### Version Bump (3 source sync)
+
+| source | v2.3.6 | v2.3.7 |
+|---|---|---|
+| `.claude-plugin/plugin.json` | `2.3.6` | `2.3.7` |
+| CHANGELOG.md 첫 `## [vX.Y.Z]` | `[v2.3.6]` | `[v2.3.7]` |
+| `package.json` | `2.3.6` | `2.3.7` |
+
+---
+
+## [v2.3.6] — 2026-05-13 (★ ★ ★ ★ PATCH session 6차 — tools/findings-aggregator 신설 + chain-driver next --findings 자동 입력 정식 통합 + "양심 의존 차단" 정책 완전 실현 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ PATCH session 6차** — v2.3.5 PATCH (commit `bbe27ab` / chain 2 4 UC 종결) + session 5차 (commit `852e7f7` / chain-driver retroactive gate) 후 ★ ★ critical carry **C-chain-driver-findings-integration** 즉시 진입. v2.3.x patch level (★ chain-driver 외부 자산 신설만 / chain harness 5 요소 변경 ❌ / schema ❌ / no new ADR).
 

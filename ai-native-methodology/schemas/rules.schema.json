@@ -17,8 +17,8 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^BR-[A-Z0-9_-]+-\\d+$",
-            "description": "규칙 ID (예: BR-ORDER-007)"
+            "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$",
+            "description": "규칙 ID (★ 4토막 strict: BR-{도메인}-{이름}-{번호} / 예: BR-ORDER-CANCEL-001 / v2.3.7 enforcement)"
           },
           "name": {
             "type": "string",

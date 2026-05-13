@@ -65,7 +65,7 @@ flowchart LR
 1. **도메인**: 대문자 (ORDER, USER, PRODUCT 등). domain.json `aggregates[].name` 정합.
 2. **번호**: 3자리 (001, 002, ...) — ★ ★ ★ v2.0 통일 / 이름 형식 (CANCEL, CREATE 등) 폐기.
 3. **카테고리** (안티패턴): DB, ARCH, DOMAIN, API, FE, VALIDATION, CONFIG, SECURITY, PERFORMANCE
-4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합).
+4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합). **★ ★ v2.3.7 enforcement** — schema-level strict pattern `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 도입 / `rules.schema.json` + `planning-spec.schema.json` + `behavior-spec.schema.json` 모두 4토막+ 강제 / 3토막 (`BR-DOMAIN-001`) ❌ schema-validator fail. 5토막+ (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001`) ✅ 자연 허용.
 5. **고유성**: 같은 유형 내에서 ID 중복 금지.
 6. **★ v2.0 chain link 의무**: BHV-* 가 ≥ 1 UC-* backward / AC-* 가 ≥ 1 BHV-* backward / TC-* 가 ≥ 1 AC-* backward / IMPL-* 가 ≥ 1 TC-* backward (chain-coverage-validator 강제 / sub-plan-3 신설).
 
@@ -77,6 +77,31 @@ flowchart LR
 - 변환 규칙: `UC-{도메인}-{이름}` → `UC-{도메인}-{순차 번호}` + `name: "{이름}"` 필드 보존
 - finding 시스템에 migration log 등재 (`F-MIG-UC-001` 등)
 - analysis stage 산출물 4 PoC 모두 일괄 변환 (PoC #01 / #02 / #03 / #04)
+
+## ★ ★ v2.3.7 BR 4토막 enforcement 마이그레이션 carry (★ 신규)
+
+★ v2.3.7 (2026-05-13 / DEC-2026-05-13-BR-id-4-segment-enforcement) — `rules.schema.json` BR pattern 3토막 → 4토막+ strict 정합.
+
+**영향 6 PoC** (★ 모두 3토막 표기 / schema-validator fail expected):
+
+| PoC | 현재 ID 형식 | 재라벨 carry |
+|---|---|---|
+| **#11 (사내 EFI-WEB Billing)** | `BR-BILLING-005` | **C-rules-BR-id-relabel-PoC-11** (★ critical / 도메인 전문가 위임) |
+| #06 (사내 EFI-WEB Exchange) | `BR-EXCHANGE-001` | C-rules-BR-id-relabel-5PoC |
+| #07 (사내 EFI-WEB Capital) | `BR-CAPITAL-001` | C-rules-BR-id-relabel-5PoC |
+| #08 (OSS jpetstore) | `BR-PETSTORE-001` | C-rules-BR-id-relabel-5PoC |
+| #09 (OSS TypeORM raw SQL) | `BR-RW-001` | C-rules-BR-id-relabel-5PoC |
+| #10 (OSS JPA + QueryDSL) | `BR-RAE-001` | C-rules-BR-id-relabel-5PoC |
+
+**재라벨 규칙** (★ 사용자 결단 위임):
+- 도메인 전문가가 description + source 분석 후 카테고리 결정
+- 예: `BR-BILLING-005` → `BR-BILLING-{CHARGE|REFUND|...}-005` (★ 카테고리는 사내 결제 도메인 의미 정합)
+- 메인 sub-agent 자동 추정 ❌ (★ F-015 한계 회피 의무)
+
+**일시적 허용**:
+- v2.3.7 release 시점 ~ 재라벨 sprint 완결 시점까지 6 PoC schema-validator fail 허용
+- §8.1 strict 검증대 영향 검증 의무 (★ 신규 carry 항목에 명시)
+- 재라벨 sprint 종결 후 → fail → pass 전환 확인 + carry resolved
 
 ---
 
