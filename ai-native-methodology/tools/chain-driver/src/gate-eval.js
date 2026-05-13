@@ -11,11 +11,14 @@
 // }
 
 const REQUIRED_VALIDATORS_PER_STAGE = {
-  planning:  ['planning-extraction-validator', 'schema-validator'],
+  planning:  ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator'],
   spec:      ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator'],
   test:      ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator'],
   implement: ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder'],
 };
+// ★ ★ ★ v2.4.0 — planning stage 안 br-cross-consistency-validator 추가 (ADR-CHAIN-011 §5.6 정합).
+//   BR dual representation paradigm — natural_language + given/when/then 정합 cross-validation.
+//   threshold ≥ 0.85 = empirical hypothesis (★ ★ 11 PoC spike 결과 자료 부재 / sub-plan §2 후 재spike 의무).
 
 const TEST_STAGE_EXPECTED = 'all_fail';   // RED 의무
 const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무

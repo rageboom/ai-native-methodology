@@ -3,10 +3,11 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ ★ **session 8차 추가 — v2.4.0 MINOR sub-plan §1 종결 — ADR-CHAIN-011 굳힘 + validator workspace 16번째 신설 + threshold spike critical 발견** — 4원칙 2원칙 3 sub-agent 토론 + Senior critique 흡수 (STOP signal 1 + REVISE 5) / 시행 순서 통합안 (c→d→a부분) 채택 / ADR-CHAIN-011 BR dual representation paradigm 본격 작성 / br-cross-consistency-validator workspace 16번째 신설 (22/22 test pass) / ★ ★ ★ ★ ★ threshold spike critical 발견 (11 PoC × 107 BR 안 두 표현 동시 보유 = 0 건 / overlap 분포 측정 자체 불가능) / no release / 다음 session sub-plan §2 schema 재설계 + 11 PoC pilot 마이그레이션)
+**기준일**: 2026-05-13 (★ ★ ★ ★ ★ ★ ★ **session 8차 v2.4.0 MINOR FINAL release 자격** — sub-plan §1 + §2 + §3 통합 완료 — ADR-CHAIN-011 + validator workspace 16번째 + schema top-level 재설계 + chain 1 gate 통합 + release-readiness 8/8 격상 / ★ ★ ★ ★ ★ ★ 8/8 release-ready ✅ / 324/324 test pass / version bump 2.3.7 → 2.4.0 / git tag v2.4.0 pending / push 보류 commit 누적 6건 통합 push)
 
-**v2.4.0-rc1 자격 보존** (★ session 7차 / commit `a24a892` / dual representation 사상 신설 / push 보류)
-**v2.3.7 PATCH release** (★ session 7차 / commit `75ee21d` + `963dfa0` / git tag v2.3.7 pending / push 보류)
+**v2.4.0 MINOR FINAL release** (★ session 8차 / 2026-05-13 / 본 release commit pending / git tag v2.4.0 pending / push 보류)
+**v2.4.0-rc1 자격 흡수** (★ session 7차 / commit `a24a892` / dual representation 사상 신설 / 본 release 안 통합)
+**v2.3.7 PATCH release** (★ session 7차 / commit `75ee21d` + `963dfa0` / 본 release 안 통합 push)
 **v2.3.6 PATCH release 보존** (★ session 6차 / commit pending / git tag v2.3.6 pending / findings-aggregator)
 **v2.3.5 PATCH release 보존** (★ session 4차 / commit `bbe27ab` / git tag `v2.3.5` / origin push ✅ / chain 2 4 UC 종결)
 **v2.3.4 PATCH release 보존** (★ session 2차 / commit `e298bb4` / git tag `v2.3.4` / F-015 finding 정정)

@@ -228,6 +228,158 @@ test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
   }
 });
 
+test('★ ★ ★ v2.4.0 — rules.schema.json business_rules array (신표준) + natural_language only 정합', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      project_id: 'test-project',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-USER-EMAIL-001',
+          title: '이메일 유일성',
+          natural_language: '사용자 등록 시 이메일은 시스템 내 유일해야 함',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `business_rules + natural_language + title should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json business_rules + GWT only 정합 (anyOf dual representation)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-ORDER-CANCEL-001',
+          name: '주문 취소',
+          given: ['주문 상태가 결제완료'],
+          when: ['사용자가 취소 요청'],
+          then: ['환불 처리됨'],
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `business_rules + GWT should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json 두 표현 모두 부재 → invalid (anyOf 강제)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      business_rules: [
+        { id: 'BR-EMPTY-FAIL-001', name: '빈 BR' },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, false, `두 표현 모두 부재 should fail: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json v1.x rules array backward-compat (alias)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      rules: [
+        {
+          id: 'BR-LEGACY-COMPAT-001',
+          name: 'v1.x backward-compat',
+          given: ['전제'],
+          when: ['발동'],
+          then: ['결과'],
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `v1.x rules array alias should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json paradigm: FE + rules_manual_authored alias (PoC #04 호환)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      paradigm: 'FE',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      rules_manual_authored: [
+        {
+          id: 'BR-FE-VALIDATION-001',
+          title: '이메일 형식 검증',
+          natural_language: 'FE 안 zod schema 로 이메일 형식 강제',
+          category: 'fe_validation',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `paradigm: FE + rules_manual_authored should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json description alias (★ deprecated / PoC #01/#05/#06 호환)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-DESC-COMPAT-001',
+          title: 'description alias',
+          description: '★ deprecated alias — natural_language 로 마이그레이션 권장',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `description alias should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v2.4.0 — rules.schema.json trigger/condition/action 변형 (PoC #03 호환)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-TRIGGER-VARIANT-001',
+          title: 'trigger 변형',
+          trigger: '사용자 가입',
+          condition: '이메일 중복',
+          action: '409 응답',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(result.valid, true, `trigger/condition/action should pass: ${JSON.stringify(result)}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
 test('★ chain — schema-validator --json 출력 schema 매칭 정합 (6 chain artifact 자동 인식)', () => {
   const dir = tmp();
   try {

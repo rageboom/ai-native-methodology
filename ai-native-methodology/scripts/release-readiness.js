@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 7/7 자동 검사 (sub-plan-6).
+// release-readiness — ★ ★ ★ §8.1 strict 8/8 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.0.0 [--json]
 //
-// 7 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 8 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -11,8 +11,13 @@
 //   5. ADR registry — content-aware 검사 (status: 승인 / decision-cluster 매칭)
 //   6. traceability-matrix 100% green (PoC #05 / matrix.json forward = 1.0)
 //   7. e2e 1 cycle pass (PoC #05 chain 4 GREEN / impl-spec.test_pass_evidence.fail_count == 0)
+//   8. ★ ★ ★ v2.4.0 신설 — analysis validator violation 0 (★ schema-validator + br-cross-consistency-validator / 11 PoC rules.json
+//      critical/high finding 0 / ADR-CHAIN-011 §5.7 정합 / LL-i-23 release-readiness 사각지대 회복)
 //
-// exit 0 = 7/7 ready / 1 = 1+ regress.
+// exit 0 = 8/8 ready / 1 = 1+ regress.
+//
+// ★ ★ ★ ★ ★ MINOR bump 부적격 가능성 (Senior STOP signal 정합 / ADR-CHAIN-011 §5.7):
+//   본 격상 자체 = chain harness paradigm 재정의 (release-readiness 검사 영역 확장) = MINOR bump 부적격 가능 / v2.5.0 분리 검토 의무.
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -223,6 +228,54 @@ function check7_e2eCyclePass() {
   };
 }
 
+// ★ ★ ★ v2.4.0 sub-plan §3 — analysis validator violation 0 (ADR-CHAIN-011 §5.7 / LL-i-23 정합)
+// PoC #05 (현재 VALID 보유) + PoC #01 (본 session 마이그레이션 후 VALID) 기준 검증.
+// 11 PoC 전수 검사 = sub-plan §2 마이그레이션 후 별도 sprint (★ C-rules-BR-id-relabel-* + C-poc-02-03-schema-mapping carry 정합).
+function check8_analysisValidatorViolation() {
+  // ★ schema-validator 안 PoC #01 + #05 = VALID 확인 (본 session 자격)
+  const pocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/input/rules.json'];
+  const failedPocs = [];
+  for (const rel of pocs) {
+    const target = join(ROOT, 'examples', rel);
+    if (!existsSync(target)) {
+      failedPocs.push(`${rel}: missing`);
+      continue;
+    }
+    const r = spawnSync('node', ['tools/schema-validator/src/cli.js', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
+    try {
+      const out = JSON.parse(r.stdout || '{}');
+      const result = out.results?.[0];
+      if (!result?.valid) failedPocs.push(`${rel}: schema invalid (${result?.errors?.length ?? '?'} errors)`);
+    } catch {
+      failedPocs.push(`${rel}: schema-validator JSON parse fail`);
+    }
+  }
+  // ★ br-cross-consistency-validator 안 PoC #05 = pass / PoC #01 = pass 확인
+  const bcvPocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/input/rules.json'];
+  const bcvFailed = [];
+  for (const rel of bcvPocs) {
+    const target = join(ROOT, 'examples', rel);
+    if (!existsSync(target)) continue;
+    const r = spawnSync('node', ['tools/br-cross-consistency-validator/src/cli.js', '--target', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
+    try {
+      const out = JSON.parse(r.stdout || '{}');
+      const critical = (out.findings || []).filter((f) => f.severity === 'critical' || f.severity === 'high').length;
+      if (critical > 0) bcvFailed.push(`${rel}: ${critical} critical/high findings`);
+    } catch {
+      bcvFailed.push(`${rel}: br-cross-consistency-validator JSON parse fail`);
+    }
+  }
+  const allFailed = [...failedPocs, ...bcvFailed];
+  return {
+    id: 'analysis_validator_violation',
+    pass: allFailed.length === 0,
+    detail: allFailed.length === 0
+      ? `analysis validator (schema + br-cross-consistency) violations 0 (PoC #01 + #05 검증 기준 / v2.4.0)`
+      : `violations: ${allFailed.join(' | ')}`,
+    delegated_to: 'tools/schema-validator + tools/br-cross-consistency-validator (★ 11 PoC 전수 = sub-plan §2 후 carry)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -235,15 +288,17 @@ function main() {
     check5_adrRegistry(),
     check6_matrixGreenness(),
     check7_e2eCyclePass(),
+    check8_analysisValidatorViolation(),
   ];
   const passCount = results.filter((r) => r.pass).length;
+  const total = results.length;
 
   if (args.json) {
     process.stdout.write(JSON.stringify({
       target: args.target,
       criteria_passed: passCount,
-      criteria_total: 7,
-      ready: passCount === 7,
+      criteria_total: total,
+      ready: passCount === total,
       results,
     }, null, 2) + '\n');
   } else {
@@ -252,11 +307,11 @@ function main() {
       const mark = r.pass ? '✅' : '❌';
       process.stdout.write(`  ${mark}  ${r.id} — ${r.detail}\n`);
     }
-    process.stdout.write(`\n${passCount}/7 criteria passed.\n`);
-    if (passCount === 7) process.stdout.write(`\n★ ★ ★ ${args.target} = release-ready.\n`);
-    else process.stdout.write(`\n❌ ${args.target} = NOT release-ready (${7 - passCount} criteria regress).\n`);
+    process.stdout.write(`\n${passCount}/${total} criteria passed.\n`);
+    if (passCount === total) process.stdout.write(`\n★ ★ ★ ${args.target} = release-ready.\n`);
+    else process.stdout.write(`\n❌ ${args.target} = NOT release-ready (${total - passCount} criteria regress).\n`);
   }
-  process.exit(passCount === 7 ? 0 : 1);
+  process.exit(passCount === total ? 0 : 1);
 }
 
 main();

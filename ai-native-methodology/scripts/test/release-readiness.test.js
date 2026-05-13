@@ -25,21 +25,22 @@ function runScript(args, env = {}) {
 }
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌)', () => {
-  it('happy path — 7/7 pass for v2.0.0-rc1 (current workspace)', () => {
+  it('happy path — 8/8 pass for v2.4.0 (current workspace)', () => {
     const r = runScript(['--target', 'v2.0.0-rc1', '--json']);
     assert.equal(r.status, 0, r.stderr);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 7);
-    assert.equal(out.criteria_passed, 7);
+    assert.equal(out.criteria_total, 8);
+    assert.equal(out.criteria_passed, 8);
     assert.equal(out.ready, true);
   });
 
-  it('all 7 criterion ids are present in output (no skipped)', () => {
-    const r = runScript(['--target', 'v2.0.0-rc1', '--json']);
+  it('all 8 criterion ids are present in output (no skipped)', () => {
+    const r = runScript(['--target', 'v2.4.0', '--json']);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
     assert.deepEqual(ids, [
       'adr_registry',
+      'analysis_validator_violation',
       'chain_coverage',
       'e2e_cycle_pass',
       'matrix_greenness',
@@ -98,11 +99,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 7 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 8 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json']);
-    // even with bogus target, should still evaluate 7 checks against current artifacts.
+    // even with bogus target, should still evaluate 8 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 7);
+    assert.equal(out.criteria_total, 8);
   });
 
   it('missing --target → exit 2 (usage error)', () => {

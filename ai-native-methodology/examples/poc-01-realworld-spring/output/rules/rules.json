@@ -2,6 +2,7 @@
   "$schema_ref": "../../../../../schemas/rules.schema.json",
   "meta": {
     "generated_at": "2026-04-28T00:00:00Z",
+    "confidence": 0.78,
     "source_commit_sha": "56be3ced4f3134424ead5fcaf387b3aa640b9532",
     "source_branch": "master",
     "extraction_env": "git_clone",

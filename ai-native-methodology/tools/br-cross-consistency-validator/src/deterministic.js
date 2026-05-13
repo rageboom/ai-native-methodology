@@ -71,9 +71,11 @@ export function keywordOverlap(setA, setB) {
 
 function joinGWT(gwt) {
   const parts = [];
-  if (Array.isArray(gwt.given)) parts.push(...gwt.given);
-  if (Array.isArray(gwt.when)) parts.push(...gwt.when);
-  if (Array.isArray(gwt.then)) parts.push(...gwt.then);
+  for (const key of ['given', 'when', 'then']) {
+    const v = gwt[key];
+    if (Array.isArray(v)) parts.push(...v);
+    else if (typeof v === 'string') parts.push(v);
+  }
   return parts.join(' ');
 }
 
@@ -87,20 +89,33 @@ export function validateBR(br, options = {}) {
   const path = options.path || '/business_rules/?';
   const keywordThreshold = options.keywordThreshold ?? 0.5;
 
-  const hasNL = typeof br.natural_language === 'string' && br.natural_language.trim().length > 0;
-  const hasGWT = Array.isArray(br.given) && br.given.length > 0
+  // ★ ★ v2.4.0 sub-plan §3 — description = natural_language alias 정합 (★ schema rules.schema.json anyOf 정합)
+  const nlText = (typeof br.natural_language === 'string' && br.natural_language.trim().length > 0)
+    ? br.natural_language
+    : (typeof br.description === 'string' && br.description.trim().length > 0 ? br.description : null);
+  const hasNL = nlText !== null;
+  // ★ ★ GWT — array 의무 (★ schema 안 array required) / 단 string 도 호환 인정 (★ PoC #02 사실 정합)
+  const hasGWTArray = Array.isArray(br.given) && br.given.length > 0
     && Array.isArray(br.when) && br.when.length > 0
     && Array.isArray(br.then) && br.then.length > 0;
+  const hasGWTString = typeof br.given === 'string' && br.given.length > 0
+    && typeof br.when === 'string' && br.when.length > 0
+    && typeof br.then === 'string' && br.then.length > 0;
+  const hasGWT = hasGWTArray || hasGWTString;
+  // ★ ★ trigger/condition/action alias (PoC #03 사실 정합)
+  const hasTCA = (typeof br.trigger === 'string' || Array.isArray(br.trigger))
+    && (typeof br.condition === 'string' || Array.isArray(br.condition))
+    && (typeof br.action === 'string' || Array.isArray(br.action));
 
-  // ★ 4-1. 두 표현 ≥ 1 의무
-  if (!hasNL && !hasGWT) {
+  // ★ 4-1. 두 표현 ≥ 1 의무 (★ description alias + trigger/condition/action 변형 인정)
+  if (!hasNL && !hasGWT && !hasTCA) {
     findings.push({
       id: nextFindingId('REPR'),
       severity: 'critical',
       path,
       br_id: br.id || '<unknown>',
       rule: 'representation_missing',
-      message: 'natural_language 또는 given/when/then 중 ≥ 1 표현 의무 (★ schema anyOf 보강)',
+      message: 'natural_language / given-when-then / description / trigger-condition-action 중 ≥ 1 표현 의무 (★ schema anyOf 보강)',
       suggestion: '두 표현 중 ≥ 1 작성 의무',
     });
   }
@@ -121,7 +136,7 @@ export function validateBR(br, options = {}) {
   // ★ 4-2 + 4-3. 두 표현 동시 보유 시 cross-validation
   let overlapScore = null;
   if (hasNL && hasGWT) {
-    const nlKw = extractKeywords(br.natural_language);
+    const nlKw = extractKeywords(nlText);
     const gwtText = joinGWT(br);
     const gwtKw = extractKeywords(gwtText);
     const { common, score } = keywordOverlap(nlKw, gwtKw);

@@ -11,6 +11,7 @@ import {
   transformSchemaValidator,
   transformTestImplPass,
   transformGeneric,
+  transformBrCrossConsistency,
   dispatchValidator,
   aggregateForStage,
   REQUIRED_VALIDATORS_PER_STAGE,
@@ -31,7 +32,7 @@ describe('emptyFindings', () => {
 
 describe('REQUIRED_VALIDATORS_PER_STAGE', () => {
   it('★ chain-driver gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 정합 (4 stage)', () => {
-    assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.planning, ['planning-extraction-validator', 'schema-validator']);
+    assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.planning, ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.spec, ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.test, ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.implement, ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder']);
@@ -146,6 +147,34 @@ describe('mergeFindings', () => {
   });
 });
 
+describe('transformBrCrossConsistency (★ v2.4.0)', () => {
+  it('★ findings severity 합산 + br_overall_score', () => {
+    const json = {
+      stats: { total: 3, with_natural_language: 2, with_gwt: 1, with_both: 0, with_finding: 2 },
+      findings: [
+        { id: 'F-1', severity: 'critical', rule: 'representation_missing' },
+        { id: 'F-2', severity: 'medium', rule: 'keyword_mismatch' },
+      ],
+      summary: { deterministic_consistency_score: 0.5, overall_score: 0.5, overall_threshold: 0.85, gate_status: 'fail' },
+    };
+    const f = transformBrCrossConsistency(json);
+    assert.equal(f.critical, 1);
+    assert.equal(f.medium, 1);
+    assert.equal(f.br_overall_score, 0.5);
+    assert.equal(f.br_gate_status, 'fail');
+  });
+  it('★ 0 findings = pass', () => {
+    const json = {
+      stats: { total: 1, with_natural_language: 1, with_gwt: 0, with_both: 0, with_finding: 0 },
+      findings: [],
+      summary: { deterministic_consistency_score: 1, overall_score: 1, overall_threshold: 0.85, gate_status: 'pass' },
+    };
+    const f = transformBrCrossConsistency(json);
+    assert.equal(f.critical, 0);
+    assert.equal(f.br_gate_status, 'pass');
+  });
+});
+
 describe('dispatchValidator', () => {
   it('★ planning-extraction-validator → JSON parse + transform', () => {
     const output = JSON.stringify({ summary: { critical: 0, high: 1 } });
@@ -183,14 +212,22 @@ describe('aggregateForStage', () => {
       if (name === 'schema-validator') {
         return '  valid: 4  invalid: 0  skipped: 0';
       }
+      if (name === 'br-cross-consistency-validator') {
+        return JSON.stringify({
+          stats: { total: 1, with_natural_language: 1, with_gwt: 0, with_both: 0, with_finding: 0 },
+          findings: [],
+          summary: { deterministic_consistency_score: 1, overall_score: 1, overall_threshold: 0.85, gate_status: 'pass' },
+        });
+      }
       return null;
     };
     const findings = aggregateForStage('planning', '/tmp/poc', mockRun);
     assert.equal(findings.critical, 0);
     assert.equal(findings.high, 0);
-    assert.equal(Object.keys(findings.sources).length, 2);
+    assert.equal(Object.keys(findings.sources).length, 3);
     assert.equal(findings.sources['planning-extraction-validator'].status, 'ok');
     assert.equal(findings.sources['schema-validator'].status, 'ok');
+    assert.equal(findings.sources['br-cross-consistency-validator'].status, 'ok');
   });
 
   it('★ spec stage — validator 부재 = skipped', () => {

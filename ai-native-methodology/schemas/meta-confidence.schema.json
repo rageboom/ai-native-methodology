@@ -127,8 +127,13 @@
               "no_orm",
               "monorepo_flat_analysis",
               "legacy_unmaintained",
-              "zero_test_coverage"
-            ]
+              "zero_test_coverage",
+              "no_operational_db",
+              "fe_absent",
+              "external_dep_absent",
+              "single_module"
+            ],
+            "description": "★ v2.4.0 확장 — PoC #01 사례 'no_operational_db' + 'fe_absent' + 'external_dep_absent' + 'single_module' 추가 (★ N영역 부재 자연 표현 흡수 / ADR-CHAIN-011 §5.2 정합 / Senior R5 'schema vs PoC 잘못 분석' 정합)."
           },
           "value": {
             "type": "number",

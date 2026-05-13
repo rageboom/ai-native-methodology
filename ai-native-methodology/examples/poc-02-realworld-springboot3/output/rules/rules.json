@@ -2,6 +2,8 @@
   "$schema_ref": "../../../../../schemas/rules.schema.json",
   "meta": {
     "generated_at": "2026-04-29T00:00:00Z",
+    "confidence": 0.85,
+    "inputs_used": ["source_code", "orm", "config_files"],
     "source_commit_sha": "93e018e9a769dadae5a80b922d649bd7c79545cd",
     "methodology_version": "v1.1.2",
     "raw_confidence": 0.85,

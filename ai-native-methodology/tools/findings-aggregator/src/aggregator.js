@@ -7,9 +7,9 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// ★ chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합
+// ★ chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합 (★ v2.4.0 br-cross-consistency-validator 추가)
 export const REQUIRED_VALIDATORS_PER_STAGE = {
-  planning: ['planning-extraction-validator', 'schema-validator'],
+  planning: ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator'],
   spec: ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator'],
   test: ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator'],
   implement: ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder'],
@@ -119,6 +119,28 @@ export function transformGeneric(json) {
   };
 }
 
+// ★ ★ ★ v2.4.0 — br-cross-consistency-validator JSON → findings 변환 (ADR-CHAIN-011 §5.6)
+// 출력 shape:
+// { stats: { total, with_natural_language, with_gwt, with_both, with_finding },
+//   overlap_distribution: { count, mean, median, ... },
+//   findings: [{ id, severity, path, br_id, rule, message, ... }],
+//   summary: { deterministic_consistency_score, llm_consistency_score, overall_score, overall_threshold, gate_status } }
+export function transformBrCrossConsistency(json) {
+  const findings = Array.isArray(json.findings) ? json.findings : [];
+  const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  for (const f of findings) {
+    const sev = f.severity ?? 'info';
+    if (counts[sev] != null) counts[sev] += 1;
+  }
+  const summary = json.summary ?? {};
+  return {
+    ...counts,
+    br_overall_score: summary.overall_score ?? null,
+    br_overall_threshold: summary.overall_threshold ?? 0.85,
+    br_gate_status: summary.gate_status ?? null,
+  };
+}
+
 // ★ findings merge — 두 findings 합산 (severity count + 최소 coverage_pct 보존)
 export function mergeFindings(a, b) {
   const merged = {
@@ -157,6 +179,8 @@ export function dispatchValidator(validatorName, output) {
       return transformSchemaValidator(output); // ★ stdout text
     case 'test-impl-pass-validator':
       return transformTestImplPass(JSON.parse(output));
+    case 'br-cross-consistency-validator':
+      return transformBrCrossConsistency(JSON.parse(output));
     default:
       // ★ generic JSON fallback (drift / formal-spec-link / spec-test-link / static-runner / traceability-matrix-builder)
       try {
