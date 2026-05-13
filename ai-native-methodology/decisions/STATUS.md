@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ **session 7차 — v2.3.7 PATCH release — rules.schema.json BR pattern 4토막 strict 정합 + id-conventions.md enforcement label 강화** — 8/8 schema-validator test pass / 6 PoC 일시 fail 허용 carry / chain harness 5 요소 변경 ❌ / DEC-2026-05-13-BR-id-4-segment-enforcement-v2.3.7 신설)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **session 7차 추가 — v2.4.0-rc1 자격 — rules.json dual representation 사상 신설** — Plan L 직후 사용자 점검 trigger / ★ ★ critical 발견 6갈래 drift + governance 실패 + §8.1 strict 사각지대 + 사상 진화 사실 / ★ ★ dual representation 사상 정식 채택 (natural_language + GWT 동시 + cross-validation) / DEC-2026-05-13-rules-dual-representation-사상-신설 / no release / 다음 session v2.4.0 MINOR)
 
 **v2.3.7 PATCH release** (★ session 7차 / commit pending / git tag v2.3.7 pending)
 **v2.3.6 PATCH release 보존** (★ session 6차 / commit pending / git tag v2.3.6 pending / findings-aggregator)
@@ -14,6 +14,56 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 7차 추가 — v2.4.0-rc1 자격 — rules.json dual representation 사상 신설**:
+
+- ✅ **사용자 점검 trigger** "다시 한번 점검 / 레거시 분석 부분부터" → 11 PoC analysis 산출물 매트릭스 + rules.json schema-validator 검증
+- ✅ **★ ★ ★ ★ critical 발견 1** — 11 PoC 모두 rules.json schema-validator INVALID (★ ★ governance 실패 본질)
+- ✅ **★ ★ critical 발견 2** — §8.1 strict release-readiness 가 chain harness validator 만 보고 analysis validator (schema/drift/formal-spec-link) ★ 사각지대
+- ✅ **rules.json 6갈래 drift 사실 확보**: PoC #01 GWT 풍부 / #02 GWT 단순 / #03 trigger-condition-action / #04 FE 특수 / #05/#06 title+type+description / #07~#11 title+natural_language
+- ✅ **사상 발전 history 조사**: v1.x GWT (공식) → v2.0 source-grounded → v2.1 characterization → v2.3 natural_language (★ schema 미동기 / ADR 부재)
+- ✅ **사용자 결단** "이거 두개를 같이 만들고 서로 정합성을 체크 하는 건 안되겠지" → ★ ★ ★ dual representation 사상 정식 채택
+- ✅ **★ schemas/rules.schema.json item 안 변경**:
+  - required: `["id", "name", "given", "when", "then"]` → `["id", "name"]`
+  - anyOf 신설 (GWT 표현 OR natural_language 표현 ≥ 1 의무)
+  - natural_language field 신설 (string / optional)
+  - given/when/then = required 제거 / minItems: 1 유지
+  - description 안 "v2.4.0-rc1 dual representation" 사상 명시
+- ✅ **PoC #01 호환 검증**: anyOf 영역 ✅ pass (★ 다른 schema errors 보존 / 별도 carry)
+- ✅ **plan 자산 2건**:
+  - `~/.claude/plans/m-rules-schema-form-realignment.md` (★ M+ 갱신 / cross-validation 사상 반영)
+  - `~/.claude/plans/n-br-cross-consistency-validator-design.md` (★ 신설 / 다음 session 구현)
+- ✅ **DEC 신설**: DEC-2026-05-13-rules-dual-representation-사상-신설
+
+### resolved by 본 session (★ session 7차 추가)
+
+(없음 — ★ 본 session 1단계 = 사상 결단 + 자산화 / 실 carry resolved 는 2단계 v2.4.0 release 시)
+
+### 신규 carry (★ ★ session 7차 추가)
+
+- ★ ★ **C-rules-top-level-realignment** (★ critical / 다음 session — top-level project_id + business_rules 정식 표준화 / 11 PoC 일괄 정합 / PoC #01 마이그레이션)
+- ★ ★ **C-br-cross-validator-implementation** (★ critical / 다음 session — tools/br-cross-consistency-validator/ workspace 16번째 신설 / Layer 1 결정적 + Layer 2 LLM optional / chain-driver 통합)
+- ★ **C-rules-other-schema-errors** (★ PoC #01 meta.confidence + enum + rule_conflicts.minItems 위반 / 별도 sprint)
+- ★ **C-poc-04-fe-rules-separate-schema** (★ FE 트랙 별도 schema 신설 / 또는 if/then 분기)
+
+### Lessons Learned 신규 (★ session 7차 추가)
+
+- ★ ★ ★ **LL-i-22** (★ ★ "schema 명세 vs 실 PoC drift = governance 실패 사실" / 사상 발전 시 schema 동기화 의무 + ADR 신설 의무 + release-readiness 검증 의무)
+- ★ ★ ★ **LL-i-23** (★ ★ "release-readiness 자체 quality 사각지대" / §8.1 strict 7/7 통과 + PoC schema-validator INVALID 11/11 사실 = release-ready 라벨 실 quality 보장 ❌)
+- ★ ★ **LL-i-24** (★ "두 사상 dilemma → dual representation 사상 정합" / characterization vs 자동화 trade-off → 두 표현 동시 + cross-validation / ADR-008 이중 렌더링 사상의 ★ "BR 영역 확장" 패턴)
+- ★ **LL-i-25** (★ "옵션/결단 단어 짜증 사용자 피드백 자산화" / 직설적 답변 + 비유 + 예시 우선 / "결단" 단어 최소화 / 핵심 결정 1~2개로 압축)
+
+### ★ ★ 다음 step (★ 다음 session)
+
+- ★ ★ ★ schema top-level 재설계 (project_id + business_rules 정식 표준화 / 11 PoC 마이그레이션)
+- ★ ★ ★ tools/br-cross-consistency-validator/ workspace 16번째 신설 (Plan N 정합)
+- ★ ★ ADR-CHAIN-011 본격 작성 (BR dual representation paradigm)
+- ★ ★ chain 1 gate 통합 + release-readiness analysis_validator_violation criterion 신설
+- ★ ★ PoC #04 FE 별도 schema
+- ★ ★ ★ v2.4.0 MINOR release + v2.3.7 commit 2건 통합 push
+- ★ ★ 4원칙 2원칙 sub-agent 3원칙 권장 (★ ★ critical 자산 변경 / Senior critique 의무)
 
 ---
 

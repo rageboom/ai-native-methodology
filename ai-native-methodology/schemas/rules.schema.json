@@ -13,7 +13,18 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["id", "name", "given", "when", "then"],
+        "required": ["id", "name"],
+        "anyOf": [
+          {
+            "title": "GWT 표현 (★ chain 3+4 자동 생성 친화 / v1.x 공식 표준)",
+            "required": ["given", "when", "then"]
+          },
+          {
+            "title": "natural_language 표현 (★ analysis stage 친화 / characterization mode 정합 / v2.x 발전)",
+            "required": ["natural_language"]
+          }
+        ],
+        "description": "★ ★ ★ v2.4.0-rc1 dual representation 사상 (DEC-2026-05-13-rules-dual-representation-신설). BR 은 ≥ 1 표현 의무 (GWT given/when/then / natural_language / 또는 둘 다). 둘 다 작성 시 cross-validation 의무 (★ ★ tools/br-cross-consistency-validator 신설 후 chain 1 진입 gate 검증).",
         "properties": {
           "id": {
             "type": "string",
@@ -23,6 +34,10 @@
           "name": {
             "type": "string",
             "description": "규칙 짧은 이름 (예: '성인 인증 후 주류 주문')"
+          },
+          "natural_language": {
+            "type": "string",
+            "description": "★ ★ v2.4.0-rc1 신설 — BR 의 자유 자연어 묘사 (★ analysis stage 친화 / characterization mode 정합). given/when/then 와 함께 작성 시 cross-validation 의무. 예: '사용자 등록 시 이메일은 시스템 내 유일해야 함. 동일 이메일로 신규 등록 시도 시 409 Conflict 응답.'"
           },
           "description": {
             "type": "string",
@@ -51,19 +66,19 @@
           "given": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "전제 조건 (자연어)",
+            "description": "전제 조건 (★ GWT 표현 / chain 3 test 자동 생성 시 Arrange 단계 / v1.x 공식 표준)",
             "minItems": 1
           },
           "when": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "발동 조건 (자연어)",
+            "description": "발동 조건 (★ GWT 표현 / chain 3 test 자동 생성 시 Act 단계)",
             "minItems": 1
           },
           "then": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "결과 (자연어)",
+            "description": "결과 (★ GWT 표현 / chain 3 test 자동 생성 시 Assert 단계)",
             "minItems": 1
           },
           "rationale": {

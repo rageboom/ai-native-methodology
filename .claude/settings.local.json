@@ -66,7 +66,17 @@
       "Bash(node tools/chain-driver/src/cli.js next examples/poc-11-efiweb-billing-spring41 --findings examples/poc-11-efiweb-billing-spring41/.aimd/output/findings-spec.json --user-decision go --dry-run)",
       "Bash(node scripts/release-readiness.js --target v2.3.6)",
       "Bash(node --test test/chain-schemas.test.js)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(node tools/schema-validator/src/cli.js examples/poc-11-efiweb-billing-spring41/input/rules.json --json)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('examples/poc-05-sample-user-register/input/rules.json'\\)\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('examples/poc-11-efiweb-billing-spring41/input/rules.json'\\)\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('examples/poc-01-realworld-spring/output/rules/rules.json'\\)\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('schemas/rules.schema.json'\\)\\); print\\('required:', d.get\\('required'\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(python3)",
+      "Bash(node tools/schema-validator/src/cli.js examples/poc-01-realworld-spring/output/rules/rules.json --json)",
+      "Bash(python3 -c \"import sys, json; d=json.load\\(sys.stdin\\); r=d['results'][0]; print\\('PoC #01:', 'VALID' if r['valid'] else f'INVALID — {len\\(r[\\\\\"errors\\\\\"]\\)} errors:', json.dumps\\([e['message'] for e in r.get\\('errors',[]\\)][:3], ensure_ascii=False\\)\\)\")",
+      "Bash(node tools/schema-validator/src/cli.js examples/poc-05-sample-user-register/input/rules.json --json)"
     ]
   }
 }
