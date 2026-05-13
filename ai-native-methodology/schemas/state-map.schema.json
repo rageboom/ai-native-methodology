@@ -266,7 +266,7 @@
           },
           "to_id": {
             "type": "string",
-            "description": "참조 대상 ID (예: PAGE-LOGIN-001, operationId, BR-AUTH-001)."
+            "description": "참조 대상 ID (★ BR 은 4토막 strict / 예: PAGE-LOGIN-001, operationId, BR-AUTH-JWT-001)."
           },
           "link_type": {
             "type": "string",

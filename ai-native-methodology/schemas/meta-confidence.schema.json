@@ -156,7 +156,7 @@
         "properties": {
           "item_id": {
             "type": "string",
-            "description": "검토 대상 ID (예: BR-ORDER-007)"
+            "description": "검토 대상 ID (★ BR 4토막 strict / 예: BR-ORDER-CANCEL-001)"
           },
           "reason": {
             "type": "string",

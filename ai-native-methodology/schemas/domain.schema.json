@@ -178,7 +178,7 @@
                       "related_rules": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "관련 비즈니스 규칙 ID (예: BR-ORDER-007)"
+                        "description": "관련 비즈니스 규칙 ID (★ 4토막 strict / 예: BR-ORDER-CANCEL-001)"
                       }
                     }
                   }
