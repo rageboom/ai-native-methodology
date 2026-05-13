@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ ★ ★ ★ **session 8차 v2.4.0 MINOR FINAL release 자격** — sub-plan §1 + §2 + §3 통합 완료 — ADR-CHAIN-011 + validator workspace 16번째 + schema top-level 재설계 + chain 1 gate 통합 + release-readiness 8/8 격상 / ★ ★ ★ ★ ★ ★ 8/8 release-ready ✅ / 324/324 test pass / version bump 2.3.7 → 2.4.0 / git tag v2.4.0 pending / push 보류 commit 누적 6건 통합 push)
+**기준일**: 2026-05-13 (★ ★ ★ ★ ★ ★ ★ ★ **session 9차 — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단 + ADR-CHAIN-011 §5.4 patch v2 + SPIKE v2 자산화** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Senior STOP 3건 흡수 / implementation = v2.5.0 carry)
+
+**v2.4.0 MINOR FINAL release 보존** (★ session 8차 / 2026-05-13 / commit `f3b62db` / git tag `v2.4.0` / origin push ✅ — ★ ★ ★ ★ ★ session 9차 carry 명시 추가: "paradigm rc 도입 / threshold gate 결정 보류 / Layer 2 LLM 의무 carry / ≥ 2 PoC corroboration 의무 carry / v2.5.0 = paradigm 본격 도입" / ★ Senior STOP-2 soft 흡수 = ★ 라벨 강등 ❌ / carry 명시 ✅)
 
 **v2.4.0 MINOR FINAL release** (★ session 8차 / 2026-05-13 / 본 release commit pending / git tag v2.4.0 pending / push 보류)
 **v2.4.0-rc1 자격 흡수** (★ session 7차 / commit `a24a892` / dual representation 사상 신설 / 본 release 안 통합)
@@ -16,6 +18,64 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 9차 — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단**:
+
+- ✅ **carry trigger** = ★ ★ ★ ★ C-threshold-spike-revisit (★ critical / session 8차 신규)
+- ✅ **★ 4원칙 1단계 plan 자산** = `~/.claude/plans/o-threshold-spike-revisit.md` (9절 / 가설 3 + 결단 Q1~Q5)
+- ✅ **★ session 9차 SPIKE v1 재측정** (★ description alias 적용 후) — ★ ★ ★ ★ ★ PoC #01 with_both 13/13 (★ session 8차 spike v1 with_both=0 정면 뒤집힘 / description→natural_language alias 작동)
+- ✅ **★ ★ ★ ★ ★ ★ ★ critical 발견 1** — PoC #01 13 BR overlap 분포 (mean=0.201 / median=0.162 / p75=0.300 / max=**0.462** / stddev=0.134 / ≥0.85 = **0/13 (0%)** / ≥0.5 = 0/13 / ≥0.3 = 4/13 (31%)) → ★ ★ ★ ★ ★ ★ ★ ★ ★ **≥0.85 hypothesis empirical 정면 부정 결정적 사실**
+- ✅ **★ ★ 4원칙 2단계 sub-agent 3 병렬 토론** (★ critical 자산 변경 의무 정합):
+  - **Agent 1 공식문서** — ★ Jaccard short-text + 한국어 교착어 형태소 부재 → ≥ 0.85 ★ 수학적 도달 불가 / Cucumber/DMN/Spectral 모두 cross-consistency 부재 / Adzic 10년 폐기 + Relish/Pickles/Green Pepper 전멸 / 권장 Q1=(b) Q2=(b) Q3=(b) Q4=(b) Q5=(a)
+  - **Agent 2 빅테크/OSS** — ★ MDPI 2025 paraphrase optimal=0.671 / range 0.334~0.867 / industry 5 곳 모두 semantic similarity threshold 공개 ❌ / Adzic 12% 만 feature files 잔존 / 권장 Q1=(d) 다층 Q2=(b) Q3=(c) Q4=(c) Q5=(b)
+  - **Agent 3 Senior critique** — ★ ★ ★ ★ ★ STOP signal 3건 발행 (STOP-1 단일 PoC #01 n=13 = §8.1 strict 정면 위반 / STOP-2 v2.4.0 MINOR FINAL 라벨 ❌ / STOP-3 Layer 1 단독 = Adzic 폐기 함정 재현) + REVISE 6건 + Q1~Q5 신규 옵션 e/c/d
+- ✅ **★ ★ ★ 3 agent 일치 corroboration** = ≥0.85 keyword threshold 정면 폐기 + Layer 2 LLM 의무 격상 + keyword-only paradigm = Adzic 폐기 회피 ❌ + industry 5 곳 cross-validation 부재 (LL-i-27 강화)
+- ✅ **★ ★ ★ ★ ★ ★ Agent 3 REVISE-6 (★ 가설 B 검증) 재실측 SPIKE v2** — `tools/br-cross-consistency-validator/scripts/spike-v2-rationale-strip.mjs` 자산화 + 시행 결과:
+  - ★ ★ ★ ★ ★ ★ ★ **가설 B 정면 부정** (mean delta -0.028 / 7건 감소 / 4건 변화 ❌ / 1건 +0.167 상승)
+  - → ★ ★ ★ ★ ★ ★ data quality 차이 ❌ 본질 / ★ ★ ★ **semantic 차이 = keyword overlap algorithm 자체 한계 (Jaccard short-text + 한국어 교착어 형태소 부재)**
+- ✅ **★ ★ ★ ★ ★ ★ ★ ★ paradigm 결단** = ★ ≥0.85 hypothesis 정면 폐기 + Layer 2 LLM 의무 격상 + Layer 1 = "structural sanity check" 격하 + ≥ 2 PoC corroboration carry + v2.4.0 라벨 soft 보존
+- ✅ **★ ★ 자산화 5종**:
+  - ★ `tools/br-cross-consistency-validator/SPIKE-2026-05-13-v2-rationale-strip.md` (★ ★ ★ SPIKE v2 report / 본 session 핵심)
+  - ★ `tools/br-cross-consistency-validator/scripts/spike-v2-rationale-strip.mjs` (★ SPIKE v2 시행 script)
+  - ★ `decisions/DEC-2026-05-13-threshold-spike-revisit-paradigm.md` (★ ★ DEC 신설)
+  - ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §5.4 patch v2 + §7.3 carry + §9 LL-i-28 + §10 version handling + §11 후속 (★ ★ session 9차 갱신)
+  - ★ `~/.claude/plans/o-threshold-spike-revisit.md` (★ 4원칙 1단계 plan)
+- ✅ **★ ★ release-readiness 8/8 자격 상태 갱신** = "8/8 + paradigm 도입 미완 carry" (★ Senior STOP-2 soft 흡수 / 라벨 강등 ❌ / carry 명시 ✅)
+
+### resolved by 본 session (★ session 9차)
+
+- ★ ★ ★ **C-threshold-spike-revisit** (★ session 8차 carry) → ★ ★ **resolved** (★ session 9차 SPIKE v1 재측정 + SPIKE v2 + Layer 2 LLM 의무 paradigm 결단 / ★ implementation carry = C-layer-2-llm-mandatory-paradigm 흡수)
+
+### 신규 carry (★ ★ session 9차)
+
+- ★ ★ ★ ★ **C-layer-2-llm-mandatory-paradigm** (★ critical / v2.5.0 — Layer 2 LLM advisory placeholder → mandatory 격상 / ≥ 0.7 threshold / F-015 cross-validation / Static Tool 시뮬레이션 금지 정합 / ≥ 2 PoC corroboration 의무)
+- ★ ★ ★ ★ ★ **C-poc-03-05-dual-representation** (★ ★ critical / Senior STOP-1 흡수 / ≥ 2 PoC corroboration 의무 / v2.5.0 의무)
+- ★ ★ **C-keyword-threshold-degrade** (★ medium / Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하 / ★ paradigm-aligned / v2.5.0)
+- ★ ★ **C-description-vs-nl-paradigm-define** (★ v2.5.0 paradigm 결단 / Q2 의 a/b/c — 3 agent 충돌 영역)
+
+### Lessons Learned 신규 (★ session 9차 / DEC §5 정합)
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-28** (★ ★ "keyword overlap = structural sanity check / Adzic 폐기 회피 도구 자격 ❌ / Layer 2 LLM 의무 격상"):
+  - **Why**: SPIKE v1+v2 + 3 agent 일치 corroboration → keyword overlap algorithm 자체 한계 (Jaccard short-text + 한국어 교착어 형태소 부재) / data quality 차이 ❌ 본질 / semantic 차이 = Layer 2 LLM 의무 격상 유일 paradigm
+  - **How to apply**: Layer 1 = structural sanity check 격하 / Layer 2 LLM = mandatory 격상 / Adzic 폐기 회피 = Layer 2 ★ 의무 / 외부 인용 시 "industry-first 임상 threshold 측정 공개" 자격
+- ★ ★ ★ ★ **LL-i-29** (★ "Senior critique STOP signal 강도 분리 흡수 paradigm"):
+  - **Why**: STOP-1 (사실 명확 + 비용 low) = 전면 흡수 / STOP-2 (사실 명확 + 비용 high git tag downstream 영향) = soft 흡수 / STOP-3 (사실 명확 + 비용 low) = 전면 흡수 = ★ ★ "사실 명확도 × 비용" 2축 평가 paradigm
+  - **How to apply**: 신규 sub-agent STOP signal 흡수 시 = "사실 명확도 × 비용" 2축 평가 의무 / soft 흡수 시 = ★ 라벨 강등 ❌ + carry 명시 의무
+- ★ ★ **LL-i-30** (★ "REVISE-6 가설 B 정면 부정 자체가 paradigm 결단 결정적 자료"):
+  - **Why**: SPIKE v2 mean delta -0.028 (★ 오히려 감소) → data quality 가설 부정 = ★ ★ "algorithm 자체 한계" 신호 / paradigm 결단 결정적 자료
+  - **How to apply**: 가설 부정 자체도 결정적 자료 / SPIKE 시행 paradigm = 가설 1 시행 → 가설 1 부정 시 다음 가설 자동 강화 / paradigm 결단 시 다중 가설 검증 의무
+
+### ★ ★ 다음 step (★ ★ 다음 session = v2.5.0 paradigm 본격 도입)
+
+- ★ ★ ★ ★ ★ ★ ★ PoC #03 + PoC #05 dual representation 적용 → cross-validation 자료 ≥ 2 PoC corroboration 확보
+- ★ ★ ★ ★ ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (★ no-simulation 정책 정합 / Static Tool 시뮬레이션 ❌ / 외부 LLM API 직접 호출)
+- ★ ★ ★ ★ description vs natural_language paradigm 재정의 (★ Q2 결단)
+- ★ ★ ★ ★ Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하
+- ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합
+- ★ ★ ★ ★ ★ ★ release-readiness 8/8 → 9/9 재격상 검토 (Layer 2 통과 criterion 추가)
+- ★ ★ ★ ★ ★ v2.5.0 MINOR release
 
 ---
 

@@ -139,32 +139,105 @@ PoC #07~#11 = title + natural_language (B 형식 발전 / 현 신표준)
 - ★ F-015 cross-validation 패턴 — 메인 + sub-agent 양쪽 호출 / 불일치 시 finding
 - ★ ★ Static Tool 시뮬레이션 절대 금지 정책 정합 — LLM 의미 검증 = ★ advisory 명시 / 결정 자체 LLM 의존 ❌
 
-### §5.4. threshold ≥ 0.85 = empirical hypothesis (★ ★ 11 PoC 분포 spike 결과 = ★ ★ 실측 자료 부재 — sub-plan §2 후 재spike 의무)
+### §5.4. ★ ★ ★ ★ ★ ★ ★ ★ threshold ≥ 0.85 hypothesis = ★ patch v2 (★ session 9차 / 정면 폐기 + Layer 2 LLM 의무 격상 paradigm 결단)
 
-★ ★ Agent 1 F2 + Agent 2 F4 + Agent 3 R2 일치 — magic number 거부 + 11 PoC keyword 분포 측정 의무.
+★ ★ ★ ★ ★ ★ ★ ★ ★ **patch v2 본격 갱신 (2026-05-13 session 9차)** — ★ session 8차 SPIKE v1 (with_both=0) + ★ session 9차 SPIKE v2 (REVISE-6 재실측) + ★ 3 sub-agent (Agent 1 공식문서 + Agent 2 빅테크 + Agent 3 Senior critique) 일치 corroboration 으로 ★ ★ ★ ★ ★ ★ **≥ 0.85 hypothesis 정면 폐기 + Layer 2 LLM 의무 격상 paradigm 결단**.
 
-본 session 1차 spike (2026-05-13):
+#### §5.4.1. ★ ★ session 8차 SPIKE v1 결과 (★ 보존)
 
-1. 11 PoC rules.json × 107 BR 검증 (★ tools/br-cross-consistency-validator/SPIKE-2026-05-13-threshold-distribution.md 자산화)
-2. ★ ★ ★ ★ ★ critical 발견: **두 표현 동시 보유 BR = 0 건 / 11 PoC 모두** → overlap_distribution 측정 자체 ★ 불가능
-3. ★ ★ ★ 즉 ≥ 0.85 hypothesis confirm 자료 ★ ★ 부재 (★ Senior critique R2 magic number 거부 정합 강력)
-4. ★ ★ ★ sub-plan §2 마이그레이션 후 (★ PoC pilot 안 ≥ 50% BR 가 두 표현 동시 작성 / overlap_distribution 실측 가능 도달 시) ★ 재spike 의무
+1. 11 PoC rules.json × 107 BR 검증 (★ `SPIKE-2026-05-13-threshold-distribution.md` 자산화)
+2. ★ ★ ★ ★ critical 발견: **두 표현 동시 보유 BR = 0 건 / 11 PoC 모두** → overlap_distribution 측정 자체 ★ 불가능
+3. ★ ★ ★ ≥ 0.85 hypothesis confirm 자료 ★ 부재
+4. ★ 6갈래 drift 사실 직접 검증:
+   - 갈래 1 (PoC #01 GWT 풍부) / 갈래 2 (PoC #02) / 갈래 3 (PoC #03 trigger-condition-action) / 갈래 4 (PoC #04 FE) / 갈래 5 (PoC #05+#06 description) / 갈래 6 (PoC #07~#11 natural_language)
 
-★ ★ 6갈래 drift 사실 직접 검증 확인:
-- 갈래 1 (PoC #01 GWT 풍부): ✅ pass / score 1.0 / 0 finding
-- 갈래 2 (PoC #02): ❌ schema 매핑 부재 — sub-plan §2 마이그레이션 의무 (★ C-poc-02-03-schema-mapping 신규 carry)
-- 갈래 3 (PoC #03 trigger-condition-action): ❌ schema 매핑 부재 — 동상
-- 갈래 4 (PoC #04 FE): ⚠️ rules array 부재 — §5.5 if/then 분기 carry 정합
-- 갈래 5 (PoC #05+#06 description): ❌ representation_missing — sub-plan §2 description → natural_language rename 의무
-- 갈래 6 (PoC #07~#11 natural_language): ⚠️ id 4토막 위반 (43건) — v2.3.7 enforcement 정합 / 기존 carry 보존
+#### §5.4.2. ★ ★ session 9차 SPIKE v1 재측정 결과 (★ description alias 적용 후)
 
-★ ★ ★ ADR §7.3 신규 carry 추가:
-- ★ ★ **C-threshold-spike-revisit** (★ critical / sub-plan §2 후 재spike 의무)
-- ★ ★ **C-poc-02-03-schema-mapping** (★ critical / PoC #02 condition+description / PoC #03 trigger+condition+action → 마이그레이션 또는 schema 매핑 추가 의무)
+★ deterministic.js 안 description → natural_language alias 적용 (★ v2.4.0 sub-plan §3 자산) 후 ★ 재측정:
 
-★ ★ deterministic_score anomaly:
-- PoC #07~#11 score = 0.6 (★ id_pattern_violation medium 1건/BR × 8~15 BR) → ★ ★ "두 표현 동시 정합도" 보다 "schema-level 정합도" 강 신호
-- sub-plan §2 마이그레이션 후 deterministic_score 산정 식 재해석 의무 (★ severity-weighted penalty + overlap 가산점 후보)
+| PoC | total | both | nl_only | gwt_only | overlap max | overlap mean |
+|---|---|---|---|---|---|---|
+| #01 RealWorld Spring | 13 | **13** | 0 | 0 | **0.462** | **0.201** |
+| #02~#11 (10 PoC) | 84 | 0 | 64 | 14 | — | — |
+
+★ ★ ★ ★ ★ PoC #01 = ★ ★ with_both 13/13 (★ description alias 작동) → ★ ★ ★ overlap 분포 실측 가능 도달.
+
+#### §5.4.3. ★ ★ ★ ★ ★ ★ ★ 결정적 사실 — PoC #01 13 BR overlap 분포 (★ session 9차)
+
+```
+n=13 / min=0.000 p10=0.077 p25=0.083 p50=0.162 p75=0.300 p90=0.381 max=0.462 / mean=0.201 / stddev=0.134
+
+≥0.85: 0/13 (0%)   ★ ★ ★ ★ ★ ★ ★ ★ ★ hypothesis DEAD (empirical 정면 부정)
+≥0.7:  0/13 (0%)
+≥0.5:  0/13 (0%)   ★ keywordThreshold 현 0.5 도 0건 도달
+≥0.4:  1/13 (8%)
+≥0.3:  4/13 (31%)
+≥0.2:  6/13 (46%)
+≥0.15: 7/13 (54%)  ★ median 정합
+≥0.1:  9/13 (69%)
+```
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ → **≥ 0.85 hypothesis = ★ ★ ★ ★ empirical 정면 부정 결정적 사실**.
+
+#### §5.4.4. ★ ★ ★ ★ ★ ★ session 9차 SPIKE v2 (REVISE-6 재실측 / 가설 B 검증)
+
+★ Agent 3 REVISE-6 가설 = *"description 안 rationale/caveat 섞임 → keyword overlap 자릿수 자체 부적합 metric / ★ 순수 BR 부분만 추출 후 ★ 재측정 시 overlap 자릿수 강 상승 가능"*.
+
+★ `tools/br-cross-consistency-validator/scripts/spike-v2-rationale-strip.mjs` 시행 결과 자산화 (★ `SPIKE-2026-05-13-v2-rationale-strip.md`):
+
+| 지표 | 원본 (v1) | stripped (v2) | delta |
+|---|---|---|---|
+| mean | 0.201 | 0.173 | ★ **-0.028 (★ 오히려 감소)** |
+| p50 (median) | 0.162 | 0.105 | -0.057 |
+| max | 0.462 | 0.500 | +0.038 |
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **가설 B 정면 부정** — 13 BR 중 7건 = ★ stripping 후 ★ 감소 / 4건 = 변화 ❌ / 1건 = +0.167 상승 → ★ ★ ★ data quality 차이 ❌ 본질 / ★ ★ ★ ★ **semantic 차이 = ★ keyword overlap algorithm 자체 한계 (Jaccard short-text + 한국어 교착어 형태소 부재)**.
+
+#### §5.4.5. ★ ★ ★ ★ ★ ★ 3 sub-agent 일치 corroboration (★ session 9차 2원칙 토론)
+
+| 사실 | Agent 1 공식문서 | Agent 2 빅테크 | Agent 3 Senior |
+|---|---|---|---|
+| ≥0.85 keyword threshold = 정면 폐기 자격 | ★ ✅ Jaccard short-text + 한국어 교착어 (수학적 불가) | ★ ✅ MDPI 2025 paraphrase optimal=0.671 / range 0.334~0.867 | ★ ★ ✅ magic number 함정 |
+| Layer 2 LLM 의무 격상 | ★ ✅ keyword 만 ≠ Adzic 폐기 회피 도구 | ★ ✅ semantic equivalence ≥ 0.7 권위 | ★ ★ ✅ structural sanity vs semantic gate 분리 의무 |
+| industry 5 곳 cross-validation 부재 | ★ Cucumber/DMN/Spectral | ★ spec-kit/AWS Q/Conduktor/MSAF | (부수) |
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ 3 agent 일치 강 corroboration → ★ paradigm 결단 자료 ★ 결정적 확보.
+
+#### §5.4.6. ★ ★ ★ ★ ★ ★ ★ paradigm 결단 (★ ★ ★ patch v2 본격)
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **≥ 0.85 hypothesis 정면 폐기 + Layer 2 LLM 의무 격상 paradigm 채택**:
+
+A. **★ ★ ★ ★ Layer 1 결정적 = "structural sanity check" 격하** (★ Adzic 폐기 회피 도구 자격 ❌):
+   - 두 표현 (NL + GWT) ≥ 1 boolean 검증 (★ schema anyOf 보강 / 본 영역만)
+   - BR id 4토막 strict 정합 (★ v2.3.7 enforcement)
+   - structure 위치 검증 (given/when/then 키워드 분포)
+   - ★ ★ keyword overlap threshold = ★ ★ "≥ 0.15 floor advisory" 격하 (★ median 정합 / Layer 1 단독 strict gate ❌)
+
+B. **★ ★ ★ ★ ★ ★ Layer 2 LLM semantic equivalence = ★ ★ chain 1 gate 의무 + paradigm 본격 도입 시 mandatory 격상** (★ v2.5.0 의무):
+   - threshold ≥ 0.7 (★ MDPI 2025 paraphrase detection commonly used 권위 정합)
+   - ★ F-015 cross-validation 패턴 정합 (메인 + sub-agent 양쪽 호출 / 불일치 시 finding)
+   - ★ ★ Static Tool 시뮬레이션 금지 정책 정합 (★ "AI sub-agent persona" 부여 ❌ / 외부 LLM API 직접 호출 / placeholder ❌ → mandatory)
+   - 비용 측정 (★ Agent 3 R3) = chain 1 gate 마다 LLM call 1회 / 사내 EFI-WEB 1000+ BR 기준 ~$50~$200 = acceptable
+
+C. **★ ★ ★ ★ ≥ 2 PoC corroboration carry (★ ★ Senior STOP-1 흡수)**:
+   - ★ session 8차+9차 SPIKE = 단일 PoC #01 13 BR (★ §8.1 strict 위반 사실)
+   - ★ ★ ★ paradigm 사상 결단 자체 = ★ 3 agent 일치 corroboration + SPIKE v1+v2 (★ n=13 표본 외 corroboration 충족) → ★ session 9차 자격 종결 가능
+   - ★ ★ ★ implementation = ★ PoC #03 + PoC #05 dual representation 적용 → cross-validation 자료 ≥ 2 PoC corroboration 확보 후 v2.5.0 진행 의무
+
+#### §5.4.7. ★ ★ ★ ★ ★ 신규 carry (★ ADR §7.3 통합)
+
+- ★ ★ ★ ★ **C-layer-2-llm-mandatory-paradigm** (★ critical / v2.5.0 — Layer 2 LLM advisory placeholder → mandatory 격상 / ≥ 2 PoC corroboration 의무)
+- ★ ★ **C-keyword-threshold-degrade** (★ medium / Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하 / ★ paradigm-aligned)
+- ★ ★ **C-description-vs-nl-paradigm-define** (★ v2.5.0 paradigm 결단 / Q2 의 a/b/c 결단)
+- ★ ★ ★ ★ ★ **C-poc-03-05-dual-representation** (★ ★ critical / Senior STOP-1 흡수 / ≥ 2 PoC corroboration 의무 / v2.5.0 의무)
+- ★ ★ **C-threshold-spike-revisit** (★ session 8차 carry / ★ **resolved by session 9차 SPIKE v1+v2 + Layer 2 LLM 의무 paradigm 결단** / ★ implementation carry = C-layer-2-llm-mandatory-paradigm 흡수)
+- ★ **C-poc-02-03-schema-mapping** (★ session 8차 carry / PoC #02 condition+description / PoC #03 trigger+condition+action — ★ ★ deterministic.js 안 alias 일부 적용 사실 확인 / 본격 마이그레이션 = v2.5.0 의무)
+
+#### §5.4.8. ★ ★ deterministic_score anomaly 갱신 (★ session 9차 보존)
+
+- ★ session 8차 anomaly = PoC #07~#11 score 0.6 (★ id_pattern_violation 1건/BR × 8~15 BR) → "schema-level 정합도" 강 신호
+- ★ session 9차 추가 anomaly = PoC #01 score 0.577 (★ 13 BR 모두 keyword_mismatch finding / mean=0.201) → "keyword overlap < 0.5 = ★ ★ keyword overlap algorithm 자체 한계 신호"
+- ★ ★ v2.5.0 = ★ Layer 2 LLM 의무 격상 후 ★ deterministic_score 산정 식 재해석 의무 (★ Layer 1 = structural sanity / Layer 2 = semantic gate 분리 점수)
 
 ### §5.5. ★ PoC #04 FE schema 분기 결정 (★ Agent 3 R3 권장 ADR 안 결정)
 
@@ -287,16 +360,28 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 
 ### §7.3. carry / 후속
 
-신규 carry 본 ADR 안 발생:
+★ ★ ★ ★ ★ **★ session 9차 갱신 — resolved + 신규 carry 통합 (★ ★ ★ ★ patch v2)**:
 
-- ★ ★ ★ **C-threshold-spike-revisit** (★ critical / 본 session 1차 spike = ★ overlap 분포 부재 사실 확인 / sub-plan §2 마이그레이션 후 ≥ 50% BR 두 표현 동시 도달 시 재spike 의무 / SPIKE-2026-05-13-threshold-distribution.md 정합)
-- ★ ★ ★ **C-poc-02-03-schema-mapping** (★ critical / PoC #02 condition+description / PoC #03 trigger+condition+action — validator 매핑 부재 + schema 매핑 부재 / sub-plan §2 마이그레이션 또는 mapping 추가 의무)
-- ★ ★ **C-br-cross-validator-implementation** (★ sub-plan §1 Layer 1 본 session 자격 ✅ / Layer 2 LLM 본격 구현 = 다음 session)
-- ★ ★ **C-rules-top-level-realignment** (★ sub-plan §2 / 다음 session — top-level project_id + business_rules 정식 표준화 / 11 PoC 마이그레이션)
-- ★ **C-poc-04-fe-rules-if-then** (★ sub-plan §2 / 다음 session — schema 안 if/then 분기 본격 구현)
-- ★ ★ **C-release-readiness-8-8-격상** (★ sub-plan §3 / 다음 session — ★ ★ MINOR bump 부적격 가능성 별도 결단 / v2.5.0 분리 검토)
-- ★ **C-chain-1-gate-integration** (★ sub-plan §3 / 다음 session — chain-driver gate-eval.js 안 br-cross-consistency-validator 통합)
-- ★ ★ **C-deterministic-score-formula-revisit** (★ sub-plan §2 후 / deterministic_score 산정 식 재해석 / overlap 가산점 후보)
+#### resolved by session 9차 (★ ★)
+
+- ★ ★ ★ **C-threshold-spike-revisit** (★ session 8차 carry) → ★ ★ ★ ★ ★ **resolved** (★ session 9차 SPIKE v1+v2 + Layer 2 LLM 의무 paradigm 결단 / ★ implementation carry = ★ C-layer-2-llm-mandatory-paradigm 흡수)
+
+#### 신규 carry (★ session 9차)
+
+- ★ ★ ★ ★ ★ ★ ★ **C-layer-2-llm-mandatory-paradigm** (★ critical / v2.5.0 — Layer 2 LLM advisory placeholder → mandatory 격상 / ≥ 0.7 threshold / F-015 cross-validation / Static Tool 시뮬레이션 금지 정합 / ≥ 2 PoC corroboration 의무)
+- ★ ★ ★ ★ ★ ★ ★ **C-poc-03-05-dual-representation** (★ ★ critical / Senior STOP-1 흡수 / ≥ 2 PoC corroboration 의무 / v2.5.0 의무)
+- ★ ★ **C-keyword-threshold-degrade** (★ medium / Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하 / ★ paradigm-aligned / v2.5.0)
+- ★ ★ **C-description-vs-nl-paradigm-define** (★ v2.5.0 paradigm 결단 / Q2 의 a/b/c — 3 agent 충돌 영역 / ★ description = AI 눈 vs NL = 사람 눈 vs description = metadata)
+
+#### 보존 carry (★ session 8차 기존)
+
+- ★ **C-poc-02-03-schema-mapping** (★ deterministic.js 안 alias 일부 적용 ✅ / 본격 마이그레이션 = v2.5.0)
+- ★ **C-br-cross-validator-implementation** (★ Layer 1 ✅ / Layer 2 mandatory = v2.5.0 / ★ C-layer-2-llm-mandatory-paradigm 흡수)
+- ★ ★ **C-rules-top-level-realignment** (★ session 8차 ✅ — schema top-level project_id + business_rules 정식 표준화 적용 / PoC #01+#05 마이그레이션 ✅)
+- ★ **C-poc-04-fe-rules-if-then** (★ v2.5.0 또는 별도 sprint)
+- ★ ★ **C-release-readiness-8-8-격상** (★ session 8차 자격 격상 ✅ / 단 ★ ★ paradigm 도입 미완 carry 명시 의무 / ★ Senior STOP-2 soft 흡수 → v2.5.0 본격 도입 시 재격상 검토)
+- ★ **C-chain-1-gate-integration** (★ v2.5.0 chain-driver gate-eval.js 통합)
+- ★ ★ **C-deterministic-score-formula-revisit** (★ v2.5.0 후 / deterministic_score 산정 식 재해석 + Layer 1 structural sanity vs Layer 2 semantic gate 분리 점수)
 
 ---
 
@@ -349,19 +434,30 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
   - **Why**: GitHub Spec Kit (90K star) / AWS Q / ThoughtWorks CodeConcise / DMN / Drools / Spectral / OpenAPI 모두 cross-consistency rule 부재 = industry 공백
   - **How to apply**: 외부 인용 시 ★ "원조 자격" 명시 가능 / 단 paradigm-cross corroboration (ADR-CHAIN-008 §1) 정합 의무 / ★ "Spec Kit + DMN + 본 방법론" 자릿수 비교 외부 발표 후보
 
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-28** (★ ★ "keyword overlap = ★ ★ structural sanity check / Adzic 폐기 회피 도구 자격 ❌ / Layer 2 LLM 의무 격상" / ★ session 9차 SPIKE v2 + 3 agent 일치 corroboration):
+  - **Why**: ★ ★ ★ session 9차 SPIKE v1 (PoC #01 13 BR mean=0.201 max=0.462 / ≥0.85 = 0/13) + SPIKE v2 (REVISE-6 rationale 제거 후 mean=0.173 mean delta -0.028 → 가설 B 정면 부정) + ★ Agent 1 F1 (Jaccard short-text + 한국어 교착어 형태소 부재) + Agent 2 F5 (MDPI 2025 paraphrase optimal=0.671 / range 0.334~0.867) + Agent 3 R5 (Layer 1 결정적 단독 = semantic gate 자격 미달) ★ ★ ★ ★ ★ ★ 일치 corroboration
+  - **How to apply**:
+    - ★ Layer 1 결정적 = "structural sanity check" 격하 (★ 두 표현 boolean + id 4토막 + structure 위치 / keyword threshold = ≥ 0.15 floor advisory)
+    - ★ Layer 2 LLM semantic equivalence = ★ mandatory 격상 의무 (★ ≥ 0.7 threshold 정합 / F-015 cross-validation 패턴 / Static Tool 시뮬레이션 금지 정합)
+    - ★ Adzic 폐기 회피 도구 = Layer 2 LLM ★ 의무 (★ Layer 1 단독 = 도구 자격 ❌)
+    - ★ ★ paradigm 사상 결단 자체 = ★ session 9차 종결 자격 (★ 3 agent + SPIKE v1+v2 corroboration 충족)
+    - ★ ★ implementation (Layer 2 LLM mandatory) = ★ ★ ★ ★ v2.5.0 의무 (★ ≥ 2 PoC corroboration 자료 확보 후 / ★ Senior STOP-1 흡수 carry)
+    - ★ 외부 인용 시 = ★ "industry-first 임상 threshold 측정 공개" 자격 (★ ★ ★ MDPI 2025 + Cucumber/DMN/Spectral 부재 corroboration)
+
 ---
 
 ## §10. version handling
 
 - 본 ADR = ★ ★ no version bump (★ v2.3.7 + v2.4.0-rc1 commit 위 추가 / sub-plan §1 자산화 commit)
-- 다음 session = sub-plan §2 + §3 진행 후 v2.4.0 MINOR FINAL release (★ 단 v2.5.0 분리 가능성 §7.3 carry 정합)
-- v2.3.7 commit 2건 (`75ee21d` + `963dfa0`) + v2.4.0-rc1 commit (`a24a892`) + 본 session commit = ★ 다음 session 통합 push
+- ★ ★ ★ ★ ★ **v2.4.0 MINOR FINAL release 라벨 ★ 보존** (★ session 8차 commit `f3b62db` / git tag v2.4.0 / origin push ✅) — ★ 단 ★ "paradigm rc 도입 / threshold gate 결정 보류 / Layer 2 LLM 의무 carry / ≥ 2 PoC corroboration 의무 carry" carry 명시 (★ Senior STOP-2 soft 흡수 / 라벨 강등 ❌ / carry 명시 ✅)
+- ★ ★ ★ ★ ★ ★ **v2.5.0 MINOR = paradigm 본격 도입** (★ Senior STOP-1+2+3 흡수 + ★ Layer 2 LLM mandatory + threshold paradigm 본격 재정의 + ≥ 2 PoC corroboration 후) — ★ 다음 session ~ 다다음 session
+- ★ session 9차 commit = SESSION-WRAPUP (★ no release / no version bump / no tag / ★ ADR §5.4 patch v2 + SPIKE v2 자산화)
 
 ---
 
 ## §11. 후속
 
-- ★ ★ ★ ★ sub-plan §1 본 session = 본 ADR + validator workspace 신설 + threshold spike → SESSION-WRAPUP commit
-- ★ ★ sub-plan §2 다음 session = schema top-level 재설계 + PoC pilot migration
-- ★ ★ sub-plan §3 그 다음 session = chain 1 gate 통합 + release-readiness 격상 검토 + release
-- ★ ★ ★ ADR-CHAIN-011 후속 patch = threshold ≥ 0.85 confirm 시점 (★ §5.4 갱신 의무)
+- ★ ★ ★ ★ sub-plan §1 session 8차 = ★ 본 ADR + validator workspace 신설 + SPIKE v1 → SESSION-WRAPUP commit `c7dfca5` ✅
+- ★ ★ ★ ★ ★ ★ sub-plan §2 session 8차 (★ release 통합) = ★ schema top-level 재설계 + PoC #01+#05 마이그레이션 → commit `f3b62db` (v2.4.0 MINOR FINAL release) ✅
+- ★ ★ ★ ★ ★ ★ ★ **sub-plan §1' session 9차 (★ ★ 본 patch v2) = ★ ★ ★ ★ ★ threshold spike revisit (C-threshold-spike-revisit 흡수) + REVISE-6 재실측 + Layer 2 LLM 의무 paradigm 결단 + ADR §5.4 patch v2 + SPIKE v2 자산화 → SESSION-WRAPUP commit (★ 본 session / no release)**
+- ★ ★ ★ ★ ★ **sub-plan §1' 후속 session = ★ ★ ★ ★ v2.5.0 paradigm 본격 도입** (★ Layer 2 LLM mandatory 구현 + PoC #03 + PoC #05 dual representation 마이그레이션 + ≥ 2 PoC corroboration 확보 + threshold paradigm 본격 재정의 + chain 1 gate 통합 + v2.5.0 MINOR release)

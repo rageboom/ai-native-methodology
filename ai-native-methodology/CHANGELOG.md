@@ -9,7 +9,77 @@
 
 ---
 
-## [v2.4.0] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ MINOR release — BR dual representation paradigm 본격 도입 + br-cross-consistency-validator workspace 16번째 신설 + chain 1 gate REQUIRED_VALIDATORS_PER_STAGE 통합 + release-readiness §8.1 strict 7/7→8/8 격상 + 11 PoC 호환 회복 (PoC #01 + PoC #05 = VALID) / chain harness 5 요소 변경 ❌)
+## [v2.4.0 carry update — session 9차 SESSION-WRAPUP] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단 + ADR-CHAIN-011 §5.4 patch v2 + SPIKE v2 자산화)
+
+> ★ ★ ★ ★ ★ ★ ★ ★ **session 9차 SESSION-WRAPUP** — ★ ★ session 8차 신규 carry C-threshold-spike-revisit (★ critical) 즉시 흡수. 4원칙 1단계 plan + 2단계 sub-agent 3 병렬 토론 (Agent 1 공식문서 + Agent 2 빅테크 + Agent 3 Senior critique) + 3단계 사용자 결단 + 4단계 시행 (SPIKE v1 재측정 + SPIKE v2 REVISE-6 + ADR §5.4 patch v2 + DEC 신설). ★ ★ ★ Senior STOP signal 3건 흡수 강도 분리 (STOP-1 단일 PoC §8.1 strict 위반 전면 흡수 / STOP-2 v2.4.0 라벨 강등 soft 흡수 = 라벨 보존 + carry 명시 / STOP-3 Layer 1 단독 = Adzic 폐기 함정 재현 전면 흡수).
+
+### ★ ★ ★ ★ ★ ★ ★ session 9차 핵심 발견
+
+**★ ★ ★ ★ ★ ★ ★ ★ 결정적 실측 자료**:
+
+```
+PoC #01 13 BR overlap 분포 (★ description alias 적용 후 / session 9차 SPIKE v1 재측정):
+  min=0.000 p25=0.083 p50=0.162 p75=0.300 p90=0.381 max=0.462 / mean=0.201 / stddev=0.134
+
+  ≥0.85: 0/13 (0%)   ★ ★ ★ ★ ★ ★ ★ hypothesis DEAD (empirical 정면 부정 결정적 사실)
+  ≥0.5:  0/13 (0%)
+  ≥0.3:  4/13 (31%)
+
+SPIKE v2 (REVISE-6 rationale 제거 후 재측정 / 가설 B 검증):
+  원본 mean=0.201 → stripped mean=0.173 → mean delta = -0.028 (★ 오히려 감소)
+  → ★ ★ ★ ★ ★ ★ 가설 B 정면 부정 (data quality 차이 ❌ 본질 / semantic 차이 본질)
+```
+
+### ★ ★ ★ ★ ★ ★ paradigm 결단 (★ ADR-CHAIN-011 §5.4 patch v2)
+
+- ★ ★ ★ ★ ★ ★ **≥0.85 hypothesis 정면 폐기** (★ session 8차 SPIKE v1 + session 9차 SPIKE v1 재측정 + SPIKE v2 + 3 agent 일치 corroboration)
+- ★ ★ ★ ★ ★ ★ **Layer 2 LLM 의무 격상 paradigm 채택** (★ chain 1 gate mandatory / threshold ≥ 0.7 MDPI 2025 paraphrase optimal 정합 / F-015 cross-validation 패턴 / Static Tool 시뮬레이션 금지 정합)
+- ★ ★ ★ **Layer 1 결정적 = "structural sanity check" 격하** (★ 두 표현 boolean + id 4토막 + structure 위치 / keyword threshold ≥ 0.15 floor advisory)
+- ★ ★ ★ ★ ★ **≥ 2 PoC corroboration carry** (★ Senior STOP-1 흡수 / PoC #03 + #05 dual representation 적용 후 v2.5.0)
+- ★ ★ ★ **v2.4.0 MINOR FINAL 라벨 soft 보존** (★ Senior STOP-2 / 라벨 강등 ❌ / carry 명시 ✅ / downstream 영향 회피)
+
+### ★ ★ ★ session 9차 산출 5종
+
+- ★ ★ ★ `tools/br-cross-consistency-validator/SPIKE-2026-05-13-v2-rationale-strip.md` (★ SPIKE v2 report 자산화)
+- ★ `tools/br-cross-consistency-validator/scripts/spike-v2-rationale-strip.mjs` (★ SPIKE v2 시행 script)
+- ★ ★ `decisions/DEC-2026-05-13-threshold-spike-revisit-paradigm.md` (★ DEC 신설)
+- ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §5.4 patch v2 + §7.3 carry + §9 LL-i-28 + §10 version handling + §11 후속 (★ session 9차 갱신)
+- ★ `~/.claude/plans/o-threshold-spike-revisit.md` (★ 4원칙 1단계 plan / 9 절 / 가설 3 + 결단 Q1~Q5)
+
+### ★ ★ session 9차 resolved + 신규 carry
+
+**resolved (1)**:
+- ★ ★ ★ C-threshold-spike-revisit (★ session 8차 critical carry) → ★ ★ resolved (★ session 9차 SPIKE v1 재측정 + SPIKE v2 + Layer 2 LLM 의무 paradigm 결단 / implementation carry = C-layer-2-llm-mandatory-paradigm 흡수)
+
+**신규 carry (4)**:
+- ★ ★ ★ ★ **C-layer-2-llm-mandatory-paradigm** (★ critical / v2.5.0 — Layer 2 LLM placeholder → mandatory / ≥ 0.7 / F-015 / no-simulation 정합 / ≥ 2 PoC corroboration 의무)
+- ★ ★ ★ ★ ★ **C-poc-03-05-dual-representation** (★ ★ critical / Senior STOP-1 흡수 / ≥ 2 PoC corroboration 의무 / v2.5.0 의무)
+- ★ ★ **C-keyword-threshold-degrade** (★ medium / Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하 / v2.5.0)
+- ★ ★ **C-description-vs-nl-paradigm-define** (★ v2.5.0 paradigm 결단 / Q2 의 a/b/c — 3 agent 충돌 영역)
+
+### ★ ★ Lessons Learned 신규 3건
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-28** (★ "keyword overlap = structural sanity check / Adzic 폐기 회피 도구 자격 ❌ / Layer 2 LLM 의무 격상" / SPIKE v1+v2 + 3 agent 일치 corroboration)
+- ★ ★ ★ ★ **LL-i-29** (★ "Senior critique STOP signal 강도 분리 흡수 paradigm — 사실 명확도 × 비용 2축 평가")
+- ★ ★ **LL-i-30** (★ "REVISE-6 가설 B 정면 부정 자체가 paradigm 결단 결정적 자료 / 가설 부정 = 다음 가설 강 corroboration")
+
+### chain harness 5 요소 변경 ❌ (★ ADR-CHAIN-001~005 정합)
+
+본 session 9차 = ★ paradigm 사상 결단 + ADR §5.4 patch v2 + DEC 신설 + 자산화 / ★ chain harness 5 요소 (chain-driver 5 요소) ★ 변경 ❌. ★ Layer 2 LLM mandatory 격상 = v2.5.0 sprint = chain harness 영역 신규 통합.
+
+### ★ ★ ★ ★ 다음 step (★ v2.5.0 paradigm 본격 도입)
+
+- ★ ★ ★ PoC #03 + PoC #05 dual representation 적용 → cross-validation 자료 ≥ 2 PoC corroboration 확보
+- ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (★ no-simulation 정책 정합 / 외부 LLM API 직접 호출)
+- ★ ★ description vs natural_language paradigm 재정의 (★ Q2 결단)
+- ★ ★ Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하
+- ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합
+- ★ ★ ★ release-readiness 8/8 → 9/9 재격상 검토 (Layer 2 통과 criterion 추가)
+- ★ ★ ★ v2.5.0 MINOR release
+
+---
+
+## [v2.4.0] — 2026-05-13 (★ ★ ★ ★ ★ ★ ★ MINOR release — BR dual representation paradigm 본격 도입 + br-cross-consistency-validator workspace 16번째 신설 + chain 1 gate REQUIRED_VALIDATORS_PER_STAGE 통합 + release-readiness §8.1 strict 7/7→8/8 격상 + 11 PoC 호환 회복 (PoC #01 + PoC #05 = VALID) / chain harness 5 요소 변경 ❌ — ★ ★ ★ ★ ★ session 9차 carry 명시 추가: "paradigm rc 도입 / threshold gate 결정 보류 / Layer 2 LLM 의무 carry / ≥ 2 PoC corroboration 의무 carry / v2.5.0 = paradigm 본격 도입")
 
 > **★ ★ ★ ★ ★ ★ ★ v2.4.0 MINOR FINAL release** — session 8차 + sub-plan §1 + §2 + §3 통합. 4원칙 2원칙 3 sub-agent 토론 (Agent 1 공식문서 + Agent 2 빅테크 + Agent 3 Senior critique) 시행 + Senior STOP signal 1 + REVISE 5 흡수. ★ ★ ★ ★ ★ Senior STOP signal — release-readiness 8/8 격상 자체 chain harness paradigm 재정의 가능성 → ★ ★ MINOR bump 부적격 가능성 보존 / ★ ★ ★ v2.5.0 분리 검토 carry. 단 release 진행 결단 (★ 사용자 의도 정합 / 호환 보존 + 기능 추가 + sub-rule 추가 자격).
 
