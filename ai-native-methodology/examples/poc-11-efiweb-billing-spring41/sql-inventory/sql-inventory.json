@@ -47,6 +47,22 @@
     "external_calls_count": 0,
     "dynamic_branch_count": 1,
     "self_recognized_count": 0,
+    "self_recognized_interpretation": {
+      "$comment": "★ ★ ★ Agent 1 F-015 cross-validation 흡수 (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화 / sub-rule v1.1.1 §AP-005 정합)",
+      "policy": "★ ★ SATD 0건 = ★ Modern OSS reference 정합 단순 결론 ❌",
+      "rationale": [
+        "★ single-case (PoC #11 한 모듈 / 일반화 ❌)",
+        "★ 작은 모듈 scope (257 Java + 77 sqlmap = 334 LOC / 잠재적 SATD 발현 모집단 ★ 작음)",
+        "★ ★ 신규 개발 잠복 기간 미경과 가능성 (★ arxiv 2601.06266 SATD median 잠복 204~492일 / billing 모듈 commit 이력 별도 검증 의무)",
+        "★ PoC #07 capital 다중책임 5509 LOC = 11 SATD vs 본 PoC = 0 = scale + 책임 효과 가능 (paradigm 단독 효과 분리 의무)"
+      ],
+      "valid_interpretations": [
+        "★ Spring 4.1 + iBATIS 2 paradigm + 작은 scope + 신규 개발 시점 합산 효과 SATD 발현 ↓ (★ valid)",
+        "★ Modern 패턴 정합 결론 = ★ ★ ★ premature (★ 검증 의무: commit 이력 SATD lifecycle + 다른 사내 billing-스케일 모듈 SATD count 비교)"
+      ],
+      "cross_link": "sub-rule `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §AP-005 (v1.1.1 명시)",
+      "resolved_carry": "C-poc-11-0-satd-해석-정정"
+    },
     "covered_in_this_poc": 6,
     "carry": 0,
     "coverage_ratio": "6/6 = 100% (★ 작은 scope / 전수 cover)"

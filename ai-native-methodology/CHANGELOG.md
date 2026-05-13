@@ -9,7 +9,94 @@
 
 ---
 
-## [v2.3.3] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH — R1' automation ceiling 본체 명문화 (3 layer 가치 명세 axis 분리) + sub-rule v1.1 → v1.1.1 PATCH (인용 정정 + 외부 권위 보강) / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+## [v2.3.4] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 2차 — Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ PATCH session 2차** — v2.3.3 PATCH (★ 같은 날 commit `6ab26b6` / origin push ✅) 직후 D + E 작은 carry 정리 session 안 진입. v2.3.x patch level (no new ADR / sub-rule patch + memory 갱신 + DEC 신설 / schema ❌). 사용자 결단 정합 — "v2.3.4 PATCH release (sub-rule v1.1.1 → v1.1.2)" (★ 4원칙 §3 사용자 명시 결단 우선 / cooling-off 영구 폐기 정합 / Agent 3 REVISE #2 정신만 흡수 = "최소 변경" + scope creep 회피).
+
+### 변경 사항 (v2.3.3 → v2.3.4)
+
+#### ★ ★ ★ DEC-2026-05-13-not-all-code-인용-복원 (★ Agent 1 F-015 finding 정정 + critical lesson)
+
+- **★ ★ trigger**: v2.3.3 Agent 1 F-015 cross-validation "arxiv 2601.21894 확인 불가" 단순 결단 → sub-rule v1.1 §X-C #5 인용 ★ 제거 + carry C-not-all-code-검증 신설
+- **★ ★ 메인 직접 검증 결과 (WebFetch + WebSearch)**:
+  - 제목: **"Not All Code Is Equal: A Data-Centric Study of Code Complexity and LLM Reasoning"**
+  - First author: **Lukas Twist** (+ Shu Yang / Hanqi Yan / Jingzhi Gong / Di Wang / Helen Yannakoudakis / Jie M. Zhang)
+  - arxiv: 2601.21894 / 2026-01-29 submission (★ ★ arxiv ID 정확)
+  - 핵심: structural complexity 가 LLM reasoning 에 dominant / 83% experiments restricting fine-tuning data to specific structural complexity range outperforms structurally diverse code
+- **★ ★ R1' "trivially deterministic 효과 = structural complexity 단순" 정합 ★ 강** — paradigm specific code 의 structural complexity 가 §3-A automation ceiling 영향 인자 정합
+
+#### ★ ★ sub-rule v1.1.1 → v1.1.2 PATCH (`spring41-ibatis2-isomorphic.md`)
+
+- **§X-C #7 신설** — Twist et al. 정확 인용 복원 + 핵심 finding 83% experiments + R1' 정합 강 + ★ critical lesson F-015 sub-agent 한계 cross-link
+- **§6 carry 표** — C-not-all-code-검증 ✅ resolved 표기 (취소선 + resolved 일자 + 본 DEC 명시)
+- **§7 참조** — "Not All Code Is Equal" 취소선 제거 + 정확 인용 복원 (Twist et al. 2026 + arxiv 2601.21894 / 2026-01-29 submission)
+- **frontmatter** — v1.1.1 → v1.1.2 (★ 3rd line 신규 추가)
+
+#### ★ ★ ★ critical lesson F-015 한계 명시 (memory `feedback_sub_agent_validation.md` v2.3.4 보강 절 추가)
+
+- ★ ★ F-015 한계 패턴 3건: (1) 가벼운 sub-agent + 시간 cap 10분 = WebFetch fail / fallback search 부정확 가능 / (2) "확인 불가" 단순 결단 = ★ ★ critical risk = 정확한 인용도 제거 위험 / (3) sub-agent 보고 그대로 본체 갱신 = ★ ★ critical 정합 위험
+- ★ ★ ★ 신규 적용 4 항목: (1) sub-agent negative 결단 발견 시 = ★ ★ 메인 WebFetch + WebSearch 즉시 cross-check 의무 / (2) 인용 제거 / carry 신설 결단 전 = ★ 메인 직접 검증 cycle 1회 의무 / (3) sub-agent fallback search "부재 정탐" 도 ★ 메인 cross-check 의무 / (4) sub-agent 결단 vs 메인 cross-check 차이 발견 = ★ critical lesson 등재 의무
+
+#### ★ ★ D 작업 종결 (PoC #11 satd 해석 정정 + cleanup)
+
+- `examples/poc-11-efiweb-billing-spring41/sql-inventory/sql-inventory.json` summary.self_recognized_interpretation 절 ★ 신설 — "Modern OSS reference 정합" 단순 결론 ❌ / single-case + 작은 모듈 + 잠복 기간 미경과 (arxiv 2601.06266 median 204~492일) 가능성 명시 / sub-rule §AP-005 cross-link
+- 빈 source 디렉토리 4 (java/jsp/sqlmap/message) + parent source/ 제거 (in-place read 정책 정합 / DEC-2026-05-12-in-place-read-정책-채택)
+
+#### ★ B 진입 plan 작성 (`~/.claude/plans/j-chain-2-4-풀가동.md`)
+
+- ★ ★ 본 plan = 4원칙 1원칙 산출만 / B 본격 진입 = 별도 multi-day session
+- 10절: 컨텍스트 + PoC 대상 결단 후보 5종 (A/B/C/D/E) + scope IN/OUT + release v2.4.0 MINOR 자격 + 4원칙 cycle + 위험 + §8.1 strict 정합 + 후속 carry + 참조
+- ★ ★ ★ ★ 추천 PoC: **(C) PoC #08 jpetstore-6** (Modern stack / test infra 보유 / OSS / 7~14d cap / chain harness validated 강 강화)
+
+#### DEC 갱신
+
+- DEC-2026-05-13-r1-prime-본체-명문화 §5.1 신규 carry C-not-all-code-검증 ✅ resolved 표기
+
+#### resolved carry 3
+
+- C-not-all-code-검증 (★ critical / 메인 cross-check)
+- C-poc-11-0-satd-해석-정정 (D 작업)
+- C-poc-11-source-디렉토리-cleanup (D 작업)
+
+#### 신규 carry 2
+
+- ★ ★ C-사내-chain-2-4 (★ critical / B sprint trigger / 사내 ROI axis / PoC #11 billing chain 2~4 별도 sprint)
+- ★ ★ C-egovframework-chain-2-4 (★ 사내 Spring 4.1 + iBATIS 2 + egov stack chain 2~4)
+
+#### 잔존 carry
+
+- ★ ★ C-모던-stack-사내-측정 (★ critical / Agent 3 REVISE #1 / 사내 Modern stack PoC)
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화)
+- C-domain-PoC11-1~3 (★ 결제 도메인 expert 위임)
+- C-PoC07-1~3 (★ chain 3 영역 retrofit / B sprint 안 자연 흡수 후보)
+- C-v2.2.0-1 (★ NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level (별도 sprint)
+
+#### Lessons Learned (★ ★ ★ critical 3건)
+
+- ★ LL-i-5 (★ critical): F-015 cross-validation 한계 (★ memory `feedback_sub_agent_validation.md` v2.3.4 보강 절 자산화)
+- ★ LL-i-6: 사용자 명시 결단 우선 (Agent 3 REVISE #2 정신만 흡수 / 형식 권고 ❌)
+- ★ LL-i-7: 같은 session 2차 = 자연 발견 burst 회피 (Agent 1 finding 정정 + 메인 cross-check 결과 = 의도 burst ❌)
+
+#### PATCH 자격 7/7 (★ §8.1 strict)
+
+- chain harness 5 요소 변경 ❌ (보존)
+- schema backward-compat 회귀 ❌ (schema 변경 ❌)
+- no new ADR (DEC 신설 1건 + 갱신 1건)
+- workspace unit test 보존 (schema ❌ + tool ❌)
+- §8.1 strict 7/7 expected (`--target v2.3.4`)
+- ≥ 6 PoC corroboration 보존 (Legacy 3 사내 + Modern 3 OSS)
+- build dist + CHECKSUMS OK expected
+
+#### Version Bump (3 source sync)
+
+- `.claude-plugin/plugin.json` 2.3.3 → 2.3.4
+- `package.json` 2.3.3 → 2.3.4
+- `scripts/version-check.js` 자동 verify
+
+---
+
+## [v2.3.3] — 2026-05-13 (★ ★ ★ ★ PATCH session 1차 — R1' automation ceiling 본체 명문화 (3 layer 가치 명세 axis 분리) + sub-rule v1.1 → v1.1.1 PATCH (인용 정정 + 외부 권위 보강) / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ PATCH** — v2.3.2 PATCH (2026-05-12 commit `ba3ed82` / sub-rule v1.0 → v1.1 minor) 후 잔존 carry **C-r1-prime-자격-Modern-corroboration** 흡수. v2.3.x patch level (no new ADR / 본문 보강 + sub-rule patch / schema 변경 ❌). 사용자 결단 정합 — DEC-2026-05-12-r1-가설-revisit §5 "본체 methodology 영향 = Day 3.5 종결 시 별도 결단 의무" 약속 종결.
 

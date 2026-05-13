@@ -3,14 +3,64 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **v2.3.3 PATCH release** — DEC-2026-05-13-r1-prime-본체-명문화 / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification / git tag v2.3.3 expected)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **v2.3.4 PATCH release** — DEC-2026-05-13-not-all-code-인용-복원 / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH / git tag v2.3.4 expected / ★ session 2차)
 
+**v2.3.3 PATCH release 보존** (★ ★ ★ ★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ 2026-05-13 / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
 
 ---
 
-★ ★ ★ ★ ★ ★ **본 session 2026-05-13 v2.3.3 PATCH release (★ R1' axis 본체 명문화)**:
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 2차 v2.3.4 PATCH release (★ Agent 1 F-015 finding 정정 + critical lesson)**:
+
+- ✅ **D 작업 종결** — PoC #11 satd 해석 정정 (`examples/poc-11-efiweb-billing-spring41/sql-inventory/sql-inventory.json` summary.self_recognized_interpretation 절 신설 / "Modern OSS reference 정합" 단순 결론 ❌ / single-case + 작은 모듈 + 잠복 기간 미경과 명시) + 빈 source 디렉토리 4 + parent 제거 (in-place read 정책 정합)
+- ✅ **E 작업 종결** — ★ ★ ★ 메인 WebFetch + WebSearch 직접 검증 = arxiv 2601.21894 정확 사실 확보 (★ Twist et al. 2026 "Not All Code Is Equal: A Data-Centric Study of Code Complexity and LLM Reasoning" / First author Lukas Twist / 2026-01-29 submission / 83% experiments structural complexity restrict outperforms)
+- ✅ **★ ★ DEC-2026-05-13-not-all-code-인용-복원 신설** — ★ Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 (메인 cross-check 의무) + sub-rule v1.1.1 → v1.1.2 PATCH trigger
+- ✅ **★ ★ sub-rule v1.1.1 → v1.1.2 PATCH** — Twist et al. 정확 인용 복원 (§X-C #7 신설 + §6 carry resolved + §7 참조 정확 인용 복원 + frontmatter v1.1.2 추가)
+- ✅ **★ ★ ★ memory `feedback_sub_agent_validation.md` v2.3.4 보강 절 추가** — F-015 한계 패턴 명시 + 적용 4 항목 (★ "확인 불가" 결단 시 메인 WebFetch + WebSearch 즉시 cross-check 의무)
+- ✅ **DEC-2026-05-13-r1-prime-본체-명문화 §5.1 갱신** — C-not-all-code-검증 ✅ resolved 표기
+- ✅ **★ B 진입 plan 작성** (4원칙 1원칙 / `~/.claude/plans/j-chain-2-4-풀가동.md` / 10절 / PoC 대상 결단 후보 5종 + 4 chain × stage 분해 + release v2.4.0 MINOR 자격)
+- ✅ **CHANGELOG + version bump** — v2.3.3 → v2.3.4 (plugin.json + package.json + scripts/version-check.js 3 source sync)
+- ✅ **build dist** — `scripts/build-plugin.js`
+- ✅ **회귀 unit test** — schema 변경 ❌ → 변동 ❌ expected
+- ✅ **release-readiness §8.1 strict 7/7** — `--target v2.3.4`
+- ✅ **git tag v2.3.4 + commit + origin push**
+
+### resolved by 본 session (★ session 2차)
+
+- ~~**C-not-all-code-검증**~~ ✅ resolved by DEC-2026-05-13-not-all-code-인용-복원 (★ ★ critical / 메인 cross-check)
+- ~~**C-poc-11-0-satd-해석-정정**~~ ✅ resolved (★ D 작업 / sql-inventory.json summary.self_recognized_interpretation 절 신설)
+- ~~**C-poc-11-source-디렉토리-cleanup**~~ ✅ resolved (★ D 작업 / 빈 디렉토리 4 + parent 제거)
+- DEC-2026-05-13-r1-prime-본체-명문화 §5.1 신규 carry 1건 ✅ resolved 갱신
+
+### 신규 carry (★ ★ v2.3.4 PATCH 후)
+
+- ★ ★ **C-사내-chain-2-4** (★ critical / B plan §8 / 사내 ROI axis / PoC #11 billing chain 2~4 별도 sprint / B 종결 후 자격 트리거)
+- ★ ★ **C-egovframework-chain-2-4** (★ 사내 Spring 4.1 + iBATIS 2 + egov stack chain 2~4 / B plan §8)
+
+### 보존 carry (★ 본 작업 후)
+
+- ★ ★ C-모던-stack-사내-측정 (★ critical / Agent 3 REVISE #1 / 사내 Modern stack PoC 진입 시 ceiling 재측정 의무)
+- C-egovframework-sub-rule (★ Modern stack sub-rule 본격 자산화)
+- C-domain-PoC11-1~3 (★ 결제 도메인 expert 위임)
+- C-PoC07-1~3 (★ chain 3 영역 retrofit / B sprint 안 자연 흡수 후보)
+- C-v2.2.0-1 (★ NoSQL/Prisma v3.0)
+- C-v2.3.0-gartner-time-application-level (별도 sprint)
+
+### ★ ★ 4원칙 Lessons Learned (본 session 2차 신규)
+
+- ★ LL-i-5 (★ critical / DEC-2026-05-13-not-all-code-인용-복원 §8): F-015 cross-validation 한계 — 가벼운 sub-agent + 시간 cap 10분 = WebFetch fail / "확인 불가" 단순 결단 = ★ ★ critical risk → ★ ★ 메인 cross-check 의무 (memory `feedback_sub_agent_validation.md` 갱신)
+- ★ LL-i-6: 사용자 명시 결단 우선 (Agent 3 REVISE #2 결단 burst 정신 vs 사용자 명시) — Agent 정신만 흡수 (★ "최소 변경" + scope creep 회피) / 형식 권고 (24h cooling) ❌
+- ★ LL-i-7: 같은 session 2차 = 자연 발견 burst 회피 (Agent 1 finding 정정 + 메인 cross-check 결과 → 의도 burst ❌ / Agent 3 정신 정합)
+
+### ★ ★ ★ 다음 step
+
+- ★ ★ ★ B 본격 진입 = ★ ★ 별도 multi-day session (★ 4원칙 2원칙 research + 3원칙 사용자 결단 PoC 대상 / PoC #08 jpetstore-6 추천)
+- ★ B plan `~/.claude/plans/j-chain-2-4-풀가동.md` 안 모든 결단 후보 명시
+
+---
+
+★ ★ ★ ★ ★ ★ **본 session 2026-05-13 session 1차 v2.3.3 PATCH release (★ R1' axis 본체 명문화)**:
 
 - ✅ **4원칙 1원칙** — plan 자산화 (`~/.claude/plans/i-r1-prime-ceiling-본체.md` / 10절 / scope IN 13항)
 - ✅ **4원칙 2원칙** — research 자산화 (`~/.claude/plans/i-r1-prime-research.md` / 3 sub-agent 병렬 / 가벼운 sub-agent 전략 / 시간 cap 10분/agent / 실측 ~76~80초/agent)

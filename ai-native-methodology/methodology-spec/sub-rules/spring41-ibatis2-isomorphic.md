@@ -2,11 +2,12 @@
 
 > ★ ★ ★ v2.3.0 Phase 2 신설 (v1.0) → ★ ★ ★ ★ v1.1 갱신 (2026-05-12 / DEC-2026-05-12-sub-rule-v1.1-갱신) — PoC #11 (billing / 작은 단일책임) corroboration #3 추가 + KL-SATD 인용 정정 + §X automation ceiling R1' 신설.
 > ★ ★ **v1.1.1 PATCH** (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화) — Agent 1 F-015 cross-validation 인용 정정 3건 (Zhang → **Wang et al.** / LongCodeBench **2025** (2026 ❌) / "Not All Code Is Equal" 검증 carry 분리) + Agent 2 외부 권위 보강 (AWS SCT + Amazon Q + ThoughtWorks isomorphic corroboration 3건) + §X-C-2 신설.
+> ★ ★ **v1.1.2 PATCH** (2026-05-13 session 2차 / DEC-2026-05-13-not-all-code-인용-복원) — ★ Agent 1 finding "★ arxiv 2601.21894 검증 실패 가능성" ★ ★ **정정** (★ 메인 WebFetch + WebSearch 직접 검증 결과 = arxiv ID 정확 / Twist et al. 2026 / 2026-01-29 submission). ★ "Not All Code Is Equal" 인용 ★ **복원** + 저자명 정확 명시. C-not-all-code-검증 carry ✅ resolved. ★ ★ critical lesson F-015 sub-agent 한계 (★ WebFetch 직접 못 한 가능성 / fallback 메인 cross-check 의무).
 > **trigger**: Spring 4.x + iBATIS 2.x stack 분석 시 본 5종 우선 후보 AP.
 > **자격 (v1.1)**: ≥ 3 사내 PoC isomorphic (PoC #06 단일책임 + PoC #07 다중책임 + ★ PoC #11 작은 단일책임 spectrum) — ★ scale-cross 3 spectrum 충족 (v1.0 ≥ 2 PoC → v1.1 ≥ 3 사내 PoC 강화).
 > **schema 참조**: `schemas/antipatterns.schema.json` AP-* 정합.
 > **ADR**: ADR-CHAIN-010 (Spring 4.1 + iBATIS 2 spectrum sub-rule 정식 자산화 / v1.0 origin).
-> **version**: v1.1.1 (PATCH / 인용 정정 + 외부 권위 보강 / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌ / 본체 v2.3.3 PATCH 정합).
+> **version**: v1.1.2 (PATCH / Not All Code 인용 복원 + Agent 1 finding 정정 / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌ / 본체 v2.3.4 PATCH 정합).
 
 ---
 
@@ -138,7 +139,7 @@
 | ~~iBATIS 2 전용 dynamic 태그 sub-classification~~ | ~~v2.2.x patch / 사용자 finding~~ | ✅ **resolved 2026-05-12** (v2.3.1 PATCH commit `bc48477` / `dynamic_branch.tag_type` enum 26종) |
 | **★ ★ R1' automation ceiling 외부 권위 정량 비교 (★ v1.1 신규)** | Spring 4.1+iBATIS 2 specific academic 권위 출현 시 (★ 현재 ❌ / paradigm class 추상화 인용만 가능) | ⏳ open (★ Wang ICSE 2025 + LongCodeBench 2025 + AWS SCT + Amazon Q + ThoughtWorks 외부 권위 = paradigm 방향성 + scope 효과 + 자릿수 sanity 정합 / 정량 ceiling 53~55% = ★ ★ ★ original empirical finding (industry first) 유지) |
 | **★ ★ PoC #11 0 SATD 해석 정정 (★ v1.1 신규 carry)** | PoC #11 Day 3.5 종결 시 | ⏳ open (★ "Modern OSS reference 정합" 단순 결론 ❌ / single-case + 작은 모듈 + 잠복 기간 미경과 해석 명시 / `examples/poc-11-efiweb-billing-spring41/input/` + `sql-inventory.json` 갱신) |
-| **★ ★ C-not-all-code-검증 (★ v1.1.1 신규 carry)** | arxiv 2601.21894 "Not All Code Is Equal" 별도 검증 후 sub-rule §X-C 재인용 vs 영구 제거 | ⏳ open (★ Agent 1 F-015 cross-validation 결과 = 2601 prefix = 2026-01 / arxiv ID 정확 확인 불가 / v1.1.1 ★ 인용 제거 / 별도 sprint 검증) |
+| ~~**★ ★ C-not-all-code-검증 (★ v1.1.1 신규 carry)**~~ | arxiv 2601.21894 "Not All Code Is Equal" 별도 검증 후 sub-rule §X-C 재인용 vs 영구 제거 | ✅ **resolved 2026-05-13** (★ session 2차 / DEC-2026-05-13-not-all-code-인용-복원 / 메인 WebFetch + WebSearch 직접 검증 = arxiv ID 정확 / Twist et al. 2026 / 인용 ★ 복원 / sub-rule v1.1.1 → v1.1.2 PATCH / 본체 v2.3.4 PATCH) |
 | **★ ★ ★ Modern stack 사내 측정 carry (★ v1.1.1 신규 critical)** | 사내 Modern stack (MyBatis 3 / TypeORM / Spring Data JPA / Prisma) PoC 진입 시 | ⏳ open (★ ★ Modern ceiling ~60~67% = 3 OSS PoC 한정 / 사내 Modern 측정 ❌ — Agent 3 Senior critique REVISE #1 / 외부 인용자 "OSS-only" 한정 인지 의무 / 본체 가치 명세 명시 의무 cross-link CLAUDE.md + README + memory) |
 
 ---
@@ -199,7 +200,11 @@
 6. ★ **"Where Do LLMs Still Struggle?"** (arxiv 2511.04355 / 2025 / ★ v1.1.1 신규 보강 — Agent 1 추가 권위 후보)
    - code generation benchmark 한계 in-depth 분석 (R1' "ceiling 존재" 방향성 보강)
 
-(★ v1.1 인용 "Not All Code Is Equal" arxiv 2601.21894 = ★ Agent 1 F-015 cross-validation 검증 실패 가능성 (2601 prefix = 2026-01 / arxiv ID 정확 확인 carry) → ★ v1.1.1 ★ 인용 제거 / 별도 검증 후 인용 carry C-not-all-code-검증)
+7. ★ ★ ★ **Twist et al. "Not All Code Is Equal: A Data-Centric Study of Code Complexity and LLM Reasoning"** (arxiv 2601.21894 / 2026-01-29 submission / ★ ★ v1.1.2 인용 ★ 복원 — Agent 1 F-015 finding 정정 / 메인 WebFetch + WebSearch 직접 검증)
+   - First author = Lukas Twist (+ Shu Yang / Hanqi Yan / Jingzhi Gong / Di Wang / Helen Yannakoudakis / Jie M. Zhang)
+   - 핵심 finding: **structural complexity 가 LLM reasoning 에 dominant** / **83% experiments** restricting fine-tuning data to specific structural complexity range outperforms structurally diverse code
+   - ★ ★ R1' "trivially deterministic 효과 (작은 scope = structural complexity 단순)" 정합 ★ 강 — paradigm specific code 의 structural complexity 가 §3-A automation ceiling 영향 인자 정합
+   - ★ ★ ★ critical lesson — Agent 1 F-015 cross-validation (가벼운 sub-agent / 시간 cap 10분) 의 ★ ★ 한계: WebFetch 직접 검증 못 한 가능성 / "2601 prefix = 2026-01 / 확인 불가" 단순 결단 ❌ / ★ ★ fallback 메인 cross-check 의무 (memory `feedback_sub_agent_validation.md` 갱신 의무)
 
 ### X-D. ★ ★ original empirical finding 명시 (외부 권위 부재 영역)
 
@@ -287,4 +292,8 @@
 - ★ ★ **AWS Schema Conversion Tool** (★ v1.1.1 신규 추가 / Agent 2 isomorphic corroboration) — Stored Proc 76.8% / Functions 66.4% 자릿수 정합
 - ★ ★ **Amazon Q Developer Code Transformation** (★ v1.1.1 신규 추가 / Agent 2) — Novacomp 80% / 보험사 36% / paradigm 별 정량 ❌
 - ★ ★ ★ **ThoughtWorks Tech Radar Vol.32~34** (2025~2026.04 / ★ v1.1.1 신규 추가 / Agent 2) — "GenAI for forward engineering" + "Spec-driven development for legacy" / ★ ★ ★ chain harness 사상 isomorphic
-- ~~"Not All Code Is Equal" (arxiv 2601.21894)~~ — ★ v1.1.1 인용 ★ 제거 (Agent 1 F-015 cross-validation 검증 실패 가능성 / 별도 sprint carry C-not-all-code-검증)
+- ★ ★ ★ **Twist et al. "Not All Code Is Equal: A Data-Centric Study of Code Complexity and LLM Reasoning"** (arxiv 2601.21894 / 2026-01-29 submission / ★ ★ v1.1.2 인용 ★ 복원 — Agent 1 F-015 finding ★ ★ 정정 / 메인 WebFetch + WebSearch 직접 검증) — First author = Lukas Twist (+ Shu Yang / Hanqi Yan / Jingzhi Gong / Di Wang / Helen Yannakoudakis / Jie M. Zhang) / structural complexity 가 LLM reasoning 에 dominant / 83% experiments 정합
+
+### ★ ★ v1.1.2 PATCH 신규 (2026-05-13 session 2차 / DEC-2026-05-13-not-all-code-인용-복원)
+
+- ★ ★ ★ **DEC-2026-05-13-not-all-code-인용-복원** (★ v1.1.2 PATCH origin / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 명시)
