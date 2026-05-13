@@ -9,7 +9,76 @@
 
 ---
 
-## [v2.3.4] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 2차 — Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+## [v2.3.5] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ PATCH session 4차 — PoC #11 chain 2 4 UC 종결 / 첫 realworld 사내 PoC chain 2 실증 / characterization mode / 5 BHV + 12 AC + traceability partial / chain harness validated v2.3.5 강 강화 / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
+
+> **★ ★ ★ ★ PATCH session 4차** — v2.3.4 PATCH (같은 날 commit `e298bb4` / Agent 1 F-015 finding 정정) + session 3차 commit `d32a6aa` (chain 2 UC #1 partial 자산화) 직후 ★ "진행" 사용자 결단 흡수 → chain 2 UC #2 + UC #3 (★ critical) + UC #4 종결 + traceability partial + DEC v2.3.5 신설 + PATCH release. ★ Q1 결단 정합 ("chain 2 종결 후 PATCH v2.3.5" / MINOR v2.4.0 ❌ / Agent 3 STOP signal 6 정합 / sample ≠ realworld).
+
+### 변경 사항 (v2.3.4 → v2.3.5)
+
+#### ★ ★ ★ ★ DEC-2026-05-13-poc-11-chain-2-종결-v2.3.5 (★ chain 2 첫 realworld 사내 PoC 실증)
+
+- **★ ★ 4 UC 종결 사실**:
+  - UC-BILLING-001 (화면 진입) + UC-BILLING-002 (12 row 조회) + UC-BILLING-003 (★ critical saveDataConfirm + ERP skip) + UC-BILLING-004 (Qlik View)
+  - 5 BHV: BHV-BILLING-001~005 (UC #1×1 + UC #2×1 + UC #3×2 + UC #4×1)
+  - 12 AC: AC-BILLING-001~012 (must×8 + should×4)
+- **★ ★ ★ ★ critical AC-BILLING-008** (BHV-BILLING-003 / UC-BILLING-003) — ★ ★ "★ 4 SQL 중 3 번째 fail 시 ★ ★ 부분 commit" assertion = ★ ★ ★ TDD intent 정면 위배 정합 / characterization mode 핵심 / 새 시스템 invariant assertion (★ @Transactional(rollbackFor=Exception.class) 의무 / carry C-stack-결단-chain-3-4-plan cross-link)
+- **★ ★ characterization mode 정합** (Q3 결단 (b)) — Michael Feathers 2004 *Working Effectively with Legacy Code* 정합 / 12 AC 모두 `@characterization-mode` tag
+
+#### ★ ★ chain 2 산출 5 file (`examples/poc-11-efiweb-billing-spring41/.aimd/output/`)
+
+- `behavior-spec.json` (★ 5 BHV / schema strict ✅ / characterization mode invariants 명시)
+- `behavior-spec.md` (★ 두 렌더링 / 핵심 결단 정합 + schema mismatch carry 명시)
+- `acceptance-criteria.json` (★ 12 AC / Gherkin BDD / MoSCoW / verifiable=true + test_case_refs TC-* placeholder / schema strict ✅)
+- `acceptance-criteria.md` (★ Gherkin .feature 렌더 / Better Gherkin 사상 정합 / 12 AC 매핑 표)
+- `traceability-matrix.json` (★ 12 entry / status=yellow / forward+backward coverage 0.4 / by_chain_stage chain_1+2 = 1.0 / chain_3+4 = 0 / schema strict ✅)
+
+#### chain 2 gate #2 통과 자격
+
+- chain-coverage-validator: **0 findings + uc_to_bhv = 1.0 + bhv_to_ac = 1.0** ✅
+- planning-extraction-validator: 0 findings + use_case coverage = 1.0 ✅
+- schema-validator: behavior-spec ✅ + acceptance-criteria ✅ + traceability-matrix ✅
+
+#### ★ ★ ★ Agent 3 Senior critique 흡수 정합 보존 (★ session 3차)
+
+- ✅ STOP 5 (cycle feasibility) + ✅ STOP 6 (v2.4.0 자격 부재 / sample ≠ realworld) + ✅ REVISE 1+2+3+4+7
+
+#### resolved carry 2
+
+- C-PoC-11-chain-2-PATCH-v2.3.5-trigger (★ chain 2 종결 후 PATCH 자격 활성)
+- C-chain-2-UC-2-3-4-진입 (UC #2~#4 chain 2 자산화 종결)
+
+#### 보존 carry
+
+- ★ ★ ★ C-stack-결단-chain-3-4-plan (★ critical / chain 3+4 진입 전 4원칙 1원칙 재실행 의무)
+- ★ ★ C-OSS-Modern-chain-2-4-PoC08 (★ critical / ≥ 2 realworld PoC 자격 trigger / v2.4.0 MINOR 자격 활성)
+- ★ ★ C-모던-stack-사내-측정 (★ critical)
+- ★ C-schema-br-pattern-fix (★ chain 2 발견)
+- 그 외 (C-egovframework-sub-rule + C-domain-PoC11-1~3 + C-PoC07-1~3 + C-v2.2.0-1 + C-v2.3.0-gartner)
+
+#### ★ ★ ★ chain harness validated v2.3.5 강 강화
+
+- ★ ★ ★ **chain 2 영역 첫 realworld 사내 PoC 실증** (★ PoC #05 sample chain 2 + 본 PoC #11 realworld chain 2 = 1 sample + 1 realworld)
+- ★ ★ ≥ 2 realworld PoC 자격 trigger = ★ ★ ★ ★ **C-OSS-Modern-chain-2-4-PoC08** (PoC #08 jpetstore-6 chain 2~4 후속 sprint) → v2.4.0 MINOR 자격 활성 expected
+
+#### Lessons Learned 3건 신규
+
+- LL-i-11: chain 2 4 UC 종결 = chain harness validated 강 강화 자격 / chain 2 = paradigm-agnostic 정합 사실 (Legacy stack 정합 가능)
+- LL-i-12: ★ ★ ★ AC-BILLING-008 = TDD intent 정면 위배 + characterization mode 자산화 의무 (Michael Feathers 2004 정합)
+- LL-i-13: schema pattern mismatch 발견 = PoC #11 chain 2 가치 (C-schema-br-pattern-fix carry)
+
+#### PATCH v2.3.5 자격 7/7 (★ §8.1 strict)
+
+- chain harness 5 요소 변경 ❌ / schema 변경 ❌ / no new ADR / unit test 보존 / §8.1 strict 7/7 expected / ≥ 6 PoC 보존 + chain 2 realworld 강화 / build + CHECKSUMS OK
+
+#### Version Bump (3 source sync)
+
+- `.claude-plugin/plugin.json` 2.3.4 → 2.3.5
+- `package.json` 2.3.4 → 2.3.5
+- `scripts/version-check.js` 자동 verify
+
+---
+
+## [v2.3.4] — 2026-05-13 (★ ★ ★ ★ PATCH session 2차 — Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH / no new ADR / schema 변경 ❌ / chain harness 5 요소 변경 ❌)
 
 > **★ ★ ★ ★ PATCH session 2차** — v2.3.3 PATCH (★ 같은 날 commit `6ab26b6` / origin push ✅) 직후 D + E 작은 carry 정리 session 안 진입. v2.3.x patch level (no new ADR / sub-rule patch + memory 갱신 + DEC 신설 / schema ❌). 사용자 결단 정합 — "v2.3.4 PATCH release (sub-rule v1.1.1 → v1.1.2)" (★ 4원칙 §3 사용자 명시 결단 우선 / cooling-off 영구 폐기 정합 / Agent 3 REVISE #2 정신만 흡수 = "최소 변경" + scope creep 회피).
 

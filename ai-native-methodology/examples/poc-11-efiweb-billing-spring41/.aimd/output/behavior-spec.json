@@ -1,17 +1,18 @@
 {
   "meta": {
-    "generated_at": "2026-05-13T22:00:00Z",
-    "methodology_version": "v2.3.4",
+    "generated_at": "2026-05-13T22:30:00Z",
+    "methodology_version": "v2.3.5",
     "inputs_used": ["source_code", "domain_context_md", "design_specs"],
-    "confidence": 0.85,
+    "confidence": 0.83,
     "formula_version": "v1",
     "confidence_breakdown": {
-      "behaviors_uc_mapping": { "confidence": 0.90, "note": "UC #1 1:1 BHV 매핑 / 자동 추출 정확 (planning-spec.json 4 UC 명확)" },
-      "br_alignment": { "confidence": 0.85, "note": "BR-BILLING-005 + BR-BILLING-006 description+invariants 매핑 / br_refs schema pattern 미정합 (rules.json 형식 vs schema 불일치 carry 신설)" },
-      "preconditions_postconditions": { "confidence": 0.85, "note": "source-grounded evidence (BillingController + JSP) 정확 / 결제 도메인 expert carry C-domain-PoC11-1+2 잔존" },
-      "invariants_characterization_mode": { "confidence": 0.80, "note": "★ ★ characterization mode 결단 (b) 정합 / Michael Feathers 2004 정합 / 단 TDD intent 위배 정합 명시" }
+      "behaviors_uc_mapping": { "confidence": 0.90, "note": "4 UC × 5 BHV 매핑 / UC #3 = ★ critical / 2 BHV (atomicity + skip) 분리" },
+      "br_alignment": { "confidence": 0.85, "note": "8 BR 매핑 (intent 6 + likely_bug 1 + ambiguous 1) / br_refs schema pattern 미정합 (★ C-schema-br-pattern-fix carry)" },
+      "preconditions_postconditions": { "confidence": 0.85, "note": "source-grounded evidence (BillingController + Service + DAO + JSP + sqlmap) 정확" },
+      "invariants_characterization_mode": { "confidence": 0.78, "note": "★ ★ ★ characterization mode 결단 (b) 정합 / UC #3 BHV-BILLING-003 = ★ ★ ★ critical atomicity Legacy bug 보존 = TDD intent 정면 위배 정합 (Michael Feathers 2004)" },
+      "ap_isomorphic_alignment": { "confidence": 0.82, "note": "13 AP 안 critical 4 (★ AP-001 @Transactional + AP-005 SQL Server 종속 + AP-006 cross-DB + AP-011 COM_NO==2) 모두 BHV invariants 매핑" }
     },
-    "$comment": "★ ★ PoC #11 chain 2 UC #1 한정 (UC-BILLING-001 / 데이터 확정처리 화면 진입). ★ ★ ★ characterization mode 명시 (사용자 결단 Q3 = (b) / 현 behavior 보존 / bug fix ❌). BR-BILLING-005 (시작년도 2015) + BR-BILLING-006 (★ ambiguous COM_NO==2) = ★ as-is 보존 invariants 명시. ★ Agent 3 Senior critique signal 3+4 흡수 / scope UC #1 만 / multi-day cap 의 1 session. vs PoC #11 chain 1 confidence 0.82 + behavior_uc_mapping 자동 ↑ (0.90)."
+    "$comment": "★ ★ ★ ★ PoC #11 chain 2 4 UC 모두 종결 (★ B sprint session 3차 + 4차 통합 / chain 2 partial → full / Q1 결단 정합 = 4 UC 모두 종결 후 PATCH v2.3.5). 5 BHV + 12 AC / characterization mode 명시 / Agent 3 Senior critique 흡수 정합."
   },
   "derivation_source": {
     "planning_spec_path": ".aimd/output/planning-spec.json",
@@ -21,7 +22,10 @@
       "input/antipatterns.json",
       "input/inventory.json",
       "sql-inventory/sql-inventory.json",
-      "characterization/snapshots/UC-BILLING-001-dataConfirm.json"
+      "characterization/snapshots/UC-BILLING-001-dataConfirm.json",
+      "characterization/snapshots/UC-BILLING-002-dataConfirmListAjax.json",
+      "characterization/snapshots/UC-BILLING-003-dataConfirmProcAjax.json",
+      "characterization/snapshots/UC-BILLING-004-qlikView.json"
     ]
   },
   "behaviors": [
@@ -44,10 +48,10 @@
         "JSP dataConfirm.jsp 렌더 (HTTP 200)"
       ],
       "invariants": [
-        "★ ★ characterization mode invariant — BR-BILLING-005 시작년도 2015 = ★ as-is 보존 (★ 사용자 결단 Q3 = (b) / 결제 도메인 expert 결단 carry C-domain-PoC11-2 = chain 4 GREEN test 시 bug 보존 의무)",
-        "★ ★ characterization mode invariant — BR-BILLING-006 COM_NO==2 hardcoded filter = ★ as-is 보존 (★ 사용자 결단 Q3 = (b) / 결제 도메인 expert 결단 carry C-domain-PoC11-1 = chain 4 GREEN test 시 bug 보존 의무 / TDD intent 정면 위배 정합)",
+        "★ ★ characterization mode invariant — BR-BILLING-005 시작년도 2015 = ★ as-is 보존",
+        "★ ★ characterization mode invariant — BR-BILLING-006 COM_NO==2 hardcoded filter = ★ as-is 보존 (★ TDD intent 정면 위배 정합 / 결제 도메인 expert carry C-domain-PoC11-1)",
         "year select option order = ASC (시간순)",
-        "★ ★ 새 시스템 마이그레이션 시 = ★ invariants 정정 의무 (★ chain 3+4 stack 결단 plan carry C-stack-결단-chain-3-4-plan)"
+        "★ ★ 새 시스템 마이그레이션 시 = ★ invariants 정정 의무 (C-stack-결단-chain-3-4-plan)"
       ],
       "property_tests": [],
       "acceptance_criteria_refs": [
@@ -60,6 +64,144 @@
         "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/web/BillingController.java:48-62 (dataConfirm method)",
         "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/dataConfirm.jsp:159 (currYear-2015 / year select)",
         "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/dataConfirm.jsp:169 (COM_NO==2 hardcoded / 법인 select)"
+      ]
+    },
+    {
+      "id": "BHV-BILLING-002",
+      "name": "데이터 확정 목록 조회 (12개월 강제 + cross-DB JOIN + window function)",
+      "description": "★ ★ characterization mode (★ T-SQL paradigm + cross-DB FQCN as-is 보존). 회계 운영자가 year + comNo 기반 데이터 확정 목록 조회 시, 시스템은 (1) recursive CTE (WITH MONTH_INFO) 로 12개월 row 강제 생성 + (2) LEFT OUTER JOIN TB_SGMA_CONFIRM_HIS (자체 DB) + (3) ★ cross-DB LEFT OUTER JOIN FIM.dbo.TB_USER (★ AP-BILLING-006) + (4) ROW_NUMBER/COUNT OVER window function + UDF dbo.FN_GET_MONTH (★ AP-BILLING-005 SQL Server vendor 종속) + (5) JSON 응답.",
+      "use_case_refs": ["UC-BILLING-002"],
+      "br_refs": [],
+      "preconditions": [
+        "year (필수) + comNo (필수) + comNm (필수) 파라미터 존재",
+        "★ FIM.dbo.TB_USER cross-DB 접근 가능 (★ AP-BILLING-006 invariant)",
+        "★ dbo.FN_GET_MONTH UDF + SCOPE_IDENTITY 등 T-SQL 함수 사용 가능 (★ AP-BILLING-005 invariant)",
+        "★ session 인증 완료"
+      ],
+      "postconditions": [
+        "★ 12 row 응답 (★ BR-BILLING-001 / 데이터 0 row 시도 12 강제 / recursive CTE 결과)",
+        "★ JSON array 형식: [{YEAR, MONTH, COM_NO, COMPANYSEQ, PROC_ID, USER_NM, PROC_DT, ROW_NUM, ROW_COUNT}, ...]",
+        "★ ERP 결과 부재 월 (★ TB_SGMA_CONFIRM_HIS 없음) = PROC_ID/USER_NM/PROC_DT null (★ LEFT OUTER JOIN)",
+        "★ ROW_NUM 1~12 + ROW_COUNT 12 (★ window function 결과)"
+      ],
+      "invariants": [
+        "★ ★ characterization mode invariant — recursive CTE 12개월 강제 = ★ as-is (★ BR-BILLING-001 / AP-BILLING-007 / T-SQL recursive CTE 종속)",
+        "★ ★ characterization mode invariant — cross-DB FQCN FIM.dbo.TB_USER hardcoded = ★ as-is 보존 (★ AP-BILLING-006 / 새 시스템 = dataSource 분리 의무 invariant)",
+        "★ ★ characterization mode invariant — dbo.FN_GET_MONTH UDF + SCOPE_IDENTITY = ★ as-is (★ AP-BILLING-005 / 새 시스템 = JVM logic + RETURNING 의무 invariant)",
+        "12 row 출력 순서 = 1월~12월 ASC"
+      ],
+      "property_tests": [],
+      "acceptance_criteria_refs": [
+        "AC-BILLING-004",
+        "AC-BILLING-005",
+        "AC-BILLING-006"
+      ],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-002-dataConfirmListAjax.json",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/web/BillingController.java:72-82 (dataConfirmListAjax)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml:8-29 (selectDataConfirmList)"
+      ]
+    },
+    {
+      "id": "BHV-BILLING-003",
+      "name": "★ ★ ★ critical — 데이터 확정 처리 (★ ★ ★ atomicity / saveDataConfirm 4 SQL 비트랜잭션 Legacy bug 보존)",
+      "description": "★ ★ ★ ★ critical characterization mode (★ ★ ★ Legacy bug 보존 / TDD intent 정면 위배 정합 / Michael Feathers 2004 정합). 회계 운영자가 distYear + distMonth + companySeq 기반 데이터 확정 처리 시, 시스템은 (1) pre-check selectConfirmDataCount (★ ERP TB_RG_RESULTS row count) + (2) count > 0 시 4 SQL 순차 호출 (deleteConfirmData + insertConfirmData + insertConfirmHistory + insertConfirmHistoryData) + (3) ★ ★ ★ **@Transactional ❌** (★ AP-BILLING-001 critical bug / 부분 commit 위험). ★ ★ ★ characterization mode = ★ ★ Legacy 비트랜잭션 as-is 보존 (★ ★ AC-BILLING-008 = 부분 fail 시 부분 commit assertion 의무 = TDD intent 정면 위배).",
+      "use_case_refs": ["UC-BILLING-003"],
+      "br_refs": [],
+      "preconditions": [
+        "distYear + distMonth + companySeq 파라미터 존재",
+        "session EKP_USER_ID 존재",
+        "★ ★ ★ SGERPMA.dbo.TB_RG_RESULTS cross-DB 접근 가능 (★ AP-BILLING-006 invariant)",
+        "★ SCOPE_IDENTITY 사용 가능 (★ AP-BILLING-005 / BR-BILLING-007)"
+      ],
+      "postconditions": [
+        "count > 0 시 4 SQL 순차 실행 (delete + insert + insertHistory + insertHistoryData)",
+        "★ TB_SGMA_CONFIRM = full overwrite (★ BR-BILLING-003 / delete + insert)",
+        "★ TB_SGMA_CONFIRM_HIS = audit history row 추가 (★ SCOPE_IDENTITY hisNo FK 자동 채움 / BR-BILLING-007)",
+        "★ TB_SGMA_CONFIRM_HIS_DATA = audit history detail row 추가 (★ hisNo FK 관계)",
+        "★ ★ ★ characterization mode = ★ 4 SQL 비트랜잭션 = 중간 fail 시 부분 commit 가능 (★ AP-BILLING-001 critical bug 보존)",
+        "★ count == 0 시 = skip + 다음 BHV-BILLING-004 (ERP 부재 skip + JSP alert)"
+      ],
+      "invariants": [
+        "★ ★ ★ ★ characterization mode invariant (★ ★ critical) — @Transactional ❌ saveDataConfirm = ★ Legacy bug as-is 보존 / 새 시스템 invariant = ★ ★ ★ @Transactional(rollbackFor=Exception.class) + try-catch 의무 (★ AP-BILLING-001 / BR-BILLING-002 likely_bug / migration_priority P0)",
+        "★ ★ characterization mode invariant — full overwrite (delete + insert) 패턴 = ★ as-is (★ BR-BILLING-003 / 새 시스템 = UPSERT 또는 partial update 대안 검토 carry)",
+        "★ ★ characterization mode invariant — cross-DB FQCN SGERPMA hardcoded = ★ as-is (★ AP-BILLING-006 / 새 시스템 = dataSource 분리 의무 invariant)",
+        "★ characterization mode invariant — DRY violation (4 SQL WHERE 절 동일 COMPANYSEQ + DIST_YEAR + DIST_MONTH) = ★ as-is (★ patterns_extension_v2 / 새 시스템 = <sql id> + <include refid> 의무 invariant)"
+      ],
+      "property_tests": [],
+      "acceptance_criteria_refs": [
+        "AC-BILLING-007",
+        "AC-BILLING-008",
+        "AC-BILLING-009",
+        "AC-BILLING-010"
+      ],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-003-dataConfirmProcAjax.json",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/web/BillingController.java:92-105 (dataConfirmProcAjax)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/service/impl/BillingServiceImpl.java:31-42 (saveDataConfirm / ★ @Transactional ❌)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml:31-75 (5 SQL)"
+      ]
+    },
+    {
+      "id": "BHV-BILLING-004",
+      "name": "데이터 확정 처리 — ERP 결과 부재 시 skip + JSP alert",
+      "description": "★ characterization mode. saveDataConfirm 호출 시 pre-check selectConfirmDataCount (★ SGERPMA.dbo.TB_RG_RESULTS COUNT) 결과 count == 0 인 경우, 시스템은 (1) 4 SQL 호출 skip + (2) JSP alert 메시지 응답 + (3) ★ no-op (DB 변경 ❌).",
+      "use_case_refs": ["UC-BILLING-003"],
+      "br_refs": [],
+      "preconditions": [
+        "distYear + distMonth + companySeq 파라미터 존재",
+        "★ SGERPMA.dbo.TB_RG_RESULTS WHERE COMPANYSEQ + DIST_MONTH 일치 row count == 0",
+        "session EKP_USER_ID 존재"
+      ],
+      "postconditions": [
+        "4 SQL (delete + insert + insertHistory + insertHistoryData) 호출 ❌ (skip)",
+        "TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA 변경 ❌ (no-op)",
+        "★ JSP alert 메시지 응답 (★ '해당 월 ERP 결과가 없습니다' 류 / BR-BILLING-004)"
+      ],
+      "invariants": [
+        "★ characterization mode invariant — pre-check skip 정책 = ★ as-is (★ BR-BILLING-004)",
+        "★ characterization mode invariant — cross-DB SGERPMA pre-check 의존 = ★ as-is (★ AP-BILLING-006 정합)",
+        "no-op idempotency = 동일 파라미터 N회 호출 시 동일 결과 (DB 변경 ❌)"
+      ],
+      "property_tests": [],
+      "acceptance_criteria_refs": [
+        "AC-BILLING-011"
+      ],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-003-dataConfirmProcAjax.json",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/service/impl/BillingServiceImpl.java:31-42 (saveDataConfirm pre-check)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/resources/egovframework/sqlmap/ifrs/billing.xml (selectConfirmDataCount)"
+      ]
+    },
+    {
+      "id": "BHV-BILLING-005",
+      "name": "Qlik Sense 외부 BI dashboard 임베드 (URL hardcoded as-is 보존)",
+      "description": "★ characterization mode (★ URL hardcoded as-is 보존 / 새 시스템 = 환경 변수 의무 invariant). 회계 운영자가 menuNm + appid + sheet 파라미터로 Qlik View 화면 진입 시, 시스템은 (1) ModelAndView wrapper 로 파라미터 전달 + (2) JSP qlikView.jsp 렌더 + (3) iframe src = datacafe.smilegate.net/sense/app/{appid}/sheet/{sheet}/state/analysis (★ AP-BILLING-013 URL hardcoded).",
+      "use_case_refs": ["UC-BILLING-004"],
+      "br_refs": [],
+      "preconditions": [
+        "menuNm + appid + sheet 파라미터 존재",
+        "session 인증 완료",
+        "★ 외부 BI Qlik Sense datacafe.smilegate.net 접근 가능"
+      ],
+      "postconditions": [
+        "menuNm + appid + sheet 모델 attribute 전달 (★ ModelAndView)",
+        "JSP qlikView.jsp 렌더 (HTTP 200)",
+        "★ iframe src = 'https://datacafe.smilegate.net/sense/app/' + {appid} + '/sheet/' + {sheet} + '/state/analysis' (★ AP-BILLING-013 / URL hardcoded as-is)"
+      ],
+      "invariants": [
+        "★ characterization mode invariant — Qlik Sense URL datacafe.smilegate.net hardcoded = ★ as-is 보존 (★ AP-BILLING-013 / 새 시스템 = 환경 변수 (예: ${qlik.base.url}) 의무 invariant)",
+        "★ characterization mode invariant — appid + sheet 메뉴별 분기 (BR-BILLING-008) = ★ as-is",
+        "iframe = X-Frame-Options 정합 (★ Qlik Sense 측 SAMEORIGIN/ALLOW-FROM 설정 의존)"
+      ],
+      "property_tests": [],
+      "acceptance_criteria_refs": [
+        "AC-BILLING-012"
+      ],
+      "source_grounded_evidence": [
+        "characterization/snapshots/UC-BILLING-004-qlikView.json",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/java/smilegate/ifrs/billing/web/BillingController.java:115-125 (qlikView)",
+        "[source absolute] /Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs/src/main/webapp/WEB-INF/jsp/billing/qlikView.jsp:17 (iframe src hardcoded)"
       ]
     }
   ],

@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ **session 3차 — B sprint chain 2 UC #1 partial 자산화** — k-plan + 3 sub-agent research + chain 2 UC #1 1 BHV + 3 AC + characterization mode + ★ ★ Agent 3 STOP signal 2 + REVISE 5 흡수 / ★ ★ release ❌ / no version bump / chain 2 자산화 commit 만)
+**기준일**: 2026-05-13 (★ ★ ★ ★ **session 4차 — v2.3.5 PATCH release — PoC #11 chain 2 4 UC 종결** — 5 BHV + 12 AC + traceability partial + characterization mode + DEC-2026-05-13-poc-11-chain-2-종결-v2.3.5 신설 + chain harness validated v2.3.5 강화 / ★ ★ ★ chain 2 첫 realworld 사내 PoC 실증)
+
+**v2.3.5 PATCH release** (★ session 4차 / commit pending / git tag v2.3.5 pending)
 
 **v2.3.4 PATCH release 보존** (★ session 2차 / 2026-05-13 / commit `e298bb4` / git tag `v2.3.4` / origin push ✅ / Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 + critical lesson F-015 한계 / sub-rule v1.1.1 → v1.1.2 PATCH)
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)

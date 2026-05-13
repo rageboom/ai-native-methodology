@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.3.4",
-  "description": "★ ★ ★ ★ v2.3.4 PATCH session 2차 — Agent 1 F-015 finding 정정 + arxiv 2601.21894 인용 복원 (★ 메인 WebFetch + WebSearch 직접 검증 / Twist et al. 2026 'Not All Code Is Equal: A Data-Centric Study of Code Complexity and LLM Reasoning' / First author Lukas Twist / 2026-01-29 submission / 83% experiments structural complexity restrict outperforms) + ★ ★ critical lesson F-015 sub-agent 한계 (memory feedback_sub_agent_validation.md v2.3.4 보강 절 추가 / 메인 cross-check 의무) + sub-rule `spring41-ibatis2-isomorphic.md` v1.1.1 → v1.1.2 PATCH + D 작업 종결 (PoC #11 satd 해석 정정 + 빈 source 디렉토리 cleanup) + B 진입 plan 작성 (j-chain-2-4-풀가동.md / multi-day 별도 session). DEC 신설 DEC-2026-05-13-not-all-code-인용-복원 + 갱신 DEC-2026-05-13-r1-prime-본체-명문화 §5.1 carry resolved. v2.3.3 PATCH (R1' axis 본체 명문화 / commit 6ab26b6) + v2.3.2 PATCH (sub-rule v1.0 → v1.1 minor) + v2.3.1 PATCH + v2.3.0 MINOR FINAL + v2.2.0 MINOR FINAL 모두 보존. chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌ / chain harness 5 요소 변경 ❌.",
+  "version": "2.3.5",
+  "description": "★ ★ ★ ★ v2.3.5 PATCH session 4차 — PoC #11 EFI-WEB billing chain 2 4 UC 종결 (★ chain 2 첫 realworld 사내 PoC 실증 / 5 BHV + 12 AC + traceability partial / characterization mode Michael Feathers 2004 정합 / AC-BILLING-008 critical TDD intent 정면 위배 정합) + chain harness validated v2.3.5 강화 (★ chain 2 영역 sample → realworld). DEC 신설 DEC-2026-05-13-poc-11-chain-2-종결-v2.3.5. ★ Agent 3 Senior critique STOP signal 6 흡수 (sample ≠ realworld / v2.4.0 MINOR ❌ / PATCH 자격 / ≥ 2 realworld 자격 trigger = C-OSS-Modern-chain-2-4-PoC08 carry). v2.3.4 PATCH (F-015 finding 정정) + v2.3.3 PATCH (R1' axis 본체 명문화) + v2.3.2 + v2.3.1 + v2.3.0 MINOR + v2.2.0 MINOR 모두 보존. chain harness validated 보존 / schema 변경 ❌ / ADR 신설 ❌ / chain harness 5 요소 변경 ❌.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"
