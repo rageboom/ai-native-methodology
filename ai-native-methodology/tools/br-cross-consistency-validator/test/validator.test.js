@@ -234,3 +234,54 @@ test('top-level 부재 (★ business_rules/rules 모두 없음) — total 0', ()
   const r = validateRulesDoc(doc);
   assert.equal(r.stats.total, 0);
 });
+
+// ★ ★ ★ v2.5.0 Phase A 신규 paradigm test (★ Q2 description vs natural_language 재정의 정합)
+
+test('★ v2.5.0 Phase A: description-only BR — description_only_fallback low finding (★ Phase B 마이그레이션 carry)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-LEGACY-DESC-001',
+    name: 'description-only fallback',
+    description: '★ v1.x legacy BR — natural_language 부재 / Phase B 마이그레이션 의무',
+  }]};
+  const r = validateRulesDoc(doc);
+  const fallback = r.findings.find(f => f.rule === 'description_only_fallback');
+  assert.ok(fallback, 'description_only_fallback finding 의무');
+  assert.equal(fallback.severity, 'low');
+  assert.equal(r.stats.with_description_only, 1);
+  assert.equal(r.stats.with_natural_language, 0); // ★ description ≠ NL alias (★ v2.5.0 paradigm)
+});
+
+test('★ v2.5.0 Phase A: description + GWT — cross-validation 미시행 (★ description 제외)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-DESC-GWT-001',
+    name: 'description with GWT (★ cross-validation 미시행)',
+    description: '★ description rationale 포함 — cross-validation 대상 ❌',
+    given: ['주문 상태가 결제완료'],
+    when: ['사용자가 취소 요청'],
+    then: ['환불 처리됨'],
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.with_natural_language, 0); // ★ description ≠ NL
+  assert.equal(r.stats.with_gwt, 1);
+  assert.equal(r.stats.with_both, 0); // ★ description + GWT ≠ both (★ NL 부재)
+  // ★ keyword_mismatch finding 부재 의무 (★ cross-validation 미시행)
+  assert.equal(r.findings.filter(f => f.rule === 'keyword_mismatch').length, 0);
+});
+
+test('★ v2.5.0 Phase A: NL + description + GWT — cross-validation = NL ↔ GWT only (★ description 제외)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-FULL-A-X-001',
+    name: 'NL + description + GWT 모두',
+    natural_language: '주문 상태가 결제완료일 때 사용자가 취소 요청하면 환불 처리됨',
+    description: '★ rationale + caveat 자유 metadata (DRIFT-XYZ 격상 / production SaaS 정합) — cross-validation 제외',
+    given: ['주문 상태가 결제완료'],
+    when: ['사용자가 취소 요청'],
+    then: ['환불 처리됨'],
+  }]};
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.with_natural_language, 1);
+  assert.equal(r.stats.with_gwt, 1);
+  assert.equal(r.stats.with_both, 1); // ★ NL + GWT = both (★ description 무관)
+  // ★ overlap 계산 = NL ↔ GWT only (★ description 제외)
+  assert.equal(r.overlap_distribution.count, 1);
+});

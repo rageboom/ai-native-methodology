@@ -141,11 +141,11 @@
               "required": ["given", "when", "then"]
             },
             {
-              "title": "natural_language 표현 (★ analysis stage 친화 / characterization mode 정합 / v2.x 발전)",
+              "title": "natural_language 표현 (★ ★ ★ v2.5.0 Phase A 권장 표준 / Layer 2 LLM cross-validation 대상 / characterization mode 정합)",
               "required": ["natural_language"]
             },
             {
-              "title": "description 표현 (★ v2.0 source-grounded 사상 alias — natural_language 로 마이그레이션 권장)",
+              "title": "description fallback (★ v2.5.0 Phase A — backward-compat / Phase B 마이그레이션 carry)",
               "required": ["description"]
             },
             {
@@ -155,7 +155,7 @@
           ]
         }
       ],
-      "description": "★ ★ ★ ★ v2.4.0 dual representation 사상 (ADR-CHAIN-011). BR 은 ≥ 1 표현 의무 (GWT / natural_language / description alias / trigger-condition-action 변형). 둘 이상 작성 시 br-cross-consistency-validator cross-validation 의무 (★ chain 1 진입 gate).",
+      "description": "★ ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3). BR 은 ≥ 1 표현 의무 (GWT / natural_language / description fallback / trigger-condition-action 변형). ★ ★ ★ cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외 / ★ description = optional metadata 격상 / Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM mandatory = v2.5.0 Phase C). ★ ★ paradigm 결단 근거 — session 9차 SPIKE v2 (REVISE-6 가설 B 정면 부정 / description 안 rationale/caveat 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement 사실 입증) + Agent 3 paradigm 정합.",
       "properties": {
         "id": {
           "type": "string",
@@ -172,11 +172,11 @@
         },
         "natural_language": {
           "type": "string",
-          "description": "★ ★ v2.4.0-rc1 신설 — BR 의 자유 자연어 묘사 (★ analysis stage 친화 / characterization mode 정합). given/when/then 와 함께 작성 시 cross-validation 의무. 예: '사용자 등록 시 이메일은 시스템 내 유일해야 함. 동일 이메일로 신규 등록 시도 시 409 Conflict 응답.'"
+          "description": "★ ★ ★ ★ v2.5.0 Phase A 권장 표준 — BR 의 ★ 'pure BR statement' (★ 1~2 문장 / GWT 동치 의미 / rationale/caveat 제외). ★ ★ cross-validation 대상 (★ Layer 2 LLM mandatory v2.5.0 Phase C). ★ Layer 1 keyword overlap = structural sanity check 격하 (★ ★ session 9차 SPIKE v2 결정적 사실 정합). 예: '사용자 등록 시 이메일은 시스템 내 유일해야 함. 동일 이메일로 신규 등록 시도 시 409 Conflict 응답.'"
         },
         "description": {
           "type": "string",
-          "description": "★ deprecated alias — `natural_language` 로 마이그레이션 권장 (PoC #01/#05/#06 사례 보존)."
+          "description": "★ ★ v2.5.0 Phase A paradigm 격상 — ★ optional metadata (★ BR statement + rationale + caveat + DRIFT 격상 자유 metadata / 사람 눈 친화 / characterization context 보존). ★ ★ ★ cross-validation 대상 ❌ (★ natural_language ↔ GWT only). v1.x deprecated alias 격하 ❌ → ★ ★ ★ optional metadata 격상. 신규 BR 작성 시 ★ natural_language 우선 / ★ description = 보조 metadata (★ session 9차 SPIKE v2 / ADR-CHAIN-011 §5 patch v3 정합)."
         },
         "category": {
           "type": "string",

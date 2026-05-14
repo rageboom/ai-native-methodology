@@ -8,32 +8,95 @@
     "extraction_env": "git_clone",
     "methodology_version": "v1.1.2",
     "formula_version": "v1",
-    "inputs_used": ["source_code", "orm", "config_files", "domain_context_md"],
+    "inputs_used": [
+      "source_code",
+      "orm",
+      "config_files",
+      "domain_context_md"
+    ],
     "applied_modifiers": [
-      {"name": "orm_full", "value": 0.10, "reason": "JPA 검증 + Service raw fetch"},
-      {"name": "config_files", "value": 0.05, "reason": "application.properties + JWTConfiguration raw fetch (5.C)"},
-      {"name": "domain_context_md", "value": 0.03, "reason": "inputs/domain-context.md"}
+      {
+        "name": "orm_full",
+        "value": 0.1,
+        "reason": "JPA 검증 + Service raw fetch"
+      },
+      {
+        "name": "config_files",
+        "value": 0.05,
+        "reason": "application.properties + JWTConfiguration raw fetch (5.C)"
+      },
+      {
+        "name": "domain_context_md",
+        "value": 0.03,
+        "reason": "inputs/domain-context.md"
+      }
     ],
     "applied_penalties": [
-      {"name": "no_operational_db", "value": -0.05, "reason": "5.B FE 부재 + 5.D 0건 — N영역 부재 (F-029)"}
+      {
+        "name": "no_operational_db",
+        "value": -0.05,
+        "reason": "5.B FE 부재 + 5.D 0건 — N영역 부재 (F-029)"
+      }
     ],
     "raw_confidence": 0.78,
     "cap_applied": false,
     "manual_override": false,
     "expected_confidence_average": 0.78,
     "confidence_breakdown": {
-      "br_5a_db_logic": {"confidence": 0.85, "element_count": 11, "extraction_method": "llm_with_grounding"},
-      "br_5c_config_policy": {"confidence": 0.80, "element_count": 2, "extraction_method": "deterministic"},
-      "br_5b_fe_logic": {"confidence": 0.0, "element_count": 0, "extraction_method": "deterministic", "note": "FE absent"},
-      "br_5d_external_dep": {"confidence": 0.0, "element_count": 0, "extraction_method": "deterministic", "note": "0 dependencies"}
+      "br_5a_db_logic": {
+        "confidence": 0.85,
+        "element_count": 11,
+        "extraction_method": "llm_with_grounding"
+      },
+      "br_5c_config_policy": {
+        "confidence": 0.8,
+        "element_count": 2,
+        "extraction_method": "deterministic"
+      },
+      "br_5b_fe_logic": {
+        "confidence": 0,
+        "element_count": 0,
+        "extraction_method": "deterministic",
+        "note": "FE absent"
+      },
+      "br_5d_external_dep": {
+        "confidence": 0,
+        "element_count": 0,
+        "extraction_method": "deterministic",
+        "note": "0 dependencies"
+      }
     },
     "human_review_required": [
-      {"item_id": "BR-USER-EMAIL-UNIQUE-001", "reason": "DRIFT-010 격상 — App+DB 이중 부재. 의도 명확하나 구현 부재.", "reviewer_role": "domain_expert"},
-      {"item_id": "BR-USER-USERNAME-UNIQUE-001", "reason": "동일 (DRIFT-010 부속).", "reviewer_role": "domain_expert"},
-      {"item_id": "BR-USER-FOLLOW-NO-SELF-001", "reason": "코드 미명시 — RealWorld spec 묵시.", "reviewer_role": "domain_expert"},
-      {"item_id": "BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001", "reason": "코드 동작이 De Morgan 버그로 의도와 불일치 (F-027).", "reviewer_role": "domain_expert"},
-      {"item_id": "BR-AUTH-JWT-EXPIRE-001", "reason": "2시간 매직 넘버 — RFC 권장 15min~1h 와 차이.", "reviewer_role": "tech_lead"},
-      {"item_id": "BR-AUTH-JWT-SECRET-LENGTH-001", "reason": "21byte SECRET — RFC 7515 §5.2.2 위반 (256bit 미달). AP critical 동시.", "reviewer_role": "tech_lead"}
+      {
+        "item_id": "BR-USER-EMAIL-UNIQUE-001",
+        "reason": "DRIFT-010 격상 — App+DB 이중 부재. 의도 명확하나 구현 부재.",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-USER-USERNAME-UNIQUE-001",
+        "reason": "동일 (DRIFT-010 부속).",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-USER-FOLLOW-NO-SELF-001",
+        "reason": "코드 미명시 — RealWorld spec 묵시.",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001",
+        "reason": "코드 동작이 De Morgan 버그로 의도와 불일치 (F-027).",
+        "reviewer_role": "domain_expert"
+      },
+      {
+        "item_id": "BR-AUTH-JWT-EXPIRE-001",
+        "reason": "2시간 매직 넘버 — RFC 권장 15min~1h 와 차이.",
+        "reviewer_role": "tech_lead"
+      },
+      {
+        "item_id": "BR-AUTH-JWT-SECRET-LENGTH-001",
+        "reason": "21byte SECRET — RFC 7515 §5.2.2 위반 (256bit 미달). AP critical 동시.",
+        "reviewer_role": "tech_lead"
+      }
     ],
     "warnings": [
       "5.B FE 부재 — UI validation 규칙 추출 0건 (F-029).",
@@ -48,25 +111,62 @@
       "description": "User.email 은 시스템 전역에서 unique 해야 함 (RealWorld spec 묵시 + production SaaS 100% 정합). 본 PoC 에서 App+DB 양쪽 검증 부재 — 의도된 누락이 아닌 spec 미명시 누락 (DRIFT-010 격상).",
       "category": "validation",
       "bounded_context": "BC-CONTENT",
-      "given": ["기존 사용자 (email_a) 가 존재함"],
-      "when": ["새 사용자 가 같은 email_a 로 회원가입을 시도함"],
-      "then": ["회원가입 거부 (의도)", "현재 동작: 거부 안 됨 — 두 사용자가 같은 email 로 가입 가능 (구현 부재)"],
+      "given": [
+        "기존 사용자 (email_a) 가 존재함"
+      ],
+      "when": [
+        "새 사용자 가 같은 email_a 로 회원가입을 시도함"
+      ],
+      "then": [
+        "회원가입 거부 (의도)",
+        "현재 동작: 거부 안 됨 — 두 사용자가 같은 email 로 가입 가능 (구현 부재)"
+      ],
       "rationale": "RealWorld spec + 100% 의 production SaaS (Twitter/Slack/GitHub) 표준. UserService.signUp 직접 save (existsByEmail 부재) + schema.sql users.email UNIQUE 부재 → DRIFT-010 격상 (medium → high) 결정 (윤주스 2026-04-28).",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_validation", "file": "domain/user/UserService.java", "line": 22, "snippet": "User signUp(...) { ... return userRepository.save(user); }  // existsByEmail / try-catch 부재"},
-        {"type": "orm_constraint", "file": "src/main/resources/schema.sql", "snippet": "users.email VARCHAR(255) NOT NULL — UNIQUE 부재"},
-        {"type": "orm_constraint", "file": "domain/user/Email.java", "snippet": "@Column(name=\"email\", nullable=false) — unique=false 기본"}
+        {
+          "type": "code_validation",
+          "file": "domain/user/UserService.java",
+          "line": 22,
+          "snippet": "User signUp(...) { ... return userRepository.save(user); }  // existsByEmail / try-catch 부재"
+        },
+        {
+          "type": "orm_constraint",
+          "file": "src/main/resources/schema.sql",
+          "snippet": "users.email VARCHAR(255) NOT NULL — UNIQUE 부재"
+        },
+        {
+          "type": "orm_constraint",
+          "file": "domain/user/Email.java",
+          "snippet": "@Column(name=\"email\", nullable=false) — unique=false 기본"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-SIGNUP", "UC-CONTENT-USER-UPDATE"],
-      "related_api_operations": ["POST /users", "PUT /user"],
-      "related_entities": ["E-CONTENT-User", "VO-CONTENT-Email"],
-      "related_db_tables": ["users"],
-      "confidence": 0.70,
+      "related_use_cases": [
+        "UC-CONTENT-USER-SIGNUP",
+        "UC-CONTENT-USER-UPDATE"
+      ],
+      "related_api_operations": [
+        "POST /users",
+        "PUT /user"
+      ],
+      "related_entities": [
+        "E-CONTENT-User",
+        "VO-CONTENT-Email"
+      ],
+      "related_db_tables": [
+        "users"
+      ],
+      "confidence": 0.7,
       "human_review_status": "pending",
       "human_review_note": "App+DB 이중 부재 — 사내 적용 시 추가 필수 (REC-EMAIL-UNIQUE-DOUBLE: existsByEmail + UNIQUE).",
       "is_active": true,
-      "tags": ["unique", "drift-010", "email", "promoted-high"]
+      "tags": [
+        "unique",
+        "drift-010",
+        "email",
+        "promoted-high"
+      ],
+      "natural_language": "User.email 은 시스템 전역에서 unique 해야 함."
     },
     {
       "id": "BR-USER-USERNAME-001",
@@ -74,25 +174,63 @@
       "description": "User.profile.userName 은 시스템 전역 unique 해야 함 (RealWorld spec — 프로필 URL `/profiles/{username}`). DRIFT-010 부속 — App+DB 양쪽 부재.",
       "category": "validation",
       "bounded_context": "BC-CONTENT",
-      "given": ["기존 사용자 (userName_a) 가 존재"],
-      "when": ["새 사용자 가 같은 userName_a 로 가입 또는 변경"],
-      "then": ["거부 (의도)", "현재 동작: 거부 안 됨"],
+      "given": [
+        "기존 사용자 (userName_a) 가 존재"
+      ],
+      "when": [
+        "새 사용자 가 같은 userName_a 로 가입 또는 변경"
+      ],
+      "then": [
+        "거부 (의도)",
+        "현재 동작: 거부 안 됨"
+      ],
       "rationale": "GET /profiles/{username} URL 단일성 보장 필요. UserService.signUp + UserName.@Column unique 부재.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_validation", "file": "domain/user/UserService.java", "line": 22},
-        {"type": "orm_constraint", "file": "src/main/resources/schema.sql", "snippet": "users.name VARCHAR(100) NOT NULL — UNIQUE 부재"},
-        {"type": "orm_constraint", "file": "domain/user/UserName.java", "snippet": "@Column(name=\"name\", nullable=false) — unique=false"}
+        {
+          "type": "code_validation",
+          "file": "domain/user/UserService.java",
+          "line": 22
+        },
+        {
+          "type": "orm_constraint",
+          "file": "src/main/resources/schema.sql",
+          "snippet": "users.name VARCHAR(100) NOT NULL — UNIQUE 부재"
+        },
+        {
+          "type": "orm_constraint",
+          "file": "domain/user/UserName.java",
+          "snippet": "@Column(name=\"name\", nullable=false) — unique=false"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-SIGNUP", "UC-CONTENT-USER-UPDATE", "UC-CONTENT-PROFILE-VIEW"],
-      "related_api_operations": ["POST /users", "PUT /user", "GET /profiles/{username}"],
-      "related_entities": ["E-CONTENT-User", "VO-CONTENT-UserName"],
-      "related_db_tables": ["users"],
-      "confidence": 0.70,
+      "related_use_cases": [
+        "UC-CONTENT-USER-SIGNUP",
+        "UC-CONTENT-USER-UPDATE",
+        "UC-CONTENT-PROFILE-VIEW"
+      ],
+      "related_api_operations": [
+        "POST /users",
+        "PUT /user",
+        "GET /profiles/{username}"
+      ],
+      "related_entities": [
+        "E-CONTENT-User",
+        "VO-CONTENT-UserName"
+      ],
+      "related_db_tables": [
+        "users"
+      ],
+      "confidence": 0.7,
       "human_review_status": "pending",
       "human_review_note": "DRIFT-010 부속 — email 과 동일 처리.",
       "is_active": true,
-      "tags": ["unique", "drift-010", "username", "promoted-high"]
+      "tags": [
+        "unique",
+        "drift-010",
+        "username",
+        "promoted-high"
+      ],
+      "natural_language": "User.profile.userName 은 시스템 전역 unique 해야 함."
     },
     {
       "id": "BR-USER-FOLLOW-001",
@@ -100,24 +238,55 @@
       "description": "A 가 B 를 follow 하면 A 의 feed 에 B 의 글이 노출되지만, B 는 A 를 follow 하지 않아도 됨. asymmetric — Twitter/Instagram/GitHub 표준.",
       "category": "policy",
       "bounded_context": "BC-CONTENT",
-      "given": ["사용자 A, B 존재"],
-      "when": ["A 가 B 를 follow 함 (POST /profiles/B/follow)"],
-      "then": ["user_followings (A.id, B.id) 삽입", "B 의 followingUsers 에는 A 가 자동 추가되지 않음"],
+      "given": [
+        "사용자 A, B 존재"
+      ],
+      "when": [
+        "A 가 B 를 follow 함 (POST /profiles/B/follow)"
+      ],
+      "then": [
+        "user_followings (A.id, B.id) 삽입",
+        "B 의 followingUsers 에는 A 가 자동 추가되지 않음"
+      ],
       "rationale": "DRIFT-002 결정 (윤주스 2026-04-28) — RealWorld API spec 명시 + Twitter asymmetric 패턴 정합. JPA OneToMany cascade=REMOVE join_table user_followings.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "orm_constraint", "file": "domain/user/User.java", "snippet": "@OneToMany(cascade=REMOVE) @JoinTable(name=\"user_followings\") Set<User> followingUsers"},
-        {"type": "code_condition", "file": "domain/user/User.java", "snippet": "followUser(User followee) { followingUsers.add(followee); } // 역방향 갱신 없음"}
+        {
+          "type": "orm_constraint",
+          "file": "domain/user/User.java",
+          "snippet": "@OneToMany(cascade=REMOVE) @JoinTable(name=\"user_followings\") Set<User> followingUsers"
+        },
+        {
+          "type": "code_condition",
+          "file": "domain/user/User.java",
+          "snippet": "followUser(User followee) { followingUsers.add(followee); } // 역방향 갱신 없음"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-PROFILE-FOLLOW", "UC-CONTENT-PROFILE-UNFOLLOW", "UC-CONTENT-ARTICLE-FEED"],
-      "related_api_operations": ["POST /profiles/{username}/follow", "DELETE /profiles/{username}/follow"],
-      "related_entities": ["E-CONTENT-User"],
-      "related_db_tables": ["user_followings"],
+      "related_use_cases": [
+        "UC-CONTENT-PROFILE-FOLLOW",
+        "UC-CONTENT-PROFILE-UNFOLLOW",
+        "UC-CONTENT-ARTICLE-FEED"
+      ],
+      "related_api_operations": [
+        "POST /profiles/{username}/follow",
+        "DELETE /profiles/{username}/follow"
+      ],
+      "related_entities": [
+        "E-CONTENT-User"
+      ],
+      "related_db_tables": [
+        "user_followings"
+      ],
       "confidence": 0.85,
       "human_review_status": "approved",
       "human_review_note": "DRIFT-002 결정 적용 (윤주스 2026-04-28).",
       "is_active": true,
-      "tags": ["follow", "drift-002", "directional"]
+      "tags": [
+        "follow",
+        "drift-002",
+        "directional"
+      ],
+      "natural_language": "A 가 B 를 follow 하면 A 의 feed 에 B 의 글이 노출되지만, B 는 A 를 follow 하지 않아도 됨."
     },
     {
       "id": "BR-USER-FOLLOW-002",
@@ -125,23 +294,49 @@
       "description": "사용자 가 자기 자신을 follow 할 수 없음. RealWorld spec 묵시 — 코드에 명시 부재.",
       "category": "policy",
       "bounded_context": "BC-CONTENT",
-      "given": ["사용자 A 존재"],
-      "when": ["A 가 A 자신을 follow 시도 (POST /profiles/A/follow with Authorization=A)"],
-      "then": ["거부 (의도)", "현재 동작: 코드 검증 부재 — 검증 필요"],
+      "given": [
+        "사용자 A 존재"
+      ],
+      "when": [
+        "A 가 A 자신을 follow 시도 (POST /profiles/A/follow with Authorization=A)"
+      ],
+      "then": [
+        "거부 (의도)",
+        "현재 동작: 코드 검증 부재 — 검증 필요"
+      ],
       "rationale": "도메인 의미상 'A 가 자기 글을 따로 follow' 무의미. 단 코드에 self-check 부재 (Profile.follow 메서드 검증 없음).",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_validation", "file": "domain/user/Profile.java", "snippet": "follow 메서드 self check 부재"},
-        {"type": "comment", "file": "inputs/domain-context.md", "snippet": "RealWorld spec 묵시"}
+        {
+          "type": "code_validation",
+          "file": "domain/user/Profile.java",
+          "snippet": "follow 메서드 self check 부재"
+        },
+        {
+          "type": "comment",
+          "file": "inputs/domain-context.md",
+          "snippet": "RealWorld spec 묵시"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-PROFILE-FOLLOW"],
-      "related_api_operations": ["POST /profiles/{username}/follow"],
-      "related_entities": ["E-CONTENT-User"],
-      "confidence": 0.50,
+      "related_use_cases": [
+        "UC-CONTENT-PROFILE-FOLLOW"
+      ],
+      "related_api_operations": [
+        "POST /profiles/{username}/follow"
+      ],
+      "related_entities": [
+        "E-CONTENT-User"
+      ],
+      "confidence": 0.5,
       "human_review_status": "pending",
       "human_review_note": "코드 미명시. 사내 적용 시 명시적 검증 추가 권장.",
       "is_active": true,
-      "tags": ["follow", "self-follow", "spec-implicit"]
+      "tags": [
+        "follow",
+        "self-follow",
+        "spec-implicit"
+      ],
+      "natural_language": "사용자 가 자기 자신을 follow 할 수 없음."
     },
     {
       "id": "BR-AUTH-PASSWORD-001",
@@ -149,22 +344,54 @@
       "description": "User.password 는 BCryptPasswordEncoder 로 해싱하여 저장. plain text 저장 금지.",
       "category": "policy",
       "bounded_context": "BC-AUTH",
-      "given": ["새 사용자 회원가입 또는 비밀번호 변경"],
-      "when": ["UserService.signUp / updateUser 실행"],
-      "then": ["Password VO 생성자에서 BCrypt 해시 적용", "users.password 컬럼에 해시값 저장"],
+      "given": [
+        "새 사용자 회원가입 또는 비밀번호 변경"
+      ],
+      "when": [
+        "UserService.signUp / updateUser 실행"
+      ],
+      "then": [
+        "Password VO 생성자에서 BCrypt 해시 적용",
+        "users.password 컬럼에 해시값 저장"
+      ],
       "rationale": "OWASP Password Storage Cheat Sheet 표준. SecurityConfiguration:59 가 BCryptPasswordEncoder Bean 등록.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_validation", "file": "application/security/SecurityConfiguration.java", "line": 59, "snippet": "@Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }"},
-        {"type": "code_validation", "file": "domain/user/Password.java", "snippet": "matches(plain, encoder) — encoder.matches() 위임"}
+        {
+          "type": "code_validation",
+          "file": "application/security/SecurityConfiguration.java",
+          "line": 59,
+          "snippet": "@Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }"
+        },
+        {
+          "type": "code_validation",
+          "file": "domain/user/Password.java",
+          "snippet": "matches(plain, encoder) — encoder.matches() 위임"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-SIGNUP", "UC-CONTENT-USER-LOGIN", "UC-CONTENT-USER-UPDATE"],
-      "related_api_operations": ["POST /users", "POST /users/login", "PUT /user"],
-      "related_entities": ["E-CONTENT-User", "VO-CONTENT-Password"],
+      "related_use_cases": [
+        "UC-CONTENT-USER-SIGNUP",
+        "UC-CONTENT-USER-LOGIN",
+        "UC-CONTENT-USER-UPDATE"
+      ],
+      "related_api_operations": [
+        "POST /users",
+        "POST /users/login",
+        "PUT /user"
+      ],
+      "related_entities": [
+        "E-CONTENT-User",
+        "VO-CONTENT-Password"
+      ],
       "confidence": 0.95,
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["security", "bcrypt", "password"]
+      "tags": [
+        "security",
+        "bcrypt",
+        "password"
+      ],
+      "natural_language": "User.password 는 BCryptPasswordEncoder 로 해싱하여 저장."
     },
     {
       "id": "BR-AUTH-STATELESS-001",
@@ -172,29 +399,57 @@
       "description": "서버는 세션을 보관하지 않음. csrf disable + formLogin disable + JWT filter only. 인증 컨텍스트는 JWT 가 운반.",
       "category": "policy",
       "bounded_context": "BC-AUTH",
-      "given": ["인증 필요 endpoint 호출"],
-      "when": ["요청 도착"],
-      "then": ["Authorization: Token <jwt> 헤더에서 컨텍스트 추출", "session cookie 검사 안 함"],
+      "given": [
+        "인증 필요 endpoint 호출"
+      ],
+      "when": [
+        "요청 도착"
+      ],
+      "then": [
+        "Authorization: Token <jwt> 헤더에서 컨텍스트 추출",
+        "session cookie 검사 안 함"
+      ],
       "rationale": "Spring Security STATELESS — JWT 토큰 자체가 인증 정보 운반. csrf 토큰 불필요 (cookie 없음).",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "auth_expression", "file": "application/security/SecurityConfiguration.java", "snippet": "csrf().disable() + formLogin().disable() + httpBasic().disable() + logout().disable() + JWTFilter (addFilterBefore(UsernamePasswordAuthenticationFilter))"},
-        {"type": "missing_explicit_policy", "file": "application/security/SecurityConfiguration.java", "snippet": "sessionCreationPolicy(STATELESS) 명시 부재 — Spring Security 5.x default = IF_REQUIRED (Phase 5-1 cross-validation 으로 발견)"}
+        {
+          "type": "auth_expression",
+          "file": "application/security/SecurityConfiguration.java",
+          "snippet": "csrf().disable() + formLogin().disable() + httpBasic().disable() + logout().disable() + JWTFilter (addFilterBefore(UsernamePasswordAuthenticationFilter))"
+        },
+        {
+          "type": "missing_explicit_policy",
+          "file": "application/security/SecurityConfiguration.java",
+          "snippet": "sessionCreationPolicy(STATELESS) 명시 부재 — Spring Security 5.x default = IF_REQUIRED (Phase 5-1 cross-validation 으로 발견)"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-LOGIN", "UC-CONTENT-USER-FIND-BY-ID"],
-      "related_api_operations": ["all"],
-      "related_entities": ["VO-AUTH-UserJWTPayload"],
+      "related_use_cases": [
+        "UC-CONTENT-USER-LOGIN",
+        "UC-CONTENT-USER-FIND-BY-ID"
+      ],
+      "related_api_operations": [
+        "all"
+      ],
+      "related_entities": [
+        "VO-AUTH-UserJWTPayload"
+      ],
       "confidence": 0.85,
       "_phase5_correction": {
         "finding_id": "F-034",
         "phase": "5-1",
-        "previous_confidence": 0.90,
+        "previous_confidence": 0.9,
         "rationale": "sessionCreationPolicy(STATELESS) 명시 부재 — 사실상 STATELESS 동작 (csrf/formLogin/httpBasic/logout disable + JWTFilter only) 이나 Spring Security default 가 IF_REQUIRED 이므로 사내 적용 시 명시 필수.",
         "remediation": "SecurityConfiguration 에 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) 추가 권고 (사내 적용 시)"
       },
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["security", "stateless", "jwt", "F-034"]
+      "tags": [
+        "security",
+        "stateless",
+        "jwt",
+        "F-034"
+      ],
+      "natural_language": "서버는 세션을 보관하지 않음."
     },
     {
       "id": "BR-AUTH-PUBLIC-001",
@@ -202,16 +457,37 @@
       "description": "Authorization 토큰 불요 endpoint 목록: GET /profiles/* /articles/** /tags/**, POST /users /users/login.",
       "category": "authorization",
       "bounded_context": "BC-AUTH",
-      "given": ["미인증 요청"],
-      "when": ["대상 endpoint 가 public 목록에 포함됨"],
-      "then": ["JWT filter 우회 + 정상 처리"],
+      "given": [
+        "미인증 요청"
+      ],
+      "when": [
+        "대상 endpoint 가 public 목록에 포함됨"
+      ],
+      "then": [
+        "JWT filter 우회 + 정상 처리"
+      ],
       "rationale": "RealWorld spec — 익명 사용자 도 글/프로필/태그 조회 가능 + 가입/로그인.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "auth_expression", "file": "application/security/SecurityConfiguration.java", "snippet": "antMatchers(GET, \"/profiles/**\", \"/articles/**\", \"/tags/**\").permitAll() — filter 통과 후 익명 허용"},
-        {"type": "auth_expression_websec_ignoring", "file": "application/security/SecurityConfiguration.java", "snippet": "WebSecurity#ignoring(POST, \"/users\", \"/users/login\") — filter chain 자체 우회 (HSTS/CSRF/security headers 미적용). Spring Security 6+ 권고는 permitAll. F-036."}
+        {
+          "type": "auth_expression",
+          "file": "application/security/SecurityConfiguration.java",
+          "snippet": "antMatchers(GET, \"/profiles/**\", \"/articles/**\", \"/tags/**\").permitAll() — filter 통과 후 익명 허용"
+        },
+        {
+          "type": "auth_expression_websec_ignoring",
+          "file": "application/security/SecurityConfiguration.java",
+          "snippet": "WebSecurity#ignoring(POST, \"/users\", \"/users/login\") — filter chain 자체 우회 (HSTS/CSRF/security headers 미적용). Spring Security 6+ 권고는 permitAll. F-036."
+        }
       ],
-      "related_api_operations": ["GET /profiles/{u}", "GET /articles", "GET /articles/{slug}", "GET /tags", "POST /users", "POST /users/login"],
+      "related_api_operations": [
+        "GET /profiles/{u}",
+        "GET /articles",
+        "GET /articles/{slug}",
+        "GET /tags",
+        "POST /users",
+        "POST /users/login"
+      ],
       "confidence": 0.92,
       "_phase5_correction": {
         "finding_id": "F-036",
@@ -222,7 +498,13 @@
       },
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["security", "public", "anonymous", "F-036"]
+      "tags": [
+        "security",
+        "public",
+        "anonymous",
+        "F-036"
+      ],
+      "natural_language": "Authorization 토큰 불요 endpoint 목록: GET /profiles/* /articles/** /tags/**, POST /users /users/login."
     },
     {
       "id": "BR-ARTICLE-AUTHOR-001",
@@ -230,21 +512,44 @@
       "description": "Article 의 author 필드 와 일치하는 User 만 수정 가능. User.updateArticle 메서드가 권한 체크.",
       "category": "authorization",
       "bounded_context": "BC-CONTENT",
-      "given": ["Article (author=A) 존재"],
-      "when": ["사용자 B (B≠A) 가 PUT /articles/{slug} 호출"],
-      "then": ["거부 — 권한 없음"],
+      "given": [
+        "Article (author=A) 존재"
+      ],
+      "when": [
+        "사용자 B (B≠A) 가 PUT /articles/{slug} 호출"
+      ],
+      "then": [
+        "거부 — 권한 없음"
+      ],
       "rationale": "도메인 의미 + RealWorld spec.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_condition", "file": "domain/user/User.java", "line": 62, "snippet": "updateArticle(article, request) { if (!this.equals(article.author)) throw ... }"}
+        {
+          "type": "code_condition",
+          "file": "domain/user/User.java",
+          "line": 62,
+          "snippet": "updateArticle(article, request) { if (!this.equals(article.author)) throw ... }"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-ARTICLE-UPDATE"],
-      "related_api_operations": ["PUT /articles/{slug}"],
-      "related_entities": ["E-CONTENT-Article", "E-CONTENT-User"],
+      "related_use_cases": [
+        "UC-CONTENT-ARTICLE-UPDATE"
+      ],
+      "related_api_operations": [
+        "PUT /articles/{slug}"
+      ],
+      "related_entities": [
+        "E-CONTENT-Article",
+        "E-CONTENT-User"
+      ],
       "confidence": 0.95,
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["authorization", "article", "author"]
+      "tags": [
+        "authorization",
+        "article",
+        "author"
+      ],
+      "natural_language": "Article 의 author 필드 와 일치하는 User 만 수정 가능."
     },
     {
       "id": "BR-ARTICLE-AUTHOR-002",
@@ -252,20 +557,42 @@
       "description": "Article author 와 일치하는 User 만 DELETE 가능. ArticleService.deleteArticleByAuthor 권한 체크.",
       "category": "authorization",
       "bounded_context": "BC-CONTENT",
-      "given": ["Article (author=A) 존재"],
-      "when": ["사용자 B (B≠A) 가 DELETE /articles/{slug} 호출"],
-      "then": ["거부"],
+      "given": [
+        "Article (author=A) 존재"
+      ],
+      "when": [
+        "사용자 B (B≠A) 가 DELETE /articles/{slug} 호출"
+      ],
+      "then": [
+        "거부"
+      ],
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_condition", "file": "domain/article/ArticleService.java", "snippet": "deleteArticleByAuthor — author 검증"}
+        {
+          "type": "code_condition",
+          "file": "domain/article/ArticleService.java",
+          "snippet": "deleteArticleByAuthor — author 검증"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-ARTICLE-DELETE"],
-      "related_api_operations": ["DELETE /articles/{slug}"],
-      "related_entities": ["E-CONTENT-Article", "E-CONTENT-User"],
+      "related_use_cases": [
+        "UC-CONTENT-ARTICLE-DELETE"
+      ],
+      "related_api_operations": [
+        "DELETE /articles/{slug}"
+      ],
+      "related_entities": [
+        "E-CONTENT-Article",
+        "E-CONTENT-User"
+      ],
       "confidence": 0.85,
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["authorization", "article", "author"]
+      "tags": [
+        "authorization",
+        "article",
+        "author"
+      ],
+      "natural_language": "Article author 와 일치하는 User 만 DELETE 가능."
     },
     {
       "id": "BR-COMMENT-DELETE-001",
@@ -273,8 +600,13 @@
       "description": "Comment 작성자 또는 해당 Article 의 작성자 만 댓글 삭제 가능 (RealWorld spec). ⚠️ 코드 동작은 De Morgan 버그로 'AND' 가 되어 의도와 불일치 — F-027 / AP-DOMAIN-LOGIC-BUG-001 critical.",
       "category": "authorization",
       "bounded_context": "BC-CONTENT",
-      "given": ["Article(author=A_article), Comment(author=A_comment) 존재", "사용자 U 가 인증 됨"],
-      "when": ["U 가 DELETE /articles/{slug}/comments/{id} 호출"],
+      "given": [
+        "Article(author=A_article), Comment(author=A_comment) 존재",
+        "사용자 U 가 인증 됨"
+      ],
+      "when": [
+        "U 가 DELETE /articles/{slug}/comments/{id} 호출"
+      ],
       "then": [
         "의도 (rule): U == A_comment OR U == A_article 이면 통과 — 그 외 거부",
         "실제 동작 (Article.java:86): U == A_article AND U == A_comment 이면 통과 — 둘 중 하나만 충족 시 거부 (De Morgan: !(A && B) → 두 조건 동시 충족 시만 통과)",
@@ -283,16 +615,36 @@
       "rationale": "RealWorld spec — '댓글 작성자 또는 article 소유자가 삭제 가능'. 다른 RealWorld 구현체 5+ 가 OR 사용 (case-phase4). 본 구현 De Morgan 버그.",
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "code_condition", "file": "domain/article/Article.java", "line": 86, "snippet": "if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) throw new IllegalAccessError(...);"}
+        {
+          "type": "code_condition",
+          "file": "domain/article/Article.java",
+          "line": 86,
+          "snippet": "if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) throw new IllegalAccessError(...);"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-COMMENT-DELETE"],
-      "related_api_operations": ["DELETE /articles/{slug}/comments/{id}"],
-      "related_entities": ["E-CONTENT-Article", "E-CONTENT-Comment", "E-CONTENT-User"],
+      "related_use_cases": [
+        "UC-CONTENT-COMMENT-DELETE"
+      ],
+      "related_api_operations": [
+        "DELETE /articles/{slug}/comments/{id}"
+      ],
+      "related_entities": [
+        "E-CONTENT-Article",
+        "E-CONTENT-Comment",
+        "E-CONTENT-User"
+      ],
       "confidence": 0.85,
       "human_review_status": "pending",
       "human_review_note": "BR (의도) ≠ actual_behavior (구현). 사내 적용 시 즉시 De Morgan 수정 필요 (|| → &&). F-027 신규 finding.",
       "is_active": true,
-      "tags": ["authorization", "comment", "bug", "f-027", "de-morgan"]
+      "tags": [
+        "authorization",
+        "comment",
+        "bug",
+        "f-027",
+        "de-morgan"
+      ],
+      "natural_language": "Comment 작성자 또는 해당 Article 의 작성자 만 댓글 삭제 가능."
     },
     {
       "id": "BR-DOMAIN-AUDITING-001",
@@ -300,21 +652,49 @@
       "description": "Article + Comment 엔티티는 @CreatedDate / @LastModifiedDate 로 createdAt / updatedAt 자동 기록. JPA Auditing 활성화 (@EnableJpaAuditing).",
       "category": "policy",
       "bounded_context": "BC-CONTENT",
-      "given": ["Article 또는 Comment 신규 생성/수정"],
-      "when": ["JPA save 호출"],
-      "then": ["createdAt / updatedAt 자동 갱신"],
+      "given": [
+        "Article 또는 Comment 신규 생성/수정"
+      ],
+      "when": [
+        "JPA save 호출"
+      ],
+      "then": [
+        "createdAt / updatedAt 자동 갱신"
+      ],
       "extracted_from_area": "5.A_db_logic",
       "source_evidence": [
-        {"type": "orm_constraint", "file": "domain/article/Article.java", "snippet": "@CreatedDate Instant createdAt; @LastModifiedDate Instant updatedAt"},
-        {"type": "orm_constraint", "file": "domain/article/Comment.java", "snippet": "동일"},
-        {"type": "config_value", "file": "infrastructure/repository/SpringDataJPAConfiguration.java", "snippet": "@EnableJpaAuditing"}
+        {
+          "type": "orm_constraint",
+          "file": "domain/article/Article.java",
+          "snippet": "@CreatedDate Instant createdAt; @LastModifiedDate Instant updatedAt"
+        },
+        {
+          "type": "orm_constraint",
+          "file": "domain/article/Comment.java",
+          "snippet": "동일"
+        },
+        {
+          "type": "config_value",
+          "file": "infrastructure/repository/SpringDataJPAConfiguration.java",
+          "snippet": "@EnableJpaAuditing"
+        }
       ],
-      "related_entities": ["E-CONTENT-Article", "E-CONTENT-Comment"],
-      "related_db_tables": ["articles", "comments"],
+      "related_entities": [
+        "E-CONTENT-Article",
+        "E-CONTENT-Comment"
+      ],
+      "related_db_tables": [
+        "articles",
+        "comments"
+      ],
       "confidence": 0.95,
       "human_review_status": "approved",
       "is_active": true,
-      "tags": ["audit", "jpa"]
+      "tags": [
+        "audit",
+        "jpa"
+      ],
+      "natural_language": "Article + Comment 엔티티는 @CreatedDate / @LastModifiedDate 로 createdAt / updatedAt 자동 기록."
     },
     {
       "id": "BR-AUTH-JWT-001",
@@ -322,21 +702,43 @@
       "description": "발급 JWT 의 exp 클레임 = iat + 2시간 (=7200초). JWTConfiguration:13 에 매직 넘버 하드코딩.",
       "category": "policy",
       "bounded_context": "BC-AUTH",
-      "given": ["사용자 로그인 성공"],
-      "when": ["JWT 발급"],
-      "then": ["exp = iat + 7200 (초)"],
+      "given": [
+        "사용자 로그인 성공"
+      ],
+      "when": [
+        "JWT 발급"
+      ],
+      "then": [
+        "exp = iat + 7200 (초)"
+      ],
       "rationale": "코드 명시. ⚠️ RFC 7519 권장 / 한국 권장 15min~1h 와 차이 — 본 PoC 학습용 spec 한정 인정. 사내 적용 시 short access token (15min) + refresh token 권장.",
       "extracted_from_area": "5.C_config_policy",
       "source_evidence": [
-        {"type": "config_value", "file": "infrastructure/jwt/JWTConfiguration.java", "line": 13, "snippet": "private static final long JWT_DURATION_SECONDS = 2 * 60 * 60; // 2 hours"}
+        {
+          "type": "config_value",
+          "file": "infrastructure/jwt/JWTConfiguration.java",
+          "line": 13,
+          "snippet": "private static final long JWT_DURATION_SECONDS = 2 * 60 * 60; // 2 hours"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-LOGIN", "UC-CONTENT-USER-SIGNUP"],
-      "related_entities": ["VO-AUTH-UserJWTPayload"],
-      "confidence": 0.80,
+      "related_use_cases": [
+        "UC-CONTENT-USER-LOGIN",
+        "UC-CONTENT-USER-SIGNUP"
+      ],
+      "related_entities": [
+        "VO-AUTH-UserJWTPayload"
+      ],
+      "confidence": 0.8,
       "human_review_status": "pending",
       "human_review_note": "매직 넘버 — 환경변수/설정파일 분리 권장 (recommendation). 사내 적용 시 단축 + refresh token 검토.",
       "is_active": true,
-      "tags": ["jwt", "magic-number", "config", "security"]
+      "tags": [
+        "jwt",
+        "magic-number",
+        "config",
+        "security"
+      ],
+      "natural_language": "발급 JWT 의 exp 클레임 = iat + 2시간."
     },
     {
       "id": "BR-AUTH-JWT-002",
@@ -344,26 +746,52 @@
       "description": "JWT 서명용 SECRET 은 HMAC-SHA256 사용 시 최소 256bit (32byte) 권장 (RFC 7515 §5.2.2). 본 구현 SECRET=\"SOME_SIGNATURE_SECRET\" = 21 byte (168 bit) — 위반 + 하드코딩.",
       "category": "policy",
       "bounded_context": "BC-AUTH",
-      "given": ["JWT 서명 발급"],
-      "when": ["HmacSHA256JWTService.serialize 호출"],
-      "then": ["SECRET 으로 HMAC-SHA256 서명 — 21byte SECRET 사용 (RFC 7515 §5.2.2 미달)"],
+      "given": [
+        "JWT 서명 발급"
+      ],
+      "when": [
+        "HmacSHA256JWTService.serialize 호출"
+      ],
+      "then": [
+        "SECRET 으로 HMAC-SHA256 서명 — 21byte SECRET 사용 (RFC 7515 §5.2.2 미달)"
+      ],
       "rationale": "OWASP JWT Cheat Sheet + RFC 8725 (JWT BCP) 위반. AP-CONFIG-HARDCODED-SECRET-001 critical 동시 등록. case-phase4: GitHub leak 통계 — 하드코딩 SECRET 이 가장 흔한 보안 사고 1순위.",
       "extracted_from_area": "5.C_config_policy",
       "source_evidence": [
-        {"type": "config_value", "file": "infrastructure/jwt/JWTConfiguration.java", "line": 12, "snippet": "private static final String SECRET = \"SOME_SIGNATURE_SECRET\";  // 21 bytes — RFC 7515 §5.2.2 위반"}
+        {
+          "type": "config_value",
+          "file": "infrastructure/jwt/JWTConfiguration.java",
+          "line": 12,
+          "snippet": "private static final String SECRET = \"SOME_SIGNATURE_SECRET\";  // 21 bytes — RFC 7515 §5.2.2 위반"
+        }
       ],
-      "related_use_cases": ["UC-CONTENT-USER-LOGIN", "UC-CONTENT-USER-SIGNUP"],
-      "related_entities": ["VO-AUTH-UserJWTPayload"],
-      "confidence": 0.70,
+      "related_use_cases": [
+        "UC-CONTENT-USER-LOGIN",
+        "UC-CONTENT-USER-SIGNUP"
+      ],
+      "related_entities": [
+        "VO-AUTH-UserJWTPayload"
+      ],
+      "confidence": 0.7,
       "human_review_status": "pending",
       "human_review_note": "AP-CONFIG-HARDCODED-SECRET-001 critical. 사내 적용 시 환경변수 + Vault/Parameter Store + 256bit ≥ random secret 강제.",
       "is_active": true,
-      "tags": ["jwt", "secret", "hardcoded", "rfc-7515", "critical", "security"]
+      "tags": [
+        "jwt",
+        "secret",
+        "hardcoded",
+        "rfc-7515",
+        "critical",
+        "security"
+      ],
+      "natural_language": "JWT 서명용 SECRET 은 HMAC-SHA256 사용 시 최소 256bit 권장."
     }
   ],
   "rule_conflicts": [
     {
-      "rule_ids": ["BR-COMMENT-DELETE-001"],
+      "rule_ids": [
+        "BR-COMMENT-DELETE-001"
+      ],
       "type": "inconsistent_threshold",
       "description": "BR (의도) ≠ actual_behavior (구현). De Morgan 버그 — Article.java:86 의 `!A || !B` 가 의도된 OR 가 아닌 AND 동작. F-027 신규 finding 으로 격리 (BR vs actual_behavior 분리 가이드 부재).",
       "resolution": "pending"

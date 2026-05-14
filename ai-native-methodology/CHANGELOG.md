@@ -9,7 +9,92 @@
 
 ---
 
-## [v2.4.0 carry update — session 9차 SESSION-WRAPUP] — 2026-05-13 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단 + ADR-CHAIN-011 §5.4 patch v2 + SPIKE v2 자산화)
+## [v2.4.0 carry update — session 10차 SESSION-WRAPUP — v2.5.0 Phase A 시행] — 2026-05-13~14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — description vs natural_language paradigm 재정의 + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 + PoC #01 13 BR 자동 마이그레이션 + 302/0 test pass + DEC + ADR patch v3)
+
+> ★ ★ ★ ★ ★ ★ ★ ★ **session 10차 — v2.5.0 Phase A 시행** — ★ session 9차 신규 carry C-description-vs-nl-paradigm-define 흡수. 사용자 결단 "1" (즉시 시행) 정합. ★ ★ Agent 3 (c) hybrid 강 옵션 채택 (★ ★ session 9차 SPIKE v2 결정적 입증 + memory feedback_quality_priority.md 재작업 최소화 정합). Plan P §3 Phase A scope 본격 시행.
+
+### ★ ★ ★ ★ ★ ★ paradigm 재정의
+
+```
+description    = ★ optional metadata (★ BR statement + rationale + caveat + DRIFT 격상 자유 metadata)
+                                       (★ 사람 눈 친화 / characterization context 보존)
+                                       (★ cross-validation 대상 ❌)
+
+natural_language = ★ ★ ★ v2.5.0 권장 표준 (★ pure BR statement / 1~2 문장 / GWT 동치 의미)
+                                            (★ cross-validation 대상 / Layer 2 LLM mandatory v2.5.0 Phase C)
+                                            (★ rationale/caveat 제외)
+
+cross-validation 대상 = ★ ★ natural_language ↔ given/when/then ONLY
+                         (★ description 제외 / ★ Layer 1 keyword overlap 한계 회피)
+```
+
+### ★ ★ ★ session 10차 산출 8종
+
+- ★ `schemas/rules.schema.json` (★ Phase A paradigm 명세 강화 / allOf.anyOf + item description + natural_language + description field description 모두 강화)
+- ★ ★ `tools/br-cross-consistency-validator/src/deterministic.js` (★ description alias 제거 + description_only_fallback low finding 신설 + hasDescription return 신규)
+- ★ `tools/br-cross-consistency-validator/src/validator.js` (★ withDescriptionOnly stat 신규)
+- ★ `tools/br-cross-consistency-validator/test/validator.test.js` (★ +3 신규 paradigm test / 25/25 pass)
+- ★ `tools/br-cross-consistency-validator/scripts/migrate-description-to-natural-language.mjs` (★ 신설 / 3 step stripping / Phase B 재사용 의무)
+- ★ ★ ★ `examples/poc-01-realworld-spring/output/rules/rules.json` (★ ★ 13/13 BR 자동 마이그레이션 적용 / description 보존 + natural_language 신규 추출)
+- ★ `decisions/DEC-2026-05-14-description-vs-nl-paradigm-재정의.md` (★ DEC 신설)
+- ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-31+32 + §11 후속 patch v3
+
+### ★ ★ schema 변경 (★ ★ ★ breaking change ❌)
+
+- ★ allOf.anyOf description 강화 — "description fallback (★ v2.5.0 Phase A — backward-compat / Phase B 마이그레이션 carry)" 명세
+- ★ item description 강화 — "cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외)" 명세
+- ★ natural_language field description 강화 — "pure BR statement" 명세 + Layer 2 LLM cross-validation 대상 명세
+- ★ description field description 강화 — "optional metadata 격상" 명세 (★ deprecated alias 격하 ❌ → ★ ★ optional metadata 격상)
+
+### ★ ★ validator 변경
+
+- ★ ★ description ↔ natural_language alias 처리 ★ 제거 (★ nlText = NL field only)
+- ★ ★ hasDescription 신규 boolean (★ cross-validation 대상 ❌ / fallback 추적)
+- ★ ★ ★ description_only_fallback low finding 신설 (★ Phase B 마이그레이션 carry 가시화)
+- ★ representation_missing 조건 갱신 (★ description fallback 인정)
+- ★ withDescriptionOnly stat 신규 (★ Phase B 마이그레이션 carry 추적)
+
+### ★ ★ PoC #01 cross-validation 결과 (★ Phase A pilot 실증)
+
+```
+stats:   with_natural_language=13 / with_gwt=13 / with_both=13 / with_description_only=0 / with_finding=13
+overlap: mean=0.173 / median=0.105 / max=0.500 (★ ★ session 9차 SPIKE v2 stripped 결과 그대로 실현)
+score:   0.608 / gate: fail (★ Layer 1 keyword overlap structural sanity 격하 paradigm 입증)
+```
+
+### ★ ★ resolved + 신규 carry
+
+**resolved (1)**:
+- ★ ★ ★ C-description-vs-nl-paradigm-define (★ session 9차 carry) → ★ ★ resolved
+
+**신규 carry (2 / Phase B 의무)**:
+- ★ ★ ★ **C-poc-01-13-br-nl-human-review** (★ Phase B carry / 자동 추출 정확 보장 ❌ / 사람 검토 의무)
+- ★ ★ ★ **C-poc-02-11-description-to-nl-migration** (★ Phase B carry / PoC #03 + #05 우선 / ≥ 2 PoC corroboration 정합)
+
+### ★ ★ Lessons Learned 신규 2건
+
+- ★ ★ ★ ★ **LL-i-31** (★ schema breaking change ❌ + validator paradigm 갱신 = safe 마이그레이션 paradigm / Phase A 시행 입증)
+- ★ ★ **LL-i-32** (★ description ↔ NL paradigm 명세 = paradigm 결단 결정적 사실 / ADR-008 이중 렌더링 사상 확장 명세)
+
+### chain harness 5 요소 변경 ❌ (★ ADR-CHAIN-001~005 정합)
+
+본 session 10차 = ★ schema paradigm + validator + pilot PoC 마이그레이션 / ★ chain harness 5 요소 ★ 변경 ❌.
+
+### ★ ★ test 보존
+
+★ ★ 302/0 pass (★ +3 신규 paradigm test / 회귀 ❌).
+
+### ★ ★ ★ ★ 다음 step (★ ★ Phase B = 다음 session)
+
+- ★ ★ ★ PoC #03 dual representation 마이그레이션 (★ trigger/condition/action → natural_language + given/when/then 신규)
+- ★ ★ ★ PoC #05 dual representation 마이그레이션 (★ description → natural_language + GWT 신규)
+- ★ ★ Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하
+- ★ ★ ≥ 2 PoC corroboration 자료 확보 (★ Senior STOP-1 흡수 정합)
+- ★ ★ Phase C 진입 자격 도달 (★ Layer 2 LLM mandatory 본격 구현)
+
+---
+
+## [v2.4.0 carry update — session 9차 SESSION-WRAPUP] — 2026-05-13 (★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단 + ADR-CHAIN-011 §5.4 patch v2 + SPIKE v2 자산화)
 
 > ★ ★ ★ ★ ★ ★ ★ ★ **session 9차 SESSION-WRAPUP** — ★ ★ session 8차 신규 carry C-threshold-spike-revisit (★ critical) 즉시 흡수. 4원칙 1단계 plan + 2단계 sub-agent 3 병렬 토론 (Agent 1 공식문서 + Agent 2 빅테크 + Agent 3 Senior critique) + 3단계 사용자 결단 + 4단계 시행 (SPIKE v1 재측정 + SPIKE v2 REVISE-6 + ADR §5.4 patch v2 + DEC 신설). ★ ★ ★ Senior STOP signal 3건 흡수 강도 분리 (STOP-1 단일 PoC §8.1 strict 위반 전면 흡수 / STOP-2 v2.4.0 라벨 강등 soft 흡수 = 라벨 보존 + carry 명시 / STOP-3 Layer 1 단독 = Adzic 폐기 함정 재현 전면 흡수).
 

@@ -89,11 +89,16 @@ export function validateBR(br, options = {}) {
   const path = options.path || '/business_rules/?';
   const keywordThreshold = options.keywordThreshold ?? 0.5;
 
-  // ★ ★ v2.4.0 sub-plan §3 — description = natural_language alias 정합 (★ schema rules.schema.json anyOf 정합)
+  // ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3) — description ≠ natural_language alias
+  //   ★ natural_language = ★ pure BR statement / cross-validation 대상 (★ Layer 2 LLM mandatory v2.5.0 Phase C)
+  //   ★ description = ★ optional metadata (★ rationale + caveat 자유 / cross-validation 대상 ❌)
+  //   ★ ★ session 9차 SPIKE v2 결정적 사실 정합 (description 안 rationale 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement)
   const nlText = (typeof br.natural_language === 'string' && br.natural_language.trim().length > 0)
     ? br.natural_language
-    : (typeof br.description === 'string' && br.description.trim().length > 0 ? br.description : null);
+    : null;
   const hasNL = nlText !== null;
+  // ★ ★ description = optional metadata (★ cross-validation 대상 ❌ / Phase A backward-compat fallback)
+  const hasDescription = typeof br.description === 'string' && br.description.trim().length > 0;
   // ★ ★ GWT — array 의무 (★ schema 안 array required) / 단 string 도 호환 인정 (★ PoC #02 사실 정합)
   const hasGWTArray = Array.isArray(br.given) && br.given.length > 0
     && Array.isArray(br.when) && br.when.length > 0
@@ -107,16 +112,29 @@ export function validateBR(br, options = {}) {
     && (typeof br.condition === 'string' || Array.isArray(br.condition))
     && (typeof br.action === 'string' || Array.isArray(br.action));
 
-  // ★ 4-1. 두 표현 ≥ 1 의무 (★ description alias + trigger/condition/action 변형 인정)
-  if (!hasNL && !hasGWT && !hasTCA) {
+  // ★ 4-1. 표현 ≥ 1 의무 (★ NL / GWT / description fallback / TCA 변형 인정)
+  if (!hasNL && !hasGWT && !hasTCA && !hasDescription) {
     findings.push({
       id: nextFindingId('REPR'),
       severity: 'critical',
       path,
       br_id: br.id || '<unknown>',
       rule: 'representation_missing',
-      message: 'natural_language / given-when-then / description / trigger-condition-action 중 ≥ 1 표현 의무 (★ schema anyOf 보강)',
-      suggestion: '두 표현 중 ≥ 1 작성 의무',
+      message: 'natural_language / given-when-then / description / trigger-condition-action 중 ≥ 1 표현 의무 (★ schema anyOf 정합)',
+      suggestion: '★ ★ natural_language 우선 작성 권장 (★ v2.5.0 paradigm)',
+    });
+  }
+
+  // ★ ★ ★ v2.5.0 Phase A 신규 — description-only fallback carry (★ Phase B 마이그레이션 의무 / C-poc-03-05-dual-representation 정합)
+  if (!hasNL && !hasGWT && !hasTCA && hasDescription) {
+    findings.push({
+      id: nextFindingId('FALLBACK'),
+      severity: 'low',
+      path,
+      br_id: br.id || '<unknown>',
+      rule: 'description_only_fallback',
+      message: '★ description fallback (★ cross-validation 미시행) — natural_language 마이그레이션 의무 (★ Phase B carry)',
+      suggestion: '★ description 첫 문장 → natural_language 추출 + description 안 rationale/caveat 보존',
     });
   }
 
@@ -189,7 +207,7 @@ export function validateBR(br, options = {}) {
     }
   }
 
-  return { findings, overlap_score: overlapScore, has_nl: hasNL, has_gwt: hasGWT };
+  return { findings, overlap_score: overlapScore, has_nl: hasNL, has_gwt: hasGWT, has_description: hasDescription };
 }
 
 // ★ Layer 1 = single-pass / finding id sequence는 호출자에서 reset

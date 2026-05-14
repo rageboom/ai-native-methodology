@@ -434,6 +434,22 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
   - **Why**: GitHub Spec Kit (90K star) / AWS Q / ThoughtWorks CodeConcise / DMN / Drools / Spectral / OpenAPI 모두 cross-consistency rule 부재 = industry 공백
   - **How to apply**: 외부 인용 시 ★ "원조 자격" 명시 가능 / 단 paradigm-cross corroboration (ADR-CHAIN-008 §1) 정합 의무 / ★ "Spec Kit + DMN + 본 방법론" 자릿수 비교 외부 발표 후보
 
+- ★ ★ ★ ★ **LL-i-31** (★ "schema breaking change ❌ + validator paradigm 갱신 = safe 마이그레이션 paradigm" / ★ session 10차 Phase A 시행 입증):
+  - **Why**: schema anyOf 보존 (★ 11 PoC 호환) + validator 영역만 변경 + description field description 강화 = ★ ★ ★ "safe 마이그레이션" — breaking change 0 + paradigm 명세 명확 + 마이그레이션 carry 분리 가능
+  - **How to apply**:
+    - paradigm 재정의 시 ★ ★ schema breaking change 회피 + validator 영역만 변경 paradigm 우선 검토 의무
+    - schema = backward-compat anyOf 보존 + description 강화 의무
+    - 마이그레이션 = ★ 자동 script 자산화 + 사람 검토 carry 분리 의무
+    - ★ ★ "Phase A scope 안 schema + validator + pilot PoC 만 / 다른 PoC = Phase B 분리" paradigm 정합
+
+- ★ ★ **LL-i-32** (★ "description ↔ natural_language paradigm 명세 = paradigm 결단 결정적 사실" / ★ session 10차 / ADR-008 이중 렌더링 사상 확장 명세):
+  - **Why**: session 10차 시행 결과 = ★ description 자체 = "BR statement + rationale + caveat 복합 자산" 사실 입증 (★ PoC #01 13 BR 실증). ★ ★ alias 인정 paradigm (★ session 9차 이전 paradigm) = ★ semantic 차이 신호 → data quality 신호 ★ 오해.
+  - **How to apply**:
+    - paradigm 명세 명확 의무 = ★ ★ 본 방법론 안 모든 dual representation 영역 정합
+    - ADR-008 이중 렌더링 사상 확장 = ★ "단일 진실 + 두 렌더링" vs "두 표현 + cross-validation" ★ 본질 차이 명확화 의무
+    - 외부 인용 시 = "Layer 1 결정적 (structural sanity) + Layer 2 LLM mandatory (semantic) + paradigm 명세 명확 (description ≠ NL)" 3 layer corroboration 의무
+    - description = optional metadata 격상 / natural_language = REQUIRED for cross-validation / cross-validation 대상 = NL ↔ GWT only paradigm 명문화
+
 - ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-28** (★ ★ "keyword overlap = ★ ★ structural sanity check / Adzic 폐기 회피 도구 자격 ❌ / Layer 2 LLM 의무 격상" / ★ session 9차 SPIKE v2 + 3 agent 일치 corroboration):
   - **Why**: ★ ★ ★ session 9차 SPIKE v1 (PoC #01 13 BR mean=0.201 max=0.462 / ≥0.85 = 0/13) + SPIKE v2 (REVISE-6 rationale 제거 후 mean=0.173 mean delta -0.028 → 가설 B 정면 부정) + ★ Agent 1 F1 (Jaccard short-text + 한국어 교착어 형태소 부재) + Agent 2 F5 (MDPI 2025 paraphrase optimal=0.671 / range 0.334~0.867) + Agent 3 R5 (Layer 1 결정적 단독 = semantic gate 자격 미달) ★ ★ ★ ★ ★ ★ 일치 corroboration
   - **How to apply**:
@@ -459,5 +475,8 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 
 - ★ ★ ★ ★ sub-plan §1 session 8차 = ★ 본 ADR + validator workspace 신설 + SPIKE v1 → SESSION-WRAPUP commit `c7dfca5` ✅
 - ★ ★ ★ ★ ★ ★ sub-plan §2 session 8차 (★ release 통합) = ★ schema top-level 재설계 + PoC #01+#05 마이그레이션 → commit `f3b62db` (v2.4.0 MINOR FINAL release) ✅
-- ★ ★ ★ ★ ★ ★ ★ **sub-plan §1' session 9차 (★ ★ 본 patch v2) = ★ ★ ★ ★ ★ threshold spike revisit (C-threshold-spike-revisit 흡수) + REVISE-6 재실측 + Layer 2 LLM 의무 paradigm 결단 + ADR §5.4 patch v2 + SPIKE v2 자산화 → SESSION-WRAPUP commit (★ 본 session / no release)**
-- ★ ★ ★ ★ ★ **sub-plan §1' 후속 session = ★ ★ ★ ★ v2.5.0 paradigm 본격 도입** (★ Layer 2 LLM mandatory 구현 + PoC #03 + PoC #05 dual representation 마이그레이션 + ≥ 2 PoC corroboration 확보 + threshold paradigm 본격 재정의 + chain 1 gate 통합 + v2.5.0 MINOR release)
+- ★ ★ ★ ★ ★ ★ ★ **sub-plan §1' session 9차 (★ ★ patch v2) = ★ ★ ★ ★ ★ threshold spike revisit (C-threshold-spike-revisit 흡수) + REVISE-6 재실측 + Layer 2 LLM 의무 paradigm 결단 + ADR §5.4 patch v2 + SPIKE v2 자산화 → SESSION-WRAPUP commit `158a700` ✅**
+- ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 10차 Phase A 시행 (★ ★ 본 patch v3) = ★ ★ description vs natural_language paradigm 재정의 (Agent 3 (c) hybrid 채택 / DEC-2026-05-14 정합) + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 (★ description alias 제거 + description_only_fallback finding 신설) + PoC #01 13 BR 자동 마이그레이션 ✅ + 302/0 test pass + LL-i-31~32 자산화 → SESSION-WRAPUP commit (★ 본 session / no release)**
+- ★ ★ ★ ★ **Phase B 후속 session = ★ ★ PoC #03 + PoC #05 dual representation 마이그레이션 (★ ≥ 2 PoC corroboration / Senior STOP-1 흡수) + Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하**
+- ★ ★ ★ ★ **Phase C 후속 session = ★ Layer 2 LLM mandatory 본격 구현 + chain 1 gate Layer 2 통합**
+- ★ ★ ★ ★ **Phase D 후속 session = ★ release-readiness 8/8 → 9/9 재격상 + ≥ 2 PoC corroboration 검증 + v2.5.0 MINOR release**

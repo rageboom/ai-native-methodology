@@ -3,7 +3,7 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-13 (★ ★ ★ ★ ★ ★ ★ ★ **session 9차 — C-threshold-spike-revisit carry 흡수 + Layer 2 LLM 의무 격상 paradigm 결단 + ADR-CHAIN-011 §5.4 patch v2 + SPIKE v2 자산화** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Senior STOP 3건 흡수 / implementation = v2.5.0 carry)
+**기준일**: 2026-05-13~14 (★ ★ ★ ★ ★ ★ ★ ★ **session 10차 — v2.5.0 Phase A 시행 — description vs NL paradigm 재정의 (Agent 3 (c) hybrid 채택) + schema 강화 (breaking change ❌) + validator paradigm 갱신 + PoC #01 13 BR 자동 마이그레이션 ✅ + 302/0 test pass + LL-i-31~32 자산화** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase B = 다음 session)
 
 **v2.4.0 MINOR FINAL release 보존** (★ session 8차 / 2026-05-13 / commit `f3b62db` / git tag `v2.4.0` / origin push ✅ — ★ ★ ★ ★ ★ session 9차 carry 명시 추가: "paradigm rc 도입 / threshold gate 결정 보류 / Layer 2 LLM 의무 carry / ≥ 2 PoC corroboration 의무 carry / v2.5.0 = paradigm 본격 도입" / ★ Senior STOP-2 soft 흡수 = ★ 라벨 강등 ❌ / carry 명시 ✅)
 
@@ -18,6 +18,58 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-13~14 session 10차 — v2.5.0 Phase A 시행 — description vs natural_language paradigm 재정의**:
+
+- ✅ **carry trigger** = ★ ★ ★ ★ C-description-vs-nl-paradigm-define (★ session 9차 신규 carry / 3 agent 충돌 영역)
+- ✅ **★ 4원칙 1단계 plan 자산** = `~/.claude/plans/p-v2.5.0-paradigm-본격-도입.md` (★ v2.5.0 Phase A~D 분리 paradigm + Phase A scope 결단)
+- ✅ **★ ★ 4원칙 2단계 = session 9차 sub-agent 3 자료 충분 흡수** (★ 추가 v2 토론 = diminishing returns 결단 / Agent 1 (a) + Agent 2 (b) + Agent 3 (c) 충돌 영역)
+- ✅ **★ ★ ★ ★ Agent 3 (c) hybrid 강 옵션 채택** (★ ★ session 9차 SPIKE v2 결정적 입증 + memory `feedback_quality_priority.md` 재작업 최소화 정합):
+  - description = optional metadata (★ BR statement + rationale + caveat + DRIFT 격상 자유 / 사람 눈 친화 / cross-validation 대상 ❌)
+  - natural_language = REQUIRED (★ pure BR statement / 1~2 문장 / Layer 2 LLM cross-validation 대상)
+  - cross-validation 대상 = ★ ★ natural_language ↔ given/when/then ONLY (★ description 제외)
+- ✅ **★ ★ schema breaking change ❌ paradigm** (★ ★ 11 PoC backward-compat anyOf 보존 + description 강화만)
+- ✅ **★ 사용자 결단** "1" (즉시 시행) → ★ Phase A scope 본격 시행
+- ✅ **★ ★ ★ ★ 시행 산출 8종**:
+  - ★ `schemas/rules.schema.json` (★ Phase A paradigm 명세 강화 / description = optional metadata 격상 / NL = REQUIRED for cross-validation / cross-validation 대상 = NL ↔ GWT only)
+  - ★ ★ `tools/br-cross-consistency-validator/src/deterministic.js` (★ description alias 제거 + description_only_fallback low finding 신설 + hasDescription return 신규)
+  - ★ `tools/br-cross-consistency-validator/src/validator.js` (★ withDescriptionOnly stat 신규)
+  - ★ `tools/br-cross-consistency-validator/test/validator.test.js` (★ +3 신규 paradigm test / 25/25 pass)
+  - ★ `tools/br-cross-consistency-validator/scripts/migrate-description-to-natural-language.mjs` (★ 신설 / Phase B 재사용 의무)
+  - ★ ★ ★ ★ `examples/poc-01-realworld-spring/output/rules/rules.json` (★ 13/13 BR 자동 마이그레이션 적용 / description 보존 + natural_language 신규 추출)
+  - ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-31+32 + §11 후속 patch v3 (★ session 10차 갱신)
+  - ★ `decisions/DEC-2026-05-14-description-vs-nl-paradigm-재정의.md` (★ DEC 신설)
+- ✅ **★ ★ PoC #01 cross-validation 결과 (★ Phase A pilot 실증)**:
+  - stats: with_natural_language=13 / with_gwt=13 / with_both=13 / with_description_only=0
+  - overlap: mean=0.173 / median=0.105 / max=0.500 (★ ★ session 9차 SPIKE v2 stripped 결과 ★ 그대로 실현)
+  - score: 0.608 / gate: fail (★ Layer 1 keyword overlap = structural sanity 격하 paradigm 입증 / Layer 2 LLM v2.5.0 Phase C 의무)
+- ✅ **★ ★ ★ workspace 전수 test 회귀 검증** = 302/0 pass (★ +3 신규 paradigm test / 회귀 ❌)
+
+### resolved by 본 session (★ session 10차)
+
+- ★ ★ ★ **C-description-vs-nl-paradigm-define** (★ session 9차 carry) → ★ ★ **resolved** (★ Q2 paradigm 재정의 본격 시행 + PoC #01 마이그레이션 ✅)
+
+### 신규 carry (★ ★ session 10차)
+
+- ★ ★ ★ **C-poc-01-13-br-nl-human-review** (★ ★ Phase B carry / 자동 추출 정확 보장 ❌ / PoC #01 13 BR 안 NL 사람 검토 의무)
+- ★ ★ ★ **C-poc-02-11-description-to-nl-migration** (★ ★ Phase B carry / PoC #02~#11 안 description 보유 BR 마이그레이션 / PoC #03 + #05 우선 / ≥ 2 PoC corroboration 정합)
+
+### Lessons Learned 신규 (★ session 10차 / DEC §5 정합)
+
+- ★ ★ ★ ★ **LL-i-31** (★ "schema breaking change ❌ + validator paradigm 갱신 = safe 마이그레이션 paradigm" / Phase A 시행 입증)
+  - **How to apply**: paradigm 재정의 시 schema breaking change 회피 + validator 영역만 변경 paradigm 우선 검토 / 자동 script 자산화 + 사람 검토 carry 분리 의무
+- ★ ★ **LL-i-32** (★ "description ↔ natural_language paradigm 명세 = paradigm 결단 결정적 사실" / ADR-008 이중 렌더링 사상 확장 명세)
+  - **How to apply**: paradigm 명세 명확 의무 / 외부 인용 시 "Layer 1 결정적 (structural sanity) + Layer 2 LLM mandatory (semantic) + paradigm 명세 명확 (description ≠ NL)" 3 layer corroboration 의무
+
+### ★ ★ 다음 step (★ ★ Phase B = 다음 session)
+
+- ★ ★ ★ ★ ★ ★ ★ PoC #03 dual representation 마이그레이션 (★ trigger/condition/action → natural_language + given/when/then 추가)
+- ★ ★ ★ ★ ★ ★ ★ PoC #05 dual representation 마이그레이션 (★ description → natural_language + GWT 신규)
+- ★ ★ ★ ★ Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하 (★ validator + test 갱신)
+- ★ ★ ≥ 2 PoC corroboration 자료 확보 (★ Senior STOP-1 흡수 정합)
+- ★ ★ ★ ★ Phase C 진입 자격 도달 (★ Layer 2 LLM mandatory 본격 구현)
 
 ---
 

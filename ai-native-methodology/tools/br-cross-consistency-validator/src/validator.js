@@ -25,10 +25,11 @@ export function validateRulesDoc(rulesDoc, options = {}) {
   let withNL = 0;
   let withGWT = 0;
   let withBoth = 0;
+  let withDescriptionOnly = 0; // ★ ★ v2.5.0 Phase A — description-only fallback carry 추적 (★ Phase B 마이그레이션 의무)
 
   for (let i = 0; i < rules.length; i++) {
     const br = rules[i];
-    const { findings, overlap_score, has_nl, has_gwt } = validateBR(br, {
+    const { findings, overlap_score, has_nl, has_gwt, has_description } = validateBR(br, {
       path: `/business_rules/${i}`,
       keywordThreshold: options.keywordThreshold,
     });
@@ -37,6 +38,7 @@ export function validateRulesDoc(rulesDoc, options = {}) {
     if (has_nl) withNL += 1;
     if (has_gwt) withGWT += 1;
     if (has_nl && has_gwt) withBoth += 1;
+    if (!has_nl && !has_gwt && has_description) withDescriptionOnly += 1;
   }
 
   const deterministicScore = computeDeterministicScore(rules.length, allFindings);
@@ -55,6 +57,7 @@ export function validateRulesDoc(rulesDoc, options = {}) {
       with_natural_language: withNL,
       with_gwt: withGWT,
       with_both: withBoth,
+      with_description_only: withDescriptionOnly, // ★ ★ v2.5.0 Phase A 신규 stat (★ Phase B 마이그레이션 carry 가시화)
       with_finding: countRulesWithFinding(rules.length, allFindings),
     },
     overlap_distribution: distributionStats(overlapScores),
