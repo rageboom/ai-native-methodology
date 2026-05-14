@@ -84,20 +84,45 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 /plugin                  # 대화형 manager — Installed 탭에서 v2.0.0-rc1 확인
 ```
 
-#### B. 배포 수신자 — dist artifact 등록 (사내 동료)
+#### B. 배포 수신자 — 사내 사용자 install (★ 사내 표준)
 
-빌드된 artifact (`dist/ai-native-methodology-v2.0.0-rc1/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
+##### B-1. 사내 GHE git URL 기반 (★ Recommended)
+
+사내 GHE (`github.smilegate.net/SGH-ISD/ai-native-methodology`) 의 read 권한 + git 인증만 있으면 install. 별도 dist artifact 전달 ❌.
+
+```bash
+# 사내 GHE 인증 1회 (gh CLI 권장 / SSH key 도 가능)
+gh auth login --hostname github.smilegate.net
+
+# Claude Code 세션에서:
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
+/plugin install ai-native-methodology@ai-native-methodology
+/reload-plugins
+```
+
+특정 버전 pin (★ 권장 — git tag):
+
+```bash
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v2.4.0
+/plugin install ai-native-methodology@ai-native-methodology
+```
+
+★ plugin update — `/plugin` 대화형 manager → Installed 탭 → "Update" → 최신 tag 자동 fetch.
+
+##### B-2. dist artifact 폴더 등록 (오프라인 / 특수 환경)
+
+빌드된 artifact (`dist/ai-native-methodology-v<version>/` 폴더 또는 zip 압축본) 을 받아 install. 폴더 자체에 `.claude-plugin/{plugin.json, marketplace.json}` 가 들어있어 자기완결.
 
 ```bash
 # 받은 dist 폴더를 임의 위치에 풀기:
-#   ~/claude-plugins/ai-native-methodology-v2.0.0-rc1/
+#   ~/claude-plugins/ai-native-methodology-v<version>/
 #   ├── .claude-plugin/{plugin.json, marketplace.json}
 #   ├── agents/ skills/ hooks/ flows/ templates/ tools/ methodology-spec/ schemas/
 #   ├── CHANGELOG.md / CHANGELOG-HISTORY.md / README.md / CLAUDE.md
 #   └── CHECKSUMS.txt   ← SHA256 manifest (무결성 검증)
 
 # Claude Code 세션에서:
-/plugin marketplace add /absolute/path/to/ai-native-methodology-v2.0.0-rc1
+/plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
 ```

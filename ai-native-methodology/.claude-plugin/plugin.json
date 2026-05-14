@@ -1,12 +1,12 @@
 {
   "name": "ai-native-methodology",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "★ ★ ★ ★ ★ v2.4.0 MINOR — BR dual representation paradigm (★ ADR-CHAIN-011 본격 작성 / Adzic 10년 폐기 회피 도구 보유 / industry 공백 채우는 original 기여 자격). natural_language + given/when/then 동시 보존 + cross-validation 자동 검증 (★ tools/br-cross-consistency-validator workspace 16번째 신설 / Layer 1 결정적 / 22/22 unit test pass / chain-driver chain 1 gate REQUIRED_VALIDATORS_PER_STAGE 통합). rules.schema.json top-level 재설계 (project_id + business_rules + paradigm enum BE/FE + rules alias 호환 / 11 PoC 호환 자격 회복 / PoC #01 + PoC #05 = VALID). meta-confidence.schema.json + rules.schema.json enum 확장 (★ Senior R5 정합 / no_operational_db + missing_explicit_policy + auth_expression_websec_ignoring 흡수). release-readiness §8.1 strict 7/7 → 8/8 격상 (★ analysis_validator_violation criterion 신설 / LL-i-23 release-readiness 사각지대 회복). ADR-CHAIN-011 신설 + LL-i-22~27 자산화 + DEC-2026-05-13-rules-dual-representation-사상-신설 정합. chain harness 5 요소 변경 ❌ (★ analysis stage schema + chain-driver REQUIRED_VALIDATORS_PER_STAGE 외부 영역). v2.3.7 PATCH + v2.3.6 (findings-aggregator) + v2.3.5 + v2.3.4 + v2.3.3 + v2.3.2 + v2.3.1 + v2.3.0 MINOR + v2.2.0 MINOR 모두 보존. chain harness validated 보존.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"
   },
-  "homepage": "https://github.com/rageboom/ai-native-methodology",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
   "license": "SEE LICENSE IN LICENSE",
   "keywords": [
     "ai-native",

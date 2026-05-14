@@ -1,0 +1,18 @@
+{
+  "name": "ai-native-methodology",
+  "owner": {
+    "name": "AIMD",
+    "email": "sangcl@smilegate.com"
+  },
+  "plugins": [
+    {
+      "name": "ai-native-methodology",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+        "path": "ai-native-methodology"
+      },
+      "description": "AI-Native 개발 방법론 — SDLC 4단계 chain harness Claude Code plugin (사내 표준). Analysis stage (legacy 분석 / 7대 산출물 + finding + antipatterns + migration-cautions) + chain 1~4 gate (planning → behavior+AC → test RED → impl GREEN) + traceability matrix + 70~80% 한계 명시."
+    }
+  ]
+}

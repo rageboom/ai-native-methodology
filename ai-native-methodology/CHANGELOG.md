@@ -9,7 +9,45 @@
 
 ---
 
-## [v2.4.0 carry update — session 14차 SESSION-WRAPUP — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경) — Phase C 본격 종결 ✅] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — gate-eval.js findings shape 안 llm_consistency_score+llm_threshold+llm_status 3 필드 + evaluateGate 안 layer2_threshold block reason + severityRank rank 2 (coverage_threshold 수준) + applyUserDecision user go → go-with-warnings 허용 + Senior STOP-3 흡수 + REVISE 4건 흡수 + chain-driver test +4 신규 (68→72) + workspace 312/0 + chain harness validated 본질 보존 ✅ + DEC + ADR §9 LL-i-42+43 + §11 patch v8 / Phase D 진입 자격 본격 도달 / session 15차+ = release-readiness 9/9 + v2.5.0 MINOR FINAL release)
+## [v2.4.1] — 2026-05-14 ⭐ 현재 (★ ★ ★ PATCH — 사내 GHE plugin 배포 채널 정착 + root `.claude-plugin/marketplace.json` 신설 (git-subdir source / path: ai-native-methodology) + `ai-native-methodology/.claude-plugin/plugin.json` homepage GHE 교체 + README.md 시나리오 B → B-1 (GHE git URL, Recommended) + B-2 (dist artifact, 오프라인) 분리 + DEC-2026-05-14-ghe-marketplace-root-신설 + chain harness 5 요소 변경 ❌)
+
+> ★ ★ ★ **v2.4.1 PATCH — 사내 GHE plugin 배포 채널 정착** — v2.4.0 ⭐ MINOR FINAL release plugin artifact 가 사내 GHE (`github.smilegate.net/SGH-ISD/ai-native-methodology`) 에 본격 배포됨. nested 레포 구조 (`<git-root>/ai-native-methodology/.claude-plugin/`) 와 Claude Code marketplace add 시 git root 의 `.claude-plugin/marketplace.json` 만 인식하는 표준 동작 사이의 path 불일치 해소 → `git-subdir` source 타입 채택.
+
+### ★ ★ ★ v2.4.1 산출 자산 5종
+
+1. ★ **root `<git-root>/.claude-plugin/marketplace.json` 신설** — `git-subdir` source / `path: "ai-native-methodology"` / `url: https://github.smilegate.net/SGH-ISD/ai-native-methodology.git` → 사용자 `/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v2.4.1` 1줄 install 가능
+2. ★ **`ai-native-methodology/.claude-plugin/plugin.json` homepage 교체** — `https://github.com/rageboom/ai-native-methodology` → `https://github.smilegate.net/SGH-ISD/ai-native-methodology` (사내 정합)
+3. ★ **`ai-native-methodology/.claude-plugin/marketplace.json` 보존** — `source: "./"` 그대로 (시나리오 A 편집자 워크스페이스 직접 등록 / 시나리오 B-2 dist artifact 폴더 등록 워크플로 보존)
+4. ★ **README.md 시나리오 B 분리** — B-1 (GHE git URL, ★ Recommended / 사내 표준) + B-2 (dist artifact, 오프라인 / 특수 환경 fallback)
+5. ★ **DEC-2026-05-14-ghe-marketplace-root-신설** + `decisions/INDEX.md` 갱신
+
+### ★ ★ chain harness 5 요소 변경 ❌
+
+본 v2.4.1 PATCH = plugin 배포 path infrastructure 영역 한정 (사내 GHE 본격 배포 / nested 레포 → git-subdir paradigm). chain harness 5 요소 (chain-driver / 4 gate validator / state.json / 산출물 schema / lifecycle) 변경 ❌. 11 PoC 호환 자격 보존 ✅. v2.4.0 ⭐ MINOR FINAL release 본질 보존 ✅.
+
+### ★ ★ ★ ★ release-ready ❌ 명시 (★ install path fix purpose only)
+
+본 v2.4.1 PATCH 는 release-readiness §8.1 strict **6/8 pass / 2 regress** 인지 상태로 commit + tag. **사용자 결단** "v2.4.1 = install path fix 한정 / release-ready ❌ 명시 carry" (★ Recommended 옵션).
+
+| criterion | 결과 | 원인 |
+|---|---|---|
+| poc_corroboration / real_tool_evidence / chain_coverage / adr_registry / matrix_greenness / e2e_cycle_pass | ✅ 6/6 | v2.4.0 본질 보존 |
+| validators_violation | ❌ | session 11~13차 carry — planning-extraction (poc-05) BR-USER-DATA-001 unknown_br |
+| analysis_validator_violation | ❌ | session 11차 carry — poc-05 input/rules.json missing (`input/ → output/rules/` 이전) |
+
+★ 본 regress 2건 = sessions 11~14차 v2.4.0 carry update (`no release / no version bump / no tag`) 누적 부담. v2.4.0 ⭐ MINOR FINAL release 시점 8/8 pass → carry update 4 session 누적 → 본 v2.4.1 release-readiness 부담 떠안음.
+
+★ ★ 본 v2.4.1 PATCH 본질 = **사내 GHE install 차단 즉시 해소**. 8/8 strict 회복 = sessions 15차+ Phase D carry 영역 (★ release-readiness 9/9 + v2.5.0 MINOR FINAL release 영역 정합).
+
+### ★ ★ 신규 carry 3건
+
+- ★ ★ **C-release-readiness-recovery-v2.5.0** (★ critical / sessions 15차+ Phase D 영역) — PoC #05 input/rules.json 재배치 + planning-extraction (poc-05) BR-USER-DATA-001 정합 + 8/8 strict 회복
+- ★ **C-ghe-distribution-validation** (medium / install UX 본격 재시도 동작 검증)
+- C-settings-json-auto-distribution (low / 사내 사전 배포 paradigm)
+
+---
+
+## [v2.4.0 carry update — session 14차 SESSION-WRAPUP — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경) — Phase C 본격 종결 ✅] — 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — gate-eval.js findings shape 안 llm_consistency_score+llm_threshold+llm_status 3 필드 + evaluateGate 안 layer2_threshold block reason + severityRank rank 2 (coverage_threshold 수준) + applyUserDecision user go → go-with-warnings 허용 + Senior STOP-3 흡수 + REVISE 4건 흡수 + chain-driver test +4 신규 (68→72) + workspace 312/0 + chain harness validated 본질 보존 ✅ + DEC + ADR §9 LL-i-42+43 + §11 patch v8 / Phase D 진입 자격 본격 도달 / session 15차+ = release-readiness 9/9 + v2.5.0 MINOR FINAL release)
 
 > ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 14차 — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합** — ★ session 13차 carry C-chain-1-gate-layer-2-integration (critical) 시행. ★ 4원칙 1단계 plan T 자산화 → 4원칙 2단계 Senior critique → 4원칙 3단계 사용자 결단 "1" (★ 종합 권장 시행) → 4원칙 4단계 본격 시행 + Phase C 본격 종결.
 
