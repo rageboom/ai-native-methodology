@@ -1,46 +1,84 @@
-# agents/ — SDLC 4-stage chain agent (★ v2.0 chain harness)
+# Agents Axis — Claude Code plugin 표준 1-depth + sub-agent invocation paradigm
 
-본 디렉토리 = SDLC stage 별 specialized sub-agent. plugin install 후 자연어 prompt 매칭 시 자동 호출 (또는 사용자 명시 호출).
+> **상태**: ★ ★ ★ v2.5.1 PATCH 본격 정합 (post-v2.5.0 commit `4d25df8` agents/skills 1-depth 평탄화 자산화)
+> **이전 자산**: v2.0~v2.5.0 의 `agents/{analysis,design,implement,planning,spec,test}/README.md` (★ chain stage 별 카테고리 디렉토리) 는 사상 자료 — 본 axis 명세로 흡수. lifecycle stage organize 의 사상 (skill / agent 가 chain stage 와 정합) 은 본 명세 + [`skills-axis.md`](./skills-axis.md) 안 사상 영역 보존.
+> **runtime axis**: `agents/_base-<name>.md` 1-depth (Claude Code plugin 표준 정합 / install 후 본격 인식)
 
-## 디렉토리 구성
+## 1. paradigm 사실 — 본 plugin 의 agent 자산 본질
 
-| 디렉토리 | stage | 상태 | 역할 |
+본 plugin 의 agents 자산 본질 = ★ **sub-agent invocation paradigm 의 helper 영역 한정**. chain harness 본격 작동의 SSOT 는 [`skills/`](../skills/) 38종 SKILL (1-depth) + chain-driver gate trio. agents 영역은 사용자/메인 agent 가 4원칙 §2 (3-에이전트 토론) 시 호출하는 **specialized sub-agent helper** 영역.
+
+★ **chain stage 별 agent README 자산 (v2.0~v2.5.0 `agents/{analysis,planning,spec,test,implement,design}/README.md`) = 사상 명세 자산** (chain stage axis 사상 보존). v2.5.1 PATCH 시점에 본 axis 명세 + [`skills-axis.md`](./skills-axis.md) §4 안 chain stage axis 표 영역으로 통합 흡수.
+
+## 2. agents 1-depth 자산 (v2.5.1 시점 / runtime)
+
+| agent file | role | model | sub-agent invocation paradigm |
 |---|---|---|---|
-| [`analysis/`](./analysis/) | analysis stage (chain 1 진입 전) | ★ ★ 활성 | Legacy 코드 → 7대 산출물 한 방향 추출. v1.x 자산 (Phase 0~6 + 4.5). |
-| [`planning/`](./planning/) | chain 1 / planning | ★ 활성 (sub-plan-4 채워짐) | legacy 분석 결과 → planning-spec (UC + 비즈니스 의도) |
-| [`spec/`](./spec/) | chain 2 / spec | ★ 활성 | behavior-spec + acceptance-criteria + 7대 통합 (executable contract) |
-| [`test/`](./test/) | chain 3 / test | ★ 활성 | test-spec + 실 test code (RED 의무) |
-| [`implement/`](./implement/) | chain 4 / impl | ★ 활성 | impl-spec + 실 impl code (GREEN / 100% test pass) |
-| [`design/`](./design/) | (carry / v2.x) | ☐ placeholder | design stage 미채움 — chain 2 spec 과 차별화 시점 carry |
+| [`agents/_base-senior-engineer.md`](../agents/_base-senior-engineer.md) | Senior engineer for design review, ADR decisions, trade-off evaluation | opus | 4원칙 §2 (3-에이전트 토론) 시 senior perspective. AI-Native methodology principles (quality 1순위 / 재작업 최소화 2순위 / no-simulation / §8.1 단일 PoC 과적합 회피) 적용. |
+| [`agents/_base-industry-case-researcher.md`](../agents/_base-industry-case-researcher.md) | Research how tech companies (FAANG / scale-ups / OSS) solved same problem | sonnet | 4원칙 §2 시 real-world precedent 기반 결단. 가벼운 sub-agent 전략 (Case skip + time cap + priority reads) 적용. |
+| [`agents/_base-official-docs-checker.md`](../agents/_base-official-docs-checker.md) | Cross-check main agent's claims against official documentation | sonnet | 4원칙 §2 시 training-corpus dependency 회피. Pattern F-015 cross-validation (main raw fetch → sub-agent cross-check on independent fetch). |
 
-## 호출 cadence
+★ chain stage 별 agent 자산 ❌ (★ Claude Code 의 skill auto-invocation paradigm + chain-driver gate trio 가 chain stage organize 의 본격 enforcement / agent 자산 의무 ❌).
 
-| stage | 자동 호출 trigger | 매뉴얼 호출 |
-|---|---|---|
-| analysis | "이 코드베이스 분석 시작" / "inventory 추출" / 코드베이스 자동 detection | `@agents/analysis/` |
-| planning | chain-driver `next` (analysis 종결 후) / "기획 단계 시작" | `@agents/planning/` |
-| spec | gate #1 통과 후 / "behavior spec / acceptance criteria" | `@agents/spec/` |
-| test | gate #2 통과 후 / "test spec 생성 RED" | `@agents/test/` |
-| implement | gate #3 통과 후 / "impl spec 생성 GREEN" | `@agents/implement/` |
+## 3. invocation paradigm — Claude Code 표준 정합
 
-★ ★ ★ chain harness gate trio enforcement: 사용자가 stage 순서 무시하고 호출 시 hook (PreToolUse) + chain-driver state.blocked 가 차단.
+### 3.1 명시 호출 (`/agents` 또는 Task tool)
 
-## 각 agent 의 skill 위치
+```
+/agents _base-senior-engineer
+```
 
-| agent | 사용 skill 위치 | 산출 deliverable |
-|---|---|---|
-| analysis | [`../skills/analysis/`](../skills/analysis/) (18 skill) | 7대 산출물 + finding + antipatterns + migration-cautions |
-| planning | [`../skills/planning/`](../skills/planning/) (3 skill) | `planning-spec.{json,md}` |
-| spec | [`../skills/spec/`](../skills/spec/) (3 skill) | `behavior-spec` + `acceptance-criteria` + 7대 통합 |
-| test | [`../skills/test/`](../skills/test/) (3 skill) | `test-spec` + 실 test code (RED) |
-| implement | [`../skills/implement/`](../skills/implement/) (2 skill) | `impl-spec` + 실 impl code (GREEN) |
+또는 Claude Code 의 [Task tool](https://code.claude.com/docs) 의 `subagent_type` 필드:
 
-★ `_base/` skill 5종 (_base-apply-template / _base-build-traceability-matrix / _base-invoke-go-stop-gate / _base-log-finding / _base-apply-baseline-ratchet) 은 모든 agent 가 공유.
+```javascript
+Task({
+  description: "Senior review",
+  subagent_type: "_base-senior-engineer",
+  prompt: "..."
+})
+```
 
-## 참조
+### 3.2 자동 invocation (★ description 키워드 매칭)
 
+각 agent 의 frontmatter `description` 영역 키워드가 사용자 prompt 와 매칭 시 자동 invoke. 자세히는 [Claude Code skills.md](https://code.claude.com/docs/en/skills.md) 참조.
+
+### 3.3 4원칙 §2 (3-에이전트 토론) 정합
+
+본 plugin 의 4원칙 (CLAUDE.md 명시) §2 = "에이전트 팀 토론 → research.md 작성 — 3 에이전트 병렬 (공식문서 / 테크기업 사례 / Senior)". 본 3-에이전트 본질 = ★ 본 axis 의 3 _base agent 정합:
+
+| 4원칙 §2 역할 | agent |
+|---|---|
+| 공식문서 | `_base-official-docs-checker` |
+| 테크기업 사례 | `_base-industry-case-researcher` |
+| Senior | `_base-senior-engineer` |
+
+## 4. lifecycle stage organize 사상 보존 (사상 axis)
+
+v2.0~v2.5.0 의 `agents/{analysis, planning, spec, test, implement, design}/README.md` 가 표현했던 사상 = "chain stage 별 agent 자산 분리 사상". 본 사상 본질 = ★ ★ ★ **chain stage 별 자산 (skills + agents + flows + state) 의 axis 정렬 paradigm** ([`lifecycle-contract.md`](./lifecycle-contract.md) 정합).
+
+v2.5.1 PATCH 시점 agent 자산이 _base 3종만 인 사실 = ★ ★ chain stage 영역의 sub-agent invocation paradigm 의무 ❌ + skills + chain-driver gate trio 가 본격 enforcement 자격 도달. 다만 향후 chain stage 별 agent 자산 신설 시:
+
+- 디렉토리 구조 = ★ **1-depth + category prefix** paradigm 의무 (★ `agents/planning-<name>.md` / `agents/spec-<name>.md` / 등)
+- 사상 axis 보존 = 본 명세 + skills-axis.md §4 chain stage axis 표 갱신 의무
+
+## 5. v2.0~v2.5.0 자산 보존 흡수
+
+| 자산 | 흡수 영역 |
+|---|---|
+| `agents/README.md` (v2.0~v2.5.0) | ★ 본 axis 명세 (v2.5.1 PATCH 본격 재작성 / paradigm 자료 보존) |
+| `agents/analysis/README.md` | skills-axis.md §4 chain stage axis 표 (analysis stage 영역) |
+| `agents/planning/README.md` | skills-axis.md §4 chain stage axis 표 (planning stage 영역) |
+| `agents/spec/README.md` | skills-axis.md §4 chain stage axis 표 (spec stage 영역) |
+| `agents/test/README.md` | skills-axis.md §4 chain stage axis 표 (test stage 영역) |
+| `agents/implement/README.md` | skills-axis.md §4 chain stage axis 표 (implement stage 영역) |
+| `agents/design/README.md` (placeholder) | 사용자 결단 carry — chain 2 spec vs design 차별화 시점 |
+
+## 6. 참조
+
+- [`skills-axis.md`](./skills-axis.md) — skills 영역 axis 사상 명세 (v2.5.1 PATCH category prefix paradigm 정합)
+- [`lifecycle-contract.md`](./lifecycle-contract.md) — SDLC stage 간 data contract
 - [`../README.md`](../README.md) — plugin user 진입점 (시나리오 A/B/C)
-- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (★ stages + revisit_edges + 4 gate)
-- [`../methodology-spec/lifecycle-contract.md`](../methodology-spec/lifecycle-contract.md) — SDLC stage 간 data contract
+- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (stages + revisit_edges + 4 gate)
 - ADR-CHAIN-001~005 — chain harness 5 요소 enforcement 명세
-- DEC-2026-05-06-sub-plan-4-종결 — 5 chain agent README 정식 채움 record
+- ADR-CHAIN-011 §9 LL-i-48+49 — Claude Code plugin 표준 1-depth vs lifecycle organize 충돌 해소 paradigm
+- DEC-2026-05-14-agents-skills-1-depth-flatten — 본 paradigm 결단 record

@@ -119,3 +119,60 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 - 산출물 번호 axis 와 manifest phase ID 가 다른 의미체계라는 사실 자체는 **혼란을 가중**할 수 있다. 본 명세 + drift-validator 가 그 혼란을 명문 + 자동 검증으로 흡수.
 - v2.0 진입 시 의미 ID + alias map (plan-b carry) 으로 자연 흡수 예정. 본 axis 분리 정책은 v1.4.x 의 과도기 패턴.
+
+## 7. v2.5.1 PATCH — category prefix 1-depth paradigm 본격 자산화 (★ ★ ★)
+
+> ★ ★ ★ 2026-05-14 / DEC-2026-05-14-agents-skills-1-depth-flatten / ADR-CHAIN-011 §9 LL-i-48+49
+
+### 7.1 paradigm 결단 사실
+
+v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>/<name>/SKILL.md` (lifecycle stage organize 사상). 본 paradigm 이 ★ ★ ★ **Claude Code plugin 표준 1-depth** (`skills/<name>/SKILL.md`) 과 본격 충돌 → 사내 GHE install 후 skill 본격 인식 ❌ critical 결함.
+
+★ ★ 사용자 결단 paradigm (v2.5.1 PATCH 본격 자산화):
+
+- **runtime axis** = `skills/<category>-<name>/SKILL.md` (★ ★ 1-depth + category prefix paradigm / Claude Code 표준 정합)
+- **사상 axis** = 본 명세 §2~§5 lifecycle stage organize 사상 보존 (★ chain stage axis + 산출물 번호 axis + manifest phase ID axis 모두 사상 영역 보존)
+
+본 paradigm 본질 = ★ **사상 axis 와 runtime axis 의 sub-axis 영역 분리**. ADR-008 이중 렌더링 사상 (사상 + 자산 분리) 의 plugin runtime 영역 확장.
+
+### 7.2 category prefix 매핑
+
+| 사상 카테고리 | runtime prefix | skill 개수 (v2.5.1) | 예 |
+|---|---|---|---|
+| _base | `_base-` | 5 | `_base-apply-template`, `_base-build-traceability-matrix`, ... |
+| analysis | `analysis-` | 22 | `analysis-phase-0-input`, `analysis-aspect-a11y`, ... |
+| planning | `planning-` | 3 | `planning-extract-from-legacy`, ... |
+| spec | `spec-` | 3 | `spec-compose-behavior-spec`, ... |
+| test | `test-` | 3 | `test-generate-test-spec`, ... |
+| implement | `implement-` | 2 | `implement-generate-impl-spec`, ... |
+| design | (placeholder) | 0 | — |
+
+총 **38 skill** (★ ★ Claude Code plugin 표준 1-depth 호환 ✅).
+
+### 7.3 frontmatter `name:` SSOT 정합
+
+각 SKILL.md frontmatter `name:` 필드 = 디렉토리 이름과 일치 의무 (v2.5.1 PATCH 본격 정합). Claude Code 의 [skills.md](https://code.claude.com/docs/en/skills.md) 공식: frontmatter `name:` 명시 시 그 값이 SSOT (디렉토리 이름 무시). 일관성 보존을 위해 v2.5.1 PATCH 안 41 파일 (38 skill + 3 agent) frontmatter 모두 새 prefix 이름과 정합 갱신.
+
+### 7.4 skill auto-invocation = description 기반 (★ ★)
+
+본 paradigm 의 critical 사실 — Claude Code 의 skill **auto-invocation 은 frontmatter `description` + `when_to_use` 키워드 매칭 기반** ([공식 docs](https://code.claude.com/docs/en/skills.md)). 즉:
+
+- 디렉토리 rename (1-depth) + description 보존 = ★ auto-trigger 본격 작동 ✅
+- 명시 호출 (`/<skill-name>`) = 디렉토리 이름 기반 → category prefix 이름 (예 `/analysis-phase-0-input`) 사용
+
+### 7.5 외부 참조 정밀 갱신 (v2.5.1 PATCH 본격 자산화)
+
+| 자산 | 갱신 영역 |
+|---|---|
+| `flows/*.json` (13) | `"skills": [...]` 배열 안 string |
+| `flows/*.mermaid` (6) | diagram label |
+| `tools/chain-driver/src/hooks-bridge.js` | `skillId` nested path (`planning/extract-from-legacy`) → flat (`planning-extract-from-legacy`) |
+| `methodology-spec/` (17 file) | 명세 본문 안 skill name 인용 |
+| `README.md` (시나리오 A 자연어 trigger 표) | 자연어 prompt → skill name 매핑 표 |
+
+★ ★ negative lookbehind/lookahead + `.md` path 회피 정규식 / `spec_file` path 영역 보존 (★ methodology-spec/workflow/<phase-id>.md 영역 그대로 / 평탄화 무관). 본 정밀 갱신 paradigm 의 본질 = ★ runtime skill 자산 path 갱신 ≠ phase spec file path (사상 axis 의 영역).
+
+### 7.6 paradigm 한계 (v2.5.1 시점)
+
+- ★ ★ skills/<category>-<name>/ 의 category prefix 가 사상 의미 + runtime axis 양쪽 표현 — 사용자 가독성 측면 OK / 단 신규 카테고리 추가 시 prefix 명명 paradigm 재정합 의무.
+- 본 paradigm = ★ **본 plugin 의 plugin lifecycle organize 사상 vs Claude Code runtime 호환성 dual axis 정합**. 향후 Claude Code plugin spec 진화 (예: components 필드 신설 또는 nested directory 지원) 시 본 paradigm 재검토 carry (★ C-poc-axis-design-vs-runtime-separation-paradigm).

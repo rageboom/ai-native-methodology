@@ -1,8 +1,8 @@
-# AI-Native 개발 방법론 v2.0.0-rc1 ★ ★ ★ ★ ★
+# AI-Native 개발 방법론 v2.5.1 ★ ★ ★ ★ ★
 
 > 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 기획 → 스펙 → 테스트 → 구현** SDLC 4단계 chain harness.
 >
-> **현재**: v2.0.0-rc1 (2026-05-06) — ★ ★ ★ ★ ★ chain harness validated / §8.1 strict 7/7 통과 / ≥ 2 PoC corroboration / 218 unit test pass / sub-plan 1~6 모두 종결 / **next: v2.0.0 final** (2026-05-07~ clean clone PoC #05 e2e 재실행 통과 시).
+> **현재**: v2.5.1 (2026-05-14) — ★ ★ ★ ★ ★ ★ chain harness validated v2.5.0 본질 보존 / §8.1 strict 9/9 통과 (★ layer_2_consistency criterion 신설) / Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 도입 / ≥ 2 PoC corroboration L1+L2 양쪽 입증 / 322/0 test pass / 11 PoC 호환 / **사내 GHE plugin install 호환성 본격 회복** (★ ★ ★ v2.5.1 PATCH — agents/skills 1-depth 평탄화 / Claude Code 표준 정합).
 >
 > ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness 4 gate + revisit loop + 70~80% 한계 명시.
 >
@@ -70,7 +70,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 - Node ≥ 18 (chain-driver / 12 workspace tool 실행)
 
-### 사용법 — Plugin install (★ v2.0.0-rc1)
+### 사용법 — Plugin install (★ v2.5.1)
 
 #### A. 편집자 — 워크스페이스 직접 등록 (Phase A self-iteration)
 
@@ -81,7 +81,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에서 v2.0.0-rc1 확인
+/plugin                  # 대화형 manager — Installed 탭에서 v2.5.1 확인
 ```
 
 #### B. 배포 수신자 — 사내 사용자 install (★ 사내 표준)
@@ -202,9 +202,9 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 ## 디렉토리 구조 (dist artifact 기준)
 
 ```
-dist/ai-native-methodology-v2.0.0-rc1/
+dist/ai-native-methodology-v2.5.1/
 ├── .claude-plugin/
-│   ├── plugin.json                   v2.0.0-rc1 manifest
+│   ├── plugin.json                   v2.5.1 manifest
 │   └── marketplace.json              source: "./" (자기완결)
 ├── CLAUDE.md                         ★ 사내 적용 정책 23 inline (자동 로드)
 ├── README.md                         ← 본 파일 (plugin user 진입점)
