@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증 — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR 총합) + PoC #03 18 BR NL 본격 합성 (Agent 1) + PoC #05 2 BR GWT 신규 합성 (Agent 3) + PoC #01 13 BR Layer 2 재검증 (Agent 5) + PoC #03 18 BR Layer 2 (Agent 2) + PoC #05 2 BR Layer 2 (Agent 4) + 본격 재실측 (PoC #01 overall=0.901 / PoC #03 overall=0.941 / PoC #05 overall=0.985 / 3 PoC 모두 gate PASS ✅) + ≥ 2 PoC corroboration Layer 1+Layer 2 양쪽 통과 ✅ + Adzic SBE 함정 회피 자격 본격 도달 ✅ + skills/analysis/br-cross-consistency-check/SKILL.md 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
+**기준일**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 14차 — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경) — gate-eval.js findings shape + evaluateGate + severityRank + applyUserDecision 본격 paradigm 갱신 (★ Q-S1 (a) + Q-S2 (b) coverage_threshold 수준 + Q-S3 (a) Phase C 종결 자격) + Senior STOP-3 흡수 + REVISE 1+2+3+4 흡수 + chain-driver test +4 신규 (68→72) + workspace 312/0 + chain harness validated 본질 보존 ✅ + DEC + ADR §9 LL-i-42+43 + §11 patch v8 + ★ ★ ★ ★ ★ Phase C 본격 종결 ✅** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase D 진입 자격 본격 도달 / session 15차+ = release-readiness 9/9 + v2.5.0 MINOR FINAL release)
+
+**기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증 — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR 총합) + PoC #03 18 BR NL 본격 합성 (Agent 1) + PoC #05 2 BR GWT 신규 합성 (Agent 3) + PoC #01 13 BR Layer 2 재검증 (Agent 5) + PoC #03 18 BR Layer 2 (Agent 2) + PoC #05 2 BR Layer 2 (Agent 4) + 본격 재실측 (PoC #01 overall=0.901 / PoC #03 overall=0.941 / PoC #05 overall=0.985 / 3 PoC 모두 gate PASS ✅) + ≥ 2 PoC corroboration Layer 1+Layer 2 양쪽 통과 ✅ + Adzic SBE 함정 회피 자격 본격 도달 ✅ + skills/analysis/br-cross-consistency-check/SKILL.md 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
 
 **기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행 — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) — Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + 사용자 결단 "진행하자" 정합 + validator interface 본격 (cli.js + llm.js + validator.js / placeholder → 본격 / semantic_drift_detected + confidence_cap_exceeded finding 신설 / Layer 1 AND Layer 2 양쪽 통과 paradigm / DETERMINISTIC_THRESHOLD 신설) + docs/layer-2-prompt-spec.md 신설 (batch paradigm + Sonnet 4.6 + confidence cap 0.85) + test +5 (31/31 pass / workspace 308/0) + DEC + ADR §9 LL-i-37+38 + §11 patch v6 + LL-i-37+38 자산화 + session 13차 = step 6~12 분리** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 13차+)
 
@@ -24,6 +26,53 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-14 session 14차 — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경)**:
+
+- ✅ **carry trigger** = ★ ★ ★ ★ C-chain-1-gate-layer-2-integration (★ session 13차 carry / critical)
+- ✅ **★ 4원칙 1단계 plan 자산** = `~/.claude/plans/t-v2.5.0-phase-c-step-9-chain-1-gate-layer-2.md` (★ scope + Q-S1+2+3 결단 의무 + 영향 범위 사실)
+- ✅ **★ ★ 4원칙 2단계 Senior critique sub-agent (★ ★ Sonnet 4.6 / chain harness 5 요소 변경 의무 영역)**:
+  - ★ ★ ★ ★ **STOP-3** (★ ★ Q-S3 (b) 단독 선택 시 Phase C 종결 자격 상실 / Q-S3 (a) 만 자격) 발행
+  - ★ STOP-1+2 자격 부재 / 조건부 영역 = REVISE 격하
+  - ★ REVISE 4건 (REVISE-1 explicit guard / REVISE-2 comment / REVISE-3 severityRank / REVISE-4 test 3 신규)
+  - ★ ★ ★ chain harness validated 본질 보존 검증 ✅ (★ ★ "additive change paradigm" 정합)
+- ✅ **★ ★ ★ ★ 사용자 결단 "1"** → ★ Senior 종합 권장 시행 (Q-S1 (a) + Q-S2 (b) coverage_threshold 수준 + Q-S3 (a))
+- ✅ **★ ★ ★ ★ ★ ★ ★ 4원칙 4단계 본격 시행 — chain harness 5 요소 1 변경 ✅**:
+  - ★ ★ ★ `tools/chain-driver/src/gate-eval.js`:
+    - findings shape 안 신규 영역 — `llm_consistency_score` + `llm_threshold` + `llm_status` 3 필드
+    - evaluateGate 안 Layer 2 block reason `layer2_threshold` 추가 (★ explicit guard / `llm_status === 'evaluated' && llm_consistency_score != null && score < threshold` / REVISE-1 정합)
+    - severityRank 안 `layer2_threshold: 2` (★ coverage_threshold 수준 / Senior 권장 / REVISE-3 정합)
+    - applyUserDecision paradigm — `layer2_threshold` = user go → go-with-warnings 허용 (★ semantic drift Phase D carry 흐름 정합)
+  - ★ ★ `tools/chain-driver/test/gate-eval.test.js`:
+    - +4 신규 Layer 2 paradigm test (★ skipped / pass / fail / user-go path) / REVISE-4 정합
+    - chain-driver test 68 → **72/72 pass** ✅
+- ✅ **★ ★ ★ workspace 전수 test = 312/0** (★ session 13차 308 → +4 / 회귀 ❌)
+- ✅ **★ ★ ★ ★ ★ ★ ★ ★ ★ Phase C 본격 종결 ✅** — step 1~12 모두 완료 (★ step 1~5 session 12차 + step 6~8 session 13차 + step 9 session 14차 + step 10 session 12차 + step 11 308→312 + step 12 본 session)
+
+### resolved by 본 session (★ session 14차)
+
+- ★ ★ ★ ★ **C-chain-1-gate-layer-2-integration** (★ session 13차 carry / critical) → ★ ★ **resolved** (★ gate-eval.js 본격 paradigm 갱신 + test +4 / 312/0 회귀 ❌)
+- ★ ★ ★ ★ ★ **Phase C 종결 (step 1~12)** → ★ ★ **resolved** (★ ★ ★ Adzic SBE 함정 회피 자격 본격 도달 + industry-first 자격 본격 입증 + chain harness validated 본질 보존)
+
+### 신규 carry (★ ★ session 14차)
+
+- ★ ★ ★ ★ ★ ★ **C-v2.5.0-minor-final-release** (★ critical / Phase D / session 15차+ / release-readiness 9/9 + v2.5.0 MINOR FINAL release 의무)
+- ★ ★ ★ **C-phase-d-domain-expert-review-3-drift** (★ Phase D / PoC #01 13 BR + 2 drift BR / domain expert / LL-i-31 정합)
+
+### Lessons Learned 신규 (★ session 14차 / ADR-CHAIN-011 §9 patch v8)
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-42** (★ "chain harness 5 요소 변경 paradigm — additive change paradigm + chain harness validated 본질 보존 의무")
+- ★ ★ ★ ★ ★ ★ **LL-i-43** (★ "Layer 2 block reason severity rank paradigm — semantic drift = coverage_threshold 수준 / Phase D 도메인 전문가 검토 carry 정합")
+
+### ★ ★ 다음 step (★ ★ ★ session 15차+ = Phase D 본격 + v2.5.0 MINOR FINAL release)
+
+- ★ ★ ★ ★ ★ release-readiness 8/8 → 9/9 재격상 (★ Layer 2 통과 criterion 추가)
+- ★ ★ ★ ≥ 2 PoC corroboration 본격 검증 (★ PoC #01 + PoC #03 / 31 BR)
+- ★ ★ ★ ★ PoC #01 13 BR + 2 drift BR (AUTH-JWT-002 + DELETE-AUTH-001) 도메인 전문가 검토
+- ★ ★ ★ ★ ★ ★ v2.5.0 MINOR FINAL release (★ commit + git tag v2.5.0 + origin push)
+- ★ ★ self-evaluation bias retrospect (★ Opus/Haiku 교차 검증 carry)
 
 ---
 

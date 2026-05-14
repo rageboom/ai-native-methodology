@@ -7,7 +7,11 @@
 //   coverage_pct: 0.92,             // chain-coverage 결과
 //   coverage_threshold: 0.85,       // ratchet
 //   evidence_missing: [],           // chain-strict lint
-//   tests_total: 100, tests_passed: 100, tests_failed: 0  // chain 3/4 only
+//   tests_total: 100, tests_passed: 100, tests_failed: 0,  // chain 3/4 only
+//   // ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm (ADR-CHAIN-011 §5.4.6 B 정합)
+//   llm_consistency_score: 0.85,    // aggregate mean (★ br-cross-consistency-validator Layer 2 / null = skipped)
+//   llm_threshold: 0.7,             // semantic threshold (★ default 0.7 / caller-configurable)
+//   llm_status: 'evaluated',        // 'evaluated' | 'skipped' | null (★ ★ explicit guard 의무 / REVISE-1 정합)
 // }
 
 const REQUIRED_VALIDATORS_PER_STAGE = {
@@ -18,7 +22,9 @@ const REQUIRED_VALIDATORS_PER_STAGE = {
 };
 // ★ ★ ★ v2.4.0 — planning stage 안 br-cross-consistency-validator 추가 (ADR-CHAIN-011 §5.6 정합).
 //   BR dual representation paradigm — natural_language + given/when/then 정합 cross-validation.
-//   threshold ≥ 0.85 = empirical hypothesis (★ ★ 11 PoC spike 결과 자료 부재 / sub-plan §2 후 재spike 의무).
+// ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 (ADR-CHAIN-011 §5.4.6 B 본격 정합).
+//   ★ Q-C4 (a) Layer 1 AND Layer 2 양쪽 통과 paradigm + Q-S2 (b) aggregate block + coverage_threshold 수준 severity.
+//   ★ ★ Senior STOP-3 흡수 (Q-S3 (a) Phase C 종결 자격 유일 paradigm).
 
 const TEST_STAGE_EXPECTED = 'all_fail';   // RED 의무
 const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무
@@ -51,6 +57,22 @@ export function evaluateGate(stage, findings) {
     });
   }
 
+  // ★ ★ ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm (★ Q-S1 (a) + Q-S2 (b) 정합)
+  //   ★ ★ ★ REVISE-1 정합 — explicit guard 의무 (★ implicit JS false 의존 ❌):
+  //     1. llm_status === 'skipped' → block 없음 (★ backward-compat / Layer 2 미시행 허용)
+  //     2. llm_status === 'evaluated' && llm_consistency_score >= threshold → block 없음
+  //     3. llm_status === 'evaluated' && llm_consistency_score < threshold → ★ block reason 추가
+  //   ★ ★ Senior 권장 = layer2_threshold severity rank = coverage_threshold 수준 (rank 2) — user go → go-with-warnings 허용 / semantic drift 도메인 전문가 검토 carry 영역 / Phase D 흐름 정합
+  if (findings.llm_status === 'evaluated' && findings.llm_consistency_score != null) {
+    const llmThreshold = findings.llm_threshold ?? 0.7;
+    if (findings.llm_consistency_score < llmThreshold) {
+      reasons.push({
+        code: 'layer2_threshold',
+        detail: `★ Layer 2 llm_consistency_score ${findings.llm_consistency_score} < threshold ${llmThreshold} (★ NL ↔ GWT semantic 정합 부재 / ADR-CHAIN-011 §5.4.6 B Layer 2 mandatory 정합)`,
+      });
+    }
+  }
+
   // Stage-specific outcome enforcement
   if (stage === 'test') {
     if (findings.tests_total != null && findings.tests_failed === 0) {
@@ -79,6 +101,7 @@ export function evaluateGate(stage, findings) {
     state_corrupt: 0,
     validator_high: 1,
     coverage_threshold: 2,
+    layer2_threshold: 2,         // ★ ★ session 14차 / Senior 권장 / coverage_threshold 수준 / user go → go-with-warnings 허용 / semantic drift Phase D carry
     evidence_missing: 3,
     schema_migration_required: 4,
     user_stop: 5,
@@ -94,6 +117,7 @@ export function evaluateGate(stage, findings) {
 }
 
 // Auto Mode override 차단 — critical/high 위반 시 사용자 명시 결단도 'go' 거부.
+// ★ ★ v2.5.0 Phase C session 14차 — layer2_threshold = ★ ★ critical/high 영역 ❌ / user go → go-with-warnings 허용 (★ ★ semantic drift 도메인 전문가 검토 carry 영역 / Phase D 흐름 정합).
 export function applyUserDecision(gateResult, userDecision) {
   if (!gateResult.blocked) {
     if (userDecision === 'stop') return { blocked: true, decision: 'stop', reasons: [{ code: 'user_stop', detail: 'user requested stop' }] };
@@ -113,7 +137,7 @@ export function applyUserDecision(gateResult, userDecision) {
     if (hasCriticalOrHigh) {
       return { ...gateResult, decision: 'block', user_override_rejected: true };
     }
-    // medium/low only — allow with warning
+    // medium/low only — allow with warning (★ ★ layer2_threshold 영역 정합)
     return { blocked: false, decision: 'go-with-warnings', reasons: gateResult.reasons };
   }
   return gateResult;
