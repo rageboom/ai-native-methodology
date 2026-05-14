@@ -484,6 +484,23 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
     - ★ "dual representation" 자체는 Cucumber Rule (2018) 정합 명시 의무 (★ 본 방법론 ≠ 원조)
     - ★ ★ LL-i-27 갱신: "GitHub Spec Kit / AWS Q / DMN / Drools / Spectral 모두 cross-consistency rule 부재" 명제 + ★ 본 LL-i-35 의 명제 (★ "4축 → GWT deterministic + Spec Kit/AutoUAT/CodeConcise 모두 부재") corroboration ✅
 
+- ★ ★ ★ ★ ★ ★ **LL-i-37** (★ ★ "Claude → Claude self-invocation echo chamber 회피 paradigm = Sonnet 4.6 sub-agent + F-015 cross-validation pattern 정합" / ★ session 12차 Phase C 본격 paradigm):
+  - **Why**: ★ ★ session 12차 Senior critique STOP-1 자격 사실 = Opus → Opus self-invocation 시 동일 학습 코퍼스 / 동일 사전훈련 / 동일 RLHF echo chamber 위험 / F-015 (memory `feedback_sub_agent_validation.md`) 정면 위반 후보. ★ session 11차 sub-agent 3 병렬 토론 paradigm 자체 = retrospect 영역 인지 ✅.
+  - **How to apply**:
+    - ★ ★ Phase C Layer 2 LLM 본격 호출 시 = Sonnet 4.6 sub-agent model 명시 의무 (★ Opus → Sonnet = echo chamber 약화)
+    - ★ F-015 cross-validation pattern 정합 (★ "sub-agent 학습 코퍼스 의존 회피")
+    - ★ 외부 인용 시 = "Claude → Claude self-invocation 회피 paradigm = sub-agent model 다양화 의무" 명시
+    - ★ Phase D 시점 retrospect 검토 의무 (★ session 11차 Phase B 결과 = Layer 1 결정적 영역 / retrospect 영향 ❌)
+
+- ★ ★ ★ ★ **LL-i-38** (★ "Node.js script 안 LLM 직접 호출 ❌ paradigm 본질 / Claude Code sub-agent invocation paradigm 본격 채택" / ★ session 11차 patch v5 + session 12차 본격 구현):
+  - **Why**: Claude Code SDK 안 Node.js script 안 Task tool / Agent tool 직접 호출 ❌ / 모든 LLM 호출 paradigm = Claude Code CLI 안 Claude (호출자) 가 호출 영역 만. ★ B-4 paradigm = "Claude 가 validator 호출 전 Task tool 호출 후 결과 JSON 입력" paradigm 본질 정합.
+  - **How to apply**:
+    - ★ ★ 본 방법론 안 모든 LLM 호출 paradigm = Claude Code sub-agent invocation paradigm 의무
+    - ★ Node.js script 안 직접 LLM 호출 paradigm ❌ (★ patch v5 paradigm 정합)
+    - ★ validator CLI = `--llm-results <path>` 입력 paradigm 의무 (★ AI 위임 paradigm)
+    - ★ trigger paradigm = skill trigger + ad-hoc hybrid (★ Q-C-trigger (d)+(a) 정합)
+    - ★ batch paradigm 의무 (★ 1회 Task tool 호출 안 전체 BR list / STOP-4 흡수)
+
 ---
 
 ## §10. version handling
@@ -503,5 +520,6 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 10차 Phase A 시행 (★ ★ 본 patch v3) = ★ ★ description vs natural_language paradigm 재정의 (Agent 3 (c) hybrid 채택 / DEC-2026-05-14 정합) + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 (★ description alias 제거 + description_only_fallback finding 신설) + PoC #01 13 BR 자동 마이그레이션 ✅ + 302/0 test pass + LL-i-31~32 자산화 → SESSION-WRAPUP commit (★ 본 session / no release)**
 - ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 11차 Phase B 시행 (★ ★ 본 patch v4) = ★ ★ PoC #03 18 BR (★ trigger→When / condition→Given / expected_result→Then 형식 sliding + action = metadata 보존 + NL TODO marker) + PoC #05 input/ → output/rules/ 이전 + sample_mode meta 명시 + Layer 1 threshold 자체 제거 (★ session 9차 "0.15 floor advisory" → session 11차 "★ threshold 자체 제거") + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 ✅ (★ PoC #01 13 + PoC #03 18 = 31 BR) + LL-i-33~35 자산화 → SESSION-WRAPUP commit (★ 본 session / no release / no version bump / no tag)**
 - ★ ★ ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 11차 patch v5 paradigm 회복 (★ ★ ★ ★ ★ ★ ★ ★ paradigm sliding error 회복 / 사용자 결단 "옵션 B" 정합) = ★ ★ ★ ★ ★ "Anthropic API / OpenAI API" 영역 ❌ → ★ ★ ★ ★ "Claude Code sub-agent (Task tool / Agent tool) invocation paradigm" 정정. ★ ★ 본 방법론 = Claude Code plugin 자산 (.claude-plugin/ + agents/ + skills/ + hooks/) / ★ Anthropic API key 의무 ❌ / Claude Code subscription 자체 영역 = 실 Claude 호출 paradigm / Static Tool 시뮬레이션 ❌ 정합. ★ ★ 본 session 11차 sub-agent 3 병렬 토론 자체 = paradigm 입증 영역.**
-- ★ ★ ★ ★ **Phase C 후속 session (★ session 12차+) = ★ ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (★ ★ **Claude Code sub-agent (Task tool / Agent tool) 호출 paradigm** / ★ Claude Code plugin hook 안 sub-agent invocation 권장 B-1 / chain-driver 안 호출 B-2 / 사용자 위임 mode B-3 / Static Tool 시뮬레이션 ❌ 정합) + chain 1 gate Layer 2 통합 + PoC #03 NL TODO marker 본격 합성 + PoC #05 GWT 신규 합성 + OVERALL_THRESHOLD 의미 재설계 (★ Layer 1 + Layer 2 통합 점수)**
+- ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 12차 Phase C step 1~5 시행 (★ ★ 본 patch v6) = ★ ★ ★ ★ Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + 사용자 결단 "진행하자" 정합 + ★ Q-C0 (b) B-4 paradigm + Q-C-trigger (d)+(a) hybrid + Q-C-batch + Q-C-model Sonnet 4.6 + Q-C1~5 정합 결단. 시행 산출 — validator interface 본격 (cli.js + llm.js + validator.js / placeholder → 본격 paradigm / semantic_drift_detected + confidence_cap_exceeded finding 신설 / Layer 1 AND Layer 2 양쪽 통과 paradigm / DETERMINISTIC_THRESHOLD 신설) + docs/layer-2-prompt-spec.md 신설 (batch paradigm + Sonnet 4.6 + confidence cap 0.85) + test +5 (31/31 pass) + workspace 308/0 + DEC-2026-05-14-phase-c-step-1-5-layer-2-paradigm-implementation 신설 + LL-i-37+38 자산화 → SESSION-WRAPUP commit (★ 본 session / no release / no version bump / no tag). ★ session 13차 = step 6~12 분리 (★ STOP-2 흡수).**
+- ★ ★ ★ ★ **Phase C 후속 session (★ session 13차 step 6~12) = ★ ★ ★ ★ Layer 2 LLM mandatory 본격 시행 (★ Claude Code sub-agent (Task tool / Agent tool) 호출 / Sonnet 4.6 model / batch paradigm) + PoC #03 18 BR NL TODO marker 본격 합성 + PoC #05 2 BR GWT 신규 합성 + PoC #01 13 BR Layer 2 재검증 + chain 1 gate br-cross-consistency-validator Layer 2 통합 (★ chain-driver gate-eval.js 영역 변경 / chain harness 5 요소 1 변경 의무) + OVERALL_THRESHOLD 의미 재설계 검토 (★ Layer 1 + Layer 2 통합 점수 / 이미 step 4~5 본격 paradigm 구현 ✅) + skills/analysis/br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)**
 - ★ ★ ★ ★ **Phase D 후속 session = ★ release-readiness 8/8 → 9/9 재격상 + ≥ 2 PoC corroboration 검증 + PoC #01 13 BR NL 도메인 전문가 검토 + v2.5.0 MINOR release**

@@ -9,7 +9,76 @@
 
 ---
 
-## [v2.4.0 carry update — session 11차 SESSION-WRAPUP — v2.5.0 Phase B 시행] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — PoC #03 18 BR 형식 sliding (TCA → GWT) + action = metadata 보존 + NL TODO marker + PoC #05 input/→output/rules/ 이전 + sample_mode meta + description→NL 자동 추출 + Layer 1 threshold 자체 제거 + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 + DEC 신설 + ADR patch v4 + LL-i-33~35 자산화)
+## [v2.4.0 carry update — session 12차 SESSION-WRAPUP — v2.5.0 Phase C step 1~5 시행] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) + Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + validator interface 본격 + docs/layer-2-prompt-spec.md 신설 + test +5 (31/31) + workspace 308/0 + DEC 신설 + ADR §9 LL-i-37+38 + §11 patch v6 / Phase C step 6~12 = session 13차 분리)
+
+> ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행** — ★ ★ session 11차 patch v5 paradigm 회복 후속 carry (C-phase-c-paradigm-redesign + C-claude-code-subagent-invocation-paradigm). ★ 4원칙 1단계 plan `~/.claude/plans/r-v2.5.0-phase-c-layer-2-claude-code-subagent.md` 자산화 → ★ ★ 4원칙 2단계 가벼운 Senior critique sub-agent 토론 → 4원칙 3단계 사용자 결단 "진행하자" → 4원칙 4단계 시행 + Lessons Learned.
+
+### ★ ★ ★ ★ ★ ★ ★ session 12차 Senior critique STOP signal 흡수
+
+- ★ ★ ★ ★ ★ **STOP-1 (최강도 / Claude → Claude self-invocation echo chamber)** → ★ Sonnet 4.6 sub-agent 호출 paradigm 의무 / F-015 cross-validation pattern 정합
+- ★ ★ ★ ★ **STOP-2 (강 / Phase C 12 step scope 폭증)** → ★ session 12차 = step 1~5 한정 / session 13차 = step 6~12 분리
+- ★ ★ ★ **STOP-3 (중강 / trigger 영역 결단 부재)** → ★ (d) skill trigger + (a) ad-hoc hybrid paradigm
+- ★ ★ ★ **STOP-4 (중 / batch paradigm 부재 시 1.5~2.5시간 비현실적)** → ★ batch paradigm 의무
+
+### ★ ★ ★ session 12차 Q-C 종합 결단 (★ ★ 사용자 "진행하자" 결단 정합)
+
+- **Q-C0 (b)**: B-4 AI-Native 본질 paradigm — Claude Code sub-agent (Task tool / Agent tool) invocation paradigm 본격 채택
+- **Q-C-trigger (d)+(a)**: skill trigger + ad-hoc hybrid
+- **Q-C-batch**: batch paradigm 의무 — 1회 Task tool 호출 안 전체 BR list 입력
+- **Q-C-model**: Sonnet 4.6 (★ STOP-1 echo chamber 약화)
+- **Q-C1 (a)**: `--llm-results <json>` 옵션 신설
+- **Q-C2 (a)**: `docs/layer-2-prompt-spec.md` 신설
+- **Q-C3 (b)**: Phase D 시 chain 1 gate 통합 (★ session 12차 scope 축소)
+- **Q-C4 (a)**: Layer 1 AND Layer 2 양쪽 통과 의무
+- **Q-C5 (a)**: Claude 가 일괄 batch 합성 + Phase D 도메인 전문가 검토 carry
+
+### ★ ★ ★ session 12차 산출 8종
+
+- ★ ★ `tools/br-cross-consistency-validator/src/cli.js` (★ `--llm-results <path>` 옵션 신설 + Layer 2 LLM 호출 paradigm usage 영역 명시)
+- ★ ★ ★ `tools/br-cross-consistency-validator/src/llm.js` (★ placeholder → 본격 paradigm / semantic_drift_detected finding 신설 + confidence_cap_exceeded finding 신설 / extractLLMMeta 함수 신설)
+- ★ ★ ★ `tools/br-cross-consistency-validator/src/validator.js` (★ Layer 1 AND Layer 2 양쪽 통과 paradigm 본격 / DETERMINISTIC_THRESHOLD 0.85 신설 / overall_score = (L1 + L2) / 2 / summary 영역 확장 / computeDeterministicScore 안 Layer 2 findings 제외 axis 분리)
+- ★ ★ `tools/br-cross-consistency-validator/test/validator.test.js` (★ +5 Layer 2 본격 paradigm test / 31/31 pass)
+- ★ ★ ★ ★ `tools/br-cross-consistency-validator/docs/layer-2-prompt-spec.md` (★ 신설 / paradigm 사상 + Task tool 호출 paradigm + batch paradigm 의무 + prompt 본문 + 응답 schema + validator 호출 paradigm + trigger paradigm + 한계 carry)
+- ★ ★ `decisions/DEC-2026-05-14-phase-c-step-1-5-layer-2-paradigm-implementation.md` (★ DEC 신설)
+- ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-37+38 + §11 후속 patch v6
+- ★ `~/.claude/plans/r-v2.5.0-phase-c-layer-2-claude-code-subagent.md` (★ §0 종결 + §6 한계 갱신)
+
+### ★ ★ ★ ★ 결정적 사실 (★ session 12차)
+
+| 사실 | 자료 |
+|---|---|
+| **★ Layer 2 본격 paradigm interface 구현 ✅** | cli.js + llm.js + validator.js / placeholder → 본격 paradigm 격상 |
+| **★ B-4 paradigm 본격 채택 ✅** | Claude Code sub-agent invocation paradigm / Anthropic API key 의무 ❌ |
+| **★ batch paradigm 의무 명시 ✅** | docs/layer-2-prompt-spec.md §2 / 1회 Task tool 호출 안 전체 BR list |
+| **★ Sonnet 4.6 sub-agent model 명시 ✅** | STOP-1 echo chamber 약화 / F-015 정합 |
+| **★ confidence cap 0.85 enforcement ✅** | Static Tool 시뮬레이션 금지 정책 정합 / advisory 신뢰도 cap |
+| **★ Layer 1 + Layer 2 통합 점수 paradigm ✅** | Q-C4 (a) / overall_score = (L1 + L2) / 2 |
+| **★ workspace 전수 test = 308/0** | session 11차 303 → +5 / 회귀 ❌ |
+
+### ★ ★ Lessons Learned 신규 (★ session 12차 / ADR-CHAIN-011 §9 patch v6 자산화)
+
+- ★ ★ ★ ★ ★ ★ **LL-i-37** (★ "Claude → Claude self-invocation echo chamber 회피 paradigm = Sonnet 4.6 sub-agent + F-015 cross-validation pattern 정합")
+- ★ ★ ★ ★ **LL-i-38** (★ "Node.js script 안 LLM 직접 호출 ❌ paradigm 본질 / Claude Code sub-agent invocation paradigm 본격 채택")
+
+### ★ chain harness 5 요소 변경 ❌
+
+본 session 12차 시행 영역 = validator interface + prompt spec + test + plan 갱신 + DEC + ADR patch. chain harness 5 요소 (★ schema / chain-driver / drift-validator / formal-spec-link-validator / spec-test-link-validator) 변경 ❌ 보존.
+
+★ chain 1 gate Layer 2 통합 (★ chain-driver gate-eval.js) = ★ ★ session 13차 (★ Phase C step 9) 영역.
+
+### ★ ★ 다음 step (★ session 13차 = Phase C step 6~12)
+
+- ★ ★ ★ ★ ★ ★ ★ PoC #03 18 BR NL TODO marker → 본격 BR statement 합성 (★ Claude Code Task tool / Sonnet 4.6 / batch paradigm) + 도메인 전문가 검토 carry
+- ★ ★ ★ ★ ★ PoC #05 2 BR GWT 신규 합성 (★ sample mode 보존)
+- ★ ★ ★ ★ PoC #01 13 BR Layer 2 재검증 (★ baseline 비교)
+- ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합 (★ chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무)
+- ★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)
+- ★ Phase C SESSION-WRAPUP
+- ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 + v2.5.0 MINOR release
+
+---
+
+## [v2.4.0 carry update — session 11차 SESSION-WRAPUP — v2.5.0 Phase B 시행] — 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — PoC #03 18 BR 형식 sliding (TCA → GWT) + action = metadata 보존 + NL TODO marker + PoC #05 input/→output/rules/ 이전 + sample_mode meta + description→NL 자동 추출 + Layer 1 threshold 자체 제거 + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 + DEC 신설 + ADR patch v4 + LL-i-33~35 자산화)
 
 > ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 11차 — v2.5.0 Phase B 시행** — ★ ★ session 9차 신규 carry C-poc-03-05-dual-representation (critical / Senior STOP-1 흡수) + C-keyword-threshold-degrade + session 10차 carry C-poc-02-11-description-to-nl-migration 후속. ★ ★ 4원칙 1단계 plan `~/.claude/plans/q-v2.5.0-phase-b-poc-03-05-마이그레이션.md` 자산화 → 4원칙 2단계 sub-agent 3 병렬 토론 → 4원칙 3단계 사용자 결단 "1" (★ 종합 권장 시행) → 4원칙 4단계 시행 + Lessons Learned. Plan Q §3 Phase B scope 본격 시행.
 

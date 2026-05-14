@@ -235,10 +235,10 @@ test('Layer 1: top-level "rules" (v1.x 호환 모드)', () => {
   assert.equal(r.stats.total, 1);
 });
 
-test('Layer 2: strict 옵션 시 placeholder skipped', async () => {
+test('★ v2.5.0 Phase C: Layer 2 strict + --llm-results 부재 → skipped', async () => {
   const doc = { business_rules: [{ id: 'BR-X-Y-001', name: 'A', natural_language: '테스트' }]};
   const r = await validateRulesDocStrict(doc);
-  assert.equal(r.summary.llm_status, 'placeholder');
+  assert.equal(r.summary.llm_status, 'skipped');
   assert.equal(r.summary.llm_consistency_score, null);
 });
 
@@ -246,6 +246,134 @@ test('Layer 2: 비 strict 모드 → llm_score null 유지', () => {
   const doc = { business_rules: [{ id: 'BR-X-Y-001', name: 'A', natural_language: '테스트' }]};
   const r = validateRulesDoc(doc);
   assert.equal(r.summary.llm_consistency_score, null);
+});
+
+// ★ ★ ★ ★ ★ ★ v2.5.0 Phase C session 12차 — Layer 2 본격 paradigm test (★ B-4 paradigm 정합)
+
+test('★ v2.5.0 Phase C: Layer 2 strict + --llm-results 본격 입력 → semantic_score 처리 + pass', async () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-EMAIL-001',
+    name: '이메일 유일성',
+    natural_language: '사용자 등록 시 이메일은 시스템 내 유일',
+    given: ['사용자가 회원가입 페이지 진입'],
+    when: ['이메일 입력 + 제출'],
+    then: ['중복 시 409 Conflict 응답'],
+  }]};
+  const llmResults = {
+    $schema_version: 'v2.5.0-phase-c',
+    model: 'claude-sonnet-4-6',
+    invoked_at: '2026-05-14T12:00:00Z',
+    batch_size: 1,
+    results: [
+      { br_id: 'BR-USER-EMAIL-001', semantic_score: 0.92, rationale: '★ NL ↔ GWT 의미 정합 본질 동치', confidence: 0.8 },
+    ],
+  };
+  const r = await validateRulesDocStrict(doc, { llmResults });
+  assert.equal(r.summary.llm_status, 'evaluated');
+  assert.equal(r.summary.llm_consistency_score, 0.92);
+  assert.equal(r.summary.llm_model, 'claude-sonnet-4-6');
+  assert.equal(r.summary.llm_batch_size, 1);
+  assert.equal(r.summary.gate_status, 'pass');
+  // ★ semantic_drift_detected finding 부재 (★ score ≥ 0.7)
+  assert.equal(r.findings.filter(f => f.rule === 'semantic_drift_detected').length, 0);
+});
+
+test('★ v2.5.0 Phase C: Layer 2 semantic_score < 0.7 → semantic_drift_detected medium finding + gate fail', async () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-DRIFT-001',
+    name: 'semantic drift',
+    natural_language: '결제 모듈은 신용카드만 지원',
+    given: ['전혀 다른 영역 인증 토큰'],
+    when: ['세션 만료'],
+    then: ['리다이렉트 로그인'],
+  }]};
+  const llmResults = {
+    $schema_version: 'v2.5.0-phase-c',
+    model: 'claude-sonnet-4-6',
+    invoked_at: '2026-05-14T12:00:00Z',
+    batch_size: 1,
+    results: [
+      { br_id: 'BR-USER-DRIFT-001', semantic_score: 0.35, rationale: '★ NL = 결제 / GWT = 세션 = 본질 차이', confidence: 0.82 },
+    ],
+  };
+  const r = await validateRulesDocStrict(doc, { llmResults });
+  const driftFinding = r.findings.find(f => f.rule === 'semantic_drift_detected');
+  assert.ok(driftFinding, 'semantic_drift_detected finding 의무');
+  assert.equal(driftFinding.severity, 'medium');
+  assert.equal(driftFinding.semantic_score, 0.35);
+  assert.equal(driftFinding.llm_model, 'claude-sonnet-4-6');
+  assert.equal(r.summary.gate_status, 'fail');
+});
+
+test('★ v2.5.0 Phase C: Layer 2 confidence > 0.85 → confidence_cap_exceeded low finding (Static Tool 시뮬레이션 금지 정합)', async () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-CAP-001',
+    name: 'confidence cap test',
+    natural_language: '테스트 BR',
+    given: ['테스트'],
+    when: ['시도'],
+    then: ['반환'],
+  }]};
+  const llmResults = {
+    $schema_version: 'v2.5.0-phase-c',
+    model: 'claude-sonnet-4-6',
+    invoked_at: '2026-05-14T12:00:00Z',
+    batch_size: 1,
+    results: [
+      { br_id: 'BR-USER-CAP-001', semantic_score: 0.95, rationale: 'high confidence', confidence: 0.99 }, // ★ ★ cap 0.85 위반
+    ],
+  };
+  const r = await validateRulesDocStrict(doc, { llmResults });
+  const capFinding = r.findings.find(f => f.rule === 'confidence_cap_exceeded');
+  assert.ok(capFinding, 'confidence_cap_exceeded finding 의무');
+  assert.equal(capFinding.severity, 'low');
+  assert.equal(capFinding.original_confidence, 0.99);
+  assert.equal(capFinding.capped_confidence, 0.85);
+});
+
+test('★ v2.5.0 Phase C: Layer 1 pass + Layer 2 pass → overall_score = (L1 + L2) / 2 + gate pass', async () => {
+  const doc = { business_rules: [{
+    id: 'BR-ORDER-CANCEL-FULL-001',
+    name: '통합 paradigm test',
+    natural_language: '주문 취소 환불',
+    given: ['주문'], when: ['취소'], then: ['환불'],
+  }]};
+  const llmResults = {
+    $schema_version: 'v2.5.0-phase-c',
+    model: 'claude-sonnet-4-6',
+    invoked_at: '2026-05-14T12:00:00Z',
+    batch_size: 1,
+    results: [
+      { br_id: 'BR-ORDER-CANCEL-FULL-001', semantic_score: 0.9, rationale: '정합', confidence: 0.8 },
+    ],
+  };
+  const r = await validateRulesDocStrict(doc, { llmResults });
+  // ★ Layer 1 = 1.0 (★ finding 부재) / Layer 2 = 0.9 / overall = 0.95
+  assert.equal(r.summary.deterministic_consistency_score, 1);
+  assert.equal(r.summary.llm_consistency_score, 0.9);
+  assert.equal(r.summary.overall_score, 0.95);
+  assert.equal(r.summary.gate_status, 'pass');
+});
+
+test('★ v2.5.0 Phase C: br_id 매칭 부재 (batch 안 미포함) → skipped per BR', async () => {
+  const doc = { business_rules: [{
+    id: 'BR-USER-MISSING-001',
+    name: 'missing batch',
+    natural_language: '테스트',
+    given: ['주어진'], when: ['호출'], then: ['반환'],
+  }]};
+  const llmResults = {
+    $schema_version: 'v2.5.0-phase-c',
+    model: 'claude-sonnet-4-6',
+    invoked_at: '2026-05-14T12:00:00Z',
+    batch_size: 0,
+    results: [], // ★ ★ batch 안 BR 미포함
+  };
+  const r = await validateRulesDocStrict(doc, { llmResults });
+  // ★ llm_consistency_score = null (★ aggregate 영역에 score 부재 BR 제외)
+  assert.equal(r.summary.llm_consistency_score, null);
+  // ★ Layer 2 skipped → Layer 1 만 검증 / Layer 1 pass → overall pass
+  assert.equal(r.summary.gate_status, 'pass');
 });
 
 test('top-level 부재 (★ business_rules/rules 모두 없음) — total 0', () => {

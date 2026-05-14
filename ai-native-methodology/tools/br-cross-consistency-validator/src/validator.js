@@ -1,15 +1,15 @@
 // br-cross-consistency-validator — 핵심 entry
 // ★ ADR-CHAIN-011 정합 / Plan N 정합
+// ★ ★ ★ ★ ★ session 12차 patch — Layer 2 본격 paradigm 통합 (★ B-4 / Q-C4 (a) 결단 정합)
 
 import { validateBR, resetFindingSeq } from './deterministic.js';
-import { validateBRSemanticConsistency, aggregateLLMScores } from './llm.js';
+import { validateBRSemanticConsistency, aggregateLLMScores, extractLLMMeta, LLM_DEFAULT_THRESHOLD } from './llm.js';
 
-// ★ ★ ★ v2.5.0 Phase B Q-B3 (b) 결단 — OVERALL_THRESHOLD 의미 갱신
-//   ★ session 9차 SPIKE v2 결정적 사실: ≥0.85 empirical 정면 부정 (PoC #01 13 BR overlap mean=0.201 / max=0.462 / ≥0.85 = 0/13)
-//   ★ ★ ★ paradigm: Layer 1 deterministic_score 자체 = ★ severity-weighted finding penalty (★ ★ "non-empty + overlap > 0" sanity check 부재 시 advisory)
-//   ★ ★ ★ ★ OVERALL_THRESHOLD = ★ Phase C Layer 2 LLM 도달 시 의미 갱신 의무 carry (★ Layer 1 + Layer 2 통합 점수 paradigm)
-//   ★ ★ 본 session 11차 = backward-compat 보존 / Phase C 도달 시 ★ ★ Layer 1 + Layer 2 통합 threshold 재설계 의무
-const OVERALL_THRESHOLD = 0.85; // ★ ★ deprecated semantic / Phase C carry — Layer 2 도달 시 의미 재설계 의무 (C-overall-threshold-redesign-phase-c)
+// ★ ★ ★ ★ v2.5.0 Phase C session 12차 결단 (★ Q-C4 (a) Layer 1 AND Layer 2 양쪽 통과 paradigm):
+//   ★ ★ Layer 1 deterministic_score ≥ DETERMINISTIC_THRESHOLD AND
+//   ★ ★ (Layer 2 미시행 → Layer 1 만 검증 / Layer 2 시행 → Layer 2 score ≥ LLM_DEFAULT_THRESHOLD)
+const DETERMINISTIC_THRESHOLD = 0.85;     // ★ Layer 1 deterministic 영역 threshold
+const OVERALL_THRESHOLD = DETERMINISTIC_THRESHOLD; // ★ legacy alias / backward-compat
 
 function extractRules(rulesDoc) {
   // ★ schema 6갈래 drift 정합 — 본 session = ★ top-level 호환 모드
@@ -30,13 +30,12 @@ export function validateRulesDoc(rulesDoc, options = {}) {
   let withNL = 0;
   let withGWT = 0;
   let withBoth = 0;
-  let withDescriptionOnly = 0; // ★ ★ v2.5.0 Phase A — description-only fallback carry 추적 (★ Phase B 마이그레이션 의무)
+  let withDescriptionOnly = 0; // ★ ★ v2.5.0 Phase A — description-only fallback carry 추적
 
   for (let i = 0; i < rules.length; i++) {
     const br = rules[i];
     const { findings, overlap_score, has_nl, has_gwt, has_description } = validateBR(br, {
       path: `/business_rules/${i}`,
-      keywordThreshold: options.keywordThreshold,
     });
     allFindings.push(...findings);
     if (typeof overlap_score === 'number') overlapScores.push(overlap_score);
@@ -50,10 +49,12 @@ export function validateRulesDoc(rulesDoc, options = {}) {
 
   const summary = {
     deterministic_consistency_score: deterministicScore,
-    llm_consistency_score: null, // ★ Layer 2 본 session placeholder
+    llm_consistency_score: null, // ★ Layer 2 — validateRulesDocStrict 시만 채움
     overall_score: deterministicScore,
     overall_threshold: OVERALL_THRESHOLD,
-    gate_status: deterministicScore >= OVERALL_THRESHOLD ? 'pass' : 'fail',
+    deterministic_threshold: DETERMINISTIC_THRESHOLD,
+    llm_threshold: null,
+    gate_status: deterministicScore >= DETERMINISTIC_THRESHOLD ? 'pass' : 'fail',
   };
 
   return {
@@ -62,7 +63,7 @@ export function validateRulesDoc(rulesDoc, options = {}) {
       with_natural_language: withNL,
       with_gwt: withGWT,
       with_both: withBoth,
-      with_description_only: withDescriptionOnly, // ★ ★ v2.5.0 Phase A 신규 stat (★ Phase B 마이그레이션 carry 가시화)
+      with_description_only: withDescriptionOnly,
       with_finding: countRulesWithFinding(rules.length, allFindings),
     },
     overlap_distribution: distributionStats(overlapScores),
@@ -71,18 +72,68 @@ export function validateRulesDoc(rulesDoc, options = {}) {
   };
 }
 
+// ★ ★ ★ ★ v2.5.0 Phase C session 12차 — Layer 2 LLM 본격 paradigm 통합
+//   ★ ★ options.llmResults 입력 시 = ★ Claude Code sub-agent 호출 후 결과 JSON 처리
+//   ★ options.llmResults 부재 시 = ★ ★ skipped (★ Layer 1 만 시행 / backward-compat)
 export async function validateRulesDocStrict(rulesDoc, options = {}) {
   const result = validateRulesDoc(rulesDoc, options);
-  // ★ ★ Layer 2 LLM advisory (★ Static Tool 시뮬레이션 금지 / 본 session placeholder)
   const rules = extractRules(rulesDoc);
-  const llmResults = [];
+
+  const llmMeta = extractLLMMeta(options.llmResults);
+  const llmRunResults = [];
+
   for (const br of rules) {
-    const r = await validateBRSemanticConsistency(br, { strict: true });
-    llmResults.push(r);
+    const r = await validateBRSemanticConsistency(br, {
+      strict: true,
+      llmResults: options.llmResults,
+    });
+    llmRunResults.push(r);
+
+    // ★ ★ Layer 2 findings 영역을 main findings 에 통합
+    if (r && !r.skipped && Array.isArray(r.findings)) {
+      for (const f of r.findings) {
+        result.findings.push({
+          ...f,
+          path: `/business_rules/${rules.indexOf(br)}`,
+        });
+      }
+    }
   }
-  const llmScore = aggregateLLMScores(llmResults);
+
+  // ★ ★ ★ aggregate Layer 2 score
+  const llmScore = aggregateLLMScores(llmRunResults);
   result.summary.llm_consistency_score = llmScore;
-  result.summary.llm_status = 'placeholder'; // ★ 다음 session 구현
+  result.summary.llm_threshold = LLM_DEFAULT_THRESHOLD;
+
+  if (options.llmResults && Array.isArray(options.llmResults.results)) {
+    result.summary.llm_status = 'evaluated';
+    result.summary.llm_model = llmMeta.model;
+    result.summary.llm_batch_size = llmMeta.batch_size;
+    result.summary.llm_invoked_at = llmMeta.invoked_at;
+    result.summary.llm_schema_version = llmMeta.schema_version;
+  } else {
+    result.summary.llm_status = 'skipped';
+    result.summary.llm_skip_reason = '--llm-results 입력 부재 / Claude Code sub-agent 호출 후 결과 JSON 입력 의무';
+  }
+
+  // ★ ★ ★ ★ ★ Q-C4 (a) Layer 1 AND Layer 2 양쪽 통과 paradigm
+  //   ★ Layer 1 pass + (Layer 2 skipped OR Layer 2 pass) → overall pass
+  //   ★ Layer 1 fail → overall fail
+  //   ★ Layer 2 fail (★ llm_consistency_score < LLM_DEFAULT_THRESHOLD) → overall fail
+  const layer1Pass = result.summary.deterministic_consistency_score >= DETERMINISTIC_THRESHOLD;
+  const layer2Skipped = llmScore === null;
+  const layer2Pass = layer2Skipped || llmScore >= LLM_DEFAULT_THRESHOLD;
+  result.summary.gate_status = (layer1Pass && layer2Pass) ? 'pass' : 'fail';
+
+  // ★ ★ overall_score = ★ Layer 1 + Layer 2 평균 (★ Layer 2 skipped 시 Layer 1 만)
+  if (layer2Skipped) {
+    result.summary.overall_score = result.summary.deterministic_consistency_score;
+  } else {
+    result.summary.overall_score = Number(
+      ((result.summary.deterministic_consistency_score + llmScore) / 2).toFixed(3),
+    );
+  }
+
   return result;
 }
 
@@ -90,8 +141,10 @@ function computeDeterministicScore(totalRules, findings) {
   if (totalRules === 0) return 1;
   // ★ severity 기반 weighted penalty
   const weight = { critical: 1.0, high: 0.7, medium: 0.4, low: 0.15 };
-  const totalPenalty = findings.reduce((acc, f) => acc + (weight[f.severity] ?? 0), 0);
-  const maxPenalty = totalRules * 1.0; // 한 BR 당 최대 1.0
+  // ★ Layer 1 findings 만 반영 (★ Layer 2 findings 는 별도 layer 2 score axis)
+  const layer1Findings = findings.filter(f => !(f.rule === 'semantic_drift_detected' || f.rule === 'confidence_cap_exceeded'));
+  const totalPenalty = layer1Findings.reduce((acc, f) => acc + (weight[f.severity] ?? 0), 0);
+  const maxPenalty = totalRules * 1.0;
   const raw = 1 - totalPenalty / maxPenalty;
   return Math.max(0, Math.min(1, Number(raw.toFixed(3))));
 }
@@ -126,4 +179,4 @@ function distributionStats(scores) {
   };
 }
 
-export { OVERALL_THRESHOLD };
+export { OVERALL_THRESHOLD, DETERMINISTIC_THRESHOLD };
