@@ -6,7 +6,7 @@
 >
 > ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness 4 gate + revisit loop + 70~80% 한계 명시.
 >
-> 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v1.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v1.3 이전).
+> 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v2.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.3.x 이전).
 
 ---
 
@@ -208,8 +208,8 @@ dist/ai-native-methodology-v2.5.1/
 │   └── marketplace.json              source: "./" (자기완결)
 ├── CLAUDE.md                         ★ 사내 적용 정책 23 inline (자동 로드)
 ├── README.md                         ← 본 파일 (plugin user 진입점)
-├── CHANGELOG.md                      v1.4+ 최근 release entry
-├── CHANGELOG-HISTORY.md              v1.3 이전 archive
+├── CHANGELOG.md                      v2.4+ 최근 release entry
+├── CHANGELOG-HISTORY.md              v2.3.x 이전 archive
 ├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
 │
 ├── agents/                           5 chain agent (planning/spec/test/implement/analysis) + _base 3
@@ -357,4 +357,4 @@ CI 자동화 = `.github/workflows/drift-check.yml` (PR / nightly / manual dispat
 - 방법론 자체 변경: ADR/DEC 신설 → plan.md 갱신 → §8.1 strict 검증대 통과
 - chain harness scaffolding (sub-plan-1~4) → harness-complete (sub-5) → harness-validated (sub-6) 로 호칭 전환 명세 (DEC-2026-05-06-sub-plan-5 + DEC-2026-05-06-sub-plan-6-종결)
 
-→ 변경 이력: [CHANGELOG.md](./CHANGELOG.md) (v1.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v1.3 이전).
+→ 변경 이력: [CHANGELOG.md](./CHANGELOG.md) (v2.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.3.x 이전).

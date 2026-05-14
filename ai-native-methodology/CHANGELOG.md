@@ -36,13 +36,15 @@
 
 - ★ `tools/drift-validator/check-phase-skills.test.js` + `chain stage layout test` 2건 실패 — v2.5.1 PATCH 1-depth 평탄화 후 validator 미동기화 / **git stash 후에도 동일 실패 = 본 meta-cleanup refactor 무관 / pre-existing regression**.
 
-### 신규 carry 1
+### 신규 carry 2
 
 - **C-drift-validator-skills-flat-sync** (medium / tools / regression) — v2.5.1 1-depth 평탄화 후 `tools/drift-validator/check-phase-skills.test.js` + `chain stage layout test` 2건 실패. category prefix 1-depth paradigm 정합 갱신 의무.
+- **C-briefing-outdated-v2.2-to-v2.5.1** (high / onboarding / content) — ★ ★ ★ `briefing/` 사내 동료 onboarding 자료 v2.2.0 시점 → v2.5.1 격차 5단계 (`03-14-tools.md` = 14→16 tools 누락 / `04-version-history.md` = v2.3/v2.4/v2.5 누락). 사내 동료 onboarding 직접 영향 → 별도 session 본격 update 의무.
 
 ### 부속 자산
 
 - `DEC-2026-05-14-post-v2.5.1-meta-cleanup.md` 신설 + INDEX.md 갱신
+- `README.md` CHANGELOG link 3건 갱신 (v1.4+/v1.3 이전 → v2.4+/v2.3.x 이전) — 본 split 정합
 
 ---
 
