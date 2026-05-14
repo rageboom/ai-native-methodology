@@ -7,7 +7,7 @@
 ## When to call
 
 - **trigger**: phase 4.7 characterization 작성 후 / chain 1 (planning-spec) 진입 직전
-- **호출자**: skill `analysis-phase-4-7-characterization` 절차 9 + 사용자 직접
+- **호출자**: skill `analysis-characterization-test` 절차 9 + 사용자 직접
 - **수동**: `node src/cli.js --target <dir>`
 
 ## Inputs
@@ -71,7 +71,7 @@ node src/cli.js \
 
 - [`../../schemas/characterization-spec.schema.json`](../../schemas/characterization-spec.schema.json) (★ 30번째 schema)
 - [`../../methodology-spec/deliverables/23-characterization-spec.md`](../../methodology-spec/deliverables/23-characterization-spec.md)
-- [`../../skills/analysis-phase-4-7-characterization/SKILL.md`](../../skills/analysis-phase-4-7-characterization/SKILL.md)
+- [`../../skills/analysis-characterization-test/SKILL.md`](../../skills/analysis-characterization-test/SKILL.md)
 - ADR-CHAIN-006 phase 4.7 정식 도입
 - DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
 - DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)

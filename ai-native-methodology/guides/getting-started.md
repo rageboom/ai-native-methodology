@@ -62,16 +62,16 @@
 "이 코드베이스 분석 시작해줘"
 ```
 
-→ `analysis-phase-0-input` skill 자동 발동. 입력 정리 (target / branch / 모듈 범위) 사용자 답변.
+→ `analysis-input-collection` skill 자동 발동. 입력 정리 (target / branch / 모듈 범위) 사용자 답변.
 
 이후 자연어 prompt:
-- "inventory 추출" → `analysis-phase-1-inventory`
-- "아키텍처 분석" → `analysis-phase-2-architecture`
-- "도메인 모델 추출" → `analysis-phase-3-domain`
-- "비즈니스 규칙 추출" → `analysis-phase-4-rules` (★ v2.4 dual representation NL + GWT)
-- "SQL inventory 추출" → `analysis-phase-4-8-sql-inventory` (v2.2 / v2.3 12컬럼)
+- "inventory 추출" → `analysis-source-inventory`
+- "아키텍처 분석" → `analysis-architecture`
+- "도메인 모델 추출" → `analysis-domain-model`
+- "비즈니스 규칙 추출" → `analysis-business-rules` (★ v2.4 dual representation NL + GWT)
+- "SQL inventory 추출" → `analysis-sql-inventory` (v2.2 / v2.3 12컬럼)
 - "비즈니스 규칙 의미 일관성 검증" → `analysis-br-cross-consistency-check` (★ v2.5 신규 / Layer 2 LLM)
-- "antipattern 정리" → `analysis-phase-6-quality`
+- "antipattern 정리" → `analysis-quality-antipattern`
 
 각 phase 종결 시 산출물 `<project>/.aimd/output/` 에 .json + .md 이중 렌더링.
 

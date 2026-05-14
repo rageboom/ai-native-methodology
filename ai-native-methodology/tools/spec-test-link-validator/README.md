@@ -2,7 +2,7 @@
 
 ## Purpose
 
-★ ★ v2.0 chain harness 의 **chain 3 (test → impl) gate #3 validator**. `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-phase-1-inventory stack signal) + coverage threshold (0.85) 강제.
+★ ★ v2.0 chain harness 의 **chain 3 (test → impl) gate #3 validator**. `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-source-inventory stack signal) + coverage threshold (0.85) 강제.
 
 ## When to call
 

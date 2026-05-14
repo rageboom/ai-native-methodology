@@ -7,7 +7,7 @@
 ## When to call
 
 - **trigger**: phase 4.8 sql-inventory 작성 후 / chain 1 (planning-spec) 진입 직전
-- **호출자**: skill `analysis-phase-4-8-sql-inventory` 절차 11 + 사용자 직접
+- **호출자**: skill `analysis-sql-inventory` 절차 11 + 사용자 직접
 - **수동**: `node src/cli.js --target <dir>`
 
 ## Inputs
@@ -60,7 +60,7 @@ node src/cli.js \
 
 - [`../../schemas/sql-inventory.schema.json`](../../schemas/sql-inventory.schema.json) (★ 31번째 schema)
 - [`../../methodology-spec/deliverables/24-sql-inventory.md`](../../methodology-spec/deliverables/24-sql-inventory.md)
-- [`../../skills/analysis-phase-4-8-sql-inventory/SKILL.md`](../../skills/analysis-phase-4-8-sql-inventory/SKILL.md)
+- [`../../skills/analysis-sql-inventory/SKILL.md`](../../skills/analysis-sql-inventory/SKILL.md)
 - ADR-CHAIN-007 phase 4.8 정식 도입
 - DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
 - DEC-2026-05-08-poc-07-종결 (corroboration #2)

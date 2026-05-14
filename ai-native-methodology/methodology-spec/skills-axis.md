@@ -11,9 +11,9 @@
 | Axis | 용도 | 예 |
 |---|---|---|
 | **manifest phase ID** | 분석 진행 단위 / phase 간 의존 그래프 노드 | `0`, `1`, `2`, `3`, `4`, `4.5`, `5-1`, `5-2`, `6` |
-| **skills 디렉토리** | 산출물 단위 / 자연어 trigger 의 매칭 단위 | `analysis-phase-2-architecture/`, `analysis-phase-5-schema-erd/`, `analysis-phase-5-state-map/` |
+| **skills 디렉토리** | 산출물 단위 / 자연어 trigger 의 매칭 단위 | `analysis-architecture/`, `analysis-db-schema-erd/`, `analysis-ui-state-map-fe/` |
 
-두 axis 의 phase 번호가 **같은 숫자라도 다른 phase 를 가리킬 수 있다**. 예: skills 의 `analysis-phase-2-architecture/` 는 manifest 의 phase `3` (arch) 의 skill 이고, manifest 의 phase `2` (db) 의 skill 은 `analysis-phase-5-schema-erd/` 다.
+두 axis 의 phase 번호가 **같은 숫자라도 다른 phase 를 가리킬 수 있었다** (★ ★ v2.6.0 의미 ID 본격 자산화 / 본 paradigm 자연 해소). 예: skills 의 `analysis-architecture/` 는 manifest 의 phase `3` (arch) 의 skill 이고, manifest 의 phase `2` (db) 의 skill 은 `analysis-db-schema-erd/` 다.
 
 ## 2. 정책
 
@@ -29,8 +29,8 @@
 `skills/analysis/phase-{N}-{slug}/` 디렉토리명의 `phase-N` prefix 는 **산출물 번호 그룹의 라벨**이다. manifest phase ID 와 일치할 의무 ❌.
 
 이유: skill 은 산출물 단위로 발동하고 (자연어 trigger → 1 skill = 1 산출물), 산출물 번호 (1~15) 와 manifest phase ID 는 본질적으로 다른 axis. 예:
-- 산출물 #2 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `analysis-phase-2-architecture/`.
-- 산출물 #5-b schema 는 manifest phase `2` (db) 에서 산출된다 → skills `analysis-phase-5-schema-erd/`.
+- 산출물 #2 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `analysis-architecture/`.
+- 산출물 #5-b schema 는 manifest phase `2` (db) 에서 산출된다 → skills `analysis-db-schema-erd/`.
 
 skill 디렉토리명은 **사용자가 산출물 번호로 기억하기 좋은 라벨**일 뿐, manifest 와의 정합은 매핑 필드를 통해 강제한다.
 
@@ -42,7 +42,7 @@ skill 디렉토리명은 **사용자가 산출물 번호로 기억하기 좋은 
 {
   "id": "3",
   "name": "arch",
-  "skills": ["analysis-phase-2-architecture"]
+  "skills": ["analysis-architecture"]
 }
 ```
 
@@ -63,7 +63,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 ```
 1. skills/analysis/phase-{N}-{slug}/SKILL.md 신설
    - frontmatter: name / description / allowed-tools
-   - phase-N prefix 는 산출물 번호 그룹 라벨로 자유 (★ 정수 의무 ❌ — analysis-phase-4-5-cross-validation 같은 .5 도 허용)
+   - ★ ★ v2.6.0 진화 = 의미 ID 본격 (analysis-formal-spec-validation / analysis-characterization-test 등) — phase-N prefix 폐기.
 
 2. flows/analysis.phase-flow.json 갱신
    - 본 skill 이 발동되는 manifest phase 의 skills 배열에 디렉토리명 추가
@@ -92,7 +92,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
-| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-phase-0-input/ | inventory + tree |
+| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ | inventory + tree |
 | 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning/ (★ 채움) | planning-spec |
 | 1 sub | analysis | analysis.phase-flow.json | skills/analysis/ (현 19) | 7대 + 8 FE 산출물 |
 | 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec/ (★ 신설) | behavior-spec / acceptance-criteria |
@@ -104,21 +104,21 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 | Manifest phase ID | spec_file | skills (디렉토리명) |
 |---|---|---|
-| 0 | phase-0-input.md | analysis-phase-0-input |
-| 1 | phase-1-init.md | analysis-phase-1-inventory |
-| 2 (db) | phase-2-db.md | analysis-phase-5-schema-erd |
-| 3 (arch) | phase-3-arch.md | analysis-phase-2-architecture |
-| 4 (business-logic) | phase-4-business-logic.md | analysis-phase-3-domain, analysis-phase-4-rules, analysis-phase-5-form-validation |
-| 4.5 (formal-spec) | phase-4-5-formal-spec.md | analysis-phase-4-5-cross-validation |
-| 5-1 (api) | phase-5-1-api.md | analysis-phase-5-openapi, analysis-phase-5-rules, **analysis-phase-5-error-mapping** (★ v1.5.0 신설) |
-| 5-2 (ui) | phase-5-2-ui.md | analysis-phase-5-state-map, analysis-phase-5-visual-manifest, analysis-phase-5-type-spec |
-| 6 (quality) | phase-6-quality.md | analysis-phase-6-quality |
+| 0 | phase-0-input.md | analysis-input-collection |
+| 1 | phase-1-init.md | analysis-source-inventory |
+| 2 (db) | phase-2-db.md | analysis-db-schema-erd |
+| 3 (arch) | phase-3-arch.md | analysis-architecture |
+| 4 (business-logic) | phase-4-business-logic.md | analysis-domain-model, analysis-business-rules, analysis-form-validation-fe |
+| 4.5 (formal-spec) | phase-4-5-formal-spec.md | analysis-formal-spec-validation |
+| 5-1 (api) | phase-5-1-api.md | analysis-openapi, analysis-api-rule-mapping, **analysis-error-mapping** (★ v1.5.0 신설) |
+| 5-2 (ui) | phase-5-2-ui.md | analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-type-spec-fe |
+| 6 (quality) | phase-6-quality.md | analysis-quality-antipattern |
 | **cross-cutting (aspects)** | (없음) | analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy |
 
-## 6. 본 정책의 한계
+## 6. 본 정책의 진화 (★ ★ ★ v1.4.x 과도기 → v2.6.0 의미 ID 본격 자산화)
 
-- 산출물 번호 axis 와 manifest phase ID 가 다른 의미체계라는 사실 자체는 **혼란을 가중**할 수 있다. 본 명세 + drift-validator 가 그 혼란을 명문 + 자동 검증으로 흡수.
-- v2.0 진입 시 의미 ID + alias map (plan-b carry) 으로 자연 흡수 예정. 본 axis 분리 정책은 v1.4.x 의 과도기 패턴.
+- v1.4.x ~ v2.5.1: 산출물 번호 axis 와 manifest phase ID 가 다른 의미체계라는 사실 자체는 **혼란을 가중**할 수 있다 (본 plan-b carry 영역).
+- ★ ★ ★ **v2.6.0 본격 자연 흡수** (★ 2026-05-14 / `.claude/plans/plan-skill-meaningful-id-rename.md` / 사용자 결단 본격) — 17 skill 디렉토리 의미 ID 본격 rename. phase-N 숫자 prefix 본격 폐기. alias map ❌ / 즉시 cutover. 본격 §8 절 참조.
 
 ## 7. v2.5.1 PATCH — category prefix 1-depth paradigm 본격 자산화 (★ ★ ★)
 
@@ -140,7 +140,7 @@ v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>
 | 사상 카테고리 | runtime prefix | skill 개수 (v2.5.1) | 예 |
 |---|---|---|---|
 | _base | `_base-` | 5 | `_base-apply-template`, `_base-build-traceability-matrix`, ... |
-| analysis | `analysis-` | 22 | `analysis-phase-0-input`, `analysis-aspect-a11y`, ... |
+| analysis | `analysis-` | 22 | `analysis-input-collection`, `analysis-aspect-a11y`, ... |
 | planning | `planning-` | 3 | `planning-extract-from-legacy`, ... |
 | spec | `spec-` | 3 | `spec-compose-behavior-spec`, ... |
 | test | `test-` | 3 | `test-generate-test-spec`, ... |
@@ -158,7 +158,7 @@ v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>
 본 paradigm 의 critical 사실 — Claude Code 의 skill **auto-invocation 은 frontmatter `description` + `when_to_use` 키워드 매칭 기반** ([공식 docs](https://code.claude.com/docs/en/skills.md)). 즉:
 
 - 디렉토리 rename (1-depth) + description 보존 = ★ auto-trigger 본격 작동 ✅
-- 명시 호출 (`/<skill-name>`) = 디렉토리 이름 기반 → category prefix 이름 (예 `/analysis-phase-0-input`) 사용
+- 명시 호출 (`/<skill-name>`) = 디렉토리 이름 기반 → category prefix 이름 (예 `/analysis-input-collection`) 사용
 
 ### 7.5 외부 참조 정밀 갱신 (v2.5.1 PATCH 본격 자산화)
 
@@ -172,7 +172,74 @@ v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>
 
 ★ ★ negative lookbehind/lookahead + `.md` path 회피 정규식 / `spec_file` path 영역 보존 (★ methodology-spec/workflow/<phase-id>.md 영역 그대로 / 평탄화 무관). 본 정밀 갱신 paradigm 의 본질 = ★ runtime skill 자산 path 갱신 ≠ phase spec file path (사상 axis 의 영역).
 
-### 7.6 paradigm 한계 (v2.5.1 시점)
+### 7.6 paradigm 한계 (v2.5.1 시점 / v2.6.0 본격 진화 후 해소)
 
 - ★ ★ skills/<category>-<name>/ 의 category prefix 가 사상 의미 + runtime axis 양쪽 표현 — 사용자 가독성 측면 OK / 단 신규 카테고리 추가 시 prefix 명명 paradigm 재정합 의무.
 - 본 paradigm = ★ **본 plugin 의 plugin lifecycle organize 사상 vs Claude Code runtime 호환성 dual axis 정합**. 향후 Claude Code plugin spec 진화 (예: components 필드 신설 또는 nested directory 지원) 시 본 paradigm 재검토 carry (★ C-poc-axis-design-vs-runtime-separation-paradigm).
+
+## 8. v2.6.0 MINOR — 의미 ID 본격 자산화 (★ ★ ★ ★ ★)
+
+> ★ ★ ★ 2026-05-14 / `.claude/plans/plan-skill-meaningful-id-rename.md` / 사용자 결단 본격 / Senior critique 5 의제 본격 흡수
+
+### 8.1 paradigm 결단 사실
+
+v2.5.1 까지 analysis stage skill 17 디렉토리 = `analysis-phase-N-{slug}/` (★ ★ ★ phase-N 숫자 prefix). 본 형식이 ★ ★ §1 두 axis 의 본격 혼란 source — phase-N 숫자가 manifest phase ID 와 동일 의미 ❌ (★ skill 디렉토리 의 phase-N = 산출물 번호 그룹 라벨 만 / manifest phase ID = 의존 그래프 노드).
+
+★ ★ 사용자 결단 paradigm (v2.6.0 MINOR 본격 자산화):
+
+- **17 skill rename 본격** — analysis-phase-N-{slug} → analysis-{semantic-slug}
+- **alias map ❌** — 즉시 cutover / v2.5.1 명시 호출 불가능 (★ `guides/common-errors.md` Q14.5 본격 명시)
+- **자연어 trigger 영역 보존** — description 본문 정합 보존 / auto-invocation 본격 작동 ✅
+
+### 8.2 rename 매핑 (17 → 17)
+
+| v2.5.1 | v2.6.0 | manifest phase |
+|---|---|---|
+| analysis-phase-0-input | **analysis-input-collection** | 0 |
+| analysis-phase-1-inventory | **analysis-source-inventory** | 1 |
+| analysis-phase-2-architecture | **analysis-architecture** | 3 (arch) |
+| analysis-phase-3-domain | **analysis-domain-model** | 4 (BL) |
+| analysis-phase-4-rules | **analysis-business-rules** | 4 (BL) |
+| analysis-phase-4-5-cross-validation | **analysis-formal-spec-validation** | 4.5 |
+| analysis-phase-4-7-characterization | **analysis-characterization-test** | 4.7 |
+| analysis-phase-4-8-sql-inventory | **analysis-sql-inventory** | 4.8 |
+| analysis-phase-5-error-mapping | **analysis-error-mapping** | 5-1 (api) |
+| analysis-phase-5-form-validation | **analysis-form-validation-fe** | 4 (BL) |
+| analysis-phase-5-openapi | **analysis-openapi** | 5-1 (api) |
+| analysis-phase-5-rules | **analysis-api-rule-mapping** | 5-1 (api) |
+| analysis-phase-5-schema-erd | **analysis-db-schema-erd** | 2 (db) |
+| analysis-phase-5-state-map | **analysis-ui-state-map-fe** | 5-2 (ui) |
+| analysis-phase-5-type-spec | **analysis-type-spec-fe** | 5-2 (ui) |
+| analysis-phase-5-visual-manifest | **analysis-ui-visual-manifest-fe** | 5-2 (ui) |
+| analysis-phase-6-quality | **analysis-quality-antipattern** | 6 (quality) |
+
+변경 ❌: aspect 4 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-aspect-static-security` / `analysis-aspect-legacy`) + `analysis-br-cross-consistency-check` (v2.5 신규 / 이미 의미 ID).
+
+### 8.3 미세 조정 paradigm (Senior critique 4건 흡수)
+
+- ★ **FE suffix 일괄** — `ui-state-map-fe` / `ui-visual-manifest-fe` / `type-spec-fe` / `form-validation-fe` (4건). id-conventions `F-FE-*` finding ID 정합. paradigm 일관성 ★.
+- ★ **`api-rule-binding` → `api-rule-mapping`** — Spring binding 혼동 회피 / 산업 표준 정합.
+- ★ **`characterization` → `characterization-test`** — Feathers WELC (Working Effectively with Legacy Code) 용어 정합.
+- ★ **`quality-finding` → `quality-antipattern`** — 산출물 정합 (antipatterns + avoid-list 주산출물).
+
+### 8.4 영향 범위 본격 (42 file)
+
+skills/ 17 rename + 외부 인용 25 = 42 file 본격. 본 §8 본문 + flows/analysis.phase-flow.json (1) + flows/README.md (1) + tools/spec-test-link-validator (src/validator.js + package.json) + methodology-spec 6 + root README + briefing 2 + guides 4 (★ common-errors.md = v2.5.1 → v2.6.0 cutover Q14.5 section 신설) + decisions 1 + tools/*/README 8.
+
+★ 변경 ❌ 영역 본격: `agents/*.md` (이미 의미 ID) / `flows/*.mermaid` (실측 인용 ❌) / `tools/chain-driver/src/*.js` (v2.5.1 PATCH 평탄화 완료) / `.github/workflows/drift-check.yml` (validator CI 호출 만).
+
+### 8.5 검증 통과 본격
+
+- ✅ drift-validator 3-way (manifest ↔ workflow ↔ skills) — 22 skills_declared / 11 phases_checked / 0 diff
+- ✅ workspace test 322/0 본격 보존 (312 workspace + 10 scripts/test/release-readiness)
+- ✅ release-readiness 9/9 본격 통과 (chain harness validated §8.1 strict 본질 보존)
+- ✅ spec-test-link-validator + chain-driver test 회귀 0
+
+### 8.6 paradigm 본격 효과
+
+- ★ §1 두 axis 본격 혼란 해소 — skill 디렉토리 = 의미 ID / manifest phase ID = 별도 axis (단 본격 동일 숫자 충돌 ❌).
+- ★ 신규 사내 동료 onboarding 시점 인지 부담 ↓ — `/analysis-business-rules` 본격 의미 명확 (★ vs `/analysis-phase-4-rules` 본격 phase-N 의미 추론 의무).
+- ★ ★ Senior critique 4건 + 영향 28 → 42 file 본격 흡수 — plan §7 4원칙 §2 본격 자산화.
+- ★ alias map ❌ — install 시점 명시 호출 변경 카리 / 자연어 trigger 본격 영향 ❌ (description SSOT 사실 정합).
+
+본 paradigm 의 본격 위치 = ★ ★ ★ §6 v1.4.x 과도기 패턴 본격 자연 흡수 / §7 v2.5.1 1-depth + category prefix runtime axis 위 본격 의미 ID 본질 정합.

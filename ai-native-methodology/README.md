@@ -154,14 +154,14 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 
 | 자연어 prompt | 발동 skill |
 |---|---|
-| "이 코드베이스 분석 시작" | `analysis-phase-0-input` |
-| "inventory 추출해줘" | `analysis-phase-1-inventory` |
-| "아키텍처 분석" | `analysis-phase-2-architecture` |
-| "도메인 모델 추출" | `analysis-phase-3-domain` |
-| "비즈니스 규칙 추출" | `analysis-phase-4-rules` |
-| "OpenAPI 만들어줘" | `analysis-phase-5-openapi` (BE) |
-| "DB schema + ERD" | `analysis-phase-5-schema-erd` (DB) |
-| "antipattern 정리" | `analysis-phase-6-quality` |
+| "이 코드베이스 분석 시작" | `analysis-input-collection` |
+| "inventory 추출해줘" | `analysis-source-inventory` |
+| "아키텍처 분석" | `analysis-architecture` |
+| "도메인 모델 추출" | `analysis-domain-model` |
+| "비즈니스 규칙 추출" | `analysis-business-rules` |
+| "OpenAPI 만들어줘" | `analysis-openapi` (BE) |
+| "DB schema + ERD" | `analysis-db-schema-erd` (DB) |
+| "antipattern 정리" | `analysis-quality-antipattern` |
 
 ★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 자동 매칭. cross_cutting (phase 무관).
 

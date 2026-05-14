@@ -138,7 +138,7 @@ additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 
 ★ D21' 정합 — 권고만 stderr 로 사용자 콘솔 노출 / LLM 이 즉시 따르는 척 차단.
 
-★ ★ **v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-phase-0-input/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
+★ ★ **v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-input-collection/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
 
 ## 5.1 ★ v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
 

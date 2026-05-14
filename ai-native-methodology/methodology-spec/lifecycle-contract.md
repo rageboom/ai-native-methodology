@@ -49,7 +49,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 
 ## 기술 스택 분기 axis (★ 정책 선언)
 
-기술 스택별 차이 (Spring / NestJS / React / Hexagonal / Express / FastAPI / Rails / Prisma / TypeORM / JPA / Zustand / Redux / Zod / Yup / etc.) = ★ SKILL.md 본문 분기로 표현 (★ analysis stage `analysis-phase-1-inventory` 패턴 차용 — `Java/Spring / Node/NestJS / Python` 본문 절차 분기). 디렉토리 분리 ❌ / frontmatter enum ❌ / 본문 분기 dominant.
+기술 스택별 차이 (Spring / NestJS / React / Hexagonal / Express / FastAPI / Rails / Prisma / TypeORM / JPA / Zustand / Redux / Zod / Yup / etc.) = ★ SKILL.md 본문 분기로 표현 (★ analysis stage `analysis-source-inventory` 패턴 차용 — `Java/Spring / Node/NestJS / Python` 본문 절차 분기). 디렉토리 분리 ❌ / frontmatter enum ❌ / 본문 분기 dominant.
 
 본 추상화 단계 (v1.4.x) = ★ 정책 선언만. v2.0 진입 시 SKILL.md 신설 시점에 적용.
 
@@ -119,7 +119,7 @@ input (test stage 가 받음):
 - **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 3 종결 시 모든 test fail / impl 부재)
 - **5종 물증 7 필드** (★ ★ ★ no-simulation 강화 — runner_version + stdout + stderr + timestamp + pass/fail count + duration + reproduction + result_hash)
 
-★ ★ ★ spec-test-link-validator (★ sub-plan-3 신설) = AC→TC 1:N 정합 + framework match (analysis-phase-1-inventory) + coverage ≥ 0.85.
+★ ★ ★ spec-test-link-validator (★ sub-plan-3 신설) = AC→TC 1:N 정합 + framework match (analysis-source-inventory) + coverage ≥ 0.85.
 
 ### chain 4 (구현) — implement stage (★ v2.0 / i-strict / ★ ★ ★ chain harness 안에서 round-trip 정식 허용)
 
@@ -181,7 +181,7 @@ input (implement stage 가 받음):
 ```
 <user-project>/
 ├── .aimd/
-│   ├── analysis-phase-0-input.json           # analysis-phase-0-input skill 메타
+│   ├── phase-0-input.json           # analysis-input-collection skill 메타 (★ ★ user project file 명 = manifest phase ID axis / 본격 짧음 형식)
 │   ├── baseline-<date>.json         # ADR-010 baseline+ratchet
 │   ├── findings.md                  # finding 누적
 │   └── output/                      # 분석 stage 산출물 (15종 중 해당분)

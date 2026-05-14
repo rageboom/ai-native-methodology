@@ -12,44 +12,44 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "이 코드베이스 분석 시작" / "분석 시작" / "프로젝트 분석" | [`analysis-phase-0-input`](../skills/analysis-phase-0-input/) | `_manifest.yml` |
-| "inventory 추출" / "코드베이스 인벤토리" / "파일 list" | [`analysis-phase-1-inventory`](../skills/analysis-phase-1-inventory/) | `inventory.json` / `tree.md` / `stats.json` |
+| "이 코드베이스 분석 시작" / "분석 시작" / "프로젝트 분석" | [`analysis-input-collection`](../skills/analysis-input-collection/) | `_manifest.yml` |
+| "inventory 추출" / "코드베이스 인벤토리" / "파일 list" | [`analysis-source-inventory`](../skills/analysis-source-inventory/) | `inventory.json` / `tree.md` / `stats.json` |
 
 ### 1.2 Architecture + DB
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-phase-2-architecture`](../skills/analysis-phase-2-architecture/) | `architecture.{json,md}` / `dependency-graph.mermaid` / `circular-dependencies.md` |
-| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석" | [`analysis-phase-5-schema-erd`](../skills/analysis-phase-5-schema-erd/) | `schema.{json,sql}` / `erd.mermaid` |
+| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-architecture`](../skills/analysis-architecture/) | `architecture.{json,md}` / `dependency-graph.mermaid` / `circular-dependencies.md` |
+| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석" | [`analysis-db-schema-erd`](../skills/analysis-db-schema-erd/) | `schema.{json,sql}` / `erd.mermaid` |
 
 ### 1.3 Domain + Rules (★ v2.4 dual representation)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-phase-3-domain`](../skills/analysis-phase-3-domain/) | `domain.{json,md}` |
-| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-phase-4-rules`](../skills/analysis-phase-4-rules/) | `rules.{json,md}` (★ natural_language + given/when/then dual) |
-| "Phase 4.5 형식 명세 검증" / "drift 검증" | [`analysis-phase-4-5-cross-validation`](../skills/analysis-phase-4-5-cross-validation/) | drift / DMN / cross-link finding |
-| "characterization 추출" / "의도 vs 버그 분류" | [`analysis-phase-4-7-characterization`](../skills/analysis-phase-4-7-characterization/) | `characterization-spec.json` (v2.1) |
-| "SQL inventory 추출" / "매퍼 SQL 정리" | [`analysis-phase-4-8-sql-inventory`](../skills/analysis-phase-4-8-sql-inventory/) | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority) |
+| "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-domain-model`](../skills/analysis-domain-model/) | `domain.{json,md}` |
+| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-business-rules`](../skills/analysis-business-rules/) | `rules.{json,md}` (★ natural_language + given/when/then dual) |
+| "Phase 4.5 형식 명세 검증" / "drift 검증" | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/) | drift / DMN / cross-link finding |
+| "characterization 추출" / "의도 vs 버그 분류" | [`analysis-characterization-test`](../skills/analysis-characterization-test/) | `characterization-spec.json` (v2.1) |
+| "SQL inventory 추출" / "매퍼 SQL 정리" | [`analysis-sql-inventory`](../skills/analysis-sql-inventory/) | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority) |
 | **"비즈니스 규칙 의미 일관성 검증" / "BR cross-consistency"** | [`analysis-br-cross-consistency-check`](../skills/analysis-br-cross-consistency-check/) | **★ v2.5 신규 / Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent)** |
 
 ### 1.4 API + UI/State (FE)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-phase-5-openapi`](../skills/analysis-phase-5-openapi/) | `openapi.yaml` + `api.md` |
-| "UI rules 추출" / "FE rules" | [`analysis-phase-5-rules`](../skills/analysis-phase-5-rules/) | `rules.json` (FE 영역) |
-| "state-map 추출" / "FE state machine" | [`analysis-phase-5-state-map`](../skills/analysis-phase-5-state-map/) | `state-map.json` (FE) |
-| "visual-manifest 추출" / "Playwright snapshot" | [`analysis-phase-5-visual-manifest`](../skills/analysis-phase-5-visual-manifest/) | `visual-manifest.json` (binary) |
-| "form validation 추출" / "Zod / RHF 분석" | [`analysis-phase-5-form-validation`](../skills/analysis-phase-5-form-validation/) | `form-validation-spec.json` |
-| "type-spec 추출" / "TypeScript type 분석" | [`analysis-phase-5-type-spec`](../skills/analysis-phase-5-type-spec/) | `type-spec.json` (ts-morph) |
-| "error-mapping 추출" / "BE error code 분석" | [`analysis-phase-5-error-mapping`](../skills/analysis-phase-5-error-mapping/) | `error-mapping-spec.json` |
+| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/) | `openapi.yaml` + `api.md` |
+| "UI rules 추출" / "FE rules" | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/) | `rules.json` (FE 영역) |
+| "state-map 추출" / "FE state machine" | [`analysis-ui-state-map-fe`](../skills/analysis-ui-state-map-fe/) | `state-map.json` (FE) |
+| "visual-manifest 추출" / "Playwright snapshot" | [`analysis-ui-visual-manifest-fe`](../skills/analysis-ui-visual-manifest-fe/) | `visual-manifest.json` (binary) |
+| "form validation 추출" / "Zod / RHF 분석" | [`analysis-form-validation-fe`](../skills/analysis-form-validation-fe/) | `form-validation-spec.json` |
+| "type-spec 추출" / "TypeScript type 분석" | [`analysis-type-spec-fe`](../skills/analysis-type-spec-fe/) | `type-spec.json` (ts-morph) |
+| "error-mapping 추출" / "BE error code 분석" | [`analysis-error-mapping`](../skills/analysis-error-mapping/) | `error-mapping-spec.json` |
 
 ### 1.5 Quality (Phase 6)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "antipattern 정리" / "안티패턴 통합" / "AP 도출" | [`analysis-phase-6-quality`](../skills/analysis-phase-6-quality/) | `antipatterns.json` / `avoid-list.md` / `migration-cautions.md` |
+| "antipattern 정리" / "안티패턴 통합" / "AP 도출" | [`analysis-quality-antipattern`](../skills/analysis-quality-antipattern/) | `antipatterns.json` / `avoid-list.md` / `migration-cautions.md` |
 
 ### 1.6 Aspect (cross-cutting / phase 무관)
 
@@ -125,14 +125,14 @@ chain harness gate 통과 의무 검증 (state.json + chain-driver)
 
 자연어 매칭 폭이 좁은 prompt → 명시적 키워드 추가:
 - ❌ "rules 만들어줘" — domain rules / FE rules 가 모호
-- ✅ "비즈니스 규칙 추출" → `analysis-phase-4-rules`
-- ✅ "FE form validation 추출" → `analysis-phase-5-form-validation`
+- ✅ "비즈니스 규칙 추출" → `analysis-business-rules`
+- ✅ "FE form validation 추출" → `analysis-form-validation-fe`
 
 ### Tip 2. Skill 명시 호출
 
 slash command 부재 환경 = 명시 path (★ v2.5.1 1-depth + prefix paradigm):
 ```
-@skills/analysis-phase-2-architecture/SKILL.md
+@skills/analysis-architecture/SKILL.md
 @skills/planning-extract-from-legacy/SKILL.md
 @skills/analysis-br-cross-consistency-check/SKILL.md
 ```

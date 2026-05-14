@@ -9,6 +9,77 @@
 
 ---
 
+## [2.6.0] — 2026-05-14 ★ ★ ★ ★ MINOR — skill 의미 ID 본격 자산화 (★ phase-N 숫자 prefix 본격 폐기 / 17 skill rename / Senior critique 5 의제 본격 흡수)
+
+> ★ ★ ★ ★ ★ ★ **BREAKING — skill 디렉토리 17 rename + 명시 호출 path 본격 변경** (★ ★ ★ semver MINOR / 사내 dogfooding 한정 / Senior critique 의제 3 전면 흡수). 자연어 trigger 영역 description 본문 보존 / auto-invocation 영향 ❌. v2.5.1 명시 호출 (예 `/analysis-phase-0-input`) → v2.6.0 새 이름 (예 `/analysis-input-collection`). alias map ❌ / 즉시 cutover.
+>
+> ★ ★ paradigm 본격 위치 = `methodology-spec/skills-axis.md` §6 plan-b carry "v2.0 진입 시 의미 ID + alias map (plan-b carry) 으로 자연 흡수 예정" 본격 자연 흡수 자산화. §6 본인이 v1.4.x "과도기 패턴" 인정 영역 본격 진화. `.claude/plans/plan-skill-meaningful-id-rename.md` + Senior critique 5 의제 본격 흡수 (HARD STOP 2건 = semver MINOR + 영향 42 file / SOFT 3건 = 명명 미세 4건 + common-errors section + micro-commit 패턴) → 사용자 결단 본격 일괄 승인 paradigm.
+
+### BREAKING — skill rename 17 (★ ★ ★ aspect 4 + br-cross 1 + chain stage 11 = 변경 ❌)
+
+| v2.5.1 | v2.6.0 |
+|---|---|
+| `analysis-phase-0-input` | **`analysis-input-collection`** |
+| `analysis-phase-1-inventory` | **`analysis-source-inventory`** |
+| `analysis-phase-2-architecture` | **`analysis-architecture`** |
+| `analysis-phase-3-domain` | **`analysis-domain-model`** |
+| `analysis-phase-4-rules` | **`analysis-business-rules`** |
+| `analysis-phase-4-5-cross-validation` | **`analysis-formal-spec-validation`** |
+| `analysis-phase-4-7-characterization` | **`analysis-characterization-test`** (★ Senior 의제 1 흡수 / Feathers WELC 용어) |
+| `analysis-phase-4-8-sql-inventory` | **`analysis-sql-inventory`** |
+| `analysis-phase-5-error-mapping` | **`analysis-error-mapping`** |
+| `analysis-phase-5-form-validation` | **`analysis-form-validation-fe`** (★ FE suffix 일괄) |
+| `analysis-phase-5-openapi` | **`analysis-openapi`** |
+| `analysis-phase-5-rules` | **`analysis-api-rule-mapping`** (★ Senior 의제 1 흡수 / Spring binding 혼동 회피) |
+| `analysis-phase-5-schema-erd` | **`analysis-db-schema-erd`** |
+| `analysis-phase-5-state-map` | **`analysis-ui-state-map-fe`** (★ FE suffix 일괄) |
+| `analysis-phase-5-type-spec` | **`analysis-type-spec-fe`** (★ FE suffix 일괄) |
+| `analysis-phase-5-visual-manifest` | **`analysis-ui-visual-manifest-fe`** (★ FE suffix 일괄) |
+| `analysis-phase-6-quality` | **`analysis-quality-antipattern`** (★ Senior 의제 1 흡수 / 산출물 정합) |
+
+### 영향 범위 본격 (★ Senior 의제 5 흡수 / grep 실측 42 file)
+
+- ★ **skills/ rename 17** — git mv + SKILL.md frontmatter `name:` + 본문 제목 + cross-skill 참조 (★ workflow/ + .aimd/ path 보존 = lifecycle-contract axis)
+- ★ **flows/ 2** — analysis.phase-flow.json (11 phases skills 배열 + 3 history entry) + flows/README.md (drift-validator 호출자 인용)
+- ★ **tools/ 2** — spec-test-link-validator src/validator.js comment + package.json description
+- ★ **methodology-spec/ 6** — skills-axis.md (★ §6 진화 + §8 신설) + lifecycle-contract.md + README.md + deliverables 20/21 + workflow phase-4-7/4-8
+- ★ **root README + briefing 2 + guides 4 + decisions 1 = 8** — 자연어 trigger 매핑 표 + 사내 onboarding + 사용자 가이드 + 역사 기록
+- ★ **tools/*/README 8** — validator/runner 자체 호출자 인용
+
+### Senior critique 5 의제 본격 흡수
+
+| 의제 | 강도 | 흡수 |
+|---|---|---|
+| 1. 명명 미세 조정 4건 | 🟠 SOFT | ✅ 전면 흡수 (FE suffix 일괄 / binding→mapping / characterization→characterization-test / quality-finding→quality-antipattern) |
+| 2. v2.5.1→v2.6.0 cutover section | 🟠 SOFT | ✅ `guides/common-errors.md` Q14.5 본격 신설 |
+| 3. semver v2.5.2 PATCH → v2.6.0 MINOR | 🔴 HARD STOP | ✅ 전면 흡수 (skill name 17 rename = breaking API surface change 사실 본격 인공) |
+| 4. Sprint 2 micro-commit + drift-validator fail-fast | 🟠 SOFT | ✅ D1a/b/c 5+6+6 batch + D3 앞당김 (D2 직후) + D4.5 chain-driver test 회귀 신설 |
+| 5. 영향 범위 28 → 42 file 본격 재산정 | 🔴 HARD STOP | ✅ 전면 흡수 (grep 실측 본격 / plan §2.5 본격 자산화) |
+
+### 검증 본격 통과
+
+- ✅ drift-validator 3-way (manifest ↔ workflow ↔ skills) — 22 skills_declared / 11 phases_checked / 0 diff
+- ✅ workspace test 322/0 본격 보존 (312 workspace + 10 release-readiness self-test)
+- ✅ release-readiness 9/9 본격 통과 (chain harness validated §8.1 strict 본질 보존)
+- ✅ spec-test-link-validator + chain-driver test 회귀 0 (5/5 + 72/72)
+- ✅ 자연어 trigger 영역 description 본문 보존 (auto-invocation 영향 ❌)
+
+### Sprint 본격 sequence
+
+- Sprint 1 (plan 본격 확정 + Senior critique 흡수) ✅
+- Sprint 2 (D1a/b/c + D2 + D3 fail-fast + D4+D4.5 + D5+D5.5 + D6+D6.5 + D7 + D8) ✅
+- Sprint 3 (skills-axis §6/§8 + ADR-CHAIN-011 LL-i-50 + CHANGELOG v2.6.0 + version bump + build dist + commit) ★ 진행
+
+### 결정적 사실
+
+- ★ ★ chain harness validated §8.1 strict 9/9 본질 보존 (★ release-readiness 회귀 ❌)
+- ★ ★ ★ alias map ❌ paradigm = ★ "사내 dogfooding 한정 + 자연어 trigger 메인 path / 명시 호출 부차 path" 사실 본격 정합
+- ★ ★ ★ ★ paradigm 본격 위치 = ★ ★ §6 v1.4.x 과도기 본격 자연 흡수 / §8 v2.6.0 의미 ID 본격 자산화 / ADR-CHAIN-011 §9 LL-i-50 본격 자산화
+- ★ workflow/<phase-id>.md file 명 보존 (★ manifest phase ID axis / skill name axis 무관)
+- ★ aspect 4 + br-cross 1 + chain stage 11 = 변경 ❌ (이미 의미 ID)
+
+---
+
 ## [post-v2.5.1 meta cleanup] — 2026-05-14 (메타 정리 — plugin.json description + CLAUDE.md CHANGELOG 라인 + CHANGELOG.md split / 가독성 영역 한정 / no release / no version bump / no tag / chain harness 5 요소 변경 ❌)
 
 > ★ ★ 사용자 결단 "즉시 가능부터" — 메타 정리 3건 일괄 시행. paradigm / chain harness / schema / PoC / validator 변경 ❌. 가독성 + 신규 contributor 진입 마찰 해소 영역 한정.

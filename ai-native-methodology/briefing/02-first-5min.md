@@ -64,7 +64,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 ```
 김개발> 이 코드베이스 분석 시작
 
-[analysis-phase-0-input 스킬 발동]
+[analysis-input-collection 스킬 발동]
 
 Phase 0: 입력 검증 시작합니다.
    ✓ 소스 디렉토리: ~/work/efiweb-legacy
@@ -76,7 +76,7 @@ Phase 0: 입력 검증 시작합니다.
 
 김개발> y
 
-[analysis-phase-1-inventory 스킬 자동 연계]
+[analysis-source-inventory 스킬 자동 연계]
 
 Phase 1: 코드베이스 인벤토리 추출 중...
    · 파일 스캔: 1,247 개
@@ -89,16 +89,16 @@ Phase 1: 코드베이스 인벤토리 추출 중...
   → analysis/1-inventory/tree.md 저장됨
 ```
 
-김개발은 **자기가 무엇을 시켰는지 정확히 몰라도** 결과가 나오는 것을 봅니다. `analysis-phase-1-inventory` 같은 스킬 이름을 외운 적이 없습니다. 그냥 "분석 시작" 이라고만 했습니다.
+김개발은 **자기가 무엇을 시켰는지 정확히 몰라도** 결과가 나오는 것을 봅니다. `analysis-source-inventory` 같은 스킬 이름을 외운 적이 없습니다. 그냥 "분석 시작" 이라고만 했습니다.
 
-> ★ v2.5.1 paradigm: 스킬 디렉토리가 1-depth + category prefix 구조 (`skills/analysis-phase-1-inventory/SKILL.md`). Claude Code plugin 표준 정합.
+> ★ v2.5.1 paradigm: 스킬 디렉토리가 1-depth + category prefix 구조 (`skills/analysis-source-inventory/SKILL.md`). Claude Code plugin 표준 정합.
 
 ## 2:30 ~ 3:30 — SQL Inventory 시도
 
 ```
 김개발> SQL 한 줄 한 줄 정리해줘
 
-[analysis-phase-4-8-sql-inventory 스킬 발동 / v2.2 신규 / v2.3 12 컬럼]
+[analysis-sql-inventory 스킬 발동 / v2.2 신규 / v2.3 12 컬럼]
 
 Phase 4.8: SQL Inventory 추출 시작합니다.
    · 매퍼 XML 47 개 스캔

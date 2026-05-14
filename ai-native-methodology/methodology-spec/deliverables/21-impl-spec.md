@@ -38,7 +38,7 @@
 | 항목 | 출처 | 도구 | 신뢰도 |
 |---|---|---|---|
 | modules (IMPL-*) | test-spec TC-* + behavior-spec | LLM 자동 생성 | 60% → 90% (실 runner) → 95% (gate #4) |
-| framework (open enum) | analysis-phase-1-inventory | 결정적 | 100% |
+| framework (open enum) | analysis-source-inventory | 결정적 | 100% |
 | source_files | ★ AI 자동 생성 | LLM | 75% |
 | commit_hash | ★ git rev-parse HEAD | 결정적 | 100% |
 | source_evidence (excerpt) | ★ 실 코드 grep | 결정적 | 100% |

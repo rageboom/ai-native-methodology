@@ -321,13 +321,13 @@ AI-Native 개발 방법론 v2.5.1 ready
 
 ```
 동료:  "이 코드베이스 분석 시작"
-  → analysis-phase-0-input 스킬 자동 발동
+  → analysis-input-collection 스킬 자동 발동
 
 동료:  "비즈니스 규칙 추출해줘"
-  → analysis-phase-4-rules 스킬 자동 발동
+  → analysis-business-rules 스킬 자동 발동
 
 동료:  "OpenAPI 만들어줘"
-  → analysis-phase-5-openapi 스킬 자동 발동
+  → analysis-openapi 스킬 자동 발동
 
 동료:  "기획 단계 시작"
   → 체인 1 (planning-extract-from-legacy) 진입
@@ -339,7 +339,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 
 스킬은 38개. 훅과 플로우가 의존 관계를 자동으로 챙겨줍니다. 동료는 38개의 스킬 이름을 외울 필요 없이 **그냥 자기 의도를 말하면** 적절한 스킬이 깨어납니다.
 
-> **★ v2.5.1 paradigm**: 스킬 디렉토리 구조가 1-depth + category prefix 형태입니다 (예: `skills/analysis-phase-0-input/SKILL.md`). Claude Code plugin 표준 정합 + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 안에 별도 axis 로 보존.
+> **★ v2.5.1 paradigm**: 스킬 디렉토리 구조가 1-depth + category prefix 형태입니다 (예: `skills/analysis-input-collection/SKILL.md`). Claude Code plugin 표준 정합 + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 안에 별도 axis 로 보존.
 
 ---
 
