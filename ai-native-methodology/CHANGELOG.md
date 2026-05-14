@@ -36,10 +36,16 @@
 
 - ★ `tools/drift-validator/check-phase-skills.test.js` + `chain stage layout test` 2건 실패 — v2.5.1 PATCH 1-depth 평탄화 후 validator 미동기화 / **git stash 후에도 동일 실패 = 본 meta-cleanup refactor 무관 / pre-existing regression**.
 
-### 신규 carry 2 (1 resolved by follow-up commit)
+### 신규 carry 2 (★ ★ 2 resolved by follow-up commits / 0 outstanding)
 
 - ✅ **C-drift-validator-skills-flat-sync** (medium / tools / regression / **resolved**) — v2.5.1 1-depth 평탄화 후 `tools/drift-validator/check-phase-skills.test.js` + `chain stage layout test` 2건 실패. follow-up commit 안 `check-phase-skills.js` 1-depth + category prefix paradigm 정합 갱신 시행 → **workspace test 310/2 → 312/0 본질 회복** ✅.
-- **C-briefing-outdated-v2.2-to-v2.5.1** (high / onboarding / content / outstanding) — ★ ★ ★ `briefing/` 사내 동료 onboarding 자료 v2.2.0 시점 → v2.5.1 격차 5단계 (`03-14-tools.md` = 14→16 tools 누락 / `04-version-history.md` = v2.3/v2.4/v2.5 누락). 사내 동료 onboarding 직접 영향 → 별도 session 본격 update 의무.
+- ✅ **C-briefing-outdated-v2.2-to-v2.5.1** (high / onboarding / content / **resolved**) — ★ ★ ★ `briefing/` 사내 동료 onboarding 자료 v2.2.0 시점 → v2.5.1 격차 5단계. follow-up commit 안 5 file 본격 갱신 시행:
+  - `01-main.md` paradigm 본격 정합 (14→16 tools / 21→38 skills / 7/7→9/9 / Layer 2 LLM / 사내 GHE install / v2.3+v2.4+v2.5 진화)
+  - `02-first-5min.md` 사내 GHE install + Layer 2 LLM 시연 (BR drift 발견 흐름)
+  - `03-14-tools.md` 14→16 도구 + 단위 테스트 280→312/322 + Layer 2 paradigm 설명
+  - `04-version-history.md` v2.3 / v2.4 / v2.5.0 / v2.5.1 entry 본격 추가 + 진화 한 줄 요약 확장
+  - `briefing/README.md` 작성 이력 + Confluence 재업로드 의무 명시
+  - ★ Confluence 재업로드 = 사용자 위임 (page_id 보존 / 마크다운 정본 갱신만 본 commit).
 
 ### 부속 자산
 
