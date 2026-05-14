@@ -1,7 +1,7 @@
 {
   "name": "ai-native-methodology",
   "version": "2.5.1",
-  "description": "★ ★ ★ ★ ★ ★ v2.5.0 MINOR FINAL — Layer 2 LLM paradigm 본격 도입 + ≥ 2 PoC corroboration 본격 입증 + Adzic SBE 10년 폐기 함정 회피 자격 본격 도달 + industry-first paradigm 본격 입증. Phase A (description vs natural_language paradigm 재정의 / session 10차) + Phase B (PoC #03 + PoC #05 dual representation 마이그레이션 / Layer 1 keyword threshold 자체 제거 / session 11차) + Phase C (Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 구현 / Sonnet 4.6 batch / docs/layer-2-prompt-spec.md / DETERMINISTIC_THRESHOLD 0.85 / confidence cap 0.85 / semantic_drift_detected + confidence_cap_exceeded finding 신설 / chain 1 gate gate-eval.js Layer 2 통합 / session 12~14차) + Phase D (release-readiness 8/8 → 9/9 격상 (★ layer_2_consistency criterion 신규) + ≥ 2 PoC corroboration 본격 검증 (31 BR = PoC #01 13 + PoC #03 18) + drift BR 2건 DRIFT 격상 자산 (BR-AUTH-JWT-002 + BR-USER-DELETE-AUTH-001) + session 15차 본격 release). chain harness 5 요소 = chain-driver gate-eval.js (★ session 14차 additive) + release-readiness 9/9 (★ session 15차 additive) 변경 / chain harness validated 본질 보존 ✅ (★ no-simulation trio + D21' + content-aware 비손상). workspace 312/0 + scripts/test 10/10 = 322/0 pass. ADR-CHAIN-011 §11 patch v9 + LL-i-44+45 자산화. v2.4.1 PATCH (GHE marketplace) + v2.4.0 MINOR (dual representation 사상 굳힘) + v2.3.x 모두 보존.",
+  "description": "AI-Native 개발 방법론 — SDLC 4단계 chain harness Claude Code plugin (사내 표준). Analysis stage (legacy 분석 / 7대 산출물 + finding + antipatterns + migration-cautions) + chain 1~4 gate (planning → behavior+AC → test RED → impl GREEN) + traceability matrix + 70~80% 한계 명시. 변경 이력은 CHANGELOG.md 참조.",
   "author": {
     "name": "AIMD",
     "email": "sangcl@smilegate.com"
