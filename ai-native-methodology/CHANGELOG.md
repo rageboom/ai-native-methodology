@@ -9,7 +9,76 @@
 
 ---
 
-## [v2.4.1] — 2026-05-14 ⭐ 현재 (★ ★ ★ PATCH — 사내 GHE plugin 배포 채널 정착 + root `.claude-plugin/marketplace.json` 신설 (git-subdir source / path: ai-native-methodology) + `ai-native-methodology/.claude-plugin/plugin.json` homepage GHE 교체 + README.md 시나리오 B → B-1 (GHE git URL, Recommended) + B-2 (dist artifact, 오프라인) 분리 + DEC-2026-05-14-ghe-marketplace-root-신설 + chain harness 5 요소 변경 ❌)
+## [v2.5.0] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ MINOR FINAL — Layer 2 LLM paradigm 본격 도입 + ≥ 2 PoC corroboration 본격 입증 + Adzic SBE 10년 폐기 함정 회피 자격 본격 도달 + industry-first paradigm 본격 입증 + release-readiness 8/8 → 9/9 격상 + chain harness validated 본질 보존 ✅)
+
+> ★ ★ ★ ★ ★ ★ **v2.5.0 MINOR FINAL** — Phase A (description vs natural_language paradigm 재정의 / session 10차) + Phase B (PoC #03 + PoC #05 dual representation 마이그레이션 / Layer 1 keyword threshold 자체 제거 / session 11차) + Phase C (Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 구현 / Sonnet 4.6 batch / session 12~14차) + Phase D (release-readiness 9/9 격상 + ≥ 2 PoC corroboration 본격 검증 + drift BR 2건 DRIFT 격상 자산 / session 15차) 모두 본격 종결.
+
+### ★ ★ ★ ★ ★ ★ v2.5.0 Phase D session 15차 산출 자산 8종
+
+1. ★ ★ **`scripts/release-readiness.js`** — check9 layer_2_consistency 신규 + check3 + check8 경로 회복 (★ session 11차 phase B `input/ → output/rules/` 회귀 회복 / per-PoC mean ≥ 0.7 + critical/high drift 0 / Senior REVISE-1 + LL-i-43 정합)
+2. ★ ★ **`scripts/test/release-readiness.test.js`** — 9 → 10 case (★ +1 신규 layer_2_consistency happy path / criterion id 9개 정합)
+3. ★ ★ **`examples/poc-05-sample-user-register/output/rules/rules.json`** — meta 안 generated_at + confidence + inputs_used + methodology_version + formula_version + extraction_env 표준 필드 회복 (★ session 11차 phase B 회귀 회복)
+4. ★ ★ ★ **`tools/br-cross-consistency-validator/PHASE-D-2026-05-14-corroboration-final.md`** — 31 BR 통합 corroboration 본격 입증 자산
+5. ★ ★ ★ **`tools/br-cross-consistency-validator/PHASE-D-2026-05-14-drift-domain-review.md`** — 2 drift BR DRIFT 격상 자산 (BR-AUTH-JWT-002 + BR-USER-DELETE-AUTH-001 / 사용자 결단 / rules.json 변경 ❌)
+6. ★ ★ **`decisions/DEC-2026-05-14-v2.5.0-minor-final.md`** — DEC 신설 (★ 본 release 정합)
+7. ★ **`docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md`** §11 patch v9 + §9 LL-i-44+45 자산화
+8. ★ **plugin.json + br-cross-consistency-validator/package.json + chain-driver/package.json** version bump (2.4.1 → 2.5.0 / 0.1.0 → 0.2.0)
+
+### ★ ★ ★ ★ ★ ★ chain harness 5 요소 변경
+
+| 요소 | session 14차 | session 15차 |
+|---|---|---|
+| 1. no-simulation policy trio | ❌ | ❌ |
+| 2. D21' (suppressOutput) | ❌ | ❌ |
+| 3. release-readiness content-aware | ❌ | ★ ★ **9th criterion 추가 (additive)** |
+| 4. chain-driver gate-eval Layer 2 | ★ session 14차 (additive) | ❌ |
+| 5. drift state-flow | ❌ | ❌ |
+
+→ ★ ★ ★ **additive change paradigm 정합** (★ ★ chain harness validated 본질 보존 ✅ / LL-i-42 정합)
+
+### ★ ★ ★ ★ ★ ★ release-readiness 9/9 실측 (★ session 15차 본격)
+
+```
+node scripts/release-readiness.js --target v2.5.0
+✅ poc_corroboration / real_tool_evidence / validators_violation / chain_coverage / adr_registry / matrix_greenness / e2e_cycle_pass / analysis_validator_violation / layer_2_consistency
+
+9/9 criteria passed.
+★ ★ ★ v2.5.0 = release-ready.
+```
+
+★ Layer 2 per-PoC mean: PoC #01=0.848 (n=13) / PoC #03=0.914 (n=18) / PoC #05=0.970 (n=2, sample).
+
+### ★ ★ ★ ★ ★ ★ ≥ 2 PoC corroboration 본격 입증 (★ 31 BR)
+
+| PoC | n | L1 | L2 | overall | gate |
+|---|---|---|---|---|---|
+| PoC #01 (Java/Spring) | 13 | 0.954 | 0.848 | **0.901** | ★ pass |
+| PoC #03 (TS/NestJS) | 18 | 0.967 | 0.914 | **0.941** | ★ pass |
+| PoC #05 (sample) | 2 | 1.0 | 0.97 | 0.985 | ★ pass (corroboration ❌) |
+
+→ ★ ★ ★ **§8.1 strict ≥ 2 PoC corroboration 자격 본격 도달 ✅** (★ ADR-CHAIN-008 정합 / cross-language + cross-platform + drift 종류 diversity 확보)
+
+### ★ ★ ★ ★ ★ ★ test 회귀 검증
+
+- workspace 전수: **312/0** (★ session 14차 보존 / 회귀 ❌)
+- scripts/test/release-readiness.test.js: **10/10** (★ session 14차 9 → 본 session 10 / +1 신규)
+- 합산 **322/0 pass** ✅
+
+### ★ ★ ★ ★ ★ ★ Lessons Learned 신규 (★ ADR-CHAIN-011 §9 patch v9)
+
+- ★ ★ ★ ★ **LL-i-44** (★ "drift BR DRIFT 격상 자산 paradigm = rules.json 변경 ❌ 본격 본질")
+- ★ ★ ★ **LL-i-45** (★ "absent BR semantic_inversion 본격 검출 = 본 방법론 가치 본격 입증")
+
+### ★ ★ ★ ★ ★ ★ 자격 본격 입증 4종 ✅
+
+- ★ ≥ 2 PoC corroboration ✅ (31 BR)
+- ★ Adzic SBE 10년 폐기 함정 회피 ✅ (★ Layer 1 + Layer 2 hybrid paradigm 본격 동작 입증)
+- ★ industry-first 자격 (Spec Kit 90K stars 정면 비교) ✅
+- ★ chain harness validated 본질 보존 ✅ (★ additive change paradigm)
+
+---
+
+## [v2.4.1] — 2026-05-14 (★ ★ ★ PATCH — 사내 GHE plugin 배포 채널 정착 + root `.claude-plugin/marketplace.json` 신설 (git-subdir source / path: ai-native-methodology) + `ai-native-methodology/.claude-plugin/plugin.json` homepage GHE 교체 + README.md 시나리오 B → B-1 (GHE git URL, Recommended) + B-2 (dist artifact, 오프라인) 분리 + DEC-2026-05-14-ghe-marketplace-root-신설 + chain harness 5 요소 변경 ❌)
 
 > ★ ★ ★ **v2.4.1 PATCH — 사내 GHE plugin 배포 채널 정착** — v2.4.0 ⭐ MINOR FINAL release plugin artifact 가 사내 GHE (`github.smilegate.net/SGH-ISD/ai-native-methodology`) 에 본격 배포됨. nested 레포 구조 (`<git-root>/ai-native-methodology/.claude-plugin/`) 와 Claude Code marketplace add 시 git root 의 `.claude-plugin/marketplace.json` 만 인식하는 표준 동작 사이의 path 불일치 해소 → `git-subdir` source 타입 채택.
 

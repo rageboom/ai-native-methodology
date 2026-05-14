@@ -24,18 +24,18 @@ function runScript(args, env = {}) {
   });
 }
 
-describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌)', () => {
-  it('happy path — 8/8 pass for v2.4.0 (current workspace)', () => {
-    const r = runScript(['--target', 'v2.0.0-rc1', '--json']);
+describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v2.5.0 9/9 격상', () => {
+  it('happy path — 9/9 pass for v2.5.0 (current workspace)', () => {
+    const r = runScript(['--target', 'v2.5.0', '--json']);
     assert.equal(r.status, 0, r.stderr);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 8);
-    assert.equal(out.criteria_passed, 8);
+    assert.equal(out.criteria_total, 9);
+    assert.equal(out.criteria_passed, 9);
     assert.equal(out.ready, true);
   });
 
-  it('all 8 criterion ids are present in output (no skipped)', () => {
-    const r = runScript(['--target', 'v2.4.0', '--json']);
+  it('all 9 criterion ids are present in output (no skipped)', () => {
+    const r = runScript(['--target', 'v2.5.0', '--json']);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
     assert.deepEqual(ids, [
@@ -43,11 +43,23 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'analysis_validator_violation',
       'chain_coverage',
       'e2e_cycle_pass',
+      'layer_2_consistency',
       'matrix_greenness',
       'poc_corroboration',
       'real_tool_evidence',
       'validators_violation',
     ]);
+  });
+
+  it('layer_2_consistency — per-PoC mean ≥ 0.7 + critical/high drift 0 (Senior REVISE-1 + LL-i-43 정합)', () => {
+    const r = runScript(['--target', 'v2.5.0', '--json']);
+    const out = JSON.parse(r.stdout);
+    const layer2 = out.results.find((x) => x.id === 'layer_2_consistency');
+    assert.ok(layer2.pass, `layer_2_consistency must pass — detail: ${layer2.detail}`);
+    assert.match(layer2.detail, /poc-01=0\.\d+ \(n=13\)/);
+    assert.match(layer2.detail, /poc-03=0\.\d+ \(n=18\)/);
+    assert.match(layer2.detail, /poc-05=0\.\d+ \(n=2,sample\)/);
+    assert.ok(layer2.delegated_to.includes('layer-2-results'), 'delegated_to must reference Layer 2 results dir');
   });
 
   it('every criterion records delegated_to (file presence 단독 ❌ / Senior F3)', () => {
@@ -99,11 +111,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 8 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 9 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json']);
-    // even with bogus target, should still evaluate 8 checks against current artifacts.
+    // even with bogus target, should still evaluate 9 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 8);
+    assert.equal(out.criteria_total, 9);
   });
 
   it('missing --target → exit 2 (usage error)', () => {

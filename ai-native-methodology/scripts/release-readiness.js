@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 8/8 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 9/9 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상).
 //
-// 사용: node scripts/release-readiness.js --target v2.0.0 [--json]
+// 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 8 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 9 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -11,13 +11,17 @@
 //   5. ADR registry — content-aware 검사 (status: 승인 / decision-cluster 매칭)
 //   6. traceability-matrix 100% green (PoC #05 / matrix.json forward = 1.0)
 //   7. e2e 1 cycle pass (PoC #05 chain 4 GREEN / impl-spec.test_pass_evidence.fail_count == 0)
-//   8. ★ ★ ★ v2.4.0 신설 — analysis validator violation 0 (★ schema-validator + br-cross-consistency-validator / 11 PoC rules.json
+//   8. v2.4.0 신설 — analysis validator violation 0 (★ schema-validator + br-cross-consistency-validator / 11 PoC rules.json
 //      critical/high finding 0 / ADR-CHAIN-011 §5.7 정합 / LL-i-23 release-readiness 사각지대 회복)
+//   9. ★ ★ ★ ★ v2.5.0 신설 — Layer 2 LLM consistency (★ br-cross-consistency-validator Layer 2 결과 자산
+//      per-PoC 집계 / mean semantic_score ≥ 0.7 / semantic_drift critical/high finding ❌ / Phase D carry medium 허용 /
+//      ADR-CHAIN-011 §5.4 patch v2 + §11 patch v8 정합 / Senior REVISE-1 흡수)
 //
-// exit 0 = 8/8 ready / 1 = 1+ regress.
+// exit 0 = 9/9 ready / 1 = 1+ regress.
 //
-// ★ ★ ★ ★ ★ MINOR bump 부적격 가능성 (Senior STOP signal 정합 / ADR-CHAIN-011 §5.7):
-//   본 격상 자체 = chain harness paradigm 재정의 (release-readiness 검사 영역 확장) = MINOR bump 부적격 가능 / v2.5.0 분리 검토 의무.
+// ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
+//   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
+//   chain harness validated 본질 보존 ✅ (no-simulation trio + D21' + release-readiness content-aware 비손상).
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -97,7 +101,7 @@ function check3_validatorsViolation() {
       cmd: [
         'tools/planning-extraction-validator/src/cli.js',
         '--planning', 'examples/poc-05-sample-user-register/.aimd/output/planning-spec.json',
-        '--rules', 'examples/poc-05-sample-user-register/input/rules.json',
+        '--rules', 'examples/poc-05-sample-user-register/output/rules/rules.json',
         '--domain', 'examples/poc-05-sample-user-register/input/domain.json',
         '--json',
       ],
@@ -233,7 +237,7 @@ function check7_e2eCyclePass() {
 // 11 PoC 전수 검사 = sub-plan §2 마이그레이션 후 별도 sprint (★ C-rules-BR-id-relabel-* + C-poc-02-03-schema-mapping carry 정합).
 function check8_analysisValidatorViolation() {
   // ★ schema-validator 안 PoC #01 + #05 = VALID 확인 (본 session 자격)
-  const pocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/input/rules.json'];
+  const pocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/output/rules/rules.json'];
   const failedPocs = [];
   for (const rel of pocs) {
     const target = join(ROOT, 'examples', rel);
@@ -251,7 +255,7 @@ function check8_analysisValidatorViolation() {
     }
   }
   // ★ br-cross-consistency-validator 안 PoC #05 = pass / PoC #01 = pass 확인
-  const bcvPocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/input/rules.json'];
+  const bcvPocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/output/rules/rules.json'];
   const bcvFailed = [];
   for (const rel of bcvPocs) {
     const target = join(ROOT, 'examples', rel);
@@ -276,6 +280,67 @@ function check8_analysisValidatorViolation() {
   };
 }
 
+// ★ ★ ★ ★ v2.5.0 Phase D §2 신설 — Layer 2 LLM consistency check (ADR-CHAIN-011 §5.4 patch v2 + §11 patch v8 정합)
+// per-PoC 집계 paradigm (Senior REVISE-1 흡수 / LL-i-43 severityRank rank 2 정합).
+// mean semantic_score ≥ 0.7 + semantic_drift critical/high finding ❌ (★ medium = Phase D carry 허용).
+function check9_layer2Consistency() {
+  const LAYER2_DIR = join(ROOT, 'tools/br-cross-consistency-validator/layer-2-results');
+  const requiredFiles = [
+    'poc-01-layer-2-results.json',
+    'poc-03-layer-2-results.json',
+    'poc-05-layer-2-results.json',
+  ];
+  const failures = [];
+  const summaries = [];
+
+  for (const f of requiredFiles) {
+    const path = join(LAYER2_DIR, f);
+    if (!existsSync(path)) {
+      failures.push(`${f}: missing`);
+      continue;
+    }
+    let data;
+    try {
+      data = JSON.parse(readFileSync(path, 'utf-8'));
+    } catch {
+      failures.push(`${f}: JSON parse fail`);
+      continue;
+    }
+    const results = Array.isArray(data.results) ? data.results : [];
+    if (results.length === 0) {
+      failures.push(`${f}: empty results array`);
+      continue;
+    }
+    // per-PoC mean semantic_score (★ Senior REVISE-1 정합 / per-PoC 집계).
+    const scores = results.map((r) => r.semantic_score).filter((s) => typeof s === 'number');
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    // semantic_drift critical/high check (★ medium = Phase D carry 허용 / LL-i-43).
+    const drift = (data.summary?.semantic_drift_detected ?? []);
+    const driftCritical = drift.filter((d) => d.severity === 'critical' || d.severity === 'high').length;
+    const passThreshold = mean >= 0.7;
+    const passDrift = driftCritical === 0;
+    summaries.push({
+      file: f,
+      mean: mean.toFixed(3),
+      n: scores.length,
+      drift_total: drift.length,
+      drift_critical: driftCritical,
+      sample_mode: data.sample_mode === true,
+    });
+    if (!passThreshold) failures.push(`${f}: mean semantic_score ${mean.toFixed(3)} < 0.7`);
+    if (!passDrift) failures.push(`${f}: ${driftCritical} critical/high semantic_drift`);
+  }
+
+  return {
+    id: 'layer_2_consistency',
+    pass: failures.length === 0,
+    detail: failures.length === 0
+      ? `Layer 2 per-PoC mean ≥ 0.7 + critical/high drift 0 — ${summaries.map((s) => `${s.file.replace('-layer-2-results.json', '')}=${s.mean} (n=${s.n}${s.sample_mode ? ',sample' : ''})`).join(' / ')}`
+      : `violations: ${failures.join(' | ')}`,
+    delegated_to: 'tools/br-cross-consistency-validator/layer-2-results (★ session 13차 본격 자료 / per-PoC 집계 / Senior REVISE-1 + LL-i-43 정합)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -289,6 +354,7 @@ function main() {
     check6_matrixGreenness(),
     check7_e2eCyclePass(),
     check8_analysisValidatorViolation(),
+    check9_layer2Consistency(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

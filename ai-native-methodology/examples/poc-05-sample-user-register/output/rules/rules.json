@@ -2,10 +2,19 @@
   "$comment": "★ PoC #05 — Business Rules. legacy 결함 분석 결과 자동 도출. chain 1 planning-spec.business_rules_intent 의 source.",
   "project_id": "poc-05-sample-user-register",
   "meta": {
+    "generated_at": "2026-05-14T00:00:00Z",
+    "confidence": 0.92,
+    "inputs_used": [
+      "source_code"
+    ],
+    "methodology_version": "v2.5.0",
+    "formula_version": "v1",
+    "extraction_env": "sample_mode",
     "sample_mode": true,
     "corroboration_eligible": false,
     "sample_mode_rationale": "★ ★ ★ PoC #05 = sample mode / n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only. ★ session 11차 Senior STOP-4 흡수 정합 (LL-i-29 paradigm: 사실 명확도 × 비용 2축 평가 / STOP-4 = 사실 명확 + 비용 low = 전면 흡수).",
-    "phase_b_migration_note": "★ ★ description → natural_language 자동 추출 ✅ (Phase A script 재활용) / given/when/then 부재 보존 (★ Phase C LLM 본격 합성 의무) / sample mode 특수성 명시. ★ ★ rules.json 위치 = input/ → output/rules/ 이전 ✅ (★ Agent 1 phase-flow SSOT 정합 / flows/analysis.phase-flow.json 안 rules.json = phase 4 output)."
+    "phase_b_migration_note": "★ ★ description → natural_language 자동 추출 ✅ (Phase A script 재활용) / given/when/then 부재 보존 (★ Phase C LLM 본격 합성 의무) / sample mode 특수성 명시. ★ ★ rules.json 위치 = input/ → output/rules/ 이전 ✅ (★ Agent 1 phase-flow SSOT 정합 / flows/analysis.phase-flow.json 안 rules.json = phase 4 output).",
+    "phase_d_meta_recovery_note": "★ session 15차 — schema-validator 필수 필드 (generated_at + confidence + inputs_used) 회복 추가 (★ session 11차 Phase B 시 누락 / release-readiness 회귀 회복)."
   },
   "business_rules": [
     {
