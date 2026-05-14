@@ -70,7 +70,7 @@ phase 4.7 본체 격상 + cleanup carry 통합 시 **v2.1.0 minor release 자격
 | 자격 | 상태 |
 |---|---|
 | ≥2 PoC corroboration | ✅ (PoC #06 + #03 retrofit) |
-| skills/analysis/phase-4-7-characterization/ 신설 | ⏳ 본 DEC 후 carry |
+| skills/analysis-phase-4-7-characterization/ 신설 | ⏳ 본 DEC 후 carry |
 | tools/characterization-coverage-validator/ 신설 | ⏳ 본 DEC 후 carry |
 | flows/analysis.phase-flow.json 갱신 (phase 4.7 추가) | ⏳ 본 DEC 후 carry |
 | meta-confidence.schema.json enum 'characterization' 추가 | ⏳ 본 DEC 후 carry |

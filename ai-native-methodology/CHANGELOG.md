@@ -368,7 +368,7 @@ node scripts/release-readiness.js --target v2.5.0
 - ★ `examples/poc-05-sample-user-register/output/rules/rules.json` (★ 2/2 BR GWT 신규 합성 + sample_mode 보존)
 - ★ ★ `tools/br-cross-consistency-validator/layer-2-results/` 디렉토리 신설 + 5 결과 JSON 자산화
 - ★ ★ ★ `tools/br-cross-consistency-validator/PHASE-C-2026-05-14-re-measurement.md` 본격 재실측 보고
-- ★ ★ ★ `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 (Q-C-trigger (d) paradigm 정합)
+- ★ ★ ★ `skills/analysis-br-cross-consistency-check/SKILL.md` 신설 (Q-C-trigger (d) paradigm 정합)
 - ★ `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록 (drift-validator 47/47 pass)
 - ★ ★ `decisions/DEC-2026-05-14-phase-c-step-6-12-session-13.md` 신설
 - ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-39+40+41 + §11 후속 patch v7
@@ -461,7 +461,7 @@ node scripts/release-readiness.js --target v2.5.0
 - ★ ★ ★ ★ ★ PoC #05 2 BR GWT 신규 합성 (★ sample mode 보존)
 - ★ ★ ★ ★ PoC #01 13 BR Layer 2 재검증 (★ baseline 비교)
 - ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합 (★ chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무)
-- ★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)
+- ★ skills/analysis-br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)
 - ★ Phase C SESSION-WRAPUP
 - ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 + v2.5.0 MINOR release
 

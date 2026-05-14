@@ -2,7 +2,7 @@
 
 - 상태: 승인됨 (Accepted) — 묶음 R #3
 - 일자: 2026-04-30
-- 관련: PoC #03 AP-API-001 (high) / F-158 (5 op cumul) / RFC 9110 §15.3.2 + §15.3.5 + §6.5
+- 관련: ADR-NEST-001 (sibling 묶음 R #1 — Auth scope) / ADR-NEST-002 (sibling 묶음 R #2 — class-validator) / ADR-NEST-004 (sibling 묶음 R #4 — TypeORM 무결성) / PoC #03 AP-API-001 (high) / F-158 (5 op cumul) / RFC 9110 §15.3.2 + §15.3.5 + §6.5
 
 ---
 

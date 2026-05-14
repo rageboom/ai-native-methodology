@@ -114,6 +114,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 | 5-2 (ui) | phase-5-2-ui.md | analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-type-spec-fe |
 | 6 (quality) | phase-6-quality.md | analysis-quality-antipattern |
 | **cross-cutting (aspects)** | (없음) | analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy |
+| **cross-cutting (base) (★ ★ ★ v2.6.0 신설)** | (없음 / 본격 ★ cross-invocation 영역) | _base-apply-baseline-ratchet (★ analysis-input-collection Phase 0 prerequisite), _base-apply-template (★ template 적용 cross-invocation), _base-log-finding (★ 모든 skill finding 등재 cross-invocation) |
 
 ## 6. 본 정책의 진화 (★ ★ ★ v1.4.x 과도기 → v2.6.0 의미 ID 본격 자산화)
 

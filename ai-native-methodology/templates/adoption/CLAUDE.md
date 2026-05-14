@@ -67,12 +67,12 @@ USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 
 | Chain | Stage | Gate | 산출물 | Skill 디렉토리 |
 |---|---|---|---|---|
-| (pre) | analysis | — | 7대 산출물 (architecture/domain/api/db/rules/antipatterns/ui-ux) | `skills/analysis/` 18 |
-| 1 | planning | gate #1 | `planning-spec.{json,md}` | `skills/planning/` 3 |
-| 2 | spec | gate #2 | `behavior-spec` + `acceptance-criteria` + 7대 통합 | `skills/spec/` 3 |
-| 3 | test | gate #3 | `test-spec` + 실 test code (RED) | `skills/test/` 3 |
-| 4 | implement | gate #4 | `impl-spec` + 실 impl code (GREEN / 100% pass) | `skills/implement/` 2 |
-| cross | traceability | — | `traceability-matrix.{json,md,mermaid}` | `skills/_base/build-traceability-matrix` |
+| (pre) | analysis | — | 7대 산출물 (architecture/domain/api/db/rules/antipatterns/ui-ux) | `skills/analysis-` 18 |
+| 1 | planning | gate #1 | `planning-spec.{json,md}` | `skills/planning-` 3 |
+| 2 | spec | gate #2 | `behavior-spec` + `acceptance-criteria` + 7대 통합 | `skills/spec-` 3 |
+| 3 | test | gate #3 | `test-spec` + 실 test code (RED) | `skills/test-` 3 |
+| 4 | implement | gate #4 | `impl-spec` + 실 impl code (GREEN / 100% pass) | `skills/implement-` 2 |
+| cross | traceability | — | `traceability-matrix.{json,md,mermaid}` | `skills/_base-build-traceability-matrix` |
 
 DAG: `flows/sdlc-4stage-flow.{json,mermaid}` (★ master SSOT) + chain stage flow 5종 (`flows/{analysis,planning,spec,test,implement}.phase-flow.{json,mermaid}`).
 

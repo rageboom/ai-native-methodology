@@ -179,7 +179,7 @@ v150_본체_격상_근거: "★ §8.1 strict + ADR-BE-001 negative-space corrobo
 
 - ★ ★ 본 ADR 신설 (v1.5.0 MINOR 핵심 결단)
 - ★ ★ ★ schemas/error-mapping-spec.schema.json 신규 (★ ★ formal-spec deliverable / Phase 5-1 의 ★ negative-space 산출물 정식화)
-- ★ skills/analysis/phase-5-error-mapping/SKILL.md 신규 (★ phase-5-1 발동 / OpenAPI + error mapping cross-link)
+- ★ skills/analysis-phase-5-error-mapping/SKILL.md 신규 (★ phase-5-1 발동 / OpenAPI + error mapping cross-link)
 - ★ flows/analysis.phase-flow.json — phase 5-1 의 skills 배열에 신규 skill 추가 (★ drift-validator 3-way 통과 의무)
 - ★ methodology-spec/skills-axis.md §5 매핑 표 갱신
 - ★ DEC + STATUS + INDEX + CHANGELOG + memory 갱신

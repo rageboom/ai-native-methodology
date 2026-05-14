@@ -133,7 +133,7 @@ PoC #07 D12 (b) nested patterns object 패턴. 4 패턴 (dynamic_branch / calcul
 1. ✅ `methodology-spec/deliverables/24-sql-inventory.md` (★ #23 사용 / #24 신규)
 2. ✅ `schemas/sql-inventory.schema.json` (★ 31번째 schema)
 3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 13 → 14 (`sql_inventory` 추가)
-4. ✅ `skills/analysis/phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
+4. ✅ `skills/analysis-phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
 5. ✅ `tools/sql-inventory-extractor/` (★ workspace 14번째 / 10 unit test)
 6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v2.1.0 → v2.2.0-rc1 (phase 4.8 entry + 5-1 depends_on 갱신)
 7. ✅ `methodology-spec/workflow/phase-4-8-sql-inventory.md` (drift-validator 3-way 회귀 통과)

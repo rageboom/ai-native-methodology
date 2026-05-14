@@ -119,7 +119,7 @@ intervention_log entry:
 
 ## 적용 시점
 
-- sub-plan-5 (hooks + harness) 에서 gate skill (`skills/_base/invoke-go-stop-gate/`) 신설 시 본 ADR 정식 운영
+- sub-plan-5 (hooks + harness) 에서 gate skill (`skills/_base-invoke-go-stop-gate/`) 신설 시 본 ADR 정식 운영
 - sub-plan-3 의 chain-coverage-validator / test-impl-pass-validator 산출물에 intervention_log 필드 호환
 
 ## 변경 이력

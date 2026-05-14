@@ -28,8 +28,8 @@ cleanup round 2-A 후 8 폴더 README 부재 + 4 도구 README 부재 발견. pl
 |---|---|
 | [`tools/README.md`](../tools/README.md) | ★ ★ ★ 12 도구 cadence table (stage × validator × 호출 주체) — 어느 stage 어느 gate 에 어느 도구 / 자동 vs 수동 vs skill 호출 / P/D 분류 / 진짜 외부 도구 (Spectral / Semgrep / PMD) 통합 |
 | [`methodology-spec/README.md`](../methodology-spec/README.md) | ★ ★ phase × deliverable × schema 매트릭스 (★ 도달 path) — analysis stage 11 phase + chain v2 5 stage + cross-cutting 4 영역 + chain-driver state 영속 + cross-cutting 정책 7 |
-| [`agents/README.md`](../agents/README.md) | 6 agent (analysis + 4 chain + design carry) / 호출 cadence / 각 agent 의 skill 위치 |
-| [`skills/README.md`](../skills/README.md) | 44 skill (5 _base + 18 analysis + 11 chain + design carry) / 자연어 prompt 표 / D21' 호출 메커니즘 |
+| `agents/README.md` (★ ★ v2.5.1 1-depth 평탄화 후 부재 / historical reference) | 6 agent (analysis + 4 chain + design carry) / 호출 cadence / 각 agent 의 skill 위치 |
+| `skills/README.md` (★ ★ v2.5.1 1-depth 평탄화 후 부재 / historical reference) | 44 skill (5 _base + 18 analysis + 11 chain + design carry) / 자연어 prompt 표 / D21' 호출 메커니즘 |
 | [`hooks/README.md`](../hooks/README.md) | 3 hook (SessionStart + UserPromptSubmit + PreToolUse) / D21' suppressOutput=true / mechanical gate trio (iii) PreToolUse deny |
 | [`templates/README.md`](../templates/README.md) | analysis 22 + adoption build alias + chain placeholder 4 (sub-plan-4 일부 채움 / 미채움 carry) |
 

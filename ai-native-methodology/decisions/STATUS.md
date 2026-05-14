@@ -7,7 +7,7 @@
 
 **기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 14차 — v2.5.0 Phase C step 9 종결 — chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경) — gate-eval.js findings shape + evaluateGate + severityRank + applyUserDecision 본격 paradigm 갱신 (★ Q-S1 (a) + Q-S2 (b) coverage_threshold 수준 + Q-S3 (a) Phase C 종결 자격) + Senior STOP-3 흡수 + REVISE 1+2+3+4 흡수 + chain-driver test +4 신규 (68→72) + workspace 312/0 + chain harness validated 본질 보존 ✅ + DEC + ADR §9 LL-i-42+43 + §11 patch v8 + ★ ★ ★ ★ ★ Phase C 본격 종결 ✅** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase D 진입 자격 본격 도달 / session 15차+ = release-readiness 9/9 + v2.5.0 MINOR FINAL release)
 
-**기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증 — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR 총합) + PoC #03 18 BR NL 본격 합성 (Agent 1) + PoC #05 2 BR GWT 신규 합성 (Agent 3) + PoC #01 13 BR Layer 2 재검증 (Agent 5) + PoC #03 18 BR Layer 2 (Agent 2) + PoC #05 2 BR Layer 2 (Agent 4) + 본격 재실측 (PoC #01 overall=0.901 / PoC #03 overall=0.941 / PoC #05 overall=0.985 / 3 PoC 모두 gate PASS ✅) + ≥ 2 PoC corroboration Layer 1+Layer 2 양쪽 통과 ✅ + Adzic SBE 함정 회피 자격 본격 도달 ✅ + skills/analysis/br-cross-consistency-check/SKILL.md 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
+**기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증 — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR 총합) + PoC #03 18 BR NL 본격 합성 (Agent 1) + PoC #05 2 BR GWT 신규 합성 (Agent 3) + PoC #01 13 BR Layer 2 재검증 (Agent 5) + PoC #03 18 BR Layer 2 (Agent 2) + PoC #05 2 BR Layer 2 (Agent 4) + 본격 재실측 (PoC #01 overall=0.901 / PoC #03 overall=0.941 / PoC #05 overall=0.985 / 3 PoC 모두 gate PASS ✅) + ≥ 2 PoC corroboration Layer 1+Layer 2 양쪽 통과 ✅ + Adzic SBE 함정 회피 자격 본격 도달 ✅ + skills/analysis-br-cross-consistency-check/SKILL.md 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
 
 **기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행 — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) — Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + 사용자 결단 "진행하자" 정합 + validator interface 본격 (cli.js + llm.js + validator.js / placeholder → 본격 / semantic_drift_detected + confidence_cap_exceeded finding 신설 / Layer 1 AND Layer 2 양쪽 통과 paradigm / DETERMINISTIC_THRESHOLD 신설) + docs/layer-2-prompt-spec.md 신설 (batch paradigm + Sonnet 4.6 + confidence cap 0.85) + test +5 (31/31 pass / workspace 308/0) + DEC + ADR §9 LL-i-37+38 + §11 patch v6 + LL-i-37+38 자산화 + session 13차 = step 6~12 분리** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 13차+)
 
@@ -152,7 +152,7 @@ node scripts/release-readiness.js --target v2.5.0
   - ★ ★ **Adzic SBE 폐기 함정 회피 자격 본격 도달 ✅** (Layer 1 + Layer 2 axis 자료 보유 / LL-i-26 정합)
   - ★ ★ **Claude Code sub-agent invocation paradigm 본격 동작 입증 ✅** (★ B-4 paradigm / Anthropic API key 의무 ❌)
   - ★ ★ ★ **industry-first 자격 본격 입증 ✅** (Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT 모두 부재 / LL-i-35 정합)
-- ✅ **★ ★ ★ skill 자산화** = `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 + `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록 (★ drift-validator 47/47 pass / orphan 회피)
+- ✅ **★ ★ ★ skill 자산화** = `skills/analysis-br-cross-consistency-check/SKILL.md` 신설 + `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록 (★ drift-validator 47/47 pass / orphan 회피)
 - ✅ **★ ★ semantic_drift_detected 2 BR (Phase D carry)**:
   - BR-AUTH-JWT-002 (PoC #01 / 0.65 / 규범 vs 현실 비대칭)
   - BR-USER-DELETE-AUTH-001 (PoC #03 / 0.55 / semantic_inversion / absent BR)
@@ -213,7 +213,7 @@ node scripts/release-readiness.js --target v2.5.0
 ### 신규 carry (★ ★ session 12차)
 
 - ★ ★ ★ ★ **C-self-invocation-echo-chamber** (★ critical / STOP-1 흡수 / Sonnet 4.6 약화 paradigm / Phase D 시점 retrospect 검토 의무)
-- ★ ★ ★ **C-trigger-skill-asset-신설** (★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 / session 13차 시행)
+- ★ ★ ★ **C-trigger-skill-asset-신설** (★ skills/analysis-br-cross-consistency-check/SKILL.md 신설 / session 13차 시행)
 - ★ ★ ★ **C-batch-paradigm-context-overflow** (★ context window 1M / 100+ BR batch 분할 paradigm / Phase D 전)
 - ★ ★ ★ ★ **C-phase-c-step-6-12-session-13** (★ ★ ★ critical / session 13차 시행 — PoC #03 NL 본격 합성 + PoC #05 GWT + PoC #01 Layer 2 재검증 + chain 1 gate Layer 2 통합 + Phase C SESSION-WRAPUP)
 - ★ ★ ★ **C-phase-d-domain-expert-review** (★ ★ session 11차 carry 보존 / LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 의무)
@@ -229,7 +229,7 @@ node scripts/release-readiness.js --target v2.5.0
 - ★ ★ ★ ★ ★ PoC #05 2 BR GWT 신규 합성 (★ sample mode 보존)
 - ★ ★ ★ ★ PoC #01 13 BR Layer 2 재검증 (★ baseline 비교)
 - ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합 (★ chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무 / session 13차 본격 결단 영역)
-- ★ ★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)
+- ★ ★ skills/analysis-br-cross-consistency-check/SKILL.md 신설 (★ Q-C-trigger (d) 정합)
 - ★ ★ Phase C SESSION-WRAPUP
 - ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 검토 + ≥ 2 PoC corroboration 검증 + PoC #01 13 BR 도메인 전문가 검토 + v2.5.0 MINOR release
 
@@ -883,7 +883,7 @@ node scripts/release-readiness.js --target v2.5.0
 1. ✅ `methodology-spec/deliverables/24-sql-inventory.md` (★ #23 사용 / #24 신규)
 2. ✅ `schemas/sql-inventory.schema.json` (★ 31번째 schema)
 3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 13 → 14 (`sql_inventory` 추가)
-4. ✅ `skills/analysis/phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
+4. ✅ `skills/analysis-phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
 5. ✅ `tools/sql-inventory-extractor/` (★ workspace 14번째 / 10 unit test)
 6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v2.1.0 → v2.2.0-rc1 (phase 4.8 entry)
 7. ✅ `methodology-spec/workflow/phase-4-8-sql-inventory.md`
@@ -1067,7 +1067,7 @@ DEC-2026-05-07-v2.1.0-release.
 1. ✅ `methodology-spec/deliverables/23-characterization-spec.md` (★ #16~22 사용 중 / 23 신규)
 2. ✅ `schemas/characterization-spec.schema.json` (★ 30번째 schema)
 3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 12 → 13 (`characterization` 추가)
-4. ✅ `skills/analysis/phase-4-7-characterization/SKILL.md` (★ skills 19 → 20)
+4. ✅ `skills/analysis-phase-4-7-characterization/SKILL.md` (★ skills 19 → 20)
 5. ✅ `tools/characterization-coverage-validator/` (★ workspace 13번째 / 10 unit test)
 6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v1.5.0 → v2.1.0 (phase 4.7 entry + 5-x depends_on 갱신)
 7. ✅ `methodology-spec/workflow/phase-4-7-characterization.md` (drift-validator 3-way 회귀 통과)
@@ -1469,7 +1469,7 @@ EFI-WEB 사내 IFRS 회계 시스템 `smilegate.ifrs.exchange` 모듈 한정 평
 
 1. ✅ 2 _base skills (build-traceability-matrix + invoke-go-stop-gate)
 2. ✅ 3 planning skills (extract-from-legacy / decompose-use-cases / identify-business-intent)
-3. ✅ 3 spec skills (★ skills/spec/ 신규 디렉토리 / compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables)
+3. ✅ 3 spec skills (★ skills/spec- 신규 디렉토리 / compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables)
 4. ✅ 3 test skills (generate-test-spec / run-test-evidence / verify-coverage)
 5. ✅ 2 implement skills (generate-impl-spec / verify-test-pass)
 6. ✅ agents/{planning,spec,test,implement}/README placeholder → 정식 채움 ✅
@@ -1654,7 +1654,7 @@ EFI-WEB 사내 IFRS 회계 시스템 `smilegate.ifrs.exchange` 모듈 한정 평
 
 ## 방법론 본체 버전
 
-- **★ ★ ★ ★ ★ v1.5.0 MINOR release (2026-05-03) ✅ 현재** — ★ ★ ★ ★ ADR-BE-001 (★ negative-space corroboration 정식화) 신설 + schemas/error-mapping-spec.schema.json (deliverable 16) 신설 + skills/analysis/phase-5-error-mapping/SKILL.md 신설. ★ ★ ★ §8.1 strict 정합 검증대 ★ 두 번째 통과 (★ ADR-FE-007 positive-space 와 ★ 대칭 — ★ 4 PoC 모두 anti-pattern 보유 ↔ ★ 3 BE PoC 모두 contract 부재). ★ AP-API-001 본체 antipattern 카탈로그 negative-space 첫 등재 (3 BE PoC isomorphic / Spring 2.5 + Spring 3 + NestJS framework 무관). ★ flows/analysis.phase-flow.json v1.4.4 → v1.5.0 (phase 5-1 outputs + error-mapping-spec.json / skills 3 → 4). ★ methodology-spec/skills-axis.md §5 매핑 표 갱신. ★ 검증: drift-validator --check-layout 9 phases / **19 skills** (★ 18 → 19) / 0 orphans / 0 missing / 4 tool 회귀 66/66 pass / version-check 3-source sync at v1.5.0 / build 224 files dist/internal-v1.5.0/ + CHECKSUMS. ★ ★ b87cec5 + v1.4.5 흡수. ★ retract risk 명시 (negative-space 정의 v1.6+ 외부 사용 시 재검토 / mapping_mechanism enum framework 추가 시 확장). ★ Cooling-off ❌ (★ ADR + schema 신설 = 적용 대상이나 ★ 사용자 명시 결단 "나머지 진행" → memory edge case 정합). ★ carry → v1.5.1+ PATCH (ts-morph decorator semantic / AP-API-001 PoC #01 evidence 보강 / antipatterns.schema 본체 카탈로그 / drift-validator BE corpus / extractor agent / deliverable 16 full spec / migration-cautions BE). git tag `v1.5.0`. commit `98998d5`.
+- **★ ★ ★ ★ ★ v1.5.0 MINOR release (2026-05-03) ✅ 현재** — ★ ★ ★ ★ ADR-BE-001 (★ negative-space corroboration 정식화) 신설 + schemas/error-mapping-spec.schema.json (deliverable 16) 신설 + skills/analysis-phase-5-error-mapping/SKILL.md 신설. ★ ★ ★ §8.1 strict 정합 검증대 ★ 두 번째 통과 (★ ADR-FE-007 positive-space 와 ★ 대칭 — ★ 4 PoC 모두 anti-pattern 보유 ↔ ★ 3 BE PoC 모두 contract 부재). ★ AP-API-001 본체 antipattern 카탈로그 negative-space 첫 등재 (3 BE PoC isomorphic / Spring 2.5 + Spring 3 + NestJS framework 무관). ★ flows/analysis.phase-flow.json v1.4.4 → v1.5.0 (phase 5-1 outputs + error-mapping-spec.json / skills 3 → 4). ★ methodology-spec/skills-axis.md §5 매핑 표 갱신. ★ 검증: drift-validator --check-layout 9 phases / **19 skills** (★ 18 → 19) / 0 orphans / 0 missing / 4 tool 회귀 66/66 pass / version-check 3-source sync at v1.5.0 / build 224 files dist/internal-v1.5.0/ + CHECKSUMS. ★ ★ b87cec5 + v1.4.5 흡수. ★ retract risk 명시 (negative-space 정의 v1.6+ 외부 사용 시 재검토 / mapping_mechanism enum framework 추가 시 확장). ★ Cooling-off ❌ (★ ADR + schema 신설 = 적용 대상이나 ★ 사용자 명시 결단 "나머지 진행" → memory edge case 정합). ★ carry → v1.5.1+ PATCH (ts-morph decorator semantic / AP-API-001 PoC #01 evidence 보강 / antipatterns.schema 본체 카탈로그 / drift-validator BE corpus / extractor agent / deliverable 16 full spec / migration-cautions BE). git tag `v1.5.0`. commit `98998d5`.
 - **★ ★ ★ v1.4.5 PATCH release (2026-05-03) ✅ 보존** — ★ ★ ★ AP-API-001 자동 회귀 도구 BE 트랙 첫 진입. NestJS sub-rule (`internal.be.api.error-mapping-nestjs-delete-201-decorator-drift`) 신규 — `@Delete + @ApiResponse({status: 201, ...})` decorator drift detect (4 분기 / 순서 양방향 + async 변형) / PoC #03 article.controller.ts:65,68 + 81,85 + 97,99 ★ 4 op 정확 매칭. ★ AP-API-001 cross-PoC base 정합 — PoC #03 ap.json 에 static_rule_link 추가 (★ PoC #02 mirror + ts-morph carry 명시). ★ 직전 b87cec5 (옵션 2′ / no release / Spring rule + AP-API-001 PoC #02 cross-link / drift-check.yml body scan 통합) ★ 정식 release 통합. ★ ★ §8.1 strict 평가 — patterns ≥ 2 PoC isomorphic + 2 framework (Spring + NestJS) 자연 충족 → static-runner quality 격상 자격. release note = CHANGELOG entry. git tag `v1.4.5`. commit `4dcace9`.
 - **★ ★ ★ v1.4.4 PATCH release (2026-05-02) ✅ 보존** — ★ ★ ★ manifest SSOT 정식 승격 (`flows/analysis.phase-flow.json` v1.2.2 → v1.4.4 / 9 phase + skills 매핑 + cross_cutting.aspects). `methodology-spec/skills-axis.md` 신설 (★ phase ID + skills 디렉토리 axis 분리 정책). drift-validator 0.2.0 → 0.3.0 (★ check-phase-skills.js + cli `--check-layout` flag + test 3건 / 36 pass). `.github/workflows/drift-check.yml` 신설 (★ CHANGELOG v1.2.1 entry 의 plan 정의만 → 실 구현 흡수). ★ ★ ★ b (rename) carry → v2.0 (★ §8.1 corroboration 0 = 본 plugin 의 정책이 본 plugin 자신의 변경 차단 메타 정합 첫 입증). git tag `v1.4.4`. commit `bac7c5d`.
 - **★ ★ ★ ★ v1.4.3 PATCH release (2026-05-02) ✅ 보존** — ★ ★ ★ 14차 결단 (DEC-2026-05-02-plugin-first) 1일 retract / adoption 분리 워크스페이스 폐기 / workspace 단일 통합 + build script 1차 도입 (★ Phase A). ★ 신규 자산: `package.json` (workspace root / private:true / type:module / devDeps only) + `scripts/build-plugin.js` (Official + Industry + Senior 보강 7건 — explicit allow-list / Windows long-path 검증 / SHA256 CHECKSUMS / Agent 4 발견 templates/adoption/ → dist root 동시 복사) + `scripts/version-check.js` (3 source 정합 / source-of-truth = plugin.json) + `.gitignore`. ★ 흡수 자산: `templates/adoption/CLAUDE.md` (★ ★ ★ 사용자 직접 편집 / 정책 23 inline / NestJS 4 + Spring 5 PoC #02 추출) + `templates/adoption/README.md` + `archive/methodology-v1.1/` + `docs/adoption/{v1.3-plan,v1.3-status,v1.3-decisions-index,lessons-learned-2026-05-02,README}.md`. ★ 검증: version-check ✅ / build:check 211 files ✅ / build 214 files + CHECKSUMS ✅ / build:diff-check (Senior gate) source mutation 0 ✅ / sha256sum -c 213/213 OK ✅ / `claude plugin install` Version 1.4.3 / Scope user / Status enabled ✅. ★ Phase A 운영: marketplace.json `"source": "./"` 그대로 / dist 부가 출력. ★ Phase B carry: `"source"` → `"./dist/internal-v1.4.3/"` 전환 / release.yml CI / 사내 ADR 1호. ★ Lessons: cadence ≥ 24h cooling-off (Senior / memory 자산화 carry) + 별도 dist sync 함정 (Babel/Yarn/Sentry) + 사용자 직접 편집 silent loss risk (★ Agent 4) + §8.1 일반화 ❌ (본 retract specific). carry 5 → 7 → ★ ★ **5** (★ DEC-2026-05-02-adoption-carry-OFF 후속 결단 / F4+F5+rename = ★ 본 프로젝트 backlog 제거 / 외부 워크스페이스 = 사용자 자체 영역 / ★ workspace 본체 단일 focus). release note = `decisions/DEC-2026-05-02-adoption-폐기-build-step-신설.md` + `docs/adoption/lessons-learned-2026-05-02.md`. git tag `v1.4.3`. DEC-2026-05-02-adoption-폐기-build-step-신설 + ★ ★ DEC-2026-05-02-adoption-carry-OFF (★ no release / no tag / 본체 commit 만).

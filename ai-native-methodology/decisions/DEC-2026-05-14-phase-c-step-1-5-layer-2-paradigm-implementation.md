@@ -93,7 +93,7 @@
 | carry | 영역 | 처분 |
 |---|---|---|
 | ★ ★ ★ ★ C-self-invocation-echo-chamber | ★ Sonnet 4.6 호출 paradigm 약화 / Phase D 시점 retrospect 검토 | Phase D 전 |
-| ★ ★ ★ C-trigger-skill-asset-신설 | ★ `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 | session 13차 |
+| ★ ★ ★ C-trigger-skill-asset-신설 | ★ `skills/analysis-br-cross-consistency-check/SKILL.md` 신설 | session 13차 |
 | ★ ★ ★ C-batch-paradigm-context-overflow | ★ context window 1M 한계 / 100+ BR batch 분할 paradigm | Phase D 전 |
 | ★ ★ ★ C-phase-d-domain-expert-review (★ 보존) | ★ LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 carry | Phase D 의무 |
 | ★ ★ ★ ★ C-phase-c-step-6-12-session-13 | ★ ★ ★ session 13차 시행 의무 — PoC #03 NL 본격 합성 + PoC #05 GWT + chain 1 gate + OVERALL_THRESHOLD 재설계 + PoC #01 13 BR Layer 2 재검증 + Phase C SESSION-WRAPUP | session 13차 |

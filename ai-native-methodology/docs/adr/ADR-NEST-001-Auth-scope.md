@@ -3,7 +3,7 @@
 - 상태: 승인됨 (Accepted) — 묶음 R #1
 - 일자: 2026-04-30
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001 / ADR-002 / DEC-2026-04-30-poc03-phase6-종결 / DEC-v1.3-격상-데이터-완비 / PoC #03 AP-AUTH-NEST-001 (5 endpoint critical)
+- 관련: ADR-001 / ADR-002 / ADR-NEST-002 (sibling 묶음 R #2 — class-validator + ValidationPipe) / ADR-NEST-003 (sibling 묶음 R #3 — @HttpCode) / ADR-NEST-004 (sibling 묶음 R #4 — TypeORM 무결성) / DEC-2026-04-30-poc03-phase6-종결 / DEC-v1.3-격상-데이터-완비 / PoC #03 AP-AUTH-NEST-001 (5 endpoint critical)
 
 ---
 

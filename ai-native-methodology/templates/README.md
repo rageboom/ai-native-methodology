@@ -54,4 +54,4 @@ template 은 [`../skills/`](../skills/) 의 `_base/apply-template` skill 을 통
 
 - [`../README.md`](../README.md) — plugin user 진입점
 - [`../methodology-spec/deliverables/`](../methodology-spec/deliverables/) — 각 산출물 명세 (template 의 의도 + 채울 자료)
-- [`../skills/_base/apply-template/`](../skills/_base/apply-template/) — template instantiate skill
+- [`../skills/_base-apply-template/`](../skills/_base-apply-template/) — template instantiate skill

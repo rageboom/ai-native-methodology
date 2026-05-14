@@ -2,7 +2,7 @@
 
 - 상태: 승인됨 (Accepted) — 묶음 R #2
 - 일자: 2026-04-30
-- 관련: PoC #03 AP-VALIDATION-001 (high) / F-128 + F-127 + F-143 + F-162 (cumul)
+- 관련: ADR-NEST-001 (sibling 묶음 R #1 — Auth scope) / ADR-NEST-003 (sibling 묶음 R #3 — @HttpCode) / ADR-NEST-004 (sibling 묶음 R #4 — TypeORM 무결성) / PoC #03 AP-VALIDATION-001 (high) / F-128 + F-127 + F-143 + F-162 (cumul)
 
 ---
 

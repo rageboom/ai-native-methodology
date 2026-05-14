@@ -131,6 +131,11 @@
       "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. ★ ★ ★ v2.5.0 Phase C session 13차 추가 — analysis-br-cross-consistency-check (★ Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger).",
       "skills": ["analysis-aspect-a11y", "analysis-aspect-i18n", "analysis-aspect-static-security", "analysis-aspect-legacy", "analysis-br-cross-consistency-check"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
+    },
+    "base": {
+      "$comment": "★ ★ ★ v2.6.0 신설 — _base- skill 3종은 phase 무관 cross-invocation 영역 (★ ★ 다른 skill 본문 안 본격 호출). apply-baseline-ratchet = analysis-input-collection 본격 Phase 0 진입 시 prerequisite / apply-template = template 적용 본격 / log-finding = finding 등재 본격 모든 skill cross-invocation 영역. ★ skills-axis.md §5 cross-cutting (base) row 본격 정합 / drift-validator 고아 0 의무 회피.",
+      "skills": ["_base-apply-baseline-ratchet", "_base-apply-template", "_base-log-finding"],
+      "applies_to": ["all phases — cross-invocation only / flow stage 직접 매핑 ❌"]
     }
   },
   "version_milestones": {

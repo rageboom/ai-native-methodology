@@ -2,7 +2,7 @@
 
 - 상태: 승인됨 (Accepted) — 묶음 R #4
 - 일자: 2026-04-30
-- 관련: PoC #03 AP-DB-001 (critical) + AP-PERFORMANCE-001 (high — 3 PoC 권위) / F-120 + F-121 + F-133 + F-135 + F-124 (cumul 5)
+- 관련: ADR-NEST-001 (sibling 묶음 R #1 — Auth scope) / ADR-NEST-002 (sibling 묶음 R #2 — class-validator) / ADR-NEST-003 (sibling 묶음 R #3 — @HttpCode) / PoC #03 AP-DB-001 (critical) + AP-PERFORMANCE-001 (high — 3 PoC 권위) / F-120 + F-121 + F-133 + F-135 + F-124 (cumul 5)
 
 ---
 

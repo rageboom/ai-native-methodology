@@ -48,7 +48,7 @@
 
 ### 2.6. ★ ★ skill 자산화
 
-- ★ ★ `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 (★ Q-C-trigger (d) paradigm 정합 / 본 LayeR 2 호출 paradigm 본격 명시)
+- ★ ★ `skills/analysis-br-cross-consistency-check/SKILL.md` 신설 (★ Q-C-trigger (d) paradigm 정합 / 본 LayeR 2 호출 paradigm 본격 명시)
 - ★ ★ `flows/analysis.phase-flow.json` 갱신 — `cross_cutting.aspects.skills[]` 안 `br-cross-consistency-check` 등록 (★ drift-validator orphan 회피 / 47/47 pass)
 
 ### 2.7. ★ ★ 자산 영역

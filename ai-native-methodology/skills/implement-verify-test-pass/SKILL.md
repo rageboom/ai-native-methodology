@@ -26,7 +26,7 @@ allowed-tools: Read, Bash, Edit
 
 ### 1. test-impl-pass-validator 진짜 호출 (chain 4 GREEN)
 
-`run-test-evidence` skill 호출 (★ skills/test/run-test-evidence / chain 3-4 횡단). expected_outcome = `all_pass`.
+`run-test-evidence` skill 호출 (★ skills/test-run-test-evidence / chain 3-4 횡단). expected_outcome = `all_pass`.
 
 ### 2. ★ ★ ★ 100% pass 의무 검증
 
@@ -55,7 +55,7 @@ run-test-evidence skill 의 산출 → impl-spec.json `test_pass_evidence` 필�
 
 ### 5. coverage 최종 검증 (★ verify-coverage skill 호출)
 
-`skills/test/verify-coverage` 호출. 3 metric 분리:
+`skills/test-verify-coverage` 호출. 3 metric 분리:
 - link_coverage ≥ 0.85 (chain 2-3 forward link)
 - test_pass_rate = 1.0 (★ chain 4 의무)
 - line+branch_coverage ≥ 0.80 (★ 정보)
