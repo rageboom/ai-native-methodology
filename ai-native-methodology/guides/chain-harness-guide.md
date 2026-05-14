@@ -2,9 +2,13 @@
 
 본 가이드 = chain harness 5 요소 enforcement 의 사용자 mental model. state.json + mechanical gate trio + revisit detector 가 어떻게 함께 동작하는지.
 
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ chain 1 gate Layer 2 LLM 통합 본격 명시 + br-cross-consistency-validator 연계).
+
 ## 1. Chain harness 가 무엇인가?
 
 ★ ★ ★ v2.0 paradigm — Aider 패턴 정합. **chain-driver 가 mechanical 하게 stage 순서 + gate 통과 + revisit loop 를 강제**. LLM "통과한 척 / RED 확인한 척" 시뮬레이션 ❌.
+
+★ ★ v2.5 paradigm 확장 — chain 1 gate 가 **Layer 2 LLM (Claude Code sub-agent invocation)** 의무 통합. `br-cross-consistency-validator` 가 chain 1 gate 통과 의무 요소로 격상. semantic_drift_detected 또는 confidence_cap_exceeded finding 발생 시 chain 진입 차단.
 
 5 요소:
 1. **Driver** — `tools/chain-driver/` cli + 6 module
@@ -83,7 +87,7 @@ node tools/chain-driver/src/cli.js next
 stateDiagram-v2
     [*] --> analysis: chain-driver init
     analysis --> planning: 7대 산출물 종결
-    planning --> spec: gate #1 pass<br/>(planning-extraction-validator)
+    planning --> spec: gate #1 pass<br/>(planning-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
     spec --> test: gate #2 pass<br/>(chain-coverage-validator)
     test --> implement: gate #3 pass<br/>(spec-test-link-validator + RED 입증)
     implement --> done: gate #4 pass<br/>(test-impl-pass-validator + GREEN 100%)
@@ -133,6 +137,34 @@ additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 ```
 
 ★ D21' 정합 — 권고만 stderr 로 사용자 콘솔 노출 / LLM 이 즉시 따르는 척 차단.
+
+★ ★ **v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-phase-0-input/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
+
+## 5.1 ★ v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
+
+chain 1 gate (planning → spec 진입) 시 chain-driver 가 호출하는 validator:
+
+```
+1. planning-extraction-validator (★ 기존 v2.0)
+2. ★ br-cross-consistency-validator (v2.4 신규 / v2.5 Layer 2 본격 통합)
+   ├─ Layer 1 (결정적):
+   │   · 두 표현 ≥ 1 의무 (natural_language + given_when_then)
+   │   · structure 검증 (given 안 결과 키워드 ❌ / when 안 전제 키워드 ❌)
+   │   · BR id 4토막 strict
+   └─ Layer 2 (★ Claude Code sub-agent invocation / Sonnet 4.6):
+       · 31 BR batch 1회 호출 (PoC #01 13 + PoC #03 18 = corroboration 자료)
+       · NL ↔ GWT 의미 등가성 평가 / semantic_score per BR
+       · DETERMINISTIC_THRESHOLD = 0.85 / confidence cap = 0.85
+       · finding 신설: semantic_drift_detected (medium) + confidence_cap_exceeded (low)
+```
+
+gate-eval.js 의 evaluateGate:
+- `layer2_threshold` block reason (★ session 14차 신설)
+- severityRank rank 2 (coverage_threshold 수준)
+- applyUserDecision user "go" → go-with-warnings 허용
+
+> ★ Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정합 (★ session 11차 정정).
+> ★ Static Tool 시뮬레이션 금지 정합 — sub-agent persona 시뮬레이션 ❌.
 
 ## 6. Chain-revisit detector
 

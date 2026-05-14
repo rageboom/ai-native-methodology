@@ -1,6 +1,8 @@
-# Common Errors — FAQ (★ chain harness 운영)
+# Common Errors — FAQ (★ chain harness 운영 / v2.5.1)
 
 본 가이드 = plugin user 가 install 후 자주 마주칠 마찰점 + 해결 방법.
+
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ install 후 Skills: 0 본질 결함 → v2.5.1 PATCH 회복 / 295 file / 사내 GHE 시나리오 / Layer 2 LLM 마찰).
 
 ## 1. Install / Hook
 
@@ -9,10 +11,30 @@
 **증상**: 세션 시작 시 `[ai-native-methodology] Plugin loaded...` 메시지 부재.
 
 **원인** + **해결**:
-- (a) `marketplace add` path 잘못 — `/plugin marketplace list` 로 확인 / 절대경로 의무
+- (a) `marketplace add` path 잘못 — `/plugin marketplace list` 로 확인 / 절대경로 의무 (또는 사내 GHE URL `https://github.smilegate.net/SGH-ISD/ai-native-methodology.git`)
 - (b) `/reload-plugins` 안 함 — install 후 reload 명령 실행
 - (c) hooks.json 부재 — dist 안 `hooks/hooks.json` 존재 확인 (`find ~/.claude/plugins/ai-native-methodology -name hooks.json`)
 - (d) Claude Code 버전 < hooks 지원 — 업그레이드
+
+### ★ Q1.1 Plugin install 후 `/plugin` 상세 출력에 "Skills: 0" 또는 "Agents: README" (★ v2.0~v2.5.0 critical 결함)
+
+**증상**: `/plugin` 입력 후 Installed 탭 본 plugin 의 상세에 Skills 수 = 0 / Agents = "README" 같은 잘못된 인식.
+
+**원인** (★ v2.5.0 이전 모든 release 본질 결함):
+- v2.0.0~v2.5.0 까지 본 plugin 의 agents/skills 자산이 **Claude Code plugin 표준 (1-depth) 과 충돌하는 2-depth lifecycle organize** 구조였음.
+
+**해결**: ★ ★ ★ **v2.5.1 PATCH 재install 의무**.
+```bash
+/plugin uninstall ai-native-methodology
+/plugin marketplace remove ai-native-methodology
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
+/plugin install ai-native-methodology@ai-native-methodology
+/reload-plugins
+```
+
+v2.5.1 재install 후 정상 출력:
+- **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
+- **Skills: 38** (1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md`)
 
 ### Q2. UserPromptSubmit hook 발동 안 함 (chain-driver 권고 stderr 안 뜸)
 
@@ -25,11 +47,13 @@
 
 ## 2. Version mismatch
 
-### Q3. README v1.4.2 / CLAUDE v1.3.0 / plugin.json v2.0.0-rc1 — 어느 게 맞나?
+### Q3. README / CLAUDE / plugin.json 의 version 출력이 다를 때
 
-★ ★ cleanup round 2-A 직전 (2026-05-06 b25a8ad commit 전) build 받은 사용자만 해당. 본 commit 이후 = 모두 v2.0.0 정합 (★ v2.0.0 final 2026-05-07~).
+**증상**: 받은 build 의 3 source 의 version 표시가 다름 (★ v2.0.0 이전 또는 v2.5.0 release commit 갱신 누락 build 한정).
 
-**해결**: 최신 dist artifact 재다운로드 + reinstall.
+**원인**: 본 plugin = 3-way sync paradigm (plugin.json / package.json / CHANGELOG.md). build 시점 sync 깨진 dist artifact 사용 시 발생.
+
+**해결**: 최신 dist artifact 재다운로드 + reinstall. **현재 정합 = v2.5.1** (★ 2026-05-14 release).
 
 ### Q4. plugin.json 과 CHANGELOG / package.json 의 version mismatch
 
@@ -104,12 +128,12 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 ### Q11. dist artifact size — file count 너무 많지 않나?
 
-★ cleanup round 2 series 종결 후 v2.0.0 = **256 files**. workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE / guides/ 5 자산 + 각 폴더 README 정합 / paradigm v2.0.0 정식.
+★ v2.5.1 = **295 files**. workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE / guides/ 5 자산 + 각 폴더 README 정합 / paradigm v2.5.1 정식.
 
 ### Q12. CHECKSUMS.txt 무결성 검증 fail
 
 ```bash
-cd dist/ai-native-methodology-v2.0.0
+cd dist/ai-native-methodology-v2.5.1
 shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 # → 어느 파일 hash mismatch 인지 확인
 ```
@@ -126,7 +150,29 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 **원인**: skill description 매칭이 다른 skill 과 겹침.
 
-**해결**: 명시 호출 — `@skills/analysis/phase-N-NAME/SKILL.md`.
+**해결**: 명시 호출 — `@skills/analysis-phase-N-NAME/SKILL.md` (★ v2.5.1 1-depth + prefix paradigm 정합).
+
+## 6.1 ★ v2.5 Layer 2 LLM 마찰
+
+### Q15. chain 1 gate 진입 시 `br-cross-consistency-validator` 가 너무 오래 걸림
+
+**원인**: Layer 2 (Sonnet 4.6 sub-agent) batch 호출 — BR 31건 1회 호출이라 sub-agent 응답 1~3분 소요.
+
+**해결**: 정상 동작 (★ ★ ★ ★ Static Tool 시뮬레이션 금지 정합 / 진짜 Claude Code sub-agent invocation paradigm). 시뮬레이션 시 신뢰도 -5%p 패널티.
+
+### Q16. `semantic_drift_detected` finding 발견 — chain 1 gate block?
+
+**원인**: Layer 2 LLM 평가 결과 BR 의 NL ↔ GWT 의미 격차 검출 (semantic_score < 0.7).
+
+**해결 옵션** (★ 사용자 결단):
+- **(1) DRIFT 격상** — rules.json 변경 ❌ / 후속 검토 carry (★ chain 1 gate 통과 자격 유지 / Senior REVISE 정합)
+- **(2) NL 또는 GWT 수정 후 재실행** — `analysis-br-cross-consistency-check` 재호출
+
+### Q17. `confidence_cap_exceeded` finding (low / Layer 2)
+
+**원인**: Sonnet 4.6 sub-agent 가 confidence > 0.85 보고. ★ Static Tool 시뮬레이션 금지 정합 cap.
+
+**해결**: 정상 동작 (low finding / chain 1 gate block 없음 / 사용자 결단 carry).
 
 ## 7. 참조
 
@@ -136,4 +182,4 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 ## 8. Finding 등재 (사용자 피드백 자산화)
 
-본 가이드에 없는 마찰점 발견 시 — 사용자 자체 프로젝트의 `findings/` 디렉토리에 등재 + 본 plugin 의 GitHub Issue 또는 사내 wiki 에 보고. v2.0.x 후속 patch / round cleanup 시 본 가이드 보강.
+본 가이드에 없는 마찰점 발견 시 — 사용자 자체 프로젝트의 `findings/` 디렉토리에 등재 + 본 plugin 의 사내 GHE Issue 또는 사내 wiki 에 보고. 후속 patch / round cleanup 시 본 가이드 보강.
