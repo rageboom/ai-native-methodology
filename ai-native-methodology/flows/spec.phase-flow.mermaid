@@ -7,11 +7,11 @@ flowchart TB
         direction TB
 
         P20["P2.0 — input 통합<br/>planning-spec + Phase 4.5 + 7대"]
-        P21["P2.1 — behavior-spec 합성 (BHV-*)<br/>compose-behavior-spec / 1 UC = 1+ BHV"]
-        P22["P2.2 — acceptance-criteria 분해 (AC-*)<br/>derive-acceptance-criteria / Gherkin BDD"]
-        P23["P2.3 — 7대 cross-link 통합<br/>integrate-7대-deliverables"]
+        P21["P2.1 — behavior-spec 합성 (BHV-*)<br/>spec-compose-behavior-spec / 1 UC = 1+ BHV"]
+        P22["P2.2 — acceptance-criteria 분해 (AC-*)<br/>spec-derive-acceptance-criteria / Gherkin BDD"]
+        P23["P2.3 — 7대 cross-link 통합<br/>spec-integrate-7대-deliverables"]
         P24["P2.4 — behavior-diagrams 통합 + 검증<br/>★ chain-coverage-validator + drift + dmn + formal-link"]
-        P25["★ ★ ★ P2.5 — gate #2 (사용자 결단)<br/>invoke-go-stop-gate"]
+        P25["★ ★ ★ P2.5 — gate #2 (사용자 결단)<br/>_base-invoke-go-stop-gate"]
 
         P20 --> P21
         P21 --> P22
@@ -33,7 +33,7 @@ flowchart TB
     end
 
     subgraph NEXT["chain 3 (test) 진입"]
-        N1["generate-test-spec skill"]
+        N1["test-generate-test-spec skill"]
     end
 
     IN --> P20

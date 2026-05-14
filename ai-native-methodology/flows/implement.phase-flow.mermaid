@@ -10,10 +10,10 @@ flowchart TB
         P41["P4.1 — IMPL-* 모듈 분해"]
         P42["★ ★ ★ P4.2 — 실 impl 코드 generate<br/>controller / service / repository / migration<br/>★ AI 자동 ≥ 80% / 사용자 검토 ≤ 20%"]
         P43["P4.3 — git commit + commit_hash 채움"]
-        P44["★ ★ ★ P4.4 — GREEN 검증 (진짜 runner / 100% pass)<br/>verify-test-pass + run-test-evidence<br/>★ test-impl-pass-validator (--allow-execute)"]
+        P44["★ ★ ★ P4.4 — GREEN 검증 (진짜 runner / 100% pass)<br/>implement-verify-test-pass + test-run-test-evidence<br/>★ test-impl-pass-validator (--allow-execute)"]
         P45["P4.5 — static-runner 6종 + chain-strict lint<br/>★ lint-no-simulation chain-strict"]
         P46["P4.6 — traceability-matrix 최종 갱신<br/>★ red_count == 0 의무"]
-        P47["★ ★ ★ P4.7 — gate #4 (final / 사용자 결단)<br/>invoke-go-stop-gate"]
+        P47["★ ★ ★ P4.7 — gate #4 (final / 사용자 결단)<br/>_base-invoke-go-stop-gate"]
 
         P40 --> P41
         P41 --> P42

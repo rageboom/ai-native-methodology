@@ -12,7 +12,7 @@
 ## When to call
 
 - **trigger**: Phase 4.5+ / Phase 6 quality / chain 4 impl 후
-- **호출자**: skill `aspect-static-security` / `phase-6-quality` 자동 호출
+- **호출자**: skill `analysis-aspect-static-security` / `analysis-phase-6-quality` 자동 호출
 - **수동**: `npx static-runner --plugin <name> ...`
 
 ## Inputs

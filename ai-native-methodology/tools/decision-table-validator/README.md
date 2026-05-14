@@ -7,7 +7,7 @@ Phase 4.5 decision-tables 산출물의 **dmn-check 5종** (red6/dmn-check Apache
 ## When to call
 
 - **trigger**: Phase 4.5 (formal-spec / decision-tables) 산출 후
-- **호출자**: skill `phase-4-5-cross-validation` 자동 호출 / drift-validator 와 짝
+- **호출자**: skill `analysis-phase-4-5-cross-validation` 자동 호출 / drift-validator 와 짝
 - **수동**: `npx decision-table-validator <dir>`
 
 ## Inputs

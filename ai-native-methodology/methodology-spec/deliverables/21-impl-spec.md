@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 §3 (★ ★ ★ 진짜 runner 100% pass 의무) / ADR-008 v2 §10 / ADR-009 v2 §2.5 (impl trust 0.95) / ADR-010 v2 §2.6 / ADR-CHAIN-002 §gate #4 (사용자 명시 결단 의무)
 > **schema**: `schemas/impl-spec.schema.json`
-> **생성 phase**: chain 4 (implement) — `/generate-impl-spec` + `/verify-test-pass` (skills / sub-plan-4)
+> **생성 phase**: chain 4 (implement) — `/implement-generate-impl-spec` + `/implement-verify-test-pass` (skills / sub-plan-4)
 > **gate**: go/stop gate #4 (★ ★ Auto Mode 위임 ❌)
 
 ## 1. 목적
@@ -38,7 +38,7 @@
 | 항목 | 출처 | 도구 | 신뢰도 |
 |---|---|---|---|
 | modules (IMPL-*) | test-spec TC-* + behavior-spec | LLM 자동 생성 | 60% → 90% (실 runner) → 95% (gate #4) |
-| framework (open enum) | phase-1-inventory | 결정적 | 100% |
+| framework (open enum) | analysis-phase-1-inventory | 결정적 | 100% |
 | source_files | ★ AI 자동 생성 | LLM | 75% |
 | commit_hash | ★ git rev-parse HEAD | 결정적 | 100% |
 | source_evidence (excerpt) | ★ 실 코드 grep | 결정적 | 100% |

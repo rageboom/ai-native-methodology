@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (★ 산업 권위 — Official research) / ADR-008 v2 §10 (matrix.json + matrix.md + matrix.mermaid 이중 렌더링)
 > **schema**: `schemas/traceability-matrix.schema.json`
-> **생성 phase**: cross-cutting — `/build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
+> **생성 phase**: cross-cutting — `/_base-build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
 > **gate**: 매 gate #1~#4 prerequisite
 
 ## 1. 목적

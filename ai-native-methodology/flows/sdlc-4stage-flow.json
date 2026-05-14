@@ -105,25 +105,25 @@
       "id": "#1",
       "stage": "planning",
       "validators": ["planning-extraction-validator", "schema-validator"],
-      "skill": "skills/_base/invoke-go-stop-gate"
+      "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
       "id": "#2",
       "stage": "spec",
       "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
-      "skill": "skills/_base/invoke-go-stop-gate"
+      "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
       "id": "#3",
       "stage": "test",
       "validators": ["test-impl-pass-validator (expected: all_fail)", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
-      "skill": "skills/_base/invoke-go-stop-gate"
+      "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
       "id": "#4",
       "stage": "implement",
       "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
-      "skill": "skills/_base/invoke-go-stop-gate"
+      "skill": "skills/_base-invoke-go-stop-gate"
     }
   ],
   "cross_cutting": {
@@ -147,7 +147,7 @@
       "policy": "DO-178C / IEC 62304 bidirectional",
       "tool": "tools/traceability-matrix-builder",
       "schema": "schemas/traceability-matrix.schema.json",
-      "skill": "skills/_base/build-traceability-matrix"
+      "skill": "skills/_base-build-traceability-matrix"
     },
     "ratchet": {
       "policy": "ADR-010 v2 §2.6",
@@ -173,7 +173,7 @@
       { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "sub-plan-6 PoC #05 + PoC #03 retrofit" },
       { "id": 2, "name": "진짜 도구 5종 물증 보존", "data_source": "test-impl-pass-validator (chain 3-4)" },
       { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "11 chain validator + drift-check.yml + chain-check.yml" },
-      { "id": 4, "name": "모든 chain stage coverage ≥ 0.85", "data_source": "chain-coverage-validator + spec-test-link-validator + verify-coverage skill" },
+      { "id": 4, "name": "모든 chain stage coverage ≥ 0.85", "data_source": "chain-coverage-validator + spec-test-link-validator + test-verify-coverage skill" },
       { "id": 5, "name": "ADR-CHAIN-001~004 + ADR-008/009/010 v2 등재", "data_source": "docs/adr/ (sub-plan-1~3 종결)" },
       { "id": 6, "name": "traceability-matrix 100% greenness", "data_source": "PoC #05 (sub-plan-6)" },
       { "id": 7, "name": "sample legacy 1 cycle e2e pass (1 BR + 1 UC + 1 TC + 1 IMPL)", "data_source": "PoC #05 (sub-plan-6)" }

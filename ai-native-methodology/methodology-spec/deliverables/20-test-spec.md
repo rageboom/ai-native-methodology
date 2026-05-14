@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 §3 (no-simulation 강화) / ADR-008 v2 §10 / ADR-009 v2 §2.5 (test trust 0.88) / ADR-010 v2 §2.6 (coverage ratchet)
 > **schema**: `schemas/test-spec.schema.json`
-> **생성 phase**: chain 3 (test) — `/generate-test-spec` + `/run-test-evidence` (skills / sub-plan-4)
+> **생성 phase**: chain 3 (test) — `/test-generate-test-spec` + `/test-run-test-evidence` (skills / sub-plan-4)
 > **gate**: go/stop gate #3
 
 ## 1. 목적
@@ -35,14 +35,14 @@
 |---|---|---|---|
 | test_cases (TC-*) | acceptance-criteria AC-* + behavior-spec | LLM 자동 생성 | 60% (base) → 80% (실 runner) → 88% (gate #3) |
 | type (8 enum) | AC severity + 도메인 | LLM | 80% |
-| framework (open enum) | phase-1-inventory stack | 결정적 | 100% |
+| framework (open enum) | analysis-phase-1-inventory stack | 결정적 | 100% |
 | framework_status | npm registry / GitHub | 결정적 | 100% |
 | source_file (실 test 코드) | ★ AI 자동 생성 | LLM | 75% |
 | source_evidence (excerpt) | ★ 실 코드 grep | 결정적 | 100% |
 | test_run_evidence (5종 물증) | ★ ★ ★ **진짜 runner 호출** | jest/vitest/junit/pytest | 100% |
 | coverage (link / pass_rate / line / branch) | runner output + chain-coverage | 결정적 | 100% |
 
-**입력**: acceptance-criteria.json + behavior-spec.json + phase-1-inventory.json (stack 시그널).
+**입력**: acceptance-criteria.json + behavior-spec.json + analysis-phase-1-inventory.json (stack 시그널).
 
 ## 4. 검증 도구
 

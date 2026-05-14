@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-008 v2 §10 (이중 렌더링 chain 단계) / ADR-009 v2 §2.5 (planning trust 0.85)
 > **schema**: `schemas/planning-spec.schema.json`
-> **생성 phase**: chain 1 (planning) — `/extract-from-legacy` (skill / sub-plan-4 신설)
+> **생성 phase**: chain 1 (planning) — `/planning-extract-from-legacy` (skill / sub-plan-4 신설)
 > **gate**: go/stop gate #1 (ADR-CHAIN-002)
 
 ## 1. 목적

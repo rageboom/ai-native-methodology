@@ -11,9 +11,9 @@
 | Axis | 용도 | 예 |
 |---|---|---|
 | **manifest phase ID** | 분석 진행 단위 / phase 간 의존 그래프 노드 | `0`, `1`, `2`, `3`, `4`, `4.5`, `5-1`, `5-2`, `6` |
-| **skills 디렉토리** | 산출물 단위 / 자연어 trigger 의 매칭 단위 | `phase-2-architecture/`, `phase-5-schema-erd/`, `phase-5-state-map/` |
+| **skills 디렉토리** | 산출물 단위 / 자연어 trigger 의 매칭 단위 | `analysis-phase-2-architecture/`, `analysis-phase-5-schema-erd/`, `analysis-phase-5-state-map/` |
 
-두 axis 의 phase 번호가 **같은 숫자라도 다른 phase 를 가리킬 수 있다**. 예: skills 의 `phase-2-architecture/` 는 manifest 의 phase `3` (arch) 의 skill 이고, manifest 의 phase `2` (db) 의 skill 은 `phase-5-schema-erd/` 다.
+두 axis 의 phase 번호가 **같은 숫자라도 다른 phase 를 가리킬 수 있다**. 예: skills 의 `analysis-phase-2-architecture/` 는 manifest 의 phase `3` (arch) 의 skill 이고, manifest 의 phase `2` (db) 의 skill 은 `analysis-phase-5-schema-erd/` 다.
 
 ## 2. 정책
 
@@ -29,8 +29,8 @@
 `skills/analysis/phase-{N}-{slug}/` 디렉토리명의 `phase-N` prefix 는 **산출물 번호 그룹의 라벨**이다. manifest phase ID 와 일치할 의무 ❌.
 
 이유: skill 은 산출물 단위로 발동하고 (자연어 trigger → 1 skill = 1 산출물), 산출물 번호 (1~15) 와 manifest phase ID 는 본질적으로 다른 axis. 예:
-- 산출물 #2 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `phase-2-architecture/`.
-- 산출물 #5-b schema 는 manifest phase `2` (db) 에서 산출된다 → skills `phase-5-schema-erd/`.
+- 산출물 #2 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `analysis-phase-2-architecture/`.
+- 산출물 #5-b schema 는 manifest phase `2` (db) 에서 산출된다 → skills `analysis-phase-5-schema-erd/`.
 
 skill 디렉토리명은 **사용자가 산출물 번호로 기억하기 좋은 라벨**일 뿐, manifest 와의 정합은 매핑 필드를 통해 강제한다.
 
@@ -42,11 +42,11 @@ skill 디렉토리명은 **사용자가 산출물 번호로 기억하기 좋은 
 {
   "id": "3",
   "name": "arch",
-  "skills": ["phase-2-architecture"]
+  "skills": ["analysis-phase-2-architecture"]
 }
 ```
 
-aspect skill 4종 (`aspect-a11y` / `aspect-i18n` / `aspect-static-security` / `aspect-legacy`) 은 `cross_cutting.aspects.skills` 에 분리.
+aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-aspect-static-security` / `analysis-aspect-legacy`) 은 `cross_cutting.aspects.skills` 에 분리.
 
 ### 2.4 drift-validator 3-way 검증 의무
 
@@ -63,7 +63,7 @@ aspect skill 4종 (`aspect-a11y` / `aspect-i18n` / `aspect-static-security` / `a
 ```
 1. skills/analysis/phase-{N}-{slug}/SKILL.md 신설
    - frontmatter: name / description / allowed-tools
-   - phase-N prefix 는 산출물 번호 그룹 라벨로 자유 (★ 정수 의무 ❌ — phase-4-5-cross-validation 같은 .5 도 허용)
+   - phase-N prefix 는 산출물 번호 그룹 라벨로 자유 (★ 정수 의무 ❌ — analysis-phase-4-5-cross-validation 같은 .5 도 허용)
 
 2. flows/analysis.phase-flow.json 갱신
    - 본 skill 이 발동되는 manifest phase 의 skills 배열에 디렉토리명 추가
@@ -92,28 +92,28 @@ aspect skill 4종 (`aspect-a11y` / `aspect-i18n` / `aspect-static-security` / `a
 
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
-| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis/phase-0-input/ | inventory + tree |
+| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-phase-0-input/ | inventory + tree |
 | 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning/ (★ 채움) | planning-spec |
 | 1 sub | analysis | analysis.phase-flow.json | skills/analysis/ (현 19) | 7대 + 8 FE 산출물 |
 | 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec/ (★ 신설) | behavior-spec / acceptance-criteria |
 | 3 | test | test.phase-flow.json (★ 신설) | skills/test/ (★ 채움) | test-spec + 실 test 코드 (RED) |
 | 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement/ (★ 채움) | impl-spec + 실 impl 코드 (GREEN) |
-| cross | traceability | (sdlc-4stage-flow.json cross_cutting) | skills/_base/build-traceability-matrix/ | traceability-matrix |
+| cross | traceability | (sdlc-4stage-flow.json cross_cutting) | skills/_base-build-traceability-matrix/ | traceability-matrix |
 
 ## 5. 매핑 현황 (v1.4.4 시점)
 
 | Manifest phase ID | spec_file | skills (디렉토리명) |
 |---|---|---|
-| 0 | phase-0-input.md | phase-0-input |
-| 1 | phase-1-init.md | phase-1-inventory |
-| 2 (db) | phase-2-db.md | phase-5-schema-erd |
-| 3 (arch) | phase-3-arch.md | phase-2-architecture |
-| 4 (business-logic) | phase-4-business-logic.md | phase-3-domain, phase-4-rules, phase-5-form-validation |
-| 4.5 (formal-spec) | phase-4-5-formal-spec.md | phase-4-5-cross-validation |
-| 5-1 (api) | phase-5-1-api.md | phase-5-openapi, phase-5-rules, **phase-5-error-mapping** (★ v1.5.0 신설) |
-| 5-2 (ui) | phase-5-2-ui.md | phase-5-state-map, phase-5-visual-manifest, phase-5-type-spec |
-| 6 (quality) | phase-6-quality.md | phase-6-quality |
-| **cross-cutting (aspects)** | (없음) | aspect-a11y, aspect-i18n, aspect-static-security, aspect-legacy |
+| 0 | phase-0-input.md | analysis-phase-0-input |
+| 1 | phase-1-init.md | analysis-phase-1-inventory |
+| 2 (db) | phase-2-db.md | analysis-phase-5-schema-erd |
+| 3 (arch) | phase-3-arch.md | analysis-phase-2-architecture |
+| 4 (business-logic) | phase-4-business-logic.md | analysis-phase-3-domain, analysis-phase-4-rules, analysis-phase-5-form-validation |
+| 4.5 (formal-spec) | phase-4-5-formal-spec.md | analysis-phase-4-5-cross-validation |
+| 5-1 (api) | phase-5-1-api.md | analysis-phase-5-openapi, analysis-phase-5-rules, **analysis-phase-5-error-mapping** (★ v1.5.0 신설) |
+| 5-2 (ui) | phase-5-2-ui.md | analysis-phase-5-state-map, analysis-phase-5-visual-manifest, analysis-phase-5-type-spec |
+| 6 (quality) | phase-6-quality.md | analysis-phase-6-quality |
+| **cross-cutting (aspects)** | (없음) | analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy |
 
 ## 6. 본 정책의 한계
 

@@ -28,7 +28,7 @@ flowchart TB
         S4_OUT["impl-spec.json (deliverable 21) + 실 impl 코드<br/>★ test_pass_evidence.fail_count: 0<br/>traceability-matrix.{json,md,mermaid}"]
     end
 
-    subgraph G["★ ★ ★ 4 Gate (사용자 결단 / invoke-go-stop-gate skill)"]
+    subgraph G["★ ★ ★ 4 Gate (사용자 결단 / _base-invoke-go-stop-gate skill)"]
         G1["Gate #1<br/>planning-extraction-validator<br/>schema-validator"]
         G2["Gate #2<br/>chain-coverage-validator<br/>drift / dmn / formal-link / schema"]
         G3["Gate #3<br/>test-impl-pass (RED expected: all_fail)<br/>spec-test-link / schema / chain-strict lint"]

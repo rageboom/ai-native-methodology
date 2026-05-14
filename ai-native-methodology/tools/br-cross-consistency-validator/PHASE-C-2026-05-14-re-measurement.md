@@ -167,7 +167,7 @@
 ## 9. ★ ★ ★ 다음 step (★ session 14차+ Phase C step 9~12 + Phase D)
 
 1. ★ ★ ★ ★ chain 1 gate Layer 2 통합 (★ chain-driver gate-eval.js 영역 변경 / chain harness 5 요소 1 변경 의무)
-2. ★ ★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 (★ ★ Q-C-trigger (d) 정합 / 본 session 13차 시행)
+2. ★ ★ skills/analysis-br-cross-consistency-check/SKILL.md 신설 (★ ★ Q-C-trigger (d) 정합 / 본 session 13차 시행)
 3. ★ ★ Phase C SESSION-WRAPUP
 4. ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 + ≥ 2 PoC corroboration 본격 검증 + PoC #01 13 BR 도메인 전문가 검토 + ★ ★ ★ v2.5.0 MINOR release
 5. ★ ★ self-evaluation bias retrospect — ★ Opus / Haiku 교차 검증 carry

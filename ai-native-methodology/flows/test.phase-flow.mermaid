@@ -11,8 +11,8 @@ flowchart TB
         P32["★ ★ ★ P3.2 — 실 test 코드 generate (RED)<br/>jest / vitest / junit5 / pytest"]
         P33["P3.3 — AC.test_case_refs backward 채움"]
         P34["★ ★ ★ P3.4 — RED 검증 + 5종 물증 7 필드<br/>test-impl-pass-validator (--allow-execute / expected: all_fail)<br/>+ lint-no-simulation chain-strict"]
-        P35["P3.5 — coverage 측정 (3 metric 분리)<br/>verify-coverage"]
-        P36["★ ★ ★ P3.6 — gate #3 (사용자 결단)<br/>invoke-go-stop-gate"]
+        P35["P3.5 — coverage 측정 (3 metric 분리)<br/>test-verify-coverage"]
+        P36["★ ★ ★ P3.6 — gate #3 (사용자 결단)<br/>_base-invoke-go-stop-gate"]
 
         P30 --> P31
         P31 --> P32
@@ -35,7 +35,7 @@ flowchart TB
     end
 
     subgraph NEXT["chain 4 (impl) 진입"]
-        N1["generate-impl-spec skill"]
+        N1["implement-generate-impl-spec skill"]
     end
 
     IN --> P30

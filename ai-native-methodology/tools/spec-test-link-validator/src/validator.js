@@ -1,13 +1,13 @@
 // spec-test-link-validator core
 // 검증:
 //   1. acceptance AC-* → test-spec TC-* 1:N coverage
-//   2. test-spec TC-* 의 framework 가 phase-1-inventory stack 정합
+//   2. test-spec TC-* 의 framework 가 analysis-phase-1-inventory stack 정합
 //   3. behavior BHV-* → TC-* link 정합 (TC.bhv_ref)
 //   4. coverage ≥ 0.85 ratchet
 
 import { readFileSync, existsSync } from 'node:fs';
 
-// phase-1-inventory.json 의 detected stack 시그널 → 허용 framework 매핑
+// analysis-phase-1-inventory.json 의 detected stack 시그널 → 허용 framework 매핑
 const FRAMEWORK_HINTS = {
   java: ['junit5', 'junit', 'spock', 'testng'],
   spring: ['junit5', 'junit'],

@@ -1,0 +1,36 @@
+---
+name: analysis-phase-5-state-map
+description: Use when project contains React/Vue/Svelte/Solid + state library (Zustand, Redux, Pinia, MobX, Jotai, TanStack Query, RTK Query, SWR). Generates state-map.json (산출물 8). FE-specific. Stage = analysis, track = FE.
+allowed-tools: Read, Glob, Grep, Bash, Write
+---
+
+# phase-5-state-map — FE State Map (FE)
+
+FE 의 client state + server state cache shape 추출.
+
+## 사전 조건
+
+- inventory.json / architecture.json 존재
+- FE 트랙 (React/Vue/Svelte/Solid + state lib 시그널)
+
+## 절차
+
+1. **State lib 식별**:
+   - Client state: Zustand store / Redux slice / Pinia store / MobX observable / Jotai atom
+   - Server state: TanStack Query / RTK Query / SWR / Apollo cache
+2. **State shape 추출** — 각 store / slice / atom 의 type 정의 (TypeScript) 또는 initial value
+3. **Mutation / action 추출** — store 의 setter / action / dispatch 후보
+4. **Server state cache key 매핑** — `useQuery(['users', id])` 같은 cache key + 응답 shape
+5. **Server state ↔ openapi 매핑** — server-state cache 가 어느 endpoint 와 정합
+6. **state-map.json 작성** — `schemas/state-map.schema.json` (v1.4 신규)
+
+## 산출물
+
+`<user-project>/.aimd/output/state-map.json`
+
+## 본체 명세
+
+- `methodology-spec/deliverables/08-state-map.md` (v1.4)
+- `methodology-spec/workflow/phase-5-2-b-state.md`
+- `schemas/state-map.schema.json`
+- ADR-FE-006 (framework-neutral IR + IR 4계층)

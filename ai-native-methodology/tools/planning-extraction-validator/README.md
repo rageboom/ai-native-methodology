@@ -7,7 +7,7 @@
 ## When to call
 
 - **trigger**: chain 1 (planning) stage 종결 시 / chain-driver `next` 진입
-- **호출자**: gate auto (chain-driver) / skill `_base/invoke-go-stop-gate`
+- **호출자**: gate auto (chain-driver) / skill `_base-invoke-go-stop-gate`
 - **수동**: `node src/cli.js ...`
 
 ## Inputs
@@ -54,7 +54,7 @@ node src/cli.js \
 
 ## Carry
 
-- planning-spec deliverable 17 의 full implementation = sub-plan-4 (skill `skills/planning/extract-from-legacy/`)
+- planning-spec deliverable 17 의 full implementation = sub-plan-4 (skill `skills/planning-extract-from-legacy/`)
 - meta-confidence schema $ref 적용 (현 CLI 는 schema 강제 X / sub-plan-3a 후속)
 
 ## ★★★ no-simulation 정합

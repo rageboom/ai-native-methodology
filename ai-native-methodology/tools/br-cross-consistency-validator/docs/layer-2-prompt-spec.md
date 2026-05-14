@@ -146,7 +146,7 @@ node tools/br-cross-consistency-validator/src/cli.js \
 ### 6.1. (d) skill trigger paradigm (★ ★ 권장)
 
 ★ ★ 본 방법론 plugin 자산 안 skill 신설:
-- 위치: `skills/analysis/br-cross-consistency-check/SKILL.md`
+- 위치: `skills/analysis-br-cross-consistency-check/SKILL.md`
 - trigger keyword: "br cross consistency check" / "Layer 2 검증" / "BR semantic 정합 검증"
 - 시행 paradigm:
   1. ★ Claude (호출자) 가 skill 권고 stderr 감지 (★ chain-driver hooks-bridge paradigm)
@@ -173,7 +173,7 @@ node tools/br-cross-consistency-validator/src/cli.js \
 - ★ ★ ★ ★ **C-self-invocation-echo-chamber** = ★ Sonnet 4.6 호출 paradigm 으로 약화 / ★ ★ Phase D 시점 retrospect 검토 의무
 - ★ ★ **C-batch-paradigm-context-overflow** = ★ ★ context window 1M 한계 / 100+ BR 시 batch 분할 paradigm carry
 - ★ ★ ★ **C-phase-d-domain-expert-review** = ★ Layer 2 LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 의무 carry
-- ★ ★ **C-trigger-skill-asset-신설** = ★ skills/analysis/br-cross-consistency-check/SKILL.md 신설 의무 (★ session 13차 시행)
+- ★ ★ **C-trigger-skill-asset-신설** = ★ skills/analysis-br-cross-consistency-check/SKILL.md 신설 의무 (★ session 13차 시행)
 
 ## 9. ★ ★ ★ chain harness 5 요소 변경 ❌
 

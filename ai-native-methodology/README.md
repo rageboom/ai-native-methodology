@@ -154,14 +154,14 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 
 | 자연어 prompt | 발동 skill |
 |---|---|
-| "이 코드베이스 분석 시작" | `phase-0-input` |
-| "inventory 추출해줘" | `phase-1-inventory` |
-| "아키텍처 분석" | `phase-2-architecture` |
-| "도메인 모델 추출" | `phase-3-domain` |
-| "비즈니스 규칙 추출" | `phase-4-rules` |
-| "OpenAPI 만들어줘" | `phase-5-openapi` (BE) |
-| "DB schema + ERD" | `phase-5-schema-erd` (DB) |
-| "antipattern 정리" | `phase-6-quality` |
+| "이 코드베이스 분석 시작" | `analysis-phase-0-input` |
+| "inventory 추출해줘" | `analysis-phase-1-inventory` |
+| "아키텍처 분석" | `analysis-phase-2-architecture` |
+| "도메인 모델 추출" | `analysis-phase-3-domain` |
+| "비즈니스 규칙 추출" | `analysis-phase-4-rules` |
+| "OpenAPI 만들어줘" | `analysis-phase-5-openapi` (BE) |
+| "DB schema + ERD" | `analysis-phase-5-schema-erd` (DB) |
+| "antipattern 정리" | `analysis-phase-6-quality` |
 
 ★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 자동 매칭. cross_cutting (phase 무관).
 
@@ -169,23 +169,23 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 
 ```
 1. chain-driver init <project>      → state.json 초기화
-2. "기획 단계 시작"                  → extract-from-legacy / decompose-use-cases / identify-business-intent
+2. "기획 단계 시작"                  → planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent
    → planning-spec.{json,md} 산출
    → gate #1 (planning-extraction-validator) 통과
 3. "behavior spec / acceptance criteria 도출"
-   → compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables
+   → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-7대-deliverables
    → behavior-spec + acceptance-criteria + 7대 통합
    → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85) 통과
 4. "test spec 생성 RED 의무"
-   → generate-test-spec / run-test-evidence / verify-coverage
+   → test-generate-test-spec / test-run-test-evidence / test-verify-coverage
    → test-spec + 실 test code (RED — 실패 입증 / impl 부재)
    → gate #3 (spec-test-link-validator / AC→TC ≥ 0.85 + RED) 통과
 5. "impl spec 생성 GREEN 의무"
-   → generate-impl-spec / verify-test-pass
+   → implement-generate-impl-spec / implement-verify-test-pass
    → impl-spec + 실 impl code (GREEN / 100% test pass)
    → gate #4 (test-impl-pass-validator / 실 test runner / 100% pass) 통과
 6. "traceability matrix"
-   → _base/build-traceability-matrix
+   → _base-build-traceability-matrix
    → UC→BHV→AC→TC→IMPL+commit_hash matrix 산출
 ```
 
@@ -214,12 +214,12 @@ dist/ai-native-methodology-v2.0.0-rc1/
 │
 ├── agents/                           5 chain agent (planning/spec/test/implement/analysis) + _base 3
 ├── skills/                           ★ 13 chain skill + analysis 18 + _base 5
-│   ├── _base/                        invoke-go-stop-gate / build-traceability-matrix / log-finding / apply-template / apply-baseline-ratchet
+│   ├── _base/                        _base-invoke-go-stop-gate / _base-build-traceability-matrix / _base-log-finding / _base-apply-template / _base-apply-baseline-ratchet
 │   ├── analysis/                     phase-0~6 + aspect 4 (a11y/i18n/static-security/legacy)
-│   ├── planning/                     extract-from-legacy / decompose-use-cases / identify-business-intent
-│   ├── spec/                         compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables
-│   ├── test/                         generate-test-spec / run-test-evidence / verify-coverage
-│   └── implement/                    generate-impl-spec / verify-test-pass
+│   ├── planning/                     planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent
+│   ├── spec/                         spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-7대-deliverables
+│   ├── test/                         test-generate-test-spec / test-run-test-evidence / test-verify-coverage
+│   └── implement/                    implement-generate-impl-spec / implement-verify-test-pass
 ├── hooks/
 │   └── hooks.json                    UserPromptSubmit + PreToolUse (chain-driver hooks-bridge / D21' suppressOutput=true)
 ├── flows/                            13 file (5 chain stage flow + sdlc-4stage SSOT + analysis flow)

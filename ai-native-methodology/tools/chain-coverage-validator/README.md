@@ -7,7 +7,7 @@
 ## When to call
 
 - **trigger**: chain 2 (spec) stage 종결 시 / chain-driver `next` 진입
-- **호출자**: gate auto (chain-driver) / skill `_base/invoke-go-stop-gate`
+- **호출자**: gate auto (chain-driver) / skill `_base-invoke-go-stop-gate`
 - **수동**: `node src/cli.js ...`
 
 ## Inputs

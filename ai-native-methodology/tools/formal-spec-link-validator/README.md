@@ -15,7 +15,7 @@ FE 산출물 (state-map / visual-manifest / a11y-spec / i18n-spec / static-secur
 ## When to call
 
 - **trigger**: Phase 4.5 산출 후 / API + antipatterns + FE 산출물 add/edit
-- **호출자**: skill `phase-4-5-cross-validation` 자동 호출
+- **호출자**: skill `analysis-phase-4-5-cross-validation` 자동 호출
 - **수동**: `node src/cli.js <path>`
 
 ## Inputs

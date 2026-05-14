@@ -12,7 +12,7 @@
       "depends_on": [],
       "inputs": ["acceptance-criteria.json", "behavior-spec.json", "inventory.json", ".aimd/config/test-cmd.json"],
       "outputs": ["framework_resolved", "test_cmd_resolved"],
-      "skills": ["generate-test-spec"],
+      "skills": ["test-generate-test-spec"],
       "skills_dir": "skills/test/",
       "adr_ref": "ADR-CHAIN-004"
     },
@@ -22,7 +22,7 @@
       "depends_on": ["P3.0"],
       "inputs": ["acceptance-criteria.criteria[]"],
       "outputs": ["test-spec.json (test_cases[])"],
-      "skills": ["generate-test-spec"],
+      "skills": ["test-generate-test-spec"],
       "skills_dir": "skills/test/"
     },
     {
@@ -31,7 +31,7 @@
       "depends_on": ["P3.1"],
       "inputs": ["test-spec.test_cases", "behavior-spec.property_tests"],
       "outputs": ["test source files (jest/vitest/junit5/pytest 등)"],
-      "skills": ["generate-test-spec"],
+      "skills": ["test-generate-test-spec"],
       "skills_dir": "skills/test/",
       "expected_outcome": "all_fail"
     },
@@ -41,7 +41,7 @@
       "depends_on": ["P3.2"],
       "inputs": ["test-spec.json", "acceptance-criteria.json"],
       "outputs": ["acceptance-criteria.criteria[].test_case_refs[]"],
-      "skills": ["generate-test-spec"],
+      "skills": ["test-generate-test-spec"],
       "skills_dir": "skills/test/"
     },
     {
@@ -50,7 +50,7 @@
       "depends_on": ["P3.2", "P3.3"],
       "inputs": ["test source files", ".aimd/config/test-cmd.json"],
       "outputs": ["test-spec.test_invocation_evidence (RED / fail_count > 0)"],
-      "skills": ["run-test-evidence"],
+      "skills": ["test-run-test-evidence"],
       "skills_dir": "skills/test/",
       "automated_validation": ["test-impl-pass-validator (--allow-execute / expected: all_fail)", "schema-validator", "spec-test-link-validator", "lint-no-simulation (chain-strict)"]
     },
@@ -60,7 +60,7 @@
       "depends_on": ["P3.4"],
       "inputs": ["test-spec.json", "acceptance-criteria.json"],
       "outputs": ["test-spec.coverage_summary"],
-      "skills": ["verify-coverage"],
+      "skills": ["test-verify-coverage"],
       "skills_dir": "skills/test/"
     },
     {
@@ -69,7 +69,7 @@
       "depends_on": ["P3.4", "P3.5"],
       "inputs": ["test-spec.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
-      "skills": ["invoke-go-stop-gate"],
+      "skills": ["_base-invoke-go-stop-gate"],
       "skills_dir": "skills/_base/",
       "gate": "#3"
     }

@@ -175,7 +175,7 @@ phase 4.8 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
 - `methodology-spec/deliverables/24-sql-inventory.md`
 - `schemas/sql-inventory.schema.json` (★ 31번째)
 - `tools/sql-inventory-extractor/` (★ workspace 14번째)
-- `skills/analysis/phase-4-8-sql-inventory/SKILL.md`
+- `skills/analysis-phase-4-8-sql-inventory/SKILL.md`
 - ADR-CHAIN-007 phase 4.8 정식 도입
 - DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
 - DEC-2026-05-08-poc-07-종결 (corroboration #2)

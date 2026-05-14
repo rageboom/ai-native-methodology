@@ -193,7 +193,7 @@ phase 4.7 출력 ↔ 다른 산출물:
 
 - `methodology-spec/deliverables/23-characterization-spec.md`
 - `schemas/characterization-spec.schema.json` (★ 30번째)
-- `skills/analysis/phase-4-7-characterization/SKILL.md` (★ skills 19 → 20)
+- `skills/analysis-phase-4-7-characterization/SKILL.md` (★ skills 19 → 20)
 - `tools/characterization-coverage-validator/` (★ workspace 13번째)
 - `flows/analysis.phase-flow.{json,mermaid}` v2.1.0
 - ADR-CHAIN-006 phase 4.7 정식 도입

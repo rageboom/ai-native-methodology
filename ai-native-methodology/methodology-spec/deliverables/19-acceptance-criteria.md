@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 §1 / ADR-008 v2 §10 (Gherkin tag 자동 매핑) / ADR-CHAIN-002 §gate #2
 > **schema**: `schemas/acceptance-criteria.schema.json`
-> **생성 phase**: chain 2 (spec) — `/derive-acceptance-criteria` (skill / sub-plan-4)
+> **생성 phase**: chain 2 (spec) — `/spec-derive-acceptance-criteria` (skill / sub-plan-4)
 > **gate**: go/stop gate #2
 
 ## 1. 목적

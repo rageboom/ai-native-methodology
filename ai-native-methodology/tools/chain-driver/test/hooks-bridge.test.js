@@ -35,11 +35,11 @@ describe('hooks-bridge', () => {
   });
 
   it('suggestSkillForPrompt matches planning trigger', () => {
-    assert.equal(suggestSkillForPrompt('planning 시작해줘'), 'planning/extract-from-legacy');
+    assert.equal(suggestSkillForPrompt('planning 시작해줘'), 'planning-extract-from-legacy');
   });
 
   it('suggestSkillForPrompt matches spec trigger', () => {
-    assert.equal(suggestSkillForPrompt('spec 진입'), 'spec/compose-behavior-spec');
+    assert.equal(suggestSkillForPrompt('spec 진입'), 'spec-compose-behavior-spec');
   });
 
   it('suggestSkillForPrompt returns null for unrelated prompt', () => {

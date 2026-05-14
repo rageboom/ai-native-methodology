@@ -9,7 +9,7 @@ DO-178C / ISO 26262 bidirectional traceability 차용 (★ S5 정합 — header 
 ## When to call
 
 - **trigger**: chain 4 (impl) gate #4 통과 후 / release 진입 시
-- **호출자**: 사용자 (수동) / skill `_base/build-traceability-matrix`
+- **호출자**: 사용자 (수동) / skill `_base-build-traceability-matrix`
 - **수동**: `node src/cli.js ...`
 
 ## Inputs

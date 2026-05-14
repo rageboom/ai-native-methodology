@@ -48,10 +48,10 @@ export function parseHookInput(jsonString) {
 
 // Inspect a UserPromptSubmit prompt for chain stage trigger keywords.
 const TRIGGER_PATTERNS = [
-  { regex: /(planning|기획)\s*(시작|진입|만들어|드라이브)/i, skillId: 'planning/extract-from-legacy' },
-  { regex: /(spec|명세|behavior)\s*(시작|진입|만들어)/i,       skillId: 'spec/compose-behavior-spec' },
-  { regex: /(test|테스트)\s*(시작|진입|만들어)/i,               skillId: 'test/generate-test-spec' },
-  { regex: /(implement|구현)\s*(시작|진입|만들어)/i,             skillId: 'implement/generate-impl-spec' },
+  { regex: /(planning|기획)\s*(시작|진입|만들어|드라이브)/i, skillId: 'planning-extract-from-legacy' },
+  { regex: /(spec|명세|behavior)\s*(시작|진입|만들어)/i,       skillId: 'spec-compose-behavior-spec' },
+  { regex: /(test|테스트)\s*(시작|진입|만들어)/i,               skillId: 'test-generate-test-spec' },
+  { regex: /(implement|구현)\s*(시작|진입|만들어)/i,             skillId: 'implement-generate-impl-spec' },
 ];
 
 export function suggestSkillForPrompt(prompt) {

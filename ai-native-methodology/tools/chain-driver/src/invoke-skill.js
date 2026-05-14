@@ -5,7 +5,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 export function resolveSkillPath(repoRoot, skillId) {
-  // skillId = "planning/extract-from-legacy" 형식.
+  // skillId = "planning-extract-from-legacy" 형식.
   const direct = join(repoRoot, 'skills', skillId, 'SKILL.md');
   if (existsSync(direct)) return direct;
   const nested = join(repoRoot, 'ai-native-methodology', 'skills', skillId, 'SKILL.md');

@@ -27,7 +27,7 @@
 | 5-2-b (state) | [`workflow/phase-5-2-b-state.md`](./workflow/phase-5-2-b-state.md) | [`8-state-map`](./deliverables/8-state-map.md) + [`14-form-validation-spec`](./deliverables/14-form-validation-spec.md) | `state-map.schema.json` + `form-validation-spec.schema.json` |
 | 5-2-c (visual) | [`workflow/phase-5-2-c-visual.md`](./workflow/phase-5-2-c-visual.md) | [`15-type-spec`](./deliverables/15-type-spec.md) | `type-spec.schema.json` |
 | 6 (quality) | [`workflow/phase-6-quality.md`](./workflow/phase-6-quality.md) | [`6-antipatterns`](./deliverables/6-antipatterns.md) | `antipatterns.schema.json` |
-| 5-error-mapping (★ v1.5) | (skill `phase-5-error-mapping`) | [`16-error-mapping-spec`](./deliverables/16-error-mapping-spec.md) | `error-mapping-spec.schema.json` |
+| 5-error-mapping (★ v1.5) | (skill `analysis-phase-5-error-mapping`) | [`16-error-mapping-spec`](./deliverables/16-error-mapping-spec.md) | `error-mapping-spec.schema.json` |
 
 ### Cross-cutting (FE 8 / aspect)
 

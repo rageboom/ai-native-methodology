@@ -10,7 +10,7 @@ flowchart TB
         P11["P1.1 — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
         P12["P1.2 — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
         P13["P1.3 — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
-        P14["★ ★ ★ P1.4 — gate #1 (사용자 결단)<br/>invoke-go-stop-gate / cluster 5~6"]
+        P14["★ ★ ★ P1.4 — gate #1 (사용자 결단)<br/>_base-invoke-go-stop-gate / cluster 5~6"]
 
         P10 --> P11
         P10 --> P12
@@ -31,7 +31,7 @@ flowchart TB
     end
 
     subgraph NEXT["chain 2 (spec) 진입"]
-        N1["compose-behavior-spec skill<br/>spec.phase-flow.json"]
+        N1["spec-compose-behavior-spec skill<br/>spec.phase-flow.json"]
     end
 
     IN --> P10

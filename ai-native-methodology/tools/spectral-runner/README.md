@@ -7,7 +7,7 @@
 ## When to call
 
 - **trigger**: Phase 5-1 (api) openapi.yaml 산출 후
-- **호출자**: skill `phase-5-openapi` 자동 호출
+- **호출자**: skill `analysis-phase-5-openapi` 자동 호출
 - **수동**: `npx spectral lint ...`
 
 ## Inputs
