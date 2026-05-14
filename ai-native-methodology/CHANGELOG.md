@@ -58,7 +58,9 @@
 
 ### ★ ★ 다음 step (★ session 12차+ / Phase C)
 
-- ★ ★ ★ ★ ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (Anthropic API / OpenAI API / Static Tool 시뮬레이션 금지 정합)
+★ ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ patch v5 paradigm 회복 (★ session 11차 후속 / 사용자 결단 "옵션 B")** — ★ Phase C 본격 구현 paradigm = **★ ★ Claude Code sub-agent (Task tool / Agent tool) invocation** (★ Anthropic API / OpenAI API 영역 ❌ / 본 방법론 plugin 자산 정합 / Static Tool 시뮬레이션 ❌)
+
+- ★ ★ ★ ★ ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (★ ★ Claude Code sub-agent 호출 paradigm / B-1 plugin hook 권장 + B-2 chain-driver + B-3 사용자 위임 mode 결단)
 - ★ ★ ★ ★ ★ PoC #03 18 BR NL TODO marker → 본격 BR statement 합성 + 도메인 전문가 검토
 - ★ ★ ★ ★ PoC #05 2 BR GWT 신규 합성
 - ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합
