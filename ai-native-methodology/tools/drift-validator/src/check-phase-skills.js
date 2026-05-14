@@ -1,17 +1,19 @@
 // check-phase-skills.js — manifest ↔ workflow ↔ skills 3-way layout 검증.
 // v1.4.4 신설 (plan-v144-manifest-ssot.md / methodology-spec/skills-axis.md 정합).
+// ★ v2.5.1 PATCH — skills 1-depth + category prefix paradigm 정합 갱신 (post-v2.5.1 meta cleanup).
 // 검증:
 //   1. manifest.phases[].spec_file → methodology-spec/workflow/ 안에 존재
-//   2. manifest.phases[].skills[] → skills/analysis/ 안에 SKILL.md 보유
-//   3. cross_cutting.aspects.skills[] → skills/analysis/ 안에 SKILL.md 보유
-//   4. 역방향 — skills/analysis/ 안 모든 SKILL.md 디렉토리가 manifest 의 어디든 등록 (★ orphan 0)
+//   2. manifest.phases[].skills[] → skills/<skill>/SKILL.md 보유 (★ skill name 자체가 'analysis-' prefix 포함)
+//   3. cross_cutting.aspects.skills[] → skills/<skill>/SKILL.md 보유
+//   4. 역방향 — skills/ 안 'analysis-' prefix SKILL.md 디렉토리가 manifest 의 어디든 등록 (★ orphan 0)
 
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const MANIFEST_REL = 'flows/analysis.phase-flow.json';
 const WORKFLOW_REL = 'methodology-spec/workflow';
-const SKILLS_REL = 'skills/analysis';
+const SKILLS_REL = 'skills';  // ★ v2.5.1 1-depth root (옛 'skills/analysis' 2-depth 폐기)
+const ANALYSIS_PREFIX = 'analysis-';  // ★ category prefix paradigm
 
 export function checkPhaseSkills(workspaceRoot) {
   const diffs = [];
@@ -109,10 +111,13 @@ export function checkPhaseSkills(workspaceRoot) {
   }
 
   // 4. 역방향 — disk skill 이 manifest 에 등록 (orphan 0)
+  // ★ v2.5.1 1-depth flatten 후 — skills/ 안 'analysis-' prefix 디렉토리만 본 manifest scope.
+  // (★ _base-/planning-/spec-/test-/implement- prefix 는 별도 chain stage 영역 → 본 검사 면제)
   if (existsSync(skillsDir)) {
     let entries = [];
     try { entries = readdirSync(skillsDir); } catch { /* empty */ }
     for (const name of entries) {
+      if (!name.startsWith(ANALYSIS_PREFIX)) continue;  // ★ analysis manifest scope 한정
       const full = join(skillsDir, name);
       try {
         if (!statSync(full).isDirectory()) continue;
@@ -149,17 +154,18 @@ export function summarizeLayoutCheck(result) {
 }
 
 // ★ ★ v2.0 sub-plan-4 신설 — chain stage layout 검증.
-// flows/{planning,spec,test,implement}.phase-flow.json + flows/sdlc-4stage-flow.json + skills/{_base,planning,spec,test,implement}/.
-// analysis stage 와 별도 axis (skills-axis.md §4 v2.0 chain stage axis).
+// flows/{planning,spec,test,implement}.phase-flow.json + flows/sdlc-4stage-flow.json + skills/ (1-depth).
+// analysis stage 와 별도 axis (skills-axis.md §4 v2.0 chain stage axis + §7 v2.5.1 category prefix paradigm).
+// ★ v2.5.1 PATCH — skills 1-depth + category prefix paradigm 정합 (옛 'skills/{stage}/' 2-depth 폐기).
 
 const CHAIN_STAGES = [
-  { stage: 'planning',  flow_file: 'flows/planning.phase-flow.json',  skills_dir: 'skills/planning' },
-  { stage: 'spec',      flow_file: 'flows/spec.phase-flow.json',      skills_dir: 'skills/spec' },
-  { stage: 'test',      flow_file: 'flows/test.phase-flow.json',      skills_dir: 'skills/test' },
-  { stage: 'implement', flow_file: 'flows/implement.phase-flow.json', skills_dir: 'skills/implement' },
+  { stage: 'planning',  flow_file: 'flows/planning.phase-flow.json',  prefix: 'planning-' },
+  { stage: 'spec',      flow_file: 'flows/spec.phase-flow.json',      prefix: 'spec-' },
+  { stage: 'test',      flow_file: 'flows/test.phase-flow.json',      prefix: 'test-' },
+  { stage: 'implement', flow_file: 'flows/implement.phase-flow.json', prefix: 'implement-' },
 ];
 
-const BASE_SKILLS_DIR = 'skills/_base';
+const CHAIN_SKILLS_DIR = 'skills';  // ★ v2.5.1 1-depth root
 
 export function checkChainStageLayout(workspaceRoot) {
   const diffs = [];
@@ -201,64 +207,48 @@ export function checkChainStageLayout(workspaceRoot) {
       continue;
     }
 
-    // 본 stage 의 phases[] 의 skills 를 walk. 각 skill 은 phase.skills_dir 우선,
-    // 없으면 cs.skills_dir, 그래도 없으면 known dir 중 어디에 있는지 search.
-    const KNOWN_DIRS = [BASE_SKILLS_DIR, ...CHAIN_STAGES.map(s => s.skills_dir)];
+    // ★ v2.5.1 — skill name 자체가 category prefix 포함 → 단일 'skills/<skill>/SKILL.md' lookup.
+    // (옛 phase.skills_dir 필드 = lifecycle organize 사상 흔적 / runtime axis 와 무관 / 무시)
     for (const phase of flow.phases ?? []) {
       phasesChecked++;
       for (const skill of phase.skills ?? []) {
-        const overrideDir = (phase.skills_dir ?? cs.skills_dir).replace(/\/+$/, '');
-        // 1) phase.skills_dir 우선
-        let foundDir = null;
-        if (existsSync(join(workspaceRoot, overrideDir, skill, 'SKILL.md'))) {
-          foundDir = overrideDir;
-        } else {
-          // 2) fallback — known dir 중 어디에 있는지
-          for (const d of KNOWN_DIRS) {
-            if (existsSync(join(workspaceRoot, d, skill, 'SKILL.md'))) {
-              foundDir = d;
-              break;
-            }
-          }
-        }
-        if (!foundDir) {
+        const skillMd = join(workspaceRoot, CHAIN_SKILLS_DIR, skill, 'SKILL.md');
+        if (!existsSync(skillMd)) {
           diffs.push({
             severity: 'breaking',
             kind: 'chain-flow.missing-skill-dir',
             stage: cs.stage,
             phase_id: phase.id,
             skill,
-            skills_dir: overrideDir,
-            message: `chain '${cs.stage}' phase '${phase.id}' skill '${skill}' SKILL.md not found in any known dir (${overrideDir} / ${KNOWN_DIRS.join(', ')})`,
+            message: `chain '${cs.stage}' phase '${phase.id}' skill '${skill}' SKILL.md not found at ${CHAIN_SKILLS_DIR}/${skill}/SKILL.md`,
           });
           continue;
         }
-        allDeclaredSkills.set(`${foundDir}/${skill}`, cs.stage);
+        allDeclaredSkills.set(skill, cs.stage);
       }
     }
   }
 
-  // 역방향 — disk skill 이 어느 chain stage 또는 analysis 에서도 등록되지 ❌ (orphan).
-  // ★ skills/_base/ 는 cross-cutting (모든 stage 공용) → orphan 검사 면제 (등록 의무 ❌).
-  // skills/{planning,spec,test,implement}/ 만 orphan 강제.
-  const chainSubdirs = CHAIN_STAGES.map(cs => cs.skills_dir);
-  for (const subdir of chainSubdirs) {
-    const fullDir = join(workspaceRoot, subdir);
-    if (!existsSync(fullDir)) continue;
+  // 역방향 — disk skill 이 어느 chain stage 에서도 등록되지 ❌ (orphan).
+  // ★ v2.5.1 — skills/ 안 chain prefix (planning-/spec-/test-/implement-) 인 entry 만 본 검사 영역.
+  // (★ _base-/analysis- prefix 는 별도 axis → 본 검사 면제)
+  const fullDir = join(workspaceRoot, CHAIN_SKILLS_DIR);
+  if (existsSync(fullDir)) {
     let entries = [];
     try { entries = readdirSync(fullDir); } catch { /* empty */ }
     for (const name of entries) {
+      const matchingStage = CHAIN_STAGES.find((cs) => name.startsWith(cs.prefix));
+      if (!matchingStage) continue;  // _base-/analysis- = 본 검사 영역 외
       const full = join(fullDir, name);
       try { if (!statSync(full).isDirectory()) continue; } catch { continue; }
       if (!existsSync(join(full, 'SKILL.md'))) continue;
-      const declaredKey = `${subdir}/${name}`;
-      if (!allDeclaredSkills.has(declaredKey)) {
+      if (!allDeclaredSkills.has(name)) {
         diffs.push({
           severity: 'breaking',
           kind: 'chain-skills.orphan',
           skill: name,
-          skills_dir: subdir,
-          message: `chain skill '${subdir}/${name}/SKILL.md' exists but not declared in any chain flow's phases[].skills[] (★ orphan / sub-plan-4 정합)`,
+          stage: matchingStage.stage,
+          message: `chain skill '${name}' (prefix '${matchingStage.prefix}') has SKILL.md but not declared in any chain flow's phases[].skills[] (★ orphan / sub-plan-4 정합)`,
         });
       }
     }
