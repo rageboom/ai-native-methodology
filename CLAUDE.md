@@ -116,7 +116,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개 (★ v2.1.0 plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v2.5.1 PATCH** (2026-05-14 / Claude Code plugin install 호환성 회복 + agents/skills 1-depth 평탄화 + 사상 명세 자산화). 직전 **v2.5.0 MINOR FINAL release** (Layer 2 LLM paradigm + ≥ 2 PoC corroboration + release-readiness 9/9 + chain harness validated 본질 보존). 상세 entry 와 session-level carry 는 CHANGELOG.md 참조.
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v2.6.0 MINOR** (2026-05-14 / ★ ★ ★ skill 의미 ID 본격 자산화 / 17 skill rename / phase-N 숫자 prefix 본격 폐기 / Senior critique 5 의제 본격 흡수 / chain harness validated §8.1 strict 9/9 본질 보존). 직전 **v2.5.1 PATCH** (Claude Code plugin install 호환성 회복 + agents/skills 1-depth 평탄화) / **v2.5.0 MINOR FINAL** (Layer 2 LLM paradigm + ≥ 2 PoC corroboration). 상세 entry 와 session-level carry 는 CHANGELOG.md 참조.
 - `ai-native-methodology/guides/` — ★ ★ 사용자 journey 자산 (cleanup round 2-C 신설 / getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
 - `ai-native-methodology/archive/v1.3-adoption/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적 / cleanup round 1 격리)
 - `ai-native-methodology/archive/phase-a-iteration/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template / cleanup round 1 격리 / v2.0 chain harness paradigm 후 outdated)

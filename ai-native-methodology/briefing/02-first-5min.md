@@ -2,7 +2,7 @@
 
 > 처음 플러그인을 설치한 동료가 5분 동안 무엇을 보게 되는지를, 실제 프롬프트와 응답 흐름으로 따라가는 시나리오입니다.
 >
-> **갱신 이력**: 2026-05-08 작성 (v2.2.0) → 2026-05-14 갱신 (★ v2.5.1 paradigm 본격 정합 + 사내 GHE install 시나리오 + Layer 2 LLM 시연).
+> **갱신 이력**: 2026-05-08 작성 (v2.2.0) → 2026-05-14 갱신 (★ v2.6.0 paradigm 본격 정합 + 의미 ID 본격 자산화 + 사내 GHE install 시나리오 + Layer 2 LLM 시연).
 
 ## 등장인물
 
@@ -91,7 +91,7 @@ Phase 1: 코드베이스 인벤토리 추출 중...
 
 김개발은 **자기가 무엇을 시켰는지 정확히 몰라도** 결과가 나오는 것을 봅니다. `analysis-source-inventory` 같은 스킬 이름을 외운 적이 없습니다. 그냥 "분석 시작" 이라고만 했습니다.
 
-> ★ v2.5.1 paradigm: 스킬 디렉토리가 1-depth + category prefix 구조 (`skills/analysis-source-inventory/SKILL.md`). Claude Code plugin 표준 정합.
+> ★ v2.6.0 paradigm: 스킬 디렉토리가 1-depth + category prefix + ★ 의미 ID 본격 구조 (`skills/analysis-source-inventory/SKILL.md` / phase-N 숫자 prefix 본격 폐기). Claude Code plugin 표준 정합 + skills-axis.md §8 본격 자산화.
 
 ## 2:30 ~ 3:30 — SQL Inventory 시도
 

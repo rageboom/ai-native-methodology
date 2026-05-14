@@ -1,6 +1,6 @@
 # AI-Native 개발 방법론 — 종합 브리핑
 
-> **갱신 이력**: 2026-05-08 작성 (v2.2.0) → 2026-05-14 갱신 (★ v2.5.1 paradigm 본격 정합 / Layer 2 LLM + dual representation + ≥ 2 PoC corroboration + 사내 GHE plugin install 호환성 + 1-depth + category prefix paradigm).
+> **갱신 이력**: 2026-05-08 작성 (v2.2.0) → 2026-05-14 갱신 (★ v2.6.0 paradigm 본격 정합 / 의미 ID 본격 자산화 + Layer 2 LLM + dual representation + ≥ 2 PoC corroboration + 사내 GHE plugin install 호환성 + 1-depth + category prefix paradigm).
 
 ## 들어가며
 
@@ -339,7 +339,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 
 스킬은 38개. 훅과 플로우가 의존 관계를 자동으로 챙겨줍니다. 동료는 38개의 스킬 이름을 외울 필요 없이 **그냥 자기 의도를 말하면** 적절한 스킬이 깨어납니다.
 
-> **★ v2.5.1 paradigm**: 스킬 디렉토리 구조가 1-depth + category prefix 형태입니다 (예: `skills/analysis-input-collection/SKILL.md`). Claude Code plugin 표준 정합 + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 안에 별도 axis 로 보존.
+> **★ v2.6.0 paradigm**: 스킬 디렉토리 구조가 1-depth + category prefix + ★ ★ 의미 ID 본격 형태입니다 (예: `skills/analysis-input-collection/SKILL.md` / phase-N 숫자 prefix 본격 폐기). Claude Code plugin 표준 정합 + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 안에 별도 axis 로 보존 (★ §6 v1.4.x 과도기 → v2.6.0 본격 자연 흡수 / §8 신설).
 
 ---
 
