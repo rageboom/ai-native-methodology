@@ -87,7 +87,12 @@ function hasAnyKeyword(text, keywords) {
 export function validateBR(br, options = {}) {
   const findings = [];
   const path = options.path || '/business_rules/?';
-  const keywordThreshold = options.keywordThreshold ?? 0.5;
+  // ★ ★ ★ v2.5.0 Phase B Q-B3 (b) 결단 — keyword threshold 자체 제거
+  //   ★ session 9차 SPIKE v2 결정적 사실 (Layer 1 keyword overlap algorithm 자체 한계 / Jaccard short-text + 한국어 교착어 형태소 부재)
+  //   ★ Agent 1 외부 권위 정합 (MDPI 2025 "no single generalizable cut-off")
+  //   ★ Agent 3 STOP-3 흡수 (magic number 0.15 자산화 위험 회피)
+  //   ★ ★ ★ paradigm: threshold 비교 자체 ❌ / "non-empty + overlap > 0" sanity check only / Layer 2 LLM Phase C 본격 의무
+  //   ★ ★ keywordThreshold option = backward-compat marker (★ Phase C 도달 시 제거 의무)
 
   // ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3) — description ≠ natural_language alias
   //   ★ natural_language = ★ pure BR statement / cross-validation 대상 (★ Layer 2 LLM mandatory v2.5.0 Phase C)
@@ -151,7 +156,10 @@ export function validateBR(br, options = {}) {
     });
   }
 
-  // ★ 4-2 + 4-3. 두 표현 동시 보유 시 cross-validation
+  // ★ ★ ★ 4-2 + 4-3. 두 표현 동시 보유 시 sanity check (★ ★ ★ v2.5.0 Phase B Q-B3 (b) 결단 정합)
+  //   ★ ★ threshold 자체 제거 — overlap > 0 (★ "non-empty intersection") sanity check only
+  //   ★ ★ ★ overlap = 0 시 → structural_sanity_only finding (advisory / severity = low)
+  //   ★ ★ ★ ★ semantic 정합 검증 = Phase C Layer 2 LLM mandatory (★ 본 Layer 1 = sanity check 격하 paradigm 정합)
   let overlapScore = null;
   if (hasNL && hasGWT) {
     const nlKw = extractKeywords(nlText);
@@ -160,19 +168,19 @@ export function validateBR(br, options = {}) {
     const { common, score } = keywordOverlap(nlKw, gwtKw);
     overlapScore = score;
 
-    if (score < keywordThreshold) {
+    // ★ ★ ★ overlap = 0 → structural_sanity_only advisory (★ ★ ★ threshold 비교 ❌ / "non-empty intersection" 의무 only)
+    if (score === 0) {
       findings.push({
-        id: nextFindingId('KW'),
-        severity: 'medium',
+        id: nextFindingId('SANITY'),
+        severity: 'low',
         path,
         br_id: br.id || '<unknown>',
-        rule: 'keyword_mismatch',
-        message: `natural_language ↔ given/when/then 키워드 정합 ${(score * 100).toFixed(0)}% (< ${(keywordThreshold * 100).toFixed(0)}%)`,
-        suggestion: '두 표현 의미 정합 검토 또는 natural_language 갱신',
+        rule: 'structural_sanity_only',
+        message: 'natural_language ↔ given/when/then 키워드 교집합 ∅ (★ ★ Layer 1 sanity check 부재 / Phase C Layer 2 LLM semantic 검증 의무)',
+        suggestion: '★ ★ Phase C Layer 2 LLM 본격 합성 후 재검증 / 또는 natural_language ↔ GWT 키워드 정합 수동 검토',
         natural_language_keywords: [...nlKw].slice(0, 20),
         gwt_keywords: [...gwtKw].slice(0, 20),
-        common_keywords: [...common].slice(0, 20),
-        overlap_score: Number(score.toFixed(3)),
+        overlap_score: 0,
       });
     }
 

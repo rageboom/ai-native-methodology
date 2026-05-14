@@ -9,7 +9,65 @@
 
 ---
 
-## [v2.4.0 carry update — session 10차 SESSION-WRAPUP — v2.5.0 Phase A 시행] — 2026-05-13~14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — description vs natural_language paradigm 재정의 + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 + PoC #01 13 BR 자동 마이그레이션 + 302/0 test pass + DEC + ADR patch v3)
+## [v2.4.0 carry update — session 11차 SESSION-WRAPUP — v2.5.0 Phase B 시행] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — PoC #03 18 BR 형식 sliding (TCA → GWT) + action = metadata 보존 + NL TODO marker + PoC #05 input/→output/rules/ 이전 + sample_mode meta + description→NL 자동 추출 + Layer 1 threshold 자체 제거 + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 + DEC 신설 + ADR patch v4 + LL-i-33~35 자산화)
+
+> ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 11차 — v2.5.0 Phase B 시행** — ★ ★ session 9차 신규 carry C-poc-03-05-dual-representation (critical / Senior STOP-1 흡수) + C-keyword-threshold-degrade + session 10차 carry C-poc-02-11-description-to-nl-migration 후속. ★ ★ 4원칙 1단계 plan `~/.claude/plans/q-v2.5.0-phase-b-poc-03-05-마이그레이션.md` 자산화 → 4원칙 2단계 sub-agent 3 병렬 토론 → 4원칙 3단계 사용자 결단 "1" (★ 종합 권장 시행) → 4원칙 4단계 시행 + Lessons Learned. Plan Q §3 Phase B scope 본격 시행.
+
+### ★ ★ ★ ★ ★ ★ ★ session 11차 Q-B 종합 결단 (★ ★ 사용자 "1" 결단 정합)
+
+- **Q-B0 (c)**: scope 축소 시행 (★ Adzic 함정 회피 + Phase C 진입 자격 자료 확보 + release 지연 회피 균형)
+- **Q-B1 (b)**: 형식 sliding only — trigger→When / condition→Given / expected_result→Then / **action = GWT step 분리 ❌ + rejection_method + verification_location metadata 보존** / NL = TODO marker (★ Phase C LLM 본격 합성 의무 carry)
+- **Q-B2 (b)**: PoC #05 `input/rules.json` → `output/rules/rules.json` git mv 이전 + sample_mode meta 명시 (★ Agent 1 phase-flow SSOT 정합)
+- **Q-B3 (b)**: Layer 1 keyword threshold **자체 제거** (★ session 9차 "0.15 floor advisory" → session 11차 "★ ★ threshold 비교 자체 ❌") / "non-empty + overlap > 0" sanity check only / `structural_sanity_only` finding 신설 (overlap = 0 시만)
+- **Q-B4 (a)+(c)**: PoC #01 13 BR NL self-review 1차 ✅ + Phase D 전 도메인 전문가 검토 carry
+- **Q-B5 (b)**: PoC #05 corroboration **산입 ❌** + spot check only (★ Senior STOP-4 흡수 / n=2 statistical power ≈ 0)
+- **Q-B6 (a)**: session 11차 LLM 부재 / Phase C session 12차+ 본격 LLM 호출
+
+### ★ ★ ★ session 11차 산출 8종
+
+- ★ ★ `tools/br-cross-consistency-validator/scripts/synthesize-gwt-from-tca.mjs` (★ 신설 / TCA → GWT 형식 sliding script / ★ Agent 1 Cucumber/Fowler/ECA 3중 외부 권위 정합)
+- ★ ★ ★ `examples/poc-03-realworld-nestjs/output/rules/rules.json` (★ ★ 18 BR Phase B 마이그레이션 ✅ / trigger→When / condition→Given / expected_result→Then + action = metadata 보존 + NL TODO marker)
+- ★ ★ `examples/poc-05-sample-user-register/output/rules/rules.json` (★ git mv input/ → output/rules/ + 2 BR description→NL 자동 추출 + meta.sample_mode=true + meta.corroboration_eligible=false)
+- ★ ★ `tools/br-cross-consistency-validator/src/deterministic.js` (★ ★ keyword_mismatch finding 완전 제거 + structural_sanity_only finding 신설 / overlap === 0 시만)
+- ★ `tools/br-cross-consistency-validator/src/validator.js` (★ OVERALL_THRESHOLD deprecated semantic 명시 + Phase C carry)
+- ★ `tools/br-cross-consistency-validator/test/validator.test.js` (★ +2 신규 paradigm test / 26/26 pass / 회귀 ❌)
+- ★ ★ `tools/br-cross-consistency-validator/PHASE-B-2026-05-14-re-measurement.md` (★ 재실측 보고 / ≥ 2 PoC corroboration 자료)
+- ★ `decisions/DEC-2026-05-14-phase-b-poc-03-05-마이그레이션.md` (★ DEC 신설)
+- ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-33~35 + §11 후속 patch v4
+
+### ★ ★ ★ ★ 결정적 사실 (★ session 11차)
+
+| 사실 | 자료 |
+|---|---|
+| **★ ≥ 2 PoC corroboration 자격 도달 ✅** | PoC #01 (13 BR) + PoC #03 (18 BR) = **31 BR** (★ Senior STOP-1 흡수 ✅) |
+| **★ PoC #01 baseline 격상** | deterministic_score 0.608 → **0.954** / gate fail → **pass** (★ paradigm 정합 격상) |
+| **★ PoC #03 cross-validation 진입 자격 ✅** | with_both=18 / 의도된 NL TODO marker = sanity ∅ paradigm 정합 |
+| **★ PoC #05 sample mode + corroboration ❌** | n=2 statistical power ≈ 0 / meta 명시 |
+| **★ workspace 전수 test = 303/0** | session 10차 302 → +1 신규 paradigm test / 회귀 ❌ |
+| **★ ★ Layer 1 threshold 자체 제거 paradigm 정착** | Agent 3 STOP-3 흡수 (magic number 0.15 회피) + MDPI 2025 "no single generalizable cut-off" 정합 |
+
+### ★ ★ Lessons Learned 신규 (★ session 11차 / ADR-CHAIN-011 §9 정합)
+
+- ★ ★ ★ ★ **LL-i-33** (★ "TCA 4축 → GWT 3축 형식 sliding paradigm = Cucumber/Fowler/ECA 3중 외부 권위 정합 / action = GWT step 분리 ❌ + metadata 보존")
+- ★ ★ ★ ★ **LL-i-34** (★ "Layer 1 keyword threshold 자체 제거 paradigm / 'non-empty + overlap > 0' sanity check only / Layer 2 LLM mandatory Phase C 의무")
+- ★ ★ ★ **LL-i-35** (★ "industry-first 자격 scope 정정 / dual representation ≠ industry-first (Cucumber Rule 2018 정합) / 4축 → GWT deterministic 합성 + NL ↔ GWT cross-consistency validator = industry-first 자격")
+
+### ★ chain harness 5 요소 변경 ❌
+
+본 session 11차 시행 영역 = PoC 자산 + validator paradigm + ADR §9+§11 patch + DEC 신설 + 자산화. ★ chain harness 5 요소 (schema / chain-driver / drift-validator / formal-spec-link-validator / spec-test-link-validator) 변경 ❌ 보존 ✅.
+
+### ★ ★ 다음 step (★ session 12차+ / Phase C)
+
+- ★ ★ ★ ★ ★ ★ ★ Layer 2 LLM mandatory 본격 구현 (Anthropic API / OpenAI API / Static Tool 시뮬레이션 금지 정합)
+- ★ ★ ★ ★ ★ PoC #03 18 BR NL TODO marker → 본격 BR statement 합성 + 도메인 전문가 검토
+- ★ ★ ★ ★ PoC #05 2 BR GWT 신규 합성
+- ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합
+- ★ ★ OVERALL_THRESHOLD 의미 재설계 (Layer 1 + Layer 2 통합 점수)
+- ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 + v2.5.0 MINOR release
+
+---
+
+## [v2.4.0 carry update — session 10차 SESSION-WRAPUP — v2.5.0 Phase A 시행] — 2026-05-13~14 (★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — description vs natural_language paradigm 재정의 + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 + PoC #01 13 BR 자동 마이그레이션 + 302/0 test pass + DEC + ADR patch v3)
 
 > ★ ★ ★ ★ ★ ★ ★ ★ **session 10차 — v2.5.0 Phase A 시행** — ★ session 9차 신규 carry C-description-vs-nl-paradigm-define 흡수. 사용자 결단 "1" (즉시 시행) 정합. ★ ★ Agent 3 (c) hybrid 강 옵션 채택 (★ ★ session 9차 SPIKE v2 결정적 입증 + memory feedback_quality_priority.md 재작업 최소화 정합). Plan P §3 Phase A scope 본격 시행.
 

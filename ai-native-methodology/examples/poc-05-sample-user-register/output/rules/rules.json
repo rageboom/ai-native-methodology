@@ -1,6 +1,12 @@
 {
   "$comment": "★ PoC #05 — Business Rules. legacy 결함 분석 결과 자동 도출. chain 1 planning-spec.business_rules_intent 의 source.",
   "project_id": "poc-05-sample-user-register",
+  "meta": {
+    "sample_mode": true,
+    "corroboration_eligible": false,
+    "sample_mode_rationale": "★ ★ ★ PoC #05 = sample mode / n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only. ★ session 11차 Senior STOP-4 흡수 정합 (LL-i-29 paradigm: 사실 명확도 × 비용 2축 평가 / STOP-4 = 사실 명확 + 비용 low = 전면 흡수).",
+    "phase_b_migration_note": "★ ★ description → natural_language 자동 추출 ✅ (Phase A script 재활용) / given/when/then 부재 보존 (★ Phase C LLM 본격 합성 의무) / sample mode 특수성 명시. ★ ★ rules.json 위치 = input/ → output/rules/ 이전 ✅ (★ Agent 1 phase-flow SSOT 정합 / flows/analysis.phase-flow.json 안 rules.json = phase 4 output)."
+  },
   "business_rules": [
     {
       "id": "BR-USER-DATA-001",
@@ -14,7 +20,8 @@
         "grep_hit_count": 0,
         "grep_query": "users.find\\(.*email"
       },
-      "severity": "high"
+      "severity": "high",
+      "natural_language": "사용자 등록 시 이메일은 시스템 내 유일해야 한다."
     },
     {
       "id": "BR-USER-VALIDATION-001",
@@ -28,7 +35,8 @@
         "grep_hit_count": 0,
         "grep_query": "password\\.length"
       },
-      "severity": "medium"
+      "severity": "medium",
+      "natural_language": "신규 등록 시 비밀번호는 최소 8자 이상."
     }
   ]
 }

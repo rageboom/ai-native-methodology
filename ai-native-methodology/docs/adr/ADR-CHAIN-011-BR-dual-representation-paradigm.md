@@ -460,6 +460,30 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
     - ★ ★ implementation (Layer 2 LLM mandatory) = ★ ★ ★ ★ v2.5.0 의무 (★ ≥ 2 PoC corroboration 자료 확보 후 / ★ Senior STOP-1 흡수 carry)
     - ★ 외부 인용 시 = ★ "industry-first 임상 threshold 측정 공개" 자격 (★ ★ ★ MDPI 2025 + Cucumber/DMN/Spectral 부재 corroboration)
 
+- ★ ★ ★ ★ **LL-i-33** (★ "trigger-condition-action 4축 → given-when-then 3축 형식 sliding paradigm = Cucumber/Fowler/ECA 3중 외부 권위 정합 / action = GWT step 분리 ❌ + metadata 보존" / ★ session 11차 Phase B 자산화):
+  - **Why**: ★ Agent 1 결정적 사실 — Cucumber 공식 "When = single action only" anti-pattern + Fowler "GivenWhenThen" 안 when=behavior/trigger + ECA pattern 안 Condition=precondition=Given 3중 정합. ★ ★ action = ★ "시스템 동작 (e.g. @IsNotEmpty 검증)" = ★ Gherkin GWT 외부 보존 자산 (rejection_method + verification_location metadata) 영역. ★ Agent 3 STOP-1 흡수 (자동 NL 합성 ❌ / 형식 sliding only) + Agent 2 결정적 사실 ("4축 → GWT deterministic 합성 도구 = 빅테크/OSS 공개 자료 0건") corroboration.
+  - **How to apply**:
+    - ★ TCA paradigm BR → GWT 합성 시 = ★ "trigger→When / condition→Given / expected_result→Then 3축 형식 sliding + action = metadata 보존" 의무
+    - ★ ★ LLM 부재 시 = 형식 sliding only 의무 (★ semantic 합성 ❌ / NL = TODO marker carry / Phase C LLM 본격 합성 의무 carry)
+    - ★ ★ action 별도 GWT step 분리 ❌ (★ Cucumber anti-pattern 정합)
+    - ★ 외부 인용 시 = "Cucumber + Fowler + ECA 3중 외부 권위 정합 / 4축 → GWT deterministic 합성 도구 industry-first 자격" 명시
+
+- ★ ★ ★ ★ **LL-i-34** (★ "Layer 1 keyword threshold 자체 제거 paradigm = 'non-empty + overlap > 0' sanity check only / Layer 2 LLM mandatory Phase C 의무" / ★ session 11차 Phase B Q-B3 (b) 결단 시행):
+  - **Why**: ★ ★ session 9차 SPIKE v2 결정적 사실 (Jaccard short-text + 한국어 교착어 형태소 부재 = ≥ 0.85 수학적 도달 불가) + Agent 3 STOP-3 (magic number 0.15 자산화 회피) + Agent 1 외부 권위 (MDPI 2025 "no single generalizable cut-off" / range 0.334~0.867) 3중 정합. ★ session 9차 paradigm "Layer 1 격하" 의 ★ 본격 시행 = ★ threshold 자체 제거 (★ session 9차 "≥ 0.15 floor advisory" → session 11차 "★ ★ threshold 비교 자체 ❌").
+  - **How to apply**:
+    - ★ ★ ★ Layer 1 = ★ "structural sanity check" 격하 (★ 키워드 비교 자체 = 진위 ❌)
+    - ★ ★ Layer 2 LLM = mandatory 격상 (★ ★ semantic 정합 검증 영역)
+    - ★ threshold magic number 자산화 회피 의무
+    - ★ overlap = 0 시 = `structural_sanity_only` advisory finding (★ severity = low) / overlap > 0 시 = finding ❌
+    - ★ 외부 인용 시 = "Layer 1 = sanity check / Layer 2 = semantic / threshold magic number ❌" paradigm 명시 의무
+
+- ★ ★ ★ **LL-i-35** (★ "industry-first 자격 scope 정정 / 'dual representation' ≠ industry-first (Cucumber Rule 2018 정합) / '4축 → GWT deterministic 합성 + NL ↔ GWT cross-consistency validator' = ★ industry-first 자격" / ★ session 11차 LL-i-27 정정 자산):
+  - **Why**: ★ Agent 1 결정적 사실 — Cucumber Rule 키워드 (2018) + Gáspár Nagy "story-rule-scenario" 가 이미 ★ "rule (자연어) + scenario (GWT)" dual representation paradigm 정의 (★ Cucumber 공식 "Rule = first-class concern of Gherkin"). ★ ★ ★ 본 방법론 industry-first 자격 ≠ "dual representation 자체". ★ ★ Agent 2 결정적 사실 — Spec Kit (90K star) / AutoUAT / TestFlow (arXiv 2504.07244 AST 2025) / CodeConcise / Drools / IBM ODM 모두 ★ ★ "NL ↔ GWT cross-consistency validator" + "4축 → GWT deterministic 합성 도구" = ★ ★ 공개 자료 0건.
+  - **How to apply**:
+    - ★ 외부 인용 시 = ★ ★ industry-first 자격 = "4축 (trigger/condition/action/expected_result) → GWT deterministic 합성 script + NL ↔ GWT cross-consistency validator (Layer 1 sanity + Layer 2 LLM mandatory)" scope 한정 의무
+    - ★ "dual representation" 자체는 Cucumber Rule (2018) 정합 명시 의무 (★ 본 방법론 ≠ 원조)
+    - ★ ★ LL-i-27 갱신: "GitHub Spec Kit / AWS Q / DMN / Drools / Spectral 모두 cross-consistency rule 부재" 명제 + ★ 본 LL-i-35 의 명제 (★ "4축 → GWT deterministic + Spec Kit/AutoUAT/CodeConcise 모두 부재") corroboration ✅
+
 ---
 
 ## §10. version handling
@@ -477,6 +501,6 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ sub-plan §2 session 8차 (★ release 통합) = ★ schema top-level 재설계 + PoC #01+#05 마이그레이션 → commit `f3b62db` (v2.4.0 MINOR FINAL release) ✅
 - ★ ★ ★ ★ ★ ★ ★ **sub-plan §1' session 9차 (★ ★ patch v2) = ★ ★ ★ ★ ★ threshold spike revisit (C-threshold-spike-revisit 흡수) + REVISE-6 재실측 + Layer 2 LLM 의무 paradigm 결단 + ADR §5.4 patch v2 + SPIKE v2 자산화 → SESSION-WRAPUP commit `158a700` ✅**
 - ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 10차 Phase A 시행 (★ ★ 본 patch v3) = ★ ★ description vs natural_language paradigm 재정의 (Agent 3 (c) hybrid 채택 / DEC-2026-05-14 정합) + schema 강화 (★ breaking change ❌) + validator paradigm 갱신 (★ description alias 제거 + description_only_fallback finding 신설) + PoC #01 13 BR 자동 마이그레이션 ✅ + 302/0 test pass + LL-i-31~32 자산화 → SESSION-WRAPUP commit (★ 본 session / no release)**
-- ★ ★ ★ ★ **Phase B 후속 session = ★ ★ PoC #03 + PoC #05 dual representation 마이그레이션 (★ ≥ 2 PoC corroboration / Senior STOP-1 흡수) + Layer 1 keyword threshold 0.5 → 0.15 floor advisory 격하**
-- ★ ★ ★ ★ **Phase C 후속 session = ★ Layer 2 LLM mandatory 본격 구현 + chain 1 gate Layer 2 통합**
-- ★ ★ ★ ★ **Phase D 후속 session = ★ release-readiness 8/8 → 9/9 재격상 + ≥ 2 PoC corroboration 검증 + v2.5.0 MINOR release**
+- ★ ★ ★ ★ ★ ★ ★ **★ ★ ★ session 11차 Phase B 시행 (★ ★ 본 patch v4) = ★ ★ PoC #03 18 BR (★ trigger→When / condition→Given / expected_result→Then 형식 sliding + action = metadata 보존 + NL TODO marker) + PoC #05 input/ → output/rules/ 이전 + sample_mode meta 명시 + Layer 1 threshold 자체 제거 (★ session 9차 "0.15 floor advisory" → session 11차 "★ threshold 자체 제거") + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 ✅ (★ PoC #01 13 + PoC #03 18 = 31 BR) + LL-i-33~35 자산화 → SESSION-WRAPUP commit (★ 본 session / no release / no version bump / no tag)**
+- ★ ★ ★ ★ **Phase C 후속 session (★ session 12차+) = ★ ★ Layer 2 LLM mandatory 본격 구현 (★ Anthropic API / OpenAI API / Static Tool 시뮬레이션 금지 정합) + chain 1 gate Layer 2 통합 + PoC #03 NL TODO marker 본격 합성 + PoC #05 GWT 신규 합성 + OVERALL_THRESHOLD 의미 재설계 (★ Layer 1 + Layer 2 통합 점수)**
+- ★ ★ ★ ★ **Phase D 후속 session = ★ release-readiness 8/8 → 9/9 재격상 + ≥ 2 PoC corroboration 검증 + PoC #01 13 BR NL 도메인 전문가 검토 + v2.5.0 MINOR release**

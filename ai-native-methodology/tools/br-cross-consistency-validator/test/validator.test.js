@@ -34,7 +34,7 @@ test('Layer 1: BR with GWT only — valid', () => {
   assert.equal(r.summary.gate_status, 'pass');
 });
 
-test('Layer 1: BR with both — valid (keyword overlap ≥ 0.5)', () => {
+test('Layer 1: BR with both — valid (★ v2.5.0 Phase B Q-B3 (b) threshold 자체 제거 / overlap > 0 sanity only)', () => {
   const doc = { business_rules: [{
     id: 'BR-ORDER-CANCEL-001',
     name: '주문 취소',
@@ -59,20 +59,39 @@ test('Layer 1: BR with both representations missing — critical finding', () =>
   assert.ok(r.findings.some(f => f.severity === 'critical'));
 });
 
-test('Layer 1: keyword mismatch < threshold — medium finding', () => {
+test('★ v2.5.0 Phase B Q-B3 (b): overlap = 0 → structural_sanity_only low finding (★ threshold 자체 제거 / non-empty + overlap > 0 sanity only)', () => {
   const doc = { business_rules: [{
     id: 'BR-MISMATCH-DRIFT-001',
-    name: '키워드 불일치',
+    name: '키워드 교집합 ∅',
     natural_language: '결제 모듈은 신용카드만 지원',
     given: ['전혀 다른 영역 인증 토큰'],
     when: ['세션 만료'],
     then: ['리다이렉트 로그인'],
   }]};
-  const r = validateRulesDoc(doc, { keywordThreshold: 0.5 });
-  const kwFinding = r.findings.find(f => f.rule === 'keyword_mismatch');
-  assert.ok(kwFinding, 'keyword_mismatch finding 발생 의무');
-  assert.equal(kwFinding.severity, 'medium');
-  assert.ok(kwFinding.overlap_score < 0.5);
+  const r = validateRulesDoc(doc);
+  const sanityFinding = r.findings.find(f => f.rule === 'structural_sanity_only');
+  assert.ok(sanityFinding, 'structural_sanity_only finding 의무 (★ overlap = 0)');
+  assert.equal(sanityFinding.severity, 'low');
+  assert.equal(sanityFinding.overlap_score, 0);
+  // ★ ★ keyword_mismatch finding 자체 제거 (★ Phase B Q-B3 (b) 결단)
+  assert.equal(r.findings.filter(f => f.rule === 'keyword_mismatch').length, 0);
+});
+
+test('★ v2.5.0 Phase B Q-B3 (b): overlap > 0 (낮아도) → finding 부재 (★ threshold 비교 자체 제거)', () => {
+  const doc = { business_rules: [{
+    id: 'BR-LOW-OVERLAP-001',
+    name: '낮은 overlap (★ session 9차 SPIKE v2 PoC #01 mean=0.201 자릿수)',
+    natural_language: '결제 모듈은 신용카드 지원',
+    given: ['결제 시점'],
+    when: ['카드 입력'],
+    then: ['환불 처리'],
+  }]};
+  const r = validateRulesDoc(doc);
+  // ★ ★ ★ overlap > 0 시 → structural_sanity_only finding ❌ (★ threshold 비교 자체 ❌)
+  assert.equal(r.findings.filter(f => f.rule === 'structural_sanity_only').length, 0);
+  assert.equal(r.findings.filter(f => f.rule === 'keyword_mismatch').length, 0);
+  // ★ overlap_distribution 측정 자체 보존 (★ sanity 자료)
+  assert.ok(r.overlap_distribution.mean > 0);
 });
 
 test('Layer 1: BR id 4토막 위반 — medium finding (v2.3.7 enforcement)', () => {

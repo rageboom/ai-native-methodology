@@ -4,7 +4,12 @@
 import { validateBR, resetFindingSeq } from './deterministic.js';
 import { validateBRSemanticConsistency, aggregateLLMScores } from './llm.js';
 
-const OVERALL_THRESHOLD = 0.85; // ★ ADR-CHAIN-011 §5.4 empirical hypothesis / 11 PoC spike 후 confirm 의무
+// ★ ★ ★ v2.5.0 Phase B Q-B3 (b) 결단 — OVERALL_THRESHOLD 의미 갱신
+//   ★ session 9차 SPIKE v2 결정적 사실: ≥0.85 empirical 정면 부정 (PoC #01 13 BR overlap mean=0.201 / max=0.462 / ≥0.85 = 0/13)
+//   ★ ★ ★ paradigm: Layer 1 deterministic_score 자체 = ★ severity-weighted finding penalty (★ ★ "non-empty + overlap > 0" sanity check 부재 시 advisory)
+//   ★ ★ ★ ★ OVERALL_THRESHOLD = ★ Phase C Layer 2 LLM 도달 시 의미 갱신 의무 carry (★ Layer 1 + Layer 2 통합 점수 paradigm)
+//   ★ ★ 본 session 11차 = backward-compat 보존 / Phase C 도달 시 ★ ★ Layer 1 + Layer 2 통합 threshold 재설계 의무
+const OVERALL_THRESHOLD = 0.85; // ★ ★ deprecated semantic / Phase C carry — Layer 2 도달 시 의미 재설계 의무 (C-overall-threshold-redesign-phase-c)
 
 function extractRules(rulesDoc) {
   // ★ schema 6갈래 drift 정합 — 본 session = ★ top-level 호환 모드
