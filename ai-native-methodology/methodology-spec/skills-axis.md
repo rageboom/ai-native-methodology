@@ -24,15 +24,15 @@
 - workflow 의 `methodology-spec/workflow/phase-{id}-*.md` 파일명은 manifest phase ID 와 1:1 정합 의무.
 - 그 외 모든 자산 (deliverables / schemas / templates / examples PoC) 의 phase 인용은 **manifest phase ID** 를 사용.
 
-### 2.2 skills 디렉토리 = 산출물 번호 prefix axis (자유)
+### 2.2 skills 디렉토리 = 의미 ID + category prefix (1-depth)
 
-`skills/analysis/phase-{N}-{slug}/` 디렉토리명의 `phase-N` prefix 는 **산출물 번호 그룹의 라벨**이다. manifest phase ID 와 일치할 의무 ❌.
+`skills/<category>-<semantic-slug>/SKILL.md` 형식 (★ v2.5.1 1-depth + v2.6.0 의미 ID paradigm). 디렉토리명은 **산출물 의미를 직접 표현하는 라벨**이며 manifest phase ID 와 일치할 의무 ❌.
 
-이유: skill 은 산출물 단위로 발동하고 (자연어 trigger → 1 skill = 1 산출물), 산출물 번호 (1~15) 와 manifest phase ID 는 본질적으로 다른 axis. 예:
-- 산출물 #2 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `analysis-architecture/`.
-- 산출물 #5-b schema 는 manifest phase `2` (db) 에서 산출된다 → skills `analysis-db-schema-erd/`.
+이유: skill 은 산출물 단위로 발동하고 (자연어 trigger → 1 skill = 1 산출물), 산출물 의미 (architecture / domain-model / business-rules 등) 와 manifest phase ID 는 본질적으로 다른 axis. 예:
+- 산출물 architecture 는 manifest phase `3` (arch) 에서 산출된다 → skills `analysis-architecture/`.
+- 산출물 schema 는 manifest phase `2` (db) 에서 산출된다 → skills `analysis-db-schema-erd/`.
 
-skill 디렉토리명은 **사용자가 산출물 번호로 기억하기 좋은 라벨**일 뿐, manifest 와의 정합은 매핑 필드를 통해 강제한다.
+skill 디렉토리명은 **사용자가 산출물 의미로 기억하기 좋은 라벨**일 뿐, manifest 와의 정합은 매핑 필드 (§2.3) 를 통해 강제한다. 본 paradigm 의 진화 이력 = §6 (v1.4.x 과도기 phase-N 숫자 prefix) + §7 (v2.5.1 1-depth + category prefix) + §8 (v2.6.0 의미 ID 본격 rename) 참조.
 
 ### 2.3 매핑 = manifest 의 `phases[].skills` 배열
 
@@ -53,21 +53,23 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 `tools/drift-validator/` 가 commit 시점에 다음을 검증:
 
 1. **manifest ↔ workflow**: `phases[].spec_file` 가 가리키는 파일이 `methodology-spec/workflow/` 안에 존재.
-2. **manifest ↔ skills**: `phases[].skills[]` + `cross_cutting.aspects.skills[]` 의 모든 skill 디렉토리가 `skills/analysis/` 안에 존재 + `SKILL.md` 보유.
-3. **skills ↔ manifest 역방향**: `skills/analysis/` 안의 모든 skill 이 manifest 의 어느 phase (또는 cross_cutting.aspects) 에 등록됨. **고아 skill 0 의무**.
+2. **manifest ↔ skills**: `phases[].skills[]` + `cross_cutting.aspects.skills[]` + `cross_cutting.base.skills[]` 의 모든 skill 디렉토리가 `skills/` 안에 1-depth 로 존재 + `SKILL.md` 보유.
+3. **skills ↔ manifest 역방향**: `skills/` 안의 모든 `analysis-*` skill 이 manifest 의 어느 phase (또는 cross_cutting.aspects / cross_cutting.base) 에 등록됨. **고아 skill 0 의무**.
 
 3건 중 1건이라도 깨지면 CI fail. CI workflow = `.github/workflows/drift-check.yml`.
 
 ## 3. 신규 skill 추가 절차
 
 ```
-1. skills/analysis/phase-{N}-{slug}/SKILL.md 신설
-   - frontmatter: name / description / allowed-tools
-   - ★ ★ v2.6.0 진화 = 의미 ID 본격 (analysis-formal-spec-validation / analysis-characterization-test 등) — phase-N prefix 폐기.
+1. skills/<category>-<semantic-slug>/SKILL.md 신설 (★ 1-depth + category prefix)
+   - frontmatter: name (디렉토리명과 동일) / description / allowed-tools
+   - 디렉토리명 = 의미 ID (예 analysis-formal-spec-validation / analysis-characterization-test). phase-N 숫자 prefix 폐기 (§8).
+   - category prefix = _base / analysis / planning / spec / test / implement (§7.2)
 
 2. flows/analysis.phase-flow.json 갱신
    - 본 skill 이 발동되는 manifest phase 의 skills 배열에 디렉토리명 추가
    - cross-cutting aspect 면 cross_cutting.aspects.skills 에 추가
+   - cross-cutting base (_base-*) 면 cross_cutting.base.skills 에 추가
 
 3. drift-validator 통과 확인 (npm test in tools/drift-validator/)
 
@@ -83,7 +85,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 - ✅ 6 신규 schema 신설 허용 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix — sub-plan-2)
 - ✅ ★ chain stage axis 신설 — `flows/sdlc-4stage-flow.json` (★ sub-plan-4 신설 / stages + revisit_edges + sub_flow 통합)
 - ✅ chain stage 별 manifest phase-flow 신설 — `flows/{planning,spec,test,implement}.phase-flow.json`
-- ✅ skills 디렉토리 chain stage axis 확장 — `skills/{planning,spec,test,implement}/` (★ sub-plan-4)
+- ✅ skills 디렉토리 chain stage axis 확장 — `skills/{planning,spec,test,implement}-<name>/` 1-depth + category prefix (★ sub-plan-4 / v2.5.1 paradigm 정합)
 - ★ window 마감 = v2.0.0 정식 release 시점 / 그 후 v2.x = add only
 
 기존 `analysis.phase-flow.json` 의 9 phase = ★ 그대로 보존 / sdlc-4stage-flow.json 의 stages[analysis].sub_flow 로 흡수.
@@ -93,14 +95,14 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
 | 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ | inventory + tree |
-| 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning/ (★ 채움) | planning-spec |
-| 1 sub | analysis | analysis.phase-flow.json | skills/analysis/ (현 19) | 7대 + 8 FE 산출물 |
-| 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec/ (★ 신설) | behavior-spec / acceptance-criteria |
-| 3 | test | test.phase-flow.json (★ 신설) | skills/test/ (★ 채움) | test-spec + 실 test 코드 (RED) |
-| 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement/ (★ 채움) | impl-spec + 실 impl 코드 (GREEN) |
+| 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning-*/ (★ 3 / planning-extract-from-legacy 등) | planning-spec |
+| 1 sub | analysis | analysis.phase-flow.json | skills/analysis-*/ (현 22 / aspect 4 + br-cross 1 포함) | 7대 + 8 FE 산출물 |
+| 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec-*/ (★ 3 / spec-compose-behavior-spec 등) | behavior-spec / acceptance-criteria |
+| 3 | test | test.phase-flow.json (★ 신설) | skills/test-*/ (★ 3 / test-generate-test-spec 등) | test-spec + 실 test 코드 (RED) |
+| 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement-*/ (★ 2 / implement-generate-impl-spec 등) | impl-spec + 실 impl 코드 (GREEN) |
 | cross | traceability | (sdlc-4stage-flow.json cross_cutting) | skills/_base-build-traceability-matrix/ | traceability-matrix |
 
-## 5. 매핑 현황 (v1.4.4 시점)
+## 5. 매핑 현황 (v2.6.0 시점)
 
 | Manifest phase ID | spec_file | skills (디렉토리명) |
 |---|---|---|
