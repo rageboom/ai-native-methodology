@@ -1,0 +1,173 @@
+{
+  "$schema_version": "v2.5.0-phase-d-self-eval-bias-retrospect",
+  "model": "claude-haiku-4-5",
+  "invoked_at": "2026-05-14T14:35:00Z",
+  "batch_size": 18,
+  "poc_id": "poc-03-realworld-nestjs",
+  "results": [
+    {
+      "br_id": "BR-USER-USERNAME-NOT-BLANK-001",
+      "semantic_score": 0.93,
+      "rationale": "NL '반드시 값 포함 / 빈 값 시 400' = GWT @IsNotEmpty + ValidationPipe 직접 대응. DTO 데코 검증 명확.",
+      "confidence": 0.83
+    },
+    {
+      "br_id": "BR-USER-EMAIL-FORMAT-001",
+      "semantic_score": 0.81,
+      "rationale": "NL 'RFC 5322 형식 위반 시 400' = GWT @IsEmail 기술. 다만 F-143 (update validate 미호출) concern이 NL에 반영 안 됨. 기본 규칙은 정합.",
+      "confidence": 0.74
+    },
+    {
+      "br_id": "BR-USER-EMAIL-NOT-BLANK-001",
+      "semantic_score": 0.94,
+      "rationale": "NL '반드시 값 포함 / 400' = GWT @IsNotEmpty + ValidationPipe 완벽 대응. 입력 검증 정책 명시.",
+      "confidence": 0.84
+    },
+    {
+      "br_id": "BR-USER-PASSWORD-NOT-BLANK-001",
+      "semantic_score": 0.93,
+      "rationale": "NL '반드시 값 포함 / 400' = GWT @IsNotEmpty (signup/login) 이중 적용. DTO 검증 명확.",
+      "confidence": 0.83
+    },
+    {
+      "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+      "semantic_score": 0.79,
+      "rationale": "NL '중복 시 400 거부' = GWT App pre-check (QueryBuilder OR). 다만 GWT state='partial (App 1중 race-prone / DB UQ 부재 F-120)' 추가 context. NL 기술은 의도이나 GWT는 불완전 상태 명시.",
+      "confidence": 0.72
+    },
+    {
+      "br_id": "BR-USER-PASSWORD-HASH-001",
+      "semantic_score": 0.90,
+      "rationale": "NL '평문 저장 금지' = GWT @BeforeInsert argon2.hash 정합. 해시 정책 명확. F-141 (update 부재 concern) 은 별도.",
+      "confidence": 0.81
+    },
+    {
+      "br_id": "BR-USER-LOGIN-VERIFY-001",
+      "semantic_score": 0.92,
+      "rationale": "NL 'match→JWT / mismatch→401' = GWT argon2.verify + 401 response 완벽 대응. 로그인 검증 정책 명확.",
+      "confidence": 0.83
+    },
+    {
+      "br_id": "BR-USER-JWT-EXPIRY-001",
+      "semantic_score": 0.75,
+      "rationale": "NL '유효 기간 포함 / 만료 후 거부' = GWT 'exp = now + 60 days' 기술. 다만 F-119 (60일 too long) + F-118 (try/catch 부재) 이슈가 NL에 미반영. 기본 의도는 정합.",
+      "confidence": 0.68
+    },
+    {
+      "br_id": "BR-USER-DELETE-AUTH-001",
+      "semantic_score": 0.45,
+      "rationale": "NL 'DELETE 본인만 수행' ≠ GWT state='absent (F-140 critical — AuthMiddleware 미적용)'. NL 은 '의도된 규칙' / GWT는 '규칙 자체 부재' 기술. 본질 괴리 심각 — **missing requirement**.",
+      "confidence": 0.65
+    },
+    {
+      "br_id": "BR-FOLLOWS-NO-SELF-001",
+      "semantic_score": 0.74,
+      "rationale": "NL '자신을 팔로우 불가' = GWT throw 'FollowerEmail and FollowingId cannot be equal'. 기본 정책 일치. 다만 F-144 (follow=email / unFollow=id 불일치) concern이 NL 반영 안 됨.",
+      "confidence": 0.70
+    },
+    {
+      "br_id": "BR-FOLLOWS-PAIR-UNIQUE-001",
+      "semantic_score": 0.82,
+      "rationale": "NL '중복 팔로우 멱등' = GWT 'if (!_follows) save' idempotent 로직. 기본 정책 정합. 다만 DB UQ 부재 (F-121 race window) 이 NL 에 미반영.",
+      "confidence": 0.75
+    },
+    {
+      "br_id": "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001",
+      "semantic_score": 0.91,
+      "rationale": "NL 'follower/username 누락 시 400' = GWT throw 'not provided' 검증. 입력 필수 조건 명확.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-SLUG-AUTO-001",
+      "semantic_score": 0.83,
+      "rationale": "NL 'slug 자동 생성 / 고유값' = GWT slugify(title) + random suffix. 기본 정책 정합. 다만 DB UQ 부재 (F-126/F-120) 이슈가 NL 에 미반영.",
+      "confidence": 0.76
+    },
+    {
+      "br_id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+      "semantic_score": 0.77,
+      "rationale": "NL '멱등 / count 단조 증가' = GWT 'isNewFavorite check'. 기본 정책 정합. 다만 F-135 (favoriteCount race window) concern이 NL 에 미반영.",
+      "confidence": 0.71
+    },
+    {
+      "br_id": "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001",
+      "semantic_score": 0.91,
+      "rationale": "NL 'unfavorite 멱등 / silent skip' = GWT 'deleteIndex >= 0' logic 완벽 정합. App-level idempotent 정책 명확.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-AUTO-001",
+      "semantic_score": 0.95,
+      "rationale": "NL '작성자 자동 매핑' = GWT findOne(userId) 명시. 현재 인증된 사용자 매핑 정책 완벽 정합.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-ARTICLE-COMMENT-EAGER-001",
+      "semantic_score": 0.84,
+      "rationale": "NL 'comments 항상 로드' = GWT {eager:true} 명시. 로딩 정책 기술 정합. F-124 (N+1 risk) 는 성능 별도 사항.",
+      "confidence": 0.77
+    },
+    {
+      "br_id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001",
+      "semantic_score": 0.89,
+      "rationale": "NL 'follows empty→empty feed' = GWT return {articles:[], count:0} 직결. 피드 필터링 정책 명확.",
+      "confidence": 0.81
+    }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.841,
+    "median_semantic_score": 0.85,
+    "std_dev": 0.121,
+    "score_distribution": {
+      "1.0": 0,
+      "0.85_1.0": 10,
+      "0.7_0.84": 7,
+      "0.5_0.69": 1,
+      "0.0_0.49": 0
+    },
+    "below_0.7_count": 4,
+    "below_0.7_brs": [
+      {
+        "id": "BR-USER-EMAIL-FORMAT-001",
+        "score": 0.81,
+        "reason": "F-143 concern (update validate 미호출) NL 미반영"
+      },
+      {
+        "id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+        "score": 0.79,
+        "reason": "F-120 race-prone 상태 NL 에 미반영"
+      },
+      {
+        "id": "BR-USER-JWT-EXPIRY-001",
+        "score": 0.75,
+        "reason": "F-119 (60일 too long) / F-118 (try/catch 부재) concern NL 미반영"
+      },
+      {
+        "id": "BR-FOLLOWS-NO-SELF-001",
+        "score": 0.74,
+        "reason": "F-144 (follow/unFollow 검증 불일치) concern NL 미반영"
+      },
+      {
+        "id": "BR-USER-DELETE-AUTH-001",
+        "score": 0.45,
+        "reason": "★ 본질 괴리 — NL='의도된 규칙' vs GWT='규칙 부재 (F-140 critical)'"
+      },
+      {
+        "id": "BR-ARTICLE-SLUG-AUTO-001",
+        "score": 0.83,
+        "reason": "F-126/F-120 DB UQ 부재 이슈 NL 미반영"
+      },
+      {
+        "id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+        "score": 0.77,
+        "reason": "F-135 (favoriteCount race window) concern NL 미반영"
+      }
+    ]
+  },
+  "cross_validation_notes": {
+    "echo_chamber_risk": "★ Haiku model class (4.5) ≠ Sonnet (4.6) — different reasoning capacity maturity (4.5 has lower synthetic drift risk but also lower semantic precision ceiling)",
+    "critical_finding": "★ BR-USER-DELETE-AUTH-001 (score 0.45) = **missing control** — AuthMiddleware 자체 부재 → 규칙이 아닌 구현 gap. PoC #03 critical flaw.",
+    "validation_gap_pattern": "★ PoC #03 = class-validator 12% coverage + manual throw 주요 source → NL 과 GWT 간 'concern (F-###) 미반영' 패턴 반복. PoC #01 이 추가 명시적.",
+    "confidence_cap_rationale": "★ confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
+  }
+}

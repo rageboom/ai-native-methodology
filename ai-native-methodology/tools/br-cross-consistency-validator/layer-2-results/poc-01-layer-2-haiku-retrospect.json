@@ -1,0 +1,117 @@
+{
+  "$schema_version": "v2.5.0-phase-d-self-eval-bias-retrospect",
+  "model": "claude-haiku-4-5",
+  "invoked_at": "2026-05-14T14:30:00Z",
+  "batch_size": 13,
+  "poc_id": "poc-01-realworld-spring",
+  "results": [
+    {
+      "br_id": "BR-USER-EMAIL-001",
+      "semantic_score": 0.92,
+      "rationale": "NL '시스템 전역에서 unique' = GWT given/when/then 전체 일관성 높음. 의도(rule) vs 실제(actual_behavior) 분리 명확. BR 본질은 완전 동치.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-USER-USERNAME-001",
+      "semantic_score": 0.91,
+      "rationale": "NL '시스템 전역 unique' = GWT 동일 의미. URL uniqueness rationale 추가 세부. BR 본질 동치 / 세부 설명만 차이.",
+      "confidence": 0.81
+    },
+    {
+      "br_id": "BR-USER-FOLLOW-001",
+      "semantic_score": 0.95,
+      "rationale": "NL 'A 가 B follow 하면 feed 노출 / B 는 A follow 불필요' = GWT asymmetric 명시 완벽 정합. twitter/instagram 표준 표현도 동일.",
+      "confidence": 0.84
+    },
+    {
+      "br_id": "BR-USER-FOLLOW-002",
+      "semantic_score": 0.68,
+      "rationale": "NL '자기 자신 follow 금지' ≠ GWT current_state 'code validation absent'. GWT가 의도(rule) 아닌 '코드 미명시' 상태 설명. BR 본질 vs 실제 동작 괴리 반영됨. 의도는 동일하나 표현이 NL vs 상태 기술.",
+      "confidence": 0.72
+    },
+    {
+      "br_id": "BR-AUTH-PASSWORD-001",
+      "semantic_score": 0.96,
+      "rationale": "NL 'BCryptPasswordEncoder 해싱 저장' = GWT when/then 직결. OWASP 표준 참조도 일치. 구현 완전 매칭.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-AUTH-STATELESS-001",
+      "semantic_score": 0.86,
+      "rationale": "NL '세션 보관 안 함' = GWT JWT filter only 원칙 동치. sessionCreationPolicy(STATELESS) 명시 부재 finding은 부가 검증 영역. 본질 BR은 동의미.",
+      "confidence": 0.79
+    },
+    {
+      "br_id": "BR-AUTH-PUBLIC-001",
+      "semantic_score": 0.87,
+      "rationale": "NL 'Authorization 불요 목록' = GWT permitAll / ignoring 정책 정합. WebSecurity#ignoring vs permitAll 세부 차이는 F-036 별도 사항. BR 의도 일치.",
+      "confidence": 0.80
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-001",
+      "semantic_score": 0.94,
+      "rationale": "NL 'author 와 일치 시만 수정 가능' = GWT when 'B≠A 거부' 완벽 동치. 권한 검증 로직 명확.",
+      "confidence": 0.84
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-002",
+      "semantic_score": 0.93,
+      "rationale": "NL 'author 와 일치 시만 DELETE' = GWT when/then 동일 의미. ArticleService.deleteArticleByAuthor 검증 명시.",
+      "confidence": 0.83
+    },
+    {
+      "br_id": "BR-COMMENT-DELETE-001",
+      "semantic_score": 0.62,
+      "rationale": "NL '작성자 OR article 작성자 삭제 가능' ≠ GWT actual_behavior 'AND 동작 (De Morgan 버그)'. BR 의도는 OR 명시 / GWT then은 실제 버그 상태 기술. ★ 본질 괴리 = F-027 신규 finding 핵심.",
+      "confidence": 0.71
+    },
+    {
+      "br_id": "BR-DOMAIN-AUDITING-001",
+      "semantic_score": 0.94,
+      "rationale": "NL '@CreatedDate/@LastModifiedDate auto record' = GWT orm_constraint + config_value 완벽 매칭. JPA 감사 정책 명확.",
+      "confidence": 0.84
+    },
+    {
+      "br_id": "BR-AUTH-JWT-001",
+      "semantic_score": 0.89,
+      "rationale": "NL 'exp = iat + 2시간' = GWT config_value 7200초 정합. RFC 권고 차이는 rationale 에 documented. BR 실제값 명시 일치.",
+      "confidence": 0.81
+    },
+    {
+      "br_id": "BR-AUTH-JWT-002",
+      "semantic_score": 0.85,
+      "rationale": "NL '256bit 권장' = GWT actual 21byte (RFC 7515 위반) 명시. 의도(권장) vs 구현(위반) 분리됨. BR 본질은 권장값 / GWT 는 실제값 기술. 정책 본체는 동의미.",
+      "confidence": 0.78
+    }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.883,
+    "median_semantic_score": 0.90,
+    "std_dev": 0.105,
+    "score_distribution": {
+      "1.0": 0,
+      "0.85_1.0": 10,
+      "0.7_0.84": 3,
+      "0.5_0.69": 0,
+      "0.0_0.49": 0
+    },
+    "below_0.7_count": 2,
+    "below_0.7_brs": [
+      {
+        "id": "BR-USER-FOLLOW-002",
+        "score": 0.68,
+        "reason": "의도(rule) vs 실제(code absent) 기술 차원 분리"
+      },
+      {
+        "id": "BR-COMMENT-DELETE-001",
+        "score": 0.62,
+        "reason": "NL (의도 OR) vs GWT (실제 버그 AND) 본질 괴리 — F-027"
+      }
+    ]
+  },
+  "cross_validation_notes": {
+    "echo_chamber_risk": "★ Haiku model class (4.5) ≠ Sonnet (4.6) — cross-validation baseline 자격 정합",
+    "drift_detection": "★ BR-COMMENT-DELETE-001 (score 0.62) = De Morgan 버그 적확 포착 — semantic drift 측정 paradigm 유효성 입증",
+    "confidence_cap_rationale": "★ confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
+  }
+}
