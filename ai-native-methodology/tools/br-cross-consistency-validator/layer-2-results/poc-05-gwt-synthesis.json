@@ -1,0 +1,61 @@
+{
+  "$schema_version": "v2.5.0-phase-c-gwt",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-14T00:00:00Z",
+  "batch_size": 2,
+  "poc_id": "poc-05-sample-user-register",
+  "sample_mode": true,
+  "corroboration_eligible": false,
+  "sample_mode_note": "n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only",
+  "synthesis_paradigm": {
+    "given": "Fowler precondition/state + ECA Condition 정합 / 단문 배열 1~2 step",
+    "when": "Cucumber single action/event + Fowler behavior/trigger 정합 / 단문 배열 1 step",
+    "then": "expected outcome / Gherkin assertion 영역 / 단문 배열 1~2 step",
+    "concrete_example_sliding": "description 안 specific value (409 Conflict / 400 Bad Request / 최소 8자) 정합 사용",
+    "current_state_note_handling": "legacy 결함(미수행) 영역 GWT 반영 ❌ / 의도(intended) 동작만 GWT 합성"
+  },
+  "results": [
+    {
+      "br_id": "BR-USER-DATA-001",
+      "br_title": "이메일 중복 ❌",
+      "br_type": "uniqueness_constraint",
+      "severity": "high",
+      "current_state_note": "legacy source 결함 — register() 가 중복 검사 미수행 / users[] 에 email 중복 허용",
+      "gwt_intended_only_note": "GWT = 의도(intended) 동작 합성 / legacy 결함(중복 허용) 은 반영 ❌",
+      "given": [
+        "시스템에 이미 'user@example.com' 으로 등록된 사용자가 존재한다",
+        "사용자 저장소(users[])에 해당 이메일이 등록된 상태이다"
+      ],
+      "when": [
+        "동일 이메일 'user@example.com' 으로 신규 사용자 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 409 Conflict 응답을 반환한다",
+        "사용자 저장소에 중복 이메일 항목이 추가되지 않는다"
+      ]
+    },
+    {
+      "br_id": "BR-USER-VALIDATION-001",
+      "br_title": "비밀번호 최소 8자",
+      "br_type": "validation",
+      "severity": "medium",
+      "current_state_note": "legacy source 결함 — register() 가 password 길이 검증 미수행",
+      "gwt_intended_only_note": "GWT = 의도(intended) 동작 합성 / legacy 결함(길이 검증 미수행) 은 반영 ❌",
+      "given": [
+        "신규 사용자 등록 요청이 준비된 상태이다"
+      ],
+      "when": [
+        "7자 이하 비밀번호('pass123')로 사용자 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 400 Bad Request 응답을 반환한다",
+        "사용자 저장소에 해당 사용자가 추가되지 않는다"
+      ]
+    }
+  ],
+  "human_review_carry": [
+    "GWT 합성 = LLM 자동 생성 / 정확도 보장 ❌ / Phase D 도메인 전문가 검토 의무 (LL-i-31 정합)",
+    "concrete example value ('user@example.com', 'pass123') = 예시값 / 실제 테스트 데이터로 교체 필요",
+    "sample_mode = true / corroboration_eligible = false / ≥ 2 PoC corroboration count 산입 ❌"
+  ]
+}

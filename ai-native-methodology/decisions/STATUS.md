@@ -3,7 +3,9 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행 — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) — Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + 사용자 결단 "진행하자" 정합 + validator interface 본격 (cli.js + llm.js + validator.js / placeholder → 본격 / semantic_drift_detected + confidence_cap_exceeded finding 신설 / Layer 1 AND Layer 2 양쪽 통과 paradigm / DETERMINISTIC_THRESHOLD 신설) + docs/layer-2-prompt-spec.md 신설 (batch paradigm + Sonnet 4.6 + confidence cap 0.85) + test +5 (31/31 pass / workspace 308/0) + DEC + ADR §9 LL-i-37+38 + §11 patch v6 + LL-i-37+38 자산화 + session 13차 = step 6~12 분리** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 13차+)
+**기준일**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증 — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR 총합) + PoC #03 18 BR NL 본격 합성 (Agent 1) + PoC #05 2 BR GWT 신규 합성 (Agent 3) + PoC #01 13 BR Layer 2 재검증 (Agent 5) + PoC #03 18 BR Layer 2 (Agent 2) + PoC #05 2 BR Layer 2 (Agent 4) + 본격 재실측 (PoC #01 overall=0.901 / PoC #03 overall=0.941 / PoC #05 overall=0.985 / 3 PoC 모두 gate PASS ✅) + ≥ 2 PoC corroboration Layer 1+Layer 2 양쪽 통과 ✅ + Adzic SBE 함정 회피 자격 본격 도달 ✅ + skills/analysis/br-cross-consistency-check/SKILL.md 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
+
+**기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행 — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) — Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + 사용자 결단 "진행하자" 정합 + validator interface 본격 (cli.js + llm.js + validator.js / placeholder → 본격 / semantic_drift_detected + confidence_cap_exceeded finding 신설 / Layer 1 AND Layer 2 양쪽 통과 paradigm / DETERMINISTIC_THRESHOLD 신설) + docs/layer-2-prompt-spec.md 신설 (batch paradigm + Sonnet 4.6 + confidence cap 0.85) + test +5 (31/31 pass / workspace 308/0) + DEC + ADR §9 LL-i-37+38 + §11 patch v6 + LL-i-37+38 자산화 + session 13차 = step 6~12 분리** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C 종결 = session 13차+)
 
 **기준일 보존**: 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ **session 11차 — v2.5.0 Phase B 시행 — PoC #03 18 BR 형식 sliding (trigger→When / condition→Given / expected_result→Then) + action = metadata 보존 + NL TODO marker + PoC #05 input/→output/rules/ 이전 + sample_mode meta + description→NL 자동 추출 + Layer 1 threshold 자체 제거 (★ 0.15 floor advisory → ★ ★ threshold 비교 자체 ❌) + 303/0 test pass + ≥ 2 PoC corroboration 자격 도달 (PoC #01 13 + PoC #03 18 = 31 BR / Senior STOP-1 흡수 ✅) + LL-i-33~35 자산화 + DEC 신설** — SESSION-WRAPUP commit / ★ ★ no release / no version bump / no tag / Phase C = 다음 session 12차+)
 
@@ -22,6 +24,63 @@
 **v2.3.3 PATCH release 보존** (★ session 1차 / 2026-05-13 / commit `6ab26b6` / git tag `v2.3.3` / origin push ✅ / R1' axis 본체 명문화 + sub-rule v1.1 → v1.1.1 PATCH / industry first paradigm-cross axis quantification)
 **v2.3.2 PATCH release 보존** (2026-05-12 / commit `ba3ed82` / git tag `v2.3.2` / sub-rule v1.0 → v1.1 minor 갱신)
 **v2.3.1 PATCH release 보존** (2026-05-12 / commit `bc48477` / git tag `v2.3.1` / origin push ✅ 2026-05-12)
+
+---
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-14 session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 — Claude Code sub-agent invocation paradigm 본격 동작 입증**:
+
+- ✅ **carry trigger** = ★ ★ ★ ★ C-phase-c-step-6-12-session-13 (★ session 12차 carry / critical)
+- ✅ **★ 4원칙 1단계 plan 자산** = `~/.claude/plans/s-v2.5.0-phase-c-step-6-12-session-13.md` (★ Task tool 5회 호출 paradigm + Q-D scope 결단)
+- ✅ **★ ★ 4원칙 2단계 (★ session 12차 Senior critique 자료 흡수 정합 / 추가 토론 부재)** — STOP-1+2+3+4 + REVISE 5 paradigm 정합 보존
+- ✅ **★ ★ ★ ★ 사용자 결단 "1"** → ★ Plan S §3.1 옵션 A 그대로 시행 (★ step 6+7+8+11+12 + skill 신설)
+- ✅ **★ ★ ★ ★ ★ ★ 4원칙 4단계 본격 시행 — Task tool 5회 병렬 호출 (Sonnet 4.6)**:
+  - Agent 1 PoC #03 18 BR NL 본격 합성 → `layer-2-results/poc-03-nl-synthesis.json`
+  - Agent 3 PoC #05 2 BR GWT 신규 합성 → `layer-2-results/poc-05-gwt-synthesis.json`
+  - Agent 5 PoC #01 13 BR Layer 2 재검증 → `layer-2-results/poc-01-layer-2-results.json`
+  - Agent 2 PoC #03 18 BR Layer 2 cross-validation → `layer-2-results/poc-03-layer-2-results.json`
+  - Agent 4 PoC #05 2 BR Layer 2 cross-validation → `layer-2-results/poc-05-layer-2-results.json`
+- ✅ **★ ★ ★ ★ ★ ★ 본격 재실측 결과 (★ Layer 1 + Layer 2 통합)**:
+  - **PoC #01 (baseline)**: L1=0.954 / L2=0.848 / **overall=0.901 / pass ✅** / findings 5 (4 low + 1 medium drift)
+  - **PoC #03 (session 13차 신규)**: L1=0.967 / L2=0.914 / **overall=0.941 / pass ✅** / findings 5 (4 low + 1 medium drift)
+  - **PoC #05 (sample)**: L1=1.0 / L2=0.97 / **overall=0.985 / pass ✅** / findings 0
+- ✅ **★ ★ ★ ★ ★ ★ ★ ★ ★ 결정적 사실**:
+  - ★ **≥ 2 PoC corroboration Layer 1 + Layer 2 양쪽 통과 ✅** (PoC #01 13 + PoC #03 18 = 31 BR)
+  - ★ ★ **Adzic SBE 폐기 함정 회피 자격 본격 도달 ✅** (Layer 1 + Layer 2 axis 자료 보유 / LL-i-26 정합)
+  - ★ ★ **Claude Code sub-agent invocation paradigm 본격 동작 입증 ✅** (★ B-4 paradigm / Anthropic API key 의무 ❌)
+  - ★ ★ ★ **industry-first 자격 본격 입증 ✅** (Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT 모두 부재 / LL-i-35 정합)
+- ✅ **★ ★ ★ skill 자산화** = `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 + `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록 (★ drift-validator 47/47 pass / orphan 회피)
+- ✅ **★ ★ semantic_drift_detected 2 BR (Phase D carry)**:
+  - BR-AUTH-JWT-002 (PoC #01 / 0.65 / 규범 vs 현실 비대칭)
+  - BR-USER-DELETE-AUTH-001 (PoC #03 / 0.55 / semantic_inversion / absent BR)
+- ✅ **★ ★ ★ workspace 전수 test = 308/0** (★ session 12차 보존 / 회귀 ❌)
+
+### resolved by 본 session (★ session 13차)
+
+- ★ ★ ★ ★ **C-phase-c-step-6-12-session-13** (★ session 12차 carry) → ★ ★ ★ ★ **resolved** (★ ★ ★ Task tool 5회 본격 호출 + Layer 1+L2 통합 점수 + 3 PoC 모두 pass)
+- ★ ★ **C-trigger-skill-asset-신설** (★ session 12차 carry) → ★ **resolved** (★ skill SKILL.md 신설 + flows 등록)
+- ★ ★ ★ **C-poc-03-18-br-nl-todo-marker** (★ session 11차 carry) → ★ ★ **resolved** (★ NL 본격 합성 ✅ / 단 Phase D 도메인 전문가 검토 carry 잔존)
+- ★ ★ **C-poc-05-2-br-gwt-synthesis** (★ session 11차 carry) → ★ ★ **resolved** (★ GWT 신규 합성 ✅)
+
+### 신규 carry (★ ★ session 13차)
+
+- ★ ★ ★ ★ **C-chain-1-gate-layer-2-integration** (★ critical / session 14차 / chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무)
+- ★ ★ ★ **C-phase-d-domain-expert-review-2-drift** (★ Phase D / BR-AUTH-JWT-002 + BR-USER-DELETE-AUTH-001 도메인 전문가 검토)
+- ★ ★ **C-absent-br-gwt-nl-paradigm** (★ Phase D 전 / absent/결함 BR GWT-NL 합성 paradigm 수립)
+- ★ ★ **C-self-evaluation-bias-retrospect** (★ Phase D / Opus / Haiku 교차 검증 paradigm)
+- ★ ★ ★ ★ ★ ★ **C-v2.5.0-minor-release** (★ Phase D 본격)
+
+### Lessons Learned 신규 (★ session 13차 / ADR-CHAIN-011 §9 patch v7)
+
+- ★ ★ ★ ★ ★ ★ ★ **LL-i-39** (★ "Claude Code sub-agent invocation paradigm 본격 동작 입증 + Sonnet 4.6 batch paradigm 정합")
+- ★ ★ ★ ★ ★ ★ **LL-i-40** (★ "Adzic SBE 폐기 함정 회피 자격 본격 도달 — Layer 1 + Layer 2 hybrid paradigm 본격 동작 입증")
+- ★ ★ **LL-i-41** (★ "same-model self-evaluation bias 위험 + Phase D retrospect carry 의무")
+
+### ★ ★ 다음 step (★ ★ session 14차 = Phase C 종결 + Phase D 진입 자격)
+
+- ★ ★ ★ ★ chain 1 gate br-cross-consistency-validator Layer 2 통합 (★ chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무)
+- ★ ★ Phase C SESSION-WRAPUP
+- ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 재격상 (★ Layer 2 통과 criterion 추가) + ≥ 2 PoC corroboration 본격 검증 + PoC #01 13 BR 도메인 전문가 검토 + ★ ★ ★ ★ v2.5.0 MINOR FINAL release
+- ★ ★ self-evaluation bias retrospect — Opus / Haiku 교차 검증 carry
 
 ---
 

@@ -54,7 +54,7 @@
       "then": [
         "blank 시 400 BadRequest"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "회원가입 요청 시 username 필드는 반드시 값을 포함해야 하며, 빈 값이 제출되면 시스템은 400 BadRequest 를 반환해야 한다."
     },
     {
       "id": "BR-USER-EMAIL-FORMAT-001",
@@ -76,7 +76,7 @@
       "then": [
         "RFC 5322 형식 위반 시 400"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "사용자 등록 및 정보 수정 시 email 필드는 RFC 5322 형식을 준수해야 하며, 형식 위반 시 시스템은 400 오류를 반환해야 한다."
     },
     {
       "id": "BR-USER-EMAIL-NOT-BLANK-001",
@@ -97,7 +97,7 @@
       "then": [
         "blank 시 400"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "회원가입 요청 시 email 필드는 반드시 값을 포함해야 하며, 빈 값이 제출되면 시스템은 400 BadRequest 를 반환해야 한다."
     },
     {
       "id": "BR-USER-PASSWORD-NOT-BLANK-001",
@@ -118,7 +118,7 @@
       "then": [
         "blank 시 400"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "회원가입 및 로그인 요청 시 password 필드는 반드시 값을 포함해야 하며, 빈 값이 제출되면 시스템은 400 BadRequest 를 반환해야 한다."
     },
     {
       "id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
@@ -140,7 +140,7 @@
       "then": [
         "중복 시 400 'Username and email must be unique.'"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "회원가입 시 username 과 email 은 시스템 전체에서 유일해야 하며, 이미 등록된 username 또는 email 로 가입을 시도하면 400 오류와 함께 거부되어야 한다."
     },
     {
       "id": "BR-USER-PASSWORD-HASH-001",
@@ -162,7 +162,7 @@
       "then": [
         "DB 에 평문 저장 ❌"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "사용자 계정이 데이터베이스에 저장되기 전 password 는 반드시 단방향 해시로 변환되어야 하며, 평문 password 는 데이터베이스에 저장되어서는 안 된다."
     },
     {
       "id": "BR-USER-LOGIN-VERIFY-001",
@@ -183,7 +183,7 @@
       "then": [
         "match ✅ → JWT / mismatch ❌ → 401"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "로그인 요청 시 제출된 password 가 저장된 해시와 일치하면 JWT 를 발급하고, 일치하지 않으면 401 Unauthorized 를 반환해야 한다."
     },
     {
       "id": "BR-USER-JWT-EXPIRY-001",
@@ -205,7 +205,7 @@
       "then": [
         "60일 후 만료"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "발급된 JWT 는 반드시 유효 기간을 포함해야 하며, 만료된 토큰으로의 인증 시도는 거부되어야 한다."
     },
     {
       "id": "BR-USER-DELETE-AUTH-001",
@@ -227,7 +227,7 @@
       "then": [
         "(★★ 권한 검증 부재 — 누구나 삭제 가능)"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "사용자 계정 삭제는 인증된 본인만 수행할 수 있어야 하며, 미인증 요청은 거부되어야 한다."
     },
     {
       "id": "BR-FOLLOWS-NO-SELF-001",
@@ -249,7 +249,7 @@
       "then": [
         "400 BadRequest"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "사용자는 자기 자신을 팔로우하거나 언팔로우할 수 없으며, 본인 대상 팔로우 요청은 400 오류로 거부되어야 한다."
     },
     {
       "id": "BR-FOLLOWS-PAIR-UNIQUE-001",
@@ -271,7 +271,7 @@
       "then": [
         "중복 follow X (idempotent)"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "동일한 사용자 쌍에 대한 중복 팔로우는 허용되지 않아야 하며, 이미 팔로우 중인 경우 요청은 멱등하게 처리되어야 한다."
     },
     {
       "id": "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001",
@@ -292,7 +292,7 @@
       "then": [
         "400"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "팔로우 및 언팔로우 요청 시 팔로워 식별자와 대상 username 은 반드시 제공되어야 하며, 누락 시 400 오류를 반환해야 한다."
     },
     {
       "id": "BR-ARTICLE-SLUG-AUTO-001",
@@ -314,7 +314,7 @@
       "then": [
         "slug 자동 생성 (random suffix 로 unique 회피)"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "게시글 생성 시 slug 는 title 로부터 자동 생성되어야 하며, 시스템 내에서 식별 가능한 고유한 값을 가져야 한다."
     },
     {
       "id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
@@ -336,7 +336,7 @@
       "then": [
         "중복 favorite X / count 단조 증가"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "게시글 즐겨찾기 추가는 멱등하게 동작해야 하며, 이미 즐겨찾기된 게시글에 대한 중복 추가는 즐겨찾기 수를 증가시키지 않아야 한다."
     },
     {
       "id": "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001",
@@ -357,7 +357,7 @@
       "then": [
         "이미 unfavorite 시 silent skip"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "게시글 즐겨찾기 제거는 멱등하게 동작해야 하며, 이미 즐겨찾기되지 않은 게시글에 대한 제거 요청은 오류 없이 무시되어야 한다."
     },
     {
       "id": "BR-ARTICLE-AUTHOR-AUTO-001",
@@ -378,7 +378,7 @@
       "then": [
         "author 자동 매핑"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "게시글 생성 시 작성자 정보는 현재 인증된 사용자로 자동 매핑되어야 한다."
     },
     {
       "id": "BR-ARTICLE-COMMENT-EAGER-001",
@@ -400,7 +400,7 @@
       "then": [
         "comments 항상 로드"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "게시글 조회 시 해당 게시글의 댓글 목록은 항상 함께 반환되어야 한다."
     },
     {
       "id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001",
@@ -421,7 +421,7 @@
       "then": [
         "follow 없으면 빈 feed"
       ],
-      "natural_language": "TODO: Phase C LLM 본격 합성 필요 — trigger + condition + expected_result + action 기반 자연어 BR statement 합성 + 사람 검토 의무 (★ ★ LL-i-31 정합)"
+      "natural_language": "피드 조회 시 팔로우 중인 사용자가 없으면 빈 게시글 목록을 반환해야 하며, 피드는 팔로우한 사용자의 게시글만 포함해야 한다."
     }
   ],
   "br_count": 18,

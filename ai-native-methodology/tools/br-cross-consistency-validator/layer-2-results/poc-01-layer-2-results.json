@@ -1,0 +1,87 @@
+{
+  "$schema_version": "v2.5.0-phase-c",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-14T00:00:00Z",
+  "batch_size": 13,
+  "poc_id": "poc-01-realworld-spring",
+  "results": [
+    {
+      "br_id": "BR-USER-EMAIL-001",
+      "semantic_score": 0.82,
+      "rationale": "NL은 '이메일 unique 해야 함'이라는 의도 규칙만 표현. GWT then은 의도(거부)와 현재 동작(구현 부재) 양쪽을 포함. 비즈니스 규칙 본질(unique 강제)은 정합하나, NL이 GWT의 actual_behavior(구현 부재 현실 묘사) 영역을 커버하지 않음.",
+      "confidence": 0.80
+    },
+    {
+      "br_id": "BR-USER-USERNAME-001",
+      "semantic_score": 0.82,
+      "rationale": "BR-USER-EMAIL-001과 동일 구조. NL은 userName unique 의도만 표현하고, GWT then은 의도(거부)+현실(거부 안 됨) 이중 표현. 비즈니스 규칙 본질은 정합하나 NL이 현실 동작 부재 상태를 포함하지 않음.",
+      "confidence": 0.80
+    },
+    {
+      "br_id": "BR-USER-FOLLOW-001",
+      "semantic_score": 0.75,
+      "rationale": "NL은 (1) A follow → B 글이 A feed에 노출, (2) asymmetric(B가 A를 follow하지 않아도 됨) 두 의미 포함. GWT then은 DB 삽입과 역방향 미추가만 표현하며 'feed 노출' 효과가 명시되지 않음. asymmetric 속성은 정합하나 NL의 feed 노출 결과가 GWT에 누락.",
+      "confidence": 0.78
+    },
+    {
+      "br_id": "BR-USER-FOLLOW-002",
+      "semantic_score": 0.82,
+      "rationale": "NL은 self-follow 금지 의도를 표현. GWT then은 의도(거부)와 현재 동작(코드 검증 부재) 이중 표현. 규칙 본질은 정합하나 NL이 구현 부재 현실 묘사를 포함하지 않음. BR-USER-EMAIL-001과 동일 패턴.",
+      "confidence": 0.80
+    },
+    {
+      "br_id": "BR-AUTH-PASSWORD-001",
+      "semantic_score": 0.92,
+      "rationale": "NL의 'BCryptPasswordEncoder로 해싱하여 저장'과 GWT의 'Password VO 생성자에서 BCrypt 해시 적용 + 컬럼 저장'은 매우 높은 의미 정합. GWT가 트리거(signUp/updateUser)와 저장 경로를 추가로 명시하나 핵심 규칙은 동치. NL의 'plain text 저장 금지' 내포 negation이 GWT에 명시되지 않은 소차이 존재.",
+      "confidence": 0.83
+    },
+    {
+      "br_id": "BR-AUTH-STATELESS-001",
+      "semantic_score": 0.72,
+      "rationale": "NL은 '세션을 보관하지 않음'이라는 상태(state)만 표현. GWT는 JWT 헤더 컨텍스트 추출(적극적 동작)과 session cookie 미검사(소극적 상태) 두 측면을 표현. NL이 JWT 인증 메커니즘의 적극적 부분을 누락하고 stateless의 소극적 면만 표현하여 의미 커버리지 부분 부족.",
+      "confidence": 0.77
+    },
+    {
+      "br_id": "BR-AUTH-PUBLIC-001",
+      "semantic_score": 0.88,
+      "rationale": "NL은 공개 endpoint 경로를 구체적으로 열거. GWT는 동일 규칙을 추상화된 'public 목록 포함' 조건과 'filter 우회+정상 처리' 결과로 표현. NL의 구체적 경로 열거와 GWT의 추상적 표현이 의미상 정합하며, filter 우회라는 메커니즘 세부사항이 NL에 없으나 높은 정합.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-001",
+      "semantic_score": 0.95,
+      "rationale": "NL 긍정형('author만 수정 가능')과 GWT 부정형('B≠A 거부')은 논리적으로 완전 동치. GWT가 구체적 API(PUT /articles/{slug})를 명시하는 세부 차이 외 의미 영역 완전 정합. 높은 semantic 일관성.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-002",
+      "semantic_score": 0.95,
+      "rationale": "BR-ARTICLE-AUTHOR-001과 동일 패턴. NL 긍정형('author만 DELETE 가능')과 GWT 부정형('B≠A 거부')은 논리적 동치. GWT의 구체적 API 명시가 NL에 없으나 핵심 권한 규칙은 완전 정합.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-COMMENT-DELETE-001",
+      "semantic_score": 0.85,
+      "rationale": "NL은 의도된 비즈니스 규칙(OR 조건: 댓글 작성자 OR article 작성자)만 표현. GWT then은 의도(OR)와 실제 De Morgan 버그(AND 동작) 양쪽을 포함. NL↔GWT 의도 영역은 완전 정합이나, GWT가 의도와 현실 버그를 동시 표현하는 복잡성이 NL에 반영되지 않음.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-DOMAIN-AUDITING-001",
+      "semantic_score": 0.93,
+      "rationale": "NL은 @CreatedDate/@LastModifiedDate 어노테이션과 createdAt/updatedAt 필드를 명시적으로 포함. GWT는 JPA save 트리거 기반으로 동일 효과(자동 갱신)를 표현. 어노테이션 명시 수준의 세부 차이 외 의미 영역 매우 높은 정합.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-AUTH-JWT-001",
+      "semantic_score": 0.97,
+      "rationale": "NL의 'exp 클레임 = iat + 2시간'과 GWT then의 'exp = iat + 7200(초)'는 단위 표현만 다를 뿐 완전 동치. GWT의 'given: 로그인 성공' 트리거가 NL에 없으나 핵심 규칙(2시간=7200초)은 완전 정합. 가장 높은 semantic 일관성.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-AUTH-JWT-002",
+      "semantic_score": 0.65,
+      "rationale": "NL은 '최소 256bit 권장'이라는 규범적(normative) 기준을 표현. GWT then은 현재 21byte(168bit) SECRET 사용이라는 현실 위반 상태를 표현. NL의 이상적 기준과 GWT의 현실 묘사 사이에 관점 전환 존재. 부분 정합 — NL은 '이래야 한다', GWT는 '이렇게 되어 있다(위반)'로 의도-현실 불일치를 반영하는 비대칭 표현.",
+      "confidence": 0.78
+    }
+  ]
+}

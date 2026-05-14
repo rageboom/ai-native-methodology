@@ -21,7 +21,18 @@
         "grep_query": "users.find\\(.*email"
       },
       "severity": "high",
-      "natural_language": "사용자 등록 시 이메일은 시스템 내 유일해야 한다."
+      "natural_language": "사용자 등록 시 이메일은 시스템 내 유일해야 한다.",
+      "given": [
+        "시스템에 이미 'user@example.com' 으로 등록된 사용자가 존재한다",
+        "사용자 저장소(users[])에 해당 이메일이 등록된 상태이다"
+      ],
+      "when": [
+        "동일 이메일 'user@example.com' 으로 신규 사용자 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 409 Conflict 응답을 반환한다",
+        "사용자 저장소에 중복 이메일 항목이 추가되지 않는다"
+      ]
     },
     {
       "id": "BR-USER-VALIDATION-001",
@@ -36,7 +47,17 @@
         "grep_query": "password\\.length"
       },
       "severity": "medium",
-      "natural_language": "신규 등록 시 비밀번호는 최소 8자 이상."
+      "natural_language": "신규 등록 시 비밀번호는 최소 8자 이상.",
+      "given": [
+        "신규 사용자 등록 요청이 준비된 상태이다"
+      ],
+      "when": [
+        "7자 이하 비밀번호('pass123')로 사용자 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 400 Bad Request 응답을 반환한다",
+        "사용자 저장소에 해당 사용자가 추가되지 않는다"
+      ]
     }
   ]
 }

@@ -1,0 +1,166 @@
+{
+  "$schema_version": "v2.5.0-phase-c",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-14T00:00:00Z",
+  "batch_size": 18,
+  "poc_id": "poc-03-realworld-nestjs",
+  "self_evaluation_bias_disclosure": "★★★★★★★★ same-model evaluation bias 위험 명시: 본 sub-agent(Sonnet 4.6) = step 6-a NL 합성 sub-agent(Sonnet 4.6)와 동일 모델. 동일 모델이 합성한 NL을 동일 모델이 평가하므로 구조적 편향(self-consistency bias) 존재. 점수가 실제보다 높게 측정될 가능성 있음. Phase D 도메인 전문가 검토 및 이종 모델 교차 검증 carry 의무.",
+  "results": [
+    {
+      "br_id": "BR-USER-USERNAME-NOT-BLANK-001",
+      "semantic_score": 1.0,
+      "rationale": "NL이 GWT의 trigger(signup), condition(username 필드), result(blank→400 BadRequest) 세 요소를 모두 정확히 재현함. 의미 동치 완전.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-USER-EMAIL-FORMAT-001",
+      "semantic_score": 1.0,
+      "rationale": "NL이 POST/PUT 두 endpoint(등록+정보수정), RFC 5322 형식 위반 조건, 400 오류 결과를 모두 정확히 재현함. 의미 동치 완전.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-USER-EMAIL-NOT-BLANK-001",
+      "semantic_score": 1.0,
+      "rationale": "NL이 GWT의 trigger(signup), condition(email 필드), result(blank→400 BadRequest) 세 요소를 모두 정확히 재현함. 의미 동치 완전.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-USER-PASSWORD-NOT-BLANK-001",
+      "semantic_score": 1.0,
+      "rationale": "NL이 GWT의 두 endpoint(signup + login), password 필드 필수, blank→400 세 요소를 모두 정확히 재현함. 의미 동치 완전.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+      "semantic_score": 0.92,
+      "rationale": "NL이 username/email 유일성, 중복 시 400 거부의 핵심 의미를 정확히 재현함. 단, GWT의 정확한 에러 메시지('Username and email must be unique.')가 NL에 미포함. 의미 방향 완전 일치, 세부 명세 소폭 손실.",
+      "confidence": 0.80
+    },
+    {
+      "br_id": "BR-USER-PASSWORD-HASH-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 DB 평문 저장 금지의 핵심 의미를 재현함. GWT(then=DB 평문 저장 ❌)보다 NL이 '단방향 해시로 변환'을 명시하여 구현 메커니즘을 추가 서술함. 추가 정보가 의미를 확장하나 GWT 범위를 벗어나지 않음.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-USER-LOGIN-VERIFY-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 GWT의 두 경로(match→JWT 발급, mismatch→401)를 모두 정확히 재현함. NL이 '저장된 해시' 언급으로 구현 세부를 추가하나 비즈니스 의미 정합.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-USER-JWT-EXPIRY-001",
+      "semantic_score": 0.72,
+      "rationale": "NL이 '유효 기간 포함'과 '만료 시 거부'를 서술하여 의미 방향은 일치하나, GWT의 핵심 명세인 60일 구체적 기간이 NL에서 완전히 누락됨. 또한 GWT의 세 개 trigger endpoint(login/findById/findByEmail)도 미반영. 의미 방향은 동일하나 구체성 손실 유의.",
+      "confidence": 0.78
+    },
+    {
+      "br_id": "BR-USER-DELETE-AUTH-001",
+      "semantic_score": 0.55,
+      "rationale": "GWT는 현 구현 결함 상태(AuthMiddleware 미적용, 권한 검증 부재, 누구나 삭제 가능)를 기술함. NL은 올바른 비즈니스 정책(인증된 본인만 가능, 미인증 거부)을 서술함. GWT가 결함 상태를 사실 묘사한다는 관점에서 NL과 의미 방향이 상반됨. 정책 의도 vs 현실 구현 괴리로 의미 정합 부재에 가까움.",
+      "confidence": 0.75
+    },
+    {
+      "br_id": "BR-FOLLOWS-NO-SELF-001",
+      "semantic_score": 0.93,
+      "rationale": "NL이 follow/unfollow 양쪽, self-follow 금지, 400 오류를 모두 정확히 재현함. GWT의 기술적 조건(follower == following)을 NL이 자연어(자기 자신)로 적절히 추상화.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-FOLLOWS-PAIR-UNIQUE-001",
+      "semantic_score": 0.93,
+      "rationale": "NL이 중복 팔로우 금지와 멱등성을 정확히 재현함. GWT의 내부 조건((followerId, followingId) pair)을 '동일한 사용자 쌍'으로 적절히 추상화.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001",
+      "semantic_score": 0.92,
+      "rationale": "NL이 팔로워 식별자 및 username 필수 제공, 누락 시 400 오류를 정확히 재현함. GWT의 followerEmail/followerId를 '팔로워 식별자'로 추상화하여 의미 보존.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-SLUG-AUTO-001",
+      "semantic_score": 0.78,
+      "rationale": "NL이 title 기반 자동 생성을 서술하나, GWT의 핵심인 random suffix 메커니즘이 NL에서 '고유한 값'으로 일반화됨. GWT(unique 회피 시도)와 NL(고유성 보장)이 의미상 다를 수 있음 — random suffix는 고유성을 완전 보장하지 않음. 의미 방향 유사하나 메커니즘 구체성 손실.",
+      "confidence": 0.78
+    },
+    {
+      "br_id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 멱등성(중복 추가 금지)과 즐겨찾기 수 불증가를 정확히 재현함. GWT의 두 결과(중복 favorite X, count 단조 증가) 모두 의미 보존.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 멱등성(미존재 항목 제거 시 silent skip)을 정확히 재현함. GWT의 내부 조건(deleteIndex >= 0)은 구현 세부이며 NL이 비즈니스 의미를 올바르게 추상화.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-AUTHOR-AUTO-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 author 자동 매핑을 정확히 재현함. GWT(author = userRepository.findOne)보다 NL이 '현재 인증된 사용자'로 명시하여 비즈니스 의미를 더 명확히 표현.",
+      "confidence": 0.82
+    },
+    {
+      "br_id": "BR-ARTICLE-COMMENT-EAGER-001",
+      "semantic_score": 1.0,
+      "rationale": "NL '항상 함께 반환'이 GWT 'comments 항상 로드'와 완전 동치. 의미 동치 완전.",
+      "confidence": 0.85
+    },
+    {
+      "br_id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001",
+      "semantic_score": 0.95,
+      "rationale": "NL이 팔로우 없음 → 빈 피드를 정확히 재현함. NL이 '팔로우한 사용자의 게시글만 포함' 추가 규칙을 서술하여 GWT 범위를 소폭 확장하나 맥락상 적절하고 의미 정합.",
+      "confidence": 0.82
+    }
+  ],
+  "summary": {
+    "score_distribution": {
+      "min": 0.55,
+      "max": 1.0,
+      "mean": 0.90,
+      "median": 0.95
+    },
+    "score_breakdown": {
+      "1.0_complete": ["BR-USER-USERNAME-NOT-BLANK-001", "BR-USER-EMAIL-FORMAT-001", "BR-USER-EMAIL-NOT-BLANK-001", "BR-USER-PASSWORD-NOT-BLANK-001", "BR-ARTICLE-COMMENT-EAGER-001"],
+      "0.85_to_0.99_near_complete": ["BR-USER-USERNAME-EMAIL-UNIQUE-001", "BR-USER-PASSWORD-HASH-001", "BR-USER-LOGIN-VERIFY-001", "BR-FOLLOWS-NO-SELF-001", "BR-FOLLOWS-PAIR-UNIQUE-001", "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001", "BR-ARTICLE-FAVORITE-IDEMPOTENT-001", "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001", "BR-ARTICLE-AUTHOR-AUTO-001", "BR-ARTICLE-FEED-FOLLOWS-ONLY-001"],
+      "0.70_to_0.84_partial": ["BR-USER-JWT-EXPIRY-001", "BR-ARTICLE-SLUG-AUTO-001"],
+      "0.50_to_0.69_weak": ["BR-USER-DELETE-AUTH-001"],
+      "0.0_to_0.49_absent": []
+    },
+    "semantic_drift_detected": [
+      {
+        "br_id": "BR-USER-DELETE-AUTH-001",
+        "score": 0.55,
+        "drift_type": "semantic_inversion",
+        "description": "GWT = 현 구현 결함 상태 묘사(권한 검증 부재). NL = 올바른 비즈니스 정책(인증 본인만 가능). 의미 방향 상반. GWT가 absent/결함 BR을 사실 기술할 때 NL 합성 패러다임 정합 검토 필요."
+      },
+      {
+        "br_id": "BR-USER-JWT-EXPIRY-001",
+        "score": 0.72,
+        "drift_type": "specificity_loss",
+        "description": "GWT의 핵심 명세(60일 만료 기간)가 NL에서 누락. 구체적 비즈니스 파라미터 손실."
+      },
+      {
+        "br_id": "BR-ARTICLE-SLUG-AUTO-001",
+        "score": 0.78,
+        "drift_type": "semantic_strengthening",
+        "description": "GWT(random suffix로 unique 회피 시도)가 NL(고유한 값 보장)으로 강화됨. 구현 한계 vs 의도 정책 불일치."
+      }
+    ],
+    "confidence_cap_reached": [
+      "BR-USER-USERNAME-NOT-BLANK-001",
+      "BR-USER-EMAIL-FORMAT-001",
+      "BR-USER-EMAIL-NOT-BLANK-001",
+      "BR-USER-PASSWORD-NOT-BLANK-001",
+      "BR-ARTICLE-COMMENT-EAGER-001"
+    ],
+    "phase_d_carry": [
+      "★★★ same-model evaluation bias carry: Sonnet 4.6이 Sonnet 4.6 합성 NL을 평가 — self-consistency bias로 점수 상향 편향 가능성",
+      "★ BR-USER-DELETE-AUTH-001 semantic inversion: absent/결함 BR의 GWT-NL 합성 패러다임 정책 수립 carry",
+      "★ BR-USER-JWT-EXPIRY-001 specificity loss: 구체적 파라미터(60일)를 포함하는 NL 재합성 검토 carry",
+      "★ BR-ARTICLE-SLUG-AUTO-001 semantic strengthening: random suffix 구현 한계 vs 고유성 보장 의도 불일치 도메인 전문가 판단 carry"
+    ]
+  }
+}

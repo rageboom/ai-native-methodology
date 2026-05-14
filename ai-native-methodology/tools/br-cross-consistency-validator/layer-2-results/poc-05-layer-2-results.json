@@ -1,0 +1,38 @@
+{
+  "$schema_version": "v2.5.0-phase-c",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-14T00:00:00Z",
+  "poc_id": "poc-05-sample-user-register",
+  "batch_size": 2,
+  "sample_mode": true,
+  "corroboration_eligible": false,
+  "sample_mode_note": "★ PoC #05 = sample mode / n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only. Senior STOP-4 흡수 정합.",
+  "self_eval_bias_note": "★ step 7-a GWT 합성 agent (Sonnet 4.6) ↔ step 7-b 검증 agent (Sonnet 4.6) = 동일 모델 → self-evaluation echo chamber 위험 존재. confidence cap 0.85 적용. Phase D 도메인 전문가 검토 carry 보존.",
+  "results": [
+    {
+      "br_id": "BR-USER-DATA-001",
+      "semantic_score": 0.97,
+      "rationale": "NL '사용자 등록 시 이메일은 시스템 내 유일해야 한다'의 핵심 의미(유일성 제약)가 GWT 전체에 완전히 반영되어 있다. given은 중복 상황을 정확히 설정하고, when은 제약 위반 시도를 명시하며, then은 409 Conflict + 저장 거부로 제약 집행을 구체화한다. NL이 HTTP 응답 코드를 명시하지 않으나 이는 구현 세부사항으로 의미 불일치가 아니다.",
+      "confidence": 0.78
+    },
+    {
+      "br_id": "BR-USER-VALIDATION-001",
+      "semantic_score": 0.97,
+      "rationale": "NL '신규 등록 시 비밀번호는 최소 8자 이상'의 핵심 의미(길이 하한 제약)가 GWT 전체에 완전히 반영되어 있다. when의 7자 비밀번호('pass123')는 8자 미만 경계값을 정확히 테스트하고, then의 400 Bad Request + 저장 거부는 제약 집행을 구체화한다. NL이 HTTP 응답 코드를 명시하지 않으나 이는 구현 세부사항으로 의미 불일치가 아니다.",
+      "confidence": 0.78
+    }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.97,
+    "min_semantic_score": 0.97,
+    "max_semantic_score": 0.97,
+    "score_band": "0.85~0.99 (거의 동치)",
+    "all_pass_threshold_0_85": true,
+    "findings": [],
+    "carry": [
+      "C-self-invocation-echo-chamber: step 7-a GWT 합성 ↔ step 7-b 검증 동일 모델(Sonnet 4.6) → echo chamber 위험 / Phase D retrospect 의무",
+      "C-phase-d-domain-expert-review: Layer 2 LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 의무 carry 보존",
+      "C-sample-mode-no-corroboration: n=2 sample / corroboration count 산입 ❌ / PoC #01 (13 BR) + PoC #03 (18 BR) 가 main corroboration 영역"
+    ]
+  }
+}

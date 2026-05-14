@@ -128,8 +128,8 @@
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     },
     "aspects": {
-      "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
-      "skills": ["aspect-a11y", "aspect-i18n", "aspect-static-security", "aspect-legacy"],
+      "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. ★ ★ ★ v2.5.0 Phase C session 13차 추가 — br-cross-consistency-check (★ Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger).",
+      "skills": ["aspect-a11y", "aspect-i18n", "aspect-static-security", "aspect-legacy", "br-cross-consistency-check"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
     }
   },

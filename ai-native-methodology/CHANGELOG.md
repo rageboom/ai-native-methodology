@@ -9,7 +9,75 @@
 
 ---
 
-## [v2.4.0 carry update — session 12차 SESSION-WRAPUP — v2.5.0 Phase C step 1~5 시행] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) + Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + validator interface 본격 + docs/layer-2-prompt-spec.md 신설 + test +5 (31/31) + workspace 308/0 + DEC 신설 + ADR §9 LL-i-37+38 + §11 patch v6 / Phase C step 6~12 = session 13차 분리)
+## [v2.4.0 carry update — session 13차 SESSION-WRAPUP — v2.5.0 Phase C step 6+7+8+11+12 본격 시행 + Claude Code sub-agent invocation paradigm 본격 동작 입증] — 2026-05-14 ⭐ 현재 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — Task tool 5회 본격 호출 (Sonnet 4.6 / batch / 31 BR) + PoC #03 NL 본격 합성 + PoC #05 GWT 신규 합성 + PoC #01+#03+#05 Layer 2 cross-validation + 3 PoC 모두 gate pass + ≥ 2 PoC corroboration L1+L2 양쪽 통과 ✅ + Adzic 함정 회피 자격 본격 도달 ✅ + industry-first 자격 본격 입증 ✅ + skill 신설 + DEC + ADR §9 LL-i-39+40+41 + §11 patch v7 + 308/0 test pass + semantic_drift 2 BR Phase D carry / Phase C 종결 = session 14차 chain 1 gate Layer 2 통합 / Phase D = release-readiness 9/9 + v2.5.0 MINOR release)
+
+> ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 13차 — v2.5.0 Phase C step 6+7+8+11+12 본격 시행** — ★ session 12차 carry (C-phase-c-step-6-12-session-13 critical) 시행. ★ 사용자 결단 "1" (Plan S §3.1 옵션 A) 정합. ★ ★ ★ Task tool 5회 본격 호출 (★ Sonnet 4.6 / batch paradigm) 본격 시행 + 본격 재실측 + skill 자산화 + SESSION-WRAPUP.
+
+### ★ ★ ★ ★ ★ ★ ★ ★ ★ session 13차 Task tool 5회 본격 호출 (★ Sonnet 4.6 / batch paradigm 정합)
+
+| Agent | step | scope | 결과 JSON |
+|---|---|---|---|
+| Agent 1 (NL 합성) | step 6-a | PoC #03 18 BR NL TODO marker → 본격 statement | layer-2-results/poc-03-nl-synthesis.json |
+| Agent 3 (GWT 합성) | step 7-a | PoC #05 2 BR GWT 신규 합성 | layer-2-results/poc-05-gwt-synthesis.json |
+| Agent 5 (Layer 2) | step 8 | PoC #01 13 BR Layer 2 재검증 | layer-2-results/poc-01-layer-2-results.json |
+| Agent 2 (Layer 2) | step 6-b | PoC #03 18 BR Layer 2 cross-validation | layer-2-results/poc-03-layer-2-results.json |
+| Agent 4 (Layer 2) | step 7-b | PoC #05 2 BR Layer 2 cross-validation | layer-2-results/poc-05-layer-2-results.json |
+
+### ★ ★ ★ session 13차 본격 재실측 결과 (★ Layer 1 + Layer 2 통합)
+
+| PoC | L1 | L2 | overall | gate | findings |
+|---|---|---|---|---|---|
+| **PoC #01 (baseline)** | 0.954 | **0.848** | **0.901** | **★ ★ pass ✅** | 5 (4 low + 1 medium drift) |
+| **PoC #03 (session 13차 신규)** | 0.967 | **0.914** | **0.941** | **★ ★ pass ✅** | 5 (4 low + 1 medium drift) |
+| **PoC #05 (sample)** | 1.000 | **0.97** | **0.985** | **★ ★ pass ✅** | 0 |
+
+### ★ ★ ★ ★ ★ ★ ★ session 13차 결정적 사실
+
+| 사실 | 자료 |
+|---|---|
+| **★ ≥ 2 PoC corroboration Layer 1 + Layer 2 양쪽 통과 ✅** | PoC #01 13 + PoC #03 18 = 31 BR (★ Senior STOP-1 본격 흡수) |
+| **★ Adzic SBE 폐기 함정 회피 자격 본격 도달 ✅** | Layer 1 + Layer 2 axis 자료 보유 / LL-i-26 정합 |
+| **★ Claude Code sub-agent invocation paradigm 본격 동작 입증 ✅** | B-4 paradigm / Anthropic API key 의무 ❌ |
+| **★ industry-first 자격 본격 입증 ✅** | Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT 모두 부재 / LL-i-35 정합 |
+| **★ workspace 전수 test = 308/0** | session 12차 보존 / 회귀 ❌ |
+
+### ★ ★ ★ session 13차 산출 (자산화 + skill)
+
+- ★ ★ ★ `examples/poc-03-realworld-nestjs/output/rules/rules.json` (★ 18/18 BR NL 본격 statement 갱신)
+- ★ `examples/poc-05-sample-user-register/output/rules/rules.json` (★ 2/2 BR GWT 신규 합성 + sample_mode 보존)
+- ★ ★ `tools/br-cross-consistency-validator/layer-2-results/` 디렉토리 신설 + 5 결과 JSON 자산화
+- ★ ★ ★ `tools/br-cross-consistency-validator/PHASE-C-2026-05-14-re-measurement.md` 본격 재실측 보고
+- ★ ★ ★ `skills/analysis/br-cross-consistency-check/SKILL.md` 신설 (Q-C-trigger (d) paradigm 정합)
+- ★ `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록 (drift-validator 47/47 pass)
+- ★ ★ `decisions/DEC-2026-05-14-phase-c-step-6-12-session-13.md` 신설
+- ★ ★ `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` §9 LL-i-39+40+41 + §11 후속 patch v7
+
+### ★ ★ semantic_drift_detected 2 BR (★ Phase D carry)
+
+- **BR-AUTH-JWT-002** (PoC #01 / 0.65 / 규범 vs 현실 비대칭)
+- **BR-USER-DELETE-AUTH-001** (PoC #03 / 0.55 / semantic_inversion / absent BR)
+
+### ★ ★ Lessons Learned 신규 (★ session 13차)
+
+- ★ ★ ★ ★ ★ ★ ★ **LL-i-39** (★ "Claude Code sub-agent invocation paradigm 본격 동작 입증 + Sonnet 4.6 batch paradigm 정합")
+- ★ ★ ★ ★ ★ ★ **LL-i-40** (★ "Adzic SBE 폐기 함정 회피 자격 본격 도달 — Layer 1 + Layer 2 hybrid paradigm 본격 동작 입증")
+- ★ ★ **LL-i-41** (★ "same-model self-evaluation bias 위험 + Phase D retrospect carry 의무")
+
+### ★ chain harness 5 요소 변경 ❌
+
+본 session 13차 시행 영역 = rules.json 갱신 + skill 신설 + flows/analysis.phase-flow.json 갱신 (★ skill manifest 등록 / drift-validator orphan 회피) + ADR + DEC + 자산화. chain harness 5 요소 변경 ❌ 보존.
+
+★ chain 1 gate Layer 2 통합 (★ chain-driver gate-eval.js) = ★ session 14차 본격 결단 영역.
+
+### ★ ★ 다음 step (★ ★ session 14차)
+
+- ★ ★ ★ ★ chain 1 gate Layer 2 통합 (★ chain-driver gate-eval.js / chain harness 5 요소 1 변경 의무)
+- ★ Phase C SESSION-WRAPUP
+- ★ ★ ★ ★ ★ ★ Phase D = release-readiness 8/8 → 9/9 + PoC #01 도메인 전문가 검토 + v2.5.0 MINOR release
+
+---
+
+## [v2.4.0 carry update — session 12차 SESSION-WRAPUP — v2.5.0 Phase C step 1~5 시행] — 2026-05-14 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ no release / no version bump / no tag — Layer 2 LLM 본격 paradigm 구현 (Claude Code sub-agent invocation paradigm) + Senior STOP-1+2+3+4 흡수 + REVISE 5건 흡수 + validator interface 본격 + docs/layer-2-prompt-spec.md 신설 + test +5 (31/31) + workspace 308/0 + DEC 신설 + ADR §9 LL-i-37+38 + §11 patch v6 / Phase C step 6~12 = session 13차 분리)
 
 > ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 12차 — v2.5.0 Phase C step 1~5 시행** — ★ ★ session 11차 patch v5 paradigm 회복 후속 carry (C-phase-c-paradigm-redesign + C-claude-code-subagent-invocation-paradigm). ★ 4원칙 1단계 plan `~/.claude/plans/r-v2.5.0-phase-c-layer-2-claude-code-subagent.md` 자산화 → ★ ★ 4원칙 2단계 가벼운 Senior critique sub-agent 토론 → 4원칙 3단계 사용자 결단 "진행하자" → 4원칙 4단계 시행 + Lessons Learned.
 
