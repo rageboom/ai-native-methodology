@@ -23,12 +23,10 @@ function runCli(target) {
 }
 
 const FULL_META = {
-  artifact_type: 'planning-spec',
-  version: '0.1.0',
-  generated_by: 'human',
   generated_at: '2026-05-06T00:00:00Z',
+  methodology_version: 'v2.6.0',
   confidence: 0.85,
-  sample_size: 1,
+  inputs_used: ['source_code'],
 };
 
 test('★ chain — planning-spec.json 정합 instance → valid', () => {
@@ -36,7 +34,7 @@ test('★ chain — planning-spec.json 정합 instance → valid', () => {
   try {
     const inst = {
       $schema_origin: '../../schemas/planning-spec.schema.json',
-      meta: { ...FULL_META, artifact_type: 'planning-spec' },
+      meta: { ...FULL_META },
       derivation_source: { analysis_artifacts: ['./rules.json'] },
       use_cases: [
         {
@@ -116,7 +114,7 @@ test('★ chain — Ajv 8 if/then/else 지원 (acceptance-criteria verifiable=tr
   try {
     const inst = {
       $schema_origin: '../schemas/acceptance-criteria.schema.json',
-      meta: { ...FULL_META, artifact_type: 'acceptance-criteria' },
+      meta: { ...FULL_META },
       derivation_source: { behavior_spec_path: './behavior-spec.json', planning_spec_path: './planning-spec.json' },
       criteria: [
         {
@@ -155,7 +153,7 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invali
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
           id: 'BR-BILLING-005',
@@ -181,7 +179,7 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
           id: 'BR-USER-DATA-001',
@@ -207,7 +205,7 @@ test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
           id: 'BR-ARTICLE-AUTHOR-EDIT-ONLY-001',
@@ -234,7 +232,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json business_rules array (신표준) 
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
       project_id: 'test-project',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
           id: 'BR-USER-EMAIL-001',
@@ -255,7 +253,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json business_rules + GWT only 정합 
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
           id: 'BR-ORDER-CANCEL-001',
@@ -278,7 +276,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json 두 표현 모두 부재 → inva
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         { id: 'BR-EMPTY-FAIL-001', name: '빈 BR' },
       ],
@@ -295,7 +293,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json v1.x rules array backward-compat 
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
           id: 'BR-LEGACY-COMPAT-001',
@@ -319,7 +317,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json paradigm: FE + rules_manual_autho
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
       paradigm: 'FE',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules_manual_authored: [
         {
           id: 'BR-FE-VALIDATION-001',
@@ -341,7 +339,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json description alias (★ deprecated
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
           id: 'BR-DESC-COMPAT-001',
@@ -362,7 +360,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json trigger/condition/action 변형 (
   try {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
-      meta: { ...FULL_META, artifact_type: 'rules', inputs_used: ['source_code'] },
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
           id: 'BR-TRIGGER-VARIANT-001',
@@ -385,7 +383,7 @@ test('★ chain — schema-validator --json 출력 schema 매칭 정합 (6 chain
   try {
     writeFileSync(join(dir, 'test-spec.json'), JSON.stringify({
       $schema_origin: '../schemas/test-spec.schema.json',
-      meta: { ...FULL_META, artifact_type: 'test-spec' },
+      meta: { ...FULL_META },
     }));
     const r = runCli(join(dir, 'test-spec.json'));
     const result = r.parsed.results[0];

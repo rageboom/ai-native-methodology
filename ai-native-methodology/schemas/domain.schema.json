@@ -4,6 +4,7 @@
   "title": "도메인 모델 (Domain Model) — DDD-Lite B",
   "description": "도메인 어휘 + 전술 패턴(Aggregate, VO, Repository) 까지. 전략 설계(Context Map)는 v1.2로 보류.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "bounded_contexts"],
   "properties": {
     "meta": {

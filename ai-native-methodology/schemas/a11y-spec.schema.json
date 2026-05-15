@@ -10,6 +10,7 @@
     "wai_aria_1_2": "https://www.w3.org/TR/wai-aria-1.2/"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "scope", "violations", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

@@ -17,6 +17,7 @@
     "ratification_source": "ADR-FE-005 §2.2.3 cross-check 권고 #3"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "default_locale", "supported_locales", "resources", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

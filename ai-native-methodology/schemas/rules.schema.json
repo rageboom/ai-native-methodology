@@ -4,6 +4,7 @@
   "title": "비즈니스 규칙 (Business Rules) — v2.4.0 dual representation paradigm",
   "description": "★ ★ ★ ★ v2.4.0 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. top-level `business_rules` (★ 기존 `rules` alias 보존 / anyOf top-level). PoC #04 FE 트랙은 `paradigm: FE` discriminator + rules_auto_extracted_reference + rules_manual_authored alias 허용. 11 PoC 호환 회복 자격 (★ ADR-CHAIN-011 §5.2 / Plan M+ §2-1 정합).",
   "type": "object",
+  "additionalProperties": false,
   "anyOf": [
     {
       "title": "v2.4.0 표준 — business_rules array",

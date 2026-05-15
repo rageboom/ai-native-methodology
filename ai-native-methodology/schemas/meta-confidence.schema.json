@@ -4,6 +4,7 @@
   "title": "신뢰도 메타데이터 (Confidence Metadata)",
   "description": "모든 산출물에 필수로 포함되는 메타데이터. 출처와 신뢰도를 명시함.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["generated_at", "confidence", "inputs_used"],
   "properties": {
     "generated_at": {

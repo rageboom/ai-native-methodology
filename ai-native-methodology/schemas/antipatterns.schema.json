@@ -4,6 +4,7 @@
   "title": "안티패턴 카탈로그 (Antipatterns)",
   "description": "재구현 시 회피해야 할 후보 목록. 비난 톤이 아닌 '회피 후보' 톤으로 작성.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "antipatterns"],
   "properties": {
     "meta": {

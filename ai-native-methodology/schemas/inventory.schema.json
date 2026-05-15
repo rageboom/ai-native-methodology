@@ -4,6 +4,7 @@
   "title": "인벤토리 (Inventory)",
   "description": "Phase 1 (init) 산출물. 분석 대상 레포의 구조·스택·규모. v1.1.2 신설 (F-007). schema = SoT, phase-1-init.md §4.2 는 reference sample.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "repo", "stack"],
   "properties": {
     "meta": {

@@ -4,6 +4,7 @@
   "title": "Finding System (명세 빈틈 기록)",
   "description": "PoC 진행 중 발견한 명세 빈틈을 기록·분류·처리하는 표준. v1.2.0 신설 (M-P1 #1). methodology-spec/finding-system.md 의 §3 표준 형식 + PoC #01/#02 운영 경험 반영. SoT.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["finding_id", "phase", "discovered_at", "discoverer", "description", "spec_gap", "decision_made", "severity"],
   "properties": {
     "finding_id": {

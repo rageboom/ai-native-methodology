@@ -10,6 +10,7 @@
     "wcag_versions": ["2.1", "2.2"]
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "snapshots", "manifest_summary"],
   "properties": {
     "meta": {

@@ -4,6 +4,7 @@
   "title": "Formal Spec (형식 명세)",
   "description": "Phase 4.5 산출물. 자연어 빈약성 (44%) 보완 + AI 코드 생성 정확도 (60% → 90%) 향상. v1.2.0 신설 (묶음 L). PoC #02 C-Sprint 1+1.5+2 정량 입증. ADR-008 (이중 렌더링) + ADR-009 (다이어그램 신뢰 모델) 정합.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "state_machines", "sequences", "decision_tables", "invariants", "property_tests"],
   "properties": {
     "meta": {

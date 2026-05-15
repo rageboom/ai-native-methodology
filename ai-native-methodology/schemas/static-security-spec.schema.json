@@ -11,6 +11,7 @@
     "cwe": "https://cwe.mitre.org/"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "scope", "findings", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

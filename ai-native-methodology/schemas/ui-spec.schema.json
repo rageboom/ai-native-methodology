@@ -4,6 +4,7 @@
   "title": "UI/UX 명세 (UI/UX Specification)",
   "description": "FE 영역 산출물. 페이지/사용자 흐름/컴포넌트 트리/디자인 토큰/사용자 시나리오. FSD + Atomic Design 호환.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "pages"],
   "properties": {
     "meta": {

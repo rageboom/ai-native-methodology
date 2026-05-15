@@ -8,6 +8,7 @@
     "monolith_to_microservices": "Sam Newman, O'Reilly 2019"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "tier_detection", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

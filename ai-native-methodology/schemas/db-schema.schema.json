@@ -4,6 +4,7 @@
   "title": "DB 스키마 (Database Schema)",
   "description": "DB 테이블/컬럼/관계 통합 표현. 다중 출처 (ERD/ORM/운영DB)에서 통합되며 출처 추적 메타 포함.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "tables"],
   "properties": {
     "meta": {

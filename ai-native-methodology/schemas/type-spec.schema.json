@@ -8,6 +8,7 @@
     "ts_morph": "https://ts-morph.com/"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "types", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

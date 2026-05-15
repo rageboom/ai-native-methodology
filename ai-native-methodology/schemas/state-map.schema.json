@@ -9,6 +9,7 @@
     "xstate_compat": "XState v5+ SCXML import"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "state_sources", "machines"],
   "properties": {
     "meta": {

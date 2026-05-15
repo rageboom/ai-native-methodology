@@ -13,6 +13,7 @@
     "vest": "https://vestjs.dev/"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "source_libraries", "validations", "summary"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },

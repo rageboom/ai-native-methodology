@@ -4,6 +4,7 @@
   "title": "API 계약 확장 메타 (OpenAPI Extension)",
   "description": "OpenAPI 3.1 yaml에 추가로 동반되는 우리 방법론 전용 메타. operationId 기반으로 도메인/규칙과 연결.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "openapi_file", "operations"],
   "properties": {
     "meta": {

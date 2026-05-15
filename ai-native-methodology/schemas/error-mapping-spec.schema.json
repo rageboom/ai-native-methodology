@@ -11,6 +11,7 @@
     "owasp_api_top10": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
   },
   "type": "object",
+  "additionalProperties": false,
   "required": ["meta", "scope", "exception_handlers", "http_status_mapping", "negative_evidence", "framework_neutrality_score"],
   "properties": {
     "meta": { "$ref": "./meta-confidence.schema.json" },
