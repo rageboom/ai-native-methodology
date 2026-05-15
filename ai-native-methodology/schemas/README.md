@@ -1,6 +1,6 @@
-# JSON Schemas (★ v2.1.0 phase 4.7 characterization 본체 격상)
+# JSON Schemas (★ v2.2.0 phase 4.7+4.8 격상 / v2.1.0 phase 4.7 characterization)
 
-> **30 schema** = chain v2 (6) + state 영속 (3) + analysis BE 5 + analysis FE 8 + cross-cutting 4 + ★ characterization 1 (v2.1.0 신설) + 메타 + 유틸. JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식.
+> **31 schema** = chain v2 (6) + state 영속 (3) + Analysis BE (5) + Analysis FE (5) + aspect FE (4) + ★ characterization 1 (v2.1.0) + ★ sql-inventory 1 (v2.2.0) + error-mapping 1 (v1.5.0) + 메타+유틸 (5). JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식 + top-level `additionalProperties: false` strict (★ D9 / v3.1.x).
 
 ---
 

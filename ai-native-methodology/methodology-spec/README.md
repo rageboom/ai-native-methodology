@@ -59,6 +59,13 @@
 | `.aimd/intervention-log.jsonl` (사용자 결단 로그) | `intervention-log.schema.json` |
 | 도구 호출 명세 | `test-cmd.schema.json` |
 
+### 공통 메타+유틸 (모든 산출물 횡단)
+
+| 자산 | schema | 적용 영역 |
+|---|---|---|
+| 신뢰도 메타 | `meta-confidence.schema.json` | 모든 산출물 (생성 시각 / 신뢰도 0.0~0.98 / 출처 / cap 0.98) |
+| finding 체계 | `finding-system.schema.json` | 모든 phase / chain stage (등록·분류·처리) |
+
 ## Cross-cutting 정책 (횡단 적용)
 
 | 파일 | 역할 | 적용 |
