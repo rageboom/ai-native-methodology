@@ -54,7 +54,7 @@ After this skill completes, the user has:
 - `.aimd/baseline-<date>.json` committed
 - Ratchet policy declared
 - CI configured (or template provided)
-- Next-step prompt: "Phase 0 진입 가능. `/methodology:phase-0-input` 호출."
+- Next-step prompt: "Phase 0 진입 가능. `/methodology:input` 호출."
 
 ## Refuse to skip
 

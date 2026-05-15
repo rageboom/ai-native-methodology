@@ -134,7 +134,7 @@ DAG: `flows/sdlc-4stage-flow.{json,mermaid}` (★ master SSOT) + chain stage flo
 
 ### 시나리오 A — analysis stage 만 (legacy 분석 / chain 1 미진입)
 
-1. **Phase 0 진입**: 자연어 prompt "이 코드베이스 분석 시작해줘" → `phase-0-input` skill 자동 발동
+1. **Phase 0 진입**: 자연어 prompt "이 코드베이스 분석 시작해줘" → `input` skill 자동 발동
 2. **Phase 1~6 + 4.5 진입**: 자연어 prompt 또는 `methodology-spec/workflow/phase-N-*.md` 직접 참조
 3. **모든 산출물 add/edit** 시 검증 도구 실행 (drift-validator / decision-table-validator / spectral-runner / static-runner)
 4. **Phase 6 종결** = analysis stage 완료 (7대 산출물 + finding + antipatterns + migration-cautions 산출)
@@ -156,7 +156,7 @@ DAG: `flows/sdlc-4stage-flow.{json,mermaid}` (★ master SSOT) + chain stage flo
 
 | 자연어 prompt | 발동 skill |
 |---|---|
-| "이 코드베이스 분석 시작" | `phase-0-input` |
+| "이 코드베이스 분석 시작" | `input` |
 | "기획 단계 시작" | `extract-from-legacy` |
 | "use case 분해" | `decompose-use-cases` |
 | "behavior spec 만들어" | `compose-behavior-spec` |

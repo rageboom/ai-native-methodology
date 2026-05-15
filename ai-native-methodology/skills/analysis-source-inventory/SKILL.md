@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- `<user-project>/.aimd/phase-0-input.json` 존재 (analysis-input-collection 완료)
+- `<user-project>/.aimd/input.json` 존재 (analysis-input-collection 완료)
 
 ## 절차
 

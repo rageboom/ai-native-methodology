@@ -3,7 +3,7 @@
   "meta": {
     "generated_at": "2026-04-30",
     "generator": "ai-native-methodology v1.2.2",
-    "phase": "5-1",
+    "phase": "api",
     "phase_name": "API 계약",
     "poc_id": "poc-03-realworld-nestjs",
     "raw_confidence": 0.90,

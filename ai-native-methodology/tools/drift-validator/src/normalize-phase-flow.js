@@ -115,19 +115,21 @@ export function normalizePhaseFlow(text) {
   };
 }
 
-// "Phase 4.5 — ..." 라벨에서 "4.5" 추출.
+// "Phase X — ..." 라벨에서 X 추출. v3.0.0 — 의미 ID 지원 (input/discovery/db-schema/...).
+// backward 호환 — 옛 숫자 ID ("4.5", "5-1") 도 매칭.
 function derivePhaseIdFromLabel(label) {
   if (!label) return null;
   // 라벨에서 따옴표 / 백틱 제거.
   const cleaned = String(label).replace(/^["'`]+|["'`]+$/g, '');
-  const m = cleaned.match(/Phase\s+([\d.\-]+)/i);
+  const m = cleaned.match(/Phase\s+([\w\-.]+)/i);
   if (m) return normalizePhaseId(m[1]);
   return null;
 }
 
-// fallback: P prefix 제거 + `_` → `-` (예: P5_1 → "5-1").
+// fallback: P 또는 P_ prefix 제거 + `_` → `-`.
+// 예: P_db_schema → "db-schema" (v3.0.0) / P5_1 → "5-1" (옛 호환) / P0 → "0" (옛 호환).
 function derivePhaseIdFromSubId(subId) {
-  return subId.replace(/^P/, '').replace(/_/g, '-');
+  return subId.replace(/^P_?/, '').replace(/_/g, '-');
 }
 
 function byEdge(a, b) {

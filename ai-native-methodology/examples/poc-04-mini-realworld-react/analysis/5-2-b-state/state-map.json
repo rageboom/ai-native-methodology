@@ -2,7 +2,7 @@
   "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json (★ Stage 3-1 신설 / SCXML 1.0 + XState v5 호환)",
   "meta": {
     "poc_id": "poc-04-mini",
-    "phase": "5-2-b-state",
+    "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "framework_neutral_format": "★ XState JSON 단일 진실 + SCXML subset compatible (states/transitions/events/guards)",

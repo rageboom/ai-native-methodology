@@ -27,7 +27,7 @@ allowed-tools: Read, Glob, Grep, Bash
 4. **분석 가치 명시** — 사용자에게:
    - 본 방법론은 한 방향 추출기 (legacy → 7대 산출물). round-trip 검증 안 함.
    - 가치 명세 (CLAUDE.md ★★★) 사용자 확인.
-5. **메타 정보 기록** — `<user-project>/.aimd/phase-0-input.json`:
+5. **메타 정보 기록** — `<user-project>/.aimd/input.json`:
    ```json
    {
      "target": { "repo": "...", "commit": "...", "scope": "module-X" },
@@ -42,11 +42,11 @@ allowed-tools: Read, Glob, Grep, Bash
 
 ## 산출물
 
-`<user-project>/.aimd/phase-0-input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
+`<user-project>/.aimd/input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
 
 ## 본체 명세 참조
 
-- `methodology-spec/workflow/phase-0-input.md`
+- `methodology-spec/workflow/input.md`
 - `methodology-spec/lifecycle-contract.md` (단계 간 산출물 인터페이스)
 
 ## When NOT to invoke

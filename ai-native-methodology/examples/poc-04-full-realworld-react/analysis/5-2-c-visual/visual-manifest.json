@@ -4,7 +4,7 @@
     "poc_id": "poc-04-full",
     "stage": "5",
     "sprint": "5-3",
-    "phase": "5-2-c-visual",
+    "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "tool": "@playwright/test (chromium headless) + ADR-FE-002 4 viewport",

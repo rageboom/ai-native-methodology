@@ -3,7 +3,7 @@
   "meta": {
     "generated_at": "2026-04-29",
     "generator": "ai-native-methodology v1.1.2",
-    "phase": "5-1",
+    "phase": "api",
     "phase_name": "API 계약",
     "poc_id": "poc-01-realworld-spring",
     "raw_confidence": 0.93,

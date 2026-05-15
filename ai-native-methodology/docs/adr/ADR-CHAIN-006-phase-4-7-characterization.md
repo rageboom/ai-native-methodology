@@ -51,7 +51,7 @@ phase 0 → 1 → 2 → 3 → 4 → 4.5 → ★ 4.7 ★ → 5-1 + 5-2 (병렬) �
 
 ### 2. ★ ★ ★ 단일 prompt 양 spectrum (Cursor/Cline/Aider 표준 정합 / DEC-2026-05-07-poc-07 §6 정합)
 
-skill prompt 분기 **❌** — Modern vs Legacy 별도 prompt 신설 ❌. `skills/analysis-phase-4-7-characterization/SKILL.md` 단일 prompt 가 양 spectrum 모두에서 동작.
+skill prompt 분기 **❌** — Modern vs Legacy 별도 prompt 신설 ❌. `skills/analysis-characterization/SKILL.md` 단일 prompt 가 양 spectrum 모두에서 동작.
 
 자연어 hint 한 줄 (★ 분기 ❌ / hint 만):
 - **Legacy 의심 신호** (자조 코멘트 ↑ + 적대성 4중 + iBATIS / JSP) → ambiguous ↑ 가능성 → 도메인 expert carry 강조
@@ -114,7 +114,7 @@ coverage:
 | deliverable 23 | `methodology-spec/deliverables/23-characterization-spec.md` | 산출물 명세 (★ #16~22 사용 중 / 23 신규) |
 | schema | `schemas/characterization-spec.schema.json` (★ 30번째) | 4 sub-schema (snapshot + scenario + intentVsBug + coverage) + if/then 강제 |
 | meta-confidence enum | `schemas/meta-confidence.schema.json` `inputs_used` 12 → 13 (`characterization` 추가) | input 출처 명시 |
-| skill | `skills/analysis-phase-4-7-characterization/SKILL.md` | 단일 prompt 양 spectrum (skills 19 → 20) |
+| skill | `skills/analysis-characterization/SKILL.md` | 단일 prompt 양 spectrum (skills 19 → 20) |
 | tool | `tools/characterization-coverage-validator/` (★ workspace 13번째) | 8 검증 + 10 unit test |
 | flow | `flows/analysis.phase-flow.{json,mermaid}` v1.5.0 → v2.1.0 | phase 4.7 entry + 5-x depends_on 갱신 |
 

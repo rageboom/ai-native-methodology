@@ -3,7 +3,7 @@
 - 상태: **승인 (Final / v1.2.3)** — ★ provisional → final 격상 (3 PoC 검증 후)
 - 일자: 2026-04-28 (provisional) / 2026-04-30 (final 격상)
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001, ADR-004, schemas/architecture.schema.json, methodology-spec/workflow/phase-3-arch.md §3.1.1, DEC-2026-04-30-v1.2.3-본체-격상
+- 관련: ADR-001, ADR-004, schemas/architecture.schema.json, methodology-spec/workflow/architecture.md §3.1.1, DEC-2026-04-30-v1.2.3-본체-격상
 
 ---
 
@@ -139,7 +139,7 @@ case research (8개 시스템 조사) 결과:
 ## 영향 범위
 
 - `schemas/architecture.schema.json`: `circular_dependencies[]` 신규 필드 5개 (bc_status, bc_assignment_explicit, documented_decision, decision_required, decision_owner, decision_deadline, phase_4_routing). 모두 옵셔널 → v1.1.1 호환.
-- `methodology-spec/workflow/phase-3-arch.md` §3.1.1: 분기 가이드 추가
+- `methodology-spec/workflow/architecture.md` §3.1.1: 분기 가이드 추가
 - `examples/poc-01-realworld-spring/`: CIRCULAR-001 재기록 시 `bc_status=undefined` 적용
 - 향후 v1.2 Context Map ADR (예정): bc_status 자동 분류 가능
 

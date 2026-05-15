@@ -2,7 +2,7 @@
 
 > **사상**: 이중 렌더링 (ADR-008 — AI 눈 JSON + 사람 눈 mermaid) + 자연어 빈약성 보완 (자연어 60% → 형식 90%)
 > **schema**: `schemas/formal-spec.schema.json` · **template**: `templates/formal-spec.template.md` 외 4건
-> **생성 phase**: Phase 4.5 (`workflow/phase-4-5-formal-spec.md`)
+> **생성 phase**: Phase 4.5 (`workflow/formal-spec.md`)
 
 ---
 

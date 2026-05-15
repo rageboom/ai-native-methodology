@@ -54,7 +54,7 @@ provenance:
 
 ```bash
 # Claude Code 진입 후
-@methodology-spec/workflow/phase-0-input.md   # phase 명세 참조
+@methodology-spec/workflow/input.md   # phase 명세 참조
 @templates/inventory/                             # 템플릿 참조
 ```
 

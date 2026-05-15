@@ -7,7 +7,7 @@
     "extraction_env": "git_clone",
     "methodology_version": "v1.1.2",
     "formula_version": "v1",
-    "phase": "6",
+    "phase": "quality",
     "phase_name": "안티패턴 통합 (quality)",
     "inputs_used": ["source_code", "orm", "config_files", "domain_context_md", "phase_4_partial", "phase_5_candidate", "phase_4_additional_candidate"],
     "applied_modifiers": [

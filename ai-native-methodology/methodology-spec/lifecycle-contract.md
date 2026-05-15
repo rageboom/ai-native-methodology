@@ -181,7 +181,7 @@ input (implement stage 가 받음):
 ```
 <user-project>/
 ├── .aimd/
-│   ├── phase-0-input.json           # analysis-input-collection skill 메타 (★ ★ user project file 명 = manifest phase ID axis / 본격 짧음 형식)
+│   ├── input.json           # analysis-input-collection skill 메타 (★ ★ user project file 명 = manifest phase ID axis / 본격 짧음 형식)
 │   ├── baseline-<date>.json         # ADR-010 baseline+ratchet
 │   ├── findings.md                  # finding 누적
 │   └── output/                      # 분석 stage 산출물 (15종 중 해당분)

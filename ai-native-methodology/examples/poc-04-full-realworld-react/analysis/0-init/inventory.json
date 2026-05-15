@@ -9,7 +9,7 @@
     "pushed_at": "2026-04-25T20:41:13Z",
     "captured_at": "2026-05-02",
     "captured_by": "real",
-    "phase": "0-init",
+    "phase": "input",
     "stage_4_mini_cross_reference": {
       "workspace": "examples/poc-04-mini-realworld-react/",
       "shared_input": true,

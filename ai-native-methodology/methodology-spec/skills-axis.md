@@ -106,15 +106,15 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 | Manifest phase ID | spec_file | skills (디렉토리명) |
 |---|---|---|
-| 0 | phase-0-input.md | analysis-input-collection |
-| 1 | phase-1-init.md | analysis-source-inventory |
-| 2 (db) | phase-2-db.md | analysis-db-schema-erd |
-| 3 (arch) | phase-3-arch.md | analysis-architecture |
-| 4 (business-logic) | phase-4-business-logic.md | analysis-domain-model, analysis-business-rules, analysis-form-validation-fe |
-| 4.5 (formal-spec) | phase-4-5-formal-spec.md | analysis-formal-spec-validation |
-| 5-1 (api) | phase-5-1-api.md | analysis-openapi, analysis-api-rule-mapping, **analysis-error-mapping** (★ v1.5.0 신설) |
-| 5-2 (ui) | phase-5-2-ui.md | analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-type-spec-fe |
-| 6 (quality) | phase-6-quality.md | analysis-quality-antipattern |
+| 0 | input.md | analysis-input-collection |
+| 1 | discovery.md | analysis-source-inventory |
+| 2 (db) | db-schema.md | analysis-db-schema-erd |
+| 3 (arch) | architecture.md | analysis-architecture |
+| 4 (business-logic) | business-logic.md | analysis-domain-model, analysis-business-rules, analysis-form-validation-fe |
+| 4.5 (formal-spec) | formal-spec.md | analysis-formal-spec-validation |
+| 5-1 (api) | api.md | analysis-openapi, analysis-api-rule-mapping, **analysis-error-mapping** (★ v1.5.0 신설) |
+| 5-2 (ui) | ui.md | analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-type-spec-fe |
+| 6 (quality) | quality.md | analysis-quality-antipattern |
 | **cross-cutting (aspects)** | (없음) | analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy |
 | **cross-cutting (base) (★ ★ ★ v2.6.0 신설)** | (없음 / 본격 ★ cross-invocation 영역) | _base-apply-baseline-ratchet (★ analysis-input-collection Phase 0 prerequisite), _base-apply-template (★ template 적용 cross-invocation), _base-log-finding (★ 모든 skill finding 등재 cross-invocation) |
 
@@ -198,14 +198,14 @@ v2.5.1 까지 analysis stage skill 17 디렉토리 = `analysis-phase-N-{slug}/` 
 
 | v2.5.1 | v2.6.0 | manifest phase |
 |---|---|---|
-| analysis-phase-0-input | **analysis-input-collection** | 0 |
+| analysis-input | **analysis-input-collection** | 0 |
 | analysis-phase-1-inventory | **analysis-source-inventory** | 1 |
 | analysis-phase-2-architecture | **analysis-architecture** | 3 (arch) |
 | analysis-phase-3-domain | **analysis-domain-model** | 4 (BL) |
 | analysis-phase-4-rules | **analysis-business-rules** | 4 (BL) |
 | analysis-phase-4-5-cross-validation | **analysis-formal-spec-validation** | 4.5 |
-| analysis-phase-4-7-characterization | **analysis-characterization-test** | 4.7 |
-| analysis-phase-4-8-sql-inventory | **analysis-sql-inventory** | 4.8 |
+| analysis-characterization | **analysis-characterization-test** | 4.7 |
+| analysis-sql-inventory | **analysis-sql-inventory** | 4.8 |
 | analysis-phase-5-error-mapping | **analysis-error-mapping** | 5-1 (api) |
 | analysis-phase-5-form-validation | **analysis-form-validation-fe** | 4 (BL) |
 | analysis-phase-5-openapi | **analysis-openapi** | 5-1 (api) |
@@ -214,7 +214,7 @@ v2.5.1 까지 analysis stage skill 17 디렉토리 = `analysis-phase-N-{slug}/` 
 | analysis-phase-5-state-map | **analysis-ui-state-map-fe** | 5-2 (ui) |
 | analysis-phase-5-type-spec | **analysis-type-spec-fe** | 5-2 (ui) |
 | analysis-phase-5-visual-manifest | **analysis-ui-visual-manifest-fe** | 5-2 (ui) |
-| analysis-phase-6-quality | **analysis-quality-antipattern** | 6 (quality) |
+| analysis-quality | **analysis-quality-antipattern** | 6 (quality) |
 
 변경 ❌: aspect 4 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-aspect-static-security` / `analysis-aspect-legacy`) + `analysis-br-cross-consistency-check` (v2.5 신규 / 이미 의미 ID).
 

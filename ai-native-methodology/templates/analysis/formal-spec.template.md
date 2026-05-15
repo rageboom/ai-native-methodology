@@ -1,7 +1,7 @@
 # Formal Spec — 작성 가이드 (Phase 4.5 산출물)
 
 > 본 template 은 Phase 4.5 형식 명세 5 산출물 작성 가이드.
-> 관련 명세: `methodology-spec/workflow/phase-4-5-formal-spec.md` + `methodology-spec/deliverables/4-5-formal-spec.md`
+> 관련 명세: `methodology-spec/workflow/formal-spec.md` + `methodology-spec/deliverables/4-5-formal-spec.md`
 > 관련 schema: `schemas/formal-spec.schema.json`
 
 ---

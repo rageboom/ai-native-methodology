@@ -7,7 +7,7 @@
     "extraction_env": "git_clone (re-cloned for Phase 5-1)",
     "methodology_version": "v1.2.2",
     "formula_version": "v1",
-    "phase": "6",
+    "phase": "quality",
     "phase_name": "안티패턴 통합 (quality)",
     "poc_id": "poc-03-realworld-nestjs",
     "inputs_used": [

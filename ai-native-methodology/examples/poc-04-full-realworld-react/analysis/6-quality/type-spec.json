@@ -2,7 +2,7 @@
   "$schema_origin": "ai-native-methodology/schemas/type-spec.schema.json (★ Stage 7-pre)",
   "meta": {
     "poc_id": "poc-04-mini",
-    "phase": "6-quality",
+    "phase": "quality",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "tool": "ts-morph",

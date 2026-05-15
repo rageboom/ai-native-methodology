@@ -37,7 +37,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-6-quality.md`
+- `methodology-spec/workflow/quality.md`
 - `methodology-spec/deliverables/06-finding-list.md`
 - `schemas/antipatterns.schema.json`
 - DEC-2026-04-29-안티패턴-마이그레이션-가이드

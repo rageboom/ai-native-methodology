@@ -79,7 +79,7 @@ API 카테고리는 `openapi-extension.schema.json` allOf if-then 으로 **forma
   sequence_diagrams: ["../formal-spec/sequence-diagrams/UC-USER-DELETE.json"]
 ```
 
-→ Phase 5-1 input 의 Phase 4.5 의존 정합 (`workflow/phase-5-1-api.md` §2). request/response schema 가 formal-spec decision-tables 와 매핑 가능해야 함.
+→ Phase 5-1 input 의 Phase 4.5 의존 정합 (`workflow/api.md` §2). request/response schema 가 formal-spec decision-tables 와 매핑 가능해야 함.
 
 ---
 

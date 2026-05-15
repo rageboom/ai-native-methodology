@@ -133,10 +133,10 @@ PoC #07 D12 (b) nested patterns object 패턴. 4 패턴 (dynamic_branch / calcul
 1. ✅ `methodology-spec/deliverables/24-sql-inventory.md` (★ #23 사용 / #24 신규)
 2. ✅ `schemas/sql-inventory.schema.json` (★ 31번째 schema)
 3. ✅ `schemas/meta-confidence.schema.json` `inputs_used` enum 13 → 14 (`sql_inventory` 추가)
-4. ✅ `skills/analysis-phase-4-8-sql-inventory/SKILL.md` (★ skills 20 → 21)
+4. ✅ `skills/analysis-sql-inventory/SKILL.md` (★ skills 20 → 21)
 5. ✅ `tools/sql-inventory-extractor/` (★ workspace 14번째 / 10 unit test)
 6. ✅ `flows/analysis.phase-flow.{json,mermaid}` v2.1.0 → v2.2.0-rc1 (phase 4.8 entry + 5-1 depends_on 갱신)
-7. ✅ `methodology-spec/workflow/phase-4-8-sql-inventory.md` (drift-validator 3-way 회귀 통과)
+7. ✅ `methodology-spec/workflow/sql-inventory.md` (drift-validator 3-way 회귀 통과)
 8. ✅ ADR-CHAIN-007 (본 문서 / 5 정책 명문화)
 
 ★ ★ ★ chain harness 5 요소 변경 ❌ — analysis stage 내부 phase 추가만.
@@ -166,7 +166,7 @@ PoC #07 D12 (b) nested patterns object 패턴. 4 패턴 (dynamic_branch / calcul
 ## 변경 요약 (commit cadence)
 
 - C1 (`f64e0b2`) — deliverable 24 + schema 31번째 + meta-confidence enum
-- C2 (`4d87416`) — skill phase-4-8-sql-inventory
+- C2 (`4d87416`) — skill sql-inventory
 - C3 — tool sql-inventory-extractor + 10 unit test + workspace 14번째
 - C4 — flow + ADR-CHAIN-007 + workflow (★ 본 commit)
 - C5 — drift-validator 회귀 + version bump v2.1.1 → v2.2.0-rc1 + build dist + CHANGELOG

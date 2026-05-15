@@ -7,7 +7,7 @@
     "extraction_env": "git_clone",
     "methodology_version": "v1.1.2",
     "formula_version": "v1",
-    "phase": "6",
+    "phase": "quality",
     "phase_name": "안티패턴 통합 (quality)",
     "poc_id": "poc-02-realworld-springboot3",
     "inputs_used": [

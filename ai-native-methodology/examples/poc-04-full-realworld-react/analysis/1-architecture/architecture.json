@@ -4,7 +4,7 @@
     "poc_id": "poc-04-full",
     "stage": "5",
     "sprint": "5-3",
-    "phase": "1-architecture",
+    "phase": "architecture",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "tool": "ts-morph + manual analysis"

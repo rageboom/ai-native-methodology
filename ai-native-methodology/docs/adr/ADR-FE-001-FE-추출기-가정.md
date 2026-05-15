@@ -14,7 +14,7 @@
 v1.3.0 까지 본 방법론은 **BE 영역 (Spring Boot / NestJS) 만 입증** 되었다. PoC #01/#02 (Java/Spring) + PoC #03 (TypeScript/NestJS) = platform-agnostic 입증 ✅. 그러나:
 
 - `methodology-spec/deliverables/7-ui-ux.md` 는 v1.1 신설 후 **PoC 입증 0회**.
-- `methodology-spec/workflow/phase-5-2-ui.md` 도 BE 산출 흐름 inverse 로만 작성.
+- `methodology-spec/workflow/ui.md` 도 BE 산출 흐름 inverse 로만 작성.
 - 사용자 진단 (2026-05-01): **"FE 분석 방법이 없잖아"**.
 
 Stage 1 research × 3 (공식문서 / 산업사례 / Senior) 의 합의:
@@ -215,7 +215,7 @@ JSP / Thymeleaf / ERB 의 server-side template 은 **BE 와 FE 가 통합 산출
 - `methodology-spec/workflow/phase-5-2-a-ui-base.md` 신설
 - `methodology-spec/workflow/phase-5-2-b-state.md` 신설
 - `methodology-spec/workflow/phase-5-2-c-visual.md` 신설
-- `methodology-spec/workflow/phase-5-2-ui.md` → redirect stub
+- `methodology-spec/workflow/ui.md` → redirect stub
 
 ### 8.4 도구 시범 (Stage 3-1 Phase E)
 

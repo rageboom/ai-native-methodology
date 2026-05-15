@@ -6,7 +6,7 @@
 
 | 영역 | 파일 | 역할 |
 |---|---|---|
-| **`workflow/`** (11) | `phase-0-input.md` ~ `phase-6-quality.md` + 4.5 + 5-2 분기 | analysis stage 의 phase 명세 (★ chain 1 진입 전 단계) |
+| **`workflow/`** (11) | `input.md` ~ `quality.md` + 4.5 + 5-2 분기 | analysis stage 의 phase 명세 (★ chain 1 진입 전 단계) |
 | **`deliverables/`** (22) | `1-architecture.md` ~ `7-ui-ux.md` + 8~22 | 7대 산출물 + chain v2 산출물 6 + FE 8 명세 |
 | **cross-cutting** | `glossary-ko.md` / `id-conventions.md` / `finding-system.md` / `lifecycle-contract.md` / `skills-axis.md` / `be-fe-separation.md` / `migration-cautions-fe.md` | 횡단 정책 |
 
@@ -16,17 +16,17 @@
 
 | phase | workflow | deliverable | schema |
 |---|---|---|---|
-| 0 | [`workflow/phase-0-input.md`](./workflow/phase-0-input.md) | (입력 정리) | — |
-| 1 (init) | [`workflow/phase-1-init.md`](./workflow/phase-1-init.md) | inventory | `inventory.schema.json` |
-| 2 (db) | [`workflow/phase-2-db.md`](./workflow/phase-2-db.md) | [`4-db-schema`](./deliverables/4-db-schema.md) | `db-schema.schema.json` |
-| 3 (arch) | [`workflow/phase-3-arch.md`](./workflow/phase-3-arch.md) | [`1-architecture`](./deliverables/1-architecture.md) | `architecture.schema.json` |
-| 4 (business-logic) | [`workflow/phase-4-business-logic.md`](./workflow/phase-4-business-logic.md) | [`2-domain`](./deliverables/2-domain.md) + [`5-business-rules`](./deliverables/5-business-rules.md) | `domain.schema.json` + `rules.schema.json` |
-| 4.5 (formal-spec) | [`workflow/phase-4-5-formal-spec.md`](./workflow/phase-4-5-formal-spec.md) | [`4-5-formal-spec`](./deliverables/4-5-formal-spec.md) | `formal-spec.schema.json` |
-| 5-1 (api) | [`workflow/phase-5-1-api.md`](./workflow/phase-5-1-api.md) | [`3-api`](./deliverables/3-api.md) | `openapi-extension.schema.json` |
+| 0 | [`workflow/input.md`](./workflow/input.md) | (입력 정리) | — |
+| 1 (init) | [`workflow/discovery.md`](./workflow/discovery.md) | inventory | `inventory.schema.json` |
+| 2 (db) | [`workflow/db-schema.md`](./workflow/db-schema.md) | [`4-db-schema`](./deliverables/4-db-schema.md) | `db-schema.schema.json` |
+| 3 (arch) | [`workflow/architecture.md`](./workflow/architecture.md) | [`1-architecture`](./deliverables/1-architecture.md) | `architecture.schema.json` |
+| 4 (business-logic) | [`workflow/business-logic.md`](./workflow/business-logic.md) | [`2-domain`](./deliverables/2-domain.md) + [`5-business-rules`](./deliverables/5-business-rules.md) | `domain.schema.json` + `rules.schema.json` |
+| 4.5 (formal-spec) | [`workflow/formal-spec.md`](./workflow/formal-spec.md) | [`4-5-formal-spec`](./deliverables/4-5-formal-spec.md) | `formal-spec.schema.json` |
+| 5-1 (api) | [`workflow/api.md`](./workflow/api.md) | [`3-api`](./deliverables/3-api.md) | `openapi-extension.schema.json` |
 | 5-2-a (ui-base) | [`workflow/phase-5-2-a-ui-base.md`](./workflow/phase-5-2-a-ui-base.md) | [`7-ui-ux`](./deliverables/7-ui-ux.md) + [`9-visual-manifest`](./deliverables/9-visual-manifest.md) | `ui-spec.schema.json` + `visual-manifest.schema.json` |
 | 5-2-b (state) | [`workflow/phase-5-2-b-state.md`](./workflow/phase-5-2-b-state.md) | [`8-state-map`](./deliverables/8-state-map.md) + [`14-form-validation-spec`](./deliverables/14-form-validation-spec.md) | `state-map.schema.json` + `form-validation-spec.schema.json` |
 | 5-2-c (visual) | [`workflow/phase-5-2-c-visual.md`](./workflow/phase-5-2-c-visual.md) | [`15-type-spec`](./deliverables/15-type-spec.md) | `type-spec.schema.json` |
-| 6 (quality) | [`workflow/phase-6-quality.md`](./workflow/phase-6-quality.md) | [`6-antipatterns`](./deliverables/6-antipatterns.md) | `antipatterns.schema.json` |
+| 6 (quality) | [`workflow/quality.md`](./workflow/quality.md) | [`6-antipatterns`](./deliverables/6-antipatterns.md) | `antipatterns.schema.json` |
 | 5-error-mapping (★ v1.5) | (skill `analysis-error-mapping`) | [`16-error-mapping-spec`](./deliverables/16-error-mapping-spec.md) | `error-mapping-spec.schema.json` |
 
 ### Cross-cutting (FE 8 / aspect)

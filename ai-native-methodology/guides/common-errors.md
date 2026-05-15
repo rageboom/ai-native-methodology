@@ -158,20 +158,20 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 **영향 범위**: 17 skill rename — aspect 4 + br-cross 1 = 변경 ❌ / chain stage (_base / planning / spec / test / implement) = 변경 ❌.
 
-**해결**: v2.5.1 명시 호출 (예 `/analysis-phase-0-input`) → v2.6.0 새 이름 (예 `/analysis-input-collection`) 본격 매핑. 자연어 trigger 영역 (description 기반 auto-invocation) = 영향 ❌ — 본격 description 영역 정합 보존.
+**해결**: v2.5.1 명시 호출 (예 `/analysis-input`) → v2.6.0 새 이름 (예 `/analysis-input-collection`) 본격 매핑. 자연어 trigger 영역 (description 기반 auto-invocation) = 영향 ❌ — 본격 description 영역 정합 보존.
 
 **전환 매핑** (★ ★ 본격 17 rename):
 
 | v2.5.1 명시 호출 | v2.6.0 명시 호출 |
 |---|---|
-| `/analysis-phase-0-input` | `/analysis-input-collection` |
+| `/analysis-input` | `/analysis-input-collection` |
 | `/analysis-phase-1-inventory` | `/analysis-source-inventory` |
 | `/analysis-phase-2-architecture` | `/analysis-architecture` |
 | `/analysis-phase-3-domain` | `/analysis-domain-model` |
 | `/analysis-phase-4-rules` | `/analysis-business-rules` |
 | `/analysis-phase-4-5-cross-validation` | `/analysis-formal-spec-validation` |
-| `/analysis-phase-4-7-characterization` | `/analysis-characterization-test` |
-| `/analysis-phase-4-8-sql-inventory` | `/analysis-sql-inventory` |
+| `/analysis-characterization` | `/analysis-characterization-test` |
+| `/analysis-sql-inventory` | `/analysis-sql-inventory` |
 | `/analysis-phase-5-error-mapping` | `/analysis-error-mapping` |
 | `/analysis-phase-5-form-validation` | `/analysis-form-validation-fe` |
 | `/analysis-phase-5-openapi` | `/analysis-openapi` |
@@ -180,7 +180,7 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 | `/analysis-phase-5-state-map` | `/analysis-ui-state-map-fe` |
 | `/analysis-phase-5-type-spec` | `/analysis-type-spec-fe` |
 | `/analysis-phase-5-visual-manifest` | `/analysis-ui-visual-manifest-fe` |
-| `/analysis-phase-6-quality` | `/analysis-quality-antipattern` |
+| `/analysis-quality` | `/analysis-quality-antipattern` |
 
 **alias map**: ❌ 의무 부재. v2.6.0 install 시 v2.5.1 명시 호출 ❌ — `methodology-spec/skills-axis.md` §6 paradigm 본격 진화 자산화.
 

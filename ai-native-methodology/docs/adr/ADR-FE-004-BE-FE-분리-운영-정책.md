@@ -149,7 +149,7 @@ JSP_통합_산출_절차:
 - `ADR-FE-001-FE-추출기-가정.md` §6 갱신 — Tier 4 carry → resolved
 - `ADR-FE-003-legacy-spectrum-정책.md` §2.4 갱신 — Tier 4 carry → resolved
 - `schemas/legacy-spectrum.schema.json` 보강 — `tier_4_be_fe_handling` enum (resolved 표기 가능)
-- `methodology-spec/workflow/phase-0-input.md` 보강 — Scenario A/B/C detection 절차
+- `methodology-spec/workflow/input.md` 보강 — Scenario A/B/C detection 절차
 
 ### 4.2 carry-over (Stage 5+)
 

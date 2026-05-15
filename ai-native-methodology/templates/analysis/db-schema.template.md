@@ -5,7 +5,7 @@
 
 > 작성일: {YYYY-MM-DD}
 > 분석 대상: `{repo}` (HEAD `{commit}`)
-> 명세: methodology-spec/workflow/phase-2-db.md (v{version}) §3.3 / §4.2
+> 명세: methodology-spec/workflow/db-schema.md (v{version}) §3.3 / §4.2
 
 ---
 

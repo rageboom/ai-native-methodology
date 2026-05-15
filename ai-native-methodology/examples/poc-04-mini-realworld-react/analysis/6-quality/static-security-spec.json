@@ -2,7 +2,7 @@
   "$schema_origin": "ai-native-methodology/schemas/static-security-spec.schema.json (★ Stage 3-2)",
   "meta": {
     "poc_id": "poc-04-mini",
-    "phase": "6-quality",
+    "phase": "quality",
     "captured_at": "2026-05-02",
     "captured_by": "real (★ Semgrep carry — Windows 환경 부재 / grep 1차 fallback)",
     "tool_primary": "Semgrep CLI (★ research G2 결단 → carry)",

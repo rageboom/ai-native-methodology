@@ -2,7 +2,7 @@
   "$schema_origin": "ai-native-methodology/schemas/a11y-spec.schema.json (★ Stage 3-2)",
   "meta": {
     "poc_id": "poc-04-mini",
-    "phase": "6-quality",
+    "phase": "quality",
     "captured_at": "2026-05-01",
     "captured_by": "real",
     "tool": "@axe-core/playwright",

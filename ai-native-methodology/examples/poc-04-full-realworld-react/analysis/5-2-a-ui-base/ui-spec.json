@@ -4,7 +4,7 @@
     "poc_id": "poc-04-full",
     "stage": "5",
     "sprint": "5-2",
-    "phase": "5-2-a-ui-base",
+    "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "framework_detected": "react",

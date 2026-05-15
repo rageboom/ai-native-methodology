@@ -436,7 +436,7 @@
       "confidence": 0.85,
       "_phase5_correction": {
         "finding_id": "F-034",
-        "phase": "5-1",
+        "phase": "api",
         "previous_confidence": 0.9,
         "rationale": "sessionCreationPolicy(STATELESS) 명시 부재 — 사실상 STATELESS 동작 (csrf/formLogin/httpBasic/logout disable + JWTFilter only) 이나 Spring Security default 가 IF_REQUIRED 이므로 사내 적용 시 명시 필수.",
         "remediation": "SecurityConfiguration 에 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) 추가 권고 (사내 적용 시)"
@@ -491,7 +491,7 @@
       "confidence": 0.92,
       "_phase5_correction": {
         "finding_id": "F-036",
-        "phase": "5-1",
+        "phase": "api",
         "previous_confidence": 0.95,
         "rationale": "POST /users 와 POST /users/login 은 permitAll 이 아닌 WebSecurity#ignoring 사용 — filter chain 자체 우회 (의미 차이). Spring Security 6+ reference 명시 권고는 permitAll (security headers 보전).",
         "remediation": "사내 적용 시 WebSecurity#ignoring → HttpSecurity.permitAll 마이그레이션. AP-SECURITY-CONFIG-WEBSEC-IGNORING-001 candidate (Phase 6)."

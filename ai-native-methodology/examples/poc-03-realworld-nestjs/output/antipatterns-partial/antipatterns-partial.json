@@ -2,7 +2,8 @@
   "$schema_ref": "../../../../../schemas/antipatterns.schema.json",
   "meta": {
     "generated_at": "2026-04-30T00:00:00Z",
-    "phase": "4 (5.C antipatterns-partial)",
+    "phase": "business-logic",
+    "phase_subarea": "5.C antipatterns-partial",
     "methodology_version": "v1.2.2",
     "raw_confidence": 0.80,
     "note": "★ partial — Phase 6 합산 시 정식 격상. 본 phase = Phase 1~4 finding 23+6+2+6 = 37건 + Phase 4 신규 6건 → 43 총. AP 가칭 후보 식별만."

@@ -4,7 +4,7 @@
     "poc_id": "poc-04-full",
     "stage": "5+",
     "sprint": "v1.4-carry-2-3-종결 (★ ★ ★ AP-FE-SECURITY-001 진짜 도구 직접 confirm 도달)",
-    "phase": "6-quality",
+    "phase": "quality",
     "captured_at": "2026-05-02",
     "captured_by": "real (★ Semgrep pip 채널 + ★ ★ custom rule + ratchet 모드 default)",
     "tool_primary": "Semgrep CLI 1.161.0 (★ pip 채널 / Python 3.14 공식 지원)",

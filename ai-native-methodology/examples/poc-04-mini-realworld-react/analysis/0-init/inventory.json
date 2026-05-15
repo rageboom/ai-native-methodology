@@ -7,7 +7,7 @@
     "pushed_at": "2026-04-25T20:41:13Z",
     "captured_at": "2026-05-02",
     "captured_by": "real",
-    "phase": "0-init"
+    "phase": "input"
   },
   "stack": {
     "language": "TypeScript",

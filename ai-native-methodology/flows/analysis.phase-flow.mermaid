@@ -1,85 +1,87 @@
 %% AI-Native 방법론 — Phase 흐름 + 산출물 의존 그래프
-%% v2.2.0-rc1 — ★ phase 4.8 (sql-inventory) 정식 단계 신설 (★ SQL 단위 11 컬럼 인벤토리 + extraction_automation + RDB 한정 sub-phase / paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6)
+%% v3.0.0 — ★ phase ID 의미 ID rename (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동 도출).
 %% 사람 눈 (mermaid). AI 눈 짝: phase-flow.json (drift-validator 호환).
-%% ADR-008 (이중 렌더링 사상) + ADR-CHAIN-006 (phase 4.7) + ADR-CHAIN-007 (phase 4.8 정식 도입) 정합.
+%% subgraph id 표기 = `P_<semantic_id>` (P 접두사 + underscore — mermaid 문법 호환 + drift-validator P prefix 정규식 호환).
+%% drift-validator 의 derivePhaseIdFromSubId 가 `P_db_schema` → `db-schema` 자동 변환.
+%% ADR-008 (이중 렌더링) + ADR-CHAIN-006 (characterization) + ADR-CHAIN-007 (sql-inventory) 정합.
 
 flowchart TB
-    %% ═════════════ Phase 0 (입력) ═════════════
-    subgraph P0["Phase 0 — 입력 정리"]
+    %% ═════════════ input ═════════════
+    subgraph P_input["Phase input — 입력 정리"]
         direction LR
-        P0_IN["소스 (필수)<br/>+ ERD / ORM / 기획 (선택)"]
-        P0_OUT["_manifest.yml (입력)"]
-        P0_IN --> P0_OUT
+        input_IN["소스 (필수)<br/>+ ERD / ORM / 기획 (선택)"]
+        input_OUT["_manifest.yml (입력)"]
+        input_IN --> input_OUT
     end
 
-    %% ═════════════ Phase 1 ═════════════
-    subgraph P1["Phase 1 — init"]
+    %% ═════════════ discovery ═════════════
+    subgraph P_discovery["Phase discovery — 탐색 (인벤토리 추출)"]
         direction LR
-        P1_OUT["inventory.json<br/>tree.md + stack-detection.md<br/>stats.json"]
+        discovery_OUT["inventory.json<br/>tree.md + stack-detection.md<br/>stats.json"]
     end
 
-    %% ═════════════ Phase 2 ═════════════
-    subgraph P2["Phase 2 — db"]
+    %% ═════════════ db-schema ═════════════
+    subgraph P_db_schema["Phase db-schema — DB 스키마"]
         direction LR
-        P2_OUT["schema.json + schema.sql<br/>erd.mermaid<br/>정합성-검증-보고서.md"]
+        db_schema_OUT["schema.json + schema.sql<br/>erd.mermaid<br/>정합성-검증-보고서.md"]
     end
 
-    %% ═════════════ Phase 3 ═════════════
-    subgraph P3["Phase 3 — arch"]
+    %% ═════════════ architecture ═════════════
+    subgraph P_architecture["Phase architecture — 아키텍처"]
         direction LR
-        P3_OUT["architecture.json<br/>architecture.mermaid + .md<br/>dependency-graph.mermaid<br/>circular-dependencies.md"]
+        architecture_OUT["architecture.json<br/>architecture.mermaid + .md<br/>dependency-graph.mermaid<br/>circular-dependencies.md"]
     end
 
-    %% ═════════════ Phase 4 (4영역 병렬) ═════════════
-    subgraph P4["Phase 4 — 비즈니스 로직 (4영역 병렬)"]
+    %% ═════════════ business-logic (4영역 병렬) ═════════════
+    subgraph P_business_logic["Phase business-logic — 비즈니스 로직 (4영역 병렬)"]
         direction TB
-        P4A["5.A rules<br/>(BR 추출)"]
-        P4B["5.B domain<br/>(Aggregate Root)"]
-        P4C["5.C antipatterns-partial<br/>(부분 추출)"]
-        P4D["5.D ui-domain<br/>(UI 도메인)"]
-        P4_OUT["domain.json + domain.mermaid + .md<br/>rules.json + rules.md<br/>antipatterns-partial.json"]
-        P4A --> P4_OUT
-        P4B --> P4_OUT
-        P4C --> P4_OUT
-        P4D --> P4_OUT
+        BL_A["5.A rules<br/>(BR 추출)"]
+        BL_B["5.B domain<br/>(Aggregate Root)"]
+        BL_C["5.C antipatterns-partial<br/>(부분 추출)"]
+        BL_D["5.D ui-domain<br/>(UI 도메인)"]
+        BL_OUT["domain.json + domain.mermaid + .md<br/>rules.json + rules.md<br/>antipatterns-partial.json"]
+        BL_A --> BL_OUT
+        BL_B --> BL_OUT
+        BL_C --> BL_OUT
+        BL_D --> BL_OUT
     end
 
-    %% ═════════════ Phase 4.5 (★ v1.2.0 신설 / v1.2.1 자동 검증) ═════════════
-    subgraph P45["Phase 4.5 — 형식 명세 (★ v1.2.0)"]
+    %% ═════════════ formal-spec (★ v1.2.0 신설 / v1.2.1 자동 검증) ═════════════
+    subgraph P_formal_spec["Phase formal-spec — 형식 명세 (★ v1.2.0)"]
         direction LR
-        P45_OUT["state-machines/*.json + .mermaid<br/>sequence-diagrams/*.json + .mermaid<br/>decision-tables/*.json + .md<br/>invariants/*.ts<br/>property-tests/*.spec.ts"]
-        P45_VAL["★ v1.2.1 자동 검증<br/>drift-validator + decision-table-validator"]
-        P45_OUT --> P45_VAL
+        formal_spec_OUT["state-machines/*.json + .mermaid<br/>sequence-diagrams/*.json + .mermaid<br/>decision-tables/*.json + .md<br/>invariants/*.ts<br/>property-tests/*.spec.ts"]
+        formal_spec_VAL["★ v1.2.1 자동 검증<br/>drift-validator + decision-table-validator"]
+        formal_spec_OUT --> formal_spec_VAL
     end
 
-    %% ═════════════ Phase 4.7 (★ v2.1.0 신설 — 의도 vs 버그 분리) ═════════════
-    subgraph P47["Phase 4.7 — characterization (★ v2.1.0)"]
+    %% ═════════════ characterization (★ v2.1.0 신설 — 의도 vs 버그 분리) ═════════════
+    subgraph P_characterization["Phase characterization — 특성화 (★ v2.1.0)"]
         direction LR
-        P47_OUT["characterization-spec.json<br/>intent-vs-bug.md<br/>coverage.json<br/>snapshots/UC-*.json"]
-        P47_VAL["★ v2.1.0 자동 검증<br/>characterization-coverage-validator"]
-        P47_OUT --> P47_VAL
+        characterization_OUT["characterization-spec.json<br/>intent-vs-bug.md<br/>coverage.json<br/>snapshots/UC-*.json"]
+        characterization_VAL["★ v2.1.0 자동 검증<br/>characterization-coverage-validator"]
+        characterization_OUT --> characterization_VAL
     end
 
-    %% ═════════════ Phase 4.8 (★ v2.2.0-rc1 신설 — SQL 인벤토리 / RDB 한정) ═════════════
-    subgraph P48["Phase 4.8 — sql-inventory (★ v2.2.0-rc1 / RDB 한정)"]
+    %% ═════════════ sql-inventory (★ v2.2.0-rc1 신설 / RDB 한정) ═════════════
+    subgraph P_sql_inventory["Phase sql-inventory — SQL 인벤토리 (★ v2.2.0-rc1 / RDB 한정)"]
         direction LR
-        P48_OUT["sql-inventory.json (11 컬럼)<br/>sql-inventory.md<br/>raw-grep.txt"]
-        P48_VAL["★ v2.2.0-rc1 자동 검증<br/>sql-inventory-extractor"]
-        P48_OUT --> P48_VAL
+        sql_inventory_OUT["sql-inventory.json (11 컬럼)<br/>sql-inventory.md<br/>raw-grep.txt"]
+        sql_inventory_VAL["★ v2.2.0-rc1 자동 검증<br/>sql-inventory-extractor"]
+        sql_inventory_OUT --> sql_inventory_VAL
     end
 
-    %% ═════════════ Phase 5 (병렬) ═════════════
-    subgraph P5_1["Phase 5-1 — api"]
-        P5_1_OUT["openapi.yaml + api.md<br/>api-extension.json"]
+    %% ═════════════ api / ui (병렬) ═════════════
+    subgraph P_api["Phase api — API 계약"]
+        api_OUT["openapi.yaml + api.md<br/>api-extension.json"]
     end
-    subgraph P5_2["Phase 5-2 — ui"]
-        P5_2_OUT["ui-spec.json + ui-spec.md + .mermaid"]
+    subgraph P_ui["Phase ui — UI"]
+        ui_OUT["ui-spec.json + ui-spec.md + .mermaid"]
     end
 
-    %% ═════════════ Phase 6 ═════════════
-    subgraph P6["Phase 6 — quality (안티패턴 통합)"]
+    %% ═════════════ quality ═════════════
+    subgraph P_quality["Phase quality — 품질 (안티패턴 통합)"]
         direction LR
-        P6_OUT["antipatterns.json<br/>avoid-list.md<br/>migration-cautions.md (★ v1.2.0)"]
+        quality_OUT["antipatterns.json<br/>avoid-list.md<br/>migration-cautions.md (★ v1.2.0)"]
     end
 
     %% ═════════════ Cross-cutting (모든 phase) ═════════════
@@ -91,49 +93,48 @@ flowchart TB
     end
 
     %% ═════════════ 의존 그래프 ═════════════
-    P0 --> P1
-    P1 --> P2
-    P1 --> P3
-    P2 --> P3
-    P1 --> P4
-    P2 --> P4
-    P3 --> P4
-    P4 --> P45
-    P4 --> P47
-    P45 --> P47
-    P1 --> P48
-    P4 --> P48
-    P47 --> P48
-    P4 --> P5_1
-    P45 --> P5_1
-    P47 --> P5_1
-    P48 --> P5_1
-    P4 --> P5_2
-    P3 --> P5_2
-    P47 --> P5_2
-    P5_1 --> P6
-    P5_2 --> P6
-    P45 --> P6
-    P47 --> P6
-    P4 --> P6
+    P_input --> P_discovery
+    P_discovery --> P_db_schema
+    P_discovery --> P_architecture
+    P_db_schema --> P_architecture
+    P_discovery --> P_business_logic
+    P_db_schema --> P_business_logic
+    P_architecture --> P_business_logic
+    P_business_logic --> P_formal_spec
+    P_business_logic --> P_characterization
+    P_formal_spec --> P_characterization
+    P_discovery --> P_sql_inventory
+    P_business_logic --> P_sql_inventory
+    P_characterization --> P_sql_inventory
+    P_business_logic --> P_api
+    P_formal_spec --> P_api
+    P_characterization --> P_api
+    P_sql_inventory --> P_api
+    P_business_logic --> P_ui
+    P_architecture --> P_ui
+    P_characterization --> P_ui
+    P_api --> P_quality
+    P_ui --> P_quality
+    P_formal_spec --> P_quality
+    P_business_logic --> P_quality
 
     %% 산출물 cross-cutting
-    P1 -.-> CC_FIND
-    P2 -.-> CC_FIND
-    P3 -.-> CC_FIND
-    P4 -.-> CC_FIND
-    P45 -.-> CC_FIND
-    P47 -.-> CC_FIND
-    P5_1 -.-> CC_FIND
-    P5_2 -.-> CC_FIND
-    P6 -.-> CC_FIND
+    P_discovery -.-> CC_FIND
+    P_db_schema -.-> CC_FIND
+    P_architecture -.-> CC_FIND
+    P_business_logic -.-> CC_FIND
+    P_formal_spec -.-> CC_FIND
+    P_characterization -.-> CC_FIND
+    P_api -.-> CC_FIND
+    P_ui -.-> CC_FIND
+    P_quality -.-> CC_FIND
 
     %% Style
-    classDef new45 fill:#fff3cd,stroke:#856404,stroke-width:3px
-    classDef new47 fill:#cce5ff,stroke:#004085,stroke-width:3px
-    classDef quality fill:#d4edda,stroke:#155724,stroke-width:2px
+    classDef new_formal fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef new_char fill:#cce5ff,stroke:#004085,stroke-width:3px
+    classDef quality_style fill:#d4edda,stroke:#155724,stroke-width:2px
     classDef cross fill:#e2e3e5,stroke:#383d41
-    class P45 new45
-    class P47 new47
-    class P6 quality
+    class P_formal_spec new_formal
+    class P_characterization new_char
+    class P_quality quality_style
     class CC cross

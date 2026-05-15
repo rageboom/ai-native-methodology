@@ -2,7 +2,7 @@
   "$schema_origin": "ai-native-methodology/schemas/ui-spec.schema.json (★ Stage 3-1 확장 4 필드 검증 시점)",
   "meta": {
     "poc_id": "poc-04-mini",
-    "phase": "5-2-a-ui-base",
+    "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
     "framework_detected": "react",

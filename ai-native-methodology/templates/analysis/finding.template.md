@@ -19,7 +19,7 @@ context: |
   {왜 이 케이스가 나왔는가. 환경/스택/조건.}
 
 spec_gap: |
-  {어느 명세의 어느 절이 비었는가. 예: 'workflow/phase-2-db.md §3.2 (ddl-auto 분기 부재)'}
+  {어느 명세의 어느 절이 비었는가. 예: 'workflow/db-schema.md §3.2 (ddl-auto 분기 부재)'}
 
 decision_made: |
   {본 PoC 는 어떻게 우회했는가. 결정 + 근거.}
