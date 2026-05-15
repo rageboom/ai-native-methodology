@@ -9,6 +9,58 @@
 
 ---
 
+## [3.6.2] — 2026-05-15 ★ PATCH — 잔여 carry 묶음 정리 / paradigm 진화 완료점
+
+> ★ ★ ★ **사용자 명시 결단 "carry 다 제거"** — charter §3 활성 Gap 모두 청산 + G1 영구 scope-out 후 잔여 carry 7종 모두 정리. plugin must-have 자산 + paradigm 진화 **안정점 도달 명시**.
+
+### 정리 대상 (7 carry)
+
+| # | carry | 결단 |
+|---|------|------|
+| C1 | G6 `/analyze-fullstack` Scenario B 통합 명령어 | **영구 scope-out** (G1 sibling / 재제안 ❌) |
+| C2 | G2 orchestrate 분리 신호 (1-A → 1-B trigger) | 라벨 제거 (history = DEC + LL-G2-03 보존) |
+| C3 | Vue 2 / React 18 legacy 분기 | 라벨 제거 (사례 발생 시 새 결단) |
+| C4 | form action 분산 anti-pattern rule | 라벨 제거 (시행 시 결단) |
+| C5/C6/C7 | PoC (Scenario A/B/C 본격 검증) | 라벨 제거 (PoC session 진입 시 새 결단) |
+
+### paradigm 근거
+
+1. paradigm 단순화 — charter §3 모두 청산 + carry 라벨 정리 = plugin must-have 안정점 도달
+2. history 보존 — 정리 carry 의 paradigm history 는 각 DEC + CHANGELOG + LL 안 본격 보존 (carry 라벨 = 중복 추적)
+3. G1 sibling paradigm — 가치 < 비용 / 사용 사례 부재
+4. 사용자 결단 권한 — 명시 결단 시 paradigm 진화 안정점 도달
+
+### paradigm 진화 완료점 (★ 2026-05-15)
+
+| 영역 | 상태 |
+|---|---|
+| charter §1 (R1~R17) | 15/15 자산 대칭 + R16/R17 scope-out |
+| charter §3 (Gap) | 모두 청산 + G1 scope-out |
+| 잔여 carry | 모두 정리 (C1~C7 라벨 제거) |
+| 본격 자산 | 5 stage + cross-cut skill 자산 대칭 |
+| 의미 ID paradigm | v2.6.0 + v3.x sub-axis 진화 정합 |
+
+### 자산 갱신
+
+- `decisions/DEC-2026-05-15-carry-cleanup-paradigm-종결.md` — 신설 (SSOT)
+- `.claude-plugin/plugin.json` 3.6.1 → 3.6.2
+- `decisions/STATUS.md` session 19차 추가 entry
+
+### Lessons Learned
+
+- **LL-cleanup-01**: carry 라벨 = paradigm 진화 추적 자산. 사용 사례 누적 부재 시 = 라벨 제거 정합. history 는 DEC/CHANGELOG/LL 본격 보존 → 라벨 = 중복 추적
+- **LL-cleanup-02**: paradigm 안정점 도달 시 carry 묶음 정리 = "단순화 결단". 미래 사용 사례 시 새 carry 신설 가능 (라벨 부활 ❌)
+
+### 정합 관계
+
+- DEC-2026-05-15-carry-cleanup-paradigm-종결 (본 entry SSOT)
+- DEC-2026-05-15-g1-itsm-permanent-scope-out (G1 영구 scope-out sibling)
+- DEC-2026-05-15-g{2,3,4,5}-* (Gap 종결 sibling)
+- be-fe-separation.md §4.1 D25 carry (G6 history 보존)
+- memory `feedback_itsm_g1_permanent_scope_out` (재제안 회피 paradigm)
+
+---
+
 ## [3.6.1] — 2026-05-15 ★ PATCH — carry C10+C8+C9 묶음 (cross-link 문서 보강)
 
 > ★ G5 paradigm 강화 — `lifecycle-contract.md` §자산 매핑 매트릭스 의 cross-link 자산 (agents/README.md 신설 + tools/README.md cross-link + spectral-runner README carry 정정). 자산 신설/기능 추가 ❌ / 문서 보강만 = PATCH 정합.
