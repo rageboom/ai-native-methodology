@@ -6,24 +6,33 @@
 
 | 디렉토리 | 상태 | 내용 |
 |---|---|---|
-| [`analysis/`](./analysis/) | ★ ★ 활성 (22 template) | analysis stage 7대 산출물 + FE 8 + aspect 4 placeholder |
+| [`analysis/`](./analysis/) | ★ ★ 활성 (21 template / flat layout) | BE 7대 + 4.5 formal-spec + 부속 (FE 8 + aspect 4 = skills/ 본문 inline) |
 | [`adoption/`](./adoption/) | ★ build alias source | `CLAUDE.md` (사내 정책 inline) — build script 가 dist root CLAUDE.md 로 별칭 복사 |
 | [`planning/`](./planning/) | ☐ placeholder | chain 1 / planning-spec template (sub-plan-4 채워짐 / 일부) |
 | [`design/`](./design/) | ☐ placeholder | design stage (v2.x carry) |
 | [`test/`](./test/) | ☐ placeholder | chain 3 / test-spec template (sub-plan-4 채워짐 / 일부) |
 | [`implement/`](./implement/) | ☐ placeholder | chain 4 / impl-spec template (sub-plan-4 채워짐 / 일부) |
 
-## analysis/ 템플릿 (22)
+## analysis/ 템플릿 (21 / flat layout)
 
-7대 산출물 + 부속:
-- `architecture/` (1) — `dependency-graph.mermaid` / `circular-dependencies.md`
-- `domain/` (2) — domain entity placeholder
-- `api/` (3) — `api.template.md` + `openapi.yaml.template`
-- `db/` (4) — `db-schema.template.md` + `erd.mermaid.template`
-- `rules/` (5) — `rules.template.md`
-- `antipatterns/` (6) — `avoid-list.template.md` + `antipatterns.template.json`
-- `ui-ux/` (7) — `ui-spec.template.md`
-- 그 외 — `inventory.template.md` / `meta-confidence.template.yaml` / `phase-flow.template.mermaid` / FE 8 + aspect 4
+BE 7대 + 4.5 formal-spec:
+- 1 architecture — `architecture.template.md` + `architecture.template.mermaid`
+- 2 domain — `domain.template.md` + `domain.template.mermaid`
+- 3 api — `api.template.md` + `api.template.yaml`
+- 4 db-schema — `db-schema.template.md` + `erd.template.mermaid`
+- 4.5 formal-spec — `formal-spec.template.md` + `decision-table.template.md` + `sequence.template.mermaid` + `state-machine.template.mermaid`
+- 5 rules — `rules.template.md`
+- 6 antipatterns — `antipatterns.template.md`
+- 7 ui-spec — `ui-spec.template.md` + `ui-spec.template.mermaid`
+
+부속 (4):
+- `inventory.template.md` + `inventory.template.json`
+- `meta-confidence.template.yaml`
+- `openapi-extension.template.json`
+- `finding.template.md`
+
+★ FE 8 (state-map / visual-manifest / form-validation / type-spec / error-mapping + a11y / i18n / static-security / legacy-spectrum) + aspect 4 → skill SKILL.md 본문 inline placeholder (별도 template 파일 ❌)
+★ `phase-flow.template.mermaid` 영역 → [`../flows/*.mermaid`](../flows/) SSOT (template 영역 X)
 
 ## adoption/ build alias
 
@@ -47,7 +56,7 @@ template 은 [`../skills/`](../skills/) 의 `_base/apply-template` skill 을 통
 
 ```bash
 # Skill 안에서
-@templates/analysis/api/api.template.md → instantiate
+@templates/analysis/api.template.md → instantiate
 ```
 
 ## 참조
