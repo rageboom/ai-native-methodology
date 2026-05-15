@@ -52,7 +52,7 @@
 |---|---|---|
 | 이미 운영 중 legacy 분석만 (기획/스펙/테스트/구현 부재) | **A** (analysis stage only) | §4 |
 | Legacy → 새 시스템 / 4 stage 전체 거치고 싶다 | **B** (chain harness e2e) | §5 — 본 가이드 메인 |
-| Phase 4.5 형식 명세 검증만 (도구 호출) | **C** (validator 단독) | §6 |
+| `formal-spec` phase 형식 명세 검증만 (도구 호출) | **C** (validator 단독) | §6 |
 
 ## 4. 시나리오 A — Analysis stage only (3분)
 
@@ -129,7 +129,7 @@ node tools/chain-driver/src/cli.js init <project>
 ## 6. 시나리오 C — Validator 단독 (3분)
 
 ```bash
-# Phase 4.5 형식 명세 검증
+# formal-spec phase 형식 명세 검증
 node tools/drift-validator/src/cli.js <output>/formal-spec/
 node tools/decision-table-validator/src/cli.js <output>/formal-spec/decision-tables/
 node tools/formal-spec-link-validator/src/cli.js <output>/

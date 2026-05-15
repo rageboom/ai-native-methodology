@@ -2,7 +2,7 @@
 
 > **사상**: binary 진실 모델 (ADR-FE-002 §2.3 — JSON / mermaid 모두 진실 아님, snapshot PNG 가 진실) + Playwright + axe-core 진짜 실행 (ADR-FE-005)
 > **schema**: `schemas/visual-manifest.schema.json`
-> **생성 phase**: Phase 5-2-c (`/analyze-visual`)
+> **생성 phase**: `ui` phase 5-2-c (`/analyze-visual`)
 
 ---
 
@@ -156,7 +156,7 @@ stateDiagram-v2
 
 ---
 
-## 7. cross-link (Phase 4.5 패턴)
+## 7. cross-link (`formal-spec` phase 패턴)
 
 ```yaml
 cross_links:

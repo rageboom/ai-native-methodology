@@ -56,7 +56,7 @@
 ai-native-methodology/                        ← 저장소 루트
 │
 ├── methodology-spec/                         방법론 명세 — 텍스트로 쓰인 표준
-│       ├── workflow/                         단계별 작업 절차 (Phase 0~6, 4.5, 4.7, 4.8)
+│       ├── workflow/                         단계별 작업 절차 (input / discovery / db-schema / architecture / business-logic / formal-spec / characterization / sql-inventory / api / ui / quality)
 │       ├── deliverables/                     산출물 정의
 │       ├── sub-rules/                        sub-rule (Spring 4.1+iBATIS 2 spectrum 등 / v2.3+)
 │       ├── glossary-ko.md                    한국어 용어집
@@ -87,7 +87,7 @@ ai-native-methodology/                        ← 저장소 루트
 ├── skills/                                   AI 발동 스킬 38종 — 자연어로 깨어남
 │       │                                     (★ v2.5.1 1-depth + category prefix paradigm)
 │       ├── _base-<name>/SKILL.md             공통 베이스 5종 (apply-baseline-ratchet / log-finding 등)
-│       ├── analysis-<name>/SKILL.md          레거시 분석용 22종 (Phase 0~6 + 4.5/4.7/4.8 + aspect)
+│       ├── analysis-<name>/SKILL.md          레거시 분석용 22종 (input~quality 11 phase + aspect)
 │       ├── planning-<name>/SKILL.md          체인 1: 기획 3종
 │       ├── spec-<name>/SKILL.md              체인 2: 행동/인수 명세 3종
 │       ├── test-<name>/SKILL.md              체인 3: 테스트 3종
@@ -309,9 +309,9 @@ AI-Native 개발 방법론 v2.5.1 ready
   추정 스택: Java 8 / Spring 4.1 / iBATIS 2 (Tier 2 Legacy)
 
   시작하려면 자연어로 말해보세요:
-    · "이 코드베이스 분석 시작"      → Phase 0 부터
+    · "이 코드베이스 분석 시작"      → `input` phase 부터
     · "기획 단계 시작"                → 체인 1 부터
-    · "SQL inventory 추출"           → Phase 4.8
+    · "SQL inventory 추출"           → `sql-inventory` phase
 
   ★ v2.5 — Layer 2 LLM (Claude Code sub-agent invocation) paradigm 본격 도입.
   도움말: /plugin guides/first-prompt-cookbook.md
@@ -353,16 +353,16 @@ AI-Native 개발 방법론 v2.5.1 ready
 레거시 코드베이스
        ↓
 ┌─────────────────────────────────────────┐
-│ Phase 0   입력 검증                       │
-│ Phase 1   코드베이스 인벤토리             │
-│ Phase 2   아키텍처 분석                   │
-│ Phase 3   도메인 모델 추출                │
-│ Phase 4   비즈니스 규칙                   │  ← v2.4 dual representation
-│ Phase 4.5 형식화 (FSM / Decision Table)  │
-│ Phase 4.7 의도 vs 버그 분류               │  ← v2.1
-│ Phase 4.8 SQL 단위 인벤토리               │  ← v2.2 / v2.3 migration_priority
-│ Phase 5   OpenAPI / DB 스키마 / FE 명세   │
-│ Phase 6   안티패턴 카탈로그               │
+│ input          입력 검증                       │
+│ discovery      코드베이스 인벤토리             │
+│ db-schema      DB 스키마 추출                  │
+│ architecture   도메인 모델 추출                │
+│ business-logic 비즈니스 규칙                   │  ← v2.4 dual representation
+│ formal-spec    형식화 (FSM / Decision Table)  │
+│ characterization 의도 vs 버그 분류             │  ← v2.1
+│ sql-inventory  SQL 단위 인벤토리               │  ← v2.2 / v2.3 migration_priority
+│ api / ui       OpenAPI / DB 스키마 / FE 명세   │
+│ quality        안티패턴 카탈로그               │
 │ ─────────────────────────────────────── │
 │ cross-cutting:                          │
 │   · BR cross-consistency check (★ v2.5) │

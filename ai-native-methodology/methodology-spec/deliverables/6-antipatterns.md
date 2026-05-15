@@ -2,7 +2,7 @@
 
 > **사상**: 회피 후보 (단정적 표현 지양 — 시니어 채택 저항 완화)
 > **schema**: `schemas/antipatterns.schema.json` · **template**: `templates/antipatterns.template.md`
-> **생성 phase**: 각 phase 에서 부분 발견 → Phase 6 (`/analyze-quality`) 에서 통합
+> **생성 phase**: 각 phase 에서 부분 발견 → `quality` phase (`/analyze-quality`) 에서 통합
 
 ---
 
@@ -92,7 +92,7 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 
 ---
 
-## 5. Phase 4.5 cross-link (formal_spec_links)
+## 5. `formal-spec` phase cross-link (formal_spec_links)
 
 ADR-008 (이중 렌더링) 정합 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p.
 
@@ -133,7 +133,7 @@ formal_spec_links:
 □ confidence < 0.70 이면 human_review_required 표기
 □ DOMAIN / API / FE 카테고리 AP 는 formal_spec_links 기재 (의무 / v1.4+)
 □ 그 외 카테고리 AP 는 formal_spec_links 선택
-□ 다른 산출물에서 발견된 AP 가 모두 통합됨 (Phase 6)
+□ 다른 산출물에서 발견된 AP 가 모두 통합됨 (`quality` phase)
 ```
 
 ---
@@ -161,9 +161,9 @@ formal_spec_links:
 - 증상: 의도적 설계를 안티패턴으로 오탐
 - 대응: confidence 표기 + 사용자 검토 게이트
 
-### 8.3 Phase 6 통합 누락
-- 증상: Phase 2 에서 발견한 AP 가 최종 목록에 빠짐
-- 대응: 각 phase 산출물에 AP 섹션 → Phase 6 에서 전수 수거
+### 8.3 `quality` phase 통합 누락
+- 증상: `db-schema` phase 에서 발견한 AP 가 최종 목록에 빠짐
+- 대응: 각 phase 산출물에 AP 섹션 → `quality` phase 에서 전수 수거
 
 ### 8.4 단일 PoC 과적합 격상
 - 증상: 1 PoC 발견을 high 로 격상

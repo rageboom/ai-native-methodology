@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-006 phase 4.7 정식 도입 + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context 합성
 > **schema**: `schemas/characterization-spec.schema.json`
-> **생성 phase**: Phase 4.7 (★ phase 4.5 formal-spec 후 / phase 5-1 + 5-2 전 / analysis stage chain 1 입력 보강)
+> **생성 phase**: `characterization` phase (★ `formal-spec` phase 후 / `api` phase + `ui` phase 전 / analysis stage chain 1 입력 보강)
 > **≥ 2 PoC corroboration**: PoC #06 (Spring 4.1 + iBATIS Legacy 적대성) + PoC #03 retrofit (NestJS Modern)
 
 ---

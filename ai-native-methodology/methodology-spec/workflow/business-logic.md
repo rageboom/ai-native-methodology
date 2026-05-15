@@ -1,4 +1,4 @@
-# Phase 4: 비즈니스 로직 추출 (4영역 병렬)
+# business-logic phase: 비즈니스 로직 추출 (4영역 병렬)
 
 > **명령어**: `/analyze-business-logic` · **사상**: 4영역 병렬 추출 (DB / FE / 설정 / 외부) · ADR-004 (DDD-Lite B)
 
@@ -19,9 +19,9 @@
 
 | 입력 | 출처 | 필수/선택 |
 |---|---|---|
-| Phase 1 inventory | `.ai-analysis/output/inventory/` | 필수 |
-| Phase 2 DB 스키마 | `.ai-analysis/output/db/` | 필수 |
-| Phase 3 아키텍처 | `.ai-analysis/output/architecture/` | 필수 |
+| `discovery` phase inventory | `.ai-analysis/output/inventory/` | 필수 |
+| `db-schema` phase DB 스키마 | `.ai-analysis/output/db/` | 필수 |
+| `architecture` phase 아키텍처 | `.ai-analysis/output/architecture/` | 필수 |
 | 소스 코드 | 원본 레포 | 필수 |
 | domain-context.md | `.ai-analysis/inputs/` | 선택 (LLM grounding) |
 
@@ -106,7 +106,7 @@
 └── state-diagrams/
 
 .ai-analysis/output/antipatterns/      # 안티패턴 (#6) — 부분
-├── antipatterns-partial.json          # Phase 6 에서 전체 통합
+├── antipatterns-partial.json          # `quality` phase 에서 전체 통합
 ```
 
 ---
@@ -124,7 +124,7 @@
 □ 안티패턴 부분 목록 확인
 ```
 
-승인 후 Phase 5 진입.
+승인 후 `api` phase / `ui` phase 진입.
 
 ---
 
@@ -137,7 +137,7 @@
 | 5.C 설정 | 0.80 | 설정 파일 직접 추출 |
 | 5.D 외부 | 0.50 | LLM 추론 비중↑ |
 
-**Phase 4 전체**: ~70% (7대 산출물 중 가장 LLM 의존도 높음)
+**`business-logic` phase 전체**: ~70% (7대 산출물 중 가장 LLM 의존도 높음)
 
 ---
 
@@ -165,4 +165,4 @@
 
 ## 8. 다음 단계
 
-Phase 4.5 (`/analyze-formal-spec`) → Phase 5-1 (`/analyze-api`) + Phase 5-2 (`/analyze-ui-base` + `/analyze-state` + `/analyze-visual`) 병렬 진입.
+`formal-spec` phase (`/analyze-formal-spec`) → `api` phase (`/analyze-api`) + `ui` phase (`/analyze-ui-base` + `/analyze-state` + `/analyze-visual`) 병렬 진입.

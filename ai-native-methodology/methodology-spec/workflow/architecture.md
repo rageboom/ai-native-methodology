@@ -1,4 +1,4 @@
-# Phase 3: arch (아키텍처)
+# architecture phase: arch (아키텍처)
 
 > **명령어**: `/analyze-arch`
 
@@ -6,7 +6,7 @@
 
 ## 1. 목적
 
-시스템의 **모듈 구성과 의존성 구조**를 추출한다. Phase 2 의 DB 스키마와 연결하여 **모듈 ↔ 테이블 그룹 매핑**까지 도출.
+시스템의 **모듈 구성과 의존성 구조**를 추출한다. `db-schema` phase 의 DB 스키마와 연결하여 **모듈 ↔ 테이블 그룹 매핑**까지 도출.
 
 **답하는 질문**:
 - 모듈 경계는?
@@ -21,8 +21,8 @@
 | 입력 | 출처 | 필수/선택 |
 |---|---|---|
 | 소스 코드 | 분석 대상 레포 | 필수 |
-| Phase 1 inventory | `.ai-analysis/output/inventory/inventory.json` | 필수 |
-| Phase 2 schema | `.ai-analysis/output/db/schema.json` | 권장 |
+| `discovery` phase inventory | `.ai-analysis/output/inventory/inventory.json` | 필수 |
+| `db-schema` phase schema | `.ai-analysis/output/db/schema.json` | 권장 |
 
 ---
 
@@ -37,7 +37,7 @@
 | S3 | 순환 의존성 검출 | Tarjan SCC |
 | S4 | 외부 호출 지점 추출 | HTTP 클라이언트 패턴 매칭 |
 | S5 | LLM: 모듈 책임 추론 + 아키텍처 스타일 식별 | LLM |
-| S6 | 모듈 ↔ 테이블 그룹 매핑 | Phase 2 결과 활용 |
+| S6 | 모듈 ↔ 테이블 그룹 매핑 | `db-schema` phase 결과 활용 |
 
 ### 3.2 순환 의존성 처리 — 탐지 + 분류 hybrid (ADR-006 정합)
 
@@ -49,7 +49,7 @@
 - `bc_status`: same | different | undefined
   - `same` = 같은 Bounded Context 안 cross-aggregate (cascade 우회 등)
   - `different` = 다른 BC 간 양방향 (안티패턴 의심)
-  - `undefined` = BC 미정의 (Phase 4 진입 전 결정 필요)
+  - `undefined` = BC 미정의 (`business-logic` phase 진입 전 결정 필요)
 - `bc_assignment_explicit`: 코드/문서에 BC 할당 명시 여부
 - `documented_decision`: ADR 또는 design doc 에 결정 문서 존재 여부
 
@@ -69,7 +69,7 @@
 - 위 도구 미활성 + ArchUnit FreezingArchRule 패턴:
   → 기존 cycle = baseline 수용, 신규 cycle 만 차단
 
-**Step 5**: `decision_required=true` 시 Phase 4 라우팅 (`phase_4_routing=true` + `decision_owner=domain_expert`).
+**Step 5**: `decision_required=true` 시 `business-logic` phase 라우팅 (`phase_4_routing=true` + `decision_owner=domain_expert`).
 
 **default 정책**: `bc_status=undefined` → severity=**medium**, decision_required=**true**
 근거: ArchUnit FreezingArchRule (신규만 차단) 산업 표준. "domain-legitimate cycle" 자동 분류는 산업 도구 어디에도 없음 → "decision_required → interface inversion" 휴리스틱 권장.
@@ -90,7 +90,7 @@ circular_dependencies:
     severity: medium            # 위 표 기반 자동 산정
     decision_required: true
     decision_owner: domain_expert
-    decision_deadline: "Phase 4 진입 전"
+    decision_deadline: "`business-logic` phase 진입 전"
     phase_4_routing: true
     antipattern_id: AP-ARCH-006  # 발견 시
 ```
@@ -103,9 +103,9 @@ circular_dependencies:
 
 ### 3.5 모듈 ↔ DB 테이블 매핑
 
-ORM 엔티티 → 모듈 (소속 패키지) → 테이블 (Phase 2 결과) → 자동 매핑.
+ORM 엔티티 → 모듈 (소속 패키지) → 테이블 (`db-schema` phase 결과) → 자동 매핑.
 
-이 매핑이 **Phase 4 도메인 추출의 Bounded Context 후보**가 됨.
+이 매핑이 **`business-logic` phase 도메인 추출의 Bounded Context 후보**가 됨.
 
 ---
 
@@ -221,7 +221,7 @@ flowchart TB
 □ 순환 의존성 = 0 또는 발견 시 안티패턴 등록
 □ 모듈 ↔ 테이블 매핑 = 사용자 검토 (시니어 BE)
 □ 아키텍처 스타일 후보 = 사용자 검증
-□ 외부 의존성 위치 = Phase 4 5.D 로 라우팅 준비
+□ 외부 의존성 위치 = `business-logic` phase 5.D 로 라우팅 준비
 ```
 
 ---
@@ -245,9 +245,9 @@ flowchart TB
 
 | 출력 | 전달 phase |
 |---|---|
-| 모듈 그룹 | Phase 4 도메인 모델 (BC 후보) |
-| 외부 의존성 | Phase 4 5.D 외부 의존성 매핑 |
-| 레이어 위반 | Phase 6 안티패턴 등록 |
+| 모듈 그룹 | `business-logic` phase 도메인 모델 (BC 후보) |
+| 외부 의존성 | `business-logic` phase 5.D 외부 의존성 매핑 |
+| 레이어 위반 | `quality` phase 안티패턴 등록 |
 
 ---
 
@@ -265,16 +265,16 @@ flowchart TB
 
 ### 8.3 외부 의존성 누락
 - 증상: HTTP 클라이언트가 wrapper 로 감싸져있어 감지 못 함
-- 대응: LLM 보강 + Phase 4 5.D 에서 재추출
+- 대응: LLM 보강 + `business-logic` phase 5.D 에서 재추출
 
 ### 8.4 generated 코드 의존성 포함
 - 증상: protobuf/openapi-generator 로 만든 코드까지 의존성 분석
-- 대응: Phase 1 에서 generated 디렉토리 표시 + 제외
+- 대응: `discovery` phase 에서 generated 디렉토리 표시 + 제외
 
 ---
 
 ## 9. 다음 단계
 
-Phase 4 (`/analyze-business-logic`) 진입.
+`business-logic` phase (`/analyze-business-logic`) 진입.
 
-> ⚠️ Phase 4 는 **4영역 병렬 처리**되는 가장 큰 단계. 입력으로 Phase 1~3 모두 사용.
+> ⚠️ `business-logic` phase 는 **4영역 병렬 처리**되는 가장 큰 단계. 입력으로 `discovery` / `db-schema` / `architecture` phase 모두 사용.

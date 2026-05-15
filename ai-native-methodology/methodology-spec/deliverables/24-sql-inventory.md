@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-007 phase 4.8 정식 도입 + ADR-CHAIN-008 paradigm-cross 정책 완화 (5 PoC isomorphic) + **★ ADR-CHAIN-009 Gartner TIME SQL 단위 보류 / `migration_priority` P0~P3 대체** + **★ ★ ADR-CHAIN-010 patterns_extension_v3 정식 도입 (MyBatis 3+ 한정) + Spring 4.1 + iBATIS 2 spectrum sub-rule 자산화** + Michael Feathers Characterization Testing (2004) "production = its own specification" + AWS Migration Acceleration Program (MAP) Assess phase
 > **schema**: `schemas/sql-inventory.schema.json` (★ 31번째 schema)
-> **생성 phase**: Phase 4.8 (★ phase 4.7 characterization 후 / phase 5-1 + 5-2 전 / RDB 한정 sub-phase)
+> **생성 phase**: `sql-inventory` phase (★ `characterization` phase 후 / `api` phase + `ui` phase 전 / RDB 한정 sub-phase)
 > **≥ 5 PoC isomorphic** (★ scale + paradigm + ORM + platform + language + responsibility-cross MEDIUM × 5 robust strong / ADR-CHAIN-008): PoC #06+#07 (Spring 4.1 + iBATIS 2) + PoC #08 (MyBatis 3) + PoC #09 (TypeORM) + PoC #10 (Spring Data JPA) — 외부 6 컬럼 자동화 4/6 = 66.7% × 5 (모두 동일 / scale + paradigm 무관 isomorphic)
 
 ---

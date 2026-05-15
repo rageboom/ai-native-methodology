@@ -2,7 +2,7 @@
 
 > **사상**: ADR-FE-005 매개체 #6 (TypeScript .d.ts) 산출 절차 정식 + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #2 해소
 > **schema**: `schemas/type-spec.schema.json`
-> **생성 phase**: Phase 4 (`/analyze-business-logic` 의 sub) 또는 Phase 5-2-a 의 sub
+> **생성 phase**: `business-logic` phase (`/analyze-business-logic` 의 sub) 또는 `ui` phase 5-2-a 의 sub
 
 ---
 

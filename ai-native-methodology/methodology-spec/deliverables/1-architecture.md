@@ -2,7 +2,7 @@
 
 > **사상**: Schema-First (ADR-001 — 코드 전 스키마 합의)
 > **schema**: `schemas/architecture.schema.json` · **template**: `templates/architecture.template.{md,mermaid}`
-> **생성 phase**: Phase 3 (`/analyze-architecture`)
+> **생성 phase**: `architecture` phase (`/analyze-architecture`)
 
 ---
 
@@ -44,15 +44,15 @@ output/architecture/
 | 레이어 분류 | controller/service/repository 패턴 | 결정적 + LLM | 0.85 | 모듈 식별 |
 | 아키텍처 스타일 추론 | 디렉토리 패턴 + 의존 방향 | LLM | 0.70 | 모듈 간 의존성 |
 
-**입력**: 소스 코드 + Phase 1 inventory
+**입력**: 소스 코드 + `discovery` phase inventory
 **출력**: `architecture.{json,md,mermaid}` + `dependency-graph.mermaid` + `circular-dependencies.md` (있을 시)
 **사람 검토 필수**: 아키텍처 스타일 추론
 
 ### 3.2 미추출 (의도적)
 
-- 런타임 의존성 (DI 컨테이너 동적 바인딩) → Phase 4 에서 추론
+- 런타임 의존성 (DI 컨테이너 동적 바인딩) → `business-logic` phase 에서 추론
 - 빌드 타임 의존성 (Gradle task 순서) → 인벤토리에서 참조
-- 외부 서비스 통합 → Phase 4 5.D 에서 처리
+- 외부 서비스 통합 → `business-logic` phase 5.D 에서 처리
 
 ---
 
@@ -78,7 +78,7 @@ output/architecture/
 □ 모든 모듈에 ID 부여
 □ 순환 의존성 있으면 안티패턴(#6) 에도 등록
 □ 아키텍처 스타일 = 사용자 확인
-□ Phase 1 inventory 와 모듈 수 정합
+□ `discovery` phase inventory 와 모듈 수 정합
 ```
 
 ---

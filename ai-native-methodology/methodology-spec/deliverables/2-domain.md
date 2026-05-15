@@ -2,7 +2,7 @@
 
 > **사상**: DDD-Lite B 강도 (ADR-004 — Entity/VO/Aggregate/Repository/UbiquitousLanguage 까지 추출, Context Map / Subdomain / Domain Event / Saga 미추출)
 > **schema**: `schemas/domain.schema.json` · **template**: `templates/domain.template.{md,mermaid}`
-> **생성 phase**: Phase 4 (`/analyze-business-logic`)
+> **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
 
@@ -45,11 +45,11 @@ output/domain/
 | Repository | Repository 클래스 | 결정적 | 0.95 / 0.70 | Entity |
 | Domain Service | Service 클래스 안 도메인 로직 | LLM 추론 | 0.70 | Entity |
 | Invariants | 메서드 안 가드 절, DB CHECK | LLM 추론 | 0.65 | Entity |
-| Bounded Context | 패키지 구조 + 모듈 경계 | LLM 추론 | 0.60 / 0.50 | Phase 3 architecture |
+| Bounded Context | 패키지 구조 + 모듈 경계 | LLM 추론 | 0.60 / 0.50 | `architecture` phase |
 | Ubiquitous Language | 클래스명 + 메서드명 + ERD 컬럼 | LLM 추출 | 0.75 / 0.65 | Entity, DB schema |
 | Use Case | 서비스 메서드 + Controller 매핑 | LLM 추론 | 0.75 / 0.60 | Entity, API |
 
-**입력**: 소스 코드 + Phase 2 DB schema + Phase 3 architecture
+**입력**: 소스 코드 + `db-schema` phase schema + `architecture` phase 아키텍처
 **평균 신뢰도**: ORM 있음 ~85%, 없음 ~60%
 **사람 검토 필수**: Bounded Context 경계, Invariants
 

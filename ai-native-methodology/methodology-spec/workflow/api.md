@@ -1,6 +1,6 @@
-# Phase 5-1: api (API 계약 추출)
+# api phase: api (API 계약 추출)
 
-> **명령어**: `/analyze-api` · Phase 5-2 (UI) 와 **병렬 실행 가능**
+> **명령어**: `/analyze-api` · `ui` phase 와 **병렬 실행 가능**
 
 ---
 
@@ -15,10 +15,10 @@ Controller/Router 에서 **OpenAPI 3.1 명세 추출**, 산출물 간 ID 매핑 
 | 입력 | 비고 |
 |---|---|
 | 소스 코드 (BE) | Controller, Router 어노테이션 |
-| Phase 1 inventory | BE 프레임워크 정보 |
-| Phase 4 결과 | 도메인 모델 (UC), 비즈니스 규칙 (BR), 외부 의존성 (5.D inbound webhook) |
-| Phase 4.5 결과 | decision-tables (BR ↔ API request/response 매핑) + sequence diagrams + state-machines. `formal_spec_links` (`openapi-extension.schema.json`) cross-link 의무 |
-| Phase 2 schema | DTO ↔ DB 컬럼 정합성 (있으면) |
+| `discovery` phase inventory | BE 프레임워크 정보 |
+| `business-logic` phase 결과 | 도메인 모델 (UC), 비즈니스 규칙 (BR), 외부 의존성 (5.D inbound webhook) |
+| `formal-spec` phase 결과 | decision-tables (BR ↔ API request/response 매핑) + sequence diagrams + state-machines. `formal_spec_links` (`openapi-extension.schema.json`) cross-link 의무 |
+| `db-schema` phase schema | DTO ↔ DB 컬럼 정합성 (있으면) |
 
 ---
 
@@ -118,4 +118,4 @@ paths:
 
 ## 8. 다음
 
-Phase 6 (`/analyze-quality`) 진입 (Phase 5-2 와 합쳐서).
+`quality` phase (`/analyze-quality`) 진입 (`ui` phase 와 합쳐서).

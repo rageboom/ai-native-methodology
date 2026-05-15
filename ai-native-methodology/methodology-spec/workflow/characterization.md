@@ -1,4 +1,4 @@
-# Phase 4.7: characterization (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
+# characterization phase: characterization (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
 
 > **명령어**: `/analyze-characterization` · **사상**: ADR-CHAIN-006 (phase 4.7 정식 도입) + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + SATD/KL-SATD (Maldonado & Shihab 2015)
 > **핵심 책임**: rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 planning-spec 입력 보강
@@ -8,7 +8,7 @@
 
 ## 1. 목적
 
-Phase 4 (rules + domain) + Phase 4.5 (formal-spec) 후에도 ★ "어떤 BR 을 보존하고 어떤 AP 를 버릴지" 명시 ❌ → ★ acceptance oracle 부재 → chain 1 planning-spec use_cases 추출 시 의도/버그 혼재.
+`business-logic` phase (rules + domain) + `formal-spec` phase 후에도 ★ "어떤 BR 을 보존하고 어떤 AP 를 버릴지" 명시 ❌ → ★ acceptance oracle 부재 → chain 1 planning-spec use_cases 추출 시 의도/버그 혼재.
 
 **답하는 질문**:
 - 새 시스템에서 어떤 비즈니스 행위를 그대로 보존해야 하나? (intent)
@@ -22,13 +22,13 @@ Phase 4 (rules + domain) + Phase 4.5 (formal-spec) 후에도 ★ "어떤 BR 을 
 
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
-| rules.json | Phase 4 산출물 | 60% |
-| antipatterns.json | Phase 4 / Phase 6 partial | +20%p |
+| rules.json | `business-logic` phase 산출물 | 60% |
+| antipatterns.json | `business-logic` / `quality` phase partial | +20%p |
 | 코드 자조 코멘트 grep | 소스 코드 | +5%p |
-| formal-spec (선택) | Phase 4.5 산출물 | +10%p |
+| formal-spec (선택) | `formal-spec` phase 산출물 | +10%p |
 | 도메인 expert 인터뷰 (ambiguous > 0 시 의무) | 사용자 위임 | +10%p (ambiguous → resolved) |
 
-→ Phase 4 미완료 시 Phase 4.7 진입 차단. rules.json + antipatterns.json 의무.
+→ `business-logic` phase 미완료 시 `characterization` phase 진입 차단. rules.json + antipatterns.json 의무.
 
 ---
 

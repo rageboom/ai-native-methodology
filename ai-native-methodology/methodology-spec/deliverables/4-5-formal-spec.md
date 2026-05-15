@@ -2,7 +2,7 @@
 
 > **사상**: 이중 렌더링 (ADR-008 — AI 눈 JSON + 사람 눈 mermaid) + 자연어 빈약성 보완 (자연어 60% → 형식 90%)
 > **schema**: `schemas/formal-spec.schema.json` · **template**: `templates/formal-spec.template.md` 외 4건
-> **생성 phase**: Phase 4.5 (`workflow/formal-spec.md`)
+> **생성 phase**: `formal-spec` phase (`workflow/formal-spec.md`)
 
 ---
 
@@ -123,7 +123,7 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 | 검증 단계 | raw confidence |
 |---|---|
-| 자연어 단독 (Phase 4 까지) | 60-70% |
+| 자연어 단독 (`business-logic` phase 까지) | 60-70% |
 | + 5 산출물 작성 | 70-80% |
 | + Cross-validation 의무 | 80-87% (시뮬 패널티) |
 | + 진짜 static tool 실행 | 90-95% |
@@ -163,7 +163,7 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 | 방향 | 의미 |
 |---|---|
-| #4 DOM + #5 RULES → #4.5 FORMAL | Phase 4 산출물 입력 |
+| #4 DOM + #5 RULES → #4.5 FORMAL | `business-logic` phase 산출물 입력 |
 | FORMAL → AI 코드 생성 | 실행 가능 명세 |
 | FORMAL → #6 AP | invariant 검증 결과 |
 | FORMAL → #3 API | x-rules 참조 |
@@ -192,4 +192,4 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 ### 6.5 자동 도구 미실행
 - 증상: drift-validator / decision-table-validator 안 돌리고 "수동 점검 OK" 로 종결
-- 대응: Phase 4.5 종료 조건에 자동 실행 결과 첨부 의무. 미실행 시 신뢰도 -5%p
+- 대응: `formal-spec` phase 종료 조건에 자동 실행 결과 첨부 의무. 미실행 시 신뢰도 -5%p

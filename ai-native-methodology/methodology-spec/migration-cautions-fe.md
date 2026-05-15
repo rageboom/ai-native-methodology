@@ -2,7 +2,7 @@
 
 > **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + 위험 기록 한 방향 추출기) FE 적용 + ADR-FE-001 (Tier 1~4 spectrum) + ADR-FE-003 (Strangler Pattern)
 > **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.md` (BE) + `migration-cautions-fe.md` (FE)
-> **생성 phase**: Phase 6 (`/analyze-quality`) — FE 산출물 (deliverable 7~13) 통합 후
+> **생성 phase**: `quality` phase (`/analyze-quality`) — FE 산출물 (deliverable 7~13) 통합 후
 
 ---
 
@@ -277,7 +277,7 @@
 | Domain | A / D | rules.schema fe_validation / fe_authorization / fe_a11y / fe_i18n cross-link |
 | Performance | (운영 NFR — v1.5 carry) | LCP / CLS = ADR-001 §명시적 제외 정합 |
 
-→ Phase 6 산출 시 BE migration-cautions + FE migration-cautions 양쪽 의무.
+→ `quality` phase 산출 시 BE migration-cautions + FE migration-cautions 양쪽 의무.
 
 ---
 

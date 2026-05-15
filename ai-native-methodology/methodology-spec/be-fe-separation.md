@@ -2,7 +2,7 @@
 
 > **사상**: ADR-FE-004 (BE/FE 분리 default + JS풀스택+JSP 예외) + ADR-FE-006 (★ framework-neutral IR + Screen+Journey 우선)
 > **위치**: 본체 spec. 사용자 사내 적용 시 직접 참조.
-> **trigger**: Phase 0 입력 시 Scenario detection 자동 분류
+> **trigger**: `input` phase 입력 시 Scenario detection 자동 분류
 
 ---
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 2. Scenario detection (Phase 0 자동)
+## 2. Scenario detection (`input` phase 자동)
 
 | signal | A | B | C |
 |---|---|---|---|
@@ -95,34 +95,34 @@ Next.js `pages/api/` 또는 `app/api/route.ts` = ★ 양쪽 산출:
 
 ```yaml
 JSP_통합_산출_절차:
-  Phase 0:
+  input phase:
     - BE Spring + JSP source 양쪽 입력
     - scenario detection → C 자동 인식
     - legacy-spectrum.tier_4_be_fe_handling = "scenario_c_integrated"
 
-  Phase 1 (init):
+  discovery phase (init):
     - inventory.json — JSP + BE controller 모두 인식
     - legacy-spectrum.json — primary_tier=4 또는 mixed (Tier 1+4)
 
-  Phase 2~3 (db / arch):
+  db-schema / architecture phase:
     - BE 영역만
 
-  Phase 4 (business-logic):
+  business-logic phase:
     - BE Spring controller + JSP form action + JSP scriptlet (★ ❌ 권장) 모두 추출
     - rules.json category=fe_validation ↔ Spring @Valid cross-link
 
-  Phase 5-1 (api):
+  api phase:
     - BE @RequestMapping + JSP form action URL 통합
     - openapi.yaml — JSP form submit 도 endpoint 등록
 
-  Phase 5-2 (ui):
+  ui phase:
     - ui-spec.framework = "jsp_template"
     - pages = JSP 파일 단위 / route = Spring @RequestMapping
     - components = template fragment + include 그래프 (level=legacy_template)
     - state-map = ★ N/A (server-side state — BE rules 가 담당)
     - visual-manifest = ✅ Playwright 진짜 실행 (rendering 후 동일)
 
-  Phase 6 (quality):
+  quality phase:
     - BE migration-cautions.md + FE migration-cautions-fe.md 양쪽 의무
     - JSP-specific 함정: XSS escape ★ <c:out> 사용 / form action 분산 / scriptlet 잔존
 ```

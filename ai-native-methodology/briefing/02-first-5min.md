@@ -48,9 +48,9 @@ AI-Native 개발 방법론 v2.5.1 ready
   추정 스택: Java 8 / Spring 4.1 / iBATIS 2 (Tier 2 Legacy)
 
   시작하려면 자연어로 말해보세요:
-    · "이 코드베이스 분석 시작"           → Phase 0 부터
+    · "이 코드베이스 분석 시작"           → `input` phase 부터
     · "기획 단계 시작"                     → 체인 1 부터
-    · "SQL inventory 추출"                → Phase 4.8
+    · "SQL inventory 추출"                → `sql-inventory` phase
     · "비즈니스 규칙 의미 일관성 검증"      → ★ v2.5 신규
 
   ★ v2.5 — Layer 2 LLM (Claude Code sub-agent invocation) paradigm 본격 도입.
@@ -66,7 +66,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 
 [analysis-input-collection 스킬 발동]
 
-Phase 0: 입력 검증 시작합니다.
+input phase: 입력 검증 시작합니다.
    ✓ 소스 디렉토리: ~/work/efiweb-legacy
    ✓ Git 저장소 인식됨 (HEAD: 8a2f1c)
    ⚠ ERD 파일 미발견 — 자동 생성 모드로 진행
@@ -78,7 +78,7 @@ Phase 0: 입력 검증 시작합니다.
 
 [analysis-source-inventory 스킬 자동 연계]
 
-Phase 1: 코드베이스 인벤토리 추출 중...
+discovery phase: 코드베이스 인벤토리 추출 중...
    · 파일 스캔: 1,247 개
    · Java 클래스: 312 개
    · Mapper XML: 47 개
@@ -100,7 +100,7 @@ Phase 1: 코드베이스 인벤토리 추출 중...
 
 [analysis-sql-inventory 스킬 발동 / v2.2 신규 / v2.3 12 컬럼]
 
-Phase 4.8: SQL Inventory 추출 시작합니다.
+sql-inventory phase: SQL Inventory 추출 시작합니다.
    · 매퍼 XML 47 개 스캔
    · SQL 식별자 추출: 312 개
    · 동적 분기 패턴: 89 개 (if / choose-when / foreach)
@@ -125,7 +125,7 @@ Phase 4.8: SQL Inventory 추출 시작합니다.
   → 자동화율: 58.3% (Spring 4.1+iBATIS 2 spectrum 53~55% 정합 범위)
 
   사람 검토 컬럼은 행동 명세 단계에서 같이 채울 수 있습니다.
-  계속하려면 "Phase 5 진행" 또는 "기획 단계 시작" 이라고 말씀해주세요.
+  계속하려면 "api phase 진행" 또는 "기획 단계 시작" 이라고 말씀해주세요.
 ```
 
 김개발은 **어디까지 자동이고 어디부터 사람인지** 가 매 단계 명시되는 것을 봅니다.

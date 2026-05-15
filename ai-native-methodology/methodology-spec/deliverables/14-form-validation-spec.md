@@ -2,7 +2,7 @@
 
 > **사상**: ADR-FE-005 §2.1.1 (Zod 매개체 13 채택) + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #1 해소
 > **schema**: `schemas/form-validation-spec.schema.json`
-> **생성 phase**: Phase 5-2-b (`/analyze-state` 의 sub) 또는 별도 `/analyze-form-validation`
+> **생성 phase**: `ui` phase 5-2-b (`/analyze-state` 의 sub) 또는 별도 `/analyze-form-validation`
 
 ---
 

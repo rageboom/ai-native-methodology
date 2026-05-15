@@ -2,7 +2,7 @@
 
 > **사상**: DDD-Lite (ADR-004) + 4영역 추출 (DB / FE / 설정 / 외부)
 > **schema**: `schemas/rules.schema.json` · **template**: `templates/rules.template.md`
-> **생성 phase**: Phase 4 (`/analyze-business-logic`)
+> **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
 

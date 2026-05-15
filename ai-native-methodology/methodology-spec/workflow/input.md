@@ -1,4 +1,4 @@
-# Phase 0: 입력 정리 (Input Preparation)
+# input phase: 입력 정리 (Input Preparation)
 
 > 유일하게 **사용자가 수동으로 진행**하는 단계. 자동화 명령어 없음.
 
@@ -82,7 +82,7 @@ git clone 이 불가능한 환경 (예: web-only):
 
 ```
 .ai-analysis/inputs/
-├── _manifest.yml                  # 입력 매니페스트 (Phase 1 이 참조)
+├── _manifest.yml                  # 입력 매니페스트 (`discovery` phase 가 참조)
 ├── source-info.md                 # 분석 대상 메타정보
 └── (입력 파일들)
 ```
@@ -99,7 +99,7 @@ source:
 inputs:
   source_code: true
   erd: false
-  orm: auto_detect         # Phase 1 에서 자동 감지
+  orm: auto_detect         # `discovery` phase 에서 자동 감지
   operational_db: false
   planning_docs: false
   design_specs: false
@@ -144,7 +144,7 @@ scenario_signals:
 □ domain-context.md 작성 여부 확인 (권장)
 ```
 
-승인 후 Phase 1 진입.
+승인 후 `discovery` phase 진입.
 
 ---
 
@@ -157,4 +157,4 @@ scenario_signals:
 
 ## 7. 다음 단계
 
-Phase 1 (`/analyze-init`) 진입.
+`discovery` phase (`/analyze-init`) 진입.

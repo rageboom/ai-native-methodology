@@ -28,7 +28,7 @@
 |---|---|---|
 | "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-domain-model`](../skills/analysis-domain-model/) | `domain.{json,md}` |
 | "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-business-rules`](../skills/analysis-business-rules/) | `rules.{json,md}` (★ natural_language + given/when/then dual) |
-| "Phase 4.5 형식 명세 검증" / "drift 검증" | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/) | drift / DMN / cross-link finding |
+| "`formal-spec` phase 형식 명세 검증" / "drift 검증" | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/) | drift / DMN / cross-link finding |
 | "characterization 추출" / "의도 vs 버그 분류" | [`analysis-characterization-test`](../skills/analysis-characterization-test/) | `characterization-spec.json` (v2.1) |
 | "SQL inventory 추출" / "매퍼 SQL 정리" | [`analysis-sql-inventory`](../skills/analysis-sql-inventory/) | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority) |
 | **"비즈니스 규칙 의미 일관성 검증" / "BR cross-consistency"** | [`analysis-br-cross-consistency-check`](../skills/analysis-br-cross-consistency-check/) | **★ v2.5 신규 / Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent)** |

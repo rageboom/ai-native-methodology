@@ -2,7 +2,7 @@
 
 > **사상**: ADR-001 §명시적 제외 갱신 (정적 분석 가능 보안 v1.4 포함 / 운영 NFR ❌) + OWASP Top 10 + CWE + ADR-009 §2.2.1 (semgrep_real / eslint_security_real enum)
 > **schema**: `schemas/static-security-spec.schema.json`
-> **생성 phase**: Phase 6 (`/analyze-quality` 의 sub) 또는 별도 `/analyze-fe-security`
+> **생성 phase**: `quality` phase (`/analyze-quality` 의 sub) 또는 별도 `/analyze-fe-security`
 
 ---
 
@@ -58,7 +58,7 @@ output/static-security/
 ### 3.1 미추출 (의도적)
 
 - runtime XSS payload fuzzing — 별도 도구 (DAST) 영역
-- 인증/인가 흐름 검증 — Phase 4 (rules) + state-map cross-link
+- 인증/인가 흐름 검증 — `business-logic` phase (rules) + state-map cross-link
 - 실사용자 행동 기반 위험 — 운영 영역 (ADR-001 §명시적 제외)
 
 ---
@@ -86,7 +86,7 @@ captured_by enum:
 
 ---
 
-## 5. cross-link (Phase 4.5 패턴)
+## 5. cross-link (`formal-spec` phase 패턴)
 
 ```yaml
 cross_links:

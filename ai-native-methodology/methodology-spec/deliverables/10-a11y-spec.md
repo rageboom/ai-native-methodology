@@ -2,7 +2,7 @@
 
 > **사상**: ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + ADR-FE-005 §2.2.2 (WCAG 2.1-AA baseline + 2.2-AA ratchet) + ADR-010 (baseline+ratchet) + ADR-009 §2.2.1 (axe_core_real)
 > **schema**: `schemas/a11y-spec.schema.json`
-> **생성 phase**: Phase 5-2-c (`/analyze-visual` 의 sub) 또는 별도 `/analyze-a11y`
+> **생성 phase**: `ui` phase 5-2-c (`/analyze-visual` 의 sub) 또는 별도 `/analyze-a11y`
 
 ---
 
@@ -68,7 +68,7 @@ output/a11y/
 
 ---
 
-## 5. cross-link (Phase 4.5 패턴)
+## 5. cross-link (`formal-spec` phase 패턴)
 
 ```yaml
 cross_links:

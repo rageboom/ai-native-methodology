@@ -2,7 +2,7 @@
 
 > **사상**: FSD + Atomic Design (ADR-001 §FE) + legacy Tier 1~4 spectrum (ADR-FE-001) + DTCG 2025.10 토큰 (ADR-FE-005)
 > **schema**: `schemas/ui-spec.schema.json`
-> **생성 phase**: Phase 5-2 (`/analyze-ui`)
+> **생성 phase**: `ui` phase (`/analyze-ui`)
 
 ---
 

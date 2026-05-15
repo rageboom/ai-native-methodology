@@ -62,7 +62,7 @@
 |---|---|---|
 | [`glossary-ko.md`](./glossary-ko.md) | 한국어 용어 사전 | ADR-005 |
 | [`id-conventions.md`](./id-conventions.md) | UC-* / BHV-* / AC-* / TC-* / IMPL-* / F-* ID 컨벤션 | 모든 산출물 |
-| [`finding-system.md`](./finding-system.md) | finding 등록·분류·처리 체계 | Phase 4.5+ |
+| [`finding-system.md`](./finding-system.md) | finding 등록·분류·처리 체계 | `formal-spec` phase 이후 |
 | [`lifecycle-contract.md`](./lifecycle-contract.md) | SDLC stage 간 data contract | chain 1~4 |
 | [`skills-axis.md`](./skills-axis.md) | phase ID ↔ skills 디렉토리 axis 분리 정책 | drift-validator `--check-chain-layout` |
 | [`be-fe-separation.md`](./be-fe-separation.md) | BE/FE 분리 default + 예외 (ADR-FE-004) | Scenario A/B/C detection |

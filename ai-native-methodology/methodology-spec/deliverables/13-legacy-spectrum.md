@@ -2,7 +2,7 @@
 
 > **사상**: ADR-FE-001 (FE 추출기 가정 — Tier 1~4) + ADR-FE-003 (legacy spectrum 정책 + Strangler Fig Pattern) + ADR-FE-004 (BE/FE 분리 — Tier 4 예외 / Stage 6)
 > **schema**: `schemas/legacy-spectrum.schema.json`
-> **생성 phase**: Phase 1 (`/analyze-init` 의 sub) 또는 별도 `/analyze-legacy`
+> **생성 phase**: `discovery` phase (`/analyze-init` 의 sub) 또는 별도 `/analyze-legacy`
 
 ---
 

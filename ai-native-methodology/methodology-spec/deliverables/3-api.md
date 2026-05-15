@@ -2,7 +2,7 @@
 
 > **사상**: Contract-First (ADR-001 — OpenAPI 3.1 산업 표준 그대로, 분석 메타는 별도 파일로 분리)
 > **schema**: `schemas/openapi-extension.schema.json` · **표준**: OpenAPI 3.1
-> **생성 phase**: Phase 5-1 (`/analyze-api`)
+> **생성 phase**: `api` phase (`/analyze-api`)
 
 ---
 

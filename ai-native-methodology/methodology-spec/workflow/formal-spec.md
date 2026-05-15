@@ -1,4 +1,4 @@
-# Phase 4.5: formal-spec (형식 명세)
+# formal-spec phase: formal-spec (형식 명세)
 
 > **명령어**: `/analyze-formal-spec` · **사상**: 이중 렌더링 (ADR-008) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무 (ADR-009)
 > **핵심 책임**: rules.json 자연어 한계를 형식 명세로 보완 / AI 코드 생성 정확도 향상
@@ -7,7 +7,7 @@
 
 ## 1. 목적
 
-Phase 4 (domain + rules) 의 자연어 명세에서 **암묵 가정 / 빈약 표현** 으로 인해 AI 코드 생성이 막히는 빈틈을 형식화로 보완한다.
+`business-logic` phase (domain + rules) 의 자연어 명세에서 **암묵 가정 / 빈약 표현** 으로 인해 AI 코드 생성이 막히는 빈틈을 형식화로 보완한다.
 
 **답하는 질문**:
 - Aggregate Root 의 생애주기 (state) 는?
@@ -22,12 +22,12 @@ Phase 4 (domain + rules) 의 자연어 명세에서 **암묵 가정 / 빈약 표
 
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
-| domain.json | Phase 4 산출물 | 60% |
-| rules.json | Phase 4 산출물 | +20%p |
+| domain.json | `business-logic` phase 산출물 | 60% |
+| rules.json | `business-logic` phase 산출물 | +20%p |
 | 코드 evidence (Aggregate Root / Service) | 소스 코드 | +15%p |
 | Cross-validation (Senior + Static tool) | sub-agent / 진짜 도구 | +5%p |
 
-→ Phase 4 미완료 시 Phase 4.5 진입 차단. domain.json + rules.json 모두 의무.
+→ `business-logic` phase 미완료 시 `formal-spec` phase 진입 차단. domain.json + rules.json 모두 의무.
 
 ---
 
@@ -130,7 +130,7 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 
 **해석 / 처리**:
 - `breaking` — structural drift. 즉시 finding 등록 (severity = high). 산출물 재작성 또는 정합 보정.
-- `non-breaking` — interpretive drift / 추상화 layer 차이. finding 등록 (severity = medium / low) — 자연어 ambiguity 노출 = Phase 4.5 본질적 가치.
+- `non-breaking` — interpretive drift / 추상화 layer 차이. finding 등록 (severity = medium / low) — 자연어 ambiguity 노출 = `formal-spec` phase 본질적 가치.
 - `info` — 한쪽이 더 자세 (mermaid 가 sub-state 까지). 의도된 패턴 — finding 미등록.
 
 수동 ad-hoc 검증 **금지** — "drift 0" 보고가 7+3 자동 검출로 한계 노출 사례 있음. 자동 도구 미실행 시 신뢰도 -5%p 패널티.
@@ -193,8 +193,8 @@ ADR-008 정합: 모든 영역에 AI 눈 + 사람 눈 동시 산출 의무.
 
 | 단계 | raw confidence |
 |---|---|
-| 자연어 단독 (Phase 4 까지) | 60-70% |
-| + Phase 4.5 5 산출물 작성 | 70-80% |
+| 자연어 단독 (`business-logic` phase 까지) | 60-70% |
+| + `formal-spec` phase 5 산출물 작성 | 70-80% |
 | + drift-validator + decision-table-validator 자동 실행 | 78-85% |
 | + Cross-validation 의무 (Senior + 시뮬 static) | 80-87% (시뮬 패널티 시) |
 | + 진짜 static tool 실행 + 5종 물증 (게이트 통과) | 90-95% |
@@ -214,7 +214,7 @@ ADR-008 정합: 모든 영역에 AI 눈 + 사람 눈 동시 산출 의무.
 - `cross_validation.real_tool: true` 시 5종 물증 schema 검증 통과 / `false` 시 `simulation_reason` 명시
 - `lint-no-simulation.sh` 통과 (CI 게이트)
 - _manifest.yml 신뢰도 정직 표기
-- Phase 5-1 (api) 진입 가능 (병행 가능)
+- `api` phase 진입 가능 (병행 가능)
 
 ---
 
@@ -224,4 +224,4 @@ ADR-008 정합: 모든 영역에 AI 눈 + 사람 눈 동시 산출 의무.
 - 자연어 표현: 트리거 / 액션 / 기대 결과 / 현재 상태
 - **자연어 누락 (형식화 필수)**: 거부 방식 / 검증 위치 / HTTP status / 에러 메시지 / unfollow 일관성
 
-→ Phase 4.5 형식화 시 100% 표현.
+→ `formal-spec` phase 형식화 시 100% 표현.

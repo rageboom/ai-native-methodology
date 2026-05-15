@@ -34,7 +34,7 @@
 | out_of_scope / risks | analysis finding + AP | LLM 분석 | 70% |
 | cross_links | 결정적 grep | 결정적 | 95% |
 
-**입력**: analysis stage 7대 + 8 FE 산출물 (rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md + Phase 4.5 + 8 FE).
+**입력**: analysis stage 7대 + 8 FE 산출물 (rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md + `formal-spec` phase 산출물 + 8 FE).
 
 ## 4. 검증 도구
 

@@ -1,4 +1,4 @@
-# Phase 4.8: sql-inventory (SQL 단위 11 컬럼 인벤토리 + extraction_automation)
+# sql-inventory phase: sql-inventory (SQL 단위 11 컬럼 인벤토리 + extraction_automation)
 
 > **명령어**: `/analyze-sql-inventory` · **사상**: ADR-CHAIN-007 (phase 4.8 정식 도입) + Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP) + Opus 4.7 외부 조언 6 컬럼
 > **핵심 책임**: rules + antipatterns + characterization 만으로는 SQL 단위 추적 ❌ → SQL 단위 11 컬럼 인벤토리 (외부 6 + 본 추가 5) + extraction_automation metric → chain 1 planning-spec UC↔sql_id mapping 입력 보강
@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-Phase 4.7 (characterization) 의 `intent_classification` 만으로는 SQL 단위 추적 ❌. iBATIS 2 / MyBatis / Spring JDBC / JPA Repository 모두 정합인 SQL 인벤토리 자산 부재.
+`characterization` phase 의 `intent_classification` 만으로는 SQL 단위 추적 ❌. iBATIS 2 / MyBatis / Spring JDBC / JPA Repository 모두 정합인 SQL 인벤토리 자산 부재.
 
 **답하는 질문**:
 - 어느 sql_id 가 어느 UC + intent 분류에 속하나? (uc_link + intent_vs_bug_classification)
@@ -23,13 +23,13 @@ Phase 4.7 (characterization) 의 `intent_classification` 만으로는 SQL 단위
 
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
-| inventory.json | Phase 1 산출물 (RDB 환경 식별) | 사전 조건 |
-| rules.json | Phase 4 산출물 | 60% |
-| antipatterns.json | Phase 6 / Phase 4 partial | +10%p |
-| characterization-spec.json | Phase 4.7 산출물 (★ intent_classification cross-link 의무) | +20%p |
+| inventory.json | `discovery` phase 산출물 (RDB 환경 식별) | 사전 조건 |
+| rules.json | `business-logic` phase 산출물 | 60% |
+| antipatterns.json | `quality` / `business-logic` phase partial | +10%p |
+| characterization-spec.json | `characterization` phase 산출물 (★ intent_classification cross-link 의무) | +20%p |
 | 도메인 expert 인터뷰 (DBA-read carry 시 의무) | 사용자 위임 | +10%p |
 
-→ Phase 1 + Phase 4 + Phase 4.7 미완료 시 Phase 4.8 진입 차단.
+→ `discovery` phase + `business-logic` phase + `characterization` phase 미완료 시 `sql-inventory` phase 진입 차단.
 → ★ ★ NoSQL / Prisma 단독 환경 시 phase 4.8 skip / `_manifest.yml` 의 `rdb_only: false`.
 
 ---

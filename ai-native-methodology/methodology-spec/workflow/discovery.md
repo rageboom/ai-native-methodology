@@ -1,4 +1,4 @@
-# Phase 1: init (인벤토리)
+# discovery phase: init (인벤토리)
 
 > **명령어**: `/analyze-init` · 분석 워크플로우의 **첫 자동화 단계**
 
@@ -13,7 +13,7 @@
 - 디렉토리 구조는?
 - ORM 은 무엇을 사용하는가?
 - 규모는 (LOC, 파일 수)?
-- 어떤 입력이 추가로 들어왔나? (Phase 0 결과 manifest 화)
+- 어떤 입력이 추가로 들어왔나? (`input` phase 결과 manifest 화)
 
 ---
 
@@ -22,7 +22,7 @@
 | 입력 | 출처 | 필수/선택 |
 |---|---|---|
 | 분석 대상 레포 | git clone 된 디렉토리 | 필수 |
-| `.ai-analysis/inputs/` | Phase 0 이 정돈 | 필수 |
+| `.ai-analysis/inputs/` | `input` phase 가 정돈 | 필수 |
 | 패키지 매니페스트 | package.json, pom.xml, build.gradle, requirements.txt 등 | 자동 감지 |
 
 ---
@@ -56,7 +56,7 @@
 ### 3.2 LLM 보강 영역
 
 - 스택 종합 요약 (예: "Spring Boot 3.x + JPA + React 18 + PostgreSQL")
-- 아키텍처 패턴 후보 추론 (Layered, Hexagonal 등 — Phase 1 에선 0.7 cap, Phase 3 에서 확정)
+- 아키텍처 패턴 후보 추론 (Layered, Hexagonal 등 — `discovery` phase 에선 0.7 cap, `architecture` phase 에서 확정)
 - 분석 권장 모듈 우선순위 (큰 모듈/핵심 도메인 추정)
 
 ---
@@ -71,7 +71,7 @@
 ├── tree.md                       # 디렉토리 트리
 ├── stack-detection.md            # 사람용 스택 보고서
 ├── stats.json                    # 파일/LOC 통계
-└── _manifest.yml                 # Phase 0 입력 manifest
+└── _manifest.yml                 # `input` phase 입력 manifest
 ```
 
 ### 4.2 inventory.json 핵심 필드
@@ -132,7 +132,7 @@ modules_for_priority_analysis:
 □ 스택 감지 결과 = 실제와 일치 (사용자 확인)
 □ ORM 자동 감지 결과 = 실제와 일치
 □ 분석 우선순위 모듈 = 사용자 의도와 일치
-□ 입력 manifest = Phase 0 정돈과 정합
+□ 입력 manifest = `input` phase 정돈과 정합
 ```
 
 ---
@@ -160,7 +160,7 @@ modules_for_priority_analysis:
 | 패키지 매니페스트 | 1.0 | deterministic | — |
 | ORM 자동 감지 | 0.85~0.95 | pattern_matching | 4단서 (어노테이션 + import + 의존성 + 설정파일) 점검 시 0.95. 단서 부족 시 감점 |
 | 스택 종합 요약 | 0.9 | llm_with_grounding | grounding 입력 부재 시 0.7 |
-| 아키텍처 스타일 추론 | 0.7 | llm_with_grounding | Phase 1 한계로 cap 0.7. 최종 분류는 Phase 3 에서 |
+| 아키텍처 스타일 추론 | 0.7 | llm_with_grounding | `discovery` phase 한계로 cap 0.7. 최종 분류는 `architecture` phase 에서 |
 | 분석 우선순위 추천 | 0.7 | llm_with_grounding | LLM 추정 — 사용자 검토 필수 |
 
 ### 6.3 warnings 의무화
@@ -194,11 +194,11 @@ warnings:
 
 ### 7.4 ORM 혼재 무시
 - 증상: JPA + MyBatis 혼재인데 하나만 감지
-- 결과: Phase 2.5 에서 SQL 분석 누락
+- 결과: `db-schema` phase 이후에서 SQL 분석 누락
 - 대응: 복수 ORM 감지 명시 + 각 사용 비율 표기
 
 ---
 
 ## 8. 다음 단계
 
-Phase 2 (`/analyze-db`) 진입.
+`db-schema` phase (`/analyze-db`) 진입.

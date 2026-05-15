@@ -95,7 +95,7 @@ input (spec stage 가 받음):
 | 약 | 약 | 강 | 강 | 강 | 강 |
 
 산출물 (spec stage 가 만듦):
-- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — Phase 4.5 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수
+- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수
 - **acceptance-criteria.json + .md** (deliverable 19 / `schemas/acceptance-criteria.schema.json` ★ sub-plan-2 신설) — Gherkin (Given/When/Then) BDD 정합 / verifiable=true 의무 / MoSCoW (must/should/nice)
 - **현 7대 산출물 통합** (변경 ❌) — behavior-spec.cross_links 가 모든 7대 산출물 reference (cross-link coverage 강제)
 

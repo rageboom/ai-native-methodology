@@ -2,7 +2,7 @@
 
 > **사상**: ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + ADR-FE-005 §2.2.3 (ICU MF1 stable + MF2 spec stable / runtime Technical Preview / ★ MF1 폴백 의무)
 > **schema**: `schemas/i18n-spec.schema.json`
-> **생성 phase**: Phase 5-2-a (`/analyze-ui-base` 의 sub) 또는 별도 `/analyze-i18n`
+> **생성 phase**: `ui` phase 5-2-a (`/analyze-ui-base` 의 sub) 또는 별도 `/analyze-i18n`
 
 ---
 
@@ -66,7 +66,7 @@ mf2_used=true & mf1_fallback_present=false → ★ schema validation fail (produ
 
 ---
 
-## 5. cross-link (Phase 4.5 패턴)
+## 5. cross-link (`formal-spec` phase 패턴)
 
 ```yaml
 cross_links:

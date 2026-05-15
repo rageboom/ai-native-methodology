@@ -2,7 +2,7 @@
 
 > **사상**: 이중 렌더링 FE 적용 (ADR-FE-002) + W3C SCXML 1.0 + XState v5+ 호환 (ADR-FE-005)
 > **schema**: `schemas/state-map.schema.json`
-> **생성 phase**: Phase 5-2-b (`/analyze-state`)
+> **생성 phase**: `ui` phase 5-2-b (`/analyze-state`)
 
 ---
 
@@ -62,7 +62,7 @@ output/state-map/
 | guards | if 조건 / 검증 함수 | LLM 추론 | 0.50 / 0.65 / 0.85 (XState type-check 통과 시) | transitions |
 | parallel regions | 동시 active region 감지 | LLM 추론 | 0.40 / 0.55 / 0.80 | machines |
 | history nodes | route restore / modal 복원 | LLM 추론 | 0.40 / 0.55 / 0.80 | machines |
-| cross_links | Phase 5-1 (api) + Phase 4 (rules) + Phase 5-2-a (ui-spec) | 결정적 + LLM | 0.75 / 0.85 / 0.90 | machines |
+| cross_links | `api` phase + `business-logic` phase (rules) + `ui` phase 5-2-a (ui-spec) | 결정적 + LLM | 0.75 / 0.85 / 0.90 | machines |
 
 **입력**: FE 소스
 **평균 신뢰도** (단계 3 / ADR-009 §2.4.1 정합): ~78% (drift-validator FE 적용 시)
@@ -125,7 +125,7 @@ stateDiagram-v2
 
 ---
 
-## 6. cross-link (Phase 4.5 패턴)
+## 6. cross-link (`formal-spec` phase 패턴)
 
 `cross_links[]` 배열 의무 (api / ui-spec / rules 중 1개 이상):
 

@@ -1,16 +1,16 @@
-# Phase 6: quality (안티패턴 통합)
+# quality phase: quality (안티패턴 통합)
 
-> **명령어**: `/analyze-quality` · 워크플로우 **마지막 단계** — Phase 1~5 결과 통합
+> **명령어**: `/analyze-quality` · 워크플로우 **마지막 단계** — `discovery`~`api`/`ui` phase 결과 통합
 
 ---
 
 ## 1. 목적
 
-Phase 1~5 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈로그 생성.
+전 phase 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈로그 생성.
 
 **왜 마지막인가**: 안티패턴은 단일 영역만 봐서는 알 수 없음. 예:
-- 정합성 검증 결과(Phase 2) + 비즈니스 로직(Phase 4) → "ERD-코드 불일치 + SQL 에 정책 박힘" 동일 영역에서 발견되면 심각도↑
-- API(Phase 5-1) + 도메인(Phase 4) → "API 에 정책 박힘 + Anemic Domain Model" 결합
+- 정합성 검증 결과(`db-schema` phase) + 비즈니스 로직(`business-logic` phase) → "ERD-코드 불일치 + SQL 에 정책 박힘" 동일 영역에서 발견되면 심각도↑
+- API(`api` phase) + 도메인(`business-logic` phase) → "API 에 정책 박힘 + Anemic Domain Model" 결합
 
 ---
 
@@ -18,12 +18,12 @@ Phase 1~5 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈
 
 | Phase | 입력 |
 |---|---|
-| Phase 1 | inventory.json (스택, 모듈) |
-| Phase 2 | schema.json + 정합성-검증-보고서.md |
-| Phase 3 | architecture.json (순환/레이어 위반) |
-| Phase 4 | 4영역 부분 안티패턴 |
-| Phase 5-1 | API 안티패턴 후보 |
-| Phase 5-2 | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c) |
+| `discovery` phase | inventory.json (스택, 모듈) |
+| `db-schema` phase | schema.json + 정합성-검증-보고서.md |
+| `architecture` phase | architecture.json (순환/레이어 위반) |
+| `business-logic` phase | 4영역 부분 안티패턴 |
+| `api` phase | API 안티패턴 후보 |
+| `ui` phase | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c) |
 | ★ deliverable 10 | a11y-spec.json (★ v1.4 — WCAG 2.1+2.2 ratchet) |
 | ★ deliverable 11 | i18n-spec.json (★ v1.4 — ICU MF1+MF2 / MF1 폴백) |
 | ★ deliverable 12 | static-security-spec.json (★ v1.4 — XSS / CSRF / CSP) |
@@ -41,9 +41,9 @@ Phase 1~5 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈
 
 후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` + `avoid-list.md`
 
-### 3.1 단순 통합 (Phase 4 가 만든 부분 안티패턴)
+### 3.1 단순 통합 (`business-logic` phase 가 만든 부분 안티패턴)
 
-Phase 4 의 4영역이 이미 등록한 것:
+`business-logic` phase 의 4영역이 이미 등록한 것:
 - 5.A: AP-DB-XXX
 - 5.B: AP-FE-XXX
 - 5.C: AP-CFG-XXX
@@ -51,17 +51,17 @@ Phase 4 의 4영역이 이미 등록한 것:
 
 → 그대로 통합 + ID 중복 검사.
 
-### 3.2 복합 안티패턴 (Phase 6 에서만 가능)
+### 3.2 복합 안티패턴 (`quality` phase 에서만 가능)
 
 여러 phase 결과를 결합해야 발견되는 패턴:
 
 ```yaml
 - id: AP-COMPOSITE-001
   composite_pattern: "Anemic Domain + SQL 에 비즈니스 로직"
-  evidence_phases: [4-5.A, 4도메인]
+  evidence_phases: [business-logic-5A, business-logic-domain]
   description: |
-    Phase 4 도메인 분석에서 Order 엔티티가 데이터 holder 만 됨 (Anemic).
-    동시에 Phase 4 5.A 에서 SQL CASE 에 가격 정책 박힌 것 발견.
+    `business-logic` phase 도메인 분석에서 Order 엔티티가 데이터 holder 만 됨 (Anemic).
+    동시에 `business-logic` phase 5.A 에서 SQL CASE 에 가격 정책 박힌 것 발견.
     → 비즈니스 로직이 도메인 레이어를 우회하고 SQL 에 박힌 패턴.
   severity: high
   recommended_alternative: |
@@ -71,13 +71,13 @@ Phase 4 의 4영역이 이미 등록한 것:
 
 ### 3.3 정합성 보고서 → 안티패턴 격상
 
-Phase 2 의 정합성 검증 보고서에서 severity=high 인 항목은 안티패턴으로:
+`db-schema` phase 의 정합성 검증 보고서에서 severity=high 인 항목은 안티패턴으로:
 
 ```yaml
-# Phase 2 결과
+# db-schema phase 결과
 DRIFT-001: column_only_in_db (severity: high)
 
-# Phase 6 격상
+# quality phase 격상
 - id: AP-DB-DRIFT-001
   category: db
   pattern_name: "ERD/코드와 운영 DB 컬럼 불일치"
@@ -209,7 +209,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 - [ ] AP-DB-DRIFT-001: ERD/코드와 운영 DB 컬럼 불일치
   - 위치: orders.admin_memo
-  - 근거: Phase 2 DRIFT-001
+  - 근거: `db-schema` phase DRIFT-001
   - 권장: 운영 DB 컬럼을 ERD/ORM 에 추가
 
 - [ ] AP-FE-VALIDATION-MISSING-BE: FE 에만 validation
@@ -226,8 +226,8 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 □ 모든 항목에 evidence + recommended_alternative
 □ 톤 점검 완료 (비난 표현 0)
 □ severity 분포 확인
-□ Phase 2 정합성 보고서 → 안티패턴 격상 완료
-□ 복합 안티패턴 검출 (Phase 6 부가가치)
+□ `db-schema` phase 정합성 보고서 → 안티패턴 격상 완료
+□ 복합 안티패턴 검출 (`quality` phase 부가가치)
 □ avoid-list.md 사용자 검토
 □ 시니어 BE 검토 ✋ (특히 high 항목)
 ```
@@ -251,7 +251,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ## 9. 최종 산출물 검증
 
-Phase 6 완료 시 **전체 산출물 일관성 검증**:
+`quality` phase 완료 시 **전체 산출물 일관성 검증**:
 
 ```
 □ 모든 ID 표준 일관성 (UC/E/BR/PAGE/AP)
@@ -268,7 +268,7 @@ Phase 6 완료 시 **전체 산출물 일관성 검증**:
 
 ## 10. 분석 워크플로우 종료
 
-Phase 6 완료 → 전체 산출물 검증 → 최종 발행:
+`quality` phase 완료 → 전체 산출물 검증 → 최종 발행:
 - TF 멤버 검토
 - 재구현 단계 입력 (v3)
 - 사내 자산화

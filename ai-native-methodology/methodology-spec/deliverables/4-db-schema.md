@@ -2,7 +2,7 @@
 
 > **사상**: Schema-First (ADR-001 — 다중 출처 통합 시 운영 DB > ORM > ERD 우선순위)
 > **schema**: `schemas/db-schema.schema.json` · **template**: `templates/erd.template.mermaid`
-> **생성 phase**: Phase 2 (`/analyze-db`)
+> **생성 phase**: `db-schema` phase (`/analyze-db`)
 
 ---
 
@@ -88,4 +88,4 @@ output/db/
 
 ### 6.3 ORM 우회 SQL 무시
 - 증상: JPA + Native Query 혼재인데 ORM 만 봄
-- 대응: Native Query 위치 함께 기록 → Phase 4 5.A 로 전달
+- 대응: Native Query 위치 함께 기록 → `business-logic` phase 5.A 로 전달

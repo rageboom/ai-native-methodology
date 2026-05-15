@@ -2,7 +2,7 @@
 
 > **사상**: ADR-BE-001 (negative-space corroboration 정식화) + ADR-FE-007 (positive-space sister) + ADR-009 (5단계 신뢰도 / 진짜 도구 의무) + ADR-010 (baseline + ratchet)
 > **schema**: `schemas/error-mapping-spec.schema.json`
-> **생성 phase**: Phase 5-1 (api)
+> **생성 phase**: `api` phase
 > **skill**: `skills/analysis-error-mapping/SKILL.md`
 
 ---
