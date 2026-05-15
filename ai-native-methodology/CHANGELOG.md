@@ -9,6 +9,86 @@
 
 ---
 
+## [3.0.0] — 2026-05-15 ★ ★ ★ ★ ★ MAJOR — phase ID 의미 ID 본격 자산화 (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동 도출)
+
+> ★ ★ ★ ★ ★ ★ ★ **BREAKING — manifest phase ID 11개 숫자 → 의미 ID + workflow file 11 rename + drift-validator 위상정렬 신규** (★ ★ ★ ★ semver MAJOR / 사내 배포 전 / 실 사용자 0 / alias map ❌ / 즉시 cutover). v2.0 SDLC 4단계 chain harness 도입 이래 누적 paradigm 의 자연 분기점 — magic decimal (4.5/4.7/4.8) + hyphenated (5-1/5-2) + 의미 부재 (0~6) 본격 폐기.
+>
+> ★ ★ paradigm 본격 위치 = `docs/adr/ADR-CHAIN-012-phase-id-semantic-id.md` (D-3 paradigm 본격 명세) + `.claude/plans/plan-phase-id-semantic-rename.md` (Senior critique 흡수 + Sprint 분할 본격).
+
+### BREAKING — phase ID 매핑 (11)
+
+| v2.6.0 (숫자) | v3.0.0 (의미 ID) | depends_on |
+|---|---|---|
+| `0` | **`input`** | [] |
+| `1` | **`discovery`** | [input] |
+| `2` | **`db-schema`** | [discovery] |
+| `3` | **`architecture`** | [discovery, db-schema] |
+| `4` | **`business-logic`** | [discovery, db-schema, architecture] |
+| `4.5` | **`formal-spec`** | [business-logic] |
+| `4.7` | **`characterization`** | [business-logic, formal-spec] |
+| `4.8` | **`sql-inventory`** | [discovery, business-logic, characterization] |
+| `5-1` | **`api`** | [business-logic, formal-spec, characterization, sql-inventory] |
+| `5-2` | **`ui`** | [architecture, business-logic, characterization] |
+| `6` | **`quality`** | [business-logic, formal-spec, api, ui] |
+
+### BREAKING — workflow file rename (11)
+
+```
+phase-0-input.md              → input.md
+phase-1-init.md               → discovery.md
+phase-2-db.md                 → db-schema.md
+phase-3-arch.md               → architecture.md
+phase-4-business-logic.md     → business-logic.md
+phase-4-5-formal-spec.md      → formal-spec.md
+phase-4-7-characterization.md → characterization.md
+phase-4-8-sql-inventory.md    → sql-inventory.md
+phase-5-1-api.md              → api.md
+phase-5-2-ui.md               → ui.md
+phase-6-quality.md            → quality.md
+```
+
+### D-3 paradigm 본질
+
+- **`id`** = 의미 ID (영문 hyphenated lowercase)
+- **`order` 필드 부재** — 순서는 `depends_on` 그래프 → 위상정렬로 자동 도출
+- **lexicographic tiebreak** — 같은 레벨 노드는 알파벳 순 (api / ui 같은 병렬)
+- **alias map ❌** — 즉시 cutover
+
+### 신규 영역 (5건)
+
+1. **`tools/drift-validator/src/topological-sort.js`** — Kahn's algorithm + lexicographic tiebreak + 순환 검출 + unknown_deps 검출
+2. **`tools/drift-validator/src/check-phase-skills.js`** — depends_on 그래프 무결성 검증 통합 (DAG 의무 + unknown phase 0)
+3. **`tools/drift-validator/test/topological-sort.test.js`** — +5 test (DAG 정상 / lexicographic / 순환 / unknown / diff 형식)
+4. **`schemas/finding-system.schema.json`** — phase 필드 oneOf (integer + enum["4.5"]) → 의미 ID enum 11종
+5. **`docs/adr/ADR-CHAIN-012-phase-id-semantic-id.md`** — D-3 paradigm 본격 명세 + LL-i-51~53
+
+### 검증 통과
+
+- ✅ workspace test 312 → 317 (drift +5 신규 / 회귀 ❌)
+- ✅ drift-validator --check-layout: 11 phases / 22 skills / 0 orphans / 0 missing
+- ✅ drift-validator --check-chain-layout: 4 stages / 26 phases / 13 skills / 0 orphans
+- ✅ drift-validator mermaid ↔ JSON 짝 비교: 0 breaking / 0 non-breaking
+- ✅ release-readiness v3.0.0: 9/9 strict pass
+- ✅ chain harness 5 요소 본질 보존 (★ chain-driver gate-eval.js / hooks-bridge.js / release-readiness.js / br-cross-consistency-validator 모두 본질 변경 ❌)
+
+### Sprint 본격 sequence
+
+- S1 (Senior critique sub-agent) — STOP-1+2 / REVISE-1~5 / CAUTION-1~4 발행 + 흡수
+- S2 (commit `8a89461`) — manifest + workflow rename + 위상정렬 신규
+- S3-a (commit `cff7949`) — schemas + tools 코드 정합 (state-store `P0.0` → `input.0`)
+- S3-b (commit `e33d380`) — PoC finding 일괄 sed + 본문 path + mermaid + normalize-phase-flow.js 정규식
+- S4 — 전수 검증 (327/0 + 9/9)
+- S5 (본 release) — ADR-CHAIN-012 + CHANGELOG v3.0.0 + version bump + commit + tag + push
+
+### Carry (v3.0 후 cleanup)
+
+- examples/poc-04-* analysis 디렉토리 명 (`0-init/`, `1-architecture/` 등 옛 표기) — 사람 가독성 axis
+- skills 본문 안 옛 file 명 misnomer 인용 (phase-3-domain / phase-1-inventory 등) — manual review
+- 본문 자유 텍스트 "Phase 4" 산문 표기 — manual review
+- ★ **다른 chain stage flow phase ID 의미 ID rename** (planning P1.0~P1.3 / spec P2.0~P2.5 / test P3.0~P3.6 / implement P4.0~?) — 별개 plan 영역
+
+---
+
 ## [2.6.0] — 2026-05-14 ★ ★ ★ ★ MINOR — skill 의미 ID 본격 자산화 (★ phase-N 숫자 prefix 본격 폐기 / 17 skill rename / Senior critique 5 의제 본격 흡수)
 
 > ★ ★ ★ ★ ★ ★ **BREAKING — skill 디렉토리 17 rename + 명시 호출 path 본격 변경** (★ ★ ★ semver MINOR / 사내 dogfooding 한정 / Senior critique 의제 3 전면 흡수). 자연어 trigger 영역 description 본문 보존 / auto-invocation 영향 ❌. v2.5.1 명시 호출 (예 `/analysis-phase-0-input`) → v2.6.0 새 이름 (예 `/analysis-input-collection`). alias map ❌ / 즉시 cutover.

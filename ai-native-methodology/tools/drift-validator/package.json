@@ -1,6 +1,6 @@
 {
   "name": "@ai-native-methodology/drift-validator",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Drift validator — single source of truth, dual rendering (.mermaid <-> .json) semantic equivalence checker. Output: oasdiff-style diff list + severity.",
   "type": "module",
   "engines": {
