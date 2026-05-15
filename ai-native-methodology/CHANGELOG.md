@@ -9,6 +9,29 @@
 
 ---
 
+## [3.6.1] — 2026-05-15 ★ PATCH — carry C10+C8+C9 묶음 (cross-link 문서 보강)
+
+> ★ G5 paradigm 강화 — `lifecycle-contract.md` §자산 매핑 매트릭스 의 cross-link 자산 (agents/README.md 신설 + tools/README.md cross-link + spectral-runner README carry 정정). 자산 신설/기능 추가 ❌ / 문서 보강만 = PATCH 정합.
+
+### 갱신 자산 (3 file)
+
+- **C10**: `tools/spectral-runner/README.md` — "호출자: skill `analysis-openapi` 자동 호출" → **"사용자/orchestrate 명시 호출 (auto-invoke ❌ / no-simulation 정합 / G2 LL-G2-06 정정)"**. 자동 호출 통합은 v3.x carry (chain-driver hooks-bridge 정합 결단 후 별도 시행).
+- **C8**: `agents/README.md` — **신설**. 본 매트릭스 §Agent column cross-link / 3 base agent persona (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`) 책임 명시 + 호출 시기 + paradigm 정합 (1-depth flat / decision axis 분리).
+- **C9**: `tools/README.md` — 본 매트릭스 §Tool/Validator column cross-link 1줄 추가 (cadence table 앞 §자산 매핑 매트릭스 cross-link section).
+
+### paradigm 결단
+
+- version 라벨 = **v3.6.1 PATCH** (semver 정합 / 자산 신설 ❌ / 문서 보강만)
+- 별도 session 의무 carry (C1 G6 / C5/C6/C7 PoC / C2 분리 신호 / C3 legacy) = 본 묶음 외
+
+### 정합 관계
+
+- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (본 PATCH = G5 paradigm 강화)
+- DEC-2026-05-15-g{2,4}-* (G2 LL-G2-06 + G4 LL-G4-04/05 정합)
+- memory `feedback_chain_driver_deterministic_axis` + `feedback_no_static_tool_simulation` (auto-invoke ❌ 정합)
+
+---
+
 ## [3.6.0] — 2026-05-15 ★ ★ ★ MINOR — G1 ITSM 영구 scope-out / charter Gap 모두 청산
 
 > ★ ★ ★ **charter §1 R16/R17 영구 폐기** (사용자 명시 결단 "G1 안해도 됨 잊어줘"). charter §3 활성 Gap **모두 청산** = plugin must-have 자산 대칭 본격 도달. 향후 자동 티켓화 재제안 ❌.

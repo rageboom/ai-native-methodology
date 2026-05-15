@@ -7,8 +7,9 @@
 ## When to call
 
 - **trigger**: Phase 5-1 (api) openapi.yaml 산출 후
-- **호출자**: skill `analysis-openapi` 자동 호출
-- **수동**: `npx spectral lint ...`
+- **호출자**: ★ **사용자 또는 orchestrate 명시 호출** (no-simulation 정합 / auto-invoke ❌ / G2 LL-G2-06 정합 / 2026-05-15 carry 정정)
+- **방식**: `npx spectral lint ...` (CLI passthrough / wrapper Node 진입 함수 부재)
+- **carry** (v3.x): skill `analysis-openapi` 의 auto-invoke 통합은 chain-driver hooks-bridge 정합 결단 후 별도 시행. 현재 = LLM 양심 의존 auto-invoke ❌ / 사용자 명시 호출 의무 ([[feedback_no_static_tool_simulation]] 정합)
 
 ## Inputs
 

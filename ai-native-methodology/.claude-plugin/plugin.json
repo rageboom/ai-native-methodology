@@ -1,6 +1,6 @@
 {
   "name": "ai-native-methodology",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "AI-Native 개발 방법론 — SDLC 4단계 chain harness Claude Code plugin (사내 표준). Analysis stage (legacy 분석 / 7대 산출물 + finding + antipatterns + migration-cautions) + chain 1~4 gate (planning → behavior+AC → test RED → impl GREEN) + traceability matrix + 70~80% 한계 명시. 변경 이력은 CHANGELOG.md 참조.",
   "author": {
     "name": "AIMD",
