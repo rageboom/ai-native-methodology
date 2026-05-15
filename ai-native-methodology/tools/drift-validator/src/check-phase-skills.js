@@ -1,14 +1,17 @@
 // check-phase-skills.js — manifest ↔ workflow ↔ skills 3-way layout 검증.
 // v1.4.4 신설 (plan-v144-manifest-ssot.md / methodology-spec/skills-axis.md 정합).
 // ★ v2.5.1 PATCH — skills 1-depth + category prefix paradigm 정합 갱신 (post-v2.5.1 meta cleanup).
+// ★ ★ ★ v3.0.0 MAJOR — depends_on 그래프 무결성 검증 추가 (위상정렬 + 순환 검출 / D-3 paradigm).
 // 검증:
 //   1. manifest.phases[].spec_file → methodology-spec/workflow/ 안에 존재
-//   2. manifest.phases[].skills[] → skills/<skill>/SKILL.md 보유 (★ skill name 자체가 'analysis-' prefix 포함)
-//   3. cross_cutting.aspects.skills[] → skills/<skill>/SKILL.md 보유
-//   4. 역방향 — skills/ 안 'analysis-' prefix SKILL.md 디렉토리가 manifest 의 어디든 등록 (★ orphan 0)
+//   2. manifest.phases[].depends_on → 그래프 무결성 (DAG / unknown phase 0 / ★ v3.0)
+//   3. manifest.phases[].skills[] → skills/<skill>/SKILL.md 보유 (★ skill name 자체가 'analysis-' prefix 포함)
+//   4. cross_cutting.aspects.skills[] → skills/<skill>/SKILL.md 보유
+//   5. 역방향 — skills/ 안 'analysis-' prefix SKILL.md 디렉토리가 manifest 의 어디든 등록 (★ orphan 0)
 
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { checkDependencyGraph } from './topological-sort.js';
 
 const MANIFEST_REL = 'flows/analysis.phase-flow.json';
 const WORKFLOW_REL = 'methodology-spec/workflow';
@@ -54,6 +57,9 @@ export function checkPhaseSkills(workspaceRoot) {
       });
     }
   }
+
+  // ★ v3.0.0 — depends_on 그래프 무결성 (DAG 의무 + unknown phase 0)
+  diffs.push(...checkDependencyGraph(manifest.phases ?? []));
 
   // 3. skills/aspects 정합 + declared set 누적
   const skillsDir = join(workspaceRoot, SKILLS_REL);
