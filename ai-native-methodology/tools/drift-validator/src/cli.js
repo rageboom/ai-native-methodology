@@ -51,6 +51,21 @@ function processOne({ jsonPath, mermaidPath }) {
   const jsonType = detectArtifactType(json);
   const mermaidType = detectDiagramType(mermaidText);
 
+  // ★ D23 — chain-flow master (sdlc-4stage-flow) 는 phase-flow 일반 비교 영역 아님 / --check-chain-layout + --check-state-flow-consistency 가 검증
+  if (jsonType === 'chain-flow') {
+    const diffs = [{
+      severity: 'info',
+      kind: 'chain-flow.detection-only',
+      message: 'chain-flow master — 별도 도구 (--check-chain-layout / --check-state-flow-consistency) 로 검증 / phase-flow 일반 비교 영역 아님',
+    }];
+    return {
+      jsonPath, mermaidPath,
+      diagram_type: jsonType,
+      summary: summarize(diffs),
+      diffs,
+    };
+  }
+
   // ★ v1.4 Stage 5 Sprint 5-3 Phase A — FE state-map mermaid 는 stateDiagram-v2 로 'state-machine' detect / FE 모드는 detection only
   const typesMatch = jsonType === mermaidType
     || (jsonType === 'state-map-fe' && mermaidType === 'state-machine');

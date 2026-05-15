@@ -12,6 +12,11 @@ export function detectArtifactType(json) {
       && Array.isArray(json.phases[0]?.depends_on)) {
     return 'phase-flow';
   }
+  // ★ D23 — chain-flow master (sdlc-4stage-flow.json) 검출 / phase-flow 와 axis 다름 (stages × gates × revisit_edges) / 별도 도구 (--check-chain-layout / --check-state-flow-consistency) 영역
+  if (Array.isArray(json.stages) && json.stages.length > 0
+      && Array.isArray(json.gates)) {
+    return 'chain-flow';
+  }
   // ★ v1.4 Stage 5 Sprint 5-3 Phase A — FE state-map (state_machines[] 배열) 검출
   // F-FE-004 (Stage 4 mini-PoC) 본체 도구 한계 closed.
   if (Array.isArray(json.state_machines) && json.state_machines.length > 0
