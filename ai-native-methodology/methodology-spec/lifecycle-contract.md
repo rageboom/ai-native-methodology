@@ -53,6 +53,46 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 
 본 추상화 단계 (v1.4.x) = ★ 정책 선언만. v2.0 진입 시 SKILL.md 신설 시점에 적용.
 
+## 자산 매핑 매트릭스 (★ v3.5.0 G5 종결 / 2026-05-15)
+
+본 매트릭스 = stage 진입 시 사용자가 어떤 자산 (agent / skill / hook / tool/validator) 을 호출할지 단일 SSOT. charter §3 G5 종결 (DEC-2026-05-15-g5-lifecycle-asset-matrix-종결).
+
+### 본 매트릭스 (stage × asset 5 column / 8 row)
+
+| Stage / Cross-cut | Agent | Skill | Hook | Tool / Validator |
+|---|---|---|---|---|
+| **input** (analysis 진입) | — | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-{prompt,swagger,plan-doc,figma}` (★ 부 매트릭스 §자산 매핑 매트릭스 detail 참조) | `SessionStart` (chain-driver hooks-bridge / D21' suppressOutput) | (input-summary.schema.json validation only) |
+| **analysis** (chain 1 sub) | `analysis-*` persona (`agents/analysis/README.md`) | `analysis-source-inventory`, `analysis-db-schema-erd`, `analysis-architecture`, `analysis-domain-model`, `analysis-business-rules`, `analysis-openapi`, `analysis-api-rule-mapping`, `analysis-error-mapping`, `analysis-quality-antipattern`, `analysis-formal-spec-validation`, `analysis-characterization-test`, `analysis-sql-inventory`, `analysis-form-validation-fe`, `analysis-type-spec-fe`, `analysis-ui-state-map-fe`, `analysis-ui-visual-manifest-fe`, `analysis-br-cross-consistency-check`, `analysis-html-template` (★ v3.4.0) | `PostToolUse(Write/Edit → lint)`, `Stop(rollup)` | `drift-validator`, `schema-validator`, `formal-spec-link-validator`, `spectral-runner` (사용자 명시 호출), `static-runner`, `decision-table-validator` |
+| **planning** (chain 1) | `full-stack-planner` persona | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding` | `PreToolUse(deny secrets)`, `Stop(gate-1 evidence)` | `planning-extraction-validator`, `br-cross-consistency-validator`, `schema-validator` |
+| **spec** (chain 2) | `full-stack-architect` persona | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-7대-deliverables`, `_base-build-traceability-matrix` | `PostToolUse(spec lint)` | `chain-coverage-validator`, `formal-spec-link-validator`, `schema-validator` |
+| **test** (chain 3) | `qa-architect`, `test-engineer` persona | `test-generate-test-spec` (jest/vitest/junit5/pytest/RTL/Vue Test Utils 본문 분기), `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (★ v3.4.0 / e2e POM) | `PreToolUse(test-cmd require)`, `Stop(RED evidence)` | `test-impl-pass-validator (dry-run)`, `spec-test-link-validator`, `schema-validator`, `lint-no-simulation (chain-strict)` |
+| **implement** (chain 4) | `full-stack-implementer` persona | `implement-generate-impl-spec` (nestjs/spring/fastapi 본문 분기), `implement-verify-test-pass`, `implement-react` (★ v3.4.0 / React 19), `implement-vue` (★ v3.4.0 / Vue 3) | `PreToolUse(commit_hash require)`, `Stop(GREEN gate-4)` | `test-impl-pass-validator (--allow-execute)`, `static-runner (6 plugin)`, `lint-no-simulation`, `traceability-matrix-builder`, `schema-validator` |
+| **cross-cut** (traceability) | — | `_base-build-traceability-matrix` | (Stop 동일) | `traceability-matrix-builder`, `chain-coverage-validator` |
+| **cross-cut** (aspects) | `aspect-*` persona | `analysis-aspect-a11y`, `analysis-aspect-i18n`, `analysis-aspect-static-security`, `analysis-aspect-legacy` | (PostToolUse 동일) | (각 aspect 자체 외부 도구 — axe-core / i18n-lint / SpotBugs / 등 / 진짜 실행 의무) |
+
+### 부 매트릭스: input 5종 (R8 입력 axis) detail
+
+본 매트릭스 의 **input row** 단일 항목을 R8 입력 axis 로 펼침. orchestrator 는 BCDE 4 skill 자동 dispatch.
+
+| R8 종류 | skill | 의존 도구 | 산출 schema |
+|---|---|---|---|
+| (a) 기존 코드 | `analysis-input-collection` | git clone + Glob/Grep + ADR-010 baseline+ratchet | `input.json` (`.aimd/<scope>/`) |
+| (b) Figma | `analysis-from-figma` | `mcp__figma-desktop__get_design_context` + `get_metadata` + `get_variable_defs` + `get_screenshot` (사전조건 = desktop selection) | `figma-extract.schema.json` |
+| (c) Swagger / OpenAPI | `analysis-from-swagger` | `@readme/openapi-parser` (3.1 + 3.0 + 2.0 / `$ref` resolve) | `swagger-extract.schema.json` |
+| (d) plan-doc | `analysis-from-plan-doc` | Read (PDF 20p cap) + markdown parser (remark) + adm-zip + csv-parse | `plan-doc-extract.schema.json` |
+| (e) 자연어 prompt | `analysis-from-prompt` | (Claude 의미 추출만 / 외부 의존 0) | `prompt-extract.schema.json` |
+| (★ orchestrator) | `analysis-input-orchestrate` | (BCDE 4 skill 자동 dispatch + merge + cross-ref + conflict 정량 산식 / Hybrid 2-B + 2-A escalate) | `input-summary.schema.json` (cross_refs + conflicts + score_components) |
+
+### Scenario × stage 매트릭스 (be-fe-separation.md §6 정합)
+
+본 매트릭스 의 stage 별 자산이 Scenario A (분리 default / React+TS) / B (JS 풀스택 / Next.js 등) / C (JSP 등 server-rendered) 에 어떻게 적용되는지 = `methodology-spec/be-fe-separation.md` §1~§6 참조. 본 자산 매핑 매트릭스 와 Scenario 매트릭스 = cross-link (axis 분리).
+
+### 사용 가이드
+
+- 사용자가 "어떤 chain stage 진입할까?" → 본 매트릭스 row 선택 → skill / hook / tool column 인용
+- 입력 시점에 R8 5종 중 어느 입력인지 → 부 매트릭스 참조 → 해당 skill 호출 (또는 orchestrate 가 자동 dispatch)
+- agent persona = 매트릭스 column "Agent" 인용 (`agents/<stage>/README.md`)
+
 ## 단계 간 인터페이스 (data contract)
 
 ### chain 1 (기획) — planning stage (★ v2.0)

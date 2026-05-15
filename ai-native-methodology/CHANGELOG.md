@@ -9,6 +9,47 @@
 
 ---
 
+## [3.5.0] — 2026-05-15 ★ ★ ★ MINOR — G5 종결 / lifecycle 자산 매핑 매트릭스 (단일 SSOT)
+
+> ★ ★ ★ **charter §3 G5 종결** — R12 lifecycle stage↔asset 매핑표 신설. 이전엔 `skills-axis.md` + `be-fe-separation.md` + `flows/*` 흩어진 자산을 사용자가 cross-read 의무. 본 매트릭스 = 1장에서 stage 진입 시 어떤 자산 호출할지 즉답. **잔여 charter Gap = G1 (ITSM 후순위) 단독**.
+
+### 신설 자산
+
+- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 신설:
+  - **본 매트릭스** (stage × asset 5 column × 8 row) — input / analysis / planning / spec / test / implement / cross-cut traceability / cross-cut aspects
+  - **부 매트릭스** (R8 입력 axis 6 row) — (a) 코드 / (b) Figma / (c) Swagger / (d) plan-doc / (e) prompt / (★ orchestrator) — 본 매트릭스 input row 의 펼침 매핑
+  - **Scenario cross-link** (be-fe-separation.md §6 / axis 분리 명시)
+  - **사용 가이드** (stage 진입 시 / R8 입력 시 / agent persona 인용 흐름)
+
+### paradigm 결단 (사용자 결단 2026-05-15)
+
+| 의제 | 결단 | 근거 |
+|---|---|---|
+| Column 5 | agent / skill / hook / tool/validator (charter §3 G5 원안 정합) | — |
+| Row 분리도 | **단일 row + 부 매트릭스** | row 비대화 회피 + orchestrate 자연 응집 + BCDE detail 분리 = ROI 최적 |
+| version 라벨 | **v3.5.0 MINOR** | G5 종결 = MINOR (G2/G4 일관) |
+
+### 부수 갱신
+
+- `methodology-spec/plugin-charter.md` §1 R12 ⚠️→✅ (자산 차원 격상) + §2 요약 ✅ 14 / ⚠️ 1 / ❌ 2 + §3 G5 종결 (잔여 G1 단독)
+- `.claude-plugin/plugin.json` 3.4.0 → 3.5.0
+- `decisions/DEC-2026-05-15-g5-lifecycle-asset-matrix-종결.md` — 신설
+
+### Lessons Learned (★ paradigm 진화)
+
+- **LL-G5-01**: 매핑 매트릭스 row 분리도 = **사용자 진입 가이드 ↑** vs **매트릭스 시야 ↓** 사이 trade-off. row 비대화 회피 + 부 매트릭스 분리 = ROI 최적. G2 LL-G2-03 (책임 합산) + G4 LL-G4-02 (분리 vs 본문 분기) 의 단순 문서 영역 응용.
+- **LL-G5-02**: charter §3 종결 자산 = 매트릭스 1장 정도라도 **단일 SSOT 확립 가치** 큼. 흩어진 자산 (skills-axis / be-fe-separation / flows) → 1장 cross-read 회피 → 사용자 진입 즉답.
+
+### 정합 관계
+
+- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (본 entry SSOT)
+- DEC-2026-05-15-plugin-charter-17-requirements-채택 (charter §3 G5 종결 sibling)
+- DEC-2026-05-15-g{2,3,4}-* (paradigm 진화 sibling)
+- v2.6.0 paradigm (skills-axis category prefix / 의미 ID)
+- be-fe-separation.md (Scenario × IR 4계층 / axis 분리)
+
+---
+
 ## [3.4.0] — 2026-05-15 ★ ★ ★ MINOR — G4 종결 / FE skill 보강 (4 skill 신설 + RTL 본문 분기 + 5 test pass)
 
 > ★ ★ ★ **charter §3 G4 종결** — R14 BE/FE 자산 비대칭 해소. **후보 C 채택** (4 skill + 본문 분기 / `test-jest` 중복 회피 / BE 트랙 paradigm 일관). v2.6.0 의미 ID + ADR-CHAIN-001 chain 4 이중 렌더링 정합.
