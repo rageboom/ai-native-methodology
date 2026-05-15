@@ -11,7 +11,8 @@ const normalizeLabel = (s) => stripDecor(stripBr(s)).toLowerCase();
 export function detectDiagramType(text) {
   const lines = text.split('\n').map(stripComment);
   let hasFlowchart = false;
-  let phaseSubgraphCount = 0;
+  let phaseSubgraphCount = 0;     // analysis pattern — P_* subgraph
+  let phasePlainNodeCount = 0;    // chain v2 pattern — P_* plain node (chain stage subgraph 안 또는 외부)
   for (const line of lines) {
     const t = line.trim();
     if (t.startsWith('stateDiagram')) return 'state-machine';
@@ -19,8 +20,10 @@ export function detectDiagramType(text) {
     // ★ Sprint 5+ Phase B — phase-flow 검출 (flowchart + subgraph P{X} ≥ 2)
     if (/^flowchart\b/i.test(t)) hasFlowchart = true;
     if (/^subgraph\s+P[\w_]*(\s|\[|$)/.test(t)) phaseSubgraphCount++;
+    // ★ D11 fix — chain v2 패턴 인식 (P_*[label] plain node / subgraph 키워드 아닌 + edge 아닌)
+    if (!t.startsWith('subgraph') && !/-->|-\.->|==>|~~>/.test(t) && /^P[\w_]+\s*\[/.test(t)) phasePlainNodeCount++;
   }
-  if (hasFlowchart && phaseSubgraphCount >= 2) return 'phase-flow';
+  if (hasFlowchart && (phaseSubgraphCount >= 2 || phasePlainNodeCount >= 2)) return 'phase-flow';
   return 'unknown';
 }
 

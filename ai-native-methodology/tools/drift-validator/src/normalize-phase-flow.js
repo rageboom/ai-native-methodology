@@ -25,13 +25,16 @@ export function detectPhaseFlowJson(json) {
 export function detectPhaseFlowMermaid(text) {
   const lines = text.split('\n').map(stripComment);
   let hasFlowchart = false;
-  let phaseSubgraphCount = 0;
+  let phaseSubgraphCount = 0;     // analysis 패턴 — phase 단위 subgraph (P_* prefix)
+  let phasePlainNodeCount = 0;    // chain v2 패턴 — phase plain node (P_*[label])
   for (const raw of lines) {
     const line = raw.trim();
     if (/^flowchart\b/i.test(line)) hasFlowchart = true;
     if (/^subgraph\s+P[\w_]*(\s|\[|$)/.test(line)) phaseSubgraphCount++;
+    // chain v2 — subgraph 키워드 / edge 라인 제외 후 P_*[ 정의 패턴
+    if (!line.startsWith('subgraph') && !/-->|-\.->|==>|~~>/.test(line) && /^P[\w_]+\s*\[/.test(line)) phasePlainNodeCount++;
   }
-  return hasFlowchart && phaseSubgraphCount >= 2;  // 최소 2 phase subgraph 가 있어야 phase-flow 로 판정
+  return hasFlowchart && (phaseSubgraphCount >= 2 || phasePlainNodeCount >= 2);
 }
 
 export function normalizePhaseFlowJson(json) {
@@ -59,52 +62,76 @@ export function normalizePhaseFlowJson(json) {
 
 export function normalizePhaseFlow(text) {
   const lines = text.split('\n').map(stripComment);
-  const subgraphs = new Map();    // raw subgraph id (P0/P45/...) → derived phase id ("0"/"4.5"/...)
+  const subgraphs = new Map();    // node/subgraph raw id → derived phase id
   const phases = new Set();
   const dependencies = [];        // { from, to } — derived phase id
 
   let depth = 0;
-  // subgraph 내부에서는 외부 edge 추출하지 않음 (★ 외부 phase 간 edge 만 의존 그래프).
-  // 단, subgraph 라인 자체는 depth 변경 직전에 처리.
+  const depthIsPhaseSubgraph = [];  // stack — true=P_* subgraph (analysis pattern, 자식 line 무시) / false=chain stage subgraph (chain v2 pattern, 자식 phase plain node 인식)
 
   for (const raw of lines) {
     if (isBlank(raw)) continue;
     const line = raw.trim();
 
-    // subgraph open
-    const sub = line.match(/^subgraph\s+(P[\w_]*)\s*(?:\[(.*)\])?\s*$/);
-    if (sub) {
-      const subId = sub[1];
-      const label = sub[2] ?? '';
+    // subgraph open — P_* prefix (phase 단위 / analysis pattern)
+    const phaseSub = line.match(/^subgraph\s+(P[\w_]*)\s*(?:\[(.*)\])?\s*$/);
+    if (phaseSub) {
+      const subId = phaseSub[1];
+      const label = phaseSub[2] ?? '';
       const phaseId = derivePhaseIdFromLabel(label) ?? derivePhaseIdFromSubId(subId);
       subgraphs.set(subId, phaseId);
       phases.add(phaseId);
       depth++;
+      depthIsPhaseSubgraph.push(true);
+      continue;
+    }
+    // subgraph open — 다른 prefix (chain stage / external — chain v2 pattern)
+    if (/^subgraph\s+/.test(line)) {
+      depth++;
+      depthIsPhaseSubgraph.push(false);
       continue;
     }
     if (/^end\s*$/i.test(line)) {
-      if (depth > 0) depth--;
+      if (depth > 0) {
+        depth--;
+        depthIsPhaseSubgraph.pop();
+      }
       continue;
     }
 
-    // subgraph 내부 line 무시 (direction / 자식 노드 / 자식 edge)
-    if (depth > 0) continue;
+    // phase 단위 subgraph 안 자식 line 무시 (산출물 / 검증 노드 — analysis pattern)
+    if (depthIsPhaseSubgraph.length > 0 && depthIsPhaseSubgraph[depthIsPhaseSubgraph.length - 1]) {
+      continue;
+    }
 
-    // 외부 edge — `Px --> Py` 또는 `Px -.-> Py` (점선 — cross-cutting). 점선은 의존 아님 → 무시.
+    // P_* plain node 정의 = phase (chain v2 pattern — chain stage subgraph 안 또는 외부)
+    if (!/-->|-\.->|==>|~~>/.test(line)) {
+      const plainNode = line.match(/^(P[\w_]+)\s*\[(.*?)\]/);
+      if (plainNode) {
+        const nodeId = plainNode[1];
+        const label = plainNode[2];
+        if (!subgraphs.has(nodeId)) {
+          const phaseId = derivePhaseIdFromLabel(label) ?? derivePhaseIdFromSubId(nodeId);
+          subgraphs.set(nodeId, phaseId);
+          phases.add(phaseId);
+        }
+        continue;
+      }
+    }
+
+    // edge — `Px --> Py` (depth 무관 / 점선 -.-> 무시 / cross-cutting 강조 무시)
     const edge = line.match(/^(P[\w_]+)\s*-->\s*(P[\w_]+)\s*$/);
     if (edge) {
       const fromSubId = edge[1];
       const toSubId = edge[2];
       const fromPhaseId = subgraphs.get(fromSubId);
       const toPhaseId = subgraphs.get(toSubId);
-      // subgraph 미선언 ID 면 무시 (CC_FIND 같은 단일 노드 — phase 아님)
+      // 미등록 ID 면 무시 (CC_FIND / OUT_X / R1 같은 phase 아닌 노드)
       if (fromPhaseId && toPhaseId) {
         dependencies.push({ from: fromPhaseId, to: toPhaseId });
       }
       continue;
     }
-
-    // 점선 edge `-.->`/`-..->`/`==>`/`~~>` 등은 cross-cutting / 강조 — 의존 아님 → 무시.
   }
 
   return {
