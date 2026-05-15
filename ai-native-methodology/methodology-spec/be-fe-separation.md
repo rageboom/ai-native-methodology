@@ -66,9 +66,12 @@
 
 ### 4.1 산출 명령
 
+★ ★ **v2.x carry — `/analyze-fullstack` 명령어 실 등록 부재** (D25 / 2026-05-15). 현재 = scenario B 도 deliverable 별 분리 실행 (각 `analyze-*` skill 호출). 통합 명령어 = methodology 진화 carry / 본 plugin 등록 시 추가 예정.
+
 ```
-★ /analyze-fullstack --scenario=B
-   = deliverable 1~13 통합 산출 (한 명령 / 한 결과)
+☐ /analyze-fullstack --scenario=B  ← 미구현 carry
+   = (목표) deliverable 1~13 통합 산출 한 명령
+   = (현재) BE 영역 (1~6) + FE 영역 (7~13) skill 개별 호출
 ```
 
 ### 4.2 API route handler 양쪽 인식
