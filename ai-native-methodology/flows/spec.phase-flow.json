@@ -12,8 +12,7 @@
       "depends_on": [],
       "inputs": ["planning-spec.json", "behavior-spec input candidates"],
       "outputs": ["integrated_input"],
-      "skills": ["spec-compose-behavior-spec"],
-      "skills_dir": "skills/spec/"
+      "skills": ["spec-compose-behavior-spec"]
     },
     {
       "id": "behavior-spec-compose",
@@ -21,8 +20,7 @@
       "depends_on": ["input-integrate"],
       "inputs": ["planning-spec.use_cases", "Phase 4.5 산출물"],
       "outputs": ["behavior-spec.json (behaviors[])"],
-      "skills": ["spec-compose-behavior-spec"],
-      "skills_dir": "skills/spec/"
+      "skills": ["spec-compose-behavior-spec"]
     },
     {
       "id": "acceptance-criteria-derive",
@@ -30,8 +28,7 @@
       "depends_on": ["behavior-spec-compose"],
       "inputs": ["behavior-spec.json"],
       "outputs": ["acceptance-criteria.json (criteria[])"],
-      "skills": ["spec-derive-acceptance-criteria"],
-      "skills_dir": "skills/spec/"
+      "skills": ["spec-derive-acceptance-criteria"]
     },
     {
       "id": "cross-link-7-deliverables",
@@ -39,8 +36,7 @@
       "depends_on": ["behavior-spec-compose", "acceptance-criteria-derive"],
       "inputs": ["behavior-spec.json", "analysis 산출물 path"],
       "outputs": ["behavior-spec.cross_links.to_analysis_artifacts[]"],
-      "skills": ["spec-integrate-7대-deliverables"],
-      "skills_dir": "skills/spec/"
+      "skills": ["spec-integrate-7대-deliverables"]
     },
     {
       "id": "behavior-diagrams-render",
@@ -49,7 +45,6 @@
       "inputs": ["behavior-spec.json", "acceptance-criteria.json"],
       "outputs": ["behavior-spec.md", "behavior-diagrams.mermaid", "acceptance-criteria.md"],
       "skills": ["spec-compose-behavior-spec"],
-      "skills_dir": "skills/spec/",
       "automated_validation": ["chain-coverage-validator", "drift-validator", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"]
     },
     {
@@ -59,7 +54,6 @@
       "inputs": ["behavior-spec.json", "acceptance-criteria.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
       "skills": ["_base-invoke-go-stop-gate"],
-      "skills_dir": "skills/_base/",
       "gate": "#2"
     }
   ],

@@ -12,8 +12,7 @@
       "depends_on": [],
       "inputs": ["test-spec.json", "behavior-spec.json", "acceptance-criteria.json", "architecture.json", "schema.json", "api-extension.json", "inventory.json"],
       "outputs": ["impl_module_plan"],
-      "skills": ["implement-generate-impl-spec"],
-      "skills_dir": "skills/implement/"
+      "skills": ["implement-generate-impl-spec"]
     },
     {
       "id": "impl-decompose",
@@ -21,8 +20,7 @@
       "depends_on": ["input-plan"],
       "inputs": ["test-spec.test_cases", "architecture.json"],
       "outputs": ["impl-spec.impl_modules[]"],
-      "skills": ["implement-generate-impl-spec"],
-      "skills_dir": "skills/implement/"
+      "skills": ["implement-generate-impl-spec"]
     },
     {
       "id": "impl-code-generate",
@@ -31,7 +29,6 @@
       "inputs": ["impl-spec.impl_modules"],
       "outputs": ["controller / service / repository / migration 코드 (framework 별)"],
       "skills": ["implement-generate-impl-spec"],
-      "skills_dir": "skills/implement/",
       "ai_automation_pct": "≥ 80",
       "user_review_pct": "≤ 20"
     },
@@ -41,8 +38,7 @@
       "depends_on": ["impl-code-generate"],
       "inputs": ["generated impl code"],
       "outputs": ["impl-spec.impl_modules[].commit_hash"],
-      "skills": ["implement-generate-impl-spec"],
-      "skills_dir": "skills/implement/"
+      "skills": ["implement-generate-impl-spec"]
     },
     {
       "id": "green-evidence",
@@ -51,7 +47,6 @@
       "inputs": ["impl 코드", ".aimd/config/test-cmd.json"],
       "outputs": ["impl-spec.test_pass_evidence (fail_count: 0 의무)"],
       "skills": ["implement-verify-test-pass", "test-run-test-evidence"],
-      "skills_dir": "skills/implement/",
       "expected_outcome": "all_pass (★ chain 4 GREEN 의무)"
     },
     {
@@ -61,7 +56,6 @@
       "inputs": ["impl 코드", "test_pass_evidence"],
       "outputs": ["impl-spec.test_pass_evidence.linter_output_path", "impl-spec.test_pass_evidence.coverage_report_path"],
       "skills": ["implement-verify-test-pass"],
-      "skills_dir": "skills/implement/",
       "automated_validation": ["lint-no-simulation (chain-strict)", "static-runner (6 plugin)", "schema-validator"]
     },
     {
@@ -71,7 +65,6 @@
       "inputs": ["planning + behavior + acceptance + test + impl-spec"],
       "outputs": ["traceability-matrix.{json,md,mermaid} (★ red_count == 0)"],
       "skills": ["_base-build-traceability-matrix"],
-      "skills_dir": "skills/_base/",
       "automated_validation": ["traceability-matrix-builder"]
     },
     {
@@ -81,7 +74,6 @@
       "inputs": ["impl-spec.json", "matrix.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go (release 자격) | stop | revisit"],
       "skills": ["_base-invoke-go-stop-gate"],
-      "skills_dir": "skills/_base/",
       "gate": "#4"
     }
   ],

@@ -12,8 +12,7 @@
       "depends_on": [],
       "inputs": ["analysis_outputs", "finding_system", "antipatterns", "migration_cautions"],
       "outputs": ["analysis_completeness_check"],
-      "skills": ["planning-extract-from-legacy"],
-      "skills_dir": "skills/planning/"
+      "skills": ["planning-extract-from-legacy"]
     },
     {
       "id": "use-cases-decompose",
@@ -21,8 +20,7 @@
       "depends_on": ["input-validate"],
       "inputs": ["domain.json", "rules.json", "api-extension.json", "state-machines/*.json"],
       "outputs": ["use_cases[]"],
-      "skills": ["planning-decompose-use-cases"],
-      "skills_dir": "skills/planning/"
+      "skills": ["planning-decompose-use-cases"]
     },
     {
       "id": "br-intent-extract",
@@ -30,8 +28,7 @@
       "depends_on": ["input-validate"],
       "inputs": ["rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
       "outputs": ["business_rules_intent[]"],
-      "skills": ["planning-identify-business-intent"],
-      "skills_dir": "skills/planning/"
+      "skills": ["planning-identify-business-intent"]
     },
     {
       "id": "planning-spec-compose",
@@ -40,7 +37,6 @@
       "inputs": ["use_cases", "business_rules_intent", "business_intent"],
       "outputs": ["planning-spec.json", "planning-spec.md"],
       "skills": ["planning-extract-from-legacy"],
-      "skills_dir": "skills/planning/",
       "automated_validation": ["planning-extraction-validator", "schema-validator"]
     },
     {
@@ -50,7 +46,6 @@
       "inputs": ["planning-spec.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
       "skills": ["_base-invoke-go-stop-gate"],
-      "skills_dir": "skills/_base/",
       "gate": "#1"
     }
   ],
