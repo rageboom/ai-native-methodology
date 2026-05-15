@@ -1,6 +1,6 @@
-# tools/ — 12 검증 도구 (★ chain harness validated)
+# tools/ — 16 검증 도구 (★ chain harness validated + v2.x 신설 4)
 
-본 디렉토리 = npm workspace 12 도구. plugin user 가 자기 산출물 검증 시 CLI 호출하는 자산.
+본 디렉토리 = npm workspace 16 도구. plugin user 가 자기 산출물 검증 시 CLI 호출하는 자산.
 
 ## 도구 cadence table (stage × validator × 호출 주체)
 
@@ -10,6 +10,9 @@
 | [`drift-validator/`](./drift-validator/) | Phase 4.5 | — | — | — | — | — | skill auto-invoke |
 | [`decision-table-validator/`](./decision-table-validator/) | Phase 4.5 | — | — | — | — | — | skill auto-invoke |
 | [`formal-spec-link-validator/`](./formal-spec-link-validator/) | Phase 4.5 | — | — | — | — | — | skill auto-invoke |
+| [`br-cross-consistency-validator/`](./br-cross-consistency-validator/) ★ v2.5.0 | Phase 4 (business-logic) | — | — | — | — | — | skill auto-invoke (★ ★ Layer 1 결정적 + Layer 2 LLM mandatory) |
+| [`characterization-coverage-validator/`](./characterization-coverage-validator/) ★ v2.1.0 | Phase 4.7 (characterization) | — | — | — | — | — | skill auto-invoke |
+| [`sql-inventory-extractor/`](./sql-inventory-extractor/) ★ v2.2.0 | Phase 4.8 (sql-inventory / RDB only) | — | — | — | — | — | skill auto-invoke |
 | [`spectral-runner/`](./spectral-runner/) | Phase 5-1 (api) | — | — | — | — | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`static-runner/`](./static-runner/) | Phase 6 (quality) | — | — | — | impl 후 | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`schema-validator/`](./schema-validator/) | — | ★ | ★ | ★ | ★ | — | gate auto |
@@ -17,6 +20,7 @@
 | [`chain-coverage-validator/`](./chain-coverage-validator/) | — | — | **gate #2** | — | — | — | gate auto |
 | [`spec-test-link-validator/`](./spec-test-link-validator/) | — | — | — | **gate #3** | — | — | gate auto |
 | [`test-impl-pass-validator/`](./test-impl-pass-validator/) | — | — | — | — | **gate #4** | — | gate auto (`--allow-execute` 의무) |
+| [`findings-aggregator/`](./findings-aggregator/) ★ v2.3.6 | — | gate aux | gate aux | gate aux | gate aux | — | chain-driver auto (★ ★ validator findings 자동 입력 통합) |
 | [`traceability-matrix-builder/`](./traceability-matrix-builder/) | — | — | — | — | — | ★ | user (수동) |
 
 ★ ★ ★ **mechanical gate trio**: gate auto 호출 시 finding 발견 → state.blocked=true / cli exit 2 / PreToolUse permissionDecision=deny. LLM "통과한 척" 시뮬레이션 차단 (ADR-CHAIN-005 §3).
@@ -71,7 +75,7 @@ release            → traceability-matrix-builder
 ## 테스트 (workspace developer 전용 / dist 제외)
 
 ```bash
-npm test --workspaces --if-present     # 218 unit test pass (chain harness validated 자격)
+npm test --workspaces --if-present     # 317 unit test pass (chain harness validated 자격)
 npm run test:chain                     # chain validator 6 도구만
 npm run test:release                   # release-readiness §8.1 strict 9 self-test
 ```
