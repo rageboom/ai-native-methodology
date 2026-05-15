@@ -27,7 +27,7 @@
     {
       "id": "br-intent-extract",
       "name": "business_rules_intent 추출",
-      "depends_on": ["input-validate", "use-cases-decompose"],
+      "depends_on": ["input-validate"],
       "inputs": ["rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
       "outputs": ["business_rules_intent[]"],
       "skills": ["planning-identify-business-intent"],
