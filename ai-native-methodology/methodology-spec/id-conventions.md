@@ -55,6 +55,16 @@ flowchart LR
 | **Test Case** | `TC-{도메인}-{3자리 번호}` | `TC-ORDER-001` | test-spec.schema |
 | **Impl Module** | `IMPL-{도메인}-{3자리 번호}` | `IMPL-ORDER-001` | impl-spec.schema |
 
+### ★ G3 운영 자산 ID (v3.2 신설)
+
+| 산출물 | ID 형식 | 예시 | schema |
+|---|---|---|---|
+| **Scope slug** | `^[a-z0-9][a-z0-9-]{1,63}$` (kebab-case / ASCII / 2~64 chars / 파일시스템 호환) | `user-registration`, `payment-flow`, `admin-v2` | work-unit-manifest.schema |
+
+★ scope 는 사용자가 작업 시작 시 자유 명명 (chain-driver init --scope <slug>). 자동 추출 ❌ (사용자 의도 분명).
+★ 한국어 / 공백 / path traversal (`../`, `/`) 비허용 — 파일시스템 호환 + state-store `validateScopeSlug` 강제.
+★ 한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 4 사이클 1회 또는 revisit 시 N회. `.aimd/<scope>/` 단위 격리.
+
 ★ planning-spec 의 use_cases 는 기존 UC-* 차용 (analysis stage UC-* 와 동일 namespace / backward link).
 ★ BR-INTENT-* prefix ❌ — rules.schema 의 BR-* 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).
 

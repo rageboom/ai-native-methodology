@@ -19,6 +19,7 @@ const DEFAULT_STATE = (projectId) => ({
   project_id: projectId,
   current_chain: 'analysis',
   current_phase: 'input.0',
+  current_scope: null,
   stage_progress: {
     analysis:  { status: 'in_progress' },
     planning:  { status: 'pending' },
@@ -225,4 +226,122 @@ export class LockHeldError extends Error {
 }
 export class MigrationRequiredError extends Error {
   constructor(msg) { super(msg); this.name = 'MigrationRequiredError'; this.exitCode = 4; }
+}
+
+// ── ★ ★ G3 R5/R7 산출물 폴더 자동 + manifest 이중 렌더링 ─────────────────────
+//
+// scope = feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case).
+// layout = .aimd/<scope>/{planning,spec,test,impl}/manifest.{json,md} + scope root manifest.
+// canonical global .aimd/output/ 5 이식성 산출물 은 scope 횡단 공통 (분리).
+// M4 sync = drift 자동 감지 / cascade 는 사용자 명시 호출 (sync.js).
+//
+// import 방향 = state-store → work-unit (단방향). 순환 회피.
+
+import {
+  STAGES as STAGES_LIST,
+  createScopeManifest,
+  createStageManifest,
+  renderManifestMd,
+} from './work-unit.js';
+
+const SCOPE_SLUG_RE = /^[a-z0-9][a-z0-9-]{1,63}$/;
+
+export function validateScopeSlug(slug) {
+  if (typeof slug !== 'string') {
+    throw new Error(`invalid scope slug: expected string, got ${typeof slug}`);
+  }
+  if (slug.length < 2 || slug.length > 64) {
+    throw new Error(`invalid scope slug "${slug}": length must be 2..64`);
+  }
+  if (!SCOPE_SLUG_RE.test(slug)) {
+    throw new Error(`invalid scope slug "${slug}": must match ${SCOPE_SLUG_RE} (kebab-case / ASCII / no path)`);
+  }
+  return true;
+}
+
+function validateStage(stage) {
+  if (!STAGES_LIST.includes(stage)) {
+    throw new Error(`invalid stage "${stage}": must be one of ${STAGES_LIST.join('|')}`);
+  }
+}
+
+export function scopeDirPath(projectRoot, scope, stage) {
+  validateScopeSlug(scope);
+  if (stage !== undefined && stage !== null) validateStage(stage);
+  return stage
+    ? join(projectRoot, '.aimd', scope, stage)
+    : join(projectRoot, '.aimd', scope);
+}
+
+export function ensureScopeDir(projectRoot, scope) {
+  validateScopeSlug(scope);
+  ensureAimdDir(projectRoot);
+
+  const scopeDir = join(projectRoot, '.aimd', scope);
+  if (!existsSync(scopeDir)) mkdirSync(scopeDir, { recursive: true });
+
+  // Seed scope manifest (idempotent — only when absent).
+  const scopeManifestPath = join(scopeDir, 'manifest.json');
+  if (!existsSync(scopeManifestPath)) {
+    writeManifest(projectRoot, scope, null, createScopeManifest(scope));
+  }
+
+  // 4 stage dirs + seeds (idempotent).
+  for (const stage of STAGES_LIST) {
+    const stageDir = join(scopeDir, stage);
+    if (!existsSync(stageDir)) mkdirSync(stageDir, { recursive: true });
+    const stageManifestPath = join(stageDir, 'manifest.json');
+    if (!existsSync(stageManifestPath)) {
+      writeManifest(projectRoot, scope, stage, createStageManifest(scope, stage));
+    }
+  }
+}
+
+export function writeManifest(projectRoot, scope, stage, manifest) {
+  validateScopeSlug(scope);
+  if (stage !== undefined && stage !== null) validateStage(stage);
+  const dir = scopeDirPath(projectRoot, scope, stage);
+  mkdirSync(dir, { recursive: true });
+
+  const now = new Date().toISOString();
+  const path = join(dir, 'manifest.json');
+  const existing = existsSync(path)
+    ? JSON.parse(readFileSync(path, 'utf-8'))
+    : null;
+
+  const enriched = {
+    ...manifest,
+    scope,
+    ...(stage ? { stage } : {}),
+    created_at: manifest.created_at || (existing && existing.created_at) || now,
+    updated_at: now,
+  };
+
+  atomicWrite(path, JSON.stringify(enriched, null, 2) + '\n');
+  atomicWrite(join(dir, 'manifest.md'), renderManifestMd(enriched));
+  return enriched;
+}
+
+export function readManifest(projectRoot, scope, stage) {
+  validateScopeSlug(scope);
+  if (stage !== undefined && stage !== null) validateStage(stage);
+  const path = join(scopeDirPath(projectRoot, scope, stage), 'manifest.json');
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, 'utf-8'));
+}
+
+export function listScopes(projectRoot) {
+  const aimdDir = join(projectRoot, '.aimd');
+  if (!existsSync(aimdDir)) return [];
+  const scopes = [];
+  for (const name of readdirSync(aimdDir)) {
+    if (name === 'output' || name.startsWith('.') || name.endsWith('.json') || name.endsWith('.md') || name.endsWith('.tmp')) continue;
+    const full = join(aimdDir, name);
+    try {
+      if (statSync(full).isDirectory() && SCOPE_SLUG_RE.test(name)) {
+        scopes.push(name);
+      }
+    } catch { /* skip */ }
+  }
+  return scopes;
 }

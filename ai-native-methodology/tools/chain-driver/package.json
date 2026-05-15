@@ -8,7 +8,7 @@
     "chain-driver": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test test/state-store.test.js test/stage-graph.test.js test/invoke-skill.test.js test/gate-eval.test.js test/revisit-detect.test.js test/hooks-bridge.test.js test/hooks-contract.test.js test/chaos.test.js"
+    "test": "node --test test/state-store.test.js test/stage-graph.test.js test/invoke-skill.test.js test/gate-eval.test.js test/revisit-detect.test.js test/hooks-bridge.test.js test/hooks-contract.test.js test/chaos.test.js test/scope-dir.test.js test/sync.test.js test/query.test.js"
   },
   "license": "UNLICENSED"
 }

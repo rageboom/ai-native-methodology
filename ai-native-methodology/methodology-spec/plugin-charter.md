@@ -1,0 +1,125 @@
+# Plugin Charter — AI-Native Methodology
+
+> 본 플러그인이 **반드시 가져야 하는 능력**의 단일 SSOT.
+> 작성일 2026-05-15 / 작성자 윤주스 (TF Lead).
+> 신규 기능 / 변경 시 본 charter 의 17 항목 + §4 권장 디폴트 정합 의무.
+
+## §1 사용자 요구사항 17 (must-have)
+
+| # | 요구 | 범주 |
+|---|------|------|
+| R1 | 분석 단계는 **기존 프로젝트 + 기획서** 를 분석할 수 있다 | analysis-input |
+| R2 | 분석은 **한번에 다 하지 않고 plan 으로** 진행한다 | plan-driven |
+| R3 | **작업 단위를 적절히 쪼개서** 하나씩 마쳐 나간다 | task-decompose |
+| R4 | 생성된 **산출물은 재사용된다** | artifact-reuse |
+| R5 | 산출물은 **사용자 프로젝트에 위치**되고 그 자리에서 사용된다 | artifact-location |
+| R6 | **Claude Code 최적화 디폴트**를 기본 제공한다 (§4 참조) | cc-defaults |
+| R7 | 산출물은 **작업 단위로 폴더화**되어 저장 + 재사용 | artifact-folder |
+| R8 | 분석 입력 5종 지원 — (a) 기존 코드 / (b) **Figma** / (c) **Swagger/OpenAPI** / (d) 기획 문서 경로 / (e) **자연어 prompt** | analysis-input |
+| R9 | **분석 → 스펙** 생성 | chain-2 |
+| R10 | **스펙 → 테스트** 생성 | chain-3 |
+| R11 | **테스트 → 구현** 생성 | chain-4 |
+| R12 | 각 단계는 **agent / skill / hook 을 적절히 활용** | stage-asset-mapping |
+| R13 | 본 chain 은 **기능 추가 / 수정에 반복 적용** | revisit-loop |
+| R14 | **BE / FE 별 맞춤 산출물** (test / impl / spec) | be-fe-split |
+| R15 | **정적 도구 검증 필수** (시뮬레이션 ❌) | static-tool |
+| R16 | 작업은 **MCP 를 통해 티켓 등록** | itsm-integration |
+| R17 | **모든 단계마다 티켓** 발행 | itsm-integration |
+
+## §2 현 구현 매핑 (v3.1.0 기준 / 2026-05-15)
+
+| # | 판정 | 근거 |
+|---|------|------|
+| R1 | ✅ | `methodology-spec/workflow/input.md` — 5종 입력 명시 (소스코드/ERD/DB/기획문서/자연어) |
+| R2 | ✅ | `flows/analysis.phase-flow.json` 11 phase 의존 그래프 + Work Principles 4원칙 (`CLAUDE.md`) |
+| R3 | ✅ | `skills/planning-decompose-use-cases/` + `tools/traceability-matrix-builder/` |
+| R4 | ✅ | `schemas/` 31종 + `templates/{analysis,planning,spec,test,implement,design}/` |
+| R5 | ✅ | `tools/chain-driver/src/state-store.js` `ensureScopeDir` + `chain-driver init --scope <s>` + SessionStart hook 자동 발동 (v3.2 G3 종결 / DEC-2026-05-15-g3-scope-folder-종결) |
+| R6 | ✅ | `hooks/hooks.json` (SessionStart + UserPromptSubmit + PreToolUse) + `CLAUDE.md` 23 policies |
+| R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{planning,spec,test,impl}/` + manifest 이중 렌더링 (`manifest.json` + `manifest.md`) 자동 생성. `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
+| R8 | ⚠️ | (a)(d)(e) ✅ / **(b) Figma ❌ / (c) Swagger ❌** — analysis-from-figma / analysis-from-swagger skill 부재 |
+| R9 | ✅ | `flows/spec.phase-flow.json` (chain 2) + `skills/spec-compose-behavior-spec/` |
+| R10 | ✅ | `flows/test.phase-flow.json` (chain 3 / RED 의무) + `tools/test-impl-pass-validator/` |
+| R11 | ✅ | `flows/implement.phase-flow.json` (chain 4 / GREEN 100% pass) |
+| R12 | ✅ | `flows/sdlc-4stage-flow.json` `stages[].sub_flow + validators + gates + skill` + `skills-axis.md` |
+| R13 | ✅ | `sdlc-4stage-flow.json` `revisit_edges` 6종 (planning↔analysis, spec↔planning, test↔spec, impl↔{test,spec,planning,analysis}) |
+| R14 | ⚠️ | `be-fe-separation.md` + scenario A/B/C — BE skill 20+ vs FE skill 6 **불균형**. FE-impl/FE-test skill 보강 필요 |
+| R15 | ✅ | `tools/static-runner/` (eslint/prettier/semgrep/tslint/stylelint/hadolint) + gate #4 강제 + no-simulation 정책 |
+| R16 | ❌ | `.claude/plans/plan-itsm-jira-chain-integration.md` 계획만 / **wiki-jira-assistant MCP wrapper skill 부재** |
+| R17 | ❌ | 단계별 자동 티켓 발행 hook 부재 / gate pass→ticket transition 자동화 ❌ |
+
+**요약**: ✅ 11 / ⚠️ 4 / ❌ 2.
+
+## §3 Gap 우선순위
+
+> 2026-05-15 갱신 — G3 종결 (v3.2 / DEC-2026-05-15-g3-scope-folder-종결). G1 후순위 (기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리 가능).
+> 활성 우선순위: **G2 > G4 > G5 > G1**.
+
+| 순위 | Gap | 영향 | 후속 |
+|------|-----|------|------|
+| G2 | **R8 Figma / Swagger 입력 skill 부재** | 5종 입력 중 2종 미지원 | skill `analysis-from-figma` (mcp__figma-desktop__get_design_context 활용) + `analysis-from-swagger` (openapi.yaml parse) |
+| G4 | **R14 FE skill 보강** | FE 프로젝트 적용도 저하 | FE-impl-react / FE-impl-vue / FE-test-jest / FE-test-playwright / design-html-template-analyze 신설 |
+| G5 | **R12 lifecycle-contract 에 stage↔asset 매핑표 부재** | 사용자가 어떤 skill 을 호출해야 할지 불명확 | `lifecycle-contract.md` 에 stage × (agent / skill / hook / tool / validator) 매핑표 1장 신설 |
+| G1 | **R16/R17 ITSM/Jira 자동 티켓화** (★ 후순위 / 2026-05-15) | — | 사용자 결단: 기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리. 자동 티켓 발행 skill/hook 은 G2~G5 완료 후 재검토 |
+| ~~G3~~ | ~~R5/R7 산출물 폴더 자동 생성~~ | ✅ **종결 (v3.2 / 2026-05-15)** — scope/stage 폴더 + manifest 이중 렌더링 + SessionStart hook + M4 sync 자동 (114/114 test pass). `DEC-2026-05-15-g3-scope-folder-종결.md` 참조. |
+
+## §4 Claude Code 최적화 디폴트 (R6 구체화)
+
+본 플러그인이 사용자에게 "디폴트로" 제공해야 하는 패턴.
+
+### §4.1 Hook 디폴트 (자동 활성)
+- **PostToolUse `Write|Edit|MultiEdit`** → prettier / eslint `--fix` 자동 실행 (BE 는 spotless / black 등 언어별 분기)
+- **PreToolUse Bash matcher `git commit`** → 테스트 + 정적 검사 통과 강제 (실패 시 `permissionDecision: "deny"` — bypassPermissions 도 차단)
+- **PreToolUse sensitive-file deny** (`.env`, `credentials.json`, `*secret*`, `*.pem`)
+- **Stop hook** → chain stage 완료 시 ITSM 티켓 코멘트 자동 등록 (R16/R17 연동)
+- **Notification hook** → gate fail 시 desktop / Slack 알림 (`async: true`)
+- 모든 hook 은 **단순 / 빠를 것** (수 초 이상 작업은 skill 로 분리, log 류는 `async: true`)
+
+### §4.2 컨텍스트 / 메모리
+- **CLAUDE.md ≤ 200 lines** 권장 (이미 초과 시 link out)
+- `/clear` between unrelated tasks 가이드 (guides/ 에 명시)
+- `/compact "focus on X"` 자연스러운 break 에서 능동 호출 권장
+- `CLAUDE_AUTOCOMPACT_PCT_OVERRIDE` 권장값 제공
+- statusline 에 `/usage` + 현 chain stage 노출
+
+### §4.3 Plan-driven 디폴트
+- Plan 은 `<user-project>/.claude/plans/plan-<topic>.md` 로 auto-persist
+- chain stage 진입 시 **TaskCreate 로 work-unit 분해** 강제 (in_progress → completed 갱신)
+- skill description 은 **"use this when [condition]" 1문장 + 반환 형태 1문장**
+
+### §4.4 Multi-agent 디폴트
+- **Subagent** = 1-way report-back (격리 워커)
+- **Agent team** = 피어 메시지 + 공유 task list (April 2026 신기능 / 무거운/노이즈 작업 격리 의무)
+- 메인 ↔ sub-agent 역할 분리는 `agents-axis.md` 매핑표 따름
+
+### §4.5 Plugin 배포 / 버전 관리
+- **stable / latest 채널 분리** — 동일 repo 의 다른 ref 가리키는 marketplace 두 개
+- `plugin.json.version` 누락 = cached copy 그대로 (silent override 위험) → 매 release 갱신 강제
+- 사내 배포 전 단계 (`project_pre_deployment_stage.md` 정합) — semver 라벨 의미 약하나 본격 외부 배포 시 SemVer 준수
+
+### §4.6 ITSM / MCP 통합 (R16/R17 실현용)
+- `mcp__wiki-jira-assistant__*` 활용 (이미 등록된 MCP server)
+- skill `itsm-ticket-emit` 신설 — chain stage 완료 시 자동 호출
+- `.mcp.json` 의 `mcpServers` 활성 + plugin install 시 사용자 토큰 확인 guide
+
+## §5 추가 권장 (Claude 제안)
+
+본 charter 17 항목 외, Claude Code 2026-05 best practice 기반 추가 후보:
+
+| # | 제안 | ROI | 우선순위 |
+|---|------|-----|---------|
+| P1 | **세션 인계 / Resume 패턴** — chain stage 중단 시 `.aimd/chain-N/<work-unit>/state.json` 으로 재개 | 高 (장시간 chain 의 안정성) | ★★★ |
+| P2 | **단계별 cost/token telemetry** — 각 chain stage 마다 token 사용량 + 자동화율 metric 자동 수집 | 高 (운영 KPI / "AI 자동화 ≥ 85%" 측정) | ★★★ |
+| P3 | **Spec change impact analyzer** — chain 산출물 변경 시 forward/backward link (traceability-matrix) 따라 영향도 자동 산출 | 中 (재작업 최소화 2순위 정합) | ★★ |
+| P4 | **산출물 semver + 재사용 catalog** — 5종 이식성 산출물 (rules/domain/openapi/schema/antipatterns) 에 semver 부여 + cross-project catalog | 中 (R4 강화) | ★★ |
+| P5 | **Rollback / undo for failed chain stage** — gate fail 시 stage 산출물 격리 + 직전 상태 복원 hook | 中 | ★★ |
+| P6 | **Statusline chain progress** — 현 stage / gate 상태 / 다음 액션 1줄 노출 | 低 (UX) | ★ |
+| P7 | **자동 PR description generator** — chain 산출물 traceability 기반 PR 본문 자동 작성 skill | 中 | ★ |
+| P8 | **Secret scanning hook** — PreToolUse 로 `git commit` 전 secret 패턴 검출 (gitleaks 류) | 高 (보안) | ★★★ |
+
+## §6 적용 정책
+
+- 본 charter 는 **단일 SSOT** — 17 항목 + §4 디폴트는 모든 신규 기능 / PR 의 정합 기준
+- charter 변경은 `decisions/DEC-YYYY-MM-DD-*.md` 결정 로그 필수
+- gap (§3) 해소 작업은 **품질 우선 + 재작업 최소화** 원칙 (memory `feedback_quality_priority.md`) 적용
+- §5 추가 제안은 charter 항목과 **별도 backlog** — 사용자 결단 후 §1 / §4 로 격상 가능

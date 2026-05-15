@@ -206,6 +206,38 @@ input (implement stage 가 받음):
 │       └── tool-runs/               # 진짜 도구 raw 출력 보존
 ```
 
+**★ ★ G3 (v3.2) — 작업 단위 (scope) 폴더 + manifest 자동 생성**:
+
+```
+<user-project>/.aimd/
+├── output/                          # ↑ canonical global = scope 와 무관 (위 layout 그대로)
+├── <scope>/                         # ★ G3 — feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case)
+│   ├── manifest.{json,md}           #   scope 전체 status / analysis_refs / sync_state
+│   ├── analysis/                    #   (선택) scope local subset — 큰 프로젝트 context 부담 ↓
+│   │   └── rules.subset.json
+│   ├── planning/                    #   chain 1
+│   │   ├── planning-spec.{json,md}
+│   │   └── manifest.{json,md}
+│   ├── spec/                        #   chain 2 (behavior-spec + acceptance-criteria + traceability-matrix)
+│   ├── test/                        #   chain 3 (test-spec + 실 test 코드 / RED)
+│   └── impl/                        #   chain 4 (impl-spec + 실 impl 코드 / GREEN)
+└── <scope-2>/                       # 운영 누적 시 N 개로 증가
+```
+
+규칙:
+- **scope slug** = kebab-case / `^[a-z0-9][a-z0-9-]{1,63}$` / ASCII only (`id-conventions.md` §scope slug 정합).
+- **stage 폴더명** = `planning` / `spec` / `test` / `impl` (chain prefix ❌ / v2.6.0 의미 ID paradigm 정합).
+- **manifest 이중 렌더링** = `manifest.json` (단일 진실) + `manifest.md` (사람 눈) 의무 — ADR-008 v2.
+- **M4 sync** = canonical global 변경 시 SessionStart hook 이 `sync_state.drift_detected=true` 자동 set / cascade 는 사용자 명시 `chain-driver sync --scope <s>` 호출 시만 (안전 · 통제 · 자동 균형).
+
+CLI:
+- `chain-driver init <project> --scope <slug>` — scope 폴더 + 4 stage manifest 자동 생성
+- `chain-driver next <project>` — gate 통과 시 stage 전이 + manifest status 갱신
+- `chain-driver query <project> [--scope] [--stage] [--ref] [--stale]` — lookup (역인덱스 + drift filter)
+- `chain-driver sync <project> [--scope <s>]` — `--scope` 없으면 markDrift summary / 있으면 cascade
+
+근거: `decisions/DEC-2026-05-15-g3-scope-folder-종결.md` + `methodology-spec/plugin-charter.md` §1 R5/R7 + §A.2 manifest 정의.
+
 ### design stage (☐ v2.x carry / 1차 = analysis 자산 reuse)
 
 design stage = ★ v2.x carry (1차 v2.0.0 = analysis 자산 deliverable 7~9 reuse / 분리 ❌). master plan §K-3 carry 정합.

@@ -26,7 +26,15 @@ import {
   initState, readState, writeStateCAS, recoverTmpFiles, ensureAimdDir,
   StateCorruptError, MigrationRequiredError, CURRENT_STATE_VERSION,
   migrate, statePath,
+  ensureScopeDir, readManifest, writeManifest, listScopes,
 } from './state-store.js';
+import { executeQuery } from './query.js';
+import { markDrift, cascade } from './sync.js';
+
+const MANIFEST_STAGES = ['planning', 'spec', 'test', 'impl'];
+function stageToManifestStage(stage) {
+  return stage === 'implement' ? 'impl' : stage;
+}
 import { loadFlow, nextStage, validateStateAgainstFlow, getGateForStage } from './stage-graph.js';
 import { evaluateGate, applyUserDecision, requiredValidators } from './gate-eval.js';
 import { loadSkill, formatSkillSuggestion } from './invoke-skill.js';
@@ -41,9 +49,11 @@ function usage(code = 3) {
     'usage: chain-driver <command> [options]',
     '',
     'commands:',
-    '  init <project>',
+    '  init <project> [--scope <slug>]',
     '  state <project> [--json]',
     '  next <project> [--findings <path>] [--user-decision <go|stop|revisit:STAGE>] [--dry-run]',
+    '  query <project> [--scope <slug>] [--stage <s>] [--ref <id>] [--stale]',
+    '  sync <project> [--scope <slug>]',
     '  suggest-skill --prompt <text>',
     '  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
     '  migrate <project>',
@@ -71,6 +81,10 @@ function parseArgs(argv) {
     else if (a === '--user-decision') out.userDecision = rest[++i];
     else if (a === '--base') out.baseSha = rest[++i];
     else if (a === '--repo-root') out.repoRoot = rest[++i];
+    else if (a === '--scope') out.scope = rest[++i];
+    else if (a === '--stage') out.stage = rest[++i];
+    else if (a === '--ref') out.ref = rest[++i];
+    else if (a === '--stale') out.stale = true;
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
   }
@@ -107,7 +121,23 @@ function cmdInit(args) {
   const projectId = basename(root);
   recoverTmpFiles(root);
   try {
-    const state = initState(root, projectId);
+    let state;
+    if (existsSync(statePath(root))) {
+      if (!args.scope) {
+        console.error(`[chain-driver] state.json already exists. Use --scope <slug> to add a scope.`);
+        process.exit(3);
+      }
+      state = readState(root);
+    } else {
+      state = initState(root, projectId);
+    }
+    if (args.scope) {
+      ensureScopeDir(root, args.scope);
+      state = writeStateCAS(root, (s) => {
+        s.current_scope = args.scope;
+        return s;
+      });
+    }
     process.stdout.write(JSON.stringify(state, null, 2) + '\n');
     process.exit(0);
   } catch (e) {
@@ -225,6 +255,27 @@ function cmdNext(args) {
     s.block_reason = null;
     return s;
   });
+  // G3 manifest sync — only when current_scope is set.
+  if (state.current_scope) {
+    try {
+      const fromStage = stageToManifestStage(stage);
+      if (MANIFEST_STAGES.includes(fromStage)) {
+        const fm = readManifest(root, state.current_scope, fromStage);
+        if (fm) writeManifest(root, state.current_scope, fromStage, { ...fm, status: 'complete' });
+      }
+      if (next) {
+        const toStage = stageToManifestStage(next);
+        if (MANIFEST_STAGES.includes(toStage)) {
+          const tm = readManifest(root, state.current_scope, toStage);
+          if (tm) writeManifest(root, state.current_scope, toStage, { ...tm, status: 'in_progress' });
+          const sm = readManifest(root, state.current_scope);
+          if (sm) writeManifest(root, state.current_scope, null, { ...sm, current_stage: toStage });
+        }
+      }
+    } catch (e) {
+      console.error(`[chain-driver] manifest sync warn: ${e.message}`);
+    }
+  }
   logIntervention(state, root, {
     event_type: 'gate_decision',
     actor: args.userDecision ? 'user' : 'driver',
@@ -235,6 +286,38 @@ function cmdNext(args) {
   });
   process.stdout.write(JSON.stringify({ stage, advanced_to: next, gate: finalDecision }, null, 2) + '\n');
   process.exit(0);
+}
+
+function cmdQuery(args) {
+  if (!args.project) usage(3);
+  const root = resolve(args.project);
+  const result = executeQuery(root, {
+    scope: args.scope,
+    stage: args.stage,
+    ref: args.ref,
+    stale: args.stale,
+  });
+  process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+  process.exit(0);
+}
+
+function cmdSync(args) {
+  if (!args.project) usage(3);
+  const root = resolve(args.project);
+  if (!args.scope) {
+    // no scope → markDrift summary
+    const summary = markDrift(root);
+    process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
+    process.exit(0);
+  }
+  try {
+    const result = cascade(root, args.scope);
+    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+    process.exit(0);
+  } catch (e) {
+    console.error(`[chain-driver] sync failed: ${e.message}`);
+    process.exit(3);
+  }
 }
 
 function cmdSuggestSkill(args) {
@@ -259,6 +342,32 @@ function cmdHooksBridge(args) {
   try { payload = parseHookInput(stdin); }
   catch (e) { console.error(`[chain-driver] ${e.message}`); process.exit(3); }
   const event = payload.hook_event_name;
+  if (event === 'SessionStart') {
+    // G3 R5/R7 — recover .tmp + drift 자동 감지 + 사용자 안내 (M4).
+    const root = payload.cwd || process.cwd();
+    if (!existsSync(join(root, '.aimd', 'state.json'))) {
+      // user project not yet initialized — pass-through.
+      process.stdout.write(JSON.stringify({ suppressOutput: true, continue: true }) + '\n');
+      process.exit(0);
+    }
+    try { recoverTmpFiles(root); } catch { /* non-fatal */ }
+    let driftSummary = { marked: [] };
+    try { driftSummary = markDrift(root); } catch { /* non-fatal */ }
+    const additionalContext = driftSummary.marked.length > 0
+      ? `[ai-native-methodology] ⚠️ drift detected in ${driftSummary.marked.length} scope(s): ${driftSummary.marked.join(', ')}. Run: chain-driver sync --scope <slug> to cascade.`
+      : '[ai-native-methodology] chain harness ready. M4 sync = drift auto-detect + manual cascade.';
+    const out = {
+      suppressOutput: true,
+      hookSpecificOutput: { additionalContext },
+      continue: true,
+    };
+    process.stdout.write(JSON.stringify(out) + '\n');
+    if (driftSummary.marked.length > 0) {
+      process.stderr.write(`[ai-native-methodology] ⚠️ drift detected: ${driftSummary.marked.join(', ')}\n`);
+      process.stderr.write(`  → chain-driver sync --scope <slug>\n`);
+    }
+    process.exit(0);
+  }
   if (event === 'UserPromptSubmit') {
     const skillId = suggestSkillForPrompt(payload.prompt);
     if (!skillId) {
@@ -386,6 +495,8 @@ function main() {
     case 'init':           return cmdInit(args);
     case 'state':          return cmdState(args);
     case 'next':           return cmdNext(args);
+    case 'query':          return cmdQuery(args);
+    case 'sync':           return cmdSync(args);
     case 'suggest-skill':  return cmdSuggestSkill(args);
     case 'hooks-bridge':   return cmdHooksBridge(args);
     case 'migrate':        return cmdMigrate(args);

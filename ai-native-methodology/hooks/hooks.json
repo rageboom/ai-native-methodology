@@ -6,8 +6,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo \"[ai-native-methodology] Plugin loaded. v2.0 chain harness ready (sub-plan-5 ✅). Read CLAUDE.md for 23 policies + 4원칙 + no-simulation. Skill 진입 = /aimd-next or /aimd-stage <name>. See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.\"",
-            "statusMessage": "Loading AI-Native methodology context (chain harness ready)..."
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
+            "statusMessage": "Loading AI-Native methodology context (G3 drift check + scope manifest recover)...",
+            "$comment": "★ G3 R5/R7 (v3.2) — SessionStart hook 가 recoverTmpFiles + markDrift (M4 자동 drift 감지). drift_detected=true scope 있으면 stderr 로 사용자 안내. additionalContext 에도 동봉."
           }
         ]
       }

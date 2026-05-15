@@ -31,6 +31,13 @@
       "pattern": "^P\\d+(\\.\\d+)*$",
       "description": "현 chain 내부의 phase ID (P*.* 형식)."
     },
+    "current_scope": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" }
+      ],
+      "description": "★ G3 (R5/R7) — 현재 active scope slug. init --scope <s> 또는 cmdNext 의 manifest sync 대상. D10 single work-unit serial 1차."
+    },
     "stage_progress": {
       "type": "object",
       "additionalProperties": false,

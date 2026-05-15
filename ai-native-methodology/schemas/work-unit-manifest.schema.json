@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/work-unit-manifest.schema.json",
+  "title": "Work-Unit Manifest (scope + stage)",
+  "description": "★ ★ ★ v3.2 G3 (R5/R7 산출물 폴더 자동 + 지속 운영 인프라). .aimd/<scope>/manifest.json (scope manifest = stage 필드 없음) + .aimd/<scope>/<stage>/manifest.json (stage manifest = stage 필드 있음) 두 mode. 이중 렌더링 ADR-008 정합 — manifest.json + manifest.md 쌍.",
+  "type": "object",
+  "required": ["scope", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+      "description": "scope slug — kebab-case / [a-z0-9-] / 2~64 chars / ASCII only."
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["planning", "spec", "test", "impl"],
+      "description": "stage manifest 시만 (scope manifest 는 미사용)."
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": ["planning", "spec", "test", "impl"],
+      "description": "scope manifest 시만 — 현 진행 stage."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "complete", "blocked"]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "linked_artifacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "이 폴더 안 산출물 상대 경로 (예: planning-spec.json)."
+    },
+    "linked_state_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "state.json CAS counter snapshot."
+    },
+    "traceability_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "★ stage manifest 의 forward link — UC→BHV→AC→TC→IMPL chain.",
+      "properties": {
+        "uc":   { "type": "array", "items": { "type": "string" } },
+        "bhv":  { "type": "array", "items": { "type": "string" } },
+        "ac":   { "type": "array", "items": { "type": "string" } },
+        "tc":   { "type": "array", "items": { "type": "string" } },
+        "impl": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence_paths": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "analysis_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "★ scope manifest 의 canonical global 5 이식성 산출물 역인덱스 — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern.",
+      "properties": {
+        "rules":        { "type": "array", "items": { "type": "string" } },
+        "endpoints":    { "type": "array", "items": { "type": "string" } },
+        "schemas":      { "type": "array", "items": { "type": "string" } },
+        "domain":       { "type": "array", "items": { "type": "string" } },
+        "antipatterns": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "sync_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["drift_detected"],
+      "description": "★ M4 동기화 메커니즘 자산. canonical global 변경 시 hook 이 drift_detected=true 자동 set / cascade 시 last_synced_at + sync_sources version 갱신.",
+      "properties": {
+        "last_synced_at": {
+          "anyOf": [
+            { "type": "null" },
+            { "type": "string", "format": "date-time" }
+          ]
+        },
+        "sync_sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["path", "version"],
+            "properties": {
+              "path":    { "type": "string" },
+              "version": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              }
+            }
+          }
+        },
+        "dependents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["scope"],
+            "properties": {
+              "scope": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+              },
+              "stage": {
+                "type": "string",
+                "enum": ["planning", "spec", "test", "impl"]
+              }
+            }
+          }
+        },
+        "drift_detected": { "type": "boolean" }
+      }
+    },
+    "token_usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "★ charter §5 P2 backlog — chain stage 별 token 사용량.",
+      "properties": {
+        "input":  { "type": "integer", "minimum": 0 },
+        "output": { "type": "integer", "minimum": 0 },
+        "total":  { "type": "integer", "minimum": 0 }
+      }
+    },
+    "git_baseline_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "description": "stage 진입 시 git HEAD SHA — state.StageRecord.git_baseline_sha 와 정합."
+    }
+  }
+}

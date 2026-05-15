@@ -1,6 +1,6 @@
-# JSON Schemas (★ v2.2.0 phase 4.7+4.8 격상 / v2.1.0 phase 4.7 characterization)
+# JSON Schemas (★ v3.2 G3 work-unit-manifest 추가)
 
-> **31 schema** = chain v2 (6) + state 영속 (3) + Analysis BE (5) + Analysis FE (5) + aspect FE (4) + ★ characterization 1 (v2.1.0) + ★ sql-inventory 1 (v2.2.0) + error-mapping 1 (v1.5.0) + 메타+유틸 (5). JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식 + top-level `additionalProperties: false` strict (★ D9 / v3.1.x).
+> **32 schema** = chain v2 (6) + state 영속 (3) + ★ G3 운영 (1) + Analysis BE (5) + Analysis FE (5) + aspect FE (4) + ★ characterization 1 (v2.1.0) + ★ sql-inventory 1 (v2.2.0) + error-mapping 1 (v1.5.0) + 메타+유틸 (5). JSON Schema Draft 2020-12. 모두 `$id = https://ai-native-methodology/schemas/{name}.schema.json` 형식 + top-level `additionalProperties: false` strict (★ D9 / v3.1.x).
 
 ---
 
@@ -17,6 +17,7 @@
 | `state.schema.json` | chain-driver state 영속 | `tools/chain-driver/src/state-store.js` |
 | `intervention-log.schema.json` | 사용자 결단 로그 (single-writer JSONL) | `tools/chain-driver/src/intervention-log.js` |
 | `test-cmd.schema.json` | test runner 호출 명세 (framework / cmd / args / cwd) | `tools/test-impl-pass-validator/` |
+| `work-unit-manifest.schema.json` | ★ G3 (R5/R7) — scope + stage manifest (analysis_refs + sync_state) | `tools/chain-driver/src/state-store.js writeManifest` |
 
 ## Analysis stage — BE 5 + FE 8
 
