@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/prompt-extract.schema.json",
+  "title": "Prompt Extract (analysis-from-prompt output)",
+  "description": "★ ★ v3.3 G2 / R8 (e) 자연어 prompt 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.prompt.extract_ref 로 참조.",
+  "type": "object",
+  "required": ["scope", "raw_prompt", "intent", "uc_candidates"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "raw_prompt": {
+      "type": "string",
+      "description": "본 skill 에 들어온 자연어 잔여 텍스트 (orchestrate 가 메타데이터 제외 후) 또는 사용자 직접 입력."
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary"],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "description": "한 문장 의도 요약 (사용자 핵심 동사 + 대상)."
+        },
+        "action_verbs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "'만들다', '수정하다', '연동하다' 같은 핵심 동사 추출."
+        },
+        "target_entities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "'사용자', '권한', '주문' 같은 대상 entity."
+        }
+      }
+    },
+    "scope_inferred": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "범위 추정 — 명시 / 암묵 구분.",
+      "properties": {
+        "explicit": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "사용자가 prompt 안에 명시한 범위."
+        },
+        "implicit": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "추정한 암묵 범위 (confidence 명시 의무)."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "범위 추정 신뢰도 (0=전부 추정 / 1=전부 명시)."
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "description"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["performance", "security", "compatibility", "integration", "deadline", "compliance", "other"]
+          },
+          "description": { "type": "string" },
+          "source_quote": {
+            "type": "string",
+            "description": "raw_prompt 안 해당 표현 그대로 인용 (역추적용 / LLM 양심 회피)."
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statement", "confidence"],
+        "properties": {
+          "statement": { "type": "string" },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "user_confirmation_required": {
+            "type": "boolean",
+            "description": "true 시 chain 1 planning-spec 진입 전 사용자 확인 의무."
+          }
+        }
+      }
+    },
+    "uc_candidates": {
+      "type": "array",
+      "description": "use case 후보 — 정식 UC-* ID 는 chain 1 planning-spec 에서 부여. 본 단계 = 후보 명사 + 동사 + 우선순위 추정.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "예: '사용자 관리', '권한 부여 / 회수', '주문 취소'"
+          },
+          "actors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "priority_hint": {
+            "type": "string",
+            "enum": ["must", "should", "could", "wont"],
+            "description": "MoSCoW. 명시 부재 시 omit (assume 금지)."
+          }
+        }
+      }
+    }
+  }
+}

@@ -9,9 +9,9 @@
       "name": "입력 정리",
       "spec_file": "input.md",
       "depends_on": [],
-      "inputs": ["source_code", "erd_optional", "orm_optional", "design_docs_optional"],
-      "outputs": ["_manifest.yml"],
-      "skills": ["analysis-input-collection"]
+      "inputs": ["source_code", "erd_optional", "orm_optional", "design_docs_optional", "figma_desktop_selection_optional", "openapi_spec_optional", "plan_doc_optional", "natural_language_prompt_optional"],
+      "outputs": ["_manifest.yml", "input-summary.json_optional"],
+      "skills": ["analysis-input-collection", "analysis-input-orchestrate", "analysis-from-prompt", "analysis-from-swagger", "analysis-from-plan-doc", "analysis-from-figma"]
     },
     {
       "id": "discovery",

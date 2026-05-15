@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/figma-extract.schema.json",
+  "title": "Figma Extract (analysis-from-figma output)",
+  "description": "★ ★ v3.3 G2 / R8 (b) Figma 디자인 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.figma.extract_ref 로 참조. FE 트랙 한정.",
+  "type": "object",
+  "required": ["scope", "source", "screens", "components"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selection_id"],
+      "properties": {
+        "selection_id": {
+          "type": "string",
+          "description": "Figma desktop selection 의 node id (get_metadata 응답에서)."
+        },
+        "file_url": {
+          "type": "string",
+          "description": "Figma 파일 URL (사용자 인용 / 역추적용 / 직접 fetch 불요)."
+        },
+        "fetched_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "description": "frame 단위 화면.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "node_type": {
+            "type": "string",
+            "enum": ["FRAME", "COMPONENT", "INSTANCE", "GROUP"]
+          },
+          "position": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "x":      { "type": "number" },
+              "y":      { "type": "number" },
+              "width":  { "type": "number", "minimum": 0 },
+              "height": { "type": "number", "minimum": 0 }
+            }
+          },
+          "screenshot_ref": {
+            "type": "string",
+            "description": "assets/figma-screenshot-*.png 상대 경로."
+          },
+          "component_refs": {
+            "type": "array",
+            "items": { "type": "string", "description": "components[].id" }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "description": "컴포넌트 트리 (parent_id 추적).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "node_type"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "node_type": {
+            "type": "string",
+            "enum": ["FRAME", "COMPONENT", "INSTANCE", "GROUP", "TEXT", "RECTANGLE", "VECTOR", "ELLIPSE", "LINE", "OTHER"]
+          },
+          "parent_id": {
+            "anyOf": [
+              { "type": "null" },
+              { "type": "string" }
+            ]
+          },
+          "tailwind_class_hint": {
+            "type": "string",
+            "description": "get_design_context 가 반환한 Tailwind class 추론."
+          }
+        }
+      }
+    },
+    "design_tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "get_variable_defs 결과 — color / spacing / typography variable + style.",
+      "properties": {
+        "colors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "value"],
+            "properties": {
+              "name":  { "type": "string" },
+              "value": { "type": "string", "description": "예: '#4F46E5' / 'rgba(0,0,0,0.5)'" },
+              "mode":  { "type": "string", "description": "예: 'light' / 'dark'" }
+            }
+          }
+        },
+        "spacing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "value"],
+            "properties": {
+              "name":  { "type": "string" },
+              "value": { "type": "number" }
+            }
+          }
+        },
+        "typography": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name"],
+            "properties": {
+              "name":        { "type": "string" },
+              "font_family": { "type": "string" },
+              "font_size":   { "type": "number" },
+              "font_weight": { "type": "number" },
+              "line_height": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "asset_refs": {
+      "type": "array",
+      "description": "캡처된 screenshot / asset 상대 경로.",
+      "items": { "type": "string" }
+    },
+    "scope_out_notes": {
+      "type": "array",
+      "description": "본 skill scope 외 영역 — 사용자에게 안내 + 후속 보강 의무.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["interaction", "animation", "autolayout-detail", "variant-traversal", "plugin-data"]
+          },
+          "note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

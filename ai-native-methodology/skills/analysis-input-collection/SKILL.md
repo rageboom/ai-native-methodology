@@ -1,6 +1,6 @@
 ---
 name: analysis-input-collection
-description: Use when starting analysis of a legacy codebase. Entry point for SDLC analysis stage. Establishes input scope, target modules, language/framework signals, and applies ADR-010 baseline+ratchet (mandatory for legacy projects). Stage = analysis (v1.4.x default).
+description: Use when starting analysis of a legacy codebase. Entry point for SDLC analysis stage. Establishes input scope, target modules, language/framework signals, and applies ADR-010 baseline+ratchet (mandatory for legacy projects). Stage = analysis (v1.4.x default). For multi-source input (Figma / Swagger / plan-doc / natural-language prompt), use analysis-input-orchestrate instead.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 

@@ -94,9 +94,9 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
-| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ | inventory + tree |
+| 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ + ★ v3.3.0 G2 신규 5종 (`analysis-input-orchestrate` + `analysis-from-{prompt,swagger,plan-doc,figma}`) | inventory + tree + input-summary.json (cross-ref + conflict) |
 | 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning-*/ (★ 3 / planning-extract-from-legacy 등) | planning-spec |
-| 1 sub | analysis | analysis.phase-flow.json | skills/analysis-*/ (현 22 / aspect 4 + br-cross 1 포함) | 7대 + 8 FE 산출물 |
+| 1 sub | analysis | analysis.phase-flow.json | skills/analysis-*/ (현 27 / aspect 4 + br-cross 1 + ★ v3.3.0 G2 신규 5종 (orchestrate + from-quad) 포함) | 7대 + 8 FE 산출물 + input-summary.json (★ v3.3.0) |
 | 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec-*/ (★ 3 / spec-compose-behavior-spec 등) | behavior-spec / acceptance-criteria |
 | 3 | test | test.phase-flow.json (★ 신설) | skills/test-*/ (★ 3 / test-generate-test-spec 등) | test-spec + 실 test 코드 (RED) |
 | 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement-*/ (★ 2 / implement-generate-impl-spec 등) | impl-spec + 실 impl 코드 (GREEN) |
@@ -143,7 +143,7 @@ v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>
 | 사상 카테고리 | runtime prefix | skill 개수 (v2.5.1) | 예 |
 |---|---|---|---|
 | _base | `_base-` | 5 | `_base-apply-template`, `_base-build-traceability-matrix`, ... |
-| analysis | `analysis-` | 22 | `analysis-input-collection`, `analysis-aspect-a11y`, ... |
+| analysis | `analysis-` | 27 (★ v3.3.0 G2 / +5: orchestrate + from-{prompt,swagger,plan-doc,figma}) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-prompt`, `analysis-from-swagger`, `analysis-from-plan-doc`, `analysis-from-figma`, `analysis-aspect-a11y`, ... |
 | planning | `planning-` | 3 | `planning-extract-from-legacy`, ... |
 | spec | `spec-` | 3 | `spec-compose-behavior-spec`, ... |
 | test | `test-` | 3 | `test-generate-test-spec`, ... |

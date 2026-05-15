@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/swagger-extract.schema.json",
+  "title": "Swagger Extract (analysis-from-swagger output)",
+  "description": "★ ★ v3.3 G2 / R8 (c) OpenAPI/Swagger 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.swagger.extract_ref 로 참조.",
+  "type": "object",
+  "required": ["scope", "spec_source", "spec_version", "endpoints", "schemas"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "spec_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_or_url"],
+      "properties": {
+        "path_or_url": { "type": "string" },
+        "fetched_at": { "type": "string", "format": "date-time" },
+        "fetch_method": {
+          "type": "string",
+          "enum": ["file", "http", "https"]
+        }
+      }
+    },
+    "spec_version": {
+      "type": "string",
+      "enum": ["openapi-3.1", "openapi-3.0", "swagger-2.0"]
+    },
+    "info": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "OpenAPI info 블록 (title / version / description) — passthrough."
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url":         { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "endpoints": {
+      "type": "array",
+      "description": "path × method 전수.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "method"],
+        "properties": {
+          "path": { "type": "string" },
+          "method": {
+            "type": "string",
+            "enum": ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
+          },
+          "operation_id": { "type": "string" },
+          "summary":      { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "parameters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "request_body_schema_ref": {
+            "type": "string",
+            "description": "schemas 의 키 또는 inline schema id."
+          },
+          "responses": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "description":      { "type": "string" },
+                "schema_ref":       { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "type": "object",
+      "description": "components.schemas (OpenAPI 3) 또는 definitions (Swagger 2) 정규화.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": true,
+        "description": "JSON Schema fragment — passthrough (의도적 strict 면제 / spec 표준 그대로)."
+      }
+    },
+    "domain_seed": {
+      "type": "array",
+      "description": "domain entity 후보 — schema 이름 + required 필드 + 연관.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["entity_name"],
+        "properties": {
+          "entity_name": { "type": "string" },
+          "required_fields": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "relations": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "rules_seed": {
+      "type": "array",
+      "description": "BR-* 후보 — schema 의 enum/pattern/minimum/maximum/required 제약에서 도출. 정식 BR-* ID 는 chain 1 planning-spec 에서 부여.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate_id", "constraint_type", "source"],
+        "properties": {
+          "candidate_id": {
+            "type": "string",
+            "description": "예: BR-USER-EMAIL-FORMAT-001 (후보 / 정식 ID 아님)."
+          },
+          "constraint_type": {
+            "type": "string",
+            "enum": ["enum", "pattern", "min", "max", "required", "format", "unique_items"]
+          },
+          "source": {
+            "type": "string",
+            "description": "schemas 의 키 + 필드 경로 (예: 'User.email')."
+          },
+          "value": {
+            "description": "제약 값 (enum array / regex pattern / min/max number).",
+            "anyOf": [
+              { "type": "string" },
+              { "type": "number" },
+              { "type": "array" }
+            ]
+          }
+        }
+      }
+    },
+    "validation_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parser_validated": {
+          "type": "boolean",
+          "description": "@readme/openapi-parser validate 통과 여부."
+        },
+        "spectral_invoked": {
+          "type": "boolean",
+          "description": "본 skill 안에서 spectral auto-invoke 했는지 = 항상 false (no-simulation 의무). true 이면 검증 위반."
+        },
+        "parser_errors": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

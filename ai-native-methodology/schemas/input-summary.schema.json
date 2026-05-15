@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/input-summary.schema.json",
+  "title": "Input Summary (analysis-input-orchestrate output)",
+  "description": "★ ★ ★ v3.3 G2 (R8 입력 5종 BCDE 자산 대칭 + orchestrator paradigm). .aimd/<scope>/planning/input-summary.json — analysis-input-orchestrate 가 BCDE 4 sub-skill 산출을 통합한 결과. 이중 렌더링 = input-summary.md 동시 생성 (ADR-008 v2).",
+  "type": "object",
+  "required": ["scope", "raw_prompt", "parsed", "inputs", "cross_refs", "conflicts"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+      "description": "scope slug — work-unit-manifest.schema.json 정합."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "raw_prompt": {
+      "type": "string",
+      "description": "사용자 원문 발화 — 보존 의무 (역추적 + 재파싱용)."
+    },
+    "parsed": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "1단계 파싱 결과 — 메타데이터 4종 + 잔여 의도.",
+      "properties": {
+        "swagger_url":     { "anyOf": [{ "type": "null" }, { "type": "string" }] },
+        "figma_url":       { "anyOf": [{ "type": "null" }, { "type": "string" }] },
+        "plan_doc_path":   { "anyOf": [{ "type": "null" }, { "type": "string" }] },
+        "residual_intent": { "type": "string" },
+        "inline_marker_used": {
+          "type": "boolean",
+          "description": "사용자가 @swagger: / @figma: / @plan-doc: 마커 명시 사용 시 true (휴리스틱 override)."
+        }
+      },
+      "required": ["residual_intent"]
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "BCDE 4 sub-skill 산출 ref + 요약 metric.",
+      "properties": {
+        "swagger": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extract_ref":     { "type": "string", "description": "swagger-extract.json 상대 경로" },
+            "endpoints_count": { "type": "integer", "minimum": 0 },
+            "schemas_count":   { "type": "integer", "minimum": 0 }
+          }
+        },
+        "figma": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extract_ref":   { "type": "string" },
+            "screens_count": { "type": "integer", "minimum": 0 },
+            "components_count": { "type": "integer", "minimum": 0 },
+            "tokens_count":  { "type": "integer", "minimum": 0 }
+          }
+        },
+        "plan_doc": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extract_ref":    { "type": "string" },
+            "sections_count": { "type": "integer", "minimum": 0 },
+            "uc_candidates_count": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "prompt": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "extract_ref":    { "type": "string" },
+            "intent_summary": { "type": "string" }
+          }
+        }
+      }
+    },
+    "dispatch_mode": {
+      "type": "string",
+      "enum": ["direct", "task-tool"],
+      "description": "Hybrid rule 결과 — direct = ≤50K token / task-tool = >50K token 또는 격리 필요."
+    },
+    "dispatch_token_estimate": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Hybrid rule 산정에 사용한 추정 token 합계."
+    },
+    "cross_refs": {
+      "type": "array",
+      "description": "UC 후보별 forward link — 같은 UC 를 가리키는 BCDE 입력 4종 인용.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["uc_candidate", "from"],
+        "properties": {
+          "uc_candidate": {
+            "type": "string",
+            "description": "UC-* 후보 ID (chain 1 planning-spec 진입 시 정식 ID 부여)."
+          },
+          "from": {
+            "type": "array",
+            "items": { "type": "string", "description": "예: 'figma:UserList' / 'swagger:GET /users' / 'plan-doc:§3' / 'prompt:사용자 관리'" }
+          },
+          "warning": {
+            "type": "string",
+            "description": "후속 skill 의존 안내 (예: '기존 auth 시스템 미파악 — analysis-source-inventory 의존')."
+          }
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "description": "BCDE 입력 사이 정합 충돌. severity 3-tier 정량 산식 적용 의무 (no-simulation 정합).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "between", "description", "similarity_score"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CONFLICT-[0-9]{3,}$"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "between": {
+            "type": "array",
+            "minItems": 2,
+            "items": { "type": "string", "description": "예: 'figma:UserDetail.email' / 'swagger:userEmail'" }
+          },
+          "description": {
+            "type": "string"
+          },
+          "similarity_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "description": "산식 = (1 - normalized_levenshtein) + (intersection_stems / union_stems). LLM 정성 판정 ❌."
+          },
+          "score_components": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "normalized_levenshtein": { "type": "number", "minimum": 0, "maximum": 1 },
+              "stem_intersection":     { "type": "integer", "minimum": 0 },
+              "stem_union":            { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "user_decisions_pending": {
+      "type": "array",
+      "description": "high severity conflict 또는 모호 케이스 → 사용자 결단 대기.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question"],
+        "properties": {
+          "id":       { "type": "string" },
+          "question": { "type": "string" },
+          "options":  {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "blocking": { "type": "boolean", "description": "true 시 state.blocked 의무." }
+        }
+      }
+    }
+  }
+}

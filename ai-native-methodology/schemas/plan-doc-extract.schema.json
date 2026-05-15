@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/plan-doc-extract.schema.json",
+  "title": "Plan Doc Extract (analysis-from-plan-doc output)",
+  "description": "★ ★ v3.3 G2 / R8 (d) 기획 문서 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.plan_doc.extract_ref 로 참조.",
+  "type": "object",
+  "required": ["scope", "source", "sections", "uc_candidates"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "format"],
+      "properties": {
+        "path": { "type": "string" },
+        "format": {
+          "type": "string",
+          "enum": ["markdown", "pdf", "notion-export-zip", "notion-export-dir"]
+        },
+        "file_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Notion export 시 page 수 (subpage 포함)."
+        },
+        "page_range_processed": {
+          "type": "string",
+          "description": "PDF 시 처리된 페이지 범위 (예: '1-20')."
+        },
+        "truncated": {
+          "type": "boolean",
+          "description": "PDF 20 page cap 초과 시 true + 사용자 분할 안내 완료."
+        }
+      }
+    },
+    "intent_summary": {
+      "type": "string",
+      "description": "문서 전체 의도 요약 (1~3 문장)."
+    },
+    "sections": {
+      "type": "array",
+      "description": "본문 섹션 — heading 기반 분리.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["heading", "level"],
+        "properties": {
+          "heading": { "type": "string" },
+          "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+          "body_excerpt": {
+            "type": "string",
+            "description": "섹션 본문 발췌 (1000자 cap / 전체 보존 의무 시 별도 .md)."
+          },
+          "tables_count": { "type": "integer", "minimum": 0 },
+          "code_blocks_count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "uc_candidates": {
+      "type": "array",
+      "description": "use case 후보. 정식 UC-* ID 는 chain 1 planning-spec.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "source_section"],
+        "properties": {
+          "name": { "type": "string" },
+          "actors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "source_section": {
+            "type": "string",
+            "description": "어느 section heading 에서 도출 (역추적용)."
+          },
+          "priority_hint": {
+            "type": "string",
+            "enum": ["must", "should", "could", "wont"]
+          }
+        }
+      }
+    },
+    "glossary": {
+      "type": "array",
+      "description": "용어집 — 본문 또는 별도 섹션에서 추출.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["term", "definition"],
+        "properties": {
+          "term": { "type": "string" },
+          "definition": { "type": "string" },
+          "source_section": { "type": "string" }
+        }
+      }
+    },
+    "csv_tables": {
+      "type": "array",
+      "description": "Notion database export 의 csv 파일 인덱스.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "row_count"],
+        "properties": {
+          "path": { "type": "string" },
+          "row_count": { "type": "integer", "minimum": 0 },
+          "columns": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "linked_section": { "type": "string" }
+        }
+      }
+    },
+    "asset_refs": {
+      "type": "array",
+      "description": "이미지/첨부 path 참조 (binary 흡수 ❌).",
+      "items": { "type": "string" }
+    }
+  }
+}

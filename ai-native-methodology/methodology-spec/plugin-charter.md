@@ -37,7 +37,7 @@
 | R5 | ✅ | `tools/chain-driver/src/state-store.js` `ensureScopeDir` + `chain-driver init --scope <s>` + SessionStart hook 자동 발동 (v3.2 G3 종결 / DEC-2026-05-15-g3-scope-folder-종결) |
 | R6 | ✅ | `hooks/hooks.json` (SessionStart + UserPromptSubmit + PreToolUse) + `CLAUDE.md` 23 policies |
 | R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{planning,spec,test,impl}/` + manifest 이중 렌더링 (`manifest.json` + `manifest.md`) 자동 생성. `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
-| R8 | ⚠️ | (a)(d)(e) ✅ / **(b) Figma ❌ / (c) Swagger ❌** — analysis-from-figma / analysis-from-swagger skill 부재 |
+| R8 | ✅ | (★ v3.3.0 G2 종결 / 2026-05-15) 5종 모두 자산 대칭. (a) `analysis-input-collection` + `analysis-source-inventory` 22 skill / (b) **`analysis-from-figma`** (Figma desktop MCP 4 도구) / (c) **`analysis-from-swagger`** (`@readme/openapi-parser`) / (d) **`analysis-from-plan-doc`** (md + pdf + Notion export) / (e) **`analysis-from-prompt`** + **`analysis-input-orchestrate`** (자연어 1발화 → 자동 dispatch + cross-ref + conflict) |
 | R9 | ✅ | `flows/spec.phase-flow.json` (chain 2) + `skills/spec-compose-behavior-spec/` |
 | R10 | ✅ | `flows/test.phase-flow.json` (chain 3 / RED 의무) + `tools/test-impl-pass-validator/` |
 | R11 | ✅ | `flows/implement.phase-flow.json` (chain 4 / GREEN 100% pass) |
@@ -48,19 +48,20 @@
 | R16 | ❌ | `.claude/plans/plan-itsm-jira-chain-integration.md` 계획만 / **wiki-jira-assistant MCP wrapper skill 부재** |
 | R17 | ❌ | 단계별 자동 티켓 발행 hook 부재 / gate pass→ticket transition 자동화 ❌ |
 
-**요약**: ✅ 11 / ⚠️ 4 / ❌ 2.
+**요약 (v3.3.0 갱신)**: ✅ **12** / ⚠️ **3** / ❌ **2**. (R8 ⚠️→✅ 격상 / G2 종결)
 
 ## §3 Gap 우선순위
 
-> 2026-05-15 갱신 — G3 종결 (v3.2 / DEC-2026-05-15-g3-scope-folder-종결). G1 후순위 (기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리 가능).
-> 활성 우선순위: **G2 > G4 > G5 > G1**.
+> 2026-05-15 갱신 — G3 종결 (v3.2 / DEC-2026-05-15-g3-scope-folder-종결). **G2 종결 (v3.3.0 / 2026-05-15 / DEC-2026-05-15-g2-orchestrate-skill-분리-채택)**.
+> G1 후순위 (기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리 가능).
+> 활성 우선순위: **G4 > G5 > G1**.
 
 | 순위 | Gap | 영향 | 후속 |
 |------|-----|------|------|
-| G2 | **R8 Figma / Swagger 입력 skill 부재** | 5종 입력 중 2종 미지원 | skill `analysis-from-figma` (mcp__figma-desktop__get_design_context 활용) + `analysis-from-swagger` (openapi.yaml parse) |
 | G4 | **R14 FE skill 보강** | FE 프로젝트 적용도 저하 | FE-impl-react / FE-impl-vue / FE-test-jest / FE-test-playwright / design-html-template-analyze 신설 |
 | G5 | **R12 lifecycle-contract 에 stage↔asset 매핑표 부재** | 사용자가 어떤 skill 을 호출해야 할지 불명확 | `lifecycle-contract.md` 에 stage × (agent / skill / hook / tool / validator) 매핑표 1장 신설 |
-| G1 | **R16/R17 ITSM/Jira 자동 티켓화** (★ 후순위 / 2026-05-15) | — | 사용자 결단: 기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리. 자동 티켓 발행 skill/hook 은 G2~G5 완료 후 재검토 |
+| G1 | **R16/R17 ITSM/Jira 자동 티켓화** (★ 후순위 / 2026-05-15) | — | 사용자 결단: 기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리. 자동 티켓 발행 skill/hook 은 G4~G5 완료 후 재검토 |
+| ~~G2~~ | ~~R8 Figma / Swagger 입력 skill 부재~~ | ✅ **종결 (v3.3.0 / 2026-05-15)** — BCDE 5 skill (`analysis-input-orchestrate` + `analysis-from-{prompt,swagger,plan-doc,figma}`) + 5 schema + 25 test pass + orchestrator paradigm (cross-ref + conflict 정량 산식). `DEC-2026-05-15-g2-orchestrate-skill-분리-채택.md` 참조. |
 | ~~G3~~ | ~~R5/R7 산출물 폴더 자동 생성~~ | ✅ **종결 (v3.2 / 2026-05-15)** — scope/stage 폴더 + manifest 이중 렌더링 + SessionStart hook + M4 sync 자동 (114/114 test pass). `DEC-2026-05-15-g3-scope-folder-종결.md` 참조. |
 
 ## §4 Claude Code 최적화 디폴트 (R6 구체화)

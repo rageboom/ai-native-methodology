@@ -9,6 +9,106 @@
 
 ---
 
+## [3.3.0] — 2026-05-15 ★ ★ ★ MINOR — G2 종결 / analysis-from-quad (BCDE 입력 5 skill + orchestrate paradigm + 25 test pass)
+
+> ★ ★ ★ **charter §3 G2 종결** — R8 입력 5종 중 BCDE 자산 대칭 ✅ 도달 + complex multi-input orchestration paradigm 도입. **5 skill + 5 schema + 25 test pass**. Senior critique STOP/REVISE 본격 흡수. v2.6.0 의미 ID paradigm 정합.
+
+### 사용자 3 메타 지적 본격 흡수
+
+1. **메타 #1** — charter §2 ✅ 판정의 "형식 명시" vs "자산 차원" 구분 누락 risk → **5 skill 자산 대칭 신설** ((a)(d)(e) ✅ 도 자산 차원 ✅ 로 격상).
+2. **메타 #2** — 복합 입력 흐름 (Figma + Swagger + 자연어 한 발화) mermaid "선택" 점선이 명세 누락 신호 → **orchestrator paradigm 채택**.
+3. **메타 #3** — orchestrator 단일 책임 위반 risk (9 책임 누적) → **B' = 별도 skill 분리** (`analysis-input-orchestrate` 신설 / 4 책임).
+
+### 신설 자산 (5 + 5 + 25)
+
+**5 skill**:
+- `skills/analysis-input-orchestrate/SKILL.md` — 자연어 파싱 + BCDE dispatch + merge + cross-ref + conflict (정량 산식)
+- `skills/analysis-from-prompt/SKILL.md` — (e) 자연어 의도 흡수
+- `skills/analysis-from-swagger/SKILL.md` — (c) OpenAPI 3.1/3.0/Swagger 2.0 흡수 (`@readme/openapi-parser`)
+- `skills/analysis-from-plan-doc/SKILL.md` — (d) md + pdf + Notion export 흡수
+- `skills/analysis-from-figma/SKILL.md` — (b) Figma desktop selection 흡수 (`mcp__figma-desktop__*` 4 도구)
+
+**5 schema** (strict / additionalProperties:false):
+- `schemas/input-summary.schema.json` — orchestrate 통합 산출 (cross_refs + conflicts + score_components + dispatch_mode)
+- `schemas/prompt-extract.schema.json`
+- `schemas/swagger-extract.schema.json` (validation_status.spectral_invoked = 항상 false / auto-invoke 위반 검출)
+- `schemas/plan-doc-extract.schema.json`
+- `schemas/figma-extract.schema.json` (scope_out_notes 안 interaction/animation/autolayout-detail 등 명시)
+
+**25 test case** — schema-validator 회귀 15 → **40/40 pass**.
+
+### paradigm 4 결단 (Senior critique 본격 흡수)
+
+| paradigm | 결단 |
+|---|---|
+| orchestrate 분리도 | **1-A 단일 skill (4 책임 응집)** / 재사용 신호 ≥ 2 누적 시 1-B carry |
+| sub-skill 호출 방식 | **Hybrid 2-B 기본 (≤ 50K token) + 2-A escalate (> 50K)** / ❌ chain-driver dispatch (STRONG-STOP) |
+| conflict 검출 산식 | **정량 (Levenshtein + stem set intersection)** / LLM 양심 회피 |
+| spectral 검증 시점 | **사용자/orchestrate 명시 호출** / auto-invoke 금지 (no-simulation 정합) |
+
+### 부수 갱신
+
+- `skills/analysis-input-collection/SKILL.md` — description trigger 한 줄 추가
+- `methodology-spec/workflow/input.md` — "수동 + skill 호출 + orchestrate 자동 dispatch" 3중
+- `methodology-spec/plugin-charter.md` §2 R8 ⚠️→✅ + §3 G2 종결 (잔여 G4 > G5 > G1)
+- `methodology-spec/skills-axis.md` — analysis 22 → 27
+- `flows/analysis.phase-flow.json` — phase 0 skill mapping
+- `.claude-plugin/plugin.json` — 3.1.0 → 3.3.0
+- `decisions/DEC-2026-05-15-g2-orchestrate-skill-분리-채택.md` — 신설
+
+### Lessons Learned (★ paradigm 진화)
+
+- LL-G2-01: charter ✅ 판정 시 "형식 명시" vs "자산 차원" 구분 의무
+- LL-G2-02: mermaid "선택" 점선 = 흐름 명세 누락 신호
+- LL-G2-03: paradigm 결단 시 책임 합산 의무 (N+M 단일 의미 검증)
+- LL-G2-04: chain-driver 결정론 axis 오염 회피 (STRONG-STOP) / Hybrid paradigm
+- LL-G2-05: LLM 양심 의존 정성 판정 회피 (정량 산식 의무)
+- LL-G2-06: auto-invoke 정책 정합 (외부 도구 명시 호출)
+
+### 정합 관계
+
+- DEC-2026-05-15-g2-orchestrate-skill-분리-채택 (본 entry SSOT)
+- DEC-2026-05-15-plugin-charter-17-requirements-채택 (charter §3 G2 종결 sibling)
+- v2.6.0 paradigm (의미 ID — `analysis-from-*` slot)
+- ADR-008 v2 (이중 렌더링 / input-summary.md)
+- ADR-009 (no-simulation / spectral auto-invoke 금지)
+
+---
+
+## [3.2.0] — 2026-05-15 ★ ★ ★ MINOR — G3 종결 / 산출물 폴더 자동 + 지속 운영 인프라 + plugin charter 채택
+
+> ★ ★ ★ **charter §3 G3 종결** — R5/R7 (산출물 폴더 + 작업단위 컨벤션) ✅ 도달. 1회성 hook ❌ / **지속 운영 인프라** 격상 (사용자 본질 재정의 "참조 쉬워야 + 동기화 되어야"). v3.1.0 → v3.2.0 정식 release (commit b762a0c).
+
+### 신설 / 수정 자산 (commit b762a0c / 19 file)
+
+- `methodology-spec/plugin-charter.md` — 17 요구사항 SSOT 신설 (R1~R17 + §4 Claude Code 디폴트 + Gap 5 + 추가 권장 8)
+- `schemas/work-unit-manifest.schema.json` — scope + stage manifest schema 신설
+- `tools/chain-driver/src/{work-unit,sync,query}.js` — M4 = 자동 drift 감지 + 수동 cascade
+- `tools/chain-driver/src/cli.js` — init --scope / query / sync CLI 신규 (115 line 추가)
+- `hooks/hooks.json` — SessionStart hook 자동 발동 (recover + markDrift 안내 / D21' 정합)
+- `methodology-spec/lifecycle-contract.md` — §파일 위치 컨벤션 확장
+- `methodology-spec/id-conventions.md` — scope slug 항목 신설
+- `schemas/state.schema.json` — current_scope optional 필드
+
+### 검증
+
+- 114/114 test pass (기존 72 + scope-dir 22 + sync 11 + query 9)
+- e2e smoke GREEN (/tmp/g3-smoke)
+
+### Lessons Learned
+
+- `feedback_strict_exposes_drift.md` — additionalProperties:false strict 적용 = fixture drift 폭로 가치 신호
+
+### 정합 관계
+
+- DEC-2026-05-15-g3-scope-folder-종결 (SSOT)
+- DEC-2026-05-15-plugin-charter-17-requirements-채택 (charter SSOT)
+- ADR-CHAIN-005 §2 (atomic write + CAS)
+- ADR-008 v2 (이중 렌더링)
+- v2.6.0 paradigm (stage 폴더 `planning/spec/test/impl` 의미 ID)
+
+---
+
 ## [3.1.0] — 2026-05-15 ★ ★ ★ MINOR — chain 1~4 phase ID 의미 ID 자산화 (v3.0.0 carry resolved / D-3 paradigm sibling)
 
 > ★ ★ ★ **v3.0.0 carry resolved** — analysis chain (v3.0.0) 의미 ID 자산화 패턴 정합 sibling. planning/spec/test/implement 4 chain 안 26 phase 숫자 ID → 의미 ID. **scaffolding only / PoC 미사용 / breaking 영향 ≈ 0 / additive 격** 사유로 MINOR. 사내 배포 전 / 실 사용자 0 / alias map ❌ / 즉시 cutover.

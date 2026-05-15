@@ -1,6 +1,6 @@
 # input phase: 입력 정리 (Input Preparation)
 
-> 유일하게 **사용자가 수동으로 진행**하는 단계. 자동화 명령어 없음.
+> **v3.3.0 G2 종결 이후 (2026-05-15)**: 본 단계는 **3중 양립** — (1) 사용자 수동 (자료를 inputs/ 폴더에 배치) / (2) skill 명시 호출 (`analysis-from-{prompt,swagger,plan-doc,figma}` / `analysis-input-collection`) / (3) `analysis-input-orchestrate` 자동 dispatch (자연어 발화 1회 → BCDE 4 skill 자동 + merge + cross-ref + conflict). 셋 모두 정합.
 
 ---
 
@@ -17,13 +17,22 @@
 
 ## 2. 입력
 
+★ ★ ★ **R8 입력 5종 (charter §1) — v3.3.0 G2 종결 시 자산 대칭 도달**:
+
+| R8 종류 | 입력 | 흡수 skill | 출처 |
+|---|---|---|---|
+| (a) 기존 코드 | 분석 대상 레포 | `analysis-input-collection` + `analysis-source-inventory` 등 22 skill | git clone |
+| (b) Figma | Figma desktop selection | `analysis-from-figma` | Figma 앱 + frame 선택 |
+| (c) Swagger / OpenAPI | openapi.yaml / swagger.json | `analysis-from-swagger` | 파일 경로 / URL |
+| (d) 기획 문서 | Markdown / PDF / Notion export | `analysis-from-plan-doc` | 파일 경로 / zip |
+| (e) 자연어 prompt | 자연어 발화 (메타데이터 + 의도) | `analysis-from-prompt` (잔여 의도) + `analysis-input-orchestrate` (메타데이터 파싱 + dispatch) | 사용자 직접 입력 |
+
+기타 선택 입력 (analysis stage 자산 보강용):
+
 | 입력 | 출처 | 필수/선택 |
 |---|---|---|
-| 분석 대상 레포 | git clone | 필수 |
 | ERD | DBML, Mermaid, 이미지 | 선택 |
 | 운영 DB 메타 | INFORMATION_SCHEMA SQL | 선택 |
-| 기획 문서 | Markdown, Notion export, PDF | 선택 |
-| 디자인 명세 | Figma JSON, design-tokens | 선택 |
 | 도메인 컨텍스트 | domain-context.md (LLM grounding 용) | 선택 (권장) |
 | API 테스트 | Postman collection, 요청/응답 샘플 | 선택 |
 
@@ -45,12 +54,23 @@
         └── api-tests/              # API 테스트 데이터
 ```
 
-### 3.2 사용자 작업
+### 3.2 사용자 작업 (3중 양립)
 
+**경로 A — 수동**:
 1. 분석 대상 레포 git clone
 2. `.ai-analysis/inputs/` 디렉토리 생성
 3. 가용한 자료를 해당 하위 디렉토리에 배치
 4. (권장) `domain-context.md` 작성 — 비즈니스 영역, 핵심 흐름, 용어 등
+
+**경로 B — skill 명시 호출**:
+- 입력 종류별 skill 직접 호출 — `/analysis-from-swagger` / `/analysis-from-figma` / `/analysis-from-plan-doc` / `/analysis-from-prompt` / `/analysis-input-collection`
+
+**경로 C — orchestrate 자동 dispatch (v3.3.0 G2)**:
+- 자연어 발화 1회 (메타데이터 + 의도 섞임) → `analysis-input-orchestrate` 자동 호출
+- 휴리스틱 (URL/path 패턴 + 키워드) + 인라인 마커 (`@swagger:`, `@figma:`, `@plan-doc:`) 으로 1단계 파싱
+- BCDE 4 skill 자동 dispatch + merge + cross-ref + conflict 검출 (정량 산식)
+- 산출 = `.aimd/<scope>/planning/input-summary.json` + `.md` (이중 렌더링)
+- Hybrid rule: 총 입력 ≤ 50K token = 직접 chain / > 50K = Task tool sub-agent
 
 ### 3.3 환경 제약 케이스
 
