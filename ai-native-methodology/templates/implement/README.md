@@ -23,6 +23,6 @@
 
 ## 참조
 
-- [`../../skills/implement/`](../../skills/implement/) — chain 4 skill 2종 (sub-plan-4 채움)
+- [`../../skills/`](../../skills/) — chain 4 skill 2종 (1-depth / implement-generate-impl-spec · implement-verify-test-pass / ★ v2.5.1 PATCH 평탄화)
 - [`../../methodology-spec/deliverables/21-impl-spec.md`](../../methodology-spec/deliverables/21-impl-spec.md)
 - DEC-2026-05-06-round-trip-부분-허용 — chain 4 round-trip 정식 허용

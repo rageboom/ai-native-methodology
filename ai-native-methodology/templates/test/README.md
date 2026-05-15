@@ -17,5 +17,5 @@
 
 ## 참조
 
-- [`../../skills/test/`](../../skills/test/) — chain 3 skill 3종 (sub-plan-4 채움)
+- [`../../skills/`](../../skills/) — chain 3 skill 3종 (1-depth / test-generate-test-spec · test-run-test-evidence · test-verify-coverage / ★ v2.5.1 PATCH 평탄화)
 - [`../../methodology-spec/deliverables/20-test-spec.md`](../../methodology-spec/deliverables/20-test-spec.md)

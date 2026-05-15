@@ -14,6 +14,6 @@
 
 ## 참조
 
-- [`../../skills/planning/`](../../skills/planning/) — chain 1 skill 3종 (sub-plan-4 채움)
+- [`../../skills/`](../../skills/) — chain 1 skill 3종 (1-depth / planning-decompose-use-cases · planning-extract-from-legacy · planning-identify-business-intent / ★ v2.5.1 PATCH 평탄화)
 - [`../../methodology-spec/deliverables/17-planning-spec.md`](../../methodology-spec/deliverables/17-planning-spec.md)
 - [`../../methodology-spec/lifecycle-contract.md`](../../methodology-spec/lifecycle-contract.md)
