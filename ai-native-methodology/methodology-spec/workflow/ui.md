@@ -7,11 +7,11 @@
 
 ## 분할 안내
 
-| 신 phase | deliverable | 영역 | spec 파일 |
+| 신 phase | deliverable | 영역 | deliverable 명세 |
 |---|---|---|---|
-| **`ui` phase 5-2-a (ui-base)** | #7 ui-spec | pages / components / design-tokens / scenarios / user-flows (정적 구조) | [`phase-5-2-a-ui-base.md`](phase-5-2-a-ui-base.md) |
-| **`ui` phase 5-2-b (state)** | #8 state-map | 분산 상태 5 진실 + state machine (동적 행동) | [`phase-5-2-b-state.md`](phase-5-2-b-state.md) |
-| **`ui` phase 5-2-c (visual)** | #9 visual-manifest | snapshot PNG (binary 진실 모델) | [`phase-5-2-c-visual.md`](phase-5-2-c-visual.md) |
+| **`ui` phase 5-2-a (ui-base)** | #7 ui-spec | pages / components / design-tokens / scenarios / user-flows (정적 구조) | [`../deliverables/7-ui-ux.md`](../deliverables/7-ui-ux.md) |
+| **`ui` phase 5-2-b (state)** | #8 state-map | 분산 상태 5 진실 + state machine (동적 행동) | [`../deliverables/8-state-map.md`](../deliverables/8-state-map.md) |
+| **`ui` phase 5-2-c (visual)** | #9 visual-manifest | snapshot PNG (binary 진실 모델) | [`../deliverables/9-visual-manifest.md`](../deliverables/9-visual-manifest.md) |
 
 ---
 
