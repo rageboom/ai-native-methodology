@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "meta": {
-      "$ref": "https://ai-native-methodology/schemas/meta-confidence.schema.json"
+      "$ref": "./meta-confidence.schema.json"
     },
     "derivation_source": {
       "type": "object",
