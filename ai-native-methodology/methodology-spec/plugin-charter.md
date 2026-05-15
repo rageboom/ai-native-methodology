@@ -23,8 +23,8 @@
 | R13 | 본 chain 은 **기능 추가 / 수정에 반복 적용** | revisit-loop |
 | R14 | **BE / FE 별 맞춤 산출물** (test / impl / spec) | be-fe-split |
 | R15 | **정적 도구 검증 필수** (시뮬레이션 ❌) | static-tool |
-| R16 | 작업은 **MCP 를 통해 티켓 등록** | itsm-integration |
-| R17 | **모든 단계마다 티켓** 발행 | itsm-integration |
+| ~~R16~~ | ~~작업은 MCP 를 통해 티켓 등록~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용 |
+| ~~R17~~ | ~~모든 단계마다 티켓 발행~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15)** — 위와 동일 |
 
 ## §2 현 구현 매핑 (v3.1.0 기준 / 2026-05-15)
 
@@ -45,20 +45,19 @@
 | R13 | ✅ | `sdlc-4stage-flow.json` `revisit_edges` 6종 (planning↔analysis, spec↔planning, test↔spec, impl↔{test,spec,planning,analysis}) |
 | R14 | ✅ | (★ v3.4.0 G4 종결 / 2026-05-15) `be-fe-separation.md` + scenario A/B/C. **FE skill 9** = analysis 5 (`-fe` + `analysis-from-figma`) + chain 4 `implement-react`/`implement-vue` + chain 3 `test-playwright` + Scenario C `analysis-html-template`. chain 4 FE impl 분기 + e2e POM paradigm + JSP 외부 도구 검증 모두 자산화. |
 | R15 | ✅ | `tools/static-runner/` (eslint/prettier/semgrep/tslint/stylelint/hadolint) + gate #4 강제 + no-simulation 정책 |
-| R16 | ❌ | `.claude/plans/plan-itsm-jira-chain-integration.md` 계획만 / **wiki-jira-assistant MCP wrapper skill 부재** |
-| R17 | ❌ | 단계별 자동 티켓 발행 hook 부재 / gate pass→ticket transition 자동화 ❌ |
+| ~~R16~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용. plan-itsm-jira-chain-integration.md 도 이미 폐기 완료 (session 16차). |
+| ~~R17~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15)** — 위와 동일 |
 
-**요약 (v3.5.0 갱신)**: ✅ **14** / ⚠️ **1** / ❌ **2**. (R12 ⚠️→✅ 격상 / G5 종결)
+**요약 (v3.6.0 갱신)**: ✅ **14** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **15/15** 자산 대칭.
 
 ## §3 Gap 우선순위
 
-> 2026-05-15 갱신 — G3 종결 (v3.2) / **G2 종결 (v3.3.0)** / **G4 종결 (v3.4.0)** / **G5 종결 (v3.5.0 / 2026-05-15 / DEC-2026-05-15-g5-lifecycle-asset-matrix-종결)**.
-> G1 후순위 (기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리 가능).
-> 활성 우선순위: **G1** (단독 / 후순위).
+> 2026-05-15 갱신 — G3 종결 (v3.2) / **G2 종결 (v3.3.0)** / **G4 종결 (v3.4.0)** / **G5 종결 (v3.5.0)** / **G1 영구 scope-out (v3.6.0 / 2026-05-15 / DEC-2026-05-15-g1-itsm-permanent-scope-out)**.
+> ★ ★ ★ **활성 charter Gap = 모두 청산**. R16/R17 = scope-out 영구 폐기 (사용자 명시 결단).
 
 | 순위 | Gap | 영향 | 후속 |
 |------|-----|------|------|
-| G1 | **R16/R17 ITSM/Jira 자동 티켓화** (★ 후순위 / 2026-05-15) | — | 사용자 결단: 기존 `mcp__wiki-jira-assistant__*` MCP 로 수동 처리. 자동 티켓 발행 skill/hook 은 carry. |
+| ~~G1~~ | ~~R16/R17 ITSM/Jira 자동 티켓화~~ | ★ **scope-out (v3.6.0 / 2026-05-15)** — 사용자 영구 폐기 결단. `mcp__wiki-jira-assistant` 수동 처리로 충분. plan-itsm 도 폐기 완료 (session 16차). 향후 재제안 ❌. |
 | ~~G5~~ | ~~R12 lifecycle stage↔asset 매핑표 부재~~ | ✅ **종결 (v3.5.0 / 2026-05-15)** — `lifecycle-contract.md` §자산 매핑 매트릭스 신설 (본 매트릭스 8 row + 부 매트릭스 R8 입력 6 row + Scenario cross-link). `DEC-2026-05-15-g5-lifecycle-asset-matrix-종결.md` 참조. |
 | ~~G4~~ | ~~R14 FE skill 보강~~ | ✅ **종결 (v3.4.0 / 2026-05-15)** — 후보 C 채택 / 4 skill + 본문 분기 + 1 schema + 5 test pass. `DEC-2026-05-15-g4-fe-skill-track-종결.md` 참조. |
 | ~~G2~~ | ~~R8 Figma / Swagger 입력 skill 부재~~ | ✅ **종결 (v3.3.0 / 2026-05-15)** — BCDE 5 skill + 5 schema + 25 test pass + orchestrator paradigm. `DEC-2026-05-15-g2-orchestrate-skill-분리-채택.md` 참조. |

@@ -9,6 +9,51 @@
 
 ---
 
+## [3.6.0] — 2026-05-15 ★ ★ ★ MINOR — G1 ITSM 영구 scope-out / charter Gap 모두 청산
+
+> ★ ★ ★ **charter §1 R16/R17 영구 폐기** (사용자 명시 결단 "G1 안해도 됨 잊어줘"). charter §3 활성 Gap **모두 청산** = plugin must-have 자산 대칭 본격 도달. 향후 자동 티켓화 재제안 ❌.
+
+### 결단 근거
+
+1. 가치 < 비용 (사용자 1인 dogfooding 단계 / 자동화 ROI ↓)
+2. `mcp__wiki-jira-assistant__*` 13 도구 = 사용자 수동 호출로 충분
+3. chain harness gate → 자동 티켓 transition = chain-driver 결정론 axis 오염 risk
+4. paradigm 단순화 (charter Gap 모두 청산)
+
+### 자산 갱신
+
+- `methodology-spec/plugin-charter.md` §1 R16/R17 strikethrough + scope-out (번호 보존 / cross-reference drift 회피)
+- charter §2 R16/R17 ❌ → ★ scope-out
+- charter §2 요약 = 활성 요구 **15/15 자산 대칭** + scope-out 2
+- charter §3 G1 strikethrough + 영구 폐기
+- `.claude-plugin/plugin.json` 3.5.0 → 3.6.0
+- `decisions/DEC-2026-05-15-g1-itsm-permanent-scope-out.md` — 신설
+
+### charter §2 진화 (v3.1.0 → v3.6.0)
+
+| 시점 | ✅ | ⚠️ | ❌ | scope-out |
+|---|---|---|---|---|
+| v3.1.0 | 11 | 4 | 2 | 0 |
+| v3.3.0 (G2) | 12 | 3 | 2 | 0 |
+| v3.4.0 (G4) | 13 | 2 | 2 | 0 |
+| v3.5.0 (G5) | 14 | 1 | 2 | 0 |
+| **v3.6.0 (G1 scope-out)** | **14** | **1** | **0** | **2** |
+
+### Lessons Learned
+
+- **LL-G1-01**: charter §1 must-have 요구는 사용자 결단으로 영구 scope-out 가능. 번호 보존 = cross-reference drift 회피.
+- **LL-G1-02**: 자동화 ROI 평가 시 "1인 dogfooding vs 사내 배포 후" 두 시기 구분. 1인 단계 = scope-out 정합. 배포 후 사용자 다수 시 새 R 요구로 재진입 가능 (R16/R17 부활 ❌).
+
+### 정합 관계
+
+- DEC-2026-05-15-g1-itsm-permanent-scope-out (본 entry SSOT)
+- DEC-2026-05-15-plugin-charter-17-requirements-채택 (원안 R16/R17 영구 폐기)
+- DEC-2026-05-15-g{2,3,4,5}-* (활성 Gap 모두 종결 sibling)
+- memory `feedback_itsm_g1_permanent_scope_out` (재제안 회피 의무)
+- memory `feedback_chain_driver_deterministic_axis` (결정론 axis 오염 회피)
+
+---
+
 ## [3.5.0] — 2026-05-15 ★ ★ ★ MINOR — G5 종결 / lifecycle 자산 매핑 매트릭스 (단일 SSOT)
 
 > ★ ★ ★ **charter §3 G5 종결** — R12 lifecycle stage↔asset 매핑표 신설. 이전엔 `skills-axis.md` + `be-fe-separation.md` + `flows/*` 흩어진 자산을 사용자가 cross-read 의무. 본 매트릭스 = 1장에서 stage 진입 시 어떤 자산 호출할지 즉답. **잔여 charter Gap = G1 (ITSM 후순위) 단독**.
