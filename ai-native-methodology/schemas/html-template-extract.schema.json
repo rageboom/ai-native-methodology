@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/html-template-extract.schema.json",
+  "title": "HTML Template Extract (analysis-html-template output)",
+  "description": "★ ★ v3.4.0 G4 / Scenario C (JSP / Thymeleaf / EJS / ERB / Razor) server-rendered template 흡수 산출. 외부 정적 분석 도구 실 실행 의무 (no-simulation 정합 / LLM 양심 count ❌).",
+  "type": "object",
+  "required": ["scope", "scenario", "templates", "external_tool_output", "scriptlet_findings"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scenario": {
+      "type": "string",
+      "enum": ["C"],
+      "description": "be-fe-separation.md Scenario detection 결과. 본 skill = C 전용."
+    },
+    "template_engine": {
+      "type": "string",
+      "enum": ["jsp", "thymeleaf", "ejs", "erb", "razor", "other"]
+    },
+    "templates": {
+      "type": "array",
+      "description": "발견된 template 파일 인덱스.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path"],
+        "properties": {
+          "path": { "type": "string" },
+          "engine": {
+            "type": "string",
+            "enum": ["jsp", "thymeleaf", "ejs", "erb", "razor", "other"]
+          },
+          "includes": {
+            "type": "array",
+            "description": "이 template 이 include 한 다른 template 경로 (그래프).",
+            "items": { "type": "string" }
+          },
+          "form_actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["action_url"],
+              "properties": {
+                "action_url": { "type": "string" },
+                "method": {
+                  "type": "string",
+                  "enum": ["get", "post", "put", "patch", "delete", "other"]
+                },
+                "hardcoded": {
+                  "type": "boolean",
+                  "description": "true = 빈 또는 hardcoded URL / false = EL/JSP expression 평가"
+                },
+                "spring_endpoint_ref": {
+                  "type": "string",
+                  "description": "Spring @RequestMapping cross-link 후보 (analysis-openapi seed)."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "external_tool_output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool", "executed", "tool_version"],
+      "description": "★ no-simulation 의무 — 외부 정적 도구 실 실행 evidence.",
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": ["sonarqube", "pmd-jsp", "jsp-lint", "spotbugs", "eslint-plugin-ejs", "rubocop", "dotnet-format", "other"]
+        },
+        "executed": {
+          "type": "boolean",
+          "description": "★ 진짜 실 실행 여부. false = state.blocked + 사용자 안내 의무 / LLM 양심 count ❌."
+        },
+        "tool_version": { "type": "string" },
+        "command_line": {
+          "type": "string",
+          "description": "예: 'sonar-scanner -Dsonar.projectKey=...' (재실행 가능 의무)"
+        },
+        "output_path": {
+          "type": "string",
+          "description": "도구 raw output 파일 path (역추적용)."
+        },
+        "exit_code": {
+          "type": "integer"
+        }
+      }
+    },
+    "scriptlet_findings": {
+      "type": "array",
+      "description": "외부 도구 finding — LLM 가공 ❌ / 정량 그대로 인용. JSP scriptlet 0 absolute 정책 (v3.4.0 사용자 결단).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "severity", "file_path", "line"],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "예: 'Web:JspScriptletCheck' / 'rspec-1459' / 'rspec-1932' / PMD rule id"
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "major", "minor", "info"]
+          },
+          "file_path": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "xss_markers": {
+      "type": "array",
+      "description": "unescaped output 외부 도구 finding 인용. JSP `<%= %>` / Thymeleaf `th:utext` / EJS `<%- %>` 등.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file_path", "line", "pattern"],
+        "properties": {
+          "file_path": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "pattern": {
+            "type": "string",
+            "enum": ["jsp-expression", "thymeleaf-utext", "ejs-raw", "erb-raw", "razor-raw", "other"]
+          },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "major", "minor"]
+          }
+        }
+      }
+    },
+    "policy_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "v3.4.0 정책 정합 — scriptlet 0 absolute.",
+      "properties": {
+        "scriptlet_zero_absolute": {
+          "type": "boolean",
+          "description": "true = scriptlet 0건 / false = 1건 이상 검출 시 critical finding + migration-cautions.md 등재 의무"
+        },
+        "total_scriptlet_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

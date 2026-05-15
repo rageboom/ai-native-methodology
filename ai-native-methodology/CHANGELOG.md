@@ -9,6 +9,70 @@
 
 ---
 
+## [3.4.0] — 2026-05-15 ★ ★ ★ MINOR — G4 종결 / FE skill 보강 (4 skill 신설 + RTL 본문 분기 + 5 test pass)
+
+> ★ ★ ★ **charter §3 G4 종결** — R14 BE/FE 자산 비대칭 해소. **후보 C 채택** (4 skill + 본문 분기 / `test-jest` 중복 회피 / BE 트랙 paradigm 일관). v2.6.0 의미 ID + ADR-CHAIN-001 chain 4 이중 렌더링 정합.
+
+### 신설 자산 (4 skill + 1 schema + 5 test)
+
+**4 skill 신설**:
+- `skills/implement-react/SKILL.md` — React 19 paradigm (forwardRef deprecated / ref prop 직접 / class component 분기 보존 / `useActionState`/`useOptimistic`/`useFormStatus`/`use()` 신규 hooks / ESLint `no-forward-ref`) + schema marker `react_version: "19"`
+- `skills/implement-vue/SKILL.md` — Vue 3 only (Composition API + `<script setup>` 우선 / Options API legacy 분기 본문 / Vue 2 = carry)
+- `skills/test-playwright/SKILL.md` — POM 분리 의무 (locator = page object / assertion = test) + web-first assertion + parallel + shard CLI + `@playwright/test` 1.4x + `npx playwright install`
+- `skills/analysis-html-template/SKILL.md` — Scenario C (JSP/Thymeleaf/EJS/ERB/Razor) / 외부 도구 의무 (SonarQube `Web:JspScriptletCheck` + `rspec-1459` + `rspec-1932` / PMD JSP / jsp-lint) / JSP 2.0 / Servlet 2.4 기준점 / **scriptlet 0 absolute**
+
+**1 schema 신설** (strict / additionalProperties:false):
+- `schemas/html-template-extract.schema.json` — external_tool_output.executed required (no-simulation 의무) + scriptlet_findings + xss_markers + policy_check.scriptlet_zero_absolute
+
+**5 test case** — schema-validator 회귀 40 → **45/45 pass**.
+
+### 본문 분기 추가
+
+- `skills/test-generate-test-spec/SKILL.md` — `## 기술 스택 분기` 섹션에 추가:
+  - **jest + RTL (React 19)** — `userEvent.setup()` v14 의무 + `await user.*` async + `getByRole` 1순위 + `findBy*`/`getBy*`/`queryBy*` 분기
+  - **vitest + Vue Test Utils (Vue 3)** — `@vue/test-utils` 2.x / Composition API 정합
+  - **Playwright e2e** — 별도 skill `test-playwright` 위임 reference
+
+### paradigm 결단 (Senior critique + research 흡수)
+
+| paradigm | 결단 | 근거 |
+|---|---|---|
+| 후보 (A 5 skill / B 절충 / **C 4 skill**) | **C** | `test-jest` 중복 회피 + BE 트랙 paradigm 일관 + 본문 비대화 risk 회피 |
+| Vue 1차 지원 | **Vue 3 만** | Vue 2 legacy = carry |
+| Scenario B `/analyze-fullstack` | **G6 carry** | 명령어 axis ≠ skill axis |
+| JSP scriptlet 정책 | **scriptlet 0 absolute** | JSP 2.0 / Servlet 2.4 paradigm 정합 |
+| `analysis-html-template` 매핑 | **신규 phase `template-analyze` 신설** | input phase 부담 ↓ + Scenario C 만 활성 |
+| 정량 검출 | **진짜 외부 도구 의무** | LLM 양심 ❌ / no-simulation 정합 (Senior STRONG-STOP) |
+
+### 부수 갱신
+
+- `methodology-spec/plugin-charter.md` §2 R14 ⚠️→✅ + §3 G4 종결 (잔여 G5 > G1)
+- `methodology-spec/skills-axis.md` analysis 27 → 28 / implement 2 → 4 / test 3 → 4
+- `flows/test.phase-flow.json` (test-playwright skill mapping)
+- `flows/implement.phase-flow.json` (implement-react / implement-vue skill mapping)
+- `flows/analysis.phase-flow.json` (신규 phase `template-analyze` + analysis-html-template)
+- `.claude-plugin/plugin.json` 3.3.0 → 3.4.0
+- `decisions/DEC-2026-05-15-g4-fe-skill-track-종결.md` — 신설
+
+### Lessons Learned (★ paradigm 진화)
+
+- LL-G4-01: charter §3 후속 표 = 후보 안 / 기존 자산 중복 평가 의무
+- LL-G4-02: paradigm 분리 vs 본문 분기 = 자산 비대화 + drift 추적 + 명시성 3축 평가
+- **LL-G4-03 (★ Senior)**: framework paradigm 충돌 시 RED test fixture = 판단 기준 + schema marker (`react_version`) 의무
+- **LL-G4-04 (★ research 정정)**: 외부 framework 사실 (React 19 / userEvent v14 / Playwright POM) 추정 ❌ / research 실 fetch 의무
+- **LL-G4-05 (★ Senior STRONG-STOP)**: 정성 검출 = 진짜 외부 도구 실행 의무 / LLM 양심 ❌
+
+### 정합 관계
+
+- DEC-2026-05-15-g4-fe-skill-track-종결 (본 entry SSOT)
+- DEC-2026-05-15-plugin-charter-17-requirements-채택 (charter §3 G4 종결 sibling)
+- DEC-2026-05-15-g2-orchestrate-skill-분리-채택 (paradigm 진화 sibling)
+- v2.6.0 paradigm (의미 ID — implement-react / implement-vue / test-playwright / analysis-html-template)
+- ADR-CHAIN-001 (chain 4 이중 렌더링 + no-simulation)
+- ADR-009 (no-simulation / 외부 도구 auto-invoke 금지)
+
+---
+
 ## [3.3.0] — 2026-05-15 ★ ★ ★ MINOR — G2 종결 / analysis-from-quad (BCDE 입력 5 skill + orchestrate paradigm + 25 test pass)
 
 > ★ ★ ★ **charter §3 G2 종결** — R8 입력 5종 중 BCDE 자산 대칭 ✅ 도달 + complex multi-input orchestration paradigm 도입. **5 skill + 5 schema + 25 test pass**. Senior critique STOP/REVISE 본격 흡수. v2.6.0 의미 ID paradigm 정합.

@@ -14,6 +14,18 @@
       "skills": ["analysis-input-collection", "analysis-input-orchestrate", "analysis-from-prompt", "analysis-from-swagger", "analysis-from-plan-doc", "analysis-from-figma"]
     },
     {
+      "id": "template-analyze",
+      "name": "★ v3.4.0 G4: server-rendered template 흡수 (Scenario C only)",
+      "spec_file": null,
+      "depends_on": ["input"],
+      "inputs": ["template files (.jsp / .thymeleaf / .ejs / .erb / .razor)", "scenario_detection_result"],
+      "outputs": ["html-template-extract.json"],
+      "skills": ["analysis-html-template"],
+      "activation_condition": "scenario == 'C' (be-fe-separation.md §2 detection 결과)",
+      "external_tool_required": true,
+      "no_simulation": true
+    },
+    {
       "id": "discovery",
       "name": "탐색 (인벤토리 추출)",
       "spec_file": "discovery.md",

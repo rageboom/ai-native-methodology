@@ -25,11 +25,11 @@
     },
     {
       "id": "test-code-generate",
-      "name": "실 test 코드 generate (RED 의무)",
+      "name": "실 test 코드 generate (RED 의무 / ★ v3.4.0 G4: e2e 는 test-playwright 위임)",
       "depends_on": ["tc-decompose"],
       "inputs": ["test-spec.test_cases", "behavior-spec.property_tests"],
-      "outputs": ["test source files (jest/vitest/junit5/pytest 등)"],
-      "skills": ["test-generate-test-spec"],
+      "outputs": ["test source files (jest/vitest/junit5/pytest 등 / ★ v3.4.0 e2e = Playwright POM)"],
+      "skills": ["test-generate-test-spec", "test-playwright"],
       "expected_outcome": "all_fail"
     },
     {

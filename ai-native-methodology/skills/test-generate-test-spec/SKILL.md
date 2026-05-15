@@ -128,6 +128,56 @@ import { describe, test, expect } from 'vitest';
 // 위 jest 와 동일 (호환 API)
 ```
 
+### jest + RTL (React 19 컴포넌트 / ★ v3.4.0 G4 / FE 트랙)
+
+권장 버전: `@testing-library/react` 16.x / `@testing-library/user-event` 14.x / `@testing-library/jest-dom` 6.x
+
+```ts
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import '@testing-library/jest-dom';
+
+describe('UC-USER-001 / BHV-USER-001', () => {
+  test('AC-USER-001 — login form submit', async () => {
+    const user = userEvent.setup();  // ★ v14 의무 (setup 먼저)
+    render(<LoginForm />);
+    // ★ getByRole 1순위 / getByLabelText 2순위 (form input)
+    await user.type(screen.getByLabelText(/email/i), 'user@example.com');  // ★ await 의무
+    await user.click(screen.getByRole('button', { name: /login/i }));       // ★ await 의무
+    // 비동기 등장 요소 = findBy* (await 의무)
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+  });
+});
+```
+
+**paradigm 명문화**:
+- `userEvent.setup()` 의무 (v14) / 모든 user 액션 = `await user.*` async 의무
+- `screen.getByRole` 1순위 / `getByLabelText` 2순위 / `getByTestId` 최후 (다른 query 불가 시)
+- 비동기 element = `findBy*` (Promise) / sync 즉시 = `getBy*` (없으면 throw) / null 허용 = `queryBy*`
+
+### vitest + Vue Test Utils (Vue 3 SFC / ★ v3.4.0 G4 / FE 트랙)
+
+권장: `@vue/test-utils` 2.x (Vue 3 전용) / vitest 1.x / Composition API + `<script setup>` 우선 (Vue 2 legacy 분기는 carry)
+
+```ts
+import { mount } from '@vue/test-utils';
+import { describe, test, expect } from 'vitest';
+import LoginForm from './LoginForm.vue';
+
+describe('UC-USER-001 / BHV-USER-001', () => {
+  test('AC-USER-001 — login form submit', async () => {
+    const wrapper = mount(LoginForm);
+    await wrapper.find('input[type="email"]').setValue('user@example.com');
+    await wrapper.find('button[type="submit"]').trigger('click');
+    expect(wrapper.text()).toContain('로그인');
+  });
+});
+```
+
+### Playwright e2e (FE 트랙 / Scenario B 풀스택 / ★ v3.4.0 G4)
+
+e2e 본질 다름 (browser runner / 별도 install / POM 분리) → **별도 skill `test-playwright` 위임**. 본 skill 안 본문 분기 ❌. e2e TC-* 생성 시 `test-playwright` skill 명시 호출 의무.
+
 ### junit5
 ```java
 @DisplayName("UC-USER-001 / BHV-USER-001")

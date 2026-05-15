@@ -24,11 +24,11 @@
     },
     {
       "id": "impl-code-generate",
-      "name": "실 impl 코드 generate (★ i-strict 정통)",
+      "name": "실 impl 코드 generate (★ i-strict 정통 / ★ v3.4.0 G4: FE 트랙 = implement-react / implement-vue 위임)",
       "depends_on": ["impl-decompose"],
       "inputs": ["impl-spec.impl_modules"],
-      "outputs": ["controller / service / repository / migration 코드 (framework 별)"],
-      "skills": ["implement-generate-impl-spec"],
+      "outputs": ["controller / service / repository / migration 코드 (framework 별) / ★ v3.4.0 React 19 component / Vue 3 SFC"],
+      "skills": ["implement-generate-impl-spec", "implement-react", "implement-vue"],
       "ai_automation_pct": "≥ 80",
       "user_review_pct": "≤ 20"
     },
