@@ -83,7 +83,18 @@
       "Bash(node tools/br-cross-consistency-validator/src/cli.js --target examples/poc-01-realworld-spring/output/rules/rules.json)",
       "Bash(node -e 'const d=JSON.parse\\(require\\('\\\\''fs'\\\\''\\).readFileSync\\('\\\\''__TRACKED_VAR__'\\\\'','\\\\''utf-8'\\\\''\\)\\);console.log\\('\\\\''top-level:'\\\\'',Object.keys\\(d\\)\\);const a=d.business_rules||d.rules;if\\(Array.isArray\\(a\\)&&a[0]\\)console.log\\('\\\\''item[0]:'\\\\'',Object.keys\\(a[0]\\)\\);')",
       "Bash(node -e ' *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(gh auth *)",
+      "Bash(GH_HOST=github.smilegate.net gh repo *)",
+      "Bash(curl -s https://code.claude.com/docs/en/plugins-reference.md)",
+      "Bash(awk '{print $NF}')",
+      "Bash(grep -v \"^skills$\")",
+      "mcp__wiki-jira-assistant__jira_search",
+      "mcp__wiki-jira-assistant__wiki_spaces",
+      "mcp__wiki-jira-assistant__jira_issue",
+      "mcp__wiki-jira-assistant__jira_transitions",
+      "mcp__wiki-jira-assistant__wiki_page",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('skills:', len\\(d.get\\('skills',[]\\)\\)\\); print\\('agents:', len\\(d.get\\('agents',[]\\)\\)\\); print\\('hooks:', len\\(d.get\\('hooks',[]\\) if isinstance\\(d.get\\('hooks'\\), list\\) else d.get\\('hooks',{}\\)\\)\\)\")"
     ]
   }
 }
