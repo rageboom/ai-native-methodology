@@ -18,7 +18,7 @@ const DEFAULT_STATE = (projectId) => ({
   version: CURRENT_STATE_VERSION,
   project_id: projectId,
   current_chain: 'analysis',
-  current_phase: 'P0.0',
+  current_phase: 'input.0',
   stage_progress: {
     analysis:  { status: 'in_progress' },
     planning:  { status: 'pending' },

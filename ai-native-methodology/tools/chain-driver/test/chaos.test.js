@@ -38,11 +38,11 @@ describe('chaos — CAS race detection', () => {
     const baseline = readState(root);
 
     // External process bumps the version (emulates concurrent writer).
-    atomicWrite(statePath(root), JSON.stringify({ ...baseline, version: '99.99', current_phase: 'P9.9' }, null, 2) + '\n');
+    atomicWrite(statePath(root), JSON.stringify({ ...baseline, version: '99.99', current_phase: 'corrupt.9' }, null, 2) + '\n');
 
     // Strict CAS — caller passes expectedVersion = baseline.version.
     assert.throws(
-      () => writeStateCAS(root, (s) => { s.current_phase = 'P2.0'; return s; }, { expectedVersion: baseline.version }),
+      () => writeStateCAS(root, (s) => { s.current_phase = 'db-schema.0'; return s; }, { expectedVersion: baseline.version }),
       StateCorruptError,
       'strict CAS must reject when expectedVersion ≠ disk version'
     );
@@ -50,28 +50,28 @@ describe('chaos — CAS race detection', () => {
     // post-state still has the external write — driver did NOT silently overwrite.
     const after = readState(root);
     assert.equal(after.version, '99.99');
-    assert.equal(after.current_phase, 'P9.9');
+    assert.equal(after.current_phase, 'corrupt.9');
   });
 
   it('★ Senior F5#1 — without expectedVersion, single-process best-effort CAS still works', () => {
     const root = join(tmp, 'race1b');
     initState(root, 'race1b');
     // No external race → write succeeds (single-writer assumption).
-    const out = writeStateCAS(root, (s) => { s.current_phase = 'P2.0'; return s; });
-    assert.equal(out.current_phase, 'P2.0');
+    const out = writeStateCAS(root, (s) => { s.current_phase = 'db-schema.0'; return s; });
+    assert.equal(out.current_phase, 'db-schema.0');
   });
 
   it('★ Senior F5#1 — sequential CAS writes monotonically bump version', () => {
     const root = join(tmp, 'race2');
     initState(root, 'race2');
     const v0 = readState(root).version;
-    writeStateCAS(root, (s) => { s.current_phase = 'P1.0'; return s; });
+    writeStateCAS(root, (s) => { s.current_phase = 'discovery.0'; return s; });
     const v1 = readState(root).version;
-    writeStateCAS(root, (s) => { s.current_phase = 'P1.1'; return s; });
+    writeStateCAS(root, (s) => { s.current_phase = 'discovery.1'; return s; });
     const v2 = readState(root).version;
     assert.notEqual(v0, v1);
     assert.notEqual(v1, v2);
-    assert.equal(readState(root).current_phase, 'P1.1');
+    assert.equal(readState(root).current_phase, 'discovery.1');
   });
 });
 

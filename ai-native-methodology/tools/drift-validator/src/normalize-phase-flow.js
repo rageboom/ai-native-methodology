@@ -12,7 +12,8 @@ const stripComment = (line) => line.replace(/%%.*$/, '');
 const isBlank = (line) => !line.trim();
 const stripDecor = (s) => String(s).replace(/[★⚠️✅❌⏳]/g, '').replace(/\s+/g, ' ').trim();
 
-// ★ phase id 정규화 — 공백/대소문자 무시. "4.5" / "5-1" / "0" 등 그대로 보존 (state-machine normalizer 와 다름 — phase id 는 의미 있는 구분자).
+// ★ phase id 정규화 — 공백/대소문자 무시. "input" / "formal-spec" / "api" 등 의미 ID 그대로 보존 (state-machine normalizer 와 다름 — phase id 는 의미 있는 구분자).
+// ★ v3.0.0 — 옛 숫자 ID ("0" / "4.5" / "5-1") 영역 본 정규식은 호환 보존 (mermaid 본문 갱신은 S3-b 영역).
 const normalizePhaseId = (s) => stripDecor(String(s)).toLowerCase();
 
 export function detectPhaseFlowJson(json) {

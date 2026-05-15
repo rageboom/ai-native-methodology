@@ -15,7 +15,7 @@ function parseArgs(argv) {
       console.log(`usage: characterization-coverage-validator --target <dir> [--threshold 0.80]
        [--coverage-baseline <path>] [--write-coverage-baseline] [--dry-run] [--json]
 
-Validates phase 4.7 characterization output:
+Validates phase characterization output:
   <target>/characterization-spec.json (entry / optional — sub files standalone OK)
   <target>/intent-vs-bug.md (★ ambiguous_carry grep)
   <target>/coverage.json (★ ratchet strategy if/then)

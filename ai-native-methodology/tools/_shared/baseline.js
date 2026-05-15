@@ -123,7 +123,7 @@ export function ratchetCheck({ grandfathered, novel }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// ★ v2.1.0 carry C-v2.1.0-5 — Coverage trend baseline (phase 4.7 ratchet 자동 검증)
+// ★ v2.1.0 carry C-v2.1.0-5 — Coverage trend baseline (phase characterization ratchet 자동 검증)
 // findings-based ratchet 와 다른 단일 metric (coverage_ratio) trend 정합성 검증.
 // ─────────────────────────────────────────────────────────────────────
 

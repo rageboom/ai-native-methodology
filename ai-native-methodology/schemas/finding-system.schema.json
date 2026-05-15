@@ -12,18 +12,21 @@
       "description": "PoC 전역 일련번호. 형식: F-NNN (3자리 0 padded). 예: F-001, F-097."
     },
     "phase": {
-      "oneOf": [
-        {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 6
-        },
-        {
-          "type": "string",
-          "enum": ["4.5"]
-        }
+      "type": "string",
+      "enum": [
+        "input",
+        "discovery",
+        "db-schema",
+        "architecture",
+        "business-logic",
+        "formal-spec",
+        "characterization",
+        "sql-inventory",
+        "api",
+        "ui",
+        "quality"
       ],
-      "description": "발견 phase. 0~6 정수 또는 4.5 (Phase 4.5 형식 명세 — v1.2.0 묶음 L)."
+      "description": "발견 phase 의미 ID (v3.0.0 — `flows/analysis.phase-flow.json` `phases[].id` 정합 / 옛 숫자 ID 0~6, 4.5, 4.7, 4.8, 5-1, 5-2 폐기). PoC 옛 finding 레코드는 S3-b에서 일괄 sed 갱신."
     },
     "discovered_at": {
       "type": "string",

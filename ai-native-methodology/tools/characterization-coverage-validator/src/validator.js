@@ -1,5 +1,5 @@
 // characterization-coverage-validator core
-// 검증 (★ ADR-CHAIN-006 phase 4.7 정합):
+// 검증 (★ ADR-CHAIN-006 phase characterization 정합):
 //   1. snapshot 4 필수 필드 (given / when / then / intent_classification)
 //   2. intent_classification.type enum (intent / bug / ambiguous / self_recognized)
 //   3. named_classified_ratio ≥ threshold (default 0.80)
@@ -57,7 +57,7 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
     findings.push({
       kind: 'snapshot.dir_missing',
       severity: 'critical',
-      message: `${snapshotsDir} not found — phase 4.7 characterization 산출 부재`
+      message: `${snapshotsDir} not found — phase characterization 산출 부재`
     });
   }
   summary.snapshot_count = snapshots.length;

@@ -37,10 +37,10 @@ describe('state-store', () => {
     const root = join(tmp, 'p3');
     initState(root, 'p3');
     const v0 = readState(root).version;
-    writeStateCAS(root, (s) => { s.current_phase = 'P1.0'; return s; });
+    writeStateCAS(root, (s) => { s.current_phase = 'discovery.0'; return s; });
     const v1 = readState(root).version;
     assert.notEqual(v0, v1);
-    assert.equal(readState(root).current_phase, 'P1.0');
+    assert.equal(readState(root).current_phase, 'discovery.0');
   });
 
   it('readState throws StateCorruptError on bad JSON', () => {

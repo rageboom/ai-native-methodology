@@ -1,5 +1,5 @@
 // sql-inventory-extractor core
-// 검증 (★ ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 migration_priority 정합):
+// 검증 (★ ADR-CHAIN-007 phase sql-inventory + ADR-CHAIN-009 migration_priority 정합):
 //   1. inventory[].sql_id + mapper_xml + business_meaning + dependent_tables + intent_vs_bug_classification + confidence 의무
 //   2. inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT] (★ default PREPARED / Agent 1 강 권고)
 //   3. inventory[].carry_flags ⊂ enum 8종
@@ -75,7 +75,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     findings.push({
       kind: 'inventory.entry_missing',
       severity: 'critical',
-      message: `${entryPath} not found — phase 4.8 sql-inventory 산출 부재`
+      message: `${entryPath} not found — phase sql-inventory 산출 부재`
     });
     return finalize(findings, summary);
   }

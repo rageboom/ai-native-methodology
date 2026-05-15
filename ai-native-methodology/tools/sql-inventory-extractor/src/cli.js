@@ -15,10 +15,10 @@ function parseArgs(argv) {
       console.log(`usage: sql-inventory-extractor --target <dir> [--threshold-auto-ratio 0.50]
        [--coverage-baseline <path>] [--write-coverage-baseline] [--dry-run] [--json]
 
-Validates phase 4.8 sql-inventory output:
+Validates phase sql-inventory output:
   <target>/sql-inventory.json (★ entry / 12 컬럼 record + extraction_automation + patterns_extension_v3 optional)
 
-검증 (★ ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 + ADR-CHAIN-010 정합):
+검증 (★ ADR-CHAIN-007 phase sql-inventory + ADR-CHAIN-009 + ADR-CHAIN-010 정합):
   - inventory[].sql_id + mapper_xml + business_meaning + dependent_tables + intent_vs_bug_classification + confidence 의무
   - inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT] (★ Agent 1 강 권고)
   - inventory[].carry_flags ⊂ enum 8종
