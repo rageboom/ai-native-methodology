@@ -1,12 +1,12 @@
 ---
 name: analysis-formal-spec-validation
-description: Use after analysis-business-rules to cross-validate domain ↔ rules ↔ inventory ↔ architecture consistency. Phase 4.5 (ADR-008 dual rendering / ADR-009 5-stage confidence). Real external tools mandatory (no simulation). formal-spec-link-validator auto-runs. Stage = analysis.
+description: Use after analysis-business-rules to cross-validate domain ↔ rules ↔ inventory ↔ architecture consistency. `formal-spec` phase (ADR-008 dual rendering / ADR-009 5-stage confidence). Real external tools mandatory (no simulation). formal-spec-link-validator auto-runs. Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # analysis-formal-spec-validation — Cross-validation
 
-도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. Phase 4.5 (★★★ no-simulation 정책 첫 실현 단계).
+도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. `formal-spec` phase (★★★ no-simulation 정책 첫 실현 단계).
 
 ## 사전 조건
 

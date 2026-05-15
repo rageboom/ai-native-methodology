@@ -1,6 +1,6 @@
 ---
 name: analysis-quality-antipattern
-description: Use after all Phase 5 outputs to consolidate antipatterns.json + migration-cautions.md (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis.
+description: Use after all `api` + `ui` phase outputs to consolidate antipatterns.json + migration-cautions.md (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- Phase 5 산출물 모두 존재 (BE/DB/FE 트랙별 해당)
+- `api` + `ui` phase 산출물 모두 존재 (BE/DB/FE 트랙별 해당)
 - finding 누적 존재 (`<user-project>/.aimd/findings.md`)
 
 ## 절차

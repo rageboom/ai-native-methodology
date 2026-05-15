@@ -24,7 +24,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-si
    ```
    환경 부재 시 사용자 위임 (CI) 명시 + 신뢰도 -5%p 기록
 2. **WCAG 2.2 기준** — Level A / AA / AAA 위반 분류
-3. **AP-A11Y-XXX 등재** — anti-pattern 형태 (Phase 6 통합)
+3. **AP-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합)
 4. **a11y.json 작성** — `schemas/a11y.schema.json` (v1.4 신규)
 
 ## 산출물

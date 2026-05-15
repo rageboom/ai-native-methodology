@@ -54,7 +54,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - medium/low = baseline grandfathered + 분기별 review
 6. **환경 부재 시** — 사용자에게 준비 요청 또는 CI 위임 명시. finding 등재 (`Type: gap, Action: 환경 X 준비 또는 CI Y 추가`).
 7. **결과 통합** — severity / category / CWE mapping. SARIF → finding 어댑터 (sarif-to-finding.js).
-8. **AP-SECURITY-XXX 등재** — anti-pattern (Phase 6 통합). 4 PoC isomorphic 패턴은 본체 antipattern 카탈로그 (ADR-FE-007) 격상 검토.
+8. **AP-SECURITY-XXX 등재** — anti-pattern (`quality` phase 통합). 4 PoC isomorphic 패턴은 본체 antipattern 카탈로그 (ADR-FE-007) 격상 검토.
 9. **static-security.json 작성** — `schemas/static-security.schema.json` (v1.4 신규)
 
 ## 산출물

@@ -1,12 +1,12 @@
 ---
 name: spec-compose-behavior-spec
-description: ★ ★ v2.0 chain 2 진입 skill. planning-spec.use_cases + analysis 의 Phase 4.5 (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.{json,md} 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
+description: ★ ★ v2.0 chain 2 진입 skill. planning-spec.use_cases + analysis 의 `formal-spec` phase (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.{json,md} 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # compose-behavior-spec
 
-★ ★ v2.0 chain 2 (spec) 의 **진입 skill**. planning-spec + analysis Phase 4.5 통합 → executable behavior contract.
+★ ★ v2.0 chain 2 (spec) 의 **진입 skill**. planning-spec + analysis `formal-spec` phase 통합 → executable behavior contract.
 
 ## 언제 사용
 
@@ -17,7 +17,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 - `<project>/.aimd/output/planning-spec.json` (★ chain 1 산출)
 - `<project>/.aimd/output/rules.json` + `domain.json` + 7대 산출물
-- `<project>/.aimd/output/state-machines/*.json` + `sequences/*.json` + `decision-tables/*.json` + `invariants/*.ts` (Phase 4.5 산출)
+- `<project>/.aimd/output/state-machines/*.json` + `sequences/*.json` + `decision-tables/*.json` + `invariants/*.ts` (`formal-spec` phase 산출)
 
 ## 산출물
 
@@ -42,10 +42,10 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 3. **각 BHV 의 5 필드 채움**:
    - `preconditions` (formal expressions)
    - `postconditions`
-   - `invariants` (Phase 4.5 invariants/*.ts 매핑)
-   - `state_transition_ref` (Phase 4.5 state-machines/{id}.json)
-   - `decision_table_ref` (Phase 4.5 decision-tables/{br}.json)
-   - `sequence_ref` (Phase 4.5 sequences/{id}.json)
+   - `invariants` (`formal-spec` phase invariants/*.ts 매핑)
+   - `state_transition_ref` (`formal-spec` phase state-machines/{id}.json)
+   - `decision_table_ref` (`formal-spec` phase decision-tables/{br}.json)
+   - `sequence_ref` (`formal-spec` phase sequences/{id}.json)
    - `property_tests[]` (★ fast-check / Hypothesis / jqwik stub)
 
 4. **acceptance_criteria_refs 채움 (forward link)** — `derive-acceptance-criteria` skill 호출. AC-* 산출 후 backward link 채움.
@@ -90,7 +90,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - ADR-CHAIN-001 (chain 4단계 정합)
 - behavior-spec.schema.json (deliverable 18)
 - master plan §B chain 2
-- DEC-2026-04-29-phase-4-5-형식화-후보 (Phase 4.5 chain 2 격상)
+- DEC-2026-04-29-phase-4-5-형식화-후보 (`formal-spec` phase chain 2 격상)
 
 ## 기술 스택 분기
 

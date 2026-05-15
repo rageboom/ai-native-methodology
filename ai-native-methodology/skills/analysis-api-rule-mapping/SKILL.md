@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # analysis-api-rule-mapping — 규칙 최종화
 
-Phase 4 의 rules.json 을 다른 Phase 5 산출물과 cross-link.
+`business-logic` phase 의 rules.json 을 다른 `api` phase 산출물과 cross-link.
 
 ## 사전 조건
 

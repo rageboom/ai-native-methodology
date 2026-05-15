@@ -10,7 +10,7 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → ru
 
 ## 사전 조건
 
-- rules.json 존재 (Phase 4 산출)
+- rules.json 존재 (`business-logic` phase 산출)
 - FE 트랙 (Zod / Yup / Joi / RHF / class-validator / Ajv / Vest 시그널)
 
 ## 절차

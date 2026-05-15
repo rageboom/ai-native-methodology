@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Bash, Edit
 | 영역 | 산출물 (★ 변경 ❌) |
 |---|---|
 | 7대 BE | inventory / domain / rules / architecture / schema / openapi (api-extension) / antipatterns |
-| 7대 보강 | finding-system / migration-cautions / Phase 4.5 (state-machines / sequences / decision-tables / invariants) |
+| 7대 보강 | finding-system / migration-cautions / `formal-spec` phase (state-machines / sequences / decision-tables / invariants) |
 | 8 FE | ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum |
 | ★ v1.5 | error-mapping-spec |
 
@@ -52,10 +52,10 @@ allowed-tools: Read, Glob, Bash, Edit
 
 ## 절차
 
-1. **<project>/.aimd/output/ 안 모든 산출물 path glob** — 7대 + 8 FE + Phase 4.5.
+1. **<project>/.aimd/output/ 안 모든 산출물 path glob** — 7대 + 8 FE + `formal-spec` phase.
 2. **각 BHV 마다 명시 reference 추출** — behaviors[].state_transition_ref / decision_table_ref / sequence_ref / br_refs / use_case_refs 에서 도출.
 3. **cross_links.to_analysis_artifacts 합집합** — 위에서 도출된 path + 추가 7대 산출물 path 합산.
-4. **inventory.json 제외** — inventory 는 phase-1 산출 (분석 메타데이터) → 비즈니스 의도 reference 대상 ❌. 단, `inventory.stack_signals` 는 chain 3 (test) framework match 에 reuse.
+4. **inventory.json 제외** — inventory 는 `discovery` phase 산출 (분석 메타데이터) → 비즈니스 의도 reference 대상 ❌. 단, `inventory.stack_signals` 는 chain 3 (test) framework match 에 reuse.
 5. **dead-reference 검증** — `formal-spec-link-validator --chain-mode` 가 자동 (compose-behavior-spec step 7).
 
 ## ★ ★ no-simulation — 모든 cross_link 진짜 path 의무
@@ -67,7 +67,7 @@ allowed-tools: Read, Glob, Bash, Edit
 본 skill = ★ ★ "현 7대 + 신규 추가" 정책의 **운영 enforcement skill**:
 - 7대 (BE) ≥ 1 reference / behavior-spec total
 - 8 FE ≥ 1 reference / FE 트랙 PoC 가 있을 때 (스택 분기)
-- Phase 4.5 ≥ 1 reference / behavior-spec total
+- `formal-spec` phase ≥ 1 reference / behavior-spec total
 
 미달 시 chain 2 gate #2 통과 ❌ (★ ADR-CHAIN-001 §2 chain coupling violation).
 

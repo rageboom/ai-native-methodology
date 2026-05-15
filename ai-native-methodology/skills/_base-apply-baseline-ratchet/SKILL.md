@@ -1,12 +1,12 @@
 ---
 name: _base-apply-baseline-ratchet
-description: Apply ADR-010 baseline+ratchet before Phase 0. MANDATORY when starting analysis on a legacy codebase. Captures initial defect baseline (e.g., Semgrep / SpotBugs / static-security findings count) and enforces ratchet — new code cannot worsen the baseline. Without this, legacy projects suffer "defect explosion" when methodology surfaces existing issues.
+description: Apply ADR-010 baseline+ratchet before `input` phase. MANDATORY when starting analysis on a legacy codebase. Captures initial defect baseline (e.g., Semgrep / SpotBugs / static-security findings count) and enforces ratchet — new code cannot worsen the baseline. Without this, legacy projects suffer "defect explosion" when methodology surfaces existing issues.
 allowed-tools: Read, Glob, Bash, Edit, Write
 ---
 
 # apply-baseline-ratchet
 
-ADR-010 의무 진입 단계. Phase 0 이전 적용.
+ADR-010 의무 진입 단계. `input` phase 이전 적용.
 
 ## Why this matters
 
@@ -54,7 +54,7 @@ After this skill completes, the user has:
 - `.aimd/baseline-<date>.json` committed
 - Ratchet policy declared
 - CI configured (or template provided)
-- Next-step prompt: "Phase 0 진입 가능. `/methodology:input` 호출."
+- Next-step prompt: "`input` phase 진입 가능. `/methodology:input` 호출."
 
 ## Refuse to skip
 
@@ -62,4 +62,4 @@ If user wants to skip baseline+ratchet on a legacy project, refuse and reference
 
 ## Greenfield projects
 
-For greenfield (no legacy code), ADR-010 is N/A — proceed directly to Phase 0. State this explicitly in the finding ledger so future readers know baseline was intentionally absent.
+For greenfield (no legacy code), ADR-010 is N/A — proceed directly to `input` phase. State this explicitly in the finding ledger so future readers know baseline was intentionally absent.

@@ -26,7 +26,7 @@ User triggers this skill when starting a new deliverable:
    - rules: requires domain
    - openapi: requires rules + domain
    - schema/erd: requires domain
-   - antipatterns: requires Phase 4.5 cross-validation
+   - antipatterns: requires `formal-spec` phase cross-validation
    - state-map / visual-manifest / form-validation / type-spec: FE-specific, may require frontend code
 4. **Fill placeholders** (`{{...}}` or `<placeholder>`) with project-specific data extracted from the codebase.
 5. **Write to user's output directory.** Default: `<user-project>/.aimd/output/<artifact>.<ext>` or as user specifies.

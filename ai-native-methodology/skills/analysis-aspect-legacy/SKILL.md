@@ -25,7 +25,7 @@ Strangler Pattern 적용 가능성 / migration debt 식별.
    - 양쪽 codepath 분기 시 logic drift (rules ↔ schema 불일치)
    - feature flag default 가 production 과 불일치
    - migration 미완료 상태에서 다른 작업 진행 시 부채
-4. **AP-LEGACY-XXX 등재** — anti-pattern (Phase 6 통합)
+4. **AP-LEGACY-XXX 등재** — anti-pattern (`quality` phase 통합)
 5. **legacy.json 작성** — `schemas/legacy.schema.json` (v1.4 신규):
    ```json
    {

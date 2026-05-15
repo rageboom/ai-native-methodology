@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 `<project>/.aimd/output/` 안:
 - 7대 산출물: inventory / domain / rules / architecture / schema / openapi / antipatterns
 - 8 FE 산출물 (있으면): ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum
-- Phase 4.5: state-machines / sequences / decision-tables / invariants
+- `formal-spec` phase: state-machines / sequences / decision-tables / invariants
 - finding-system: findings.json
 - migration-cautions.md
 

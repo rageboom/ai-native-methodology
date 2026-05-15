@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Grep
 - `domain.json` (entity / aggregate)
 - `rules.json` (BR + br_type)
 - `api-extension.json` (operation_id) — 있으면
-- `state-machines/*.json` (Phase 4.5) — 있으면
+- `state-machines/*.json` (`formal-spec` phase) — 있으면
 
 ## 산출
 
