@@ -1,13 +1,13 @@
 {
-  "$comment": "★ ★ v2.0 chain 1 (planning) phase flow — AI 눈 짝 (planning.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. analysis stage 산출물 입력 → planning-spec.{json,md} 산출. 1차 = legacy single-case (use case 4종 분기 = v2.1+ K-1 carry).",
+  "$comment": "★ ★ v2.0 chain 1 (planning) phase flow — AI 눈 짝 (planning.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. analysis stage 산출물 입력 → planning-spec.{json,md} 산출. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동). v3.0.0 analysis chain 패턴 정합 sibling.",
   "id": "planning-phase-flow",
-  "version": "2.0.0-dev",
+  "version": "3.1.0",
   "stage": "planning",
   "chain": 1,
   "rendered_mermaid_path": "./planning.phase-flow.mermaid",
   "phases": [
     {
-      "id": "P1.0",
+      "id": "input-validate",
       "name": "input 검증",
       "depends_on": [],
       "inputs": ["analysis_outputs", "finding_system", "antipatterns", "migration_cautions"],
@@ -16,27 +16,27 @@
       "skills_dir": "skills/planning/"
     },
     {
-      "id": "P1.1",
+      "id": "use-cases-decompose",
       "name": "use_cases 분해",
-      "depends_on": ["P1.0"],
+      "depends_on": ["input-validate"],
       "inputs": ["domain.json", "rules.json", "api-extension.json", "state-machines/*.json"],
       "outputs": ["use_cases[]"],
       "skills": ["planning-decompose-use-cases"],
       "skills_dir": "skills/planning/"
     },
     {
-      "id": "P1.2",
+      "id": "br-intent-extract",
       "name": "business_rules_intent 추출",
-      "depends_on": ["P1.0", "P1.1"],
+      "depends_on": ["input-validate", "use-cases-decompose"],
       "inputs": ["rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
       "outputs": ["business_rules_intent[]"],
       "skills": ["planning-identify-business-intent"],
       "skills_dir": "skills/planning/"
     },
     {
-      "id": "P1.3",
+      "id": "planning-spec-compose",
       "name": "planning-spec 합성 + 검증",
-      "depends_on": ["P1.1", "P1.2"],
+      "depends_on": ["use-cases-decompose", "br-intent-extract"],
       "inputs": ["use_cases", "business_rules_intent", "business_intent"],
       "outputs": ["planning-spec.json", "planning-spec.md"],
       "skills": ["planning-extract-from-legacy"],
@@ -44,9 +44,9 @@
       "automated_validation": ["planning-extraction-validator", "schema-validator"]
     },
     {
-      "id": "P1.4",
+      "id": "gate-1",
       "name": "go/stop gate #1",
-      "depends_on": ["P1.3"],
+      "depends_on": ["planning-spec-compose"],
       "inputs": ["planning-spec.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
       "skills": ["_base-invoke-go-stop-gate"],

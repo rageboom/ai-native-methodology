@@ -1,13 +1,13 @@
 {
-  "$comment": "★ ★ ★ v2.0 chain 4 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통.",
+  "$comment": "★ ★ ★ v2.0 chain 4 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동 / `static-analysis` phase 명 = tools/static-runner 와 axis 분리).",
   "id": "implement-phase-flow",
-  "version": "2.0.0-dev",
+  "version": "3.1.0",
   "stage": "implement",
   "chain": 4,
   "rendered_mermaid_path": "./implement.phase-flow.mermaid",
   "phases": [
     {
-      "id": "P4.0",
+      "id": "input-plan",
       "name": "input 통합 (test-spec + behavior + arch + schema + api)",
       "depends_on": [],
       "inputs": ["test-spec.json", "behavior-spec.json", "acceptance-criteria.json", "architecture.json", "schema.json", "api-extension.json", "inventory.json"],
@@ -16,18 +16,18 @@
       "skills_dir": "skills/implement/"
     },
     {
-      "id": "P4.1",
+      "id": "impl-decompose",
       "name": "IMPL-* 모듈 분해",
-      "depends_on": ["P4.0"],
+      "depends_on": ["input-plan"],
       "inputs": ["test-spec.test_cases", "architecture.json"],
       "outputs": ["impl-spec.impl_modules[]"],
       "skills": ["implement-generate-impl-spec"],
       "skills_dir": "skills/implement/"
     },
     {
-      "id": "P4.2",
+      "id": "impl-code-generate",
       "name": "실 impl 코드 generate (★ i-strict 정통)",
-      "depends_on": ["P4.1"],
+      "depends_on": ["impl-decompose"],
       "inputs": ["impl-spec.impl_modules"],
       "outputs": ["controller / service / repository / migration 코드 (framework 별)"],
       "skills": ["implement-generate-impl-spec"],
@@ -36,18 +36,18 @@
       "user_review_pct": "≤ 20"
     },
     {
-      "id": "P4.3",
+      "id": "commit-hash-fill",
       "name": "git commit + commit_hash 채움",
-      "depends_on": ["P4.2"],
+      "depends_on": ["impl-code-generate"],
       "inputs": ["generated impl code"],
       "outputs": ["impl-spec.impl_modules[].commit_hash"],
       "skills": ["implement-generate-impl-spec"],
       "skills_dir": "skills/implement/"
     },
     {
-      "id": "P4.4",
+      "id": "green-evidence",
       "name": "★ ★ ★ GREEN 검증 (진짜 runner / 100% pass)",
-      "depends_on": ["P4.3"],
+      "depends_on": ["commit-hash-fill"],
       "inputs": ["impl 코드", ".aimd/config/test-cmd.json"],
       "outputs": ["impl-spec.test_pass_evidence (fail_count: 0 의무)"],
       "skills": ["implement-verify-test-pass", "test-run-test-evidence"],
@@ -55,9 +55,9 @@
       "expected_outcome": "all_pass (★ chain 4 GREEN 의무)"
     },
     {
-      "id": "P4.5",
+      "id": "static-analysis",
       "name": "static-runner 6종 + chain-strict lint",
-      "depends_on": ["P4.4"],
+      "depends_on": ["green-evidence"],
       "inputs": ["impl 코드", "test_pass_evidence"],
       "outputs": ["impl-spec.test_pass_evidence.linter_output_path", "impl-spec.test_pass_evidence.coverage_report_path"],
       "skills": ["implement-verify-test-pass"],
@@ -65,9 +65,9 @@
       "automated_validation": ["lint-no-simulation (chain-strict)", "static-runner (6 plugin)", "schema-validator"]
     },
     {
-      "id": "P4.6",
+      "id": "matrix-finalize",
       "name": "traceability-matrix 최종 갱신",
-      "depends_on": ["P4.4", "P4.5"],
+      "depends_on": ["green-evidence", "static-analysis"],
       "inputs": ["planning + behavior + acceptance + test + impl-spec"],
       "outputs": ["traceability-matrix.{json,md,mermaid} (★ red_count == 0)"],
       "skills": ["_base-build-traceability-matrix"],
@@ -75,9 +75,9 @@
       "automated_validation": ["traceability-matrix-builder"]
     },
     {
-      "id": "P4.7",
+      "id": "gate-4",
       "name": "go/stop gate #4 (final)",
-      "depends_on": ["P4.4", "P4.5", "P4.6"],
+      "depends_on": ["green-evidence", "static-analysis", "matrix-finalize"],
       "inputs": ["impl-spec.json", "matrix.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go (release 자격) | stop | revisit"],
       "skills": ["_base-invoke-go-stop-gate"],

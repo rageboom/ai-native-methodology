@@ -1,26 +1,29 @@
 %% ★ ★ v2.0 chain 3 (test) phase flow — 사람 눈 (mermaid)
 %% AI 눈 짝: test.phase-flow.json (drift-validator 호환)
+%% ★ ★ ★ v3.1.0 — phase ID 의미 ID rename (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동).
+%% subgraph id = `P_<semantic_id>` (P 접두사 + underscore — mermaid 문법 호환 + drift-validator 정규식 호환).
 %% ADR-008 v2 §10 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합
 
 flowchart TB
     subgraph C3["★ Chain 3 — test (RED 의무)"]
         direction TB
 
-        P30["P3.0 — framework 추론<br/>inventory + .aimd/config/test-cmd<br/>(★ ADR-CHAIN-004 Aider 패턴)"]
-        P31["P3.1 — TC-* 분해 (1 AC = 1 TC)"]
-        P32["★ ★ ★ P3.2 — 실 test 코드 generate (RED)<br/>jest / vitest / junit5 / pytest"]
-        P33["P3.3 — AC.test_case_refs backward 채움"]
-        P34["★ ★ ★ P3.4 — RED 검증 + 5종 물증 7 필드<br/>test-impl-pass-validator (--allow-execute / expected: all_fail)<br/>+ lint-no-simulation chain-strict"]
-        P35["P3.5 — coverage 측정 (3 metric 분리)<br/>test-verify-coverage"]
-        P36["★ ★ ★ P3.6 — gate #3 (사용자 결단)<br/>_base-invoke-go-stop-gate"]
+        P_framework_detect["Phase framework-detect — framework 추론<br/>inventory + .aimd/config/test-cmd<br/>(★ ADR-CHAIN-004 Aider 패턴)"]
+        P_tc_decompose["Phase tc-decompose — TC-* 분해 (1 AC = 1 TC)"]
+        P_test_code_generate["★ ★ ★ Phase test-code-generate — 실 test 코드 generate (RED)<br/>jest / vitest / junit5 / pytest"]
+        P_ac_tc_backlink["Phase ac-tc-backlink — AC.test_case_refs backward 채움"]
+        P_red_evidence["★ ★ ★ Phase red-evidence — RED 검증 + 5종 물증 7 필드<br/>test-impl-pass-validator (--allow-execute / expected: all_fail)<br/>+ lint-no-simulation chain-strict"]
+        P_coverage_measure["Phase coverage-measure — coverage 측정 (3 metric 분리)<br/>test-verify-coverage"]
+        P_gate_3["★ ★ ★ Phase gate-3 — go/stop gate #3 (사용자 결단)<br/>_base-invoke-go-stop-gate"]
 
-        P30 --> P31
-        P31 --> P32
-        P32 --> P33
-        P32 --> P34
-        P33 --> P34
-        P34 --> P35
-        P35 --> P36
+        P_framework_detect --> P_tc_decompose
+        P_tc_decompose --> P_test_code_generate
+        P_test_code_generate --> P_ac_tc_backlink
+        P_test_code_generate --> P_red_evidence
+        P_ac_tc_backlink --> P_red_evidence
+        P_red_evidence --> P_coverage_measure
+        P_red_evidence --> P_gate_3
+        P_coverage_measure --> P_gate_3
     end
 
     subgraph IN["chain 2 (spec)"]
@@ -38,13 +41,13 @@ flowchart TB
         N1["implement-generate-impl-spec skill"]
     end
 
-    IN --> P30
-    P32 --> OUT_CODE
-    P34 --> OUT_TS
-    P34 --> OUT_EV
-    P36 -->|"go (RED 확정)"| NEXT
-    P36 -.->|"stop"| STOP["sprint 중단"]
-    P36 -.->|"revisit:spec"| IN
+    IN --> P_framework_detect
+    P_test_code_generate --> OUT_CODE
+    P_red_evidence --> OUT_TS
+    P_red_evidence --> OUT_EV
+    P_gate_3 -->|"go (RED 확정)"| NEXT
+    P_gate_3 -.->|"stop"| STOP["sprint 중단"]
+    P_gate_3 -.->|"revisit:spec"| IN
 
     classDef chain3 fill:#fce4ec,stroke:#ad1457,stroke-width:3px
     classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
@@ -52,7 +55,7 @@ flowchart TB
     classDef stop fill:#f8d7da,stroke:#721c24
     classDef red fill:#f8d7da,stroke:#721c24,stroke-width:2px
     class C3 chain3
-    class P36 gate
-    class P32 red
+    class P_gate_3 gate
+    class P_test_code_generate red
     class OUT out
     class STOP stop

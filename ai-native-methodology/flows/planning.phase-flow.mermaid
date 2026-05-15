@@ -1,22 +1,24 @@
 %% ★ ★ v2.0 chain 1 (planning) phase flow — 사람 눈 (mermaid)
 %% AI 눈 짝: planning.phase-flow.json (drift-validator 호환)
+%% ★ ★ ★ v3.1.0 — phase ID 의미 ID rename (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동).
+%% subgraph id = `P_<semantic_id>` (P 접두사 + underscore — mermaid 문법 호환 + drift-validator 정규식 호환).
 %% ADR-008 v2 §10 (chain 단계 이중 렌더링) + ADR-CHAIN-001 정합
 
 flowchart TB
     subgraph C1["★ Chain 1 — planning (legacy single-case)"]
         direction TB
 
-        P10["P1.0 — input 검증<br/>analysis 7대 + 8 FE + finding + AP + migration"]
-        P11["P1.1 — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
-        P12["P1.2 — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
-        P13["P1.3 — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
-        P14["★ ★ ★ P1.4 — gate #1 (사용자 결단)<br/>_base-invoke-go-stop-gate / cluster 5~6"]
+        P_input_validate["Phase input-validate — input 검증<br/>analysis 7대 + 8 FE + finding + AP + migration"]
+        P_use_cases_decompose["Phase use-cases-decompose — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
+        P_br_intent_extract["Phase br-intent-extract — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
+        P_planning_spec_compose["Phase planning-spec-compose — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
+        P_gate_1["★ ★ ★ Phase gate-1 — go/stop gate #1 (사용자 결단)<br/>_base-invoke-go-stop-gate / cluster 5~6"]
 
-        P10 --> P11
-        P10 --> P12
-        P11 --> P13
-        P12 --> P13
-        P13 --> P14
+        P_input_validate --> P_use_cases_decompose
+        P_input_validate --> P_br_intent_extract
+        P_use_cases_decompose --> P_planning_spec_compose
+        P_br_intent_extract --> P_planning_spec_compose
+        P_planning_spec_compose --> P_gate_1
     end
 
     subgraph IN["analysis stage 산출물 (input)"]
@@ -34,12 +36,12 @@ flowchart TB
         N1["spec-compose-behavior-spec skill<br/>spec.phase-flow.json"]
     end
 
-    IN --> P10
-    P13 --> OUT_JSON
-    P13 --> OUT_MD
-    P14 -->|"go"| NEXT
-    P14 -.->|"stop"| STOP["sprint 중단 / carry"]
-    P14 -.->|"revisit:analysis"| IN
+    IN --> P_input_validate
+    P_planning_spec_compose --> OUT_JSON
+    P_planning_spec_compose --> OUT_MD
+    P_gate_1 -->|"go"| NEXT
+    P_gate_1 -.->|"stop"| STOP["sprint 중단 / carry"]
+    P_gate_1 -.->|"revisit:analysis"| IN
 
     %% Style
     classDef chain1 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
@@ -47,6 +49,6 @@ flowchart TB
     classDef out fill:#d4edda,stroke:#155724,stroke-width:2px
     classDef stop fill:#f8d7da,stroke:#721c24
     class C1 chain1
-    class P14 gate
+    class P_gate_1 gate
     class OUT out
     class STOP stop

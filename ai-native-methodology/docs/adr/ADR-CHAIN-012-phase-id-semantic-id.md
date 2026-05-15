@@ -136,4 +136,4 @@ D-3 선택 근거 — 추가/삭제 시 그 phase 의 `depends_on` 만 손대면
 - examples/poc-04-* analysis 디렉토리 명 (`0-init/`, `1-architecture/`, `5-1-api/` 등 옛 phase 표기) — 사람 가독성 axis / paradigm 외
 - skills 본문 안 옛 file 명 misnomer 인용 일부 (phase-3-domain.md / phase-1-inventory / phase-2-architecture.md 등 옛 명세 경로) — manual review 권장
 - 본문 자유 텍스트 "Phase 4" 등 산문 표기 — manual review carry
-- **★ 다른 chain stage flow phase ID 의미 ID rename** (planning P1.0~P1.3 / spec P2.0~P2.5 / test P3.0~P3.6 / implement P4.0~?) — 별개 plan 영역 (본 paradigm 정합 sibling)
+- ~~**★ 다른 chain stage flow phase ID 의미 ID rename** (planning P1.0~P1.3 / spec P2.0~P2.5 / test P3.0~P3.6 / implement P4.0~?) — 별개 plan 영역 (본 paradigm 정합 sibling)~~ → **v3.1.0 resolved** (2026-05-15 / CHANGELOG.md §[3.1.0] / Plan V / Senior critique REVISE-3 흡수 = `static-runner` phase 명 → `static-analysis` / D-3 paradigm sibling / 10 file / scaffolding only / MINOR)

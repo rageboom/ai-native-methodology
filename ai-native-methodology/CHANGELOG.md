@@ -9,6 +9,115 @@
 
 ---
 
+## [3.1.0] — 2026-05-15 ★ ★ ★ MINOR — chain 1~4 phase ID 의미 ID 자산화 (v3.0.0 carry resolved / D-3 paradigm sibling)
+
+> ★ ★ ★ **v3.0.0 carry resolved** — analysis chain (v3.0.0) 의미 ID 자산화 패턴 정합 sibling. planning/spec/test/implement 4 chain 안 26 phase 숫자 ID → 의미 ID. **scaffolding only / PoC 미사용 / breaking 영향 ≈ 0 / additive 격** 사유로 MINOR. 사내 배포 전 / 실 사용자 0 / alias map ❌ / 즉시 cutover.
+
+### chain별 phase ID 매핑 (26)
+
+**chain 1 (planning) — 5 phase**
+| old | new | depends_on |
+|---|---|---|
+| `P1.0` | **`input-validate`** | [] |
+| `P1.1` | **`use-cases-decompose`** | [input-validate] |
+| `P1.2` | **`br-intent-extract`** | [input-validate, use-cases-decompose] |
+| `P1.3` | **`planning-spec-compose`** | [use-cases-decompose, br-intent-extract] |
+| `P1.4` | **`gate-1`** | [planning-spec-compose] |
+
+**chain 2 (spec) — 6 phase**
+| old | new | depends_on |
+|---|---|---|
+| `P2.0` | **`input-integrate`** | [] |
+| `P2.1` | **`behavior-spec-compose`** | [input-integrate] |
+| `P2.2` | **`acceptance-criteria-derive`** | [behavior-spec-compose] |
+| `P2.3` | **`cross-link-7-deliverables`** | [behavior-spec-compose, acceptance-criteria-derive] |
+| `P2.4` | **`behavior-diagrams-render`** | [behavior-spec-compose, acceptance-criteria-derive, cross-link-7-deliverables] |
+| `P2.5` | **`gate-2`** | [behavior-diagrams-render] |
+
+**chain 3 (test) — 7 phase**
+| old | new | depends_on |
+|---|---|---|
+| `P3.0` | **`framework-detect`** | [] |
+| `P3.1` | **`tc-decompose`** | [framework-detect] |
+| `P3.2` | **`test-code-generate`** | [tc-decompose] |
+| `P3.3` | **`ac-tc-backlink`** | [test-code-generate] |
+| `P3.4` | **`red-evidence`** | [test-code-generate, ac-tc-backlink] |
+| `P3.5` | **`coverage-measure`** | [red-evidence] |
+| `P3.6` | **`gate-3`** | [red-evidence, coverage-measure] |
+
+**chain 4 (implement) — 8 phase**
+| old | new | depends_on |
+|---|---|---|
+| `P4.0` | **`input-plan`** | [] |
+| `P4.1` | **`impl-decompose`** | [input-plan] |
+| `P4.2` | **`impl-code-generate`** | [impl-decompose] |
+| `P4.3` | **`commit-hash-fill`** | [impl-code-generate] |
+| `P4.4` | **`green-evidence`** | [commit-hash-fill] |
+| `P4.5` | **`static-analysis`** ★ Senior REVISE-3 흡수 (tools/static-runner 명과 axis 분리) | [green-evidence] |
+| `P4.6` | **`matrix-finalize`** | [green-evidence, static-analysis] |
+| `P4.7` | **`gate-4`** | [green-evidence, static-analysis, matrix-finalize] |
+
+### paradigm 정합 (v3.0.0 D-3 sibling)
+
+- **D-3 paradigm 본질 보존** — `depends_on` 그래프 SSOT / `order` 필드 부재 / 위상정렬 자동 / lexicographic tiebreak
+- **작명 paradigm** = "의미만 보존" (chain prefix ❌ / `input-validate` / `input-integrate` / `input-plan` — chain 별 의미 차이를 이름에 담음)
+- **flow JSON `version` 일괄 격상** — `2.0.0-dev` → `3.1.0` (repo version 동기화 / "미완성 draft" 신호 영역 정리)
+
+### 영향 범위 (실측 10 file)
+
+- `flows/planning.phase-flow.{json,mermaid}` — 5 phase ID + depends_on + version
+- `flows/spec.phase-flow.{json,mermaid}` — 6 phase ID + depends_on + version
+- `flows/test.phase-flow.{json,mermaid}` — 7 phase ID + depends_on + version
+- `flows/implement.phase-flow.{json,mermaid}` — 8 phase ID + depends_on + version (★ P4.5 `static-runner` → `static-analysis`)
+- `CHANGELOG.md` — v3.0.0 Carry strikethrough + v3.1.0 entry 신설
+- `docs/adr/ADR-CHAIN-012-phase-id-semantic-id.md` — §carry resolved 본문
+
+### 영향 ❌ 영역 (grep 실측)
+
+- `skills/` `methodology-spec/` `templates/` `schemas/` `agents/` — P1.X~P4.X 직접 인용 0건 (skill 명만 인용)
+- `tools/` src code — P1.X~P4.X 직접 인용 0건 (chain stage prefix 만 인용)
+- finding-system enum — P1.X~P4.X 부재 (v3.0.0 시점 P-prefix 폐기 완료)
+
+### Senior critique 흡수 (Sonnet 4.6 / 가벼운 sub-agent / 20분 cap)
+
+| 신호 | 흡수 |
+|---|---|
+| STOP | 없음 ✅ |
+| REVISE-1 (`input-*` cross-chain 혼동) | drift-validator 경고 영역 보완 paradigm (chain prefix ❌ 정합 보존) |
+| REVISE-2 (gate-2 depends_on 의도) | 현 P2.5 = `[P2.4]` 동일 paradigm 보존 / JSON 의도 명시 |
+| REVISE-3 (static-runner phase ID ↔ tool 명 충돌) | **`static-runner` → `static-analysis` 격하** ✅ |
+| CAUTION-1 (normalize-phase-flow.js 호환) | ✅ 실측 호환 (chain 비종속 정규식) |
+| CAUTION-2 (scope 신뢰) | ✅ |
+| CAUTION-3 (flow JSON version 의미) | ✅ 본 entry 명시 |
+
+### 검증 통과
+
+- ✅ JSON 정합 4/4 (`node -e JSON.parse`)
+- ✅ workspace test 317/0 (v3.0.0 baseline 보존)
+- ✅ release-readiness 9/9 strict
+- ✅ drift-validator --check-chain-layout: 4 stages / 26 phases / 13 skills / 0 orphans / 0 missing
+- ✅ drift-validator --check-layout: 11 phases / 22 skills / 0 orphans
+- ✅ drift-validator --check-state-flow-consistency: 5 flow stages / 5 enum stages match
+- ✅ chain harness 5 요소 변경 ❌ (chain-driver gate-eval.js / hooks-bridge.js / release-readiness.js / br-cross-consistency-validator 본질 보존)
+
+### Sprint sequence
+
+- S1 — Senior critique sub-agent (Sonnet 4.6 / 20분 cap) — STOP 0 / REVISE 3 / CAUTION 3 발행 + 흡수
+- S2 — 사용자 일괄 승인 6 결정 묶음
+- S3 — flows JSON 4 file rename (★ 26 phase ID + depends_on + version `2.0.0-dev` → `3.1.0`)
+- S4 — flows mermaid 4 file rename (★ subgraph 노드 ID `P_<semantic>` 패턴 + edge)
+- S5 — CHANGELOG v3.1.0 entry + v3.0.0 Carry strikethrough + ADR-CHAIN-012 §carry resolved
+- S6 — 전수 검증 (workspace + release-readiness + drift-validator)
+- S7 — plugin.json + package.json 3.0.0 → 3.1.0 + commit + git tag v3.1.0 + origin push
+
+### 결정적 사실
+
+- ★ ★ **scaffolding only** — planning/spec/test/implement chain 안 PoC end-to-end 실행 0건 / chain harness 입력 0 / breaking 영향 ≈ 0
+- ★ ★ ★ v3.0.0 (analysis MAJOR / 54 file) vs v3.1.0 (chain 1~4 MINOR / 10 file) — 1/5 scope + breaking 영향 단계 차이로 semver weight 격하 정당
+- ★ ★ chain harness validated §8.1 strict 9/9 본질 보존
+
+---
+
 ## [3.0.0] — 2026-05-15 ★ ★ ★ ★ ★ MAJOR — phase ID 의미 ID 본격 자산화 (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동 도출)
 
 > ★ ★ ★ ★ ★ ★ ★ **BREAKING — manifest phase ID 11개 숫자 → 의미 ID + workflow file 11 rename + drift-validator 위상정렬 신규** (★ ★ ★ ★ semver MAJOR / 사내 배포 전 / 실 사용자 0 / alias map ❌ / 즉시 cutover). v2.0 SDLC 4단계 chain harness 도입 이래 누적 paradigm 의 자연 분기점 — magic decimal (4.5/4.7/4.8) + hyphenated (5-1/5-2) + 의미 부재 (0~6) 본격 폐기.
@@ -85,9 +194,8 @@ phase-6-quality.md            → quality.md
 - examples/poc-04-* analysis 디렉토리 명 (`0-init/`, `1-architecture/` 등 옛 표기) — 사람 가독성 axis
 - skills 본문 안 옛 file 명 misnomer 인용 (phase-3-domain / phase-1-inventory 등) — manual review
 - 본문 자유 텍스트 "Phase 4" 산문 표기 — manual review
-- ★ **다른 chain stage flow phase ID 의미 ID rename** (planning P1.0~P1.3 / spec P2.0~P2.5 / test P3.0~P3.6 / implement P4.0~?) — 별개 plan 영역
+- ~~★ **다른 chain stage flow phase ID 의미 ID rename** (planning P1.0~P1.3 / spec P2.0~P2.5 / test P3.0~P3.6 / implement P4.0~?) — 별개 plan 영역~~ → **v3.1.0 resolved**
 
----
 
 ## [2.6.0] — 2026-05-14 ★ ★ ★ ★ MINOR — skill 의미 ID 본격 자산화 (★ phase-N 숫자 prefix 본격 폐기 / 17 skill rename / Senior critique 5 의제 본격 흡수)
 
