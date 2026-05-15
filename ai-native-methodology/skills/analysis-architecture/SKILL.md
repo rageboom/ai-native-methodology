@@ -42,8 +42,8 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-2-architecture.md`
-- `methodology-spec/deliverables/02-architecture.md`
+- `methodology-spec/workflow/architecture.md`
+- `methodology-spec/deliverables/1-architecture.md`
 - `schemas/architecture.schema.json`
 - ADR-006 (순환의존 정책)
 

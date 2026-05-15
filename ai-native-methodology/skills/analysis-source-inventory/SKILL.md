@@ -39,9 +39,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-1-inventory.md`
-- `methodology-spec/deliverables/01-inventory.md`
-- `schemas/inventory.schema.json`
+- `methodology-spec/workflow/discovery.md`
+- `schemas/inventory.schema.json` (inventory 산출물 = `discovery` phase output / 별도 deliverables 문서 ❌ — v3.0.0 phase 의미 ID rename 정합)
 
 ## 다음
 

@@ -196,25 +196,25 @@ v2.5.1 까지 analysis stage skill 17 디렉토리 = `analysis-phase-N-{slug}/` 
 
 ### 8.2 rename 매핑 (17 → 17)
 
-| v2.5.1 | v2.6.0 | manifest phase |
+| v2.5.1 | v2.6.0 | manifest phase (★ v3.0.0 의미 ID 정합) |
 |---|---|---|
-| analysis-input | **analysis-input-collection** | 0 |
-| analysis-phase-1-inventory | **analysis-source-inventory** | 1 |
-| analysis-phase-2-architecture | **analysis-architecture** | 3 (arch) |
-| analysis-phase-3-domain | **analysis-domain-model** | 4 (BL) |
-| analysis-phase-4-rules | **analysis-business-rules** | 4 (BL) |
-| analysis-phase-4-5-cross-validation | **analysis-formal-spec-validation** | 4.5 |
-| analysis-characterization | **analysis-characterization-test** | 4.7 |
-| analysis-sql-inventory | **analysis-sql-inventory** | 4.8 |
-| analysis-phase-5-error-mapping | **analysis-error-mapping** | 5-1 (api) |
-| analysis-phase-5-form-validation | **analysis-form-validation-fe** | 4 (BL) |
-| analysis-phase-5-openapi | **analysis-openapi** | 5-1 (api) |
-| analysis-phase-5-rules | **analysis-api-rule-mapping** | 5-1 (api) |
-| analysis-phase-5-schema-erd | **analysis-db-schema-erd** | 2 (db) |
-| analysis-phase-5-state-map | **analysis-ui-state-map-fe** | 5-2 (ui) |
-| analysis-phase-5-type-spec | **analysis-type-spec-fe** | 5-2 (ui) |
-| analysis-phase-5-visual-manifest | **analysis-ui-visual-manifest-fe** | 5-2 (ui) |
-| analysis-quality | **analysis-quality-antipattern** | 6 (quality) |
+| analysis-input | **analysis-input-collection** | `input` |
+| analysis-phase-1-inventory | **analysis-source-inventory** | `discovery` |
+| analysis-phase-2-architecture | **analysis-architecture** | `architecture` |
+| analysis-phase-3-domain | **analysis-domain-model** | `business-logic` (§5.B domain) |
+| analysis-phase-4-rules | **analysis-business-rules** | `business-logic` (§5.A rules) |
+| analysis-phase-4-5-cross-validation | **analysis-formal-spec-validation** | `formal-spec` |
+| analysis-characterization | **analysis-characterization-test** | `characterization` |
+| analysis-sql-inventory | **analysis-sql-inventory** | `sql-inventory` |
+| analysis-phase-5-error-mapping | **analysis-error-mapping** | `api` |
+| analysis-phase-5-form-validation | **analysis-form-validation-fe** | `business-logic` (§5.D ui-domain) |
+| analysis-phase-5-openapi | **analysis-openapi** | `api` |
+| analysis-phase-5-rules | **analysis-api-rule-mapping** | `api` |
+| analysis-phase-5-schema-erd | **analysis-db-schema-erd** | `db-schema` |
+| analysis-phase-5-state-map | **analysis-ui-state-map-fe** | `ui` |
+| analysis-phase-5-type-spec | **analysis-type-spec-fe** | `ui` |
+| analysis-phase-5-visual-manifest | **analysis-ui-visual-manifest-fe** | `ui` |
+| analysis-quality | **analysis-quality-antipattern** | `quality` |
 
 변경 ❌: aspect 4 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-aspect-static-security` / `analysis-aspect-legacy`) + `analysis-br-cross-consistency-check` (v2.5 신규 / 이미 의미 ID).
 

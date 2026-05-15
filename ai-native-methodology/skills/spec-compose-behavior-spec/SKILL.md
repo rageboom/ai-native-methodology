@@ -99,4 +99,4 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - Python/FastAPI/Pydantic: invariants/*.py + Pydantic validator.
 - Go: invariants/*.go (struct tag + validator package).
 
-각 framework 에 맞는 invariants 산출물 path 변환은 본 skill 본문에서 분기 (★ analysis stage `phase-1-inventory` 차용).
+각 framework 에 맞는 invariants 산출물 path 변환은 본 skill 본문에서 분기 (★ analysis stage `discovery` phase 차용).

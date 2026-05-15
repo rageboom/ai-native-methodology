@@ -42,8 +42,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-4-rules.md`
-- `methodology-spec/deliverables/04-rules.md`
+- `methodology-spec/workflow/business-logic.md` (§5.A rules — `business-logic` phase 안 4영역 병렬 / v3.0.0 phase 의미 ID rename 정합)
+- `methodology-spec/deliverables/5-business-rules.md`
 - `schemas/rules.schema.json`
 - ADR-FE-005 (권위 매개체 13 — Zod / Yup / RHF / class-validator 등 fe_validation 자동 등록)
 

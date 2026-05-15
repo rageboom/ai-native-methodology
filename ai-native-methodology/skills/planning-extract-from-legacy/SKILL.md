@@ -88,4 +88,4 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 
 ## 기술 스택 분기
 
-`inventory.stack_signals` 정합 — Spring / NestJS / Django / Rails / Hexagonal 분기는 ★ analysis stage `phase-1-inventory` 차용 / 본 skill 에서는 도메인 추출만 (framework neutral).
+`inventory.stack_signals` 정합 — Spring / NestJS / Django / Rails / Hexagonal 분기는 ★ analysis stage `discovery` phase 차용 / 본 skill 에서는 도메인 추출만 (framework neutral).

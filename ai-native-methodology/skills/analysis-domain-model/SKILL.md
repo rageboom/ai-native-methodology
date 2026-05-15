@@ -38,8 +38,8 @@ DDD 원칙 (ADR-004) 기반. Entity / Aggregate / Value Object / Bounded Context
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-3-domain.md`
-- `methodology-spec/deliverables/03-domain.md`
+- `methodology-spec/workflow/business-logic.md` (§5.B domain — `business-logic` phase 안 4영역 병렬 / v3.0.0 phase 의미 ID rename 정합)
+- `methodology-spec/deliverables/2-domain.md`
 - `schemas/domain.schema.json`
 - ADR-004 (DDD), ADR-005 (한국어)
 
