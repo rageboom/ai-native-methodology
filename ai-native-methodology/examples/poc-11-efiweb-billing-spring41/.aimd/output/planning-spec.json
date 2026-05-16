@@ -11,7 +11,7 @@
       "out_of_scope": 0.95,
       "risks_and_constraints": 0.78
     },
-    "$comment": "★ ★ confidence 0.82 — Legacy 작은 단일책임 + cross-DB SP 본문 미확인 + 결제 도메인 expert carry (BR-BILLING-006 ambiguous 유지). vs PoC #06 단일 (0.85) + PoC #07 다중 (0.78) 사이 / scale 작아 use_cases 자동 추출 정확도 ↑ (0.90)."
+    "$comment": "★ ★ confidence 0.82 — Legacy 작은 단일책임 + cross-DB SP 본문 미확인 + 결제 도메인 expert carry (BR-BILLING-ENTITY-006 ambiguous 유지). vs PoC #06 단일 (0.85) + PoC #07 다중 (0.78) 사이 / scale 작아 use_cases 자동 추출 정확도 ↑ (0.90)."
   },
   "derivation_source": {
     "type": "legacy-extraction",
@@ -42,7 +42,7 @@
     "domain_purpose": "EFI-WEB IFRS 회계 시스템의 결제 / 청구 (Billing) 모듈 — ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 의 월별 데이터 확정 처리. 확정 후 ERP 결과 변경 ↔ 자체 IFRS DB (TB_SGMA_CONFIRM*) 절연 + 확정 이력 (TB_SGMA_CONFIRM_HIS 헤더 + TB_SGMA_CONFIRM_HIS_DATA 상세) 기록. 부가 = Qlik Sense 외부 BI dashboard 임베드 (qlikView).",
     "stakeholders": [
       "ifrs_admin (회계 운영자 / 데이터 확정 처리)",
-      "billing_expert (★ 결제 도메인 담당자 / BR-BILLING-006 의도 검증 carry C-domain-PoC11-1)",
+      "billing_expert (★ 결제 도메인 담당자 / BR-BILLING-ENTITY-006 의도 검증 carry C-domain-PoC11-1)",
       "DBA (★ cross-DB FQCN FIM + SGERPMA / dbo.FN_GET_MONTH UDF / cross-DB 운영)",
       "qlik_admin (Qlik Sense 운영 / appid + sheet 관리)"
     ],
@@ -50,7 +50,7 @@
       "월별 데이터 확정 = ERP 결과 → 자체 DB 복사 (full overwrite) + atomicity 의무 (★ 새 시스템 = @Transactional 의무)",
       "12개월 row 강제 표시 (recursive CTE / 누락 ❌)",
       "확정 이력 = SCOPE_IDENTITY hisNo PK-FK 관계 (TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA)",
-      "★ phase 4.7 acceptance oracle = D2.5 후 14/15 = 93.3% (★ 1 ambiguous BR-BILLING-006 carry 유지)",
+      "★ phase 4.7 acceptance oracle = D2.5 후 14/15 = 93.3% (★ 1 ambiguous BR-BILLING-ENTITY-006 carry 유지)",
       "외부 BI Qlik Sense 메뉴별 dashboard 임베드 (★ URL 환경 변수 의무)"
     ]
   },
@@ -61,7 +61,7 @@
       "description": "GET /ifrs/billing/dataConfirm — currYear + 권한별 companyList 모델 전달. JSP dataConfirm.jsp 렌더 (year select 12 + 법인 select / ★ COM_NO==2 hardcoded filter).",
       "actors": ["ifrs_admin"],
       "preconditions": ["session 인증 + authMap 권한 (★ 7 속성)"],
-      "postconditions": ["currYear + companyList 모델 → JSP 렌더 / year select (currYear-2015)+1 option / 법인 select COM_NO==2 만 노출 (★ ambiguous BR-BILLING-006)"],
+      "postconditions": ["currYear + companyList 모델 → JSP 렌더 / year select (currYear-2015)+1 option / 법인 select COM_NO==2 만 노출 (★ ambiguous BR-BILLING-ENTITY-006)"],
       "acceptance_criteria_refs": ["AC-BILLING-001"],
       "source_grounded_evidence": [
         "characterization/snapshots/UC-BILLING-001-dataConfirm.json",
@@ -115,18 +115,18 @@
   ],
   "business_rules": {
     "intent": [
-      "BR-BILLING-001 (12개월 강제 생성 recursive CTE)",
-      "BR-BILLING-003 (full overwrite delete + insert)",
-      "BR-BILLING-004 (ERP 부재 시 skip + JSP alert)",
-      "BR-BILLING-005 (시작년도 2015 hardcoded / ★ 결제 도메인 expert carry C-domain-PoC11-2)",
-      "BR-BILLING-007 (SCOPE_IDENTITY PK 자동 채움)",
-      "BR-BILLING-008 (외부 BI Qlik Sense 임베드)"
+      "BR-BILLING-PERIOD-001 (12개월 강제 생성 recursive CTE)",
+      "BR-BILLING-OVERWRITE-003 (full overwrite delete + insert)",
+      "BR-BILLING-ERPDATA-004 (ERP 부재 시 skip + JSP alert)",
+      "BR-BILLING-BASEYEAR-005 (시작년도 2015 hardcoded / ★ 결제 도메인 expert carry C-domain-PoC11-2)",
+      "BR-BILLING-HISTPK-007 (SCOPE_IDENTITY PK 자동 채움)",
+      "BR-BILLING-EXTBI-008 (외부 BI Qlik Sense 임베드)"
     ],
     "likely_bug": [
-      "★ ★ ★ BR-BILLING-002 (★ critical / @Transactional ❌ saveDataConfirm 4 SQL 비원자성 / ★ AP-BILLING-001 critical link)"
+      "★ ★ ★ BR-BILLING-CONFIRM-002 (★ critical / @Transactional ❌ saveDataConfirm 4 SQL 비원자성 / ★ AP-BILLING-001 critical link)"
     ],
     "ambiguous": [
-      "★ ★ ★ BR-BILLING-006 (★ ★ COM_NO==2 hardcoded JSP filter / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1)"
+      "★ ★ ★ BR-BILLING-ENTITY-006 (★ ★ COM_NO==2 hardcoded JSP filter / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1)"
     ]
   },
   "out_of_scope": [
@@ -142,7 +142,7 @@
       "★ ★ ★ AP-BILLING-001 (@Transactional ❌ saveDataConfirm 4 SQL 비원자성) — 새 시스템 migration 시 @Transactional(rollbackFor=Exception.class) + try-catch 의무",
       "★ ★ ★ AP-BILLING-005 (SQL Server vendor 종속 4 차원) — PostgreSQL/Oracle 이식 시 SCOPE_IDENTITY → RETURNING / WITH NOLOCK → isolation level / dbo.FN_GET_MONTH → JVM logic / getDate → CURRENT_TIMESTAMP 재작성 의무",
       "★ ★ ★ AP-BILLING-006 (cross-DB FQCN FIM + SGERPMA hardcoded) — 새 시스템 = dataSource 분리 (ifrsDS / fimDS / sgerpDS) 또는 Linked Server 추상화 의무",
-      "★ ★ ★ AP-BILLING-011 (★ ambiguous BR-BILLING-006 COM_NO==2 hardcoded) — 결제 도메인 expert 결단 carry"
+      "★ ★ ★ AP-BILLING-011 (★ ambiguous BR-BILLING-ENTITY-006 COM_NO==2 hardcoded) — 결제 도메인 expert 결단 carry"
     ],
     "high": [
       "AP-BILLING-009 (XSS risk HTML concat / makeDataTable raw insert) — jQuery .text() 또는 template engine 의무",
@@ -183,7 +183,7 @@
     ],
     "to_characterization": [
       "characterization/snapshots/ (4 snapshot)",
-      "characterization/intent-vs-bug.md (15 분류 / Day 2.5 후 14/15 = 93.3% / 1 ambiguous BR-BILLING-006 유지)",
+      "characterization/intent-vs-bug.md (15 분류 / Day 2.5 후 14/15 = 93.3% / 1 ambiguous BR-BILLING-ENTITY-006 유지)",
       "characterization/coverage.json (★ ratchet baseline write / 100% UC coverage)"
     ],
     "to_sql_inventory": [

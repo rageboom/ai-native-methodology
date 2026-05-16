@@ -30,7 +30,7 @@
       "acceptance_id": "AC-BILLING-003",
       "status": "yellow",
       "severity": "medium",
-      "gaps": ["TC-BILLING-003 부재 (chain 3 placeholder)", "IMPL-BILLING-001 부재 (chain 4 placeholder)", "★ BR-BILLING-006 ambiguous → C-domain-PoC11-1 carry"]
+      "gaps": ["TC-BILLING-003 부재 (chain 3 placeholder)", "IMPL-BILLING-001 부재 (chain 4 placeholder)", "★ BR-BILLING-ENTITY-006 ambiguous → C-domain-PoC11-1 carry"]
     },
     {
       "use_case_id": "UC-BILLING-002",

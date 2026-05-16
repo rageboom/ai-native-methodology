@@ -10,16 +10,16 @@
 | AC | BHV | UC | severity | 핵심 |
 |---|---|---|---|---|
 | AC-BILLING-001 | BHV-BILLING-001 | UC-BILLING-001 | must | 화면 진입 + 모델 전달 + JSP 렌더 |
-| AC-BILLING-002 | BHV-BILLING-001 | UC-BILLING-001 | must | year select option = (currYear-2015)+1 (BR-BILLING-005) |
-| AC-BILLING-003 | BHV-BILLING-001 | UC-BILLING-001 | should | 법인 select count=1 (★ COM_NO==2 hardcoded / BR-BILLING-006 ambiguous) |
-| AC-BILLING-004 | BHV-BILLING-002 | UC-BILLING-002 | must | 12 row 강제 (★ recursive CTE / BR-BILLING-001) |
+| AC-BILLING-002 | BHV-BILLING-001 | UC-BILLING-001 | must | year select option = (currYear-2015)+1 (BR-BILLING-BASEYEAR-005) |
+| AC-BILLING-003 | BHV-BILLING-001 | UC-BILLING-001 | should | 법인 select count=1 (★ COM_NO==2 hardcoded / BR-BILLING-ENTITY-006 ambiguous) |
+| AC-BILLING-004 | BHV-BILLING-002 | UC-BILLING-002 | must | 12 row 강제 (★ recursive CTE / BR-BILLING-PERIOD-001) |
 | AC-BILLING-005 | BHV-BILLING-002 | UC-BILLING-002 | must | cross-DB FIM JOIN 데이터 응답 (★ AP-BILLING-006) |
 | AC-BILLING-006 | BHV-BILLING-002 | UC-BILLING-002 | should | cross-DB 접근 부재 시 에러 (★ AP-BILLING-006 invariant) |
 | AC-BILLING-007 | BHV-BILLING-003 | UC-BILLING-003 | must | 정상 happy path / 4 SQL 순차 commit |
 | **AC-BILLING-008** | **BHV-BILLING-003** | **UC-BILLING-003** | **★ ★ ★ critical must** | **★ ★ ★ ★ 4 SQL 중 3 번째 fail 시 ★ ★ 부분 commit (★ ★ ★ AP-BILLING-001 / @Transactional ❌ Legacy bug 보존 / TDD intent 정면 위배)** |
-| AC-BILLING-009 | BHV-BILLING-003 | UC-BILLING-003 | must | full overwrite delete + insert (BR-BILLING-003) |
-| AC-BILLING-010 | BHV-BILLING-003 | UC-BILLING-003 | must | SCOPE_IDENTITY hisNo PK-FK (BR-BILLING-007 / AP-BILLING-005) |
-| AC-BILLING-011 | BHV-BILLING-004 | UC-BILLING-003 | must | ERP 부재 시 skip + JSP alert + no-op (BR-BILLING-004) |
+| AC-BILLING-009 | BHV-BILLING-003 | UC-BILLING-003 | must | full overwrite delete + insert (BR-BILLING-OVERWRITE-003) |
+| AC-BILLING-010 | BHV-BILLING-003 | UC-BILLING-003 | must | SCOPE_IDENTITY hisNo PK-FK (BR-BILLING-HISTPK-007 / AP-BILLING-005) |
+| AC-BILLING-011 | BHV-BILLING-004 | UC-BILLING-003 | must | ERP 부재 시 skip + JSP alert + no-op (BR-BILLING-ERPDATA-004) |
 | AC-BILLING-012 | BHV-BILLING-005 | UC-BILLING-004 | should | Qlik iframe + URL hardcoded as-is (AP-BILLING-013) |
 
 ---
@@ -42,13 +42,13 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
     When 데이터 확정처리 화면에 진입한다
     Then currYear 모델 전달 + companyList 모델 전달 + HTTP 200 + JSP 렌더
 
-  @must @characterization-mode @BR-BILLING-005
+  @must @characterization-mode @BR-BILLING-BASEYEAR-005
   Scenario: AC-BILLING-002 — year select option count = (currYear-2015)+1
     Given currYear = 2026
     When 화면 진입
     Then year select option count == 12 + 첫 2015 + 마지막 2026 + ASC
 
-  @should @characterization-mode @BR-BILLING-006-ambiguous @domain-expert-carry
+  @should @characterization-mode @BR-BILLING-ENTITY-006-ambiguous @domain-expert-carry
   Scenario: AC-BILLING-003 — 법인 select count=1 (★ COM_NO==2 hardcoded)
     Given 다수 법인 (COM_NO ∈ {1, 2, 3, ...}) 등록
     When 화면 진입
@@ -58,7 +58,7 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
   # UC #2 — BHV-BILLING-002 (12 row 조회)
   # ────────────────────────────────────────────────────────────
 
-  @must @characterization-mode @BR-BILLING-001 @T-SQL
+  @must @characterization-mode @BR-BILLING-PERIOD-001 @T-SQL
   Scenario: AC-BILLING-004 — 12 row 강제 (ERP 부재 시도 12 row)
     Given year=2025, comNo=2, comNm='회사명' + TB_SGMA_CONFIRM_HIS row count==0
     When 데이터 확정 목록 조회
@@ -80,7 +80,7 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
   # UC #3 — BHV-BILLING-003 (★ ★ ★ critical atomicity)
   # ────────────────────────────────────────────────────────────
 
-  @must @characterization-mode @BR-BILLING-003 @BR-BILLING-007 @happy-path
+  @must @characterization-mode @BR-BILLING-OVERWRITE-003 @BR-BILLING-HISTPK-007 @happy-path
   Scenario: AC-BILLING-007 — 정상 happy path (4 SQL 순차 commit)
     Given distYear=2025, distMonth='03', companySeq=1 + SGERPMA row 5건 + TB_SGMA_CONFIRM 빈 상태
     When 데이터 확정 처리
@@ -98,13 +98,13 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
     And ★ ★ ★ rollback ❌ (★ @Transactional ❌ Legacy bug 보존)
     And ★ ★ ★ ★ 새 시스템 invariant assertion: 동일 시나리오 ★ ★ ★ 4 SQL 모두 rollback 의무 (★ @Transactional(rollbackFor=Exception.class) / carry C-stack-결단-chain-3-4-plan)
 
-  @must @characterization-mode @BR-BILLING-003
+  @must @characterization-mode @BR-BILLING-OVERWRITE-003
   Scenario: AC-BILLING-009 — full overwrite (기존 3 row 삭제 + 신규 5 row insert)
     Given TB_SGMA_CONFIRM 기존 3 row + SGERPMA 신규 5 row
     When 확정 처리
     Then deleteConfirmData → 0 row + insertConfirmData → 5 row + 최종 count==5 (★ full overwrite)
 
-  @must @characterization-mode @BR-BILLING-007 @AP-BILLING-005
+  @must @characterization-mode @BR-BILLING-HISTPK-007 @AP-BILLING-005
   Scenario: AC-BILLING-010 — SCOPE_IDENTITY hisNo PK-FK
     Given ERP 5건 + SCOPE_IDENTITY 함수 사용 가능
     When 확정 처리
@@ -115,7 +115,7 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
   # UC #3 — BHV-BILLING-004 (ERP 부재 skip)
   # ────────────────────────────────────────────────────────────
 
-  @must @characterization-mode @BR-BILLING-004
+  @must @characterization-mode @BR-BILLING-ERPDATA-004
   Scenario: AC-BILLING-011 — ERP 부재 시 skip + JSP alert + no-op
     Given SGERPMA row count == 0 + TB_SGMA_CONFIRM 기존 상태
     When 확정 처리
@@ -125,7 +125,7 @@ Feature: PoC #11 EFI-WEB billing — chain 2 4 UC 종결 (12 AC / characterizati
   # UC #4 — BHV-BILLING-005 (Qlik iframe)
   # ────────────────────────────────────────────────────────────
 
-  @should @characterization-mode @BR-BILLING-008 @AP-BILLING-013 @URL-hardcoded
+  @should @characterization-mode @BR-BILLING-EXTBI-008 @AP-BILLING-013 @URL-hardcoded
   Scenario: AC-BILLING-012 — Qlik iframe + URL hardcoded as-is
     Given menuNm='sales', appid='app-uuid-123', sheet='sheet-uuid-456'
     When Qlik View 화면 진입

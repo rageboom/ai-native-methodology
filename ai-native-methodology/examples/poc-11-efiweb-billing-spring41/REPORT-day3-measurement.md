@@ -71,7 +71,7 @@ UC coverage: 100.0%
 | BR 총 | 7 | **8** | 15 |
 | AP 총 | 10 | **13** | 12 |
 | 분류 합계 | 17 | **15** (UC 4 × 분류 + 5 BR 일부) | 27 |
-| ambiguous (Day 2 초안) | 3 | **1** (BR-BILLING-006) | 2 |
+| ambiguous (Day 2 초안) | 3 | **1** (BR-BILLING-ENTITY-006) | 2 |
 | named_classified_ratio (Day 2) | 14/17 = 0.82 | **14/15 = 0.933** | 25/27 = 0.926 |
 | named_classified_ratio (Day 2.5 후) | 17/18 = **0.94** | **14/15 = 0.933 보존** (★ 사용자 결단 ambiguous 유지) | **27/27 = 1.000** |
 | self_recognized SATD | 1 | **0** (★ ★ ★ single-case strict ❌ / Agent 1 cross-validation 해석 정정 carry) | 4 |
@@ -157,7 +157,7 @@ carry_flags total: 8
 | AP-BILLING-007 | medium | recursive CTE T-SQL 한정 |
 | ★ AP-BILLING-009 | high | XSS risk HTML concat (raw insert) |
 | AP-BILLING-010 | medium | 시작년도 2015 hardcoded magic year |
-| ★ ★ ★ AP-BILLING-011 | critical | 법인 COM_NO==2 hardcoded business logic in view (★ ★ ambiguous BR-BILLING-006 동반) |
+| ★ ★ ★ AP-BILLING-011 | critical | 법인 COM_NO==2 hardcoded business logic in view (★ ★ ambiguous BR-BILLING-ENTITY-006 동반) |
 | AP-BILLING-013 | medium | 외부 BI URL hardcoded `datacafe.smilegate.net` |
 
 ★ ★ ★ **novel 8 + isomorphic 5 = 총 13 AP** (★ PoC #06 10 / PoC #07 12 / 작은 scope BUT critical 다수 = 결제 도메인 risk + cross-DB + hardcoded surface).
@@ -204,8 +204,8 @@ carry_flags total: 8
 
 ### 신규 carry (★ Day 3.5 종결 시 신설)
 
-- ★ ★ ★ **C-domain-PoC11-1** (★ 결제 도메인 expert / BR-BILLING-006 ambiguous COM_NO==2 hardcoded 재검증 의무)
-- ★ ★ **C-domain-PoC11-2** (BR-BILLING-005 시작년도 2015 의미 확인)
+- ★ ★ ★ **C-domain-PoC11-1** (★ 결제 도메인 expert / BR-BILLING-ENTITY-006 ambiguous COM_NO==2 hardcoded 재검증 의무)
+- ★ ★ **C-domain-PoC11-2** (BR-BILLING-BASEYEAR-005 시작년도 2015 의미 확인)
 - ★ **C-domain-PoC11-3** (Qlik Sense appid/sheet 운영 체계)
 - ★ ★ C-poc-11-0-satd-해석-정정 (★ Agent 1 cross-validation 기반 / single-case + 잠복 기간 미경과 해석 명시)
 - ★ C-poc-11-source-디렉토리-cleanup (★ examples/poc-11-efiweb-billing-spring41/source/ 4 빈 디렉토리 / 낮은 우선순위)

@@ -55,8 +55,8 @@
     "intent_count": 6,
     "bug_count": 8,
     "ambiguous_count": 1,
-    "ambiguous_after_d2_5": "★ ★ 1 유지 (BR-BILLING-006 COM_NO==2 hardcoded / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1 신설)",
-    "named_classified_ratio_d2": "★ Day 2 초안 = 14/15 = 0.933 (★ 1 ambiguous BR-BILLING-006)",
+    "ambiguous_after_d2_5": "★ ★ 1 유지 (BR-BILLING-ENTITY-006 COM_NO==2 hardcoded / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1 신설)",
+    "named_classified_ratio_d2": "★ Day 2 초안 = 14/15 = 0.933 (★ 1 ambiguous BR-BILLING-ENTITY-006)",
     "named_classified_ratio_d2_5": "★ ★ ★ 14/15 = 0.933 보존 (★ 사용자 결단 ambiguous 유지 / pass threshold ≥ 80% + plan 2차 expectation ≥ 88% 정합)"
   },
   "comparison_to_poc06_07": {

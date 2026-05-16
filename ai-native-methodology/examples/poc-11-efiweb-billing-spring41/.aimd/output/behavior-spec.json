@@ -43,13 +43,13 @@
       "postconditions": [
         "currYear 모델 attribute 전달 ('currYear' key)",
         "companyList 모델 attribute 전달 ('companyList' key)",
-        "year select option count == (currYear - 2015) + 1 (★ BR-BILLING-005)",
-        "법인 select option count == 1 (★ COM_NO==2 hardcoded filter / BR-BILLING-006 ambiguous → characterization mode 보존)",
+        "year select option count == (currYear - 2015) + 1 (★ BR-BILLING-BASEYEAR-005)",
+        "법인 select option count == 1 (★ COM_NO==2 hardcoded filter / BR-BILLING-ENTITY-006 ambiguous → characterization mode 보존)",
         "JSP dataConfirm.jsp 렌더 (HTTP 200)"
       ],
       "invariants": [
-        "★ ★ characterization mode invariant — BR-BILLING-005 시작년도 2015 = ★ as-is 보존",
-        "★ ★ characterization mode invariant — BR-BILLING-006 COM_NO==2 hardcoded filter = ★ as-is 보존 (★ TDD intent 정면 위배 정합 / 결제 도메인 expert carry C-domain-PoC11-1)",
+        "★ ★ characterization mode invariant — BR-BILLING-BASEYEAR-005 시작년도 2015 = ★ as-is 보존",
+        "★ ★ characterization mode invariant — BR-BILLING-ENTITY-006 COM_NO==2 hardcoded filter = ★ as-is 보존 (★ TDD intent 정면 위배 정합 / 결제 도메인 expert carry C-domain-PoC11-1)",
         "year select option order = ASC (시간순)",
         "★ ★ 새 시스템 마이그레이션 시 = ★ invariants 정정 의무 (C-stack-결단-chain-3-4-plan)"
       ],
@@ -79,13 +79,13 @@
         "★ session 인증 완료"
       ],
       "postconditions": [
-        "★ 12 row 응답 (★ BR-BILLING-001 / 데이터 0 row 시도 12 강제 / recursive CTE 결과)",
+        "★ 12 row 응답 (★ BR-BILLING-PERIOD-001 / 데이터 0 row 시도 12 강제 / recursive CTE 결과)",
         "★ JSON array 형식: [{YEAR, MONTH, COM_NO, COMPANYSEQ, PROC_ID, USER_NM, PROC_DT, ROW_NUM, ROW_COUNT}, ...]",
         "★ ERP 결과 부재 월 (★ TB_SGMA_CONFIRM_HIS 없음) = PROC_ID/USER_NM/PROC_DT null (★ LEFT OUTER JOIN)",
         "★ ROW_NUM 1~12 + ROW_COUNT 12 (★ window function 결과)"
       ],
       "invariants": [
-        "★ ★ characterization mode invariant — recursive CTE 12개월 강제 = ★ as-is (★ BR-BILLING-001 / AP-BILLING-007 / T-SQL recursive CTE 종속)",
+        "★ ★ characterization mode invariant — recursive CTE 12개월 강제 = ★ as-is (★ BR-BILLING-PERIOD-001 / AP-BILLING-007 / T-SQL recursive CTE 종속)",
         "★ ★ characterization mode invariant — cross-DB FQCN FIM.dbo.TB_USER hardcoded = ★ as-is 보존 (★ AP-BILLING-006 / 새 시스템 = dataSource 분리 의무 invariant)",
         "★ ★ characterization mode invariant — dbo.FN_GET_MONTH UDF + SCOPE_IDENTITY = ★ as-is (★ AP-BILLING-005 / 새 시스템 = JVM logic + RETURNING 의무 invariant)",
         "12 row 출력 순서 = 1월~12월 ASC"
@@ -112,19 +112,19 @@
         "distYear + distMonth + companySeq 파라미터 존재",
         "session EKP_USER_ID 존재",
         "★ ★ ★ SGERPMA.dbo.TB_RG_RESULTS cross-DB 접근 가능 (★ AP-BILLING-006 invariant)",
-        "★ SCOPE_IDENTITY 사용 가능 (★ AP-BILLING-005 / BR-BILLING-007)"
+        "★ SCOPE_IDENTITY 사용 가능 (★ AP-BILLING-005 / BR-BILLING-HISTPK-007)"
       ],
       "postconditions": [
         "count > 0 시 4 SQL 순차 실행 (delete + insert + insertHistory + insertHistoryData)",
-        "★ TB_SGMA_CONFIRM = full overwrite (★ BR-BILLING-003 / delete + insert)",
-        "★ TB_SGMA_CONFIRM_HIS = audit history row 추가 (★ SCOPE_IDENTITY hisNo FK 자동 채움 / BR-BILLING-007)",
+        "★ TB_SGMA_CONFIRM = full overwrite (★ BR-BILLING-OVERWRITE-003 / delete + insert)",
+        "★ TB_SGMA_CONFIRM_HIS = audit history row 추가 (★ SCOPE_IDENTITY hisNo FK 자동 채움 / BR-BILLING-HISTPK-007)",
         "★ TB_SGMA_CONFIRM_HIS_DATA = audit history detail row 추가 (★ hisNo FK 관계)",
         "★ ★ ★ characterization mode = ★ 4 SQL 비트랜잭션 = 중간 fail 시 부분 commit 가능 (★ AP-BILLING-001 critical bug 보존)",
         "★ count == 0 시 = skip + 다음 BHV-BILLING-004 (ERP 부재 skip + JSP alert)"
       ],
       "invariants": [
-        "★ ★ ★ ★ characterization mode invariant (★ ★ critical) — @Transactional ❌ saveDataConfirm = ★ Legacy bug as-is 보존 / 새 시스템 invariant = ★ ★ ★ @Transactional(rollbackFor=Exception.class) + try-catch 의무 (★ AP-BILLING-001 / BR-BILLING-002 likely_bug / migration_priority P0)",
-        "★ ★ characterization mode invariant — full overwrite (delete + insert) 패턴 = ★ as-is (★ BR-BILLING-003 / 새 시스템 = UPSERT 또는 partial update 대안 검토 carry)",
+        "★ ★ ★ ★ characterization mode invariant (★ ★ critical) — @Transactional ❌ saveDataConfirm = ★ Legacy bug as-is 보존 / 새 시스템 invariant = ★ ★ ★ @Transactional(rollbackFor=Exception.class) + try-catch 의무 (★ AP-BILLING-001 / BR-BILLING-CONFIRM-002 likely_bug / migration_priority P0)",
+        "★ ★ characterization mode invariant — full overwrite (delete + insert) 패턴 = ★ as-is (★ BR-BILLING-OVERWRITE-003 / 새 시스템 = UPSERT 또는 partial update 대안 검토 carry)",
         "★ ★ characterization mode invariant — cross-DB FQCN SGERPMA hardcoded = ★ as-is (★ AP-BILLING-006 / 새 시스템 = dataSource 분리 의무 invariant)",
         "★ characterization mode invariant — DRY violation (4 SQL WHERE 절 동일 COMPANYSEQ + DIST_YEAR + DIST_MONTH) = ★ as-is (★ patterns_extension_v2 / 새 시스템 = <sql id> + <include refid> 의무 invariant)"
       ],
@@ -156,10 +156,10 @@
       "postconditions": [
         "4 SQL (delete + insert + insertHistory + insertHistoryData) 호출 ❌ (skip)",
         "TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA 변경 ❌ (no-op)",
-        "★ JSP alert 메시지 응답 (★ '해당 월 ERP 결과가 없습니다' 류 / BR-BILLING-004)"
+        "★ JSP alert 메시지 응답 (★ '해당 월 ERP 결과가 없습니다' 류 / BR-BILLING-ERPDATA-004)"
       ],
       "invariants": [
-        "★ characterization mode invariant — pre-check skip 정책 = ★ as-is (★ BR-BILLING-004)",
+        "★ characterization mode invariant — pre-check skip 정책 = ★ as-is (★ BR-BILLING-ERPDATA-004)",
         "★ characterization mode invariant — cross-DB SGERPMA pre-check 의존 = ★ as-is (★ AP-BILLING-006 정합)",
         "no-op idempotency = 동일 파라미터 N회 호출 시 동일 결과 (DB 변경 ❌)"
       ],
@@ -191,7 +191,7 @@
       ],
       "invariants": [
         "★ characterization mode invariant — Qlik Sense URL datacafe.smilegate.net hardcoded = ★ as-is 보존 (★ AP-BILLING-013 / 새 시스템 = 환경 변수 (예: ${qlik.base.url}) 의무 invariant)",
-        "★ characterization mode invariant — appid + sheet 메뉴별 분기 (BR-BILLING-008) = ★ as-is",
+        "★ characterization mode invariant — appid + sheet 메뉴별 분기 (BR-BILLING-EXTBI-008) = ★ as-is",
         "iframe = X-Frame-Options 정합 (★ Qlik Sense 측 SAMEORIGIN/ALLOW-FROM 설정 의존)"
       ],
       "property_tests": [],

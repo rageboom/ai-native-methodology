@@ -25,16 +25,16 @@
         "TB_SGMA_CONFIRM_HIS_DATA_after": "[+1500 row / hisNo=42 FK]",
         "model_attrs": { "insertCount": 1500 },
         "json_response": "{ insertCount: 1500 } → JSP doSave alert '처리되었습니다.'",
-        "_BR_link": "BR-BILLING-002 (4 SQL 비트랜잭션) + BR-BILLING-003 (full overwrite) + BR-BILLING-004 (ERP 부재 시 skip) + BR-BILLING-007 (SCOPE_IDENTITY)"
+        "_BR_link": "BR-BILLING-CONFIRM-002 (4 SQL 비트랜잭션) + BR-BILLING-OVERWRITE-003 (full overwrite) + BR-BILLING-ERPDATA-004 (ERP 부재 시 skip) + BR-BILLING-HISTPK-007 (SCOPE_IDENTITY)"
       },
       "intent_classification": [
-        { "rule": "BR-BILLING-003", "type": "intent", "note": "full overwrite 의도 (delete + insert 명백)" },
-        { "rule": "BR-BILLING-004", "type": "intent", "note": "ERP 부재 시 skip 의도 (selectConfirmDataCount pre-check)" },
-        { "rule": "BR-BILLING-007", "type": "intent", "note": "SCOPE_IDENTITY PK 자동 채움" },
-        { "rule": "BR-BILLING-002", "type": "bug", "note": "★ ★ ★ critical — 4 SQL 비트랜잭션 (★ @Transactional ❌)" }
+        { "rule": "BR-BILLING-OVERWRITE-003", "type": "intent", "note": "full overwrite 의도 (delete + insert 명백)" },
+        { "rule": "BR-BILLING-ERPDATA-004", "type": "intent", "note": "ERP 부재 시 skip 의도 (selectConfirmDataCount pre-check)" },
+        { "rule": "BR-BILLING-HISTPK-007", "type": "intent", "note": "SCOPE_IDENTITY PK 자동 채움" },
+        { "rule": "BR-BILLING-CONFIRM-002", "type": "bug", "note": "★ ★ ★ critical — 4 SQL 비트랜잭션 (★ @Transactional ❌)" }
       ],
       "behavior_to_preserve": [
-        "selectConfirmDataCount 0 시 → 후속 SQL 4건 skip (intent / BR-BILLING-004)",
+        "selectConfirmDataCount 0 시 → 후속 SQL 4건 skip (intent / BR-BILLING-ERPDATA-004)",
         "insertConfirmHistory + insertConfirmHistoryData = audit 이력 (intent)",
         "delete-then-insert full overwrite 패턴 (intent / 단, atomic 의무 추가)"
       ],
@@ -78,22 +78,22 @@
         "tables_state": "★ no change (모든 TB_SGMA_CONFIRM* 변경 없음)",
         "model_attrs": { "insertCount": 0 },
         "json_response": "{ insertCount: 0 } → JSP doSave alert '관리회계 집계 데이터가 존재하지 않습니다.'",
-        "_BR_link": "BR-BILLING-004"
+        "_BR_link": "BR-BILLING-ERPDATA-004"
       },
       "intent_classification": [
-        { "rule": "BR-BILLING-004", "type": "intent" }
+        { "rule": "BR-BILLING-ERPDATA-004", "type": "intent" }
       ],
       "behavior_to_preserve": ["count 0 시 skip + 사용자 안내 alert (intent)"]
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-BILLING-002 (full overwrite)", "BR-BILLING-004 (ERP 부재 skip)", "BR-BILLING-007 (SCOPE_IDENTITY)"],
+    "intent": ["BR-BILLING-CONFIRM-002 (full overwrite)", "BR-BILLING-ERPDATA-004 (ERP 부재 skip)", "BR-BILLING-HISTPK-007 (SCOPE_IDENTITY)"],
     "bug": ["★ ★ ★ AP-BILLING-001 critical (@Transactional ❌)", "AP-BILLING-006 (cross-DB)", "AP-BILLING-005 (vendor 종속)", "AP-BILLING-004 (param mix)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-BILLING-003"],
-    "brs_covered": ["BR-BILLING-002", "BR-BILLING-003", "BR-BILLING-004", "BR-BILLING-007"],
+    "brs_covered": ["BR-BILLING-CONFIRM-002", "BR-BILLING-OVERWRITE-003", "BR-BILLING-ERPDATA-004", "BR-BILLING-HISTPK-007"],
     "aps_intersected": ["AP-BILLING-001", "AP-BILLING-004", "AP-BILLING-005", "AP-BILLING-006"]
   }
 }

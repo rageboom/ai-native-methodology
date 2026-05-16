@@ -21,10 +21,10 @@
         "model_attrs": { "menuNm": "결제대시보드", "appid": "qlik-app-001", "sheet": "sheet-billing-summary" },
         "jsp_render": "★ qlikView.jsp = $('#qlik_frame').attr('src', 'https://datacafe.smilegate.net/sense/app/${appid}/sheet/${sheet}/state/analysis') / iframe 임베드",
         "iframe_src": "https://datacafe.smilegate.net/sense/app/qlik-app-001/sheet/sheet-billing-summary/state/analysis",
-        "_BR_link": "BR-BILLING-008 (외부 BI Qlik Sense 임베드)"
+        "_BR_link": "BR-BILLING-EXTBI-008 (외부 BI Qlik Sense 임베드)"
       },
       "intent_classification": [
-        { "rule": "BR-BILLING-008", "type": "intent", "note": "외부 BI 임베드 의도 (★ 단, URL hardcoded 환경 변수 ❌)" }
+        { "rule": "BR-BILLING-EXTBI-008", "type": "intent", "note": "외부 BI 임베드 의도 (★ 단, URL hardcoded 환경 변수 ❌)" }
       ],
       "behavior_to_preserve": [
         "외부 BI dashboard 임베드 (intent)",
@@ -36,13 +36,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-BILLING-008 (외부 BI 임베드 + 메뉴별 분기)"],
+    "intent": ["BR-BILLING-EXTBI-008 (외부 BI 임베드 + 메뉴별 분기)"],
     "bug": ["AP-BILLING-013 (URL hardcoded)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-BILLING-004"],
-    "brs_covered": ["BR-BILLING-008"],
+    "brs_covered": ["BR-BILLING-EXTBI-008"],
     "aps_intersected": ["AP-BILLING-013"]
   }
 }

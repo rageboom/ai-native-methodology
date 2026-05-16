@@ -1,7 +1,7 @@
 # PoC #11 EFI-WEB billing — Behavior Spec (chain 2 / 4 UC 종결)
 
 > ★ ★ ★ ★ chain 2 stage 종결 (4 UC 모두 / 5 BHV + 12 AC).
-> ★ ★ ★ **characterization mode** (사용자 결단 Q3 = (b) / 현 behavior 보존 / bug fix ❌) — BR-BILLING-002/005/006 as-is 보존 / Michael Feathers 2004 정합 / ★ ★ TDD intent 정면 위배 정합 명시.
+> ★ ★ ★ **characterization mode** (사용자 결단 Q3 = (b) / 현 behavior 보존 / bug fix ❌) — BR-BILLING-CONFIRM-002/005/006 as-is 보존 / Michael Feathers 2004 정합 / ★ ★ TDD intent 정면 위배 정합 명시.
 
 ---
 
@@ -46,8 +46,8 @@
 
 ### BHV-BILLING-001 — UC #1 화면 진입
 
-- ★ characterization mode invariant: BR-BILLING-005 시작년도 2015 hardcoded as-is
-- ★ characterization mode invariant: BR-BILLING-006 COM_NO==2 hardcoded filter as-is (★ ambiguous → expert carry C-domain-PoC11-1)
+- ★ characterization mode invariant: BR-BILLING-BASEYEAR-005 시작년도 2015 hardcoded as-is
+- ★ characterization mode invariant: BR-BILLING-ENTITY-006 COM_NO==2 hardcoded filter as-is (★ ambiguous → expert carry C-domain-PoC11-1)
 - AC: AC-BILLING-001 (must) + AC-BILLING-002 (must) + AC-BILLING-003 (should)
 
 ### BHV-BILLING-002 — UC #2 12 row 조회
@@ -59,15 +59,15 @@
 
 ### ★ ★ ★ BHV-BILLING-003 — UC #3 atomicity (★ ★ ★ critical)
 
-- ★ ★ ★ ★ characterization mode invariant: **@Transactional ❌ saveDataConfirm 4 SQL 비트랜잭션** = ★ Legacy bug as-is 보존 / 새 시스템 invariant = ★ ★ ★ **@Transactional(rollbackFor=Exception.class) + try-catch 의무** (AP-BILLING-001 / BR-BILLING-002 likely_bug / migration_priority P0)
-- ★ ★ characterization mode invariant: full overwrite (delete + insert) 패턴 as-is (BR-BILLING-003)
+- ★ ★ ★ ★ characterization mode invariant: **@Transactional ❌ saveDataConfirm 4 SQL 비트랜잭션** = ★ Legacy bug as-is 보존 / 새 시스템 invariant = ★ ★ ★ **@Transactional(rollbackFor=Exception.class) + try-catch 의무** (AP-BILLING-001 / BR-BILLING-CONFIRM-002 likely_bug / migration_priority P0)
+- ★ ★ characterization mode invariant: full overwrite (delete + insert) 패턴 as-is (BR-BILLING-OVERWRITE-003)
 - ★ ★ characterization mode invariant: cross-DB SGERPMA hardcoded as-is (AP-BILLING-006)
 - ★ DRY violation invariant: 4 SQL WHERE 절 동일 as-is (patterns_extension_v2)
 - AC: AC-BILLING-007 (must) + **AC-BILLING-008 (★ ★ critical must / 부분 commit assertion / TDD intent 정면 위배)** + AC-BILLING-009 (must) + AC-BILLING-010 (must)
 
 ### BHV-BILLING-004 — UC #3 ERP 부재 skip
 
-- ★ characterization mode invariant: pre-check skip 정책 as-is (BR-BILLING-004)
+- ★ characterization mode invariant: pre-check skip 정책 as-is (BR-BILLING-ERPDATA-004)
 - ★ characterization mode invariant: cross-DB SGERPMA pre-check 의존 as-is (AP-BILLING-006)
 - no-op idempotency
 - AC: AC-BILLING-011 (must)
@@ -75,14 +75,14 @@
 ### BHV-BILLING-005 — UC #4 Qlik iframe
 
 - ★ characterization mode invariant: Qlik Sense URL `datacafe.smilegate.net` hardcoded as-is (AP-BILLING-013) / 새 시스템 invariant = 환경 변수 `${qlik.base.url}` 의무
-- ★ characterization mode invariant: appid + sheet 메뉴별 분기 as-is (BR-BILLING-008)
+- ★ characterization mode invariant: appid + sheet 메뉴별 분기 as-is (BR-BILLING-EXTBI-008)
 - AC: AC-BILLING-012 (should)
 
 ---
 
 ## ★ ★ ★ schema pattern mismatch carry (★ critical / 본 chain 2 발견)
 
-> behavior-spec.json `br_refs` 빈 array (★ ★ schema strict pass 의무 / `additionalProperties: false`) / 사유 = rules.json BR ID 형식 (`"BR-BILLING-005"` / 3 segment) vs behavior-spec.schema.json `br_refs` pattern (`"^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$"` / 4 segment) 불일치 / ★ ★ ★ ★ **C-schema-br-pattern-fix carry 신설** (★ schema fix 별도 sprint / 본 PoC + PoC #06+#07 rules.json 모두 동일 패턴 / ★ schema 자체 정정 또는 rules.json 형식 정합 결단 의무). BR 매핑 fact = ★ description + invariants + source_grounded_evidence 안 자연 보존.
+> behavior-spec.json `br_refs` 빈 array (★ ★ schema strict pass 의무 / `additionalProperties: false`) / 사유 = rules.json BR ID 형식 (`"BR-BILLING-BASEYEAR-005"` / 3 segment) vs behavior-spec.schema.json `br_refs` pattern (`"^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$"` / 4 segment) 불일치 / ★ ★ ★ ★ **C-schema-br-pattern-fix carry 신설** (★ schema fix 별도 sprint / 본 PoC + PoC #06+#07 rules.json 모두 동일 패턴 / ★ schema 자체 정정 또는 rules.json 형식 정합 결단 의무). BR 매핑 fact = ★ description + invariants + source_grounded_evidence 안 자연 보존.
 
 ---
 

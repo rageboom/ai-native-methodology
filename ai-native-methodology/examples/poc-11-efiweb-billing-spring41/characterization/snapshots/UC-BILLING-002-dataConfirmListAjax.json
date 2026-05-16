@@ -23,10 +23,10 @@
         "result_columns": ["YEAR", "MONTH", "COM_NO", "COMPANYSEQ", "PROC_ID", "USER_NM", "PROC_DT", "ROW_NUM", "ROW_COUNT"],
         "result_pattern": "★ ★ 1~6월 = 확정 이력 row 출력 / 7~12월 = LEFT OUTER JOIN NULL row (★ procDt + userNm = null)",
         "json_response": "{ list: [12 row], status: success }",
-        "_BR_link": "BR-BILLING-001 (12개월 강제 생성 recursive CTE)"
+        "_BR_link": "BR-BILLING-PERIOD-001 (12개월 강제 생성 recursive CTE)"
       },
       "intent_classification": [
-        { "rule": "BR-BILLING-001", "type": "intent", "note": "월별 row 누락 ❌ 의도 (recursive CTE 명백)" }
+        { "rule": "BR-BILLING-PERIOD-001", "type": "intent", "note": "월별 row 누락 ❌ 의도 (recursive CTE 명백)" }
       ],
       "behavior_to_preserve": [
         "12개월 row 강제 생성 (월별 데이터 부재 시도 null row 표시)",
@@ -41,13 +41,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-BILLING-001 (12개월 강제 생성)"],
+    "intent": ["BR-BILLING-PERIOD-001 (12개월 강제 생성)"],
     "bug": ["AP-BILLING-005 (vendor 종속)", "AP-BILLING-006 (cross-DB)", "AP-BILLING-007 (T-SQL recursive)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-BILLING-002"],
-    "brs_covered": ["BR-BILLING-001"],
+    "brs_covered": ["BR-BILLING-PERIOD-001"],
     "aps_intersected": ["AP-BILLING-005", "AP-BILLING-006", "AP-BILLING-007"]
   }
 }

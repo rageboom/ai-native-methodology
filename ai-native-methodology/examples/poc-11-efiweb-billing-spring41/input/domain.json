@@ -53,7 +53,7 @@
         "BillingDAO.insertConfirmHistoryData"
       ],
       "sub_domain": "A. DataConfirm",
-      "scope_decision": "covered (★ ★ critical / 4 SQL 비트랜잭션 BR-BILLING-002)",
+      "scope_decision": "covered (★ ★ critical / 4 SQL 비트랜잭션 BR-BILLING-CONFIRM-002)",
       "preconditions": ["distYear + distMonth + companySeq 파라미터", "ERP 결과 데이터 (SGERPMA.dbo.TB_RG_RESULTS) 존재"],
       "postconditions": [
         "insertCount > 0 시 = delete (TB_SGMA_CONFIRM) + insert (TB_SGMA_CONFIRM from TB_RG_RESULTS) + insertHistory (TB_SGMA_CONFIRM_HIS / SCOPE_IDENTITY hisNo) + insertHistoryData (TB_SGMA_CONFIRM_HIS_DATA from TB_RG_RESULTS)",

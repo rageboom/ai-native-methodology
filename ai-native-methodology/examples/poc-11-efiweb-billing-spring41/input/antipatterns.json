@@ -133,7 +133,7 @@
       "applies_to": ["dataConfirm.jsp:169"],
       "modern_alternative": "★ Controller 단 filtering / 또는 권한 + 도메인 정책 service / view = 단순 표시",
       "is_likely_bug": true,
-      "isomorphic_to_poc06_07": "★ 신규 — ★ ★ ★ 결제 도메인 expert 의 의도 확인 의무 (BR-BILLING-006 domain_carry)"
+      "isomorphic_to_poc06_07": "★ 신규 — ★ ★ ★ 결제 도메인 expert 의 의도 확인 의무 (BR-BILLING-ENTITY-006 domain_carry)"
     },
     {
       "id": "AP-BILLING-012",
