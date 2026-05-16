@@ -10,10 +10,9 @@
 
 ## 진행중 결정
 
-| ID | 일자 | 카테고리 | 상태 | 요약 |
-|---|---|---|---|---|
-| [★★★ DEC-2026-04-30-v1.2.3-본체-격상](DEC-2026-04-30-v1.2.3-본체-격상.md) | 2026-04-30 | methodology | 승인 (★★★ v1.2.3 PATCH — 본체 4 묶음) | ★★ 사용자 방향 재정렬 — PoC 산출물 ❌ / 본체 격상 ✅. 묶음 C (Phase 4.5 cross-link schema 의무화) + I (AP-PERFORMANCE 3 PoC 격상 정책) + H (Positive finding 패턴 schema + learning_effect_type 4종) + K (Lifecycle BR null 허용 + br_type enum + current_state_note). 본체 갭 closure 7 → 11. v1.3.0 release 진입 직전 상태. |
-| [DEC-2026-04-29-phase-4-5-형식화-후보](DEC-2026-04-29-phase-4-5-형식화-후보.md) | 2026-04-29 | methodology | 진행중 (옵션 C 시범) | rules.json L0 자연어 한계. L1~L2 형식화 도입. ADR-008 후보. |
+(없음 — 2026-05-16 갱신. 직전 "진행중" 표기 2건 모두 후속 release 안 흡수 완료 / 아래 ↓ 승인 결정으로 이전):
+- DEC-2026-04-30-v1.2.3-본체-격상 → v1.3.0 release 안 본격 흡수 완료 (2026-05-01)
+- DEC-2026-04-29-phase-4-5-형식화-후보 (옵션 C 시범) → ADR-008 dual rendering + ADR-009 5-stage confidence 본격 정식 채택 (v1.4.x)
 
 ---
 

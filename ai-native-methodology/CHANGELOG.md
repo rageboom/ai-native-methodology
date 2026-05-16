@@ -9,6 +9,67 @@
 
 ---
 
+## [3.6.3] — 2026-05-16 ★ PATCH — session 20차 점검 / P0 회귀 2건 복구 + drift 갱신 묶음
+
+> ★ ★ ★ **사용자 명시 "점검해 보자"** 진입 → 4 영역 점검 (본체 자가 정합 + CLAUDE.md drift + STATUS/INDEX 비대화 + 잔여 carry/다음 의제) → critical 회귀 2건 발견 + 즉시 복구. paradigm 변경 ❌ / additive change + 회귀 복구만 = PATCH 정합.
+
+### 🔴 회귀 복구 (P0)
+
+**1. `release-readiness analysis_validator_violation` ❌**
+
+- 원인: PoC #01 `/meta` (4 errors) + PoC #05 `/meta` (6 errors) 안 v3.x 진화 중 추가된 필드 10종이 `meta-confidence.schema.json` 안 `additionalProperties: false` 위반
+- 추가된 필드 10종:
+  - PoC #01 (v1.1.2 시점 자산): `source_branch` / `extraction_env` / `raw_confidence` / `expected_confidence_average`
+  - PoC #05 (v2.5.0 phase B/D 자산): `extraction_env` / `sample_mode` / `corroboration_eligible` / `sample_mode_rationale` / `phase_b_migration_note` / `phase_d_meta_recovery_note`
+- 복구: `schemas/meta-confidence.schema.json` 안 10 properties 정식 등록 (모두 optional / paradigm 진화 자산 보존)
+- 결과: ✅ **9/9 release-ready** 회복
+
+**2. `tools/chain-driver/test/scope-dir.test.js` Windows path 회귀 ❌**
+
+- 원인: assertion 안 Unix path (`'/root/.aimd/user-registration'`) 하드코딩 → Windows `path.join` 결과 (`\root\.aimd\user-registration`) 불일치 → 2 test ERR_ASSERTION
+- 복구: `assert.equal(p, join('/root', '.aimd', 'user-registration'))` platform-aware fix (이미 import 된 `node:path` join 활용)
+- 결과: ✅ **chain-driver 114/114** 회복 / workspace 전체 **359/359 ✅**
+
+### 🟠 drift 갱신 (P1)
+
+**`CLAUDE.md` 본격 갱신** — v2.6.0 시점 머무름 (6 release drift) → v3.6.2 paradigm 진화 안정점 본격 반영:
+- 버전 표기 v2.6.0 → v3.6.2 + 직전 6 release 요약 (v3.6.1 cross-link / v3.6.0 G1 scope-out / v3.5.0 G5 / v3.4.0 G4 / v3.3.0 G2 / v3.2 G3)
+- schemas 13종 → **39종** / tools 12종 → **16종** / PoC 4 → **14** / skills **47종** 명시
+- 신설 자산 반영: plugin-charter SSOT + lifecycle 자산 매핑 매트릭스 + FE skill 4종 + analysis-input-orchestrate 5종 + scope/stage 폴더
+- sub-plan-6 "현재" → 역사 기록 격하 + paradigm 진화 안정점 표기
+
+### 🟡 INDEX.md 갱신 (P2)
+
+- "진행중 결정" 2건 모두 후속 release 안 흡수 완료 사실 명시 → "(없음)" 표기 + 사유 (v1.3.0 / ADR-008+ADR-009 정식 채택)
+
+### 🟢 STATUS.md 헤더 갱신 (P3)
+
+- 기준일 2026-05-15 → **2026-05-16** + session 20차 entry 추가 (점검 + 복구 사실 자산화)
+- 본격 archive (session 8차~14차 분리) = **사용자 결단 영역** / 본 release 안 시행 ❌
+
+### 자산 갱신 (5 file)
+
+- `schemas/meta-confidence.schema.json` — v3.x 진화 필드 10종 정식 등록 (additive / breaking ❌)
+- `tools/chain-driver/test/scope-dir.test.js` — Windows path platform-aware fix
+- `CLAUDE.md` (repo root) — v3.6.2 사실 동기화 + 신설 자산 반영
+- `decisions/INDEX.md` — 진행중 결정 2건 흡수 사실 명시
+- `decisions/STATUS.md` — session 20차 entry 추가
+- `.claude-plugin/plugin.json` 3.6.2 → 3.6.3
+
+### Lessons Learned
+
+- **LL-session-20-01**: paradigm 진화 안정점 도달 후 = "점검 cadence" 진입 자격. **장기 drift 누적 회피 의무** — release 안 가려진 회귀 (PoC #01 + #05 schema invalid 가 9/9 → 8/9 회귀 / Windows path 가 OS-specific bug) 가 본 cadence 안 발견됨.
+- **LL-session-20-02**: CLAUDE.md = 다음 conversation 컨텍스트 / 본 자산 drift 시 **다음 session 의 plan + research 부정확** risk. 매 MINOR release 시 CLAUDE.md 갱신 의무 cadence 정착 (향후 release-readiness criterion 신설 후보 / 본 release 안 시행 ❌ / 사용자 결단 영역).
+- **LL-session-20-03**: schema additionalProperties=false + paradigm 진화 자산 (sample_mode 등) 추가 시 **schema 동시 갱신 의무**. v2.5.0 phase B+D 시 누락된 갱신이 v3.x 본격 진화 후에야 release-readiness 회귀로 드러남.
+
+### 정합 관계
+
+- DEC-2026-05-15-carry-cleanup-paradigm-종결 (v3.6.2 paradigm 진화 안정점 / 본 PATCH = 안정점 후 점검 cadence 첫 시행)
+- v2.5.0 phase B + phase D session 11/15차 (PoC #05 meta 회복 자산 / 본 PATCH = schema 안 정식 등록)
+- v3.2 G3 종결 (chain-driver scope-dir 신설 / 본 PATCH = Windows path platform-aware 보완)
+
+---
+
 ## [3.6.2] — 2026-05-15 ★ PATCH — 잔여 carry 묶음 정리 / paradigm 진화 완료점
 
 > ★ ★ ★ **사용자 명시 결단 "carry 다 제거"** — charter §3 활성 Gap 모두 청산 + G1 영구 scope-out 후 잔여 carry 7종 모두 정리. plugin must-have 자산 + paradigm 진화 **안정점 도달 명시**.

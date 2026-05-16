@@ -192,6 +192,45 @@
       "items": {
         "type": "string"
       }
+    },
+    "source_branch": {
+      "type": "string",
+      "description": "★ v3.x — 분석 대상 git branch (source_commit_sha 보완)."
+    },
+    "extraction_env": {
+      "type": "string",
+      "description": "★ v3.x — 추출 환경 식별자 (예: 'git_clone' / 'sample_mode' / 'ci_pipeline')."
+    },
+    "raw_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "★ v3.x — cap 적용 전 raw 신뢰도 (cap_applied=true 시 confidence 와 다름)."
+    },
+    "expected_confidence_average": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 0.98,
+      "description": "★ v3.x — confidence_breakdown 영역들의 element_count 가중 평균 기대값."
+    },
+    "sample_mode": {
+      "type": "boolean",
+      "description": "★ v2.5.0 phase B — sample 모드 여부 (★ true 시 statistical power ≈ 0 / corroboration 산입 제외)."
+    },
+    "corroboration_eligible": {
+      "type": "boolean",
+      "description": "★ v2.5.0 phase B — ≥ 2 PoC corroboration count 산입 자격 (★ sample_mode=true 시 false)."
+    },
+    "sample_mode_rationale": {
+      "type": "string",
+      "description": "★ v2.5.0 phase B — sample_mode=true 시 근거 명시 (★ Senior STOP-4 흡수 정합)."
+    },
+    "phase_b_migration_note": {
+      "type": "string",
+      "description": "★ v2.5.0 phase B — description → natural_language 마이그레이션 메모."
+    },
+    "phase_d_meta_recovery_note": {
+      "type": "string",
+      "description": "★ v2.5.0 phase D — schema-validator 필수 필드 회복 메모 (release-readiness 회귀 회복)."
     }
   }
 }

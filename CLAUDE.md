@@ -10,7 +10,7 @@
 **품질 1순위 + 재작업 최소화 2순위**. 속도/quick win/컨텍스트 신선도 후순위.
 격상/처분/순서 결정 시 §8.1 단일 PoC 과적합 회피 강제 적용. (memory `feedback_quality_priority.md`)
 
-## ★★★ 본 방법론 가치 명세 (★ v2.0 / 2026-05-06 갱신)
+## ★★★ 본 방법론 가치 명세 (★ v3.6.2 / 2026-05-15 갱신 / paradigm 진화 안정점)
 
 ```
 INPUT (1차 = legacy single-case):  legacy 코드베이스
@@ -27,10 +27,11 @@ USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 
 **SDLC 4단계 chain harness** ¹ (DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-5-종결 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005). round-trip = ★ ★ chain harness gate 안에서 정식 허용. harness 외부 자동 코드 생성 ❌.
 
-> ¹ ★ ★ ★ ★ ★ **호칭 전환** (DEC-2026-05-06-sub-plan-6-종결 / 2026-05-06 / v2.0.0-rc1):
-> - sub-plan-1~4 = `chain harness scaffolding` (부품) — 역사 기록 보존.
-> - sub-plan-5 = `chain harness` (5 요소 코드 enforcement / 198 test).
-> - **★ ★ ★ ★ ★ sub-plan-6 (현재) / v2.0.0-rc1** = `chain harness validated` — §8.1 strict 7/7 ✅ + ≥ 2 PoC corroboration ✅ (PoC #05 e2e + PoC #03 retrofit) / 210 test pass.
+> ¹ ★ ★ ★ ★ ★ **호칭 전환 + paradigm 진화 사실** (역사 기록 보존):
+> - sub-plan-1~4 = `chain harness scaffolding` (부품 / v2.0).
+> - sub-plan-5 = `chain harness` (5 요소 코드 enforcement / 198 test / v2.0).
+> - sub-plan-6 = `chain harness validated` (§8.1 strict 7/7 + ≥ 2 PoC corroboration / 210 test / v2.0.0-rc1).
+> - **★ ★ ★ ★ ★ 현재 (v3.6.2 / 2026-05-15)** = paradigm 진화 안정점 — charter §3 활성 Gap 모두 청산 (G2~G5 종결 / G1 영구 scope-out) + 잔여 carry 7종 모두 정리 + plugin must-have 자산 대칭 (R1~R15 = 15/15 / R16~R17 = scope-out). workspace test 359/359 ✅ + release-readiness 9/9 ✅.
 > - ★ no-simulation 정책 enforcement 완성 — trio (state.blocked + cli exit 2 + PreToolUse deny) + D21' (suppressOutput=true) + release-readiness content-aware (file presence ❌) 로 양심 의존 차단.
 
 ★ ★ ★ **70~80% 한계 = 명시 잔존** (★ **chain harness 전체 자동화 axis** / process 통과율 metric). AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌.
@@ -88,21 +89,18 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 핵심 디렉토리
 
-- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow 11 + deliverables 1~15 + glossary-ko + finding-system + id-conventions + lifecycle-contract + ★ skills-axis — phase ID 와 skills 디렉토리 axis 분리 정책 / v1.4.4 신설)
-- `ai-native-methodology/flows/analysis.phase-flow.json` — ★ ★ ★ phase 순서 + 의존 그래프 + skills 매핑의 단일 SSOT (★ v1.4.4 정식 승격 / drift-validator 3-way 검증 강제 / `methodology-spec/skills-axis.md` 정합)
-- `ai-native-methodology/docs/adr/` — ADR-001~010 (BE) + ADR-FE-001~007 (FE) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
-- `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태)
-- `ai-native-methodology/schemas/` — JSON Schema (13종 — BE 5 + FE 8)
-- `ai-native-methodology/templates/` — 산출물 템플릿 (★ analysis/ + design/test/implement/planning placeholder + ★ adoption/ — 사내 적용 진입점 customization)
-- `ai-native-methodology/tools/` — Node CLI 도구 12종 (drift-validator / decision-table-validator / formal-spec-link-validator / spectral-runner / static-runner / schema-validator / planning-extraction-validator / chain-coverage-validator / spec-test-link-validator / traceability-matrix-builder / test-impl-pass-validator / ★ ★ ★ chain-driver — sub-plan-5 / harness 5 요소 enforcement) — ★ 자체 package.json 독립 + npm workspace
-- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json + marketplace.json) / Claude Code plugin 시스템 진입점
-- `ai-native-methodology/agents/` + `skills/` + `hooks/` + `flows/` — plugin 자산 (★ install 후 자연어 prompt 매칭 / lifecycle stage organize)
-- `ai-native-methodology/scripts/` — build-plugin.js + version-check.js (★ v1.4.3 도입 / build artifact `dist/ai-native-methodology-v<version>/` 추출 / cleanup round 2-E `internal-` prefix 제거 → plugin user 환경 path 정합)
-- `ai-native-methodology/examples/poc-01-realworld-spring/` — PoC #01 (Java/Spring Boot 2.5) ✅ 종료
-- `ai-native-methodology/examples/poc-02-realworld-springboot3/` — PoC #02 (Java/Spring Boot 3.3 Hexagonal) ✅ 종료
-- `ai-native-methodology/examples/poc-03-realworld-nestjs/` — PoC #03 (TypeScript/NestJS) ✅ 종료 (★ platform-agnostic 입증)
-- `ai-native-methodology/examples/poc-04-full-realworld-react/` — PoC #04 (TypeScript/React FSD / yurisldk fork) ✅ 종료 (★ FE 트랙 + §8.1 strict 검증대 통과)
-- `ai-native-methodology/archive/` — 진화 history (★ v1.0~v1.1.2 metadata + v1.3-adoption + v1.4-evaluation + phase-a-iteration / cleanup round 1 격리)
+- `ai-native-methodology/methodology-spec/` — 방법론 명세 (workflow + deliverables + glossary-ko + finding-system + id-conventions + lifecycle-contract + skills-axis + ★ **plugin-charter.md** (v3.6.0 / R1~R17 SSOT / 활성 Gap 모두 청산) + ★ **lifecycle-contract.md §자산 매핑 매트릭스** (v3.5.0 G5 종결 / stage × asset 5 column 단일 SSOT))
+- `ai-native-methodology/flows/` — `analysis.phase-flow.json` (단일 SSOT / drift-validator 3-way 검증) + `planning/spec/test/implement.phase-flow.json` (chain 1~4) + `sdlc-4stage-flow.json` (revisit_edges 6종)
+- `ai-native-methodology/docs/adr/` — ADR-001~010 (BE) + ADR-FE-001~007 (FE) + ★ **ADR-CHAIN-001~012** (chain harness paradigm) + ADR-BE-001 (negative-space corroboration) ※ ADR-007 부재 — openapi-extension.schema.json 으로 대체
+- `ai-native-methodology/decisions/` — 운영/일정 결정 로그 (역시간순, INDEX.md 단일 진입점) + STATUS.md (휘발성 상태 / session 19차까지 누적)
+- `ai-native-methodology/schemas/` — **JSON Schema 39종** (BE + FE + chain 산출물 + work-unit-manifest + state + error-mapping-spec + sql-inventory 등 / 모두 top-level `additionalProperties:false` strict / cleanup round 9 정합)
+- `ai-native-methodology/templates/` — 산출물 템플릿 (analysis/ + planning/ + spec/ + test/ + implement/ + design/)
+- `ai-native-methodology/tools/` — **Node CLI 도구 16종** (drift-validator + decision-table-validator + formal-spec-link-validator + spectral-runner + static-runner + schema-validator + planning-extraction-validator + chain-coverage-validator + spec-test-link-validator + traceability-matrix-builder + test-impl-pass-validator + ★ chain-driver + characterization-coverage-validator + sql-inventory-extractor + findings-aggregator + ★ br-cross-consistency-validator (v2.5.0 Layer 2 LLM paradigm)) — ★ 단일 npm workspace
+- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json v3.6.2 + marketplace.json) / Claude Code plugin 시스템 진입점
+- `ai-native-methodology/agents/` (3 base persona — senior + industry-case + official-docs) + `skills/` (**47종** / 5 stage organize / v2.6.0 의미 ID + v3.x 진화) + `hooks/` + `flows/` — plugin 자산
+- `ai-native-methodology/scripts/` — build-plugin.js + version-check.js + release-readiness.js (9/9 strict criterion 검증)
+- `ai-native-methodology/examples/` — **PoC 14종** (#01 Spring Boot 2.5 / #02 Spring Boot 3.3 Hexagonal / #03 NestJS / #04 full-React FSD / #04 mini-React / #05 sample-user-register / #06~#07+#11 Spring 4.1 + iBATIS 2 사내 EFI-WEB (R1' axis legacy) / #08~#10 Modern ORM OSS (MyBatis 3 + TypeORM + JPA QueryDSL / R1' axis modern) / #12 RawSQL user-decided / #13 QueryDSL user-decided) ✅ 모두 종료
+- `ai-native-methodology/archive/` — 진화 history (v1.0~v1.4 metadata + adoption + evaluation / cleanup round 1 격리)
 
 ## 정착 패턴 (메서드론 자산화)
 
@@ -115,9 +113,15 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 
 ## 참고
 
-- `ai-native-methodology/README.md` — 방법론 소개 (★ v2.1.0 plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v2.6.0 MINOR** (2026-05-14 / ★ ★ ★ skill 의미 ID 본격 자산화 / 17 skill rename / phase-N 숫자 prefix 본격 폐기 / Senior critique 5 의제 본격 흡수 / chain harness validated §8.1 strict 9/9 본질 보존). 직전 **v2.5.1 PATCH** (Claude Code plugin install 호환성 회복 + agents/skills 1-depth 평탄화) / **v2.5.0 MINOR FINAL** (Layer 2 LLM paradigm + ≥ 2 PoC corroboration). 상세 entry 와 session-level carry 는 CHANGELOG.md 참조.
-- `ai-native-methodology/guides/` — ★ ★ 사용자 journey 자산 (cleanup round 2-C 신설 / getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
-- `ai-native-methodology/archive/v1.3-adoption/v1.3-promotion-report.md` — v1.3 격상 보고 (3 PoC 통합 + 사내 적용 ROI 견적 / cleanup round 1 격리)
-- `ai-native-methodology/archive/phase-a-iteration/phase-a-iteration-guide.md` — Phase A self-iteration 절차 (★ install / SessionStart hook / skill trigger / 마찰점 finding template / cleanup round 1 격리 / v2.0 chain harness paradigm 후 outdated)
-- `ai-native-methodology/archive/v1.3-adoption/lessons-learned-2026-05-02.md` — ★ 14차 결단 1일 retract Lessons Learned (cleanup round 1 격리)
+- `ai-native-methodology/README.md` — 방법론 소개 (plugin install 가이드 + 시나리오 A/B/C)
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v3.6.2 PATCH** (2026-05-15 / ★ ★ ★ 잔여 carry 묶음 정리 / paradigm 진화 안정점 도달). 직전 6 release 요약:
+  - **v3.6.1 PATCH** (cross-link 문서 보강 / agents/README 신설)
+  - **v3.6.0 MINOR** (G1 ITSM 영구 scope-out / charter §3 활성 Gap 모두 청산)
+  - **v3.5.0 MINOR** (G5 종결 / lifecycle 자산 매핑 매트릭스 단일 SSOT)
+  - **v3.4.0 MINOR** (G4 종결 / FE skill 보강 — implement-react + implement-vue + test-playwright + analysis-html-template)
+  - **v3.3.0 MINOR** (G2 종결 / analysis-input-orchestrate + analysis-from-{prompt,swagger,plan-doc,figma})
+  - **v3.2 MINOR** (G3 종결 / scope/stage 폴더 + manifest 이중 렌더링 + SessionStart hook)
+  - 더 이전 (v3.1 / v2.6 / v2.5 / v2.4 / v2.3 / v2.2 / v2.1 / v2.0~v1.x) = CHANGELOG.md 참조.
+- `ai-native-methodology/guides/` — 사용자 journey 자산 (getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
+- `ai-native-methodology/methodology-spec/plugin-charter.md` — ★ ★ ★ **사용자 요구사항 17 단일 SSOT** (R1~R17 / 활성 Gap 모두 청산 / DEC-2026-05-15-plugin-charter-17-requirements-채택)
+- `ai-native-methodology/archive/` — 진화 history (v1.3-adoption + phase-a-iteration + v1.4-evaluation / cleanup round 1 격리)

@@ -57,12 +57,12 @@ describe('validateScopeSlug', () => {
 describe('scopeDirPath', () => {
   it('returns scope root when stage omitted', () => {
     const p = scopeDirPath('/root', 'user-registration');
-    assert.equal(p, '/root/.aimd/user-registration');
+    assert.equal(p, join('/root', '.aimd', 'user-registration'));
   });
 
   it('returns stage subdir when stage supplied', () => {
     const p = scopeDirPath('/root', 'user-registration', 'planning');
-    assert.equal(p, '/root/.aimd/user-registration/planning');
+    assert.equal(p, join('/root', '.aimd', 'user-registration', 'planning'));
   });
 
   it('rejects invalid stage', () => {
