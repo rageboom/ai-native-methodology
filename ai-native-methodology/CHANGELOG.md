@@ -9,6 +9,43 @@
 
 ---
 
+## [3.6.9] — 2026-05-16 ★ PATCH — A3 시행 / README.md + guides/ 외부 인지 자산 본격 sync (v2.5.1 → v3.6.9)
+
+> ★ ★ ★ **A3 시행** (옵션 3 = A2 + A3 둘 다 진행 묶음 / A3 = 2번째 / 본 session 마지막 release). README.md + guides/ 5 file = v2.5.1 시점 머묾 (1년 outdated) → v3.6.9 paradigm 진화 안정점 + enforcement cadence 정착 사실 본격 반영.
+
+### 시행 결단
+
+- 핵심 헤더 갱신 우선 (가장 가시화 영역) + 본격 본문 재작성 = carry (별도 session)
+- 갱신 영역: 라인 1 (version 헤더) / 라인 5 (현재 사실) / 라인 47 (§8.1 strict 자격) / 라인 50~57 (자격 목록 7 → 11) / 라인 73 (사용법 v) / install URL / dist artifact path / "갱신 이력" 라인
+
+### 자산 갱신 (6 file)
+
+- **`README.md`** — version 헤더 v2.5.1 → v3.6.9 (★ ★ ★ ★ ★ ★ → ★ ★ ★ ★ ★ ★ ★) + 현재 사실 본격 갱신 (paradigm 진화 안정점 + enforcement criterion 11종 + skill 47/도구 16/스키마 39/PoC 14 + 분석 입력 5종 orchestrate + FE skill 4종 + scope/stage 자동 폴더 + lifecycle 매트릭스) + §8.1 strict 자격 7/7 → 11/11 + 자격 목록 7개 → 11개 (analysis_validator_violation + layer_2_consistency + claude_md_version_sync + workspace_test_pass 추가) + install URL v2.4.0 → v3.6.9 + dist artifact path v2.5.1 → v3.6.9 + CHANGELOG cross-link (v2.4+ → v2.6+ / v2.3.x 이전 → v2.5.x 이전)
+- **`guides/README.md`** — 헤더 v2.5.1 → v3.6.9 + 갱신 이력 라인 v3.6.9 entry 추가
+- **`guides/chain-harness-guide.md`** — 갱신 이력 라인 v3.6.9 entry 추가
+- **`guides/common-errors.md`** — 헤더 v2.5.1 → v3.6.9 + 갱신 이력 라인 v3.6.9 entry 추가
+- **`guides/getting-started.md`** — 헤더 v2.5.1 → v3.6.9 (★ ★ ★ chain harness validated 정식 release → paradigm 진화 안정점 + enforcement cadence 정착) + 갱신 이력 라인 v3.6.9 entry 추가
+- **`.claude-plugin/plugin.json`** — 3.6.8 → 3.6.9
+- **`CLAUDE.md`** (repo root) — 라인 99 plugin.json v3.6.8 → v3.6.9 (R2 cadence 정합)
+
+### 비-범위 (별도 session carry)
+
+- guides/ 본문 안 install URL / dist artifact path / SessionStart hook message / 시나리오 표기 등 = 본격 재작성 carry (본 conversation 안 핵심 표기만 갱신)
+- guides/first-prompt-cookbook.md = v 표기 안 검사 ❌ (사용자 prompt 예시 영역 / paradigm 진화 영향 적음)
+- 새 guides 자산 신설 (예: enforcement-criteria-guide.md / paradigm-stable-point-cadence.md) = 별도 session
+
+### Lessons Learned
+
+- **LL-session-20-A3-1**: 외부 인지 자산 (README / guides) = paradigm 진화 cadence 안 drift 누적 잠재 영역. release-readiness 11th criterion (`workspace_test_pass`) + 10th criterion (`claude_md_version_sync`) cadence 안 외부 인지 자산 sync criterion 신설 후보 (★ 향후 12th criterion / `external_doc_version_sync` 신설 자격).
+
+### 정합 관계
+
+- session 20차 v3.6.8 R3 cadence (INDEX archive) + v3.6.9 A3 (외부 인지 sync) = 동일 session "비대화 + drift" 묶음 처분
+- v3.6.4 R2 (CLAUDE.md drift enforcement) = 본 A3 = drift enforcement paradigm 정합 (단 R2 = 내부 자산 / A3 = 외부 인지 자산 axis 다름)
+- session 20차 = R1+R2+R3+R4+A1+A2+A3 = **7 잔여 결단 + 다음 의제 모두 시행 완료** / v3.6.3+v3.6.4+v3.6.5+v3.6.6+v3.6.7+v3.6.8+v3.6.9 = **7 release**
+
+---
+
 ## [3.6.8] — 2026-05-16 ★ PATCH — A2 시행 / INDEX.md 본격 archive (session 14차 이전 의사결정 분리)
 
 > ★ ★ ★ **A2 시행** (다음 의제 1번째 / 2개 묶음 진행 결단 옵션 3). INDEX.md 149 → 31 라인 (79% 절감) + INDEX-HISTORY.md 137 라인 신설. R3 STATUS archive cadence 정합 (paradigm 진화 안정점 = v2.5.0 MINOR FINAL = session 15차 / 2026-05-14 분기 cutoff).

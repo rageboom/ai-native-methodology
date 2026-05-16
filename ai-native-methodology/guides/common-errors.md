@@ -1,8 +1,8 @@
-# Common Errors — FAQ (★ chain harness 운영 / v2.5.1)
+# Common Errors — FAQ (★ chain harness 운영 / v3.6.9)
 
 본 가이드 = plugin user 가 install 후 자주 마주칠 마찰점 + 해결 방법.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ install 후 Skills: 0 본질 결함 → v2.5.1 PATCH 회복 / 295 file / 사내 GHE 시나리오 / Layer 2 LLM 마찰).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / paradigm 진화 안정점 + enforcement 11종).
 
 ## 1. Install / Hook
 

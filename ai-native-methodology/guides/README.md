@@ -1,8 +1,8 @@
-# guides/ — 사용자 journey 자산 (★ ★ cleanup round 2-C 신설 / ★ v2.5.1 정합)
+# guides/ — 사용자 journey 자산 (★ ★ cleanup round 2-C 신설 / ★ v3.6.9 정합)
 
 본 디렉토리 = plugin install 후 사용자가 막히는 지점에 대한 friction-free 가이드. journey 4 자산.
 
-> **갱신 이력**: v2.0.0 시점 작성 (cleanup round 2-C) → v2.5.1 정합 갱신 (★ 모든 skill path 1-depth + category prefix paradigm / 사내 GHE install 시나리오 / Layer 2 LLM paradigm).
+> **갱신 이력**: v2.0.0 시점 작성 (cleanup round 2-C) → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / paradigm 진화 안정점 + enforcement criterion 11종 + skill 47/도구 16/PoC 14 + 분석 입력 5종 orchestrate + FE skill 4종 + scope/stage 자동 폴더 + lifecycle 매트릭스).
 
 ## 자산 (4)
 

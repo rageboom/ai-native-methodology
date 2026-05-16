@@ -1,12 +1,12 @@
-# AI-Native 개발 방법론 v2.5.1 ★ ★ ★ ★ ★
+# AI-Native 개발 방법론 v3.6.9 ★ ★ ★ ★ ★ ★
 
 > 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 기획 → 스펙 → 테스트 → 구현** SDLC 4단계 chain harness.
 >
-> **현재**: v2.5.1 (2026-05-14) — ★ ★ ★ ★ ★ ★ chain harness validated v2.5.0 본질 보존 / §8.1 strict 9/9 통과 (★ layer_2_consistency criterion 신설) / Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 도입 / ≥ 2 PoC corroboration L1+L2 양쪽 입증 / 322/0 test pass / 11 PoC 호환 / **사내 GHE plugin install 호환성 본격 회복** (★ ★ ★ v2.5.1 PATCH — agents/skills 1-depth 평탄화 / Claude Code 표준 정합).
+> **현재**: v3.6.9 (2026-05-16) — ★ ★ ★ ★ ★ ★ ★ **paradigm 진화 안정점 + enforcement cadence 정착** / 사용자 요구사항 17 모두 청산 (R1~R15 활성 ✅ / R16~R17 영구 scope-out) / release-readiness **11/11** strict 통과 (★ v3.6.7 A1 신설 — workspace test 회귀 자동 차단) / CLAUDE.md ↔ plugin.json drift 자동 enforcement (★ v3.6.4 R2) / **skill 47종 / 도구 16종 / 스키마 39종 / PoC 14종** / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill 4종 (React/Vue/Playwright/JSP) / scope/stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT / workspace test **359/359** pass.
 >
-> ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness 4 gate + revisit loop + 70~80% 한계 명시.
+> ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness 4 gate + revisit loop + 70~80% 한계 명시. v3.x = Gap 청산 + enforcement cadence 정착 + 자산 대칭 완성.
 >
-> 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v2.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.3.x 이전).
+> 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v2.6+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.5.x 이전).
 
 ---
 
@@ -44,16 +44,20 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 
 ---
 
-## ★ ★ chain harness validated 자격 (§8.1 strict 7/7)
+## ★ ★ chain harness validated 자격 (§8.1 strict 11/11 / v3.6.7 A1 격상)
 
 ```
-✅ 1. poc_corroboration: 2 PoC (poc-05 + poc-03 retrofit + poc-04 mini FE)
-✅ 2. real_tool_evidence: 5종 물증 7 필드 all present / sha256 valid
-✅ 3. validators_violation: 4 validators 0 critical/high
-✅ 4. chain_coverage: 1.0 / threshold 0.85
-✅ 5. adr_registry: 5 ADR-CHAIN status: 승인됨 + 결정 section
-✅ 6. matrix_greenness: forward=1 / backward=1 / cells=2 / green=2
-✅ 7. e2e_cycle_pass: pass=6 / fail=0 (vitest 1.6.1 chain 4 GREEN)
+✅  1. poc_corroboration: 9 PoC 본격 (poc-03/04-mini/05/06~11)
+✅  2. real_tool_evidence: 5종 물증 10 필드 all present / sha256 valid
+✅  3. validators_violation: 4 validators 0 critical/high
+✅  4. chain_coverage: 1.0 / threshold 0.85
+✅  5. adr_registry: 12 ADR-CHAIN status: 승인됨 + 결정 section
+✅  6. matrix_greenness: forward=1 / backward=1 / cells=2 / green=2
+✅  7. e2e_cycle_pass: pass=6 / fail=0 (chain 4 GREEN)
+✅  8. analysis_validator_violation: schema + br-cross-consistency 0 critical/high (v2.4.0 신설)
+✅  9. layer_2_consistency: Layer 2 per-PoC mean ≥ 0.7 + drift 0 (v2.5.0 신설)
+✅ 10. claude_md_version_sync: CLAUDE.md "plugin.json vX.Y.Z" 표기 모두 일치 (v3.6.4 R2 신설)
+✅ 11. workspace_test_pass: npm test --workspaces 359/359 pass / 0 fail (v3.6.7 A1 신설)
 ```
 
 ★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + sample chain 4 e2e (PoC #01~#05).
@@ -70,7 +74,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 - Node ≥ 18 (chain-driver / 12 workspace tool 실행)
 
-### 사용법 — Plugin install (★ v2.5.1)
+### 사용법 — Plugin install (★ v3.6.9)
 
 #### A. 편집자 — 워크스페이스 직접 등록 (Phase A self-iteration)
 
@@ -81,7 +85,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@ai-native-methodology
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에서 v2.5.1 확인
+/plugin                  # 대화형 manager — Installed 탭에서 v3.6.9 확인
 ```
 
 #### B. 배포 수신자 — 사내 사용자 install (★ 사내 표준)
@@ -103,7 +107,7 @@ gh auth login --hostname github.smilegate.net
 특정 버전 pin (★ 권장 — git tag):
 
 ```bash
-/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v2.4.0
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v3.6.9
 /plugin install ai-native-methodology@ai-native-methodology
 ```
 
@@ -140,7 +144,7 @@ npm run version:check       # 3-way sync 검증 단독
 npm run build               # version-check 강제 → dist/internal-v<version>/ 생성 + CHECKSUMS.txt
 npm run build:check         # dry-run (file count 만 출력)
 npm run build:diff-check    # build 후 git diff exit-code 0 검증 (CI 용)
-npm run release:check       # §8.1 strict 7/7 자동 검사
+npm run release:check       # §8.1 strict 11/11 자동 검사
 npm run test                # workspace 12 tool unit test (218 test pass)
 ```
 
@@ -202,14 +206,14 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 ## 디렉토리 구조 (dist artifact 기준)
 
 ```
-dist/ai-native-methodology-v2.5.1/
+dist/ai-native-methodology-v3.6.9/
 ├── .claude-plugin/
-│   ├── plugin.json                   v2.5.1 manifest
+│   ├── plugin.json                   v3.6.9 manifest
 │   └── marketplace.json              source: "./" (자기완결)
 ├── CLAUDE.md                         ★ 사내 적용 정책 23 inline (자동 로드)
 ├── README.md                         ← 본 파일 (plugin user 진입점)
-├── CHANGELOG.md                      v2.4+ 최근 release entry
-├── CHANGELOG-HISTORY.md              v2.3.x 이전 archive
+├── CHANGELOG.md                      v2.6+ 최근 release entry
+├── CHANGELOG-HISTORY.md              v2.5.x 이전 archive
 ├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
 │
 ├── agents/                           5 chain agent (planning/spec/test/implement/analysis) + _base 3
@@ -357,4 +361,4 @@ CI 자동화 = `.github/workflows/drift-check.yml` (PR / nightly / manual dispat
 - 방법론 자체 변경: ADR/DEC 신설 → plan.md 갱신 → §8.1 strict 검증대 통과
 - chain harness scaffolding (sub-plan-1~4) → harness-complete (sub-5) → harness-validated (sub-6) 로 호칭 전환 명세 (DEC-2026-05-06-sub-plan-5 + DEC-2026-05-06-sub-plan-6-종결)
 
-→ 변경 이력: [CHANGELOG.md](./CHANGELOG.md) (v2.4+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.3.x 이전).
+→ 변경 이력: [CHANGELOG.md](./CHANGELOG.md) (v2.6+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v2.5.x 이전).

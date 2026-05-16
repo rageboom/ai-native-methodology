@@ -1,8 +1,8 @@
-# Getting Started — 10분 walkthrough (★ ★ ★ v2.5.1 chain harness validated 정식 release)
+# Getting Started — 10분 walkthrough (★ ★ ★ v3.6.9 paradigm 진화 안정점 + enforcement cadence 정착)
 
 본 가이드 = plugin install 직후 첫 100 line. 사용자가 자기 legacy 코드 분석 + chain harness 진입까지 10분.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ 사내 GHE install 시나리오 + Layer 2 LLM paradigm + 16 tools / 38 skills / 9/9 strict + 1-depth + category prefix).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / Gap 모두 청산 + 47 skills / 16 tools / 39 schemas / 14 PoC / **11/11 strict criterion** / 분석 입력 5종 orchestrate / FE skill 4종 / scope/stage 자동 폴더).
 
 ## 1. Install (2분)
 

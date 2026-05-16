@@ -2,7 +2,7 @@
 
 본 가이드 = chain harness 5 요소 enforcement 의 사용자 mental model. state.json + mechanical gate trio + revisit detector 가 어떻게 함께 동작하는지.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ chain 1 gate Layer 2 LLM 통합 본격 명시 + br-cross-consistency-validator 연계).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / release-readiness 11/11 criterion 도달 + CLAUDE.md drift enforcement + workspace test 회귀 자동 차단).
 
 ## 1. Chain harness 가 무엇인가?
 
