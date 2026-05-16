@@ -3,7 +3,17 @@
 > 휘발성 진행 상태. 영속 컨텍스트는 [`/CLAUDE.md`](../../CLAUDE.md), 결정 이력은 [INDEX.md](INDEX.md).
 > 본 파일은 phase / sprint 종결 시 갱신.
 
-**기준일**: 2026-05-16 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 20차 (현 session) — v3.6.9 PATCH release — A3 시행 / README.md + guides/ 외부 인지 자산 본격 sync (v2.5.1 → v3.6.9)** — 옵션 3 (A2 + A3 묶음) 2번째 / 본 session 마지막 release / 핵심 헤더 갱신 우선 + 본격 본문 재작성 carry / README.md (version 헤더 + 현재 사실 + §8.1 strict 자격 7 → 11 + 자격 목록 4 추가 + install URL + dist artifact path + CHANGELOG cross-link) + guides/ 4 file (README + chain-harness-guide + common-errors + getting-started) 헤더 + 갱신 이력 라인 v3.6.9 entry 추가 / guides/first-prompt-cookbook = paradigm 진화 영향 적음 / plugin.json 3.6.8 → 3.6.9 + CLAUDE.md sync + CHANGELOG v3.6.9 entry + LL-session-20-A3-1 자산화 (외부 인지 자산 drift 누적 잠재 / 12th criterion 후보 `external_doc_version_sync`) / ★ ★ ★ ★ ★ ★ session 20차 = R1+R2+R3+R4+A1+A2+A3 = 7 잔여 결단 + 다음 의제 모두 시행 완료 / v3.6.3~v3.6.9 = **7 release 묶음**
+**기준일**: 2026-05-17 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 25차 (현 session) — v4.1.0 MINOR release — Phase 2 ⑤ cross_consistency_check 신설 + is_intent⇔intent_vs_bug_classification 양방향 동치 enforcement** — session 25차 진입 시 STATUS drift 청산 (session 20→24 stale / LL-i-46+47 ADR §9 자산화 / ADR §11 후속 list sync carry 등재) → 사용자 "Phase 2 ⑤ 진입". 4원칙 — plan + 3-에이전트 research (Senior CONCUR+조건2+STOP-1 / official-docs if/then VERIFIED / industry-case SARIF·Semgrep·OPA·Spectral 분리 우세 + intent-vs-bug 강제 보존 precedent 부재=novelty) + 사용자 결단 4건 추천안 묶음 + 시행. **결단** — #1 정제된 옵션 C (heavy 실행데이터 layer-2-results/ 분리=산업표준 + BR 안 slim provenance-tagged marker=Semgrep metadata: 패턴) / #2 schema if/then 강제 (★ 코드 착수 전 실측 both=0 → 전 PoC vacuous = 회귀 풀이 0 수학 보장 / Senior 조건2 해소) / #3 v4.1.0 MINOR / #4 ⑤ 단독. **시행** — rules.schema.json 2변경 (cross_consistency_check slim 객체 + is_intent⇔classification 양방향 동치 if/then 2블록) + test 17 신설 (★ schema-validator functional 11 = if/then 모순 실제 거부 입증 / drift-validator 구조 6) + ADR §5.9 patch v12 + §9 LL-i-51 + DEC-2026-05-17-phase-2-5-cross-consistency-check + INDEX + CHANGELOG v4.1.0 + plugin.json 4.0.1→4.1.0 + CLAUDE.md + deliverables 5 §4.2. **회귀** — workspace 364→**381/381 pass** (신규 17 / 0 fail) + release-readiness **11/11 release-ready** + chain harness validated 본질 보존 / 0 회귀. STOP-1 advisory 해소 (verdict consumer unknown-fatal 부재).
+
+**기준일 보존**: 2026-05-17 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 24차 — 묶음 P prereq 전 chain 종결 (★ no version bump / carry only / push)** — 사용자 결단 "묶음 P 해줘" → Sprint 1~3 자율 시행 + gate 결단 3건. **Sprint 1** (schema cleanup / 10 sub-sprint) = 전체 11 PoC rules.json schema VALID + release-readiness `analysis_validator_violation` criterion PoC #01+#05 한정 → ★ 전체 11 PoC auto-discover 전수 격상 (Sprint 1-J = pre-pre-prereq 사각지대 PoC #03 76 errors 계획 외 발견 즉시 보정 / LL-i-46). **Sprint 2** (dual representation / 4 PoC 30 BR) = #02·#04 GWT→NL + #08·#10 NL→GWT additive. **Sprint 3** (Layer 2 LLM / 4 PoC 8 dispatch) = Sonnet 4.6 phase-c + Haiku 4.5 blind retrospect → ★ ★ ★ Layer 2 corroboration **7 PoC 도달** (poc-01/02/03/04/05/08/10 / Phase 2 prereq ≥7 충족). ★ ★ ★ **핵심 발견 = PoC #08 echo-chamber drift** (Sprint 2 GWT 합성 Sonnet 이 is_likely_bug 무시 → PASSWD-006 보안버그 + ORDQRY-005 N+1 정상규칙 정규화 / 동일모델 Sonnet Layer 2 미검출 0.93·0.90 / 독립 Haiku blind 검출 0.55·0.58 = industry-first + Adzic SBE 함정 회피 자격 본격 실측 / LL-i-47 / 처분 = rules.json 변경 ❌ / C-poc08-drift carry). ★ ★ Phase 2 ⑤ 사용자 결단 3건 (#1 보류·별도 session / #2 ★ 확정 제약 "분류 보존 강제 포함" 재논의 ❌ / #3 push carry only 18 commit / version bump ❌). DEC-2026-05-17-묶음-P-prereq-종결-phase2-5-보류 + INDEX 등재 + LL-i-46+47 자산화. release-readiness **11/11** + workspace **364/364** + chain harness validated 본질 보존 / 0 회귀.
+
+**기준일 보존**: 2026-05-17 (★ ★ ★ **session 23차 — Sprint 1-A 시범 진입 (★ no release / carry only)** — 사용자 STRONG-STOP 점검 발화 "drift 없이 가고 있는가? 최초 목적?" 흡수 → 회고 후 "continue — Sprint 1-A" 결단. PoC #06 7 BR ID 4토막 strict 마이그레이션 (BR-EXCHANGE-NNN → BR-EXCHANGE-{KRW/COMPLETE/DECIMAL/COMMA/ANNUAL/GUBUN/CALCFN}-NNN / sub-domain 토막 Sonnet 4.6 sub-agent 자동 합성) + cross-ref 13 file 일괄 갱신 (old ID 잔존 0) + PoC #06 schema-validator INVALID 7 → VALID. ★ ★ ★ ★ ★ 사용자 의제 본격 재정의 — 본 plugin 본격 정체성 = ★ paradigm 자체 입증 (industry-first claim 강화) / 본격 사용자 부재·사용 시점 멀음 / 본격 의제 = Layer 2 LLM corroboration ≥ 7 PoC 도달 (Adzic SBE 함정 회피 자격) / "P 먼저" 결단. commit 70704c2.
+
+**기준일 보존**: 2026-05-17 (★ ★ ★ ★ **session 22차 — v4.0.1 PATCH release — rules schema enforcement 강화** — 3-에이전트 research 후 사용자 "추천으로 해줘" 4 결단 묶음. ③ source_grounded_evidence required (auto_extracted=true 한정 / if-then schema) + ⑥ intent_vs_bug_classification 공유 $ref SSOT 신설 (schemas/intent-classification.schema.json) + H-1 (Gherkin tag 표기 수정) + H-2 (Maldonado 인용 오류 수정 / SATD 5 분류 명시). ⑤ cross_consistency_check inline = carry (PoC 적용률 3/14 시기상조 / ≥7 PoC 후 재평가 → 묶음 P prereq source). additive only / breaking change ❌. DEC-2026-05-17-rules-schema-enforcement-strengthen + ADR-CHAIN-011 §5.8 patch v11. drift-validator 신규 5 test (57/57) / workspace 359 → 364/364 / release-readiness 11/11 / chain harness validated 본질 보존. commit 02258da.
+
+**기준일 보존**: 2026-05-17 (★ ★ ★ ★ ★ **session 21차 — v4.0.0 MAJOR release — multi-agent paradigm 본격 채택 / DEC-2026-05-15-g5 retract** — plan-skill-invocation-guarantee §B5 옵션 A (사용자 "A로 해줘"). stage 별 sub-agent 5종 신설 (agents/{analysis,planning,spec,test,implement}-agent.md) + 3 base agent 병존 + spike agent archive 이동 (C-3 carry). main agent = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch) / frontmatter `skills:[...]` 사전 주입 paradigm. lifecycle-contract §Agent column 재작성 + chain-driver hooks-bridge 격상 + agents/README 정책 재작성. ★ ★ DEC-2026-05-15-g5 retract. DEC-2026-05-17-v4-multi-agent-paradigm-채택 (source = DEC-2026-05-17-spike-planning-agent-실험 / archive/v4-spike/). C-1+C-3 본격 흡수 / C-2 (PoC 재실행) + C-4 (design agent) = 후속 carry. plugin.json 3.6.9 → 4.0.0.
+
+**기준일 보존**: 2026-05-16 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 20차 — v3.6.9 PATCH release — A3 시행 / README.md + guides/ 외부 인지 자산 본격 sync (v2.5.1 → v3.6.9)** — 옵션 3 (A2 + A3 묶음) 2번째 / 본 session 마지막 release / 핵심 헤더 갱신 우선 + 본격 본문 재작성 carry / README.md (version 헤더 + 현재 사실 + §8.1 strict 자격 7 → 11 + 자격 목록 4 추가 + install URL + dist artifact path + CHANGELOG cross-link) + guides/ 4 file (README + chain-harness-guide + common-errors + getting-started) 헤더 + 갱신 이력 라인 v3.6.9 entry 추가 / guides/first-prompt-cookbook = paradigm 진화 영향 적음 / plugin.json 3.6.8 → 3.6.9 + CLAUDE.md sync + CHANGELOG v3.6.9 entry + LL-session-20-A3-1 자산화 (외부 인지 자산 drift 누적 잠재 / 12th criterion 후보 `external_doc_version_sync`) / ★ ★ ★ ★ ★ ★ session 20차 = R1+R2+R3+R4+A1+A2+A3 = 7 잔여 결단 + 다음 의제 모두 시행 완료 / v3.6.3~v3.6.9 = **7 release 묶음**
 
 **기준일 보존**: 2026-05-16 (★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **session 20차 — v3.6.8 PATCH release — A2 시행 / INDEX.md 본격 archive (session 14차 이전 의사결정 분리)** — 다음 의제 옵션 3 (A2 + A3 둘 다 진행) 2개 묶음 / A2 = INDEX.md cutoff 결단 (session 14차 이하 111 DEC → INDEX-HISTORY.md 137 라인 신설 / session 15차 이후 4 DEC = R4 + G3 + plugin-charter + v2.5.0 final 보존) + INDEX.md 149 → 31 라인 (79% 절감) + Archive cross-link section 신설 / CHANGELOG.md 추가 archive 보류 (이미 v2.4 이전 = CHANGELOG-HISTORY.md 안 archive / v2.6~v3.6.x 사용자 가시화 자산 보존) / plugin.json 3.6.7 → 3.6.8 + CLAUDE.md sync + CHANGELOG v3.6.8 entry + workspace test 359/359 ✅ + release-readiness 11/11 ✅
 
@@ -34,6 +44,106 @@
 ## Archive
 
 > session 14차 이전 entry + 그 이전 session body 모두 → [`STATUS-HISTORY.md`](STATUS-HISTORY.md) 이전 (★ R3 / v3.6.5 / paradigm 진화 안정점 분기 cutoff).
+
+---
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-17 session 25차 — v4.1.0 MINOR release — Phase 2 ⑤ cross_consistency_check 신설**:
+
+- ✅ **carry trigger** = DEC-2026-05-17-묶음-P §3 #1 (⑤ 보류·별도 session / ≥7 PoC 재평가 trigger 충족) + 사용자 결단 "Phase 2 ⑤ 진입"
+- ✅ **선행 = STATUS drift 청산** (사용자 결단 "STATUS drift 먼저 청산") — STATUS.md session 20→24 stale sync + ADR-CHAIN-011 §9 LL-i-46+47 자산화 + ADR §11 후속 list sync = carry 등재 (`C-adr-chain-011-§11-후속-list-sync`)
+- ✅ **★ 4원칙 1단계 plan** = `.claude/plans/plan-phase2-5-cross-consistency-check-inline.md`
+- ✅ **★ ★ 4원칙 2단계 3-에이전트 research** = `.claude/research/research-phase2-5-cross-consistency-check.md`:
+  - Senior — CONCUR + 조건1(provenance discriminator) + 조건2(both=0 grep 실측) + STOP-1 advisory(verdict enum) + Q5(⑤ 단독)
+  - official-docs — if/then+properties = 값 기반 cross-field 유일 공식 메커니즘 VERIFIED / SARIF result↔rule 분리 표준 VERIFIED
+  - industry-case — SARIF·Semgrep·OPA·Spectral 분리 우세 / OpenSpec #666 inline 강제 역사례 / intent-vs-bug 강제 보존 precedent 부재 = novelty
+- ✅ **★ ★ ★ 코드 착수 전 실측 (Senior 조건2 + STOP-1 해소)** — both=0 (전 11 PoC) → if/then vacuous = 회귀 풀이 0 수학 보장 / is_intent 단독 43 / intent_vs_bug_classification 실사용 0 / verdict consumer unknown-fatal 부재
+- ✅ **★ ★ ★ ★ 사용자 결단 4건 (추천안 묶음)** = #1 정제된 옵션 C / #2 schema if/then 강제 / #3 v4.1.0 MINOR / #4 ⑤ 단독
+
+### resolved by 본 session (★ session 25차)
+
+- ★ ★ ★ ★ **C-phase-2-5-cross-consistency-check** (★ session 24차 carry / 1순위) → ★ ★ ★ ★ **resolved** (v4.1.0 MINOR release 본격 시행)
+- ★ ★ **STATUS drift (session 20→24 stale)** → ★ ★ **resolved** (STATUS sync + LL-i-46+47 자산화 + INDEX 점검)
+- ★ ★ **DEC-2026-05-17-묶음-P §3 #2 "분류 보존 강제 포함" 확정 제약** → ★ ★ **resolved** (intent_classification_preserved + classification_drift verdict + is_intent⇔classification if/then 구현)
+
+### 신규 carry (★ session 25차)
+
+- ★ ★ ★ **묶음 Q** (⑤ 종결 후 / 4건) = ① alias 4중첩 폐기 / ② BR 표현 4→2 단일화 / ④ severity cross-stage mapping / ⑦ rules.json → business-rules.json rename
+- ★ ★ **C-poc08-drift-passwd-ordqry** (★ Phase D 도메인 전문가 검토 / rules.json 변경 ❌ — 변경 없음 / ⑤ schema = 향후 검출 infra)
+- ★ ★ **C-cross-consistency-validator-inline-emit** (★ ⑤ schema 신설됨 / br-cross-consistency-validator 가 slim marker 를 BR 에 실제 기록하는 emit path = forward 구현 carry / 현재 both=0·intent_vs_bug 실사용 0 = 데이터 부재로 미발동)
+- ★ **C-adr-chain-011-§11-후속-list-sync** (session 25차 식별 / §11 후속 list = v2.5.1까지만 / v2.6~v4.1.0 미기재)
+- ★ **C-poc05-haiku-retrospect** (★ session 13차 carry / Phase D self-eval-bias 완성)
+
+### Lessons Learned 신규 (★ session 25차 / ADR-CHAIN-011 §9)
+
+- ★ ★ ★ ★ ★ ★ **LL-i-46** (pre-pre-prerequisite 사각지대 재현 / Sprint 1-J PoC #03 — session 25차 자산화)
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-47** (echo-chamber self-eval bias 실측 / PoC #08 — session 25차 자산화)
+- ★ ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-51** (★ "양심 의존 → schema enforcement 결정화 paradigm — 단 실측(both=0) 선행 + functional(모순 거부) test 동반 의무" / Phase 2 ⑤)
+
+### ★ ★ ★ ★ release-readiness 11/11 실측 결과
+
+```
+node scripts/release-readiness.js --target v4.1.0
+✅ 11/11 criteria passed.
+★ ★ ★ v4.1.0 = release-ready.
+workspace test 381/381 pass (364 baseline + 17 신규 / 0 fail) / analysis_validator_violation = 11 PoC 전수 violations 0
+```
+
+★ functional test 4·5 = if/then 이 모순 BR (is_intent=true+classification="bug" / 역방향) 실제 INVALID = vacuous-everywhere 아님 입증
+
+### 다음 session entry-point (★ session 26차+)
+
+1. **묶음 Q** (1순위 / ⑤ 종결 후) — ① alias / ② BR 표현 단일화 / ④ severity mapping / ⑦ rename. breaking change 동반 → 별도 plan + Senior critique + 사용자 결단 의무
+2. **별도 carry** — C-poc08-drift Phase D 검토 / C-cross-consistency-validator-inline-emit / §11 후속 list sync / PoC #05 Haiku retrospect
+
+---
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-17 session 24차 — 묶음 P prereq 전 chain 종결 (★ no version bump / carry only / 18 commit push)**:
+
+- ✅ **carry trigger** = ★ ★ ★ ★ DEC-2026-05-17-rules-schema-enforcement-strengthen §⑤ carry ("≥ 7 PoC 도달 후 재평가") + 사용자 결단 "묶음 P 해줘" (자율 시행 위임)
+- ✅ **★ 묶음 P 정의** = Sprint 1 (schema cleanup / pre-pre-prereq) → Sprint 2 (NL/GWT dual representation / pre-prereq) → Sprint 3 (Layer 2 LLM corroboration) → Phase 2 본격 (⑤)
+- ✅ **★ ★ Sprint 1~3 자율 종결 (18 commit b96fb84~85f1e6a)**:
+  - Sprint 1 (10 sub-sprint) = 전체 11 PoC rules.json schema VALID + `analysis_validator_violation` criterion PoC #01+#05 한정 → 전체 11 PoC auto-discover 전수 격상
+  - ★ Sprint 1-J = pre-pre-prereq 사각지대 PoC #03 (NestJS) INVALID 76 errors 계획 외 발견 → 사각지대 carry 거부 + 즉시 보정 (LL-i-46 자산화)
+  - Sprint 2 (4 PoC 30 BR) = #02·#04 GWT→NL + #08·#10 NL→GWT dual representation additive
+  - Sprint 3 (4 PoC 8 dispatch) = Sonnet 4.6 phase-c + Haiku 4.5 blind retrospect → ★ ★ ★ Layer 2 corroboration 7 PoC 도달 (poc-01/02/03/04/05/08/10)
+- ✅ **★ ★ ★ 핵심 발견 — PoC #08 echo-chamber drift 본격 실측** (LL-i-47 자산화):
+  - Sprint 2 GWT 합성 (Sonnet 4.6) 이 is_intent=false / is_likely_bug=true 무시 → BR-PETSTORE-PASSWD-006 (평문 password 보안버그) + BR-PETSTORE-ORDQRY-005 (N+1) 정상규칙 정규화
+  - 동일 모델 Sonnet 4.6 Layer 2 = 미검출 (0.93·0.90 / echo chamber) / 독립 Haiku 4.5 blind retrospect = 검출 (0.55·0.58 / 2 critical drift)
+  - → industry-first paradigm + Adzic SBE 10년 폐기 함정 회피 자격 **본격 실측 입증**
+- ✅ **★ ★ ★ ★ 사용자 결단 3건 (session 24차 gate)** = #1 Phase 2 ⑤ 보류·별도 session / #2 ★ 확정 제약 "분류 보존 강제 포함" (재논의 ❌) / #3 push carry only (version bump ❌)
+
+### resolved by 본 session (★ session 24차)
+
+- ★ ★ ★ ★ **묶음 P prerequisite 전 chain** (Sprint 1+2+3) → ★ ★ ★ ★ **resolved** (자율 시행 종결 / Layer 2 corroboration 7 PoC 도달 / Phase 2 prereq ≥7 충족)
+- ★ ★ **Sprint 1-I `analysis_validator_violation` criterion = PoC #01+#05 한정 사각지대** → ★ ★ **resolved** (전체 11 PoC auto-discover 전수 격상 / `feedback_pre_pre_prerequisite_lacuna` 정합)
+- ★ ★ **4 PoC dual representation 부재** (#02·#04·#08·#10) → ★ ★ **resolved** (Sprint 2 / 30 BR additive 합성)
+
+### 신규 carry (★ ★ session 24차)
+
+- ★ ★ ★ ★ **C-phase-2-5-cross-consistency-check** (★ 1순위 / 별도 session / 진입 자격 충족 — ≥7 PoC + "분류 보존 강제 포함" 확정 제약 + inline(CodeQL) vs 분리(Spec-Kit) 결단 + v4.1.0 MINOR bump)
+- ★ ★ ★ **C-poc08-drift-passwd-ordqry** (★ Phase D 도메인 전문가 검토 / rules.json 변경 ❌ / release-readiness check9 poc-08 미산입 의도된 carry)
+- ★ ★ **묶음 Q** (P 종결 후) = ① alias 4중첩 폐기 / ② BR 표현 4→2 단일화 / ④ severity cross-stage mapping / ⑦ rules.json → business-rules.json rename
+- ★ **C-poc05-haiku-retrospect** (★ session 13차 carry / Phase D self-eval-bias 완성) + **C-version-bump-sprint1i-criterion** (Sprint 1-I criterion 격상 = 다음 release v4.1.0 MINOR 후보 일괄)
+- ★ **C-adr-chain-011-§11-후속-list-sync** (★ session 25차 식별 / §11 후속 list = v2.5.1까지만 / v2.6~v4.0.1 미기재 — 별도 doc sync carry)
+
+### Lessons Learned 신규 (★ session 24차 / ADR-CHAIN-011 §9 / session 25차 자산화)
+
+- ★ ★ ★ ★ ★ ★ **LL-i-46** (★ "pre-pre-prerequisite 사각지대 재현 — criterion 부분 적용이 잔여 PoC drift 은폐 / 계획 외 발견 즉시 보정 paradigm" / Sprint 1-J PoC #03)
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-47** (★ "echo-chamber self-eval bias 실측 + cross-model blind retrospect 가 dual-representation drift 본격 검출 / industry-first + Adzic SBE 함정 회피 자격 본격 실측" / PoC #08)
+
+### ★ ★ ★ ★ release-readiness 11/11 실측 결과
+
+```
+node scripts/release-readiness.js
+✅ 11/11 criteria passed.
+★ workspace test 364/364 / chain harness validated 본질 보존 / 0 회귀.
+```
+
+★ Layer 2 corroboration: poc-01/02/03/04/05/08/10 = **7 PoC** (Phase 2 prereq ≥7 충족) / poc-08 = echo-chamber drift carry (check9 미산입)
+
+### 다음 session entry-point (★ session 25차+)
+
+1. **Phase 2 ⑤** (1순위 / 진입 자격 충족) — inline(CodeQL) vs 분리(Spec-Kit) 결단 + "분류 보존 강제 포함" 확정 제약 (재논의 ❌) + v4.1.0 MINOR / 4원칙 (plan + 3-에이전트 research + 사용자 결단 + 시행)
+2. **묶음 Q** (P 종결 후 / 4건)
+3. **별도 carry** — PoC #05 Haiku retrospect / C-poc08-drift Phase D 검토 / §11 후속 list sync / version 결단
 
 ---
 ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session 2026-05-14 session 15차 — v2.5.0 MINOR FINAL release — Phase D 본격 종결**:

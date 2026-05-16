@@ -90,6 +90,8 @@ output/rules/
 □ 규칙 간 충돌 검토
 □ ★ v4.0.1 — auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
 □ ★ v4.0.1 — intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)
+□ ★ v4.1.0 — is_intent + intent_vs_bug_classification 둘 다 보유 시 is_intent=true ⇔ classification='intent' 정합 (if/then schema enforcement)
+□ ★ v4.1.0 — cross_consistency_check 기록 시 generated_by provenance + heavy 데이터는 layer-2-results/ 분리 (slim marker only)
 ```
 
 ### 4.1 ★ v4.0.1 schema enforcement 강화 (DEC-2026-05-17 / ADR-CHAIN-011 §5 patch v8)
@@ -115,6 +117,27 @@ output/rules/
   intent_vs_bug_classification: "bug"          # ★ v4.0.1 신설 / characterization-spec 정합
   is_intent: false                             # ★ legacy alias / classification 와 cross-consistency
   current_state_note: "legacy source 결함 — register() 중복 검사 미수행"
+```
+
+### 4.2 ★ ★ v4.1.0 Phase 2 ⑤ — cross_consistency_check + 동치 enforcement (DEC-2026-05-17-phase-2-5 / ADR-CHAIN-011 §5 patch v12)
+
+**⑤ cross_consistency_check (slim provenance-tagged marker)** — Layer 1+2 cross-validation 결과의 BR 단위 추적성 marker. ★ heavy 실행 데이터(per-BR rationale·score dump)는 `tools/br-cross-consistency-validator/layer-2-results/poc-NN-layer-2-results.json` 분리 보존 (SARIF·Semgrep·OPA·Spectral 산업 표준) / BR 안 inline = rule 의 '서술적 속성' 영역 한정 (Semgrep `metadata:` 패턴). optional / additionalProperties:false.
+
+**is_intent ⇔ intent_vs_bug_classification 양방향 동치 enforcement** — 둘 다 보유 시 schema if/then 으로 `is_intent=true ⇔ classification='intent'` 강제 (PoC #08 echo-chamber drift 차단 / LL-i-47·51). 단방향·미보유 BR = vacuous (실측 both=0 → 전 PoC 회귀 풀이 0 수학 보장).
+
+```yaml
+# v4.1.0 추가 예시 (위 BR-USER-DATA-001 확장 — is_intent=false ⇔ classification≠'intent' 정합)
+  cross_consistency_check:                       # ★ v4.1.0 신설 / optional / additionalProperties:false
+    generated_by: "br-cross-consistency-validator@0.2.0"   # ★ provenance discriminator (Senior 조건 1)
+    layer: 2
+    layer2_model: "claude-sonnet-4-6"
+    layer2_semantic_score: 0.58
+    verdict: "classification_drift"              # ★ enum: consistent|inconsistent|ambiguous|classification_drift|skipped
+    intent_classification_preserved: false       # ★ ★ 분류 보존 강제 핵심
+    classification_drift_detected: true
+    classification_drift_reason: "GWT synthesis dropped is_likely_bug=true → normalized as business rule"
+    external_result_ref: "tools/br-cross-consistency-validator/layer-2-results/poc-08-layer-2-results.json"
+    checked_at: "2026-05-17T00:00:00Z"
 ```
 
 ---

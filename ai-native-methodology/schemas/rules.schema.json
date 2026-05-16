@@ -172,6 +172,26 @@
               }
             ]
           }
+        },
+        {
+          "$comment": "★ ★ ★ v4.1.0 신설 (Phase 2 ⑤ / DEC-2026-05-17-묶음-P §3 #2 '분류 보존 강제' 확정 제약). is_intent ⇔ intent_vs_bug_classification 양방향 동치 enforcement 의 정방향 (is_intent=true ⇒ classification='intent'). PoC #08 echo-chamber drift 차단 (LL-i-47). ★ 둘 다 보유 시만 발동 = 단방향/미보유 vacuous (실측 both=0 → 전 PoC 회귀 풀이 0 수학 보장). official-docs VERIFIED 패턴 (2 if/then in allOf / json-schema.org conditionals).",
+          "if": {
+            "required": ["is_intent", "intent_vs_bug_classification"],
+            "properties": { "is_intent": { "const": true } }
+          },
+          "then": {
+            "properties": { "intent_vs_bug_classification": { "const": "intent" } }
+          }
+        },
+        {
+          "$comment": "★ v4.1.0 — 역방향: is_intent=false ⇒ intent_vs_bug_classification ≠ 'intent' (bug / ambiguous / self_recognized). Phase 2 ⑤ 동치 enforcement 의 두 번째 if/then. 둘 다 보유 시만 발동 (both=0 vacuous).",
+          "if": {
+            "required": ["is_intent", "intent_vs_bug_classification"],
+            "properties": { "is_intent": { "const": false } }
+          },
+          "then": {
+            "properties": { "intent_vs_bug_classification": { "not": { "const": "intent" } } }
+          }
         }
       ],
       "description": "★ ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3). BR 은 ≥ 1 표현 의무 (GWT / natural_language / description fallback / trigger-condition-action 변형). ★ ★ ★ cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외 / ★ description = optional metadata 격상 / Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM mandatory = v2.5.0 Phase C). ★ ★ paradigm 결단 근거 — session 9차 SPIKE v2 (REVISE-6 가설 B 정면 부정 / description 안 rationale/caveat 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement 사실 입증) + Agent 3 paradigm 정합.",
@@ -233,6 +253,58 @@
         "intent_vs_bug_classification": {
           "$ref": "./intent-classification.schema.json",
           "description": "★ ★ ★ v4.0.1 신설 — characterization mode 양방향 분류 enum (intent / bug / ambiguous / self_recognized). schemas/intent-classification.schema.json SSOT $ref / characterization-spec.scenario.intent_classification.type 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상. DEC-2026-05-17-rules-schema-enforcement-strengthen + ADR-CHAIN-011 §5 patch v4 정합."
+        },
+        "cross_consistency_check": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "★ ★ ★ v4.1.0 Phase 2 ⑤ 신설 — BR 단위 cross-validation slim marker (정제된 옵션 C / research-phase2-5 §5 정합). ★ heavy 실행 데이터(per-BR rationale·score dump)는 tools/br-cross-consistency-validator/layer-2-results/poc-NN-layer-2-results.json 분리 보존 (SARIF·Semgrep·OPA·Spectral 산업 표준) / 본 inline = rule 의 '서술적 속성' 영역 한정 (Semgrep metadata: 패턴 정합). ★ ★ '분류 보존 강제' (DEC-2026-05-17-묶음-P §3 #2 확정 제약 / PoC #08 echo-chamber drift 차단 / LL-i-47). Layer 2 = 실 Claude Code Task tool 호출 (no-simulation 의무). ADR-CHAIN-011 §5 정합.",
+          "properties": {
+            "generated_by": {
+              "type": "string",
+              "description": "★ provenance discriminator (Senior 조건 1 / auto_extracted provenance 패턴 재사용). 예: 'br-cross-consistency-validator@0.2.0'. machine-generated 식별 → rules.json human-authored 의도 SSOT 와 기계적 분리 가능."
+            },
+            "layer": {
+              "type": "integer",
+              "enum": [1, 2],
+              "description": "검증 계층 (1 = 결정적 keyword overlap / 2 = LLM semantic)."
+            },
+            "layer2_model": {
+              "type": "string",
+              "description": "Layer 2 LLM model (예: 'claude-sonnet-4-6' / 'claude-haiku-4-5-20251001'). layer=2 시 권장."
+            },
+            "layer2_semantic_score": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "★ slim score (Layer 2 LLM NL↔GWT semantic 정합 / 0~1). per-BR rationale = 외부 분리."
+            },
+            "verdict": {
+              "type": "string",
+              "enum": ["consistent", "inconsistent", "ambiguous", "classification_drift", "skipped"],
+              "description": "★ ★ 최종 verdict. classification_drift = v4.1.0 신설 (intent/bug 분류가 NL↔GWT 합성 중 유실·역전 / PoC #08 PASSWD-006·ORDQRY-005 사례). skipped = Layer 1 만 검증 시."
+            },
+            "intent_classification_preserved": {
+              "type": "boolean",
+              "description": "★ ★ ★ '분류 보존 강제' 핵심 — NL 표현과 GWT 표현 양쪽에서 is_intent / intent_vs_bug_classification 의미 동일 보존 여부 (Layer 2 LLM 검증 산출). false = bug→정상규칙 정규화 등 drift."
+            },
+            "classification_drift_detected": {
+              "type": "boolean",
+              "description": "★ bug→intent 정규화 등 분류 drift 검출 시 true (verdict=classification_drift 동반 권장)."
+            },
+            "classification_drift_reason": {
+              "type": "string",
+              "description": "★ classification_drift_detected=true 시 사유 (LLM 생성 / 예: 'GWT synthesis dropped is_likely_bug=true → normalized as business rule')."
+            },
+            "external_result_ref": {
+              "type": "string",
+              "description": "★ 분리 집계 join — layer-2-results/poc-NN-layer-2-results.json 경로 (heavy 실행 데이터 위치 / BR↔결과 추적성)."
+            },
+            "checked_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "검증 시각 (provenance)."
+            }
+          }
         },
         "source": {
           "type": ["string", "object"],

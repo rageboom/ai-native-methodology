@@ -330,6 +330,45 @@ planning: ['planning-extraction-validator', 'schema-validator', 'br-cross-consis
 
 ---
 
+### §5.9. ★ ★ ★ Phase 2 ⑤ — cross_consistency_check 신설 + 동치 enforcement — patch v12 (★ session 2026-05-17 / v4.1.0 MINOR)
+
+★ ★ ★ ★ v4.1.0 MINOR — DEC-2026-05-17-phase-2-5-cross-consistency-check 본격 시행. §5.8.5 carry (⑤ 시기상조 / ≥7 PoC 후 재평가) 가 묶음 P 종결 (Layer 2 corroboration 7 PoC 도달) 로 trigger 충족 → 본격 진입. 4원칙 (plan + 3-에이전트 research + 사용자 결단 4건 + 시행).
+
+#### §5.9.1. ★ 사용자 결단 4건 (research 후 / 추천안 묶음)
+
+| # | 결단 | 채택 | 근거 |
+|---|---|---|---|
+| #1 설계 옵션 | **정제된 옵션 C** | research 수렴 — heavy 실행 데이터(score/rationale)는 layer-2-results/ 분리 (SARIF·Semgrep·OPA·Spectral 산업 표준 / OpenSpec #666 inline 강제 역사례) + BR 안 slim provenance-tagged marker (rule 의 '서술적 속성' inline = Semgrep `metadata:` 표준 패턴). 옵션 A=산업 anti-pattern / B=BR 추적성 단절 (Senior 부적격) |
+| #2 분류 보존 강도 | **schema if/then 강제** | official-docs VERIFIED (if/then+properties = 값 기반 cross-field 유일 공식 메커니즘 / dependentRequired·dependentSchemas = 존재 기반만 부적합) / 실측 both=0 → 전 PoC vacuous = 회귀 풀이 0 수학 보장 / validator-only = 양심 의존 (no-simulation 위배) |
+| #3 version | **v4.1.0 MINOR** | optional 필드 + if/then conformance 제약 = additive API surface 확장 / patch v4 (intent-classification) precedent / 외부 plugin consumer schema parse |
+| #4 scope | **⑤ 단독** | Senior Q5 — PoC #08/LL-i-47 단일 실측 근거 + ≥7 corroboration = clean scope / 묶음 Q(①alias/②BR표현) = 다른 risk profile → 동반 시 §6 회귀 격리 희석 |
+
+#### §5.9.2. ★ ★ schema 변경 (rules.schema.json / additive)
+
+- **businessRule.properties `cross_consistency_check`** — slim 객체 (optional / additionalProperties:false). provenance discriminator (`generated_by`/`layer`/`layer2_model`/`checked_at` — Senior 조건 1 / auto_extracted provenance 패턴 재사용) + 분류 보존 (`intent_classification_preserved`/`classification_drift_detected`/`classification_drift_reason`) + `verdict` enum 5종 (`classification_drift` 신설 = PoC #08 PASSWD-006·ORDQRY-005 echo-chamber drift 차단) + `external_result_ref` (분리 집계 join) + slim `layer2_semantic_score` (heavy per-BR rationale = 외부 분리).
+- **businessRule.allOf `is_intent` ⇔ `intent_vs_bug_classification` 양방향 동치 if/then 2블록** — 정방향 (is_intent=true & 둘 다 보유 ⇒ classification const "intent") + 역방향 (is_intent=false & 둘 다 보유 ⇒ classification not const "intent"). 둘 다 `required` = 단방향/미보유 vacuous. official-docs "2 if/then in allOf" 패턴 정합.
+
+#### §5.9.3. ★ ★ ★ "분류 보존 강제 포함" 확정 제약 (DEC-2026-05-17-묶음-P §3 #2 / 재논의 ❌)
+
+PoC #08 echo-chamber drift (LL-i-47) = NL↔GWT 합성 시 `is_likely_bug=true` 유실 → 보안버그가 정상규칙으로 정규화. ⑤ = 이 drift class 를 schema/validator 검증 항목으로 결정화. `intent_classification_preserved`/`classification_drift_detected` + `verdict=classification_drift` + is_intent⇔classification if/then 이 본 제약의 구현.
+
+#### §5.9.4. ★ ★ 코드 착수 전 실측 (Senior 조건 2 + STOP-1 해소)
+
+- **both=0** (전 11 PoC `is_intent`∧`intent_vs_bug_classification` 동시 보유 = 0) → if/then 전 PoC vacuous = ★ 회귀 풀이 0 수학 보장. `is_intent` 단독 43 / `intent_vs_bug_classification` 실사용 0.
+- verdict/llm_status consumer = unknown-value fatal 처리 부재 (validator.js evaluated|skipped 만) → enum 확장 저위험 (STOP-1 advisory 해소).
+
+#### §5.9.5. ★ ★ test 신설 (★ functional = if/then 실제 거부 입증)
+
+- `schema-validator/test/rules-cross-consistency.test.js` (11 functional / ajv 실 검증) — ★ test 4·5 = is_intent=true+classification="bug" (정방향 모순) + 역방향 모순 = **INVALID 입증 = vacuous-everywhere 아님** / test 1~3 = 단방향·미보유 = VALID (회귀 풀이 0) / cross_consistency_check shape + additionalProperties:false + verdict enum.
+- `drift-validator/test/cross-consistency-check.test.js` (6 구조 / v4.0.1 cross-schema-enum 패턴 미러) — schema-shape 정합.
+- drift-validator package.json v0.4.1 → v0.4.2. workspace test 364 → 381/381 pass (신규 17 / 0 회귀).
+
+#### §5.9.6. ★ ★ industry-first novelty 보강
+
+industry-case research — intent-vs-bug 분류를 자동 합성 과정에서 schema/validator 로 machine-readable 강제 보존한 precedent 부재 (Salesforce 인간 review / SARIF `suppression.justification` free-form / OpenRewrite 범위 밖). 본 ⑤ = 조사 범위 내 industry-first claim 보강 (단 샘플 = 반증 부재 수준).
+
+---
+
 ## §6. 사상
 
 ### §6.1. ★ ★ ★ ★ ADR-008 (이중 렌더링 사상) 의 BR 영역 확장
@@ -572,6 +611,14 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
   - **Why**: Layer 2 LLM advisory 본격 동작 = semantic_inversion (NL 의도 vs GWT 결함) 검출 / Spec Kit / AWS Q / DMN / Spectral / Drools / AutoUAT 모두 부재 / 본 방법론 industry-first 자격 본격 입증 / BR-USER-DELETE-AUTH-001 (PoC #03 / L2=0.55 / current_state="absent" F-140 critical) 본격 검출 사례
   - **How to apply**: absent/결함 BR (current_state = "absent" / Layer 2 semantic_score < 0.6) = ★ ★ industry-first 자격 본격 자산화 의무 / 본 방법론 외부 인용 시 "drift 자체 자산화 paradigm" 차별 표현 의무 / Adzic SBE 함정 회피 paradigm 본격 동작 사례 자격
 
+- ★ ★ ★ ★ ★ ★ **LL-i-46** (★ "pre-pre-prerequisite 사각지대 재현 — criterion 부분 적용(PoC #01+#05 한정)이 잔여 PoC drift 은폐 / 계획 외 발견 즉시 보정 paradigm" / ★ session 24차 Sprint 1-J PoC #03 본격 자산화):
+  - **Why**: ★ Sprint 1-I (release-readiness `analysis_validator_violation` criterion 전수 격상) 진입 중 PoC #03 (NestJS) rules.json INVALID **76 errors** 발견 — `feedback_pre_pre_prerequisite_lacuna` 재현 사례. 근본 원인 = criterion 이 PoC #01+#05 한정 적용 → 잔여 9 PoC schema drift 가 release-readiness 통과 그늘에 은폐 (★ 부분 적용 criterion = drift 은폐 vector). ★ ★ prerequisite 의 prerequisite (schema VALID) 미점검 시 상위 sprint (Sprint 2 dual representation) 가 INVALID 입력 위에 누적 build 되는 구조 결함.
+  - **How to apply**: criterion 신설/격상 시 ★ ★ "부분 적용(특정 PoC 한정) = 잔여 영역 drift 은폐" 의무 점검 / **전수 auto-discover 격상** 우선 (PoC enumerate 하드코딩 ❌). ★ 계획 외 발견(76 errors) 시 사각지대 carry 거부 + 즉시 보정 sub-sprint 신설 (Sprint 1-J paradigm / quality 1순위 + drift-enforcement 정합). ★ 본 사례 자체 = 전수 격상의 입증 근거로 DEC §4 자산화 의무 (`feedback_pre_pre_prerequisite_lacuna` 정합).
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-47** (★ "echo-chamber self-eval bias 실측 + cross-model blind retrospect 가 dual-representation drift 본격 검출 — industry-first + Adzic SBE 함정 회피 자격 본격 실측 입증" / ★ session 24차 PoC #08 본격 자산화):
+  - **Why**: ★ ★ ★ Sprint 2 GWT 합성 (Sonnet 4.6) 이 `is_intent=false` / `is_likely_bug=true` metadata 무시 → BR-PETSTORE-PASSWD-006 (평문 password 보안버그) + BR-PETSTORE-ORDQRY-005 (N+1 anti-pattern) 을 정상 비즈니스 규칙으로 정규화. **동일 모델 Sonnet 4.6 Layer 2 = 미검출** (0.93 / 0.90 / echo chamber — 같은 모델이 자기 산출을 정상으로 평가). **독립 Haiku 4.5 blind retrospect = 검출** (0.55 / 0.58 / 2 critical drift). ★ same-model self-eval bias 정량 + cross-model blind retrospect 가 dual-representation drift 를 실제 검출 = LL-i-41 (same-model self-eval bias 위험 carry) 의 본격 실측 입증. ★ ★ Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT 모두 cross-consistency + blind retrospect 부재 = industry-first paradigm + Adzic SBE 10년 폐기 함정 회피 자격 본격 실측 입증.
+  - **How to apply**: Layer 2 corroboration 시 ★ ★ ★ same-model 평가 = echo chamber 위험 명시 / **cross-model blind retrospect (독립 모델 / blind / no-context) 의무** paradigm. ★ dual representation 합성 시 `intent_vs_bug_classification` (is_intent / is_likely_bug) 보존 검증 의무 — bug-정규화 drift 차단 (★ Phase 2 ⑤ cross_consistency_check "분류 보존 강제 포함" 확정 제약 = 본 사례 설계 근거 / DEC-2026-05-17-묶음-P §3 #2 정합). ★ 처분 = LL-i-44 정합 (rules.json 변경 ❌ / DRIFT 격상 자산 / `C-poc08-drift-passwd-ordqry` Phase D 도메인 전문가 검토 carry / release-readiness check9 = poc-08 미산입 의도된 carry). ★ 본 사례 = 본 방법론 외부 인용 시 "echo chamber 실측 + blind retrospect 검출" 차별 표현 의무.
+
 - ★ ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-48** (★ "Claude Code plugin 표준 1-depth vs lifecycle organize 2-depth 충돌 본질 결함 — 5 release 모두 동일 / sub-axis 영역 분리 회피 paradigm" / ★ v2.5.1 PATCH 본격 자산화):
   - **Why**: v2.0.0 ~ v2.5.0 까지 본 plugin 의 agents/skills 2-depth (`agents/<category>/<name>/<name>.md` + `skills/<category>/<name>/SKILL.md`) lifecycle stage organize 구조가 Claude Code plugin 표준 1-depth scan 과 본격 충돌 → install 후 skill 본격 작동 ❌ (★ ★ 5 release 모두 동일 결함 / 사내 GHE install 검증 시 `Agents: README / Skills: 0종 / MCP Servers: _comment` 자체가 결정적 자료). ★ ★ plugin lifecycle organize 사상 자체 (skills-axis.md v1.4.4 신설 정책) ≠ Claude Code runtime paradigm. ★ ★ 검증 절차 부재 시 결함 발견 ❌ (★ install paradigm 직접 시도 의무).
   - **How to apply**: plugin 자산 신설/구조 변경 시 ★ ★ ★ Claude Code plugin 표준 1-depth scan 호환성 검증 의무 (★ install 시도 + `/plugin` 상세 출력 자체 검증). ★ lifecycle organize 사상 = methodology-spec 사상 axis / runtime 자산 = 1-depth + prefix paradigm (★ sub-axis 분리). 사상 명세 vs runtime axis 충돌 시 ADR-008 이중 렌더링 사상 (사상 + 자산 분리) 정합 적용. ★ 외부 plugin 표준 호환 검증 = ★ release readiness 의무 자격 (★ v2.5.1 PATCH 본격 도달).
@@ -583,6 +630,10 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-50** (★ "skill 디렉토리 의미 ID 본격 자산화 = §1 두 axis 본격 혼란 해소 paradigm / phase-N 숫자 prefix 본격 폐기 / Senior critique 5 의제 본격 흡수" / ★ ★ ★ v2.6.0 MINOR 본격 자산화):
   - **Why**: ★ ★ skills-axis.md §1 본격 정합 "manifest phase ID axis 와 skill 디렉토리 phase-N axis 가 같은 숫자라도 다른 phase 본격 인용 가능" = ★ §6 본인이 "혼란 가중" 인정 / "v2.0 진입 시 의미 ID + alias map 으로 자연 흡수 예정" 명시. ★ ★ v2.6.0 본격 = 본 자연 흡수 본격 자산화. ★ ★ Senior critique 5 의제 본격 흡수 — (1) 명명 미세 조정 4건 (FE suffix 일괄 / api-rule-binding→mapping / characterization→characterization-test / quality-finding→quality-antipattern) (2) common-errors.md v2.5.1→v2.6.0 cutover Q14.5 section 신설 (3) ★ ★ semver MINOR (PATCH ❌ — breaking API surface change 사실 본격 인공) (4) micro-commit 5+6+6 batch + drift-validator fail-fast 앞당김 + chain-driver test 회귀 신설 (5) ★ ★ 영향 범위 본격 실측 42 file (plan §2 28 file 초기 산정 → 본격 재산정). ★ ★ ★ ★ alias map ❌ paradigm = ★ ★ "사내 dogfooding 한정 + 자연어 trigger 가 메인 path / 명시 호출 = 부차 path" 사실 본격 정합 (★ skills-axis.md §7.4 정합).
   - **How to apply**: 본 방법론의 sub-axis 본격 진화 사상 영역 (★ §6 plan-b carry 본격 자연 흡수 paradigm) 본격 본 plan-b 본격 자산화 / 사용자 결단 일괄 승인 paradigm (★ 4원칙 §3 / Auto Mode 호환 / 6+2 결단 항목 본격 묶음). ★ ★ Senior critique 흡수도 본격 — HARD STOP 의제 = 사실 명확도 ★★★ + 비용 ▲ 양쪽 본격 시 ★ 전면 흡수 의무 (★ memory `feedback_senior_stop_signal_absorption.md` LL-i-29 본격 정합). ★ 영향 범위 plan §2 추정 시 ★ ★ grep 본격 실측 의무 (★ Senior 의제 5 본격 흡수 paradigm). ★ ★ ★ 본 paradigm = ★ ★ ★ v1.4.x 과도기 영역 본격 자연 흡수 자격 / chain harness validated §8.1 strict 본질 보존 의무 (★ release-readiness 9/9 본격 통과 의무 + workspace test 322/0 본격 보존).
+
+- ★ ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-51** (★ "양심 의존 → schema enforcement 결정화 paradigm — 단 실측(both=0) 선행 + functional(모순 거부) test 동반 의무" / ★ ★ ★ v4.1.0 MINOR Phase 2 ⑤ 본격 자산화):
+  - **Why**: ★ ★ ★ PoC #08 echo-chamber drift 실측 (LL-i-47 — Sprint 2 GWT 합성이 is_likely_bug 무시 → 보안버그 정상규칙 정규화 / Haiku blind 만 검출) 이 ⑤ 에서 `is_intent`⇔`intent_vs_bug_classification` schema if/then 으로 ★ 코드 enforcement 결정화. ★ ★ 단 결정화 paradigm 의 본질 = (1) ★ 코드 착수 전 실측 의무 (both=0 → if/then 전 PoC vacuous = 회귀 풀이 0 수학 보장 / Senior 조건 2) (2) ★ ★ functional test 동반 의무 (vacuous-everywhere ❌ 입증 = 모순 BR is_intent=true+classification="bug" 가 실제 INVALID / 단순 schema-shape 구조 test 만으로는 enforcement 가 실제 무는지 불명). ★ inline vs 분리 = 단일 정답 ❌ (research 3-에이전트 수렴 — SARIF·Semgrep·OPA·Spectral 분리 우세 / rule object 는 '서술적 속성'만 inline = Semgrep `metadata:`) → 정제된 공존 (heavy 실행 데이터 분리 + slim provenance-tagged inline) = ADR-008 이중 렌더링 사상의 cross-consistency 영역 확장.
+  - **How to apply**: ★ ★ 양심 의존 enforcement (memory `feedback_no_simulation_realized` + `feedback_drift_enforcement_via_release_readiness`) 를 schema if/then 으로 결정화 시 ★ ★ ★ (1) 코드 착수 전 grep 실측 으로 vacuous 영역 정량 (Senior 조건 2 paradigm / 회귀 풀이 0 수학 보장 입증) (2) functional test (실 ajv / 모순 instance = INVALID + 단방향 instance = VALID) 동반 의무 — 구조 test (schema-shape) 만 = enforcement 실제 bite 불명. ★ machine-generated 결과를 rule/spec SSOT 에 기록 시 = provenance discriminator (`generated_by`/`layer`/`timestamp`) 의무 + heavy 실행 데이터는 분리 (산업 표준) / slim 서술 속성만 inline (Semgrep `metadata:` 패턴). ★ chain harness validated §8.1 strict 본질 보존 의무 (release-readiness 11/11 + workspace test 무회귀).
 
 ---
 

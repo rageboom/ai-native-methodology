@@ -9,6 +9,39 @@
 
 ---
 
+## [4.1.0] — 2026-05-17 ★ ★ MINOR — Phase 2 ⑤ cross_consistency_check 신설 + is_intent⇔classification 동치 enforcement
+
+> ★ ★ ★ ★ ★ **v4.1.0 MINOR — additive API surface 확장 / breaking change ❌**. 묶음 P 종결 (Layer 2 corroboration 7 PoC 도달) 로 ⑤ carry trigger 충족 → 본격 진입. 4원칙 (plan + 3-에이전트 research + 사용자 결단 4건 + 시행). DEC-2026-05-17-phase-2-5-cross-consistency-check / ADR-CHAIN-011 §5 patch v12 + §9 LL-i-51.
+
+### 결단 결과 (사용자 결단 4건 / research 후 / 추천안 묶음)
+
+- **#1 설계 = 정제된 옵션 C** (heavy 실행 데이터 layer-2-results/ 분리=SARIF·Semgrep·OPA·Spectral 산업 표준 + BR 안 slim provenance-tagged marker=Semgrep `metadata:` 패턴)
+- **#2 분류 보존 = schema if/then 강제** (실측 both=0 → 전 PoC vacuous = 회귀 풀이 0 수학 보장 / official-docs VERIFIED)
+- **#3 version = v4.1.0 MINOR** (additive API surface 확장)
+- **#4 scope = ⑤ 단독** (Senior Q5 / 묶음 Q 비동반)
+
+### 신설/수정 자산 (1 schema 2변경 + 2 test + 1 ADR + 1 DEC + 1 deliverable)
+
+- **`schemas/rules.schema.json`** — businessRule.properties `cross_consistency_check` slim 객체 신설 (additionalProperties:false / provenance discriminator + 분류보존 필드 + verdict enum 5종(classification_drift 신설) + external_result_ref) + businessRule.allOf `is_intent`⇔`intent_vs_bug_classification` 양방향 동치 if/then 2블록 (둘 다 required = 단방향/미보유 vacuous)
+- **`tools/schema-validator/test/rules-cross-consistency.test.js`** 신설 (11 functional / ★ ajv 실 검증 / test 4·5 = 모순 BR 실제 INVALID = vacuous-everywhere 아님 입증)
+- **`tools/drift-validator/test/cross-consistency-check.test.js`** 신설 (6 구조 / v4.0.1 cross-schema-enum 패턴 미러) + drift-validator v0.4.1 → v0.4.2
+- **`docs/adr/ADR-CHAIN-011-...`** §5.9 patch v12 + §9 LL-i-51
+- **`decisions/DEC-2026-05-17-phase-2-5-cross-consistency-check.md`** 신설 + INDEX 등재
+- **`methodology-spec/deliverables/5-business-rules.md`** — §4.2 v4.1.0 ⑤ cross_consistency_check 섹션 추가
+- **`CLAUDE.md`** (repo root) — plugin.json v4.0.1 → v4.1.0 + 직전 release 요약 첫 줄 갱신 / **`STATUS.md`** session 25차 갱신
+
+### 회귀 검증 (★ chain harness validated 본질 보존)
+
+- workspace test 364 → **381/381 pass** (신규 17 / 0 fail / 0 회귀)
+- release-readiness **11/11 release-ready** (analysis_validator_violation = 11 PoC 전수 violations 0 / 회귀 풀이 0 실측)
+- breaking change ❌ / round-trip 영향 ❌ / chain harness 5 요소 = schema additive 영역 한정 / no-simulation trio + D21' + content-aware 비손상
+
+### industry-first novelty
+
+- intent-vs-bug 분류를 자동 합성 과정에서 schema/validator 로 machine-readable 강제 보존한 precedent 부재 (Salesforce 인간 review / SARIF suppression.justification free-form / OpenRewrite 범위 밖) → 본 ⑤ = 조사 범위 내 industry-first claim 보강
+
+---
+
 ## [4.0.1] — 2026-05-17 ★ PATCH — rules schema enforcement 강화 (③+⑥ 진입 / ⑤ carry / H-1+H-2 housekeeping)
 
 > ★ ★ ★ ★ ★ **v4.0.1 PATCH — additive only / breaking change ❌**. paradigm 안정점 직후 enforcement criterion 강화 묶음. DEC-2026-05-17-rules-schema-enforcement-strengthen 본격 시행. ADR-CHAIN-011 §5 patch v11 추가. Senior REVISE 흡수 + Industry case 4/4 정합 + official-docs CONTRADICTS 2건 housekeeping 동시 흡수.
