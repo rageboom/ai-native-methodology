@@ -14,7 +14,7 @@
       "given": {"followerEmail": "alice@example.com", "username": "bob", "follows_table": "alice→bob 미존재"},
       "when": "userRepository.findOne(username='bob') + userRepository.findOne(email='alice') → self-check 통과 → followsRepository.findOne(follower+following) null → save",
       "then": {"expected_db_state_after": ["follows row 신규 (followerId=alice.id, followingId=bob.id)"]},
-      "intent_classification": [{"rule": "BR-RW-007", "type": "intent", "note": "uniqueness + relation save"}]
+      "intent_classification": [{"rule": "BR-RW-FOLLOW-007", "type": "intent", "note": "uniqueness + relation save"}]
     },
     {
       "id": "SCN-RW-018-002",
@@ -27,5 +27,5 @@
       "behavior_to_preserve": ["self-follow 차단 자체 (BAD_REQUEST 반환)"]
     }
   ],
-  "intent_vs_bug_summary": {"intent": ["BR-RW-007"], "bug": [], "ambiguous": ["AP-RW-004"], "self_recognized": []}
+  "intent_vs_bug_summary": {"intent": ["BR-RW-FOLLOW-007"], "bug": [], "ambiguous": ["AP-RW-004"], "self_recognized": []}
 }

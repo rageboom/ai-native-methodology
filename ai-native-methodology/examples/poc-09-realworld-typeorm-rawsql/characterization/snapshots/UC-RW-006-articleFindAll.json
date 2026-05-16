@@ -14,7 +14,7 @@
       "given": {"request_query": "(empty)"},
       "when": "createQueryBuilder + leftJoinAndSelect author + .where('1 = 1') + 0 .andWhere + orderBy + getCount + getMany",
       "then": {"expected_sql_pattern": "SELECT article.*, author.* FROM article LEFT JOIN user ON article.authorId = user.id WHERE 1=1 ORDER BY article.created DESC", "expected_response": "{ articles: [...], articlesCount: N }"},
-      "intent_classification": [{"rule": "BR-RW-003", "type": "intent", "note": "기본 list 조회"}]
+      "intent_classification": [{"rule": "BR-RW-ARTICLE-003", "type": "intent", "note": "기본 list 조회"}]
     },
     {
       "id": "SCN-RW-006-002",
@@ -22,7 +22,7 @@
       "given": {"request_query": "?tag=javascript"},
       "when": "createQueryBuilder + .where('1=1') + .andWhere('article.tagList LIKE :tag', {tag: '%javascript%'})",
       "then": {"expected_sql_pattern": "... WHERE 1=1 AND article.tagList LIKE '%javascript%'"},
-      "intent_classification": [{"rule": "BR-RW-003", "type": "intent", "note": "dynamic tag 분기"}]
+      "intent_classification": [{"rule": "BR-RW-ARTICLE-003", "type": "intent", "note": "dynamic tag 분기"}]
     },
     {
       "id": "SCN-RW-006-003",
@@ -30,7 +30,7 @@
       "given": {"request_query": "?author=jane"},
       "when": "userRepository.findOne({username:'jane'}) → createQueryBuilder + .andWhere('article.authorId = :id', {id: jane.id})",
       "then": {"expected_sql_pattern": "... WHERE 1=1 AND article.authorId = ?"},
-      "intent_classification": [{"rule": "BR-RW-003", "type": "intent", "note": "dynamic author 분기"}]
+      "intent_classification": [{"rule": "BR-RW-ARTICLE-003", "type": "intent", "note": "dynamic author 분기"}]
     },
     {
       "id": "SCN-RW-006-004",
@@ -38,7 +38,7 @@
       "given": {"request_query": "?favorited=jane"},
       "when": "userRepository.findOne({username:'jane'}) → ids = jane.favorites.map(el=>el.id) → .andWhere('article.authorId IN (:ids)', {ids})",
       "then": {"expected_sql_pattern": "... WHERE 1=1 AND article.authorId IN (?, ?, ...)", "_note": "★ ★ FIXME — favorited 의 의미 = 'Jane 이 favorite 한 article' 인데 코드는 'authorId IN' = 의미 부정확 → ★ likely bug?"},
-      "intent_classification": [{"rule": "BR-RW-003", "type": "ambiguous", "note": "★ 코드 read 결과 favorited 의미 부정확 = bug 가능성"}],
+      "intent_classification": [{"rule": "BR-RW-ARTICLE-003", "type": "ambiguous", "note": "★ 코드 read 결과 favorited 의미 부정확 = bug 가능성"}],
       "behavior_likely_bug": ["★ favorited query 의미 부정확 — 'Jane 이 favorite 한 article' 의도라면 다른 join 의무 / 'Jane 이 작성한' = author query 와 isomorphic = 의도 모호"],
       "behavior_to_preserve": ["dynamic IN clause paradigm 자체"]
     },
@@ -48,11 +48,11 @@
       "given": {"request_query": "?limit=10&offset=20"},
       "when": ".limit(10).offset(20)",
       "then": {"expected_sql_pattern": "... LIMIT 10 OFFSET 20"},
-      "intent_classification": [{"rule": "BR-RW-003", "type": "intent", "note": "pagination 표준"}]
+      "intent_classification": [{"rule": "BR-RW-ARTICLE-003", "type": "intent", "note": "pagination 표준"}]
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-RW-003 dynamic search"],
+    "intent": ["BR-RW-ARTICLE-003 dynamic search"],
     "bug": [],
     "ambiguous": ["★ favorited 분기 의미 부정확 — author authorId IN ids = 'Jane 이 작성한' 의미 / 'Jane 이 favorite 한' 아닌 듯 (코드 read 시점)"],
     "self_recognized": [],

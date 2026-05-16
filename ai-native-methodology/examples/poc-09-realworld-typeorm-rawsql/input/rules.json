@@ -3,7 +3,7 @@
   "project_id": "poc-09-realworld-typeorm-rawsql",
   "business_rules": [
     {
-      "id": "BR-RW-001",
+      "id": "BR-RW-IDENTITY-001",
       "title": "User 등록 시 username + email uniqueness 검증",
       "natural_language": "UserService.create — createQueryBuilder 로 (user.username = :username OR user.email = :email) 검증 후 매칭 시 HttpException(BAD_REQUEST). ★ ★ TypeORM dynamic SQL paradigm corroboration 핵심.",
       "source": "user.service.ts:42-54",
@@ -12,7 +12,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-RW-002",
+      "id": "BR-RW-AUTHN-002",
       "title": "★ ★ ★ password = argon2 해시 (★ vs PoC #08 평문 → 본 PoC ★ 정상 보안)",
       "natural_language": "UserService.findOne (login) — argon2.verify(user.password, password) 호출. password 저장 시 argon2 해시. ★ ★ ★ vs PoC #08 jpetstore 평문 password 정합 (BR-PETSTORE-006 / AP-PETSTORE-004) — Modern Node.js stack = ★ 보안 정상.",
       "source": "user.service.ts:30 + argon2 dependency",
@@ -22,7 +22,7 @@
       "isomorphic_to_poc08": "★ ★ inverse — PoC #08 = 평문 (bug) / PoC #09 = argon2 (intent / 정상) / paradigm-cross AP 일반화 입증 ↑"
     },
     {
-      "id": "BR-RW-003",
+      "id": "BR-RW-ARTICLE-003",
       "title": "★ ★ Article findAll = 4 동적 분기 (tag / author / favorited / 기본 1=1)",
       "natural_language": "ArticleService.findAll(query) — createQueryBuilder + leftJoinAndSelect + .where('1 = 1') + 4 dynamic .andWhere (tag LIKE / authorId / favorited author / IN ids) + orderBy + getCount + limit/offset. ★ ★ ★ TypeORM dynamic SQL paradigm = iBATIS `<isNotEmpty>` / `<if>` 와 isomorphic.",
       "source": "article.service.ts:26-64",
@@ -31,7 +31,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-RW-004",
+      "id": "BR-RW-FEED-004",
       "title": "Article findFeed = 사용자 follow IN ids 분기",
       "natural_language": "ArticleService.findFeed(userId, query) — followsRepository.find({followerId}) → ids = follows.map → createQueryBuilder + where('article.authorId IN (:ids)') + orderBy + limit/offset. ★ TypeORM IN clause paradigm.",
       "source": "article.service.ts:66-94",
@@ -40,7 +40,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-RW-005",
+      "id": "BR-RW-SLUG-005",
       "title": "Article slug 자동 생성 (title 기반)",
       "natural_language": "ArticleService.create — slug 패키지 사용 (title → URL-safe slug) + create. slug 추후 URL path 사용 (/:slug).",
       "source": "article.service.ts:170-188 + import slug",
@@ -49,7 +49,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-RW-006",
+      "id": "BR-RW-COMMENT-006",
       "title": "Comment 추가 = Article cascade save",
       "natural_language": "ArticleService.addComment — article.findOne + comment.save + article.comments.push + article.save. ★ TypeORM cascade relation 활용.",
       "source": "article.service.ts:101-112",
@@ -58,7 +58,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-RW-007",
+      "id": "BR-RW-FOLLOW-007",
       "title": "Profile follow = followsRepository unique check + save",
       "natural_language": "ProfileService.follow — findOne(followerId + followingId) 으로 unique check 후 부재 시 save. self-follow 차단 (followerEmail === followingEmail).",
       "source": "profile.service.ts:50-77",

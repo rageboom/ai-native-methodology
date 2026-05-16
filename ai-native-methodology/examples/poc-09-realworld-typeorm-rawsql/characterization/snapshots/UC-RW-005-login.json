@@ -14,7 +14,7 @@
       "given": {"request_body": {"user": {"email": "user@example.com", "password": "secret123"}}, "user_table": "argon2-hashed password 저장"},
       "when": "userRepository.findOne({email}) → argon2.verify(user.password, password) → true",
       "then": {"expected_response": "200 OK + UserRO + JWT token", "_note": "★ ★ ★ vs PoC #08 평문 비교 (BR-PETSTORE-006) inverse — Modern stack 정상 보안"},
-      "intent_classification": [{"rule": "BR-RW-002", "type": "intent", "note": "argon2.verify 정상 보안"}]
+      "intent_classification": [{"rule": "BR-RW-AUTHN-002", "type": "intent", "note": "argon2.verify 정상 보안"}]
     },
     {
       "id": "SCN-RW-005-002",
@@ -22,11 +22,11 @@
       "given": {"request_body": {"user": {"email": "user@example.com", "password": "wrong"}}},
       "when": "argon2.verify → false",
       "then": {"expected_response": "null (★ controller 에서 401 반환)"},
-      "intent_classification": [{"rule": "BR-RW-002", "type": "intent", "note": "잘못된 인증 거부 정합"}]
+      "intent_classification": [{"rule": "BR-RW-AUTHN-002", "type": "intent", "note": "잘못된 인증 거부 정합"}]
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-RW-002 argon2 정상 보안"],
+    "intent": ["BR-RW-AUTHN-002 argon2 정상 보안"],
     "bug": [],
     "ambiguous": [],
     "self_recognized": []

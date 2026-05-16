@@ -14,8 +14,8 @@
       "given": {"request_body": {"comment": {"body": "Great article!"}}, "article": "slug='hello-world' 존재"},
       "when": "articleRepository.findOne(slug) → comment 신규 + body 설정 → article.comments.push → commentRepository.save + articleRepository.save",
       "then": {"expected_db_state_after": ["comment row 신규", "article.comments cascade 갱신"]},
-      "intent_classification": [{"rule": "BR-RW-006", "type": "intent", "note": "TypeORM cascade relation 정합"}]
+      "intent_classification": [{"rule": "BR-RW-COMMENT-006", "type": "intent", "note": "TypeORM cascade relation 정합"}]
     }
   ],
-  "intent_vs_bug_summary": {"intent": ["BR-RW-006 cascade"], "bug": [], "ambiguous": [], "self_recognized": []}
+  "intent_vs_bug_summary": {"intent": ["BR-RW-COMMENT-006 cascade"], "bug": [], "ambiguous": [], "self_recognized": []}
 }

@@ -7,13 +7,13 @@
 
 | ID | 제목 | 분류 | 근거 |
 |---|---|---|---|
-| BR-RW-001 | User 등록 시 username + email uniqueness | **intent** | createQueryBuilder uniqueness check 정합 |
-| BR-RW-002 | ★ ★ ★ password = argon2 해시 (★ vs PoC #08 평문 inverse) | **intent** | argon2.verify + hash = 정상 보안 / Modern Node.js stack 정합 |
-| BR-RW-003 | Article findAll = 4 동적 분기 | **intent** | TypeORM dynamic SQL paradigm 정합 |
-| BR-RW-004 | Article findFeed = follow IN ids | **intent** | feed contract 정합 |
-| BR-RW-005 | Article slug 자동 생성 | **intent** | URL-safe slug = REST 표준 |
-| BR-RW-006 | Comment cascade save | **intent** | TypeORM cascade relation = 표준 |
-| BR-RW-007 | Profile follow uniqueness check | **intent** | findOne + save 패턴 정합 |
+| BR-RW-IDENTITY-001 | User 등록 시 username + email uniqueness | **intent** | createQueryBuilder uniqueness check 정합 |
+| BR-RW-AUTHN-002 | ★ ★ ★ password = argon2 해시 (★ vs PoC #08 평문 inverse) | **intent** | argon2.verify + hash = 정상 보안 / Modern Node.js stack 정합 |
+| BR-RW-ARTICLE-003 | Article findAll = 4 동적 분기 | **intent** | TypeORM dynamic SQL paradigm 정합 |
+| BR-RW-FEED-004 | Article findFeed = follow IN ids | **intent** | feed contract 정합 |
+| BR-RW-SLUG-005 | Article slug 자동 생성 | **intent** | URL-safe slug = REST 표준 |
+| BR-RW-COMMENT-006 | Comment cascade save | **intent** | TypeORM cascade relation = 표준 |
+| BR-RW-FOLLOW-007 | Profile follow uniqueness check | **intent** | findOne + save 패턴 정합 |
 
 **BR 분류 결과**: intent 7 / bug 0 / ambiguous 0 / self_recognized 0
 
@@ -32,7 +32,7 @@
 
 | 항목 | 분류 | 명시 키워드 | 자격 |
 |---|---|---|---|
-| BR-RW-001 ~ 007 | intent | ✅ "intent" | ✅ |
+| BR-RW-IDENTITY-001 ~ 007 | intent | ✅ "intent" | ✅ |
 | AP-RW-001 | ambiguous | ✅ "ambiguous" | ✅ |
 | AP-RW-002 | intent (D2.5 격하) | ✅ "intent" | ✅ |
 | AP-RW-003 | bug | ✅ "bug" | ✅ |

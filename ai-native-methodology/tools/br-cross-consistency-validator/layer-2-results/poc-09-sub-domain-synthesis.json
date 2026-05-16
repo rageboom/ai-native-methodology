@@ -1,0 +1,34 @@
+{
+  "$schema_version": "v2.5.0-sub-domain-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 7,
+  "poc_id": "poc-09-realworld-typeorm-rawsql",
+  "$comment": "★ ★ session 23차 Sprint 1-D / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 10 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "results": [
+    { "old_id": "BR-RW-001", "new_id": "BR-RW-IDENTITY-001", "sub_domain": "IDENTITY", "rationale": "username·email 중복 방지 = 신원 고유성 보장 도메인" },
+    { "old_id": "BR-RW-002", "new_id": "BR-RW-AUTHN-002", "sub_domain": "AUTHN", "rationale": "argon2 해시 저장·로그인 검증 = 인증 보안 핵심" },
+    { "old_id": "BR-RW-003", "new_id": "BR-RW-ARTICLE-003", "sub_domain": "ARTICLE", "rationale": "4 동적 분기 게시글 목록 조회 = Article 탐색 도메인" },
+    { "old_id": "BR-RW-004", "new_id": "BR-RW-FEED-004", "sub_domain": "FEED", "rationale": "팔로우 사용자 게시글만 노출 = 개인화 Feed 조회 도메인" },
+    { "old_id": "BR-RW-005", "new_id": "BR-RW-SLUG-005", "sub_domain": "SLUG", "rationale": "title 기반 URL-safe slug 자동 생성 = Article 식별자 도메인" },
+    { "old_id": "BR-RW-006", "new_id": "BR-RW-COMMENT-006", "sub_domain": "COMMENT", "rationale": "댓글 추가 Article cascade save = Comment 영속화 도메인" },
+    { "old_id": "BR-RW-007", "new_id": "BR-RW-FOLLOW-007", "sub_domain": "FOLLOW", "rationale": "팔로우 중복 체크·저장·자기팔로우 차단 = 사용자 관계 도메인" }
+  ],
+  "cross_ref_files_updated": [
+    "input/rules.json",
+    "input/domain.json",
+    ".aimd/output/planning-spec.json",
+    "characterization/intent-vs-bug.md",
+    "characterization/snapshots/UC-RW-003-register.json",
+    "characterization/snapshots/UC-RW-005-login.json",
+    "characterization/snapshots/UC-RW-006-articleFindAll.json",
+    "characterization/snapshots/UC-RW-013-addComment.json",
+    "characterization/snapshots/UC-RW-018-follow.json",
+    "sql-inventory/sql-inventory.json"
+  ],
+  "verification": {
+    "old_id_residual_count": 0,
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}
