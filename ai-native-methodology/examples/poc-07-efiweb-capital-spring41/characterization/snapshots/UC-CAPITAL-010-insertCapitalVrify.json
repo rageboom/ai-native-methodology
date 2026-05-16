@@ -20,10 +20,10 @@
       "then": {
         "expected_TB_CAPITAL_VRIFY_after": { "COM_NO": "001", "VRIFY_DATE": "20260507", "INS_ID": "ifrs_admin_01" },
         "expected_response": "{ \"success\": \"Y\" }",
-        "_BR_link": "BR-CAPITAL-008 — verify lock = 결재 후 임시저장 차단 트리거"
+        "_BR_link": "BR-CAPITAL-VRFYLOCK-008 — verify lock = 결재 후 임시저장 차단 트리거"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-008", "type": "intent", "note": "결재 lock = 회계 data 보호 (감사 정합)" }
+        { "rule": "BR-CAPITAL-VRFYLOCK-008", "type": "intent", "note": "결재 lock = 회계 data 보호 (감사 정합)" }
       ],
       "behavior_to_preserve": [
         "verify 후 INS_ID (USER_ID) 저장 — 감사 추적 (intent)",
@@ -56,10 +56,10 @@
       "when": "(Controller 별도 분기 없음 — DB unique constraint 또는 application 검증 부재 / 같은 com_no + vrify_date 두 번째 호출)",
       "then": {
         "expected_behavior": "★ ambiguous — DB constraint 의존 / 또는 selectCapitalVrify 결과를 Controller 가 미리 검증해야 하는지 결단 부재",
-        "_BR_link": "BR-CAPITAL-008 domain_carry — verify 후 수정 가능 여부 planner 결단 의무"
+        "_BR_link": "BR-CAPITAL-VRFYLOCK-008 domain_carry — verify 후 수정 가능 여부 planner 결단 의무"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-008", "type": "ambiguous", "note": "★ verify 후 수정 정책 모호 — IFRS 회계 담당자 결단 의무" }
+        { "rule": "BR-CAPITAL-VRFYLOCK-008", "type": "ambiguous", "note": "★ verify 후 수정 정책 모호 — IFRS 회계 담당자 결단 의무" }
       ],
       "behavior_to_preserve": [
         "(★ ambiguous — D2 결단 의뢰 의무 / Day 2.5 DEC-도메인-결단 작성 후 갱신)"
@@ -70,13 +70,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-008 (verify lock)"],
+    "intent": ["BR-CAPITAL-VRFYLOCK-008 (verify lock)"],
     "bug": ["AP-CAPITAL-002"],
-    "ambiguous": ["BR-CAPITAL-008 verify 후 수정 정책"]
+    "ambiguous": ["BR-CAPITAL-VRFYLOCK-008 verify 후 수정 정책"]
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-010"],
-    "brs_covered": ["BR-CAPITAL-008"],
+    "brs_covered": ["BR-CAPITAL-VRFYLOCK-008"],
     "aps_intersected": ["AP-CAPITAL-002"]
   }
 }

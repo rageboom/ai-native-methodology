@@ -1,0 +1,47 @@
+{
+  "$schema_version": "v2.5.0-sub-domain-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 15,
+  "poc_id": "poc-07-efiweb-capital-spring41",
+  "$comment": "★ ★ session 23차 Sprint 1-B / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (★ implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 15 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "results": [
+    { "old_id": "BR-CAPITAL-001", "new_id": "BR-CAPITAL-CORPYN-001", "sub_domain": "CORPYN", "rationale": "capital_yn / cms_use_yn 플래그로 '자본 보고 대상 법인' 여부를 분류하는 것이 규칙의 핵심 — 법인(CORP) 자격 플래그(YN)" },
+    { "old_id": "BR-CAPITAL-002", "new_id": "BR-CAPITAL-STYPE-002", "sub_domain": "STYPE", "rationale": "sType=1(표준)/sType=2(비즈니스) 구분이 Capital 조회 API 분기의 핵심 비즈니스 식별자" },
+    { "old_id": "BR-CAPITAL-003", "new_id": "BR-CAPITAL-TXBOUND-003", "sub_domain": "TXBOUND", "rationale": "단일 트랜잭션 없이 DAO 다중 호출하는 트랜잭션 경계 모호성이 규칙의 본질적 비즈니스 위험" },
+    { "old_id": "BR-CAPITAL-004", "new_id": "BR-CAPITAL-DATASRC-004", "sub_domain": "DATASRC", "rationale": "ERP/CMS/NonERP 3종 입금 데이터 출처 분기가 규칙의 핵심 관심사" },
+    { "old_id": "BR-CAPITAL-005", "new_id": "BR-CAPITAL-SAVTYPE-005", "sub_domain": "SAVTYPE", "rationale": "R(저장)/B(임시저장)/A(초기화) saveType 3분기 상태머신이 자금일보 저장 흐름의 핵심 상태 전이" },
+    { "old_id": "BR-CAPITAL-006", "new_id": "BR-CAPITAL-PREVBAL-006", "sub_domain": "PREVBAL", "rationale": "전주 마지막 날짜 잔액(basicBalance) 자동 fetch 가 규칙의 핵심 비즈니스 의미" },
+    { "old_id": "BR-CAPITAL-007", "new_id": "BR-CAPITAL-AUDIT-007", "sub_domain": "AUDIT", "rationale": "세션 USER_ID를 등록/수정자로 자동 기록하는 감사 추적이 핵심 관심사" },
+    { "old_id": "BR-CAPITAL-008", "new_id": "BR-CAPITAL-VRFYLOCK-008", "sub_domain": "VRFYLOCK", "rationale": "결재 후 검증 lock 으로 임시저장을 차단하는 승인 워크플로우 잠금이 핵심 비즈니스 제약" },
+    { "old_id": "BR-CAPITAL-009", "new_id": "BR-CAPITAL-XRATE-009", "sub_domain": "XRATE", "rationale": "exchange 모듈 TB_DAY_EXCHANGE cross-domain 의존 주간 환율 데이터 활용이 핵심 의존" },
+    { "old_id": "BR-CAPITAL-010", "new_id": "BR-CAPITAL-HISTORY-010", "sub_domain": "HISTORY", "rationale": "자본 보고 변경 이력 추적·보존이 규칙의 핵심 관심사" },
+    { "old_id": "BR-CAPITAL-011", "new_id": "BR-CAPITAL-MAILSPEC-011", "sub_domain": "MAILSPEC", "rationale": "슈퍼크리에이티브 사용자 메일 수신 임시처리(SATD 4회 중복)가 핵심 비즈니스 예외 케이스" },
+    { "old_id": "BR-CAPITAL-012", "new_id": "BR-CAPITAL-IMGB64-012", "sub_domain": "IMGB64", "rationale": "이미지를 base64 인라인 문자열로 DB 직접 저장하는 데이터 저장 방식이 핵심 사실" },
+    { "old_id": "BR-CAPITAL-013", "new_id": "BR-CAPITAL-CALEND-013", "sub_domain": "CALEND", "rationale": "영업일/휴일/주차를 TB_HOLIDAY+TB_WEEK_CALENDAR 분기 계산하는 캘린더 로직이 핵심" },
+    { "old_id": "BR-CAPITAL-014", "new_id": "BR-CAPITAL-GRAPHSET-014", "sub_domain": "GRAPHSET", "rationale": "회사별·사용자별 그래프 설정 개인화 저장이 규칙의 핵심 기능" },
+    { "old_id": "BR-CAPITAL-015", "new_id": "BR-CAPITAL-ASSETSP-015", "sub_domain": "ASSETSP", "rationale": "Asset list 1~7단계 별도 SP 다단계 호출 집계 파이프라인이 핵심 데이터 조회 방식" }
+  ],
+  "cross_ref_files_updated": [
+    "input/rules.json",
+    ".aimd/output/planning-spec.json",
+    ".aimd/output/planning-spec.md",
+    "characterization/coverage.json",
+    "characterization/intent-vs-bug.md",
+    "characterization/snapshots/UC-CAPITAL-001-comBasicInfo.json",
+    "characterization/snapshots/UC-CAPITAL-002-IfrsComINSetSave.json",
+    "characterization/snapshots/UC-CAPITAL-006-IfrsERPINListSave.json",
+    "characterization/snapshots/UC-CAPITAL-008-IfrsLoadSaveData.json",
+    "characterization/snapshots/UC-CAPITAL-010-insertCapitalVrify.json",
+    "characterization/snapshots/UC-CAPITAL-011-IfrsWeekReport1.json",
+    "characterization/snapshots/UC-CAPITAL-013-IfrsWeekReport10.json",
+    "sql-inventory/sql-inventory.json",
+    "PROGRESS-2026-05-08.md",
+    "REPORT-day3-measurement.md"
+  ],
+  "verification": {
+    "old_id_residual_count": 0,
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}

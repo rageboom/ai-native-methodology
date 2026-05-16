@@ -31,13 +31,13 @@
           "004 (CAPITAL_YN=N, CMS_USE_YN=N / 정렬 4)"
         ],
         "order_clause": "ORDER BY CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO",
-        "_note": "BR-CAPITAL-001 — 자본 보고 대상 법인 (CAPITAL_YN='Y' OR CMS_USE_YN='Y') 우선 정렬"
+        "_note": "BR-CAPITAL-CORPYN-001 — 자본 보고 대상 법인 (CAPITAL_YN='Y' OR CMS_USE_YN='Y') 우선 정렬"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-001", "type": "intent", "note": "법인별 capital_yn / cms_use_yn 분류 = 회계 정합" }
+        { "rule": "BR-CAPITAL-CORPYN-001", "type": "intent", "note": "법인별 capital_yn / cms_use_yn 분류 = 회계 정합" }
       ],
       "behavior_to_preserve": [
-        "TB_COMPANY 의 CAPITAL_YN + CMS_USE_YN 두 flag 정렬 (BR-CAPITAL-001)",
+        "TB_COMPANY 의 CAPITAL_YN + CMS_USE_YN 두 flag 정렬 (BR-CAPITAL-CORPYN-001)",
         "Map<String,Object> 결과 (현재 형식 / 새 시스템 = DTO 매핑 의무)"
       ],
       "behavior_likely_bug": [
@@ -46,13 +46,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-001 (capital_yn / cms_use_yn 분류)"],
+    "intent": ["BR-CAPITAL-CORPYN-001 (capital_yn / cms_use_yn 분류)"],
     "bug": ["AP-CAPITAL-002 (Map + 강제 캐스팅)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-001"],
-    "brs_covered": ["BR-CAPITAL-001"],
+    "brs_covered": ["BR-CAPITAL-CORPYN-001"],
     "aps_intersected": ["AP-CAPITAL-002"]
   }
 }

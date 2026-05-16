@@ -53,8 +53,8 @@
         "auto_grep": "✅ 80% — tag pattern grep + nested branch depth = LLM",
         "decision_table_candidate": "★ phase 4.5 formal-spec / decision-table 영역 정합 (★ C-v2.2.0-decision-table-auto carry)",
         "core_examples": [
-          { "sql_id": "selectLoadSaveData", "tags": ["<isEqual property=\"SaveType\" compareValue=\"R\">", "<isEqual property=\"SaveType\" compareValue=\"B\">", "<isEqual property=\"SaveType\" compareValue=\"A\">"], "branch_count": 3, "line": 391, "br_link": "BR-CAPITAL-005 saveType 3 분기" },
-          { "sql_id": "selectERPINReport", "tags": ["<isNotEmpty property=\"sType\">"], "branch_count": 7, "line": 746, "br_link": "BR-CAPITAL-002 sType 분기" },
+          { "sql_id": "selectLoadSaveData", "tags": ["<isEqual property=\"SaveType\" compareValue=\"R\">", "<isEqual property=\"SaveType\" compareValue=\"B\">", "<isEqual property=\"SaveType\" compareValue=\"A\">"], "branch_count": 3, "line": 391, "br_link": "BR-CAPITAL-SAVTYPE-005 saveType 3 분기" },
+          { "sql_id": "selectERPINReport", "tags": ["<isNotEmpty property=\"sType\">"], "branch_count": 7, "line": 746, "br_link": "BR-CAPITAL-STYPE-002 sType 분기" },
           { "sql_id": "selectIfrsERPINList", "tags": ["<isNotEmpty> 다수"], "branch_count": 5, "line": 65 }
         ]
       },
@@ -153,7 +153,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["TB_COMPANY"],
       "uc_link": "UC-CAPITAL-001",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-001 / 회사 마스터 분류)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-CORPYN-001 / 회사 마스터 분류)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered (★ 핵심)"
@@ -167,7 +167,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["TB_COMPANY"],
       "uc_link": "UC-CAPITAL-002",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-001 갱신) + bug 동반 (★ AP-CAPITAL-003 트랜잭션 boundary 모호 / DAO 다중 호출)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-CORPYN-001 갱신) + bug 동반 (★ AP-CAPITAL-003 트랜잭션 boundary 모호 / DAO 다중 호출)",
       "confidence": 0.80,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -181,7 +181,7 @@
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "UC-CAPITAL-003",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-002 sType 분기) + bug 동반 (cross-system 의존 직접)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-STYPE-002 sType 분기) + bug 동반 (cross-system 의존 직접)",
       "confidence": 0.65,
       "carry_flags": ["DBA-read", "external_call_out_of_scope"],
       "scope_decision": "covered"
@@ -195,7 +195,7 @@
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "UC-CAPITAL-004",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-002 sType=2)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-STYPE-002 sType=2)",
       "confidence": 0.65,
       "carry_flags": ["DBA-read", "external_call_out_of_scope"],
       "scope_decision": "covered"
@@ -211,7 +211,7 @@
       ],
       "dependent_tables": ["TB_CAPITAL_LIST"],
       "uc_link": "UC-CAPITAL-005",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-004 / ERP 입금) + bug 동반 (AP-CAPITAL-004 NOLOCK / AP-CAPITAL-011 cross-domain)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-DATASRC-004 / ERP 입금) + bug 동반 (AP-CAPITAL-004 NOLOCK / AP-CAPITAL-011 cross-domain)",
       "confidence": 0.75,
       "carry_flags": ["DBA-read"],
       "scope_decision": "covered (★ 핵심)"
@@ -225,7 +225,7 @@
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "UC-CAPITAL-006",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-004 등록)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-DATASRC-004 등록)",
       "confidence": 0.70,
       "carry_flags": ["DBA-read", "proc-body", "external_call_out_of_scope"],
       "scope_decision": "covered"
@@ -234,7 +234,7 @@
       "sql_id": "CapitalDAO.IfrsWEEKINListSave",
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 360,
-      "called_from_screen": "capitalDepositAction.jsp → /ifrs/capital/IfrsERPINListSave (BR-CAPITAL-006 동반)",
+      "called_from_screen": "capitalDepositAction.jsp → /ifrs/capital/IfrsERPINListSave (BR-CAPITAL-PREVBAL-006 동반)",
       "business_meaning": "주간 입금 List 저장 (IFRS.dbo._IFRSWeekList SP)",
       "dynamic_branch": [],
       "dependent_tables": [],
@@ -249,13 +249,13 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 503,
       "called_from_screen": "capitalReport.jsp → /ifrs/capital/IfrsLoadSaveData",
-      "business_meaning": "자금일보 임시저장 데이터 조회 (saveType R/B/A 분기 BR-CAPITAL-005 정합)",
+      "business_meaning": "자금일보 임시저장 데이터 조회 (saveType R/B/A 분기 BR-CAPITAL-SAVTYPE-005 정합)",
       "dynamic_branch": [
         { "tag": "<isNotEmpty>", "branch_count": "~3 분기" }
       ],
       "dependent_tables": ["TB_CAPITAL_LIST", "TB_CAPITAL_LIST_USERSET"],
       "uc_link": "UC-CAPITAL-008",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-005 saveType 3 분기)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-SAVTYPE-005 saveType 3 분기)",
       "confidence": 0.85,
       "carry_flags": [],
       "scope_decision": "covered (★ 핵심)"
@@ -295,11 +295,11 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 1354,
       "called_from_screen": "capitalReport.jsp → /ifrs/capital/selectCapitalVrify",
-      "business_meaning": "★ 자본 검증 lock 조회 (BR-CAPITAL-008 결재 후 lock)",
+      "business_meaning": "★ 자본 검증 lock 조회 (BR-CAPITAL-VRFYLOCK-008 결재 후 lock)",
       "dynamic_branch": [],
       "dependent_tables": ["TB_CAPITAL_VRIFY"],
       "uc_link": "UC-CAPITAL-010",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-008 approval workflow)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-VRFYLOCK-008 approval workflow)",
       "confidence": 0.85,
       "carry_flags": ["domain-expert"],
       "scope_decision": "covered (★ 핵심 verify)"
@@ -309,7 +309,7 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 686,
       "called_from_screen": "weeklist.jsp → /ifrs/capital/IfrsWeekReport1",
-      "business_meaning": "★ 자금일보 주간보고 1 — 자금조달내역 (cramt 잔액 / 전주 마지막 날짜 자동 fetch BR-CAPITAL-006)",
+      "business_meaning": "★ 자금일보 주간보고 1 — 자금조달내역 (cramt 잔액 / 전주 마지막 날짜 자동 fetch BR-CAPITAL-PREVBAL-006)",
       "dynamic_branch": [
         { "tag": "<isNotEmpty> + sType 분기", "branch_count": "~6 분기" }
       ],
@@ -339,13 +339,13 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": "1285 + 1292",
       "called_from_screen": "weeklist.jsp → /ifrs/capital/IfrsWeekRate, /ifrs/capital/IfrsWeekRateList",
-      "business_meaning": "★ ★ 주간 환율 (TB_DAY_EXCHANGE / cross-domain — exchange 모듈 의존 BR-CAPITAL-009)",
+      "business_meaning": "★ ★ 주간 환율 (TB_DAY_EXCHANGE / cross-domain — exchange 모듈 의존 BR-CAPITAL-XRATE-009)",
       "dynamic_branch": [
         { "tag": "<isNotEmpty currCd>", "branch_count": 1 }
       ],
       "dependent_tables": ["TB_DAY_EXCHANGE"],
       "uc_link": "UC-CAPITAL-016",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-009 / cross-module dep) + bug 동반 (★ AP-CAPITAL-011 / module boundary 위반)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-XRATE-009 / cross-module dep) + bug 동반 (★ AP-CAPITAL-011 / module boundary 위반)",
       "confidence": 0.85,
       "carry_flags": ["cross-domain"],
       "scope_decision": "covered (★ 핵심 / cross-module 의존 입증)"
@@ -372,12 +372,12 @@
     "$comment": "★ ★ 시간 cap 정합 — 56 SQL 자동 추출 컬럼 (1, 2, 5, 6) 만 raw-grep.txt 에 존재 / 매뉴얼 컬럼 (3, 4, 7, 8) 부재 → carry note",
     "by_sub_domain": {
       "C. CapitalAsset (selectAssetListAjax1~7 + insertAssetINSetList)": "8 SQL / external SP 다수 / DBA-read carry",
-      "E. Mail (saveMail / insertSendMail / selectMail / selectDeptCd / selectDeptMail / mailsendlogAjax)": "10 SQL / 슈퍼크리에이티브 임시처리 SATD 4회 BR-CAPITAL-011 정합",
+      "E. Mail (saveMail / insertSendMail / selectMail / selectDeptCd / selectDeptMail / mailsendlogAjax)": "10 SQL / 슈퍼크리에이티브 임시처리 SATD 4회 BR-CAPITAL-MAILSPEC-011 정합",
       "F. Calendar (holyday / week / weekList / IfrsPreviousWeekEndDate)": "4 SQL / TB_HOLIDAY + TB_WEEK_CALENDAR",
       "G. WeeklyReport (IfrsWeekReport2/3/4/5/6/7/8/9/11/12/13/14 / IfrsWeekReportCms)": "13 SQL / 부분 cover (UC-CAPITAL-011/013/014/015 = 핵심) / 나머지 carry",
-      "H. CapitalHistory (selectCapitalHistory / insertCapitalHistory / updateCapitalHistory / deleteCapitalHistory)": "4 SQL / audit BR-CAPITAL-010",
+      "H. CapitalHistory (selectCapitalHistory / insertCapitalHistory / updateCapitalHistory / deleteCapitalHistory)": "4 SQL / audit BR-CAPITAL-HISTORY-010",
       "I. Comment+Verify (insertCapitalVrify / insertCapitalComment / getComment)": "3 SQL (selectCapitalVrify = 핵심 cover)",
-      "J. GraphSetting (selectCompanyGraphSetting / insert/update/delete + deleteUserSet)": "5 SQL / BR-CAPITAL-014 ui_personalization",
+      "J. GraphSetting (selectCompanyGraphSetting / insert/update/delete + deleteUserSet)": "5 SQL / BR-CAPITAL-GRAPHSET-014 ui_personalization",
       "K. ETC (selectErpYn / selectLastSaveSdate / setFcmmnLog / selectAssetListAjax6+7 / saveCompanyGraphSetting / IfrsAssetListAjax5)": "9 SQL"
     }
   },

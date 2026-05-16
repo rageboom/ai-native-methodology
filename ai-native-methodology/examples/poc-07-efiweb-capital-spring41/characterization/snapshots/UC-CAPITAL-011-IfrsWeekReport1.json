@@ -32,31 +32,31 @@
         "transaction_scope": "★ 명시 부재 — read 전용 / 트랜잭션 boundary 모호"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-006", "type": "intent", "note": "전주 마지막 영업일 잔액 자동 fetch = 자금일보 핵심" },
-        { "rule": "BR-CAPITAL-009", "type": "intent", "note": "TB_DAY_EXCHANGE cross-module 의존 = 환율 가중 의무 (회계 정합)" }
+        { "rule": "BR-CAPITAL-PREVBAL-006", "type": "intent", "note": "전주 마지막 영업일 잔액 자동 fetch = 자금일보 핵심" },
+        { "rule": "BR-CAPITAL-XRATE-009", "type": "intent", "note": "TB_DAY_EXCHANGE cross-module 의존 = 환율 가중 의무 (회계 정합)" }
       ],
       "behavior_to_preserve": [
-        "전주 영업일 잔액 자동 fetch (BR-CAPITAL-006 / intent)",
-        "환율 가중 평균 cramt 계산 (BR-CAPITAL-009 / intent — IFRS 정합)",
+        "전주 영업일 잔액 자동 fetch (BR-CAPITAL-PREVBAL-006 / intent)",
+        "환율 가중 평균 cramt 계산 (BR-CAPITAL-XRATE-009 / intent — IFRS 정합)",
         "patch 2020.10.30 김승희 — null 시 0.0 default (NPE 회피 / intent)",
         "sType 1 (CAPITAL_LIST) + 2 (CAPITAL_LIST 별도 grouping) + 3 (CAPITAL_ASSET 가중 마이너스 8) UNION ALL"
       ],
       "behavior_likely_bug": [
         "★ ★ Service 2회 호출 — 첫 호출 / 전주 마지막 날짜 fetch / 다시 호출 → N+1 query 패턴 + 트랜잭션 boundary 모호. 새 시스템 = 단일 query (sub-query) + read-only @Transactional 의무",
         "★ AP-CAPITAL-011 (cross-domain 직접 의존 / TB_DAY_EXCHANGE) — module boundary 위반",
-        "★ String → Double parseDouble 강제 캐스팅 (BR-CAPITAL-006 patch / 새 시스템 = BigDecimal 회계 정합 의무)",
+        "★ String → Double parseDouble 강제 캐스팅 (BR-CAPITAL-PREVBAL-006 patch / 새 시스템 = BigDecimal 회계 정합 의무)",
         "★ AP-CAPITAL-004 (NOLOCK) — 회계 데이터 Dirty Read 위험"
       ]
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-006 (전주 잔액 fetch)", "BR-CAPITAL-009 (환율 가중)"],
+    "intent": ["BR-CAPITAL-PREVBAL-006 (전주 잔액 fetch)", "BR-CAPITAL-XRATE-009 (환율 가중)"],
     "bug": ["Service 2회 호출 (N+1)", "AP-CAPITAL-011 (cross-module)", "Double parseDouble (BigDecimal 의무)", "AP-CAPITAL-004 (NOLOCK)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-011"],
-    "brs_covered": ["BR-CAPITAL-006", "BR-CAPITAL-009"],
+    "brs_covered": ["BR-CAPITAL-PREVBAL-006", "BR-CAPITAL-XRATE-009"],
     "aps_intersected": ["AP-CAPITAL-004", "AP-CAPITAL-011"]
   }
 }

@@ -83,7 +83,7 @@ UC coverage: 94.1%
 
 | SATD evidence | source location |
 |---|---|
-| BR-CAPITAL-011 | "★ 슈퍼크리에이티브 메일수신 유저 임시처리" (Controller line 1289 + 1299 + 1329 + 1456 / 4회 중복) |
+| BR-CAPITAL-MAILSPEC-011 | "★ 슈퍼크리에이티브 메일수신 유저 임시처리" (Controller line 1289 + 1299 + 1329 + 1456 / 4회 중복) |
 | AP-CAPITAL-008 | "// TODO Auto-generated method stub" (CapitalServiceImpl.java:687) |
 | AP-CAPITAL-009 | 위 BR-011 동반 (4회 중복) |
 | AP-CAPITAL-010 | "// TODO Auto-generated catch block" + e.printStackTrace + System.out.print |

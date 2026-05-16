@@ -28,7 +28,7 @@
         "_SQL_injection_risk": "★ Java String concatenation 으로 XML 작성 시 escape 처리 부재 가능 / SP 입력 검증 의무"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-015", "type": "intent", "note": "주간보고 sType=10 = SAC ledger / 보통예금 ERP 조회 (sub-domain G 핵심)" },
+        { "rule": "BR-CAPITAL-ASSETSP-015", "type": "intent", "note": "주간보고 sType=10 = SAC ledger / 보통예금 ERP 조회 (sub-domain G 핵심)" },
         { "rule": "AP-CAPITAL-005", "type": "bug", "note": "XML 인라인 String = 데이터 모델 부재 / SQL injection 위험" },
         { "rule": "AP-CAPITAL-006", "type": "bug", "note": "DEAD parameter (comNo) = 의도 ↔ 실제 drift" }
       ],
@@ -58,13 +58,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-015 (Asset list 다단계 sub-domain G 핵심)"],
+    "intent": ["BR-CAPITAL-ASSETSP-015 (Asset list 다단계 sub-domain G 핵심)"],
     "bug": ["AP-CAPITAL-005 (XML 인라인)", "AP-CAPITAL-006 (DEAD parameter)", "AP-CAPITAL-010 (logger 미사용)", "AP-CAPITAL-001 (God Controller)"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-013"],
-    "brs_covered": ["BR-CAPITAL-015"],
+    "brs_covered": ["BR-CAPITAL-ASSETSP-015"],
     "aps_intersected": ["AP-CAPITAL-001", "AP-CAPITAL-005", "AP-CAPITAL-006", "AP-CAPITAL-010"]
   }
 }

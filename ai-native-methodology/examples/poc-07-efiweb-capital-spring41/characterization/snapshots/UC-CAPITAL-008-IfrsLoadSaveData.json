@@ -23,10 +23,10 @@
         "expected_response": "(TB_CAPITAL_ASSET row list)"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-005", "type": "intent", "note": "saveType=R = 정식 저장 view (state machine 의무)" }
+        { "rule": "BR-CAPITAL-SAVTYPE-005", "type": "intent", "note": "saveType=R = 정식 저장 view (state machine 의무)" }
       ],
       "behavior_to_preserve": [
-        "saveType R/B/A 3 분기 state machine (BR-CAPITAL-005)",
+        "saveType R/B/A 3 분기 state machine (BR-CAPITAL-SAVTYPE-005)",
         "정식 저장 row 와 임시 저장 row 의 별도 테이블 분리 (TB_CAPITAL_ASSET vs TB_CAPITAL_ASSET_BAK)"
       ],
       "behavior_likely_bug": [
@@ -43,7 +43,7 @@
         "expected_query": "select * from TB_CAPITAL_ASSET_BAK WITH(NOLOCK) where companyseq = #comNo# and sdate = #sdate2#"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-005", "type": "intent" }
+        { "rule": "BR-CAPITAL-SAVTYPE-005", "type": "intent" }
       ],
       "behavior_to_preserve": "임시저장 별도 테이블 분리 (intent — 임시저장 lock 회피)"
     },
@@ -55,10 +55,10 @@
       "then": {
         "iBATIS_dynamic_branch": "★ ★ XML 의 <isEqual property=\"SaveType\" compareValue=\"A\"> 분기 부재 → 빈 SQL 실행 가능 / runtime fail 가능",
         "expected_query": "(빈 SQL — iBATIS 가 dynamic branch 모두 fail 시 ParseException 또는 빈 result)",
-        "_BR_link": "BR-CAPITAL-005 명시 — saveType A 는 초기화 / 그러나 selectLoadSaveData 가 read 만 → A case 는 별도 endpoint (IfrsCapitalDeleteAjax) 의무"
+        "_BR_link": "BR-CAPITAL-SAVTYPE-005 명시 — saveType A 는 초기화 / 그러나 selectLoadSaveData 가 read 만 → A case 는 별도 endpoint (IfrsCapitalDeleteAjax) 의무"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-005", "type": "ambiguous", "note": "★ saveType=A 분기 의도 부재 — Controller / DAO 어디서 분기 결단? domain expert carry" }
+        { "rule": "BR-CAPITAL-SAVTYPE-005", "type": "ambiguous", "note": "★ saveType=A 분기 의도 부재 — Controller / DAO 어디서 분기 결단? domain expert carry" }
       ],
       "behavior_to_preserve": "(★ ambiguous — domain expert (사용자 또는 IFRS 회계 담당자) 결단 필요)",
       "behavior_likely_bug": [
@@ -67,13 +67,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-005 (R/B 분기)"],
+    "intent": ["BR-CAPITAL-SAVTYPE-005 (R/B 분기)"],
     "bug": ["AP-CAPITAL-004 (NOLOCK)"],
-    "ambiguous": ["BR-CAPITAL-005 saveType=A 흐름 모호"]
+    "ambiguous": ["BR-CAPITAL-SAVTYPE-005 saveType=A 흐름 모호"]
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-008"],
-    "brs_covered": ["BR-CAPITAL-005"],
+    "brs_covered": ["BR-CAPITAL-SAVTYPE-005"],
     "aps_intersected": ["AP-CAPITAL-004"]
   }
 }

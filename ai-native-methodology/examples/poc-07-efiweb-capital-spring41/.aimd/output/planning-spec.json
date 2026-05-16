@@ -243,27 +243,27 @@
   ],
   "business_rules_intent": [
     {
-      "br_id": "BR-CAPITAL-001",
+      "br_id": "BR-CAPITAL-CORPYN-001",
       "reasoning": "TB_COMPANY 의 CAPITAL_YN / CMS_USE_YN flag 정렬 = 자본 보고 대상 법인 우선 표시 (회계 운영자 효율). IFRS 다중 법인 회계 정합.",
       "source_grounded_evidence": "source/sqlmap/capital.xml:7-19 — order by CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO"
     },
     {
-      "br_id": "BR-CAPITAL-005",
+      "br_id": "BR-CAPITAL-SAVTYPE-005",
       "reasoning": "자금일보 saveType R/B/A 3 분기 state machine — 정식저장(R) / 임시저장(B) / 초기화(A). ★ D2 결단 b — saveType=A 는 selectLoadSaveData 가 아닌 IfrsCapitalDeleteAjax 별도 endpoint 라우팅 정합. 새 시스템 = Controller/Service 명시 라우팅 의무.",
       "source_grounded_evidence": "source/java/web/CapitalController.java:763 (자조 코멘트) + source/sqlmap/capital.xml:503-528 (selectLoadSaveData R/B + IfrsCapitalDeleteAjax 별도)"
     },
     {
-      "br_id": "BR-CAPITAL-006",
+      "br_id": "BR-CAPITAL-PREVBAL-006",
       "reasoning": "전주 마지막 영업일 잔액 (basicBalance) 자동 fetch = 자금일보 일관성 핵심 (전주 → 금주 잔액 추적). 2020.10.30 patch (NPE 회피) 정합 / 그러나 String→Double parseDouble 자체는 BigDecimal 마이그레이션 의무 (회계 데이터).",
       "source_grounded_evidence": "source/java/web/CapitalController.java:1666-1690"
     },
     {
-      "br_id": "BR-CAPITAL-008",
+      "br_id": "BR-CAPITAL-VRFYLOCK-008",
       "reasoning": "Capital Verify lock = 결재 후 임시저장 차단 / IFRS 표준 정합 (감사 추적). ★ D2 결단 a — workflow state machine (DRAFT → SUBMITTED → APPROVED → LOCKED) 명시 의무.",
       "source_grounded_evidence": "source/sqlmap/capital.xml:1354 (selectCapitalVrify) + 1371 (insertCapitalVrify) + decisions/DEC-2026-05-08-poc-07-domain-결단.md §2.2"
     },
     {
-      "br_id": "BR-CAPITAL-009",
+      "br_id": "BR-CAPITAL-XRATE-009",
       "reasoning": "TB_DAY_EXCHANGE cross-module 환율 가중 = IFRS 외화→원화 환산 정합. ★ 그러나 직접 SQL access = DDD bounded context 위반 → 새 시스템 = exchange micro-service API 또는 Anti-Corruption Layer 의무.",
       "source_grounded_evidence": "source/sqlmap/capital.xml:743-749 (IfrsWeekReport1 LEFT JOIN TB_DAY_EXCHANGE)"
     }
@@ -275,7 +275,7 @@
     "다중 모듈 (51K LOC 전체) — capital 모듈 한정 / billing / employee / etc. = scope OUT",
     "Stored Procedure 본문 (_IFRSCapitalList + _IFRSCapitalSetCom + _SACCashBookList_IFRS 등) — DBA + proc-body C-data-PoC07-1 carry",
     "external schema (LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD) — DBA-read C-domain-PoC07-1 carry",
-    "Mail (E. sub-domain) / canvasUpload + 이미지 base64 인라인 (BR-CAPITAL-012 / AP-CAPITAL-007) — 다음 PoC carry",
+    "Mail (E. sub-domain) / canvasUpload + 이미지 base64 인라인 (BR-CAPITAL-IMGB64-012 / AP-CAPITAL-007) — 다음 PoC carry",
     "10 carry UC (UC-CAPITAL-003/004/005/007/009/012/014/015/016) — Day 1 시간 cap"
   ],
   "risks_and_constraints": [

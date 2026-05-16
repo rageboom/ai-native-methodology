@@ -29,7 +29,7 @@
         "side_effect": "★ Controller 의 System.out.print(param) — logger 부재 (AP-CAPITAL-010)"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-004", "type": "intent", "note": "ERP source 분기 = 자금일보 핵심" }
+        { "rule": "BR-CAPITAL-DATASRC-004", "type": "intent", "note": "ERP source 분기 = 자금일보 핵심" }
       ],
       "behavior_to_preserve": [
         "ERP 입금 데이터 → SP 호출 위임 (intent — DB 측 batch 정합)",
@@ -43,13 +43,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-CAPITAL-004 (ERP source 분기)"],
+    "intent": ["BR-CAPITAL-DATASRC-004 (ERP source 분기)"],
     "bug": ["AP-CAPITAL-010 (logger 미사용)", "AP-CAPITAL-002", "AP-CAPITAL-003"],
     "ambiguous": ["★ Stored Procedure (_IFRSCapitalList) 비즈니스 로직 — DBA + proc-body read carry"]
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-006"],
-    "brs_covered": ["BR-CAPITAL-004"],
+    "brs_covered": ["BR-CAPITAL-DATASRC-004"],
     "aps_intersected": ["AP-CAPITAL-002", "AP-CAPITAL-003", "AP-CAPITAL-010"]
   }
 }

@@ -25,10 +25,10 @@
         "expected_TB_COMPANY_after": { "COM_NO": "001", "CAPITAL_YN": "Y", "CAPITAL_CURR_CD": "USD" },
         "expected_SP_call": "EXEC IFRS.dbo._IFRSCapitalSetCom (?, ?, ?, ?, ?) — 본문 미확인",
         "transaction_scope": "★ ★ 명시 부재 — @Transactional 부재 + 2 단계 호출 → 부분 실패 시 TB_COMPANY 만 갱신 / SP 실패 가능성 ↑ (atomicity 부재)",
-        "_BR_link": "BR-CAPITAL-003 — 단일 트랜잭션 ❌ / DAO 다중 호출"
+        "_BR_link": "BR-CAPITAL-TXBOUND-003 — 단일 트랜잭션 ❌ / DAO 다중 호출"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-003", "type": "bug", "note": "트랜잭션 atomicity 부재 = 명백한 폐해 (회계 데이터)" }
+        { "rule": "BR-CAPITAL-TXBOUND-003", "type": "bug", "note": "트랜잭션 atomicity 부재 = 명백한 폐해 (회계 데이터)" }
       ],
       "behavior_to_preserve": [
         "TB_COMPANY 갱신 → SP 호출 순서 (intent — 마스터 갱신 후 setup)",
@@ -56,12 +56,12 @@
   ],
   "intent_vs_bug_summary": {
     "intent": ["TB_COMPANY 갱신 → SP 호출 순서"],
-    "bug": ["BR-CAPITAL-003 (atomicity 부재)", "AP-CAPITAL-002", "AP-CAPITAL-003"],
+    "bug": ["BR-CAPITAL-TXBOUND-003 (atomicity 부재)", "AP-CAPITAL-002", "AP-CAPITAL-003"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-002"],
-    "brs_covered": ["BR-CAPITAL-003"],
+    "brs_covered": ["BR-CAPITAL-TXBOUND-003"],
     "aps_intersected": ["AP-CAPITAL-002", "AP-CAPITAL-003"]
   }
 }

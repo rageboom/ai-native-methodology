@@ -44,7 +44,7 @@ EFI-WEB IFRS 회계 시스템의 자본 일보 (Capital Daily Report) 모듈의 
 | ID | name | 분류 | snapshot | 핵심 사실 |
 |---|---|---|---|---|
 | UC-CAPITAL-001 | 법인 기초정보 조회 | covered | ✅ | TB_COMPANY 의 자본 보고 대상 법인 우선 정렬 |
-| UC-CAPITAL-002 | 법인 기본정보 갱신 | covered | ✅ | ★ TB_COMPANY 갱신 + SP _IFRSCapitalSetCom 호출 / atomicity 부재 (BR-CAPITAL-003 bug) |
+| UC-CAPITAL-002 | 법인 기본정보 갱신 | covered | ✅ | ★ TB_COMPANY 갱신 + SP _IFRSCapitalSetCom 호출 / atomicity 부재 (BR-CAPITAL-TXBOUND-003 bug) |
 | UC-CAPITAL-006 | ERP 입금 List 일괄 등록 | covered | ✅ | ★ Stored Procedure (_IFRSCapitalList) 호출 / SP body 미확인 |
 | UC-CAPITAL-008 | 자금일보 임시 저장 / 저장 / 초기화 | covered | ✅ | ★ saveType R/B/A 3 분기 state machine (★ D2 결단 b — A는 별도 endpoint 라우팅) |
 | UC-CAPITAL-010 | 자본 검증 결재 lock | covered | ✅ | ★ workflow LOCKED state (★ D2 결단 a — workflow state machine 명시 의무) |
@@ -69,11 +69,11 @@ EFI-WEB IFRS 회계 시스템의 자본 일보 (Capital Daily Report) 모듈의 
 
 | ID | 분류 | reasoning |
 |---|---|---|
-| BR-CAPITAL-001 | intent | TB_COMPANY 정렬 = 자본 보고 대상 법인 우선 표시 (회계 운영자 효율) |
-| BR-CAPITAL-005 | intent + 라우팅 분리 (D2 b) | saveType R/B/A 3 분기 state machine / saveType=A 는 IfrsCapitalDeleteAjax 별도 endpoint 라우팅 |
-| BR-CAPITAL-006 | intent + BigDecimal 마이그 | 전주 마지막 영업일 잔액 자동 fetch / String→Double parseDouble = BigDecimal 의무 |
-| BR-CAPITAL-008 | intent (D2 a) | Capital Verify lock = 결재 후 임시저장 차단 / workflow state machine 명시 의무 |
-| BR-CAPITAL-009 | intent (환율) + bug (cross-module) | TB_DAY_EXCHANGE 환율 가중 = IFRS 정합 / 직접 SQL = DDD bounded context 위반 |
+| BR-CAPITAL-CORPYN-001 | intent | TB_COMPANY 정렬 = 자본 보고 대상 법인 우선 표시 (회계 운영자 효율) |
+| BR-CAPITAL-SAVTYPE-005 | intent + 라우팅 분리 (D2 b) | saveType R/B/A 3 분기 state machine / saveType=A 는 IfrsCapitalDeleteAjax 별도 endpoint 라우팅 |
+| BR-CAPITAL-PREVBAL-006 | intent + BigDecimal 마이그 | 전주 마지막 영업일 잔액 자동 fetch / String→Double parseDouble = BigDecimal 의무 |
+| BR-CAPITAL-VRFYLOCK-008 | intent (D2 a) | Capital Verify lock = 결재 후 임시저장 차단 / workflow state machine 명시 의무 |
+| BR-CAPITAL-XRATE-009 | intent (환율) + bug (cross-module) | TB_DAY_EXCHANGE 환율 가중 = IFRS 정합 / 직접 SQL = DDD bounded context 위반 |
 
 (나머지 10 BR = carry / planning-spec.json business_rules_intent §5+ 등재 자격 — chain 2 진입 시 업데이트 carry)
 

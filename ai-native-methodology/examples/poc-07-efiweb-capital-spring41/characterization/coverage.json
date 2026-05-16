@@ -78,7 +78,7 @@
       "sql_id": "selectLoadSaveData (iBATIS dynamic <isEqual>) + IfrsCapitalDeleteAjax",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-CAPITAL-008 / 3 scenario (R + B + ★ ambiguous A)"],
-      "scope_decision": "covered (★ 핵심 — state machine + ambiguous BR-CAPITAL-005)"
+      "scope_decision": "covered (★ 핵심 — state machine + ambiguous BR-CAPITAL-SAVTYPE-005)"
     },
     {
       "uc": "UC-CAPITAL-009",
@@ -96,7 +96,7 @@
       "sql_id": "insertCapitalVrify (TB_CAPITAL_VRIFY)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-CAPITAL-010 / 3 scenario (happy + try-catch + ★ ambiguous verify 후 수정)"],
-      "scope_decision": "covered (★ 핵심 — approval workflow + ambiguous BR-CAPITAL-008)"
+      "scope_decision": "covered (★ 핵심 — approval workflow + ambiguous BR-CAPITAL-VRFYLOCK-008)"
     },
     {
       "uc": "UC-CAPITAL-011",
@@ -150,7 +150,7 @@
       "sql_id": "IfrsWeekRate (TB_CAPITAL_LIST_RATE)",
       "snapshot": "❌",
       "covered_by": [],
-      "scope_decision": "carry — TB_CAPITAL_LIST_RATE 단순 read / TB_DAY_EXCHANGE cross-module 의존 (BR-CAPITAL-009) 의 핵심은 UC-011 IfrsWeekReport1 SNAP 로 cover (★ source 검증 결과 IfrsWeekRate 자체는 TB_CAPITAL_LIST_RATE 만 read)"
+      "scope_decision": "carry — TB_CAPITAL_LIST_RATE 단순 read / TB_DAY_EXCHANGE cross-module 의존 (BR-CAPITAL-XRATE-009) 의 핵심은 UC-011 IfrsWeekReport1 SNAP 로 cover (★ source 검증 결과 IfrsWeekRate 자체는 TB_CAPITAL_LIST_RATE 만 read)"
     }
   ],
   "coverage_summary": {
