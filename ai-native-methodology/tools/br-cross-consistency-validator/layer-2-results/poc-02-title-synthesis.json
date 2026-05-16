@@ -1,0 +1,35 @@
+{
+  "$schema_version": "v2.5.0-title-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 14,
+  "poc_id": "poc-02-realworld-springboot3",
+  "$comment": "★ ★ session 23차 Sprint 1-G / schema cleanup — BR ID 는 이미 4토막 valid (rename ❌). schema invalid 원인 = (1) name/title 부재 (2) given/when/then 이 array 가 아닌 string. title 자동 합성 (Sonnet 4.6 sub-agent / batch / 7초) + given/when/then string→array 변환 (의미 변경 ❌ / GWT 표현 보존 / additive+type-fix). Sprint 1-A isomorphic (paradigm).",
+  "transformation": {
+    "title_added_count": 14,
+    "gwt_string_to_array_fields": 42,
+    "br_id_rename": false,
+    "representation_preserved": "GWT (given/when/then) — string → single-element array, 의미 동일",
+    "cross_ref_files_updated": ["output/rules/rules.json"]
+  },
+  "results": [
+    { "br_id": "BR-USER-EMAIL-UNIQUE-001", "title": "이메일 중복 가입 차단" },
+    { "br_id": "BR-USER-USERNAME-UNIQUE-001", "title": "사용자명 중복 가입 차단" },
+    { "br_id": "BR-USER-PASSWORD-ENCRYPTED-001", "title": "비밀번호 암호화 저장 의무" },
+    { "br_id": "BR-USER-FOLLOW-DIRECTIONAL-001", "title": "팔로우 단방향 독립성" },
+    { "br_id": "BR-USER-FOLLOW-IDEMPOTENT-001", "title": "팔로우 중복 요청 무시" },
+    { "br_id": "BR-USER-FOLLOW-NO-SELF-001", "title": "자기 자신 팔로우 금지" },
+    { "br_id": "BR-ARTICLE-TITLE-UNIQUE-001", "title": "게시글 제목 전역 유일성" },
+    { "br_id": "BR-ARTICLE-SLUG-UNIQUE-001", "title": "슬러그 전역 유일 식별자" },
+    { "br_id": "BR-ARTICLE-AUTHOR-EDIT-ONLY-001", "title": "게시글 작성자 전용 수정·삭제" },
+    { "br_id": "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001", "title": "즐겨찾기 중복 요청 차단" },
+    { "br_id": "BR-COMMENT-AUTHOR-DELETE-ONLY-001", "title": "댓글 작성자 전용 삭제" },
+    { "br_id": "BR-LOGIN-EMAIL-PASSWORD-MATCH-001", "title": "이메일·비밀번호 일치 인증" },
+    { "br_id": "BR-PAGINATION-SIZE-CAP-50-001", "title": "페이지 크기 최대 50 제한" },
+    { "br_id": "BR-PAGINATION-PAGE-ZERO-BASED-001", "title": "페이지 번호 0 기반 음수 차단" }
+  ],
+  "verification": {
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}

@@ -3,150 +3,300 @@
   "meta": {
     "generated_at": "2026-04-29T00:00:00Z",
     "confidence": 0.85,
-    "inputs_used": ["source_code", "orm", "config_files"],
+    "inputs_used": [
+      "source_code",
+      "orm",
+      "config_files"
+    ],
     "source_commit_sha": "93e018e9a769dadae5a80b922d649bd7c79545cd",
     "methodology_version": "v1.1.2",
     "raw_confidence": 0.85,
     "human_review_required": [
-      {"item_id": "BR-ARTICLE-TITLE-UNIQUE-001", "reason": "F-052 over-constraint anti-pattern"},
-      {"item_id": "BR-USER-FOLLOW-NO-SELF-001", "reason": "F-074 코드 부재"},
-      {"item_id": "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001", "reason": "F-070 RFC 7231 위반 (high)"}
+      {
+        "item_id": "BR-ARTICLE-TITLE-UNIQUE-001",
+        "reason": "F-052 over-constraint anti-pattern"
+      },
+      {
+        "item_id": "BR-USER-FOLLOW-NO-SELF-001",
+        "reason": "F-074 코드 부재"
+      },
+      {
+        "item_id": "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001",
+        "reason": "F-070 RFC 7231 위반 (high)"
+      }
     ]
   },
   "business_rules": [
     {
       "id": "BR-USER-EMAIL-UNIQUE-001",
+      "title": "이메일 중복 가입 차단",
       "category": "validation",
       "severity": "high",
-      "given": "시스템에 email='X' 인 User 가 이미 존재할 때",
-      "when": "동일 email 로 signup 요청이 들어오면",
-      "then": "IllegalArgumentException 발생 + DB unique 제약이 race-safe 차단",
-      "evidence_files": ["UserService.java:46-49", "User.java:29", "schema.sql:65"],
+      "given": [
+        "시스템에 email='X' 인 User 가 이미 존재할 때"
+      ],
+      "when": [
+        "동일 email 로 signup 요청이 들어오면"
+      ],
+      "then": [
+        "IllegalArgumentException 발생 + DB unique 제약이 race-safe 차단"
+      ],
+      "evidence_files": [
+        "UserService.java:46-49",
+        "User.java:29",
+        "schema.sql:65"
+      ],
       "race_safety": "DB UQ 1중 race-safe / App existsBy* 1중 race-prone TOCTOU"
     },
     {
       "id": "BR-USER-USERNAME-UNIQUE-001",
+      "title": "사용자명 중복 가입 차단",
       "category": "validation",
       "severity": "high",
-      "given": "시스템에 username='X' 인 User 가 이미 존재할 때",
-      "when": "동일 username 로 signup 요청이 들어오면",
-      "then": "IllegalArgumentException 발생",
-      "evidence_files": ["UserService.java:46-49", "User.java:32", "schema.sql:66"]
+      "given": [
+        "시스템에 username='X' 인 User 가 이미 존재할 때"
+      ],
+      "when": [
+        "동일 username 로 signup 요청이 들어오면"
+      ],
+      "then": [
+        "IllegalArgumentException 발생"
+      ],
+      "evidence_files": [
+        "UserService.java:46-49",
+        "User.java:32",
+        "schema.sql:66"
+      ]
     },
     {
       "id": "BR-USER-PASSWORD-ENCRYPTED-001",
+      "title": "비밀번호 암호화 저장 의무",
       "category": "policy",
       "severity": "high",
-      "given": "User signup 또는 password 업데이트 시",
-      "when": "encryptPassword 호출",
-      "then": "BCrypt 로 암호화된 password 가 저장됨 (plain 절대 금지)",
-      "evidence_files": ["User.java:104-121", "UserService.java:51"]
+      "given": [
+        "User signup 또는 password 업데이트 시"
+      ],
+      "when": [
+        "encryptPassword 호출"
+      ],
+      "then": [
+        "BCrypt 로 암호화된 password 가 저장됨 (plain 절대 금지)"
+      ],
+      "evidence_files": [
+        "User.java:104-121",
+        "UserService.java:51"
+      ]
     },
     {
       "id": "BR-USER-FOLLOW-DIRECTIONAL-001",
+      "title": "팔로우 단방향 독립성",
       "category": "policy",
       "severity": "medium",
-      "given": "User A 가 User B 를 follow 했을 때",
-      "when": "B 의 follow 상태 조회",
-      "then": "단방향 — B 는 A 를 follow 하지 않을 수 있음. UQ(follower, following)",
-      "evidence_files": ["UserFollow.java:24-25", "schema.sql:58"]
+      "given": [
+        "User A 가 User B 를 follow 했을 때"
+      ],
+      "when": [
+        "B 의 follow 상태 조회"
+      ],
+      "then": [
+        "단방향 — B 는 A 를 follow 하지 않을 수 있음. UQ(follower, following)"
+      ],
+      "evidence_files": [
+        "UserFollow.java:24-25",
+        "schema.sql:58"
+      ]
     },
     {
       "id": "BR-USER-FOLLOW-IDEMPOTENT-001",
+      "title": "팔로우 중복 요청 무시",
       "category": "policy",
       "severity": "low",
-      "given": "follower 가 following 을 이미 follow 한 상태일 때",
-      "when": "follow 요청이 다시 들어오면",
-      "then": "아무 변화 없이 silent return",
-      "evidence_files": ["UserRelationshipService.java:26-32"],
+      "given": [
+        "follower 가 following 을 이미 follow 한 상태일 때"
+      ],
+      "when": [
+        "follow 요청이 다시 들어오면"
+      ],
+      "then": [
+        "아무 변화 없이 silent return"
+      ],
+      "evidence_files": [
+        "UserRelationshipService.java:26-32"
+      ],
       "rfc_compliance": "RFC 7231 §4.2.2 idempotent ✅"
     },
     {
       "id": "BR-USER-FOLLOW-NO-SELF-001",
+      "title": "자기 자신 팔로우 금지",
       "category": "policy",
       "severity": "medium",
-      "given": "follower == following 인 follow 요청",
-      "when": "follow 호출",
-      "then": "거부 (RealWorld spec 묵시) — **현재 코드 부재 (F-074 anti-pattern)**",
-      "evidence_files": ["UserRelationshipService.java:26-32"],
+      "given": [
+        "follower == following 인 follow 요청"
+      ],
+      "when": [
+        "follow 호출"
+      ],
+      "then": [
+        "거부 (RealWorld spec 묵시) — **현재 코드 부재 (F-074 anti-pattern)**"
+      ],
+      "evidence_files": [
+        "UserRelationshipService.java:26-32"
+      ],
       "anti_pattern_ref": "F-074"
     },
     {
       "id": "BR-ARTICLE-TITLE-UNIQUE-001",
+      "title": "게시글 제목 전역 유일성",
       "category": "validation",
       "severity": "high",
-      "given": "Article 작성/수정 시",
-      "when": "title 글로벌 unique 검증",
-      "then": "이미 존재하는 title 이면 IllegalArgumentException",
-      "evidence_files": ["ArticleService.java:91-93", "ArticleService.java:111-113", "schema.sql:9"],
+      "given": [
+        "Article 작성/수정 시"
+      ],
+      "when": [
+        "title 글로벌 unique 검증"
+      ],
+      "then": [
+        "이미 존재하는 title 이면 IllegalArgumentException"
+      ],
+      "evidence_files": [
+        "ArticleService.java:91-93",
+        "ArticleService.java:111-113",
+        "schema.sql:9"
+      ],
       "anti_pattern_caveat": "F-052 over-constraint (Medium/Velog/Brunch 어디도 없음 — RealWorld spec 미명세)"
     },
     {
       "id": "BR-ARTICLE-SLUG-UNIQUE-001",
+      "title": "슬러그 전역 유일 식별자",
       "category": "validation",
       "severity": "medium",
-      "given": "Article 작성 시",
-      "when": "slug 글로벌 unique",
-      "then": "RealWorld spec 정합 — URL 식별자",
-      "evidence_files": ["Article.java:38", "schema.sql:8"]
+      "given": [
+        "Article 작성 시"
+      ],
+      "when": [
+        "slug 글로벌 unique"
+      ],
+      "then": [
+        "RealWorld spec 정합 — URL 식별자"
+      ],
+      "evidence_files": [
+        "Article.java:38",
+        "schema.sql:8"
+      ]
     },
     {
       "id": "BR-ARTICLE-AUTHOR-EDIT-ONLY-001",
+      "title": "게시글 작성자 전용 수정·삭제",
       "category": "authorization",
       "severity": "high",
-      "given": "Article edit/delete 요청",
-      "when": "requester != article.author",
-      "then": "isNotAuthor 검증 → IllegalArgumentException",
-      "evidence_files": ["Article.java:82-84", "ArticleService.java:107-109,128-130,145-147,160-162"]
+      "given": [
+        "Article edit/delete 요청"
+      ],
+      "when": [
+        "requester != article.author"
+      ],
+      "then": [
+        "isNotAuthor 검증 → IllegalArgumentException"
+      ],
+      "evidence_files": [
+        "Article.java:82-84",
+        "ArticleService.java:107-109,128-130,145-147,160-162"
+      ]
     },
     {
       "id": "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001",
+      "title": "즐겨찾기 중복 요청 차단",
       "category": "policy",
       "severity": "high",
-      "given": "사용자가 article 을 이미 favorite/unfavorite 상태일 때",
-      "when": "동일 요청이 다시 들어오면",
-      "then": "IllegalArgumentException 발생",
-      "evidence_files": ["ArticleService.java:184-204"],
+      "given": [
+        "사용자가 article 을 이미 favorite/unfavorite 상태일 때"
+      ],
+      "when": [
+        "동일 요청이 다시 들어오면"
+      ],
+      "then": [
+        "IllegalArgumentException 발생"
+      ],
+      "evidence_files": [
+        "ArticleService.java:184-204"
+      ],
       "rfc_compliance": "❌ RFC 7231 §4.2.2 위반 (DELETE unfavorite idempotent MUST)",
       "anti_pattern_ref": "F-070"
     },
     {
       "id": "BR-COMMENT-AUTHOR-DELETE-ONLY-001",
+      "title": "댓글 작성자 전용 삭제",
       "category": "authorization",
       "severity": "high",
-      "given": "ArticleComment delete 요청",
-      "when": "requester != articleComment.author",
-      "then": "isNotAuthor 검증 → IllegalArgumentException",
-      "evidence_files": ["ArticleComment.java:58-60", "ArticleCommentService.java:58-63"],
+      "given": [
+        "ArticleComment delete 요청"
+      ],
+      "when": [
+        "requester != articleComment.author"
+      ],
+      "then": [
+        "isNotAuthor 검증 → IllegalArgumentException"
+      ],
+      "evidence_files": [
+        "ArticleComment.java:58-60",
+        "ArticleCommentService.java:58-63"
+      ],
       "poc_01_comparison": "PoC #01 De Morgan 버그 (Article.java:86 removeCommentByUser) **비재현** — 깔끔"
     },
     {
       "id": "BR-LOGIN-EMAIL-PASSWORD-MATCH-001",
+      "title": "이메일·비밀번호 일치 인증",
       "category": "authorization",
       "severity": "high",
-      "given": "login 요청 (email, password)",
-      "when": "findByEmail + passwordEncoder.matches",
-      "then": "match 시 User 반환 / 미스 시 IllegalArgumentException",
-      "evidence_files": ["UserService.java:64-76"]
+      "given": [
+        "login 요청 (email, password)"
+      ],
+      "when": [
+        "findByEmail + passwordEncoder.matches"
+      ],
+      "then": [
+        "match 시 User 반환 / 미스 시 IllegalArgumentException"
+      ],
+      "evidence_files": [
+        "UserService.java:64-76"
+      ]
     },
     {
       "id": "BR-PAGINATION-SIZE-CAP-50-001",
+      "title": "페이지 크기 최대 50 제한",
       "category": "validation",
       "severity": "medium",
-      "given": "ArticleFacets 생성 시",
-      "when": "size 입력",
-      "then": "0~50 cap 강제 (size > 50 시 IllegalArgumentException)",
-      "evidence_files": ["ArticleFacets.java:21-23"],
+      "given": [
+        "ArticleFacets 생성 시"
+      ],
+      "when": [
+        "size 입력"
+      ],
+      "then": [
+        "0~50 cap 강제 (size > 50 시 IllegalArgumentException)"
+      ],
+      "evidence_files": [
+        "ArticleFacets.java:21-23"
+      ],
       "poc_01_comparison": "PoC #01 AP-PERFORMANCE-002 (Pageable cap 부재) **회피 ✅** — 본 PoC 명시"
     },
     {
       "id": "BR-PAGINATION-PAGE-ZERO-BASED-001",
+      "title": "페이지 번호 0 기반 음수 차단",
       "category": "validation",
       "severity": "low",
-      "given": "ArticleFacets 생성 시",
-      "when": "page 입력",
-      "then": "0-based + page < 0 시 IllegalArgumentException",
-      "evidence_files": ["ArticleFacets.java:18-20"]
+      "given": [
+        "ArticleFacets 생성 시"
+      ],
+      "when": [
+        "page 입력"
+      ],
+      "then": [
+        "0-based + page < 0 시 IllegalArgumentException"
+      ],
+      "evidence_files": [
+        "ArticleFacets.java:18-20"
+      ]
     }
   ],
   "rule_summary": {
