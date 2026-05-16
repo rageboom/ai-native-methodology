@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 10/10 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 11/11 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 10 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 11 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -19,8 +19,10 @@
 //
 //   10. ★ ★ v3.6.4 R2 신설 — CLAUDE.md ↔ plugin.json.version sync (★ LL-session-20-02 정합 / drift 시 다음 session
 //       plan + research 부정확 risk 차단 / "plugin.json vX.Y.Z" 표기 패턴 검증 / cadence enforcement).
+//   11. ★ ★ v3.6.7 A1 신설 — workspace test 회귀 자동 차단 (★ npm test --workspaces 실시간 실행 / fail count 0 의무 /
+//       chain-driver Windows path 회귀 사례 정합 / `--skip-workspace-test` flag 시 본 check skip / release 시 본 flag ❌ 의무).
 //
-// exit 0 = 10/10 ready / 1 = 1+ regress.
+// exit 0 = 11/11 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -45,11 +47,12 @@ function usage(code = 2) {
 }
 
 function parseArgs(argv) {
-  const out = { json: false };
+  const out = { json: false, skipWorkspaceTest: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
     else if (a === '--json') out.json = true;
+    else if (a === '--skip-workspace-test') out.skipWorkspaceTest = true;
     else if (a === '--help' || a === '-h') usage(0);
   }
   return out;
@@ -381,6 +384,50 @@ function check10_claudeMdVersionSync() {
   };
 }
 
+function check11_workspaceTestPass(args) {
+  // ★ ★ A1 (session 20차 / v3.6.7) — workspace test 회귀 자동 차단.
+  // chain-driver Windows path 회귀 사례 (session 20차 v3.6.3 P0) = 본 criterion 부재로 drift 누적 사례 정합.
+  // --skip-workspace-test flag 시 skip (test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무).
+  if (args.skipWorkspaceTest) {
+    return {
+      id: 'workspace_test_pass',
+      pass: false,
+      detail: 'skipped via --skip-workspace-test (★ test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무)',
+      delegated_to: 'npm test --workspaces --if-present (skipped)',
+    };
+  }
+  // ★ Windows Node.js v22+ EINVAL fix — npm.cmd spawn 시 shell: true 의무 (CVE-2024-27980 정합).
+  // ★ ★ NODE_TEST_CONTEXT 제거 — test runner 안 release-readiness 호출 시 child env inherit 회피
+  //    (본 env 잔존 시 workspace 안 모든 test 자동 skip → 0/0 pass false positive).
+  const childEnv = { ...process.env };
+  delete childEnv.NODE_TEST_CONTEXT;
+  const result = spawnSync('npm', ['test', '--workspaces', '--if-present'], {
+    cwd: ROOT,
+    env: childEnv,
+    encoding: 'utf-8',
+    timeout: 600_000,
+    shell: true,
+  });
+  const stdout = result.stdout || '';
+  const sumMatches = (pattern) =>
+    (stdout.match(pattern) || []).reduce((acc, line) => {
+      const m = line.match(/\d+/);
+      return acc + (m ? parseInt(m[0], 10) : 0);
+    }, 0);
+  const totalTests = sumMatches(/^# tests \d+/gm);
+  const totalPass = sumMatches(/^# pass \d+/gm);
+  const totalFail = sumMatches(/^# fail \d+/gm);
+  const passed = result.status === 0 && totalFail === 0 && totalTests > 0;
+  return {
+    id: 'workspace_test_pass',
+    pass: passed,
+    detail: passed
+      ? `workspace test ${totalPass}/${totalTests} pass / 0 fail / exit=0 ✅`
+      : `regress: ${totalFail} fail / ${totalPass}/${totalTests} pass / exit=${result.status}`,
+    delegated_to: 'npm test --workspaces --if-present (★ A1 / chain-driver Windows path 회귀 사례 정합 / LL-session-20-A1)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -396,6 +443,7 @@ function main() {
     check8_analysisValidatorViolation(),
     check9_layer2Consistency(),
     check10_claudeMdVersionSync(),
+    check11_workspaceTestPass(args),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

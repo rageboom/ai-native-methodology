@@ -9,6 +9,61 @@
 
 ---
 
+## [3.6.7] — 2026-05-16 ★ PATCH — A1 시행 / release-readiness 11th criterion 신설 (workspace test 회귀 자동 차단) + R2 test 회귀 fix
+
+> ★ ★ ★ **A1 시행** (다음 의제 R1 채택 = "release-readiness 11th criterion 신설"). session 20차 v3.6.3 P0 회귀 (chain-driver Windows path 2 fail) = 본 criterion 부재 = drift 누적 사례 정합. 또한 **R2 시점 test expectation 갱신 누락 회귀 동시 fix** (9 → 11).
+
+### A1 신설 (`check11_workspaceTestPass`)
+
+- 검증 대상: `npm test --workspaces --if-present` 실시간 실행 → fail count 0 + total tests > 0 의무
+- spawn cadence:
+  - Windows Node.js v22+ EINVAL fix — `shell: true` 의무 (CVE-2024-27980 정합)
+  - NODE_TEST_CONTEXT env 제거 — test runner 안 release-readiness 호출 시 child env inherit 회피 (잔존 시 workspace 안 test 자동 skip → 0/0 pass false positive)
+  - timeout 600s (workspace test ~30~60초 cadence 정합)
+- `--skip-workspace-test` flag 지원:
+  - test cadence 시 본 flag 사용 (60초 비용 회피)
+  - release 본격 시행 시 본 flag ❌ 의무 (drift enforcement 정합)
+  - skip 시 pass=false → release-readiness exit 1 → mistakenly skip 사용 시 release 차단
+
+### R2 test 회귀 fix
+
+- session 20차 v3.6.4 R2 시 `release-readiness.test.js` 안 expectation 갱신 누락 = 본 test 안 회귀 발생 (10 → 7 pass / 3 fail)
+- `npm run test:release` 가 `npm test --workspaces` 와 별도 cadence → workspace test 359/359 안 본 fail 미포함 → 누락 회귀
+- 본 A1 시행 시 동시 fix:
+  - describe 안 "9/9 격상" → "11/11 격상"
+  - `criteria_total === 9` → 11 (4 곳)
+  - ids array 안 `claude_md_version_sync` (R2) + `workspace_test_pass` (A1) 추가 (총 11)
+  - 기존 test 안 `--skip-workspace-test` flag 추가 (시간 절감)
+  - 신규 test 1 case = check11 본격 spawn 검증 (timeout 600_000)
+
+### 자산 갱신 (5 file)
+
+- `scripts/release-readiness.js` — `check11_workspaceTestPass` 신설 + `parseArgs` `--skip-workspace-test` flag + main results array 등록 + header 명세 10 → 11 자격 갱신
+- `scripts/test/release-readiness.test.js` — 9 → 11 expectation 갱신 + ids array 신규 2 추가 + SKIP_WS flag 사용 + 신규 A1 본격 spawn case 1
+- `.claude-plugin/plugin.json` — 3.6.6 → 3.6.7
+- `CLAUDE.md` (repo root) — 라인 99 plugin.json v3.6.6 → v3.6.7 (R2 cadence 정합)
+- `decisions/STATUS.md` — session 20차 v3.6.7 entry 추가
+
+### 검증
+
+- workspace test: **359/359 pass** ✅
+- release-readiness v3.6.7: **11/11** ✅ (check11 본격 spawn = workspace test 359/359 검증 ✅)
+- release-readiness test (`npm run test:release`): **11/11 pass** ✅ (R2 회귀 회복 + A1 신설 검증)
+
+### Lessons Learned
+
+- **LL-session-20-A1-1**: 다른 cadence 안 test (예: `npm run test:release`) = `npm test --workspaces` 안 미포함 = 회귀 잠재 발생. release-readiness 안 본 test cadence 도 추가 검증 의무 영역 (별도 criterion 후보).
+- **LL-session-20-A1-2**: Node.js `--test` runner 안 NODE_TEST_CONTEXT env inherit = child process 안 test 자동 skip 정합. inner spawn 시 본 env 명시 제거 의무.
+- **LL-session-20-A1-3**: Windows Node.js v22+ 안 `.cmd` 파일 spawn = EINVAL (CVE-2024-27980) = `shell: true` 의무.
+
+### 정합 관계
+
+- session 20차 v3.6.3 P0 회귀 (chain-driver Windows path / workspace test 2 fail) = 본 A1 신설 근거
+- v3.6.4 R2 (release-readiness 10th criterion 신설) = 본 A1 = 동일 cadence 정합 (drift enforcement via release-readiness criterion)
+- LL-session-20-04 (양심 의존 ❌ paradigm) + LL-session-20-05 (paradigm 안정점 후 enforcement cadence 진입 자격) = 본 A1 정합
+
+---
+
 ## [3.6.6] — 2026-05-16 ★ PATCH — R4 시행 / PoC #12 + #13 보류 처분 자산화
 
 > ★ ★ ★ **R4 잔여 결단 시행** (session 20차 carry / 본 session 20차 = R1+R2+R3+R4 4 결단 모두 시행). PoC #12 (raw query) + PoC #13 (QueryDSL) = 둘 다 README 안 정탐 결과 추천 + ADR-CHAIN-008 정합 → status = "보류" 명시 자산화. 사용자 source 도착 시 재진입 자격 보존.
