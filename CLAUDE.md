@@ -96,7 +96,7 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 - `ai-native-methodology/schemas/` — **JSON Schema 39종** (BE + FE + chain 산출물 + work-unit-manifest + state + error-mapping-spec + sql-inventory 등 / 모두 top-level `additionalProperties:false` strict / cleanup round 9 정합)
 - `ai-native-methodology/templates/` — 산출물 템플릿 (analysis/ + planning/ + spec/ + test/ + implement/ + design/)
 - `ai-native-methodology/tools/` — **Node CLI 도구 16종** (drift-validator + decision-table-validator + formal-spec-link-validator + spectral-runner + static-runner + schema-validator + planning-extraction-validator + chain-coverage-validator + spec-test-link-validator + traceability-matrix-builder + test-impl-pass-validator + ★ chain-driver + characterization-coverage-validator + sql-inventory-extractor + findings-aggregator + ★ br-cross-consistency-validator (v2.5.0 Layer 2 LLM paradigm)) — ★ 단일 npm workspace
-- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json v4.0.0 + marketplace.json) / Claude Code plugin 시스템 진입점
+- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json v4.0.1 + marketplace.json) / Claude Code plugin 시스템 진입점
 - `ai-native-methodology/agents/` (★ v4.0 multi-agent — 5 stage agent + 3 base persona + 1 spike = 9종) + `skills/` (**47종** / 5 stage organize / v2.6.0 의미 ID + v3.x 진화) + `hooks/` + `flows/` — plugin 자산
 - `ai-native-methodology/scripts/` — build-plugin.js + version-check.js + release-readiness.js (9/9 strict criterion 검증)
 - `ai-native-methodology/examples/` — **PoC 14종** (#01 Spring Boot 2.5 / #02 Spring Boot 3.3 Hexagonal / #03 NestJS / #04 full-React FSD / #04 mini-React / #05 sample-user-register / #06~#07+#11 Spring 4.1 + iBATIS 2 사내 EFI-WEB (R1' axis legacy) / #08~#10 Modern ORM OSS (MyBatis 3 + TypeORM + JPA QueryDSL / R1' axis modern) / #12 RawSQL user-decided / #13 QueryDSL user-decided) ✅ 모두 종료
@@ -114,7 +114,8 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개 (plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v4.0.0 MAJOR** (2026-05-17 / ★ ★ ★ ★ ★ multi-agent paradigm 본격 채택 / DEC-2026-05-17-v4-multi-agent-paradigm-채택 / DEC-2026-05-15-g5 retract / stage 별 sub-agent 5종 + 3 base + spike 1종). 직전 7 release 요약:
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v4.0.1 PATCH** (2026-05-17 / ★ rules schema enforcement 강화 — ③ source_grounded_evidence required if/then + ⑥ intent_vs_bug_classification 공유 $ref SSOT (schemas/intent-classification.schema.json 신설) + H-1 (Gherkin tag 표기 수정) + H-2 (Maldonado 인용 오류 수정) / DEC-2026-05-17-rules-schema-enforcement-strengthen / ADR-CHAIN-011 §5 patch v11 / additive only / breaking change ❌). 직전 7 release 요약:
+  - **v4.0.0 MAJOR** (multi-agent paradigm 본격 채택 / stage 별 sub-agent 5종 + 3 base + spike 1종 / DEC-2026-05-15-g5 retract)
   - **v3.6.9 PATCH** (A3 시행 / README + guides 외부 인지 자산 sync)
   - **v3.6.x PATCH** (A1+A2+R1~R4 / 11/11 release-readiness + INDEX archive + STATUS archive)
   - **v3.6.2 PATCH** (잔여 carry 묶음 정리 / paradigm 진화 안정점)

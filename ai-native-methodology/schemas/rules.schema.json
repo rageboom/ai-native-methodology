@@ -154,6 +154,24 @@
               "required": ["trigger", "condition", "action"]
             }
           ]
+        },
+        {
+          "$comment": "★ ★ ★ v4.0.1 신설 — auto_extracted=true 시 source 인용 의무 (no-simulation 정책 schema enforcement / Industry case Semgrep+CodeQL+SonarQube+Daikon 4/4 정합 / DEC-2026-05-17-rules-schema-enforcement-strengthen + ADR-CHAIN-011 §5 patch v4 정합). 사람 작성 BR (auto_extracted 부재 또는 false) = optional 보존 (★ legacy 14 PoC 회귀 풀이 0).",
+          "if": {
+            "properties": { "auto_extracted": { "const": true } },
+            "required": ["auto_extracted"]
+          },
+          "then": {
+            "anyOf": [
+              { "required": ["source_grounded_evidence"] },
+              {
+                "required": ["source_evidence"],
+                "properties": {
+                  "source_evidence": { "minItems": 1 }
+                }
+              }
+            ]
+          }
         }
       ],
       "description": "★ ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3). BR 은 ≥ 1 표현 의무 (GWT / natural_language / description fallback / trigger-condition-action 변형). ★ ★ ★ cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외 / ★ description = optional metadata 격상 / Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM mandatory = v2.5.0 Phase C). ★ ★ paradigm 결단 근거 — session 9차 SPIKE v2 (REVISE-6 가설 B 정면 부정 / description 안 rationale/caveat 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement 사실 입증) + Agent 3 paradigm 정합.",
@@ -210,7 +228,11 @@
         },
         "is_intent": {
           "type": "boolean",
-          "description": "★ v2.x optional — BR 가 사용자 의도 / 비즈니스 의도인지 (PoC #07~#11 사례 / characterization mode 친화)."
+          "description": "★ v2.x optional — BR 가 사용자 의도 / 비즈니스 의도인지 (PoC #07~#11 사례 / characterization mode 친화). ★ v4.0.1 — intent_vs_bug_classification ENUM 와 cross-consistency 의무 (둘 다 보유 시 is_intent=true ⇔ classification='intent' 정합)."
+        },
+        "intent_vs_bug_classification": {
+          "$ref": "./intent-classification.schema.json",
+          "description": "★ ★ ★ v4.0.1 신설 — characterization mode 양방향 분류 enum (intent / bug / ambiguous / self_recognized). schemas/intent-classification.schema.json SSOT $ref / characterization-spec.scenario.intent_classification.type 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상. DEC-2026-05-17-rules-schema-enforcement-strengthen + ADR-CHAIN-011 §5 patch v4 정합."
         },
         "source": {
           "type": ["string", "object"],

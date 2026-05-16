@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/intent-classification.schema.json",
+  "title": "Intent vs Bug Classification — 4 분류 enum (★ v4.0.1 신설 / SSOT)",
+  "description": "★ ★ ★ characterization mode 핵심 4 분류 enum 의 단일 source-of-truth (SSOT). v4.0.1 신설 — rules.schema.json (BR 단위) + characterization-spec.schema.json (scenario 단위) 양쪽이 본 schema $ref 의무 (drift-validator cross-schema enum 정합 check 대상). ★ ★ 인용 사실 정밀 (★ session 2026-05-17 official-docs cross-check CONTRADICTS 흡수): (a) Michael Feathers 'Working Effectively with Legacy Code' (2004) = intent-bug context-dependent 통찰 source / 4-enum 형식은 본 방법론 합성 / Feathers 본인이 enum 화 ❌. (b) 'self_recognized' = SATD (Self-Admitted Technical Debt) 개념 차용 / Maldonado & Shihab 2015 논문 안 SATD 5 분류 (design/defect/documentation/test/requirement) 와 ★ ★ 별개 / 분류명 'self_recognized' = 본 방법론 고유 합성. SSOT 위반 회피 paradigm — DEC-2026-05-17-rules-schema-enforcement-strengthen + ADR-CHAIN-011 §5 patch v4 정합.",
+  "type": "string",
+  "enum": ["intent", "bug", "ambiguous", "self_recognized"],
+  "$comment": "★ 4 분류 의미: 'intent' = 보존 의무 비즈니스 의도 / 'bug' = legacy 결함 / modern_alternative 대상 / 'ambiguous' = 도메인 expert carry 의무 / 'self_recognized' = 코드 주석 안 SATD-style 명시 자기 인정 부채 (예: TODO/FIXME/HACK comment). ★ ★ characterization-spec.scenario.intent_classification.type + rules.businessRule.intent_vs_bug_classification 양쪽 cross-stage 정합 의무."
+}

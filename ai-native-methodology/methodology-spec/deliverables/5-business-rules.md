@@ -88,6 +88,33 @@ output/rules/
 □ FE-BE 검증 중복/누락 → 안티패턴(#6) 에 등록
 □ 상태 다이어그램 Mermaid 렌더링 (있을 경우)
 □ 규칙 간 충돌 검토
+□ ★ v4.0.1 — auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
+□ ★ v4.0.1 — intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)
+```
+
+### 4.1 ★ v4.0.1 schema enforcement 강화 (DEC-2026-05-17 / ADR-CHAIN-011 §5 patch v8)
+
+**③ source-grounded enforcement** — AI 자동 추출 BR (auto_extracted=true) 은 schema 안 if/then 으로 source 인용 의무. 사람 작성 BR optional 보존. Industry case 정합 (Semgrep + CodeQL + SonarQube + Daikon 4/4 모두 source location required 또는 degraded-without).
+
+**⑥ intent_vs_bug_classification (cross-stage SSOT)** — schemas/intent-classification.schema.json 의 enum 4종 (intent / bug / ambiguous / self_recognized) 을 본 BR + characterization-spec scenario 양쪽이 $ref 의무. drift-validator cross-schema enum 정합 check 통과 의무.
+
+```yaml
+# v4.0.1 예시
+- id: BR-USER-DATA-001
+  name: "이메일 중복 ❌"
+  natural_language: "사용자 등록 시 이메일은 시스템 내 유일해야 한다."
+  given: ["기존 사용자 존재"]
+  when: ["동일 이메일 신규 등록 시도"]
+  then: ["409 Conflict"]
+  auto_extracted: true                         # ★ v4.0.1
+  source_grounded_evidence:                    # ★ v4.0.1 if/then required (auto_extracted=true)
+    file: "source/src/user.legacy.ts"
+    line_range: "10-15"
+    grep_hit_count: 0
+    grep_query: "users.find\\(.*email"
+  intent_vs_bug_classification: "bug"          # ★ v4.0.1 신설 / characterization-spec 정합
+  is_intent: false                             # ★ legacy alias / classification 와 cross-consistency
+  current_state_note: "legacy source 결함 — register() 중복 검사 미수행"
 ```
 
 ---

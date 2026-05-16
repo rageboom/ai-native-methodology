@@ -96,7 +96,7 @@
         "tags": {
           "type": "array",
           "items": { "type": "string", "pattern": "^@" },
-          "description": "(★ Gherkin tag 표준 / optional / dual encoding traceability) 예: ['@happy', '@bug', '@AP-DB-001']."
+          "description": "(★ Cucumber Gherkin 도구 관례 / optional / dual encoding traceability) 예: ['@happy', '@bug', '@AP-DB-001']. ★ v4.0.1 housekeeping H-1 — '★ Gherkin tag 표준' 표기 = 오표기 (Cucumber 공식 spec 안 tag 의미 표준화 ❌ / @ prefix 만 표준 / MoSCoW 매핑은 본 방법론 독자 관례) → 'Cucumber 도구 관례' 명시 (★ session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
         },
         "given": {
           "type": "object",
@@ -124,9 +124,8 @@
                 "description": "rules.json BR 또는 antipatterns.json AP ID (예: 'BR-USER-EMAIL-FORMAT-001' / 'AP-DB-001')."
               },
               "type": {
-                "type": "string",
-                "enum": ["intent", "bug", "ambiguous", "self_recognized"],
-                "description": "★ 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (SATD/KL-SATD per Maldonado & Shihab 2015)."
+                "$ref": "./intent-classification.schema.json",
+                "description": "★ ★ ★ v4.0.1 — schemas/intent-classification.schema.json SSOT $ref (rules.schema.json businessRule.intent_vs_bug_classification 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상). 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (★ ★ housekeeping H-2 — 코드 주석 안 SATD-style 자기 인정 부채 / Maldonado & Shihab 2015 SATD 개념 차용 / 'self_recognized' 분류명 자체는 본 방법론 고유 합성 / 논문 안 SATD 5 분류 = design/defect/documentation/test/requirement 와 ★ 별개 / session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
               },
               "reason": {
                 "type": "string",

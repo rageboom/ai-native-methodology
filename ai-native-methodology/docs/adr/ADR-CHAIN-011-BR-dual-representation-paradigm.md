@@ -285,6 +285,49 @@ planning: ['planning-extraction-validator', 'schema-validator', 'br-cross-consis
 - 검사 대상: schema-validator + drift-validator + decision-table-validator + formal-spec-link-validator + br-cross-consistency-validator
 - ★ ★ release-readiness 자체 quality 사각지대 발견 = LL-i-23 정합
 
+### §5.8. ★ ★ ★ schema enforcement 강화 — patch v11 (★ session 2026-05-17 / v4.0.1 PATCH)
+
+★ ★ ★ ★ v4.0.1 PATCH 신설 — DEC-2026-05-17-rules-schema-enforcement-strengthen 본격 시행. ★ 본 patch v11 = 본 ADR §5 dual representation paradigm 의 **schema enforcement 강화** sub-paradigm. additive only / breaking change ❌ / Senior REVISE 흡수 + Industry case 4/4 정합 + official-docs CONTRADICTS 2건 housekeeping 흡수.
+
+#### §5.8.1. ★ 사용자 결단 4건 (research 후) 본격 채택
+
+| # | 결단 | 채택 | 근거 |
+|---|---|---|---|
+| #1 ⑤ cross_consistency_check inline | **carry** | Senior REVISE — PoC 적용률 3/14 (21%) / ≥ 7 PoC 50% 도달 후 재평가 / Industry case (CodeQL inline / Spec-Kit 분리 = 패턴 분기 / 단일 정답 ❌) |
+| #2 ⑥ SSOT | **공유 $ref schema 신설** | Senior REVISE — duplicate enum 재선언 = SSOT 위반 risk / schemas/intent-classification.schema.json 신설 + 양쪽 schema $ref + drift-validator cross-schema enum 정합 check |
+| #3 ③ source_grounded_evidence + PoC 처리 | **auto_extracted=true 한정 + PoC optional** | Industry case 4/4 정합 (Semgrep + CodeQL + SonarQube + Daikon) / 14 PoC 회귀 풀이 0 (auto_extracted=true BR 부재 = vacuous 발동) |
+| #4 H + ADR + 버전 | **H 함께 + ADR-CHAIN-011 patch + v4.0.1 PATCH** | additive only / breaking change ❌ / 사실 부정확 동시 수정 paradigm |
+
+#### §5.8.2. ★ ★ schema 변경 (3 파일)
+
+- **신설** `schemas/intent-classification.schema.json` — 단일 SSOT enum `["intent", "bug", "ambiguous", "self_recognized"]` + 인용 사실 정밀 ($comment 안 Feathers + Maldonado 정확 인용 본격 명시)
+- **rules.schema.json** — businessRule.allOf 안 if/then 신규 블록 (auto_extracted=true → source_grounded_evidence 또는 source_evidence required) + businessRule.properties 안 intent_vs_bug_classification 신설 ($ref SSOT)
+- **characterization-spec.schema.json** — scenario.intent_classification.items.type = `$ref` SSOT 적용 (inline enum 폐기) + scenario.tags description "★ Gherkin tag 표준" → "Cucumber Gherkin 도구 관례" (H-1 표기 수정)
+
+#### §5.8.3. ★ ★ official-docs CONTRADICTS 2건 본격 수정 (housekeeping H-1+H-2)
+
+- **H-1** — characterization-spec.schema.json scenario.tags description 안 "Gherkin tag 표준" = ★ ★ 오표기 (Cucumber 공식 spec 안 tag 의미 표준화 ❌ / @ prefix 만 표준 / MoSCoW 매핑은 본 방법론 독자 관례). 본격 "Cucumber Gherkin 도구 관례" 명시.
+- **H-2** — characterization-spec.schema.json scenario.intent_classification.items.type 안 "SATD/KL-SATD per Maldonado & Shihab 2015" = ★ ★ ★ 인용 오류 (논문 안 SATD 5 분류 = design/defect/documentation/test/requirement / `self_recognized` 분류명 ❌). 본격 "Maldonado & Shihab 2015 SATD 개념 차용 / `self_recognized` 분류명 자체는 본 방법론 고유 합성" 명시 (intent-classification.schema.json $comment 안 본격 명시).
+
+#### §5.8.4. ★ ★ drift-validator 신규 unit test (cross-schema enum SSOT 정합 check)
+
+- 신설 `tools/drift-validator/test/cross-schema-enum.test.js` (5 test) — intent-classification.schema.json SSOT 파일 존재 + rules.schema.json + characterization-spec.schema.json 양쪽 $ref 의무 + inline enum 재선언 ❌ 검증 + source-grounded enforcement if/then 검증.
+- drift-validator package.json — v0.4.0 → v0.4.1 + npm test command 안 cross-schema-enum.test.js 추가.
+- workspace test 회귀 — 기존 52 test + 신규 5 = 57/57 pass.
+
+#### §5.8.5. ★ ★ ⑤ cross_consistency_check inline 보존 carry (Phase 2 분리)
+
+- 시기상조 risk (Senior REVISE) — PoC 적용률 3/14 (21%) / ≥ 7 PoC (50%) 도달 후 재평가 carry.
+- 별도 Phase 2 sprint — inline vs 분리 결단 (Industry case 패턴 분기 — CodeQL inline / Spec-Kit specs/ 분리) 도 carry.
+- 현 `tools/br-cross-consistency-validator/layer-2-results/` 디렉토리 paradigm 유지 (PoC 단위 집계).
+
+#### §5.8.6. ★ ★ ★ 본 sprint 외부 carry (큰 구조 결단)
+
+- **① alias 4중첩 폐기** — v1.x deprecated alias 본격 제거 + 14 PoC 마이그레이션 script. breaking change. 별도 sprint plan + Senior critique + 사용자 결단 의무. v4.1.0 MINOR 후보.
+- **② BR 표현 4종 → 2종 단일화** — description = optional metadata 격하 + trigger/condition/action 폐기. breaking change. v4.1.0 MINOR 후보.
+- **④ severity cross-stage mapping table** — rules.json (5종) ↔ acceptance-criteria.json (3종 MoSCoW) ↔ ratchet (4종) 정합 매핑 신설.
+- **⑦ `rules.json` → `business-rules.json` rename** — skill + ID prefix + DMN 산업 표준 정합. cosmetic ❌ / cross-ref 치환 다수. v4.1.0 MINOR 후보.
+
 ---
 
 ## §6. 사상

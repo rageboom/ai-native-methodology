@@ -9,6 +9,56 @@
 
 ---
 
+## [4.0.1] — 2026-05-17 ★ PATCH — rules schema enforcement 강화 (③+⑥ 진입 / ⑤ carry / H-1+H-2 housekeeping)
+
+> ★ ★ ★ ★ ★ **v4.0.1 PATCH — additive only / breaking change ❌**. paradigm 안정점 직후 enforcement criterion 강화 묶음. DEC-2026-05-17-rules-schema-enforcement-strengthen 본격 시행. ADR-CHAIN-011 §5 patch v11 추가. Senior REVISE 흡수 + Industry case 4/4 정합 + official-docs CONTRADICTS 2건 housekeeping 동시 흡수.
+
+### 결단 결과 (사용자 결단 4건 / research 후)
+
+- **#1 ⑤ cross_consistency_check inline = carry** — Senior REVISE / PoC 적용률 3/14 (21%) / ≥ 7 PoC 도달 후 재평가
+- **#2 ⑥ SSOT = 공유 $ref 신설** — schemas/intent-classification.schema.json 신설 + rules.schema.json + characterization-spec.schema.json 양쪽 $ref + drift-validator cross-schema enum 정합 check
+- **#3 ③ source_grounded_evidence + PoC 처리 = auto_extracted=true 한정 + PoC optional** — Industry case 4/4 정합 (Semgrep + CodeQL + SonarQube + Daikon)
+- **#4 H + ADR + 버전 = H 함께 + ADR-CHAIN-011 patch + v4.0.1 PATCH**
+
+### 신설 자산 (1 schema + 1 test)
+
+- **`schemas/intent-classification.schema.json`** (★ 신설 / 단일 SSOT enum 4종 `intent` / `bug` / `ambiguous` / `self_recognized` + 인용 사실 정밀 명시 — Feathers 합성 + Maldonado SATD 개념 차용 / 분류명 본 방법론 고유 합성)
+- **`tools/drift-validator/test/cross-schema-enum.test.js`** (★ 신설 / 5 test — SSOT 파일 + 양쪽 $ref + inline enum 재선언 ❌ + source-grounded enforcement if/then 검증)
+
+### 수정 자산 (★ 3 schema + 2 본체 + 1 ADR + 1 deliverable)
+
+- **`schemas/rules.schema.json`** — businessRule.allOf 안 if/then 신규 블록 (auto_extracted=true → source_grounded_evidence 또는 source_evidence required) + businessRule.properties 안 intent_vs_bug_classification 신설 ($ref SSOT)
+- **`schemas/characterization-spec.schema.json`** — scenario.intent_classification.items.type = `$ref` SSOT 적용 (inline enum 폐기 / 직전 4 enum 단일 정의) + scenario.tags description "★ Gherkin tag 표준" → "Cucumber Gherkin 도구 관례" 표기 수정 (H-1)
+- **`tools/drift-validator/package.json`** — v0.4.0 → v0.4.1 + npm test command 안 cross-schema-enum.test.js 추가
+- **`docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md`** — §5.8 patch v11 신설 (★ 본 PATCH 본격 명세)
+- **`methodology-spec/deliverables/5-business-rules.md`** — §4.1 v4.0.1 schema enforcement 강화 + v4.0.1 예시 추가
+- **`decisions/DEC-2026-05-17-rules-schema-enforcement-strengthen.md`** (신설) + **`decisions/INDEX.md`** 등재
+- **`.claude-plugin/plugin.json`** — version 4.0.0 → 4.0.1
+- **`CLAUDE.md`** (repo root) — plugin.json v4.0.0 → v4.0.1 + 직전 release 요약 첫 줄 갱신
+
+### 사실 부정확 수정 housekeeping (★ ★ research 흡수)
+
+- **H-1** — characterization-spec.schema.json scenario.tags description 안 "Gherkin tag 표준" = 오표기 (Cucumber 공식 spec 안 tag 의미 표준화 ❌) → "Cucumber Gherkin 도구 관례" 명시
+- **H-2** — characterization-spec.schema.json scenario.intent_classification.items.type 안 "SATD/KL-SATD per Maldonado & Shihab 2015" = 인용 오류 (논문 안 SATD 5 분류 = design/defect/documentation/test/requirement / `self_recognized` 분류명 ❌) → intent-classification.schema.json $comment 안 본격 명시 ("SATD 개념 차용 / 분류명 자체는 본 방법론 고유 합성")
+
+### 회귀 검증 (★ chain harness validated 본질 보존)
+
+- workspace test 회귀 — 기존 52 test (drift-validator) + 신규 5 = 57/57 pass
+- schema-validator 회귀 — PoC #05 + PoC #01 valid 유지 (auto_extracted=true BR 부재 = vacuous 발동 / 14 PoC 회귀 풀이 0)
+- chain harness 5 요소 변경 ❌ (schema additive 영역 한정)
+- release-readiness 9/9 strict criterion 보존
+- breaking change ❌ / round-trip 영향 ❌
+
+### Phase 2 carry (★ 본 sprint 외부)
+
+- **⑤ cross_consistency_check inline 보존** — PoC 적용률 ≥ 50% 도달 후 재평가 / inline vs 분리 결단 별도 sprint
+- **① alias 4중첩 폐기** — v4.1.0 MINOR 후보 / breaking change + 14 PoC 마이그레이션 script
+- **② BR 표현 4종 → 2종 단일화** — v4.1.0 MINOR 후보 / breaking change
+- **④ severity cross-stage mapping table** — 별도 plan 의무
+- **⑦ `rules.json` → `business-rules.json` rename** — v4.1.0 MINOR 후보 / cross-ref 치환 다수
+
+---
+
 ## [4.0.0] — 2026-05-17 ★ ★ ★ MAJOR — multi-agent paradigm 본격 채택 (DEC-2026-05-17-v4 / DEC-2026-05-15-g5 retract)
 
 > ★ ★ ★ ★ ★ **v4.0.0 MAJOR — paradigm 본질 변화**. plan-skill-invocation-guarantee.md §B5 옵션 A 본격 채택. stage 별 sub-agent 5종 신설 + 3 base agent 병존 + spike agent 보존. main agent = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch). frontmatter `skills: [...]` 사전 주입 paradigm (Sub-agents.md spec line 407~429 정합). DEC-2026-05-15-g5 "stage 별 분리 ❌" 정책 **retract**.
