@@ -11,23 +11,17 @@
     "source_commit_sha": "c1c2cc4e448b279ff083272df1ac50d20c3304fa",
     "methodology_version": "v1.2.2",
     "raw_confidence": 0.78,
-    "br_extraction_method_breakdown": {
-      "class_validator_decorator": 6,
-      "entity_decorator": 1,
-      "service_manual_throw": 12,
-      "implicit_db_default": 5,
-      "lifecycle_hook": 2
-    },
-    "natural_language_poverty_estimate": "PoC #02 44% (Senior 위험 3 — DTO 단독 가정 30% 악화 입증). 본 PoC = class-validator coverage 12% → 자연어로 재현 시 28~33% 만 표현 가능 → Phase 4.5 형식화 ROI 더 큼.",
-    "honesty_disclosures": [
+    "warnings": [
       "★ class-validator 데코 6개 (UserEntity.@IsEmail + CreateUserDto/LoginUserDto @IsNotEmpty 5개) — 12% coverage",
       "★ service.ts manual throw 12+ 가 주요 BR source — Senior 위험 3 정합",
       "★ DB UQ 부재 (F-120) → DB-level race-safe BR 0건 (PoC #02 의 2중 안전망 부재)"
-    ]
+    ],
+    "phase_d_meta_recovery_note": "★ Sprint 1-J schema cleanup — meta-confidence 비표준 키 회복(의미 변경 ❌): natural_language_poverty_estimate: PoC #02 44% (Senior 위험 3 — DTO 단독 가정 30% 악화 입증). 본 PoC = class-validator coverage 12% → 자연어로 재현 시 28~33% 만 표현 가능 → Phase 4.5 형식화 ROI 더 큼. | br_extraction_method_breakdown: {\"class_validator_decorator\":6,\"entity_decorator\":1,\"service_manual_throw\":12,\"implicit_db_default\":5,\"lifecycle_hook\":2}"
   },
   "business_rules": [
     {
       "id": "BR-USER-USERNAME-NOT-BLANK-001",
+      "title": "사용자명 필수 입력",
       "domain": "User",
       "trigger": "POST /api/users (signup)",
       "condition": "username 필드 입력",
@@ -58,6 +52,7 @@
     },
     {
       "id": "BR-USER-EMAIL-FORMAT-001",
+      "title": "이메일 형식 유효성",
       "domain": "User",
       "trigger": "POST /api/users / PUT /api/user",
       "condition": "email 입력",
@@ -80,6 +75,7 @@
     },
     {
       "id": "BR-USER-EMAIL-NOT-BLANK-001",
+      "title": "이메일 필수 입력",
       "domain": "User",
       "trigger": "POST /api/users (signup)",
       "condition": "email 필드 입력",
@@ -101,6 +97,7 @@
     },
     {
       "id": "BR-USER-PASSWORD-NOT-BLANK-001",
+      "title": "비밀번호 필수 입력",
       "domain": "User",
       "trigger": "POST /api/users (signup) / POST /api/users/login",
       "condition": "password 입력",
@@ -122,6 +119,7 @@
     },
     {
       "id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
+      "title": "사용자명·이메일 중복 금지",
       "domain": "User",
       "trigger": "POST /api/users (signup)",
       "condition": "username 또는 email 이 DB 에 이미 존재",
@@ -144,6 +142,7 @@
     },
     {
       "id": "BR-USER-PASSWORD-HASH-001",
+      "title": "비밀번호 해시 저장 의무",
       "domain": "User",
       "trigger": "@BeforeInsert (UserEntity)",
       "condition": "User insert 시점",
@@ -166,6 +165,7 @@
     },
     {
       "id": "BR-USER-LOGIN-VERIFY-001",
+      "title": "로그인 자격증명 검증",
       "domain": "User",
       "trigger": "POST /api/users/login",
       "condition": "email + password",
@@ -187,6 +187,7 @@
     },
     {
       "id": "BR-USER-JWT-EXPIRY-001",
+      "title": "JWT 만료 기한 60일",
       "domain": "User",
       "trigger": "JWT 발행 (login / findById / findByEmail)",
       "condition": "JWT 생성 시점",
@@ -209,6 +210,7 @@
     },
     {
       "id": "BR-USER-DELETE-AUTH-001",
+      "title": "회원 탈퇴 본인 인증 필수",
       "domain": "User",
       "trigger": "DELETE /api/users/:slug",
       "condition": "(★ AuthMiddleware 미적용 — F-140 critical)",
@@ -231,6 +233,7 @@
     },
     {
       "id": "BR-FOLLOWS-NO-SELF-001",
+      "title": "자기 자신 팔로우 금지",
       "domain": "Profile",
       "trigger": "POST /api/profiles/:username/follow / DELETE",
       "condition": "follower == following",
@@ -253,6 +256,7 @@
     },
     {
       "id": "BR-FOLLOWS-PAIR-UNIQUE-001",
+      "title": "팔로우 중복 멱등 처리",
       "domain": "Profile",
       "trigger": "POST /api/profiles/:username/follow",
       "condition": "(followerId, followingId) pair 가 follows 에 이미 존재",
@@ -275,6 +279,7 @@
     },
     {
       "id": "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001",
+      "title": "팔로우 식별자 필수",
       "domain": "Profile",
       "trigger": "follow / unFollow",
       "condition": "followerEmail/followerId or username 누락",
@@ -296,6 +301,7 @@
     },
     {
       "id": "BR-ARTICLE-SLUG-AUTO-001",
+      "title": "슬러그 자동 생성",
       "domain": "Article",
       "trigger": "POST /api/articles",
       "condition": "create 호출",
@@ -318,6 +324,7 @@
     },
     {
       "id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
+      "title": "좋아요 중복 멱등 처리",
       "domain": "Article",
       "trigger": "POST /api/articles/:slug/favorite",
       "condition": "user.favorites 에 이미 존재",
@@ -340,6 +347,7 @@
     },
     {
       "id": "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001",
+      "title": "좋아요 취소 멱등 처리",
       "domain": "Article",
       "trigger": "DELETE /api/articles/:slug/favorite",
       "condition": "deleteIndex >= 0",
@@ -361,6 +369,7 @@
     },
     {
       "id": "BR-ARTICLE-AUTHOR-AUTO-001",
+      "title": "게시글 작성자 자동 매핑",
       "domain": "Article",
       "trigger": "POST /api/articles",
       "condition": "create 호출",
@@ -382,6 +391,7 @@
     },
     {
       "id": "BR-ARTICLE-COMMENT-EAGER-001",
+      "title": "댓글 즉시 로딩 의무",
       "domain": "Article",
       "trigger": "Article find 시점",
       "condition": "—",
@@ -404,6 +414,7 @@
     },
     {
       "id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001",
+      "title": "피드 팔로우 사용자 한정",
       "domain": "Article",
       "trigger": "GET /api/articles/feed",
       "condition": "follows 가 빈 배열",
@@ -432,13 +443,15 @@
     "critical_concerns": 2,
     "race_safe_brs": 0
   },
-  "concerns": {
-    "race_safe_zero": "★★ DB UQ 부재 (F-120) + FK 부재 (F-121) → race-safe BR 0건. PoC #02 = 5+ race-safe BR (DB UQ 2중 안전망)",
-    "validation_inconsistency": "★ Senior 위험 3 입증 — class-validator coverage 12% / service manual throw 가 주요 source",
-    "auth_scope_missing": "★★ F-140 critical — UC-USER-DELETE AuthMiddleware 미적용",
-    "consistency_gaps": [
-      "★ F-144 신규 — follow self-check email vs unFollow self-check id (검증 차원 불일치)",
-      "★ F-143 신규 후보 — UserService.update 에서 validate(newUser) 미호출 (signup 만 호출)"
-    ]
-  }
+  "concerns": [
+    {
+      "race_safe_zero": "★★ DB UQ 부재 (F-120) + FK 부재 (F-121) → race-safe BR 0건. PoC #02 = 5+ race-safe BR (DB UQ 2중 안전망)",
+      "validation_inconsistency": "★ Senior 위험 3 입증 — class-validator coverage 12% / service manual throw 가 주요 source",
+      "auth_scope_missing": "★★ F-140 critical — UC-USER-DELETE AuthMiddleware 미적용",
+      "consistency_gaps": [
+        "★ F-144 신규 — follow self-check email vs unFollow self-check id (검증 차원 불일치)",
+        "★ F-143 신규 후보 — UserService.update 에서 validate(newUser) 미호출 (signup 만 호출)"
+      ]
+    }
+  ]
 }

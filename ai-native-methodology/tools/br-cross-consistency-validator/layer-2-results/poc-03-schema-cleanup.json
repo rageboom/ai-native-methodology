@@ -1,0 +1,44 @@
+{
+  "$schema_version": "v2.5.0-schema-cleanup",
+  "model": "claude-opus-4-7",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 18,
+  "poc_id": "poc-03-realworld-nestjs",
+  "$comment": "★ ★ ★ session 23차 Sprint 1-J / ★ pre-pre-prerequisite 발견 sub-sprint (Sprint 1-I 진입 중 PoC #03 INVALID 76 errors 발견 — LL-phase2-prereq-01 재현). BR ID 는 이미 4토막 valid (rename ❌). 의미 변경 ❌ / provenance 보존. title 합성 = Sonnet 4.6 sub-agent / batch / 6초.",
+  "transformation": {
+    "meta_standardized": {
+      "honesty_disclosures→warnings": "array of string 정합 이동",
+      "natural_language_poverty_estimate + br_extraction_method_breakdown → phase_d_meta_recovery_note": "meta-confidence 비표준 키 (additionalProperties:false) 회복 / provenance string 보존",
+      "kept": ["generated_at", "confidence=0.78", "inputs_used", "source_commit_sha", "methodology_version=v1.2.2", "raw_confidence"]
+    },
+    "title_added_count": 18,
+    "title_model": "claude-sonnet-4-6",
+    "concerns_type_fix": "top-level concerns object → array (schema type array, items string|object)",
+    "br_id_rename": false,
+    "cross_ref_files_updated": ["output/rules/rules.json"]
+  },
+  "results": [
+    { "br_id": "BR-USER-USERNAME-NOT-BLANK-001", "title": "사용자명 필수 입력" },
+    { "br_id": "BR-USER-EMAIL-FORMAT-001", "title": "이메일 형식 유효성" },
+    { "br_id": "BR-USER-EMAIL-NOT-BLANK-001", "title": "이메일 필수 입력" },
+    { "br_id": "BR-USER-PASSWORD-NOT-BLANK-001", "title": "비밀번호 필수 입력" },
+    { "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001", "title": "사용자명·이메일 중복 금지" },
+    { "br_id": "BR-USER-PASSWORD-HASH-001", "title": "비밀번호 해시 저장 의무" },
+    { "br_id": "BR-USER-LOGIN-VERIFY-001", "title": "로그인 자격증명 검증" },
+    { "br_id": "BR-USER-JWT-EXPIRY-001", "title": "JWT 만료 기한 60일" },
+    { "br_id": "BR-USER-DELETE-AUTH-001", "title": "회원 탈퇴 본인 인증 필수" },
+    { "br_id": "BR-FOLLOWS-NO-SELF-001", "title": "자기 자신 팔로우 금지" },
+    { "br_id": "BR-FOLLOWS-PAIR-UNIQUE-001", "title": "팔로우 중복 멱등 처리" },
+    { "br_id": "BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001", "title": "팔로우 식별자 필수" },
+    { "br_id": "BR-ARTICLE-SLUG-AUTO-001", "title": "슬러그 자동 생성" },
+    { "br_id": "BR-ARTICLE-FAVORITE-IDEMPOTENT-001", "title": "좋아요 중복 멱등 처리" },
+    { "br_id": "BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001", "title": "좋아요 취소 멱등 처리" },
+    { "br_id": "BR-ARTICLE-AUTHOR-AUTO-001", "title": "게시글 작성자 자동 매핑" },
+    { "br_id": "BR-ARTICLE-COMMENT-EAGER-001", "title": "댓글 즉시 로딩 의무" },
+    { "br_id": "BR-ARTICLE-FEED-FOLLOWS-ONLY-001", "title": "피드 팔로우 사용자 한정" }
+  ],
+  "verification": {
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}
