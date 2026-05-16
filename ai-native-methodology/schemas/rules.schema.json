@@ -244,7 +244,8 @@
         "severity": {
           "type": "string",
           "enum": ["critical", "high", "medium", "low", "info"],
-          "description": "★ v2.x optional — BR 중요도 (PoC #02/#05/#06 사례)."
+          "description": "★ v2.x optional — BR 중요도 (PoC #02/#05/#06 사례).",
+          "$comment": "★ v4.1.0 — cross-stage 정합 매핑 SSOT = methodology-spec/severity-cross-stage-mapping.md (critical/high→must · medium→should · low/info→nice / ratchet ADR-010 4종 1:1 (info=비대상)). acceptance-criteria.severity 도출 시 본 매핑표 anchor 의무."
         },
         "is_intent": {
           "type": "boolean",

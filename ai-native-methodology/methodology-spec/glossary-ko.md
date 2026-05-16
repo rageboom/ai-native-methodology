@@ -66,6 +66,7 @@
 | baseline + ratchet | 기준선 + 라쳇 | drift / dmn 도구 회귀 방지 패턴 (`--baseline` / `--ratchet` / `--write-baseline`) — ADR-010 |
 | formal-spec-link | 형식 명세 cross-link | `formal-spec` phase 산출물 간 참조 무결성 (decision_tables / state_machines / sequence_diagrams / invariants) |
 | severity:positive | 모범 사례 등재 | finding-system schema 신규 severity. cross-PoC 학습 효과 입증 (`learning_effect_type`: framework_natural_avoidance / language_static_block / platform_difference / team_learning) |
+| severity cross-stage mapping | 등급 stage 간 정합 매핑 | rules 5종 ↔ ratchet 4종 ↔ MoSCoW 3종 단일 SSOT — `methodology-spec/severity-cross-stage-mapping.md` (v4.1.0 / 묶음 Q ④) |
 | composite AP | 복합 안티패턴 | 여러 BR/state 결합 결함 (단일 패턴 매칭 불가). 등록 거절 + avoid-list.md 가독성 우선 |
 
 ---

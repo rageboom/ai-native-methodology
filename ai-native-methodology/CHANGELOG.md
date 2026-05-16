@@ -9,6 +9,35 @@
 
 ---
 
+## [4.1.1] — 2026-05-17 ★ PATCH — 묶음 Q ④ severity cross-stage 정합 매핑 SSOT 신설 (additive)
+
+> ★ ★ **v4.1.1 PATCH — additive doc / breaking change ❌ / schema 기능 변경 ❌**. 사용자 "1"(묶음 Q) → risk 비균등 실측 → "④만 먼저 (additive)" 결단. ①②⑦ = breaking → 별도 session+ cooling-off carry. DEC-2026-05-17-severity-cross-stage-mapping.
+
+### 결단 (사용자 3건)
+
+- **#1 high → must** (ADR-010 = high 신규 차단 / critical+high 모두 must = 차단 정책 일관)
+- **#2 info → nice** (MoSCoW 3종 안 흡수 / 5종 모두 MoSCoW 값 = 단순·완전)
+- **#3 SSOT = 신규 methodology-spec doc** (⑥ intent-classification SSOT 패턴 정합)
+
+### 신설/수정 자산
+
+- **`methodology-spec/severity-cross-stage-mapping.md`** 신설 — 단일 SSOT (rules.json 5종 ↔ ADR-010 ratchet 4종 ↔ MoSCoW 3종 정합 매핑표 + stage 별 소비 규약 + cross-ref)
+- **`schemas/rules.schema.json`** businessRule.severity `$comment` cross-ref (ajv inert / 검증 동작 무변경) + **`schemas/acceptance-criteria.schema.json`** severity `$comment`
+- **`methodology-spec/glossary-ko.md`** severity cross-stage mapping pointer 1행
+- **`decisions/DEC-2026-05-17-severity-cross-stage-mapping.md`** 신설 + INDEX 등재
+- **`CLAUDE.md`** plugin.json v4.1.0 → v4.1.1 + 직전 release 요약 갱신 / **`STATUS.md`** session 25차 ④ 추가
+
+### 회귀 검증
+
+- workspace test **381/381 pass** (변경 ❌ / $comment ajv inert) + release-readiness **11/11 release-ready** + 0 회귀
+- breaking change ❌ / schema enum·required 무변경 / 데이터 변경 ❌ / chain harness validated 본질 보존
+
+### 묶음 Q 잔여 carry (★ breaking / cooling-off)
+
+- ① alias 4중첩 폐기 (실측 마이그레이션 2 PoC) / ② BR 표현 4→2 (poc-06 7 BR 합성 의무) / ⑦ rules.json→business-rules.json rename (265 file blast radius) — 각각 별도 plan + Senior critique + 사용자 결단 의무
+
+---
+
 ## [4.1.0] — 2026-05-17 ★ ★ MINOR — Phase 2 ⑤ cross_consistency_check 신설 + is_intent⇔classification 동치 enforcement
 
 > ★ ★ ★ ★ ★ **v4.1.0 MINOR — additive API surface 확장 / breaking change ❌**. 묶음 P 종결 (Layer 2 corroboration 7 PoC 도달) 로 ⑤ carry trigger 충족 → 본격 진입. 4원칙 (plan + 3-에이전트 research + 사용자 결단 4건 + 시행). DEC-2026-05-17-phase-2-5-cross-consistency-check / ADR-CHAIN-011 §5 patch v12 + §9 LL-i-51.
