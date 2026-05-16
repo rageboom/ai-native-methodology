@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 9/9 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 10/10 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 9 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 10 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -17,7 +17,10 @@
 //      per-PoC 집계 / mean semantic_score ≥ 0.7 / semantic_drift critical/high finding ❌ / Phase D carry medium 허용 /
 //      ADR-CHAIN-011 §5.4 patch v2 + §11 patch v8 정합 / Senior REVISE-1 흡수)
 //
-// exit 0 = 9/9 ready / 1 = 1+ regress.
+//   10. ★ ★ v3.6.4 R2 신설 — CLAUDE.md ↔ plugin.json.version sync (★ LL-session-20-02 정합 / drift 시 다음 session
+//       plan + research 부정확 risk 차단 / "plugin.json vX.Y.Z" 표기 패턴 검증 / cadence enforcement).
+//
+// exit 0 = 10/10 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -341,6 +344,43 @@ function check9_layer2Consistency() {
   };
 }
 
+function check10_claudeMdVersionSync() {
+  // ★ ★ R2 (session 20차 / LL-session-20-02) — CLAUDE.md ↔ plugin.json.version sync 검증.
+  // 검증 대상: CLAUDE.md 안 "plugin.json vX.Y.Z" 표기 (★ 핵심 컨텍스트 자산 안 plugin 진화 정합 표기).
+  // drift 발생 시 다음 session 의 plan + research 부정확 risk → release 차단 의무.
+  const pluginJsonPath = join(ROOT, '.claude-plugin/plugin.json');
+  const claudeMdPath = resolve(ROOT, '..', 'CLAUDE.md');
+  if (!existsSync(pluginJsonPath)) {
+    return { id: 'claude_md_version_sync', pass: false, detail: 'plugin.json missing' };
+  }
+  if (!existsSync(claudeMdPath)) {
+    return { id: 'claude_md_version_sync', pass: false, detail: `CLAUDE.md missing (expected at ${claudeMdPath})` };
+  }
+  const pluginVer = JSON.parse(readFileSync(pluginJsonPath, 'utf-8')).version;
+  const claudeMd = readFileSync(claudeMdPath, 'utf-8');
+  const matches = claudeMd.match(/plugin\.json v(\d+\.\d+\.\d+)/g) || [];
+  if (matches.length === 0) {
+    return {
+      id: 'claude_md_version_sync',
+      pass: false,
+      detail: 'CLAUDE.md 안 "plugin.json vX.Y.Z" 표기 부재 (R2 cadence 정합 의무)',
+    };
+  }
+  const mismatches = [];
+  for (const m of matches) {
+    const ver = m.match(/v(\d+\.\d+\.\d+)/)[1];
+    if (ver !== pluginVer) mismatches.push(`"${m}" ↔ plugin.json=${pluginVer}`);
+  }
+  return {
+    id: 'claude_md_version_sync',
+    pass: mismatches.length === 0,
+    detail: mismatches.length === 0
+      ? `CLAUDE.md "plugin.json v${pluginVer}" 표기 ${matches.length}건 모두 일치 / R2 cadence 정합`
+      : `drift: ${mismatches.join(' | ')}`,
+    delegated_to: '.claude-plugin/plugin.json.version ↔ CLAUDE.md "plugin.json vX.Y.Z" 표기 sync (R2 / LL-session-20-02)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -355,6 +395,7 @@ function main() {
     check7_e2eCyclePass(),
     check8_analysisValidatorViolation(),
     check9_layer2Consistency(),
+    check10_claudeMdVersionSync(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

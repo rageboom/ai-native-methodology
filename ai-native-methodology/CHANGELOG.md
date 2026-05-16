@@ -9,6 +9,54 @@
 
 ---
 
+## [3.6.4] — 2026-05-16 ★ PATCH — R2 시행 / release-readiness 10th criterion 신설 (CLAUDE.md drift enforcement)
+
+> ★ ★ ★ **R2 잔여 결단 시행** (session 20차 carry / LL-session-20-02 정합). CLAUDE.md ↔ plugin.json.version drift 회피 cadence 자동화 (양심 의존 ❌). 본 cadence 안 release 마다 CLAUDE.md 안 plugin 진화 표기 갱신 의무 강제.
+
+### 시행 결단
+
+- **옵션 (a) release-readiness 10th criterion 신설** 채택 (옵션 (b) PostCommit hook 자동 commit risk + (c) 매뉴얼 양심 의존 거절)
+- 검증 대상: CLAUDE.md 안 `plugin.json vX.Y.Z` 표기 (★ 핵심 컨텍스트 자산 안 plugin 진화 정합 표기 / 라인 99 pattern)
+- drift 발생 시 release 자동 차단 (exit 1)
+
+### 자산 갱신
+
+- **`scripts/release-readiness.js`** — `check10_claudeMdVersionSync` function 신설 + main results array 안 등록 + header 명세 9 → 10 자격 갱신
+- **`CLAUDE.md`** (repo root) — 라인 99 `plugin.json v3.6.2` → `plugin.json v3.6.4` sync (★ R2 검증 정합)
+- **`.claude-plugin/plugin.json`** — 3.6.3 → 3.6.4
+
+### 즉시 검증 (R2 이론적 정합 입증)
+
+```
+check10 신설 직후 (plugin.json=3.6.3 시점):
+  ❌  claude_md_version_sync — drift: "plugin.json v3.6.2" ↔ plugin.json=3.6.3
+  → 9/10 (★ drift 즉시 검출 = criterion 정합 입증)
+
+plugin.json bump + CLAUDE.md sync 후:
+  ✅  claude_md_version_sync — CLAUDE.md "plugin.json v3.6.4" 표기 1건 모두 일치 / R2 cadence 정합
+  → ★ ★ ★ 10/10 = release-ready
+```
+
+### 비-범위 (별도 결단)
+
+- ❌ CLAUDE.md 안 다른 version 표기 (라인 13 / 34 / 117-119 의 paradigm 진화 안정점 + CHANGELOG 직전 release 요약) = 본 criterion 미검증 (의미 영역 다름 / 별도 cadence 결단)
+- ❌ R3 STATUS.md 본격 archive = 별도 session
+- ❌ R4 PoC #12 / #13 본격 활용 = 별도 session
+- ❌ R1 retroactive 12 tag 부여 = 옵션 1 최소 결단 보존
+
+### Lessons Learned
+
+- **LL-session-20-04**: drift enforcement criterion = "양심 의존 ❌" paradigm 의 본격 적용 영역. release-readiness 가 "release 직전 검증" 위치 = 모든 drift 의 마지막 차단 자격 / hook 보다 단순 + 안정적 (자동 commit risk ❌ / 사용자 양심 의존 ❌)
+- **LL-session-20-05**: R2 시행 = "drift 회피 cadence" 정식화 사례. paradigm 진화 안정점 도달 후 = enforcement criterion 신설 cadence 본격 진입 자격 (drift 누적 회피 자산 cumulative).
+
+### 정합 관계
+
+- v3.6.3 PATCH session 20차 (LL-session-20-02 자산 / 본 R2 시행 근거)
+- DEC-2026-05-15-carry-cleanup-paradigm-종결 (paradigm 진화 안정점 / 본 R2 = 안정점 후 enforcement cadence 진입)
+- ADR-CHAIN-005 §3 mechanical trio (★ release-readiness = 4번째 mechanical gate 자격 / hook trio + state.blocked + release-readiness 4중 enforcement)
+
+---
+
 ## [3.6.3] — 2026-05-16 ★ PATCH — session 20차 점검 / P0 회귀 2건 복구 + drift 갱신 묶음
 
 > ★ ★ ★ **사용자 명시 "점검해 보자"** 진입 → 4 영역 점검 (본체 자가 정합 + CLAUDE.md drift + STATUS/INDEX 비대화 + 잔여 carry/다음 의제) → critical 회귀 2건 발견 + 즉시 복구. paradigm 변경 ❌ / additive change + 회귀 복구만 = PATCH 정합.
