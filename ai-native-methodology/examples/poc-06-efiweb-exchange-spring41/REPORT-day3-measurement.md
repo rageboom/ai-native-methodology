@@ -102,7 +102,7 @@ exit: 0
 
 ### 4.4 도메인 expert 결단 의무 (carry C-domain-1 ~ 3)
 
-- BR-EXCHANGE-005 + AP-EXCHANGE-006/008/009 동반 처분 (intent vs bug) — 사용자 (TF Lead) 또는 IFRS 회계 담당자
+- BR-EXCHANGE-ANNUAL-005 + AP-EXCHANGE-006/008/009 동반 처분 (intent vs bug) — 사용자 (TF Lead) 또는 IFRS 회계 담당자
 - AP-EXCHANGE-008 (S_ExRateMigration) — 도메인 expert + DB 함수 본문 read
 - KRW selectExchangeList 표시 필요성 — 사용자
 
@@ -135,7 +135,7 @@ exit: 0
 ### 6.1 사용자 (TF Lead) 결단 영역
 
 - **D1**: PoC #06 정식 등재 (a) 채택 여부
-- **D2**: BR-EXCHANGE-005 + AP-EXCHANGE-006/008/009 ambiguous 3건 처분 (intent vs bug)
+- **D2**: BR-EXCHANGE-ANNUAL-005 + AP-EXCHANGE-006/008/009 ambiguous 3건 처분 (intent vs bug)
 - **D3**: PoC #07 또는 retrofit 후보 결단 (사내 다른 legacy Java + characterization 적용 / carry 1순위 + carry C-3 ≥2 PoC corroboration 위해)
 - **D4**: capital (3752 LOC / 다중책임) 모듈에서 plan §3-A 추정 정합 재측정 의향?
 - **D5**: KRW 환율이 selectExchangeList 결과에도 표시될 필요성

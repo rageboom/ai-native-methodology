@@ -28,7 +28,7 @@
         "expected_response": { "excRateReg": "Y" }
       },
       "intent_classification": [
-        { "rule": "BR-EXCHANGE-002", "type": "intent", "note": "E + A 두 GUBUN 모두 등록 의무 — IFRS B/S + P/L 동시" }
+        { "rule": "BR-EXCHANGE-COMPLETE-002", "type": "intent", "note": "E + A 두 GUBUN 모두 등록 의무 — IFRS B/S + P/L 동시" }
       ],
       "behavior_to_preserve": "cnt == 2 일 때만 'Y' (cnt == 1 은 'N')"
     },
@@ -66,7 +66,7 @@
         "expected_response": { "excRateReg": "N" }
       },
       "intent_classification": [
-        { "rule": "BR-EXCHANGE-002 (확장)", "type": "intent", "note": "EXC_RATE != 0 조건 — 0 = 미등록 동치" }
+        { "rule": "BR-EXCHANGE-COMPLETE-002 (확장)", "type": "intent", "note": "EXC_RATE != 0 조건 — 0 = 미등록 동치" }
       ],
       "behavior_to_preserve": "0 환율 = 미등록 (UI 가 빈 input 을 0 으로 INSERT 하면 등록 미완 신호)",
       "behavior_likely_bug": [
@@ -88,13 +88,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-EXCHANGE-002 (E + A 모두 등록 의무)", "EXC_RATE != 0 = 미등록 동치"],
+    "intent": ["BR-EXCHANGE-COMPLETE-002 (E + A 모두 등록 의무)", "EXC_RATE != 0 = 미등록 동치"],
     "bug": ["NULL vs 0 동치 처리 명시 부재", "month 1~12 검증 부재", "★ AP-EXCHANGE-007 자조 코멘트 자체 — '환율관리 페이지만 생각하고 설계한 폐해' 자체 인지"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-EXCHANGE-007"],
-    "brs_covered": ["BR-EXCHANGE-002"],
+    "brs_covered": ["BR-EXCHANGE-COMPLETE-002"],
     "aps_intersected": ["AP-EXCHANGE-007 (자조 코멘트 / 자체 인지된 기술부채)"]
   }
 }

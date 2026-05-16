@@ -91,7 +91,7 @@
     "threshold_target": "≥0.80 (PoC #05 정합)",
     "threshold_status": "★ 미달 (-0.30) — Day 2 시간 cap (1일) 내 핵심 3 UC 만 / 나머지 4 UC + selectExchangeRate carry",
     "remediation": [
-      "Day 3 시간 여유 시 UC-004 (getDayExchangeList) 추가 (BR-EXCHANGE-003 검증 보강)",
+      "Day 3 시간 여유 시 UC-004 (getDayExchangeList) 추가 (BR-EXCHANGE-DECIMAL-003 검증 보강)",
       "selectExchangeRate (FN_Get_ExcRate) 는 다른 모듈 통합 시 carry — exchange 모듈 단독 phase 4.7 scope 외",
       "★ phase 4.7 본체 격상 시 (v2.1.0) — coverage threshold 재정의 의무: 단일 모듈 내 핵심 UC 3개 = 0.5 도 정합 가능?"
     ]

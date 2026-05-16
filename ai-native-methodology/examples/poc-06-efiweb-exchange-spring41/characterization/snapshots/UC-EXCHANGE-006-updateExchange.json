@@ -39,12 +39,12 @@
         "transaction_scope": "★ 명시 부재 — for 루프 4회 호출이 단일 트랜잭션인지 4개 트랜잭션인지 코드만으로 불명 / @Transactional 부재 + EgovComAbstractDAO.update 동작 의존"
       },
       "intent_classification": [
-        { "rule": "BR-EXCHANGE-004", "type": "intent", "note": "콤마 자동 제거 — UX 친화" },
-        { "rule": "BR-EXCHANGE-005", "type": "ambiguous", "note": "12개월 일괄 입력 — IFRS 정합 vs 1NF 위반" },
-        { "rule": "BR-EXCHANGE-006", "type": "intent", "note": "E/A 분리" }
+        { "rule": "BR-EXCHANGE-COMMA-004", "type": "intent", "note": "콤마 자동 제거 — UX 친화" },
+        { "rule": "BR-EXCHANGE-ANNUAL-005", "type": "ambiguous", "note": "12개월 일괄 입력 — IFRS 정합 vs 1NF 위반" },
+        { "rule": "BR-EXCHANGE-GUBUN-006", "type": "intent", "note": "E/A 분리" }
       ],
       "behavior_to_preserve": [
-        "콤마 제거 후 저장 (BR-EXCHANGE-004)",
+        "콤마 제거 후 저장 (BR-EXCHANGE-COMMA-004)",
         "MERGE 패턴 — UPDATE if exists else INSERT (idempotent)",
         "session USER_ID → sessionId 파라미터 매핑 (감사 추정)"
       ],
@@ -80,13 +80,13 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-EXCHANGE-004 (콤마 제거)", "BR-EXCHANGE-006 (E/A 분리)", "MERGE idempotent"],
+    "intent": ["BR-EXCHANGE-COMMA-004 (콤마 제거)", "BR-EXCHANGE-GUBUN-006 (E/A 분리)", "MERGE idempotent"],
     "bug": ["트랜잭션 atomicity 부재 (4 트랜잭션 가능성)", "sessionId DEAD parameter (sql-map 미사용)", "음수/null 환율 검증 부재"],
-    "ambiguous": ["BR-EXCHANGE-005 (12개월 일괄 / 1NF)", "AP-EXCHANGE-009 (12 String[])"]
+    "ambiguous": ["BR-EXCHANGE-ANNUAL-005 (12개월 일괄 / 1NF)", "AP-EXCHANGE-009 (12 String[])"]
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-EXCHANGE-006"],
-    "brs_covered": ["BR-EXCHANGE-004", "BR-EXCHANGE-005", "BR-EXCHANGE-006"],
+    "brs_covered": ["BR-EXCHANGE-COMMA-004", "BR-EXCHANGE-ANNUAL-005", "BR-EXCHANGE-GUBUN-006"],
     "aps_intersected": ["AP-EXCHANGE-001 (Map 캐스팅)", "AP-EXCHANGE-006 (1NF)", "AP-EXCHANGE-009 (12 배열)"]
   }
 }

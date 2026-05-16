@@ -41,10 +41,10 @@
       "downstream-modules (capital, connect 등) — selectExchangeRate 호출 의존"
     ],
     "success_criteria": [
-      "기말(E) + 평균(A) 두 GUBUN 모두 등록되어야 회계 인식 완성 (BR-EXCHANGE-002)",
-      "KRW 환율 = 1 고정 (기준 통화 / BR-EXCHANGE-001)",
-      "외화 → 원화 환산 시 currCd 별 정확한 환율 적용 (BR-EXCHANGE-007)",
-      "12개월 환율 일괄 입력 + 천단위 콤마 자동 제거 UX (BR-EXCHANGE-004 + BR-EXCHANGE-005)"
+      "기말(E) + 평균(A) 두 GUBUN 모두 등록되어야 회계 인식 완성 (BR-EXCHANGE-COMPLETE-002)",
+      "KRW 환율 = 1 고정 (기준 통화 / BR-EXCHANGE-KRW-001)",
+      "외화 → 원화 환산 시 currCd 별 정확한 환율 적용 (BR-EXCHANGE-CALCFN-007)",
+      "12개월 환율 일괄 입력 + 천단위 콤마 자동 제거 UX (BR-EXCHANGE-COMMA-004 + BR-EXCHANGE-ANNUAL-005)"
     ]
   },
   "use_cases": [
@@ -91,7 +91,7 @@
     {
       "id": "UC-EXCHANGE-004",
       "name": "통화·월별 일일 환율 조회",
-      "description": "GET /ifrs/exchange/getDayExchangeList?currCd=...&yyyyMM=... — 특정 통화·월의 일자별 환율 list. VND 는 소수 4자리 / 그 외 2자리 표시 (BR-EXCHANGE-003).",
+      "description": "GET /ifrs/exchange/getDayExchangeList?currCd=...&yyyyMM=... — 특정 통화·월의 일자별 환율 list. VND 는 소수 4자리 / 그 외 2자리 표시 (BR-EXCHANGE-DECIMAL-003).",
       "actors": ["ifrs-user"],
       "preconditions": ["currCd + yyyyMM 파라미터"],
       "postconditions": ["TB_DAY_EXCHANGE 일자별 환율 list (jsonView)"],
@@ -146,37 +146,37 @@
   ],
   "business_rules_intent": [
     {
-      "br_id": "BR-EXCHANGE-001",
+      "br_id": "BR-EXCHANGE-KRW-001",
       "reasoning": "KRW (원화) 는 IFRS 보고 기준 통화 — 외화→원화 환산 시 KRW 자체는 환산 불필요. selectExchangeRate 의 if 분기로 DB 호출 회피 = 도메인 정합 + 성능 최적.",
       "source_grounded_evidence": "source/java/service/impl/ExchangeServiceImpl.java:85-90 — if('KRW'.equals(currCd)) return 1; (intent_vs_bug 분류 = intent)"
     },
     {
-      "br_id": "BR-EXCHANGE-002",
+      "br_id": "BR-EXCHANGE-COMPLETE-002",
       "reasoning": "IFRS B/S (외화 자산/부채 평가) 와 P/L (외화거래 인식) 동시에 평가하려면 기말환율(E) + 평균환율(A) 둘 다 필요. 한 GUBUN 만 있으면 회계 인식 미완.",
       "source_grounded_evidence": "source/sqlmap/exchange.xml:76-98 — cnt == 2 strict + EXC_RATE != 0 (intent_vs_bug = intent)"
     },
     {
-      "br_id": "BR-EXCHANGE-003",
+      "br_id": "BR-EXCHANGE-DECIMAL-003",
       "reasoning": "VND (베트남 동) 환율 단위가 매우 작음 (1원 ≈ 18 VND). 소수 2자리만 표시하면 정밀도 손실 → 4자리 표시 의무.",
       "source_grounded_evidence": "source/sqlmap/exchange.xml:118-127 — FORMAT(EXCHANGE_RATE , CASE WHEN CURR_CD = 'VND' THEN '##0.0000' ELSE '##0.00' END) (intent_vs_bug = intent)"
     },
     {
-      "br_id": "BR-EXCHANGE-004",
+      "br_id": "BR-EXCHANGE-COMMA-004",
       "reasoning": "UI 에서 사람이 1,300.50 같은 천단위 콤마 형식으로 환율 입력. Service 가 콤마 자동 제거 후 저장 → UX 친화 + DB 는 numeric 형식 유지.",
       "source_grounded_evidence": "source/java/service/impl/ExchangeServiceImpl.java:61-72 — mon[N]Arr[i].replaceAll(',', '') 12회 반복 (intent_vs_bug = intent)"
     },
     {
-      "br_id": "BR-EXCHANGE-005",
+      "br_id": "BR-EXCHANGE-ANNUAL-005",
       "reasoning": "★ ambiguous — IFRS 연간 환율표는 12개월 한 번에 보는 표 형식이 표준 (intent 가능성 ↑) vs DB 정규화 (1NF) 위반 + 13번째 월 추가 시 schema migration 폐해 (bug 가능성). characterization/intent-vs-bug.md §3.1 참조 — 도메인 expert 결단 carry. **잠정 결단: bug** (자조 코멘트 자체 인지 신호).",
       "source_grounded_evidence": "source/sqlmap/exchange.xml:36-73 (TB_EXCHANGE MON1~MON12 일괄 MERGE) + AP-EXCHANGE-006 + AP-EXCHANGE-007 (자조 코멘트)"
     },
     {
-      "br_id": "BR-EXCHANGE-006",
+      "br_id": "BR-EXCHANGE-GUBUN-006",
       "reasoning": "TB_EXCHANGE.GUBUN 컬럼으로 기말환율(E) / 평균환율(A) row 단위 분리. IFRS B/S vs P/L 회계 기준 필수. PRIMARY KEY = (CURR_CD, YEAR, GUBUN).",
       "source_grounded_evidence": "source/sqlmap/exchange.xml:8-32 — UNION ALL of GUBUN='E' + GUBUN='A' (intent_vs_bug = intent)"
     },
     {
-      "br_id": "BR-EXCHANGE-007",
+      "br_id": "BR-EXCHANGE-CALCFN-007",
       "reasoning": "외화 → 원화 환산 산식의 기본 — 다른 모듈 (capital, connect 등) 이 ExchangeService.selectExchangeRate(year, month, currCd, gubun) 호출 → DB 함수 FN_Get_ExcRate 가 환율 반환.",
       "source_grounded_evidence": "source/sqlmap/exchange.xml:102-104 — SELECT ifrs.dbo.FN_Get_ExcRate(...). FN 본문 read carry — 정확한 산식 미확인 (intent_vs_bug = intent / 산식 자체 정합 carry)"
     }
@@ -194,7 +194,7 @@
   "risks_and_constraints": [
     "★ Spring 4.1 + iBATIS 2 + 표준프레임워크 corpus 빈약 — AP-EXCHANGE-001~010 자동 추출 자동화율 22% (plan §3-A 35% 추정 -13%p)",
     "★ IFRS 회계 도메인 지식 무게 ↑ — rules.json 자연어 description 비중 ↑ / 자동화율 29% (plan §3-A 55% 추정 -26%p)",
-    "★ ambiguous 3종 (BR-EXCHANGE-005 + AP-EXCHANGE-006/008/009 동반) — 도메인 expert 결단 의무 / chain 2 진입 ❌ (이 결단 전까지)",
+    "★ ambiguous 3종 (BR-EXCHANGE-ANNUAL-005 + AP-EXCHANGE-006/008/009 동반) — 도메인 expert 결단 의무 / chain 2 진입 ❌ (이 결단 전까지)",
     "★ 실 DB 환경 (MSSQL) 부재 — characterization snapshot 정확도 한계 / 도메인 expert 검증 carry",
     "70~80% 자동화 한계 잔존 (chain harness 정신) — gate #1~#4 사용자 검토 의무",
     "테스트 0 환경 — chain 3 RED→GREEN baseline 부재 / Spring 4.1 test context 부팅 휴리스틱 corpus 빈약"

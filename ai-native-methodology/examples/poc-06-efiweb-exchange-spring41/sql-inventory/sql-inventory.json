@@ -44,7 +44,7 @@
         "auto_grep": "✅ 100%",
         "decision_table_candidate": "★ phase 4.5 formal-spec / decision-table 영역 정합",
         "core_examples": [
-          { "sql_id": "selectExchangeList", "tags": ["<isNotEmpty property=\"currCd\">"], "branch_count": 1, "line": 28, "br_link": "BR-EXCHANGE-002 currCd 분기" }
+          { "sql_id": "selectExchangeList", "tags": ["<isNotEmpty property=\"currCd\">"], "branch_count": 1, "line": 28, "br_link": "BR-EXCHANGE-COMPLETE-002 currCd 분기" }
         ]
       },
       "pattern_2_calculation_formula": {
@@ -54,7 +54,7 @@
         "domain_formula_candidate": "★ 도메인 공식 reference",
         "core_examples": [
           { "function": "CASE WHEN (12 분기 / 월별)", "context": "CASE WHEN '01'=#month# THEN MON1 ... WHEN '12'=#month# THEN MON12 END", "line": 79, "sql_id": "selectCheckExcRate", "ap_link": "AP-EXCHANGE-007 (★ 자조 폐해)" },
-          { "function": "FORMAT (VND vs 그 외)", "context": "FORMAT(EXCHANGE_RATE, CASE WHEN CURR_CD='VND' THEN '##0.0000' ELSE '##0.00' END)", "line": 122, "sql_id": "selectDayExchangeList", "br_link": "BR-EXCHANGE-003 VND 4자리 정밀도" }
+          { "function": "FORMAT (VND vs 그 외)", "context": "FORMAT(EXCHANGE_RATE, CASE WHEN CURR_CD='VND' THEN '##0.0000' ELSE '##0.00' END)", "line": 122, "sql_id": "selectDayExchangeList", "br_link": "BR-EXCHANGE-DECIMAL-003 VND 4자리 정밀도" }
         ],
         "mssql_specific": "DECODE 부재 → CASE WHEN/FORMAT 대체"
       },
@@ -132,7 +132,7 @@
           "sql_id": "ExchangeDAO.selectDayExchangeList",
           "patterns": {
             "dynamic_branch": [],
-            "calculation_formula": [{ "function": "FORMAT (VND 4자리 vs 그 외 2자리)", "line": 122, "br_link": "BR-EXCHANGE-003" }, { "function": "CONVERT (datetime)", "line": 121 }],
+            "calculation_formula": [{ "function": "FORMAT (VND 4자리 vs 그 외 2자리)", "line": 122, "br_link": "BR-EXCHANGE-DECIMAL-003" }, { "function": "CONVERT (datetime)", "line": 121 }],
             "result_mapping": { "type": "resultClass", "value": "egovMap", "line": 118 },
             "shared_sql_fragments": []
           }
@@ -152,7 +152,7 @@
       ],
       "dependent_tables": ["TB_CURRENCY", "TB_EXCHANGE"],
       "uc_link": "UC-EXCHANGE-002 (selectExchangeList)",
-      "intent_vs_bug_classification": "intent (BR-EXCHANGE-002 IFRS 정합) + bug 동반 (AP-EXCHANGE-006 1NF 위반 / D2 결단)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-COMPLETE-002 IFRS 정합) + bug 동반 (AP-EXCHANGE-006 1NF 위반 / D2 결단)",
       "confidence": 0.90,
       "carry_flags": []
     },
@@ -165,7 +165,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["TB_EXCHANGE"],
       "uc_link": "UC-EXCHANGE-006 (updateExchange)",
-      "intent_vs_bug_classification": "intent (BR-EXCHANGE-005 12개월 일괄 입력 UX) + bug 동반 (AP-EXCHANGE-006 정규화 위반 / D2 결단)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-ANNUAL-005 12개월 일괄 입력 UX) + bug 동반 (AP-EXCHANGE-006 정규화 위반 / D2 결단)",
       "confidence": 0.85,
       "carry_flags": []
     },
@@ -193,7 +193,7 @@
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "(★ supplementary / capital 등 cross-module 의존)",
-      "intent_vs_bug_classification": "intent (BR-EXCHANGE-007 외화→원화 환산 산식 / 회계 기본)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-CALCFN-007 외화→원화 환산 산식 / 회계 기본)",
       "confidence": 0.80,
       "carry_flags": ["external_call_out_of_scope", "DBA-read"]
     },
@@ -215,13 +215,13 @@
       "mapper_xml": "source/sqlmap/exchange.xml",
       "mapper_xml_line": 118,
       "called_from_screen": "exchange/exchangeView (JSP / 일일 환율 조회) → /ifrs/exchange/getDayExchangeList (Controller / Excel 다운로드 재사용)",
-      "business_meaning": "통화별 월별 일일 환율 조회 — VND 4자리 / 그 외 2자리 소수 정밀도 (BR-EXCHANGE-003 정합)",
+      "business_meaning": "통화별 월별 일일 환율 조회 — VND 4자리 / 그 외 2자리 소수 정밀도 (BR-EXCHANGE-DECIMAL-003 정합)",
       "dynamic_branch": [
         { "tag": "SQL CASE WHEN (VND vs 그 외)", "line": 122, "branch_count": 2, "note": "iBATIS dynamic ❌ / SQL FORMAT 함수 분기" }
       ],
       "dependent_tables": ["TB_DAY_EXCHANGE"],
       "uc_link": "UC-EXCHANGE-004 (getDayExchangeList) / UC-EXCHANGE-005 (downloadDayExchangeExcel 재사용)",
-      "intent_vs_bug_classification": "intent (BR-EXCHANGE-003 VND 4자리 정밀도)",
+      "intent_vs_bug_classification": "intent (BR-EXCHANGE-DECIMAL-003 VND 4자리 정밀도)",
       "confidence": 0.90,
       "carry_flags": []
     }

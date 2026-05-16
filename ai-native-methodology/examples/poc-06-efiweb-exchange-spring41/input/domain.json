@@ -27,7 +27,7 @@
       "alternatives": [
         { "id": "UC-EXCHANGE-002-A1", "title": "currCd 파라미터 지정", "outcome": "해당 통화만 필터" }
       ],
-      "related_rules": ["BR-EXCHANGE-006"],
+      "related_rules": ["BR-EXCHANGE-GUBUN-006"],
       "source_grounded_evidence": {
         "file": "source/java/web/ExchangeController.java",
         "line_range": "49-59",
@@ -56,7 +56,7 @@
       "actor": "ifrs-user",
       "primary_outcome": "일자별 환율 list (TB_DAY_EXCHANGE)",
       "alternatives": [],
-      "related_rules": ["BR-EXCHANGE-003"],
+      "related_rules": ["BR-EXCHANGE-DECIMAL-003"],
       "source_grounded_evidence": {
         "file": "source/java/web/ExchangeController.java",
         "line_range": "83-92",
@@ -70,7 +70,7 @@
       "actor": "ifrs-user",
       "primary_outcome": "Excel 파일 (header [고시일, 환율] / sheet 명 = 화폐단위(currCd) yyyy-MM)",
       "alternatives": [],
-      "related_rules": ["BR-EXCHANGE-003"],
+      "related_rules": ["BR-EXCHANGE-DECIMAL-003"],
       "source_grounded_evidence": {
         "file": "source/java/web/ExchangeController.java",
         "line_range": "94-120",
@@ -84,9 +84,9 @@
       "actor": "ifrs-user (관리자 — 추정)",
       "primary_outcome": "TB_EXCHANGE MERGE (통화 × 기말/평균 × 12개월 일괄) + sessionId 기록",
       "alternatives": [
-        { "id": "UC-EXCHANGE-006-A1", "title": "환율값에 천단위 콤마 포함", "outcome": "콤마 자동 제거 후 저장 (BR-EXCHANGE-004)" }
+        { "id": "UC-EXCHANGE-006-A1", "title": "환율값에 천단위 콤마 포함", "outcome": "콤마 자동 제거 후 저장 (BR-EXCHANGE-COMMA-004)" }
       ],
-      "related_rules": ["BR-EXCHANGE-004", "BR-EXCHANGE-005", "BR-EXCHANGE-006"],
+      "related_rules": ["BR-EXCHANGE-COMMA-004", "BR-EXCHANGE-ANNUAL-005", "BR-EXCHANGE-GUBUN-006"],
       "source_grounded_evidence": {
         "file": "source/java/web/ExchangeController.java",
         "line_range": "133-144",
@@ -100,9 +100,9 @@
       "actor": "ifrs-user",
       "primary_outcome": "기말(E) + 평균(A) 두 GUBUN 모두 등록 시 'Y' / 그 외 'N'",
       "alternatives": [
-        { "id": "UC-EXCHANGE-007-A1", "title": "한 GUBUN 만 등록", "outcome": "'N' (BR-EXCHANGE-002)" }
+        { "id": "UC-EXCHANGE-007-A1", "title": "한 GUBUN 만 등록", "outcome": "'N' (BR-EXCHANGE-COMPLETE-002)" }
       ],
-      "related_rules": ["BR-EXCHANGE-002"],
+      "related_rules": ["BR-EXCHANGE-COMPLETE-002"],
       "source_grounded_evidence": {
         "file": "source/java/web/ExchangeController.java",
         "line_range": "157-168",

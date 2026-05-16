@@ -67,7 +67,7 @@
       "pattern": "월별 환율을 row 단위가 아닌 컬럼 단위 (MON1~MON12) 로 저장. 13번째 월 (윤달/조정월) 추가 시 schema migration 필요 + 모든 SQL 변경 필요. 정규화 (TB_EXCHANGE_MONTHLY: CURR_CD, YEAR, GUBUN, MONTH, RATE) 의 정합.",
       "modern_alternative": "TB_EXCHANGE_MONTHLY (CURR_CD, YEAR, GUBUN, MONTH, RATE) — 1NF 정합",
       "carry_to": "★ 본 AP 는 의도 가능성 ↑ — IFRS 연간 환율표는 12개월 정합. phase 4.7 intent-vs-bug 분류 carry.",
-      "intent_vs_bug": "★ 분간 어려움 (BR-EXCHANGE-005 와 동일 영역)"
+      "intent_vs_bug": "★ 분간 어려움 (BR-EXCHANGE-ANNUAL-005 와 동일 영역)"
     },
     {
       "id": "AP-EXCHANGE-007",

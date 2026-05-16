@@ -221,6 +221,18 @@
 
 ### Sprint 1 — schema cleanup (★ ★ ★ ★ pre-pre-prerequisite)
 
+**★ ★ Sprint 1-A 시범 종결 (★ session 23차 / 2026-05-17)** — PoC #06 (EXCHANGE) BR ID rename 7개 + cross-ref 13 file 갱신 ✅. paradigm 입증 자격. ★ sub-domain 자동 합성 (Sonnet 4.6 sub-agent / batch / 8초 dispatch) + 의미 보존 (KRW / COMPLETE / DECIMAL / COMMA / ANNUAL / GUBUN / CALCFN). 결과 = `tools/br-cross-consistency-validator/layer-2-results/poc-06-sub-domain-synthesis.json` 자산화.
+
+**★ 7 sub-sprint carry (★ ★ 다음 session 진입 권고 / cooling-off 의무)**:
+- Sprint 1-B (#07 CAPITAL / 15 BR + 15 cross-ref)
+- Sprint 1-C (#08 PETSTORE / 8 BR + 10 cross-ref)
+- Sprint 1-D (#09 RW / 7 BR + 10 cross-ref)
+- Sprint 1-E (#10 RAE / 5 BR + 11 cross-ref)
+- Sprint 1-F (#11 BILLING / 2 BR + 17 cross-ref + anyOf errors)
+- Sprint 1-G (#02 / 14 BR name 추가)
+- Sprint 1-H (#04 / meta + name + category + type)
+- Sprint 1-I (release-readiness §8.1 strict analysis_validator_violation criterion 격상 — PoC #01+#05 한정 → 전체 PoC 검증)
+
 **목표**: PoC #02 + #04 + #08 + #10 (+ 가능 시 PoC #06 + #07 + #09 + #11) **모두 schema-validator 통과 의무**.
 
 **시행 단계**:

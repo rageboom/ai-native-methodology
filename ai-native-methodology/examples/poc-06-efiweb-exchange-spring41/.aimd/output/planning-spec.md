@@ -22,10 +22,10 @@
 
 ### Success Criteria
 
-1. 기말(E) + 평균(A) 두 GUBUN 모두 등록되어야 회계 인식 완성 (BR-EXCHANGE-002)
-2. KRW 환율 = 1 고정 (기준 통화 / BR-EXCHANGE-001)
-3. 외화 → 원화 환산 시 currCd 별 정확한 환율 적용 (BR-EXCHANGE-007)
-4. 12개월 환율 일괄 입력 + 천단위 콤마 자동 제거 UX (BR-EXCHANGE-004 + BR-EXCHANGE-005)
+1. 기말(E) + 평균(A) 두 GUBUN 모두 등록되어야 회계 인식 완성 (BR-EXCHANGE-COMPLETE-002)
+2. KRW 환율 = 1 고정 (기준 통화 / BR-EXCHANGE-KRW-001)
+3. 외화 → 원화 환산 시 currCd 별 정확한 환율 적용 (BR-EXCHANGE-CALCFN-007)
+4. 12개월 환율 일괄 입력 + 천단위 콤마 자동 제거 UX (BR-EXCHANGE-COMMA-004 + BR-EXCHANGE-ANNUAL-005)
 
 ---
 
@@ -49,13 +49,13 @@
 
 | BR | intent_vs_bug | 핵심 |
 |---|---|---|
-| BR-EXCHANGE-001 (KRW = 1) | **intent** | IFRS 기준 통화 / 환산 회피 |
-| BR-EXCHANGE-002 (E+A 모두 등록) | **intent** | B/S + P/L 동시 평가 의무 |
-| BR-EXCHANGE-003 (VND 4자리) | **intent** | 단위가 작음 → 정밀도 |
-| BR-EXCHANGE-004 (콤마 제거) | **intent** | UX 친화 |
-| BR-EXCHANGE-005 (12개월 일괄) | **★ ambiguous → 잠정 bug** | 자조 코멘트 자체 인지 신호 |
-| BR-EXCHANGE-006 (E/A 분리) | **intent** | B/S vs P/L 회계 기준 |
-| BR-EXCHANGE-007 (FN_Get_ExcRate) | **intent** | 환산 산식 / FN 본문 carry |
+| BR-EXCHANGE-KRW-001 (KRW = 1) | **intent** | IFRS 기준 통화 / 환산 회피 |
+| BR-EXCHANGE-COMPLETE-002 (E+A 모두 등록) | **intent** | B/S + P/L 동시 평가 의무 |
+| BR-EXCHANGE-DECIMAL-003 (VND 4자리) | **intent** | 단위가 작음 → 정밀도 |
+| BR-EXCHANGE-COMMA-004 (콤마 제거) | **intent** | UX 친화 |
+| BR-EXCHANGE-ANNUAL-005 (12개월 일괄) | **★ ambiguous → 잠정 bug** | 자조 코멘트 자체 인지 신호 |
+| BR-EXCHANGE-GUBUN-006 (E/A 분리) | **intent** | B/S vs P/L 회계 기준 |
+| BR-EXCHANGE-CALCFN-007 (FN_Get_ExcRate) | **intent** | 환산 산식 / FN 본문 carry |
 
 ---
 

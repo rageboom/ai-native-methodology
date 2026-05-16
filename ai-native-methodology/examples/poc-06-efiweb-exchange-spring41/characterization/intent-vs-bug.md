@@ -10,13 +10,13 @@
 
 | ID | 제목 | 분류 | 근거 |
 |---|---|---|---|
-| BR-EXCHANGE-001 | KRW 환율 = 1 고정 | **intent** | IFRS 회계 기준 통화 — 외화→원화 환산 시 KRW 자체는 환산 불필요. selectExchangeRate 코드의 if 분기는 도메인 정합 |
-| BR-EXCHANGE-002 | E + A 두 GUBUN 모두 등록 = 'Y' | **intent** | IFRS B/S (기말환율) + P/L (평균환율) 동시 평가 의무 — 회계 정합 |
-| BR-EXCHANGE-003 | VND 소수 4자리 / 그 외 2자리 | **intent** | VND 환율 단위가 매우 작아 정밀도 필요 (실무 정합) |
-| BR-EXCHANGE-004 | 환율 입력 시 콤마 자동 제거 | **intent** | UX 친화 — 사람이 1,300.50 형식 입력 가능 |
-| BR-EXCHANGE-005 | 12개월 환율 일괄 단위 입력 | **★ ambiguous** | (a) IFRS 연간 환율표 정합 vs (b) DB 정규화 (1NF) 위반 폐해 — **도메인 expert 결단 필요** |
-| BR-EXCHANGE-006 | 기말(E) / 평균(A) 분리 관리 | **intent** | IFRS B/S vs P/L 회계 기준 |
-| BR-EXCHANGE-007 | 외화→원화 환산 currCd 별 환율 | **intent** | 회계 산식의 기본 |
+| BR-EXCHANGE-KRW-001 | KRW 환율 = 1 고정 | **intent** | IFRS 회계 기준 통화 — 외화→원화 환산 시 KRW 자체는 환산 불필요. selectExchangeRate 코드의 if 분기는 도메인 정합 |
+| BR-EXCHANGE-COMPLETE-002 | E + A 두 GUBUN 모두 등록 = 'Y' | **intent** | IFRS B/S (기말환율) + P/L (평균환율) 동시 평가 의무 — 회계 정합 |
+| BR-EXCHANGE-DECIMAL-003 | VND 소수 4자리 / 그 외 2자리 | **intent** | VND 환율 단위가 매우 작아 정밀도 필요 (실무 정합) |
+| BR-EXCHANGE-COMMA-004 | 환율 입력 시 콤마 자동 제거 | **intent** | UX 친화 — 사람이 1,300.50 형식 입력 가능 |
+| BR-EXCHANGE-ANNUAL-005 | 12개월 환율 일괄 단위 입력 | **★ ambiguous** | (a) IFRS 연간 환율표 정합 vs (b) DB 정규화 (1NF) 위반 폐해 — **도메인 expert 결단 필요** |
+| BR-EXCHANGE-GUBUN-006 | 기말(E) / 평균(A) 분리 관리 | **intent** | IFRS B/S vs P/L 회계 기준 |
+| BR-EXCHANGE-CALCFN-007 | 외화→원화 환산 currCd 별 환율 | **intent** | 회계 산식의 기본 |
 
 **BR 분류 결과**: intent 6 / ambiguous 1 / bug 0
 
@@ -31,7 +31,7 @@
 | AP-EXCHANGE-003 | Controller 에 Excel 출력 로직 | **bug** | View/Controller 책임 혼재 = 폐해. 새 시스템 ExcelExportService 분리 |
 | AP-EXCHANGE-004 | WITH(NOLOCK) 무차별 사용 | **bug** | Dirty Read 위험 = 명백한 폐해 (회계 데이터에 특히 위험). 새 시스템 READ_COMMITTED_SNAPSHOT |
 | AP-EXCHANGE-005 | iBATIS 2 #...# 인라인 | **bug** | deprecated syntax = 폐해 (안전성은 OK 이지만 마이그레이션 의무). 새 시스템 MyBatis 3 + #{...} |
-| AP-EXCHANGE-006 | TB_EXCHANGE.MON1~MON12 (1NF 위반) | **★ ambiguous** | BR-EXCHANGE-005 와 동일 — 도메인 expert 결단 필요 |
+| AP-EXCHANGE-006 | TB_EXCHANGE.MON1~MON12 (1NF 위반) | **★ ambiguous** | BR-EXCHANGE-ANNUAL-005 와 동일 — 도메인 expert 결단 필요 |
 | AP-EXCHANGE-007 | SQL 자조 코멘트 | **bug + 자체인지** | 작성자 본인이 폐해로 인지 ("환율관리 페이지만 생각하고 설계한 폐해라 할 수 있다 ㅋ"). 새 시스템 결정표(DMN) 기반 GUBUN 별 검증 분리 |
 | AP-EXCHANGE-008 | Stored Procedure (S_ExRateMigration) 비즈니스 로직 | **★ ambiguous** | 외부 환율 데이터 일괄 가져오기는 DB 작업 정합 가능성 ↑ — 도메인 expert + 외부 시스템 spec 확인 carry |
 | AP-EXCHANGE-009 | 12 String[] 배열 파싱 | **bug (AP-006 의존)** | AP-006 이 ambiguous 이므로 — AP-006 이 intent 면 AP-009 도 intent / AP-006 이 bug 면 AP-009 도 bug. 동반 처분 |
@@ -43,7 +43,7 @@
 
 ## 3. ★ ambiguous 3종 → 정식 분류 (2026-05-07 / DEC-2026-05-07-poc-06-domain-결단)
 
-### 3.1 BR-EXCHANGE-005 + AP-EXCHANGE-006 + AP-EXCHANGE-009 — **★ 정식 결단: bug (데이터 모델) + intent (입력 UX) 분리**
+### 3.1 BR-EXCHANGE-ANNUAL-005 + AP-EXCHANGE-006 + AP-EXCHANGE-009 — **★ 정식 결단: bug (데이터 모델) + intent (입력 UX) 분리**
 
 **핵심 질문**: TB_EXCHANGE 의 12개월 컬럼 (MON1~MON12) 구조는 IFRS 회계 정합 의도인가, 1NF 위반 폐해인가?
 
@@ -59,7 +59,7 @@
 
 **★ 정식 결단** (DEC-2026-05-07-poc-06-domain-결단):
 - **데이터 모델 = bug** — AP-EXCHANGE-007 자조 코멘트 자체 인지 신호 결정적. 새 시스템 정규화 의무 (TB_EXCHANGE_MONTHLY: CURR_CD, YEAR, GUBUN, MONTH, RATE).
-- **입력 UX = intent** — BR-EXCHANGE-005 의 "12개월 한 화면 일괄 입력" 은 IFRS 연간 환율표 정합 / UX 보존 의무.
+- **입력 UX = intent** — BR-EXCHANGE-ANNUAL-005 의 "12개월 한 화면 일괄 입력" 은 IFRS 연간 환율표 정합 / UX 보존 의무.
 - AP-EXCHANGE-006 = **bug** (정규화 의무)
 - AP-EXCHANGE-009 = **bug** (AP-006 동반 / List<MonthRate> 정규화 모델 정합)
 
@@ -99,7 +99,7 @@
 
 | ID | 항목 | 결단 의무 주체 |
 |---|---|---|
-| C-domain-1 | BR-EXCHANGE-005 + AP-EXCHANGE-006 + AP-EXCHANGE-009 동반 처분 (intent vs bug) | 사용자 (TF Lead) 또는 IFRS 회계 담당자 |
+| C-domain-1 | BR-EXCHANGE-ANNUAL-005 + AP-EXCHANGE-006 + AP-EXCHANGE-009 동반 처분 (intent vs bug) | 사용자 (TF Lead) 또는 IFRS 회계 담당자 |
 | C-domain-2 | AP-EXCHANGE-008 (S_ExRateMigration) | 도메인 expert + DB 함수 본문 read |
 | C-domain-3 | KRW 환율이 selectExchangeList 결과에도 보일 필요성 (BR-001 vs 화면 일관성) | 사용자 결단 |
 | C-data-1 | FN_Get_ExcRate DB 함수 본문 (환율 조회 산식) | DB DDL/함수 정의 read |

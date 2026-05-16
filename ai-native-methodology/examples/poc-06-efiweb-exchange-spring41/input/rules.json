@@ -3,7 +3,7 @@
   "project_id": "poc-06-efiweb-exchange-spring41",
   "business_rules": [
     {
-      "id": "BR-EXCHANGE-001",
+      "id": "BR-EXCHANGE-KRW-001",
       "title": "원화 (KRW) 환율 = 1 고정",
       "type": "domain_invariant",
       "description": "selectExchangeRate 호출 시 currCd='KRW' 이면 DB 조회 없이 1.0 반환. 외화 → 원화 환산 시 KRW 자체는 환산 불필요 (회계 기준 통화).",
@@ -18,7 +18,7 @@
       "intent_vs_bug": "intent (의도된 비즈니스 규칙 — IFRS 회계 기준 통화)"
     },
     {
-      "id": "BR-EXCHANGE-002",
+      "id": "BR-EXCHANGE-COMPLETE-002",
       "title": "환율 등록 완료 조건 = 기말(E) + 평균(A) 두 GUBUN 모두 등록",
       "type": "completeness_invariant",
       "description": "특정 통화·연·월의 환율이 '등록 완료' 로 인정되려면 기말환율(GUBUN='E') + 평균환율(GUBUN='A') 둘 다 0이 아닌 값으로 존재해야 한다. checkExcRateReg 가 cnt == 2 일 때만 'Y' 반환.",
@@ -33,7 +33,7 @@
       "intent_vs_bug": "intent (IFRS B/S + P/L 평가 시 두 환율 동시 의무)"
     },
     {
-      "id": "BR-EXCHANGE-003",
+      "id": "BR-EXCHANGE-DECIMAL-003",
       "title": "VND (베트남 동) 일일 환율 소수점 4자리 / 그 외 2자리 표시",
       "type": "presentation_format",
       "description": "selectDayExchangeList 결과의 EXCHANGE_RATE 출력 시 currCd='VND' 이면 '##0.0000' / 그 외는 '##0.00' 포맷.",
@@ -48,7 +48,7 @@
       "intent_vs_bug": "intent (VND 환율 단위가 매우 작아 소수 정밀도 필요 — 실무 정합)"
     },
     {
-      "id": "BR-EXCHANGE-004",
+      "id": "BR-EXCHANGE-COMMA-004",
       "title": "환율 입력 시 천단위 콤마(,) 자동 제거",
       "type": "input_normalization",
       "description": "updateExchange 호출 시 mon1_arr[] ~ mon12_arr[] 의 각 값에서 콤마 제거 후 DB 저장. UI 에서 사람이 1,300.50 같은 형식으로 입력해도 1300.50 으로 저장.",
@@ -63,7 +63,7 @@
       "intent_vs_bug": "intent (UX 친화 — 사람이 천단위 콤마로 입력 가능)"
     },
     {
-      "id": "BR-EXCHANGE-005",
+      "id": "BR-EXCHANGE-ANNUAL-005",
       "title": "연간 환율은 12개월 일괄 단위 입력",
       "type": "data_granularity",
       "description": "환율 입력은 항상 한 통화·한 GUBUN·한 연도에 대해 12개월 (MON1~MON12) 일괄. 단일 월 단독 입력 API ❌. TB_EXCHANGE 테이블도 row 1개 = 12개월.",
@@ -78,7 +78,7 @@
       "intent_vs_bug": "★ 분간 어려움 — IFRS 연간 환율표 일괄 등록 정합 (intent) vs DB 정규화 부재 폐해 (bug). phase 4.7 carry."
     },
     {
-      "id": "BR-EXCHANGE-006",
+      "id": "BR-EXCHANGE-GUBUN-006",
       "title": "기말환율(E) / 평균환율(A) 분리 관리",
       "type": "domain_classification",
       "description": "TB_EXCHANGE.GUBUN 컬럼으로 기말환율(E) 과 평균환율(A) 를 row 단위 분리. 기말 = B/S 외화 자산/부채 평가용 (보고일 시점 환율). 평균 = P/L 외화거래 인식용 (회기 평균 환율).",
@@ -93,7 +93,7 @@
       "intent_vs_bug": "intent (IFRS B/S vs P/L 회계 기준)"
     },
     {
-      "id": "BR-EXCHANGE-007",
+      "id": "BR-EXCHANGE-CALCFN-007",
       "title": "외화 → 원화 환산 시 currCd 별 환율 적용 (FN_Get_ExcRate)",
       "type": "calculation_rule",
       "description": "다른 모듈 (capital, connect 등) 이 외화를 원화로 환산 시 ExchangeService.selectExchangeRate(year, month, currCd, gubun) 호출 → DB 함수 FN_Get_ExcRate 가 환율 반환.",

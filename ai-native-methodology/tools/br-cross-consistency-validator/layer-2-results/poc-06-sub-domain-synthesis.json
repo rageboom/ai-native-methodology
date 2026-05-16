@@ -1,0 +1,37 @@
+{
+  "$schema_version": "v2.5.0-sub-domain-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 7,
+  "poc_id": "poc-06-efiweb-exchange-spring41",
+  "$comment": "★ ★ ★ session 23차 Sprint 1-A 시범 진입 / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (★ implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 13 file rename 동반.",
+  "results": [
+    { "old_id": "BR-EXCHANGE-001", "new_id": "BR-EXCHANGE-KRW-001", "sub_domain": "KRW", "rationale": "KRW 환율 = 1 고정 — 통화 코드 자체가 규칙의 핵심 식별자" },
+    { "old_id": "BR-EXCHANGE-002", "new_id": "BR-EXCHANGE-COMPLETE-002", "sub_domain": "COMPLETE", "rationale": "기말(E)+평균(A) 두 GUBUN 모두 등록해야 완료 — 등록 완료 조건(completeness) 핵심" },
+    { "old_id": "BR-EXCHANGE-003", "new_id": "BR-EXCHANGE-DECIMAL-003", "sub_domain": "DECIMAL", "rationale": "VND 4자리 / 그 외 2자리 — 소수점 자릿수 표시 포맷이 본질" },
+    { "old_id": "BR-EXCHANGE-004", "new_id": "BR-EXCHANGE-COMMA-004", "sub_domain": "COMMA", "rationale": "천단위 콤마 자동 제거 — 입력 정규화 규칙의 구체 동작이 콤마 처리" },
+    { "old_id": "BR-EXCHANGE-005", "new_id": "BR-EXCHANGE-ANNUAL-005", "sub_domain": "ANNUAL", "rationale": "12개월 일괄 입력 — 연간(annual) 단위 데이터 구조가 본질" },
+    { "old_id": "BR-EXCHANGE-006", "new_id": "BR-EXCHANGE-GUBUN-006", "sub_domain": "GUBUN", "rationale": "E(기말)/A(평균) GUBUN 분리 관리 — 도메인 분류 키가 GUBUN" },
+    { "old_id": "BR-EXCHANGE-007", "new_id": "BR-EXCHANGE-CALCFN-007", "sub_domain": "CALCFN", "rationale": "FN_Get_ExcRate 호출로 currCd별 환율 적용 — 계산 함수(calculation function) 본질" }
+  ],
+  "cross_ref_files_updated": [
+    "input/rules.json",
+    "input/domain.json",
+    "input/antipatterns.json",
+    ".aimd/output/planning-spec.json",
+    ".aimd/output/planning-spec.md",
+    "characterization/coverage.json",
+    "characterization/intent-vs-bug.md",
+    "characterization/snapshots/UC-EXCHANGE-002-selectExchangeList.json",
+    "characterization/snapshots/UC-EXCHANGE-006-updateExchange.json",
+    "characterization/snapshots/UC-EXCHANGE-007-checkExcRateReg.json",
+    "sql-inventory/sql-inventory.json",
+    "PROGRESS-2026-05-07.md",
+    "REPORT-day3-measurement.md"
+  ],
+  "verification": {
+    "old_id_residual_count": 0,
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}
