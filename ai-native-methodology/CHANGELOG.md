@@ -9,6 +9,36 @@
 
 ---
 
+## [3.6.8] — 2026-05-16 ★ PATCH — A2 시행 / INDEX.md 본격 archive (session 14차 이전 의사결정 분리)
+
+> ★ ★ ★ **A2 시행** (다음 의제 1번째 / 2개 묶음 진행 결단 옵션 3). INDEX.md 149 → 31 라인 (79% 절감) + INDEX-HISTORY.md 137 라인 신설. R3 STATUS archive cadence 정합 (paradigm 진화 안정점 = v2.5.0 MINOR FINAL = session 15차 / 2026-05-14 분기 cutoff).
+
+### 시행 결단
+
+- cutoff: session 14차 이하 의사결정 (111 DEC) → archive / session 15차 이후 (4 DEC = R4 + G3 + plugin-charter + v2.5.0 final) → INDEX.md 보존
+- CHANGELOG.md 추가 archive 보류 — 이미 v2.4 이전 = `CHANGELOG-HISTORY.md` 안 archive 됨 (34 entries). v2.6.0~v3.6.7 (23 entries / 1601 라인) = 사용자 가시화 자산 + 외부 인지 보존 우선 / 추가 archive ≠ A2 의제
+
+### 자산 갱신
+
+- **`decisions/INDEX-HISTORY.md`** — **신설** (137 라인 / intro + cross-link + session 14차 이전 의사결정 111 DEC table 보존)
+- **`decisions/INDEX.md`** — 149 → 31 라인 (보존 = header + 진행중 없음 + 승인 결정 session 15차 이후 4 DEC + Archive cross-link)
+- **`.claude-plugin/plugin.json`** — 3.6.7 → 3.6.8
+- **`CLAUDE.md`** (repo root) — 라인 99 plugin.json v3.6.7 → v3.6.8 (R2 cadence 정합)
+
+### 절감 사실
+
+| 자산 | before | after | 절감 |
+|---|---|---|---|
+| INDEX.md (라인) | 149 | 31 | -118 (79%) |
+| INDEX.md (토큰 추정) | ~70K | ~15K | -55K (79%) |
+
+### 정합 관계
+
+- R3 v3.6.5 (STATUS.md archive) = 본 A2 = 동일 archive cadence (paradigm 안정점 분기 cutoff)
+- CHANGELOG-HISTORY.md (이미 존재 / v2.4 이전 archive) = 본 A2 = 동일 history file 패턴
+
+---
+
 ## [3.6.7] — 2026-05-16 ★ PATCH — A1 시행 / release-readiness 11th criterion 신설 (workspace test 회귀 자동 차단) + R2 test 회귀 fix
 
 > ★ ★ ★ **A1 시행** (다음 의제 R1 채택 = "release-readiness 11th criterion 신설"). session 20차 v3.6.3 P0 회귀 (chain-driver Windows path 2 fail) = 본 criterion 부재 = drift 누적 사례 정합. 또한 **R2 시점 test expectation 갱신 누락 회귀 동시 fix** (9 → 11).
