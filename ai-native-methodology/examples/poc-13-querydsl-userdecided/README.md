@@ -1,7 +1,10 @@
-# PoC #13 — DSL builder QueryDSL user-decided source (★ paradigm-cross MEDIUM / sources 사용자 결정 carry)
+# PoC #13 — DSL builder QueryDSL user-decided source (★ paradigm-cross MEDIUM / ★ ★ ★ R4 보류 처분 자산)
 
 > 2026-05-08 / DEC-2026-05-08-poc-13-prelim-신설
 > ★ paradigm-cross MEDIUM #4 / ★ ★ source 결정 = ★ 사용자 위임 의무 (★ ★ realworld OSS 부재 사실)
+>
+> ★ ★ ★ ★ ★ **status = 보류** (2026-05-16 / R4 결단 / DEC-2026-05-16-r4-poc-12-13-보류-자산화 / v3.6.6 PATCH)
+> ★ ★ ★ ★ 사용자 명시 결단 옵션 (c) "보류 + (B) 정책 완화 회귀 처분 자산화" 채택 — ★ ★ ★ ★ ★ README 안 정탐 결과 추천 (옵션 (v) "PoC #13 보류 + (B) 정책 완화 회귀") 정합 / ADR-CHAIN-008 정합 / paradigm-cross corroboration 자격 = 본 PoC 진입 없이 도달. 향후 사용자 source 도착 시 재진입 가능 (라벨 부활 ❌ / 새 DEC 신설 의무 / LL-cleanup-02 정합).
 
 ## scope
 

@@ -9,6 +9,43 @@
 
 ---
 
+## [3.6.6] — 2026-05-16 ★ PATCH — R4 시행 / PoC #12 + #13 보류 처분 자산화
+
+> ★ ★ ★ **R4 잔여 결단 시행** (session 20차 carry / 본 session 20차 = R1+R2+R3+R4 4 결단 모두 시행). PoC #12 (raw query) + PoC #13 (QueryDSL) = 둘 다 README 안 정탐 결과 추천 + ADR-CHAIN-008 정합 → status = "보류" 명시 자산화. 사용자 source 도착 시 재진입 자격 보존.
+
+### 시행 결단
+
+- **옵션 (c) PoC #12/#13 보류 + (B) 정책 완화 회귀 처분 자산화** 채택 (옵션 (a) 본격 시행 plan + (b) 사내 적용 가이드 + (d) 별도 session 거절)
+- 근거 4종:
+  1. 정탐 결과 정합 (둘 다 README 안 ★ ★ ★ ★ ★ "pure realworld OSS 부재" 사실 + (B) 추천 명시)
+  2. ADR-CHAIN-008 정합 (MEDIUM × ≥ 5 PoC isomorphic = strong corroboration 자격 도달 / PoC #06~#11 6 PoC 누적)
+  3. 비용 vs 가치 (14d cap × source 결정 비용 > corroboration 추가 가치 / 이미 자격 도달)
+  4. paradigm 진화 안정점 정합 (v2.5.0 MINOR FINAL 이후 안정점 / 추가 PoC 본격 시행 ≠ 의제)
+
+### 자산 갱신
+
+- **`examples/poc-12-rawsql-userdecided/README.md`** — status = "보류" 명시 + DEC cross-link
+- **`examples/poc-13-querydsl-userdecided/README.md`** — status = "보류" 명시 + DEC cross-link
+- **`decisions/DEC-2026-05-16-r4-poc-12-13-보류-자산화.md`** — **신설** (SSOT)
+- **`decisions/INDEX.md`** — 본 DEC entry 추가 (역시간순 / 가장 위)
+- **`.claude-plugin/plugin.json`** — 3.6.5 → 3.6.6
+- **`CLAUDE.md`** (repo root) — 라인 99 plugin.json v3.6.5 → v3.6.6 (R2 cadence 정합)
+
+### 재진입 cadence
+
+★ 사용자 source 도착 시 (사내 모듈 또는 외부 source 결정) 진입 가능:
+- 본 DEC = 보류 처분 자산 / 재진입 시 **새 DEC 신설 의무** (LL-cleanup-02 정합 / 라벨 부활 ❌)
+- chain harness 5 stage 본격 시행 (PoC #08+#09+#10 패턴 재사용 / ~3~4일 실측)
+
+### 정합 관계
+
+- DEC-2026-05-08-poc-{12,13}-prelim-신설 (prelim 자산 / 본 R4 = prelim 처분)
+- DEC-2026-05-08-paradigm-cross-policy-완화 + ADR-CHAIN-008 (strong corroboration 자격 paradigm)
+- DEC-2026-05-15-carry-cleanup-paradigm-종결 (paradigm 진화 안정점 / 본 R4 = 잔여 PoC 처분)
+- v3.6.3 + v3.6.4 + v3.6.5 + v3.6.6 = session 20차 4 release 묶음 (R1+R2+R3+R4 모두 시행)
+
+---
+
 ## [3.6.5] — 2026-05-16 ★ PATCH — R3 시행 / STATUS.md 본격 archive (session 14차 이전 분리)
 
 > ★ ★ ★ **R3 잔여 결단 시행** (session 20차 carry). STATUS.md 1871 → 80 라인 (95.7% 절감) + STATUS-HISTORY.md 1807 라인 신설. paradigm 진화 안정점 (v2.5.0 MINOR FINAL = session 15차 / 2026-05-14) 이 자연 분기 = 본 cutoff 결단 근거.
