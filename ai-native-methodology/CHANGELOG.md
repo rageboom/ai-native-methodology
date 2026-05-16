@@ -9,6 +9,47 @@
 
 ---
 
+## [3.6.5] — 2026-05-16 ★ PATCH — R3 시행 / STATUS.md 본격 archive (session 14차 이전 분리)
+
+> ★ ★ ★ **R3 잔여 결단 시행** (session 20차 carry). STATUS.md 1871 → 80 라인 (95.7% 절감) + STATUS-HISTORY.md 1807 라인 신설. paradigm 진화 안정점 (v2.5.0 MINOR FINAL = session 15차 / 2026-05-14) 이 자연 분기 = 본 cutoff 결단 근거.
+
+### 시행 결단
+
+- **옵션 (a) session 15차 이전 archive 채택** (옵션 (b) 강력 archive + (c) v3.x 기준 + (d) 별도 session 거절)
+- cutoff: session 14차 이하 모두 archive / STATUS.md = session 15차~20차 보존
+- STATUS.md 안 cross-link section 신설 (Archive 진입점 명시)
+
+### 자산 갱신
+
+- **`decisions/STATUS-HISTORY.md`** — **신설** (intro + session 14차 header 23 라인 + session 14차 이전 body 1769 라인 = 1807 라인)
+- **`decisions/STATUS.md`** — 1871 → 80 라인 (보존 영역 = header 라인 1~22 + Archive cross-link + session 15차 body)
+- **`.claude-plugin/plugin.json`** — 3.6.4 → 3.6.5
+- **`CLAUDE.md`** (repo root) — 라인 99 plugin.json v3.6.4 → v3.6.5 (R2 cadence 정합)
+
+### 절감 사실
+
+| 자산 | before | after | 절감 |
+|---|---|---|---|
+| STATUS.md (라인) | 1,871 | 80 | -1,791 (95.7%) |
+| STATUS.md (토큰 추정) | ~96K | ~4K | -92K (95.8%) |
+| context load 비용 | 매 conversation 96K | 4K (+ STATUS-HISTORY on-demand) | 매우 큰 절감 |
+
+### Lessons Learned
+
+- **LL-session-20-06**: STATUS.md 비대화 = 매 conversation context load 안 누적 비용 (다음 session 의 plan/research 출발점 자산). paradigm 진화 안정점 도달 cadence 마다 archive 의무 자격.
+- **LL-session-20-07**: archive cutoff = "paradigm 진화 안정점" 자연 분기 활용 = R3 정합 paradigm. version 기반 (v2.x ↔ v3.x) 또는 session 기반 (5 session) cutoff 보다 의미 영역 정합 우선.
+
+### 비-범위 (별도 결단)
+
+- ❌ R4 PoC #12 / #13 user-decided 본격 활용 = 별도 session
+
+### 정합 관계
+
+- v3.6.4 PATCH session 20차 R2 (CLAUDE.md drift enforcement / 본 R3 = STATUS.md 비대화 처분 / 동일 session 의 paradigm 진화 안정점 후 cadence enforcement 묶음)
+- DEC-2026-05-14-v2.5.0-minor-final (paradigm 진화 안정점 = 본 archive cutoff 근거)
+
+---
+
 ## [3.6.4] — 2026-05-16 ★ PATCH — R2 시행 / release-readiness 10th criterion 신설 (CLAUDE.md drift enforcement)
 
 > ★ ★ ★ **R2 잔여 결단 시행** (session 20차 carry / LL-session-20-02 정합). CLAUDE.md ↔ plugin.json.version drift 회피 cadence 자동화 (양심 의존 ❌). 본 cadence 안 release 마다 CLAUDE.md 안 plugin 진화 표기 갱신 의무 강제.
