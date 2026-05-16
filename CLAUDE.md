@@ -96,8 +96,8 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 - `ai-native-methodology/schemas/` — **JSON Schema 39종** (BE + FE + chain 산출물 + work-unit-manifest + state + error-mapping-spec + sql-inventory 등 / 모두 top-level `additionalProperties:false` strict / cleanup round 9 정합)
 - `ai-native-methodology/templates/` — 산출물 템플릿 (analysis/ + planning/ + spec/ + test/ + implement/ + design/)
 - `ai-native-methodology/tools/` — **Node CLI 도구 16종** (drift-validator + decision-table-validator + formal-spec-link-validator + spectral-runner + static-runner + schema-validator + planning-extraction-validator + chain-coverage-validator + spec-test-link-validator + traceability-matrix-builder + test-impl-pass-validator + ★ chain-driver + characterization-coverage-validator + sql-inventory-extractor + findings-aggregator + ★ br-cross-consistency-validator (v2.5.0 Layer 2 LLM paradigm)) — ★ 단일 npm workspace
-- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json v3.6.9 + marketplace.json) / Claude Code plugin 시스템 진입점
-- `ai-native-methodology/agents/` (3 base persona — senior + industry-case + official-docs) + `skills/` (**47종** / 5 stage organize / v2.6.0 의미 ID + v3.x 진화) + `hooks/` + `flows/` — plugin 자산
+- `ai-native-methodology/.claude-plugin/` — plugin manifest (plugin.json v4.0.0 + marketplace.json) / Claude Code plugin 시스템 진입점
+- `ai-native-methodology/agents/` (★ v4.0 multi-agent — 5 stage agent + 3 base persona + 1 spike = 9종) + `skills/` (**47종** / 5 stage organize / v2.6.0 의미 ID + v3.x 진화) + `hooks/` + `flows/` — plugin 자산
 - `ai-native-methodology/scripts/` — build-plugin.js + version-check.js + release-readiness.js (9/9 strict criterion 검증)
 - `ai-native-methodology/examples/` — **PoC 14종** (#01 Spring Boot 2.5 / #02 Spring Boot 3.3 Hexagonal / #03 NestJS / #04 full-React FSD / #04 mini-React / #05 sample-user-register / #06~#07+#11 Spring 4.1 + iBATIS 2 사내 EFI-WEB (R1' axis legacy) / #08~#10 Modern ORM OSS (MyBatis 3 + TypeORM + JPA QueryDSL / R1' axis modern) / #12 RawSQL user-decided / #13 QueryDSL user-decided) ✅ 모두 종료
 - `ai-native-methodology/archive/` — 진화 history (v1.0~v1.4 metadata + adoption + evaluation / cleanup round 1 격리)
@@ -114,14 +114,15 @@ Phase 4.5 검증 / 모든 cross-validation 단계에서:
 ## 참고
 
 - `ai-native-methodology/README.md` — 방법론 소개 (plugin install 가이드 + 시나리오 A/B/C)
-- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v3.6.2 PATCH** (2026-05-15 / ★ ★ ★ 잔여 carry 묶음 정리 / paradigm 진화 안정점 도달). 직전 6 release 요약:
+- `ai-native-methodology/CHANGELOG.md` — 변경 이력. **현재 v4.0.0 MAJOR** (2026-05-17 / ★ ★ ★ ★ ★ multi-agent paradigm 본격 채택 / DEC-2026-05-17-v4-multi-agent-paradigm-채택 / DEC-2026-05-15-g5 retract / stage 별 sub-agent 5종 + 3 base + spike 1종). 직전 7 release 요약:
+  - **v3.6.9 PATCH** (A3 시행 / README + guides 외부 인지 자산 sync)
+  - **v3.6.x PATCH** (A1+A2+R1~R4 / 11/11 release-readiness + INDEX archive + STATUS archive)
+  - **v3.6.2 PATCH** (잔여 carry 묶음 정리 / paradigm 진화 안정점)
   - **v3.6.1 PATCH** (cross-link 문서 보강 / agents/README 신설)
   - **v3.6.0 MINOR** (G1 ITSM 영구 scope-out / charter §3 활성 Gap 모두 청산)
-  - **v3.5.0 MINOR** (G5 종결 / lifecycle 자산 매핑 매트릭스 단일 SSOT)
+  - **v3.5.0 MINOR** (G5 종결 / lifecycle 자산 매핑 매트릭스 단일 SSOT — ★ ★ v4.0 안 retract 대상)
   - **v3.4.0 MINOR** (G4 종결 / FE skill 보강 — implement-react + implement-vue + test-playwright + analysis-html-template)
-  - **v3.3.0 MINOR** (G2 종결 / analysis-input-orchestrate + analysis-from-{prompt,swagger,plan-doc,figma})
-  - **v3.2 MINOR** (G3 종결 / scope/stage 폴더 + manifest 이중 렌더링 + SessionStart hook)
-  - 더 이전 (v3.1 / v2.6 / v2.5 / v2.4 / v2.3 / v2.2 / v2.1 / v2.0~v1.x) = CHANGELOG.md 참조.
+  - 더 이전 (v3.3 / v3.2 / v3.1 / v2.6 / v2.5 / v2.4 / v2.3 / v2.2 / v2.1 / v2.0~v1.x) = CHANGELOG.md 참조.
 - `ai-native-methodology/guides/` — 사용자 journey 자산 (getting-started + chain-harness-guide + common-errors + first-prompt-cookbook)
 - `ai-native-methodology/methodology-spec/plugin-charter.md` — ★ ★ ★ **사용자 요구사항 17 단일 SSOT** (R1~R17 / 활성 Gap 모두 청산 / DEC-2026-05-15-plugin-charter-17-requirements-채택)
 - `ai-native-methodology/archive/` — 진화 history (v1.3-adoption + phase-a-iteration + v1.4-evaluation / cleanup round 1 격리)

@@ -61,9 +61,14 @@ export function formatSkillSuggestion(skillId, meta) {
 }
 
 // hookSpecificOutput.additionalContext — 차단 문구를 LLM context 에 명시 동봉.
-export function formatHookBlockContext(skillId, meta) {
+// ★ v4.0 multi-agent paradigm (DEC-2026-05-17): agentId 가 있으면 agent dispatch 권고 동봉.
+export function formatHookBlockContext(skillId, meta, agentId) {
   return (
     `chain-driver suggested skill '${skillId}' (${meta?.name || ''}). ` +
+    (agentId
+      ? `★ v4.0 paradigm: dispatch agent '${agentId}' via Task tool (multi-agent / DEC-2026-05-17-v4-multi-agent-paradigm-채택). `
+      : ''
+    ) +
     `LLM SHALL NOT auto-invoke this skill. ` +
     `User explicit decision REQUIRED via /aimd-next or /aimd-stage <name>.`
   );

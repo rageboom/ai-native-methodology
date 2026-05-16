@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver hooks 통합. ADR-CHAIN-005 §3 (mechanical gate trio (iii)) + §4 (D21' suppressOutput=true / stderr only) 정합. UserPromptSubmit + PreToolUse + SessionStart 3 event 활용.",
+  "$comment": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver hooks 통합. ADR-CHAIN-005 §3 (mechanical gate trio (iii)) + §4 (D21' suppressOutput=true / stderr only) 정합. UserPromptSubmit + PreToolUse + SessionStart 3 event 활용. ★ ★ ★ v4.0 (DEC-2026-05-17-v4-multi-agent-paradigm-채택): hooks-bridge 가 stage 별 agent dispatch 권고 동봉 (TRIGGER_PATTERNS 의 agentId 매핑). main agent = orchestrator + Task tool 로 stage agent dispatch paradigm.",
   "hooks": {
     "SessionStart": [
       {

@@ -9,6 +9,69 @@
 
 ---
 
+## [4.0.0] — 2026-05-17 ★ ★ ★ MAJOR — multi-agent paradigm 본격 채택 (DEC-2026-05-17-v4 / DEC-2026-05-15-g5 retract)
+
+> ★ ★ ★ ★ ★ **v4.0.0 MAJOR — paradigm 본질 변화**. plan-skill-invocation-guarantee.md §B5 옵션 A 본격 채택. stage 별 sub-agent 5종 신설 + 3 base agent 병존 + spike agent 보존. main agent = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch). frontmatter `skills: [...]` 사전 주입 paradigm (Sub-agents.md spec line 407~429 정합). DEC-2026-05-15-g5 "stage 별 분리 ❌" 정책 **retract**.
+
+### paradigm 결단 (사용자 명시 결단 2026-05-17)
+
+- 사용자 의제 "B5 부터 해보자" → 1차 옵션 C (스파이크 PoC) 진입 → 사용자 redirect "A로 해줘" → 옵션 A 본격 진입
+- spike 자산 (`agents/_spike-planning-agent.md` / commit `8605652`) 보존 (역사 기록 / paradigm 가능 입증 source)
+- cooling-off 무시 (사용자 명시 결단 우선 / "without stopping" 모드)
+
+### 신설 자산 (5 stage agent)
+
+- **`agents/analysis-agent.md`** (★ chain 0 input + chain 1 sub analysis / 22 analysis skill + 6 input skill + 3 base utility = 31 skill 사전 주입)
+- **`agents/planning-agent.md`** (★ chain 1 / 3 planning skill + 4 base utility = 7 skill)
+- **`agents/spec-agent.md`** (★ chain 2 / 3 spec skill + 4 base utility = 7 skill)
+- **`agents/test-agent.md`** (★ chain 3 RED / 4 test skill + 4 base utility = 8 skill)
+- **`agents/implement-agent.md`** (★ chain 4 GREEN / 4 implement skill + 4 base utility = 8 skill)
+
+### 수정 자산 (★ paradigm 정책 재작성)
+
+- **`agents/README.md`** — paradigm 정책 본격 재작성 ("Stage 별 분리 ❌" → "Stage 별 분리 ✅ + 3 base agent 병존")
+- **`methodology-spec/lifecycle-contract.md`** §자산 매핑 매트릭스 §Agent column 5 row 본격 재작성 (실 agent path 명시)
+- **`methodology-spec/skills-axis.md`** — §9 v4.0 multi-agent paradigm + skill ↔ agent 매핑 SSOT 신설
+- **`tools/chain-driver/src/hooks-bridge.js`** — TRIGGER_PATTERNS 의 entry 마다 agentId 추가 + `suggestAgentForPrompt` 함수 신설 (옛 `suggestSkillForPrompt` 보존 / hybrid 격상) + analysis stage 진입 패턴 추가 (B1 보강 통합)
+- **`tools/chain-driver/src/invoke-skill.js`** — `formatHookBlockContext` 의 agentId optional 인자 추가 / v4.0 권고 동봉 ("dispatch agent via Task tool")
+- **`hooks/hooks.json`** — `$comment` 안 v4.0 정합 명시 (hook event 자체는 변경 ❌)
+- **`decisions/DEC-2026-05-17-v4-multi-agent-paradigm-채택.md`** (신설) + **`decisions/INDEX.md`** 등재
+- **`.claude-plugin/plugin.json`** — version 3.6.9 → 4.0.0
+- **`CLAUDE.md`** (repo root) — plugin.json v3.6.9 → v4.0.0 + paradigm 설명 갱신
+
+### 외부 사실 검증 (claude-code-guide 위임)
+
+- ❌ frontmatter `tools` 에 `Skill` 명시 불가 (Sub-agents.md spec line 267)
+- ✅ sub-agent Skill tool 자동 활성 (parent scope 상속 / line 272)
+- ✅ frontmatter `skills: [...]` 사전 주입 (line 407~429)
+
+### 검증
+
+- chain-driver test 114/114 통과 (회귀 0)
+- release-readiness 11/11 통과 의무 (check10 CLAUDE.md sync + check11 workspace test)
+
+### 비-범위 (★ v4.1+ carry)
+
+- 47 SKILL.md persona 임베드 분리 평가
+- PoC #05 + 추가 PoC chain harness agent dispatch paradigm 으로 재실행 + cross-validation
+- spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)
+- design stage agent 신설 (v2.x carry K-? 합산)
+
+### Lessons Learned
+
+- **LL-v4-01**: reasonable call (옵션 C 보수적) 우선 + 사용자 명시 redirect (옵션 A 본격) 패턴. without stopping 모드 + 큰 paradigm 결단 = 사용자 명시 confirmation 의무 입증.
+- **LL-v4-02**: spike 자산 보존 = paradigm 진화 lineage 유지 / cleanup 강박 회피 (memory `feedback_carry_cleanup_paradigm.md` 정합).
+- **LL-v4-03**: DEC-2026-05-15-g5 retract = lifecycle-contract.md §Agent column 본격 재작성 비용 큼 (plan 본문 caution 3 정합). v4.0 commit 안 본격 흡수.
+
+### 정합 관계
+
+- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ ★ ★ 본 release 의 모 결단)
+- DEC-2026-05-17-spike-planning-agent-실험 (★ paradigm 가능 입증 / commit `8605652`)
+- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (★ ★ ★ retract 대상)
+- `plan-skill-invocation-guarantee.md` (★ 모 plan / B5 옵션 A)
+
+---
+
 ## [3.6.9] — 2026-05-16 ★ PATCH — A3 시행 / README.md + guides/ 외부 인지 자산 본격 sync (v2.5.1 → v3.6.9)
 
 > ★ ★ ★ **A3 시행** (옵션 3 = A2 + A3 둘 다 진행 묶음 / A3 = 2번째 / 본 session 마지막 release). README.md + guides/ 5 file = v2.5.1 시점 머묾 (1년 outdated) → v3.6.9 paradigm 진화 안정점 + enforcement cadence 정착 사실 본격 반영.

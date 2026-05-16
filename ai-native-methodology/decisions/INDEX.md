@@ -10,9 +10,12 @@
 
 ## 진행중 결정
 
-- [★ ★ DEC-2026-05-17-spike-planning-agent-실험](DEC-2026-05-17-spike-planning-agent-실험.md) — 2026-05-17 (session 21차 / B5 multi-agent paradigm 옵션 C 스파이크) / `agents/_spike-planning-agent.md` EXPERIMENTAL 단일 파일 신설 / 본체 paradigm (DEC-2026-05-15-g5 "stage 별 분리 ❌") retract ❌ / 1주 fail-fast cadence 후 ≥ 2 PoC corroboration 자산화 → v3.7 (옵션 B MINOR) / v4.0 (옵션 A MAJOR) / 본체 보존 (spike archive) 결단 source. cooling-off 면제 근거 = cosmetic 4 기준 "구조 변경 ❌" 충족 (실험 자산만).
+(없음 — 2026-05-17 갱신. 직전 진행중 표기 1건 모두 후속 결단 안 흡수 완료 / 아래 ↓ 승인 결정으로 이전):
+- DEC-2026-05-17-spike-planning-agent-실험 → DEC-2026-05-17-v4-multi-agent-paradigm-채택 안 본격 흡수 (옵션 C → 옵션 A 본격 격상 / spike 자산 보존)
+- DEC-2026-04-30-v1.2.3-본체-격상 → v1.3.0 release 안 본격 흡수 완료 (2026-05-01)
+- DEC-2026-04-29-phase-4-5-형식화-후보 (옵션 C 시범) → ADR-008 dual rendering + ADR-009 5-stage confidence 본격 정식 채택 (v1.4.x)
 
-(직전 "진행중" 표기 2건 모두 후속 release 안 흡수 완료 / 아래 ↓ 승인 결정으로 이전):
+(★ ★ ★ ★ ★ ★ 직전 흡수 2026-05-17 noter):
 - DEC-2026-04-30-v1.2.3-본체-격상 → v1.3.0 release 안 본격 흡수 완료 (2026-05-01)
 - DEC-2026-04-29-phase-4-5-형식화-후보 (옵션 C 시범) → ADR-008 dual rendering + ADR-009 5-stage confidence 본격 정식 채택 (v1.4.x)
 
@@ -22,6 +25,8 @@
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
 |---|---|---|---|---|
+| [★ ★ ★ ★ ★ DEC-2026-05-17-v4-multi-agent-paradigm-채택](DEC-2026-05-17-v4-multi-agent-paradigm-채택.md) | 2026-05-17 (★ session 21차 / v4.0.0 MAJOR / paradigm 본질 변화) | methodology / B5 옵션 A 본격 채택 / DEC-2026-05-15-g5 retract | 승인 (★ ★ ★ 사용자 명시 결단 "A로 해줘" / opt-out cooling-off) | plan-skill-invocation-guarantee §B5 옵션 A 본격 진입. stage 별 sub-agent 5종 신설 (`agents/{analysis,planning,spec,test,implement}-agent.md`) + 3 base agent 병존 + spike agent 보존. main agent = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch). frontmatter `skills: [...]` 사전 주입 paradigm (Sub-agents.md spec). lifecycle-contract §Agent column 본격 재작성 + chain-driver hooks-bridge 격상 + agents/README paradigm 정책 재작성. **DEC-2026-05-15-g5 retract**. v4.0.0 MAJOR. 47 SKILL.md persona 임베드 분리 + PoC 재실행 = carry. |
+| [★ ★ DEC-2026-05-17-spike-planning-agent-실험](DEC-2026-05-17-spike-planning-agent-실험.md) | 2026-05-17 (★ session 21차 / B5 옵션 C 스파이크 / v4 본격 결단 source) | methodology / B5 옵션 C 스파이크 / paradigm 가능 입증 자산 | 승인 (★ v4.0 본격 채택 의 source / spike 자산 보존) | `agents/_spike-planning-agent.md` EXPERIMENTAL 단일 파일 신설 + 외부 사실 검증 (claude-code-guide / Sub-agents.md spec) — frontmatter `tools` 에 Skill 명시 ❌ / sub-agent Skill tool 자동 활성 ✅ / `skills: [...]` 사전 주입 ✅ → multi-agent paradigm 가능 입증. 본 spike 결과 = v4.0 본격 채택 (옵션 A) source 자격. spike 자산 보존 (역사 기록). |
 | [★ ★ ★ DEC-2026-05-16-r4-poc-12-13-보류-자산화](DEC-2026-05-16-r4-poc-12-13-보류-자산화.md) | 2026-05-16 (★ session 20차 / v3.6.6 PATCH) | methodology / R4 결단 / PoC 처분 자산화 | 승인 (★ 사용자 명시 옵션 (c) 채택) | PoC #12 (raw query) + PoC #13 (QueryDSL) = README 안 정탐 결과 추천 (★ ★ ★ ★ ★ "pure realworld OSS 부재" + (B) 정책 완화 회귀 추천) + ADR-CHAIN-008 (MEDIUM × ≥ 5 PoC isomorphic = strong corroboration 자격 도달 / PoC #06~#11 6 PoC 누적) + paradigm 진화 안정점 정합 → status = "보류" 명시 자산화. 사용자 source 도착 시 재진입 가능 (라벨 부활 ❌ / 새 DEC 신설 의무 / LL-cleanup-02 정합). |
 | [DEC-2026-05-15-g3-scope-folder-종결](DEC-2026-05-15-g3-scope-folder-종결.md) | 2026-05-15 | methodology / G3 종결 / 지속 운영 인프라 (v3.2) | 종결 | charter §3 G3 (R5/R7 산출물 폴더 자동 생성) 종결. scope/stage 폴더 + manifest 이중 렌더링 + M4 sync (자동 drift 감지 + 수동 갱신) + chain-driver query/sync CLI. SessionStart hook 자동 발동. 114/114 test pass. plan-charter §3 G2>G4>G5>G1 활성 / G3 종결 표기. |
 | [DEC-2026-05-15-plugin-charter-17-requirements-채택](DEC-2026-05-15-plugin-charter-17-requirements-채택.md) | 2026-05-15 | methodology / charter (사용자 요구사항 SSOT) | 승인 | 사용자 요구사항 17 (R1~R17) 채택 + `methodology-spec/plugin-charter.md` 단일 SSOT 신설. v3.1.0 검증 = ✅ 11 / ⚠️ 4 / ❌ 2. Gap G1~G5 (ITSM 티켓화 / Figma+Swagger 입력 / 산출물 폴더 자동화 / FE skill 보강 / stage↔asset 매핑표) + 추가 권장 P1~P8 (Resume / token telemetry / impact analyzer / semver catalog / rollback / statusline / PR generator / secret scanning) backlog. Claude Code 디폴트 §4 (hooks / 컨텍스트 / plan-driven / multi-agent / 배포 / MCP ITSM) 본격 명문화. |

@@ -1,21 +1,58 @@
-# agents/ — Sub-agent persona (1-depth flat)
+# agents/ — Sub-agent paradigm (★ v4.0 multi-agent / DEC-2026-05-17 정합)
 
-본 디렉토리 = 본 방법론의 cross-cutting agent persona. Claude Code plugin 표준 = 1-depth flat (`agents/<name>.md`). Stage 별 분리 ❌ (lifecycle-contract.md §자산 매핑 매트릭스 §Agent column 정합).
+본 디렉토리 = 본 방법론의 sub-agent 자산. ★ v4.0 paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택) — **stage 별 sub-agent 5종 + 3 base cross-cutting agent + spike 자산 1종 병존**. Claude Code plugin 표준 = 1-depth flat (`agents/<name>.md`).
 
-## 자산 매핑 매트릭스 cross-link (★ v3.6.1)
+## paradigm (★ v4.0)
 
-본 agent 자산 = `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 의 **Agent column** detail. 본 매트릭스 8 row 중 cross-cut + stage 영역 인용:
+- **main agent** = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch)
+- **stage 별 sub-agent 5종** (`analysis-agent` / `planning-agent` / `spec-agent` / `test-agent` / `implement-agent`) — 각 chain stage 의 단일 책임 entry point
+- **3 base cross-cutting agent** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`) — research / critique 등 cross-cutting 책임
+- **spike agent** (`_spike-planning-agent`) — paradigm 가능 입증 자산 / 역사 기록 / EXPERIMENTAL (★ 신 paradigm 정식 진입 후에도 보존)
+- **frontmatter `skills: [...]` 사전 주입** — 각 stage agent 가 자기 책임 skill 들을 startup 시점에 인지 (Sub-agents.md spec line 407~429 정합)
+
+## 자산 매핑 매트릭스 cross-link (★ v3.5.0 → v4.0 갱신)
+
+본 agent 자산 = `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 의 **Agent column** detail. v4.0 안 §Agent column 5 row 본격 재작성 정합.
 
 | 본 매트릭스 row | 본 agent 위치 |
 |---|---|
-| input | (없음 — orchestrate skill 안 dispatch 책임) |
-| analysis | `_base-industry-case-researcher.md` + analysis-* skill 안 persona 임베드 |
-| planning | `_base-senior-engineer.md` (★ Senior critique 의무 / 2원칙) + planning-* skill 안 임베드 |
-| spec / test / implement | (skill 안 persona 임베드 / 별도 agent 파일 ❌ — chain harness skill 자체가 persona 책임) |
-| cross-cut (traceability) | `_base-senior-engineer.md` (gate 검토 시 critique 위임) |
+| input | `analysis-agent.md` 안 입력 6 skill (input-collection / input-orchestrate / from-{prompt,swagger,plan-doc,figma}) |
+| analysis | `analysis-agent.md` (★ chain 1 sub 22 skill + 6 input skill 책임) |
+| planning | `planning-agent.md` (★ chain 1 / 3 planning skill + 4 base 책임) |
+| spec | `spec-agent.md` (★ chain 2 / 3 spec skill + 4 base 책임) |
+| test | `test-agent.md` (★ chain 3 / 4 test skill + 4 base 책임) |
+| implement | `implement-agent.md` (★ chain 4 / 4 implement skill + 4 base 책임) |
+| cross-cut (traceability) | `_base-senior-engineer.md` (gate 검토 시 critique 위임) + `_base-build-traceability-matrix` skill |
 | cross-cut (aspects) | `_base-official-docs-checker.md` + `_base-industry-case-researcher.md` (research 트랙 dispatch) |
 
-## 3 base agent persona
+## stage agent 5종
+
+### `analysis-agent.md` (★ chain 1 sub)
+- **책임**: legacy 코드베이스 분석 + 7대 BE 산출물 + 8 FE 산출물 + finding + antipatterns + migration-cautions
+- **skill 사전 주입**: 22 analysis skill + 6 input skill + 3 base utility = 31 skill
+- **호출 시기**: main agent 가 "analysis 시작" / "분석 진입" / "legacy 분석" 등 자연어 인지 시 Task tool dispatch
+
+### `planning-agent.md` (★ chain 1)
+- **책임**: analysis 산출물 → planning-spec.{json,md} (UC-* + BR-INTENT-* + cross_links + source_grounded_evidence)
+- **skill 사전 주입**: 3 planning skill + 4 base utility = 7 skill
+- **호출 시기**: chain 1 gate 진입 자연어 trigger 시
+
+### `spec-agent.md` (★ chain 2)
+- **책임**: behavior-spec + acceptance-criteria (Gherkin BDD) + cross_links 7대 산출물 통합
+- **skill 사전 주입**: 3 spec skill + 4 base utility = 7 skill
+- **호출 시기**: chain 2 gate 진입 자연어 trigger 시
+
+### `test-agent.md` (★ chain 3 / RED)
+- **책임**: test-spec + 실 test 코드 (RED 의무) + 5종 물증 7 필드
+- **skill 사전 주입**: 4 test skill + 4 base utility = 8 skill
+- **호출 시기**: chain 3 gate 진입 자연어 trigger 시
+
+### `implement-agent.md` (★ chain 4 / GREEN)
+- **책임**: impl-spec + 실 impl 코드 (GREEN 의무 / 100% test pass) + traceability-matrix 100% green
+- **skill 사전 주입**: 4 implement skill + 4 base utility = 8 skill
+- **호출 시기**: chain 4 gate 진입 자연어 trigger 시
+
+## 3 base cross-cutting agent
 
 ### `_base-senior-engineer.md`
 - **책임**: Work Principles 2원칙 (research) 의 Senior critique sub-agent / paradigm 결단 시 STOP signal 강도 평가
@@ -31,19 +68,54 @@
 - **책임**: 공식 문서 (React / Vue / Playwright / OpenAPI / 등) 인용 검증
 - **호출 시기**: 위와 동일 (research 트랙 sibling)
 
-## paradigm 정합
+## spike 자산 (★ EXPERIMENTAL — 보존)
 
-- **단일 책임**: 각 agent persona = research/critique 등 cross-cutting 책임 1종 / stage 별 책임 ❌
-- **호출 패턴**: skill 안 `Task tool` 으로 sub-agent dispatch (또는 Claude Code 자연어 prompt 매칭)
+### `_spike-planning-agent.md`
+- **책임**: v4.0 multi-agent paradigm 의 가능 입증 자산 (★ DEC-2026-05-17-spike-planning-agent-실험 / commit `8605652`)
+- **상태**: ★ EXPERIMENTAL 보존 — 본 agent paradigm 의 source 자격 / `_` prefix + EXPERIMENTAL 표기 / 별도 산출 디렉토리 (`.aimd/output/_spike/`)
+- **처분**: v4.0 정식 진입 후에도 보존 (역사 기록 / paradigm 진화 lineage). archive 결단 = v4.1+ carry.
+
+## paradigm 정합 (★ v4.0)
+
+- **stage 별 분리** ✅ (★ DEC-2026-05-15-g5 retract / DEC-2026-05-17 정합)
+- **호출 패턴**: main agent → Task tool 로 stage agent dispatch / stage agent 가 자기 frontmatter `skills` 의 skill 들 호출
+- **frontmatter `tools`** = Read, Glob, Grep, Bash, Write (★ `Skill` 명시 불가 — Sub-agents.md spec line 267 / Skill tool 자동 활성 line 272)
+- **frontmatter `skills: [...]`** = 사전 주입 paradigm (★ line 407~429)
+- **chain harness mechanical gate trio 보존** = state.blocked + cli exit 2 + PreToolUse deny (★ ADR-CHAIN-005)
 - **결정론 axis 분리**: agent = LLM 의미 영역 / chain-driver = 결정론 영역 ([[feedback_chain_driver_deterministic_axis]] 정합)
+
+## 호출 패턴 예시
+
+```
+# main agent → stage agent dispatch
+main agent → Task(subagent_type="analysis-agent", prompt="""
+target: examples/poc-05-sample-user-register
+goal: 7대 + 8 FE 산출물 추출
+input: legacy code only
+expected: .aimd/output/{inventory,architecture,domain,rules,schema,openapi,antipatterns}.json + FE 산출 (있으면)
+""")
+
+# 산출물 hand-off via filesystem
+main agent → analysis-agent → planning-agent → spec-agent → test-agent → implement-agent
+            (.aimd/output/*.json 매개)
+```
 
 ## When NOT to use
 
-- skill 내부 persona 임베드 (예: `implement-react` 가 React 전문가 persona 임베드) — 별도 agent 호출 불요
-- gate evaluation (결정론 영역) — chain-driver CLI 사용 / agent ❌
+- **chain stage 외부 작업** — gate evaluation (결정론 영역) = chain-driver CLI 사용 / agent ❌
+- **chain harness gate 통과 안 한 임의 코드 생성** = round-trip 정책 위반 (DEC-2026-05-06-round-trip-부분-허용)
 
 ## 본체 명세 참조
 
-- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스
-- `methodology-spec/skills-axis.md` §category prefix
-- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결
+- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 (★ v4.0 §Agent column 본격 재작성)
+- `methodology-spec/skills-axis.md` §skill ↔ agent 매핑 (★ v4.0 신설)
+- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 paradigm 의 모 결단)
+- DEC-2026-05-17-spike-planning-agent-실험 (★ 가능 입증 자산)
+- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (★ ★ ★ retract 대상 — "stage 별 분리 ❌" 폐기)
+
+## 이력 (paradigm 진화)
+
+- **v3.5.0 (DEC-2026-05-15-g5)**: stage 별 분리 ❌ / skill 내부 persona 임베드 paradigm
+- **v3.6.x (안정점)**: 본체 paradigm 보존 / spike 없음
+- **2026-05-17 spike (DEC-2026-05-17-spike-planning-agent-실험 / commit `8605652`)**: 가능 입증 자산 (옵션 C) — 본격 paradigm 진입 source
+- **v4.0.0 (DEC-2026-05-17-v4-multi-agent-paradigm-채택)**: stage 별 분리 ✅ 본격 채택 (옵션 A) / 본 README 재작성

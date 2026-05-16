@@ -246,3 +246,73 @@ skills/ 17 rename + 외부 인용 25 = 42 file 본격. 본 §8 본문 + flows/an
 - ★ alias map ❌ — install 시점 명시 호출 변경 카리 / 자연어 trigger 본격 영향 ❌ (description SSOT 사실 정합).
 
 본 paradigm 의 본격 위치 = ★ ★ ★ §6 v1.4.x 과도기 패턴 본격 자연 흡수 / §7 v2.5.1 1-depth + category prefix runtime axis 위 본격 의미 ID 본질 정합.
+
+## 9. v4.0.0 MAJOR — skill ↔ agent 매핑 (★ ★ ★ multi-agent paradigm 본격 채택)
+
+> ★ ★ ★ 2026-05-17 / DEC-2026-05-17-v4-multi-agent-paradigm-채택 / DEC-2026-05-15-g5 retract
+
+### 9.1 paradigm 결단 사실
+
+v3.6.x 까지 본 plugin 의 agent 자산 = **3 base cross-cutting agent 만** (skill 내부 persona 임베드 / DEC-2026-05-15-g5 정합 "stage 별 분리 ❌"). v4.0 안에서 사용자 명시 결단으로 본 paradigm retract → ★ ★ ★ **stage 별 sub-agent 5종 + 3 base + spike 1종 병존**.
+
+paradigm 가능 입증 = `agents/_spike-planning-agent.md` (★ commit `8605652` / DEC-2026-05-17-spike-planning-agent-실험). 외부 사실 (claude-code-guide / Sub-agents.md spec line 267 + 272 + 407~429) — frontmatter `tools` 에 `Skill` 명시 ❌ / sub-agent Skill tool 자동 활성 ✅ / `skills: [...]` 사전 주입 ✅.
+
+### 9.2 skill ↔ agent 매핑 (★ SSOT)
+
+각 stage 별 sub-agent 가 자기 frontmatter `skills: [...]` 에 사전 주입할 skill 목록:
+
+| Agent | 책임 stage | 사전 주입 skill (frontmatter `skills: [...]`) | 총 |
+|---|---|---|---|
+| `analysis-agent.md` | chain 0 (input) + chain 1 sub (analysis) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-{prompt,swagger,plan-doc,figma}` (6), `analysis-source-inventory`, `analysis-architecture`, `analysis-domain-model`, `analysis-business-rules`, `analysis-db-schema-erd`, `analysis-openapi`, `analysis-api-rule-mapping`, `analysis-error-mapping`, `analysis-quality-antipattern`, `analysis-formal-spec-validation`, `analysis-characterization-test`, `analysis-sql-inventory`, `analysis-form-validation-fe`, `analysis-type-spec-fe`, `analysis-ui-state-map-fe`, `analysis-ui-visual-manifest-fe`, `analysis-aspect-{a11y,i18n,static-security,legacy}` (4), `analysis-br-cross-consistency-check`, `analysis-html-template` (22 analysis), `_base-apply-baseline-ratchet`, `_base-apply-template`, `_base-log-finding` | 31 |
+| `planning-agent.md` | chain 1 (planning) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent` (3 planning), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
+| `spec-agent.md` | chain 2 (spec) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-7대-deliverables` (3 spec), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
+| `test-agent.md` | chain 3 (test / RED) | `test-generate-test-spec`, `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (4 test), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
+| `implement-agent.md` | chain 4 (implement / GREEN) | `implement-generate-impl-spec`, `implement-verify-test-pass`, `implement-react`, `implement-vue` (4 implement), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
+| `_spike-planning-agent.md` (★ EXPERIMENTAL / 보존) | chain 1 spike (역사 기록) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-invoke-go-stop-gate`, `_base-log-finding` | 5 |
+
+### 9.3 cross-cutting agent (★ 3 base + spike 보존)
+
+| Agent | 책임 (cross-cut) | 사전 주입 skill |
+|---|---|---|
+| `_base-senior-engineer.md` | research / critique (gate 검토 시 main 위임) | (없음 — Read/Grep/Glob/Edit/Bash tools 만 / Skill tool 자동 활성으로 on-demand 호출) |
+| `_base-industry-case-researcher.md` | 외부 framework / library / 도구 fact fetch | (없음 — WebSearch / WebFetch / Read / Grep 만) |
+| `_base-official-docs-checker.md` | 공식 문서 cross-check | (없음 — WebFetch / Read / Grep / WebSearch 만) |
+
+### 9.4 호출 패턴 (★ v4.0)
+
+```
+# main agent (orchestrator) → stage agent dispatch
+main agent → Task(subagent_type="planning-agent", prompt="""
+target: <project-path>
+goal: planning-spec 추출
+input: .aimd/output/{rules,domain,inventory,antipatterns}.json + findings.md
+""")
+
+# stage agent → skill chain (frontmatter skills 사전 주입 + Skill tool on-demand)
+planning-agent → Skill(planning-extract-from-legacy)
+                → Skill(planning-decompose-use-cases)
+                → Skill(planning-identify-business-intent)
+                → Skill(_base-invoke-go-stop-gate)
+```
+
+### 9.5 paradigm 정합 (★ chain harness mechanical gate trio 보존)
+
+- ★ state.blocked + cli exit 2 + PreToolUse deny enforcement = ★ v4.0 안에서 보존 (★ ADR-CHAIN-005)
+- ★ hooks-bridge TRIGGER_PATTERNS = skillId + agentId 둘 다 보유 / suggestSkillForPrompt + suggestAgentForPrompt 양쪽 함수 (옛 호환 + 신 paradigm)
+- ★ formatHookBlockContext = agentId optional / v4.0 권고 동봉 ("dispatch agent via Task tool")
+- ★ hooks.json $comment = v4.0 정합 명시 / hook event 자체는 변경 ❌
+
+### 9.6 retract 자산
+
+- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 §자산 매핑 매트릭스 §Agent column → ★ ★ ★ 본격 재작성 (★ lifecycle-contract.md §자산 매핑 매트릭스 본격 갱신)
+- agents/README.md = ★ stage 별 분리 ❌ → ★ ✅ paradigm 재작성
+
+### 9.7 carry (★ v4.1+)
+
+- 47 SKILL.md persona 임베드 분리 평가 (agent system prompt 흡수 vs SKILL.md 절차 보존)
+- PoC #05 + 추가 PoC chain harness agent dispatch paradigm 으로 재실행 + 산출물 cross-validation
+- spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)
+- design stage agent 신설 (v2.x carry K-? 합산)
+
+본 paradigm 본격 위치 = ★ ★ ★ §8 v2.6.0 의미 ID 자산화 위 본격 stage 별 agent dispatch 본질 정합.
+
