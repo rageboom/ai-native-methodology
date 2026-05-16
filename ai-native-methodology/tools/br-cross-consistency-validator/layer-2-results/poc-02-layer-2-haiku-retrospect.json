@@ -1,0 +1,33 @@
+{
+  "$schema_version": "v2.5.0-phase-d-self-eval-bias-retrospect",
+  "model": "claude-haiku-4-5",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 14,
+  "poc_id": "poc-02-realworld-springboot3",
+  "results": [
+    { "br_id": "BR-USER-EMAIL-UNIQUE-001", "semantic_score": 0.92, "rationale": "NL/GWT 의도 완전 일치: 중복 이메일 차단 + 동시 요청 race-safe. DB unique = implementation detail이나 '한 건만 허용' 의도 충분 포착", "confidence": 0.95 },
+    { "br_id": "BR-USER-USERNAME-UNIQUE-001", "semantic_score": 0.95, "rationale": "NL/GWT 명확 일치: username 중복 불가. '거부' vs '차단' 동의어", "confidence": 0.98 },
+    { "br_id": "BR-USER-PASSWORD-ENCRYPTED-001", "semantic_score": 0.88, "rationale": "NL(암호화 저장) ↔ GWT(BCrypt) 일치. BCrypt = 기술 선택 / semantic drift 아님. 평문 금지 반대 명제 충분", "confidence": 0.93 },
+    { "br_id": "BR-USER-FOLLOW-DIRECTIONAL-001", "semantic_score": 0.98, "rationale": "NL(단방향 A→B≠B→A) ↔ GWT(단방향) 완전 동일", "confidence": 0.99 },
+    { "br_id": "BR-USER-FOLLOW-IDEMPOTENT-001", "semantic_score": 0.93, "rationale": "NL(재팔로우 변화 없음) ↔ GWT(silent) 일치. idempotent 명확", "confidence": 0.96 },
+    { "br_id": "BR-USER-FOLLOW-NO-SELF-001", "semantic_score": 0.85, "rationale": "의도 일치(자기 팔로우 불가). '미구현 취약점' 메모 vs GWT '거부(코드 부재)' 약간 긴장. semantic intent 명확", "confidence": 0.90 },
+    { "br_id": "BR-ARTICLE-TITLE-UNIQUE-001", "semantic_score": 0.80, "rationale": "NL(제목 유일) ↔ GWT(존재 시 거부) 기본 의도 일치. '과도 제약' 주석이 도메인 현명함 의문 암시 / requirement 자체는 명확", "confidence": 0.85 },
+    { "br_id": "BR-ARTICLE-SLUG-UNIQUE-001", "semantic_score": 0.96, "rationale": "NL(슬러그 유일) ↔ GWT(slug unique) 정확 일치", "confidence": 0.98 },
+    { "br_id": "BR-ARTICLE-AUTHOR-EDIT-ONLY-001", "semantic_score": 0.94, "rationale": "NL(작성 본인만) ↔ GWT(요청자!=작성자 거부) 완전 동일", "confidence": 0.97 },
+    { "br_id": "BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001", "semantic_score": 0.75, "rationale": "의도 일치(동일 상태서 동일 요청 거부). '멱등성 위반 취약점' 메모가 도메인 correctness 의문 제시 / NL↔GWT 의도 mismatch 아님 (도메인 설계 우려)", "confidence": 0.80 },
+    { "br_id": "BR-COMMENT-AUTHOR-DELETE-ONLY-001", "semantic_score": 0.94, "rationale": "NL(작성 본인만) ↔ GWT(요청자!=작성자 거부) 완전 동일", "confidence": 0.97 },
+    { "br_id": "BR-LOGIN-EMAIL-PASSWORD-MATCH-001", "semantic_score": 0.91, "rationale": "NL(일치 시만 로그인) ↔ GWT(자격증명 확인) 일치. standard 로그인 semantics", "confidence": 0.95 },
+    { "br_id": "BR-PAGINATION-SIZE-CAP-50-001", "semantic_score": 0.93, "rationale": "NL(최대 50 초과 거부) ↔ GWT(0~50 cap) 명확 일치", "confidence": 0.97 },
+    { "br_id": "BR-PAGINATION-PAGE-ZERO-BASED-001", "semantic_score": 0.94, "rationale": "NL(0 기반 음수 거부) ↔ GWT(0-based/음수 거부) 정확 일치", "confidence": 0.97 }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.9064,
+    "median_semantic_score": 0.935,
+    "std_dev": 0.0667,
+    "score_distribution": { "0.95~1.0": 4, "0.85~0.95": 7, "0.75~0.85": 3, "below_0.75": 0 },
+    "below_0.7_count": 0,
+    "below_0.7_brs": [],
+    "$comment": "★ Haiku 원 출력은 BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001(0.75) 을 below_0.7_brs 에 잘못 포함 (0.75 ≥ 0.7 산술 비정합) — semantic_score/rationale 원문 보존, 파생 필드만 산술 정정. Haiku 자체 rationale = 'NL↔GWT 의도 mismatch 아님'."
+  },
+  "cross_validation_notes": "blind retrospect / Sonnet 결과 미열람 / self-eval bias 측정용. 14 BR 독립 채점. 평균 0.906 = 높은 정합. 최저 0.75 (BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001) = 도메인 설계 우려이지 의미 반전 아님. 모든 BR ≥ 0.7 (genuine semantic drift 0). Sonnet vs Haiku delta = +0.027 (same-model 상향 bias 경미 / 허용 범위)."
+}
