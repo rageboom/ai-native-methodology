@@ -11,8 +11,9 @@
 //   5. ADR registry — content-aware 검사 (status: 승인 / decision-cluster 매칭)
 //   6. traceability-matrix 100% green (PoC #05 / matrix.json forward = 1.0)
 //   7. e2e 1 cycle pass (PoC #05 chain 4 GREEN / impl-spec.test_pass_evidence.fail_count == 0)
-//   8. v2.4.0 신설 — analysis validator violation 0 (★ schema-validator + br-cross-consistency-validator / 11 PoC rules.json
-//      critical/high finding 0 / ADR-CHAIN-011 §5.7 정합 / LL-i-23 release-readiness 사각지대 회복)
+//   8. v2.4.0 신설 / ★ v4.0 Sprint 1-I 격상 — analysis validator violation 0 (★ schema-validator + br-cross-consistency-validator
+//      / ★ 전체 PoC rules.json 전수 auto-discover 검증 — PoC #01+#05 한정 사각지대 영구 해소 / critical/high finding 0
+//      / ADR-CHAIN-011 §5.7 정합 / LL-i-23 + feedback_pre_pre_prerequisite_lacuna release-readiness 사각지대 회복)
 //   9. ★ ★ ★ ★ v2.5.0 신설 — Layer 2 LLM consistency (★ br-cross-consistency-validator Layer 2 결과 자산
 //      per-PoC 집계 / mean semantic_score ≥ 0.7 / semantic_drift critical/high finding ❌ / Phase D carry medium 허용 /
 //      ADR-CHAIN-011 §5.4 patch v2 + §11 patch v8 정합 / Senior REVISE-1 흡수)
@@ -239,50 +240,68 @@ function check7_e2eCyclePass() {
 }
 
 // ★ ★ ★ v2.4.0 sub-plan §3 — analysis validator violation 0 (ADR-CHAIN-011 §5.7 / LL-i-23 정합)
-// PoC #05 (현재 VALID 보유) + PoC #01 (본 session 마이그레이션 후 VALID) 기준 검증.
-// 11 PoC 전수 검사 = sub-plan §2 마이그레이션 후 별도 sprint (★ C-rules-BR-id-relabel-* + C-poc-02-03-schema-mapping carry 정합).
-function check8_analysisValidatorViolation() {
-  // ★ schema-validator 안 PoC #01 + #05 = VALID 확인 (본 session 자격)
-  const pocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/output/rules/rules.json'];
-  const failedPocs = [];
-  for (const rel of pocs) {
-    const target = join(ROOT, 'examples', rel);
-    if (!existsSync(target)) {
-      failedPocs.push(`${rel}: missing`);
+// ★ ★ ★ ★ ★ v4.0 Sprint 1-I 격상 — PoC #01 + #05 한정 → ★ 전체 PoC rules.json 전수 검사.
+//   사각지대 (PoC #02~#04 + #06~#11 schema invalid 잠재) = 묶음 P / Sprint 1 schema cleanup 종결 후
+//   본 criterion 이 모든 PoC rules.json 의 schema-validator + br-cross-consistency 위반을 강제 차단.
+//   (★ feedback_pre_pre_prerequisite_lacuna 정합 — PoC #01+#05 한정 사각지대 영구 해소 / drift enforcement).
+//   examples/**/rules.json 자동 discover (하드코딩 ❌ / 신규 PoC 추가 시 자동 포함).
+function discoverPocRulesJson() {
+  const found = [];
+  const examplesDir = join(ROOT, 'examples');
+  if (!existsSync(examplesDir)) return found;
+  const stack = [examplesDir];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync(cur, { withFileTypes: true });
+    } catch {
       continue;
     }
-    const r = spawnSync('node', ['tools/schema-validator/src/cli.js', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
+    for (const e of entries) {
+      const full = join(cur, e.name);
+      if (e.isDirectory()) {
+        if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+        stack.push(full);
+      } else if (e.name === 'rules.json') {
+        found.push(full);
+      }
+    }
+  }
+  return found.sort();
+}
+
+function check8_analysisValidatorViolation() {
+  const targets = discoverPocRulesJson();
+  const failed = [];
+  for (const target of targets) {
+    const rel = target.slice(ROOT.length + 1).replace(/\\/g, '/');
+    // ★ schema-validator 전수 (모든 PoC rules.json = VALID 의무)
+    const sv = spawnSync('node', ['tools/schema-validator/src/cli.js', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
     try {
-      const out = JSON.parse(r.stdout || '{}');
+      const out = JSON.parse(sv.stdout || '{}');
       const result = out.results?.[0];
-      if (!result?.valid) failedPocs.push(`${rel}: schema invalid (${result?.errors?.length ?? '?'} errors)`);
+      if (!result?.valid) failed.push(`${rel}: schema invalid (${result?.errors?.length ?? '?'} errors)`);
     } catch {
-      failedPocs.push(`${rel}: schema-validator JSON parse fail`);
+      failed.push(`${rel}: schema-validator JSON parse fail`);
     }
-  }
-  // ★ br-cross-consistency-validator 안 PoC #05 = pass / PoC #01 = pass 확인
-  const bcvPocs = ['poc-01-realworld-spring/output/rules/rules.json', 'poc-05-sample-user-register/output/rules/rules.json'];
-  const bcvFailed = [];
-  for (const rel of bcvPocs) {
-    const target = join(ROOT, 'examples', rel);
-    if (!existsSync(target)) continue;
-    const r = spawnSync('node', ['tools/br-cross-consistency-validator/src/cli.js', '--target', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
+    // ★ br-cross-consistency-validator 전수 (critical/high finding 0 의무)
+    const bcv = spawnSync('node', ['tools/br-cross-consistency-validator/src/cli.js', '--target', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
     try {
-      const out = JSON.parse(r.stdout || '{}');
+      const out = JSON.parse(bcv.stdout || '{}');
       const critical = (out.findings || []).filter((f) => f.severity === 'critical' || f.severity === 'high').length;
-      if (critical > 0) bcvFailed.push(`${rel}: ${critical} critical/high findings`);
+      if (critical > 0) failed.push(`${rel}: ${critical} bcv critical/high findings`);
     } catch {
-      bcvFailed.push(`${rel}: br-cross-consistency-validator JSON parse fail`);
+      failed.push(`${rel}: br-cross-consistency-validator JSON parse fail`);
     }
   }
-  const allFailed = [...failedPocs, ...bcvFailed];
   return {
     id: 'analysis_validator_violation',
-    pass: allFailed.length === 0,
-    detail: allFailed.length === 0
-      ? `analysis validator (schema + br-cross-consistency) violations 0 (PoC #01 + #05 검증 기준 / v2.4.0)`
-      : `violations: ${allFailed.join(' | ')}`,
-    delegated_to: 'tools/schema-validator + tools/br-cross-consistency-validator (★ 11 PoC 전수 = sub-plan §2 후 carry)',
+    pass: failed.length === 0,
+    detail: failed.length === 0
+      ? `analysis validator (schema + br-cross-consistency) violations 0 / ★ 전체 ${targets.length} PoC rules.json 전수 검증 (★ v4.0 Sprint 1-I 격상 — PoC #01+#05 한정 사각지대 해소)`
+      : `violations: ${failed.join(' | ')}`,
+    delegated_to: 'tools/schema-validator + tools/br-cross-consistency-validator (★ examples/**/rules.json 전수 auto-discover)',
   };
 }
 
