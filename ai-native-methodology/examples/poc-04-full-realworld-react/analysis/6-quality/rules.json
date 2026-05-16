@@ -48,6 +48,7 @@
       "then": [
         "★ requireAuthMiddleware 강제 401 또는 redirect /login"
       ],
+      "natural_language": "로그인하지 않은 사용자가 인증이 필요한 기능(설정, 글 작성/수정, 삭제, 즐겨찾기, 팔로우, 댓글)에 접근하면 서비스는 해당 사용자를 로그인 화면으로 이동시켜 접근을 차단한다.",
       "evidence": "src/shared/lib/react-router/requireAuthMiddleware.ts + redirectIfAuthenticatedMiddleware.ts"
     },
     {
@@ -65,6 +66,7 @@
       "then": [
         "★ Edit / Delete 버튼 표시 의무 / 비작성자 표시 ❌"
       ],
+      "natural_language": "게시글 또는 댓글을 조회할 때, 해당 콘텐츠의 작성자 본인에게만 수정 및 삭제 기능이 제공되며 다른 사용자에게는 해당 기능이 노출되지 않는다.",
       "evidence": "src/pages/article/article.ui.tsx § ArticleActionsBlock + DeleteCommentButton"
     },
     {
@@ -82,6 +84,7 @@
       "then": [
         "★ ★ redirect to / 의무 (★ ★ ★ F-FE-001 발견 violation — 본 fork = redirect 부재 / 회피 의무)"
       ],
+      "natural_language": "사용자가 게시글 삭제를 완료하면 서비스는 즉시 홈 화면으로 이동시켜 삭제된 게시글에 계속 머무르는 상황을 방지한다.",
       "evidence": "★ AP-FE-FLOW-INCOMPLETE-ARTICLE-DELETE 등록 / 본 fork 의 actions/article-delete.action.ts 갱신 권고"
     }
   ],
