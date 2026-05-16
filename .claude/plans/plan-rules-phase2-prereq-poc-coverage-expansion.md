@@ -272,3 +272,19 @@
 
 - **⑤ cross_consistency_check inline schema 신설** — additive schema 변경 / breaking change ❌
 - target version: v4.1.0 MINOR 또는 v4.0.2 PATCH
+
+---
+
+## §12. ★ ★ ★ session 24차 종결 — 묶음 P prereq 전 chain 완료 / Phase 2 보류 결단
+
+**시행 (자율 / 사용자 "묶음 P 해줘")**: Sprint 1 (1-B~1-J + 1-I / 10 sub-sprint) + Sprint 2 (4 PoC 30 BR) + Sprint 3 (4 PoC Layer 2 / 8 dispatch) 모두 종결. 18 commit / release-readiness 11/11 / workspace 364/364 / 0 회귀.
+
+**달성**: 전체 11 PoC rules.json schema VALID + Layer 2 corroboration **7 PoC** (≥7 Phase 2 prereq trigger 충족).
+
+**★ ★ ★ 핵심 발견 (PoC #08 echo chamber drift)**: Sprint 2 GWT 합성(Sonnet 4.6)이 `is_intent=false`/`is_likely_bug=true` 무시 → BR-PETSTORE-PASSWD-006(보안버그) + ORDQRY-005(N+1) 를 정상 규칙처럼 정규화. 동일 모델 Sonnet Layer 2 = 미검출 (echo chamber) / Haiku 4.5 blind = 검출 (0.55/0.58). industry-first + Adzic SBE 함정 회피 자격 본격 실측. 처분 = LL-i-44 정합 (rules.json 변경 ❌ / `C-poc08-drift-passwd-ordqry` carry).
+
+**★ ★ Phase 2 ⑤ 사용자 결단 (session 24차 gate / 확정 carry)**:
+- ⑤ = **보류 / 별도 session** (≥7 재평가 trigger 충족 인지 / inline-vs-분리 결단 + MINOR bump 는 별도 session)
+- ★ ★ ⑤ 설계 **확정 제약** = **"분류 보존 강제 포함"** — ⑤ cross_consistency_check 는 `intent_vs_bug_classification` 보존을 검증 항목으로 명시 의무 (PoC #08 bug-정규화 drift 차단 / schema §6 강화 동반). 다음 session ⑤ sprint 진입 시 본 제약 = 사용자 확정 입력 (재논의 ❌)
+- inline(CodeQL 패턴) vs 분리(Spec-Kit 패턴) = 다음 session 결단
+- version: 18 commit = carry only push (version bump ❌ / Sprint 1-I criterion 격상 = 다음 release v4.1.0 MINOR 후보)
