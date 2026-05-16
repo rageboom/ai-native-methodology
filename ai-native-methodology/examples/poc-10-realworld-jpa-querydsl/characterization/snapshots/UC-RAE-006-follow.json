@@ -5,7 +5,7 @@
   "endpoint": "POST /profiles/{username}/follow",
   "controller_method": "ProfileRestController.follow",
   "scenarios": [
-    {"id": "SCN-RAE-006-001", "name": "happy path — follow 신규", "given": {"username": "bob", "current_user": "alice"}, "when": "Follow uniqueness check + save", "then": {"expected_db_state_after": ["follow row 신규 (alice → bob)"]}, "intent_classification": [{"rule": "BR-RAE-005", "type": "intent", "note": "uniqueness + relation save"}]}
+    {"id": "SCN-RAE-006-001", "name": "happy path — follow 신규", "given": {"username": "bob", "current_user": "alice"}, "when": "Follow uniqueness check + save", "then": {"expected_db_state_after": ["follow row 신규 (alice → bob)"]}, "intent_classification": [{"rule": "BR-RAE-FOLLOW-005", "type": "intent", "note": "uniqueness + relation save"}]}
   ],
-  "intent_vs_bug_summary": {"intent": ["BR-RAE-005"], "bug": [], "ambiguous": [], "self_recognized": []}
+  "intent_vs_bug_summary": {"intent": ["BR-RAE-FOLLOW-005"], "bug": [], "ambiguous": [], "self_recognized": []}
 }

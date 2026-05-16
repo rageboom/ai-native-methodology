@@ -7,7 +7,7 @@
   "service_method": "UserService.signUp + JWTService.tokenFromUser",
   "sql_id": "UserRepository.save (logical INSERT)",
   "scenarios": [
-    {"id": "SCN-RAE-001-001", "name": "happy path — User 신규 + JWT 발급", "given": {"request": {"user": {"username": "u", "email": "u@e.com", "password": "p"}}}, "when": "UserRepository.save → JWT 발급", "then": {"expected_response": "201 + UserRO + JWT"}, "intent_classification": [{"rule": "BR-RAE-001", "type": "intent", "note": "JWT 즉시 발급"}]}
+    {"id": "SCN-RAE-001-001", "name": "happy path — User 신규 + JWT 발급", "given": {"request": {"user": {"username": "u", "email": "u@e.com", "password": "p"}}}, "when": "UserRepository.save → JWT 발급", "then": {"expected_response": "201 + UserRO + JWT"}, "intent_classification": [{"rule": "BR-RAE-AUTH-001", "type": "intent", "note": "JWT 즉시 발급"}]}
   ],
-  "intent_vs_bug_summary": {"intent": ["BR-RAE-001"], "bug": [], "ambiguous": [], "self_recognized": []}
+  "intent_vs_bug_summary": {"intent": ["BR-RAE-AUTH-001"], "bug": [], "ambiguous": [], "self_recognized": []}
 }

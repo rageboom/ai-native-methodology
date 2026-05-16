@@ -1,0 +1,33 @@
+{
+  "$schema_version": "v2.5.0-sub-domain-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 5,
+  "poc_id": "poc-10-realworld-jpa-querydsl",
+  "$comment": "★ ★ session 23차 Sprint 1-E / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 11 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "results": [
+    { "old_id": "BR-RAE-001", "new_id": "BR-RAE-AUTH-001", "sub_domain": "AUTH", "rationale": "User 등록 동시 JWT 즉시 발급 = 인증 도메인 핵심" },
+    { "old_id": "BR-RAE-002", "new_id": "BR-RAE-SEARCH-002", "sub_domain": "SEARCH", "rationale": "Article 4 조건 분기 검색 = 비즈니스 검색 요건" },
+    { "old_id": "BR-RAE-003", "new_id": "BR-RAE-SLUG-003", "sub_domain": "SLUG", "rationale": "title → URL-safe slug 자동 변환 = 식별자 생성 도메인" },
+    { "old_id": "BR-RAE-004", "new_id": "BR-RAE-CONTENT-004", "sub_domain": "CONTENT", "rationale": "Comment+Favorite Article Aggregate cascade = 콘텐츠 생명주기" },
+    { "old_id": "BR-RAE-005", "new_id": "BR-RAE-FOLLOW-005", "sub_domain": "FOLLOW", "rationale": "팔로우 중복 방지·자기팔로우 차단 = 소셜 관계 고유성" }
+  ],
+  "cross_ref_files_updated": [
+    "input/rules.json",
+    "input/domain.json",
+    ".aimd/output/planning-spec.json",
+    "characterization/intent-vs-bug.md",
+    "characterization/snapshots/UC-RAE-001-register.json",
+    "characterization/snapshots/UC-RAE-006-follow.json",
+    "characterization/snapshots/UC-RAE-008-articleCreate.json",
+    "characterization/snapshots/UC-RAE-010-articleByAuthor.json",
+    "characterization/snapshots/UC-RAE-011-articleByTag.json",
+    "characterization/snapshots/UC-RAE-019-comment.json",
+    "sql-inventory/sql-inventory.json"
+  ],
+  "verification": {
+    "old_id_residual_count": 0,
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}

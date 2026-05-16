@@ -7,7 +7,7 @@
   "service_method": "ArticleService.create",
   "sql_id": "ArticleRepository.save (★ Aggregate cascade INSERT article + tag)",
   "scenarios": [
-    {"id": "SCN-RAE-008-001", "name": "happy path — Article 작성 + slug 자동 + tag cascade", "given": {"request": {"article": {"title": "Hello World", "description": "...", "body": "...", "tagList": ["intro", "demo"]}}}, "when": "Article aggregate 생성 → Title.slug = 'hello-world' 자동 → tag 신규/기존 매핑 → save (cascade)", "then": {"expected_db_state_after": ["article row 신규 (slug='hello-world')", "tag 'intro' + 'demo' 신규 (★ 미존재 시)", "article_tags M:N 신규 row x2"]}, "intent_classification": [{"rule": "BR-RAE-003", "type": "intent", "note": "slug Embedded VO + DDD Aggregate cascade"}]}
+    {"id": "SCN-RAE-008-001", "name": "happy path — Article 작성 + slug 자동 + tag cascade", "given": {"request": {"article": {"title": "Hello World", "description": "...", "body": "...", "tagList": ["intro", "demo"]}}}, "when": "Article aggregate 생성 → Title.slug = 'hello-world' 자동 → tag 신규/기존 매핑 → save (cascade)", "then": {"expected_db_state_after": ["article row 신규 (slug='hello-world')", "tag 'intro' + 'demo' 신규 (★ 미존재 시)", "article_tags M:N 신규 row x2"]}, "intent_classification": [{"rule": "BR-RAE-SLUG-003", "type": "intent", "note": "slug Embedded VO + DDD Aggregate cascade"}]}
   ],
-  "intent_vs_bug_summary": {"intent": ["BR-RAE-003", "BR-RAE-004"], "bug": [], "ambiguous": [], "self_recognized": []}
+  "intent_vs_bug_summary": {"intent": ["BR-RAE-SLUG-003", "BR-RAE-CONTENT-004"], "bug": [], "ambiguous": [], "self_recognized": []}
 }

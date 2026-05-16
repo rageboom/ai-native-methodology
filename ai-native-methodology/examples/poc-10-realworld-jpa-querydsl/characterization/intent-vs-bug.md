@@ -4,11 +4,11 @@
 
 | ID | 분류 | 근거 |
 |---|---|---|
-| BR-RAE-001 | intent | JWT 즉시 발급 = 표준 |
-| BR-RAE-002 | intent | ★ ★ method name derived query paradigm = Spring Data JPA 정합 |
-| BR-RAE-003 | intent | Embedded VO + slug 자동 = DDD 정합 |
-| BR-RAE-004 | intent | Aggregate cascade = DDD 정합 |
-| BR-RAE-005 | intent | uniqueness check 정합 |
+| BR-RAE-AUTH-001 | intent | JWT 즉시 발급 = 표준 |
+| BR-RAE-SEARCH-002 | intent | ★ ★ method name derived query paradigm = Spring Data JPA 정합 |
+| BR-RAE-SLUG-003 | intent | Embedded VO + slug 자동 = DDD 정합 |
+| BR-RAE-CONTENT-004 | intent | Aggregate cascade = DDD 정합 |
+| BR-RAE-FOLLOW-005 | intent | uniqueness check 정합 |
 
 ## 2. AP (2건)
 

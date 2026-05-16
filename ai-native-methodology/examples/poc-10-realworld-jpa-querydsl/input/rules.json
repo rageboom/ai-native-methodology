@@ -2,11 +2,11 @@
   "$comment": "★ PoC #10 Day 1 — raeperd Spring Data JPA BR. ★ DDD + Embedded VO + method name derived query / 5 BR (small Modern).",
   "project_id": "poc-10-realworld-jpa-querydsl",
   "business_rules": [
-    {"id": "BR-RAE-001", "title": "User 등록 시 JWT 발급", "natural_language": "POST /users → User 신규 + JWT 즉시 발급 (★ Spring Security 정합)", "evidence_strength": "high", "br_type": "authentication", "is_intent": true},
-    {"id": "BR-RAE-002", "title": "★ Article 검색 = Spring Data JPA method name derived (4 분기)", "natural_language": "ArticleRepository.findAll/findAllByUserFavoritedContains/findAllByAuthorProfileUserName/findAllByContentsTagsContains — ★ ★ 4 method = 4 query param 분기 (basic / favorited / author / tag). ★ ★ ★ Spring Data JPA method name → SQL 자동 생성 paradigm.", "evidence_strength": "high", "br_type": "dynamic_search", "is_intent": true},
-    {"id": "BR-RAE-003", "title": "Article slug = URL-safe title 변환", "natural_language": "Article.contents.title.slug — Embedded VO + slug 자동 생성 (★ DDD Value Object)", "evidence_strength": "high", "br_type": "id_generation", "is_intent": true},
-    {"id": "BR-RAE-004", "title": "Comment / Favorite cascade (★ DDD Aggregate)", "natural_language": "Article = Aggregate Root / Comment + Favorite = cascade 관리 (★ JPA cascade + DDD)", "evidence_strength": "high", "br_type": "aggregate", "is_intent": true},
-    {"id": "BR-RAE-005", "title": "Profile follow uniqueness", "natural_language": "Follow relation uniqueness check + 자기 자신 follow 차단", "evidence_strength": "high", "br_type": "uniqueness", "is_intent": true}
+    {"id": "BR-RAE-AUTH-001", "title": "User 등록 시 JWT 발급", "natural_language": "POST /users → User 신규 + JWT 즉시 발급 (★ Spring Security 정합)", "evidence_strength": "high", "br_type": "authentication", "is_intent": true},
+    {"id": "BR-RAE-SEARCH-002", "title": "★ Article 검색 = Spring Data JPA method name derived (4 분기)", "natural_language": "ArticleRepository.findAll/findAllByUserFavoritedContains/findAllByAuthorProfileUserName/findAllByContentsTagsContains — ★ ★ 4 method = 4 query param 분기 (basic / favorited / author / tag). ★ ★ ★ Spring Data JPA method name → SQL 자동 생성 paradigm.", "evidence_strength": "high", "br_type": "dynamic_search", "is_intent": true},
+    {"id": "BR-RAE-SLUG-003", "title": "Article slug = URL-safe title 변환", "natural_language": "Article.contents.title.slug — Embedded VO + slug 자동 생성 (★ DDD Value Object)", "evidence_strength": "high", "br_type": "id_generation", "is_intent": true},
+    {"id": "BR-RAE-CONTENT-004", "title": "Comment / Favorite cascade (★ DDD Aggregate)", "natural_language": "Article = Aggregate Root / Comment + Favorite = cascade 관리 (★ JPA cascade + DDD)", "evidence_strength": "high", "br_type": "aggregate", "is_intent": true},
+    {"id": "BR-RAE-FOLLOW-005", "title": "Profile follow uniqueness", "natural_language": "Follow relation uniqueness check + 자기 자신 follow 차단", "evidence_strength": "high", "br_type": "uniqueness", "is_intent": true}
   ],
   "summary": {"total_br": 5, "intent_br": 5, "likely_bug_br": 0, "ambiguous_br": 0}
 }
