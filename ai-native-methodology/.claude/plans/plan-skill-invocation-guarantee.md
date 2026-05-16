@@ -186,7 +186,7 @@ check7_e2eCyclePass            // impl-spec.test_pass_evidence.fail_count==0 (�
 
 | 파일 | 옵션 A (전면 v4.0) | 옵션 B (chain 1~4 만 v3.7) | 옵션 C (스파이크 PoC) |
 |---|---|---|---|
-| `agents/_spike-planning-agent.md` (신설) | — | — | ★ 신설 (단일 파일) |
+| `agents/_spike-planning-agent.md` (신설 → archive 이동) | — | — | ★ 신설 / 2026-05-17 본격 시행 / `archive/v4-spike/_spike-planning-agent.md` 이동 (C-3 carry 본격 종결) |
 | `agents/analysis-agent.md` (신설) | ★ 신설 | — | — |
 | `agents/planning-agent.md` (신설) | ★ 신설 | ★ 신설 | — |
 | `agents/spec-agent.md` (신설) | ★ 신설 | ★ 신설 | — |

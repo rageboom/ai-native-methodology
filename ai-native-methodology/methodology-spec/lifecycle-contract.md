@@ -72,7 +72,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 
 ### ★ v4.0 spike 자산 (paradigm 가능 입증 / 보존)
 
-- [`agents/_spike-planning-agent.md`](../agents/_spike-planning-agent.md) (★ EXPERIMENTAL / paradigm 가능 입증 source / commit `8605652` / DEC-2026-05-17-spike-planning-agent-실험 / v4.0 정식 진입 후에도 보존 — 역사 기록)
+- [`archive/v4-spike/_spike-planning-agent.md`](../archive/v4-spike/_spike-planning-agent.md) (★ ★ ★ EXPERIMENTAL / archive 이동 / paradigm 가능 입증 source / commit `8605652` / DEC-2026-05-17-spike-planning-agent-실험 / v4.0 정식 진입 후 archive 이동 — agents/ 폴더 가시화 ↓ + 역사 기록 보존)
 
 ### 부 매트릭스: input 5종 (R8 입력 axis) detail
 

@@ -10,7 +10,7 @@
 
 - **stage 별 sub-agent 5종 신설** (`agents/{analysis,planning,spec,test,implement}-agent.md`)
 - 3 base agent (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`) **병존 보존** (cross-cutting persona)
-- spike agent (`_spike-planning-agent.md` / commit `8605652`) **보존** — paradigm 가능 입증 자산 / 역사 기록
+- spike agent (`archive/v4-spike/_spike-planning-agent.md` / commit `8605652`) ★ ★ ★ **archive 이동** (★ C-3 carry 본격 시행 2026-05-17 / 사용자 명시 결단 "archive 이동") — paradigm 가능 입증 자산 / 역사 기록
 - main agent = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch)
 - 산출물 hand-off = `.aimd/output/` 파일 시스템 매개 (현 chain harness paradigm 유지)
 - frontmatter `skills: [...]` 사전 주입 paradigm (Sub-agents.md spec line 407~429 정합)
@@ -21,7 +21,7 @@
 |---|---|---|
 | paradigm 변화 진입 | **옵션 A 전면 채택** ✅ | 사용자 명시 "A로 해줘" — multi-agent 협업 vision 본격 |
 | DEC-2026-05-15-g5 처분 | **retract** ✅ | "stage 별 분리 ❌" 정책 폐기 / lifecycle-contract.md §Agent column 본격 재작성 의무 |
-| spike commit 처분 | **보존** ✅ | 역사 기록 / paradigm 가능 입증 자산 / `_spike-` prefix 명시로 stage agent 5종과 axis 분리 |
+| spike commit 처분 | **archive 이동** ✅ (★ C-3 carry 본격 시행 2026-05-17) | 역사 기록 / paradigm 가능 입증 자산 / `archive/v4-spike/` 이동 = agents/ 폴더 가시화 ↓ + git history (commit `8605652`) 안 영원 보존 |
 | version label | **v4.0.0 MAJOR** ✅ | paradigm 본질 변화 / DEC retract + agent 5종 신설 + lifecycle-contract 본격 재작성 + chain-driver 격상 |
 | cooling-off | **무시 (사용자 명시 결단)** ✅ | "without stopping" 모드 + 사용자 옵션 A 명시 선택 / paradigm cooling-off cosmetic 4 기준 미충족이지만 사용자 결단 우선 |
 | 47 SKILL.md persona 임베드 분리 | **carry** ⚠️ | 본 commit scope 외 / 후속 v4.1+ 정리 / agent system prompt 가 persona 흡수하므로 실 변경은 작을 수 있음 |
@@ -57,13 +57,13 @@
 
 - **C-v4.0-skill-persona-분리** — 47 SKILL.md persona 임베드 부분 정리 (agent system prompt 흡수 vs SKILL.md 절차 보존 평가)
 - **C-v4.0-poc-재실행** — PoC #05 (그리고 추가 PoC) chain harness 를 agent dispatch paradigm 으로 재실행 + 산출물 cross-validation
-- **C-v4.0-spike-archive** — `_spike-planning-agent.md` archive 결단 (보존 / archive 이동)
+- ~~**C-v4.0-spike-archive** — `_spike-planning-agent.md` archive 결단~~ ✅ 본격 시행 2026-05-17 (★ archive 이동 / `archive/v4-spike/_spike-planning-agent.md` / 사용자 명시 결단)
 - **C-v4.0-design-stage-agent** — design stage agent 신설 (v2.x carry 와 합산)
 
 ## 정합 관계
 
 - `plan-skill-invocation-guarantee.md` (★ 본 결단의 모 plan)
-- DEC-2026-05-17-spike-planning-agent-실험 (★ 가능 입증 자산 / 보존)
+- DEC-2026-05-17-spike-planning-agent-실험 (★ 가능 입증 자산 / archive 이동 / `archive/v4-spike/_spike-planning-agent.md`)
 - DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (★ ★ ★ retract 대상 — "stage 별 분리 ❌" 정책 폐기)
 - DEC-2026-05-15-plugin-charter-17-requirements-채택 (★ R1~R17 SSOT — 본 v4.0 가 R 정합 유지 의무)
 - ADR-CHAIN-001~005 (chain harness paradigm — 본 v4.0 가 chain harness 위에서 agent dispatch 격상)
@@ -72,5 +72,5 @@
 ## Lessons Learned (★ paradigm 진화)
 
 - **LL-v4-01**: 본 paradigm 본질 변화는 reasonable call (옵션 C) 보수적 선택 후 사용자 명시 redirect (옵션 A) 로 진행되었다. without stopping 모드 + 큰 paradigm 결단 = 사용자 명시 confirmation 의무 입증. 1차 보수적 선택은 paradigm 보존 안전망 / 사용자 명시 결단이 본격 진입 trigger.
-- **LL-v4-02**: spike 자산 (commit 8605652) 의 보존 = paradigm 가능 입증의 역사 기록 자격. retract 대신 archive 또는 그대로 보존 = paradigm 진화 lineage 유지. cleanup 강박 회피 (memory `feedback_carry_cleanup_paradigm.md` 정합).
+- **LL-v4-02**: spike 자산 (commit 8605652) 의 보존 = paradigm 가능 입증의 역사 기록 자격. ★ archive 이동 결단 본격 시행 (2026-05-17 / 사용자 명시) — `agents/_spike-planning-agent.md` → `archive/v4-spike/_spike-planning-agent.md` / agents/ 폴더 가시화 ↓ + 역사 기록 보존. paradigm 진화 lineage 유지 + cleanup 강박 회피 (memory `feedback_carry_cleanup_paradigm.md` 정합) 양립.
 - **LL-v4-03**: DEC-2026-05-15-g5 retract = lifecycle-contract.md §Agent column 본격 재작성 비용 큼 (plan 본문 caution 3 정합). 본 v4.0 commit 안 본격 흡수.

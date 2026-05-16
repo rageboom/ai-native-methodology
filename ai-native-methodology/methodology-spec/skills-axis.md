@@ -255,7 +255,7 @@ skills/ 17 rename + 외부 인용 25 = 42 file 본격. 본 §8 본문 + flows/an
 
 v3.6.x 까지 본 plugin 의 agent 자산 = **3 base cross-cutting agent 만** (skill 내부 persona 임베드 / DEC-2026-05-15-g5 정합 "stage 별 분리 ❌"). v4.0 안에서 사용자 명시 결단으로 본 paradigm retract → ★ ★ ★ **stage 별 sub-agent 5종 + 3 base + spike 1종 병존**.
 
-paradigm 가능 입증 = `agents/_spike-planning-agent.md` (★ commit `8605652` / DEC-2026-05-17-spike-planning-agent-실험). 외부 사실 (claude-code-guide / Sub-agents.md spec line 267 + 272 + 407~429) — frontmatter `tools` 에 `Skill` 명시 ❌ / sub-agent Skill tool 자동 활성 ✅ / `skills: [...]` 사전 주입 ✅.
+paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (★ commit `8605652` / DEC-2026-05-17-spike-planning-agent-실험 / v4.0 정식 진입 후 archive 이동 — 역사 기록 보존). 외부 사실 (claude-code-guide / Sub-agents.md spec line 267 + 272 + 407~429) — frontmatter `tools` 에 `Skill` 명시 ❌ / sub-agent Skill tool 자동 활성 ✅ / `skills: [...]` 사전 주입 ✅.
 
 ### 9.2 skill ↔ agent 매핑 (★ SSOT)
 
@@ -268,7 +268,7 @@ paradigm 가능 입증 = `agents/_spike-planning-agent.md` (★ commit `8605652`
 | `spec-agent.md` | chain 2 (spec) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-7대-deliverables` (3 spec), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
 | `test-agent.md` | chain 3 (test / RED) | `test-generate-test-spec`, `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (4 test), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
 | `implement-agent.md` | chain 4 (implement / GREEN) | `implement-generate-impl-spec`, `implement-verify-test-pass`, `implement-react`, `implement-vue` (4 implement), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
-| `_spike-planning-agent.md` (★ EXPERIMENTAL / 보존) | chain 1 spike (역사 기록) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-invoke-go-stop-gate`, `_base-log-finding` | 5 |
+| `archive/v4-spike/_spike-planning-agent.md` (★ ★ ★ EXPERIMENTAL / archive 이동) | chain 1 spike (역사 기록 / agent dispatch 대상 ❌) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-invoke-go-stop-gate`, `_base-log-finding` | 5 |
 
 ### 9.3 cross-cutting agent (★ 3 base + spike 보존)
 
@@ -311,7 +311,7 @@ planning-agent → Skill(planning-extract-from-legacy)
 
 - 47 SKILL.md persona 임베드 분리 평가 (agent system prompt 흡수 vs SKILL.md 절차 보존)
 - PoC #05 + 추가 PoC chain harness agent dispatch paradigm 으로 재실행 + 산출물 cross-validation
-- spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)
+- spike agent (`archive/v4-spike/_spike-planning-agent.md`) ★ archive 이동 본격 시행 (2026-05-17 / 본 release 안 흡수)
 - design stage agent 신설 (v2.x carry K-? 합산)
 
 본 paradigm 본격 위치 = ★ ★ ★ §8 v2.6.0 의미 ID 자산화 위 본격 stage 별 agent dispatch 본질 정합.

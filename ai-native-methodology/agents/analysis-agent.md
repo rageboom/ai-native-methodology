@@ -80,6 +80,6 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 agent 의 모 결단)
 - DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (★ retract 대상 — "stage 별 분리 ❌" 폐기)
-- `agents/_spike-planning-agent.md` (★ paradigm 가능 입증 spike)
+- `archive/v4-spike/_spike-planning-agent.md` (★ paradigm 가능 입증 spike / archive 이동 / 역사 기록)
 - `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스
 - `flows/analysis.phase-flow.json` (★ phase 의존 그래프 SSOT)

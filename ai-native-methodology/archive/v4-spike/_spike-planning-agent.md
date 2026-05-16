@@ -1,12 +1,18 @@
 ---
 name: _spike-planning-agent
-description: ★ EXPERIMENTAL spike for B5 multi-agent paradigm (2026-05-17). chain 1 (planning) stage 전문 agent. Use when user explicitly invokes "spike planning agent" or main agent dispatches via Task tool for chain 1 stage. DEC-2026-05-17-spike-planning-agent-실험 정합 — 본 agent = 실험 자산 / 본체 paradigm (DEC-2026-05-15-g5 "stage 별 분리 ❌") retract ❌. 1주 fail-fast cadence 후 v3.7/v4.0 결단 source.
+description: ★ ★ ★ ARCHIVED 2026-05-17 — paradigm 가능 입증 source 자격 본격 달성 (v4.0 옵션 A 채택 / commit `8605652`). agents/ 폴더 외부 archive 자산 = Claude Code agent dispatch 대상 ❌. 역사 기록만. (★ 본래 description) ★ EXPERIMENTAL spike for B5 multi-agent paradigm (2026-05-17). chain 1 (planning) stage 전문 agent. DEC-2026-05-17-spike-planning-agent-실험 정합.
 tools: Read, Glob, Grep, Bash, Write
 skills: [planning-extract-from-legacy, planning-decompose-use-cases, planning-identify-business-intent, _base-invoke-go-stop-gate, _base-log-finding]
 model: opus
 ---
 
-# _spike-planning-agent (EXPERIMENTAL)
+# _spike-planning-agent (★ ★ ★ ARCHIVED 2026-05-17 — 역사 기록)
+
+> **★ ARCHIVED**: 본 자산은 v4.0 paradigm 가능 입증 source 자격 달성 후 archive 이동. agents/ 폴더 안 Claude Code agent dispatch 대상 ❌. paradigm 본격 자산 = `agents/planning-agent.md` (v4.0 정식).
+>
+> **History**: commit `8605652` (신설 / 옵션 C 스파이크) → commit `cce5f3c` (v4.0 옵션 A 본격 채택 / spike 보존) → 본 archive 이동 (C-3 carry 본격 시행 / 사용자 명시 결단 "archive 이동" 2026-05-17).
+
+# _spike-planning-agent (EXPERIMENTAL — 본래 본문)
 
 ★ EXPERIMENTAL — B5 multi-agent paradigm 의 1 stage spike. chain 1 (planning) stage 전문 agent. ai-native-methodology plugin 의 47종 skill 중 planning stage 5종을 자기 책임 영역으로 보유.
 

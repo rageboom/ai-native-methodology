@@ -63,7 +63,7 @@ chain 0 (analysis) / chain 2~4 skill ❌ — 각 stage agent 권한.
 
 - **본 agent = 새 paradigm 표준** (★ DEC-2026-05-17-v4-multi-agent-paradigm-채택 정합)
 - **본체 산출 경로** = `.aimd/output/planning-spec.{json,md}` (★ spike 의 `.aimd/output/_spike/planning-spec.{json,md}` 와 axis 분리)
-- **spike agent (`_spike-planning-agent.md`) 보존** — 역사 기록 / paradigm 가능 입증 자산
+- **spike agent (`archive/v4-spike/_spike-planning-agent.md`) ★ archive 이동** — 역사 기록 / paradigm 가능 입증 자산 (commit `8605652` 안 영원 보존)
 - **lifecycle-contract §Agent column planning row** = 본 agent 가 실 agent path
 
 ## 산출 자산 (chain 1)
@@ -81,7 +81,7 @@ chain 0 (analysis) / chain 2~4 skill ❌ — 각 stage agent 권한.
 ## 인용
 
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 agent 의 모 결단)
-- `agents/_spike-planning-agent.md` (★ 본 agent 의 spike source / 보존)
+- `archive/v4-spike/_spike-planning-agent.md` (★ 본 agent 의 spike source / archive 이동 / 역사 기록)
 - ADR-CHAIN-001 §1 (이중 렌더링 chain 1)
 - ADR-CHAIN-002 (gate UX)
 - `schemas/planning-spec.schema.json` (deliverable 17)

@@ -16,7 +16,7 @@
 ### paradigm 결단 (사용자 명시 결단 2026-05-17)
 
 - 사용자 의제 "B5 부터 해보자" → 1차 옵션 C (스파이크 PoC) 진입 → 사용자 redirect "A로 해줘" → 옵션 A 본격 진입
-- spike 자산 (`agents/_spike-planning-agent.md` / commit `8605652`) 보존 (역사 기록 / paradigm 가능 입증 source)
+- spike 자산 (`archive/v4-spike/_spike-planning-agent.md` / commit `8605652`) ★ archive 이동 (★ C-3 carry 본격 시행 / 역사 기록 / paradigm 가능 입증 source)
 - cooling-off 무시 (사용자 명시 결단 우선 / "without stopping" 모드)
 
 ### 신설 자산 (5 stage agent)
@@ -54,7 +54,7 @@
 
 - 47 SKILL.md persona 임베드 분리 평가
 - PoC #05 + 추가 PoC chain harness agent dispatch paradigm 으로 재실행 + cross-validation
-- spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)
+- ~~spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)~~ ✅ 본격 시행 (C-3 carry / 사용자 명시 결단 "archive 이동" 2026-05-17 / `archive/v4-spike/_spike-planning-agent.md`)
 - design stage agent 신설 (v2.x carry K-? 합산)
 
 ### Lessons Learned

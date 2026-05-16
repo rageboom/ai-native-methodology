@@ -2,7 +2,7 @@
 
 - **결정일**: 2026-05-17 (session 21차 / paradigm 안정점 직후 실험)
 - **결정자**: 윤주스 (TF Lead) — 사용자 명시 의제 "★ B5. multi-agent 협업 paradigm 으로 전환 부터 해보자"
-- **상태**: 진행중 (★ ★ EXPERIMENTAL / 1주 fail-fast cadence 후 v3.7/v4.0 결단)
+- **상태**: ★ ★ ★ 종결 (2026-05-17 / v4.0 옵션 A 본격 채택 + spike archive 이동 본격 시행) — 사용자 명시 결단 source 자격 본격 달성 / 본 spike 자산 = `archive/v4-spike/_spike-planning-agent.md` 이동 (역사 기록)
 
 ## 결정
 
