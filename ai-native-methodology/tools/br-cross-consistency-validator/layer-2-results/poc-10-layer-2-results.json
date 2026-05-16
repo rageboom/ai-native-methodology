@@ -1,0 +1,31 @@
+{
+  "$schema_version": "v2.5.0-phase-c",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "poc_id": "poc-10-realworld-jpa-querydsl",
+  "batch_size": 5,
+  "self_eval_bias_note": "★ Sprint 2 NL→GWT 합성(Sonnet 4.6) ↔ Layer 2 검증(Sonnet 4.6) echo chamber / confidence cap 0.85 / Haiku 4.5 blind retrospect 동반 실행.",
+  "results": [
+    { "br_id": "BR-RAE-AUTH-001", "semantic_score": 0.92, "rationale": "회원가입과 동시 JWT 발급(로그인 생략) 핵심 의미 NL↔GWT 일치.", "confidence": 0.85 },
+    { "br_id": "BR-RAE-SEARCH-002", "semantic_score": 0.78, "rationale": "4종 필터 분기 검색 의도 일치. GWT Then 절 QueryDSL 동적분기 구현 어휘 노출 = 비즈니스 계약 순도 저하 (의미 반전 ❌).", "confidence": 0.80 },
+    { "br_id": "BR-RAE-SLUG-003", "semantic_score": 0.88, "rationale": "title→URL-safe slug 자동 파생 + 식별자 역할 NL↔GWT 완전 일치.", "confidence": 0.82 },
+    { "br_id": "BR-RAE-CONTENT-004", "semantic_score": 0.85, "rationale": "Article 삭제 시 하위 cascade + 단일 생명주기 제어 의도 일치. NL+GWT 양측 DDD 기술 어휘 노출 = 비즈니스 표현력 제한 (의미 정합).", "confidence": 0.78 },
+    { "br_id": "BR-RAE-FOLLOW-005", "semantic_score": 0.91, "rationale": "자기 팔로우 금지 + 중복 방지 + 성공 시 상태 반영 3 규칙 NL↔GWT 명확 일치.", "confidence": 0.85 }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.868,
+    "min_semantic_score": 0.78,
+    "max_semantic_score": 0.92,
+    "below_0.7_count": 0,
+    "below_0.7_brs": [],
+    "all_pass_threshold_0_85": false,
+    "findings": [
+      "BR-RAE-SEARCH-002 (0.78): GWT Then QueryDSL 동적분기 구현 어휘 노출 — 의미 반전 ❌ / 비즈니스 계약 순화 권장",
+      "BR-RAE-CONTENT-004 (0.85): NL+GWT 양측 DDD/cascade 기술 어휘 — 사용자 관점 언어 재표현 권장"
+    ],
+    "carry": [
+      "C-poc10-gwt-purity: BR-RAE-SEARCH-002 / CONTENT-004 GWT 비즈니스 순도 보강 권장 (의미 반전 ❌ / per-PoC mean 0.868 ≥ 0.7 통과 / drift 0) — Phase D carry",
+      "C-self-invocation-echo-chamber: Sonnet 동일 모델 / Haiku blind delta = +0.056 (Haiku 더 관대 / Sonnet 상향 bias ❌)"
+    ]
+  }
+}

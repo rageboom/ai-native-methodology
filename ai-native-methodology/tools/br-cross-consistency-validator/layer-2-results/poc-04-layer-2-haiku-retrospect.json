@@ -1,0 +1,20 @@
+{
+  "$schema_version": "v2.5.0-phase-d-self-eval-bias-retrospect",
+  "model": "claude-haiku-4-5",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 3,
+  "poc_id": "poc-04-full-realworld-react",
+  "results": [
+    { "br_id": "BR-FE-AUTH-REQUIRED-001", "semantic_score": 0.95, "rationale": "NL/GWT 완전 동일 — 토큰 부재/invalid → /login redirect 또는 401. NL=결과, GWT=메커니즘. 구현 발산 허용.", "confidence": 0.95 },
+    { "br_id": "BR-FE-AUTH-OWNERSHIP-001", "semantic_score": 0.98, "rationale": "완벽한 semantic isomorphism. '작성자 본인만 / 타인 미노출' ↔ 'isAuthor → 표시 / 비작성자 ❌'. 이중 의무 정확 mapping.", "confidence": 0.98 },
+    { "br_id": "BR-FE-FLOW-DELETE-REDIRECT-001", "semantic_score": 0.96, "rationale": "NL-GWT 완전 정합 (삭제 성공 → 즉시 홈). violation 주석 = integrity signal (구현 갭 explicit capture) / semantic drift 아님.", "confidence": 0.96 }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.963,
+    "median_semantic_score": 0.96,
+    "std_dev": 0.012,
+    "below_0.7_count": 0,
+    "below_0.7_brs": []
+  },
+  "cross_validation_notes": "blind retrospect / Sonnet 미열람. 3 BR 모두 ≥ 0.95. 구현 메커니즘 divergence ≠ NL↔GWT 위반. Sonnet(0.923) vs Haiku(0.963) delta = -0.040 → Haiku 더 관대 / Sonnet 상향 self-eval bias ❌ 입증."
+}

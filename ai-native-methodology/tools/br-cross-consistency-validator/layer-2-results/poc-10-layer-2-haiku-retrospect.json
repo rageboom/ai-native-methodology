@@ -1,0 +1,22 @@
+{
+  "$schema_version": "v2.5.0-phase-d-self-eval-bias-retrospect",
+  "model": "claude-haiku-4-5",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 5,
+  "poc_id": "poc-10-realworld-jpa-querydsl",
+  "results": [
+    { "br_id": "BR-RAE-AUTH-001", "semantic_score": 0.92, "rationale": "가입직후 JWT 발급 비즈니스 의도 완전 일치. '별도 로그인 절차 없음' = GWT 확장이나 의도 부합.", "confidence": 0.95 },
+    { "br_id": "BR-RAE-SEARCH-002", "semantic_score": 0.88, "rationale": "4 필터 동적 검색 의도 일치. NL 'method name derived' = 구현 패턴 / GWT 미반영 (의미 정합).", "confidence": 0.92 },
+    { "br_id": "BR-RAE-SLUG-003", "semantic_score": 0.95, "rationale": "자동 slug 생성 + URL 안전 의도 완전 일치. GWT 변환 규칙 더 명시.", "confidence": 0.96 },
+    { "br_id": "BR-RAE-CONTENT-004", "semantic_score": 0.96, "rationale": "Aggregate 패턴 + cascade 관리 거의 완벽 일치. GWT 생명주기 명시성 우수.", "confidence": 0.97 },
+    { "br_id": "BR-RAE-FOLLOW-005", "semantic_score": 0.91, "rationale": "uniqueness + 자기 차단 의도 일치. GWT 성공 응답 상태 추가 (미미한 확장).", "confidence": 0.93 }
+  ],
+  "summary": {
+    "mean_semantic_score": 0.924,
+    "median_semantic_score": 0.92,
+    "std_dev": 0.030,
+    "below_0.7_count": 0,
+    "below_0.7_brs": []
+  },
+  "cross_validation_notes": "blind retrospect / Sonnet 미열람. 5 BR 0.88~0.96 = 높은 정합 / drift 0. 모든 규칙 intent=true 정합 확인. Sonnet(0.868) vs Haiku(0.924) delta = +0.056 → Haiku 더 관대 / Sonnet 상향 self-eval bias ❌. ★ PoC #08 과 대조 — #10 은 is_likely_bug BR 부재로 echo chamber drift 미발생 (#08 PASSWD/ORDQRY 대비 control)."
+}
