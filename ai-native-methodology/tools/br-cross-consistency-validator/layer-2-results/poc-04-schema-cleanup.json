@@ -1,0 +1,28 @@
+{
+  "$schema_version": "v2.5.0-schema-cleanup",
+  "model": "claude-opus-4-7",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 3,
+  "poc_id": "poc-04-full-realworld-react",
+  "$comment": "★ ★ session 23차 Sprint 1-H / FE 트랙 schema cleanup. BR ID 는 이미 4토막 valid (rename ❌). schema invalid 원인 4종 보정 — 의미 변경 ❌ / provenance 보존 / additive+type-fix. Sprint 1-A isomorphic (paradigm).",
+  "transformation": {
+    "meta_standardized": {
+      "from": "비표준 키 (poc_id/stage/sprint/captured_at/captured_by/tool)",
+      "to": "meta-confidence 표준 (generated_at/confidence=0.92/inputs_used/methodology_version=v1.4.4/raw_confidence/phase_b_migration_note)",
+      "provenance_preserved_in": "phase_b_migration_note"
+    },
+    "title_added": [
+      { "br_id": "BR-FE-AUTH-REQUIRED-001", "title": "인증 필요 라우트 접근 보호" },
+      { "br_id": "BR-FE-AUTH-OWNERSHIP-001", "title": "작성자 전용 수정·삭제 노출" },
+      { "br_id": "BR-FE-FLOW-DELETE-REDIRECT-001", "title": "게시글 삭제 후 홈 리다이렉트" }
+    ],
+    "category_fix": "BR-FE-FLOW-DELETE-REDIRECT-001 category fe_flow → workflow (enum 부재 / 의미 정합 = redirect flow = workflow). rules_summary.by_category 동기화.",
+    "rules_auto_extracted_reference_type_fix": "string → object ({source, auto_registered_br:77, note}) — schema type array|object 정합",
+    "br_id_rename": false,
+    "cross_ref_files_updated": ["analysis/6-quality/rules.json"]
+  },
+  "verification": {
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}
