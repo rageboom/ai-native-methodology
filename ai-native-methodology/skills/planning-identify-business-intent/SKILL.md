@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep
 
 # identify-business-intent
 
-`extract-from-legacy` skill 의 sub-skill. **legacy-archaeologist persona** (agents/planning/README.md §agent persona) 책임.
+`extract-from-legacy` skill 의 sub-skill. **legacy-archaeologist persona** (★ v4.0 multi-agent / `agents/planning-agent.md` system prompt 흡수) 책임.
 
 ## 언제 사용
 
