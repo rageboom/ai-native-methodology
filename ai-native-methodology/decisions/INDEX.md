@@ -10,7 +10,9 @@
 
 ## 진행중 결정
 
-(없음 — 2026-05-16 갱신. 직전 "진행중" 표기 2건 모두 후속 release 안 흡수 완료 / 아래 ↓ 승인 결정으로 이전):
+- [★ ★ DEC-2026-05-17-spike-planning-agent-실험](DEC-2026-05-17-spike-planning-agent-실험.md) — 2026-05-17 (session 21차 / B5 multi-agent paradigm 옵션 C 스파이크) / `agents/_spike-planning-agent.md` EXPERIMENTAL 단일 파일 신설 / 본체 paradigm (DEC-2026-05-15-g5 "stage 별 분리 ❌") retract ❌ / 1주 fail-fast cadence 후 ≥ 2 PoC corroboration 자산화 → v3.7 (옵션 B MINOR) / v4.0 (옵션 A MAJOR) / 본체 보존 (spike archive) 결단 source. cooling-off 면제 근거 = cosmetic 4 기준 "구조 변경 ❌" 충족 (실험 자산만).
+
+(직전 "진행중" 표기 2건 모두 후속 release 안 흡수 완료 / 아래 ↓ 승인 결정으로 이전):
 - DEC-2026-04-30-v1.2.3-본체-격상 → v1.3.0 release 안 본격 흡수 완료 (2026-05-01)
 - DEC-2026-04-29-phase-4-5-형식화-후보 (옵션 C 시범) → ADR-008 dual rendering + ADR-009 5-stage confidence 본격 정식 채택 (v1.4.x)
 
