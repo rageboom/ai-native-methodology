@@ -55,6 +55,7 @@
 - 47 SKILL.md persona 임베드 분리 평가
 - PoC #05 + 추가 PoC chain harness agent dispatch paradigm 으로 재실행 + cross-validation
 - ~~spike agent (`_spike-planning-agent.md`) archive 결단 (보존 유지 / archive 이동)~~ ✅ 본격 시행 (C-3 carry / 사용자 명시 결단 "archive 이동" 2026-05-17 / `archive/v4-spike/_spike-planning-agent.md`)
+- ~~design stage agent 신설 (v2.x carry K-? 합산)~~ ✅ 옵션 C 본격 시행 (C-4 carry / 사용자 명시 결단 "C" 2026-05-17 / `agents/design-agent.md` PLACEHOLDER 신설 / `skills: []` / paradigm 본질 미충족 인지 / v4.1+ design-* skill 신설 carry)
 - design stage agent 신설 (v2.x carry K-? 합산)
 
 ### Lessons Learned

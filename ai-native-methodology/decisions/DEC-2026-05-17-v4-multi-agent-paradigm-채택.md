@@ -58,7 +58,7 @@
 - **C-v4.0-skill-persona-분리** — 47 SKILL.md persona 임베드 부분 정리 (agent system prompt 흡수 vs SKILL.md 절차 보존 평가)
 - **C-v4.0-poc-재실행** — PoC #05 (그리고 추가 PoC) chain harness 를 agent dispatch paradigm 으로 재실행 + 산출물 cross-validation
 - ~~**C-v4.0-spike-archive** — `_spike-planning-agent.md` archive 결단~~ ✅ 본격 시행 2026-05-17 (★ archive 이동 / `archive/v4-spike/_spike-planning-agent.md` / 사용자 명시 결단)
-- **C-v4.0-design-stage-agent** — design stage agent 신설 (v2.x carry 와 합산)
+- ~~**C-v4.0-design-stage-agent** — design stage agent 신설 (v2.x carry 와 합산)~~ ✅ 옵션 C 본격 시행 2026-05-17 (★ 사용자 명시 결단 "C" / `agents/design-agent.md` PLACEHOLDER 신설 / paradigm 본질 미충족 인지 / skill 부재 = dispatch 무의미 / v4.1+ design-* skill 신설 + frontmatter `skills: [...]` 사전 주입 carry)
 
 ## 정합 관계
 

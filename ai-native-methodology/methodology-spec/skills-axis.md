@@ -268,6 +268,7 @@ paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (★ commit
 | `spec-agent.md` | chain 2 (spec) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-7대-deliverables` (3 spec), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
 | `test-agent.md` | chain 3 (test / RED) | `test-generate-test-spec`, `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (4 test), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
 | `implement-agent.md` | chain 4 (implement / GREEN) | `implement-generate-impl-spec`, `implement-verify-test-pass`, `implement-react`, `implement-vue` (4 implement), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
+| `design-agent.md` (★ ★ ★ PLACEHOLDER / v4.1+ carry) | design stage (chain harness 외부 / 가시화만) | ★ 없음 (`skills: []` / v4.1+ `design-wireframe-spec` + `design-component-spec` + `design-tokens-extract` + `design-visual-regression` + `design-a11y-prep` 5~6종 신설 carry) | 0 |
 | `archive/v4-spike/_spike-planning-agent.md` (★ ★ ★ EXPERIMENTAL / archive 이동) | chain 1 spike (역사 기록 / agent dispatch 대상 ❌) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-invoke-go-stop-gate`, `_base-log-finding` | 5 |
 
 ### 9.3 cross-cutting agent (★ 3 base + spike 보존)
