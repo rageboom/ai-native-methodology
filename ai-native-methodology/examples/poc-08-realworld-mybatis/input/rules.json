@@ -3,7 +3,7 @@
   "project_id": "poc-08-realworld-mybatis",
   "business_rules": [
     {
-      "id": "BR-PETSTORE-001",
+      "id": "BR-PETSTORE-ACCREG-001",
       "title": "Account 생성 시 3 테이블 단일 트랜잭션 insert",
       "natural_language": "AccountService.insertAccount(account) → accountMapper.insertAccount + insertProfile + insertSignon. @Transactional 보장 단일 transaction. 한 호출에 account/profile/signon 3 테이블 insert.",
       "source": "AccountService.java:insertAccount + AccountMapper.xml (insertAccount/insertProfile/insertSignon)",
@@ -12,7 +12,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-PETSTORE-002",
+      "id": "BR-PETSTORE-ACCUPD-002",
       "title": "Account 갱신 시 password Optional 분기 (length > 0 만 updateSignon)",
       "natural_language": "AccountService.updateAccount(account) → updateAccount + updateProfile 항상 + Optional<password>.filter(length > 0).ifPresent → updateSignon. password 미입력 시 signon 갱신 ❌.",
       "source": "AccountService.java:updateAccount",
@@ -21,7 +21,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-PETSTORE-003",
+      "id": "BR-PETSTORE-PRODSRCH-003",
       "title": "Product 검색 = keyword split + lowercase + LIKE 양쪽 wildcard",
       "natural_language": "CatalogService.searchProductList(keywords) → keywords.split('\\\\s+') 후 각 keyword.toLowerCase() → '%keyword%' LIKE 검색. 매 keyword 별 별도 SQL 호출 (★ N+1 risk).",
       "source": "CatalogService.java:searchProductList + ProductMapper.xml (searchProductList)",
@@ -32,7 +32,7 @@
       "$comment_bug": "★ N+1 패턴 = 의도된 것 같음 (multi-keyword AND/OR = client side aggregation) but 성능 risk → AP-PETSTORE-005"
     },
     {
-      "id": "BR-PETSTORE-004",
+      "id": "BR-PETSTORE-ORDCRT-004",
       "title": "Order 생성 = 5 단계 단일 트랜잭션",
       "natural_language": "OrderService.insertOrder(order) — (1) sequenceMapper.getNextId('ordernum') → orderId 할당, (2) lineItems.forEach → itemMapper.updateInventoryQuantity (재고 차감), (3) orderMapper.insertOrder, (4) orderMapper.insertOrderStatus, (5) lineItems.forEach → lineItemMapper.insertLineItem. @Transactional 단일 boundary.",
       "source": "OrderService.java:insertOrder",
@@ -41,7 +41,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-PETSTORE-005",
+      "id": "BR-PETSTORE-ORDQRY-005",
       "title": "Order 조회 = order + lineItems + item + inventory fetch chaining",
       "natural_language": "OrderService.getOrder(orderId) — (1) orderMapper.getOrder → order, (2) lineItemMapper.getLineItemsByOrderId → lineItems, (3) lineItems.forEach → itemMapper.getItem + getInventoryQuantity 별도 호출. ★ ★ N+1 패턴 (lineItem 수 × 2 SQL).",
       "source": "OrderService.java:getOrder",
@@ -52,7 +52,7 @@
       "$comment_bug": "★ N+1 fetch = 명백 anti-pattern → AP-PETSTORE-006. 모범 = JOIN 또는 batch fetch."
     },
     {
-      "id": "BR-PETSTORE-006",
+      "id": "BR-PETSTORE-PASSWD-006",
       "title": "★ ★ ★ 평문 password — signon 테이블 평문 저장 + getAccountByUsernameAndPassword 평문 비교",
       "natural_language": "AccountService.getAccount(username, password) → accountMapper.getAccountByUsernameAndPassword. signon 테이블 schema = (username VARCHAR(25), password VARCHAR(25)) 평문 저장. 해시 ❌.",
       "source": "AccountMapper.xml:getAccountByUsernameAndPassword + jpetstore-hsqldb-schema.sql (create table signon)",
@@ -63,7 +63,7 @@
       "$comment_bug": "★ ★ 보안 취약 — bcrypt/argon2 의무 → AP-PETSTORE-004. reference webapp 의 demo limitation."
     },
     {
-      "id": "BR-PETSTORE-007",
+      "id": "BR-PETSTORE-BANNER-007",
       "title": "favcategory 기반 banner 표시",
       "natural_language": "Profile.favcategory → bannerdata 매핑 (favcategory → bannername). 사용자 선호 카테고리 별 다른 배너 표시.",
       "source": "AccountMapper.xml + bannerdata schema (favcategory PK / bannername)",
@@ -72,7 +72,7 @@
       "is_intent": true
     },
     {
-      "id": "BR-PETSTORE-008",
+      "id": "BR-PETSTORE-SEQMGR-008",
       "title": "DB native sequence ❌ — 자체 sequence 테이블 관리",
       "natural_language": "ordernum sequence = SequenceMapper (sequence 테이블) 자체 관리. getNextId('ordernum') → SELECT + UPDATE (race condition risk). DB native (Postgres SEQUENCE / MySQL AUTO_INCREMENT) 미사용 — multi-RDBMS 호환 의도.",
       "source": "OrderService.java:getNextId + SequenceMapper.xml (getSequence + updateSequence) + sequence schema",

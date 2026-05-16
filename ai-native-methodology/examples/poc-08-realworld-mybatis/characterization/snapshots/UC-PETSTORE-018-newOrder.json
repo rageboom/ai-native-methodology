@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-018 주문 등록 (★ ★ 5 단계 단일 트랜잭션 / BR-PETSTORE-004 + BR-PETSTORE-008 sequence).",
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-018 주문 등록 (★ ★ 5 단계 단일 트랜잭션 / BR-PETSTORE-ORDCRT-004 + BR-PETSTORE-SEQMGR-008 sequence).",
   "snapshot_id": "SNAP-UC-PETSTORE-018",
   "use_case": "UC-PETSTORE-018",
   "endpoint": "POST /order/newOrder.action (★ confirmed=true 후)",
@@ -31,8 +31,8 @@
         "transaction_boundary": "★ 5 단계 모두 commit 또는 모두 rollback"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-004", "type": "intent", "note": "5 단계 단일 트랜잭션 atomic 보장" },
-        { "rule": "BR-PETSTORE-008", "type": "ambiguous", "note": "★ ★ 자체 sequence (DB native ❌) = multi-RDBMS 호환 의도 + race risk 동반" }
+        { "rule": "BR-PETSTORE-ORDCRT-004", "type": "intent", "note": "5 단계 단일 트랜잭션 atomic 보장" },
+        { "rule": "BR-PETSTORE-SEQMGR-008", "type": "ambiguous", "note": "★ ★ 자체 sequence (DB native ❌) = multi-RDBMS 호환 의도 + race risk 동반" }
       ],
       "behavior_to_preserve": [
         "5 단계 @Transactional atomic",
@@ -47,9 +47,9 @@
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-PETSTORE-004 단일 트랜잭션"],
+    "intent": ["BR-PETSTORE-ORDCRT-004 단일 트랜잭션"],
     "bug": ["AP-PETSTORE-006 N+1 update", "AP-PETSTORE-007 race condition"],
-    "ambiguous": ["BR-PETSTORE-008 multi-RDBMS sequence", "ORDERSTATUS schema design"],
+    "ambiguous": ["BR-PETSTORE-SEQMGR-008 multi-RDBMS sequence", "ORDERSTATUS schema design"],
     "self_recognized": []
   }
 }

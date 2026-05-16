@@ -26,7 +26,7 @@
       "sql_ids": ["insertAccount", "insertProfile", "insertSignon"],
       "bc": "BC-ACCOUNT",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-001"]
+      "linked_brs": ["BR-PETSTORE-ACCREG-001"]
     },
     {
       "id": "UC-PETSTORE-003",
@@ -45,7 +45,7 @@
       "sql_ids": ["updateAccount", "updateProfile", "updateSignon (조건부)"],
       "bc": "BC-ACCOUNT",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-002"]
+      "linked_brs": ["BR-PETSTORE-ACCUPD-002"]
     },
     {
       "id": "UC-PETSTORE-005",
@@ -64,7 +64,7 @@
       "sql_ids": ["getAccountByUsernameAndPassword"],
       "bc": "BC-ACCOUNT",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-006"],
+      "linked_brs": ["BR-PETSTORE-PASSWD-006"],
       "note": "★ ★ 보안 취약 BR → AP-PETSTORE-004"
     },
     {
@@ -147,7 +147,7 @@
       "sql_ids": ["searchProductList (★ keyword 별 호출)"],
       "bc": "BC-CATALOG",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-003"]
+      "linked_brs": ["BR-PETSTORE-PRODSRCH-003"]
     },
     {
       "id": "UC-PETSTORE-016",
@@ -175,7 +175,7 @@
       "sql_ids": ["getSequence", "updateSequence", "updateInventoryQuantity (per lineItem)", "insertOrder", "insertOrderStatus", "insertLineItem (per lineItem)"],
       "bc": "BC-ORDER",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-004", "BR-PETSTORE-008"]
+      "linked_brs": ["BR-PETSTORE-ORDCRT-004", "BR-PETSTORE-SEQMGR-008"]
     },
     {
       "id": "UC-PETSTORE-019",
@@ -185,7 +185,7 @@
       "sql_ids": ["getOrder", "getLineItemsByOrderId", "getItem (per lineItem)", "getInventoryQuantity (per lineItem)"],
       "bc": "BC-ORDER",
       "scope_decision": "covered (★ 핵심)",
-      "linked_brs": ["BR-PETSTORE-005"]
+      "linked_brs": ["BR-PETSTORE-ORDQRY-005"]
     }
   ],
   "summary": {

@@ -10,14 +10,14 @@
 
 | ID | 제목 | 분류 | 근거 |
 |---|---|---|---|
-| BR-PETSTORE-001 | Account 생성 시 3 테이블 단일 트랜잭션 insert | **intent** | @Transactional 명시 = atomicity 의도 (PoC #06 BR 와 isomorphic) |
-| BR-PETSTORE-002 | Account 갱신 시 password Optional 분기 (length > 0 만 updateSignon) | **intent** | UX 정합 (★ password 미입력 = 평문 보존) — but 평문 자체가 bug → AP-004 동반 |
-| BR-PETSTORE-003 | Product 검색 = keyword split + lowercase + LIKE 양쪽 wildcard | **★ ambiguous** | multi-keyword 의도 = intent / 매 keyword 별 SQL 호출 = bug (AP-PETSTORE-005 N+1) — 동반 처분. D2 expert 결단: 모범 = 단일 SQL OR 또는 FULL TEXT SEARCH |
-| BR-PETSTORE-004 | Order 생성 = 5 단계 단일 트랜잭션 | **intent** | @Transactional 명시 = atomic 보장 / 표준 e-commerce |
-| BR-PETSTORE-005 | Order 조회 = order + lineItems + item + inventory fetch chaining | **bug** | ★ ★ ★ N+1 fetch (lineItem 수 N → 2+2N SQL) — 모범 = JOIN 또는 nested resultMap. AP-PETSTORE-006 동반. |
-| BR-PETSTORE-006 | ★ ★ ★ 평문 password — signon 테이블 평문 저장 + 평문 비교 | **bug** | ★ ★ ★ critical 보안 — bcrypt/argon2 의무. reference webapp demo limitation but production = 차단 의무. AP-PETSTORE-004 동반. |
-| BR-PETSTORE-007 | favcategory 기반 banner 표시 | **intent** | UI personalization = 사용자 가치 |
-| BR-PETSTORE-008 | DB native sequence ❌ — 자체 sequence 테이블 관리 | **★ ambiguous** | multi-RDBMS 호환 의도 = intent / UPDATE 후 SELECT race condition risk = bug (AP-PETSTORE-007 동반). D2 expert 결단: 모범 = DB native (Postgres SEQUENCE / MySQL AUTO_INCREMENT) 또는 UUID v4 / Snowflake ID |
+| BR-PETSTORE-ACCREG-001 | Account 생성 시 3 테이블 단일 트랜잭션 insert | **intent** | @Transactional 명시 = atomicity 의도 (PoC #06 BR 와 isomorphic) |
+| BR-PETSTORE-ACCUPD-002 | Account 갱신 시 password Optional 분기 (length > 0 만 updateSignon) | **intent** | UX 정합 (★ password 미입력 = 평문 보존) — but 평문 자체가 bug → AP-004 동반 |
+| BR-PETSTORE-PRODSRCH-003 | Product 검색 = keyword split + lowercase + LIKE 양쪽 wildcard | **★ ambiguous** | multi-keyword 의도 = intent / 매 keyword 별 SQL 호출 = bug (AP-PETSTORE-005 N+1) — 동반 처분. D2 expert 결단: 모범 = 단일 SQL OR 또는 FULL TEXT SEARCH |
+| BR-PETSTORE-ORDCRT-004 | Order 생성 = 5 단계 단일 트랜잭션 | **intent** | @Transactional 명시 = atomic 보장 / 표준 e-commerce |
+| BR-PETSTORE-ORDQRY-005 | Order 조회 = order + lineItems + item + inventory fetch chaining | **bug** | ★ ★ ★ N+1 fetch (lineItem 수 N → 2+2N SQL) — 모범 = JOIN 또는 nested resultMap. AP-PETSTORE-006 동반. |
+| BR-PETSTORE-PASSWD-006 | ★ ★ ★ 평문 password — signon 테이블 평문 저장 + 평문 비교 | **bug** | ★ ★ ★ critical 보안 — bcrypt/argon2 의무. reference webapp demo limitation but production = 차단 의무. AP-PETSTORE-004 동반. |
+| BR-PETSTORE-BANNER-007 | favcategory 기반 banner 표시 | **intent** | UI personalization = 사용자 가치 |
+| BR-PETSTORE-SEQMGR-008 | DB native sequence ❌ — 자체 sequence 테이블 관리 | **★ ambiguous** | multi-RDBMS 호환 의도 = intent / UPDATE 후 SELECT race condition risk = bug (AP-PETSTORE-007 동반). D2 expert 결단: 모범 = DB native (Postgres SEQUENCE / MySQL AUTO_INCREMENT) 또는 UUID v4 / Snowflake ID |
 
 **BR 분류 결과 (Day 2)**: intent 4 / bug 2 / ambiguous 2 / self_recognized 0
 
@@ -86,8 +86,8 @@
 
 | ID | 결단 | 근거 + 새 시스템 권고 |
 |---|---|---|
-| BR-PETSTORE-003 | **bug 격상 ✅** | client-side aggregation = 명백한 폐해. 새 시스템 = MyBatis `<foreach>` 단일 SQL OR (e.g., `WHERE LOWER(name) LIKE #{kw1} OR LOWER(name) LIKE #{kw2}`) 또는 FULL TEXT SEARCH (PostgreSQL tsvector / Elasticsearch) |
-| BR-PETSTORE-008 + AP-PETSTORE-007 | **ambiguous 유지 (★ split 결단)** | reference webapp design = multi-RDBMS 호환 의도 존중 (intent). 새 시스템 = ★ DB native sequence dialect 분기 (PostgreSQL SEQUENCE / MySQL AUTO_INCREMENT / Oracle SEQUENCE) 또는 UUID v4 / Snowflake ID. race risk = ★ bug (production 차단 의무) |
+| BR-PETSTORE-PRODSRCH-003 | **bug 격상 ✅** | client-side aggregation = 명백한 폐해. 새 시스템 = MyBatis `<foreach>` 단일 SQL OR (e.g., `WHERE LOWER(name) LIKE #{kw1} OR LOWER(name) LIKE #{kw2}`) 또는 FULL TEXT SEARCH (PostgreSQL tsvector / Elasticsearch) |
+| BR-PETSTORE-SEQMGR-008 + AP-PETSTORE-007 | **ambiguous 유지 (★ split 결단)** | reference webapp design = multi-RDBMS 호환 의도 존중 (intent). 새 시스템 = ★ DB native sequence dialect 분기 (PostgreSQL SEQUENCE / MySQL AUTO_INCREMENT / Oracle SEQUENCE) 또는 UUID v4 / Snowflake ID. race risk = ★ bug (production 차단 의무) |
 | AP-PETSTORE-003 | **intent 격하 ✅ (Stripes paradigm 정상)** | reference webapp = Stripes 학습 자료 / convention default routing = Stripes 표준 사용. 새 시스템 = ★ Spring MVC @RequestMapping 명시 권장 (paradigm 다름 / Modern recommendation) |
 
 ★ 결단 후 분류 갱신:

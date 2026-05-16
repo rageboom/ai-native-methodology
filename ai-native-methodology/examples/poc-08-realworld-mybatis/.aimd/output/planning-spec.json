@@ -49,7 +49,7 @@
     ],
     "success_criteria": [
       "표준 CRUD 4 BC 정합 (Account/Catalog/Cart/Order)",
-      "5 단계 주문 단일 트랜잭션 atomic 보장 (BR-PETSTORE-004)",
+      "5 단계 주문 단일 트랜잭션 atomic 보장 (BR-PETSTORE-ORDCRT-004)",
       "★ ★ phase 4.7 acceptance oracle = D2 후 16/16 = 100% 명확 분류 (Modern stack 정합)",
       "★ paradigm-cross corroboration #1 MEDIUM 자격 사실 확보 (iBATIS 2 → MyBatis 3 / Spring 4 → 6)",
       "★ ★ ★ 새 시스템 권고: Spring Boot + Spring MVC (Stripes paradigm shift) + Spring Security PasswordEncoder (★ AP-004 평문 password 차단) + JPA/QueryDSL 또는 MyBatis annotation (XML 단독 → 양식 진화)"
@@ -77,14 +77,14 @@
     { "id": "UC-PETSTORE-019", "name": "★ ★ 주문 상세 조회 (N+1 fetch / AP-006)", "description": "GET /order/viewOrder — order + lineItems + N×item + N×inventory (★ ★ 1+1+2N SQL)", "actors": ["registered_user"], "preconditions": ["orderId 입력 + 사용자 권한"], "postconditions": ["ViewOrder.jsp 상세"], "acceptance_criteria_refs": ["AC-PETSTORE-019"], "source_grounded_evidence": ["snapshots/UC-PETSTORE-019-viewOrder.json", "OrderService.getOrder (@Transactional / N+1)", "Order/LineItem/Item Mapper"], "modernization_note": "★ ★ ★ MyBatis nested resultMap 또는 단일 JOIN 의무 (N+1 차단)" }
   ],
   "business_rules": [
-    { "id": "BR-PETSTORE-001", "statement": "Account 생성 시 ACCOUNT + PROFILE + SIGNON 3 테이블 단일 트랜잭션 insert (atomicity 의무)", "applies_to": ["UC-PETSTORE-002"], "br_type": "transaction", "is_intent": true },
-    { "id": "BR-PETSTORE-002", "statement": "Account 갱신 시 password Optional 분기 — length > 0 만 SIGNON 갱신", "applies_to": ["UC-PETSTORE-004"], "br_type": "conditional_update", "is_intent": true },
-    { "id": "BR-PETSTORE-003", "statement": "Product 검색 = keyword whitespace split + lowercase + LIKE 양쪽 wildcard / multi-keyword aggregation (★ N+1 동반 / D2.5 결단 = bug 격상)", "applies_to": ["UC-PETSTORE-015"], "br_type": "search", "is_intent": false, "is_likely_bug": true, "modernization_note": "MyBatis `<foreach>` 단일 SQL OR 의무" },
-    { "id": "BR-PETSTORE-004", "statement": "Order 생성 = sequence + N×inventory + orderHeader + orderStatus + N×lineItem 5 단계 단일 트랜잭션", "applies_to": ["UC-PETSTORE-018"], "br_type": "transaction", "is_intent": true },
-    { "id": "BR-PETSTORE-005", "statement": "Order 조회 = order + lineItems + N×item + N×inventory fetch chaining (★ ★ N+1 / bug)", "applies_to": ["UC-PETSTORE-019"], "br_type": "fetch_chain", "is_intent": false, "is_likely_bug": true, "modernization_note": "nested resultMap 또는 단일 JOIN 의무" },
-    { "id": "BR-PETSTORE-006", "statement": "★ ★ ★ 평문 password — signon 테이블 평문 저장 + 평문 비교 (★ critical 보안 bug)", "applies_to": ["UC-PETSTORE-006", "UC-PETSTORE-002", "UC-PETSTORE-004"], "br_type": "authentication", "is_intent": false, "is_likely_bug": true, "modernization_note": "★ ★ ★ Spring Security + bcrypt/argon2 PasswordEncoder 의무" },
-    { "id": "BR-PETSTORE-007", "statement": "favcategory 기반 banner 표시 (Profile.favcategory → bannerdata)", "applies_to": ["UC-PETSTORE-002", "UC-PETSTORE-003", "UC-PETSTORE-004"], "br_type": "personalization", "is_intent": true },
-    { "id": "BR-PETSTORE-008", "statement": "DB native sequence ❌ — 자체 sequence 테이블 + UPDATE 후 SELECT race condition risk (D2.5 결단 = ambiguous 유지 / multi-RDBMS 호환 의도 + race risk 동반)", "applies_to": ["UC-PETSTORE-018"], "br_type": "id_generation", "is_intent": true, "is_likely_bug": true, "modernization_note": "DB native sequence dialect 분기 또는 UUID v4 / Snowflake ID 권장" }
+    { "id": "BR-PETSTORE-ACCREG-001", "statement": "Account 생성 시 ACCOUNT + PROFILE + SIGNON 3 테이블 단일 트랜잭션 insert (atomicity 의무)", "applies_to": ["UC-PETSTORE-002"], "br_type": "transaction", "is_intent": true },
+    { "id": "BR-PETSTORE-ACCUPD-002", "statement": "Account 갱신 시 password Optional 분기 — length > 0 만 SIGNON 갱신", "applies_to": ["UC-PETSTORE-004"], "br_type": "conditional_update", "is_intent": true },
+    { "id": "BR-PETSTORE-PRODSRCH-003", "statement": "Product 검색 = keyword whitespace split + lowercase + LIKE 양쪽 wildcard / multi-keyword aggregation (★ N+1 동반 / D2.5 결단 = bug 격상)", "applies_to": ["UC-PETSTORE-015"], "br_type": "search", "is_intent": false, "is_likely_bug": true, "modernization_note": "MyBatis `<foreach>` 단일 SQL OR 의무" },
+    { "id": "BR-PETSTORE-ORDCRT-004", "statement": "Order 생성 = sequence + N×inventory + orderHeader + orderStatus + N×lineItem 5 단계 단일 트랜잭션", "applies_to": ["UC-PETSTORE-018"], "br_type": "transaction", "is_intent": true },
+    { "id": "BR-PETSTORE-ORDQRY-005", "statement": "Order 조회 = order + lineItems + N×item + N×inventory fetch chaining (★ ★ N+1 / bug)", "applies_to": ["UC-PETSTORE-019"], "br_type": "fetch_chain", "is_intent": false, "is_likely_bug": true, "modernization_note": "nested resultMap 또는 단일 JOIN 의무" },
+    { "id": "BR-PETSTORE-PASSWD-006", "statement": "★ ★ ★ 평문 password — signon 테이블 평문 저장 + 평문 비교 (★ critical 보안 bug)", "applies_to": ["UC-PETSTORE-006", "UC-PETSTORE-002", "UC-PETSTORE-004"], "br_type": "authentication", "is_intent": false, "is_likely_bug": true, "modernization_note": "★ ★ ★ Spring Security + bcrypt/argon2 PasswordEncoder 의무" },
+    { "id": "BR-PETSTORE-BANNER-007", "statement": "favcategory 기반 banner 표시 (Profile.favcategory → bannerdata)", "applies_to": ["UC-PETSTORE-002", "UC-PETSTORE-003", "UC-PETSTORE-004"], "br_type": "personalization", "is_intent": true },
+    { "id": "BR-PETSTORE-SEQMGR-008", "statement": "DB native sequence ❌ — 자체 sequence 테이블 + UPDATE 후 SELECT race condition risk (D2.5 결단 = ambiguous 유지 / multi-RDBMS 호환 의도 + race risk 동반)", "applies_to": ["UC-PETSTORE-018"], "br_type": "id_generation", "is_intent": true, "is_likely_bug": true, "modernization_note": "DB native sequence dialect 분기 또는 UUID v4 / Snowflake ID 권장" }
   ],
   "out_of_scope": [
     "admin UI (★ jpetstore-6 = customer-facing 만 / admin 부재)",
@@ -123,7 +123,7 @@
   },
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json (8 BR / BR-PETSTORE-001~008)",
+      "input/rules.json (8 BR / BR-PETSTORE-ACCREG-001~008)",
       "input/domain.json (19 UC / 4 BC / UC-PETSTORE-001~019)",
       "input/antipatterns.json (8 AP / AP-PETSTORE-001~008)",
       "input/inventory.json (24 Java + 18 test + 7 mapper + 25 SQL + 19 endpoint + 12 tables + LOC 9234)",

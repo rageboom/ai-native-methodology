@@ -58,7 +58,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["ACCOUNT", "PROFILE", "SIGNON", "BANNERDATA"],
       "uc_link": "UC-PETSTORE-003",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-007 favcategory banner mapping 정합)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-BANNER-007 favcategory banner mapping 정합)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -73,7 +73,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["ACCOUNT", "PROFILE", "SIGNON", "BANNERDATA"],
       "uc_link": "UC-PETSTORE-006",
-      "intent_vs_bug_classification": "bug (★ ★ ★ AP-PETSTORE-004 평문 password 정합 / BR-PETSTORE-006 / signon 테이블 평문 저장 + 평문 비교 = 보안 critical)",
+      "intent_vs_bug_classification": "bug (★ ★ ★ AP-PETSTORE-004 평문 password 정합 / BR-PETSTORE-PASSWD-006 / signon 테이블 평문 저장 + 평문 비교 = 보안 critical)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -88,7 +88,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["ACCOUNT"],
       "uc_link": "UC-PETSTORE-004",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-002 password Optional 분기의 한 갈래)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ACCUPD-002 password Optional 분기의 한 갈래)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -103,7 +103,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["ACCOUNT"],
       "uc_link": "UC-PETSTORE-002",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-001 단일 트랜잭션 정합)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ACCREG-001 단일 트랜잭션 정합)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -121,7 +121,7 @@
       ],
       "dependent_tables": ["PROFILE"],
       "uc_link": "UC-PETSTORE-004",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-007 favcategory + langpref personalization)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-BANNER-007 favcategory + langpref personalization)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -139,7 +139,7 @@
       ],
       "dependent_tables": ["PROFILE"],
       "uc_link": "UC-PETSTORE-002",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-001 단일 트랜잭션 정합)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ACCREG-001 단일 트랜잭션 정합)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -150,11 +150,11 @@
       "mapper_xml_line": 125,
       "statement_type": "PREPARED",
       "called_from_screen": "EditAccountForm.jsp (★ Optional<password>.length > 0 시만)",
-      "business_meaning": "★ ★ SIGNON.PASSWORD 평문 갱신 (BR-PETSTORE-002 password Optional 분기)",
+      "business_meaning": "★ ★ SIGNON.PASSWORD 평문 갱신 (BR-PETSTORE-ACCUPD-002 password Optional 분기)",
       "dynamic_branch": [],
       "dependent_tables": ["SIGNON"],
       "uc_link": "UC-PETSTORE-004",
-      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-002 정합 + bug 동반 AP-PETSTORE-004 평문 password)",
+      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-ACCUPD-002 정합 + bug 동반 AP-PETSTORE-004 평문 password)",
       "confidence": 0.85,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -169,7 +169,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["SIGNON"],
       "uc_link": "UC-PETSTORE-002",
-      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-001 단일 트랜잭션 + bug 동반 AP-PETSTORE-004 평문 password)",
+      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-ACCREG-001 단일 트랜잭션 + bug 동반 AP-PETSTORE-004 평문 password)",
       "confidence": 0.85,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -244,7 +244,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["INVENTORY"],
       "uc_link": "UC-PETSTORE-008/014/019",
-      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-006 N+1 정합 / BR-PETSTORE-005 fetch chain — JOIN 또는 batch 미사용)",
+      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-006 N+1 정합 / BR-PETSTORE-ORDQRY-005 fetch chain — JOIN 또는 batch 미사용)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -259,7 +259,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["INVENTORY"],
       "uc_link": "UC-PETSTORE-018",
-      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-004 단일 트랜잭션 + bug 동반 AP-PETSTORE-006 N+1 update)",
+      "intent_vs_bug_classification": "ambiguous (★ ★ intent BR-PETSTORE-ORDCRT-004 단일 트랜잭션 + bug 동반 AP-PETSTORE-006 N+1 update)",
       "confidence": 0.85,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -274,7 +274,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["LINEITEM"],
       "uc_link": "UC-PETSTORE-019",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-005 fetch chain 정합)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ORDQRY-005 fetch chain 정합)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -289,7 +289,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["LINEITEM"],
       "uc_link": "UC-PETSTORE-018",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-004 단일 트랜잭션)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ORDCRT-004 단일 트랜잭션)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -334,7 +334,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["ORDERS"],
       "uc_link": "UC-PETSTORE-018",
-      "intent_vs_bug_classification": "intent (BR-PETSTORE-004 단일 트랜잭션)",
+      "intent_vs_bug_classification": "intent (BR-PETSTORE-ORDCRT-004 단일 트랜잭션)",
       "confidence": 0.95,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -394,7 +394,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["PRODUCT"],
       "uc_link": "UC-PETSTORE-015",
-      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-005 N+1 검색 정합 / BR-PETSTORE-003 keyword split LIKE)",
+      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-005 N+1 검색 정합 / BR-PETSTORE-PRODSRCH-003 keyword split LIKE)",
       "confidence": 0.90,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -424,7 +424,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["SEQUENCE"],
       "uc_link": "UC-PETSTORE-018",
-      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-007 race condition risk / BR-PETSTORE-008)",
+      "intent_vs_bug_classification": "bug (★ AP-PETSTORE-007 race condition risk / BR-PETSTORE-SEQMGR-008)",
       "confidence": 0.85,
       "carry_flags": [],
       "scope_decision": "covered"

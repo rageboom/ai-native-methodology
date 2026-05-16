@@ -23,7 +23,7 @@
         "expected_response_view": "ForwardResolution to ViewOrder.jsp"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-005", "type": "bug", "note": "★ ★ ★ N+1 fetch chain (AP-PETSTORE-006) — production 차단 의무 / 모범 = JOIN 또는 nested resultMap" }
+        { "rule": "BR-PETSTORE-ORDQRY-005", "type": "bug", "note": "★ ★ ★ N+1 fetch chain (AP-PETSTORE-006) — production 차단 의무 / 모범 = JOIN 또는 nested resultMap" }
       ],
       "behavior_to_preserve": [
         "Order header + lineItems + item 조회 (도메인 contract)"

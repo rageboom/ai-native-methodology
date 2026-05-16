@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-015 상품 검색 (★ AP-PETSTORE-005 N+1 검색 / BR-PETSTORE-003 keyword split LIKE).",
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-015 상품 검색 (★ AP-PETSTORE-005 N+1 검색 / BR-PETSTORE-PRODSRCH-003 keyword split LIKE).",
   "snapshot_id": "SNAP-UC-PETSTORE-015",
   "use_case": "UC-PETSTORE-015",
   "endpoint": "GET /catalog/searchProducts.action?keyword=...",
@@ -24,7 +24,7 @@
         "_note": "client-side aggregation — DB 단일 쿼리 ❌"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-003", "type": "ambiguous", "note": "★ ★ keyword split + LIKE = 의도된 multi-keyword 검색 / 그러나 N+1 패턴 = AP-005 동반" }
+        { "rule": "BR-PETSTORE-PRODSRCH-003", "type": "ambiguous", "note": "★ ★ keyword split + LIKE = 의도된 multi-keyword 검색 / 그러나 N+1 패턴 = AP-005 동반" }
       ],
       "behavior_to_preserve": [
         "multi-keyword 검색 contract (whitespace split)"
@@ -37,7 +37,7 @@
   "intent_vs_bug_summary": {
     "intent": [],
     "bug": ["AP-PETSTORE-005 N+1 검색"],
-    "ambiguous": ["BR-PETSTORE-003 keyword split (intent + bug 동반)"],
+    "ambiguous": ["BR-PETSTORE-PRODSRCH-003 keyword split (intent + bug 동반)"],
     "self_recognized": []
   }
 }

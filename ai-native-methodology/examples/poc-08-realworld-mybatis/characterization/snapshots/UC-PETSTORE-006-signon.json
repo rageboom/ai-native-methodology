@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-006 로그인 (★ ★ ★ 평문 password 비교 / BR-PETSTORE-006 / AP-PETSTORE-004 critical bug).",
+  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-006 로그인 (★ ★ ★ 평문 password 비교 / BR-PETSTORE-PASSWD-006 / AP-PETSTORE-004 critical bug).",
   "snapshot_id": "SNAP-UC-PETSTORE-006",
   "use_case": "UC-PETSTORE-006",
   "endpoint": "POST /account/signon.action (Stripes convention)",
@@ -22,7 +22,7 @@
         "expected_session_state": "session.authenticated=true / account=Account(j2ee, ...)"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-006", "type": "bug", "note": "★ ★ ★ 평문 password 비교 (AP-PETSTORE-004) — 보안 critical" }
+        { "rule": "BR-PETSTORE-PASSWD-006", "type": "bug", "note": "★ ★ ★ 평문 password 비교 (AP-PETSTORE-004) — 보안 critical" }
       ],
       "behavior_likely_bug": [
         "★ ★ ★ AP-PETSTORE-004 — 평문 password 비교 (해시 ❌) — production 차단 의무"
@@ -39,12 +39,12 @@
         "expected_response": "Account null 또는 empty result / Stripes ValidationError / signonForm 으로 redirect"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-006", "type": "intent", "note": "잘못된 인증 거부 = 정합" }
+        { "rule": "BR-PETSTORE-PASSWD-006", "type": "intent", "note": "잘못된 인증 거부 = 정합" }
       ]
     }
   ],
   "intent_vs_bug_summary": {
-    "intent": ["BR-PETSTORE-006 인증 거부 (잘못된 case)"],
+    "intent": ["BR-PETSTORE-PASSWD-006 인증 거부 (잘못된 case)"],
     "bug": ["AP-PETSTORE-004 평문 password (critical)"],
     "ambiguous": [],
     "self_recognized": []

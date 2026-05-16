@@ -1,0 +1,35 @@
+{
+  "$schema_version": "v2.5.0-sub-domain-synthesis",
+  "model": "claude-sonnet-4-6",
+  "invoked_at": "2026-05-17T00:00:00Z",
+  "batch_size": 8,
+  "poc_id": "poc-08-realworld-mybatis",
+  "$comment": "★ ★ session 23차 Sprint 1-C / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 10 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "results": [
+    { "old_id": "BR-PETSTORE-001", "new_id": "BR-PETSTORE-ACCREG-001", "sub_domain": "ACCREG", "rationale": "account/profile/signon 3 테이블 단일 트랜잭션 원자 생성 = 계정 등록 경계" },
+    { "old_id": "BR-PETSTORE-002", "new_id": "BR-PETSTORE-ACCUPD-002", "sub_domain": "ACCUPD", "rationale": "password 변경 여부 따라 signon 갱신 조건 분기 = 계정 수정 규칙" },
+    { "old_id": "BR-PETSTORE-003", "new_id": "BR-PETSTORE-PRODSRCH-003", "sub_domain": "PRODSRCH", "rationale": "keyword 분리 후 각 LIKE 양쪽 wildcard 검색 = 상품 탐색 규칙" },
+    { "old_id": "BR-PETSTORE-004", "new_id": "BR-PETSTORE-ORDCRT-004", "sub_domain": "ORDCRT", "rationale": "seq~재고차감~insert 5단계 단일 트랜잭션 = 주문 생성 경계" },
+    { "old_id": "BR-PETSTORE-005", "new_id": "BR-PETSTORE-ORDQRY-005", "sub_domain": "ORDQRY", "rationale": "order→lineItems→item+inventory 순차 별도 fetch = 주문 조회 체이닝" },
+    { "old_id": "BR-PETSTORE-006", "new_id": "BR-PETSTORE-PASSWD-006", "sub_domain": "PASSWD", "rationale": "signon 평문 저장 + 평문 비교 인증 = 패스워드 보안 결함 규칙" },
+    { "old_id": "BR-PETSTORE-007", "new_id": "BR-PETSTORE-BANNER-007", "sub_domain": "BANNER", "rationale": "favcategory → bannername 매핑 개인화 = 배너 표시 규칙" },
+    { "old_id": "BR-PETSTORE-008", "new_id": "BR-PETSTORE-SEQMGR-008", "sub_domain": "SEQMGR", "rationale": "sequence 테이블 SELECT+UPDATE 자체 채번 = 시퀀스 관리 규칙" }
+  ],
+  "cross_ref_files_updated": [
+    "input/rules.json",
+    "input/domain.json",
+    ".aimd/output/planning-spec.json",
+    "characterization/intent-vs-bug.md",
+    "characterization/snapshots/UC-PETSTORE-002-newAccount.json",
+    "characterization/snapshots/UC-PETSTORE-006-signon.json",
+    "characterization/snapshots/UC-PETSTORE-015-searchProducts.json",
+    "characterization/snapshots/UC-PETSTORE-018-newOrder.json",
+    "characterization/snapshots/UC-PETSTORE-019-viewOrder.json",
+    "sql-inventory/sql-inventory.json"
+  ],
+  "verification": {
+    "old_id_residual_count": 0,
+    "schema_validator_valid": true,
+    "release_readiness_11_11_pass": true
+  }
+}
