@@ -9,6 +9,24 @@
 
 ---
 
+## [8.2.1] — 2026-05-17 ★ PATCH — §8-2 `_base-*` documented-exception 종결 (backlog 잔여 0 / Senior GO 0.88 / F-015 = nominal not functional)
+
+> ★ **v8.2.1 PATCH — corrective·additive / non-breaking**. 사용자 "b 하고 a 진행" — briefing deck 버전 drift(v5.0.0→v8.2.0·387→395·11/11→13/13·15/15→16/16·16→17종) 정리 후 plugin-authoring-spec §8-2 backlog 2번 결단. v8.2.0 F-015 ×5 재검 완료 = §8-2 trigger 충족 → `_base-*` skill5+agent3 rename(v9.0.0 MAJOR / ~195 occ·70 file / 0 functional gain) vs documented-exception. 실 F-015(공식 charset verbatim 확인 / violation enforcement·`_`-prefix 거동 **미문서화** = nominal not functional) + Senior GO 0.88 → **documented-exception**. §8 backlog 잔여 **0**. DEC-2026-05-17-base-prefix-documented-exception / ADR-PLUGIN-001 §7 patch v5 + §8 LL-plugin-03.
+
+### 종결 (§8 backlog 2번 / S3·A1 ⚠️→✅)
+
+- **§7 매트릭스** `_base-*` 행 ⚠️→✅ (documented-exception) + 결론 "§8 backlog 잔여 0".
+- **§8-2 명세** — 영구 grandfather = 정확 8 frozen allowlist (skill 5: log-finding·apply-template·build-traceability-matrix·apply-baseline-ratchet·invoke-go-stop-gate / agent 3: official-docs-checker·senior-engineer·industry-case-researcher).
+- **★ Senior 필수 guardrail 1** — §9 skills digest 가 enforcement-strength encode (charset 문자열뿐 아니라 "violation 거동 미문서화 = advisory-consistent / hard-enforce 전환 시 차기 F-015 CONTRADICTS tripwire"). digest 변경 → skills `digest_sha` 재산출 ea06dc97470e → b8b2376312b0 (★ v8.2.0 digest_sha 메커니즘이 자기 변경 STALE 검출 = 1 release 만에 자기 dogfood 실효).
+- **★ Senior 필수 guardrail 2** — release-readiness check #12 = `_base-` 자산 정확 8 allowlist 결정적 assert (9번째 = fail / 예외 loophole 화 차단 / 신규 non-`_base`=S3 ratchet). check #12 내부 강화 (신 check ❌ / 13 유지).
+- **release-readiness.test.js** — `_base-` allowlist case 신설 + readdirSync import.
+
+### 회귀
+
+release-readiness 13/13 (check#12 = §6 4행 ≤60d + digest_sha 4행 일치 incl 재산출 skills b8b2 + `_base-` 8 allowlist) · skill-citation 0 stale · version-check 3-way 8.2.1 · workspace green · drift-validator 3-way 불변 · breaking 0 (rename ❌ / 8 자산 무변 / ADR-010 영구 grandfather). tier = PATCH (문서종결+이미참 invariant 형식화 / consumer 영향 0 / LL-i-56 정합).
+
+---
+
 ## [8.2.0] — 2026-05-17 ★ MINOR — 공식 docs F-015 ×5 재검 + §6 digest_sha META blind-spot closure (hooks VERIFIED-WITH-DELTA / additive)
 
 > ★ **v8.2.0 MINOR — additive / non-breaking**. 사용자 "Anthropic 공식 skills·agents·hooks best practice 재확인 + 비교 + 개선" → `plugin-authoring-spec.md` §9 Layer i 실 `_base-official-docs-checker` F-015 ×5 (skills/hooks/sub-agents/plugins-reference + matcher/if 정밀). 판정 = skills·sub-agents·plugins **VERIFIED-IDENTICAL** / hooks **VERIFIED-WITH-DELTA**. ★ Explore pre-research 가설 3건(event 30+·sub-agent name-only required·P2 stale) = 실 F-015 가 **모두 반증** (research 수렴 ≠ 사실 / 1차 출처 독립 fetch 의무 / LL-plugin-02). DEC-2026-05-17-plugin-authoring-docs-drift / ADR-PLUGIN-001 §7 patch v4 + §8 LL-plugin-02.

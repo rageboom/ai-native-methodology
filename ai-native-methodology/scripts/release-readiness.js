@@ -464,7 +464,7 @@ function check11_workspaceTestPass(args) {
 //   - baseline = methodology-spec/plugin-authoring-spec.md §6 pin (last_verified 4행)
 //   - 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory / release-readiness 밖)
 //   - 결정적 가드 = 본 check (date-math + digest_sha 재계산 only / 네트워크 ❌ / no-simulation·결정론 불변 / check10 패턴 isomorphic).
-// pass ⟺ §6 표 4 area(skills/hooks/sub-agents/plugins-reference) 모두 last_verified ≤ 60일 AND digest_sha 일치 (★ v8.2.0).
+// pass ⟺ §6 표 4 area 모두 last_verified ≤ 60일 AND digest_sha 일치 (★ v8.2.0) AND `_base-` 자산 = 정확 8 allowlist (★ v8.2.1 §8-2 documented-exception no-loophole).
 // --skip-authoring-staleness flag 시 skip (test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무).
 function check12_authoringSpecStaleness(args) {
   if (args.skipAuthoringStaleness) {
@@ -527,13 +527,42 @@ function check12_authoringSpecStaleness(args) {
   }
   const missing = EXPECTED_AREAS.filter((a) => !seen[a]);
   if (missing.length) failures.push(`§6 표 area 누락: ${missing.join(', ')}`);
+
+  // ★ v8.2.1 §8-2 documented-exception no-loophole guard (DEC-2026-05-17-base-prefix-documented-exception / ADR-PLUGIN-001 §7 patch v5).
+  // `_base-*` charset 편차 = nominal (F-015 = enforcement 미문서화) → 영구 grandfather. 단 정확히 8 자산만 (frozen allowlist).
+  // 9번째 `_base-` skill/agent 추가 = 예외의 loophole 화 → fail (신규 자산 = S3/A1 즉시 강제 / ratchet).
+  const BASE_ALLOWLIST = [
+    'skill:_base-log-finding', 'skill:_base-apply-template', 'skill:_base-build-traceability-matrix',
+    'skill:_base-apply-baseline-ratchet', 'skill:_base-invoke-go-stop-gate',
+    'agent:_base-official-docs-checker', 'agent:_base-senior-engineer', 'agent:_base-industry-case-researcher',
+  ].sort();
+  try {
+    const baseSkills = readdirSync(join(ROOT, 'skills'), { withFileTypes: true })
+      .filter((e) => e.isDirectory() && e.name.startsWith('_base-'))
+      .map((e) => `skill:${e.name}`);
+    const baseAgents = readdirSync(join(ROOT, 'agents'), { withFileTypes: true })
+      .filter((e) => e.isFile() && e.name.startsWith('_base-') && e.name.endsWith('.md'))
+      .map((e) => `agent:${e.name.replace(/\.md$/, '')}`);
+    const actual = [...baseSkills, ...baseAgents].sort();
+    if (JSON.stringify(actual) !== JSON.stringify(BASE_ALLOWLIST)) {
+      const extra = actual.filter((a) => !BASE_ALLOWLIST.includes(a));
+      const gone = BASE_ALLOWLIST.filter((a) => !actual.includes(a));
+      failures.push(
+        `_base- allowlist drift (§8-2 documented-exception loophole 방지) — ` +
+        `extra: [${extra.join(', ') || '∅'}] / missing: [${gone.join(', ') || '∅'}]`
+      );
+    }
+  } catch (e) {
+    failures.push(`_base- allowlist 검사 실패: ${e.message}`);
+  }
+
   return {
     id: 'authoring_spec_staleness',
     pass: failures.length === 0,
     detail: failures.length === 0
-      ? `plugin-authoring-spec §6 pin ${EXPECTED_AREAS.length} area 모두 ≤ ${STALE_DAYS}d fresh + digest_sha 4행 일치 / 외부 권위 drift 가드 정합 (R18 / ADR-PLUGIN-001 §7 patch v4)`
+      ? `plugin-authoring-spec §6 pin ${EXPECTED_AREAS.length} area 모두 ≤ ${STALE_DAYS}d fresh + digest_sha 4행 일치 + _base- 8 allowlist 정합 / 외부 권위 drift 가드 (R18 / ADR-PLUGIN-001 §7 patch v5)`
       : `staleness: ${failures.join(' | ')}`,
-    delegated_to: 'methodology-spec/plugin-authoring-spec.md §6 last_verified (R18 / ADR-PLUGIN-001 / 네트워크 재검증 = §9 Layer i cadence)',
+    delegated_to: 'methodology-spec/plugin-authoring-spec.md §6 + §8-2 (R18 / ADR-PLUGIN-001 / 네트워크 재검증 = §9 Layer i cadence)',
   };
 }
 

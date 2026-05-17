@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve, join } from 'node:path';
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync, existsSync, readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync, mkdirSync, cpSync, existsSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -97,6 +97,29 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       rows.push(m[1]);
     }
     assert.deepEqual(rows.sort(), ['hooks', 'plugins-reference', 'skills', 'sub-agents']);
+  });
+
+  // ★ v8.2.1 §8-2 documented-exception no-loophole — `_base-` 자산 정확 8 (frozen allowlist).
+  // 9번째 `_base-` skill/agent 추가 시 check #12 fail (예외의 loophole 화 차단 / 신규=S3 ratchet).
+  it('check12 _base- allowlist — 정확 5 skill + 3 agent (§8-2 documented-exception / loophole 방지)', () => {
+    const r = runScript(['--target', 'v8.2.1', '--json', ...SKIP_WS]);
+    const out = JSON.parse(r.stdout);
+    const c = out.results.find((x) => x.id === 'authoring_spec_staleness');
+    assert.ok(c.pass, `check12 must pass — detail: ${c.detail}`);
+    assert.match(c.detail, /_base- 8 allowlist 정합/);
+    // 실 디스크 = 정확히 enumerated 8 (frozen).
+    const baseSkills = readdirSync(join(ROOT, 'skills'), { withFileTypes: true })
+      .filter((e) => e.isDirectory() && e.name.startsWith('_base-')).map((e) => e.name).sort();
+    const baseAgents = readdirSync(join(ROOT, 'agents'), { withFileTypes: true })
+      .filter((e) => e.isFile() && e.name.startsWith('_base-') && e.name.endsWith('.md'))
+      .map((e) => e.name.replace(/\.md$/, '')).sort();
+    assert.deepEqual(baseSkills, [
+      '_base-apply-baseline-ratchet', '_base-apply-template', '_base-build-traceability-matrix',
+      '_base-invoke-go-stop-gate', '_base-log-finding',
+    ]);
+    assert.deepEqual(baseAgents, [
+      '_base-industry-case-researcher', '_base-official-docs-checker', '_base-senior-engineer',
+    ]);
   });
 
   it('layer_2_consistency — per-PoC mean ≥ 0.7 + critical/high drift 0 (Senior REVISE-1 + LL-i-43 정합)', () => {
