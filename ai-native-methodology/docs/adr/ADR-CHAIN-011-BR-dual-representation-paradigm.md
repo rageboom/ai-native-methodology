@@ -369,6 +369,41 @@ industry-case research — intent-vs-bug 분류를 자동 합성 과정에서 sc
 
 ---
 
+### §5.10. ★ ★ ★ 묶음 Q ① — alias 4중첩 폐기 / canonical 단일 — patch v13 (★ session 2026-05-17 / v5.0.0 MAJOR)
+
+★ ★ ★ ★ v5.0.0 MAJOR — DEC-2026-05-17-q1-alias-4중첩-폐기 본격 시행. §5 dual representation paradigm 의 **top-level container canonical 단일화** (breaking / semver 정합). 묶음 Q ④(v4.1.1 additive) 종결 후 사용자 "1" → 잔여 ①②⑦ risk 오름차순 첫 항목 ①.
+
+#### §5.10.1. ★ 사용자 결단 4건 + 사실 확정
+
+| # | 결단 | 채택 | 근거 |
+|---|---|---|---|
+| #1 cooling-off | 지금 시행 (사용자 명시 생략) | plan+research+STOP-1 실측 = 심의 충족 |
+| #2 deprecation | (A) hard 폐기 | 외부 consumer 부재 (dogfooding / skill·doc·template ref=0) / deprecation period = zero benefit |
+| #3 summary aliases | ① 동반 | 순수 alias / canonical 단일화 일관 |
+| #4 rules_auto_extracted_reference | ① scope 외 / 별도 carry | object/provenance pointer ≠ BR-list alias / semantic-rename ≠ alias 폐기 |
+
+★ version = **v5.0.0 MAJOR 사실 확정** (official-docs VERIFIED — anyOf branch 제거 = 기존 valid 문서 invalid / 필드 제거 valid→invalid = semver MAJOR 필수 / MINOR 호칭 = 방법론 integrity drift).
+
+#### §5.10.2. ★ ★ schema 변경 (breaking)
+
+- top-level `anyOf` (business_rules|rules|rules_manual_authored 3 분기) 폐기 → `required:["business_rules"]` 단일.
+- `rules`·`rules_manual_authored`·`rule_summary`·`rules_summary`·`br_summary` properties 제거 → `additionalProperties:false` 로 폐기 alias 보유 문서 **hard reject**.
+- `summary` (canonical) + `rules_auto_extracted_reference` (① scope 외 / Q-①-followup) 보존.
+
+#### §5.10.3. ★ scope-completion 투명 명시 (`br_summary`)
+
+사용자 #3 질의 = `rule_summary`/`rules_summary` 열거. 실측 — `br_summary`(poc-11)도 동일 alias class. 2/3만 폐기 = canonicalization 불완전 즉시 drift → 사용자 **의도**("summary aliases canonicalize") 정합 위해 포함 + DEC §2 투명 명시 (열거=예시·배타 아님 / silent 확장 ❌).
+
+#### §5.10.4. ★ ★ ★ STOP-1 해소 코드 착수 전 실측 (Senior blocking)
+
+release-readiness.js 가 전 PoC br-cross-consistency critical/high=0 의무. poc-04 현재 extractRules `[]` = vacuous pass. 가시화 시 critical/high emit → release-readiness 11/11 hard block 위험. ★ **코드 착수 전 dry-run 실측** = poc-04 3 BR(BR-FE-AUTH-REQUIRED-001/OWNERSHIP-001/FLOW-DELETE-REDIRECT-001) canonical 변환 br-cross-consistency = findings 3 전부 `low` / critical·high 0 / gate pass 0.85. → 가시화 = 회귀 아닌 **개선 실측 확정** (⑤ both=0 실측과 동형 paradigm / OpenAPI 3.1 latent-bug-fix precedent).
+
+#### §5.10.5. ★ ★ 회귀 (chain harness validated 본질 보존)
+
+PoC migration 4종 5 key rename (Edit per-file / bulk script = auto-mode classifier 차단 → per-file Edit 안전 mechanism) + extractRules canonical 단일 + test 5 fix(alias-accept → alias-REJECT 전환) + 6 신설(drift-validator canonical-single-alias guard 5 + FE-canonical 1). workspace 381→**387/387** + release-readiness **11/11** + breaking ✅(의도) / chain harness validated 본질 보존.
+
+---
+
 ## §6. 사상
 
 ### §6.1. ★ ★ ★ ★ ADR-008 (이중 렌더링 사상) 의 BR 영역 확장
@@ -634,6 +669,14 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-51** (★ "양심 의존 → schema enforcement 결정화 paradigm — 단 실측(both=0) 선행 + functional(모순 거부) test 동반 의무" / ★ ★ ★ v4.1.0 MINOR Phase 2 ⑤ 본격 자산화):
   - **Why**: ★ ★ ★ PoC #08 echo-chamber drift 실측 (LL-i-47 — Sprint 2 GWT 합성이 is_likely_bug 무시 → 보안버그 정상규칙 정규화 / Haiku blind 만 검출) 이 ⑤ 에서 `is_intent`⇔`intent_vs_bug_classification` schema if/then 으로 ★ 코드 enforcement 결정화. ★ ★ 단 결정화 paradigm 의 본질 = (1) ★ 코드 착수 전 실측 의무 (both=0 → if/then 전 PoC vacuous = 회귀 풀이 0 수학 보장 / Senior 조건 2) (2) ★ ★ functional test 동반 의무 (vacuous-everywhere ❌ 입증 = 모순 BR is_intent=true+classification="bug" 가 실제 INVALID / 단순 schema-shape 구조 test 만으로는 enforcement 가 실제 무는지 불명). ★ inline vs 분리 = 단일 정답 ❌ (research 3-에이전트 수렴 — SARIF·Semgrep·OPA·Spectral 분리 우세 / rule object 는 '서술적 속성'만 inline = Semgrep `metadata:`) → 정제된 공존 (heavy 실행 데이터 분리 + slim provenance-tagged inline) = ADR-008 이중 렌더링 사상의 cross-consistency 영역 확장.
   - **How to apply**: ★ ★ 양심 의존 enforcement (memory `feedback_no_simulation_realized` + `feedback_drift_enforcement_via_release_readiness`) 를 schema if/then 으로 결정화 시 ★ ★ ★ (1) 코드 착수 전 grep 실측 으로 vacuous 영역 정량 (Senior 조건 2 paradigm / 회귀 풀이 0 수학 보장 입증) (2) functional test (실 ajv / 모순 instance = INVALID + 단방향 instance = VALID) 동반 의무 — 구조 test (schema-shape) 만 = enforcement 실제 bite 불명. ★ machine-generated 결과를 rule/spec SSOT 에 기록 시 = provenance discriminator (`generated_by`/`layer`/`timestamp`) 의무 + heavy 실행 데이터는 분리 (산업 표준) / slim 서술 속성만 inline (Semgrep `metadata:` 패턴). ★ chain harness validated §8.1 strict 본질 보존 의무 (release-readiness 11/11 + workspace test 무회귀).
+
+- ★ ★ ★ ★ ★ ★ ★ **LL-i-52** (★ "alias 다중첩 폐기 — '순수 rename alias' vs '의미 구분 별개 키' 분리 식별 의무 + scope-completion 투명 명시 paradigm" / ★ ★ v5.0.0 묶음 Q ① 본격 자산화):
+  - **Why**: 묶음 Q ① "alias 4중첩 폐기" 일괄 진입 시 `rules_auto_extracted_reference` = object/provenance pointer (타 산출물 자동추출 BR 참조) ≠ BR-list alias → 일괄 폐기 시 정보 손실. Senior Q1 = ① scope 외 분리 (semantic-rename ≠ alias 폐기 / 별도 carry Q-①-followup). ★ ★ 별도: 사용자 결단 질의 = `rule_summary`/`rules_summary` 열거였으나 실측 `br_summary`(poc-11)도 동일 alias class → 2/3만 폐기 시 canonicalization 불완전 즉시 drift. 사용자 결단 **의도**("summary aliases canonicalize ① 동반") 정합 위해 포함하되 silent 확장 ❌ → DEC 투명 명시.
+  - **How to apply**: alias 폐기 cluster 진입 시 ★ ★ 각 키를 (a) 순수 rename alias (동일 의미 / 폐기 가능) (b) 의미 구분 별개 키 (provenance/cross-ref / 보존 + 별도 rename carry) 로 ★ 분리 식별 의무 (type·semantic grep 실측). 일괄 폐기 ❌ / 의미 보존 우선. ★ 사용자 결단 열거 = 예시 (배타 아님) — 동일 class 누락 키 발견 시 의도 정합 위해 포함하되 ★ DEC scope-completion 절 투명 명시 (silent 확장 = 신뢰 위반 / 명시 확장 = quality-correct).
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-53** (★ "breaking migration 이 latent consumer 결함 동시 수정 = 숨은 가치 / 단 '회귀 vs 개선' 판정 = 코드 착수 전 dry-run 실측 의무" / ★ ★ v5.0.0 묶음 Q ① 본격 자산화):
+  - **Why**: ① alias 폐기 migration (poc-04 `rules_manual_authored`→`business_rules`) 이 `br-cross-consistency-validator` extractRules() 의 latent 결함 (rules_manual_authored 미처리 → poc-04 3 BR `[]` 비가시 / vacuous pass) 을 동시 수정 = breaking change 의 숨은 가치 (OpenAPI 3.1 stricter validation 이 비가시 3 필드 노출 precedent 정합). ★ ★ 단 Senior STOP-1 (blocking) = release-readiness.js 가 전 PoC critical/high=0 의무 → 가시화 시 critical/high emit 면 11/11 hard block. "개선" 단정 ❌ → ★ 코드 착수 전 dry-run 실측 (poc-04 3 BR canonical br-cross-consistency = low only / critical·high 0 / gate pass) 으로 "회귀 아닌 개선" 확정.
+  - **How to apply**: breaking migration 이 latent consumer 결함을 노출/수정할 가능성 시 ★ ★ ★ "회귀 vs 개선" = 코드 착수 전 dry-run 실측 의무 (LL-i-51 both=0 실측 / LL-i-44 drift 실측 과 동형 paradigm — 양심 단정 ❌ / 실측 우선). release-readiness gate 영향 (critical/high finding 신규 emit) 사전 정량 의무. 실측 결과 안전 시 = 회귀 아닌 개선으로 자산화 (breaking change 의 숨은 가치 명시).
 
 ---
 

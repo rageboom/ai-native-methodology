@@ -229,10 +229,14 @@ test('Layer 1: critical finding → gate_status fail (★ deterministic 패널�
   assert.equal(r.summary.gate_status, 'fail');
 });
 
-test('Layer 1: top-level "rules" (v1.x 호환 모드)', () => {
-  const doc = { rules: [{ id: 'BR-LEGACY-COMPAT-001', name: '레거시', natural_language: 'v1.x 호환' }]};
-  const r = validateRulesDoc(doc);
-  assert.equal(r.stats.total, 1);
+test('★ v5.0.0 — top-level `rules` alias 폐기 → extractRules canonical 단일 (묶음 Q ①)', () => {
+  // ★ v5.0.0 (DEC-2026-05-17-q1-alias-4중첩-폐기) — extractRules = business_rules 단일.
+  // 폐기된 `rules` alias 문서 = BR 0 추출 (canonical 아니므로 비가시 / schema 단에서 reject).
+  const legacyDoc = { rules: [{ id: 'BR-LEGACY-COMPAT-001', name: '레거시', natural_language: 'v1.x 호환' }]};
+  assert.equal(validateRulesDoc(legacyDoc).stats.total, 0, '폐기 alias `rules` = 0 추출 (canonical 아님)');
+
+  const canonicalDoc = { business_rules: [{ id: 'BR-LEGACY-COMPAT-001', name: '레거시', natural_language: 'v1.x 호환' }]};
+  assert.equal(validateRulesDoc(canonicalDoc).stats.total, 1, 'business_rules canonical = 정상 추출');
 });
 
 test('★ v2.5.0 Phase C: Layer 2 strict + --llm-results 부재 → skipped', async () => {

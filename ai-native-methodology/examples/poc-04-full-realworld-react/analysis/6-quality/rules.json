@@ -12,7 +12,7 @@
     "raw_confidence": 0.92,
     "phase_b_migration_note": "★ Sprint 1-H schema cleanup — 기존 meta(poc_id=poc-04-full/stage=5/sprint=5-4/captured_at=2026-05-02/captured_by=real/tool=form-validation-spec.json ★ Sprint 5-2 자동 추출+manual) → meta-confidence 표준 정합 변환. provenance 보존 / 의미 변경 ❌."
   },
-  "rules_summary": {
+  "summary": {
     "total_br": 80,
     "auto_extracted": 77,
     "manual_authored": 3,
@@ -32,7 +32,7 @@
     "auto_registered_br": 77,
     "note": "★ form-validation-spec.json 의 90 validations / 77 BR auto-registered (★ Sprint 5-2)"
   },
-  "rules_manual_authored": [
+  "business_rules": [
     {
       "id": "BR-FE-AUTH-REQUIRED-001",
       "title": "인증 필요 라우트 접근 보호",

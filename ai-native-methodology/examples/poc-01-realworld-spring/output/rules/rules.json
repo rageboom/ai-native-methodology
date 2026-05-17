@@ -104,7 +104,7 @@
       "BR-COMMENT-AUTHOR-OR-ARTICLE-OWNER-DELETE-001: 의도(rule) ≠ 실제 동작(actual_behavior 메모) — F-027 신규 finding 으로 격리."
     ]
   },
-  "rules": [
+  "business_rules": [
     {
       "id": "BR-USER-EMAIL-001",
       "name": "사용자 이메일 unique (의도, 구현 부재)",

@@ -1,24 +1,11 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/rules.schema.json",
-  "title": "비즈니스 규칙 (Business Rules) — v2.4.0 dual representation paradigm",
-  "description": "★ ★ ★ ★ v2.4.0 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. top-level `business_rules` (★ 기존 `rules` alias 보존 / anyOf top-level). PoC #04 FE 트랙은 `paradigm: FE` discriminator + rules_auto_extracted_reference + rules_manual_authored alias 허용. 11 PoC 호환 회복 자격 (★ ADR-CHAIN-011 §5.2 / Plan M+ §2-1 정합).",
+  "title": "비즈니스 규칙 (Business Rules) — v5.0.0 canonical 단일 (alias 4중첩 폐기)",
+  "description": "★ ★ ★ ★ v5.0.0 MAJOR (묶음 Q ① / DEC-2026-05-17-q1-alias-4중첩-폐기) — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ `rules_auto_extracted_reference` = ① scope 외 보존 (BR-list alias 아님 / 타 산출물 자동추출 BR 참조 / 별도 carry Q-①-followup). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + rules_auto_extracted_reference.",
   "type": "object",
   "additionalProperties": false,
-  "anyOf": [
-    {
-      "title": "v2.4.0 표준 — business_rules array",
-      "required": ["business_rules"]
-    },
-    {
-      "title": "v1.x 호환 alias — rules array (★ 마이그레이션 deprecated)",
-      "required": ["rules"]
-    },
-    {
-      "title": "FE 트랙 호환 — rules_manual_authored array (★ PoC #04 / paradigm: FE 시)",
-      "required": ["rules_manual_authored"]
-    }
-  ],
+  "required": ["business_rules"],
   "properties": {
     "$schema_ref": { "type": "string" },
     "$schema_origin": { "type": "string" },
@@ -38,38 +25,16 @@
     },
     "business_rules": {
       "type": "array",
-      "description": "★ v2.4.0 표준 — BR 목록 (★ 기존 v1.x `rules` alias 보존).",
-      "items": { "$ref": "#/$defs/businessRule" }
-    },
-    "rules": {
-      "type": "array",
-      "description": "★ v1.x 호환 alias — `business_rules` 로 마이그레이션 의무 (★ deprecated / v2.4.0+).",
-      "items": { "$ref": "#/$defs/businessRule" }
-    },
-    "rules_manual_authored": {
-      "type": "array",
-      "description": "★ FE 트랙 호환 alias (PoC #04 / paradigm: FE) — `business_rules` 로 마이그레이션 권장.",
+      "description": "★ ★ v5.0.0 단일 canonical — BR 목록 (alias `rules`/`rules_manual_authored` 폐기 / 묶음 Q ①).",
       "items": { "$ref": "#/$defs/businessRule" }
     },
     "rules_auto_extracted_reference": {
       "type": ["array", "object"],
-      "description": "★ FE 트랙 호환 — form-validation-spec / state-map 등 다른 산출물에서 자동 추출된 BR 참조 (★ rules array 자체 보유 ❌ / cross-link만)."
+      "description": "★ FE 트랙 — form-validation-spec / state-map 등 다른 산출물에서 자동 추출된 BR 참조 (★ BR-list alias 아님 / cross-link만 / ① scope 외 — 향후 `auto_extracted_br_refs` rename 별도 carry Q-①-followup)."
     },
     "summary": {
       "type": ["string", "object"],
-      "description": "★ v2.4.0 — BR 분석 요약 (★ 기존 br_summary / rule_summary / rules_summary alias 통합)."
-    },
-    "br_summary": {
-      "type": ["string", "object"],
-      "description": "★ alias — `summary` 와 동일 (PoC #11)."
-    },
-    "rule_summary": {
-      "type": ["string", "object"],
-      "description": "★ alias — `summary` 와 동일 (PoC #02)."
-    },
-    "rules_summary": {
-      "type": ["string", "object"],
-      "description": "★ alias — `summary` 와 동일 (PoC #04)."
+      "description": "★ ★ v5.0.0 단일 canonical — BR 분석 요약 (alias `br_summary`/`rule_summary`/`rules_summary` 폐기 / 묶음 Q ①)."
     },
     "br_count": {
       "type": "integer",

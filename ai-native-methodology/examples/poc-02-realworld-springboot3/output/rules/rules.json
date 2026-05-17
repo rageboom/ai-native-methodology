@@ -313,7 +313,7 @@
       ]
     }
   ],
-  "rule_summary": {
+  "summary": {
     "total": 14,
     "by_category": {
       "validation": 5,

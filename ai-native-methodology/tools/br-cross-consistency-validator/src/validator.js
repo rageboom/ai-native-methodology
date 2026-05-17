@@ -12,12 +12,11 @@ const DETERMINISTIC_THRESHOLD = 0.85;     // ★ Layer 1 deterministic 영역 th
 const OVERALL_THRESHOLD = DETERMINISTIC_THRESHOLD; // ★ legacy alias / backward-compat
 
 function extractRules(rulesDoc) {
-  // ★ schema 6갈래 drift 정합 — 본 session = ★ top-level 호환 모드
-  //   v1.x: { rules: [...] }
-  //   v2.x candidate: { business_rules: [...] } (★ sub-plan §2 다음 session)
-  //   PoC #07~#11: { business_rules: [...] } 또는 { rules: [...] } variant
+  // ★ ★ v5.0.0 (묶음 Q ① / DEC-2026-05-17-q1-alias-4중첩-폐기) — canonical 단일.
+  //   alias `rules` / `rules_manual_authored` 폐기 (hard kill / schema additionalProperties:false reject).
+  //   ★ poc-04 잠재 결함 자동 수정 — 직전 rules_manual_authored 미처리(return [])였으나
+  //     migration 으로 business_rules 보유 → 가시화 (회귀 아닌 개선 / STOP-1 실측: 3 BR low only).
   if (Array.isArray(rulesDoc.business_rules)) return rulesDoc.business_rules;
-  if (Array.isArray(rulesDoc.rules)) return rulesDoc.rules;
   return [];
 }
 

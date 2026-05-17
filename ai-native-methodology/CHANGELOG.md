@@ -9,6 +9,41 @@
 
 ---
 
+## [5.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ① rules.json alias 4중첩 폐기 → canonical 단일 (breaking)
+
+> ★ ★ ★ ★ ★ **v5.0.0 MAJOR — breaking change (의도 / semver 정합)**. 사용자 "1"(묶음 Q 잔여) → ① risk 오름차순 첫. 4원칙 (plan + 3-에이전트 research + STOP-1 실측 + 사용자 결단 4건). DEC-2026-05-17-q1-alias-4중첩-폐기 / ADR-CHAIN-011 §5 patch v13 + §9 LL-i-52·53.
+
+### 결단 (사용자 4건 + 사실 확정 1)
+
+- **#1 cooling-off = 지금 시행 (사용자 명시 생략)** / **#2 (A) hard 폐기** (외부 consumer 부재 / dogfooding) / **#3 summary aliases ① 동반** / **#4 rules_auto_extracted_reference = ① scope 외** (별도 carry Q-①-followup)
+- ★ **version = v5.0.0 MAJOR 사실 확정** (official-docs VERIFIED: 필드 제거로 valid→invalid = semver MAJOR 필수 / anyOf branch 제거 = breaking)
+- scope-completion 투명 명시 — `br_summary`(poc-11) = 사용자 열거 외였으나 동일 alias class → 의도 정합 위해 포함 (silent 확장 ❌ / DEC §2)
+
+### breaking 변경
+
+- **`schemas/rules.schema.json`** — top-level `anyOf`(business_rules|rules|rules_manual_authored 3 분기) 폐기 → `required:["business_rules"]` 단일 / `rules`·`rules_manual_authored`·`rule_summary`·`rules_summary`·`br_summary` properties **제거** (additionalProperties:false → 폐기 alias 보유 문서 hard reject) / `summary`·`rules_auto_extracted_reference` 보존
+- **PoC migration 4종 5 key rename** (Edit per-file) — poc-01 `rules`→`business_rules` / poc-02 `rule_summary`→`summary` / poc-04 `rules_manual_authored`→`business_rules`+`rules_summary`→`summary` / poc-11 `br_summary`→`summary`
+- **`tools/br-cross-consistency-validator`** extractRules() canonical 단일 (`rules` fallback 제거 / ★ poc-04 잠재 결함 자동 수정 = 가시화)
+
+### test (5 fix + 6 신설)
+
+- `schema-validator/test/chain-schemas.test.js` — v2.3.7 2건 business_rules envelope 전환 / v2.4.0 alias-accept 2건 → ★ alias-**REJECT** 2건 + FE-canonical VALID 신규 1
+- `br-cross-consistency-validator/test/validator.test.js` — `rules` alias test → canonical-only 2 assert
+- `drift-validator/test/canonical-single-alias.test.js` 신설 5 (폐기 alias 재유입 guard) + drift-validator v0.4.2→v0.4.3
+
+### 회귀 검증
+
+- workspace test 381 → **387/387 pass** (5 fix + 6 신규 / 0 fail / 0 회귀)
+- release-readiness **11/11 release-ready** (analysis_validator_violation = 11 PoC 전수 schema valid post-migration)
+- ★ **STOP-1 해소 실측** — poc-04 3 BR canonical br-cross-consistency = findings 3 전부 `low` / critical·high 0 / gate pass → 가시화 = 회귀 아닌 **개선 실측 확정** (Senior blocking 해소 / OpenAPI 3.1 latent-bug-fix precedent 정합)
+- breaking ✅ (의도 / 폐기 alias 문서 hard reject) / chain harness validated 본질 보존
+
+### 묶음 Q 잔여 carry (★ breaking / cooling-off)
+
+- ② BR 표현 4→2 (poc-06 7 BR desc-only 합성 의무 + poc-03 TCA 제거) / ⑦ rules.json→business-rules.json rename (265 file) / Q-①-followup (rules_auto_extracted_reference → auto_extracted_br_refs) — 각각 별도 plan + Senior critique
+
+---
+
 ## [4.1.1] — 2026-05-17 ★ PATCH — 묶음 Q ④ severity cross-stage 정합 매핑 SSOT 신설 (additive)
 
 > ★ ★ **v4.1.1 PATCH — additive doc / breaking change ❌ / schema 기능 변경 ❌**. 사용자 "1"(묶음 Q) → risk 비균등 실측 → "④만 먼저 (additive)" 결단. ①②⑦ = breaking → 별도 session+ cooling-off carry. DEC-2026-05-17-severity-cross-stage-mapping.

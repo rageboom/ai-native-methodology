@@ -180,7 +180,7 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
-      rules: [
+      business_rules: [
         {
           id: 'BR-USER-DATA-001',
           name: '사용자 데이터 규칙',
@@ -206,7 +206,7 @@ test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
     const inst = {
       $schema_origin: '../schemas/rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
-      rules: [
+      business_rules: [
         {
           id: 'BR-ARTICLE-AUTHOR-EDIT-ONLY-001',
           name: '작성자 수정 전용',
@@ -288,7 +288,7 @@ test('★ ★ ★ v2.4.0 — rules.schema.json 두 표현 모두 부재 → inva
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json v1.x rules array backward-compat (alias)', () => {
+test('★ ★ ★ v5.0.0 — rules.schema.json v1.x `rules` alias 폐기 → REJECTED (묶음 Q ① hard kill)', () => {
   const dir = tmp();
   try {
     const inst = {
@@ -307,11 +307,16 @@ test('★ ★ ★ v2.4.0 — rules.schema.json v1.x rules array backward-compat 
     writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
     const r = runCli(join(dir, 'rules.json'));
     const result = r.parsed.results[0];
-    assert.equal(result.valid, true, `v1.x rules array alias should pass: ${JSON.stringify(result)}`);
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(
+      result.valid,
+      false,
+      `v5.0.0 — \`rules\` alias 폐기 / business_rules 단일 canonical / additionalProperties:false reject: ${JSON.stringify(result)}`,
+    );
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json paradigm: FE + rules_manual_authored alias (PoC #04 호환)', () => {
+test('★ ★ ★ v5.0.0 — paradigm: FE + `rules_manual_authored` alias 폐기 → REJECTED (묶음 Q ① hard kill)', () => {
   const dir = tmp();
   try {
     const inst = {
@@ -330,7 +335,36 @@ test('★ ★ ★ v2.4.0 — rules.schema.json paradigm: FE + rules_manual_autho
     writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
     const r = runCli(join(dir, 'rules.json'));
     const result = r.parsed.results[0];
-    assert.equal(result.valid, true, `paradigm: FE + rules_manual_authored should pass: ${JSON.stringify(result)}`);
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(
+      result.valid,
+      false,
+      `v5.0.0 — FE 트랙도 business_rules 단일 canonical / rules_manual_authored 폐기 reject: ${JSON.stringify(result)}`,
+    );
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v5.0.0 — paradigm: FE + business_rules canonical → VALID (FE 트랙 정합 보존)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      paradigm: 'FE',
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-FE-VALIDATION-001',
+          title: '이메일 형식 검증',
+          natural_language: 'FE 안 zod schema 로 이메일 형식 강제',
+          category: 'fe_validation',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(result.valid, true, `FE 트랙 business_rules canonical should pass: ${JSON.stringify(result)}`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

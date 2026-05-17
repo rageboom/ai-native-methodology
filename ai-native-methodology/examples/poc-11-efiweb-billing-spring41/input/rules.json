@@ -83,7 +83,7 @@
       "domain_carry": "★ Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)"
     }
   ],
-  "br_summary": {
+  "summary": {
     "total": 8,
     "by_intent": {"intent": 6, "likely_bug": 2, "ambiguous": 0},
     "by_evidence": {"high": 8, "medium": 0, "low": 0},
