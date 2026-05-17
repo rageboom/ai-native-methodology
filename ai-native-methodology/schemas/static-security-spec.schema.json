@@ -87,7 +87,7 @@
           "fix_suggestion": {"type": "string"},
           "page_id": {"type": "string"},
           "component_id": {"type": "string"},
-          "★ runtime_check_required": {
+          "runtime_check_required": {
             "type": "boolean",
             "description": "★ 정적 분석만으로 미흡 — runtime check 의무 표기. true 시 사용자 confirm 의무."
           }
@@ -133,7 +133,7 @@
         "runtime_check_required_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ runtime_check_required=true 인 finding 개수. > 0 시 사용자 confirm 의무 표기 의무."
+          "description": "runtime_check_required=true 인 finding 개수. > 0 시 사용자 confirm 의무 표기 의무."
         }
       },
       "allOf": [

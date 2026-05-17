@@ -141,7 +141,7 @@ cd tools/spectral-runner && npx spectral lint <openapi.yaml>
 node tools/static-runner/src/cli.js --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
 
 # ★ v2.4+ BR cross-consistency 검증
-node tools/br-cross-consistency-validator/src/cli.js <output>/rules.json
+node tools/br-cross-consistency-validator/src/cli.js <output>/business-rules.json
 # (Layer 1 결정적 + Layer 2 LLM strict mode 옵션)
 
 # ★ v2.3.6+ findings aggregator (전체 finding 단일 stream)

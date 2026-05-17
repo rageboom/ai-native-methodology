@@ -18,7 +18,7 @@
       "id": "use-cases-decompose",
       "name": "use_cases 분해",
       "depends_on": ["input-validate"],
-      "inputs": ["domain.json", "rules.json", "api-extension.json", "state-machines/*.json"],
+      "inputs": ["domain.json", "business-rules.json", "api-extension.json", "state-machines/*.json"],
       "outputs": ["use_cases[]"],
       "skills": ["planning-decompose-use-cases"]
     },
@@ -26,7 +26,7 @@
       "id": "br-intent-extract",
       "name": "business_rules_intent 추출",
       "depends_on": ["input-validate"],
-      "inputs": ["rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
+      "inputs": ["business-rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
       "outputs": ["business_rules_intent[]"],
       "skills": ["planning-identify-business-intent"]
     },

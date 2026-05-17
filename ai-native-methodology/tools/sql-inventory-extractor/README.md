@@ -2,7 +2,7 @@
 
 ## Purpose
 
-★ ★ v2.2.0-rc1 phase 4.8 (sql-inventory) 의 산출물 (`sql-inventory.json` 11 컬럼 + extraction_automation) 정합 검증. ★ statement_type enum (PREPARED/CALLABLE/STATEMENT) + carry_flags enum 8종 + confidence ∈ [0.0, 1.0] + external_call_out_of_scope 또는 DBA-read carry 시 confidence ≤ 0.80 if/then + intent_vs_bug_classification 4 분류 키워드 ≥ 1 의무 + extraction_automation.auto_ratio_external_6 ≥ threshold (default 0.50).
+★ ★ v2.2.0-rc1 phase 4.8 (sql-inventory) 의 산출물 (`sql-inventory.json` 12 컬럼 + extraction_automation / ★ v2.3.0 migration_priority P0~P3 ADR-CHAIN-009) 정합 검증. ★ statement_type enum (PREPARED/CALLABLE/STATEMENT) + carry_flags enum 8종 + confidence ∈ [0.0, 1.0] + external_call_out_of_scope 또는 DBA-read carry 시 confidence ≤ 0.80 if/then + intent_vs_bug_classification 4 분류 키워드 ≥ 1 의무 + extraction_automation.auto_ratio_external_6 ≥ threshold (default 0.50).
 
 ## When to call
 
@@ -20,7 +20,7 @@ node src/cli.js \
 ```
 
 검증 대상:
-- `<target>/sql-inventory.json` (★ entry / 11 컬럼 record + extraction_automation)
+- `<target>/sql-inventory.json` (★ entry / 12 컬럼 record + extraction_automation / ★ v2.3.0 migration_priority P0~P3 = 12번째 컬럼 / ADR-CHAIN-009)
 
 ## Outputs
 

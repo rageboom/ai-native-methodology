@@ -197,7 +197,7 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 **원인**: Layer 2 LLM 평가 결과 BR 의 NL ↔ GWT 의미 격차 검출 (semantic_score < 0.7).
 
 **해결 옵션** (★ 사용자 결단):
-- **(1) DRIFT 격상** — rules.json 변경 ❌ / 후속 검토 carry (★ chain 1 gate 통과 자격 유지 / Senior REVISE 정합)
+- **(1) DRIFT 격상** — business-rules.json 변경 ❌ / 후속 검토 carry (★ chain 1 gate 통과 자격 유지 / Senior REVISE 정합)
 - **(2) NL 또는 GWT 수정 후 재실행** — `analysis-br-cross-consistency-check` 재호출
 
 ### Q17. `confidence_cap_exceeded` finding (low / Layer 2)

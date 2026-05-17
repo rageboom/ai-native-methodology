@@ -125,7 +125,7 @@
               },
               "type": {
                 "$ref": "./intent-classification.schema.json",
-                "description": "★ ★ ★ v4.0.1 — schemas/intent-classification.schema.json SSOT $ref (rules.schema.json businessRule.intent_vs_bug_classification 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상). 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (★ ★ housekeeping H-2 — 코드 주석 안 SATD-style 자기 인정 부채 / Maldonado & Shihab 2015 SATD 개념 차용 / 'self_recognized' 분류명 자체는 본 방법론 고유 합성 / 논문 안 SATD 5 분류 = design/defect/documentation/test/requirement 와 ★ 별개 / session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
+                "description": "★ ★ ★ v4.0.1 — schemas/intent-classification.schema.json SSOT $ref (business-rules.schema.json businessRule.intent_vs_bug_classification 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상). 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (★ ★ housekeeping H-2 — 코드 주석 안 SATD-style 자기 인정 부채 / Maldonado & Shihab 2015 SATD 개념 차용 / 'self_recognized' 분류명 자체는 본 방법론 고유 합성 / 논문 안 SATD 5 분류 = design/defect/documentation/test/requirement 와 ★ 별개 / session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
               },
               "reason": {
                 "type": "string",

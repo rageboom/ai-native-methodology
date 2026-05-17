@@ -16,6 +16,10 @@ Phase 4.5 decision-tables 산출물의 **dmn-check 5종** (red6/dmn-check Apache
 npx decision-table-validator <decision-tables-dir>
 npx decision-table-validator path/to/BR-X.md
 npx decision-table-validator <dir> --json   # 기계 판독
+
+# ADR-010 baseline+ratchet (cli.js 구현)
+npx decision-table-validator <dir> --write-baseline path/to/baseline.json   # baseline 기록
+npx decision-table-validator <dir> --baseline path/to/baseline.json --ratchet # 신규 위반 차단
 ```
 
 ## Outputs

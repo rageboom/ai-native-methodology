@@ -331,3 +331,117 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Evidence:** `agents/design-agent.md` frontmatter skills:[] + body 자기명시
 - **Action:** wontfix (의도된 설계 / 사용자 결정 / 규칙 무위반)
 - **Status:** wontfix
+
+---
+
+## Body Finding Ledger — F-MB namespace (methodology-body: deliverables/schemas/tools)
+
+> 출처: 확장 감사 2026-05-17 (사용자 "1,2,3 다하자 순서대로" — Area E deliverables 25 + Area F schemas 39 + Area G tools 18 = 82 단위). F-PA(plugin-authoring 4영역)와 별개 namespace.
+> overall: GREEN 74 / RED 8(전부 G = README↔code 문서 drift / 기능결함·no-simulation 위반 ❌). post-dedupe 고유 8건 / **F-021 band 5~15 "건강한 검증"**. Area E·F 구조 거의 완벽 — 실 가치 = ① F-PA-002 미완(deliverables/schemas) ② tools README↔cli.js drift.
+> ★ ★ **수정 cycle 종결 (2026-05-17 / 사용자 "전체 corrective sweep + 릴리즈")** — 아래 Status = 본 cycle 처분. STOP-3 hard gate: 잔여 grep 0(rules.json safe-tier·★-key·3-seg pattern CLEAN) + skill-citation 0 + release-readiness **13/13 ready:true** (★ analysis_validator_violation = schema-validator 전 11 PoC pass = F-MB-002 패턴 tighten·F-MB-003 ★-key rename 의 PoC 회귀 0 결정적 입증 / workspace 395+ / drift-validator 3-way flows json+mermaid 정합).
+>
+> | F-MB | 처분 | 비고 |
+> |---|---|---|
+> | 001 | **resolved (부분 / 활성 DOC 표면)** | flows(json+mermaid)+guides+methodology-spec docs+deliverables 6+schemas 2 안전 3-step sweep / ★ 5-business-rules.md "(구 rules.json)" 의도적 annotation 제외 / cross_links `to_artifact: rules` = logical 자산명(불변·drift 아님 / ground-truth 적발 = FP) → **무변경** / tool src·test·scripts·PHASE-history = F-MB-009 분리 defer |
+> | 002 | **resolved** | form-validation-spec:130 + formal-spec:117,198 BR-id 3-seg→canonical 4-seg. PoC 0 consumer 검증 + schema-validator 11 PoC 0-regression 입증 |
+> | 003 | **resolved** | legacy-spectrum:192·static-security-spec:90 property 키 `★ ` 제거(+136 desc) / 0 PoC consumer / additionalProperties:false 영향 0 입증 |
+> | 004 | **resolved** | chain-driver README exit 표 → cli.js 권위(0=ok/1=blocked-by-gate/2=invariant-violation/3=usage/4=state-corrupt) |
+> | 005 | **resolved** | chain-coverage(dry-run=0)·schema-validator(violation=1/usage=2)·test-impl-pass(fail=1/usage=2) README exit 표 → cli.js header 권위 |
+> | 006 | **resolved** | decision-table(+baseline/ratchet)·drift-validator(+--check-layout)·sql-inventory(11→12컬럼+migration_priority) README 보강 |
+> | 007 | **resolved** | spec-test-link README finding-kind → validator.js emit(underscore)+chain.tc.no_ac_ref 정합 |
+> | 008 | **resolved** | test-impl-pass README adapter 경로 src/adapters→src/runners |
+> | **009** | **deferred** (★ 신규 / LL-i-55 함정존) | tool src·test·scripts·PHASE/SPIKE-history 의 `rules.json` literal = test fixture / migration script / 역사 측정기록 가능성 → blanket sweep 시 release gate 자해. forensic 파일별 disposition = 별건 (revisit) |
+>
+> ★ ground-truth-before-edit 가 재작업 1건 추가 차단: cross_links `to_artifact: rules` = lifecycle-contract SSOT logical 자산명(불변) → blanket 변경 시 6 deliverable logical id 파괴 (3번째 위생 적발 / LL-plugin-04 재확인).
+>
+> 처분(수정)은 별도 결단 (4원칙 §3) — 잔여 F-MB-009 = open/deferred.
+
+### F-MB-001: `rules.json`→`business-rules.json`(v7.0.0) 미전파 — deliverables+schemas 확장
+
+- **Phase:** cross-validation
+- **Confidence:** verified (결정적 grep + sub-agent 실파일)
+- **Type:** migration-risk
+- **Description:** F-PA-002 corrective 가 skills+5 workflow doc 만 sweep → deliverables 11 파일 + schemas 2 파일에 동일 drift 잔존. cross_links `to_artifact: rules` 별칭 변종 포함. (★ 제외: 5-business-rules.md:23 = 의도적 rename 문서화 = drift 아님)
+- **Evidence:** deliverables/ — 4-5-formal-spec(176)·14-form-validation-spec(11,23,32,60,71,85,87,90,98,112,125)·15-type-spec(104)·16-error-mapping-spec(96)·17-planning-spec(33,37,58)·18-behavior-spec(76)·23-characterization-spec(12,45,50,180)·24-sql-inventory(12,71) / schemas/ — characterization-spec.schema.json:128·intent-classification.schema.json:5
+- **Action:** F-PA-002 동형 안전 3-step sweep 확장 (deliverables 11 + schema 2 / `to_artifact: rules`→`business-rules` 별칭 포함)
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-002: cross-schema BR-id 패턴 SSOT drift (3-seg vs canonical 4-seg)
+
+- **Phase:** cross-validation
+- **Confidence:** verified (sub-agent schema 직접 대조)
+- **Type:** gap
+- **Description:** form-validation-spec.cross_link_to_br + formal-spec.decision_tables.br_id·invariants.related_brs = 3-seg `^BR-[A-Z0-9_-]+-[0-9]+$` vs business-rules canonical 4-seg `^BR-...-...-[0-9]+$`. hard-reject 없음(4-seg id 가 looser 패턴에도 매칭) / 패턴 SSOT 불일치만.
+- **Evidence:** schemas/form-validation-spec.schema.json:130 / schemas/formal-spec.schema.json:117,198 vs schemas/business-rules.schema.json:159
+- **Action:** 3-seg 패턴을 canonical 4-seg 로 정합 (또는 공유 $defs SSOT 화) — low / 회귀 위험 검토 동반
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-003: JSON property 키에 `★` glyph 내장 (authoring smell)
+
+- **Phase:** cross-validation
+- **Confidence:** verified
+- **Type:** gap
+- **Description:** `legacy-spectrum.schema.json:192`(`★ tier_4_be_fe_split_carry`) + `static-security-spec.schema.json:90`(`★ runtime_check_required`) — 구조 valid JSON 이나 instance author 가 비-ASCII 장식 키를 그대로 emit 해야 함. plugin-authoring-spec schema 저작규칙 gap.
+- **Evidence:** schemas/legacy-spectrum.schema.json:192 / schemas/static-security-spec.schema.json:90
+- **Action:** 키에서 `★ ` 제거(ASCII 키 + description 에 강조) — 단 instance 계약 변경 = P2′ 검토(소비자 0 확인 시 PATCH)
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-004: chain-driver README exit-code 표가 cli.js 권위와 모순 (consumer-facing)
+
+- **Phase:** cross-validation
+- **Confidence:** verified (main agent ground-truth: cli.js header L16-21 + usage L62)
+- **Type:** anti-pattern
+- **Description:** chain-driver README exit 표 = `3=state migration / 4=interrupted` + 1↔2 의미. cli.js 권위 = `0=ok / 1=blocked-by-gate / 2=invariant-violation / 3=usage-error / 4=state-corrupt`. CI/consumer 가 README 기준 gate 시 exit 2(invariant-violation)를 blocked 로 오인 = 실 오작동 위험.
+- **Evidence:** tools/chain-driver/README.md:41-42 vs tools/chain-driver/src/cli.js:16-21,62
+- **Action:** README exit 표를 cli.js 권위로 동기화 (+ query/sync command 표 추가)
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-005: README exit-code 표 drift (systemic — 3 tools)
+
+- **Phase:** cross-validation
+- **Confidence:** verified (sub-agent cli.js 대조)
+- **Type:** gap
+- **Description:** chain-coverage-validator(README phantom code 3 / 실제 dry-run=exit 0) + schema-validator(README 1↔2 반전 / 실제 violation=1·usage=2) + test-impl-pass-validator(README fail=2 / 실제 fail=1·usage=2). 각 cli.js header `$comment` 는 정확 = README 표만 stale.
+- **Evidence:** tools/chain-coverage-validator/README.md:41 / tools/schema-validator/README.md:34-39 vs cli.js:184,7 / tools/test-impl-pass-validator/README.md:38 vs cli.js:19,322
+- **Action:** 3 README exit 표를 각 cli.js header 권위로 동기화
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-006: README 가 구현 표면 미문서화 (systemic — 3 tools)
+
+- **Phase:** cross-validation
+- **Confidence:** verified
+- **Type:** gap
+- **Description:** decision-table-validator(--baseline/--ratchet/--write-baseline ADR-010 옵션 README 부재 + Carry 가 future 로 stale-implies) + drift-validator(--check-layout v1.4.4 3-way mode README 부재) + sql-inventory-extractor(README "11 컬럼" / 실제 12 = migration_priority ADR-CHAIN-009).
+- **Evidence:** tools/decision-table-validator/README.md(§Inputs/§Exit/§Carry) vs cli.js:72,77-79,109-129 / tools/drift-validator/README.md vs cli.js:141,205 / tools/sql-inventory-extractor/README.md:4 vs cli.js:19·package.json:4
+- **Action:** 3 README 에 구현된 옵션/컬럼 보강
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-007: spec-test-link-validator README finding-`kind` 명이 emit 값과 전면 불일치
+
+- **Phase:** cross-validation
+- **Confidence:** verified
+- **Type:** anti-pattern
+- **Description:** README Outputs kind 가 hyphen 표기(coverage.ac-to-tc.below-threshold 등) / validator.js emit 은 underscore(chain.ac_coverage.below_threshold 등) + 미문서 `chain.tc.no_ac_ref`. consumer 가 kind 로 키하면 finding silently miss.
+- **Evidence:** tools/spec-test-link-validator/README.md:28 vs src/validator.js:37 외
+- **Action:** README Outputs(+deliverables/20-test-spec.md) kind 명을 validator.js 상수와 일치
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-008: test-impl-pass-validator README 가 dead path `src/adapters/*` 인용
+
+- **Phase:** cross-validation
+- **Confidence:** verified
+- **Type:** gap
+- **Description:** README adapter 표가 `src/adapters/jest.js` 등 인용하나 실제 `src/runners/*` (cli.js:26-30).
+- **Evidence:** tools/test-impl-pass-validator/README.md:54 vs src/runners/
+- **Action:** README adapter 경로 표를 src/runners/ 로 정정
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
+
+### F-MB-009: tool src·test·scripts·PHASE-history 의 `rules.json` literal (★ LL-i-55 함정존 / deferred)
+
+- **Phase:** cross-validation
+- **Confidence:** verified (결정적 grep / 분류 보류)
+- **Type:** migration-risk
+- **Description:** F-MB-001 활성 DOC sweep 범위 밖 — `tools/**/test/*.test.js` (chain-driver/sync, drift-validator/canonical-single-alias·cross-*, planning-extraction-validator, formal-spec-link, static-runner, chain-coverage), `tools/**/src/*.js` (planning-extraction-validator/validator.js, br-cross-consistency/cli.js), `tools/**/scripts/*.mjs` (migration scripts), `tools/br-cross-consistency-validator/PHASE-*·SPIKE-*·layer-2-results/*` (dated 측정 history) 에 `rules.json` literal 잔존. ★ test fixture / migration script (구 format 대상) / 역사 측정기록 = 의도적일 가능성 — blanket sweep 시 workspace 395+ release gate 자해 (v7.0.0 LL-i-55·57 = post-mv hard gate 가 잡은 hidden test literal class 정확 재현). PHASE/SPIKE/layer-2-results = history immutable (LL-i-52).
+- **Evidence:** `grep -rnE 'rules(\.subset)?\.(json|schema\.json)' tools/` minus business-rules (다수 / 위 분류)
+- **Action:** **deferred** — 파일별 forensic disposition (각 literal = stale doc vs intentional fixture vs live code path 판정) 별건 audit. blanket ❌ (품질 1순위·재작업 최소화 / LL-i-55 정합). history 부분 = wontfix(immutable).
+- **Status:** deferred (revisit — 별건 forensic audit / 본 cycle scope 외 명시)

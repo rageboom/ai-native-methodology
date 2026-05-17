@@ -50,7 +50,7 @@
 | openapi.yaml operationId → ui-spec.api_calls.operationId | API 계약 매핑 |
 | openapi.yaml operationId → state-map.cross_links (link_type=triggers) | state machine triggers API |
 | domain.json UC → ui-spec.scenarios.related_use_cases | 시스템 행동 ↔ 사용자 경험 매핑 |
-| rules.json BR → state-map.cross_links (link_type=validates) | FE validation BR ↔ FE state |
+| business-rules.json BR → state-map.cross_links (link_type=validates) | FE validation BR ↔ FE state |
 
 → 두 팀 운영 시 cross-link 깨짐 자동 검출 = `formal-spec-link-validator --mode=both`.
 
@@ -112,7 +112,7 @@ JSP_통합_산출_절차:
 
   business-logic phase:
     - BE Spring controller + JSP form action + JSP scriptlet (★ ❌ 권장) 모두 추출
-    - rules.json category=fe_validation ↔ Spring @Valid cross-link
+    - business-rules.json category=fe_validation ↔ Spring @Valid cross-link
 
   api phase:
     - BE @RequestMapping + JSP form action URL 통합

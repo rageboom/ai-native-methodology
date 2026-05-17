@@ -73,7 +73,7 @@ behaviors:
       - "src/user/UserService.java:30-60"
 cross_links:
   to_analysis_artifacts:
-    - .aimd/output/rules.json
+    - .aimd/output/business-rules.json
     - .aimd/output/domain.json
     - .aimd/output/openapi.yaml
     - .aimd/output/schema.json

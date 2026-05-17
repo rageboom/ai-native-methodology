@@ -189,7 +189,7 @@
             "antipatterns": {"type": "boolean"}
           }
         },
-        "★ tier_4_be_fe_split_carry": {
+        "tier_4_be_fe_split_carry": {
           "type": "boolean",
           "description": "★ DEPRECATED (Stage 6 종결). primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무 — Stage 6 종결로 carry-over resolved. 신규 산출물은 tier_4_be_fe_handling 사용 권장."
         },

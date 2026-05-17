@@ -234,7 +234,7 @@ input (implement stage 가 받음):
 │       ├── architecture.json
 │       ├── architecture.mermaid
 │       ├── domain.json
-│       ├── rules.json
+│       ├── business-rules.json
 │       ├── openapi.yaml             # BE
 │       ├── schema.json              # DB
 │       ├── erd.mermaid              # DB
@@ -259,7 +259,7 @@ input (implement stage 가 받음):
 ├── <scope>/                         # ★ G3 — feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case)
 │   ├── manifest.{json,md}           #   scope 전체 status / analysis_refs / sync_state
 │   ├── analysis/                    #   (선택) scope local subset — 큰 프로젝트 context 부담 ↓
-│   │   └── rules.subset.json
+│   │   └── business-rules.subset.json
 │   ├── planning/                    #   chain 1
 │   │   ├── planning-spec.{json,md}
 │   │   └── manifest.{json,md}

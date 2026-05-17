@@ -127,7 +127,7 @@
           "source_snippet": { "type": "string" },
           "cross_link_to_br": {
             "type": "string",
-            "pattern": "^BR-[A-Z0-9_-]+-\\d+$",
+            "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$",
             "description": "★ business-rules.json fe_validation BR auto-extracted ID. (business-rules.json 자동 등록 후 cross-link)"
           },
           "framework_coupled": {

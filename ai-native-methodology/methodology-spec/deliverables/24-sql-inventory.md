@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-**답하는 질문**: "rules.json + antipatterns.json + characterization-spec.json 만으로는 SQL 단위 추적 ❌. 새 시스템 재구현 시 ★ 어떤 sql_id 가 어느 UC + intent 분류에 속하고, 어느 DB function/SP 가 외부 의존인지 ★ ★ 명시 의무."
+**답하는 질문**: "business-rules.json + antipatterns.json + characterization-spec.json 만으로는 SQL 단위 추적 ❌. 새 시스템 재구현 시 ★ 어떤 sql_id 가 어느 UC + intent 분류에 속하고, 어느 DB function/SP 가 외부 의존인지 ★ ★ 명시 의무."
 
 **AI 재구현 시 활용**:
 - chain 1 planning-spec 입력 보강 (UC ↔ sql_id ↔ intent_classification cross-link)
@@ -68,7 +68,7 @@ output/sql-inventory/
 | carry_flags | DBA-read / external_call_out_of_scope / domain-expert-review enum | 매뉴얼 | 90% |
 | **migration_priority** (★ v2.3.0-rc1) | P0/P1/P2/P3 (AP severity + carry_flags + paradigm risk → 분류) | LLM + 매뉴얼 | 70~85% (★ classification 매뉴얼 / ADR-CHAIN-009) |
 
-**입력**: rules.json (phase 4) + antipatterns.json (phase 6) + characterization-spec.json (phase 4.7) + 코드 (mapper XML + DAO + Controller + JSP)
+**입력**: business-rules.json (phase 4) + antipatterns.json (phase 6) + characterization-spec.json (phase 4.7) + 코드 (mapper XML + DAO + Controller + JSP)
 **no-simulation 정책**: simulation 시 -5%p 패널티 / 도메인 expert 인터뷰 carry 필수.
 
 ### 3.1 미추출 (의도적)

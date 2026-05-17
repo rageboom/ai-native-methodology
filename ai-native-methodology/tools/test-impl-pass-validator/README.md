@@ -33,10 +33,11 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 
 | code | 의미 |
 |---|---|
-| 0 | 100% test pass / GREEN |
-| 1 | 일반 error |
-| **2** | ★ test fail or impl 부재 (gate blocked) |
-| 3 | dry-run only (수동 검증) |
+> ★ 권위 = `src/cli.js:16-19` header.
+
+| 0 | 100% pass + 5종 물증 7 필드 정합 / `--dry-run` |
+| **1** | ★ 1+ fail / evidence 누락 / timeout (gate blocked) |
+| 2 | usage error / config parse error / `--allow-execute` 부재 + `--dry-run` 부재 |
 
 ## ★ ★ ★ `--allow-execute` 의무
 
@@ -50,11 +51,11 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 
 | framework | adapter | 출력 parsing |
 |---|---|---|
-| jest | `src/adapters/jest.js` | --json + jest-result.json |
-| vitest | `src/adapters/vitest.js` | --json + vitest-result.json |
-| junit5 (xml) | `src/adapters/junit-xml.js` | xunit-style XML |
-| pytest | `src/adapters/pytest.js` | --junit-xml |
-| other | `src/adapters/other.js` | `stdout_parser` 의무 (test-cmd.schema if/then strict) |
+| jest | `src/runners/jest.js` | --json + jest-result.json |
+| vitest | `src/runners/vitest.js` | --json + vitest-result.json |
+| junit5 (xml) | `src/runners/junit-xml.js` | xunit-style XML |
+| pytest | `src/runners/pytest.js` | --junit-xml |
+| other | `src/runners/other.js` | `stdout_parser` 의무 (test-cmd.schema if/then strict) |
 
 ★ mocha / cargo / dotnet / phpunit / go-test = v2.1+ carry.
 

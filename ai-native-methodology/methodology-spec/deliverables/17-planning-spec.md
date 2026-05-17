@@ -30,11 +30,11 @@
 |---|---|---|---|
 | business_intent | analysis 산출물 + LLM 추론 | LLM with grounding | 70% (base) → 85% (gate #1) |
 | use_cases | domain.json UC-* + 정합 | 결정적 | 90% |
-| business_rules_intent | rules.json BR-* + reasoning | ★ source-grounded LLM | 75% (★ no-simulation 강화) |
+| business_rules_intent | business-rules.json BR-* + reasoning | ★ source-grounded LLM | 75% (★ no-simulation 강화) |
 | out_of_scope / risks | analysis finding + AP | LLM 분석 | 70% |
 | cross_links | 결정적 grep | 결정적 | 95% |
 
-**입력**: analysis stage 7대 + 8 FE 산출물 (rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md + `formal-spec` phase 산출물 + 8 FE).
+**입력**: analysis stage 7대 + 8 FE 산출물 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md + `formal-spec` phase 산출물 + 8 FE).
 
 ## 4. 검증 도구
 
@@ -55,7 +55,7 @@ meta:
 derivation_source:
   type: legacy-extraction
   source_artifacts:
-    - .aimd/output/rules.json
+    - .aimd/output/business-rules.json
     - .aimd/output/domain.json
 business_intent:
   domain_purpose: "RealWorld blogging platform — article CRUD + social follow"

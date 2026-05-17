@@ -9,7 +9,7 @@
 
 ## 1. 목적
 
-**답하는 질문**: "rules.json + antipatterns.json 만으로 새 시스템 동작이 결정되는가? — ★ ❌. 어떤 BR 을 보존하고 어떤 AP 를 버릴지 ★ ★ 명시 의무."
+**답하는 질문**: "business-rules.json + antipatterns.json 만으로 새 시스템 동작이 결정되는가? — ★ ❌. 어떤 BR 을 보존하고 어떤 AP 를 버릴지 ★ ★ 명시 의무."
 
 **AI 재구현 시 활용**:
 - chain 1 planning-spec 입력 보강 (use_cases 추출 시 acceptance oracle 직접 적용)
@@ -42,12 +42,12 @@ output/characterization/
 
 | 항목 | 출처 | 도구 | 신뢰도 (단계 5) |
 |---|---|---|---|
-| intent_vs_bug 분류 | rules.json + antipatterns.json + 코드 자조 코멘트 grep | LLM + grep | 80~90% (도메인 expert 결단 후) |
+| intent_vs_bug 분류 | business-rules.json + antipatterns.json + 코드 자조 코멘트 grep | LLM + grep | 80~90% (도메인 expert 결단 후) |
 | snapshot Given/When/Then | 코드 + 실 환경 (DB 접속 가능 시) | LLM + 실행 (선택) | 70~95% |
 | acceptance_oracle (intent_classification) | snapshot.scenarios[].intent_classification | 분류표 reference | 80~95% |
 | coverage matrix | UC ↔ snapshot 매핑 + 코드 grep | grep + 매뉴얼 | 90~95% |
 
-**입력**: rules.json + antipatterns.json (phase 4 출력) + formal-spec (phase 4.5 출력 / 선택) + 코드
+**입력**: business-rules.json + antipatterns.json (phase 4 출력) + formal-spec (phase 4.5 출력 / 선택) + 코드
 **no-simulation 정책**: simulation 시 -5%p 패널티 / 도메인 expert 인터뷰 carry 필수.
 
 ### 3.1 미추출 (의도적)
@@ -177,7 +177,7 @@ cross_links:
 | 단계 | 조건 | 신뢰도 |
 |---|---|---|
 | 1 | LLM 분류 만 | 50~65% |
-| 3 | + rules.json + antipatterns.json grounding | 70~85% |
+| 3 | + business-rules.json + antipatterns.json grounding | 70~85% |
 | 5 | + 도메인 expert 결단 (ambiguous = 0 또는 carry 명시) + 실 환경 검증 | 85~95% |
 
 ### 8.1 ambiguous 정책 (★ 핵심)

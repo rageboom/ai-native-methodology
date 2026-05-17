@@ -9,6 +9,25 @@
 
 ---
 
+## [8.2.3] — 2026-05-17 ★ PATCH — 확장 감사(methodology-body deliverables/schemas/tools) + F-MB-001~009 corrective sweep (breaking 0)
+
+> ★ **v8.2.3 PATCH — corrective / non-breaking**. 사용자 "1,2,3 다하자 순서대로" → "전체 corrective sweep + 릴리즈". 확장 감사 = Area E deliverables 25 + Area F schemas 39 + Area G tools 18 = **82 단위** (L1 + L2 의미·claim accuracy + L3 §8.1·no-simulation / 8 sub-agent 배치 + ground-truth XV). **GREEN 74 / RED 8** (RED 전부 Area G tools README↔cli.js 문서 drift — 코드·테스트·no-simulation 전부 정상). Area E·F 구조 거의 완벽($id↔filename 0 불일치 / F-PA-009=singleton / $ref 0 broken). post-dedupe F-MB 9건 / F-021 band 5~15 "건강한 검증". finding-system.md Body Finding Ledger **F-MB namespace 신설**. DEC-2026-05-17-plugin-authoring-mb-audit / ADR-PLUGIN-001 §7 patch v7 + §8 LL-plugin-05.
+
+### 감사 + 처분 (F-MB-001~009)
+
+- **resolved 8**: F-MB-001(rules.json→business-rules.json 활성 DOC 표면 sweep — flows json+mermaid + guides + methodology-spec docs + deliverables 6 + schemas 2 / ★ cross_links `to_artifact: rules`=logical 자산명 불변 ground-truth 적발 무변경) / F-MB-002(form-validation-spec·formal-spec BR-id 3-seg→canonical 4-seg / 0 PoC consumer + schema-validator 11 PoC 0-regression 입증) / F-MB-003(legacy-spectrum·static-security-spec property 키 `★ ` 제거 / 0 consumer) / F-MB-004(chain-driver README exit 표 → cli.js 권위 / consumer-facing high) / F-MB-005(chain-coverage·schema-validator·test-impl-pass README exit 표 → cli.js header) / F-MB-006(decision-table·drift-validator·sql-inventory README 구현표면 보강) / F-MB-007(spec-test-link README finding-kind → validator.js emit 정합) / F-MB-008(test-impl-pass README src/adapters→src/runners)
+- **deferred 1**: F-MB-009(tool src·test·scripts·PHASE-history `rules.json` literal = LL-i-55 함정존 / test fixture·migration script·역사기록 = blanket 시 release gate 자해 → 파일별 forensic 별건 revisit)
+- **★ 메타**: ground-truth-before-edit 가 재작업 1건 추가 차단 (cross_links `to_artifact: rules` = lifecycle-contract SSOT logical 자산명 불변 / sub-agent 과탐 = 3번째 위생 적발 / LL-plugin-04 재확인). Area F = F-PA-009($id) singleton 확인(나머지 38 정합).
+
+### 회귀 (STOP-3 hard gate 전부 통과)
+
+- 잔여 grep 0: safe-tier rules.json / ★-prefixed property key / 3-seg BR pattern
+- skill-citation-validator finding 0 (207 active doc)
+- release-readiness **13/13 ready:true** — ★ analysis_validator_violation = **schema-validator 전 11 PoC pass** (F-MB-002 패턴 tighten + F-MB-003 ★-key rename PoC 회귀 0 결정적 입증) + workspace 395+ + drift-validator 3-way (flows json+mermaid 정합) + version-check 3-way 8.2.3
+- P2′ 판정 = **PATCH** — F-MB-002/003 = schema-contract touch 이나 0-consumer 검증 + canonical 정렬(corrective) + schema-validator 전 PoC 0-regression 결정적 입증 → F-PA-009($id 정합 PATCH) 선례 동형 / semver inflation 회피 / 나머지 전부 doc-corrective. breaking 0.
+
+---
+
 ## [8.2.2] — 2026-05-17 ★ PATCH — plugin-authoring 4영역 파일별 품질 감사 + L2 인용 drift corrective sweep (F-PA-001~010 / breaking 0)
 
 > ★ **v8.2.2 PATCH — corrective / non-breaking**. 사용자 "각 영역 별 파일별 품질 검증" → plugin-authoring 4영역 60 단위(47 SKILL.md + 9 agents + README + hooks.json + 2 manifests) 파일별 감사(L1 규칙 + L2 의미·claim accuracy + L3 §8.1·no-simulation / 10 sub-agent 배치 + XV 독립 재검증). **L1 구조 60/60 PASS** — 결함 전부 **L2 인용 drift**(근본원인 = v7.0.0 rules.json·v8.0.0 skill rename·v5~6 BR schema rename 후속 전파 누락). post-dedupe finding 10건 (F-021 band 5~15 "건강한 검증" / 명세 부실 ❌). 사용자 "진행" → corrective sweep 시행. DEC-2026-05-17-plugin-authoring-file-audit / ADR-PLUGIN-001 §7 patch v6 + §8 LL-plugin-04.

@@ -34,9 +34,11 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 
 | code | 의미 |
 |---|---|
-| 0 | 모든 산출물 schema valid |
-| 1 | 일반 error |
-| 2 | ★ schema violation 발견 (gate blocked) |
+> ★ 권위 = `src/cli.js:15` header.
+
+| 0 | 모든 산출물 schema valid (모두 통과) |
+| 1 | ★ schema violation ≥ 1 (gate blocked) |
+| 2 | usage error |
 
 ## Ajv 8 strict mode
 

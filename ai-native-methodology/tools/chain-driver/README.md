@@ -33,13 +33,15 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 
 ## Exit codes
 
+> ★ 권위 = `src/cli.js` header (ADR-CHAIN-005 §7). 본 표는 cli.js 와 일치 의무.
+
 | code | 의미 |
 |---|---|
-| 0 | success / next stage 진입 가능 |
-| 1 | 일반 error |
-| **2** | ★ ★ blocked — gate validator finding 발견 / state.blocked=true |
-| 3 | state schema migration 필요 |
-| 4 | interrupted mid-stage (CLI exit / user fix 필요) |
+| 0 | ok / next stage 진입 가능 |
+| **1** | ★ ★ blocked-by-gate — gate validator finding / state.blocked=true |
+| **2** | invariant-violation (mechanical trio (ii)) |
+| 3 | usage-error |
+| 4 | state-corrupt |
 
 ## Sibling tools (gate validator 4종)
 

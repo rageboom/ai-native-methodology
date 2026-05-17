@@ -35,10 +35,9 @@ node src/cli.js \
 
 | code | 의미 |
 |---|---|
-| 0 | pass / no breaking finding |
+| 0 | pass / no breaking finding / `--dry-run` (cli.js:43) / usage-help |
 | 1 | critical/high finding ≥ 1 (default strict) |
-| 2 | usage error |
-| **3** | dry-run only (★ S3 — write-baseline ∧ prompt ∧ exit 0 강제) |
+| 2 | usage error (bad/missing arg) |
 
 ★ `--dry-run` = (write-baseline 차단) ∧ (prompt 차단) ∧ (exit 0 강제) 3 조합 (sub-plan-3 research S3 정합).
 

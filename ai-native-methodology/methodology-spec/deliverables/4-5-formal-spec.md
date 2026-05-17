@@ -173,7 +173,7 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 ## 6. 흔한 함정
 
 ### 6.1 자연어 빈약성 자기-시인 누락
-- 증상: rules.json 의 자연어로 충분하다고 착각
+- 증상: business-rules.json 의 자연어로 충분하다고 착각
 - 대응: 자연어 9 항목 점검 (44% / 100% 정량) → 5+ 항목 누락 시 형식화 필수
 
 ### 6.2 Self-reference 함정

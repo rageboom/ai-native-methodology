@@ -10,7 +10,7 @@
 
 ### §1.1 dual representation paradigm 정합 (★ ADR-CHAIN-011 정합)
 
-본 방법론 v2.4.0+ rules.json BR 안 ★ 두 표현 동시 보존:
+본 방법론 v2.4.0+ business-rules.json BR 안 ★ 두 표현 동시 보존:
 
 | 표현 | 영역 | 사용자 |
 |---|---|---|
@@ -132,9 +132,9 @@ then: [현 결함 결과 / 권한 검증 부재 / 누구나 가능]
 
 ### §5.1 paradigm 본격 영역
 
-★ ★ **rules.json 변경 ❌** + **별도 markdown 자산** paradigm (★ Senior REVISE-3 흡수 / session 15차 본격):
+★ ★ **business-rules.json 변경 ❌** + **별도 markdown 자산** paradigm (★ Senior REVISE-3 흡수 / session 15차 본격):
 
-- ★ rules.json 안 absent BR 자체 = drift 사실 본격 자료 (★ 변경 시 drift 사실 자체 소실 위험)
+- ★ business-rules.json 안 absent BR 자체 = drift 사실 본격 자료 (★ 변경 시 drift 사실 자체 소실 위험)
 - ★ DRIFT 격상 자산 = `tools/br-cross-consistency-validator/PHASE-D-{date}-drift-domain-review.md` 형식
 - ★ ★ ★ corroboration 자료 보존 의무 (★ Layer 1 + Layer 2 score 보존)
 
@@ -174,8 +174,8 @@ then: [현 결함 결과 / 권한 검증 부재 / 누구나 가능]
 - `tools/br-cross-consistency-validator/PHASE-D-2026-05-14-corroboration-final.md` (★ 31 BR 통합)
 - `tools/br-cross-consistency-validator/PHASE-D-2026-05-14-drift-domain-review.md` (★ 2 drift BR DRIFT 격상 자산)
 - `tools/br-cross-consistency-validator/PHASE-D-2026-05-14-self-eval-bias-retrospect.md` (★ multi-model 본격 자료)
-- `examples/poc-01-realworld-spring/output/rules/rules.json` (★ BR-AUTH-JWT-002 보유)
-- `examples/poc-03-realworld-nestjs/output/rules/rules.json` (★ BR-USER-DELETE-AUTH-001 보유)
+- `examples/poc-01-realworld-spring/output/rules/business-rules.json` (★ BR-AUTH-JWT-002 보유)
+- `examples/poc-03-realworld-nestjs/output/rules/business-rules.json` (★ BR-USER-DELETE-AUTH-001 보유)
 
 ### §7.3 Layer 2 paradigm 자료
 
@@ -184,7 +184,7 @@ then: [현 결함 결과 / 권한 검증 부재 / 누구나 가능]
 
 ### §7.4 Lessons Learned 정합
 
-- ★ ★ **LL-i-44** (★ drift BR DRIFT 격상 자산 paradigm = rules.json 변경 ❌ 본격 본질)
+- ★ ★ **LL-i-44** (★ drift BR DRIFT 격상 자산 paradigm = business-rules.json 변경 ❌ 본격 본질)
 - ★ ★ **LL-i-45** (★ absent BR semantic_inversion 본격 검출 = 본 방법론 가치 본격 입증)
 - ★ ★ **LL-i-46** (★ self-eval bias 단방향 가설 정면 부정 / model 별 검출 영역 차이)
 - ★ ★ **LL-i-47** (★ critical drift = model 무관 검출 본격 신호 / Layer 2 paradigm 신뢰도 강력)

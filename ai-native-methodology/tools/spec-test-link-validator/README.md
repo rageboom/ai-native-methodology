@@ -25,11 +25,14 @@ node src/cli.js \
 
 | kind | severity | 의미 |
 |---|---|---|
-| `coverage.ac-to-tc.below-threshold` | critical | AC → TC coverage < threshold |
-| `chain.tc.unknown-ac` | critical | TC.ac_ref 가 acceptance 에 없음 |
-| `chain.tc.unknown-bhv` | high | TC.bhv_ref 가 behavior 에 없음 |
-| `chain.ac.verifiable-no-tc` | high | verifiable=true AC 인데 test_case_refs 빈 배열 |
-| `chain.tc.framework-mismatch` | medium | TC.framework 가 inventory.stack_signals 와 어긋남 (★ ADR-CHAIN-004 정합) |
+> ★ 권위 = `src/validator.js` emit 상수. kind 명은 validator.js 와 일치 의무.
+
+| `chain.ac_coverage.below_threshold` | critical | AC → TC coverage < threshold |
+| `chain.tc.no_ac_ref` | critical | TC.ac_ref 누락 (validator.js:37) |
+| `chain.tc.unknown_ac` | critical | TC.ac_ref 가 acceptance 에 없음 |
+| `chain.tc.unknown_bhv` | high | TC.bhv_ref 가 behavior 에 없음 |
+| `chain.ac.no_tc` | high | verifiable=true AC 인데 test_case_refs 빈 배열 |
+| `chain.tc.framework_mismatch` | medium | TC.framework 가 inventory.stack_signals 와 어긋남 (★ ADR-CHAIN-004 정합) |
 
 ## Exit codes
 

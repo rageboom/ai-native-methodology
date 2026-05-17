@@ -38,7 +38,7 @@
 | risk | 컴파일 타임 type 검증 ❌ / 키 오타 ✗ / 새 시스템 마이그레이션 시 DTO 추출 비용 ↑ |
 | 회피 | `resultType` 명시 DTO 클래스 + `@MapperScan` (MyBatis 3) 또는 JPA Repository |
 | PoC 정합 | AP-EXCHANGE-001 (Map<String,Object> 강제 캐스팅) + AP-CAPITAL-002 (동일 / 다중책임 강화) |
-| cross-link | rules.json BR-* → DTO 추출 후보 / antipatterns.json AP-*-001 |
+| cross-link | business-rules.json BR-* → DTO 추출 후보 / antipatterns.json AP-*-001 |
 
 ### AP-LEGACY-IBATIS2-002: Anemic Service (단순 DAO 위임 / 비즈니스 로직 부재)
 

@@ -8,7 +8,7 @@
 
 ## 1. 목적
 
-**답하는 질문**: "form validation 규칙은 어떤 라이브러리로 어떻게 정의되었나? rules.json `fe_validation` BR 자동 추출은?"
+**답하는 질문**: "form validation 규칙은 어떤 라이브러리로 어떻게 정의되었나? business-rules.json `fe_validation` BR 자동 추출은?"
 
 **AI 재구현 시 활용**: Zod / Yup / RHF rules → BR 자동 변환 / 신규 시스템 구축 시 즉시 활용
 
@@ -20,7 +20,7 @@
 | **★ #14 form-validation-spec** (본 문서) | form validation 라이브러리 → BR 자동 추출 source |
 | **#8 state-map** | form_state (5 진실 #4) — 진실 source 정합 |
 
-→ form-validation-spec → rules.json `category=fe_validation` BR 자동 등록 + auto_extracted=true 표기.
+→ form-validation-spec → business-rules.json `category=fe_validation` BR 자동 등록 + auto_extracted=true 표기.
 
 ---
 
@@ -29,7 +29,7 @@
 ```
 output/form-validation/
 ├── form-validation-spec.json   # AI 눈
-├── br-auto-extracted.md        # ★ rules.json 자동 등록된 BR 목록
+├── br-auto-extracted.md        # ★ business-rules.json 자동 등록된 BR 목록
 └── _manifest.yml
 ```
 
@@ -57,7 +57,7 @@ output/form-validation/
 
 ---
 
-## 4. ★ rules.json `fe_validation` BR 자동 등록 절차
+## 4. ★ business-rules.json `fe_validation` BR 자동 등록 절차
 
 ```yaml
 # Step 1: form-validation-spec.json 추출
@@ -68,7 +68,7 @@ F-VAL-LOGIN-EMAIL-001:
   rule_value: null
   error_message: "Invalid email"
 
-# Step 2: rules.json 자동 등록 (BR-* ID 부여)
+# Step 2: business-rules.json 자동 등록 (BR-* ID 부여)
 BR-FE-LOGIN-EMAIL-001:
   category: fe_validation              # ★ Stage 3-2 enum
   source_format: zod                   # ★ Stage 7-pre 신규
@@ -82,12 +82,12 @@ BR-FE-LOGIN-EMAIL-001:
     - "email 형식 validation 통과 의무"
     - "fail 시 'Invalid email' 메시지 노출"
 
-# Step 3: form-validation-spec.cross_links → rules.json BR cross-link
+# Step 3: form-validation-spec.cross_links → business-rules.json BR cross-link
 cross_links:
   - {from_validation: F-VAL-LOGIN-EMAIL-001, to_artifact: rules, to_id: BR-FE-LOGIN-EMAIL-001, link_type: auto_extracted_to_br}
 ```
 
-→ ★ rules.json `auto_extracted=true` BR 은 FE 코드 변경 시 자동 갱신 가능 (사람 작성 BR 과 분리 운영).
+→ ★ business-rules.json `auto_extracted=true` BR 은 FE 코드 변경 시 자동 갱신 가능 (사람 작성 BR 과 분리 운영).
 
 ---
 
@@ -109,7 +109,7 @@ cross_links:
 | 단계 | 조건 | 신뢰도 |
 |---|---|---|
 | 1 | 코드 정적 추출 (LLM) | 60-70% |
-| 3 | + drift-validator (form-validation ↔ rules.json BR 정합) | 78-85% (Stage 5+ 검토) |
+| 3 | + drift-validator (form-validation ↔ business-rules.json BR 정합) | 78-85% (Stage 5+ 검토) |
 | 5 | + ts-morph 진짜 실행 + 5종 물증 | 85-92% |
 
 ---
@@ -122,7 +122,7 @@ cross_links:
 □ ★ Zod 사용 시 zod = primary 표기 (ADR-FE-005 매개체 13)
 □ 모든 validation 에 id / field_name / validation_type / source_format 명시
 □ ★ framework_coupled=true 시 신규 스택 정해진 후 재추출 의무 표기
-□ cross_link_to_br 명시 (rules.json fe_validation BR 자동 등록)
+□ cross_link_to_br 명시 (business-rules.json fe_validation BR 자동 등록)
 □ summary.br_auto_extraction_count 정량
 □ summary.captured_by ∈ [static_extraction, ts_morph_real, babel_traverse_real]
 □ ★ simulation 시 simulation_reason 의무

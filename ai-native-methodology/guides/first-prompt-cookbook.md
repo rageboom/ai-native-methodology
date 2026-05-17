@@ -38,7 +38,7 @@
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
 | "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/) | `openapi.yaml` + `api.md` |
-| "UI rules 추출" / "FE rules" | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/) | `rules.json` (FE 영역) |
+| "UI rules 추출" / "FE rules" | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/) | `business-rules.json` (FE 영역) |
 | "state-map 추출" / "FE state machine" | [`analysis-ui-state-map-fe`](../skills/analysis-ui-state-map-fe/) | `state-map.json` (FE) |
 | "visual-manifest 추출" / "Playwright snapshot" | [`analysis-ui-visual-manifest-fe`](../skills/analysis-ui-visual-manifest-fe/) | `visual-manifest.json` (binary) |
 | "form validation 추출" / "Zod / RHF 분석" | [`analysis-form-validation-fe`](../skills/analysis-form-validation-fe/) | `form-validation-spec.json` |

@@ -19,6 +19,9 @@ npx drift-validator <dir>
 # 단일 짝
 npx drift-validator path/to/User-Account.json
 
+# 3-way layout 검증 (★ v1.4.4 — manifest ↔ workflow ↔ skills)
+npx drift-validator --check-layout
+
 # Chain layout 검증 (★ sub-plan-4 신설)
 npx drift-validator --check-chain-layout
 
