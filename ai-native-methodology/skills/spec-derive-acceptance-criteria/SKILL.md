@@ -1,6 +1,6 @@
 ---
 name: spec-derive-acceptance-criteria
-description: ★ ★ v2.0 chain 2 sub-skill. behavior-spec.behaviors[] 의 BHV-* 마다 Gherkin (Given/When/Then) acceptance-criteria 추출. verifiable=true 의무 / verifiable=true 시 test_case_refs ≥ 1 의무 (chain 2 → 3 forward link). MoSCoW 우선순위. bdd-author persona 책임.
+description: ★ ★ v2.0 chain 2 sub-skill. behavior-spec.behaviors[] 의 BHV-* 마다 Gherkin (Given/When/Then) acceptance-criteria 추출. verifiable=true 의무 / verifiable=true 시 test_case_refs ≥ 1 의무 (chain 2 → 3 forward link). MoSCoW 우선순위. bdd-author persona 책임. 사용자 (자연어 직접 호출 시): "acceptance criteria 추출" / "AC Gherkin" / "BDD".
 allowed-tools: Read, Grep, Bash, Write
 ---
 

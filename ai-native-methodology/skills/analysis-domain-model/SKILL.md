@@ -1,6 +1,6 @@
 ---
 name: analysis-domain-model
-description: Use after analysis-architecture to extract domain model (entities, aggregates, value objects, bounded contexts). DDD-style. Generates domain.json (산출물 2). Required prerequisite for analysis-business-rules. Stage = analysis.
+description: Use after analysis-architecture to extract domain model (entities, aggregates, value objects, bounded contexts). DDD-style. Generates domain.json (산출물 2). Required prerequisite for analysis-business-rules. Stage = analysis. 사용자: "도메인 모델 추출" / "엔티티 분석" / "DDD 모델링".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -38,7 +38,7 @@ DDD 원칙 (ADR-004) 기반. Entity / Aggregate / Value Object / Bounded Context
 
 ## 본체 명세
 
-- `methodology-spec/workflow/business-logic.md` (§5.B domain — `business-logic` phase 안 4영역 병렬 / v3.0.0 phase 의미 ID rename 정합)
+- `methodology-spec/workflow/business-logic.md` (§5 — 4영역 병렬 추출 / domain 매핑 = §5.A ORM 메서드 + §5.B FE 도메인 분기 / v3.0.0 phase 의미 ID rename 정합)
 - `methodology-spec/deliverables/2-domain.md`
 - `schemas/domain.schema.json`
 - ADR-004 (DDD), ADR-005 (한국어)

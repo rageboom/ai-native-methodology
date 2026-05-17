@@ -1,6 +1,6 @@
 ---
 name: analysis-quality-antipattern
-description: Use after all `api` + `ui` phase outputs to consolidate antipatterns.json + migration-cautions.md (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis.
+description: Use after all `api` + `ui` phase outputs to consolidate antipatterns.json + migration-cautions.md (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis. 사용자: "안티패턴 추출" / "migration cautions" / "회피 가이드".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 

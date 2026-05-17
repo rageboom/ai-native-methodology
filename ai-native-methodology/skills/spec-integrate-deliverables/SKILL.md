@@ -1,6 +1,6 @@
 ---
 name: spec-integrate-deliverables
-description: ★ ★ v2.0 chain 2 sub-skill. behavior-spec 의 cross_links.to_analysis_artifacts 에 analysis 7대 + 8 FE 산출물 모두 backward link 등록. 사용자 답변 (3) "현 7대 + 신규 추가 산출물" 정합. chain-coverage-validator 가 모든 reference 강제. formal-spec-extractor persona 책임.
+description: ★ ★ v2.0 chain 2 sub-skill. behavior-spec 의 cross_links.to_analysis_artifacts 에 analysis 7대 + 8 FE 산출물 모두 backward link 등록. 사용자 답변 (3) "현 7대 + 신규 추가 산출물" 정합. chain-coverage-validator 가 모든 reference 강제. formal-spec-extractor persona 책임. 사용자 (자연어 직접 호출 시): "산출물 통합" / "cross_links 등록".
 allowed-tools: Read, Glob, Bash, Edit
 ---
 

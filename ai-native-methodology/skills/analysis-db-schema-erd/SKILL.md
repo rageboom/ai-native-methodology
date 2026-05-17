@@ -10,7 +10,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- domain.json 존재 (entity ↔ table 매핑 reference)
+- inventory.json 존재 (DDL / ORM entity 시그널 위치 / analysis-source-inventory 완료)
+- domain.json 존재 (entity ↔ table 매핑 reference / analysis-domain-model 완료)
 - DB 트랙 (DDL / ORM entity 시그널 검출)
 
 ## 절차

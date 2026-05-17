@@ -631,30 +631,32 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 >
 > | F-SKILL | severity | corroboration | priority | 처분 |
 > |---|---|---|---|---|
-> | 001 | medium | within-shard 2-site | P1 | open (v8.5.0 — `business-logic.md` §A/§B anchor drift fix) |
+> | 001 | medium | within-shard 2-site | P1 | ★ **closed v8.5.0** — analysis-domain-model:41 + analysis-business-rules:52 business-logic.md anchor 정정 Option A (§5 4영역 병렬 + 실 매핑 명시) |
 > | 002 | medium | ≥ 2 shard ✓ | **P0** | **closed v8.4.1** — `_base-log-finding` ghost AP prefix → `id-conventions.md` §3 canonical 9 + scope 확장 (analysis-quality-antipattern + analysis-aspect-a11y AP-FE-* 정규화) |
-> | 003 | low | within-shard 4-site | P1 | open (v8.5.0 — Korean trigger 4 analysis-* descriptions) |
+> | 003 | low | within-shard 4-site | P1 | ★ **closed v8.5.0** — 4 analysis-* (architecture+domain-model+source-inventory+business-rules) descriptions Korean trigger keywords 추가 |
 > | 004 | medium | spec-authority (validator mask) | **P0** | **closed v8.4.1** — `analysis-input-collection` `apply-baseline-ratchet` → `_base-apply-baseline-ratchet` (2 sites) |
 > | 005 | medium | ≥ 2 shard ✓ | **P0** | **closed v8.4.1** — `_base/<name>` slash → `_base-<name>` dash (9 sites / 7 files) |
 > | 006 | low | within-shard 2-site | P2 | open (`_base-*` family heading EN/KO drift / cooling-off) |
-> | 007 | low | ≥ 2 shard ✓ | P1 | open (`_base-apply-template` "19 templates" → "21" or auto-discovery) |
+> | 007 | low | ≥ 2 shard ✓ | P1 | ★ **closed v8.5.0** — `_base-apply-template:20` "19 templates" → "21 templates" + drift recurrence carry note (LL-v85-01 / templates/analysis/ enumerated count = drift attractor / P2 sub-rule 후보) |
 > | 008 | low | single-shard | P2 | open (`rules.template.md` → `business-rules.template.md` / v7.0.0 followup / minor breaking) |
 > | 009 | info | ≥ 2 shard ✓ | P2 | open (★-decoration density `analysis-br-cross-consistency-check` + chain skills) |
-> | 010 | low | ≥ 2 shard ✓ | P1 | open (NL trigger 5 weak skills) |
+> | 010 | low | ≥ 2 shard ✓ | P1 | ★ **closed v8.5.0** — analysis-quality-antipattern + 4 sub-skills (planning-decompose + planning-identify + spec-derive-AC + spec-integrate) NL trigger phrase 추가 |
 > | 011 | info | ≥ 2 shard ✓ | P2 | open (composite-orchestrator borderline — 4 chain-entry skills / ADR cite callout 보강) |
 > | 012 | low | within-shard 3-site | P2 | open (body-size narrative density `sql-inventory` 210 / `characterization-test` 196 / `error-mapping` 120) |
-> | 013 | low | single-shard | P1 | open (`analysis-db-schema-erd` prereq inventory.json 누락) |
+> | 013 | low | single-shard | P1 | ★ **closed v8.5.0** — `analysis-db-schema-erd` 사전조건 inventory.json 추가 |
 > | 014 | low | single-shard | P2 | open (`analysis-type-spec-fe` `-fe` suffix vs BE+FE scope) |
 > | 015 | info | single-shard | P2 | open (sub-skill citation form 일관성) |
-> | 016 | low | spec-authority | P1 | open (`disable-model-invocation: true` for 4 gate skills) |
-> | 017 | low | spec-authority | P1 | open (S2 per-field 1024-char cap 강화 / plugin-authoring-spec) |
-> | 018 | low | spec-authority | P1 | open (`${CLAUDE_EFFORT}` digest refresh / §6 pin) |
-> | 019 | info | spec-authority | P2 | open (v2.1.142 root-level SKILL.md 패키징 relaxation 명시) |
-> | 020 | low | ≥ 2 shard ✓ | P1 | open (third-person POV S2 sub-rule) |
+> | 016 | low | spec-authority | P1 | ★ ★ **ABORT v8.5.0 → P2 carry** — F-015 cross-check (research-v85-p1-batch.md §1) = `disable-model-invocation: true` Claude 모든 invoke 경로 차단 ("Claude can invoke: No") → chain harness body 호출 차단 가능성 높음. 안전한 대안 `user-invocable: false` REVISE-2 carry (plugin runtime smoke test 의무) |
+> | 017 | low | spec-authority | P1 | ★ **closed v8.5.0** — plugin-authoring-spec §2 S2 per-field description ≤ 1,024 char cap 추가 + §6 digest 반영 |
+> | 018 | low | spec-authority | P1 | ★ **closed v8.5.0** — §6 skills + plugins pinned_guidance_digest 갱신 (DELTA-1 `${CLAUDE_EFFORT}` + DELTA-3 1024c + DELTA-4 third-person + DELTA-5 one-level + DELTA-2 root-level SKILL.md) + digest_sha 재계산 (skills `b8b2376312b0`→`e2b44d9d0e53` plugins `b0e11058b05e`→`4498207cc547`) |
+> | 019 | info | spec-authority | P2 | open (v2.1.142 root-level SKILL.md 패키징 relaxation 명시) — ★ partial: §6 plugins digest 안 DELTA-2 흡수 = v8.5.0 시점 anchor sync / 본 finding 핵심 (P1 rule 본문 wording) carry |
+> | 020 | low | ≥ 2 shard ✓ | P1 | ★ **partial-closed v8.5.0** — A (S2 third-person POV sub-rule 추가) closed / B (~25 skill descriptions audit) = P2 carry (별도 cooling-off / wording 변경 자연 breaking risk) |
 > | 021 | low | industry N=3 | P2 | open (SKIP-in-description for env-restricted skills) |
 > | 022 | low | industry N=3 | P2 | open (`model:` frontmatter for compute-intensity-differentiated skills) |
 > | 023 | info | industry N=3 | P2 | open (per-skill eval framework — v9.x feature) |
 > | 024 | info | meta (3 finding root) | P2 | open — ★ ★ **v9.0 charter review** — `_base-*` documented-exception drift-attractor 해소 (rename canonical OR validator-level normalization) |
+>
+> **★ v8.5.0 release 결과**: P1 9 finding 중 **8 closed + 1 ABORT (F-SKILL-016)**. closed = 001/003/007/010/013/017/018/020-A. F-SKILL-019 partial (digest anchor sync / 본 finding 핵심 wording carry). F-SKILL-020-B = audit 25 skills wording P2 carry.
 >
 > 본 ledger 등재 시점 = P0 3 finding 시행 후 v8.4.1 release. P1/P2 = open carry.
 

@@ -1,6 +1,6 @@
 ---
 name: analysis-business-rules
-description: Use after analysis-domain-model to extract business rules as DMN-style decision tables. Generates business-rules.json (산출물 4 일부). DMN 5-check (duplicate / conflict / gap / overlap / type) auto-validated by decision-table-validator. Stage = analysis.
+description: Use after analysis-domain-model to extract business rules as DMN-style decision tables. Generates business-rules.json (산출물 4 일부). DMN 5-check (duplicate / conflict / gap / overlap / type) auto-validated by decision-table-validator. Stage = analysis. 사용자: "비즈니스 규칙 추출" / "decision table" / "BR 분석".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -49,7 +49,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/workflow/business-logic.md` (§5.A rules — `business-logic` phase 안 4영역 병렬 / v3.0.0 phase 의미 ID rename 정합)
+- `methodology-spec/workflow/business-logic.md` (§5 — 4영역 병렬 추출 / rules 매핑 = §5.A SQL CASE/WHERE + §5.B FE validation + §5.C 매직 넘버 / v3.0.0 phase 의미 ID rename 정합)
 - `methodology-spec/deliverables/5-business-rules.md`
 - `schemas/business-rules.schema.json`
 - ADR-FE-005 (권위 매개체 13 — Zod / Yup / RHF / class-validator 등 fe_validation 자동 등록)

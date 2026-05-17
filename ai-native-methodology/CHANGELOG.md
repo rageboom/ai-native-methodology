@@ -9,6 +9,43 @@
 
 ---
 
+## [8.5.0] — 2026-05-18 ★ MINOR — F-SKILL P1 8 finding batch + plugin-authoring-spec §2 S2 강화 + §6 digest baseline refresh (additive)
+
+> ★ **v8.5.0 MINOR — L3 audit P1 batch corrective sweep**. 사용자 "A. P1 9 finding batch (v8.5.0 MINOR / 권장)" → "진행 해줘" 시행.
+>
+> **4원칙 ladder full**:
+> - 1원칙 `plan-v85-p1-batch.md` (lay-of-the-land 후 9 finding 정밀 scope + 시행 순서)
+> - 2원칙 2-에이전트 lightweight research (`_base-official-docs-checker` F-015 + `_base-senior-engineer` critique / 산업 비교 skip)
+> - 3원칙 사용자 묶음 결단 3 cluster (F-SKILL-016 ABORT / F-SKILL-001 Option A + F-SKILL-020 A only / 즉시 release cadence)
+> - 4원칙 N/A (실패 0)
+>
+> **★ ★ ★ critical research finding**: `_base-official-docs-checker` F-015 cross-check on `disable-model-invocation: true` = ★ Claude 의 모든 invoke 경로 차단 ("Claude can invoke: No") → chain harness body 호출 차단 가능성 높음 → **F-SKILL-016 ABORT → P2 carry** (사용자 결단). 안전한 대안 = `user-invocable: false` (REVISE-2 carry).
+>
+> **시행** (additive / breaking 0 / 8 finding closed + 1 ABORT):
+> - **F-SKILL-001** (medium / closed) — `analysis-domain-model:41` + `analysis-business-rules:52` business-logic.md anchor 정정 Option A (§5 4영역 병렬 + 실 매핑 명시 / domain = §5.A ORM + §5.B FE / rules = §5.A SQL + §5.B FE validation + §5.C 매직 넘버)
+> - **F-SKILL-003** (low / closed) — 4 analysis-* descriptions (`architecture` + `domain-model` + `source-inventory` + `business-rules`) Korean trigger keywords 추가
+> - **F-SKILL-007** (low / closed) — `_base-apply-template:20` "19 templates" → "21 templates" + drift recurrence carry note (LL-v85-01)
+> - **F-SKILL-010** (low / closed) — `analysis-quality-antipattern` + 4 sub-skills (`planning-decompose-use-cases` + `planning-identify-business-intent` + `spec-derive-acceptance-criteria` + `spec-integrate-deliverables`) NL trigger phrase 추가
+> - **F-SKILL-013** (low / closed) — `analysis-db-schema-erd` 사전조건 inventory.json 추가 (analysis-* family consistency)
+> - **F-SKILL-016** (low / ★ ★ **ABORT → P2 carry**) — F-015 cross-check ABORT 권장 / `user-invocable: false` REVISE-2 carry
+> - **F-SKILL-017** (low / closed) — `plugin-authoring-spec.md §2 S2` per-field description ≤ 1,024 char cap 추가 (best-practices)
+> - **F-SKILL-018** (low / closed) — `§6` skills + plugins pinned_guidance_digest 갱신 (DELTA-1 `${CLAUDE_EFFORT}` + DELTA-3 1024c + DELTA-4 third-person + DELTA-5 one-level + DELTA-2 root-level SKILL.md) + **`digest_sha` 재계산** (skills `b8b2376312b0` → `e2b44d9d0e53` / plugins `b0e11058b05e` → `4498207cc547`)
+> - **F-SKILL-020** (low / closed / A only) — `§2 S2` third-person POV sub-rule 추가 (audit ~25 skill wording 은 P2 carry)
+>
+> **★ ★ ★ 차기 session carry surface**:
+> - **F-SKILL-016 REVISE-2** = `user-invocable: false` 검토 + plugin runtime smoke test (P2 carry)
+> - **F-SKILL-020 후속** = ~25 skill descriptions 본격 wording audit (P2 carry / 별도 cooling-off)
+> - **F-SKILL-007 drift 재발 방지** = templates/analysis/ enumerated count drift attractor (LL-v85-01 / plugin-authoring-spec sub-rule 후보 P2)
+> - **v9.0 charter review carry 3종** = F-021 임계 v2 + skill-citation-validator recursive drift + F-SKILL-024 meta `_base-*` drift attractor
+>
+> **STOP-3 9-gate**: workspace 414/414·release-readiness **13/13 ready:true**·skill-citation-validator 207 active doc 0 stale·drift-validator 3-way·version 3-way 8.5.0·CLAUDE.md plugin.json v8.5.0·digest_sha 4/4 일치 (재계산 검증)·`_base-` 8 allowlist 변경 없음·description 단독 ≤ 1024 char (47/47 / 변경 없음).
+>
+> **classification = MINOR (additive / breaking 0 / digest recompute + methodology body change)**: skill body·frontmatter·plugin-authoring-spec §2 + §6 모두 additive (S2 추가 sub-rule + §6 digest 확장 / 기존 의무 제거 0). 산출물 schema·command-surface·산출물 파일명 변경 0.
+>
+> DEC-2026-05-18-v85-p1-batch.
+
+---
+
 ## [8.4.1] — 2026-05-18 ★ PATCH — 47 SKILL.md L3 품질 감사 + P0 3 finding 즉시 fix + F-SKILL namespace 신설
 
 > ★ **v8.4.1 PATCH — L3 skill audit corrective sweep**. 사용자 "나의 스킬들을 분석해 보고 싶다" → 축 "품질 감사 (citations / drift / SSOT)" → 깊이 "L3 + 산업 비교" → Plan A (report only) → 사용자 "진행 해줘" 시행 escalation.

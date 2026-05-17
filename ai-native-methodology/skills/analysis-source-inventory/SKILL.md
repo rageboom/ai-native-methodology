@@ -1,6 +1,6 @@
 ---
 name: analysis-source-inventory
-description: Use after analysis-input-collection to enumerate modules, packages, files, and dependencies in the analysis target. Generates inventory.json (산출물 1). Required prerequisite for analysis-architecture. Stage = analysis.
+description: Use after analysis-input-collection to enumerate modules, packages, files, and dependencies in the analysis target. Generates inventory.json (산출물 1). Required prerequisite for analysis-architecture. Stage = analysis. 사용자: "인벤토리 조사" / "모듈 분석" / "의존성 추출".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 

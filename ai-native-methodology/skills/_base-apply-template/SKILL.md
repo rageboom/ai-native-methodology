@@ -17,7 +17,7 @@ User triggers this skill when starting a new deliverable:
 
 ## Steps
 
-1. **Identify target artifact.** Match user request to one of the 19 templates in `templates/analysis/` (this directory exists post-G4 reorganization).
+1. **Identify target artifact.** Match user request to one of the 21 templates in `templates/analysis/` (this directory exists post-G4 reorganization). ★ Count = current `templates/analysis/` ls — if mismatched, log finding (drift recurrence carry per LL-v85-01).
 2. **Read the template.** Use `Read` on `templates/analysis/<artifact>.template.<ext>`.
 3. **Read prerequisite artifacts.** Per `methodology-spec/lifecycle-contract.md` and the artifact's phase ordering:
    - inventory: no prerequisite
