@@ -1,12 +1,12 @@
 ---
 name: analysis-api-rule-mapping
-description: Use after analysis-formal-spec-validation to finalize rules.json with formal spec links. BE+FE common. Cross-references to openapi.yaml + schema.json + state-map.json. Stage = analysis.
+description: Use after analysis-formal-spec-validation to finalize business-rules.json with formal spec links. BE+FE common. Cross-references to openapi.yaml + schema.json + state-map.json. Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # analysis-api-rule-mapping — 규칙 최종화
 
-`business-logic` phase 의 rules.json 을 다른 `api` phase 산출물과 cross-link.
+`business-logic` phase 의 business-rules.json 을 다른 `api` phase 산출물과 cross-link.
 
 ## 사전 조건
 
@@ -23,7 +23,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.aimd/output/rules.json` (cross-link 강화 + meta_confidence 갱신)
+`<user-project>/.aimd/output/business-rules.json` (cross-link 강화 + meta_confidence 갱신)
 
 ## 본체 명세
 

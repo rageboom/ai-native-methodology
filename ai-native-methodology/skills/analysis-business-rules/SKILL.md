@@ -1,6 +1,6 @@
 ---
 name: analysis-business-rules
-description: Use after analysis-domain-model to extract business rules as DMN-style decision tables. Generates rules.json (산출물 4 일부). DMN 5-check (duplicate / conflict / gap / overlap / type) auto-validated by decision-table-validator. Stage = analysis.
+description: Use after analysis-domain-model to extract business rules as DMN-style decision tables. Generates business-rules.json (산출물 4 일부). DMN 5-check (duplicate / conflict / gap / overlap / type) auto-validated by decision-table-validator. Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -24,7 +24,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
      "hit_policy": "first | unique | rule-order"
    }
    ```
-3. **rules.json 작성** — `schemas/rules.schema.json`:
+3. **business-rules.json 작성** — `schemas/rules.schema.json`:
    ```json
    {
      "decision_tables": [...],
@@ -38,7 +38,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.aimd/output/rules.json`
+`<user-project>/.aimd/output/business-rules.json`
 
 ## 본체 명세
 

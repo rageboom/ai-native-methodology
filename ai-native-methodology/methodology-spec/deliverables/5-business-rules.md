@@ -20,7 +20,7 @@
 
 ```
 output/rules/
-├── rules.json                     # AI용 (구조화, Given/When/Then)
+├── business-rules.json            # AI용 (구조화, Given/When/Then) — ★ v7.0.0 묶음 Q ⑦ rename (구 rules.json)
 ├── rules.md                       # 사람용 카탈로그
 ├── state-diagrams/                # 상태 다이어그램 (있을 경우)
 │   └── order-status.mermaid
@@ -80,7 +80,7 @@ output/rules/
 ## 4. 검증 체크리스트
 
 ```
-□ rules.json schema 검증 통과
+□ business-rules.json schema 검증 통과 (business-rules.schema.json)
 □ 모든 BR 에 ID 표준 (BR-{도메인}-{이름}-{번호}) 적용
 □ Given/When/Then 형식 준수
 □ 추출 영역 (5.A/5.B/5.C/5.D) 명시

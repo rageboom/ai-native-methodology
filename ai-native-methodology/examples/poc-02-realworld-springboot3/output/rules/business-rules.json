@@ -1,5 +1,5 @@
 {
-  "$schema_ref": "../../../../../schemas/rules.schema.json",
+  "$schema_ref": "../../../../../schemas/business-rules.schema.json",
   "meta": {
     "generated_at": "2026-04-29T00:00:00Z",
     "confidence": 0.85,

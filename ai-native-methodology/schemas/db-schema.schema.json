@@ -141,7 +141,7 @@
                 "expression": {"type": "string"},
                 "extracted_to_rule_id": {
                   "type": "string",
-                  "description": "rules.json의 BR-XXX로 추출되었으면 그 ID"
+                  "description": "business-rules.json의 BR-XXX로 추출되었으면 그 ID"
                 }
               }
             }
@@ -161,7 +161,7 @@
           "description": {"type": "string"},
           "extracted_business_logic": {
             "type": "boolean",
-            "description": "비즈니스 로직이 발견되었는가? (true면 rules.json에 추출)"
+            "description": "비즈니스 로직이 발견되었는가? (true면 business-rules.json에 추출)"
           },
           "related_rules": {
             "type": "array",

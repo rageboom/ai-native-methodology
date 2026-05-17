@@ -27,7 +27,7 @@ test('intent-classification.schema.json — SSOT 파일 존재 + enum 4종', () 
 });
 
 test('rules.schema.json — intent_vs_bug_classification $ref SSOT', () => {
-  const schema = readSchema('rules.schema.json');
+  const schema = readSchema('business-rules.schema.json');
   const field = schema.$defs.businessRule.properties.intent_vs_bug_classification;
   assert.ok(field, 'intent_vs_bug_classification 필드 존재');
   assert.equal(field.$ref, './intent-classification.schema.json', '$ref SSOT 의무');
@@ -46,7 +46,7 @@ test('characterization-spec.schema.json — intent_classification.type $ref SSOT
 });
 
 test('cross-schema enum 정합 — 두 schema 모두 동일 SSOT $ref', () => {
-  const rulesSchema = readSchema('rules.schema.json');
+  const rulesSchema = readSchema('business-rules.schema.json');
   const charSchema = readSchema('characterization-spec.schema.json');
 
   const rulesRef = rulesSchema.$defs.businessRule.properties.intent_vs_bug_classification.$ref;
@@ -57,7 +57,7 @@ test('cross-schema enum 정합 — 두 schema 모두 동일 SSOT $ref', () => {
 
 test('source-grounded enforcement — rules.schema.json businessRule.allOf if/then required (auto_extracted=true)', () => {
   // ★ v4.0.1 ③ 정합 — auto_extracted=true 시 source_grounded_evidence 또는 source_evidence 의무
-  const schema = readSchema('rules.schema.json');
+  const schema = readSchema('business-rules.schema.json');
   const allOf = schema.$defs.businessRule.allOf;
   assert.ok(Array.isArray(allOf), 'businessRule.allOf 배열 존재');
 

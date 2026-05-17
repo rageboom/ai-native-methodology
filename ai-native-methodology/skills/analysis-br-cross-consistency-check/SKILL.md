@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Agent
 
 ## 언제 사용
 
-- ★ ★ rules.json 안 BR 의 NL ↔ GWT 정합 본격 검증 시
+- ★ ★ business-rules.json 안 BR 의 NL ↔ GWT 정합 본격 검증 시
 - ★ ★ ★ Adzic SBE 폐기 함정 회피 도구 사용 시
 - 사용자 자연어 trigger:
   - "★ BR cross consistency check"
@@ -29,15 +29,15 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Agent
 
 ## 입력
 
-- ★ ★ `<project>/.aimd/output/rules.json` 또는 `<project>/output/rules/rules.json` (★ analysis stage 산출물)
-- ★ ★ rules.json 안 BR 의 ★ natural_language + given/when/then 양쪽 보유 (★ Phase B + Phase C 마이그레이션 후)
+- ★ ★ `<project>/.aimd/output/business-rules.json` 또는 `<project>/output/rules/business-rules.json` (★ analysis stage 산출물)
+- ★ ★ business-rules.json 안 BR 의 ★ natural_language + given/when/then 양쪽 보유 (★ Phase B + Phase C 마이그레이션 후)
 
 ## ★ ★ ★ ★ ★ ★ 시행 paradigm (★ ★ 4 step)
 
 ### Step 1 — Layer 1 결정적 영역 사전 시행
 
 ```bash
-node tools/br-cross-consistency-validator/src/cli.js --target <rules.json>
+node tools/br-cross-consistency-validator/src/cli.js --target <business-rules.json>
 ```
 
 ★ ★ Layer 1 만 시행 (★ structural sanity check / BR id 4토막 / overlap > 0 등) — ★ ★ Layer 1 fail 시 = Layer 2 진입 자격 ❌.
@@ -81,7 +81,7 @@ Agent({
 
 ```bash
 node tools/br-cross-consistency-validator/src/cli.js \
-  --target <rules.json> \
+  --target <business-rules.json> \
   --strict \
   --llm-results <path-to-layer-2-results.json>
 ```

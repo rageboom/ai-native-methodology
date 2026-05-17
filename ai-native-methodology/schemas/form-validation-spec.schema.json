@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/form-validation-spec.schema.json",
   "title": "Form Validation Spec (★ v1.4 Stage 7-pre 신설)",
-  "description": "Deliverable #14. Zod / Yup / Joi / React Hook Form / class-validator / Ajv / Vest 등 form validation 라이브러리 → rules.json fe_validation BR 자동 추출. ADR-FE-005 §2.1.1 (Zod 매개체 13 채택) + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #1 해소.",
+  "description": "Deliverable #14. Zod / Yup / Joi / React Hook Form / class-validator / Ajv / Vest 등 form validation 라이브러리 → business-rules.json fe_validation BR 자동 추출. ADR-FE-005 §2.1.1 (Zod 매개체 13 채택) + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #1 해소.",
   "x-spec-source": {
     "zod": "https://zod.dev/",
     "yup": "https://github.com/jquense/yup",
@@ -128,7 +128,7 @@
           "cross_link_to_br": {
             "type": "string",
             "pattern": "^BR-[A-Z0-9_-]+-\\d+$",
-            "description": "★ rules.json fe_validation BR auto-extracted ID. (rules.json 자동 등록 후 cross-link)"
+            "description": "★ business-rules.json fe_validation BR auto-extracted ID. (business-rules.json 자동 등록 후 cross-link)"
           },
           "framework_coupled": {
             "type": "boolean",
@@ -157,7 +157,7 @@
         "br_auto_extraction_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ rules.json fe_validation BR 으로 자동 등록된 개수. (rules.json `category=fe_validation` 항목 매칭)"
+          "description": "★ business-rules.json fe_validation BR 으로 자동 등록된 개수. (business-rules.json `category=fe_validation` 항목 매칭)"
         },
         "framework_coupled_count": {
           "type": "integer",

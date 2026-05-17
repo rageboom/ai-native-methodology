@@ -23,7 +23,7 @@
         },
         "source_artifacts": {
           "type": "array",
-          "description": "본 planning-spec 추출에 사용된 analysis stage 산출물 경로 (rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5)",
+          "description": "본 planning-spec 추출에 사용된 analysis stage 산출물 경로 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5)",
           "items": {"type": "string"},
           "minItems": 1
         }
@@ -104,7 +104,7 @@
           "br_id": {
             "type": "string",
             "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$",
-            "description": "analysis stage rules.json 의 BR-* (★ backward link)"
+            "description": "analysis stage business-rules.json 의 BR-* (★ backward link)"
           },
           "reasoning": {
             "type": "string",
@@ -135,7 +135,7 @@
         "to_analysis_artifacts": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "backward link to analysis 산출물 (rules.json / domain.json / 7대 산출물)"
+          "description": "backward link to analysis 산출물 (business-rules.json / domain.json / 7대 산출물)"
         }
       }
     }

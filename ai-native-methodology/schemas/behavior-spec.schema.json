@@ -23,7 +23,7 @@
           "type": "array",
           "items": {"type": "string"},
           "minItems": 1,
-          "description": "analysis stage 산출물 경로 (rules.json / domain.json / openapi.yaml / 8 FE 산출물 / Phase 4.5)"
+          "description": "analysis stage 산출물 경로 (business-rules.json / domain.json / openapi.yaml / 8 FE 산출물 / Phase 4.5)"
         }
       }
     },
@@ -52,7 +52,7 @@
           "br_refs": {
             "type": "array",
             "items": {"type": "string", "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$"},
-            "description": "analysis stage rules.json BR-* backward link"
+            "description": "analysis stage business-rules.json BR-* backward link"
           },
           "preconditions": {
             "type": "array",

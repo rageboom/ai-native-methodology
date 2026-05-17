@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMAS_DIR = resolve(__dirname, '../../../schemas');
-const rulesSchema = JSON.parse(readFileSync(resolve(SCHEMAS_DIR, 'rules.schema.json'), 'utf-8'));
+const rulesSchema = JSON.parse(readFileSync(resolve(SCHEMAS_DIR, 'business-rules.schema.json'), 'utf-8'));
 
 const KILLED_ALIASES = ['rules', 'rules_manual_authored', 'rule_summary', 'rules_summary', 'br_summary'];
 

@@ -462,6 +462,30 @@ deterministic.js `representation_missing` 조건 `!hasNL&&!hasGWT` + `descriptio
 
 ---
 
+### §5.13. ★ ★ ★ 묶음 Q ⑦ — rules.json → business-rules.json 산출물 파일명 rename — patch v16 (★ session 2026-05-17 / v7.0.0 MAJOR / ★ 묶음 Q 완결)
+
+★ ★ ★ ★ ★ v7.0.0 MAJOR — DEC-2026-05-17-q7-rules-json-rename 시행. 묶음 Q 마지막 잔여 = 산출물 **파일명** rename (최대 blast 642 occ·252 files). ①②④⑤+Q-①-followup 종결 후 사용자 "하자" → ⑦ 단독.
+
+#### §5.13.1. ★ 사용자 결단 (추천안 묶음 / D1 사실 확정)
+
+- D1 = **v7.0.0 MAJOR 사실 확정** — official-docs(파일명=계약 처우 시 MAJOR / $id 파일경로 독립 / 파일명 resolution 비표준) + industry(파일명 rename=MAJOR 우세 / 외부 consumer 0=즉시 MAJOR 가장 가벼움 / ESLint v9) + Senior CONCUR(artifact contract surface + hardcoded literal consumer = Q-①-followup MINOR 와 결정적 차이 / LL-i-56 real-tier).
+- D2 Option A(rules.schema.json→business-rules.schema.json 동시) / D3 $id 정합 변경 / D4 역사 보존+활성 SSOT / D5 git mv 12+분류별 Edit(script ❌) / D6 1-session(Senior validated / cooling-off 별도 session 불요).
+
+#### §5.13.2. ★ ★ 시행 (git mv 12 + literal / breaking)
+
+- git mv 12: 11 PoC rules.json→business-rules.json + schemas/rules.schema.json→business-rules.schema.json (history-preserving). $id 정합 변경.
+- Senior REVISE-3 실측 정정 — PoC schema key: 3 `$schema_ref`(poc-01/02/03 honesty) / 1 `$schema_origin`(poc-04 value-edit) / 7 무키(fallback auto-correct). 코드 literal 3곳 (findings-aggregator:83 / release-readiness:111,266).
+
+#### §5.13.3. ★ ★ ★ STOP-3 hard gate — 방법론 hard gate 본격 가치 입증
+
+post-mv hard gate (schema-validator 11 PoC + workspace + release-readiness 11/11 or revert) 가 ★ **plan/research(Senior REVISE-3 포함 3-에이전트) 가 모두 놓친 consumer 검출** = 6 test 파일 hardcoded `rules.schema.json`/`rules.json` literal (ENOENT 9+). 사용자 결단 = 근본 결함 ❌ (test=활성 자산 / ⑦ 정당한 일부) → 동반 치환 → 재검증 통과. ★ LL-i-55 paradigm 확장 본격 입증 (research 수렴 ≠ 코드 착수 충분 / 실측 hard gate 가 src-만 본 research 누락 검출).
+
+#### §5.13.4. ★ ★ 회귀 + 묶음 Q 완결
+
+schema-validator 11 PoC VALID + workspace **393/393** + release-readiness **11/11** + chain harness validated 본질 보존 / breaking ✅의도 / 역사(decisions/CHANGELOG/dist) 무수정. ★ ①(v5.0.0)②(v6.0.0)④(v4.1.1)⑤(v4.1.0)+Q-①-followup(v6.1.0)+⑦(v7.0.0) = **묶음 Q 전 항목 종결**.
+
+---
+
 ## §6. 사상
 
 ### §6.1. ★ ★ ★ ★ ADR-008 (이중 렌더링 사상) 의 BR 영역 확장
@@ -747,6 +771,10 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ **LL-i-56** (★ "동일 cluster 내 항목이라도 consumer 분포·breaking 성격 차이 시 version tier 분리 의무 — scope 분리는 version 분리를 동반 / 일괄 MAJOR 강제 = semver inflation" / ★ v6.1.0 Q-①-followup 본격 자산화):
   - **Why**: 묶음 Q ① 이 `rules_auto_extracted_reference` 를 "semantic-rename ≠ alias 폐기"(LL-i-52)로 scope 분리. 후속 Q-①-followup 진입 시 ①②(v5.0.0/v6.0.0 MAJOR) 연속 선례로 v7.0.0 MAJOR 가정. 실측 = src consumer **0** (전수 grep) + 유일 holder poc-04 **atomic 동시 마이그레이션** → 어떤 consumer 도 break 관측 ❌ = textbook MINOR (additive-equivalent). ① "MINOR 호칭=integrity drift" 논리는 ★ alias 폐기+real consumer(4 PoC+extractRules load-bearing) 맥락 한정 — 본 건에 적용 시 v7.0.0 강제 = **semver inflation = 역방향 integrity drift** (industry: 연속 MAJOR signal 가치 희석 / official-docs: semver spec 이 MAJOR 강제 ❌ public API 경계=프로젝트 재량).
   - **How to apply**: cluster(묶음) carry 항목 진입 시 ★ ★ 직전 항목 version tier 를 관성 적용 ❌. 각 항목의 (a) consumer 분포 (real/zero) (b) breaking 성격 (valid→invalid 제거 vs atomic 동시 마이그레이션 rename) 실측 → version tier 독립 판정. ★ scope 분리(LL-i-52)는 version tier 분리를 **동반**해야 정합. + 소작업 process depth = LL-i-54 (breaking 동형 ≠ 비용 동형) 정합 — lightweight research 정당하되 DEC 에 일탈 근거 명시 (향후 "왜 full research 생략?" drift 회피). version 은 ① 선례대로 **사실 확정 (사용자 choice ❌)** — 단 사실 = 선례 관성이 아니라 실측 기반.
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-57** (★ "파일명(artifact) rename = contract 변경 = MAJOR (property rename/MINOR 와 version tier 분리 / LL-i-56 확장) — ★ ★ 단 hardcoded literal consumer(특히 test 코드)는 코드 착수 전 grep·research 수렴만으로 완전 식별 불가 / post-mv hard gate 가 실측 검출 = 방법론 hard gate 본격 가치" / ★ ★ v7.0.0 묶음 Q ⑦ 본격 자산화 / ★ 묶음 Q 완결):
+  - **Why**: ⑦ = 산출물 파일명 rename. Q-①-followup(property rename/zero-consumer atomic/MINOR) 과 LL-i-56 real-tier 비교 = ⑦ 은 파일 artifact 계약 surface + hardcoded literal-resolution consumer (release-readiness `e.name==='rules.json'` / findings-aggregator `input/rules.json`) broad → v7.0.0 MAJOR (official-docs 파일명=계약 시 MAJOR / industry ESLint v9 / Senior CONCUR). ★ ★ 핵심 = plan + 3-에이전트 research (Senior REVISE-3 = src 3곳 실측까지 함) 가 **test 코드 hardcoded `rules.schema.json`/`rules.json` literal 6 파일 누락** → STOP-3 post-mv hard gate 가 ENOENT 9+ 실측 검출. research 수렴(Senior 포함)도 src-만 보면 test literal 사각지대 = LL-i-55 ("research 수렴 ≠ 코드 착수 충분") 의 본격 확장 입증.
+  - **How to apply**: 파일명/식별자 rename breaking 시 ★ ★ ★ (1) version tier = artifact contract 변경 = MAJOR (property/zero-consumer rename 의 MINOR 와 분리 / LL-i-56) (2) ★ consumer 실측을 src 에 한정 ❌ — test 코드·fixture 의 hardcoded schema/file literal 도 consumer (활성 자산). grep·research 가 놓칠 수 있으므로 post-mv hard gate (전 PoC resolution + workspace test + release-readiness or revert) 를 ★ blocking 으로 의무화. (3) hard gate fail = "근본 설계 결함" vs "식별 누락 동반수정" 구분 → 후자(test literal 등 활성 자산 동반 치환)는 revert ❌ 동반 수정 (역사 보존 분리 / LL-i-52). hard gate = 방법론의 누락-안전망 본격 가치.
 
 ---
 

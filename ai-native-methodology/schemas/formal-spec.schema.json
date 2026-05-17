@@ -115,7 +115,7 @@
           "br_id": {
             "type": "string",
             "pattern": "^BR-[A-Z0-9_-]+-[0-9]+$",
-            "description": "BR ID (rules.json 정합)."
+            "description": "BR ID (business-rules.json 정합)."
           },
           "trigger": {
             "type": "string",

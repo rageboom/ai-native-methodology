@@ -80,7 +80,7 @@ function buildValidatorArgs(validatorName, projectDir) {
     case 'planning-extraction-validator':
       return [
         '--planning', join(projectDir, '.aimd/output/planning-spec.json'),
-        '--rules', join(projectDir, 'input/rules.json'),
+        '--rules', join(projectDir, 'input/business-rules.json'),
         '--domain', join(projectDir, 'input/domain.json'),
         '--json',
       ];

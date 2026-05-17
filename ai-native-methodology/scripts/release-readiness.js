@@ -108,7 +108,7 @@ function check3_validatorsViolation() {
       cmd: [
         'tools/planning-extraction-validator/src/cli.js',
         '--planning', 'examples/poc-05-sample-user-register/.aimd/output/planning-spec.json',
-        '--rules', 'examples/poc-05-sample-user-register/output/rules/rules.json',
+        '--rules', 'examples/poc-05-sample-user-register/output/rules/business-rules.json',
         '--domain', 'examples/poc-05-sample-user-register/input/domain.json',
         '--json',
       ],
@@ -263,7 +263,7 @@ function discoverPocRulesJson() {
       if (e.isDirectory()) {
         if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
         stack.push(full);
-      } else if (e.name === 'rules.json') {
+      } else if (e.name === 'business-rules.json') {
         found.push(full);
       }
     }

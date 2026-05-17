@@ -35,7 +35,7 @@ test('★ chain — planning-spec.json 정합 instance → valid', () => {
     const inst = {
       $schema_origin: '../../schemas/planning-spec.schema.json',
       meta: { ...FULL_META },
-      derivation_source: { analysis_artifacts: ['./rules.json'] },
+      derivation_source: { analysis_artifacts: ['./business-rules.json'] },
       use_cases: [
         {
           id: 'UC-USER-001',
@@ -44,7 +44,7 @@ test('★ chain — planning-spec.json 정합 instance → valid', () => {
           actors: ['User'],
           br_refs: ['BR-AUTH-LOGIN-001'],
           source_grounded_evidence: [
-            { artifact: 'rules', element_id: 'BR-AUTH-LOGIN-001', grep_hit_count: 3, file_paths: ['rules.json'] },
+            { artifact: 'rules', element_id: 'BR-AUTH-LOGIN-001', grep_hit_count: 3, file_paths: ['business-rules.json'] },
           ],
         },
       ],
@@ -148,11 +148,11 @@ test('★ chain — Ajv 8 if/then/else 지원 (acceptance-criteria verifiable=tr
   }
 });
 
-test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invalid)', () => {
+test('★ ★ v2.3.7 — business-rules.schema.json BR 4토막 strict (3토막 → invalid)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
@@ -164,8 +164,8 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invali
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(result.valid, false, `3토막 BR-BILLING-005 should fail (v2.3.7 enforcement): ${JSON.stringify(result)}`);
@@ -174,11 +174,11 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (3토막 → invali
   }
 });
 
-test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)', () => {
+test('★ ★ v2.3.7 — business-rules.schema.json BR 4토막 strict (4토막 → valid)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -190,8 +190,8 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(result.valid, true, `4토막 BR-USER-DATA-001 should pass: ${JSON.stringify(result)}`);
@@ -200,11 +200,11 @@ test('★ ★ v2.3.7 — rules.schema.json BR 4토막 strict (4토막 → valid)
   }
 });
 
-test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
+test('★ ★ v2.3.7 — business-rules.schema.json BR 5토막+ 자연 허용', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -216,8 +216,8 @@ test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(result.valid, true, `5토막 BR-ARTICLE-AUTHOR-EDIT-ONLY-001 should pass: ${JSON.stringify(result)}`);
@@ -226,11 +226,11 @@ test('★ ★ v2.3.7 — rules.schema.json BR 5토막+ 자연 허용', () => {
   }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json business_rules array (신표준) + natural_language only 정합', () => {
+test('★ ★ ★ v2.4.0 — business-rules.schema.json business_rules array (신표준) + natural_language only 정합', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       project_id: 'test-project',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
@@ -241,18 +241,18 @@ test('★ ★ ★ v2.4.0 — rules.schema.json business_rules array (신표준) 
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.equal(result.valid, true, `business_rules + natural_language + title should pass: ${JSON.stringify(result)}`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json business_rules + GWT only 정합 (anyOf dual representation)', () => {
+test('★ ★ ★ v2.4.0 — business-rules.schema.json business_rules + GWT only 정합 (anyOf dual representation)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -264,35 +264,35 @@ test('★ ★ ★ v2.4.0 — rules.schema.json business_rules + GWT only 정합 
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.equal(result.valid, true, `business_rules + GWT should pass: ${JSON.stringify(result)}`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json 두 표현 모두 부재 → invalid (anyOf 강제)', () => {
+test('★ ★ ★ v2.4.0 — business-rules.schema.json 두 표현 모두 부재 → invalid (anyOf 강제)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         { id: 'BR-EMPTY-FAIL-001', name: '빈 BR' },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.equal(result.valid, false, `두 표현 모두 부재 should fail: ${JSON.stringify(result)}`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v5.0.0 — rules.schema.json v1.x `rules` alias 폐기 → REJECTED (묶음 Q ① hard kill)', () => {
+test('★ ★ ★ v5.0.0 — business-rules.schema.json v1.x `rules` alias 폐기 → REJECTED (묶음 Q ① hard kill)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules: [
         {
@@ -304,8 +304,8 @@ test('★ ★ ★ v5.0.0 — rules.schema.json v1.x `rules` alias 폐기 → REJ
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(
@@ -320,7 +320,7 @@ test('★ ★ ★ v5.0.0 — paradigm: FE + `rules_manual_authored` alias 폐기
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       paradigm: 'FE',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       rules_manual_authored: [
@@ -332,8 +332,8 @@ test('★ ★ ★ v5.0.0 — paradigm: FE + `rules_manual_authored` alias 폐기
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(
@@ -348,7 +348,7 @@ test('★ ★ ★ v5.0.0 — paradigm: FE + business_rules canonical → VALID (
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       paradigm: 'FE',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
@@ -360,19 +360,19 @@ test('★ ★ ★ v5.0.0 — paradigm: FE + business_rules canonical → VALID (
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(result.valid, true, `FE 트랙 business_rules canonical should pass: ${JSON.stringify(result)}`);
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v6.0.0 — rules.schema.json description-only 표현 자격 박탈 → REJECTED (묶음 Q ② anyOf 4→2)', () => {
+test('★ ★ ★ v6.0.0 — business-rules.schema.json description-only 표현 자격 박탈 → REJECTED (묶음 Q ② anyOf 4→2)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -382,8 +382,8 @@ test('★ ★ ★ v6.0.0 — rules.schema.json description-only 표현 자격 �
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(
@@ -394,11 +394,11 @@ test('★ ★ ★ v6.0.0 — rules.schema.json description-only 표현 자격 �
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v6.0.0 — rules.schema.json trigger/condition/action-only 표현 자격 박탈 → REJECTED (묶음 Q ②)', () => {
+test('★ ★ ★ v6.0.0 — business-rules.schema.json trigger/condition/action-only 표현 자격 박탈 → REJECTED (묶음 Q ②)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -410,8 +410,8 @@ test('★ ★ ★ v6.0.0 — rules.schema.json trigger/condition/action-only 표
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.notEqual(result.schema_status, 'not-found');
     assert.equal(
@@ -426,7 +426,7 @@ test('★ ★ ★ v6.0.0 — GWT + description property 동시 = VALID (D1: desc
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -439,8 +439,8 @@ test('★ ★ ★ v6.0.0 — GWT + description property 동시 = VALID (D1: desc
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.equal(
       result.valid,
@@ -454,7 +454,7 @@ test('★ ★ ★ v6.0.0 — natural_language + trigger/condition/action propert
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../schemas/rules.schema.json',
+      $schema_origin: '../schemas/business-rules.schema.json',
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
@@ -467,8 +467,8 @@ test('★ ★ ★ v6.0.0 — natural_language + trigger/condition/action propert
         },
       ],
     };
-    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'rules.json'));
+    writeFileSync(join(dir, 'business-rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'business-rules.json'));
     const result = r.parsed.results[0];
     assert.equal(
       result.valid,

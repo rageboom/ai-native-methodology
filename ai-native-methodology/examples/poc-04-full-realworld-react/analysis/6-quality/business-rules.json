@@ -1,5 +1,5 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/rules.schema.json",
+  "$schema_origin": "ai-native-methodology/schemas/business-rules.schema.json",
   "meta": {
     "generated_at": "2026-05-02T00:00:00Z",
     "confidence": 0.92,

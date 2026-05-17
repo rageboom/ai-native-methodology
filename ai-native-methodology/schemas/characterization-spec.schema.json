@@ -121,7 +121,7 @@
             "properties": {
               "rule": {
                 "type": "string",
-                "description": "rules.json BR 또는 antipatterns.json AP ID (예: 'BR-USER-EMAIL-FORMAT-001' / 'AP-DB-001')."
+                "description": "business-rules.json BR 또는 antipatterns.json AP ID (예: 'BR-USER-EMAIL-FORMAT-001' / 'AP-DB-001')."
               },
               "type": {
                 "$ref": "./intent-classification.schema.json",

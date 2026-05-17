@@ -412,7 +412,7 @@ test('★ ★ ★ v6.0.0 묶음 Q ②: description-only BR — representation_mi
 });
 
 test('★ ★ ★ v6.0.0 묶음 Q ② Senior gate: PoC #06 post-migration — 7 BR 전부 GWT+NL / representation_missing 0 (합성 결함 은폐 inverse 차단)', () => {
-  const poc06 = join(__testdir, '../../../examples/poc-06-efiweb-exchange-spring41/input/rules.json');
+  const poc06 = join(__testdir, '../../../examples/poc-06-efiweb-exchange-spring41/input/business-rules.json');
   const doc = JSON.parse(readFileSync(poc06, 'utf8'));
   const r = validateRulesDoc(doc);
   assert.equal(r.stats.total, 7, '#06 cross-consistency corpus = 7 BR (Senior #06 count==7 guard)');

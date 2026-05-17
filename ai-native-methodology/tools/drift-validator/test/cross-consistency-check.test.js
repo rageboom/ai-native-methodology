@@ -17,7 +17,7 @@ function readSchema(filename) {
 }
 
 test('rules.schema.json — cross_consistency_check slim marker 신설 + additionalProperties:false', () => {
-  const schema = readSchema('rules.schema.json');
+  const schema = readSchema('business-rules.schema.json');
   const cc = schema.$defs.businessRule.properties.cross_consistency_check;
   assert.ok(cc, 'cross_consistency_check 필드 존재');
   assert.equal(cc.type, 'object');
@@ -25,21 +25,21 @@ test('rules.schema.json — cross_consistency_check slim marker 신설 + additio
 });
 
 test('cross_consistency_check — Senior 조건 1 provenance discriminator (generated_by) 존재', () => {
-  const cc = readSchema('rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
+  const cc = readSchema('business-rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
   assert.ok(cc.properties.generated_by, '★ provenance discriminator generated_by 의무 (machine-generated 식별)');
   assert.ok(cc.properties.checked_at, 'checked_at provenance 존재');
   assert.ok(cc.properties.external_result_ref, '★ 분리 집계 join — external_result_ref 존재 (정제된 옵션 C)');
 });
 
 test('cross_consistency_check — 분류 보존 강제 핵심 필드 (DEC §3 #2 확정 제약)', () => {
-  const cc = readSchema('rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
+  const cc = readSchema('business-rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
   assert.equal(cc.properties.intent_classification_preserved.type, 'boolean');
   assert.equal(cc.properties.classification_drift_detected.type, 'boolean');
   assert.ok(cc.properties.classification_drift_reason, 'classification_drift_reason 존재');
 });
 
 test('cross_consistency_check — verdict enum 에 classification_drift 신설 (PoC #08 사례)', () => {
-  const cc = readSchema('rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
+  const cc = readSchema('business-rules.schema.json').$defs.businessRule.properties.cross_consistency_check;
   const verdict = cc.properties.verdict;
   assert.deepEqual(
     verdict.enum,
@@ -49,7 +49,7 @@ test('cross_consistency_check — verdict enum 에 classification_drift 신설 (
 });
 
 test('rules.schema.json — is_intent ⇔ intent_vs_bug_classification 양방향 동치 if/then 2블록', () => {
-  const allOf = readSchema('rules.schema.json').$defs.businessRule.allOf;
+  const allOf = readSchema('business-rules.schema.json').$defs.businessRule.allOf;
   assert.ok(Array.isArray(allOf));
 
   // 정방향: is_intent=true ⇒ classification const "intent"
@@ -82,7 +82,7 @@ test('rules.schema.json — is_intent ⇔ intent_vs_bug_classification 양방향
 });
 
 test('동치 if/then — 둘 다 required (단방향/미보유 vacuous / 실측 both=0 회귀 풀이 0)', () => {
-  const allOf = readSchema('rules.schema.json').$defs.businessRule.allOf;
+  const allOf = readSchema('business-rules.schema.json').$defs.businessRule.allOf;
   const equivBlocks = allOf.filter(
     (b) =>
       b.if &&

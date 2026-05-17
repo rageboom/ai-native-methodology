@@ -9,6 +9,36 @@
 
 ---
 
+## [7.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ⑦: rules.json → business-rules.json 산출물 파일명 rename (breaking 최대)
+
+> ★ ★ ★ ★ ★ **v7.0.0 MAJOR — breaking (의도 / semver 정합)**. 사용자 "하자" → 묶음 Q 잔여 ⑦ 단독 (최대 blast 642 occ·252 files) → "추천안 묶음 + 1-session 시행". 4원칙 full (plan + 3-에이전트 full research + Senior REVISE-3 + STOP-3 hard gate). DEC-2026-05-17-q7-rules-json-rename / ADR-CHAIN-011 §5 patch v16 + §9 LL-i-57. ★ 묶음 Q **전 항목 종결** (①②④⑤+Q-①-followup+⑦).
+
+### 결단 (3-에이전트 수렴 / D1 사실 확정)
+
+- **D1 = v7.0.0 MAJOR 사실 확정** (choice ❌) — official-docs(파일명=계약 처우 시 MAJOR / $id 독립) + industry(파일명 rename=MAJOR 우세 / 외부 consumer 0=즉시 MAJOR 가장 가벼움 / ESLint v9 선례) + Senior CONCUR(artifact contract + hardcoded literal consumer = Q-①-followup MINOR 와 결정적 차이 / LL-i-56 real-tier). ★ Q-①-followup(property/zero-consumer/MINOR) 과 대조 = 파일 artifact 계약 + literal-resolution broad
+- **D2 Option A** (rules.schema.json→business-rules.schema.json 동시 rename) / **D3 $id 정합 변경** / **D4 역사 보존+활성 SSOT 갱신** / **D5 git mv 12 명령+분류별 Edit(script ❌)** / **D6 1-session(cooling-off 별도 session 불요 / Senior validated)**
+
+### rename (git mv 12 + literal)
+
+- **git mv 12**: 11 PoC `rules.json`→`business-rules.json` + `schemas/rules.schema.json`→`schemas/business-rules.schema.json` (history-preserving)
+- schema $id `https://ai-native-methodology/schemas/business-rules.schema.json` 정합 변경 (다른 schema $ref ❌ → 영향 0)
+- ★ Senior REVISE-3 실측 정정 — PoC schema key: 3 `$schema_ref`(poc-01/02/03 honesty) / 1 `$schema_origin`(poc-04 value-edit) / 7 무키(auto-correct). 코드 literal 3곳 (findings-aggregator:83 / release-readiness:111,266)
+
+### ★ ★ STOP-3 hard gate (방법론 hard gate 가치 입증)
+
+- post-mv hard gate 가 **plan/research(Senior REVISE-3 포함 3-에이전트) 누락 consumer 검출** — 6 test 파일 hardcoded `rules.schema.json`/`rules.json` literal (ENOENT). LL-i-55 paradigm 입증 (research 수렴만으로 코드 착수 ❌ / 실측 hard gate). 처분 = 근본 결함 ❌ (test=활성 자산) → 동반 치환 → 재검증
+- gate 3/3 통과 = schema-validator 11 PoC VALID + workspace **393/393** + release-readiness **11/11**
+
+### 회귀
+
+- workspace 393/393 + release-readiness 11/11 + chain harness validated 본질 보존 / breaking ✅의도 / 역사(decisions/CHANGELOG/dist) 무수정
+
+### ★ 묶음 Q 전 항목 종결
+
+①(v5.0.0)②(v6.0.0)④(v4.1.1)⑤(v4.1.0)+Q-①-followup(v6.1.0)+**⑦(v7.0.0)** = 묶음 Q 완결. 잔여 carry = C-poc08-drift / C-cross-consistency-validator-inline-emit / §11 후속 list sync / PoC #05 Haiku retrospect
+
+---
+
 ## [6.1.0] — 2026-05-17 ★ MINOR — Q-①-followup: rules_auto_extracted_reference → auto_extracted_br_refs semantic-rename
 
 > ★ **v6.1.0 MINOR — additive-equivalent (no consumer observes break)**. 사용자 "1"(묶음 Q 잔여) → "Q-①-followup 먼저"(risk 오름차순 / 11 files) → "추천안 묶음 + 지금 시행". 4원칙 lightweight (plan + 3-에이전트 가벼운 research + 사용자 결단 / ★ LL-i-54 정당 일탈 — breaking 동형 ≠ 비용 동형). DEC-2026-05-17-q1-followup-rename / ADR-CHAIN-011 §5 patch v15 + §9 LL-i-56.

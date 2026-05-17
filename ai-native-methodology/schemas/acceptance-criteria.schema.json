@@ -76,7 +76,7 @@
             "type": "string",
             "enum": ["must", "should", "nice"],
             "description": "MoSCoW severity (★ Senior B6 ADR-CHAIN-001 정합)",
-            "$comment": "★ v4.1.0 — cross-stage 정합 매핑 SSOT = methodology-spec/severity-cross-stage-mapping.md. rules.json BR severity 원천 보유 시 must←critical/high · should←medium · nice←low/info default / LLM business_intent 근거 ±1 단계 조정만 허용 (drift 정량 추적)."
+            "$comment": "★ v4.1.0 — cross-stage 정합 매핑 SSOT = methodology-spec/severity-cross-stage-mapping.md. business-rules.json BR severity 원천 보유 시 must←critical/high · should←medium · nice←low/info default / LLM business_intent 근거 ±1 단계 조정만 허용 (drift 정량 추적)."
           },
           "verifiable": {
             "type": "boolean",

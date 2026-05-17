@@ -19,16 +19,16 @@ function validateRules(businessRule) {
   const dir = mkdtempSync(join(tmpdir(), 'sv-cc-'));
   try {
     const inst = {
-      $schema_origin: '../../schemas/rules.schema.json',
+      $schema_origin: '../../schemas/business-rules.schema.json',
       business_rules: [businessRule],
     };
-    const f = join(dir, 'rules.json');
+    const f = join(dir, 'business-rules.json');
     writeFileSync(f, JSON.stringify(inst));
     const r = spawnSync('node', [CLI, f, '--schema-dir', SCHEMA_DIR, '--json'], { encoding: 'utf-8' });
     const parsed = r.stdout ? JSON.parse(r.stdout) : null;
     const result = parsed && parsed.results && parsed.results[0];
     assert.ok(result, `cli.js 결과 파싱 실패: ${r.stdout} ${r.stderr}`);
-    assert.notEqual(result.schema_status, 'not-found', 'rules.schema.json 매핑 실패');
+    assert.notEqual(result.schema_status, 'not-found', 'business-rules.schema.json 매핑 실패');
     return result.valid;
   } finally {
     rmSync(dir, { recursive: true, force: true });
