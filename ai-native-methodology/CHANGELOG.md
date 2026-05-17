@@ -9,6 +9,48 @@
 
 ---
 
+## [8.4.0] — 2026-05-18 ★ MINOR — F-SIM corroboration #2 attained (poc-14 external-user simulation / P1 deadline 14d 전 이행 / 패러독스 해소)
+
+> ★ **v8.4.0 MINOR — corroboration #2 + 외부 사용자 dogfood 일석이조**. 사용자 "시뮬레이션…빌드된 plugins / 기존 PoC ❌ / 사용자 시점 기록 / 사용 빈도+사용 못하는 경우" → plan `peaceful-dreaming-dragonfly.md` 작성·ExitPlanMode 승인 후 시행.
+>
+> **신설**: `examples/poc-14-fsim-corroboration/` (Python FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic v2 + SQLite / ~319 LOC / 의도된 결함 3종 — AP-FSIM-SEC-001 critical / AP-FSIM-DATA-001 high / AP-FSIM-AUTH-001 medium). poc-05 (TypeScript+vitest) 와 **stack 횡단** corroboration.
+>
+> **chain harness e2e RED→GREEN 완성**:
+> - chain 0 (analysis): 7대 산출물 + aspect 5종 (static-security blocked-by-env carry / 4 FE skill non-fire)
+> - chain 1 (planning): `excluded_antipatterns: [AP-FSIM-SEC-001, AP-FSIM-AUTH-001]` (F-SIM-001 lane carry) — planning-extraction-validator 0 findings
+> - chain 2 (spec): `AC.related_brs + related_aps` (F-SIM-002/004 propagation source) — chain-coverage-validator + F-SIM-001 lane severe AP=2 / uncovered=0
+> - chain 3 (RED): pytest 7/7 fail (Beck-canonical compile-import / `result_hash sha256:e0608e`)
+> - chain 4 (GREEN): pytest 7/7 pass / fail_count=0 / `commit_hash 8e83c6f` / `result_hash sha256:47dbad`
+> - matrix: 4 rows / 4 green / `severity_propagation_active:true` / `business_rule_ids+antipattern_ids` populated
+>
+> **사용자 4 조건 충족 (사용자 시점 기록 3 산출)**:
+> - `.aimd/simulation/invocation-log.md` (63 entry / 35분 sequential / element 발화 / hook+agent non-fire 표면)
+> - `.aimd/simulation/element-frequency.json` (47 skill × stage × fire / 9 agent × dispatch / 17 tool × invoke / 3 hook × fire — 결정적 매트릭스)
+> - `.aimd/simulation/non-use-rationale.md` (미 fire 16 skill + 9 agent + 3 hook + 10 tool / 9 category 분류)
+>
+> **F-SIM-011 패러독스 해소** (`flows/sdlc-4stage-flow.json` release_eligibility): #1/#2/#6/#7 `current_corroboration_count_at_required_strength` **1→2** (poc-05+poc-14) / `self_consistency_note` "패러독스 해소". DEC-2026-05-17 §4.1.2 P1 deadline (2026-06-01) **14일 전 이행**.
+>
+> **★ ★ ★ element coverage threshold 결과 (정직 표면화)**:
+> - skills fire: 31/47 (66%) ✓
+> - agents dispatch: **0/9 ✗** (★ Type 1 시뮬레이션 본질 한계 / F-SIM-13)
+> - tools invoke: 7/17 (41%) ✗ (phase-simplified + plugin-self-change-only)
+> - hooks fire: **0/3 ✗** (★ Type 1 한계 / Claude Code session 외)
+>
+> → Type 1 (main self-run) ≠ Type 2 (real Claude Code session). **Type 2 별도 시뮬레이션 carry** (F-SIM-13 자산화).
+>
+> **신규 finding 후보 5종 (F-SIM-12~16 / 등재 carry)**:
+> - F-SIM-12 (medium): severity_distinct_count=1 (모든 AC must → cell critical / SSOT mapping 한계)
+> - F-SIM-13 (medium): Type 1 시뮬레이션 한계 (hook+agent fire 0)
+> - F-SIM-14 (low): analysis-form-validation-fe description "FE-only" — Pydantic BE schema validation cover ❌
+> - F-SIM-15 (high): test-spec.fail_mode schema 미허용 (F-SIM-005 P1 carry — 본 시뮬레이션 시 schema 차단)
+> - F-SIM-16 (low): static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌
+>
+> **STOP-3 9-gate**: 6.5 pass / 2 partial (F-SIM-12/13 표면화) / honest 결과. **release-readiness 13/13** ✓ + workspace 414/414 + drift 3-way + skill-citation 0.
+>
+> **classification = MINOR (additive)**: corroboration #2 = 사실 변경 / 정의 변경 아님 / breaking 0.
+>
+> DEC-2026-05-18-fsim-corroboration-2-attained / plan `peaceful-dreaming-dragonfly.md`.
+
 ## [8.3.0] — 2026-05-18 ★ MINOR — chain harness e2e simulation audit + F-SIM-001/002/003/004/011 P0 corrective (additive / breaking 0)
 
 > ★ **v8.3.0 MINOR — additive corrective + industry-aligned**. 사용자 "시뮬레이션…모든 단계에서 목표 정합·비효율 확인" → 데스크 워크스루 감사 (no-simulation 정책 무충돌) / poc-05(reference cycle / §8.1 strict 7/7 #7) + poc-03(retrofit) cross-validation → 11 finding 도출 (**F-SIM-001~011 / Body Finding Ledger F-SIM namespace 신설**). 단일 PoC 특이 0 + 4 finding RealWorld 악화 = **방법론 구조 결함 확정**. 공통 뿌리 1개: "본 방법론은 *링크 존재* 결정적 강제 / *링크가 비즈니스 사실 보존* 미강제" — F-SIM-001/002/003/004/005 동일 뿌리.

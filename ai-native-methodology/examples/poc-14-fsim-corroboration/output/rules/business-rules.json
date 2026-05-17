@@ -5,13 +5,12 @@
   "meta": {
     "generated_at": "2026-05-18T16:03:00Z",
     "confidence": 0.88,
-    "inputs_used": ["source_code", "swagger.yaml", "plan_doc"],
-    "methodology_version": "8.3.0",
+    "inputs_used": ["source_code", "design_specs", "planning_docs"],
+    "methodology_version": "v8.3.0",
     "formula_version": "v1",
     "extraction_env": "poc14_simulation",
     "sample_mode": false,
-    "corroboration_eligible": true,
-    "corroboration_role": "L2_or_L3 candidate (poc-05 와 stack 횡단 ⓒ #2)"
+    "corroboration_eligible": true
   },
   "business_rules": [
     {
