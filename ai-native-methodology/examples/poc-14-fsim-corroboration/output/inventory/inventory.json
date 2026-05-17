@@ -1,0 +1,65 @@
+{
+  "$comment": "★ analysis-source-inventory skill 산출 — phase=discovery.1",
+  "project_id": "poc-14-fsim-corroboration",
+  "language": "Python",
+  "framework": "FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic v2",
+  "stack_signals": [
+    "requirements.txt: fastapi==0.115.0",
+    "requirements.txt: sqlalchemy==2.0.30",
+    "requirements.txt: pydantic==2.7.0",
+    "requirements.txt: python-jose==3.3.0",
+    "requirements.txt: pytest==8.2.0",
+    ".semgrep.yml present (static-security capable)"
+  ],
+  "test_runner_inferred": "pytest",
+  "source_files": [
+    "source/__init__.py",
+    "source/main.py",
+    "source/models.py",
+    "source/schemas.py",
+    "source/auth.py",
+    "source/users.py (★ 명시 부재 / register/login 모두 auth.py 흡수)",
+    "source/todos.py",
+    "source/database.py"
+  ],
+  "loc_total": 319,
+  "modules": [
+    {
+      "name": "main",
+      "exports": ["app (FastAPI)"],
+      "endpoints": ["POST /users", "POST /users/login", "GET /todos", "POST /todos", "PUT /todos/{id}", "DELETE /todos/{id}"],
+      "loc": 78,
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "models",
+      "exports": ["User", "Todo", "TodoStatus"],
+      "loc": 43,
+      "antipatterns_flagged": ["AP-FSIM-DATA-001"]
+    },
+    {
+      "name": "schemas",
+      "exports": ["UserCreate", "UserLogin", "UserResponse", "AuthToken", "TodoCreate", "TodoUpdate", "TodoResponse"],
+      "loc": 53,
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "auth",
+      "exports": ["register_user", "authenticate_user", "create_access_token", "get_current_user"],
+      "loc": 64,
+      "antipatterns_flagged": ["AP-FSIM-SEC-001", "AP-FSIM-AUTH-001", "AP-FSIM-DATA-001"]
+    },
+    {
+      "name": "todos",
+      "exports": ["create_todo", "list_todos", "get_todo_for_user", "update_todo", "delete_todo"],
+      "loc": 61,
+      "antipatterns_flagged": []
+    },
+    {
+      "name": "database",
+      "exports": ["Base", "engine", "SessionLocal", "get_db"],
+      "loc": 19,
+      "antipatterns_flagged": []
+    }
+  ]
+}

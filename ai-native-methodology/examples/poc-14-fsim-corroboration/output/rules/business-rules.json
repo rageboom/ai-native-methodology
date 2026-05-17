@@ -1,0 +1,119 @@
+{
+  "$schema_origin": "../../../../schemas/business-rules.schema.json",
+  "$comment": "★ analysis-business-rules skill 산출 — phase=business-logic.4 (sub: business-rules) / v6.0.0 표현 2종 (GWT + natural_language)",
+  "project_id": "poc-14-fsim-corroboration",
+  "meta": {
+    "generated_at": "2026-05-18T16:03:00Z",
+    "confidence": 0.88,
+    "inputs_used": ["source_code", "swagger.yaml", "plan_doc"],
+    "methodology_version": "8.3.0",
+    "formula_version": "v1",
+    "extraction_env": "poc14_simulation",
+    "sample_mode": false,
+    "corroboration_eligible": true,
+    "corroboration_role": "L2_or_L3 candidate (poc-05 와 stack 횡단 ⓒ #2)"
+  },
+  "business_rules": [
+    {
+      "id": "BR-USER-DATA-FSIM-001",
+      "title": "이메일 시스템 내 unique",
+      "type": "uniqueness_constraint",
+      "description": "사용자 등록 시 이메일은 시스템 내 유일해야 한다. 중복 등록 시 409 Conflict 응답.",
+      "current_state_note": "★ 현 구현 위배 — auth.register_user() 가 중복 검사 미수행 / models.User.email 에 unique=True 부재 (AP-FSIM-DATA-001 high)",
+      "source_grounded_evidence": {
+        "file": "source/auth.py",
+        "line_range": "21-30",
+        "grep_hit_count": 0,
+        "grep_query": "db.query\\(User\\)\\.filter\\(User\\.email"
+      },
+      "severity": "high",
+      "natural_language": "사용자 등록 시 이메일은 시스템 내 유일해야 한다.",
+      "given": [
+        "시스템에 email='alice@example.com' 으로 등록된 사용자가 존재한다"
+      ],
+      "when": [
+        "동일 email 로 신규 사용자 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 409 Conflict 응답을 반환한다",
+        "사용자 저장소에 중복 이메일 항목이 추가되지 않는다"
+      ]
+    },
+    {
+      "id": "BR-USER-VALIDATION-FSIM-001",
+      "title": "비밀번호 최소 8자",
+      "type": "validation",
+      "description": "신규 등록 시 비밀번호 최소 8자. Pydantic Field(min_length=8) 로 자동 검증.",
+      "current_state_note": "Pydantic 자동 검증 정상 동작 — schemas.UserCreate.password 명시. ★ severity medium 으로 medium 보안 (storage 결함 별개 AP-FSIM-SEC-001).",
+      "source_grounded_evidence": {
+        "file": "source/schemas.py",
+        "line_range": "11",
+        "grep_hit_count": 1,
+        "grep_query": "min_length=8"
+      },
+      "severity": "medium",
+      "natural_language": "신규 등록 시 비밀번호는 최소 8자 이상.",
+      "given": [
+        "신규 사용자 등록 요청이 준비된 상태이다"
+      ],
+      "when": [
+        "7자 이하 비밀번호 ('pass123')로 등록을 시도한다"
+      ],
+      "then": [
+        "시스템은 422 Unprocessable Entity (FastAPI 기본 Pydantic 응답) 또는 400 응답을 반환한다",
+        "사용자 저장소에 해당 사용자가 추가되지 않는다"
+      ]
+    },
+    {
+      "id": "BR-TODO-VALIDATION-FSIM-001",
+      "title": "Todo title 길이 제약",
+      "type": "validation",
+      "description": "Todo 생성 시 title 은 1~200자 (Pydantic Field).",
+      "current_state_note": "Pydantic 자동 검증 — schemas.TodoCreate.title 명시. 정상 동작.",
+      "source_grounded_evidence": {
+        "file": "source/schemas.py",
+        "line_range": "32",
+        "grep_hit_count": 1,
+        "grep_query": "max_length=200"
+      },
+      "severity": "low",
+      "natural_language": "Todo 생성 시 title 은 1~200자 사이.",
+      "given": [
+        "인증된 사용자가 Todo 생성 요청 준비"
+      ],
+      "when": [
+        "title 길이가 0자 또는 200자 초과인 요청을 보낸다"
+      ],
+      "then": [
+        "시스템은 422 응답을 반환한다",
+        "Todo 가 생성되지 않는다"
+      ]
+    },
+    {
+      "id": "BR-TODO-OWNERSHIP-FSIM-001",
+      "title": "Todo 소유권 (본인만 접근)",
+      "type": "ownership_constraint",
+      "description": "Todo 의 update / delete 는 본인 (user_id 일치) 만 가능. 타인 todo 접근 시 거부.",
+      "current_state_note": "현 구현 = `get_todo_for_user` 가 user_id 검사 후 None 반환 → endpoint 가 404 Not Found 변환. 정상은 403 Forbidden 분리 권장이나 본 PoC 채택 acceptable.",
+      "source_grounded_evidence": {
+        "file": "source/todos.py",
+        "line_range": "30-35",
+        "grep_hit_count": 1,
+        "grep_query": "todo.user_id != user.id"
+      },
+      "severity": "high",
+      "natural_language": "Todo 의 수정/삭제는 작성자 본인만 가능하다.",
+      "given": [
+        "User A 가 todo_id=1 을 소유한다",
+        "User B 가 로그인되어 있다"
+      ],
+      "when": [
+        "User B 가 PUT /todos/1 또는 DELETE /todos/1 을 호출한다"
+      ],
+      "then": [
+        "시스템은 404 Not Found (또는 403 Forbidden) 응답을 반환한다",
+        "User A 의 todo 는 변경되지 않는다"
+      ]
+    }
+  ]
+}

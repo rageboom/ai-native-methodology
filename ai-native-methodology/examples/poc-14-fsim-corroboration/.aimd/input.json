@@ -1,0 +1,32 @@
+{
+  "$schema_origin": "analysis-input-collection skill output",
+  "project_id": "poc-14-fsim-corroboration",
+  "target": {
+    "type": "directory",
+    "path": "source/",
+    "language": "Python",
+    "framework": "FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic v2",
+    "loc_total": 319
+  },
+  "input_sources": [
+    { "type": "source_code", "path": "source/", "weight": "primary" },
+    { "type": "swagger", "path": "input/swagger.yaml", "weight": "supplementary" },
+    { "type": "plan_doc", "path": "input/docs/plan.md", "weight": "supplementary" },
+    { "type": "semgrep_config", "path": ".semgrep.yml", "weight": "static_analysis" }
+  ],
+  "stack_signals": [
+    "fastapi", "sqlalchemy", "pydantic-v2", "sqlite", "python-jose", "pytest", "semgrep"
+  ],
+  "track_branch": "BE",
+  "scenario": "A_or_B (analysis required / chain harness decided by user)",
+  "baseline_ratchet": {
+    "applied": false,
+    "rationale": "신규 sample / legacy 아님 — _base-apply-baseline-ratchet 비대상 (small / no defect history)"
+  },
+  "meta": {
+    "generated_at": "2026-05-18T16:01:00Z",
+    "methodology_version": "8.3.0",
+    "skill_used": "analysis-input-collection + analysis-input-orchestrate (멀티소스)",
+    "auto_dispatch_sub_skills": ["analysis-from-swagger", "analysis-from-plan-doc", "analysis-from-prompt"]
+  }
+}

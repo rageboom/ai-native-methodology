@@ -1,0 +1,25 @@
+{
+  "$comment": "★ analysis-aspect-static-security skill 산출 — phase=aspect (cross-cutting / no-simulation 의무)",
+  "project_id": "poc-14-fsim-corroboration",
+  "tool_attempted": "semgrep 1.161.0 (Python wrapper)",
+  "execution_result": "blocked_by_environment",
+  "evidence": {
+    "command_attempted": "python -m semgrep --config .semgrep.yml source/",
+    "exit_code": 2,
+    "stderr_excerpt": "Using `python -m semgrep` to run Semgrep is deprecated as of 1.38.0. Please simply run `semgrep` instead.",
+    "diagnosis": "semgrep 1.161.0 deprecates `python -m semgrep` wrapper. Direct `semgrep` binary not in PATH on Windows MSYS2 환경 (Cygwin/Git Bash). Real execution = WSL2 또는 Docker 필요."
+  },
+  "static_findings_simulated": null,
+  "★_no_simulation_policy": "AI persona 로 'Semgrep 했더라면 이러이러한 결과' 시뮬레이션 ❌. 실 도구 미실행 = carry 명시. ADR-009 단계 5 정합.",
+  "carry_to": "다음 시행 환경 = WSL2 또는 Docker semgrep image (`returntocorp/semgrep`) 적용 의무. 본 simulation 한정 = environment-blocked.",
+  "expected_findings_if_run": [
+    "plaintext-password-storage @ source/auth.py:24 (ERROR / matches AP-FSIM-SEC-001)",
+    "missing-email-unique @ source/models.py:24 (WARNING / matches AP-FSIM-DATA-001)",
+    "jwt-no-expiry @ source/auth.py:40-44 (INFO / matches AP-FSIM-AUTH-001)"
+  ],
+  "meta": {
+    "generated_at": "2026-05-18T16:06:00Z",
+    "skill_used": "analysis-aspect-static-security",
+    "fire_status": "attempted_then_blocked"
+  }
+}

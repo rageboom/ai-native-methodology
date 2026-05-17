@@ -1,0 +1,92 @@
+{
+  "$comment": "★ analysis-domain-model skill 산출 — phase=business-logic.4 (sub: domain-model)",
+  "project_id": "poc-14-fsim-corroboration",
+  "use_cases": [
+    {
+      "id": "UC-USER-FSIM-001",
+      "title": "신규 사용자 등록",
+      "trigger": "POST /users",
+      "actor": "anonymous",
+      "primary_outcome": "201 Created + user.id 반환",
+      "alternatives": [
+        { "id": "UC-USER-FSIM-001-A1", "title": "이메일 중복", "outcome": "409 Conflict (BR-USER-DATA-FSIM-001) — ★ 현 구현 미수행" },
+        { "id": "UC-USER-FSIM-001-A2", "title": "비밀번호 < 8자", "outcome": "400 Bad Request (BR-USER-VALIDATION-FSIM-001 / Pydantic 자동 검증)" }
+      ],
+      "related_rules": ["BR-USER-DATA-FSIM-001", "BR-USER-VALIDATION-FSIM-001"],
+      "source_grounded_evidence": {
+        "file": "source/main.py",
+        "line_range": "21-24",
+        "function_name": "register"
+      }
+    },
+    {
+      "id": "UC-USER-FSIM-002",
+      "title": "로그인",
+      "trigger": "POST /users/login",
+      "actor": "anonymous",
+      "primary_outcome": "200 OK + JWT access_token",
+      "alternatives": [
+        { "id": "UC-USER-FSIM-002-A1", "title": "사용자 없음 / 비밀번호 불일치", "outcome": "401 Unauthorized" }
+      ],
+      "related_rules": [],
+      "source_grounded_evidence": {
+        "file": "source/main.py",
+        "line_range": "27-35",
+        "function_name": "login"
+      }
+    },
+    {
+      "id": "UC-TODO-FSIM-001",
+      "title": "Todo 생성",
+      "trigger": "POST /todos",
+      "actor": "authenticated user",
+      "primary_outcome": "201 Created + todo.id 반환",
+      "alternatives": [
+        { "id": "UC-TODO-FSIM-001-A1", "title": "JWT 부재", "outcome": "401 Unauthorized" },
+        { "id": "UC-TODO-FSIM-001-A2", "title": "title 비어있음 / >200자", "outcome": "400 Bad Request (Pydantic 자동)" }
+      ],
+      "related_rules": ["BR-TODO-VALIDATION-FSIM-001"],
+      "source_grounded_evidence": {
+        "file": "source/main.py",
+        "line_range": "46-52",
+        "function_name": "create_todo_endpoint"
+      }
+    },
+    {
+      "id": "UC-TODO-FSIM-002",
+      "title": "Todo 수정 (소유자만)",
+      "trigger": "PUT /todos/{id}",
+      "actor": "authenticated user",
+      "primary_outcome": "200 OK",
+      "alternatives": [
+        { "id": "UC-TODO-FSIM-002-A1", "title": "타인 todo", "outcome": "404 Not Found (현 구현 / 정상은 403 Forbidden)" }
+      ],
+      "related_rules": ["BR-TODO-OWNERSHIP-FSIM-001"],
+      "source_grounded_evidence": {
+        "file": "source/main.py",
+        "line_range": "55-62",
+        "function_name": "update_todo_endpoint"
+      }
+    },
+    {
+      "id": "UC-TODO-FSIM-003",
+      "title": "Todo 삭제 (소유자만)",
+      "trigger": "DELETE /todos/{id}",
+      "actor": "authenticated user",
+      "primary_outcome": "204 No Content",
+      "alternatives": [
+        { "id": "UC-TODO-FSIM-003-A1", "title": "타인 todo", "outcome": "404 Not Found (현 구현 / 정상은 403 Forbidden)" }
+      ],
+      "related_rules": ["BR-TODO-OWNERSHIP-FSIM-001"],
+      "source_grounded_evidence": {
+        "file": "source/main.py",
+        "line_range": "65-72",
+        "function_name": "delete_todo_endpoint"
+      }
+    }
+  ],
+  "aggregates": [
+    { "name": "User", "use_case_refs": ["UC-USER-FSIM-001", "UC-USER-FSIM-002"] },
+    { "name": "Todo", "use_case_refs": ["UC-TODO-FSIM-001", "UC-TODO-FSIM-002", "UC-TODO-FSIM-003"] }
+  ]
+}

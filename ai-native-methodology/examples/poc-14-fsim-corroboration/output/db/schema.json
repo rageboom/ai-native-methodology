@@ -1,0 +1,37 @@
+{
+  "$comment": "★ analysis-db-schema-erd skill 산출 — phase=db-schema.2",
+  "project_id": "poc-14-fsim-corroboration",
+  "database": "SQLite",
+  "tables": [
+    {
+      "name": "users",
+      "columns": [
+        { "name": "id", "type": "INTEGER", "primary_key": true, "auto_increment": true },
+        { "name": "email", "type": "STRING", "nullable": false, "indexed": true, "unique": false, "★_drift": "AP-FSIM-DATA-001 — unique=True 부재 (의도된 결함)" },
+        { "name": "password", "type": "STRING", "nullable": false, "★_drift": "AP-FSIM-SEC-001 — plaintext 저장 (hash 부재)" },
+        { "name": "created_at", "type": "DATETIME", "nullable": true, "default": "datetime.utcnow" }
+      ],
+      "indexes": [{ "name": "ix_users_email", "columns": ["email"], "unique": false }],
+      "constraints": []
+    },
+    {
+      "name": "todos",
+      "columns": [
+        { "name": "id", "type": "INTEGER", "primary_key": true, "auto_increment": true },
+        { "name": "user_id", "type": "INTEGER", "nullable": false, "indexed": true, "foreign_key": "users.id" },
+        { "name": "title", "type": "STRING(200)", "nullable": false },
+        { "name": "body", "type": "STRING", "nullable": true },
+        { "name": "due_date", "type": "DATETIME", "nullable": true },
+        { "name": "status", "type": "ENUM(pending,done)", "nullable": false, "default": "pending" },
+        { "name": "created_at", "type": "DATETIME", "default": "datetime.utcnow" }
+      ],
+      "indexes": [{ "name": "ix_todos_user_id", "columns": ["user_id"] }],
+      "constraints": [{ "type": "fk", "name": "fk_todos_user", "from": "user_id", "to": "users.id", "on_delete": "CASCADE" }]
+    }
+  ],
+  "rendered_paths": { "erd_mermaid": "output/db/erd.mermaid" },
+  "meta": {
+    "generated_at": "2026-05-18T16:04:00Z",
+    "skill_used": "analysis-db-schema-erd"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$comment": "★ analysis-architecture skill 산출 — phase=architecture.3",
+  "project_id": "poc-14-fsim-corroboration",
+  "layers": [
+    { "name": "interface", "modules": ["main"], "responsibility": "FastAPI routing + HTTP request/response" },
+    { "name": "schema", "modules": ["schemas"], "responsibility": "Pydantic v2 validation + serialization" },
+    { "name": "service", "modules": ["auth", "todos"], "responsibility": "business logic (register/login/CRUD)" },
+    { "name": "domain", "modules": ["models"], "responsibility": "SQLAlchemy entity (User + Todo)" },
+    { "name": "infrastructure", "modules": ["database"], "responsibility": "SQLite session + DDL" }
+  ],
+  "dependencies": [
+    { "from": "main", "to": ["schemas", "auth", "todos", "database"] },
+    { "from": "auth", "to": ["models", "database"] },
+    { "from": "todos", "to": ["models", "schemas"] },
+    { "from": "schemas", "to": ["models"] },
+    { "from": "models", "to": ["database"] }
+  ],
+  "boundaries": [
+    {
+      "name": "User authentication boundary",
+      "modules": ["auth"],
+      "notes": "★ AP-FSIM-SEC-001 + AP-FSIM-AUTH-001 concentration — antipattern hotspot"
+    },
+    {
+      "name": "Todo ownership boundary",
+      "modules": ["todos"],
+      "notes": "본인 user_id 만 CRUD — ownership 검사 (`get_todo_for_user`)"
+    }
+  ],
+  "cycles_detected": [],
+  "meta": {
+    "generated_at": "2026-05-18T16:02:00Z",
+    "methodology_version": "8.3.0",
+    "skill_used": "analysis-architecture"
+  }
+}

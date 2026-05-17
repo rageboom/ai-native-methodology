@@ -1,0 +1,126 @@
+{
+  "meta": {
+    "generated_at": "2026-05-18T16:10:00Z",
+    "methodology_version": "v8.3.0",
+    "inputs_used": ["source_code", "domain_context_md", "planning_docs", "design_specs"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "output/rules/business-rules.json",
+      "output/domain/domain.json",
+      "output/antipatterns/antipatterns.json",
+      "source/main.py"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "외부 사용자 사이드 프로젝트 — single-user Todo API. production 직전 외부 컨설팅 적용 시뮬레이션.",
+    "stakeholders": ["end-user (Todo 작성자)", "외부 컨설턴트", "dev team"],
+    "success_criteria": [
+      "이메일 중복 가입 차단율 100% (BR-USER-DATA-FSIM-001 / chain 4 fix 의무)",
+      "비밀번호 < 8자 거부율 100% (Pydantic 자동)",
+      "본인 todo 만 read/update/delete 가능 (BR-TODO-OWNERSHIP-FSIM-001)"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-USER-FSIM-001",
+      "name": "신규 사용자 등록",
+      "description": "POST /users — email + password. 이메일 중복 시 409 / pwd<8자 시 422.",
+      "actors": ["anonymous"],
+      "preconditions": ["요청에 email + password 포함"],
+      "postconditions": ["users 저장소 신규 1건 추가 (중복 ❌ 시)"],
+      "acceptance_criteria_refs": ["AC-USER-FSIM-001"],
+      "source_grounded_evidence": ["source/main.py:21-24 (register endpoint)"]
+    },
+    {
+      "id": "UC-USER-FSIM-002",
+      "name": "로그인",
+      "description": "POST /users/login — JWT 발급. 불일치 시 401.",
+      "actors": ["anonymous"],
+      "preconditions": ["email + password 요청"],
+      "postconditions": ["일치 시 JWT 응답"],
+      "acceptance_criteria_refs": ["AC-USER-FSIM-002"],
+      "source_grounded_evidence": ["source/main.py:27-35 (login endpoint)"]
+    },
+    {
+      "id": "UC-TODO-FSIM-001",
+      "name": "Todo 생성",
+      "description": "POST /todos — 인증 필요. title 1~200자.",
+      "actors": ["authenticated user"],
+      "preconditions": ["JWT bearer + title 유효"],
+      "postconditions": ["본인 user_id 의 todo 1건 추가"],
+      "acceptance_criteria_refs": ["AC-TODO-FSIM-001"],
+      "source_grounded_evidence": ["source/main.py:46-52"]
+    },
+    {
+      "id": "UC-TODO-FSIM-002",
+      "name": "Todo 수정 (소유자만)",
+      "description": "PUT /todos/{id} — ownership 검사 의무.",
+      "actors": ["authenticated user"],
+      "preconditions": ["JWT + 본인 소유 todo"],
+      "postconditions": ["타인 todo 시 변경 ❌ + 404"],
+      "acceptance_criteria_refs": ["AC-TODO-FSIM-002"],
+      "source_grounded_evidence": ["source/main.py:55-62"]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-USER-DATA-FSIM-001",
+      "reasoning": "email = 사용자 식별자 / 중복 허용 시 인증/인가 충돌. RDB UNIQUE constraint + service level 사전 검사 = 2중 안전망.",
+      "source_grounded_evidence": "source/auth.py:21-30 + source/models.py:24 — 둘 다 중복 검사 부재 (AP-FSIM-DATA-001 high)"
+    },
+    {
+      "br_id": "BR-USER-VALIDATION-FSIM-001",
+      "reasoning": "password 8자 미만 = 무차별 공격 취약 / NIST SP 800-63B 권고. Pydantic Field(min_length=8) 자동 검증.",
+      "source_grounded_evidence": "source/schemas.py:11 — min_length=8 명시 (정상)"
+    },
+    {
+      "br_id": "BR-TODO-VALIDATION-FSIM-001",
+      "reasoning": "title 길이 제약 = 표시 안정성 + DB 용량 보호. Pydantic Field(min_length=1, max_length=200).",
+      "source_grounded_evidence": "source/schemas.py:32 — 명시 (정상)"
+    },
+    {
+      "br_id": "BR-TODO-OWNERSHIP-FSIM-001",
+      "reasoning": "Todo = 개인 데이터 / 본인만 접근. user_id filter 의무. 위배 시 정보 누출.",
+      "source_grounded_evidence": "source/todos.py:30-35 (`get_todo_for_user` 안 ownership 검사)"
+    }
+  ],
+  "out_of_scope": [
+    "비밀번호 hash (AP-FSIM-SEC-001 / bcrypt — v2.x sprint carry / 본 PoC sample scale 외 / chain harness 검증 본질 ❌)",
+    "JWT 만료 + refresh token (AP-FSIM-AUTH-001 / 별도 auth sprint)",
+    "이메일 인증 메일 / 비밀번호 재설정 (별도 도메인)",
+    "관리자 권한 분리 (별도 도메인)",
+    "OAuth / SSO (별도 도메인)"
+  ],
+  "excluded_antipatterns": [
+    {
+      "ap_id": "AP-FSIM-SEC-001",
+      "reason": "v2.x carry — bcrypt/argon2 hash 마이그레이션 별도 sprint / 본 PoC sample scale 본질 ❌ (시간 비용 절제 / chain harness 검증대 본질이 아님). antipatterns.json carry_to 정합.",
+      "decision_ref": "DEC-2026-05-17-chain-harness-e2e-simulation-audit + plan peaceful-dreaming-dragonfly §1"
+    },
+    {
+      "ap_id": "AP-FSIM-AUTH-001",
+      "reason": "v2.x carry — JWT exp claim + refresh token 분리 별도 auth sprint / 본 PoC scope-out.",
+      "decision_ref": "DEC-2026-05-17-chain-harness-e2e-simulation-audit"
+    }
+  ],
+  "risks_and_constraints": [
+    "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무",
+    "in-memory SQLite (개발용) — production 시 PostgreSQL 마이그레이션 의무",
+    "Semgrep 환경 부재 (Windows MSYS2) — analysis-aspect-static-security carry / WSL2 또는 Docker 필요"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "output/rules/business-rules.json",
+      "output/domain/domain.json",
+      "output/antipatterns/antipatterns.json",
+      "output/inventory/inventory.json",
+      "output/architecture/architecture.json",
+      "output/db/schema.json",
+      "output/api/openapi.yaml"
+    ]
+  }
+}

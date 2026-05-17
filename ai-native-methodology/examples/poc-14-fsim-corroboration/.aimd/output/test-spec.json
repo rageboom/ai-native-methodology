@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "generated_at": "2026-05-18T16:25:00Z",
+    "methodology_version": "v8.3.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "behavior_spec_path": ".aimd/output/behavior-spec.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-USER-FSIM-001",
+      "ac_ref": "AC-USER-FSIM-001",
+      "bhv_ref": "BHV-USER-FSIM-001",
+      "type": "unit",
+      "framework": "pytest",
+      "framework_status": "active",
+      "source_file": "target/tests/test_users.py",
+      "source_evidence": "test_tc_user_fsim_001_register_with_duplicate_email_raises + test_tc_user_fsim_001_register_happy_path",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "pytest 8.4.2",
+        "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
+        "test_runner_stderr_path": ".aimd/output/evidence/pytest-red.json",
+        "invocation_timestamp": "2026-05-18T16:23:00Z",
+        "duration_ms": 50,
+        "pass_count": 0,
+        "fail_count": 2,
+        "skip_count": 0,
+        "reproduction_command": "cd target && python -m pytest tests/ --tb=line",
+        "result_hash": "sha256:e0608e997dcff7f7d16960b5f9ef1112eac2c64af022c30cf8afbf0a3acbda45",
+        "report_format": "pytest_json",
+        "flaky_retries_count": 0
+      }
+    },
+    {
+      "id": "TC-USER-FSIM-002",
+      "ac_ref": "AC-USER-FSIM-002",
+      "bhv_ref": "BHV-USER-FSIM-002",
+      "type": "unit",
+      "framework": "pytest",
+      "framework_status": "active",
+      "source_file": "target/tests/test_users.py",
+      "source_evidence": "test_tc_user_fsim_002_login_match_returns_token + test_tc_user_fsim_002_login_mismatch_returns_none",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "pytest 8.4.2",
+        "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
+        "test_runner_stderr_path": ".aimd/output/evidence/pytest-red.json",
+        "invocation_timestamp": "2026-05-18T16:23:00Z",
+        "duration_ms": 50,
+        "pass_count": 0,
+        "fail_count": 2,
+        "skip_count": 0,
+        "reproduction_command": "cd target && python -m pytest tests/ --tb=line",
+        "result_hash": "sha256:e0608e997dcff7f7d16960b5f9ef1112eac2c64af022c30cf8afbf0a3acbda45",
+        "report_format": "pytest_json",
+        "flaky_retries_count": 0
+      }
+    },
+    {
+      "id": "TC-TODO-FSIM-001",
+      "ac_ref": "AC-TODO-FSIM-001",
+      "bhv_ref": "BHV-TODO-FSIM-001",
+      "type": "unit",
+      "framework": "pytest",
+      "framework_status": "active",
+      "source_file": "target/tests/test_todos.py",
+      "source_evidence": "test_tc_todo_fsim_001_create_happy_path",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "pytest 8.4.2",
+        "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
+        "test_runner_stderr_path": ".aimd/output/evidence/pytest-red.json",
+        "invocation_timestamp": "2026-05-18T16:23:00Z",
+        "duration_ms": 50,
+        "pass_count": 0,
+        "fail_count": 1,
+        "skip_count": 0,
+        "reproduction_command": "cd target && python -m pytest tests/ --tb=line",
+        "result_hash": "sha256:e0608e997dcff7f7d16960b5f9ef1112eac2c64af022c30cf8afbf0a3acbda45",
+        "report_format": "pytest_json",
+        "flaky_retries_count": 0
+      }
+    },
+    {
+      "id": "TC-TODO-FSIM-002",
+      "ac_ref": "AC-TODO-FSIM-002",
+      "bhv_ref": "BHV-TODO-FSIM-002",
+      "type": "unit",
+      "framework": "pytest",
+      "framework_status": "active",
+      "source_file": "target/tests/test_todos.py",
+      "source_evidence": "test_tc_todo_fsim_002_update_by_owner + test_tc_todo_fsim_002_update_by_non_owner_rejected",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "pytest 8.4.2",
+        "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
+        "test_runner_stderr_path": ".aimd/output/evidence/pytest-red.json",
+        "invocation_timestamp": "2026-05-18T16:23:00Z",
+        "duration_ms": 50,
+        "pass_count": 0,
+        "fail_count": 2,
+        "skip_count": 0,
+        "reproduction_command": "cd target && python -m pytest tests/ --tb=line",
+        "result_hash": "sha256:e0608e997dcff7f7d16960b5f9ef1112eac2c64af022c30cf8afbf0a3acbda45",
+        "report_format": "pytest_json",
+        "flaky_retries_count": 0
+      }
+    }
+  ],
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1.0,
+      "by_business_rule": 1.0,
+      "by_use_case": 1.0,
+      "threshold": 0.85,
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 1.0,
+        "medium": 1.0,
+        "low": 1.0
+      }
+    },
+    "test_pass_rate": 0.0,
+    "line_coverage": 0.0,
+    "branch_coverage": 0.0
+  },
+  "chain_attempt": {
+    "attempt_n": 1,
+    "retry_cap": 3,
+    "revisit_count": 0
+  }
+}

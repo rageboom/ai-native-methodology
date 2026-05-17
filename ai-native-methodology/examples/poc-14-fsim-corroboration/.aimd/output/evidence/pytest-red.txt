@@ -1,0 +1,34 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.1, pytest-9.0.3, pluggy-1.6.0
+rootdir: C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target
+configfile: pytest.ini
+plugins: anyio-4.12.1
+collected 7 items
+
+target\tests\test_todos.py FFF                                           [ 42%]
+target\tests\test_users.py FFFF                                          [100%]
+
+================================== FAILURES ===================================
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_todos.py:11: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_todos.py:28: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_todos.py:45: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_users.py:11: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_users.py:24: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_users.py:35: ModuleNotFoundError: No module named 'target.src'
+E   ModuleNotFoundError: No module named 'target.src'
+C:\Users\RAGEBOOM\Documents\Developments\AI\ai-native-methodology\ai-native-methodology\examples\poc-14-fsim-corroboration\target\tests\test_users.py:48: ModuleNotFoundError: No module named 'target.src'
+=========================== short test summary info ===========================
+FAILED target\tests\test_todos.py::test_tc_todo_fsim_001_create_happy_path - ...
+FAILED target\tests\test_todos.py::test_tc_todo_fsim_002_update_by_owner - Mo...
+FAILED target\tests\test_todos.py::test_tc_todo_fsim_002_update_by_non_owner_rejected
+FAILED target\tests\test_users.py::test_tc_user_fsim_001_register_with_duplicate_email_raises
+FAILED target\tests\test_users.py::test_tc_user_fsim_001_register_happy_path
+FAILED target\tests\test_users.py::test_tc_user_fsim_002_login_match_returns_token
+FAILED target\tests\test_users.py::test_tc_user_fsim_002_login_mismatch_returns_none
+============================== 7 failed in 0.05s ==============================

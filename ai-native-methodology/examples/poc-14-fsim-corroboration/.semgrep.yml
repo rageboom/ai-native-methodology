@@ -1,0 +1,31 @@
+# Semgrep rules — poc-14 sample (no-simulation 의무)
+# analysis-aspect-static-security 가 진짜 Semgrep 실행 시 사용. ADR-009 단계 5 정합.
+
+rules:
+  - id: plaintext-password-storage
+    pattern: |
+      user.password = $X
+    message: |
+      ★ AP-FSIM-SEC-001 (critical) — Plaintext password 저장. bcrypt/argon2 hash 적용 의무.
+    severity: ERROR
+    languages: [python]
+
+  - id: missing-email-unique
+    patterns:
+      - pattern: Column(String, ...)
+      - pattern-not: Column(String, ..., unique=True, ...)
+    message: |
+      ★ AP-FSIM-DATA-001 (high) — email column 에 unique constraint 부재 가능성. 검토 의무.
+    severity: WARNING
+    languages: [python]
+
+  - id: jwt-no-expiry
+    pattern: |
+      jwt.encode($PAYLOAD, ...)
+    paths:
+      include:
+        - "*auth*"
+    message: |
+      ★ AP-FSIM-AUTH-001 (medium) — JWT payload 에 'exp' claim 부재 가능성. 만료 시간 설정 의무.
+    severity: INFO
+    languages: [python]

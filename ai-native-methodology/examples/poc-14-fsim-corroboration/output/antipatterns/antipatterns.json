@@ -1,0 +1,41 @@
+{
+  "$comment": "★ analysis-quality-antipattern skill 산출 — phase=quality.6 (chain 0 종료)",
+  "project_id": "poc-14-fsim-corroboration",
+  "antipatterns": [
+    {
+      "id": "AP-FSIM-SEC-001",
+      "title": "비밀번호 plaintext 저장",
+      "applies_to": "auth.register_user() + User.password",
+      "category": "security",
+      "severity": "critical",
+      "evidence_loc": "source/auth.py:24-29 + source/models.py:24-25",
+      "rationale": "bcrypt/argon2 hash 부재 → DB 유출 시 즉시 자격증명 노출. 산업 표준 (OWASP Top 10 A02:2021) 위배.",
+      "carry_to": "F-SIM-001 lane 통과 의무 — AC 매핑 또는 명시 carry 둘 중 하나."
+    },
+    {
+      "id": "AP-FSIM-DATA-001",
+      "title": "이메일 unique constraint 부재",
+      "applies_to": "User.email + auth.register_user()",
+      "category": "data-integrity",
+      "severity": "high",
+      "evidence_loc": "source/models.py:24 (unique=True 부재) + source/auth.py:21-30 (중복 검사 부재)",
+      "rationale": "DB level (`UNIQUE` 부재) + service level (사전 검사 부재) 양쪽 누락 → 동일 이메일 다중 등록 가능. 인증 / 인가 충돌."
+    },
+    {
+      "id": "AP-FSIM-AUTH-001",
+      "title": "JWT 만료 시간 부재 (exp claim 부재)",
+      "applies_to": "auth.create_access_token()",
+      "category": "security",
+      "severity": "medium",
+      "evidence_loc": "source/auth.py:40-44",
+      "rationale": "JWT payload 에 'exp' claim 없음 → 토큰 영구 유효. 탈취 시 무기한 재사용 위험. refresh token 부재.",
+      "carry_to": "F-SIM-002 severity max-propagation 검증 (medium → AC 어디서 cover)."
+    }
+  ],
+  "meta": {
+    "generated_at": "2026-05-18T16:05:00Z",
+    "skill_used": "analysis-quality-antipattern",
+    "phase_terminal": true,
+    "summary": "critical 1 + high 1 + medium 1 = severity 3축 모두 보유 → F-SIM-001 lane + F-SIM-002 propagation 자기검증 자료."
+  }
+}
