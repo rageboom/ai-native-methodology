@@ -90,7 +90,7 @@
 | 47 skills frontmatter keys | S6 | ✅ | — | 47/47 공식 키(name·description·allowed-tools)만 사용 |
 | 47 skills 본문 길이 | S1 | ✅ | — | 47/47 ≤ 500줄(max 197) + out-of-tree ref cite = progressive disclosure 정합 (★ "retrofit 필요" 가설 = false-positive 제거) |
 | 47 skills description | S2 | ✅ | — | 47/47 존재·trigger형·≤1536c (213~419c) |
-| `spec-integrate-7대-deliverables` name | S3 | ❌ | high | "7대" = 한글 → 공식 charset `[a-z0-9-]` 위반. 수정=command-surface rename=**MAJOR breaking** (§8-1 / 이연) |
+| `spec-integrate-deliverables` name | S3 | ✅ | — | ★ **resolved v8.0.0** (was `spec-integrate-7대-deliverables` / 한글 → kebab rename / DEC-2026-05-17-skill-name-rename / §8-1 종결). 현 name = 공식 charset `[a-z0-9-]` 정합 |
 | `_base-*` skill ×5 + agent ×3 name | S3/A1 | ⚠️ | low | leading `_` = 공식 skill charset 밖. 의도적 base/utility grouping 관례 / 393 test 무결 / 수정=rename=breaking → 이연·문서화(§8-2) |
 | 9 agents frontmatter | A1·A2 | ✅ | — | 9/9 name+description 필수 충족 / 키 전부 공식(`skills` 포함=공식 preload / 자체확장 ❌) |
 | hooks.json events | H1 | ✅ | — | SessionStart·UserPromptSubmit·PreToolUse = 공식 29종 subset |
@@ -100,7 +100,7 @@
 | marketplace.json | P3 | ✅ | — | name·owner.name·plugins[] 충족 |
 | version 3-way | P4 | ✅ | — | DEC-2026-05-17-package-version-3way-sync-fix 선행 청산 (4.0.1→7.0.0) → version-check exit 0 |
 
-**결론**: 실 위반 = **S3 1건(❌ high / 이연)** + S3/A1 1군(⚠️ low / 이연·수용 후보). 나머지 전 규칙 정합. 실 F-015 cross-check 가 가설 3건(S1 retrofit·marketplace 위치·`skills` 자체확장) false-positive 제거.
+**결론**: S3 high 1건 = ★ **v8.0.0 종결** (한글 skill rename / DEC-2026-05-17-skill-name-rename). 잔여 = S3/A1 1군(⚠️ low / 수용 후보 / §8-2). 나머지 전 규칙 정합. 실 F-015 cross-check 가 가설 3건(S1 retrofit·marketplace 위치·`skills` 자체확장) false-positive 제거.
 
 ---
 
@@ -108,7 +108,7 @@
 
 | 순위 | 항목 | severity | breaking | 후속 |
 |---|---|---|---|---|
-| 1 | `spec-integrate-7대-deliverables` → kebab rename (예 `spec-integrate-deliverables`) — 3 ref: skill dir / `agents/spec-agent.md` skills[] / `flows/spec.phase-flow.json` | high | **MAJOR** | 별도 session + cooling-off + Senior critique + STOP-gate (v7.0.0 rename 선례 정합) |
+| ~~1~~ | ~~`spec-integrate-7대-deliverables` → kebab rename~~ | ~~high~~ | ~~MAJOR~~ | ★ **종결 v8.0.0** (`spec-integrate-deliverables` / git mv + 4 active-code ref + 7 active-doc / Senior GO+REVISE / STOP-gate / DEC-2026-05-17-skill-name-rename / ADR-PLUGIN-001 §7 patch v1) |
 | 2 | `_base-*` skill×5 + agent×3 leading `_` charset deviation | low | 수정=rename=breaking | ★ 수용 가능 후보(의도적 grouping·무결) — 차기 네트워크 재검증서 공식 charset 강제 여부 재평가 후 결단 (rename vs documented-exception) |
 
 ★ ADR-010 grandfather 차용: 위 항목 = baseline grandfathered. ratchet = **신규·수정 skill/agent 는 §2·§4 즉시 강제**.

@@ -102,7 +102,7 @@ node tools/chain-driver/src/cli.js init <project>
 
 # 5-4. chain 2 (spec) 진입 (1분)
 "behavior spec / acceptance criteria 도출"
-→ spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-7대-deliverables
+→ spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
 → behavior-spec + acceptance-criteria + 7대 통합
 → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85)
 

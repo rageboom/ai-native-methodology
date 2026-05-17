@@ -94,7 +94,7 @@
 
 ## §7 patch 영역 (★ 향후 §9 Layer i CONTRADICTS 발생 시 patch vN + Lessons Learned LL-i-NN accretion / ADR-CHAIN-011 §5·§9 패턴 차용)
 
-- (없음 — 신설 시점. 차기 네트워크 재검증서 공식 docs 변경 검출 시 본 절에 patch v1 + 영향 규칙 + semver 영향 기록)
+- **patch v1 (2026-05-17 / v8.0.0 MAJOR / §8-1 deferred backlog 종결)** — §2.5 가 scope-out 했던 `spec-integrate-7대-deliverables` 한글 skill rename 을 사용자 결단("1 바꾸자")으로 본격 시행. 새 name = `spec-integrate-deliverables` (Senior GO+REVISE conf 0.88 — "7" = stale noise / 실제 ~17 산출물 통합 / skills-axis 의미-ID + v2.6.0 무의미 숫자토큰 제거 선례). 실 blast = 19 occ / 13 files (v7.0.0 대비 ~13× 작음 / fully grep-able). 분류 — 활성 코드 5(git mv dir + spec-agent.md×3 + spec.phase-flow.{json,mermaid}) + 활성 문서 7(skills-axis·lifecycle-contract·guides×2·README×2) literal 치환 / SSOT plugin-authoring-spec §7·§8 = content-aware(❌→✅ resolved / blind swap ❌) / ★ 본 §2.5 line 57 literal + DEC-2026-05-17-plugin-authoring-spec = audit-time 기록 **보존**(역사 무수정 / LL-i-52) / CHANGELOG 구 entry 무수정. v8.0.0 MAJOR (P2′ command-surface = 비협상 / 선례 v7.0.0 D1). STOP-3 hard gate (sweep A/B/C + drift-validator 3-way + release-readiness 12/12 incl check #12 dogfood green). DEC-2026-05-17-skill-name-rename.
 
 ## §8 Lessons Learned
 

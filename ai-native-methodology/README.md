@@ -177,7 +177,7 @@ npm run test                # workspace 12 tool unit test (218 test pass)
    → planning-spec.{json,md} 산출
    → gate #1 (planning-extraction-validator) 통과
 3. "behavior spec / acceptance criteria 도출"
-   → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-7대-deliverables
+   → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
    → behavior-spec + acceptance-criteria + 7대 통합
    → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85) 통과
 4. "test spec 생성 RED 의무"
@@ -221,7 +221,7 @@ dist/ai-native-methodology-v3.6.9/
 │   ├── _base/                        _base-invoke-go-stop-gate / _base-build-traceability-matrix / _base-log-finding / _base-apply-template / _base-apply-baseline-ratchet
 │   ├── analysis/                     phase-0~6 + aspect 4 (a11y/i18n/static-security/legacy)
 │   ├── planning/                     planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent
-│   ├── spec/                         spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-7대-deliverables
+│   ├── spec/                         spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
 │   ├── test/                         test-generate-test-spec / test-run-test-evidence / test-verify-coverage
 │   └── implement/                    implement-generate-impl-spec / implement-verify-test-pass
 ├── hooks/

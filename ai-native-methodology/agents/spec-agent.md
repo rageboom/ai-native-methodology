@@ -2,7 +2,7 @@
 name: spec-agent
 description: Use when chain 2 (spec) 진입. planning-spec.use_cases + analysis formal-spec phase 통합 behavior-spec.{json,md} + acceptance-criteria.{json,md} (Gherkin BDD) 추출 전문. UC → BHV → AC forward link 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
-skills: [spec-compose-behavior-spec, spec-derive-acceptance-criteria, spec-integrate-7대-deliverables, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
+skills: [spec-compose-behavior-spec, spec-derive-acceptance-criteria, spec-integrate-deliverables, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
 ---
 
@@ -18,7 +18,7 @@ model: opus
 |---|---|---|
 | `spec-compose-behavior-spec` | chain 2 진입 / behavior-spec 본격 작성 | behavior-spec.{json,md} (BHV-* + state machine + sequence + invariant + property test) |
 | `spec-derive-acceptance-criteria` | behavior-spec 채움 후 sub | acceptance-criteria.{json,md} (AC-* Gherkin Given/When/Then + MoSCoW) |
-| `spec-integrate-7대-deliverables` | cross_links.to_analysis_artifacts backward link | 7대 + 8 FE 산출물 모두 ref 등재 |
+| `spec-integrate-deliverables` | cross_links.to_analysis_artifacts backward link | 7대 + 8 FE 산출물 모두 ref 등재 |
 | `_base-apply-template` | 진입 시 behavior-spec.{json,md} 골조 | template 자동 적용 |
 | `_base-build-traceability-matrix` | UC → BHV → AC forward link 갱신 | matrix.json (갱신) |
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
@@ -47,7 +47,7 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
    - MoSCoW 우선순위 (Must / Should / Could / Won't)
    - test_case_refs (chain 3 → TC forward link 의무)
 
-4. **spec-integrate-7대-deliverables skill 호출** — cross_links 채움:
+4. **spec-integrate-deliverables skill 호출** — cross_links 채움:
    - 7대 BE + 8 FE 산출물 모두 ref 등재
    - chain-coverage-validator 자동 검증 통과 의무
 

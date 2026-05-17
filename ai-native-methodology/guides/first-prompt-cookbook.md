@@ -80,7 +80,7 @@
 |---|---|---|
 | "behavior spec 만들어" / "BHV 도출" / "executable contract" | [`spec-compose-behavior-spec`](../skills/spec-compose-behavior-spec/) | `behavior-spec.{json,md}` (BHV-*) |
 | "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.{json,md}` (AC-*) |
-| "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-7대-deliverables`](../skills/spec-integrate-7대-deliverables/) | analysis 7대 산출물 통합 |
+| "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/) | analysis 7대 산출물 통합 |
 
 ### 2.3 Chain 3 (test / RED 의무)
 

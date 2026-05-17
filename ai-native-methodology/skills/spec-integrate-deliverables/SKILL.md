@@ -1,10 +1,10 @@
 ---
-name: spec-integrate-7대-deliverables
+name: spec-integrate-deliverables
 description: ★ ★ v2.0 chain 2 sub-skill. behavior-spec 의 cross_links.to_analysis_artifacts 에 analysis 7대 + 8 FE 산출물 모두 backward link 등록. 사용자 답변 (3) "현 7대 + 신규 추가 산출물" 정합. chain-coverage-validator 가 모든 reference 강제. formal-spec-extractor persona 책임.
 allowed-tools: Read, Glob, Bash, Edit
 ---
 
-# integrate-7대-deliverables
+# integrate-deliverables
 
 ★ ★ v2.0 chain 2 의 sub-skill. 사용자 답변 (3) "현 7대 + 신규 추가 산출물" 정합 — 7대 산출물 ★ 변경 ❌ / behavior-spec.cross_links 가 모두 reference (chain-coverage-validator 강제).
 

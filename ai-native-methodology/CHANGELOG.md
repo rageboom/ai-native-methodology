@@ -9,6 +9,34 @@
 
 ---
 
+## [8.0.0] — 2026-05-17 ★ ★ ★ MAJOR — skill rename `spec-integrate-7대-deliverables` → `spec-integrate-deliverables` (한글 → kebab / command-surface breaking)
+
+> ★ ★ ★ **v8.0.0 MAJOR — breaking (의도 / semver 정합)**. 사용자 "1 바꾸자" → ADR-PLUGIN-001 §8-1 deferred backlog 본격 시행. Senior critique **GO+REVISE conf 0.88** + STOP-3 hard gate. command-surface(skill `name`) rename = P2′ MAJOR 비협상 (선례 v7.0.0 D1). DEC-2026-05-17-skill-name-rename / ADR-PLUGIN-001 §7 patch v1. ★ plugin-authoring-spec §8-1 종결.
+
+### 결단 (Senior GO+REVISE 3 교정 수용)
+
+- 새 name = **`spec-integrate-deliverables`** — "7" = stale noise (실제 ~17 산출물 통합 / "7대"는 틀린 수) / `spec-` prefix 가 이미 stage 표시 / skills-axis 의미-ID + v2.6.0 무의미 숫자토큰 제거 선례. (후보 `-analysis-deliverables` = redundant / `-7-deliverables` = v2.6.0 안티패턴 재발 → 기각)
+- 분류 교정 — SSOT `plugin-authoring-spec.md` §7/§8 = **content-aware (❌→✅ resolved)** not blind swap (거짓 행 방지) / ADR-PLUGIN-001 §2.5 line 57 literal + `DEC-2026-05-17-plugin-authoring-spec` = audit-time 기록 **보존** (역사 무수정 / LL-i-52) / CHANGELOG 구 entry 무수정
+
+### rename (git mv + 활성 ref / 실측 19 occ·13 files)
+
+- **git mv** `skills/spec-integrate-7대-deliverables` → `skills/spec-integrate-deliverables` (history-preserving)
+- 활성 코드 5: SKILL.md `name:`+H1 / `agents/spec-agent.md` ×3 / `flows/spec.phase-flow.json` skills[] / `flows/spec.phase-flow.mermaid` 라벨 literal (phase-id `cross-link-7-deliverables` = 유지 / skill 식별자 아님)
+- 활성 문서 7: `skills-axis.md` / `lifecycle-contract.md` / `guides/getting-started.md` / `guides/first-prompt-cookbook.md`(link+path) / `README.md` ×2
+- ★ LL-i-55 trap 회피 — generic "7대 산출물" 도메인 산문(SKILL.md 본문·templates·spec-compose 등)은 skill 식별자 아님 → 무수정
+
+### STOP-3 hard gate (v7.0.0 LL-i-55·57 정합)
+
+- sweep (A) 활성 코드 literal 0 / (B) tools·scripts hidden consumer 0 / (C) broader-prose false-positive 수동 확인
+- drift-validator 3-way (manifest↔skills↔mermaid) + schema-validator 11 PoC + workspace + release-readiness **12/12 incl check #12** (★ dogfood — plugin-authoring-spec 가 자신의 위반 해소를 검증 / check #12 green 의무)
+
+### 검증
+
+- (gate 결과 = 본 commit 직전 실측 기록)
+- 버전 trio 8.0.0 (plugin.json + package.json + CHANGELOG / version-check exit 0) + CLAUDE.md sync (check #10)
+
+---
+
 ## [7.1.0] — 2026-05-17 ★ ★ MINOR — plugin-authoring-spec SSOT + 외부 docs drift baseline+ratchet (ADR-PLUGIN-001 / charter R18 / release-readiness #12)
 
 > ★ ★ **v7.1.0 MINOR — additive (선행 자산 무수정)**. 사용자 질문 "plugin skill/hooks/agent 작성 시 Anthropic 공식 best practice?" → 저작 규칙 단일 SSOT 신설 + 47 skills·9 agents·hooks·packaging 전수 감사 + 외부 권위(공식 docs) drift 재검증 메커니즘. 4원칙 full (plan + Plan agent Senior 압력테스트 + 실 `_base-official-docs-checker` F-015 ×4 VERIFIED). DEC-2026-05-17-plugin-authoring-spec / ADR-PLUGIN-001. 선행 housekeeping = DEC-2026-05-17-package-version-3way-sync-fix (package.json 4.0.1→7.0.0 별도 commit).
