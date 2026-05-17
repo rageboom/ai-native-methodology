@@ -52,7 +52,25 @@
           "severity": {
             "type": "string",
             "enum": ["critical", "high", "medium", "low"],
-            "description": "AC-* severity_floor 매핑 (DO-178C DAL A 차용)"
+            "description": "★ F-SIM-002 (2026-05-18): source-grounded max-propagation — max(BR.severity, AP.severity ∈ AC.related_aps, AC.MoSCoW→severity). SSOT: methodology-spec/severity-cross-stage-mapping.md §2. 권위: ISO 26262 Part 9 ASIL inheritance + IEC 62304 Class A/B/C propagation (F-015 Claim B). 단일 MoSCoW 축 회귀 ❌."
+          },
+          "business_rule_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^BR-[A-Z0-9_-]+-[0-9]{3}$"
+            },
+            "uniqueItems": true,
+            "description": "★ F-SIM-004 (2026-05-18): BR 1급 축 — BHV.br_refs ∪ AC.related_brs. DO-178C requirements axis 1급 의무 (F-015 Claim A ★★★)."
+          },
+          "antipattern_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^AP-[A-Z0-9_-]+-[0-9]{3}$"
+            },
+            "uniqueItems": true,
+            "description": "★ F-SIM-002 (2026-05-18): AC.related_aps — severity max-propagation source 추적용."
           },
           "gaps": {
             "type": "array",
@@ -98,7 +116,16 @@
         },
         "green_count": {"type": "integer", "minimum": 0},
         "yellow_count": {"type": "integer", "minimum": 0},
-        "red_count": {"type": "integer", "minimum": 0}
+        "red_count": {"type": "integer", "minimum": 0},
+        "severity_distinct_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "★ F-SIM-002 (2026-05-18) audit signal — matrix cell severity 분포 수. == 1 시 MoSCoW 단축 회귀 의심 (release-readiness 신규 #14 sentinel)."
+        },
+        "severity_propagation_active": {
+          "type": "boolean",
+          "description": "★ F-SIM-002 (2026-05-18) — businessRules / antipatterns 입력 통과 여부 (false 시 propagation 미적용 → 회귀 위험)."
+        }
       }
     },
     "rendered_paths": {

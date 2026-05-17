@@ -105,7 +105,7 @@
     {
       "id": "#2",
       "stage": "spec",
-      "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
+      "validators": ["chain-coverage-validator", "chain-coverage-validator --antipatterns (★ F-SIM-001 ap-coverage lane)", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
@@ -164,15 +164,23 @@
   },
   "release_eligibility": {
     "policy": "§8.1 strict 7/7",
+    "$comment": "★ F-SIM-011 (2026-05-18): corroboration 강도(depth) 명시 — 권위 SLSA L1~L3 + CNCF graduation + OpenSSF Gold (F-015 Claim D / industry-aligned). #1/#2/#6/#7 의 data_source 가 각 PoC 의 도달 stage 강도 명시 의무. dry_run_placeholder 는 corroboration count 제외 (F-SIM-005 fail_mode enum 정합 / P1 carry).",
+    "corroboration_depth_levels": {
+      "L0_analysis_only": "analysis stage 만 — release_eligibility corroboration 자격 ❌",
+      "L1_chain_3_complete": "chain 1~3 종결 (test-spec 산출 / 단 RED 강도 = 본 PoC 의 test_run_evidence.fail_mode 명시 의무)",
+      "L2_chain_4_GREEN": "chain 4 GREEN 도달 (impl-spec.test_pass_evidence.fail_count == 0 + 실 runner 실행)",
+      "L3_full_traceability_green": "L2 + traceability-matrix 100% green + critical AP 무누락 (F-SIM-001 ap-coverage lane pass)"
+    },
     "items": [
-      { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "sub-plan-6 PoC #05 + PoC #03 retrofit" },
-      { "id": 2, "name": "진짜 도구 5종 물증 보존", "data_source": "test-impl-pass-validator (chain 3-4)" },
-      { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "11 chain validator + drift-check.yml + chain-check.yml" },
+      { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "sub-plan-6 PoC #05 (L3) + PoC #03 retrofit (L1 / 격하 2026-05-18 — F-SIM-011 ★ test-spec dry_run_placeholder 로 인한 L2 미도달)", "corroboration_strength_required": "L2_chain_4_GREEN", "current_corroboration_count_at_required_strength": 1, "p1_carry": "신규 PoC corroboration #2 (chain 4 GREEN 도달) — DEC-2026-05-17-chain-harness-e2e-simulation-audit §4.1.2 deadline = 2026-06-01" },
+      { "id": 2, "name": "진짜 도구 5종 물증 보존 (★ 각 PoC chain 4 GREEN 도달 의무)", "data_source": "test-impl-pass-validator (chain 3-4) — dry_run_placeholder 제외 (F-SIM-005 fail_mode enum / P1)", "corroboration_requirement": "≥ 2 PoC 가 모두 chain 4 GREEN 도달 + test_pass_evidence.fail_count == 0" },
+      { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "12 chain validator + drift-check.yml + chain-check.yml (★ v8.3.0 — F-SIM-001 antipattern-coverage lane 신설로 12종)" },
       { "id": 4, "name": "모든 chain stage coverage ≥ 0.85", "data_source": "chain-coverage-validator + spec-test-link-validator + test-verify-coverage skill" },
       { "id": 5, "name": "ADR-CHAIN-001~004 + ADR-008/009/010 v2 등재", "data_source": "docs/adr/ (sub-plan-1~3 종결)" },
-      { "id": 6, "name": "traceability-matrix 100% greenness", "data_source": "PoC #05 (sub-plan-6)" },
-      { "id": 7, "name": "sample legacy 1 cycle e2e pass (1 BR + 1 UC + 1 TC + 1 IMPL)", "data_source": "PoC #05 (sub-plan-6)" }
-    ]
+      { "id": 6, "name": "traceability-matrix 100% greenness", "data_source": "PoC #05 (L3 — sub-plan-6) — corroboration #2 부재 (PoC #03 = L1 격하)", "corroboration_strength_required": "L3_full_traceability_green", "current_corroboration_count_at_required_strength": 1, "p1_carry": "신규 PoC L3 도달 의무" },
+      { "id": 7, "name": "sample legacy 1 cycle e2e pass (1 BR + 1 UC + 1 TC + 1 IMPL)", "data_source": "PoC #05 (L3 — sub-plan-6)", "corroboration_strength_required": "L2_chain_4_GREEN", "current_corroboration_count_at_required_strength": 1, "p1_carry": "신규 PoC L2+ 도달 의무" }
+    ],
+    "self_consistency_note": "★ F-SIM-011 (2026-05-18): #1/#2/#6/#7 의 current_corroboration_count_at_required_strength = 1 = §8.1 단일 PoC 과적합 자기적용 위배. v8.3.0 = 정의 강화 / 사실 미충족 패러독스 잔존 — P1 (DEC 별도) 14일 내 (2026-06-01) corroboration #2 신규 PoC 의무. 미시행 시 LL-fsim-04+05 본격 재발."
   },
   "implemented_in": {
     "sub_plan_1": "scope (DEC + lifecycle-contract + skills-axis chain stage 신설)",

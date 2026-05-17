@@ -4,7 +4,9 @@
     "behavior-spec.json",
     "acceptance-criteria.json",
     "test-spec.json",
-    "impl-spec.json"
+    "impl-spec.json",
+    "business-rules.json",
+    "antipatterns.json"
   ],
   "do_not_edit_manually": true,
   "matrix": [
@@ -14,6 +16,14 @@
       "acceptance_id": "AC-USER-001",
       "test_id": "TC-USER-001",
       "impl_id": "IMPL-USER-001",
+      "business_rule_ids": [
+        "BR-USER-DATA-001",
+        "BR-USER-VALIDATION-001"
+      ],
+      "antipattern_ids": [
+        "AP-USER-001",
+        "AP-USER-002"
+      ],
       "status": "green",
       "severity": "critical",
       "impl_commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
@@ -24,6 +34,8 @@
       "acceptance_id": "AC-USER-002",
       "test_id": "TC-USER-002",
       "impl_id": "IMPL-USER-002",
+      "business_rule_ids": [],
+      "antipattern_ids": [],
       "status": "green",
       "severity": "critical",
       "impl_commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
@@ -41,6 +53,8 @@
     },
     "green_count": 2,
     "yellow_count": 0,
-    "red_count": 0
+    "red_count": 0,
+    "severity_distinct_count": 1,
+    "severity_propagation_active": true
   }
 }

@@ -9,6 +9,36 @@
 
 ---
 
+## [8.3.0] — 2026-05-18 ★ MINOR — chain harness e2e simulation audit + F-SIM-001/002/003/004/011 P0 corrective (additive / breaking 0)
+
+> ★ **v8.3.0 MINOR — additive corrective + industry-aligned**. 사용자 "시뮬레이션…모든 단계에서 목표 정합·비효율 확인" → 데스크 워크스루 감사 (no-simulation 정책 무충돌) / poc-05(reference cycle / §8.1 strict 7/7 #7) + poc-03(retrofit) cross-validation → 11 finding 도출 (**F-SIM-001~011 / Body Finding Ledger F-SIM namespace 신설**). 단일 PoC 특이 0 + 4 finding RealWorld 악화 = **방법론 구조 결함 확정**. 공통 뿌리 1개: "본 방법론은 *링크 존재* 결정적 강제 / *링크가 비즈니스 사실 보존* 미강제" — F-SIM-001/002/003/004/005 동일 뿌리.
+>
+> **P0 시행 (사용자 "권고안 그대로 시행" 2026-05-18 / 9 결단 묶음 D1~D9)**:
+> - **F-SIM-002**: `tools/traceability-matrix-builder/src/builder.js:56,67,77` 의 single-axis MoSCoW 종속 폐기 → **source-grounded max-propagation** (`deriveCellSeverity({ac, brs, aps})`). 권위 ISO 26262 Part 9 ASIL inheritance + IEC 62304 Class A/B/C propagation (F-015 Claim B / DMN 약함 — 인용 교체). SSOT `methodology-spec/severity-cross-stage-mapping.md` §2 정합. 신규 audit signal `coverage_summary.severity_distinct_count` + `severity_propagation_active`.
+> - **F-SIM-004**: matrix cell 에 **`business_rule_ids[]`** + `antipattern_ids[]` 신규 1급 축 — DO-178C requirements axis 정합 (F-015 Claim A ★★★). md 컬럼 + mermaid edge `BR --> BHV` 추가.
+> - **F-SIM-003**: `tools/chain-coverage-validator/src/validator.js` 에 `validateCrossRefPaths` 신설 — `planning.derivation_source` / `cross_links` + `behavior.derivation_source` / `cross_links` 4 source 경로 resolve assert + 컨벤션(repo-absolute vs project-relative) 검증. **`--strict-paths` flag warn default** (LL-i-55 함정존 회피 / v+1 default 전환 carry).
+> - **F-SIM-001**: `validateAntipatternCoverage` 신규 lane — critical/high AP 가 `AC.related_aps` 매핑 또는 `planning.excluded_antipatterns` carry 둘 다 부재 시 finding emit. **industry-aligned** SonarQube Sonar Way + GitHub CodeQL + Snyk (F-015 Claim E + industry case 3종 corroboration). gate #2 validators 에 추가.
+> - **F-SIM-011**: `flows/sdlc-4stage-flow.json` `release_eligibility` 강화 — `corroboration_depth_levels` (L0/L1/L2/L3) 명시 + #1/#2/#6/#7 의 `corroboration_strength_required` + `current_corroboration_count_at_required_strength` + `p1_carry` 명시. **poc-03 격하 (L1 — chain 4 미도달)** + `self_consistency_note` ("v8.3.0 = 정의 강화 / 사실 미충족 패러독스 잔존"). **P1 deadline = 2026-06-01** (DEC §4.1.2 commit-block).
+>
+> **schema 신규 (additive / breaking 0)**:
+> - `schemas/acceptance-criteria.schema.json` AC 에 `related_brs[]` (`BR-*` pattern) + `related_aps[]` (`AP-*` pattern) optional.
+> - `schemas/planning-spec.schema.json` 최상위 `excluded_antipatterns[]` (`{ap_id, reason, decision_ref?}`) optional.
+> - `schemas/traceability-matrix.schema.json` cell `business_rule_ids[]` + `antipattern_ids[]` optional + coverage_summary 신규 audit signal `severity_distinct_count` + `severity_propagation_active`.
+>
+> **§8.1 자기정합 ≥3 PoC pre-sweep (D9)**: poc-05(BE micro) + poc-03(BE RealWorld) + **poc-04-mini(FE)** = 3 PoC 동형 재현 BE+FE 횡단 ★★★. F-SIM-003 = BE 2 PoC (v7.0.0 collateral 특이 / FE all paths exist). LL-fsim-04 해소.
+>
+> **3-에이전트 research** (`.claude/researches/research-fsim-p0.md`): Senior critique GO 0.82 + D4/D7/D8 REVISE / Official-docs F-015 ×5 (1차 출처 독립 fetch — DO-178C+ISO 26262+Kent Beck+SLSA+CNCF+OpenSSF+SonarQube) / Industry-case 3 Topic × 3 Case = 9 case all industry-aligned 확인. 권위 H3 반증 = **F-SIM-005 ledger Beck-canonical 수정** (compile-import-fail = valid RED / per-TC granularity 잔존 본질).
+>
+> **self-bootstrap (#16 STOP-3)**: poc-05 = AC-USER-001 에 `related_brs`/`related_aps` 추가 + planning `excluded_antipatterns: [AP-USER-003]` carry + cross_refs `output/rules/business-rules.json` sync → `chain-coverage-validator` exit=0 / severe AP=2 / uncovered=0. matrix 재생성 — `business_rule_ids` + `antipattern_ids` populated + `severity_propagation_active:true`.
+>
+> **STOP-3 9-gate**: schema-validator (11 PoC 0-regression) / **workspace test 414/414** (395+ → 414 +19 신규 F-SIM test) / drift-validator 3-way (chain-flow detection-only / state-flow consistency / chain-layout passed) / **release-readiness 13/13 ready:true** (workspace_test_pass 포함) / version-check 3-way 8.3.0 / skill-citation 0 stale / antipattern-coverage lane self-bootstrap pass.
+>
+> **classification = MINOR (additive)** — 5 schema field 추가 (전부 optional / 11 PoC 0-regression) + 신규 validator lane 1종 (chain-coverage-validator workspace 일부 / 신 도구 ❌) + flow 정의 강화. breaking 0 / cooling-off 사용자 명시 위임 생략 (D6).
+>
+> **P1 carry (DEC commit-block 2026-06-01 deadline)**: F-SIM-005 (RED fail_mode enum) + corroboration #2 신규 PoC chain 4 GREEN. 미시행 시 release_eligibility 자기충족 패러독스 잔존.
+>
+> DEC-2026-05-17-chain-harness-e2e-simulation-audit / `.claude/plans/plan-fsim-p0.md` / `.claude/researches/research-fsim-p0.md` / Body Finding Ledger F-SIM-001~011.
+
 ## [8.2.3] — 2026-05-17 ★ PATCH — 확장 감사(methodology-body deliverables/schemas/tools) + F-MB-001~009 corrective sweep (breaking 0)
 
 > ★ **v8.2.3 PATCH — corrective / non-breaking**. 사용자 "1,2,3 다하자 순서대로" → "전체 corrective sweep + 릴리즈". 확장 감사 = Area E deliverables 25 + Area F schemas 39 + Area G tools 18 = **82 단위** (L1 + L2 의미·claim accuracy + L3 §8.1·no-simulation / 8 sub-agent 배치 + ground-truth XV). **GREEN 74 / RED 8** (RED 전부 Area G tools README↔cli.js 문서 drift — 코드·테스트·no-simulation 전부 정상). Area E·F 구조 거의 완벽($id↔filename 0 불일치 / F-PA-009=singleton / $ref 0 broken). post-dedupe F-MB 9건 / F-021 band 5~15 "건강한 검증". finding-system.md Body Finding Ledger **F-MB namespace 신설**. DEC-2026-05-17-plugin-authoring-mb-audit / ADR-PLUGIN-001 §7 patch v7 + §8 LL-plugin-05.

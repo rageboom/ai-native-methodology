@@ -445,3 +445,171 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Evidence:** `grep -rnE 'rules(\.subset)?\.(json|schema\.json)' tools/` minus business-rules (다수 / 위 분류)
 - **Action:** **deferred** — 파일별 forensic disposition (각 literal = stale doc vs intentional fixture vs live code path 판정) 별건 audit. blanket ❌ (품질 1순위·재작업 최소화 / LL-i-55 정합). history 부분 = wontfix(immutable).
 - **Status:** deferred (revisit — 별건 forensic audit / 본 cycle scope 외 명시)
+
+---
+
+## Body Finding Ledger — F-SIM namespace (chain-harness e2e simulation walkthrough audit)
+
+> 출처: 데스크 워크스루 감사 2026-05-17 (사용자 "시뮬레이션을 해보고 싶다 — 분석부터 구현까지 모든 단계에서 플러그인의 목표에 맞게 모두 적용되는지 비효율·개선점" / 본 cycle = audit + log + P0 plan 단계 / 시행 ❌). F-PA(plugin-authoring 4영역) / F-MB(deliverables·schemas·tools) 와 별개 namespace.
+> 범위: SDLC chain harness 4-stage e2e (analysis → planning → spec → test → impl + traceability) — `examples/poc-05-sample-user-register`(reference cycle / sub-plan-6 / §8.1 strict 7/7 #7) + `examples/poc-03-realworld-nestjs`(retrofit corroboration #2) **2 PoC cross-validation**. stack·scale 모두 상이(pure-node·micro vs NestJS·RealWorld) → 재현 시 방법론 레벨 확정.
+> overall: 11 finding / 교차 가능한 7개 전부 **2 PoC 동형 재현 + 4개 RealWorld 에서 악화**. 단일 PoC 특이 = 0 → **방법론 구조 결함 확정** (§8.1 단일 PoC 과적합 회피 휴리스틱 통과).
+> ★ ★ ★ **D9 §8.1 자기정합 ≥3 PoC pre-sweep 결과 (2026-05-18)**: chain 산출물 가용 = poc-05(BE micro) + poc-03(BE RealWorld) + poc-04-mini(FE) = 3 PoC. **F-SIM-002/004 = 3 PoC 모두 재현** (severity all-critical / BR축 부재) → methodology-level **★★★ 확정** (BE+FE 횡단). **F-SIM-003 = BE 2 PoC 만 재현** (poc-04-mini FE = all paths exist / v7.0.0 `rules.json` rename collateral = BE-track 특이) → validator path-resolve assert 는 universal good 이나 prevalence claim 정합 (BE 전용). **F-SIM-011 본질 잔존** = 오직 poc-05 만 chain 4 GREEN 도달 (corroboration #2 = poc-03 placeholder / poc-04-mini chain 3 종결). LL-fsim-04 자산화 의무 해소.
+> F-021 band = 5~15 "건강한 검증"(11건 / 명세 부실 의심 ❌ — chain harness 자산 자체가 활발히 측정 중인 신호).
+> **공통 뿌리 1개**: "본 방법론은 *링크 존재*는 결정적으로 강제하나 *링크가 비즈니스 사실을 보존하는가*는 강제하지 않는다" — F-SIM-001/002/003/004/005가 모두 이 한 뿌리.
+> ★ ★ ★ **본 cycle Status = open / proposed_fix 명시 / 4원칙 §3 묶음 go/stop 대기** — F-PA/F-MB 와 달리 본 ledger 등재 시점 = 시행 전. P0 plan 별도 산출(`.claude/plans/plan-fsim-p0.md`) + 3-에이전트 research 후 묶음 결단.
+>
+> | F-SIM | severity | 처분 (제안) | 비고 |
+> |---|---|---|---|
+> | 001 | **high** | closed (MINOR 후보) | AP→BR→AC coverage lane 신설 + critical 이탈 시 gate 강제 경고 |
+> | 002 | **high** | closed (PATCH~MINOR) | `tools/traceability-matrix-builder/src/builder.js:56` severity = max(BR·AP·AC.MoSCoW) source-grounded 전파 |
+> | 003 | **high** | closed (PATCH) | `tools/chain-coverage-validator/src/validator.js` cross-ref 경로 resolve assert (dead-link 결정적 차단 / skill-citation-validator 선례 동형) |
+> | 004 | **medium** | closed (MINOR / 002 동반) | matrix BR 축 추가 — schema + builder + by_business_rule 정합 |
+> | 005 | **high** | closed (MINOR) | RED 규약: 실 runner 실행 의무화 (dry-run placeholder 금지) + assertion-fail RED + per-TC 물증 granularity |
+> | 006 | **high** | closed (PATCH) | gate #4 = `test-impl-pass-validator --allow-execute` 경유 의무화 (수동 사이드채널 차단 / release-readiness criterion 후보) |
+> | 007 | **medium** | deferred | chain 산출물 `meta` 단일화 / source_grounded_evidence 참조화 — scale 의존 / PoC 2~3회 누적 후 closed |
+> | 008 | **medium** | closed (PATCH) | 산출물 meta 의 방법론 서사(phase_b/phase_d note) 분리 → decisions/ 이전 (이식성 5종 원칙 정합) |
+> | 009 | **medium** | closed (PATCH) | 4 gate 공통 `chain-intervention-log.jsonl` 영속 강제 (flow gate-1 outputs 이미 명세) |
+> | 010 | **medium** | closed (PATCH) | 기준 PoC README/run-log content-aware sync + release-readiness #14 후보 (PoC 문서 drift) |
+> | 011 | **high** | closed (MINOR) | release_eligibility #2/#6/#7 = "≥2 PoC 모두 chain 4 GREEN 도달" 강화 또는 poc-03 chain 4 실행 / corroboration 명시 제외 (§8.1 자기정합) |
+>
+> ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2.
+
+### F-SIM-001: critical antipattern 이 chain 을 무경고로 관통 + matrix 가 "critical/green" 보고
+
+- **Phase:** chain harness e2e (cross-validation 2 PoC)
+- **Confidence:** verified (poc-05 + poc-03 동형 재현)
+- **Type:** anti-pattern (false assurance)
+- **Description:** chain 은 "AC가 된 것"만 검증. AP(antipattern) 가 BR→AC 로 매핑되지 않으면 chain validator 도 matrix 도 침묵. poc-05 = AP-USER-003(critical / plaintext 비교) 가 `scope OUT` → BR/AC/TC 부재 → IMPL-USER-002 가 legacy 결함을 **그대로 재구현** (`if (user.password !== password)`) → matrix 는 `UC-USER-002 / status:green / severity:critical / 100% pass`. poc-03 = AP-AUTH-NEST-001 + AP-DB-001(critical 2건) 가 AC 어디에도 없음(`included:false`/2) — 무선언으로 chain 이탈. **AP→BR→AC enforced lane 부재** (antipattern 은 "avoid-list 자료"로만 소비 / gate validator 목록에 antipattern coverage 없음).
+- **Evidence:** `examples/poc-05-sample-user-register/input/antipatterns.json` AP-USER-003 + `.aimd/output/impl-spec.json` IMPL-USER-002.source_evidence + `.aimd/output/matrix.json` row 2. `examples/poc-03-realworld-nestjs/output/antipatterns/antipatterns.json` critical 2건 vs `.aimd/output/acceptance-criteria.json` (언급 0).
+- **Spec gap:** `flows/sdlc-4stage-flow.json` gate validators / `flows/spec.phase-flow.json` 에 AP coverage lane 부재. `methodology-spec/workflow/phase-N-*.md` AP→AC 매핑 강제 절 부재.
+- **Decision made:** poc-05 가 AP-003 explicit scope-out 으로 우회(carry_to v2.x). poc-03 은 silent omit.
+- **Severity:** **high** — 모든 chain 영향 / 우회 시 critical 결함 ship / 표준화 시급.
+- **Proposed fix:** (a) `tools/chain-coverage-validator` 에 antipattern-coverage 신 lane 추가 (severity≥high AP 가 AC.test_case_refs 로 도달하지 못하면 finding emit) (b) scope-out 시 명시 `excluded:{reason, decision_ref}` field 의무 (c) matrix 에 `unaddressed_critical_aps` 컬럼 추가. MINOR(validator+schema+flow 추가 / breaking ❌).
+
+### F-SIM-002: matrix severity 가 source-grounded 아님 (AC.MoSCoW 단일 축 / BR·AP severity 전파 부재)
+
+- **Phase:** chain harness e2e (cross-validation 2 PoC)
+- **Confidence:** verified (코드 ground-truth — `tools/traceability-matrix-builder/src/builder.js:56`)
+- **Type:** anti-pattern (source-grounded 원칙 위배)
+- **Description:** matrix-builder 가 cell severity 를 오직 `ac.severity` MoSCoW 로 매핑 — `must→critical / should→medium / could→low`. BR.severity (high/medium/low/critical) 도 AP.severity 도 전혀 전파 안 됨. 2 PoC 모두 모든 AC = `severity:"must"` → 결과적으로 **all-critical matrix**. `severity_floor.critical:1.0` ratchet 이 trivially 충족(가짜 critical 100% green) — 진짜 critical(AP-USER-003) 은 matrix 밖. 본 방법론 1순위 원칙(source-grounded / 환각 차단)과 정면 충돌.
+- **Evidence:** `tools/traceability-matrix-builder/src/builder.js:56,67,77` (`severity: ac.severity === 'must' ? 'critical' : ac.severity === 'should' ? 'medium' : 'low'`). poc-05 matrix severity distinct = `['critical']`. poc-03 matrix severity distinct = `['critical']` (동일 패턴 / stack 무관).
+- **Spec gap:** `schemas/traceability-matrix.schema.json` cell.severity 산정 규칙 부재. `methodology-spec/deliverables/22-traceability-matrix.md` severity 의미축 정의 부재.
+- **Decision made:** N/A (의도된 동작 아님 — 단일 축 누락).
+- **Severity:** **high** — 모든 PoC matrix 영향 / ratchet 자체 무력화 / 단일 지점 fix (builder.js:56,67,77 + schema).
+- **Proposed fix:** `severity = max(BR.severity, AP.severity ∈ AC.related_aps, AC.MoSCoW→severity)` source-grounded 전파. AC schema 에 `related_aps[]` + `related_brs[]` 명시. PATCH~MINOR (단일 도구 + schema 추가 / 11 PoC 회귀 검증 필수 / F-PA-009 선례 동형).
+
+### F-SIM-003: chain-coverage-validator 가 cross-ref 경로 resolve 미검증 (broken cross-ref silent)
+
+- **Phase:** chain harness e2e (cross-validation 2 PoC)
+- **Confidence:** verified (코드 + 2 PoC dead-link 실측)
+- **Type:** gap
+- **Description:** `tools/chain-coverage-validator/src/validator.js:98-103` 는 `behavior.cross_links.to_analysis_artifacts` 가 **비어있지 않음만** 확인 — 경로 resolve / existsSync assert 부재. v7.0.0 `rules.json → business-rules.json` rename 이 docs는 sweep (F-MB-001) 했으나 chain 산출물의 `derivation_source.source_artifacts` 와 `cross_links.to_analysis_artifacts` 는 미동기화 → 두 PoC 모두 dead-link 보유. poc-03 은 추가로 derivation_source(상대 `output/rules/rules.json`)와 cross_links(repo-absolute `examples/.../output/rules/rules.json`) **경로 컨벤션 불일치**.
+- **Evidence:** poc-05 `planning-spec.json` derivation_source.source_artifacts = `["input/rules.json", ...]` (MISSING). poc-03 동일 + 컨벤션 불일치. validator.js:98 코드 직접 검증.
+- **Spec gap:** chain-coverage-validator 명세에 path-resolve assert 부재. `schemas/planning-spec.schema.json` + `schemas/behavior-spec.schema.json` cross_links/derivation_source 항목에 path format / resolution rule 부재.
+- **Decision made:** N/A (rename 후속 전파 누락).
+- **Severity:** **high** — dead-link 결정적 차단 부재 = F-MB-001 / skill-citation-validator(v8.1.0 #13) 선례와 동일 class 가 chain stage 잔존.
+- **Proposed fix:** chain-coverage-validator 에 `pathExistsAssert(cross_links + derivation_source)` 추가 + 경로 컨벤션 단일화(repo-relative). PATCH (additive assert / validator 단일 지점 / skill-citation-validator paradigm 재활용).
+
+### F-SIM-004: BR 이 traceability-matrix 의 1급 축에서 누락
+
+- **Phase:** chain harness e2e (cross-validation 2 PoC)
+- **Confidence:** verified
+- **Type:** gap
+- **Description:** matrix 행 = UC→BHV→AC→TC→IMPL. **BR 컬럼 없음**. `coverage_summary.by_business_rule:1.0` 는 별도 계산되나 사람이 읽는 matrix 에서 "어느 BR 이 어디서 검증됐는가" 추적 불가. poc-05 BR-USER-VALIDATION-001 은 전용 AC 없이 TC it-block 만 존재 → matrix 상 보이지 않음. BR 은 환각 차단의 핵심 anchor 인데 최종 추적표에서 증발.
+- **Evidence:** poc-05/03 `matrix.json.matrix[]` row schema = `{use_case_id, behavior_id, acceptance_id, test_id, impl_id, status, severity}` — `business_rule_id` 부재. `has BR axis: false` (poc-03 검증 출력 직접).
+- **Spec gap:** `schemas/traceability-matrix.schema.json` cell schema 에 br 축 부재. DO-178C bidirectional 차용 시 BR(요구사항) 누락은 비정합.
+- **Decision made:** N/A.
+- **Severity:** **medium** — matrix 가독성·완전성 (구조적 무결성보다 사람 추적 가능성).
+- **Proposed fix:** matrix row 에 `business_rule_ids[]` 추가 (BHV.br_refs 경유). F-SIM-002 와 동반 시 MINOR. schema + builder + md/mermaid 렌더 갱신.
+
+### F-SIM-005: RED granularity 결여 + dry-run placeholder (★ 표현 수정 2026-05-18 / F-015 Claim C CONTRADICTS 반영)
+
+- **Phase:** chain harness e2e (cross-validation 2 PoC)
+- **Confidence:** verified
+- **Type:** anti-pattern (RED 의무 의미 누수 / per-TC granularity)
+- **Description:** **★ 수정 2026-05-18** — 기존 "약한 RED(import 부재)" 표현은 Kent Beck "TDD by Example" 원저 *"Red — Write a little test that doesn't work, **and perhaps doesn't even compile at first**"* + Uncle Bob 3 Laws *"compilation failures are failures"* 기준 **틀림**. 정확한 RED 강도 3계층:
+  - **Strongest** = assertion-fail (SUT 존재 + 단언 실패)
+  - **Valid (Beck-canonical)** = compile/import-fail (Beck 원저 명시 RED 포함)
+  - **Weak / Non-RED** = dry-run placeholder / `pending()` / TODO (Cucumber 기준 assertion 미실행 = 노란색)
+
+  본 finding 본질 (수정 후):
+  - poc-05 RED 물증 = `"Failed to load url ./user.service.js"` (suite load 실패 / module not found) = **Beck-canonical valid RED** (격하 무효 / 인용 정확). 다만 두 TC가 **동일 result_hash·동일 stdout·동일 timestamp** 공유 → per-TC 물증이 실제로는 suite-level 1건 복제. `fail_count:1`×2 는 "2개 TC 가 단언 실패"로 오인 유발 — **per-TC granularity 결여**가 본 finding 잔존 본질.
+  - poc-03 = `"(not run / retrofit dry-run)"`, `duration_ms:0` → **테스트 자체 미실행** = invalid placeholder (corroboration #2 가 진짜 RED 없이 등재 / F-SIM-011 본질 직결).
+- **Evidence:** poc-05 `.aimd/output/test-spec.json` TC-USER-001/002 test_run_evidence 동일 hash. poc-03 동 file 의 placeholder 문자열. ★ F-015 출처: Kent Beck "TDD by Example" via stanislaw.github.io / Uncle Bob 3 Laws / Cucumber docs (research-fsim-p0.md §2 Claim C).
+- **Evidence:** poc-05 `.aimd/output/test-spec.json` TC-USER-001/002 test_run_evidence 동일 hash. poc-03 동 file 의 placeholder 문자열.
+- **Spec gap:** `flows/test.phase-flow.json` "expected_outcome: all_fail" 표현만 — RED 강도 3계층 (assertion-fail / compile-import-fail / dry_run_placeholder) 규약 부재. `schemas/test-spec.schema.json` 에 per-TC granular evidence 의무 + fail_mode enum 부재.
+- **Decision made:** poc-05 implicit (compile-import-fail = Beck-canonical valid RED 수용 / 단 per-TC granularity 결여). poc-03 explicit (retrofit 환경 부재 dry_run_placeholder = invalid RED).
+- **Severity:** **high** — per-TC granularity 결여 + dry_run_placeholder 가 "진짜 runner 5종 물증" claim 을 실제로 corroborate 안 함 (F-SIM-011 와 직결). compile-import-fail 자체는 RED 자격 유효 (Beck-canonical).
+- **Proposed fix:** RED 규약 강도 3계층화 — `expected_outcome:fail` 시 `test_run_evidence.fail_mode ∈ {assertion, compile_import, dry_run_placeholder}` enum 강제 + per-TC granular invocation 의무 (suite-level 복제 ❌) + `dry_run_placeholder` 는 corroboration count 제외. **★ Beck-canonical 정합**: compile_import 도 valid RED 인정 / strongest 아님 명시. MINOR.
+
+### F-SIM-006: no-simulation 강제 도구가 gate 에서 우회됨 (--dry-run + 수동 사이드채널)
+
+- **Phase:** chain harness e2e (poc-05 run-log 실측)
+- **Confidence:** verified (run-log + flow 대조)
+- **Type:** anti-pattern (양심 의존 회귀)
+- **Description:** gate #4 cross_cutting.no_simulation.enforcement 가 명시한 경로 = `test-impl-pass-validator --allow-execute`. poc-05 run-log 실제: `test-impl-pass-validator --dry-run` (config 검증만) + 실제 실행은 수동 `npx vitest run` 사이드채널. 강제 게이트가 강제하지 않고 manual 물증을 신뢰. trio enforcement (state.blocked + cli exit 2 + PreToolUse deny) + D21' suppressOutput=true 의 "양심 의존 차단" paradigm 자기 위배.
+- **Evidence:** `examples/poc-05-sample-user-register/.aimd/output/run-log.md` chain 4 절 "test-impl-pass-validator (--dry-run) → exit 0 / config 검증 ✅" vs `flows/sdlc-4stage-flow.json` cross_cutting.no_simulation.enforcement `test-impl-pass-validator --allow-execute`.
+- **Spec gap:** release-readiness 에 gate validator 가 `--allow-execute` 경로로 실행됐는지 결정적 assert 부재.
+- **Decision made:** poc-05 implicit — 사용자 manual side-channel.
+- **Severity:** **high** — chain harness "harness-validated" status 핵심 claim 의 실 enforcement 누수.
+- **Proposed fix:** release-readiness criterion 신설 — chain 4 진입 PoC 는 `test-impl-pass-validator --allow-execute` 실 invocation evidence(stderr 마커 / state.json 마커) 필수. PATCH.
+
+### F-SIM-007: chain 산출물 ceremony-to-payload 비대 + meta 중복
+
+- **Phase:** chain harness e2e (2 PoC)
+- **Confidence:** verified
+- **Type:** smell (efficiency)
+- **Description:** UC 2종·test 6개 전달에 chain JSON ~423줄(poc-05) + md/mermaid 3중 렌더. `meta` 블록(generated_at/methodology_version/confidence/formula_version) **chain 4~5 단계 verbatim 중복**, source_grounded_evidence 3~4회 재기술, UC description 이 planning→behavior→AC 에서 거의 동일 재진술. RealWorld scale 에서 선형 증폭 + 검증·drift 표면 증가 → ≥85% 자동화 목표의 숨은 비용.
+- **Evidence:** poc-05 meta 블록 5× verbatim / poc-03 4× (+ source_commit_sha 추가). chain 산출물 라인 수: planning 81 + behavior 69 + AC 59 + test 87 + impl 82 = 378 + matrix 45.
+- **Spec gap:** schema 에 meta 단일화 / 참조화 규약 부재.
+- **Decision made:** N/A.
+- **Severity:** **medium** — 효율 / scale 의존 / 단일 PoC 임계 결정 불가 (F-021 §8.1 휴리스틱: PoC 2~3 회 누적 후 closed).
+- **Proposed fix:** meta 단일화 (chain-meta.json 1개 + 각 spec 참조) + source_grounded_evidence 첫 등재 후 ref 만. deferred (PoC 누적 후).
+
+### F-SIM-008: 산출물 meta 에 방법론 진화 서사(phase_b/phase_d note) 혼입
+
+- **Phase:** chain harness e2e (2 PoC)
+- **Confidence:** verified
+- **Type:** anti-pattern (산출물 이식성 원칙 위배)
+- **Description:** poc-05 `business-rules.json.meta` = `phase_b_migration_note` (session 11차) + `phase_d_meta_recovery_note` (session 15차). poc-03 = `phase_d_meta_recovery_note` Sprint 1-J 서사 + `methodology_version` skew (rules=v1.2.2 vs chain artifacts=v2.0.0 한 PoC 내 불일치). PoC 산출물이 방법론 진화 이력을 inline 운반 → `decisions/` 에 있어야 할 내용. 산출물 이식성 5종 원칙(언어/환경 100% 무관) 과 상충 (이식 시 노이즈 + 버전 skew).
+- **Evidence:** 직접 인용 가능 (poc-05/03 business-rules.json.meta).
+- **Spec gap:** `schemas/business-rules.schema.json` meta 에 `migration_note` enum 부재 / `methodology-spec/deliverables/4-business-rules.md` meta 절 형식 미규정.
+- **Decision made:** N/A (점진 누적).
+- **Severity:** **medium** — 단일 phase / 이식성 영향 / 우회 가능.
+- **Proposed fix:** meta 진화 서사 → `decisions/DEC-*.md` 이전 + business-rules.json meta 는 `generated_at/confidence/inputs_used/methodology_version` core 만 유지 + version skew 결정적 차단. PATCH.
+
+### F-SIM-009: gate 감사 추적 비일관 (intervention_log 영속 불일치)
+
+- **Phase:** chain harness e2e (poc-05)
+- **Confidence:** verified
+- **Type:** gap
+- **Description:** intervention_log 가 impl-spec(gate #4) `human_review.intervention_log` 에만 존재. gate #1~#3 은 run-log.md 서사로만. README 가 약속한 `intervention-log.jsonl` 파일 부재. 4 gate 의 결단 영속 방식 불일치 → gate UX/audit 신뢰성 비대칭. flow `gate-1.outputs` 에 `chain-intervention-log.jsonl` 이미 명세 (planning.phase-flow.json) 인데 poc-05 미시행.
+- **Evidence:** poc-05 `impl-spec.json` human_review.intervention_log (단일) vs `flows/planning.phase-flow.json` gate-1.outputs (스펙). `find .aimd -name "intervention-log.jsonl"` = empty.
+- **Spec gap:** chain-driver / hooks 가 gate decision 을 통일 형식으로 jsonl append 하는 강제 부재.
+- **Decision made:** N/A.
+- **Severity:** **medium** — gate UX·audit 신뢰성.
+- **Proposed fix:** chain-driver `state` mutation 시 `intervention-log.jsonl` append 강제 (gate #1~#4 공통). PATCH.
+
+### F-SIM-010: 기준 PoC README/run-log 가 자기 산출물과 drift
+
+- **Phase:** chain harness e2e (poc-05)
+- **Confidence:** verified
+- **Type:** gap (consumer-facing)
+- **Description:** poc-05 README 가 `password-comparator.ts` / `vitest.config.ts` / `.aimd/state.json` / `traceability-matrix.{json,md,mermaid}` 등 약속 — 실제 `matrix.{json,md,mermaid}` 외 다수 부재. run-log 는 `input/rules.json` 명령 예시 (실제 `output/rules/business-rules.json`). 기준 레퍼런스 PoC 의 문서가 자기 산출물과 불일치 → 신규 사용자 first-prompt-cookbook 경로 오염. F-MB-001 (v7.0.0 rename) 후속 전파 누락 class.
+- **Evidence:** poc-05 README 의 `## 산출` 트리 vs `find examples/poc-05-sample-user-register`.
+- **Spec gap:** PoC 문서 ↔ 실 산출물 결정적 일치 검증 도구 부재.
+- **Decision made:** N/A.
+- **Severity:** **medium** — consumer-facing 이나 단일 PoC 한정.
+- **Proposed fix:** release-readiness #14 후보 — PoC README 가 인용한 파일 경로의 실재 결정적 assert (skill-citation-validator repo-wide 확장 paradigm 재활용). PATCH.
+
+### F-SIM-011: §8.1 "≥2 PoC corroboration" 이 최강 claim 에서 사실상 n=1 (release_eligibility 자기정합 위배)
+
+- **Phase:** chain harness e2e (cross-validation 발견)
+- **Confidence:** verified (poc-03 실측)
+- **Type:** anti-pattern (자기정합 위배)
+- **Description:** §8.1 strict 7/7 release_eligibility 의 명목 corroboration = poc-05 + poc-03 retrofit. 실측: poc-03 test-spec = `"(not run / retrofit dry-run)"`, `duration_ms:0` → **테스트 미실행**. matrix = 전 행 `yellow`, `green_count:0`, `forward_coverage:0`, impl-spec 부재 → **chain 4 (GREEN) 미도달**. 따라서: (#2 진짜 도구 5종 물증) corroborated by poc-05 only / (#6 matrix 100% green) poc-05 only / (#7 e2e 1 cycle pass) poc-05 only. **본 방법론이 §8.1 에서 경계하는 단일 PoC 과적합이 본 방법론 자신의 검증대(§8.1 strict 7/7) 에 실재.** F-SIM-001~010 이 두 PoC 에서 모두 통과한 이유 = 검증 골격이 의미 안 보고 링크만 봐서(공통 뿌리) + 두 번째 PoC 가 후반 chain 비어서.
+- **Evidence:** `examples/poc-03-realworld-nestjs/.aimd/output/test-spec.json` test_run_evidence (placeholder 문자열) + matrix.json `green_count:0`. `flows/sdlc-4stage-flow.json` release_eligibility.items[1,5,6].data_source 명목.
+- **Spec gap:** release_eligibility 의 "≥2 PoC corroboration" 정의에 "각 PoC 가 어느 chain stage 까지 도달했는지" 강도 차이 미구분.
+- **Decision made:** N/A (구조적 누락).
+- **Severity:** **high** — release 자격 자체 흔들림 / §8.1 자기정합 위배.
+- **Proposed fix:** 옵션 둘 중 — (A) poc-03 chain 4 실제 실행 후 GREEN 도달 (PoC 보강 / 시간 비용 ↑) / (B) release_eligibility #2/#6/#7 에 "각 PoC 가 chain 4 GREEN 도달" 명시 + poc-03 = analysis~chain-3 corroboration 으로 격하 + 신규 PoC(예: poc-12/13) 를 chain 4 GREEN corroboration #2 후보로 명시. MINOR. ★ F-SIM-005 와 직결 (RED placeholder 가 §8.1 #2 빈약 corroboration 본질).

@@ -120,7 +120,32 @@
     "out_of_scope": {
       "type": "array",
       "items": {"type": "string"},
-      "description": "본 chain 에서 제외 영역"
+      "description": "본 chain 에서 제외 영역 (자유서술)"
+    },
+    "excluded_antipatterns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ap_id", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "ap_id": {
+            "type": "string",
+            "pattern": "^AP-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "antipatterns.json AP-* ID 결정적 reference"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "description": "본 PoC 가 본 AP 를 carry out 하는 사유 (carry contract)"
+          },
+          "decision_ref": {
+            "type": "string",
+            "description": "선택 — 관련 DEC.md 또는 ADR.md 식별자"
+          }
+        }
+      },
+      "description": "★ F-SIM-001 (2026-05-18): critical/high AP 를 본 chain 에서 명시 제외 — antipattern-coverage lane 의 carry contract. AC.related_aps 와 본 목록 둘 다 부재 시 chain-coverage-validator 가 finding emit (chain.ap.uncovered_severe). out_of_scope (자유서술 string array) 와 별개 — 결정적 ap_id 결합으로 silent omission 차단."
     },
     "risks_and_constraints": {
       "type": "array",

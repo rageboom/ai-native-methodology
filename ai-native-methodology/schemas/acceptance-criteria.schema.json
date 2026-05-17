@@ -96,6 +96,18 @@
             "type": "boolean",
             "default": false,
             "description": "★ Industry — verifiable=true AC 만 chain 4 impl 진입 허용 (Aider /ask↔/code 정합)"
+          },
+          "related_brs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^BR-[A-Z0-9_-]+-[0-9]{3}$"},
+            "uniqueItems": true,
+            "description": "★ F-SIM-002/004 (2026-05-18): 본 AC 가 검증하는 BR id 목록 — severity max-propagation source + matrix BR 1급 축. BHV.br_refs 와 합집합으로 cell.business_rule_ids 결정. DO-178C requirements axis 정합."
+          },
+          "related_aps": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^AP-[A-Z0-9_-]+-[0-9]{3}$"},
+            "uniqueItems": true,
+            "description": "★ F-SIM-002 (2026-05-18): 본 AC 가 cover 하는 antipattern id 목록 — severity max-propagation source. F-SIM-001 antipattern-coverage lane 의 backward link source."
           }
         },
         "if": {

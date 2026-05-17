@@ -9,7 +9,7 @@
   "derivation_source": {
     "planning_spec_path": ".aimd/output/planning-spec.json",
     "analysis_artifacts": [
-      "input/rules.json",
+      "output/rules/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json"
     ]
@@ -60,7 +60,7 @@
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json",
+      "output/rules/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json"

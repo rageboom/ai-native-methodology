@@ -1,6 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateChainCoverage } from '../src/validator.js';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage } from '../src/validator.js';
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -62,5 +65,142 @@ describe('chain-coverage-validator', () => {
     const planning = { use_cases: [{ id: 'UC-A-001' }, { id: 'UC-B-001' }, { id: 'UC-C-001' }, { id: 'UC-D-001' }, { id: 'UC-E-001' }] };
     const r = validateChainCoverage(planning, validBehavior, validAcceptance);
     assert.ok(r.findings.some(f => f.kind === 'chain.uc_coverage.below_threshold'));
+  });
+
+  // ★ F-SIM-003 (2026-05-18) — cross-ref path resolve tests
+  describe('F-SIM-003 validateCrossRefPaths', () => {
+    function makeProject() {
+      const dir = mkdtempSync(join(tmpdir(), 'fsim003-'));
+      mkdirSync(join(dir, 'output', 'rules'), { recursive: true });
+      writeFileSync(join(dir, 'output', 'rules', 'business-rules.json'), '{}');
+      return dir;
+    }
+
+    it('warn-mode default: broken path → severity=medium / non-blocking kind', () => {
+      const projectRoot = makeProject();
+      try {
+        const planning = { derivation_source: { source_artifacts: ['output/rules/business-rules.json', 'input/rules.json'] } };
+        const r = validateCrossRefPaths({
+          planning, behavior: null,
+          projectRoot, repoRoot: projectRoot,
+          opts: { strict: false }
+        });
+        assert.ok(r.findings.some(f => f.kind === 'chain.cross_links.broken_path_warning' && f.severity === 'medium'));
+        assert.ok(!r.findings.some(f => f.kind === 'chain.cross_links.broken_path'));
+        assert.equal(r.summary.broken_path_count, 1);
+      } finally { rmSync(projectRoot, { recursive: true, force: true }); }
+    });
+
+    it('strict-mode: broken path → severity=high / blocking kind', () => {
+      const projectRoot = makeProject();
+      try {
+        const planning = { derivation_source: { source_artifacts: ['input/rules.json'] } };
+        const r = validateCrossRefPaths({
+          planning, behavior: null,
+          projectRoot, repoRoot: projectRoot,
+          opts: { strict: true }
+        });
+        assert.ok(r.findings.some(f => f.kind === 'chain.cross_links.broken_path' && f.severity === 'high'));
+      } finally { rmSync(projectRoot, { recursive: true, force: true }); }
+    });
+
+    it('detects repo-absolute path convention (examples/...) as low severity', () => {
+      const projectRoot = makeProject();
+      try {
+        const behavior = { cross_links: { to_analysis_artifacts: ['examples/poc-X/output/rules/business-rules.json'] } };
+        const r = validateCrossRefPaths({
+          planning: null, behavior,
+          projectRoot, repoRoot: projectRoot,
+          opts: { strict: false }
+        });
+        assert.ok(r.findings.some(f => f.kind === 'chain.cross_links.path_convention_repo_absolute' && f.severity === 'low'));
+      } finally { rmSync(projectRoot, { recursive: true, force: true }); }
+    });
+
+    it('valid project-relative existing path → 0 findings', () => {
+      const projectRoot = makeProject();
+      try {
+        const planning = { derivation_source: { source_artifacts: ['output/rules/business-rules.json'] } };
+        const r = validateCrossRefPaths({
+          planning, behavior: null,
+          projectRoot, repoRoot: projectRoot,
+          opts: { strict: true }
+        });
+        assert.equal(r.findings.length, 0);
+      } finally { rmSync(projectRoot, { recursive: true, force: true }); }
+    });
+
+    it('checks all 4 cross-ref sources (planning derivation/cross_links + behavior derivation/cross_links)', () => {
+      const projectRoot = makeProject();
+      try {
+        const planning = {
+          derivation_source: { source_artifacts: ['missing1.json'] },
+          cross_links: { to_analysis_artifacts: ['missing2.json'] }
+        };
+        const behavior = {
+          derivation_source: { analysis_artifacts: ['missing3.json'] },
+          cross_links: { to_analysis_artifacts: ['missing4.json'] }
+        };
+        const r = validateCrossRefPaths({
+          planning, behavior,
+          projectRoot, repoRoot: projectRoot,
+          opts: { strict: false }
+        });
+        assert.equal(r.summary.broken_path_count, 4);
+        const sources = new Set(r.findings.filter(f => f.kind.includes('broken_path')).map(f => f.source));
+        assert.equal(sources.size, 4);
+      } finally { rmSync(projectRoot, { recursive: true, force: true }); }
+    });
+  });
+
+  // ★ F-SIM-001 (2026-05-18) — antipattern coverage lane
+  describe('F-SIM-001 validateAntipatternCoverage', () => {
+    it('emits finding for critical AP not in AC.related_aps and not excluded', () => {
+      const antipatterns = { antipatterns: [{ id: 'AP-USER-003', severity: 'critical', title: 'plaintext password' }] };
+      const acceptanceCriteria = { criteria: [{ id: 'AC-USER-001', related_aps: [] }] };
+      const planning = {};
+      const r = validateAntipatternCoverage({ antipatterns, acceptanceCriteria, planning });
+      assert.ok(r.findings.some(f => f.kind === 'chain.ap.uncovered_severe' && f.ap_id === 'AP-USER-003' && f.severity === 'critical'));
+      assert.equal(r.summary.uncovered_severe_count, 1);
+    });
+
+    it('emits finding for high AP not covered', () => {
+      const antipatterns = { antipatterns: [{ id: 'AP-AUTH-NEST-001', severity: 'high' }] };
+      const acceptanceCriteria = { criteria: [] };
+      const r = validateAntipatternCoverage({ antipatterns, acceptanceCriteria, planning: {} });
+      assert.ok(r.findings.some(f => f.severity === 'high'));
+    });
+
+    it('passes when critical AP is referenced in AC.related_aps', () => {
+      const antipatterns = { antipatterns: [{ id: 'AP-USER-003', severity: 'critical' }] };
+      const acceptanceCriteria = { criteria: [{ id: 'AC-USER-001', related_aps: ['AP-USER-003'] }] };
+      const r = validateAntipatternCoverage({ antipatterns, acceptanceCriteria, planning: {} });
+      assert.equal(r.findings.length, 0);
+    });
+
+    it('passes when critical AP is explicitly excluded via planning.excluded_antipatterns', () => {
+      const antipatterns = { antipatterns: [{ id: 'AP-USER-003', severity: 'critical' }] };
+      const acceptanceCriteria = { criteria: [] };
+      const planning = { excluded_antipatterns: [{ ap_id: 'AP-USER-003', reason: 'v2.x carry — bcrypt/argon2 scope OUT' }] };
+      const r = validateAntipatternCoverage({ antipatterns, acceptanceCriteria, planning });
+      assert.equal(r.findings.length, 0);
+    });
+
+    it('ignores low/medium severity APs', () => {
+      const antipatterns = { antipatterns: [
+        { id: 'AP-X-001', severity: 'low' },
+        { id: 'AP-X-002', severity: 'medium' },
+        { id: 'AP-X-003', severity: 'info' },
+      ]};
+      const r = validateAntipatternCoverage({ antipatterns, acceptanceCriteria: { criteria: [] }, planning: {} });
+      assert.equal(r.findings.length, 0);
+      assert.equal(r.summary.severe_ap_count, 0);
+    });
+
+    it('graceful when antipatterns input is missing', () => {
+      const r = validateAntipatternCoverage({ antipatterns: null, acceptanceCriteria: { criteria: [] }, planning: {} });
+      assert.equal(r.summary.ap_input_missing, true);
+      assert.equal(r.findings.length, 0);
+    });
   });
 });

@@ -31,7 +31,9 @@
       "verifiable": true,
       "automated_runnable": true,
       "test_case_refs": ["TC-USER-001"],
-      "gate_required": true
+      "gate_required": true,
+      "related_brs": ["BR-USER-DATA-001", "BR-USER-VALIDATION-001"],
+      "related_aps": ["AP-USER-001", "AP-USER-002"]
     },
     {
       "id": "AC-USER-002",

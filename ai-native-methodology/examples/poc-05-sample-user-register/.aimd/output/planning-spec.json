@@ -9,7 +9,7 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      "input/rules.json",
+      "output/rules/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "source/src/user.legacy.ts"
@@ -67,13 +67,20 @@
     "JWT 발급 (별개 도메인)",
     "이메일 인증 메일 발송 (별개 도메인)"
   ],
+  "excluded_antipatterns": [
+    {
+      "ap_id": "AP-USER-003",
+      "reason": "v2.x carry — bcrypt/argon2 / 본 PoC scope OUT (시간 비용 절제 / chain harness 검증대 본질이 아님). antipatterns.json carry_to 정합.",
+      "decision_ref": "DEC-2026-05-17-chain-harness-e2e-simulation-audit §4.1 (F-SIM-001 lane)"
+    }
+  ],
   "risks_and_constraints": [
     "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무",
     "in-memory store (테스트 전용) — production = DB 정합 의무"
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json",
+      "output/rules/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json"
     ]
