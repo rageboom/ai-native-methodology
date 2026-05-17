@@ -75,7 +75,7 @@ flowchart LR
 1. **도메인**: 대문자 (ORDER, USER, PRODUCT 등). domain.json `aggregates[].name` 정합.
 2. **번호**: 3자리 (001, 002, ...) — ★ ★ ★ v2.0 통일 / 이름 형식 (CANCEL, CREATE 등) 폐기.
 3. **카테고리** (안티패턴): DB, ARCH, DOMAIN, API, FE, VALIDATION, CONFIG, SECURITY, PERFORMANCE
-4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합). **★ ★ v2.3.7 enforcement** — schema-level strict pattern `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 도입 / `rules.schema.json` + `planning-spec.schema.json` + `behavior-spec.schema.json` 모두 4토막+ 강제 / 3토막 (`BR-DOMAIN-001`) ❌ schema-validator fail. 5토막+ (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001`) ✅ 자연 허용.
+4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합). **★ ★ v2.3.7 enforcement** — schema-level strict pattern `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 도입 / `business-rules.schema.json` + `planning-spec.schema.json` + `behavior-spec.schema.json` 모두 4토막+ 강제 / 3토막 (`BR-DOMAIN-001`) ❌ schema-validator fail. 5토막+ (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001`) ✅ 자연 허용.
 5. **고유성**: 같은 유형 내에서 ID 중복 금지.
 6. **★ v2.0 chain link 의무**: BHV-* 가 ≥ 1 UC-* backward / AC-* 가 ≥ 1 BHV-* backward / TC-* 가 ≥ 1 AC-* backward / IMPL-* 가 ≥ 1 TC-* backward (chain-coverage-validator 강제 / sub-plan-3 신설).
 
@@ -90,7 +90,7 @@ flowchart LR
 
 ## ★ ★ v2.3.7 BR 4토막 enforcement 마이그레이션 carry (★ 신규)
 
-★ v2.3.7 (2026-05-13 / DEC-2026-05-13-BR-id-4-segment-enforcement) — `rules.schema.json` BR pattern 3토막 → 4토막+ strict 정합.
+★ v2.3.7 (2026-05-13 / DEC-2026-05-13-BR-id-4-segment-enforcement) — `business-rules.schema.json` (v7.0.0 이전 명칭에서 rename) BR pattern 3토막 → 4토막+ strict 정합.
 
 **영향 6 PoC** (★ 모두 3토막 표기 / schema-validator fail expected):
 

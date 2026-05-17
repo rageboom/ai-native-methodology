@@ -21,7 +21,7 @@
 | 1 (init) | [`workflow/discovery.md`](./workflow/discovery.md) | inventory | `inventory.schema.json` |
 | 2 (db) | [`workflow/db-schema.md`](./workflow/db-schema.md) | [`4-db-schema`](./deliverables/4-db-schema.md) | `db-schema.schema.json` |
 | 3 (arch) | [`workflow/architecture.md`](./workflow/architecture.md) | [`1-architecture`](./deliverables/1-architecture.md) | `architecture.schema.json` |
-| 4 (business-logic) | [`workflow/business-logic.md`](./workflow/business-logic.md) | [`2-domain`](./deliverables/2-domain.md) + [`5-business-rules`](./deliverables/5-business-rules.md) | `domain.schema.json` + `rules.schema.json` |
+| 4 (business-logic) | [`workflow/business-logic.md`](./workflow/business-logic.md) | [`2-domain`](./deliverables/2-domain.md) + [`5-business-rules`](./deliverables/5-business-rules.md) | `domain.schema.json` + `business-rules.schema.json` |
 | 4.5 (formal-spec) | [`workflow/formal-spec.md`](./workflow/formal-spec.md) | [`4-5-formal-spec`](./deliverables/4-5-formal-spec.md) | `formal-spec.schema.json` |
 | 4.7 (characterization) ★ v2.1 | [`workflow/characterization.md`](./workflow/characterization.md) | [`23-characterization-spec`](./deliverables/23-characterization-spec.md) | `characterization-spec.schema.json` |
 | 4.8 (sql-inventory) ★ v2.2 | [`workflow/sql-inventory.md`](./workflow/sql-inventory.md) | [`24-sql-inventory`](./deliverables/24-sql-inventory.md) | `sql-inventory.schema.json` |

@@ -1,7 +1,7 @@
 # 산출물 #4: DB 스키마 (Database Schema)
 
 > **사상**: Schema-First (ADR-001 — 다중 출처 통합 시 운영 DB > ORM > ERD 우선순위)
-> **schema**: `schemas/db-schema.schema.json` · **template**: `templates/erd.template.mermaid`
+> **schema**: `schemas/db-schema.schema.json` · **template**: `templates/analysis/erd.template.mermaid`
 > **생성 phase**: `db-schema` phase (`/analyze-db`)
 
 ---

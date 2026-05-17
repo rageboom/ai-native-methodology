@@ -553,7 +553,7 @@ function check13_skillCitationIntegrity() {
     pass: r.status === 0 && n === 0,
     detail:
       n === 0
-        ? `${parsed.skill_count} SKILL.md 인용 정합 (schema/repo-path/ADR/DEC 실존 / 0 stale dead-link)`
+        ? `${parsed.scanned_file_count} active doc 인용 정합 (repo-wide / schema·repo-path·ADR·DEC 실존 / 0 stale dead-link)`
         : `${n} stale citation across ${
             new Set((parsed.findings || []).map((f) => f.skill)).size
           } skill(s) — ${(parsed.findings || [])

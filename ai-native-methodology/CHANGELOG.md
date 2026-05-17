@@ -9,6 +9,31 @@
 
 ---
 
+## [8.1.1] — 2026-05-17 ★ PATCH — skill-citation-validator repo-wide 확장 + 활성 SSOT stale 인용 정합 (FP 교정)
+
+> ★ **v8.1.1 PATCH — corrective / non-breaking**. 사용자 "다른 stale 인용 더 없나 전체 레포 스캔" → repo-wide 결정적 스캔 → 활성 SSOT 문서에 SKILL.md 와 **동일 schema-drift class** 잔존 확인 → validator scope 확장 + FP 교정 + dead-link 수정. check #13·tool 자체는 v8.1.0 기존 (신규 surface ❌) = PATCH. DEC-2026-05-17-repo-wide-citation-scan / ADR-PLUGIN-001 §7 patch v3.
+
+### validator 결함 교정 (skill-citation-validator)
+
+- **scope** SKILL.md 한정 → **repo-wide active 표면** (.md/.mermaid / EXCLUDE = node_modules·.git·.claude·.github·briefing·dist·examples·archive + CHANGELOG*·*HISTORY*·decisions/DEC-*·decisions/STATUS*·decisions/INDEX* + **docs/adr/**(ADR=immutable decision record / LL-i-52) + **templates/adoption/**(downstream scaffold placeholder))
+- **DEC/ADR exact-match → prefix-match 교정** (파일명 descriptive suffix 때문에 단축 id 인용 FP 였음 / 결정적 버그)
+- **relative-path 해석** 추가 (도구-local `docs/` 등 citing-file-relative 흡수)
+- **ABSENCE_CTX 확장** — 의도적 부재 + supersession(격상/승격) + future-carry(carry/후보/예정/미생성) + **흡수**(제거된 구 자산 historical mapping) → 현재-dead-link 주장 아님 skip
+- **migration/absorption 표 인식** — header 가 `흡수/보존/migrated/legacy` 면 그 표 region row 인용 = historical mapping skip (agents-axis §5 정합 / LL-i-52)
+
+### 발견·수정 (ground truth 삼중 대조 / LL-i-55)
+
+- repo-wide raw → HISTORY 453 + POC 41 (정직 분리 / 결함 아님) → 활성 표면 정밀 triage → **실 stale 31건 / 15 file → 0**
+- 동일 schema-drift class 활성 SSOT 잔존 수정 — `lifecycle-contract.md`(자산매핑 SSOT: rules→business-rules + a11y/i18n/static-security/legacy → -spec/-spectrum + ADR-FE-002/005 정확명) · `id-conventions.md` · `methodology-spec/README.md` · `severity-cross-stage-mapping.md`(severity SSOT) · `schemas/README.md`(+intervention-log.js→state-store.js) · `templates/planning/planning-doc-format.md` · `deliverables/{5-business-rules,4-5-formal-spec,4-db-schema,6-antipatterns}.md`(templates/→templates/analysis/) · `skills/analysis-br-cross-consistency-check`(docs/→tools/br-cross-consistency-validator/docs/)
+- FP 정확 분리 무수정 — agents-axis §5 흡수표(historical) · sql-inventory carry 후보 · ADR-FE-001 §결정 신설서술 · ADR-FE-005 ADR-007 격상 · DEC/ADR 산문 약식 인용
+
+### 검증
+
+- skill-citation-validator **0 stale** (207 active doc / dogfood green) + test **2/2** (regression-guard + synthetic history/absence/migration-table/relative FP 입증)
+- release-readiness **13/13** (check #13 repo-wide green) + version-check 3-way 8.1.1 + workspace green + chain harness validated 본질 보존
+
+---
+
 ## [8.1.0] — 2026-05-17 ★ ★ MINOR — skill-citation-validator 신설 + 47 SKILL.md stale 인용 정합 (R18 내부정합 / release-readiness #13)
 
 > ★ ★ **v8.1.0 MINOR — additive enforcement + 비-breaking 내부 dead-link 수정**. 사용자 "내용 로직도 확인 가능한가" → A(내부 정합 결정적 검사) → "수정 + validator 도구화". skill 지시 설계품질(증명불가 C계층) 아닌 **"인용 문서 실존"(결정적)** 검증. DEC-2026-05-17-skill-citation-integrity / ADR-PLUGIN-001 §7 patch v2.

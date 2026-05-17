@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // skill-citation-validator CLI — exit 0 = 0 finding / 1 = stale 인용 검출.
-// 사용: skill-citation-validator [--json] [--root <repoRoot>]
+// scope = repo-wide active shipped 표면 (v8.1.1). 사용: skill-citation-validator [--json] [--root <repoRoot>]
 
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -30,20 +30,20 @@ if (args.json) {
   process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 } else {
   process.stdout.write(
-    `skill-citation-validator — ${result.skill_count} SKILL.md scanned\n\n`
+    `skill-citation-validator — ${result.scanned_file_count} active doc scanned (repo-wide)\n\n`
   );
   if (result.finding_count === 0) {
     process.stdout.write('✅ 0 stale citation — 내부 인용 정합.\n');
   } else {
     for (const f of result.findings) {
       process.stdout.write(
-        `  ❌ ${f.skill}/SKILL.md:${f.line} [${f.kind}] ${f.ref} — ${f.why}\n`
+        `  ❌ ${f.file}:${f.line} [${f.kind}] ${f.ref} — ${f.why}\n`
       );
     }
     process.stdout.write(
       `\n${result.finding_count} stale citation(s) across ${
-        new Set(result.findings.map((x) => x.skill)).size
-      } skill(s).\n`
+        new Set(result.findings.map((x) => x.file)).size
+      } file(s).\n`
     );
   }
 }

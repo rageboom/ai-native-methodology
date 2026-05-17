@@ -51,7 +51,7 @@ Agent({
   description: "Layer 2 BR semantic 검증",
   subagent_type: "general-purpose",
   model: "sonnet",
-  prompt: <prompt 본문 — docs/layer-2-prompt-spec.md §3 정합>
+  prompt: <prompt 본문 — tools/br-cross-consistency-validator/docs/layer-2-prompt-spec.md §3 정합>
 })
 ```
 

@@ -204,7 +204,7 @@ input (implement stage 가 받음):
 | 1 | inventory | `inventory.schema.json` | 공통 |
 | 2 | architecture (+ .mermaid) | `architecture.schema.json` | 공통 |
 | 3 | domain | `domain.schema.json` | 공통 |
-| 4 | rules | `rules.schema.json` | BE+FE |
+| 4 | rules | `business-rules.schema.json` | BE+FE |
 | 5-a | openapi | `openapi-extension.schema.json` | BE |
 | 5-b | schema + erd (.mermaid) | `db-schema.schema.json` | DB |
 | 6 | finding-list | (`finding-system.md` 형식) | 공통 |
@@ -212,10 +212,10 @@ input (implement stage 가 받음):
 | 7' | antipatterns + migration-cautions | `antipatterns.schema.json` | 공통 |
 | 8 | state-map | `state-map.schema.json` | FE+디자인 |
 | 9 | visual-manifest | `visual-manifest.schema.json` | FE+디자인 |
-| 10 | a11y | `a11y.schema.json` | FE+디자인 |
-| 11 | i18n | `i18n.schema.json` | FE |
-| 12 | static-security | `static-security.schema.json` | BE+FE |
-| 13 | legacy | `legacy.schema.json` | 공통 |
+| 10 | a11y | `a11y-spec.schema.json` | FE+디자인 |
+| 11 | i18n | `i18n-spec.schema.json` | FE |
+| 12 | static-security | `static-security-spec.schema.json` | BE+FE |
+| 13 | legacy | `legacy-spectrum.schema.json` | 공통 |
 | 14 | form-validation-spec | `form-validation-spec.schema.json` | FE |
 | 15 | type-spec | `type-spec.schema.json` | FE (TS) |
 
@@ -291,8 +291,8 @@ design stage 기존 자산 (analysis stage 안에 일부 포함됨 / v2.x carry 
 - `deliverables/7-ui-ux.md` (★ FE+디자인 cross-cutting)
 - `deliverables/8-state-map.md` (★ FE 동적 행동)
 - `deliverables/9-visual-manifest.md` (★ Playwright snapshot binary 진실)
-- `docs/adr/ADR-FE-002.md` (★ DTCG 2025.10 W3C spec)
-- `docs/adr/ADR-FE-005.md` (★ 권위 매개체 13)
+- `docs/adr/ADR-FE-002-이중-렌더링-FE-적용.md` (★ DTCG 2025.10 W3C spec)
+- `docs/adr/ADR-FE-005-권위-매개체-12-채택.md` (★ 권위 매개체 13)
 
 design stage 산출물 (v2.x 시점에 정식 분리 시):
 - wireframe spec

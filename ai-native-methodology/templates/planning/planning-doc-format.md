@@ -126,7 +126,7 @@ USE:    analysis stage 의 7대 산출물 빈칸 채우기 / LLM 직접 소비
 
 | 기획서 component | analysis 산출물 | schema | 우선순위 |
 |---|---|---|---|
-| C1 decision table | rules.json | `rules.schema.json` | ★ ★ ★ |
+| C1 decision table | business-rules.json | `business-rules.schema.json` | ★ ★ ★ |
 | C2 entity table | domain.json + schema.json | `domain.schema.json` + `db-schema.schema.json` | ★ ★ ★ |
 | C3 use case | openapi.yaml + error-mapping | `openapi-extension.schema.json` + `error-mapping-spec.schema.json` | ★ ★ ★ |
 | C4 flow | state-map.json | `state-map.schema.json` | ★ ★ |

@@ -4,7 +4,7 @@
 
 ## 배경
 
-doc 재구조화(deliverables 재번호 `04-rules.md`→`5-business-rules.md` / workflow `phase-N`→semantic / schema `-spec`·`-spectrum` 접미 / v7.0.0 `rules.schema.json`→`business-rules.schema.json`)가 SKILL.md "본체 명세 / Spec reference" 인용에 미전파되어 **dead-link stale 인용**이 누적. 기존 validator 사각 (drift-validator=flows / formal-spec-link-validator=chain 산출물 / SKILL.md 산문 인용은 무검증). v8.1.0 신설 (ADR-PLUGIN-001 §7 patch v2 / R18 내부 정합 enforcement).
+doc 재구조화(deliverables 재번호 `04`→`5` / workflow `phase-N`→semantic / schema `-spec`·`-spectrum` 접미 / v7.0.0 business-rules schema 파일명 rename / templates/analysis 경로 / ADR 정확명)가 SKILL.md·methodology-spec "본체 명세 / Spec reference" 인용에 미전파되어 **dead-link stale 인용**이 누적. 기존 validator 사각 (drift-validator=flows / formal-spec-link-validator=chain 산출물 / SKILL.md 산문 인용은 무검증). v8.1.0 신설 (ADR-PLUGIN-001 §7 patch v2 / R18 내부 정합 enforcement).
 
 ## 검사 class (low-FP — Senior F3 content-aware 정합)
 

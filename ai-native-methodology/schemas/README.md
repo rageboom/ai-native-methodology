@@ -15,7 +15,7 @@
 | `impl-spec.schema.json` | chain 4 / IMPL-* (GREEN / 100% pass) | `tools/test-impl-pass-validator/` (gate #4) |
 | `traceability-matrix.schema.json` | release / UC→BHV→AC→TC→IMPL+commit_hash | `tools/traceability-matrix-builder/` |
 | `state.schema.json` | chain-driver state 영속 | `tools/chain-driver/src/state-store.js` |
-| `intervention-log.schema.json` | 사용자 결단 로그 (single-writer JSONL) | `tools/chain-driver/src/intervention-log.js` |
+| `intervention-log.schema.json` | 사용자 결단 로그 (single-writer JSONL) | `tools/chain-driver/src/state-store.js` |
 | `test-cmd.schema.json` | test runner 호출 명세 (framework / cmd / args / cwd) | `tools/test-impl-pass-validator/` |
 | `work-unit-manifest.schema.json` | ★ G3 (R5/R7) — scope + stage manifest (analysis_refs + sync_state) | `tools/chain-driver/src/state-store.js writeManifest` |
 
@@ -27,7 +27,7 @@
 | `domain.schema.json` | Phase 4 domain | BE |
 | `db-schema.schema.json` | Phase 2 DB schema | BE |
 | `openapi-extension.schema.json` | Phase 5-1 API 확장 (x-* fields) | BE |
-| `rules.schema.json` | Phase 4 business-rules | BE/FE |
+| `business-rules.schema.json` | Phase 4 business-rules | BE/FE |
 | `ui-spec.schema.json` | Phase 5-2 UI 명세 | FE |
 | `state-map.schema.json` | Phase 5-2-b state machine | FE |
 | `visual-manifest.schema.json` | Phase 5-2-c Playwright snapshot | FE |
@@ -105,4 +105,4 @@ npx ajv validate \
 - [`../tools/README.md`](../tools/README.md) — 12 도구 cadence + 각 도구가 검증하는 schema
 - [`../methodology-spec/README.md`](../methodology-spec/README.md) — phase × deliverable × schema 매트릭스
 - ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-004 (test-runner-invocation-contract)
-- DEC-2026-05-06-sub-plan-2-종결 — chain v2 6 schema 신설 record
+- chain v2 6 schema 신설 record (sub-plan-2 종결 / `CHANGELOG-HISTORY.md` 참조)

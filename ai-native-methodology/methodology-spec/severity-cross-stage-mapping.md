@@ -48,7 +48,7 @@ stage 마다 등급 체계가 다름 (실측):
 
 - ★ 본 문서 = severity cross-stage 정합의 **단일 SSOT**. 등급 매핑 변경 시 ★ 본 문서에서만 / 타 문서·schema 는 본 문서 참조 (재선언 ❌ — ⑥ SSOT 위반 회피 paradigm 정합).
 - cross-ref (본 문서 가리킴):
-  - `schemas/rules.schema.json` businessRule.severity `$comment`
+  - `schemas/business-rules.schema.json` businessRule.severity `$comment`
   - `schemas/acceptance-criteria.schema.json` severity `$comment`
   - `docs/adr/ADR-010-*.md` (ratchet 정책 원천 / 본 표 4종 = ADR-010 §2 정합)
   - `methodology-spec/glossary-ko.md` (severity 항목 pointer)
