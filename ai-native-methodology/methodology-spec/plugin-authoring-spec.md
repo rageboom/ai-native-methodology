@@ -26,6 +26,7 @@
 | S5 | imperative voice 본문 ("Do X" / 서사 최소) | "State what to do rather than narrating how or why" | 권장 | low |
 | S6 | frontmatter = **공식 필드만**: `name`·`description`·`allowed-tools`·`when_to_use`·`disable-model-invocation`·`user-invocable`·`argument-hint`·`arguments`·`model`·`effort`·`context`·`agent`·`hooks`·`paths`·`shell` | "Frontmatter reference" 표 | MUST | high |
 | S7 | side-effect 워크플로(deploy/commit/send) skill = `disable-model-invocation: true` | task content 가이드 | 권장 | low |
+| S8 | auto-compaction 재첨부 대비 — `SKILL.md` 선두 ~5,000 토큰을 self-contained 하게(핵심 절차·계약 우선 / 후방 reference 는 별 파일). 재첨부 skill 은 25,000 토큰 공유 budget(최근 invoke 우선·초과 시 오래된 skill drop) | "Skill content lifecycle" — "keeping the first 5,000 tokens of each" / "combined budget of 25,000 tokens" | 권장 | low |
 
 ---
 
@@ -40,6 +41,7 @@
 | H5 | 임의 shell 입력 검증 (injection 방어) + idempotency (resume 시 SessionStart 재실행 `source:"resume"` / mid-session event 는 transcript replay) | shell form / 세션 resume 절 | MUST | high |
 | H6 | 경로 = `${CLAUDE_PLUGIN_ROOT}` (절대경로 ❌) / 보조 `${CLAUDE_PROJECT_DIR}`·`${CLAUDE_PLUGIN_DATA}` | "path placeholders" | MUST | high |
 | H7 | plugin hook 은 `hooks/hooks.json`(root) 또는 plugin.json `hooks` 필드 | "File locations" | MUST | medium |
+| H8 | per-handler `if` = permission-rule 구문 필터(`Bash(git *)`·`Edit(*.ts)`) — tool 이벤트(PreToolUse·PostToolUse·PostToolUseFailure·PermissionRequest·PermissionDenied)에서만 평가 / 그 외 이벤트는 미실행. handler type 5종(command·http·mcp_tool·prompt·agent). `timeout` 기본 = 600s(command/http/mcp_tool)·30s(prompt)·60s(agent). `once` = skills/agents 한정. ★ `matcher`(event-group wrapper) ≠ `if`(per-handler) — 별개·공존·비폐기 | "Common Fields (All Handler Types)" / "Hook Resolution Example" | 권장 | medium |
 
 ---
 
@@ -71,15 +73,16 @@
 
 ## §6. 공식 docs pin baseline (★ ★ ★ ADR-010 baseline 차용 — drift 검증 기준)
 
-> `last_verified` = check #12 가 읽는 **유일 결정적 필드** (date 산술 / 네트워크 ❌).
+> `last_verified` = check #12 가 읽는 staleness 결정 필드 (date 산술 / 네트워크 ❌).
+> `digest_sha` = `sha256(trim(pinned_guidance_digest))` 선두 12 hex. check #12 가 재계산 일치 결정적 assert → digest 변경과 commitment 동반 이동 강제 (날짜만 갱신·digest 무단편집 동시 차단 / §9 Layer i 불변식).
 > `pinned_guidance_digest` = §9 네트워크 재검증의 diff 대상. 본 표는 실 F-015 dispatch 결과 seed (암기 작성 ❌ = no-simulation 정합).
 
-| area | official_url (canonical) | content_anchor | pinned_guidance_digest | last_verified | retrieved |
-|---|---|---|---|---|---|
-| skills | https://code.claude.com/docs/en/skills | "Configure skills" → "Frontmatter reference" | SKILL.md ≤500줄·reference 분리 link / `name` lowercase+숫자+하이픈 ≤64 / `description`=trigger·핵심선두·≤1536c / single-responsibility / imperative voice / 공식 frontmatter 15종(allowed-tools·disable-model-invocation·user-invocable·when_to_use·argument-hint·arguments·model·effort·context·agent·hooks·paths·shell) / context:fork 는 explicit task 필요 | 2026-05-17 | 2026-05-17 |
-| hooks | https://code.claude.com/docs/en/hooks | "Hooks reference" → "Hook lifecycle"/"Exit code output"/"JSON output" | 공식 event 29종 / exit 0=stdout JSON·2=blocking(stderr)·기타=non-blocking / 정책강제=exit 2 / JSON: continue·suppressOutput·systemMessage·decision:block·hookSpecificOutput.{hookEventName,permissionDecision(allow/deny/ask/defer),additionalContext} / matcher 3규칙 / hook type 5종(command·http·mcp_tool·prompt·agent) / ${CLAUDE_PLUGIN_ROOT}·${CLAUDE_PROJECT_DIR}·${CLAUDE_PLUGIN_DATA} / parallel+dedup / resume=SessionStart 재실행 source:resume·mid-session replay / 출력 10000자 cap | 2026-05-17 | 2026-05-17 |
-| sub-agents | https://code.claude.com/docs/en/sub-agents | "Configure subagents" → "Supported frontmatter fields" | single .md+frontmatter / body=system prompt / 필수=name·description 2종만 / optional 14종 incl. `skills`(preload·plural) / model: sonnet·opus·haiku·full-id·inherit / description=위임 trigger / 자체 context window·재spawn ❌ / plugin agent 은 hooks·mcpServers·permissionMode 무시 / `system_prompt`·`preloaded_skills` 미존재 | 2026-05-17 | 2026-05-17 |
-| plugins-reference | https://code.claude.com/docs/en/plugins-reference (+ /plugins, /plugin-marketplaces) | "Plugin directory structure"/"Plugin manifest schema"/"Marketplace schema" → "Required fields" | .claude-plugin/=plugin.json(+marketplace.json)만 / 컴포넌트=root / manifest optional·`name`만 필수(kebab) / version·description·author optional / semver=semver.org 위임 / marketplace 필수 name·owner.name·plugins[] / ${CLAUDE_PLUGIN_ROOT}·_DATA·PROJECT_DIR / commands/=legacy(skills/ 권장) / plugin name=skill namespace(변경=breaking) / version 우선순위 plugin.json>marketplace>git SHA | 2026-05-17 | 2026-05-17 |
+| area | official_url (canonical) | content_anchor | pinned_guidance_digest | digest_sha | last_verified | retrieved |
+|---|---|---|---|---|---|---|
+| skills | https://code.claude.com/docs/en/skills | "Configure skills" → "Frontmatter reference"/"Skill content lifecycle" | SKILL.md ≤500줄·reference 분리 link / `name` lowercase+숫자+하이픈 ≤64 / `description`=trigger·핵심선두·≤1536c / single-responsibility / imperative voice / 공식 frontmatter 15종(allowed-tools·disable-model-invocation·user-invocable·when_to_use·argument-hint·arguments·model·effort·context·agent·hooks·paths·shell) / context:fork 는 explicit task 필요 / auto-compaction 재첨부 = skill 당 선두 5000 토큰·재첨부 공유 25000 토큰 budget(최근 invoke 우선) | ea06dc97470e | 2026-05-17 | 2026-05-17 |
+| hooks | https://code.claude.com/docs/en/hooks | "Hooks reference" → "Hook lifecycle"/"Exit code output"/"JSON output" | 공식 event 29종 / exit 0=stdout JSON·2=blocking(stderr)·기타=non-blocking / 정책강제=exit 2 / JSON: continue·suppressOutput·systemMessage·decision:block·hookSpecificOutput.{hookEventName,permissionDecision(allow/deny/ask/defer),additionalContext} / matcher 3규칙(event-group wrapper) / per-handler if=permission-rule filter(Bash(git *)·Edit(*.ts))·tool 이벤트(PreToolUse·PostToolUse·PostToolUseFailure·PermissionRequest·PermissionDenied) 한정 / matcher≠if 별개·공존·비폐기 / common handler field if·once(skills/agents 한정)·timeout default 600(command/http/mcp_tool)·30(prompt)·60(agent) / hook type 5종(command·http·mcp_tool·prompt·agent) / JSON 추가 permissionDecisionReason·terminalSequence·stopReason / ${CLAUDE_PLUGIN_ROOT}·${CLAUDE_PROJECT_DIR}·${CLAUDE_PLUGIN_DATA} / parallel+dedup / resume=SessionStart 재실행 source:resume·mid-session replay / 출력 10000자 cap | 89f2f4fdf55e | 2026-05-17 | 2026-05-17 |
+| sub-agents | https://code.claude.com/docs/en/sub-agents | "Configure subagents" → "Supported frontmatter fields" | single .md+frontmatter / body=system prompt / 필수=name·description 2종만 / optional 14종 incl. `skills`(preload·plural) / model: sonnet·opus·haiku·full-id·inherit / description=위임 trigger / 자체 context window·재spawn ❌ / plugin agent 은 hooks·mcpServers·permissionMode 무시 / `system_prompt`·`preloaded_skills` 미존재 | 5a0b74658955 | 2026-05-17 | 2026-05-17 |
+| plugins-reference | https://code.claude.com/docs/en/plugins-reference (+ /plugins, /plugin-marketplaces) | "Plugin directory structure"/"Plugin manifest schema"/"Marketplace schema" → "Required fields" | .claude-plugin/=plugin.json(+marketplace.json)만 / 컴포넌트=root / manifest optional·`name`만 필수(kebab) / version·description·author optional / semver=semver.org 위임 / marketplace 필수 name·owner.name·plugins[] / ${CLAUDE_PLUGIN_ROOT}·_DATA·PROJECT_DIR / commands/=legacy(skills/ 권장) / plugin name=skill namespace(변경=breaking) / version 우선순위 plugin.json>marketplace>git SHA / 추가 optional channels(stable)·userConfig·dependencies(semver)·lspServers·outputStyles / experimental.{themes,monitors}=schema may change caveat | b0e11058b05e | 2026-05-17 | 2026-05-17 |
 
 ---
 
@@ -93,14 +96,15 @@
 | `spec-integrate-deliverables` name | S3 | ✅ | — | ★ **resolved v8.0.0** (was `spec-integrate-7대-deliverables` / 한글 → kebab rename / DEC-2026-05-17-skill-name-rename / §8-1 종결). 현 name = 공식 charset `[a-z0-9-]` 정합 |
 | `_base-*` skill ×5 + agent ×3 name | S3/A1 | ⚠️ | low | leading `_` = 공식 skill charset 밖. 의도적 base/utility grouping 관례 / 393 test 무결 / 수정=rename=breaking → 이연·문서화(§8-2) |
 | 9 agents frontmatter | A1·A2 | ✅ | — | 9/9 name+description 필수 충족 / 키 전부 공식(`skills` 포함=공식 preload / 자체확장 ❌) |
-| hooks.json events | H1 | ✅ | — | SessionStart·UserPromptSubmit·PreToolUse = 공식 29종 subset |
+| hooks.json events | H1 | ✅ | — | SessionStart·UserPromptSubmit·PreToolUse = 공식 29종 subset (★ event 29 + matcher 실재·비폐기 = F-015 재확인 2026-05-17) |
 | hooks.json exit/path | H2·H6 | ✅ | — | PreToolUse deny=exit 2 ($comment 확인) / `${CLAUDE_PLUGIN_ROOT}` 사용 |
+| hooks.json per-handler `if`/`timeout` | H8 | ✅ | — | 미사용 = optional 정합 (H8 = 권장 informational / `matcher` 만으로 충족 / 강제 ❌) |
 | .claude-plugin/ 구조 | P1 | ✅ | — | `plugin.json`+`marketplace.json` 만 (★ marketplace.json 위치 = 공식 정합 / "P1 위반" 가설 = false-positive 제거) |
 | plugin.json 필드 | P2 | ✅ | — | name(kebab)+version+description+author+homepage+license+keywords (필수 name 충족) |
 | marketplace.json | P3 | ✅ | — | name·owner.name·plugins[] 충족 |
 | version 3-way | P4 | ✅ | — | DEC-2026-05-17-package-version-3way-sync-fix 선행 청산 (4.0.1→7.0.0) → version-check exit 0 |
 
-**결론**: S3 high 1건 = ★ **v8.0.0 종결** (한글 skill rename / DEC-2026-05-17-skill-name-rename). 잔여 = S3/A1 1군(⚠️ low / 수용 후보 / §8-2). 나머지 전 규칙 정합. 실 F-015 cross-check 가 가설 3건(S1 retrofit·marketplace 위치·`skills` 자체확장) false-positive 제거.
+**결론**: S3 high 1건 = ★ **v8.0.0 종결** (한글 skill rename / DEC-2026-05-17-skill-name-rename). 잔여 = S3/A1 1군(⚠️ low / 수용 후보 / §8-2). 나머지 전 규칙 정합. 실 F-015 cross-check 가 가설 3건(S1 retrofit·marketplace 위치·`skills` 자체확장) false-positive 제거. ★ v8.2.0 재검(F-015 ×5 / 2026-05-17) — 4 area 중 skills·sub-agents·plugins = VERIFIED-IDENTICAL / hooks = VERIFIED-WITH-DELTA(S8·H8 additive 보강 / 거짓 0). Explore pre-research 가설(event 30+·name-only required·P2 stale) = 실 F-015 가 모두 반증 (research 수렴 ≠ 사실 / LL-plugin-02).
 
 ---
 
@@ -123,16 +127,21 @@ ADR-010 baseline+ratchet 를 **외부 권위(공식 docs)** 에 재적용. ADR-0
 
 1. **cadence**: 60일마다 OR check #12 red OR plugin-authoring 관련 PR.
 2. **dispatch**: `_base-official-docs-checker` (Task tool) ×4 (§6 area 별). 입력 = official_url + content_anchor + pinned_guidance_digest. 출력 = `[VERIFIED / CONTRADICTS / INSUFFICIENT-DATA]`.
-3. **VERIFIED** → §6 `last_verified` 만 today 갱신 (규칙 무변 / no version bump).
-4. **CONTRADICTS** → (a) `_base-log-finding` F-XXX(severity per diff) (b) `DEC-YYYY-MM-DD-plugin-authoring-docs-drift.md` 신설 (c) §2~§5 규칙 + §6 digest + last_verified 갱신 (d) semver 영향 DEC 평가 (규칙 강화로 기존 자산 break 시 MAJOR 가능 / additive 시 MINOR·PATCH).
+3. **VERIFIED 분기 (★ v8.2.0 blind-spot closure)**:
+   - **VERIFIED-IDENTICAL** (문서 = digest 와 동치 / delta 0) → §6 `last_verified`·`retrieved` 만 today (규칙 무변 / no version bump). digest 무변 → `digest_sha` 무변.
+   - **VERIFIED-WITH-DELTA** (digest 의 모든 claim 참이나 문서가 신 사실 추가) → **동일 변경 안에서** §6 digest 재발행 + `digest_sha` 재산출 + 영향 §2~§5 규칙 additive 재정합 + DEC. last_verified 만 갱신하고 digest 방치 ❌ (= 본 메커니즘이 닫는 사각).
+4. **CONTRADICTS** → (a) `_base-log-finding` F-XXX(severity per diff) (b) `DEC-YYYY-MM-DD-plugin-authoring-docs-drift.md` 신설 (c) §2~§5 규칙 + §6 digest + `digest_sha` + last_verified 갱신 (d) semver 영향 DEC 평가 (규칙 강화로 기존 자산 break 시 MAJOR 가능 / additive 시 MINOR·PATCH).
 5. **INSUFFICIENT-DATA** → finding 만, `last_verified` 미갱신 (clock 지속 → check #12 red 유지 → human 주의 보장 / corpus fallback ❌ = checker 계약).
+
+> **불변식 (★ v8.2.0)**: `last_verified` bump ⟺ 실 F-015 run 동반 AND `digest_sha` 가 현 digest 와 일관 (재산출 일치). 날짜만 fresh 한데 규칙 본문이 stale 한 사각 = digest_sha 결정적 결합으로 차단.
 
 ### Layer (ii) 결정적 staleness 가드 — release-readiness check #12 (offline / date-math)
 
-- `plugin-authoring-spec.md` §6 표 `last_verified` 4행 정규식 추출 (content-aware / `check10` 패턴 isomorphic).
+- `plugin-authoring-spec.md` §6 표 4행 정규식 추출 (content-aware / `check10` 패턴 isomorphic / **7-cell** 파싱 — `|` 침입 시 fail-closed).
 - `daysSince = today − last_verified`. **임계 60일**. pass ⟺ 4행 모두 ≤ 60일 AND 표 파싱(≥4행).
+- **★ v8.2.0 digest_sha assert**: 각 행 `sha256(trim(digest))` 선두 12 hex == 커밋된 `digest_sha` 의무. 불일치 = fail (digest 변경 후 hash 미재커밋 / §9 Layer i 불변식 위반). → digest 와 commitment 동반 이동 강제 (날짜만 갱신·digest 무단편집 동시 결정적 차단 / content-correctness 증명은 불가하나 content-commitment 일관성은 결정적 / precedent check #13 · TUF metadata expires+hash).
 - `--skip-authoring-staleness` flag = skip(≠pass) / release 시 본 flag 사용 ❌ 의무 (`--skip-workspace-test` 의미 mirror).
-- 정당화: 네트워크는 비결정·offline 불가 → release-readiness 진입 ❌. 가드는 commit 된 `last_verified` date 산술만 → 결정론·재현. 양심 의존 차단 = 본 repo 정의 패러다임 (precedent R2→#10·A1→#11).
+- 정당화: 네트워크는 비결정·offline 불가 → release-readiness 진입 ❌. 가드는 commit 된 date 산술 + digest_sha 재계산만 → 결정론·재현. 양심 의존 차단 = 본 repo 정의 패러다임 (precedent R2→#10·A1→#11·R18→#12·#13).
 
 ---
 
@@ -150,4 +159,5 @@ ADR-010 baseline+ratchet 를 **외부 권위(공식 docs)** 에 재적용. ADR-0
 
 ## §11. 이력
 
+- **v8.2.0 MINOR (2026-05-17 / DEC-2026-05-17-plugin-authoring-docs-drift / ADR-PLUGIN-001 §7 patch v4)** — 사용자 "공식 best practice 재확인+비교+개선". 실 F-015 ×5 재검 (skills/hooks/sub-agents/plugins-reference + matcher/if 정밀). 판정 = skills·sub-agents·plugins **VERIFIED-IDENTICAL** / hooks **VERIFIED-WITH-DELTA**. §2 S8 (auto-compaction budget) + §3 H8 (per-handler if·timeout default·handler 5종·matcher≠if) additive 신설 (H1~H7·A·P 무변 / 거짓 0). ★ META blind-spot closure — §6 `digest_sha` 컬럼 + check #12 sha-equality assert + §9 Layer i VERIFIED-IDENTICAL/WITH-DELTA 분기 + 불변식. Explore pre-research 가설(event 30+·name-only·P2 stale) = 실 F-015 모두 반증 (LL-plugin-02). breaking 0 = MINOR.
 - **신설 (2026-05-17 / v7.1.0 MINOR / DEC-2026-05-17-plugin-authoring-spec)** — §1~§11. §6 pin = 실 `_base-official-docs-checker` F-015 VERIFIED ×4 (skills/hooks/sub-agents/plugins-reference / canonical `code.claude.com/docs/en/*`). 감사 결과 §7 (실 위반 S3 1건 ❌ + 1군 ⚠️ / false-positive 3건 제거) + §8 이연 backlog. Layer ii = release-readiness check #12 (60일). ADR-PLUGIN-001 + charter R18 정합.

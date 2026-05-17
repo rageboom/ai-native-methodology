@@ -9,6 +9,30 @@
 
 ---
 
+## [8.2.0] — 2026-05-17 ★ MINOR — 공식 docs F-015 ×5 재검 + §6 digest_sha META blind-spot closure (hooks VERIFIED-WITH-DELTA / additive)
+
+> ★ **v8.2.0 MINOR — additive / non-breaking**. 사용자 "Anthropic 공식 skills·agents·hooks best practice 재확인 + 비교 + 개선" → `plugin-authoring-spec.md` §9 Layer i 실 `_base-official-docs-checker` F-015 ×5 (skills/hooks/sub-agents/plugins-reference + matcher/if 정밀). 판정 = skills·sub-agents·plugins **VERIFIED-IDENTICAL** / hooks **VERIFIED-WITH-DELTA**. ★ Explore pre-research 가설 3건(event 30+·sub-agent name-only required·P2 stale) = 실 F-015 가 **모두 반증** (research 수렴 ≠ 사실 / 1차 출처 독립 fetch 의무 / LL-plugin-02). DEC-2026-05-17-plugin-authoring-docs-drift / ADR-PLUGIN-001 §7 patch v4 + §8 LL-plugin-02.
+
+### 규칙 additive 보강 (거짓 규칙 0 / H1~H7·§4·§5 무변)
+
+- **§2 S8 신설** (권장/low) — auto-compaction 재첨부 대비 (`SKILL.md` 선두 ~5000 토큰 self-contained / 재첨부 공유 25000 토큰 budget). 공식 "Skill content lifecycle" verbatim.
+- **§3 H8 신설** (권장/medium) — per-handler `if`=permission-rule filter(tool 이벤트 한정) / handler type 5종(command·http·mcp_tool·prompt·agent) / `timeout` 기본 600(command/http/mcp_tool)·30(prompt)·60(agent) / `once`=skills/agents 한정 / ★ `matcher`(event-group)≠`if`(per-handler) 별개·공존·비폐기 (H4 matcher = F-015 verbatim 정합 확인 / 무변).
+- **§6 digest enrich** — skills·hooks·plugins 3행 (sub-agents 무변) / 4행 `last_verified`=`retrieved`=2026-05-17 (실 F-015 재검).
+- **§7** — hooks.json `if`/`timeout` 미사용=optional 정합 + 29-event·matcher F-015 재확인 주석 + 결론 보강.
+
+### ★ META — §6 digest_sha content-commitment 결정적 결합 (사용자 채택)
+
+- **§6 `digest_sha` 컬럼 신설** = `sha256(trim(pinned_guidance_digest))` 선두 12 hex.
+- **release-readiness check #12 강화** — `last_verified` date-math **+ digest_sha 재계산 일치 결정적 assert** (6→7 cell 파싱 / fail-closed-on-`|` 유지). 날짜만 갱신·digest 무단편집 동시 차단. check 수 **13 유지** (check #12 내부 강화 / 신 check ❌).
+- **§9 Layer i** — VERIFIED 분기 (IDENTICAL=날짜만 / WITH-DELTA=동일 변경서 digest 재발행+§2~§5 재정합) + 불변식 ("last_verified bump ⟺ 실 F-015 run AND digest_sha 일관") + blind-spot closure note.
+- **release-readiness.test.js** — check12 digest_sha assert 갱신 + digest_sha regression-guard case 신설 (실 §6 4행 sha 재계산 dogfood / 7-cell 의무).
+
+### 회귀
+
+release-readiness 13/13 (check #12 4행 ≤60d + digest_sha 일치 / check #13 0 stale) · version-check 3-way 8.2.0 · workspace test green · drift-validator 3-way 불변 (skill/agent/flow 무편집 / chain harness §1 비범위 safety property) · breaking 0 (전부 additive / ADR-010 grandfather 47 skills·9 agents·hooks.json 정합 유지).
+
+---
+
 ## [8.1.1] — 2026-05-17 ★ PATCH — skill-citation-validator repo-wide 확장 + 활성 SSOT stale 인용 정합 (FP 교정)
 
 > ★ **v8.1.1 PATCH — corrective / non-breaking**. 사용자 "다른 stale 인용 더 없나 전체 레포 스캔" → repo-wide 결정적 스캔 → 활성 SSOT 문서에 SKILL.md 와 **동일 schema-drift class** 잔존 확인 → validator scope 확장 + FP 교정 + dead-link 수정. check #13·tool 자체는 v8.1.0 기존 (신규 surface ❌) = PATCH. DEC-2026-05-17-repo-wide-citation-scan / ADR-PLUGIN-001 §7 patch v3.

@@ -22,10 +22,11 @@
 //       plan + research 부정확 risk 차단 / "plugin.json vX.Y.Z" 표기 패턴 검증 / cadence enforcement).
 //   11. ★ ★ v3.6.7 A1 신설 — workspace test 회귀 자동 차단 (★ npm test --workspaces 실시간 실행 / fail count 0 의무 /
 //       chain-driver Windows path 회귀 사례 정합 / `--skip-workspace-test` flag 시 본 check skip / release 시 본 flag ❌ 의무).
-//   12. ★ ★ v7.1.0 R18 신설 — plugin-authoring-spec §6 공식 docs pin staleness (★ 외부 권위 drift ADR-010 baseline+ratchet
-//       차용 / methodology-spec/plugin-authoring-spec.md §6 last_verified 4행 ≤ 60일 의무 / 결정적 date-math only·네트워크 ❌
+//   12. ★ ★ v7.1.0 R18 신설 / ★ v8.2.0 digest_sha 강화 — plugin-authoring-spec §6 공식 docs pin staleness + content-commitment
+//       (★ 외부 권위 drift ADR-010 baseline+ratchet 차용 / §6 last_verified 4행 ≤ 60일 + ★ digest_sha = sha256(digest) 선두
+//       12hex 재계산 일치 의무 (날짜만 갱신·digest 무단편집 동시 결정적 차단 / §9 Layer i 불변식) / date-math+hash only·네트워크 ❌
 //       / 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory) /
-//       `--skip-authoring-staleness` flag 시 본 check skip / release 시 본 flag ❌ 의무 / ADR-PLUGIN-001 정합).
+//       `--skip-authoring-staleness` flag 시 본 check skip / release 시 본 flag ❌ 의무 / ADR-PLUGIN-001 §7 patch v4 정합).
 //   13. ★ ★ v8.1.0 R18 내부정합 신설 — skill-citation-validator (★ skills/*/SKILL.md 인용 schema/repo-path/ADR/DEC
 //       실존 결정적 검사 / doc 재구조화 후 stale dead-link 자동 차단 / AI 추론 0% / 기존 validator 사각 회복 /
 //       ADR-PLUGIN-001 §7 patch v2 / DEC-2026-05-17-skill-citation-integrity).
@@ -38,6 +39,7 @@
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -461,8 +463,8 @@ function check11_workspaceTestPass(args) {
 // 외부 권위(공식 Claude Code docs) drift = ADR-010 baseline+ratchet 차용:
 //   - baseline = methodology-spec/plugin-authoring-spec.md §6 pin (last_verified 4행)
 //   - 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory / release-readiness 밖)
-//   - 결정적 가드 = 본 check (date-math only / 네트워크 ❌ / no-simulation·결정론 불변 / check10 패턴 isomorphic).
-// pass ⟺ §6 표 4 area(skills/hooks/sub-agents/plugins-reference) 모두 last_verified ≤ 60일.
+//   - 결정적 가드 = 본 check (date-math + digest_sha 재계산 only / 네트워크 ❌ / no-simulation·결정론 불변 / check10 패턴 isomorphic).
+// pass ⟺ §6 표 4 area(skills/hooks/sub-agents/plugins-reference) 모두 last_verified ≤ 60일 AND digest_sha 일치 (★ v8.2.0).
 // --skip-authoring-staleness flag 시 skip (test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무).
 function check12_authoringSpecStaleness(args) {
   if (args.skipAuthoringStaleness) {
@@ -485,8 +487,10 @@ function check12_authoringSpecStaleness(args) {
     };
   }
   const text = readFileSync(specPath, 'utf-8');
-  // content-aware (check10 패턴) — §6 표 data row: `| <area> | url | anchor | digest | YYYY-MM-DD | YYYY-MM-DD |`.
-  // last_verified = 끝에서 2번째 cell (digest 에 `|` 미사용 = S-rule 자체 정합 / `|` 침입 시 fail-closed).
+  // content-aware (check10 패턴) — §6 표 data row (★ v8.2.0 7-cell):
+  //   `| <area> | url | anchor | digest | digest_sha | YYYY-MM-DD | YYYY-MM-DD |`.
+  // digest 에 `|` 미사용 = S-rule 자체 정합 / `|` 침입 시 cell 수 ≠ 7 → fail-closed.
+  // ★ v8.2.0 digest_sha = sha256(trim(digest)) 선두 12 hex 재계산 일치 의무 (§9 Layer i 불변식 / 날짜만 갱신·digest 무단편집 동시 차단).
   const today = new Date();
   const failures = [];
   const seen = {};
@@ -495,12 +499,19 @@ function check12_authoringSpecStaleness(args) {
     if (!m) continue;
     const area = m[1];
     const cells = line.split('|').slice(1, -1).map((c) => c.trim());
-    if (cells.length !== 6) {
-      failures.push(`${area}: §6 행 cell 수 ${cells.length} ≠ 6 (digest 안 '|' 침입 의심 / fail-closed)`);
+    if (cells.length !== 7) {
+      failures.push(`${area}: §6 행 cell 수 ${cells.length} ≠ 7 (digest 안 '|' 침입 의심 / fail-closed)`);
       seen[area] = true;
       continue;
     }
-    const lastVerified = cells[4]; // area|url|anchor|digest|last_verified|retrieved
+    // area|url|anchor|digest|digest_sha|last_verified|retrieved
+    const expectedSha = createHash('sha256').update(cells[3]).digest('hex').slice(0, 12);
+    if (expectedSha !== cells[4]) {
+      failures.push(`${area}: digest_sha 불일치 (커밋 ${cells[4]} ≠ 재계산 ${expectedSha} / digest 변경 후 hash 미재커밋 / §9 Layer i 불변식 위반)`);
+      seen[area] = true;
+      continue;
+    }
+    const lastVerified = cells[5];
     const dm = lastVerified.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!dm) {
       failures.push(`${area}: last_verified "${lastVerified}" not YYYY-MM-DD`);
@@ -520,7 +531,7 @@ function check12_authoringSpecStaleness(args) {
     id: 'authoring_spec_staleness',
     pass: failures.length === 0,
     detail: failures.length === 0
-      ? `plugin-authoring-spec §6 pin ${EXPECTED_AREAS.length} area 모두 ≤ ${STALE_DAYS}d fresh / 외부 권위 drift 가드 정합 (R18 / ADR-PLUGIN-001)`
+      ? `plugin-authoring-spec §6 pin ${EXPECTED_AREAS.length} area 모두 ≤ ${STALE_DAYS}d fresh + digest_sha 4행 일치 / 외부 권위 drift 가드 정합 (R18 / ADR-PLUGIN-001 §7 patch v4)`
       : `staleness: ${failures.join(' | ')}`,
     delegated_to: 'methodology-spec/plugin-authoring-spec.md §6 last_verified (R18 / ADR-PLUGIN-001 / 네트워크 재검증 = §9 Layer i cadence)',
   };

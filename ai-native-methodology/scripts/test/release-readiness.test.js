@@ -64,18 +64,39 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     ]);
   });
 
-  it('authoring_spec_staleness — §6 pin 4 area ≤ 60d fresh + --skip-authoring-staleness ≠ pass (R18 / ADR-PLUGIN-001)', () => {
+  it('authoring_spec_staleness — §6 pin 4 area ≤ 60d fresh + digest_sha 4행 일치 + --skip-authoring-staleness ≠ pass (R18 / ADR-PLUGIN-001 §7 patch v4)', () => {
     const r = runScript(['--target', 'v7.1.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
     assert.ok(stale.pass, `check12 must pass — detail: ${stale.detail}`);
-    assert.match(stale.detail, /4 area 모두 ≤ 60d fresh/);
+    assert.match(stale.detail, /4 area 모두 ≤ 60d fresh \+ digest_sha 4행 일치/);
     // skip flag = skip(≠pass) — release 시 본 flag ❌ 의무 (drift enforcement 정합 / check11 mirror).
     const r2 = runScript(['--target', 'v7.1.0', '--json', ...SKIP_WS, '--skip-authoring-staleness']);
     const out2 = JSON.parse(r2.stdout);
     const stale2 = out2.results.find((x) => x.id === 'authoring_spec_staleness');
     assert.equal(stale2.pass, false);
     assert.ok(stale2.detail.includes('skipped via --skip-authoring-staleness'), 'skip detail 명시 의무');
+  });
+
+  // ★ v8.2.0 digest_sha regression-guard (dogfood) — 실 §6 4행 각 digest_sha == sha256(trim(digest)) 선두 12hex.
+  // release-readiness.js 가 ROOT 경로 hardcode → 파괴적 mutation 회피 (adr_registry test 패턴 동형).
+  // digest 변경 후 hash 미재커밋 시 sha 불일치 = check #12 fail = §9 Layer i 불변식 결정적 강제 입증.
+  it('§6 digest_sha — 4 area 모두 sha256(trim(digest)) 선두 12hex 와 일치 (§9 Layer i 불변식 / blind-spot closure)', async () => {
+    const { createHash } = await import('node:crypto');
+    const specPath = join(ROOT, 'methodology-spec/plugin-authoring-spec.md');
+    const text = readFileSync(specPath, 'utf-8');
+    const rows = [];
+    for (const line of text.split(/\r?\n/)) {
+      const m = line.match(/^\|\s*(skills|hooks|sub-agents|plugins-reference)\s*\|/);
+      if (!m) continue;
+      const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+      assert.equal(cells.length, 7, `${m[1]}: §6 행 7-cell 의무 (digest '|' 침입 fail-closed) — got ${cells.length}`);
+      const expected = createHash('sha256').update(cells[3]).digest('hex').slice(0, 12);
+      assert.equal(cells[4], expected,
+        `${m[1]}: digest_sha 불일치 (커밋 ${cells[4]} ≠ 재계산 ${expected} — digest 변경 후 hash 미재커밋)`);
+      rows.push(m[1]);
+    }
+    assert.deepEqual(rows.sort(), ['hooks', 'plugins-reference', 'skills', 'sub-agents']);
   });
 
   it('layer_2_consistency — per-PoC mean ≥ 0.7 + critical/high drift 0 (Senior REVISE-1 + LL-i-43 정합)', () => {
