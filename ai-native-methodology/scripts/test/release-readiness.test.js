@@ -28,24 +28,27 @@ function runScript(args, env = {}, timeout = 60000) {
 // happy path / criterion full 검증 case 만 본격 spawn (timeout 600_000).
 const SKIP_WS = ['--skip-workspace-test'];
 
-describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 격상', () => {
-  it('happy path — 10/11 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / 본격 spawn 회피 cadence)', () => {
-    // ★ skip 시 check11 = pass=false / total 10/11. release 본격 시행 시 본 flag ❌ 의무 (drift enforcement 정합).
+describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 격상', () => {
+  it('happy path — 11/12 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness pass / 본격 spawn 회피 cadence)', () => {
+    // ★ skip 시 check11 = pass=false / total 11/12 (check12 staleness = pass). release 본격 시행 시 본 flag ❌ 의무.
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 11);
-    assert.equal(out.criteria_passed, 10);
+    assert.equal(out.criteria_total, 12);
+    assert.equal(out.criteria_passed, 11);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.detail.includes('skipped via --skip-workspace-test'), 'skip detail 명시 의무');
+    const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
+    assert.ok(stale.pass, `check12 staleness must pass — detail: ${stale.detail}`);
   });
 
-  it('all 11 criterion ids are present in output (no skipped)', () => {
+  it('all 12 criterion ids are present in output (no skipped)', () => {
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
     assert.deepEqual(ids, [
       'adr_registry',
       'analysis_validator_violation',
+      'authoring_spec_staleness',
       'chain_coverage',
       'claude_md_version_sync',
       'e2e_cycle_pass',
@@ -56,6 +59,20 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'validators_violation',
       'workspace_test_pass',
     ]);
+  });
+
+  it('authoring_spec_staleness — §6 pin 4 area ≤ 60d fresh + --skip-authoring-staleness ≠ pass (R18 / ADR-PLUGIN-001)', () => {
+    const r = runScript(['--target', 'v7.1.0', '--json', ...SKIP_WS]);
+    const out = JSON.parse(r.stdout);
+    const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
+    assert.ok(stale.pass, `check12 must pass — detail: ${stale.detail}`);
+    assert.match(stale.detail, /4 area 모두 ≤ 60d fresh/);
+    // skip flag = skip(≠pass) — release 시 본 flag ❌ 의무 (drift enforcement 정합 / check11 mirror).
+    const r2 = runScript(['--target', 'v7.1.0', '--json', ...SKIP_WS, '--skip-authoring-staleness']);
+    const out2 = JSON.parse(r2.stdout);
+    const stale2 = out2.results.find((x) => x.id === 'authoring_spec_staleness');
+    assert.equal(stale2.pass, false);
+    assert.ok(stale2.detail.includes('skipped via --skip-authoring-staleness'), 'skip detail 명시 의무');
   });
 
   it('layer_2_consistency — per-PoC mean ≥ 0.7 + critical/high drift 0 (Senior REVISE-1 + LL-i-43 정합)', () => {
@@ -118,11 +135,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 11 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 12 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
-    // even with bogus target, should still evaluate 11 checks against current artifacts.
+    // even with bogus target, should still evaluate 12 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 11);
+    assert.equal(out.criteria_total, 12);
   });
 
   it('missing --target → exit 2 (usage error)', () => {
@@ -130,16 +147,16 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.equal(r.status, 2);
   });
 
-  it('★ A1 본격 spawn — workspace test 11/11 pass (★ npm test --workspaces 실시간 실행 / timeout 600s)', () => {
+  it('★ A1 본격 spawn — workspace test + 12/12 pass (★ npm test --workspaces 실시간 실행 / timeout 600s)', () => {
     // ★ ★ A1 본격 검증 — check11 spawn → npm test --workspaces 실시간 실행 → fail=0 의무 입증.
     // 본 case = release 본격 시행 cadence 정합 (다른 case 는 SKIP_WS 사용 / 본 case 만 본격 spawn).
-    const r = runScript(['--target', 'v3.6.7', '--json'], {}, 600_000);
+    const r = runScript(['--target', 'v7.1.0', '--json'], {}, 600_000);
     const out = JSON.parse(r.stdout);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.pass, `workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`);
     assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-    assert.equal(out.criteria_total, 11);
-    assert.equal(out.criteria_passed, 11);
+    assert.equal(out.criteria_total, 12);
+    assert.equal(out.criteria_passed, 12);
     assert.equal(out.ready, true);
     assert.equal(r.status, 0);
   });

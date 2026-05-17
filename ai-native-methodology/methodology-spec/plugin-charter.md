@@ -4,7 +4,7 @@
 > 작성일 2026-05-15 / 작성자 윤주스 (TF Lead).
 > 신규 기능 / 변경 시 본 charter 의 17 항목 + §4 권장 디폴트 정합 의무.
 
-## §1 사용자 요구사항 17 (must-have)
+## §1 사용자 요구사항 18 (must-have / ★ R18 v7.1.0 신설 / R16·R17 영구 scope-out)
 
 | # | 요구 | 범주 |
 |---|------|------|
@@ -25,6 +25,7 @@
 | R15 | **정적 도구 검증 필수** (시뮬레이션 ❌) | static-tool |
 | ~~R16~~ | ~~작업은 MCP 를 통해 티켓 등록~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용 |
 | ~~R17~~ | ~~모든 단계마다 티켓 발행~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15)** — 위와 동일 |
+| R18 | **플러그인 자산(Skill/Hook/Agent/packaging)은 Anthropic 공식 best practice 정합** + 공식 docs 변경 시 재검증 — `plugin-authoring-spec.md` 단일 SSOT (★ v7.1.0 신설 / 사용자 결단 = 정식 R / §5 backlog ❌) | plugin-authoring |
 
 ## §2 현 구현 매핑 (v3.1.0 기준 / 2026-05-15)
 
@@ -47,8 +48,9 @@
 | R15 | ✅ | `tools/static-runner/` (eslint/prettier/semgrep/tslint/stylelint/hadolint) + gate #4 강제 + no-simulation 정책 |
 | ~~R16~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용. plan-itsm-jira-chain-integration.md 도 이미 폐기 완료 (session 16차). |
 | ~~R17~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15)** — 위와 동일 |
+| R18 | ✅ | (★ v7.1.0 신설 / DEC-2026-05-17-plugin-authoring-spec) `methodology-spec/plugin-authoring-spec.md` 단일 SSOT (Skill S1~S7 / Hook H1~H7 / Agent A1~A6 / Packaging P1~P4 + §6 공식 docs pin baseline) + `docs/adr/ADR-PLUGIN-001` + `scripts/release-readiness.js` **check #12** (§6 staleness 결정적 가드 60일) + §9 네트워크 재검증 cadence (`_base-official-docs-checker` dispatch). 감사 — 실 위반 S3 1건 ❌(한글 skill MAJOR rename 이연) + 1군 ⚠️(`_base-*` charset 이연) / 나머지 정합 |
 
-**요약 (v3.6.0 갱신)**: ✅ **14** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **15/15** 자산 대칭.
+**요약 (v7.1.0 갱신)**: ✅ **15** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **16/16** 자산 대칭 (★ R18 v7.1.0 신설).
 
 ## §3 Gap 우선순위
 
@@ -119,7 +121,8 @@
 
 ## §6 적용 정책
 
-- 본 charter 는 **단일 SSOT** — 17 항목 + §4 디폴트는 모든 신규 기능 / PR 의 정합 기준
+- 본 charter 는 **단일 SSOT** — 18 항목 (R1~R18 / R16·R17 scope-out / 활성 16) + §4 디폴트는 모든 신규 기능 / PR 의 정합 기준
 - charter 변경은 `decisions/DEC-YYYY-MM-DD-*.md` 결정 로그 필수
+- ★ R18 (v7.1.0) = §5 backlog 격상 아닌 **신규 정식 R** (사용자 결단 / enforcement 강제력 = `plugin-authoring-spec.md` SSOT + release-readiness #12). 저작 규칙·공식 docs pin 변경은 본 charter 아닌 `plugin-authoring-spec.md` 에서만 (재선언 ❌)
 - gap (§3) 해소 작업은 **품질 우선 + 재작업 최소화** 원칙 (memory `feedback_quality_priority.md`) 적용
 - §5 추가 제안은 charter 항목과 **별도 backlog** — 사용자 결단 후 §1 / §4 로 격상 가능

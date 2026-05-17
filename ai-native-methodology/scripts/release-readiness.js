@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 11/11 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 12/12 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 11 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 12 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -22,8 +22,12 @@
 //       plan + research 부정확 risk 차단 / "plugin.json vX.Y.Z" 표기 패턴 검증 / cadence enforcement).
 //   11. ★ ★ v3.6.7 A1 신설 — workspace test 회귀 자동 차단 (★ npm test --workspaces 실시간 실행 / fail count 0 의무 /
 //       chain-driver Windows path 회귀 사례 정합 / `--skip-workspace-test` flag 시 본 check skip / release 시 본 flag ❌ 의무).
+//   12. ★ ★ v7.1.0 R18 신설 — plugin-authoring-spec §6 공식 docs pin staleness (★ 외부 권위 drift ADR-010 baseline+ratchet
+//       차용 / methodology-spec/plugin-authoring-spec.md §6 last_verified 4행 ≤ 60일 의무 / 결정적 date-math only·네트워크 ❌
+//       / 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory) /
+//       `--skip-authoring-staleness` flag 시 본 check skip / release 시 본 flag ❌ 의무 / ADR-PLUGIN-001 정합).
 //
-// exit 0 = 11/11 ready / 1 = 1+ regress.
+// exit 0 = 12/12 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -41,19 +45,22 @@ const ROOT = resolve(__dirname, '..');
 function usage(code = 2) {
   console.error([
     'usage: release-readiness --target <version> [--json]',
-    '  --target <version>   target release version (예: v2.0.0)',
-    '  --json               machine-readable output',
+    '  --target <version>          target release version (예: v2.0.0)',
+    '  --json                      machine-readable output',
+    '  --skip-workspace-test       skip check #11 (test cadence 안 사용 / release 시 ❌)',
+    '  --skip-authoring-staleness  skip check #12 (test cadence 안 사용 / release 시 ❌)',
   ].join('\n'));
   process.exit(code);
 }
 
 function parseArgs(argv) {
-  const out = { json: false, skipWorkspaceTest: false };
+  const out = { json: false, skipWorkspaceTest: false, skipAuthoringStaleness: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
     else if (a === '--json') out.json = true;
     else if (a === '--skip-workspace-test') out.skipWorkspaceTest = true;
+    else if (a === '--skip-authoring-staleness') out.skipAuthoringStaleness = true;
     else if (a === '--help' || a === '-h') usage(0);
   }
   return out;
@@ -447,6 +454,75 @@ function check11_workspaceTestPass(args) {
   };
 }
 
+// ★ ★ v7.1.0 R18 신설 — plugin-authoring-spec §6 공식 docs pin staleness (ADR-PLUGIN-001 / charter R18).
+// 외부 권위(공식 Claude Code docs) drift = ADR-010 baseline+ratchet 차용:
+//   - baseline = methodology-spec/plugin-authoring-spec.md §6 pin (last_verified 4행)
+//   - 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory / release-readiness 밖)
+//   - 결정적 가드 = 본 check (date-math only / 네트워크 ❌ / no-simulation·결정론 불변 / check10 패턴 isomorphic).
+// pass ⟺ §6 표 4 area(skills/hooks/sub-agents/plugins-reference) 모두 last_verified ≤ 60일.
+// --skip-authoring-staleness flag 시 skip (test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무).
+function check12_authoringSpecStaleness(args) {
+  if (args.skipAuthoringStaleness) {
+    return {
+      id: 'authoring_spec_staleness',
+      pass: false,
+      detail: 'skipped via --skip-authoring-staleness (★ test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무)',
+      delegated_to: 'plugin-authoring-spec §6 last_verified staleness (skipped)',
+    };
+  }
+  const STALE_DAYS = 60;
+  const EXPECTED_AREAS = ['skills', 'hooks', 'sub-agents', 'plugins-reference'];
+  const specPath = join(ROOT, 'methodology-spec/plugin-authoring-spec.md');
+  if (!existsSync(specPath)) {
+    return {
+      id: 'authoring_spec_staleness',
+      pass: false,
+      detail: `plugin-authoring-spec.md missing (expected ${specPath})`,
+      delegated_to: 'methodology-spec/plugin-authoring-spec.md §6 pin baseline',
+    };
+  }
+  const text = readFileSync(specPath, 'utf-8');
+  // content-aware (check10 패턴) — §6 표 data row: `| <area> | url | anchor | digest | YYYY-MM-DD | YYYY-MM-DD |`.
+  // last_verified = 끝에서 2번째 cell (digest 에 `|` 미사용 = S-rule 자체 정합 / `|` 침입 시 fail-closed).
+  const today = new Date();
+  const failures = [];
+  const seen = {};
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/^\|\s*(skills|hooks|sub-agents|plugins-reference)\s*\|/);
+    if (!m) continue;
+    const area = m[1];
+    const cells = line.split('|').slice(1, -1).map((c) => c.trim());
+    if (cells.length !== 6) {
+      failures.push(`${area}: §6 행 cell 수 ${cells.length} ≠ 6 (digest 안 '|' 침입 의심 / fail-closed)`);
+      seen[area] = true;
+      continue;
+    }
+    const lastVerified = cells[4]; // area|url|anchor|digest|last_verified|retrieved
+    const dm = lastVerified.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!dm) {
+      failures.push(`${area}: last_verified "${lastVerified}" not YYYY-MM-DD`);
+      seen[area] = true;
+      continue;
+    }
+    const lv = new Date(Number(dm[1]), Number(dm[2]) - 1, Number(dm[3]));
+    const days = Math.floor((today - lv) / 86_400_000);
+    if (days > STALE_DAYS) {
+      failures.push(`${area}: ${days}d stale (> ${STALE_DAYS}d / §9 Layer i 재검증 의무)`);
+    }
+    seen[area] = true;
+  }
+  const missing = EXPECTED_AREAS.filter((a) => !seen[a]);
+  if (missing.length) failures.push(`§6 표 area 누락: ${missing.join(', ')}`);
+  return {
+    id: 'authoring_spec_staleness',
+    pass: failures.length === 0,
+    detail: failures.length === 0
+      ? `plugin-authoring-spec §6 pin ${EXPECTED_AREAS.length} area 모두 ≤ ${STALE_DAYS}d fresh / 외부 권위 drift 가드 정합 (R18 / ADR-PLUGIN-001)`
+      : `staleness: ${failures.join(' | ')}`,
+    delegated_to: 'methodology-spec/plugin-authoring-spec.md §6 last_verified (R18 / ADR-PLUGIN-001 / 네트워크 재검증 = §9 Layer i cadence)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -463,6 +539,7 @@ function main() {
     check9_layer2Consistency(),
     check10_claudeMdVersionSync(),
     check11_workspaceTestPass(args),
+    check12_authoringSpecStaleness(args),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

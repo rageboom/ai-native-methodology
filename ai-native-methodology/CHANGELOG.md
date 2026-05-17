@@ -9,6 +9,38 @@
 
 ---
 
+## [7.1.0] — 2026-05-17 ★ ★ MINOR — plugin-authoring-spec SSOT + 외부 docs drift baseline+ratchet (ADR-PLUGIN-001 / charter R18 / release-readiness #12)
+
+> ★ ★ **v7.1.0 MINOR — additive (선행 자산 무수정)**. 사용자 질문 "plugin skill/hooks/agent 작성 시 Anthropic 공식 best practice?" → 저작 규칙 단일 SSOT 신설 + 47 skills·9 agents·hooks·packaging 전수 감사 + 외부 권위(공식 docs) drift 재검증 메커니즘. 4원칙 full (plan + Plan agent Senior 압력테스트 + 실 `_base-official-docs-checker` F-015 ×4 VERIFIED). DEC-2026-05-17-plugin-authoring-spec / ADR-PLUGIN-001. 선행 housekeeping = DEC-2026-05-17-package-version-3way-sync-fix (package.json 4.0.1→7.0.0 별도 commit).
+
+### 신설 (additive)
+
+- **`methodology-spec/plugin-authoring-spec.md`** (★ ★ ★ 단일 SSOT / §1~§11) — Skill(S1~S7)·Hook(H1~H7)·Agent(A1~A6)·Packaging(P1~P4) 저작 규칙 + §6 공식 docs pin baseline(ADR-010 차용) + §7 compliance 매트릭스 + §8 이연 backlog + §9 drift 재검증 2계층
+- **`docs/adr/ADR-PLUGIN-001-authoring-spec-and-docs-drift.md`** (신규 namespace = ADR-BE/FE/CHAIN/NEST 컨벤션 정합)
+- **`scripts/release-readiness.js` check #12** (`authoring_spec_staleness`) — §6 pin `last_verified` 4행 ≤ 60일 결정적 가드 (date-math only / 네트워크 ❌ / check10 패턴 isomorphic / `--skip-authoring-staleness` flag = skip≠pass / release 시 ❌ 의무). 11/11 → **12/12**
+- **`plugin-charter.md` R18** 정식 요구사항 신설 (§1 + §2 매핑 / 사용자 결단 = §5 backlog 아닌 정식 R)
+
+### 감사 결과 (실 F-015 cross-check / false-positive 3건 제거)
+
+- §6 pin = 실 `_base-official-docs-checker` ×4 VERIFIED (canonical `code.claude.com/docs/en/{skills,hooks,sub-agents,plugins-reference}` / 2026-05-17)
+- 실 위반 = **S3 1건 ❌ high** (`spec-integrate-7대-deliverables` 한글 → MAJOR rename / §8-1 이연) + **S3/A1 1군 ⚠️ low** (`_base-*` leading `_` / §8-2 이연·수용 후보)
+- false-positive 제거 = S1 retrofit 불요(47/47 ≤500L+외부ref) / marketplace.json 위치 공식 정합 / agent `skills:` = 공식 preload 필드(자체확장 ❌). `system_prompt`·`preloaded_skills` over-claim 교정
+- ADR-010 grandfather: 위반 = baseline grandfathered / ratchet = 신규·수정 자산만 §2·§4 즉시 강제
+
+### 검증
+
+- release-readiness **12/12** (A1 본격 spawn / `criteria_total=12 passed=12 ready=true exit 0`) + release-readiness.test.js **12/12 pass**
+- version-check **3-way 7.1.0** (선행 housekeeping 으로 package.json 청산 후 정상 bump)
+- workspace test green / drift-validator 3-way 불변 (skill/agent/flow 무수정 = §8 이연의 안전 속성)
+- chain harness validated 본질 보존 / breaking ❌ (선행 자산 무수정 / 감사는 기록만)
+
+### 이연 (별도 user-gated bundle)
+
+- §8-1 `spec-integrate-7대-deliverables` → kebab rename = **별도 MAJOR** (3 ref / cooling-off + Senior + STOP-gate / v7.0.0 선례 정합 / 본 release scope ❌)
+- §8-2 `_base-*` charset deviation = 차기 네트워크 재검증서 재평가
+
+---
+
 ## [7.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ⑦: rules.json → business-rules.json 산출물 파일명 rename (breaking 최대)
 
 > ★ ★ ★ ★ ★ **v7.0.0 MAJOR — breaking (의도 / semver 정합)**. 사용자 "하자" → 묶음 Q 잔여 ⑦ 단독 (최대 blast 642 occ·252 files) → "추천안 묶음 + 1-session 시행". 4원칙 full (plan + 3-에이전트 full research + Senior REVISE-3 + STOP-3 hard gate). DEC-2026-05-17-q7-rules-json-rename / ADR-CHAIN-011 §5 patch v16 + §9 LL-i-57. ★ 묶음 Q **전 항목 종결** (①②④⑤+Q-①-followup+⑦).
