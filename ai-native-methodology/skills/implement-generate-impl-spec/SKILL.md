@@ -130,7 +130,7 @@ node tools/traceability-matrix-builder/src/cli.js \
 
 ### 8. gate #4 호출
 
-`_base/invoke-go-stop-gate` skill (cluster 5~6 / GREEN 100% pass 명시 + impl 모듈 review 항목).
+`_base-invoke-go-stop-gate` skill (cluster 5~6 / GREEN 100% pass 명시 + impl 모듈 review 항목).
 
 ## 기술 스택 분기 (★ skills-axis 정합 / 본문 분기)
 

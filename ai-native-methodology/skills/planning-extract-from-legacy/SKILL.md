@@ -67,7 +67,7 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 
 8. **planning-spec.md 렌더링** — json 의 use_cases / business_intent / business_rules_intent 를 markdown 으로 변환 (★ ADR-008 v2 이중 렌더링).
 
-9. **gate #1 호출** — `_base/invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
+9. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
    1. business_intent 정확성?
    2. 누락 use case 추가?
    3. 의문 BR-INTENT?

@@ -9,6 +9,39 @@
 
 ---
 
+## [8.4.1] — 2026-05-18 ★ PATCH — 47 SKILL.md L3 품질 감사 + P0 3 finding 즉시 fix + F-SKILL namespace 신설
+
+> ★ **v8.4.1 PATCH — L3 skill audit corrective sweep**. 사용자 "나의 스킬들을 분석해 보고 싶다" → 축 "품질 감사 (citations / drift / SSOT)" → 깊이 "L3 + 산업 비교" → Plan A (report only) → 사용자 "진행 해줘" 시행 escalation.
+>
+> **L3 audit 산출**:
+> - 6 sub-agent 병렬 dispatch (B-shard 1~4 / 329 cell × 7 axis × 47 skill / `_base-official-docs-checker` F-015 / `_base-industry-case-researcher` N=3 OSS) + `_base-senior-engineer` D7 synthesis.
+> - 산출: `.claude/plans/audit-skill-l3-report.md` (사용자 검토 entry-point) + 5 supporting deliverables (`B-shard-1~4.md` + `C-official-docs.md` + `C-industry-case.md` + `D-senior-conscience.md`) + `plan-skill-l3-audit.md` methodology.
+> - **24 unified F-SKILL findings** (31 CAND → 24 + 3 NOT-A-FINDING + 1 Senior gap-find F-SKILL-024 meta). severity 분포: medium 4 / low 11 / info 9. 8 ≥ 2 shard corroboration ✓ / 8 within-shard multi-site / 7 single-source spec-authority. Senior GO @ 0.86 conf.
+>
+> **P0 3 finding 즉시 시행 (additive / breaking 0 / 12 sites edited)**:
+> - **F-SKILL-002** (medium / ghost-taxonomy) — `_base-log-finding/SKILL.md:15` 가 AP-RENDER/AP-FETCH/AP-A11Y/AP-i18n/AP-STATE 인용 / 실 examples/ 안 occurrences = 0 / `id-conventions.md` §3 canonical 9 카테고리 정합 ❌. **★ scope 확장 corroboration**: `analysis-quality-antipattern:18` (5 ghost prefix) + `analysis-aspect-a11y:27` (1 ghost prefix) = 3 skill 통합 fix. 실 PoC #04 사용 패턴 `AP-FE-{SUB}-NNN` (44 occurrence) 정합.
+> - **F-SKILL-004** (medium / `_base-` prefix citation drift) — `analysis-input-collection/SKILL.md:14, :55` bare `apply-baseline-ratchet` → `_base-apply-baseline-ratchet` (2 sites / skill-citation-validator v8.1.1 bare-name resolver 사각 표면화).
+> - **F-SKILL-005** (medium / slash↔dash citation form) — 7 file × 9 site 가 `_base/<name>` slash form → `_base-<name>` dash form 정규화. Senior 가 5 chain skills 보고 / 실 grep 추가 2 `_base-*` self-cite 확인.
+>
+> **F-SKILL namespace 신설** — `methodology-spec/finding-system.md` 에 L3 audit 24 finding 등재 (F-SIM/F-PA/F-MB 패턴 정합 / SSOT 표 + P0 closed + P1/P2 open carry).
+>
+> **★ ★ ★ 본 audit 핵심 발견 surface (사용자 결단 필요 carry)**:
+> 1. **F-021 임계 unhealthy** (24 ≥ 20) — 단 actionable = 15 (caution band) / Phase reset ❌ / plugin-authoring-spec S1~S8 maturity signal → v9.0 charter review carry.
+> 2. **skill-citation-validator coverage gap** (F-SKILL-001 + 004 + 005 root) — v8.1.0 validator 가 anchor §X.Y 의미 drift + `_base-` prefix bare-name mask + slash↔dash 모호 3 class 미 catch / **validator 자기 motivation class 자기 표면 안 재발 = recursive drift** / v9.0 의제.
+> 3. **F-SKILL-024 meta (Senior gap-find)** — `_base-*` documented-exception 이 drift attractor (F-SKILL-004+005+015 공통 root = §8-2 frozen allowlist convention) / v9.0 charter-level 결단 (canonical rename OR validator-level normalization).
+>
+> **STOP-3**: workspace 414/414 ✓ + release-readiness **13/13 ready:true** for v8.4.1 ✓ + skill-citation-validator 207 active doc 0 stale ✓ + drift-validator 3-way ✓ + 12 site edited / breaking 0.
+>
+> **차기 session 권장 cadence**:
+> - **v8.5.0 MINOR** = P1 9 finding (F-SKILL-001+003+007+010+013+016+017+018+020) + plugin-authoring-spec §2 S2 강화 + §6 pinned digest 갱신 (`${CLAUDE_EFFORT}`) + `digest_sha` 재계산.
+> - **P2 12 finding (별도 cooling-off 24h)** = 각 별건 plan / F-SKILL-024 = v9.0 charter review.
+>
+> **classification = PATCH (additive / breaking 0)**: 12 site edited 모두 citation 정합 corrective + namespace 신설 (additive) / 산출물 schema·command-surface·산출물 파일명 변경 0.
+>
+> DEC-2026-05-18-skill-l3-audit-p0-corrective.
+
+---
+
 ## [8.4.0] — 2026-05-18 ★ MINOR — F-SIM corroboration #2 attained (poc-14 external-user simulation / P1 deadline 14d 전 이행 / 패러독스 해소)
 
 > ★ **v8.4.0 MINOR — corroboration #2 + 외부 사용자 dogfood 일석이조**. 사용자 "시뮬레이션…빌드된 plugins / 기존 PoC ❌ / 사용자 시점 기록 / 사용 빈도+사용 못하는 경우" → plan `peaceful-dreaming-dragonfly.md` 작성·ExitPlanMode 승인 후 시행.

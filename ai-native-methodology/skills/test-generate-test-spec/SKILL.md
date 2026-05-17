@@ -84,7 +84,7 @@ chain 3 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
       --dry-run --json
     ```
 
-11. **gate #3 호출** — `_base/invoke-go-stop-gate` (cluster 5~6 / RED 상태 명시).
+11. **gate #3 호출** — `_base-invoke-go-stop-gate` (cluster 5~6 / RED 상태 명시).
 
 ## ★ ★ ★ no-simulation — runner 호출 의무 ❌ (chain 3 단계)
 

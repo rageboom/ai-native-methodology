@@ -57,7 +57,7 @@ allowed-tools: Read, Write, Edit
    {"timestamp":"2026-05-06T11:00:00Z","gate":"#1","stage_in":"analysis","stage_out":"planning","decision":"go","cluster_size":5,"approved_items":[1,2,3,4,5],"rejected_items":[],"revisit_target":null,"user":"sangcl@smilegate.com"}
    ```
 
-5. **traceability-matrix 갱신** — `_base/build-traceability-matrix` skill 호출 (gate 종결 의무 / forward_coverage 갱신).
+5. **traceability-matrix 갱신** — `_base-build-traceability-matrix` skill 호출 (gate 종결 의무 / forward_coverage 갱신).
 
 ## ★ ★ Auto Mode 호환
 

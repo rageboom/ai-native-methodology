@@ -42,7 +42,7 @@ allowed-tools: Read, Write, Edit, Bash
    - `red_count > 0` → ★ ADR-CHAIN-001 §2 violation (chain coupling) → 사용자 결단 prompt (go/stop-gate skill 호출).
    - `forward_coverage < 0.85` → ratchet violation → 위와 동일.
 
-5. **finding 등록** (필요 시) — `_base/log-finding` skill 호출. severity = critical (red_count > 0) / high (forward_coverage < 0.85).
+5. **finding 등록** (필요 시) — `_base-log-finding` skill 호출. severity = critical (red_count > 0) / high (forward_coverage < 0.85).
 
 ## ★ S5 — header schema 의무
 

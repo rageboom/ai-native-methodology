@@ -613,3 +613,117 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Decision made:** N/A (구조적 누락).
 - **Severity:** **high** — release 자격 자체 흔들림 / §8.1 자기정합 위배.
 - **Proposed fix:** 옵션 둘 중 — (A) poc-03 chain 4 실제 실행 후 GREEN 도달 (PoC 보강 / 시간 비용 ↑) / (B) release_eligibility #2/#6/#7 에 "각 PoC 가 chain 4 GREEN 도달" 명시 + poc-03 = analysis~chain-3 corroboration 으로 격하 + 신규 PoC(예: poc-12/13) 를 chain 4 GREEN corroboration #2 후보로 명시. MINOR. ★ F-SIM-005 와 직결 (RED placeholder 가 §8.1 #2 빈약 corroboration 본질).
+
+---
+
+## Body Finding Ledger — F-SKILL namespace (47 SKILL.md L3 품질 감사)
+
+> 출처: 2026-05-18 L3 skill audit (사용자 "나의 스킬들을 분석해 보고 싶다" → 축 "품질 감사 (citations / drift / SSOT)" → 깊이 "L3 + 산업 비교"). 6 sub-agent 병렬 dispatch (B-shard 1~4 / `_base-official-docs-checker` F-015 / `_base-industry-case-researcher` N=3) + `_base-senior-engineer` D7 synthesis. 산출: `.claude/plans/audit-skill-l3-report.md` (사용자 검토 entry-point).
+> 범위: `ai-native-methodology/skills/` 47 SKILL.md × 7 axis (B-1 description↔body / B-2 trigger keyword 품질 / B-3 단일 책임 / B-4 imperative voice / B-5 progressive disclosure / B-6 family consistency / B-7 citation semantic accuracy) = 329 cell 검증 + 산업 비교 (Anthropic 공식 docs F-015 + N=3 OSS).
+> overall: 31 sub-agent CAND → **24 unified F-SKILL** (3 demoted NOT-A-FINDING) + 1 Senior gap-find (F-SKILL-024 meta). severity 분포 (recalibrated): medium 4 / low 11 / info 9. 8 finding ≥ 2 독립 shard corroboration ✓ / 8 within-shard multi-site / 7 single-source spec-authority. Senior verdict: **GO @ 0.86**.
+> F-021 band = **24 ≥ 20 = unhealthy** (단 9 info/cosmetic 격하 후 actionable=15 = upper-caution band / Phase reset ❌ / plugin-authoring-spec S1~S8 maturity signal → v9.0 charter review carry).
+> ★ ★ ★ **공통 뿌리 2개**: ① skill-citation-validator coverage gap (anchor §X.Y 의미 drift / `_base-` prefix bare-name mask / slash↔dash form 모호) — 3 finding (F-SKILL-001+004+005) 공통 root + validator 자기 motivation 의 class 가 자기 표면에서 재발 (recursive drift) / ② `_base-*` documented-exception 이 drift attractor (3 finding F-SKILL-004+005+015 의 root cause = §8-2 frozen allowlist convention).
+>
+> **시행 cadence**:
+> - **v8.4.1 (본 cycle)** = P0 3 finding 즉시 fix (F-SKILL-002 + F-SKILL-004 + F-SKILL-005) + F-SKILL namespace 등재 + scope 확장 (analysis-quality-antipattern + analysis-aspect-a11y AP-FE-* 정규화).
+> - **v8.5.0 (P1 carry)** = MINOR (F-SKILL-001 + 003 + 007 + 010 + 013 + 016 + 017 + 018 + 020) — digest recompute + methodology body change.
+> - **P2 12 finding (별도 cooling-off 24h)** = 각 별건 plan.
+>
+> | F-SKILL | severity | corroboration | priority | 처분 |
+> |---|---|---|---|---|
+> | 001 | medium | within-shard 2-site | P1 | open (v8.5.0 — `business-logic.md` §A/§B anchor drift fix) |
+> | 002 | medium | ≥ 2 shard ✓ | **P0** | **closed v8.4.1** — `_base-log-finding` ghost AP prefix → `id-conventions.md` §3 canonical 9 + scope 확장 (analysis-quality-antipattern + analysis-aspect-a11y AP-FE-* 정규화) |
+> | 003 | low | within-shard 4-site | P1 | open (v8.5.0 — Korean trigger 4 analysis-* descriptions) |
+> | 004 | medium | spec-authority (validator mask) | **P0** | **closed v8.4.1** — `analysis-input-collection` `apply-baseline-ratchet` → `_base-apply-baseline-ratchet` (2 sites) |
+> | 005 | medium | ≥ 2 shard ✓ | **P0** | **closed v8.4.1** — `_base/<name>` slash → `_base-<name>` dash (9 sites / 7 files) |
+> | 006 | low | within-shard 2-site | P2 | open (`_base-*` family heading EN/KO drift / cooling-off) |
+> | 007 | low | ≥ 2 shard ✓ | P1 | open (`_base-apply-template` "19 templates" → "21" or auto-discovery) |
+> | 008 | low | single-shard | P2 | open (`rules.template.md` → `business-rules.template.md` / v7.0.0 followup / minor breaking) |
+> | 009 | info | ≥ 2 shard ✓ | P2 | open (★-decoration density `analysis-br-cross-consistency-check` + chain skills) |
+> | 010 | low | ≥ 2 shard ✓ | P1 | open (NL trigger 5 weak skills) |
+> | 011 | info | ≥ 2 shard ✓ | P2 | open (composite-orchestrator borderline — 4 chain-entry skills / ADR cite callout 보강) |
+> | 012 | low | within-shard 3-site | P2 | open (body-size narrative density `sql-inventory` 210 / `characterization-test` 196 / `error-mapping` 120) |
+> | 013 | low | single-shard | P1 | open (`analysis-db-schema-erd` prereq inventory.json 누락) |
+> | 014 | low | single-shard | P2 | open (`analysis-type-spec-fe` `-fe` suffix vs BE+FE scope) |
+> | 015 | info | single-shard | P2 | open (sub-skill citation form 일관성) |
+> | 016 | low | spec-authority | P1 | open (`disable-model-invocation: true` for 4 gate skills) |
+> | 017 | low | spec-authority | P1 | open (S2 per-field 1024-char cap 강화 / plugin-authoring-spec) |
+> | 018 | low | spec-authority | P1 | open (`${CLAUDE_EFFORT}` digest refresh / §6 pin) |
+> | 019 | info | spec-authority | P2 | open (v2.1.142 root-level SKILL.md 패키징 relaxation 명시) |
+> | 020 | low | ≥ 2 shard ✓ | P1 | open (third-person POV S2 sub-rule) |
+> | 021 | low | industry N=3 | P2 | open (SKIP-in-description for env-restricted skills) |
+> | 022 | low | industry N=3 | P2 | open (`model:` frontmatter for compute-intensity-differentiated skills) |
+> | 023 | info | industry N=3 | P2 | open (per-skill eval framework — v9.x feature) |
+> | 024 | info | meta (3 finding root) | P2 | open — ★ ★ **v9.0 charter review** — `_base-*` documented-exception drift-attractor 해소 (rename canonical OR validator-level normalization) |
+>
+> 본 ledger 등재 시점 = P0 3 finding 시행 후 v8.4.1 release. P1/P2 = open carry.
+
+### F-SKILL-001: skill-citation-validator coverage gap — anchor §X.Y 의미 drift (L2 semantic mismatch)
+
+- **Phase:** L3 skill audit (B-shard-1 within-shard 2-site)
+- **Confidence:** verified (Senior live cross-check)
+- **Type:** gap (validator scope)
+- **Description:** `analysis-domain-model/SKILL.md` 가 "business-logic.md §5.B domain" 인용 but §5.B 실제 = "FE 코드 영역". `analysis-business-rules/SKILL.md` 가 "§5.A rules" 인용 but §5.A 실제 = "DB 영역". L1 dead-link (skill-citation-validator v8.1.0 가 잡는 class) ❌ / L2 anchor 의미 drift = ★ ★ ★ validator 자기 motivation 의 class 가 본체 active 표면 안에서 재발 (recursive drift).
+- **Evidence:** `methodology-spec/workflow/business-logic.md` §5.A `## 5.A: AP-DB-XXX` / §5.B `## 5.B: AP-FE-XXX`. `skills/analysis-domain-model/SKILL.md` 인용 ↔ skills/analysis-business-rules/SKILL.md 인용.
+- **Spec gap:** skill-citation-validator 가 file 존재 + anchor 존재까지만 검증. anchor 의 의미 mapping (cite 가 "domain" claim 인데 anchor = "FE") 부재.
+- **Decision made:** v8.5.0 P1 carry.
+- **Severity:** **medium** — 2 production skills affected / validator 의 motivation class 자기 표면 재발 = recursive drift / v9.0 charter validator scope 확장 의제.
+- **Proposed fix:** (a) anchor 의미 drift fix (2 skill cite anchor 정정 / additive) + (b) skill-citation-validator anchor-level semantic check 추가 (v9.0 검토). MINOR.
+- **Status:** open (v8.5.0 P1)
+
+### F-SKILL-002: `_base-log-finding` ghost AP prefix (taxonomy 0 actual use) — P0 closed v8.4.1
+
+- **Phase:** L3 skill audit (B-shard-1 + Senior live grep)
+- **Confidence:** verified
+- **Type:** gap (citation semantic / id-conventions drift)
+- **Description:** `_base-log-finding/SKILL.md:15` 가 AP-RENDER / AP-FETCH / AP-A11Y / AP-i18n / AP-STATE 인용 — 실 examples/ 안 occurrences = 0. `id-conventions.md` §3 canonical 카테고리 9종 (DB·ARCH·DOMAIN·API·FE·VALIDATION·CONFIG·SECURITY·PERFORMANCE) 정합 ❌. 실 PoC #04 사용 패턴 = `AP-FE-{SUB}-NNN` (44 occurrence). scope 확장 corroboration: `analysis-quality-antipattern` step 1 (5 ghost prefix) + `analysis-aspect-a11y` step 3 (1 ghost prefix) = 3 skill drift.
+- **Evidence:** `grep -rn "AP-(RENDER|FETCH|A11Y|i18n|STATE)" examples/` = 0 / `grep -rn "AP-FE-[A-Z]" examples/poc-04-full-realworld-react/` = 44 occurrence.
+- **Spec gap:** id-conventions.md §3 카테고리 9종 단일 SSOT 인데 3 skill 이 sub-namespace 를 top-level prefix 로 격상 사용.
+- **Decision made:** v8.4.1 P0 즉시 fix.
+- **Severity:** medium (recalibrated) — 3 skill 표면.
+- **Proposed fix:** ghost prefix → canonical 9 + AP-FE-{SUB}-NNN 패턴 (실 PoC #04 정합). additive / breaking 0.
+- **Status:** ★ ★ **resolved v8.4.1** — `_base-log-finding/SKILL.md:15` + `analysis-quality-antipattern/SKILL.md:18` + `analysis-aspect-a11y/SKILL.md:27` 모두 canonical 정합.
+
+### F-SKILL-004: `analysis-input-collection` `_base-` prefix 누락 (`apply-baseline-ratchet` bare) — P0 closed v8.4.1
+
+- **Phase:** L3 skill audit (B-shard-2)
+- **Confidence:** verified
+- **Type:** citation-drift (`_base-` documented-exception § 8-2 정합 누락)
+- **Description:** `analysis-input-collection/SKILL.md` line 14 + 55 가 bare `apply-baseline-ratchet` 인용 (실 skill name = `_base-apply-baseline-ratchet` per v8.2.1 §8-2 documented-exception). skill-citation-validator v8.1.1 가 bare-name resolver 로 통과시킴 (sub-agent 가 표면화한 validator 사각).
+- **Evidence:** `grep -n "apply-baseline-ratchet" skills/analysis-input-collection/SKILL.md` = lines 14, 55.
+- **Spec gap:** skill-citation-validator 가 `_base-` prefix 부재 bare name 을 dead-link 으로 잡지 못함.
+- **Decision made:** v8.4.1 P0 즉시 fix.
+- **Severity:** medium — single-shard but validator-mask class.
+- **Proposed fix:** 2 site replace_all bare → `_base-` prefix 정합.
+- **Status:** ★ ★ **resolved v8.4.1**.
+
+### F-SKILL-005: `_base/<name>` slash → `_base-<name>` dash citation 정규화 — P0 closed v8.4.1
+
+- **Phase:** L3 skill audit (B-shard-4 + Senior live grep 5 file 확인)
+- **Confidence:** verified
+- **Type:** citation-form-inconsistency (slash vs dash ambiguity)
+- **Description:** 7 file × 9 site 가 `_base/<name>` slash form 으로 다른 `_base-*` skill 인용 (normative = `_base-<name>` dash form / skill name 정합). chain-entry skills (planning-extract / spec-compose / test-generate / impl-generate / impl-verify) + 2 `_base-*` self-cite.
+- **Evidence:** `grep -rn "_base/" skills/` = 9 sites / 7 files (Senior 가 5 chain skills 만 보고 / 실측 2 `_base-*` self-cite 추가 확인).
+- **Spec gap:** plugin-authoring-spec S6 / skill-citation-validator 가 slash-vs-dash form 모호성 미강제.
+- **Decision made:** v8.4.1 P0 즉시 fix.
+- **Severity:** medium — 7 files / 9 sites / slash-vs-dash 의미적 모호.
+- **Proposed fix:** `_base/<name>` → `_base-<name>` 정규화 (9 sites).
+- **Status:** ★ ★ **resolved v8.4.1**.
+
+### F-SKILL-024 (meta — Senior gap-find): `_base-*` documented-exception drift-attractor
+
+- **Phase:** L3 skill audit (D-senior-conscience T4 blind-spot)
+- **Confidence:** high (3 finding root cause analysis)
+- **Type:** anti-pattern (charter-level convention drift attractor)
+- **Description:** F-SKILL-004 + F-SKILL-005 + F-SKILL-015 의 공통 root cause = `_base-*` documented-exception (ADR-PLUGIN-001 §8-2 frozen allowlist v8.2.1). 매 release 마다 같은 drift class 재발 — exception 자체가 drift attractor. v9.0 charter-level 결단 필요: (a) canonical convention rename (`_base-` → 그 외 prefix / MAJOR / LL-i-55 cautious-cooling-off), OR (b) validator-level normalization (additive / breaking 0).
+- **Evidence:** F-SKILL-004 + 005 + 015 모두 root cause = `_base-` prefix convention.
+- **Spec gap:** charter §8-2 frozen allowlist 가 exception 으로 grandfather 했으나 향후 drift 재발 방지 mechanism 부재.
+- **Decision made:** P2 carry / v9.0 charter review 의제 추가 후보.
+- **Severity:** info — meta finding (no immediate functional defect).
+- **Proposed fix:** v9.0 charter review — 위 (a) 또는 (b) 결단.
+- **Status:** open (v9.0 charter review carry / 사용자 결단 의무).
+
+### F-SKILL-003, 006~023 — 본 ledger 표 (위) 의 1-line summary 참조
+
+- 상세 (per-finding spec gap + proposed fix + evidence) = `.claude/plans/audit-skill-l3-report.md` §3 canonical list + `.claude/plans/D-senior-conscience.md` T5 (full table).
+- 본 ledger 위 표 = SSOT 인덱스. 시행 시 각 finding 별 본 ledger 에 정식 block 추가 (resolved/deferred 처분 시).

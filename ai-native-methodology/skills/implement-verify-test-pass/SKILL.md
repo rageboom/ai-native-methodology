@@ -44,7 +44,7 @@ validator 결과 분석:
 | spec 결함 (BHV preconditions 부족) | revisit:spec | behavior-spec / acceptance-criteria 갱신 → cycle 재시작 |
 | use case 결함 (planning 단계 추출 오류) | revisit:planning | planning-spec 갱신 → ★ 가장 큰 cycle |
 
-★ 사용자 결단 의무 (Auto Mode 도 차단 / no-simulation). `_base/invoke-go-stop-gate` skill 호출 / cluster:
+★ 사용자 결단 의무 (Auto Mode 도 차단 / no-simulation). `_base-invoke-go-stop-gate` skill 호출 / cluster:
 1. revisit target 결정 (4 분류 중 하나)
 2. 영향 범위 (chain-revisit-detector — sub-plan-5 carry / 현재는 사용자 명시)
 3. 재시도 사이클 한도 (★ 권고: 동일 fail 3회+ → escalation)
@@ -66,7 +66,7 @@ severity_floor (DO-178C DAL A) 검증:
 
 ### 6. traceability-matrix 최종 갱신
 
-`_base/build-traceability-matrix` skill 호출:
+`_base-build-traceability-matrix` skill 호출:
 ```bash
 node tools/traceability-matrix-builder/src/cli.js \
   --planning   .aimd/output/planning-spec.json \
@@ -92,7 +92,7 @@ bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --cha
 
 ### 8. gate #4 final 호출
 
-`_base/invoke-go-stop-gate` skill — chain 4 종결 결단:
+`_base-invoke-go-stop-gate` skill — chain 4 종결 결단:
 - go → release 자격 평가 (sub-plan-6).
 - stop → carry 등재.
 - revisit:<stage> → §3 분류 결과 적용.

@@ -72,7 +72,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    node tools/decision-table-validator/src/cli.js .aimd/output/decision-tables/
    ```
 
-8. **gate #2 호출** — `_base/invoke-go-stop-gate` skill (cluster 5~6).
+8. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).
 
 ## ★ ★ ★ property_tests 의무 (chain 2 quality)
 

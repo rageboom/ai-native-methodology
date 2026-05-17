@@ -11,7 +11,7 @@ allowed-tools: Read, Glob, Grep, Bash
 ## 사전 조건
 
 - 사용자가 분석 대상 legacy 코드베이스 (또는 신규 시스템 구축 input) 을 가리킴
-- ADR-010 baseline+ratchet 적용 확인 — 미적용 legacy 프로젝트면 `apply-baseline-ratchet` skill 우선 호출
+- ADR-010 baseline+ratchet 적용 확인 — 미적용 legacy 프로젝트면 `_base-apply-baseline-ratchet` skill 우선 호출
 
 ## 절차
 
@@ -52,4 +52,4 @@ allowed-tools: Read, Glob, Grep, Bash
 ## When NOT to invoke
 
 - 사용자가 신규 시스템 구축 (legacy 없음) — 기획→설계→구현 흐름이라 본 skill 부적합. v2.0 lifecycle 확장 시 planning skill 안내.
-- ADR-010 baseline+ratchet 미적용 legacy — `apply-baseline-ratchet` 먼저.
+- ADR-010 baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.
