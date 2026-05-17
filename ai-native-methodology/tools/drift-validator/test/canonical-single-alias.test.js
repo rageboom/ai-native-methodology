@@ -38,11 +38,17 @@ test('rules.schema.json — summary 단일 canonical (summary alias 3종 폐기)
   }
 });
 
-test('rules.schema.json — rules_auto_extracted_reference 보존 (① scope 외 / 별도 carry)', () => {
-  // ★ Senior Q1 — BR-list alias 아님 (provenance pointer) → ① 폐기 대상 ❌ / 보존 의무
+test('rules.schema.json — v6.1.0 Q-①-followup: auto_extracted_br_refs rename 완료 + 구명 재유입 0', () => {
+  // ★ ★ v6.1.0 Q-①-followup — rules_auto_extracted_reference → auto_extracted_br_refs semantic-rename.
+  //   ① scope 외였던 provenance pointer (BR-list alias 아님 / src consumer 0 / poc-04 atomic 마이그레이션 = MINOR).
   assert.ok(
-    rulesSchema.properties.rules_auto_extracted_reference,
-    '★ rules_auto_extracted_reference = ① scope 외 보존 (Q-①-followup carry)',
+    rulesSchema.properties.auto_extracted_br_refs,
+    '★ v6.1.0 — auto_extracted_br_refs canonical 존재 (rename 완료)',
+  );
+  assert.equal(
+    'rules_auto_extracted_reference' in rulesSchema.properties,
+    false,
+    '★ v6.1.0 — 구명 rules_auto_extracted_reference 재유입 ❌ (additionalProperties:false hard reject)',
   );
 });
 

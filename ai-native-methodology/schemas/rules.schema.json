@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/rules.schema.json",
-  "title": "비즈니스 규칙 (Business Rules) — v6.0.0 BR 표현 2종 단일 (4→2 / alias 4중첩 폐기 계승)",
-  "description": "★ ★ ★ ★ ★ v6.0.0 MAJOR (묶음 Q ② / DEC-2026-05-17-q2-br-표현-4to2) — BR 표현 형식 4종(GWT/NL/description/TCA) → 2종(GWT/NL) 단일화 (breaking / description·trigger·condition·action property 는 optional metadata 보존 / D1·D2). v5.0.0 MAJOR (묶음 Q ① / alias 4중첩 폐기) 계승 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ `rules_auto_extracted_reference` = ① scope 외 보존 (BR-list alias 아님 / 타 산출물 자동추출 BR 참조 / 별도 carry Q-①-followup). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + rules_auto_extracted_reference.",
+  "title": "비즈니스 규칙 (Business Rules) — v6.1.0 (BR 표현 2종 단일 계승 / Q-①-followup auto_extracted_br_refs rename)",
+  "description": "★ ★ ★ ★ ★ v6.0.0 MAJOR (묶음 Q ② / DEC-2026-05-17-q2-br-표현-4to2) — BR 표현 형식 4종(GWT/NL/description/TCA) → 2종(GWT/NL) 단일화 (breaking / description·trigger·condition·action property 는 optional metadata 보존 / D1·D2). v5.0.0 MAJOR (묶음 Q ① / alias 4중첩 폐기) 계승 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ ★ v6.1.0 MINOR (Q-①-followup / DEC-2026-05-17-q1-followup-rename) — `rules_auto_extracted_reference` → `auto_extracted_br_refs` semantic-rename **완료** (의미 불변 / 타 산출물 자동추출 BR 참조 cross-link / BR-list alias 아님 / src consumer 0 + poc-04 atomic 동시 마이그레이션 = MINOR = textbook additive-equivalent / v7.0.0 semver inflation 회피 / LL-i-52 'semantic-rename ≠ alias 폐기' 정합). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + auto_extracted_br_refs.",
   "type": "object",
   "additionalProperties": false,
   "required": ["business_rules"],
@@ -28,9 +28,9 @@
       "description": "★ ★ v5.0.0 단일 canonical — BR 목록 (alias `rules`/`rules_manual_authored` 폐기 / 묶음 Q ①).",
       "items": { "$ref": "#/$defs/businessRule" }
     },
-    "rules_auto_extracted_reference": {
+    "auto_extracted_br_refs": {
       "type": ["array", "object"],
-      "description": "★ FE 트랙 — form-validation-spec / state-map 등 다른 산출물에서 자동 추출된 BR 참조 (★ BR-list alias 아님 / cross-link만 / ① scope 외 — 향후 `auto_extracted_br_refs` rename 별도 carry Q-①-followup)."
+      "description": "★ ★ v6.1.0 Q-①-followup rename 완료 (`rules_auto_extracted_reference` → `auto_extracted_br_refs` / 의미 불변). FE 트랙 — form-validation-spec / state-map 등 다른 산출물에서 자동 추출된 BR 참조 (★ BR-list alias 아님 / cross-link만 / ① scope 외였던 provenance pointer / src consumer 0 + poc-04 단일 holder atomic 마이그레이션 = MINOR)."
     },
     "summary": {
       "type": ["string", "object"],

@@ -440,6 +440,28 @@ deterministic.js `representation_missing` 조건 `!hasNL&&!hasGWT` + `descriptio
 
 ---
 
+### §5.12. ★ Q-①-followup — auto_extracted_br_refs semantic-rename — patch v15 (★ session 2026-05-17 / v6.1.0 MINOR)
+
+★ v6.1.0 MINOR — DEC-2026-05-17-q1-followup-rename 시행. ① (v5.0.0) scope 외 분리됐던 `rules_auto_extracted_reference` 청산. 묶음 Q ②(v6.0.0) 종결 후 사용자 "1" → 잔여 risk 오름차순 → Q-①-followup 먼저 (blast 11 files / src consumer 0).
+
+#### §5.12.1. ★ 사용자 결단 (추천안 묶음 / D1 사실 확정)
+
+- D1 = **v6.1.0 MINOR 사실 확정** (choice ❌) — official-docs(semver spec MAJOR 강제 ❌ / public API 경계=프로젝트 재량) + industry(zero-consumer 실용주의 + 연속 MAJOR signal 희석 batch 통설) + Senior(src consumer 0 + poc-04 단일 holder atomic 마이그레이션 = textbook MINOR additive-equivalent / v7.0.0 = semver inflation = 역방향 integrity drift).
+- ★ ① "MINOR 호칭=integrity drift" 는 **alias 폐기+real consumer 맥락 한정**. LL-i-52 "semantic-rename ≠ alias 폐기" → version tier 도 분리 (scope 분리 = version 분리 동반 / LL-i-56).
+- D3 cooling-off = 지금 시행 / process = **lightweight** (LL-i-54 정당 — breaking 동형 ≠ 비용 동형 / 11 file·src consumer 0·순수 rename → full Phase-3 research 과함 / ① DEC §1 #4 문자적 일탈을 LL-i-54 로 정당화 + 본 DEC 명시 = 향후 drift 회피).
+
+#### §5.12.2. ★ 시행 (rename / MINOR additive-equivalent)
+
+- `rules.schema.json` property `rules_auto_extracted_reference` → `auto_extracted_br_refs` + description + 최상단 title/description forward-pointer **재작성** (carry → 완료 / Senior 누락 보정 — schema 자체 forward-pointer = active SSOT).
+- `examples/poc-04-.../rules.json` 유일 holder key rename (atomic 동시 마이그레이션 = no consumer observes break).
+- `drift-validator/canonical-single-alias.test.js` 보존 test → rename후 보존+구명 재유입 0 전환 + ② guard(businessRule anyOf) 비교란 확인 (8/8 pass).
+
+#### §5.12.3. ★ STOP / 회귀
+
+- STOP 없음 (Senior no blocking). src consumer 0 (전수 grep / 문서·test·schema·poc-04 만) = load-bearing 부재 (LL-i-55 close round 불요). poc-04 schema VALID + drift canonical 8/8 + release-readiness 11/11 + MINOR=additive-equivalent (breaking 호칭 ❌). 묶음 Q 잔여 = ⑦ 단독 (별도 session).
+
+---
+
 ## §6. 사상
 
 ### §6.1. ★ ★ ★ ★ ADR-008 (이중 렌더링 사상) 의 BR 영역 확장
@@ -721,6 +743,10 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-55** (★ "schema branch 제거 시 해당 필드 외부 consumer(load-bearing) 실측 의무 — naive hard-remove 가 silent breakage / close round paradigm" / ★ ★ v6.0.0 묶음 Q ② 본격 자산화):
   - **Why**: ② D2 (TCA property 처분) 초기 Senior 권고 = (A) hard-remove (① 동형 / TCA-only BR 0 = 비용 0 가정). close round 실소스 검증 = `decision-table-validator/json-sanity.js` 가 `expected_result`·`verification_location` = REQUIRED_ALWAYS / `rejection_method` = REQUIRED_IF_API 강제 + `synthesize-gwt-from-tca.mjs` 가 expected_result→then 소비 = ★ load-bearing consumer. hard-remove 시 schema 통과 BR 이 decision-table-validator 에서 breaking finding = silent breakage. official-docs#2 (branch 제거 ≠ property 금지 / additionalProperties 는 동일 subschema properties 선언 기준) 가 "branch only 제거 + property 보존" 정답 보장.
   - **How to apply**: schema anyOf/표현 branch 제거 시 ★ ★ ★ 해당 필드를 (1) 표현 자격 (branch / 제거 대상) (2) property 존재 (consumer 소비 / 보존 검토) 2축 분리. property 제거 전 ★ tools/skills/templates 전 consumer grep 실측 의무 (REQUIRED 강제 / read 참조). load-bearing 발견 시 branch only 제거 + property optional 보존 (null-sentinel posture). ★ Senior confidence < 0.9 잔여 사유(미검증 가정)는 ★ 코드 착수 전 close round (실소스 검증) 로 닫는다 — research 수렴만으로 코드 착수 ❌ (가정 잔존 = 재작업 risk).
+
+- ★ ★ ★ ★ ★ ★ ★ **LL-i-56** (★ "동일 cluster 내 항목이라도 consumer 분포·breaking 성격 차이 시 version tier 분리 의무 — scope 분리는 version 분리를 동반 / 일괄 MAJOR 강제 = semver inflation" / ★ v6.1.0 Q-①-followup 본격 자산화):
+  - **Why**: 묶음 Q ① 이 `rules_auto_extracted_reference` 를 "semantic-rename ≠ alias 폐기"(LL-i-52)로 scope 분리. 후속 Q-①-followup 진입 시 ①②(v5.0.0/v6.0.0 MAJOR) 연속 선례로 v7.0.0 MAJOR 가정. 실측 = src consumer **0** (전수 grep) + 유일 holder poc-04 **atomic 동시 마이그레이션** → 어떤 consumer 도 break 관측 ❌ = textbook MINOR (additive-equivalent). ① "MINOR 호칭=integrity drift" 논리는 ★ alias 폐기+real consumer(4 PoC+extractRules load-bearing) 맥락 한정 — 본 건에 적용 시 v7.0.0 강제 = **semver inflation = 역방향 integrity drift** (industry: 연속 MAJOR signal 가치 희석 / official-docs: semver spec 이 MAJOR 강제 ❌ public API 경계=프로젝트 재량).
+  - **How to apply**: cluster(묶음) carry 항목 진입 시 ★ ★ 직전 항목 version tier 를 관성 적용 ❌. 각 항목의 (a) consumer 분포 (real/zero) (b) breaking 성격 (valid→invalid 제거 vs atomic 동시 마이그레이션 rename) 실측 → version tier 독립 판정. ★ scope 분리(LL-i-52)는 version tier 분리를 **동반**해야 정합. + 소작업 process depth = LL-i-54 (breaking 동형 ≠ 비용 동형) 정합 — lightweight research 정당하되 DEC 에 일탈 근거 명시 (향후 "왜 full research 생략?" drift 회피). version 은 ① 선례대로 **사실 확정 (사용자 choice ❌)** — 단 사실 = 선례 관성이 아니라 실측 기반.
 
 ---
 

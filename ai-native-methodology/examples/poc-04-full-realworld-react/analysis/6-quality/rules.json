@@ -27,7 +27,7 @@
       "html5_native": 13
     }
   },
-  "rules_auto_extracted_reference": {
+  "auto_extracted_br_refs": {
     "source": "form-validation-spec.json",
     "auto_registered_br": 77,
     "note": "★ form-validation-spec.json 의 90 validations / 77 BR auto-registered (★ Sprint 5-2)"

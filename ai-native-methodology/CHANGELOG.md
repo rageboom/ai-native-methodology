@@ -9,6 +9,31 @@
 
 ---
 
+## [6.1.0] — 2026-05-17 ★ MINOR — Q-①-followup: rules_auto_extracted_reference → auto_extracted_br_refs semantic-rename
+
+> ★ **v6.1.0 MINOR — additive-equivalent (no consumer observes break)**. 사용자 "1"(묶음 Q 잔여) → "Q-①-followup 먼저"(risk 오름차순 / 11 files) → "추천안 묶음 + 지금 시행". 4원칙 lightweight (plan + 3-에이전트 가벼운 research + 사용자 결단 / ★ LL-i-54 정당 일탈 — breaking 동형 ≠ 비용 동형). DEC-2026-05-17-q1-followup-rename / ADR-CHAIN-011 §5 patch v15 + §9 LL-i-56.
+
+### 결단 (3-에이전트 수렴 / D1 사실 확정)
+
+- **D1 = v6.1.0 MINOR 사실 확정** (choice ❌) — official-docs(semver spec MAJOR 강제 ❌ / public API 경계=프로젝트 재량) + industry(zero-consumer 실용주의 + 연속 MAJOR signal 희석 batch 통설) + Senior(src consumer 0 + poc-04 단일 holder atomic 마이그레이션 = textbook MINOR / v7.0.0 = semver inflation = 역방향 integrity drift). ① "MINOR=integrity drift" 는 alias 폐기+real consumer 한정 / LL-i-52 "semantic-rename ≠ alias 폐기" → version 논리도 분리
+- **D3 cooling-off = 지금 시행** / **process = lightweight** (LL-i-54 정당 / DEC 명시)
+
+### rename
+
+- `rules.schema.json` property `rules_auto_extracted_reference` → **`auto_extracted_br_refs`** (의미 불변 / FE 트랙 cross-link provenance pointer / BR-list alias 아님) + description + 최상단 title/description forward-pointer **재작성** (carry → 완료 / Senior 누락 보정)
+- `examples/poc-04-.../rules.json` — 유일 holder key rename (atomic 동시 마이그레이션 / src consumer 0)
+- `drift-validator/canonical-single-alias.test.js` — 보존 test → rename후 보존 + 구명 재유입 0 전환 / ② guard(businessRule anyOf) 비교란 확인 = **8/8 pass**
+
+### 회귀
+
+- poc-04 schema VALID + drift canonical 8/8 + release-readiness 11/11(목표) + chain harness validated 본질 보존 / MINOR=additive-equivalent (breaking 호칭 ❌ / semver 정합)
+
+### 묶음 Q 진행
+
+- ①(v5.0.0)②(v6.0.0)④(v4.1.1)+**Q-①-followup(v6.1.0)** 종결. **잔여 = ⑦ 단독** (rules.json→business-rules.json / 642 occ·252 files / 별도 session + 4원칙 full + cooling-off)
+
+---
+
 ## [6.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ② BR 표현 4종 → 2종 단일화 (breaking)
 
 > ★ ★ ★ ★ ★ **v6.0.0 MAJOR — breaking change (의도 / semver 정합)**. 사용자 "권고를 따를게"(추천안 전부 채택) → 묶음 Q 잔여 risk 오름차순 첫 ②. 4원칙 (plan + 3-에이전트 research + STOP-1 dry-run 실측 + 사용자 결단). DEC-2026-05-17-q2-br-표현-4to2 / ADR-CHAIN-011 §5 patch v14 + §9 LL-i-54·55.
