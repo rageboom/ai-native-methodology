@@ -404,6 +404,42 @@ PoC migration 4종 5 key rename (Edit per-file / bulk script = auto-mode classif
 
 ---
 
+### §5.11. ★ ★ ★ 묶음 Q ② — BR 표현 4종 → 2종 단일화 — patch v14 (★ session 2026-05-17 / v6.0.0 MAJOR)
+
+★ ★ ★ ★ ★ v6.0.0 MAJOR — DEC-2026-05-17-q2-br-표현-4to2 본격 시행. §5 dual representation paradigm 의 **BR 표현(representation) 형식 canonical 2종 단일화** (breaking / semver 정합). ① (v5.0.0 top-level container canonical) 계승 — 사용자 "권고를 따를게" → 잔여 ②⑦ risk 오름차순 첫 ②.
+
+#### §5.11.1. ★ 사용자 결단 (추천안 전부 채택) + 사실 확정
+
+| D | 결단 | 채택 | 근거 |
+|---|---|---|---|
+| D1 description | branch 제거 + property optional metadata 보존 | official-docs#2 VERIFIED (branch 제거 ≠ property 금지) / OpenAPI description=보조 산업 정합 |
+| D2 TCA property 6종 | branch 제거 + property canonical 보존 | ★ Senior close round — decision-table-validator json-sanity.js = expected_result·verification_location REQUIRED_ALWAYS / rejection_method REQUIRED_IF_API = load-bearing → hard-remove ❌ |
+| D3 #06 7 BR 합성 | Sonnet 4.6 batch + 전체 gate | Senior STOP-2 (①과 isomorphic ❌ / echo-chamber risk) → source_grounded + 독립 spot-check ≥3/7 + Layer 2 self-pass 제외 + #06 corpus==7 guard |
+| D5 cooling-off | 지금 시행 (생략) | 사용자 명시 위임 / dogfooding 즉시시행 산업 정당 (JSON Schema·Docusaurus) / Senior 조건 D3 전체 gate 충족 |
+| D6 ② 단독 | ② 단독 (⑦ 별도) | ⑦ 265 file blast 분리 / ① precedent |
+
+★ version = **v6.0.0 MAJOR 사실 확정** (official-docs#3 VERIFIED — anyOf 4→2 로 description-only valid→invalid = semver Rule 8 MAJOR 필수).
+
+#### §5.11.2. ★ ★ schema 변경 (breaking)
+
+- `$defs.businessRule.allOf[0].anyOf` 4 branch(GWT/NL/description/TCA) → **2 branch (GWT + natural_language ONLY)** + $comment(②) + businessRule description "2종 ONLY" + 최상단 title/description v6.0.0 + description property "표현 자격 박탈/metadata 보존" 갱신.
+- `description`/`trigger`/`condition`/`action`/`expected_result`/`rejection_method`/`verification_location` property = **optional metadata 보존** (branch 제거 ≠ property 금지 / decision-table-validator consumer 보호 / D1·D2). description-only / TCA-only BR = schema **INVALID hard reject**.
+
+#### §5.11.3. ★ ★ ★ STOP-1 해소 코드 착수 전 dry-run 실측 (Senior blocking)
+
+`_q2-dryrun.mjs` (no-simulation) — 전 11 PoC 중 **#06 7/7 description-only 가 유일** / TCA-only 0 / 그 외 100 BR 전부 GWT|NL 보유. #06 7 BR NL+GWT 합성(Sonnet 4.6 batch / 독립 Opus spot-check 4/7 EFI-WEB 원본 ExchangeServiceImpl·ExchangeDAO·exchange.xml line 대조 일치) 후 재실측 = 전 11 PoC `descOnly=0 tcaOnly=0`. → 회귀 면 = 7 BR(1 PoC) 전부 coverage 증가 = **회귀 아닌 개선 실측 확정** (LL-i-53 / ① poc-04 precedent 동형).
+
+#### §5.11.4. ★ ★ Senior close round (가정 2개 코드 착수 전 close / confidence 0.82→0.90)
+
+- Item 1 extractRules masking = **NO** (validator.js:14-21 v5.0.0 post 순수 구조적 / description fallback 제거가 #06 코퍼스 축소 ❌, finding 으로 표면화 = LL-i-53 정합).
+- Item 2 test-artifact consumer = **YES load-bearing** (decision-table-validator json-sanity.js + synthesize-gwt-from-tca.mjs) → D2 (A)hard-reject 보정 → branch only 제거 + property 보존.
+
+#### §5.11.5. ★ ★ 회귀 (chain harness validated 본질 보존)
+
+deterministic.js `representation_missing` 조건 `!hasNL&&!hasGWT` + `description_only_fallback`(low) 폐기 → critical 격상 (Senior "surfaces louder"). test = chain-schemas 2 전환(REJECT)+2 신설(functional VALID) / validator 1 전환+1 신설(#06 guard) / drift canonical 3 신설. 영향 3 패키지 = schema-validator 18/18 + br-cross-consistency 32/32 + drift canonical 8/8 + release-readiness **11/11** + breaking ✅(의도) / chain harness validated 본질 보존.
+
+---
+
 ## §6. 사상
 
 ### §6.1. ★ ★ ★ ★ ADR-008 (이중 렌더링 사상) 의 BR 영역 확장
@@ -677,6 +713,14 @@ Gojko Adzic (SBE 사상가) 의 2020-03-17 자기 회고: *"The idea of specific
 - ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-53** (★ "breaking migration 이 latent consumer 결함 동시 수정 = 숨은 가치 / 단 '회귀 vs 개선' 판정 = 코드 착수 전 dry-run 실측 의무" / ★ ★ v5.0.0 묶음 Q ① 본격 자산화):
   - **Why**: ① alias 폐기 migration (poc-04 `rules_manual_authored`→`business_rules`) 이 `br-cross-consistency-validator` extractRules() 의 latent 결함 (rules_manual_authored 미처리 → poc-04 3 BR `[]` 비가시 / vacuous pass) 을 동시 수정 = breaking change 의 숨은 가치 (OpenAPI 3.1 stricter validation 이 비가시 3 필드 노출 precedent 정합). ★ ★ 단 Senior STOP-1 (blocking) = release-readiness.js 가 전 PoC critical/high=0 의무 → 가시화 시 critical/high emit 면 11/11 hard block. "개선" 단정 ❌ → ★ 코드 착수 전 dry-run 실측 (poc-04 3 BR canonical br-cross-consistency = low only / critical·high 0 / gate pass) 으로 "회귀 아닌 개선" 확정.
   - **How to apply**: breaking migration 이 latent consumer 결함을 노출/수정할 가능성 시 ★ ★ ★ "회귀 vs 개선" = 코드 착수 전 dry-run 실측 의무 (LL-i-51 both=0 실측 / LL-i-44 drift 실측 과 동형 paradigm — 양심 단정 ❌ / 실측 우선). release-readiness gate 영향 (critical/high finding 신규 emit) 사전 정량 의무. 실측 결과 안전 시 = 회귀 아닌 개선으로 자산화 (breaking change 의 숨은 가치 명시).
+
+- ★ ★ ★ ★ ★ ★ ★ **LL-i-54** (★ "표현 자격 축소(②) = alias 폐기(①)와 schema 메커니즘 동형이나 PoC 데이터 비용 ①≪② 비대칭 / breaking 동형 ≠ 비용 동형" / ★ ★ v6.0.0 묶음 Q ② 본격 자산화):
+  - **Why**: 묶음 Q ②(BR 표현 4→2) 는 ①(alias 4중첩 폐기)과 schema 메커니즘 동형 (allOf anyOf 분기 축소 + additionalProperties:false hard reject). 그러나 PoC 데이터 마이그레이션 비용은 ① = 순수 기계적 key rename (semantic 합성 0) vs ② = #06 7 BR description-only → IFRS 회계 도메인 prose 에서 GWT+NL semantic 합성 (도메인 지식 + rationale 분리) = ★ 비대칭. "breaking change 동형이니 비용도 동형" 가정 시 #06 합성 echo-chamber risk (LL-i-47) 과소평가.
+  - **How to apply**: 묶음/cluster 내 동형 schema 변경이라도 ★ ★ 각 항목의 PoC 데이터 마이그레이션 = (a) 순수 기계 rename (저비용 / per-file Edit) (b) semantic 합성 (고비용 / 도메인 + echo-chamber gate) 분리 정량 의무. STOP-1 dry-run 으로 합성 의무 BR 총량·회귀면 사전 측정 (양심 추정 ❌). semantic 합성 시 합성↔검증 주체 분리 (Sonnet 합성 ↔ Opus 독립 spot-check ≥3/7 source 대조) + #06 corpus 보존 guard test 동반 (LL-i-47 echo-chamber 회피).
+
+- ★ ★ ★ ★ ★ ★ ★ ★ **LL-i-55** (★ "schema branch 제거 시 해당 필드 외부 consumer(load-bearing) 실측 의무 — naive hard-remove 가 silent breakage / close round paradigm" / ★ ★ v6.0.0 묶음 Q ② 본격 자산화):
+  - **Why**: ② D2 (TCA property 처분) 초기 Senior 권고 = (A) hard-remove (① 동형 / TCA-only BR 0 = 비용 0 가정). close round 실소스 검증 = `decision-table-validator/json-sanity.js` 가 `expected_result`·`verification_location` = REQUIRED_ALWAYS / `rejection_method` = REQUIRED_IF_API 강제 + `synthesize-gwt-from-tca.mjs` 가 expected_result→then 소비 = ★ load-bearing consumer. hard-remove 시 schema 통과 BR 이 decision-table-validator 에서 breaking finding = silent breakage. official-docs#2 (branch 제거 ≠ property 금지 / additionalProperties 는 동일 subschema properties 선언 기준) 가 "branch only 제거 + property 보존" 정답 보장.
+  - **How to apply**: schema anyOf/표현 branch 제거 시 ★ ★ ★ 해당 필드를 (1) 표현 자격 (branch / 제거 대상) (2) property 존재 (consumer 소비 / 보존 검토) 2축 분리. property 제거 전 ★ tools/skills/templates 전 consumer grep 실측 의무 (REQUIRED 강제 / read 참조). load-bearing 발견 시 branch only 제거 + property optional 보존 (null-sentinel posture). ★ Senior confidence < 0.9 잔여 사유(미검증 가정)는 ★ 코드 착수 전 close round (실소스 검증) 로 닫는다 — research 수렴만으로 코드 착수 ❌ (가정 잔존 = 재작업 risk).
 
 ---
 

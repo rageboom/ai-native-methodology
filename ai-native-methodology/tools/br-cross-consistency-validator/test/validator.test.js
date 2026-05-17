@@ -5,6 +5,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateRulesDoc, validateRulesDocStrict, OVERALL_THRESHOLD } from '../src/validator.js';
 import { extractKeywords, keywordOverlap, validateBR, resetFindingSeq } from '../src/deterministic.js';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+const __testdir = dirname(fileURLToPath(import.meta.url));
 
 test('Layer 1: BR with natural_language only — valid', () => {
   const doc = { business_rules: [{
@@ -388,18 +392,35 @@ test('top-level 부재 (★ business_rules/rules 모두 없음) — total 0', ()
 
 // ★ ★ ★ v2.5.0 Phase A 신규 paradigm test (★ Q2 description vs natural_language 재정의 정합)
 
-test('★ v2.5.0 Phase A: description-only BR — description_only_fallback low finding (★ Phase B 마이그레이션 carry)', () => {
+test('★ ★ ★ v6.0.0 묶음 Q ②: description-only BR — representation_missing critical (★ fallback low 폐기 / 표현 자격 박탈 / Senior surfaces louder / LL-i-53 동형)', () => {
   const doc = { business_rules: [{
     id: 'BR-LEGACY-DESC-001',
-    name: 'description-only fallback',
-    description: '★ v1.x legacy BR — natural_language 부재 / Phase B 마이그레이션 의무',
+    name: 'description-only',
+    description: '★ v5.x 까지 fallback 인정 / v6.0.0 묶음 Q ② 표현 자격 박탈',
   }]};
   const r = validateRulesDoc(doc);
-  const fallback = r.findings.find(f => f.rule === 'description_only_fallback');
-  assert.ok(fallback, 'description_only_fallback finding 의무');
-  assert.equal(fallback.severity, 'low');
-  assert.equal(r.stats.with_description_only, 1);
-  assert.equal(r.stats.with_natural_language, 0); // ★ description ≠ NL alias (★ v2.5.0 paradigm)
+  const repr = r.findings.find(f => f.rule === 'representation_missing');
+  assert.ok(repr, 'v6.0.0 — description-only = representation_missing finding 의무');
+  assert.equal(repr.severity, 'critical');
+  assert.equal(
+    r.findings.some(f => f.rule === 'description_only_fallback'),
+    false,
+    'v6.0.0 — description_only_fallback (low) finding 폐기 (critical 격상)',
+  );
+  assert.equal(r.stats.with_description_only, 1); // ★ stats 집계는 보존 (with_description_only / has_description)
+  assert.equal(r.stats.with_natural_language, 0); // ★ description ≠ NL alias (★ v2.5.0 paradigm 계승)
+});
+
+test('★ ★ ★ v6.0.0 묶음 Q ② Senior gate: PoC #06 post-migration — 7 BR 전부 GWT+NL / representation_missing 0 (합성 결함 은폐 inverse 차단)', () => {
+  const poc06 = join(__testdir, '../../../examples/poc-06-efiweb-exchange-spring41/input/rules.json');
+  const doc = JSON.parse(readFileSync(poc06, 'utf8'));
+  const r = validateRulesDoc(doc);
+  assert.equal(r.stats.total, 7, '#06 cross-consistency corpus = 7 BR (Senior #06 count==7 guard)');
+  assert.equal(
+    r.findings.filter(f => f.rule === 'representation_missing').length,
+    0,
+    '#06 7 BR 전부 GWT+NL 합성 완료 (description fallback 제거가 코퍼스 축소 ❌ / Senior Item1 NO-masking 실증)',
+  );
 });
 
 test('★ v2.5.0 Phase A: description + GWT — cross-validation 미시행 (★ description 제외)', () => {

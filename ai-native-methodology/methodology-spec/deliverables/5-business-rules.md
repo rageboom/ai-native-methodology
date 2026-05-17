@@ -91,6 +91,7 @@ output/rules/
 □ ★ v4.0.1 — auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
 □ ★ v4.0.1 — intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)
 □ ★ v4.1.0 — is_intent + intent_vs_bug_classification 둘 다 보유 시 is_intent=true ⇔ classification='intent' 정합 (if/then schema enforcement)
+□ ★ ★ v6.0.0 묶음 Q ② — BR 은 given/when/then 또는 natural_language 중 **≥ 1 표현 의무** (★ description·trigger/condition/action 표현 자격 박탈 / description-only·TCA-only = schema INVALID hard reject / description·trigger·condition·action property 자체는 optional metadata 로 보존)
 □ ★ v4.1.0 — cross_consistency_check 기록 시 generated_by provenance + heavy 데이터는 layer-2-results/ 분리 (slim marker only)
 ```
 

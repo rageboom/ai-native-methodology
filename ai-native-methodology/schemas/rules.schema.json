@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/rules.schema.json",
-  "title": "비즈니스 규칙 (Business Rules) — v5.0.0 canonical 단일 (alias 4중첩 폐기)",
-  "description": "★ ★ ★ ★ v5.0.0 MAJOR (묶음 Q ① / DEC-2026-05-17-q1-alias-4중첩-폐기) — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ `rules_auto_extracted_reference` = ① scope 외 보존 (BR-list alias 아님 / 타 산출물 자동추출 BR 참조 / 별도 carry Q-①-followup). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + rules_auto_extracted_reference.",
+  "title": "비즈니스 규칙 (Business Rules) — v6.0.0 BR 표현 2종 단일 (4→2 / alias 4중첩 폐기 계승)",
+  "description": "★ ★ ★ ★ ★ v6.0.0 MAJOR (묶음 Q ② / DEC-2026-05-17-q2-br-표현-4to2) — BR 표현 형식 4종(GWT/NL/description/TCA) → 2종(GWT/NL) 단일화 (breaking / description·trigger·condition·action property 는 optional metadata 보존 / D1·D2). v5.0.0 MAJOR (묶음 Q ① / alias 4중첩 폐기) 계승 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ `rules_auto_extracted_reference` = ① scope 외 보존 (BR-list alias 아님 / 타 산출물 자동추출 BR 참조 / 별도 carry Q-①-followup). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + rules_auto_extracted_reference.",
   "type": "object",
   "additionalProperties": false,
   "required": ["business_rules"],
@@ -101,6 +101,7 @@
       ],
       "allOf": [
         {
+          "$comment": "★ ★ ★ ★ ★ v6.0.0 MAJOR (묶음 Q ② / DEC-2026-05-17-q2-br-표현-4to2). BR 표현 형식 4종 → 2종 단일화 (breaking). 폐기 = description fallback branch (v2.5.0 Phase A backward-compat / Phase B carry 종료) + trigger/condition/action branch (PoC #03 변형). 잔존 = GWT + natural_language 2종 ONLY (NL↔GWT cross-validation paradigm 강화 / industry Cucumber·DMN·OpenAPI 3 독립표준 수렴). ★ description / trigger / condition / action property 자체는 optional metadata 로 보존 (anyOf branch 만 제거 = '표현 자격 박탈' / property 금지 ❌ — official-docs#2 VERIFIED + decision-table-validator load-bearing consumer 보호 / D1·D2). description-only / TCA-only BR = 이제 INVALID hard reject. STOP-1 dry-run 실측 = #06 7 BR 합성 후 전 11 PoC descOnly=0·tcaOnly=0 (회귀 아닌 개선 / LL-i-53 동형).",
           "anyOf": [
             {
               "title": "GWT 표현 (★ chain 3+4 자동 생성 친화 / v1.x 공식 표준)",
@@ -109,14 +110,6 @@
             {
               "title": "natural_language 표현 (★ ★ ★ v2.5.0 Phase A 권장 표준 / Layer 2 LLM cross-validation 대상 / characterization mode 정합)",
               "required": ["natural_language"]
-            },
-            {
-              "title": "description fallback (★ v2.5.0 Phase A — backward-compat / Phase B 마이그레이션 carry)",
-              "required": ["description"]
-            },
-            {
-              "title": "trigger/condition/action 표현 (★ PoC #03 사례 / BR 분해 변형)",
-              "required": ["trigger", "condition", "action"]
             }
           ]
         },
@@ -159,7 +152,7 @@
           }
         }
       ],
-      "description": "★ ★ ★ ★ v2.5.0 Phase A paradigm 재정의 (ADR-CHAIN-011 §5 patch v3). BR 은 ≥ 1 표현 의무 (GWT / natural_language / description fallback / trigger-condition-action 변형). ★ ★ ★ cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외 / ★ description = optional metadata 격상 / Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM mandatory = v2.5.0 Phase C). ★ ★ paradigm 결단 근거 — session 9차 SPIKE v2 (REVISE-6 가설 B 정면 부정 / description 안 rationale/caveat 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement 사실 입증) + Agent 3 paradigm 정합.",
+      "description": "★ ★ ★ ★ ★ v6.0.0 MAJOR 묶음 Q ② (ADR-CHAIN-011 §5 patch v14 / v2.5.0 Phase A paradigm §5 patch v3 계승). ★ BR 은 GWT 또는 natural_language **2종 ONLY** 중 ≥ 1 표현 의무 (★ v5.x 까지 description fallback / trigger-condition-action 변형 폐기 = breaking). ★ ★ ★ cross-validation 대상 = natural_language ↔ given/when/then **ONLY** (★ description 제외 / ★ description = optional metadata 격상 / Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM mandatory = v2.5.0 Phase C). ★ ★ paradigm 결단 근거 — session 9차 SPIKE v2 (REVISE-6 가설 B 정면 부정 / description 안 rationale/caveat 안 GWT 매칭 keyword 존재 = description ≠ pure BR statement 사실 입증) + Agent 3 paradigm 정합.",
       "properties": {
         "id": {
           "type": "string",
@@ -180,7 +173,7 @@
         },
         "description": {
           "type": "string",
-          "description": "★ ★ v2.5.0 Phase A paradigm 격상 — ★ optional metadata (★ BR statement + rationale + caveat + DRIFT 격상 자유 metadata / 사람 눈 친화 / characterization context 보존). ★ ★ ★ cross-validation 대상 ❌ (★ natural_language ↔ GWT only). v1.x deprecated alias 격하 ❌ → ★ ★ ★ optional metadata 격상. 신규 BR 작성 시 ★ natural_language 우선 / ★ description = 보조 metadata (★ session 9차 SPIKE v2 / ADR-CHAIN-011 §5 patch v3 정합)."
+          "description": "★ ★ ★ v6.0.0 묶음 Q ② — BR '표현(representation)' 자격 박탈 (anyOf branch 제거 / description 단독 = INVALID). ★ property 자체는 optional metadata 로 보존 (★ BR statement + rationale + caveat + DRIFT 격상 자유 metadata / 사람 눈 친화 / characterization context 보존). ★ ★ ★ cross-validation 대상 ❌ (★ natural_language ↔ GWT only). 신규 BR 작성 시 ★ natural_language 또는 GWT 필수 / ★ description = 보조 metadata only (★ session 9차 SPIKE v2 / ADR-CHAIN-011 §5 patch v3+v14 / OpenAPI description=prose 보조 산업 정합)."
         },
         "category": {
           "type": "string",

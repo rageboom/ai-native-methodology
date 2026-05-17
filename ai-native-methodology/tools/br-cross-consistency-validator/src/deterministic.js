@@ -112,34 +112,22 @@ export function validateBR(br, options = {}) {
     && typeof br.when === 'string' && br.when.length > 0
     && typeof br.then === 'string' && br.then.length > 0;
   const hasGWT = hasGWTArray || hasGWTString;
-  // ★ ★ trigger/condition/action alias (PoC #03 사실 정합)
-  const hasTCA = (typeof br.trigger === 'string' || Array.isArray(br.trigger))
-    && (typeof br.condition === 'string' || Array.isArray(br.condition))
-    && (typeof br.action === 'string' || Array.isArray(br.action));
+  // ★ ★ ★ ★ ★ v6.0.0 묶음 Q ② (DEC-2026-05-17-q2-br-표현-4to2 / ADR-CHAIN-011 §5 patch v14) —
+  //   trigger/condition/action + description = BR '표현(representation)' 자격 박탈 (schema anyOf branch 폐기).
+  //   description / trigger / condition / action property 자체는 optional metadata 로 보존 (D1·D2).
+  //   ★ hasDescription (line 위) = stats(with_description_only) 집계 용으로만 잔존 / 표현 판정 제외.
+  //   ★ Senior gate — description-only / TCA-only 는 이제 low 'fallback' 아닌 critical 'representation_missing' (defect surfaces louder / LL-i-53 동형).
 
-  // ★ 4-1. 표현 ≥ 1 의무 (★ NL / GWT / description fallback / TCA 변형 인정)
-  if (!hasNL && !hasGWT && !hasTCA && !hasDescription) {
+  // ★ 4-1. 표현 ≥ 1 의무 (★ v6.0.0 — natural_language / given-when-then 2종 ONLY)
+  if (!hasNL && !hasGWT) {
     findings.push({
       id: nextFindingId('REPR'),
       severity: 'critical',
       path,
       br_id: br.id || '<unknown>',
       rule: 'representation_missing',
-      message: 'natural_language / given-when-then / description / trigger-condition-action 중 ≥ 1 표현 의무 (★ schema anyOf 정합)',
-      suggestion: '★ ★ natural_language 우선 작성 권장 (★ v2.5.0 paradigm)',
-    });
-  }
-
-  // ★ ★ ★ v2.5.0 Phase A 신규 — description-only fallback carry (★ Phase B 마이그레이션 의무 / C-poc-03-05-dual-representation 정합)
-  if (!hasNL && !hasGWT && !hasTCA && hasDescription) {
-    findings.push({
-      id: nextFindingId('FALLBACK'),
-      severity: 'low',
-      path,
-      br_id: br.id || '<unknown>',
-      rule: 'description_only_fallback',
-      message: '★ description fallback (★ cross-validation 미시행) — natural_language 마이그레이션 의무 (★ Phase B carry)',
-      suggestion: '★ description 첫 문장 → natural_language 추출 + description 안 rationale/caveat 보존',
+      message: '★ v6.0.0 묶음 Q ② — natural_language 또는 given-when-then 중 ≥ 1 표현 의무 (★ description·trigger-condition-action 표현 자격 박탈 / schema anyOf 2종 정합)',
+      suggestion: '★ ★ natural_language 우선 작성 권장 (★ description-only / TCA-only = schema INVALID hard reject)',
     });
   }
 

@@ -9,6 +9,42 @@
 
 ---
 
+## [6.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ② BR 표현 4종 → 2종 단일화 (breaking)
+
+> ★ ★ ★ ★ ★ **v6.0.0 MAJOR — breaking change (의도 / semver 정합)**. 사용자 "권고를 따를게"(추천안 전부 채택) → 묶음 Q 잔여 risk 오름차순 첫 ②. 4원칙 (plan + 3-에이전트 research + STOP-1 dry-run 실측 + 사용자 결단). DEC-2026-05-17-q2-br-표현-4to2 / ADR-CHAIN-011 §5 patch v14 + §9 LL-i-54·55.
+
+### 결단 (사용자 추천안 전부 채택)
+
+- **D1 description = anyOf branch 제거 + property optional metadata 보존** / **D2 TCA = branch 제거 + property 6종 canonical 보존** (★ Senior close round — `decision-table-validator` load-bearing consumer 실소스 검증 → hard-remove ❌) / **D3 #06 7 BR 합성 = 전체 gate** / **D5 cooling-off = 지금 시행** / **D6 ② 단독**
+- ★ **version = v6.0.0 MAJOR 사실 확정** (official-docs VERIFIED: anyOf 4→2 로 description-only valid→invalid = semver Rule 8 MAJOR 필수)
+
+### BR 표현 4종 → 2종
+
+- **폐기 (BR 표현 자격 박탈)**: `description` 단독 / `trigger`+`condition`+`action`(TCA). `rules.schema.json` `$defs.businessRule.allOf[0].anyOf` 4 branch → **2 branch (given/when/then + natural_language ONLY)**
+- **보존 (D1·D2 / official-docs#2 VERIFIED — branch 제거 ≠ property 금지)**: `description`/`trigger`/`condition`/`action`/`expected_result`/`rejection_method`/`verification_location` property = optional metadata (decision-table-validator + synthesize-gwt-from-tca.mjs consumer 보호)
+- description-only / TCA-only BR = 이제 schema **INVALID hard reject**
+
+### STOP-1 dry-run 실측 (회귀 아닌 개선 확정)
+
+- `_q2-dryrun.mjs` (no-simulation) — 전 11 PoC 중 **#06 7/7 description-only 가 유일** / TCA-only 0 / 그 외 100 BR 전부 GWT|NL 보유
+- #06 7 BR NL+GWT 합성(Sonnet 4.6 batch + 독립 Opus spot-check 4/7 EFI-WEB 원본 대조) 후 재실측 = 전 11 PoC `descOnly=0 tcaOnly=0` → 회귀 면 7 BR(1 PoC) 전부 coverage 증가 = **개선 확정** (LL-i-53 / ① poc-04 precedent 동형)
+
+### tool / test
+
+- `br-cross-consistency-validator/deterministic.js` — `representation_missing` 조건 `!hasNL&&!hasGWT` (description/TCA 제외) + `description_only_fallback`(low) finding 폐기 → **critical 'representation_missing' 격상** (Senior "defect surfaces louder")
+- test = chain-schemas (description-alias·TCA accept 2 → v6.0.0 REJECT 2 + GWT+desc·NL+TCA VALID functional 2 신규) + validator (description_only_fallback → representation_missing critical 전환 + #06 corpus==7 guard) + drift canonical (② anyOf 2 branch + 재유입 0 + property 보존 3 신규)
+- 영향 3 패키지 = schema-validator 18/18 + br-cross-consistency 32/32 + drift canonical 8/8 pass (functional REJECT = vacuous 아님 실증)
+
+### 회귀
+
+- release-readiness **11/11 release-ready** / workspace test 전수 pass / chain harness validated 본질 보존 / breaking ✅의도
+
+### 묶음 Q 잔여 carry (breaking / cooling-off)
+
+- ⑦ rules.json→business-rules.json rename (265 file) / Q-①-followup (rules_auto_extracted_reference→auto_extracted_br_refs semantic-rename) — 각 별도 plan
+
+---
+
 ## [5.0.0] — 2026-05-17 ★ ★ ★ MAJOR — 묶음 Q ① rules.json alias 4중첩 폐기 → canonical 단일 (breaking)
 
 > ★ ★ ★ ★ ★ **v5.0.0 MAJOR — breaking change (의도 / semver 정합)**. 사용자 "1"(묶음 Q 잔여) → ① risk 오름차순 첫. 4원칙 (plan + 3-에이전트 research + STOP-1 실측 + 사용자 결단 4건). DEC-2026-05-17-q1-alias-4중첩-폐기 / ADR-CHAIN-011 §5 patch v13 + §9 LL-i-52·53.

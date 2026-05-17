@@ -368,7 +368,7 @@ test('★ ★ ★ v5.0.0 — paradigm: FE + business_rules canonical → VALID (
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json description alias (★ deprecated / PoC #01/#05/#06 호환)', () => {
+test('★ ★ ★ v6.0.0 — rules.schema.json description-only 표현 자격 박탈 → REJECTED (묶음 Q ② anyOf 4→2)', () => {
   const dir = tmp();
   try {
     const inst = {
@@ -376,20 +376,25 @@ test('★ ★ ★ v2.4.0 — rules.schema.json description alias (★ deprecated
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
-          id: 'BR-DESC-COMPAT-001',
-          title: 'description alias',
-          description: '★ deprecated alias — natural_language 로 마이그레이션 권장',
+          id: 'BR-DESC-ONLY-001',
+          title: 'description-only',
+          description: '★ v5.x 까지 fallback 인정 / v6.0.0 묶음 Q ② 표현 자격 박탈',
         },
       ],
     };
     writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
     const r = runCli(join(dir, 'rules.json'));
     const result = r.parsed.results[0];
-    assert.equal(result.valid, true, `description alias should pass: ${JSON.stringify(result)}`);
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(
+      result.valid,
+      false,
+      `v6.0.0 — description-only = anyOf 2종(GWT/NL) 미충족 hard reject: ${JSON.stringify(result)}`,
+    );
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('★ ★ ★ v2.4.0 — rules.schema.json trigger/condition/action 변형 (PoC #03 호환)', () => {
+test('★ ★ ★ v6.0.0 — rules.schema.json trigger/condition/action-only 표현 자격 박탈 → REJECTED (묶음 Q ②)', () => {
   const dir = tmp();
   try {
     const inst = {
@@ -397,8 +402,8 @@ test('★ ★ ★ v2.4.0 — rules.schema.json trigger/condition/action 변형 (
       meta: { ...FULL_META, inputs_used: ['source_code'] },
       business_rules: [
         {
-          id: 'BR-TRIGGER-VARIANT-001',
-          title: 'trigger 변형',
+          id: 'BR-TCA-ONLY-001',
+          title: 'TCA-only',
           trigger: '사용자 가입',
           condition: '이메일 중복',
           action: '409 응답',
@@ -408,7 +413,68 @@ test('★ ★ ★ v2.4.0 — rules.schema.json trigger/condition/action 변형 (
     writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
     const r = runCli(join(dir, 'rules.json'));
     const result = r.parsed.results[0];
-    assert.equal(result.valid, true, `trigger/condition/action should pass: ${JSON.stringify(result)}`);
+    assert.notEqual(result.schema_status, 'not-found');
+    assert.equal(
+      result.valid,
+      false,
+      `v6.0.0 — trigger/condition/action-only = anyOf 2종 미충족 hard reject: ${JSON.stringify(result)}`,
+    );
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v6.0.0 — GWT + description property 동시 = VALID (D1: description property optional metadata 보존)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-GWT-DESC-001',
+          title: 'GWT + description metadata',
+          given: ['전제'],
+          when: ['발동'],
+          then: ['결과'],
+          description: '★ v6.0.0 — description 은 표현 자격 박탈이나 property 는 metadata 로 보존 (rationale/caveat 자유)',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(
+      result.valid,
+      true,
+      `v6.0.0 — GWT 표현 + description metadata 공존 정합 (branch 제거 ≠ property 금지 / official-docs#2): ${JSON.stringify(result)}`,
+    );
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ ★ ★ v6.0.0 — natural_language + trigger/condition/action property 동시 = VALID (D2: TCA property 보존 / decision-table-validator consumer 보호)', () => {
+  const dir = tmp();
+  try {
+    const inst = {
+      $schema_origin: '../schemas/rules.schema.json',
+      meta: { ...FULL_META, inputs_used: ['source_code'] },
+      business_rules: [
+        {
+          id: 'BR-NL-TCA-001',
+          title: 'NL + TCA metadata',
+          natural_language: '사용자 가입 시 이메일 중복이면 409 를 반환한다',
+          trigger: '사용자 가입',
+          condition: '이메일 중복',
+          action: '409 응답',
+        },
+      ],
+    };
+    writeFileSync(join(dir, 'rules.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'rules.json'));
+    const result = r.parsed.results[0];
+    assert.equal(
+      result.valid,
+      true,
+      `v6.0.0 — natural_language 표현 + TCA metadata 공존 정합 (TCA property 보존 / D2): ${JSON.stringify(result)}`,
+    );
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
