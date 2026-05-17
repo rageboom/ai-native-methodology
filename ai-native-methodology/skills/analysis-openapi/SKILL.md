@@ -25,7 +25,7 @@ REST API 표면 → OpenAPI 3.x spec.
 2. **request / response 스키마** — DTO / TypeScript interface / Pydantic / JSON Schema
 3. **path / query / body / header parameter** 분류
 4. **status code + error response** 명세
-5. **openapi.yaml 작성** — `templates/analysis/openapi.template.yaml` 기반. ADR-007 부재 → `openapi-extension.schema.json` 활용 (custom extension)
+5. **openapi.yaml 작성** — `templates/analysis/openapi-extension.template.json` 기반. ADR-007 부재 → `openapi-extension.schema.json` 활용 (custom extension)
 6. **spectral-runner 자동 호출** — OpenAPI 정합 검증 (★ no-simulation 정책 첫 실현 단계 — ADR-009 단계 5 도구 실 실행 evidence)
 7. **rules / domain cross-link** — analysis-api-rule-mapping 에서 사용
 
@@ -35,7 +35,7 @@ REST API 표면 → OpenAPI 3.x spec.
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/05-formal-spec.md` (api 부분)
+- `methodology-spec/deliverables/4-5-formal-spec.md` (api 부분)
 - `schemas/openapi-extension.schema.json`
 - `tools/spectral-runner/`
 - ADR-009 (5단계 신뢰도 — 단계 5 도달 의무)

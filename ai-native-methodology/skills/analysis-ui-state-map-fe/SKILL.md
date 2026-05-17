@@ -30,7 +30,7 @@ FE 의 client state + server state cache shape 추출.
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/08-state-map.md` (v1.4)
-- `methodology-spec/workflow/phase-5-2-b-state.md`
+- `methodology-spec/deliverables/8-state-map.md` (v1.4)
+- `methodology-spec/workflow/ui.md`
 - `schemas/state-map.schema.json`
 - ADR-FE-006 (framework-neutral IR + IR 4계층)

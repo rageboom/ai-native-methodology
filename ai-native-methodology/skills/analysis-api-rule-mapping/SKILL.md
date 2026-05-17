@@ -27,5 +27,5 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/04-rules.md`
+- `methodology-spec/deliverables/5-business-rules.md`
 - ADR-FE-005 (권위 매개체 13)

@@ -9,6 +9,30 @@
 
 ---
 
+## [8.1.0] — 2026-05-17 ★ ★ MINOR — skill-citation-validator 신설 + 47 SKILL.md stale 인용 정합 (R18 내부정합 / release-readiness #13)
+
+> ★ ★ **v8.1.0 MINOR — additive enforcement + 비-breaking 내부 dead-link 수정**. 사용자 "내용 로직도 확인 가능한가" → A(내부 정합 결정적 검사) → "수정 + validator 도구화". skill 지시 설계품질(증명불가 C계층) 아닌 **"인용 문서 실존"(결정적)** 검증. DEC-2026-05-17-skill-citation-integrity / ADR-PLUGIN-001 §7 patch v2.
+
+### 발견 (결정적 스캔 / ground truth 삼중 대조)
+
+- 47 SKILL.md 인용 전수 스캔 → **37 stale dead-link / 14 skills** (휴리스틱) → ground truth 대조 후 false-positive 분리 → **37 실결함 확정** (스캐너 정밀화 후)
+- 원인 = doc 재구조화 미전파: deliverables 재번호(`04-rules.md`→`5-business-rules.md`·`08`→`8`) / workflow `phase-N`→semantic(`phase-4-5-cross-validation`→`formal-spec.md`·`phase-5-2-*`→`ui.md`) / schema `-spec`·`-spectrum` 접미(`a11y.schema.json`→`a11y-spec.schema.json` 등 4종) / v7.0.0 `rules.schema.json`→`business-rules.schema.json` / template(`rules.template.json`→`.md`·`openapi.template.yaml`→`openapi-extension.template.json`) / ADR 정확명(`ADR-CHAIN-001.md`→`-chain-4-stage-enforcement.md`)
+- ★ 기존 validator 전 사각 (drift=flows / formal-spec-link=chain 산출물 / SKILL.md 산문 인용 무검증) — A 검사가 진짜 사각지대 노출
+- false-positive 정확 분리 (LL-i-55) — `implement-react-18`·`-svelte`·`-vue-2`(미존재 carry 정확 기술) / `planning-extraction-validator`(tool) / DEC `.md` 접미 / `ADR-007 부재`(의도적 부재) = 무수정
+
+### 신설 (additive)
+
+- **`tools/skill-citation-validator/`** (npm workspace 17번째) — schema/repo-path/ADR(부재-context 제외)/DEC(.md 정규화) 실존 결정적 검사. AI 추론 0% (no-simulation). cli + check-citations + test(dogfood regression-guard + synthetic + FP 필터 2/2) + README
+- **`scripts/release-readiness.js` check #13** (`skill_citation_integrity`) — 12/12 → **13/13**. 향후 doc 재구조화 시 SKILL.md stale 인용 release gate 자동 차단
+- **수정 14 SKILL.md / 20 인용** (비-breaking 내부 dead-link 정정 / ground truth 정밀 target / 추정 ❌ LL-i-55)
+
+### 검증
+
+- skill-citation-validator **0 stale** (dogfood green) + test 2/2
+- release-readiness **13/13** (A1 본격 spawn) + release-readiness.test.js 13 갱신 + version-check 3-way 8.1.0 + workspace green + drift-validator 불변 + chain harness validated 본질 보존
+
+---
+
 ## [8.0.0] — 2026-05-17 ★ ★ ★ MAJOR — skill rename `spec-integrate-7대-deliverables` → `spec-integrate-deliverables` (한글 → kebab / command-surface breaking)
 
 > ★ ★ ★ **v8.0.0 MAJOR — breaking (의도 / semver 정합)**. 사용자 "1 바꾸자" → ADR-PLUGIN-001 §8-1 deferred backlog 본격 시행. Senior critique **GO+REVISE conf 0.88** + STOP-3 hard gate. command-surface(skill `name`) rename = P2′ MAJOR 비협상 (선례 v7.0.0 D1). DEC-2026-05-17-skill-name-rename / ADR-PLUGIN-001 §7 patch v1. ★ plugin-authoring-spec §8-1 종결.

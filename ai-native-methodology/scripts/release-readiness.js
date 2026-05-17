@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 12/12 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 13/13 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 12 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 13 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -26,8 +26,11 @@
 //       차용 / methodology-spec/plugin-authoring-spec.md §6 last_verified 4행 ≤ 60일 의무 / 결정적 date-math only·네트워크 ❌
 //       / 네트워크 재검증 = §9 Layer i cadence (_base-official-docs-checker dispatch / ADR-009 §2 territory) /
 //       `--skip-authoring-staleness` flag 시 본 check skip / release 시 본 flag ❌ 의무 / ADR-PLUGIN-001 정합).
+//   13. ★ ★ v8.1.0 R18 내부정합 신설 — skill-citation-validator (★ skills/*/SKILL.md 인용 schema/repo-path/ADR/DEC
+//       실존 결정적 검사 / doc 재구조화 후 stale dead-link 자동 차단 / AI 추론 0% / 기존 validator 사각 회복 /
+//       ADR-PLUGIN-001 §7 patch v2 / DEC-2026-05-17-skill-citation-integrity).
 //
-// exit 0 = 12/12 ready / 1 = 1+ regress.
+// exit 0 = 13/13 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -523,6 +526,45 @@ function check12_authoringSpecStaleness(args) {
   };
 }
 
+// ★ ★ v8.1.0 R18 내부정합 신설 — skill-citation-validator (ADR-PLUGIN-001 §7 patch v2 / DEC-2026-05-17-skill-citation-integrity).
+// skills/*/SKILL.md 인용(schema/repo-path/ADR/DEC) 실존 결정적 검사 (AI 추론 0%).
+// doc 재구조화(deliverables 재번호·workflow phase→semantic·schema -spec 접미·v7.0.0 rename) 후 stale dead-link 자동 차단.
+// 기존 validator 사각 (drift=flows / formal-spec-link=chain 산출물 / SKILL.md 산문 인용 무검증) 회복.
+function check13_skillCitationIntegrity() {
+  const r = spawnSync(
+    'node',
+    ['tools/skill-citation-validator/src/cli.js', '--json'],
+    { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 }
+  );
+  let parsed;
+  try {
+    parsed = JSON.parse(r.stdout || '{}');
+  } catch {
+    return {
+      id: 'skill_citation_integrity',
+      pass: false,
+      detail: `skill-citation-validator JSON parse fail (exit ${r.status})`,
+      delegated_to: 'tools/skill-citation-validator',
+    };
+  }
+  const n = parsed.finding_count ?? -1;
+  return {
+    id: 'skill_citation_integrity',
+    pass: r.status === 0 && n === 0,
+    detail:
+      n === 0
+        ? `${parsed.skill_count} SKILL.md 인용 정합 (schema/repo-path/ADR/DEC 실존 / 0 stale dead-link)`
+        : `${n} stale citation across ${
+            new Set((parsed.findings || []).map((f) => f.skill)).size
+          } skill(s) — ${(parsed.findings || [])
+            .slice(0, 5)
+            .map((f) => `${f.skill}:${f.line} ${f.ref}`)
+            .join(' | ')}`,
+    delegated_to:
+      'tools/skill-citation-validator (★ v8.1.0 R18 내부정합 / doc 재구조화 dead-link 자동 차단 / ADR-PLUGIN-001 §7 patch v2)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -540,6 +582,7 @@ function main() {
     check10_claudeMdVersionSync(),
     check11_workspaceTestPass(args),
     check12_authoringSpecStaleness(args),
+    check13_skillCitationIntegrity(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

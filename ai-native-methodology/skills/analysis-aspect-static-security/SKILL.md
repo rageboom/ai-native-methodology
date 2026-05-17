@@ -55,7 +55,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 6. **환경 부재 시** — 사용자에게 준비 요청 또는 CI 위임 명시. finding 등재 (`Type: gap, Action: 환경 X 준비 또는 CI Y 추가`).
 7. **결과 통합** — severity / category / CWE mapping. SARIF → finding 어댑터 (sarif-to-finding.js).
 8. **AP-SECURITY-XXX 등재** — anti-pattern (`quality` phase 통합). 4 PoC isomorphic 패턴은 본체 antipattern 카탈로그 (ADR-FE-007) 격상 검토.
-9. **static-security.json 작성** — `schemas/static-security.schema.json` (v1.4 신규)
+9. **static-security.json 작성** — `schemas/static-security-spec.schema.json` (v1.4 신규)
 
 ## 산출물
 
@@ -69,8 +69,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/12-static-security.md` (v1.4)
-- `schemas/static-security.schema.json`
+- `methodology-spec/deliverables/12-static-security-spec.md` (v1.4)
+- `schemas/static-security-spec.schema.json`
 - `tools/static-runner/` (★ v1.4.2 — `--extra-rules` 옵션 / `rules/jwt-localstorage.yml` 사례)
 - DEC-2026-04-29-static-tool-실행-의무화
 - DEC-2026-05-02-v1.4.1-Semgrep-carry-종결 (★ Semgrep pip 채널)

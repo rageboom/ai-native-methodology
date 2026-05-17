@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/skill-citation-validator",
+  "version": "0.1.0",
+  "description": "skills/*/SKILL.md 내부 인용 정합 결정적 검증 도구 — 인용한 schema(*.schema.json) / repo doc 경로(methodology-spec·flows·templates·schemas·docs/adr) / ADR-id / DEC-id 가 실제 파일시스템에 존재하는지 검사. doc 재구조화(deliverables 재번호·workflow phase→semantic·schema -spec 접미·v7.0.0 rename) 후 SKILL.md stale 인용 dead-link 자동 차단. AI 추론 0% (정규식 + 명시 existence + 부재-context 필터만). ADR-PLUGIN-001 R18 내부 정합 enforcement.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "skill-citation-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/citation.test.js" },
+  "license": "UNLICENSED"
+}

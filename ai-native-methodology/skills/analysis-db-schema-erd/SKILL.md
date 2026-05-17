@@ -47,6 +47,6 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/05-formal-spec.md` (db 부분)
+- `methodology-spec/deliverables/4-5-formal-spec.md` (db 부분)
 - `schemas/db-schema.schema.json`
 - ADR-008 (이중 렌더링)

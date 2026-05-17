@@ -49,7 +49,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/workflow/phase-4-5-cross-validation.md`
+- `methodology-spec/workflow/formal-spec.md`
 - ADR-008 (이중 렌더링), ADR-009 (5단계 신뢰도)
 - `tools/formal-spec-link-validator/`, `tools/drift-validator/`, `tools/static-runner/`
 

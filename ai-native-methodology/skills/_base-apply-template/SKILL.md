@@ -12,8 +12,8 @@ Generate an artifact from a template, filling it with project-specific context.
 
 User triggers this skill when starting a new deliverable:
 - "inventory.md 시작해줘" → fills `templates/analysis/inventory.template.md`
-- "rules.json 새로 작성" → fills `templates/analysis/rules.template.json`
-- "openapi.yaml 작성" → fills `templates/analysis/openapi.template.yaml`
+- "business-rules.json 새로 작성" → fills `templates/analysis/rules.template.md`
+- "openapi.yaml 작성" → fills `templates/analysis/openapi-extension.template.json`
 
 ## Steps
 

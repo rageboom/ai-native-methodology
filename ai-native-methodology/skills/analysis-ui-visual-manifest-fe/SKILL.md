@@ -38,7 +38,7 @@ DTCG token / 시각 시스템 / 컴포넌트 카탈로그.
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/09-visual-manifest.md` (v1.4)
-- `methodology-spec/workflow/phase-5-2-a-ui-base.md`
+- `methodology-spec/deliverables/9-visual-manifest.md` (v1.4)
+- `methodology-spec/workflow/ui.md`
 - `schemas/visual-manifest.schema.json`
 - ADR-FE-005 (권위 매개체 13)
