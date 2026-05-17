@@ -26,12 +26,13 @@ export function buildSuggestOutput({ skillId, meta, sessionId, agentId }) {
   };
 }
 
-export function buildBlockOutput({ reason, sessionId }) {
+export function buildBlockOutput({ reason, sessionId, hookEventName = 'PreToolUse' }) {
   // PreToolUse / PostToolUse 차단용 output. exit 2 로 차단 통지.
   return {
     decision: 'block',
     reason,
     hookSpecificOutput: {
+      hookEventName,
       permissionDecision: 'deny',
       additionalContext: `chain-driver mechanical gate blocked: ${reason}. User must resolve via /aimd-next or /aimd-stage <name>.`,
     },

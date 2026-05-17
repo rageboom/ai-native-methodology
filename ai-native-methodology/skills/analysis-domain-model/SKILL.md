@@ -1,6 +1,6 @@
 ---
 name: analysis-domain-model
-description: Use after analysis-architecture to extract domain model (entities, aggregates, value objects, bounded contexts). DDD-style. Generates domain.json (산출물 3). Required prerequisite for analysis-business-rules. Stage = analysis.
+description: Use after analysis-architecture to extract domain model (entities, aggregates, value objects, bounded contexts). DDD-style. Generates domain.json (산출물 2). Required prerequisite for analysis-business-rules. Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 

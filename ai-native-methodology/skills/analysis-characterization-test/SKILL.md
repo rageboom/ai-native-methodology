@@ -1,6 +1,6 @@
 ---
 name: analysis-characterization-test
-description: Use when project has analysis output (rules.json + antipatterns.json) AND user invokes "characterization" or "intent-vs-bug" or "snapshot golden" or "behavior preserve" task. Generates characterization-spec.json (산출물 23). ★ Michael Feathers Characterization Testing 정합 + Specification by Example (Gojko Adzic) Given/When/Then BDD + SATD/KL-SATD self_recognized 분류. Single prompt — Legacy (Spring/iBATIS/JSP) + Modern (NestJS/Spring Boot 3+/Express) 두 spectrum 모두에서 동작 (★ ≥ 2 PoC corroboration 입증). Stage = analysis, manifest phase = 4.7.
+description: Use when project has analysis output (business-rules.json + antipatterns.json) AND user invokes "characterization" or "intent-vs-bug" or "snapshot golden" or "behavior preserve" task. Generates characterization-spec.json (산출물 23). ★ Michael Feathers Characterization Testing 정합 + Specification by Example (Gojko Adzic) Given/When/Then BDD + SATD/KL-SATD self_recognized 분류. Single prompt — Legacy (Spring/iBATIS/JSP) + Modern (NestJS/Spring Boot 3+/Express) 두 spectrum 모두에서 동작 (★ ≥ 2 PoC corroboration 입증). Stage = analysis, manifest phase = 4.7.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -17,16 +17,16 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- analysis output 존재 — rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial)
+- analysis output 존재 — business-rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial)
 - (권장) formal-spec (phase 4.5 / state-machine + decision-table)
 - 도메인 expert 인터뷰 가능 OR carry 명시 의무 (ambiguous > 0 시)
 
 ## ★ 절차 (단일 prompt 양 spectrum / Cursor/Cline/Aider 표준 정합)
 
-### 1. rules.json + antipatterns.json read
+### 1. business-rules.json + antipatterns.json read
 
 ```bash
-cat .aimd/output/rules.json | jq '.business_rules | length'
+cat .aimd/output/business-rules.json | jq '.business_rules | length'
 cat .aimd/output/antipatterns.json | jq '.antipatterns | length'
 ```
 

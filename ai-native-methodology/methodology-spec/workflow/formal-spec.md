@@ -1,7 +1,7 @@
 # formal-spec phase: formal-spec (형식 명세)
 
 > **명령어**: `/analyze-formal-spec` · **사상**: 이중 렌더링 (ADR-008) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무 (ADR-009)
-> **핵심 책임**: rules.json 자연어 한계를 형식 명세로 보완 / AI 코드 생성 정확도 향상
+> **핵심 책임**: business-rules.json 자연어 한계를 형식 명세로 보완 / AI 코드 생성 정확도 향상
 
 ---
 
@@ -23,11 +23,11 @@
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
 | domain.json | `business-logic` phase 산출물 | 60% |
-| rules.json | `business-logic` phase 산출물 | +20%p |
+| business-rules.json | `business-logic` phase 산출물 | +20%p |
 | 코드 evidence (Aggregate Root / Service) | 소스 코드 | +15%p |
 | Cross-validation (Senior + Static tool) | sub-agent / 진짜 도구 | +5%p |
 
-→ `business-logic` phase 미완료 시 `formal-spec` phase 진입 차단. domain.json + rules.json 모두 의무.
+→ `business-logic` phase 미완료 시 `formal-spec` phase 진입 차단. domain.json + business-rules.json 모두 의무.
 
 ---
 

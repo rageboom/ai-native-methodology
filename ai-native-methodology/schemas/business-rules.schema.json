@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ai-native-methodology/schemas/rules.schema.json",
+  "$id": "https://ai-native-methodology/schemas/business-rules.schema.json",
   "title": "비즈니스 규칙 (Business Rules) — v6.1.0 (BR 표현 2종 단일 계승 / Q-①-followup auto_extracted_br_refs rename)",
   "description": "★ ★ ★ ★ ★ v6.0.0 MAJOR (묶음 Q ② / DEC-2026-05-17-q2-br-표현-4to2) — BR 표현 형식 4종(GWT/NL/description/TCA) → 2종(GWT/NL) 단일화 (breaking / description·trigger·condition·action property 는 optional metadata 보존 / D1·D2). v5.0.0 MAJOR (묶음 Q ① / alias 4중첩 폐기) 계승 — BR dual representation paradigm (ADR-CHAIN-011). 두 표현 (natural_language + given/when/then) 동시 보유 + cross-validation 자동 검증. ★ ★ top-level BR list = `business_rules` **단일 canonical** (v1.x `rules` / FE `rules_manual_authored` alias 폐기 / hard kill — additionalProperties:false 로 reject). summary = `summary` 단일 (rule_summary / rules_summary / br_summary alias 폐기). ★ ★ v6.1.0 MINOR (Q-①-followup / DEC-2026-05-17-q1-followup-rename) — `rules_auto_extracted_reference` → `auto_extracted_br_refs` semantic-rename **완료** (의미 불변 / 타 산출물 자동추출 BR 참조 cross-link / BR-list alias 아님 / src consumer 0 + poc-04 atomic 동시 마이그레이션 = MINOR = textbook additive-equivalent / v7.0.0 semver inflation 회피 / LL-i-52 'semantic-rename ≠ alias 폐기' 정합). PoC #04 FE 트랙 = `paradigm: FE` discriminator + business_rules + auto_extracted_br_refs.",
   "type": "object",

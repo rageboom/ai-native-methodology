@@ -394,7 +394,7 @@ function cmdHooksBridge(args) {
         state,
       });
       if (reason) {
-        const out = buildBlockOutput({ reason, sessionId: payload.session_id });
+        const out = buildBlockOutput({ reason, sessionId: payload.session_id, hookEventName: event });
         process.stdout.write(JSON.stringify(out) + '\n');
         process.stderr.write(`[chain-driver] PreToolUse blocked: ${reason}\n`);
         process.exit(2);

@@ -1,6 +1,6 @@
 ---
 name: analysis-sql-inventory
-description: Use when project is RDB-based AND has analysis output (rules.json + antipatterns.json + characterization-spec.json) AND user invokes "sql inventory" or "mapper xml" or "ibatis sql" or "DAO sql" or "stored procedure inventory" task. Generates sql-inventory.json (산출물 24). ★ Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 5 컬럼 (statement_type / uc_link / intent_vs_bug_classification / confidence / carry_flags) = 11 컬럼. iBATIS 2 / MyBatis / Spring JDBC / JPA Repository 모두 정합. ≥ 2 PoC scale-cross isomorphic 입증 (PoC #06 단일책임 + PoC #07 다중책임 / Spring 4.1 + iBATIS 2 spectrum / paradigm-cross = Modern ORM PoC #08 carry). Stage = analysis, manifest phase = 4.8.
+description: Use when project is RDB-based AND has analysis output (business-rules.json + antipatterns.json + characterization-spec.json) AND user invokes "sql inventory" or "mapper xml" or "ibatis sql" or "DAO sql" or "stored procedure inventory" task. Generates sql-inventory.json (산출물 24). ★ Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 5 컬럼 (statement_type / uc_link / intent_vs_bug_classification / confidence / carry_flags) = 11 컬럼. iBATIS 2 / MyBatis / Spring JDBC / JPA Repository 모두 정합. ≥ 2 PoC scale-cross isomorphic 입증 (PoC #06 단일책임 + PoC #07 다중책임 / Spring 4.1 + iBATIS 2 spectrum / paradigm-cross = Modern ORM PoC #08 carry). Stage = analysis, manifest phase = 4.8.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 사전 조건
 
 - ★ ★ RDB 환경 (NoSQL/Prisma 단독 환경 시 skip / `_manifest.yml` 의 `rdb_only: false` 시 phase 4.8 자동 skip)
-- analysis output 존재 — rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial) + characterization-spec.json (phase 4.7)
+- analysis output 존재 — business-rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial) + characterization-spec.json (phase 4.7)
 - 도메인 expert 인터뷰 가능 OR carry 명시 의무 (ambiguous + DBA-read + proc-body carry)
 
 ## ★ 절차 (단일 prompt 양 spectrum / Cursor/Cline/Aider 표준 정합)

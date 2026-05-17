@@ -1,6 +1,6 @@
 ---
 name: analysis-architecture
-description: Use after analysis-source-inventory to extract architecture (layers, modules, dependencies, boundaries). Generates architecture.json (산출물 2) + ERD-style architecture diagram. Required prerequisite for analysis-domain-model. Stage = analysis.
+description: Use after analysis-source-inventory to extract architecture (layers, modules, dependencies, boundaries). Generates architecture.json (산출물 1) + ERD-style architecture diagram. Required prerequisite for analysis-domain-model. Stage = analysis.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 

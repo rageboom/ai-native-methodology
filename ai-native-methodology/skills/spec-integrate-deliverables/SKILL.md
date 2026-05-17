@@ -30,7 +30,7 @@ allowed-tools: Read, Glob, Bash, Edit
 {
   "cross_links": {
     "to_analysis_artifacts": [
-      "rules.json",
+      "business-rules.json",
       "domain.json",
       "schema.json",
       "architecture.json",

@@ -1,16 +1,16 @@
 ---
 name: analysis-form-validation-fe
-description: Use when project contains Zod, Yup, Joi, react-hook-form, class-validator, Ajv, or Vest schemas. Extracts form validation rules → rules.json fe_validation (auto_extracted=true). Generates form-validation-spec.json (산출물 14). FE-specific. Stage = analysis, track = FE.
+description: Use when project contains Zod, Yup, Joi, react-hook-form, class-validator, Ajv, or Vest schemas. Extracts form validation rules → business-rules.json fe_validation (auto_extracted=true). Generates form-validation-spec.json (산출물 14). FE-specific. Stage = analysis, track = FE.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # analysis-form-validation-fe — Form Validation Spec (FE)
 
-Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → rules.json fe_validation 자동 등록.
+Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → business-rules.json fe_validation 자동 등록.
 
 ## 사전 조건
 
-- rules.json 존재 (`business-logic` phase 산출)
+- business-rules.json 존재 (`business-logic` phase 산출)
 - FE 트랙 (Zod / Yup / Joi / RHF / class-validator / Ajv / Vest 시그널)
 
 ## 절차
@@ -25,7 +25,7 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → ru
    - Vest
 2. **Schema 추출** — `z.object()`, `Yup.object()`, `IsEmail()` decorator 등
 3. **Constraint 분류** — required / format / range / pattern / cross-field / async
-4. **rules.json 의 fe_validation 등재** (★ ADR-FE-005):
+4. **business-rules.json 의 fe_validation 등재** (★ ADR-FE-005):
    ```json
    {
      "fe_validation": [
@@ -43,7 +43,7 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → ru
 
 ## 산출물
 
-- `<user-project>/.aimd/output/rules.json` (fe_validation 추가)
+- `<user-project>/.aimd/output/business-rules.json` (fe_validation 추가)
 - `<user-project>/.aimd/output/form-validation-spec.json`
 
 ## 본체 명세

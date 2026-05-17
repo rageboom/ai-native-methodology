@@ -29,7 +29,7 @@ allowed-tools: Read, Write, Edit
 
    ## 산출물 요약
    - planning-spec.use_cases: 12개 (UC-USER-001 ~ UC-PROFILE-003)
-   - planning-spec.business_rules_intent: 47 BR-INTENT (rules.json 매핑 100%)
+   - planning-spec.business_rules_intent: 47 BR-INTENT (business-rules.json 매핑 100%)
    - source_grounded_evidence: 12 UC 모두 존재 / grep_hit_count 합 89
 
    ## validator 결과

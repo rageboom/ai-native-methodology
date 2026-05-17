@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 입력
 
 - `<project>/.aimd/output/planning-spec.json` (★ chain 1 산출)
-- `<project>/.aimd/output/rules.json` + `domain.json` + 7대 산출물
+- `<project>/.aimd/output/business-rules.json` + `domain.json` + 7대 산출물
 - `<project>/.aimd/output/state-machines/*.json` + `sequences/*.json` + `decision-tables/*.json` + `invariants/*.ts` (`formal-spec` phase 산출)
 
 ## 산출물
@@ -50,7 +50,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 4. **acceptance_criteria_refs 채움 (forward link)** — `derive-acceptance-criteria` skill 호출. AC-* 산출 후 backward link 채움.
 
-5. **integrate-7대-deliverables skill 호출** — analysis 산출물 모두 `cross_links.to_analysis_artifacts` 에 등록.
+5. **spec-integrate-deliverables skill 호출** — analysis 산출물 모두 `cross_links.to_analysis_artifacts` 에 등록.
 
 6. **behavior-diagrams.mermaid 통합 렌더** — 모든 BHV 의 state_machine + sequence 합성 (★ ≥ 100 cell 시 subgraph 분할 / sp3-c1 carry).
 

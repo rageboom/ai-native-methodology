@@ -180,7 +180,7 @@ async def login(req: LoginRequest, svc: AuthService = Depends()):
 
 ## 인용
 
-- ADR-CHAIN-001 §1 (이중 렌더링 chain 4) §6 (no-simulation 강화)
+- ADR-CHAIN-001 §1 (이중 렌더링 chain 4) §3 (no-simulation 강화)
 - ADR-CHAIN-004 §4 (--allow-execute 의무)
 - impl-spec.schema.json (deliverable 21) `fail_count const 0`
 - master plan §B chain 4

@@ -256,7 +256,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 ```
 □ 모든 ID 표준 일관성 (UC/E/BR/PAGE/AP)
 □ ID 교차 참조 무결성
-   - x-related-rules 의 BR-XXX 가 rules.json 에 존재
+   - x-related-rules 의 BR-XXX 가 business-rules.json 에 존재
    - operationId 가 도메인 UC 와 매핑
    - related_table 이 db schema 에 존재
 □ 모든 산출물에 confidence 메타

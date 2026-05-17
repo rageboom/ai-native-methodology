@@ -118,7 +118,7 @@ per-test cap 2. 3회+ retry = 진짜 fail. flaky_retries_count 필드로 trace.
 ## 인용
 
 - ADR-CHAIN-004 (Test Runner Invocation Contract)
-- ADR-CHAIN-001 §6 (no-simulation 강화)
+- ADR-CHAIN-001 §3 (no-simulation 강화)
 - test-spec.schema.json + impl-spec.schema.json `test_invocation_evidence`
 - master plan §B chain 3 / chain 4 / §J 1 (시뮬 위험)
 

@@ -42,11 +42,11 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 
 1. **input 확인** — 7대 산출물 + finding 모두 존재? 누락 시 사용자에게 명시 + analysis stage 재진입 권고.
 
-2. **business_intent 추출** — domain.json + rules.json 에서 도메인 의도 (e.g., "user authentication" / "article lifecycle") 추출. 자연어 prompt + 사용자 검토 후 채움.
+2. **business_intent 추출** — domain.json + business-rules.json 에서 도메인 의도 (e.g., "user authentication" / "article lifecycle") 추출. 자연어 prompt + 사용자 검토 후 채움.
 
 3. **use_cases 분해** — `decompose-use-cases` skill 호출. 산출 = `UC-{domain}-NNN` 목록.
 
-4. **business_rules_intent 채움** — `identify-business-intent` skill 호출. 산출 = `BR-INTENT-NNN` 목록 + br_refs (rules.json 매핑).
+4. **business_rules_intent 채움** — `identify-business-intent` skill 호출. 산출 = `BR-INTENT-NNN` 목록 + br_refs (business-rules.json 매핑).
 
 5. **cross_links.to_analysis_artifacts 채움** — analysis 산출물 path 모두 backward link.
 
@@ -54,7 +54,7 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
    ```bash
    node tools/planning-extraction-validator/src/cli.js \
      --planning .aimd/output/planning-spec.json \
-     --rules    .aimd/output/rules.json \
+     --rules    .aimd/output/business-rules.json \
      --domain   .aimd/output/domain.json \
      --json
    ```

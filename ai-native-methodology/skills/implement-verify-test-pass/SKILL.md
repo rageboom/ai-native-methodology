@@ -1,6 +1,6 @@
 ---
 name: implement-verify-test-pass
-description: ★ ★ ★ v2.0 chain 4 종결 skill. test-impl-pass-validator 호출 → 100% pass 검증 + 5종 물증 7 필드 + traceability-matrix green 의무. test-pass-verifier persona 책임. ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합.
+description: ★ ★ ★ v2.0 chain 4 종결 skill. test-impl-pass-validator 호출 → 100% pass 검증 + 5종 물증 7 필드 + traceability-matrix green 의무. test-pass-verifier persona 책임. ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합.
 allowed-tools: Read, Bash, Edit
 ---
 
@@ -117,7 +117,7 @@ bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --cha
 
 ## 인용
 
-- ADR-CHAIN-001 §6 (no-simulation 강화 chain 4)
+- ADR-CHAIN-001 §3 (no-simulation 강화 chain 4)
 - ADR-CHAIN-004 (Test Runner Invocation Contract)
 - ADR-CHAIN-002 (go/stop gate)
 - ADR-CHAIN-003 (revisit loop)

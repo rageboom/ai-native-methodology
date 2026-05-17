@@ -17,7 +17,7 @@ allowed-tools: Read, Grep, Bash, Write
 
 - `<project>/.aimd/output/behavior-spec.json` (★ chain 2 진행 중)
 - `<project>/.aimd/output/planning-spec.json` (use case backward link)
-- `<project>/.aimd/output/rules.json` + `domain.json` (BR / domain reference)
+- `<project>/.aimd/output/business-rules.json` + `domain.json` (BR / domain reference)
 
 ## 산출
 

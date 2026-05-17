@@ -1,6 +1,6 @@
 ---
 name: planning-decompose-use-cases
-description: ★ v2.0 chain 1 sub-skill. domain.json + rules.json + api-extension 에서 UC-* 분해. 1 actor + 1 domain entity + 1 trigger 단위로 분리. extract-from-legacy 가 호출하는 sub-skill.
+description: ★ v2.0 chain 1 sub-skill. domain.json + business-rules.json + api-extension 에서 UC-* 분해. 1 actor + 1 domain entity + 1 trigger 단위로 분리. extract-from-legacy 가 호출하는 sub-skill.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep
 ## 입력
 
 - `domain.json` (entity / aggregate)
-- `rules.json` (BR + br_type)
+- `business-rules.json` (BR + br_type)
 - `api-extension.json` (operation_id) — 있으면
 - `state-machines/*.json` (`formal-spec` phase) — 있으면
 
@@ -36,7 +36,7 @@ planning-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
   "state_machine_ref": "state-machines/auth-flow.json",
   "source_grounded_evidence": [
     { "artifact": "domain", "element_id": "User",                "grep_hit_count": 14, "file_paths": ["domain.json"] },
-    { "artifact": "rules",  "element_id": "BR-AUTH-LOGIN-001",   "grep_hit_count": 3,  "file_paths": ["rules.json"] }
+    { "artifact": "rules",  "element_id": "BR-AUTH-LOGIN-001",   "grep_hit_count": 3,  "file_paths": ["business-rules.json"] }
   ],
   "priority": "critical"
 }
@@ -58,7 +58,7 @@ planning-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
 | source | priority |
 |---|---|
 | domain.json `aggregate.actor` 필드 | ★ 1순위 |
-| rules.json `applies_to_role` 필드 | 2순위 |
+| business-rules.json `applies_to_role` 필드 | 2순위 |
 | api-extension `security.scopes` | 3순위 |
 | inferred (User / Admin / System / External) | 4순위 (★ 사용자 명시 검토 의무) |
 

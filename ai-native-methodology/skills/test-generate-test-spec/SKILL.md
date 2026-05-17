@@ -48,7 +48,7 @@ chain 3 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
    - 그 외 → `other` (사용자 명시 의무 / `--test-cmd` override)
 
 3. **각 AC 마다 1 TC 분해** — TC-{AC}-001:
-   - test type 분포: unit (60%) / integration (25%) / contract (10%) / e2e (5%) (★ ADR-CHAIN-001 §3 권고).
+   - test type 분포: unit (60%) / integration (25%) / contract (10%) / e2e (5%) (★ test pyramid 관행 권고).
    - source_file path 결정 (framework convention).
    - expected_outcome = "fail" (★ RED 의무 / impl 부재 가정).
 
@@ -102,7 +102,7 @@ chain 3 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
 
 ## 인용
 
-- ADR-CHAIN-001 §3 (test type 분포)
+- ADR-CHAIN-001 §3 (no-simulation 강화 / RED 의무)
 - ADR-CHAIN-004 §1 (framework match / inventory 추론)
 - test-spec.schema.json (deliverable 20)
 - master plan §B chain 3

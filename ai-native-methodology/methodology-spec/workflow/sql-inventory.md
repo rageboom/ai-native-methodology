@@ -24,7 +24,7 @@
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
 | inventory.json | `discovery` phase 산출물 (RDB 환경 식별) | 사전 조건 |
-| rules.json | `business-logic` phase 산출물 | 60% |
+| business-rules.json | `business-logic` phase 산출물 | 60% |
 | antipatterns.json | `quality` / `business-logic` phase partial | +10%p |
 | characterization-spec.json | `characterization` phase 산출물 (★ intent_classification cross-link 의무) | +20%p |
 | 도메인 expert 인터뷰 (DBA-read carry 시 의무) | 사용자 위임 | +10%p |

@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- inventory.json / architecture.json / domain.json / rules.json 모두 존재
+- inventory.json / architecture.json / domain.json / business-rules.json 모두 존재
 
 ## ★★★ no-simulation 절대 금지 (CLAUDE.md)
 
@@ -23,9 +23,9 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 1. **이중 렌더링 정합 (ADR-008)** — `architecture.json ↔ architecture.mermaid` / `decision-table.json ↔ .mermaid` drift-validator 자동 호출
 2. **cross-link 검증** — formal-spec-link-validator:
-   - rules.json 의 domain reference 가 domain.json 에 존재하는지
+   - business-rules.json 의 domain reference 가 domain.json 에 존재하는지
    - architecture.json 의 module 이 inventory.json 에 존재하는지
-   - openapi.yaml endpoint 가 rules.json 의 rule 과 매칭되는지
+   - openapi.yaml endpoint 가 business-rules.json 의 rule 과 매칭되는지
 3. **진짜 도구 실행** (해당 stack 에 한해):
    - Semgrep (다중 언어 / 보안 + 패턴)
    - PMD (Java)

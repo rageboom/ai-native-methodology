@@ -28,7 +28,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 - `src/**/*.vue` (SFC)
 - `src/**/*.composable.ts` (composable 분리 시)
-- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / **`vue_version: "3"` schema marker 의무**)
+- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "vue-3"` — schema modules.items.framework 필드)
 
 ## paradigm (★ Vue 3 only / 2026-05-15 사용자 결단)
 
@@ -99,7 +99,7 @@ Vue 2 Options API + filter + Vue.extend 패턴 = 본 skill ❌ / 별도 carry sk
 4. **composable generate** — reusable logic = `src/composables/use*.ts`.
 5. **commit_hash 채움** — `implement-generate-impl-spec` §4 동일 paradigm.
 6. **vitest 진짜 호출** — `npx vitest run` (사용자 명시 / auto-invoke ❌). 100% pass GREEN 의무.
-7. **impl-spec.json 안 `vue_version: "3"` marker 명시**.
+7. **impl-spec.json `modules[].framework` 에 `"vue-3"` 명시** (★ schema modules.items.framework 기존 필드 / top-level vue_version ❌ = additionalProperties:false reject).
 
 ## GREEN 의무
 

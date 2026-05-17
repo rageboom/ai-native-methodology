@@ -1,6 +1,6 @@
 ---
 name: planning-identify-business-intent
-description: ★ v2.0 chain 1 sub-skill. rules.json BR-* 와 antipatterns + finding 을 분석하여 BR-INTENT-NNN 추출 ("왜 이 규칙인가" reasoning). 모든 BR-INTENT 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임.
+description: ★ v2.0 chain 1 sub-skill. business-rules.json BR-* 와 antipatterns + finding 을 분석하여 BR-INTENT-NNN 추출 ("왜 이 규칙인가" reasoning). 모든 BR-INTENT 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임.
 allowed-tools: Read, Glob, Grep
 ---
 
@@ -15,7 +15,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 입력
 
-- `rules.json` (BR-* + br_type + decision_tables)
+- `business-rules.json` (BR-* + br_type + decision_tables)
 - `antipatterns.json` (AP-* + applies_to + migration_advice)
 - `finding-system.findings.json` (positive finding + learning_effect_type)
 - `migration-cautions.md`
@@ -36,7 +36,7 @@ planning-spec 의 `business_rules_intent[]` 배열. 각 BR-INTENT:
   "category": "security",
   "criticality": "critical",
   "source_grounded_evidence": [
-    { "artifact": "rules",        "element_id": "BR-AUTH-PASSWORD-002", "grep_hit_count": 5, "file_paths": ["rules.json"] },
+    { "artifact": "rules",        "element_id": "BR-AUTH-PASSWORD-002", "grep_hit_count": 5, "file_paths": ["business-rules.json"] },
     { "artifact": "antipatterns", "element_id": "AP-SECURITY-PASSWORD-001", "grep_hit_count": 2, "file_paths": ["antipatterns.json"] }
   ]
 }
@@ -44,7 +44,7 @@ planning-spec 의 `business_rules_intent[]` 배열. 각 BR-INTENT:
 
 ## reasoning 추출 알고리즘
 
-1. **rules.json br_type 분석** — invariant / constraint / lifecycle / 4 enum 별 reasoning 패턴 분기.
+1. **business-rules.json br_type 분석** — invariant / constraint / lifecycle / 4 enum 별 reasoning 패턴 분기.
 2. **antipatterns 매핑** — 본 BR 가 회피하는 AP 가 antipatterns.json 에 있으면 자동 link (★ negative-space corroboration / ADR-BE-001 정합).
 3. **migration-cautions.md grep** — "왜 이 규칙이 도입되었는가" 의 history 단서 (e.g., "#SEC-CR-114" / "Issue #245").
 4. **decision-tables hit-rate** — 동일 BR 의 decision-table 의 outcomes 분포 → BR 의 비즈니스 의도 강도.

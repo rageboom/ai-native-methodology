@@ -9,6 +9,25 @@
 
 ---
 
+## [8.2.2] — 2026-05-17 ★ PATCH — plugin-authoring 4영역 파일별 품질 감사 + L2 인용 drift corrective sweep (F-PA-001~010 / breaking 0)
+
+> ★ **v8.2.2 PATCH — corrective / non-breaking**. 사용자 "각 영역 별 파일별 품질 검증" → plugin-authoring 4영역 60 단위(47 SKILL.md + 9 agents + README + hooks.json + 2 manifests) 파일별 감사(L1 규칙 + L2 의미·claim accuracy + L3 §8.1·no-simulation / 10 sub-agent 배치 + XV 독립 재검증). **L1 구조 60/60 PASS** — 결함 전부 **L2 인용 drift**(근본원인 = v7.0.0 rules.json·v8.0.0 skill rename·v5~6 BR schema rename 후속 전파 누락). post-dedupe finding 10건 (F-021 band 5~15 "건강한 검증" / 명세 부실 ❌). 사용자 "진행" → corrective sweep 시행. DEC-2026-05-17-plugin-authoring-file-audit / ADR-PLUGIN-001 §7 patch v6 + §8 LL-plugin-04.
+
+### 감사 + 처분 (finding-system.md Body Finding Ledger F-PA 신설 namespace)
+
+- **resolved 8**: F-PA-001(spec-compose-behavior-spec:53 dead skill명 `integrate-7대-deliverables`→`spec-integrate-deliverables`) / F-PA-002(13 SKILL.md + **5 workflow SSOT doc** rules.json→business-rules.json / 3-step 안전치환) / F-PA-003(5 chain skill ADR-CHAIN-001 §3↔§6 인용 정정) / F-PA-004(analysis-business-rules inline 예제 canonical) / F-PA-005(implement-react/vue 거부키 react/vue_version → 실재 schema 필드 `modules[].framework` redirect / schema 무변경) / F-PA-006(analysis-architecture·domain-model 산출물 N off-by-one) / F-PA-008(hooks-bridge buildBlockOutput `hookEventName` 추가 / additive optional) / F-PA-009(business-rules.schema.json `$id` 정합 / $ref 의존 0)
+- **wontfix 2**: F-PA-007(skill 인용 정확 / stale = ADR 파일명 immutable-history) / F-PA-010(design-agent 의도된 placeholder)
+- **★ 메타 가치**: 기존 skill-citation-validator(check #13)가 "본문·CLI 예제 내 맨 artifact 파일명" drift 를 구조적으로 못 보는 사각을 본 감사 L2 가 메움. ground-truth-before-edit 가 재작업 2건 차단(FP-1 `_base-apply-template` 1차 RED 오탐 / F-PA-007 1차 오진).
+
+### 회귀 (STOP-3 hard gate 전부 통과)
+
+- 잔여 grep **0**: standalone rules.json(skill+workflow) / §6-no-sim·§3-test-type miscite / react·vue_version 의무 / integrate-7대
+- skill-citation-validator **finding 0** (207 active doc / 자가 회귀 1건 — ledger 내 죽은 `*.schema.json` 토큰 — 발견 즉시 비리터럴화 교정)
+- release-readiness **13/13 ready:true** (workspace test 395+ pass / chain-driver hookEventName 변경 무회귀 / validators·analysis·citation green) + drift-validator 3-way 불변
+- breaking **0** = PATCH (doc-corrective + schema $id 정합($ref 의존 0 / CHANGELOG v7.0.0 미완 보정) + chain-driver additive optional)
+
+---
+
 ## [8.2.1] — 2026-05-17 ★ PATCH — §8-2 `_base-*` documented-exception 종결 (backlog 잔여 0 / Senior GO 0.88 / F-015 = nominal not functional)
 
 > ★ **v8.2.1 PATCH — corrective·additive / non-breaking**. 사용자 "b 하고 a 진행" — briefing deck 버전 drift(v5.0.0→v8.2.0·387→395·11/11→13/13·15/15→16/16·16→17종) 정리 후 plugin-authoring-spec §8-2 backlog 2번 결단. v8.2.0 F-015 ×5 재검 완료 = §8-2 trigger 충족 → `_base-*` skill5+agent3 rename(v9.0.0 MAJOR / ~195 occ·70 file / 0 functional gain) vs documented-exception. 실 F-015(공식 charset verbatim 확인 / violation enforcement·`_`-prefix 거동 **미문서화** = nominal not functional) + Senior GO 0.88 → **documented-exception**. §8 backlog 잔여 **0**. DEC-2026-05-17-base-prefix-documented-exception / ADR-PLUGIN-001 §7 patch v5 + §8 LL-plugin-03.

@@ -101,7 +101,7 @@
 └── ubiquitous-language.md
 
 .ai-analysis/output/rules/            # 비즈니스 규칙 (#5) — 부분
-├── rules.json
+├── business-rules.json
 ├── rules.md
 └── state-diagrams/
 
@@ -115,7 +115,7 @@
 
 ```
 □ domain.json schema 검증 통과
-□ rules.json schema 검증 통과
+□ business-rules.json schema 검증 통과
 □ 4개 영역 모두 추출 시도 완료 (FE 없으면 5.B 스킵 OK)
 □ 도메인 모델 classDiagram 렌더링
 □ Use Case ↔ Entity 매핑 일관성

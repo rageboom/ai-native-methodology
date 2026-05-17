@@ -15,7 +15,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 절차
 
 1. **rule 후보 수집** — 코드의 if/switch/policy / annotation / config / 비즈니스 logic 함수
-2. **decision table 변환** — DMN 5-check 알고리즘 적용 가능한 형태:
+2. **decision table 변환** — DMN 5-check 적용용 **중간 작업 형태** (★ 최종 산출물 shape 아님 / DMN 검증 후 BR 로 환원):
    ```json
    {
      "id": "DT-USER-VERIFY",
@@ -24,15 +24,22 @@ allowed-tools: Read, Glob, Grep, Bash, Write
      "hit_policy": "first | unique | rule-order"
    }
    ```
-3. **business-rules.json 작성** — `schemas/business-rules.schema.json`:
+3. **business-rules.json 작성** — `schemas/business-rules.schema.json` (★ ★ v5.0.0+ canonical / `required:["business_rules"]` / `additionalProperties:false` — 폐기 alias hard-reject):
    ```json
    {
-     "decision_tables": [...],
-     "rule_categories": [...],
-     "fe_validation": [...],   // FE form validation (auto_extracted=true 분리)
-     "meta_confidence": {...}
+     "business_rules": [
+       {
+         "id": "BR-USER-VERIFY-001",
+         "title": "이메일 미인증 사용자 로그인 차단",
+         "natural_language": "사용자가 이메일 미인증 상태면 로그인을 거부한다."
+       }
+     ],
+     "summary": "...",
+     "meta": { "$ref": "meta-confidence.schema.json" }
    }
    ```
+   - BR item = `required:["id"]` + (`name`|`title`) + (GWT `given`/`when`/`then` | `natural_language`) 2종 표현 (v6.0.0 / $defs.businessRule).
+   - FE form validation 은 `business_rules[]` 안 `auto_extracted=true` BR + top-level `auto_extracted_br_refs` cross-link (★ 별도 top-level 키 아님).
 4. **decision-table-validator 자동 호출** — DMN 5-check (duplicate / conflict / gap / overlap / type) 정합 검증
 5. **finding 등재** — 검출된 conflict / gap / overlap → `log-finding`
 

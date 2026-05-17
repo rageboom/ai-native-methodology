@@ -10,7 +10,7 @@ REST API 표면 → OpenAPI 3.x spec.
 
 ## 사전 조건
 
-- domain.json / rules.json 존재
+- domain.json / business-rules.json 존재
 - BE 트랙 (REST endpoint 시그널 검출)
 
 ## 절차

@@ -1,7 +1,7 @@
 # characterization phase: characterization (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
 
 > **명령어**: `/analyze-characterization` · **사상**: ADR-CHAIN-006 (phase 4.7 정식 도입) + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + SATD/KL-SATD (Maldonado & Shihab 2015)
-> **핵심 책임**: rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 planning-spec 입력 보강
+> **핵심 책임**: business-rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 planning-spec 입력 보강
 > **introduced**: v2.1.0
 
 ---
@@ -22,13 +22,13 @@
 
 | 입력 | 출처 | 신뢰도 기여 |
 |---|---|---|
-| rules.json | `business-logic` phase 산출물 | 60% |
+| business-rules.json | `business-logic` phase 산출물 | 60% |
 | antipatterns.json | `business-logic` / `quality` phase partial | +20%p |
 | 코드 자조 코멘트 grep | 소스 코드 | +5%p |
 | formal-spec (선택) | `formal-spec` phase 산출물 | +10%p |
 | 도메인 expert 인터뷰 (ambiguous > 0 시 의무) | 사용자 위임 | +10%p (ambiguous → resolved) |
 
-→ `business-logic` phase 미완료 시 `characterization` phase 진입 차단. rules.json + antipatterns.json 의무.
+→ `business-logic` phase 미완료 시 `characterization` phase 진입 차단. business-rules.json + antipatterns.json 의무.
 
 ---
 
@@ -164,7 +164,7 @@ phase 4.7 출력 ↔ 다른 산출물:
 | 단계 | 조건 | 신뢰도 |
 |---|---|---|
 | 1 | LLM 분류 만 | 50~65% |
-| 3 | + rules.json + antipatterns.json grounding | 70~85% |
+| 3 | + business-rules.json + antipatterns.json grounding | 70~85% |
 | 5 | + 도메인 expert 결단 (ambiguous = 0 또는 carry 명시) + 실 환경 검증 | 85~95% |
 
 ---

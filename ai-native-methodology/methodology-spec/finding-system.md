@@ -193,3 +193,141 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 ```
 
 → Phase 4 진입과 잔여 finding 처리는 **분리**. 잔여는 백로그 등재 후 PoC #02 누적 데이터로 처리.
+
+---
+
+## Body Finding Ledger (★ methodology 자체 finding / PoC F-NNN 시퀀스와 별개 namespace `F-PA-NNN`)
+
+> 출처: plugin-authoring 4영역 파일별 품질 감사 2026-05-17 (`examples/_audits/2026-05-17-plugin-authoring-file-level-audit.md`).
+> 범위: 47 SKILL.md + 9 agents + README + hooks.json + 2 manifests = 60 단위. L1 구조 60/60 PASS / 결함 전부 L2 인용 drift.
+> **F-021 band = 5~15 "건강한 검증"** (post-dedupe 10건 / 명세 부실 ❌ — v7.0.0·v8.0.0·v5~6 rename 후속 전파 누락 표면화).
+> ※ 감사 위생: 1차 RED 중 `_base-apply-template`(rules.json claim) = XV 적발 false-positive → finding 아님(재등급). F-015 cross-check 가 차단 = LL-audit-01·02 실증.
+>
+> ★ ★ **수정 cycle 종결 (2026-05-17 / 사용자 "진행")** — 아래 finding 별 Status 는 본 cycle 처분 반영. STOP-3 hard gate 통과: 잔여 grep 0 (rules.json·§6-no-sim·marker 의무·integrate-7대 전부 CLEAN) + skill-citation-validator **0** + release-readiness **13/13 ready:true** (workspace test 395+ 포함 / chain-driver 코드 변경 무회귀). breaking 0 (전부 doc-corrective + schema $id 정합(=$ref 의존 0 / CHANGELOG v7.0.0 미완 보정) + chain-driver additive optional 필드) = PATCH-class.
+>
+> | F-PA | 처분 | 비고 |
+> |---|---|---|
+> | 001 | **resolved** | spec-compose:53 → `spec-integrate-deliverables` |
+> | 002 | **resolved** | 13 SKILL + 5 workflow SSOT doc(formal-spec 외 business-logic/characterization/quality/sql-inventory 확대) `rules.json`→`business-rules.json` (3-step 안전치환 / 잔여 0) |
+> | 003 | **resolved** | 5 chain skill ADR-CHAIN-001 §3/§6 정정 (§3=no-sim / test-type=test pyramid 재귀속) |
+> | 004 | **resolved** | analysis-business-rules inline 예제 canonical(`business_rules` required) + step2 중간 DMN form 명시 |
+> | 005 | **resolved (옵션 a 심화)** | implement-react/vue: 거부키 react/vue_version 제거 → 실재 schema 필드 `modules[].framework:"react-19"/"vue-3"` redirect (drift-추적 의도 보존 / schema 무변경) |
+> | 006 | **resolved** | analysis-architecture desc 산출물 2→1 / analysis-domain-model 3→2 |
+> | 007 | **wontfix-document** | skill 인용("매개체 13") 정확 / stale = ADR **파일명**(immutable-history) → 무변경, 본 ledger 기록 유지 |
+> | 008 | **resolved** | hooks-bridge buildBlockOutput `hookEventName` 추가(default 'PreToolUse' / 호출부 실 event 전달 / test 무회귀) |
+> | 009 | **resolved** | business-rules.schema.json:3 `$id` → business-rules (안전 / $ref 의존 0) |
+> | 010 | **wontfix** | design-agent 의도된 placeholder (규칙 무위반) |
+>
+> ★ scope 확대 사실: F-PA-002 sweep 이 XV 시점(13 skill + formal-spec.md)보다 넓은 **5 workflow SSOT doc**(business-logic/characterization/formal-spec/quality/sql-inventory) 포함 — drift 가 SSOT 근원에 잔존하던 것 동반 해소.
+
+### F-PA-001: spec-compose-behavior-spec 가 v8.0.0 rename 전 skill명 `integrate-7대-deliverables` 호출
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV 독립 재read)
+- **Type:** anti-pattern
+- **Description:** `skills/spec-compose-behavior-spec/SKILL.md:53` step 5 가 "integrate-7대-deliverables skill 호출"로 지시. v8.0.0 에서 `spec-integrate-deliverables` 로 rename(한글→kebab)되어 pre-rename 디렉토리 부재. chain 2 sub-skill dispatch 가 dead reference.
+- **Evidence:**
+  - `skills/spec-compose-behavior-spec/SKILL.md:53`
+  - `skills/spec-integrate-7대-deliverables/` 부재 / `skills/spec-integrate-deliverables/` 존재 (XV Q3)
+- **Action:** step 5 skill명을 `spec-integrate-deliverables` 로 정정 (corrective / dispatch 깨짐 = 우선)
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-002: `rules.json` → `business-rules.json`(v7.0.0) 미전파 — methodology-wide
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV 독립 재read / 정확 카운트)
+- **Type:** migration-risk
+- **Description:** v7.0.0 artifact rename 이 본문·prereq·실행 CLI 예제에 미전파. 13 active SKILL.md + body doc `methodology-spec/workflow/formal-spec.md` + `schemas/business-rules.schema.json` 내부 `$id`(L3 = rename 전 구 파일명 미반영) 잔존. validator 를 옛 경로로 호출 시 런타임 path 불일치.
+- **Evidence:**
+  - 13 SKILL.md: analysis-characterization-test(L20,26,29), analysis-form-validation-fe(L3,9,13,28,46), analysis-formal-spec-validation(L13,26,28), analysis-from-swagger(L3,26,34), analysis-openapi(L13), analysis-sql-inventory(L21), planning-extract-from-legacy(L45,49,57), planning-decompose-use-cases(L3,19,39,61), planning-identify-business-intent(L3,18,39,47), spec-compose-behavior-spec(L19), spec-integrate-deliverables(L33), spec-derive-acceptance-criteria(L20), _base-invoke-go-stop-gate(L32)
+  - `methodology-spec/workflow/formal-spec.md:4,10,27,30`
+  - 실행 CLI: planning-extract-from-legacy:57 `--rules .aimd/output/rules.json` / analysis-characterization-test:29 `cat .aimd/output/rules.json`
+- **Action:** repo-wide sweep (13 SKILL + workflow doc + schema $id + CLI 예제) `rules.json`→`business-rules.json`. ★ skill-citation-validator(check#13) 구조적 미탐 사각 → validator class 확장 검토 동반
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-003: chain 3-4 skill 5종 ADR-CHAIN-001 §3/§6 인용 swap
+
+- **Phase:** cross-validation
+- **Confidence:** verified (main agent ADR 매핑표 직접 read)
+- **Type:** anti-pattern
+- **Description:** ADR-CHAIN-001 실제 = §3 no-simulation 강화 / §6 revisit loop (ADR 매핑표 L82-87). 다음 skill 들이 §6 을 "no-simulation"으로, §3 을 "test type 분포"로 오인용: test-generate-test-spec, test-run-test-evidence, implement-generate-impl-spec, implement-verify-test-pass, implement-react.
+- **Evidence:**
+  - `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md:41,61,84,87`
+  - test-generate-test-spec(L51,105), test-run-test-evidence(L121), implement-generate-impl-spec(L183), implement-verify-test-pass(L120), implement-react(L92)
+- **Action:** 5 skill 의 ADR-CHAIN-001 §번호 인용 정정 (§3=no-sim / §6=revisit). corrective.
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-004: analysis-business-rules inline schema 예제 pre-v5/v6 stale
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV schema 직접 대조)
+- **Type:** gap
+- **Description:** `skills/analysis-business-rules/SKILL.md:29-35` inline 예제 top-level 키(decision_tables/rule_categories/fe_validation/meta_confidence)가 현 `business-rules.schema.json`(`required:[business_rules]`+top `additionalProperties:false`) 에서 전부 hard-reject + 필수 키 부재. v5.0.0 alias-kill / v6.0.0 BR-form 2종 단일화 미반영.
+- **Evidence:**
+  - `schemas/business-rules.schema.json` top `required:["business_rules"]`, `additionalProperties:false`
+  - `skills/analysis-business-rules/SKILL.md:29-35` (+ L20-26 DT 형상도 비-canonical)
+- **Action:** inline 예제를 현행 canonical schema 형상으로 갱신. corrective.
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-005: implement-react/vue 가 schema 가 hard-reject 하는 키를 "marker 의무"로 지시
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV impl-spec.schema.json 167L 전수)
+- **Type:** anti-pattern
+- **Description:** `impl-spec.schema.json` 에 `react_version`/`vue_version` 부재 + top·modules.items `additionalProperties:false` → 해당 키 emit 시 schema-validator hard-reject. implement-react(L32,77)·implement-vue(L31,102) 가 이를 "schema marker 의무"로 지시 = skill↔schema 계약 모순.
+- **Evidence:**
+  - `schemas/impl-spec.schema.json` (react_version/vue_version 부재 / additionalProperties:false)
+  - `skills/implement-react/SKILL.md:32,77` / `skills/implement-vue/SKILL.md:31,102`
+- **Action:** 결단 필요 — (a) skill 문구에서 marker 의무 제거 또는 (b) impl-spec.schema.json 에 react_version/vue_version 속성 추가. design 결단 동반.
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-006: analysis-architecture/domain-model description 산출물 N off-by-one
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV deliverable 파일번호 대조)
+- **Type:** gap
+- **Description:** description 이 실제 deliverable 번호와 불일치. analysis-architecture:3 "산출물 2" (실제 `1-architecture.md`), analysis-domain-model:3 "산출물 3" (실제 `2-domain.md`). body 는 올바른 파일 인용 = description-body 내부 모순.
+- **Evidence:** `deliverables/1-architecture.md`·`2-domain.md` vs `skills/analysis-architecture/SKILL.md:3`·`skills/analysis-domain-model/SKILL.md:3`
+- **Action:** description 산출물 번호 정정. batch corrective (low).
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-007: ADR-FE-005 파일명이 자기 본문(12→13 갱신)과 stale — ★ 1차 오진 정정 (skill 인용은 정확)
+
+- **Phase:** cross-validation
+- **Confidence:** verified (수정 cycle ground-truth — ADR 본문 직접 read)
+- **Type:** migration-risk
+- **Description:** ★ **1차 감사 오진 정정**. ADR-FE-005 본문 title(L1)="권위 매개체 **13** 채택" + L4 "갱신 2026-05-01 (매개체 12→13 / Zod 추가)" = 내용 SSOT = **13**. 따라서 analysis-ui-visual-manifest-fe(L44)·analysis-form-validation-fe(L53) 의 "권위 매개체 13" 인용은 **정확**. stale 한 것은 **ADR 파일명**(`ADR-FE-005-권위-매개체-12-채택.md` = 12 잔존). skill 수정 ❌ (정확한 인용을 깨뜨릴 뻔 = ground-truth-before-edit 가 재작업 차단 / FP-2 위생 적발).
+- **Evidence:** `docs/adr/ADR-FE-005-권위-매개체-12-채택.md:1,4` (본문 13 / 파일명 12)
+- **Action:** skill 무변경(인용 정확). ADR 파일명 = immutable-history 영역(skill-citation EXCLUDE 대상) → 처분 = **wontfix-document**. 본 finding 은 "ADR 파일명 self-drift (본문 13 / 파일명 12)" 기록용.
+- **Status:** wontfix-document (수정 cycle 2026-05-17 — skill 무변경 / ledger 기록 유지)
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-008: hooks-bridge buildBlockOutput 가 hookSpecificOutput.hookEventName 누락
+
+- **Phase:** cross-validation
+- **Confidence:** high (Area C 감사 file:line)
+- **Type:** gap
+- **Description:** `tools/chain-driver/src/hooks-bridge.js:29-40` buildBlockOutput 이 `hookSpecificOutput` 에 `permissionDecision`+`additionalContext` 만 두고 spec 권장 `hookEventName` 미설정. H3 비차단(권장) — 완성도 감소.
+- **Evidence:** `tools/chain-driver/src/hooks-bridge.js:29-40`
+- **Action:** buildBlockOutput 에 hookEventName 추가 (deferred/batch / 권장 필드).
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-009: business-rules.schema.json 내부 `$id` 가 rename 전 구 명칭 잔존
+
+- **Phase:** cross-validation
+- **Confidence:** verified (XV 발견 / 1차 미탐)
+- **Type:** migration-risk
+- **Description:** v7.0.0 파일 rename 시 `schemas/business-rules.schema.json` 의 내부 `$id`(L3)가 여전히 rename 전 구 파일명(business-rules 미반영). F-PA-002 sweep 동반 처리 대상.
+- **Evidence:** `schemas/business-rules.schema.json:3`
+- **Action:** `$id` → `business-rules.schema.json` (F-PA-002 sweep 동반).
+- **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
+
+### F-PA-010: design-agent 의도된 빈 placeholder (규칙 위반 아님)
+
+- **Phase:** cross-validation
+- **Confidence:** high
+- **Type:** validation-result
+- **Description:** `agents/design-agent.md` = skills:[] 빈 placeholder / dispatch no-op. A1~A6 위반 ❌. 사용자 결정(DEC-2026-05-17 C-4 옵션 C) 으로 비기능 상태 투명 명시. rejected 처분 권고 (정보성).
+- **Evidence:** `agents/design-agent.md` frontmatter skills:[] + body 자기명시
+- **Action:** wontfix (의도된 설계 / 사용자 결정 / 규칙 무위반)
+- **Status:** wontfix

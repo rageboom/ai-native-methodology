@@ -29,7 +29,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 - `src/**/*.{tsx,jsx}` (component)
 - `src/**/*.hook.ts` (custom hook)
 - `src/**/*.context.tsx` (Context Provider)
-- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / **`react_version: "19"` schema marker 의무**)
+- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "react-19"` — schema modules.items.framework 필드)
 
 ## paradigm (★ React 19 / research 흡수)
 
@@ -74,7 +74,7 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 5. **Context Provider generate** — 전역 상태 = `src/contexts/Auth.context.tsx`.
 6. **commit_hash 채움** — `implement-generate-impl-spec` §4 동일 paradigm.
 7. **RTL test 진짜 호출** — `npx jest` 또는 `npx vitest` (사용자 명시 / auto-invoke ❌). 100% pass GREEN 의무 (fail_count = 0).
-8. **impl-spec.json 안 `react_version: "19"` marker 명시** — drift-validator 추적용.
+8. **impl-spec.json `modules[].framework` 에 `"react-19"` 명시** — drift-validator 추적용 (★ schema modules.items.framework 기존 필드 / top-level react_version ❌ = additionalProperties:false reject).
 
 ## GREEN 의무 (chain 4 종결 조건)
 
@@ -89,7 +89,7 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 
 - `methodology-spec/plugin-charter.md` §1 R14 + §3 G4
 - `skills/implement-generate-impl-spec/SKILL.md` (본 skill 의 BE sibling)
-- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (이중 렌더링 chain 4) §6 (no-simulation)
+- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (이중 렌더링 chain 4) §3 (no-simulation)
 - React 19 공식: https://react.dev/blog/2024/12/05/react-19
 
 ## When NOT to invoke
