@@ -9,6 +9,42 @@
 
 ---
 
+## [8.6.2] — 2026-05-18 ★ PATCH — R20 phase=enter 확장 (stage 진입 시 의무 작업 Task 1개 / analysis-planning = 도메인 단위 / spec-test-implement = per UC 단위) + enter Task 자동 종결 (phase=exit 시) + traceability-matrix `enter_task_ids` (additive / breaking 0)
+
+> ★ **v8.6.2 PATCH — R20 phase=enter 확장**. 사용자 "단지 티켓 따는것 뿐아니라 각 단계에서 일감을 따는 부분도 필요하다" → R20 channel 안에 stage **진입 시점** 동작 추가 (R20 기존 = 종료 시점만 / phase=exit). 의도 = "오늘 무엇 할지 Jira dashboard 만 봐도 가시화".
+>
+> 본 release = R20 channel 의 phase × stage matrix 확장 — **phase=enter (stage 진입 시 의무 작업 Task 1개)** + **phase=exit (기존 결과 batch + enter Task 자동 종결)**. default phase=exit (backward compat).
+>
+> ### 신규 자산 (v8.6.2)
+>
+> - **`schemas/ticket-sync-evidence.schema.json`** — `phase` enum (enter/exit) optional + `uc_id` pattern (phase=enter + stage ∈ spec/test/implement 시 의무)
+> - **`schemas/traceability-matrix.schema.json`** — `ticket_ref.enter_task_ids` optional (analysis/planning/spec/test/implement 별 enter Task id)
+> - **`skills/ticket-sync/SKILL.md`** — `phase` / `uc_id` / `issuetype_enter` 파라미터 추가 + phase=enter MCP call matrix (5 stage) + phase=exit 에서 enter Task 자동 종결 path
+> - **`methodology-spec/ticket-policy.md`** — §Tier 2.5 자동화 행동 = phase × stage matrix 재작성 + car 도메인 ticket 수 예시 (R20 기존 59 → R20 + A 확장 82)
+>
+> ### 회귀
+>
+> - schema-validator: 83 → **89/89 pass** (+6 phase=enter test — analysis/spec valid + uc_id pattern + phase enum + enter_task_ids valid + unknown key reject)
+> - chain-driver hooks-bridge: 15/15 유지
+> - 기존 ticket-sync evidence / traceability matrix sample 영향 0 (모든 신규 field optional)
+> - backward compat = default phase=exit (기존 R20 호출 무영향)
+>
+> ### 대안 비교 (B/C 결단 외)
+>
+> | 옵션 | 채택 | 사유 |
+> |---|---|---|
+> | **A. phase=enter stage 진입 시 의무 작업 Task ★** | ✅ | 충돌 0 / ticket 폭증 ❌ / Jira dashboard 가시화 |
+> | B. continuous emit (UC 1개당 즉시 Story) | ❌ | 결정론 axis 침범 + plugin TaskCreate 와 중복 + confirmation 과다 |
+> | C. BHV/AC/TC/IMPL 별 ticket | ❌ | ticket-policy.md §6 결단 위반 + 폭증 + artifact/process 영역 혼합 |
+>
+> ### car 도메인 ticket 수 (예시)
+>
+> - R20 기존 (59) = 1 Initiative + 23 Epic + 7 Story + 28 Sub-task
+> - **A 확장 추가 (+23) = +2 (analysis/planning 도메인 단위) + +21 (spec/test/implement × 7 UC)**
+> - 합계 = **82 ticket** (car 도메인 7 UC 완주 시)
+
+---
+
 ## [8.6.1] — 2026-05-18 ★ MINOR — charter R20 신설 (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only / R16·R17 부활 ❌ — 신규 채널) + `ticket-sync` skill + 7-field evidence schema + `traceability-matrix.ticket_ref.status_history` + PreToolUse `mcp__wiki-jira-assistant__.*` deny-when-blocked (additive)
 
 > ★ **v8.6.1 MINOR — R20 신설 (MCP Ticket Sync Channel)**. 사용자 "내가 만약에 티켓을 우리 일감과 연동한다고 할때 티켓은 어느시점에 따지는게 맞나? 아니면 각 시점 마다 별도로 따는게 맞나?" (Tier 1 정책 v8.6.0+ 04bd0a1) → "지금 이 티켓 정책도 우리 플러그인의 정책으로 넣을 수 있나?" → "각 단계가 끝날때 마다 상태가 바뀌도 하고 신규 티켓이 생기기도 해야 해 거기에 맞는 방법이야?" → "나는 jira-confluence mcp 가 있고 이를 이용하고 싶어. 결국 뭔가 동작전에 물어보면 되는거 아닌가?" 결단.

@@ -5,6 +5,7 @@
 > 신규 기능 / 변경 시 본 charter 의 20 항목 + §4 권장 디폴트 정합 의무.
 > ★ v8.6.0 (2026-05-18) — **R19 신설** (Tool Ecosystem Dependency Classification).
 > ★ v8.6.1 (2026-05-18) — **R20 신설** (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only).
+> ★ v8.6.2 (2026-05-18) — **R20 확장** (phase=enter — stage 진입 시 의무 작업 Task 1개 / analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 / DEC-2026-05-18-r20 §확장).
 
 ## §1 사용자 요구사항 20 (must-have / ★ R20 v8.6.1 신설 / R19 v8.6.0 / R18 v7.1.0 / R16·R17 영구 scope-out)
 
@@ -54,9 +55,9 @@
 | ~~R17~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15)** — 위와 동일 |
 | R18 | ✅ | (★ v7.1.0 신설 / DEC-2026-05-17-plugin-authoring-spec) `methodology-spec/plugin-authoring-spec.md` 단일 SSOT (Skill S1~S7 / Hook H1~H7 / Agent A1~A6 / Packaging P1~P4 + §6 공식 docs pin baseline) + `docs/adr/ADR-PLUGIN-001` + `scripts/release-readiness.js` **check #12** (§6 staleness 결정적 가드 60일) + §9 네트워크 재검증 cadence (`_base-official-docs-checker` dispatch). 감사 — 실 위반 S3 1건 ❌(한글 skill MAJOR rename 이연) + 1군 ⚠️(`_base-*` charset 이연) / 나머지 정합 |
 | R19 | ✅ | (★ v8.6.0 신설 / DEC-2026-05-18-runtime-tool-exclusion) `tools/static-runner/src/runner.js` 의 `IMPORTED_DRIVER_ALLOWLIST` + `importSarif` 함수 = 4 조건 강제 (driver allowlist `[pmd, spotbugs, codeql, daikon]` + non-empty results 또는 `non_use_rationale` 의무 + `reproduction_command` 의무 + `EVIDENCE_TRUST` enum `[real_tool, imported_sarif, simulated]`). Tier 3 (simulated) = chain gate -5%p + block. F-015 6/6 verbatim (Semgrep Python pipx / Spectral Node.js / PMD Java 8 or above / SpotBugs JRE 11+ / SARIF 2.1.0 Plus Errata 01). Senior STRONG-STOP 전면 흡수 (confidence 0.84) — `feedback_no_static_tool_simulation.md` 정합. |
-| R20 | ✅ | (★ v8.6.1 신설 / DEC-2026-05-18-r20-mcp-ticket-sync-channel) `skills/ticket-sync/SKILL.md` 5 stage matrix (analysis/planning/spec/test/implement) + `mcp__wiki-jira-assistant__*` 위임 (jira 18 + wiki 13 tools) + confirmation gate 의무 (preview MD → yes/no/dry-run halt) + 7-field evidence (`schemas/ticket-sync-evidence.schema.json` / static-runner `REQUIRED_EVIDENCE` 재사용) + `traceability-matrix.ticket_ref.status_history` + search-first idempotency (`jira_search` JQL by UC-*) + `hooks/hooks.json` PreToolUse matcher 에 `mcp__wiki-jira-assistant__.*` 추가 (state.blocked 시 deny). R16/R17 부활 ❌ — 신규 채널. |
+| R20 | ✅ | (★ v8.6.1 신설 / v8.6.2 확장 / DEC-2026-05-18-r20-mcp-ticket-sync-channel) `skills/ticket-sync/SKILL.md` 5 stage × 2 phase matrix (analysis/planning/spec/test/implement × enter/exit) + `mcp__wiki-jira-assistant__*` 위임 (jira 18 + wiki 13 tools) + confirmation gate 의무 (preview MD → yes/no/dry-run halt) + 7-field evidence (`schemas/ticket-sync-evidence.schema.json` / static-runner `REQUIRED_EVIDENCE` 재사용) + `traceability-matrix.ticket_ref.status_history` + `enter_task_ids` (v8.6.2) + search-first idempotency + `hooks/hooks.json` PreToolUse matcher 에 `mcp__wiki-jira-assistant__.*` 추가 (state.blocked 시 deny). ★ v8.6.2 phase=enter (stage 진입 시 의무 작업 Task 1개 / analysis-planning = 도메인 단위 / spec-test-implement = per UC 단위) + phase=exit (기존 결과 batch + enter Task 자동 종결 / backward compat). R16/R17 부활 ❌ — 신규 채널. |
 
-**요약 (v8.6.1 갱신)**: ✅ **17** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **18/18** 자산 대칭 (★ R20 v8.6.1 신설 / R19 v8.6.0).
+**요약 (v8.6.2 갱신)**: ✅ **17** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **18/18** 자산 대칭 (★ R20 v8.6.1 신설 + v8.6.2 phase=enter 확장 / R19 v8.6.0).
 
 ## §3 Gap 우선순위
 

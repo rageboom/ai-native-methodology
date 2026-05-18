@@ -16,6 +16,16 @@
       "enum": ["analysis", "planning", "spec", "test", "implement"],
       "description": "ticket-sync 호출 시점 chain stage. analysis = Initiative + Epic batch / planning (chain 1 종료) = Story batch / spec (chain 2) = Sub-task BHV/AC batch + Story In Progress 전이 / test (chain 3 RED) = AC sub-task Testing 전이 + RED evidence comment / implement (chain 4 GREEN) = AC sub-task Done + Story Done + GREEN evidence comment"
     },
+    "phase": {
+      "type": "string",
+      "enum": ["enter", "exit"],
+      "description": "★ v8.6.2+ — `enter` (stage 진입 시 의무 작업 Task 1개 생성 / analysis-planning = 도메인 단위 / spec-test-implement = per UC 단위) / `exit` (stage 종료 시 결과 batch + enter Task 자동 종결 / R20 기존 동작). 미지정 시 default = `exit` (backward compat)."
+    },
+    "uc_id": {
+      "type": "string",
+      "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
+      "description": "★ v8.6.2+ — phase=enter + stage ∈ {spec, test, implement} 시 의무. per UC 단위 Task 등록 (예: UC-CAR-007)"
+    },
     "scope": {
       "type": "string",
       "description": "G3 scope slug (예: car / payroll / mainpay) — `.aimd/<scope>/` 단위 격리"

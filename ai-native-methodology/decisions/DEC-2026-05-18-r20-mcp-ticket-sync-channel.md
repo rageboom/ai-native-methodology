@@ -98,3 +98,54 @@ DEC-2026-05-15-g1-itsm-permanent-scope-out §31 verbatim 인용:
 3. Auto-invoke 정책 — gate 통과 후 auto-suggest (confirmation gated) ★ 권고
 4. Idempotency — search-first ★ 권고 (재실행 시 기존 ticket lookup skip)
 5. MCP 미연결 — silent skip + `F-TICKETSYNC-001` finding emit ★ 권고
+
+---
+
+## ★ v8.6.2 PATCH 확장 — phase=enter (stage 진입 시 의무 작업 Task)
+
+★ 2026-05-18 / 동일 R20 channel 안 추가 동작 / additive / breaking 0.
+
+### 배경
+
+사용자 "단지 티켓 따는것 뿐아니라 각 단계에서 일감을 따는 부분도 필요하다" — chain stage **종료 시점** ticket 생성 (R20 기존) **외**, **진입 시점** "오늘 의무 작업" Task 등록 의무.
+
+### 결정
+
+- R20 channel 의 동작 = **phase × stage matrix** 로 확장
+- `phase=enter` (★ 신설) — stage 진입 시 의무 작업 Task 1개 등록 (analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위)
+- `phase=exit` (기존 R20) — stage 종료 시 결과 batch + enter Task 자동 종결
+- default `phase=exit` (backward compat / 기존 R20 동작 유지)
+- ticket-policy.md §6 (BHV/AC/TC/IMPL 별 별도 ticket ❌) **유지** — 본 확장은 stage 단위 Task 1개만 추가 (artifact 단위 ticket X)
+
+### 대안 비교 (B/C 안 되는 사유 명시)
+
+| 옵션 | 채택 | 사유 |
+|---|---|---|
+| **A. phase=enter stage 진입 시 의무 작업 Task 1개 ★** | **✅ 채택** | R20 sibling / 충돌 0 / ticket 폭증 ❌ / Jira dashboard 가시화 |
+| B. continuous emit (UC 1개당 즉시 Story) | ❌ | 결정론 axis 침범 + plugin TaskCreate 와 중복 + confirmation 과다 + rate limit 위험 |
+| C. BHV/AC/TC/IMPL 별 ticket | ❌ | ticket-policy.md §6 결단 위반 + 폭증 + artifact/process 영역 혼합 |
+
+### 신규 자산 (v8.6.2)
+
+| 경로 | 변경 |
+|---|---|
+| `schemas/ticket-sync-evidence.schema.json` | `phase` enum (enter/exit) optional + `uc_id` pattern (phase=enter + spec/test/implement 시 의무) |
+| `schemas/traceability-matrix.schema.json` | `ticket_ref.enter_task_ids` (analysis/planning/spec/test/implement) optional |
+| `skills/ticket-sync/SKILL.md` | `phase` 파라미터 + `uc_id` 파라미터 + `issuetype_enter` 파라미터 + phase=enter MCP call matrix + phase=exit 에서 enter Task 자동 종결 |
+| `methodology-spec/ticket-policy.md` | §Tier 2.5 자동화 행동 = phase × stage matrix 로 재작성 |
+| `tools/schema-validator/test/ticket-sync-evidence.test.js` | phase=enter valid 2 + uc_id pattern reject + phase enum reject + enter_task_ids valid + enter_task_ids unknown key reject = 6 신규 (83 → 89 pass) |
+
+### car 도메인 ticket 수 영향
+
+| 항목 | R20 기존 | A 추가 |
+|---|---|---|
+| Initiative / Epic / Story / Sub-task | 1 + 23 + 7 + 28 = 59 | 동일 |
+| **★ Enter Task (analysis/planning)** | — | **+2** (도메인 단위) |
+| **★ Enter Task (spec/test/implement)** | — | **+21** (7 UC × 3 chain) |
+| **합계** | **59** | **82** |
+
+### 회귀
+
+- schema-validator: 83 → **89/89 pass** (+6 phase=enter test)
+- 기존 evidence sample / traceability matrix sample 영향 0 (phase / uc_id / enter_task_ids 모두 optional)
+- backward compat = default phase=exit (기존 R20 호출 무영향)

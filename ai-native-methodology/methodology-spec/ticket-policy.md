@@ -133,15 +133,50 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 
 ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임으로 chain stage 동기 ticket lifecycle 자동화. **R16/R17 부활 ❌** — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+) — R16/R17 부활 ❌" 정합).
 
-### 자동화 행동 (5 stage matrix)
+### 자동화 행동 — phase × stage matrix (★ v8.6.2+ phase 분리)
+
+★ v8.6.2 PATCH (DEC-2026-05-18-r20 §확장 / 2026-05-18) — chain stage **진입 시점 (`phase=enter`)** + **종료 시점 (`phase=exit`)** 분리. 사용자 의도 "각 단계에서 일감을 따는 부분도 필요" 정합. backward compat = `phase=exit` default (기존 R20 동작).
+
+#### phase=enter — Stage 진입 시점 의무 작업 Task
+
+★ 의미 = "오늘 무엇을 할 지 Jira 에서 가시화" / 작업자가 dashboard 만 봐도 진행 중 작업 알 수 있음.
+
+| Stage | Skill 호출 | MCP 호출 | issuetype | parent | scope |
+|---|---|---|---|---|---|
+| analysis 진입 시 | `ticket-sync stage=analysis phase=enter` | 1 Task ("[Analysis] {scope} 분석 시작") | Task (default) | Initiative | 도메인 단위 |
+| Chain 1 (planning) 진입 시 | `ticket-sync stage=planning phase=enter` | 1 Task ("[Chain 1] {scope} UC 분해 작업") | Task (default) | Epic (도메인) | 도메인 단위 |
+| Chain 2 (spec) 진입 시 | `ticket-sync stage=spec phase=enter uc_id=UC-CAR-007` | 1 Task ("[Chain 2] {scope}/{uc_id} BHV/AC 작성") | Task (default) | Story (UC) | **per UC 단위** |
+| Chain 3 (test) 진입 시 | `ticket-sync stage=test phase=enter uc_id=UC-CAR-007` | 1 Task ("[Chain 3] {scope}/{uc_id} RED test 작성") | Task (default) | Story (UC) | **per UC 단위** |
+| Chain 4 (impl) 진입 시 | `ticket-sync stage=implement phase=enter uc_id=UC-CAR-007` | 1 Task ("[Chain 4] {scope}/{uc_id} GREEN impl 작성") | Task (default) | Story (UC) | **per UC 단위** |
+
+★ issuetype default = `Task` (Jira 기본 / universal). 사용자 환경 결단 시 env override 가능 (Spike / Story 등 선택).
+
+★ Stage 진입 시 Task 상태 = `To Do` (생성 직후). 사용자가 작업 시작하면 manual 또는 hook 자동 `In Progress` 전이.
+
+#### phase=exit — Stage 종료 시점 결과 batch (기존 R20 동작 / backward compat)
 
 | Stage | Skill 호출 | MCP 호출 |
 |---|---|---|
-| analysis 종료 후 | `ticket-sync stage=analysis` | 1 Initiative + N Epics (per BC) + Tech Debt Story (AP P0) |
-| Chain 1 (planning) 종료 후 | `ticket-sync stage=planning` | Story per UC-* + Sub-task 4 batch (chain1 done, chain2/3/4 pending) |
-| Chain 2 (spec) 종료 후 | `ticket-sync stage=spec` | Sub-task chain2 done / BHV/AC link comment / Story → In Progress |
-| Chain 3 (test) 종료 후 | `ticket-sync stage=test` | RED evidence comment / AC sub-task → Testing |
-| Chain 4 (impl) 종료 후 | `ticket-sync stage=implement` | GREEN evidence + commit hash / AC sub-task → Done / Story → Done |
+| analysis 종료 후 | `ticket-sync stage=analysis` (default phase=exit) | 1 Initiative + N Epics (per BC) + Tech Debt Story (AP P0) + (enter Task → Done 전이) |
+| Chain 1 (planning) 종료 후 | `ticket-sync stage=planning` | Story per UC-* + Sub-task 4 batch (chain1 done, chain2/3/4 pending) + (enter Task → Done) |
+| Chain 2 (spec) 종료 후 | `ticket-sync stage=spec` | Sub-task chain2 done / BHV/AC link comment / Story → In Progress + (enter Task → Done) |
+| Chain 3 (test) 종료 후 | `ticket-sync stage=test` | RED evidence comment / AC sub-task → Testing + (enter Task → Done) |
+| Chain 4 (impl) 종료 후 | `ticket-sync stage=implement` | GREEN evidence + commit hash / AC sub-task → Done / Story → Done + (enter Task → Done) |
+
+★ phase=exit 시 enter Task 자동 종결 — 즉 진입 Task 가 "오늘 의무 작업" / 종료 시점에 자동 close.
+
+#### car 도메인 7 UC 완주 시 ticket 수 예시
+
+| 항목 | 수 |
+|---|---|
+| Initiative | 1 |
+| Epic (도메인) | 23 (car 포함 / 전체) |
+| Story (UC) | 7 (car 만) |
+| Sub-task (per Story chain 1~4) | 28 (7 × 4) |
+| **★ Enter Task — analysis** | 1 (도메인) |
+| **★ Enter Task — planning** | 1 (도메인) |
+| **★ Enter Task — spec/test/implement** | 21 (per UC × chain 2~4 = 7 × 3) |
+| **합계 (car 도메인 / R20 + A 확장)** | **82 ticket** (R20 기존 59 + A 확장 23) |
 
 ### Confirmation gate (의무)
 

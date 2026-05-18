@@ -180,6 +180,134 @@ test('R20 traceability-matrix — ticket_ref.status_history valid sample', () =>
   rmSync(TMP, { recursive: true, force: true });
 });
 
+// ★ v8.6.2+ R20 phase=enter (stage 진입 시 의무 작업 Task) 회귀
+test('R20 v8.6.2 — phase=enter + stage=analysis valid (도메인 단위 Task)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'analysis',
+    phase: 'enter',
+    scope: 'car',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+      ticket_id_created: 'MIG-CAR-ENTER-001',
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `phase=enter analysis valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.2 — phase=enter + stage=spec + uc_id valid (per UC Task)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'spec',
+    phase: 'enter',
+    scope: 'car',
+    uc_id: 'UC-CAR-007',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+      ticket_id_created: 'MIG-CAR-007-SPEC-ENTER',
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `phase=enter spec per UC valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.2 — uc_id pattern reject (UC- prefix 의무)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'spec',
+    phase: 'enter',
+    scope: 'car',
+    uc_id: 'CAR-007', // UC- prefix 누락
+    mcp_invocations: [VALID_INVOCATION],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `uc_id pattern reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.2 — phase enum reject (unknown value)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'planning',
+    phase: 'invalid', // enum reject
+    mcp_invocations: [VALID_INVOCATION],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `phase enum reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.2 — traceability-matrix ticket_ref.enter_task_ids valid', () => {
+  ensureTmp();
+  const f = join(TMP, 'traceability-matrix.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    matrix: [{
+      use_case_id: 'UC-CAR-007',
+      status: 'green',
+      ticket_ref: {
+        platform: 'jira',
+        id: 'MIG-1234',
+        enter_task_ids: {
+          analysis: 'MIG-ENTER-AN',
+          planning: 'MIG-ENTER-PL',
+          spec: 'MIG-CAR-007-SPEC-ENTER',
+          test: 'MIG-CAR-007-TEST-ENTER',
+          implement: 'MIG-CAR-007-IMPL-ENTER',
+        },
+      },
+    }],
+    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `enter_task_ids valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.2 — enter_task_ids unknown stage key reject', () => {
+  ensureTmp();
+  const f = join(TMP, 'traceability-matrix.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    matrix: [{
+      use_case_id: 'UC-CAR-007',
+      status: 'green',
+      ticket_ref: {
+        platform: 'jira',
+        id: 'MIG-1234',
+        enter_task_ids: {
+          chain99_unknown: 'MIG-X', // stage enum 외 reject
+        },
+      },
+    }],
+    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
+  }));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `unknown stage key reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
 test('R20 traceability-matrix — status_history.mcp_tool pattern (mcp__wiki-jira-assistant__ prefix only)', () => {
   ensureTmp();
   const f = join(TMP, 'traceability-matrix.json');

@@ -117,6 +117,18 @@
                   "chain4_impl": {"type": "string"}
                 }
               },
+              "enter_task_ids": {
+                "type": "object",
+                "description": "★ v8.6.2+ R20 phase=enter — stage 진입 시점 의무 작업 Task ticket id 매핑 (선택). analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 (본 ticket_ref 가 속한 UC 의 enter Task). chain 종료 시 phase=exit 가 enter Task 자동 종결.",
+                "additionalProperties": false,
+                "properties": {
+                  "analysis": {"type": "string", "description": "analysis 진입 시 Task id (도메인 단위 / per UC 동일)"},
+                  "planning": {"type": "string", "description": "planning 진입 시 Task id (도메인 단위 / per UC 동일)"},
+                  "spec": {"type": "string", "description": "spec 진입 시 Task id (★ per UC)"},
+                  "test": {"type": "string", "description": "test 진입 시 Task id (★ per UC)"},
+                  "implement": {"type": "string", "description": "implement 진입 시 Task id (★ per UC)"}
+                }
+              },
               "status_history": {
                 "type": "array",
                 "description": "★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — ticket 상태 전이 timeline. MCP 호출 시 append (monotonic by transitioned_at). 사용자 Jira workflow 의 from→to status 기록 + 호출한 MCP tool + evidence cross-link.",

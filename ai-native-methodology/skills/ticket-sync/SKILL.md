@@ -27,8 +27,11 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 | 파라미터 | 타입 | 기본 | 비고 |
 |---|---|---|---|
 | `stage` | enum | (의무) | `analysis` \| `planning` \| `spec` \| `test` \| `implement` |
+| `phase` | enum | **`exit`** | ★ v8.6.2+ — `enter` (stage 진입 시 의무 작업 Task) \| `exit` (stage 종료 시 결과 batch / R20 기존). backward compat default = `exit`. |
 | `scope` | string | state.scope | G3 scope slug (예: `car` / `payroll`) — `.aimd/<scope>/` 경로 추출 |
+| `uc_id` | string | (없음) | ★ phase=enter + stage ∈ {spec, test, implement} 시 의무 (per UC 단위 Task). 예: `UC-CAR-007` |
 | `dry_run` | boolean | **`true`** | ★ default true — reproduction_command 만 print / MCP 호출 X. 사용자 OK 후 `dry_run=false` 명시 호출. |
+| `issuetype_enter` | string | `Task` | ★ v8.6.2+ — phase=enter Task 의 Jira issuetype. default `Task` (universal). 환경 결단 시 `Spike` / `Story` 가능. |
 | `confluence_emit` | boolean | `false` | analysis stage 시 Initiative-level Confluence overview page 생성 (v8.6.1 default false / 사용자 결단 시 활성). per-stage 보고서 page = v8.7.0+ Tier 2.6 carry. |
 
 ## 절차
@@ -101,9 +104,41 @@ stage 별 MCP 호출 batch 의 preview 표시. 예 (stage=planning, scope=car):
 
 ### 단계 5 — MCP 호출 (sequential / 결정론 보호)
 
-stage 별 MCP call matrix:
+phase × stage 별 MCP call matrix:
 
-#### analysis
+#### phase=enter (★ v8.6.2+ — stage 진입 시 의무 작업 Task)
+
+```
+analysis enter:
+  jira_create (Task, summary="[Analysis] {scope} 분석 시작",
+               issuetype=$issuetype_enter, parent=Initiative if exists,
+               status=To Do)
+  → enter_task_id 저장 (traceability-matrix.ticket_ref.enter_task_id 또는 별도)
+
+planning enter:
+  jira_create (Task, summary="[Chain 1] {scope} UC 분해 작업",
+               issuetype=$issuetype_enter, parent=Epic(scope),
+               status=To Do)
+
+spec enter (uc_id 의무):
+  jira_create (Task, summary="[Chain 2] {scope}/{uc_id} BHV/AC 작성",
+               issuetype=$issuetype_enter, parent=Story(uc_id),
+               status=To Do)
+
+test enter (uc_id 의무):
+  jira_create (Task, summary="[Chain 3] {scope}/{uc_id} RED test 작성",
+               issuetype=$issuetype_enter, parent=Story(uc_id),
+               status=To Do)
+
+implement enter (uc_id 의무):
+  jira_create (Task, summary="[Chain 4] {scope}/{uc_id} GREEN impl 작성",
+               issuetype=$issuetype_enter, parent=Story(uc_id),
+               status=To Do)
+```
+
+★ enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
+
+#### phase=exit — analysis (기존 R20 + enter Task 종결)
 ```
 1. jira_create (Initiative) → MIG-1
 2. for each BC in architecture.json:
@@ -113,9 +148,11 @@ stage 별 MCP call matrix:
    jira_create (Tech Debt Story) → MIG-AP-<n>
    jira_label_add (AP-{category})
 4. (optional confluence_emit=true) wiki_page_create (Initiative overview)
+5. ★ if exists enter_task_id (analysis enter):
+   jira_transition (enter_task_id → Done)
 ```
 
-#### planning (chain 1 종료)
+#### phase=exit — planning (chain 1 종료 + enter Task 종결)
 ```
 for each UC in planning-spec.use_cases[]:
    1. jira_create (Story, summary="[UC-CAR-007] ...", body=planning-spec UC body)
@@ -124,24 +161,30 @@ for each UC in planning-spec.use_cases[]:
    4. jira_create (Sub-task chain2_spec, status=To Do)
    5. jira_create (Sub-task chain3_test, status=To Do)
    6. jira_create (Sub-task chain4_impl, status=To Do)
+★ if exists enter_task_id (planning enter):
+   jira_transition (enter_task_id → Done)
 ```
 
-#### spec (chain 2 종료)
+#### phase=exit — spec (chain 2 종료 + enter Task 종결)
 ```
 for each Story:
    1. jira_transition (Story → "In Progress")
    2. jira_update (chain2_spec sub-task → Done)
    3. jira_comment (BHV/AC link MD)
+★ if exists enter_task_id (spec enter / per UC):
+   jira_transition (enter_task_id → Done)
 ```
 
-#### test (chain 3 종료, RED)
+#### phase=exit — test (chain 3 종료 / RED + enter Task 종결)
 ```
 for each Story:
    1. jira_comment (test-spec.json summary + RED evidence link)
    2. jira_transition (chain3_test sub-task → "Testing")
+★ if exists enter_task_id (test enter / per UC):
+   jira_transition (enter_task_id → Done)
 ```
 
-#### implement (chain 4 종료, GREEN)
+#### phase=exit — implement (chain 4 종료 / GREEN + enter Task 종결)
 ```
 for each Story:
    1. jira_comment (GREEN evidence + commit_hash)
@@ -149,9 +192,12 @@ for each Story:
    3. jira_transition (chain4_impl sub-task → "Done")
    4. jira_transition (Story → "Done")
 5. (optional confluence_emit=true) wiki_page_update (final report)
+★ if exists enter_task_id (implement enter / per UC):
+   jira_transition (enter_task_id → Done)
 ```
 
 ★ 각 호출 = Bash 로 stdout/stderr 캡쳐 → 7-field evidence record (`mcp_invocations[]` append).
+★ enter_task_id = traceability-matrix.ticket_ref.enter_task_ids[stage] (v8.6.2+ schema).
 
 ### 단계 6 — Evidence 기록
 
