@@ -18,7 +18,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join, basename, extname, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -81,8 +81,9 @@ function main() {
   const schemaDir = getArgValue(args, '--schema-dir') ?? DEFAULT_SCHEMA_DIR;
   const jsonOutput = args.includes('--json');
 
-  // Ajv setup
-  const ajv = new Ajv({ allErrors: true, strict: false, allowUnionTypes: true });
+  // Ajv setup — ★ Ajv 2020 (draft 2020-12 meta-schema 명시 import)
+  // 모든 schemas/*.schema.json 가 "$schema": "https://json-schema.org/draft/2020-12/schema" 사용 (F-V2-01 fix)
+  const ajv = new Ajv2020({ allErrors: true, strict: false, allowUnionTypes: true });
   addFormats(ajv);
 
   // Pre-load all schemas in dir for $ref resolution

@@ -24,6 +24,50 @@
 
 ★ install 직후 SessionStart hook 메시지 표시 — `[ai-native-methodology] Plugin loaded. v2.5 chain harness ready / Layer 2 LLM paradigm ✅`.
 
+## 1.5 외부 도구 사전 install — chain harness 동작 의무 (★ v8.5.0+ F-V2-05 신설)
+
+★ ★ ★ 본 plugin 의 **R15 (no-simulation 정책)** + chain 3/4 의 **real test runner** 의무로 다음 외부 도구가 사용자 환경에 필요. 부재 시 chain 단계 산출물이 차단되거나 F-SIM finding 자동 등재.
+
+### Core (필수)
+
+| 도구 | 의무 | 검증 |
+|---|---|---|
+| `node` ≥ 18 | chain-driver / 모든 17 cli tool 동작 | `node --version` |
+| `npm` | workspace test (release-readiness #11) | `npm --version` |
+
+### Stack-specific (해당 스택일 때 의무)
+
+| 도구 | 사용처 | 필요 stack |
+|---|---|---|
+| `mvn` + `javac` (JDK ≥ 1.8) | chain 3 RED + chain 4 GREEN test runner | Java/Spring (예: IFRS / EFI-WEB) |
+| `npx` + `vitest`/`jest`/`playwright` | 동상 | Node/NestJS/React |
+| `python3` + `pytest` | 동상 | Python/FastAPI |
+
+### Analysis cross-cutting (해당 skill 호출 시 의무 / 부재 시 F-SIM 자동 등재)
+
+| 도구 | 의무 skill |
+|---|---|
+| `semgrep` | `analysis-aspect-static-security` |
+| `pmd` (PMD-JSP 포함) | `analysis-html-template` (JSP 분석 / Scenario C) |
+| `spotbugs` | `analysis-aspect-legacy` |
+| `spectral` | `analysis-openapi` lint |
+| `axe-core` (Playwright 의존) | `analysis-aspect-a11y` |
+
+### 환경 진단 명령
+
+```bash
+# release 직전 또는 plugin install 직후 의무 호출:
+node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all
+
+# stack 지정 (Java/Spring 만):
+node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack java-spring
+
+# JSON 출력:
+node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
+```
+
+본 preflight 가 **core 도구 부재 시 exit 1** (release 차단). analysis 외부 도구 absent 는 warning + 사용자 결단. release-readiness check #14 (`preflight_tools`) 가 동일 logic 호출 — release 직전 자동 검증.
+
 ## 2. Sanity check (1분)
 
 ```bash

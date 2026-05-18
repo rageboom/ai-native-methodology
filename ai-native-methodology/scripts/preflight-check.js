@@ -1,0 +1,115 @@
+#!/usr/bin/env node
+/**
+ * preflight-check — chain harness 외부 도구 환경 검사 (★ F-V2-05 fix / v8.5.0+).
+ *
+ * Plugin 의 no-simulation 정책 (R15) 정합 — Semgrep / PMD / Maven / Java 등 외부 도구는
+ * "real 실행" 의무. 그러나 환경 부재 시 chain 3/4 의 RED/GREEN proof 측정 차단 →
+ * 사용자가 release 직전 본 check 로 환경 진단 가능.
+ *
+ * 사용:
+ *   node scripts/preflight-check.js [--stack java-spring|node-nestjs|python-fastapi|fe-react|all]
+ *                                   [--json]
+ *
+ * exit code:
+ *   0 — core 도구 (node ≥18) 모두 존재 (stack-specific 도구는 warning 만)
+ *   1 — core 도구 부재
+ *   2 — usage error
+ *
+ * stack 별 expected 도구:
+ *   - java-spring: mvn, javac (JDK ≥1.8)
+ *   - node-nestjs: npm, npx
+ *   - python-fastapi: python3, pip
+ *   - fe-react: npm, npx, (eslint, prettier — local install)
+ *   - all (default): 위 합집합 + Semgrep, PMD, Spectral, axe-core
+ *
+ * 참조: ADR-CHAIN-001 §3 (no-simulation), F-V2-05 (검증 환경 vs release 환경 분리),
+ *       finding F-SIM-005 (external tool absent fail_mode).
+ */
+
+import { spawnSync } from 'node:child_process';
+
+const TOOLS = {
+  // core (없으면 exit 1)
+  node:     { kind: 'core',    cmd: 'node',     versionFlag: '--version',   minVersion: '18' },
+  npm:      { kind: 'core',    cmd: 'npm',      versionFlag: '--version' },
+
+  // BE Java/Spring stack
+  mvn:      { kind: 'be-java', cmd: 'mvn',      versionFlag: '--version' },
+  javac:    { kind: 'be-java', cmd: 'javac',    versionFlag: '--version' },
+
+  // Python
+  python3:  { kind: 'be-py',   cmd: 'python3',  versionFlag: '--version' },
+  pip:      { kind: 'be-py',   cmd: 'pip',      versionFlag: '--version' },
+
+  // analysis stage external (no-simulation 의무)
+  semgrep:  { kind: 'analysis', cmd: 'semgrep',  versionFlag: '--version' },
+  pmd:      { kind: 'analysis', cmd: 'pmd',      versionFlag: '--version' },
+  spectral: { kind: 'analysis', cmd: 'spectral', versionFlag: '--version' },
+  spotbugs: { kind: 'analysis', cmd: 'spotbugs', versionFlag: '-version'  },
+};
+
+function checkTool(name, spec) {
+  const probe = spawnSync(spec.cmd, [spec.versionFlag], { encoding: 'utf-8', shell: true });
+  if (probe.status === 0 || (probe.stdout && probe.stdout.trim())) {
+    const version = (probe.stdout || probe.stderr || '').split('\n')[0].trim();
+    return { name, kind: spec.kind, installed: true, version, status: 'ok' };
+  }
+  return { name, kind: spec.kind, installed: false, version: null, status: 'absent' };
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`usage: preflight-check [--stack java-spring|node-nestjs|python-fastapi|fe-react|all] [--json]`);
+    process.exit(2);
+  }
+  const stackIdx = args.indexOf('--stack');
+  const stack = stackIdx >= 0 ? args[stackIdx + 1] : 'all';
+  const jsonOutput = args.includes('--json');
+
+  const results = [];
+  for (const [name, spec] of Object.entries(TOOLS)) {
+    if (stack !== 'all') {
+      if (stack === 'java-spring'    && !(spec.kind === 'core' || spec.kind === 'be-java' || spec.kind === 'analysis')) continue;
+      if (stack === 'node-nestjs'    && !(spec.kind === 'core' || spec.kind === 'analysis')) continue;
+      if (stack === 'python-fastapi' && !(spec.kind === 'core' || spec.kind === 'be-py'   || spec.kind === 'analysis')) continue;
+      if (stack === 'fe-react'       && !(spec.kind === 'core' || spec.kind === 'analysis')) continue;
+    }
+    results.push(checkTool(name, spec));
+  }
+
+  const coreAbsent = results.filter(r => r.kind === 'core' && !r.installed);
+  const analysisAbsent = results.filter(r => r.kind === 'analysis' && !r.installed);
+  const stackAbsent = results.filter(r => (r.kind === 'be-java' || r.kind === 'be-py') && !r.installed);
+
+  const passed = coreAbsent.length === 0;
+
+  const summary = {
+    stack,
+    pass: passed,
+    core_absent: coreAbsent.map(r => r.name),
+    analysis_absent: analysisAbsent.map(r => r.name),
+    stack_absent: stackAbsent.map(r => r.name),
+    no_simulation_warning: analysisAbsent.length > 0
+      ? `${analysisAbsent.length} analysis 외부 도구 부재 — chain 2 cross-cutting (static-security/openapi-lint/legacy) 실 실행 차단 / F-SIM 후속 등재 의무`
+      : null,
+  };
+
+  if (jsonOutput) {
+    console.log(JSON.stringify({ summary, results }, null, 2));
+  } else {
+    console.log(`preflight-check — stack=${stack}`);
+    console.log(`  ${passed ? '✅' : '❌'} core: ${coreAbsent.length === 0 ? 'all present' : coreAbsent.map(r => r.name).join(', ') + ' ABSENT'}`);
+    console.log(`  ${stackAbsent.length === 0 ? '✅' : '⚠️'} stack: ${stackAbsent.length === 0 ? 'all present' : stackAbsent.map(r => r.name).join(', ') + ' absent (chain 3/4 RED/GREEN 영향)'}`);
+    console.log(`  ${analysisAbsent.length === 0 ? '✅' : '⚠️'} analysis: ${analysisAbsent.length === 0 ? 'all present' : analysisAbsent.map(r => r.name).join(', ') + ' absent (★ no-simulation = F-SIM 후속 의무)'}`);
+    console.log('');
+    for (const r of results) {
+      const icon = r.installed ? '✅' : (r.kind === 'core' ? '❌' : '⚠️');
+      console.log(`  ${icon} ${r.name.padEnd(10)} [${r.kind.padEnd(9)}] ${r.installed ? r.version : 'ABSENT'}`);
+    }
+  }
+
+  process.exit(passed ? 0 : 1);
+}
+
+main();

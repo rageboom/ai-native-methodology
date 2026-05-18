@@ -54,18 +54,20 @@ function usage(code = 2) {
     '  --json                      machine-readable output',
     '  --skip-workspace-test       skip check #11 (test cadence 안 사용 / release 시 ❌)',
     '  --skip-authoring-staleness  skip check #12 (test cadence 안 사용 / release 시 ❌)',
+    '  --skip-preflight            skip check #14 (★ F-V2-05 — verifier env 외부 도구 검사 / release 시 ❌)',
   ].join('\n'));
   process.exit(code);
 }
 
 function parseArgs(argv) {
-  const out = { json: false, skipWorkspaceTest: false, skipAuthoringStaleness: false };
+  const out = { json: false, skipWorkspaceTest: false, skipAuthoringStaleness: false, skipPreflight: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
     else if (a === '--json') out.json = true;
     else if (a === '--skip-workspace-test') out.skipWorkspaceTest = true;
     else if (a === '--skip-authoring-staleness') out.skipAuthoringStaleness = true;
+    else if (a === '--skip-preflight') out.skipPreflight = true;
     else if (a === '--help' || a === '-h') usage(0);
   }
   return out;
@@ -449,12 +451,19 @@ function check11_workspaceTestPass(args) {
   const totalPass = sumMatches(/^# pass \d+/gm);
   const totalFail = sumMatches(/^# fail \d+/gm);
   const passed = result.status === 0 && totalFail === 0 && totalTests > 0;
+  // ★ F-V1-01 fix — 0 tests collected 별도 inconclusive 분기 (환경 진단 안내).
+  // 이전: 0/0 → pass=false / detail="regress: 0 fail / 0/0 pass / exit=0" (정확하지만 환경 vs 회귀 구분 불가)
+  // 갱신: 0/0 → pass=false + status:'inconclusive' + detail = 환경 진단 (release 차단 효과 동일)
+  const inconclusive = result.status === 0 && totalFail === 0 && totalTests === 0;
   return {
     id: 'workspace_test_pass',
     pass: passed,
+    ...(inconclusive ? { status: 'inconclusive' } : {}),
     detail: passed
       ? `workspace test ${totalPass}/${totalTests} pass / 0 fail / exit=0 ✅`
-      : `regress: ${totalFail} fail / ${totalPass}/${totalTests} pass / exit=${result.status}`,
+      : inconclusive
+        ? `inconclusive — 0 tests collected / exit=${result.status} (★ npm workspaces 인식 실패 또는 test script 부재. 사내 환경: package.json workspaces 필드 + 각 workspace 의 test script + node ≥18 + NODE_TEST_CONTEXT env 제거 확인 의무 / release 차단 효과 동일)`
+        : `regress: ${totalFail} fail / ${totalPass}/${totalTests} pass / exit=${result.status}`,
     delegated_to: 'npm test --workspaces --if-present (★ A1 / chain-driver Windows path 회귀 사례 정합 / LL-session-20-A1)',
   };
 }
@@ -605,6 +614,49 @@ function check13_skillCitationIntegrity() {
   };
 }
 
+// ★ ★ v8.5.0+ R15/F-V2-05 신설 — preflight 외부 도구 검사 (no-simulation 정책 강화).
+// chain harness 의 R15 (정적 도구 검증 의무 / 시뮬레이션 ❌) 정합 — Semgrep / PMD / Maven / Java 등
+// 외부 도구 부재 시 analysis cross-cutting + chain 3/4 RED/GREEN 측정 차단. 본 check 가 release 직전 환경 진단.
+// pass 기준: core 도구 (node + npm) 모두 present. stack/analysis 도구 absent 는 warning 만 (release 차단 ❌).
+// --skip-preflight flag 시 skip (release 시 본 flag ❌ 의무).
+function check14_preflightTools(args) {
+  if (args.skipPreflight) {
+    return {
+      id: 'preflight_tools',
+      pass: false,
+      detail: 'skipped via --skip-preflight (★ release 본격 시행 시 본 flag ❌ 의무 / F-V2-05)',
+      delegated_to: 'scripts/preflight-check.js (★ F-V2-05 / no-simulation 환경 진단)',
+    };
+  }
+  const r = spawnSync(
+    'node',
+    ['scripts/preflight-check.js', '--stack', 'all', '--json'],
+    { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 }
+  );
+  let parsed;
+  try {
+    parsed = JSON.parse(r.stdout || '{}');
+  } catch {
+    return {
+      id: 'preflight_tools',
+      pass: false,
+      detail: `preflight-check JSON parse fail (exit ${r.status})`,
+      delegated_to: 'scripts/preflight-check.js',
+    };
+  }
+  const s = parsed.summary || {};
+  const corePass = (s.core_absent || []).length === 0;
+  const analysisAbsent = (s.analysis_absent || []).length;
+  return {
+    id: 'preflight_tools',
+    pass: corePass,
+    detail: corePass
+      ? `core (node+npm) present ✅${analysisAbsent > 0 ? ` / ${analysisAbsent} analysis 외부 도구 absent (★ no-simulation warning — chain 2 cross-cutting/openapi-lint 실행 시 F-SIM 등재 의무): ${(s.analysis_absent || []).join(', ')}` : ' / all analysis 외부 도구 present ★ '}`
+      : `core 도구 부재: ${(s.core_absent || []).join(', ')} — release 차단 (★ chain harness 동작 자체 불가)`,
+    delegated_to: 'scripts/preflight-check.js (★ F-V2-05 / no-simulation 환경 진단 / ADR-CHAIN-001 §3 정합)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -623,6 +675,7 @@ function main() {
     check11_workspaceTestPass(args),
     check12_authoringSpecStaleness(args),
     check13_skillCitationIntegrity(),
+    check14_preflightTools(args),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;
