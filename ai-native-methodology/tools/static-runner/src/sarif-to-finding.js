@@ -1,7 +1,9 @@
 // ★ Sprint 5+ Phase D — SARIF → standardized finding 어댑터 (baseline.js fingerprint 호환).
-// SARIF 2.1.0 spec: https://docs.oasis-open.org/sarif/sarif/v2.1.0/csprd02/sarif-v2.1.0-csprd02.html
+// SARIF 2.1.0 Plus Errata 01 (OASIS Standard 28-Aug-2023):
+//   https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
 //
-// Semgrep / PMD / SpotBugs / CodeQL 등의 SARIF 출력을 단일 finding 형식으로 정규화.
+// Tier 1 (in-plugin Semgrep) 및 Tier 2 (사용자 환경 PMD/SpotBugs/CodeQL/Daikon 결과 import) 양쪽의
+// SARIF 출력을 단일 finding 형식으로 정규화.
 // finding 형식 (tools/_shared/baseline.js fingerprint 호환): { kind, severity, file, line, message, plugin }.
 
 import { readFileSync, existsSync } from 'node:fs';

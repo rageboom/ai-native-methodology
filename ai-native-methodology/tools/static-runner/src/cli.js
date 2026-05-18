@@ -1,11 +1,25 @@
 #!/usr/bin/env node
-// static-runner CLI — `npx static-runner --plugin semgrep --target <dir> --output <dir>`.
-// 환경 부재 시 PluginEnvironmentMissing throw → exit 3 ("환경 부재 — 사용자 위임" 정직 신호).
+// static-runner CLI
+//
+// ★ v8.6.0 — R19 Tier 1 (Semgrep in-plugin) + Tier 2 (사용자 환경 SARIF import).
+//
+//   Tier 1 사용 (in-plugin Semgrep):
+//     npx static-runner --plugin semgrep --target <dir> --output <dir>
+//
+//   Tier 2 사용 (사용자 환경 PMD/SpotBugs/CodeQL/Daikon 실행 후 SARIF import):
+//     npx static-runner --import-sarif <path> --import-driver pmd --output <dir> \
+//       [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]
+//
+//   환경 부재 시 PluginEnvironmentMissing throw → exit 3 ("환경 부재 — 사용자 위임" 정직 신호).
+//   import 시 4 조건 미만족 → ImportSarifRejected throw → exit 4 ("import 우회 표면 차단" 결정적 reject).
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join } from 'node:path';
-import { PLUGINS, PluginEnvironmentMissing, REQUIRED_EVIDENCE } from './runner.js';
+import {
+  PLUGINS, PluginEnvironmentMissing, REQUIRED_EVIDENCE,
+  importSarif, ImportSarifRejected, EVIDENCE_TRUST,
+} from './runner.js';
 import { readSarifFindings } from './sarif-to-finding.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../_shared/baseline.js';
 
@@ -16,7 +30,11 @@ function detectGitSha(targetDir) {
 }
 
 function parseArgs(argv) {
-  const opts = { plugins: [], target: null, output: null, ruleset: null, extraRules: [], extra: [], baseline: null, ratchet: false, writeBaseline: null };
+  const opts = {
+    plugins: [], target: null, output: null, ruleset: null, extraRules: [], extra: [],
+    baseline: null, ratchet: false, writeBaseline: null,
+    importSarif: null, importDriver: null, reproductionCommand: null, nonUseRationale: null,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--plugin') opts.plugins.push(argv[++i]);
@@ -27,15 +45,75 @@ function parseArgs(argv) {
     else if (a === '--baseline') opts.baseline = argv[++i];
     else if (a === '--ratchet') opts.ratchet = true;
     else if (a === '--write-baseline') opts.writeBaseline = argv[++i];
+    else if (a === '--import-sarif') opts.importSarif = argv[++i];
+    else if (a === '--import-driver') opts.importDriver = argv[++i];
+    else if (a === '--reproduction-command') opts.reproductionCommand = argv[++i];
+    else if (a === '--non-use-rationale') opts.nonUseRationale = argv[++i];
     else if (a === '--') opts.extra = argv.slice(i + 1).join(' ').split(' ').filter(Boolean);
   }
   return opts;
 }
 
+function usage() {
+  console.error('usage:');
+  console.error('  static-runner --plugin semgrep --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]');
+  console.error('  static-runner --import-sarif <path> --import-driver <pmd|spotbugs|codeql|daikon> --output <dir> [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]');
+}
+
 function main() {
   const opts = parseArgs(process.argv.slice(2));
+
+  // ★ Tier 2 — import-sarif 경로 (사용자 환경 결과 흡수)
+  if (opts.importSarif) {
+    if (!opts.output || !opts.importDriver) {
+      usage();
+      process.exit(2);
+    }
+    mkdirSync(opts.output, { recursive: true });
+    let run;
+    try {
+      run = importSarif({
+        sarifPath: opts.importSarif,
+        expectedDriver: opts.importDriver,
+        nonUseRationale: opts.nonUseRationale,
+        reproductionCommand: opts.reproductionCommand,
+        outputDir: opts.output,
+      });
+    } catch (err) {
+      if (err instanceof ImportSarifRejected) {
+        console.error(`[static-runner] ★★★ import rejected — ${err.reason}: ${err.detail}`);
+        console.error('[static-runner] ★ R19 Tier 2 4 조건 미만족 (driver allowlist / non-empty results / reproduction_command). 우회 차단.');
+        process.exit(4);
+      }
+      throw err;
+    }
+
+    const findings = readSarifFindings(run.sarifPath, run.plugin);
+    const manifestPath = join(opts.output, 'static-runner.evidence.json');
+    writeFileSync(manifestPath, JSON.stringify({
+      cross_validation: {
+        real_tool: false,                              // ★ in-process 실행 ❌ (사용자 환경)
+        imported_sarif: true,                          // ★ R19 Tier 2 명시
+        simulation_only: false,
+        runs: [{
+          plugin: run.plugin,
+          exit_code: run.exitCode,
+          sarif_path: run.sarifPath,
+          evidence: run.evidence,
+        }],
+        environment_missing: [],
+        findings_count: findings.length,
+        baseline_report: null,
+      },
+    }, null, 2));
+    console.log(`[static-runner] imported: driver=${run.plugin}, findings=${findings.length}, evidence_trust=${run.evidence.evidence_trust}`);
+    console.log(`[static-runner] manifest: ${manifestPath}`);
+    process.exit(0);
+  }
+
+  // ★ Tier 1 — in-plugin Semgrep 실행
   if (!opts.target || !opts.output || opts.plugins.length === 0) {
-    console.error('usage: static-runner --plugin <semgrep|pmd> --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]');
+    usage();
     process.exit(2);
   }
 
@@ -45,7 +123,7 @@ function main() {
   for (const pname of opts.plugins) {
     const plugin = PLUGINS[pname];
     if (!plugin) {
-      console.error(`[static-runner] unknown plugin: ${pname}`);
+      console.error(`[static-runner] unknown plugin: ${pname} (Tier 1 = semgrep / Tier 2 = --import-sarif)`);
       process.exit(2);
     }
     try {
@@ -53,7 +131,7 @@ function main() {
     } catch (err) {
       if (err instanceof PluginEnvironmentMissing) {
         console.error(`[static-runner] ${err.message}`);
-        console.error(`[static-runner] ★★★ NO SIMULATION — install ${pname} or delegate to CI environment.`);
+        console.error(`[static-runner] ★★★ NO SIMULATION — install ${pname} (e.g. pipx install semgrep) or delegate to CI environment.`);
         summary.environment_missing.push({ plugin: pname, detail: err.detail, ts: new Date().toISOString() });
         continue;
       }
@@ -110,6 +188,7 @@ function main() {
   writeFileSync(manifestPath, JSON.stringify({
     cross_validation: {
       real_tool: summary.runs.length > 0,
+      imported_sarif: false,
       simulation_only: summary.runs.length === 0,
       runs: summary.runs.map((r) => ({
         plugin: r.plugin,

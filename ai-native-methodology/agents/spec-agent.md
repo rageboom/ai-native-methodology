@@ -29,7 +29,7 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
 1. **품질 1순위 + 재작업 최소화 2순위**
-2. **No simulation** — behavior-spec 의 invariant + property test 는 진짜 도구 (Daikon / fast-check / hypothesis) 검증 의무
+2. **No simulation** — behavior-spec 의 invariant + property test 는 진짜 도구 (Tier 1 in-plugin: `fast-check` / `hypothesis` / Tier 2 사용자 환경 SARIF import: Daikon) 검증 의무
 3. **UC → BHV → AC forward link 의무** — chain-coverage-validator 자동 차단
 4. **verifiable=true → test_case_refs ≥ 1 의무** (chain 2 → 3 forward link / chain-coverage-validator 정합)
 

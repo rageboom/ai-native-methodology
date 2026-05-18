@@ -28,7 +28,7 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
 1. **품질 1순위 + 재작업 최소화 2순위**
-2. **No simulation** — Semgrep / SpotBugs / PMD / Daikon / axe-core 등 진짜 도구 실행 의무. AI persona 시뮬레이션 ❌ / 신뢰도 -5%p 패널티
+2. **No simulation** — R19 Tier 1 (Semgrep / axe-core / 등 in-plugin 실행) + Tier 2 (PMD / SpotBugs / CodeQL / Daikon 사용자 환경 SARIF import) 의무. AI persona 시뮬레이션 ❌ / 신뢰도 -5%p 패널티
 3. **§8.1 단일 PoC 과적합 회피** — ≥ 2 PoC corroboration 후 본체 격상
 4. **Round-trip out of scope** — analysis = one-way 추출만 / round-trip ❌
 

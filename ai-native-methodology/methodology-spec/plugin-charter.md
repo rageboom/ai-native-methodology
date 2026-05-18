@@ -2,9 +2,11 @@
 
 > 본 플러그인이 **반드시 가져야 하는 능력**의 단일 SSOT.
 > 작성일 2026-05-15 / 작성자 윤주스 (TF Lead).
-> 신규 기능 / 변경 시 본 charter 의 17 항목 + §4 권장 디폴트 정합 의무.
+> 신규 기능 / 변경 시 본 charter 의 20 항목 + §4 권장 디폴트 정합 의무.
+> ★ v8.6.0 (2026-05-18) — **R19 신설** (Tool Ecosystem Dependency Classification).
+> ★ v8.6.1 (2026-05-18) — **R20 신설** (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only).
 
-## §1 사용자 요구사항 18 (must-have / ★ R18 v7.1.0 신설 / R16·R17 영구 scope-out)
+## §1 사용자 요구사항 20 (must-have / ★ R20 v8.6.1 신설 / R19 v8.6.0 / R18 v7.1.0 / R16·R17 영구 scope-out)
 
 | # | 요구 | 범주 |
 |---|------|------|
@@ -26,6 +28,8 @@
 | ~~R16~~ | ~~작업은 MCP 를 통해 티켓 등록~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용 |
 | ~~R17~~ | ~~모든 단계마다 티켓 발행~~ | ★ **영구 scope-out (v3.6.0 / 2026-05-15)** — 위와 동일 |
 | R18 | **플러그인 자산(Skill/Hook/Agent/packaging)은 Anthropic 공식 best practice 정합** + 공식 docs 변경 시 재검증 — `plugin-authoring-spec.md` 단일 SSOT (★ v7.1.0 신설 / 사용자 결단 = 정식 R / §5 backlog ❌) | plugin-authoring |
+| R19 | **외부 도구 의존 분류** — Tier 1 (in-plugin native / JVM 의존 0) / Tier 2 (사용자 환경 SARIF import / JVM 의존 도구) / Tier 3 (simulated 영구 reject). 4 조건 schema-level 강제 (driver allowlist + non-empty results + reproduction_command + evidence_trust 3-tier) — ★ v8.6.0 신설 (Senior STRONG-STOP 전면 흡수 / no-simulation 정책 정합 / sub-axis evolution paradigm 정합) | tool-ecosystem |
+| R20 | **MCP Ticket Sync Channel** — chain stage 종료 동기로 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 호출 / 모든 호출 직전 사용자 confirmation gate 의무 / 7-field evidence 캡쳐 / Tier 2.5 (MCP delegation) only — Tier 3 (자체 platform adapter) = v9.0+ carry. R16/R17 부활 ❌ — DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+)" 정합. ★ v8.6.1 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) | ticket-lifecycle |
 
 ## §2 현 구현 매핑 (v3.1.0 기준 / 2026-05-15)
 
@@ -45,12 +49,14 @@
 | R12 | ✅ | (★ v3.5.0 G5 종결) `flows/sdlc-4stage-flow.json` + `skills-axis.md` + **`methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스** (★ stage × (agent / skill / hook / tool / validator) 8 row 본 매트릭스 + 부 매트릭스 R8 입력 6 row / 사용자 진입 시 단일 SSOT) |
 | R13 | ✅ | `sdlc-4stage-flow.json` `revisit_edges` 6종 (planning↔analysis, spec↔planning, test↔spec, impl↔{test,spec,planning,analysis}) |
 | R14 | ✅ | (★ v3.4.0 G4 종결 / 2026-05-15) `be-fe-separation.md` + scenario A/B/C. **FE skill 9** = analysis 5 (`-fe` + `analysis-from-figma`) + chain 4 `implement-react`/`implement-vue` + chain 3 `test-playwright` + Scenario C `analysis-html-template`. chain 4 FE impl 분기 + e2e POM paradigm + JSP 외부 도구 검증 모두 자산화. |
-| R15 | ✅ | `tools/static-runner/` (eslint/prettier/semgrep/tslint/stylelint/hadolint) + gate #4 강제 + no-simulation 정책 |
+| R15 | ✅ | `tools/static-runner/` Tier 1 = Semgrep (in-plugin / JVM 의존 0) + Tier 2 = 사용자 환경 SARIF import (PMD/SpotBugs/CodeQL/Daikon) + gate #4 강제 + no-simulation 정책 + 4 조건 schema-level enforcement (v8.6.0 R19 정합) |
 | ~~R16~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용. plan-itsm-jira-chain-integration.md 도 이미 폐기 완료 (session 16차). |
 | ~~R17~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15)** — 위와 동일 |
 | R18 | ✅ | (★ v7.1.0 신설 / DEC-2026-05-17-plugin-authoring-spec) `methodology-spec/plugin-authoring-spec.md` 단일 SSOT (Skill S1~S7 / Hook H1~H7 / Agent A1~A6 / Packaging P1~P4 + §6 공식 docs pin baseline) + `docs/adr/ADR-PLUGIN-001` + `scripts/release-readiness.js` **check #12** (§6 staleness 결정적 가드 60일) + §9 네트워크 재검증 cadence (`_base-official-docs-checker` dispatch). 감사 — 실 위반 S3 1건 ❌(한글 skill MAJOR rename 이연) + 1군 ⚠️(`_base-*` charset 이연) / 나머지 정합 |
+| R19 | ✅ | (★ v8.6.0 신설 / DEC-2026-05-18-runtime-tool-exclusion) `tools/static-runner/src/runner.js` 의 `IMPORTED_DRIVER_ALLOWLIST` + `importSarif` 함수 = 4 조건 강제 (driver allowlist `[pmd, spotbugs, codeql, daikon]` + non-empty results 또는 `non_use_rationale` 의무 + `reproduction_command` 의무 + `EVIDENCE_TRUST` enum `[real_tool, imported_sarif, simulated]`). Tier 3 (simulated) = chain gate -5%p + block. F-015 6/6 verbatim (Semgrep Python pipx / Spectral Node.js / PMD Java 8 or above / SpotBugs JRE 11+ / SARIF 2.1.0 Plus Errata 01). Senior STRONG-STOP 전면 흡수 (confidence 0.84) — `feedback_no_static_tool_simulation.md` 정합. |
+| R20 | ✅ | (★ v8.6.1 신설 / DEC-2026-05-18-r20-mcp-ticket-sync-channel) `skills/ticket-sync/SKILL.md` 5 stage matrix (analysis/planning/spec/test/implement) + `mcp__wiki-jira-assistant__*` 위임 (jira 18 + wiki 13 tools) + confirmation gate 의무 (preview MD → yes/no/dry-run halt) + 7-field evidence (`schemas/ticket-sync-evidence.schema.json` / static-runner `REQUIRED_EVIDENCE` 재사용) + `traceability-matrix.ticket_ref.status_history` + search-first idempotency (`jira_search` JQL by UC-*) + `hooks/hooks.json` PreToolUse matcher 에 `mcp__wiki-jira-assistant__.*` 추가 (state.blocked 시 deny). R16/R17 부활 ❌ — 신규 채널. |
 
-**요약 (v7.1.0 갱신)**: ✅ **15** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **16/16** 자산 대칭 (★ R18 v7.1.0 신설).
+**요약 (v8.6.1 갱신)**: ✅ **17** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **18/18** 자산 대칭 (★ R20 v8.6.1 신설 / R19 v8.6.0).
 
 ## §3 Gap 우선순위
 

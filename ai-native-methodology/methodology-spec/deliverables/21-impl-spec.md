@@ -55,7 +55,7 @@
 | **★ ★ ★ test-impl-pass-validator** (sub-plan-3) | 진짜 runner 호출 / 100% pass / 5종 물증 7 필드 |
 | schema-validator | impl-spec.schema.json (★ fail_count const 0 강제) |
 | chain-coverage-validator | severity_floor (critical=1.0 / DO-178C DAL A) |
-| static-runner (★ 진짜 도구 6종) | linter / Semgrep / PMD / SpotBugs / etc |
+| static-runner (★ 진짜 도구) | R19 Tier 1 (in-plugin: Semgrep / linter) + Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / CodeQL / Daikon) |
 | chain-revisit-detector | impl 변경 시 spec/test 영향 자동 감지 → gate prompt |
 
 ## 5. test_pass_evidence (★ ★ ★ no-simulation 강화)

@@ -14,7 +14,7 @@ You are one of three sub-agents in the 4원칙 §2 toolkit (senior / official-do
 # Absolute priorities (CLAUDE.md ★★★)
 
 1. **Quality 1순위, 재작업 최소화 2순위.** Speed / quick-win / context-freshness are subordinate.
-2. **No simulation.** Static analysis / cross-validation must use real external tools (Semgrep / PMD / SpotBugs / Daikon / CodeQL / SonarQube). AI persona simulation is forbidden — penalize confidence -5%p if used.
+2. **No simulation.** Static analysis / cross-validation must use real external tools — R19 Tier 1 (in-plugin: Semgrep / Spectral) or Tier 2 (user-environment SARIF import: PMD / SpotBugs / CodeQL / Daikon / SonarQube). AI persona simulation is forbidden — penalize confidence -5%p if used.
 3. **§8.1 단일 PoC 과적합 회피.** Promotion / disposal / order decisions require ≥2 PoC corroboration before body changes.
 4. **Round-trip out of scope.** This methodology is a **one-way extractor** (legacy code → 7 deliverables + finding + antipatterns + migration-cautions). Do not propose round-trip validation.
 

@@ -237,7 +237,7 @@ dist/ai-native-methodology-v3.6.9/
 │   ├── decision-table-validator/     dmn-check 5종
 │   ├── formal-spec-link-validator/   Phase 4.5 cross-link
 │   ├── spectral-runner/              OpenAPI lint (★ 진짜 외부 도구)
-│   ├── static-runner/                Semgrep / PMD / SpotBugs plugin host + custom rules
+│   ├── static-runner/                Semgrep (Tier 1) + SARIF import (Tier 2 / PMD·SpotBugs·CodeQL·Daikon) — R19
 │   ├── schema-validator/             chain 산출물 6 schema 검증
 │   ├── planning-extraction-validator/ chain 1 / source-grounded ≥ 0.80
 │   ├── chain-coverage-validator/     chain 2 / UC→BHV→AC ≥ 0.85

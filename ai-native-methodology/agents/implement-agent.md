@@ -30,7 +30,7 @@ chain 0~3 skill ❌ — 각 stage agent 권한.
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
 1. **품질 1순위 + 재작업 최소화 2순위**
-2. **No simulation** — 진짜 runner 실행 의무 + static-runner 6 plugin (Semgrep / PMD / SpotBugs / ESLint / Bandit / Snyk) 실 실행
+2. **No simulation** — 진짜 runner 실행 의무 + static-runner R19 Tier 1 (in-plugin Semgrep / ESLint) + Tier 2 (사용자 환경 SARIF import — PMD / SpotBugs / CodeQL / Daikon / Bandit / Snyk 환경 의존)
 3. **GREEN 의무 / i-strict** — chain 4 종결 시 모든 test 100% pass (fail_count: 0 / pass_count > 0). 미충족 시 chain harness gate #4 차단
 4. **traceability-matrix 100% green 의무** — forward + backward coverage = 1.0 / 모든 cell status=green
 
@@ -55,7 +55,7 @@ chain 0~3 skill ❌ — 각 stage agent 권한.
    - 5종 물증 7 필드 + fail_count: 0 의무
    - 100% pass 미충족 시 → impl 수정 후 재실행 (revisit-loop)
 
-5. **static-runner 진짜 도구 실행 의무** — 6 plugin (Semgrep / PMD / SpotBugs / ESLint / Bandit / Snyk) lint-no-simulation chain-strict mode
+5. **static-runner 진짜 도구 실행 의무** — R19 Tier 1 (in-plugin Semgrep / ESLint) + Tier 2 (사용자 환경 SARIF import / PMD / SpotBugs / CodeQL / Daikon) / `lint-no-simulation chain-strict mode` (evidence_trust ∈ {real_tool, imported_sarif} 양쪽 강제 / simulated reject)
 
 6. **traceability-matrix 100% green 의무** — `_base-build-traceability-matrix` 호출:
    - forward + backward coverage = 1.0

@@ -21,12 +21,9 @@ ADR-010 fixes this: capture the baseline once, then **ratchet** — new findings
 ## Steps
 
 1. **Identify the analysis target** — confirm with user: which legacy codebase / branch / commit ref?
-2. **Run baseline tools** — real external tools, not simulation:
-   - Semgrep (`tools/static-runner` adapter)
-   - SpotBugs (Java)
-   - PMD (Java)
-   - ESLint (JS/TS)
-   - Bandit (Python)
+2. **Run baseline tools** — real external tools, not simulation (★ R19 Tier 명시):
+   - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint
+   - **Tier 2 (user-environment SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+) / CodeQL / Daikon / Bandit (Python) → `tools/static-runner --import-sarif <path> --import-driver <name>`
    - Whichever applies to the target language stack
 3. **Capture baseline counts and findings** — write to `<user-project>/.aimd/baseline-<YYYY-MM-DD>.json`:
    ```json

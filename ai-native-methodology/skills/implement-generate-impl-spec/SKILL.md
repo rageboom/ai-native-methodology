@@ -107,7 +107,7 @@ node tools/test-impl-pass-validator/src/cli.js \
 ### 6. coverage_report_path / linter_output_path 채움
 
 ```bash
-# static-runner 6종 (Semgrep / PMD / SpotBugs / 등)
+# static-runner R19 Tier 1 (Semgrep in-plugin) + Tier 2 (SARIF import / PMD / SpotBugs / CodeQL / Daikon)
 bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
 ```
 

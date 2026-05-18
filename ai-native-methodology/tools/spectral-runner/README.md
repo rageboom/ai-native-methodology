@@ -51,7 +51,7 @@ npx spectral lint <openapi.yaml> \
 
 ## Sibling tools
 
-- [`../static-runner/`](../static-runner/) — 진짜 외부 도구 #2 (Semgrep / PMD / SpotBugs / Daikon / CodeQL)
+- [`../static-runner/`](../static-runner/) — 진짜 외부 도구 #2 (R19 Tier 1 = Semgrep / Tier 2 = SARIF import for PMD·SpotBugs·CodeQL·Daikon)
 - [`../formal-spec-link-validator/`](../formal-spec-link-validator/) — Phase 4.5 cross-link (api-extension.json formal_spec_links 검증)
 
 ## 참조

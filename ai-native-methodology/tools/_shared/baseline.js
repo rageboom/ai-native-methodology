@@ -5,7 +5,7 @@
 // finding 형식 호환:
 //   - drift-validator: { kind, json, mermaid, severity, message, ... }
 //   - decision-table-validator: { kind, severity, table_index, location, column_index, ... }
-//   - static-runner: { kind, severity, file, line, ... } (Phase D — Semgrep/PMD finding 어댑터 거쳐서)
+//   - static-runner: { kind, severity, file, line, ... } (Phase D — Semgrep + SARIF import finding 어댑터 거쳐서 / R19 Tier 1+2)
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';

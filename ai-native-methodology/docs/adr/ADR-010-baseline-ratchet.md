@@ -206,7 +206,8 @@ AI code gen SOTA pass rate (60~88%) gap 봉쇄:
 
 ### 변경 이력 추가
 - 2026-05-06: §2.6 신설 — chain 4단계 coverage ratchet baseline (DEC-2026-05-06-v2.0-i-strict-채택 / ADR-CHAIN-001 §2 정합).
+- **2026-05-18 (★ v8.6.0)**: §3 / §4 도구 list patch — charter R19 (Tool Ecosystem Dependency Classification) 정합. static-runner Tier 1 (in-plugin Semgrep) baseline + ratchet 패턴 유지 / Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / CodeQL / Daikon) 는 별도 `evidence_trust=imported_sarif` 등급 (finding 어댑터 통과 후 baseline 패턴 동일 작동). DEC-2026-05-18-runtime-tool-exclusion. F-015 verbatim: PMD = **Java 8 or above** (당초 "JRE 17+" 사실 오류 정정 / LL-rte-04).
 
 ---
 
-**End of ADR-010 (★ v2 §2.6 확장 포함).**
+**End of ADR-010 (★ v2 §2.6 확장 + v8.6.0 R19 patch 포함).**

@@ -39,16 +39,20 @@
 
 ★ build-plugin.js EXCLUDE_BASENAMES (test/tests/__tests__/corpus/fixtures/coverage) 으로 dist 자동 누락 (cleanup round 2-A 정합).
 
-## 진짜 외부 도구 통합 (★ ★ ★ no-simulation 정책)
+## 진짜 외부 도구 통합 (★ ★ ★ no-simulation 정책 / R19 정합)
 
-DEC-2026-04-29-static-tool-실행-의무화 정합. AI sub-agent persona 시뮬레이션 ❌ / 진짜 도구 실 실행 의무.
+DEC-2026-04-29-static-tool-실행-의무화 + DEC-2026-05-18-runtime-tool-exclusion 정합. AI sub-agent persona 시뮬레이션 ❌ / 진짜 도구 실 실행 의무.
 
-| 외부 도구 | wrapper | 환경 의무 |
-|---|---|---|
-| Spectral (OpenAPI lint) | `spectral-runner/` | npm install 의존 (package-lock 보존) |
-| Semgrep (정적 분석) | `static-runner/` | pip install semgrep / Python 3.10+ / `PYTHONUTF8=1` (Windows 한국어) |
-| PMD | `static-runner/` | Java 17+ |
-| SpotBugs / Daikon / CodeQL | (carry / v2.x) | future extension |
+charter R19 (Tool Ecosystem Dependency Classification) 의 3-tier paradigm:
+
+| Tier | 도구 | wrapper | 환경 의무 |
+|---|---|---|---|
+| **1** (in-plugin native) | Spectral (OpenAPI lint) | `spectral-runner/` | npm install 의존 (Node.js) |
+| **1** (in-plugin native) | Semgrep (정적 분석 / multi-language) | `static-runner/` | `pipx install semgrep` / Python 3.10+ / `PYTHONUTF8=1` (Windows 한국어) |
+| **2** (user-environment SARIF import) | PMD / SpotBugs / CodeQL / Daikon | `static-runner/ --import-sarif` | 사용자 CI / 로컬 환경 (Java 8+ / JRE 11+ / JDK / runtime trace) — plugin 환경 실행 ❌ |
+| **3** (simulated) | ❌ AI persona / 손작성 SARIF | — | 영구 reject (chain gate -5%p + block) |
+
+★ v8.6.0 격하 사유: plugin 배포 환경 (Claude Code / Node.js 기반) 에서 JVM/JDK/Maven/Gradle/bytecode 컴파일 환경 보장 비현실. Tier 2 = SARIF 2.1.0 (OASIS Standard) 결과 import 패턴으로 위임.
 
 ## chain harness validator 4종 (sub-plan-3a/3b/4 정합)
 

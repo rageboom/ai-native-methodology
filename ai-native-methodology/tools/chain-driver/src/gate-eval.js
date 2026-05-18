@@ -89,6 +89,15 @@ export function evaluateGate(stage, findings) {
         detail: `chain 4 expected ${IMPL_STAGE_EXPECTED} (GREEN), but ${findings.tests_failed} tests failed`,
       });
     }
+    // ★ ★ ★ v8.6.0 — R19 evidence_trust 3-tier chain-strict mode 격상 (Senior STRONG-STOP 흡수).
+    //   Tier 3 (simulated) emit 검출 시 영구 reject — chain gate block.
+    //   findings.simulated_evidence_count > 0 시 block (static-runner evidence_trust=simulated 감지 결과).
+    if ((findings.simulated_evidence_count ?? 0) > 0) {
+      reasons.push({
+        code: 'evidence_missing',
+        detail: `★ R19 Tier 3 (simulated) evidence detected ×${findings.simulated_evidence_count} — no-simulation 정책 정면 위반 / chain gate -5%p + block`,
+      });
+    }
   }
 
   if (reasons.length === 0) {

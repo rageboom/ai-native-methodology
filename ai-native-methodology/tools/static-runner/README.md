@@ -1,8 +1,16 @@
-# static-runner/ — 외부 정적 분석 host (★ ★ ★ no-simulation 정책 핵심 enforcement)
+# static-runner/ — 외부 정적 분석 host (★ ★ ★ no-simulation 정책 핵심 enforcement / R19 정합)
 
 ## Purpose
 
-진짜 외부 정적 분석 도구 (Semgrep / PMD / SpotBugs / Daikon / CodeQL) 통합 host. ★ ★ ★ **no-simulation 정책 enforcement** (DEC-2026-04-29-static-tool-실행-의무화). AI sub-agent persona 시뮬레이션 ❌ / 진짜 도구 실행 의무.
+진짜 외부 정적 분석 도구 host. **charter R19 (Tool Ecosystem Dependency Classification) 정합** — JVM/추가 환경 의무 도구는 사용자 환경 위임 (★ v8.6.0 신설). ★ ★ ★ **no-simulation 정책 enforcement** (DEC-2026-04-29-static-tool-실행-의무화 / DEC-2026-05-18-runtime-tool-exclusion).
+
+| Tier | 도구 | 실행 환경 | evidence_trust |
+|---|---|---|---|
+| **Tier 1** (in-plugin native) | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0) | plugin 환경 (사용자 1회 install) | `real_tool` |
+| **Tier 2** (user-environment SARIF import) | **PMD** (Java 8 or above) / **SpotBugs** (JRE 11+) / **CodeQL** (JDK + DB build) / **Daikon** (Java + runtime trace) | 사용자 CI / 로컬 | `imported_sarif` |
+| **Tier 3** (simulated) | ❌ AI persona / 손작성 / `manual` driver SARIF | — | `simulated` → 영구 reject (-5%p) |
+
+★ v8.6.0 격하 근거: plugin 배포 환경 (Claude Code / Node.js 기반) 에서 JVM/JDK/Maven/Gradle/bytecode 컴파일 환경 보장 비현실 → in-plugin 실행 ❌. 사용자 환경 SARIF import 패턴 = Adzic SBE 10년 폐기 함정 정공법 (시뮬 ❌ + 실 사용자 환경 의무).
 
 ## 핵심 원칙
 
@@ -13,16 +21,19 @@
 
 - **trigger**: Phase 4.5+ / Phase 6 quality / chain 4 impl 후
 - **호출자**: skill `analysis-aspect-static-security` / `analysis-quality-antipattern` 자동 호출
-- **수동**: `npx static-runner --plugin <name> ...`
+- **수동**: `npx static-runner --plugin <name> ...` (Tier 1) / `npx static-runner --import-sarif <path> ...` (Tier 2)
 
 ## Inputs
 
+### Tier 1 — in-plugin Semgrep
+
 ```bash
+# 사용자 1회 install (PEP 668 격리 권장)
+pipx install semgrep
+# 또는 brew install semgrep / uv tool install semgrep
+
 # 단일 plugin
 npx static-runner --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
-
-# 여러 plugin
-npx static-runner --plugin semgrep --plugin pmd --target ./src --output ./out
 
 # ★ v1.4.2 — `--extra-rules` 옵션 (custom Semgrep rule)
 npx static-runner --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten \
@@ -33,16 +44,45 @@ npx static-runner --plugin semgrep ... --baseline .baseline.json --ratchet
 npx static-runner --plugin semgrep ... --write-baseline .baseline.json
 ```
 
+### Tier 2 — 사용자 환경 SARIF import (★ v8.6.0 신설)
+
+사용자가 자체 환경 (사내 CI / 로컬 Java 환경) 에서 도구 실행 후 SARIF 결과 흡수:
+
+```bash
+# 1. 사용자 환경 — 예: PMD 실행 (Java 8 or above)
+pmd check -d ./src -R rulesets/java/quickstart.xml -f sarif -r ./out/pmd.sarif
+
+# 2. plugin — SARIF import
+npx static-runner --import-sarif ./out/pmd.sarif --import-driver pmd --output ./out \
+  --reproduction-command "pmd check -d ./src -R rulesets/java/quickstart.xml -f sarif"
+
+# 빈 SARIF (results=[]) 인 경우 = non_use_rationale 의무 (Adzic SBE 함정 회피)
+npx static-runner --import-sarif ./out/spotbugs.sarif --import-driver spotbugs --output ./out \
+  --reproduction-command "spotbugs -sarif=./out/spotbugs.sarif ..." \
+  --non-use-rationale "legacy module — SpotBugs 결함 0 사실 기록"
+```
+
+### Tier 2 4 조건 schema-level 강제 (★ Senior STRONG-STOP 흡수)
+
+| # | 조건 | 미만족 시 |
+|---|---|---|
+| 1 | driver.name allowlist `[pmd, spotbugs, codeql, daikon]` (대소문자 무관) | `ImportSarifRejected: driver_name_not_allowlisted` (exit 4) |
+| 2 | `runs[].results > 0` 또는 `--non-use-rationale` 명시 | `ImportSarifRejected: empty_sarif_without_rationale` |
+| 3 | SARIF `invocations[].commandLine` 또는 `--reproduction-command` 명시 | `ImportSarifRejected: reproduction_command_missing` |
+| 4 | `evidence_trust = imported_sarif` (real_tool 과 결정적 구분) | manifest 에 명시 / chain gate 가 별도 등급 평가 |
+
+`manual` / `ai-generated` / 미명시 driver = ★ 자동 reject (시뮬 우회 표면 차단).
+
 ## Outputs
 
 산출물 (`<output>` 디렉토리):
-- `<plugin>.stdout.log` / `<plugin>.stderr.log` — raw 로그 (★ 물증)
-- `<plugin>.sarif` — SARIF 표준 출력 (Code Scanning 호환)
-- `static-runner.evidence.json` — 5종 물증 + cross_validation 메타
+- Tier 1: `<plugin>.stdout.log` / `<plugin>.stderr.log` / `<plugin>.sarif`
+- Tier 2: `<driver>.imported.sarif` (사용자 SARIF copy)
+- `static-runner.evidence.json` — 7종 물증 + cross_validation 메타 + `evidence_trust` 등급
 
-### 5종 물증 의무화 (★ Sprint 4 신설)
+### 7 evidence 필드 (★ schema enforcement)
 
-`real_tool: true` 표기 시 7 필드 모두 의무 (`formal-spec.schema.json` enforcement):
+`evidence_trust=real_tool` 시 7 필드 모두 의무 (`formal-spec.schema.json` enforcement):
 
 | # | 필드 | 목적 |
 |---|---|---|
@@ -53,8 +93,11 @@ npx static-runner --plugin semgrep ... --write-baseline .baseline.json
 | 4b | `duration_ms` | 실행 소요 |
 | 5 | `result_hash` | SARIF SHA256 (위조 차단) |
 | 6 | `reproduction_command` | 사용자 재현 가능 명령 |
+| 7 | `evidence_trust` | enum [real_tool, imported_sarif, simulated] (★ v8.6.0 신설 / R19) |
 
-`real_tool: false` 표기 시 `simulation_reason` 의무. `lint-no-simulation.sh` 가 grep 검증.
+`evidence_trust=imported_sarif` 시 (Tier 2): `tool_stdout_path` / `tool_stderr_path` = null (사용자 환경 stdout 부재 정직 표기 / 시뮬 ❌) / `duration_ms` = null (보강 carry). 나머지 7 필드 의무. 추가 필드: `imported_driver_name`, `imported_results_count`, `non_use_rationale`.
+
+`evidence_trust=simulated` 시: ❌ 영구 reject (chain gate -5%p + block).
 
 ## Exit codes
 
@@ -63,7 +106,8 @@ npx static-runner --plugin semgrep ... --write-baseline .baseline.json
 | 0 | success |
 | 1 | finding ≥ 1 (severity 기반) |
 | 2 | usage error |
-| **3** | ★ 환경 부재 ("환경 부재 — 사용자 위임" 정직 신호) |
+| **3** | ★ Tier 1 환경 부재 ("환경 부재 — 사용자 위임" 정직 신호) |
+| **4** | ★ Tier 2 import 4 조건 미만족 (`ImportSarifRejected`) — v8.6.0 신설 |
 
 ## 차단 룰 (`lint-no-simulation.sh`)
 
@@ -74,15 +118,10 @@ bash src/lint-no-simulation.sh <dir-with-evidence-or-manifest>
 검사:
 1. `simulation_only: true` 자동 fail
 2. `real_tool: false` + `simulation_reason` 부재 → fail
-3. `real_tool: true` + 5종 물증 필드 1+ 누락 → fail
+3. `evidence_trust=real_tool` + 7 필드 1+ 누락 → fail
+4. `evidence_trust=simulated` 검출 → fail (영구 reject)
 
 CI step 통합 (`.github/workflows/drift-check.yml`).
-
-## 1차 plugin 범위
-
-- ✅ `semgrep` — `p/owasp-top-ten` ruleset 1차 (★ v1.4.1 pip 채널 진짜 실행 종결) + ★ ★ ★ 사내 custom rule (★ v1.4.2 첫 실현 — `rules/jwt-localstorage.yml` + 8개)
-- ✅ `pmd` — `rulesets/java/quickstart.xml` 1차
-- ⏳ `spotbugs` / `daikon` / `codeql` — v2.x carry / plugin 인터페이스 = `Plugin` 클래스 (`src/runner.js`)
 
 ## custom rules (★ rules/ 디렉토리 — P 의무 / dist 포함)
 
@@ -98,17 +137,22 @@ cd rules && semgrep --test --config <name>.yml <name>.{js,ts}
 
 ## Sibling tools
 
-- [`../spectral-runner/`](../spectral-runner/) — 진짜 외부 도구 #1 (OpenAPI Spectral)
+- [`../spectral-runner/`](../spectral-runner/) — Tier 1 정합 외부 도구 (OpenAPI Spectral / Node.js)
 - [`../drift-validator/`](../drift-validator/) + [`../decision-table-validator/`](../decision-table-validator/) — Phase 4.5 짝
 - [`../_shared/baseline.js`](../_shared/) — ADR-010 baseline + ratchet 공용 모듈
 
 ## 참조
 
+- `methodology-spec/plugin-charter.md` R19 (Tool Ecosystem Dependency Classification)
 - ADR-009 (다이어그램 신뢰 모델 / 진짜 도구 +5~10%p) + ADR-010 (baseline + ratchet)
-- DEC-2026-04-29-static-tool-실행-의무화 — no-simulation 정책
+- DEC-2026-04-29-static-tool-실행-의무화 — no-simulation 정책 원본
+- DEC-2026-05-18-runtime-tool-exclusion — R19 신설 + Tier 1/2/3 paradigm
 - DEC-2026-05-02-v1.4.2-carry-2-3-종결 — custom Semgrep rule 첫 실현
 - memory `feedback_no_static_tool_simulation.md`
 
 ## ★★★ no-simulation 정합
 
-본 도구는 진짜 외부 도구 wrapper. AI 추론 0%. 환경 부재 = 정직 exit 3 / 시뮬레이션 대체 절대 금지.
+본 도구는 진짜 외부 도구 wrapper. AI 추론 0%.
+- Tier 1 환경 부재 = 정직 exit 3 / 시뮬레이션 대체 절대 금지
+- Tier 2 import 4 조건 미만족 = 정직 exit 4 / 우회 표면 결정적 차단
+- Tier 3 (simulated) = 영구 reject (chain gate -5%p + block)

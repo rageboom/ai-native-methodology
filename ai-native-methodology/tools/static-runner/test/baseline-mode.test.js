@@ -1,5 +1,6 @@
 // ★ Sprint 5+ Phase D — static-runner SARIF → finding 어댑터 + baseline-ratchet 회귀.
-// 본 환경 Semgrep/PMD 부재 가정. fixture SARIF 파일로 어댑터/baseline 회귀만 검증.
+// 본 환경 Semgrep 부재 가정. fixture SARIF 파일로 어댑터/baseline 회귀만 검증.
+// ★ v8.6.0 — Tier 2 import 결과 SARIF 도 동일 어댑터 통과 정합.
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';

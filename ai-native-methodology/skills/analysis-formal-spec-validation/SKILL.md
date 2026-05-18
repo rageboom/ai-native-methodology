@@ -15,7 +15,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## ★★★ no-simulation 절대 금지 (CLAUDE.md)
 
 - ❌ AI sub-agent 에 "Static Analyzer / Daikon / Semgrep persona" 부여 금지
-- ✅ 진짜 외부 도구 실행 의무 (Semgrep / PMD / SpotBugs / Daikon / CodeQL / SonarQube)
+- ✅ 진짜 외부 도구 실행 의무 — R19 Tier 1 (in-plugin: Semgrep) 또는 Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / CodeQL / Daikon / SonarQube)
 - ✅ 환경 부재 시 사용자에게 환경 준비 요청 또는 사용자 위임 (CI) 명시
 - ✅ 시뮬레이션 사용 시 신뢰도 -5%p 패널티 + "진짜 도구 미실행" 명시 의무
 
@@ -26,14 +26,10 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - business-rules.json 의 domain reference 가 domain.json 에 존재하는지
    - architecture.json 의 module 이 inventory.json 에 존재하는지
    - openapi.yaml endpoint 가 business-rules.json 의 rule 과 매칭되는지
-3. **진짜 도구 실행** (해당 stack 에 한해):
-   - Semgrep (다중 언어 / 보안 + 패턴)
-   - PMD (Java)
-   - SpotBugs (Java bytecode)
-   - Daikon (불변식 추론)
-   - CodeQL (모든 언어 / GitHub)
-   - SonarQube (다중 언어)
-   - 환경 부재 시 사용자 위임 명시
+3. **진짜 도구 실행** (해당 stack 에 한해 / R19 Tier 명시):
+   - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx)
+   - **Tier 2 (사용자 환경 SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+ + bytecode) / Daikon (Java + runtime trace) / CodeQL (JDK + DB build) / SonarQube
+   - 환경 부재 시 사용자 위임 명시 (정직 표기 / 시뮬 ❌)
 4. **5단계 신뢰도 (ADR-009)** — 각 산출물별 신뢰도 평가:
    - 1단계: 사람 작성 / source 없음
    - 2단계: AI 추론

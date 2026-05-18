@@ -138,7 +138,7 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 ### 4.2 Static Analyzer 정합 — DEC-static-tool-실행-의무화 (★★★)
 
 - ❌ AI persona 시뮬레이션 절대 금지
-- ✅ 진짜 외부 도구 실행 의무 (Semgrep / PMD / SpotBugs / Daikon / CodeQL)
+- ✅ 진짜 외부 도구 실행 의무 — R19 Tier 1 (in-plugin: Semgrep) 또는 Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / Daikon / CodeQL)
 - ✅ 환경 부재 시 사용자 위임 명시 + 신뢰도 -5%p 패널티
 - ✅ `tools/static-runner/` + `lint-no-simulation.sh` enforcement 자동화
 

@@ -103,7 +103,7 @@ cross_links:
 |---|---|---|
 | 1 | LLM 패턴 추론 | 50-60% |
 | 3 | drift-validator (정적 finding 비교) | 65-75% (Stage 5+ 검토) |
-| 5 | ★ Semgrep / ESLint security / Snyk Code / CodeQL 진짜 실행 + 5종 물증 | 85-92% |
+| 5 | ★ R19 Tier 1 (in-plugin: Semgrep / ESLint security) + Tier 2 (사용자 환경 SARIF import: Snyk Code / CodeQL) 진짜 실행 + 7 evidence 필드 (evidence_trust 포함) | 85-92% |
 
 ★ runtime check 통과 시 95%+ (별도 영역).
 

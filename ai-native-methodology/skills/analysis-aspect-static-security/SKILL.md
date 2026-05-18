@@ -11,9 +11,9 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## ★★★ no-simulation 절대 금지 (CLAUDE.md)
 
 - ❌ AI sub-agent 에 "Static Analyzer / Semgrep persona" 부여 시뮬레이션 금지 (★ ADR-009 단계 4 = -5%p 패널티)
-- ✅ 진짜 외부 도구 실행 의무 (Semgrep / PMD / SpotBugs / Bandit / Snyk / OSV-Scanner / CodeQL / SonarQube) → ADR-009 단계 5
+- ✅ 진짜 외부 도구 실행 의무 — R19 Tier 1 (in-plugin: Semgrep / ESLint) 또는 Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / CodeQL / Daikon / Bandit / Snyk / OSV-Scanner / SonarQube) → ADR-009 단계 5
 - ✅ 환경 부재 시 사용자 위임 (CI) 명시
-- ✅ 5종 물증 의무 (`tool_version` / `stdout_path` / `stderr_path` / `invocation_timestamp` + `duration_ms` / `result_hash` / `reproduction_command`)
+- ✅ 7 evidence 필드 의무 (`tool_version` / `stdout_path` / `stderr_path` / `invocation_timestamp` + `duration_ms` / `result_hash` / `reproduction_command` / `evidence_trust` enum)
 
 ## 사전 조건
 
@@ -21,12 +21,14 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 절차
 
-1. **stack 별 도구 매핑**:
-   - **다중 언어**: Semgrep / SonarQube / CodeQL
-   - **Java**: PMD / SpotBugs / Checkstyle
-   - **JS/TS**: ESLint security plugin / Snyk
-   - **Python**: Bandit
-   - **dependency**: OSV-Scanner / Snyk / Dependabot
+1. **stack 별 도구 매핑** (★ R19 Tier 명시):
+   - **Tier 1 — 다중 언어 (in-plugin)**: Semgrep (Python pipx / Java 소스 source-pattern 분석 가능)
+   - **Tier 2 — 다중 언어 (사용자 환경 SARIF import)**: SonarQube / CodeQL
+   - **Tier 2 — Java (사용자 환경)**: PMD (Java 8 or above) / SpotBugs (JRE 11+) / Checkstyle
+   - **Tier 1 — JS/TS (in-plugin)**: ESLint security plugin
+   - **Tier 2 — JS/TS (사용자 환경)**: Snyk
+   - **Tier 2 — Python (사용자 환경)**: Bandit
+   - **Tier 2 — dependency (사용자 환경)**: OSV-Scanner / Snyk / Dependabot
 2. **static-runner 호출** — `tools/static-runner/` 가 도구 hook 통합 (Plugin host 패턴)
 3. **도구별 실 실행** — `node tools/static-runner/src/cli.js --plugin <semgrep|pmd> --target <dir> --output <dir>` (★ cli.mjs MCP wrapper = carry-over)
 4. **★ v1.4.2 — 사내 custom rule 적용** — `--extra-rules <path>` 옵션 (멀티 지정 가능):

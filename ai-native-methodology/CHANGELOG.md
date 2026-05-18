@@ -9,6 +9,127 @@
 
 ---
 
+## [8.6.1] — 2026-05-18 ★ MINOR — charter R20 신설 (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only / R16·R17 부활 ❌ — 신규 채널) + `ticket-sync` skill + 7-field evidence schema + `traceability-matrix.ticket_ref.status_history` + PreToolUse `mcp__wiki-jira-assistant__.*` deny-when-blocked (additive)
+
+> ★ **v8.6.1 MINOR — R20 신설 (MCP Ticket Sync Channel)**. 사용자 "내가 만약에 티켓을 우리 일감과 연동한다고 할때 티켓은 어느시점에 따지는게 맞나? 아니면 각 시점 마다 별도로 따는게 맞나?" (Tier 1 정책 v8.6.0+ 04bd0a1) → "지금 이 티켓 정책도 우리 플러그인의 정책으로 넣을 수 있나?" → "각 단계가 끝날때 마다 상태가 바뀌도 하고 신규 티켓이 생기기도 해야 해 거기에 맞는 방법이야?" → "나는 jira-confluence mcp 가 있고 이를 이용하고 싶어. 결국 뭔가 동작전에 물어보면 되는거 아닌가?" 결단.
+>
+> 본 release = charter R20 신설 — **Tier 2.5 (MCP delegation)**. R16/R17 부활 ❌ (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+) — R16/R17 부활 ❌" 정합 = 신규 채널 R20). Tier 3 (자체 platform adapter) = v9.0+ carry.
+>
+> ### 신규 자산
+>
+> - **`decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`** — R20 신설 결단 + 비용/가치 재평가 (MCP 위임 비용 매우 작음) + Tier 분리 (Tier 2.5 vs Tier 3) + R15 / R16/R17 정합 점검
+> - **`schemas/ticket-sync-evidence.schema.json`** — 7-field evidence (`tool_stdout_path` / `tool_stderr_path` / `tool_version` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command`) + `evidence_trust` enum `real_tool|imported_sarif` (simulated 영구 거부) + `confirmation_log_ref` + `mcp_invocations[]`
+> - **`skills/ticket-sync/SKILL.md`** — 5 stage matrix (analysis/planning/spec/test/implement) + 사용자 confirmation gate (preview MD → yes/no/dry-run halt) + sequential MCP 호출 (결정론 보호) + search-first idempotency (`jira_search` JQL by UC-*) + graceful MCP-missing (silent skip + `F-TICKETSYNC-001` finding)
+> - **`tools/schema-validator/test/ticket-sync-evidence.test.js`** — 회귀 test ≥6 (status_history monotonic / evidence_trust enum strict / dry_run vs real_tool 분리)
+> - **`schemas/traceability-matrix.schema.json`** `matrix.items.ticket_ref.status_history[]` optional 신설 (transitioned_at / from_status / to_status / mcp_tool / evidence_ref)
+> - **`hooks/hooks.json`** PreToolUse matcher 에 `mcp__wiki-jira-assistant__.*` 추가 (state.blocked 시 MCP deny / `tools/chain-driver/src/hooks-bridge.js::buildBlockOutput` 재사용)
+> - **`methodology-spec/plugin-charter.md`** §1 R20 entry / §2 R20 매핑 / 요약 17/17 → 18/18 활성 / 헤더 R20 v8.6.1 신설
+> - **`methodology-spec/ticket-policy.md`** Tier 2.5 (MCP delegation) section 신설 / R20 reference / Tier 3 carry 명시
+> - **`methodology-spec/id-conventions.md`** §Ticket Binding — status_history example 추가
+>
+> ### 사용자 결단 5건 (실 사용 시점)
+>
+> 1. Jira workflow transition target IDs (project-specific / `jira_transitions` 사전 lookup)
+> 2. Confluence emit 범위 (Initiative overview default v8.6.1 / per-stage 보고서 page = v8.7.0+ Tier 2.6 후보)
+> 3. Auto-invoke 정책 — auto-suggest (confirmation gated) ★ 권고
+> 4. Idempotency — search-first ★ 권고
+> 5. MCP 미연결 — silent skip + finding emit ★ 권고
+>
+> ### 사용자 묶음 결단
+>
+> - 자동화 강도 = **B+A hybrid → MCP 위임으로 변경 (Tier 2.5)** — 비용 (자체 adapter) 회피 + 사용자 환경 MCP 활용
+> - Platform = `mcp__wiki-jira-assistant__*` 가정 (사용자 보유 MCP)
+> - Confirmation = 모든 호출 직전 사용자 OK 의무
+
+---
+
+## [8.6.0] — 2026-05-18 ★ MINOR — Runtime/JVM 의존 도구 plugin 환경 제외 + charter R19 신설 + SARIF import 4 조건 schema-level 강제 + evidence_trust 3-tier + chain-strict mode 격상 (additive)
+
+> ★ **v8.6.0 MINOR — R19 신설 (Tool Ecosystem Dependency Classification)**. 사용자 "코드 분석에서 런타임 분석이 필요한 툴들은 안쓸거야" → "java runtime 이 필요한것도 못쓸거 같은데?" → "이렇게 해줘" 결단 + Senior STRONG-STOP signal 전면 흡수 (5 concerns / confidence 0.84).
+>
+> 본 release = charter R19 신설 — **Tier 1 (in-plugin native: Semgrep / Spectral) + Tier 2 (사용자 환경 SARIF import: PMD Java 8 or above / SpotBugs JRE 11+ / CodeQL / Daikon) + Tier 3 (simulated 영구 reject)**. 4 조건 schema-level 강제 (driver allowlist + non-empty results 또는 non_use_rationale + reproduction_command + evidence_trust enum).
+>
+> ### 신규 자산
+>
+> - **`tools/static-runner/src/runner.js` `importSarif` 함수** — R19 Tier 2 흡수 / 4 조건 schema-level reject (`ImportSarifRejected` 신규 error class / driver allowlist `[pmd, spotbugs, codeql, daikon]` / empty results without rationale reject / driver mismatch reject / reproduction_command 의무)
+> - **`tools/static-runner/src/cli.js`** `--import-sarif` / `--import-driver` / `--reproduction-command` / `--non-use-rationale` flag + exit 4 (`ImportSarifRejected`) 신설
+> - **`EVIDENCE_TRUST` enum** — `real_tool` / `imported_sarif` / `simulated` 3-tier
+> - **`IMPORTED_DRIVER_ALLOWLIST`** — PMD/SpotBugs/CodeQL/Daikon 4 한정 (대소문자 무관)
+> - **`tools/chain-driver/src/gate-eval.js`** implement stage `simulated_evidence_count > 0` block 신규 (chain-strict mode 격상)
+> - **charter R19 신설** (`methodology-spec/plugin-charter.md` §1 + §2)
+> - **11 신규 import-sarif test** (`tools/static-runner/test/runner.test.js` 15→26)
+>
+> ### 정정 / sweep
+>
+> - **PMDPlugin in-plugin 제거** (Java 8 or above JVM 의존 / plugin 환경 비현실)
+> - **`tools/static-runner/package.json` description** — R19 Tier 1+2 명시 / 7 evidence + evidence_trust 3-tier
+> - **`tools/static-runner/README.md`** 전면 개정 (Tier 1/2/3 + 4 조건 + exit code 4 + custom rule)
+> - **agents 4 sweep** — analysis-agent / implement-agent (line 33+58) / spec-agent / _base-senior-engineer
+> - **skills 5 sweep** — analysis-aspect-static-security / analysis-formal-spec-validation / _base-apply-baseline-ratchet / implement-generate-impl-spec / (analysis-html-template + test-verify-coverage = 원래도 외부 도구 의무 명시 / 무수정)
+> - **methodology-spec 5 sweep** — plugin-charter (R19) / lifecycle-contract (line 69+72+338) / deliverables/21-impl-spec (line 58) / deliverables/12-static-security-spec (line 106) / workflow/formal-spec (line 141)
+> - **ADR patch** — ADR-009 §2.1 단계 5 + §2.2 도구 종류 표 + 변경 이력 / ADR-010 변경 이력
+> - **`tools/_shared/baseline.js` + `tools/static-runner/src/sarif-to-finding.js`** 주석 정정 (Tier 1+2 통합 어댑터)
+> - **`tools/spectral-runner/README.md` + `tools/README.md` + `README.md` (root)** sibling 인용 정합
+>
+> ### 4원칙 ladder full
+>
+> - **1원칙 plan**: `.claude/plans/plan-runtime-tool-exclusion.md` (§1-9 본 plan + §10 Senior 5 concerns 흡수 patch)
+> - **2원칙 research (lightweight 2-agent)**: F-015 official-docs check (sub-agent `_base-official-docs-checker` / 6/6 1차 출처 verbatim / VERIFIED-IDENTICAL 4 + WITH-DELTA 2 / ★ load-bearing 정정 1건 PMD = **Java 8 or above** / 잔여 carry 4건 LL-rte-01~05) + Senior critique (sub-agent `_base-senior-engineer` / **REVISE-5 + STRONG-STOP signal 1건** SARIF import 우회 표면 / 5 concerns / confidence 0.84)
+> - **3원칙 사용자 묶음 결단**: 2 cluster 7/7 추천 채택 (Option A + MINOR + 2-agent + ADR patch / 전면 흡수 + PMD 정정 + R19 신설)
+> - **4원칙 시행**: Senior 5 concerns 전면 흡수 (additive / breaking 0)
+>
+> ### Senior 5 concerns 전면 흡수 결과
+>
+> 1. **SARIF import 4 조건 schema 강제** — driver allowlist + non-empty results 또는 non_use_rationale + reproduction_command + evidence_trust 3-tier ✅
+> 2. **(P1)+(P2) 결합 명시** — "JVM 의존 = plugin scope 외" 솔직 격하 + "사용자 환경 SARIF import 패턴" 명시 ✅
+> 3. **인용 13곳 동반 sweep** — agents 4 + skills 5 + methodology-spec 5 = 14 sweep (skill-citation-validator dead-link 차단 회피) ✅
+> 4. **charter R19 신설** — R18 §5 patch ❌ / sub-axis evolution paradigm 정합 (plugin-authoring axis ≠ tool-ecosystem axis) ✅
+> 5. **evidence_trust 3-tier + chain-strict mode 격상** — gate-eval.js `simulated_evidence_count` block 신규 ✅
+>
+> ### STOP-3 hard gate
+>
+> | 검증 | 결과 |
+> |---|---|
+> | `npm test --workspaces` | ★ **424/424 pass** (414 + import-sarif 10 신규) |
+> | `static-runner` 단독 test | 26/26 pass (15 + 11 신규 import-sarif test) |
+> | `chain-driver` 단독 test | 114/114 pass (gate-eval.js 변경 후 회귀 0) |
+> | `release-readiness.js` | 13/13 ready:true |
+> | `drift-validator` 3-way (flow/schema/template) | clean |
+> | `skill-citation-validator` (47 SKILL.md + repo-wide active) | 0 stale |
+> | `version-check` 3-way | plugin.json + package.json + CLAUDE.md = 8.6.0 |
+> | F-021 임계 | ≤ 15 caution band |
+>
+> ### 잠재 함정 회피 (Adzic SBE 10년 폐기 함정 정공법)
+>
+> - 시뮬 ❌ + 실 사용자 환경 의무 = 본 결단의 본질
+> - evidence_trust 3-tier = Tier 1 (in-plugin 실 실행) / Tier 2 (사용자 환경 실 실행 + import) / Tier 3 (영구 reject)
+> - SARIF 4 조건 schema 강제 = 우회 표면 결정적 차단
+> - 양심 의존 0 / chain-strict mode trio (state.blocked + cli exit 4 + PreToolUse deny) 정합
+>
+> ### 10 LL 자산화
+>
+> - **LL-rte-01** Semgrep install = `pipx install semgrep` (★ `pip install` ❌ — PEP 668 격리)
+> - **LL-rte-02** Spectral AsyncAPI = v2.x 한정 명시 (v3 미지원 / Arazzo v1.0 자산 추가)
+> - **LL-rte-03** SARIF = 2.1.0 Plus Errata 01 (OASIS Standard 28-Aug-2023) 정밀 표기
+> - **LL-rte-04 ★ load-bearing** F-015 시 사실 정정 의무 — PMD = "Java 8 or above"
+> - **LL-rte-05** SPA docs WebFetch fail → fall-back cascade carry
+> - **LL-runtime-tool-01** charter R 신규 시 plugin-authoring (R18) ↔ tool-ecosystem (R19) axis 분리 의무
+> - **LL-runtime-tool-02** evidence_trust 2-tier → 3-tier 격상 의무 (Adzic 함정 회피)
+> - **LL-runtime-tool-03** F-015 load-bearing 정정 발견 시 결단 본질 재평가 의무
+> - **LL-runtime-tool-04** 사전 배포 + 사용자 0 → breaking 자격 약함 / "additive primary signal" 우선
+> - **LL-runtime-tool-05** SARIF import `results=[]` reject 의무 / `non_use_rationale` 첨부 시 허용
+>
+> ### 잔여 carry (v8.7.0+)
+>
+> - LL-rte-05 — plugin-authoring-spec §6 SPA fail cascade 보강
+> - LL-rte-02 — Spectral AsyncAPI v2.x sweep 보강
+> - import SARIF `duration_ms` 환산 보강
+> - Tier 2 import 패턴 외부 적용 입증 (사내 CI 실 실행 + SARIF import 시연)
+>
+> tier = MINOR (additive — import 패턴 신설 + R19 charter 신설 + evidence_trust 신규 + chain-strict mode 격상 / 기존 의무 제거 0 / breaking 0). DEC-2026-05-18-runtime-tool-exclusion. Amends DEC-2026-04-29-static-tool-실행-의무화.
+
+---
+
 ## [8.5.0] — 2026-05-18 ★ MINOR — F-SKILL P1 8 finding batch + plugin-authoring-spec §2 S2 강화 + §6 digest baseline refresh (additive)
 
 > ★ **v8.5.0 MINOR — L3 audit P1 batch corrective sweep**. 사용자 "A. P1 9 finding batch (v8.5.0 MINOR / 권장)" → "진행 해줘" 시행.

@@ -475,9 +475,11 @@ function check11_workspaceTestPass(args) {
       const m = line.match(/\d+/);
       return acc + (m ? parseInt(m[0], 10) : 0);
     }, 0);
-  const totalTests = sumMatches(/^# tests \d+/gm);
-  const totalPass = sumMatches(/^# pass \d+/gm);
-  const totalFail = sumMatches(/^# fail \d+/gm);
+  // ★ v8.6.0 fix — node:test 출력 prefix 변동 양쪽 지원 (`# tests N` 또는 `ℹ tests N` / U+2139).
+  //   본 환경 sandbox 에서 spawnSync child output 이 ℹ prefix 만 emit → 0 collect false positive 회피.
+  const totalTests = sumMatches(/^(?:# |ℹ )tests \d+/gm);
+  const totalPass = sumMatches(/^(?:# |ℹ )pass \d+/gm);
+  const totalFail = sumMatches(/^(?:# |ℹ )fail \d+/gm);
   const passed = result.status === 0 && totalFail === 0 && totalTests > 0;
   // ★ F-V1-01 fix — 0 tests collected 별도 inconclusive 분기 (환경 진단 안내).
   // 이전: 0/0 → pass=false / detail="regress: 0 fail / 0/0 pass / exit=0" (정확하지만 환경 vs 회귀 구분 불가)
