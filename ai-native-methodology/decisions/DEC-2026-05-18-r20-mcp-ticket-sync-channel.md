@@ -149,3 +149,74 @@ DEC-2026-05-15-g1-itsm-permanent-scope-out §31 verbatim 인용:
 - schema-validator: 83 → **89/89 pass** (+6 phase=enter test)
 - 기존 evidence sample / traceability matrix sample 영향 0 (phase / uc_id / enter_task_ids 모두 optional)
 - backward compat = default phase=exit (기존 R20 호출 무영향)
+
+---
+
+## ★ v8.6.3 PATCH 확장 — 구조 강제 (Hierarchy Enforcement)
+
+★ 2026-05-18 / 동일 R20 channel 안 추가 동작 / additive / breaking 0.
+
+### 배경
+
+사용자 "**티켓은 스트럭쳐를 가져야 함**" — v8.6.1+v8.6.2 까지 R20 의 hierarchy 명시 = `ticket-policy.md` §Layer mapping 표 + `SKILL.md` MCP call matrix 의 `parent=Epic(scope)` / `parent=Story(uc_id)` text 뿐 / **schema-level / evidence-level 강제 부재** + **Atlassian Structure plugin (`jira_structure_*` MCP tool) 미사용** → Jira dashboard 가 tree view 로 가시화 안 됨.
+
+### 결정
+
+R20 channel 의 동작 = **hierarchy 강제 (parent_ticket_id 의무 + jira_structure tree)** 로 확장.
+
+| 항목 | v8.6.2 (기존) | **v8.6.3 (본 확장)** |
+|---|---|---|
+| Schema 측 parent 강제 | `ticket-policy.md` §Layer mapping 표만 | ★ `mcp_invocations[].parent_ticket_id` (Sub-task / Story / Epic 의무) + `link_type` enum |
+| Traceability matrix hierarchy | `ticket_ref.epic_id` / `initiative_id` / `subtask_ids` 분리 | ★ 동일 + chain consistency (Story 가진 행 = epic_id 의무 + initiative_id 의무) |
+| Atlassian Structure 통합 | 미사용 | ★ `mcp__wiki-jira-assistant__jira_structure_add_issues` allowed-tools 추가 + analysis stage phase=exit 시 Initiative tree 등록 |
+| 위반 finding | 없음 | ★ `F-TICKETSYNC-002 missing_parent` emit (chain consistency 깨짐 시) |
+
+### Sub-agent 부재 결단 (★ 명시)
+
+사용자 질의 "**티켓 관리자 에이전트가 있어야 되는 거 아냐?**" — **불필요 결단**. 3가지 이유:
+
+1. **Confirmation gate 의 구조적 제약** — 사용자 `yes/no/dry-run` 응답 = main agent (= 사용자 대화 layer) 에서만 받을 수 있음. sub-agent 는 Task tool 1회 호출/응답 = 도중에 사용자 prompt ❌
+2. **결정론 axis 보호 (R8)** — sub-agent 추가 = state.json 동기화 + chain-driver hooks-bridge 가 sub-agent 호출도 차단해야 함 → 결정론 axis 침범 위험. skill = main agent 도구 = state unbroken
+3. **YAGNI** — ticket-sync skill 의 책임 = MCP call sequence + evidence + matrix update = 단일 책임. sub-agent 분리는 multi-platform (Linear / GitHub) 시점에 재평가
+
+v9.0+ MAJOR carry — `ticket-platform-router` (multi-platform abstraction) / `ticket-reconciler` (자동 idempotency loop / confirmation 완화 결단 함께).
+
+### 대안 비교 (B/C 안 되는 사유 명시)
+
+| 옵션 | 채택 | 사유 |
+|---|---|---|
+| **A. parent_ticket_id schema 강제 + jira_structure tree ★** | **✅ 채택** | R20 sibling / additive / 위반 시 자동 finding emit / Atlassian Structure 활용 |
+| B. ticket-manager sub-agent 신설 | ❌ | confirmation gate sub-agent 호환 ❌ + 결정론 axis 침범 + YAGNI (Sub-agent 부재 결단 §위) |
+| C. parent 만 권고 / schema 강제 X | ❌ | v8.6.2 와 동일 상태 = 구조 보장 안 됨 / 사용자 의도 "구조를 가져야" 미충족 |
+
+### 신규 자산 (v8.6.3)
+
+| 경로 | 변경 |
+|---|---|
+| `schemas/ticket-sync-evidence.schema.json` | `mcp_invocations[].parent_ticket_id` (optional / 정책 의무) + `mcp_invocations[].link_type` (enum `parent-child` / `relates-to` / `blocks` / `is-blocked-by` / default `parent-child`) |
+| `schemas/traceability-matrix.schema.json` | `ticket_ref` 의 `epic_id` / `initiative_id` 가 Story 존재 시 의무 (allOf if-then conditional) |
+| `skills/ticket-sync/SKILL.md` | `mcp__wiki-jira-assistant__jira_structure_add_issues` + `jira_structure_get` allowed-tools 추가 + phase=exit analysis 에 Initiative tree 등록 step 추가 |
+| `methodology-spec/ticket-policy.md` | §Tier 2.5 = "★ hierarchy 의무" subsection 추가 + `F-TICKETSYNC-002 missing_parent` finding 명시 |
+| `tools/schema-validator/test/ticket-sync-evidence.test.js` | parent_ticket_id valid 2 + Sub-task link_type 강제 + traceability matrix chain consistency = 6 신규 (89 → 95 pass) |
+
+### car 도메인 ticket 수 영향
+
+| 항목 | v8.6.2 | v8.6.3 |
+|---|---|---|
+| Initiative / Epic / Story / Sub-task | 59 | 59 (동일) |
+| Enter Task (analysis/planning + spec/test/implement × 7) | 23 | 23 (동일) |
+| **★ jira_structure_add_issues 호출** | 0 | **+1 호출** (Initiative tree 1번만 / per release cycle) |
+| **합계 ticket** | 82 | **82 (동일)** + 1 structure 호출 |
+
+★ ticket 수 증가 ❌ — hierarchy 강제는 **메타 강제 (parent_ticket_id schema + structure tree)** 만 / ticket 폭증 ❌.
+
+### 회귀
+
+- schema-validator: 89 → **95/95 pass** (+6 hierarchy test)
+- 기존 evidence sample / traceability matrix sample 영향 0 (parent_ticket_id / link_type 모두 optional schema-side / 정책 의무는 ticket-policy.md §Tier 2.5 hierarchy subsection)
+- backward compat = default link_type=parent-child (기존 R20 호출 무영향)
+
+### Lessons Learned (v8.6.3)
+
+- **LL-R20-03**: ticket 구조 강제 = (1) policy 문서 (2) schema field (3) skill MCP call (4) finding emit **4 layer 동시** 의무 — 중 어느 하나만 빠지면 결정론 axis 침범 (예: schema 만 있고 finding emit 없으면 위반이 통과 / policy 만 있고 schema 없으면 강제 X)
+- **LL-R20-04**: ticket-manager sub-agent 도입 결단 = **confirmation gate 호환성 / 결정론 axis** 두 axis 동시 통과 의무 — v9.0+ MAJOR charter review 시점 (confirmation 완화 결단 + multi-platform 결단 함께)

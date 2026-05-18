@@ -1,7 +1,7 @@
 ---
 name: ticket-sync
 description: ★ v8.6.1+ R20 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel). chain stage 종료 동기로 사용자 보유 jira-confluence MCP (mcp__wiki-jira-assistant__*) 위임 호출 — Initiative/Epic/Story/Sub-task 자동 생성·상태 전이. 5 stage matrix (analysis/planning/spec/test/implement). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing. R16/R17 부활 ❌ — 신규 채널 (Tier 2.5 MCP delegation only / Tier 3 자체 adapter = v9.0+ carry).
-allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
+allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
 ---
 
 # ticket-sync
@@ -138,29 +138,35 @@ implement enter (uc_id 의무):
 
 ★ enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
 
-#### phase=exit — analysis (기존 R20 + enter Task 종결)
+#### phase=exit — analysis (기존 R20 + enter Task 종결 + ★ v8.6.3 structure tree)
 ```
 1. jira_create (Initiative) → MIG-1
 2. for each BC in architecture.json:
-   jira_create (Epic) → MIG-<n>
+   jira_create (Epic, parent_ticket_id=MIG-1, link_type=parent-child) → MIG-<n>
    jira_link (Epic, parent=MIG-1)
 3. for each AP P0 in antipatterns.json:
-   jira_create (Tech Debt Story) → MIG-AP-<n>
+   jira_create (Tech Debt Story, parent_ticket_id=MIG-1, link_type=relates-to) → MIG-AP-<n>
    jira_label_add (AP-{category})
 4. (optional confluence_emit=true) wiki_page_create (Initiative overview)
-5. ★ if exists enter_task_id (analysis enter):
+5. ★ ★ ★ v8.6.3+ — jira_structure_add_issues (Initiative + all Epics + Tech Debt Stories)
+   → Atlassian Structure tree 등록 → ticket_ref.structure_tree_url 채움
+   → 모든 child 의 ticket_ref.structure_complete=true
+6. ★ if exists enter_task_id (analysis enter):
    jira_transition (enter_task_id → Done)
 ```
 
-#### phase=exit — planning (chain 1 종료 + enter Task 종결)
+#### phase=exit — planning (chain 1 종료 + enter Task 종결 + ★ v8.6.3 parent 의무)
 ```
 for each UC in planning-spec.use_cases[]:
-   1. jira_create (Story, summary="[UC-CAR-007] ...", body=planning-spec UC body)
+   1. jira_create (Story, parent_ticket_id=Epic(scope), link_type=parent-child,
+                  summary="[UC-CAR-007] ...", body=planning-spec UC body)
    2. jira_link (Story, parent=Epic MIG-CAR-100)
-   3. jira_create (Sub-task chain1_planning, status=Done)
-   4. jira_create (Sub-task chain2_spec, status=To Do)
-   5. jira_create (Sub-task chain3_test, status=To Do)
-   6. jira_create (Sub-task chain4_impl, status=To Do)
+   3. jira_create (Sub-task chain1_planning, parent_ticket_id=Story, link_type=parent-child, status=Done)
+   4. jira_create (Sub-task chain2_spec, parent_ticket_id=Story, link_type=parent-child, status=To Do)
+   5. jira_create (Sub-task chain3_test, parent_ticket_id=Story, link_type=parent-child, status=To Do)
+   6. jira_create (Sub-task chain4_impl, parent_ticket_id=Story, link_type=parent-child, status=To Do)
+★ ★ v8.6.3+ parent_ticket_id 의무 — Sub-task / Story 생성 시 모두 parent_ticket_id 필드 채움 (mcp_invocations[] evidence 기록). 위반 시 F-TICKETSYNC-002 missing_parent finding emit.
+★ traceability-matrix.ticket_ref.{epic_id, initiative_id, subtask_ids} 모두 채움 → structure_complete=true.
 ★ if exists enter_task_id (planning enter):
    jira_transition (enter_task_id → Done)
 ```
@@ -246,6 +252,8 @@ for each Story:
 - **parallel MCP 호출 ❌** — sequential only (결정론 axis 보호)
 - **state.blocked 시 MCP 호출 ❌** — `hooks/hooks.json` PreToolUse matcher 가 `mcp__wiki-jira-assistant__.*` deny (`tools/chain-driver/src/hooks-bridge.js::buildBlockOutput` 재사용)
 - **R16/R17 부활 ❌** — 본 skill = R20 신규 채널 (drift attractor 회피)
+- **★ v8.6.3+ orphan ticket ❌** — Sub-task / Story / Epic 생성 시 `parent_ticket_id` 의무 (Initiative / Tech Debt Story / Spike 만 omit 가능). 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit + ticket_ref.structure_complete=false 표식.
+- **★ v8.6.3+ link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (Tech Debt / Spike / 도메인 횡단 BR) 만 허용.
 
 ## 사용자 결단 5건 (실 사용 시점 / DEC-2026-05-18-r20)
 

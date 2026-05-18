@@ -220,6 +220,55 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 
 ★ `ListMcpResourcesTool` probe 결과 `mcp__wiki-jira-assistant__*` 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt X / 다른 chain harness 진행 무영향).
 
+### ★ Hierarchy 의무 (v8.6.3+ 구조 강제)
+
+★ v8.6.3 PATCH (DEC-2026-05-18-r20 §v8.6.3 확장 / 2026-05-18) — 사용자 의도 "**티켓은 스트럭쳐를 가져야 함**" 정합. 모든 R20 생성 ticket = **부모-자식 chain 의무** + **Atlassian Structure tree 등록 의무**.
+
+#### 4 layer 동시 강제 (LL-R20-03)
+
+| Layer | 위치 | 강제 방식 |
+|---|---|---|
+| **1. Policy** | 본 subsection | "★ Sub-task / Story / Epic 의무 parent" 명시 |
+| **2. Schema** | `ticket-sync-evidence.schema.json` | `mcp_invocations[].parent_ticket_id` + `link_type` enum + `ticket_ref.structure_complete` boolean |
+| **3. Skill** | `skills/ticket-sync/SKILL.md` | phase=exit 각 stage 호출 sequence 에 `parent_ticket_id=` 명시 + analysis phase=exit 끝에 `jira_structure_add_issues` step |
+| **4. Finding** | `tools/_shared/finding-log.js` (또는 skill 인라인) | `F-TICKETSYNC-002 missing_parent` emit |
+
+#### Parent 의무 매트릭스
+
+| 생성 ticket 유형 | parent_ticket_id 의무? | link_type | 위반 시 |
+|---|---|---|---|
+| **Initiative** | ❌ omit (최상위) | — | — |
+| **Epic** (도메인) | ✅ Initiative id | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Epic) |
+| **Story** (UC) | ✅ Epic id | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Story) |
+| **Sub-task** (chain N) | ✅ Story id | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
+| **Enter Task** (phase=enter) | ✅ 단계별 (Initiative / Epic / Story) | `parent-child` | `F-TICKETSYNC-002 missing_parent` (enter) |
+| **Tech Debt Story** (AP P0 / cross-cutting) | ⚪ Initiative id (선택) | `relates-to` | — (omit 가능) |
+| **Spike** (도메인 횡단 BR) | ⚪ Story prerequisite (선택) | `relates-to` | — (omit 가능) |
+
+#### Atlassian Structure 통합
+
+★ analysis stage phase=exit 끝에 `mcp__wiki-jira-assistant__jira_structure_add_issues` 1회 호출 (Initiative + all Epics + Tech Debt Stories) → Jira dashboard 의 tree view 가시화 → `ticket_ref.structure_tree_url` 채움 + `ticket_ref.structure_complete=true`.
+
+★ Atlassian Standard plan = `jira_link` (Epic Link) + tree view plugin (Structure / Advanced Roadmaps) 의 가용성 결단 → 미가용 시 `F-TICKETSYNC-003 structure_unavailable` finding emit + skip (오류 halt X / link 만으로도 hierarchy 의미 보존).
+
+#### Traceability matrix chain consistency
+
+`ticket_ref` 에 `id` (Story) 채움 시:
+- `epic_id` **의무** (Story 의 parent Epic)
+- `initiative_id` **의무** (Epic 의 parent Initiative)
+- 미채움 시 → `structure_complete=false` + `F-TICKETSYNC-002 missing_parent` emit
+
+#### F-TICKETSYNC-002 finding 정의
+
+| field | 값 |
+|---|---|
+| ID | `F-TICKETSYNC-002` |
+| name | `missing_parent` |
+| severity | `high` |
+| origin | `ticket-sync skill` |
+| trigger | `parent_ticket_id` 미설정 ticket 생성 / `ticket_ref.epic_id` 또는 `initiative_id` 미설정 |
+| 해결 path | parent 채움 + status_history append + structure_complete=true 재설정 |
+
 ### v8.6.1 default 제약
 
 - Platform: `mcp__wiki-jira-assistant__*` only (Linear / GitHub Issues MCP = v8.7.0+ multi-platform carry)

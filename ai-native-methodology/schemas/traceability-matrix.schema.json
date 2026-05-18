@@ -79,7 +79,7 @@
           },
           "ticket_ref": {
             "type": "object",
-            "description": "★ v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md",
+            "description": "★ v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md. ★ v8.6.3+ hierarchy 강제 — Story id 채움 시 epic_id + initiative_id 의무 (ticket-policy.md §Tier 2.5 hierarchy subsection / 위반 시 F-TICKETSYNC-002 missing_parent finding emit).",
             "required": ["platform", "id"],
             "additionalProperties": false,
             "properties": {
@@ -100,11 +100,22 @@
               },
               "epic_id": {
                 "type": "string",
-                "description": "상위 Epic ticket id (도메인 단위 / 선택)"
+                "minLength": 1,
+                "description": "상위 Epic ticket id (도메인 단위). ★ v8.6.3+ — Story 단위 row 시 의무 (ticket-policy.md §Tier 2.5 hierarchy / 미채움 시 F-TICKETSYNC-002)."
               },
               "initiative_id": {
                 "type": "string",
-                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps / 선택)"
+                "minLength": 1,
+                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps). ★ v8.6.3+ — Story 단위 row 시 의무 (epic_id 의 parent / ticket-policy.md §Tier 2.5 hierarchy)."
+              },
+              "structure_complete": {
+                "type": "boolean",
+                "description": "★ v8.6.3+ — hierarchy chain 완비 여부 (Initiative → Epic → Story → Sub-task 모든 부모 ID 채움 + jira_structure_add_issues tree 등록 완료). skill / 사용자 확인 후 set. false 또는 미설정 시 F-TICKETSYNC-002 missing_parent 위험 시그널."
+              },
+              "structure_tree_url": {
+                "type": "string",
+                "format": "uri",
+                "description": "★ v8.6.3+ — Atlassian Structure (또는 동등 tree view) URL — Jira dashboard 가시화 link. jira_structure_add_issues 호출 후 채움 (선택)."
               },
               "subtask_ids": {
                 "type": "object",

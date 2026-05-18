@@ -9,6 +9,43 @@
 
 ---
 
+## [8.6.3] — 2026-05-18 ★ PATCH — R20 구조 강제 (parent_ticket_id schema + link_type enum + jira_structure_add_issues 통합 + F-TICKETSYNC-002 missing_parent finding) (additive / breaking 0)
+
+> ★ **v8.6.3 PATCH — R20 hierarchy enforcement**. 사용자 "**티켓은 스트럭쳐를 가져야 함**" → v8.6.2 까지 R20 의 parent 명시 = `ticket-policy.md` §Layer mapping 표 + `SKILL.md` MCP call matrix text 뿐 / schema-level 강제 부재 + Atlassian Structure plugin (`jira_structure_*`) 미사용. 본 release = **4 layer 동시 강제** (policy + schema + skill + finding emit).
+>
+> ### 결단 — Sub-agent 부재 (★ 명시)
+>
+> 사용자 질의 "티켓 관리자 에이전트가 있어야 되는 거 아냐?" — 불필요 결단. confirmation gate sub-agent 호환 ❌ + 결정론 axis 침범 위험 + YAGNI. v9.0+ MAJOR carry — `ticket-platform-router` (multi-platform abstraction) / `ticket-reconciler` (자동 idempotency loop).
+>
+> ### 신규 자산 (v8.6.3)
+>
+> - **`schemas/ticket-sync-evidence.schema.json`** — `mcp_invocations[].parent_ticket_id` (optional / 정책 의무) + `link_type` (enum `parent-child` / `relates-to` / `blocks` / `is-blocked-by` / default `parent-child`)
+> - **`schemas/traceability-matrix.schema.json`** — `ticket_ref.structure_complete` boolean + `structure_tree_url` (format=uri) + `epic_id` / `initiative_id` minLength 1 + description v8.6.3+ 의무 명시
+> - **`skills/ticket-sync/SKILL.md`** — `mcp__wiki-jira-assistant__jira_structure_add_issues` + `jira_structure_get` allowed-tools 추가 + phase=exit analysis 끝 step #5 jira_structure_add_issues (Initiative tree) + planning step 1-6 parent_ticket_id= 명시
+> - **`methodology-spec/ticket-policy.md`** — §Tier 2.5 "★ Hierarchy 의무 (v8.6.3+ 구조 강제)" subsection 추가 (4 layer 동시 강제 / parent 의무 매트릭스 / F-TICKETSYNC-002 finding 정의)
+>
+> ### car 도메인 ticket 수 영향
+>
+> v8.6.2 = 82 ticket / **v8.6.3 = 82 ticket 동일** (hierarchy 강제 = 메타 강제만 / ticket 폭증 ❌) + `jira_structure_add_issues` 1회 호출 (Initiative tree / per release cycle).
+>
+> ### 회귀
+>
+> - schema-validator: 89 → **95/95 pass** (+6 v8.6.3 hierarchy test — parent_ticket_id Story→Epic + Sub-task→Story + link_type enum reject + link_type=relates-to valid + structure_complete valid + structure_tree_url uri reject)
+> - chain-driver hooks-bridge: 15/15 유지
+> - 기존 ticket-sync evidence / traceability matrix sample 영향 0 (parent_ticket_id / link_type / structure_complete / structure_tree_url 모두 optional schema-side)
+> - backward compat = default link_type=parent-child (기존 R20 호출 무영향)
+>
+> ### Lessons Learned (v8.6.3)
+>
+> - **LL-R20-03**: ticket 구조 강제 = (1) policy 문서 (2) schema field (3) skill MCP call (4) finding emit **4 layer 동시** 의무 — 중 어느 하나만 빠지면 결정론 axis 침범
+> - **LL-R20-04**: ticket-manager sub-agent 도입 결단 = confirmation gate 호환성 / 결정론 axis 두 axis 동시 통과 의무 — v9.0+ MAJOR charter review 시점 (confirmation 완화 결단 + multi-platform 결단 함께)
+>
+> ### 결단 출처
+>
+> - DEC-2026-05-18-r20-mcp-ticket-sync-channel §v8.6.3 PATCH 확장 section (B/C 대안 비교 + 신규 자산 + Lessons Learned)
+
+---
+
 ## [8.6.2] — 2026-05-18 ★ PATCH — R20 phase=enter 확장 (stage 진입 시 의무 작업 Task 1개 / analysis-planning = 도메인 단위 / spec-test-implement = per UC 단위) + enter Task 자동 종결 (phase=exit 시) + traceability-matrix `enter_task_ids` (additive / breaking 0)
 
 > ★ **v8.6.2 PATCH — R20 phase=enter 확장**. 사용자 "단지 티켓 따는것 뿐아니라 각 단계에서 일감을 따는 부분도 필요하다" → R20 channel 안에 stage **진입 시점** 동작 추가 (R20 기존 = 종료 시점만 / phase=exit). 의도 = "오늘 무엇 할지 Jira dashboard 만 봐도 가시화".

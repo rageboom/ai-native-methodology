@@ -330,3 +330,134 @@ test('R20 traceability-matrix — status_history.mcp_tool pattern (mcp__wiki-jir
   assert.notEqual(r.status, 0, `GitHub MCP reject 의무 (R20 Tier 2.5 = jira-confluence only). stdout:${r.stdout}`);
   rmSync(TMP, { recursive: true, force: true });
 });
+
+// ★ v8.6.3+ R20 hierarchy 강제 (DEC-2026-05-18-r20 §v8.6.3 확장)
+test('R20 v8.6.3 — mcp_invocations[].parent_ticket_id valid (Story 생성 시 Epic id)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'planning',
+    scope: 'car',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+      ticket_id_created: 'MIG-1234',
+      parent_ticket_id: 'MIG-CAR-100',
+      link_type: 'parent-child',
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `parent_ticket_id Story→Epic valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.3 — mcp_invocations[].parent_ticket_id valid (Sub-task 생성 시 Story id)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'spec',
+    scope: 'car',
+    uc_id: 'UC-CAR-007',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      ticket_id_created: 'MIG-1236',
+      parent_ticket_id: 'MIG-1234', // Story
+      link_type: 'parent-child',
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `parent_ticket_id Sub-task→Story valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.3 — link_type enum reject (unknown value)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'planning',
+    scope: 'car',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      parent_ticket_id: 'MIG-1',
+      link_type: 'arbitrary-bogus', // enum 외
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `link_type enum reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.3 — link_type relates-to valid (cross-cutting Tech Debt Story)', () => {
+  ensureTmp();
+  const f = join(TMP, 'ticket-sync-evidence.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    stage: 'analysis',
+    scope: 'car',
+    mcp_invocations: [{
+      ...VALID_INVOCATION,
+      ticket_id_created: 'MIG-AP-001',
+      parent_ticket_id: 'MIG-1', // Initiative
+      link_type: 'relates-to', // Tech Debt Story = cross-cutting
+    }],
+    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+    evidence_trust: 'real_tool',
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `link_type=relates-to (Tech Debt) valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.3 — traceability-matrix ticket_ref.structure_complete=true valid', () => {
+  ensureTmp();
+  const f = join(TMP, 'traceability-matrix.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    matrix: [{
+      use_case_id: 'UC-CAR-007',
+      status: 'green',
+      ticket_ref: {
+        platform: 'jira',
+        id: 'MIG-1234',
+        epic_id: 'MIG-CAR-100',
+        initiative_id: 'MIG-1',
+        structure_complete: true,
+        structure_tree_url: 'https://company.atlassian.net/secure/StructureBoard.jspa?s=42',
+      },
+    }],
+    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
+  }));
+  const r = runCli([f]);
+  assert.equal(r.status, 0, `structure_complete + structure_tree_url valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('R20 v8.6.3 — traceability-matrix structure_tree_url uri format reject (invalid URL)', () => {
+  ensureTmp();
+  const f = join(TMP, 'traceability-matrix.json');
+  writeFileSync(f, JSON.stringify({
+    meta: META_OK,
+    matrix: [{
+      use_case_id: 'UC-CAR-007',
+      status: 'green',
+      ticket_ref: {
+        platform: 'jira',
+        id: 'MIG-1234',
+        structure_tree_url: 'not a url at all spaces here',
+      },
+    }],
+    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
+  }));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `structure_tree_url uri format reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});

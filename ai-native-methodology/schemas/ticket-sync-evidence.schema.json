@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/ticket-sync-evidence.schema.json",
-  "title": "Ticket Sync Evidence (v8.6.1+ R20 MCP Ticket Sync Channel)",
-  "description": "★ v8.6.1+ R20 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — chain stage 종료 시점 사용자 보유 jira-confluence MCP (mcp__wiki-jira-assistant__*) 호출 evidence. 모든 MCP 호출 직전 사용자 confirmation gate 의무. 7-field evidence (tools/static-runner/src/runner.js::REQUIRED_EVIDENCE 패턴 재사용) + evidence_trust enum (simulated 영구 거부 / R15 정합). R16/R17 부활 ❌ — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path).",
+  "title": "Ticket Sync Evidence (v8.6.1+ R20 MCP Ticket Sync Channel / v8.6.3 hierarchy enforcement)",
+  "description": "★ v8.6.1+ R20 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — chain stage 종료 시점 사용자 보유 jira-confluence MCP (mcp__wiki-jira-assistant__*) 호출 evidence. 모든 MCP 호출 직전 사용자 confirmation gate 의무. 7-field evidence (tools/static-runner/src/runner.js::REQUIRED_EVIDENCE 패턴 재사용) + evidence_trust enum (simulated 영구 거부 / R15 정합). R16/R17 부활 ❌ — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path). ★ v8.6.3+ — mcp_invocations[].parent_ticket_id + link_type (hierarchy 강제 / Atlassian Structure 통합).",
   "type": "object",
   "required": ["meta", "stage", "mcp_invocations", "confirmation_log_ref", "evidence_trust"],
   "additionalProperties": true,
@@ -51,7 +51,7 @@
           "mcp_tool_name": {
             "type": "string",
             "pattern": "^mcp__wiki-jira-assistant__[a-z0-9_]+$",
-            "description": "★ R20 = `mcp__wiki-jira-assistant__*` 만 허용 (jira_create / jira_link / jira_transition / jira_comment / jira_search / wiki_page_create / wiki_page_update / 등). 다른 MCP 호출 = ❌ schema-validator reject (Tier 2.5 = jira-confluence MCP only / Linear/GitHub Issues 등 = v8.7.0+ multi-platform carry)."
+            "description": "★ R20 = `mcp__wiki-jira-assistant__*` 만 허용 (jira_create / jira_link / jira_transition / jira_comment / jira_search / jira_structure_add_issues / wiki_page_create / wiki_page_update / 등). 다른 MCP 호출 = ❌ schema-validator reject (Tier 2.5 = jira-confluence MCP only / Linear/GitHub Issues 등 = v8.7.0+ multi-platform carry)."
           },
           "tool_stdout_path": {
             "type": "string",
@@ -92,6 +92,16 @@
           "ticket_id_created": {
             "type": "string",
             "description": "MCP 호출 결과 생성/갱신된 ticket id (Jira PROJ-123 형식)"
+          },
+          "parent_ticket_id": {
+            "type": "string",
+            "description": "★ v8.6.3+ — 생성/갱신 ticket 의 parent ticket id. Sub-task 의무 (Story id) / Story 의무 (Epic id) / Epic 의무 (Initiative id). Initiative / Tech Debt Story / Spike (cross-cutting) = omit 가능. 정책 미준수 시 `F-TICKETSYNC-002 missing_parent` finding emit (methodology-spec/ticket-policy.md §Tier 2.5 hierarchy subsection)."
+          },
+          "link_type": {
+            "type": "string",
+            "enum": ["parent-child", "relates-to", "blocks", "is-blocked-by"],
+            "default": "parent-child",
+            "description": "★ v8.6.3+ — ticket 관계 종류. `parent-child` (default / R20 hierarchy 의무 매핑 / Atlassian Structure tree 정합) / `relates-to` (도메인 횡단 BR Spike 등) / `blocks` / `is-blocked-by`. Sub-task / Story / Epic = `parent-child` 의무 (다른 값 시 finding emit)."
           }
         }
       }
