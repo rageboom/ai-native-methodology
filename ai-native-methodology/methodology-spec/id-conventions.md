@@ -176,3 +176,36 @@ flowchart LR
 - `tools/drift-validator/` 에서 ID pattern 회귀 검증
 - `tools/chain-coverage-validator/` (sub-plan-3 신설) 에서 chain link 의무 검증
 - `schemas/{domain,rules,formal-spec,planning-spec,behavior-spec,acceptance-criteria,test-spec,impl-spec}.schema.json` 에서 pattern enforce
+
+---
+
+## ★ v8.6.0 Ticket Binding (외부 일감 시스템 연동)
+
+★ DEC-2026-05-18-ticket-binding-policy 결단 / 자세한 정책 = `methodology-spec/ticket-policy.md` / **권고만 / validator 강제 X**.
+
+### 매핑 단위
+
+| Plugin 산출물 | Ticket 단위 | 시점 |
+|---|---|---|
+| Analysis 산출물 (inventory + architecture + sql-inventory + antipatterns) | Initiative (or 상위 Epic / label) | 분석 stage 종료 직후 |
+| Domain | Epic | Initiative 분해 시점 |
+| **UC-{도메인}-{번호}** | **★ Story** | **★ Chain 1 (planning-spec.json) green 시점** |
+| Chain 1~4 stage | Sub-task (선택) | Story 생성 시 batch 4개 |
+| BHV / AC / TC / IMPL | (별도 ticket X — Story 본문 link / sub-task acceptance) | — |
+
+### UC ↔ Story 매핑 권장 형식
+
+- **Story summary**: `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}` (예: `[UC-CAR-007] 차량 비용 회계연도 prorate + cross-company billing`)
+- **Story 본문**: `planning-spec.json` 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs
+- **Sub-task summary**: `chain{N}/{stage_name} — {UC ID}` (예: `chain3/test — UC-CAR-007`)
+- **Traceability matrix**: `schemas/traceability-matrix.schema.json` matrix item 의 `ticket_ref` optional field 에 platform / id / url / epic_id / initiative_id / subtask_ids 기록
+
+### BHV / AC / TC / IMPL 별 별도 ticket 금지 사유
+
+★ 1 UC 당 N BHV × M AC × K TC × L IMPL = ticket 폭증 위험 + chain-coverage-validator 가 이미 backward link 의무 → ticket 시스템과 1:1 중복 = entropy. ID 는 Story description 또는 sub-task acceptance criteria 에 link 만.
+
+### Cross-link
+
+- 정책 본문: `methodology-spec/ticket-policy.md`
+- 결단 record: `decisions/DEC-2026-05-18-ticket-binding-policy.md`
+- Schema field: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref

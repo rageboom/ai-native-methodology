@@ -76,6 +76,48 @@
             "type": "array",
             "items": {"type": "string"},
             "description": "끊긴 link 또는 missing element 목록 (e.g., 'TC-* 부재' / 'IMPL-* commit_hash 부재')"
+          },
+          "ticket_ref": {
+            "type": "object",
+            "description": "★ v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md",
+            "required": ["platform", "id"],
+            "additionalProperties": false,
+            "properties": {
+              "platform": {
+                "type": "string",
+                "enum": ["jira", "linear", "github", "asana", "azure-devops", "other"],
+                "description": "ticket platform 식별자"
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "platform 의 Story ticket key (예: Jira `MIG-1234` / GitHub Issues `#456`)"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "ticket browse URL (선택)"
+              },
+              "epic_id": {
+                "type": "string",
+                "description": "상위 Epic ticket id (도메인 단위 / 선택)"
+              },
+              "initiative_id": {
+                "type": "string",
+                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps / 선택)"
+              },
+              "subtask_ids": {
+                "type": "object",
+                "description": "chain stage 별 sub-task ticket id 매핑 (선택)",
+                "additionalProperties": false,
+                "properties": {
+                  "chain1_planning": {"type": "string"},
+                  "chain2_spec": {"type": "string"},
+                  "chain3_test": {"type": "string"},
+                  "chain4_impl": {"type": "string"}
+                }
+              }
+            }
           }
         }
       }
