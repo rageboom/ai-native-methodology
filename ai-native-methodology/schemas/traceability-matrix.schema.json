@@ -116,6 +116,39 @@
                   "chain3_test": {"type": "string"},
                   "chain4_impl": {"type": "string"}
                 }
+              },
+              "status_history": {
+                "type": "array",
+                "description": "★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — ticket 상태 전이 timeline. MCP 호출 시 append (monotonic by transitioned_at). 사용자 Jira workflow 의 from→to status 기록 + 호출한 MCP tool + evidence cross-link.",
+                "items": {
+                  "type": "object",
+                  "required": ["transitioned_at", "to_status"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "transitioned_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "ISO 8601 상태 전이 시각"
+                    },
+                    "from_status": {
+                      "type": "string",
+                      "description": "전이 전 상태 (예: 'To Do' / 'Open')"
+                    },
+                    "to_status": {
+                      "type": "string",
+                      "description": "전이 후 상태 (예: 'In Progress' / 'Testing' / 'Done')"
+                    },
+                    "mcp_tool": {
+                      "type": "string",
+                      "pattern": "^mcp__wiki-jira-assistant__[a-z0-9_]+$",
+                      "description": "전이 수행 MCP tool 이름 (예: mcp__wiki-jira-assistant__jira_transition)"
+                    },
+                    "evidence_ref": {
+                      "type": "string",
+                      "description": "ticket-sync-evidence.json 경로 (mcp_invocations 본 전이의 7-field evidence)"
+                    }
+                  }
+                }
               }
             }
           }

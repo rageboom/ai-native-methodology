@@ -269,6 +269,7 @@ const ANALYSIS_VALIDATOR_TARGETS = new Set([
   'test-spec.json',             // chain 3
   'impl-spec.json',             // chain 4
   'traceability-matrix.json',   // cross-chain
+  'ticket-sync-evidence.json',  // ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — MCP 호출 evidence
 ]);
 
 function discoverPocSchemaArtifacts() {

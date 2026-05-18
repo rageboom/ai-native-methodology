@@ -88,9 +88,21 @@ export function suggestAgentForPrompt(prompt) {
 }
 
 // Determine if a tool call should be blocked based on state.json blocked flag.
-// Used for PreToolUse hook on Write/Edit targeting .aimd/output/**.
+// Used for PreToolUse hook on Write/Edit targeting .aimd/output/** + R20 MCP ticket-sync.
+//
+// ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
+// - mcp__wiki-jira-assistant__* (jira-confluence MCP) 호출도 state.blocked 시 deny.
+// - 결정론 axis 보호 + 사용자 confirmation gate bypass 차단 (chain harness gate 중 ticket-sync auto-fire 차단).
+// - Write/Edit 와 달리 file_path 체크 X — state.blocked=true 만 충분.
 export function shouldBlockToolUse({ toolName, toolInput, state }) {
   if (!state?.blocked) return null;
+
+  // R20 path — MCP ticket-sync 차단 (state.blocked 시 file_path 무관 deny)
+  if (typeof toolName === 'string' && toolName.startsWith('mcp__wiki-jira-assistant__')) {
+    return `R20 MCP ticket-sync blocked: ${state.block_reason || 'state.blocked=true'}`;
+  }
+
+  // 기존 Write/Edit/NotebookEdit path (ADR-CHAIN-005 §3 mechanical trio iii)
   if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
   const path = toolInput?.file_path || toolInput?.path || '';
   if (!path) return null;

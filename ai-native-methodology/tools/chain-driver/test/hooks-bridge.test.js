@@ -72,4 +72,41 @@ describe('hooks-bridge', () => {
     });
     assert.equal(reason, null);
   });
+
+  // ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — MCP ticket-sync blocked when state.blocked
+  it('shouldBlockToolUse blocks mcp__wiki-jira-assistant__ when state.blocked', () => {
+    const reason = shouldBlockToolUse({
+      toolName: 'mcp__wiki-jira-assistant__jira_create',
+      toolInput: { body: { summary: '[UC-CAR-007] test' } },
+      state: { blocked: true, block_reason: 'validator_critical' },
+    });
+    assert.match(reason, /^R20 MCP ticket-sync blocked: validator_critical$/);
+  });
+
+  it('shouldBlockToolUse allows mcp__wiki-jira-assistant__ when state.blocked=false', () => {
+    const reason = shouldBlockToolUse({
+      toolName: 'mcp__wiki-jira-assistant__jira_transition',
+      toolInput: { issueKey: 'MIG-1234', transitionId: '21' },
+      state: { blocked: false },
+    });
+    assert.equal(reason, null);
+  });
+
+  it('shouldBlockToolUse blocks mcp__wiki-jira-assistant__ without file_path (state.blocked)', () => {
+    const reason = shouldBlockToolUse({
+      toolName: 'mcp__wiki-jira-assistant__jira_search',
+      toolInput: { jql: 'project = MIG' },
+      state: { blocked: true },
+    });
+    assert.match(reason, /^R20 MCP ticket-sync blocked:/);
+  });
+
+  it('shouldBlockToolUse allows other MCP servers (non-wiki-jira-assistant) even when state.blocked', () => {
+    const reason = shouldBlockToolUse({
+      toolName: 'mcp__figma__authenticate',
+      toolInput: {},
+      state: { blocked: true, block_reason: 'validator_critical' },
+    });
+    assert.equal(reason, null);
+  });
 });

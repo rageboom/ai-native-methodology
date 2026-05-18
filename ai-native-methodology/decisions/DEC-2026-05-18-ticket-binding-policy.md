@@ -68,3 +68,13 @@ PoC-EFI 검증 cycle 2 종결 후 사용자 (sangcl@smilegate.com) 가 일감/ti
 - ID 명명: `methodology-spec/id-conventions.md` §"Ticket Binding"
 - Schema: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref
 - Plugin baseline: branch `fix/v8.5.0-p0-findings` 의 3번째 commit 예상 (v8.6.0 cut 전)
+
+## 후속 — v8.6.1 R20 신설 (Tier 2.5 MCP delegation)
+
+★ 본 Tier 1 DEC = manual only. v8.6.1 (2026-05-18) 에 **R20 신설 = Tier 2.5 MCP delegation 자동화** 진입 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
+
+- 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임 → chain stage 동기 ticket lifecycle 자동
+- 모든 MCP 호출 직전 사용자 confirmation gate 의무
+- 7-field evidence + `traceability-matrix.ticket_ref.status_history` 추가
+- 신규 자산: `skills/ticket-sync/SKILL.md` + `schemas/ticket-sync-evidence.schema.json` + `hooks/hooks.json` PreToolUse matcher 확장
+- R16/R17 부활 ❌ — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path 정합)

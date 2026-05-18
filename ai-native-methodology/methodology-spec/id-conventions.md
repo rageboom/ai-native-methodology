@@ -204,8 +204,47 @@ flowchart LR
 
 ★ 1 UC 당 N BHV × M AC × K TC × L IMPL = ticket 폭증 위험 + chain-coverage-validator 가 이미 backward link 의무 → ticket 시스템과 1:1 중복 = entropy. ID 는 Story description 또는 sub-task acceptance criteria 에 link 만.
 
+### ★ v8.6.1+ R20 — status_history (MCP delegation 자동화)
+
+★ Tier 2.5 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) 활성 시 ticket 상태 전이 timeline 자동 기록:
+
+```yaml
+# traceability-matrix.json matrix item 예시
+- use_case_id: UC-CAR-007
+  status: green
+  ticket_ref:
+    platform: jira
+    id: MIG-1234
+    epic_id: MIG-CAR-100
+    initiative_id: MIG-1
+    subtask_ids:
+      chain1_planning: MIG-1235
+      chain2_spec: MIG-1236
+      chain3_test: MIG-1237
+      chain4_impl: MIG-1238
+    status_history:    # ★ v8.6.1+ R20 신설 — ticket 상태 전이 timeline
+      - transitioned_at: "2026-05-18T14:30:00+09:00"
+        to_status: "To Do"
+        mcp_tool: "mcp__wiki-jira-assistant__jira_create"
+      - transitioned_at: "2026-05-18T15:00:00+09:00"
+        from_status: "To Do"
+        to_status: "In Progress"
+        mcp_tool: "mcp__wiki-jira-assistant__jira_transition"
+        evidence_ref: ".aimd/output/evidence/ticket-sync-spec-20260518T150000.json"
+      - transitioned_at: "2026-05-18T16:30:00+09:00"
+        from_status: "In Progress"
+        to_status: "Done"
+        mcp_tool: "mcp__wiki-jira-assistant__jira_transition"
+```
+
+★ MCP tool = `mcp__wiki-jira-assistant__*` only (v8.6.1 Tier 2.5 / v8.7.0+ multi-platform carry).
+
 ### Cross-link
 
-- 정책 본문: `methodology-spec/ticket-policy.md`
-- 결단 record: `decisions/DEC-2026-05-18-ticket-binding-policy.md`
-- Schema field: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref
+- 정책 본문: `methodology-spec/ticket-policy.md` (§Tier 2.5 자동화 / §11 v9.0+ carry)
+- 결단 record (Tier 1 정책): `decisions/DEC-2026-05-18-ticket-binding-policy.md`
+- 결단 record (Tier 2.5 자동화): `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
+- Skill: `skills/ticket-sync/SKILL.md` (5 stage matrix + confirmation gate)
+- Schema field: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref (+ status_history)
+- Evidence schema: `schemas/ticket-sync-evidence.schema.json` (7-field MCP invocation)
+- Charter R20: `methodology-spec/plugin-charter.md` §1+§2 (v8.6.1 신설)

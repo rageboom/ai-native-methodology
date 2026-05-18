@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/ticket-sync-evidence.schema.json",
+  "title": "Ticket Sync Evidence (v8.6.1+ R20 MCP Ticket Sync Channel)",
+  "description": "★ v8.6.1+ R20 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — chain stage 종료 시점 사용자 보유 jira-confluence MCP (mcp__wiki-jira-assistant__*) 호출 evidence. 모든 MCP 호출 직전 사용자 confirmation gate 의무. 7-field evidence (tools/static-runner/src/runner.js::REQUIRED_EVIDENCE 패턴 재사용) + evidence_trust enum (simulated 영구 거부 / R15 정합). R16/R17 부활 ❌ — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path).",
+  "type": "object",
+  "required": ["meta", "stage", "mcp_invocations", "confirmation_log_ref", "evidence_trust"],
+  "additionalProperties": true,
+  "$comment_additionalProperties": "★ v8.6.0+ 정합 (R#1 fix 패턴) — PoC 부가 keys 허용 (extra metadata 권장 위치).",
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "stage": {
+      "type": "string",
+      "enum": ["analysis", "planning", "spec", "test", "implement"],
+      "description": "ticket-sync 호출 시점 chain stage. analysis = Initiative + Epic batch / planning (chain 1 종료) = Story batch / spec (chain 2) = Sub-task BHV/AC batch + Story In Progress 전이 / test (chain 3 RED) = AC sub-task Testing 전이 + RED evidence comment / implement (chain 4 GREEN) = AC sub-task Done + Story Done + GREEN evidence comment"
+    },
+    "scope": {
+      "type": "string",
+      "description": "G3 scope slug (예: car / payroll / mainpay) — `.aimd/<scope>/` 단위 격리"
+    },
+    "mcp_invocations": {
+      "type": "array",
+      "minItems": 1,
+      "description": "★ 본 stage 의 모든 MCP 호출 sequential 기록 (NOT parallel — 결정론 axis 보호). 1 invocation = 1 MCP tool call.",
+      "items": {
+        "type": "object",
+        "required": [
+          "mcp_tool_name",
+          "tool_stdout_path",
+          "tool_stderr_path",
+          "tool_version",
+          "invocation_timestamp",
+          "duration_ms",
+          "result_hash",
+          "reproduction_command"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "mcp_tool_name": {
+            "type": "string",
+            "pattern": "^mcp__wiki-jira-assistant__[a-z0-9_]+$",
+            "description": "★ R20 = `mcp__wiki-jira-assistant__*` 만 허용 (jira_create / jira_link / jira_transition / jira_comment / jira_search / wiki_page_create / wiki_page_update / 등). 다른 MCP 호출 = ❌ schema-validator reject (Tier 2.5 = jira-confluence MCP only / Linear/GitHub Issues 등 = v8.7.0+ multi-platform carry)."
+          },
+          "tool_stdout_path": {
+            "type": "string",
+            "description": "MCP 응답 stdout 캡쳐 file path (예: .aimd/output/evidence/mcp-stdout-<timestamp>.log)"
+          },
+          "tool_stderr_path": {
+            "type": "string",
+            "description": "MCP 응답 stderr 캡쳐 file path"
+          },
+          "tool_version": {
+            "type": "string",
+            "description": "MCP server version (사용자 jira-confluence MCP 의 버전 / 예: 1.4.2)"
+          },
+          "invocation_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 호출 시각"
+          },
+          "duration_ms": {
+            "type": "number",
+            "minimum": 0,
+            "description": "MCP 호출 duration 밀리초"
+          },
+          "result_hash": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "description": "MCP 응답 본문 sha256 (정규화 후 — timestamp 제외 / sorted keys)"
+          },
+          "reproduction_command": {
+            "type": "string",
+            "minLength": 1,
+            "description": "★ R15 no-simulation 정합 — MCP 호출 재현 명령 (예: 'mcp__wiki-jira-assistant__jira_create with body=...')"
+          },
+          "request_payload_redacted": {
+            "type": "string",
+            "description": "MCP 요청 payload (민감 정보 redaction 후 / 선택 — debugging 용)"
+          },
+          "ticket_id_created": {
+            "type": "string",
+            "description": "MCP 호출 결과 생성/갱신된 ticket id (Jira PROJ-123 형식)"
+          }
+        }
+      }
+    },
+    "confirmation_log_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "★ 모든 MCP 호출 직전 사용자 confirmation gate 기록 경로. 보통 `.aimd/output/intervention-log.jsonl` (intervention-log.schema.json 정합) 또는 별도 ticket-sync-confirmation-<timestamp>.jsonl. 사용자 yes/no/dry-run 응답 + preview MD digest."
+    },
+    "evidence_trust": {
+      "type": "string",
+      "enum": ["real_tool", "imported_sarif"],
+      "description": "★ R15 정합 — `real_tool` (real MCP 호출 / 권장 default) / `imported_sarif` (R19 SARIF import 패턴 — ticket-sync 에서는 미사용 예상 / 카테고리 정합 위해 enum 보존). `simulated` = 영구 거부 (R15 no-simulation policy / R19 chain gate -5%p + block 정합)."
+    },
+    "preview_md_digest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "★ 사용자에게 표시한 preview MD 의 sha256 — confirmation gate 의 binding evidence (사용자가 본 내용과 실 호출 내용 일치 보장)"
+    },
+    "dry_run": {
+      "type": "boolean",
+      "description": "★ true 시 reproduction_command 만 print / MCP 호출 X (skill default `dry_run=true`). false 시 real MCP 호출."
+    },
+    "idempotency_skip_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "★ search-first idempotency (DEC-2026-05-18-r20 권고) — `jira_search` JQL 로 기존 ticket lookup → skip 한 횟수. status_history 만 갱신."
+    }
+  }
+}

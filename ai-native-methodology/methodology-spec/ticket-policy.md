@@ -129,13 +129,78 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 
 ---
 
-## 10. v9.0+ carry — Tier 2/3 (미진입)
+## 10. Tier 2.5 (v8.6.1+ R20 신설) — MCP delegation
+
+★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임으로 chain stage 동기 ticket lifecycle 자동화. **R16/R17 부활 ❌** — 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+) — R16/R17 부활 ❌" 정합).
+
+### 자동화 행동 (5 stage matrix)
+
+| Stage | Skill 호출 | MCP 호출 |
+|---|---|---|
+| analysis 종료 후 | `ticket-sync stage=analysis` | 1 Initiative + N Epics (per BC) + Tech Debt Story (AP P0) |
+| Chain 1 (planning) 종료 후 | `ticket-sync stage=planning` | Story per UC-* + Sub-task 4 batch (chain1 done, chain2/3/4 pending) |
+| Chain 2 (spec) 종료 후 | `ticket-sync stage=spec` | Sub-task chain2 done / BHV/AC link comment / Story → In Progress |
+| Chain 3 (test) 종료 후 | `ticket-sync stage=test` | RED evidence comment / AC sub-task → Testing |
+| Chain 4 (impl) 종료 후 | `ticket-sync stage=implement` | GREEN evidence + commit hash / AC sub-task → Done / Story → Done |
+
+### Confirmation gate (의무)
+
+★ 모든 MCP 호출 직전 사용자 confirmation:
+```
+★ Confirm ticket-sync stage=planning scope=car?
+   [yes] = real MCP 호출 batch (dry_run=false)
+   [no]  = cancel + state 무변경
+   [dry-run] = reproduction_command 만 print / MCP 호출 X
+```
+
+### Evidence (7-field per MCP invocation)
+
+`schemas/ticket-sync-evidence.schema.json` — `mcp_tool_name` + `tool_stdout_path` + `tool_stderr_path` + `tool_version` + `invocation_timestamp` + `duration_ms` + `result_hash` + `reproduction_command` (R15 정합 — `evidence_trust=simulated` 영구 거부).
+
+### Status history (traceability-matrix)
+
+각 ticket 상태 전이 = `traceability-matrix.ticket_ref.status_history[]` append. 예:
+
+```json
+{
+  "use_case_id": "UC-CAR-007",
+  "status": "green",
+  "ticket_ref": {
+    "platform": "jira",
+    "id": "MIG-1234",
+    "status_history": [
+      { "transitioned_at": "2026-05-18T14:30:00+09:00", "to_status": "To Do", "mcp_tool": "mcp__wiki-jira-assistant__jira_create" },
+      { "transitioned_at": "2026-05-18T15:00:00+09:00", "from_status": "To Do", "to_status": "In Progress", "mcp_tool": "mcp__wiki-jira-assistant__jira_transition", "evidence_ref": ".aimd/output/evidence/ticket-sync-spec-20260518T150000.json" },
+      { "transitioned_at": "2026-05-18T16:30:00+09:00", "from_status": "In Progress", "to_status": "Done", "mcp_tool": "mcp__wiki-jira-assistant__jira_transition" }
+    ]
+  }
+}
+```
+
+### Idempotency
+
+★ 재실행 시 `mcp__wiki-jira-assistant__jira_search` JQL 로 기존 ticket lookup (`"UC ID" ~ "UC-CAR-007"`) → 발견 시 신규 생성 skip / `status_history` 만 갱신. `idempotency_skip_count` 증가 기록.
+
+### MCP 미연결 환경
+
+★ `ListMcpResourcesTool` probe 결과 `mcp__wiki-jira-assistant__*` 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt X / 다른 chain harness 진행 무영향).
+
+### v8.6.1 default 제약
+
+- Platform: `mcp__wiki-jira-assistant__*` only (Linear / GitHub Issues MCP = v8.7.0+ multi-platform carry)
+- Confluence emit: Initiative overview default false (per-stage 보고서 page = v8.7.0+ Tier 2.6 후보)
+- Auto-invoke: gate 통과 후 auto-suggest (confirmation 만 사용자) ★ 권고
+
+---
+
+## 11. v9.0+ carry — Tier 3 (미진입)
 
 | Tier | 형태 | 비용 | 진입 시점 |
 |---|---|---|---|
-| **Tier 1 (현재)** | 정책 문서 + schema field + id-convention | ~30분 | **★ v8.6.0** |
-| Tier 2 (carry) | chain 1 종료 시 ticket payload (CSV/JSON) 자동 emit skill (`planning-ticket-emit`) — file emit 만 / API 호출 X | ~2시간 | v8.7.0+ 후보 (MINOR) |
-| Tier 3 (carry) | Jira / Linear / GitHub Issues platform adapter (`tools/ticket-emitter-{platform}/`) — real API 호출 / no-simulation evidence 의무 | ~4~6시간 / platform | v9.0+ charter review (외부 시스템 통합 카테고리 신설) |
+| Tier 1 (v8.6.0+ 04bd0a1) | 정책 문서 + schema field + id-convention manual | ~30분 | ✅ 활성 |
+| **Tier 2.5 (v8.6.1+ R20)** | MCP delegation — `skills/ticket-sync/SKILL.md` + 7-field evidence + confirmation gate | ~10시간 | **✅ 활성** (DEC-2026-05-18-r20) |
+| Tier 2 (deprecated) | (Tier 2.5 가 흡수 — file emit only 패턴은 별도 진입 X) | — | — |
+| Tier 3 (carry) | 자체 platform adapter (Jira REST / Linear GraphQL / GitHub Issues 직접 구현) — MCP 위임 충분 시 carry 영구 유지 | ~4~6시간 / platform | v9.0+ charter review (MAJOR) |
 
 ---
 
