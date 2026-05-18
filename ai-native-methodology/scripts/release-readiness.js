@@ -255,11 +255,23 @@ function check7_e2eCyclePass() {
 
 // ★ ★ ★ v2.4.0 sub-plan §3 — analysis validator violation 0 (ADR-CHAIN-011 §5.7 / LL-i-23 정합)
 // ★ ★ ★ ★ ★ v4.0 Sprint 1-I 격상 — PoC #01 + #05 한정 → ★ 전체 PoC rules.json 전수 검사.
-//   사각지대 (PoC #02~#04 + #06~#11 schema invalid 잠재) = 묶음 P / Sprint 1 schema cleanup 종결 후
-//   본 criterion 이 모든 PoC rules.json 의 schema-validator + br-cross-consistency 위반을 강제 차단.
-//   (★ feedback_pre_pre_prerequisite_lacuna 정합 — PoC #01+#05 한정 사각지대 영구 해소 / drift enforcement).
-//   examples/**/rules.json 자동 discover (하드코딩 ❌ / 신규 PoC 추가 시 자동 포함).
-function discoverPocRulesJson() {
+// ★ ★ ★ v8.6.0+ F-V2C2-1-01 fix — analysis (business-rules.json) + ★ chain 1~4 산출물 6종
+//   (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix)
+//   까지 schema-validator 전수 검사 scope 확장. release-readiness 가 "release-ready" 보고 시 분석 stage 뿐
+//   아니라 chain harness 산출물 quality 도 자동 검증 의무 (cycle-2 발견 — F-V2C2-1-01 / V2C2-1-02).
+//   br-cross-consistency-validator 는 business-rules.json 만 적용 (chain artifact 미적용).
+//   examples/**/{business-rules,planning-spec,behavior-spec,acceptance-criteria,test-spec,impl-spec,traceability-matrix}.json 자동 discover.
+const ANALYSIS_VALIDATOR_TARGETS = new Set([
+  'business-rules.json',        // analysis stage (R15 baseline / br-cross-consistency 의무)
+  'planning-spec.json',         // chain 1
+  'behavior-spec.json',         // chain 2
+  'acceptance-criteria.json',   // chain 2
+  'test-spec.json',             // chain 3
+  'impl-spec.json',             // chain 4
+  'traceability-matrix.json',   // cross-chain
+]);
+
+function discoverPocSchemaArtifacts() {
   const found = [];
   const examplesDir = join(ROOT, 'examples');
   if (!existsSync(examplesDir)) return found;
@@ -275,9 +287,12 @@ function discoverPocRulesJson() {
     for (const e of entries) {
       const full = join(cur, e.name);
       if (e.isDirectory()) {
-        if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+        if (e.name === 'node_modules') continue;
+        // ★ v8.6.0+ F-V2C2-1-01 fix — `.aimd/` 는 chain artifact 표준 위치 (lifecycle-contract.md §파일 위치 컨벤션 정합) — skip 금지.
+        // 그 외 dotfile (`.git`, `.idea`, `.vscode` 등) 은 그대로 skip.
+        if (e.name.startsWith('.') && e.name !== '.aimd') continue;
         stack.push(full);
-      } else if (e.name === 'business-rules.json') {
+      } else if (ANALYSIS_VALIDATOR_TARGETS.has(e.name)) {
         found.push(full);
       }
     }
@@ -285,12 +300,22 @@ function discoverPocRulesJson() {
   return found.sort();
 }
 
+// Backward-compat alias (다른 곳에서 import 시 회귀 차단).
+function discoverPocRulesJson() {
+  return discoverPocSchemaArtifacts().filter(p => p.endsWith('business-rules.json'));
+}
+
 function check8_analysisValidatorViolation() {
-  const targets = discoverPocRulesJson();
+  const targets = discoverPocSchemaArtifacts();
   const failed = [];
+  let businessRulesCount = 0;
+  let chainArtifactCount = 0;
   for (const target of targets) {
     const rel = target.slice(ROOT.length + 1).replace(/\\/g, '/');
-    // ★ schema-validator 전수 (모든 PoC rules.json = VALID 의무)
+    const isBusinessRules = target.endsWith('business-rules.json');
+    if (isBusinessRules) businessRulesCount++; else chainArtifactCount++;
+
+    // ★ schema-validator 전수 (모든 PoC 산출물 = VALID 의무 / chain 1~4 산출물 포함)
     const sv = spawnSync('node', ['tools/schema-validator/src/cli.js', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
     try {
       const out = JSON.parse(sv.stdout || '{}');
@@ -299,23 +324,26 @@ function check8_analysisValidatorViolation() {
     } catch {
       failed.push(`${rel}: schema-validator JSON parse fail`);
     }
-    // ★ br-cross-consistency-validator 전수 (critical/high finding 0 의무)
-    const bcv = spawnSync('node', ['tools/br-cross-consistency-validator/src/cli.js', '--target', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
-    try {
-      const out = JSON.parse(bcv.stdout || '{}');
-      const critical = (out.findings || []).filter((f) => f.severity === 'critical' || f.severity === 'high').length;
-      if (critical > 0) failed.push(`${rel}: ${critical} bcv critical/high findings`);
-    } catch {
-      failed.push(`${rel}: br-cross-consistency-validator JSON parse fail`);
+
+    // ★ br-cross-consistency-validator = business-rules.json 만 적용 (chain artifact 미적용)
+    if (isBusinessRules) {
+      const bcv = spawnSync('node', ['tools/br-cross-consistency-validator/src/cli.js', '--target', target, '--json'], { cwd: ROOT, encoding: 'utf-8' });
+      try {
+        const out = JSON.parse(bcv.stdout || '{}');
+        const critical = (out.findings || []).filter((f) => f.severity === 'critical' || f.severity === 'high').length;
+        if (critical > 0) failed.push(`${rel}: ${critical} bcv critical/high findings`);
+      } catch {
+        failed.push(`${rel}: br-cross-consistency-validator JSON parse fail`);
+      }
     }
   }
   return {
     id: 'analysis_validator_violation',
     pass: failed.length === 0,
     detail: failed.length === 0
-      ? `analysis validator (schema + br-cross-consistency) violations 0 / ★ 전체 ${targets.length} PoC rules.json 전수 검증 (★ v4.0 Sprint 1-I 격상 — PoC #01+#05 한정 사각지대 해소)`
-      : `violations: ${failed.join(' | ')}`,
-    delegated_to: 'tools/schema-validator + tools/br-cross-consistency-validator (★ examples/**/rules.json 전수 auto-discover)',
+      ? `analysis validator (schema + br-cross-consistency) violations 0 / ★ ${businessRulesCount} business-rules + ${chainArtifactCount} chain artifact 전수 검증 (★ v8.6.0+ F-V2C2-1-01 fix — chain 1~4 산출물 scope 확장)`
+      : `violations (${failed.length}): ${failed.slice(0, 5).join(' | ')}${failed.length > 5 ? ` | ...+${failed.length - 5} more` : ''}`,
+    delegated_to: 'tools/schema-validator + tools/br-cross-consistency-validator (★ examples/**/{business-rules,planning-spec,behavior-spec,acceptance-criteria,test-spec,impl-spec,traceability-matrix}.json 전수 auto-discover)',
   };
 }
 

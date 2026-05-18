@@ -5,7 +5,8 @@
   "description": "v2.0 SDLC 4단계 chain harness 의 chain 1 stage 산출물. legacy 분석 결과 → 비즈니스 의도 추출 (1차 single-case). DEC-2026-05-06-v2.0-i-strict-채택 정합. ID 컨벤션: methodology-spec/id-conventions.md.",
   "type": "object",
   "required": ["meta", "derivation_source", "business_intent", "use_cases"],
-  "additionalProperties": false,
+  "additionalProperties": true,
+  "$comment_additionalProperties": "★ v8.6.0+ F-V2C2-1-02 R#4 fix — PoC 부가 top-level keys (business_rules / migration_priority_summary / phase_4_7_acceptance_oracle / sql_inventory_summary / planning_validator_pass / $3_axis_alignment 등) 허용. drift attractor 차단은 v9.0 charter review carry — 권장 위치 = `extra` field (meta-confidence 와 동일 패턴).",
   "properties": {
     "meta": {
       "$ref": "./meta-confidence.schema.json"
@@ -54,7 +55,8 @@
       "items": {
         "type": "object",
         "required": ["id", "description", "acceptance_criteria_refs"],
-        "additionalProperties": false,
+        "additionalProperties": true,
+        "$comment_additionalProperties": "★ v8.6.0+ F-V2C2-1-02 R#4 fix — UC 부가 keys (note / rationale 등) 허용",
         "properties": {
           "id": {
             "type": "string",

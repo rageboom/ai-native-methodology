@@ -4,7 +4,8 @@
   "title": "신뢰도 메타데이터 (Confidence Metadata)",
   "description": "모든 산출물에 필수로 포함되는 메타데이터. 출처와 신뢰도를 명시함.",
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
+  "$comment_additionalProperties": "★ v8.6.0+ F-V2C2-1-02 R#1 fix — PoC 부가 metadata (예: confidence_reasoning, _inputs_used_evidence, $comment) 허용. drift attractor 차단은 v9.0 charter review carry — 권장 위치 = `extra` field.",
   "required": ["generated_at", "confidence", "inputs_used"],
   "properties": {
     "generated_at": {
@@ -18,9 +19,9 @@
     },
     "methodology_version": {
       "type": "string",
-      "pattern": "^v\\d+\\.\\d+(\\.\\d+)?$",
-      "description": "본 산출물을 생성한 방법론 버전 (예: v1.1.0)",
-      "examples": ["v1.1.0"]
+      "pattern": "^v\\d+\\.\\d+(\\.\\d+)?(-[a-zA-Z0-9][a-zA-Z0-9.-]*)?$",
+      "description": "본 산출물을 생성한 방법론 버전 (예: v1.1.0 / v2.0.0-rc1). ★ v8.6.0+ — SemVer pre-release suffix (-rc1 / -alpha.2 / -beta 등) 허용 (F-V2C2-1-02 R#3 fix).",
+      "examples": ["v1.1.0", "v2.0.0-rc1", "v8.5.0"]
     },
     "inputs_used": {
       "type": "array",
@@ -55,28 +56,38 @@
     },
     "confidence_breakdown": {
       "type": "object",
-      "description": "산출물 내 영역별 신뢰도 (요소 수 가중 평균에 사용). ADR-003 §7 참조.",
+      "description": "산출물 내 영역별 신뢰도 (요소 수 가중 평균에 사용). ADR-003 §7 참조. ★ v8.6.0+ F-V2C2-1-02 R#2 fix — values 는 (a) object 형식 (확장 메타 / ADR-003 §7 strict) 또는 (b) number 형식 (단순 신뢰도 0.0~0.98) 둘 다 허용. PoC 자연스러운 emit 패턴 흡수.",
       "additionalProperties": {
-        "type": "object",
-        "required": ["confidence"],
-        "properties": {
-          "confidence": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["confidence"],
+            "properties": {
+              "confidence": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 0.98,
+                "description": "이 영역의 신뢰도"
+              },
+              "element_count": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "이 영역의 추출 항목 수 (가중 평균에 사용)"
+              },
+              "extraction_method": {
+                "type": "string",
+                "enum": ["deterministic", "pattern_matching", "llm_with_grounding", "llm_code_only"],
+                "description": "추출 방법. ADR-003 §8 표 참조."
+              }
+            }
+          },
+          {
             "type": "number",
             "minimum": 0.0,
             "maximum": 0.98,
-            "description": "이 영역의 신뢰도"
-          },
-          "element_count": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "이 영역의 추출 항목 수 (가중 평균에 사용)"
-          },
-          "extraction_method": {
-            "type": "string",
-            "enum": ["deterministic", "pattern_matching", "llm_with_grounding", "llm_code_only"],
-            "description": "추출 방법. ADR-003 §8 표 참조."
+            "description": "★ v8.6.0+ 단순 형식 — number 만 (sub-section 별 신뢰도 빠른 표기)"
           }
-        }
+        ]
       }
     },
     "formula_version": {
@@ -231,6 +242,15 @@
     "phase_d_meta_recovery_note": {
       "type": "string",
       "description": "★ v2.5.0 phase D — schema-validator 필수 필드 회복 메모 (release-readiness 회귀 회복)."
+    },
+    "extra": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "★ v8.6.0+ F-V2C2-1-02 R#1 fix — PoC / 사용자 부가 metadata 격리 영역. 본 객체 안 임의 keys 허용 (additionalProperties: true). schema 본체의 strict 정신 유지하면서 R4 (재사용성) 마찰 해소. 의도 외 키는 본 extra 안 위치 의무 (drift attractor 회피)."
+    },
+    "$comment": {
+      "type": "string",
+      "description": "★ v8.6.0+ — JSON Schema 표준 $comment field (산출물 작성자 메모 / consumer 무시 의무)."
     }
   }
 }
