@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<!-- ★ v8.7.1 PATCH fixture — 5 stmt 종류 (select + insert + update + delete + procedure) 혼합 / total = 5 -->
+<sqlMap namespace="TestMixedDAO">
+    <select id="findById" parameterClass="java.lang.Long" resultClass="HashMap">
+        SELECT * FROM users WHERE id = #id#
+    </select>
+
+    <insert id="insertUser" parameterClass="HashMap">
+        INSERT INTO users (name, email) VALUES (#name#, #email#)
+    </insert>
+
+    <update id="updateUser" parameterClass="HashMap">
+        UPDATE users SET name = #name# WHERE id = #id#
+    </update>
+
+    <delete id="deleteUser" parameterClass="java.lang.Long">
+        DELETE FROM users WHERE id = #id#
+    </delete>
+
+    <procedure id="callRefreshUser" parameterClass="HashMap">
+        EXEC MDI.dbo.REFRESH_USER ?
+    </procedure>
+</sqlMap>

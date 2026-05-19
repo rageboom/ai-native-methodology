@@ -53,7 +53,7 @@ v2.3.1 PATCH baseline ratchet (C-v2.2.0-2 / characterization-coverage-validator 
 
 ★ v8.7 PATCH — legacy XML cross-check (R15 silent simulation 차단 / F-CYCLE3-005 fix):
   --legacy-xml-dir <dir>                       실 legacy XML (iBATIS/MyBatis mapper) 디렉토리
-                                               xmllint XPath \`count(//select | //insert | //update | //delete)\`
+                                               xmllint XPath \`count(//select | //insert | //update | //delete | //procedure)\`
                                                합과 inventory_count 정량 cross-check.
   --legacy-mismatch-high-threshold <ratio>     mismatch ≥ N% 시 high finding (default 0.30)
   --legacy-mismatch-critical-threshold <ratio> mismatch ≥ N% 시 critical finding (default 0.70)

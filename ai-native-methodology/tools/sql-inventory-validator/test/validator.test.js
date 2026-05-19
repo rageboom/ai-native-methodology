@@ -4,6 +4,7 @@ import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 import { validateSqlInventory } from '../src/validator.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -200,4 +201,39 @@ test('★ v8.7 Layer 3 — evidence-dir 명시 / tool_count < claim (2 vs 4) →
   assert.ok(r.findings.some(f =>
     f.kind === 'evidence_cross_check.invocation_count_mismatch' && f.severity === 'critical'),
     `2 (evidence) < 4 (claim) → CRITICAL finding 의무 (R15 silent simulation 의심): ${JSON.stringify(r.findings)}`);
+});
+
+// ★ ★ ★ v8.7.1 PATCH — F-CYCLE4-001 fix: xmllint XPath 에 iBATIS 2 <procedure> tag 추가
+// 이전 (v8.7.0): rbac.xml 류 stored-procedure-only mapper 가 xmllint_total=0 → zero_xmllint_count medium finding
+// 이후 (v8.7.1+): procedure tag 도 count → boundary service 도 정확 cross-check
+// dogfood: poc-efi-web-1 cycle-4 rbac scope 의 정직 발견 (F-CYCLE4-001) 으로 트리거.
+
+test('★ v8.7.1 — iBATIS 2 <procedure> only mapper xmllint_total > 0 (F-CYCLE4-001 fix / rbac.xml 형식)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    legacyXmlDir: join(FIX, 'legacy-xml-ibatis2-procedure')
+  });
+  assert.equal(r.summary.legacy_cross_check.status, 'ok',
+    `legacy_cross_check status ok 의무: ${JSON.stringify(r.summary.legacy_cross_check)}`);
+  assert.equal(r.summary.legacy_cross_check.xmllint_total, 3,
+    `★ v8.7.1 — rbac-like mapper (3 procedure) xmllint count = 3 의무 / v8.7.0 까지는 0 (procedure tag 누락 결함). 실 결과: ${r.summary.legacy_cross_check.xmllint_total}`);
+  // zero_xmllint_count finding 부재 확인 (v8.7.0 까지는 emit, v8.7.1 부터 0 count 아님)
+  assert.equal(r.findings.filter(f => f.kind === 'legacy_cross_check.zero_xmllint_count').length, 0,
+    `★ v8.7.1 — procedure tag 가 count 되므로 zero_xmllint_count finding 부재 의무: ${JSON.stringify(r.findings)}`);
+});
+
+test('★ v8.7.1 — select/insert/update/delete/procedure 혼합 mapper xmllint_total 정확 합산', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    legacyXmlDir: join(FIX, 'legacy-xml-mixed-stmt-proc')
+  });
+  assert.equal(r.summary.legacy_cross_check.status, 'ok');
+  assert.equal(r.summary.legacy_cross_check.xmllint_total, 5,
+    `★ v8.7.1 — 5 stmt (select + insert + update + delete + procedure) 합산 = 5 의무 / v8.7.0 까지는 4 (procedure 누락). 실 결과: ${r.summary.legacy_cross_check.xmllint_total}`);
+});
+
+test('★ v8.7.1 — zero_xmllint_count message 갱신 (procedure tag 언급)', () => {
+  // empty dir 같은 fixture 가 없으니 단순 message 정합만 확인 — 실 동작은 다른 test 에 위임
+  // 본 test 는 v8.7.1 message 가 'procedure' 키워드 포함하는지 회귀 보장 (소스 직접 grep)
+  const validatorSrc = readFileSync(join(__dirname, '..', 'src', 'validator.js'), 'utf8');
+  assert.ok(validatorSrc.includes('select/insert/update/delete/procedure'),
+    '★ v8.7.1 — zero_xmllint_count message 가 procedure 키워드 포함 의무');
 });

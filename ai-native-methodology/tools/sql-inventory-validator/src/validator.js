@@ -373,7 +373,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
         findings.push({
           kind: 'legacy_cross_check.zero_xmllint_count',
           severity: 'medium',
-          message: `xmllint XPath count = 0 across ${crossCheck.files_scanned} .xml files (no select/insert/update/delete tags) — legacy XML 이 iBATIS/MyBatis mapper 아닐 가능성`
+          message: `xmllint XPath count = 0 across ${crossCheck.files_scanned} .xml files (no select/insert/update/delete/procedure tags) — legacy XML 이 iBATIS/MyBatis mapper 아닐 가능성`
         });
       } else if (mismatch_ratio >= legacyMismatchCriticalThreshold) {
         findings.push({
@@ -429,7 +429,10 @@ function crossCheckLegacyXml(legacyXmlDir, inventoryCount) {
   let xmllintTotal = 0;
   const perFile = [];
   for (const f of xmlFiles) {
-    const xpath = 'count(//select) + count(//insert) + count(//update) + count(//delete)';
+    // ★ v8.7.1 PATCH (F-CYCLE4-001 fix) — iBATIS 2 <procedure> tag 추가 (stored procedure 호출 mapper 대응)
+    // 이전 (v8.7.0): count(//select) + count(//insert) + count(//update) + count(//delete) — iBATIS 2 <procedure> 미포함 → rbac.xml 류 stored procedure mapper 가 0 count
+    // 이후 (v8.7.1+): //procedure 포함 — boundary service (rbac 등) 의 stored procedure 호출도 정확 count
+    const xpath = 'count(//select) + count(//insert) + count(//update) + count(//delete) + count(//procedure)';
     const res = spawnSync('xmllint', ['--xpath', xpath, f], { encoding: 'utf8' });
     if (res.status !== 0) {
       perFile.push({ file: f, status: 'xmllint_error', count: 0, error: (res.stderr || '').slice(0, 200) });

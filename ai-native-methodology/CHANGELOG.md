@@ -9,6 +9,48 @@
 
 ---
 
+## [8.7.1] — 2026-05-19 ★ PATCH — sql-inventory-validator xmllint XPath 에 iBATIS 2 `//procedure` tag 추가 (F-CYCLE4-001 fix / boundary service 대응 / breaking 0)
+
+> ★ **v8.7.1 PATCH — F-CYCLE4-001 fix**. cycle-4 dogfood (poc-efi-web-1 / rbac scope) 의 정직 발견: rbac.xml 류 stored-procedure-only mapper (iBATIS 2 `<procedure>` tag 만 사용) 가 sql-inventory-validator Layer 2 cross-check 에서 xmllint_total=0 으로 측정 → `zero_xmllint_count` medium finding 오탐. XPath 가 `select | insert | update | delete` 4 tag 만 cover → `procedure` 누락.
+
+### 본질 발견 (cycle-4 dogfood)
+
+- cycle-4 분석 대상: poc-efi-web-1 의 `rbac` 도메인 (boundary service / 외부 MDI DB stored procedure wrapper)
+- rbac.xml = 3 `<procedure>` 만 정의 (rbac 인증/메뉴/권한 조회용 stored procedure 호출)
+- v8.7.0 까지: xmllint XPath = `count(//select) + count(//insert) + count(//update) + count(//delete)` → rbac.xml count=0 → `zero_xmllint_count` medium finding (오탐 — 실은 3 SQL 정확 존재)
+- ★ 본질: iBATIS 2 의 `<procedure>` tag 가 표준 SQL 호출 tag 중 누락 — `select|insert|update|delete` 외 `procedure` 도 의무
+
+### 시행 (1 commit / branch `v8.7.1-xpath-procedure-fix`)
+
+1. **XPath fix** (`validator.js:432`) — `count(//procedure)` 추가. 이전: 4 tag 합산 / 이후: 5 tag 합산 (select + insert + update + delete + procedure).
+2. **finding message 갱신** (`validator.js:376`) — `zero_xmllint_count` message 의 "no select/insert/update/delete tags" → "no select/insert/update/delete/procedure tags".
+3. **cli.js help 문구 갱신** (line 56) — XPath 표기 정정.
+4. **test 신규 3건** (`test/validator.test.js`):
+   - "★ v8.7.1 — iBATIS 2 `<procedure>` only mapper xmllint_total > 0 (F-CYCLE4-001 fix / rbac.xml 형식)" — fixture `legacy-xml-ibatis2-procedure/rbac-like.xml` (3 procedure) / 기대 xmllint_total=3.
+   - "★ v8.7.1 — select/insert/update/delete/procedure 혼합 mapper xmllint_total 정확 합산" — fixture `legacy-xml-mixed-stmt-proc/mixed-mapper.xml` (5 stmt) / 기대 xmllint_total=5.
+   - "★ v8.7.1 — zero_xmllint_count message 갱신 (procedure tag 언급)" — source grep 회귀 보장.
+5. **fixture 신규 2개** — `legacy-xml-ibatis2-procedure/` + `legacy-xml-mixed-stmt-proc/`.
+6. **package.json version bump** — `0.2.0` → `0.2.1`.
+
+### 검증
+
+- sql-inventory-validator 27 tests pass / 0 fail (★ v8.7.1 신규 3 / 24 기존 정합 — 회귀 0)
+- xmllint 직접 검증: rbac-like.xml = 3, mixed-mapper.xml = 5 (예상치 일치)
+- breaking 0 — 옛 4 tag 호출자는 영향 없음 (procedure tag 가 누락된 mapper 만 추가 count)
+
+### dogfood 효과
+
+- cycle-4 의 sql-inventory.json (rbac 3 procedure) 가 plugin v8.7.1 의 Layer 2 cross-check 통과 가능 — xmllint_total=3 vs inventory_count=3 → mismatch 0% (정합)
+- F-CYCLE4-001 medium finding 해소 (v8.7.0 까지의 plugin XPath 결함)
+
+### dependencies / migration
+
+- `_shared/` 변경 없음 / schema 변경 없음 / cli flag 변경 없음 / data file 변경 없음
+- 옛 호출자 break 0 (XPath 만 +1 tag, 옛 count 결과 ≤ 새 count 결과)
+- 후속 R15 차단 의무 영역 (Layer 3 evidence-dir) 변경 없음
+
+---
+
 ## [8.7.0] — 2026-05-19 ★ MINOR — R15 silent enabler fix (sql-inventory-validator Layer 1~4 + characterization-coverage-validator Layer 3 mirror + _shared/evidence-cross-check.js refactor + bin alias 양쪽 보존 rename) (additive / breaking 0)
 
 > ★ ★ **v8.7.0 MINOR — R15 silent enabler 4 layer fix**. cycle-3 dogfood (poc-efi-web-1) 의 **F-CYCLE3-005** R15 violation 정량 evidence 발견 → plugin 17 validator 중 2 도구 (sql-inventory-extractor + characterization-coverage-validator) 가 `_shared/baseline.js` 공유 = **R15 silent enabler 공범** 확정 → 본 release = **4 layer fix + 정직 명칭 채택 + duplication 청산**.
