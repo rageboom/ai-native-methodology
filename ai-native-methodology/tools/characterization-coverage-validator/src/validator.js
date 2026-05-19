@@ -9,7 +9,7 @@
 //   7. UC 유일성 (snapshot 의 use_case 가 matrix 에 존재)
 //   8. data_source_status: code_only 시 carry note 권장 (medium finding)
 
-import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
 
@@ -21,7 +21,7 @@ const VALID_TYPE = new Set(['intent', 'bug', 'ambiguous', 'self_recognized']);
 const VALID_STRATEGY = new Set(['absolute', 'ratchet']);
 
 export function validateCharacterization(targetDir, threshold = 0.80, options = {}) {
-  const { coverageBaselinePath = null, writeBaseline = false } = options;
+  const { coverageBaselinePath = null, writeBaseline = false, evidenceDir = null } = options;
   const findings = [];
   const summary = {
     snapshot_count: 0,
@@ -33,7 +33,8 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
     named_classified_ratio: null,
     coverage_strategy: null,
     coverage_target: null,
-    actual_coverage_ratio: null
+    actual_coverage_ratio: null,
+    evidence_cross_check: null
   };
 
   // 1. snapshots/UC-*.json read
@@ -335,6 +336,45 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
     }
   }
 
+  // ★ Layer 3 (v8.7+) — evidence cross-check (실 tool invocation log 와 real-source snapshot count claim cross-check)
+  // R15 silent enabler fix (sql-inventory-extractor Layer 3 mirror): AI 가 data_source_status 만 'real_db' /
+  // 'real_environment' / 'domain_expert_interview' 로 자기 기입한 silent simulation 차단. 실 외부 도구 invocation
+  // evidence (JSON Lines log) 의 unique tool count 와 정량 cross-check.
+  if (evidenceDir) {
+    const claimedN = countRealSourceSnapshots(snapshots);
+    const crossCheck = crossCheckEvidence(evidenceDir, claimedN);
+    summary.evidence_cross_check = crossCheck;
+
+    if (crossCheck.status === 'dir_missing') {
+      findings.push({
+        kind: 'evidence_cross_check.dir_missing',
+        severity: 'high',
+        message: `--evidence-dir '${evidenceDir}' not found or not a directory`
+      });
+    } else if (crossCheck.status === 'no_evidence_files') {
+      findings.push({
+        kind: 'evidence_cross_check.no_evidence_files',
+        severity: 'high',
+        message: `--evidence-dir '${evidenceDir}' has no *.jsonl evidence files — characterization-spec.json 의 real-source snapshot claim 검증 불가 (R15 silent enabler unverified)`
+      });
+    } else if (crossCheck.status === 'ok') {
+      const { evidence_tool_count, claimed_count, total_invocations } = crossCheck;
+      if (claimedN === 0) {
+        findings.push({
+          kind: 'evidence_cross_check.claim_empty',
+          severity: 'medium',
+          message: `real-source snapshot 0 (data_source_status real_db/real_environment/domain_expert_interview 명시 부재) → evidence cross-check skip (evidence_tool_count=${evidence_tool_count} / total_invocations=${total_invocations})`
+        });
+      } else if (evidence_tool_count < claimedN) {
+        findings.push({
+          kind: 'evidence_cross_check.invocation_count_mismatch',
+          severity: 'critical',
+          message: `★ R15 silent simulation 의심 — real-source snapshot claim=${claimedN} vs evidence_tool_count=${evidence_tool_count} (실 invocation 의 unique tool 개수 부족). data_source_status='real_*' AI 자기 보고 가능성 / 실 외부 도구 invocation 의무.`
+        });
+      }
+    }
+  }
+
   // tally
   for (const f of findings) {
     summary.total_findings++;
@@ -344,4 +384,69 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
   }
 
   return { summary, findings };
+}
+
+// ★ Layer 3 helper — real-source snapshot count (data_source_status 가 실 evidence source 명시)
+const REAL_SOURCE_STATUSES = new Set(['real_db', 'real_environment', 'domain_expert_interview']);
+function countRealSourceSnapshots(snapshots) {
+  let n = 0;
+  for (const s of snapshots) {
+    if (REAL_SOURCE_STATUSES.has(s.data?.data_source_status)) n++;
+  }
+  return n;
+}
+
+// ★ Layer 3 helper — evidence cross-check (실 tool invocation log file 의 unique tool count)
+function crossCheckEvidence(evidenceDir, claimedN) {
+  if (!existsSync(evidenceDir)) {
+    return { status: 'dir_missing', evidence_dir: evidenceDir };
+  }
+  let st;
+  try { st = statSync(evidenceDir); } catch { return { status: 'dir_missing', evidence_dir: evidenceDir }; }
+  if (!st.isDirectory()) return { status: 'dir_missing', evidence_dir: evidenceDir };
+
+  const entries = readdirSync(evidenceDir);
+  const jsonlFiles = entries
+    .filter(f => f.endsWith('.jsonl'))
+    .map(f => join(evidenceDir, f));
+
+  if (jsonlFiles.length === 0) {
+    return { status: 'no_evidence_files', evidence_dir: evidenceDir, files_scanned: 0 };
+  }
+
+  const tools = new Set();
+  let totalInvocations = 0;
+  let parseErrors = 0;
+  const perFile = [];
+
+  for (const f of jsonlFiles) {
+    let content;
+    try { content = readFileSync(f, 'utf8'); } catch { perFile.push({ file: f, status: 'read_error' }); continue; }
+    const lines = content.split('\n').filter(l => l.trim().length > 0);
+    let fileInvocations = 0;
+    let fileTools = new Set();
+    for (const line of lines) {
+      let rec;
+      try { rec = JSON.parse(line); } catch { parseErrors++; continue; }
+      if (typeof rec.tool === 'string') {
+        tools.add(rec.tool);
+        fileTools.add(rec.tool);
+        totalInvocations++;
+        fileInvocations++;
+      }
+    }
+    perFile.push({ file: f, invocations: fileInvocations, unique_tools: [...fileTools] });
+  }
+
+  return {
+    status: 'ok',
+    evidence_dir: evidenceDir,
+    files_scanned: jsonlFiles.length,
+    total_invocations: totalInvocations,
+    evidence_tool_count: tools.size,
+    unique_tools: [...tools].sort(),
+    claimed_count: claimedN,
+    parse_errors: parseErrors,
+    per_file: perFile,
+  };
 }

@@ -1,0 +1,2 @@
+{"tool": "semgrep", "version": "1.50.0", "invocation_id": "inv-001", "args": ["--config", "auto"], "target": "src/", "timestamp": "2026-05-19T10:00:00Z", "duration_ms": 1234, "exit_code": 0, "stdout_sample": "0 findings"}
+{"tool": "rg", "version": "14.1.0", "invocation_id": "inv-002", "args": ["TODO|FIXME|HACK|XXX"], "target": "src/", "timestamp": "2026-05-19T10:01:00Z", "duration_ms": 56, "exit_code": 0, "stdout_sample": "src/foo.ts:10: // TODO carry"}

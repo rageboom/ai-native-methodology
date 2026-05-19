@@ -17,6 +17,7 @@ node src/cli.js \
   --target .aimd/output/characterization/ \
   [--threshold 0.80] \
   [--coverage-baseline <path>] [--write-coverage-baseline] \
+  [--evidence-dir <dir>] \
   [--dry-run] [--json]
 ```
 
@@ -30,6 +31,16 @@ node src/cli.js \
 - `--coverage-baseline <path>` — 이전 측정 baseline JSON 비교
 - `--write-coverage-baseline` — 현재 측정을 baseline 으로 기록 (legacy 첫 진입 또는 trend pass 후)
 - `coverage_strategy=ratchet` + `trend_required=true` + `--coverage-baseline` 모두 충족 시 trend negative (current < baseline) 자동 차단
+
+★ **v8.7 PATCH 신규 (Fix #3 Layer 3 / sql-inventory-extractor Layer 3 mirror)** — evidence cross-check (R15 silent simulation 차단):
+- `--evidence-dir <dir>` — 실 외부 도구 invocation log (*.jsonl) 디렉토리
+  - 각 line schema: `{ tool, version, invocation_id, args, target, timestamp, duration_ms, exit_code, stdout_sample, result_sha256 }` (필수: `tool`)
+  - 디렉토리 안 `*.jsonl` scan → unique `tool` field count = `evidence_tool_count`
+  - snapshot 의 `data_source_status` 가 `real_db` / `real_environment` / `domain_expert_interview` 중 하나인 snapshot 개수 = `claimed_count`
+  - `evidence_tool_count < claimed_count` → critical finding (R15 silent simulation 의심 — AI 가 `data_source_status='real_*'` 자기 기입한 가능성)
+- 미지정 시 cross-check skip (backward-compat)
+
+권장 path (v8.7+): `--coverage-baseline` + `--evidence-dir` 둘 다 사용 — ratchet trend + Layer 3 evidence 동시 R15 차단.
 
 ## Outputs
 
@@ -50,6 +61,10 @@ node src/cli.js \
 | `classification.named_ratio_below_threshold` | high | named_classified_ratio < threshold (default 0.80) |
 | `classification.ambiguous_carry_missing` | critical | ambiguous > 0 인데 ambiguous_carry 명시 부재 (entry 또는 intent-vs-bug.md grep) |
 | `snapshot.code_only_carry_required` | **high** (★ v8.7 PATCH 격상) | data_source_status='code_only' — 도메인 expert 검증 의무 (R15 silent enabler 차단 / 옛 `code_only_carry_recommended` medium 격상) |
+| `evidence_cross_check.dir_missing` | high | ★ v8.7 Layer 3 — `--evidence-dir` 경로 부재 또는 디렉토리 아님 |
+| `evidence_cross_check.no_evidence_files` | high | ★ v8.7 Layer 3 — `--evidence-dir` 안 `*.jsonl` 부재 (R15 silent enabler unverified) |
+| `evidence_cross_check.claim_empty` | medium | ★ v8.7 Layer 3 — real-source snapshot 0 (`data_source_status` real_* 부재) → cross-check skip 권고 |
+| `evidence_cross_check.invocation_count_mismatch` | **critical** | ★ v8.7 Layer 3 — `evidence_tool_count < claimed_count` (R15 silent simulation 의심 / AI 자기 보고 metric 가능성) |
 
 ## Exit codes
 
@@ -94,9 +109,11 @@ node src/cli.js \
 - **`named_classified_ratio` + `coverage_ratio`** = snapshot/coverage.json 안 metric 이 caller (AI 또는 사용자) 자기 보고. 본 도구는 형식 + threshold + ratchet trend 만 검증, **실 test runner 의 coverage report cross-check 불가**.
 - **R15 (no-simulation) partial defense** (★ v8.7 격상):
   - `snapshot.code_only_carry_required` finding severity **medium → high 격상** — `data_source_status='code_only'` snapshot 은 AI 가 코드만 보고 작성된 hypothesis 가능성. 도메인 expert 검증 의무.
-- **R15 full 차단 carry** (Fix #3 후속 — v8.7+ 의 더 본격적 fix):
+  - **★ v8.7 PATCH Fix #3 Layer 3 resolved** — `--evidence-dir <dir>` 옵션 신설 (sql-inventory-extractor Layer 3 mirror). real-source snapshot (`data_source_status` real_* enum) 개수 ≤ `*.jsonl` 안 unique `tool` count 의무. mismatch 시 critical finding.
+- **R15 full 차단 carry** (v8.7+ 후속):
   - `--test-coverage-report <path>` — 실 test runner (vitest/jest/pytest) coverage report 와 cross-check
-  - `--evidence-dir <path>` — sql-inventory-extractor Layer 3 mirror (실 invocation log cross-check)
+  - `_shared/baseline.js` audit — AI 자기 보고 metric channel 의 본질 patrol
+  - `_shared/evidence-cross-check.js` refactor — sql-inventory-extractor + characterization-coverage-validator 의 Layer 3 helper duplication 통합
 
 ### 원본 cycle-3 evidence (F-CYCLE3-005)
 

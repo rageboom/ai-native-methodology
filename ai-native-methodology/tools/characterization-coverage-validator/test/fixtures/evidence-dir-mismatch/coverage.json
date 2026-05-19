@@ -1,0 +1,16 @@
+{
+  "matrix": [
+    { "uc": "UC-USER-SIGNUP-001", "snapshot": "✅", "covered_by": ["SNAP-UC-USER-SIGNUP-001"], "scope_decision": "covered" },
+    { "uc": "UC-USER-LOGIN-001", "snapshot": "✅", "covered_by": ["SNAP-UC-USER-LOGIN-001"], "scope_decision": "covered" },
+    { "uc": "UC-USER-PROFILE-001", "snapshot": "✅", "covered_by": ["SNAP-UC-USER-PROFILE-001"], "scope_decision": "covered" }
+  ],
+  "coverage_summary": {
+    "ucs_total": 3,
+    "ucs_covered": 3,
+    "uc_coverage_ratio": 1.0
+  },
+  "coverage_target": 0.80,
+  "coverage_strategy": "absolute",
+  "coverage_minimum_legacy": 0.40,
+  "trend_required": false
+}

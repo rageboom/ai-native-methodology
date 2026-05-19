@@ -190,3 +190,50 @@ test('★ v8.7 — 옛 kind name (code_only_carry_recommended) 은 v8.7+ 부터 
   const oldKind = r.findings.filter(f => f.kind === 'snapshot.code_only_carry_recommended');
   assert.equal(oldKind.length, 0, '옛 kind name (medium severity) 은 v8.7 부터 emit 안 됨 / 새 kind name 으로 통일');
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// ★ v8.7 PATCH — Fix #3 Layer 3 mirror (sql-inventory-extractor Layer 3 pattern):
+// --evidence-dir <dir> 옵션 → 실 외부 도구 invocation log (*.jsonl) 의 unique tool count 와
+// data_source_status 'real_db' / 'real_environment' / 'domain_expert_interview' snapshot count cross-check
+// ─────────────────────────────────────────────────────────────────────
+
+test('★ v8.7 Layer 3 — --evidence-dir 미지정 시 evidence_cross_check skip (backward-compat)', () => {
+  const r = validateCharacterization(fx('valid'), 0.80);
+  assert.equal(r.summary.evidence_cross_check, null,
+    '옵션 미지정 시 evidence_cross_check 미실행 (summary null)');
+  const ec = r.findings.filter(f => f.kind.startsWith('evidence_cross_check.'));
+  assert.equal(ec.length, 0, '옵션 미지정 시 evidence_cross_check finding emit ❌');
+});
+
+test('★ v8.7 Layer 3 — --evidence-dir 부재 디렉토리 시 dir_missing HIGH finding', () => {
+  const r = validateCharacterization(fx('evidence-dir-match'), 0.80, {
+    evidenceDir: fx('evidence-dir-match/no-such-evidence-dir'),
+  });
+  const dm = r.findings.filter(f => f.kind === 'evidence_cross_check.dir_missing');
+  assert.equal(dm.length, 1, 'dir_missing finding ≥ 1 의무');
+  assert.equal(dm[0].severity, 'high');
+});
+
+test('★ v8.7 Layer 3 — evidence-dir-match → N_evidence=2 ≥ N_claim=2 → invocation_count_mismatch finding ❌ (pass)', () => {
+  const r = validateCharacterization(fx('evidence-dir-match'), 0.80, {
+    evidenceDir: fx('evidence-dir-match/evidence'),
+  });
+  const mismatch = r.findings.filter(f => f.kind === 'evidence_cross_check.invocation_count_mismatch');
+  assert.equal(mismatch.length, 0,
+    `mismatch finding 미 emit 의무 (N_evidence=2 ≥ N_claim=2): ${JSON.stringify(r.summary.evidence_cross_check, null, 2)}`);
+  assert.ok(r.summary.evidence_cross_check, 'evidence_cross_check summary set 의무');
+  assert.equal(r.summary.evidence_cross_check.status, 'ok');
+  assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 2);
+  assert.equal(r.summary.evidence_cross_check.claimed_count, 2);
+});
+
+test('★ v8.7 Layer 3 — evidence-dir-mismatch → N_evidence=1 < N_claim=3 → invocation_count_mismatch CRITICAL finding', () => {
+  const r = validateCharacterization(fx('evidence-dir-mismatch'), 0.80, {
+    evidenceDir: fx('evidence-dir-mismatch/evidence'),
+  });
+  const mismatch = r.findings.filter(f => f.kind === 'evidence_cross_check.invocation_count_mismatch');
+  assert.equal(mismatch.length, 1, `mismatch finding 정확 1 의무: ${JSON.stringify(r.summary.evidence_cross_check, null, 2)}`);
+  assert.equal(mismatch[0].severity, 'critical');
+  assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 1);
+  assert.equal(r.summary.evidence_cross_check.claimed_count, 3);
+});

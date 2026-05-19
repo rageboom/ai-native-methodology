@@ -2,18 +2,21 @@
 import { validateCharacterization, loadJson } from './validator.js';
 
 function parseArgs(argv) {
-  const out = { dryRun: false, json: false, threshold: 0.80, coverageBaseline: null, writeBaseline: false };
+  const out = { dryRun: false, json: false, threshold: 0.80, coverageBaseline: null, writeBaseline: false, evidenceDir: null };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
     else if (a === '--threshold') out.threshold = parseFloat(argv[++i]);
     else if (a === '--coverage-baseline') out.coverageBaseline = argv[++i];
     else if (a === '--write-coverage-baseline') out.writeBaseline = true;
+    else if (a === '--evidence-dir') out.evidenceDir = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
       console.log(`usage: characterization-coverage-validator --target <dir> [--threshold 0.80]
-       [--coverage-baseline <path>] [--write-coverage-baseline] [--dry-run] [--json]
+       [--coverage-baseline <path>] [--write-coverage-baseline]
+       [--evidence-dir <dir>]
+       [--dry-run] [--json]
 
 Validates phase characterization output:
   <target>/characterization-spec.json (entry / optional — sub files standalone OK)
@@ -27,6 +30,13 @@ Validates phase characterization output:
 
   Coverage strategy 'ratchet' + trend_required=true + --coverage-baseline 제공 시
   current coverage_ratio < baseline coverage_ratio 이면 high finding (ratchet trend negative).
+
+★ v8.7 PATCH — evidence cross-check (R15 silent simulation 차단 / sql-inventory-extractor Layer 3 mirror):
+  --evidence-dir <dir>     실 외부 도구 invocation 의 evidence file (*.jsonl) 디렉토리
+                           각 line: { tool, version, args, target, timestamp, duration_ms, exit_code, ... }
+                           unique 'tool' field count 와 snapshot data_source_status 'real_db' /
+                           'real_environment' / 'domain_expert_interview' 명시 개수 cross-check.
+                           N_evidence < N_claim 시 critical finding (R15 silent simulation 의심).
 
 Threshold default 0.80 (PIT/Stryker/BullseyeCoverage 산업 표준).
 `);
@@ -45,6 +55,7 @@ if (!args.target) {
 const result = validateCharacterization(args.target, args.threshold, {
   coverageBaselinePath: args.coverageBaseline,
   writeBaseline: args.writeBaseline,
+  evidenceDir: args.evidenceDir,
 });
 
 if (args.json) {
@@ -54,6 +65,14 @@ if (args.json) {
   console.log(`snapshots: ${result.summary.snapshot_count} / scenarios: ${result.summary.scenario_count}`);
   console.log(`named_classified_ratio: ${(result.summary.named_classified_ratio * 100).toFixed(1)}% (threshold ${(args.threshold * 100).toFixed(0)}%)`);
   console.log(`coverage strategy: ${result.summary.coverage_strategy} / target: ${result.summary.coverage_target} / actual: ${result.summary.actual_coverage_ratio !== null ? (result.summary.actual_coverage_ratio * 100).toFixed(1) + '%' : 'N/A'}`);
+  if (result.summary.evidence_cross_check) {
+    const ec = result.summary.evidence_cross_check;
+    if (ec.status === 'ok') {
+      console.log(`evidence_cross_check: tool_count=${ec.evidence_tool_count} vs claim=${ec.claimed_count} real-source snapshots (invocations=${ec.total_invocations} / ${ec.files_scanned} *.jsonl / tools=[${ec.unique_tools.join(', ')}])`);
+    } else {
+      console.log(`evidence_cross_check: status=${ec.status}`);
+    }
+  }
   for (const f of result.findings) {
     console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
   }

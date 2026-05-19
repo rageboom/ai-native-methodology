@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "SNAP-UC-USER-SIGNUP-001",
+  "use_case": "UC-USER-SIGNUP-001",
+  "endpoint": "POST /api/users",
+  "data_source_status": "real_db",
+  "scenarios": [
+    {
+      "id": "SCN-SIGNUP-001",
+      "name": "happy path",
+      "given": { "request_body": { "email": "alice@example.com" } },
+      "when": "POST /api/users",
+      "then": { "expected_response": { "status": 201 } },
+      "intent_classification": [
+        { "rule": "BR-USER-EMAIL-FORMAT-001", "type": "intent" }
+      ]
+    }
+  ]
+}

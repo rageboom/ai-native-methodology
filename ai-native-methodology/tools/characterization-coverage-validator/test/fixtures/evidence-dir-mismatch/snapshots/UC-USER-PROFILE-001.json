@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "SNAP-UC-USER-PROFILE-001",
+  "use_case": "UC-USER-PROFILE-001",
+  "endpoint": "GET /api/users/profile",
+  "data_source_status": "domain_expert_interview",
+  "scenarios": [
+    {
+      "id": "SCN-PROFILE-001",
+      "name": "happy",
+      "given": {},
+      "when": "GET /api/users/profile",
+      "then": { "status": 200 },
+      "intent_classification": [
+        { "rule": "BR-USER-USERNAME-NOT-BLANK-001", "type": "intent" }
+      ]
+    }
+  ]
+}
