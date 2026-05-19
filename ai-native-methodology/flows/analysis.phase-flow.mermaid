@@ -66,7 +66,7 @@ flowchart TB
     subgraph P_sql_inventory["Phase sql-inventory — SQL 인벤토리 (★ v2.2.0-rc1 / RDB 한정)"]
         direction LR
         sql_inventory_OUT["sql-inventory.json (11 컬럼)<br/>sql-inventory.md<br/>raw-grep.txt"]
-        sql_inventory_VAL["★ v2.2.0-rc1 자동 검증<br/>sql-inventory-extractor"]
+        sql_inventory_VAL["★ v2.2.0-rc1 자동 검증<br/>sql-inventory-validator"]
         sql_inventory_OUT --> sql_inventory_VAL
     end
 

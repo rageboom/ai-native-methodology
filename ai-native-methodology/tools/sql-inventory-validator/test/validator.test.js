@@ -1,4 +1,4 @@
-// sql-inventory-extractor unit tests (★ workspace 14번째 / 18 tests / ★ v2.3.0-rc1 +3 migration_priority / ★ v2.3.0 Phase 2 +1 patterns_extension_v3 / ★ v2.3.1 PATCH +4 [tag_type valid/invalid + ratchet pass/fail])
+// sql-inventory-validator unit tests (★ workspace 14번째 / 24 tests / ★ v2.3.0-rc1 +3 migration_priority / ★ v2.3.0 Phase 2 +1 patterns_extension_v3 / ★ v2.3.1 PATCH +4 [tag_type valid/invalid + ratchet pass/fail] / ★ v8.7 rename from sql-inventory-extractor — bin alias 양쪽 보존)
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';

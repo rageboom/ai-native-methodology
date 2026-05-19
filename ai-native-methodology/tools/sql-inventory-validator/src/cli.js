@@ -26,7 +26,7 @@ function parseArgs(argv) {
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: sql-inventory-extractor --target <dir> [--threshold-auto-ratio 0.50]
+      console.log(`usage: sql-inventory-validator --target <dir> [--threshold-auto-ratio 0.50]
        [--coverage-baseline <path>] [--write-coverage-baseline]
        [--legacy-xml-dir <dir>] [--legacy-mismatch-high-threshold 0.30] [--legacy-mismatch-critical-threshold 0.70]
        [--evidence-dir <dir>]
@@ -93,7 +93,7 @@ const result = validateSqlInventory(args.target, args.thresholdAutoRatio, {
 if (args.json) {
   console.log(JSON.stringify(result, null, 2));
 } else {
-  console.log(`[sql-inventory-extractor] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);
+  console.log(`[sql-inventory-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);
   console.log(`inventory: ${result.summary.inventory_count} records`);
   if (result.summary.auto_ratio_external_6 !== null) {
     console.log(`auto_ratio_external_6: ${(result.summary.auto_ratio_external_6 * 100).toFixed(1)}% (threshold ${(args.thresholdAutoRatio * 100).toFixed(0)}%)`);

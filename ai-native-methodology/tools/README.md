@@ -16,7 +16,7 @@
 | [`formal-spec-link-validator/`](./formal-spec-link-validator/) | Phase 4.5 | — | — | — | — | — | skill auto-invoke |
 | [`br-cross-consistency-validator/`](./br-cross-consistency-validator/) ★ v2.5.0 | Phase 4 (business-logic) | — | — | — | — | — | skill auto-invoke (★ ★ Layer 1 결정적 + Layer 2 LLM mandatory) |
 | [`characterization-coverage-validator/`](./characterization-coverage-validator/) ★ v2.1.0 | Phase 4.7 (characterization) | — | — | — | — | — | skill auto-invoke |
-| [`sql-inventory-extractor/`](./sql-inventory-extractor/) ★ v2.2.0 | Phase 4.8 (sql-inventory / RDB only) | — | — | — | — | — | skill auto-invoke |
+| [`sql-inventory-validator/`](./sql-inventory-validator/) ★ v2.2.0 (★ v8.7 rename from sql-inventory-extractor / bin alias 양쪽 보존) | Phase 4.8 (sql-inventory / RDB only) | — | — | — | — | — | skill auto-invoke |
 | [`spectral-runner/`](./spectral-runner/) | Phase 5-1 (api) | — | — | — | — | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`static-runner/`](./static-runner/) | Phase 6 (quality) | — | — | — | impl 후 | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`schema-validator/`](./schema-validator/) | — | ★ | ★ | ★ | ★ | — | gate auto |

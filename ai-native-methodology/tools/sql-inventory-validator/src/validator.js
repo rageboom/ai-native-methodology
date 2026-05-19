@@ -1,4 +1,4 @@
-// sql-inventory-extractor core
+// sql-inventory-validator core (★ v8.7 rename from sql-inventory-extractor — 실 동작 = validator / bin alias 양쪽 보존)
 // 검증 (★ ADR-CHAIN-007 phase sql-inventory + ADR-CHAIN-009 migration_priority 정합):
 //   1. inventory[].sql_id + mapper_xml + business_meaning + dependent_tables + intent_vs_bug_classification + confidence 의무
 //   2. inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT] (★ default PREPARED / Agent 1 강 권고)

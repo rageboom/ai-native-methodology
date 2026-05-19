@@ -1,4 +1,6 @@
-# sql-inventory-extractor/ — phase 4.8 (sql-inventory) gate validator
+# sql-inventory-validator/ — phase 4.8 (sql-inventory) gate validator
+
+> ★ v8.7 rename — 옛 명칭 `sql-inventory-extractor` (실 동작 = validator / 명칭 fraud F-CYCLE3-005 자산화 결과 정직 명칭 채택). bin alias 양쪽 보존 (`sql-inventory-validator` / `sql-inventory-extractor` 모두 실행 가능). 옛 호출자 break 없음.
 
 ## Purpose
 

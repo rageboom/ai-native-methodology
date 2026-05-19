@@ -338,7 +338,7 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
   }
 
   // ★ Layer 3 (v8.7+) — evidence cross-check (실 tool invocation log 와 real-source snapshot count claim cross-check)
-  // R15 silent enabler fix (sql-inventory-extractor Layer 3 mirror): AI 가 data_source_status 만 'real_db' /
+  // R15 silent enabler fix (sql-inventory-validator Layer 3 mirror): AI 가 data_source_status 만 'real_db' /
   // 'real_environment' / 'domain_expert_interview' 로 자기 기입한 silent simulation 차단. 실 외부 도구 invocation
   // evidence (JSON Lines log) 의 unique tool count 와 정량 cross-check.
   if (evidenceDir) {

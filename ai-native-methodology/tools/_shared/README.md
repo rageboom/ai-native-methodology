@@ -16,7 +16,7 @@ import 하는 도구:
 - [`../decision-table-validator/`](../decision-table-validator/) — DMN 5종 baseline + ratchet
 - [`../static-runner/`](../static-runner/) — SARIF finding baseline + ratchet
 - [`../characterization-coverage-validator/`](../characterization-coverage-validator/) — coverage baseline + ratchet trend / ★ evidence cross-check (v8.7 PATCH)
-- [`../sql-inventory-extractor/`](../sql-inventory-extractor/) — ★ evidence cross-check (v8.7 PATCH / Layer 3)
+- [`../sql-inventory-validator/`](../sql-inventory-validator/) — ★ evidence cross-check (v8.7 PATCH / Layer 3) / ★ v8.7 rename from sql-inventory-extractor (bin alias 양쪽 보존)
 
 ## ADR-010 baseline + ratchet 정책
 

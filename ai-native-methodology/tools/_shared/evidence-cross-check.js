@@ -1,6 +1,6 @@
 // ★ v8.7 PATCH — Layer 3 evidence cross-check 공용 helper
 // R15 silent enabler fix: AI 자기 보고 metric 의 실 외부 도구 invocation evidence 정량 검증.
-// sql-inventory-extractor (commit 86bc271) + characterization-coverage-validator (commit ed84f3e)
+// sql-inventory-validator (옛 sql-inventory-extractor / commit 86bc271) + characterization-coverage-validator (commit ed84f3e)
 // 의 Layer 3 helper 가 95% 동일 → 본 모듈로 통합 (v8.7 PATCH 후속 refactor).
 //
 // evidence file schema (JSON Lines / *.jsonl):

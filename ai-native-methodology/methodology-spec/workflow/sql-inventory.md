@@ -74,7 +74,7 @@
 
 ### 3.5 ★ if/then 의무
 
-`carry_flags` 에 `external_call_out_of_scope` 또는 `DBA-read` 시 → `confidence ≤ 0.80` 자동 검증 (sql-inventory-extractor enforcement).
+`carry_flags` 에 `external_call_out_of_scope` 또는 `DBA-read` 시 → `confidence ≤ 0.80` 자동 검증 (sql-inventory-validator enforcement).
 
 ---
 
@@ -89,7 +89,7 @@ extraction_automation:
   auto_ratio_total_11: "5/11 = 45.5%"
 ```
 
-**threshold**: 외부 6 컬럼 자동화 비율 ≥ 0.50 (default / sql-inventory-extractor `--threshold-auto-ratio`).
+**threshold**: 외부 6 컬럼 자동화 비율 ≥ 0.50 (default / sql-inventory-validator `--threshold-auto-ratio`).
 
 ---
 
@@ -109,9 +109,10 @@ PoC #07 D12 결단 (b) nested patterns object 패턴. 4 패턴:
 node tools/schema-validator/src/cli.js .aimd/output/sql-inventory/
 
 # 11 컬럼 + statement_type + carry_flags + confidence if/then
-node tools/sql-inventory-extractor/src/cli.js \
+node tools/sql-inventory-validator/src/cli.js \
   --target .aimd/output/sql-inventory/ \
   --threshold-auto-ratio 0.50
+# ★ v8.7 rename — 옛 명칭 'sql-inventory-extractor' bin alias 양쪽 보존 (옛 호출자 break ❌)
 ```
 
 Exit codes:
@@ -174,7 +175,7 @@ phase 4.8 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
 
 - `methodology-spec/deliverables/24-sql-inventory.md`
 - `schemas/sql-inventory.schema.json` (★ 31번째)
-- `tools/sql-inventory-extractor/` (★ workspace 14번째)
+- `tools/sql-inventory-validator/` (★ workspace 14번째)
 - `skills/analysis-sql-inventory/SKILL.md`
 - ADR-CHAIN-007 phase 4.8 정식 도입
 - DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)

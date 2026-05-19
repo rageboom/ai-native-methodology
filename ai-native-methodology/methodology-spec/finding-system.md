@@ -412,7 +412,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Confidence:** verified
 - **Type:** gap
 - **Description:** decision-table-validator(--baseline/--ratchet/--write-baseline ADR-010 옵션 README 부재 + Carry 가 future 로 stale-implies) + drift-validator(--check-layout v1.4.4 3-way mode README 부재) + sql-inventory-extractor(README "11 컬럼" / 실제 12 = migration_priority ADR-CHAIN-009).
-- **Evidence:** tools/decision-table-validator/README.md(§Inputs/§Exit/§Carry) vs cli.js:72,77-79,109-129 / tools/drift-validator/README.md vs cli.js:141,205 / tools/sql-inventory-extractor/README.md:4 vs cli.js:19·package.json:4
+- **Evidence:** tools/decision-table-validator/README.md(§Inputs/§Exit/§Carry) vs cli.js:72,77-79,109-129 / tools/drift-validator/README.md vs cli.js:141,205 / tools/sql-inventory-validator/README.md(★ v8.7 rename — 옛 sql-inventory-extractor) vs cli.js·package.json
 - **Action:** 3 README 에 구현된 옵션/컬럼 보강
 - **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-MB 처분표 SSOT)
 

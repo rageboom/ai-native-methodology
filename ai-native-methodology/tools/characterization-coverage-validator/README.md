@@ -32,7 +32,7 @@ node src/cli.js \
 - `--write-coverage-baseline` — 현재 측정을 baseline 으로 기록 (legacy 첫 진입 또는 trend pass 후)
 - `coverage_strategy=ratchet` + `trend_required=true` + `--coverage-baseline` 모두 충족 시 trend negative (current < baseline) 자동 차단
 
-★ **v8.7 PATCH 신규 (Fix #3 Layer 3 / sql-inventory-extractor Layer 3 mirror)** — evidence cross-check (R15 silent simulation 차단):
+★ **v8.7 PATCH 신규 (Fix #3 Layer 3 / sql-inventory-validator Layer 3 mirror)** — evidence cross-check (R15 silent simulation 차단):
 - `--evidence-dir <dir>` — 실 외부 도구 invocation log (*.jsonl) 디렉토리
   - 각 line schema: `{ tool, version, invocation_id, args, target, timestamp, duration_ms, exit_code, stdout_sample, result_sha256 }` (필수: `tool`)
   - 디렉토리 안 `*.jsonl` scan → unique `tool` field count = `evidence_tool_count`
@@ -103,20 +103,20 @@ node src/cli.js \
 
 ### scope 한계 (R15 silent simulation 차단 의무)
 
-본 도구의 "no-simulation 정합" 보장 scope = **본 도구 자체의 검증 로직 만**. 검증 **대상** `snapshots/UC-*.json` + `coverage.json` 의 AI hypothesis 여부 cross-check 는 별 입력 의무 (sql-inventory-extractor 의 [[../sql-inventory-extractor/]] mirror pattern):
+본 도구의 "no-simulation 정합" 보장 scope = **본 도구 자체의 검증 로직 만**. 검증 **대상** `snapshots/UC-*.json` + `coverage.json` 의 AI hypothesis 여부 cross-check 는 별 입력 의무 (sql-inventory-validator 의 [[../sql-inventory-validator/]] mirror pattern):
 
 - **schema 정합 (4 필수 필드 + enum + if/then) 통과 ≠ 도메인 정합** — AI 가 hypothesis 로 작성한 snapshot 도 schema 정합 시 critical/high finding 0 통과 가능.
 - **`named_classified_ratio` + `coverage_ratio`** = snapshot/coverage.json 안 metric 이 caller (AI 또는 사용자) 자기 보고. 본 도구는 형식 + threshold + ratchet trend 만 검증, **실 test runner 의 coverage report cross-check 불가**.
 - **R15 (no-simulation) partial defense** (★ v8.7 격상):
   - `snapshot.code_only_carry_required` finding severity **medium → high 격상** — `data_source_status='code_only'` snapshot 은 AI 가 코드만 보고 작성된 hypothesis 가능성. 도메인 expert 검증 의무.
-  - **★ v8.7 PATCH Fix #3 Layer 3 resolved** — `--evidence-dir <dir>` 옵션 신설 (sql-inventory-extractor Layer 3 mirror). real-source snapshot (`data_source_status` real_* enum) 개수 ≤ `*.jsonl` 안 unique `tool` count 의무. mismatch 시 critical finding.
+  - **★ v8.7 PATCH Fix #3 Layer 3 resolved** — `--evidence-dir <dir>` 옵션 신설 (sql-inventory-validator Layer 3 mirror). real-source snapshot (`data_source_status` real_* enum) 개수 ≤ `*.jsonl` 안 unique `tool` count 의무. mismatch 시 critical finding.
 - **R15 full 차단 carry** (v8.7+ 후속):
   - `--test-coverage-report <path>` — 실 test runner (vitest/jest/pytest) coverage report 와 cross-check
   - `_shared/baseline.js` audit — AI 자기 보고 metric channel 의 본질 patrol
-  - `_shared/evidence-cross-check.js` refactor — sql-inventory-extractor + characterization-coverage-validator 의 Layer 3 helper duplication 통합
+  - `_shared/evidence-cross-check.js` refactor — sql-inventory-validator + characterization-coverage-validator 의 Layer 3 helper duplication 통합
 
 ### 원본 cycle-3 evidence (F-CYCLE3-005)
 
-- `_shared/baseline.js` 공유 = sql-inventory-extractor mirror pattern (R15 silent enabler 공범).
+- `_shared/baseline.js` 공유 = sql-inventory-validator mirror pattern (R15 silent enabler 공범).
 - AI 자기 보고 metric (`named_classified_ratio` / `coverage_ratio` / `coverage_target` / `coverage_minimum_legacy`) → schema valid 통과 silent pass 위험.
 - v8.6.3 까지 partial defense (medium finding) 만 / v8.7 = high 격상 + future cross-check option carry.

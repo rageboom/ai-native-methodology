@@ -1,0 +1,13 @@
+{
+  "name": "@ai-native-methodology/sql-inventory-validator",
+  "version": "0.2.0",
+  "description": "v2.2.0-rc1 phase 4.8 (sql-inventory) 11 컬럼 + ★ v2.3.0-rc1 migration_priority 12번째 컬럼 (P0~P3 / ADR-CHAIN-009) + ★ v2.3.1 PATCH baseline ratchet (auto_ratio trend / C-v2.2.0-2) + dynamic_branch.tag_type enum (iBATIS 2 + MyBatis 3 + sql / C-v2.2.0-7) + ★ v8.7 PATCH Layer 2 legacy XML cross-check (xmllint XPath count vs inventory_count) + Layer 3 evidence cross-check (--evidence-dir / R15 silent enabler 차단). workspace 14번째. ★ v8.7 rename from sql-inventory-extractor (실 동작 = validator / 옛 명 = extractor / bin alias 양쪽 보존).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "sql-inventory-validator": "./src/cli.js",
+    "sql-inventory-extractor": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

@@ -91,7 +91,7 @@
       "depends_on": ["discovery", "business-logic", "characterization"],
       "inputs": ["inventory.json", "business-rules.json", "antipatterns.json", "characterization-spec.json"],
       "outputs": ["sql-inventory.json", "sql-inventory.md", "raw-grep.txt"],
-      "automated_validation": ["sql-inventory-extractor", "schema-validator"],
+      "automated_validation": ["sql-inventory-validator", "schema-validator"],
       "introduced": "v2.2.0-rc1",
       "rdb_only": true,
       "skills": ["analysis-sql-inventory"]

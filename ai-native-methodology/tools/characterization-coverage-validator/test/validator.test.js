@@ -192,7 +192,7 @@ test('★ v8.7 — 옛 kind name (code_only_carry_recommended) 은 v8.7+ 부터 
 });
 
 // ─────────────────────────────────────────────────────────────────────
-// ★ v8.7 PATCH — Fix #3 Layer 3 mirror (sql-inventory-extractor Layer 3 pattern):
+// ★ v8.7 PATCH — Fix #3 Layer 3 mirror (sql-inventory-validator Layer 3 pattern):
 // --evidence-dir <dir> 옵션 → 실 외부 도구 invocation log (*.jsonl) 의 unique tool count 와
 // data_source_status 'real_db' / 'real_environment' / 'domain_expert_interview' snapshot count cross-check
 // ─────────────────────────────────────────────────────────────────────

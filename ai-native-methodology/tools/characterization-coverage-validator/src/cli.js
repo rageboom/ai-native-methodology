@@ -31,7 +31,7 @@ Validates phase characterization output:
   Coverage strategy 'ratchet' + trend_required=true + --coverage-baseline 제공 시
   current coverage_ratio < baseline coverage_ratio 이면 high finding (ratchet trend negative).
 
-★ v8.7 PATCH — evidence cross-check (R15 silent simulation 차단 / sql-inventory-extractor Layer 3 mirror):
+★ v8.7 PATCH — evidence cross-check (R15 silent simulation 차단 / sql-inventory-validator Layer 3 mirror):
   --evidence-dir <dir>     실 외부 도구 invocation 의 evidence file (*.jsonl) 디렉토리
                            각 line: { tool, version, args, target, timestamp, duration_ms, exit_code, ... }
                            unique 'tool' field count 와 snapshot data_source_status 'real_db' /

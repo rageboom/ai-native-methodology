@@ -138,10 +138,10 @@ node ../../tools/schema-validator/src/cli.js .aimd/output/sql-inventory/
 # Expect: sql-inventory.json valid + carry_flags enum 통과 + external_call_out_of_scope confidence if/then 통과
 ```
 
-### 11. sql-inventory-extractor 실행 (★ v2.2.0-rc1 신설 / workspace 14번째)
+### 11. sql-inventory-validator 실행 (★ v2.2.0-rc1 신설 / workspace 14번째 / ★ v8.7 rename from sql-inventory-extractor)
 
 ```bash
-node ../../tools/sql-inventory-extractor/src/cli.js \
+node ../../tools/sql-inventory-validator/src/cli.js \
   --target .aimd/output/sql-inventory/ \
   [--threshold-auto-ratio 0.50]
 # Expect: 11 컬럼 의무 / statement_type enum / carry_flags enum / extraction_automation 형식 검증 통과
@@ -166,7 +166,7 @@ phase 4.8 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
 
 - `methodology-spec/deliverables/24-sql-inventory.md`
 - `schemas/sql-inventory.schema.json` (★ 31번째 schema)
-- `tools/sql-inventory-extractor/` (★ workspace 14번째)
+- `tools/sql-inventory-validator/` (★ workspace 14번째 / ★ v8.7 rename from sql-inventory-extractor — bin alias 양쪽 보존)
 - `flows/analysis.phase-flow.json` v2.2.0-rc1 phase 4.8 entry
 - ADR-CHAIN-007 phase 4.8 정식 도입
 - ADR-008 (이중 렌더링)
