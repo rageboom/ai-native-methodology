@@ -9,6 +9,66 @@
 
 ---
 
+## [8.7.0] — 2026-05-19 ★ MINOR — R15 silent enabler fix (sql-inventory-validator Layer 1~4 + characterization-coverage-validator Layer 3 mirror + _shared/evidence-cross-check.js refactor + bin alias 양쪽 보존 rename) (additive / breaking 0)
+
+> ★ ★ **v8.7.0 MINOR — R15 silent enabler 4 layer fix**. cycle-3 dogfood (poc-efi-web-1) 의 **F-CYCLE3-005** R15 violation 정량 evidence 발견 → plugin 17 validator 중 2 도구 (sql-inventory-extractor + characterization-coverage-validator) 가 `_shared/baseline.js` 공유 = **R15 silent enabler 공범** 확정 → 본 release = **4 layer fix + 정직 명칭 채택 + duplication 청산**.
+
+### 본질 발견 (cycle-3 dogfood)
+
+- `sql-inventory-extractor` plugin validator 가 `findings=0` 통과 → 실 legacy XML 21 SQL vs AI hypothesis sql-inventory.json 7 SQL (★ 67% miss) silent pass
+- `extraction_automation.auto_ratio_external_6 = 0.5` 도 AI 자기 보고 (실 외부 도구 invocation 0회 / shell exit log 부재)
+- 명칭 fraud — `extractor` 이름 / 실 동작 = `validator` (README L1 자기 시인)
+- 본 pattern = ★ ★ 17 validator audit 결과 ★ 2 도구 한정 (sql-inventory-extractor + characterization-coverage-validator / `_shared/baseline.js` 공유 = silent enabler 공범 heuristic)
+
+### 시행 (6 commit cluster / branch `v8.7-r15-silent-enabler-fix`)
+
+1. **Fix #2 Layer 2+4** (`0c53801`) — sql-inventory-extractor `--legacy-xml-dir <dir>` 옵션 + xmllint XPath count vs `inventory_count` cross-check. mismatch ≥ 30% high finding / ≥ 70% critical finding. xmllint 부재 시 medium finding + graceful skip. README scope 정정 (no-simulation 정합 scope 한계 명시).
+2. **Fix #3 partial defense 격상** (`3f609f0`) — characterization-coverage-validator `snapshot.code_only_carry_recommended` (medium) → `snapshot.code_only_carry_required` (high) 격상. data_source_status='code_only' snapshot = AI hypothesis 가능성 / 도메인 expert 검증 의무.
+3. **Fix #2 Layer 3** (`86bc271`) — sql-inventory-extractor `--evidence-dir <dir>` 옵션 + JSON Lines evidence file schema (`{ tool, version, args, target, timestamp, duration_ms, exit_code, ... }`) + unique `tool` field count 와 `auto_ratio_external_6` N claim cross-check. mismatch 시 critical finding (R15 silent simulation 의심).
+4. **Fix #3 Layer 3 mirror** (`ed84f3e`) — characterization-coverage-validator `--evidence-dir` 동일 pattern. claim source = `data_source_status` ∈ {real_db, real_environment, domain_expert_interview} 명시 snapshot count. real-source claim 0 시 medium finding `claim_empty`.
+5. **`_shared/evidence-cross-check.js` refactor** (`d020000`) — Fix #2 + Fix #3 Layer 3 helper duplication (95% 동일 코드) 통합 → `_shared/` 로 추출. 각 도구의 claim 계산 (parseClaimedAutoCount / countRealSourceSnapshots) 만 도구별 보존. net -87 LOC.
+6. **Task #84 rename** (`7ac6fe7`) — `sql-inventory-extractor` → `sql-inventory-validator` (명칭 fraud 정직 해소). 디렉토리 + test file git mv (file history 보존). **bin alias 양쪽 보존** (`sql-inventory-validator` + `sql-inventory-extractor` 모두 cli.js 매핑) → ★ 옛 호출자 break 0. live source 15 file 갱신 (workspace + characterization mirror 참조 + skill + workflow + flows + finding-system evidence). historical doc 보존 (decisions/ + docs/adr/ + briefing/ + examples/ + dist/ — skill-citation-validator history-summary 제외 list 정합).
+
+### 검증
+
+- sql-inventory-validator 24 tests pass / 0 fail (★ Layer 2 + Layer 3 test 6 신규 / 18 기존 정합)
+- characterization-coverage-validator 20 tests pass / 0 fail (★ Layer 3 mirror test 4 신규 + code_only 격상 test 2 신규 / 14 기존 정합)
+- workspace test 439/440 pass (★ skill-citation-validator 1 fail = pre-existing `tools/_shared/finding-log.js` stale citation in `ticket-policy.md:234` / 본 PATCH 무관 / v8.6.3 baseline 동등)
+- 본 PATCH 추가 stale citation = 0 (finding-system.md F-MB record evidence path 갱신 효과)
+- bin alias verify (양쪽 명 cli.js 매핑)
+- cli --help 출력 verify (sql-inventory-validator 명 정합)
+
+### Pre-existing fail (★ v8.6.3 baseline 동등 / 본 PATCH scope 외 / v8.7+ carry)
+
+- `analysis_validator_violation` — 6 PoC example 의 planning-spec.json schema invalid
+- `claude_md_version_sync` — ★ ★ ★ ★ 본 release 에서 ★ ★ 해소 (CLAUDE.md line 99 "plugin.json v8.6.0" → "v8.7.0" + plugin.json + package.json 3 SSOT 일치)
+- `workspace_test_pass` + `skill_citation_integrity` — `methodology-spec/ticket-policy.md:234` 의 `tools/_shared/finding-log.js` stale citation (1 file 갱신으로 해소 가능 / 별 commit / 본 PATCH 무관)
+
+### Charter / heuristic 자산화
+
+- **heuristic**: `_shared/baseline.js` 공유 도구 = ★ R15 silent enabler 의심. 미래 plugin contributor 의무 (CONTRIBUTING.md carry).
+- **plugin validator pass = `evidence_trust = schema_valid`** (★ NOT `real_tool`). 실 외부 도구 invocation + cross-check 후만 `evidence_trust = real_tool` 정합.
+- **R15 4 layer 정합 (필수 시행)**: Layer 1 명칭 정직 / Layer 2 legacy source cross-check (e.g. xmllint) / Layer 3 evidence cross-check (`--evidence-dir` *.jsonl) / Layer 4 README scope 정정.
+
+### Carry (v8.7+)
+
+- `--test-coverage-report <path>` 옵션 — characterization-coverage-validator 의 더 본격 R15 full 차단 (실 test runner vitest/jest/pytest coverage report cross-check)
+- pre-existing skill-citation fail 해소 (`tools/_shared/finding-log.js` reference 갱신 또는 finding-log.js 신설)
+- 6 PoC example planning-spec.json schema 갱신 (★ analysis_validator_violation 해소 / 작업량 큼)
+- plugin contributor R15 heuristic 자산화 (CONTRIBUTING.md / plugin-authoring-spec patch)
+
+### MINOR rationale
+
+- ★ ★ additive — `--evidence-dir` 옵션 신설 + bin alias 양쪽 보존 + Layer 3 helper `_shared/` 추출 / 기존 의무 제거 0 / 기존 호출자 break 0
+- 본 release 의 가장 큰 ★ ★ semantic change = ★ ★ ★ `evidence_trust` 의 plugin validator scope 정확 정의 (schema_valid vs real_tool) → MINOR 격상 (단순 PATCH 이상)
+
+### Evidence
+
+- `poc-efi-web-1/cycle-3/verification/F-CYCLE3-005-r15-violation-quantitative-evidence.md` (★ 원본 finding + LL-CYCLE3-13~16)
+- branch `v8.7-r15-silent-enabler-fix` commits `0c53801`·`3f609f0`·`86bc271`·`ed84f3e`·`d020000`·`7ac6fe7`
+
+DEC-2026-05-19-v8.7-r15-silent-enabler-fix. 직전 release 요약 (역순):
+
 ## [8.6.3] — 2026-05-18 ★ PATCH — R20 구조 강제 (parent_ticket_id schema + link_type enum + jira_structure_add_issues 통합 + F-TICKETSYNC-002 missing_parent finding) (additive / breaking 0)
 
 > ★ **v8.6.3 PATCH — R20 hierarchy enforcement**. 사용자 "**티켓은 스트럭쳐를 가져야 함**" → v8.6.2 까지 R20 의 parent 명시 = `ticket-policy.md` §Layer mapping 표 + `SKILL.md` MCP call matrix text 뿐 / schema-level 강제 부재 + Atlassian Structure plugin (`jira_structure_*`) 미사용. 본 release = **4 layer 동시 강제** (policy + schema + skill + finding emit).
