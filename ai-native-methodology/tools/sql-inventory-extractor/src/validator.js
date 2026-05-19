@@ -11,8 +11,9 @@
 //   9. ★ inventory[].dynamic_branch[].tag_type (optional) ∈ enum (★ v2.3.1 PATCH / C-v2.2.0-7 / iBATIS 2 + MyBatis 3 + SQL native sub-classification)
 //  10. ★ extraction_automation.auto_ratio_external_6 baseline ratchet trend (★ v2.3.1 PATCH / C-v2.2.0-2 / characterization-coverage-validator mirror)
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
 
 export function loadJson(path) {
@@ -53,7 +54,13 @@ const VALID_TAG_TYPE = new Set([
 ]);
 
 export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, options = {}) {
-  const { coverageBaselinePath = null, writeBaseline = false } = options;
+  const {
+    coverageBaselinePath = null,
+    writeBaseline = false,
+    legacyXmlDir = null,
+    legacyMismatchHighThreshold = 0.30,
+    legacyMismatchCriticalThreshold = 0.70,
+  } = options;
   const findings = [];
   const summary = {
     inventory_count: 0,
@@ -66,7 +73,8 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     carry_flags_count: 0,
     migration_priority_distribution: { P0: 0, P1: 0, P2: 0, P3: 0, unspecified: 0 },
     tag_type_distribution: {},
-    ratchet_trend: null
+    ratchet_trend: null,
+    legacy_cross_check: null,
   };
 
   // 1. sql-inventory.json read
@@ -295,7 +303,130 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     });
   }
 
+  // ★ Layer 2 (v8.7+) — legacy XML cross-check (xmllint XPath count vs inventory_count)
+  // R15 silent enabler fix: AI hypothesis sql-inventory.json 이 실 legacy XML 의 SQL count 와 ★ 정량 cross-check.
+  if (legacyXmlDir) {
+    const crossCheck = crossCheckLegacyXml(legacyXmlDir, summary.inventory_count);
+    summary.legacy_cross_check = crossCheck;
+
+    if (crossCheck.status === 'xmllint_unavailable') {
+      findings.push({
+        kind: 'legacy_cross_check.xmllint_unavailable',
+        severity: 'medium',
+        message: `xmllint command not found in PATH — legacy XML cross-check skipped (--legacy-xml-dir ${legacyXmlDir}). 본 도구 의 R15 silent simulation 차단 의무 = xmllint 가용 환경 권고.`
+      });
+    } else if (crossCheck.status === 'dir_missing') {
+      findings.push({
+        kind: 'legacy_cross_check.dir_missing',
+        severity: 'high',
+        message: `--legacy-xml-dir '${legacyXmlDir}' not found or not a directory`
+      });
+    } else if (crossCheck.status === 'no_xml_files') {
+      findings.push({
+        kind: 'legacy_cross_check.no_xml_files',
+        severity: 'medium',
+        message: `--legacy-xml-dir '${legacyXmlDir}' has no .xml files (recursive scan / iBATIS/MyBatis SQL mapper 기대)`
+      });
+    } else if (crossCheck.status === 'ok') {
+      const { xmllint_total, mismatch_ratio } = crossCheck;
+      if (xmllint_total === 0) {
+        findings.push({
+          kind: 'legacy_cross_check.zero_xmllint_count',
+          severity: 'medium',
+          message: `xmllint XPath count = 0 across ${crossCheck.files_scanned} .xml files (no select/insert/update/delete tags) — legacy XML 이 iBATIS/MyBatis mapper 아닐 가능성`
+        });
+      } else if (mismatch_ratio >= legacyMismatchCriticalThreshold) {
+        findings.push({
+          kind: 'legacy_cross_check.mismatch_critical',
+          severity: 'critical',
+          message: `★ R15 silent simulation 의심 — inventory_count=${summary.inventory_count} vs xmllint_total=${xmllint_total} (mismatch ${(mismatch_ratio * 100).toFixed(1)}% ≥ ${(legacyMismatchCriticalThreshold * 100).toFixed(0)}% critical threshold). AI hypothesis 가능성 큼 / 실 legacy XML grep 의무.`
+        });
+      } else if (mismatch_ratio >= legacyMismatchHighThreshold) {
+        findings.push({
+          kind: 'legacy_cross_check.mismatch_high',
+          severity: 'high',
+          message: `inventory_count=${summary.inventory_count} vs xmllint_total=${xmllint_total} (mismatch ${(mismatch_ratio * 100).toFixed(1)}% ≥ ${(legacyMismatchHighThreshold * 100).toFixed(0)}% high threshold). 일부 SQL 누락 가능성 / 실 legacy XML 추가 추출 권고.`
+        });
+      }
+    }
+  }
+
   return finalize(findings, summary);
+}
+
+// ★ Layer 2 helper — xmllint XPath SQL count cross-check
+function crossCheckLegacyXml(legacyXmlDir, inventoryCount) {
+  // 1. xmllint 가용성 확인
+  const probe = spawnSync('xmllint', ['--version'], { encoding: 'utf8' });
+  if (probe.error || probe.status !== 0) {
+    return { status: 'xmllint_unavailable', xmllint_version: null };
+  }
+  const xmllintVersion = (probe.stderr || probe.stdout || '').split('\n')[0];
+
+  // 2. legacy dir 존재 확인
+  if (!existsSync(legacyXmlDir)) {
+    return { status: 'dir_missing' };
+  }
+  let st;
+  try { st = statSync(legacyXmlDir); } catch { return { status: 'dir_missing' }; }
+  if (!st.isDirectory()) return { status: 'dir_missing' };
+
+  // 3. *.xml file 재귀 수집
+  const xmlFiles = collectXmlFiles(legacyXmlDir);
+  if (xmlFiles.length === 0) {
+    return { status: 'no_xml_files', files_scanned: 0 };
+  }
+
+  // 4. 각 file 에 xmllint XPath count 실행
+  let xmllintTotal = 0;
+  const perFile = [];
+  for (const f of xmlFiles) {
+    const xpath = 'count(//select) + count(//insert) + count(//update) + count(//delete)';
+    const res = spawnSync('xmllint', ['--xpath', xpath, f], { encoding: 'utf8' });
+    if (res.status !== 0) {
+      perFile.push({ file: f, status: 'xmllint_error', count: 0, error: (res.stderr || '').slice(0, 200) });
+      continue;
+    }
+    const count = parseInt((res.stdout || '0').trim(), 10) || 0;
+    xmllintTotal += count;
+    perFile.push({ file: f, status: 'ok', count });
+  }
+
+  // mismatch ratio (symmetric / larger 기준 — small inventory 에서 small xmllint 도 정합 처리)
+  const denominator = Math.max(xmllintTotal, inventoryCount);
+  const mismatchRatio = denominator > 0
+    ? Math.abs(xmllintTotal - inventoryCount) / denominator
+    : 0;
+
+  return {
+    status: 'ok',
+    xmllint_version: xmllintVersion,
+    legacy_xml_dir: legacyXmlDir,
+    files_scanned: xmlFiles.length,
+    xmllint_total: xmllintTotal,
+    inventory_count: inventoryCount,
+    mismatch_ratio: mismatchRatio,
+    per_file: perFile,
+  };
+}
+
+function collectXmlFiles(dir) {
+  const out = [];
+  const stack = [dir];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try { entries = readdirSync(cur); } catch { continue; }
+    for (const name of entries) {
+      if (name === 'node_modules' || name.startsWith('.')) continue;
+      const full = join(cur, name);
+      let s;
+      try { s = statSync(full); } catch { continue; }
+      if (s.isDirectory()) stack.push(full);
+      else if (name.endsWith('.xml')) out.push(full);
+    }
+  }
+  return out;
 }
 
 function finalize(findings, summary) {

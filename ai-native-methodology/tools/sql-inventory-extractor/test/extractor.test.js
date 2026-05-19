@@ -136,3 +136,24 @@ test('★ ratchet trend negative — PoC #06 (auto_ratio 0.667) vs baseline 0.85
     'ratchet trend negative (0.667 < 0.85) → high finding 의무 (C-v2.2.0-2)');
   assert.equal(r.summary.ratchet_trend.pass, false);
 });
+
+// ★ v8.7 PATCH — Layer 2 legacy XML cross-check (R15 silent enabler fix / F-CYCLE3-005)
+
+test('★ v8.7 Layer 2 — legacy-xml-dir 부재 → dir_missing high finding', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    legacyXmlDir: '/__nonexistent_legacy_xml_dir_test_fixture__'
+  });
+  // xmllint 가용 여부에 따라 다름 — xmllint_unavailable medium 이 먼저 emit 되면 dir 체크 안 도달
+  const hasDirMissing = r.findings.some(f => f.kind === 'legacy_cross_check.dir_missing' && f.severity === 'high');
+  const hasXmllintUnavail = r.findings.some(f => f.kind === 'legacy_cross_check.xmllint_unavailable');
+  assert.ok(hasDirMissing || hasXmllintUnavail,
+    `legacy-xml-dir 부재 → dir_missing 또는 xmllint_unavailable finding 의무: ${JSON.stringify(r.findings)}`);
+  assert.ok(r.summary.legacy_cross_check, 'legacy_cross_check summary 존재 의무');
+});
+
+test('★ v8.7 Layer 2 — legacy-xml-dir 미지정 → cross-check skip (legacy_cross_check=null / backward-compat)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'));
+  assert.equal(r.summary.legacy_cross_check, null,
+    'legacyXmlDir option 미지정 시 cross-check skip 의무 (backward-compat)');
+  assert.equal(r.findings.filter(f => f.kind?.startsWith('legacy_cross_check.')).length, 0);
+});

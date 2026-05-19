@@ -2,40 +2,63 @@
 import { validateSqlInventory } from './validator.js';
 
 function parseArgs(argv) {
-  const out = { dryRun: false, json: false, thresholdAutoRatio: 0.50, coverageBaseline: null, writeBaseline: false };
+  const out = {
+    dryRun: false,
+    json: false,
+    thresholdAutoRatio: 0.50,
+    coverageBaseline: null,
+    writeBaseline: false,
+    legacyXmlDir: null,
+    legacyMismatchHighThreshold: 0.30,
+    legacyMismatchCriticalThreshold: 0.70,
+  };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
     else if (a === '--threshold-auto-ratio') out.thresholdAutoRatio = parseFloat(argv[++i]);
     else if (a === '--coverage-baseline') out.coverageBaseline = argv[++i];
     else if (a === '--write-coverage-baseline') out.writeBaseline = true;
+    else if (a === '--legacy-xml-dir') out.legacyXmlDir = argv[++i];
+    else if (a === '--legacy-mismatch-high-threshold') out.legacyMismatchHighThreshold = parseFloat(argv[++i]);
+    else if (a === '--legacy-mismatch-critical-threshold') out.legacyMismatchCriticalThreshold = parseFloat(argv[++i]);
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
       console.log(`usage: sql-inventory-extractor --target <dir> [--threshold-auto-ratio 0.50]
-       [--coverage-baseline <path>] [--write-coverage-baseline] [--dry-run] [--json]
+       [--coverage-baseline <path>] [--write-coverage-baseline]
+       [--legacy-xml-dir <dir>] [--legacy-mismatch-high-threshold 0.30] [--legacy-mismatch-critical-threshold 0.70]
+       [--dry-run] [--json]
 
 Validates phase sql-inventory output:
   <target>/sql-inventory.json (★ entry / 12 컬럼 record + extraction_automation + patterns_extension_v3 optional)
 
-검증 (★ ADR-CHAIN-007 phase sql-inventory + ADR-CHAIN-009 + ADR-CHAIN-010 정합):
+검증 (ADR-CHAIN-007 phase sql-inventory + ADR-CHAIN-009 + ADR-CHAIN-010 정합):
   - inventory[].sql_id + mapper_xml + business_meaning + dependent_tables + intent_vs_bug_classification + confidence 의무
-  - inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT] (★ Agent 1 강 권고)
+  - inventory[].statement_type ∈ [PREPARED, CALLABLE, STATEMENT]
   - inventory[].carry_flags ⊂ enum 8종
   - inventory[].confidence ∈ [0.0, 1.0]
-  - inventory[].carry_flags 에 external_call_out_of_scope 또는 DBA-read 시 confidence ≤ 0.80 (★ if/then)
+  - inventory[].carry_flags 에 external_call_out_of_scope 또는 DBA-read 시 confidence ≤ 0.80 (if/then)
   - inventory[].intent_vs_bug_classification 본문에 (intent/bug/ambiguous/self_recognized) 4 분류 키워드 ≥ 1
-  - inventory[].migration_priority (optional) ∈ [P0, P1, P2, P3] (★ ADR-CHAIN-009)
-  - inventory[].dynamic_branch[].tag_type (optional / ★ v2.3.1 / C-v2.2.0-7) ∈ iBATIS 2 + MyBatis 3 + sql:* + other enum
+  - inventory[].migration_priority (optional) ∈ [P0, P1, P2, P3] (ADR-CHAIN-009)
+  - inventory[].dynamic_branch[].tag_type (optional / v2.3.1 / C-v2.2.0-7) ∈ iBATIS 2 + MyBatis 3 + sql:* + other enum
   - extraction_automation.auto_ratio_external_6 형식 검증 + threshold ≥ 0.50 (default)
 
-★ v2.3.1 PATCH baseline ratchet (C-v2.2.0-2 / characterization-coverage-validator mirror):
+v2.3.1 PATCH baseline ratchet (C-v2.2.0-2 / characterization-coverage-validator mirror):
   --coverage-baseline <path>          이전 측정 baseline JSON (auto_ratio_external_6 ratchet)
   --write-coverage-baseline           현재 측정을 baseline 으로 write
-
   current auto_ratio_external_6 < baseline ratio 이면 high finding (ratchet trend negative).
 
-Threshold default 0.50 (Opus 4.7 외부 조언 / PoC #06+#07 baseline 66.7% / scale 무관 isomorphic).
+★ v8.7 PATCH — legacy XML cross-check (R15 silent simulation 차단 / F-CYCLE3-005 fix):
+  --legacy-xml-dir <dir>                       실 legacy XML (iBATIS/MyBatis mapper) 디렉토리
+                                               xmllint XPath \`count(//select | //insert | //update | //delete)\`
+                                               합과 inventory_count 정량 cross-check.
+  --legacy-mismatch-high-threshold <ratio>     mismatch ≥ N% 시 high finding (default 0.30)
+  --legacy-mismatch-critical-threshold <ratio> mismatch ≥ N% 시 critical finding (default 0.70)
+
+  R15 silent enabler 차단 — schema 정합 통과의 sql-inventory.json 이 AI hypothesis 인지 실 legacy grep 결과인지
+  외부 도구 (xmllint) 정량 비교로 판별. xmllint 부재 시 medium finding + skip (graceful).
+
+Threshold default 0.50 (auto-ratio) / 0.30 (mismatch high) / 0.70 (mismatch critical).
 `);
       process.exit(0);
     }
@@ -51,7 +74,10 @@ if (!args.target) {
 
 const result = validateSqlInventory(args.target, args.thresholdAutoRatio, {
   coverageBaselinePath: args.coverageBaseline,
-  writeBaseline: args.writeBaseline
+  writeBaseline: args.writeBaseline,
+  legacyXmlDir: args.legacyXmlDir,
+  legacyMismatchHighThreshold: args.legacyMismatchHighThreshold,
+  legacyMismatchCriticalThreshold: args.legacyMismatchCriticalThreshold,
 });
 
 if (args.json) {
@@ -64,6 +90,14 @@ if (args.json) {
   }
   console.log(`statement_type distribution: PREPARED=${result.summary.statement_type_distribution.PREPARED} / CALLABLE=${result.summary.statement_type_distribution.CALLABLE} / STATEMENT=${result.summary.statement_type_distribution.STATEMENT}`);
   console.log(`carry_flags total: ${result.summary.carry_flags_count}`);
+  if (result.summary.legacy_cross_check) {
+    const cc = result.summary.legacy_cross_check;
+    if (cc.status === 'ok') {
+      console.log(`legacy_cross_check: xmllint_total=${cc.xmllint_total} vs inventory_count=${cc.inventory_count} (mismatch ${(cc.mismatch_ratio * 100).toFixed(1)}% / ${cc.files_scanned} .xml files)`);
+    } else {
+      console.log(`legacy_cross_check: status=${cc.status}`);
+    }
+  }
   for (const f of result.findings) {
     console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
   }
