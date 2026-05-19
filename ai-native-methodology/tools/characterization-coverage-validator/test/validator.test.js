@@ -172,3 +172,21 @@ test('★ ratchet baseline write — --write-coverage-baseline 옵션 시 baseli
     rmSync(tmpDir, { recursive: true, force: true });
   }
 });
+
+// ★ v8.7 PATCH — Fix #3 characterization-coverage-validator R15 silent enabler partial defense 격상
+// F-CYCLE3-005: data_source_status='code_only' snapshot 은 AI hypothesis 가능성 — medium → high 격상
+
+test('★ v8.7 — data_source_status=code_only → snapshot.code_only_carry_required HIGH finding (R15 partial defense 격상)', () => {
+  const r = validateCharacterization(fx('valid-code-only'), 0.80);
+  const codeOnly = r.findings.filter(f => f.kind === 'snapshot.code_only_carry_required');
+  assert.equal(codeOnly.length, 1,
+    `expected exactly 1 snapshot.code_only_carry_required finding: ${JSON.stringify(r.findings, null, 2)}`);
+  assert.equal(codeOnly[0].severity, 'high',
+    'v8.7 PATCH: severity medium → high 격상 의무 (F-CYCLE3-005 R15 silent enabler partial defense)');
+});
+
+test('★ v8.7 — 옛 kind name (code_only_carry_recommended) 은 v8.7+ 부터 emit ❌ (격상 검증)', () => {
+  const r = validateCharacterization(fx('valid-code-only'), 0.80);
+  const oldKind = r.findings.filter(f => f.kind === 'snapshot.code_only_carry_recommended');
+  assert.equal(oldKind.length, 0, '옛 kind name (medium severity) 은 v8.7 부터 emit 안 됨 / 새 kind name 으로 통일');
+});

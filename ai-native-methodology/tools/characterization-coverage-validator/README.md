@@ -49,7 +49,7 @@ node src/cli.js \
 | `coverage.trend_negative_ratchet` | high | ★ v2.1.1 — ratchet + trend_required + baseline 제공 시 current < baseline (regression block) |
 | `classification.named_ratio_below_threshold` | high | named_classified_ratio < threshold (default 0.80) |
 | `classification.ambiguous_carry_missing` | critical | ambiguous > 0 인데 ambiguous_carry 명시 부재 (entry 또는 intent-vs-bug.md grep) |
-| `snapshot.code_only_carry_recommended` | medium | data_source_status='code_only' — 도메인 expert carry 권장 |
+| `snapshot.code_only_carry_required` | **high** (★ v8.7 PATCH 격상) | data_source_status='code_only' — 도메인 expert 검증 의무 (R15 silent enabler 차단 / 옛 `code_only_carry_recommended` medium 격상) |
 
 ## Exit codes
 
@@ -82,6 +82,24 @@ node src/cli.js \
 - snapshot Gherkin (.feature) 변환 출력 = v2.x carry (C-v2.1.0-1)
 - ts-morph + 실 환경 (DB) snapshot 자동 추출 = v2.x carry (C-v2.1.0-6)
 
-## ★★★ no-simulation 정합
+## no-simulation 정합 — scope 명시 (★ v8.7+ 정정)
 
-본 도구는 AI 추론 0% — JSON 파싱 + grep + 비교 알고리즘. lint-no-simulation 정합.
+본 도구 **자체의** 검증 로직은 AI 추론 0% — JSON 파싱 + grep + 비교 알고리즘. lint-no-simulation 정합.
+
+### scope 한계 (R15 silent simulation 차단 의무)
+
+본 도구의 "no-simulation 정합" 보장 scope = **본 도구 자체의 검증 로직 만**. 검증 **대상** `snapshots/UC-*.json` + `coverage.json` 의 AI hypothesis 여부 cross-check 는 별 입력 의무 (sql-inventory-extractor 의 [[../sql-inventory-extractor/]] mirror pattern):
+
+- **schema 정합 (4 필수 필드 + enum + if/then) 통과 ≠ 도메인 정합** — AI 가 hypothesis 로 작성한 snapshot 도 schema 정합 시 critical/high finding 0 통과 가능.
+- **`named_classified_ratio` + `coverage_ratio`** = snapshot/coverage.json 안 metric 이 caller (AI 또는 사용자) 자기 보고. 본 도구는 형식 + threshold + ratchet trend 만 검증, **실 test runner 의 coverage report cross-check 불가**.
+- **R15 (no-simulation) partial defense** (★ v8.7 격상):
+  - `snapshot.code_only_carry_required` finding severity **medium → high 격상** — `data_source_status='code_only'` snapshot 은 AI 가 코드만 보고 작성된 hypothesis 가능성. 도메인 expert 검증 의무.
+- **R15 full 차단 carry** (Fix #3 후속 — v8.7+ 의 더 본격적 fix):
+  - `--test-coverage-report <path>` — 실 test runner (vitest/jest/pytest) coverage report 와 cross-check
+  - `--evidence-dir <path>` — sql-inventory-extractor Layer 3 mirror (실 invocation log cross-check)
+
+### 원본 cycle-3 evidence (F-CYCLE3-005)
+
+- `_shared/baseline.js` 공유 = sql-inventory-extractor mirror pattern (R15 silent enabler 공범).
+- AI 자기 보고 metric (`named_classified_ratio` / `coverage_ratio` / `coverage_target` / `coverage_minimum_legacy`) → schema valid 통과 silent pass 위험.
+- v8.6.3 까지 partial defense (medium finding) 만 / v8.7 = high 격상 + future cross-check option carry.

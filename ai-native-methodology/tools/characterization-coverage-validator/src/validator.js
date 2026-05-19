@@ -76,11 +76,13 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
     }
 
     if (d.data_source_status === 'code_only') {
+      // ★ v8.7 PATCH — severity 격상 (medium → high) / R15 silent enabler partial defense 강화
+      // F-CYCLE3-005: snapshot 이 AI 가 코드만 보고 작성된 hypothesis 시 도메인 expert 검증 의무 / silent pass 차단
       findings.push({
-        kind: 'snapshot.code_only_carry_recommended',
-        severity: 'medium',
+        kind: 'snapshot.code_only_carry_required',
+        severity: 'high',
         file: s.file,
-        message: `${s.file}: data_source_status='code_only' — 도메인 expert 검증 carry 권장`
+        message: `${s.file}: data_source_status='code_only' — 도메인 expert 검증 의무 (R15 silent enabler 차단 / AI hypothesis 가능성 시 코드만 기반 snapshot 은 도메인 정합 보장 불가)`
       });
     }
 
