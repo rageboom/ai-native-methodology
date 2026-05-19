@@ -13,6 +13,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { crossCheckEvidence } from '../../_shared/evidence-cross-check.js';
 import { spawnSync } from 'node:child_process';
 import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
 
@@ -394,67 +395,11 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
 }
 
 // ★ Layer 3 helper — claimedAutoCount parse from "N/6 = X.X%" format
+// (crossCheckEvidence 는 v8.7 PATCH refactor 로 _shared/evidence-cross-check.js 로 추출 / 본 도구별 claim parser 만 보존)
 function parseClaimedAutoCount(autoRatioStr) {
   if (typeof autoRatioStr !== 'string') return null;
   const m = autoRatioStr.match(/^(\d+)\/6\b/);
   return m ? parseInt(m[1], 10) : null;
-}
-
-// ★ Layer 3 helper — evidence cross-check (실 tool invocation log file 의 unique tool count)
-function crossCheckEvidence(evidenceDir, claimedN) {
-  if (!existsSync(evidenceDir)) {
-    return { status: 'dir_missing', evidence_dir: evidenceDir };
-  }
-  let st;
-  try { st = statSync(evidenceDir); } catch { return { status: 'dir_missing', evidence_dir: evidenceDir }; }
-  if (!st.isDirectory()) return { status: 'dir_missing', evidence_dir: evidenceDir };
-
-  // *.jsonl file scan (recursive 한 layer만 — common case)
-  const entries = readdirSync(evidenceDir);
-  const jsonlFiles = entries
-    .filter(f => f.endsWith('.jsonl'))
-    .map(f => join(evidenceDir, f));
-
-  if (jsonlFiles.length === 0) {
-    return { status: 'no_evidence_files', evidence_dir: evidenceDir, files_scanned: 0 };
-  }
-
-  // JSON Lines parse → unique tool extract
-  const tools = new Set();
-  let totalInvocations = 0;
-  let parseErrors = 0;
-  const perFile = [];
-
-  for (const f of jsonlFiles) {
-    let content;
-    try { content = readFileSync(f, 'utf8'); } catch { perFile.push({ file: f, status: 'read_error' }); continue; }
-    const lines = content.split('\n').filter(l => l.trim().length > 0);
-    let fileInvocations = 0;
-    let fileTools = new Set();
-    for (const line of lines) {
-      let rec;
-      try { rec = JSON.parse(line); } catch { parseErrors++; continue; }
-      if (typeof rec.tool === 'string') {
-        tools.add(rec.tool);
-        fileTools.add(rec.tool);
-        totalInvocations++;
-        fileInvocations++;
-      }
-    }
-    perFile.push({ file: f, invocations: fileInvocations, unique_tools: [...fileTools] });
-  }
-
-  return {
-    status: 'ok',
-    evidence_dir: evidenceDir,
-    files_scanned: jsonlFiles.length,
-    total_invocations: totalInvocations,
-    evidence_tool_count: tools.size,
-    unique_tools: [...tools].sort(),
-    claimed_count: claimedN,
-    parse_errors: parseErrors,
-    per_file: perFile,
-  };
 }
 
 // ★ Layer 2 helper — xmllint XPath SQL count cross-check

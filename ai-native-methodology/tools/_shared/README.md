@@ -7,6 +7,7 @@
 ## 파일
 
 - `baseline.js` — ADR-010 baseline + ratchet 로직 (zero-defect 강제 ❌ / 신규 결함만 차단)
+- `evidence-cross-check.js` — ★ v8.7 PATCH Layer 3 evidence cross-check helper (실 외부 도구 invocation log *.jsonl scan → unique `tool` count 산출). R15 silent enabler 차단 공용 logic.
 
 ## 사용 위치
 
@@ -14,6 +15,8 @@ import 하는 도구:
 - [`../drift-validator/`](../drift-validator/) — drift count baseline + ratchet
 - [`../decision-table-validator/`](../decision-table-validator/) — DMN 5종 baseline + ratchet
 - [`../static-runner/`](../static-runner/) — SARIF finding baseline + ratchet
+- [`../characterization-coverage-validator/`](../characterization-coverage-validator/) — coverage baseline + ratchet trend / ★ evidence cross-check (v8.7 PATCH)
+- [`../sql-inventory-extractor/`](../sql-inventory-extractor/) — ★ evidence cross-check (v8.7 PATCH / Layer 3)
 
 ## ADR-010 baseline + ratchet 정책
 
@@ -36,7 +39,22 @@ import 하는 도구:
 - runtime 독립 실행 ❌ (script 단독 호출 시점 0 / src/ 와 동급)
 - ★ dist 의무 포함 (3 도구가 import / 부재 시 빌드 회귀)
 
+## ★ v8.7 PATCH Layer 3 evidence cross-check 정책
+
+```
+1. 도구는 --evidence-dir <dir> 옵션 (cli flag) 신설
+2. *.jsonl scan → unique 'tool' field count = evidence_tool_count
+3. 도구별 claim 계산 (e.g. auto_ratio_external_6 N parse / real_source snapshot count)
+4. evidence_tool_count < claimedN → critical finding "evidence_cross_check.invocation_count_mismatch"
+5. dir 부재 / *.jsonl 부재 → high finding
+6. claim 부재 또는 0 → medium finding (도구별 명명 — claim_unparseable / claim_empty 등)
+7. 옵션 미지정 → cross-check skip (backward-compat)
+```
+
+evidence file schema (JSON Lines / *.jsonl): `{ tool, version, invocation_id, args, target, timestamp, duration_ms, exit_code, stdout_sample, result_sha256 }` — 필수 field: `tool`.
+
 ## 참조
 
 - ADR-010 — baseline + ratchet 정책 (legacy 도입 시 zero-defect 강제 ❌)
 - [`../drift-validator/src/check-baseline.js`](../drift-validator/) — import 사용 예
+- F-CYCLE3-005 — R15 silent enabler quantitative evidence (cycle-3 dogfood)

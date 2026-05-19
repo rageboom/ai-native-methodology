@@ -9,9 +9,10 @@
 //   7. UC 유일성 (snapshot 의 use_case 가 matrix 에 존재)
 //   8. data_source_status: code_only 시 carry note 권장 (medium finding)
 
-import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
+import { crossCheckEvidence } from '../../_shared/evidence-cross-check.js';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -387,6 +388,7 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
 }
 
 // ★ Layer 3 helper — real-source snapshot count (data_source_status 가 실 evidence source 명시)
+// (crossCheckEvidence 는 v8.7 PATCH refactor 로 _shared/evidence-cross-check.js 로 추출 / 본 도구별 claim 계산만 보존)
 const REAL_SOURCE_STATUSES = new Set(['real_db', 'real_environment', 'domain_expert_interview']);
 function countRealSourceSnapshots(snapshots) {
   let n = 0;
@@ -394,59 +396,4 @@ function countRealSourceSnapshots(snapshots) {
     if (REAL_SOURCE_STATUSES.has(s.data?.data_source_status)) n++;
   }
   return n;
-}
-
-// ★ Layer 3 helper — evidence cross-check (실 tool invocation log file 의 unique tool count)
-function crossCheckEvidence(evidenceDir, claimedN) {
-  if (!existsSync(evidenceDir)) {
-    return { status: 'dir_missing', evidence_dir: evidenceDir };
-  }
-  let st;
-  try { st = statSync(evidenceDir); } catch { return { status: 'dir_missing', evidence_dir: evidenceDir }; }
-  if (!st.isDirectory()) return { status: 'dir_missing', evidence_dir: evidenceDir };
-
-  const entries = readdirSync(evidenceDir);
-  const jsonlFiles = entries
-    .filter(f => f.endsWith('.jsonl'))
-    .map(f => join(evidenceDir, f));
-
-  if (jsonlFiles.length === 0) {
-    return { status: 'no_evidence_files', evidence_dir: evidenceDir, files_scanned: 0 };
-  }
-
-  const tools = new Set();
-  let totalInvocations = 0;
-  let parseErrors = 0;
-  const perFile = [];
-
-  for (const f of jsonlFiles) {
-    let content;
-    try { content = readFileSync(f, 'utf8'); } catch { perFile.push({ file: f, status: 'read_error' }); continue; }
-    const lines = content.split('\n').filter(l => l.trim().length > 0);
-    let fileInvocations = 0;
-    let fileTools = new Set();
-    for (const line of lines) {
-      let rec;
-      try { rec = JSON.parse(line); } catch { parseErrors++; continue; }
-      if (typeof rec.tool === 'string') {
-        tools.add(rec.tool);
-        fileTools.add(rec.tool);
-        totalInvocations++;
-        fileInvocations++;
-      }
-    }
-    perFile.push({ file: f, invocations: fileInvocations, unique_tools: [...fileTools] });
-  }
-
-  return {
-    status: 'ok',
-    evidence_dir: evidenceDir,
-    files_scanned: jsonlFiles.length,
-    total_invocations: totalInvocations,
-    evidence_tool_count: tools.size,
-    unique_tools: [...tools].sort(),
-    claimed_count: claimedN,
-    parse_errors: parseErrors,
-    per_file: perFile,
-  };
 }
