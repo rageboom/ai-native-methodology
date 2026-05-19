@@ -19,13 +19,15 @@ node src/cli.js \
   [--legacy-xml-dir <dir>] \
   [--legacy-mismatch-high-threshold 0.30] \
   [--legacy-mismatch-critical-threshold 0.70] \
+  [--evidence-dir <dir>] \
   [--coverage-baseline <path>] [--write-coverage-baseline] \
   [--dry-run] [--json]
 ```
 
 검증 대상:
 - `<target>/sql-inventory.json` (★ entry / 12 컬럼 record + extraction_automation / ★ v2.3.0 migration_priority P0~P3 = 12번째 컬럼 / ADR-CHAIN-009)
-- `--legacy-xml-dir <dir>` (★ v8.7+ optional) — 실 legacy XML (iBATIS/MyBatis SQL mapper) 디렉토리. xmllint XPath count 와 `inventory_count` 정량 cross-check 으로 R15 silent simulation 차단.
+- `--legacy-xml-dir <dir>` (★ v8.7+ optional / Layer 2) — 실 legacy XML (iBATIS/MyBatis SQL mapper) 디렉토리. xmllint XPath count 와 `inventory_count` 정량 cross-check 으로 R15 silent simulation 차단.
+- `--evidence-dir <dir>` (★ v8.7+ optional / Layer 3) — 실 외부 도구 invocation evidence file (`*.jsonl`) 디렉토리. JSON Lines schema `{ tool, version, args, target, timestamp, duration_ms, exit_code, ... }`. unique `tool` field count 와 `extraction_automation.auto_ratio_external_6` 의 N claim cross-check 으로 AI 자기 보고 metric 검증.
 
 ## Outputs
 
@@ -50,6 +52,10 @@ node src/cli.js \
 | `legacy_cross_check.zero_xmllint_count` | medium | xmllint 가용 / .xml 발견 / 그러나 SQL tag (select/insert/update/delete) 0 — iBATIS/MyBatis mapper 아닐 가능성 |
 | `legacy_cross_check.mismatch_high` | high | inventory_count vs xmllint_total mismatch ≥ 30% (default high threshold) — 일부 SQL 누락 가능성 |
 | `legacy_cross_check.mismatch_critical` | critical | mismatch ≥ 70% (default critical threshold) — **R15 silent simulation 의심** / AI hypothesis 가능성 |
+| `evidence_cross_check.dir_missing` | high | `--evidence-dir` 경로 부재 또는 디렉토리 아님 (★ v8.7+ Layer 3) |
+| `evidence_cross_check.no_evidence_files` | high | `--evidence-dir` 안 `*.jsonl` 부재 — auto_ratio_external_6 claim 검증 불가 |
+| `evidence_cross_check.claim_unparseable` | medium | `auto_ratio_external_6` string 의 N parse 실패 (형식 "N/6 = X.X%" 위반) |
+| `evidence_cross_check.invocation_count_mismatch` | critical | unique tool count < auto_ratio_external_6 의 N claim — **R15 silent simulation 의심** / AI 자기 보고 metric 가능성 |
 
 ## Exit codes
 
@@ -91,11 +97,25 @@ node src/cli.js \
 
 - **schema 정합 (12 컬럼 + enum + if/then) 통과 ≠ 도메인 정합** — AI 가 hypothesis 로 작성한 sql-inventory.json 도 schema 정합 시 critical/high finding 0 통과 가능.
 - **`extraction_automation.auto_ratio_external_6`** = sql-inventory.json 안 metric 이 caller (AI 또는 사용자) 자기 보고. 본 도구는 형식 + threshold + ratchet trend 만 검증, **실 외부 도구 invocation 여부 cross-check 불가**.
-- **R15 (no-simulation) 차단** = `--legacy-xml-dir <dir>` option 사용 의무 (★ v8.7+). xmllint XPath count 와 inventory_count 의 정량 cross-check 로 AI hypothesis silent pass 차단.
+- **R15 (no-simulation) 차단** = 두 가지 cross-check option 동시 사용 의무 (★ v8.7+):
+  - `--legacy-xml-dir <dir>` (Layer 2) — xmllint XPath count 와 inventory_count 의 정량 cross-check
+  - `--evidence-dir <dir>` (Layer 3) — 실 외부 도구 invocation log 와 auto_ratio_external_6 claim cross-check
 - **권장 path**:
-  1. legacy 분석 단계 — xmllint / rg / ast-grep 등 실 외부 도구로 sql-inventory.json 생성 (인간 또는 AI + 실 도구 호출)
-  2. validator 호출 시 `--legacy-xml-dir <legacy XML root>` 의무 — mismatch ≥ 30% (high) / ≥ 70% (critical) finding 으로 silent enabler 차단
-  3. xmllint 부재 환경에서는 medium finding 으로 skip (graceful) — R15 보호 약화 명시.
+  1. legacy 분석 단계 — xmllint / rg / ast-grep 등 실 외부 도구로 sql-inventory.json 생성 + 각 invocation 을 `<evidence-dir>/<tool>-invocations.jsonl` 에 append
+  2. validator 호출 시 `--legacy-xml-dir <legacy XML root>` + `--evidence-dir <invocation log dir>` 둘 다 의무
+  3. mismatch finding (`mismatch_critical` / `invocation_count_mismatch`) 발생 시 R15 silent enabler 차단
+  4. xmllint 부재 환경에서는 medium finding 으로 skip (graceful) — R15 보호 약화 명시.
+
+### evidence file schema (Layer 3 JSON Lines)
+
+`<evidence-dir>/<tool>-invocations.jsonl` — 각 line 이 단일 외부 도구 invocation evidence:
+
+```jsonl
+{"tool":"xmllint","version":"20910","invocation_id":"inv-001","args":["--xpath","count(//select)","carMgt.xml"],"target":"carMgt.xml","timestamp":"2026-05-19T12:00:00+09:00","duration_ms":42,"exit_code":0,"stdout_sample":"21"}
+{"tool":"rg","version":"14.1.0","invocation_id":"inv-002","args":["-l","selectCarList","src/"],"target":"src/","timestamp":"2026-05-19T12:00:05+09:00","duration_ms":120,"exit_code":0}
+```
+
+필수 field: `tool` (cross-check 의 unique count 기준). 권장 field: version / args / target / timestamp / duration_ms / exit_code / stdout_sample 또는 result_sha256.
 
 ### 원본 cycle-3 evidence (F-CYCLE3-005)
 

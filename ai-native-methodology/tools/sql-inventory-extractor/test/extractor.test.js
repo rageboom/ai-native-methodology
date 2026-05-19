@@ -157,3 +157,47 @@ test('★ v8.7 Layer 2 — legacy-xml-dir 미지정 → cross-check skip (legacy
     'legacyXmlDir option 미지정 시 cross-check skip 의무 (backward-compat)');
   assert.equal(r.findings.filter(f => f.kind?.startsWith('legacy_cross_check.')).length, 0);
 });
+
+// ★ v8.7 PATCH — Layer 3 evidence cross-check (AI 자기 보고 metric 검증 / F-CYCLE3-005 fix)
+
+test('★ v8.7 Layer 3 — evidence-dir 미지정 → cross-check skip (evidence_cross_check=null / backward-compat)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'));
+  assert.equal(r.summary.evidence_cross_check, null,
+    'evidenceDir option 미지정 시 cross-check skip 의무 (backward-compat)');
+  assert.equal(r.findings.filter(f => f.kind?.startsWith('evidence_cross_check.')).length, 0);
+});
+
+test('★ v8.7 Layer 3 — evidence-dir 부재 → dir_missing high finding', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    evidenceDir: '/__nonexistent_evidence_dir_fixture__'
+  });
+  assert.ok(r.findings.some(f => f.kind === 'evidence_cross_check.dir_missing' && f.severity === 'high'),
+    `evidence-dir 부재 → dir_missing high finding 의무: ${JSON.stringify(r.findings)}`);
+  assert.equal(r.summary.evidence_cross_check.status, 'dir_missing');
+});
+
+test('★ v8.7 Layer 3 — evidence-dir 명시 / tool_count >= claim (5 vs 4) → no critical (R15 정합 verified)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    evidenceDir: join(FIX, 'evidence-dir-match')
+  });
+  assert.equal(r.summary.evidence_cross_check.status, 'ok');
+  assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 4,
+    `expected 4 unique tools (xmllint, rg, ast-grep, semgrep): got ${r.summary.evidence_cross_check.evidence_tool_count}`);
+  assert.equal(r.summary.evidence_cross_check.claimed_count, 4,
+    'poc-06 의 auto_ratio_external_6 = "4/6 = 66.7%" 의 claim N = 4');
+  const criticalEvidence = r.findings.filter(f =>
+    f.kind === 'evidence_cross_check.invocation_count_mismatch' && f.severity === 'critical');
+  assert.equal(criticalEvidence.length, 0,
+    '4 (evidence) >= 4 (claim) → no critical finding 의무 (R15 정합 verified)');
+});
+
+test('★ v8.7 Layer 3 — evidence-dir 명시 / tool_count < claim (2 vs 4) → invocation_count_mismatch CRITICAL (R15 silent simulation 의심)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
+    evidenceDir: join(FIX, 'evidence-dir-mismatch')
+  });
+  assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 2);
+  assert.equal(r.summary.evidence_cross_check.claimed_count, 4);
+  assert.ok(r.findings.some(f =>
+    f.kind === 'evidence_cross_check.invocation_count_mismatch' && f.severity === 'critical'),
+    `2 (evidence) < 4 (claim) → CRITICAL finding 의무 (R15 silent simulation 의심): ${JSON.stringify(r.findings)}`);
+});

@@ -60,6 +60,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     legacyXmlDir = null,
     legacyMismatchHighThreshold = 0.30,
     legacyMismatchCriticalThreshold = 0.70,
+    evidenceDir = null,
   } = options;
   const findings = [];
   const summary = {
@@ -75,6 +76,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     tag_type_distribution: {},
     ratchet_trend: null,
     legacy_cross_check: null,
+    evidence_cross_check: null,
   };
 
   // 1. sql-inventory.json read
@@ -303,6 +305,43 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     });
   }
 
+  // ★ Layer 3 (v8.7+) — evidence cross-check (실 tool invocation log 와 auto_ratio_external_6 claim cross-check)
+  // R15 silent enabler fix: AI 자기 보고 metric 의 실 외부 도구 invocation evidence 정량 검증.
+  if (evidenceDir) {
+    const claimedN = parseClaimedAutoCount(entry?.extraction_automation?.auto_ratio_external_6);
+    const crossCheck = crossCheckEvidence(evidenceDir, claimedN);
+    summary.evidence_cross_check = crossCheck;
+
+    if (crossCheck.status === 'dir_missing') {
+      findings.push({
+        kind: 'evidence_cross_check.dir_missing',
+        severity: 'high',
+        message: `--evidence-dir '${evidenceDir}' not found or not a directory`
+      });
+    } else if (crossCheck.status === 'no_evidence_files') {
+      findings.push({
+        kind: 'evidence_cross_check.no_evidence_files',
+        severity: 'high',
+        message: `--evidence-dir '${evidenceDir}' has no *.jsonl evidence files — sql-inventory.json 의 auto_ratio_external_6 claim 검증 불가 (R15 silent enabler unverified)`
+      });
+    } else if (crossCheck.status === 'ok') {
+      const { evidence_tool_count, claimed_count, total_invocations } = crossCheck;
+      if (claimedN === null) {
+        findings.push({
+          kind: 'evidence_cross_check.claim_unparseable',
+          severity: 'medium',
+          message: `auto_ratio_external_6 string 의 N parse 실패 → evidence cross-check skip (evidence_tool_count=${evidence_tool_count} / total_invocations=${total_invocations})`
+        });
+      } else if (evidence_tool_count < claimedN) {
+        findings.push({
+          kind: 'evidence_cross_check.invocation_count_mismatch',
+          severity: 'critical',
+          message: `★ R15 silent simulation 의심 — auto_ratio_external_6 claim=${claimedN}/6 vs evidence_tool_count=${evidence_tool_count} (실 invocation 의 unique tool 개수 부족). AI 자기 보고 metric 가능성 / 실 외부 도구 invocation 의무.`
+        });
+      }
+    }
+  }
+
   // ★ Layer 2 (v8.7+) — legacy XML cross-check (xmllint XPath count vs inventory_count)
   // R15 silent enabler fix: AI hypothesis sql-inventory.json 이 실 legacy XML 의 SQL count 와 ★ 정량 cross-check.
   if (legacyXmlDir) {
@@ -352,6 +391,70 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
   }
 
   return finalize(findings, summary);
+}
+
+// ★ Layer 3 helper — claimedAutoCount parse from "N/6 = X.X%" format
+function parseClaimedAutoCount(autoRatioStr) {
+  if (typeof autoRatioStr !== 'string') return null;
+  const m = autoRatioStr.match(/^(\d+)\/6\b/);
+  return m ? parseInt(m[1], 10) : null;
+}
+
+// ★ Layer 3 helper — evidence cross-check (실 tool invocation log file 의 unique tool count)
+function crossCheckEvidence(evidenceDir, claimedN) {
+  if (!existsSync(evidenceDir)) {
+    return { status: 'dir_missing', evidence_dir: evidenceDir };
+  }
+  let st;
+  try { st = statSync(evidenceDir); } catch { return { status: 'dir_missing', evidence_dir: evidenceDir }; }
+  if (!st.isDirectory()) return { status: 'dir_missing', evidence_dir: evidenceDir };
+
+  // *.jsonl file scan (recursive 한 layer만 — common case)
+  const entries = readdirSync(evidenceDir);
+  const jsonlFiles = entries
+    .filter(f => f.endsWith('.jsonl'))
+    .map(f => join(evidenceDir, f));
+
+  if (jsonlFiles.length === 0) {
+    return { status: 'no_evidence_files', evidence_dir: evidenceDir, files_scanned: 0 };
+  }
+
+  // JSON Lines parse → unique tool extract
+  const tools = new Set();
+  let totalInvocations = 0;
+  let parseErrors = 0;
+  const perFile = [];
+
+  for (const f of jsonlFiles) {
+    let content;
+    try { content = readFileSync(f, 'utf8'); } catch { perFile.push({ file: f, status: 'read_error' }); continue; }
+    const lines = content.split('\n').filter(l => l.trim().length > 0);
+    let fileInvocations = 0;
+    let fileTools = new Set();
+    for (const line of lines) {
+      let rec;
+      try { rec = JSON.parse(line); } catch { parseErrors++; continue; }
+      if (typeof rec.tool === 'string') {
+        tools.add(rec.tool);
+        fileTools.add(rec.tool);
+        totalInvocations++;
+        fileInvocations++;
+      }
+    }
+    perFile.push({ file: f, invocations: fileInvocations, unique_tools: [...fileTools] });
+  }
+
+  return {
+    status: 'ok',
+    evidence_dir: evidenceDir,
+    files_scanned: jsonlFiles.length,
+    total_invocations: totalInvocations,
+    evidence_tool_count: tools.size,
+    unique_tools: [...tools].sort(),
+    claimed_count: claimedN,
+    parse_errors: parseErrors,
+    per_file: perFile,
+  };
 }
 
 // ★ Layer 2 helper — xmllint XPath SQL count cross-check

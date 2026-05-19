@@ -1,0 +1,5 @@
+{"tool":"xmllint","version":"20910","invocation_id":"inv-001","args":["--xpath","count(//select)","carMgt.xml"],"target":"carMgt.xml","timestamp":"2026-05-19T12:00:00+09:00","duration_ms":42,"exit_code":0,"stdout_sample":"21"}
+{"tool":"xmllint","version":"20910","invocation_id":"inv-002","args":["--xpath","count(//insert)","carMgt.xml"],"target":"carMgt.xml","timestamp":"2026-05-19T12:00:01+09:00","duration_ms":38,"exit_code":0,"stdout_sample":"3"}
+{"tool":"rg","version":"14.1.0","invocation_id":"inv-003","args":["-l","selectCarList","src/"],"target":"src/","timestamp":"2026-05-19T12:00:05+09:00","duration_ms":120,"exit_code":0,"stdout_sample":"src/main/.../carMgt.xml"}
+{"tool":"ast-grep","version":"0.20.0","invocation_id":"inv-004","args":["run","-p","selectCarList","--lang","xml"],"target":"src/","timestamp":"2026-05-19T12:00:10+09:00","duration_ms":250,"exit_code":0}
+{"tool":"semgrep","version":"1.45.0","invocation_id":"inv-005","args":["--config","p/sql","src/"],"target":"src/","timestamp":"2026-05-19T12:00:15+09:00","duration_ms":3500,"exit_code":0}

@@ -11,6 +11,7 @@ function parseArgs(argv) {
     legacyXmlDir: null,
     legacyMismatchHighThreshold: 0.30,
     legacyMismatchCriticalThreshold: 0.70,
+    evidenceDir: null,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -21,12 +22,14 @@ function parseArgs(argv) {
     else if (a === '--legacy-xml-dir') out.legacyXmlDir = argv[++i];
     else if (a === '--legacy-mismatch-high-threshold') out.legacyMismatchHighThreshold = parseFloat(argv[++i]);
     else if (a === '--legacy-mismatch-critical-threshold') out.legacyMismatchCriticalThreshold = parseFloat(argv[++i]);
+    else if (a === '--evidence-dir') out.evidenceDir = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
       console.log(`usage: sql-inventory-extractor --target <dir> [--threshold-auto-ratio 0.50]
        [--coverage-baseline <path>] [--write-coverage-baseline]
        [--legacy-xml-dir <dir>] [--legacy-mismatch-high-threshold 0.30] [--legacy-mismatch-critical-threshold 0.70]
+       [--evidence-dir <dir>]
        [--dry-run] [--json]
 
 Validates phase sql-inventory output:
@@ -58,6 +61,12 @@ v2.3.1 PATCH baseline ratchet (C-v2.2.0-2 / characterization-coverage-validator 
   R15 silent enabler 차단 — schema 정합 통과의 sql-inventory.json 이 AI hypothesis 인지 실 legacy grep 결과인지
   외부 도구 (xmllint) 정량 비교로 판별. xmllint 부재 시 medium finding + skip (graceful).
 
+★ v8.7 PATCH — evidence cross-check (R15 silent simulation 차단 / AI 자기 보고 metric 검증):
+  --evidence-dir <dir>     실 외부 도구 invocation 의 evidence file (*.jsonl) 디렉토리
+                           각 line: { tool, version, args, target, timestamp, duration_ms, exit_code, ... }
+                           unique 'tool' field 의 count 와 sql-inventory.json 의 auto_ratio_external_6 N claim cross-check
+                           N_evidence < N_claim 시 critical finding (R15 silent simulation 의심).
+
 Threshold default 0.50 (auto-ratio) / 0.30 (mismatch high) / 0.70 (mismatch critical).
 `);
       process.exit(0);
@@ -78,6 +87,7 @@ const result = validateSqlInventory(args.target, args.thresholdAutoRatio, {
   legacyXmlDir: args.legacyXmlDir,
   legacyMismatchHighThreshold: args.legacyMismatchHighThreshold,
   legacyMismatchCriticalThreshold: args.legacyMismatchCriticalThreshold,
+  evidenceDir: args.evidenceDir,
 });
 
 if (args.json) {
@@ -96,6 +106,14 @@ if (args.json) {
       console.log(`legacy_cross_check: xmllint_total=${cc.xmllint_total} vs inventory_count=${cc.inventory_count} (mismatch ${(cc.mismatch_ratio * 100).toFixed(1)}% / ${cc.files_scanned} .xml files)`);
     } else {
       console.log(`legacy_cross_check: status=${cc.status}`);
+    }
+  }
+  if (result.summary.evidence_cross_check) {
+    const ec = result.summary.evidence_cross_check;
+    if (ec.status === 'ok') {
+      console.log(`evidence_cross_check: tool_count=${ec.evidence_tool_count} vs claim=${ec.claimed_count}/6 (invocations=${ec.total_invocations} / ${ec.files_scanned} *.jsonl / tools=[${ec.unique_tools.join(', ')}])`);
+    } else {
+      console.log(`evidence_cross_check: status=${ec.status}`);
     }
   }
   for (const f of result.findings) {
