@@ -78,6 +78,7 @@ DEC-2026-05-15-g1-itsm-permanent-scope-out §31 verbatim 인용:
 - **부모**: DEC-2026-05-15-g1-itsm-permanent-scope-out §31 (별도 charter 요구 신설 path)
 - **반대 polarity**: R16/R17 strikethrough 유지 — 본 R20 ≠ R16/R17 revival (drift attractor 회피)
 - **sibling**: R19 (DEC-2026-05-18-runtime-tool-exclusion / 외부 도구 의존 분류 4 조건) — tool ecosystem 카테고리 정합
+- **★ v8.7.2 amendment** (forward): DEC-2026-05-20-r20-verification-mode.md — parent_epic override + mode=verification 메타 모드 + chain-driver next 안 stderr auto-suggest (mis-fe-admin EAM-AUTH iter-6 verification cycle 의 F-VERIFY-001~004 driver / breaking 0 / standard mode 본문 무변경)
 - **재사용**: R15 (`tools/static-runner/src/runner.js::REQUIRED_EVIDENCE` 7 field + `EVIDENCE_TRUST` 3-tier)
 
 ## 회귀 (target)

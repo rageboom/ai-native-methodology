@@ -9,6 +9,58 @@
 
 ---
 
+## [8.7.2] — 2026-05-20 ★ ★ PATCH — ticket-sync verification mode + parent_epic override + chain-driver next stderr auto-suggest (R20 amendment / breaking 0)
+
+> ★ **v8.7.2 PATCH — R20 amendment**. mis-fe-admin EAM-AUTH iter-6 verification cycle Stage 0 dry-run findings 4건 + 보강 candidate 6건 driver. ticket-sync 의 3축 본질 확장: (B3) `parent_epic` override + (B4) `mode=verification` 분기 + (B6) `chain-driver next` 안 ticket-sync auto-suggest stderr. Initiative 생성 권한 부재 환경 / plugin dogfood meta-cycle / 기존 Epic 재사용 시 사용. R20 confirmation gate / 7-field evidence / fire-and-forget ❌ 본질 보존.
+
+### 본질 발견 (mis-fe-admin EAM-AUTH iter-6 verification cycle)
+
+- 사용자가 plugin v8.7.0 의 5-stage chain harness + Jira 자동 연동을 검증 (Figma + Swagger input / parent epic = `DWPD-1442 [2026] AI TF`) 진입 시 4 finding:
+  - **F-VERIFY-001**: ticket-sync 는 chain harness state-driven (`.aimd/state.json` + `traceability-matrix.json` 의무) — iter-1~5 가 `chain-driver init` 안 거쳐 state.json 부재 → ticket-sync 호출 reject path. ★ 본질 = chain-driver CLI 가 정식 entry point 인데 사용자가 그것을 모르고 skill 만 직접 호출. plugin 측 보강 = onboarding doc (별 carry).
+  - **F-VERIFY-002**: ticket-sync standard flow hierarchy (Initiative + per-BC Epic + per-UC Story) ↔ 사용자 verification 의도 (parent_epic = DWPD-1442 하위 + per-stage Story 5) mismatch. 두 hierarchy 가 본질적으로 다름 (실 도메인 feature ≠ plugin dogfood).
+  - **F-VERIFY-003** (예상): Initiative 생성 권한 부재 → standard flow analysis exit 첫 호출 시 jira_create(Initiative) 실패 예상 → 전체 batch abort.
+  - **F-VERIFY-004**: `hooks/hooks.json` 에 Stop / PostToolUse hook 미등록 → SKILL.md 가 명시한 "chain stage 종료 동기로 호출" 의 실 auto-trigger 0건 (★ ★ 가설 H1 의 결정적 evidence — SKILL.md ↔ 실 hook 정합 부재).
+- → standard mode 본문 유지 + verification mode 분기 신설 + chain-driver next 안 auto-suggest 통합 = 3축 amendment
+
+### 시행 (1 commit / branch `v8.7.2-r20-verification-mode`)
+
+1. **B3 `parent_epic` override 파라미터 추가** (`skills/ticket-sync/SKILL.md` §파라미터) — 명시 시 standard flow 의 Initiative 자동 생성 skip + 기존 Epic 하위 직접 매핑. `mode=verification` 시 의무.
+2. **B4 `mode=verification` 메타 모드 추가** (동상 §파라미터 + §단계 5 헤더 + §단계 5b 신설) — per-stage Story 5 (analysis/planning/spec/test/implement 각 1) + 산출물·UC·AC·TC 별 Sub-task. plugin dogfood meta-cycle / verification 작업 전용. `parent_epic` 의무.
+3. **§금지·강제력** — F-TICKETSYNC-003 (mode=verification + parent_epic 미명시 reject) + F-TICKETSYNC-004 (mode=standard + parent_epic 명시 시 hybrid info finding) 추가.
+4. **§사용자 결단 6번** — mode 선택 결단 추가 / Auto-invoke 정책 갱신 (`chain-driver next` stderr / Stop hook 직접 등록 ❌).
+5. **B6 chain-driver next 안 auto-suggest stderr** (`tools/chain-driver/src/cli.js` `cmdNext` line ~286) — stage 전이 직후 ticket-sync auto-suggest stderr 출력 (~10 LOC additive / stdout 무영향). Stop hook 직접 등록 ❌ — Stop event = 매 turn 종료마다 발화 = noise. 의도된 stage 전이 시점 (chain-driver next 호출 후) 에만 발화 = 정합.
+6. **decision record 신설** — `decisions/DEC-2026-05-20-r20-verification-mode.md` (R20 amendment / 4 finding driver / 3축 변경 / Tier sub-axis 확장 / 정합 관계).
+7. **SSOT 일치** — `.claude-plugin/plugin.json` 8.7.0 → 8.7.2 / `package.json` 8.7.1 → 8.7.2 / `CLAUDE.md` line 99 v8.7.0 → v8.7.2.
+
+### 검증
+
+- SKILL.md standard mode 본문 무변경 — diff = §파라미터 표 신규 2행 + §단계 5 헤더 분기 안내 + §단계 5b 신설 + §금지 신규 2건 + §사용자 결단 6번 + §Cross-link 1줄
+- mode=verification 본문 5 phase (analysis/planning/spec/test/implement) parent_ticket_id 의무 + structure_complete=true 의무 + verification_mode=true 표식 + verification_story_ids map 정합
+- chain-driver next stderr 출력은 stdout 무영향 (JSON output 정합 보존)
+- R20 confirmation gate / 7-field evidence / fire-and-forget ❌ / Sequential MCP / search-first idempotency 전부 보존
+- breaking 0 — standard mode 호출자는 영향 없음 (mode default = standard / parent_epic optional)
+
+### dogfood 효과
+
+- mis-fe-admin EAM-AUTH iter-6 verification cycle 의 Stage 1~5 가 본 v8.7.2 patched plugin 으로 진입 가능 — `ticket-sync stage=analysis phase=exit mode=verification parent_epic=DWPD-1442` 호출 자연 fit
+- plugin self-verification meta-cycle 의 hierarchy 가 표준화 — 본 release 이후 plugin dogfood 작업 모두 `mode=verification` 사용 권고
+- F-VERIFY-001~004 finding 4건 → 해소 path 명확: B1/B2 = chain-driver init onboarding (별 carry) / B3+B4 = mode + parent_epic (본 release) / B6 = stderr auto-suggest (본 release)
+
+### Pre-existing fail (★ v8.7.1 baseline 동등 / 본 PATCH scope 외 / v8.7.3+ carry)
+
+- `analysis_validator_violation` — 6 PoC example (poc-06/07/08/09/10/11) 의 planning-spec.json schema invalid (★ v8.7.0 baseline 부터 inherited / v8.7.1 release 시점 동일 상태)
+- `workspace_test_pass` + `skill_citation_integrity` — `methodology-spec/ticket-policy.md:234` 의 `tools/_shared/finding-log.js` stale citation (실 file 부재 — finding emit path 가 skill 인라인 + `finding-system.md` 통합 path 로 진화됐는데 ticket-policy 인용 미갱신 / 1 file 1줄 갱신으로 해소 가능 / 본 PATCH 무관 / v8.7.3+ carry)
+- release:check = 11/14 pass (3 fail = 위 inherited / 본 PATCH 회귀 0건)
+
+### dependencies / migration
+
+- `_shared/` 변경 없음 / schema 변경 없음 (단 ticket_ref 의 `verification_mode` boolean + `verification_story_ids` map field 추가는 v8.7.3+ 후속 carry) / cli flag 변경 없음 / data file 변경 없음
+- 옛 호출자 break 0 (mode default = standard / parent_epic optional / opt-in)
+- 후속 R15 차단 의무 영역 (Layer 3 evidence-dir) 변경 없음
+- v8.7.3+ carry: ticket-sync-evidence schema 에 verification_mode field 추가 / traceability-matrix.schema 에 verification_mode + verification_story_ids 추가 / 사용자 onboarding doc (`chain-driver init` 진입 안내) 강화 / ticket-policy.md:234 stale citation 1줄 fix
+
+---
+
 ## [8.7.1] — 2026-05-19 ★ PATCH — sql-inventory-validator xmllint XPath 에 iBATIS 2 `//procedure` tag 추가 (F-CYCLE4-001 fix / boundary service 대응 / breaking 0)
 
 > ★ **v8.7.1 PATCH — F-CYCLE4-001 fix**. cycle-4 dogfood (poc-efi-web-1 / rbac scope) 의 정직 발견: rbac.xml 류 stored-procedure-only mapper (iBATIS 2 `<procedure>` tag 만 사용) 가 sql-inventory-validator Layer 2 cross-check 에서 xmllint_total=0 으로 측정 → `zero_xmllint_count` medium finding 오탐. XPath 가 `select | insert | update | delete` 4 tag 만 cover → `procedure` 누락.

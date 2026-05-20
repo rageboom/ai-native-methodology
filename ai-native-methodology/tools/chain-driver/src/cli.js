@@ -284,6 +284,18 @@ function cmdNext(args) {
     exit_code: 0,
     message: `advanced to ${next || '(terminal)'}`,
   });
+  // ★ ★ v8.7.2+ — ticket-sync auto-suggest stderr (R20 / DEC-2026-05-20-r20-verification-mode).
+  // Stop hook 직접 등록 ❌ — Stop event = 매 turn 종료마다 발화 = noise.
+  // chain-driver next 호출 시점 = 의도된 stage 전이 = ticket-sync 호출 candidate moment.
+  // 실 MCP 호출은 사용자 명시 호출 의무 (R20 confirmation gate 본질 보존 / fire-and-forget ❌).
+  const stageForTicketSync = stage === 'impl' ? 'implement' : stage;
+  process.stderr.write(
+    `[chain-driver] ★ ticket-sync auto-suggest: invoke skill ai-native-methodology:ticket-sync ` +
+    `with stage=${stageForTicketSync} phase=exit (dry_run=true default). ` +
+    `Initiative 생성 권한 부재 환경 / plugin verification meta-cycle / migration carry 시: ` +
+    `mode=verification + parent_epic=<existing-epic-key>. ` +
+    `R20 / DEC-2026-05-20-r20-verification-mode.\n`
+  );
   process.stdout.write(JSON.stringify({ stage, advanced_to: next, gate: finalDecision }, null, 2) + '\n');
   process.exit(0);
 }

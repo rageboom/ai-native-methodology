@@ -33,6 +33,8 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 | `dry_run` | boolean | **`true`** | ★ default true — reproduction_command 만 print / MCP 호출 X. 사용자 OK 후 `dry_run=false` 명시 호출. |
 | `issuetype_enter` | string | `Task` | ★ v8.6.2+ — phase=enter Task 의 Jira issuetype. default `Task` (universal). 환경 결단 시 `Spike` / `Story` 가능. |
 | `confluence_emit` | boolean | `false` | analysis stage 시 Initiative-level Confluence overview page 생성 (v8.6.1 default false / 사용자 결단 시 활성). per-stage 보고서 page = v8.7.0+ Tier 2.6 carry. |
+| `parent_epic` | string | (없음) | ★ ★ v8.7.2+ — 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`. |
+| `mode` | enum | **`standard`** | ★ ★ v8.7.2+ — `standard` (default / R20 original — per-UC Story + 4 Sub-task per Story) \| `verification` (per-stage Story 5개 + 산출물 별 Sub-task / `parent_epic` 의무 / plugin dogfood meta-cycle 전용 / DEC-2026-05-20-r20-verification-mode 정합). |
 
 ## 절차
 
@@ -103,6 +105,8 @@ stage 별 MCP 호출 batch 의 preview 표시. 예 (stage=planning, scope=car):
 - 응답 = `yes` 시 단계 5 진행
 
 ### 단계 5 — MCP 호출 (sequential / 결정론 보호)
+
+★ ★ v8.7.2+ — mode 분기: `mode=standard` (default / 아래 phase × stage 본문) 또는 `mode=verification` (§ 단계 5b 본문).
 
 phase × stage 별 MCP call matrix:
 
@@ -205,6 +209,103 @@ for each Story:
 ★ 각 호출 = Bash 로 stdout/stderr 캡쳐 → 7-field evidence record (`mcp_invocations[]` append).
 ★ enter_task_id = traceability-matrix.ticket_ref.enter_task_ids[stage] (v8.6.2+ schema).
 
+### 단계 5b — MCP 호출 (★ ★ v8.7.2+ mode=verification 분기)
+
+verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycle 전용. `parent_epic` 의무 — 미명시 시 reject + Block error.
+
+★ standard mode 와의 본질 차이:
+| 축 | standard | verification |
+|---|---|---|
+| Initiative 생성 | analysis exit 시 자동 (1건) | ❌ skip (parent_epic 재사용) |
+| per-BC Epic 생성 | analysis exit 시 architecture.json 기반 (N건) | ❌ skip (parent_epic 직접 매핑) |
+| Story 단위 | **per UC** (planning exit 마다 N건) | **per stage** (5건 고정 / analysis~implement 각 1건) |
+| Sub-task 단위 | per Story 의 4 chain (chain1/2/3/4) | per Story 의 산출물 / UC / AC / TC |
+| 사용 시점 | 실 도메인 feature 개발 cycle | plugin 검증 / migration meta-cycle / 기존 Epic 재사용 |
+
+#### phase=exit — mode=verification — analysis
+
+```
+1. if !exists Story("[Plugin Verify] Stage 1 — analysis"):
+   jira_create (Story, parent_ticket_id=$parent_epic, link_type=parent-child,
+                summary="[Plugin Verify] Stage 1 — analysis",
+                labels=[verification-mode, $scope_id], body=verification plan link)
+   → verification_story_ids[analysis] = <key>
+2. for each artifact in inventory/architecture/domain/business-rules/antipatterns/state-map/openapi/...:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[analysis],
+                link_type=parent-child,
+                summary="[Verify artifact] {artifact_name}",
+                status=Done)
+3. jira_comment (verification_story_ids[analysis],
+                 "5종 물증 7 필드 + iter-N carry inheritance + analysis gate result")
+4. jira_transition (verification_story_ids[analysis] → "Done")
+```
+
+#### phase=exit — mode=verification — planning
+
+```
+1. jira_create (Story, parent_ticket_id=$parent_epic, link_type=parent-child,
+                summary="[Plugin Verify] Stage 2 — planning (UC/BR-INTENT)",
+                labels=[verification-mode, $scope_id]) → verification_story_ids[planning]
+2. for each UC in planning-spec.use_cases[]:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
+                summary="[Verify UC] {uc_id} {uc_summary}", status=Done)
+3. for each BR-INTENT in planning-spec.business_rules_intent[]:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
+                summary="[Verify BR-INTENT] {br_id} {summary}", status=Done)
+4. jira_comment (verification_story_ids[planning],
+                 "UC count=N + BR-INTENT count=M + traceability v1 link")
+5. jira_transition (verification_story_ids[planning] → "Done")
+```
+
+#### phase=exit — mode=verification — spec
+
+```
+1. jira_create (Story, parent_ticket_id=$parent_epic, ...,
+                summary="[Plugin Verify] Stage 3 — spec (BHV + AC Gherkin)")
+   → verification_story_ids[spec]
+2. for each AC in acceptance-criteria[]:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[spec],
+                summary="[Verify AC] {ac_id} {gherkin_when}", status=Done)
+3. jira_comment (verification_story_ids[spec],
+                 "BHV count=N + AC count=M + BR cross-consistency result")
+4. jira_transition (verification_story_ids[spec] → "Done")
+```
+
+#### phase=exit — mode=verification — test (RED)
+
+```
+1. jira_create (Story, parent_ticket_id=$parent_epic, ...,
+                summary="[Plugin Verify] Stage 4 — test (RED)")
+   → verification_story_ids[test]
+2. for each test_case in test-spec[]:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[test],
+                summary="[Verify TC] {tc_id} {ac_id_link}", status="Testing")
+3. jira_comment (verification_story_ids[test],
+                 "RED evidence + 5종 물증 7 필드 + AC↔TC forward coverage")
+```
+★ Story status 는 Testing/In Progress 유지 — implement stage 종료 후 일괄 Done.
+
+#### phase=exit — mode=verification — implement (GREEN)
+
+```
+1. jira_create (Story, parent_ticket_id=$parent_epic, ...,
+                summary="[Plugin Verify] Stage 5 — implement (GREEN)")
+   → verification_story_ids[implement]
+2. for each impl artifact:
+   jira_create (Sub-task, parent_ticket_id=verification_story_ids[implement],
+                summary="[Verify impl] {file_path}", status=Done)
+3. jira_transition (verification_story_ids[test] sub-tasks → "Done")
+4. jira_transition (verification_story_ids[test] → "Done")
+5. jira_transition (verification_story_ids[implement] → "Done")
+6. jira_comment ($parent_epic,
+                 "★ verification cycle 종결 — 5 Story keys + Q1~Q5 pass/fail summary
+                  + traceability-matrix 100% green + commit hash + findings 링크")
+```
+
+★ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` 표식 + `verification_story_ids` map 추가 (analysis/planning/spec/test/implement → Story 키).
+
+★ structure_complete 의무 동일 (모든 Story / Sub-task 의 parent_ticket_id 채움).
+
 ### 단계 6 — Evidence 기록
 
 `<project>/.aimd/output/evidence/ticket-sync-<stage>-<timestamp>.json` 작성 (schema: `ticket-sync-evidence.schema.json`):
@@ -254,23 +355,27 @@ for each Story:
 - **R16/R17 부활 ❌** — 본 skill = R20 신규 채널 (drift attractor 회피)
 - **★ v8.6.3+ orphan ticket ❌** — Sub-task / Story / Epic 생성 시 `parent_ticket_id` 의무 (Initiative / Tech Debt Story / Spike 만 omit 가능). 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit + ticket_ref.structure_complete=false 표식.
 - **★ v8.6.3+ link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (Tech Debt / Spike / 도메인 횡단 BR) 만 허용.
+- **★ ★ v8.7.2+ mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error (Initiative 자동 생성 시도 ❌). 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.
+- **★ ★ v8.7.2+ mode=standard + parent_epic 명시 시 hybrid 경고** — standard mode 인데 parent_epic 명시 시 → Initiative 생성 skip + per-BC Epic 의 link 대상이 parent_epic 으로 변경 (architecture-driven Epic 자동 생성은 유지). 명시적 hybrid path / `F-TICKETSYNC-004 hybrid_parent_epic` info finding emit (deny ❌).
 
-## 사용자 결단 5건 (실 사용 시점 / DEC-2026-05-18-r20)
+## 사용자 결단 6건 (실 사용 시점 / DEC-2026-05-18-r20 + ★ v8.7.2 amendment DEC-2026-05-20-r20-verification-mode)
 
 1. **Jira workflow transition target IDs** — project-specific / `jira_transitions` 사전 lookup 의무 (Initiative/Epic/Story/Sub-task workflow 가 사용자 Jira 환경 의존)
 2. **Confluence emit 범위** — Initiative overview default v8.6.1 / per-stage 보고서 page = v8.7.0+ Tier 2.6 후보
-3. **Auto-invoke 정책** — chain stage gate 통과 후 본 skill auto-suggest (confirmation 만 사용자) ★ 권고
+3. **Auto-invoke 정책** — chain stage gate 통과 후 본 skill auto-suggest (confirmation 만 사용자) ★ 권고. ★ v8.7.2+ — `chain-driver next` 명령이 stage 전이 직후 stderr only suggest 송출 (Stop hook 직접 등록 ❌ — noise 회피 / 의도된 stage 전이 시점에만 발화). 실 MCP 호출은 항상 사용자 명시 호출.
 4. **Idempotency** — search-first ★ 권고 (재실행 시 기존 ticket lookup skip + status_history 만 갱신)
 5. **MCP 미연결 환경** — silent skip + finding emit ★ 권고
+6. **★ v8.7.2+ mode 선택** — `standard` (default / 실 도메인 feature cycle / Initiative+Epic 자동 생성) / `verification` (plugin dogfood meta-cycle / parent_epic 의무 / per-stage Story 5 + 산출물 별 Sub-task). 환경상 Initiative 생성 권한 부재 / 기존 Epic 재사용 / migration carry meta-cycle 시 `mode=verification` + `parent_epic=<key>` 명시.
 
 ## Cross-link
 
 - 결단 record: `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
+- ★ v8.7.2 amendment: `decisions/DEC-2026-05-20-r20-verification-mode.md` (parent_epic override + mode=verification + Stop hook auto-suggest)
 - 정책 본문: `methodology-spec/ticket-policy.md` §Tier 2.5
 - ID 명명: `methodology-spec/id-conventions.md` §Ticket Binding
 - Evidence schema: `schemas/ticket-sync-evidence.schema.json`
 - Traceability matrix: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref.status_history
-- Hook config: `hooks/hooks.json` PreToolUse matcher (state.blocked deny path)
+- Hook config: `hooks/hooks.json` PreToolUse matcher (state.blocked deny path) / ★ v8.7.2 auto-suggest = `tools/chain-driver/src/cli.js` cmdNext stderr (Stop hook 직접 등록 ❌)
 - R20 charter entry: `methodology-spec/plugin-charter.md` §1+§2
 - R16/R17 영구 scope-out parent: `decisions/DEC-2026-05-15-g1-itsm-permanent-scope-out.md` §31
 - Tier 1 (manual) 선행: `decisions/DEC-2026-05-18-ticket-binding-policy.md`
