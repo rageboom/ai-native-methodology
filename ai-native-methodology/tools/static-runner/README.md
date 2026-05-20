@@ -6,7 +6,7 @@
 
 | Tier | 도구 | 실행 환경 | evidence_trust |
 |---|---|---|---|
-| **Tier 1** (in-plugin native) | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0) | plugin 환경 (사용자 1회 install) | `real_tool` |
+| **Tier 1** (in-plugin native) | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0) | plugin 환경 (★ SessionStart hook 자동 install — `scripts/install-static-tools.sh`) | `real_tool` |
 | **Tier 2** (user-environment SARIF import) | **PMD** (Java 8 or above) / **SpotBugs** (JRE 11+) / **CodeQL** (JDK + DB build) / **Daikon** (Java + runtime trace) | 사용자 CI / 로컬 | `imported_sarif` |
 | **Tier 3** (simulated) | ❌ AI persona / 손작성 / `manual` driver SARIF | — | `simulated` → 영구 reject (-5%p) |
 
@@ -28,21 +28,46 @@
 ### Tier 1 — in-plugin Semgrep
 
 ```bash
-# 사용자 1회 install (PEP 668 격리 권장)
-pipx install semgrep
-# 또는 brew install semgrep / uv tool install semgrep
+# ★ 자동 install (SessionStart hook 가 첫 세션에 실행 / 이후 idempotent skip)
+#   수동 강제 실행:  bash ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.sh
+#   fallback chain:  pipx → brew → pip3 --user → 사용자 안내
+# 또는 사용자 수동:
+#   pipx install semgrep
+#   brew install semgrep / uv tool install semgrep
 
-# 단일 plugin
+# 단일 plugin — 번들 룰 (★ 사내 정책으로 semgrep registry 접근 불가 환경 대응)
+#   semgrep-rules 가 git subtree 로 tools/semgrep-rules/ 에 vendor 됨 (install 시 자동 동봉)
+npx static-runner --plugin semgrep --target ./src --output ./out \
+  --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/python
+
+# 단일 plugin — semgrep registry (registry 접근 가능 환경에서만)
 npx static-runner --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
 
 # ★ v1.4.2 — `--extra-rules` 옵션 (custom Semgrep rule)
-npx static-runner --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten \
+npx static-runner --plugin semgrep --target ./src --output ./out \
+  --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/javascript \
   --extra-rules <repo-rules-path>/jwt-localstorage.yml
 
 # Baseline + Ratchet (★ ADR-010)
 npx static-runner --plugin semgrep ... --baseline .baseline.json --ratchet
 npx static-runner --plugin semgrep ... --write-baseline .baseline.json
 ```
+
+#### 번들 룰 경로 (★ git subtree from https://github.com/semgrep/semgrep-rules.git develop)
+
+`tools/semgrep-rules/` 하위 폴더 = `--ruleset` 에 그대로 전달 가능:
+
+| 경로 | 용도 |
+|---|---|
+| `tools/semgrep-rules/python` | Python 전반 |
+| `tools/semgrep-rules/javascript` | JS (브라우저/Node) |
+| `tools/semgrep-rules/typescript` | TS |
+| `tools/semgrep-rules/java` | Java |
+| `tools/semgrep-rules/go` | Go |
+| `tools/semgrep-rules/generic` | 언어 무관 (secrets, RSA private key 등) |
+| `tools/semgrep-rules/problem-based-packs` | 큐레이션 팩 (OWASP / SSRF 등) |
+
+업데이트: 유지보수자가 `git subtree pull --squash --prefix=ai-native-methodology/tools/semgrep-rules https://github.com/semgrep/semgrep-rules.git develop` 로 upstream 동기화.
 
 ### Tier 2 — 사용자 환경 SARIF import (★ v8.6.0 신설)
 

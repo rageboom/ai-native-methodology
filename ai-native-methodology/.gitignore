@@ -12,3 +12,6 @@ tools/**/out/
 examples/**/.aimd/state.json
 examples/**/.aimd/state.json.tmp
 examples/**/.aimd/output/intervention-log.jsonl
+
+# install-static-tools.sh marker (사용자 환경별 idempotent flag)
+.aimd-install/

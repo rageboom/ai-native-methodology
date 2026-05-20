@@ -31,13 +31,28 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - **Tier 2 — dependency (사용자 환경)**: OSV-Scanner / Snyk / Dependabot
 2. **static-runner 호출** — `tools/static-runner/` 가 도구 hook 통합 (Plugin host 패턴)
 3. **도구별 실 실행** — `node tools/static-runner/src/cli.js --plugin <semgrep|pmd> --target <dir> --output <dir>` (★ cli.mjs MCP wrapper = carry-over)
-4. **★ v1.4.2 — 사내 custom rule 적용** — `--extra-rules <path>` 옵션 (멀티 지정 가능):
+4. **★ 번들 룰 우선 사용** — `tools/semgrep-rules/` 가 git subtree 로 vendor (install 시 자동 동봉, 사내 정책으로 semgrep registry 막힌 환경 1차 대응):
    ```bash
+   # 번들 룰 (registry 의존 0 — 권장 default)
    node tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <dir> \
      --output <dir> \
-     --ruleset p/owasp-top-ten \
+     --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/python
+
+   # registry pack (registry 접근 가능 환경에서만)
+   node tools/static-runner/src/cli.js \
+     --plugin semgrep \
+     --target <dir> \
+     --output <dir> \
+     --ruleset p/owasp-top-ten
+
+   # ★ v1.4.2 — `--extra-rules <path>` 사내 custom rule 병행 (멀티 지정 가능)
+   node tools/static-runner/src/cli.js \
+     --plugin semgrep \
+     --target <dir> \
+     --output <dir> \
+     --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/javascript \
      --extra-rules tools/static-runner/rules/jwt-localstorage.yml
    ```
    - 사례: `rules/jwt-localstorage.yml` (★ AP-FE-SECURITY-001 / 4 PoC isomorphic 직접 confirm 도달)

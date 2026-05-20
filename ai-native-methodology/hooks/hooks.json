@@ -9,6 +9,12 @@
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
             "statusMessage": "Loading AI-Native methodology context (G3 drift check + scope manifest recover)...",
             "$comment": "★ G3 R5/R7 (v3.2) — SessionStart hook 가 recoverTmpFiles + markDrift (M4 자동 drift 감지). drift_detected=true scope 있으면 stderr 로 사용자 안내. additionalContext 에도 동봉."
+          },
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.sh",
+            "statusMessage": "Checking Tier 1 static-analysis tools (semgrep)...",
+            "$comment": "Tier 1 auto-install (semgrep). Idempotent — no-op when semgrep already on PATH. Always exits 0. Tier 2 (PMD/SpotBugs/CodeQL/Bandit/Snyk/OSV) stays user-environment per DEC-2026-05-18-runtime-tool-exclusion."
           }
         ]
       }
