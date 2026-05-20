@@ -35,16 +35,32 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 | `confluence_emit` | boolean | `false` | analysis stage 시 Initiative-level Confluence overview page 생성 (v8.6.1 default false / 사용자 결단 시 활성). per-stage 보고서 page = v8.7.0+ Tier 2.6 carry. |
 | `parent_epic` | string | (없음) | ★ ★ v8.7.2+ — 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`. |
 | `mode` | enum | **`standard`** | ★ ★ v8.7.2+ — `standard` (default / R20 original — per-UC Story + 4 Sub-task per Story) \| `verification` (per-stage Story 5개 + 산출물 별 Sub-task / `parent_epic` 의무 / plugin dogfood meta-cycle 전용 / DEC-2026-05-20-r20-verification-mode 정합). |
+| `issuetype_map` | object | (env default — 아래 resolve 표 참조) | ★ ★ ★ v8.7.3+ — Jira 환경별 issuetype 명명 / id 매핑. role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug`. 미명시 시 environment-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준 `Story` / `Sub-task` / `Initiative` / `Tech Debt Story` / `Task` / `Bug`). DWPD 환경 예 (DEC-2026-05-20-r20-environment-bridge 정합): `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. 명명 모호 시 id 명시 권고 (`{story:{id:"10401"}}`). |
+| `parent_strategy` | enum | **`auto`** | ★ ★ ★ v8.7.3+ — parent 매핑 전략. `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` 가 set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` (모든 role 이 native parent / Atlassian Cloud 표준) \| `epic_link_customfield` (Story/일반 issue 는 Epic Link customfield 사용 / Sub-task 만 parent_key / DWPD 환경 등 권한 분리 환경). DEC-2026-05-20-r20-environment-bridge §parent-bridge 정합. |
+| `epic_link_customfield_id` | string | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | ★ ★ ★ v8.7.3+ — `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. environment-config 또는 args 명시. DWPD 환경 reference: `customfield_10006`. 미명시 + `parent_strategy=epic_link_customfield` 시 reject + `F-TICKETSYNC-005 missing_epic_link_customfield` finding emit. |
 
 ## 절차
 
 ### 단계 1 — Pre-flight
 
-1. `ListMcpResourcesTool` 호출로 `mcp__wiki-jira-assistant__*` 가용성 확인
-   - 부재 시 → `tools/_shared/finding-log.js` 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip (다른 chain harness 진행 무영향)
-2. `.aimd/<scope>/state.json` read — 본 stage 가 gate 통과 상태인지 확인 (gate 미통과 시 reject + Block error)
-3. `traceability-matrix.json` read — 본 stage 의 ticket_ref 기 등록 lookup
-4. 본 stage 산출물 read — `planning-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` (stage 별)
+1. **MCP 가용성 확인** (★ ★ v8.7.3+ tools-probe 교체 / F-VERIFY-005 → B8 해결)
+   - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인 (★ tool-name presence probe / mis-fe-admin iter-6 verification cycle 입증).
+   - 2차 (fallback) — `mcp__wiki-jira-assistant__jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
+   - 3차 (skip 결단) — `ListMcpResourcesTool` 은 **resource-only probe** 라 tools 가용성 추론에 ★ 부적합 (F-VERIFY-005 결정적 evidence — wiki-jira MCP resource 0 노출 시 tools 는 deferred 로 정상 등록). resource probe 결과 단독으로 silent skip 분기 ❌.
+   - 모두 불가 시 → `tools/_shared/finding-log.js` 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip (다른 chain harness 진행 무영향).
+2. **state.json read** (★ ★ v8.7.3+ path 정정 + gate 분기 / F-VERIFY-006 + F-VERIFY-008 → B9 + B11 해결)
+   - 정식 path = `<project>/.aimd/state.json` (★ 단일 file / scope 는 `state.current_scope` 필드). `.aimd/<scope>/state.json` 은 v8.7.2 이전 명세 drift — `chain-driver init` 의 실 산출 위치와 불일치 (★ F-VERIFY-006 결정적 evidence).
+   - 매칭 의무 — `state.current_scope === <scope>` 일치 확인. 불일치 시 `F-TICKETSYNC-006 scope_mismatch` finding + reject.
+   - **gate-pass 확인 분기** (★ v8.7.3+ / F-VERIFY-008):
+     - `mode=standard` 시 — `state.last_gate` 가 본 stage gate 통과 evidence 와 일치해야 함 (미통과 시 reject + Block error).
+     - `mode=verification` 시 — gate-pass check **우회** ★ (gate=null OK / verification meta-cycle 본질상 정식 chain harness gate 부재가 자연 — mis-fe-admin iter-6 입증). `intervention-log` 에 `gate_bypass:verification_mode` 1 entry 기록 의무.
+3. `traceability-matrix.json` read — 본 stage 의 ticket_ref 기 등록 lookup. **부재 시** = first-entry path (verification cycle 의 자연 초기 상태) → 신규 생성 path 로 분기 (reject ❌).
+4. **본 stage 산출물 read** (★ ★ v8.7.3+ stage 분기 명시 / F-VERIFY-007 → B10 해결)
+   - `stage=analysis` 시 — `inventory.json` / `architecture.json` / `domain.json` / `business-rules.json` / `antipatterns.json` / `state-map.json` (FE) / `type-spec.json` (FE) / `form-validation-spec.json` (FE) / `visual-manifest.json` (FE) / `i18n-spec.json` (FE) / `a11y-spec.json` (FE) / `br-cross-consistency.json` / `static-security-spec.json` / `validation-report.json` / `openapi.yaml` (BE) / `schema.json` (DB) — 환경별 산출 최대 14~16건. carry baseline 시 iter-N path 의 reference (`input-manifest.inherited_from.carry_artifacts`) 도 valid.
+   - `stage=planning` 시 — `planning-spec.json`.
+   - `stage=spec` 시 — `behavior-spec.json` / `acceptance-criteria.json`.
+   - `stage=test` 시 — `test-spec.json`.
+   - `stage=implement` 시 — `impl-spec.json`.
 
 ### 단계 2 — Idempotency check (search-first)
 
@@ -107,6 +123,57 @@ stage 별 MCP 호출 batch 의 preview 표시. 예 (stage=planning, scope=car):
 ### 단계 5 — MCP 호출 (sequential / 결정론 보호)
 
 ★ ★ v8.7.2+ — mode 분기: `mode=standard` (default / 아래 phase × stage 본문) 또는 `mode=verification` (§ 단계 5b 본문).
+
+#### ★ ★ ★ v8.7.3+ — 환경 resolve prelude (호출 전 의무 / F-VERIFY-009 + F-VERIFY-010 → B12+B13 해결)
+
+본 §단계 5 / 5b 본문이 사용하는 `Story` / `Sub-task` / `Initiative` / `Tech Debt Story` 등의 명명은 **role label**. 실 MCP 호출 시점에 다음 resolve table 적용 의무 (mis-fe-admin EAM-AUTH iter-6 verification cycle Stage 1 입증 — Story 1 (DWPD-1667) 생성 시 "스토리" 명명 reject → "작업" + customfield_10006 우회 path 로 success).
+
+**resolve 알고리즘 (의무)**:
+
+1. **issuetype resolve**:
+   - args.`issuetype_map[role]` 우선 → 없으면 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) → 없으면 default table 적용 (Atlassian 표준 영문 명명):
+
+   | role | default name | DWPD 환경 reference |
+   |------|--------------|---------------------|
+   | story | Story | 작업 (또는 새 기능) |
+   | subtask | Sub-task | 하위 작업 |
+   | initiative | Initiative | epic |
+   | tech_debt | Tech Debt Story | 개선 |
+   | task | Task | 작업 |
+   | bug | Bug | 버그 |
+
+   - resolve 결과 `string` 시 jira_create `issue_type` 필드 또는 `extra_fields.issuetype.name`
+   - resolve 결과 `{id: "..."}` 시 `extra_fields.issuetype.id` (명명 모호 환경 권고)
+   - resolve 실패 (role 미정의) 시 `F-TICKETSYNC-007 issuetype_unresolved` finding + reject
+
+2. **parent linking resolve** (`parent_strategy` 별):
+   - `parent_strategy=auto` (default):
+     - role=`subtask` → `parent_key` 필드 사용
+     - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback (Atlassian Cloud 표준 path).
+     - role=`initiative` → parent 없음 (top-level)
+   - `parent_strategy=parent_key`: 모든 role 이 `parent_key` 시도 (★ DWPD 환경에서는 일반 issue 가 400 reject — `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding).
+   - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` / 그 외 = `extra_fields[epic_link_customfield_id]`. `epic_link_customfield_id` 미명시 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
+
+3. **호출 sequence 의무**:
+   - jira_create payload 의 `issue_type` + parent linking 필드는 위 resolve 결과 직접 인용 (★ no-simulation / SKILL.md 본문 hardcode 표기 인용 ❌).
+   - jira_create 실패 (400/403) 시 — error message parse 후 `F-TICKETSYNC-008 environment_drift` finding emit + 환경별 resolve table 보강 권고 evidence 누적.
+
+★ 본 prelude 는 §단계 5 (standard mode) + §단계 5b (verification mode) 모두 적용. SKILL.md 본문 "Story / Sub-task / Epic" 표기는 role label / 실 명명은 env resolve.
+
+**DWPD 환경 reference config** (DEC-2026-05-20-r20-environment-bridge / mis-fe-admin iter-6 verification 입증):
+
+```yaml
+# .aimd/ticket-sync-config.yaml (DWPD 환경)
+issuetype_map:
+  story: 작업          # 또는 새 기능
+  subtask: 하위 작업
+  initiative: epic
+  tech_debt: 개선
+  task: 작업
+  bug: 버그
+parent_strategy: epic_link_customfield
+epic_link_customfield_id: customfield_10006
+```
 
 phase × stage 별 MCP call matrix:
 
@@ -353,24 +420,28 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 - **parallel MCP 호출 ❌** — sequential only (결정론 axis 보호)
 - **state.blocked 시 MCP 호출 ❌** — `hooks/hooks.json` PreToolUse matcher 가 `mcp__wiki-jira-assistant__.*` deny (`tools/chain-driver/src/hooks-bridge.js::buildBlockOutput` 재사용)
 - **R16/R17 부활 ❌** — 본 skill = R20 신규 채널 (drift attractor 회피)
-- **★ v8.6.3+ orphan ticket ❌** — Sub-task / Story / Epic 생성 시 `parent_ticket_id` 의무 (Initiative / Tech Debt Story / Spike 만 omit 가능). 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit + ticket_ref.structure_complete=false 표식.
+- **★ v8.6.3+ orphan ticket ❌** (★ v8.7.3+ environment-aware 정정) — role ∈ {`subtask`, `story`, `task`, `tech_debt`, `bug`} 생성 시 parent linking 의무 — `parent_strategy=parent_key` 시 `parent_ticket_id` / `parent_strategy=epic_link_customfield` (또는 auto + epic_link set) 시 `extra_fields[epic_link_customfield_id]` 중 1개 채움. Initiative 만 omit 가능. 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit + ticket_ref.structure_complete=false 표식.
 - **★ v8.6.3+ link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (Tech Debt / Spike / 도메인 횡단 BR) 만 허용.
 - **★ ★ v8.7.2+ mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error (Initiative 자동 생성 시도 ❌). 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.
 - **★ ★ v8.7.2+ mode=standard + parent_epic 명시 시 hybrid 경고** — standard mode 인데 parent_epic 명시 시 → Initiative 생성 skip + per-BC Epic 의 link 대상이 parent_epic 으로 변경 (architecture-driven Epic 자동 생성은 유지). 명시적 hybrid path / `F-TICKETSYNC-004 hybrid_parent_epic` info finding emit (deny ❌).
+- **★ ★ ★ v8.7.3+ environment hardcode ❌** — SKILL.md 본문의 `Story` / `Sub-task` / `Initiative` 표기는 **role label** (★ resolve table 의 key). 실 MCP payload 의 `issue_type` 값은 §단계 5 prelude 의 resolve 결과 직접 인용 의무. SKILL.md 본문 영문 명명을 그대로 payload 에 hardcode ❌ (★ F-VERIFY-009 결정적 evidence — DWPD 환경 "스토리" 미사용 + 실 명명 "작업"). 위반 시 `F-TICKETSYNC-009 issuetype_hardcode_drift` finding emit + 호출 reject.
+- **★ ★ ★ v8.7.3+ parent_strategy 우회 ❌** — `parent_strategy ∈ {epic_link_customfield, auto + epic_link_customfield_id set}` 환경에서 일반 issue (`story` / `task` / `tech_debt` / `bug`) 의 `parent` 필드 직접 채움 ❌. 반드시 `extra_fields[epic_link_customfield_id]` 사용 (★ F-VERIFY-010 결정적 evidence — DWPD "이슈 유형 10401 은 하위 작업이 아니지만 상위가 지정" 400 reject). 위반 시 `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding emit.
 
-## 사용자 결단 6건 (실 사용 시점 / DEC-2026-05-18-r20 + ★ v8.7.2 amendment DEC-2026-05-20-r20-verification-mode)
+## 사용자 결단 7건 (실 사용 시점 / DEC-2026-05-18-r20 + ★ v8.7.2 DEC-2026-05-20-r20-verification-mode + ★ ★ ★ v8.7.3 DEC-2026-05-20-r20-environment-bridge)
 
 1. **Jira workflow transition target IDs** — project-specific / `jira_transitions` 사전 lookup 의무 (Initiative/Epic/Story/Sub-task workflow 가 사용자 Jira 환경 의존)
 2. **Confluence emit 범위** — Initiative overview default v8.6.1 / per-stage 보고서 page = v8.7.0+ Tier 2.6 후보
 3. **Auto-invoke 정책** — chain stage gate 통과 후 본 skill auto-suggest (confirmation 만 사용자) ★ 권고. ★ v8.7.2+ — `chain-driver next` 명령이 stage 전이 직후 stderr only suggest 송출 (Stop hook 직접 등록 ❌ — noise 회피 / 의도된 stage 전이 시점에만 발화). 실 MCP 호출은 항상 사용자 명시 호출.
 4. **Idempotency** — search-first ★ 권고 (재실행 시 기존 ticket lookup skip + status_history 만 갱신)
-5. **MCP 미연결 환경** — silent skip + finding emit ★ 권고
+5. **MCP 미연결 환경** — silent skip + finding emit ★ 권고. ★ v8.7.3+ — probe 는 tools-deferred-list 우선 / `ListMcpResourcesTool` 단독 의존 ❌ (resource-only / tools 가용성 false negative — F-VERIFY-005).
 6. **★ v8.7.2+ mode 선택** — `standard` (default / 실 도메인 feature cycle / Initiative+Epic 자동 생성) / `verification` (plugin dogfood meta-cycle / parent_epic 의무 / per-stage Story 5 + 산출물 별 Sub-task). 환경상 Initiative 생성 권한 부재 / 기존 Epic 재사용 / migration carry meta-cycle 시 `mode=verification` + `parent_epic=<key>` 명시.
+7. **★ ★ ★ v8.7.3+ environment bridge** — 신규 Jira 환경 첫 도입 시 (1) `jira_search project=<K> AND issuetype != Epic` 으로 사용 issuetype 분포 sample → (2) `.aimd/ticket-sync-config.yaml` 안 `issuetype_map` 채우기 → (3) `parent_strategy` 결정 (DWPD 같이 일반 issue 의 parent 직접 매핑 reject 환경 = `epic_link_customfield` / Atlassian Cloud 표준 환경 = `parent_key` 또는 `auto`) → (4) `epic_link_customfield_id` 환경별 확인 (DWPD = `customfield_10006`). 본 4 단계가 1회 setup / 이후 재사용. DEC-2026-05-20-r20-environment-bridge 정합.
 
 ## Cross-link
 
 - 결단 record: `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
 - ★ v8.7.2 amendment: `decisions/DEC-2026-05-20-r20-verification-mode.md` (parent_epic override + mode=verification + Stop hook auto-suggest)
+- ★ ★ ★ v8.7.3 amendment: `decisions/DEC-2026-05-20-r20-environment-bridge.md` (issuetype_map + parent_strategy + epic_link_customfield_id + Pre-flight 정정 B8/B9/B10/B11)
 - 정책 본문: `methodology-spec/ticket-policy.md` §Tier 2.5
 - ID 명명: `methodology-spec/id-conventions.md` §Ticket Binding
 - Evidence schema: `schemas/ticket-sync-evidence.schema.json`

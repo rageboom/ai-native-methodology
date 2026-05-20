@@ -9,6 +9,53 @@
 
 ---
 
+## [8.7.3] — 2026-05-20 ★ ★ ★ PATCH — ticket-sync environment bridge (issuetype_map + parent_strategy + Pre-flight 정정) (R20 v3 amendment / breaking 0)
+
+> ★ **v8.7.3 PATCH — R20 v3 amendment**. mis-fe-admin EAM-AUTH iter-6 verification cycle **Stage 1 실 진입** 결과 driver. v8.7.2 의 parent_epic + mode=verification 으로 Story 1 (DWPD-1667) + Sub-task 14 (DWPD-1668~1681) 실 생성 / Q4·Q5 PASS 달성한 진행 도중 발견한 6 finding (F-VERIFY-005 ~ F-VERIFY-010) 의 본질 = environment portability 결손. SKILL.md 의 Atlassian Cloud 표준 hardcode (issuetype "Story" / parent_key 단일 path / `.aimd/<scope>/state.json` / ListMcpResourcesTool probe / gate-pass 의무) 를 6축 environment-config 화. DEC-2026-05-20-r20-environment-bridge 신설.
+
+### 본질 발견 (mis-fe-admin EAM-AUTH iter-6 Stage 1 실 진입 / 31 MCP 호출 evidence)
+
+- **F-VERIFY-005** (★ B8) — SKILL.md §단계 1.1 `ListMcpResourcesTool` 호출이 resource-only probe. wiki-jira MCP server 가 resource 0 + tools 50+ deferred 등록 환경 (실 mis-fe-admin) 에서 false negative → silent skip + 잘못된 F-TICKETSYNC-001 emit 위험.
+- **F-VERIFY-006** (★ B9) — SKILL.md §단계 1.2 `.aimd/<scope>/state.json` path 와 `chain-driver init` 의 실 산출 위치 `.aimd/state.json` (scope=current_scope 필드) drift. spec 강행 시 file-not-found → reject.
+- **F-VERIFY-007** (★ B10) — SKILL.md §단계 1.4 산출물 list (planning/behavior/AC/test/impl-spec) 와 §단계 5b verification analysis 가 enumerate 하는 14 산출물 (inventory/architecture/domain/business-rules/antipatterns/state-map/...) 불일치. analysis 산출물 누락.
+- **F-VERIFY-008** (★ B11) — SKILL.md §단계 1.2 "gate 미통과 시 reject" vs `mode=verification` meta-cycle 의 gate 부재 자연성 충돌. 본 verification cycle 의 state.json `last_gate=null` 정상 상태.
+- **F-VERIFY-009** (★ ★ HIGH / B12) — SKILL.md §단계 5b issuetype="Story" hardcode. DWPD project (1565 issue 표본) "스토리" 0건 사용. 실 사용 = 작업/버그/하위 작업/개선/새 기능/epic. 우회 path: issue_type="작업" → DWPD-1667 생성 성공.
+- **F-VERIFY-010** (★ ★ HIGH / B13) — SKILL.md §v8.6.3+ "parent_ticket_id 의무" vs DWPD 환경 일반 issue 의 `parent` 직접 매핑 ❌ → `customfield_10006` Epic Link 의무. 우회 path: `extra_fields={customfield_10006:DWPD-1442}` → DWPD-1667 생성 성공.
+
+→ 6 finding 모두 본질 = plugin universal claim 보존하려면 SKILL.md 의 Atlassian Cloud 표준 hardcode 를 **role label + env-config substitute** 로 추상화 정합.
+
+### 시행 (1 commit / branch `v8.7.3-r20-environment-bridge`)
+
+1. **B12 `issuetype_map` 파라미터 추가** (`skills/ticket-sync/SKILL.md` §파라미터 7번) — role → name/id resolve table. role enum = `story` / `subtask` / `initiative` / `tech_debt` / `task` / `bug`. env-config (`.aimd/ticket-sync-config.yaml`) 또는 args 명시. default = Atlassian 표준 영문 명명.
+2. **B13 `parent_strategy` + `epic_link_customfield_id` 파라미터 추가** (동상 §파라미터 8/9번) — `auto` (default) / `parent_key` / `epic_link_customfield`. role=subtask 는 항상 parent_key / 그 외 role 은 `parent_strategy` 결정. DWPD 환경 reference `customfield_10006`.
+3. **§단계 5 prelude 신설** (env resolve algorithm) — role → name/id resolve + parent linking resolve + 호출 sequence 의무. standard mode + verification mode 본문 모두 적용. SKILL.md 본문 영문 명명을 role label 로 추상화 + 실 payload 는 resolve 결과 직접 인용.
+4. **B8 §단계 1.1 정정** — MCP probe = tools-deferred-list 우선 + jira_search fallback / `ListMcpResourcesTool` 단독 의존 ❌.
+5. **B9 §단계 1.2 정정** — state.json path = `.aimd/state.json` + `state.current_scope === <scope>` 매칭.
+6. **B11 §단계 1.2 gate-pass 분기** — `mode=verification` 시 gate-pass check 우회 (gate=null OK).
+7. **B10 §단계 1.4 stage 분기** — `stage=analysis` 시 14~16 산출물 명시.
+8. **§금지 v8.7.3+ 절 2건 추가** — environment hardcode ❌ (F-TICKETSYNC-009) + parent_strategy 우회 ❌ (F-TICKETSYNC-010).
+9. **§금지 v8.6.3+ orphan ticket 절 정정** — environment-aware (parent_strategy 별 분기).
+10. **§사용자 결단 7번 신설** — environment bridge setup 4단계 (issuetype 분포 sample → config → parent_strategy → customfield_id).
+11. **§Cross-link** — `decisions/DEC-2026-05-20-r20-environment-bridge.md` 등록.
+12. **decisions/DEC-2026-05-20-r20-environment-bridge.md** 신설.
+13. 3 SSOT version sync — `.claude-plugin/plugin.json` + `package.json` + `CLAUDE.md` 모두 `8.7.2` → `8.7.3`.
+
+### v8.7.3 release 결과
+
+- additive only / breaking 0 (standard + verification mode 본문 무변경 / 신규 args 3개 모두 default 가 v8.7.2 동치 행동)
+- standard mode 호출자 (Atlassian Cloud 표준) 영향 0
+- env-config 명시 사용자만 새 path (DWPD / 사내 Atlassian DC 등)
+- mis-fe-admin EAM-AUTH iter-6 Stage 2 진입 가능 상태
+
+### v8.7.3 가 풀지 않는 본질 (carry)
+
+- **F-VERIFY-004 (Stop hook 부재)** — v8.7.2 의 B6 chain-driver next stderr 로 부분 완화. Stop hook 직접 등록은 noise 회피 carry.
+- **B7 onboarding doc** — v8.7.4+ carry.
+- **Confluence per-stage 보고서** — Tier 2.6 carry.
+- **Trello/Linear/GitHub Issues adapter** — Tier 3 자체 adapter / v9.0+ carry.
+
+---
+
 ## [8.7.2] — 2026-05-20 ★ ★ PATCH — ticket-sync verification mode + parent_epic override + chain-driver next stderr auto-suggest (R20 amendment / breaking 0)
 
 > ★ **v8.7.2 PATCH — R20 amendment**. mis-fe-admin EAM-AUTH iter-6 verification cycle Stage 0 dry-run findings 4건 + 보강 candidate 6건 driver. ticket-sync 의 3축 본질 확장: (B3) `parent_epic` override + (B4) `mode=verification` 분기 + (B6) `chain-driver next` 안 ticket-sync auto-suggest stderr. Initiative 생성 권한 부재 환경 / plugin dogfood meta-cycle / 기존 Epic 재사용 시 사용. R20 confirmation gate / 7-field evidence / fire-and-forget ❌ 본질 보존.
