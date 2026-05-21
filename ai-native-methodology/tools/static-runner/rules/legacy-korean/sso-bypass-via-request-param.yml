@@ -1,0 +1,30 @@
+rules:
+  - id: legacy-korean.sso-bypass-via-request-param
+    message: |
+      LOCAL / DEV 환경에서 SSO toggle 우회 — request.getParameter("SM_USER") 또는 동등한 hardcoded user 식별.
+      cycle-7 SEC-CAR-002 — production code 안 LOCAL 환경 분기 (`if (LOCAL) { userId = request.getParameter("SM_USER") }`)
+      → production deploy 시 client-controlled user identity 입력 = 권한 우회.
+      권고: production code 안 SSO bypass 분기 0건 / LOCAL 전용 분기 = production build profile 에서 제거.
+    severity: ERROR
+    languages: [java]
+    pattern-either:
+      - pattern: request.getParameter("SM_USER")
+      - pattern: request.getParameter("USER_ID")
+      - pattern: request.getParameter("userId")
+      - patterns:
+          - pattern: $REQ.getParameter("$U")
+          - metavariable-regex:
+              metavariable: $U
+              regex: '(?i)(sm_user|user_?id|sso_user|logon_?id)'
+    metadata:
+      cwe: 'CWE-302'
+      owasp: ['A01:2021', 'A07:2021']
+      category: security
+      technology: [java, spring]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        adr: DEC-2026-05-21-v8.8.0-cycle7-evolution
+        antipattern: SEC-CAR-002
+        cycle_origin: cycle-7
+        introduced_in: v8.8.0
+        notes: 'client-controlled identity 가 production code 에 노출 = 권한 우회 marker.'

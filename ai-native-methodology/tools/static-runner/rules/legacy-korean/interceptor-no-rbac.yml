@@ -1,0 +1,48 @@
+rules:
+  - id: legacy-korean.interceptor-no-rbac
+    message: |
+      Spring HandlerInterceptorAdapter 의 preHandle() 안 권한 검증 SQL/lookup 부재.
+      cycle-7 SEC-CAR-001 — CarMgtInterceptor.preHandle() 가 selectCarMemberInfoById 만 호출 (FIM.dbo.TB_USER) /
+      local ifrs.dbo.TB_USER JOIN 누락 / CAPITAL_AUTH/CAR_AUTH 검사 0 / FIM 사번이면 32 endpoint 무방어 진입.
+      권고: preHandle 안 명시 권한 검증 (TB_USER local JOIN + AUTH flag 검사 / Spring Security @PreAuthorize 전환).
+    severity: ERROR
+    languages: [java]
+    pattern-either:
+      # case 1: preHandle return true 인데 권한 검증 호출 0건 (semgrep negative pattern)
+      - patterns:
+          - pattern: |
+              public boolean preHandle(...) {
+                ...
+                return true;
+              }
+          - pattern-not: |
+              public boolean preHandle(...) {
+                ...
+                if (...AUTH...) { ... }
+                ...
+              }
+          - pattern-not: |
+              public boolean preHandle(...) {
+                ...
+                $X.select$Y(...);
+                ...
+              }
+          - pattern-inside: |
+              class $C extends HandlerInterceptorAdapter {
+                ...
+              }
+    metadata:
+      cwe: 'CWE-862'
+      owasp: ['A01:2021']
+      category: security
+      technology: [java, spring]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        adr: DEC-2026-05-21-v8.8.0-cycle7-evolution
+        antipattern: SEC-CAR-001
+        cycle_origin: cycle-7
+        introduced_in: v8.8.0
+        cross_link:
+          - F-CYCLE6-002
+          - AP-CYCLE7-SECURITY-001
+        notes: '본 rule = best-effort negative pattern. preHandle 안 권한 검증 누락 = 32 endpoint 무방어 risk.'

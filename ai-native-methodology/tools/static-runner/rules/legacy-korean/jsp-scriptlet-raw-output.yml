@@ -1,0 +1,28 @@
+rules:
+  - id: legacy-korean.jsp-scriptlet-raw-output
+    message: |
+      JSP scriptlet `<%= ... %>` 안 raw output — HTML escape 부재 → XSS 표면.
+      cycle-7 AP-CYCLE7-FE-RENDER-001 — carInclude.jsp:6 의 `<%=request.getHeader("SM_USER")%>` 미escape.
+      `request.getHeader` 또는 `request.getParameter` 가 직접 scriptlet 으로 출력되면 XSS 표면.
+      권고: <c:out value="${...}" escapeXml="true"/> 또는 JSTL fn:escapeXml() 사용.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - '*.jsp'
+    pattern-either:
+      - pattern-regex: '<%=\s*request\.getHeader\([^%]+%>'
+      - pattern-regex: '<%=\s*request\.getParameter\([^%]+%>'
+      - pattern-regex: '<%=\s*session\.getAttribute\([^%]+%>'
+    metadata:
+      cwe: 'CWE-79'
+      owasp: ['A03:2021', 'A05:2021']
+      category: security
+      technology: [jsp, java]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        adr: DEC-2026-05-21-v8.8.0-cycle7-evolution
+        antipattern: AP-CYCLE7-FE-RENDER-001
+        cycle_origin: cycle-7
+        introduced_in: v8.8.0
+        notes: 'JSP scriptlet 안 request.getHeader/getParameter/session.getAttribute 가 직접 출력 = XSS.'

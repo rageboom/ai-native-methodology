@@ -1,0 +1,24 @@
+rules:
+  - id: legacy-korean.eclipse-todo-catch
+    message: |
+      Eclipse IDE 자동 생성 "// TODO Auto-generated catch block" + e.printStackTrace() SATD (Self-Admitted Technical Debt).
+      cycle-7 AP-CYCLE7-CODE-001 — CarMgtServiceImpl.java:209 의 catch (ParseException e) 안 silent swallow
+      → 운행일지 ParseException 무시 시 일련번호 갱신 실패 = 운행일지 누락 risk.
+      권고: 명시 exception handling (사용자 mapped error + logger.error + audit trail) 또는 propagate.
+    severity: WARNING
+    languages: [generic]
+    paths:
+      include:
+        - '*.java'
+    pattern-regex: '//\s*TODO\s+Auto-generated\s+catch\s+block'
+    metadata:
+      cwe: 'CWE-390'
+      category: maintainability
+      technology: [java, eclipse]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        adr: DEC-2026-05-21-v8.8.0-cycle7-evolution
+        antipattern: AP-CYCLE7-CODE-001
+        cycle_origin: cycle-7
+        introduced_in: v8.8.0
+        notes: 'Eclipse IDE 가 catch block 자동 생성 시 stub. production code 에 남으면 SATD.'

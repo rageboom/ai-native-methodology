@@ -1,0 +1,37 @@
+rules:
+  - id: legacy-korean.pii-realname-with-test-comment
+    message: |
+      ★ Production 코드 내 hardcoded 한글 실명 PII + 인접 "// 테스트용" 또는 "// 라이브용" annotation 검출.
+      cycle-7 F-CYCLE7-001 — CarCostServiceImpl.java:92 의 "장인*"→"장인아", "양동*"→"양동기" 등 5인 hardcoded
+      production code 활성 / "// 테스트용" toggle ON / "// 라이브용" 비활성.
+      → production data leak risk. git history scrub 의무.
+      권고: server-side masking 정책 single source / production code 안 실명 0건 의무.
+    severity: ERROR
+    languages: [java]
+    pattern-either:
+      # case 1: replace chain with Korean asterisk pattern + adjacent "테스트용" comment
+      - patterns:
+          - pattern-either:
+              - pattern: $X.replace("$NAME", "$REPLACED")
+              - pattern: $X.replace($NAME, $REPLACED)
+          - metavariable-regex:
+              metavariable: $NAME
+              regex: '[가-힣]+\*'
+      # case 2: explicit annotation "// 테스트용" or "// 라이브용" comments in service code
+      - patterns:
+          - pattern-regex: '//\s*테스트용'
+      - patterns:
+          - pattern-regex: '//\s*라이브용'
+    metadata:
+      cwe: 'CWE-359'
+      owasp: ['A02:2021', 'A04:2021']
+      category: security
+      technology: [java, spring]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        adr: DEC-2026-05-21-v8.8.0-cycle7-evolution
+        antipattern: F-CYCLE7-001
+        cycle_origin: cycle-7
+        introduced_in: v8.8.0
+        cross_poc_isomorphic_count: 1
+        notes: '본 rule = single PoC (cycle-7) / §8.1 ≥2 PoC corroboration carry'
