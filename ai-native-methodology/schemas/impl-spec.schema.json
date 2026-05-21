@@ -162,6 +162,53 @@
         "retry_cap": {"type": "integer", "minimum": 1, "default": 3},
         "revisit_count": {"type": "integer", "minimum": 0, "default": 0}
       }
+    },
+    "real_integration_axis": {
+      "type": "object",
+      "description": "★ v8.8.0 Tier 1.2 — chain 4 GREEN 의 진정성 측정 axis (informational / v8.9+ mandatory carry). chain 4 가 unit-only mock fixture 통과인지 실 외부 의존성 통합 통과인지 구분. 본 field 부재 시 unknown 처리 / breaking 0.",
+      "additionalProperties": false,
+      "properties": {
+        "prisma_client_injected": {
+          "type": "boolean",
+          "description": "Prisma client (또는 동등 ORM client) 가 실 주입됐는지 (cycle-7 dogfood: car.service.ts:63 `prisma: unknown` = false / cycle-3 car.service.ts: constructor(prisma: PrismaService) = true)"
+        },
+        "e2e_supertest_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "supertest e2e test 개수 (NestApp bootstrap 통합 / cycle-3 F-CYCLE3-004 carry 정합 metric)"
+        },
+        "real_db_fixture_loaded": {
+          "type": "boolean",
+          "description": "실 DB (SQLite / MSSQL / PostgreSQL) migrate + seed 통과 여부"
+        },
+        "real_integration_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "0~1 normalized integration completeness (3 boolean + supertest count weighted)"
+        },
+        "evidence_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "real_integration evidence file paths (jsonl / log)"
+        }
+      }
+    },
+    "mock_detect": {
+      "type": "object",
+      "description": "★ v8.8.0 Tier 1.1 — mock_implementation_ratio detect 결과 (experimental opt-in). test-impl-pass-validator --detect-mock-impl 의 산출.",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {"type": "string", "enum": ["off", "experimental", "enforce"]},
+        "mock_implementation_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "file_mock_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "score_threshold": {"type": "number"},
+        "file_threshold": {"type": "number"},
+        "files_with_indicators": {"type": "integer", "minimum": 0},
+        "files_scanned": {"type": "integer", "minimum": 0},
+        "mock_locations_total": {"type": "integer", "minimum": 0},
+        "exceeded": {"type": "boolean"}
+      }
     }
   }
 }

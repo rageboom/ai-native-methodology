@@ -28,6 +28,7 @@ import { parseVitestJson } from './runners/vitest.js';
 import { parseJunitXml } from './runners/junit-xml.js';
 import { parsePytestJson } from './runners/pytest.js';
 import { parseStdout as parseOtherStdout } from './runners/other.js';
+import { detectMockImplementation } from './mock-detect.js';
 
 function usage(code = 2) {
   console.error([
@@ -36,17 +37,29 @@ function usage(code = 2) {
     '  --inventory <path>       inventory.json (stack_signals 자동 추론용)',
     '  --test-cmd <json>        inline test-cmd JSON override',
     '  --out <path>             test_invocation_evidence 산출 path (default: <project>/.aimd/output/evidence/test-invocation-evidence.json)',
-    '  --allow-execute          ★ ★ ★ ADR-CHAIN-004 §4 — 진짜 실행 동의 (없으면 dry-run only)',
+    '  --allow-execute          ADR-CHAIN-004 §4 — 진짜 실행 동의 (없으면 dry-run only)',
     '  --dry-run                config 검증만 / 실행 ❌ / exit 0 강제',
     '  --json                   JSON output',
     '  --timeout <ms>           runner timeout (default 600000)',
     '  --flaky-retry <n>        per-test retry cap (default 2 / max 5)',
+    '',
+    'v8.8.0 Tier 1.1 — mock_implementation_ratio (experimental opt-in / §8.1 ≥2 PoC carry):',
+    '  --detect-mock-impl <mode>   off (default) | experimental (measure + warn) | enforce (degrade ok)',
+    '  --impl-dir <dir>            impl 코드 root (default: <project>/src) — mock detect target',
+    '  --mock-threshold <ratio>    mock_implementation_ratio threshold (default 0.40)',
   ].join('\n'));
   process.exit(code);
 }
 
 function parseArgs(argv) {
-  const out = { allowExecute: false, dryRun: false, json: false };
+  const out = {
+    allowExecute: false,
+    dryRun: false,
+    json: false,
+    detectMockImpl: 'off',
+    implDir: null,
+    mockThreshold: 0.40,
+  };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--project') out.project = argv[++i];
@@ -58,7 +71,15 @@ function parseArgs(argv) {
     else if (a === '--json') out.json = true;
     else if (a === '--timeout') out.timeoutOverride = Number(argv[++i]);
     else if (a === '--flaky-retry') out.flakyRetryOverride = Number(argv[++i]);
+    else if (a === '--detect-mock-impl') out.detectMockImpl = argv[++i];
+    else if (a === '--impl-dir') out.implDir = argv[++i];
+    else if (a === '--mock-threshold') out.mockThreshold = parseFloat(argv[++i]);
     else if (a === '--help' || a === '-h') usage(0);
+  }
+  // detect mode 유효성
+  if (!['off', 'experimental', 'enforce'].includes(out.detectMockImpl)) {
+    console.error(`[test-impl-pass-validator] invalid --detect-mock-impl=${out.detectMockImpl} (must be off|experimental|enforce)`);
+    process.exit(2);
   }
   return out;
 }
@@ -298,8 +319,40 @@ function main() {
   const evidencePath = writeEvidenceFiles(evidence, runResult, args.outPath, projectDir);
 
   const ok100 = parsed.fail_count === 0 && parsed.pass_count > 0;
+
+  // ★ v8.8.0 Tier 1.1 — mock_implementation_ratio detect (experimental opt-in)
+  let mockReport = null;
+  let okState = ok100 ? 'ok' : 'fail';
+  if (args.detectMockImpl !== 'off') {
+    const implDir = args.implDir
+      ? (isAbsolute(args.implDir) ? args.implDir : resolve(projectDir, args.implDir))
+      : resolve(projectDir, 'src');
+    if (existsSync(implDir)) {
+      mockReport = detectMockImplementation(implDir, {
+        mode: args.detectMockImpl,
+        threshold: args.mockThreshold,
+      });
+      if (mockReport.exceeded) {
+        if (args.detectMockImpl === 'experimental') {
+          okState = ok100 ? 'degraded_mock' : 'fail';
+        } else if (args.detectMockImpl === 'enforce') {
+          okState = 'fail_mock';
+        }
+      }
+    } else {
+      mockReport = {
+        mode: args.detectMockImpl,
+        skip_reason: `impl_dir_missing: ${implDir}`,
+        mock_implementation_ratio: null,
+        mock_locations: [],
+        files_scanned: 0,
+      };
+    }
+  }
+
   const out = {
-    ok: ok100,
+    ok: okState === 'ok' || okState === 'degraded_mock',
+    ok_state: okState,
     mode: 'execute',
     source,
     framework: resolved.framework,
@@ -309,6 +362,7 @@ function main() {
     flaky_retries_count: runResult.flaky_retries_count ?? 0,
     result_hash: evidence.result_hash,
     evidence_path: evidencePath,
+    mock_detect: mockReport,
   };
 
   if (args.json) {
@@ -317,9 +371,25 @@ function main() {
     console.log(`[test-impl-pass-validator] framework=${resolved.framework} / pass=${parsed.pass_count} / fail=${parsed.fail_count} / skip=${parsed.skip_count} / flaky_retries=${runResult.flaky_retries_count ?? 0}`);
     console.log(`  result_hash: ${evidence.result_hash}`);
     console.log(`  evidence_path: ${evidencePath}`);
-    console.log(ok100 ? '✅ 100% pass (gate #4 통과)' : `❌ fail / fail_count=${parsed.fail_count}`);
+    if (mockReport && mockReport.mock_implementation_ratio !== null) {
+      const scorePct = (mockReport.mock_implementation_ratio * 100).toFixed(2);
+      const filePct = (mockReport.file_mock_ratio * 100).toFixed(1);
+      const scoreThr = (mockReport.score_threshold * 100).toFixed(0);
+      const fileThr = (mockReport.file_threshold * 100).toFixed(0);
+      console.log(`  mock_detect: score=${scorePct}% (≥${scoreThr}%?) / file=${filePct}% (${mockReport.files_with_indicators}/${mockReport.files_scanned} ≥${fileThr}%?) / locations=${mockReport.mock_locations_total} / mode=${mockReport.mode}`);
+      if (mockReport.exceeded) {
+        console.log(`  ⚠️  mock threshold 초과 — chain 4 GREEN false signal 의심 (v8.8.0 Tier 1.1 / experimental)`);
+      }
+    }
+    if (okState === 'ok') console.log('✅ 100% pass (gate #4 통과)');
+    else if (okState === 'degraded_mock') console.log('⚠️  100% pass but mock_ratio 초과 — degraded_mock (experimental warning / chain blocking ❌)');
+    else if (okState === 'fail_mock') console.log('❌ mock_ratio 초과 / enforce mode');
+    else console.log(`❌ fail / fail_count=${parsed.fail_count}`);
   }
-  process.exit(ok100 ? 0 : 1);
+  // experimental mode = degraded_mock 는 exit 0 (warning only / chain blocking ❌)
+  // enforce mode = fail_mock 은 exit 1
+  const failExit = okState === 'fail' || okState === 'fail_mock';
+  process.exit(failExit ? 1 : 0);
 }
 
 main();
