@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/cycle-carry.schema.json",
+  "title": "Cycle Carry Record (v8.8.0 / Tier 4.1)",
+  "description": "cycle 산출물의 carry 추적 schema. 본 schema 는 v8.8.0 Tier 4.1 (DEC-2026-05-21-v8.8.0-cycle7-evolution) — cycle 간 carry 항목의 'original_intent' (원 의도) vs 'resolution_kind' (실 resolution 방식) 정직 표기 강제. cycle-3 의 A2~A6 carry (= 'v8.7 PATCH 적용 후 정합 redo' 의도) 가 cycle-7 의 '신규 분석' 으로 resolution 되는 drift 추적 필요성에서 도출. cycle 의 state.json 안 'carries' 필드 또는 CLOSURE.md 안 carry table 의 자료를 본 schema 형식으로 표준화.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["carries"],
+  "properties": {
+    "$schema_origin": {
+      "type": "string",
+      "description": "참조 schema 상대 경로 (관행)"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^v\\d+(\\.\\d+){0,2}$",
+      "description": "본 carry record 의 schema version (v8.8.0+) — semver 형식 (v<MAJOR> | v<MAJOR>.<MINOR> | v<MAJOR>.<MINOR>.<PATCH>)"
+    },
+    "cycle": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "본 carry record 의 소속 cycle 번호 (예: 7)"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "본 cycle 의 domain scope (예: 'car', 'rbac', 'user')"
+    },
+    "carries": {
+      "type": "array",
+      "minItems": 0,
+      "description": "carry record 의 list. 각 항목 = 1 개의 carry (cycle 간 미해결 / pending 작업 / 결단 영역)",
+      "items": { "$ref": "#/$defs/CarryRecord" }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "generated_at": { "type": "string", "format": "date-time" },
+        "generator": {
+          "type": "string",
+          "description": "본 carry record 의 generator (예: 'analysis-agent', 'main-agent', 'manual')"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "CarryRecord": {
+      "type": "object",
+      "required": ["id", "title", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(A\\d+|CARRY-[A-Z0-9]{2,}-\\d{3}|[A-Z]+-CYCLE\\d+-\\d+)$",
+          "description": "carry ID. format: 'A1' (cycle-3 style) | 'CARRY-CAR-001' (v8.8.0+ style) | 'F-CYCLE7-001' (finding cross-link)"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "carry 의 1-line title"
+        },
+        "original_intent": {
+          "type": "string",
+          "description": "★ Tier 4.1 — 본 carry 가 원래 의도한 작업 (예: 'v8.7 PATCH 적용 후 산출물 redo' / 'NestApp bootstrap supertest 통합'). 본 field 가 비어 있으면 resolution drift 검출 어려움."
+        },
+        "resolution_kind": {
+          "type": "string",
+          "enum": ["intended", "alternative", "drift", "pending"],
+          "description": "★ Tier 4.1 — 본 carry 의 실제 resolution 방식. 'intended' = 원 의도 그대로 완료. 'alternative' = 다른 방식으로 동등한 결과 도달 (예: redo 대신 신규 분석). 'drift' = 원 의도와 다른 방향으로 흘러간 resolution. 'pending' = 아직 미해결."
+        },
+        "resolution_note": {
+          "type": "string",
+          "description": "resolution_kind 의 사유 / 정직 설명 (예: 'cycle-3 의 redo carry 였으나 cycle-7 에서 신규 분석으로 cross-validation 완성 = alternative')"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "completed", "deferred", "rejected"],
+          "description": "carry 의 현재 status"
+        },
+        "resolved_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "resolution 완료 시점 (status=completed 시 의무)"
+        },
+        "resolved_in_cycle": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "본 carry 가 resolution 된 cycle 번호 (status=completed 시 의무)"
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "description": "carry 의 severity"
+        },
+        "cross_link": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "cross-link IDs (예: ['F-CYCLE3-005', 'F-CYCLE7-004', 'DEC-2026-05-21-v8.8.0-cycle7-evolution'])"
+        },
+        "evidence_paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "carry 의 evidence file paths (status=completed 시 권장)"
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
+          "then": {
+            "required": ["resolution_kind", "resolved_at", "resolved_in_cycle"],
+            "description": "★ Tier 4.1 — status=completed 시 resolution_kind 의무 (drift 검출 가능)"
+          }
+        }
+      ]
+    }
+  }
+}
