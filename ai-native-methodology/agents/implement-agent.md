@@ -54,7 +54,11 @@ chain 0~3 skill ❌ — 각 stage agent 권한.
    - 실 코드 (placeholder ❌)
    - test 코드와 1:1 정합
 
-4. **implement-verify-test-pass skill 호출** — GREEN 검증:
+4. **implement-verify-test-pass skill 호출** — GREEN 검증 (v8.8.2+ 자동 mock detect 의무):
+   - test-impl-pass-validator `--allow-execute --detect-mock-impl=experimental --impl-dir <impl_root>` 자동 호출
+   - mock_detect 결과 (mode + ratio + threshold + files_scanned + exceeded) → impl-spec.json `mock_detect` field 자동 채움
+   - exceeded=true 시 warning emit (chain blocking ❌ / experimental 정합)
+   - chain blocking 강제 격상 (`--detect-mock-impl=enforce`) = v8.9+ ≥2 PoC corroboration carry
 5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
 6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - 진짜 runner 실행 (`--allow-execute`)

@@ -105,3 +105,53 @@ test('★ v8.8.0 — empty dir → 0 findings', () => {
   const r = JSON.parse(res.stdout);
   assert.equal(r.files_scanned, 0);
 });
+
+// v8.8.2 — 3 신규 rule (claim_absoluteness / emoji_density / korean_overemphasis)
+
+test('★ v8.8.2 — absoluteness claim (100% / 절대 / 완벽 / never / always) ≥ N → claim_absoluteness warning', () => {
+  ensureTmp();
+  writeFileSync(join(TMP, 'absolute.md'), `# Absolute claim test
+
+100% pass / 절대 fail 없음 / 완벽 정합 / never wrong / always correct / perfect output / guaranteed.
+`);
+  const res = runCli([join(TMP, 'absolute.md')]);
+  const r = JSON.parse(res.stdout);
+  assert.ok(r.findings.some(f => f.kind === 'claim_absoluteness'),
+    `claim_absoluteness warning emit 의무: ${JSON.stringify(r.findings)}`);
+});
+
+test('★ v8.8.2 — emoji density (❌ ⚠️ ✅ ❗ ⭐) ≥ 15 → emoji_density warning', () => {
+  ensureTmp();
+  writeFileSync(join(TMP, 'emoji.md'), `# Emoji test
+
+✅ done ✅ pass ✅ ok ❌ fail ❌ block ⚠️ warn ⚠️ risk ❗ critical ❗ urgent ⭐ feature
+✅ ✅ ✅ ❌ ❌ ⚠️ ⚠️ ❗ ⭐ ⭐
+`);
+  const res = runCli([join(TMP, 'emoji.md'), '--emoji-threshold', '10']);
+  const r = JSON.parse(res.stdout);
+  assert.ok(r.findings.some(f => f.kind === 'emoji_density'),
+    `emoji_density warning emit 의무: ${JSON.stringify(r.findings)}`);
+});
+
+test('★ v8.8.2 — korean overemphasis (본질/진정/정직/결단/핵심) ≥ 8 → korean_overemphasis warning', () => {
+  ensureTmp();
+  writeFileSync(join(TMP, 'overemphasis.md'), `# 한국어 overemphasis
+
+본질 가치 / 진정 사실 / 정직 표기 / 결단 의무 / 핵심 결과 / 본질 의도 / 진정 결단 / 정직 cleanup
+`);
+  const res = runCli([join(TMP, 'overemphasis.md'), '--overemphasis-threshold', '6']);
+  const r = JSON.parse(res.stdout);
+  assert.ok(r.findings.some(f => f.kind === 'korean_overemphasis'),
+    `korean_overemphasis warning emit 의무: ${JSON.stringify(r.findings)}`);
+});
+
+test('★ v8.8.2 — clean .md (no inflation) → 6 rule 모두 0 findings', () => {
+  ensureTmp();
+  writeFileSync(join(TMP, 'pristine.md'), `# Pristine
+
+본 문서는 정합한 정보만 기록한다. 측정 결과 = 35 SQL / 7 UC. cycle-7 분석 완료.
+`);
+  const res = runCli([join(TMP, 'pristine.md')]);
+  const r = JSON.parse(res.stdout);
+  assert.equal(r.total_findings, 0, `clean .md → 0 findings 의무 (실 ${r.total_findings}): ${JSON.stringify(r.findings)}`);
+});

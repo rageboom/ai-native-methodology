@@ -9,6 +9,44 @@
 
 ---
 
+## [8.8.2] — 2026-05-21 PATCH — mock detect chain-4 자동 호출 + inflation-lint rule pack 확장 (3 rule)
+
+> v8.8.2 PATCH — v8.8.0 carry 2건 진행. 환경 의존 도구 (Stryker / textlint / PIT) carry 는 영구 scope-out (user memory `environment-dependent-tools-scope-out`).
+
+### 변경 1 — mock detect chain-4 자동 호출 의무 강제 (Tier 1.1 / v8.8.0 → v8.8.2)
+
+- v8.8.0 = `--detect-mock-impl=experimental` 의심 시 호출 (옵션)
+- v8.8.2 = chain 4 종결 시 (test-impl-pass-validator 호출 마다) 자동 호출 의무
+- `agents/implement-agent.md` 호출 절차 §4 갱신 — verify-test-pass 호출 시 `--detect-mock-impl=experimental --impl-dir <impl_root>` 자동 추가
+- impl-spec.json `mock_detect` field 자동 채움 (mode + ratio + threshold + files_scanned + exceeded)
+- exceeded=true 시 warning emit (chain blocking ❌ / experimental 정합 유지)
+- mandatory 격상 (enforce mode default) = ≥ 2 PoC corroboration carry (v8.9+)
+
+### 변경 2 — inflation-lint rule pack 확장 (3 신규 rule / Tier 3.1)
+
+`tools/inflation-lint/src/cli.js` 확장:
+- **claim_absoluteness** — 100% / 절대 / 반드시 / 완벽 / perfect / never / always / guaranteed 등 absoluteness claim ≥ 5 (default)
+- **emoji_density** — ❌ ⚠️ ✅ ❗ ⭐ 🎉 🔥 ✨ 💯 status emoji 합 ≥ 15 (default)
+- **korean_overemphasis** — 본질 / 진정 / 정직 / 결단 / 핵심 / 명확 / 강조 / 입증 어휘 ≥ 8 (default)
+
+threshold override:
+- `--absolute-threshold` / `--emoji-threshold` / `--overemphasis-threshold`
+
+severity = warning only / chain blocking ❌ / scope = markdown text 만 / report semantics ❌
+
+### 회귀
+
+- inflation-lint 11/11 pass (7 baseline + 4 신규 v8.8.2 rule test)
+- breaking 0 (신규 rule = 신규 finding kind / 기존 cli 호환)
+- 환경 의존 도구 의존성 0 (pure-JS regex)
+
+### v8.9+ carry (영구 carry)
+
+- mock detect mandatory 격상 = ≥ 2 PoC corroboration (cycle-8+)
+- 환경 의존 도구 (Stryker / textlint / PIT / osv-scanner) = 영구 scope-out (memory `environment-dependent-tools-scope-out`)
+
+---
+
 ## [8.8.1] — 2026-05-21 PATCH — skill-citation pre-existing fail 해소 (tools/_shared/finding-log.js stale ref)
 
 > v8.8.1 PATCH — v8.7+ 부터 carry 의 pre-existing fail 해소. `tools/_shared/finding-log.js` 가 ticket-policy.md + ticket-sync/SKILL.md 에서 인용되지만 실 파일 부재 (재구조화 drift). 본 PATCH 가 stale ref 정정.
