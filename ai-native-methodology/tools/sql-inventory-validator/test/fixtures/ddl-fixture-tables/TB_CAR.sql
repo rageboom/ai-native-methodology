@@ -1,0 +1,5 @@
+CREATE TABLE [dbo].[TB_CAR] (
+    [idx] INT IDENTITY(1,1) NOT NULL,
+    [CAR_NO] VARCHAR(20) NOT NULL,
+    [USE_YN] CHAR(1) NOT NULL
+);

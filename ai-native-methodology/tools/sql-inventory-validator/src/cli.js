@@ -12,6 +12,7 @@ function parseArgs(argv) {
     legacyMismatchHighThreshold: 0.30,
     legacyMismatchCriticalThreshold: 0.70,
     evidenceDir: null,
+    ddlDir: null,
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
@@ -23,6 +24,7 @@ function parseArgs(argv) {
     else if (a === '--legacy-mismatch-high-threshold') out.legacyMismatchHighThreshold = parseFloat(argv[++i]);
     else if (a === '--legacy-mismatch-critical-threshold') out.legacyMismatchCriticalThreshold = parseFloat(argv[++i]);
     else if (a === '--evidence-dir') out.evidenceDir = argv[++i];
+    else if (a === '--ddl-dir') out.ddlDir = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
@@ -30,6 +32,7 @@ function parseArgs(argv) {
        [--coverage-baseline <path>] [--write-coverage-baseline]
        [--legacy-xml-dir <dir>] [--legacy-mismatch-high-threshold 0.30] [--legacy-mismatch-critical-threshold 0.70]
        [--evidence-dir <dir>]
+       [--ddl-dir <dir>]
        [--dry-run] [--json]
 
 Validates phase sql-inventory output:
@@ -67,6 +70,12 @@ v2.3.1 PATCH baseline ratchet (C-v2.2.0-2 / characterization-coverage-validator 
                            unique 'tool' field 의 count 와 sql-inventory.json 의 auto_ratio_external_6 N claim cross-check
                            N_evidence < N_claim 시 critical finding (R15 silent simulation 의심).
 
+★ v8.8 PATCH — DDL cross-check (Phantom 검출 / DDL Gap 자동화 / Tier 2.2):
+  --ddl-dir <dir>          실 DDL .sql file (CREATE TABLE / CREATE VIEW / CREATE PROCEDURE) 디렉토리
+                           inventory[].dependent_tables 의 각 테이블명 → DDL dir 안 CREATE 구문 실존 cross-check
+                           Phantom 검출: DDL 부재 + cross-DB 표기 없음 (.dbo. / .external schema) → high finding
+                           cross-DB 정합 자동 분류: 'schema.dbo.table' 또는 cross_db_external carry_flag → phantom 검출 제외
+
 Threshold default 0.50 (auto-ratio) / 0.30 (mismatch high) / 0.70 (mismatch critical).
 `);
       process.exit(0);
@@ -88,6 +97,7 @@ const result = validateSqlInventory(args.target, args.thresholdAutoRatio, {
   legacyMismatchHighThreshold: args.legacyMismatchHighThreshold,
   legacyMismatchCriticalThreshold: args.legacyMismatchCriticalThreshold,
   evidenceDir: args.evidenceDir,
+  ddlDir: args.ddlDir,
 });
 
 if (args.json) {
@@ -114,6 +124,17 @@ if (args.json) {
       console.log(`evidence_cross_check: tool_count=${ec.evidence_tool_count} vs claim=${ec.claimed_count}/6 (invocations=${ec.total_invocations} / ${ec.files_scanned} *.jsonl / tools=[${ec.unique_tools.join(', ')}])`);
     } else {
       console.log(`evidence_cross_check: status=${ec.status}`);
+    }
+  }
+  if (result.summary.ddl_cross_check) {
+    const dc = result.summary.ddl_cross_check;
+    if (dc.status === 'ok') {
+      console.log(`ddl_cross_check: tables_referenced=${dc.tables_referenced} / ddl_present=${dc.ddl_present} / cross_db=${dc.cross_db_excluded} / phantom=${dc.phantom_tables.length} / ${dc.ddl_files_scanned} .sql files`);
+      if (dc.phantom_tables.length > 0) {
+        console.log(`  phantom: ${dc.phantom_tables.slice(0, 5).join(', ')}${dc.phantom_tables.length > 5 ? ' ...' : ''}`);
+      }
+    } else {
+      console.log(`ddl_cross_check: status=${dc.status}`);
     }
   }
   for (const f of result.findings) {

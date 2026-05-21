@@ -237,3 +237,51 @@ test('★ v8.7.1 — zero_xmllint_count message 갱신 (procedure tag 언급)', 
   assert.ok(validatorSrc.includes('select/insert/update/delete/procedure'),
     '★ v8.7.1 — zero_xmllint_count message 가 procedure 키워드 포함 의무');
 });
+
+// ============================================================================
+// v8.8.0 Tier 2.2 — DDL cross-check (Phantom 검출 / DDL Gap 자동화)
+// ============================================================================
+
+test('★ v8.8.0 — DDL match path / Phantom 0 + info_positive emit', () => {
+  const r = validateSqlInventory(join(FIX, 'ddl-match'), 0.50, {
+    ddlDir: join(FIX, 'ddl-fixture-tables')
+  });
+  assert.equal(r.summary.ddl_cross_check.status, 'ok',
+    `ddl_cross_check ok 의무: ${JSON.stringify(r.summary.ddl_cross_check)}`);
+  assert.equal(r.summary.ddl_cross_check.phantom_tables.length, 0,
+    `Phantom 0 의무 (TB_CAR + TB_CAR_USER_TERM DDL 실존 / FIM.dbo.TB_USER cross-DB 제외): phantom=${JSON.stringify(r.summary.ddl_cross_check.phantom_tables)}`);
+  assert.equal(r.summary.ddl_cross_check.cross_db_excluded, 1,
+    `cross_db_excluded = 1 (FIM.dbo.TB_USER): ${r.summary.ddl_cross_check.cross_db_excluded}`);
+  assert.ok(r.findings.some(f => f.kind === 'ddl_cross_check.phantom_zero'),
+    `phantom_zero info finding emit 의무 (Phantom 0 + 인용 > 0): ${JSON.stringify(r.findings)}`);
+});
+
+test('★ v8.8.0 — DDL mismatch path / Phantom 검출 + high finding', () => {
+  const r = validateSqlInventory(join(FIX, 'ddl-mismatch'), 0.50, {
+    ddlDir: join(FIX, 'ddl-fixture-tables')
+  });
+  assert.equal(r.summary.ddl_cross_check.status, 'ok');
+  assert.equal(r.summary.ddl_cross_check.phantom_tables.length, 2,
+    `Phantom 2 의무 (TB_PHANTOM_X + TB_PHANTOM_Y / TB_CAR 는 DDL 실존): ${JSON.stringify(r.summary.ddl_cross_check.phantom_tables)}`);
+  assert.deepEqual(r.summary.ddl_cross_check.phantom_tables.sort(), ['TB_PHANTOM_X', 'TB_PHANTOM_Y'],
+    `Phantom list mismatch`);
+  const phantomFinding = r.findings.find(f => f.kind === 'ddl_cross_check.phantom_tables');
+  assert.ok(phantomFinding, `phantom_tables finding emit 의무`);
+  assert.ok(phantomFinding.severity === 'high' || phantomFinding.severity === 'medium',
+    `phantom severity = high or medium: ${phantomFinding.severity}`);
+});
+
+test('★ v8.8.0 — DDL dir 미가용 시 dir_missing finding (graceful)', () => {
+  const r = validateSqlInventory(join(FIX, 'ddl-match'), 0.50, {
+    ddlDir: '/nonexistent/path/to/ddl'
+  });
+  assert.equal(r.summary.ddl_cross_check.status, 'dir_missing');
+  assert.ok(r.findings.some(f => f.kind === 'ddl_cross_check.dir_missing'),
+    `dir_missing finding emit 의무`);
+});
+
+test('★ v8.8.0 — --ddl-dir 미명시 시 ddl_cross_check skip (회귀 0)', () => {
+  const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50);
+  assert.equal(r.summary.ddl_cross_check, null,
+    `ddl-dir 미명시 시 null 의무 (회귀 0): ${JSON.stringify(r.summary.ddl_cross_check)}`);
+});

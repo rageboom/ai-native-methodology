@@ -1,0 +1,25 @@
+{
+  "$comment": "v8.8.0 — DDL cross-check fixture (mismatch path). dependent_tables 안 TB_PHANTOM_X / TB_PHANTOM_Y 가 DDL 부재 + cross-DB 표기 없음 = Phantom 검출 의무.",
+  "meta_confidence": {
+    "generated_at": "2026-05-21T00:00:00Z",
+    "methodology_version": "v8.8.0",
+    "confidence": 0.85,
+    "inputs_used": ["source_code"]
+  },
+  "extraction_automation": {
+    "auto_extracted_columns": ["sql_id", "mapper_xml", "dependent_tables", "dynamic_branch"],
+    "manual_columns": ["business_meaning", "called_from_screen"],
+    "auto_ratio_external_6": "4/6 = 66.7%"
+  },
+  "inventory": [
+    {
+      "sql_id": "selectCarInfo",
+      "mapper_xml": "carMgt.xml",
+      "business_meaning": "phantom 검출 test",
+      "dependent_tables": ["TB_CAR", "TB_PHANTOM_X", "TB_PHANTOM_Y"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.85,
+      "statement_type": "PREPARED"
+    }
+  ]
+}

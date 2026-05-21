@@ -62,6 +62,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     legacyMismatchHighThreshold = 0.30,
     legacyMismatchCriticalThreshold = 0.70,
     evidenceDir = null,
+    ddlDir = null,
   } = options;
   const findings = [];
   const summary = {
@@ -78,6 +79,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     ratchet_trend: null,
     legacy_cross_check: null,
     evidence_cross_check: null,
+    ddl_cross_check: null,
   };
 
   // 1. sql-inventory.json read
@@ -391,7 +393,136 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     }
   }
 
+  // ★ Layer 4 (v8.8+) — DDL cross-check (Phantom 검출 / DDL Gap 자동화 / Tier 2.2)
+  // inventory[].dependent_tables → DDL .sql 안 CREATE TABLE/VIEW/PROCEDURE 실존 cross-check
+  if (ddlDir) {
+    const ddlCheck = crossCheckDDL(ddlDir, inventory);
+    summary.ddl_cross_check = ddlCheck;
+
+    if (ddlCheck.status === 'dir_missing') {
+      findings.push({
+        kind: 'ddl_cross_check.dir_missing',
+        severity: 'high',
+        message: `--ddl-dir '${ddlDir}' not found or not a directory`
+      });
+    } else if (ddlCheck.status === 'no_sql_files') {
+      findings.push({
+        kind: 'ddl_cross_check.no_sql_files',
+        severity: 'medium',
+        message: `--ddl-dir '${ddlDir}' has no .sql files (recursive scan / CREATE TABLE/VIEW/PROCEDURE 기대)`
+      });
+    } else if (ddlCheck.status === 'ok') {
+      if (ddlCheck.phantom_tables.length > 0) {
+        const severity = ddlCheck.phantom_tables.length >= 3 ? 'high' : 'medium';
+        findings.push({
+          kind: 'ddl_cross_check.phantom_tables',
+          severity,
+          message: `★ DDL Gap 검출 — ${ddlCheck.phantom_tables.length} 테이블 inventory 인용 / DDL 부재 / cross-DB 표기 없음 (Phantom 후보): ${ddlCheck.phantom_tables.slice(0, 10).join(', ')}${ddlCheck.phantom_tables.length > 10 ? ' ...' : ''}. 실 DDL grep 또는 cross-DB carry_flag 명시 권고.`
+        });
+      } else if (ddlCheck.tables_referenced > 0) {
+        // info_positive — Phantom 0 confirmed (cycle-7 paradigm)
+        findings.push({
+          kind: 'ddl_cross_check.phantom_zero',
+          severity: 'info',
+          message: `DDL 정합 confirmed — ${ddlCheck.tables_referenced} 테이블 인용 / ddl_present=${ddlCheck.ddl_present} / cross_db_excluded=${ddlCheck.cross_db_excluded} / Phantom 0 (★ DDL Gap 검출 부재).`
+        });
+      }
+    }
+  }
+
   return finalize(findings, summary);
+}
+
+// ★ Layer 4 helper — DDL cross-check (Phantom 검출 / Tier 2.2 / cycle-7 paradigm)
+// inventory[].dependent_tables → DDL dir 안 CREATE TABLE/VIEW/PROCEDURE 실존 cross-check.
+// cross-DB (예: 'FIM.dbo.TB_USER', schema-qualified) 또는 carry_flags 안 cross-DB 표기 = phantom 검출 제외.
+function crossCheckDDL(ddlDir, inventory) {
+  // 1. ddl dir 존재 확인
+  if (!existsSync(ddlDir)) return { status: 'dir_missing' };
+  let st;
+  try { st = statSync(ddlDir); } catch { return { status: 'dir_missing' }; }
+  if (!st.isDirectory()) return { status: 'dir_missing' };
+
+  // 2. *.sql file 재귀 수집
+  const sqlFiles = collectSqlFiles(ddlDir);
+  if (sqlFiles.length === 0) return { status: 'no_sql_files', files_scanned: 0 };
+
+  // 3. DDL 안 CREATE TABLE / VIEW / PROCEDURE 이름 추출 (정규식 / 대소문자 무관)
+  const ddlTableSet = new Set();
+  const re = /CREATE\s+(?:TABLE|VIEW|PROCEDURE|FUNCTION)\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:\[?dbo\]?\.)?(?:\[?([A-Za-z_][A-Za-z0-9_]*)\]?)/gi;
+  for (const f of sqlFiles) {
+    let content;
+    try { content = readFileSync(f, 'utf-8'); } catch { continue; }
+    let m;
+    while ((m = re.exec(content)) !== null) {
+      if (m[1]) ddlTableSet.add(m[1].toUpperCase());
+    }
+  }
+
+  // 4. inventory[].dependent_tables 의 각 테이블 cross-check
+  const referencedSet = new Set();
+  const crossDbSet = new Set();  // cross-DB 검출 제외
+  const phantomSet = new Set();
+  const presentSet = new Set();
+
+  for (const rec of inventory) {
+    if (!Array.isArray(rec.dependent_tables)) continue;
+    const isCrossDbFlagged = Array.isArray(rec.carry_flags)
+      && (rec.carry_flags.includes('external_call_out_of_scope')
+          || rec.carry_flags.includes('cross_db_external'));
+
+    for (const raw of rec.dependent_tables) {
+      if (typeof raw !== 'string' || !raw.trim()) continue;
+      const t = raw.trim();
+      referencedSet.add(t);
+
+      // cross-DB 검출: 'DB.dbo.TABLE' 또는 'SCHEMA.TABLE' (.가 2개 이상 또는 schema 명시)
+      const dotCount = (t.match(/\./g) || []).length;
+      if (dotCount >= 2 || isCrossDbFlagged) {
+        crossDbSet.add(t);
+        continue;  // Phantom 검출 제외
+      }
+
+      // dbo. prefix 제거 + uppercase 후 DDL 안 검색
+      const norm = t.replace(/^\[?dbo\]?\./i, '').replace(/[\[\]]/g, '').toUpperCase();
+      if (ddlTableSet.has(norm)) {
+        presentSet.add(t);
+      } else {
+        phantomSet.add(t);
+      }
+    }
+  }
+
+  return {
+    status: 'ok',
+    ddl_dir: ddlDir,
+    ddl_files_scanned: sqlFiles.length,
+    ddl_tables_total: ddlTableSet.size,
+    tables_referenced: referencedSet.size,
+    ddl_present: presentSet.size,
+    cross_db_excluded: crossDbSet.size,
+    phantom_tables: [...phantomSet].sort(),
+    cross_db_tables: [...crossDbSet].sort(),
+  };
+}
+
+function collectSqlFiles(dir) {
+  const out = [];
+  const stack = [dir];
+  while (stack.length) {
+    const cur = stack.pop();
+    let entries;
+    try { entries = readdirSync(cur); } catch { continue; }
+    for (const name of entries) {
+      if (name === 'node_modules' || name.startsWith('.')) continue;
+      const full = join(cur, name);
+      let s;
+      try { s = statSync(full); } catch { continue; }
+      if (s.isDirectory()) stack.push(full);
+      else if (name.endsWith('.sql')) out.push(full);
+    }
+  }
+  return out;
 }
 
 // ★ Layer 3 helper — claimedAutoCount parse from "N/6 = X.X%" format
