@@ -33,6 +33,8 @@ chain 0~2 / chain 4 skill ❌ — 각 stage agent 권한.
 2. **No simulation** — 진짜 runner (vitest / jest / junit5 / pytest / RTL / Vue Test Utils / Playwright) 실행 의무. AI persona simulation ❌
 3. **RED 의무** — chain 3 종결 시 모든 test fail (impl 부재). test_pass_evidence.fail_count > 0 + pass_count = 0 의무
 4. **5종 물증 7 필드 보존** — test-impl-pass-validator schema 정합 / `--allow-execute` flag
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — 산출물 markdown 에 별표 남발 ❌ / 과장 형용사 신중.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` + `actual_count_from_artifact` 두 field 의무.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -51,6 +53,8 @@ chain 0~2 / chain 4 skill ❌ — 각 stage agent 권한.
    - test 파일은 실제 코드 (placeholder ❌)
 
 4. **test-run-test-evidence skill 호출** — 진짜 runner 실행:
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - `--allow-execute` flag 의무 (ADR-CHAIN-004 정합)
    - 5종 물증 7 필드 산출 + result_hash sha256 정규화
    - RED 검증 (fail_count > 0 / impl 부재)

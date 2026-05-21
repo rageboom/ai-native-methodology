@@ -31,6 +31,8 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 2. **No simulation** — R19 Tier 1 (Semgrep / axe-core / 등 in-plugin 실행) + Tier 2 (PMD / SpotBugs / CodeQL / Daikon 사용자 환경 SARIF import) 의무. AI persona 시뮬레이션 ❌ / 신뢰도 -5%p 패널티
 3. **§8.1 단일 PoC 과적합 회피** — ≥ 2 PoC corroboration 후 본체 격상
 4. **Round-trip out of scope** — analysis = one-way 추출만 / round-trip ❌
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조. `inflation-lint` warning 0 의무 (chain blocking 없지만 정직 자산 보존).
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 

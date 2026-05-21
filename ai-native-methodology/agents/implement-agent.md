@@ -33,6 +33,10 @@ chain 0~3 skill ❌ — 각 stage agent 권한.
 2. **No simulation** — 진짜 runner 실행 의무 + static-runner R19 Tier 1 (in-plugin Semgrep / ESLint) + Tier 2 (사용자 환경 SARIF import — PMD / SpotBugs / CodeQL / Daikon / Bandit / Snyk 환경 의존)
 3. **GREEN 의무 / i-strict** — chain 4 종결 시 모든 test 100% pass (fail_count: 0 / pass_count > 0). 미충족 시 chain harness gate #4 차단
 4. **traceability-matrix 100% green 의무** — forward + backward coverage = 1.0 / 모든 cell status=green
+5. **v8.8.0 Tier 1.1 — mock_implementation_ratio (experimental)** — chain 4 GREEN false signal 의심 시 `test-impl-pass-validator --detect-mock-impl=experimental` 호출. cycle-7 paradigm (prisma: unknown / scenarioState / fixture builder) 검출 시 warning emit. mock 코드 = chain harness dogfood 한정 / 실 비즈니스 검증 ❌ 명시.
+6. **v8.8.0 Tier 1.2 — real_integration_axis (optional / informational)** — impl-spec.json 안 `real_integration_axis: { prisma_client_injected, e2e_supertest_count, real_db_fixture_loaded }` 정직 emit.
+7. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — 산출물 markdown 에 별표 남발 ❌ / 과장 형용사 신중.
+8. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` + `actual_count_from_artifact` 두 field 의무.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -51,6 +55,8 @@ chain 0~3 skill ❌ — 각 stage agent 권한.
    - test 코드와 1:1 정합
 
 4. **implement-verify-test-pass skill 호출** — GREEN 검증:
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - 진짜 runner 실행 (`--allow-execute`)
    - 5종 물증 7 필드 + fail_count: 0 의무
    - 100% pass 미충족 시 → impl 수정 후 재실행 (revisit-loop)

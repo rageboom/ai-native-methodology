@@ -9,6 +9,64 @@
 
 ---
 
+## [8.8.0] — 2026-05-21 MINOR — cycle-7 dogfood 9 개선 cluster (chain 4 GREEN false signal 검출 + legacy rule pack + DDL Phantom 자동화 + inflation lint + carry resolution_kind + preflight fallback)
+
+> v8.8.0 MINOR — cycle-7 (car / 2026-05-21) dogfood 가 표면화한 9 개선 batch. cycle-7 의 본질 발견 = chain 4 "GREEN" 이 in-memory fixture mock 통과 (car.service.ts:63 `prisma: unknown` + scenarioState module-level counter + hardcoded return fixture) / vitest pass=44 / line cov 92.59% 만족 / 진정 비즈니스 검증 0 / plugin `test-impl-pass-validator` ok=true 리턴 = false signal. 본 MINOR 가 가장 큰 ROI.
+
+> branch: `v8.8.0-cycle7-evolution` (6 commit / breaking 0 / DEC: `DEC-2026-05-21-v8.8.0-cycle7-evolution.md`).
+
+### 본질 발견 (cycle-7 dogfood)
+
+- chain 4 GREEN false signal — in-memory fixture mock 통과 / 진정 비즈니스 검증 0
+- legacy 발견 5건 grep+rg 수동 — plugin rule pack 부재 → 매 cycle 재발견 위험
+- sub-agent 산출물 inflation 만연 — `★ ★ ★ ★ ★` 다발 / user memory `no-star-inflation` 영구 위반
+- DDL cross-check 수동 — IFRS_split TB_CAR_* 6 매번 수동 검증
+- carry 추적 정밀도 부재 — cycle-3 의 'redo' 의도 vs cycle-7 의 '신규 분석' resolution 차이 표기 부재
+- preflight fallback 부재 — semgrep SSL 차단 / lizard / osv-scanner 미설치 매번 수동
+
+### 신규 자산 (6 commit / Tier 별)
+
+| commit | Tier | 변경 |
+|---|---|---|
+| C1 | 5.1 | `scripts/preflight-check.js` 확장 — fallback hint per-tool + analysis-opt 도구 4 (osv-scanner / lizard / ast-grep / xmllint) |
+| C2 | 4.1 | `schemas/cycle-carry.schema.json` 신설 — `original_intent` + `resolution_kind` (intended/alternative/drift/pending) + allOf if/then status=completed 의무 |
+| C3 | 2.1 | `tools/static-runner/rules/legacy-korean/` 신설 — 5 Semgrep rule (pii-realname / eclipse-todo-catch / jsp-scriptlet-raw / interceptor-no-rbac / sso-bypass) |
+| C4 | 2.2 | `tools/sql-inventory-validator --ddl-dir` 신규 옵션 — Phantom 자동 검출 + cross-DB 자동 분류 |
+| C5 | 1.1+1.2 | `tools/test-impl-pass-validator/src/mock-detect.js` (experimental opt-in / 6 heuristic / dual metric) + `schemas/impl-spec.schema.json` real_integration_axis optional field |
+| C6 | 3.1+3.2 | `tools/inflation-lint/` 신설 + 5 sub-agent SKILL.md (analysis/planning/spec/test/implement) 정직 톤 + 보고 schema 의무 추가 |
+
+### dogfood
+
+- mock-detect on cycle-7 impl-output: score=5.23% / file=29.41% / 5 mock indicator file (prisma_unknown 4건 + scenarioState + fixture_builder)
+- DDL cross-check on cycle-7 + IFRS_split 180 .sql: Phantom 3 검출 (TB_CAR_INFO / TB_CAR_USERTERM 오타 자동 발견)
+- legacy-korean rule pack: 4/5 rule dogfood (eclipse-todo-catch 1 + pii-realname 7 + jsp-scriptlet 1 + sso-bypass 2)
+- inflation-lint on cycle-7 CLOSURE.md: 21 warning (132 ★ + 18 long runs + inflation_phrases)
+
+### 회귀 test
+
+- sql-inventory-validator: 31/31 pass (27 baseline + 4 DDL test)
+- schema-validator: 35/35 pass (29 baseline + 6 cycle-carry test)
+- test-impl-pass-validator: 30/30 pass (25 baseline + 5 mock-detect test)
+- inflation-lint: 7/7 pass (신규)
+- breaking 0 (모든 신규 schema field optional / 모든 신규 옵션 flag opt-in)
+
+### v8.9+ carry
+
+- Tier 1.1 mock detect mandatory 격상 (cycle-8+ ≥2 PoC corroboration 후)
+- Tier 1.2 real_integration_axis mandatory 격상
+- Stryker mutation testing 통합 (Tier 6)
+- Java 환경 mock detect (PIT/Pitest 통합)
+- textlint plugin 통합 (사내 SSL 차단 영구 회피 후)
+
+### LL (Lessons Learned)
+
+- LL-V8.8-01 — sub-agent dogfood 의 가장 큰 가치 = scaffold pass 가 아니라 scaffold pass 의 본질 결함 (cycle-7 chain 4 mock fixture) 검출. plugin 진화의 가장 큰 ROI.
+- LL-V8.8-02 — §8.1 의 ≥2 PoC corroboration 의무 시 single PoC 발견은 experimental opt-in flag 으로 reduction. mandatory 격상 = ≥2 PoC carry.
+- LL-V8.8-03 — sub-agent 산출물 inflation 톤 (★ 다발) 은 user memory 위반 + 진정 가치 신호 약화. plugin lint rule 자산화.
+- LL-V8.8-04 — vendored upstream subtree (`tools/semgrep-rules/`) 폴루션 ❌. 자체 rule = sibling dir (`tools/static-runner/rules/`) 활용.
+
+---
+
 ## [8.7.4] — 2026-05-21 ★ ★ ★ PATCH — ticket-sync Sub-task Epic auto-inherit invariant + Structure 자동 등록 표준화 (R20 v4 amendment / breaking 0)
 
 > ★ **v8.7.4 PATCH — R20 v4 amendment**. mis-fe-admin EAM-AUTH **verify-1 iter-6 cycle 종결** 결과 driver. 5 stage 일주 PASS / 106 ticket / Atlassian Structure 등록 15 row 진행 중 2 carry 식별:

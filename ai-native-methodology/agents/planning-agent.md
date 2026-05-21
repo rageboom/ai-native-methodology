@@ -32,6 +32,8 @@ chain 0 (analysis) / chain 2~4 skill ❌ — 각 stage agent 권한.
 2. **No simulation** — 모든 BR-INTENT + UC 는 `source_grounded_evidence` (grep_hit_count > 0) 의무
 3. **§8.1 단일 PoC 과적합 회피** — UC 4종 분기 (legacy/신규/수정/버그) carry K-1
 4. **AI 환각 차단 1차 목적** — planning-extraction-validator 자동 차단 (`grep_hit_count: 0` 또는 `source_grounded_evidence` 부재)
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — 산출물 markdown 에 별표 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적" 등) 신중. 진정 중요 fact 만 강조.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` + `actual_count_from_artifact` 두 field 의무. discrepancy 발생 시 명시 carry.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -51,6 +53,8 @@ chain 0 (analysis) / chain 2~4 skill ❌ — 각 stage agent 권한.
    - intervention-log 본체 등재
 
 4. **종결 보고**:
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - planning-spec.{json,md} path
    - traceability-matrix backward link 상태
    - chain 2 (spec) 진입 권고 → `spec-agent` dispatch

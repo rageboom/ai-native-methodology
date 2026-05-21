@@ -8,6 +8,9 @@ package-lock.json
 # tool 5종 자체 출력 (★ tools/<name>/out/ 등)
 tools/**/out/
 
+# v8.8.0 — test 의 임시 fixture 디렉토리 (mock-detect / inflation-lint 등)
+tools/**/test/_tmp_*/
+
 # ★ ★ ★ chain harness driver runtime state (PoC 별 영속 / sub-plan-5+)
 examples/**/.aimd/state.json
 examples/**/.aimd/state.json.tmp

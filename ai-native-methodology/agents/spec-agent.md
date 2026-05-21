@@ -32,6 +32,8 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
 2. **No simulation** — behavior-spec 의 invariant + property test 는 진짜 도구 (Tier 1 in-plugin: `fast-check` / `hypothesis` / Tier 2 사용자 환경 SARIF import: Daikon) 검증 의무
 3. **UC → BHV → AC forward link 의무** — chain-coverage-validator 자동 차단
 4. **verifiable=true → test_case_refs ≥ 1 의무** (chain 2 → 3 forward link / chain-coverage-validator 정합)
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — 산출물 markdown 에 별표 남발 ❌ / 과장 형용사 신중.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` + `actual_count_from_artifact` 두 field 의무.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -48,6 +50,8 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
    - test_case_refs (chain 3 → TC forward link 의무)
 
 4. **spec-integrate-deliverables skill 호출** — cross_links 채움:
+5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
+6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - 7대 BE + 8 FE 산출물 모두 ref 등재
    - chain-coverage-validator 자동 검증 통과 의무
 
