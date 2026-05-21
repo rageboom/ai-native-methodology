@@ -72,7 +72,53 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
    2. 누락 use case 추가?
    3. 의문 BR-INTENT?
    4. cross_links 추가?
-   5. chain 2 (spec) 진입?
+   5. ★ v8.7.5+ pending_decisions[] (사용자 결단 필요) — Auto Mode 미활성 시 본 cluster 에서 user-explicit 결단 받음.
+   6. chain 2 (spec) 진입?
+
+## ★ ★ ★ v8.7.5+ 결단 처리 (G-005 보강 / Auto Mode 정합)
+
+### 배경
+
+chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT / use case 가 발생 가능 (예: BR 의 default 값 / state 의 source / pagination 정책 / system-level 첫 옵션 자동 선택 여부 등). Auto Mode 호환 + 후속 chain 2~4 stage 의 traceability 보장을 위해 결단 처리를 정식화. ★ mis-fe-admin DWPD-1774 5 stage 실증 테스트 §결단 보류 3건 (D-1/D-2/D-3) 입증 — 명세 부재로 plugin 본문이 아닌 사용자 ad-hoc record 로 처리됨 (F-VERIFY-G005 결정적 evidence).
+
+### planning-spec.json 신설 필드
+
+| 필드 | 타입 | 의미 |
+|---|---|---|
+| `decisions[]` | array | 결정된 결단 entry |
+| `decisions[].id` | string | `DEC-PLAN-NNN` (planning-spec 안 local id) |
+| `decisions[].topic` | string | 결단 주제 (예: "system default value for first option") |
+| `decisions[].source` | enum | `user-explicit` \| `AI-default` \| `AI-investigation-complete` \| `carry` |
+| `decisions[].rationale` | string | 결단 사유 (★ AI-default 시 1차 default 선택 근거 명시 의무) |
+| `decisions[].affected_ids` | array | 영향받는 `UC-*` / `BR-INTENT-*` ID 목록 |
+| `decisions[].revisit_required` | boolean | 후속 stage gate 에서 사용자 confirm 의무 여부 (★ `AI-default` 시 true 의무) |
+| `pending_decisions[]` | array | ★ 미결단 항목 (carry 대상 / Auto Mode 미활성 시 gate #1 에서 user-explicit 으로 전환 의무) |
+| `meta.auto_mode_default_count` | integer | Auto Mode 에서 AI-default 적용된 결단 수 (★ 후속 gate 사용자 confirm 부담 sizing) |
+
+### source enum semantic
+
+- **`user-explicit`** — 사용자가 명시적으로 답한 결단. `revisit_required: false` default. ★ 사용자가 명시 의사를 표시한 path 만 본 enum 사용.
+- **`AI-default`** — Auto Mode 에서 AI 가 1차 default 적용 (예: "첫 옵션 자동 선택" / "BE escalate placeholder UI carry"). ★ `revisit_required: true` 의무 + 후속 chain 2/3/4 stage gate 에서 사용자 confirm 의무.
+- **`AI-investigation-complete`** — AI 가 legacy code grep / 도메인 분석 / source-grounded evidence 로 결단 추출 (단순 default 가 아닌 본문 근거). `revisit_required: true` 권고 (사용자 검토).
+- **`carry`** — 이전 cycle / iter 의 결단 인계. `rationale` 에 evidence path (예: `.aimd/output/iter-3/planning-spec.json#decisions[2]`) 인용 의무.
+
+### Auto Mode 흐름
+
+Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 자연어 "Auto Mode 로 진행") — `pending_decisions[]` 가 발생하면:
+1. AI 가 1차 default 결단 (`source: AI-default` / `rationale` 에 1차 default 근거 명시)
+2. `revisit_required: true` set
+3. `planning-spec.json` 의 `meta.auto_mode_default_count` ++
+4. 후속 chain 2 (spec) 진입 시 gate #2 에서 `decisions[].source = AI-default + revisit_required = true` 만 cluster 로 추출 → 사용자 일괄 confirm (cluster 결단 권고)
+
+### Auto Mode 미활성 (default)
+
+`pending_decisions[]` 가 있으면 chain 1 gate #1 의 cluster 5번 (사용자 검토 cluster) 에서 사용자 결단 받음 → `user-explicit` 으로 record. ★ `AI-default` 0 의무. 사용자가 결단을 보류하면 → `pending_decisions[]` 유지 + chain 1 종결 reject (gate stop).
+
+### `planning-extraction-validator` 검증 (★ v8.7.5+)
+
+- `decisions[].source = AI-default + revisit_required != true` 시 → `planning.ai-default-revisit-flag-missing` finding emit + critical.
+- `pending_decisions[]` non-empty + Auto Mode 미활성 + gate=go 진입 시 → `planning.pending-decisions-not-resolved` finding emit + critical (gate stop).
+- `decisions[].source = carry + rationale 안 evidence path 부재` 시 → `planning.carry-decision-missing-evidence-path` finding emit + high.
 
 ## 70~80% 한계 명시
 

@@ -1,6 +1,6 @@
 {
   "name": "ai-native-methodology",
-  "version": "8.7.4",
+  "version": "8.8.0",
   "description": "AI-Native 개발 방법론 — SDLC 4단계 chain harness Claude Code plugin (사내 표준). ★ v4.0 multi-agent paradigm — stage 별 sub-agent 5종 + 3 base + spike 1종 (main agent = orchestrator + Task tool dispatch). Analysis stage (legacy 분석 / 7대 산출물 + finding + antipatterns + migration-cautions) + chain 1~4 gate (planning → behavior+AC → test RED → impl GREEN) + traceability matrix + 70~80% 한계 명시. 변경 이력은 CHANGELOG.md 참조.",
   "author": {
     "name": "AIMD",

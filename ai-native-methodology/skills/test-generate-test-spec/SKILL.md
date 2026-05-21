@@ -96,9 +96,54 @@ chain 3 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
 
 본 skill step 6 종결 시 acceptance-criteria.json 을 in-place edit — 각 AC 의 test_case_refs 배열에 본 chain 3 산출 TC-* ID 추가. ★ chain 2 → 3 forward+backward link 완성.
 
+## ★ ★ ★ v8.8.0+ test_carry_from 처리 (G-006 보강)
+
+### 배경
+
+mis-fe-admin DWPD-1774 5 stage 실증 테스트 §G-006 — chain 3 진입 시 v1 cycle 1~13 의 test 12 파일이 살아있어 test stage 가 **"fresh-write" 가 아닌 "carry-from-iter-N"** 케이스. plugin v8.7.4 의 test-spec.json 산출물 표기 명세에 carry 케이스 부재 → 사용자 ad-hoc 표기 + chain 4 진입 시 GREEN 검증 게이트가 carry test 의 정합성 확인 path 부재.
+
+### test-spec.json 신설 필드
+
+| 필드 | 타입 | 의미 |
+|---|---|---|
+| `meta.generation_mode` | enum | `fresh-write` (default / 전체 신규 generate) \| `carry-from-iter` (이전 iter test 인계) \| `hybrid` (일부 carry + 일부 신규) |
+| `tests[].carry_from` | object \| null | TC 단위 carry 정보. null = 본 chain 3 신규 generate. |
+| `tests[].carry_from.iter_path` | string | 이전 iter 의 path (예: `.aimd/output/iter-3/test-spec.json`) |
+| `tests[].carry_from.tc_id_prior` | string | 이전 iter 의 TC ID (rename 가능) |
+| `tests[].carry_from.source_file_prior` | string | 이전 iter 의 test 파일 경로 |
+| `tests[].carry_from.rationale` | string | carry 사유 (예: "AC-USER-001 의미 불변 + framework 동일 vitest 14.x") |
+| `tests[].carry_from.equivalence_check` | enum | `manual-confirmed` (사용자 검토) \| `automated-diff-passed` (validator 자동) \| `pending` (gate stop) |
+| `meta.carry_count` | integer | carry 모드 TC 수 (audit signal) |
+| `meta.fresh_count` | integer | 신규 TC 수 |
+
+### generation_mode 분기
+
+- **`fresh-write`** (default) — chain 3 진입 시 모든 TC 가 acceptance-criteria 기반 신규 generate. `tests[].carry_from: null` 의무.
+- **`carry-from-iter`** — chain 3 진입 전 이전 iter test 가 살아있고, acceptance-criteria 가 그 iter 와 동일 (또는 superset) 정합. 모든 TC `carry_from` 필드 채움. ★ AC ↔ carried TC 의미 정합 검증 의무 (아래 합격 게이트).
+- **`hybrid`** — 일부 TC 만 carry / 나머지 신규. mixed mode.
+
+### 합격 게이트 — carry TC 정합 검증 (★ v8.8.0+ 신규)
+
+각 carry TC 마다 acceptance-criteria 와의 의미 정합 검증 의무:
+1. **AC ID match** — `tests[].ac_ref` ∈ 현재 chain 의 acceptance-criteria.AC-* 의무.
+2. **Gherkin assertion match** — carried test 의 assertion 이 AC.gherkin.then 과 의미 정합 (★ `equivalence_check` enum 명시 의무).
+3. **framework match** — `tests[].framework` = `inventory.stack_signals` 의 framework 일치 (drift 시 carry path reject).
+4. **commit_hash 인용** — `carry_from.iter_path` 가 git 추적 path 면 commit hash + branch 인용 권고 (evidence).
+
+### spec-test-link-validator 신규 finding (★ v8.8.0+)
+
+- `test.carry-from-missing-equivalence-check` (high) — `carry_from` 필드 있는데 `equivalence_check: pending` 시 gate #3 stop.
+- `test.carry-from-iter-path-not-found` (critical) — `carry_from.iter_path` 가 디스크 부재 시 reject.
+- `test.carry-from-ac-ref-orphan` (critical) — carried TC 의 `ac_ref` 가 현재 acceptance-criteria 에 없음 → 의미 drift 표면화.
+- `test.generation-mode-meta-missing` (medium) — `meta.generation_mode` 부재 시 default=`fresh-write` 가정 + warning emit.
+
+### Auto Mode 흐름 (정합)
+
+Auto Mode 활성 시 — 이전 iter test 가 살아있으면 `generation_mode: carry-from-iter` 1차 default 적용 + `equivalence_check: pending` set + gate #3 cluster 에서 사용자 일괄 confirm 의무 (★ G-005 의 `decisions[].source: AI-default` 와 동일 paradigm).
+
 ## 70~80% 한계 명시
 
-자동 generate ≥ 70% / 사용자 검토 ≤ 30% (test = framework convention 차이 ↑ / sandbox 부재 검증 ❌). property test arbitrary 는 ★ 사용자 검토 의무.
+자동 generate ≥ 70% / 사용자 검토 ≤ 30% (test = framework convention 차이 ↑ / sandbox 부재 검증 ❌). property test arbitrary 는 ★ 사용자 검토 의무. ★ v8.8.0+ — carry mode 시 `equivalence_check: manual-confirmed` 가 사용자 검토 비중 ↑.
 
 ## 인용
 

@@ -132,6 +132,71 @@ node tools/traceability-matrix-builder/src/cli.js \
 
 `_base-invoke-go-stop-gate` skill (cluster 5~6 / GREEN 100% pass 명시 + impl 모듈 review 항목).
 
+## ★ ★ ★ v8.8.0+ strategy_chosen enum (G-007 보강)
+
+### 배경
+
+mis-fe-admin DWPD-1774 5 stage 실증 테스트 §G-007 — chain 4 진입 시 v1 코드가 git history (develop) 에 있어 implement stage 가 **"fresh-generate" 가 아닌 "git-restore"** 케이스. plugin v8.7.4 의 impl-spec.json 산출물 표기 명세에 generate 외 strategy 부재 → 사용자 ad-hoc 표기 + `commit_hash` 필드 의미가 "신규 generate commit" vs "restored 출처 commit" 모호.
+
+### impl-spec.json 신설 필드
+
+| 필드 | 타입 | 의미 |
+|---|---|---|
+| `meta.strategy_chosen` | enum | `ai-generate-fresh` (default / 전체 신규 generate) \| `git-restore` (이전 branch / commit 의 코드 복원) \| `hybrid-restore-and-modify` (restore + 신규 generate / 일부만 modify) |
+| `impl_modules[].strategy` | enum | 모듈 단위 strategy (meta.strategy_chosen 가 hybrid 시 의무) |
+| `impl_modules[].restore_source` | object \| null | git-restore / hybrid 시 의무. null = ai-generate-fresh. |
+| `impl_modules[].restore_source.branch` | string | 출처 branch (예: `develop`) |
+| `impl_modules[].restore_source.commit_hash` | string | 출처 commit hash (★ 의무 — `git rev-parse <branch>` 시점 캡쳐) |
+| `impl_modules[].restore_source.file_paths[]` | array | restore 대상 파일 path 목록 (예: `["src/auth/auth.controller.ts"]`) |
+| `impl_modules[].restore_source.rationale` | string | restore 사유 (예: "v1 cycle 1~13 누적 정합 / chain 3 test 12개 carry 와 matching") |
+| `impl_modules[].modify_diff` | string \| null | hybrid 시 의무 — restore 후 modify diff summary (1~3 줄) |
+| `meta.restore_count` | integer | strategy=git-restore 모듈 수 |
+| `meta.fresh_count` | integer | strategy=ai-generate-fresh 모듈 수 |
+| `meta.hybrid_count` | integer | strategy=hybrid 모듈 수 |
+
+### strategy 별 합격 게이트 (★ v8.8.0+ 신규)
+
+#### `ai-generate-fresh` (default)
+
+기존 v8.7.4 절차 본문 (test-spec → impl 코드 generate → commit_hash 채움) 적용. `restore_source: null` 의무. `commit_hash` = 신규 generate 의 commit hash.
+
+#### `git-restore`
+
+1. 출처 branch + commit hash 식별:
+   ```bash
+   git rev-parse <branch>  # → restore_source.commit_hash
+   git ls-tree <commit_hash> --name-only  # 복원 대상 파일 목록 확인
+   ```
+2. `git checkout <branch> -- <file_paths>` 또는 `git show <commit_hash>:<file> > <target>` 으로 복원.
+3. **★ ★ ★ AC ↔ restored impl 정합 검증 의무** — restored 코드가 현재 acceptance-criteria 와 의미 정합인지 사용자 검토 (gate #4 cluster 필수 항목).
+4. test 진짜 호출 → 100% pass 확인 (`--allow-execute`). pass 실패 시 → hybrid 전환 또는 ai-generate-fresh fallback.
+5. `commit_hash` (impl-spec.json) = restore 후 본 chain 4 의 새 commit hash (★ restore_source.commit_hash 와 별개 / restore 결과를 본 chain 의 commit 으로 기록).
+
+#### `hybrid-restore-and-modify`
+
+1. 위 git-restore 절차 1~2 동일.
+2. modify 대상 파일 명시 (`modify_diff` 필드).
+3. modify 결과가 test pass 의무 (GREEN).
+4. modify commit + restore commit 분리 권고 (audit signal).
+
+### 신규 finding (★ v8.8.0+)
+
+- `impl.strategy-chosen-meta-missing` (medium) — `meta.strategy_chosen` 부재 시 default=`ai-generate-fresh` 가정 + warning.
+- `impl.git-restore-source-incomplete` (critical) — strategy=git-restore 인데 `restore_source.branch` 또는 `restore_source.commit_hash` 부재.
+- `impl.git-restore-equivalence-not-verified` (high) — strategy=git-restore + gate #4 cluster 에 "AC ↔ restored 정합 confirm" intervention-log entry 부재.
+- `impl.hybrid-modify-diff-missing` (high) — strategy=hybrid 인데 `modify_diff` 부재.
+- `impl.restore-source-commit-not-in-repo` (critical) — `restore_source.commit_hash` 가 `git cat-file -t <hash>` reject.
+
+### Auto Mode 흐름 (정합)
+
+Auto Mode 활성 시 — 이전 branch 의 코드가 살아있고 chain 3 의 carry test 와 paths 일치하면 → 1차 default `strategy_chosen: git-restore` 적용 + gate #4 cluster 에서 사용자 일괄 confirm 의무 (★ G-005/G-006 와 동일 paradigm).
+
+### 인용 (G-007 보강 추가)
+
+- mis-fe-admin DWPD-1774 5 stage 테스트 §G-007 — case study reference (본 보강의 impl-spec.json 이 reference 자격).
+- `decisions/DEC-2026-05-21-G007-impl-strategy-enum.md` — 본 결단 record.
+- DEC-2026-05-06-round-trip-부분-허용 — revisit:test 가능 (strategy 전환 시 chain 3 재진입).
+
 ## 기술 스택 분기 (★ skills-axis 정합 / 본문 분기)
 
 ### nestjs
