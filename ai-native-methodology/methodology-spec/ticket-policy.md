@@ -231,7 +231,7 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 | **1. Policy** | 본 subsection | "★ Sub-task / Story / Epic 의무 parent" 명시 |
 | **2. Schema** | `ticket-sync-evidence.schema.json` | `mcp_invocations[].parent_ticket_id` + `link_type` enum + `ticket_ref.structure_complete` boolean |
 | **3. Skill** | `skills/ticket-sync/SKILL.md` | phase=exit 각 stage 호출 sequence 에 `parent_ticket_id=` 명시 + analysis phase=exit 끝에 `jira_structure_add_issues` step |
-| **4. Finding** | `tools/_shared/finding-log.js` (또는 skill 인라인) | `F-TICKETSYNC-002 missing_parent` emit |
+| **4. Finding** | `_base-log-finding` skill 또는 ticket-sync skill 인라인 (별 finding-log 도구 부재) | `F-TICKETSYNC-002 missing_parent` emit |
 
 #### Parent 의무 매트릭스
 

@@ -49,7 +49,7 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
    - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인 (★ tool-name presence probe / mis-fe-admin iter-6 verification cycle 입증).
    - 2차 (fallback) — `mcp__wiki-jira-assistant__jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
    - 3차 (skip 결단) — `ListMcpResourcesTool` 은 **resource-only probe** 라 tools 가용성 추론에 ★ 부적합 (F-VERIFY-005 결정적 evidence — wiki-jira MCP resource 0 노출 시 tools 는 deferred 로 정상 등록). resource probe 결과 단독으로 silent skip 분기 ❌.
-   - 모두 불가 시 → `tools/_shared/finding-log.js` 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip (다른 chain harness 진행 무영향).
+   - 모두 불가 시 → `_base-log-finding` skill 호출 (또는 인라인 finding emit) 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip (다른 chain harness 진행 무영향). 별 `tools/_shared/finding-log.js` 도구 부재 — `_base-log-finding` skill 이 정합 entry point.
 2. **state.json read** (★ ★ v8.7.3+ path 정정 + gate 분기 / F-VERIFY-006 + F-VERIFY-008 → B9 + B11 해결)
    - 정식 path = `<project>/.aimd/state.json` (★ 단일 file / scope 는 `state.current_scope` 필드). `.aimd/<scope>/state.json` 은 v8.7.2 이전 명세 drift — `chain-driver init` 의 실 산출 위치와 불일치 (★ F-VERIFY-006 결정적 evidence).
    - 매칭 의무 — `state.current_scope === <scope>` 일치 확인. 불일치 시 `F-TICKETSYNC-006 scope_mismatch` finding + reject.

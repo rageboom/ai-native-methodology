@@ -9,6 +9,26 @@
 
 ---
 
+## [8.8.1] — 2026-05-21 PATCH — skill-citation pre-existing fail 해소 (tools/_shared/finding-log.js stale ref)
+
+> v8.8.1 PATCH — v8.7+ 부터 carry 의 pre-existing fail 해소. `tools/_shared/finding-log.js` 가 ticket-policy.md + ticket-sync/SKILL.md 에서 인용되지만 실 파일 부재 (재구조화 drift). 본 PATCH 가 stale ref 정정.
+
+### 변경
+
+- `methodology-spec/ticket-policy.md:234` — `tools/_shared/finding-log.js (또는 skill 인라인)` → `_base-log-finding skill 또는 ticket-sync skill 인라인 (별 finding-log 도구 부재)` 로 정합 정정
+- `skills/ticket-sync/SKILL.md:52` — `tools/_shared/finding-log.js 로 emit` → `_base-log-finding skill 호출 (또는 인라인 finding emit)` 로 정정. 별 도구 부재 명시.
+
+### 회귀
+
+- skill-citation-validator 2/2 pass (이전 1 fail = stale citation 재유입 → 해소)
+- breaking 0 (단순 doc ref 정정)
+
+### Carry
+
+- 향후 cycle 에서 신규 stale ref 발생 시 skill-citation-validator 가 회귀 차단 (dogfood paradigm 유지)
+
+---
+
 ## [8.8.0] — 2026-05-21 MINOR — cycle-7 dogfood 9 개선 cluster (chain 4 GREEN false signal 검출 + legacy rule pack + DDL Phantom 자동화 + inflation lint + carry resolution_kind + preflight fallback)
 
 > v8.8.0 MINOR — cycle-7 (car / 2026-05-21) dogfood 가 표면화한 9 개선 batch. cycle-7 의 본질 발견 = chain 4 "GREEN" 이 in-memory fixture mock 통과 (car.service.ts:63 `prisma: unknown` + scenarioState module-level counter + hardcoded return fixture) / vitest pass=44 / line cov 92.59% 만족 / 진정 비즈니스 검증 0 / plugin `test-impl-pass-validator` ok=true 리턴 = false signal. 본 MINOR 가 가장 큰 ROI.
