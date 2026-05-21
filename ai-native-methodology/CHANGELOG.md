@@ -9,6 +9,53 @@
 
 ---
 
+## [8.7.4] — 2026-05-21 ★ ★ ★ PATCH — ticket-sync Sub-task Epic auto-inherit invariant + Structure 자동 등록 표준화 (R20 v4 amendment / breaking 0)
+
+> ★ **v8.7.4 PATCH — R20 v4 amendment**. mis-fe-admin EAM-AUTH **verify-1 iter-6 cycle 종결** 결과 driver. 5 stage 일주 PASS / 106 ticket / Atlassian Structure 등록 15 row 진행 중 2 carry 식별:
+> - **B14** — Stage 1 Sub-task 14건 (DWPD-1668~1681) 생성 시 `extra_fields.customfield_10006` 명시 시도 모두 400 reject. parent Story 의 Epic Link 가 Sub-task 에 native auto-inherit 됨이 본질. SKILL.md v8.7.3 본문 "Sub-task = parent_key" 표기가 약해 사용자/AI 가 dual binding 시도하는 path 가 열려 있었음. → invariant 명문화 + 위반 reject path.
+> - **B15** — Stage 마다 사용자가 `jira_structure_add_issues` (DWP-Forge id=676) manual 호출. plugin 본문에 자동화 부재. 5 stage × 1 manual = 5 친화도 손실. → `structure_id` + `structure_auto_add_on_exit` 파라미터 신설 + 모든 phase=exit 자동 호출 표준화.
+
+### 본질 발견 (mis-fe-admin EAM-AUTH verify-1 iter-6 / Stage 1~5 종결 / 47 MCP 호출 + manual Structure 호출 6회)
+
+- **F-VERIFY-015 (★ B14 amended)** — Sub-task `jira_create` 후 `jira_update × 14` 로 customfield_10006 backfill 시도 모두 400 reject. evidence: `jira-trace.json` stage1_analysis.B14 sub_section. Jira native semantic = Sub-task 의 Epic Link 은 parent Story / Task 로부터 auto-inherit. dual binding 시도는 본질 위배.
+- **B15 carry** — verify-1 iter-6 jira-trace.json stage1~5 모두 `atlassian_structure` 절에 manual 호출 evidence (version 1 → 6 / 총 106 row 등록). plugin 자동화로 가져오면 사용자 manual 부담 0.
+
+### 시행 (1 commit / branch `v8.7.4-r20-subtask-autoinherit-structure-auto`)
+
+1. **B14 SKILL.md §단계 5 prelude / parent linking resolve** — subtask 분기에 "`extra_fields[epic_link_customfield_id]` 명시 ❌. parent Story 로부터 auto-inherit" 명문화 (auto / epic_link_customfield 두 strategy 모두).
+2. **B14 SKILL.md §금지/강제력** — v8.7.4+ Sub-task Epic Link customfield 명시 ❌ 항목 신설 + F-TICKETSYNC-011 subtask_epic_link_violation 신설.
+3. **B14 SKILL.md §사용자 결단 8번** — Sub-task Epic auto-inherit invariant (DWPD `customfield_10006` 외 환경 동일).
+4. **B14 SKILL.md §단계 5/5b 본문** — phase=exit planning + 5 verification stage 의 Sub-task `jira_create` step 에 B14 주석 추가 (extra_fields 명시 ❌).
+5. **B15 SKILL.md §파라미터 표** — `structure_id` + `structure_auto_add_on_exit` 2 파라미터 신설.
+6. **B15 SKILL.md §단계 5/5b 본문** — analysis/planning/implement standard 본문 + 5 verification stage 본문 모두 structure_add_issues 자동 호출 step 추가.
+7. **B15 SKILL.md §사용자 결단 9번** — Structure 보드 자동 등록 (DWPD reference `structure_id=676`).
+8. **DWPD 환경 reference config** — structure_id + structure_auto_add_on_exit 추가 / B14 주석.
+9. **DEC-2026-05-21-r20-subtask-autoinherit-structure-auto.md** 신설 — v8.7.4 amendment ADR.
+10. **3 SSOT bump** — plugin.json + package.json + CLAUDE.md 8.7.3 → 8.7.4.
+
+### Q&A — 사용자 결단 매트릭스 누적 (v8.7.1 ~ v8.7.4)
+
+| 결단 | 신설 cycle | 본질 |
+|---|---|---|
+| 1. Jira workflow transition target IDs | v8.6.1 R20 charter | project-specific |
+| 2. Confluence emit 범위 | v8.6.1 R20 charter | per-stage Tier 2.6 carry |
+| 3. Auto-invoke 정책 (chain-driver next stderr) | v8.7.2 verification | Stop hook 직접 등록 ❌ |
+| 4. Idempotency | v8.6.1 R20 charter | search-first |
+| 5. MCP 미연결 환경 | v8.6.1 R20 charter | silent skip + finding emit |
+| 6. mode 선택 (standard / verification) | v8.7.2 verification | parent_epic 의무 (verification) |
+| 7. environment bridge (4 단계 1회 setup) | v8.7.3 environment-bridge | issuetype_map + parent_strategy + epic_link_customfield_id |
+| **8. Sub-task Epic auto-inherit invariant** | **v8.7.4 본 cycle** | **customfield 명시 ❌ / parent 의존** |
+| **9. Structure 보드 자동 등록** | **v8.7.4 본 cycle** | **structure_id env-config / 모든 phase=exit 자동** |
+
+### 정합 cross-ref
+
+- ADR: `decisions/DEC-2026-05-21-r20-subtask-autoinherit-structure-auto.md`
+- SKILL: `skills/ticket-sync/SKILL.md` (§파라미터 + §단계 5/5b + §금지 + §사용자 결단 + §DWPD config)
+- Evidence: mis-fe-admin `.aimd/output/eam/authority/iter-6/jira-trace.json`
+- Memory: [[project-plugin-verification-cycle-verify1]] § carry to next cycle (v8.7.4 PATCH 시 B14 + B15 반영)
+
+---
+
 ## [8.7.3] — 2026-05-20 ★ ★ ★ PATCH — ticket-sync environment bridge (issuetype_map + parent_strategy + Pre-flight 정정) (R20 v3 amendment / breaking 0)
 
 > ★ **v8.7.3 PATCH — R20 v3 amendment**. mis-fe-admin EAM-AUTH iter-6 verification cycle **Stage 1 실 진입** 결과 driver. v8.7.2 의 parent_epic + mode=verification 으로 Story 1 (DWPD-1667) + Sub-task 14 (DWPD-1668~1681) 실 생성 / Q4·Q5 PASS 달성한 진행 도중 발견한 6 finding (F-VERIFY-005 ~ F-VERIFY-010) 의 본질 = environment portability 결손. SKILL.md 의 Atlassian Cloud 표준 hardcode (issuetype "Story" / parent_key 단일 path / `.aimd/<scope>/state.json` / ListMcpResourcesTool probe / gate-pass 의무) 를 6축 environment-config 화. DEC-2026-05-20-r20-environment-bridge 신설.

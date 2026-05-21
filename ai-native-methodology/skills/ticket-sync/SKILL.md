@@ -38,6 +38,8 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 | `issuetype_map` | object | (env default — 아래 resolve 표 참조) | ★ ★ ★ v8.7.3+ — Jira 환경별 issuetype 명명 / id 매핑. role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug`. 미명시 시 environment-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준 `Story` / `Sub-task` / `Initiative` / `Tech Debt Story` / `Task` / `Bug`). DWPD 환경 예 (DEC-2026-05-20-r20-environment-bridge 정합): `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. 명명 모호 시 id 명시 권고 (`{story:{id:"10401"}}`). |
 | `parent_strategy` | enum | **`auto`** | ★ ★ ★ v8.7.3+ — parent 매핑 전략. `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` 가 set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` (모든 role 이 native parent / Atlassian Cloud 표준) \| `epic_link_customfield` (Story/일반 issue 는 Epic Link customfield 사용 / Sub-task 만 parent_key / DWPD 환경 등 권한 분리 환경). DEC-2026-05-20-r20-environment-bridge §parent-bridge 정합. |
 | `epic_link_customfield_id` | string | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | ★ ★ ★ v8.7.3+ — `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. environment-config 또는 args 명시. DWPD 환경 reference: `customfield_10006`. 미명시 + `parent_strategy=epic_link_customfield` 시 reject + `F-TICKETSYNC-005 missing_epic_link_customfield` finding emit. |
+| `structure_id` | string | env-config (`.aimd/ticket-sync-config.yaml` 안 `structure_id`) 또는 (없음) | ★ ★ ★ v8.7.4+ B15 — Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). 미set 시 silent skip (Structure 미사용 환경 무영향). DWPD 환경 reference: `676`. |
+| `structure_auto_add_on_exit` | boolean | `true` (단 `structure_id` set 일 때) | ★ ★ ★ v8.7.4+ B15 — true 시 phase=exit 각 stage 종료 후 자동 호출. false 명시 시 사용자 manual `jira_structure_add_issues` 호출 가정 (drift attractor 회피 path). |
 
 ## 절차
 
@@ -148,11 +150,11 @@ stage 별 MCP 호출 batch 의 preview 표시. 예 (stage=planning, scope=car):
 
 2. **parent linking resolve** (`parent_strategy` 별):
    - `parent_strategy=auto` (default):
-     - role=`subtask` → `parent_key` 필드 사용
+     - role=`subtask` → `parent_key` 필드 **만** 사용 (★ ★ ★ v8.7.4+ B14 invariant — `extra_fields[epic_link_customfield_id]` 명시 ❌. Sub-task 의 Epic Link 은 parent Story 로부터 **auto-inherit** 됨)
      - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback (Atlassian Cloud 표준 path).
      - role=`initiative` → parent 없음 (top-level)
    - `parent_strategy=parent_key`: 모든 role 이 `parent_key` 시도 (★ DWPD 환경에서는 일반 issue 가 400 reject — `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding).
-   - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` / 그 외 = `extra_fields[epic_link_customfield_id]`. `epic_link_customfield_id` 미명시 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
+   - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` **만** / 그 외 = `extra_fields[epic_link_customfield_id]`. ★ ★ ★ v8.7.4+ B14 — Sub-task 에 `extra_fields[epic_link_customfield_id]` 추가 시도 시 backend 400 reject ("이슈 유형 10402 은 Epic Link 를 받지 않음" 등) — Sub-task 는 parent Story 의 Epic Link 을 auto-inherit 한다. `epic_link_customfield_id` 미명시 + 일반 issue 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
 
 3. **호출 sequence 의무**:
    - jira_create payload 의 `issue_type` + parent linking 필드는 위 resolve 결과 직접 인용 (★ no-simulation / SKILL.md 본문 hardcode 표기 인용 ❌).
@@ -173,6 +175,11 @@ issuetype_map:
   bug: 버그
 parent_strategy: epic_link_customfield
 epic_link_customfield_id: customfield_10006
+# ★ ★ ★ v8.7.4+ B14 — Sub-task 는 epic_link_customfield_id 명시 ❌
+# (parent Story/Task 로부터 auto-inherit / 명시 시 400 reject)
+# ★ ★ ★ v8.7.4+ B15 — Structure 보드 자동 등록 (옵션)
+structure_id: 676                # ALM Works DWP-Forge id (DWPD 환경)
+structure_auto_add_on_exit: true # phase=exit 마다 jira_structure_add_issues 자동 호출
 ```
 
 phase × stage 별 MCP call matrix:
@@ -219,9 +226,12 @@ implement enter (uc_id 의무):
    jira_create (Tech Debt Story, parent_ticket_id=MIG-1, link_type=relates-to) → MIG-AP-<n>
    jira_label_add (AP-{category})
 4. (optional confluence_emit=true) wiki_page_create (Initiative overview)
-5. ★ ★ ★ v8.6.3+ — jira_structure_add_issues (Initiative + all Epics + Tech Debt Stories)
+5. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[Initiative + all Epics + Tech Debt Stories])
    → Atlassian Structure tree 등록 → ticket_ref.structure_tree_url 채움
    → 모든 child 의 ticket_ref.structure_complete=true
+   → mcp_invocations[] evidence (1 호출 / version_before, version_after 캡쳐)
 6. ★ if exists enter_task_id (analysis enter):
    jira_transition (enter_task_id → Done)
 ```
@@ -233,11 +243,15 @@ for each UC in planning-spec.use_cases[]:
                   summary="[UC-CAR-007] ...", body=planning-spec UC body)
    2. jira_link (Story, parent=Epic MIG-CAR-100)
    3. jira_create (Sub-task chain1_planning, parent_ticket_id=Story, link_type=parent-child, status=Done)
+      ★ ★ ★ v8.7.4+ B14 — Sub-task payload 에 extra_fields[epic_link_customfield_id] 명시 ❌ (auto-inherit)
    4. jira_create (Sub-task chain2_spec, parent_ticket_id=Story, link_type=parent-child, status=To Do)
    5. jira_create (Sub-task chain3_test, parent_ticket_id=Story, link_type=parent-child, status=To Do)
    6. jira_create (Sub-task chain4_impl, parent_ticket_id=Story, link_type=parent-child, status=To Do)
 ★ ★ v8.6.3+ parent_ticket_id 의무 — Sub-task / Story 생성 시 모두 parent_ticket_id 필드 채움 (mcp_invocations[] evidence 기록). 위반 시 F-TICKETSYNC-002 missing_parent finding emit.
 ★ traceability-matrix.ticket_ref.{epic_id, initiative_id, subtask_ids} 모두 채움 → structure_complete=true.
+★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id, issue_keys=[새 Story N개 + Sub-task 4N개])
+   → traceability-matrix.ticket_ref.structure_tree_url 갱신 / version_after 캡쳐.
 ★ if exists enter_task_id (planning enter):
    jira_transition (enter_task_id → Done)
 ```
@@ -269,6 +283,9 @@ for each Story:
    3. jira_transition (chain4_impl sub-task → "Done")
    4. jira_transition (Story → "Done")
 5. (optional confluence_emit=true) wiki_page_update (final report)
+6. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id, issue_keys=[새 추가 ticket if any])
+   ★ 일반적으로 implement exit 시점에는 신규 ticket 0건이라 no-op / 단 cycle 종료 마무리 evidence.
 ★ if exists enter_task_id (implement enter / per UC):
    jira_transition (enter_task_id → Done)
 ```
@@ -302,9 +319,15 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
                 link_type=parent-child,
                 summary="[Verify artifact] {artifact_name}",
                 status=Done)
+   ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
+                       (parent Story 로부터 auto-inherit)
 3. jira_comment (verification_story_ids[analysis],
                  "5종 물증 7 필드 + iter-N carry inheritance + analysis gate result")
 4. jira_transition (verification_story_ids[analysis] → "Done")
+5. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[verification_story_ids[analysis] + Sub-task N개])
+   → version_after 캡쳐 / mcp_invocations[] evidence.
 ```
 
 #### phase=exit — mode=verification — planning
@@ -316,12 +339,16 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 2. for each UC in planning-spec.use_cases[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
                 summary="[Verify UC] {uc_id} {uc_summary}", status=Done)
+   ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
 3. for each BR-INTENT in planning-spec.business_rules_intent[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
                 summary="[Verify BR-INTENT] {br_id} {summary}", status=Done)
 4. jira_comment (verification_story_ids[planning],
                  "UC count=N + BR-INTENT count=M + traceability v1 link")
 5. jira_transition (verification_story_ids[planning] → "Done")
+6. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[verification_story_ids[planning] + UC/BR-INTENT Sub-task])
 ```
 
 #### phase=exit — mode=verification — spec
@@ -333,9 +360,13 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 2. for each AC in acceptance-criteria[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[spec],
                 summary="[Verify AC] {ac_id} {gherkin_when}", status=Done)
+   ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
 3. jira_comment (verification_story_ids[spec],
                  "BHV count=N + AC count=M + BR cross-consistency result")
 4. jira_transition (verification_story_ids[spec] → "Done")
+5. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[verification_story_ids[spec] + AC Sub-task])
 ```
 
 #### phase=exit — mode=verification — test (RED)
@@ -347,8 +378,12 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 2. for each test_case in test-spec[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[test],
                 summary="[Verify TC] {tc_id} {ac_id_link}", status="Testing")
+   ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
 3. jira_comment (verification_story_ids[test],
                  "RED evidence + 5종 물증 7 필드 + AC↔TC forward coverage")
+4. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[verification_story_ids[test] + TC Sub-task])
 ```
 ★ Story status 는 Testing/In Progress 유지 — implement stage 종료 후 일괄 Done.
 
@@ -361,12 +396,17 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 2. for each impl artifact:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[implement],
                 summary="[Verify impl] {file_path}", status=Done)
+   ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
 3. jira_transition (verification_story_ids[test] sub-tasks → "Done")
 4. jira_transition (verification_story_ids[test] → "Done")
 5. jira_transition (verification_story_ids[implement] → "Done")
 6. jira_comment ($parent_epic,
                  "★ verification cycle 종결 — 5 Story keys + Q1~Q5 pass/fail summary
                   + traceability-matrix 100% green + commit hash + findings 링크")
+7. ★ ★ ★ v8.7.4+ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+   jira_structure_add_issues (structure_id=$structure_id,
+                              issue_keys=[verification_story_ids[implement] + impl Sub-task])
+   → cycle 종료 마무리 evidence (5 Story 전체 등록 완료 + traceability link).
 ```
 
 ★ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` 표식 + `verification_story_ids` map 추가 (analysis/planning/spec/test/implement → Story 키).
@@ -426,6 +466,7 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 - **★ ★ v8.7.2+ mode=standard + parent_epic 명시 시 hybrid 경고** — standard mode 인데 parent_epic 명시 시 → Initiative 생성 skip + per-BC Epic 의 link 대상이 parent_epic 으로 변경 (architecture-driven Epic 자동 생성은 유지). 명시적 hybrid path / `F-TICKETSYNC-004 hybrid_parent_epic` info finding emit (deny ❌).
 - **★ ★ ★ v8.7.3+ environment hardcode ❌** — SKILL.md 본문의 `Story` / `Sub-task` / `Initiative` 표기는 **role label** (★ resolve table 의 key). 실 MCP payload 의 `issue_type` 값은 §단계 5 prelude 의 resolve 결과 직접 인용 의무. SKILL.md 본문 영문 명명을 그대로 payload 에 hardcode ❌ (★ F-VERIFY-009 결정적 evidence — DWPD 환경 "스토리" 미사용 + 실 명명 "작업"). 위반 시 `F-TICKETSYNC-009 issuetype_hardcode_drift` finding emit + 호출 reject.
 - **★ ★ ★ v8.7.3+ parent_strategy 우회 ❌** — `parent_strategy ∈ {epic_link_customfield, auto + epic_link_customfield_id set}` 환경에서 일반 issue (`story` / `task` / `tech_debt` / `bug`) 의 `parent` 필드 직접 채움 ❌. 반드시 `extra_fields[epic_link_customfield_id]` 사용 (★ F-VERIFY-010 결정적 evidence — DWPD "이슈 유형 10401 은 하위 작업이 아니지만 상위가 지정" 400 reject). 위반 시 `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding emit.
+- **★ ★ ★ v8.7.4+ Sub-task Epic Link customfield 명시 ❌ (B14 invariant)** — role=`subtask` 의 `jira_create` payload 에 `extra_fields[epic_link_customfield_id]` (예: DWPD `customfield_10006`) 명시 ❌. Sub-task 의 Epic Link 은 **parent Story / Task 로부터 auto-inherit** 된다 (Jira native semantic). 명시 시 backend 400 reject ("Epic Link is not supported on subtask" / "이슈 유형 10402 은 Epic Link 를 받지 않음" 등) — ★ F-VERIFY-015 결정적 evidence (mis-fe-admin EAM-AUTH iter-6 verify-1 Stage 1 — Sub-task 14건 `jira_update` × 14 customfield_10006 backfill 시도 모두 400 reject). 후속 `jira_update` 로 backfill 시도도 동일 reject. 위반 시 `F-TICKETSYNC-011 subtask_epic_link_violation` finding emit + 호출 reject. ★ 본 invariant 는 parent linking resolve table 와 §사용자 결단 8번 (Sub-task auto-inherit) 정합.
 
 ## 사용자 결단 7건 (실 사용 시점 / DEC-2026-05-18-r20 + ★ v8.7.2 DEC-2026-05-20-r20-verification-mode + ★ ★ ★ v8.7.3 DEC-2026-05-20-r20-environment-bridge)
 
@@ -436,12 +477,15 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 5. **MCP 미연결 환경** — silent skip + finding emit ★ 권고. ★ v8.7.3+ — probe 는 tools-deferred-list 우선 / `ListMcpResourcesTool` 단독 의존 ❌ (resource-only / tools 가용성 false negative — F-VERIFY-005).
 6. **★ v8.7.2+ mode 선택** — `standard` (default / 실 도메인 feature cycle / Initiative+Epic 자동 생성) / `verification` (plugin dogfood meta-cycle / parent_epic 의무 / per-stage Story 5 + 산출물 별 Sub-task). 환경상 Initiative 생성 권한 부재 / 기존 Epic 재사용 / migration carry meta-cycle 시 `mode=verification` + `parent_epic=<key>` 명시.
 7. **★ ★ ★ v8.7.3+ environment bridge** — 신규 Jira 환경 첫 도입 시 (1) `jira_search project=<K> AND issuetype != Epic` 으로 사용 issuetype 분포 sample → (2) `.aimd/ticket-sync-config.yaml` 안 `issuetype_map` 채우기 → (3) `parent_strategy` 결정 (DWPD 같이 일반 issue 의 parent 직접 매핑 reject 환경 = `epic_link_customfield` / Atlassian Cloud 표준 환경 = `parent_key` 또는 `auto`) → (4) `epic_link_customfield_id` 환경별 확인 (DWPD = `customfield_10006`). 본 4 단계가 1회 setup / 이후 재사용. DEC-2026-05-20-r20-environment-bridge 정합.
+8. **★ ★ ★ v8.7.4+ Sub-task Epic auto-inherit invariant (B14)** — 모든 `parent_strategy` 환경 공통: Sub-task 의 Epic Link 은 parent Story / Task 로부터 **auto-inherit**. Sub-task `jira_create` payload 에 `extra_fields[epic_link_customfield_id]` 명시 ❌ (DWPD `customfield_10006` 외 환경 동일). 사후 `jira_update` 로 backfill 도 동일 reject — Sub-task 본질이 parent 의존이라 별도 binding 불필요. ★ mis-fe-admin EAM-AUTH iter-6 verify-1 Stage 1 입증 — `jira_update × 14` customfield_10006 backfill 시도 14건 전건 400 reject. 본 invariant 는 parent linking resolve 의 subtask 분기 + 금지 항목 + DWPD config reference 모두 정합.
+9. **★ ★ ★ v8.7.4+ Structure 보드 자동 등록 (B15)** — Atlassian Structure (ALM Works DWP-Forge) 사용 환경에서 `structure_id` args 또는 env-config 명시 시 phase=exit 종료 시점에 `jira_structure_add_issues` 자동 호출 표준화. native Epic Link 와 **별개 trace 채널** (Epic Link 는 1:N parent-child / Structure 는 임의 tree manual override 가능). DWPD 환경 reference: DWP-Forge `structure_id=676`. 미명시 시 silent skip (Structure 미사용 환경 무영향). 호출 결과 `structure_complete=true` + `structure_tree_url` traceability-matrix 채움.
 
 ## Cross-link
 
 - 결단 record: `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
 - ★ v8.7.2 amendment: `decisions/DEC-2026-05-20-r20-verification-mode.md` (parent_epic override + mode=verification + Stop hook auto-suggest)
 - ★ ★ ★ v8.7.3 amendment: `decisions/DEC-2026-05-20-r20-environment-bridge.md` (issuetype_map + parent_strategy + epic_link_customfield_id + Pre-flight 정정 B8/B9/B10/B11)
+- ★ ★ ★ v8.7.4 amendment: `decisions/DEC-2026-05-21-r20-subtask-autoinherit-structure-auto.md` (B14 Sub-task Epic auto-inherit invariant + B15 Structure 자동 등록 표준화 / mis-fe-admin EAM-AUTH verify-1 iter-6 입증)
 - 정책 본문: `methodology-spec/ticket-policy.md` §Tier 2.5
 - ID 명명: `methodology-spec/id-conventions.md` §Ticket Binding
 - Evidence schema: `schemas/ticket-sync-evidence.schema.json`
