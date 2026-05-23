@@ -9,6 +9,72 @@
 
 ---
 
+## [8.14.2] — 2026-05-23 PATCH — poc-03 chain 4 GREEN = deadline 없는 carry 정직 표기 (Senior STRONG-STOP signal 2종 본격 입증 + paradigm enforcement 본격 입증대)
+
+> Type 1.5 second arm sprint 본격 종결 = poc-03 carry 정직 표기 paradigm. 사용자 결단 ladder = "이제 진행 하자" → C (Type 1.5 second arm) → A1+B2+C1+D1+E2 + sqlite → Senior REVISE-3 STRONG-STOP 2종 발견 → REVISE 전면 흡수 → C3.5 pre-flight smoke FAIL → 옵션 B (carry 정직 표기). additive doc only / breaking 0.
+
+### 본질 (paradigm enforcement 본격 입증대)
+
+본 release = chain 4 GREEN 미도달이나 ★ ★ ★ **paradigm enforcement 본격 입증대** = 가치 본격 ★★★:
+- Senior 사실 검증 보강 paradigm **2회 재발** (v8.14.0 poc-02 source empty + 본 sprint poc-03 npm install fail) = LL-fsim-11 본격 paradigm 입증 확장
+- pre-flight smoke = STOP-3 hard gate 의무 paradigm 본격 자산화
+- commit-block 회피 꼼수 ❌ paradigm 본격 재작동 (LL-fsim-12 + LL-fsim-17) = pre-flight fail 시 carry 정직 표기 본격 선택 = paradigm maturity signal 본격
+- 14차 retract pattern 회피 본격 정합 (본격 시행 후 실패 ❌ / pre-flight 단계 carry 정직 표기)
+
+### Senior REVISE-3 (confidence 0.74) STRONG-STOP signal 2종
+
+- **STRONG-STOP-1 (BLOCKER)**: poc-03 source = impl-only / Senior claim "0 matches" 사실 정정 (실측 1 spec 보유 / SIGNUP+LOGIN spec ❌ 유효) / characterization test paradigm 본격 적용 의무 (Michael Feathers / aspirational test ❌)
+- **STRONG-STOP-2 (HIGH)**: sqlite scope expansion 9일 시한 비현실 + argon2 native build Windows + Node 22 = likely install failure → **본격 입증 = npm install fail / jest 본격 install ❌**
+
+### C3.5 pre-flight smoke 시행 결과 (STOP-3 gate #10 FAIL)
+
+| 단계 | 결과 |
+|---|---|
+| Node v22.11.0 + npm 10.9.0 | 환경 본격 가용 ✅ |
+| `**/*.spec.ts` 실측 | 1 spec 본격 보유 (`tag.controller.spec.ts`) — Senior "0 matches" 사실 정정 |
+| `npm install --ignore-scripts` | ★ ★ **본격 fail** ("Exit handler never called" / 2020 deps + npm 10 strict peer deps) |
+| jest 본격 install | ❌ (npm install 부분 install / jest 자체 install ❌) |
+| `npx jest --listTests` | ❌ "jest 본격 인식 불가" |
+| **STOP-3 gate #10** | ❌ **FAIL** |
+
+### 자산 변경 (additive doc / breaking 0)
+
+- **`plan-poc-03-chain-4-green.md`** — §9 본 sprint 본격 종결 + Senior STRONG-STOP-2 입증 + carry 정직 표기 paradigm 추가
+- **`decisions/DEC-2026-05-23-poc-03-carry-acknowledged.md`** — 본 DEC 신설
+- 3-way version sync = plugin.json + package.json + CHANGELOG 8.14.1 → 8.14.2
+- INDEX 최상단 entry + STATUS session 39차 v8.14.2 sub-entry + CLAUDE.md sync
+- memory `project_v8140_release_status.md` 갱신 (v8.14.2 carry + LL-fsim-14~17 추가)
+
+### STOP-3 hard gate (시행 결과)
+
+- ✅ pre-flight smoke FAIL = paradigm 정합 carry 정직 표기 본격 선택
+- ✅ v8.14.0 + v8.14.1 paradigm 본격 보존
+- ✅ skill-citation-validator 0 stale (보존)
+- ✅ breaking 0 (PATCH)
+
+### LL 자산화 (4종 / LL-fsim-14~17)
+
+- LL-fsim-14 — Senior 사실 검증 보강 paradigm 2회 재발 (LL-fsim-11 본격 입증 확장)
+- LL-fsim-15 — pre-flight smoke = STOP-3 hard gate 의무 paradigm
+- LL-fsim-16 — 6년 전 OSS fork environment-dependent risk (F-SIM-016 paradigm 동형)
+- LL-fsim-17 — commit-block 회피 꼼수 ❌ paradigm 본격 재작동 검증 (LL-fsim-12 재입증)
+
+### 차기 session carry path (deadline 없음)
+
+- poc-03 chain 4 GREEN (npm install environment fail / Docker 또는 Node 14.x downgrade 후보)
+- poc-04-mini React chain 4 GREEN (FE 트랙 / 환경 사전 사실 검증 의무)
+- poc-02 Spring Boot 3 chain 1~4 (source clone 의무 / 가장 무거운 work-unit)
+- Type 2 axis (외부 사용자 / OSS 채택 트리거 의존)
+
+### Cross-link
+
+- Resolves Type 1.5 second arm sprint = paradigm 정합 carry 정직 표기 (poc-03 본격 carry)
+- Amends DEC-2026-05-23-fsim-005-corroboration-2-genuine (Type 1.5 second arm carry 본격 명시)
+
+본 session 누적 3 release (v8.14.0 MINOR + v8.14.1 PATCH + v8.14.2 PATCH).
+
+---
+
 ## [8.14.1] — 2026-05-23 PATCH — F-SIM-12~16 정식 ledger 등재 + closed 2종 (F-SIM-013 + F-SIM-015 본격 흡수 자산화 / v8.4.0 carry 본격 종결)
 
 > v8.4.0 (2026-05-18) 시뮬레이션 dogfood 5 신규 finding 의 정식 ledger 등재 carry (`project_v84_simulation_carry.md` 의제 B) 본격 종결. v8.14.0 paradigm 진화 후속 sync. 사용자 결단 "α로 진행" (cooling-off cadence 안 additive only 작업). additive doc only / breaking 0.
