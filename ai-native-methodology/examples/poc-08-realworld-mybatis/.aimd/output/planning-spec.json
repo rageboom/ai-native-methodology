@@ -16,7 +16,7 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json",
@@ -123,7 +123,7 @@
   },
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json (8 BR / BR-PETSTORE-ACCREG-001~008)",
+      "input/business-rules.json (8 BR / BR-PETSTORE-ACCREG-001~008)",
       "input/domain.json (19 UC / 4 BC / UC-PETSTORE-001~019)",
       "input/antipatterns.json (8 AP / AP-PETSTORE-001~008)",
       "input/inventory.json (24 Java + 18 test + 7 mapper + 25 SQL + 19 endpoint + 12 tables + LOC 9234)",

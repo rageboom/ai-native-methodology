@@ -10,7 +10,7 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      "output/rules/rules.json",
+      "output/rules/business-rules.json",
       "output/domain/domain.json",
       "output/inventory/inventory.json"
     ]
@@ -33,7 +33,7 @@
       "postconditions": ["users 테이블에 신규 row 1건"],
       "acceptance_criteria_refs": ["AC-USER-SIGNUP-001"],
       "source_grounded_evidence": [
-        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.create)"
+        "source/src/user/user.service.ts (UserService.create)"
       ]
     },
     {
@@ -45,7 +45,7 @@
       "postconditions": ["JWT 발급 / user 객체 반환"],
       "acceptance_criteria_refs": ["AC-USER-LOGIN-001"],
       "source_grounded_evidence": [
-        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.findOne + generateJWT)"
+        "source/src/user/user.service.ts (UserService.findOne + generateJWT)"
       ]
     }
   ],
@@ -53,7 +53,7 @@
     {
       "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
       "reasoning": "이메일/사용자명 = 시스템 식별자 / 중복 시 인증 충돌. RealWorld 명세 의무.",
-      "source_grounded_evidence": "output/rules/rules.json BR-USER-USERNAME-EMAIL-UNIQUE-001 + output/db/schema.json users UNIQUE constraint"
+      "source_grounded_evidence": "output/rules/business-rules.json BR-USER-USERNAME-EMAIL-UNIQUE-001 + output/db/schema.json users UNIQUE constraint"
     }
   ],
   "out_of_scope": [
@@ -66,8 +66,8 @@
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "examples/poc-03-realworld-nestjs/output/rules/rules.json",
-      "examples/poc-03-realworld-nestjs/output/domain/domain.json"
+      "output/rules/business-rules.json",
+      "output/domain/domain.json"
     ]
   }
 }

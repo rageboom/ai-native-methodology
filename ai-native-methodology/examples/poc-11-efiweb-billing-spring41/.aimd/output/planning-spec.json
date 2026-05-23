@@ -18,7 +18,7 @@
     "source_handling": "★ ★ ★ in-place read (DEC-2026-05-12-in-place-read-정책-채택 / 사본 ❌)",
     "source_root_absolute": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs",
     "source_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json",
@@ -168,7 +168,7 @@
   },
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json"

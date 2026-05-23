@@ -6,7 +6,7 @@
     "_inputs_used_evidence": {
       "source_code": "source/java/**/*.java + source/jsp/* — 345 Java LOC + JSP",
       "orm": "source/sqlmap/exchange.xml — iBATIS 2 sql-map (130 LOC)",
-      "design_specs": "input/rules.json + input/domain.json + input/antipatterns.json + input/inventory.json (analysis 4종)",
+      "design_specs": "input/business-rules.json + input/domain.json + input/antipatterns.json + input/inventory.json (analysis 4종)",
       "test_code": "characterization/snapshots/UC-EXCHANGE-{002,006,007}.json — phase 4.7 golden snapshot 3종 (★ characterization 본질은 enum 부재 — carry C-9 / phase 4.7 본체 격상 v2.1.0 시 enum 'characterization' 추가 후보)",
       "documentation": "characterization/intent-vs-bug.md + characterization/coverage.json"
     },
@@ -17,7 +17,7 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json",
@@ -201,7 +201,7 @@
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json"

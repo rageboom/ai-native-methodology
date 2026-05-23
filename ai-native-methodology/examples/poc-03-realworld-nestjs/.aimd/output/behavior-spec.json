@@ -10,7 +10,7 @@
   "derivation_source": {
     "planning_spec_path": ".aimd/output/planning-spec.json",
     "analysis_artifacts": [
-      "output/rules/rules.json",
+      "output/rules/business-rules.json",
       "output/domain/domain.json"
     ]
   },
@@ -26,7 +26,7 @@
       "invariants": ["no two users share same email or username"],
       "acceptance_criteria_refs": ["AC-USER-SIGNUP-001"],
       "source_grounded_evidence": [
-        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.create)"
+        "source/src/user/user.service.ts (UserService.create)"
       ]
     },
     {
@@ -40,14 +40,14 @@
       "invariants": [],
       "acceptance_criteria_refs": ["AC-USER-LOGIN-001"],
       "source_grounded_evidence": [
-        "examples/poc-03-realworld-nestjs/source/src/user/user.service.ts (UserService.findOne)"
+        "source/src/user/user.service.ts (UserService.findOne)"
       ]
     }
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "examples/poc-03-realworld-nestjs/output/rules/rules.json",
-      "examples/poc-03-realworld-nestjs/output/domain/domain.json"
+      "output/rules/business-rules.json",
+      "output/domain/domain.json"
     ]
   }
 }

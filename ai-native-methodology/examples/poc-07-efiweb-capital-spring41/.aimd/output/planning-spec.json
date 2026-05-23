@@ -16,7 +16,7 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json",
@@ -288,7 +288,7 @@
   ],
   "cross_links": {
     "to_analysis_artifacts": [
-      "input/rules.json",
+      "input/business-rules.json",
       "input/domain.json",
       "input/antipatterns.json",
       "input/inventory.json"
