@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm } from '../src/validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm, validateFailModeDistribution } from '../src/validator.js';
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -251,6 +251,73 @@ describe('chain-coverage-validator', () => {
       assert.equal(validateRisksForm({ risks_and_constraints: [] }).findings.length, 0);
       assert.equal(validateRisksForm(null).findings.length, 0);
       assert.equal(validateRisksForm(undefined).findings.length, 0);
+    });
+  });
+
+  describe('v8.14.0 validateFailModeDistribution — F-SIM-005 P1 본격 흡수 (Adzic SBE 함정 회피)', () => {
+    it('all compile_import_fail RED → corroboration_qualified=true / 0 finding (Beck-canonical 정합)', () => {
+      const testSpec = {
+        test_cases: [
+          { id: 'TC-001', expected_outcome: 'fail', fail_mode: 'compile_import_fail' },
+          { id: 'TC-002', expected_outcome: 'fail', fail_mode: 'compile_import_fail' }
+        ]
+      };
+      const r = validateFailModeDistribution(testSpec);
+      assert.equal(r.findings.length, 0);
+      assert.equal(r.fail_mode_distribution.compile_import_fail, 2);
+      assert.equal(r.fail_mode_distribution.dry_run_placeholder, 0);
+      assert.equal(r.fail_mode_distribution.corroboration_qualified, true);
+    });
+
+    it('any dry_run_placeholder → corroboration_qualified=false + low finding emit (warn-only / Senior REVISE-3)', () => {
+      const testSpec = {
+        test_cases: [
+          { id: 'TC-001', expected_outcome: 'fail', fail_mode: 'assertion_fail' },
+          { id: 'TC-002', expected_outcome: 'fail', fail_mode: 'dry_run_placeholder' },
+          { id: 'TC-003', expected_outcome: 'fail', fail_mode: 'dry_run_placeholder' }
+        ]
+      };
+      const r = validateFailModeDistribution(testSpec);
+      assert.equal(r.findings.length, 1);
+      assert.equal(r.findings[0].kind, 'chain.test_spec.dry_run_placeholder_present');
+      assert.equal(r.findings[0].severity, 'low'); // warn-only default
+      assert.equal(r.findings[0].dry_run_count, 2);
+      assert.equal(r.fail_mode_distribution.corroboration_qualified, false);
+      assert.deepEqual(r.findings[0].affected_indices, [1, 2]);
+    });
+
+    it('mixed compile_import + assertion + pending + absent → fail_mode_absent warn / dry_run 0 → qualified=true', () => {
+      const testSpec = {
+        test_cases: [
+          { id: 'TC-001', expected_outcome: 'fail', fail_mode: 'compile_import_fail' },
+          { id: 'TC-002', expected_outcome: 'fail', fail_mode: 'assertion_fail' },
+          { id: 'TC-003', expected_outcome: 'fail', fail_mode: 'pending' },
+          { id: 'TC-004', expected_outcome: 'fail' } // absent legacy carry
+        ]
+      };
+      const r = validateFailModeDistribution(testSpec);
+      assert.equal(r.findings.length, 1); // absent_warn only
+      assert.equal(r.findings[0].kind, 'chain.test_spec.fail_mode_absent_warn');
+      assert.equal(r.fail_mode_distribution.absent, 1);
+      assert.equal(r.fail_mode_distribution.pending, 1);
+      assert.equal(r.fail_mode_distribution.corroboration_qualified, true); // dry_run = 0
+    });
+
+    it('GREEN only (expected_outcome=pass) + empty + null → 0 finding (graceful / chain 4 단계)', () => {
+      const testSpec = {
+        test_cases: [
+          { id: 'TC-001', expected_outcome: 'pass', impl_module_ref: 'IMPL-001' }
+        ]
+      };
+      const r = validateFailModeDistribution(testSpec);
+      assert.equal(r.findings.length, 0);
+      assert.equal(r.fail_mode_distribution.total_red, 0);
+      assert.equal(r.fail_mode_distribution.corroboration_qualified, true);
+      // empty / null graceful
+      assert.equal(validateFailModeDistribution({}).findings.length, 0);
+      assert.equal(validateFailModeDistribution({ test_cases: [] }).findings.length, 0);
+      assert.equal(validateFailModeDistribution(null).findings.length, 0);
+      assert.equal(validateFailModeDistribution(undefined).findings.length, 0);
     });
   });
 });

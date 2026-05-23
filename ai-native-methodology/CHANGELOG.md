@@ -9,6 +9,82 @@
 
 ---
 
+## [8.14.0] — 2026-05-23 MINOR — F-SIM-005 P1 corroboration #2 본격 해소 + Type 분류 3계층화 paradigm 진화 + fail_mode_qualification boolean 강제 (Adzic SBE 함정 직접 회피)
+
+> F-SIM-005 P1 carry (commit-block deadline 2026-06-01 / D-9) 본격 해소. 사용자 결단 "ㄱㄱ" (4원칙 §1+§2+§3 ladder full / 3-agent Senior REVISE-3 @ 0.83 흡수 + 옵션 α 채택). additive / breaking 0.
+
+### 본질 진화 (paradigm)
+
+본 release = v8.4.0 (2026-05-18) 의 "패러독스 해소" claim 을 ★ ★ ★ **진정 해소** 로 격상. v8.4.0 시점에 PoC #14 corroboration #2 자격 명목 달성 (Type 1 / Claude self-run / Python+pytest) 했으나, 본질 잔존 = Type 1 vs Type 2 분리 미명시 + fail_mode enum 부재 + dry_run_placeholder 자격 mask 가능성 잔존. v8.14.0 = Type 분류 3계층화 paradigm 진화 + fail_mode 4종 enum + boolean 강제로 본격 해소.
+
+★ ★ ★ ★ ★ **self-bootstrap proof 부분 입증** = PoC #05 Type 1.5 single arm 본격 달성 (TypeScript+vitest / 본 user 별도 PoC 적용 / Rust/GCC Stage 3 identity check 동형). Type 1.5 second arm + Type 2 = carry 정직 표기 (commit-block 회피 꼼수 ❌).
+
+### 4원칙 ladder full
+
+1. **1원칙 (plan)**: `.claude/plans/plan-fsim-005-corroboration-2.md` + REVISE-1+2+3+LOW 흡수 갱신
+2. **2원칙 (3-agent)**: `_base-official-docs-checker` (F-015 Claim A VERIFIED / Claim B PARTIAL-VERIFIED / Claim C PARTIAL / STOP 없음) + `_base-industry-case-researcher` (9 case isomorphic / first-mover 자격 ✅ / 함정 회피 3종 ✅) + `_base-senior-engineer` (REVISE-3 @ 0.83 / STRONG-STOP 1 + HIGH 1 + MED 1 + LOW 1 흡수)
+3. **3원칙 (사용자 묶음 결단)**: A5 + B3 + C3 + D2 권고 전면 흡수 → Senior REVISE 전면 흡수 (A5' + B3' + C3' + D2 + LOW) → poc-02 source empty 발견 시 옵션 α 채택 (carry 정직 표기 + 현 상태 release)
+
+### Senior REVISE 흡수 (4종)
+
+- **REVISE-1 BLOCKER**: Type 2 9일 시한 안 불가능 → Type 분류 3계층화 (Type 1 / Type 1.5 / Type 2) + Type 2 carry 정직 표기
+- **REVISE-2 HIGH**: poc-15 신설 ❌ → poc-02 재검증 → (turn 중 source empty 발견 / 옵션 α 채택) → carry 정직 표기
+- **REVISE-3 MED**: dry-run 30% 임계 §8.1 단일 PoC 함정 위배 → warn-only + boolean 강제 (임계 ratio ❌ / 30% ratchet = v+1)
+- **LOW**: "5번째 export" 사실 오류 → "7번째 export (utility 제외 6번째)" 정정
+
+### 자산 변경 (additive / breaking 0)
+
+- **`schemas/test-spec.schema.json`** — `test_cases.items.properties.fail_mode` enum 4종 (compile_import_fail / assertion_fail / dry_run_placeholder / pending) 추가 (additive optional)
+- **`tools/chain-coverage-validator/src/validator.js`** — `validateFailModeDistribution` 7번째 export 신설 (warn-only / dry_run_placeholder boolean 강제 + corroboration_qualified 반환)
+- **`tools/chain-coverage-validator/src/cli.js`** — `--test-spec <path>` flag wire + JSON/human output + exit code 보존 (warn-only)
+- **`tools/chain-coverage-validator/test/validator.test.js`** — 신규 4 test 추가 (all-compile_import / any-dry_run / mixed-pending-absent / GREEN+graceful) — 30/30 → **34/34 pass**
+- **`flows/sdlc-4stage-flow.json`** — `release_eligibility.corroboration_type_levels` 3계층 신설 (Type 1 / Type 1.5 / Type 2 + 권위 동형 명시) + `fail_mode_qualification` boolean 강제 (qualified_modes 3종 + excluded dry_run_placeholder) + items 7 갱신 + self_consistency_note 정직 표기 (Type 1.5 single arm 본격 + Type 1 partial 보존 + Type 1.5 second arm carry + Type 2 carry)
+- **`examples/poc-05-sample-user-register/.aimd/output/test-spec.json`** — `fail_mode: assertion_fail` 표기 2건 (additive)
+- **`examples/poc-14-fsim-corroboration/.aimd/output/test-spec.json`** — `fail_mode: assertion_fail` 표기 4건 (additive)
+- 3-way version sync = plugin.json + package.json + CHANGELOG.md 8.13.3 → 8.14.0
+- DEC-2026-05-23-fsim-005-corroboration-2-genuine 신설 + INDEX 최상단 + STATUS session 39차 + CLAUDE.md sync
+
+### F-015 권위 (3 primary source VERIFIED)
+
+- **Beck-canonical RED** = Kent Beck "Test-Driven Development: By Example" (Addison-Wesley 2002) preface p.x verbatim: "Red — Write a little test that doesn't work, **and perhaps doesn't even compile at first**"
+- **DO-178C bidirectional traceability** = Parasoft Learning Center verbatim: "Maintaining the bidirectional correlation between requirements, tests, and the artifacts that implement them is an essential component of traceability"
+- **Adzic SBE 10-year lesson** = gojko.net/2020/03/17/sbe-10-years.html verbatim: "about one third of the teams miss out on the potential benefits of examples to create high quality, self-checking documentation"
+
+### Industry case 9 case isomorphic (first-mover 자격)
+
+- **Self-bootstrap 영역**: Rust 4-stage bootstrap (Stage 3 identity check) + GCC 3-stage + Go self-hosting
+- **Spec-driven gate 영역**: GitHub Spec Kit (specify→plan→tasks→implement + validator) + ThoughtWorks Radar "big-bang anti-pattern" + SWE-bench static/Live 격차 35~50%p
+- **Type 1 vs Type 2 영역**: Waymo CarCraft simulation arm + 실도로 arm 병렬 + Anthropic Bloom auto-eval + NIST/AISI 외부 eval 분리 + HumanEval/SWE-bench gap
+
+### STOP-3 hard gate (시행 결과)
+
+- ✅ workspace test 690 → **694/694 pass** (신규 4 test additive)
+- ✅ schema-validator 4 PoC test-spec 모두 VALID (additive optional 회귀 ❌)
+- ✅ release-readiness 15/16 ready (1 = --skip-workspace-test 명시 skip / release 시 disable 의무)
+- ✅ JSON validity (corroboration_type_levels 3 + qualified_modes 3 + items 7)
+- ✅ fail_mode regression: poc-05 + poc-14 모두 corroboration_qualified=true
+- ✅ chain-coverage-validator 34/34 pass
+- ✅ breaking 0 (additive enum + new export only)
+
+### Carry (정직 표기)
+
+- **Type 1.5 second arm** = poc-02 source empty 발견 (Senior 사실 검증 보강) / poc-03 NestJS chain 4 yellow / poc-04-mini React chain 4 yellow — deadline 없음
+- **Type 2** = 외부 사용자 / 외부 repo / 별도 Claude Code session — deadline 없음 / OSS 채택 트리거 의존
+- 두 carry 모두 **commit-block 회피 꼼수 ❌** paradigm 정합 = release-readiness 자기 enforcement 본격 입증대
+
+### LL 자산화 (8종 / LL-fsim-05~12)
+
+- F-SIM-011 패러독스 진정 해소 부분 입증 (Type 1.5 single arm)
+- Beck-canonical RED = compile-import-fail (F-015 VERIFIED)
+- dry_run_placeholder 정직 표기 의무 (Adzic 함정 회피)
+- Type 분류 3계층화 paradigm 진화
+- Senior STRONG-STOP signal 흡수 paradigm (v8.6.0 동형)
+- single-PoC threshold 함정 자기 검출 (warn-only 격하)
+- Senior 사실 검증 보강 paradigm (AI 결단 ladder 안 사실 검증 의무 / poc-02 source empty 발견)
+- commit-block 회피 꼼수 ❌ paradigm = release-readiness 자기 enforcement 입증대
+
+---
+
 ## [8.13.3] — 2026-05-23 PATCH — dist/ 전체 정리 (잔여 v1.4.5 + v1.5.0 archive / cleanup carry 종결)
 
 > v8.13.2 carry "C-dist-v145-v15-cleanup" (low) 종결. v8.13.2 dist/internal-v1.4.3 + v1.4.4 archive paradigm 동형 시행 (gitignored / file system mv / commit 자산 변경 0). 사용자 결단 "케리해줘" (2026-05-23). additive corrective / breaking 0.

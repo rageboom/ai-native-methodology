@@ -21,6 +21,7 @@
       "source_file": "target/tests/test_users.py",
       "source_evidence": "test_tc_user_fsim_001_register_with_duplicate_email_raises + test_tc_user_fsim_001_register_happy_path",
       "expected_outcome": "fail",
+      "fail_mode": "assertion_fail",
       "test_run_evidence": {
         "test_runner_version": "pytest 8.4.2",
         "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
@@ -46,6 +47,7 @@
       "source_file": "target/tests/test_users.py",
       "source_evidence": "test_tc_user_fsim_002_login_match_returns_token + test_tc_user_fsim_002_login_mismatch_returns_none",
       "expected_outcome": "fail",
+      "fail_mode": "assertion_fail",
       "test_run_evidence": {
         "test_runner_version": "pytest 8.4.2",
         "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
@@ -71,6 +73,7 @@
       "source_file": "target/tests/test_todos.py",
       "source_evidence": "test_tc_todo_fsim_001_create_happy_path",
       "expected_outcome": "fail",
+      "fail_mode": "assertion_fail",
       "test_run_evidence": {
         "test_runner_version": "pytest 8.4.2",
         "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",
@@ -96,6 +99,7 @@
       "source_file": "target/tests/test_todos.py",
       "source_evidence": "test_tc_todo_fsim_002_update_by_owner + test_tc_todo_fsim_002_update_by_non_owner_rejected",
       "expected_outcome": "fail",
+      "fail_mode": "assertion_fail",
       "test_run_evidence": {
         "test_runner_version": "pytest 8.4.2",
         "test_runner_stdout_path": ".aimd/output/evidence/pytest-red.json",

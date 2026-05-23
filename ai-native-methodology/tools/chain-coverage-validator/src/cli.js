@@ -5,7 +5,7 @@
 //   default: warn-mode (broken-path = medium / non-blocking) — F-MB-009 LL-i-55 함정존 회피
 //   --strict-paths: broken-path = high / blocking — release-readiness #14 baseline ratchet 진입 후 v+1 default 전환
 
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, loadJson } from './validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, validateFailModeDistribution, loadJson } from './validator.js';
 import { dirname } from 'node:path';
 
 function parseArgs(argv) {
@@ -16,6 +16,7 @@ function parseArgs(argv) {
     else if (a === '--behavior') out.behavior = argv[++i];
     else if (a === '--acceptance') out.acceptance = argv[++i];
     else if (a === '--antipatterns') out.antipatterns = argv[++i];
+    else if (a === '--test-spec') out.testSpec = argv[++i];
     else if (a === '--threshold') out.threshold = parseFloat(argv[++i]);
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
@@ -46,6 +47,7 @@ const planning = args.planning ? loadJson(args.planning) : null;
 const behavior = loadJson(args.behavior);
 const acceptance = loadJson(args.acceptance);
 const antipatterns = args.antipatterns ? loadJson(args.antipatterns) : null;
+const testSpec = args.testSpec ? loadJson(args.testSpec) : null;
 
 const result = validateChainCoverage(planning, behavior, acceptance, args.threshold);
 
@@ -54,6 +56,9 @@ const apResult = validateAntipatternCoverage({ antipatterns, acceptanceCriteria:
 
 // ★ v8.11.0: risks_and_constraints string form (legacy carry) warn lane (Senior REVISE-1)
 const risksFormResult = validateRisksForm(planning);
+
+// ★ v8.14.0: F-SIM-005 P1 본격 흡수 — test_cases[].fail_mode 분포 + dry_run_placeholder boolean 강제 (warn-only / Senior REVISE-3)
+const failModeResult = testSpec ? validateFailModeDistribution(testSpec) : { findings: [], fail_mode_distribution: null, summary: { total_findings: 0, dry_run_count: 0, corroboration_qualified: true } };
 
 // ★ F-SIM-003: cross-ref path resolve (separate validation pass)
 let pathResult = { findings: [], summary: { total_findings: 0, broken_path_count: 0, path_convention_warning_count: 0, strict_mode: args.strictPaths } };
@@ -69,7 +74,7 @@ if (args.planning || args.behavior) {
 }
 
 if (args.json) {
-  console.log(JSON.stringify({ coverage: result, cross_refs: pathResult, antipattern_coverage: apResult, risks_form: risksFormResult }, null, 2));
+  console.log(JSON.stringify({ coverage: result, cross_refs: pathResult, antipattern_coverage: apResult, risks_form: risksFormResult, fail_mode: failModeResult }, null, 2));
 } else {
   console.log(`[chain-coverage-validator] ${result.summary.total_findings} coverage findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);
   console.log(`coverage UC→BHV: ${(result.coverage.uc_to_bhv * 100).toFixed(1)}% / BHV→AC: ${(result.coverage.bhv_to_ac * 100).toFixed(1)}% (threshold ${args.threshold})`);
@@ -91,6 +96,13 @@ if (args.json) {
   if (risksFormResult.summary.string_count > 0) {
     console.log(`[risks-form] string=${risksFormResult.summary.string_count} / object=${risksFormResult.summary.object_count} / total=${risksFormResult.summary.total_count} (★ v8.11.0 / Senior REVISE-1 legacy carry warn lane)`);
     for (const f of risksFormResult.findings) {
+      console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
+    }
+  }
+  if (testSpec && failModeResult.fail_mode_distribution) {
+    const d = failModeResult.fail_mode_distribution;
+    console.log(`[fail-mode] compile_import=${d.compile_import_fail} / assertion=${d.assertion_fail} / dry_run=${d.dry_run_placeholder} / pending=${d.pending} / absent=${d.absent} / total_red=${d.total_red} / corroboration_qualified=${d.corroboration_qualified} (★ v8.14.0 / F-SIM-005 P1 / Adzic SBE 함정 회피)`);
+    for (const f of failModeResult.findings) {
       console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
     }
   }

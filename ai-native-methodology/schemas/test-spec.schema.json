@@ -68,6 +68,11 @@
             "enum": ["pass", "fail"],
             "description": "★ chain 3 RED 의무 = 'fail' (impl 부재 / chain 4 GREEN 시 'pass' 격상)"
           },
+          "fail_mode": {
+            "type": "string",
+            "enum": ["compile_import_fail", "assertion_fail", "dry_run_placeholder", "pending"],
+            "description": "★ F-SIM-005 P1 본격 흡수 (v8.14.0 / DEC-2026-05-23-fsim-005-corroboration-2-genuine). per-TC RED granularity 의무화. compile_import_fail = Beck-canonical 정합 (Kent Beck 2002 preface p.x verbatim 'test doesn't even compile at first') / assertion_fail = per-TC RED 표준 / dry_run_placeholder = ★ corroboration 자격 ❌ (Adzic SBE 10년 폐기 함정 직접 회피 — gojko.net/2020/03/17/sbe-10-years.html) / pending = Cucumber yellow (skipped) 정합 (Senior REVISE-1 추가 권고). expected_outcome='fail' 시 권고 (optional / chain 3 RED granularity 입증). expected_outcome='pass' (chain 4 GREEN) 시 미사용."
+          },
           "impl_module_ref": {
             "type": "string",
             "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$",

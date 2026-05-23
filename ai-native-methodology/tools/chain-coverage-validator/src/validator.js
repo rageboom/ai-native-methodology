@@ -372,6 +372,81 @@ export function validateConfidenceCoverage(graph) {
   };
 }
 
+// ★ v8.14.0 (F-SIM-005 P1 본격 흡수 / DEC-2026-05-23-fsim-005-corroboration-2-genuine).
+// test_cases[].fail_mode 분포 + dry_run_placeholder boolean 강제 lane.
+// Senior REVISE-3 흡수 (research-fsim-005-corroboration-2.md §1.1) — dry-run ratio 임계 = warn-only (v8.14.0) / 30% ratchet = v+1 (≥ 2 PoC 실측 후 결정 / §8.1 단일 PoC 함정 회피).
+// 권위: Adzic SBE 10년 폐기 함정 (gojko.net/2020/03/17/sbe-10-years.html / F-015 VERIFIED 2026-05-23) 직접 회피.
+// 본 lane = corroboration 자격 시 dry_run_placeholder 제외 boolean 만 강제 / 임계 ratio ❌.
+// 7번째 export (utility loadJson 제외 시 6번째).
+export function validateFailModeDistribution(testSpec, opts = {}) {
+  const findings = [];
+  const { strict = false } = opts;
+  const tcs = Array.isArray(testSpec?.test_cases) ? testSpec.test_cases : [];
+
+  let compileImport = 0;
+  let assertion = 0;
+  let dryRun = 0;
+  let pending = 0;
+  let absent = 0;
+  let total = 0;
+  const dryRunIndices = [];
+
+  tcs.forEach((tc, idx) => {
+    if (tc?.expected_outcome !== 'fail') return; // RED 단계 TC 만 대상 (GREEN 시 fail_mode 미사용)
+    total++;
+    const mode = tc?.fail_mode;
+    if (mode === 'compile_import_fail') compileImport++;
+    else if (mode === 'assertion_fail') assertion++;
+    else if (mode === 'dry_run_placeholder') {
+      dryRun++;
+      dryRunIndices.push(idx);
+    } else if (mode === 'pending') pending++;
+    else absent++; // fail_mode 미선언 (legacy carry / v8.13.x 이하)
+  });
+
+  // ★ dry_run_placeholder = corroboration 자격 ❌ (boolean / 임계 ratio ❌)
+  if (dryRun > 0) {
+    findings.push({
+      kind: 'chain.test_spec.dry_run_placeholder_present',
+      severity: strict ? 'high' : 'low',
+      dry_run_count: dryRun,
+      total_red_count: total,
+      affected_indices: dryRunIndices,
+      message: `test_cases 안 dry_run_placeholder ${dryRun} item / 총 RED ${total} — corroboration 자격 ❌ (Adzic SBE 10년 폐기 함정 직접 회피). 진짜 RED (compile_import_fail / assertion_fail) 또는 pending (Cucumber yellow) 으로 재분류 의무. dry_run 임계 ratio = warn-only (v8.14.0) / 30% ratchet = v+1 (≥ 2 PoC 실측 후 결정 / §8.1 단일 PoC 함정 회피).`
+    });
+  }
+
+  // ★ fail_mode 미선언 (legacy carry warn) — additive optional 이므로 silent OK 이나 표면화
+  if (absent > 0) {
+    findings.push({
+      kind: 'chain.test_spec.fail_mode_absent_warn',
+      severity: 'low',
+      absent_count: absent,
+      total_red_count: total,
+      message: `test_cases 안 fail_mode 미선언 ${absent} item / 총 RED ${total} — legacy carry 한정 (v8.14.0+ 권장 = compile_import_fail / assertion_fail / dry_run_placeholder / pending 명시). expected_outcome='fail' TC 만 대상.`
+    });
+  }
+
+  return {
+    findings,
+    fail_mode_distribution: {
+      compile_import_fail: compileImport,
+      assertion_fail: assertion,
+      dry_run_placeholder: dryRun,
+      pending,
+      absent,
+      total_red: total,
+      dry_run_ratio: total === 0 ? 0 : dryRun / total,
+      corroboration_qualified: dryRun === 0 // ★ boolean = corroboration 자격 (dry_run 0건 의무)
+    },
+    summary: {
+      total_findings: findings.length,
+      dry_run_count: dryRun,
+      corroboration_qualified: dryRun === 0
+    }
+  };
+}
+
 export function loadJson(path) {
   if (!existsSync(path)) return null;
   try { return JSON.parse(readFileSync(path, 'utf-8')); }
