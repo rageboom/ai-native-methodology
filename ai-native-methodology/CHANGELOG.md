@@ -9,6 +9,59 @@
 
 ---
 
+## [8.14.3] — 2026-05-23 PATCH — F-SIM-016 closed (R19 Tier 2 environment-dependent risk sub-axis paradigm 진화 / Tier 3 격상 ❌)
+
+> v8.14.2 carry F-SIM-016 본격 종결. 사용자 결단 "나머지 진행 하자" → #1 F-SIM-016 영구 scope-out 채택. paradigm 정합 = Tier 2 sub-axis 본격 명시 (Tier 3 격상 ❌ / simulated 와 본질 구분). additive doc only / breaking 0.
+
+### 본질 (paradigm self-correction 본격 입증대)
+
+v8.14.1 정식 ledger 등재 시 carry note = "R19 Tier 3 영구 reject 격상 후보" 명시 = ★ **사실 잘못** (Tier 3 = simulated only). Senior 사실 검증 보강 paradigm 재발 (LL-fsim-11 본격 입증 확장 = ★ main agent self-fact-check).
+
+★ ★ ★ **paradigm self-correction 본격 입증대**:
+- Tier 3 = simulated only 본격 재확인
+- environment-dependent risk = 사용자 환경 부재 case (simulated 아님)
+- paradigm 정합 path = Tier 2 안 **sub-axis** 본격 명시 + carry 정직 표기
+
+### R19 Tier 2 environment-dependent risk sub-axis (paradigm 진화)
+
+charter R19 row sub-axis patch:
+- 사용자 환경 부재 (Semgrep Windows MSYS2 / argon2+Node 22+Windows native build / sqlite3 native rebuild 등) = Tier 3 격상 ❌
+- carry 정직 표기 의무 (deadline 없음 / 환경 가용 시 본격 진입)
+- pre-flight smoke STOP-3 hard gate paradigm (LL-fsim-15) + Senior 사실 검증 보강 paradigm (LL-fsim-11) 정합
+
+### 자산 변경 (additive doc / breaking 0)
+
+- **`methodology-spec/plugin-charter.md`** — §2 R19 row sub-axis patch (environment-dependent risk 본격 명시)
+- **`methodology-spec/finding-system.md`** — F-SIM-016 ledger 표 row status open → closed v8.14.3 + body Resolved fix + Status 갱신
+- **memory `feedback_environment_dependent_tools_scope_out.md`** — 본격 신설 (feedback type / Tier 3 격상 ❌ paradigm 본격 명시 / Cross-link feedback-commit-block-no-cheat + feedback-senior-fact-check-supplement)
+- **memory MEMORY.md** — index 본격 entry 추가
+- **`decisions/DEC-2026-05-23-fsim-016-environment-dependent-scope-out.md`** — 본 DEC 신설
+- 3-way version sync = plugin.json + package.json + CHANGELOG 8.14.2 → 8.14.3
+- INDEX 최상단 + STATUS session 39차 v8.14.3 sub-entry + CLAUDE.md sync
+
+### STOP-3 hard gate (시행 결과)
+
+- ✅ paradigm 정합 (Tier 3 = simulated only) 본격 재확인
+- ✅ Tier 2 sub-axis 본격 명시 (additive paradigm 진화)
+- ✅ F-SIM-016 status closed v8.14.3
+- ✅ skill-citation-validator 0 stale (보존)
+- ✅ breaking 0 (PATCH)
+
+### LL 자산화 (2종 / LL-fsim-18 + LL-r19-04)
+
+- LL-fsim-18 — Senior 사실 검증 보강 paradigm 안 main agent self-fact-check 본격 작동 (Tier 3 격상 후보 사실 잘못 발견 + paradigm 정합 path 본격 결정) = LL-fsim-11 본격 확장
+- LL-r19-04 — R19 Tier 2 안 environment-dependent risk sub-axis paradigm 진화 (sub-axis 본격 분류 의무 / 14차 retract pattern 회피)
+
+### 본 session 누적 4 release (v8.14.0 MINOR + v8.14.1 PATCH + v8.14.2 PATCH + v8.14.3 PATCH)
+
+### Cross-link
+
+- Resolves F-SIM-016 (v8.4.0 carry / v8.14.1 정식 ledger / v8.14.2 carry note 본격 정정)
+- Amends charter R19 (v8.6.0 신설 / v8.14.3 sub-axis patch)
+- Cross-link: DEC-2026-05-18-runtime-tool-exclusion + DEC-2026-05-23-poc-03-carry-acknowledged
+
+---
+
 ## [8.14.2] — 2026-05-23 PATCH — poc-03 chain 4 GREEN = deadline 없는 carry 정직 표기 (Senior STRONG-STOP signal 2종 본격 입증 + paradigm enforcement 본격 입증대)
 
 > Type 1.5 second arm sprint 본격 종결 = poc-03 carry 정직 표기 paradigm. 사용자 결단 ladder = "이제 진행 하자" → C (Type 1.5 second arm) → A1+B2+C1+D1+E2 + sqlite → Senior REVISE-3 STRONG-STOP 2종 발견 → REVISE 전면 흡수 → C3.5 pre-flight smoke FAIL → 옵션 B (carry 정직 표기). additive doc only / breaking 0.

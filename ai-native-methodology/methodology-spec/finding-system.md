@@ -475,7 +475,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 013 | medium | **closed v8.14.0** | Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm) — v8.14.0 Type 분류 3계층화 paradigm 본격 흡수 (Type 1 정식 분류 + Type 2 carry 정직 표기 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §1) |
 > | 014 | low | open (v8.4.0 carry) | analysis-form-validation-fe description "FE-only" → Pydantic BE schema validation cover ❌ — skill description scope 확장 후보 (P2 cooling-off 후 별 결단) |
 > | 015 | **high** | **closed v8.14.0** | test-spec.fail_mode schema 미허용 / F-SIM-005 P1 carry 즉시 영향 — v8.14.0 fail_mode enum 4종 (compile_import_fail/assertion_fail/dry_run_placeholder/pending) 추가 + chain-coverage-validator validateFailModeDistribution 7번째 export (warn-only / boolean 강제) 본격 흡수 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §3 |
-> | 016 | low | open (v8.4.0 carry) | static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ — 환경 의존 도구 (R19 Tier 2) 영구 scope-out 후보 (cooling-off 후 별 결단) |
+> | 016 | low | **closed v8.14.3** | static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ — v8.14.3 본격 흡수 (R19 Tier 2 안 environment-dependent risk sub-axis 본격 명시 / Tier 3 격상 ❌ paradigm 정합 / memory `feedback_environment_dependent_tools_scope_out` 본격 신설 / DEC-2026-05-23-fsim-016-environment-dependent-scope-out §1) |
 >
 > ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2. ★ v8.14.0 본격 흡수 = F-SIM-005 (P1 carry 본격 해소) + F-SIM-013 (Type 분류 3계층화 paradigm 안 흡수) + F-SIM-015 (test-spec.fail_mode schema 본격 추가). 잔존 carry = F-SIM-012/014/016 (cooling-off 후 별 session 결단).
 
@@ -682,7 +682,8 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
 - **Severity:** low — 환경 의존 / R19 Tier 2 paradigm 정합 / pipx 또는 Docker 우회 가능.
 - **Proposed fix:** (a) Semgrep deprecated wrapper 영구 scope-out 결단 (memory environment-dependent-tools-scope-out 정합 / R19 Tier 3 영구 reject 격상) 또는 (b) Tier 1 (in-plugin) ESLint-based AST scan 대체 후보 (v8.13.0 xmllint → fast-xml-parser Tier 1 격상 paradigm 동형) — cooling-off 후 별 결단.
-- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / 환경 의존 도구 영구 scope-out 후보 / cooling-off 후 별 결단).
+- **Resolved fix (v8.14.3)**: (a)+(b) 변형 = **R19 Tier 2 안 environment-dependent risk sub-axis 본격 명시** (Tier 3 격상 ❌ / simulated paradigm 정합 ❌). charter R19 patch 본격 시행 + memory `feedback_environment_dependent_tools_scope_out.md` 본격 신설. DEC-2026-05-23-fsim-016-environment-dependent-scope-out §1.
+- **Status:** ★ ★ **closed v8.14.3** (R19 Tier 2 sub-axis 본격 명시 / paradigm 정합 carry 정직 표기 / Tier 3 격상 ❌ / simulated 와 본질 구분 본격 명시).
 
 ---
 
