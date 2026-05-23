@@ -781,6 +781,50 @@ function check16_codePointerCoverage(args) {
   };
 }
 
+// ★ ★ v9.0.6 LL-v903-03 follow-up — marketplace.json description ↔ current chain stage sync.
+// 사용자 1차 접점 표면 (plugin install 첫 description) 정합 검증.
+// MAJOR/MINOR stage 변경 시 본 description 까지 cascade 의무 (v9.0.0 → v9.0.1 prose coherence drift case 동형).
+// SSOT: 현재 6-stage = analysis + chain 5 (discovery / spec / plan / test / implement).
+// 검사 axes (3): ① "6단계 chain harness" 또는 "6-stage chain harness" 표기 ② 5 stage name 모두 포함 ③ legacy "planning →" 미포함.
+function check17_marketplaceStageSync() {
+  const marketplacePath = join(ROOT, '.claude-plugin/marketplace.json');
+  if (!existsSync(marketplacePath)) {
+    return { id: 'marketplace_stage_sync', pass: false, detail: 'marketplace.json missing' };
+  }
+  let marketplace;
+  try {
+    marketplace = JSON.parse(readFileSync(marketplacePath, 'utf-8'));
+  } catch (e) {
+    return { id: 'marketplace_stage_sync', pass: false, detail: `marketplace.json parse fail: ${e.message}` };
+  }
+  const plugins = marketplace.plugins || [];
+  if (plugins.length === 0) {
+    return { id: 'marketplace_stage_sync', pass: false, detail: 'marketplace.json plugins[] empty' };
+  }
+  const desc = plugins[0].description || '';
+  const EXPECTED_STAGES = ['discovery', 'spec', 'plan', 'test', 'implement'];
+  const EXPECTED_COUNT_PATTERNS = [/6\s*단계\s*chain\s*harness/, /6[-\s]stage\s*chain\s*harness/i];
+  const LEGACY_PATTERN = /\bplanning\s*[→\->]+/i; // "planning →" 또는 "planning ->" (legacy 5-stage)
+
+  const countMatch = EXPECTED_COUNT_PATTERNS.some((p) => p.test(desc));
+  const missingStages = EXPECTED_STAGES.filter((s) => !desc.toLowerCase().includes(s));
+  const legacyFound = LEGACY_PATTERN.test(desc);
+
+  const issues = [];
+  if (!countMatch) issues.push('"6단계 chain harness" 또는 "6-stage chain harness" 표기 부재');
+  if (missingStages.length > 0) issues.push(`stage 누락: ${missingStages.join(', ')}`);
+  if (legacyFound) issues.push('legacy "planning →" 표기 잔존 (v9.0 6-stage 미전파)');
+
+  return {
+    id: 'marketplace_stage_sync',
+    pass: issues.length === 0,
+    detail: issues.length === 0
+      ? `marketplace.json description 안 "6단계 chain harness" + 5 stage (${EXPECTED_STAGES.join('/')}) 모두 포함 + legacy "planning →" 미포함 ✅`
+      : `drift: ${issues.join(' / ')}`,
+    delegated_to: '.claude-plugin/marketplace.json plugins[0].description ↔ current 6-stage chain harness sync (LL-v903-03 / sweeping MAJOR stage change cascade enforcement)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -802,6 +846,7 @@ function main() {
     check14_preflightTools(args),
     check15_graphIntegrity(),
     check16_codePointerCoverage(args),
+    check17_marketplaceStageSync(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;
