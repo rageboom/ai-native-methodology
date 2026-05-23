@@ -9,6 +9,42 @@
 
 ---
 
+## [8.13.3] — 2026-05-23 PATCH — dist/ 전체 정리 (잔여 v1.4.5 + v1.5.0 archive / cleanup carry 종결)
+
+> v8.13.2 carry "C-dist-v145-v15-cleanup" (low) 종결. v8.13.2 dist/internal-v1.4.3 + v1.4.4 archive paradigm 동형 시행 (gitignored / file system mv / commit 자산 변경 0). 사용자 결단 "케리해줘" (2026-05-23). additive corrective / breaking 0.
+
+### 시행
+
+- `dist/internal-v1.4.5` → `archive/dist-history/internal-v1.4.5` (file system mv)
+- `dist/internal-v1.5.0` → `archive/dist-history/internal-v1.5.0` (file system mv)
+- `dist/` 폴더 = **empty** (전 4 폴더 archive 완료)
+- `archive/dist-history/` = **4 폴더** (v1.4.3 + v1.4.4 + v1.4.5 + v1.5.0)
+
+### 자산 갱신
+
+- `plugin.json` 8.13.2 → 8.13.3 + `package.json` 8.13.2 → 8.13.3 (3-way sync)
+- 본 CHANGELOG entry
+- DEC-2026-05-23-dist-cleanup-final + INDEX 최상단 + STATUS session 38차
+
+### 검증 — STOP-3 hard gate
+
+- dist/ folder 정리 완료 (4 폴더 → archive/dist-history/) ✅
+- workspace test 690/690 pass (보존) ✅
+- release-readiness 16/16 ready (보존) ✅
+- breaking 0 = PATCH (additive corrective)
+
+### carry (다음 session)
+
+- ✅ **carry 잔존 0 보존** (v8.13.1 paradigm 본격 보존)
+
+### 참고
+
+- DEC-2026-05-23-dist-cleanup-final
+- v8.13.2 DEC-2026-05-23-project-cleanup §7 carry C-dist-v145-v15-cleanup 종결
+- v8.13.2 Phase D paradigm 동형
+
+---
+
 ## [8.13.2] — 2026-05-23 PATCH — 프로젝트 정리 cleanup (4 axis archive)
 
 > v8.13.1 carry 잔존 0 + paradigm 안정점 본격 재도달 후 archive cadence 시행. 사용자 결단 "프로젝트를 정리해 보자" → "추천안 묶음 전체 시행 (4 axis)" (2026-05-23). additive corrective / 정보 손실 0 / breaking 0 / cosmetic 4 기준 충족 (rename 0 + cross-ref 치환 0 + 구조 변경 ❌ + plan 명시).
