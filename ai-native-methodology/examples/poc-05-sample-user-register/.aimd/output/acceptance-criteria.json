@@ -2,7 +2,10 @@
   "meta": {
     "generated_at": "2026-05-06T16:35:00Z",
     "methodology_version": "v2.0.0",
-    "inputs_used": ["source_code", "design_specs"],
+    "inputs_used": [
+      "source_code",
+      "design_specs"
+    ],
     "confidence": 0.95,
     "formula_version": "v1"
   },
@@ -25,15 +28,26 @@
           "EmailDuplicateError 가 발생한다",
           "users 저장소 크기는 변하지 않는다"
         ],
-        "tags": ["@must"]
+        "tags": [
+          "@must"
+        ]
       },
       "severity": "must",
       "verifiable": true,
       "automated_runnable": true,
-      "test_case_refs": ["TC-USER-001"],
+      "test_case_refs": [
+        "TC-USER-001"
+      ],
       "gate_required": true,
-      "related_brs": ["BR-USER-DATA-001", "BR-USER-VALIDATION-001"],
-      "related_aps": ["AP-USER-001", "AP-USER-002"]
+      "related_brs": [
+        "BR-USER-DATA-001",
+        "BR-USER-VALIDATION-001"
+      ],
+      "related_aps": [
+        "AP-USER-001",
+        "AP-USER-002"
+      ],
+      "code_pointers_na": true
     },
     {
       "id": "AC-USER-002",
@@ -49,13 +63,18 @@
           "user 객체가 반환된다 (id !== null)",
           "user.email == 'alice@example.com'"
         ],
-        "tags": ["@must"]
+        "tags": [
+          "@must"
+        ]
       },
       "severity": "must",
       "verifiable": true,
       "automated_runnable": true,
-      "test_case_refs": ["TC-USER-002"],
-      "gate_required": true
+      "test_case_refs": [
+        "TC-USER-002"
+      ],
+      "gate_required": true,
+      "code_pointers_na": true
     }
   ]
 }

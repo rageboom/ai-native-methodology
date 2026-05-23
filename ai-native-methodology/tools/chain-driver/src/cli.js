@@ -41,8 +41,13 @@ import { loadSkill, formatSkillSuggestion } from './invoke-skill.js';
 import {
   parseHookInput, buildSuggestOutput, buildBlockOutput,
   suggestSkillForPrompt, shouldBlockToolUse,
+  detectGraphArtifactWrite, evaluatePolicyForEdges,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
+import { analyzeImpact } from './impact-analyzer.js';
+import { loadPolicy, evaluatePolicy, appendProposeRecord } from './policy-evaluator.js';
+import { topologicalOrder, cascadeOrder } from './propagation-orderer.js';
+import { topKImpactRoot } from './centrality.js';
 
 function usage(code = 3) {
   console.error([
@@ -53,7 +58,10 @@ function usage(code = 3) {
     '  state <project> [--json]',
     '  next <project> [--findings <path>] [--user-decision <go|stop|revisit:STAGE>] [--dry-run]',
     '  query <project> [--scope <slug>] [--stage <s>] [--ref <id>] [--stale]',
+    '  query --graph <artifact-graph.json> [--ref <node-id>]   (graph JSON 출력 / 툴링용)',
     '  sync <project> [--scope <slug>]',
+    '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
+    '  navigate --graph <artifact-graph.json> --origin <node-id> [--json]   (dep-graph-navigator backend)',
     '  suggest-skill --prompt <text>',
     '  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
     '  migrate <project>',
@@ -85,6 +93,13 @@ function parseArgs(argv) {
     else if (a === '--stage') out.stage = rest[++i];
     else if (a === '--ref') out.ref = rest[++i];
     else if (a === '--stale') out.stale = true;
+    // dep-graph P3 impact 명령
+    else if (a === '--graph') out.graphPath = rest[++i];
+    else if (a === '--origin') out.origin = rest[++i];
+    else if (a === '--change-kind') out.changeKind = rest[++i];
+    else if (a === '--policy') out.policyPath = rest[++i];
+    else if (a === '--out-jsonl') out.outJsonl = rest[++i];
+    else if (a === '--code-pointer-only') out.codePointerOnly = true;
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
   }
@@ -301,6 +316,25 @@ function cmdNext(args) {
 }
 
 function cmdQuery(args) {
+  // ★ dep-graph P4 (operation.md 결정 7) — query --graph 로 artifact-graph.json JSON 출력 (툴링용).
+  if (args.graphPath) {
+    if (!existsSync(args.graphPath)) {
+      console.error(`[chain-driver] query --graph: graph not found: ${args.graphPath}`);
+      process.exit(3);
+    }
+    let graph;
+    try { graph = JSON.parse(readFileSync(args.graphPath, 'utf-8')); }
+    catch (e) { console.error(`[chain-driver] query --graph parse error: ${e.message}`); process.exit(3); }
+    // 노드 id 필터 (--ref 재사용) 또는 전체
+    if (args.ref) {
+      const node = (graph.nodes ?? []).find(n => n.id === args.ref);
+      const edges = (graph.edges ?? []).filter(e => e.source === args.ref || e.target === args.ref);
+      process.stdout.write(JSON.stringify({ node: node ?? null, edges }, null, 2) + '\n');
+    } else {
+      process.stdout.write(JSON.stringify({ stats: graph.stats, nodes: graph.nodes, edges: graph.edges }, null, 2) + '\n');
+    }
+    process.exit(0);
+  }
   if (!args.project) usage(3);
   const root = resolve(args.project);
   const result = executeQuery(root, {
@@ -310,6 +344,81 @@ function cmdQuery(args) {
     stale: args.stale,
   });
   process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+  process.exit(0);
+}
+
+// ★ dep-graph P4 (operation.md 결정 7) — dep-graph-navigator skill 의 backend.
+// node 상세 + 영향 트리(BFS) + code_pointers + top-K impact root (centrality) 통합.
+// usage: chain-driver navigate --graph <path> --origin <node-id> [--json]
+function cmdNavigate(args) {
+  if (!args.graphPath || !args.origin) {
+    console.error('[chain-driver] navigate: --graph <path> and --origin <node-id> required');
+    process.exit(3);
+  }
+  if (!existsSync(args.graphPath)) {
+    console.error(`[chain-driver] navigate: graph not found: ${args.graphPath}`);
+    process.exit(3);
+  }
+  let graph;
+  try { graph = JSON.parse(readFileSync(args.graphPath, 'utf-8')); }
+  catch (e) { console.error(`[chain-driver] navigate parse error: ${e.message}`); process.exit(3); }
+
+  const node = (graph.nodes ?? []).find(n => n.id === args.origin);
+  if (!node) {
+    console.error(`[chain-driver] navigate: node '${args.origin}' not in graph`);
+    process.exit(3);
+  }
+
+  const policyPath = args.policyPath
+    || join(resolveRepoRoot(process.cwd()), 'policies', 'propagation-policy.json');
+  let policy = null;
+  try { policy = loadPolicy(policyPath); } catch { policy = null; }
+  const nonTraversable = policy?.non_traversable_states ?? ['propose'];
+
+  let impact;
+  try {
+    impact = analyzeImpact(graph, args.origin, {
+      baseGradeOverrides: policy?.edge_grade_overrides ?? undefined,
+      nonTraversableStates: nonTraversable,
+    });
+  } catch (e) { console.error(`[chain-driver] navigate: ${e.message}`); process.exit(3); }
+
+  const topRoots = topKImpactRoot(graph, { k: 3, nonTraversableStates: nonTraversable });
+
+  const result = {
+    node: {
+      id: node.id,
+      artifact_kind: node.artifact_kind,
+      artifact_subkind: node.artifact_subkind,
+      state: node.state,
+      source_path: node.source_path,
+      code_pointers: node.code_pointers ?? [],
+      code_pointers_na: node.code_pointers_na ?? false,
+    },
+    impact: { by_grade: impact.by_grade, forward: impact.forward, backward: impact.backward },
+    top_impact_roots: topRoots,
+    stats: impact.stats,
+  };
+
+  if (args.json) {
+    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+  } else {
+    process.stdout.write(`[dep-graph-navigator] ${node.id} (${node.artifact_kind}/${node.artifact_subkind}) state=${node.state}\n`);
+    process.stdout.write(`  source: ${node.source_path}\n`);
+    if (result.node.code_pointers.length > 0) {
+      process.stdout.write(`  code_pointers:\n`);
+      for (const cp of result.node.code_pointers) {
+        process.stdout.write(`    - ${cp.anchor_type}: ${cp.path}${cp.symbol ? ` #${cp.symbol}` : ''}\n`);
+      }
+    } else {
+      process.stdout.write(`  code_pointers: ${result.node.code_pointers_na ? '(N/A 명시)' : '(없음)'}\n`);
+    }
+    process.stdout.write(`  영향 트리:\n`);
+    process.stdout.write(`    MUST: ${impact.by_grade.MUST.join(', ') || '-'}\n`);
+    process.stdout.write(`    SHOULD: ${impact.by_grade.SHOULD.join(', ') || '-'}\n`);
+    process.stdout.write(`    FYI: ${impact.by_grade.FYI.join(', ') || '-'}\n`);
+    process.stdout.write(`  top-3 impact root (graph-wide): ${topRoots.map(r => `${r.id}(${r.score})`).join(', ')}\n`);
+  }
   process.exit(0);
 }
 
@@ -347,6 +456,44 @@ function cmdSuggestSkill(args) {
   process.exit(0);
 }
 
+// ★ dep-graph P4 (operation.md 결정 7) — SessionStart 그래프 컨텍스트 주입.
+// artifact-graph.json 위치 후보를 탐색해 dirty(state=drift) 노드 수 + top-3 impact root 요약.
+// 그래프 없으면 null (non-fatal).
+function buildGraphSessionContext(root) {
+  const candidates = [
+    join(root, '.aimd', 'output', 'artifact-graph.json'),
+    join(root, '.aimd', 'artifact-graph.json'),
+  ];
+  let graphPath = candidates.find(p => existsSync(p));
+  if (!graphPath) {
+    // scope 별 위치도 탐색 (.aimd/<scope>/artifact-graph.json)
+    try {
+      for (const scope of listScopes(root)) {
+        const p = join(root, '.aimd', scope, 'artifact-graph.json');
+        if (existsSync(p)) { graphPath = p; break; }
+      }
+    } catch { /* ok */ }
+  }
+  if (!graphPath) return null;
+
+  let graph;
+  try { graph = JSON.parse(readFileSync(graphPath, 'utf-8')); }
+  catch { return null; }
+
+  const nodes = graph.nodes ?? [];
+  const driftCount = nodes.filter(n => n.state === 'drift').length;
+  const proposeCount = nodes.filter(n => n.state === 'propose').length;
+  const topRoots = topKImpactRoot(graph, { k: 3 });
+  const rootStr = topRoots.map(r => `${r.id}(${r.score})`).join(', ');
+
+  const parts = [`[dep-graph] ${nodes.length} nodes`];
+  if (driftCount > 0) parts.push(`⚠️ ${driftCount} drift`);
+  if (proposeCount > 0) parts.push(`${proposeCount} propose 대기`);
+  parts.push(`top-3 impact root: ${rootStr || '-'}`);
+  parts.push(`탐색: /dep-graph-navigator <node-id>`);
+  return parts.join(' / ');
+}
+
 function cmdHooksBridge(args) {
   let stdin = '';
   try { stdin = readFileSync(0, 'utf-8'); } catch { /* ok */ }
@@ -365,9 +512,14 @@ function cmdHooksBridge(args) {
     try { recoverTmpFiles(root); } catch { /* non-fatal */ }
     let driftSummary = { marked: [] };
     try { driftSummary = markDrift(root); } catch { /* non-fatal */ }
-    const additionalContext = driftSummary.marked.length > 0
+    let additionalContext = driftSummary.marked.length > 0
       ? `[ai-native-methodology] ⚠️ drift detected in ${driftSummary.marked.length} scope(s): ${driftSummary.marked.join(', ')}. Run: chain-driver sync --scope <slug> to cascade.`
       : '[ai-native-methodology] chain harness ready. M4 sync = drift auto-detect + manual cascade.';
+    // ★ dep-graph P4 (operation.md 결정 7) — artifact-graph.json 있으면 dirty 노드 수 + top-3 impact root 주입.
+    try {
+      const graphInjection = buildGraphSessionContext(root);
+      if (graphInjection) additionalContext += `\n${graphInjection}`;
+    } catch { /* non-fatal — 그래프 없으면 skip */ }
     const out = {
       suppressOutput: true,
       hookSpecificOutput: { additionalContext },
@@ -411,6 +563,42 @@ function cmdHooksBridge(args) {
         process.stderr.write(`[chain-driver] PreToolUse blocked: ${reason}\n`);
         process.exit(2);
       }
+    }
+  }
+  // ★ dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지 → impact_pending 마킹.
+  // hook 은 빠른 detect+mark 만. per-node 영향 분석(BFS)+정책 평가는 `chain-driver impact` 로 분리 (기계적 정직성).
+  if (event === 'PostToolUse') {
+    const detected = detectGraphArtifactWrite({
+      toolName: payload.tool_name,
+      toolInput: payload.tool_input,
+    });
+    if (detected) {
+      const root = payload.cwd || process.cwd();
+      let markedScope = null;
+      try {
+        const state = readState(root);
+        const scope = state?.current_scope;
+        if (scope) {
+          const manifest = readManifest(root, scope);
+          if (manifest) {
+            manifest.sync_state = manifest.sync_state || { drift_detected: false };
+            manifest.sync_state.impact_pending = true;
+            writeManifest(root, scope, manifest);
+            markedScope = scope;
+          }
+        }
+      } catch { /* non-fatal — manifest 없으면 stderr 안내만 */ }
+      const note = `[ai-native-methodology] graph artifact 변경 감지 (${detected.artifact_kind}/${detected.artifact_subkind}: ${detected.filename})`
+        + `${markedScope ? ` — scope '${markedScope}' impact_pending=true` : ''}. `
+        + `영향 분석: chain-driver impact --graph <artifact-graph.json> --origin <node-id>`;
+      const out = {
+        suppressOutput: true,
+        hookSpecificOutput: { additionalContext: note },
+        continue: true,
+      };
+      process.stdout.write(JSON.stringify(out) + '\n');
+      process.stderr.write(note + '\n');
+      process.exit(0);
     }
   }
   // default: pass-through suppress.
@@ -501,6 +689,97 @@ function resolveRepoRoot(start) {
   return start;
 }
 
+// ★ dep-graph P3 (operation.md 결정 4·5) — impact 분석 + 정책 평가 + propose JSONL 기록.
+// usage: chain-driver impact --graph <artifact-graph.json> --origin <node-id>
+//          [--change-kind typo|item_add|item_remove|semantic_change] [--policy <path>]
+//          [--out-jsonl <path>] [--code-pointer-only] [--json]
+function cmdImpact(args) {
+  if (!args.graphPath || !args.origin) {
+    console.error('[chain-driver] impact: --graph <path> and --origin <node-id> required');
+    process.exit(3);
+  }
+  if (!existsSync(args.graphPath)) {
+    console.error(`[chain-driver] impact: graph not found: ${args.graphPath}`);
+    process.exit(3);
+  }
+  let graph;
+  try { graph = JSON.parse(readFileSync(args.graphPath, 'utf-8')); }
+  catch (e) { console.error(`[chain-driver] impact: graph parse error: ${e.message}`); process.exit(3); }
+
+  // 정책 로드 (default = repo policies/propagation-policy.json)
+  const policyPath = args.policyPath
+    || join(resolveRepoRoot(process.cwd()), 'policies', 'propagation-policy.json');
+  let policy = null;
+  try { policy = loadPolicy(policyPath); } catch { policy = null; }
+
+  const changeKind = args.changeKind || 'semantic_change';
+
+  // BFS 영향 분석 (propose 노드는 policy.non_traversable_states 또는 기본 제외)
+  let impact;
+  try {
+    impact = analyzeImpact(graph, args.origin, {
+      codePointerOnly: !!args.codePointerOnly,
+      baseGradeOverrides: policy?.edge_grade_overrides ?? undefined,
+      nonTraversableStates: policy?.non_traversable_states ?? ['propose'],
+    });
+  } catch (e) {
+    console.error(`[chain-driver] impact: ${e.message}`);
+    process.exit(3);
+  }
+
+  // topological order → cascade 순서
+  const topo = topologicalOrder(graph, {
+    nonTraversableStates: policy?.non_traversable_states ?? ['propose'],
+  });
+  const affectedIds = impact.merged.map(e => e.id);
+  const ordered = cascadeOrder(affectedIds, topo.order);
+
+  // 정책 평가 (evaluate_policy deliverable)
+  const nodeById = new Map((graph.nodes ?? []).map(n => [n.id, n]));
+  const originNode = nodeById.get(args.origin);
+  const records = policy
+    ? evaluatePolicyForEdges({
+        affected: impact.merged, originNode, nodeById, policy, evaluatePolicy, changeKind,
+      })
+    : [];
+
+  // JSONL 기록 (operation.md 결정 5 — auto-propose JSONL). dry_run 여부와 무관하게 기록은 함.
+  if (args.outJsonl && records.length > 0) {
+    for (const rec of records) {
+      appendProposeRecord(args.outJsonl, { ...rec, origin: args.origin });
+    }
+  }
+
+  const result = {
+    origin: args.origin,
+    change_kind: changeKind,
+    by_grade: impact.by_grade,
+    cascade_order: ordered,
+    has_cycle: topo.has_cycle,
+    policy_loaded: !!policy,
+    auto_cascade: policy?.auto_cascade ?? { enabled: false, dry_run: true },
+    records,
+    stats: impact.stats,
+  };
+
+  if (args.json) {
+    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+  } else {
+    process.stdout.write(`[chain-driver impact] origin=${args.origin} change=${changeKind}\n`);
+    process.stdout.write(`  MUST: ${impact.by_grade.MUST.join(', ') || '-'}\n`);
+    process.stdout.write(`  SHOULD: ${impact.by_grade.SHOULD.join(', ') || '-'}\n`);
+    process.stdout.write(`  FYI: ${impact.by_grade.FYI.join(', ') || '-'}\n`);
+    if (topo.has_cycle) process.stdout.write(`  ⚠️ cycle detected — 자동 cascade 차단 (graph-integrity #15 fail)\n`);
+    for (const rec of records) {
+      process.stdout.write(`  [${rec.decision}] ${rec.affected_id} (${rec.grade}/${rec.direction}) — ${rec.reasoning}\n`);
+    }
+    if (args.outJsonl && records.length > 0) {
+      process.stdout.write(`  written ${records.length} propose record(s) → ${args.outJsonl}\n`);
+    }
+  }
+  process.exit(0);
+}
+
 function main() {
   const args = parseArgs(process.argv);
   switch (args.command) {
@@ -509,6 +788,8 @@ function main() {
     case 'next':           return cmdNext(args);
     case 'query':          return cmdQuery(args);
     case 'sync':           return cmdSync(args);
+    case 'impact':         return cmdImpact(args);
+    case 'navigate':       return cmdNavigate(args);
     case 'suggest-skill':  return cmdSuggestSkill(args);
     case 'hooks-bridge':   return cmdHooksBridge(args);
     case 'migrate':        return cmdMigrate(args);

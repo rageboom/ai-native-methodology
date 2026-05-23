@@ -108,6 +108,16 @@
             "type": "array",
             "items": {"type": "string"},
             "description": "★ no-simulation — analysis 산출물 / 코드 경로"
+          },
+          "code_pointers": {
+            "type": "array",
+            "description": "★ operation.md 결정 3 + P2 — artifact ↔ code anchor. graph-synthesizer 가 평탄화 / code-pointer-validator 가 검증.",
+            "items": {"$ref": "./code-pointer.schema.json"}
+          },
+          "code_pointers_na": {
+            "type": "boolean",
+            "default": false,
+            "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
           }
         }
       }

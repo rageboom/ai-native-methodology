@@ -120,7 +120,7 @@
 |---|------|-----|---------|
 | P1 | **세션 인계 / Resume 패턴** — chain stage 중단 시 `.aimd/chain-N/<work-unit>/state.json` 으로 재개 | 高 (장시간 chain 의 안정성) | ★★★ |
 | P2 | **단계별 cost/token telemetry** — 각 chain stage 마다 token 사용량 + 자동화율 metric 자동 수집 | 高 (운영 KPI / "AI 자동화 ≥ 85%" 측정) | ★★★ |
-| P3 | **Spec change impact analyzer** — chain 산출물 변경 시 forward/backward link (traceability-matrix) 따라 영향도 자동 산출 | 中 (재작업 최소화 2순위 정합) | ★★ |
+| ~~P3~~ | ✅ **SHIPPED (2026-05-22 / dep-graph)** — Spec change impact analyzer. chain 산출물 변경 시 forward/backward link 따라 영향도 자동 산출. 구현: `tools/chain-driver/src/impact-analyzer.js` (confidence-aware BFS) + `graph-synthesizer.js` (artifact-graph.json) + `code-pointer-validator` + `propagation-policy.json` + `dep-graph-navigator` skill + release-readiness #15/#16. 설계 SSOT = `dep-graph/operation.md` (8 결정 / 7 알고리즘). 운영 가이드 = `docs/dependency-graph.md`. | 中 (재작업 최소화 2순위 정합) | ✅ done |
 | P4 | **산출물 semver + 재사용 catalog** — 5종 이식성 산출물 (rules/domain/openapi/schema/antipatterns) 에 semver 부여 + cross-project catalog | 中 (R4 강화) | ★★ |
 | P5 | **Rollback / undo for failed chain stage** — gate fail 시 stage 산출물 격리 + 직전 상태 복원 hook | 中 | ★★ |
 | P6 | **Statusline chain progress** — 현 stage / gate 상태 / 다음 액션 1줄 노출 | 低 (UX) | ★ |

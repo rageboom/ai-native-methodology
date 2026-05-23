@@ -2,7 +2,11 @@
   "meta": {
     "generated_at": "2026-05-06T16:30:00Z",
     "methodology_version": "v2.0.0",
-    "inputs_used": ["source_code", "domain_context_md", "design_specs"],
+    "inputs_used": [
+      "source_code",
+      "domain_context_md",
+      "design_specs"
+    ],
     "confidence": 0.95,
     "formula_version": "v1"
   },
@@ -19,8 +23,13 @@
       "id": "BHV-USER-001",
       "name": "신규 사용자 등록 동작",
       "description": "이메일/비밀번호 입력 시 새 user 생성. 이메일 중복 시 409 / 비밀번호 < 8자 시 400.",
-      "use_case_refs": ["UC-USER-001"],
-      "br_refs": ["BR-USER-DATA-001", "BR-USER-VALIDATION-001"],
+      "use_case_refs": [
+        "UC-USER-001"
+      ],
+      "br_refs": [
+        "BR-USER-DATA-001",
+        "BR-USER-VALIDATION-001"
+      ],
       "preconditions": [
         "request.email is non-empty string",
         "request.password is non-empty string"
@@ -32,16 +41,21 @@
       "invariants": [
         "no two users share the same email"
       ],
-      "acceptance_criteria_refs": ["AC-USER-001"],
+      "acceptance_criteria_refs": [
+        "AC-USER-001"
+      ],
       "source_grounded_evidence": [
         "source/src/user.legacy.ts:10-15 (legacy register / 결함 source)"
-      ]
+      ],
+      "code_pointers_na": true
     },
     {
       "id": "BHV-USER-002",
       "name": "로그인 동작",
       "description": "이메일/비밀번호 일치 시 user 반환 / 불일치 시 401.",
-      "use_case_refs": ["UC-USER-002"],
+      "use_case_refs": [
+        "UC-USER-002"
+      ],
       "br_refs": [],
       "preconditions": [
         "request.email is non-empty string",
@@ -52,10 +66,13 @@
         "returns null (unmatched case)"
       ],
       "invariants": [],
-      "acceptance_criteria_refs": ["AC-USER-002"],
+      "acceptance_criteria_refs": [
+        "AC-USER-002"
+      ],
       "source_grounded_evidence": [
         "source/src/user.legacy.ts:17-22 (legacy login)"
-      ]
+      ],
+      "code_pointers_na": true
     }
   ],
   "cross_links": {

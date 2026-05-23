@@ -2,7 +2,10 @@
   "meta": {
     "generated_at": "2026-05-06T16:00:00Z",
     "methodology_version": "v2.0.0",
-    "inputs_used": ["source_code", "domain_context_md"],
+    "inputs_used": [
+      "source_code",
+      "domain_context_md"
+    ],
     "confidence": 0.95,
     "formula_version": "v1"
   },
@@ -17,7 +20,10 @@
   },
   "business_intent": {
     "domain_purpose": "사용자 가입 + 인증 (이메일 기반) — PoC sample 도메인 / RealWorld scale ❌",
-    "stakeholders": ["end-user", "auth-team"],
+    "stakeholders": [
+      "end-user",
+      "auth-team"
+    ],
     "success_criteria": [
       "이메일 중복 가입 차단율 100%",
       "비밀번호 길이 < 8자 거부율 100%",
@@ -29,25 +35,43 @@
       "id": "UC-USER-001",
       "name": "신규 사용자 등록",
       "description": "POST /users — 이메일/비밀번호로 신규 사용자 등록. 이메일 중복 시 409 / 비밀번호 < 8자 시 400.",
-      "actors": ["anonymous"],
-      "preconditions": ["요청에 email + password 포함"],
-      "postconditions": ["users 저장소에 신규 user 1건 추가"],
-      "acceptance_criteria_refs": ["AC-USER-001"],
+      "actors": [
+        "anonymous"
+      ],
+      "preconditions": [
+        "요청에 email + password 포함"
+      ],
+      "postconditions": [
+        "users 저장소에 신규 user 1건 추가"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-USER-001"
+      ],
       "source_grounded_evidence": [
         "source/src/user.legacy.ts:10-15 (function register)"
-      ]
+      ],
+      "code_pointers_na": true
     },
     {
       "id": "UC-USER-002",
       "name": "로그인",
       "description": "POST /users/login — 이메일/비밀번호 일치 시 user 반환 / 불일치 시 401.",
-      "actors": ["anonymous"],
-      "preconditions": ["요청에 email + password 포함"],
-      "postconditions": ["일치 시 user 객체 반환"],
-      "acceptance_criteria_refs": ["AC-USER-002"],
+      "actors": [
+        "anonymous"
+      ],
+      "preconditions": [
+        "요청에 email + password 포함"
+      ],
+      "postconditions": [
+        "일치 시 user 객체 반환"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-USER-002"
+      ],
       "source_grounded_evidence": [
         "source/src/user.legacy.ts:17-22 (function login)"
-      ]
+      ],
+      "code_pointers_na": true
     }
   ],
   "business_rules_intent": [

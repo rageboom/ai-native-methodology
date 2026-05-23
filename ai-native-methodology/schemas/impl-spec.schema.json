@@ -61,6 +61,16 @@
           "source_evidence": {
             "type": "string",
             "description": "★ no-simulation — 실 코드 excerpt (≤ 500 char) / commit_hash 의 source_files 와 sha 일치 의무"
+          },
+          "code_pointers": {
+            "type": "array",
+            "description": "★ operation.md 결정 3 + P2 — artifact ↔ code anchor. source_files 의 strict_path 평탄화 보완 / glob·ast_symbol·doc_link 등 비단조 anchor 추가 표현. graph-synthesizer 가 평탄화 / code-pointer-validator 가 검증.",
+            "items": {"$ref": "./code-pointer.schema.json"}
+          },
+          "code_pointers_na": {
+            "type": "boolean",
+            "default": false,
+            "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
           }
         }
       }

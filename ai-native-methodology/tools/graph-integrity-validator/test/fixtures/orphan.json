@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    { "id": "UC-USER-001", "artifact_kind": "chain", "artifact_subkind": "UC", "source_path": "x.md", "state": "active" },
+    { "id": "BHV-USER-001", "artifact_kind": "chain", "artifact_subkind": "BHV", "source_path": "y.md", "state": "active" },
+    { "id": "ORPHAN-NODE", "artifact_kind": "analysis", "artifact_subkind": "domain", "source_path": "z.md", "state": "active" },
+    { "id": "PROPOSE-NEW", "artifact_kind": "chain", "artifact_subkind": "BHV", "source_path": "p.md", "state": "propose" },
+    { "id": "DEPRECATED-OLD", "artifact_kind": "chain", "artifact_subkind": "BHV", "source_path": "d.md", "state": "deprecated" }
+  ],
+  "edges": [
+    { "source": "UC-USER-001", "target": "BHV-USER-001", "edge_type": "derived_from", "confidence": "hard" }
+  ]
+}

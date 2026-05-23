@@ -1,0 +1,55 @@
+{
+  "$schema_origin": "./propagation-policy.schema.json",
+  "_comment": "★ operation.md 결정 4 (BFS base 등급) + 결정 5 (3-tier × 4-edge 매트릭스). dep-graph operation.md SSOT.",
+  "_format_note": "operation.md 는 propagation-policy.yaml 로 명시 — 본 plugin 은 dependency-free 원칙으로 JSON 사용 (operation.md drift fix 필요).",
+
+  "edge_grade_overrides": {
+    "_comment": "결정 4 끝 노트 — soft 엣지의 base 등급 override. 빈 객체 = default 사용.",
+    "cross_reference": "SHOULD",
+    "informs": "FYI"
+  },
+
+  "change_tier_matrix": {
+    "_comment": "결정 5 — 변경 종류 × chain 인접 단계 → 자동 propagation 결정 {auto | propose | manual}.",
+    "typo": {
+      "UC_to_BHV": "auto",
+      "BHV_to_AC": "auto",
+      "AC_to_TC": "auto",
+      "TC_to_IMPL": "manual"
+    },
+    "item_add": {
+      "UC_to_BHV": "propose",
+      "BHV_to_AC": "propose",
+      "AC_to_TC": "propose",
+      "TC_to_IMPL": "manual"
+    },
+    "item_remove": {
+      "UC_to_BHV": "manual",
+      "BHV_to_AC": "manual",
+      "AC_to_TC": "manual",
+      "TC_to_IMPL": "manual"
+    },
+    "semantic_change": {
+      "UC_to_BHV": "manual",
+      "BHV_to_AC": "manual",
+      "AC_to_TC": "manual",
+      "TC_to_IMPL": "manual"
+    }
+  },
+
+  "code_pointer_anchor_rules": {
+    "_comment": "결정 5 — anchor_type 별 자동 갱신 정책. path_only_patch = 파일 이동/이름 변경 / symbol_change = 심볼 의미 변경.",
+    "strict_path": { "path_only_patch": "auto", "symbol_change": "manual" },
+    "glob":        { "path_only_patch": "auto", "symbol_change": "manual" },
+    "ast_symbol":  { "path_only_patch": "manual", "symbol_change": "manual" },
+    "doc_link":    { "path_only_patch": "auto", "symbol_change": "manual" }
+  },
+
+  "non_traversable_states": ["propose"],
+
+  "auto_cascade": {
+    "_comment": "결정 5 끝 — '자동 cascade 는 결정 8 의 topological sort 도입(Phase 3) 이후에만 활성화'. dry_run=true 면 propose JSONL 기록만, 실제 적용 ❌.",
+    "enabled": false,
+    "dry_run": true
+  }
+}

@@ -22,7 +22,9 @@
     "tools/findings-aggregator",
     "tools/br-cross-consistency-validator",
     "tools/skill-citation-validator",
-    "tools/inflation-lint"
+    "tools/inflation-lint",
+    "tools/code-pointer-validator",
+    "tools/graph-integrity-validator"
   ],
   "scripts": {
     "build": "node scripts/build-plugin.js",

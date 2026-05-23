@@ -4,9 +4,7 @@
     "behavior-spec.json",
     "acceptance-criteria.json",
     "test-spec.json",
-    "impl-spec.json",
-    "business-rules.json",
-    "antipatterns.json"
+    "impl-spec.json"
   ],
   "do_not_edit_manually": true,
   "matrix": [
@@ -55,6 +53,6 @@
     "yellow_count": 0,
     "red_count": 0,
     "severity_distinct_count": 1,
-    "severity_propagation_active": true
+    "severity_propagation_active": false
   }
 }

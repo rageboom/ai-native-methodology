@@ -120,7 +120,12 @@
             }
           }
         },
-        "drift_detected": { "type": "boolean" }
+        "drift_detected": { "type": "boolean" },
+        "impact_pending": {
+          "type": "boolean",
+          "default": false,
+          "description": "★ dep-graph operation.md P3 결정 5 — PostToolUse hook 이 chain/analysis artifact write 감지 시 true. 실제 영향 분석(BFS)+정책 평가는 `chain-driver impact` 또는 SessionStart preview 에서 수행. 사용자 confirm 후 false 로 clear."
+        }
       }
     },
     "token_usage": {

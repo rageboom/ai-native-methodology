@@ -42,6 +42,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
+            "$comment": "★ dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.aimd/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
+          }
+        ]
+      }
     ]
   }
 }

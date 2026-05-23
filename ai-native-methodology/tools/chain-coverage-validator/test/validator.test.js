@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage } from '../src/validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage } from '../src/validator.js';
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -202,5 +202,94 @@ describe('chain-coverage-validator', () => {
       assert.equal(r.summary.ap_input_missing, true);
       assert.equal(r.findings.length, 0);
     });
+  });
+});
+
+// ★ dep-graph operation.md (수정·신설 파일 표: chain-coverage-validator "confidence 인지")
+describe('validateConfidenceCoverage — hard/soft 인지', () => {
+  function cn(id, subkind, state = 'active') {
+    return { id, artifact_kind: 'chain', artifact_subkind: subkind, source_path: `${id}.md`, state };
+  }
+  function an(id) {
+    return { id, artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: 'br.json', state: 'active' };
+  }
+  const hard = (s, t, type = 'derived_from') => ({ source: s, target: t, edge_type: type, confidence: 'hard' });
+  const soft = (s, t, type = 'cross_reference') => ({ source: s, target: t, edge_type: type, confidence: 'soft' });
+
+  it('hard chain 으로 연결된 노드 → finding 없음', () => {
+    const g = {
+      nodes: [cn('UC-1', 'UC'), cn('BHV-1', 'BHV')],
+      edges: [hard('UC-1', 'BHV-1')],
+    };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.findings.length, 0);
+    assert.equal(r.confidence_coverage.hard_connected, 2);
+    assert.equal(r.confidence_coverage.ratio, 1.0);
+  });
+
+  it('soft 엣지로만 연결된 chain 노드 → hard_disconnected high finding', () => {
+    const g = {
+      nodes: [cn('BHV-1', 'BHV'), an('analysis-business-rules')],
+      edges: [soft('analysis-business-rules', 'BHV-1')],
+    };
+    const r = validateConfidenceCoverage(g);
+    const f = r.findings.find(x => x.kind === 'chain.confidence.hard_disconnected');
+    assert.ok(f);
+    assert.equal(f.severity, 'high');
+    assert.equal(f.node_id, 'BHV-1');
+    assert.equal(r.confidence_coverage.soft_only, 1);
+  });
+
+  it('엣지 0 노드는 isolated 카운트만 (finding 은 graph-integrity 가 emit)', () => {
+    const g = { nodes: [cn('BHV-LONELY', 'BHV')], edges: [] };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.confidence_coverage.isolated, 1);
+    assert.equal(r.findings.length, 0, 'orphan finding 은 본 validator 가 아닌 graph-integrity 책임');
+  });
+
+  it('analysis/aspect 노드는 검사 대상 아님 (chain 만)', () => {
+    const g = { nodes: [an('analysis-business-rules')], edges: [] };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.confidence_coverage.chain_nodes, 0);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('propose/deprecated chain 노드 제외', () => {
+    const g = {
+      nodes: [cn('BHV-P', 'BHV', 'propose'), cn('BHV-D', 'BHV', 'deprecated')],
+      edges: [],
+    };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.confidence_coverage.chain_nodes, 0);
+  });
+
+  it('drift 노드는 active 와 동일 검사', () => {
+    const g = {
+      nodes: [cn('BHV-1', 'BHV', 'drift'), an('analysis-business-rules')],
+      edges: [soft('analysis-business-rules', 'BHV-1')],
+    };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.findings.length, 1, 'drift 도 hard_disconnected 검사 대상');
+  });
+
+  it('implements leaf (dangling target) 는 hard degree 에 포함 안 됨', () => {
+    // IMPL → src/foo.kt (코드 leaf, nodes 부재) — dangling 이므로 hardDeg 미반영.
+    // IMPL 이 TC 로부터 tests(hard) 받으면 connected.
+    const g = {
+      nodes: [cn('TC-1', 'TC'), cn('IMPL-1', 'IMPL')],
+      edges: [hard('TC-1', 'IMPL-1', 'tests'), { source: 'IMPL-1', target: 'src/foo.kt', edge_type: 'implements', confidence: 'hard' }],
+    };
+    const r = validateConfidenceCoverage(g);
+    assert.equal(r.findings.length, 0, 'IMPL 은 TC→IMPL tests 로 hard connected');
+  });
+
+  it('빈 그래프 → ratio 1.0', () => {
+    const r = validateConfidenceCoverage({ nodes: [], edges: [] });
+    assert.equal(r.confidence_coverage.ratio, 1.0);
+  });
+
+  it('null 입력 방어', () => {
+    assert.doesNotThrow(() => validateConfidenceCoverage(null));
+    assert.doesNotThrow(() => validateConfidenceCoverage({}));
   });
 });

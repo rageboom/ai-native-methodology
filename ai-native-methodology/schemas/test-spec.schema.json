@@ -73,6 +73,16 @@
             "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$",
             "description": "★ chain 4 forward link (chain 3 RED 시 미정 / chain 4 GREEN 시 채움)"
           },
+          "code_pointers": {
+            "type": "array",
+            "description": "★ operation.md 결정 3 + P2 — artifact ↔ code anchor. graph-synthesizer 가 평탄화 / code-pointer-validator 가 검증.",
+            "items": {"$ref": "./code-pointer.schema.json"}
+          },
+          "code_pointers_na": {
+            "type": "boolean",
+            "default": false,
+            "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
+          },
           "test_run_evidence": {
             "type": "object",
             "description": "★ no-simulation 5종 물증 7 필드 (B5 정합 / 정규화)",

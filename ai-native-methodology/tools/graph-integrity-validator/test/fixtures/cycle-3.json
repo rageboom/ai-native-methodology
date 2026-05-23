@@ -1,0 +1,12 @@
+{
+  "nodes": [
+    { "id": "A", "artifact_kind": "chain", "artifact_subkind": "UC", "source_path": "a.md", "state": "active" },
+    { "id": "B", "artifact_kind": "chain", "artifact_subkind": "BHV", "source_path": "b.md", "state": "active" },
+    { "id": "C", "artifact_kind": "chain", "artifact_subkind": "AC", "source_path": "c.md", "state": "active" }
+  ],
+  "edges": [
+    { "source": "A", "target": "B", "edge_type": "derived_from", "confidence": "hard" },
+    { "source": "B", "target": "C", "edge_type": "derived_from", "confidence": "hard" },
+    { "source": "C", "target": "A", "edge_type": "depends_on", "confidence": "hard" }
+  ]
+}

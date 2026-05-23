@@ -1,10 +1,10 @@
 # Traceability Matrix
 
-> ★ S5: do_not_edit_manually = true. derived_from = planning-spec.json, behavior-spec.json, acceptance-criteria.json, test-spec.json, impl-spec.json, business-rules.json, antipatterns.json
+> ★ S5: do_not_edit_manually = true. derived_from = planning-spec.json, behavior-spec.json, acceptance-criteria.json, test-spec.json, impl-spec.json
 
 **Coverage**: forward=100.0% / backward=100.0% (threshold 0.85)
 green=2 / yellow=0 / red=0
-severity_propagation_active=true / severity_distinct_count=1
+severity_propagation_active=false / severity_distinct_count=1
 
 | UC | BR | BHV | AC | TC | IMPL | commit | status | severity |
 |---|---|---|---|---|---|---|---|---|

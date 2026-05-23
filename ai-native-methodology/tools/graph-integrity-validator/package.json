@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/graph-integrity-validator",
+  "version": "0.1.0",
+  "description": "13번째 validator — artifact-graph.json 무결성 검증. DFS cycle 감지 + Tier-1 orphan 감지 + unknown edge 감지. release-readiness #13 게이트.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "graph-integrity-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

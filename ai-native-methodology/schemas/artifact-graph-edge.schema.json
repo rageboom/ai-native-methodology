@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/artifact-graph-edge.schema.json",
+  "title": "Artifact Graph Edge (hard/soft confidence)",
+  "description": "artifact-graph.json 의 엣지. 노드 사이의 관계(derivation / implementation / test / reference / informs / dependency)를 confidence(hard·soft)와 함께 표현. 운영 plan: dep-graph/operation.md 결정 1 + 결정 4 BFS Step 1·2.",
+  "type": "object",
+  "required": ["source", "target", "edge_type", "confidence"],
+  "additionalProperties": false,
+  "properties": {
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "출발 노드 ID (artifact-graph-node.schema.json#/properties/id 와 일치)."
+    },
+    "target": {
+      "type": "string",
+      "minLength": 1,
+      "description": "도착 노드 ID."
+    },
+    "edge_type": {
+      "type": "string",
+      "enum": ["derived_from", "implements", "tests", "depends_on", "cross_reference", "informs"],
+      "description": "★ 엣지 종류 (6종, 결정 1). hard 4종: derived_from(chain forward) / implements(artifact→code) / tests(TC→IMPL) / depends_on(schema·validator). soft 2종: cross_reference(analysis↔chain) / informs(aspect→chain). BFS 등급 결정에 사용."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["hard", "soft"],
+      "description": "★ edge_type 에서 도출되지만 schema 에 explicit 으로 저장 (결정 4 BFS 가속·검증). hard = derived_from·implements·tests·depends_on / soft = cross_reference·informs. graph-synthesizer 가 일관성 보장(불일치는 graph-integrity-validator 가 검출)."
+    },
+    "commit_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{7,40}$",
+      "description": "엣지가 마지막으로 검증된 commit."
+    }
+  }
+}

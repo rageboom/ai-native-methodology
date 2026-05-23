@@ -5,6 +5,6 @@
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": { "traceability-matrix-builder": "./src/cli.js" },
-  "scripts": { "test": "node --test test/builder.test.js" },
+  "scripts": { "test": "node --test test/*.test.js" },
   "license": "UNLICENSED"
 }

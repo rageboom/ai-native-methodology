@@ -1,9 +1,37 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { writeFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { buildMatrix, renderMarkdown, renderMermaid, loadJson } from './builder.js';
+import { synthesizeGraph, TIER1_CATALOG } from './graph-synthesizer.js';
+
+// ★ operation.md 결정 8 P1 — artifact-graph.json 산출 (23번째 산출물)
+// analysis/aspect input 은 directory scan 으로 자동 인식 (well-known filename).
+const ANALYSIS_FILENAMES = {
+  'architecture': 'architecture.json',
+  'domain': 'domain.json',
+  'api': 'openapi-extension.json',
+  'db-schema': 'db-schema.json',
+  'formal-spec': 'formal-spec.json',
+  'business-rules': 'business-rules.json',
+  'antipatterns': 'antipatterns.json',
+  'ui-ux': 'ui-spec.json',
+  'state-map': 'state-map.json',
+  'visual-manifest': 'visual-manifest.json',
+  'form-validation-spec': 'form-validation-spec.json',
+  'type-spec': 'type-spec.json',
+  'error-mapping-spec': 'error-mapping-spec.json',
+  'characterization-spec': 'characterization-spec.json',
+  'sql-inventory': 'sql-inventory.json',
+};
+const ASPECT_FILENAMES = {
+  'a11y': 'a11y-spec.json',
+  'i18n': 'i18n-spec.json',
+  'static-security': 'static-security-spec.json',
+  'legacy-spectrum': 'legacy-spectrum.json',
+};
 
 function parseArgs(argv) {
-  const out = { dryRun: false };
+  const out = { dryRun: false, graph: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--planning') out.planning = argv[++i];
@@ -13,8 +41,23 @@ function parseArgs(argv) {
     else if (a === '--impl-spec') out.implSpec = argv[++i];
     else if (a === '--out-dir') out.outDir = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
+    // ★ 신설 (P1 graph) ─────────────────────────────────────────────
+    else if (a === '--graph') out.graph = true;
+    else if (a === '--analysis-dir') out.analysisDir = argv[++i];
+    else if (a === '--aspect-dir') out.aspectDir = argv[++i];
+    else if (a === '--previous-graph') out.previousGraph = argv[++i];
+    else if (a === '--scope-id') out.scopeId = argv[++i];
+    else if (a === '--commit-hash') out.commitHash = argv[++i];
+    // ──────────────────────────────────────────────────────────────
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: traceability-matrix-builder --behavior <path> --acceptance <path> [--planning <path>] [--test-spec <path>] [--impl-spec <path>] [--out-dir <dir>] [--dry-run]`);
+      console.log(`usage: traceability-matrix-builder --behavior <path> --acceptance <path> \\
+            [--planning <path>] [--test-spec <path>] [--impl-spec <path>] \\
+            [--out-dir <dir>] [--dry-run] \\
+            [--graph] [--analysis-dir <dir>] [--aspect-dir <dir>] \\
+            [--previous-graph <path>] [--scope-id <id>] [--commit-hash <sha>]
+
+★ --graph 옵션: artifact-graph.json 도 함께 산출 (P1 — operation.md 결정 8).
+  analysis-dir / aspect-dir 의 well-known filename 자동 scan (총 ${TIER1_CATALOG.total} Tier-1 artifact).`);
       process.exit(0);
     }
   }
@@ -51,6 +94,53 @@ if (args.outDir) {
   writeFileSync(`${args.outDir}/matrix.md`, md);
   writeFileSync(`${args.outDir}/matrix.mermaid`, mermaid);
   console.log(`written: ${args.outDir}/matrix.{json,md,mermaid}`);
+}
+
+// ★ --graph: artifact-graph.json 합성 (operation.md 결정 8 P1)
+if (args.graph) {
+  const analysis = {};
+  const analysisPaths = {};
+  if (args.analysisDir) {
+    for (const [kind, fname] of Object.entries(ANALYSIS_FILENAMES)) {
+      const p = join(args.analysisDir, fname);
+      if (existsSync(p)) {
+        analysis[kind] = loadJson(p);
+        analysisPaths[kind] = p;
+      }
+    }
+  }
+  const aspect = {};
+  const aspectPaths = {};
+  if (args.aspectDir) {
+    for (const [kind, fname] of Object.entries(ASPECT_FILENAMES)) {
+      const p = join(args.aspectDir, fname);
+      if (existsSync(p)) {
+        aspect[kind] = loadJson(p);
+        aspectPaths[kind] = p;
+      }
+    }
+  }
+  const previousGraph = args.previousGraph ? loadJson(args.previousGraph) : null;
+  const graph = synthesizeGraph({
+    planning: chain.planning, behavior: chain.behavior, acceptance: chain.acceptance,
+    testSpec: chain.testSpec, implSpec: chain.implSpec,
+    analysis, aspect,
+    sourcePaths: {
+      planning: args.planning, behavior: args.behavior, acceptance: args.acceptance,
+      testSpec: args.testSpec, implSpec: args.implSpec,
+      analysis: analysisPaths, aspect: aspectPaths,
+    },
+    previousGraph,
+    scopeId: args.scopeId,
+    commitHash: args.commitHash,
+  });
+  console.log(`[graph-synthesizer] nodes=${graph.stats.node_count} edges=${graph.stats.edge_count} chain=${graph.stats.by_kind.chain} analysis=${graph.stats.by_kind.analysis} aspect=${graph.stats.by_kind.aspect}`);
+  console.log(`  by_state: ${JSON.stringify(graph.stats.by_state)}`);
+  console.log(`  by_edge_type: ${JSON.stringify(graph.stats.by_edge_type)}`);
+  if (args.outDir && !args.dryRun) {
+    writeFileSync(`${args.outDir}/artifact-graph.json`, JSON.stringify(graph, null, 2));
+    console.log(`written: ${args.outDir}/artifact-graph.json`);
+  }
 }
 
 const fail = cs.red_count > 0 || cs.forward_coverage < cs.threshold;

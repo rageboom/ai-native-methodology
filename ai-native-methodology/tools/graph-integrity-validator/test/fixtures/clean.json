@@ -1,0 +1,13 @@
+{
+  "nodes": [
+    { "id": "UC-USER-001", "artifact_kind": "chain", "artifact_subkind": "UC", "source_path": "specs/uc/UC-USER-001.md", "state": "active" },
+    { "id": "BHV-USER-001", "artifact_kind": "chain", "artifact_subkind": "BHV", "source_path": "specs/bhv/BHV-USER-001.md", "state": "active" },
+    { "id": "AC-USER-001", "artifact_kind": "chain", "artifact_subkind": "AC", "source_path": "specs/ac/AC-USER-001.md", "state": "active" },
+    { "id": "analysis-domain", "artifact_kind": "analysis", "artifact_subkind": "domain", "source_path": "analysis/domain.md", "state": "active" }
+  ],
+  "edges": [
+    { "source": "UC-USER-001", "target": "BHV-USER-001", "edge_type": "derived_from", "confidence": "hard" },
+    { "source": "BHV-USER-001", "target": "AC-USER-001", "edge_type": "derived_from", "confidence": "hard" },
+    { "source": "analysis-domain", "target": "UC-USER-001", "edge_type": "cross_reference", "confidence": "soft" }
+  ]
+}

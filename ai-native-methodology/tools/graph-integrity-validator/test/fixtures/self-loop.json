@@ -1,0 +1,8 @@
+{
+  "nodes": [
+    { "id": "A", "artifact_kind": "chain", "artifact_subkind": "UC", "source_path": "a.md", "state": "active" }
+  ],
+  "edges": [
+    { "source": "A", "target": "A", "edge_type": "depends_on", "confidence": "hard" }
+  ]
+}

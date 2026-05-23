@@ -260,6 +260,75 @@ export function validateAntipatternCoverage({ antipatterns, acceptanceCriteria, 
   };
 }
 
+// ★ dep-graph operation.md (수정·신설 파일 표: "confidence 인지") — artifact-graph confidence-aware 검증.
+// graph-integrity-validator 의 orphan(엣지 0)과 비중복: 본 검사는 "hard 엣지로 chain 에 연결돼야 할 노드가
+// soft 엣지로만 연결된 경우(hard-disconnected)"를 잡는다. soft ref(analysis↔chain)는 있지만 hard chain
+// (derived_from/tests/implements/depends_on) 에 미편입 = chain 정합 위반 (결정 1 confidence + 결정 4 정합).
+const HARD_EDGE_TYPES = new Set(['derived_from', 'implements', 'tests', 'depends_on']);
+
+export function validateConfidenceCoverage(graph) {
+  const findings = [];
+  const nodes = Array.isArray(graph?.nodes) ? graph.nodes : [];
+  const edges = Array.isArray(graph?.edges) ? graph.edges : [];
+
+  // active/drift chain 노드만 대상 (propose/deprecated 는 일시 상태 — 결정 1)
+  const chainNodes = nodes.filter(
+    n => n && n.artifact_kind === 'chain' && (n.state === 'active' || n.state === 'drift')
+  );
+  const nodeIds = new Set(nodes.map(n => n?.id).filter(Boolean));
+
+  // 노드별 hard / soft 인접 카운트 (in + out)
+  const hardDeg = new Map();
+  const softDeg = new Map();
+  for (const id of nodeIds) { hardDeg.set(id, 0); softDeg.set(id, 0); }
+  for (const e of edges) {
+    if (!nodeIds.has(e.source) || !nodeIds.has(e.target)) continue; // dangling 제외 (implements leaf 등)
+    const bucket = HARD_EDGE_TYPES.has(e.edge_type) ? hardDeg : softDeg;
+    bucket.set(e.source, bucket.get(e.source) + 1);
+    bucket.set(e.target, bucket.get(e.target) + 1);
+  }
+
+  let hardConnected = 0;
+  let softOnly = 0;
+  let isolated = 0;
+  for (const node of chainNodes) {
+    const h = hardDeg.get(node.id) ?? 0;
+    const s = softDeg.get(node.id) ?? 0;
+    if (h > 0) {
+      hardConnected++;
+    } else if (s > 0) {
+      // soft 엣지만 있음 — chain 에 hard 로 미편입 (analysis ref 만 받는 고아 chain artifact)
+      softOnly++;
+      findings.push({
+        kind: 'chain.confidence.hard_disconnected',
+        severity: 'high',
+        node_id: node.id,
+        artifact_subkind: node.artifact_subkind,
+        soft_degree: s,
+        message: `chain 노드 ${node.id} (${node.artifact_subkind}) 가 hard 엣지 없이 soft 엣지(${s})로만 연결됨 — chain 정합 미편입 (cross_reference/informs 만 존재). hard derivation link 필요.`,
+      });
+    } else {
+      // 엣지 0 — graph-integrity orphan 과 중복이지만 confidence 관점 카운트만 (finding 은 integrity 가 emit)
+      isolated++;
+    }
+  }
+
+  return {
+    findings,
+    confidence_coverage: {
+      chain_nodes: chainNodes.length,
+      hard_connected: hardConnected,
+      soft_only: softOnly,
+      isolated,
+      ratio: chainNodes.length === 0 ? 1.0 : hardConnected / chainNodes.length,
+    },
+    summary: {
+      total_findings: findings.length,
+      high: findings.filter(f => f.severity === 'high').length,
+    },
+  };
+}
+
 export function loadJson(path) {
   if (!existsSync(path)) return null;
   try { return JSON.parse(readFileSync(path, 'utf-8')); }

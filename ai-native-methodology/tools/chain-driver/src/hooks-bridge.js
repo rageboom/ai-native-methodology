@@ -87,6 +87,97 @@ export function suggestAgentForPrompt(prompt) {
   return null;
 }
 
+// ★ dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지.
+// 파일명 → artifact_subkind 매핑. 한 파일이 여러 노드(예: behavior-spec.json = 다수 BHV)에 대응하므로
+// hook 은 "어떤 종류의 artifact 가 바뀌었나"만 판정하고, per-node 영향 분석은 `chain-driver impact` 로 분리.
+const ARTIFACT_FILENAME_TO_SUBKIND = Object.freeze({
+  'planning-spec.json': 'UC',
+  'behavior-spec.json': 'BHV',
+  'acceptance-criteria.json': 'AC',
+  'test-spec.json': 'TC',
+  'impl-spec.json': 'IMPL',
+});
+
+const ANALYSIS_FILENAME_TO_SUBKIND = Object.freeze({
+  'architecture.json': 'architecture',
+  'domain.json': 'domain',
+  'openapi-extension.json': 'api',
+  'db-schema.json': 'db-schema',
+  'formal-spec.json': 'formal-spec',
+  'business-rules.json': 'business-rules',
+  'antipatterns.json': 'antipatterns',
+  'ui-spec.json': 'ui-ux',
+  'state-map.json': 'state-map',
+  'visual-manifest.json': 'visual-manifest',
+  'form-validation-spec.json': 'form-validation-spec',
+  'type-spec.json': 'type-spec',
+  'error-mapping-spec.json': 'error-mapping-spec',
+  'characterization-spec.json': 'characterization-spec',
+  'sql-inventory.json': 'sql-inventory',
+});
+
+const ASPECT_FILENAME_TO_SUBKIND = Object.freeze({
+  'a11y-spec.json': 'a11y',
+  'i18n-spec.json': 'i18n',
+  'static-security-spec.json': 'static-security',
+  'legacy-spectrum.json': 'legacy-spectrum',
+});
+
+// PostToolUse payload → 변경된 graph artifact 판정. null = graph artifact 아님.
+export function detectGraphArtifactWrite({ toolName, toolInput }) {
+  if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+  const path = toolInput?.file_path || toolInput?.path || '';
+  if (!path) return null;
+  // .aimd 경로 하위만 (산출물 영역)
+  if (!path.includes('/.aimd/') && !path.includes('\\.aimd\\')) return null;
+  const filename = path.split(/[/\\]/).pop();
+  if (ARTIFACT_FILENAME_TO_SUBKIND[filename]) {
+    return { path, filename, artifact_kind: 'chain', artifact_subkind: ARTIFACT_FILENAME_TO_SUBKIND[filename] };
+  }
+  if (ANALYSIS_FILENAME_TO_SUBKIND[filename]) {
+    return { path, filename, artifact_kind: 'analysis', artifact_subkind: ANALYSIS_FILENAME_TO_SUBKIND[filename] };
+  }
+  if (ASPECT_FILENAME_TO_SUBKIND[filename]) {
+    return { path, filename, artifact_kind: 'aspect', artifact_subkind: ASPECT_FILENAME_TO_SUBKIND[filename] };
+  }
+  return null;
+}
+
+// ★ operation.md "evaluate_policy()" deliverable — 영향 노드 집합에 대해 정책 평가 + propose record 생성.
+// impact-analyzer 결과 merged 리스트의 각 노드에 대해, 해당 엣지 단계의 변경 종류 정책을 적용.
+// 순수 함수 — I/O 없음. 호출자(cli.js)가 JSONL append 책임.
+//
+// @param {Object[]} affected   impact-analyzer merged 리스트 [{ id, grade, ... }]
+// @param {Object} originNode   변경 origin 노드 { id, artifact_subkind }
+// @param {Map} nodeById        id → node 맵 (target subkind 조회용)
+// @param {Object} policy       loadPolicy 결과
+// @param {Function} evaluatePolicy  policy-evaluator.evaluatePolicy
+// @param {string} changeKind   'typo'|'item_add'|'item_remove'|'semantic_change'
+// @returns {Object[]}          [{ origin_id, affected_id, grade, decision, source, reasoning, change_kind }]
+export function evaluatePolicyForEdges({ affected, originNode, nodeById, policy, evaluatePolicy, changeKind = 'semantic_change' }) {
+  const records = [];
+  for (const entry of affected ?? []) {
+    const targetNode = nodeById.get(entry.id);
+    const change = {
+      kind: changeKind,
+      origin_subkind: originNode?.artifact_subkind,
+      target_subkind: targetNode?.artifact_subkind,
+    };
+    const evald = evaluatePolicy(policy, change);
+    records.push({
+      origin_id: originNode?.id,
+      affected_id: entry.id,
+      grade: entry.grade,
+      direction: entry.direction,
+      change_kind: changeKind,
+      decision: evald.decision,
+      source: evald.source,
+      reasoning: evald.reasoning,
+    });
+  }
+  return records;
+}
+
 // Determine if a tool call should be blocked based on state.json blocked flag.
 // Used for PreToolUse hook on Write/Edit targeting .aimd/output/** + R20 MCP ticket-sync.
 //

@@ -55,12 +55,13 @@ function usage(code = 2) {
     '  --skip-workspace-test       skip check #11 (test cadence 안 사용 / release 시 ❌)',
     '  --skip-authoring-staleness  skip check #12 (test cadence 안 사용 / release 시 ❌)',
     '  --skip-preflight            skip check #14 (★ F-V2-05 — verifier env 외부 도구 검사 / release 시 ❌)',
+    '  --no-strict-code-pointers   check #16 strict 완화 (★ dep-graph P2 — PoC 백필 완료로 strict 기본 / 회귀 비상용 / release 시 ❌)',
   ].join('\n'));
   process.exit(code);
 }
 
 function parseArgs(argv) {
-  const out = { json: false, skipWorkspaceTest: false, skipAuthoringStaleness: false, skipPreflight: false };
+  const out = { json: false, skipWorkspaceTest: false, skipAuthoringStaleness: false, skipPreflight: false, noStrictCodePointers: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--target') out.target = argv[++i];
@@ -68,6 +69,7 @@ function parseArgs(argv) {
     else if (a === '--skip-workspace-test') out.skipWorkspaceTest = true;
     else if (a === '--skip-authoring-staleness') out.skipAuthoringStaleness = true;
     else if (a === '--skip-preflight') out.skipPreflight = true;
+    else if (a === '--no-strict-code-pointers') out.noStrictCodePointers = true;
     else if (a === '--help' || a === '-h') usage(0);
   }
   return out;
@@ -688,6 +690,97 @@ function check14_preflightTools(args) {
   };
 }
 
+// ★ ★ dep-graph 신규 게이트 — operation.md Verification 표 #12 / #13 (실제 release-readiness 카운트는 #15 / #16).
+// operation.md 기준 표기 = "11→13 신규". 본 script 는 이미 1–14 존재하므로 #15 / #16 로 편입.
+// 별도 doc drift fix 필요 (incidents/2026-05-21+ — operation.md Verification 절 갱신).
+//
+// 실행 순서:
+//   #15 graph-integrity (artifact-graph.json 합성 성공 + cycle/orphan/unknown 0) — code-pointer 의 prerequisite
+//   #16 code-pointer (24 Tier-1 노드 code_pointers 또는 명시적 N/A coverage)
+//
+// 입력 그래프 위치: PoC #05 .aimd/output/artifact-graph.json (release-readiness 표준 corpus).
+const POC05_GRAPH_PATH = 'examples/poc-05-sample-user-register/.aimd/output/artifact-graph.json';
+
+function check15_graphIntegrity() {
+  const graphPath = join(ROOT, POC05_GRAPH_PATH);
+  if (!existsSync(graphPath)) {
+    return {
+      id: 'graph_integrity',
+      pass: false,
+      detail: `${POC05_GRAPH_PATH} missing — matrix-builder --graph 로 합성 필요 (operation.md P1 결정 8)`,
+      delegated_to: 'tools/graph-integrity-validator (★ 13번째 validator / dep-graph operation.md #13)',
+    };
+  }
+  const r = spawnSync(
+    'node',
+    ['tools/graph-integrity-validator/src/cli.js', POC05_GRAPH_PATH, '--format', 'json'],
+    { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 }
+  );
+  let parsed;
+  try {
+    parsed = JSON.parse(r.stdout || '{}');
+  } catch {
+    return {
+      id: 'graph_integrity',
+      pass: false,
+      detail: `graph-integrity-validator JSON parse fail (exit ${r.status})`,
+      delegated_to: 'tools/graph-integrity-validator',
+    };
+  }
+  const s = parsed.summary || {};
+  return {
+    id: 'graph_integrity',
+    pass: r.status === 0 && parsed.passed === true,
+    detail: parsed.passed
+      ? `artifact-graph.json 합성 정상 (nodes=${s.node_count}/edges=${s.edge_count}/cycle=0/orphan=0/unknown=0)`
+      : `${s.cycle_count} cycle / ${s.orphan_count} orphan / ${s.unknown_edge_count} unknown edge — release-readiness #13 fail (topological sort 작동 불가 → 자동 cascade 차단)`,
+    delegated_to: 'tools/graph-integrity-validator (★ 13번째 validator / dep-graph operation.md 결정 8 P1 DFS cycle/orphan)',
+  };
+}
+
+function check16_codePointerCoverage(args) {
+  const graphPath = join(ROOT, POC05_GRAPH_PATH);
+  if (!existsSync(graphPath)) {
+    return {
+      id: 'code_pointer_coverage',
+      pass: false,
+      detail: `${POC05_GRAPH_PATH} missing — matrix-builder --graph 로 합성 필요 (operation.md P2)`,
+      delegated_to: 'tools/code-pointer-validator (★ 12번째 validator / dep-graph operation.md #12)',
+    };
+  }
+  // ★ 2026-05-22 — PoC #05 chain frontmatter 백필 완료 (coverage 100%) → strict 기본 활성.
+  //   --no-strict-code-pointers 로 한시적 완화 가능 (회귀 시 비상용 / release 시 ❌).
+  const strictMode = args.noStrictCodePointers !== true;
+  const flags = ['tools/code-pointer-validator/src/cli.js', POC05_GRAPH_PATH,
+    '--repo-root', 'examples/poc-05-sample-user-register', '--format', 'json'];
+  if (strictMode) flags.push('--strict');
+  const r = spawnSync('node', flags, { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 });
+  let parsed;
+  try {
+    parsed = JSON.parse(r.stdout || '{}');
+  } catch {
+    return {
+      id: 'code_pointer_coverage',
+      pass: false,
+      detail: `code-pointer-validator JSON parse fail (exit ${r.status})`,
+      delegated_to: 'tools/code-pointer-validator',
+    };
+  }
+  const cv = parsed.coverage || {};
+  const sum = parsed.summary || {};
+  const strictNote = strictMode
+    ? ' (--strict 모드 / PoC #05 백필 완료 default-on)'
+    : ' (★ --no-strict-code-pointers 한시 완화)';
+  return {
+    id: 'code_pointer_coverage',
+    pass: r.status === 0,
+    detail: r.status === 0
+      ? `coverage ${(cv.ratio * 100).toFixed(1)}% (covered=${cv.covered}/na=${cv.explicit_na}/missing=${cv.missing}, pointers=${sum.pointers_checked})${strictNote}`
+      : `${sum.high} high / ${sum.medium} medium finding — coverage ${(cv.ratio * 100).toFixed(1)}%${strictNote}`,
+    delegated_to: 'tools/code-pointer-validator (★ 12번째 validator / dep-graph operation.md 결정 3 P2 / "24 artifact 100% code_pointers 또는 명시적 N/A")',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -707,6 +800,8 @@ function main() {
     check12_authoringSpecStaleness(args),
     check13_skillCitationIntegrity(),
     check14_preflightTools(args),
+    check15_graphIntegrity(),
+    check16_codePointerCoverage(args),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/policies/propagation-policy.schema.json",
+  "title": "Propagation Policy",
+  "description": "★ dep-graph operation.md 결정 4·5 — 변경 종류 × chain 인접 단계 매트릭스 + edge 등급 override + code_pointer anchor 규칙.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": { "type": "string" },
+    "_comment": { "type": "string" },
+    "_format_note": { "type": "string" },
+
+    "edge_grade_overrides": {
+      "type": "object",
+      "description": "operation.md 결정 4 끝 노트 — soft 엣지 base 등급 override. propagation-orderer / impact-analyzer 의 baseGradeOverrides 로 전달.",
+      "additionalProperties": false,
+      "properties": {
+        "_comment": { "type": "string" },
+        "cross_reference": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] },
+        "informs": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] },
+        "derived_from": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] },
+        "implements": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] },
+        "tests": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] },
+        "depends_on": { "type": "string", "enum": ["MUST", "SHOULD", "FYI", "ignore"] }
+      }
+    },
+
+    "change_tier_matrix": {
+      "type": "object",
+      "description": "operation.md 결정 5 — 변경 종류 4 × chain 인접 단계 4 매트릭스.",
+      "required": ["typo", "item_add", "item_remove", "semantic_change"],
+      "additionalProperties": false,
+      "properties": {
+        "_comment": { "type": "string" },
+        "typo":            { "$ref": "#/$defs/tier_row" },
+        "item_add":        { "$ref": "#/$defs/tier_row" },
+        "item_remove":     { "$ref": "#/$defs/tier_row" },
+        "semantic_change": { "$ref": "#/$defs/tier_row" }
+      }
+    },
+
+    "code_pointer_anchor_rules": {
+      "type": "object",
+      "description": "operation.md 결정 5 — anchor_type 별 자동 갱신 정책.",
+      "required": ["strict_path", "glob", "ast_symbol", "doc_link"],
+      "additionalProperties": false,
+      "properties": {
+        "_comment": { "type": "string" },
+        "strict_path": { "$ref": "#/$defs/anchor_rule" },
+        "glob":        { "$ref": "#/$defs/anchor_rule" },
+        "ast_symbol":  { "$ref": "#/$defs/anchor_rule" },
+        "doc_link":    { "$ref": "#/$defs/anchor_rule" }
+      }
+    },
+
+    "non_traversable_states": {
+      "type": "array",
+      "description": "BFS / topological sort 가 traverse 하지 않을 노드 state. operation.md 결정 8 상호작용 노트 (propose 기본 제외).",
+      "items": { "type": "string", "enum": ["active", "drift", "propose", "deprecated"] }
+    },
+
+    "auto_cascade": {
+      "type": "object",
+      "description": "operation.md 결정 5 끝 노트 — Phase 3 topological sort 도입 후 활성화. dry_run=true 일 때는 propose JSONL 기록만.",
+      "additionalProperties": false,
+      "required": ["enabled", "dry_run"],
+      "properties": {
+        "_comment": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "dry_run": { "type": "boolean" }
+      }
+    }
+  },
+
+  "$defs": {
+    "tier_row": {
+      "type": "object",
+      "required": ["UC_to_BHV", "BHV_to_AC", "AC_to_TC", "TC_to_IMPL"],
+      "additionalProperties": false,
+      "properties": {
+        "UC_to_BHV":  { "$ref": "#/$defs/decision" },
+        "BHV_to_AC":  { "$ref": "#/$defs/decision" },
+        "AC_to_TC":   { "$ref": "#/$defs/decision" },
+        "TC_to_IMPL": { "$ref": "#/$defs/decision" }
+      }
+    },
+    "anchor_rule": {
+      "type": "object",
+      "required": ["path_only_patch", "symbol_change"],
+      "additionalProperties": false,
+      "properties": {
+        "path_only_patch": { "$ref": "#/$defs/decision" },
+        "symbol_change":   { "$ref": "#/$defs/decision" }
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["auto", "propose", "manual"]
+    }
+  }
+}
