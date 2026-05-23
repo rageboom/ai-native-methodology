@@ -9,6 +9,16 @@
 
 ---
 
+## [8.14.4] — 2026-05-23 PATCH — F-SIM-012 + F-SIM-014 closed (잔존 시뮬레이션 carry 0 도달)
+
+> v8.14.3 carry 의 마지막 잔존 F-SIM 2건 종결. 사용자 묶음 결단 (F-SIM-012 close / F-SIM-014 scope-out / 둘 다 권장 채택). additive doc + schema 설명 정정 / breaking 0.
+>
+> - **F-SIM-012** (severity_distinct_count=1 mask): `severity_distinct_count` gauge 는 F-SIM-002 로 schema+builder 에 **이미 존재** (audit signal). schema 설명이 약속한 "release-readiness #14 sentinel" 은 미구현 → **하드 release-gate sentinel scope-out** (distinct==1 은 작은 all-must PoC[poc-14] 정상값 → gate 화 시 §8.1 단일 PoC false-positive). gauge(감사 신호)로 충분 → **closed**. schema 설명에서 미구현 sentinel 문구 정정.
+> - **F-SIM-014** (analysis-form-validation-fe BE cover): skill 은 의도적 FE 전용 (name `-fe` / track=FE / Zod·Yup·RHF 대상). BE schema validation (Pydantic / dataclass / Joi-BE) = 별도 future skill 후보로 문서화 → **scope-out closed** (skill 정체성 보존 + breaking 0 / F-SIM-016 환경-의존 scope-out 선례 동형 / poc-14 BE 표면은 analysis-source-inventory 우회 cover).
+> - **결과**: 시뮬레이션 dogfood(F-SIM) ledger 잔존 carry = **0** (F-SIM-001~016 전부 처분).
+> - 변경: finding-system.md F-SIM-012/014 status closed + summary / traceability-matrix.schema.json severity_distinct_count 설명 정정 / 3-way version 8.14.3 → 8.14.4 / DEC-2026-05-23-fsim-012-014-close + INDEX + STATUS + CLAUDE.md sync.
+> - **STOP-3**: workspace 694/694 pass (보존) / version 3-way 8.14.4 / skill-citation 0 stale / breaking 0 = PATCH.
+
 ## [8.14.3] — 2026-05-23 PATCH — F-SIM-016 closed (R19 Tier 2 environment-dependent risk sub-axis paradigm 진화 / Tier 3 격상 ❌)
 
 > v8.14.2 carry F-SIM-016 본격 종결. 사용자 결단 "나머지 진행 하자" → #1 F-SIM-016 영구 scope-out 채택. paradigm 정합 = Tier 2 sub-axis 본격 명시 (Tier 3 격상 ❌ / simulated 와 본질 구분). additive doc only / breaking 0.

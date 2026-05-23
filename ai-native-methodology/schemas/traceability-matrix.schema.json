@@ -218,7 +218,7 @@
         "severity_distinct_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ F-SIM-002 (2026-05-18) audit signal — matrix cell severity 분포 수. == 1 시 MoSCoW 단축 회귀 의심 (release-readiness 신규 #14 sentinel)."
+          "description": "★ F-SIM-002 (2026-05-18) audit signal — matrix cell severity 분포 수. == 1 시 MoSCoW 단축 회귀 의심 (audit signal / F-SIM-012 v8.14.4: 하드 release-gate sentinel 은 scope-out — distinct==1 은 작은 all-must PoC 정상값이라 §8.1 false-positive)."
         },
         "severity_propagation_active": {
           "type": "boolean",

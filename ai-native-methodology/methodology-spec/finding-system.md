@@ -477,7 +477,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 015 | **high** | **closed v8.14.0** | test-spec.fail_mode schema 미허용 / F-SIM-005 P1 carry 즉시 영향 — v8.14.0 fail_mode enum 4종 (compile_import_fail/assertion_fail/dry_run_placeholder/pending) 추가 + chain-coverage-validator validateFailModeDistribution 7번째 export (warn-only / boolean 강제) 본격 흡수 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §3 |
 > | 016 | low | **closed v8.14.3** | static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ — v8.14.3 본격 흡수 (R19 Tier 2 안 environment-dependent risk sub-axis 본격 명시 / Tier 3 격상 ❌ paradigm 정합 / memory `feedback_environment_dependent_tools_scope_out` 본격 신설 / DEC-2026-05-23-fsim-016-environment-dependent-scope-out §1) |
 >
-> ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2. ★ v8.14.0 본격 흡수 = F-SIM-005 (P1 carry 본격 해소) + F-SIM-013 (Type 분류 3계층화 paradigm 안 흡수) + F-SIM-015 (test-spec.fail_mode schema 본격 추가). 잔존 carry = F-SIM-012/014/016 (cooling-off 후 별 session 결단).
+> ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2. ★ v8.14.0 본격 흡수 = F-SIM-005 (P1 carry 본격 해소) + F-SIM-013 (Type 분류 3계층화 paradigm 안 흡수) + F-SIM-015 (test-spec.fail_mode schema 본격 추가). 잔존 carry = **0** (F-SIM-016 closed v8.14.3 scope-out / F-SIM-012 closed v8.14.4 gauge-sufficient / F-SIM-014 closed v8.14.4 FE scope-out).
 
 ### F-SIM-001: critical antipattern 이 chain 을 무경고로 관통 + matrix 가 "critical/green" 보고
 
@@ -626,11 +626,11 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Type:** anti-pattern (SSOT mapping 단일축 / F-SIM-002 propagation 가시화 한계)
 - **Description:** v8.4.0 시뮬레이션 (poc-14) chain harness 안 traceability-matrix 의 severity distinct count = 1 (모든 cell = "critical"). F-SIM-002 가 severity max-propagation 본격 흡수했으나, 모든 AC = MoSCoW must → cell 전부 critical 도달 = severity_distinct_count 본질 mask. propagation 본격 가시화 ❌ (BR/AP 단계 별 severity 차이 보존 ❌).
 - **Evidence:** poc-14 matrix.json `severity distinct = ['critical']`. v8.4.0 시뮬레이션 산출물 `.aimd/simulation/invocation-log.md` 안 본격 표면화.
-- **Spec gap:** `schemas/traceability-matrix.schema.json` severity 산정 시 distinct count gauge 부재. `methodology-spec/deliverables/22-traceability-matrix.md` severity propagation 의미축 단일화.
-- **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
-- **Severity:** medium — F-SIM-002 본격 흡수 후 부분 잔존 / paradigm-level 한계 표면화 / single-PoC carry (≥ 2 PoC 확인 후 closed 결단).
-- **Proposed fix:** AC MoSCoW 분포 다양화 권고 ★ deliverable §5 + severity_distinct_count gauge metric 신설 (warn ≤ 1 / target ≥ 2) + matrix.md 안 distribution histogram 렌더. PATCH (additive metric).
-- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / cooling-off 후 별 결단)
+- **Spec gap:** ~~gauge 부재~~ → `severity_distinct_count` gauge 는 F-SIM-002 로 `schemas/traceability-matrix.schema.json` + builder.js 에 **이미 존재** (audit signal). `methodology-spec/deliverables/22-traceability-matrix.md` severity propagation 단일축 = 알려진 paradigm 한계 (수용 / AC MoSCoW 분포 다양화는 권고 수준).
+- **Decision made:** v8.4.0 표면화 → v8.14.0 ledger 등재 → **v8.14.4 close** (gauge 충분 / 하드 sentinel scope-out / 2026-05-23).
+- **Severity:** medium — F-SIM-002 본격 흡수 후 부분 잔존 / paradigm-level 한계 표면화 / single-PoC carry.
+- **Proposed fix:** ★ 해소됨 — `severity_distinct_count` gauge 이미 존재 (audit signal 충분). 하드 release-gate sentinel 은 **scope-out**: distinct==1 은 작은 all-must PoC(poc-14)에서 정상값 → gate 화 시 §8.1 단일 PoC false-positive. schema 설명의 미구현 "#14 sentinel" 문구 제거.
+- **Status:** ★ ★ **closed v8.14.4 (gauge 충분 / sentinel scope-out)** (DEC-2026-05-23-fsim-012-014-close).
 
 ### F-SIM-013: Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm)
 
@@ -653,10 +653,10 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Description:** `skills/analysis-form-validation-fe/SKILL.md` description = "FE-only" 명시 → Pydantic BE schema validation (FastAPI request body validation 본격 표면) cover ❌ / poc-14 BE stack 안 본격 fire 누락. Pydantic BE validation = schema-validation paradigm 정합 = FE Zod/Yup 와 동형 / description scope 확장 후보.
 - **Evidence:** poc-14 `.aimd/simulation/element-frequency.json` 안 analysis-form-validation-fe = non-fire (track-mismatch 분류). Pydantic schema = `examples/poc-14-fsim-corroboration/source/app/schemas.py` 안 본격 표면.
 - **Spec gap:** skill description scope 정의에 "BE schema validation framework (Pydantic / dataclass / Joi-BE 등)" 본격 cover 정책 부재.
-- **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
+- **Decision made:** v8.4.0 표면화 → v8.14.0 ledger 등재 → **v8.14.4 close (scope-out)** (2026-05-23).
 - **Severity:** low — single skill scope / 우회 가능 (analysis-source-inventory 가 Pydantic 표면 cover).
-- **Proposed fix:** (a) skill description 안 BE schema validation framework 본격 cover 명시 + (b) skill rename 후보 (`analysis-form-validation` / `-fe` suffix 제거 / F-SKILL-014 동형 / breaking minor) — cooling-off 후 별 결단.
-- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / P2 cooling-off 후 별 결단 / F-SKILL-014 동반 후보).
+- **Proposed fix:** ★ scope-out — `analysis-form-validation-fe` 는 의도적 FE 전용 (name `-fe` / track=FE / Zod·Yup·RHF 대상) 유지. BE schema validation (Pydantic / dataclass / Joi-BE) = 별도 future skill 후보로 문서화 (skill 정체성 보존 + breaking 0). poc-14 BE 검증 표면은 analysis-source-inventory 가 우회 cover. F-SIM-016 환경-의존 scope-out 선례 동형.
+- **Status:** ★ ★ **closed v8.14.4 (scope-out / FE 전용 유지)** (DEC-2026-05-23-fsim-012-014-close / BE schema validation skill = future 후보).
 
 ### F-SIM-015: test-spec.fail_mode schema 미허용 (F-SIM-005 P1 carry 즉시 영향)
 
