@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm, validateFailModeDistribution } from '../src/validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm, validateFailModeDistribution, autoDetectProjectRoot } from '../src/validator.js';
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -408,5 +408,37 @@ describe('validateConfidenceCoverage — hard/soft 인지', () => {
   it('null 입력 방어', () => {
     assert.doesNotThrow(() => validateConfidenceCoverage(null));
     assert.doesNotThrow(() => validateConfidenceCoverage({}));
+  });
+});
+
+// ★ F-MB-VAL-001 (v9.0.4 / 2026-05-24): autoDetectProjectRoot default 결함 fix 검증
+describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
+  it('.aimd/output/<file>.json 패턴 → PoC root 자동 감지 (../..)', () => {
+    const specPath = '/repo/examples/poc-05/.aimd/output/behavior-spec.json';
+    const result = autoDetectProjectRoot(specPath);
+    // dirname = /repo/examples/poc-05/.aimd/output, ../.. = /repo/examples/poc-05
+    assert.ok(result.endsWith('poc-05') || result.endsWith('poc-05/') || result.endsWith('poc-05\\'),
+      `expected PoC root ending with 'poc-05', got: ${result}`);
+  });
+
+  it('Windows backslash path 도 .aimd/output 패턴 자동 감지', () => {
+    const specPath = 'C:\\repo\\examples\\poc-14\\.aimd\\output\\planning-spec.json';
+    const result = autoDetectProjectRoot(specPath);
+    assert.ok(result.endsWith('poc-14') || result.endsWith('poc-14\\') || result.endsWith('poc-14/'),
+      `expected PoC root ending with 'poc-14', got: ${result}`);
+  });
+
+  it('non-.aimd/output 위치 → fallback dirname 그대로 (backward-compat)', () => {
+    const specPath = '/repo/some/other/dir/behavior-spec.json';
+    const result = autoDetectProjectRoot(specPath);
+    // dirname = /repo/some/other/dir (변경 없음)
+    assert.ok(result.endsWith('dir') || result.endsWith('dir/') || result.endsWith('dir\\'),
+      `expected fallback dirname, got: ${result}`);
+  });
+
+  it('null/empty 입력 방어', () => {
+    assert.equal(autoDetectProjectRoot(null), null);
+    assert.equal(autoDetectProjectRoot(''), null);
+    assert.equal(autoDetectProjectRoot(undefined), null);
   });
 });

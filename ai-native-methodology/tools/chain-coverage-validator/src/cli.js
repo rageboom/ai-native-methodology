@@ -5,8 +5,7 @@
 //   default: warn-mode (broken-path = medium / non-blocking) — F-MB-009 LL-i-55 함정존 회피
 //   --strict-paths: broken-path = high / blocking — release-readiness #14 baseline ratchet 진입 후 v+1 default 전환
 
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, validateFailModeDistribution, loadJson } from './validator.js';
-import { dirname } from 'node:path';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, validateFailModeDistribution, autoDetectProjectRoot, loadJson } from './validator.js';
 
 function parseArgs(argv) {
   const out = { dryRun: false, json: false, threshold: 0.85, strictPaths: false };
@@ -30,7 +29,7 @@ function parseArgs(argv) {
 
 ★ F-SIM-003 (2026-05-18):
   --strict-paths : cross-ref broken-path = high (blocking). default = warn (medium / non-blocking).
-  --project-root : project base for relative path resolution (default = dirname of --behavior).
+  --project-root : project base for relative path resolution (default = ★ v9.0.4 autoDetectProjectRoot — .aimd/output/ 패턴 시 PoC root 자동 감지 / 그 외 dirname(behavior) fallback / F-MB-VAL-001).
   --repo-root    : repo base for repo-absolute (examples/...) paths (default = process.cwd()).`);
       process.exit(0);
     }
@@ -63,7 +62,7 @@ const failModeResult = testSpec ? validateFailModeDistribution(testSpec) : { fin
 // ★ F-SIM-003: cross-ref path resolve (separate validation pass)
 let pathResult = { findings: [], summary: { total_findings: 0, broken_path_count: 0, path_convention_warning_count: 0, strict_mode: args.strictPaths } };
 if (args.planning || args.behavior) {
-  const projectRoot = args.projectRoot ?? dirname(args.behavior ?? args.planning);
+  const projectRoot = args.projectRoot ?? autoDetectProjectRoot(args.behavior ?? args.planning);
   const repoRoot = args.repoRoot ?? process.cwd();
   pathResult = validateCrossRefPaths({
     planning, behavior,

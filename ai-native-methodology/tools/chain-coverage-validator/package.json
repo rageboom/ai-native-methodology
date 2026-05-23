@@ -1,7 +1,7 @@
 {
   "name": "@ai-native-methodology/chain-coverage-validator",
-  "version": "0.2.0",
-  "description": "v2.0 chain 정합 validator — UC→BHV→AC link coverage / verifiable / cross_links 의무 / coverage ≥ 0.85 ratchet. ★ v8.11.0 — validateRisksForm lane 신설 (Senior REVISE-1 흡수 / risks_and_constraints string form legacy carry warn).",
+  "version": "0.3.0",
+  "description": "v2.0 chain 정합 validator — UC→BHV→AC link coverage / verifiable / cross_links 의무 / coverage ≥ 0.85 ratchet. ★ v8.11.0 — validateRisksForm lane 신설 (Senior REVISE-1 흡수 / risks_and_constraints string form legacy carry warn). ★ v9.0.4 — autoDetectProjectRoot 신설 (F-MB-VAL-001 / `.aimd/output/<file>.json` 패턴 자동 PoC root 감지 / 5 PoC self-corroboration / default mismatch silent sink 해소).",
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": { "chain-coverage-validator": "./src/cli.js" },
