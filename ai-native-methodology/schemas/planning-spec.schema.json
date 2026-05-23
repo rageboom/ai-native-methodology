@@ -16,6 +16,7 @@
       "description": "본 planning-spec 의 출처. 1차 = legacy-extraction 만 / use case 4종 분기는 v2.1+ carry K-1.",
       "required": ["type", "source_artifacts"],
       "additionalProperties": false,
+      "$comment": "★ v8.10.0 — source_handling + source_root_absolute 명시 properties 추가 (DEC-2026-05-12-in-place-read-정책-채택 정합 / poc-11 실측 정식 흡수 / additive). additionalProperties:false 유지 = drift attractor 차단 본질 보존.",
       "properties": {
         "type": {
           "type": "string",
@@ -27,6 +28,14 @@
           "description": "본 planning-spec 추출에 사용된 analysis stage 산출물 경로 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5)",
           "items": {"type": "string"},
           "minItems": 1
+        },
+        "source_handling": {
+          "type": "string",
+          "description": "★ v8.10.0 — source 처리 paradigm (DEC-2026-05-12-in-place-read-정책-채택 정합 / 예: '★ ★ ★ in-place read (사본 ❌)')"
+        },
+        "source_root_absolute": {
+          "type": "string",
+          "description": "★ v8.10.0 — source 절대경로 (in-place read paradigm 시 reference / poc-11 사례)"
         }
       }
     },
@@ -161,18 +170,77 @@
     },
     "risks_and_constraints": {
       "type": "array",
-      "items": {"type": "string"},
-      "description": "위험 / 제약 (e.g., 70~80% 한계 / 라이선스 / 인프라 제약)"
+      "description": "위험 / 제약 (e.g., 70~80% 한계 / 라이선스 / 인프라 제약). ★ v8.10.0 — polymorphic items: legacy string carry OR object {id, severity, description, type?} (5 PoC 실측 정식 흡수).",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "$comment": "★ v8.10.0 — legacy carry 한정 (PoC v8.9.x 이전). 신규 PoC = object form 권장 (severity 결정적 추출 가능). v8.11.0+ chain-coverage-validator risks_string_form_warn lane = Senior REVISE-1 carry."
+          },
+          {
+            "type": "object",
+            "required": ["id", "severity", "description"],
+            "additionalProperties": true,
+            "$comment_additionalProperties": "★ v8.10.0 — PoC 부가 키 (type / category 등) 허용. drift attractor 차단은 chain-coverage-validator risks lane (v8.11.0 carry).",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "위험 ID (예: R-001 / RISK-SEC-001)"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["critical", "high", "medium", "low"],
+                "description": "★ v8.10.0 — severity-cross-stage-mapping.md SSOT 정합 (rules 5종↔ratchet 4종↔MoSCoW 3종)"
+              },
+              "description": {
+                "type": "string",
+                "minLength": 5,
+                "description": "위험 / 제약 자연어 기술"
+              },
+              "type": {
+                "type": "string",
+                "description": "위험 분류 (예: security / performance / concurrency / design / paradigm / schema / type-safety)"
+              }
+            }
+          }
+        ]
+      }
     },
     "cross_links": {
       "type": "object",
       "description": "★ DO-178C bidirectional traceability 차용",
       "additionalProperties": false,
+      "$comment": "★ v8.10.0 — 4 신규 enum 추가 (to_characterization / to_sql_inventory / to_source / to_decisions) — poc-07+poc-11 실측 정식 흡수. additionalProperties:false 유지 = drift attractor 차단 본질 보존 (Senior C3 권고).",
       "properties": {
         "to_analysis_artifacts": {
           "type": "array",
           "items": {"type": "string"},
           "description": "backward link to analysis 산출물 (business-rules.json / domain.json / 7대 산출물)"
+        },
+        "to_characterization": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ v8.10.0 — backward link to characterization 산출물 (characterization/snapshots/ 등 / analysis-characterization-test 정합)"
+        },
+        "to_sql_inventory": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ v8.10.0 — backward link to sql-inventory 산출물 (sql-inventory.json / analysis-sql-inventory 정합)"
+        },
+        "to_source": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ v8.10.0 — backward link to source 코드 (source/java/* + source/sqlmap/* 등 / source-grounded paradigm 정합)"
+        },
+        "to_decisions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ v8.10.0 — backward link to decisions/ DEC.md (DEC-YYYY-MM-DD-* / planning 결단 trace)"
+        },
+        "to_phase7_findings": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "★ v8.10.0 — backward link to Phase 4.7 findings (F-PHASE7-* / intent-vs-bug ambiguous 영역 trace / analysis-characterization-test 정합)"
         }
       }
     }

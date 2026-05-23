@@ -55,7 +55,7 @@
       "actors": ["ifrs-user"],
       "preconditions": ["인증된 세션 존재 — IfrsUtil.getSession 의무"],
       "postconditions": ["환율 관리 JSP 렌더 + thisYear/year 모델 attribute"],
-      "acceptance_criteria_refs": ["(carry — chain 2 진입 시 AC-EXCHANGE-001 등재)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-001"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:34-46 (function exchangeView)"
       ]
@@ -67,7 +67,7 @@
       "actors": ["ifrs-user"],
       "preconditions": ["year 파라미터 (필수 추정 — sql-map 의 #year# 강제)"],
       "postconditions": ["TB_CURRENCY × {E, A} × 12 month 환율 list (jsonView)"],
-      "acceptance_criteria_refs": ["(carry)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-002"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:49-59 (function exchangeViewAjax)",
         "source/sqlmap/exchange.xml:8-32 (selectExchangeList SQL UNION ALL E + A)",
@@ -81,7 +81,7 @@
       "actors": ["ifrs-admin (추정)"],
       "preconditions": ["year 파라미터", "관리자 권한 (추정 — 인가 검증 부재 / AP-EXCHANGE-001 영역)"],
       "postconditions": ["TB_EXCHANGE 갱신 + result 메시지 반환"],
-      "acceptance_criteria_refs": ["(carry — 도메인 expert 인터뷰 후)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-003"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:68-80 (function exchangeMigration)",
         "source/sqlmap/exchange.xml:107-116 (procedure S_ExRateMigration)"
@@ -95,7 +95,7 @@
       "actors": ["ifrs-user"],
       "preconditions": ["currCd + yyyyMM 파라미터"],
       "postconditions": ["TB_DAY_EXCHANGE 일자별 환율 list (jsonView)"],
-      "acceptance_criteria_refs": ["(carry)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-004"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:83-92 (function getDayExchangeList)",
         "source/sqlmap/exchange.xml:118-127 (selectDayExchangeList SQL FORMAT)"
@@ -108,7 +108,7 @@
       "actors": ["ifrs-user"],
       "preconditions": ["currCd + yyyyMM 파라미터"],
       "postconditions": ["Excel 파일 응답 (header [고시일, 환율])"],
-      "acceptance_criteria_refs": ["(carry)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-005"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:94-120 (function downloadDayExchangeExcel)"
       ],
@@ -121,7 +121,7 @@
       "actors": ["ifrs-admin (추정)"],
       "preconditions": ["year + currCd_arr[] + gubun_arr[] + mon1_arr[]~mon12_arr[]", "인증 세션 (IfrsUtil.getSession)"],
       "postconditions": ["TB_EXCHANGE MERGE (matched UPDATE / not matched INSERT)"],
-      "acceptance_criteria_refs": ["(carry)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-006"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:133-144 (function updateExchange)",
         "source/java/service/impl/ExchangeServiceImpl.java:38-76 (12개월 배열 파싱)",
@@ -136,7 +136,7 @@
       "actors": ["ifrs-user"],
       "preconditions": ["currCd + year + month 파라미터"],
       "postconditions": ["{ excRateReg: 'Y' | 'N' } (jsonView)"],
-      "acceptance_criteria_refs": ["(carry)"],
+      "acceptance_criteria_refs": ["AC-EXCHANGE-PLACEHOLDER-007"],
       "source_grounded_evidence": [
         "source/java/web/ExchangeController.java:157-168 (function checkExcRateReg)",
         "source/sqlmap/exchange.xml:76-98 (selectCheckExcRate SQL CASE WHEN month → MON1~MON12)",
@@ -206,7 +206,7 @@
       "input/antipatterns.json",
       "input/inventory.json"
     ],
-    "to_characterization_artifacts": [
+    "to_characterization": [
       "characterization/snapshots/*.json (3 UC × 10 scenario)",
       "characterization/coverage.json (UC coverage 0.43)",
       "characterization/intent-vs-bug.md (14 명확 + 3 ambiguous = 82% acceptance oracle 적용 가능)"
@@ -217,7 +217,7 @@
       "F-PHASE7-003 (Given/When/Then BDD 형식 = chain 2 acceptance-criteria.json 정합)",
       "F-PHASE7-004 (behavior_likely_bug = 새 시스템 검증 추가 의무 신호)"
     ],
-    "to_carry_decisions": [
+    "to_decisions": [
       "carry C-1 (Spring 4.x AP seed 본체 격상 — evidence 1 PoC 확보 / ≥2 PoC 의무)",
       "carry C-3 (phase 4.7 v2.1.0 본체 격상 — 1 PoC corroboration 확보)"
     ]

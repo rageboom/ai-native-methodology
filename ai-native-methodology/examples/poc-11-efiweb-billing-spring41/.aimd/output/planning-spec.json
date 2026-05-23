@@ -137,30 +137,22 @@
     "★ paradigm-cross 자격 ❌ (Spring 4.1+iBATIS 2 동일 / PoC #08+#09 Modern stack 영역)",
     "cross-DB FIM + SGERPMA 본문 (★ DBA-read carry)"
   ],
-  "risks_and_constraints": {
-    "critical": [
-      "★ ★ ★ AP-BILLING-001 (@Transactional ❌ saveDataConfirm 4 SQL 비원자성) — 새 시스템 migration 시 @Transactional(rollbackFor=Exception.class) + try-catch 의무",
-      "★ ★ ★ AP-BILLING-005 (SQL Server vendor 종속 4 차원) — PostgreSQL/Oracle 이식 시 SCOPE_IDENTITY → RETURNING / WITH NOLOCK → isolation level / dbo.FN_GET_MONTH → JVM logic / getDate → CURRENT_TIMESTAMP 재작성 의무",
-      "★ ★ ★ AP-BILLING-006 (cross-DB FQCN FIM + SGERPMA hardcoded) — 새 시스템 = dataSource 분리 (ifrsDS / fimDS / sgerpDS) 또는 Linked Server 추상화 의무",
-      "★ ★ ★ AP-BILLING-011 (★ ambiguous BR-BILLING-ENTITY-006 COM_NO==2 hardcoded) — 결제 도메인 expert 결단 carry"
-    ],
-    "high": [
-      "AP-BILLING-009 (XSS risk HTML concat / makeDataTable raw insert) — jQuery .text() 또는 template engine 의무",
-      "★ DRY violation (4 SQL WHERE 절 동일 / patterns_extension_v2 등재) — <sql id> + <include refid> 또는 service 단 추상화 의무"
-    ],
-    "medium": [
-      "AP-BILLING-004 (param 사후 변경 input/output mix)",
-      "AP-BILLING-007 (recursive CTE T-SQL 한정)",
-      "AP-BILLING-008 (logging 부재 / throws Exception 광범위)",
-      "AP-BILLING-010 (시작년도 2015 hardcoded magic year)",
-      "AP-BILLING-013 (외부 BI URL hardcoded)"
-    ],
-    "low": [
-      "AP-BILLING-002 (Map raw type / @SuppressWarnings)",
-      "AP-BILLING-003 (unused import ConnectService + DataService / dead code)",
-      "AP-BILLING-012 (자체 ajax wrapper fn_ajax)"
-    ]
-  },
+  "risks_and_constraints": [
+    {"id": "R-001", "severity": "critical", "type": "transaction", "description": "★ ★ ★ AP-BILLING-001 (@Transactional ❌ saveDataConfirm 4 SQL 비원자성) — 새 시스템 migration 시 @Transactional(rollbackFor=Exception.class) + try-catch 의무"},
+    {"id": "R-002", "severity": "critical", "type": "vendor-lock-in", "description": "★ ★ ★ AP-BILLING-005 (SQL Server vendor 종속 4 차원) — PostgreSQL/Oracle 이식 시 SCOPE_IDENTITY → RETURNING / WITH NOLOCK → isolation level / dbo.FN_GET_MONTH → JVM logic / getDate → CURRENT_TIMESTAMP 재작성 의무"},
+    {"id": "R-003", "severity": "critical", "type": "cross-db", "description": "★ ★ ★ AP-BILLING-006 (cross-DB FQCN FIM + SGERPMA hardcoded) — 새 시스템 = dataSource 분리 (ifrsDS / fimDS / sgerpDS) 또는 Linked Server 추상화 의무"},
+    {"id": "R-004", "severity": "critical", "type": "domain-expert-carry", "description": "★ ★ ★ AP-BILLING-011 (★ ambiguous BR-BILLING-ENTITY-006 COM_NO==2 hardcoded) — 결제 도메인 expert 결단 carry"},
+    {"id": "R-005", "severity": "high", "type": "security", "description": "AP-BILLING-009 (XSS risk HTML concat / makeDataTable raw insert) — jQuery .text() 또는 template engine 의무"},
+    {"id": "R-006", "severity": "high", "type": "dry-violation", "description": "★ DRY violation (4 SQL WHERE 절 동일 / patterns_extension_v2 등재) — <sql id> + <include refid> 또는 service 단 추상화 의무"},
+    {"id": "R-007", "severity": "medium", "type": "design", "description": "AP-BILLING-004 (param 사후 변경 input/output mix)"},
+    {"id": "R-008", "severity": "medium", "type": "vendor-lock-in", "description": "AP-BILLING-007 (recursive CTE T-SQL 한정)"},
+    {"id": "R-009", "severity": "medium", "type": "observability", "description": "AP-BILLING-008 (logging 부재 / throws Exception 광범위)"},
+    {"id": "R-010", "severity": "medium", "type": "magic-value", "description": "AP-BILLING-010 (시작년도 2015 hardcoded magic year)"},
+    {"id": "R-011", "severity": "medium", "type": "magic-value", "description": "AP-BILLING-013 (외부 BI URL hardcoded)"},
+    {"id": "R-012", "severity": "low", "type": "type-safety", "description": "AP-BILLING-002 (Map raw type / @SuppressWarnings)"},
+    {"id": "R-013", "severity": "low", "type": "dead-code", "description": "AP-BILLING-003 (unused import ConnectService + DataService / dead code)"},
+    {"id": "R-014", "severity": "low", "type": "paradigm", "description": "AP-BILLING-012 (자체 ajax wrapper fn_ajax)"}
+  ],
   "migration_priority_summary": {
     "$comment": "★ v2.3.0 12번째 컬럼 migration_priority P0~P3 — 6 SQL 단위 분포",
     "P0": ["BillingDAO.insertConfirmHistoryData", "BillingDAO.insertConfirmData", "BillingDAO.deleteConfirmData"],

@@ -9,6 +9,55 @@
 
 ---
 
+## [8.10.0] — 2026-05-23 MINOR — planning-spec schema 진화 (5 enum + polymorphic risks + derivation_source 2 properties / 6 PoC analysis_validator carry 해소)
+
+> v8.9.0 carry "C-analysis-validator-poc06-10-placeholder" 종결. 사용자 결단 "추천안 묶음 전체 시행 (Senior REVISE-1 포함)" (2026-05-23 / D1~D6 6건 묶음). Senior critique GO @ 0.87 + REVISE-1 (D2 severity required + $comment legacy-carry warning + chain-coverage-validator risks_string_form_warn lane v8.11.0 carry) 흡수.
+
+### Schema 진화 (additive / breaking 0)
+
+- **D2 — `risks_and_constraints` items polymorphic** (anyOf[string, object{id, severity, description, type?}])
+  - 5 PoC 실측 흡수 (poc-08/09/10/11 객체 array + legacy string carry 양쪽)
+  - `severity` required enum (`critical|high|medium|low`) — severity-cross-stage-mapping.md SSOT 정합
+  - $comment "string 분기 = legacy carry 한정 / 신규 PoC = object 의무" 명시 (Senior REVISE-1)
+- **D3 — `cross_links` 5 enum** (Senior 실측 보강 + poc-06 5번째 변종 발견 정합)
+  - 기존 `to_analysis_artifacts` (보존)
+  - 신규 `to_characterization` (analysis-characterization-test 정합 / poc-06/07/11)
+  - 신규 `to_sql_inventory` (analysis-sql-inventory 정합 / poc-07/11)
+  - 신규 `to_source` (source-grounded paradigm / poc-11)
+  - 신규 `to_decisions` (planning 결단 trace / poc-06/07/11)
+  - 신규 `to_phase7_findings` (Phase 4.7 ambiguous 영역 / poc-06)
+  - `additionalProperties:false` 유지 = drift attractor 차단 본질 보존
+- **D4 — `derivation_source` 2 properties** (DEC-2026-05-12-in-place-read-정책-채택 정합)
+  - 신규 `source_handling` (string / in-place read paradigm)
+  - 신규 `source_root_absolute` (string / source 절대경로)
+  - poc-11 실측 정식 흡수
+
+### PoC 정합
+
+- **poc-06** (chain 1 only)
+  - 7 use_cases `acceptance_criteria_refs` placeholder → `AC-EXCHANGE-PLACEHOLDER-001` ~ `AC-EXCHANGE-PLACEHOLDER-007` marker 정합 (chain 2 진입 시 진짜 AC ID 교체 의무)
+  - `cross_links` naming canonical 정합 (`to_characterization_artifacts` → `to_characterization`, `to_carry_decisions` → `to_decisions`)
+- **poc-11** (chain 2+)
+  - `risks_and_constraints` dict (`{critical:[], high:[], medium:[], low:[]}`) → array of 14 objects (id+severity+type+description / severity 보존)
+
+### 검증 — STOP-3 hard gate
+
+- schema-validator 6 PoC planning-spec.json **VALID** ✅ (10+3+8+4+2+7 errors → 0)
+- release-readiness `analysis_validator_violation` red → ✅ (v8.9.0 carry 종결)
+- breaking 0 = MINOR (additive — schema 3 properties 진화 + PoC naming 정합 / 기존 의무 제거 0)
+
+### carry (다음 session)
+
+- **v8.11.0 carry — chain-coverage-validator `risks_string_form_warn` lane** (Senior REVISE-1 / risks_and_constraints string form = legacy carry 한정 명시 enforcement / 신규 PoC object form 권장)
+- **xmllint env absent carry** (sql-inventory-validator iBATIS test #25+#26 / Linux/Mac libxml2 환경 의무 / v8.9.0 carry 보존)
+
+### 참고
+
+- DEC-2026-05-23-analysis-validator-poc06-11-resolve
+- v8.9.0 carry C-analysis-validator-poc06-10-placeholder 종결
+
+---
+
 ## [8.9.0] — 2026-05-23 MINOR — dep-graph P1~P4 (artifact dependency graph + impact analyzer + 2 validator + chain-driver/matrix-builder 통합)
 
 > charter §5 P3 "Spec change impact analyzer" SHIPPED. 설계 SSOT = `work/dep-graph/operation.md` (8 결정 / 7 알고리즘). 사용자 결단 "추천안 묶음 전체 시행" (2026-05-23) — additive only / breaking 0 / 직전 commit `b9615d0` 의 명시 carry "다음 세션 release ceremony" 시행.
