@@ -9,6 +9,44 @@
 
 ---
 
+## [8.9.0] — 2026-05-23 MINOR — dep-graph P1~P4 (artifact dependency graph + impact analyzer + 2 validator + chain-driver/matrix-builder 통합)
+
+> charter §5 P3 "Spec change impact analyzer" SHIPPED. 설계 SSOT = `work/dep-graph/operation.md` (8 결정 / 7 알고리즘). 사용자 결단 "추천안 묶음 전체 시행" (2026-05-23) — additive only / breaking 0 / 직전 commit `b9615d0` 의 명시 carry "다음 세션 release ceremony" 시행.
+
+### 신규 자산 (additive / breaking 0)
+
+- **schema 5 신설**: `artifact-graph-node.schema.json` + `artifact-graph-edge.schema.json` + `code-pointer.schema.json` + `discovery-output.schema.json` + `plan-spec.schema.json` (chain schema 6종 안 `code_pointers` optional 추가 — strict 의무 ❌)
+- **validator 2 신설**: `graph-integrity-validator` (DFS cycle/orphan/unknown / 13 test) + `code-pointer-validator` (pointer coverage)
+- **chain-driver 확장**: `impact-analyzer` (confidence-aware BFS) + `propagation-orderer` (topo sort) + `centrality` (PageRank-lite top-3 root) + `policy-evaluator` (propagation-policy schema-driven) + CLI `impact` / `navigate` / `query --graph` + `hooks-bridge evaluate_policy`
+- **matrix-builder 확장**: `graph-synthesizer` (4-state machine: active/propose/drift/deprecated) + diff-view 렌더러
+- **skill 신설**: `dep-graph-navigator` (`/dep-graph-navigator <node-id>` — BFS MUST/SHOULD/FYI + code_pointers + centrality)
+- **hooks**: PostToolUse + SessionStart `graph-sync` 자동 호출
+- **policies**: `propagation-policy.json` + `propagation-policy.schema.json` (4 change-tier × 4 chain-step + 4 anchor_type × 2 patch-kind)
+- **release-readiness #15 + #16**: `graph_integrity` + `code_pointer_coverage` (strict default-on / PoC 백필 완료)
+- **docs/dependency-graph.md** 운영 가이드 신설 + plugin-charter P3 SHIPPED 마킹
+
+### 회귀 fix
+
+- `tools/chain-driver/package.json` 에 `ajv ^8.17.1` + `ajv-formats ^3.0.1` dependency 등록 (test/policy-schema.test.js 안 ajv import 인데 미등록 = ERR_MODULE_NOT_FOUND regress / 본 release 안 동반 fix)
+
+### 검증 — STOP-3 hard gate
+
+- workspace 686/686 → 685/686 pass (1 fail = xmllint 환경 부재 / Windows / sql-inventory-validator iBATIS test #25+#26 = env absent carry 정당)
+- release-readiness 14/16 → 15/16 ready (analysis_validator red 1 carry = poc-06~10 planning-spec placeholder / 본 작업 무관 기존 drift)
+- breaking 0 = MINOR (additive — schema 5 + validator 2 + criterion 2 신설 / 기존 의무 제거 0)
+
+### carry (다음 session)
+
+- **analysis_validator red 6건** (poc-06~10 planning-spec.json schema invalid) — placeholder 카리 정리 별도 session
+- **xmllint 환경 의존 carry** — Linux/Mac libxml2 환경 의무 (sql-inventory-validator iBATIS 2 test = env absent)
+
+### 참고
+
+- DEC-2026-05-23-dep-graph-p1-p4
+- 직전 commit `b9615d0` (b9615d0425ba532468c58f9f169becab43f8c651) "feat(dep-graph): artifact dependency graph P1~P4"
+
+---
+
 ## [8.8.2] — 2026-05-21 PATCH — mock detect chain-4 자동 호출 + inflation-lint rule pack 확장 (3 rule)
 
 > v8.8.2 PATCH — v8.8.0 carry 2건 진행. 환경 의존 도구 (Stryker / textlint / PIT) carry 는 영구 scope-out (user memory `environment-dependent-tools-scope-out`).
