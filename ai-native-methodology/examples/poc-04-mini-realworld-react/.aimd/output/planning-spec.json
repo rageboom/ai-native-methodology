@@ -51,8 +51,8 @@
     "진짜 React Testing Library 실행 (★ chain 3 RED dry-run only / sub-plan-6 시간 제약)"
   ],
   "risks_and_constraints": [
-    "70~80% 자동화 한계 잔존 — gate 별 사용자 검토 의무",
-    "본 PoC = chain 1~2 + chain 3 RED dry-run / chain 4 GREEN 미실행 (PoC #03 retrofit 패턴 정합 / corroboration #3 자격)"
+    {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 잔존 — gate 별 사용자 검토 의무"},
+    {"id": "R-002", "severity": "medium", "type": "environment", "description": "본 PoC = chain 1~2 + chain 3 RED dry-run / chain 4 GREEN 미실행 (PoC #03 retrofit 패턴 정합 / corroboration #3 자격)"}
   ],
   "cross_links": {
     "to_analysis_artifacts": [

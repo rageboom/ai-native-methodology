@@ -9,6 +9,77 @@
 
 ---
 
+## [8.12.0] — 2026-05-23 MINOR — 5 PoC 18 risks string → object form 마이그레이션 (legacy carry 청산)
+
+> v8.11.0 carry "C-legacy-risks-poc-migration" 종결. 사용자 결단 "ㄱㄱ" → "추천안 묶음 전체 시행" (2026-05-23 / D1~D7 7 cluster). 정보 손실 risk = **0** (실측 입증 / description 자유서술 그대로 보존 + severity enum 추가 metadata).
+
+### 마이그레이션 — 5 PoC 18 items (string → object)
+
+severity ★ prefix 자동 매핑:
+- "★ ★ ★" prefix → critical (1건)
+- "★ ★" prefix → high (1건)
+- "★" prefix → medium (10건)
+- prefix 부재 → low (6건)
+
+type 추론 (description 안 키워드 기반):
+- methodology — paradigm 본질 / 70~80% 한계 / 본체 격상 결단
+- environment — 테스트 0 / in-memory store / 실 DB 부재 / chain harness 일부 dry-run
+- legacy-corpus — Spring 4.1 + iBATIS 2 / SP 본문 비가시성 / sql-inventory 자동화율
+- legacy-domain — IFRS 회계 / 다중책임 + SATD
+- domain-expert-carry — ambiguous BR + AP 도메인 expert 결단 의무
+- architecture-carry — cross-module 의존 / service boundary
+
+| PoC | items | severity 분포 | 정보 보존 |
+|---|---|---|---|
+| poc-03 | 2 | low 1 + medium 1 | ✅ description 그대로 |
+| poc-04-mini | 2 | low 1 + medium 1 | ✅ description 그대로 |
+| poc-05 | 2 | low 1 + medium 1 | ✅ description 그대로 |
+| poc-06 | 6 | low 1 + medium 5 | ✅ ★ prefix → severity / description 그대로 |
+| poc-07 | 6 | low 1 + medium 3 + high 1 + critical 1 | ✅ ★★★/★★/★ → severity / description 그대로 |
+
+### 검증 — 9 PoC 분포 (v8.12.0 완료 시점)
+
+| PoC | string | object | 분류 |
+|---|---|---|---|
+| poc-03 | 0 | 2 | ✅ object form |
+| poc-04-mini | 0 | 2 | ✅ object form |
+| poc-05 | 0 | 2 | ✅ object form |
+| poc-06 | 0 | 6 | ✅ object form |
+| poc-07 | 0 | 6 | ✅ object form |
+| poc-08 | 0 | 8 | ✅ object form (v8.10.0) |
+| poc-09 | 0 | 4 | ✅ object form (v8.10.0) |
+| poc-10 | 0 | 2 | ✅ object form (v8.10.0) |
+| poc-11 | 0 | 14 | ✅ object form (v8.10.0) |
+
+**string form = 0 (전 9 PoC)** / chain-coverage-validator `validateRisksForm` lane = 0 finding emit. legacy carry 완전 청산.
+
+### 자산 갱신
+
+- 5 PoC planning-spec.json risks_and_constraints array 마이그레이션 (string × 18 → object × 18 / 정보 보존)
+- `plugin.json` 8.11.0 → 8.12.0 + `package.json` 8.11.0 → 8.12.0 (3-way sync)
+- DEC-2026-05-23-legacy-risks-migration + INDEX 최상단 + STATUS session 35차
+
+### 검증 — STOP-3 hard gate
+
+- schema-validator 5 PoC (poc-03/04-mini/05/06/07) planning-spec.json **VALID** ✅
+- chain-coverage-validator `validateRisksForm` string_count = 0 (9 PoC 전수) ✅
+- release-readiness 15/16 ready (1 carry = xmllint env absent / 보존)
+- 정보 손실 = 0 (description 자유서술 + ★ prefix → severity enum 정합)
+- breaking 0 = MINOR (additive metadata 추가 — id + severity + type / description 보존)
+
+### carry (다음 session)
+
+- **C-xmllint-env-absent** (v8.9.0~v8.12.0 carry 보존) — Linux/Mac libxml2 환경 의무
+- **C-operation-md-work-folder** (v8.9.0 carry 보존) — docs/ 흡수 후보
+
+### 참고
+
+- DEC-2026-05-23-legacy-risks-migration
+- v8.11.0 carry C-legacy-risks-poc-migration 종결
+- v8.10.0 polymorphic items + v8.11.0 forward warn lane + v8.12.0 legacy 청산 = paradigm 완결 cycle
+
+---
+
 ## [8.11.0] — 2026-05-23 MINOR — chain-coverage-validator validateRisksForm lane (Senior REVISE-1 carry 종결)
 
 > v8.10.0 carry "C-risks-string-form-warn-v811" 종결. v8.10.0 §3 D2 Senior REVISE-1 흡수 — chain-coverage-validator forward lane 신설로 silent omission 결정적 차단. additive only / breaking 0.

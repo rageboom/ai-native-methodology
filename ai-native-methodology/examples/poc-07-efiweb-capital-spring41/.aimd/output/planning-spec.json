@@ -279,12 +279,12 @@
     "10 carry UC (UC-CAPITAL-003/004/005/007/009/012/014/015/016) — Day 1 시간 cap"
   ],
   "risks_and_constraints": [
-    "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무 (CLAUDE.md 정합)",
-    "★ ★ 다중책임 모듈 = SATD ↑↑ (4건 self_recognized — 단일책임 PoC #06 1건 대비 ×4) → 새 시스템 재구현 시 SATD 우선 처리 의무",
-    "★ Spring 4.1 + iBATIS 2 spectrum = sql-inventory 외부 6 컬럼 자동화 4/6 = 66.7% / 매뉴얼 2 + 본 추가 4 = 6 컬럼 carry",
-    "★ ★ ★ 본체 격상 ❌ — 사용자 D11 결단 (b) ≥ 2 PoC isomorphic 후 v2.2.0 (★ §8.1 strict 의무 / 14차 retract 회피)",
-    "★ Stored Procedure 본문 비가시성 = chain 3/4 진입 시 SP 마이그레이션 결단 의무 (Java 측 vs DB 측)",
-    "TB_DAY_EXCHANGE cross-module 직접 의존 = service boundary 분리 검토 의무 (architect carry)"
+    {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무 (CLAUDE.md 정합)"},
+    {"id": "R-002", "severity": "high", "type": "legacy-domain", "description": "★ ★ 다중책임 모듈 = SATD ↑↑ (4건 self_recognized — 단일책임 PoC #06 1건 대비 ×4) → 새 시스템 재구현 시 SATD 우선 처리 의무"},
+    {"id": "R-003", "severity": "medium", "type": "legacy-corpus", "description": "★ Spring 4.1 + iBATIS 2 spectrum = sql-inventory 외부 6 컬럼 자동화 4/6 = 66.7% / 매뉴얼 2 + 본 추가 4 = 6 컬럼 carry"},
+    {"id": "R-004", "severity": "critical", "type": "methodology", "description": "★ ★ ★ 본체 격상 ❌ — 사용자 D11 결단 (b) ≥ 2 PoC isomorphic 후 v2.2.0 (★ §8.1 strict 의무 / 14차 retract 회피)"},
+    {"id": "R-005", "severity": "medium", "type": "legacy-corpus", "description": "★ Stored Procedure 본문 비가시성 = chain 3/4 진입 시 SP 마이그레이션 결단 의무 (Java 측 vs DB 측)"},
+    {"id": "R-006", "severity": "medium", "type": "architecture-carry", "description": "TB_DAY_EXCHANGE cross-module 직접 의존 = service boundary 분리 검토 의무 (architect carry)"}
   ],
   "cross_links": {
     "to_analysis_artifacts": [

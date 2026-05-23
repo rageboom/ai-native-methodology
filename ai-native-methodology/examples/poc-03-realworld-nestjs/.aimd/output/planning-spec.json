@@ -61,8 +61,8 @@
     "Article / Comment / Tag / Profile bounded context (★ retrofit subset OUT)"
   ],
   "risks_and_constraints": [
-    "70~80% 자동화 한계 — gate별 사용자 검토 의무",
-    "본 PoC = chain 1~2 + chain 3 RED dry-run / chain 4 GREEN 미실행 (sub-plan-6 D26' 정합 / corroboration #2 자격)"
+    {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 — gate별 사용자 검토 의무"},
+    {"id": "R-002", "severity": "medium", "type": "environment", "description": "본 PoC = chain 1~2 + chain 3 RED dry-run / chain 4 GREEN 미실행 (sub-plan-6 D26' 정합 / corroboration #2 자격)"}
   ],
   "cross_links": {
     "to_analysis_artifacts": [

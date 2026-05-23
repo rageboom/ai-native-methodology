@@ -99,8 +99,8 @@
     }
   ],
   "risks_and_constraints": [
-    "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무",
-    "in-memory store (테스트 전용) — production = DB 정합 의무"
+    {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 잔존 — gate #1~#4 사용자 검토 의무"},
+    {"id": "R-002", "severity": "medium", "type": "environment", "description": "in-memory store (테스트 전용) — production = DB 정합 의무"}
   ],
   "cross_links": {
     "to_analysis_artifacts": [
