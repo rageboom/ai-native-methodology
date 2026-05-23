@@ -9,6 +9,66 @@
 
 ---
 
+## [8.13.0] — 2026-05-23 MINOR — sql-inventory-validator Tier 1 in-plugin XML parser 격상 (xmllint → fast-xml-parser / R19 paradigm 정합)
+
+> v8.12.0 carry "C-xmllint-env-absent" 종결. 사용자 결단 "Option A: Tier 1 격상 (fast-xml-parser 도입)" (2026-05-23). DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classification) paradigm 정합. additive / breaking 0 / Windows/Linux/Mac 동일 동작.
+
+### 신규 자산
+
+- **`fast-xml-parser ^4.5.0`** dependency 추가 (`tools/sql-inventory-validator/package.json`)
+  - Node-native XML parser (pure JS / no native deps / Windows/Linux/Mac 동일 동작)
+  - libxml2 외부 의존 제거 (xmllint command 부재 OS 호환)
+
+### Tier 분류 변경 (R19 정합)
+
+| 변경 | 이전 (v8.7~v8.12) | 이후 (v8.13.0+) |
+|---|---|---|
+| Tier | Tier 2 (user-environment OS-native binary) | **Tier 1 (in-plugin Node-native)** |
+| 도구 | xmllint (libxml2 binary spawn) | fast-xml-parser (npm dep) |
+| OS 호환 | Linux/Mac 한정 (Windows env absent) | Windows/Linux/Mac 동일 |
+| spawn 호출 | `xmllint --version` probe + `xmllint --xpath` per file | `XMLParser.parse(xmlContent)` + 재귀 tag count |
+| field 호환 | `xmllint_total` + `xmllint_version` | **backward-compat** — 동일 field name (value 만 `fast-xml-parser:<ver>` marker) |
+
+### Tag count 알고리즘 (재귀 traversal)
+
+- `XMLParser({ ignoreAttributes:true, parseTagValue:false, isArray: tag => SQL_TAGS.has(tag) })`
+- `SQL_TAGS = { select, insert, update, delete, procedure }` (iBATIS 2 + MyBatis 3 공통)
+- 재귀 traversal — nested mapper 대응 (Array 강제 / 동일 tag 중복 정확 count)
+- v8.7.1 PATCH (F-CYCLE4-001 fix) `<procedure>` tag 포함 — 정합 보존
+
+### Dead code 제거
+
+- `xmllint_unavailable` status 분기 제거 (v8.13.0+ 도달 불가 / clean code)
+- `spawnSync` import 제거 (sql-inventory-validator validator.js 한정)
+
+### 자산 갱신
+
+- `tools/sql-inventory-validator/package.json` 0.2.1 → 0.3.0 + `fast-xml-parser ^4.5.0` dependency
+- `tools/sql-inventory-validator/src/validator.js` — `crossCheckLegacyXml` 함수 Node-native paradigm 격상 + `countSqlTagsRecursive` 헬퍼 신설
+- `tools/sql-inventory-validator/test/validator.test.js` — v8.7 Layer 2 dir_missing test v8.13.0 noter 갱신
+- `plugin.json` 8.12.0 → 8.13.0 + `package.json` 8.12.0 → 8.13.0 (3-way sync)
+
+### 검증 — STOP-3 hard gate
+
+- sql-inventory-validator test **31/31 pass** ✅ (v8.7.1 iBATIS test #25+#26 회복 / OS 무관 동일 동작)
+- workspace test **690/690 pass** ✅ (v8.12.0 688/690 → v8.13.0 690/690 / xmllint env absent 2 fail 회복)
+- release-readiness **16/16 ready** ✅ (v8.12.0 15/16 → v8.13.0 16/16 / xmllint carry 종결)
+- breaking 0 = MINOR (additive — Node-native parser 격상 / field name backward-compat)
+
+### carry (다음 session)
+
+- **C-operation-md-work-folder** (v8.9.0 carry 보존 / low) — work/dep-graph/operation.md 가 git tracked 아님 / docs/ 흡수 후보
+
+★ ★ ★ ★ **R19 paradigm 본격 완결** — sql-inventory-validator = Tier 1 in-plugin / xmllint 외부 의존 제거 / Windows 환경 부재 차단 회피 / workspace_test_pass 회복.
+
+### 참고
+
+- DEC-2026-05-23-xmllint-tier1-migration
+- DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classification)
+- v8.9.0 carry C-xmllint-env-absent 종결
+
+---
+
 ## [8.12.0] — 2026-05-23 MINOR — 5 PoC 18 risks string → object form 마이그레이션 (legacy carry 청산)
 
 > v8.11.0 carry "C-legacy-risks-poc-migration" 종결. 사용자 결단 "ㄱㄱ" → "추천안 묶음 전체 시행" (2026-05-23 / D1~D7 7 cluster). 정보 손실 risk = **0** (실측 입증 / description 자유서술 그대로 보존 + severity enum 추가 metadata).

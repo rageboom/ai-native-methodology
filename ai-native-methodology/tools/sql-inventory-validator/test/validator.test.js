@@ -144,11 +144,12 @@ test('★ v8.7 Layer 2 — legacy-xml-dir 부재 → dir_missing high finding', 
   const r = validateSqlInventory(join(FIX, 'valid', 'poc-06'), 0.50, {
     legacyXmlDir: '/__nonexistent_legacy_xml_dir_test_fixture__'
   });
-  // xmllint 가용 여부에 따라 다름 — xmllint_unavailable medium 이 먼저 emit 되면 dir 체크 안 도달
+  // ★ v8.13.0 — Tier 1 in-plugin XML parser 격상 (xmllint → fast-xml-parser).
+  // 이전 (v8.7~v8.12): xmllint 가용 여부 분기 의무 (Windows env absent 시 xmllint_unavailable medium emit).
+  // 이후 (v8.13.0+): Node-native parser / OS 무관 항상 dir_missing 분기 도달 (xmllint_unavailable kind 제거).
   const hasDirMissing = r.findings.some(f => f.kind === 'legacy_cross_check.dir_missing' && f.severity === 'high');
-  const hasXmllintUnavail = r.findings.some(f => f.kind === 'legacy_cross_check.xmllint_unavailable');
-  assert.ok(hasDirMissing || hasXmllintUnavail,
-    `legacy-xml-dir 부재 → dir_missing 또는 xmllint_unavailable finding 의무: ${JSON.stringify(r.findings)}`);
+  assert.ok(hasDirMissing,
+    `legacy-xml-dir 부재 → dir_missing high finding 의무 (v8.13.0+ Tier 1 in-plugin): ${JSON.stringify(r.findings)}`);
   assert.ok(r.summary.legacy_cross_check, 'legacy_cross_check summary 존재 의무');
 });
 

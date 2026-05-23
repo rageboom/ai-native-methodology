@@ -14,8 +14,8 @@
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { crossCheckEvidence } from '../../_shared/evidence-cross-check.js';
-import { spawnSync } from 'node:child_process';
 import { readCoverageBaseline, writeCoverageBaseline, coverageTrendCheck } from '../../_shared/baseline.js';
+import { XMLParser } from 'fast-xml-parser';
 
 export function loadJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
@@ -351,13 +351,7 @@ export function validateSqlInventory(targetDir, thresholdAutoRatio = 0.50, optio
     const crossCheck = crossCheckLegacyXml(legacyXmlDir, summary.inventory_count);
     summary.legacy_cross_check = crossCheck;
 
-    if (crossCheck.status === 'xmllint_unavailable') {
-      findings.push({
-        kind: 'legacy_cross_check.xmllint_unavailable',
-        severity: 'medium',
-        message: `xmllint command not found in PATH — legacy XML cross-check skipped (--legacy-xml-dir ${legacyXmlDir}). 본 도구 의 R15 silent simulation 차단 의무 = xmllint 가용 환경 권고.`
-      });
-    } else if (crossCheck.status === 'dir_missing') {
+    if (crossCheck.status === 'dir_missing') {
       findings.push({
         kind: 'legacy_cross_check.dir_missing',
         severity: 'high',
@@ -533,16 +527,33 @@ function parseClaimedAutoCount(autoRatioStr) {
   return m ? parseInt(m[1], 10) : null;
 }
 
-// ★ Layer 2 helper — xmllint XPath SQL count cross-check
-function crossCheckLegacyXml(legacyXmlDir, inventoryCount) {
-  // 1. xmllint 가용성 확인
-  const probe = spawnSync('xmllint', ['--version'], { encoding: 'utf8' });
-  if (probe.error || probe.status !== 0) {
-    return { status: 'xmllint_unavailable', xmllint_version: null };
+// ★ Layer 2 helper — legacy XML SQL count cross-check
+// ★ v8.13.0 — Tier 1 in-plugin parser 격상 (xmllint spawn → fast-xml-parser / R19 DEC-2026-05-18-runtime-tool-exclusion paradigm 정합)
+//   기존 (v8.7.0~v8.12.0): xmllint XPath spawn (Tier 2 / OS-native binary / Windows env absent → workspace_test_pass regress)
+//   이후 (v8.13.0+): fast-xml-parser Node-native (Tier 1 in-plugin / Windows/Linux/Mac 동일 동작 / xmllint_total field 보존 — backward-compat)
+//   xmllint_version 필드 = `fast-xml-parser:<pkg-version>` marker (Node-native 식별 / 양심 의존 ❌)
+function countSqlTagsRecursive(node, tagSet) {
+  let count = 0;
+  if (Array.isArray(node)) {
+    for (const item of node) count += countSqlTagsRecursive(item, tagSet);
+    return count;
   }
-  const xmllintVersion = (probe.stderr || probe.stdout || '').split('\n')[0];
+  if (node !== null && typeof node === 'object') {
+    for (const [key, value] of Object.entries(node)) {
+      if (tagSet.has(key)) {
+        // tag 매칭 — Array면 length 누적 / 객체면 1
+        if (Array.isArray(value)) count += value.length;
+        else count += 1;
+      }
+      // 재귀 (tag 매칭 여부와 무관하게 children 도 traverse — nested mapper 대응)
+      count += countSqlTagsRecursive(value, tagSet);
+    }
+  }
+  return count;
+}
 
-  // 2. legacy dir 존재 확인
+function crossCheckLegacyXml(legacyXmlDir, inventoryCount) {
+  // 1. legacy dir 존재 확인 (v8.13.0+ — xmllint 가용성 probe 제거 / Tier 1 in-plugin 격상)
   if (!existsSync(legacyXmlDir)) {
     return { status: 'dir_missing' };
   }
@@ -550,42 +561,56 @@ function crossCheckLegacyXml(legacyXmlDir, inventoryCount) {
   try { st = statSync(legacyXmlDir); } catch { return { status: 'dir_missing' }; }
   if (!st.isDirectory()) return { status: 'dir_missing' };
 
-  // 3. *.xml file 재귀 수집
+  // 2. *.xml file 재귀 수집
   const xmlFiles = collectXmlFiles(legacyXmlDir);
   if (xmlFiles.length === 0) {
     return { status: 'no_xml_files', files_scanned: 0 };
   }
 
-  // 4. 각 file 에 xmllint XPath count 실행
+  // 3. fast-xml-parser 안 각 file parse + tag count 재귀 traversal
+  // ★ v8.7.1 PATCH (F-CYCLE4-001 fix) — iBATIS 2 <procedure> tag 포함 (stored procedure 호출 mapper 대응 / rbac.xml 류)
+  // tag set: select / insert / update / delete / procedure (iBATIS 2 + MyBatis 3 공통 SQL statement tags)
+  const SQL_TAGS = new Set(['select', 'insert', 'update', 'delete', 'procedure']);
+  const parser = new XMLParser({
+    ignoreAttributes: true,
+    parseTagValue: false,
+    isArray: (tagName) => SQL_TAGS.has(tagName), // 동일 tag 중복 시 Array 강제 — count 정확
+  });
+
   let xmllintTotal = 0;
   const perFile = [];
   for (const f of xmlFiles) {
-    // ★ v8.7.1 PATCH (F-CYCLE4-001 fix) — iBATIS 2 <procedure> tag 추가 (stored procedure 호출 mapper 대응)
-    // 이전 (v8.7.0): count(//select) + count(//insert) + count(//update) + count(//delete) — iBATIS 2 <procedure> 미포함 → rbac.xml 류 stored procedure mapper 가 0 count
-    // 이후 (v8.7.1+): //procedure 포함 — boundary service (rbac 등) 의 stored procedure 호출도 정확 count
-    const xpath = 'count(//select) + count(//insert) + count(//update) + count(//delete) + count(//procedure)';
-    const res = spawnSync('xmllint', ['--xpath', xpath, f], { encoding: 'utf8' });
-    if (res.status !== 0) {
-      perFile.push({ file: f, status: 'xmllint_error', count: 0, error: (res.stderr || '').slice(0, 200) });
-      continue;
+    try {
+      const xmlContent = readFileSync(f, 'utf8');
+      const parsed = parser.parse(xmlContent);
+      const count = countSqlTagsRecursive(parsed, SQL_TAGS);
+      xmllintTotal += count;
+      perFile.push({ file: f, status: 'ok', count });
+    } catch (err) {
+      perFile.push({ file: f, status: 'parse_error', count: 0, error: (err.message || '').slice(0, 200) });
     }
-    const count = parseInt((res.stdout || '0').trim(), 10) || 0;
-    xmllintTotal += count;
-    perFile.push({ file: f, status: 'ok', count });
   }
 
-  // mismatch ratio (symmetric / larger 기준 — small inventory 에서 small xmllint 도 정합 처리)
+  // 4. mismatch ratio (symmetric / larger 기준 — small inventory 에서 small total 도 정합 처리)
   const denominator = Math.max(xmllintTotal, inventoryCount);
   const mismatchRatio = denominator > 0
     ? Math.abs(xmllintTotal - inventoryCount) / denominator
     : 0;
 
+  // 5. xmllint_version 필드 = fast-xml-parser marker (Node-native 식별 / xmllint backward-compat 호환)
+  let parserVersion = 'fast-xml-parser';
+  try {
+    const pkgPath = new URL('../../node_modules/fast-xml-parser/package.json', import.meta.url);
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+    parserVersion = `fast-xml-parser:${pkg.version}`;
+  } catch { /* graceful — version probe 실패해도 marker 보존 */ }
+
   return {
     status: 'ok',
-    xmllint_version: xmllintVersion,
+    xmllint_version: parserVersion, // backward-compat field name (v8.13.0+ = Node-native marker)
     legacy_xml_dir: legacyXmlDir,
     files_scanned: xmlFiles.length,
-    xmllint_total: xmllintTotal,
+    xmllint_total: xmllintTotal, // backward-compat field name
     inventory_count: inventoryCount,
     mismatch_ratio: mismatchRatio,
     per_file: perFile,
