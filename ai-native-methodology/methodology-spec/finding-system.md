@@ -471,8 +471,13 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 009 | **medium** | closed (PATCH) | 4 gate 공통 `chain-intervention-log.jsonl` 영속 강제 (flow gate-1 outputs 이미 명세) |
 > | 010 | **medium** | closed (PATCH) | 기준 PoC README/run-log content-aware sync + release-readiness #14 후보 (PoC 문서 drift) |
 > | 011 | **high** | closed (MINOR) | release_eligibility #2/#6/#7 = "≥2 PoC 모두 chain 4 GREEN 도달" 강화 또는 poc-03 chain 4 실행 / corroboration 명시 제외 (§8.1 자기정합) |
+> | 012 | medium | open (v8.4.0 carry) | severity_distinct_count=1 mask — 모든 AC must → cell critical / SSOT mapping 한계 / F-SIM-002 propagation 가시화 ❌ (v8.14.0 후속 점검 carry) |
+> | 013 | medium | **closed v8.14.0** | Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm) — v8.14.0 Type 분류 3계층화 paradigm 본격 흡수 (Type 1 정식 분류 + Type 2 carry 정직 표기 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §1) |
+> | 014 | low | open (v8.4.0 carry) | analysis-form-validation-fe description "FE-only" → Pydantic BE schema validation cover ❌ — skill description scope 확장 후보 (P2 cooling-off 후 별 결단) |
+> | 015 | **high** | **closed v8.14.0** | test-spec.fail_mode schema 미허용 / F-SIM-005 P1 carry 즉시 영향 — v8.14.0 fail_mode enum 4종 (compile_import_fail/assertion_fail/dry_run_placeholder/pending) 추가 + chain-coverage-validator validateFailModeDistribution 7번째 export (warn-only / boolean 강제) 본격 흡수 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §3 |
+> | 016 | low | open (v8.4.0 carry) | static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ — 환경 의존 도구 (R19 Tier 2) 영구 scope-out 후보 (cooling-off 후 별 결단) |
 >
-> ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2.
+> ★ P0 = F-SIM-001 / 002 / 003 / 011 (high + 공통 뿌리 핵심 4종). 나머지는 P0 시행 후 P1/P2. ★ v8.14.0 본격 흡수 = F-SIM-005 (P1 carry 본격 해소) + F-SIM-013 (Type 분류 3계층화 paradigm 안 흡수) + F-SIM-015 (test-spec.fail_mode schema 본격 추가). 잔존 carry = F-SIM-012/014/016 (cooling-off 후 별 session 결단).
 
 ### F-SIM-001: critical antipattern 이 chain 을 무경고로 관통 + matrix 가 "critical/green" 보고
 
@@ -613,6 +618,71 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Decision made:** N/A (구조적 누락).
 - **Severity:** **high** — release 자격 자체 흔들림 / §8.1 자기정합 위배.
 - **Proposed fix:** 옵션 둘 중 — (A) poc-03 chain 4 실제 실행 후 GREEN 도달 (PoC 보강 / 시간 비용 ↑) / (B) release_eligibility #2/#6/#7 에 "각 PoC 가 chain 4 GREEN 도달" 명시 + poc-03 = analysis~chain-3 corroboration 으로 격하 + 신규 PoC(예: poc-12/13) 를 chain 4 GREEN corroboration #2 후보로 명시. MINOR. ★ F-SIM-005 와 직결 (RED placeholder 가 §8.1 #2 빈약 corroboration 본질).
+
+### F-SIM-012: severity_distinct_count=1 mask (모든 AC must → cell critical / SSOT mapping 한계)
+
+- **Phase:** chain harness e2e (v8.4.0 시뮬레이션 dogfood / poc-14)
+- **Confidence:** verified (poc-14 시뮬레이션 실측)
+- **Type:** anti-pattern (SSOT mapping 단일축 / F-SIM-002 propagation 가시화 한계)
+- **Description:** v8.4.0 시뮬레이션 (poc-14) chain harness 안 traceability-matrix 의 severity distinct count = 1 (모든 cell = "critical"). F-SIM-002 가 severity max-propagation 본격 흡수했으나, 모든 AC = MoSCoW must → cell 전부 critical 도달 = severity_distinct_count 본질 mask. propagation 본격 가시화 ❌ (BR/AP 단계 별 severity 차이 보존 ❌).
+- **Evidence:** poc-14 matrix.json `severity distinct = ['critical']`. v8.4.0 시뮬레이션 산출물 `.aimd/simulation/invocation-log.md` 안 본격 표면화.
+- **Spec gap:** `schemas/traceability-matrix.schema.json` severity 산정 시 distinct count gauge 부재. `methodology-spec/deliverables/22-traceability-matrix.md` severity propagation 의미축 단일화.
+- **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
+- **Severity:** medium — F-SIM-002 본격 흡수 후 부분 잔존 / paradigm-level 한계 표면화 / single-PoC carry (≥ 2 PoC 확인 후 closed 결단).
+- **Proposed fix:** AC MoSCoW 분포 다양화 권고 ★ deliverable §5 + severity_distinct_count gauge metric 신설 (warn ≤ 1 / target ≥ 2) + matrix.md 안 distribution histogram 렌더. PATCH (additive metric).
+- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / cooling-off 후 별 결단)
+
+### F-SIM-013: Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm)
+
+- **Phase:** chain harness e2e (v8.4.0 시뮬레이션 dogfood / poc-14)
+- **Confidence:** verified (poc-14 시뮬레이션 실측 + v8.14.0 Type 분류 3계층화 paradigm 본격 흡수)
+- **Type:** paradigm-level (Type 1 self-run 한계)
+- **Description:** v8.4.0 시뮬레이션 = main agent (Claude) self-run paradigm = SKILL.md 매뉴얼 읽고 직접 따라 실행. hooks (SessionStart / UserPromptSubmit / PreToolUse) + 5 stage agent (analysis/planning/spec/test/implement) dispatch 모두 fire 0 (실제 Claude Code session 안에서만 측정 가능). Plugin 의 자동화 paradigm 본격 측정 불가 / 자동변속기를 손으로 페달 밟아 시뮬레이션 본질.
+- **Evidence:** poc-14 `.aimd/simulation/invocation-log.md` (63 entry / 47 skill × 9 hook × 17 agent × 3 매트릭스 안 hook fire=0 / agent dispatch=0). v8.14.0 Type 분류 3계층화 paradigm 본격 흡수 (Type 1 = Claude self-run / Type 1.5 = user dogfood / Type 2 = external user).
+- **Spec gap:** v8.4.0 시점 = paradigm-level 분류 부재. v8.14.0 = `flows/sdlc-4stage-flow.json` `release_eligibility.corroboration_type_levels` 3계층 신설로 본격 해소.
+- **Decision made:** v8.14.0 (2026-05-23 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §1) — Type 분류 3계층화 paradigm 진화 + Type 1 정식 분류 + Type 2 carry 정직 표기.
+- **Severity:** medium — paradigm-level 한계 / v8.14.0 본격 흡수 완료.
+- **Proposed fix:** ★ 본격 적용됨 (v8.14.0 / Type 분류 3계층화 + self_consistency_note 정직 표기 + carry 명시).
+- **Status:** ★ ★ **closed v8.14.0** (DEC-2026-05-23-fsim-005-corroboration-2-genuine §1 / Type 분류 3계층화 paradigm 본격 흡수).
+
+### F-SIM-014: analysis-form-validation-fe description "FE-only" → Pydantic BE schema validation cover ❌
+
+- **Phase:** chain harness e2e (v8.4.0 시뮬레이션 dogfood / poc-14)
+- **Confidence:** verified (poc-14 = Python FastAPI + Pydantic BE / analysis-form-validation-fe skill non-fire 본격 표면)
+- **Type:** gap (skill description scope mismatch)
+- **Description:** `skills/analysis-form-validation-fe/SKILL.md` description = "FE-only" 명시 → Pydantic BE schema validation (FastAPI request body validation 본격 표면) cover ❌ / poc-14 BE stack 안 본격 fire 누락. Pydantic BE validation = schema-validation paradigm 정합 = FE Zod/Yup 와 동형 / description scope 확장 후보.
+- **Evidence:** poc-14 `.aimd/simulation/element-frequency.json` 안 analysis-form-validation-fe = non-fire (track-mismatch 분류). Pydantic schema = `examples/poc-14-fsim-corroboration/source/app/schemas.py` 안 본격 표면.
+- **Spec gap:** skill description scope 정의에 "BE schema validation framework (Pydantic / dataclass / Joi-BE 등)" 본격 cover 정책 부재.
+- **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
+- **Severity:** low — single skill scope / 우회 가능 (analysis-source-inventory 가 Pydantic 표면 cover).
+- **Proposed fix:** (a) skill description 안 BE schema validation framework 본격 cover 명시 + (b) skill rename 후보 (`analysis-form-validation` / `-fe` suffix 제거 / F-SKILL-014 동형 / breaking minor) — cooling-off 후 별 결단.
+- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / P2 cooling-off 후 별 결단 / F-SKILL-014 동반 후보).
+
+### F-SIM-015: test-spec.fail_mode schema 미허용 (F-SIM-005 P1 carry 즉시 영향)
+
+- **Phase:** chain harness e2e (v8.4.0 시뮬레이션 dogfood / poc-14 chain 3 단계)
+- **Confidence:** verified (poc-14 시뮬레이션 chain 3 안 schema reject 본격 표면 + v8.14.0 본격 흡수)
+- **Type:** gap (schema 강화 미시행 / F-SIM-005 P1 carry 즉시 영향)
+- **Description:** v8.4.0 시뮬레이션 chain 3 단계 안 test-spec.json 생성 시 `tests[].fail_mode` 필드 본격 추가 시도 → `schemas/test-spec.schema.json` 안 fail_mode enum 미허용 → schema-validator reject → 우회 (fail_mode 필드 제거 후 진행). 본 시점 = F-SIM-005 의 "P1 carry" 결단 (v8.3.0 deadline 2026-06-01) 의 즉시 영향 = **P1 미룬 결단이 1 session 뒤 즉시 영향 = 결단 cadence dogfood 입증**.
+- **Evidence:** v8.4.0 시뮬레이션 `.aimd/simulation/invocation-log.md` 안 schema-validator reject 본격 표면 (entry 38~42). v8.14.0 schema 본격 진화 = `schemas/test-spec.schema.json` `test_cases.items.properties.fail_mode` enum 4종 (compile_import_fail / assertion_fail / dry_run_placeholder / pending) 추가 (additive optional / DEC-2026-05-23-fsim-005-corroboration-2-genuine §3).
+- **Spec gap:** v8.4.0 시점 = F-SIM-005 P1 carry 결단의 즉시 영향 표면화. v8.14.0 = schema 본격 진화로 본격 해소.
+- **Decision made:** v8.14.0 (2026-05-23) — test-spec.schema.json fail_mode enum 4종 추가 + chain-coverage-validator validateFailModeDistribution 7번째 export 본격 신설 + poc-05/poc-14 test-spec fail_mode=assertion_fail 표기.
+- **Severity:** high — schema 강화 미시행이 chain 단계 본격 차단 / F-SIM-005 P1 즉시 영향 표면.
+- **Proposed fix:** ★ 본격 적용됨 (v8.14.0 / schema enum 4종 + validator 7번째 export + 2 PoC test-spec 본격 표기).
+- **Status:** ★ ★ **closed v8.14.0** (DEC-2026-05-23-fsim-005-corroboration-2-genuine §3 / fail_mode enum 본격 추가 + Adzic SBE 함정 직접 회피 boolean 강제).
+
+### F-SIM-016: static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌
+
+- **Phase:** chain harness e2e (v8.4.0 시뮬레이션 dogfood / poc-14)
+- **Confidence:** verified (poc-14 시뮬레이션 환경 fire 본격 absent)
+- **Type:** environment-dependent (R19 Tier 2 / Windows MSYS2 환경 의존)
+- **Description:** `tools/static-runner/` 의 Semgrep wrapper (R19 Tier 2 = 사용자 환경 SARIF import) 가 Windows MSYS2 환경 안 본격 fire ❌. v8.4.0 시뮬레이션 환경 (Windows + MSYS2) 안 semgrep 자체 absent → static-runner skill non-fire / cross-cutting aspect (analysis-aspect-static-security) cover ❌.
+- **Evidence:** v8.4.0 시뮬레이션 `.aimd/simulation/non-use-rationale.md` 안 static-runner = "환경 부재" 분류. preflight-check.js `semgrep absent` 본격 표면.
+- **Spec gap:** R19 Tier 2 (사용자 환경 SARIF import) paradigm 안 Windows MSYS2 환경 본격 cover 미명시. `memory environment-dependent-tools-scope-out` 정합 = 환경 의존 도구 (Stryker / textlint / PIT / osv-scanner) 영구 scope-out 후보 / Semgrep 도 동일 후보.
+- **Decision made:** v8.4.0 표면화 / 본격 처분 carry → 본 ledger 정식 등재 v8.14.0 후속 점검 (2026-05-23).
+- **Severity:** low — 환경 의존 / R19 Tier 2 paradigm 정합 / pipx 또는 Docker 우회 가능.
+- **Proposed fix:** (a) Semgrep deprecated wrapper 영구 scope-out 결단 (memory environment-dependent-tools-scope-out 정합 / R19 Tier 3 영구 reject 격상) 또는 (b) Tier 1 (in-plugin) ESLint-based AST scan 대체 후보 (v8.13.0 xmllint → fast-xml-parser Tier 1 격상 paradigm 동형) — cooling-off 후 별 결단.
+- **Status:** open (v8.4.0 carry / v8.14.0 본격 등재 / 환경 의존 도구 영구 scope-out 후보 / cooling-off 후 별 결단).
 
 ---
 

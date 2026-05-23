@@ -9,6 +9,52 @@
 
 ---
 
+## [8.14.1] — 2026-05-23 PATCH — F-SIM-12~16 정식 ledger 등재 + closed 2종 (F-SIM-013 + F-SIM-015 본격 흡수 자산화 / v8.4.0 carry 본격 종결)
+
+> v8.4.0 (2026-05-18) 시뮬레이션 dogfood 5 신규 finding 의 정식 ledger 등재 carry (`project_v84_simulation_carry.md` 의제 B) 본격 종결. v8.14.0 paradigm 진화 후속 sync. 사용자 결단 "α로 진행" (cooling-off cadence 안 additive only 작업). additive doc only / breaking 0.
+
+### 본질 (cooling-off cadence 정합)
+
+v8.14.0 (2026-05-23) MINOR release 직후 paradigm 안정점 cooling-off 24h cadence 안 additive 즉시 작업 진입. v8.13.1 dep-graph SSOT doc only PATCH precedent 동형 = release 후 carry 정식 자산화 의무.
+
+### F-SIM ledger 갱신
+
+`methodology-spec/finding-system.md` F-SIM namespace 표 11 row → **16 row**.
+
+- **closed v8.14.0** (2종 / 본격 자산화):
+  - **F-SIM-013** (medium) — Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm). v8.14.0 Type 분류 3계층화 paradigm 본격 흡수 (Type 1 정식 분류 + Type 2 carry 정직 표기 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §1).
+  - **F-SIM-015** (high) — test-spec.fail_mode schema 미허용 / F-SIM-005 P1 carry 즉시 영향. v8.14.0 fail_mode enum 4종 (compile_import_fail/assertion_fail/dry_run_placeholder/pending) + chain-coverage-validator validateFailModeDistribution 7번째 export 본격 흡수 (DEC-2026-05-23-fsim-005-corroboration-2-genuine §3).
+
+- **open carry** (3종 / 정직 표기 / cooling-off 후 별 결단 / deadline 없음):
+  - **F-SIM-012** (medium) — severity_distinct_count=1 mask (모든 AC must → cell critical / F-SIM-002 propagation 가시화 부분 잔존 / paradigm-level 한계 single-PoC carry / proposed fix = severity_distinct_count gauge metric 신설).
+  - **F-SIM-014** (low) — analysis-form-validation-fe description "FE-only" → Pydantic BE schema validation cover ❌ / F-SKILL-014 동반 후보 / skill description scope 확장.
+  - **F-SIM-016** (low) — static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ / R19 Tier 2 환경 의존 / memory `environment-dependent-tools-scope-out` 정합 영구 scope-out 후보.
+
+### 자산 변경 (additive doc / breaking 0)
+
+- **`methodology-spec/finding-system.md`** — F-SIM ledger 표 11 → 16 row + body 5종 신설 (F-SIM-012/013/014/015/016 각 phase / confidence / type / description / evidence / spec_gap / decision_made / severity / proposed_fix / status)
+- 3-way version sync = plugin.json + package.json + CHANGELOG 8.14.0 → 8.14.1
+- DEC-2026-05-23-fsim-12-16-ledger-registration 신설 + INDEX 최상단 + STATUS session 39차 v8.14.1 sub-entry + CLAUDE.md sync
+
+### STOP-3 hard gate (시행 결과)
+
+- ✅ skill-citation-validator 227 active doc / 0 stale dead-link
+- ✅ 변경 = finding-system.md 만 (additive doc only)
+- ✅ breaking 0 (PATCH)
+- ✅ version 3-way sync
+
+### LL 자산화 (1종)
+
+- **LL-fsim-13** — release 직후 cooling-off cadence 안 additive only doc-sync paradigm = v8.13.1 dep-graph SSOT doc only PATCH precedent 동형. paradigm preservation = release 후 carry 정식 자산화 의무.
+
+### Cross-link
+
+- Resolves `project_v84_simulation_carry.md` §의제 B (F-SIM-12~16 정식 ledger 등재) — v8.4.0 carry 본격 종결
+- Amends DEC-2026-05-23-fsim-005-corroboration-2-genuine (F-SIM-013 + F-SIM-015 closed 본격 등재 추가)
+- Open carry = F-SIM-012/014/016 (cooling-off 후 별 결단 / deadline 없음)
+
+---
+
 ## [8.14.0] — 2026-05-23 MINOR — F-SIM-005 P1 corroboration #2 본격 해소 + Type 분류 3계층화 paradigm 진화 + fail_mode_qualification boolean 강제 (Adzic SBE 함정 직접 회피)
 
 > F-SIM-005 P1 carry (commit-block deadline 2026-06-01 / D-9) 본격 해소. 사용자 결단 "ㄱㄱ" (4원칙 §1+§2+§3 ladder full / 3-agent Senior REVISE-3 @ 0.83 흡수 + 옵션 α 채택). additive / breaking 0.
