@@ -88,10 +88,11 @@ ai-native-methodology/                        ← 저장소 루트
 │       │                                     (★ v2.5.1 1-depth + category prefix paradigm)
 │       ├── _base-<name>/SKILL.md             공통 베이스 5종 (apply-baseline-ratchet / log-finding 등)
 │       ├── analysis-<name>/SKILL.md          레거시 분석용 22종 (input~quality 11 phase + aspect)
-│       ├── planning-<name>/SKILL.md          체인 1: 기획 3종
+│       ├── discovery-<name>/SKILL.md         체인 1: 발견 6종
 │       ├── spec-<name>/SKILL.md              체인 2: 행동/인수 명세 3종
-│       ├── test-<name>/SKILL.md              체인 3: 테스트 3종
-│       └── implement-<name>/SKILL.md         체인 4: 구현 2종
+│       ├── plan-<name>/SKILL.md              체인 3: 계획 3종 (★ placeholder)
+│       ├── test-<name>/SKILL.md              체인 4: 테스트 4종
+│       └── implement-<name>/SKILL.md         체인 5: 구현 4종
 │
 ├── agents/                                   서브 에이전트 정의 (★ v2.5.1 1-depth)
 │       ├── _base-senior-engineer.md          Senior critique
@@ -104,10 +105,11 @@ ai-native-methodology/                        ← 저장소 루트
 ├── flows/                                    단계 흐름 정의 (단일 진실)
 │       ├── analysis.phase-flow.json          ← 모든 phase 의존 그래프 SSOT
 │       ├── analysis.phase-flow.mermaid       사람용 다이어그램
-│       ├── planning.phase-flow.json          체인 1 흐름
+│       ├── discovery.phase-flow.json         체인 1 흐름
 │       ├── spec.phase-flow.json              체인 2 흐름
-│       ├── test.phase-flow.json              체인 3 흐름
-│       ├── implement.phase-flow.json         체인 4 흐름
+│       ├── plan.phase-flow.json              체인 3 흐름 (★ placeholder)
+│       ├── test.phase-flow.json              체인 4 흐름
+│       ├── implement.phase-flow.json         체인 5 흐름
 │       └── sdlc-4stage-flow.json             master plan SSOT
 │
 ├── templates/                                산출물 템플릿
@@ -310,7 +312,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 
   시작하려면 자연어로 말해보세요:
     · "이 코드베이스 분석 시작"      → `input` phase 부터
-    · "기획 단계 시작"                → 체인 1 부터
+    · "발견 단계 시작"                → 체인 1 (discovery) 부터
     · "SQL inventory 추출"           → `sql-inventory` phase
 
   ★ v2.5 — Layer 2 LLM (Claude Code sub-agent invocation) paradigm 본격 도입.
@@ -329,8 +331,8 @@ AI-Native 개발 방법론 v2.5.1 ready
 동료:  "OpenAPI 만들어줘"
   → analysis-openapi 스킬 자동 발동
 
-동료:  "기획 단계 시작"
-  → 체인 1 (planning-extract-from-legacy) 진입
+동료:  "발견 단계 시작"
+  → 체인 1 (discovery-from-analysis-output) 진입
 
 동료:  "비즈니스 규칙 의미 일관성 검증"  (★ v2.5 신규)
   → analysis-br-cross-consistency-check 스킬 발동
@@ -383,7 +385,7 @@ AI-Native 개발 방법론 v2.5.1 ready
        Stage 1 산출물
             ↓
   ┌────────────────────┐
-  │ 체인 1: 기획        │ → 게이트 #1 (사람이 통과/중단 결정)
+  │ 체인 1: 발견        │ → 게이트 #1 (사람이 통과/중단 결정)
   │                    │   ★ v2.5: Layer 2 LLM 의무 통과
   └────────────────────┘
             ↓
@@ -392,11 +394,15 @@ AI-Native 개발 방법론 v2.5.1 ready
   └────────────────────┘
             ↓
   ┌────────────────────┐
-  │ 체인 3: 테스트(RED) │ → 게이트 #3 (테스트가 일단 실패해야 함)
+  │ 체인 3: 계획        │ → (게이트 deferred / ★ placeholder)
   └────────────────────┘
             ↓
   ┌────────────────────┐
-  │ 체인 4: 구현(GREEN) │ → 게이트 #4 (테스트 100% 통과해야 함)
+  │ 체인 4: 테스트(RED) │ → 게이트 #3 (테스트가 일단 실패해야 함)
+  └────────────────────┘
+            ↓
+  ┌────────────────────┐
+  │ 체인 5: 구현(GREEN) │ → 게이트 #4 (테스트 100% 통과해야 함)
   └────────────────────┘
             ↓
        프로덕션 시스템 + 추적성 매트릭스

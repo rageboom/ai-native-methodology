@@ -58,7 +58,7 @@ v2.0~v2.5.0 의 `agents/{analysis, planning, spec, test, implement, design}/READ
 
 v2.5.1 PATCH 시점 agent 자산이 _base 3종만 인 사실 = ★ ★ chain stage 영역의 sub-agent invocation paradigm 의무 ❌ + skills + chain-driver gate trio 가 본격 enforcement 자격 도달. 다만 향후 chain stage 별 agent 자산 신설 시:
 
-- 디렉토리 구조 = ★ **1-depth + category prefix** paradigm 의무 (★ `agents/planning-<name>.md` / `agents/spec-<name>.md` / 등)
+- 디렉토리 구조 = ★ **1-depth + category prefix** paradigm 의무 (★ `agents/discovery-<name>.md` / `agents/spec-<name>.md` / 등)
 - 사상 axis 보존 = 본 명세 + skills-axis.md §4 chain stage axis 표 갱신 의무
 
 ## 5. v2.0~v2.5.0 자산 보존 흡수
@@ -67,7 +67,7 @@ v2.5.1 PATCH 시점 agent 자산이 _base 3종만 인 사실 = ★ ★ chain sta
 |---|---|
 | `agents/README.md` (v2.0~v2.5.0) | ★ 본 axis 명세 (v2.5.1 PATCH 본격 재작성 / paradigm 자료 보존) |
 | `agents/analysis/README.md` | skills-axis.md §4 chain stage axis 표 (analysis stage 영역) |
-| `agents/planning/README.md` | skills-axis.md §4 chain stage axis 표 (planning stage 영역) |
+| `agents/planning/README.md` (v2.0~v2.5.0) | skills-axis.md §4 chain stage axis 표 (discovery stage 영역 / ★ v9.0 planning→discovery 개칭) |
 | `agents/spec/README.md` | skills-axis.md §4 chain stage axis 표 (spec stage 영역) |
 | `agents/test/README.md` | skills-axis.md §4 chain stage axis 표 (test stage 영역) |
 | `agents/implement/README.md` | skills-axis.md §4 chain stage axis 표 (implement stage 영역) |

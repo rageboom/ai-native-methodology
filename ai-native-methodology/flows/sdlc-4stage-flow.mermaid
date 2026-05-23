@@ -1,16 +1,16 @@
-%% ★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (사람 눈)
-%% AI 눈 짝: sdlc-4stage-flow.json (drift-validator 호환)
-%% master plan §B 정합 / DEC-2026-05-06-v2.0-i-strict-채택
+%% ★ ★ ★ SDLC chain harness 통합 SSOT (사람 눈) — ★ v9.0 6-stage (analysis→discovery→spec→plan→test→implement)
+%% AI 눈 짝: sdlc-4stage-flow.json (파일명 reuse 유지 / drift-validator chain-flow master 영역)
+%% master plan §B 정합 / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-21 (planning→discovery 개칭 + plan 신설)
 
 flowchart TB
-    subgraph S0["★ Stage 0 — Analysis (1차 input / sub_flow: analysis.phase-flow.json)"]
+    subgraph S0["★ Stage 0 — Analysis (1차 input / chain 진입 전 / sub_flow: analysis.phase-flow.json)"]
         direction LR
         S0_OUT["7대 BE + 8 FE + Phase 4.5 + finding + AP + migration"]
     end
 
-    subgraph S1["★ Chain 1 — Planning (sub_flow: planning.phase-flow.json)"]
+    subgraph S1["★ Chain 1 — Discovery (구 planning 개칭 / sub_flow: discovery.phase-flow.json)"]
         direction LR
-        S1_OUT["planning-spec.{json,md} (deliverable 17)"]
+        S1_OUT["planning-spec.{json,md} (deliverable 17 / 산출물명 reuse)"]
     end
 
     subgraph S2["★ Chain 2 — Spec (sub_flow: spec.phase-flow.json)"]
@@ -18,21 +18,26 @@ flowchart TB
         S2_OUT["behavior-spec.json (deliverable 18)<br/>acceptance-criteria.json (deliverable 19)"]
     end
 
-    subgraph S3["★ Chain 3 — Test / RED 의무 (sub_flow: test.phase-flow.json)"]
+    subgraph S3["★ Chain 3 — Plan / HOW (★ PLACEHOLDER / gate deferred / sub_flow: plan.phase-flow.json)"]
         direction LR
-        S3_OUT["test-spec.json (deliverable 20) + 실 test 코드<br/>★ 5종 물증 7 필드 / fail_count > 0"]
+        S3_OUT["plan-spec (task / ADR / NFR / risk)<br/>★ plan-agent placeholder / 본격 구현 v9.x+ carry"]
     end
 
-    subgraph S4["★ ★ ★ Chain 4 — Implement / GREEN 의무 / i-strict (sub_flow: implement.phase-flow.json)"]
+    subgraph S4["★ Chain 4 — Test / RED 의무 (sub_flow: test.phase-flow.json)"]
         direction LR
-        S4_OUT["impl-spec.json (deliverable 21) + 실 impl 코드<br/>★ test_pass_evidence.fail_count: 0<br/>traceability-matrix.{json,md,mermaid}"]
+        S4_OUT["test-spec.json (deliverable 20) + 실 test 코드<br/>★ 5종 물증 7 필드 / fail_count > 0"]
     end
 
-    subgraph G["★ ★ ★ 4 Gate (사용자 결단 / _base-invoke-go-stop-gate skill)"]
-        G1["Gate #1<br/>planning-extraction-validator<br/>schema-validator"]
-        G2["Gate #2<br/>chain-coverage-validator<br/>drift / dmn / formal-link / schema"]
-        G3["Gate #3<br/>test-impl-pass (RED expected: all_fail)<br/>spec-test-link / schema / chain-strict lint"]
-        G4["Gate #4 (final)<br/>test-impl-pass (GREEN expected: all_pass)<br/>static-runner 6종 / matrix 100% green / chain-strict"]
+    subgraph S5["★ ★ ★ Chain 5 — Implement / GREEN 의무 / i-strict (sub_flow: implement.phase-flow.json)"]
+        direction LR
+        S5_OUT["impl-spec.json (deliverable 21) + 실 impl 코드<br/>★ test_pass_evidence.fail_count: 0<br/>traceability-matrix.{json,md,mermaid}"]
+    end
+
+    subgraph G["★ ★ ★ 4 Gate (사용자 결단 / _base-invoke-go-stop-gate skill / plan gate deferred)"]
+        G1["Gate #1 (discovery)<br/>planning-extraction-validator<br/>schema-validator"]
+        G2["Gate #2 (spec)<br/>chain-coverage-validator<br/>drift / dmn / formal-link / schema"]
+        G3["Gate #3 (test)<br/>test-impl-pass (RED expected: all_fail)<br/>spec-test-link / schema / chain-strict lint"]
+        G4["Gate #4 (implement / final)<br/>test-impl-pass (GREEN expected: all_pass)<br/>static-runner 6종 / matrix 100% green / chain-strict"]
     end
 
     subgraph CC["Cross-cutting"]
@@ -46,24 +51,27 @@ flowchart TB
         R["1. ≥ 2 PoC corroboration<br/>2. 진짜 도구 5종 물증<br/>3. 0 violation<br/>4. coverage ≥ 0.85<br/>5. ADR-CHAIN-001~004 + ADR-008/009/010 v2<br/>6. matrix 100% green<br/>7. e2e cycle 1 BR + 1 UC + 1 TC + 1 IMPL"]
     end
 
-    %% main flow
+    %% main flow (★ plan stage = gate deferred / spec → plan → test pass-through)
     S0 --> S1
     S1 --> G1
     G1 -->|"go"| S2
     S2 --> G2
     G2 -->|"go"| S3
-    S3 --> G3
-    G3 -->|"go (RED 확정)"| S4
-    S4 --> G4
+    S3 -->|"gate deferred (placeholder)"| S4
+    S4 --> G3
+    G3 -->|"go (RED 확정)"| S5
+    S5 --> G4
     G4 -->|"go"| REL
 
-    %% revisit edges (★ chain harness gate 안 round-trip 정식 허용)
+    %% revisit edges 8종 (★ chain harness gate 안 round-trip 정식 허용 / ★ v9.0 6-stage)
     G1 -.->|"revisit:analysis"| S0
-    G2 -.->|"revisit:planning"| S1
-    G3 -.->|"revisit:spec"| S2
-    G4 -.->|"revisit:test"| S3
+    G2 -.->|"revisit:discovery"| S1
+    S3 -.->|"revisit:spec"| S2
+    G3 -.->|"revisit:plan"| S3
+    G4 -.->|"revisit:test"| S4
     G4 -.->|"revisit:spec"| S2
-    G4 -.->|"revisit:planning"| S1
+    G4 -.->|"revisit:discovery"| S1
+    G4 -.->|"revisit:analysis"| S0
 
     %% stop edges
     G1 -.->|"stop"| STOP["sprint 중단 / carry"]
@@ -76,13 +84,15 @@ flowchart TB
     S2 -.-> CC
     S3 -.-> CC
     S4 -.-> CC
+    S5 -.-> CC
 
     %% Style
     classDef stage0 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     classDef chain1 fill:#e3f2fd,stroke:#1565c0,stroke-width:3px
     classDef chain2 fill:#fff8e1,stroke:#ef6c00,stroke-width:3px
-    classDef chain3 fill:#fce4ec,stroke:#ad1457,stroke-width:3px
-    classDef chain4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    classDef chainplan fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,stroke-dasharray: 5 5
+    classDef chain4 fill:#fce4ec,stroke:#ad1457,stroke-width:3px
+    classDef chain5 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
     classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
     classDef cross fill:#e2e3e5,stroke:#383d41
     classDef rel fill:#cce5ff,stroke:#004085,stroke-width:2px
@@ -91,8 +101,9 @@ flowchart TB
     class S0 stage0
     class S1 chain1
     class S2 chain2
-    class S3 chain3
+    class S3 chainplan
     class S4 chain4
+    class S5 chain5
     class G gate
     class CC cross
     class REL rel

@@ -41,7 +41,7 @@ v2.5.1 재install 후 정상 출력:
 **증상**: "기획 단계 시작" 같은 prompt 입력했는데 chain-driver 가 권고 안 함.
 
 **원인** + **해결**:
-- (a) matcher 패턴 미스 — hooks.json 의 `matcher: "(planning|기획|spec|명세|behavior|test|테스트|implement|구현)"` 확인. 한국어/영어 alias 외 keyword 는 자동 매칭 ❌
+- (a) matcher 패턴 미스 — hooks.json 의 `matcher: "(discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)"` 확인. 한국어/영어 alias 외 keyword 는 자동 매칭 ❌
 - (b) `${CLAUDE_PLUGIN_ROOT}` 환경변수 inject 안 됨 — Claude Code 버전 확인
 - (c) chain-driver hooks-bridge 실행 실패 — stderr 확인 (`tail -f ~/.claude/logs/...`)
 
@@ -103,7 +103,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 ## 4. RED / GREEN 의무
 
-### Q8. chain 3 (test) 종결 — RED 가 진짜 RED 인가?
+### Q8. chain 4 (test) 종결 — RED 가 진짜 RED 인가?
 
 **검증**:
 - `<project>/.aimd/output/test/result_hash.json` 의 `pass_count: 0` + `fail_count: N` 확인
@@ -113,12 +113,12 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 **Q**: AI 가 "RED 확인했다" 라고만 답하면?
 **A**: 5종 물증 7 필드 부재 시 schema if/then 의무 위반 → schema-validator finding → state.blocked=true.
 
-### Q9. chain 4 (impl) 종결 — GREEN 100% pass 가 진짜인가?
+### Q9. chain 5 (impl) 종결 — GREEN 100% pass 가 진짜인가?
 
 **검증** (Q8 와 동일 + 추가):
 - `pass_count` = `total_count` / `fail_count: 0`
 - `--allow-execute` flag 사용됨 (test-impl-pass-validator 의무)
-- chain 3 의 test code 가 변경 안 됨 (★ git diff `<project>/.aimd/output/test/` 확인)
+- chain 4 의 test code 가 변경 안 됨 (★ git diff `<project>/.aimd/output/test/` 확인)
 
 ## 5. Build / dist artifact
 

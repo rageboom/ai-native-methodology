@@ -2,7 +2,7 @@
 
 > **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-008 v2 §10 (이중 렌더링 chain 단계) / ADR-009 v2 §2.5 (planning trust 0.85)
 > **schema**: `schemas/planning-spec.schema.json`
-> **생성 phase**: chain 1 (planning) — `/planning-extract-from-legacy` (skill / sub-plan-4 신설)
+> **생성 phase**: chain 1 (discovery) — `/discovery-from-analysis-output` (skill / ★ v9.0 planning→discovery 개칭 / 산출물 파일명 `planning-spec.json` 은 reuse 유지)
 > **gate**: go/stop gate #1 (ADR-CHAIN-002)
 
 ## 1. 목적
@@ -18,7 +18,7 @@
 ## 2. 형식
 
 ```
-.aimd/output/chain-1-planning/
+.aimd/output/chain-1-discovery/
 ├── planning-spec.json   # AI 눈
 ├── planning-spec.md     # 사람 눈 (★ ADR-008 v2 §10 의무)
 └── _manifest.yml
@@ -47,7 +47,7 @@
 ## 5. 예시 (chain 1 sample)
 
 ```yaml
-# .aimd/output/chain-1-planning/planning-spec.json
+# .aimd/output/chain-1-discovery/planning-spec.json
 meta:
   generated_at: "2026-05-06T12:00:00Z"
   confidence: 0.85

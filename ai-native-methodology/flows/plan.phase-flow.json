@@ -44,6 +44,10 @@
     "no_simulation": true,
     "gate_deferred": "plan hard gate = plan-agent 본격 구현 시 추가 (현재 placeholder / gate #1~#4 = discovery/spec/test/implement 유지)"
   },
+  "previous_chain": {
+    "id": "spec",
+    "flow_file": "spec.phase-flow.json"
+  },
   "next_chain": {
     "id": "test",
     "flow_file": "test.phase-flow.json",

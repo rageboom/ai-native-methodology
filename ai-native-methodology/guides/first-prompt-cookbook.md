@@ -64,13 +64,16 @@
 
 ## 2. Chain harness stage (★ v2.0 / v2.5 Layer 2 통합)
 
-### 2.1 Chain 1 (planning) ★ v2.5: Layer 2 LLM 의무 통과
+### 2.1 Chain 1 (discovery) ★ v2.5: Layer 2 LLM 의무 통과
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "기획 단계 시작" / "planning 진입" / "use case 추출" | [`planning-extract-from-legacy`](../skills/planning-extract-from-legacy/) | `planning-spec.{json,md}` |
-| "use case 분해" / "UC decompose" / "story 분해" | [`planning-decompose-use-cases`](../skills/planning-decompose-use-cases/) | UC-* 분해 |
-| "비즈니스 의도 식별" / "domain priority" / "intent 추출" | [`planning-identify-business-intent`](../skills/planning-identify-business-intent/) | intent-tag + domain priority |
+| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `planning-spec.{json,md}` (산출물명 reuse 유지) |
+| "Swagger/OpenAPI 에서 추출" | [`discovery-from-swagger`](../skills/discovery-from-swagger/) | UC + intent (API spec 입력 어댑터) |
+| "Figma 에서 추출" | [`discovery-from-figma`](../skills/discovery-from-figma/) | UC + intent (디자인 입력 어댑터) |
+| "기획문서/자연어 md 에서 추출" | [`discovery-from-nl-md`](../skills/discovery-from-nl-md/) | UC + intent (NL 입력 어댑터) |
+| "use case 분해" / "UC decompose" / "story 분해" | [`discovery-decompose-use-cases`](../skills/discovery-decompose-use-cases/) | UC-* 분해 |
+| "비즈니스 의도 식별" / "domain priority" / "intent 추출" | [`discovery-identify-business-intent`](../skills/discovery-identify-business-intent/) | intent-tag + domain priority |
 
 ★ ★ v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
 
@@ -82,7 +85,11 @@
 | "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.{json,md}` (AC-*) |
 | "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/) | analysis 7대 산출물 통합 |
 
-### 2.3 Chain 3 (test / RED 의무)
+### 2.3 Chain 3 (plan / ★ placeholder — gate deferred)
+
+★ plan-agent = PLACEHOLDER (`skills:[]` / dispatch 무의미 / 본격 구현 v9.x+ carry). plan-* skill 3종 (`plan-decompose-and-sequence` / `plan-architect-decisions` / `plan-risk-and-nfr`) = placeholder. hard gate = plan-agent 본격 구현 시 추가 (현재 chain 2 → chain 4 사이 통과 stage / DEC-2026-05-21).
+
+### 2.4 Chain 4 (test / RED 의무)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
@@ -90,14 +97,14 @@
 | "test code RED" / "test 실 실행 RED" / "5종 물증 RED" | [`test-run-test-evidence`](../skills/test-run-test-evidence/) | 실 test code + 5종 물증 (★ no-simulation) |
 | "AC→TC coverage 검증" / "test coverage 검증" | [`test-verify-coverage`](../skills/test-verify-coverage/) | coverage finding |
 
-### 2.4 Chain 4 (impl / GREEN 의무)
+### 2.5 Chain 5 (impl / GREEN 의무)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
 | "impl spec 생성" / "구현 코드 작성" / "impl GREEN" | [`implement-generate-impl-spec`](../skills/implement-generate-impl-spec/) | `impl-spec.{json,md}` (IMPL-*) + 실 impl code |
 | "test pass 검증" / "100% GREEN" / "test runner 실 실행" | [`implement-verify-test-pass`](../skills/implement-verify-test-pass/) | 실 test runner + 5종 물증 (★ --allow-execute) |
 
-### 2.5 Release matrix
+### 2.6 Release matrix
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|

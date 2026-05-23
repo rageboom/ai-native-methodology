@@ -2,7 +2,7 @@
 
 본 가이드 = chain harness 5 요소 enforcement 의 사용자 mental model. state.json + mechanical gate trio + revisit detector 가 어떻게 함께 동작하는지.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / release-readiness 11/11 criterion 도달 + CLAUDE.md drift enforcement + workspace test 회귀 자동 차단).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 → **v9.0.1 6-stage 정합 갱신** (★ planning→discovery 개칭 + plan stage 신설 / state.schema `current_chain` 6-stage enum 정합 / DEC-2026-05-21).
 
 ## 1. Chain harness 가 무엇인가?
 
@@ -23,15 +23,19 @@
 
 ```json
 {
-  "schema_version": "1.0",
-  "stage": "planning" | "spec" | "test" | "implement" | "done",
+  "version": "1.0",
+  "project_id": "<basename>",
+  "current_chain": "analysis" | "discovery" | "spec" | "plan" | "test" | "implement" | "revisit_pending",
+  "current_scope": null | "<slug>",
+  "stage_progress": { "analysis": {...}, "discovery": {...}, "spec": {...}, "plan": {...}, "test": {...}, "implement": {...} },
+  "last_gate": { "id": "#1"|"#2"|"#3"|"#4", "stage": "discovery"|"spec"|"test"|"implement", "decision": "go"|"stop"|"revisit", "decision_at": "<ISO>" },
+  "pending_revisit": null | { "target_stage": "...", "confidence_loc": <int> },
   "blocked": false | true,
-  "block_reason": "validator_critical" | "validator_high" | "user_intervention" | "...",
-  "revisit_history": [...],
-  "last_gate_result": { "gate": "1"|"2"|"3"|"4", "pass": bool, "findings_count": N },
-  "version": <atomic CAS counter>
+  "block_reason": "validator_critical" | "validator_high" | "coverage_threshold" | "evidence_missing" | "..."
 }
 ```
+
+★ ★ gate id (#1~#4) ≠ chain 번호 — plan stage (chain 3) 는 hard gate 미보유 (deferred). gate #1=discovery / #2=spec / #3=test / #4=implement.
 
 ★ ★ atomic write CAS — chain-driver 가 state 갱신 시 expectedVersion 비교 후 fdatasync + rename. Windows fallback 동작.
 
@@ -43,7 +47,7 @@
 node tools/chain-driver/src/cli.js init <project-dir>
 ```
 
-→ `.aimd/state.json` 신규 생성 (stage: "planning" / blocked: false). 이후 사용자 prompt 로 chain stage 진입.
+→ `.aimd/state.json` 신규 생성 (current_chain: "analysis" / blocked: false). 이후 사용자 prompt 로 chain stage 진입.
 
 ### 3.2 Next (다음 stage 진입)
 
@@ -86,19 +90,19 @@ node tools/chain-driver/src/cli.js next
 ```mermaid
 stateDiagram-v2
     [*] --> analysis: chain-driver init
-    analysis --> planning: 7대 산출물 종결
-    planning --> spec: gate #1 pass<br/>(planning-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
-    spec --> test: gate #2 pass<br/>(chain-coverage-validator)
+    analysis --> discovery: 7대 산출물 종결
+    discovery --> spec: gate #1 pass<br/>(planning-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
+    spec --> plan: gate #2 pass<br/>(chain-coverage-validator)
+    plan --> test: ★ gate deferred<br/>(plan placeholder / hard gate v9.x+ carry)
     test --> implement: gate #3 pass<br/>(spec-test-link-validator + RED 입증)
-    implement --> done: gate #4 pass<br/>(test-impl-pass-validator + GREEN 100%)
-    done --> [*]: traceability-matrix release
+    implement --> [*]: gate #4 pass<br/>(test-impl-pass-validator + GREEN 100%)<br/>traceability-matrix release
 
-    planning --> blocked: gate #1 finding
+    discovery --> blocked: gate #1 finding
     spec --> blocked: gate #2 finding
     test --> blocked: gate #3 finding
     implement --> blocked: gate #4 finding
 
-    blocked --> planning: user fix + next
+    blocked --> discovery: user fix + next
     blocked --> spec: user fix + next
     blocked --> test: user fix + next
     blocked --> implement: user fix + next
@@ -110,7 +114,7 @@ stateDiagram-v2
     end note
 ```
 
-★ state name = `state.schema.json` enum 정합 (planning / spec / test / implement / done / blocked).
+★ current_chain = `state.schema.json` enum 정합 (analysis / discovery / spec / plan / test / implement / revisit_pending). blocked = 별도 boolean field. plan stage (chain 3) 는 hard gate 미보유 (deferred / plan-agent 본격 구현 v9.x+ carry).
 
 ## 4. Mechanical gate trio (★ ★ ★ no-simulation enforcement)
 
@@ -130,7 +134,7 @@ stateDiagram-v2
 `hooks/hooks.json` 의 UserPromptSubmit hook:
 
 ```
-matcher: (planning|기획|spec|명세|behavior|test|테스트|implement|구현)
+matcher: (discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)
 action:  chain-driver hooks-bridge → suggest-skill (stderr)
 suppressOutput: true (★ LLM context 미주입)
 additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
@@ -142,7 +146,7 @@ additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 
 ## 5.1 ★ v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
 
-chain 1 gate (planning → spec 진입) 시 chain-driver 가 호출하는 validator:
+chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 validator:
 
 ```
 1. planning-extraction-validator (★ 기존 v2.0)
@@ -181,7 +185,7 @@ baseline_sha = state.json 의 `last_baseline_sha` 필드. chain stage 종결 시
 
 ## 7. 5종 물증 (no-simulation 정책 핵심)
 
-chain 3+4 종결 시 다음 모두 검증:
+chain 4 (test) + chain 5 (implement) 종결 시 다음 모두 검증:
 
 | 필드 | 목적 |
 |---|---|
@@ -202,7 +206,7 @@ chain 3+4 종결 시 다음 모두 검증:
 ```
 1. node tools/chain-driver/src/cli.js init <project>
 2. "이 코드베이스 분석 시작" → analysis stage
-3. analysis 종결 후 "기획 단계 시작" → chain 1
+3. analysis 종결 후 "발견 단계 시작" (또는 "기획 단계 시작") → chain 1 (discovery)
 4. ... (각 stage 자연어 prompt)
 ```
 
@@ -231,7 +235,7 @@ $ git diff
 ... (planning-spec 변경)
 
 $ chain-driver revisit-detect
-[chain-driver] revisit 감지 / chain 1 → 현재 chain 4
+[chain-driver] revisit 감지 / chain 1 → 현재 chain 5
 [chain-driver] 사용자 prompt: revisit / stop ?
 ```
 
@@ -244,7 +248,7 @@ sequenceDiagram
     participant V as gate validator
     participant T as test runner
 
-    Note over U,T: chain 3 (test stage / RED 의무)
+    Note over U,T: chain 4 (test stage / RED 의무)
     U->>C: "test spec 생성 RED"
     C->>V: spec-test-link-validator (gate #3)
     V->>T: 진짜 test runner 호출 (--allow-execute)
@@ -252,16 +256,16 @@ sequenceDiagram
     V-->>C: 5종 물증 + result_hash sha256
     C-->>U: gate #3 pass / next stage = implement
 
-    Note over U,T: chain 4 (impl stage / GREEN 100% 의무)
+    Note over U,T: chain 5 (impl stage / GREEN 100% 의무)
     U->>C: "impl spec 생성 GREEN"
     C->>V: test-impl-pass-validator (gate #4)
     V->>T: 진짜 test runner 재실행 (test code 변경 ❌)
     T-->>V: pass=N / fail=0 (★ ★ GREEN 100%)
     V-->>C: 5종 물증 + result_hash deterministic
-    C-->>U: gate #4 pass / done
+    C-->>U: gate #4 pass / 완료 (release)
 ```
 
-★ ★ ★ chain 3 의 test code = chain 4 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.
+★ ★ ★ chain 4 의 test code = chain 5 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.
 
 ## 9. 막혔을 때
 

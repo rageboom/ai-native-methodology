@@ -2,7 +2,7 @@
 
 본 가이드 = plugin install 직후 첫 100 line. 사용자가 자기 legacy 코드 분석 + chain harness 진입까지 10분.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / Gap 모두 청산 + 47 skills / 16 tools / 39 schemas / 14 PoC / **11/11 strict criterion** / 분석 입력 5종 orchestrate / FE skill 4종 / scope/stage 자동 폴더).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (★ A3 / session 20차 / Gap 모두 청산 + 47 skills / 16 tools / 39 schemas / 14 PoC / **11/11 strict criterion** / 분석 입력 5종 orchestrate / FE skill 4종 / scope/stage 자동 폴더) → **v9.0.1 6-stage 정합 갱신** (planning→discovery 개칭 + plan stage 신설).
 
 ## 1. Install (2분)
 
@@ -26,7 +26,7 @@
 
 ## 1.5 외부 도구 사전 install — chain harness 동작 의무 (★ v8.5.0+ F-V2-05 신설)
 
-★ ★ ★ 본 plugin 의 **R15 (no-simulation 정책)** + chain 3/4 의 **real test runner** 의무로 다음 외부 도구가 사용자 환경에 필요. 부재 시 chain 단계 산출물이 차단되거나 F-SIM finding 자동 등재.
+★ ★ ★ 본 plugin 의 **R15 (no-simulation 정책)** + chain 4/5 (test/implement) 의 **real test runner** 의무로 다음 외부 도구가 사용자 환경에 필요. 부재 시 chain 단계 산출물이 차단되거나 F-SIM finding 자동 등재.
 
 ### Core (필수)
 
@@ -39,7 +39,7 @@
 
 | 도구 | 사용처 | 필요 stack |
 |---|---|---|
-| `mvn` + `javac` (JDK ≥ 1.8) | chain 3 RED + chain 4 GREEN test runner | Java/Spring (예: IFRS / EFI-WEB) |
+| `mvn` + `javac` (JDK ≥ 1.8) | chain 4 RED + chain 5 GREEN test runner | Java/Spring (예: IFRS / EFI-WEB) |
 | `npx` + `vitest`/`jest`/`playwright` | 동상 | Node/NestJS/React |
 | `python3` + `pytest` | 동상 | Python/FastAPI |
 
@@ -77,7 +77,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 
 ★ ★ ★ **v2.5.1 install 후 확인 의무**:
 - **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
-- **Skills: 38** (`_base 5 + analysis 22 + planning 3 + spec 3 + test 3 + implement 2`)
+- **Skills: 55** (`_base 5 + analysis 28 + discovery 6 + spec 3 + plan 3 + test 4 + implement 4 + dep-graph-navigator 1 + ticket-sync 1`)
 - **MCP Servers: (없음)**
 
 만약 `Skills: 0` 또는 `Agents: README` 식 출력 = v2.5.0 이전 버전 / 재install 의무 (v2.5.1 PATCH 가 1-depth flatten paradigm 으로 fix).
@@ -135,10 +135,10 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-2. analysis stage 종결 (시나리오 A 와 동일)
 "이 코드베이스 분석 시작해줘"  → 7대 산출물 산출
 
-# 5-3. chain 1 (planning) 진입 (1분 / ★ v2.5: Layer 2 LLM 의무 통과)
-"기획 단계 시작"
-→ planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent skill 자동 발동
-→ planning-spec.{json,md} 산출
+# 5-3. chain 1 (discovery) 진입 (1분 / ★ v2.5: Layer 2 LLM 의무 통과)
+"발견 단계 시작" (또는 "기획 단계 시작")
+→ discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent skill 자동 발동
+→ planning-spec.{json,md} 산출 (산출물 파일명 reuse 유지)
 → gate #1 자동 호출:
   · planning-extraction-validator (입출력 무결성)
   · ★ br-cross-consistency-validator Layer 1 (결정적) + Layer 2 (Claude Code sub-agent / Sonnet 4.6) 양쪽 통과
@@ -150,21 +150,26 @@ node tools/chain-driver/src/cli.js init <project>
 → behavior-spec + acceptance-criteria + 7대 통합
 → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85)
 
-# 5-5. chain 3 (test) 진입 (1분 / ★ RED 의무)
+# 5-5. chain 3 (plan) 진입 (★ placeholder / gate deferred)
+"plan / 계획 / task 분해"
+→ plan-agent = PLACEHOLDER (skills:[] / dispatch 무의미 / 본격 구현 v9.x+ carry)
+→ (산출 plan-spec / hard gate = plan-agent 본격 구현 시 추가)
+
+# 5-6. chain 4 (test) 진입 (1분 / ★ RED 의무)
 "test spec 생성 RED"
 → test-generate-test-spec / test-run-test-evidence / test-verify-coverage
 → test-spec + 실 test code (jest/vitest/junit5/pytest 등)
 → ★ ★ ★ 모든 test fail 입증 (impl 부재 / RED)
 → gate #3 (spec-test-link-validator / AC→TC ≥ 0.85)
 
-# 5-6. chain 4 (impl) 진입 (1분 / ★ GREEN 의무)
+# 5-7. chain 5 (impl) 진입 (1분 / ★ GREEN 의무)
 "impl spec 생성 GREEN"
 → implement-generate-impl-spec / implement-verify-test-pass
 → impl-spec + 실 impl code
 → ★ ★ ★ 100% test pass 입증
 → gate #4 (test-impl-pass-validator / --allow-execute 의무)
 
-# 5-7. release matrix (1분)
+# 5-8. release matrix (1분)
 "traceability matrix"
 → _base-build-traceability-matrix
 → UC→BHV→AC→TC→IMPL+commit_hash matrix 산출

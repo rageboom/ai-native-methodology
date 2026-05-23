@@ -1,6 +1,6 @@
 # ID 표준 (산출물 간 추적성)
 
-> 7대 산출물 + ★ v2.0 chain 4단계 산출물 ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능. 단일 source-of-truth (★ 14차 retract pattern 차단).
+> 7대 산출물 + ★ v2.0 chain 산출물 (★ v9.0 6-stage) ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능. 단일 source-of-truth (★ 14차 retract pattern 차단).
 
 ★ ★ ★ **v2.0 갱신 (2026-05-06)**: chain 4단계 산출물 ID 추가 + UC-* 3 형식 충돌 통일 (DEC-2026-05-06-v2.0-i-strict-채택 정합 / sub-plan-2 §D1 결단).
 
@@ -46,7 +46,7 @@ flowchart LR
 | API operationId | `{camelCase 동사+명사}` | `createOrder`, `getUsers` | openapi |
 | DB 테이블 | `{snake_case}` | `orders`, `order_items` | db-schema.schema |
 
-### ★ v2.0 chain 4단계 산출물 (sub-plan-2 신설)
+### ★ v2.0 chain 산출물 (sub-plan-2 신설 / ★ v9.0 6-stage / plan-spec ID = placeholder carry)
 
 | 산출물 | ID 형식 | 예시 | schema |
 |---|---|---|---|
@@ -63,7 +63,7 @@ flowchart LR
 
 ★ scope 는 사용자가 작업 시작 시 자유 명명 (chain-driver init --scope <slug>). 자동 추출 ❌ (사용자 의도 분명).
 ★ 한국어 / 공백 / path traversal (`../`, `/`) 비허용 — 파일시스템 호환 + state-store `validateScopeSlug` 강제.
-★ 한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 4 사이클 1회 또는 revisit 시 N회. `.aimd/<scope>/` 단위 격리.
+★ 한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 사이클 1회 또는 revisit 시 N회. `.aimd/<scope>/` 단위 격리.
 
 ★ planning-spec 의 use_cases 는 기존 UC-* 차용 (analysis stage UC-* 와 동일 namespace / backward link).
 ★ BR-INTENT-* prefix ❌ — rules.schema 의 BR-* 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).

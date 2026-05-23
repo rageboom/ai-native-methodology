@@ -30,7 +30,7 @@ Claude Code 가 켜지자, 김개발은 두 줄을 입력합니다.
 > /plugin install ai-native-methodology@ai-native-methodology
 ✓ ai-native-methodology v2.5.1 설치 완료
   · Agents: 3 (_base-senior-engineer / _base-industry-case-researcher / _base-official-docs-checker)
-  · Skills: 38 (_base 5 + analysis 22 + planning 3 + spec 3 + test 3 + implement 2)
+  · Skills: 55 (_base 5 + analysis 28 + discovery 6 + spec 3 + plan 3 + test 4 + implement 4 + dep-graph-navigator 1 + ticket-sync 1)
   · MCP Servers: (없음)
 ```
 
@@ -49,7 +49,7 @@ AI-Native 개발 방법론 v2.5.1 ready
 
   시작하려면 자연어로 말해보세요:
     · "이 코드베이스 분석 시작"           → `input` phase 부터
-    · "기획 단계 시작"                     → 체인 1 부터
+    · "발견 단계 시작"                     → 체인 1 (discovery) 부터
     · "SQL inventory 추출"                → `sql-inventory` phase
     · "비즈니스 규칙 의미 일관성 검증"      → ★ v2.5 신규
 
@@ -187,7 +187,7 @@ BR Cross-Consistency Validator 실행 중...
     1. UC-07 "환율 동기화"의 비즈니스 의도가 모호 (confidence 0.62)
     2. UC-09 는 다른 시스템과 의존 — 범위 확정 필요
 
-  → analysis/chain-1-planning/planning-spec.json
+  → analysis/chain-1-discovery/planning-spec.json
 
   통과(go) 또는 중단(stop) 결정해 주세요.
 ```

@@ -4,21 +4,22 @@
 
 ## ★ ★ ★ Master SSOT (v2.0 진입점)
 
-- **`sdlc-4stage-flow.{json,mermaid}`** — ★ ★ ★ chain harness 4 stage 통합 SSOT (planning → spec → test → impl + cross_cutting analysis stage / 4 gate + revisit_edges + release_eligibility)
+- **`sdlc-4stage-flow.{json,mermaid}`** (파일명 reuse 유지) — ★ ★ ★ chain harness 6-stage 통합 SSOT (analysis → discovery → spec → plan → test → implement / 4 gate (plan gate deferred) + revisit_edges + release_eligibility)
   - **plugin user 의 v2.0 진입 우선순위 = 1순위** (chain-driver init / next 가 본 SSOT 참조)
   - schemas/state.schema.json 의 stage enum ↔ stages 정합 자동 검증 (drift-validator `--check-state-flow-consistency`)
 
-## Chain stage 4종 (★ v2.0 채워짐)
+## Chain stage 5종 (★ v9.0 6-stage / planning→discovery 개칭 + plan 신설)
 
-- `planning.phase-flow.{json,mermaid}` — chain 1 / planning-spec 추출
+- `discovery.phase-flow.{json,mermaid}` — chain 1 / planning-spec 추출 (discovery stage / 입력 어댑터 4종)
 - `spec.phase-flow.{json,mermaid}` — chain 2 / behavior + acceptance + 7대 통합
-- `test.phase-flow.{json,mermaid}` — chain 3 / test-spec + 실 test code (RED)
-- `implement.phase-flow.{json,mermaid}` — chain 4 / impl-spec + 실 impl code (GREEN)
+- `plan.phase-flow.{json,mermaid}` — chain 3 / plan-spec (task 분해 / ADR / NFR / risk — ★ placeholder / gate deferred)
+- `test.phase-flow.{json,mermaid}` — chain 4 / test-spec + 실 test code (RED)
+- `implement.phase-flow.{json,mermaid}` — chain 5 / impl-spec + 실 impl code (GREEN)
 
 ## Cross-cutting (analysis stage / chain 1 진입 전)
 
 - `analysis.phase-flow.{json,mermaid}` — analysis stage 의 Phase 0 → 1 → 2 → 3 → 4 → 4.5 → 5 (BE/FE/DB 분기) → 6 흐름
-  - **chain 1 (planning) 의 INPUT 으로 사용** — legacy 코드 → 7대 산출물 한 방향 추출
+  - **chain 1 (discovery) 의 INPUT 으로 사용** — legacy 코드 → 7대 산출물 한 방향 추출
   - v1.x 자산 그대로 v2.0 chain 1 진입 전 단계로 흡수
 
 ## 미채움 흐름 (☐ v2.x+ lifecycle 확장)

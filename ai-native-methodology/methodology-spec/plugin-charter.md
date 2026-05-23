@@ -39,17 +39,17 @@
 |---|------|------|
 | R1 | ✅ | `methodology-spec/workflow/input.md` — 5종 입력 명시 (소스코드/ERD/DB/기획문서/자연어) |
 | R2 | ✅ | `flows/analysis.phase-flow.json` 11 phase 의존 그래프 + Work Principles 4원칙 (`CLAUDE.md`) |
-| R3 | ✅ | `skills/planning-decompose-use-cases/` + `tools/traceability-matrix-builder/` |
+| R3 | ✅ | `skills/discovery-decompose-use-cases/` + `tools/traceability-matrix-builder/` |
 | R4 | ✅ | `schemas/` 31종 + `templates/{analysis,planning,spec,test,implement,design}/` |
 | R5 | ✅ | `tools/chain-driver/src/state-store.js` `ensureScopeDir` + `chain-driver init --scope <s>` + SessionStart hook 자동 발동 (v3.2 G3 종결 / DEC-2026-05-15-g3-scope-folder-종결) |
 | R6 | ✅ | `hooks/hooks.json` (SessionStart + UserPromptSubmit + PreToolUse) + `CLAUDE.md` 23 policies |
-| R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{planning,spec,test,impl}/` + manifest 이중 렌더링 (`manifest.json` + `manifest.md`) 자동 생성. `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
+| R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{discovery,spec,plan,test,impl}/` + manifest 이중 렌더링 (`manifest.json` + `manifest.md`) 자동 생성. `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
 | R8 | ✅ | (★ v3.3.0 G2 종결 / 2026-05-15) 5종 모두 자산 대칭. (a) `analysis-input-collection` + `analysis-source-inventory` 22 skill / (b) **`analysis-from-figma`** (Figma desktop MCP 4 도구) / (c) **`analysis-from-swagger`** (`@readme/openapi-parser`) / (d) **`analysis-from-plan-doc`** (md + pdf + Notion export) / (e) **`analysis-from-prompt`** + **`analysis-input-orchestrate`** (자연어 1발화 → 자동 dispatch + cross-ref + conflict) |
 | R9 | ✅ | `flows/spec.phase-flow.json` (chain 2) + `skills/spec-compose-behavior-spec/` |
-| R10 | ✅ | `flows/test.phase-flow.json` (chain 3 / RED 의무) + `tools/test-impl-pass-validator/` |
-| R11 | ✅ | `flows/implement.phase-flow.json` (chain 4 / GREEN 100% pass) |
-| R12 | ✅ | (★ v3.5.0 G5 종결) `flows/sdlc-4stage-flow.json` + `skills-axis.md` + **`methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스** (★ stage × (agent / skill / hook / tool / validator) 8 row 본 매트릭스 + 부 매트릭스 R8 입력 6 row / 사용자 진입 시 단일 SSOT) |
-| R13 | ✅ | `sdlc-4stage-flow.json` `revisit_edges` 6종 (planning↔analysis, spec↔planning, test↔spec, impl↔{test,spec,planning,analysis}) |
+| R10 | ✅ | `flows/test.phase-flow.json` (chain 4 / RED 의무) + `tools/test-impl-pass-validator/` |
+| R11 | ✅ | `flows/implement.phase-flow.json` (chain 5 / GREEN 100% pass) |
+| R12 | ✅ | (★ v3.5.0 G5 종결 / ★ v9.0 plan row 추가) `flows/sdlc-4stage-flow.json` + `skills-axis.md` + **`methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스** (★ stage × (agent / skill / hook / tool / validator) 9 row 본 매트릭스 + 부 매트릭스 R8 입력 6 row / 사용자 진입 시 단일 SSOT) |
+| R13 | ✅ | `sdlc-4stage-flow.json` `revisit_edges` 8종 (discovery→analysis, spec→discovery, plan→spec, test→plan, implement→{test, spec, discovery, analysis}) ★ v9.0 6-stage |
 | R14 | ✅ | (★ v3.4.0 G4 종결 / 2026-05-15) `be-fe-separation.md` + scenario A/B/C. **FE skill 9** = analysis 5 (`-fe` + `analysis-from-figma`) + chain 4 `implement-react`/`implement-vue` + chain 3 `test-playwright` + Scenario C `analysis-html-template`. chain 4 FE impl 분기 + e2e POM paradigm + JSP 외부 도구 검증 모두 자산화. |
 | R15 | ✅ | `tools/static-runner/` Tier 1 = Semgrep (in-plugin / JVM 의존 0) + Tier 2 = 사용자 환경 SARIF import (PMD/SpotBugs/CodeQL/Daikon) + gate #4 강제 + no-simulation 정책 + 4 조건 schema-level enforcement (v8.6.0 R19 정합) |
 | ~~R16~~ | ★ scope-out | ★ **영구 폐기 (v3.6.0 / 2026-05-15 사용자 결단)** — `mcp__wiki-jira-assistant` 수동 처리로 충분 / 자동 티켓화 가치 < 비용. plan-itsm-jira-chain-integration.md 도 이미 폐기 완료 (session 16차). |

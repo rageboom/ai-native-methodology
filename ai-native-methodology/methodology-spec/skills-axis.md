@@ -64,7 +64,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 1. skills/<category>-<semantic-slug>/SKILL.md 신설 (★ 1-depth + category prefix)
    - frontmatter: name (디렉토리명과 동일) / description / allowed-tools
    - 디렉토리명 = 의미 ID (예 analysis-formal-spec-validation / analysis-characterization-test). phase-N 숫자 prefix 폐기 (§8).
-   - category prefix = _base / analysis / planning / spec / test / implement (§7.2)
+   - category prefix = _base / analysis / discovery / spec / plan / test / implement (§7.2)
 
 2. flows/analysis.phase-flow.json 갱신
    - 본 skill 이 발동되는 manifest phase 의 skills 배열에 디렉토리명 추가
@@ -95,11 +95,12 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
 | 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ + ★ v3.3.0 G2 신규 5종 (`analysis-input-orchestrate` + `analysis-from-{prompt,swagger,plan-doc,figma}`) | inventory + tree + input-summary.json (cross-ref + conflict) |
-| 1 | planning | planning.phase-flow.json (★ 신설) | skills/planning-*/ (★ 3 / planning-extract-from-legacy 등) | planning-spec |
+| 1 | discovery | discovery.phase-flow.json | skills/discovery-*/ (★ 6 / discovery-from-{analysis-output,swagger,figma,nl-md} + discovery-decompose-use-cases + discovery-identify-business-intent) | planning-spec (산출물명 reuse) |
 | 1 sub | analysis | analysis.phase-flow.json | skills/analysis-*/ (현 28 / aspect 4 + br-cross 1 + ★ v3.3.0 G2 5종 + ★ v3.4.0 G4 `analysis-html-template` 1종 포함) | 7대 + 8 FE 산출물 + input-summary.json (★ v3.3.0) + html-template-extract.json (★ v3.4.0 Scenario C) |
-| 2 | spec | spec.phase-flow.json (★ 신설) | skills/spec-*/ (★ 3 / spec-compose-behavior-spec 등) | behavior-spec / acceptance-criteria |
-| 3 | test | test.phase-flow.json (★ 신설) | skills/test-*/ (현 4 / test-generate-test-spec + ★ v3.4.0 G4 `test-playwright` 1종 추가) | test-spec + 실 test 코드 (RED) |
-| 4 | implement | implement.phase-flow.json (★ 신설) | skills/implement-*/ (현 4 / implement-generate-impl-spec + implement-verify-test-pass + ★ v3.4.0 G4 `implement-react` + `implement-vue` 2종 추가) | impl-spec + 실 impl 코드 (GREEN) |
+| 2 | spec | spec.phase-flow.json | skills/spec-*/ (★ 3 / spec-compose-behavior-spec 등) | behavior-spec / acceptance-criteria |
+| 3 | plan | plan.phase-flow.json (★ v9.0 placeholder) | skills/plan-*/ (★ 3 placeholder / plan-decompose-and-sequence 등) | plan-spec (placeholder / gate deferred) |
+| 4 | test | test.phase-flow.json | skills/test-*/ (현 4 / test-generate-test-spec + ★ v3.4.0 G4 `test-playwright` 1종 추가) | test-spec + 실 test 코드 (RED) |
+| 5 | implement | implement.phase-flow.json | skills/implement-*/ (현 4 / implement-generate-impl-spec + implement-verify-test-pass + ★ v3.4.0 G4 `implement-react` + `implement-vue` 2종 추가) | impl-spec + 실 impl 코드 (GREEN) |
 | cross | traceability | (sdlc-4stage-flow.json cross_cutting) | skills/_base-build-traceability-matrix/ | traceability-matrix |
 
 ## 5. 매핑 현황 (v2.6.0 시점)
@@ -140,17 +141,19 @@ v2.0~v2.5.0 까지 본 plugin 의 skills 자산 = **2-depth** `skills/<category>
 
 ### 7.2 category prefix 매핑
 
-| 사상 카테고리 | runtime prefix | skill 개수 (v2.5.1) | 예 |
+| 사상 카테고리 | runtime prefix | skill 개수 (v9.0.1) | 예 |
 |---|---|---|---|
 | _base | `_base-` | 5 | `_base-apply-template`, `_base-build-traceability-matrix`, ... |
 | analysis | `analysis-` | 28 (★ v3.3.0 G2 +5 + ★ v3.4.0 G4 +1: `analysis-html-template`) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-prompt`, `analysis-from-swagger`, `analysis-from-plan-doc`, `analysis-from-figma`, `analysis-html-template`, `analysis-aspect-a11y`, ... |
-| planning | `planning-` | 3 | `planning-extract-from-legacy`, ... |
+| discovery | `discovery-` | 6 | `discovery-from-analysis-output`, `discovery-from-swagger`, `discovery-from-figma`, `discovery-from-nl-md`, `discovery-decompose-use-cases`, `discovery-identify-business-intent` |
 | spec | `spec-` | 3 | `spec-compose-behavior-spec`, ... |
-| test | `test-` | 3 | `test-generate-test-spec`, ... |
-| implement | `implement-` | 2 | `implement-generate-impl-spec`, ... |
+| plan | `plan-` | 3 (★ placeholder) | `plan-decompose-and-sequence`, `plan-architect-decisions`, `plan-risk-and-nfr` |
+| test | `test-` | 4 | `test-generate-test-spec`, `test-playwright`, ... |
+| implement | `implement-` | 4 | `implement-generate-impl-spec`, `implement-react`, `implement-vue`, ... |
 | design | (placeholder) | 0 | — |
+| (standalone) | — | 2 | `dep-graph-navigator`, `ticket-sync` |
 
-총 **38 skill** (★ ★ Claude Code plugin 표준 1-depth 호환 ✅).
+총 **55 skill** (★ v9.0.1 / ★ ★ Claude Code plugin 표준 1-depth 호환 ✅).
 
 ### 7.3 frontmatter `name:` SSOT 정합
 
@@ -264,10 +267,11 @@ paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (★ commit
 | Agent | 책임 stage | 사전 주입 skill (frontmatter `skills: [...]`) | 총 |
 |---|---|---|---|
 | `analysis-agent.md` | chain 0 (input) + chain 1 sub (analysis) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-{prompt,swagger,plan-doc,figma}` (6), `analysis-source-inventory`, `analysis-architecture`, `analysis-domain-model`, `analysis-business-rules`, `analysis-db-schema-erd`, `analysis-openapi`, `analysis-api-rule-mapping`, `analysis-error-mapping`, `analysis-quality-antipattern`, `analysis-formal-spec-validation`, `analysis-characterization-test`, `analysis-sql-inventory`, `analysis-form-validation-fe`, `analysis-type-spec-fe`, `analysis-ui-state-map-fe`, `analysis-ui-visual-manifest-fe`, `analysis-aspect-{a11y,i18n,static-security,legacy}` (4), `analysis-br-cross-consistency-check`, `analysis-html-template` (22 analysis), `_base-apply-baseline-ratchet`, `_base-apply-template`, `_base-log-finding` | 31 |
-| `planning-agent.md` | chain 1 (planning) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent` (3 planning), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
+| `discovery-agent.md` | chain 1 (discovery) | `discovery-from-analysis-output`, `discovery-from-swagger`, `discovery-from-figma`, `discovery-from-nl-md`, `discovery-decompose-use-cases`, `discovery-identify-business-intent` (6 discovery), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 10 |
 | `spec-agent.md` | chain 2 (spec) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-deliverables` (3 spec), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 7 |
-| `test-agent.md` | chain 3 (test / RED) | `test-generate-test-spec`, `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (4 test), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
-| `implement-agent.md` | chain 4 (implement / GREEN) | `implement-generate-impl-spec`, `implement-verify-test-pass`, `implement-react`, `implement-vue` (4 implement), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
+| `plan-agent.md` (★ ★ ★ PLACEHOLDER / v9.x+ carry) | chain 3 (plan / HOW) | ★ 없음 (`skills: []` / dispatch 무의미 / v9.x+ `plan-decompose-and-sequence` + `plan-architect-decisions` + `plan-risk-and-nfr` 신설 carry) | 0 |
+| `test-agent.md` | chain 4 (test / RED) | `test-generate-test-spec`, `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (4 test), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
+| `implement-agent.md` | chain 5 (implement / GREEN) | `implement-generate-impl-spec`, `implement-verify-test-pass`, `implement-react`, `implement-vue` (4 implement), `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` (4 base) | 8 |
 | `design-agent.md` (★ ★ ★ PLACEHOLDER / v4.1+ carry) | design stage (chain harness 외부 / 가시화만) | ★ 없음 (`skills: []` / v4.1+ `design-wireframe-spec` + `design-component-spec` + `design-tokens-extract` + `design-visual-regression` + `design-a11y-prep` 5~6종 신설 carry) | 0 |
 | `archive/v4-spike/_spike-planning-agent.md` (★ ★ ★ EXPERIMENTAL / archive 이동) | chain 1 spike (역사 기록 / agent dispatch 대상 ❌) | `planning-extract-from-legacy`, `planning-decompose-use-cases`, `planning-identify-business-intent`, `_base-invoke-go-stop-gate`, `_base-log-finding` | 5 |
 
@@ -283,16 +287,16 @@ paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (★ commit
 
 ```
 # main agent (orchestrator) → stage agent dispatch
-main agent → Task(subagent_type="planning-agent", prompt="""
+main agent → Task(subagent_type="discovery-agent", prompt="""
 target: <project-path>
-goal: planning-spec 추출
-input: .aimd/output/{rules,domain,inventory,antipatterns}.json + findings.md
+goal: planning-spec 추출 (discovery stage / 산출물명 reuse)
+input: .aimd/output/{business-rules,domain,inventory,antipatterns}.json + findings.md
 """)
 
 # stage agent → skill chain (frontmatter skills 사전 주입 + Skill tool on-demand)
-planning-agent → Skill(planning-extract-from-legacy)
-                → Skill(planning-decompose-use-cases)
-                → Skill(planning-identify-business-intent)
+discovery-agent → Skill(discovery-from-analysis-output)
+                → Skill(discovery-decompose-use-cases)
+                → Skill(discovery-identify-business-intent)
                 → Skill(_base-invoke-go-stop-gate)
 ```
 

@@ -64,12 +64,12 @@
     "verifiable_required": true
   },
   "previous_chain": {
-    "id": "planning",
-    "flow_file": "planning.phase-flow.json"
+    "id": "discovery",
+    "flow_file": "discovery.phase-flow.json"
   },
   "next_chain": {
-    "id": "test",
-    "flow_file": "test.phase-flow.json",
+    "id": "plan",
+    "flow_file": "plan.phase-flow.json",
     "gate_decision": "go"
   }
 }

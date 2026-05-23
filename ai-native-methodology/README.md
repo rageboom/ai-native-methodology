@@ -1,6 +1,6 @@
 # AI-Native 개발 방법론 v3.6.9 ★ ★ ★ ★ ★ ★
 
-> 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 기획 → 스펙 → 테스트 → 구현** SDLC 4단계 chain harness.
+> 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 발견 → 스펙 → 계획 → 테스트 → 구현** SDLC 6-stage chain harness.
 >
 > **현재**: v3.6.9 (2026-05-16) — ★ ★ ★ ★ ★ ★ ★ **paradigm 진화 안정점 + enforcement cadence 정착** / 사용자 요구사항 17 모두 청산 (R1~R15 활성 ✅ / R16~R17 영구 scope-out) / release-readiness **11/11** strict 통과 (★ v3.6.7 A1 신설 — workspace test 회귀 자동 차단) / CLAUDE.md ↔ plugin.json drift 자동 enforcement (★ v3.6.4 R2) / **skill 47종 / 도구 16종 / 스키마 39종 / PoC 14종** / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill 4종 (React/Vue/Playwright/JSP) / scope/stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT / workspace test **359/359** pass.
 >
@@ -18,15 +18,17 @@ INPUT (1차 = legacy single-case):
 
   ↓ analysis stage (chain 1 진입 전 / 한 방향 추출)
   ↓
-[CHAIN 1] planning-spec               ── go/stop gate #1
+[CHAIN 1] planning-spec (discovery stage)      ── go/stop gate #1
   ↓
 [CHAIN 2] behavior-spec
         + acceptance-criteria
         + 7대 산출물 통합              ── go/stop gate #2
   ↓
-[CHAIN 3] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+[CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk — ★ placeholder)  ── gate deferred
   ↓
-[CHAIN 4] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+[CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+  ↓
+[CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
   ↓
 OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_hash)
 ```
@@ -60,7 +62,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 ✅ 11. workspace_test_pass: npm test --workspaces 359/359 pass / 0 fail (v3.6.7 A1 신설)
 ```
 
-★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + sample chain 4 e2e (PoC #01~#05).
+★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + sample chain 5 e2e (PoC #01~#05).
 
 ---
 
@@ -173,13 +175,14 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 
 ```
 1. chain-driver init <project>      → state.json 초기화
-2. "기획 단계 시작"                  → planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent
-   → planning-spec.{json,md} 산출
+2. "발견 단계 시작"                  → discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent
+   → planning-spec.{json,md} 산출 (산출물명 reuse 유지)
    → gate #1 (planning-extraction-validator) 통과
 3. "behavior spec / acceptance criteria 도출"
    → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
    → behavior-spec + acceptance-criteria + 7대 통합
    → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85) 통과
+   (chain 3 = plan stage / ★ placeholder / gate deferred / pass-through — plan-agent 본격 구현 v9.x+ carry)
 4. "test spec 생성 RED 의무"
    → test-generate-test-spec / test-run-test-evidence / test-verify-coverage
    → test-spec + 실 test code (RED — 실패 입증 / impl 부재)
@@ -216,12 +219,13 @@ dist/ai-native-methodology-v3.6.9/
 ├── CHANGELOG-HISTORY.md              v2.5.x 이전 archive
 ├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
 │
-├── agents/                           5 chain agent (planning/spec/test/implement/analysis) + _base 3
+├── agents/                           6 chain agent (analysis/discovery/spec/plan/test/implement / plan=placeholder) + _base 3
 ├── skills/                           ★ 13 chain skill + analysis 18 + _base 5
 │   ├── _base/                        _base-invoke-go-stop-gate / _base-build-traceability-matrix / _base-log-finding / _base-apply-template / _base-apply-baseline-ratchet
 │   ├── analysis/                     phase-0~6 + aspect 4 (a11y/i18n/static-security/legacy)
-│   ├── planning/                     planning-extract-from-legacy / planning-decompose-use-cases / planning-identify-business-intent
+│   ├── discovery/                    discovery-from-{analysis-output,swagger,figma,nl-md} / discovery-decompose-use-cases / discovery-identify-business-intent
 │   ├── spec/                         spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
+│   ├── plan/                         plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr (★ placeholder)
 │   ├── test/                         test-generate-test-spec / test-run-test-evidence / test-verify-coverage
 │   └── implement/                    implement-generate-impl-spec / implement-verify-test-pass
 ├── hooks/
@@ -229,7 +233,7 @@ dist/ai-native-methodology-v3.6.9/
 ├── flows/                            13 file (5 chain stage flow + sdlc-4stage SSOT + analysis flow)
 │   ├── sdlc-4stage-flow.{json,mermaid}     ★ ★ ★ chain harness master SSOT
 │   ├── analysis.phase-flow.{json,mermaid}  v1.x 자산 (chain 1 진입 전)
-│   └── {planning,spec,test,implement}.phase-flow.{json,mermaid}
+│   └── {discovery,spec,plan,test,implement}.phase-flow.{json,mermaid}
 │
 ├── tools/                            ★ 12 workspace tool (npm workspace / 218 unit test)
 │   ├── chain-driver/                 ★ harness driver (cli + 6 module / 60+8 chaos test)
@@ -242,7 +246,7 @@ dist/ai-native-methodology-v3.6.9/
 │   ├── planning-extraction-validator/ chain 1 / source-grounded ≥ 0.80
 │   ├── chain-coverage-validator/     chain 2 / UC→BHV→AC ≥ 0.85
 │   ├── spec-test-link-validator/     chain 3 / AC→TC ≥ 0.85
-│   ├── test-impl-pass-validator/     chain 4 / 100% pass + result_hash 정규화
+│   ├── test-impl-pass-validator/     chain 5 (implement) / 100% pass + result_hash 정규화
 │   └── traceability-matrix-builder/  release matrix
 │
 ├── templates/                        analysis 22 + chain placeholder + adoption alias source
