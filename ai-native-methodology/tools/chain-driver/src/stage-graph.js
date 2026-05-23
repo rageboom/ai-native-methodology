@@ -4,7 +4,8 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-const STAGES = ['analysis', 'planning', 'spec', 'test', 'implement'];
+// ★ v9.0 6-stage (analysis→discovery→spec→plan→test→implement / DEC-2026-05-21).
+const STAGES = ['analysis', 'discovery', 'spec', 'plan', 'test', 'implement'];
 
 export function loadFlow(repoRoot) {
   const path = resolveFlowPath(repoRoot);
@@ -39,7 +40,8 @@ export function previousStage(current) {
 }
 
 export function getGateForStage(stage) {
-  const map = { planning: '#1', spec: '#2', test: '#3', implement: '#4' };
+  // ★ v9.0 — plan stage hard gate = deferred (placeholder / DEC-2026-05-23-discovery-stage-v9). gate #1~#4 유지.
+  const map = { discovery: '#1', spec: '#2', test: '#3', implement: '#4' };
   return map[stage] ?? null;
 }
 

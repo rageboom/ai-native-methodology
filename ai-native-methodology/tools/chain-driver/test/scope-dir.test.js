@@ -19,7 +19,7 @@ let tmp;
 before(() => { tmp = mkdtempSync(join(tmpdir(), 'chain-driver-scope-')); });
 after(() => { rmSync(tmp, { recursive: true, force: true }); });
 
-const STAGES = ['planning', 'spec', 'test', 'impl'];
+const STAGES = ['discovery', 'spec', 'plan', 'test', 'impl']; // ★ v9.0 6-stage manifest dirs
 
 describe('validateScopeSlug', () => {
   it('accepts kebab-case lowercase', () => {
@@ -61,8 +61,8 @@ describe('scopeDirPath', () => {
   });
 
   it('returns stage subdir when stage supplied', () => {
-    const p = scopeDirPath('/root', 'user-registration', 'planning');
-    assert.equal(p, join('/root', '.aimd', 'user-registration', 'planning'));
+    const p = scopeDirPath('/root', 'user-registration', 'discovery');
+    assert.equal(p, join('/root', '.aimd', 'user-registration', 'discovery'));
   });
 
   it('rejects invalid stage', () => {
@@ -71,7 +71,7 @@ describe('scopeDirPath', () => {
 });
 
 describe('ensureScopeDir', () => {
-  it('creates 4 stage dirs + scope root', () => {
+  it('creates 5 stage dirs + scope root', () => {
     const root = join(tmp, 'p1');
     ensureScopeDir(root, 'user-registration');
     assert.ok(existsSync(join(root, '.aimd', 'user-registration')));
@@ -89,7 +89,7 @@ describe('ensureScopeDir', () => {
     const m = JSON.parse(readFileSync(scopeManifestPath, 'utf-8'));
     assert.equal(m.scope, 'user-registration');
     assert.equal(m.status, 'pending');
-    assert.equal(m.current_stage, 'planning');
+    assert.equal(m.current_stage, 'discovery');
     assert.ok(m.sync_state);
     assert.equal(m.sync_state.drift_detected, false);
   });
@@ -162,14 +162,14 @@ describe('writeManifest / readManifest', () => {
   it('writeManifest persists stage manifest', () => {
     const root = join(tmp, 'p9');
     ensureScopeDir(root, 'user-registration');
-    writeManifest(root, 'user-registration', 'planning', {
+    writeManifest(root, 'user-registration', 'discovery', {
       scope: 'user-registration',
-      stage: 'planning',
+      stage: 'discovery',
       status: 'complete',
       linked_artifacts: ['planning-spec.json'],
       traceability_refs: { uc: ['UC-USER-001'], bhv: [], ac: [], tc: [], impl: [] },
     });
-    const m = readManifest(root, 'user-registration', 'planning');
+    const m = readManifest(root, 'user-registration', 'discovery');
     assert.equal(m.status, 'complete');
     assert.deepEqual(m.linked_artifacts, ['planning-spec.json']);
     assert.deepEqual(m.traceability_refs.uc, ['UC-USER-001']);

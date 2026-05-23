@@ -22,8 +22,9 @@ const DEFAULT_STATE = (projectId) => ({
   current_scope: null,
   stage_progress: {
     analysis:  { status: 'in_progress' },
-    planning:  { status: 'pending' },
+    discovery: { status: 'pending' },
     spec:      { status: 'pending' },
+    plan:      { status: 'pending' },
     test:      { status: 'pending' },
     implement: { status: 'pending' },
   },
@@ -231,7 +232,7 @@ export class MigrationRequiredError extends Error {
 // ── ★ ★ G3 R5/R7 산출물 폴더 자동 + manifest 이중 렌더링 ─────────────────────
 //
 // scope = feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case).
-// layout = .aimd/<scope>/{planning,spec,test,impl}/manifest.{json,md} + scope root manifest.
+// layout = .aimd/<scope>/{discovery,spec,plan,test,impl}/manifest.{json,md} + scope root manifest.
 // canonical global .aimd/output/ 5 이식성 산출물 은 scope 횡단 공통 (분리).
 // M4 sync = drift 자동 감지 / cascade 는 사용자 명시 호출 (sync.js).
 //

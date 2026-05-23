@@ -14,40 +14,45 @@ const __dirname = dirname(__filename);
 const REPO = resolve(__dirname, '..', '..', '..');
 
 describe('stage-graph', () => {
-  it('getStageOrder returns 5 stages in canonical order', () => {
-    assert.deepEqual(getStageOrder(), ['analysis', 'planning', 'spec', 'test', 'implement']);
+  it('getStageOrder returns 6 stages in canonical order', () => {
+    assert.deepEqual(getStageOrder(), ['analysis', 'discovery', 'spec', 'plan', 'test', 'implement']);
   });
 
   it('nextStage walks forward and returns null at terminal', () => {
-    assert.equal(nextStage('analysis'), 'planning');
+    assert.equal(nextStage('analysis'), 'discovery');
+    assert.equal(nextStage('spec'), 'plan');
+    assert.equal(nextStage('plan'), 'test');
     assert.equal(nextStage('test'), 'implement');
     assert.equal(nextStage('implement'), null);
   });
 
   it('previousStage walks backward and returns null at start', () => {
-    assert.equal(previousStage('planning'), 'analysis');
+    assert.equal(previousStage('discovery'), 'analysis');
+    assert.equal(previousStage('test'), 'plan');
     assert.equal(previousStage('analysis'), null);
   });
 
-  it('getGateForStage maps planning..implement to #1..#4', () => {
-    assert.equal(getGateForStage('planning'), '#1');
+  it('getGateForStage maps discovery..implement to #1..#4 (plan gate deferred)', () => {
+    assert.equal(getGateForStage('discovery'), '#1');
     assert.equal(getGateForStage('spec'), '#2');
     assert.equal(getGateForStage('test'), '#3');
     assert.equal(getGateForStage('implement'), '#4');
     assert.equal(getGateForStage('analysis'), null);
+    assert.equal(getGateForStage('plan'), null); // ★ v9.0 plan gate deferred (placeholder)
   });
 
   it('isUpstream returns true for earlier stages, false otherwise', () => {
     assert.equal(isUpstream('spec', 'implement'), true);
-    assert.equal(isUpstream('planning', 'spec'), true);
+    assert.equal(isUpstream('discovery', 'spec'), true);
+    assert.equal(isUpstream('spec', 'plan'), true);
     assert.equal(isUpstream('test', 'spec'), false);
     assert.equal(isUpstream('implement', 'spec'), false);
   });
 
   it('detectCycles finds none in well-formed flow', () => {
     const flow = { revisit_edges: [
-      { from: 'spec', to: 'planning' },
-      { from: 'test', to: 'spec' },
+      { from: 'spec', to: 'discovery' },
+      { from: 'test', to: 'plan' },
     ]};
     assert.deepEqual(detectCycles(flow), []);
   });
@@ -62,9 +67,9 @@ describe('stage-graph', () => {
   });
 
   it('validateStateAgainstFlow flags missing stage_progress', () => {
-    const state = { current_chain: 'spec', stage_progress: { planning: {} } };
+    const state = { current_chain: 'spec', stage_progress: { discovery: {} } };
     const flow = { stages: [
-      { id: 'analysis' }, { id: 'planning' }, { id: 'spec' }, { id: 'test' }, { id: 'implement' },
+      { id: 'analysis' }, { id: 'discovery' }, { id: 'spec' }, { id: 'plan' }, { id: 'test' }, { id: 'implement' },
     ]};
     const errors = validateStateAgainstFlow(state, flow);
     assert.ok(errors.some((e) => e.includes('analysis')));
@@ -75,7 +80,7 @@ describe('stage-graph', () => {
     const flowPath = join(REPO, 'flows', 'sdlc-4stage-flow.json');
     if (!existsSync(flowPath)) return; // guarded
     const flow = loadFlow(REPO);
-    assert.ok(flow.stages?.length >= 5);
-    assert.ok(flow.stages.find((s) => s.id === 'planning'));
+    assert.ok(flow.stages?.length >= 6);
+    assert.ok(flow.stages.find((s) => s.id === 'discovery'));
   });
 });

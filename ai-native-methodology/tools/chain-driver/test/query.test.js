@@ -19,7 +19,7 @@ function seedScope(root, scope, opts = {}) {
   writeManifest(root, scope, null, {
     scope,
     status: opts.status || 'in_progress',
-    current_stage: opts.current_stage || 'planning',
+    current_stage: opts.current_stage || 'discovery',
     analysis_refs: opts.analysis_refs || { rules: [], endpoints: [], schemas: [] },
     sync_state: {
       drift_detected: opts.drift_detected || false,
@@ -44,11 +44,11 @@ describe('executeQuery', () => {
   it('--scope + --stage returns stage manifest', () => {
     const root = join(tmp, 'q2');
     seedScope(root, 'user-registration', {
-      stages: { planning: { status: 'complete', linked_artifacts: ['planning-spec.json'] } },
+      stages: { discovery: { status: 'complete', linked_artifacts: ['planning-spec.json'] } },
     });
-    const result = executeQuery(root, { scope: 'user-registration', stage: 'planning' });
+    const result = executeQuery(root, { scope: 'user-registration', stage: 'discovery' });
     assert.equal(result.length, 1);
-    assert.equal(result[0].stage, 'planning');
+    assert.equal(result[0].stage, 'discovery');
     assert.equal(result[0].status, 'complete');
   });
 

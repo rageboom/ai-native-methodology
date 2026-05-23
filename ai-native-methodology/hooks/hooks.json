@@ -21,7 +21,7 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "(planning|기획|spec|명세|behavior|test|테스트|implement|구현)",
+        "matcher": "(discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)",
         "hooks": [
           {
             "type": "command",

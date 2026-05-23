@@ -164,9 +164,12 @@ export function summarizeLayoutCheck(result) {
 // analysis stage 와 별도 axis (skills-axis.md §4 v2.0 chain stage axis + §7 v2.5.1 category prefix paradigm).
 // ★ v2.5.1 PATCH — skills 1-depth + category prefix paradigm 정합 (옛 'skills/{stage}/' 2-depth 폐기).
 
+// ★ v9.0 6-stage (analysis→discovery→spec→plan→test→implement / DEC-2026-05-21).
+// planning→discovery 개칭 + plan 신설. analysis 는 별도 axis (위 주석).
 const CHAIN_STAGES = [
-  { stage: 'planning',  flow_file: 'flows/planning.phase-flow.json',  prefix: 'planning-' },
+  { stage: 'discovery', flow_file: 'flows/discovery.phase-flow.json', prefix: 'discovery-' },
   { stage: 'spec',      flow_file: 'flows/spec.phase-flow.json',      prefix: 'spec-' },
+  { stage: 'plan',      flow_file: 'flows/plan.phase-flow.json',      prefix: 'plan-' },
   { stage: 'test',      flow_file: 'flows/test.phase-flow.json',      prefix: 'test-' },
   { stage: 'implement', flow_file: 'flows/implement.phase-flow.json', prefix: 'implement-' },
 ];

@@ -1,14 +1,15 @@
-%% ★ ★ v2.0 chain 1 (planning) phase flow — 사람 눈 (mermaid)
-%% AI 눈 짝: planning.phase-flow.json (drift-validator 호환)
+%% ★ ★ v2.0 chain 1 (discovery / planning 개칭) phase flow — 사람 눈 (mermaid)
+%% AI 눈 짝: discovery.phase-flow.json (drift-validator 호환)
+%% ★ v9.0 — planning→discovery 개칭 + 입력 어댑터 4종 확장 (DEC-2026-05-21).
 %% ★ ★ ★ v3.1.0 — phase ID 의미 ID rename (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동).
 %% subgraph id = `P_<semantic_id>` (P 접두사 + underscore — mermaid 문법 호환 + drift-validator 정규식 호환).
 %% ADR-008 v2 §10 (chain 단계 이중 렌더링) + ADR-CHAIN-001 정합
 
 flowchart TB
-    subgraph C1["★ Chain 1 — planning (legacy single-case)"]
+    subgraph C1["★ Chain 1 — discovery (planning 개칭)"]
         direction TB
 
-        P_input_validate["Phase input-validate — input 검증<br/>analysis 7대 + 8 FE + finding + AP + migration"]
+        P_input_validate["Phase input-validate — input 검증<br/>analysis 산출물 + swagger/figma/nl-md 어댑터"]
         P_use_cases_decompose["Phase use-cases-decompose — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
         P_br_intent_extract["Phase br-intent-extract — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
         P_planning_spec_compose["Phase planning-spec-compose — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
@@ -21,14 +22,14 @@ flowchart TB
         P_planning_spec_compose --> P_gate_1
     end
 
-    subgraph IN["analysis stage 산출물 (input)"]
+    subgraph IN["analysis stage 산출물 + 외부 입력 (input)"]
         direction LR
-        IN_OUT["7대 BE + 8 FE 산출물<br/>+ Phase 4.5 (state-machine / sequence / decision-table)<br/>+ finding + antipatterns + migration-cautions"]
+        IN_OUT["7대 BE + 8 FE 산출물<br/>+ Phase 4.5 (state-machine / sequence / decision-table)<br/>+ finding + antipatterns + migration-cautions<br/>+ swagger / figma / nl-md (어댑터)"]
     end
 
     subgraph OUT["chain 1 산출물"]
         direction LR
-        OUT_JSON["planning-spec.json (deliverable 17)"]
+        OUT_JSON["planning-spec.json (deliverable 17 / 파일명 reuse)"]
         OUT_MD["planning-spec.md (사람 눈 / ADR-008 v2)"]
     end
 

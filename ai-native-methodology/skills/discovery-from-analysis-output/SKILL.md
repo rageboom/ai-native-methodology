@@ -1,6 +1,6 @@
 ---
-name: planning-extract-from-legacy
-description: ★ ★ v2.0 chain 1 진입 skill (1차 single-case). analysis stage 7대 + 8 FE 산출물 + finding + antipatterns + migration-cautions 를 입력으로 planning-spec.{json,md} 추출. 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적.
+name: discovery-from-analysis-output
+description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). analysis stage 7대 + 8 FE 산출물 + finding + antipatterns + migration-cautions 를 입력으로 planning-spec.{json,md} 추출 (discovery stage 산출물 / 파일명 reuse). 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적. v4.0 planning-extract-from-legacy 의 rename (DEC-2026-05-21 정합) — 본문 stage 표기 본격 갱신은 carry.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 

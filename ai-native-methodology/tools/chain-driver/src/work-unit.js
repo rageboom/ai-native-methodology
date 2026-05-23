@@ -3,13 +3,14 @@
 // state-store.js 가 이 module 의 createScopeManifest / createStageManifest 를
 // ensureScopeDir 안에서 호출. import 방향 = state-store → work-unit (단방향).
 
-export const STAGES = Object.freeze(['planning', 'spec', 'test', 'impl']);
+// ★ v9.0 — manifest stage dirs (planning→discovery 개칭 + plan 신설 / 'impl' = implement 단축).
+export const STAGES = Object.freeze(['discovery', 'spec', 'plan', 'test', 'impl']);
 
 export function createScopeManifest(scope) {
   return {
     scope,
     status: 'pending',
-    current_stage: 'planning',
+    current_stage: 'discovery',
     analysis_refs: {
       rules: [],
       endpoints: [],

@@ -23,8 +23,8 @@
     },
     "current_chain": {
       "type": "string",
-      "enum": ["analysis", "planning", "spec", "test", "implement", "revisit_pending"],
-      "description": "★ sdlc-4stage-flow.json stages 와 정합. drift-validator --check-state-flow-consistency 가 build-time 검증."
+      "enum": ["analysis", "discovery", "spec", "plan", "test", "implement", "revisit_pending"],
+      "description": "★ v9.0 6-stage (analysis→discovery→spec→plan→test→implement). sdlc-4stage-flow.json stages 와 정합. drift-validator --check-state-flow-consistency 가 build-time 검증. (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21)"
     },
     "current_phase": {
       "type": "string",
@@ -41,11 +41,12 @@
     "stage_progress": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["analysis", "planning", "spec", "test", "implement"],
+      "required": ["analysis", "discovery", "spec", "plan", "test", "implement"],
       "properties": {
         "analysis": { "$ref": "#/$defs/StageRecord" },
-        "planning": { "$ref": "#/$defs/StageRecord" },
+        "discovery": { "$ref": "#/$defs/StageRecord" },
         "spec": { "$ref": "#/$defs/StageRecord" },
+        "plan": { "$ref": "#/$defs/StageRecord" },
         "test": { "$ref": "#/$defs/StageRecord" },
         "implement": { "$ref": "#/$defs/StageRecord" }
       }
@@ -65,7 +66,8 @@
             },
             "stage": {
               "type": "string",
-              "enum": ["planning", "spec", "test", "implement"]
+              "enum": ["discovery", "spec", "test", "implement"],
+              "description": "★ v9.0 — gate #1~#4 = discovery/spec/test/implement. plan stage hard gate 는 plan-agent 본격 구현 시 추가 (현재 placeholder → gate deferred / DEC-2026-05-23-discovery-stage-v9)."
             },
             "decision": {
               "type": "string",
@@ -104,7 +106,7 @@
           "properties": {
             "target_stage": {
               "type": "string",
-              "enum": ["analysis", "planning", "spec", "test"]
+              "enum": ["analysis", "discovery", "spec", "plan", "test"]
             },
             "detected_at": {
               "type": "string",

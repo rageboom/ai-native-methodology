@@ -5,7 +5,7 @@
 ## paradigm (★ v4.0)
 
 - **main agent** = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch)
-- **stage 별 sub-agent 5종 본격 + 1종 placeholder** (`analysis-agent` / `planning-agent` / `spec-agent` / `test-agent` / `implement-agent` / `design-agent` ★ PLACEHOLDER) — 각 chain stage 의 단일 책임 entry point. design = v4.0 가시화만 / skill 부재 / dispatch 무의미 (★ v4.1+ carry).
+- **stage 별 sub-agent 5종 본격 + 2종 placeholder** (`analysis-agent` / `discovery-agent` / `spec-agent` / `test-agent` / `implement-agent` 본격 + `plan-agent` ★ PLACEHOLDER + `design-agent` ★ PLACEHOLDER) — 각 chain stage 의 단일 책임 entry point. ★ v9.0 6-stage (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21+DEC-2026-05-23-discovery-stage-v9). plan = HOW 단계(task/ADR/NFR/risk) / skill 3종 placeholder / hard gate deferred. design = v4.0 가시화만 / skill 부재.
 - **3 base cross-cutting agent** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`) — research / critique 등 cross-cutting 책임
 - **spike agent** (`archive/v4-spike/_spike-planning-agent.md`) — paradigm 가능 입증 자산 / 역사 기록 / EXPERIMENTAL (★ ★ ★ v4.0 정식 진입 후 archive 이동 / commit `8605652` 안 source 보존)
 - **frontmatter `skills: [...]` 사전 주입** — 각 stage agent 가 자기 책임 skill 들을 startup 시점에 인지 (Sub-agents.md spec line 407~429 정합)
@@ -18,10 +18,11 @@
 |---|---|
 | input | `analysis-agent.md` 안 입력 6 skill (input-collection / input-orchestrate / from-{prompt,swagger,plan-doc,figma}) |
 | analysis | `analysis-agent.md` (★ chain 1 sub 22 skill + 6 input skill 책임) |
-| planning | `planning-agent.md` (★ chain 1 / 3 planning skill + 4 base 책임) |
+| discovery | `discovery-agent.md` (★ chain 1 / planning 개칭 / 6 discovery skill[4 어댑터 + 2 공통] + 4 base 책임) |
 | spec | `spec-agent.md` (★ chain 2 / 3 spec skill + 4 base 책임) |
-| test | `test-agent.md` (★ chain 3 / 4 test skill + 4 base 책임) |
-| implement | `implement-agent.md` (★ chain 4 / 4 implement skill + 4 base 책임) |
+| plan | `plan-agent.md` (★ chain 3 / HOW / skill 3종 placeholder / hard gate deferred) |
+| test | `test-agent.md` (★ chain 4 / 4 test skill + 4 base 책임) |
+| implement | `implement-agent.md` (★ chain 5 / 4 implement skill + 4 base 책임) |
 | cross-cut (traceability) | `_base-senior-engineer.md` (gate 검토 시 critique 위임) + `_base-build-traceability-matrix` skill |
 | cross-cut (aspects) | `_base-official-docs-checker.md` + `_base-industry-case-researcher.md` (research 트랙 dispatch) |
 
@@ -32,10 +33,15 @@
 - **skill 사전 주입**: 22 analysis skill + 6 input skill + 3 base utility = 31 skill
 - **호출 시기**: main agent 가 "analysis 시작" / "분석 진입" / "legacy 분석" 등 자연어 인지 시 Task tool dispatch
 
-### `planning-agent.md` (★ chain 1)
-- **책임**: analysis 산출물 → planning-spec.{json,md} (UC-* + BR-INTENT-* + cross_links + source_grounded_evidence)
-- **skill 사전 주입**: 3 planning skill + 4 base utility = 7 skill
-- **호출 시기**: chain 1 gate 진입 자연어 trigger 시
+### `discovery-agent.md` (★ chain 1 / planning 개칭)
+- **책임**: 입력 4종(analysis-output/swagger/figma/nl-md) → planning-spec.{json,md} (UC-* + BR-INTENT-* + cross_links + source_grounded_evidence / 파일명 reuse)
+- **skill 사전 주입**: 6 discovery skill(4 어댑터 + discovery-decompose-use-cases + discovery-identify-business-intent) + 4 base utility = 10 skill
+- **호출 시기**: chain 1 gate 진입 자연어 trigger 시 (discovery/발견/탐색/planning alias)
+- ★ v9.0 = v4.0 planning-agent 흡수 + 입력 어댑터 paradigm 확장 (DEC-2026-05-21)
+
+### `plan-agent.md` (★ chain 3 / HOW / PLACEHOLDER)
+- **책임**: spec(BHV/AC) → plan-spec (task 분해 / 의존성 / ADR / NFR allocation / risk / rollback)
+- **상태**: placeholder — skill 3종(plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr) placeholder / hard gate deferred (gate #1~#4 유지) / 본격 구현 v9.x+ carry
 
 ### `spec-agent.md` (★ chain 2)
 - **책임**: behavior-spec + acceptance-criteria (Gherkin BDD) + cross_links 7대 산출물 통합
@@ -103,7 +109,7 @@ expected: .aimd/output/{inventory,architecture,domain,rules,schema,openapi,antip
 """)
 
 # 산출물 hand-off via filesystem
-main agent → analysis-agent → planning-agent → spec-agent → test-agent → implement-agent
+main agent → analysis-agent → discovery-agent → spec-agent → plan-agent(placeholder) → test-agent → implement-agent
             (.aimd/output/*.json 매개)
 ```
 

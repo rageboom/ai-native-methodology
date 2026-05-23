@@ -57,14 +57,14 @@ describe('gate-eval', () => {
   });
 
   it('user stop → blocked decision=stop', () => {
-    const gateResult = evaluateGate('planning', { critical: 0, high: 0 });
+    const gateResult = evaluateGate('discovery', { critical: 0, high: 0 });
     const final = applyUserDecision(gateResult, 'stop');
     assert.equal(final.blocked, true);
     assert.equal(final.decision, 'stop');
   });
 
   it('requiredValidators returns canonical list per stage', () => {
-    assert.ok(requiredValidators('planning').includes('planning-extraction-validator'));
+    assert.ok(requiredValidators('discovery').includes('planning-extraction-validator'));
     assert.ok(requiredValidators('test').includes('test-impl-pass-validator'));
     assert.deepEqual(requiredValidators('unknown'), []);
   });
@@ -72,7 +72,7 @@ describe('gate-eval', () => {
   // ★ ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm test (★ Q-S1+S2+S3 결단 정합)
 
   it('★ v2.5.0 Phase C: llm_status=skipped → block 없음 (backward-compat)', () => {
-    const r = evaluateGate('planning', {
+    const r = evaluateGate('discovery', {
       critical: 0, high: 0,
       llm_consistency_score: null,
       llm_threshold: 0.7,
@@ -82,7 +82,7 @@ describe('gate-eval', () => {
   });
 
   it('★ v2.5.0 Phase C: llm_status=evaluated + score >= threshold → block 없음 (pass)', () => {
-    const r = evaluateGate('planning', {
+    const r = evaluateGate('discovery', {
       critical: 0, high: 0,
       llm_consistency_score: 0.85,
       llm_threshold: 0.7,
@@ -92,7 +92,7 @@ describe('gate-eval', () => {
   });
 
   it('★ v2.5.0 Phase C: llm_status=evaluated + score < threshold → block with layer2_threshold', () => {
-    const r = evaluateGate('planning', {
+    const r = evaluateGate('discovery', {
       critical: 0, high: 0,
       llm_consistency_score: 0.65,
       llm_threshold: 0.7,
@@ -105,7 +105,7 @@ describe('gate-eval', () => {
   });
 
   it('★ v2.5.0 Phase C: layer2_threshold + user go → go-with-warnings (★ semantic drift Phase D carry)', () => {
-    const gateResult = evaluateGate('planning', {
+    const gateResult = evaluateGate('discovery', {
       critical: 0, high: 0,
       llm_consistency_score: 0.65,
       llm_threshold: 0.7,

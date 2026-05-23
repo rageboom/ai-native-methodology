@@ -1,0 +1,52 @@
+{
+  "$comment": "★ v9.0 신설 — chain 3 (plan) phase flow — AI 눈 짝 (plan.phase-flow.mermaid SSOT). DEC-2026-05-21 (spec ↔ test 사이 HOW 단계 신설). ★ plan-agent = placeholder (skills 3종 placeholder / 본격 구현 v9.x+ carry). hard gate = deferred (DEC-2026-05-23-discovery-stage-v9 / plan-agent 본격 구현 시 추가). spec 산출물(behavior/AC) → plan-spec(task 분해 / 의존성 / ADR / NFR allocation / risk / rollback).",
+  "id": "plan-phase-flow",
+  "version": "0.1.0-placeholder",
+  "stage": "plan",
+  "chain": 3,
+  "rendered_mermaid_path": "./plan.phase-flow.mermaid",
+  "placeholder": true,
+  "phases": [
+    {
+      "id": "task-decompose",
+      "name": "task 분해 + 의존성 (1~3 AC 묶음 / 같은 BHV+layer+module)",
+      "depends_on": [],
+      "inputs": ["behavior-spec.json", "acceptance-criteria.json"],
+      "outputs": ["tasks[]"],
+      "skills": ["plan-decompose-and-sequence"]
+    },
+    {
+      "id": "architect-decisions",
+      "name": "ADR (되돌리기 어려운 결정 5 기준 / Nygard)",
+      "depends_on": ["task-decompose"],
+      "inputs": ["tasks", "behavior-spec.json"],
+      "outputs": ["adr[]"],
+      "skills": ["plan-architect-decisions"]
+    },
+    {
+      "id": "risk-nfr",
+      "name": "risk + NFR allocation (hard gate / 3중 망)",
+      "depends_on": ["task-decompose"],
+      "inputs": ["tasks", "acceptance-criteria.json"],
+      "outputs": ["risks[]", "nfr_allocation[]"],
+      "skills": ["plan-risk-and-nfr"]
+    },
+    {
+      "id": "plan-spec-compose",
+      "name": "plan-spec 합성 (★ placeholder — plan-agent 본격 구현 시 산출 schema 확정)",
+      "depends_on": ["architect-decisions", "risk-nfr"],
+      "inputs": ["tasks", "adr", "risks", "nfr_allocation"],
+      "outputs": ["plan-spec (placeholder)"],
+      "skills": ["plan-decompose-and-sequence"]
+    }
+  ],
+  "cross_cutting": {
+    "no_simulation": true,
+    "gate_deferred": "plan hard gate = plan-agent 본격 구현 시 추가 (현재 placeholder / gate #1~#4 = discovery/spec/test/implement 유지)"
+  },
+  "next_chain": {
+    "id": "test",
+    "flow_file": "test.phase-flow.json",
+    "gate_decision": "go"
+  }
+}

@@ -48,7 +48,7 @@ test('summarizeLayoutCheck — pass/fail 메시지 정합', () => {
 
 // ★ ★ v2.0 sub-plan-4 — chain stage layout 검증 test
 
-test('★ ★ chain stage layout — current workspace 정합 ok (4 stages / 0 orphan)', () => {
+test('★ ★ chain stage layout — current workspace 정합 ok (5 stages / 0 orphan)', () => {
   const result = checkChainStageLayout(WORKSPACE);
   if (!result.ok) {
     console.error('[chain-stage-layout] findings:');
@@ -57,7 +57,7 @@ test('★ ★ chain stage layout — current workspace 정합 ok (4 stages / 0 o
     }
   }
   assert.equal(result.ok, true, 'chain stage layout must be consistent');
-  assert.equal(result.counts.chain_stages, 4, '4 chain stages (planning/spec/test/implement)');
+  assert.equal(result.counts.chain_stages, 5, '5 chain stages (discovery/spec/plan/test/implement)');
   assert.ok(result.counts.phases_checked >= 20, `≥ 20 phases (got ${result.counts.phases_checked})`);
   assert.ok(result.counts.skills_declared >= 13, `≥ 13 chain skills declared (got ${result.counts.skills_declared})`);
 });
@@ -69,10 +69,10 @@ test('★ chain stage layout — workspace 부재 → diffs', () => {
 });
 
 test('★ summarizeChainLayoutCheck — pass/fail 메시지 정합', () => {
-  const ok = { ok: true, diffs: [], counts: { chain_stages: 4, phases_checked: 26, skills_declared: 13 } };
+  const ok = { ok: true, diffs: [], counts: { chain_stages: 5, phases_checked: 30, skills_declared: 22 } };
   assert.match(summarizeChainLayoutCheck(ok), /chain layout check passed/);
-  assert.match(summarizeChainLayoutCheck(ok), /4 stages/);
-  assert.match(summarizeChainLayoutCheck(ok), /26 phases/);
+  assert.match(summarizeChainLayoutCheck(ok), /5 stages/);
+  assert.match(summarizeChainLayoutCheck(ok), /30 phases/);
 
   const fail = { ok: false, diffs: [{ severity: 'breaking', kind: 'x' }], counts: {} };
   assert.match(summarizeChainLayoutCheck(fail), /chain layout check failed/);
@@ -89,8 +89,8 @@ test('★ state-flow consistency — current workspace 정합 ok (★ enum vs fl
     }
   }
   assert.equal(result.ok, true, 'state.schema enum must match sdlc-4stage-flow stages');
-  assert.equal(result.counts.flow_stages, 5, '5 flow stages (analysis/planning/spec/test/implement)');
-  assert.equal(result.counts.enum_strict_stages, 5, '5 enum strict stages (excluding revisit_pending)');
+  assert.equal(result.counts.flow_stages, 6, '6 flow stages (analysis/discovery/spec/plan/test/implement)');
+  assert.equal(result.counts.enum_strict_stages, 6, '6 enum strict stages (excluding revisit_pending)');
 });
 
 test('★ state-flow consistency — workspace 부재 → breaking diff', () => {

@@ -1,18 +1,18 @@
 {
-  "$comment": "★ ★ v2.0 chain 1 (planning) phase flow — AI 눈 짝 (planning.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. analysis stage 산출물 입력 → planning-spec.{json,md} 산출. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동). v3.0.0 analysis chain 패턴 정합 sibling.",
-  "id": "planning-phase-flow",
+  "$comment": "★ ★ v2.0 chain 1 (discovery / planning 개칭) phase flow — AI 눈 짝 (discovery.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 + ★ v9.0 DEC-2026-05-21 (planning→discovery 개칭 + 입력 어댑터 4종 확장) 정합. analysis stage 산출물 + 외부 입력(swagger/figma/nl-md) → planning-spec.{json,md} 산출 (파일명 reuse). ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
+  "id": "discovery-phase-flow",
   "version": "3.1.0",
-  "stage": "planning",
+  "stage": "discovery",
   "chain": 1,
-  "rendered_mermaid_path": "./planning.phase-flow.mermaid",
+  "rendered_mermaid_path": "./discovery.phase-flow.mermaid",
   "phases": [
     {
       "id": "input-validate",
-      "name": "input 검증",
+      "name": "input 검증 (analysis-output / swagger / figma / nl-md 어댑터)",
       "depends_on": [],
-      "inputs": ["analysis_outputs", "finding_system", "antipatterns", "migration_cautions"],
+      "inputs": ["analysis_outputs", "finding_system", "antipatterns", "migration_cautions", "swagger", "figma", "nl_md"],
       "outputs": ["analysis_completeness_check"],
-      "skills": ["planning-extract-from-legacy"]
+      "skills": ["discovery-from-analysis-output", "discovery-from-swagger", "discovery-from-figma", "discovery-from-nl-md"]
     },
     {
       "id": "use-cases-decompose",
@@ -20,7 +20,7 @@
       "depends_on": ["input-validate"],
       "inputs": ["domain.json", "business-rules.json", "api-extension.json", "state-machines/*.json"],
       "outputs": ["use_cases[]"],
-      "skills": ["planning-decompose-use-cases"]
+      "skills": ["discovery-decompose-use-cases"]
     },
     {
       "id": "br-intent-extract",
@@ -28,15 +28,15 @@
       "depends_on": ["input-validate"],
       "inputs": ["business-rules.json", "antipatterns.json", "finding-system.findings.json", "migration-cautions.md"],
       "outputs": ["business_rules_intent[]"],
-      "skills": ["planning-identify-business-intent"]
+      "skills": ["discovery-identify-business-intent"]
     },
     {
       "id": "planning-spec-compose",
-      "name": "planning-spec 합성 + 검증",
+      "name": "planning-spec 합성 + 검증 (discovery 산출물 / 파일명 reuse)",
       "depends_on": ["use-cases-decompose", "br-intent-extract"],
       "inputs": ["use_cases", "business_rules_intent", "business_intent"],
       "outputs": ["planning-spec.json", "planning-spec.md"],
-      "skills": ["planning-extract-from-legacy"],
+      "skills": ["discovery-from-analysis-output"],
       "automated_validation": ["planning-extraction-validator", "schema-validator"]
     },
     {

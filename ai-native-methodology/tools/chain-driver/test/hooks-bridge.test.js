@@ -34,8 +34,9 @@ describe('hooks-bridge', () => {
     assert.match(out.reason, /validator_critical/);
   });
 
-  it('suggestSkillForPrompt matches planning trigger', () => {
-    assert.equal(suggestSkillForPrompt('planning 시작해줘'), 'planning-extract-from-legacy');
+  it('suggestSkillForPrompt matches discovery trigger (planning alias 유지)', () => {
+    assert.equal(suggestSkillForPrompt('discovery 시작해줘'), 'discovery-from-analysis-output');
+    assert.equal(suggestSkillForPrompt('planning 시작해줘'), 'discovery-from-analysis-output'); // ★ v9.0 planning = legacy alias
   });
 
   it('suggestSkillForPrompt matches spec trigger', () => {

@@ -8,7 +8,7 @@ const MIN_NON_COMMENT_LOC = 5;   // < 5 미만은 자동 ignore + log only
 
 // path-to-chain whitelist
 const PATH_PATTERNS = [
-  { regex: /\.aimd\/.*planning-spec\.(json|md)$/,        chain: 'planning' },
+  { regex: /\.aimd\/.*planning-spec\.(json|md)$/,        chain: 'discovery' },
   { regex: /\.aimd\/.*behavior-spec\.(json|md|mermaid)$/, chain: 'spec' },
   { regex: /\.aimd\/.*acceptance-criteria\.(json|md)$/,   chain: 'spec' },
   { regex: /\.aimd\/.*test-spec\.(json|md)$/,             chain: 'test' },

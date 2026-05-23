@@ -35,13 +35,13 @@
       "user_review_pct": "≤ 15"
     },
     {
-      "id": "planning",
-      "name": "Planning (chain 1)",
+      "id": "discovery",
+      "name": "Discovery (chain 1 / planning 개칭)",
       "chain": 1,
       "depends_on": ["analysis"],
-      "sub_flow": "planning.phase-flow.json",
-      "outputs_summary": ["planning-spec.json (deliverable 17)", "planning-spec.md"],
-      "introduced": "v2.0",
+      "sub_flow": "discovery.phase-flow.json",
+      "outputs_summary": ["planning-spec.json (deliverable 17 / discovery 산출물 — 파일명 reuse)", "planning-spec.md"],
+      "introduced": "v2.0 (★ v9.0 planning→discovery 개칭 + 입력 어댑터 4종 확장 / DEC-2026-05-21)",
       "gate": "#1",
       "user_review_pct": "≤ 20",
       "ai_automation_pct": "≥ 80"
@@ -50,7 +50,7 @@
       "id": "spec",
       "name": "Spec (chain 2)",
       "chain": 2,
-      "depends_on": ["planning"],
+      "depends_on": ["discovery"],
       "sub_flow": "spec.phase-flow.json",
       "outputs_summary": ["behavior-spec.json (deliverable 18)", "acceptance-criteria.json (deliverable 19)", "behavior-spec.md", "behavior-diagrams.mermaid"],
       "introduced": "v2.0",
@@ -59,10 +59,23 @@
       "ai_automation_pct": "≥ 85"
     },
     {
-      "id": "test",
-      "name": "Test (chain 3 / RED 의무)",
+      "id": "plan",
+      "name": "Plan (chain 3 / HOW — placeholder)",
       "chain": 3,
       "depends_on": ["spec"],
+      "sub_flow": "plan.phase-flow.json",
+      "outputs_summary": ["plan-spec (task 분해 / 의존성 / ADR / NFR allocation / risk / rollback) — ★ placeholder / plan-agent 본격 구현 시 산출"],
+      "introduced": "★ v9.0 신설 (spec ↔ test 사이 HOW 단계 / DEC-2026-05-21 / plan-agent placeholder)",
+      "gate": null,
+      "gate_deferred": "plan hard gate = plan-agent 본격 구현 시 추가 (DEC-2026-05-23-discovery-stage-v9 / 현재 placeholder)",
+      "user_review_pct": "≤ 20",
+      "ai_automation_pct": "≥ 80"
+    },
+    {
+      "id": "test",
+      "name": "Test (chain 4 / RED 의무)",
+      "chain": 4,
+      "depends_on": ["plan"],
       "sub_flow": "test.phase-flow.json",
       "outputs_summary": ["test-spec.json (deliverable 20)", "실 test 코드", "5종 물증 7 필드"],
       "introduced": "v2.0",
@@ -73,8 +86,8 @@
     },
     {
       "id": "implement",
-      "name": "Implement (chain 4 / GREEN 의무 / i-strict)",
-      "chain": 4,
+      "name": "Implement (chain 5 / GREEN 의무 / i-strict)",
+      "chain": 5,
       "depends_on": ["test"],
       "sub_flow": "implement.phase-flow.json",
       "outputs_summary": ["impl-spec.json (deliverable 21)", "실 impl 코드 + commit_hash", "test_pass_evidence (fail_count: 0)", "traceability-matrix.{json,md,mermaid}"],
@@ -87,18 +100,19 @@
     }
   ],
   "revisit_edges": [
-    { "from": "planning",  "to": "analysis",  "trigger": "revisit:analysis"  },
-    { "from": "spec",      "to": "planning",  "trigger": "revisit:planning"  },
-    { "from": "test",      "to": "spec",      "trigger": "revisit:spec"      },
+    { "from": "discovery", "to": "analysis",  "trigger": "revisit:analysis"  },
+    { "from": "spec",      "to": "discovery", "trigger": "revisit:discovery" },
+    { "from": "plan",      "to": "spec",      "trigger": "revisit:spec"      },
+    { "from": "test",      "to": "plan",      "trigger": "revisit:plan"      },
     { "from": "implement", "to": "test",      "trigger": "revisit:test"      },
     { "from": "implement", "to": "spec",      "trigger": "revisit:spec"      },
-    { "from": "implement", "to": "planning",  "trigger": "revisit:planning"  },
+    { "from": "implement", "to": "discovery", "trigger": "revisit:discovery" },
     { "from": "implement", "to": "analysis",  "trigger": "revisit:analysis (★ rare / 가장 큰 cycle)" }
   ],
   "gates": [
     {
       "id": "#1",
-      "stage": "planning",
+      "stage": "discovery",
       "validators": ["planning-extraction-validator", "schema-validator"],
       "skill": "skills/_base-invoke-go-stop-gate"
     },

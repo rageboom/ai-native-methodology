@@ -589,7 +589,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Confidence:** verified
 - **Type:** gap
 - **Description:** intervention_log 가 impl-spec(gate #4) `human_review.intervention_log` 에만 존재. gate #1~#3 은 run-log.md 서사로만. README 가 약속한 `intervention-log.jsonl` 파일 부재. 4 gate 의 결단 영속 방식 불일치 → gate UX/audit 신뢰성 비대칭. flow `gate-1.outputs` 에 `chain-intervention-log.jsonl` 이미 명세 (planning.phase-flow.json) 인데 poc-05 미시행.
-- **Evidence:** poc-05 `impl-spec.json` human_review.intervention_log (단일) vs `flows/planning.phase-flow.json` gate-1.outputs (스펙). `find .aimd -name "intervention-log.jsonl"` = empty.
+- **Evidence:** poc-05 `impl-spec.json` human_review.intervention_log (단일) vs `flows/discovery.phase-flow.json` gate-1.outputs (스펙). `find .aimd -name "intervention-log.jsonl"` = empty.
 - **Spec gap:** chain-driver / hooks 가 gate decision 을 통일 형식으로 jsonl append 하는 강제 부재.
 - **Decision made:** N/A.
 - **Severity:** **medium** — gate UX·audit 신뢰성.

@@ -1,6 +1,6 @@
 ---
-name: planning-decompose-use-cases
-description: ★ v2.0 chain 1 sub-skill. domain.json + business-rules.json + api-extension 에서 UC-* 분해. 1 actor + 1 domain entity + 1 trigger 단위로 분리. extract-from-legacy 가 호출하는 sub-skill. 사용자 (자연어 직접 호출 시): "use case 분해" / "UC 추출".
+name: discovery-decompose-use-cases
+description: v4.1 chain (discovery) 공통 sub-skill. 어댑터 (discovery-from-*) 결과에서 UC-* 분해 + 정규화. 1 actor + 1 domain entity + 1 trigger 단위로 분리. discovery-from-analysis-output / discovery-from-swagger / discovery-from-figma / discovery-from-nl-md 모두 호출. 사용자 (자연어 직접 호출 시): "use case 분해" / "UC 추출". v4.0 planning-decompose-use-cases 의 rename (DEC-2026-05-21 정합).
 allowed-tools: Read, Glob, Grep
 ---
 

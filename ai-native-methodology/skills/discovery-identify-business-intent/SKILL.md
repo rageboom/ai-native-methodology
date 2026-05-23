@@ -1,6 +1,6 @@
 ---
-name: planning-identify-business-intent
-description: ★ v2.0 chain 1 sub-skill. business-rules.json BR-* 와 antipatterns + finding 을 분석하여 BR-INTENT-NNN 추출 ("왜 이 규칙인가" reasoning). 모든 BR-INTENT 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임. 사용자 (자연어 직접 호출 시): "business intent 추출" / "BR-INTENT 분석".
+name: discovery-identify-business-intent
+description: v4.1 chain (discovery) 공통 sub-skill. 어댑터 (discovery-from-*) 결과 + business-rules.json BR-* + antipatterns + finding 을 분석하여 BR-INTENT-NNN 추출 ("왜 이 규칙인가" reasoning). 모든 BR-INTENT 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임. 사용자 (자연어 직접 호출 시): "business intent 추출" / "BR-INTENT 분석". v4.0 planning-identify-business-intent 의 rename (DEC-2026-05-21 정합).
 allowed-tools: Read, Glob, Grep
 ---
 

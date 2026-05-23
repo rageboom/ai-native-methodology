@@ -31,7 +31,7 @@ import {
 import { executeQuery } from './query.js';
 import { markDrift, cascade } from './sync.js';
 
-const MANIFEST_STAGES = ['planning', 'spec', 'test', 'impl'];
+const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
   return stage === 'implement' ? 'impl' : stage;
 }
@@ -205,9 +205,9 @@ function cmdNext(args) {
   if (!state) { console.error('[chain-driver] no state.json — run init first'); process.exit(3); }
   if (state.blocked) blockedExit(state, root);
 
-  const stage = state.current_chain === 'analysis' ? 'planning' : state.current_chain;
+  const stage = state.current_chain === 'analysis' ? 'discovery' : state.current_chain;
   const findings = loadFindings(args.findingsPath);
-  const gateResult = evaluateGate(stage === 'analysis' ? 'planning' : stage, findings);
+  const gateResult = evaluateGate(stage === 'analysis' ? 'discovery' : stage, findings);
   const finalDecision = applyUserDecision(gateResult, args.userDecision);
 
   if (args.dryRun) {

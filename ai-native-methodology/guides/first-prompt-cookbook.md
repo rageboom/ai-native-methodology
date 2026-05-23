@@ -133,7 +133,7 @@ chain harness gate 통과 의무 검증 (state.json + chain-driver)
 slash command 부재 환경 = 명시 path (★ v2.5.1 1-depth + prefix paradigm):
 ```
 @skills/analysis-architecture/SKILL.md
-@skills/planning-extract-from-legacy/SKILL.md
+@skills/discovery-from-analysis-output/SKILL.md
 @skills/analysis-br-cross-consistency-check/SKILL.md
 ```
 
