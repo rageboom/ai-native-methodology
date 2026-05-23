@@ -23,6 +23,8 @@
 
 ## 승인 결정 (시간순)
 
+- **DEC-2026-05-24-v903-l1-flow-audit-carry-corrective** — session 43차 6-stage chain harness L1 결정적 점검 carry 시행 (F-MB-DRIFT-001 analysis.phase-flow.mermaid 6개월 carry + F-MB-DOC-003 tool/schema count 4-area drift / forward-only / additive doc / breaking 0) / v9.0.3 PATCH release / 사용자 묶음 결단 D1+D2+D3+D4 모두 채택 (D1 mermaid subgraph + edge 추가 / D2 4 doc 갱신 CLAUDE.md+package.json+marketplace.json / D3 release ceremony / D4 G axis F-SIM-003 strict_mode 별도 plan carry cooling-off) / 3 LL 자산화 (LL-v903-01 silent drift sink paradigm 본격 표면화 = drift-validator breaking exit 0 carry sink + 후속 carry hard gate 전환 v+1 / LL-v903-02 L1 결정적 점검 paradigm enforcement 본격 표면화 cadence + paradigm 안정점 본격 재도달 v4 / LL-v903-03 marketplace.json description = plugin install 첫 표면 + release-readiness #1 grep 추가 후보 v+1) / Resolves F-MB-DRIFT-001 + F-MB-DOC-003
+
 - **DEC-2026-05-24-v902-audit-carry-corrective** — session 42차 paradigm + dep-graph L2 audit carry 시행 (F-PA-DRIFT-001 + F-MB-DOC-002 / forward-only / additive doc / breaking 0) / v9.0.2 PATCH release / 시행 직전 사실 검증 보강 = b9615d0 + DEC §3.1 + STATUS 32차 "schema 5 신설" claim 안 discovery-output + plan-spec 본 적 없음 사실 오류 발견 / 사용자 묶음 결단 D1+D2+D3 모두 채택 (D2 옵션 B forward-only / history doc immutable / LL-i-52 정합) / 3 LL 자산화 (LL-v902-01 시행 직전 사실 검증 paradigm 재발 + LL-v902-02 history immutable forward-only + LL-v902-03 audit + 시행 분리 paradigm 본격 입증대) / Resolves F-PA-DRIFT-001 + F-MB-DOC-002
 
 | ID | 일자 | 카테고리 | 상태 | 요약 |
