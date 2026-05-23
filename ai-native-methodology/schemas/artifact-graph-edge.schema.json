@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/artifact-graph-edge.schema.json",
   "title": "Artifact Graph Edge (hard/soft confidence)",
-  "description": "artifact-graph.json 의 엣지. 노드 사이의 관계(derivation / implementation / test / reference / informs / dependency)를 confidence(hard·soft)와 함께 표현. 운영 plan: dep-graph/operation.md 결정 1 + 결정 4 BFS Step 1·2.",
+  "description": "artifact-graph.json 의 엣지. 노드 사이의 관계(derivation / implementation / test / reference / informs / dependency)를 confidence(hard·soft)와 함께 표현. 운영 plan: docs/dependency-graph.md §2 (그래프 모델) + §5 (영향 등급 BFS).",
   "type": "object",
   "required": ["source", "target", "edge_type", "confidence"],
   "additionalProperties": false,

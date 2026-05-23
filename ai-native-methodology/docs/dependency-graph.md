@@ -1,11 +1,11 @@
 # Artifact Dependency Graph — 운영 가이드
 
 > 신규 리뷰어 onboarding 목표 < 5분. 본 문서로 dep-graph 의 **무엇을·왜·어떻게** 를 파악한다.
-> 설계 원본(SSOT): `dep-graph/operation.md` (8 결정), `dep-graph/concept.md` (시나리오), `dep-graph/conventions.md` (표기 규약).
+> ★ v8.13.1 — **본 문서 = 단일 SSOT** (DEC-2026-05-23-dep-graph-ssot-consolidation 정합 / 외부 work folder SSOT 폐기).
 
 ## 1. 한 줄 요약
 
-24개 Tier-1 artifact (chain 5 + analysis 15 + aspect 4) 사이의 의존성을 **결정적 알고리즘**으로 추적·계산·시각화·검증한다. 사람은 도메인·승인 결정에만 개입 (conventions.md §9 기계적 동작 우선).
+24개 Tier-1 artifact (chain 5 + analysis 15 + aspect 4) 사이의 의존성을 **결정적 알고리즘**으로 추적·계산·시각화·검증한다. 사람은 도메인·승인 결정에만 개입 (§7 기계적 동작 우선).
 
 ## 2. 그래프 모델 (operation.md 결정 1)
 
@@ -124,8 +124,7 @@ node tools/code-pointer-validator/src/cli.js .aimd/output/artifact-graph.json --
 
 ## 9. 참조
 
-- `dep-graph/operation.md` — 8 결정 + 7 알고리즘 + Phase 로드맵 (SSOT)
-- `dep-graph/concept.md` — 시나리오 A~E (해소하는 통증)
-- `dep-graph/conventions.md` — 표기·검증 규약 (§9 기계적 동작 우선)
+- 본 문서 — 8 결정 + Phase 로드맵 + 시나리오 + 표기 규약 통합 SSOT (★ v8.13.1+ / DEC-2026-05-23-dep-graph-ssot-consolidation)
 - `schemas/artifact-graph-node.schema.json` / `artifact-graph-edge.schema.json` / `code-pointer.schema.json`
 - `policies/propagation-policy.json` (+ `.schema.json`)
+- `tools/{graph-integrity-validator, code-pointer-validator, chain-driver, traceability-matrix-builder}` / `skills/dep-graph-navigator`

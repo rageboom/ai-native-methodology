@@ -6,13 +6,13 @@
  *   2) Orphan — state ∈ {active, drift} 노드 중 in/out 엣지 모두 없는 것
  *   3) Unknown edge — source 또는 target 이 nodes 배열에 없는 엣지
  *      ★ 예외: edge_type=implements 의 target 은 Tier-2 leaf (source code 파일) 이므로
- *        nodes 배열에 없는 것이 정상 (operation.md 결정 1 "그래프 폭증 회피").
+ *        nodes 배열에 없는 것이 정상 (docs/dependency-graph.md §2 "그래프 폭증 회피").
  *        source 는 여전히 Tier-1 IMPL 노드여야 함.
  *
  * 입력 형식: { nodes: ArtifactGraphNode[], edges: ArtifactGraphEdge[] }
  * 출력 형식: { passed, cycles, orphans, unknown_edges, summary }
  *
- * 운영 plan: dep-graph/operation.md 결정 8 (DFS cycle 감지) + release-readiness #13.
+ * 운영 plan: docs/dependency-graph.md §3 P1 (graph-integrity) + §7 (DFS cycle 감지) + release-readiness #15.
  */
 
 export function validateGraph(graph) {

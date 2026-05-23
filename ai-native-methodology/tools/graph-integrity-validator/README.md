@@ -97,5 +97,5 @@ npm test
 
 ## 운영 plan 참조
 
-- `dep-graph/operation.md` 결정 1 (그래프 모델), 결정 8 (알고리즘 셋), Verification #13
-- `dep-graph/concept.md` 시나리오 종합 (해소하는 통증)
+- `docs/dependency-graph.md` §2 (그래프 모델) + §3 (도구 맵 / 알고리즘 셋) + §7 (알고리즘 상호작용) + release-readiness #15
+- `docs/dependency-graph.md` §1 (요약 / 해소하는 통증)

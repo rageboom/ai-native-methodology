@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/code-pointer.schema.json",
   "title": "Code Pointer (artifact ↔ source code anchor)",
-  "description": "artifact 가 가리키는 코드 좌표. Tier-1 24 artifact 의 frontmatter 에 code_pointers 배열로 들어가며 artifact-graph-node 에도 평탄화돼 노출. 운영 plan: dep-graph/operation.md 결정 3. Figma Code Connect 스타일 영감.",
+  "description": "artifact 가 가리키는 코드 좌표. Tier-1 24 artifact 의 frontmatter 에 code_pointers 배열로 들어가며 artifact-graph-node 에도 평탄화돼 노출. 운영 plan: docs/dependency-graph.md §3 P2 (code-pointer-validator). Figma Code Connect 스타일 영감.",
   "type": "object",
   "required": ["path", "anchor_type"],
   "additionalProperties": false,

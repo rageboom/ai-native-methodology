@@ -3,9 +3,9 @@
 // ★ state machine 내장 (active/drift/propose/deprecated transition table)
 // ★ S5 정합: derived_from + do_not_edit_manually:true (matrix-builder header 규약 따름)
 //
-// 운영 plan: dep-graph/operation.md
-//   - 결정 1: 2-tier 노드 + confidence 엣지 + 4-state
-//   - 결정 8: P1 알고리즘 3종 중 state machine 부분(BFS·DFS cycle 은 별도 모듈)
+// 운영 plan: docs/dependency-graph.md
+//   - §2 (그래프 모델): 2-tier 노드 + confidence 엣지 + 4-state
+//   - §3 P1 (도구 맵): state machine 부분 (BFS·DFS cycle 은 별도 모듈)
 // schemas: artifact-graph-node.schema.json + artifact-graph-edge.schema.json + code-pointer.schema.json
 
 import { readFileSync, existsSync } from 'node:fs';

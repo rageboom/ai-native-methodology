@@ -1,14 +1,14 @@
 // propagation-orderer.js
-// ★ operation.md 결정 8 — P3 알고리즘 Topological sort.
+// ★ docs/dependency-graph.md §3 P3 — Topological sort.
 //   자동 cascade 시 어떤 순서로 노드를 처리해야 안전한지 결정.
 //   DFS cycle ≠ 0 이면 작동 불가 (graph-integrity-validator 가 선행 의무 — release-readiness #15).
 //
 // Kahn 알고리즘 — in-degree 0 노드부터 큐 처리. 결정성 보장 위해 id 알파벳 순서 tie-break.
 //
 // 적용 범위: hard 엣지만 따라간다 (자동 cascade 의 의미상 hard chain 만 안전 전파).
-//   결정 4 의 BFS attenuation 표 (soft 2-hop ignore) 와 일관.
+//   §5 의 BFS attenuation 표 (soft 2-hop ignore) 와 일관.
 //
-// 운영 plan: dep-graph/operation.md 결정 8 (Phase 3 도입), 결정 5 (자동 cascade 활성 전제).
+// 운영 plan: docs/dependency-graph.md §3 P3 (Phase 3 도입) + §6 (자동 cascade 활성 전제).
 
 const HARD_EDGE_TYPES = new Set(['derived_from', 'implements', 'tests', 'depends_on']);
 

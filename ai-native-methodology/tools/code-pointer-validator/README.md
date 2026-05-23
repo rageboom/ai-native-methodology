@@ -91,6 +91,6 @@ code-pointer-validator <artifact-graph.json> [--repo-root <dir>] [--strict] [--f
 
 ## 운영 plan 참조
 
-- `dep-graph/operation.md` 결정 3 (code_pointers), 결정 5 (stale matrix), Verification #12
+- `docs/dependency-graph.md` §3 P2 (code_pointers) + §6 (stale matrix / propagation-policy) + release-readiness #16
 - `schemas/code-pointer.schema.json`
 - `schemas/artifact-graph-node.schema.json` (`code_pointers` + `code_pointers_na`)

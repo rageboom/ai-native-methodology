@@ -9,6 +9,77 @@
 
 ---
 
+## [8.13.1] — 2026-05-23 PATCH — dep-graph SSOT 통합 (dead-link 제거 / docs/dependency-graph.md 자체 SSOT 격상)
+
+> v8.9.0 carry "C-operation-md-work-folder" (low / 마지막 carry) 종결. 사용자 결단 "추천" (2026-05-23 / Option C — 16 file 인용 갱신). DEC-2026-05-23-dep-graph-ssot-consolidation 정합. PATCH (corrective dead-link 제거 / 정보 손실 0 / breaking 0).
+
+### 실측 (dead-link 진단)
+
+16 file 안 `dep-graph/operation.md` / `concept.md` / `conventions.md` 인용 발견. 3 SSOT 파일 모두 git tracked 아님 + file system 부재 (commit `b9615d0` 시 사용자 환경 work folder 안 작업 doc / 본 plugin tracked 외부).
+
+### 결단 — Option C 채택
+
+- A. 3 file 신설 (사용자 원본 복원 / 안정도 ↑ but 사용자 read 의무) ❌
+- B. SSOT footer 제거 (decommission / 단순) ❌
+- **C. 16 file 인용 갱신** — docs/dependency-graph.md 가 이미 131 line SSOT 역할 → 자체 SSOT 격상 + dead-link redirect ✅ (정보 손실 0)
+
+### 시행 (additive / corrective / breaking 0)
+
+#### docs/dependency-graph.md SSOT 자체 격상
+- 머리말 "설계 원본(SSOT): dep-graph/{operation,concept,conventions}.md" → "★ v8.13.1 — 본 문서 = 단일 SSOT (DEC-2026-05-23-dep-graph-ssot-consolidation)"
+- §1 "(conventions.md §9 …)" → "(§7 기계적 동작 우선)"
+- §9 참조 — 3 dead-link 삭제 + 본 doc 자체 SSOT 명시 + 도구 cross-link 보강
+
+#### 10 활성 file 인용 redirect
+- `schemas/artifact-graph-node.schema.json`: "dep-graph/operation.md 결정 1" → "docs/dependency-graph.md §2 (그래프 모델)"
+- `schemas/artifact-graph-edge.schema.json`: "dep-graph/operation.md 결정 1 + 결정 4 BFS" → "docs/dependency-graph.md §2 + §5 (영향 등급 BFS)"
+- `schemas/code-pointer.schema.json`: "dep-graph/operation.md 결정 3" → "docs/dependency-graph.md §3 P2 (code-pointer-validator)"
+- `tools/traceability-matrix-builder/src/graph-synthesizer.js`: "dep-graph/operation.md" → "docs/dependency-graph.md §2 + §3 P1"
+- `tools/chain-driver/src/propagation-orderer.js`: "operation.md 결정 8 + 결정 5" → "docs/dependency-graph.md §3 P3 + §6"
+- `tools/graph-integrity-validator/src/validator.js`: "dep-graph/operation.md 결정 8" → "docs/dependency-graph.md §3 P1 + §7"
+- `tools/graph-integrity-validator/README.md` (2건): "dep-graph/operation.md 결정 1+8" + "dep-graph/concept.md 시나리오" → "docs/dependency-graph.md §2+§3+§7" + "docs/dependency-graph.md §1"
+- `tools/code-pointer-validator/README.md`: "dep-graph/operation.md 결정 3, 결정 5" → "docs/dependency-graph.md §3 P2 + §6"
+- `skills/dep-graph-navigator/SKILL.md` (2건): "dep-graph/operation.md 결정 1/4/7/8" + "dep-graph/concept.md 시나리오" → "docs/dependency-graph.md §2+§5+§3 P4+§7" + "docs/dependency-graph.md §1"
+- `methodology-spec/plugin-charter.md`: "설계 SSOT = dep-graph/operation.md" → "설계 SSOT + 운영 가이드 = docs/dependency-graph.md (★ v8.13.1+ 통합)"
+
+#### History immutable file (변경 ❌)
+- `CHANGELOG.md` (3건 — v8.13.0/v8.12.0/v8.9.0 history)
+- `decisions/INDEX.md` + `decisions/DEC-2026-05-23-{dep-graph,analysis-validator,xmllint}.md` (history reference 보존)
+
+### 자산 갱신
+
+- `plugin.json` 8.13.0 → 8.13.1 + `package.json` 8.13.0 → 8.13.1 (3-way sync)
+- DEC-2026-05-23-dep-graph-ssot-consolidation + INDEX 최상단 + STATUS session 36차 entry
+
+### 검증 — STOP-3 hard gate
+
+- dead-link 0 (active surface) ✅ — `grep dep-graph/operation\|concept\|conventions ./{schemas,tools,skills,methodology-spec,docs}` = 0 match
+- workspace test pass (xmllint 환경 회복 / fast-xml-parser 정합)
+- release-readiness 16/16 ready (보존)
+- breaking 0 = PATCH (corrective dead-link 제거 / 정보 손실 0)
+
+### carry 종결 cascade (본 release = 본 session 종결)
+
+★ ★ ★ ★ ★ ★ ★ ★ ★ ★ **본 session (33차~36차) 누적 6 release / 5 carry cascade 종결**:
+
+| Session | Release | carry 종결 |
+|---|---|---|
+| 33차 | v8.9.0 | dep-graph release ceremony (b9615d0 명시) |
+| 33차 | v8.10.0 | analysis_validator carry |
+| 34차 | v8.11.0 | Senior REVISE-1 carry |
+| 35차 | v8.12.0 | legacy-risks-poc-migration carry |
+| 36차 | v8.13.0 | xmllint-env-absent carry (R19 paradigm 완결) |
+| **36차** | **v8.13.1** | **operation-md-work-folder carry (dep-graph SSOT 통합)** ← 본 release |
+
+★ ★ ★ ★ ★ ★ **carry 잔존 = 0** (역사상 최초).
+
+### 참고
+
+- DEC-2026-05-23-dep-graph-ssot-consolidation
+- v8.9.0 carry C-operation-md-work-folder 종결 (4 release 보존 carry)
+
+---
+
 ## [8.13.0] — 2026-05-23 MINOR — sql-inventory-validator Tier 1 in-plugin XML parser 격상 (xmllint → fast-xml-parser / R19 paradigm 정합)
 
 > v8.12.0 carry "C-xmllint-env-absent" 종결. 사용자 결단 "Option A: Tier 1 격상 (fast-xml-parser 도입)" (2026-05-23). DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classification) paradigm 정합. additive / breaking 0 / Windows/Linux/Mac 동일 동작.

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/artifact-graph-node.schema.json",
   "title": "Artifact Graph Node (24-node Tier-1)",
-  "description": "artifact-graph.json 의 노드. Tier-1 권위 노드 24개(chain 5 + analysis 15 + aspect 4) 만 모델링. Tier-2(schema/hook/validator/skill/source file)는 속성 노드로 leaf 취급. 운영 plan: dep-graph/operation.md 결정 1.",
+  "description": "artifact-graph.json 의 노드. Tier-1 권위 노드 24개(chain 5 + analysis 15 + aspect 4) 만 모델링. Tier-2(schema/hook/validator/skill/source file)는 속성 노드로 leaf 취급. 운영 plan: docs/dependency-graph.md §2 (그래프 모델).",
   "type": "object",
   "required": ["id", "artifact_kind", "artifact_subkind", "source_path", "state"],
   "additionalProperties": false,
