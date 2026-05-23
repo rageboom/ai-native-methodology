@@ -1,0 +1,15 @@
+%% phase-flow corpus drift 01 — P0 → P2 dep 누락 (JSON 측 0→2 있음).
+
+flowchart TB
+    subgraph P0["Phase 0 — input"]
+        P0_OUT["_manifest.yml"]
+    end
+    subgraph P1["Phase 1 — init"]
+        P1_OUT["inventory.json"]
+    end
+    subgraph P2["Phase 2 — db"]
+        P2_OUT["schema.json"]
+    end
+
+    P0 --> P1
+    P1 --> P2

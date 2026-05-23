@@ -1,0 +1,11 @@
+{
+  "id": "Corpus-Drift-Seq-03-LabelMismatch",
+  "actors": [
+    {"id": "Client", "type": "user"},
+    {"id": "Service", "type": "service"}
+  ],
+  "messages": [
+    {"from": "Client", "to": "Service", "label": "create user with email and password", "sync": "sync"},
+    {"from": "Service", "to": "Client", "label": "user response", "sync": "return"}
+  ]
+}

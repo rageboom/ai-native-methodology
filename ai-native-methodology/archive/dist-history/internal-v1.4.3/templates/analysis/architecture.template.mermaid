@@ -1,0 +1,89 @@
+%% 아키텍처 Component Diagram (Mermaid)
+%% 사상: C4 Model Level 3 (Component Level)
+%% 생성일: {meta.generated_at}
+%% 신뢰도: {meta.confidence}
+
+flowchart TB
+    %% ====================================
+    %% Presentation Layer
+    %% ====================================
+    subgraph Presentation["프레젠테이션 레이어"]
+        Web["Web (FE)"]
+        Mobile["Mobile App"]
+        AdminUI["Admin UI"]
+    end
+    
+    %% ====================================
+    %% Business Layer (Bounded Contexts)
+    %% ====================================
+    subgraph Business["비즈니스 레이어"]
+        ModOrder["주문 모듈<br/>MOD-ORDER"]
+        ModUser["사용자 모듈<br/>MOD-USER"]
+        ModPayment["결제 모듈<br/>MOD-PAYMENT"]
+        ModProduct["상품 모듈<br/>MOD-PRODUCT"]
+        ModNotification["알림 모듈<br/>MOD-NOTIFICATION"]
+    end
+    
+    %% ====================================
+    %% Persistence Layer
+    %% ====================================
+    subgraph Persistence["영속성 레이어"]
+        OrderRepo["OrderRepository"]
+        UserRepo["UserRepository"]
+        PaymentRepo["PaymentRepository"]
+        ProductRepo["ProductRepository"]
+    end
+    
+    %% ====================================
+    %% External Systems
+    %% ====================================
+    subgraph External["외부 시스템"]
+        PG["결제 게이트웨이<br/>(EXT-PAYMENT)"]
+        SMS["SMS 서비스<br/>(EXT-SMS)"]
+        Email["Email 서비스<br/>(EXT-EMAIL)"]
+        Kafka["Kafka<br/>(EXT-MQ)"]
+    end
+    
+    %% ====================================
+    %% Infrastructure
+    %% ====================================
+    subgraph Infra["인프라"]
+        DB[("PostgreSQL")]
+        Redis[("Redis")]
+    end
+    
+    %% ====================================
+    %% Dependencies
+    %% ====================================
+    Web --> ModOrder
+    Web --> ModUser
+    Mobile --> ModOrder
+    AdminUI --> ModOrder
+    AdminUI --> ModPayment
+    
+    ModOrder --> OrderRepo
+    ModOrder --> ModUser
+    ModOrder --> ModProduct
+    ModOrder --> ModPayment
+    ModOrder --> ModNotification
+    ModUser --> UserRepo
+    ModPayment --> PaymentRepo
+    ModProduct --> ProductRepo
+    
+    OrderRepo --> DB
+    UserRepo --> DB
+    PaymentRepo --> DB
+    ProductRepo --> DB
+    UserRepo --> Redis
+    
+    ModOrder --> PG
+    ModOrder --> Kafka
+    ModUser --> SMS
+    ModNotification --> Email
+    
+    %% ====================================
+    %% Styles
+    %% ====================================
+    style Business fill:#d4edda
+    style External fill:#fff3cd
+    style Infra fill:#e2e3e5

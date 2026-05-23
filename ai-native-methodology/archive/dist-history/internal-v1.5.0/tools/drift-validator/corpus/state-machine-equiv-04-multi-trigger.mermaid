@@ -1,0 +1,10 @@
+stateDiagram-v2
+    [*] --> draft
+    draft --> validating: SUBMIT
+    draft --> deleted: DELETE
+    draft --> archived: ARCHIVE
+    validating --> approved: PASS
+    validating --> draft: FAIL
+    approved --> [*]
+    deleted --> [*]
+    archived --> [*]

@@ -1,0 +1,9 @@
+{
+  "id": "Corpus-Drift-01",
+  "initial": "idle",
+  "states": {
+    "idle": { "on": { "START": "active" } },
+    "active": { "on": { "STOP": "idle" } },
+    "completed": { "on": {} }
+  }
+}

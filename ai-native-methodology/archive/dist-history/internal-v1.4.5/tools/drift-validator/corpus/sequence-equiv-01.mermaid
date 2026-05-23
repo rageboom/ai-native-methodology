@@ -1,0 +1,9 @@
+sequenceDiagram
+    actor User
+    participant API
+    participant DB
+
+    User->>API: request
+    API->>DB: query
+    DB-->>API: result
+    API-->>User: response

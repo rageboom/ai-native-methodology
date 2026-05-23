@@ -1,0 +1,9 @@
+{
+  "id": "Corpus-Drift-02-MissingState",
+  "initial": "idle",
+  "states": {
+    "idle": { "on": { "START": "active" } },
+    "active": { "on": { "PAUSE": "paused", "STOP": "idle" } },
+    "paused": { "on": { "RESUME": "active" } }
+  }
+}

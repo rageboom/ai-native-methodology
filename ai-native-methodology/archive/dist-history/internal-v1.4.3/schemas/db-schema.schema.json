@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/db-schema.schema.json",
+  "title": "DB 스키마 (Database Schema)",
+  "description": "DB 테이블/컬럼/관계 통합 표현. 다중 출처 (ERD/ORM/운영DB)에서 통합되며 출처 추적 메타 포함.",
+  "type": "object",
+  "required": ["meta", "tables"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "database_type": {
+      "type": "string",
+      "enum": ["postgresql", "mysql", "mariadb", "oracle", "sqlserver", "sqlite", "mongodb", "unknown"],
+      "description": "감지된 DB 종류"
+    },
+    "schema_name": {
+      "type": "string",
+      "description": "기본 스키마 이름 (예: public)"
+    },
+    "tables": {
+      "type": "array",
+      "description": "테이블 목록",
+      "items": {
+        "type": "object",
+        "required": ["name", "columns"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "테이블 이름 (snake_case)",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "description": {
+            "type": "string"
+          },
+          "related_entity_id": {
+            "type": "string",
+            "description": "매칭되는 도메인 엔티티 ID (예: E-ORDER-Order)"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["erd", "orm", "operational_db", "migration"]
+            },
+            "minItems": 1,
+            "description": "이 테이블 정보가 확인된 출처들"
+          },
+          "columns": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type", "sources"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "DB 타입 (예: UUID, NUMERIC(12,2), VARCHAR(255))"
+                },
+                "nullable": {"type": "boolean"},
+                "default": {},
+                "is_primary_key": {"type": "boolean"},
+                "description": {"type": "string"},
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["erd", "orm", "operational_db", "migration"]
+                  },
+                  "description": "컬럼 확인 출처"
+                },
+                "drift_note": {
+                  "type": "string",
+                  "description": "출처 간 불일치 발견 시 노트 (예: 'ERD는 (10,2), 운영DB는 (12,2)')"
+                }
+              }
+            }
+          },
+          "primary_key": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "PK 컬럼 이름 목록 (단일 PK 권장 — 복합 PK는 안티패턴)"
+          },
+          "foreign_keys": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["columns", "references_table", "references_columns"],
+              "properties": {
+                "name": {"type": "string"},
+                "columns": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "references_table": {"type": "string"},
+                "references_columns": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "on_delete": {
+                  "type": "string",
+                  "enum": ["CASCADE", "SET NULL", "RESTRICT", "NO ACTION", "SET DEFAULT"]
+                },
+                "on_update": {
+                  "type": "string",
+                  "enum": ["CASCADE", "SET NULL", "RESTRICT", "NO ACTION", "SET DEFAULT"]
+                }
+              }
+            }
+          },
+          "indexes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "columns"],
+              "properties": {
+                "name": {"type": "string"},
+                "columns": {
+                  "type": "array",
+                  "items": {"type": "string"}
+                },
+                "unique": {"type": "boolean"},
+                "type": {
+                  "type": "string",
+                  "enum": ["btree", "hash", "gin", "gist", "fulltext", "other"]
+                }
+              }
+            }
+          },
+          "check_constraints": {
+            "type": "array",
+            "description": "CHECK 제약 (비즈니스 규칙으로도 등록될 후보)",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {"type": "string"},
+                "expression": {"type": "string"},
+                "extracted_to_rule_id": {
+                  "type": "string",
+                  "description": "rules.json의 BR-XXX로 추출되었으면 그 ID"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stored_procedures": {
+      "type": "array",
+      "description": "스토어드 프로시저 (Phase 4 5.A에서 분석)",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "language": {"type": "string"},
+          "description": {"type": "string"},
+          "extracted_business_logic": {
+            "type": "boolean",
+            "description": "비즈니스 로직이 발견되었는가? (true면 rules.json에 추출)"
+          },
+          "related_rules": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "views": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string"},
+          "definition_sql": {"type": "string"},
+          "based_on_tables": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "consistency_report_file": {
+      "type": "string",
+      "description": "출처 간 정합성 검증 보고서 파일 경로 (Phase 2 산출물)"
+    },
+    "diagram_files": {
+      "type": "object",
+      "properties": {
+        "erd": {
+          "type": "string",
+          "description": "통합 ERD (Mermaid erDiagram)"
+        }
+      }
+    }
+  }
+}

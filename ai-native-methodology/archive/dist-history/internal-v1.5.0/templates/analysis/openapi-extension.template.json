@@ -1,0 +1,58 @@
+{
+  "$schema": "../schemas/openapi-extension.schema.json",
+  "_comment": "OpenAPI 3.1 yaml 동반 메타. operationId 기반으로 도메인/규칙 매핑. Phase 5-1 산출물. PoC 작성 시 본 골격을 채움.",
+
+  "meta": {
+    "$ref": "./meta-confidence.template.yaml"
+  },
+
+  "openapi_file": "api/openapi.yaml",
+  "openapi_version": "3.1.0",
+
+  "operations": [
+    {
+      "_comment_basic": "기본 매핑 — 모든 operation 작성",
+      "operation_id": "{operationId — OpenAPI 와 일치, 예: createOrder}",
+      "method": "POST",
+      "path": "/orders",
+      "related_use_case_id": "UC-ORDER-CREATE",
+      "related_rules": ["BR-ORDER-001", "BR-ORDER-002"],
+      "affects_aggregates": ["AR-ORDER"],
+      "reads_aggregates": ["AR-USER", "AR-PRODUCT"],
+      "auth_required": true,
+      "required_roles": ["USER"],
+      "permission_expression": "@PreAuthorize('hasRole(USER)')",
+      "external_dependencies": ["EXT-PAYMENT-GATEWAY"],
+      "ui_pages": ["PAGE-ORDER-NEW"],
+
+      "extracted_from": {
+        "controller_file": "src/main/java/com/example/order/OrderController.java",
+        "controller_class": "OrderController",
+        "controller_method": "create",
+        "annotations_seen": ["@PostMapping", "@PreAuthorize", "@RequestBody"]
+      },
+
+      "_comment_v123": "★ v1.2.3 — Phase 4.5 cross-link (operations 의무: BR/state/sequence 직결 카테고리). antipatterns.schema.json allOf if-then 정합 (DOMAIN/API/FE 의무).",
+      "formal_spec_links": {
+        "decision_tables": [
+          "../formal-spec/decision-tables/BR-ORDER-001.md"
+        ],
+        "state_machines": [
+          "../formal-spec/state-machines/Order.json"
+        ],
+        "sequence_diagrams": [
+          "../formal-spec/sequence-diagrams/UC-ORDER-CREATE.json"
+        ]
+      }
+    }
+  ],
+
+  "schemas_to_entities": [
+    {
+      "openapi_schema": "OrderResponse",
+      "entity_id": "E-ORDER-Order",
+      "mapping_type": "dto_projection",
+      "_comment": "mapping_type enum: direct (1:1) | dto_projection (subset) | aggregate_view (계산) | synthesized (조합)"
+    }
+  ]
+}

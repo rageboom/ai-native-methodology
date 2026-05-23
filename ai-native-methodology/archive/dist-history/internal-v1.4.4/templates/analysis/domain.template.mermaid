@@ -1,0 +1,78 @@
+%% 도메인 모델 클래스 다이어그램 (Mermaid)
+%% 사상: DDD-Lite B 강도 (전술 패턴까지)
+%% 생성일: {meta.generated_at}
+%% 신뢰도: {meta.confidence}
+
+classDiagram
+    %% ====================================
+    %% BC-ORDER 주문 도메인 (예시)
+    %% ====================================
+    
+    class Order {
+        <<Aggregate Root>>
+        +UUID id
+        +UUID userId
+        +Money totalAmount
+        +OrderStatus status
+        +LocalDateTime createdAt
+        +LocalDateTime cancelledAt
+        +cancel() void
+        +addItem(OrderItem) void
+        +calculateTotal() Money
+    }
+    
+    class OrderItem {
+        <<Entity>>
+        +UUID id
+        +UUID orderId
+        +UUID productId
+        +int quantity
+        +Money unitPrice
+    }
+    
+    class Money {
+        <<Value Object>>
+        +BigDecimal amount
+        +Currency currency
+        +add(Money) Money
+        +multiply(int) Money
+    }
+    
+    class OrderStatus {
+        <<enumeration>>
+        PENDING
+        PAID
+        SHIPPED
+        DELIVERED
+        CANCELLED
+    }
+    
+    class OrderRepository {
+        <<Repository>>
+        +findById(UUID) Order
+        +save(Order) Order
+        +delete(Order) void
+    }
+    
+    class OrderPricingPolicy {
+        <<Domain Service>>
+        +calculateDiscount(Order, User) Money
+        +applyShippingFee(Order) Money
+    }
+    
+    %% ====================================
+    %% 관계
+    %% ====================================
+    
+    Order "1" *-- "1..*" OrderItem : aggregate
+    Order *-- Money : totalAmount
+    Order *-- OrderStatus : status
+    OrderItem *-- Money : unitPrice
+    OrderRepository ..> Order : manages
+    OrderPricingPolicy ..> Order : uses
+    
+    %% ====================================
+    %% Notes (불변식)
+    %% ====================================
+    
+    note for Order "Invariants:<br/>- items.size() >= 1<br/>- totalAmount == sum(items)<br/>- 30분 후 취소 불가 (BR-ORDER-005)"

@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/legacy-spectrum.schema.json",
+  "title": "Legacy Spectrum (Tier 1~4 detection + bootstrap data flow + strangler plan)",
+  "description": "Deliverable #13 (v1.4 신설). ADR-FE-001 spectrum Tier 1~4 cover + ADR-FE-003 legacy 정책 + Strangler Fig Pattern (Martin Fowler 2004) + Tier 4 ADR-FE-004 BE/FE 분리 예외 정합. legacy 시스템에서 sample이 신규 FE 시스템 구축 시 입력 자료.",
+  "x-spec-source": {
+    "strangler_fig": "https://martinfowler.com/bliki/StranglerFigApplication.html",
+    "monolith_to_microservices": "Sam Newman, O'Reilly 2019"
+  },
+  "type": "object",
+  "required": ["meta", "tier_detection", "summary"],
+  "properties": {
+    "meta": { "$ref": "./meta-confidence.schema.json" },
+    "tier_detection": {
+      "type": "object",
+      "required": ["primary_tier", "signals"],
+      "properties": {
+        "primary_tier": {
+          "type": "string",
+          "enum": [
+            "1_modern_spa",
+            "2_jquery_legacy",
+            "3_vanilla_js",
+            "4_server_side_template",
+            "mixed"
+          ],
+          "description": "★ ADR-FE-001 spectrum Tier 1~4 정합. mixed=2개 이상 Tier 혼재."
+        },
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tier", "signal_type", "detected"],
+            "properties": {
+              "tier": {
+                "type": "string",
+                "enum": ["1_modern_spa", "2_jquery_legacy", "3_vanilla_js", "4_server_side_template"]
+              },
+              "signal_type": {
+                "type": "string",
+                "enum": [
+                  "package_json_dependency",
+                  "file_extension",
+                  "dom_pattern",
+                  "build_config",
+                  "html_script_tag",
+                  "server_template_directive"
+                ]
+              },
+              "detected": {"type": "boolean"},
+              "evidence_files": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "evidence_count": {"type": "integer", "minimum": 0},
+              "confidence": {
+                "type": "number",
+                "minimum": 0.0,
+                "maximum": 0.98
+              }
+            }
+          }
+        },
+        "mixed_breakdown": {
+          "type": "object",
+          "description": "★ primary_tier=mixed 시 의무. 각 Tier 별 비율 (코드 line / file 단위).",
+          "properties": {
+            "tier_1_pct": {"type": "number", "minimum": 0, "maximum": 100},
+            "tier_2_pct": {"type": "number", "minimum": 0, "maximum": 100},
+            "tier_3_pct": {"type": "number", "minimum": 0, "maximum": 100},
+            "tier_4_pct": {"type": "number", "minimum": 0, "maximum": 100},
+            "measurement_method": {
+              "type": "string",
+              "enum": ["loc", "file_count", "module_count"]
+            }
+          }
+        }
+      }
+    },
+    "bootstrap_flow": {
+      "type": "object",
+      "description": "초기 데이터 진실 source 추출 (★ Tier 2/3/4 핵심).",
+      "properties": {
+        "entry_html": {
+          "type": "string",
+          "description": "메인 entry HTML 파일 경로 (예: 'index.html', 'WEB-INF/jsp/main.jsp')."
+        },
+        "data_injection_methods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["method"],
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "server_render_initial_state",
+                  "window_global_assignment",
+                  "data_attribute_dom",
+                  "ajax_fetch_on_load",
+                  "websocket_on_load",
+                  "jsp_request_attribute",
+                  "thymeleaf_model_attribute",
+                  "erb_instance_variable",
+                  "cookie_initial",
+                  "localstorage_initial",
+                  "none"
+                ],
+                "description": "★ Tier 별 흔한 패턴 — server_render = Next.js / Nuxt / 직접 inline / data_attribute = jQuery 패턴 / jsp_request_attribute = Tier 4."
+              },
+              "initial_data_keys": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "evidence_files": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "ssr_safe": {
+                "type": "boolean",
+                "description": "★ XSS 위험 평가 (server_render 시 escape 의무 / static-security-spec cross-link)."
+              }
+            }
+          }
+        }
+      }
+    },
+    "strangler_plan": {
+      "type": "object",
+      "description": "Martin Fowler Strangler Fig Pattern 정합 마이그레이션 plan. ADR-FE-003 §3 정합.",
+      "properties": {
+        "migration_target_tier": {
+          "type": "string",
+          "enum": ["1_modern_spa", "stays_legacy_no_migration"]
+        },
+        "approach": {
+          "type": "string",
+          "enum": [
+            "page_by_page",
+            "feature_by_feature",
+            "side_by_side_iframe",
+            "edge_proxy",
+            "big_bang_rewrite_not_recommended"
+          ],
+          "description": "★ big_bang_rewrite_not_recommended = 산업 사례 모두 strangle 권고 (ADR-FE-003 §5.3)."
+        },
+        "estimated_phases": {"type": "integer", "minimum": 1},
+        "phase_breakdown": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["phase"],
+            "properties": {
+              "phase": {"type": "integer", "minimum": 1},
+              "target_pages": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "target_features": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "effort_estimate": {"type": "string"},
+              "rollback_strategy": {
+                "type": "string",
+                "enum": ["feature_flag", "url_route", "blue_green", "edge_proxy_revert", "manual"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["primary_tier", "extraction_completeness"],
+      "properties": {
+        "primary_tier": {"type": "string"},
+        "extraction_completeness": {
+          "type": "object",
+          "description": "Tier 별 7대 산출물 추출 매트릭스 (ADR-FE-001 §3.1 정합).",
+          "properties": {
+            "ui_spec": {"type": "boolean"},
+            "state_map": {"type": "boolean"},
+            "visual_manifest": {"type": "boolean"},
+            "a11y_spec": {"type": "boolean"},
+            "i18n_spec": {"type": "boolean"},
+            "static_security_spec": {"type": "boolean"},
+            "antipatterns": {"type": "boolean"}
+          }
+        },
+        "★ tier_4_be_fe_split_carry": {
+          "type": "boolean",
+          "description": "★ DEPRECATED (Stage 6 종결). primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무 — Stage 6 종결로 carry-over resolved. 신규 산출물은 tier_4_be_fe_handling 사용 권장."
+        },
+        "tier_4_be_fe_handling": {
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "scenario_c_integrated",
+            "legacy_carry_over_resolved_v14"
+          ],
+          "description": "★ v1.4 Stage 6 신설 — Tier 4 (JSP / Thymeleaf / ERB) 처리 정책. ADR-FE-004 §2.4 + be-fe-separation.md §5 정합. not_applicable=Tier 4 부재 / scenario_c_integrated=Scenario C 통합 산출 (BE Spring controller + JSP 통합 분석) / legacy_carry_over_resolved_v14=v1.4 carry-over resolved 명시."
+        },
+        "captured_by": {
+          "type": "string",
+          "enum": ["code_static_analysis", "simulation"],
+          "description": "code_static_analysis = 실제 코드 read (정적). simulation = 시뮬 추정."
+        },
+        "simulation_reason": {"type": "string"}
+      }
+    }
+  }
+}

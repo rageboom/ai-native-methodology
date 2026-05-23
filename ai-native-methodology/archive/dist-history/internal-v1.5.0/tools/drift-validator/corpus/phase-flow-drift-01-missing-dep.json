@@ -1,0 +1,10 @@
+{
+  "$comment": "phase-flow corpus drift 01 — JSON 측 dep 1건 mermaid 누락. drift-validator phase-flow 비교기 검출 검증용.",
+  "id": "phase-flow-corpus-drift-01",
+  "version": "test",
+  "phases": [
+    {"id": "0", "name": "input", "depends_on": [], "outputs": []},
+    {"id": "1", "name": "init", "depends_on": ["0"], "outputs": []},
+    {"id": "2", "name": "db", "depends_on": ["0", "1"], "outputs": []}
+  ]
+}

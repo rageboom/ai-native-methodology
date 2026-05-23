@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/decision-table-validator",
+  "version": "0.1.0",
+  "description": "Decision table 5-check validator (dmn-check 알고리즘 차용) — duplicate / conflict / gap / overlap / type. Phase 4.5 decision_tables[] 산출물 검증.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "decision-table-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/dmn-check.test.js test/baseline.test.js" },
+  "license": "UNLICENSED"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "Corpus-Drift-03-MissingCompound",
+  "initial": "draft",
+  "states": {
+    "draft": { "on": { "SUBMIT": "validating" } },
+    "validating": {
+      "type": "compound",
+      "on": { "PASS": "approved" }
+    },
+    "approved": { "type": "final", "on": {} }
+  }
+}

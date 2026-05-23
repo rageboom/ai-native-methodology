@@ -1,0 +1,17 @@
+{
+  "id": "Corpus-Equiv-04-MultiTrigger",
+  "initial": "draft",
+  "states": {
+    "draft": {
+      "on": {
+        "SUBMIT": "validating",
+        "DELETE": "deleted",
+        "ARCHIVE": "archived"
+      }
+    },
+    "validating": { "on": { "PASS": "approved", "FAIL": "draft" } },
+    "approved": { "type": "final", "on": {} },
+    "deleted": { "type": "final", "on": {} },
+    "archived": { "type": "final", "on": {} }
+  }
+}

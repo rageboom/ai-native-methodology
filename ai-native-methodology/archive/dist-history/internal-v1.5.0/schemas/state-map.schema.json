@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/state-map.schema.json",
+  "title": "State Map (분산 상태 5 진실)",
+  "description": "Deliverable #8 (v1.4 신설). FE 영역 분산 상태 (server cache / client state / URL state / form state / DOM state) 추출. W3C SCXML 1.0 (REC) + XState v5+ 호환. ADR-FE-001 / ADR-FE-002 / ADR-FE-005 / ADR-009 §2.4 정합. drift-validator FE 적용 대상 (BE Phase 4.5 패턴 정합).",
+  "x-spec-source": {
+    "scxml": "https://www.w3.org/TR/scxml/",
+    "scxml_status": "W3C Recommendation 2015-09-01",
+    "xstate_compat": "XState v5+ SCXML import"
+  },
+  "type": "object",
+  "required": ["meta", "state_sources", "machines"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "react",
+        "vue",
+        "angular",
+        "svelte",
+        "solid",
+        "qwik",
+        "astro",
+        "next",
+        "nuxt",
+        "remix",
+        "vanilla_js",
+        "jquery_legacy",
+        "jsp_template",
+        "unknown"
+      ],
+      "description": "감지된 FE 프레임워크. ui-spec.schema.json framework enum 정합 (ADR-FE-001 spectrum Tier 1~4)."
+    },
+    "state_sources": {
+      "type": "array",
+      "description": "감지된 분산 상태 진실 (5 source of truth). 모든 항목 (1~5) 의 사용 여부 명시 의무.",
+      "items": {
+        "type": "object",
+        "required": ["source_type", "detected"],
+        "properties": {
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "server_cache",
+              "client_state",
+              "url_state",
+              "form_state",
+              "dom_state"
+            ],
+            "description": "5 진실 분류. server_cache=TanStack Query/SWR/Apollo / client_state=Zustand/Redux/Jotai / url_state=router params/query / form_state=React Hook Form/Formik / dom_state=input value/focus/scroll."
+          },
+          "detected": {
+            "type": "boolean",
+            "description": "본 source 가 코드베이스에 존재하는지 여부."
+          },
+          "library": {
+            "type": "string",
+            "description": "사용 라이브러리 (예: tanstack-query, zustand, react-router, react-hook-form). detected=false 시 생략 가능."
+          },
+          "library_version": {
+            "type": "string",
+            "description": "라이브러리 버전 (가능 시). 신뢰도 영향."
+          },
+          "scope_files": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "본 source 가 사용된 주요 파일 경로 목록."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 0.98
+          }
+        }
+      },
+      "minItems": 5,
+      "maxItems": 5,
+      "description": "정확히 5 항목 (5 진실). 모든 진실의 detected 여부 명시 의무."
+    },
+    "machines": {
+      "type": "array",
+      "description": "FE 영역 상태 머신 (SCXML 1.0 호환).",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "scope", "initial", "states"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FSM-FE-[A-Z0-9_-]+-\\d+$",
+            "description": "FE FSM ID. 예: FSM-FE-LOGIN-001."
+          },
+          "name": {
+            "type": "string",
+            "description": "사람 읽기용 머신 이름 (예: '로그인 흐름')."
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "page",
+              "component",
+              "feature",
+              "global"
+            ],
+            "description": "머신 범위. global=앱 전역 (Redux store), feature=feature slice 단위, component=컴포넌트 내부, page=라우트 단위."
+          },
+          "scxml_compliant": {
+            "type": "boolean",
+            "description": "SCXML 1.0 호환 여부. true 시 W3C SCXML XML 변환 가능."
+          },
+          "xstate_compatible": {
+            "type": "boolean",
+            "description": "XState v5+ machine config 호환 여부."
+          },
+          "primary_source_type": {
+            "type": "string",
+            "enum": [
+              "server_cache",
+              "client_state",
+              "url_state",
+              "form_state",
+              "dom_state",
+              "mixed"
+            ],
+            "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (★ 분산 위험 — finding 등록 의무)."
+          },
+          "initial": {
+            "type": "string",
+            "description": "초기 상태 ID."
+          },
+          "final_states": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "최종 상태 ID 목록 (SCXML <final>)."
+          },
+          "states": {
+            "type": "object",
+            "description": "상태 객체. 키=상태명. SCXML state element 정합.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["atomic", "compound", "parallel", "history_shallow", "history_deep", "final"],
+                  "description": "SCXML state type. compound=중첩 상태, parallel=<parallel> region, history=<history> shallow/deep."
+                },
+                "on": {
+                  "type": "object",
+                  "description": "이벤트 핸들러. 키=이벤트명. 값=transition target 또는 객체.",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {"type": "string"},
+                      {
+                        "type": "object",
+                        "properties": {
+                          "target": {"type": "string"},
+                          "guard": {"type": "string"},
+                          "actions": {"type": "array", "items": {"type": "string"}}
+                        }
+                      }
+                    ]
+                  }
+                },
+                "entry_actions": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "SCXML <onentry> actions."
+                },
+                "exit_actions": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "SCXML <onexit> actions."
+                },
+                "child_states": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "description": "compound state 의 child state 키 목록."
+                }
+              }
+            }
+          },
+          "parallel_regions": {
+            "type": "array",
+            "description": "SCXML <parallel> region 목록. 동시 활성 상태.",
+            "items": {
+              "type": "object",
+              "required": ["id", "regions"],
+              "properties": {
+                "id": {"type": "string"},
+                "regions": {
+                  "type": "array",
+                  "items": {"type": "string"},
+                  "minItems": 2
+                }
+              }
+            }
+          },
+          "history": {
+            "type": "array",
+            "description": "SCXML <history> 노드 목록.",
+            "items": {
+              "type": "object",
+              "required": ["state_id", "type"],
+              "properties": {
+                "state_id": {"type": "string"},
+                "type": {"type": "string", "enum": ["shallow", "deep"]},
+                "default_target": {"type": "string"}
+              }
+            }
+          },
+          "rendered_mermaid_path": {
+            "type": "string",
+            "description": "★ 이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로 (ADR-008 + ADR-FE-002 정합). drift-validator FE 적용 대상."
+          },
+          "source_files": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "본 머신이 추출된 코드 파일 목록."
+          },
+          "related_components": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "관련 컴포넌트 ID (CMP-XXX) 목록 — ui-spec.json cross-link."
+          },
+          "related_pages": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "관련 페이지 ID (PAGE-XXX) 목록 — ui-spec.json cross-link."
+          },
+          "related_apis": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "관련 API operationId 목록 — openapi.yaml cross-link."
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 0.98
+          },
+          "trust_step": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8,
+            "description": "ADR-009 §2.4.1 신뢰도 단계 (1~8). state-map 행 정합."
+          }
+        }
+      }
+    },
+    "cross_links": {
+      "type": "array",
+      "description": "★ Phase 4.5 cross-link 패턴 정합. state-map ↔ ui-spec / api / rules 의 관계.",
+      "items": {
+        "type": "object",
+        "required": ["from_machine", "to_artifact", "to_id", "link_type"],
+        "properties": {
+          "from_machine": {
+            "type": "string",
+            "description": "본 state-map 의 machine id (FSM-FE-XXX-NNN)."
+          },
+          "to_artifact": {
+            "type": "string",
+            "enum": ["ui-spec", "api", "rules", "domain", "antipatterns"],
+            "description": "참조 산출물 종류."
+          },
+          "to_id": {
+            "type": "string",
+            "description": "참조 대상 ID (예: PAGE-LOGIN-001, operationId, BR-AUTH-001)."
+          },
+          "link_type": {
+            "type": "string",
+            "enum": ["implements", "derives_from", "validates", "triggers", "depends_on"],
+            "description": "관계 유형. implements=BR/UC 구현, derives_from=API 응답에서 파생, validates=form rules 검증, triggers=API 호출 트리거, depends_on=다른 machine 의존."
+          },
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "diagram_files": {
+      "type": "object",
+      "description": "사람 눈 다이어그램 파일 경로 (ADR-008 + ADR-FE-002 정합).",
+      "properties": {
+        "state_overview": {
+          "type": "string",
+          "description": "전체 상태 머신 overview mermaid 파일 경로."
+        },
+        "per_machine_dir": {
+          "type": "string",
+          "description": "machine 별 mermaid 파일 디렉토리."
+        }
+      }
+    },
+    "validation_summary": {
+      "type": "object",
+      "description": "drift-validator FE / cross-validation 검증 요약. ADR-009 §2.4.1 정합.",
+      "properties": {
+        "drift_validator_executed": {"type": "boolean"},
+        "drift_validator_version": {"type": "string"},
+        "drift_count_breaking": {"type": "integer", "minimum": 0},
+        "drift_count_real": {"type": "integer", "minimum": 0, "description": "도구 한계 제외한 진짜 drift."},
+        "drift_count_tool_limitation": {"type": "integer", "minimum": 0},
+        "scxml_export_validated": {
+          "type": "boolean",
+          "description": "XState v5+ SCXML import 시도 통과 여부 (★ 단계 5 진짜 도구 검증)."
+        },
+        "scxml_export_artifact_path": {"type": "string"}
+      }
+    }
+  }
+}

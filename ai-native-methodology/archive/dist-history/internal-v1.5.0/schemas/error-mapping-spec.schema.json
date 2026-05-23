@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/error-mapping-spec.schema.json",
+  "title": "Error Mapping Spec — BE error contract 자동 추출 명세 (★ negative-space evidence + AP-API-001 회귀 도구)",
+  "description": "Deliverable #16 (v1.5.0 신설). BE 도메인 예외 ↔ HTTP status 매핑 contract 자동 추출. ★ ADR-BE-001 negative-space corroboration 정식화 정합. ★ ADR-FE-007 의 positive-space variant. Spring (★ @ControllerAdvice/@ExceptionHandler) + NestJS (★ @Catch ExceptionFilter) 양 framework 지원. ★ 진짜 도구 (Semgrep custom rule + ts-morph carry) 실 실행 의무 (no-simulation 정책 / ADR-009 단계 5).",
+  "x-spec-source": {
+    "rfc_7231": "https://datatracker.ietf.org/doc/html/rfc7231#section-4.2.2",
+    "rfc_9110": "https://datatracker.ietf.org/doc/html/rfc9110#section-15.3",
+    "spring_exceptions": "https://docs.spring.io/spring-framework/reference/web/webmvc/mvc-controller/ann-exceptions.html",
+    "nestjs_exception_filters": "https://docs.nestjs.com/exception-filters",
+    "owasp_api_top10": "https://owasp.org/API-Security/editions/2023/en/0x11-t10/"
+  },
+  "type": "object",
+  "required": ["meta", "scope", "exception_handlers", "http_status_mapping", "negative_evidence", "framework_neutrality_score"],
+  "properties": {
+    "meta": { "$ref": "./meta-confidence.schema.json" },
+    "scope": {
+      "type": "object",
+      "required": ["framework", "modules"],
+      "properties": {
+        "framework": {
+          "type": "string",
+          "enum": ["spring", "spring-hexagonal", "nestjs", "fastapi", "express", "ktor", "other"],
+          "description": "BE framework — 추출 mechanism 분기. spring/spring-hexagonal = @ControllerAdvice / nestjs = @Catch / etc."
+        },
+        "modules": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "분석 대상 모듈 / 패키지 경로 (예: 'module/core/src/main/java/io/zhc1/realworld')."
+        },
+        "controllers_scanned": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "@RestController / @Controller / NestJS @Controller 클래스 개수."
+        },
+        "services_scanned": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "@Service / NestJS Provider 클래스 개수."
+        }
+      }
+    },
+    "exception_handlers": {
+      "type": "array",
+      "description": "★ 발견된 ExceptionHandler / ExceptionFilter 등재. ★ 빈 배열 = ★ negative-space evidence (★ AP-API-001 trigger).",
+      "items": {
+        "type": "object",
+        "required": ["handler_class", "handler_type", "source_file"],
+        "properties": {
+          "handler_class": {
+            "type": "string",
+            "description": "Handler 클래스 FQCN (예: 'GlobalExceptionHandler')."
+          },
+          "handler_type": {
+            "type": "string",
+            "enum": ["controller_advice", "rest_controller_advice", "exception_handler_method", "nestjs_exception_filter", "global_filter", "use_filters"],
+            "description": "Handler 구현 mechanism."
+          },
+          "source_file": {
+            "type": "string",
+            "description": "Source 파일 경로 (relative)."
+          },
+          "source_line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Source 파일의 시작 line."
+          },
+          "exceptions_handled": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "본 handler 가 처리하는 exception 클래스 목록."
+          },
+          "registered_globally": {
+            "type": "boolean",
+            "description": "Spring @ControllerAdvice 또는 NestJS app.useGlobalFilters() 등록 여부."
+          }
+        }
+      }
+    },
+    "http_status_mapping": {
+      "type": "array",
+      "description": "도메인 예외 → HTTP status 매핑 표. 정합성 분석 + AP-API-001 회귀 evidence.",
+      "items": {
+        "type": "object",
+        "required": ["exception_class", "http_status", "mapping_mechanism"],
+        "properties": {
+          "exception_class": {
+            "type": "string",
+            "description": "Exception 클래스 (예: 'IllegalArgumentException', 'NotFoundException')."
+          },
+          "http_status": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 599,
+            "description": "매핑된 HTTP status code."
+          },
+          "mapping_mechanism": {
+            "type": "string",
+            "enum": ["response_status_annotation", "exception_handler_method", "exception_filter", "default_resolver", "response_entity_status", "implicit_default", "throw_unmapped"],
+            "description": "매핑 mechanism. throw_unmapped = ★ ★ AP-API-001 trigger (★ 도메인 예외가 handler 없이 throw)."
+          },
+          "evidence_file": {
+            "type": "string",
+            "description": "Source 파일 경로."
+          },
+          "evidence_line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "rfc_compliance": {
+            "type": "object",
+            "properties": {
+              "compliant": {"type": "boolean"},
+              "rfc_section": {"type": "string", "description": "예: 'RFC 9110 §15.3.5 (DELETE → 204)'."},
+              "violation_note": {"type": "string", "description": "위반 시 설명."}
+            }
+          }
+        },
+        "if": {
+          "properties": {"mapping_mechanism": {"const": "throw_unmapped"}}
+        },
+        "then": {
+          "required": ["evidence_file", "evidence_line", "rfc_compliance"]
+        }
+      }
+    },
+    "decorator_drift": {
+      "type": "array",
+      "description": "★ NestJS-specific. @Post default 201 / @ApiResponse status drift 등 decorator 의 RFC 위반 발견. AP-API-001 mechanism = decorator-drift trigger.",
+      "items": {
+        "type": "object",
+        "required": ["endpoint", "decorator_pattern", "rfc_violation", "evidence_file"],
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "예: 'DELETE /articles/:slug'."
+          },
+          "decorator_pattern": {
+            "type": "string",
+            "enum": ["post_default_201_for_login", "apiresponse_201_for_delete", "apiresponse_201_for_update", "apiresponse_status_mismatch_runtime", "missing_httpcode_explicit"]
+          },
+          "rfc_violation": {
+            "type": "string",
+            "description": "예: 'RFC 9110 §15.3.5 권고 204 / decorator 201 drift'."
+          },
+          "evidence_file": {
+            "type": "string"
+          },
+          "evidence_line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "recommended_fix": {
+            "type": "string",
+            "description": "예: '@HttpCode(204) + @ApiResponse({status: 204})'."
+          }
+        }
+      }
+    },
+    "negative_evidence": {
+      "type": "object",
+      "description": "★ ★ ★ ADR-BE-001 negative-space corroboration 정식 evidence 4종.",
+      "required": ["contract_absent", "negative_effect", "industry_standard", "automatic_regression_capable"],
+      "properties": {
+        "contract_absent": {
+          "type": "object",
+          "required": ["evidence_type", "details"],
+          "properties": {
+            "evidence_type": {
+              "type": "string",
+              "enum": ["grep_zero_hit", "ast_zero_match", "ts_morph_zero_decorator", "manual_review"]
+            },
+            "details": {"type": "string", "description": "예: 'grep -r @ControllerAdvice → 0 hit'."}
+          }
+        },
+        "negative_effect": {
+          "type": "string",
+          "description": "부재의 negative effect (★ ★ unmapped error leak / spec drift / 500 leak 등)."
+        },
+        "industry_standard": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "RFC / OWASP / framework docs 인용 (★ ≥ 1 필수)."
+        },
+        "automatic_regression_capable": {
+          "type": "object",
+          "required": ["tool", "rule_path"],
+          "properties": {
+            "tool": {
+              "type": "string",
+              "enum": ["semgrep_custom_rule", "ts_morph_ast", "spotbugs_extension", "pmd_extension", "codeql_query"]
+            },
+            "rule_path": {
+              "type": "string",
+              "description": "예: 'tools/static-runner/rules/error-mapping-missing.yml'."
+            },
+            "rule_id": {
+              "type": "string",
+              "description": "예: 'internal.be.api.error-mapping-generic-exception-in-service'."
+            }
+          }
+        }
+      }
+    },
+    "framework_neutrality_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "★ ADR-FE-006 IR 4계층 정합 / framework 무관 metric. 0 = framework-coupled / 1 = framework-neutral. error-mapping-spec 본문은 ★ exception_class + http_status + mapping_mechanism axis 로 framework 무관 표준 = 1.0 목표. spring/nestjs 분기는 mechanism enum 으로 흡수."
+    },
+    "ap_links": {
+      "type": "array",
+      "description": "본 spec 이 회귀 / 발견하는 antipattern ID 목록.",
+      "items": {
+        "type": "object",
+        "required": ["ap_id", "linkage_type"],
+        "properties": {
+          "ap_id": {
+            "type": "string",
+            "pattern": "^AP-[A-Z]+-\\d+$"
+          },
+          "linkage_type": {
+            "type": "string",
+            "enum": ["regresses", "discovers", "isomorphic_evidence"]
+          },
+          "adr_link": {
+            "type": "string",
+            "description": "관련 ADR (★ ADR-BE-001 본 ADR 또는 ADR-FE-007 변형)."
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_handlers": {"type": "integer"},
+        "total_throw_unmapped": {"type": "integer", "description": "★ ★ AP-API-001 evidence count."},
+        "total_decorator_drift": {"type": "integer"},
+        "rfc_compliant_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "negative_space_triggered": {"type": "boolean", "description": "★ ★ ADR-BE-001 negative-space corroboration trigger 여부."}
+      }
+    }
+  }
+}

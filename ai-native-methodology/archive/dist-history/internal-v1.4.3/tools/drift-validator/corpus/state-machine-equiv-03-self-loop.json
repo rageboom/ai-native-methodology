@@ -1,0 +1,14 @@
+{
+  "id": "Corpus-Equiv-03-SelfLoop",
+  "initial": "running",
+  "states": {
+    "running": {
+      "type": "compound",
+      "on": {
+        "TICK": "running",
+        "STOP": "stopped"
+      }
+    },
+    "stopped": { "type": "final", "on": {} }
+  }
+}

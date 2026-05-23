@@ -1,0 +1,119 @@
+{
+  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.4.4 PATCH — manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md). 각 phase 에 skills 디렉토리 매핑 명시 (★ skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
+  "id": "phase-flow",
+  "version": "1.4.4",
+  "rendered_mermaid_path": "./phase-flow.mermaid",
+  "phases": [
+    {
+      "id": "0",
+      "name": "입력 정리",
+      "spec_file": "phase-0-input.md",
+      "depends_on": [],
+      "inputs": ["source_code", "erd_optional", "orm_optional", "design_docs_optional"],
+      "outputs": ["_manifest.yml"],
+      "skills": ["phase-0-input"]
+    },
+    {
+      "id": "1",
+      "name": "init",
+      "spec_file": "phase-1-init.md",
+      "depends_on": ["0"],
+      "inputs": ["_manifest.yml"],
+      "outputs": ["inventory.json", "tree.md", "stack-detection.md", "stats.json"],
+      "skills": ["phase-1-inventory"]
+    },
+    {
+      "id": "2",
+      "name": "db",
+      "spec_file": "phase-2-db.md",
+      "depends_on": ["1"],
+      "inputs": ["inventory.json"],
+      "outputs": ["schema.json", "schema.sql", "erd.mermaid", "정합성-검증-보고서.md"],
+      "skills": ["phase-5-schema-erd"]
+    },
+    {
+      "id": "3",
+      "name": "arch",
+      "spec_file": "phase-3-arch.md",
+      "depends_on": ["1", "2"],
+      "inputs": ["inventory.json", "schema.json"],
+      "outputs": ["architecture.json", "architecture.mermaid", "architecture.md", "dependency-graph.mermaid", "circular-dependencies.md"],
+      "skills": ["phase-2-architecture"]
+    },
+    {
+      "id": "4",
+      "name": "비즈니스 로직 (4영역 병렬)",
+      "spec_file": "phase-4-business-logic.md",
+      "depends_on": ["1", "2", "3"],
+      "parallel_areas": ["5.A rules", "5.B domain", "5.C antipatterns-partial", "5.D ui-domain"],
+      "outputs": ["domain.json", "domain.mermaid", "domain.md", "rules.json", "rules.md", "antipatterns-partial.json"],
+      "skills": ["phase-3-domain", "phase-4-rules", "phase-5-form-validation"]
+    },
+    {
+      "id": "4.5",
+      "name": "formal-spec (★ v1.2.0 신설)",
+      "spec_file": "phase-4-5-formal-spec.md",
+      "depends_on": ["4"],
+      "inputs": ["domain.json", "rules.json", "code_evidence"],
+      "outputs": ["state-machines/*.json", "state-machines/*.mermaid", "sequence-diagrams/*.json", "sequence-diagrams/*.mermaid", "decision-tables/*.json", "decision-tables/*.md", "invariants/*.ts", "property-tests/*.spec.ts"],
+      "automated_validation": ["drift-validator", "decision-table-validator"],
+      "introduced": "v1.2.0",
+      "automation_added": "v1.2.1",
+      "skills": ["phase-4-5-cross-validation"]
+    },
+    {
+      "id": "5-1",
+      "name": "api",
+      "spec_file": "phase-5-1-api.md",
+      "depends_on": ["4", "4.5"],
+      "outputs": ["openapi.yaml", "api.md", "api-extension.json"],
+      "skills": ["phase-5-openapi", "phase-5-rules"]
+    },
+    {
+      "id": "5-2",
+      "name": "ui",
+      "spec_file": "phase-5-2-ui.md",
+      "depends_on": ["3", "4"],
+      "outputs": ["ui-spec.json", "ui-spec.md", "ui-spec.mermaid", "state-map.json", "visual-manifest.json", "type-spec.json"],
+      "skills": ["phase-5-state-map", "phase-5-visual-manifest", "phase-5-type-spec"]
+    },
+    {
+      "id": "6",
+      "name": "quality (안티패턴 통합)",
+      "spec_file": "phase-6-quality.md",
+      "depends_on": ["4", "4.5", "5-1", "5-2"],
+      "outputs": ["antipatterns.json", "avoid-list.md", "migration-cautions.md"],
+      "migration_cautions_introduced": "v1.2.0",
+      "skills": ["phase-6-quality"]
+    }
+  ],
+  "cross_cutting": {
+    "findings": {
+      "schema": "schemas/finding-system.schema.json",
+      "location": "findings/poc-findings.md",
+      "applies_to": ["all phases"]
+    },
+    "decisions": {
+      "location": "decisions/",
+      "index": "decisions/INDEX.md",
+      "status_snapshot": "decisions/STATUS.md"
+    },
+    "meta_confidence": {
+      "schema": "schemas/meta-confidence.schema.json",
+      "template": "templates/meta-confidence.template.yaml",
+      "applies_to": ["all phase outputs"],
+      "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
+    },
+    "aspects": {
+      "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
+      "skills": ["aspect-a11y", "aspect-i18n", "aspect-static-security", "aspect-legacy"],
+      "applies_to": ["all phases — FE+BE+DB cross-cutting"]
+    }
+  },
+  "version_milestones": {
+    "v1.2.0": ["Phase 4.5 정식 도입 (묶음 L)", "ADR-008 이중 렌더링", "finding-system schema", "migration-cautions 의무"],
+    "v1.2.1": ["drift-validator + decision-table-validator + static-runner 도구 산출", "drift-check.yml CI", "Phase 4.5 cross_validation 5종 물증 if/then"],
+    "v1.2.2": ["묶음 M-P2-3 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template"],
+    "v1.4.4": ["manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md)", "각 phase 에 skills 매핑 명시", "cross_cutting.aspects 신설 (aspect skill 4종)", "skills-axis.md 명세 신설", "drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제"]
+  }
+}

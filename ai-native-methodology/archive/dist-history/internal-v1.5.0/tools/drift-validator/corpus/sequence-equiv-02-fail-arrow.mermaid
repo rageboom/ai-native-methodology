@@ -1,0 +1,9 @@
+sequenceDiagram
+    actor Client
+    participant Server
+    participant Auth
+
+    Client->>Server: request
+    Server-xAuth: verify (★ fail)
+    Auth-->>Server: 401 unauthorized
+    Server-->>Client: 401

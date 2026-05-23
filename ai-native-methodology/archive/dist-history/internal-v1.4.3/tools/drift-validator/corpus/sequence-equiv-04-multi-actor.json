@@ -1,0 +1,17 @@
+{
+  "id": "Corpus-Equiv-Seq-04-MultiActor",
+  "actors": [
+    {"id": "User", "type": "user"},
+    {"id": "Web", "type": "service"},
+    {"id": "Api", "type": "service"},
+    {"id": "Db", "type": "external"}
+  ],
+  "messages": [
+    {"from": "User", "to": "Web", "label": "click submit", "sync": "sync"},
+    {"from": "Web", "to": "Api", "label": "POST /orders", "sync": "sync"},
+    {"from": "Api", "to": "Db", "label": "INSERT orders", "sync": "sync"},
+    {"from": "Db", "to": "Api", "label": "row id", "sync": "return"},
+    {"from": "Api", "to": "Web", "label": "201 created", "sync": "return"},
+    {"from": "Web", "to": "User", "label": "render confirmation", "sync": "return"}
+  ]
+}

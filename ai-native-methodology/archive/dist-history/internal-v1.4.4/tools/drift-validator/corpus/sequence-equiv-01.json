@@ -1,0 +1,14 @@
+{
+  "uc_id": "Corpus-Equiv-01",
+  "actors": [
+    {"id": "User", "type": "user"},
+    {"id": "API", "type": "controller"},
+    {"id": "DB", "type": "external"}
+  ],
+  "messages": [
+    {"from": "User", "to": "API", "label": "request", "sync": "sync"},
+    {"from": "API", "to": "DB", "label": "query", "sync": "sync"},
+    {"from": "DB", "to": "API", "label": "result", "sync": "return"},
+    {"from": "API", "to": "User", "label": "response", "sync": "return"}
+  ]
+}
