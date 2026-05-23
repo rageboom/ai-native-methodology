@@ -471,9 +471,9 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 009 | **medium** | closed (PATCH) | 4 gate 공통 `chain-intervention-log.jsonl` 영속 강제 (flow gate-1 outputs 이미 명세) |
 > | 010 | **medium** | closed (PATCH) | 기준 PoC README/run-log content-aware sync + release-readiness #14 후보 (PoC 문서 drift) |
 > | 011 | **high** | closed (MINOR) | release_eligibility #2/#6/#7 = "≥2 PoC 모두 chain 4 GREEN 도달" 강화 또는 poc-03 chain 4 실행 / corroboration 명시 제외 (§8.1 자기정합) |
-> | 012 | medium | open (v8.4.0 carry) | severity_distinct_count=1 mask — 모든 AC must → cell critical / SSOT mapping 한계 / F-SIM-002 propagation 가시화 ❌ (v8.14.0 후속 점검 carry) |
+> | 012 | medium | **closed v8.14.4** | severity_distinct_count gauge = F-SIM-002 로 schema+builder 에 이미 존재 (audit signal) / 단일 PoC false-positive (distinct==1 = AC.MoSCoW must 분포 정상값) / hard sentinel scope-out (paradigm 한계 수용) / DEC-2026-05-23-fsim-012-014-close §1 |
 > | 013 | medium | **closed v8.14.0** | Type 1 시뮬레이션 한계 (hook + agent fire 0 / Claude self-run paradigm) — v8.14.0 Type 분류 3계층화 paradigm 본격 흡수 (Type 1 정식 분류 + Type 2 carry 정직 표기 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §1) |
-> | 014 | low | open (v8.4.0 carry) | analysis-form-validation-fe description "FE-only" → Pydantic BE schema validation cover ❌ — skill description scope 확장 후보 (P2 cooling-off 후 별 결단) |
+> | 014 | low | **closed v8.14.4** | analysis-form-validation-fe 의도적 FE 전용 유지 (name -fe / track=FE / Zod·Yup·RHF 대상) + BE schema validation (Pydantic/dataclass/Joi-BE) 별도 future skill 후보 / F-SIM-016 선례 동형 / DEC-2026-05-23-fsim-012-014-close §2 |
 > | 015 | **high** | **closed v8.14.0** | test-spec.fail_mode schema 미허용 / F-SIM-005 P1 carry 즉시 영향 — v8.14.0 fail_mode enum 4종 (compile_import_fail/assertion_fail/dry_run_placeholder/pending) 추가 + chain-coverage-validator validateFailModeDistribution 7번째 export (warn-only / boolean 강제) 본격 흡수 / DEC-2026-05-23-fsim-005-corroboration-2-genuine §3 |
 > | 016 | low | **closed v8.14.3** | static-runner Semgrep wrapper deprecated / Windows MSYS2 환경 fire ❌ — v8.14.3 본격 흡수 (R19 Tier 2 안 environment-dependent risk sub-axis 본격 명시 / Tier 3 격상 ❌ paradigm 정합 / memory `feedback_environment_dependent_tools_scope_out` 본격 신설 / DEC-2026-05-23-fsim-016-environment-dependent-scope-out §1) |
 >
