@@ -9,6 +9,68 @@
 
 ---
 
+## [8.11.0] — 2026-05-23 MINOR — chain-coverage-validator validateRisksForm lane (Senior REVISE-1 carry 종결)
+
+> v8.10.0 carry "C-risks-string-form-warn-v811" 종결. v8.10.0 §3 D2 Senior REVISE-1 흡수 — chain-coverage-validator forward lane 신설로 silent omission 결정적 차단. additive only / breaking 0.
+
+### 신규 자산
+
+- **`validateRisksForm(planning)` 함수** (`tools/chain-coverage-validator/src/validator.js`)
+  - 5번째 export function (validateChainCoverage + validateCrossRefPaths + validateAntipatternCoverage + validateConfidenceCoverage 다음)
+  - risks_and_constraints items 안 string form 검출 시 `chain.planning.risks_string_form_warn` finding emit (severity: low)
+  - 정보: `string_count` + `object_count` + `affected_indices` + `total_count`
+  - message: "legacy carry 한정 (v8.10.0+ object form 권장) / severity 결정적 추출 가능 + drift attractor 차단 본질 / Senior REVISE-1 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4)"
+- **CLI wire** (`src/cli.js`)
+  - `validateRisksForm` import + `--json` output 안 `risks_form` 키 추가 + 사람-친화 출력 (`[risks-form] string=N / object=M / total=K`)
+  - severity: low = blocking ❌ (warning만 / chain coverage gate 종결 차단 ❌)
+- **test 4종 신설** (`test/validator.test.js`)
+  - all-string form → low finding emit
+  - all-object form → no finding (신규 paradigm 정합)
+  - mixed string + object → low finding emit + count 정확
+  - empty/missing field → graceful (no finding)
+
+### 실측 PoC 분포 (v8.11.0 검출)
+
+| PoC | string | object | 분류 |
+|---|---|---|---|
+| poc-03-realworld-nestjs | 2 | 0 | legacy carry |
+| poc-04-mini-realworld-react | 2 | 0 | legacy carry |
+| poc-05-sample-user-register | 2 | 0 | legacy carry |
+| poc-06-efiweb-exchange-spring41 | 6 | 0 | legacy carry |
+| poc-07-efiweb-capital-spring41 | 6 | 0 | legacy carry |
+| poc-08-realworld-mybatis | 0 | 8 | object form ✅ |
+| poc-09-realworld-typeorm-rawsql | 0 | 4 | object form ✅ |
+| poc-10-realworld-jpa-querydsl | 0 | 2 | object form ✅ |
+| poc-11-efiweb-billing-spring41 | 0 | 14 | object form ✅ (v8.10.0 정합) |
+
+총 string=18 (5 PoC 영구 carry / legacy 산출물) / object=28 (4 PoC).
+
+### 자산 갱신
+
+- `plugin.json` 8.10.0 → 8.11.0 + `package.json` 8.10.0 → 8.11.0 (3-way sync)
+- `chain-coverage-validator/package.json` 0.1.0 → 0.2.0 (workspace MINOR)
+- DEC-2026-05-23-risks-string-form-warn + INDEX 최상단 + STATUS session 34차
+
+### 검증 — STOP-3 hard gate
+
+- chain-coverage-validator test **30/30 pass** ✅ (신규 4 + 기존 26)
+- release-readiness 15/16 ready (1 carry 보존 — xmllint env absent)
+- breaking 0 = MINOR (additive — validate function + CLI flag + test 4)
+
+### carry (다음 session)
+
+- **C-xmllint-env-absent** (v8.9.0+v8.10.0 carry 보존) — sql-inventory-validator iBATIS test #25+#26 / Linux/Mac libxml2 환경 의무
+- **C-operation-md-work-folder** (v8.9.0 carry 보존) — work/dep-graph/operation.md git tracked 아님 / docs/ 흡수 후보
+- **C-legacy-risks-poc-migration** (medium 신설) — string form 5 PoC (poc-03/04-mini/05/06/07) object form 마이그레이션 — 별도 session / 정보 손실 risk 평가 의무 / 사용자 결단
+
+### 참고
+
+- DEC-2026-05-23-risks-string-form-warn
+- v8.10.0 §3 D2 Senior REVISE-1 carry 종결
+- DEC-2026-05-23-analysis-validator-poc06-11-resolve §8 차기 session carry C-risks-string-form-warn-v811
+
+---
+
 ## [8.10.0] — 2026-05-23 MINOR — planning-spec schema 진화 (5 enum + polymorphic risks + derivation_source 2 properties / 6 PoC analysis_validator carry 해소)
 
 > v8.9.0 carry "C-analysis-validator-poc06-10-placeholder" 종결. 사용자 결단 "추천안 묶음 전체 시행 (Senior REVISE-1 포함)" (2026-05-23 / D1~D6 6건 묶음). Senior critique GO @ 0.87 + REVISE-1 (D2 severity required + $comment legacy-carry warning + chain-coverage-validator risks_string_form_warn lane v8.11.0 carry) 흡수.

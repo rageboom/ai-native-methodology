@@ -260,6 +260,49 @@ export function validateAntipatternCoverage({ antipatterns, acceptanceCriteria, 
   };
 }
 
+// ★ v8.11.0 — risks_and_constraints string form (legacy carry) warn lane.
+// Senior REVISE-1 흡수 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4) — schemas/planning-spec.schema.json
+// 안 risks_and_constraints items polymorphic anyOf[string, object] 도입 후 string 분기 = legacy carry 한정 의무.
+// 신규 PoC = object form (id + severity required + description + type?) 권장 (severity 결정적 추출 + drift attractor 차단).
+// 본 함수 = string form 검출 시 low finding emit (silent omission 회피 / chain-coverage gate #2 추가 lane).
+export function validateRisksForm(planning) {
+  const findings = [];
+  const risks = Array.isArray(planning?.risks_and_constraints) ? planning.risks_and_constraints : [];
+  let stringCount = 0;
+  let objectCount = 0;
+  const stringIndices = [];
+
+  risks.forEach((item, idx) => {
+    if (typeof item === 'string') {
+      stringCount++;
+      stringIndices.push(idx);
+    } else if (item !== null && typeof item === 'object') {
+      objectCount++;
+    }
+  });
+
+  if (stringCount > 0) {
+    findings.push({
+      kind: 'chain.planning.risks_string_form_warn',
+      severity: 'low',
+      string_count: stringCount,
+      object_count: objectCount,
+      affected_indices: stringIndices,
+      message: `risks_and_constraints 안 string form ${stringCount} item — legacy carry 한정 (v8.10.0+ object form 권장). object form = {id, severity (enum critical|high|medium|low), description, type?} / severity 결정적 추출 가능 + drift attractor 차단 본질. Senior REVISE-1 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4).`
+    });
+  }
+
+  return {
+    findings,
+    summary: {
+      total_findings: findings.length,
+      string_count: stringCount,
+      object_count: objectCount,
+      total_count: risks.length
+    }
+  };
+}
+
 // ★ dep-graph operation.md (수정·신설 파일 표: "confidence 인지") — artifact-graph confidence-aware 검증.
 // graph-integrity-validator 의 orphan(엣지 0)과 비중복: 본 검사는 "hard 엣지로 chain 에 연결돼야 할 노드가
 // soft 엣지로만 연결된 경우(hard-disconnected)"를 잡는다. soft ref(analysis↔chain)는 있지만 hard chain

@@ -5,7 +5,7 @@
 //   default: warn-mode (broken-path = medium / non-blocking) — F-MB-009 LL-i-55 함정존 회피
 //   --strict-paths: broken-path = high / blocking — release-readiness #14 baseline ratchet 진입 후 v+1 default 전환
 
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, loadJson } from './validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, loadJson } from './validator.js';
 import { dirname } from 'node:path';
 
 function parseArgs(argv) {
@@ -52,6 +52,9 @@ const result = validateChainCoverage(planning, behavior, acceptance, args.thresh
 // ★ F-SIM-001: antipattern coverage lane (SonarQube/CodeQL/Snyk industry-aligned)
 const apResult = validateAntipatternCoverage({ antipatterns, acceptanceCriteria: acceptance, planning });
 
+// ★ v8.11.0: risks_and_constraints string form (legacy carry) warn lane (Senior REVISE-1)
+const risksFormResult = validateRisksForm(planning);
+
 // ★ F-SIM-003: cross-ref path resolve (separate validation pass)
 let pathResult = { findings: [], summary: { total_findings: 0, broken_path_count: 0, path_convention_warning_count: 0, strict_mode: args.strictPaths } };
 if (args.planning || args.behavior) {
@@ -66,7 +69,7 @@ if (args.planning || args.behavior) {
 }
 
 if (args.json) {
-  console.log(JSON.stringify({ coverage: result, cross_refs: pathResult, antipattern_coverage: apResult }, null, 2));
+  console.log(JSON.stringify({ coverage: result, cross_refs: pathResult, antipattern_coverage: apResult, risks_form: risksFormResult }, null, 2));
 } else {
   console.log(`[chain-coverage-validator] ${result.summary.total_findings} coverage findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);
   console.log(`coverage UC→BHV: ${(result.coverage.uc_to_bhv * 100).toFixed(1)}% / BHV→AC: ${(result.coverage.bhv_to_ac * 100).toFixed(1)}% (threshold ${args.threshold})`);
@@ -82,6 +85,12 @@ if (args.json) {
   if (apResult.summary.ap_input_missing === false) {
     console.log(`[ap-coverage] severe AP=${apResult.summary.severe_ap_count} / uncovered=${apResult.summary.uncovered_severe_count} (F-SIM-001 / industry-aligned SonarQube+CodeQL+Snyk)`);
     for (const f of apResult.findings) {
+      console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
+    }
+  }
+  if (risksFormResult.summary.string_count > 0) {
+    console.log(`[risks-form] string=${risksFormResult.summary.string_count} / object=${risksFormResult.summary.object_count} / total=${risksFormResult.summary.total_count} (★ v8.11.0 / Senior REVISE-1 legacy carry warn lane)`);
+    for (const f of risksFormResult.findings) {
       console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
     }
   }

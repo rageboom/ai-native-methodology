@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage } from '../src/validator.js';
+import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm } from '../src/validator.js';
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -201,6 +201,56 @@ describe('chain-coverage-validator', () => {
       const r = validateAntipatternCoverage({ antipatterns: null, acceptanceCriteria: { criteria: [] }, planning: {} });
       assert.equal(r.summary.ap_input_missing, true);
       assert.equal(r.findings.length, 0);
+    });
+  });
+
+  // ★ v8.11.0 — Senior REVISE-1 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4)
+  describe('v8.11.0 validateRisksForm — string form legacy carry warn lane', () => {
+    it('all-string form → low finding emit (legacy carry warn)', () => {
+      const planning = { risks_and_constraints: ['risk A', 'risk B', 'risk C'] };
+      const r = validateRisksForm(planning);
+      assert.equal(r.findings.length, 1);
+      assert.equal(r.findings[0].kind, 'chain.planning.risks_string_form_warn');
+      assert.equal(r.findings[0].severity, 'low');
+      assert.equal(r.summary.string_count, 3);
+      assert.equal(r.summary.object_count, 0);
+      assert.equal(r.summary.total_count, 3);
+      assert.deepEqual(r.findings[0].affected_indices, [0, 1, 2]);
+    });
+
+    it('all-object form → no finding (신규 paradigm 정합)', () => {
+      const planning = {
+        risks_and_constraints: [
+          { id: 'R-001', severity: 'critical', description: 'risk A', type: 'security' },
+          { id: 'R-002', severity: 'high', description: 'risk B', type: 'performance' }
+        ]
+      };
+      const r = validateRisksForm(planning);
+      assert.equal(r.findings.length, 0);
+      assert.equal(r.summary.string_count, 0);
+      assert.equal(r.summary.object_count, 2);
+    });
+
+    it('mixed string + object → low finding emit + 양측 count 정확', () => {
+      const planning = {
+        risks_and_constraints: [
+          'legacy risk A',
+          { id: 'R-001', severity: 'medium', description: 'new risk' },
+          'legacy risk B'
+        ]
+      };
+      const r = validateRisksForm(planning);
+      assert.equal(r.findings.length, 1);
+      assert.equal(r.findings[0].string_count, 2);
+      assert.equal(r.findings[0].object_count, 1);
+      assert.deepEqual(r.findings[0].affected_indices, [0, 2]);
+    });
+
+    it('empty / missing field → no finding (graceful)', () => {
+      assert.equal(validateRisksForm({}).findings.length, 0);
+      assert.equal(validateRisksForm({ risks_and_constraints: [] }).findings.length, 0);
+      assert.equal(validateRisksForm(null).findings.length, 0);
+      assert.equal(validateRisksForm(undefined).findings.length, 0);
     });
   });
 });
