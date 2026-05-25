@@ -26,7 +26,7 @@ OUTPUT chain (★ v9.0 6-stage / planning→discovery 개칭 + plan 신설 / DEC
 USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 ```
 
-**SDLC 4단계 chain harness** ¹ (DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-sub-plan-5-종결 + DEC-2026-05-06-sub-plan-6-종결 + ADR-CHAIN-001~005). round-trip = ★ ★ chain harness gate 안에서 정식 허용. harness 외부 자동 코드 생성 ❌.
+**SDLC 5단계 chain harness** ¹ (★ v10.0.0 / discovery → spec → plan → test → impl / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-21-chain-discovery-plan-stage-도입 + DEC-2026-05-25-axis-a-phase-4-4-prime + ADR-CHAIN-001~005). round-trip = ★ ★ chain harness gate 안에서 정식 허용. harness 외부 자동 코드 생성 ❌. ★ chain N = gate #N 1:1 INTERNAL CONVENTION.
 
 > ¹ ★ ★ ★ ★ ★ **호칭 전환 + paradigm 진화 사실** (역사 기록 보존):
 > - sub-plan-1~4 = `chain harness scaffolding` (부품 / v2.0).

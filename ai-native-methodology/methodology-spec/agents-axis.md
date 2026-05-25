@@ -78,7 +78,7 @@ v2.5.1 PATCH 시점 agent 자산이 _base 3종만 인 사실 = ★ ★ chain sta
 - [`skills-axis.md`](./skills-axis.md) — skills 영역 axis 사상 명세 (v2.5.1 PATCH category prefix paradigm 정합)
 - [`lifecycle-contract.md`](./lifecycle-contract.md) — SDLC stage 간 data contract
 - [`../README.md`](../README.md) — plugin user 진입점 (시나리오 A/B/C)
-- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (stages + revisit_edges + 4 gate)
+- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (★ v10.0.0 6 stage / stages + revisit_edges + 5 gate / chain N = gate #N 1:1 INTERNAL CONVENTION)
 - ADR-CHAIN-001~005 — chain harness 5 요소 enforcement 명세
 - ADR-CHAIN-011 §9 LL-i-48+49 — Claude Code plugin 표준 1-depth vs lifecycle organize 충돌 해소 paradigm
 - DEC-2026-05-14-agents-skills-1-depth-flatten — 본 paradigm 결단 record

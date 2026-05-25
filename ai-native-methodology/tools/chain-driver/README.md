@@ -23,7 +23,7 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 - `<project-dir>/.aimd/state.json` — chain harness state (★ schema/state.schema.json 정합)
 - `<project-dir>/.aimd/output/**` — chain stage 산출물
 - `<project-dir>/.aimd/intervention-log.jsonl` — 사용자 결단 로그
-- `flows/sdlc-4stage-flow.json` — stage 순서 + 4 gate SSOT
+- `flows/sdlc-4stage-flow.json` — stage 순서 + 5 gate SSOT (★ v10.0.0 / chain N = gate #N 1:1)
 
 ## Outputs
 
@@ -43,13 +43,14 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 | 3 | usage-error |
 | 4 | state-corrupt |
 
-## Sibling tools (gate validator 4종)
+## Sibling tools (gate validator 5종 / ★ v10.0.0)
 
 chain-driver `next` 진입 시 자동 호출:
-- chain 1 → [`../planning-extraction-validator/`](../planning-extraction-validator/) (gate #1)
-- chain 2 → [`../chain-coverage-validator/`](../chain-coverage-validator/) (gate #2)
-- chain 3 → [`../spec-test-link-validator/`](../spec-test-link-validator/) (gate #3)
-- chain 4 → [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #4)
+- chain 1 (discovery) → [`../planning-extraction-validator/`](../planning-extraction-validator/) (gate #1)
+- chain 2 (spec) → [`../chain-coverage-validator/`](../chain-coverage-validator/) (gate #2)
+- chain 3 (plan) → [`../plan-coverage-validator/`](../plan-coverage-validator/) (gate #3 / ★ v10.0.0 신규 hard gate)
+- chain 4 (test) → [`../spec-test-link-validator/`](../spec-test-link-validator/) + [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #4 / RED 의무)
+- chain 5 (implement) → [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #5 / GREEN 의무)
 
 ## 5 요소 enforcement (★ ★ ★ ADR-CHAIN-005)
 
@@ -76,4 +77,4 @@ npm test --workspace=tools/chain-driver       # 60 unit test + 8 chaos test = 68
 - DEC-2026-05-06-sub-plan-6-종결 §sp6-c8 — chaos test (CAS race detection + JSONL concurrency + interrupted mid-stage recovery)
 - [`../../hooks/README.md`](../../hooks/README.md) — hooks 진입 + chain-driver 호출 cadence
 - [`../../schemas/state.schema.json`](../../schemas/state.schema.json) — state 영속 schema
-- [`../../flows/sdlc-4stage-flow.json`](../../flows/sdlc-4stage-flow.json) — stage 순서 + 4 gate SSOT
+- [`../../flows/sdlc-4stage-flow.json`](../../flows/sdlc-4stage-flow.json) — stage 순서 + 5 gate SSOT (★ v10.0.0 / chain N = gate #N 1:1)

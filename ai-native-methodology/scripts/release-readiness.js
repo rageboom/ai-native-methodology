@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 13/13 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 20/20 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상 + v10.0.0 Phase 4-4' 3 criterion 격상).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
@@ -825,6 +825,105 @@ function check17_marketplaceStageSync() {
   };
 }
 
+// ★ ★ ★ ★ v10.0.0 Phase 4-4' 신설 (3 criterion / DEC-2026-05-25-axis-a-phase-4-4-prime).
+// gate 번호 재정렬 paradigm (chain N = gate #N 1:1 INTERNAL CONVENTION) 의 enforcement 자격.
+function check18_gateEnumConsistency() {
+  // stage-graph.js getGateForStage 결과 set = state.schema.json gate.id enum set
+  try {
+    const stageGraphPath = join(ROOT, 'tools/chain-driver/src/stage-graph.js');
+    const stateSchemaPath = join(ROOT, 'schemas/state.schema.json');
+    const src = readFileSync(stageGraphPath, 'utf-8');
+    // map { discovery:'#1', ... } 패턴 추출 (정규 식)
+    const mapMatch = src.match(/const\s+map\s*=\s*\{([^}]+)\}/);
+    if (!mapMatch) {
+      return { id: 'gate_enum_consistency', pass: false, detail: 'stage-graph.js map 패턴 미발견' };
+    }
+    const fromGraph = new Set();
+    // key 가 unquoted JS identifier ({ discovery: '#1', ... }) 또는 quoted ('discovery': '#1') 모두 정합.
+    const entryRegex = /['"]?([a-z]+)['"]?\s*:\s*['"](#[a-zA-Z0-9]+)['"]/g;
+    let m;
+    while ((m = entryRegex.exec(mapMatch[1])) !== null) fromGraph.add(m[2]);
+
+    const schema = JSON.parse(readFileSync(stateSchemaPath, 'utf-8'));
+    const lastGate = schema?.properties?.last_gate;
+    const enumRaw =
+      lastGate?.properties?.id?.enum ??
+      (lastGate?.anyOf?.flatMap((b) => b?.properties?.id?.enum ?? []) ?? []);
+    const fromSchema = new Set(enumRaw);
+
+    const diffAtoB = [...fromGraph].filter((x) => !fromSchema.has(x));
+    const diffBtoA = [...fromSchema].filter((x) => !fromGraph.has(x));
+    const pass = diffAtoB.length === 0 && diffBtoA.length === 0;
+    return {
+      id: 'gate_enum_consistency',
+      pass,
+      detail: pass
+        ? `gate enum 정합 ✅ (stage-graph = state.schema = {${[...fromGraph].sort().join(',')}})`
+        : `drift: graph-only=[${diffAtoB.join(',')}] / schema-only=[${diffBtoA.join(',')}]`,
+      delegated_to: 'tools/chain-driver/src/stage-graph.js ↔ schemas/state.schema.json (Phase 4-4\' v10.0.0 chain N = gate #N 1:1)',
+    };
+  } catch (e) {
+    return { id: 'gate_enum_consistency', pass: false, detail: `error: ${e.message}` };
+  }
+}
+
+function check19_legacy4StageExpressionAbsent() {
+  // ★ user-facing 4 file (CLAUDE.md / README.md / methodology-spec/agents-axis / chain-driver/README) 안 "chain 4단계" / "4 gate" prose 잔존 ❌
+  const FILES = [
+    join(ROOT, '..', 'CLAUDE.md'), // project root CLAUDE.md
+    join(ROOT, 'README.md'),
+    join(ROOT, 'methodology-spec/agents-axis.md'),
+    join(ROOT, 'tools/chain-driver/README.md'),
+  ];
+  const PATTERNS = [/chain\s*harness\s*4\b/i, /chain\s*4단계/, /\b4\s*gate\b/i, /\bSDLC\s*4단계/];
+  const violations = [];
+  for (const f of FILES) {
+    if (!existsSync(f)) continue;
+    const text = readFileSync(f, 'utf-8');
+    for (const p of PATTERNS) {
+      if (p.test(text)) violations.push(`${f.split(/[/\\]/).slice(-2).join('/')}: ${p}`);
+    }
+  }
+  return {
+    id: 'legacy_4_stage_expression_absent',
+    pass: violations.length === 0,
+    detail: violations.length === 0
+      ? `user-facing 4 file 안 "chain 4단계" / "4 gate" 표현 잔존 ❌ ✅`
+      : `drift: ${violations.join(' / ')}`,
+    delegated_to: 'CLAUDE.md + README + methodology-spec/agents-axis + chain-driver/README (Phase 4-4\' v10.0.0 5단계 paradigm)',
+  };
+}
+
+function check20_planGateOperational() {
+  // plan gate 본격 작동 — requiredValidators('plan').length > 0 + sdlc-4stage-flow stages[plan].gate == '#3'
+  try {
+    const flowPath = join(ROOT, 'flows/sdlc-4stage-flow.json');
+    const flow = JSON.parse(readFileSync(flowPath, 'utf-8'));
+    const planStage = (flow.stages || []).find((s) => s.id === 'plan');
+    if (!planStage) {
+      return { id: 'plan_gate_operational', pass: false, detail: 'sdlc-4stage-flow.json stages[].plan 부재' };
+    }
+    if (planStage.gate !== '#3') {
+      return { id: 'plan_gate_operational', pass: false, detail: `plan stage gate = ${planStage.gate} (expected '#3')` };
+    }
+    const planGate = (flow.gates || []).find((g) => g.id === '#3' && g.stage === 'plan');
+    if (!planGate) {
+      return { id: 'plan_gate_operational', pass: false, detail: 'gates[].{id=#3,stage=plan} 부재' };
+    }
+    if (!Array.isArray(planGate.validators) || planGate.validators.length === 0) {
+      return { id: 'plan_gate_operational', pass: false, detail: 'gates[#3].validators empty' };
+    }
+    return {
+      id: 'plan_gate_operational',
+      pass: true,
+      detail: `plan stage gate=#3 + validators=[${planGate.validators.join(',')}] ✅`,
+      delegated_to: 'flows/sdlc-4stage-flow.json (Phase 4-4\' v10.0.0 hard gate #3 본격 진입)',
+    };
+  } catch (e) {
+    return { id: 'plan_gate_operational', pass: false, detail: `error: ${e.message}` };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -847,6 +946,9 @@ function main() {
     check15_graphIntegrity(),
     check16_codePointerCoverage(args),
     check17_marketplaceStageSync(),
+    check18_gateEnumConsistency(),
+    check19_legacy4StageExpressionAbsent(),
+    check20_planGateOperational(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;
