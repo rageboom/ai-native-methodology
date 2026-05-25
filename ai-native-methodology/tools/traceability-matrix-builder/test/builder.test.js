@@ -59,6 +59,42 @@ describe('traceability-matrix-builder', () => {
     assert.equal(m.coverage_summary.severity_floor.high, 0.95);
   });
 
+  // ★ v9.2.0 (DEC-2026-05-25-axis-a-phase-4-3) — TASK layer (chain 3 plan) additive
+  describe('TASK layer (chain 3 plan / DEC-2026-05-25-axis-a-phase-4-3)', () => {
+    it('★ v9.2.0: backward compat — taskPlan 부재 시 cell.task_id 부재 (회귀 0)', () => {
+      const m = buildMatrix(fullChain);
+      assert.equal(m.matrix[0].task_id, undefined);
+      assert.equal(m.do_not_edit_manually, true);
+    });
+
+    it('★ v9.2.0: taskPlan 입력 시 cell.task_id 채움 (AC→TASK→TC paradigm 정합)', () => {
+      const chain = {
+        ...fullChain,
+        taskPlan: {
+          tasks: [
+            { id: 'TASK-USER-001', ac_refs: ['AC-USER-001'], behavior_ref: 'BHV-USER-001', execution_order: 1 }
+          ]
+        }
+      };
+      const m = buildMatrix(chain);
+      assert.equal(m.matrix[0].task_id, 'TASK-USER-001');
+      assert.ok(m.derived_from.includes('task-plan.json'));
+    });
+
+    it('★ v9.2.0: taskPlan 입력 + yellow cell (impl missing) 시 task_id 채움 (★ Senior risk #4 / additive only / 기존 ratchet 분모 미영향)', () => {
+      const chain = {
+        ...fullChain,
+        implSpec: { modules: [] },
+        taskPlan: {
+          tasks: [{ id: 'TASK-USER-001', ac_refs: ['AC-USER-001'], behavior_ref: 'BHV-USER-001', execution_order: 1 }]
+        }
+      };
+      const m = buildMatrix(chain);
+      assert.equal(m.matrix[0].status, 'yellow');
+      assert.equal(m.matrix[0].task_id, 'TASK-USER-001');
+    });
+  });
+
   // ★ F-SIM-002 — severity max-propagation tests
   describe('F-SIM-002 severity max-propagation', () => {
     it('preserves backwards compat: empty BR/AP → AC.MoSCoW only (must=critical)', () => {

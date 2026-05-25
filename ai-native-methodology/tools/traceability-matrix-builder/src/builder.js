@@ -61,11 +61,21 @@ export function buildMatrix(chain) {
   // ★ F-SIM-002/004 analysis inputs (optional / backwards compat)
   const businessRules = chain.businessRules ?? null;
   const antipatterns = chain.antipatterns ?? null;
+  // ★ v9.2.0 (DEC-2026-05-25-axis-a-phase-4-3) — chain 3 (plan) TASK layer input (optional / backwards compat / Senior risk #4 흡수)
+  const taskPlan = chain.taskPlan ?? null;
 
   const brById = new Map();
   for (const br of businessRules?.business_rules ?? []) brById.set(br.id, br);
   const apById = new Map();
   for (const ap of antipatterns?.antipatterns ?? []) apById.set(ap.id, ap);
+  // ★ v9.2.0 TASK layer index — taskByAC = Map<ac_id, task_id> (chain 3 / plan stage)
+  const taskByAC = new Map();
+  for (const task of taskPlan?.tasks ?? []) {
+    for (const acRef of task.ac_refs ?? []) {
+      // 1 AC = 1 task 우선 (1~3 AC 묶음 paradigm / first-match — DEC-2026-05-21 §정책4)
+      if (!taskByAC.has(acRef)) taskByAC.set(acRef, task.id);
+    }
+  }
 
   // index map
   const acByBHV = new Map();
@@ -118,29 +128,35 @@ export function buildMatrix(chain) {
       }
       for (const ac of acs) {
         const propagated = cellSeverityFor({ behavior: b, ac });
+        // ★ v9.2.0 TASK layer — ac.id 매핑 시 task_id 채움 (★ Senior risk #4 흡수 / additive only / task-plan 부재 시 undefined)
+        const taskId = taskByAC.get(ac.id);
         const tcs = tcByAC.get(ac.id) ?? [];
         if (tcs.length === 0) {
-          matrix.push({
+          const cell = {
             use_case_id: ucRef, behavior_id: b.id, acceptance_id: ac.id,
             business_rule_ids: propagated.business_rule_ids,
             antipattern_ids: propagated.antipattern_ids,
             status: ac.verifiable ? 'red' : 'yellow',
             severity: propagated.severity,
             gaps: ['No TC linked']
-          });
+          };
+          if (taskId) cell.task_id = taskId;
+          matrix.push(cell);
           continue;
         }
         for (const tc of tcs) {
           const impls = implByTC.get(tc.id) ?? [];
           if (impls.length === 0) {
-            matrix.push({
+            const cell = {
               use_case_id: ucRef, behavior_id: b.id, acceptance_id: ac.id, test_id: tc.id,
               business_rule_ids: propagated.business_rule_ids,
               antipattern_ids: propagated.antipattern_ids,
               status: 'yellow',
               severity: propagated.severity,
               gaps: ['No IMPL linked (chain 4 not done)']
-            });
+            };
+            if (taskId) cell.task_id = taskId;
+            matrix.push(cell);
             continue;
           }
           for (const impl of impls) {
@@ -152,6 +168,7 @@ export function buildMatrix(chain) {
               status: 'green',
               severity: propagated.severity,
             };
+            if (taskId) cell.task_id = taskId;
             if (impl.commit_hash) cell.impl_commit_hash = impl.commit_hash;
             matrix.push(cell);
           }
@@ -177,6 +194,8 @@ export function buildMatrix(chain) {
       // F-SIM-002/004 optional analysis inputs
       ...(businessRules ? ['business-rules.json'] : []),
       ...(antipatterns ? ['antipatterns.json'] : []),
+      // ★ v9.2.0 TASK layer optional input (DEC-2026-05-25-axis-a-phase-4-3)
+      ...(taskPlan ? ['task-plan.json'] : []),
     ],
     do_not_edit_manually: true,
     matrix,
