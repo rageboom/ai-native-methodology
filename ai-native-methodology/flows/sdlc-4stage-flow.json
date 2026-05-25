@@ -60,14 +60,13 @@
     },
     {
       "id": "plan",
-      "name": "Plan (chain 3 / HOW — placeholder)",
+      "name": "Plan (chain 3 / HOW)",
       "chain": 3,
       "depends_on": ["spec"],
       "sub_flow": "plan.phase-flow.json",
-      "outputs_summary": ["plan-spec (task 분해 / 의존성 / ADR / NFR allocation / risk / rollback) — ★ placeholder / plan-agent 본격 구현 시 산출"],
-      "introduced": "★ v9.0 신설 (spec ↔ test 사이 HOW 단계 / DEC-2026-05-21 / plan-agent placeholder)",
-      "gate": null,
-      "gate_deferred": "plan hard gate = plan-agent 본격 구현 시 추가 (DEC-2026-05-23-discovery-stage-v9 / 현재 placeholder)",
+      "outputs_summary": ["task-plan.json (deliverable 22 / task 분해 + 의존성 + ADR + NFR allocation + risk + rollback)", "task-plan.md"],
+      "introduced": "★ v9.0 신설 (spec ↔ test 사이 HOW 단계 / DEC-2026-05-21) — ★ v10.0.0 MAJOR (Phase 4-4') hard gate #3 본격 진입 (v9.3.0 placeholder → 본격)",
+      "gate": "#3",
       "user_review_pct": "≤ 20",
       "ai_automation_pct": "≥ 80"
     },
@@ -79,7 +78,7 @@
       "sub_flow": "test.phase-flow.json",
       "outputs_summary": ["test-spec.json (deliverable 20)", "실 test 코드", "5종 물증 7 필드"],
       "introduced": "v2.0",
-      "gate": "#3",
+      "gate": "#4",
       "user_review_pct": "≤ 15",
       "ai_automation_pct": "≥ 85",
       "expected_outcome": "all_fail"
@@ -92,7 +91,7 @@
       "sub_flow": "implement.phase-flow.json",
       "outputs_summary": ["impl-spec.json (deliverable 21)", "실 impl 코드 + commit_hash", "test_pass_evidence (fail_count: 0)", "traceability-matrix.{json,md,mermaid}"],
       "introduced": "v2.0",
-      "gate": "#4",
+      "gate": "#5",
       "user_review_pct": "≤ 15",
       "ai_automation_pct": "≥ 85",
       "expected_outcome": "all_pass",
@@ -105,6 +104,7 @@
     { "from": "plan",      "to": "spec",      "trigger": "revisit:spec"      },
     { "from": "test",      "to": "plan",      "trigger": "revisit:plan"      },
     { "from": "implement", "to": "test",      "trigger": "revisit:test"      },
+    { "from": "implement", "to": "plan",      "trigger": "revisit:plan"      },
     { "from": "implement", "to": "spec",      "trigger": "revisit:spec"      },
     { "from": "implement", "to": "discovery", "trigger": "revisit:discovery" },
     { "from": "implement", "to": "analysis",  "trigger": "revisit:analysis (★ rare / 가장 큰 cycle)" }
@@ -124,12 +124,18 @@
     },
     {
       "id": "#3",
+      "stage": "plan",
+      "validators": ["plan-coverage-validator", "schema-validator"],
+      "skill": "skills/_base-invoke-go-stop-gate"
+    },
+    {
+      "id": "#4",
       "stage": "test",
       "validators": ["test-impl-pass-validator (expected: all_fail)", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
-      "id": "#4",
+      "id": "#5",
       "stage": "implement",
       "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
       "skill": "skills/_base-invoke-go-stop-gate"
