@@ -800,3 +800,91 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 
 - 상세 (per-finding spec gap + proposed fix + evidence) = `.claude/plans/audit-skill-l3-report.md` §3 canonical list + `.claude/plans/D-senior-conscience.md` T5 (full table).
 - 본 ledger 위 표 = SSOT 인덱스. 시행 시 각 finding 별 본 ledger 에 정식 block 추가 (resolved/deferred 처분 시).
+
+---
+
+## Body Finding Ledger — F-CHA namespace (chain-harness structural deep-dive audit)
+
+> 출처: 2026-05-25 session 45차 chain harness deep-dive 점검 (사용자 "현재 플로우를 점검해 보고 싶다 — 처음부터 끝까지 어떤 플로우인지 간단히 설명해줘" → "chain harness 가 뭔가. 이거 게이트가 1 4 밖에 없나?" → "다 깊게 봐봐" → ★ ★ ★ ★ ★ "plan 도 게이트 있어야 되는 거 아냐?"). 3 Explore sub-agent 병렬 dispatch (gate validator deep-dive / revisit edges deep-dive / plan stage placeholder deep-dive). plan 파일 SSOT = `.claude/plans/recursive-nibbling-mango.md`.
+> 범위: v9.0 6-stage chain harness 구조 정합 점검 — gate 4종 wiring + revisit 8 edges + plan stage placeholder 자격. 코드 변경 ❌ / read-only / file:line citation 기반.
+> overall: 6 finding 발견 / **3 finding 등재** (F-CHA-001/002/003) + 3 informational (등재 ❌). F-021 band 5~15 "건강한 검증" 잔존 (등재 후 ledger total 10→13).
+> ★ ★ ★ ★ ★ **공통 paradigm signal**: 본 namespace 의 3 finding = 모두 **양심 의존 → 코드 enforcement 전환** 본 방법론 절대 우선순위와 부분 부정합. 단 ★ ★ ★ ★ ★ ★ 본 cycle 시행 ❌ — **self-referential corrective drift 회피** (memory `feedback_self_referential_corrective_drift.md` / session 43차 4 release 동형 재발 경계 / session 44차 carry "본격 prod 가치 진전" 의제 우선). δ Type 2 외부 사용자 dogfood 안 자연 close 채널 의무 명시.
+>
+> | F-CHA | severity | 처분 | 비고 |
+> |---|---|---|---|
+> | 001 | low~medium | **deferred** (Type 2 dogfood channel) | gate #4 Auto Mode 차단 = `gate-eval.js` 코드 부재 / `_base-invoke-go-stop-gate/SKILL.md:62-67` skill body Korean prose 만 인코딩 (양심 의존 잔존) |
+> | 002 | low | **deferred** (Type 2 dogfood channel) | implement→analysis revisit "rare / 가장 큰 cycle" friction 코드 부재 / retry_cap=3 = ADR-CHAIN-003 §4 PoC-only / sp5-c5 carry |
+> | ★ 003 | **★ ★ ★ ★ ★ paradigm-level** | **deferred** (Type 2 dogfood channel / 1순위 표면화 대상) | plan stage = stage 자격 미달 / methodology paradigm 위배 (gate `null` + `gate_deferred` / AI macro HOW 양심 결정 / traceability TASK·ADR·NFR·RISK layer 부재 / DEC-2026-05-21 진단 자기모순). ★ ★ ★ ★ ★ 사용자 직관 채널 발견 (2026-05-25) |
+>
+> ★ ★ ★ 모두 `Status: deferred` (★ self-referential corrective fix ❌ / δ Type 2 외부 사용자 channel close 의무 명시). ζ-1 (plan + gate #plan 동시 신설) / ζ-2 (plan retract) / ζ-3 (informal 표기) 모두 본 cycle 시행 ❌ — 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
+>
+> ★ ★ **본 deferred 자체 = paradigm 정합 입증** — session 43차 4 release (v9.0.3/4/5/6) 동형 self-referential corrective cycle 회피. 본 plugin 의 self-bootstrap proof 진정성.
+
+### F-CHA-001: gate #4 Auto Mode 차단 = `gate-eval.js` 코드 부재 / skill body 만 인코딩
+
+- **Phase:** chain harness structural deep-dive (session 45차 / Explore agent #1)
+- **Confidence:** verified (gate-eval.js 직접 read + skill SKILL.md 직접 read + ADR-CHAIN-002 직접 read)
+- **Type:** anti-pattern (양심 의존 잔존 / ADR ↔ code drift)
+- **Description:** ADR-CHAIN-002 §2 (line 52) = "gate #4 (impl → done) = Auto Mode 위임 ❌ — 사용자 명시 결단 의무 (★ 70~80% 한계 + 재검토 정합)". 하지만 `tools/chain-driver/src/gate-eval.js:17-127` 안 stage-specific Auto Mode 차단 코드 **부재**. enforcement 위치 = `skills/_base-invoke-go-stop-gate/SKILL.md:62-67` skill body Korean prose 만:
+  ```
+  "단 ★★★ critical 임계 위반 (red_count > 0 / fail_count > 0) 은
+   **Auto Mode 도 차단**"
+  ```
+  → gate #4 `fail_count=0` hard requirement (gate-eval.js:86-92) 자체는 GREEN 강제이긴 함. 하지만 `fail_count=0` 인 상태에서 사용자가 "go" 결단 자동 위임을 **코드가 직접 차단하지 않음** — SKILL.md body 가 LLM 에 prompt 로 들어와야 작동 (양심 의존).
+- **Evidence:**
+  - `docs/adr/ADR-CHAIN-002-go-stop-gate.md:52` (정책 명시)
+  - `tools/chain-driver/src/gate-eval.js:17-127` (stage-specific Auto Mode 차단 부재)
+  - `skills/_base-invoke-go-stop-gate/SKILL.md:62-67` (skill body 만 인코딩)
+- **Spec gap:** ADR-CHAIN-002 §2 정책의 코드 enforcement 부재. `mechanical trio` (state.blocked + CLI exit 2 + PreToolUse deny) 외 ★ skill-level prose 가 enforcement 채널인 단일 case.
+- **Decision made:** N/A (구조적 누락 / ADR 시행 시 skill-level 채널로 우회 채택 / sub-plan-5 종결 시점 carry).
+- **Severity:** **low~medium** — `fail_count=0` 강제로 실질 GREEN 입증 후에만 도달 = 위험 제한적. 단 ★ 양심 의존 → 코드 enforcement 본 방법론 절대 우선순위와 부분 부정합 / drift 잔존 신호.
+- **Proposed fix:** (a) `gate-eval.js` 에 stage='implement' AND `userDecision==='go'` AND `autoMode===true` 시 reject 추가 (additive / breaking 0). (b) ADR-CHAIN-002 §2 갱신 — code enforcement 명시. PATCH. ★ ★ ★ 단 ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 자연 표면화 채널 의무.
+- **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / self-referential corrective drift 회피 paradigm 정합)
+
+### F-CHA-002: implement→analysis revisit "rare / 가장 큰 cycle" friction 코드 부재 / retry_cap=3 PoC-only carry
+
+- **Phase:** chain harness structural deep-dive (session 45차 / Explore agent #2)
+- **Confidence:** verified (revisit-detect.js 직접 read + ADR-CHAIN-003 직접 read + sdlc-4stage-flow.json 직접 read)
+- **Type:** gap (friction policy ↔ code drift)
+- **Description:** `flows/sdlc-4stage-flow.json:110` 가 implement→analysis 를 "rare / 가장 큰 cycle" 표기 — paradigm 의도 = 가장 큰 cycle 에 추가 friction. 하지만 `tools/chain-driver/src/revisit-detect.js:100-107` = 모든 upstream stage 동등 처리 (LOC 만 비교) — analysis 라고 추가 friction 없음. ADR-CHAIN-003 §4 의 `retry_cap=3` 정책 = ★ ★ PoC-only / sp5-c5 carry / 코드 enforcement ❌. 현 friction = 간접 (LOC threshold 5 라인 / 사용자 명시 결단 의무 / critical/high finding 시 gate revalidation) 만.
+- **Evidence:**
+  - `flows/sdlc-4stage-flow.json:110` (rare / 가장 큰 cycle 표기)
+  - `tools/chain-driver/src/revisit-detect.js:100-107` (upstream stage 동등 처리)
+  - `docs/adr/ADR-CHAIN-003-revisit-loop.md` §4 (retry_cap=3 정책 / PoC-only)
+- **Spec gap:** ADR-CHAIN-003 §4 의 retry_cap 정책 code enforcement 부재. cycle 거리 (1-hop vs 4-hop) 별 friction 차등 부재.
+- **Decision made:** sub-plan-5 (chain harness 5 요소 완성) 종결 시점 carry / PoC ROI 우선 / 코드 enforcement 후순위.
+- **Severity:** **low** — 직접 코드 enforcement 부재이지만 process 친화적 / 자동 implement→analysis 발생 가능성 낮음 (실 PoC 14종 0건).
+- **Proposed fix:** (a) `revisit-detect.js` 에 cycle 거리 별 confidence threshold 차등 (1-hop 5 LOC / 4-hop 50 LOC). (b) `chain-driver state.attempts` 카운터 + retry_cap=3 enforcement / chain abort 트리거 추가. state.schema.json 갱신 / breaking 가능. ★ ★ ★ 단 ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 자연 표면화 채널 의무.
+- **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / sp5-c5 carry 본격 청산은 외부 사용자 channel)
+
+### F-CHA-003: ★ ★ ★ ★ ★ plan stage = stage 자격 미달 / methodology paradigm 위배 (paradigm-level)
+
+- **Phase:** chain harness structural deep-dive (session 45차 / Explore agent #3 + ★ ★ ★ ★ ★ 사용자 직관 채널)
+- **Confidence:** verified (plan-agent.md + plan.phase-flow.json + 3 plan-* SKILL.md + lifecycle-contract.md + DEC-2026-05-21 직접 read / Glob `examples/poc-*/plan-spec.json` 0건 실측)
+- **Type:** anti-pattern (★ ★ ★ ★ ★ paradigm-level / methodology 정합 위배)
+- **Description:** ★ ★ ★ ★ ★ 본 namespace 의 ★ ★ ★ 진짜 본격 finding. 2026-05-25 session 45차 사용자 직관 발화 "plan 도 게이트 있어야 되는 거 아냐?" 가 ★ ★ ★ ★ paradigm-level finding 채널로 발현. 사실:
+  - stage 의 본질 = "AI 자동 ≥ 85% + 사람 검토 (gate) ≤ 15%" (`sdlc-4stage-flow.json` `user_review_pct`)
+  - stage 자격 = gate 보유 (analysis 자연 예외 — 입력 stage / discovery·spec·test·implement 모두 gate)
+  - plan 현 상태 = gate `null` + `gate_deferred` → ★ ★ stage 자격 미달 / chain 4 stage methodology 위장
+  - 운영 시 ★ 완전 skip — `agents/plan-agent.md:5` `skills:[]` 빈 배열 (dispatch ❌) / 3 plan-* SKILL.md PLACEHOLDER / 모든 PoC 14종에 `plan-spec.json` 부재
+  
+  paradigm-level 위배 **3건**:
+  1. methodology 검토 채널 부재 → AI 가 macro HOW (task decompose / ADR / NFR / risk) 양심 결정 / 사용자 검토 ❌
+  2. traceability UC → BHV → AC → ★ ★ ★ (TASK / ADR / NFR / RISK 모두 검토 부재) → TC → IMPL forward link 깨짐
+  3. DEC-2026-05-21 본 진단 ("macro HOW implicit in LLM" 문제) → plan stage 신설 → ★ ★ ★ ★ gate 없으면 implicit 그대로 / **문제 해결 ❌ / 자기모순**
+- **Evidence:**
+  - `agents/plan-agent.md:5` (`skills: []` 빈 배열)
+  - `flows/plan.phase-flow.json:4` (`"placeholder": true`) + `:45` (gate_deferred)
+  - `skills/plan-{decompose-and-sequence,architect-decisions,risk-and-nfr}/SKILL.md` (모두 description 첫 문구 = "PLACEHOLDER 2026-05-21 (v4.1 paradigm 가시화만)")
+  - `methodology-spec/lifecycle-contract.md:153-171` ("plan-agent = PLACEHOLDER (`skills: []` / dispatch 무의미)")
+  - `decisions/DEC-2026-05-21-chain-discovery-plan-stage-도입.md` (진단 + 신설 결정 + 진단 자기모순 본질)
+  - Glob `ai-native-methodology/examples/poc-*/plan-spec.json` = 0건 (실 PoC 14종 plan stage 산출물 부재)
+- **Spec gap:** v9.0 chain harness 가 6-stage 라 외부 표기하지만 실질 4-stage harness + 1 input stage + 1 ★ ★ ★ ghost stage (plan). stage 자격 미달. 본 plugin 의 "AI 자동 ≥ 85% + 사람 검토 ≤ 15%" 정합 양보.
+- **Decision made:** v9.0.0 MAJOR (2026-05-23) 시점 plan-agent body + gate #plan 모두 deferred 채택 — DEC-2026-05-23-discovery-stage-v9. 본 finding 발견 시점 = 2026-05-25 (2일 후 사용자 직관 채널 발현).
+- **Severity:** **★ ★ ★ ★ ★ paradigm-level** — methodology 정합 위배 / 단일 finding 이 아닌 paradigm decision 재점검 의제.
+- **Proposed fix:** ★ ★ ★ 3 옵션 모두 본 cycle 시행 ❌:
+  - **ζ-1**: plan stage 본격 구현 + gate #plan 동시 (plan-agent body + 3 skill 본격 + gate-eval.js stage='plan' 분기 + plan-coverage-validator + adr-link-validator + nfr-allocation-validator carry + sdlc-4stage-flow.json gates[] = 4 → 5 + traceability TASK·ADR·NFR·RISK layer 신설). ★ ★ paradigm 정합 / 가장 정직한 답.
+  - **ζ-2**: plan stage 폐기 (v9.0 paradigm retract / DEC-2026-05-21 진단 재검증 / spec → test 직접 회귀 / macro HOW = spec 흡수 vs test 흡수 결단 / v9.x MAJOR breaking).
+  - **ζ-3**: plan stage = gate 없는 informal stage 로 정합 표기 (외부 표기 변경 / paradigm 정합 양보 / 5-stage harness + informal plan helper).
+  ★ ★ ★ ★ ★ ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 ★ 1순위 자연 표면화 대상. 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
+- **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / ★ ★ ★ ★ ★ 1순위 표면화 대상 / paradigm-level finding 자격 외부 사용자 channel 의무)
