@@ -15,9 +15,10 @@
 // }
 
 const REQUIRED_VALIDATORS_PER_STAGE = {
-  // ★ v9.0 — planning→discovery 개칭 (gate #1). plan stage = gate deferred (placeholder / 항목 없음).
+  // ★ v9.0 — planning→discovery 개칭 (gate #1). ★ v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2 / hard gate = Cluster 1 X 재번호 = v10.0.0 MAJOR carry / 본 시점 validator 등록만 / gate enforcement = generic findings 본격 작동).
   discovery: ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator'],
   spec:      ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator'],
+  plan:      ['plan-coverage-validator', 'schema-validator'],
   test:      ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator'],
   implement: ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder'],
 };

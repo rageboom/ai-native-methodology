@@ -69,6 +69,14 @@ describe('gate-eval', () => {
     assert.deepEqual(requiredValidators('unknown'), []);
   });
 
+  // ★ v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2)
+  it('★ v9.1.x: requiredValidators(plan) includes plan-coverage-validator + schema-validator', () => {
+    const r = requiredValidators('plan');
+    assert.ok(r.includes('plan-coverage-validator'));
+    assert.ok(r.includes('schema-validator'));
+    assert.equal(r.length, 2);
+  });
+
   // ★ ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm test (★ Q-S1+S2+S3 결단 정합)
 
   it('★ v2.5.0 Phase C: llm_status=skipped → block 없음 (backward-compat)', () => {
