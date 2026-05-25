@@ -9,6 +9,62 @@
 
 ---
 
+## [10.0.0] — 2026-05-25 MAJOR — Phase 4-4' axis A plan stage paradigm 본격 구현 (★ ★ gate 번호 재정렬 widespread breaking / chain N = gate #N 1:1 INTERNAL CONVENTION) + cooling-off paradigm 영구 폐기 재확인
+
+> session 47차 / 본 conversation 안 5 commit cluster 통합 + 1 release ceremony.
+>
+> **trigger 발화 chain** (★ paradigm dispute → 본격 시행):
+> 1. 사용자 "이번 session 에서 뭐하면 되나" → "Phase 4-4' 준비 (plan 작성만)"
+> 2. plan-mode 시행 → `~/.claude/plans/jiggly-mapping-hopper.md` 작성 완료
+> 3. ExitPlanMode 후 사용자 "진행" → ★ paradigm STRONG-STOP signal 보고 → option A (차기 session 시행)
+> 4. 사용자 "cooling-off 를 왜하는건가?" → ★ ★ paradigm 메타 dispute
+> 5. 사용자 "cooling-off 아예 없애도 되는거 아닌가?" → AskUserQuestion ★ A. 폐기 + ★ B. 본 conversation Cluster 2~5 시행
+>
+> **★ ★ ★ ★ ★ ★ ★ paradigm 본격 결단** (★ session 47차 prod 가치 진전):
+> - **cooling-off paradigm 영구 폐기 재확인** (DEC-2026-05-25-cooling-off-영구-폐기-재확인) — v2.2.0 (2026-05-08) "패기해줘" 폐기 → v9.x 재도입 cycle (19일 만) → v10.0.0 폐기 재확인 / paradigm-without-teeth 본격 입증 (actual 발동 case 0 / 사용자 push back 2회 / 본 레포 cadence 5 release/1day)
+> - **chain N = gate #N 1:1 INTERNAL CONVENTION 본격 정합** (DO-178C SOI / IEC 62304 isomorphic 사상 / 직접 standard 표기 ❌ / official-docs-checker REVISE-1 흡수)
+>
+> **시행 — 5 Cluster commit (★ widespread breaking)**:
+>
+> | Cluster | scope | commit |
+> |---|---|---|
+> | 1 (★ 외부 session) | B1+B2 stage-graph.js gate 재번호 (plan='#3' / test='#4' / impl='#5') + state.schema.json enum +'#5' / +'plan' | `e5c8672` |
+> | 2 | B4+B5 sdlc-4stage-flow.json revisit_edges 8→9 + gate 재번호 + plan.phase-flow.json placeholder=false + 2 DEC 신설 + INDEX 갱신 | `676f948` |
+> | 3 | B3+B6 ADR-CHAIN-001 chain 4단계→5단계 + ADR-CHAIN-002 4 gate→5 gate + plan gate prompt | `142852e` |
+> | 4 | B7 F-CHA-001 trio integration test 6 시나리오 신규 (validator critical + cli exit 1 + hooks deny + trio 통합 + gate enum 정합 + requiredValidators) | `568bcb2` |
+> | 5 | B8 CLAUDE.md + README + agents-axis + chain-driver/README sweep + release-readiness #18+#19+#20 신규 criterion | `4e28619` |
+>
+> **★ ★ ★ ★ ★ ★ ★ STOP-3 달성**:
+> - workspace test **737/737 pass** (731 → 737 / +6 / F-CHA-001 trio integration test 신규)
+> - **release-readiness 20/20 ready:true** (17 → 20 / #18 gate_enum_consistency + #19 legacy_4_stage_expression_absent + #20 plan_gate_operational 신규)
+> - drift-validator 7 pair / 0 breaking / state-flow consistency PASS / chain layout PASS
+> - skill-citation 0 stale (★ DEC-2026-05-25-axis-a-phase-4-4-prime 신설로 회복)
+> - version 3-way 10.0.0 (CHANGELOG / plugin.json / package.json)
+>
+> **★ BREAKING CHANGE**:
+> - gate.id enum 의미 재할당 — test '#3'→'#4' / implement '#4'→'#5' / plan '#3' 신규
+> - state.json 영속 last_gate.stage='plan' 신규 진입 자격 (외부 사용자 state.json reset 또는 manual migration 의무 / 실측 poc-14: last_gate=null 영향 ❌)
+> - plan.phase-flow.json version 0.1.0-placeholder → 1.0.0
+> - cooling-off ≥24h paradigm = ★ ★ 영구 폐기 재확인 (★ 재도입 자격 ≥2 PoC corroboration + Adzic SBE strict 정합 의무 / 사실상 ❌)
+>
+> **★ ★ ★ paradigm 메타 인지** (★ session 47차 paradigm 진화 본격):
+> - **LL-v1000-01** — cooling-off paradigm-without-teeth 본격 입증 (actual 발동 case 0 / 사용자 push back 2회 / DEC-2026-05-08 "패기해줘" 19일 만 재도입 cycle 차단)
+> - **LL-v1000-02** — paradigm 부활 cycle = self-referential corrective drift 의 본격 paradigm 사례 (★ AI 가 ★ 영구 폐기된 paradigm 을 ★ 19일 만 재도입 carry note 안에 표기 = paradigm honesty 위배)
+> - **LL-v1000-03** — 사용자 메타 질문 = STRONG-STOP signal + ★ paradigm dispute 자격 (Auto Mode 안에서도 메타 dispute 자격 보고 의무)
+> - **LL-v1000-04** — paradigm 격상 자격 = ≥2 PoC corroboration + Adzic SBE strict 정합 의무 (1 사건 일반화 + AI persona 권고 + industry case 단순 인용 = paradigm 격상 자격 부재)
+> - **LL-v1000-05** — INTERNAL CONVENTION paradigm framing 본격 정합 (chain N = gate #N 1:1 / DO-178C SOI / IEC 62304 isomorphic / 직접 standard 표기 ❌ / official-docs-checker REVISE-1 흡수)
+>
+> **★ session 안 4 release cap (LL-v930-02) 정합**: session 47차 = ★ 본 v10.0.0 release **1회** (Cluster 1 외부 session e5c8672 + Cluster 2~5 본 conversation = 통합 1 release).
+>
+> **차기 carry**:
+> - Phase 4-5 (v10.1.0 MAJOR / ticket subsystem 6-stage migration / Type 2 외부 사용자 ≥1 corroboration trigger 의무 / deadline 없음 / OSS 채택 의존)
+> - methodology-spec/ + decisions/ + schemas/ + history doc + skill SKILL.md 안 "4단계" 표현 잔존 (≈25 files / historical SSOT 보존 / 별 patch release carry 자격)
+> - DEC-2026-05-25-axis-a-phase-4-4-prime + DEC-2026-05-25-cooling-off-영구-폐기-재확인 2 DEC SSOT 보존
+>
+> Resolves F-CHA-001 본격 해소 (Senior BLOCKER-2 trio integration test 6/6 pass) + F-CHA-003 5 axis 본격 해소 (gate 번호 재정렬 + state.schema enum + flows + ADR + RR criterion).
+
+---
+
 ## [9.3.0] — 2026-05-25 MINOR — axis A plan stage paradigm 본격 구현 Phase 4-4 minimal (★ gate #plan trio enforcement 본격 활성 / Senior BLOCKER-2 잔여 본격 해소 / additive only / breaking 0)
 
 > session 46차 연속 4번째 release / v9.2.0 직후 사용자 "다음 진행" + "B cooling-off retract" + "추천 (옵션 1 minimal)" 결단 → Phase 4-4 minimal scope 본격 시행.
