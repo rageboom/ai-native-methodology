@@ -1,15 +1,15 @@
-# ADR-CHAIN-001: SDLC chain 4단계 정합 강제 정책
+# ADR-CHAIN-001: SDLC chain 5단계 정합 강제 정책 (★ v10.0.0 본격)
 
 - 상태: 승인됨 (Accepted)
-- 일자: 2026-05-06
+- 일자: 2026-05-06 (★ v10.0.0 / 2026-05-25 — Phase 4-4' 본격 갱신 / 5 stage chain / DEC-2026-05-25-axis-a-phase-4-4-prime 정합)
 - 결정자: 윤주스 (TF Lead)
-- 관련: DEC-2026-05-06-v2.0-i-strict-채택 (★ trigger), DEC-2026-05-06-round-trip-부분-허용 (partial retract), ADR-001 (사상적 기반), ADR-008 (이중 렌더링 — v2 §10 확장 동반), ADR-009 (다이어그램 신뢰 모델 — v2 §2.5 확장 동반), ADR-010 (baseline+ratchet — v2 §2.6 확장 동반), ADR-CHAIN-002 (go/stop gate UX), ADR-CHAIN-003 (revisit loop), master plan `~/.claude/plans/a-stateful-gadget.md`
+- 관련: DEC-2026-05-06-v2.0-i-strict-채택 (★ trigger), DEC-2026-05-25-axis-a-phase-4-4-prime (★ v10.0.0 5단계 격상), DEC-2026-05-06-round-trip-부분-허용 (partial retract), ADR-001 (사상적 기반), ADR-008 (이중 렌더링 — v2 §10 확장 동반), ADR-009 (다이어그램 신뢰 모델 — v2 §2.5 확장 동반), ADR-010 (baseline+ratchet — v2 §2.6 확장 동반), ADR-CHAIN-002 (go/stop gate UX), ADR-CHAIN-003 (revisit loop), master plan `~/.claude/plans/a-stateful-gadget.md`
 
 ## 컨텍스트
 
 v1.5.0 까지 본 방법론 = "코드 → 7대 산출물 한 방향 추출기" (DEC-2026-04-29-round-trip-스코프-아웃). round-trip = 영구 scope 외부.
 
-2026-05-06 사용자 결단 (★ ★ ★ "A로 하고 싶다") → **(A) i-strict 채택** = 본 방법론 = SDLC 4단계 chain harness. 4 단계: planning (chain 1) → spec (chain 2) → test (chain 3) → impl (chain 4). 각 단계 AI 자동 생성 + 사용자 검토 (gate #1~#4) + revisit loop (자동 감지 + 사용자 결단).
+2026-05-06 사용자 결단 (★ ★ ★ "A로 하고 싶다") → **(A) i-strict 채택** = 본 방법론 = SDLC chain harness. ★ ★ v10.0.0 (Phase 4-4') 본격 5단계: discovery (chain 1 / 구 planning 개칭 v9.0) → spec (chain 2) → plan (chain 3 / v9.0 신설 / v10.0.0 hard gate 본격) → test (chain 4) → impl (chain 5). 각 단계 AI 자동 생성 + 사용자 검토 (gate #1~#5 / chain N = gate #N 1:1 INTERNAL CONVENTION) + revisit loop (자동 감지 + 사용자 결단).
 
 DEC-2026-05-06-round-trip-부분-허용 = DEC-2026-04-29 partial retract — chain harness gate 안에서 round-trip 정식 허용 / 외부 자동 코드 생성 ❌.
 
@@ -17,16 +17,17 @@ DEC-2026-05-06-round-trip-부분-허용 = DEC-2026-04-29 partial retract — cha
 
 ## 결정
 
-**chain 4단계 정합 강제** 를 다음 6 정책으로 명문화:
+**chain 5단계 정합 강제** 를 다음 6 정책으로 명문화 (★ v10.0.0 5 stage):
 
 ### 1. 모든 chain stage 산출물 = ADR-008 v2 이중 렌더링 의무
 
 | chain | AI 눈 | 사람 눈 |
 |---|---|---|
-| 1 (planning) | planning-spec.json | planning-spec.md |
+| 1 (discovery / 구 planning) | planning-spec.json (★ 파일명 reuse) | planning-spec.md |
 | 2 (spec) | behavior-spec.json + acceptance-criteria.json | behavior-spec.md + behavior-diagrams.mermaid + acceptance-criteria.md |
-| 3 (test) | test-spec.json | test-report.md (+ coverage-report.md) |
-| 4 (impl) | impl-spec.json | impl-report.md (+ test-pass-evidence.md) |
+| 3 (plan / ★ v9.0 신설 / v10.0.0 본격) | task-plan.json | task-plan.md |
+| 4 (test) | test-spec.json | test-report.md (+ coverage-report.md) |
+| 5 (impl) | impl-spec.json | impl-report.md (+ test-pass-evidence.md) |
 | cross | traceability-matrix.json | matrix.md + matrix.mermaid |
 
 ADR-008 v2 §10 (chain 단계 확장) 으로 동반 격상.
@@ -34,13 +35,13 @@ ADR-008 v2 §10 (chain 단계 확장) 으로 동반 격상.
 ### 2. 단계 간 cross-link coverage ≥ 0.85 의무 (ratchet)
 
 - forward+backward bidirectional 의무 (★ DO-178C / IEC 62304 차용 — Official research 권고)
-- 3 metric 분리: link_coverage (chain 정합) / test_pass_rate (gate #4 1.0 의무) / line+branch_coverage (정보용)
+- 3 metric 분리: link_coverage (chain 정합) / test_pass_rate (gate #5 1.0 의무) / line+branch_coverage (정보용)
 - ratchet 0.85 → 0.90 → 0.95 (★ ADR-010 v2 §2.6)
 - severity_floor: critical=1.0 / high=0.95 / medium=0.90 / low=0.85 (★ DO-178C DAL A)
 
 ### 3. test-impl 단계 100% pass 의무 (no-simulation 강화)
 
-- chain 4 GREEN 의무 = 모든 TC-* pass
+- chain 5 GREEN 의무 = 모든 TC-* pass (★ v10.0.0 chain 4 test → chain 5 impl)
 - ★ ★ ★ **진짜 runner 호출 의무** — `tools/test-impl-pass-validator/` (sub-plan-3 신설)
 - 5종 물증 7 필드 (test_runner_version + stdout_path + stderr_path + invocation_timestamp + duration_ms + pass/fail/skip count + reproduction_command + result_hash + report_format) 의무
 - result_hash 정규화 (timestamp+duration 제외 / sorted test names 만)
@@ -48,15 +49,15 @@ ADR-008 v2 §10 (chain 단계 확장) 으로 동반 격상.
 
 ### 4. traceability-matrix 매 gate 갱신 의무
 
-- 4 chain stage gate 종결 시마다 traceability-matrix.json 갱신
-- UC → BHV → AC → TC → IMPL + commit_hash forward+backward link 채움
+- 5 chain stage gate 종결 시마다 traceability-matrix.json 갱신 (★ v10.0.0)
+- UC → BHV → AC → TASK → TC → IMPL + commit_hash forward+backward link 채움 (★ v9.2.0 DO-178C 6 layer 격상)
 - coverage_summary 자동 산출
 
-### 5. go/stop gate #1~#4 = 사용자 명시 결단 의무
+### 5. go/stop gate #1~#5 = 사용자 명시 결단 의무 (★ v10.0.0)
 
 - ★ ADR-CHAIN-002 (go/stop gate UX) 정합
 - Auto Mode 위임 가능 — 단 결단 trace logged 의무 (intervention_log)
-- gate_4_intervention_pct ≤ 0.30 (★ 70~80% 한계 명시 잔존 / master plan §J.2 옵션 A)
+- gate_5_intervention_pct ≤ 0.30 (★ 70~80% 한계 명시 잔존 / master plan §J.2 옵션 A / ★ v10.0.0 gate_4 → gate_5 재번호)
 
 ### 6. revisit loop 자동 감지 → 사용자 결단 의무
 
@@ -108,8 +109,8 @@ ADR-CHAIN-002 (go/stop gate UX) + ADR-CHAIN-003 (revisit loop)
 1. **chain harness 정체성 명문화** — DEC-2026-05-06 결단 의 사상 ADR 확보
 2. **DO-178C bidirectional traceability 권위 확보** — 산업 표준 인용 가능
 3. **no-simulation 정책 chain 단계 확장** — test/impl 단계 위조 차단
-4. **70~80% 한계 schema 수용 정합** — gate_4_intervention_pct ≤ 0.30 명문
-5. **사용자 cluster 결단 정책 강화** — gate #1~#4 명시 trace
+4. **70~80% 한계 schema 수용 정합** — gate_5_intervention_pct ≤ 0.30 명문 (★ v10.0.0 재번호)
+5. **사용자 cluster 결단 정책 강화** — gate #1~#5 명시 trace
 6. **6 sub-plan 작업의 사상 기둥** — sub-plan-2~6 모두 본 ADR 인용
 7. **14차 retract pattern 차단** — single source-of-truth = impl-spec.json (★ 실 코드 = 산출물 ❌ / commit_hash 만)
 
@@ -117,7 +118,7 @@ ADR-CHAIN-002 (go/stop gate UX) + ADR-CHAIN-003 (revisit loop)
 
 1. **chain coupling 위험** — 한 단계 변경 시 모두 영향
    - **완화**: traceability-matrix 매 gate 갱신 + chain-revisit-detector 자동 감지
-2. **gate 마찰** — 4 gate × 매 cycle = 사용자 cognitive load
+2. **gate 마찰** — 5 gate × 매 cycle = 사용자 cognitive load
    - **완화**: Auto Mode 위임 + 묶음 결단 (5~6 cluster 패턴)
 3. **AI code gen SOTA gap** — 단발 100% 의무 = 비현실 (산업 SOTA 60~88%)
    - **완화**: chain_attempt retry cap (default 3) + revisit loop + finding escalation + 70~80% 한계 명시
@@ -142,3 +143,4 @@ ADR-CHAIN-002 (go/stop gate UX) + ADR-CHAIN-003 (revisit loop)
 ## 변경 이력
 
 - 2026-05-06: 신설 (sub-plan-2). DEC-2026-05-06-v2.0-i-strict-채택 정합. master plan `~/.claude/plans/a-stateful-gadget.md`.
+- 2026-05-25: ★ ★ ★ v10.0.0 본격 갱신 (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — chain 4단계 → 5단계 (discovery + plan 신설 / v9.0 planning→discovery 개칭 + v9.0 plan 신설 + v10.0.0 gate 재번호) / 산출물 표 plan row (task-plan.{json,md}) 추가 / gate #1~#5 / traceability 6 layer (UC→BHV→AC→TASK→TC→IMPL).

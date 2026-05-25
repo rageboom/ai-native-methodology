@@ -1,13 +1,13 @@
-# ADR-CHAIN-002: go/stop gate UX — 4 gate 사용자 결단 의무
+# ADR-CHAIN-002: go/stop gate UX — 5 gate 사용자 결단 의무 (★ v10.0.0 본격)
 
 - 상태: 승인됨 (Accepted)
-- 일자: 2026-05-06
+- 일자: 2026-05-06 (★ v10.0.0 / 2026-05-25 — Phase 4-4' 본격 갱신 / gate #1~#5 / DEC-2026-05-25-axis-a-phase-4-4-prime 정합)
 - 결정자: 윤주스 (TF Lead)
-- 관련: DEC-2026-05-06-v2.0-i-strict-채택 (★ trigger), ADR-CHAIN-001 (chain 정합 강제 / 본 ADR §5 인용), ADR-CHAIN-003 (revisit loop / 본 ADR 와 결합), Work Principles 4 원칙 §3 (사용자 승인 후 코드 착수)
+- 관련: DEC-2026-05-06-v2.0-i-strict-채택 (★ trigger), DEC-2026-05-25-axis-a-phase-4-4-prime (★ v10.0.0 gate 재번호), ADR-CHAIN-001 (chain 정합 강제 / 본 ADR §5 인용), ADR-CHAIN-003 (revisit loop / 본 ADR 와 결합), Work Principles 4 원칙 §3 (사용자 승인 후 코드 착수)
 
 ## 컨텍스트
 
-v2.0 chain 4단계 (planning → spec → test → impl) 의 각 단계 종결 시 **사용자 명시 결단**으로 다음 단계 진입 여부 결정. ADR-CHAIN-001 §5 = "go/stop gate #1~#4 = 사용자 명시 결단 의무".
+v10.0.0 chain 5단계 (discovery → spec → plan → test → impl / ★ v9.0 discovery 개칭 + plan 신설 + v10.0.0 Phase 4-4' gate 재번호) 의 각 단계 종결 시 **사용자 명시 결단**으로 다음 단계 진입 여부 결정. ADR-CHAIN-001 §5 = "go/stop gate #1~#5 = 사용자 명시 결단 의무". ★ chain N = gate #N 1:1 INTERNAL CONVENTION.
 
 UX 결정 영역:
 - 사용자 prompt 형식 (질문 / 정보 / decision options)
@@ -19,9 +19,9 @@ UX 결정 영역:
 
 ## 결정
 
-**4 gate UX 정책** 명문화:
+**5 gate UX 정책** 명문화 (★ v10.0.0):
 
-### 1. gate #1~#4 prompt 형식
+### 1. gate #1~#5 prompt 형식
 
 각 gate 종결 시 사용자에게 다음 정보 제시:
 
@@ -35,7 +35,8 @@ UX 결정 영역:
 검증:
 - {validator names} 모두 0 violation
 - coverage threshold 통과 / 미달
-- (gate #4) test_pass_rate = 1.0 / fail_count = 0
+- (gate #3 plan) plan-coverage-validator critical=0 + NFR allocation hard gate + dependency cycle 0
+- (gate #5 impl) test_pass_rate = 1.0 / fail_count = 0
 
 결단 cluster:
 1. ★ go (다음 단계 진입)
@@ -49,14 +50,14 @@ UX 결정 영역:
 
 - Auto Mode 활성 시 = ★ 사용자 명시 토글 ❌ → ★ 일반 결단 영역
 - Auto Mode 활성 시 = ★ 일반 결단 = 결단 자동 위임
-- 단 ★ ★ ★ **gate #4 (impl → done) = Auto Mode 위임 ❌** — 사용자 명시 결단 의무 (★ 70~80% 한계 + 재검토 정합)
-- gate #1~#3 = Auto Mode 위임 허용 / 단 intervention_log 자동 기록
+- 단 ★ ★ ★ **gate #5 (impl → done) = Auto Mode 위임 ❌** — 사용자 명시 결단 의무 (★ 70~80% 한계 + 재검토 정합)
+- gate #1~#4 (discovery / spec / plan / test) = Auto Mode 위임 허용 / 단 intervention_log 자동 기록
 
 ### 3. 결단 trace 보존 의무
 
 ```yaml
 intervention_log entry:
-  gate: "#1" | "#2" | "#3" | "#4"
+  gate: "#1" | "#2" | "#3" | "#4" | "#5"
   timestamp: ISO 8601
   decision: "go" | "stop+revisit" | "stop+abort"
   reason: string (사용자 명시 또는 Auto Mode 사유)
@@ -106,13 +107,13 @@ intervention_log entry:
 5. 산업 사례 (Aider / Copilot Workspace) 권위 확보
 
 ### 부정적 영향
-1. **gate 마찰** — 4 gate × 매 cycle / 완화: cluster 패턴 + Auto Mode 위임
-2. **gate #4 강제 = Auto Mode 비호환** — 1 gate 만 강제 / 합리
+1. **gate 마찰** — 5 gate × 매 cycle / 완화: cluster 패턴 + Auto Mode 위임
+2. **gate #5 강제 = Auto Mode 비호환** — 1 gate 만 강제 / 합리
 
 ## 대안 (검토 후 거부)
 
 ### 대안 1: 모든 gate Auto Mode 위임
-- 거부 이유: gate #4 (impl GREEN 의무) = 70~80% 한계 영역 / 사용자 검토 ≤ 15% 정합 위배.
+- 거부 이유: gate #5 (impl GREEN 의무) = 70~80% 한계 영역 / 사용자 검토 ≤ 15% 정합 위배.
 
 ### 대안 2: gate 사용자 prompt 자유 형식
 - 거부 이유: intervention_log 표준 부재 → 감사 / 재현 차단.
@@ -124,3 +125,4 @@ intervention_log entry:
 
 ## 변경 이력
 - 2026-05-06: 신설 (sub-plan-2).
+- 2026-05-25: ★ ★ ★ v10.0.0 본격 갱신 (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — 4 gate → 5 gate / plan gate (#3) 신설 / gate 재번호 (test #3→#4 / impl #4→#5) / Auto Mode 위임 정책 갱신 (gate #5 impl 만 ❌).
