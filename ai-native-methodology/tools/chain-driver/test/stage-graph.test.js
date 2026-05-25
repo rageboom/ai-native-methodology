@@ -32,13 +32,22 @@ describe('stage-graph', () => {
     assert.equal(previousStage('analysis'), null);
   });
 
-  it('getGateForStage maps discovery..implement to #1..#4 (plan gate deferred)', () => {
+  it('getGateForStage maps discovery..implement to #1..#4 + plan to "#plan" (v9.3.0)', () => {
     assert.equal(getGateForStage('discovery'), '#1');
     assert.equal(getGateForStage('spec'), '#2');
     assert.equal(getGateForStage('test'), '#3');
     assert.equal(getGateForStage('implement'), '#4');
     assert.equal(getGateForStage('analysis'), null);
-    assert.equal(getGateForStage('plan'), null); // ★ v9.0 plan gate deferred (placeholder)
+    // ★ v9.3.0 (DEC-2026-05-25-axis-a-phase-4-4) — plan gate ID '#plan' 본격 신설 (Senior BLOCKER-2 잔여 본격 해소 / 번호 부여 ❌ / Cluster 1 X 재번호 = Phase 4-4' v10.0.0 MAJOR carry)
+    assert.equal(getGateForStage('plan'), '#plan');
+  });
+
+  // ★ v9.3.0 — plan gate trio enforcement 본격 작동 자격 검증 (Senior BLOCKER-2)
+  it('★ v9.3.0: plan gate ID "#plan" 본격 신설 = generic trio mechanism 작동 자격 확보 (state.blocked + cli exit 2 + hooks deny)', () => {
+    const planGate = getGateForStage('plan');
+    assert.equal(planGate, '#plan');
+    assert.ok(planGate !== null, 'plan gate must not be null (deferred → 본격 작동)');
+    assert.doesNotMatch(planGate, /^#[0-9]+$/, '★ Cluster 1 X 재번호 = Phase 4-4 carry / 번호 부여 ❌ / 별 string ID');
   });
 
   it('isUpstream returns true for earlier stages, false otherwise', () => {

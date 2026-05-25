@@ -41,7 +41,10 @@ export function previousStage(current) {
 
 export function getGateForStage(stage) {
   // ★ v9.0 — plan stage hard gate = deferred (placeholder / DEC-2026-05-23-discovery-stage-v9). gate #1~#4 유지.
-  const map = { discovery: '#1', spec: '#2', test: '#3', implement: '#4' };
+  // ★ v9.3.0 (DEC-2026-05-25-axis-a-phase-4-4) — plan gate ID '#plan' 본격 신설 (Senior BLOCKER-2 잔여 본격 해소).
+  //   ★ 번호 부여 ❌ (별 string ID / Cluster 1 X 재번호 = Phase 4-4' v10.0.0 MAJOR carry).
+  //   ★ generic trio enforcement mechanism (state.blocked + cli exit 2 + hooks-bridge PreToolUse deny) 본격 작동 자격 확보 / additive only / breaking 0.
+  const map = { discovery: '#1', spec: '#2', plan: '#plan', test: '#3', implement: '#4' };
   return map[stage] ?? null;
 }
 
