@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/plan-coverage-validator",
+  "version": "0.1.0",
+  "description": "★ v9.x MINOR 신설 (DEC-2026-05-25-axis-a-phase-4-1 정합 / Phase 4-1 Senior BLOCKER-2 흡수). chain harness 안 plan stage (chain 3) coverage validator. task-plan.json 산출물 검증 — TASK ↔ AC backward link + TASK ↔ TC forward link + NFR allocation (high+critical) hard gate + TASK granularity (1~3 AC 묶음) + dependency cycle (DAG) + risk severity. exit code contract (0=ok / 1=blocking findings / 2=usage-error). chain-coverage-validator 동형 paradigm.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "plan-coverage-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

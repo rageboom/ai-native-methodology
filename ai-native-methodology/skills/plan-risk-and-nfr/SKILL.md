@@ -1,57 +1,118 @@
 ---
 name: plan-risk-and-nfr
-description: PLACEHOLDER 2026-05-21 (v4.1 paradigm 가시화만). chain (plan) sub-skill. risk 도출 + NFR allocation + rollback 전략 추출 전문. plan-agent 가 호출. v4.2+ 본격 구현 carry. NFR 게이트 = hard (allocation 필수 / Discovery soft 와 비대칭). Risk 도출 = LLM + industry-case-researcher + 사람 보강 (3중 망).
+description: ★ ★ v9.x MINOR chain 3 (plan) sub-skill. risk 도출 + NFR allocation + rollback 전략 추출. plan-agent 가 호출. NFR allocation hard gate (Plan / Discovery soft 비대칭). Risk 도출 = 3중 망 (LLM + industry-case-researcher + 사람 보강). ISO/IEC 25010:2023 SQuaRE 9 quality characteristic. DEC-2026-05-25-axis-a-phase-4-1 정합.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
-# plan-risk-and-nfr (PLACEHOLDER 2026-05-21)
+# plan-risk-and-nfr
 
-> **PLACEHOLDER**: 본 skill 은 v4.1 chain (plan) sub-skill paradigm 정합 가시화 자산. 본격 구현은 v4.2+ carry.
->
-> 본 skill 의 모 결단: DEC-2026-05-21-chain-discovery-plan-stage-도입 §신설 자산 skills/.
+★ ★ v9.x chain 3 (plan) 의 **risk + NFR + rollback sub-skill**. task-plan.risks[] + nfr_allocation[] + rollback_strategy 채움.
 
-## 책임 범위 (v4.2+ carry)
+## 언제 사용
 
-spec + plan 의 task 분해 결과 + discovery-output 의 NFR 입력에서 다음 추출:
-
-| 항목 | 추출 방법 |
-|---|---|
-| Risk | 기술적/비즈니스 위험 — LLM 1차 + industry-case-researcher 사례 + 사람 보강 (3중 망) |
-| NFR allocation | discovery NFR → task 분배 (budget + verification_method) |
-| Rollback strategy | integration_points 별 실패 시 되돌리기 전략 (필수 필드) |
+- plan-decompose-and-sequence step 9 에서 자동 호출.
+- 사용자가 risk / NFR 보강 시 직접 호출.
 
 ## 입력
 
-- `.aimd/output/plan-spec.tasks[]` (decompose-and-sequence 산출)
-- `.aimd/output/plan-spec.integration_points[]` (architect-decisions 산출)
-- `.aimd/output/discovery-output.nfr[]` (Discovery 어댑터 산출 — soft 게이트)
-- `.aimd/output/analysis-output/*.json` (architecture / domain — 통합 영향 분석 source)
+- `<project>/.aimd/output/task-plan.json` (★ chain 3 진행 중 / tasks[] + adrs[] 채워진 상태)
+- `<project>/.aimd/output/acceptance-criteria.json` (★ AC-* / NFR 관련 AC 식별 source)
+- `<project>/.aimd/output/analysis-output/static-security.json` (★ analysis stage 산출 / risk source)
+- `<project>/.aimd/output/analysis-output/antipatterns.json` (★ AP-* / risk source)
 
 ## 산출
 
-- `plan-spec.risks[]` (R-NNN id + description + likelihood H/M/L + impact H/M/L + mitigation + owner_role)
-- `plan-spec.nfr_allocation[]` (nfr_ref + task_id + budget + verification_method)
-- `plan-spec.integration_points[].rollback_strategy` (필수 필드 — 누락 시 skill reject)
+- `<project>/.aimd/output/task-plan.json` 안 `risks[]` + `nfr_allocation[]` + `rollback_strategy` 갱신
 
-## 운영 정책 (DEC-2026-05-21 §8 정합)
+## ★ ★ ★ NFR allocation hard gate (Plan / Discovery soft 비대칭)
 
-| # | 정책 | 본 skill 적용 |
+DEC-2026-05-21 §정책3 정합. Discovery (chain 1) = soft gate (NFR 누락 시 `intent: unknown` 표지 carry 허용) / Plan (chain 3) = ★ ★ **hard gate** (NFR allocation 누락 시 진입 차단).
+
+★ ★ Cluster 2 결단 (DEC-2026-05-25-axis-a-phase-4-1) — `severity = critical` 또는 `high` NFR 의 `task_refs[]` 누락 시 `plan-coverage-validator` high finding emit → gate #plan block.
+
+★ ★ ★ ISO/IEC 25010:2023 SQuaRE 9 quality characteristic (★ 2023 신설 = Safety):
+- functional_suitability
+- performance_efficiency
+- compatibility
+- usability
+- reliability
+- security
+- maintainability
+- portability
+- safety ← ★ 2023 신설
+
+공식 출처: https://www.iso.org/standard/78176.html
+
+## ★ severity_floor 사내 해석
+
+`task-plan.schema.json` nfr_allocation[].severity enum (critical / high / medium / low) 의 numeric floor:
+- critical = 1.0 (100% coverage 의무)
+- high = 0.95
+- medium = 0.90
+- low = 0.85
+
+★ ★ ★ **출처 명시**: DO-178C 정신 기반 ★ 사내 해석. DO-178C 원본 = objectives count 기반 (DAL A=71 objectives 등) / coverage % 직접 규정 ❌. 본 0.95/0.90/0.85 수치 = 본 plugin 내부 측정치 (DO-178C 직접 인용 ❌ / 공식 docs REVISE-1 흡수).
+
+## ★ ★ Risk 도출 3중 망 (DEC-2026-05-21 §정책6)
+
+| 망 | 책임 | 산출 |
 |---|---|---|
-| 3 | NFR 게이트 = hard | NFR allocation 누락 시 진입 차단 (Discovery soft 와 비대칭) |
-| 6 | Risk 도출 = 3중 망 | LLM 1차 → industry-case-researcher 사례 carry → 사람 보강 gate (필수) |
-| (Rollback 강제) | rollback_strategy 필수 필드 | integration_points 별 누락 시 reject |
+| LLM 1차 | 본 skill (LLM) | risks[] 후보 도출 (severity + description + type) |
+| industry-case-researcher sub-agent | `agents/_base-industry-case-researcher.md` dispatch | risks[].industry_case_refs[] URL 등 외부 권위 근거 |
+| 사람 보강 | 사용자 명시 결단 | risks[].human_review = true (gate #plan 통과 자격) |
 
-## carry (v4.2+)
+★ ★ 3중 망 망 부재 시 = `plan-coverage-validator validateRiskSeverity` finding emit (mitigation 누락 medium / human_review 누락 low).
 
-- 본 skill 본격 구현 (risk 도출 알고리즘 + NFR allocation 매핑 + rollback 전략 추출)
-- risk-register template (plan/ 디렉토리) 신설 (placeholder / plan-agent 본격 구현 시)
-- industry-case-researcher sub-agent 호출 정형화 (risk generic 회피 / 도메인 특화 사례)
-- NFR unknown 처리 (Discovery 에서 unknown 표지로 carry 된 경우 — Plan 에서 사용자 명시 요구)
-- rollback verification (실제 rollback 가능성 검증 도구 carry)
+## ★ rollback 전략
+
+DEC-2026-05-21 §plan-risk-and-nfr 정합. 본 task-plan 시행 후 회귀 시 rollback channel.
+
+- `rollback_strategy.strategy` (필수 / 예: 'git revert + feature flag toggle')
+- `rollback_strategy.verification` (★ v4.2+ carry — 실제 rollback 가능성 검증 도구)
+
+## 절차
+
+1. **task-plan + acceptance-criteria + static-security + antipatterns 로드**.
+
+2. **NFR 후보 도출** — acceptance-criteria.criteria[] 안 verifiable=false AC (예: "p95 latency < 200ms") + static-security.json critical/high finding + antipatterns.json critical/high AP 모두 NFR 후보:
+   - characteristic 매핑 (ISO 25010:2023 9 enum)
+   - severity 매핑 (BR/AP severity → critical/high/medium/low)
+   - acceptance_criteria_ref (Cluster 4 cross-cut bidirectional link)
+   - task_refs (★ hard gate / 누락 시 block)
+
+3. **Risk 도출 3중 망**:
+   - LLM 1차 — risk 후보 도출 (severity + description + type)
+   - industry-case-researcher sub-agent 호출 — 외부 사례 URL carry (risks[].industry_case_refs[])
+   - 사용자 명시 결단 — risks[].human_review = true imperative
+
+4. **rollback_strategy 채움** — 본 task-plan 시행 후 회귀 시 rollback channel.
+
+5. **자동 검증**:
+   ```bash
+   node tools/plan-coverage-validator/src/cli.js \
+     --task-plan  .aimd/output/task-plan.json \
+     --acceptance .aimd/output/acceptance-criteria.json
+   ```
+   `plan.nfr.allocation_missing` high finding + `plan.risk.no_mitigation` / `plan.risk.no_human_review` 확인.
+
+6. **gate #plan 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6 / plan-agent step 종결).
+
+## ★ 70~80% 한계
+
+자동 risk + NFR 도출 ≥ 60% / 사용자 검토 ≤ 40%. 특히:
+- risk 누락 cost 큼 → 3중 망 본격 시행 의무
+- NFR allocation hard gate = critical/high severity 누락 = ★ ★ block (사용자 명시 결단 의무)
+- rollback verification = v4.2+ carry (실제 rollback 가능성 검증 도구 부재)
 
 ## 인용
 
 - DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 skill 의 모 결단)
+- DEC-2026-05-25-axis-a-phase-4-1 (본격 구현 결단)
 - `agents/plan-agent.md` (본 skill 의 caller)
-- `agents/_base-industry-case-researcher.md` (risk 도출 3중 망 carry)
-- `agents/_base-senior-engineer.md` (risk gate 검토 / Senior critique 패턴)
+- `agents/_base-industry-case-researcher.md` (3중 망 보강 sub-agent)
+- `schemas/task-plan.schema.json` risks[] + nfr_allocation[] + rollback_strategy (산출 schema)
+- `tools/plan-coverage-validator/` (검증 도구 — validateNfrAllocation + validateRiskSeverity)
+- ISO/IEC 25010:2023 SQuaRE — https://www.iso.org/standard/78176.html
+- DO-178C (정신 기반 / 본 0.95/0.90/0.85 수치 = 본 plugin 내부 측정치 / 원본 직접 인용 ❌)
+- ADR-CHAIN-001 §2 (cross-link coverage ratchet)
+- ADR-CHAIN-002 (gate UX)
