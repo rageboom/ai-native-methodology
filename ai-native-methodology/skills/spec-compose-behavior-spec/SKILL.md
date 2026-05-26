@@ -1,12 +1,12 @@
 ---
 name: spec-compose-behavior-spec
-description: ★ ★ v2.0 chain 2 진입 skill. planning-spec.use_cases + analysis 의 `formal-spec` phase (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.{json,md} 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
+description: ★ ★ v2.0 chain 2 진입 skill. discovery-spec.use_cases + analysis 의 `formal-spec` phase (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.{json,md} 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # compose-behavior-spec
 
-★ ★ v2.0 chain 2 (spec) 의 **진입 skill**. planning-spec + analysis `formal-spec` phase 통합 → executable behavior contract.
+★ ★ v2.0 chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec` phase 통합 → executable behavior contract.
 
 ## 언제 사용
 
@@ -15,7 +15,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 입력
 
-- `<project>/.aimd/output/planning-spec.json` (★ chain 1 산출)
+- `<project>/.aimd/output/discovery-spec.json` (★ chain 1 산출)
 - `<project>/.aimd/output/business-rules.json` + `domain.json` + 7대 산출물
 - `<project>/.aimd/output/state-machines/*.json` + `sequences/*.json` + `decision-tables/*.json` + `invariants/*.ts` (`formal-spec` phase 산출)
 
@@ -27,15 +27,25 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## ★ UC → BHV 1:N forward link 의무
 
-각 BHV 는 ≥ 1 `use_case_refs` (UC-* backward link) + ≥ 1 `acceptance_criteria_refs` (AC-* forward link / chain 2 → 3).
+각 BHV 는 ≥ 1 `use_case_refs` (UC-* backward link) + ≥ 1 `acceptance_criteria_refs` (AC-* forward link / chain spec → chain test).
 
 복합 use case 분리 원칙:
 - 1 UC = 1+ BHV. 단순 CRUD UC = 1 BHV / 복합 lifecycle UC = state 마다 1 BHV.
 - 예: UC-USER-001 (login) → BHV-USER-001 (validate-credentials) + BHV-USER-002 (issue-jwt) + BHV-USER-003 (set-session).
 
+## ★ v11.0.0 Story cross-cut anchor 정합 (DEC-2026-05-26-be-fe-산출물-분리 §결단 #6)
+
+본 skill 안 BHV 산출 시 Story cross-cut anchor 본격 인식:
+- BHV-* = ★ Story anchor (BE+FE/DB/E2E 가로지름) — discovery-spec.UC 의 자연 evolution.
+- 본 skill 안 BHV 자체 = cross-cut 단일 (BE-only BHV / FE-only BHV 분리 ❌ — Story paradigm 정합).
+- chain plan 진입 후 task-plan.story_refs[] 안 jira_id record (본 skill 책임 ❌ / plan-decompose-and-sequence 책임).
+- 본 skill 출력 `behavior-spec.json` 안 BHV-* = ★ 차기 Story anchor source (jira_id 사전 부여 ❌).
+
+★ Epic = FE 화면 단위 / 본 skill 안에서 Epic 추출 ❌ (plan-decompose-and-sequence 책임). 다만 BHV 안 `screen_id` hint 가능 (FE 트랙 PoC / 본 skill 안 optional).
+
 ## 절차
 
-1. **planning-spec 로드** — `use_cases[]` + `business_rules_intent[]` 파싱.
+1. **discovery-spec 로드** — `use_cases[]` + `business_rules_intent[]` 파싱.
 
 2. **각 UC 마다 BHV 분해** — 1 UC + 1 trigger + 1 outcome 단위. 복합 UC 는 분해 (위 §원칙).
 
@@ -58,7 +68,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    ```bash
    # chain coverage (UC → BHV / BHV → AC)
    node tools/chain-coverage-validator/src/cli.js \
-     --planning   .aimd/output/planning-spec.json \
+     --planning   .aimd/output/discovery-spec.json \
      --behavior   .aimd/output/behavior-spec.json \
      --acceptance .aimd/output/acceptance-criteria.json
 

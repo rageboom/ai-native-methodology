@@ -13,7 +13,7 @@ allowed-tools: Read, Glob, Bash, Edit
 - `compose-behavior-spec` 의 step 5 에서 자동 호출.
 - 사용자가 cross_links 보강 시 직접 호출.
 
-## 통합 대상 (analysis stage 산출물)
+## 통합 대상 (analysis stage 산출물 + discovery stage backward link)
 
 | 영역 | 산출물 (★ 변경 ❌) |
 |---|---|
@@ -21,10 +21,12 @@ allowed-tools: Read, Glob, Bash, Edit
 | 7대 보강 | finding-system / migration-cautions / `formal-spec` phase (state-machines / sequences / decision-tables / invariants) |
 | 8 FE | ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum |
 | ★ v1.5 | error-mapping-spec |
+| ★ v11.0.0 신설 | discovery-spec (★ cross_links.to_discovery_spec / chain discovery backward link / DEC-2026-05-26-discovery-spec-rename) |
 
 ## 산출
 
 `behavior-spec.json` 의 `cross_links.to_analysis_artifacts[]` 배열 갱신 (in-place edit).
+★ v11.0.0 — `cross_links.to_discovery_spec[]` 본격 추가 (chain discovery backward link / `[".aimd/output/discovery-spec.json"]` 1 entry 본격).
 
 ```json
 {

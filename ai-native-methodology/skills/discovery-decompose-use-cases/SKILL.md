@@ -22,7 +22,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 산출
 
-planning-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
+discovery-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
 
 ```json
 {

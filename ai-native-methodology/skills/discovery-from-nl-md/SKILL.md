@@ -23,7 +23,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 
 ## 산출
 
-`.aimd/output/planning-spec.json` 의 다음 entries:
+`.aimd/output/discovery-spec.json` 의 다음 entries:
 
 - `use_cases[]` — paragraph / scenario 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
 - `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → BR-INTENT-*
@@ -50,7 +50,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 6. **NFR 추출 (★ 1차 책임)**: 응답시간 / 가용성 / 동시 사용자 / 보안 / a11y / 데이터 보존 기간 등 명시 NFR → NFR-*. **명시되지 않은 NFR fabricate ❌** (no-simulation 의무 핵심).
 7. **risks / concerns 추출**: 명시 위험 / 불확실성 / open-question → R-*.
 8. **intent classification**: orchestrator inject `intent` (new/modify/bug-fix) 와 NL 안 키워드 cross-check — 모순 시 finding emit (예: intent=bug-fix 인데 NL 은 신규 기능 묘사).
-9. **planning-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
+9. **discovery-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
 10. **`planning-extraction-validator` 통과** 자격 = 모든 entry source_grounded / NL 안 실 문장 검증 (grep_hit_count > 0).
 
 ## 70~80% 한계 명시

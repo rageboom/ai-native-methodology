@@ -23,7 +23,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 
 ## 산출
 
-`.aimd/output/planning-spec.json` 의 다음 entries (source_grounded_evidence 의무):
+`.aimd/output/discovery-spec.json` 의 다음 entries (source_grounded_evidence 의무):
 
 - `use_cases[]` — frame 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
 - `business_rules_intent[]` — interaction 에 함축된 BR (예: 카드 만료 가림 / 폼 validation 시각화 / 조건부 button enable) → BR-INTENT-*
@@ -48,7 +48,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 6. **BR-INTENT 추출**: UI interaction 에 함축된 비즈니스 규칙 식별 (마스킹 / 조건부 enable / error state) → BR-INTENT-* + node reference.
 7. **NFR (부 채널) 추출**: a11y / responsive / transition — `analysis-from-figma` 의 visual-manifest 와 cross-check.
 8. **`cross_links.to_visual_manifest`** 채움 (baseline 있을 시) — discovery 가 analysis baseline 위에 UC axis 추가하는 paradigm.
-9. **planning-spec.json append/merge** — discovery-agent 가 다른 어댑터 산출과 통합 (multi-source 시).
+9. **discovery-spec.json append/merge** — discovery-agent 가 다른 어댑터 산출과 통합 (multi-source 시).
 10. **`planning-extraction-validator` 통과** 자격 = 모든 entry `source_grounded_evidence` 존재 / grep_hit_count > 0 (node_id figma file 실재 확인).
 
 ## 70~80% 한계 명시

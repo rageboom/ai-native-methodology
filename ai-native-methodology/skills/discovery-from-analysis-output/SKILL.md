@@ -1,6 +1,6 @@
 ---
 name: discovery-from-analysis-output
-description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). analysis stage 7대 + 8 FE 산출물 + finding + antipatterns + migration-cautions 를 입력으로 planning-spec.{json,md} 추출 (discovery stage 산출물 / 파일명 reuse). 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적. v4.0 planning-extract-from-legacy 의 rename (DEC-2026-05-21 정합) — 본문 stage 표기 본격 갱신은 carry.
+description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). analysis stage 7대 + 8 FE 산출물 + finding + antipatterns + migration-cautions 를 입력으로 discovery-spec.{json,md} 추출 (discovery stage 산출물 / 파일명 reuse). 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적. v4.0 planning-extract-from-legacy 의 rename (DEC-2026-05-21 정합) — 본문 stage 표기 본격 갱신은 carry.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -11,7 +11,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 언제 사용
 
 - analysis stage 종결 후 chain 1 진입 시 의무.
-- 사용자 자연어: "기획 단계 시작" / "planning-spec 만들어줘" / "legacy 분석 결과로 use case 추출해줘".
+- 사용자 자연어: "기획 단계 시작" / "discovery-spec 만들어줘" / "legacy 분석 결과로 use case 추출해줘".
 
 ## 입력
 
@@ -24,12 +24,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-- `<project>/.aimd/output/planning-spec.json` (★ schemas/discovery-spec.schema.json 의무)
-- `<project>/.aimd/output/planning-spec.md` (★ 사람 눈 / ADR-008 v2)
+- `<project>/.aimd/output/discovery-spec.json` (★ schemas/discovery-spec.schema.json 의무)
+- `<project>/.aimd/output/discovery-spec.md` (★ 사람 눈 / ADR-008 v2)
 
 ## ★ ★ ★ no-simulation 의무 (source-grounded)
 
-planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 grep-hit 의무:
+discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 grep-hit 의무:
 - analysis BR-* match (`source_grounded_evidence.artifact: "rules"`)
 - domain entity match (`source_grounded_evidence.artifact: "domain"`)
 - API operation match (`source_grounded_evidence.artifact: "api"`)
@@ -53,7 +53,7 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 6. **`planning-extraction-validator` 자동 검증**:
    ```bash
    node tools/planning-extraction-validator/src/cli.js \
-     --planning .aimd/output/planning-spec.json \
+     --planning .aimd/output/discovery-spec.json \
      --rules    .aimd/output/business-rules.json \
      --domain   .aimd/output/domain.json \
      --json
@@ -62,10 +62,10 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 
 7. **schema-validator 자동 검증**:
    ```bash
-   node tools/schema-validator/src/cli.js .aimd/output/planning-spec.json
+   node tools/schema-validator/src/cli.js .aimd/output/discovery-spec.json
    ```
 
-8. **planning-spec.md 렌더링** — json 의 use_cases / business_intent / business_rules_intent 를 markdown 으로 변환 (★ ADR-008 v2 이중 렌더링).
+8. **discovery-spec.md 렌더링** — json 의 use_cases / business_intent / business_rules_intent 를 markdown 으로 변환 (★ ADR-008 v2 이중 렌더링).
 
 9. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
    1. business_intent 정확성?
@@ -81,12 +81,12 @@ planning-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상 
 
 chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT / use case 가 발생 가능 (예: BR 의 default 값 / state 의 source / pagination 정책 / system-level 첫 옵션 자동 선택 여부 등). Auto Mode 호환 + 후속 chain 2~4 stage 의 traceability 보장을 위해 결단 처리를 정식화. ★ mis-fe-admin DWPD-1774 5 stage 실증 테스트 §결단 보류 3건 (D-1/D-2/D-3) 입증 — 명세 부재로 plugin 본문이 아닌 사용자 ad-hoc record 로 처리됨 (F-VERIFY-G005 결정적 evidence).
 
-### planning-spec.json 신설 필드
+### discovery-spec.json 신설 필드
 
 | 필드 | 타입 | 의미 |
 |---|---|---|
 | `decisions[]` | array | 결정된 결단 entry |
-| `decisions[].id` | string | `DEC-PLAN-NNN` (planning-spec 안 local id) |
+| `decisions[].id` | string | `DEC-PLAN-NNN` (discovery-spec 안 local id) |
 | `decisions[].topic` | string | 결단 주제 (예: "system default value for first option") |
 | `decisions[].source` | enum | `user-explicit` \| `AI-default` \| `AI-investigation-complete` \| `carry` |
 | `decisions[].rationale` | string | 결단 사유 (★ AI-default 시 1차 default 선택 근거 명시 의무) |
@@ -100,14 +100,14 @@ chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT
 - **`user-explicit`** — 사용자가 명시적으로 답한 결단. `revisit_required: false` default. ★ 사용자가 명시 의사를 표시한 path 만 본 enum 사용.
 - **`AI-default`** — Auto Mode 에서 AI 가 1차 default 적용 (예: "첫 옵션 자동 선택" / "BE escalate placeholder UI carry"). ★ `revisit_required: true` 의무 + 후속 chain 2/3/4 stage gate 에서 사용자 confirm 의무.
 - **`AI-investigation-complete`** — AI 가 legacy code grep / 도메인 분석 / source-grounded evidence 로 결단 추출 (단순 default 가 아닌 본문 근거). `revisit_required: true` 권고 (사용자 검토).
-- **`carry`** — 이전 cycle / iter 의 결단 인계. `rationale` 에 evidence path (예: `.aimd/output/iter-3/planning-spec.json#decisions[2]`) 인용 의무.
+- **`carry`** — 이전 cycle / iter 의 결단 인계. `rationale` 에 evidence path (예: `.aimd/output/iter-3/discovery-spec.json#decisions[2]`) 인용 의무.
 
 ### Auto Mode 흐름
 
 Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 자연어 "Auto Mode 로 진행") — `pending_decisions[]` 가 발생하면:
 1. AI 가 1차 default 결단 (`source: AI-default` / `rationale` 에 1차 default 근거 명시)
 2. `revisit_required: true` set
-3. `planning-spec.json` 의 `meta.auto_mode_default_count` ++
+3. `discovery-spec.json` 의 `meta.auto_mode_default_count` ++
 4. 후속 chain 2 (spec) 진입 시 gate #2 에서 `decisions[].source = AI-default + revisit_required = true` 만 cluster 로 추출 → 사용자 일괄 confirm (cluster 결단 권고)
 
 ### Auto Mode 미활성 (default)

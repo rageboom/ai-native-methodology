@@ -23,7 +23,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 산출
 
-planning-spec 의 `business_rules_intent[]` 배열. 각 BR-INTENT:
+discovery-spec 의 `business_rules_intent[]` 배열. 각 BR-INTENT:
 
 ```json
 {

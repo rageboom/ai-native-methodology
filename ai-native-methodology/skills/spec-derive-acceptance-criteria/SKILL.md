@@ -16,7 +16,7 @@ allowed-tools: Read, Grep, Bash, Write
 ## 입력
 
 - `<project>/.aimd/output/behavior-spec.json` (★ chain 2 진행 중)
-- `<project>/.aimd/output/planning-spec.json` (use case backward link)
+- `<project>/.aimd/output/discovery-spec.json` (use case backward link)
 - `<project>/.aimd/output/business-rules.json` + `domain.json` (BR / domain reference)
 
 ## 산출
@@ -32,14 +32,65 @@ allowed-tools: Read, Grep, Bash, Write
   "behavior_ref": "BHV-USER-001",
   "use_case_ref": "UC-USER-001",
   "title": "이메일+비밀번호로 정상 로그인",
-  "gherkin": "Given user 가 회원가입을 마쳤다\nWhen user 가 이메일 'a@x.com' 과 비밀번호 'P@ssw0rd!' 로 POST /login 호출\nThen 200 응답 + JWT 발급",
-  "severity": "critical",
-  "moscow": "MUST",
+  "gherkin": {
+    "given": ["user 가 회원가입을 마쳤다"],
+    "when": "user 가 이메일 'a@x.com' 과 비밀번호 'P@ssw0rd!' 로 POST /login 호출",
+    "then": ["200 응답", "JWT 발급"]
+  },
+  "severity": "must",
   "verifiable": true,
   "test_case_refs": ["TC-USER-001"],
-  "automated_runnable": true
+  "automated_runnable": true,
+  "layer": "be",
+  "story_ref": "STORY-LOGIN-001",
+  "openapi_path": "/api/login",
+  "operationId": "loginUser"
 }
 ```
+
+## ★ v11.0.0 layer + contract ref 산출 의무 (DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate)
+
+AC 안 `layer` 필드 본격 부여 + contract ref 본격 명시 (schema-level if/then 강제):
+
+| layer | 본격 required 필드 |
+|---|---|
+| `be` | `openapi_path` + `operationId` (★ BE swagger contract anchor) |
+| `fe` | `state_map_ref` + `dtcg_token_ref` + `visual_manifest_ref` (★ FE state-map + DTCG token + visual contract) |
+| `db` | 본격 required ❌ (carry — v11.x 안 schema migration ref 후보) |
+| `e2e` | 본격 required ❌ (FE+BE cross / e2e test framework anchor) |
+| `infra` | 본격 required ❌ |
+| `cross-cut` | Story anchor (BE+FE 모두 포함) / contract ref optional |
+| (layer 부재) | legacy carry / 기존 PoC backward-compat / if/then trigger ❌ |
+
+### FE AC 예제 (★ v11.0.0)
+
+```json
+{
+  "id": "AC-PWD-002",
+  "behavior_ref": "BHV-PWD-001",
+  "use_case_ref": "UC-PWD-001",
+  "gherkin": {
+    "given": ["사용자 인증됨"],
+    "when": "PasswordChangeForm 안 새 비번 12자 입력",
+    "then": ["submit 버튼 enabled", "validation toast 미표시"]
+  },
+  "severity": "must",
+  "verifiable": true,
+  "test_case_refs": ["TC-PWD-101"],
+  "automated_runnable": true,
+  "layer": "fe",
+  "story_ref": "STORY-PWD-001",
+  "state_map_ref": "PasswordChangeForm.idle",
+  "dtcg_token_ref": "default",
+  "visual_manifest_ref": "settings/PasswordChangeForm"
+}
+```
+
+## ★ v11.0.0 Story anchor 본격 명시
+
+AC 안 `story_ref` 본격 부여 (Jira Story ID 또는 자유 string). Story = BHV/AC cross-cut anchor:
+- BHV 1개 안에서 BE AC + FE AC 모두 같은 `story_ref` 부여 가능 (cross-cut paradigm 정합).
+- chain plan 진입 시 task-plan.tasks[].story_ref 안 정합 의무.
 
 ## ★ ★ verifiable=true 정합 (schema if/then)
 
