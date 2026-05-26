@@ -4,6 +4,18 @@
 
 ★ ★ ★ **v2.0 갱신 (2026-05-06)**: chain 4단계 산출물 ID 추가 + UC-* 3 형식 충돌 통일 (DEC-2026-05-06-v2.0-i-strict-채택 정합 / sub-plan-2 §D1 결단).
 
+> ★ ★ ★ ★ ★ **v11.0.0 paradigm 결단 의제 carry** (2026-05-26 / Phase 0 결단 문서화만 / 차기 세션 cascade) — Jira hierarchy 정합 entity matrix 본격 신설:
+>
+> | Jira | 본 방법론 ID | 정의 | 신설 시점 |
+> |---|---|---|---|
+> | Initiative | (외부 매핑만) | 대형 결단 단위 | (entity ❌) |
+> | Epic | (외부 매핑만 + screen_id/route cross_link) | FE 화면 단위 | v11.0.0 |
+> | Story | (외부 매핑만 + story_ref → BHV-*/AC-*) | 화면 내 사용자 시나리오 (BE+FE cross-cut anchor) | v11.0.0 |
+> | Task (Story sibling) | **OP-{도메인}-{3자리 번호}** | 사용자 가시 없는 작업 (운영/인프라/마이그레이션) | ★ v11.0.0 신설 |
+> | Sub-task | TASK-{도메인}-{3자리 번호} (기존 유지) | 개발 작업 단위 (1~3 AC 묶음 / layer 분기) | (기존 / 명명 정합 명시화) |
+>
+> SSOT: [`../decisions/DEC-2026-05-26-v11-paradigm-결단.md`](../decisions/DEC-2026-05-26-v11-paradigm-결단.md). Phase 1+ 본격 OP-* entity schema 신설 cascade (차기 세션 / Phase 1 안 본격 file path 확정).
+
 ---
 
 ## ID 체계
@@ -75,7 +87,7 @@ flowchart LR
 1. **도메인**: 대문자 (ORDER, USER, PRODUCT 등). domain.json `aggregates[].name` 정합.
 2. **번호**: 3자리 (001, 002, ...) — ★ ★ ★ v2.0 통일 / 이름 형식 (CANCEL, CREATE 등) 폐기.
 3. **카테고리** (안티패턴): DB, ARCH, DOMAIN, API, FE, VALIDATION, CONFIG, SECURITY, PERFORMANCE
-4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합). **★ ★ v2.3.7 enforcement** — schema-level strict pattern `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 도입 / `business-rules.schema.json` + `planning-spec.schema.json` + `behavior-spec.schema.json` 모두 4토막+ 강제 / 3토막 (`BR-DOMAIN-001`) ❌ schema-validator fail. 5토막+ (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001`) ✅ 자연 허용.
+4. **이름**: BR-{도메인}-**{이름}**-{번호} 만 이름 형식 유지 (예: BR-ORDER-CANCEL-001 / BR 은 비즈니스 의미 명시 의무 / 산업 BR 표준 정합). **★ ★ v2.3.7 enforcement** — schema-level strict pattern `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 도입 / `business-rules.schema.json` + `discovery-spec.schema.json` + `behavior-spec.schema.json` 모두 4토막+ 강제 / 3토막 (`BR-DOMAIN-001`) ❌ schema-validator fail. 5토막+ (`BR-ARTICLE-AUTHOR-EDIT-ONLY-001`) ✅ 자연 허용.
 5. **고유성**: 같은 유형 내에서 ID 중복 금지.
 6. **★ v2.0 chain link 의무**: BHV-* 가 ≥ 1 UC-* backward / AC-* 가 ≥ 1 BHV-* backward / TC-* 가 ≥ 1 AC-* backward / IMPL-* 가 ≥ 1 TC-* backward (chain-coverage-validator 강제 / sub-plan-3 신설).
 

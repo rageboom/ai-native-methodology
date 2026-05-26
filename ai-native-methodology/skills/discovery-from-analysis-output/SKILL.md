@@ -24,7 +24,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-- `<project>/.aimd/output/planning-spec.json` (★ schemas/planning-spec.schema.json 의무)
+- `<project>/.aimd/output/planning-spec.json` (★ schemas/discovery-spec.schema.json 의무)
 - `<project>/.aimd/output/planning-spec.md` (★ 사람 눈 / ADR-008 v2)
 
 ## ★ ★ ★ no-simulation 의무 (source-grounded)
@@ -128,7 +128,7 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 - ADR-CHAIN-001 §1 (이중 렌더링 chain 1)
 - ADR-CHAIN-002 (gate UX)
-- planning-spec.schema.json (deliverable 17)
+- discovery-spec.schema.json (deliverable 17)
 - master plan §B chain 1
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)
 

@@ -67,9 +67,9 @@ test('F-V2-02 — valid instance → exit 0', () => {
   rmSync(TMP, { recursive: true, force: true });
 });
 
-test('F-V2-01 — chain 1~4 schema (planning/behavior/acceptance/test/impl/traceability-matrix) 모두 로드', () => {
+test('F-V2-01 — chain discovery~impl schema (discovery/behavior/acceptance/test/impl/traceability-matrix) 모두 로드 (★ v11.0.0 — planning-spec → discovery-spec rename)', () => {
   const schemaNames = [
-    'planning-spec.schema.json',
+    'discovery-spec.schema.json',
     'behavior-spec.schema.json',
     'acceptance-criteria.schema.json',
     'test-spec.schema.json',
@@ -83,7 +83,7 @@ test('F-V2-01 — chain 1~4 schema (planning/behavior/acceptance/test/impl/trace
   const dummy = join(TMP, 'dummy.json');
   writeFileSync(dummy, JSON.stringify({ foo: 'bar' }));
   const r = runCli([dummy]);
-  const failures = (r.stderr || '').match(/failed to load (planning-spec|behavior-spec|acceptance-criteria|test-spec|impl-spec|traceability-matrix)\.schema\.json/g) || [];
-  assert.equal(failures.length, 0, `chain 1~4 schema 로드 실패: ${failures.join(', ')}`);
+  const failures = (r.stderr || '').match(/failed to load (discovery-spec|behavior-spec|acceptance-criteria|test-spec|impl-spec|traceability-matrix)\.schema\.json/g) || [];
+  assert.equal(failures.length, 0, `chain discovery~impl schema 로드 실패: ${failures.join(', ')}`);
   rmSync(TMP, { recursive: true, force: true });
 });

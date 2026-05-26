@@ -2,6 +2,8 @@
 
 본 문서는 본 방법론의 lifecycle stage 간 **data contract** 를 정의. ★ ★ ★ **v2.0 = SDLC chain harness 정식 채택** (DEC-2026-05-06-v2.0-i-strict-채택) → ★ ★ **v9.0 6-stage** (analysis→discovery→spec→plan→test→implement / planning→discovery 개칭 + plan 신설 / DEC-2026-05-21). 본 v1.5.x 가 채운 부분 = analysis stage. v2.0 sub-plan-1 ~ sub-plan-6 진행 중 다른 stage 정식 채움.
 
+> ★ ★ ★ ★ ★ **v11.0.0 paradigm 결단 의제 carry** (2026-05-26 / Phase 0 결단 문서화만 / 차기 세션 cascade) — 산출물 polymorphism cascade: chain harness anchor entity = UC(discovery cross-cut) → BHV/AC(spec cross-cut) → Epic/Story/OP/TASK(plan layer 분기) → TC(test framework 분기) → IMPL(implement stack 분기). planning-spec → discovery-spec rename + ticket = plan 단일 + Epic = FE 화면 + OP-* 신설 + contract 강제 양 axis. 본 매트릭스 Phase 1+ 본격 갱신 의무. SSOT: [`../decisions/DEC-2026-05-26-v11-paradigm-결단.md`](../decisions/DEC-2026-05-26-v11-paradigm-결단.md).
+
 ## 본 방법론 가치 명세 (★ v2.0 / CLAUDE.md ★★★)
 
 ```
@@ -136,7 +138,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | 강 | 강 | 약 | 약 | 약 | 약 |
 
 산출물 (discovery stage 가 만듦):
-- **planning-spec.json** (deliverable 17 / `schemas/planning-spec.schema.json` ★ sub-plan-2 신설 / ★ v9.0 산출물 파일명 reuse 유지)
+- **planning-spec.json** (deliverable 17 / `schemas/discovery-spec.schema.json` ★ sub-plan-2 신설 / ★ v9.0 산출물 파일명 reuse 유지)
 - **planning-spec.md** (이중 렌더링 / ADR-008 v2 정합)
 
 기존 placeholder (v2.0 carry 였던 PRD / story / domain-priority) = ★ planning-spec.json 의 sub-section 으로 흡수 (1차 = legacy-extraction 모드 / 후속 use case 분기 시 source_format 분기 정책).

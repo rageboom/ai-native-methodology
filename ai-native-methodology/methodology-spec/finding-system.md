@@ -510,7 +510,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Type:** gap
 - **Description:** `tools/chain-coverage-validator/src/validator.js:98-103` 는 `behavior.cross_links.to_analysis_artifacts` 가 **비어있지 않음만** 확인 — 경로 resolve / existsSync assert 부재. v7.0.0 `rules.json → business-rules.json` rename 이 docs는 sweep (F-MB-001) 했으나 chain 산출물의 `derivation_source.source_artifacts` 와 `cross_links.to_analysis_artifacts` 는 미동기화 → 두 PoC 모두 dead-link 보유. poc-03 은 추가로 derivation_source(상대 `output/rules/rules.json`)와 cross_links(repo-absolute `examples/.../output/rules/rules.json`) **경로 컨벤션 불일치**.
 - **Evidence:** poc-05 `planning-spec.json` derivation_source.source_artifacts = `["input/rules.json", ...]` (MISSING). poc-03 동일 + 컨벤션 불일치. validator.js:98 코드 직접 검증.
-- **Spec gap:** chain-coverage-validator 명세에 path-resolve assert 부재. `schemas/planning-spec.schema.json` + `schemas/behavior-spec.schema.json` cross_links/derivation_source 항목에 path format / resolution rule 부재.
+- **Spec gap:** chain-coverage-validator 명세에 path-resolve assert 부재. `schemas/discovery-spec.schema.json` + `schemas/behavior-spec.schema.json` cross_links/derivation_source 항목에 path format / resolution rule 부재.
 - **Decision made:** N/A (rename 후속 전파 누락).
 - **Severity:** **high** — dead-link 결정적 차단 부재 = F-MB-001 / skill-citation-validator(v8.1.0 #13) 선례와 동일 class 가 chain stage 잔존.
 - **Proposed fix:** chain-coverage-validator 에 `pathExistsAssert(cross_links + derivation_source)` 추가 + 경로 컨벤션 단일화(repo-relative). PATCH (additive assert / validator 단일 지점 / skill-citation-validator paradigm 재활용).

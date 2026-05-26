@@ -280,7 +280,7 @@ export function validateAntipatternCoverage({ antipatterns, acceptanceCriteria, 
 }
 
 // ★ v8.11.0 — risks_and_constraints string form (legacy carry) warn lane.
-// Senior REVISE-1 흡수 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4) — schemas/planning-spec.schema.json
+// Senior REVISE-1 흡수 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §4) — schemas/discovery-spec.schema.json (★ v11.0.0 — planning-spec rename)
 // 안 risks_and_constraints items polymorphic anyOf[string, object] 도입 후 string 분기 = legacy carry 한정 의무.
 // 신규 PoC = object form (id + severity required + description + type?) 권장 (severity 결정적 추출 + drift attractor 차단).
 // 본 함수 = string form 검출 시 low finding emit (silent omission 회피 / chain-coverage gate #2 추가 lane).

@@ -70,5 +70,5 @@ planning-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
 ## 인용
 
 - master plan §B chain 1
-- planning-spec.schema.json `use_cases[]` 정합
+- discovery-spec.schema.json `use_cases[]` 정합
 - ADR-CHAIN-001 §2 (UC → BHV 1:N forward link)

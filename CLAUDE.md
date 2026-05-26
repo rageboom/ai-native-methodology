@@ -10,6 +10,25 @@
 **품질 1순위 + 재작업 최소화 2순위**. 속도/quick win/컨텍스트 신선도 후순위.
 격상/처분/순서 결정 시 §8.1 단일 PoC 과적합 회피 강제 적용. (memory `feedback_quality_priority.md`)
 
+## ★ ★ ★ ★ ★ v11.0.0 paradigm 결단 의제 carry (2026-05-26 / Phase 0 결단 문서화만 / 차기 세션 cascade)
+
+본 세션 (session 48차) 사용자 결단 = "template body carry 5종 처리하자" → 단순 carry 의제 → 본격 paradigm drift 8종 표면화 → **v11.0.0 MAJOR 결단**. **Phase 0** = 본 세션 paradigm 문서화만 (4 DEC file + INDEX + plugin-charter + 3 methodology-spec + 본 CLAUDE.md). **Phase 1~5** = 차기 세션 cascade (schema 진화 + skill body + template body + 5 PoC sweep + v11.0.0 release).
+
+**8 결단 SSOT**: [decisions/DEC-2026-05-26-v11-paradigm-결단.md](ai-native-methodology/decisions/DEC-2026-05-26-v11-paradigm-결단.md)
+
+| # | 결단 | 영향 |
+|---|---|---|
+| 1 | `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename | breaking — schema $ref / cross_links / 5 PoC artifact |
+| 2 | BE/FE 산출물 분리 paradigm (stage 별 axis 다름 — discovery/spec cross-cut 단일 / plan layer 분기 / test framework 분기 / implement stack 분기) | schema / skill body / template body |
+| 3 | ticket = plan stage 한 곳 (R20 stage-별 paradigm retract → R20-prime) | ticket-sync skill 본격 재설계 |
+| 4 | User Story 추가 부재 (UC 유지 / 변경 ❌) | 무 |
+| 5 | Epic = FE 화면 단위 (UI screen / route) / discovery ≠ Epic | ticket hierarchy 재매핑 |
+| 6 | Story = cross-cut anchor (BE+FE/DB/E2E 가로지름) | spec stage 산출물 cross-cut 정합 |
+| 7 | Jira Task level entity 매핑 (OP-* 신설 / TASK-* 유지=Sub-task / 명명 정합) | schema 신설 + 명명 정정 |
+| 8 | ★ ★ ★ contract 강제 양 axis (BE = swagger / FE = state-map + visual-manifest + DTCG token) | schema 필수 필드 / test framework enum / validator matching |
+
+★ ★ 본 carry **차기 세션 진입 시 본격 시행** (LL-v930-02 cap 정합 / Phase 0 만 본 세션 / self-referential drift 회피 paradigm).
+
 ## ★★★ 본 방법론 가치 명세 (★ v3.6.2 / 2026-05-15 갱신 / paradigm 진화 안정점)
 
 ```

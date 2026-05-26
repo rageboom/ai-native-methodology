@@ -8,7 +8,7 @@
 
 | Schema | 대응 산출물 | 사용 위치 |
 |---|---|---|
-| `planning-spec.schema.json` | chain 1 / planning-spec | `tools/planning-extraction-validator/` (gate #1) |
+| `discovery-spec.schema.json` | chain 1 / planning-spec | `tools/planning-extraction-validator/` (gate #1) |
 | `behavior-spec.schema.json` | chain 2 / behavior-spec (BHV-* executable contract) | `tools/chain-coverage-validator/` (gate #2) |
 | `acceptance-criteria.schema.json` | chain 2 / Gherkin BDD AC-* | `tools/chain-coverage-validator/` |
 | `test-spec.schema.json` | chain 3 / TC-* (RED 의무) | `tools/spec-test-link-validator/` (gate #3) |
@@ -94,7 +94,7 @@ node tools/schema-validator/src/cli.js <output-dir>
 
 ```bash
 npx ajv validate \
-  -s schemas/planning-spec.schema.json \
+  -s schemas/discovery-spec.schema.json \
   -d output/.aimd/planning-spec.json \
   -r schemas/meta-confidence.schema.json
 ```

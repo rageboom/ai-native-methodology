@@ -63,4 +63,4 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 - `agents/discovery-agent.md` (본 skill 의 caller)
 - `skills/analysis-from-figma/SKILL.md` (baseline 채널 / source 동일 / 출력 axis 다름)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference / source_grounded paradigm)
-- `schemas/planning-spec.schema.json` (산출 schema)
+- `schemas/discovery-spec.schema.json` (산출 schema)

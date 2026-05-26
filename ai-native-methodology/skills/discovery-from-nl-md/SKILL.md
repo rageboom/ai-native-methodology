@@ -66,4 +66,4 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 - `agents/discovery-agent.md` (본 skill 의 caller)
 - `skills/analysis-from-prompt/SKILL.md` + `skills/analysis-from-plan-doc/SKILL.md` (baseline 채널)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference)
-- `schemas/planning-spec.schema.json` (산출 schema)
+- `schemas/discovery-spec.schema.json` (산출 schema)

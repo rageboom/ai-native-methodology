@@ -16,13 +16,15 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 ## Inputs
 
 - `<project-dir>/.aimd/output/**/*.json` — 검증 대상 산출물
-- chain 6 schema (자동 등록):
-  - `planning-spec.schema.json`
+- chain 6 schema (자동 등록 / ★ v11.0.0 — planning-spec → discovery-spec rename):
+  - `discovery-spec.schema.json`
   - `behavior-spec.schema.json`
   - `acceptance-criteria.schema.json`
   - `test-spec.schema.json`
   - `impl-spec.schema.json`
   - `traceability-matrix.schema.json`
+  - `operational-task.schema.json` (★ v11.0.0 신설 / Story sibling OP-* anchor)
+  - `task-plan.schema.json` (★ v9.x / v11.0.0 확장)
 - 기타 schema (state / intervention-log / 19+ BE/FE 공용)
 
 ## Outputs

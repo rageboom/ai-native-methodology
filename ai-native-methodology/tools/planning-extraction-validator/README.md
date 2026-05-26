@@ -47,7 +47,7 @@ node src/cli.js \
 
 ## 참조
 
-- [`../../schemas/planning-spec.schema.json`](../../schemas/planning-spec.schema.json)
+- [`../../schemas/discovery-spec.schema.json`](../../schemas/discovery-spec.schema.json)
 - [`../../methodology-spec/deliverables/17-planning-spec.md`](../../methodology-spec/deliverables/17-planning-spec.md)
 - ADR-CHAIN-001 (chain-4-stage-enforcement) + ADR-CHAIN-002 (go-stop-gate) + ADR-CHAIN-003 (revisit-loop)
 - DEC-2026-05-06-sub-plan-3a-종결 — chain validator 4종 신설 record

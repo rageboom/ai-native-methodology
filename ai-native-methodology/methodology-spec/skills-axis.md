@@ -3,6 +3,7 @@
 > **상태**: 신설 (v1.4.4 / plan-v144-manifest-ssot.md / D-A=A3 + D-D=D1 결단)
 > **SSOT**: `flows/analysis.phase-flow.json`
 > **검증 도구**: `tools/drift-validator/` (3-way: manifest ↔ workflow ↔ skills)
+> ★ ★ ★ ★ ★ v11.0.0 paradigm 결단 의제 carry (2026-05-26 / Phase 0 결단 문서화만 / 차기 세션 cascade) — stage 별 산출물 분리 axis 본격 재정합 (discovery/spec cross-cut 단일 / plan layer 분기 / test framework 분기 / implement stack 분기) + planning-spec → discovery-spec rename + BE/FE 산출물 분리 paradigm 본격 진입. 본 §4 chain stage axis 표 Phase 1+ 본격 갱신 의무. SSOT: [`../decisions/DEC-2026-05-26-v11-paradigm-결단.md`](../decisions/DEC-2026-05-26-v11-paradigm-결단.md).
 
 ## 1. 배경 — 두 개의 axis
 

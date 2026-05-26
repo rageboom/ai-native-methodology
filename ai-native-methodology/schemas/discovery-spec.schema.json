@@ -1,31 +1,31 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ai-native-methodology/schemas/planning-spec.schema.json",
-  "title": "Planning Spec (chain 1 / 기획문서)",
-  "description": "v2.0 SDLC 4단계 chain harness 의 chain 1 stage 산출물. legacy 분석 결과 → 비즈니스 의도 추출 (1차 single-case). DEC-2026-05-06-v2.0-i-strict-채택 정합. ID 컨벤션: methodology-spec/id-conventions.md.",
+  "$id": "https://ai-native-methodology/schemas/discovery-spec.schema.json",
+  "title": "Discovery Spec (chain discovery / 기획 의도)",
+  "description": "★ v11.0.0 MAJOR — `planning-spec` → `discovery-spec` rename (DEC-2026-05-26-discovery-spec-rename 정합). chain harness 안 discovery stage 산출물. legacy 분석 결과 + 입력 어댑터 4종 (analysis-output / swagger / figma / nl-md) → 비즈니스 의도 추출. discovery stage = cross-cut 단일 산출물 (BE/FE 양쪽 자연 가로지름 — DEC-2026-05-26-be-fe-산출물-분리 §1 정합). ID 컨벤션: methodology-spec/id-conventions.md.",
   "type": "object",
   "required": ["meta", "derivation_source", "business_intent", "use_cases"],
   "additionalProperties": true,
-  "$comment_additionalProperties": "★ v8.6.0+ F-V2C2-1-02 R#4 fix — PoC 부가 top-level keys (business_rules / migration_priority_summary / phase_4_7_acceptance_oracle / sql_inventory_summary / planning_validator_pass / $3_axis_alignment 등) 허용. drift attractor 차단은 v9.0 charter review carry — 권장 위치 = `extra` field (meta-confidence 와 동일 패턴).",
+  "$comment_additionalProperties": "★ v8.6.0+ F-V2C2-1-02 R#4 fix — PoC 부가 top-level keys (business_rules / migration_priority_summary / phase_4_7_acceptance_oracle / sql_inventory_summary / discovery_validator_pass / $3_axis_alignment 등) 허용. drift attractor 차단은 v11.x carry — 권장 위치 = `extra` field (meta-confidence 와 동일 패턴).",
   "properties": {
     "meta": {
       "$ref": "./meta-confidence.schema.json"
     },
     "derivation_source": {
       "type": "object",
-      "description": "본 planning-spec 의 출처. 1차 = legacy-extraction 만 / use case 4종 분기는 v2.1+ carry K-1.",
+      "description": "본 discovery-spec 의 출처. v11.0.0 = 4 입력 어댑터 + legacy-extraction 모두 정합 (analysis-output / swagger / figma / nl-md).",
       "required": ["type", "source_artifacts"],
       "additionalProperties": false,
-      "$comment": "★ v8.10.0 — source_handling + source_root_absolute 명시 properties 추가 (DEC-2026-05-12-in-place-read-정책-채택 정합 / poc-11 실측 정식 흡수 / additive). additionalProperties:false 유지 = drift attractor 차단 본질 보존.",
+      "$comment": "★ v8.10.0 — source_handling + source_root_absolute 명시 properties 추가 (DEC-2026-05-12-in-place-read-정책-채택 정합 / poc-11 실측 정식 흡수 / additive). additionalProperties:false 유지 = drift attractor 차단 본질 보존. ★ v11.0.0 — input 어댑터 4종 정합 (DEC-2026-05-26-input-skill-roles).",
       "properties": {
         "type": {
           "type": "string",
           "enum": ["legacy-extraction", "new-prd", "modification", "bugfix"],
-          "description": "기획 input 출처. 1차 v2.0.0 = legacy-extraction only / 다른 enum 은 v2.1+ carry K-1"
+          "description": "기획 input 출처. v11.0.0 = legacy-extraction (analysis stage 산출물 채널) / new-prd (nl-md + figma + swagger 채널) / modification + bugfix (delta 갱신) 모두 정합."
         },
         "source_artifacts": {
           "type": "array",
-          "description": "본 planning-spec 추출에 사용된 analysis stage 산출물 경로 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5)",
+          "description": "본 discovery-spec 추출에 사용된 analysis stage 산출물 + 입력 어댑터 산출물 경로 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md / 8 FE 산출물 / Phase 4.5 / swagger-extract.json / figma-extract.json / nl-md prompt-extract.json)",
           "items": {"type": "string"},
           "minItems": 1
         },
@@ -60,7 +60,7 @@
     },
     "use_cases": {
       "type": "array",
-      "description": "유스케이스 목록. analysis stage domain.json 의 UC-* 를 chain 2 forward link 가능한 형태로 정리",
+      "description": "유스케이스 목록. analysis stage domain.json 의 UC-* 를 chain spec forward link 가능한 형태로 정리. ★ v11.0.0 = cross-cut anchor (BE/FE 양쪽 가로지름 / DEC-2026-05-26-be-fe-산출물-분리 §1 정합).",
       "items": {
         "type": "object",
         "required": ["id", "description", "acceptance_criteria_refs"],
@@ -93,7 +93,7 @@
               "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$"
             },
             "minItems": 1,
-            "description": "★ chain 2 forward link 의무 (sub-plan-3 chain-coverage-validator 강제)"
+            "description": "★ chain spec forward link 의무 (sub-plan-3 chain-coverage-validator 강제)"
           },
           "source_grounded_evidence": {
             "type": "array",
@@ -235,7 +235,7 @@
         "to_decisions": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "★ v8.10.0 — backward link to decisions/ DEC.md (DEC-YYYY-MM-DD-* / planning 결단 trace)"
+          "description": "★ v8.10.0 — backward link to decisions/ DEC.md (DEC-YYYY-MM-DD-* / discovery 결단 trace)"
         },
         "to_phase7_findings": {
           "type": "array",

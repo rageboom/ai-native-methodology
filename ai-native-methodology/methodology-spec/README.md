@@ -45,7 +45,7 @@
 
 | chain | deliverable | schema | gate validator |
 |---|---|---|---|
-| 1 (planning) | [`17-planning-spec`](./deliverables/17-planning-spec.md) | `planning-spec.schema.json` | `planning-extraction-validator` |
+| 1 (planning) | [`17-planning-spec`](./deliverables/17-planning-spec.md) | `discovery-spec.schema.json` | `planning-extraction-validator` |
 | 2 (spec) | [`18-behavior-spec`](./deliverables/18-behavior-spec.md) + [`19-acceptance-criteria`](./deliverables/19-acceptance-criteria.md) | `behavior-spec.schema.json` + `acceptance-criteria.schema.json` | `chain-coverage-validator` |
 | 3 (test) | [`20-test-spec`](./deliverables/20-test-spec.md) | `test-spec.schema.json` | `spec-test-link-validator` |
 | 4 (impl) | [`21-impl-spec`](./deliverables/21-impl-spec.md) | `impl-spec.schema.json` | `test-impl-pass-validator` |

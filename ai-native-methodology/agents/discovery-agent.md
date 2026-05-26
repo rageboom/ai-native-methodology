@@ -53,13 +53,13 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 2. **어댑터 병렬 dispatch** — 입력 유형별 skill 호출 (analysis-output / swagger / figma / nl-md)
 3. **공통 sub-skill 호출** — `discovery-decompose-use-cases` + `discovery-identify-business-intent` 로 어댑터 결과 정규화
 4. **Merge + 충돌 해소** — 어댑터 간 동일 UC / Intent 충돌 / 중복 detection 결과 사용자 결단 묶음 gate
-5. **planning-spec.{json,md} 산출** — `schemas/planning-spec.schema.json` 의무 (carry — schema 신설)
+5. **planning-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무 (carry — schema 신설)
 6. **gate 진입** — `_base-invoke-go-stop-gate` 호출 / 사용자 결단 cluster + intervention-log 등재
 7. **종결 보고** — planning-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
 
 ## 산출 자산
 
-- `.aimd/output/planning-spec.json` (`schemas/planning-spec.schema.json` 의무 — carry C-v4.1-discovery-schema)
+- `.aimd/output/planning-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema)
 - `.aimd/output/planning-spec.md` (사람 눈 / ADR-008 v2 이중 렌더링)
 - `.aimd/output/findings.md` (discovery stage 의 발견 사항 누적)
 - `.aimd/output/intervention-log.json` (discovery gate 사용자 결단 로그)
@@ -88,5 +88,5 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 - v4.0 planning-agent (git history 보존 / 본 작업 안 discovery-agent 로 rename — `agents/discovery-agent.md`)
 - ADR-CHAIN-001 (이중 렌더링)
 - ADR-CHAIN-002 (gate UX)
-- `schemas/planning-spec.schema.json` (carry — v4.1 신설)
+- `schemas/discovery-spec.schema.json` (carry — v4.1 신설)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)

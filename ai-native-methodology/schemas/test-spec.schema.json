@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/test-spec.schema.json",
-  "title": "Test Spec (chain 3 / 테스트 명세 + 실 test 코드 메타)",
-  "description": "v2.0 SDLC 4단계 chain harness 의 chain 3 stage 산출물. acceptance-criteria 기반 실 test 코드 자동 생성 (RED 의무). 5종 물증 7 필드 (★ no-simulation 강화). DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "title": "Test Spec (chain test / 테스트 명세 + 실 test 코드 메타)",
+  "description": "v2.0 chain harness 의 test stage 산출물. acceptance-criteria 기반 실 test 코드 자동 생성 (RED 의무). 5종 물증 7 필드 (★ no-simulation 강화). DEC-2026-05-06-v2.0-i-strict-채택 정합. ★ v11.0.0 MAJOR 확장 (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 hard gate) — test_cases[].framework hint 확장 (schemathesis/dredd/pact/playwright-visual/axe-core/percy/chromatic 추가) + openapi_contract_ref (BE contract framework 본격 required) + visual_regression_ref (FE visual framework 본격 required) 본격 if/then.",
   "type": "object",
   "required": ["meta", "derivation_source", "test_cases", "coverage"],
   "additionalProperties": false,
@@ -34,7 +34,7 @@
           "ac_ref": {
             "type": "string",
             "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "★ chain 2 backward link"
+            "description": "★ chain spec backward link"
           },
           "bhv_ref": {
             "type": "string",
@@ -42,12 +42,12 @@
           },
           "type": {
             "type": "string",
-            "enum": ["unit", "integration", "contract", "e2e", "property", "mutation", "security", "load"],
-            "description": "★ B4 — 5 → 8 enum 확장 (mutation/security/load 추가 / Senior 권고)"
+            "enum": ["unit", "integration", "contract", "e2e", "property", "mutation", "security", "load", "visual", "a11y"],
+            "description": "★ B4 — 8 → 10 enum 확장 (visual + a11y 추가 / v11.0.0 contract 강제 양 axis 정합). contract = BE openapi 정합 / visual = FE visual regression / a11y = FE accessibility (WCAG)"
           },
           "framework": {
             "type": "string",
-            "description": "★ B3 open enum — 사내 stack 추가 시 schema 변경 ❌ / hint = jest/vitest/jasmine/mocha/junit5/pytest/rspec/gotest/playwright/cypress/supertest/testcontainers 등"
+            "description": "★ B3 open enum — 사내 stack 추가 시 schema 변경 ❌ / hint = jest/vitest/jasmine/mocha/junit5/pytest/rspec/gotest/playwright/cypress/supertest/testcontainers/schemathesis/dredd/pact/spring-cloud-contract/playwright-visual/axe-core/percy/chromatic 등. ★ v11.0.0 — BE contract framework (schemathesis/dredd/pact/spring-cloud-contract) 시 openapi_contract_ref 본격 required / FE visual framework (playwright-visual/axe-core/percy/chromatic) 시 visual_regression_ref 본격 required (allOf if/then)."
           },
           "framework_status": {
             "type": "string",
@@ -66,17 +66,17 @@
           "expected_outcome": {
             "type": "string",
             "enum": ["pass", "fail"],
-            "description": "★ chain 3 RED 의무 = 'fail' (impl 부재 / chain 4 GREEN 시 'pass' 격상)"
+            "description": "★ chain test RED 의무 = 'fail' (impl 부재 / chain impl GREEN 시 'pass' 격상)"
           },
           "fail_mode": {
             "type": "string",
             "enum": ["compile_import_fail", "assertion_fail", "dry_run_placeholder", "pending"],
-            "description": "★ F-SIM-005 P1 본격 흡수 (v8.14.0 / DEC-2026-05-23-fsim-005-corroboration-2-genuine). per-TC RED granularity 의무화. compile_import_fail = Beck-canonical 정합 (Kent Beck 2002 preface p.x verbatim 'test doesn't even compile at first') / assertion_fail = per-TC RED 표준 / dry_run_placeholder = ★ corroboration 자격 ❌ (Adzic SBE 10년 폐기 함정 직접 회피 — gojko.net/2020/03/17/sbe-10-years.html) / pending = Cucumber yellow (skipped) 정합 (Senior REVISE-1 추가 권고). expected_outcome='fail' 시 권고 (optional / chain 3 RED granularity 입증). expected_outcome='pass' (chain 4 GREEN) 시 미사용."
+            "description": "★ F-SIM-005 P1 본격 흡수 (v8.14.0 / DEC-2026-05-23-fsim-005-corroboration-2-genuine). per-TC RED granularity 의무화. compile_import_fail = Beck-canonical 정합 (Kent Beck 2002 preface p.x verbatim 'test doesn't even compile at first') / assertion_fail = per-TC RED 표준 / dry_run_placeholder = ★ corroboration 자격 ❌ (Adzic SBE 10년 폐기 함정 직접 회피 — gojko.net/2020/03/17/sbe-10-years.html) / pending = Cucumber yellow (skipped) 정합 (Senior REVISE-1 추가 권고). expected_outcome='fail' 시 권고 (optional / chain test RED granularity 입증). expected_outcome='pass' (chain impl GREEN) 시 미사용."
           },
           "impl_module_ref": {
             "type": "string",
             "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "★ chain 4 forward link (chain 3 RED 시 미정 / chain 4 GREEN 시 채움)"
+            "description": "★ chain impl forward link (chain test RED 시 미정 / chain impl GREEN 시 채움)"
           },
           "code_pointers": {
             "type": "array",
@@ -87,6 +87,59 @@
             "type": "boolean",
             "default": false,
             "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
+          },
+          "openapi_contract_ref": {
+            "type": "object",
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 hard gate). BE contract framework (schemathesis/dredd/pact/spring-cloud-contract) 시 본격 required (allOf if/then).",
+            "required": ["path", "operationId"],
+            "additionalProperties": false,
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "OpenAPI path (예: /api/password-change)"
+              },
+              "operationId": {
+                "type": "string",
+                "description": "OpenAPI operationId (예: changePassword)"
+              },
+              "method": {
+                "type": "string",
+                "enum": ["get", "post", "put", "patch", "delete", "head", "options"]
+              },
+              "contract_file": {
+                "type": "string",
+                "description": "Pact contract file path 또는 spring-cloud-contract DSL file path (선택)"
+              }
+            }
+          },
+          "visual_regression_ref": {
+            "type": "object",
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 hard gate). FE visual framework (playwright-visual/axe-core/percy/chromatic) 시 본격 required (allOf if/then).",
+            "required": ["screen"],
+            "additionalProperties": false,
+            "properties": {
+              "screen": {
+                "type": "string",
+                "description": "screen 또는 component name (예: PasswordChangeForm)"
+              },
+              "state_map_ref": {
+                "type": "string",
+                "description": "state-map.json 안 state id (예: PasswordChangeForm.idle / loading / error)"
+              },
+              "dtcg_token_set": {
+                "type": "string",
+                "description": "DTCG W3C token set (예: default / dark)"
+              },
+              "baseline_screenshot": {
+                "type": "string",
+                "description": "baseline screenshot path (visual regression diff anchor)"
+              },
+              "viewports": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "viewport list (예: ['1280x720', '375x667'])"
+              }
+            }
           },
           "test_run_evidence": {
             "type": "object",
@@ -127,7 +180,37 @@
               }
             }
           }
-        }
+        },
+        "allOf": [
+          {
+            "$comment": "★ v11.0.0 if/then — framework in BE contract 4종 (schemathesis/dredd/pact/spring-cloud-contract) 시 openapi_contract_ref 본격 required (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 hard gate).",
+            "if": {
+              "properties": {
+                "framework": {
+                  "enum": ["schemathesis", "dredd", "pact", "spring-cloud-contract"]
+                }
+              },
+              "required": ["framework"]
+            },
+            "then": {
+              "required": ["openapi_contract_ref"]
+            }
+          },
+          {
+            "$comment": "★ v11.0.0 if/then — framework in FE visual/a11y 4종 (playwright-visual/axe-core/percy/chromatic) 시 visual_regression_ref 본격 required.",
+            "if": {
+              "properties": {
+                "framework": {
+                  "enum": ["playwright-visual", "axe-core", "percy", "chromatic"]
+                }
+              },
+              "required": ["framework"]
+            },
+            "then": {
+              "required": ["visual_regression_ref"]
+            }
+          }
+        ]
       }
     },
     "coverage": {
@@ -168,7 +251,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "★ chain 3 = 0.0 (RED 의무) / chain 4 = 1.0 (GREEN 의무 / gate #4) — 본 schema 는 chain 3 단계 / chain 4 는 impl-spec 에서 1.0 의무"
+          "description": "★ chain test = 0.0 (RED 의무) / chain impl = 1.0 (GREEN 의무 / gate #impl) — 본 schema 는 chain test 단계 / chain impl 은 impl-spec 에서 1.0 의무"
         },
         "line_coverage": {
           "type": "number",

@@ -7,6 +7,7 @@
 > ★ v8.6.1 (2026-05-18) — **R20 신설** (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only).
 > ★ v8.6.2 (2026-05-18) — **R20 확장** (phase=enter — stage 진입 시 의무 작업 Task 1개 / analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 / DEC-2026-05-18-r20 §확장).
 > ★ v8.6.3 (2026-05-18) — **R20 구조 강제** (parent_ticket_id schema 의무 + link_type enum + jira_structure_add_issues 통합 + F-TICKETSYNC-002 missing_parent finding / DEC-2026-05-18-r20 §v8.6.3).
+> ★ ★ ★ ★ ★ v11.0.0 결단 의제 carry (2026-05-26 / Phase 0 결단 문서화만) — **R20-prime** = ticket = plan stage 단일 paradigm (R20 v8.6.x phase enum {enter, exit} 본격 retract / DEC-2026-05-26-ticket-plan-단일 / Phase 1+ 본격 시행 / 차기 세션 cascade) + templates §2 R4 = templates/{analysis, **discovery (★ planning→rename)**, **spec (★ 신설)**, plan, test, implement, design}/ 정합 (DEC-2026-05-26-discovery-spec-rename / DEC-2026-05-26-v11-paradigm-결단).
 
 ## §1 사용자 요구사항 20 (must-have / ★ R20 v8.6.1 신설 / R19 v8.6.0 / R18 v7.1.0 / R16·R17 영구 scope-out)
 

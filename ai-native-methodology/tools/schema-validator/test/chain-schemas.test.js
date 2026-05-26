@@ -29,28 +29,26 @@ const FULL_META = {
   inputs_used: ['source_code'],
 };
 
-test('★ chain — planning-spec.json 정합 instance → valid', () => {
+test('★ chain — discovery-spec.json 정합 instance → valid (★ v11.0.0 — planning-spec rename)', () => {
   const dir = tmp();
   try {
     const inst = {
-      $schema_origin: '../../schemas/planning-spec.schema.json',
+      $schema_origin: '../../schemas/discovery-spec.schema.json',
       meta: { ...FULL_META },
-      derivation_source: { analysis_artifacts: ['./business-rules.json'] },
+      derivation_source: { type: 'legacy-extraction', source_artifacts: ['./business-rules.json'] },
+      business_intent: { domain_purpose: '사용자 인증' },
       use_cases: [
         {
           id: 'UC-USER-001',
           name: 'login',
           description: '사용자 로그인',
           actors: ['User'],
-          br_refs: ['BR-AUTH-LOGIN-001'],
-          source_grounded_evidence: [
-            { artifact: 'rules', element_id: 'BR-AUTH-LOGIN-001', grep_hit_count: 3, file_paths: ['business-rules.json'] },
-          ],
+          acceptance_criteria_refs: ['AC-USER-001'],
         },
       ],
     };
-    writeFileSync(join(dir, 'planning-spec.json'), JSON.stringify(inst));
-    const r = runCli(join(dir, 'planning-spec.json'));
+    writeFileSync(join(dir, 'discovery-spec.json'), JSON.stringify(inst));
+    const r = runCli(join(dir, 'discovery-spec.json'));
     const result = r.parsed.results[0];
     if (result.valid !== true) {
       // schema 가 still being designed — log errors for debug but allow PASS if errors are about
@@ -65,12 +63,12 @@ test('★ chain — planning-spec.json 정합 instance → valid', () => {
   }
 });
 
-test('★ chain — 6 schema 모두 로드 (no parse error)', () => {
+test('★ chain — 6 schema 모두 로드 (no parse error / ★ v11.0.0 — planning-spec → discovery-spec)', () => {
   // 빈 instance 라도 schema 로드 자체는 성공해야 함.
   const dir = tmp();
   try {
     const sixArtifacts = [
-      'planning-spec',
+      'discovery-spec',
       'behavior-spec',
       'acceptance-criteria',
       'test-spec',
@@ -115,7 +113,7 @@ test('★ chain — Ajv 8 if/then/else 지원 (acceptance-criteria verifiable=tr
     const inst = {
       $schema_origin: '../schemas/acceptance-criteria.schema.json',
       meta: { ...FULL_META },
-      derivation_source: { behavior_spec_path: './behavior-spec.json', planning_spec_path: './planning-spec.json' },
+      derivation_source: { behavior_spec_path: './behavior-spec.json', discovery_spec_path: './discovery-spec.json' },
       criteria: [
         {
           id: 'AC-USER-001',

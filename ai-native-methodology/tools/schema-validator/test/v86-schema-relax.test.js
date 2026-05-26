@@ -1,6 +1,6 @@
 // schema-validator 회귀 — v8.6.0+ C Hybrid fix (F-V2C2-1-02 schema 완화).
 // 1) meta-confidence: extra field + methodology_version SemVer pre-release + confidence_breakdown number 허용 + additionalProperties true
-// 2) planning-spec: top-level + use_case additionalProperties true
+// 2) discovery-spec: top-level + use_case additionalProperties true
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
@@ -87,9 +87,9 @@ test('F-V2C2-1-02 R#2 — confidence_breakdown number value 허용 (PoC #07 패�
   rmSync(TMP, { recursive: true, force: true });
 });
 
-test('F-V2C2-1-02 R#4 — planning-spec top-level 부가 keys 허용', () => {
+test('F-V2C2-1-02 R#4 — discovery-spec top-level 부가 keys 허용', () => {
   ensureTmp();
-  const f = join(TMP, 'planning-spec.json');
+  const f = join(TMP, 'discovery-spec.json');
   writeFileSync(f, JSON.stringify({
     meta: { generated_at: '2026-05-18T10:00:00+09:00', confidence: 0.9, inputs_used: ['source_code'] },
     derivation_source: { type: 'legacy-extraction', source_artifacts: ['x'] },
@@ -100,13 +100,13 @@ test('F-V2C2-1-02 R#4 — planning-spec top-level 부가 keys 허용', () => {
     phase_4_7_acceptance_oracle: {},
   }));
   const r = runCli([f]);
-  assert.equal(r.status, 0, `planning-spec top-level 부가 keys 허용 의무. stdout:${r.stdout}`);
+  assert.equal(r.status, 0, `discovery-spec top-level 부가 keys 허용 의무. stdout:${r.stdout}`);
   rmSync(TMP, { recursive: true, force: true });
 });
 
-test('F-V2C2-1-02 R#4 — planning-spec use_case 부가 keys 허용 (note 등)', () => {
+test('F-V2C2-1-02 R#4 — discovery-spec use_case 부가 keys 허용 (note 등)', () => {
   ensureTmp();
-  const f = join(TMP, 'planning-spec.json');
+  const f = join(TMP, 'discovery-spec.json');
   writeFileSync(f, JSON.stringify({
     meta: { generated_at: '2026-05-18T10:00:00+09:00', confidence: 0.9, inputs_used: ['source_code'] },
     derivation_source: { type: 'legacy-extraction', source_artifacts: ['x'] },

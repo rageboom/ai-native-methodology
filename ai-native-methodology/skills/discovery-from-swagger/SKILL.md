@@ -62,4 +62,4 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 - `agents/discovery-agent.md` (본 skill 의 caller)
 - `skills/analysis-from-swagger/SKILL.md` (baseline 채널 / source 동일 / 출력 axis 다름)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference)
-- `schemas/planning-spec.schema.json` + `schemas/openapi-extension.schema.json` (산출 schema)
+- `schemas/discovery-spec.schema.json` + `schemas/openapi-extension.schema.json` (산출 schema)

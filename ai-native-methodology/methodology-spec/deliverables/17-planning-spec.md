@@ -1,7 +1,7 @@
 # 산출물 #17: Planning Spec (★ v2.0 chain 1)
 
 > **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-008 v2 §10 (이중 렌더링 chain 단계) / ADR-009 v2 §2.5 (planning trust 0.85)
-> **schema**: `schemas/planning-spec.schema.json`
+> **schema**: `schemas/discovery-spec.schema.json`
 > **생성 phase**: chain 1 (discovery) — `/discovery-from-analysis-output` (skill / ★ v9.0 planning→discovery 개칭 / 산출물 파일명 `planning-spec.json` 은 reuse 유지)
 > **gate**: go/stop gate #1 (ADR-CHAIN-002)
 
@@ -41,7 +41,7 @@
 | 도구 | 검증 |
 |---|---|
 | **planning-extraction-validator** (★ sub-plan-3 신설) | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
-| schema-validator (Ajv 8) | planning-spec.schema.json 구조 정합 |
+| schema-validator (Ajv 8) | discovery-spec.schema.json 구조 정합 |
 | traceability-matrix-builder | UC-* row 채움 (matrix.json + matrix.md + matrix.mermaid) |
 
 ## 5. 예시 (chain 1 sample)

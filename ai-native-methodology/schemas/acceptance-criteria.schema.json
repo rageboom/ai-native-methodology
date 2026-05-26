@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/acceptance-criteria.schema.json",
-  "title": "Acceptance Criteria (chain 2 / 합격 기준)",
-  "description": "v2.0 SDLC 4단계 chain harness 의 chain 2 stage 산출물. Gherkin BDD 형식. AC-* 가 ≥ 1 BHV-* + ≥ 1 UC-* backward + ≥ 1 TC-* forward link 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "title": "Acceptance Criteria (chain spec / 합격 기준)",
+  "description": "v2.0 chain harness 의 spec stage 산출물. Gherkin BDD 형식. AC-* 가 ≥ 1 BHV-* + ≥ 1 UC-* backward + ≥ 1 TC-* forward link 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합. ★ v11.0.0 MAJOR 확장 (DEC-2026-05-26-discovery-spec-rename + DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6 Story cross-cut anchor) — derivation_source.discovery_spec_path rename + criteria[] 안 layer + story_ref + openapi_path + operationId + state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 if/then 강제.",
   "type": "object",
   "required": ["meta", "derivation_source", "criteria"],
   "additionalProperties": false,
@@ -12,11 +12,14 @@
     },
     "derivation_source": {
       "type": "object",
-      "required": ["behavior_spec_path", "planning_spec_path"],
+      "required": ["behavior_spec_path", "discovery_spec_path"],
       "additionalProperties": false,
       "properties": {
         "behavior_spec_path": {"type": "string"},
-        "planning_spec_path": {"type": "string"}
+        "discovery_spec_path": {
+          "type": "string",
+          "description": "★ v11.0.0 rename — chain discovery backward link — discovery-spec.json path. 이전 명명 `planning_spec_path` 본격 폐기 (DEC-2026-05-26-discovery-spec-rename)."
+        }
       }
     },
     "criteria": {
@@ -36,12 +39,12 @@
           "behavior_ref": {
             "type": "string",
             "pattern": "^BHV-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "★ chain 2 backward link 의무 (chain-coverage-validator 강제)"
+            "description": "★ chain spec backward link 의무 (chain-coverage-validator 강제)"
           },
           "use_case_ref": {
             "type": "string",
             "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "★ chain 1 backward link 의무"
+            "description": "★ chain discovery backward link 의무"
           },
           "gherkin": {
             "type": "object",
@@ -90,12 +93,12 @@
           "test_case_refs": {
             "type": "array",
             "items": {"type": "string", "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$"},
-            "description": "★ chain 3 forward link (chain-coverage-validator 강제)"
+            "description": "★ chain test forward link (chain-coverage-validator 강제)"
           },
           "gate_required": {
             "type": "boolean",
             "default": false,
-            "description": "★ Industry — verifiable=true AC 만 chain 4 impl 진입 허용 (Aider /ask↔/code 정합)"
+            "description": "★ Industry — verifiable=true AC 만 chain impl 진입 허용 (Aider /ask↔/code 정합)"
           },
           "related_brs": {
             "type": "array",
@@ -118,18 +121,72 @@
             "type": "boolean",
             "default": false,
             "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["be", "fe", "db", "e2e", "infra", "cross-cut"],
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate). AC 의 layer 분기 — layer in [be] 시 openapi_path + operationId 본격 required / layer in [fe] 시 state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 required (if/then). cross-cut = Story anchor (BE+FE 모두 포함 시) / layer 부재 = legacy carry (기존 PoC 정합)."
+          },
+          "story_ref": {
+            "type": "string",
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-be-fe-산출물-분리 §결단 #6 + DEC-2026-05-26-ticket-plan-단일 §결단 #6). Story cross-cut anchor — 본 AC 가 속한 Story 매핑 (Jira Story ID 또는 자유 string). Story = BHV/AC 묶음 anchor (BE+FE/DB/E2E 가로지름)."
+          },
+          "openapi_path": {
+            "type": "string",
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate). layer=be 시 본격 required. OpenAPI path (예: /api/password-change)."
+          },
+          "operationId": {
+            "type": "string",
+            "description": "★ v11.0.0 신설. layer=be 시 본격 required. OpenAPI operationId (예: changePassword)."
+          },
+          "state_map_ref": {
+            "type": "string",
+            "description": "★ v11.0.0 신설. layer=fe 시 본격 required. state-map.json 안 state id ref."
+          },
+          "dtcg_token_ref": {
+            "type": "string",
+            "description": "★ v11.0.0 신설. layer=fe 시 본격 required. DTCG W3C token set ref (예: 'default' 또는 'dark')."
+          },
+          "visual_manifest_ref": {
+            "type": "string",
+            "description": "★ v11.0.0 신설. layer=fe 시 본격 required. visual-manifest.json 안 screen id ref."
           }
         },
-        "if": {
-          "properties": {"verifiable": {"const": true}}
-        },
-        "then": {
-          "required": ["test_case_refs", "automated_runnable"],
-          "properties": {
-            "test_case_refs": {"minItems": 1},
-            "automated_runnable": {"const": true}
+        "allOf": [
+          {
+            "$comment": "★ B2 — verifiable=true 시 test_case_refs ≥ 1 + automated_runnable=true 본격 required",
+            "if": {
+              "properties": {"verifiable": {"const": true}}
+            },
+            "then": {
+              "required": ["test_case_refs", "automated_runnable"],
+              "properties": {
+                "test_case_refs": {"minItems": 1},
+                "automated_runnable": {"const": true}
+              }
+            }
+          },
+          {
+            "$comment": "★ v11.0.0 if/then — layer=be 시 openapi_path + operationId 본격 required (DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate). layer 부재 = legacy carry / trigger ❌ — backward-compat 본격 정합.",
+            "if": {
+              "properties": {"layer": {"const": "be"}},
+              "required": ["layer"]
+            },
+            "then": {
+              "required": ["openapi_path", "operationId"]
+            }
+          },
+          {
+            "$comment": "★ v11.0.0 if/then — layer=fe 시 state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 required",
+            "if": {
+              "properties": {"layer": {"const": "fe"}},
+              "required": ["layer"]
+            },
+            "then": {
+              "required": ["state_map_ref", "dtcg_token_ref", "visual_manifest_ref"]
+            }
           }
-        }
+        ]
       }
     }
   }
