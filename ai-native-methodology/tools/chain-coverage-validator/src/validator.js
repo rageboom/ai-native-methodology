@@ -22,7 +22,9 @@ import { resolve as pathResolve, isAbsolute, dirname } from 'node:path';
 // LL-v903-04 자산화: validator default 와 산출물 convention mismatch silent sink — 5 PoC corroboration ≥ 2 fix.
 export function autoDetectProjectRoot(specPath) {
   if (!specPath || typeof specPath !== 'string') return null;
-  const d = dirname(specPath);
+  // ★ cross-platform: Windows backslash path 도 macOS/Linux 에서 처리 (DEC-2026-05-26-gate-renumber-coherence carry §macOS env-dependent test fix)
+  // POSIX dirname() 은 \ 를 path separator 로 안 봐서 Windows path 입력 시 '.' 반환 → 사전 정규화 의무
+  const d = dirname(specPath.replace(/\\/g, '/'));
   const normalized = d.replace(/\\/g, '/');
   // `.aimd/output` 끝나는 패턴 → PoC root = ../..
   if (/(^|\/)\.aimd\/output$/.test(normalized)) {

@@ -9,6 +9,17 @@
 
 ---
 
+## [10.0.3] — 2026-05-26 PATCH — 잔여 carry quick wins 종결 (macOS env test fix + session-재시작-검증 표기)
+
+> 사용자 "남은 carry 처리하자" → 잔여 4 carry 정밀 점검 → Quick wins(env + session-LL) 채택. corrective / breaking 0.
+>
+> - **env test fix**: `tools/chain-coverage-validator/src/validator.js` `autoDetectProjectRoot` cross-platform path normalization. POSIX `dirname()` 이 `\` 를 path separator 로 안 봐서 Windows path 입력 시 `'.'` 반환 → dirname **전** backslash→slash 정규화로 해소. → `node --test tools/chain-coverage-validator/test/validator.test.js` **38/38 pass** (이전 37/38) / **release-readiness 19/20 → 20/20 ready**.
+> - **C-v4.1-session-재시작-검증 종결 표기**: DEC-2026-05-21 carry 표 안 해당 row 에 ✅ + LL-v4-04 자산화 location 명시 (DEC-05-17 + DEC-05-21 등재 완료 / protocol 자산 = 별도 코드/문서 작업 없음).
+> - **STOP-3**: workspace all pass + release-readiness **20/20** + skill-citation 0 stale + version 3-way 10.0.3 + breaking 0 = PATCH.
+> - **잔여 carry (사용자 결단 보류)**: C-v4.1-poc-재실행 (9 PoC 전부 task-plan 없음 / heavy / v10.x) + C-v4.1-input-skill-이관 (figma·swagger 실 중복 / discovery-from-figma 는 v4.1 PLACEHOLDER 그대로 / 3 옵션 결단 의무).
+>
+> DEC-2026-05-26-quick-carry-close.
+
 ## [10.0.2] — 2026-05-26 PATCH — v10.0.0 gate 재번호 prose+flow coherence (이전 session WIP 통합 + prose 전면 정합)
 
 > v10.0.0 이 machine 층(stage-graph gate map #1~#5)만 하고 **개별 phase-flow gate phase + plan agent/skills/templates + guides·README·lifecycle prose** 를 미정합으로 남긴 drift 청산. corrective / breaking 0.
