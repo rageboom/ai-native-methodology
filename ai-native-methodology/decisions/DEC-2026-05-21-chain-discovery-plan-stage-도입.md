@@ -99,7 +99,7 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 | C-v4.1-input-skill-이관 | `analysis-from-{prompt,swagger,plan-doc,figma}` 6 input skill 의 실제 이관 — 현 ADR scope = discovery-from-* 신설 / analysis-from-* 흡수 여부는 본격 검토 후 결단 |
 | C-v4.1-session-재시작-검증 | LL-v4-04 정합 — 본 paradigm 변경 후 Claude Code session 재시작 후 dispatch 검증 의무 |
 | C-v4.1-traceability-확장 | traceability-matrix 안 TASK + ADR + NFR + RISK layer 신설 (UC → BHV → AC → TASK → TC → IMPL + ADR/NFR/RISK cross-cut) |
-| C-v4.1-baseline-delta-운영-문서화 | "초기 1회 full analysis + 매 신규 건 delta 갱신" 운영 모델 명시 (baseline carry 규약) |
+| C-v4.1-baseline-delta-운영-문서화 ✅ **(v10.0.1 종결)** | "초기 1회 full analysis + 매 신규 건 delta 갱신" 운영 모델 명시 (baseline carry 규약) → `methodology-spec/baseline-delta-operating-model.md` 신설 / DEC-2026-05-26-baseline-delta-operating-model |
 | C-v4.1-poc-재실행 | 기존 PoC chain 산출물에 discovery·plan stage 추가 재실행 |
 | ★ C-v4.1-hooks-정합 (★ 깨진 참조 버그 / 시급) | `hooks.json` matcher (`planning` → `discovery`) + `hooks-bridge.js` TRIGGER_PATTERNS agentId 매핑 (`planning-agent` → `discovery-agent`, `planning-extract-from-legacy` → `discovery-from-analysis-output`) 갱신. ★ rename 미반영 = 깨진 참조 (6-stage 가 hooks 레벨 미작동). ★ 주의: artifact-graph 작업 (feat/artifact-graph-p1 / dependency-graph P1~P3) 이 동일 파일 (`hooks.json` + `hooks-bridge.js`) 대폭 수정 중 → 분리 commit 시 충돌. **artifact-graph 작업 안에 함께 수정** 또는 **artifact-graph merge 후** 수정 필요. plan/design 은 placeholder 라 TRIGGER 미등록 유지 (design-agent 패턴 정합 / v4.2+ 본격 시 등록). |
 

@@ -9,6 +9,21 @@
 
 ---
 
+## [10.0.1] — 2026-05-26 PATCH — baseline-delta 운영 모델 문서화 (v4.1 폐기 브랜치 carry 점검 → 실행)
+
+> 사용자 "정리해줘 그리고 carry 실행해줘". 폐기된 v4.1 브랜치(feat/v4.1-*) 개념을 현 main(v10.0.0)과 대조한 결과, discovery/plan stage·hooks 정합·plan-agent·traceability 확장은 v9.0.0~v10.0.0 에서 모두 완성. **유일 미해소 깨끗한 doc carry = DEC-2026-05-21 `C-v4.1-baseline-delta-운영-문서화`** 실행. additive doc / breaking 0.
+>
+> - **신설**: `methodology-spec/baseline-delta-operating-model.md` — "초기 1회 full analysis + 신규 건 delta 갱신" 운영 모델.
+>   - 두 baseline axis 구분: 분석 baseline(canonical global `.aimd/output/`) vs 품질 baseline(`baseline-<date>.json` / ADR-010 ratchet).
+>   - 운영 cadence 3단계: 초기 full 1회 → 신규 건 scope delta(`related_artifacts` 상속 / 재분석 ❌) → 레거시 변경 시 변경 영역만 재분석 + M4 `sync_state` + `chain-driver sync` 통제 cascade.
+>   - baseline carry 규약: 단일 source 참조 / drift 자동감지·cascade 수동 / 품질 baseline 단조(ratchet up) / iter-N carry(`inherited_from.carry_artifacts`).
+>   - 70~80% axis 정합 (운영 모델 = process cadence / metric 불변).
+> - **carry resolve**: DEC-2026-05-21 carry 표 `C-v4.1-baseline-delta-운영-문서화` ✅ 종결 표기 + DEC-2026-05-26-baseline-delta-operating-model 신설.
+> - **STOP-3**: workspace 737/737(보존) + release-readiness target 10.0.1 + skill-citation 0 stale + version 3-way 10.0.1 + breaking 0 = PATCH.
+> - **carry (점검 중 식별)**: poc-재실행(기존 PoC plan-spec 추가 / v10.x) + input-skill-이관(`analysis-from-*` ↔ `discovery-from-*` 공존 처분 결단) + lifecycle-contract plan placeholder prose drift(v10.0.0 잔존 점검).
+>
+> DEC-2026-05-26-baseline-delta-operating-model. Resolves DEC-2026-05-21 §carry C-v4.1-baseline-delta-운영-문서화.
+
 ## [10.0.0] — 2026-05-25 MAJOR — Phase 4-4' axis A plan stage paradigm 본격 구현 (★ ★ gate 번호 재정렬 widespread breaking / chain N = gate #N 1:1 INTERNAL CONVENTION) + cooling-off paradigm 영구 폐기 재확인
 
 > session 47차 / 본 conversation 안 5 commit cluster 통합 + 1 release ceremony.
