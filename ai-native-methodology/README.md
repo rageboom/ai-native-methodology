@@ -24,11 +24,11 @@ INPUT (1차 = legacy single-case):
         + acceptance-criteria
         + 7대 산출물 통합              ── go/stop gate #2
   ↓
-[CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk — ★ placeholder)  ── gate deferred
+[CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
   ↓
-[CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
+[CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #4
   ↓
-[CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+[CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #5
   ↓
 OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_hash)
 ```
@@ -182,16 +182,19 @@ npm run test                # workspace 12 tool unit test (218 test pass)
    → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
    → behavior-spec + acceptance-criteria + 7대 통합
    → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85) 통과
-   (chain 3 = plan stage / ★ placeholder / gate deferred / pass-through — plan-agent 본격 구현 v9.x+ carry)
-4. "test spec 생성 RED 의무"
+4. "plan / task 분해 / ADR / NFR / risk"
+   → plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr
+   → task-plan.{json,md} 산출
+   → gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR alternatives ≥3) 통과
+5. "test spec 생성 RED 의무"
    → test-generate-test-spec / test-run-test-evidence / test-verify-coverage
    → test-spec + 실 test code (RED — 실패 입증 / impl 부재)
-   → gate #3 (spec-test-link-validator / AC→TC ≥ 0.85 + RED) 통과
-5. "impl spec 생성 GREEN 의무"
+   → gate #4 (spec-test-link-validator / AC→TC ≥ 0.85 + RED) 통과
+6. "impl spec 생성 GREEN 의무"
    → implement-generate-impl-spec / implement-verify-test-pass
    → impl-spec + 실 impl code (GREEN / 100% test pass)
-   → gate #4 (test-impl-pass-validator / 실 test runner / 100% pass) 통과
-6. "traceability matrix"
+   → gate #5 (test-impl-pass-validator / 실 test runner / 100% pass) 통과
+7. "traceability matrix"
    → _base-build-traceability-matrix
    → UC→BHV→AC→TC→IMPL+commit_hash matrix 산출
 ```
@@ -219,13 +222,13 @@ dist/ai-native-methodology-v3.6.9/
 ├── CHANGELOG-HISTORY.md              v2.5.x 이전 archive
 ├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
 │
-├── agents/                           6 chain agent (analysis/discovery/spec/plan/test/implement / plan=placeholder) + _base 3
+├── agents/                           6 chain agent (analysis/discovery/spec/plan/test/implement) + _base 3
 ├── skills/                           ★ 13 chain skill + analysis 18 + _base 5
 │   ├── _base/                        _base-invoke-go-stop-gate / _base-build-traceability-matrix / _base-log-finding / _base-apply-template / _base-apply-baseline-ratchet
 │   ├── analysis/                     phase-0~6 + aspect 4 (a11y/i18n/static-security/legacy)
 │   ├── discovery/                    discovery-from-{analysis-output,swagger,figma,nl-md} / discovery-decompose-use-cases / discovery-identify-business-intent
 │   ├── spec/                         spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
-│   ├── plan/                         plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr (★ placeholder)
+│   ├── plan/                         plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr (★ v10.0.0 본격)
 │   ├── test/                         test-generate-test-spec / test-run-test-evidence / test-verify-coverage
 │   └── implement/                    implement-generate-impl-spec / implement-verify-test-pass
 ├── hooks/
@@ -298,11 +301,12 @@ node tools/drift-validator/src/cli.js {산출물 경로}/formal-spec/
 node tools/decision-table-validator/src/cli.js {산출물 경로}/formal-spec/decision-tables/
 node tools/formal-spec-link-validator/src/cli.js {산출물 경로}/formal-spec/
 
-# Chain harness validator (gate #1~#4)
-node tools/planning-extraction-validator/src/cli.js   # gate #1
-node tools/chain-coverage-validator/src/cli.js        # gate #2
-node tools/spec-test-link-validator/src/cli.js        # gate #3
-node tools/test-impl-pass-validator/src/cli.js --allow-execute  # gate #4 (실 test runner)
+# Chain harness validator (gate #1~#5)
+node tools/planning-extraction-validator/src/cli.js   # gate #1 (discovery)
+node tools/chain-coverage-validator/src/cli.js        # gate #2 (spec)
+node tools/plan-coverage-validator/src/cli.js         # gate #3 (plan)
+node tools/spec-test-link-validator/src/cli.js        # gate #4 (test)
+node tools/test-impl-pass-validator/src/cli.js --allow-execute  # gate #5 (실 test runner / implement)
 node tools/traceability-matrix-builder/src/cli.js     # release
 
 # 외부 도구 (★★★ no-simulation 의무)

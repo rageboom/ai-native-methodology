@@ -90,7 +90,7 @@ ai-native-methodology/                        ← 저장소 루트
 │       ├── analysis-<name>/SKILL.md          레거시 분석용 22종 (input~quality 11 phase + aspect)
 │       ├── discovery-<name>/SKILL.md         체인 1: 발견 6종
 │       ├── spec-<name>/SKILL.md              체인 2: 행동/인수 명세 3종
-│       ├── plan-<name>/SKILL.md              체인 3: 계획 3종 (★ placeholder)
+│       ├── plan-<name>/SKILL.md              체인 3: 계획 3종
 │       ├── test-<name>/SKILL.md              체인 4: 테스트 4종
 │       └── implement-<name>/SKILL.md         체인 5: 구현 4종
 │
@@ -107,7 +107,7 @@ ai-native-methodology/                        ← 저장소 루트
 │       ├── analysis.phase-flow.mermaid       사람용 다이어그램
 │       ├── discovery.phase-flow.json         체인 1 흐름
 │       ├── spec.phase-flow.json              체인 2 흐름
-│       ├── plan.phase-flow.json              체인 3 흐름 (★ placeholder)
+│       ├── plan.phase-flow.json              체인 3 흐름
 │       ├── test.phase-flow.json              체인 4 흐름
 │       ├── implement.phase-flow.json         체인 5 흐름
 │       └── sdlc-4stage-flow.json             master plan SSOT
@@ -394,21 +394,21 @@ AI-Native 개발 방법론 v2.5.1 ready
   └────────────────────┘
             ↓
   ┌────────────────────┐
-  │ 체인 3: 계획        │ → (게이트 deferred / ★ placeholder)
+  │ 체인 3: 계획        │ → 게이트 #3 (NFR allocation hard gate)
   └────────────────────┘
             ↓
   ┌────────────────────┐
-  │ 체인 4: 테스트(RED) │ → 게이트 #3 (테스트가 일단 실패해야 함)
+  │ 체인 4: 테스트(RED) │ → 게이트 #4 (테스트가 일단 실패해야 함)
   └────────────────────┘
             ↓
   ┌────────────────────┐
-  │ 체인 5: 구현(GREEN) │ → 게이트 #4 (테스트 100% 통과해야 함)
+  │ 체인 5: 구현(GREEN) │ → 게이트 #5 (테스트 100% 통과해야 함)
   └────────────────────┘
             ↓
        프로덕션 시스템 + 추적성 매트릭스
 ```
 
-**4개의 게이트** = 사람이 4번만 보면 됩니다. 그 사이는 모두 AI가 자동으로 합니다.
+**5개의 게이트** = 사람이 5번만 보면 됩니다. 그 사이는 모두 AI가 자동으로 합니다.
 
 ★ **v2.5 본격 paradigm**: 게이트 #1 진입 시 chain-driver 가 `br-cross-consistency-validator` 의 Layer 1 (결정적) + Layer 2 (Claude Code sub-agent 호출 / Sonnet 4.6) 양쪽 통과를 강제. semantic_drift_detected 또는 confidence_cap_exceeded finding 발생 시 chain 진입 차단.
 
@@ -494,7 +494,7 @@ v1.0 ── v1.4 ── v2.0 ── v2.1 ── v2.2 ── v2.3 ── v2.4 ─
 >
 > 워크스페이스에서 빌드 → 자기완결 플러그인 폴더 → 동료 환경에 설치 → 자연어 한 마디로 발동.
 >
-> 그 안에서는 14개 PoC로 입증된 16개의 검증 도구가 4번의 사람 게이트와 함께 돌아갑니다. ★ ★ v2.5 부터는 Layer 2 LLM (Claude Code sub-agent invocation) 이 의미 일관성까지 책임집니다.
+> 그 안에서는 14개 PoC로 입증된 16개의 검증 도구가 5번의 사람 게이트와 함께 돌아갑니다. ★ ★ v2.5 부터는 Layer 2 LLM (Claude Code sub-agent invocation) 이 의미 일관성까지 책임집니다.
 
 ---
 

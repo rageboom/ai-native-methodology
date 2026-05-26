@@ -9,6 +9,28 @@
 
 ---
 
+## [10.0.2] — 2026-05-26 PATCH — v10.0.0 gate 재번호 prose+flow coherence (이전 session WIP 통합 + prose 전면 정합)
+
+> v10.0.0 이 machine 층(stage-graph gate map #1~#5)만 하고 **개별 phase-flow gate phase + plan agent/skills/templates + guides·README·lifecycle prose** 를 미정합으로 남긴 drift 청산. corrective / breaking 0.
+>
+> **발견 경위**: 사용자 "WIP부터 같이 들여다보자" → working tree 의 이전 session 중단 작업(plan-stage gate 정합 WIP) 분석 → v10.0.0 의 chain N = gate #N 가 phase-flow 렌더링 + plan agent/skills + guides·README·lifecycle prose 까지 전파 안 됨 발견. drift-validator 가 chain-flow master mermaid + 개별 phase-flow gate 번호 vs stage-graph map 정합 을 안 봐 v10.0.0/v10.0.1 STOP-3 통과한 잔존 (제 v9.0.1 코herence redux 패턴).
+>
+> **번호 규칙 확정**: chain N = gate #N 1:1 (#1 discovery / #2 spec / **#3 plan** / #4 test / #5 implement) / "gate id ≠ chain" framing 폐기 / plan placeholder · deferred 표기 전면 해제.
+>
+> - **WIP 통합** (이전 session 중단 작업 / 정합 + 정확): `flows/plan.phase-flow.{json,mermaid}`(plan **gate-3 phase 추가** / 다른 flow 와 구조 대칭) + `flows/test.phase-flow.{json,mermaid}`(gate-3 → **#4**) + `flows/implement.phase-flow.{json,mermaid}`(gate-4 → **#5**) + `agents/plan-agent.md`("gate #plan/deferred" → "gate #3 hard gate 활성") + `skills/plan-{decompose-and-sequence,risk-and-nfr}/SKILL.md` + `templates/README.md` + `templates/plan/`(신규).
+> - **prose 정합 11 파일**:
+>   - `methodology-spec/lifecycle-contract.md`: OUTPUT block(plan #3 / test #4 / impl #5) + 5영역 plan row 본격 + 매핑 매트릭스 plan row 본격(skills 7 + gate #3 + plan-coverage-validator) + data-contract plan 절 placeholder 해제 + tree + traceability TASK layer + gate #1~#4 → #1~#5.
+>   - `methodology-spec/skills-axis.md`: §4·§7.2·§9.2 plan placeholder 해제 (plan-agent skills 7 / chain 3 본격).
+>   - `methodology-spec/id-conventions.md`: plan ID = task-plan TASK-*/ADR-*.
+>   - `methodology-spec/deliverables/22-traceability-matrix.md`: gate #1~#5 + TASK layer.
+>   - `README.md`: CHAIN block(plan #3 / test #4 / impl #5) + scenario plan step 본격 + validator block(gate #1~#5 + plan-coverage-validator) + tree placeholder 해제.
+>   - guides 4종: `chain-harness-guide.md` mermaid + sequenceDiagram + "gate id ≠ chain" 폐기 / `getting-started.md` 5-5 plan 본격 + gate 번호 / `first-prompt-cookbook.md` 2.3 Chain 3 plan skill-map / `common-errors.md`(검증).
+>   - briefing 2종: `01-main.md` flow 다이어그램 + skill tree + "5번의 게이트" / `slides/methodology-deck.md` value block + flow + chain 책임 표 + revisit 8 + asset 표 + multiagent.
+>   - `flows/README.md`: master SSOT "5 gate (chain N = gate #N)" + plan.phase-flow 본격.
+> - **STOP-3**: drift state-flow(6=6) + chain-layout(5 stage / **31 phase** = +1 plan gate-3) + phase-flow 짝(plan/test/implement) 0 breaking + release-readiness 19/20(env fail 1 = macOS Windows-path test / 본 PATCH 무관) + skill-citation 0 stale + version 3-way 10.0.2 + breaking 0 = PATCH.
+>
+> DEC-2026-05-26-gate-renumber-coherence. Resolves v10.0.0 phase-flow + prose drift 잔존 (machine 층 완성 후 렌더링/prose 미정합).
+
 ## [10.0.1] — 2026-05-26 PATCH — baseline-delta 운영 모델 문서화 (v4.1 폐기 브랜치 carry 점검 → 실행)
 
 > 사용자 "정리해줘 그리고 carry 실행해줘". 폐기된 v4.1 브랜치(feat/v4.1-*) 개념을 현 main(v10.0.0)과 대조한 결과, discovery/plan stage·hooks 정합·plan-agent·traceability 확장은 v9.0.0~v10.0.0 에서 모두 완성. **유일 미해소 깨끗한 doc carry = DEC-2026-05-21 `C-v4.1-baseline-delta-운영-문서화`** 실행. additive doc / breaking 0.

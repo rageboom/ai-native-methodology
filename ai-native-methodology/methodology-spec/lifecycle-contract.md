@@ -11,16 +11,16 @@ INPUT (1차 = legacy single-case):  legacy 코드베이스
 OUTPUT chain:
   [CHAIN 1] planning-spec (discovery stage)      ── go/stop gate #1
   [CHAIN 2] behavior-spec + acceptance-criteria + 7대 산출물 통합  ── go/stop gate #2
-  [CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk — ★ placeholder)  ── gate deferred
-  [CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #3
-  [CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #4
+  [CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
+  [CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #4
+  [CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #5
   ↓
 USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceability-matrix
 ```
 
 **SDLC 6-stage chain harness**. round-trip = ★ ★ chain harness gate 안에서 정식 허용 (DEC-2026-05-06-round-trip-부분-허용 / partial retract of DEC-2026-04-29-round-trip-스코프-아웃). harness 외부 자동 코드 생성 = ❌ scope 외부.
 
-★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#4) ≤ 15% / 100% 자동화 ❌ 명시.
+★ ★ ★ **70~80% 한계 = 명시 잔존**. AI 자동화 ≥ 85% / 사람 검토 (gate #1~#5) ≤ 15% / 100% 자동화 ❌ 명시.
 
 ## SDLC stage 흐름 (★ v2.0)
 
@@ -28,7 +28,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 분석 (analysis)  →  발견 (discovery)  →  스펙 (spec)  →  계획 (plan)  →  테스트 (test)  →  구현 (implement)
    ★ v1.5.x         ★ v9.0             ★ v2.0          ★ v9.0          ★ v2.0          ★ v2.0
    chain 진입 전     chain 1            chain 2         chain 3         chain 4         chain 5
-   (단방향 추출)     gate #1            gate #2         gate deferred   gate #3         gate #4
+   (단방향 추출)     gate #1            gate #2         gate #3         gate #4         gate #5
 ```
 
 ★ design stage = ★ v2.x carry (1차 = analysis 자산 deliverable 7~9 reuse / sub-plan 분할 정책 정합).
@@ -43,7 +43,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | **analysis (chain 진입 전)** ★ v1.5.x | ❌ | 약 (deliverable 7~9) | 강 | 강 | 강 | 강 |
 | **discovery (chain 1)** ★ v9.0 | 강 | 강 | 약 | 약 | 약 | 약 |
 | **spec (chain 2)** ★ v2.0 | 약 | 약 | 강 | 강 | 강 | 강 |
-| **plan (chain 3)** ★ v9.0 placeholder (HOW / task·ADR·NFR·risk) | 약 | 약 | 약 | 약 | 약 | 강 |
+| **plan (chain 3)** ★ v9.0 신설 / v10.0.0 gate #3 본격 (HOW / task·ADR·NFR·risk) | 약 | 약 | 약 | 약 | 약 | 강 |
 | **design** ☐ v2.x carry | 약 | 강 | 강 | 약 | 약 | 약 |
 | **test (chain 4)** ★ v2.0 | ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
 | **implement (chain 5)** ★ v2.0 (i-strict / chain harness 안에서 round-trip 정식 허용) | ❌ | 약 | 강 | 강 | 강 | 강 |
@@ -68,9 +68,9 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | **analysis** (chain 1 sub) | [`agents/analysis-agent.md`](../agents/analysis-agent.md) (★ v4.0 / 22 analysis skill + 6 input skill + 3 base = 31 skill 사전 주입) | `analysis-source-inventory`, `analysis-db-schema-erd`, `analysis-architecture`, `analysis-domain-model`, `analysis-business-rules`, `analysis-openapi`, `analysis-api-rule-mapping`, `analysis-error-mapping`, `analysis-quality-antipattern`, `analysis-formal-spec-validation`, `analysis-characterization-test`, `analysis-sql-inventory`, `analysis-form-validation-fe`, `analysis-type-spec-fe`, `analysis-ui-state-map-fe`, `analysis-ui-visual-manifest-fe`, `analysis-br-cross-consistency-check`, `analysis-html-template` (★ v3.4.0) | `PostToolUse(Write/Edit → lint)`, `Stop(rollup)` | `drift-validator`, `schema-validator`, `formal-spec-link-validator`, `spectral-runner` (사용자 명시 호출), `static-runner`, `decision-table-validator` |
 | **discovery** (chain 1) | [`agents/discovery-agent.md`](../agents/discovery-agent.md) (★ v9.0 / 6 discovery skill + 4 base = 10 skill 사전 주입) | `discovery-from-analysis-output`, `discovery-from-swagger`, `discovery-from-figma`, `discovery-from-nl-md`, `discovery-decompose-use-cases`, `discovery-identify-business-intent`, `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` | `PreToolUse(deny secrets)`, `Stop(gate-1 evidence)` | `planning-extraction-validator`, `br-cross-consistency-validator`, `schema-validator` |
 | **spec** (chain 2) | [`agents/spec-agent.md`](../agents/spec-agent.md) (★ v4.0 / 3 spec skill + 4 base = 7 skill 사전 주입) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-deliverables`, `_base-build-traceability-matrix` | `PostToolUse(spec lint)` | `chain-coverage-validator`, `formal-spec-link-validator`, `schema-validator` |
-| **plan** (chain 3 / ★ ★ ★ PLACEHOLDER / gate deferred) | [`agents/plan-agent.md`](../agents/plan-agent.md) (★ PLACEHOLDER / `skills: []` / dispatch 무의미) | (★ v9.x+ carry — `plan-decompose-and-sequence`, `plan-architect-decisions`, `plan-risk-and-nfr` placeholder) | (★ v9.x+ carry — plan hard gate = plan-agent 본격 구현 시 추가) | (★ v9.x+ carry — plan-spec schema 신설) |
+| **plan** (chain 3 / ★ v10.0.0 gate #3 본격) | [`agents/plan-agent.md`](../agents/plan-agent.md) (★ v9.1.0 body + v10.0.0 gate #3 / 3 plan skill + 4 base = 7 skill 사전 주입) | `plan-decompose-and-sequence`, `plan-architect-decisions`, `plan-risk-and-nfr`, `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` | `PreToolUse(deny)`, `Stop(gate-3 evidence)` | `plan-coverage-validator`, `schema-validator` |
 | **test** (chain 4) | [`agents/test-agent.md`](../agents/test-agent.md) (★ v4.0 / 4 test skill + 4 base = 8 skill 사전 주입) | `test-generate-test-spec` (jest/vitest/junit5/pytest/RTL/Vue Test Utils 본문 분기), `test-run-test-evidence`, `test-verify-coverage`, `test-playwright` (★ v3.4.0 / e2e POM) | `PreToolUse(test-cmd require)`, `Stop(RED evidence)` | `test-impl-pass-validator (dry-run)`, `spec-test-link-validator`, `schema-validator`, `lint-no-simulation (chain-strict)` |
-| **implement** (chain 5) | [`agents/implement-agent.md`](../agents/implement-agent.md) (★ v4.0 / 4 implement skill + 4 base = 8 skill 사전 주입) | `implement-generate-impl-spec` (nestjs/spring/fastapi 본문 분기), `implement-verify-test-pass`, `implement-react` (★ v3.4.0 / React 19), `implement-vue` (★ v3.4.0 / Vue 3) | `PreToolUse(commit_hash require)`, `Stop(GREEN gate-4)` | `test-impl-pass-validator (--allow-execute)`, `static-runner (R19 Tier 1 Semgrep + Tier 2 SARIF import)`, `lint-no-simulation`, `traceability-matrix-builder`, `schema-validator` |
+| **implement** (chain 5) | [`agents/implement-agent.md`](../agents/implement-agent.md) (★ v4.0 / 4 implement skill + 4 base = 8 skill 사전 주입) | `implement-generate-impl-spec` (nestjs/spring/fastapi 본문 분기), `implement-verify-test-pass`, `implement-react` (★ v3.4.0 / React 19), `implement-vue` (★ v3.4.0 / Vue 3) | `PreToolUse(commit_hash require)`, `Stop(GREEN gate-5)` | `test-impl-pass-validator (--allow-execute)`, `static-runner (R19 Tier 1 Semgrep + Tier 2 SARIF import)`, `lint-no-simulation`, `traceability-matrix-builder`, `schema-validator` |
 | **design** (★ ★ ★ PLACEHOLDER / v4.1+ carry) | [`agents/design-agent.md`](../agents/design-agent.md) (★ PLACEHOLDER / `skills: []` / dispatch 무의미) | (★ v4.1+ carry — `design-wireframe-spec`, `design-component-spec`, `design-tokens-extract`, `design-visual-regression`, `design-a11y-prep`) | (★ v4.1+ carry) | (★ v4.1+ carry — Playwright snapshot / DTCG validator) |
 | **cross-cut** (traceability) | [`agents/_base-senior-engineer.md`](../agents/_base-senior-engineer.md) (gate 검토 시 critique) | `_base-build-traceability-matrix` | (Stop 동일) | `traceability-matrix-builder`, `chain-coverage-validator` |
 | **cross-cut** (aspects) | [`agents/_base-industry-case-researcher.md`](../agents/_base-industry-case-researcher.md) + [`agents/_base-official-docs-checker.md`](../agents/_base-official-docs-checker.md) (research 트랙) | `analysis-aspect-a11y`, `analysis-aspect-i18n`, `analysis-aspect-static-security`, `analysis-aspect-legacy` | (PostToolUse 동일) | (각 aspect 자체 외부 도구 — Tier 1: axe-core / i18n-lint / Semgrep / Tier 2: SpotBugs / PMD / CodeQL SARIF import / 진짜 실행 의무) |
@@ -150,9 +150,9 @@ input (spec stage 가 받음):
 
 ★ ★ chain-coverage-validator (★ sub-plan-3 신설) = AC-* / BHV-* / UC-* 정합 ≥ 0.85 ratchet.
 
-### chain 3 (계획) — plan stage (★ v9.0 / ★ ★ ★ PLACEHOLDER — gate deferred)
+### chain 3 (계획) — plan stage (★ v9.0 신설 / ★ v10.0.0 gate #3 본격)
 
-★ ★ ★ plan stage = spec 이후 **HOW 명시** (task 분해 / 의존성 / 순서 / ADR / NFR allocation / risk / rollback). plan-agent = PLACEHOLDER (`skills: []` / dispatch 무의미). hard gate = deferred (plan-agent 본격 구현 v9.x+ carry). 근거: DEC-2026-05-21-chain-discovery-plan-stage-도입 / `flows/plan.phase-flow.json`.
+★ ★ ★ plan stage = spec 이후 **HOW 명시** (task 분해 / 의존성 / 순서 / ADR / NFR allocation / risk / rollback). plan-agent = 본격 (3 plan skill + 4 base 주입 / v9.1.0 body). hard gate = **gate #3 본격 활성** (v10.0.0 / chain 3 = gate #3 1:1). 근거: DEC-2026-05-21-chain-discovery-plan-stage-도입 + DEC-2026-05-25-axis-a-phase-4-4-prime / `flows/plan.phase-flow.json`.
 
 input (plan stage 가 받음):
 - behavior-spec.json + acceptance-criteria.json
@@ -164,11 +164,11 @@ input (plan stage 가 받음):
 |---|---|---|---|---|---|
 | 약 | 약 | 약 | 약 | 약 | 강 |
 
-산출물 (plan stage 가 만듦 / ★ v9.x+ carry):
-- **plan-spec** (task[] / dependencies[] / execution_order[] / adr[] / integration_points[] / risks[] / nfr_allocation[]) — schema 파일명 미확정 (placeholder / 기존 동등물 없음)
+산출물 (plan stage 가 만듦):
+- **task-plan.{json,md}** (★ `schemas/task-plan.schema.json` / v10.0.0 신설 / tasks[] / dependencies[] / adrs[] (alternatives ≥3) / nfr_allocation[] / risks[]) — discovery 산출 `planning-spec.json` 과 명독 분리
 - 운영 정책 (DEC-2026-05-21 §8): task granularity 1~3 AC 묶음 / ADR 5 자동 판정 기준 / NFR hard gate / risk 3중 망 / estimation_ai+estimation_human 분리
 
-★ plan hard gate = plan-agent 본격 구현 시 추가 (현재 gate #1~#4 = discovery/spec/test/implement 유지).
+★ plan hard gate = **gate #3 본격 활성** (v10.0.0 / gate #1~#5 = discovery/spec/plan/test/implement / chain N = gate #N 1:1 / `plan-coverage-validator` NFR allocation hard gate).
 
 ### chain 4 (테스트) — test stage (★ v2.0)
 
@@ -185,7 +185,7 @@ input (test stage 가 받음):
 
 산출물 (test stage 가 만듦):
 - **test-spec.json + .md** (deliverable 20 / `schemas/test-spec.schema.json` ★ sub-plan-2 신설) — TC-* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / framework (jest/vitest/junit/pytest/playwright)
-- **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 3 종결 시 모든 test fail / impl 부재)
+- **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 4 종결 시 모든 test fail / impl 부재)
 - **5종 물증 7 필드** (★ ★ ★ no-simulation 강화 — runner_version + stdout + stderr + timestamp + pass/fail count + duration + reproduction + result_hash)
 
 ★ ★ ★ spec-test-link-validator (★ sub-plan-3 신설) = AC→TC 1:N 정합 + framework match (analysis-source-inventory) + coverage ≥ 0.85.
@@ -206,16 +206,16 @@ input (implement stage 가 받음):
 산출물 (implement stage 가 만듦):
 - **impl-spec.json + .md** (deliverable 21 / `schemas/impl-spec.schema.json` ★ sub-plan-2 신설) — IMPL-* / framework / source_files / commit_hash
 - **실 impl 코드** (사용자 프로젝트) — GREEN 의무 (모든 test 100% pass)
-- **5종 물증 7 필드** (★ ★ ★ no-simulation — chain 3 의 5종 물증 + impl_test_pass_rate 100% + coverage_report + linter)
+- **5종 물증 7 필드** (★ ★ ★ no-simulation — chain 4 (test) 의 5종 물증 + impl_test_pass_rate 100% + coverage_report + linter)
 - **production code + 빌드 artifact**
 
 ★ ★ ★ test-impl-pass-validator (★ sub-plan-3 신설) = ★ ★ 진짜 runner 호출 / 100% pass / 5종 물증 7 필드 / chain harness 의 ★ ★ ★ 핵심 enforcement.
 
-★ ★ **70~80% 한계** = ★ 명시 잔존 / gate #4 사용자 검토 ≤ 15% / 100% 자동화 ❌ 명시 (DEC-2026-05-06-round-trip-부분-허용 정합).
+★ ★ **70~80% 한계** = ★ 명시 잔존 / gate #5 사용자 검토 ≤ 15% / 100% 자동화 ❌ 명시 (DEC-2026-05-06-round-trip-부분-허용 정합).
 
 ### cross-cutting — traceability-matrix (deliverable 22 / ★ v2.0 / `schemas/traceability-matrix.schema.json` ★ sub-plan-2 신설)
 
-매 chain stage 종결 시 갱신 의무. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link. coverage ≥ 0.85 ratchet (ADR-010 v2 정합).
+매 chain stage 종결 시 갱신 의무. UC-* → BHV-* → AC-* → **TASK-*** (★ v10.0.0 plan stage layer) → TC-* → IMPL-* + commit_hash forward+backward link. coverage ≥ 0.85 ratchet (ADR-010 v2 정합).
 
 ### 분석 → 스펙 (★ v2.0 / 현 v1.5.x analysis 자산 = chain 2 spec stage 의 input / "현 7대 + 신규 추가" 정합)
 
@@ -288,7 +288,7 @@ input (implement stage 가 받음):
 │   │   ├── planning-spec.{json,md}
 │   │   └── manifest.{json,md}
 │   ├── spec/                        #   chain 2 (behavior-spec + acceptance-criteria + traceability-matrix)
-│   ├── plan/                        #   chain 3 (plan-spec / ★ placeholder / gate deferred)
+│   ├── plan/                        #   chain 3 (task-plan / gate #3)
 │   ├── test/                        #   chain 4 (test-spec + 실 test 코드 / RED)
 │   └── impl/                        #   chain 5 (impl-spec + 실 impl 코드 / GREEN)
 └── <scope-2>/                       # 운영 누적 시 N 개로 증가

@@ -28,7 +28,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 DEC-2026-05-21 §정책3 정합. Discovery (chain 1) = soft gate (NFR 누락 시 `intent: unknown` 표지 carry 허용) / Plan (chain 3) = ★ ★ **hard gate** (NFR allocation 누락 시 진입 차단).
 
-★ ★ Cluster 2 결단 (DEC-2026-05-25-axis-a-phase-4-1) — `severity = critical` 또는 `high` NFR 의 `task_refs[]` 누락 시 `plan-coverage-validator` high finding emit → gate #plan block.
+★ ★ Cluster 2 결단 (DEC-2026-05-25-axis-a-phase-4-1) — `severity = critical` 또는 `high` NFR 의 `task_refs[]` 누락 시 `plan-coverage-validator` high finding emit → gate #3 block.
 
 ★ ★ ★ ISO/IEC 25010:2023 SQuaRE 9 quality characteristic (★ 2023 신설 = Safety):
 - functional_suitability
@@ -59,7 +59,7 @@ DEC-2026-05-21 §정책3 정합. Discovery (chain 1) = soft gate (NFR 누락 시
 |---|---|---|
 | LLM 1차 | 본 skill (LLM) | risks[] 후보 도출 (severity + description + type) |
 | industry-case-researcher sub-agent | `agents/_base-industry-case-researcher.md` dispatch | risks[].industry_case_refs[] URL 등 외부 권위 근거 |
-| 사람 보강 | 사용자 명시 결단 | risks[].human_review = true (gate #plan 통과 자격) |
+| 사람 보강 | 사용자 명시 결단 | risks[].human_review = true (gate #3 통과 자격) |
 
 ★ ★ 3중 망 망 부재 시 = `plan-coverage-validator validateRiskSeverity` finding emit (mitigation 누락 medium / human_review 누락 low).
 
@@ -95,7 +95,7 @@ DEC-2026-05-21 §plan-risk-and-nfr 정합. 본 task-plan 시행 후 회귀 시 r
    ```
    `plan.nfr.allocation_missing` high finding + `plan.risk.no_mitigation` / `plan.risk.no_human_review` 확인.
 
-6. **gate #plan 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6 / plan-agent step 종결).
+6. **gate #3 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6 / plan-agent step 종결).
 
 ## ★ 70~80% 한계
 

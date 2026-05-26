@@ -35,7 +35,7 @@
 }
 ```
 
-★ ★ gate id (#1~#4) ≠ chain 번호 — plan stage (chain 3) 는 hard gate 미보유 (deferred). gate #1=discovery / #2=spec / #3=test / #4=implement.
+★ ★ chain N = gate #N (★ v10.0.0 / INTERNAL CONVENTION). gate #1=discovery / #2=spec / #3=plan / #4=test / #5=implement.
 
 ★ ★ atomic write CAS — chain-driver 가 state 갱신 시 expectedVersion 비교 후 fdatasync + rename. Windows fallback 동작.
 
@@ -93,17 +93,19 @@ stateDiagram-v2
     analysis --> discovery: 7대 산출물 종결
     discovery --> spec: gate #1 pass<br/>(planning-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
     spec --> plan: gate #2 pass<br/>(chain-coverage-validator)
-    plan --> test: ★ gate deferred<br/>(plan placeholder / hard gate v9.x+ carry)
-    test --> implement: gate #3 pass<br/>(spec-test-link-validator + RED 입증)
-    implement --> [*]: gate #4 pass<br/>(test-impl-pass-validator + GREEN 100%)<br/>traceability-matrix release
+    plan --> test: gate #3 pass<br/>(plan-coverage-validator / NFR hard gate + ADR ≥3)
+    test --> implement: gate #4 pass<br/>(spec-test-link-validator + RED 입증)
+    implement --> [*]: gate #5 pass<br/>(test-impl-pass-validator + GREEN 100%)<br/>traceability-matrix release
 
     discovery --> blocked: gate #1 finding
     spec --> blocked: gate #2 finding
-    test --> blocked: gate #3 finding
-    implement --> blocked: gate #4 finding
+    plan --> blocked: gate #3 finding
+    test --> blocked: gate #4 finding
+    implement --> blocked: gate #5 finding
 
     blocked --> discovery: user fix + next
     blocked --> spec: user fix + next
+    blocked --> plan: user fix + next
     blocked --> test: user fix + next
     blocked --> implement: user fix + next
 
@@ -250,19 +252,19 @@ sequenceDiagram
 
     Note over U,T: chain 4 (test stage / RED 의무)
     U->>C: "test spec 생성 RED"
-    C->>V: spec-test-link-validator (gate #3)
+    C->>V: spec-test-link-validator (gate #4)
     V->>T: 진짜 test runner 호출 (--allow-execute)
     T-->>V: pass=0 / fail=N (★ ★ RED 입증)
     V-->>C: 5종 물증 + result_hash sha256
-    C-->>U: gate #3 pass / next stage = implement
+    C-->>U: gate #4 pass / next stage = implement
 
     Note over U,T: chain 5 (impl stage / GREEN 100% 의무)
     U->>C: "impl spec 생성 GREEN"
-    C->>V: test-impl-pass-validator (gate #4)
+    C->>V: test-impl-pass-validator (gate #5)
     V->>T: 진짜 test runner 재실행 (test code 변경 ❌)
     T-->>V: pass=N / fail=0 (★ ★ GREEN 100%)
     V-->>C: 5종 물증 + result_hash deterministic
-    C-->>U: gate #4 pass / 완료 (release)
+    C-->>U: gate #5 pass / 완료 (release)
 ```
 
 ★ ★ ★ chain 4 의 test code = chain 5 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.

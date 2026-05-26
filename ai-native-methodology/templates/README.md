@@ -8,10 +8,11 @@
 |---|---|---|
 | [`analysis/`](./analysis/) | ★ ★ 활성 (21 template / flat layout) | BE 7대 + 4.5 formal-spec + 부속 (FE 8 + aspect 4 = skills/ 본문 inline) |
 | [`adoption/`](./adoption/) | ★ build alias source | `CLAUDE.md` (사내 정책 inline) — build script 가 dist root CLAUDE.md 로 별칭 복사 |
-| [`planning/`](./planning/) | ☐ placeholder | chain 1 / planning-spec template (sub-plan-4 채워짐 / 일부) |
+| [`planning/`](./planning/) | ☐ placeholder | chain 1 (discovery / 구 planning) / planning-spec template (입력 형식 design notes) |
+| [`plan/`](./plan/) | ☐ placeholder | chain 3 (plan) / task-plan template (★ v10.0.0 신설) |
 | [`design/`](./design/) | ☐ placeholder | design stage (v2.x carry) |
-| [`test/`](./test/) | ☐ placeholder | chain 3 / test-spec template (sub-plan-4 채워짐 / 일부) |
-| [`implement/`](./implement/) | ☐ placeholder | chain 4 / impl-spec template (sub-plan-4 채워짐 / 일부) |
+| [`test/`](./test/) | ☐ placeholder | chain 4 (test) / test-spec template (sub-plan-4 채워짐 / 일부) |
+| [`implement/`](./implement/) | ☐ placeholder | chain 5 (implement) / impl-spec template (sub-plan-4 채워짐 / 일부) |
 
 ## analysis/ 템플릿 (21 / flat layout)
 
@@ -44,7 +45,7 @@ BE 7대 + 4.5 formal-spec:
 
 ★ ★ cleanup round 2-A (2026-05-06) — `templates/adoption/README.md` 의 dist root ADOPTION-README 별칭 복사 비활성 (단일 entry-point 정합 / source 보존).
 
-## chain stage placeholder (planning/spec/test/implement/design)
+## chain stage placeholder (planning/plan/test/implement/design)
 
 sub-plan-4 (DEC-2026-05-06-sub-plan-4-종결) 에서 일부 채워짐. 미채움 부분 = v2.x carry.
 
@@ -52,7 +53,7 @@ sub-plan-4 (DEC-2026-05-06-sub-plan-4-종결) 에서 일부 채워짐. 미채움
 
 ## 호출
 
-template 은 [`../skills/`](../skills/) 의 `_base/apply-template` skill 을 통해 instantiate. 직접 cp 도 가능.
+template 은 [`../skills/`](../skills/) 의 `_base-apply-template` skill 을 통해 instantiate. 직접 cp 도 가능.
 
 ```bash
 # Skill 안에서

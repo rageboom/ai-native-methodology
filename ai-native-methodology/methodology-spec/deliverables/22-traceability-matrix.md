@@ -3,15 +3,15 @@
 > **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (★ 산업 권위 — Official research) / ADR-008 v2 §10 (matrix.json + matrix.md + matrix.mermaid 이중 렌더링)
 > **schema**: `schemas/traceability-matrix.schema.json`
 > **생성 phase**: cross-cutting — `/_base-build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
-> **gate**: 매 gate #1~#4 prerequisite
+> **gate**: 매 gate #1~#5 prerequisite
 
 ## 1. 목적
 
-**답하는 질문**: "UC → BHV → AC → TC → IMPL + commit_hash chain end-to-end 추적성은?"
+**답하는 질문**: "UC → BHV → AC → TASK → TC → IMPL + commit_hash chain end-to-end 추적성은?" (★ v10.0.0 TASK layer)
 
 **활용**: 사용자 검토 / 감사 / 산업 표준 (DO-178C / IEC 62304) 정합 입증.
 
-매 chain stage gate 종결 시 갱신 의무 (chain 1~4 모두).
+매 chain stage gate 종결 시 갱신 의무 (chain 1~5 모두).
 
 ## 2. 형식
 

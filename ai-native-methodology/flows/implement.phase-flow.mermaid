@@ -1,4 +1,4 @@
-%% ★ ★ ★ v2.0 chain 4 (implement) phase flow — 사람 눈 (mermaid)
+%% ★ ★ ★ v2.0 chain 5 (implement) phase flow — 사람 눈 (mermaid)
 %% AI 눈 짝: implement.phase-flow.json (drift-validator 호환)
 %% ★ ★ ★ v3.1.0 — phase ID 의미 ID rename (D-3 paradigm / depends_on 그래프 SSOT / 위상정렬 자동).
 %% subgraph id = `P_<semantic_id>` (P 접두사 + underscore — mermaid 문법 호환 + drift-validator 정규식 호환).
@@ -6,7 +6,7 @@
 %% ADR-008 v2 §10 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합 / i-strict 정통
 
 flowchart TB
-    subgraph C4["★ ★ ★ Chain 4 — implement (GREEN 의무 / i-strict)"]
+    subgraph C4["★ ★ ★ Chain 5 — implement (GREEN 의무 / i-strict)"]
         direction TB
 
         P_input_plan["Phase input-plan — input 통합<br/>test-spec + behavior + arch + schema + api + inventory"]
@@ -16,7 +16,7 @@ flowchart TB
         P_green_evidence["★ ★ ★ Phase green-evidence — GREEN 검증 (진짜 runner / 100% pass)<br/>implement-verify-test-pass + test-run-test-evidence<br/>★ test-impl-pass-validator (--allow-execute)"]
         P_static_analysis["Phase static-analysis — static-runner 6종 + chain-strict lint<br/>★ lint-no-simulation chain-strict"]
         P_matrix_finalize["Phase matrix-finalize — traceability-matrix 최종 갱신<br/>★ red_count == 0 의무"]
-        P_gate_4["★ ★ ★ Phase gate-4 — go/stop gate #4 (final / 사용자 결단)<br/>_base-invoke-go-stop-gate"]
+        P_gate_5["★ ★ ★ Phase gate-5 — go/stop gate #5 (final / 사용자 결단)<br/>_base-invoke-go-stop-gate"]
 
         P_input_plan --> P_impl_decompose
         P_impl_decompose --> P_impl_code_generate
@@ -25,12 +25,12 @@ flowchart TB
         P_green_evidence --> P_static_analysis
         P_green_evidence --> P_matrix_finalize
         P_static_analysis --> P_matrix_finalize
-        P_green_evidence --> P_gate_4
-        P_static_analysis --> P_gate_4
-        P_matrix_finalize --> P_gate_4
+        P_green_evidence --> P_gate_5
+        P_static_analysis --> P_gate_5
+        P_matrix_finalize --> P_gate_5
     end
 
-    subgraph IN["chain 3 (test) + analysis"]
+    subgraph IN["chain 4 (test) + analysis"]
         IN_OUT["test-spec.json + 실 test 코드 (RED)<br/>+ behavior + acceptance + arch + schema + api + inventory<br/>+ .aimd/config/test-cmd.json"]
     end
 
@@ -53,11 +53,11 @@ flowchart TB
     P_impl_code_generate --> OUT_CODE
     P_green_evidence --> OUT_IS
     P_matrix_finalize --> OUT_MAT
-    P_gate_4 -->|"go"| REL
-    P_gate_4 -.->|"stop"| STOP["release 보류 / carry"]
-    P_gate_4 -.->|"revisit:test"| IN
-    P_gate_4 -.->|"revisit:spec"| RS["chain 2"]
-    P_gate_4 -.->|"revisit:planning"| RP["chain 1"]
+    P_gate_5 -->|"go"| REL
+    P_gate_5 -.->|"stop"| STOP["release 보류 / carry"]
+    P_gate_5 -.->|"revisit:test"| IN
+    P_gate_5 -.->|"revisit:spec"| RS["chain 2"]
+    P_gate_5 -.->|"revisit:discovery"| RP["chain 1 (discovery)"]
 
     classDef chain4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
     classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
@@ -66,7 +66,7 @@ flowchart TB
     classDef green fill:#d4edda,stroke:#155724,stroke-width:3px
     classDef rel fill:#cce5ff,stroke:#004085,stroke-width:2px
     class C4 chain4
-    class P_gate_4 gate
+    class P_gate_5 gate
     class P_impl_code_generate green
     class P_green_evidence green
     class OUT out

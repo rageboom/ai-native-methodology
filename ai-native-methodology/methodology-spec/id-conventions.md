@@ -46,7 +46,7 @@ flowchart LR
 | API operationId | `{camelCase 동사+명사}` | `createOrder`, `getUsers` | openapi |
 | DB 테이블 | `{snake_case}` | `orders`, `order_items` | db-schema.schema |
 
-### ★ v2.0 chain 산출물 (sub-plan-2 신설 / ★ v9.0 6-stage / plan-spec ID = placeholder carry)
+### ★ v2.0 chain 산출물 (sub-plan-2 신설 / ★ v9.0 6-stage / ★ v10.0.0 plan = task-plan TASK-*·ADR-*)
 
 | 산출물 | ID 형식 | 예시 | schema |
 |---|---|---|---|

@@ -85,9 +85,15 @@
 | "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.{json,md}` (AC-*) |
 | "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/) | analysis 7대 산출물 통합 |
 
-### 2.3 Chain 3 (plan / ★ placeholder — gate deferred)
+### 2.3 Chain 3 (plan / ★ v10.0.0 gate #3 본격)
 
-★ plan-agent = PLACEHOLDER (`skills:[]` / dispatch 무의미 / 본격 구현 v9.x+ carry). plan-* skill 3종 (`plan-decompose-and-sequence` / `plan-architect-decisions` / `plan-risk-and-nfr`) = placeholder. hard gate = plan-agent 본격 구현 시 추가 (현재 chain 2 → chain 4 사이 통과 stage / DEC-2026-05-21).
+| 자연어 prompt | 발동 skill | 산출 |
+|---|---|---|
+| "plan / 계획 / task 분해" | [`plan-decompose-and-sequence`](../skills/plan-decompose-and-sequence/) | `task-plan.{json,md}` (tasks / dependencies) |
+| "ADR / 아키텍처 결정" | [`plan-architect-decisions`](../skills/plan-architect-decisions/) | ADR (alternatives ≥3) + integration points |
+| "risk / NFR allocation" | [`plan-risk-and-nfr`](../skills/plan-risk-and-nfr/) | risks[] + nfr_allocation[] (hard gate) |
+
+★ gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR alternatives ≥3 + dependency cycle / chain 3 = gate #3 1:1).
 
 ### 2.4 Chain 4 (test / RED 의무)
 

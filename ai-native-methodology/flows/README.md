@@ -4,7 +4,7 @@
 
 ## ★ ★ ★ Master SSOT (v2.0 진입점)
 
-- **`sdlc-4stage-flow.{json,mermaid}`** (파일명 reuse 유지) — ★ ★ ★ chain harness 6-stage 통합 SSOT (analysis → discovery → spec → plan → test → implement / 4 gate (plan gate deferred) + revisit_edges + release_eligibility)
+- **`sdlc-4stage-flow.{json,mermaid}`** (파일명 reuse 유지) — ★ ★ ★ chain harness 6-stage 통합 SSOT (analysis → discovery → spec → plan → test → implement / 5 gate (★ v10.0.0 chain N = gate #N) + revisit_edges + release_eligibility)
   - **plugin user 의 v2.0 진입 우선순위 = 1순위** (chain-driver init / next 가 본 SSOT 참조)
   - schemas/state.schema.json 의 stage enum ↔ stages 정합 자동 검증 (drift-validator `--check-state-flow-consistency`)
 
@@ -12,7 +12,7 @@
 
 - `discovery.phase-flow.{json,mermaid}` — chain 1 / planning-spec 추출 (discovery stage / 입력 어댑터 4종)
 - `spec.phase-flow.{json,mermaid}` — chain 2 / behavior + acceptance + 7대 통합
-- `plan.phase-flow.{json,mermaid}` — chain 3 / plan-spec (task 분해 / ADR / NFR / risk — ★ placeholder / gate deferred)
+- `plan.phase-flow.{json,mermaid}` — chain 3 / task-plan (task 분해 / ADR / NFR / risk — ★ v10.0.0 gate #3 본격)
 - `test.phase-flow.{json,mermaid}` — chain 4 / test-spec + 실 test code (RED)
 - `implement.phase-flow.{json,mermaid}` — chain 5 / impl-spec + 실 impl code (GREEN)
 

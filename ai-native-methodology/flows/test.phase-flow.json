@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ v2.0 chain 4 (test) phase flow (★ v9.0 plan 신설로 재번호 / 구 chain 3) — AI 눈 짝 (test.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합. acceptance-criteria 기반 실 test 코드 자동 generate (RED 의무 / impl 부재 가정 모든 test fail). ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
+  "$comment": "★ ★ v2.0 chain 4 (test) phase flow (★ v9.0 plan 신설로 재번호 / 구 chain 3 / ★ v10.0.0 MAJOR gate #3→#4 재번호 chain N=gate #N) — AI 눈 짝 (test.phase-flow.mermaid 의 SSOT). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합. acceptance-criteria 기반 실 test 코드 자동 generate (RED 의무 / impl 부재 가정 모든 test fail). ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
   "id": "test-phase-flow",
   "version": "3.1.0",
   "stage": "test",
@@ -58,13 +58,13 @@
       "skills": ["test-verify-coverage"]
     },
     {
-      "id": "gate-3",
-      "name": "go/stop gate #3",
+      "id": "gate-4",
+      "name": "go/stop gate #4",
       "depends_on": ["red-evidence", "coverage-measure"],
       "inputs": ["test-spec.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
       "skills": ["_base-invoke-go-stop-gate"],
-      "gate": "#3"
+      "gate": "#4"
     }
   ],
   "cross_cutting": {

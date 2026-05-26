@@ -1,6 +1,6 @@
 %% ★ v9.0 신설 — chain 3 (plan) phase flow — 사람 눈 (mermaid)
 %% AI 눈 짝: plan.phase-flow.json (drift-validator 호환)
-%% ★ v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — placeholder 폐기 / hard gate #3 본격 진입.
+%% ★ v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — placeholder 폐기 / hard gate #3 본격 진입 (gate-3 phase 노드 본격 / 다른 4 flow 와 구조 대칭).
 %% spec(behavior/AC) → task-plan (task 분해 / 의존성 / ADR / NFR / risk / rollback).
 %% ADR-008 v2 §10 + ADR-CHAIN-001 정합
 
@@ -12,11 +12,13 @@ flowchart TB
         P_architect_decisions["Phase architect-decisions — ADR<br/>plan-architect-decisions / Nygard 5 기준"]
         P_risk_nfr["Phase risk-nfr — risk + NFR allocation<br/>plan-risk-and-nfr / 3중 망"]
         P_plan_spec_compose["Phase plan-spec-compose — task-plan 합성<br/>task-plan.json + task-plan.md"]
+        P_gate_3["★ ★ ★ Phase gate-3 — go/stop gate #3 (사용자 결단)<br/>_base-invoke-go-stop-gate<br/>plan-coverage-validator + schema-validator<br/>★ trio: state.blocked + cli exit 2 + PreToolUse deny"]
 
         P_task_decompose --> P_architect_decisions
         P_task_decompose --> P_risk_nfr
         P_architect_decisions --> P_plan_spec_compose
         P_risk_nfr --> P_plan_spec_compose
+        P_plan_spec_compose --> P_gate_3
     end
 
     subgraph IN["chain 2 (spec) 산출물 (input)"]
@@ -24,20 +26,19 @@ flowchart TB
         IN_SPEC["behavior-spec.json (BHV-*)<br/>acceptance-criteria.json (AC-*)"]
     end
 
-    subgraph GATE["★ Gate #3 (plan / v10.0.0)"]
-        G3["plan-coverage-validator<br/>schema-validator<br/>★ trio: state.blocked + cli exit 2 + PreToolUse deny"]
-    end
-
     subgraph NEXT["chain 4 (test) 진입"]
         N1["test-* skill<br/>test.phase-flow.json"]
     end
 
     IN --> P_task_decompose
-    P_plan_spec_compose --> GATE
-    GATE -->|"go"| NEXT
+    P_gate_3 -->|"go"| NEXT
+    P_gate_3 -.->|"stop"| STOP["sprint 중단"]
+    P_gate_3 -.->|"revisit:spec"| IN
 
     %% Style
     classDef chain3 fill:#ede7f6,stroke:#4527a0,stroke-width:3px
     classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px
+    classDef stop fill:#f8d7da,stroke:#721c24
     class C3 chain3
-    class GATE gate
+    class P_gate_3 gate
+    class STOP stop

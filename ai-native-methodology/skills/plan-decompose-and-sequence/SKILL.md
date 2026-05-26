@@ -41,7 +41,7 @@ implicit 의존 추론 source:
 - 같은 cache key / 같은 file 수정 → blocks
 - code_pointer 동일 range overlap → blocks
 
-cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (gate #plan block 의무).
+cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (gate #3 block 의무).
 
 ## 절차
 

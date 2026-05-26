@@ -38,6 +38,15 @@
       "inputs": ["tasks", "adr", "risks", "nfr_allocation"],
       "outputs": ["task-plan.json", "task-plan.md"],
       "skills": ["plan-decompose-and-sequence"]
+    },
+    {
+      "id": "gate-3",
+      "name": "go/stop gate #3",
+      "depends_on": ["plan-spec-compose"],
+      "inputs": ["task-plan.json", "validator_findings"],
+      "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
+      "skills": ["_base-invoke-go-stop-gate"],
+      "gate": "#3"
     }
   ],
   "cross_cutting": {

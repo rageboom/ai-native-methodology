@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ ★ v2.0 chain 5 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). (★ v9.0 plan 신설로 재번호 / 구 chain 4) DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동 / `static-analysis` phase 명 = tools/static-runner 와 axis 분리).",
+  "$comment": "★ ★ ★ v2.0 chain 5 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). (★ v9.0 plan 신설로 재번호 / 구 chain 4 / ★ v10.0.0 MAJOR gate #4→#5 재번호 chain N=gate #N) DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동 / `static-analysis` phase 명 = tools/static-runner 와 axis 분리).",
   "id": "implement-phase-flow",
   "version": "3.1.0",
   "stage": "implement",
@@ -68,13 +68,13 @@
       "automated_validation": ["traceability-matrix-builder"]
     },
     {
-      "id": "gate-4",
-      "name": "go/stop gate #4 (final)",
+      "id": "gate-5",
+      "name": "go/stop gate #5 (final)",
       "depends_on": ["green-evidence", "static-analysis", "matrix-finalize"],
       "inputs": ["impl-spec.json", "matrix.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go (release 자격) | stop | revisit"],
       "skills": ["_base-invoke-go-stop-gate"],
-      "gate": "#4"
+      "gate": "#5"
     }
   ],
   "cross_cutting": {

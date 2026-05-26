@@ -150,24 +150,25 @@ node tools/chain-driver/src/cli.js init <project>
 → behavior-spec + acceptance-criteria + 7대 통합
 → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85)
 
-# 5-5. chain 3 (plan) 진입 (★ placeholder / gate deferred)
+# 5-5. chain 3 (plan) 진입 (1분 / ★ v10.0.0 gate #3 본격)
 "plan / 계획 / task 분해"
-→ plan-agent = PLACEHOLDER (skills:[] / dispatch 무의미 / 본격 구현 v9.x+ carry)
-→ (산출 plan-spec / hard gate = plan-agent 본격 구현 시 추가)
+→ plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr
+→ task-plan.{json,md} 산출 (tasks / ADR alternatives ≥3 / NFR allocation / risks)
+→ gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR ≥3 + dependency cycle)
 
 # 5-6. chain 4 (test) 진입 (1분 / ★ RED 의무)
 "test spec 생성 RED"
 → test-generate-test-spec / test-run-test-evidence / test-verify-coverage
 → test-spec + 실 test code (jest/vitest/junit5/pytest 등)
 → ★ ★ ★ 모든 test fail 입증 (impl 부재 / RED)
-→ gate #3 (spec-test-link-validator / AC→TC ≥ 0.85)
+→ gate #4 (spec-test-link-validator / AC→TC ≥ 0.85)
 
 # 5-7. chain 5 (impl) 진입 (1분 / ★ GREEN 의무)
 "impl spec 생성 GREEN"
 → implement-generate-impl-spec / implement-verify-test-pass
 → impl-spec + 실 impl code
 → ★ ★ ★ 100% test pass 입증
-→ gate #4 (test-impl-pass-validator / --allow-execute 의무)
+→ gate #5 (test-impl-pass-validator / --allow-execute 의무)
 
 # 5-8. release matrix (1분)
 "traceability matrix"
