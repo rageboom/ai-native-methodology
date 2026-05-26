@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "generated_at": "2026-05-26T10:05:00Z",
+    "methodology_version": "v10.1.1",
+    "inputs_used": ["planning_docs", "documentation"],
+    "confidence": 0.85,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "tasks": [
+    {
+      "id": "TASK-USER-001",
+      "title": "신규 사용자 등록 — email unique 강제 + password 해싱 + 409 Conflict",
+      "description": "POST /api/users 진입 → input 검증 → email unique 확인 (DB unique constraint + race 안전) → password argon2id 해싱 → 저장 → 201 + user (id + email). 중복 이메일 시 409.",
+      "ac_refs": ["AC-USER-001"],
+      "behavior_ref": "BHV-USER-001",
+      "execution_order": 1,
+      "layer": "application",
+      "module": "user"
+    },
+    {
+      "id": "TASK-USER-002",
+      "title": "로그인 — credential 검증 + 401 / user 객체 반환",
+      "description": "POST /api/users/login 진입 → email lookup → password verify (argon2 timing-safe) → 성공 시 user 객체 반환 (token 발급은 별도 task) / 실패 시 401 (email 존재 여부 노출 ❌ — 동일 응답).",
+      "ac_refs": ["AC-USER-002"],
+      "behavior_ref": "BHV-USER-002",
+      "execution_order": 2,
+      "layer": "application",
+      "module": "user"
+    }
+  ],
+  "adrs": [
+    {
+      "id": "ADR-USER-001",
+      "title": "Password 해싱 알고리즘 — argon2id 채택",
+      "status": "accepted",
+      "decision": "argon2id (memory-hard / side-channel-resistant) 채택. OWASP Password Storage Cheat Sheet 1순위 권장 (2026 기준).",
+      "alternatives": [
+        {"option": "bcrypt", "rejection_reason": "memory-hard 아님 (GPU 공격 취약 / 2024 OWASP 2순위)"},
+        {"option": "scrypt", "rejection_reason": "parameter 튜닝 복잡 + memory 사용량 예측 어려움 / 운영 부담"},
+        {"option": "PBKDF2-SHA256", "rejection_reason": "memory-hard 아님 / GPU 공격 매우 취약 / FIPS 호환 필요 시만 고려"}
+      ],
+      "consequences": {
+        "positive": ["GPU/ASIC 공격 저항", "OWASP 권장 1순위", "side-channel attack resistant"],
+        "negative": ["native build 의존 (Windows MSVC 등 / 환경 fail 가능 = LL-fsim-15 정합)", "약간 무거운 verify cost (~50ms / 의도적)"]
+      }
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-USER-001",
+      "severity": "high",
+      "type": "security",
+      "description": "Password 평문 노출 / weak hashing — DB leak 시 password rainbow table 공격. argon2 미적용 시 사용자 password 전수 노출 위험.",
+      "mitigation": "ADR-USER-001 (argon2id) + DB encryption-at-rest + access audit log. password 절대 로그 ❌ + error message 에 노출 ❌.",
+      "task_refs": ["TASK-USER-001", "TASK-USER-002"]
+    },
+    {
+      "id": "RISK-USER-002",
+      "severity": "medium",
+      "type": "security",
+      "description": "Email enumeration via signup 409 Conflict — 공격자가 email 존재 여부 식별 → phishing target list 작성.",
+      "mitigation": "장기 = 409 대신 202 Accepted + email confirmation flow (존재 여부 미노출) / 단기 = rate limit + signup 빈도 모니터링.",
+      "task_refs": ["TASK-USER-001"]
+    },
+    {
+      "id": "RISK-USER-003",
+      "severity": "high",
+      "type": "security",
+      "description": "Login brute-force 공격 — 무차별 password 시도 / 401 응답 동일하면 enumeration 어렵지만 timing attack 가능.",
+      "mitigation": "rate limit (IP + email 기반 / exponential backoff) + CAPTCHA after N fails + account lockout / argon2 timing-safe verify 의무.",
+      "task_refs": ["TASK-USER-002"]
+    },
+    {
+      "id": "RISK-USER-004",
+      "severity": "medium",
+      "type": "concurrency",
+      "description": "Email uniqueness race condition — 동시 signup 시 application-level 검증만으론 race window 존재.",
+      "mitigation": "DB UNIQUE constraint 의무 (DB-level atomic) + INSERT 시 unique violation catch → 409. application-level check 는 UX 용 (보조).",
+      "task_refs": ["TASK-USER-001"]
+    }
+  ],
+  "nfr_allocation": [
+    {
+      "id": "NFR-USER-001",
+      "characteristic": "security",
+      "severity": "critical",
+      "description": "Password storage 안전성 = argon2id (OWASP 권장) + DB encryption-at-rest + password 로그/error 노출 ❌.",
+      "task_refs": ["TASK-USER-001", "TASK-USER-002"]
+    },
+    {
+      "id": "NFR-USER-002",
+      "characteristic": "performance_efficiency",
+      "severity": "medium",
+      "description": "Login API ≤ 200ms (p95 / argon2 verify 비용 제외) / signup ≤ 300ms (p95).",
+      "task_refs": ["TASK-USER-002", "TASK-USER-001"]
+    },
+    {
+      "id": "NFR-USER-003",
+      "characteristic": "security",
+      "severity": "high",
+      "description": "Brute-force 방지 — rate limit (≤ 5 attempt/min per IP+email) + CAPTCHA after 3 fails + account lockout after 10 fails (30min cool-off).",
+      "task_refs": ["TASK-USER-002"]
+    },
+    {
+      "id": "NFR-USER-004",
+      "characteristic": "reliability",
+      "severity": "high",
+      "description": "Email uniqueness atomic — DB UNIQUE constraint 의무 (application-level race 우회 차단).",
+      "task_refs": ["TASK-USER-001"]
+    }
+  ]
+}

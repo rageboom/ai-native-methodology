@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "generated_at": "2026-05-26T10:15:00Z",
+    "methodology_version": "v10.1.1",
+    "inputs_used": ["planning_docs", "documentation"],
+    "confidence": 0.85,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "tasks": [
+    {
+      "id": "TASK-USER-FSIM-001",
+      "title": "Signup — email unique + password 검증 (≥8자) + argon2 해싱 + 409/422",
+      "description": "POST /users 진입 → input 검증 (email format / password ≥8자) → email unique → argon2id 해싱 → 저장. 중복 시 EmailDuplicateError(409) / 짧은 pwd 시 422 (BR-USER-DATA-FSIM-001 + AP-FSIM-DATA-001 fix).",
+      "ac_refs": ["AC-USER-FSIM-001"],
+      "behavior_ref": "BHV-USER-FSIM-001",
+      "execution_order": 1,
+      "layer": "application",
+      "module": "user"
+    },
+    {
+      "id": "TASK-USER-FSIM-002",
+      "title": "Login — credential 검증 + AuthToken (JWT) 발급",
+      "description": "POST /users/login → email lookup → argon2 verify (timing-safe) → JWT 발급 → 200 + token / 실패 시 InvalidCredentialsError(401 / email 존재 미노출).",
+      "ac_refs": ["AC-USER-FSIM-002"],
+      "behavior_ref": "BHV-USER-FSIM-002",
+      "execution_order": 2,
+      "layer": "application",
+      "module": "user"
+    },
+    {
+      "id": "TASK-TODO-FSIM-001",
+      "title": "Todo create — 인증 사용자 user_id 매핑 + title 검증",
+      "description": "POST /todos (Auth required) → DTO 검증 (title non-empty / body+due_date optional) → req.user.id 를 todo.user_id 로 매핑 → 저장 → 201 + todo.",
+      "ac_refs": ["AC-TODO-FSIM-001"],
+      "behavior_ref": "BHV-TODO-FSIM-001",
+      "execution_order": 3,
+      "layer": "application",
+      "module": "todo"
+    },
+    {
+      "id": "TASK-TODO-FSIM-002",
+      "title": "Todo update — 소유자 검증 (IDOR 차단) + NotFound 응답",
+      "description": "PATCH /todos/:id (Auth required) → todo lookup → todo.user_id === req.user.id 검증 → 일치 시 update → 200. 불일치 또는 부재 시 NotFound(404 / Forbidden 미사용 = enumeration 차단).",
+      "ac_refs": ["AC-TODO-FSIM-002"],
+      "behavior_ref": "BHV-TODO-FSIM-002",
+      "execution_order": 4,
+      "layer": "application",
+      "module": "todo"
+    }
+  ],
+  "adrs": [
+    {
+      "id": "ADR-USER-001",
+      "title": "Password 해싱 — argon2id",
+      "status": "accepted",
+      "decision": "argon2id (OWASP 2026 1순위 / memory-hard / side-channel-resistant).",
+      "alternatives": [
+        {"option": "bcrypt", "rejection_reason": "memory-hard 아님 / GPU 공격 취약"},
+        {"option": "scrypt", "rejection_reason": "parameter 튜닝 복잡"},
+        {"option": "PBKDF2", "rejection_reason": "memory-hard 아님 / GPU 매우 취약"}
+      ],
+      "consequences": {
+        "positive": ["GPU/ASIC 저항", "OWASP 권장 1순위", "side-channel resistant"],
+        "negative": ["native build 의존 (LL-fsim-15 / Windows native build fail 경험)", "verify ~50ms"]
+      }
+    },
+    {
+      "id": "ADR-TODO-001",
+      "title": "Todo 소유자 검증 패턴 — middleware vs service-level",
+      "status": "accepted",
+      "decision": "Service-level ownership check 채택. todo lookup 시점에 user_id 일치 확인 → IDOR (Insecure Direct Object Reference) 차단. NotFound 응답으로 enumeration 차단.",
+      "alternatives": [
+        {"option": "Express middleware (route-level)", "rejection_reason": "todo lookup 중복 (middleware + service 양쪽) / 성능 비용 / N+1 risk"},
+        {"option": "DB row-level security (PostgreSQL RLS)", "rejection_reason": "DB 의존 강함 / 마이그레이션 복잡 / SQLite 등 RLS 미지원 DB 비호환"},
+        {"option": "Authorization library (CASL / Pundit)", "rejection_reason": "추가 dependency / 작은 PoC 에 과한 abstraction / learning curve"}
+      ],
+      "consequences": {
+        "positive": ["lookup 1회 / 추가 dependency 없음", "NotFound 응답 = enumeration 차단", "service 단순"],
+        "negative": ["각 service method 마다 check 반복 (DRY 위반 약간)", "복잡 authz 필요 시 library 재검토"]
+      }
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-USER-001",
+      "severity": "high",
+      "type": "security",
+      "description": "Password weak hash → DB leak rainbow table 공격.",
+      "mitigation": "ADR-USER-001 argon2id + DB encryption-at-rest + password 로그 ❌.",
+      "task_refs": ["TASK-USER-FSIM-001", "TASK-USER-FSIM-002"]
+    },
+    {
+      "id": "RISK-USER-002",
+      "severity": "medium",
+      "type": "security",
+      "description": "Login brute-force / timing attack.",
+      "mitigation": "rate limit + argon2 timing-safe verify.",
+      "task_refs": ["TASK-USER-FSIM-002"]
+    },
+    {
+      "id": "RISK-TODO-001",
+      "severity": "high",
+      "type": "security",
+      "description": "IDOR (Insecure Direct Object Reference) — 타인 todo update 시도 시 ownership check 누락 = 임의 변경 / 데이터 손실.",
+      "mitigation": "ADR-TODO-001 service-level ownership check + NotFound 응답 (Forbidden 노출 ❌ = enumeration 차단). integration test 의무 (Senior BLOCKER-2 trio 정합).",
+      "task_refs": ["TASK-TODO-FSIM-002"]
+    },
+    {
+      "id": "RISK-TODO-002",
+      "severity": "medium",
+      "type": "design",
+      "description": "Todo create 시 client 가 user_id 를 inject 시도 → req.user.id 무시 위험.",
+      "mitigation": "DTO 에서 user_id 필드 ❌ (절대 client 입력 ❌) + service 에서 req.user.id 만 사용.",
+      "task_refs": ["TASK-TODO-FSIM-001"]
+    }
+  ],
+  "nfr_allocation": [
+    {
+      "id": "NFR-USER-001",
+      "characteristic": "security",
+      "severity": "critical",
+      "description": "Password storage = argon2id + DB encryption + password 로그/error 노출 ❌.",
+      "task_refs": ["TASK-USER-FSIM-001", "TASK-USER-FSIM-002"]
+    },
+    {
+      "id": "NFR-TODO-001",
+      "characteristic": "security",
+      "severity": "critical",
+      "description": "IDOR 차단 — todo update/delete 시 ownership check 의무 (service-level) + NotFound 응답.",
+      "task_refs": ["TASK-TODO-FSIM-002"]
+    },
+    {
+      "id": "NFR-API-001",
+      "characteristic": "performance_efficiency",
+      "severity": "medium",
+      "description": "User API ≤ 250ms (p95) / Todo API ≤ 100ms (p95 / simple CRUD).",
+      "task_refs": ["TASK-USER-FSIM-001", "TASK-USER-FSIM-002", "TASK-TODO-FSIM-001", "TASK-TODO-FSIM-002"]
+    },
+    {
+      "id": "NFR-USER-002",
+      "characteristic": "reliability",
+      "severity": "high",
+      "description": "Email uniqueness atomic — DB UNIQUE constraint 의무.",
+      "task_refs": ["TASK-USER-FSIM-001"]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "meta": {
+    "generated_at": "2026-05-26T10:00:00Z",
+    "methodology_version": "v10.1.1",
+    "inputs_used": ["planning_docs", "documentation"],
+    "confidence": 0.85,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "planning_spec_path": ".aimd/output/planning-spec.json"
+  },
+  "tasks": [
+    {
+      "id": "TASK-FE-LOGIN-001",
+      "title": "FE Login form 구현 + JWT 저장 + /settings redirect",
+      "description": "Zod schema 검증 → POST /api/users/login → 성공: localStorage.set('token') + navigate('/settings') / 실패: form-level error 표시.",
+      "ac_refs": ["AC-FE-LOGIN-001"],
+      "behavior_ref": "BHV-FE-LOGIN-001",
+      "execution_order": 1,
+      "layer": "presentation",
+      "module": "auth"
+    }
+  ],
+  "adrs": [
+    {
+      "id": "ADR-FE-LOGIN-001",
+      "title": "Login form 검증 library 선택 — Zod",
+      "status": "accepted",
+      "decision": "Zod schema 기반 client-side 검증 채택. form input 즉시 피드백 + TypeScript 추론 강함 + BE/FE schema 공유 가능.",
+      "alternatives": [
+        {"option": "react-hook-form 의 register + manual 검증", "rejection_reason": "schema 정의 분산 + TypeScript 추론 약함 + 동일 schema 재정의 비용"},
+        {"option": "Yup", "rejection_reason": "TypeScript 추론이 Zod 대비 약함 + 번들 사이즈 큼 (~20KB)"},
+        {"option": "Joi", "rejection_reason": "Node.js 지향 library / browser 환경 부적합 / 번들 사이즈 매우 큼"}
+      ],
+      "consequences": {
+        "positive": ["타입 추론 강함 (z.infer<typeof schema>)", "schema 1곳 정의", "BE/FE schema 공유 가능", "런타임 검증 + 타입 안전"],
+        "negative": ["기존 codebase 가 다른 lib 사용 시 마이그레이션 비용", "런타임 비용 약간 (≈ ~10ms parse / submit 당)"]
+      }
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-FE-LOGIN-001",
+      "severity": "medium",
+      "type": "security",
+      "description": "JWT 를 localStorage 에 저장 시 XSS 공격에 노출 (httpOnly cookie 대비 보안 약함). React app 자체 XSS 차단되더라도 third-party script 주입 시 token 탈취 가능.",
+      "mitigation": "CSP (Content-Security-Policy) 강화 + sanitize-html / 장기 = httpOnly cookie + CSRF token + SameSite=Strict 로 마이그레이션 검토.",
+      "task_refs": ["TASK-FE-LOGIN-001"]
+    },
+    {
+      "id": "RISK-FE-LOGIN-002",
+      "severity": "low",
+      "type": "design",
+      "description": "Client-side 검증만 신뢰 시 BE 검증 누락 위험. 악의적 client 가 검증 우회 시 BE 가 잘못된 입력 처리 가능.",
+      "mitigation": "BE 도 동일 schema 적용 (Zod schema 공유 또는 BE 독립 검증). client 검증 = UX 용 / 보안 = BE 검증 필수 paradigm.",
+      "task_refs": ["TASK-FE-LOGIN-001"]
+    }
+  ],
+  "nfr_allocation": [
+    {
+      "id": "NFR-FE-LOGIN-001",
+      "characteristic": "performance_efficiency",
+      "severity": "medium",
+      "description": "Login API 응답 시간 ≤ 500ms (p95). Form submit 부터 redirect 까지 perceived latency ≤ 800ms.",
+      "task_refs": ["TASK-FE-LOGIN-001"]
+    },
+    {
+      "id": "NFR-FE-LOGIN-002",
+      "characteristic": "security",
+      "severity": "high",
+      "description": "JWT 저장 + transmission 안전성. HTTPS only / token rotation policy / expiry ≤ 24h.",
+      "task_refs": ["TASK-FE-LOGIN-001"]
+    },
+    {
+      "id": "NFR-FE-LOGIN-003",
+      "characteristic": "usability",
+      "severity": "medium",
+      "description": "Form a11y. aria-label 의무 / focus management (submit 후 error message focus) / error message screen-reader announcement (aria-live='polite').",
+      "task_refs": ["TASK-FE-LOGIN-001"]
+    }
+  ]
+}

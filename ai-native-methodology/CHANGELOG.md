@@ -9,6 +9,28 @@
 
 ---
 
+## [10.1.1] — 2026-05-26 PATCH — C-v4.1-poc-재실행 부분 종결 (5 PoC task-plan 생성 / plan-agent e2e 입증)
+
+> 사용자 "마지막 carry 처리하자" → option A 채택 (5 가능 PoC 전부 + spec 부재 5 = 서브-carry). additive PoC artifact / methodology 무변경 / breaking 0 = PATCH.
+>
+> v10.0.0 plan-agent 본격 구현 후에도 미해소였던 C-v4.1-poc-재실행 carry. 점검 결과 5 PoC (poc-03/04-mini/05/11/14) 만 prerequisite (behavior-spec + AC) 보유. 나머지 5 PoC (poc-06/07/08/09/10) 는 spec stage 미실행 = 서브-carry.
+>
+> | PoC | tasks | ADRs | risks | NFR | 특성 |
+> |---|---|---|---|---|---|
+> | poc-04-mini | 1 | 1 | 2 | 3 | FE Login + JWT (Zod ADR) |
+> | poc-05 | 2 | 1 | 4 | 4 | signup + login (argon2 ADR) |
+> | poc-03 | 2 | 2 | 4 | 4 | RealWorld NestJS (argon2 + JWT ADR) |
+> | poc-14 | 4 | 2 | 4 | 4 | user + todo (IDOR 차단) |
+> | poc-11 | 6 | 2 | 5 | 4 | ★ 사내 EFI-WEB billing characterization mode |
+> | **합계** | **15** | **7** | **18** | **19** | — |
+>
+> - **schema 정합**: task-plan.schema.json VALID 5/5 (task granularity 1-3 AC / ADR alternatives ≥3 / risks severity enum / NFR ISO 25010:2023 9 characteristic).
+> - **Type 1 self-run corroboration ≥ 5** (§8.1 strict ≥ 2 충족 / chain harness plan stage e2e 입증 / 다른 도메인+stack 단일 PoC 과적합 회피).
+> - **STOP-3**: release-readiness 20/20 (보존) + skill-citation 0 stale + version 3-way 10.1.1 + breaking 0 = PATCH.
+> - **잔여 서브-carry**: poc-06/07/08/09/10 (spec stage 미실행 / 각 PoC × behavior-spec + AC 실행 의무 = task-plan 보다 더 heavy / v10.x).
+>
+> DEC-2026-05-26-poc-task-plan-5. Partial resolve C-v4.1-poc-재실행 (5/9 = 56%).
+
 ## [10.1.0] — 2026-05-26 MINOR — discovery-from-{figma, swagger, nl-md} 3 SKILL.md body 본격 구현 (DEC-2026-05-26-input-skill-roles §2 carry 종결)
 
 > 사용자 "잔여 적용" 결단 (v10.0.4 trigger carry 보류 권고 override) → option α 본격. additive doc / breaking 0 / 신규 기능 = MINOR.
