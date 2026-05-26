@@ -77,7 +77,7 @@ node src/cli.js \
 
 ## Sibling tools
 
-- [`../planning-extraction-validator/`](../planning-extraction-validator/) — chain 1 (planning) gate (★ characterization 출력 = chain 1 입력 보강)
+- [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — chain 1 (discovery) gate (★ characterization 출력 = chain 1 입력 보강)
 - [`../chain-coverage-validator/`](../chain-coverage-validator/) — chain 2 (spec) gate
 - [`../schema-validator/`](../schema-validator/) — characterization-spec.schema.json sub-validate (Ajv 8 strict mode)
 - [`../drift-validator/`](../drift-validator/) — `--check-layout` 시 phase 4.7 entry 인식 (★ skills 19 → 20)

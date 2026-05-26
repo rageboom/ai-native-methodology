@@ -1,0 +1,90 @@
+{
+  "$comment": "★ v11.0.0 — acceptance-criteria.json template placeholder. chain 2 (spec) 산출물. BHV-* 마다 Gherkin (Given/When/Then) AC-* 추출. verifiable=true ⇔ ≥ 1 TC forward link. ★ layer 분기 본격 (DEC-2026-05-26-contract-강제-양-axis §1) — layer=be → openapi_path+operationId 의무 / layer=fe → state_map_ref+dtcg_token_ref+visual_manifest_ref 의무.",
+  "meta": {
+    "generated_at": "2026-01-01T00:00:00+09:00",
+    "source_commit_sha": "<git commit SHA>",
+    "methodology_version": "v11.0.0",
+    "inputs_used": ["source_code", "documentation"],
+    "confidence": {
+      "level": 0.85,
+      "rationale": "★ BHV → AC Gherkin 분해 / MoSCoW 우선순위 결단 정합"
+    }
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
+  },
+  "criteria": [
+    {
+      "$comment": "★ Example 1: layer=cross-cut Story anchor (BE+FE 모두 포함)",
+      "id": "AC-DOMAIN-001",
+      "description": "<AC 설명>",
+      "behavior_ref": "BHV-DOMAIN-001",
+      "use_case_ref": "UC-DOMAIN-001",
+      "gherkin": {
+        "given": ["사용자가 로그인 상태이다"],
+        "when": "유효한 input 으로 작업을 실행한다",
+        "then": ["결과가 success 상태이다", "audit log 가 기록된다"],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-DOMAIN-001"],
+      "gate_required": true,
+      "related_brs": ["BR-DOMAIN-RULE-001"],
+      "related_aps": [],
+      "layer": "cross-cut",
+      "story_ref": "STORY-DOMAIN-001"
+    },
+    {
+      "$comment": "★ Example 2: layer=be (★ openapi_path + operationId 본격 required / DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate)",
+      "id": "AC-DOMAIN-002",
+      "description": "BE API 시나리오",
+      "behavior_ref": "BHV-DOMAIN-001",
+      "use_case_ref": "UC-DOMAIN-001",
+      "gherkin": {
+        "given": ["인증 토큰이 유효하다"],
+        "when": "POST /api/domain/resource 호출",
+        "then": ["응답 status=201", "Location header 가 채워진다"],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-DOMAIN-002"],
+      "gate_required": true,
+      "related_brs": ["BR-DOMAIN-RULE-001"],
+      "related_aps": [],
+      "layer": "be",
+      "story_ref": "STORY-DOMAIN-001",
+      "openapi_path": "/api/domain/resource",
+      "operationId": "createDomainResource"
+    },
+    {
+      "$comment": "★ Example 3: layer=fe (★ state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 required)",
+      "id": "AC-DOMAIN-003",
+      "description": "FE UI 시나리오",
+      "behavior_ref": "BHV-DOMAIN-001",
+      "use_case_ref": "UC-DOMAIN-001",
+      "gherkin": {
+        "given": ["사용자가 대시보드 화면에 진입했다"],
+        "when": "[작업 생성] 버튼을 클릭한다",
+        "then": ["form modal 이 나타난다", "DTCG primary color 가 적용된다"],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-DOMAIN-003"],
+      "gate_required": true,
+      "related_brs": [],
+      "related_aps": [],
+      "layer": "fe",
+      "story_ref": "STORY-DOMAIN-001",
+      "state_map_ref": "dashboard.modal.create",
+      "dtcg_token_ref": "default",
+      "visual_manifest_ref": "screen.dashboard"
+    }
+  ]
+}

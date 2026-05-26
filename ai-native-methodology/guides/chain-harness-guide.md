@@ -91,7 +91,7 @@ node tools/chain-driver/src/cli.js next
 stateDiagram-v2
     [*] --> analysis: chain-driver init
     analysis --> discovery: 7대 산출물 종결
-    discovery --> spec: gate #1 pass<br/>(planning-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
+    discovery --> spec: gate #1 pass<br/>(discovery-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
     spec --> plan: gate #2 pass<br/>(chain-coverage-validator)
     plan --> test: gate #3 pass<br/>(plan-coverage-validator / NFR hard gate + ADR ≥3)
     test --> implement: gate #4 pass<br/>(spec-test-link-validator + RED 입증)
@@ -151,7 +151,7 @@ additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 validator:
 
 ```
-1. planning-extraction-validator (★ 기존 v2.0)
+1. discovery-extraction-validator (★ v11.0.0 rename / 기존 planning-extraction-validator)
 2. ★ br-cross-consistency-validator (v2.4 신규 / v2.5 Layer 2 본격 통합)
    ├─ Layer 1 (결정적):
    │   · 두 표현 ≥ 1 의무 (natural_language + given_when_then)

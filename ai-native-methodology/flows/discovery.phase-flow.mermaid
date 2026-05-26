@@ -12,14 +12,14 @@ flowchart TB
         P_input_validate["Phase input-validate — input 검증<br/>analysis 산출물 + swagger/figma/nl-md 어댑터"]
         P_use_cases_decompose["Phase use-cases-decompose — use_cases 분해<br/>domain + rules + api + state-machine → UC-*"]
         P_br_intent_extract["Phase br-intent-extract — business_rules_intent 추출<br/>rules + antipatterns + finding → BR-INTENT-*"]
-        P_planning_spec_compose["Phase planning-spec-compose — planning-spec 합성 + 검증<br/>★ planning-extraction-validator + schema-validator"]
+        P_discovery_spec_compose["Phase discovery-spec-compose — discovery-spec 합성 + 검증<br/>★ discovery-extraction-validator + schema-validator"]
         P_gate_1["★ ★ ★ Phase gate-1 — go/stop gate #1 (사용자 결단)<br/>_base-invoke-go-stop-gate / cluster 5~6"]
 
         P_input_validate --> P_use_cases_decompose
         P_input_validate --> P_br_intent_extract
-        P_use_cases_decompose --> P_planning_spec_compose
-        P_br_intent_extract --> P_planning_spec_compose
-        P_planning_spec_compose --> P_gate_1
+        P_use_cases_decompose --> P_discovery_spec_compose
+        P_br_intent_extract --> P_discovery_spec_compose
+        P_discovery_spec_compose --> P_gate_1
     end
 
     subgraph IN["analysis stage 산출물 + 외부 입력 (input)"]
@@ -38,8 +38,8 @@ flowchart TB
     end
 
     IN --> P_input_validate
-    P_planning_spec_compose --> OUT_JSON
-    P_planning_spec_compose --> OUT_MD
+    P_discovery_spec_compose --> OUT_JSON
+    P_discovery_spec_compose --> OUT_MD
     P_gate_1 -->|"go"| NEXT
     P_gate_1 -.->|"stop"| STOP["sprint 중단 / carry"]
     P_gate_1 -.->|"revisit:analysis"| IN

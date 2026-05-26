@@ -78,12 +78,16 @@ function parseArgs(argv) {
 function check1_pocCorroboration() {
   const candidates = readdirSync(join(ROOT, 'examples'))
     .filter((d) => d.startsWith('poc-'))
-    .filter((d) => existsSync(join(ROOT, 'examples', d, '.aimd/output/planning-spec.json')));
+    .filter((d) => {
+      // ★ v11.0.0 — discovery-spec.json 우선 / planning-spec.json legacy carry
+      const base = join(ROOT, 'examples', d, '.aimd/output');
+      return existsSync(join(base, 'discovery-spec.json')) || existsSync(join(base, 'planning-spec.json'));
+    });
   return {
     id: 'poc_corroboration',
     pass: candidates.length >= 2,
     detail: `found ${candidates.length} PoC with chain harness output: ${candidates.join(', ')}`,
-    delegated_to: 'examples/*/.aimd/output/planning-spec.json existence + valid schema',
+    delegated_to: 'examples/*/.aimd/output/discovery-spec.json (★ v11.0.0) or planning-spec.json (legacy) existence + valid schema',
   };
 }
 
@@ -120,10 +124,10 @@ function check3_validatorsViolation() {
       cmd: ['tools/drift-validator/src/cli.js', '--check-state-flow-consistency', '--json'],
     },
     {
-      name: 'planning-extraction (poc-05)',
+      name: 'discovery-extraction (poc-05)',
       cmd: [
-        'tools/planning-extraction-validator/src/cli.js',
-        '--planning', 'examples/poc-05-sample-user-register/.aimd/output/planning-spec.json',
+        'tools/discovery-extraction-validator/src/cli.js',
+        '--discovery', 'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
         '--rules', 'examples/poc-05-sample-user-register/output/rules/business-rules.json',
         '--domain', 'examples/poc-05-sample-user-register/input/domain.json',
         '--json',
@@ -133,7 +137,7 @@ function check3_validatorsViolation() {
       name: 'chain-coverage (poc-05)',
       cmd: [
         'tools/chain-coverage-validator/src/cli.js',
-        '--planning', 'examples/poc-05-sample-user-register/.aimd/output/planning-spec.json',
+        '--planning', 'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
         '--behavior', 'examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json',
         '--acceptance', 'examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json',
         '--test-spec', 'examples/poc-05-sample-user-register/.aimd/output/test-spec.json',
@@ -265,11 +269,13 @@ function check7_e2eCyclePass() {
 //   examples/**/{business-rules,planning-spec,behavior-spec,acceptance-criteria,test-spec,impl-spec,traceability-matrix}.json 자동 discover.
 const ANALYSIS_VALIDATOR_TARGETS = new Set([
   'business-rules.json',        // analysis stage (R15 baseline / br-cross-consistency 의무)
-  'planning-spec.json',         // chain 1
+  'discovery-spec.json',        // chain 1 (★ v11.0.0 — DEC-2026-05-26-discovery-spec-rename)
+  'planning-spec.json',         // chain 1 (legacy carry / v10.x 산출물 호환)
   'behavior-spec.json',         // chain 2
   'acceptance-criteria.json',   // chain 2
-  'test-spec.json',             // chain 3
-  'impl-spec.json',             // chain 4
+  'task-plan.json',             // chain 3 (★ v9.x plan stage)
+  'test-spec.json',             // chain 4
+  'impl-spec.json',             // chain 5
   'traceability-matrix.json',   // cross-chain
   'ticket-sync-evidence.json',  // ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — MCP 호출 evidence
 ]);

@@ -40,7 +40,7 @@
 
 | 도구 | 검증 |
 |---|---|
-| **planning-extraction-validator** (★ sub-plan-3 신설) | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
+| **discovery-extraction-validator** (★ sub-plan-3 신설 / v11.0.0 rename) | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
 | schema-validator (Ajv 8) | discovery-spec.schema.json 구조 정합 |
 | traceability-matrix-builder | UC-* row 채움 (matrix.json + matrix.md + matrix.mermaid) |
 

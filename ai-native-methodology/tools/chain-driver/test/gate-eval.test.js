@@ -64,7 +64,7 @@ describe('gate-eval', () => {
   });
 
   it('requiredValidators returns canonical list per stage', () => {
-    assert.ok(requiredValidators('discovery').includes('planning-extraction-validator'));
+    assert.ok(requiredValidators('discovery').includes('discovery-extraction-validator'));
     assert.ok(requiredValidators('test').includes('test-impl-pass-validator'));
     assert.deepEqual(requiredValidators('unknown'), []);
   });

@@ -71,7 +71,7 @@ node src/cli.js \
 ## Sibling tools
 
 - [`../characterization-coverage-validator/`](../characterization-coverage-validator/) — phase 4.7 gate (★ sql-inventory 의 intent_vs_bug_classification 이 phase 4.7 cross-link 의무)
-- [`../planning-extraction-validator/`](../planning-extraction-validator/) — chain 1 gate
+- [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — chain 1 gate
 - [`../schema-validator/`](../schema-validator/) — sql-inventory.schema.json sub-validate (Ajv 8)
 - [`../drift-validator/`](../drift-validator/) — `--check-layout` 시 phase 4.8 entry 인식 (★ skills 20 → 21)
 

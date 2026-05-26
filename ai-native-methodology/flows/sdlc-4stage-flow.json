@@ -113,7 +113,7 @@
     {
       "id": "#1",
       "stage": "discovery",
-      "validators": ["planning-extraction-validator", "schema-validator"],
+      "validators": ["discovery-extraction-validator", "schema-validator"],
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {

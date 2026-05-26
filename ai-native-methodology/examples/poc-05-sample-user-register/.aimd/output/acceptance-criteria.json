@@ -11,7 +11,7 @@
   },
   "derivation_source": {
     "behavior_spec_path": ".aimd/output/behavior-spec.json",
-    "planning_spec_path": ".aimd/output/planning-spec.json"
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
   },
   "criteria": [
     {

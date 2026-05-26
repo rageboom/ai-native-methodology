@@ -9,7 +9,7 @@
   "derivation_source": {
     "behavior_spec_path": ".aimd/output/behavior-spec.json",
     "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
-    "planning_spec_path": ".aimd/output/planning-spec.json"
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
   },
   "tasks": [
     {

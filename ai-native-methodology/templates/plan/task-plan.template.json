@@ -1,0 +1,157 @@
+{
+  "$comment": "★ v11.0.0 — task-plan.json template placeholder. chain 3 (plan) 산출물. macro HOW (task 분해 / 의존성 / ADR / NFR / risk / rollback). 본 stage = ticket 생성 시점 (4-level cascade: Epic + Story + OP-* + TASK-*). ★ layer 분기 본격 — be → openapi_endpoint_ref 의무 / fe → component_ref 의무.",
+  "meta": {
+    "generated_at": "2026-01-01T00:00:00+09:00",
+    "source_commit_sha": "<git commit SHA>",
+    "methodology_version": "v11.0.0",
+    "inputs_used": ["source_code", "documentation"],
+    "confidence": {
+      "level": 0.85,
+      "rationale": "★ AC → TASK 분해 + ADR alternatives ≥3 + NFR allocation + risk 3중 망"
+    }
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
+  },
+  "tasks": [
+    {
+      "$comment": "★ Example 1: layer=be (★ openapi_endpoint_ref 의무)",
+      "id": "TASK-DOMAIN-001",
+      "title": "BE API endpoint 구현",
+      "description": "<설명>",
+      "ac_refs": ["AC-DOMAIN-002"],
+      "behavior_ref": "BHV-DOMAIN-001",
+      "layer": "be",
+      "module": "domain",
+      "tc_refs": ["TC-DOMAIN-002"],
+      "adr_refs": ["ADR-DOMAIN-001"],
+      "risks_refs": ["RISK-DOMAIN-001"],
+      "dependencies": [],
+      "execution_order": 1,
+      "estimation_ai": "M",
+      "estimation_human": "<사람 추정 / over-confidence 차단>",
+      "story_ref": "STORY-DOMAIN-001",
+      "epic_ref": "EPIC-DOMAIN-DASH",
+      "openapi_endpoint_ref": {
+        "path": "/api/domain/resource",
+        "operationId": "createDomainResource",
+        "method": "post"
+      }
+    },
+    {
+      "$comment": "★ Example 2: layer=fe (★ component_ref 의무)",
+      "id": "TASK-DOMAIN-002",
+      "title": "FE 화면 컴포넌트 구현",
+      "description": "<설명>",
+      "ac_refs": ["AC-DOMAIN-003"],
+      "behavior_ref": "BHV-DOMAIN-001",
+      "layer": "fe",
+      "module": "domain",
+      "tc_refs": ["TC-DOMAIN-003"],
+      "dependencies": ["TASK-DOMAIN-001"],
+      "execution_order": 2,
+      "estimation_ai": "M",
+      "story_ref": "STORY-DOMAIN-001",
+      "epic_ref": "EPIC-DOMAIN-DASH",
+      "component_ref": {
+        "package": "src/features/domain",
+        "name": "DomainCreateForm",
+        "state_map_ref": "dashboard.modal.create",
+        "dtcg_token_set": "default"
+      }
+    },
+    {
+      "$comment": "★ Example 3: layer=e2e (cross-cut Story anchor / contract ref ❌)",
+      "id": "TASK-DOMAIN-003",
+      "title": "E2E 시나리오 자동화",
+      "ac_refs": ["AC-DOMAIN-001"],
+      "behavior_ref": "BHV-DOMAIN-001",
+      "layer": "e2e",
+      "module": "domain",
+      "dependencies": ["TASK-DOMAIN-002"],
+      "execution_order": 3,
+      "story_ref": "STORY-DOMAIN-001"
+    }
+  ],
+  "epic_refs": [
+    {
+      "jira_id": "EPIC-DOMAIN-DASH",
+      "screen_id": "DashboardScreen",
+      "route": "/domain/dashboard",
+      "title": "Domain 대시보드 화면 (FE Epic anchor)"
+    }
+  ],
+  "story_refs": [
+    {
+      "jira_id": "STORY-DOMAIN-001",
+      "behavior_ref": "BHV-DOMAIN-001",
+      "ac_refs": ["AC-DOMAIN-001", "AC-DOMAIN-002", "AC-DOMAIN-003"],
+      "epic_ref": "EPIC-DOMAIN-DASH",
+      "title": "Domain resource 생성 시나리오 (cross-cut Story anchor)"
+    }
+  ],
+  "op_task_refs": [
+    {
+      "jira_id": "OP-DOMAIN-001-JIRA",
+      "op_task_id": "OP-DOMAIN-001",
+      "category": "infra",
+      "title": "DB 인덱스 추가 (Story sibling — BE only 운영)"
+    }
+  ],
+  "adrs": [
+    {
+      "id": "ADR-DOMAIN-001",
+      "title": "<ADR 제목>",
+      "status": "proposed",
+      "decision": "<결정 본문>",
+      "alternatives": [
+        {"option": "<대안 1>", "rejection_reason": "<reject 사유>"},
+        {"option": "<대안 2>", "rejection_reason": "<reject 사유>"},
+        {"option": "<대안 3>", "rejection_reason": "<reject 사유>"}
+      ],
+      "consequences": {
+        "positive": ["<긍정 결과>"],
+        "negative": ["<부정 결과>"]
+      },
+      "trigger_category": "structure",
+      "integration_points": ["src/domain/Service.java:45-60"],
+      "behavior_refs": ["BHV-DOMAIN-001"]
+    }
+  ],
+  "risks": [
+    {
+      "id": "RISK-DOMAIN-001",
+      "severity": "high",
+      "description": "<위험 내용>",
+      "type": "concurrency",
+      "mitigation": "<완화 전략>",
+      "task_refs": ["TASK-DOMAIN-001"],
+      "industry_case_refs": ["<URL 또는 출처>"],
+      "human_review": true
+    }
+  ],
+  "nfr_allocation": [
+    {
+      "id": "NFR-DOMAIN-001",
+      "characteristic": "performance_efficiency",
+      "severity": "high",
+      "description": "<NFR 설명 — 예: 응답시간 p95 < 500ms>"
+    }
+  ],
+  "rollback_strategy": {
+    "approach": "<rollback 전략 — 예: feature flag / blue-green / backward-compat shim>",
+    "trigger_conditions": ["<rollback 발동 조건>"],
+    "data_migration_reversibility": "reversible"
+  },
+  "cross_links": {
+    "to_spec_artifacts": [
+      ".aimd/output/behavior-spec.json",
+      ".aimd/output/acceptance-criteria.json"
+    ],
+    "to_discovery_artifacts": [
+      ".aimd/output/discovery-spec.json"
+    ]
+  }
+}

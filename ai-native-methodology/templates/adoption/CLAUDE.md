@@ -98,7 +98,7 @@ DAG: `flows/sdlc-4stage-flow.{json,mermaid}` (★ master SSOT) + chain stage flo
 | `spectral-runner` | OpenAPI lint (실 실행) | API 산출물 add/edit |
 | `static-runner` | 외부 정적 분석 hook (Semgrep / PMD / SpotBugs / Daikon / CodeQL) | Phase 4.5+ |
 | `schema-validator` | chain 산출물 schema 검증 | 모든 chain stage |
-| `planning-extraction-validator` | chain 1 / planning-spec source-grounded coverage ≥ 0.80 | gate #1 |
+| `discovery-extraction-validator` | chain 1 / discovery-spec source-grounded coverage ≥ 0.80 | gate #1 |
 | `chain-coverage-validator` | chain 정합 (UC→BHV→AC link coverage ≥ 0.85) | gate #2 |
 | `spec-test-link-validator` | chain 3 (AC→TC link coverage ≥ 0.85) | gate #3 |
 | `test-impl-pass-validator` | chain 4 (실 test runner / 100% pass / result_hash 정규화) | gate #4 |
@@ -142,8 +142,8 @@ DAG: `flows/sdlc-4stage-flow.{json,mermaid}` (★ master SSOT) + chain stage flo
 ### 시나리오 B — chain harness e2e (legacy → planning → spec → test → impl)
 
 1. **chain-driver init**: `node tools/chain-driver/src/cli.js init <project>` (또는 첫 자연어 prompt 시 hooks-bridge 자동 호출)
-2. **chain 1 진입**: `extract-from-legacy` + `decompose-use-cases` + `identify-business-intent` skill → planning-spec 산출
-3. **gate #1 (planning-extraction-validator)** — finding 발견 시 state.blocked=true / 사용자 fix 후 재시도
+2. **chain 1 (discovery) 진입**: `discovery-from-analysis-output` + `discovery-decompose-use-cases` + `discovery-identify-business-intent` skill → discovery-spec 산출
+3. **gate #1 (discovery-extraction-validator)** — finding 발견 시 state.blocked=true / 사용자 fix 후 재시도
 4. **chain 2 진입**: `compose-behavior-spec` + `derive-acceptance-criteria` + `integrate-7대-deliverables` skill
 5. **gate #2 (chain-coverage-validator)** — UC→BHV→AC link coverage ≥ 0.85 의무
 6. **chain 3 진입**: `generate-test-spec` + `run-test-evidence` + `verify-coverage` skill (★ RED 의무)

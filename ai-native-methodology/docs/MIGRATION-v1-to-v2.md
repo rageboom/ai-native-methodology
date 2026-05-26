@@ -110,9 +110,9 @@ ls .aimd/
 ```bash
 # planning-spec.json 작성 (사용자 manual or skill)
 # validator 회귀
-node /path/to/.../tools/planning-extraction-validator/src/cli.js \
-  --planning .aimd/output/planning-spec.json \
-  --rules output/rules.json \
+node /path/to/.../tools/discovery-extraction-validator/src/cli.js \
+  --discovery .aimd/output/discovery-spec.json \
+  --rules output/business-rules.json \
   --domain output/domain.json
 ```
 

@@ -51,7 +51,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 7. **risks / concerns 추출**: 명시 위험 / 불확실성 / open-question → R-*.
 8. **intent classification**: orchestrator inject `intent` (new/modify/bug-fix) 와 NL 안 키워드 cross-check — 모순 시 finding emit (예: intent=bug-fix 인데 NL 은 신규 기능 묘사).
 9. **discovery-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
-10. **`planning-extraction-validator` 통과** 자격 = 모든 entry source_grounded / NL 안 실 문장 검증 (grep_hit_count > 0).
+10. **`discovery-extraction-validator` 통과** 자격 = 모든 entry source_grounded / NL 안 실 문장 검증 (grep_hit_count > 0).
 
 ## 70~80% 한계 명시
 

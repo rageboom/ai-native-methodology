@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// planning-extraction-validator CLI
-// usage: planning-extraction-validator --planning <path> --rules <path> --domain <path> [--dry-run] [--json]
+// discovery-extraction-validator CLI (v11.0.0 / renamed from planning-extraction-validator)
+// usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]
+// backward-compat: --planning alias kept for legacy PoC artifact carry (deprecated / Phase 4 sweep 후 제거)
 
 import { validatePlanningExtraction, loadJson } from './validator.js';
 
@@ -8,13 +9,13 @@ function parseArgs(argv) {
   const out = { dryRun: false, json: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--planning') out.planning = argv[++i];
+    if (a === '--discovery' || a === '--planning') out.discovery = argv[++i];
     else if (a === '--rules') out.rules = argv[++i];
     else if (a === '--domain') out.domain = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: planning-extraction-validator --planning <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]`);
+      console.log(`usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]`);
       process.exit(0);
     }
   }
@@ -22,14 +23,14 @@ function parseArgs(argv) {
 }
 
 const args = parseArgs(process.argv);
-if (!args.planning) {
-  console.error('error: --planning required');
+if (!args.discovery) {
+  console.error('error: --discovery required (or legacy --planning)');
   process.exit(2);
 }
 
-const planning = loadJson(args.planning);
-if (!planning) {
-  console.error(`error: planning-spec not found at ${args.planning}`);
+const discovery = loadJson(args.discovery);
+if (!discovery) {
+  console.error(`error: discovery-spec not found at ${args.discovery}`);
   process.exit(2);
 }
 const analysis = {
@@ -37,12 +38,12 @@ const analysis = {
   domain: args.domain ? loadJson(args.domain) : null,
 };
 
-const result = validatePlanningExtraction(planning, analysis);
+const result = validatePlanningExtraction(discovery, analysis);
 
 if (args.json) {
   console.log(JSON.stringify(result, null, 2));
 } else {
-  console.log(`[planning-extraction-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high})`);
+  console.log(`[discovery-extraction-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high})`);
   console.log(`UC coverage: ${(result.coverage.use_case * 100).toFixed(1)}%`);
   for (const f of result.findings) {
     console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);

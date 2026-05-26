@@ -1,0 +1,69 @@
+{
+  "$comment": "★ v11.0.0 — behavior-spec.json template placeholder. chain 2 (spec) 산출물. discovery-spec.use_cases + analysis Phase 4.5 (state-machine / sequence / decision-table / invariant / property-test) 통합 → executable behavioral contract. cross-cut 단일 (BE/FE 양쪽 가로지름).",
+  "meta": {
+    "generated_at": "2026-01-01T00:00:00+09:00",
+    "source_commit_sha": "<git commit SHA>",
+    "methodology_version": "v11.0.0",
+    "inputs_used": ["source_code", "documentation"],
+    "confidence": {
+      "level": 0.85,
+      "rationale": "★ discovery-spec UC forward + Phase 4.5 state-machine/sequence 정합"
+    }
+  },
+  "derivation_source": {
+    "discovery_spec_path": ".aimd/output/discovery-spec.json",
+    "analysis_artifacts": [
+      ".aimd/output/business-rules.json",
+      ".aimd/output/domain.json",
+      ".aimd/output/openapi.yaml",
+      ".aimd/output/formal-spec/state-machines/UC-DOMAIN-001.json"
+    ]
+  },
+  "behaviors": [
+    {
+      "id": "BHV-DOMAIN-001",
+      "name": "<BHV 이름>",
+      "description": "<BHV 설명 — executable contract 의도>",
+      "use_case_refs": ["UC-DOMAIN-001"],
+      "br_refs": ["BR-DOMAIN-RULE-001"],
+      "preconditions": [
+        "user.status == ACTIVE"
+      ],
+      "postconditions": [
+        "entity.created_at != null"
+      ],
+      "invariants": [
+        "balance >= 0"
+      ],
+      "state_transition_ref": ".aimd/output/formal-spec/state-machines/UC-DOMAIN-001.json",
+      "decision_table_ref": ".aimd/output/formal-spec/decision-tables/UC-DOMAIN-001.json",
+      "sequence_ref": ".aimd/output/formal-spec/sequences/UC-DOMAIN-001.json",
+      "property_tests": [
+        {
+          "property": "any positive amount must succeed",
+          "framework": "fast-check",
+          "framework_status": "active",
+          "arbitrary_stub": "fc.integer({ min: 1, max: 1000 })"
+        }
+      ],
+      "acceptance_criteria_refs": ["AC-DOMAIN-001"],
+      "source_grounded_evidence": [
+        "src/domain/Service.java:30-60",
+        "business-rules.json#BR-DOMAIN-RULE-001"
+      ],
+      "code_pointers": [],
+      "code_pointers_na": false
+    }
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      ".aimd/output/business-rules.json",
+      ".aimd/output/domain.json",
+      ".aimd/output/openapi.yaml",
+      ".aimd/output/schema.json",
+      ".aimd/output/antipatterns.json",
+      ".aimd/output/state-map.json",
+      ".aimd/output/visual-manifest.json"
+    ]
+  }
+}

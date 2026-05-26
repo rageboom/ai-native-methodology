@@ -46,7 +46,7 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 ## Sibling tools (gate validator 5종 / ★ v10.0.0)
 
 chain-driver `next` 진입 시 자동 호출:
-- chain 1 (discovery) → [`../planning-extraction-validator/`](../planning-extraction-validator/) (gate #1)
+- chain 1 (discovery) → [`../discovery-extraction-validator/`](../discovery-extraction-validator/) (gate #1)
 - chain 2 (spec) → [`../chain-coverage-validator/`](../chain-coverage-validator/) (gate #2)
 - chain 3 (plan) → [`../plan-coverage-validator/`](../plan-coverage-validator/) (gate #3 / ★ v10.0.0 신규 hard gate)
 - chain 4 (test) → [`../spec-test-link-validator/`](../spec-test-link-validator/) + [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #4 / RED 의무)

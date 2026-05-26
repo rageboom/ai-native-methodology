@@ -20,7 +20,7 @@
 | [`spectral-runner/`](./spectral-runner/) | Phase 5-1 (api) | — | — | — | — | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`static-runner/`](./static-runner/) | Phase 6 (quality) | — | — | — | impl 후 | — | skill auto-invoke (★ 진짜 외부 도구) |
 | [`schema-validator/`](./schema-validator/) | — | ★ | ★ | ★ | ★ | — | gate auto |
-| [`planning-extraction-validator/`](./planning-extraction-validator/) | — | **gate #1** | — | — | — | — | gate auto (chain-driver next) |
+| [`discovery-extraction-validator/`](./discovery-extraction-validator/) | — | **gate #1** | — | — | — | — | gate auto (chain-driver next / ★ v11.0.0 renamed from planning-extraction-validator) |
 | [`chain-coverage-validator/`](./chain-coverage-validator/) | — | — | **gate #2** | — | — | — | gate auto |
 | [`spec-test-link-validator/`](./spec-test-link-validator/) | — | — | — | **gate #3** | — | — | gate auto |
 | [`test-impl-pass-validator/`](./test-impl-pass-validator/) | — | — | — | — | **gate #4** | — | gate auto (`--allow-execute` 의무) |
@@ -59,7 +59,7 @@ charter R19 (Tool Ecosystem Dependency Classification) 의 3-tier paradigm:
 chain harness 의 4 gate 각각에 대응하는 validator:
 
 ```
-chain 1 (planning) → planning-extraction-validator (gate #1)
+chain 1 (discovery) → discovery-extraction-validator (gate #1)
 chain 2 (spec)     → chain-coverage-validator     (gate #2)
 chain 3 (test)     → spec-test-link-validator     (gate #3)
 chain 4 (impl)     → test-impl-pass-validator     (gate #4 / --allow-execute)

@@ -11,15 +11,15 @@ allowed-tools: Read, Write, Edit
 ## 언제 사용
 
 - chain stage skill 종결 직후 의무 호출. 호출 순서:
-  1. stage 산출물 생성 (e.g., `planning/extract-from-legacy`)
-  2. validator 자동 검증 (e.g., `planning-extraction-validator`)
+  1. stage 산출물 생성 (e.g., `discovery/extract-from-analysis-output`)
+  2. validator 자동 검증 (e.g., `discovery-extraction-validator`)
   3. ★ **invoke-go-stop-gate** ← 본 skill
   4. (go) 다음 stage skill 호출 / (stop) sprint 중단 / (revisit) 임의 stage jump
 
 ## 절차
 
 1. **gate 입력 수집**:
-   - 본 stage 산출물 path (예: `.aimd/output/planning-spec.json`)
+   - 본 stage 산출물 path (예: `.aimd/output/discovery-spec.json`)
    - validator 결과 (finding 목록 / coverage / 임계 위반)
    - traceability-matrix 현 상태 (forward_coverage / red_count)
 
@@ -28,12 +28,12 @@ allowed-tools: Read, Write, Edit
    ★ Gate #N (chain {stage} → {next}) 결단 의무
 
    ## 산출물 요약
-   - planning-spec.use_cases: 12개 (UC-USER-001 ~ UC-PROFILE-003)
-   - planning-spec.business_rules_intent: 47 BR-INTENT (business-rules.json 매핑 100%)
+   - discovery-spec.use_cases: 12개 (UC-USER-001 ~ UC-PROFILE-003)
+   - discovery-spec.business_rules_intent: 47 BR-INTENT (business-rules.json 매핑 100%)
    - source_grounded_evidence: 12 UC 모두 존재 / grep_hit_count 합 89
 
    ## validator 결과
-   - planning-extraction-validator: ✅ 0 finding
+   - discovery-extraction-validator: ✅ 0 finding
    - schema-validator: ✅ valid
    - traceability-matrix forward_coverage: 1.0 (UC 단계만)
 

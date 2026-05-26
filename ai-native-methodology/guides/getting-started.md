@@ -138,9 +138,9 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-3. chain 1 (discovery) 진입 (1분 / ★ v2.5: Layer 2 LLM 의무 통과)
 "발견 단계 시작" (또는 "기획 단계 시작")
 → discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent skill 자동 발동
-→ planning-spec.{json,md} 산출 (산출물 파일명 reuse 유지)
+→ discovery-spec.{json,md} 산출 (★ v11.0.0 rename)
 → gate #1 자동 호출:
-  · planning-extraction-validator (입출력 무결성)
+  · discovery-extraction-validator (입출력 무결성)
   · ★ br-cross-consistency-validator Layer 1 (결정적) + Layer 2 (Claude Code sub-agent / Sonnet 4.6) 양쪽 통과
 → semantic_drift_detected 또는 confidence_cap_exceeded finding 발생 시 → state.blocked / 사용자 결단
 

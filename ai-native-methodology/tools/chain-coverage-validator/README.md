@@ -43,7 +43,7 @@ node src/cli.js \
 
 ## Sibling tools
 
-- [`../planning-extraction-validator/`](../planning-extraction-validator/) — gate #1 / chain 1 (planning)
+- [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — gate #1 / chain 1 (discovery)
 - [`../spec-test-link-validator/`](../spec-test-link-validator/) — gate #3 / chain 3 (test)
 - [`../schema-validator/`](../schema-validator/) — chain 2 schema (behavior + acceptance) sub-validate
 - [`../traceability-matrix-builder/`](../traceability-matrix-builder/) — release matrix

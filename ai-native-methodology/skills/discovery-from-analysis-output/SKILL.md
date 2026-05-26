@@ -36,7 +36,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 - code file match (`source_grounded_evidence.file_paths[]`)
 - antipattern reference (`source_grounded_evidence.artifact: "antipatterns"`)
 
-`grep_hit_count: 0` 또는 `source_grounded_evidence` 부재 = ★ planning-extraction-validator 자동 차단 (`planning.no-source-grounded-evidence` / `planning.grep-hit-zero` finding).
+`grep_hit_count: 0` 또는 `source_grounded_evidence` 부재 = ★ discovery-extraction-validator 자동 차단 (`discovery.source_grounded.missing` finding).
 
 ## 절차
 
@@ -50,12 +50,12 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 5. **cross_links.to_analysis_artifacts 채움** — analysis 산출물 path 모두 backward link.
 
-6. **`planning-extraction-validator` 자동 검증**:
+6. **`discovery-extraction-validator` 자동 검증**:
    ```bash
-   node tools/planning-extraction-validator/src/cli.js \
-     --planning .aimd/output/discovery-spec.json \
-     --rules    .aimd/output/business-rules.json \
-     --domain   .aimd/output/domain.json \
+   node tools/discovery-extraction-validator/src/cli.js \
+     --discovery .aimd/output/discovery-spec.json \
+     --rules     .aimd/output/business-rules.json \
+     --domain    .aimd/output/domain.json \
      --json
    ```
    - critical/high finding 0 의무 (source-grounded coverage ≥ 0.80).
@@ -114,11 +114,11 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 `pending_decisions[]` 가 있으면 chain 1 gate #1 의 cluster 5번 (사용자 검토 cluster) 에서 사용자 결단 받음 → `user-explicit` 으로 record. ★ `AI-default` 0 의무. 사용자가 결단을 보류하면 → `pending_decisions[]` 유지 + chain 1 종결 reject (gate stop).
 
-### `planning-extraction-validator` 검증 (★ v8.7.5+)
+### `discovery-extraction-validator` 검증 (★ v8.7.5+)
 
-- `decisions[].source = AI-default + revisit_required != true` 시 → `planning.ai-default-revisit-flag-missing` finding emit + critical.
-- `pending_decisions[]` non-empty + Auto Mode 미활성 + gate=go 진입 시 → `planning.pending-decisions-not-resolved` finding emit + critical (gate stop).
-- `decisions[].source = carry + rationale 안 evidence path 부재` 시 → `planning.carry-decision-missing-evidence-path` finding emit + high.
+- `decisions[].source = AI-default + revisit_required != true` 시 → `discovery.ai-default-revisit-flag-missing` finding emit + critical.
+- `pending_decisions[]` non-empty + Auto Mode 미활성 + gate=go 진입 시 → `discovery.pending-decisions-not-resolved` finding emit + critical (gate stop).
+- `decisions[].source = carry + rationale 안 evidence path 부재` 시 → `discovery.carry-decision-missing-evidence-path` finding emit + high.
 
 ## 70~80% 한계 명시
 

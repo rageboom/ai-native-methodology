@@ -34,7 +34,7 @@ flowchart TB
     end
 
     subgraph G["★ ★ ★ 5 Gate (사용자 결단 / _base-invoke-go-stop-gate skill)"]
-        G1["Gate #1 (discovery)<br/>planning-extraction-validator<br/>schema-validator"]
+        G1["Gate #1 (discovery)<br/>discovery-extraction-validator<br/>schema-validator"]
         G2["Gate #2 (spec)<br/>chain-coverage-validator<br/>drift / dmn / formal-link / schema"]
         G3["Gate #3 (plan)<br/>plan-coverage-validator<br/>schema-validator<br/>★ trio enforcement"]
         G4["Gate #4 (test)<br/>test-impl-pass (RED expected: all_fail)<br/>spec-test-link / schema / chain-strict lint"]

@@ -52,7 +52,7 @@ node src/cli.js \
 
 ## Sibling tools
 
-- [`../planning-extraction-validator/`](../planning-extraction-validator/) — gate #1 / chain 1 input 검증
+- [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — gate #1 / chain 1 input 검증
 - [`../chain-coverage-validator/`](../chain-coverage-validator/) — gate #2 / chain 2 input 검증
 - [`../spec-test-link-validator/`](../spec-test-link-validator/) — gate #3 / chain 3 input 검증
 - [`../test-impl-pass-validator/`](../test-impl-pass-validator/) — gate #4 / chain 4 input 검증

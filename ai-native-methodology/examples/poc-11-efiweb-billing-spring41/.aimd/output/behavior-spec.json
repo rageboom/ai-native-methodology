@@ -15,7 +15,7 @@
     "$comment": "★ ★ ★ ★ PoC #11 chain 2 4 UC 모두 종결 (★ B sprint session 3차 + 4차 통합 / chain 2 partial → full / Q1 결단 정합 = 4 UC 모두 종결 후 PATCH v2.3.5). 5 BHV + 12 AC / characterization mode 명시 / Agent 3 Senior critique 흡수 정합."
   },
   "derivation_source": {
-    "planning_spec_path": ".aimd/output/planning-spec.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json",
     "analysis_artifacts": [
       "input/business-rules.json",
       "input/domain.json",

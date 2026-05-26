@@ -52,7 +52,7 @@ discovery-spec 의 `business_rules_intent[]` 배열. 각 BR-INTENT:
 ## ★ ★ ★ no-simulation — reasoning 환각 차단
 
 reasoning 필드는 **사람 검토 의무** (Auto Mode 도 차단). AI 가 추론한 reasoning 이 source 에 없으면:
-- `source_grounded_evidence` 의 grep_hit_count = 0 → planning-extraction-validator 자동 차단.
+- `source_grounded_evidence` 의 grep_hit_count = 0 → discovery-extraction-validator 자동 차단.
 - 사용자에게 명시: "★ AI 추론 reasoning — source 에 grep-hit 없음. 검토 후 채워주세요" / 빈 BR-INTENT 등록 ❌.
 
 ## 카테고리 분류

@@ -77,16 +77,17 @@ function runValidator(validatorName, projectDir) {
 // ★ validator 별 인자 매핑 (★ chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)
 function buildValidatorArgs(validatorName, projectDir) {
   switch (validatorName) {
-    case 'planning-extraction-validator':
+    case 'discovery-extraction-validator':
+    case 'planning-extraction-validator': // backward-compat alias (deprecated)
       return [
-        '--planning', join(projectDir, '.aimd/output/planning-spec.json'),
+        '--discovery', join(projectDir, '.aimd/output/discovery-spec.json'),
         '--rules', join(projectDir, 'input/business-rules.json'),
         '--domain', join(projectDir, 'input/domain.json'),
         '--json',
       ];
     case 'chain-coverage-validator':
       return [
-        '--planning', join(projectDir, '.aimd/output/planning-spec.json'),
+        '--discovery', join(projectDir, '.aimd/output/discovery-spec.json'),
         '--behavior', join(projectDir, '.aimd/output/behavior-spec.json'),
         '--acceptance', join(projectDir, '.aimd/output/acceptance-criteria.json'),
         '--json',
@@ -128,7 +129,7 @@ function main() {
   }
   if (!REQUIRED_VALIDATORS_PER_STAGE[args.stage]) {
     console.error(`error: unknown stage ${args.stage}`);
-    console.error(`  expected: planning / spec / test / implement`);
+    console.error(`  expected: discovery / spec / plan / test / implement`);
     process.exit(2);
   }
 

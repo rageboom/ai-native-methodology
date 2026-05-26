@@ -1,0 +1,83 @@
+{
+  "$comment": "★ v11.0.0 — impl-spec.json template placeholder. chain 5 (implement) 산출물. test-spec → 실 impl 코드 (GREEN 의무 / 모든 test 100% pass / fail_count=0). 실 코드 = 산출물 ❌ / commit_hash 만 보존 (i-strict). stack 분기 본격 (be/fe/db/e2e/infra).",
+  "meta": {
+    "generated_at": "2026-01-01T00:00:00+09:00",
+    "source_commit_sha": "<git commit SHA>",
+    "methodology_version": "v11.0.0",
+    "inputs_used": ["source_code", "test_code"],
+    "confidence": {
+      "level": 0.85,
+      "rationale": "★ 실 runner GREEN 100% pass / 5종 물증 7 필드"
+    }
+  },
+  "derivation_source": {
+    "test_spec_path": ".aimd/output/test-spec.json",
+    "behavior_spec_path": ".aimd/output/behavior-spec.json"
+  },
+  "modules": [
+    {
+      "$comment": "★ Example 1: BE (spring-boot-3)",
+      "id": "IMPL-DOMAIN-001",
+      "tc_refs": ["TC-DOMAIN-001", "TC-DOMAIN-002"],
+      "bhv_refs": ["BHV-DOMAIN-001"],
+      "framework": "spring-boot-3",
+      "layer": "be",
+      "stack": "spring-boot",
+      "source_files": [
+        "src/main/java/com/example/domain/DomainService.java",
+        "src/main/java/com/example/domain/DomainController.java"
+      ],
+      "commit_hash": "0000000000000000000000000000000000000000",
+      "source_evidence": "@Service public class DomainService { ... public Resource create(Input input) { ... } }"
+    },
+    {
+      "$comment": "★ Example 2: FE (react-18)",
+      "id": "IMPL-DOMAIN-002",
+      "tc_refs": ["TC-DOMAIN-003"],
+      "bhv_refs": ["BHV-DOMAIN-001"],
+      "framework": "react-18",
+      "layer": "fe",
+      "stack": "react",
+      "source_files": [
+        "src/features/domain/DomainCreateForm.tsx",
+        "src/features/domain/api.ts"
+      ],
+      "commit_hash": "0000000000000000000000000000000000000000"
+    }
+  ],
+  "test_pass_evidence": {
+    "test_runner_version": "junit-jupiter 5.10.0 + vitest 1.4.0",
+    "test_runner_stdout_path": ".aimd/output/test-evidence/impl-green.stdout.log",
+    "invocation_timestamp": "2026-01-01T00:00:00+09:00",
+    "duration_ms": 12345,
+    "pass_count": 3,
+    "fail_count": 0,
+    "skip_count": 0,
+    "reproduction_command": ["./gradlew test", "npm test"],
+    "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "report_format": "junit_xml",
+    "coverage_report_path": ".aimd/output/test-evidence/lcov.info",
+    "linter_output_path": ".aimd/output/test-evidence/static-runner.sarif"
+  },
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1.0,
+      "threshold": 0.85,
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 0.95,
+        "medium": 0.90,
+        "low": 0.85
+      }
+    },
+    "test_pass_rate": 1.0,
+    "line_coverage": 0.85,
+    "branch_coverage": 0.80
+  },
+  "human_review": {
+    "gate_4_intervention_pct": 0.10,
+    "intervention_log": [
+      "<gate #5 사용자 결단 trace>"
+    ]
+  }
+}

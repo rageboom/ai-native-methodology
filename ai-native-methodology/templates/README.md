@@ -8,11 +8,12 @@
 |---|---|---|
 | [`analysis/`](./analysis/) | ★ ★ 활성 (21 template / flat layout) | BE 7대 + 4.5 formal-spec + 부속 (FE 8 + aspect 4 = skills/ 본문 inline) |
 | [`adoption/`](./adoption/) | ★ build alias source | `CLAUDE.md` (사내 정책 inline) — build script 가 dist root CLAUDE.md 로 별칭 복사 |
-| [`planning/`](./planning/) | ☐ placeholder | chain 1 (discovery / 구 planning) / planning-spec template (입력 형식 design notes) |
-| [`plan/`](./plan/) | ☐ placeholder | chain 3 (plan) / task-plan template (★ v10.0.0 신설) |
-| [`design/`](./design/) | ☐ placeholder | design stage (v2.x carry) |
-| [`test/`](./test/) | ☐ placeholder | chain 4 (test) / test-spec template (sub-plan-4 채워짐 / 일부) |
-| [`implement/`](./implement/) | ☐ placeholder | chain 5 (implement) / impl-spec template (sub-plan-4 채워짐 / 일부) |
+| [`discovery/`](./discovery/) | ★ 활성 (v11.0.0 rename) | chain 1 (discovery) / discovery-spec template + 기획서 입력 형식 design notes |
+| [`spec/`](./spec/) | ★ 활성 (v11.0.0 신설) | chain 2 (spec) / behavior-spec + acceptance-criteria template |
+| [`plan/`](./plan/) | ★ 활성 (v11.0.0 신설) | chain 3 (plan) / task-plan template + epic-story-op 매핑 |
+| [`test/`](./test/) | ★ 활성 (v11.0.0 신설) | chain 4 (test) / test-spec template (framework 분기 inline 주석) |
+| [`implement/`](./implement/) | ★ 활성 (v11.0.0 신설) | chain 5 (implement) / impl-spec template (stack 분기 inline 주석) |
+| [`design/`](./design/) | ☐ placeholder | design stage (v12.x carry) |
 
 ## analysis/ 템플릿 (21 / flat layout)
 
@@ -45,11 +46,17 @@ BE 7대 + 4.5 formal-spec:
 
 ★ ★ cleanup round 2-A (2026-05-06) — `templates/adoption/README.md` 의 dist root ADOPTION-README 별칭 복사 비활성 (단일 entry-point 정합 / source 보존).
 
-## chain stage placeholder (planning/plan/test/implement/design)
+## chain stage template (discovery/spec/plan/test/implement)
 
-sub-plan-4 (DEC-2026-05-06-sub-plan-4-종결) 에서 일부 채워짐. 미채움 부분 = v2.x carry.
+★ v11.0.0 (DEC-2026-05-26-v11-paradigm-결단) — 5 chain stage 모두 본격 template body 채움. Phase 3 시행.
 
-★ 향후 round 2-B 후속 작업으로 정돈 예정 (lifecycle placeholder 통합).
+| 디렉토리 | template body | source skill |
+|---|---|---|
+| discovery/ | discovery-spec.template.{json,md} | discovery-from-analysis-output |
+| spec/ | behavior-spec.template.{json,md} + acceptance-criteria.template.{json,md} | spec-compose-behavior-spec + spec-derive-acceptance-criteria |
+| plan/ | task-plan.template.{json,md} + epic-story-op.template.md | plan-decompose-and-sequence + plan-architect-decisions + plan-risk-and-nfr |
+| test/ | test-spec.template.{json,md} | test-generate-test-spec |
+| implement/ | impl-spec.template.{json,md} | implement-generate-impl-spec |
 
 ## 호출
 

@@ -4,7 +4,7 @@ name: chain-check
 # ★ drift-check.yml 오염 ❌ — 본 워크플로우는 if: false gate + workflow_dispatch only 로 시작.
 # ★ PoC #05 신설 (sub-plan-6) 시점에 본격 활성. 그 전까지는 수동 trigger / template 보존.
 #
-# Gate #1 (planning → spec): planning-extraction-validator
+# Gate #1 (discovery → spec): discovery-extraction-validator
 # Gate #2 (spec → test): chain-coverage-validator + drift-validator (chain-mode) +
 #                        formal-spec-link-validator (--chain-mode)
 # Gate #3 (test → impl): spec-test-link-validator + 진짜 test runner (★ chain 3 RED 의무 / sub-plan-3b)
@@ -41,14 +41,14 @@ jobs:
       - name: install workspace deps
         run: npm install --no-audit --no-fund
 
-      # ★ Gate #1 — planning → spec
-      - name: gate#1 — planning-extraction-validator
-        working-directory: tools/planning-extraction-validator
+      # ★ Gate #1 — discovery → spec (v11.0.0 rename)
+      - name: gate#1 — discovery-extraction-validator
+        working-directory: tools/discovery-extraction-validator
         run: |
-          if [ -f "${{ github.workspace }}/${{ inputs.target_dir }}/planning-spec.json" ]; then
-            node src/cli.js "${{ github.workspace }}/${{ inputs.target_dir }}/planning-spec.json"
+          if [ -f "${{ github.workspace }}/${{ inputs.target_dir }}/discovery-spec.json" ]; then
+            node src/cli.js --discovery "${{ github.workspace }}/${{ inputs.target_dir }}/discovery-spec.json"
           else
-            echo "[chain-check] planning-spec.json not found — skipped"
+            echo "[chain-check] discovery-spec.json not found — skipped"
           fi
 
       # ★ Gate #2 — spec → test

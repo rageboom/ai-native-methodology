@@ -1,12 +1,13 @@
 // aggregator.test.js — findings-aggregator unit test
 // ★ ★ v2.3.6 PATCH (DEC-2026-05-13-chain-driver-findings-integration-v2.3.6)
+// ★ ★ v11.0.0 MAJOR — discovery rename (planning-extraction-validator → discovery-extraction-validator)
 
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
 import {
   emptyFindings,
   mergeFindings,
-  transformPlanningExtraction,
+  transformDiscoveryExtraction,
   transformChainCoverage,
   transformSchemaValidator,
   transformTestImplPass,
@@ -31,25 +32,26 @@ describe('emptyFindings', () => {
 });
 
 describe('REQUIRED_VALIDATORS_PER_STAGE', () => {
-  it('★ chain-driver gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 정합 (4 stage)', () => {
-    assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.planning, ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator']);
+  it('★ chain-driver gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 정합 (5 stage / v11.0.0 discovery rename)', () => {
+    assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.discovery, ['discovery-extraction-validator', 'schema-validator', 'br-cross-consistency-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.spec, ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator']);
+    assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.plan, ['plan-coverage-validator', 'schema-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.test, ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator']);
     assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.implement, ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder']);
   });
 });
 
-describe('transformPlanningExtraction', () => {
+describe('transformDiscoveryExtraction', () => {
   it('★ summary critical/high count 정합', () => {
     const json = { summary: { total_findings: 2, critical: 1, high: 1, medium: 0 } };
-    const f = transformPlanningExtraction(json);
+    const f = transformDiscoveryExtraction(json);
     assert.equal(f.critical, 1);
     assert.equal(f.high, 1);
     assert.equal(f.medium, 0);
   });
   it('★ 0 findings = all zero', () => {
     const json = { summary: { total_findings: 0, critical: 0, high: 0 } };
-    const f = transformPlanningExtraction(json);
+    const f = transformDiscoveryExtraction(json);
     assert.equal(f.critical, 0);
     assert.equal(f.high, 0);
   });
@@ -176,7 +178,12 @@ describe('transformBrCrossConsistency (★ v2.4.0)', () => {
 });
 
 describe('dispatchValidator', () => {
-  it('★ planning-extraction-validator → JSON parse + transform', () => {
+  it('★ discovery-extraction-validator → JSON parse + transform', () => {
+    const output = JSON.stringify({ summary: { critical: 0, high: 1 } });
+    const f = dispatchValidator('discovery-extraction-validator', output);
+    assert.equal(f.high, 1);
+  });
+  it('★ planning-extraction-validator backward-compat alias still works', () => {
     const output = JSON.stringify({ summary: { critical: 0, high: 1 } });
     const f = dispatchValidator('planning-extraction-validator', output);
     assert.equal(f.high, 1);
@@ -204,9 +211,9 @@ describe('aggregateForStage', () => {
     );
   });
 
-  it('★ planning stage — 0 findings (validator 모두 pass)', () => {
+  it('★ discovery stage — 0 findings (validator 모두 pass)', () => {
     const mockRun = (name) => {
-      if (name === 'planning-extraction-validator') {
+      if (name === 'discovery-extraction-validator') {
         return JSON.stringify({ summary: { critical: 0, high: 0 } });
       }
       if (name === 'schema-validator') {
@@ -221,11 +228,11 @@ describe('aggregateForStage', () => {
       }
       return null;
     };
-    const findings = aggregateForStage('planning', '/tmp/poc', mockRun);
+    const findings = aggregateForStage('discovery', '/tmp/poc', mockRun);
     assert.equal(findings.critical, 0);
     assert.equal(findings.high, 0);
     assert.equal(Object.keys(findings.sources).length, 3);
-    assert.equal(findings.sources['planning-extraction-validator'].status, 'ok');
+    assert.equal(findings.sources['discovery-extraction-validator'].status, 'ok');
     assert.equal(findings.sources['schema-validator'].status, 'ok');
     assert.equal(findings.sources['br-cross-consistency-validator'].status, 'ok');
   });
@@ -250,9 +257,9 @@ describe('aggregateForStage', () => {
     assert.equal(findings.sources['formal-spec-link-validator'].status, 'skipped');
   });
 
-  it('★ critical accumulate (★ schema invalid + planning critical 합산)', () => {
+  it('★ critical accumulate (★ schema invalid + discovery critical 합산)', () => {
     const mockRun = (name) => {
-      if (name === 'planning-extraction-validator') {
+      if (name === 'discovery-extraction-validator') {
         return JSON.stringify({ summary: { critical: 2, high: 0 } });
       }
       if (name === 'schema-validator') {
@@ -260,13 +267,13 @@ describe('aggregateForStage', () => {
       }
       return null;
     };
-    const findings = aggregateForStage('planning', '/tmp/poc', mockRun);
+    const findings = aggregateForStage('discovery', '/tmp/poc', mockRun);
     assert.equal(findings.critical, 5); // 2 + 3
   });
 
   it('★ ★ ★ parse fail = critical 증가 (★ 양심 의존 차단)', () => {
     const mockRun = (name) => {
-      if (name === 'planning-extraction-validator') {
+      if (name === 'discovery-extraction-validator') {
         return 'not valid json';
       }
       if (name === 'schema-validator') {
@@ -274,8 +281,8 @@ describe('aggregateForStage', () => {
       }
       return null;
     };
-    const findings = aggregateForStage('planning', '/tmp/poc', mockRun);
+    const findings = aggregateForStage('discovery', '/tmp/poc', mockRun);
     assert.equal(findings.critical, 1); // ★ parse fail 1
-    assert.equal(findings.sources['planning-extraction-validator'].status, 'error');
+    assert.equal(findings.sources['discovery-extraction-validator'].status, 'error');
   });
 });

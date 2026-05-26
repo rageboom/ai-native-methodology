@@ -1,0 +1,12 @@
+{
+  "name": "@ai-native-methodology/discovery-extraction-validator",
+  "version": "0.2.0",
+  "description": "v11.0.0 chain 1 (discovery) validator — discovery-spec.json source-grounded coverage / no-hallucination / use_case coverage ≥ 0.80. Renamed from planning-extraction-validator (DEC-2026-05-26-discovery-spec-rename).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "discovery-extraction-validator": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

@@ -23,7 +23,7 @@
 ├──────────────────────────────────────────────────────┤
 │ 체인 하네스 검증 (6종)                                   │
 │   · chain-driver                                      │
-│   · planning-extraction-validator                     │
+│   · discovery-extraction-validator                    │
 │   · chain-coverage-validator                          │
 │   · spec-test-link-validator                          │
 │   · test-impl-pass-validator                          │
@@ -104,9 +104,9 @@
 - **막는 것**: 게이트를 우회한 자동 코드 생성. AI 가 "양심"에 의존하는 모든 회피 경로.
 - **★ v2.5 갱신**: chain 1 gate 가 Layer 2 LLM 의무 통합 (br-cross-consistency-validator 와 연계 / layer2_threshold block reason 신설).
 
-### 11. `planning-extraction-validator`
+### 11. `discovery-extraction-validator` (★ v11.0.0 / renamed from `planning-extraction-validator`)
 
-- **하는 일**: 분석 산출물에서 기획 명세를 뽑을 때, 입력 → 출력 무결성 검증.
+- **하는 일**: 분석 산출물에서 discovery 명세를 뽑을 때, 입력 → 출력 무결성 검증.
 - **막는 것**: 비즈니스 의도가 임의로 변형되어 추출되는 것.
 
 ### 12. `chain-coverage-validator`

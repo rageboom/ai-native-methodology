@@ -7,10 +7,11 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-// ★ chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합 (★ v2.4.0 br-cross-consistency-validator 추가)
+// ★ chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합 (★ v2.4.0 br-cross-consistency-validator 추가 / ★ v11.0.0 discovery rename)
 export const REQUIRED_VALIDATORS_PER_STAGE = {
-  planning: ['planning-extraction-validator', 'schema-validator', 'br-cross-consistency-validator'],
+  discovery: ['discovery-extraction-validator', 'schema-validator', 'br-cross-consistency-validator'],
   spec: ['chain-coverage-validator', 'drift-validator', 'formal-spec-link-validator', 'schema-validator'],
+  plan: ['plan-coverage-validator', 'schema-validator'],
   test: ['test-impl-pass-validator', 'spec-test-link-validator', 'schema-validator'],
   implement: ['test-impl-pass-validator', 'static-runner', 'traceability-matrix-builder'],
 };
@@ -37,10 +38,10 @@ export function emptyFindings() {
   };
 }
 
-// ★ planning-extraction-validator JSON → findings 변환
+// ★ discovery-extraction-validator JSON → findings 변환 (v11.0.0 / renamed from planning-extraction-validator)
 // 출력 shape (cli.js --json):
 // { findings: [], coverage: { use_case: 1 }, summary: { total_findings, critical, high } }
-export function transformPlanningExtraction(json) {
+export function transformDiscoveryExtraction(json) {
   const summary = json.summary ?? {};
   return {
     critical: summary.critical ?? 0,
@@ -171,8 +172,10 @@ export function mergeFindings(a, b) {
 // ★ validator dispatch — validator_name + stage → transform 호출
 export function dispatchValidator(validatorName, output) {
   switch (validatorName) {
-    case 'planning-extraction-validator':
-      return transformPlanningExtraction(JSON.parse(output));
+    case 'discovery-extraction-validator':
+      return transformDiscoveryExtraction(JSON.parse(output));
+    case 'planning-extraction-validator': // backward-compat alias (deprecated)
+      return transformDiscoveryExtraction(JSON.parse(output));
     case 'chain-coverage-validator':
       return transformChainCoverage(JSON.parse(output));
     case 'schema-validator':
@@ -196,7 +199,7 @@ export function dispatchValidator(validatorName, output) {
 export function aggregateForStage(stage, projectDir, runValidator) {
   const validators = REQUIRED_VALIDATORS_PER_STAGE[stage];
   if (!validators) {
-    throw new Error(`unknown stage: ${stage} (expected: planning / spec / test / implement)`);
+    throw new Error(`unknown stage: ${stage} (expected: discovery / spec / plan / test / implement)`);
   }
 
   let findings = emptyFindings();

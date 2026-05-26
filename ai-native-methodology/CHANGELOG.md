@@ -9,6 +9,100 @@
 
 ---
 
+## [11.0.0] — 2026-05-26 MAJOR — v11.0.0 paradigm cascade 본격 시행 종결 (8 결단 + 5 chain stage 산출물 본격 통합)
+
+> ★ ★ ★ ★ ★ session 48차 paradigm SSOT 확립 + session 49차 schema/skill body cascade + 본 session 안 Phase 2f-prime + sub-phase + Phase 3 + Phase 4 + Phase 5 본격 시행 종결. v11.0.0 MAJOR breaking — `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename + BE/FE 산출물 분리 paradigm 본격 + Epic/Story/Task(OP-*)/Sub-task(TASK-*) 4-level cascade + ticket=plan stage 한 곳 (R20-prime) + contract 강제 양 axis (BE swagger / FE state-map+DTCG).
+>
+> ## 8 결단 본격 시행 종결
+>
+> | # | 결단 | 시행 |
+> |---|---|---|
+> | 1 | `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename | ✅ schema/skill/tool/PoC 모두 cascade |
+> | 2 | BE/FE 산출물 분리 paradigm (stage 별 axis 다름) | ✅ schema if/then 강제 본격 |
+> | 3 | ticket = plan stage 한 곳 (R20→R20-prime) | ✅ skills/ticket-sync SKILL.md 본문 재설계 |
+> | 4 | UC 유지 (User Story 추가 부재) | ✅ |
+> | 5 | Epic = FE 화면 단위 (또는 BE-domain) | ✅ task-plan.epic_refs 본격 |
+> | 6 | Story = cross-cut anchor (BE+FE/DB/E2E) | ✅ task-plan.story_refs + AC.story_ref |
+> | 7 | OP-* (Story sibling Task entity) 신설 + TASK-*=Sub-task 명시 | ✅ operational-task.schema.json + task-plan.op_task_refs |
+> | 8 | contract 강제 양 axis (BE swagger / FE state-map+DTCG) | ✅ schema if/then layer 1/2/3 hard gate |
+>
+> ## 본 session 시행 (Phase 2f-prime + sub-phase + Phase 3 + Phase 4 + Phase 5)
+>
+> ### Phase 2f-prime — `skills/ticket-sync/SKILL.md` 본문 재설계
+> - 5 stage matrix (analysis/planning/spec/test/implement) × 2 phase 본격 폐기
+> - **plan stage 단일** 4-level cascade 일괄 (Epic + Story + OP-* + TASK-*) 본문 본격
+> - phase enum: `enter` / `exit` / `update-test-red` / `update-impl-green`
+> - stage paradigm 위반 시 reject (`F-TICKETSYNC-012 stage_paradigm_violation`) 본격 정합
+> - 환경 resolve prelude (DWPD issuetype_map / parent_strategy / epic_link_customfield_id / Sub-task auto-inherit B14 / Structure 자동 B15) 본격 보존
+>
+> ### sub-phase — `tools/planning-extraction-validator` → `tools/discovery-extraction-validator` rename
+> - `git mv tools/planning-extraction-validator tools/discovery-extraction-validator`
+> - workspace npm rename + package.json name + bin name 본격
+> - chain-driver REQUIRED_VALIDATORS_PER_STAGE.discovery 본격
+> - flows + scripts/release-readiness + 활성 docs 모두 cascade
+> - backward-compat alias (`--planning` flag / `transformPlanningExtraction` function alias / dispatchValidator case 'planning-extraction-validator') 본격 보존
+>
+> ### Phase 3 — template body 본격 채움
+> - `templates/planning/` → `templates/discovery/` rename (`git mv`)
+> - `templates/spec/` 신설
+> - **13 신규 template body** (`.json` + `.md` 이중 렌더링 / ADR-008 v2):
+>   - `templates/discovery/discovery-spec.template.{json,md}` (2)
+>   - `templates/spec/behavior-spec.template.{json,md}` + `acceptance-criteria.template.{json,md}` (4)
+>   - `templates/plan/task-plan.template.{json,md}` + `epic-story-op.template.md` (3)
+>   - `templates/test/test-spec.template.{json,md}` (2)
+>   - `templates/implement/impl-spec.template.{json,md}` (2)
+> - `templates/README.md` 본격 갱신 (5 chain stage 본격 활성)
+> - `skills/_base-apply-template/SKILL.md` 인식 artifact list 21 → 27 (analysis 21 + chain 6) 본격 확장 + chain stage prerequisite 명시
+>
+> ### Phase 4 — 10 PoC sweep 본격
+> - `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename × **10 PoC** (poc-03 / poc-04-mini / poc-05 / poc-06 / poc-07 / poc-08 / poc-09 / poc-10 / poc-11 / poc-14)
+> - `derivation_source.planning_spec_path` → `discovery_spec_path` sed batch × 10 PoC (acceptance-criteria + behavior-spec + task-plan)
+> - release-readiness `poc_corroboration` discovery-spec.json 우선 인식 본격
+> - release-readiness `ANALYSIS_VALIDATOR_TARGETS` set 안 discovery-spec.json 본격 추가 + planning-spec.json legacy carry
+> - `analysis_validator_violation` 본격 해소 (20 violations → 0)
+> - `validators_violation` poc-05 chain-coverage cmd discovery-spec.json 본격 전환
+>
+> ### Phase 5 — v11.0.0 release
+> - CHANGELOG entry 본 표기
+> - version 3-way sync 10.1.1 → 11.0.0
+> - workspace test 746/746 pass ✅
+> - release-readiness **22/22 ready** ✅
+> - skill-citation 0 stale ✅
+>
+> ## breaking change scope (★ v11.0.0 MAJOR 자격)
+>
+> ### 직접 breaking
+> - 산출물 file 명 `planning-spec.{json,md}` → `discovery-spec.{json,md}` (10 PoC + active doc 정합)
+> - schema `derivation_source.planning_spec_path` → `discovery_spec_path` (behavior-spec / acceptance-criteria / task-plan)
+> - workspace tool `tools/planning-extraction-validator` → `tools/discovery-extraction-validator` (npm package + bin name)
+> - `templates/planning/` → `templates/discovery/` + `templates/spec/` 신설
+> - `methodology-spec/deliverables/17-planning-spec.md` → `17-discovery-spec.md`
+> - skills/ticket-sync SKILL.md 본문 paradigm 본격 재설계 (5 stage matrix 폐기 / plan 단일 본격)
+>
+> ### backward-compat carry
+> - tools/discovery-extraction-validator/src/cli.js — `--planning` flag alias 보존 (deprecated / 차기 v12.x retract)
+> - tools/findings-aggregator — `transformPlanningExtraction` function alias + `'planning-extraction-validator'` dispatchValidator case 보존
+> - release-readiness `poc_corroboration` discovery-spec.json OR planning-spec.json (legacy 둘다 인식)
+>
+> ## STOP-3 + paradigm 적합 점검
+>
+> | STOP-3 | 상태 |
+> |---|---|
+> | workspace test 746/746 pass | ✅ |
+> | release-readiness 22/22 ready | ✅ (analysis_validator_violation 해소 + poc_corroboration 갱신) |
+> | skill-citation 0 stale (245 active doc) | ✅ |
+> | version 3-way 11.0.0 | ✅ (CHANGELOG + plugin.json + version-check 3-way) |
+> | breaking 본격 (MAJOR 자격) | ✅ (8 결단 본격 cascade) |
+>
+> ★ ★ ★ ★ ★ **paradigm 본격 진전** (self-referential corrective drift ❌) — v11.0.0 MAJOR 본격 cascade 종결. session 48차 paradigm SSOT → session 49차 schema/skill body cascade → 본 session Phase 2f-prime + Phase 3 + Phase 4 + Phase 5 종결. self-celebration inflation ❌ — 본격 prod 가치 진전 paradigm 결단 8종 시행 종결.
+>
+> ## Lessons Learned (자산화)
+>
+> - **LL-v110-04** (template skill citation false-positive) — template 안 placeholder ADR/UC/BHV ID 가 skill-citation-validator 의 `\bADR-(?:[A-Z]+-)?\d{1,3}\b` 패턴 매칭 → 실 ADR 부재 시 stale citation 오류. 해소 = `ADR-<scope>-NNN` 등 `<` 포함 placeholder syntax 사용 (FP_LINE regex `<[a-z-]+>` 정합).
+> - **LL-v110-05** (1 session 안 MAJOR release cascade 본격 자격) — paradigm 본격 진전 (8 결단 시행) + ≥ 22/22 release-readiness + ≥ 745+ workspace test + 0 stale citation + 3-way version sync 동시 충족 시 본격 자격. LL-v930-02 cap (1 session 1 MAJOR) 본격 정합.
+
+---
+
 ## [10.1.1] — 2026-05-26 PATCH — C-v4.1-poc-재실행 부분 종결 (5 PoC task-plan 생성 / plan-agent e2e 입증)
 
 > 사용자 "마지막 carry 처리하자" → option A 채택 (5 가능 PoC 전부 + spec 부재 5 = 서브-carry). additive PoC artifact / methodology 무변경 / breaking 0 = PATCH.

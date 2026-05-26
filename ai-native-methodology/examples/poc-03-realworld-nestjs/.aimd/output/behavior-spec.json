@@ -8,7 +8,7 @@
     "formula_version": "v1"
   },
   "derivation_source": {
-    "planning_spec_path": ".aimd/output/planning-spec.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json",
     "analysis_artifacts": [
       "output/rules/business-rules.json",
       "output/domain/domain.json"

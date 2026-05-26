@@ -315,7 +315,7 @@ input → discovery → db-schema → architecture → business-logic
 
 | Chain | 단계 | 산출물 | 게이트 통과 조건 |
 |---|---|---|---|
-| **1** | Discovery | `planning-spec.{json,md}` (산출물명 reuse) | planning-extraction-validator · schema |
+| **1** | Discovery | `discovery-spec.{json,md}` | discovery-extraction-validator · schema |
 | **2** | Spec | `behavior-spec` + `acceptance-criteria` (Gherkin) | chain-coverage · drift · dmn · formal-link |
 | **3** | Plan | `task-plan` (task/ADR/NFR/risk) | gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR ≥3) |
 | **4** | Test (RED) | `test-spec` + 실 test 코드 + 5종 물증 | test-impl-pass = **모든 test fail** (RED 의무) |
@@ -441,7 +441,7 @@ severity_floor:  critical = 1.0   /   high = 0.95
 | stage | agent | skill | hook | tool/validator |
 |---|---|---|---|---|
 | input | `analysis-agent` | input-collection / orchestrate / from-{prompt,swagger,plan-doc,figma} | SessionStart | input-summary schema |
-| discovery | `discovery-agent` | from-analysis-output / decompose-uc / identify-intent | UserPromptSubmit | planning-extraction-validator |
+| discovery | `discovery-agent` | from-analysis-output / decompose-uc / identify-intent | UserPromptSubmit | discovery-extraction-validator |
 | spec | `spec-agent` | compose-behavior / derive-AC | PostToolUse | chain-coverage-validator |
 | plan | `plan-agent` | decompose-and-sequence / architect-decisions / risk-and-nfr | UserPromptSubmit | plan-coverage-validator (gate #3) |
 | test | `test-agent` | generate-test-spec | — | test-impl-pass (RED) |

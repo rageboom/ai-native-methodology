@@ -176,8 +176,8 @@ npm run test                # workspace 12 tool unit test (218 test pass)
 ```
 1. chain-driver init <project>      → state.json 초기화
 2. "발견 단계 시작"                  → discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent
-   → planning-spec.{json,md} 산출 (산출물명 reuse 유지)
-   → gate #1 (planning-extraction-validator) 통과
+   → discovery-spec.{json,md} 산출 (★ v11.0.0 rename)
+   → gate #1 (discovery-extraction-validator) 통과
 3. "behavior spec / acceptance criteria 도출"
    → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
    → behavior-spec + acceptance-criteria + 7대 통합
@@ -246,7 +246,7 @@ dist/ai-native-methodology-v3.6.9/
 │   ├── spectral-runner/              OpenAPI lint (★ 진짜 외부 도구)
 │   ├── static-runner/                Semgrep (Tier 1) + SARIF import (Tier 2 / PMD·SpotBugs·CodeQL·Daikon) — R19
 │   ├── schema-validator/             chain 산출물 6 schema 검증
-│   ├── planning-extraction-validator/ chain 1 / source-grounded ≥ 0.80
+│   ├── discovery-extraction-validator/ chain 1 / source-grounded ≥ 0.80
 │   ├── chain-coverage-validator/     chain 2 / UC→BHV→AC ≥ 0.85
 │   ├── spec-test-link-validator/     chain 3 / AC→TC ≥ 0.85
 │   ├── test-impl-pass-validator/     chain 5 (implement) / 100% pass + result_hash 정규화
@@ -302,7 +302,7 @@ node tools/decision-table-validator/src/cli.js {산출물 경로}/formal-spec/de
 node tools/formal-spec-link-validator/src/cli.js {산출물 경로}/formal-spec/
 
 # Chain harness validator (gate #1~#5)
-node tools/planning-extraction-validator/src/cli.js   # gate #1 (discovery)
+node tools/discovery-extraction-validator/src/cli.js  # gate #1 (discovery)
 node tools/chain-coverage-validator/src/cli.js        # gate #2 (spec)
 node tools/plan-coverage-validator/src/cli.js         # gate #3 (plan)
 node tools/spec-test-link-validator/src/cli.js        # gate #4 (test)
