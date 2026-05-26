@@ -109,9 +109,9 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | set | timing | 책임 | skill |
 |---|---|---|---|
 | **`analysis-from-*`** (4) | **최초 1회** (legacy baseline 수립) | analysis 산출물 만들기 (visual-manifest / ui-state-map / inventory / domain 등 canonical global `.aimd/output/`) | `analysis-from-{figma, swagger, prompt, plan-doc}` (★ 모두 본격 구현) |
-| **`discovery-from-*`** (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec(discovery 산출) | `discovery-from-{analysis-output(★본격), figma(light placeholder), swagger(light placeholder), nl-md(light placeholder)}` |
+| **`discovery-from-*`** (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec(discovery 산출) | `discovery-from-{analysis-output, figma, swagger, nl-md}` ★ v10.1.0 모두 본격 구현 (DEC-2026-05-26-discovery-input-bodies) |
 
-같은 figma 파일이라도 (a) baseline 수립 시 = `analysis-from-figma`, (b) 신규 feature scope 진입 시 = `discovery-from-figma`. **다른 목적/다른 산출**. 둘 다 유지 = 중복 ❌ / 다른 axis ✅. `discovery-from-{figma,swagger,nl-md}` 본격 구현 = 실 use case (해당 채널로 scope 진입 사용자) 트리거 시 carry / v10.x (현 사내 배포 전 단계 ROI 정합).
+같은 figma 파일이라도 (a) baseline 수립 시 = `analysis-from-figma`, (b) 신규 feature scope 진입 시 = `discovery-from-figma`. **다른 목적/다른 산출**. 둘 다 유지 = 중복 ❌ / 다른 axis ✅. `discovery-from-nl-md` 는 **NFR 1차 채널** (다른 채널은 부 / NL 만이 명시 NFR 표현).
 
 ## 단계 간 인터페이스 (data contract)
 

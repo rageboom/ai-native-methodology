@@ -9,6 +9,26 @@
 
 ---
 
+## [10.1.0] — 2026-05-26 MINOR — discovery-from-{figma, swagger, nl-md} 3 SKILL.md body 본격 구현 (DEC-2026-05-26-input-skill-roles §2 carry 종결)
+
+> 사용자 "잔여 적용" 결단 (v10.0.4 trigger carry 보류 권고 override) → option α 본격. additive doc / breaking 0 / 신규 기능 = MINOR.
+>
+> v10.0.4 가 paradigm (analysis-from-* baseline ↔ discovery-from-* scope 진입 timing/책임 분리) 만 명문화하고 `discovery-from-{figma, swagger, nl-md}` 3종은 light placeholder 로 두었던 것을 **본격 SKILL.md body 작성**. `discovery-from-analysis-output` (v9.0.0 본격 / 137 line) pattern 정합 / 책임 범위·입력·산출·no-simulation·절차·인용 6 섹션.
+>
+> | skill | source 채널 | UC 추출 | NFR axis | line |
+> |---|---|---|---|---|
+> | `discovery-from-figma` | figma file + selected frame | MCP 4 도구 → frame nodes → 사용자 flow | 부 (a11y/responsive/transition) | ~70 |
+> | `discovery-from-swagger` | openapi.yaml / swagger.json | OpenAPI parse → operation 별 summary/description → UC + I/O contract + schema constraint | 부 (security/rate-limit/SLA) | ~65 |
+> | `discovery-from-nl-md` | markdown 기획문서 / in-conversation NL | structural parse (heading/paragraph/sentence index) → 사용자 flow 패턴 | ★ **1차 채널** (NL 만이 명시 NFR) | ~80 |
+>
+> 각 entry source_grounded_evidence 의무: figma=`figma:<file_id>:<node_id>` / swagger=`openapi:<path>:<operationId>` / nl-md=`doc:<filepath>:<para>:<sentence>` 또는 `prompt:<message_id>:<line>`. 산출 = `.aimd/output/planning-spec.json`. LLM fabrication ❌ (특히 nl-md NFR — verbatim quote 권장 + `planning-extraction-validator` grep_hit_count > 0 강제).
+>
+> - **동반 doc 갱신**: `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리 (4 모두 본격) + `guides/first-prompt-cookbook.md` §2.1 timing note + `decisions/DEC-2026-05-26-input-skill-roles.md` §2 carry resolved 표기.
+> - **STOP-3**: release-readiness 20/20 (보존) + skill-citation 0 stale + version 3-way 10.1.0 + breaking 0 = MINOR.
+> - **잔여 carry**: C-v4.1-poc-재실행 (9 PoC 전부 task-plan 없음 / heavy validation / v10.x / Type 1 self-run).
+>
+> DEC-2026-05-26-discovery-input-bodies. Resolves DEC-2026-05-26-input-skill-roles §2 carry.
+
 ## [10.0.4] — 2026-05-26 PATCH — C-v4.1-input-skill-이관 결단 종결 (analysis-from-* ↔ discovery-from-* timing 분리 paradigm / option α light)
 
 > 사용자 "최초에 분석은 analysis 에서 하는데 한번 분석이 끝난 프로젝트는 그냥 다양한 input 을 받도록 하고 싶다" → option α light 채택. additive doc / breaking 0.

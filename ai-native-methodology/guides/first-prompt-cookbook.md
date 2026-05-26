@@ -77,7 +77,7 @@
 
 ★ ★ v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
 
-★ ★ **timing 분리** (v10.0.4): `discovery-from-{figma, swagger, nl-md}` = **scope 진입 시** UC 추출용 (현 light placeholder / 본격 구현 = 실 use case 트리거 carry). 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등 본격 구현). 두 set 평행 유지 / 다른 timing+책임. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
+★ ★ **timing 분리** (v10.0.4 paradigm / v10.1.0 본격): `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용 (★ v10.1.0 모두 본격 구현). 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등 본격 구현). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
 
 ### 2.2 Chain 2 (spec)
 

@@ -33,12 +33,14 @@ DEC-2026-05-21 carry `C-v4.1-input-skill-이관` 의 결단:
 
 중복 ❌ / 다른 axis ✅. baseline-delta 운영 모델의 입력 측면 정합.
 
-### §2. light 본격 구현 deferred (use case 트리거 carry)
+### §2. ~~light 본격 구현 deferred~~ → **v10.1.0 본격 구현 완료** (DEC-2026-05-26-discovery-input-bodies)
 
-`discovery-from-{figma, swagger, nl-md}` 본격 구현(figma→UC 추출 알고리즘 등 substantive skill logic) = **실 use case 트리거 carry**:
-- 해당 채널로 scope 진입하는 사용자 등장 시 본격 구현.
-- 현 사내 배포 전 단계 (`project_pre_deployment_stage` memory 정합) ROI 낮음 = light placeholder 로 paradigm 만 확정.
-- carry deadline 없음 (use case 트리거 의존).
+본 결단(v10.0.4)에서 trigger carry 로 보류했던 `discovery-from-{figma, swagger, nl-md}` 본격 구현 = **v10.1.0 MINOR 에서 본격 구현 완료** (사용자 결단 override / "잔여 적용"):
+- `skills/discovery-from-figma/SKILL.md` — figma MCP tools (4종) 기반 frame → UC + flow + intent 추출 procedure 본격 명세
+- `skills/discovery-from-swagger/SKILL.md` — OpenAPI parse → operation 별 UC + I/O contract + NFR(부) 추출 procedure 본격 명세
+- `skills/discovery-from-nl-md/SKILL.md` — markdown/NL prompt → UC + BR-INTENT + NFR(1차) + risk 추출 procedure 본격 명세
+
+각 skill body ~70-90 line / `discovery-from-analysis-output` pattern 정합 / 책임 범위·입력·산출·no-simulation·절차·인용 6 섹션. 산출은 모두 planning-spec.json (source_grounded_evidence 의무).
 
 ### §3. 시행 (additive doc / breaking 0)
 

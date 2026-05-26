@@ -1,55 +1,66 @@
 ---
 name: discovery-from-figma
-description: ★ light placeholder (v10.0.4 paradigm 명문화 / DEC-2026-05-26-input-skill-roles). chain (discovery) 입력 어댑터 skill (figma 채널 / **scope 진입 timing**). figma 파일 + selected frame 입력에서 UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) 추출 전문. discovery-agent 가 호출. `analysis-from-figma` (baseline 수립 / 최초 1회 / Track=FE) 와 **timing+책임 분리** (analysis = baseline / discovery = 신규 건마다 scope). 본격 구현 = 실 use case (figma 로 scope 진입 사용자) 트리거 carry / v10.x.
-allowed-tools: Read, Glob, Grep, Bash
+description: chain (discovery) 입력 어댑터 skill (figma 채널 / scope 진입 timing / ★ v10.1.0 본격). figma 파일 + selected frame 입력에서 UC + interaction flow + UI 의도 + 출처 ref (file_id:node_id) 추출 전문. discovery-agent 가 호출. `analysis-from-figma` (baseline 수립 / 최초 1회 / Track=FE) 와 timing+책임 분리 — analysis = visual structure (design tokens / layouts) / discovery = UC behavior intent (사용자 flow / 의도). NFR 부 채널 (a11y / responsive / transition).
+allowed-tools: Read, Bash, mcp__figma-desktop__get_design_context, mcp__figma-desktop__get_metadata, mcp__figma-desktop__get_variable_defs, mcp__figma-desktop__get_screenshot
 ---
 
-# discovery-from-figma (PLACEHOLDER 2026-05-21)
+# discovery-from-figma
 
-> **PLACEHOLDER**: 본 skill 은 v4.1 chain (discovery) 입력 어댑터 paradigm 정합 가시화 자산. 본격 구현은 v4.2+ carry.
->
-> 본 skill 의 모 결단: DEC-2026-05-21-chain-discovery-plan-stage-도입 §신설 자산 skills/.
+## 언제 사용
 
-## 책임 범위 (v4.2+ carry)
+scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 source 채널일 때. discovery-agent 가 dispatch. 본 skill = **UC / flow / intent 추출 axis** (`analysis-from-figma` 의 visual structure 추출과 분리 / DEC-2026-05-26-input-skill-roles 정합).
 
-figma 파일 + selected frame 입력에서 다음 추출:
+## 사전 조건 (★ 의무)
 
-| 항목 | 추출 방법 |
-|---|---|
-| UC 후보 | 화면 × 인터랙션 이벤트 = 1 UC 후보 (e.g., button click flow = 1 UC) |
-| Intent 후보 | 디자인 노트 / 코멘트 (없으면 `intent: unknown` 표지 carry — soft 게이트) |
-| UI 구조 | 컴포넌트 트리 + variant + design token reference |
-| Interaction flow | figma prototype connections (있으면) |
-| 출처 ref | `<file_id>#<node_id>` |
-| confidence 등급 | `confirmed` (코멘트 명시) / `inferred` (시각 추론) / `ambiguous` (모호한 flow) |
+- Figma desktop 앱 실행 중 + **대상 frame selected** (file URL 만으로 부족 — analysis-from-figma §사전 조건 정합)
+- `mcp__figma-desktop__*` 4 도구 사용자 환경 등록 (부재 시 skill reject + 사용자 setup 요청)
 
 ## 입력
 
-- Figma 파일 (MCP `figma-desktop` 도구 / selected frame 의무)
-- ★ file URL 만으로는 부족 — desktop app 의 selected frame 필요 (MCP spec 정합)
+- Figma file URL + selected frame
+- (선택) `.aimd/output/visual-manifest.json` (`analysis-from-figma` baseline 산출 — design tokens / layouts 참조 cross-check)
+- discovery context: `intent` (new feature / modify / bug-fix) — orchestrator inject
 
 ## 산출
 
-- `.aimd/output/_discovery/from-figma-result.json` (어댑터 1차 산출)
-- discovery-agent 가 공통 sub-skill 호출 후 `discovery-output.json` 으로 merge
+`.aimd/output/planning-spec.json` 의 다음 entries (source_grounded_evidence 의무):
 
-## 운영 정책 (DEC-2026-05-21 §8 정합)
+- `use_cases[]` — frame 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
+- `business_rules_intent[]` — interaction 에 함축된 BR (예: 카드 만료 가림 / 폼 validation 시각화 / 조건부 button enable) → BR-INTENT-*
+- `nfr[]` (부 채널) — a11y (color contrast / aria hints) / responsive breakpoints / transition timing → NFR-*
+- `cross_links.to_visual_manifest` — `analysis-from-figma` baseline 산출 reference (있을 시)
 
-- NFR 추출 ❌ (figma 는 NFR 채널 ❌ — nl-md 영역)
-- I/O contract 추출 ❌ (swagger 영역)
-- Interaction flow 추출 시 사용자 confirm 의무 (시각 추론 = LLM 의존도 높음 / mini-gate)
-- 출처 ref 형식: `figma:<file_id>:<node_id>`
+각 entry `source_grounded_evidence` = `figma:<file_id>:<node_id>` (또는 frame name fallback).
 
-## carry (v4.2+)
+## ★ ★ ★ no-simulation 의무 (source-grounded)
 
-- 본 skill 본격 구현 (MCP figma-desktop 도구 호출 + 화면 분석 + interaction 추론 알고리즘)
-- 산출 schema = 기존 `schemas/figma-extract.schema.json` 재사용 (analysis-from-figma 어댑터와 동일 / 별도 result schema 신설 ❌)
-- 기존 `analysis-from-figma` skill 일부 흡수 평가
-- design token 추출 시 `visual-manifest.json` 과 cross-reference
+- 모든 UC / BR-INTENT / NFR entry 는 figma node 의 실 reference 동반 (`mcp__figma-desktop__*` 호출 결과 기반).
+- LLM 추론만으로 entry 생성 ❌ — MCP tool 호출 + 실 node 인용 의무.
+- `analysis-from-figma` (baseline visual) 와 **source 동일 / 출력 axis 다름** (UC behavior intent vs visual structure).
+
+## 절차
+
+1. **frame 선택 확인**: `mcp__figma-desktop__get_metadata` 호출 → 현재 selected frame 확인. 없으면 skill reject + 사용자 frame select 요청.
+2. **design context 추출**: `mcp__figma-desktop__get_design_context` 호출 → 선택 frame 의 nodes / hierarchy / interaction 메타.
+3. **variables / tokens 참조**: `mcp__figma-desktop__get_variable_defs` 호출 → 사용된 design tokens (a11y / responsive vars 추출 보조).
+4. **screenshot (선택)**: `mcp__figma-desktop__get_screenshot` 호출 → 시각 cross-check (LLM 환각 차단 보조 / large frame 시 skip 가능).
+5. **UC 추출**: frame 별 사용자 flow 식별 (starting node + target node + 행동 sequence) → UC-* entry. source_grounded_evidence = `figma:<file_id>:<node_id>`.
+6. **BR-INTENT 추출**: UI interaction 에 함축된 비즈니스 규칙 식별 (마스킹 / 조건부 enable / error state) → BR-INTENT-* + node reference.
+7. **NFR (부 채널) 추출**: a11y / responsive / transition — `analysis-from-figma` 의 visual-manifest 와 cross-check.
+8. **`cross_links.to_visual_manifest`** 채움 (baseline 있을 시) — discovery 가 analysis baseline 위에 UC axis 추가하는 paradigm.
+9. **planning-spec.json append/merge** — discovery-agent 가 다른 어댑터 산출과 통합 (multi-source 시).
+10. **`planning-extraction-validator` 통과** 자격 = 모든 entry `source_grounded_evidence` 존재 / grep_hit_count > 0 (node_id figma file 실재 확인).
+
+## 70~80% 한계 명시
+
+- figma 디자인이 UC 의 전부를 표현 ❌ — UI flow 만 / business logic 은 `discovery-from-swagger` / `discovery-from-nl-md` 보강 필요. **multi-source 권장** (orchestrator 자동 dispatch).
+- LLM 의 frame interpretation 신뢰도 ~75% 베이스 → gate #1 `br-cross-consistency-validator` Layer 2 LLM 통과 의무.
 
 ## 인용
 
 - DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 skill 의 모 결단)
+- DEC-2026-05-26-input-skill-roles (`analysis-from-figma` 와 timing 분리 / v10.0.4 paradigm / v10.1.0 본격 구현)
 - `agents/discovery-agent.md` (본 skill 의 caller)
-- `skills/analysis-from-figma/` (carry — 일부 흡수 가능성 평가)
-- `skills/figma:figma-use` (MCP 도구 호출 패턴 source)
+- `skills/analysis-from-figma/SKILL.md` (baseline 채널 / source 동일 / 출력 axis 다름)
+- `skills/discovery-from-analysis-output/SKILL.md` (pattern reference / source_grounded paradigm)
+- `schemas/planning-spec.schema.json` (산출 schema)
