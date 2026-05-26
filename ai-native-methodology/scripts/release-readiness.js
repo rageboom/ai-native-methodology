@@ -894,6 +894,140 @@ function check19_legacy4StageExpressionAbsent() {
   };
 }
 
+// ★ ★ ★ ★ ★ v11.0.0 Phase 1 잔여 신설 (2 criterion / DEC-2026-05-26-contract-강제-양-axis §5 + SSOT §5).
+// criterion #14 (SSOT 명명 / release-readiness 안 sequential #21) = template count drift (LL-v85-01 follow-up).
+// criterion #15 (SSOT 명명 / release-readiness 안 sequential #22) = BE TASK 안 openapi_endpoint_ref baseline+ratchet.
+
+function check21_templateCountDrift() {
+  // ★ v11.0.0 SSOT #14 — _base-apply-template SKILL.md 안 enumerated artifact count vs templates/* dir file count 정합.
+  // LL-v85-01 follow-up — silent_omission attractor 차단 (Phase 3 template body 본격 채움 trigger).
+  try {
+    const skillPath = join(ROOT, 'skills/_base-apply-template/SKILL.md');
+    if (!existsSync(skillPath)) {
+      return { id: 'template_count_drift', pass: false, detail: '_base-apply-template SKILL.md 부재' };
+    }
+    const skillText = readFileSync(skillPath, 'utf-8');
+    // SKILL.md 안 "21 artifact" 또는 유사 enumerated count 추출 (정규)
+    const countMatch = skillText.match(/(\d+)\s*artifact/i);
+    if (!countMatch) {
+      return {
+        id: 'template_count_drift',
+        pass: true,
+        detail: '_base-apply-template SKILL.md 안 enumerated artifact count 패턴 부재 (skip / Phase 3 carry)',
+      };
+    }
+    const enumeratedCount = parseInt(countMatch[1], 10);
+
+    // templates/{analysis,discovery,spec,plan,test,implement,design}/ dir 안 .template.* file count 합계
+    const TEMPLATE_DIRS = ['analysis', 'discovery', 'spec', 'plan', 'test', 'implement', 'design'];
+    let actualCount = 0;
+    const missingDirs = [];
+    for (const d of TEMPLATE_DIRS) {
+      const dirPath = join(ROOT, 'templates', d);
+      if (!existsSync(dirPath)) {
+        missingDirs.push(d);
+        continue;
+      }
+      const files = readdirSync(dirPath).filter((f) => f.match(/\.template\.(json|md)$/));
+      actualCount += files.length;
+    }
+
+    if (missingDirs.length > 0) {
+      return {
+        id: 'template_count_drift',
+        pass: false,
+        detail: `templates/ dir 부재 (${missingDirs.join('+')}) — Phase 3 template body 본격 채움 carry / DEC-2026-05-26-v11-paradigm-결단 §5 Phase 3`,
+        delegated_to: 'templates/{discovery,spec}/ 신설 + 12 신규 file body 본격 채움 (Phase 3 차기 session)',
+      };
+    }
+
+    const drift = actualCount !== enumeratedCount;
+    return {
+      id: 'template_count_drift',
+      pass: !drift,
+      detail: drift
+        ? `drift: _base-apply-template SKILL.md 안 ${enumeratedCount} artifact vs templates/ 실제 ${actualCount} (LL-v85-01 silent_omission attractor)`
+        : `template count 정합 ✅ (_base-apply-template = ${enumeratedCount} = templates/ 실제 ${actualCount})`,
+      delegated_to: '_base-apply-template/SKILL.md ↔ templates/*/ count drift (LL-v85-01 / Phase 3 본격)',
+    };
+  } catch (e) {
+    return { id: 'template_count_drift', pass: false, detail: `error: ${e.message}` };
+  }
+}
+
+function check22_beTaskOpenapiRefRatchet() {
+  // ★ v11.0.0 SSOT #15 — BE TASK 안 openapi_endpoint_ref 부재 baseline+ratchet (ADR-010 정합).
+  // DEC-2026-05-26-contract-강제-양-axis §3 정합. baseline file: scripts/baseline-data/be-task-openapi-ref-baseline.json.
+  // 신규 BE TASK 안 openapi_endpoint_ref 부재 count > baseline 시 block.
+  try {
+    const examplesDir = join(ROOT, 'examples');
+    if (!existsSync(examplesDir)) {
+      return { id: 'be_task_openapi_ref_ratchet', pass: true, detail: 'examples/ dir 부재 (skip / no PoC)' };
+    }
+    const pocDirs = readdirSync(examplesDir).filter((d) => {
+      const p = join(examplesDir, d);
+      try {
+        return existsSync(join(p, '.aimd', 'output')) || existsSync(join(p, '.aimd'));
+      } catch {
+        return false;
+      }
+    });
+
+    let missingCount = 0;
+    const missingDetails = [];
+    for (const poc of pocDirs) {
+      // task-plan.json 후보 path
+      const taskPlanCandidates = [
+        join(examplesDir, poc, '.aimd', 'output', 'task-plan.json'),
+        join(examplesDir, poc, '.aimd', 'plan', 'task-plan.json'),
+      ];
+      let taskPlan = null;
+      for (const candidate of taskPlanCandidates) {
+        if (existsSync(candidate)) {
+          try {
+            taskPlan = JSON.parse(readFileSync(candidate, 'utf-8'));
+            break;
+          } catch {
+            // skip parse error
+          }
+        }
+      }
+      if (!taskPlan) continue;
+      const tasks = taskPlan.tasks || [];
+      for (const t of tasks) {
+        if (t.layer === 'be' && !t.openapi_endpoint_ref) {
+          missingCount++;
+          missingDetails.push(`${poc}/${t.id}`);
+        }
+      }
+    }
+
+    // baseline file (optional / 부재 시 baseline = 0)
+    const baselinePath = join(ROOT, 'scripts', 'baseline-data', 'be-task-openapi-ref-baseline.json');
+    let baseline = 0;
+    if (existsSync(baselinePath)) {
+      try {
+        const baselineData = JSON.parse(readFileSync(baselinePath, 'utf-8'));
+        baseline = baselineData.missing_count ?? 0;
+      } catch {
+        // skip parse error / baseline = 0
+      }
+    }
+
+    const ratchet_violation = missingCount > baseline;
+    return {
+      id: 'be_task_openapi_ref_ratchet',
+      pass: !ratchet_violation,
+      detail: ratchet_violation
+        ? `ratchet violation: BE TASK 안 openapi_endpoint_ref 부재 ${missingCount} > baseline ${baseline} (DEC-2026-05-26-contract-강제-양-axis §3)`
+        : `BE TASK ↔ openapi_endpoint_ref ratchet ✅ (missing=${missingCount} ≤ baseline=${baseline}${missingDetails.length > 0 ? ' / details: ' + missingDetails.slice(0, 3).join(',') + (missingDetails.length > 3 ? '...' : '') : ''})`,
+      delegated_to: 'PoC task-plan.tasks[].openapi_endpoint_ref ratchet (ADR-010 baseline+ratchet / Phase 4 PoC sweep 안 본격 진전)',
+    };
+  } catch (e) {
+    return { id: 'be_task_openapi_ref_ratchet', pass: false, detail: `error: ${e.message}` };
+  }
+}
+
 function check20_planGateOperational() {
   // plan gate 본격 작동 — requiredValidators('plan').length > 0 + sdlc-4stage-flow stages[plan].gate == '#3'
   try {
@@ -949,6 +1083,8 @@ function main() {
     check18_gateEnumConsistency(),
     check19_legacy4StageExpressionAbsent(),
     check20_planGateOperational(),
+    check21_templateCountDrift(),
+    check22_beTaskOpenapiRefRatchet(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

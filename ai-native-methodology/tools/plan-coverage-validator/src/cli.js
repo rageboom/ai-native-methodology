@@ -16,6 +16,8 @@ import {
   validateTaskGranularity,
   validateDependencyCycle,
   validateRiskSeverity,
+  validateBETaskOpenapiRef,
+  validateFETaskComponentRef,
   loadJson
 } from './validator.js';
 
@@ -46,7 +48,9 @@ function parseArgs(argv) {
   3. NFR allocation hard gate — high+critical NFR 누락 시 high finding (★ Cluster 2 결단)
   4. TASK granularity — 1~3 AC 묶음 강제 (4+ = warn / --strict 시 high)
   5. Dependency cycle — DAG cycle 검출 (cycle 시 critical)
-  6. Risk severity — high+critical risk mitigation/human_review 검증`);
+  6. Risk severity — high+critical risk mitigation/human_review 검증
+  7. ★ v11.0.0 — BE TASK ↔ openapi_endpoint_ref 1:1 matching (layer=be 시 hard / DEC-2026-05-26-contract-강제-양-axis)
+  8. ★ v11.0.0 — FE TASK ↔ component_ref 1:1 matching (layer=fe 시 hard)`);
       process.exit(0);
     }
   }
@@ -68,13 +72,17 @@ const nfrResult = validateNfrAllocation(taskPlan);
 const granularityResult = validateTaskGranularity(taskPlan, args.strict);
 const cycleResult = validateDependencyCycle(taskPlan);
 const riskResult = validateRiskSeverity(taskPlan);
+const beOpenapiResult = validateBETaskOpenapiRef(taskPlan);
+const feComponentResult = validateFETaskComponentRef(taskPlan);
 
 const allFindings = [
   ...taskCoverageResult.findings,
   ...nfrResult.findings,
   ...granularityResult.findings,
   ...cycleResult.findings,
-  ...riskResult.findings
+  ...riskResult.findings,
+  ...beOpenapiResult.findings,
+  ...feComponentResult.findings
 ];
 
 const summary = {
@@ -92,6 +100,8 @@ if (args.json) {
     task_granularity: granularityResult,
     dependency_cycle: cycleResult,
     risk_severity: riskResult,
+    be_openapi_ref: beOpenapiResult,
+    fe_component_ref: feComponentResult,
     summary
   }, null, 2));
 } else {

@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/impl-spec.schema.json",
-  "title": "Impl Spec (chain 4 / 구현 명세 + 실 impl 코드 메타)",
-  "description": "v2.0 SDLC 4단계 chain harness 의 chain 4 stage 산출물 (i-strict 정통). test-spec 기반 실 impl 코드 자동 생성 (GREEN 의무 / 100% test pass). ★ ★ ★ chain 4 single source-of-truth = 본 impl-spec.json (B7 14차 retract 차단). 실 코드 = 산출물 ❌ (commit_hash 만 보존). DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "title": "Impl Spec (chain implement / 구현 명세 + 실 impl 코드 메타)",
+  "description": "v2.0 chain harness 의 implement stage 산출물 (i-strict 정통). test-spec 기반 실 impl 코드 자동 생성 (GREEN 의무 / 100% test pass). ★ ★ ★ chain implement single source-of-truth = 본 impl-spec.json (B7 14차 retract 차단). 실 코드 = 산출물 ❌ (commit_hash 만 보존). DEC-2026-05-06-v2.0-i-strict-채택 정합. ★ v11.0.0 MAJOR 확장 (DEC-2026-05-26-be-fe-산출물-분리 §3) — modules[].layer enum + stack enum 신설 (BE/FE 분기 본격 / additive optional / backward-compat).",
   "type": "object",
   "required": ["meta", "derivation_source", "modules", "test_pass_evidence", "coverage", "human_review"],
   "additionalProperties": false,
@@ -45,7 +45,43 @@
           },
           "framework": {
             "type": "string",
-            "description": "★ B3 open enum — phase-1-inventory stack 정합 (예: spring-boot-3 / nestjs-10 / express-4 / fastapi-0.110 / rails-7 / react-18)"
+            "description": "★ B3 open enum — phase-1-inventory stack 정합 (예: spring-boot-3 / nestjs-10 / express-4 / fastapi-0.110 / rails-7 / react-18). framework = stack+version 결합 형태 (예: spring-boot-3). stack base name 만 분리 격납은 본 schema 의 `stack` field 안."
+          },
+          "layer": {
+            "type": "string",
+            "enum": ["be", "fe", "db", "e2e", "infra"],
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-be-fe-산출물-분리 §3 정합). impl-spec 안 layer 본격 분기 — be (Spring/NestJS/FastAPI/Rails 등) / fe (React/Vue/Svelte/Solid 등) / db (migration / DDL 등) / e2e (Playwright 등) / infra (Terraform / Docker 등). additive optional (backward-compat / 기존 PoC layer 부재 OK)."
+          },
+          "stack": {
+            "type": "string",
+            "enum": [
+              "spring-boot",
+              "nestjs",
+              "express",
+              "fastapi",
+              "flask",
+              "rails",
+              "phoenix",
+              "go-gin",
+              "go-fiber",
+              "react",
+              "vue",
+              "svelte",
+              "solid",
+              "angular",
+              "next-js",
+              "nuxt",
+              "remix",
+              "postgresql",
+              "mysql",
+              "sqlite",
+              "mongodb",
+              "playwright",
+              "cypress",
+              "terraform",
+              "docker"
+            ],
+            "description": "★ v11.0.0 신설 (DEC-2026-05-26-be-fe-산출물-분리 §3 정합). stack base name (version 제외). framework field 안 stack+version 결합과 별 axis. additive optional. 본 enum = 사내 가장 빈도 24종 (BE 9 + FE 8 + DB 4 + e2e 2 + infra 1). 사내 stack 추가 시 enum 확장 필요 — drift attractor 위험 / open enum 전환은 v11.x carry."
           },
           "source_files": {
             "type": "array",

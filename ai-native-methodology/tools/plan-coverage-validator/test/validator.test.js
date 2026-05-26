@@ -5,7 +5,9 @@ import {
   validateNfrAllocation,
   validateTaskGranularity,
   validateDependencyCycle,
-  validateRiskSeverity
+  validateRiskSeverity,
+  validateBETaskOpenapiRef,
+  validateFETaskComponentRef
 } from '../src/validator.js';
 
 // ──────────────────────────────────────────────────────────────────────
@@ -381,5 +383,118 @@ describe('Phase 4-1 Senior BLOCKER-2 integration scenarios', () => {
     const tc = validateTaskCoverage(validTaskPlan, acceptance, null);
     const blocking = tc.findings.some(f => f.kind === 'plan.ac_coverage.below_threshold' && f.severity === 'high');
     assert.equal(blocking, true);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// ★ v11.0.0 — BE/FE contract 1:1 matching tests
+// ──────────────────────────────────────────────────────────────────────
+
+describe('validateBETaskOpenapiRef (★ v11.0.0)', () => {
+  it('layer=be + openapi_endpoint_ref 본격 present → no finding', () => {
+    const taskPlan = {
+      tasks: [{
+        id: 'TASK-BE-001',
+        ac_refs: ['AC-BE-001'],
+        behavior_ref: 'BHV-BE-001',
+        execution_order: 1,
+        layer: 'be',
+        openapi_endpoint_ref: { path: '/api/users', operationId: 'createUser' }
+      }]
+    };
+    const r = validateBETaskOpenapiRef(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('layer=be + openapi_endpoint_ref 부재 → high finding', () => {
+    const taskPlan = {
+      tasks: [{
+        id: 'TASK-BE-002',
+        ac_refs: ['AC-BE-002'],
+        behavior_ref: 'BHV-BE-002',
+        execution_order: 1,
+        layer: 'be'
+      }]
+    };
+    const r = validateBETaskOpenapiRef(taskPlan);
+    assert.equal(r.findings.length, 1);
+    assert.equal(r.findings[0].kind, 'plan.task.be_missing_openapi_ref');
+    assert.equal(r.findings[0].severity, 'high');
+  });
+
+  it('layer=fe → skip (BE only validator)', () => {
+    const taskPlan = {
+      tasks: [{ id: 'TASK-FE-001', ac_refs: ['AC-FE-001'], behavior_ref: 'BHV-FE-001', execution_order: 1, layer: 'fe' }]
+    };
+    const r = validateBETaskOpenapiRef(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('layer=be + openapi_endpoint_ref 부재 path 또는 operationId → high finding', () => {
+    const taskPlan = {
+      tasks: [{
+        id: 'TASK-BE-003',
+        ac_refs: ['AC-BE-003'],
+        behavior_ref: 'BHV-BE-003',
+        execution_order: 1,
+        layer: 'be',
+        openapi_endpoint_ref: { path: '/api/users' }
+      }]
+    };
+    const r = validateBETaskOpenapiRef(taskPlan);
+    assert.equal(r.findings.length, 1);
+    assert.equal(r.findings[0].kind, 'plan.task.be_invalid_openapi_ref');
+  });
+});
+
+describe('validateFETaskComponentRef (★ v11.0.0)', () => {
+  it('layer=fe + component_ref 본격 present → no finding', () => {
+    const taskPlan = {
+      tasks: [{
+        id: 'TASK-FE-001',
+        ac_refs: ['AC-FE-001'],
+        behavior_ref: 'BHV-FE-001',
+        execution_order: 1,
+        layer: 'fe',
+        component_ref: { package: 'src/features/settings', name: 'PasswordChangeForm' }
+      }]
+    };
+    const r = validateFETaskComponentRef(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('layer=fe + component_ref 부재 → high finding', () => {
+    const taskPlan = {
+      tasks: [{ id: 'TASK-FE-002', ac_refs: ['AC-FE-002'], behavior_ref: 'BHV-FE-002', execution_order: 1, layer: 'fe' }]
+    };
+    const r = validateFETaskComponentRef(taskPlan);
+    assert.equal(r.findings.length, 1);
+    assert.equal(r.findings[0].kind, 'plan.task.fe_missing_component_ref');
+    assert.equal(r.findings[0].severity, 'high');
+  });
+
+  it('layer=be → skip (FE only validator)', () => {
+    const taskPlan = {
+      tasks: [{
+        id: 'TASK-BE-001',
+        ac_refs: ['AC-BE-001'],
+        behavior_ref: 'BHV-BE-001',
+        execution_order: 1,
+        layer: 'be',
+        openapi_endpoint_ref: { path: '/api/users', operationId: 'createUser' }
+      }]
+    };
+    const r = validateFETaskComponentRef(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('layer 부재 → skip (legacy carry / backward-compat)', () => {
+    const taskPlan = {
+      tasks: [{ id: 'TASK-X-001', ac_refs: ['AC-X-001'], behavior_ref: 'BHV-X-001', execution_order: 1 }]
+    };
+    const beR = validateBETaskOpenapiRef(taskPlan);
+    const feR = validateFETaskComponentRef(taskPlan);
+    assert.equal(beR.findings.length, 0);
+    assert.equal(feR.findings.length, 0);
   });
 });

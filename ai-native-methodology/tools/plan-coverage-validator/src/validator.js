@@ -1,15 +1,17 @@
 // plan-coverage-validator core
-// 검증 (Senior BLOCKER-2 흡수 / Phase 4-1):
+// 검증 (Senior BLOCKER-2 흡수 / Phase 4-1 / ★ v11.0.0 Phase 1 잔여 확장):
 //   1. TASK ↔ AC backward link coverage (chain 2 ↔ chain 3)
 //   2. TASK ↔ TC forward link coverage (chain 3 ↔ chain 4 / optional / chain 4 진입 전 placeholder 허용)
 //   3. validateNfrAllocation — high+critical NFR 누락 시 high finding (★ DO-178C 정신 기반 사내 해석 / Cluster 2 결단)
 //   4. validateTaskGranularity — task.ac_refs.length 1~3 imperative (4+ = warn / --strict 시 high)
 //   5. validateDependencyCycle — task.dependencies[] DAG cycle 검출 / cycle 시 critical finding
 //   6. validateRiskSeverity — risk.severity high+critical 누락 시 medium finding (additive)
+//   7. ★ v11.0.0 — validateBETaskOpenapiRef — layer=be 시 openapi_endpoint_ref 본격 required (high finding)
+//   8. ★ v11.0.0 — validateFETaskComponentRef — layer=fe 시 component_ref 본격 required (high finding)
 //
 // exit code contract (cli.js):
 //   exit 0 = ok
-//   exit 1 = blocking findings (critical / high / NFR allocation 누락 / TASK dependency cycle / coverage_pct < threshold)
+//   exit 1 = blocking findings (critical / high / NFR allocation 누락 / TASK dependency cycle / coverage_pct < threshold / BE/FE contract 부재)
 //   exit 2 = usage-error (invalid args)
 //
 // chain-coverage-validator 동형 paradigm (autoDetectProjectRoot + loadJson + finding {kind, severity, ...domain, message}).
@@ -311,6 +313,79 @@ export function validateRiskSeverity(taskPlan) {
       severity: 'medium',
       message: `task-plan has ${tasks.length} tasks but risks[] is empty (★ 3중 망 LLM + industry + human / DEC-2026-05-21 §정책6 정합)`
     });
+  }
+
+  return {
+    findings,
+    summary: aggregateSummary(findings)
+  };
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// 6. ★ v11.0.0 — BE/FE contract 1:1 matching (DEC-2026-05-26-contract-강제-양-axis §1 layer 2 hard gate)
+//   layer=be 시 openapi_endpoint_ref 본격 required (schema-level if/then + validator-level finding dual)
+//   layer=fe 시 component_ref 본격 required
+//   cross-file (openapi.yaml file system load + endpoint 존재 verify) = v11.x carry
+// ──────────────────────────────────────────────────────────────────────
+
+export function validateBETaskOpenapiRef(taskPlan) {
+  const findings = [];
+  const tasks = taskPlan?.tasks ?? [];
+
+  for (const t of tasks) {
+    if (t.layer !== 'be') continue;
+    if (!t.openapi_endpoint_ref) {
+      findings.push({
+        kind: 'plan.task.be_missing_openapi_ref',
+        severity: 'high',
+        task_id: t.id,
+        layer: t.layer,
+        message: `BE TASK ${t.id} (layer=be) missing openapi_endpoint_ref (★ DEC-2026-05-26-contract-강제-양-axis §1 layer 2 hard gate / schema-level if/then dual)`
+      });
+      continue;
+    }
+    const { path, operationId } = t.openapi_endpoint_ref;
+    if (!path || !operationId) {
+      findings.push({
+        kind: 'plan.task.be_invalid_openapi_ref',
+        severity: 'high',
+        task_id: t.id,
+        message: `BE TASK ${t.id} openapi_endpoint_ref missing path or operationId (path=${path ?? 'null'} / operationId=${operationId ?? 'null'})`
+      });
+    }
+  }
+
+  return {
+    findings,
+    summary: aggregateSummary(findings)
+  };
+}
+
+export function validateFETaskComponentRef(taskPlan) {
+  const findings = [];
+  const tasks = taskPlan?.tasks ?? [];
+
+  for (const t of tasks) {
+    if (t.layer !== 'fe') continue;
+    if (!t.component_ref) {
+      findings.push({
+        kind: 'plan.task.fe_missing_component_ref',
+        severity: 'high',
+        task_id: t.id,
+        layer: t.layer,
+        message: `FE TASK ${t.id} (layer=fe) missing component_ref (★ DEC-2026-05-26-contract-강제-양-axis §1 layer 2 hard gate)`
+      });
+      continue;
+    }
+    const { package: pkg, name } = t.component_ref;
+    if (!pkg || !name) {
+      findings.push({
+        kind: 'plan.task.fe_invalid_component_ref',
+        severity: 'high',
+        task_id: t.id,
+        message: `FE TASK ${t.id} component_ref missing package or name (package=${pkg ?? 'null'} / name=${name ?? 'null'})`
+      });
+    }
   }
 
   return {
