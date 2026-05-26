@@ -46,6 +46,39 @@ chain 3 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
    - java+maven/gradle → `junit5` adapter
    - python+pytest → `pytest` adapter
    - 그 외 → `other` (사용자 명시 의무 / `--test-cmd` override)
+   - **★ v11.0.0 — AC.layer 기반 framework 본격 분기** (DEC-2026-05-26-be-fe-산출물-분리 §3):
+     - `layer=be` + REST API → `junit5` (Spring) / `jest+supertest` (NestJS) / `pytest+httpx` (FastAPI)
+     - `layer=fe` + component → `vitest+RTL` (React 19) / `vitest+vue-test-utils` (Vue 3)
+     - `layer=e2e` → `playwright` (★ POM paradigm / test-playwright skill 위임)
+     - `layer=db` + migration → `testcontainers` + DB-specific runner
+
+## ★ v11.0.0 contract test 본격 (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 hard gate)
+
+AC.layer 가 `be` 또는 `fe` 면 contract test framework 본격 dispatch:
+
+### BE contract test (★ AC.openapi_path + operationId 본격 의무)
+
+| framework | 호출 시기 | source_evidence |
+|---|---|---|
+| **schemathesis** | openapi.yaml → property-based test 자동 생성 + 실행 | `schemathesis run --url=... openapi.yaml` |
+| **dredd** | endpoint × payload × response 정합 검증 | `dredd openapi.yaml http://localhost:PORT` |
+| **pact** | consumer-driven contract (FE+BE cross) | pact broker integration |
+| **spring-cloud-contract** | Spring + Groovy contract DSL | `mvn spring-cloud:generateTests` |
+
+TC.framework ∈ {schemathesis, dredd, pact, spring-cloud-contract} 시 `openapi_contract_ref` (path + operationId) 본격 required (test-spec.schema.json allOf if/then 강제).
+
+### FE visual/a11y contract test (★ AC.state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 의무)
+
+| framework | 호출 시기 | source_evidence |
+|---|---|---|
+| **axe-core** | WCAG 2.2 accessibility auto-check | `npx axe-core --tags wcag22aa` |
+| **playwright-visual** | screenshot diff (visual regression) | `playwright test --update-snapshots` |
+| **percy** | hosted visual regression (Tier 2 / 사용자 환경) | `percy exec -- ...` |
+| **chromatic** | Storybook + visual regression (Tier 2) | `chromatic --project-token=...` |
+
+TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_regression_ref` (screen + state_map_ref + dtcg_token_set) 본격 required.
+
+★ no-simulation 본격 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 3 simulated 영구 거부).
 
 3. **각 AC 마다 1 TC 분해** — TC-{AC}-001:
    - test type 분포: unit (60%) / integration (25%) / contract (10%) / e2e (5%) (★ test pyramid 관행 권고).

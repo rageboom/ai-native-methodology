@@ -10,6 +10,22 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 
 ★ ★ ★ **R16/R17 부활 ❌** — 본 skill = 신규 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+) — R16/R17 부활 ❌"). Tier 2.5 = MCP delegation only / Tier 3 (자체 adapter) = v9.0+ carry.
 
+## ★ ★ ★ ★ ★ v11.0.0 paradigm 본격 재설계 (DEC-2026-05-26-ticket-plan-단일 §3 / R20-prime)
+
+본 skill body 안 v8.6.x 5 stage matrix (analysis/planning/spec/test/implement) × 2 phase (enter/exit) 본격 paradigm = **v11.0.0 안 본격 폐기**. 신규 paradigm:
+
+| v8.6.x (legacy / 본 body 잔존 carry) | v11.0.0 R20-prime (★ 본격) |
+|---|---|
+| 5 stage matrix × 2 phase (enter/exit) | **plan stage 단일** (analysis/discovery/spec 안 ticket 호출 ❌) |
+| stage 별 Initiative + Epic + Story + Sub-task batch | **plan stage 안 4-level cascade 일괄** (Epic + Story + Task[OP-*] + Sub-task[TASK-*]) |
+| Epic = BC (analysis 안 architecture.json bounded context) | **Epic = FE 화면 단위** (UI screen / route) |
+| Story = UC | **Story = BHV/AC cross-cut anchor** (BE+FE/DB/E2E 가로지름) |
+| (Story sibling Task entity 부재) | **★ Task = OP-* (Story sibling / BE only 운영·인프라·마이그레이션 / operational-task.schema.json)** |
+| Sub-task = chain 1~4 marker | **Sub-task = TASK-* (1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra)** |
+| test/implement stage = ticket 신규 생성 | **test/implement stage = Sub-task status 갱신만 (신규 생성 ❌)** |
+
+★ 본 SKILL.md body 안 v8.6.x 절차 본문 (단계 1~N / 5 stage 흐름 / phase enter/exit matrix) = ★ ★ legacy carry note 자격. **본격 v11.0.0 4-level cascade 본문 재설계 = Phase 2f-prime carry** (광범위 rewrite / 차기 session). ticket-sync-evidence.schema.json 은 이미 v11.0.0 정합 (Phase 1 잔여 commit 안 본격 — stage=`plan` 단일 const + ticket_cascade 4-level + confirmation_gate + search_first_idempotency + graceful_mcp_missing).
+
 ## 언제 사용
 
 | 호출 시점 | stage 파라미터 | 동작 |
@@ -59,7 +75,7 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 3. `traceability-matrix.json` read — 본 stage 의 ticket_ref 기 등록 lookup. **부재 시** = first-entry path (verification cycle 의 자연 초기 상태) → 신규 생성 path 로 분기 (reject ❌).
 4. **본 stage 산출물 read** (★ ★ v8.7.3+ stage 분기 명시 / F-VERIFY-007 → B10 해결)
    - `stage=analysis` 시 — `inventory.json` / `architecture.json` / `domain.json` / `business-rules.json` / `antipatterns.json` / `state-map.json` (FE) / `type-spec.json` (FE) / `form-validation-spec.json` (FE) / `visual-manifest.json` (FE) / `i18n-spec.json` (FE) / `a11y-spec.json` (FE) / `br-cross-consistency.json` / `static-security-spec.json` / `validation-report.json` / `openapi.yaml` (BE) / `schema.json` (DB) — 환경별 산출 최대 14~16건. carry baseline 시 iter-N path 의 reference (`input-manifest.inherited_from.carry_artifacts`) 도 valid.
-   - `stage=planning` 시 — `planning-spec.json`.
+   - `stage=planning` 시 — `discovery-spec.json`.
    - `stage=spec` 시 — `behavior-spec.json` / `acceptance-criteria.json`.
    - `stage=test` 시 — `test-spec.json`.
    - `stage=implement` 시 — `impl-spec.json`.
@@ -238,9 +254,9 @@ implement enter (uc_id 의무):
 
 #### phase=exit — planning (chain 1 종료 + enter Task 종결 + ★ v8.6.3 parent 의무)
 ```
-for each UC in planning-spec.use_cases[]:
+for each UC in discovery-spec.use_cases[]:
    1. jira_create (Story, parent_ticket_id=Epic(scope), link_type=parent-child,
-                  summary="[UC-CAR-007] ...", body=planning-spec UC body)
+                  summary="[UC-CAR-007] ...", body=discovery-spec UC body)
    2. jira_link (Story, parent=Epic MIG-CAR-100)
    3. jira_create (Sub-task chain1_planning, parent_ticket_id=Story, link_type=parent-child, status=Done)
       ★ ★ ★ v8.7.4+ B14 — Sub-task payload 에 extra_fields[epic_link_customfield_id] 명시 ❌ (auto-inherit)
@@ -336,11 +352,11 @@ verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycl
 1. jira_create (Story, parent_ticket_id=$parent_epic, link_type=parent-child,
                 summary="[Plugin Verify] Stage 2 — planning (UC/BR-INTENT)",
                 labels=[verification-mode, $scope_id]) → verification_story_ids[planning]
-2. for each UC in planning-spec.use_cases[]:
+2. for each UC in discovery-spec.use_cases[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
                 summary="[Verify UC] {uc_id} {uc_summary}", status=Done)
    ★ ★ ★ v8.7.4+ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
-3. for each BR-INTENT in planning-spec.business_rules_intent[]:
+3. for each BR-INTENT in discovery-spec.business_rules_intent[]:
    jira_create (Sub-task, parent_ticket_id=verification_story_ids[planning],
                 summary="[Verify BR-INTENT] {br_id} {summary}", status=Done)
 4. jira_comment (verification_story_ids[planning],

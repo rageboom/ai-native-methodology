@@ -18,7 +18,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 - `<project>/.aimd/output/behavior-spec.json` (★ chain 2 산출 / BHV-*)
 - `<project>/.aimd/output/acceptance-criteria.json` (★ chain 2 산출 / AC-*)
-- `<project>/.aimd/output/planning-spec.json` (★ chain 1 산출 / UC + intent context — cross-validation)
+- `<project>/.aimd/output/discovery-spec.json` (★ chain 1 산출 / UC + intent context — cross-validation)
 
 ## 산출
 
@@ -28,9 +28,39 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 DEC-2026-05-21 §정책4 — task 안 ac_refs.length 1~3 imperative:
 - 같은 BHV-* 안 AC 들만 묶음 (cross-BHV ❌)
-- 같은 layer (`domain` / `application` / `infrastructure` / `presentation` / `cross-cutting`) 안 묶음 (cross-layer ❌)
+- 같은 layer (★ v11.0.0 — tech-track 5종 `be` / `fe` / `db` / `e2e` / `infra` 권장 / hexagonal 5종 `domain` / `application` / `infrastructure` / `presentation` / `cross-cutting` = legacy carry) 안 묶음 (cross-layer ❌)
 - 같은 module 안 묶음 (cross-module ❌)
 - 4+ AC = `plan-coverage-validator validateTaskGranularity` warn (medium / `--strict` 시 high)
+
+## ★ v11.0.0 Epic/Story/OP-*/TASK-* 4-level cascade (DEC-2026-05-26-ticket-plan-단일 §3 + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6)
+
+본 skill 안 task-plan.json 산출 시 4-level matrix 본격:
+
+| Jira | 본 방법론 entity | 정의 | 본 skill 책임 |
+|---|---|---|---|
+| **Epic** | task-plan.epic_refs[] | ★ FE 화면 단위 (UI screen / route) | screen_id / route 추출 + jira_id placeholder |
+| **Story** | task-plan.story_refs[] | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id placeholder |
+| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | ★ OP-* (운영/인프라/마이그레이션 / BE only) | OP-* 검출 + jira_id placeholder |
+| **Sub-task** | task-plan.tasks[] | TASK-* (1~3 AC 묶음 / layer 분기) | 본 skill 의 주 산출 |
+
+★ 본 skill = Sub-task (TASK-*) 본격 책임 + Epic/Story 식별 (jira_id 부여 ❌ — ticket-sync skill 책임).
+
+★ OP-* = 운영 작업 anchor (예: argon2 라이브러리 도입 / column migration / cron job) — 본 skill 안 별도 검출 (AC 부재 + 사용자 가시 없음 — analysis 산출물 안 migration-cautions / static-security-spec 검출).
+
+## ★ v11.0.0 layer 분기 본격 (DEC-2026-05-26-be-fe-산출물-분리 §1)
+
+본 skill 산출 task-plan.tasks[].layer 본격 부여:
+
+| layer | 산출 의무 추가 필드 |
+|---|---|
+| `be` | ★ `openapi_endpoint_ref` (path + operationId) 본격 required — DEC-2026-05-26-contract-강제-양-axis §1 layer 2 |
+| `fe` | ★ `component_ref` (package + name + state_map_ref + dtcg_token_set) 본격 required |
+| `db` | (선택 / schema migration ref carry) |
+| `e2e` | (선택 / e2e test target ref carry) |
+| `infra` | (선택) |
+| hexagonal 5종 | legacy carry / backward-compat |
+
+★ schema-level if/then hard gate 본격 적용 (task-plan.schema.json allOf if/then). plan-coverage-validator validateBETaskOpenapiRef + validateFETaskComponentRef 가 추가 finding emit.
 
 ## ★ ★ 의존성 graph (DAG)
 

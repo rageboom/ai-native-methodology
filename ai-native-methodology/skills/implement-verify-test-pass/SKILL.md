@@ -19,7 +19,7 @@ allowed-tools: Read, Bash, Edit
 - `<project>/.aimd/output/impl-spec.json`
 - `<project>/.aimd/output/test-spec.json`
 - `<project>/.aimd/output/behavior-spec.json` + `acceptance-criteria.json`
-- `<project>/.aimd/output/planning-spec.json`
+- `<project>/.aimd/output/discovery-spec.json`
 - `<project>/.aimd/config/test-cmd.json`
 
 ## 절차
@@ -42,7 +42,7 @@ validator 결과 분석:
 | impl 코드 결함 (가장 흔함) | impl 보강 (no revisit) | impl-spec.md 본문 갱신 + retry |
 | test 잘못 generate (acceptance 의도 미반영) | revisit:test | test-spec 갱신 → cycle 재시작 |
 | spec 결함 (BHV preconditions 부족) | revisit:spec | behavior-spec / acceptance-criteria 갱신 → cycle 재시작 |
-| use case 결함 (planning 단계 추출 오류) | revisit:planning | planning-spec 갱신 → ★ 가장 큰 cycle |
+| use case 결함 (planning 단계 추출 오류) | revisit:planning | discovery-spec 갱신 → ★ 가장 큰 cycle |
 
 ★ 사용자 결단 의무 (Auto Mode 도 차단 / no-simulation). `_base-invoke-go-stop-gate` skill 호출 / cluster:
 1. revisit target 결정 (4 분류 중 하나)
@@ -69,7 +69,7 @@ severity_floor (DO-178C DAL A) 검증:
 `_base-build-traceability-matrix` skill 호출:
 ```bash
 node tools/traceability-matrix-builder/src/cli.js \
-  --planning   .aimd/output/planning-spec.json \
+  --planning   .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   --test-spec  .aimd/output/test-spec.json \

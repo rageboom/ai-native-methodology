@@ -35,11 +35,46 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
   - go: `<project>/<pkg>/{handler,service,repo}.go`
 - `<project>/<src>/migrations/*.{sql,ts,py}` (DB schema 변경 시)
 
-## ★ ★ ★ GREEN 의무 (chain 4 종결 조건)
+## ★ ★ ★ GREEN 의무 (chain implement 종결 조건)
 
-chain 4 종결 시 **모든 test 100% pass** 의무 (★ impl-spec.schema.json `fail_count: const 0`):
+chain implement 종결 시 **모든 test 100% pass** 의무 (★ impl-spec.schema.json `fail_count: const 0`):
 - test-impl-pass-validator 호출 → ok=true 의무.
-- fail_count > 0 → chain 4 종결 ❌ / impl 보강 cycle (revisit:test 또는 revisit:spec).
+- fail_count > 0 → chain implement 종결 ❌ / impl 보강 cycle (revisit:test 또는 revisit:spec).
+
+## ★ v11.0.0 stack 별 분기 + 코드→swagger drift 차단 (DEC-2026-05-26-be-fe-산출물-분리 §3 + DEC-2026-05-26-contract-강제-양-axis §6)
+
+본 skill 산출 impl-spec.modules[] 안 `layer` (be/fe/db/e2e/infra) + `stack` (24종 enum) 본격 분기:
+
+### BE stack 본격
+- `spring-boot` → `src/main/java/**/{Controller,Service,Repository}.java`
+- `nestjs` → `src/**/{module,controller,service,repository}.ts`
+- `express` → `src/{routes,middlewares,services}.{ts,js}`
+- `fastapi` → `app/{routers,services,models}.py`
+- `flask` / `rails` / `phoenix` / `go-gin` / `go-fiber` — 동형 convention
+
+### FE stack 본격
+- `react` → `src/{features,pages,components,hooks}.tsx`
+- `vue` → `src/{views,components,composables}.vue`
+- `svelte` / `solid` / `angular` / `next-js` / `nuxt` / `remix` — 동형 convention
+
+### ★ 코드 → swagger drift 차단 도구 본격 인식
+
+BE 산출 시 다음 도구 본격 활용 (R15 no-simulation 정합):
+
+| stack | drift 차단 도구 | 호출 |
+|---|---|---|
+| `spring-boot` | **springdoc-openapi** | `mvn springdoc-openapi:generate` → openapi.yaml drift 검출 |
+| `nestjs` | **@nestjs/swagger** | `node generate-swagger.ts` → openapi.yaml drift 검출 |
+| `fastapi` | **automatic OpenAPI** | `app.openapi()` JSON dump → drift 검출 |
+| `rails` | **rswag** | `rake rswag:specs:swaggerize` |
+
+★ 본 도구 실행 후 코드 ↔ swagger 일치 검증 의무 (analysis-openapi skill 안 spectral-runner 와 분리 axis / drift 시 chain implement 종결 ❌ / impl 보강 cycle).
+
+### FE design token drift 차단 (DEC.contract §2 / FE 트랙)
+
+- DTCG W3C token validator (R19 Tier 1 / in-plugin / 사용자 환경)
+- Storybook + Chromatic visual regression (Tier 2)
+- state-map ↔ component state 정합 검증
 
 ## 70~80% 한계 명시 (★ 본 skill 핵심)
 
@@ -118,7 +153,7 @@ linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
 ```bash
 node tools/schema-validator/src/cli.js .aimd/output/impl-spec.json
 node tools/traceability-matrix-builder/src/cli.js \
-  --planning   .aimd/output/planning-spec.json \
+  --planning   .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   --test-spec  .aimd/output/test-spec.json \
