@@ -102,6 +102,17 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 - 입력 시점에 R8 5종 중 어느 입력인지 → 부 매트릭스 참조 → 해당 skill 호출 (또는 orchestrate 가 자동 dispatch)
 - agent persona = 매트릭스 column "Agent" 인용 (`agents/<stage>-agent.md`)
 
+### ★ Input 어댑터 timing 분리 (analysis-from-* ↔ discovery-from-* / v10.0.4 paradigm 명문화)
+
+**같은 source(figma/swagger/NL md)지만 timing+책임이 다른 두 set 평행 유지** (DEC-2026-05-26-input-skill-roles / baseline-delta 운영 모델 정합):
+
+| set | timing | 책임 | skill |
+|---|---|---|---|
+| **`analysis-from-*`** (4) | **최초 1회** (legacy baseline 수립) | analysis 산출물 만들기 (visual-manifest / ui-state-map / inventory / domain 등 canonical global `.aimd/output/`) | `analysis-from-{figma, swagger, prompt, plan-doc}` (★ 모두 본격 구현) |
+| **`discovery-from-*`** (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec(discovery 산출) | `discovery-from-{analysis-output(★본격), figma(light placeholder), swagger(light placeholder), nl-md(light placeholder)}` |
+
+같은 figma 파일이라도 (a) baseline 수립 시 = `analysis-from-figma`, (b) 신규 feature scope 진입 시 = `discovery-from-figma`. **다른 목적/다른 산출**. 둘 다 유지 = 중복 ❌ / 다른 axis ✅. `discovery-from-{figma,swagger,nl-md}` 본격 구현 = 실 use case (해당 채널로 scope 진입 사용자) 트리거 시 carry / v10.x (현 사내 배포 전 단계 ROI 정합).
+
 ## 단계 간 인터페이스 (data contract)
 
 ### chain 1 (발견) — discovery stage (★ v9.0 / planning→discovery 개칭)

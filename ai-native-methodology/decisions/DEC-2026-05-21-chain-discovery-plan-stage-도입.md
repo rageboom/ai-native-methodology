@@ -96,7 +96,7 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 | ID | 내용 |
 |---|---|
 | C-v4.1-plan-skill | `plan-{decompose-and-sequence, architect-decisions, risk-and-nfr}` skill 3종 본격 신설 (현 placeholder 상태) |
-| C-v4.1-input-skill-이관 | `analysis-from-{prompt,swagger,plan-doc,figma}` 6 input skill 의 실제 이관 — 현 ADR scope = discovery-from-* 신설 / analysis-from-* 흡수 여부는 본격 검토 후 결단 |
+| C-v4.1-input-skill-이관 ✅ **(v10.0.4 종결 / option α light)** | `analysis-from-{prompt,swagger,plan-doc,figma}` 6 input skill 의 실제 이관 — 현 ADR scope = discovery-from-* 신설 / analysis-from-* 흡수 여부는 본격 검토 후 결단. **결단 (DEC-2026-05-26-input-skill-roles)**: 양쪽 set 평행 유지 + timing/책임 분리 명문화 (analysis-from-* = 최초 1회 baseline 수립 / discovery-from-* = 신규 건마다 scope 진입). `discovery-from-{figma,swagger,nl-md}` 본격 구현 = 실 use case 트리거 carry (v10.x / 사내 배포 전 ROI 정합). |
 | C-v4.1-session-재시작-검증 ✅ **(v10.0.3 종결 표기)** | LL-v4-04 정합 — 본 paradigm 변경 후 Claude Code session 재시작 후 dispatch 검증 의무. **자산화 완료** = DEC-2026-05-17-v4-multi-agent-paradigm-채택 + DEC-2026-05-21 본 문서 안 LL-v4-04 series 등재. v9.0.0/v9.1.0 paradigm 진입 시 session 재시작 검증 적용됨 (별도 코드/문서 작업 불필요 = protocol 자산 / DEC-2026-05-26-quick-carry-close). |
 | C-v4.1-traceability-확장 | traceability-matrix 안 TASK + ADR + NFR + RISK layer 신설 (UC → BHV → AC → TASK → TC → IMPL + ADR/NFR/RISK cross-cut) |
 | C-v4.1-baseline-delta-운영-문서화 ✅ **(v10.0.1 종결)** | "초기 1회 full analysis + 매 신규 건 delta 갱신" 운영 모델 명시 (baseline carry 규약) → `methodology-spec/baseline-delta-operating-model.md` 신설 / DEC-2026-05-26-baseline-delta-operating-model |

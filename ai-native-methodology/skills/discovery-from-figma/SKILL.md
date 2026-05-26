@@ -1,6 +1,6 @@
 ---
 name: discovery-from-figma
-description: PLACEHOLDER 2026-05-21 (v4.1 paradigm 가시화만). chain (discovery) 입력 어댑터 skill (figma 채널). figma 파일 + selected frame 입력에서 UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) 추출 전문. discovery-agent 가 호출. v4.2+ 본격 구현 carry.
+description: ★ light placeholder (v10.0.4 paradigm 명문화 / DEC-2026-05-26-input-skill-roles). chain (discovery) 입력 어댑터 skill (figma 채널 / **scope 진입 timing**). figma 파일 + selected frame 입력에서 UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) 추출 전문. discovery-agent 가 호출. `analysis-from-figma` (baseline 수립 / 최초 1회 / Track=FE) 와 **timing+책임 분리** (analysis = baseline / discovery = 신규 건마다 scope). 본격 구현 = 실 use case (figma 로 scope 진입 사용자) 트리거 carry / v10.x.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 

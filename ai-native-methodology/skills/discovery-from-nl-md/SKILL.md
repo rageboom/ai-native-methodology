@@ -1,6 +1,6 @@
 ---
 name: discovery-from-nl-md
-description: PLACEHOLDER 2026-05-21 (v4.1 paradigm 가시화만). chain (discovery) 입력 어댑터 skill (자연어 / 마크다운 채널). 자연어 prompt 또는 markdown 기획 문서 입력에서 UC + intent + NFR + 출처 ref (doc:para:sentence) 추출 전문. discovery-agent 가 호출. v4.2+ 본격 구현 carry. NFR 추출 의 1차 채널.
+description: ★ light placeholder (v10.0.4 paradigm 명문화 / DEC-2026-05-26-input-skill-roles). chain (discovery) 입력 어댑터 skill (자연어 / 마크다운 채널 / **scope 진입 timing**). 자연어 prompt 또는 markdown 기획 문서 입력에서 UC + intent + NFR + 출처 ref (doc:para:sentence) 추출 전문. discovery-agent 가 호출. `analysis-from-prompt` + `analysis-from-plan-doc` (baseline 수립 / 최초 1회) 와 **timing+책임 분리** (analysis = baseline / discovery = 신규 건마다 scope). NFR 추출 의 1차 채널. 본격 구현 = 실 use case (NL md 로 scope 진입 사용자) 트리거 carry / v10.x.
 allowed-tools: Read, Glob, Grep, Bash
 ---
 

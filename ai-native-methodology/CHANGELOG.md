@@ -9,6 +9,29 @@
 
 ---
 
+## [10.0.4] — 2026-05-26 PATCH — C-v4.1-input-skill-이관 결단 종결 (analysis-from-* ↔ discovery-from-* timing 분리 paradigm / option α light)
+
+> 사용자 "최초에 분석은 analysis 에서 하는데 한번 분석이 끝난 프로젝트는 그냥 다양한 input 을 받도록 하고 싶다" → option α light 채택. additive doc / breaking 0.
+>
+> **paradigm 명문화** (baseline-delta 운영 모델 입력 측면 / v10.0.1 정합):
+>
+> | set | timing | 책임 | skill |
+> |---|---|---|---|
+> | `analysis-from-*` (4) | 최초 1회 (legacy baseline 수립) | analysis 산출물 (visual-manifest / inventory / domain 등 canonical global) | `analysis-from-{figma, swagger, prompt, plan-doc}` ★ 모두 본격 구현 |
+> | `discovery-from-*` (4) | 신규 건마다 (scope 진입 trigger) | UC + intent + flow → planning-spec | `discovery-from-{analysis-output(★본격), figma(light placeholder), swagger(light), nl-md(light)}` |
+>
+> 같은 source(figma/swagger/NL md) 라도 baseline 시 vs scope 진입 시 = **다른 목적/다른 산출**. 양쪽 set 평행 유지 / 중복 ❌ / 다른 axis ✅.
+>
+> - **시행** (additive doc / breaking 0):
+>   - `skills/discovery-from-{figma, swagger, nl-md}/SKILL.md` 3 placeholder description 갱신 (paradigm 반영 + analysis-from-* timing 분리 명시 + use case 트리거 carry 표기).
+>   - `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 다음에 **§Input 어댑터 timing 분리** 신설 (두 set 평행 표).
+>   - `guides/first-prompt-cookbook.md` §2.1 discovery 섹션 timing 분리 note.
+>   - `decisions/DEC-2026-05-21-chain-discovery-plan-stage-도입.md` carry 표 `C-v4.1-input-skill-이관` ✅ 종결 표기 + option α light 결단 명시.
+> - **STOP-3**: release-readiness 20/20 ready (보존) + skill-citation 0 stale + version 3-way 10.0.4 + breaking 0 = PATCH.
+> - **잔여 carry (use case 트리거 의존)**: `discovery-from-{figma, swagger, nl-md}` 본격 구현 = 해당 채널로 scope 진입하는 실 사용자 등장 시 별도 PATCH/MINOR. 현 사내 배포 전 단계 ROI 정합 (light placeholder 유지). 그 외: C-v4.1-poc-재실행 (9 PoC 전부 task-plan 없음 / heavy / v10.x).
+>
+> DEC-2026-05-26-input-skill-roles. Resolves C-v4.1-input-skill-이관.
+
 ## [10.0.3] — 2026-05-26 PATCH — 잔여 carry quick wins 종결 (macOS env test fix + session-재시작-검증 표기)
 
 > 사용자 "남은 carry 처리하자" → 잔여 4 carry 정밀 점검 → Quick wins(env + session-LL) 채택. corrective / breaking 0.
