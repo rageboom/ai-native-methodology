@@ -123,3 +123,39 @@ ALL 6 PoC = schema 와 deviate. 두 axis 동시 사실:
 3. cooling-off / 별도 session
 
 **핵심**: schema 진화 paradigm = v8.6.0+ F-V2C2-1-02 R#4 fix 선례 정합 / breaking 0 / 실 사용 패턴 정식 흡수 / drift attractor 차단 본질 보존.
+
+---
+
+## ★ ★ ★ OBSOLETE 표기 (2026-05-27 / session 49차 close)
+
+> **상태**: ❌ obsolete / 시행 ❌ / **plan trigger 이미 해소**
+> **종결 결단**: DEC-2026-05-27-codegraph-integration-scope-out 후속 carry 점검 session
+
+### 해소 사유 (★ 2 axis 동시)
+
+**axis 1 — release-readiness `analysis_validator_violation` carry trigger 이미 해소** (v8.6.0+ F-V2C2-1-01 fix / chain 1~4 산출물 scope 확장):
+
+```
+✅ analysis_validator_violation — analysis validator (schema + br-cross-consistency)
+   violations 0 / 12 business-rules + 32 chain artifact 전수 검증
+```
+
+본 plan §1 본문 §1.2 violation 분류 (poc-06 10 errors / poc-07 3 errors / poc-08 8 errors / poc-09 4 errors / poc-10 2 errors / poc-11 ~7 errors) = 작성 시점 사실. v8.6.0+ F-V2C2-1-01 fix 로 그 이후 0 violation 도달. release-readiness 22/22 ready (2026-05-27 실측).
+
+**axis 2 — v11.0.0 paradigm shift 미반영**:
+
+- 본 plan 본문 = `planning-spec.json` schema 명칭 사용 (v8.x cycle 가정).
+- v11.0.0 MAJOR (2026-05-26) — `planning-spec.{json,md}` → **`discovery-spec.{json,md}`** rename (10 PoC artifact + active doc cascade).
+- 본 plan §1.3 schema path `schemas/planning-spec.schema.json` = stale (현 `schemas/discovery-spec.schema.json`).
+
+### LL 자산화 후보 (선택적)
+
+- **LL-obsolete-plan-detection**: carry plan close 시 (a) release-readiness criterion 실측 + (b) paradigm shift 후 산출물명/schema path 정합성 사전 검증 의무. plan 작성 시점 ↔ session 시행 시점 사이 paradigm 진화 시 stale 위험. (memory `feedback_self_referential_corrective_drift` 정합 / [[feedback-strict-exposes-drift]] 동형 paradigm)
+
+### carry queue (재발동 조건)
+
+본 plan 의 §3 cluster (B3 + C3 + D2 + A3) 는 다음 트리거 발생 시 별 plan 으로 재작성:
+
+1. release-readiness `analysis_validator_violation` 재regression (현재 ✅ / regression 발생 시)
+2. v11.0.0 discovery-spec schema strict 진화 시 PoC #06~#11 산출물 deviate 재발 견 시 (실측 의무)
+3. 외부 사용자 자연 요구 (Type 2 corroboration trigger)
