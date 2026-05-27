@@ -243,3 +243,138 @@
 - **옵션 X**: 4원칙 §2 진입 (research-codegraph-integration.md 작성 / 3 sub-agent 병렬 / 본 conversation 안 시행)
 - **옵션 Y**: 본 plan 만 작성 + 다음 session 진입 시 §2 진입 (cooling-off 자격 아님 / 단순 session boundary)
 - **옵션 Z**: 본 design scope-out / carry queue 등록만 / 본격 prod 가치 진전 자격 검토 후 결단 (R7 self-referential drift risk 회피)
+
+---
+
+## REVISE-1 (2026-05-27 / session 49차 / §2 research 흡수)
+
+### R1.1 사용자 결단 = 분기 1 (α 단독 v10.2.0 PATCH 권고 채택)
+
+`.claude/plans/research-codegraph-integration.md` §5 4 분기 중 **분기 1** 채택. Senior critique (D agent) + B agent SCIP 권고 통합 흡수. paradigm 정합 = `feedback_senior_stop_signal_absorption.md` "사실 명확도 × 비용" 2축 평가 → 전면 흡수 자격.
+
+### R1.2 §3 채택안 갱신
+
+| Cluster | 원안 | **REVISE-1 결단** | 흡수 근거 |
+|---|---|---|---|
+| A — phase 진입 순서 | A4 (α/β/γ 3 release) | **α 단독 (v10.2.0 PATCH 수준)** + β/γ scope-out | Senior REVISE @ 55% (α 단독 가치 0~5% / cooling-off ≠ session 무제한) |
+| B — symbol_id 표기 | research carry | **SCIP BNF style 채택**: `code_pointer.{symbol_id, path, range}` 3 분리 필드 | B agent 권고 (Sourcegraph open spec / 재발명 ❌) + codegraph repo 안 명세 부재 사실 (raw fetch 확정) |
+| C — validator 3 mode | 3 mode (strict-path / symbol-check / symbol-strict) | **schema only / validator mode 신설 ❌** (α 단독 분기에서 federation 없으므로 의미 약함) | Senior REVISE — α 단독에서 `--symbol-check` 의미 약함 |
+| D — federation 6 단계 | 채택 | **scope-out** (Type 2 외부 사용자 자연 요구 발생 시 carry) | Senior REVISE @ 40% (가장 critical) — UX wrapper 수준 / trust 모델 clash / surface 작다 |
+| E — additive schema | 채택 (anchor_type enum + symbol_id + symbol_kind + symbol_anchors[]) | **채택 유지** + SCIP BNF 정합 갱신 | Senior GO @ 95% / B agent 정합 |
+| F — release-readiness #17 | F2 warn-only | **F3 (신설 ❌)** | Senior REVISE — warn-only noise 영구화 → warn 무시 학습 |
+| G — ADR-CHAIN-013 | 신설 | **ADR 보류 + DEC 만 신설** | Senior REVISE — paradigm 진전 ❌ (단순 schema 격상) / ADR 자격 약함 |
+| H — PoC corroboration | H4 3 stack (poc-02 + poc-03 + poc-04-mini) | **poc-02 + poc-03 2 stack** | Senior REVISE @ 50% — TS 중복 (NestJS + React 양쪽 TS) |
+
+### R1.3 R1~R10 risk 재평가 + R11~R13 신설
+
+| Risk | 원 severity | REVISE-1 severity | 비고 |
+|---|---|---|---|
+| R1 (cadence drift) | medium | low (β scope-out 으로 무의미) | F3 채택 → criterion 없음 |
+| R2 (환경 의존) | medium | medium (α 단독에서도 schema 의무 0 — codegraph 미설치 사용자도 schema 변경 안전) | graceful degradation 자동 |
+| R3 (symbol_id stability) | medium | **low** (SCIP BNF 채택 → codegraph 내부 id 무관) | B agent 권고 흡수 |
+| R4 (자기-도구 simulation) | high | **low** (α 단독에서 codegraph 실행 의존 ❌ / schema 만) | federation scope-out 효과 |
+| R5 (PoC ≥ 2 corroboration) | high | medium (2 stack 축소) | H REVISE 흡수 |
+| R6 (가중치 cross-feed) | medium | low (D scope-out 으로 무의미) | — |
+| R7 (self-referential drift) | medium | **medium 유지** (α 단독에서 (a) 외부 사용자 요구 = 0건 여전 / (b) SCIP grammar 정합 = codegraph 무관 가치 ✅ / (c) corroboration 2 stack hypothesis 자격) | Senior 측정 criterion 적용 = (a) fail / (b) pass / (c) pass = 2/3 |
+| R8 (codegraph OSS 수명) | low | low (α 단독에서 codegraph 의존 ❌ / SCIP open spec 의존) | federation scope-out 효과 |
+| R9 (4 release session cap) | low | **low 유지** (현 session 안 release 1 = α 만) | session 분리 권고 폐기 |
+| R10 (DEC trail 누락) | low | low (DEC-2026-05-27-codegraph-integration-alpha-only 신설) | — |
+| **R11 (trust 모델 clash)** | — | **low** (α 단독에서 codegraph 실행 0 / clash 무의미) | federation scope-out 효과 |
+| **R12 (Type 2 사용자 부재)** | — | **medium** (α 만이라도 외부 사용자 요구 0건 사실 보존 / scope-out 효과 일부) | R7 본질 |
+| **R13 (research negative 폐기 발동조건)** | — | **종결** — research §2 결과 = α 단독 분기 자격 충분 / 폐기 ❌ + scope 축소만 | §2 research 완료 |
+
+### R1.4 시행 시퀀스 (분기 1 / α 단독)
+
+1. **schema additive (Cluster E + SCIP BNF 정합)**:
+   - `schemas/code-pointer.schema.json` — `anchor_type` enum 에 `symbol` 추가 / `symbol_id` (optional, SCIP BNF format string: `<scheme> <package> <descriptors>` 또는 `local <local-id>`) / `symbol_kind` (optional enum)
+   - `schemas/impl-spec.schema.json` — `modules[].source_files[].symbol_anchors[]` optional 필드
+   - `additionalProperties:false` strict 유지
+2. **graph-synthesizer 확장** — `code_pointers[].symbol_id` 평탄화 (있을 시 / optional)
+3. **PoC 2 stack 실측** — poc-02 (Java/Spring) + poc-03 (TS/NestJS) IMPL 산출물 `symbol_anchors[]` 채움 (각 1~3 IMPL 노드 / 진짜 SCIP 형식 / 추측 ❌)
+4. **DEC 신설** — `decisions/DEC-2026-05-27-codegraph-integration-alpha-only.md` (본 REVISE-1 결단 trail)
+5. **CHANGELOG MINOR** — v10.2.0 후보 / additive / breaking 0 (`code_pointer.symbol_id` SCIP BNF)
+6. **release-readiness STOP-3** — workspace test green + criterion 20/20 보존 + version 3-way + skill-citation 0 stale + §8.1 ≥ 2 PoC corroboration (poc-02 + poc-03)
+
+### R1.5 carry 등록 (β/γ Type 2 trigger 후 재발동 조건)
+
+| carry | 발동 조건 |
+|---|---|
+| C-codegraph-β-federation | **외부 사용자 (윤주스 외 사내 동료 또는 OSS 사용자) ≥ 1 자연 요구 발생** + codegraph v1.0+ 안정화 (≥ 6 개월 maturity 관찰) |
+| C-codegraph-γ-MCP-대칭 | β 시행 후 ≥ 1 PoC corroboration + Type 2 추가 trigger |
+| C-codegraph-tree-sitter-안정성-검증 | tree-sitter version pin 명세 시점 (codegraph repo 갱신 시) |
+
+### R1.6 사용자 승인 묶음 (4원칙 §3)
+
+본 REVISE-1 채택 = 묶음 결단 6 항 자동 흡수 (사용자 분기 1 채택 시점 implicit 승인):
+
+1. ✅ Phase 진입 순서 = α 단독
+2. ✅ symbol_id 표기 = SCIP BNF
+3. ✅ release-readiness criterion = F3 (신설 ❌)
+4. ✅ ADR = 보류 + DEC 만
+5. ✅ PoC = poc-02 + poc-03 2 stack
+6. ✅ carry queue = §R1.5 3 carry 등록
+
+**남은 사용자 결단** = 시행 시점 (현 session vs 다음 session) 1건.
+
+---
+
+## REVISE-2 (2026-05-27 / session 49차 / §4 시행 직전 PoC 자격 사실 발견 → 전면 scope-out)
+
+### R2.1 시행 직전 사실 발견 (LL-fsim-11 paradigm 본격 재발 v8 / 5회 이상 연속)
+
+REVISE-1 §R1.4 #3 "poc-02 + poc-03 IMPL 산출물 SCIP symbol_anchors 실측" 시행 직전 사실 검증 = **PoC corroboration 자격 fundamental 부재**:
+
+| 사실 | 검증 |
+|---|---|
+| poc-02 `.aimd/output/` 디렉토리 | **비어있음** (impl-spec.json 부재) |
+| poc-03 `.aimd/output/` | test-spec.json 만 / impl-spec.json **부재** |
+| 14 PoC 전수 impl-spec.json 보유 | **단 2 PoC** (poc-05 + poc-14) |
+| poc-05 (TS pure-node) modules[].code_pointers[] | **0개 (부재)** |
+| poc-14 (Python pure-3.14) modules[].code_pointers[] | **0개 (부재)** |
+| isomorphic 자격 | TS + Python = 사내 실 stack (Java/Spring + TS/NestJS + React) 무관 |
+
+§8.1 strict ≥ 2 PoC corroboration 의무 통과 자격 = **자산 자체 부재**. corroboration 의무 추가 부담 (code_pointers[] 새로 채우기 의무 / ~3~5시간 PoC 코드 베이스 깊이 read).
+
+### R2.2 사용자 2차 결단 = 전면 scope-out
+
+사실 누적 6건 (REVISE-1 흡수) + 본 사실 발견 2건 = 8건 누적. R7 self-referential corrective drift paradigm 정조준 발동 자격. memory `feedback_senior_stop_signal_absorption.md` "사실 명확도 × 비용" 2축 = 전면 흡수 자격 본격.
+
+사용자 결단 (2026-05-27 / AskUserQuestion "PoC corroboration 자격 부재 사실 발견 — 재결단?") = **전면 scope-out 채택**.
+
+### R2.3 §3 채택안 + REVISE-1 §R1.1~R1.6 전면 retract
+
+| Cluster | REVISE-1 결단 | **REVISE-2 결단** |
+|---|---|---|
+| A — phase 진입 | α 단독 v10.2.0 PATCH | **scope-out** |
+| B — symbol_id | SCIP BNF 채택 | **carry (C-scip-grammar-adoption-light)** — 별 axis / codegraph 무관 / PoC 자격 자산 사전 의무 |
+| C — validator mode | schema only | **scope-out** |
+| D — federation | scope-out | scope-out (REVISE-1 정합 / 유지) |
+| E — additive schema | 채택 + SCIP BNF | **carry (C-scip-grammar-adoption-light)** |
+| F — release-readiness | F3 (신설 ❌) | **scope-out** (criterion 신설 ❌ 자격 유지) |
+| G — ADR-CHAIN-013 | ADR 보류 + DEC | **DEC-2026-05-27-codegraph-integration-scope-out 단일** (본 결단 trail) |
+| H — PoC corroboration | poc-02 + poc-03 | **scope-out** (자격 자산 부재 입증) |
+
+### R2.4 carry queue 3종 (Type 2 trigger 조건)
+
+| carry | 발동 조건 |
+|---|---|
+| `C-codegraph-bridge-design` | (a) 외부 사용자 (윤주스 외 사내 동료 또는 OSS 사용자) ≥ 1 자연 요구 + (b) codegraph v1.0+ 안정화 (≥ 6 개월 maturity 관찰) + (c) Type 2 corroboration ≥ 2 PoC 자격 자산 (impl-spec.json + code_pointers[] 채워진 PoC ≥ 2) **3 criterion 동시 충족** 시 재발동 |
+| `C-scip-grammar-adoption-light` | 별 axis (codegraph 무관) / 본 방법론 표현력 ↑ 자체 가치 / Type 2 trigger 부재여도 시행 가능 / 단 PoC code_pointers[] 채워진 PoC ≥ 2 사전 의무 |
+| `C-tree-sitter-stability-verify` | codegraph repo / SCIP indexer / Aider tree-sitter `.scm` query 안 version pin 명세 시점 시행 |
+
+### R2.5 doc 자산 보존
+
+- 본 plan-codegraph-integration.md = `.claude/plans/` 안 보존 (역사 trail / 외부 사용자 자연 요구 발생 시 재발동 base)
+- `.claude/plans/research-codegraph-integration.md` = 보존 (B/D sub-agent 결과 + raw fetch + SCIP grammar 사실 = 별 axis 활용 가능 자산)
+- `decisions/DEC-2026-05-27-codegraph-integration-scope-out.md` = 신설 (본 결단 trail)
+- `decisions/INDEX.md` = 갱신 (DEC 등재)
+- `decisions/STATUS.md` = 갱신 (carry queue 3 등록)
+
+### R2.6 release ❌
+
+- 본 결단 = pure doc trail / 실 plugin 자산 변경 0
+- CHANGELOG entry ❌ / version 3-way sync ❌ / STOP-3 ❌ / workspace test ❌
+
+### R2.7 본 plan 다음 단계 (R1.6 retract)
+
+R1.6 의 "남은 사용자 결단 = 시행 시점" = retract. **본 plan = scope-out 종결 상태**. 재발동 = §R2.4 carry queue 3 criterion 동시 충족 시.
