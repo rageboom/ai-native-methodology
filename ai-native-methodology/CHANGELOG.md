@@ -9,6 +9,27 @@
 
 ---
 
+## [11.0.1] — 2026-05-27 PATCH — F-162 analysis-from-figma verbatim 검증 의무화 (외부 dogfood 발견)
+
+> ★ δ Type 2 외부 consumer repo (mis-fe-admin EAM 통합권한조회) 실전 dogfood 에서 자연 표면화한 첫 corrective fix. `feedback_self_referential_corrective_drift.md` 가 명시적으로 기다리던 외부 채널 발견 → self-referential drift 아님 → 본 cycle fix 정당.
+
+### 배경 (F-162)
+
+`analysis-from-figma` 는 `discovery-from-figma` 가 가진 source-grounded 의무 (LLM 추론 금지 / node 실 인용 / grep_hit 검증) 를 **비대칭으로 결여**. `figma-extract.schema.json` 에 TEXT 노드의 verbatim 표시 텍스트 (`characters`) 를 담을 필드조차 없어, 라벨/버튼/헤더를 `get_metadata` layer name + OpenAPI 파라미터로 **추론**해 채우는 silent fallback 허용. 실 피해: consumer repo spec md 가 추론 라벨을 "✅ Figma 검증 완료" 로 GO-STOP gate 통과 → cycle 13 Figma MCP `get_design_context` 실 verbatim 추출 결과 spec ≠ Figma 갭 8건 실증.
+
+### Fixed
+
+- **`schemas/figma-extract.schema.json`**: `components[]` 에 `text_content` (verbatim 표시 텍스트 / TEXT 노드 의무) + `provenance` (`verbatim` | `inferred`) 필드 추가. `name` description 에 "레이어명 ≠ 표시 텍스트" 명시. (optional 추가라 기존 산출 호환 — PATCH)
+- **`skills/analysis-from-figma/SKILL.md`**: 절차 2 verbatim 의무화 + 절차 3 silent skip 금지 (TEXT 노드 sub-frame `get_design_context` 재호출 의무) + provenance 태깅. "산출 자격 조건" 절 신설 (TEXT verbatim 의무 / inferred 금지 대상 / inferred 비율 > 0 시 finding+gate 노출). scope-out 의 "추정 ❌" 을 텍스트 라벨까지 확대.
+- **`methodology-spec/finding-system.md`**: F-162 등록 (Status: resolved / schema+SKILL fix / validator 신설은 carry).
+
+### Carry (δ 후속)
+
+- analysis-figma 전용 source-grounded validator 신설 (`discovery-extraction-validator` 패턴 차용 / provenance=inferred 비율 임계 hard gate).
+- 동형 비대칭 점검: `analysis-from-swagger` / `analysis-from-prompt` 등 다른 input-adapter 의 source-grounded 의무 일관성.
+
+---
+
 ## [11.0.0] — 2026-05-26 MAJOR — v11.0.0 paradigm cascade 본격 시행 종결 (8 결단 + 5 chain stage 산출물 본격 통합)
 
 > ★ ★ ★ ★ ★ session 48차 paradigm SSOT 확립 + session 49차 schema/skill body cascade + 본 session 안 Phase 2f-prime + sub-phase + Phase 3 + Phase 4 + Phase 5 본격 시행 종결. v11.0.0 MAJOR breaking — `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename + BE/FE 산출물 분리 paradigm 본격 + Epic/Story/Task(OP-*)/Sub-task(TASK-*) 4-level cascade + ticket=plan stage 한 곳 (R20-prime) + contract 강제 양 axis (BE swagger / FE state-map+DTCG).

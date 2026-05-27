@@ -888,3 +888,29 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
   - **ζ-3**: plan stage = gate 없는 informal stage 로 정합 표기 (외부 표기 변경 / paradigm 정합 양보 / 5-stage harness + informal plan helper).
   ★ ★ ★ ★ ★ ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 ★ 1순위 자연 표면화 대상. 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
 - **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / ★ ★ ★ ★ ★ 1순위 표면화 대상 / paradigm-level finding 자격 외부 사용자 channel 의무)
+
+### F-162: ★ ★ ★ ★ analysis-from-figma = verbatim 검증 의무 부재 / input-adapter source-grounded 비대칭 (δ Type 2 외부 dogfood 채널 발견)
+
+- **Phase:** 외부 consumer repo (mis-fe-admin) 실전 dogfood — cycle 13 통합권한조회 화면 (2026-05-27 / 사용자 sangcl 직접 작업 중 발견)
+- **Confidence:** verified (`skills/analysis-from-figma/SKILL.md` + `skills/discovery-from-figma/SKILL.md` + `schemas/figma-extract.schema.json` + `schemas/discovery-spec.schema.json` 직접 read 대조 / Figma MCP `get_design_context` 실 verbatim 추출로 spec md 8건 갭 실증)
+- **Type:** gap (input-adapter source-grounded 의무 비대칭 / no-simulation 정합 구멍)
+- **Description:** ★ 본 finding 은 `feedback_self_referential_corrective_drift.md` 가 **명시적으로 기다리던 δ Type 2 외부 사용자 dogfood 채널 발현** — plugin 자신의 내부 PoC 가 아니라 외부 consumer repo (mis-fe-admin EAM 통합권한조회) 실전 작업 중 자연 표면화. 따라서 self-referential corrective drift 아님 → 본 cycle corrective fix 정당.
+
+  **갭 본질**: `discovery-from-figma` 는 강력한 source-grounded 게이트 보유 — "LLM 추론만으로 entry 생성 ❌ / MCP tool 호출 + 실 node 인용 의무" (SKILL §no-simulation) + 모든 entry `source_grounded_evidence = figma:<file_id>:<node_id>` 의무 + `discovery-extraction-validator` 가 `grep_hit_count > 0` 으로 node 실재 검증. **그러나 `analysis-from-figma` 에는 이 의무가 전무**:
+  1. `figma-extract.schema.json` 에 `source_grounded_evidence` / node ref / provenance 필드 **0건** (discovery-spec.schema.json 엔 존재).
+  2. TEXT 노드의 실 표시 텍스트 (`characters`) 를 담는 필드 부재 — `components[].name` 은 **레이어명**일 뿐 verbatim 라벨 아님. verbatim 을 담을 곳 자체가 없음.
+  3. verbatim 확인 값 vs LLM 추론 값 구분 (provenance) 메커니즘 부재.
+  4. analysis figma 산출 전용 validator 부재 (`discovery-extraction-validator` 대응물 없음).
+
+  **실증 피해**: 통합권한조회 spec md 가 cycle 1~12 동안 `get_metadata` (구조/레이어명) 만 보고 라벨을 OpenAPI 파라미터로 **추론**해 채움 (spec md §4.1 주석 자기 고백 "Figma metadata 에서 검색 라벨 텍스트는 노출되지 않음... 추론"). cycle 13 Figma MCP `get_design_context` 실 verbatim 추출 결과 spec ≠ Figma 갭 8건 실증 (검색 버튼 "검색"→"조회" / 그리드 컬럼 라벨·순서 / 4번째 필드 "권한 설명"→"권한역할" / 엑셀 라디오 카운트 라벨 / "신규" 컬럼 부재 등). 추론이 "✅ Figma 검증 완료" 상태로 굳어 GO-STOP gate 통과.
+- **Evidence:**
+  - `skills/analysis-from-figma/SKILL.md:19-27` (절차 2 get_design_context 는 "권장" / 절차 3 sub-frame 재호출 silent skip 가능 / §scope-out 의 "추정 ❌ no-simulation" 은 interaction·animation 한정 — 텍스트 라벨 추론 미차단)
+  - `skills/discovery-from-figma/SKILL.md:35-39,52` (source-grounded 의무 + grep_hit_count 검증 — 대조군)
+  - `schemas/figma-extract.schema.json` (source_grounded_evidence / characters / provenance 필드 0건)
+  - `schemas/discovery-spec.schema.json:98,122,134` (source_grounded_evidence required — 대조군)
+  - 외부 실증 (mis-fe-admin 외부 레포 / docs/specs 하위): `eam-integration-authority.md` cycle 13 정정 6곳 + `eam-integration-authority-user-test.tsv` GAP 5건
+- **Spec gap:** input-adapter skill 군 (analysis-from-figma / analysis-from-swagger / analysis-from-prompt) 의 source-grounded 의무가 discovery-adapter 대비 비대칭. analysis baseline 산출 (visual structure) 이 verbatim 미확보 시 추론 fallback 을 허용 → no-simulation 절대 우선순위 구멍.
+- **Decision made:** ★ self-referential drift 아님 (외부 δ Type 2 채널 발견 + 사용자 명시 자산화 요청 + paradigm-level 아닌 SKILL/schema consistency gap) → **본 cycle corrective fix 시행**. (a) figma-extract.schema.json 에 `text_content` (verbatim characters) + `provenance` (verbatim|inferred) 필드 추가. (b) analysis-from-figma SKILL 에 TEXT verbatim 추출 의무 + silent skip 금지 + provenance 태깅 + 산출 자격 조건 강화.
+- **Severity:** **high** — no-simulation 절대 우선순위 직접 구멍 / FE 트랙 전 PoC 영향 / 외부 실 피해 실증 (spec ≠ Figma 8건).
+- **Proposed fix:** (본 cycle 시행 ✅) schema 2 필드 추가 + SKILL 절차 의무화. (carry) analysis-figma 전용 source-grounded validator 신설 (`discovery-extraction-validator` 패턴 차용 / grep_hit 대신 provenance=inferred 비율 임계) — δ 후속.
+- **Status:** **resolved** (본 cycle schema + SKILL fix / validator 신설은 carry)
