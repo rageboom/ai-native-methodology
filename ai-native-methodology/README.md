@@ -85,7 +85,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
-/plugin install ai-native-methodology@ai-native-methodology
+/plugin install ai-native-methodology@mis-plugins
 /reload-plugins
 /plugin                  # 대화형 manager — Installed 탭에서 v3.6.9 확인
 ```
@@ -102,7 +102,7 @@ gh auth login --hostname github.smilegate.net
 
 # Claude Code 세션에서:
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@ai-native-methodology
+/plugin install ai-native-methodology@mis-plugins
 /reload-plugins
 ```
 
@@ -110,7 +110,7 @@ gh auth login --hostname github.smilegate.net
 
 ```bash
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v3.6.9
-/plugin install ai-native-methodology@ai-native-methodology
+/plugin install ai-native-methodology@mis-plugins
 ```
 
 ★ plugin update — `/plugin` 대화형 manager → Installed 탭 → "Update" → 최신 tag 자동 fetch.
@@ -129,7 +129,7 @@ gh auth login --hostname github.smilegate.net
 
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
-/plugin install ai-native-methodology@ai-native-methodology
+/plugin install ai-native-methodology@mis-plugins
 /reload-plugins
 ```
 

@@ -26,9 +26,9 @@
 **해결**: ★ ★ ★ **v2.5.1 PATCH 재install 의무**.
 ```bash
 /plugin uninstall ai-native-methodology
-/plugin marketplace remove ai-native-methodology
+/plugin marketplace remove mis-plugins
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@ai-native-methodology
+/plugin install ai-native-methodology@mis-plugins
 /reload-plugins
 ```
 
