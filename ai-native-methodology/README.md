@@ -76,7 +76,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 - Node ≥ 18 (chain-driver / 12 workspace tool 실행)
 
-### 사용법 — Plugin install (★ v3.6.9)
+### 사용법 — Plugin install (★ v11.1.0)
 
 #### A. 편집자 — 워크스페이스 직접 등록 (Phase A self-iteration)
 
@@ -87,7 +87,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TC→IMPL+commit_h
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@mis-plugins
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에서 v3.6.9 확인
+/plugin                  # 대화형 manager — Installed 탭에서 v11.1.0 확인
 ```
 
 #### B. 배포 수신자 — 사내 사용자 install (★ 사내 표준)
@@ -109,7 +109,7 @@ gh auth login --hostname github.smilegate.net
 특정 버전 pin (★ 권장 — git tag):
 
 ```bash
-/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v3.6.9
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v11.1.0
 /plugin install ai-native-methodology@mis-plugins
 ```
 
