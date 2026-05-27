@@ -5,9 +5,10 @@
  *   1) DFS cycle — back-edge 등장 시 stack 경로를 사이클로 기록
  *   2) Orphan — state ∈ {active, drift} 노드 중 in/out 엣지 모두 없는 것
  *   3) Unknown edge — source 또는 target 이 nodes 배열에 없는 엣지
- *      ★ 예외: edge_type=implements 의 target 은 Tier-2 leaf (source code 파일) 이므로
+ *      ★ 예외: edge_type ∈ {implements, conforms_to} 의 target 은 Tier-2 leaf 이므로
  *        nodes 배열에 없는 것이 정상 (docs/dependency-graph.md §2 "그래프 폭증 회피").
- *        source 는 여전히 Tier-1 IMPL 노드여야 함.
+ *        implements = source code 파일 / conforms_to = contract 산출물(openapi/component/visual) leaf (★ v11.0.0).
+ *        source 는 여전히 Tier-1 노드여야 함.
  *
  * 입력 형식: { nodes: ArtifactGraphNode[], edges: ArtifactGraphEdge[] }
  * 출력 형식: { passed, cycles, orphans, unknown_edges, summary }
@@ -38,9 +39,10 @@ export function validateGraph(graph) {
       unknownEdges.push({ edge, reason: `source '${edge.source}' not in nodes` });
       continue;
     }
-    // ★ implements 엣지: target 이 Tier-2 leaf (source code 경로) 이므로 nodes 부재 정상.
+    // ★ implements/conforms_to 엣지: target 이 Tier-2 leaf 이므로 nodes 부재 정상.
+    //   implements = source code 경로 / conforms_to = contract 산출물 leaf (★ v11.0.0).
     //   adjacency 에는 추가하지 않아 cycle/orphan 계산에 영향 없음.
-    if (edge.edge_type === "implements" && !nodeMap.has(edge.target)) {
+    if ((edge.edge_type === "implements" || edge.edge_type === "conforms_to") && !nodeMap.has(edge.target)) {
       continue;
     }
     if (!nodeMap.has(edge.target)) {

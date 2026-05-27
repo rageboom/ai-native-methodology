@@ -1,5 +1,8 @@
 // graph-synthesizer.js
-// 24 Tier-1 artifact (chain 5 + analysis 15 + aspect 4) → artifact-graph.json
+// 25 Tier-1 artifact (chain 6 + analysis 15 + aspect 4) → artifact-graph.json
+//   ★ v11.0.0 paradigm — chain 6 layer = UC→BHV→AC→TASK→TC→IMPL (discovery→spec→plan→test→implement)
+//   + plan 조직 노드 3종 (EPIC/STORY/OP) = task-plan 내부 cross-cut/screen anchor (catalog total 외 / 그래프 노드)
+//   (plan-dep-graph-v11-paradigm-cascade.md §8 DESIGN)
 // ★ state machine 내장 (active/drift/propose/deprecated transition table)
 // ★ S5 정합: derived_from + do_not_edit_manually:true (matrix-builder header 규약 따름)
 //
@@ -54,8 +57,15 @@ export function transition(currentState, event) {
 // graph-integrity-validator 가 edge_type ↔ confidence 일관성 검증 (불일치 = fail)
 // ============================================================================
 
-const HARD_EDGE_TYPES = new Set(['derived_from', 'implements', 'tests', 'depends_on']);
-const SOFT_EDGE_TYPES = new Set(['cross_reference', 'informs']);
+// ★ v11.0.0 — conforms_to (artifact→contract leaf, hard) + groups (조직 layer 포함, soft) 신설.
+const HARD_EDGE_TYPES = new Set(['derived_from', 'implements', 'tests', 'depends_on', 'conforms_to']);
+const SOFT_EDGE_TYPES = new Set(['cross_reference', 'informs', 'groups']);
+
+// 통계/stats 순회용 권위 목록 (schema edge_type enum 과 1:1)
+const ALL_EDGE_TYPES = Object.freeze([
+  'derived_from', 'implements', 'tests', 'depends_on', 'conforms_to',
+  'cross_reference', 'informs', 'groups',
+]);
 
 export function confidenceFor(edgeType) {
   if (HARD_EDGE_TYPES.has(edgeType)) return 'hard';
@@ -64,11 +74,17 @@ export function confidenceFor(edgeType) {
 }
 
 // ============================================================================
-// Tier-1 카탈로그 (24 = 5 + 15 + 4)
-// methodology-spec/deliverables/1~24 와 1:1 (22-traceability-matrix 는 derived 산출물이므로 제외)
+// Tier-1 카탈로그 (25 = 6 chain + 15 analysis + 4 aspect)
+// methodology-spec/deliverables 와 1:1 (22-traceability-matrix 는 derived 산출물이므로 제외)
+// ★ v11.0.0 — chain +TASK (plan stage / task-plan.json 산출물).
 // ============================================================================
 
-const CHAIN_SUBKINDS = Object.freeze(['UC', 'BHV', 'AC', 'TC', 'IMPL']);
+const CHAIN_SUBKINDS = Object.freeze(['UC', 'BHV', 'AC', 'TASK', 'TC', 'IMPL']);
+
+// ★ v11.0.0 plan 조직 노드 (task-plan 내부 entity / catalog total 외 — 별도 deliverable 아님).
+//   EPIC = FE 화면 단위 / STORY = cross-cut anchor / OP = Story sibling 운영 task.
+//   (DEC-2026-05-26-ticket-plan-단일)
+const PLAN_SUBKINDS = Object.freeze(['EPIC', 'STORY', 'OP']);
 
 const ANALYSIS_SUBKINDS = Object.freeze([
   'architecture', 'domain', 'api', 'db-schema', 'formal-spec',
@@ -101,8 +117,10 @@ function chainNodeFromItem(item, subkind, source_path) {
     source_path,
     state: 'active',
   };
-  const title = item.name ?? item.description;
+  const title = item.name ?? item.title ?? item.description;
   if (title) node.title = title;
+  // ★ v11.0.0 BE/FE axis — layer 속성 (TASK 등). 그래프 폭증 회피 (§2): 별도 노드 아닌 속성.
+  if (typeof item.layer === 'string') node.layer = item.layer;
   if (Array.isArray(item.code_pointers) && item.code_pointers.length > 0) {
     node.code_pointers = item.code_pointers;
   }
@@ -110,6 +128,33 @@ function chainNodeFromItem(item, subkind, source_path) {
     node.code_pointers_na = true;
   }
   return node;
+}
+
+// ★ v11.0.0 — Story 내부 id 규약 (Jira 비종속). behavior_ref 'BHV-USER-001' → 'STORY-USER-001'.
+function storyIdFromBehaviorRef(behaviorRef) {
+  if (typeof behaviorRef !== 'string') return null;
+  const m = behaviorRef.match(/^BHV-(.+)$/);
+  return m ? `STORY-${m[1]}` : null;
+}
+
+// ★ v11.0.0 — contract leaf target id 합성 (conforms_to 의 leaf target / IMPL→코드 implements 와 동형).
+function openapiContractLeafId(ref) {
+  if (!ref || typeof ref !== 'object') return null;
+  const method = (ref.method ?? '').toString().toUpperCase();
+  const path = ref.path ?? ref.operationId ?? '';
+  if (!path) return null;
+  return `contract:openapi:${method ? method + ' ' : ''}${path}`;
+}
+function componentContractLeafId(ref) {
+  if (!ref || typeof ref !== 'object') return null;
+  const name = ref.name ?? ref.package;
+  if (!name) return null;
+  return `contract:component:${ref.package ? ref.package + '/' : ''}${ref.name ?? ''}`;
+}
+function visualContractLeafId(ref) {
+  if (!ref || typeof ref !== 'object') return null;
+  if (!ref.screen) return null;
+  return `contract:visual:${ref.screen}`;
 }
 
 function kindNode({ artifact_kind, subkind, source_path, title, data }) {
@@ -163,14 +208,17 @@ function makeEdge(source, target, edge_type, extra = {}) {
 
 /**
  * @param {Object} input
- * @param {Object|null} input.planning      planning-spec.json (use_cases[])
+ * @param {Object|null} input.discovery     discovery-spec.json (use_cases[]) ★ v11.0.0 (planning-spec 개칭)
+ * @param {Object|null} input.planning      ★ backward-compat alias of `discovery`
  * @param {Object|null} input.behavior      behavior-spec.json (behaviors[])
  * @param {Object|null} input.acceptance    acceptance-criteria.json (criteria[])
+ * @param {Object|null} input.taskPlan      task-plan.json (tasks[] + epic_refs/story_refs/op_task_refs) ★ v11.0.0 plan stage
+ * @param {Object|null} input.operationalTask  operational-task.json (op_tasks[]) ★ v11.0.0 (optional / OP 보강)
  * @param {Object|null} input.testSpec      test-spec.json (test_cases[])
  * @param {Object|null} input.implSpec      impl-spec.json (modules[])
  * @param {Object} [input.analysis]         { [kind]: json } — ANALYSIS_SUBKINDS 중
  * @param {Object} [input.aspect]           { [kind]: json } — ASPECT_SUBKINDS 중
- * @param {Object} [input.sourcePaths]      { planning, behavior, acceptance, testSpec, implSpec, analysis:{[k]:p}, aspect:{[k]:p} }
+ * @param {Object} [input.sourcePaths]      { discovery, behavior, acceptance, taskPlan, testSpec, implSpec, analysis:{[k]:p}, aspect:{[k]:p} }
  * @param {Object|null} [input.previousGraph]  이전 artifact-graph.json (state carry-over 용)
  * @param {string} [input.scopeId]
  * @param {string} [input.commitHash]
@@ -178,9 +226,12 @@ function makeEdge(source, target, edge_type, extra = {}) {
  */
 export function synthesizeGraph(input) {
   const {
+    discovery = null,
     planning = null,
     behavior = null,
     acceptance = null,
+    taskPlan = null,
+    operationalTask = null,
     testSpec = null,
     implSpec = null,
     analysis = {},
@@ -190,6 +241,10 @@ export function synthesizeGraph(input) {
     scopeId,
     commitHash,
   } = input;
+
+  // ★ v11.0.0 — discovery 우선, planning 은 backward-compat alias.
+  const discoverySpec = discovery ?? planning;
+  const discoveryPath = sourcePaths.discovery ?? sourcePaths.planning;
 
   const nodes = [];
   const edges = [];
@@ -201,9 +256,15 @@ export function synthesizeGraph(input) {
     nodeIds.add(node.id);
   }
 
+  // ★ v11.0.0 — TASK layer index. tcCoveredByTask = TASK 가 점유한 TC id 집합
+  //   (AC→TC shortcut 억제용 / matrix-builder taskByAC 정합 / task-plan 부재 시 빈 set → AC→TC fallback).
+  const tasks = taskPlan?.tasks ?? [];
+  const tcCoveredByTask = new Set();
+  for (const t of tasks) for (const tcRef of t.tc_refs ?? []) tcCoveredByTask.add(tcRef);
+
   // --- chain instance 노드 + chain forward 엣지 ---
-  for (const uc of planning?.use_cases ?? []) {
-    pushNode(chainNodeFromItem(uc, 'UC', sourcePaths.planning ?? '(planning)'));
+  for (const uc of discoverySpec?.use_cases ?? []) {
+    pushNode(chainNodeFromItem(uc, 'UC', discoveryPath ?? '(discovery)'));
   }
   for (const b of behavior?.behaviors ?? []) {
     pushNode(chainNodeFromItem(b, 'BHV', sourcePaths.behavior ?? '(behavior)'));
@@ -217,6 +278,18 @@ export function synthesizeGraph(input) {
       edges.push(makeEdge(ac.behavior_ref, ac.id, 'derived_from'));
     }
   }
+  // ★ v11.0.0 plan stage — TASK 노드 + chain forward (AC→TASK, TASK→TC) + layer 속성.
+  for (const task of tasks) {
+    pushNode(chainNodeFromItem(task, 'TASK', sourcePaths.taskPlan ?? '(task-plan)'));
+    // backward chain link: AC → TASK (task.ac_refs)
+    for (const acRef of task.ac_refs ?? []) {
+      edges.push(makeEdge(acRef, task.id, 'derived_from'));
+    }
+    // forward chain link: TASK → TC (task.tc_refs)
+    for (const tcRef of task.tc_refs ?? []) {
+      edges.push(makeEdge(task.id, tcRef, 'derived_from'));
+    }
+  }
   for (const tc of testSpec?.test_cases ?? []) {
     const tcNode = chainNodeFromItem(tc, 'TC', sourcePaths.testSpec ?? '(testSpec)');
     // TC.source_file (단수, 실 test 코드) → code_pointers (strict_path) 평탄화. IMPL.source_files 와 정합.
@@ -226,7 +299,9 @@ export function synthesizeGraph(input) {
       tcNode.code_pointers = [ptr];
     }
     pushNode(tcNode);
-    if (tc.ac_ref) {
+    // ★ v11.0.0 — TASK 가 이 TC 를 점유하면 AC→TASK→TC 가 정식 경로이므로 직접 AC→TC shortcut 억제.
+    //   (점유 안 됨 = task-plan 부재/부분 → AC→TC fallback 보존 = backward compat)
+    if (tc.ac_ref && !tcCoveredByTask.has(tc.id)) {
       edges.push(makeEdge(tc.ac_ref, tc.id, 'derived_from'));
     }
   }
@@ -245,6 +320,67 @@ export function synthesizeGraph(input) {
       if (ptr.commit_hash) extra.commit_hash = ptr.commit_hash;
       edges.push(makeEdge(impl.id, ptr.path, 'implements', extra));
     }
+  }
+
+  // --- ★ v11.0.0 plan 조직 노드 (EPIC / STORY / OP) + groups 엣지 ---
+  // EPIC = FE 화면 단위 / STORY = cross-cut anchor / OP = Story sibling 운영 task.
+  // 노드 id 규약: Epic = screen_id||jira_id / Story = STORY-<BHV suffix> / OP = op_task_id.
+  // groups (soft): Epic→Story (story.epic_ref) / Story→TASK (task.story_ref) / OP→TASK (task.op_task_ref).
+  const taskPlanPath = sourcePaths.taskPlan ?? '(task-plan)';
+  for (const ep of taskPlan?.epic_refs ?? []) {
+    const id = ep.screen_id ?? ep.jira_id;
+    if (!id) continue;
+    pushNode({
+      id, artifact_kind: 'plan', artifact_subkind: 'EPIC',
+      source_path: taskPlanPath, state: 'active',
+      ...(ep.title ? { title: ep.title } : {}),
+    });
+  }
+  for (const st of taskPlan?.story_refs ?? []) {
+    const id = storyIdFromBehaviorRef(st.behavior_ref) ?? st.jira_id;
+    if (!id) continue;
+    pushNode({
+      id, artifact_kind: 'plan', artifact_subkind: 'STORY',
+      source_path: taskPlanPath, state: 'active',
+      ...(st.title ? { title: st.title } : {}),
+    });
+    // Epic → Story (조직 포함). 양 끝 노드 존재 시만 (dangling 방지는 합성 후 일괄 — 여기선 source 존재만 보장).
+    if (st.epic_ref) edges.push(makeEdge(st.epic_ref, id, 'groups'));
+  }
+  // OP 노드 — task-plan.op_task_refs[] + (선택) operational-task.op_tasks[]
+  for (const op of taskPlan?.op_task_refs ?? []) {
+    const id = op.op_task_id;
+    if (!id) continue;
+    pushNode({
+      id, artifact_kind: 'plan', artifact_subkind: 'OP',
+      source_path: taskPlanPath, state: 'active',
+      ...(op.title ? { title: op.title } : {}),
+    });
+  }
+  for (const op of operationalTask?.op_tasks ?? []) {
+    if (!op.id) continue;
+    pushNode({
+      id: op.id, artifact_kind: 'plan', artifact_subkind: 'OP',
+      source_path: sourcePaths.operationalTask ?? '(operational-task)', state: 'active',
+      ...(op.title ? { title: op.title } : {}),
+    });
+  }
+  // Story→TASK / OP→TASK (조직 포함) + TASK contract conforms_to (leaf hard).
+  for (const task of tasks) {
+    if (task.story_ref) edges.push(makeEdge(task.story_ref, task.id, 'groups'));
+    if (task.op_task_ref) edges.push(makeEdge(task.op_task_ref, task.id, 'groups'));
+    // ★ contract 강제 양 axis (DEC #8) — TASK → contract leaf (BE openapi / FE component).
+    const beLeaf = openapiContractLeafId(task.openapi_endpoint_ref);
+    if (beLeaf) edges.push(makeEdge(task.id, beLeaf, 'conforms_to'));
+    const feLeaf = componentContractLeafId(task.component_ref);
+    if (feLeaf) edges.push(makeEdge(task.id, feLeaf, 'conforms_to'));
+  }
+  // TC contract conforms_to (leaf hard) — BE openapi_contract / FE visual_regression.
+  for (const tc of testSpec?.test_cases ?? []) {
+    const beLeaf = openapiContractLeafId(tc.openapi_contract_ref);
+    if (beLeaf) edges.push(makeEdge(tc.id, beLeaf, 'conforms_to'));
+    const visLeaf = visualContractLeafId(tc.visual_regression_ref);
+    if (visLeaf) edges.push(makeEdge(tc.id, visLeaf, 'conforms_to'));
   }
 
   // --- analysis kind 노드 (15) ---
@@ -332,6 +468,16 @@ export function synthesizeGraph(input) {
     }
   }
 
+  // --- ★ v11.0.0 groups dangling prune ---
+  // groups (조직 포함) 엣지는 leaf 예외가 아니므로 양 끝 노드가 모두 존재할 때만 보존
+  // (cross_reference/informs 와 동일 정책 / dangling 시 graph-integrity unknown_edge fail 회피).
+  // conforms_to 는 leaf(contract) target 이므로 prune 제외 (implements 와 동형 / integrity 예외).
+  for (let i = edges.length - 1; i >= 0; i--) {
+    const e = edges[i];
+    if (e.edge_type !== 'groups') continue;
+    if (!nodeIds.has(e.source) || !nodeIds.has(e.target)) edges.splice(i, 1);
+  }
+
   // --- commit_hash / scope_id 스탬프 ---
   for (const n of nodes) {
     if (commitHash && !n.commit_hash) n.commit_hash = commitHash;
@@ -347,13 +493,14 @@ export function synthesizeGraph(input) {
     edge_count: edges.length,
     by_kind: {
       chain: nodes.filter(n => n.artifact_kind === 'chain').length,
+      plan: nodes.filter(n => n.artifact_kind === 'plan').length,
       analysis: nodes.filter(n => n.artifact_kind === 'analysis').length,
       aspect: nodes.filter(n => n.artifact_kind === 'aspect').length,
     },
     by_state: Object.fromEntries(
       NODE_STATES.map(s => [s, nodes.filter(n => n.state === s).length])
     ),
-    by_edge_type: ['derived_from', 'implements', 'tests', 'depends_on', 'cross_reference', 'informs']
+    by_edge_type: ALL_EDGE_TYPES
       .reduce((acc, t) => {
         acc[t] = edges.filter(e => e.edge_type === t).length;
         return acc;
@@ -362,7 +509,7 @@ export function synthesizeGraph(input) {
 
   // --- header (★ S5 정합) ---
   const derivedFromList = [];
-  for (const key of ['planning', 'behavior', 'acceptance', 'testSpec', 'implSpec']) {
+  for (const key of ['discovery', 'planning', 'behavior', 'acceptance', 'taskPlan', 'operationalTask', 'testSpec', 'implSpec']) {
     if (sourcePaths[key]) derivedFromList.push(sourcePaths[key]);
   }
   for (const p of Object.values(sourcePaths.analysis ?? {})) if (p) derivedFromList.push(p);
@@ -400,9 +547,12 @@ export function loadJson(path) {
 }
 
 // 카탈로그 export — graph-integrity-validator / dep-graph-navigator 에서 재사용
+// ★ v11.0.0 — chain 6 (UC/BHV/AC/TASK/TC/IMPL) + analysis 15 + aspect 4 = 25 deliverable.
+//   plan 조직 노드 (EPIC/STORY/OP) = task-plan 내부 entity / deliverable total 외 (별도 노출).
 export const TIER1_CATALOG = Object.freeze({
   chain: CHAIN_SUBKINDS,
+  plan: PLAN_SUBKINDS,
   analysis: ANALYSIS_SUBKINDS,
   aspect: ASPECT_SUBKINDS,
-  total: CHAIN_SUBKINDS.length + ANALYSIS_SUBKINDS.length + ASPECT_SUBKINDS.length, // = 24
+  total: CHAIN_SUBKINDS.length + ANALYSIS_SUBKINDS.length + ASPECT_SUBKINDS.length, // = 25
 });

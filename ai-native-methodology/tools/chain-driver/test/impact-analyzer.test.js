@@ -351,9 +351,11 @@ describe('출력 구조 (by_grade / 액션 매핑 / 결정성)', () => {
     assert.equal(GRADE_TO_ACTION.ignore, '노출 X');
   });
 
-  it('EDGE_TYPE_CATALOG — hard 4 / soft 2', () => {
-    assert.equal(EDGE_TYPE_CATALOG.hard.length, 4);
-    assert.equal(EDGE_TYPE_CATALOG.soft.length, 2);
+  it('EDGE_TYPE_CATALOG — hard 5 / soft 3 (★ v11.0.0 +conforms_to +groups)', () => {
+    assert.equal(EDGE_TYPE_CATALOG.hard.length, 5);
+    assert.equal(EDGE_TYPE_CATALOG.soft.length, 3);
+    assert.ok(EDGE_TYPE_CATALOG.hard.includes('conforms_to'), 'conforms_to = hard');
+    assert.ok(EDGE_TYPE_CATALOG.soft.includes('groups'), 'groups = soft');
   });
 
   it('동일 입력 → 동일 출력 (결정성, conventions.md §9)', () => {

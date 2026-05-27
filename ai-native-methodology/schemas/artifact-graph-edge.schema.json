@@ -19,13 +19,13 @@
     },
     "edge_type": {
       "type": "string",
-      "enum": ["derived_from", "implements", "tests", "depends_on", "cross_reference", "informs"],
-      "description": "★ 엣지 종류 (6종, 결정 1). hard 4종: derived_from(chain forward) / implements(artifact→code) / tests(TC→IMPL) / depends_on(schema·validator). soft 2종: cross_reference(analysis↔chain) / informs(aspect→chain). BFS 등급 결정에 사용."
+      "enum": ["derived_from", "implements", "tests", "depends_on", "conforms_to", "cross_reference", "informs", "groups"],
+      "description": "★ 엣지 종류 (8종, 결정 1 + ★ v11.0.0 +2). hard 5종: derived_from(chain forward UC→BHV→AC→TASK→TC) / implements(artifact→code leaf) / tests(TC→IMPL) / depends_on(schema·validator) / conforms_to(★ artifact→contract leaf — TASK/TC → openapi/component/visual). soft 3종: cross_reference(analysis↔chain) / informs(aspect→chain) / groups(★ 조직 포함 — Epic→Story→TASK / OP→TASK). BFS 등급 결정에 사용."
     },
     "confidence": {
       "type": "string",
       "enum": ["hard", "soft"],
-      "description": "★ edge_type 에서 도출되지만 schema 에 explicit 으로 저장 (결정 4 BFS 가속·검증). hard = derived_from·implements·tests·depends_on / soft = cross_reference·informs. graph-synthesizer 가 일관성 보장(불일치는 graph-integrity-validator 가 검출)."
+      "description": "★ edge_type 에서 도출되지만 schema 에 explicit 으로 저장 (결정 4 BFS 가속·검증). hard = derived_from·implements·tests·depends_on·conforms_to / soft = cross_reference·informs·groups. graph-synthesizer 가 일관성 보장(불일치는 graph-integrity-validator 가 검출)."
     },
     "commit_hash": {
       "type": "string",

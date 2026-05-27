@@ -104,12 +104,15 @@ describe('confidenceFor — edge_type ↔ confidence 일관성', () => {
 // 3. Tier-1 카탈로그 (24 = 5 + 15 + 4) — conventions.md §1 정수 표기 정합
 // ============================================================================
 
-describe('TIER1_CATALOG — 24 artifact (chain 5 + analysis 15 + aspect 4)', () => {
-  it('total = 24 (정수, conventions.md §1)', () => {
-    assert.equal(TIER1_CATALOG.total, 24);
+describe('TIER1_CATALOG — 25 artifact (chain 6 + analysis 15 + aspect 4) + plan 조직 3 (★ v11.0.0)', () => {
+  it('total = 25 (deliverable / chain 6 + analysis 15 + aspect 4)', () => {
+    assert.equal(TIER1_CATALOG.total, 25);
   });
-  it('chain subkinds = 5', () => {
-    assert.deepEqual([...TIER1_CATALOG.chain], ['UC', 'BHV', 'AC', 'TC', 'IMPL']);
+  it('chain subkinds = 6 (★ v11.0.0 +TASK / UC→BHV→AC→TASK→TC→IMPL)', () => {
+    assert.deepEqual([...TIER1_CATALOG.chain], ['UC', 'BHV', 'AC', 'TASK', 'TC', 'IMPL']);
+  });
+  it('plan 조직 subkinds = 3 (EPIC / STORY / OP / deliverable total 외)', () => {
+    assert.deepEqual([...TIER1_CATALOG.plan], ['EPIC', 'STORY', 'OP']);
   });
   it('analysis subkinds = 15', () => {
     assert.equal(TIER1_CATALOG.analysis.length, 15);
@@ -445,5 +448,129 @@ describe('header + stats (★ S5 derived_from / do_not_edit_manually)', () => {
     assert.equal(g.stats.by_edge_type.cross_reference, 3);
     assert.equal(g.stats.by_edge_type.informs, 1);
     assert.equal(g.stats.by_edge_type.depends_on, 0);
+  });
+});
+
+// ============================================================================
+// 8. ★ v11.0.0 paradigm — 6-layer chain (TASK) + plan 조직 노드 + contract leaf
+//    (plan-dep-graph-v11-paradigm-cascade.md §8 DESIGN)
+// ============================================================================
+
+const v11Input = {
+  // ★ discovery (planning alias 대체) — UC source
+  discovery: { use_cases: [{ id: 'UC-USER-001', name: '회원가입' }] },
+  behavior: { behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'] }] },
+  acceptance: { criteria: [{ id: 'AC-USER-001', behavior_ref: 'BHV-USER-001' }] },
+  // ★ plan stage — TASK + 조직 ref (epic/story/op)
+  taskPlan: {
+    epic_refs: [{ screen_id: 'SCREEN-REGISTER', title: '회원가입 화면' }],
+    story_refs: [{ behavior_ref: 'BHV-USER-001', epic_ref: 'SCREEN-REGISTER', title: '가입 스토리' }],
+    op_task_refs: [{ op_task_id: 'OP-USER-001', category: 'infra', title: 'DB 마이그' }],
+    tasks: [{
+      id: 'TASK-USER-001',
+      layer: 'be',
+      ac_refs: ['AC-USER-001'],
+      tc_refs: ['TC-USER-001'],
+      story_ref: 'STORY-USER-001',
+      op_task_ref: 'OP-USER-001',
+      openapi_endpoint_ref: { path: '/users', operationId: 'registerUser', method: 'post' },
+    }],
+  },
+  testSpec: { test_cases: [{
+    id: 'TC-USER-001', ac_ref: 'AC-USER-001',
+    openapi_contract_ref: { path: '/users', operationId: 'registerUser', method: 'post', contract_file: 'openapi.yaml' },
+  }] },
+  implSpec: { modules: [{ id: 'IMPL-USER-001', tc_refs: ['TC-USER-001'], source_files: ['src/user.ts'] }] },
+  sourcePaths: {
+    discovery: 'discovery-spec.json', behavior: 'behavior-spec.json',
+    acceptance: 'acceptance-criteria.json', taskPlan: 'task-plan.json',
+    testSpec: 'test-spec.json', implSpec: 'impl-spec.json',
+  },
+};
+
+describe('synthesizeGraph — ★ v11.0.0 6-layer chain + plan 조직 + contract', () => {
+  it('TASK 노드 생성 (artifact_kind=chain / subkind=TASK / layer=be 속성)', () => {
+    const g = synthesizeGraph(v11Input);
+    const task = g.nodes.find(n => n.id === 'TASK-USER-001');
+    assert.ok(task, 'TASK 노드 존재');
+    assert.equal(task.artifact_kind, 'chain');
+    assert.equal(task.artifact_subkind, 'TASK');
+    assert.equal(task.layer, 'be', 'BE/FE axis = layer 속성');
+  });
+
+  it('6-layer chain forward: AC→TASK→TC (derived_from) + AC→TC shortcut 억제', () => {
+    const g = synthesizeGraph(v11Input);
+    const der = g.edges.filter(e => e.edge_type === 'derived_from').map(e => `${e.source}->${e.target}`);
+    assert.ok(der.includes('AC-USER-001->TASK-USER-001'), 'AC→TASK');
+    assert.ok(der.includes('TASK-USER-001->TC-USER-001'), 'TASK→TC');
+    assert.ok(!der.includes('AC-USER-001->TC-USER-001'), 'TASK 점유 시 AC→TC shortcut 억제');
+  });
+
+  it('task-plan 부재 시 AC→TC fallback 보존 (backward compat)', () => {
+    const noTask = { ...v11Input, taskPlan: null };
+    const g = synthesizeGraph(noTask);
+    const der = g.edges.filter(e => e.edge_type === 'derived_from').map(e => `${e.source}->${e.target}`);
+    assert.ok(der.includes('AC-USER-001->TC-USER-001'), 'task 부재 → AC→TC 직접');
+    assert.ok(!g.nodes.some(n => n.artifact_subkind === 'TASK'), 'TASK 노드 없음');
+  });
+
+  it('plan 조직 노드: EPIC / STORY / OP (artifact_kind=plan)', () => {
+    const g = synthesizeGraph(v11Input);
+    const plan = g.nodes.filter(n => n.artifact_kind === 'plan');
+    const ids = plan.map(n => `${n.artifact_subkind}:${n.id}`).sort();
+    assert.deepEqual(ids, ['EPIC:SCREEN-REGISTER', 'OP:OP-USER-001', 'STORY:STORY-USER-001']);
+  });
+
+  it('groups 엣지 (soft): Epic→Story / Story→TASK / OP→TASK', () => {
+    const g = synthesizeGraph(v11Input);
+    const grp = g.edges.filter(e => e.edge_type === 'groups');
+    const pairs = grp.map(e => `${e.source}->${e.target}`).sort();
+    assert.deepEqual(pairs, [
+      'OP-USER-001->TASK-USER-001',
+      'SCREEN-REGISTER->STORY-USER-001',
+      'STORY-USER-001->TASK-USER-001',
+    ]);
+    assert.ok(grp.every(e => e.confidence === 'soft'));
+  });
+
+  it('dangling groups prune — 존재하지 않는 노드 참조 시 제거', () => {
+    const orphanRef = {
+      ...v11Input,
+      taskPlan: { ...v11Input.taskPlan,
+        tasks: [{ ...v11Input.taskPlan.tasks[0], story_ref: 'STORY-MISSING-999', op_task_ref: 'OP-MISSING-999' }] },
+    };
+    const g = synthesizeGraph(orphanRef);
+    const grp = g.edges.filter(e => e.edge_type === 'groups').map(e => `${e.source}->${e.target}`);
+    assert.ok(!grp.some(p => p.includes('MISSING')), 'dangling groups 제거됨');
+  });
+
+  it('conforms_to 엣지 (hard leaf): TASK→openapi contract + TC→openapi contract', () => {
+    const g = synthesizeGraph(v11Input);
+    const cf = g.edges.filter(e => e.edge_type === 'conforms_to');
+    const pairs = cf.map(e => `${e.source}->${e.target}`).sort();
+    assert.deepEqual(pairs, [
+      'TASK-USER-001->contract:openapi:POST /users',
+      'TC-USER-001->contract:openapi:POST /users',
+    ]);
+    assert.ok(cf.every(e => e.confidence === 'hard'));
+  });
+
+  it('stats: by_kind.plan + by_edge_type.groups/conforms_to', () => {
+    const g = synthesizeGraph(v11Input);
+    assert.equal(g.stats.by_kind.plan, 3);
+    assert.equal(g.stats.by_kind.chain, 6); // UC/BHV/AC/TASK/TC/IMPL
+    assert.equal(g.stats.by_edge_type.groups, 3);
+    assert.equal(g.stats.by_edge_type.conforms_to, 2);
+  });
+
+  it('planning alias = discovery (backward compat)', () => {
+    const aliased = { ...v11Input, discovery: undefined, planning: v11Input.discovery };
+    const g = synthesizeGraph({ ...aliased, planning: { use_cases: [{ id: 'UC-USER-001', name: 'x' }] } });
+    assert.ok(g.nodes.some(n => n.id === 'UC-USER-001'), 'planning alias 로도 UC 합성');
+  });
+
+  it('confidenceFor: conforms_to=hard / groups=soft', () => {
+    assert.equal(confidenceFor('conforms_to'), 'hard');
+    assert.equal(confidenceFor('groups'), 'soft');
   });
 });

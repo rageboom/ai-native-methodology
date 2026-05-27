@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/artifact-graph-node.schema.json",
-  "title": "Artifact Graph Node (24-node Tier-1)",
-  "description": "artifact-graph.json 의 노드. Tier-1 권위 노드 24개(chain 5 + analysis 15 + aspect 4) 만 모델링. Tier-2(schema/hook/validator/skill/source file)는 속성 노드로 leaf 취급. 운영 plan: docs/dependency-graph.md §2 (그래프 모델).",
+  "title": "Artifact Graph Node (Tier-1 + plan 조직)",
+  "description": "artifact-graph.json 의 노드. ★ v11.0.0 — Tier-1 deliverable 25개(chain 6 + analysis 15 + aspect 4) + plan 조직 노드 3종(EPIC/STORY/OP). Tier-2(schema/hook/validator/skill/source file/contract leaf)는 속성/leaf 취급. 운영 plan: docs/dependency-graph.md §2 (그래프 모델).",
   "type": "object",
   "required": ["id", "artifact_kind", "artifact_subkind", "source_path", "state"],
   "additionalProperties": false,
@@ -10,16 +10,20 @@
     "id": {
       "type": "string",
       "minLength": 1,
-      "description": "노드 고유 식별자. chain artifact = ID 형식 (예: UC-USER-001, BHV-USER-001, AC-USER-001, TC-USER-001, IMPL-USER-001). analysis·aspect = '<kind>-<scope>' 형식 (예: analysis-domain, aspect-a11y)."
+      "description": "노드 고유 식별자. chain artifact = ID 형식 (예: UC-USER-001, BHV-USER-001, AC-USER-001, TASK-USER-001, TC-USER-001, IMPL-USER-001). plan 조직 = EPIC(screen_id/jira_id) / STORY-<scope>-NNN / OP-<scope>-NNN. analysis·aspect = '<kind>-<scope>' 형식 (예: analysis-domain, aspect-a11y)."
     },
     "artifact_kind": {
       "type": "string",
-      "enum": ["chain", "analysis", "aspect"],
-      "description": "★ Tier-1 분류 (3종). chain = 5 chain artifact (UC/BHV/AC/TC/IMPL). analysis = 15 analysis 산출물. aspect = 4 aspect (a11y/i18n/static-security/legacy-spectrum)."
+      "enum": ["chain", "plan", "analysis", "aspect"],
+      "description": "★ Tier-1 분류 (4종). ★ v11.0.0 — chain = 6 chain artifact (UC/BHV/AC/TASK/TC/IMPL). plan = 조직 노드 (EPIC/STORY/OP / task-plan 내부 entity). analysis = 15 analysis 산출물. aspect = 4 aspect (a11y/i18n/static-security/legacy-spectrum)."
     },
     "artifact_subkind": {
       "type": "string",
-      "description": "하위 종류 라벨. chain: UC|BHV|AC|TC|IMPL. analysis: inventory|architecture|domain|business-rules|openapi|db-schema|finding-list|ui-ux|antipatterns|state-map|visual-manifest|form-validation-spec|type-spec|… analysis 15종 한정. aspect: a11y|i18n|static-security|legacy-spectrum."
+      "description": "하위 종류 라벨. chain: UC|BHV|AC|TASK|TC|IMPL (★ v11.0.0 TASK = plan stage). plan: EPIC|STORY|OP. analysis: inventory|architecture|domain|business-rules|openapi|db-schema|finding-list|ui-ux|antipatterns|state-map|visual-manifest|form-validation-spec|type-spec|… analysis 15종 한정. aspect: a11y|i18n|static-security|legacy-spectrum."
+    },
+    "layer": {
+      "type": "string",
+      "description": "★ v11.0.0 BE/FE axis (DEC-2026-05-26-be-fe-산출물-분리). TASK 노드의 작업 layer. tech-track: be|fe|db|e2e|infra / hexagonal(legacy): domain|application|infrastructure|presentation|cross-cutting. 그래프 폭증 회피 (§2): 별도 노드 아닌 노드 속성으로 BE/FE 구분."
     },
     "title": {
       "type": "string",

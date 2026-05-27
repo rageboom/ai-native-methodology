@@ -5,25 +5,30 @@
 
 ## 1. 한 줄 요약
 
-24개 Tier-1 artifact (chain 5 + analysis 15 + aspect 4) 사이의 의존성을 **결정적 알고리즘**으로 추적·계산·시각화·검증한다. 사람은 도메인·승인 결정에만 개입 (§7 기계적 동작 우선).
+25개 Tier-1 deliverable (chain 6 + analysis 15 + aspect 4) + plan 조직 노드 3종(Epic/Story/OP) 사이의 의존성을 **결정적 알고리즘**으로 추적·계산·시각화·검증한다. 사람은 도메인·승인 결정에만 개입 (§7 기계적 동작 우선). ★ v11.0.0 — 6-layer chain (discovery→spec→plan→test→implement) + BE/FE axis + contract 강제 양 axis 반영.
 
-## 2. 그래프 모델 (operation.md 결정 1)
+## 2. 그래프 모델 (operation.md 결정 1 + ★ v11.0.0 paradigm)
 
-- **노드**: 24 Tier-1 artifact.
-  - chain instance: `UC-* / BHV-* / AC-* / TC-* / IMPL-*`
+- **노드**: 25 Tier-1 deliverable + plan 조직 3.
+  - chain instance (6 layer): `UC-* / BHV-* / AC-* / TASK-* / TC-* / IMPL-*` (★ v11.0.0 +TASK = plan stage)
+    - ★ BE/FE axis = TASK 노드의 `layer` 속성 (be/fe/db/e2e/infra / 그래프 폭증 회피 — 별도 노드 아님)
+  - plan 조직 (artifact_kind=`plan`): `EPIC`(FE 화면 / screen_id) / `STORY-*`(cross-cut anchor / BHV 기준) / `OP-*`(Story sibling 운영 task)
   - analysis kind: `analysis-domain`, `analysis-business-rules`, … (15종)
   - aspect kind: `aspect-a11y`, `aspect-i18n`, `aspect-static-security`, `aspect-legacy-spectrum`
-  - Tier-2 (schema/hook/validator/skill/source file) = leaf, 노드 추가 안 함 (그래프 폭증 회피)
-- **엣지** (6종 = hard 4 + soft 2):
+  - Tier-2 (schema/hook/validator/skill/source file/contract leaf) = leaf, 노드 추가 안 함 (그래프 폭증 회피)
+- **엣지** (8종 = hard 5 + soft 3 / ★ v11.0.0 +2):
   | edge_type | confidence | 의미 |
   |---|---|---|
-  | `derived_from` | hard | chain forward (UC→BHV→AC→TC) |
+  | `derived_from` | hard | chain forward (UC→BHV→AC→TASK→TC) |
   | `tests` | hard | TC→IMPL |
   | `implements` | hard | IMPL→코드 (Tier-2 leaf target) |
   | `depends_on` | hard | schema/validator 의존 |
+  | `conforms_to` | hard | ★ artifact→contract leaf (TASK/TC → openapi/component/visual) |
   | `cross_reference` | soft | analysis ↔ chain |
   | `informs` | soft | aspect → chain |
+  | `groups` | soft | ★ 조직 포함 (Epic→Story / Story→TASK / OP→TASK) |
 - **노드 상태** (4-state): `active` / `drift` / `propose` / `deprecated`
+- **TASK 삽입 규약**: task-plan 존재 시 chain forward 는 `AC→TASK→TC` (직접 `AC→TC` shortcut 억제). task-plan 부재 시 `AC→TC` fallback 보존 (backward compat).
 
 ## 3. 도구 맵 (Phase 별)
 
@@ -45,14 +50,17 @@
 
 ```bash
 node tools/traceability-matrix-builder/src/cli.js \
-  --planning .aimd/output/planning-spec.json \
+  --discovery .aimd/output/discovery-spec.json \
   --behavior .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
+  --task-plan .aimd/output/task-plan.json \
   --test-spec .aimd/output/test-spec.json \
   --impl-spec .aimd/output/impl-spec.json \
   --analysis-dir .aimd/output/ --aspect-dir .aimd/output/ \
   --out-dir .aimd/output/ --graph
 ```
+
+> ★ v11.0.0 — `--discovery` (구 `--planning` alias 보존) + `--task-plan` (plan stage TASK/Epic/Story/OP) + `--operational-task` (OP 보강 optional).
 
 → `.aimd/output/artifact-graph.json` 산출 (matrix.{json,md,mermaid} 와 함께).
 
@@ -91,10 +99,12 @@ node tools/code-pointer-validator/src/cli.js .aimd/output/artifact-graph.json --
 
 | 첫 hop | base |
 |---|---|
-| hard | MUST |
-| soft cross_reference | SHOULD |
+| hard (derived_from / implements / tests / depends_on / conforms_to) | MUST |
+| soft cross_reference / groups | SHOULD |
 | soft informs | FYI |
 | soft 2-hop+ | ignore |
+
+> ★ v11.0.0 예: contract(openapi) 변경 → `conforms_to` 로 연결된 TASK/TC = MUST sync. Story 변경 → `groups` 로 연결된 직속 TASK + Epic = SHOULD (1-hop), 그 너머 TC = FYI (감쇠).
 
 **Step 2 — hard chain 따라가며 감쇠**: MUST→MUST(끝까지) / SHOULD→FYI→ignore / FYI→ignore.
 

@@ -34,9 +34,12 @@ function parseArgs(argv) {
   const out = { dryRun: false, graph: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--planning') out.planning = argv[++i];
+    if (a === '--discovery') out.discovery = argv[++i];        // ★ v11.0.0 primary
+    else if (a === '--planning') out.planning = argv[++i];     // ★ backward-compat alias of --discovery
     else if (a === '--behavior') out.behavior = argv[++i];
     else if (a === '--acceptance') out.acceptance = argv[++i];
+    else if (a === '--task-plan') out.taskPlan = argv[++i];    // ★ v11.0.0 plan stage
+    else if (a === '--operational-task') out.operationalTask = argv[++i]; // ★ v11.0.0 OP 보강 (optional)
     else if (a === '--test-spec') out.testSpec = argv[++i];
     else if (a === '--impl-spec') out.implSpec = argv[++i];
     else if (a === '--out-dir') out.outDir = argv[++i];
@@ -51,7 +54,8 @@ function parseArgs(argv) {
     // ──────────────────────────────────────────────────────────────
     else if (a === '--help' || a === '-h') {
       console.log(`usage: traceability-matrix-builder --behavior <path> --acceptance <path> \\
-            [--planning <path>] [--test-spec <path>] [--impl-spec <path>] \\
+            [--discovery <path>] [--task-plan <path>] [--operational-task <path>] \\
+            [--test-spec <path>] [--impl-spec <path>] \\
             [--out-dir <dir>] [--dry-run] \\
             [--graph] [--analysis-dir <dir>] [--aspect-dir <dir>] \\
             [--previous-graph <path>] [--scope-id <id>] [--commit-hash <sha>]
@@ -69,13 +73,16 @@ if (!args.behavior || !args.acceptance) {
   console.error('error: --behavior and --acceptance required');
   process.exit(2);
 }
+const discoveryArg = args.discovery ?? args.planning; // ★ v11.0.0 discovery 우선 / planning alias
 const chain = {
-  planning: args.planning ? loadJson(args.planning) : null,
+  planning: discoveryArg ? loadJson(discoveryArg) : null,
   behavior: loadJson(args.behavior),
   acceptance: loadJson(args.acceptance),
+  taskPlan: args.taskPlan ? loadJson(args.taskPlan) : null,
   testSpec: args.testSpec ? loadJson(args.testSpec) : null,
   implSpec: args.implSpec ? loadJson(args.implSpec) : null,
 };
+const operationalTaskData = args.operationalTask ? loadJson(args.operationalTask) : null;
 
 const matrix = buildMatrix(chain);
 const md = renderMarkdown(matrix);
@@ -122,11 +129,13 @@ if (args.graph) {
   }
   const previousGraph = args.previousGraph ? loadJson(args.previousGraph) : null;
   const graph = synthesizeGraph({
-    planning: chain.planning, behavior: chain.behavior, acceptance: chain.acceptance,
+    discovery: chain.planning, behavior: chain.behavior, acceptance: chain.acceptance,
+    taskPlan: chain.taskPlan, operationalTask: operationalTaskData,
     testSpec: chain.testSpec, implSpec: chain.implSpec,
     analysis, aspect,
     sourcePaths: {
-      planning: args.planning, behavior: args.behavior, acceptance: args.acceptance,
+      discovery: discoveryArg, behavior: args.behavior, acceptance: args.acceptance,
+      taskPlan: args.taskPlan, operationalTask: args.operationalTask,
       testSpec: args.testSpec, implSpec: args.implSpec,
       analysis: analysisPaths, aspect: aspectPaths,
     },
@@ -134,7 +143,7 @@ if (args.graph) {
     scopeId: args.scopeId,
     commitHash: args.commitHash,
   });
-  console.log(`[graph-synthesizer] nodes=${graph.stats.node_count} edges=${graph.stats.edge_count} chain=${graph.stats.by_kind.chain} analysis=${graph.stats.by_kind.analysis} aspect=${graph.stats.by_kind.aspect}`);
+  console.log(`[graph-synthesizer] nodes=${graph.stats.node_count} edges=${graph.stats.edge_count} chain=${graph.stats.by_kind.chain} plan=${graph.stats.by_kind.plan} analysis=${graph.stats.by_kind.analysis} aspect=${graph.stats.by_kind.aspect}`);
   console.log(`  by_state: ${JSON.stringify(graph.stats.by_state)}`);
   console.log(`  by_edge_type: ${JSON.stringify(graph.stats.by_edge_type)}`);
   if (args.outDir && !args.dryRun) {

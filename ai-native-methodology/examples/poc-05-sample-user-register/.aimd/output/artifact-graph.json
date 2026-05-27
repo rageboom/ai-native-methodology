@@ -1,8 +1,9 @@
 {
   "derived_from": [
-    "examples/poc-05-sample-user-register/.aimd/output/planning-spec.json",
+    "examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json",
     "examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json",
     "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
+    "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
     "examples/poc-05-sample-user-register/.aimd/output/test-spec.json",
     "examples/poc-05-sample-user-register/.aimd/output/impl-spec.json"
   ],
@@ -11,27 +12,25 @@
     "node": "artifact-graph-node.schema.json",
     "edge": "artifact-graph-edge.schema.json"
   },
-  "synthesized_at": "2026-05-22T02:57:31.617Z",
+  "synthesized_at": "2026-05-27T02:23:42.748Z",
   "nodes": [
     {
       "id": "UC-USER-001",
       "artifact_kind": "chain",
       "artifact_subkind": "UC",
-      "source_path": "examples/poc-05-sample-user-register/.aimd/output/planning-spec.json",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json",
       "state": "active",
       "title": "신규 사용자 등록",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
     },
     {
       "id": "UC-USER-002",
       "artifact_kind": "chain",
       "artifact_subkind": "UC",
-      "source_path": "examples/poc-05-sample-user-register/.aimd/output/planning-spec.json",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json",
       "state": "active",
       "title": "로그인",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
     },
     {
       "id": "BHV-USER-001",
@@ -40,8 +39,7 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json",
       "state": "active",
       "title": "신규 사용자 등록 동작",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
     },
     {
       "id": "BHV-USER-002",
@@ -50,8 +48,7 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json",
       "state": "active",
       "title": "로그인 동작",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
     },
     {
       "id": "AC-USER-001",
@@ -60,8 +57,7 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
       "state": "active",
       "title": "이메일 중복 등록 시 409 Conflict (BR-USER-DATA-001).",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
     },
     {
       "id": "AC-USER-002",
@@ -70,8 +66,27 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
       "state": "active",
       "title": "올바른 자격증명으로 login 시 user 객체 반환 / 불일치 시 401.",
-      "code_pointers_na": true,
-      "commit_hash": "deadbee"
+      "code_pointers_na": true
+    },
+    {
+      "id": "TASK-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "신규 사용자 등록 — email unique 강제 + password 해싱 + 409 Conflict",
+      "layer": "be",
+      "code_pointers_na": true
+    },
+    {
+      "id": "TASK-USER-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "로그인 — credential 검증 + 401 / user 객체 반환",
+      "layer": "be",
+      "code_pointers_na": true
     },
     {
       "id": "TC-USER-001",
@@ -84,8 +99,7 @@
           "path": "target/src/user.service.test.ts",
           "anchor_type": "strict_path"
         }
-      ],
-      "commit_hash": "deadbee"
+      ]
     },
     {
       "id": "TC-USER-002",
@@ -98,8 +112,7 @@
           "path": "target/src/user.service.test.ts",
           "anchor_type": "strict_path"
         }
-      ],
-      "commit_hash": "deadbee"
+      ]
     },
     {
       "id": "IMPL-USER-001",
@@ -123,8 +136,7 @@
           "anchor_type": "strict_path",
           "commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
         }
-      ],
-      "commit_hash": "deadbee"
+      ]
     },
     {
       "id": "IMPL-USER-002",
@@ -143,8 +155,39 @@
           "anchor_type": "strict_path",
           "commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
         }
-      ],
-      "commit_hash": "deadbee"
+      ]
+    },
+    {
+      "id": "SCREEN-AUTH",
+      "artifact_kind": "plan",
+      "artifact_subkind": "EPIC",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "인증 화면 (회원가입 + 로그인) — FE Epic"
+    },
+    {
+      "id": "STORY-USER-001",
+      "artifact_kind": "plan",
+      "artifact_subkind": "STORY",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "회원가입 Story (cross-cut BHV-USER-001 / AC-USER-001)"
+    },
+    {
+      "id": "STORY-USER-002",
+      "artifact_kind": "plan",
+      "artifact_subkind": "STORY",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "로그인 Story (cross-cut BHV-USER-002 / AC-USER-002)"
+    },
+    {
+      "id": "OP-USER-001",
+      "artifact_kind": "plan",
+      "artifact_subkind": "OP",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "users 테이블 email UNIQUE constraint + 인덱스 마이그레이션 (race-safe)"
     }
   ],
   "edges": [
@@ -152,50 +195,55 @@
       "source": "UC-USER-001",
       "target": "BHV-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "UC-USER-002",
       "target": "BHV-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "BHV-USER-001",
       "target": "AC-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "BHV-USER-002",
       "target": "AC-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "AC-USER-001",
+      "target": "TASK-USER-001",
+      "edge_type": "derived_from",
+      "confidence": "hard"
+    },
+    {
+      "source": "TASK-USER-001",
       "target": "TC-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "AC-USER-002",
+      "target": "TASK-USER-002",
+      "edge_type": "derived_from",
+      "confidence": "hard"
+    },
+    {
+      "source": "TASK-USER-002",
       "target": "TC-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "TC-USER-001",
       "target": "IMPL-USER-001",
       "edge_type": "tests",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "IMPL-USER-001",
@@ -222,8 +270,7 @@
       "source": "TC-USER-002",
       "target": "IMPL-USER-002",
       "edge_type": "tests",
-      "confidence": "hard",
-      "commit_hash": "deadbee"
+      "confidence": "hard"
     },
     {
       "source": "IMPL-USER-002",
@@ -238,30 +285,80 @@
       "edge_type": "implements",
       "confidence": "hard",
       "commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
+    },
+    {
+      "source": "SCREEN-AUTH",
+      "target": "STORY-USER-001",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "SCREEN-AUTH",
+      "target": "STORY-USER-002",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "STORY-USER-001",
+      "target": "TASK-USER-001",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "OP-USER-001",
+      "target": "TASK-USER-001",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "TASK-USER-001",
+      "target": "contract:openapi:POST /api/users",
+      "edge_type": "conforms_to",
+      "confidence": "hard"
+    },
+    {
+      "source": "STORY-USER-002",
+      "target": "TASK-USER-002",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "OP-USER-001",
+      "target": "TASK-USER-002",
+      "edge_type": "groups",
+      "confidence": "soft"
+    },
+    {
+      "source": "TASK-USER-002",
+      "target": "contract:openapi:POST /api/users/login",
+      "edge_type": "conforms_to",
+      "confidence": "hard"
     }
   ],
   "stats": {
-    "node_count": 10,
-    "edge_count": 13,
+    "node_count": 16,
+    "edge_count": 23,
     "by_kind": {
-      "chain": 10,
+      "chain": 12,
+      "plan": 4,
       "analysis": 0,
       "aspect": 0
     },
     "by_state": {
-      "active": 10,
+      "active": 16,
       "drift": 0,
       "propose": 0,
       "deprecated": 0
     },
     "by_edge_type": {
-      "derived_from": 6,
+      "derived_from": 8,
       "implements": 5,
       "tests": 2,
       "depends_on": 0,
+      "conforms_to": 2,
       "cross_reference": 0,
-      "informs": 0
+      "informs": 0,
+      "groups": 6
     }
-  },
-  "commit_hash": "deadbee"
+  }
 }

@@ -16,7 +16,9 @@ const EDGE_WEIGHT = Object.freeze({
   implements: 1.0,
   tests: 1.0,
   depends_on: 1.0,
+  conforms_to: 1.0,     // ★ v11.0.0 hard — contract 준수 (결정 4 MUST)
   cross_reference: 0.5, // soft — 1-hop 만 영향 (결정 4 SHOULD)
+  groups: 0.5,          // ★ v11.0.0 soft — 조직 포함 1-hop (결정 4 SHOULD)
   informs: 0.25,        // soft — 권고성 (결정 4 FYI)
 });
 

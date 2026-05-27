@@ -4,7 +4,8 @@
     "behavior-spec.json",
     "acceptance-criteria.json",
     "test-spec.json",
-    "impl-spec.json"
+    "impl-spec.json",
+    "task-plan.json"
   ],
   "do_not_edit_manually": true,
   "matrix": [
@@ -24,6 +25,7 @@
       ],
       "status": "green",
       "severity": "critical",
+      "task_id": "TASK-USER-001",
       "impl_commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
     },
     {
@@ -36,6 +38,7 @@
       "antipattern_ids": [],
       "status": "green",
       "severity": "critical",
+      "task_id": "TASK-USER-002",
       "impl_commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
     }
   ],

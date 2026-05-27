@@ -18,9 +18,18 @@
       "description": "POST /api/users 진입 → input 검증 → email unique 확인 (DB unique constraint + race 안전) → password argon2id 해싱 → 저장 → 201 + user (id + email). 중복 이메일 시 409.",
       "ac_refs": ["AC-USER-001"],
       "behavior_ref": "BHV-USER-001",
+      "tc_refs": ["TC-USER-001"],
       "execution_order": 1,
-      "layer": "application",
-      "module": "user"
+      "layer": "be",
+      "module": "user",
+      "code_pointers_na": true,
+      "story_ref": "STORY-USER-001",
+      "op_task_ref": "OP-USER-001",
+      "openapi_endpoint_ref": {
+        "path": "/api/users",
+        "operationId": "registerUser",
+        "method": "post"
+      }
     },
     {
       "id": "TASK-USER-002",
@@ -28,9 +37,50 @@
       "description": "POST /api/users/login 진입 → email lookup → password verify (argon2 timing-safe) → 성공 시 user 객체 반환 (token 발급은 별도 task) / 실패 시 401 (email 존재 여부 노출 ❌ — 동일 응답).",
       "ac_refs": ["AC-USER-002"],
       "behavior_ref": "BHV-USER-002",
+      "tc_refs": ["TC-USER-002"],
       "execution_order": 2,
-      "layer": "application",
-      "module": "user"
+      "layer": "be",
+      "module": "user",
+      "code_pointers_na": true,
+      "story_ref": "STORY-USER-002",
+      "op_task_ref": "OP-USER-001",
+      "openapi_endpoint_ref": {
+        "path": "/api/users/login",
+        "operationId": "loginUser",
+        "method": "post"
+      }
+    }
+  ],
+  "epic_refs": [
+    {
+      "jira_id": "DWPD-1500",
+      "screen_id": "SCREEN-AUTH",
+      "route": "/auth",
+      "title": "인증 화면 (회원가입 + 로그인) — FE Epic"
+    }
+  ],
+  "story_refs": [
+    {
+      "jira_id": "DWPD-1501",
+      "behavior_ref": "BHV-USER-001",
+      "ac_refs": ["AC-USER-001"],
+      "epic_ref": "SCREEN-AUTH",
+      "title": "회원가입 Story (cross-cut BHV-USER-001 / AC-USER-001)"
+    },
+    {
+      "jira_id": "DWPD-1502",
+      "behavior_ref": "BHV-USER-002",
+      "ac_refs": ["AC-USER-002"],
+      "epic_ref": "SCREEN-AUTH",
+      "title": "로그인 Story (cross-cut BHV-USER-002 / AC-USER-002)"
+    }
+  ],
+  "op_task_refs": [
+    {
+      "jira_id": "DWPD-1510",
+      "op_task_id": "OP-USER-001",
+      "category": "infra",
+      "title": "users 테이블 email UNIQUE constraint + 인덱스 마이그레이션 (race-safe)"
     }
   ],
   "adrs": [

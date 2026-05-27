@@ -4,8 +4,8 @@
 //
 // 알고리즘:
 //   Step 1 — 변경 origin 에서 BFS, 첫 hop 의 엣지 종류로 base 등급 결정
-//     hard (derived_from/implements/tests/depends_on) → MUST
-//     soft cross_reference → SHOULD
+//     hard (derived_from/implements/tests/depends_on/conforms_to) → MUST
+//     soft cross_reference / groups → SHOULD
 //     soft informs → FYI
 //     soft 2-hop 이상 → ignore (Step 2 가 hard chain 만 follow)
 //   Step 2 — base 등급에서 hard chain 을 더 따라가면 한 단계씩 감쇠
@@ -16,8 +16,9 @@
 // 방향: forward(origin→하류) + backward(origin←상류) 양방향 (결정 4 적용 전제).
 // 노드 상태: active/drift 만 traverse. propose 는 BFS 대상에서 제외 (결정 8 상호작용).
 
-const HARD_EDGES = new Set(['derived_from', 'implements', 'tests', 'depends_on']);
-const SOFT_EDGES = new Set(['cross_reference', 'informs']);
+// ★ v11.0.0 — conforms_to (artifact→contract leaf, hard) + groups (조직 포함, soft) 신설.
+const HARD_EDGES = new Set(['derived_from', 'implements', 'tests', 'depends_on', 'conforms_to']);
+const SOFT_EDGES = new Set(['cross_reference', 'informs', 'groups']);
 
 // 등급 우선순위 (multi-path 시 max 채택)
 const GRADE_RANK = Object.freeze({ ignore: 0, FYI: 1, SHOULD: 2, MUST: 3 });
@@ -29,8 +30,10 @@ const DEFAULT_BASE_GRADE_MAP = Object.freeze({
   implements: 'MUST',
   tests: 'MUST',
   depends_on: 'MUST',
+  conforms_to: 'MUST',     // ★ v11.0.0 — contract 변경 → 준수 artifact MUST sync (hard)
   cross_reference: 'SHOULD',
   informs: 'FYI',
+  groups: 'SHOULD',        // ★ v11.0.0 — 조직 layer 변경(Story/Epic/OP) → 직속 child SHOULD 검토 (soft 1-hop)
 });
 
 // code-pointer-only patch backward 규칙 (결정 5 보조 — 본문 무변경일 때 backward 한 단계 보수적)
