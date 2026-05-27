@@ -1,0 +1,12 @@
+{
+  "name": "@ai-native-methodology/analysis-extraction-validator",
+  "version": "0.1.0",
+  "description": "v11.0.3 analysis stage source-grounded validator — figma-extract / plan-doc-extract 의 provenance(verbatim|inferred) coverage + TEXT 노드 verbatim 의무 검증. F-162/F-163 의 구조적 비대칭 해소 (discovery-extraction-validator 대칭).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "analysis-extraction-validator": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

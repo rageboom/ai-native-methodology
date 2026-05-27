@@ -9,6 +9,30 @@
 
 ---
 
+## [11.0.3] — 2026-05-27 PATCH — analysis-extraction-validator 신설 (F-162·F-163 구조적 carry 청산)
+
+> F-162 / F-163 의 근본 carry — analysis stage 의 source-grounded hard gate 부재 — 를 validator 신설로 청산. discovery-extraction-validator 가 discovery stage 에 한 것을 analysis stage 입력 어댑터 산출물에 대칭 적용. tools 21종 → 22종.
+
+### Added
+
+- **`tools/analysis-extraction-validator/`** (신규 npm workspace / 13 test pass):
+  - figma-extract / plan-doc-extract adapter 자동 감지 (`components`·`screens` → figma / `uc_candidates`·`glossary` → plan-doc)
+  - 검증: TEXT 노드 `text_content` 부재 → **critical** (F-162) / `provenance` 부재 또는 가시 텍스트 `inferred` → **high** (F-163) / `inferred` 비율 > threshold(default 0.5) → **medium** (사용자 확인 권고)
+  - CLI: `--extract <path> [--threshold <0..1>] [--dry-run] [--json]` / critical·high 시 exit 1
+- **`root package.json` workspaces**: `tools/analysis-extraction-validator` 등록.
+
+### Changed
+
+- `skills/analysis-from-figma/SKILL.md` + `skills/analysis-from-plan-doc/SKILL.md`: 산출 자격 조건에 validator 자동 검증 명령 참조 추가.
+- `methodology-spec/finding-system.md`: F-162 / F-163 의 validator carry → **resolved** 갱신 (swagger evidence 필드만 잔여 carry).
+- `CLAUDE.md`: tools 21종 → 22종.
+
+### 잔여 carry (δ 후속)
+
+- `swagger-extract` evidence 필드 (LOW / parser verbatim 추출이라 후순위).
+
+---
+
 ## [11.0.2] — 2026-05-27 PATCH — F-163 input-adapter source-grounded 비대칭 전수 점검 + plan-doc fix
 
 > F-162 후속 sweep. analysis stage 5 adapter vs discovery stage 4 adapter 의 source-grounded 의무 전수 대조 — figma 단발 누락이 아닌 stage 전반 구조적 비대칭 확인.

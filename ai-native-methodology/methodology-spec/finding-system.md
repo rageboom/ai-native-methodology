@@ -912,8 +912,8 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Spec gap:** input-adapter skill 군 (analysis-from-figma / analysis-from-swagger / analysis-from-prompt) 의 source-grounded 의무가 discovery-adapter 대비 비대칭. analysis baseline 산출 (visual structure) 이 verbatim 미확보 시 추론 fallback 을 허용 → no-simulation 절대 우선순위 구멍.
 - **Decision made:** ★ self-referential drift 아님 (외부 δ Type 2 채널 발견 + 사용자 명시 자산화 요청 + paradigm-level 아닌 SKILL/schema consistency gap) → **본 cycle corrective fix 시행**. (a) figma-extract.schema.json 에 `text_content` (verbatim characters) + `provenance` (verbatim|inferred) 필드 추가. (b) analysis-from-figma SKILL 에 TEXT verbatim 추출 의무 + silent skip 금지 + provenance 태깅 + 산출 자격 조건 강화.
 - **Severity:** **high** — no-simulation 절대 우선순위 직접 구멍 / FE 트랙 전 PoC 영향 / 외부 실 피해 실증 (spec ≠ Figma 8건).
-- **Proposed fix:** (본 cycle 시행 ✅) schema 2 필드 추가 + SKILL 절차 의무화. (carry) analysis-figma 전용 source-grounded validator 신설 (`discovery-extraction-validator` 패턴 차용 / grep_hit 대신 provenance=inferred 비율 임계) — δ 후속.
-- **Status:** **resolved** (본 cycle schema + SKILL fix / validator 신설은 carry)
+- **Proposed fix:** (본 cycle 시행 ✅) schema 2 필드 추가 + SKILL 절차 의무화. (✅ v11.0.3 carry 청산) `analysis-extraction-validator` 신설 — TEXT 노드 text_content 의무(critical) + provenance 검증(high) + inferred 비율 임계(medium). discovery-extraction-validator 대칭.
+- **Status:** **resolved** (schema + SKILL fix v11.0.1 / validator 신설 v11.0.3)
 
 ### F-163: ★ ★ ★ input-adapter source-grounded 비대칭 전수 점검 (F-162 후속 sweep)
 
@@ -938,5 +938,5 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Spec gap:** analysis stage 에 discovery-extraction-validator 대응 source-grounded hard gate 부재. adapter 별 source-grounded 의무가 SKILL prose 양심 의존 (코드 enforcement ❌).
 - **Decision made:** ★ self-referential drift 아님 (F-162 와 동일 외부 dogfood 후속 / 사용자 명시 요청 / SKILL+schema consistency gap). **본 cycle = plan-doc fix** (figma 동형 MEDIUM / source_excerpt verbatim + provenance schema 필드 + SKILL no-simulation 절 + 산출 자격 조건). swagger evidence 필드 + analysis-extraction-validator 신설은 carry.
 - **Severity:** **medium** — plan-doc 1건 실 위험 / 나머지는 LOW 또는 이미 적절. 구조적 validator 부재는 carry.
-- **Proposed fix:** (본 cycle ✅) plan-doc schema+SKILL fix. (carry) swagger-extract 에 evidence 필드 + analysis-extraction-validator 신설 (`discovery-extraction-validator` 패턴 / provenance=inferred 비율 hard gate / analysis 5 adapter 공통 적용).
-- **Status:** **resolved** (plan-doc 본 cycle fix / swagger·validator carry)
+- **Proposed fix:** (본 cycle ✅) plan-doc schema+SKILL fix. (✅ v11.0.3 carry 청산) `analysis-extraction-validator` 신설 (figma + plan-doc adapter 자동 감지 / 13 test pass). (잔여 carry) swagger-extract evidence 필드 (LOW / parser verbatim 후순위).
+- **Status:** **resolved** (plan-doc fix v11.0.2 / validator 신설 v11.0.3 / swagger evidence 잔여 carry)

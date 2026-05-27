@@ -39,6 +39,8 @@ Markdown / PDF / Notion export 문서를 입력 받아 비즈니스 의도 + UC 
 - **inferred 명시 의무** — 문서에 직접 명시 안 됐으나 내용 기반 종합한 entry 는 `provenance: "inferred"` 명시 (verbatim 으로 위장 ❌). intent_summary 는 본질상 요약이라 예외 (전체 의도 1~3문장).
 - **inferred 비율 노출** — uc_candidates / glossary 중 `provenance: "inferred"` 비율 > 0 이면 후속 GO-STOP gate 에 노출 (사용자 확인 의무). 추론 UC 가 "문서 근거" 로 silent 통과 차단.
 
+> ★ 자동 검증: `tools/analysis-extraction-validator --extract <plan-doc-extract.json>` — provenance 누락(high) + inferred 비율 임계(medium) hard gate (v11.0.3 / discovery-extraction-validator 대칭).
+
 ## 산출물
 
 - `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false)

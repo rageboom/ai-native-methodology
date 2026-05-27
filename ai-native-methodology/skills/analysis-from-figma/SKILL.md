@@ -34,6 +34,8 @@ Figma 디자인을 입력 받아 화면 + 컴포넌트 + 디자인 토큰 추출
 2. **provenance=inferred 금지 대상** — 사용자 가시 라벨/버튼/헤더/옵션 텍스트는 `provenance: "inferred"` 금지. verbatim 미확보 시 → `get_design_context` 재호출 (절차 3) 또는 `scope_out_notes` 로 "verbatim 미확보 / 사용자 보강 필요" 명시 (추론으로 spec 채우기 ❌).
 3. **inferred 비율 임계** — TEXT 노드 중 `provenance: "inferred"` 비율 > 0 이면 finding (`_base-log-finding`) 등록 + GO-STOP gate 에 노출 (사용자 결단 의무). 추론 라벨이 "✅ Figma 검증 완료" 로 silent 통과하는 것 차단 (F-162 실 피해 재발 방지).
 
+> ★ 자동 검증: `tools/analysis-extraction-validator --extract <figma-extract.json>` — TEXT 노드 text_content 누락(critical) + provenance 누락/inferred(high) + inferred 비율 임계(medium) 를 hard gate 로 강제 (v11.0.3 / discovery-extraction-validator 대칭).
+
 ## 산출물
 
 - `.aimd/<scope>/planning/figma-extract.json` (strict / additionalProperties:false)
