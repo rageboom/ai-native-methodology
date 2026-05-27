@@ -10,7 +10,7 @@
 
 ## Chain stage 5종 (★ v9.0 6-stage / planning→discovery 개칭 + plan 신설)
 
-- `discovery.phase-flow.{json,mermaid}` — chain 1 / planning-spec 추출 (discovery stage / 입력 어댑터 4종)
+- `discovery.phase-flow.{json,mermaid}` — chain 1 / discovery-spec 추출 (discovery stage / 입력 어댑터 4종)
 - `spec.phase-flow.{json,mermaid}` — chain 2 / behavior + acceptance + 7대 통합
 - `plan.phase-flow.{json,mermaid}` — chain 3 / task-plan (task 분해 / ADR / NFR / risk — ★ v10.0.0 gate #3 본격)
 - `test.phase-flow.{json,mermaid}` — chain 4 / test-spec + 실 test code (RED)

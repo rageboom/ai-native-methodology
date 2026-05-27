@@ -61,5 +61,31 @@ export function comparePhaseFlow({ jsonNorm, mermaidNorm, jsonPath, mermaidPath 
     }
   }
 
+  // 5. 산출물 파일명 정합 (★ 이중 렌더링 SSOT — JSON inputs/outputs 가 계약).
+  //    mermaid 가 렌더한 산출물 파일명이 JSON 계약에 부재 → breaking (rename 누락 / 산출물명 drift).
+  //    JSON 계약 파일명이 mermaid 미렌더 → info (중간 산출물 / config 는 사람 눈 생략 정상).
+  const jsonFiles = jsonNorm.artifact_files ?? new Set();
+  const mermaidFiles = mermaidNorm.artifact_files ?? new Set();
+  for (const f of mermaidFiles) {
+    if (!jsonFiles.has(f)) {
+      diffs.push({
+        severity: 'breaking',
+        kind: 'artifact.mermaid-not-in-json',
+        mermaid: f,
+        message: `mermaid 산출물 파일명 "${f}" 가 JSON inputs/outputs 에 부재 — 산출물명 drift (rename 누락 의심)`,
+      });
+    }
+  }
+  for (const f of jsonFiles) {
+    if (!mermaidFiles.has(f)) {
+      diffs.push({
+        severity: 'info',
+        kind: 'artifact.json-not-in-mermaid',
+        json: f,
+        message: `JSON 산출물 파일명 "${f}" 가 mermaid 에 미렌더 (중간 산출물/config 정상 또는 보강 누락 점검)`,
+      });
+    }
+  }
+
   return diffs;
 }

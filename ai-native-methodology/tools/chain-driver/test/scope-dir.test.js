@@ -166,12 +166,12 @@ describe('writeManifest / readManifest', () => {
       scope: 'user-registration',
       stage: 'discovery',
       status: 'complete',
-      linked_artifacts: ['planning-spec.json'],
+      linked_artifacts: ['discovery-spec.json'],
       traceability_refs: { uc: ['UC-USER-001'], bhv: [], ac: [], tc: [], impl: [] },
     });
     const m = readManifest(root, 'user-registration', 'discovery');
     assert.equal(m.status, 'complete');
-    assert.deepEqual(m.linked_artifacts, ['planning-spec.json']);
+    assert.deepEqual(m.linked_artifacts, ['discovery-spec.json']);
     assert.deepEqual(m.traceability_refs.uc, ['UC-USER-001']);
   });
 

@@ -12,6 +12,16 @@ const stripComment = (line) => line.replace(/%%.*$/, '');
 const isBlank = (line) => !line.trim();
 const stripDecor = (s) => String(s).replace(/[★⚠️✅❌⏳]/g, '').replace(/\s+/g, ' ').trim();
 
+// ★ v? — 산출물 파일명 추출 (이중 렌더링 정합 — outputs[] ↔ mermaid 노드 라벨 비교용).
+// 산출물/입력 entry 문자열 또는 mermaid 라벨에서 deliverable 파일명만 골라냄.
+// `*.json` 와일드카드 / 경로 prefix 는 char class(`/` 불포함)로 자연 분리.
+const ARTIFACT_FILE_RE = /[\w.\-]+\.(?:json|jsonl|md|mermaid|yaml|yml)\b/gi;
+// flow 정의 파일(`*.phase-flow.json|mermaid`)은 산출물 아님 — next_chain/이웃 chain 교차참조용. 제외.
+const META_FILE_RE = /\.phase-flow\.(?:json|mermaid)$/i;
+function extractArtifactFiles(str) {
+  return (String(str).match(ARTIFACT_FILE_RE) ?? []).filter((f) => !META_FILE_RE.test(f));
+}
+
 // ★ phase id 정규화 — 공백/대소문자 무시. "input" / "formal-spec" / "api" 등 의미 ID 그대로 보존 (state-machine normalizer 와 다름 — phase id 는 의미 있는 구분자).
 // ★ v3.0.0 — 옛 숫자 ID ("0" / "4.5" / "5-1") 영역 본 정규식은 호환 보존 (mermaid 본문 갱신은 S3-b 영역).
 const normalizePhaseId = (s) => stripDecor(String(s)).toLowerCase();
@@ -41,6 +51,7 @@ export function normalizePhaseFlowJson(json) {
   const phases = new Set();
   const phaseMeta = new Map();  // id → { name }
   const dependencies = [];      // { from, to }
+  const artifactFiles = new Set();  // inputs[] ∪ outputs[] 산출물 파일명 (SSOT 계약)
 
   for (const p of json.phases ?? []) {
     const id = normalizePhaseId(p.id);
@@ -50,6 +61,9 @@ export function normalizePhaseFlowJson(json) {
       const fromId = normalizePhaseId(dep);
       dependencies.push({ from: fromId, to: id });
     }
+    for (const entry of [...(p.inputs ?? []), ...(p.outputs ?? [])]) {
+      for (const f of extractArtifactFiles(entry)) artifactFiles.add(f);
+    }
   }
 
   return {
@@ -57,6 +71,7 @@ export function normalizePhaseFlowJson(json) {
     phases: Array.from(phases).sort(),
     phase_meta: phaseMeta,
     dependencies: dependencies.sort(byEdge),
+    artifact_files: artifactFiles,
   };
 }
 
@@ -65,6 +80,11 @@ export function normalizePhaseFlow(text) {
   const subgraphs = new Map();    // node/subgraph raw id → derived phase id
   const phases = new Set();
   const dependencies = [];        // { from, to } — derived phase id
+  // mermaid 노드 라벨에 등장하는 산출물 파일명 (사람 눈 렌더 — 주석 %% 제거 후 전수 스캔).
+  const artifactFiles = new Set();
+  for (const ln of lines) {
+    for (const f of extractArtifactFiles(ln)) artifactFiles.add(f);
+  }
 
   let depth = 0;
   const depthIsPhaseSubgraph = [];  // stack — true=P_* subgraph (analysis pattern, 자식 line 무시) / false=chain stage subgraph (chain v2 pattern, 자식 phase plain node 인식)
@@ -139,6 +159,7 @@ export function normalizePhaseFlow(text) {
     phases: Array.from(phases).sort(),
     subgraph_to_phase: subgraphs,
     dependencies: dependencies.sort(byEdge),
+    artifact_files: artifactFiles,
   };
 }
 

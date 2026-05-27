@@ -34,14 +34,14 @@
 - **호출 시기**: main agent 가 "analysis 시작" / "분석 진입" / "legacy 분석" 등 자연어 인지 시 Task tool dispatch
 
 ### `discovery-agent.md` (★ chain 1 / planning 개칭)
-- **책임**: 입력 4종(analysis-output/swagger/figma/nl-md) → planning-spec.{json,md} (UC-* + BR-INTENT-* + cross_links + source_grounded_evidence / 파일명 reuse)
+- **책임**: 입력 4종(analysis-output/swagger/figma/nl-md) → discovery-spec.{json,md} (UC-* + BR-INTENT-* + cross_links + source_grounded_evidence)
 - **skill 사전 주입**: 6 discovery skill(4 어댑터 + discovery-decompose-use-cases + discovery-identify-business-intent) + 4 base utility = 10 skill
 - **호출 시기**: chain 1 gate 진입 자연어 trigger 시 (discovery/발견/탐색/planning alias)
 - ★ v9.0 = v4.0 planning-agent 흡수 + 입력 어댑터 paradigm 확장 (DEC-2026-05-21)
 
-### `plan-agent.md` (★ chain 3 / HOW / PLACEHOLDER)
-- **책임**: spec(BHV/AC) → plan-spec (task 분해 / 의존성 / ADR / NFR allocation / risk / rollback)
-- **상태**: placeholder — skill 3종(plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr) placeholder / hard gate deferred (gate #1~#4 유지) / 본격 구현 v9.x+ carry
+### `plan-agent.md` (★ chain 3 / HOW / gate #3 본격)
+- **책임**: spec(BHV/AC) → task-plan (task 분해 / 의존성 / ADR / NFR allocation / risk / rollback)
+- **상태**: 본격 구현 (v9.1.0 body / v10.0.0 gate #3 hard gate 활성) — skill 3종(plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr) body + `plan-coverage-validator` trio enforcement (chain 3 = gate #3 1:1)
 
 ### `spec-agent.md` (★ chain 2)
 - **책임**: behavior-spec + acceptance-criteria (Gherkin BDD) + cross_links 7대 산출물 통합

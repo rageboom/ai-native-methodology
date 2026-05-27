@@ -68,7 +68,7 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `planning-spec.{json,md}` (산출물명 reuse 유지) |
+| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `discovery-spec.{json,md}` |
 | "Swagger/OpenAPI 에서 추출" | [`discovery-from-swagger`](../skills/discovery-from-swagger/) | UC + intent (API spec 입력 어댑터) |
 | "Figma 에서 추출" | [`discovery-from-figma`](../skills/discovery-from-figma/) | UC + intent (디자인 입력 어댑터) |
 | "기획문서/자연어 md 에서 추출" | [`discovery-from-nl-md`](../skills/discovery-from-nl-md/) | UC + intent (NL 입력 어댑터) |

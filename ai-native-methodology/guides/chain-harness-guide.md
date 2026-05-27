@@ -178,7 +178,7 @@ gate-eval.js 의 evaluateGate:
 
 ```
 1. git diff --numstat <baseline_sha>..HEAD
-2. path-to-chain whitelist 9 pattern (analysis/* / planning-spec / behavior-spec / etc)
+2. path-to-chain whitelist 9 pattern (analysis/* / discovery-spec / behavior-spec / etc)
 3. LOC threshold ≥ 5 (revisit_ignore_globs 학습)
 4. revisit 감지 시 사용자 prompt → go (revisit) / stop
 ```
@@ -232,9 +232,9 @@ exit 0
 ### C. Revisit (이미 종결한 stage 로 돌아가기)
 
 ```
-# 사용자가 chain 1 산출물 (planning-spec) 수정
+# 사용자가 chain 1 산출물 (discovery-spec) 수정
 $ git diff
-... (planning-spec 변경)
+... (discovery-spec 변경)
 
 $ chain-driver revisit-detect
 [chain-driver] revisit 감지 / chain 1 → 현재 chain 5

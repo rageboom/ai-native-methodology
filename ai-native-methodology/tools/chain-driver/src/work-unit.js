@@ -42,11 +42,11 @@ export function createStageManifest(scope, stage) {
 }
 
 // 산출물 JSON 에서 traceability_refs 추출 — 산출물 종류별 분기.
-// 1차 = planning-spec.use_cases[].id / behavior-spec.behaviors[].id / 등.
+// 1차 = discovery-spec.use_cases[].id / behavior-spec.behaviors[].id / 등.
 // v3.x 에서 산출물 schema 자동 파싱 강화.
 export function extractTraceabilityRefs(artifactJson, kind) {
   switch (kind) {
-    case 'planning-spec':
+    case 'discovery-spec':   // ★ v11.0.0 planning-spec → discovery-spec rename
       return { uc: (artifactJson.use_cases || []).map((u) => u.id).filter(Boolean) };
     case 'behavior-spec':
       return { bhv: (artifactJson.behaviors || []).map((b) => b.id).filter(Boolean) };

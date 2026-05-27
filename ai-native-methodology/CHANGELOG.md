@@ -9,6 +9,40 @@
 
 ---
 
+## [11.1.0] — 2026-05-27 MINOR — v11 discovery-spec cascade 완결 + drift-validator outputs 비교 신설 (F-MB-010·F-MB-011)
+
+> end-to-end 흐름 점검 결과, v11.0.0 이 "active doc cascade 완료" 로 기재했으나 실제로는 `planning-spec`→`discovery-spec` rename 이 flows·docs·chain-driver runtime 에 미흡수 (선언↔실상 모순). 본 release 가 잔여 cascade 를 완결하고, 동종 발산을 재발 차단할 drift-validator 산출물명 비교를 신설. RED→GREEN paradigm 정합.
+
+### Added
+
+- **drift-validator phase-flow 산출물명 비교** (F-MB-011 / 신규 capability = MINOR):
+  - `normalize-phase-flow.js` — `phases[].inputs[]/outputs[]` (JSON) + mermaid 노드 라벨 (사람 눈) 에서 산출물 파일명 추출 (`extractArtifactFiles` / `*.phase-flow.*` 메타파일 제외).
+  - `compare-phase-flow.js` — mermaid 산출물명이 JSON inputs/outputs 에 부재 → **breaking** (rename 누락 / 산출물명 drift) / JSON 만 → info (중간 산출물 정상). 이중 렌더링 SSOT = JSON 계약.
+  - `test/compare-phase-flow-artifacts.test.js` 4 케이스 회귀 고정.
+
+### Changed
+
+- **`planning-spec`→`discovery-spec` rename cascade 완결** (F-MB-010 / DEC-2026-05-26-discovery-spec-rename §4 미완료분):
+  - **flows**: `discovery.phase-flow.mermaid` OUT 노드 + `sdlc-4stage-flow.{json,mermaid}` + `spec.phase-flow.{json,mermaid}` (입력/NEXT) + `flows/README.md`. spec.phase-flow.mermaid 동반 stale 정정 (NEXT "chain 3 (test)"→"(plan)" / `revisit:planning`→`revisit:discovery`).
+  - **docs**: `lifecycle-contract.md` (CHAIN 1·data-contract·tree·schema 목록 + plan stage v11 contract 강제 BE/FE prose 보강) + `README.md` + `guides/chain-harness-guide.md` + `guides/first-prompt-cookbook.md` + `agents/README.md` (plan-agent placeholder→gate #3 본격 표기 동반). `plan-spec`→`task-plan` (chain 3 산출물명) 동반 정정.
+  - **runtime hard replace** (PoC frozen 보존 = 사용자 결단): `chain-driver/src/hooks-bridge.js`·`revisit-detect.js`·`work-unit.js` = `discovery-spec.json` keying 으로 교체 (신규 산출물 dep-graph 노드 인식·revisit 감지·traceability 추출) + 4 test fixture 갱신.
+
+### Fixed
+
+- **`finding-system.md:934` brace-notation citation** (`{swagger,plan-doc}-extract.schema.json` → 두 파일명 명시) — skill-citation-validator 오파싱 → `skill_citation_integrity` + `workspace_test_pass` 2 gate regress 해소 (단일 원인 / 외부 figma source-grounding finding 산물).
+
+### Carry (잔여 / 별건)
+
+- `tools/traceability-matrix-builder/src/builder.js` `derived_from` + `tools/formal-spec-link-validator` (CHAIN_ARTIFACT_BY_NAME + `planning_spec_path` schema 필드) = PoC artifact·behavior-spec 필드명 bound → 교체 시 PoC 깨짐 (discovery-spec=chain 1 backward link 없어 실효 영향 ≈ 0). C-dep-graph-v11-paradigm-cascade carry 와 합치.
+
+### STOP-3
+
+- workspace test 전수 pass + release-readiness **22/22 ready** (regress 2 → 0) + skill-citation 0 stale + version 3-way 11.1.0 + drift-validator flows 5/5 0 breaking + chain-layout/state-flow ✅ = MINOR (additive validator capability + corrective cascade).
+
+DEC-2026-05-27-v11-discovery-spec-cascade-완결.
+
+---
+
 ## [11.0.3] — 2026-05-27 PATCH — analysis-extraction-validator 신설 (F-162·F-163 구조적 carry 청산)
 
 > F-162 / F-163 의 근본 carry — analysis stage 의 source-grounded hard gate 부재 — 를 validator 신설로 청산. discovery-extraction-validator 가 discovery stage 에 한 것을 analysis stage 입력 어댑터 산출물에 대칭 적용. tools 21종 → 22종.

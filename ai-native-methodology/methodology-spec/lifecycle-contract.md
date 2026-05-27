@@ -11,9 +11,9 @@ INPUT (1차 = legacy single-case):  legacy 코드베이스
   ↓ analysis stage (chain 진입 전 = 현 v1.5.x 자산 / 단방향 추출)
   ↓
 OUTPUT chain:
-  [CHAIN 1] planning-spec (discovery stage)      ── go/stop gate #1
+  [CHAIN 1] discovery-spec (discovery stage)      ── go/stop gate #1
   [CHAIN 2] behavior-spec + acceptance-criteria + 7대 산출물 통합  ── go/stop gate #2
-  [CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
+  [CHAIN 3] task-plan (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
   [CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #4
   [CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #5
   ↓
@@ -111,7 +111,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | set | timing | 책임 | skill |
 |---|---|---|---|
 | **`analysis-from-*`** (4) | **최초 1회** (legacy baseline 수립) | analysis 산출물 만들기 (visual-manifest / ui-state-map / inventory / domain 등 canonical global `.aimd/output/`) | `analysis-from-{figma, swagger, prompt, plan-doc}` (★ 모두 본격 구현) |
-| **`discovery-from-*`** (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec(discovery 산출) | `discovery-from-{analysis-output, figma, swagger, nl-md}` ★ v10.1.0 모두 본격 구현 (DEC-2026-05-26-discovery-input-bodies) |
+| **`discovery-from-*`** (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → discovery-spec(discovery 산출) | `discovery-from-{analysis-output, figma, swagger, nl-md}` ★ v10.1.0 모두 본격 구현 (DEC-2026-05-26-discovery-input-bodies) |
 
 같은 figma 파일이라도 (a) baseline 수립 시 = `analysis-from-figma`, (b) 신규 feature scope 진입 시 = `discovery-from-figma`. **다른 목적/다른 산출**. 둘 다 유지 = 중복 ❌ / 다른 axis ✅. `discovery-from-nl-md` 는 **NFR 1차 채널** (다른 채널은 부 / NL 만이 명시 NFR 표현).
 
@@ -138,15 +138,15 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 | 강 | 강 | 약 | 약 | 약 | 약 |
 
 산출물 (discovery stage 가 만듦):
-- **planning-spec.json** (deliverable 17 / `schemas/discovery-spec.schema.json` ★ sub-plan-2 신설 / ★ v9.0 산출물 파일명 reuse 유지)
-- **planning-spec.md** (이중 렌더링 / ADR-008 v2 정합)
+- **discovery-spec.json** (deliverable 17 / `schemas/discovery-spec.schema.json` ★ sub-plan-2 신설 / ★ v11.0.0 planning-spec → discovery-spec rename / DEC-2026-05-26-discovery-spec-rename)
+- **discovery-spec.md** (이중 렌더링 / ADR-008 v2 정합)
 
-기존 placeholder (v2.0 carry 였던 PRD / story / domain-priority) = ★ planning-spec.json 의 sub-section 으로 흡수 (1차 = legacy-extraction 모드 / 후속 use case 분기 시 source_format 분기 정책).
+기존 placeholder (v2.0 carry 였던 PRD / story / domain-priority) = ★ discovery-spec.json 의 sub-section 으로 흡수 (1차 = legacy-extraction 모드 / 후속 use case 분기 시 source_format 분기 정책).
 
 ### chain 2 (스펙) — spec stage (★ v2.0 / ★ ★ ★ "현 7대 + 신규 추가" 사용자 답변 3 정합)
 
 input (spec stage 가 받음):
-- planning-spec.json
+- discovery-spec.json
 - analysis stage 7대 + 8 FE 산출물 (1~15 + 4.5)
 - finding-system 누적
 
@@ -157,7 +157,7 @@ input (spec stage 가 받음):
 | 약 | 약 | 강 | 강 | 강 | 강 |
 
 산출물 (spec stage 가 만듦):
-- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수
+- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + discovery-spec.use_cases 흡수
 - **acceptance-criteria.json + .md** (deliverable 19 / `schemas/acceptance-criteria.schema.json` ★ sub-plan-2 신설) — Gherkin (Given/When/Then) BDD 정합 / verifiable=true 의무 / MoSCoW (must/should/nice)
 - **현 7대 산출물 통합** (변경 ❌) — behavior-spec.cross_links 가 모든 7대 산출물 reference (cross-link coverage 강제)
 
@@ -178,8 +178,9 @@ input (plan stage 가 받음):
 | 약 | 약 | 약 | 약 | 약 | 강 |
 
 산출물 (plan stage 가 만듦):
-- **task-plan.{json,md}** (★ `schemas/task-plan.schema.json` / v10.0.0 신설 / tasks[] / dependencies[] / adrs[] (alternatives ≥3) / nfr_allocation[] / risks[]) — discovery 산출 `planning-spec.json` 과 명독 분리
+- **task-plan.{json,md}** (★ `schemas/task-plan.schema.json` / v10.0.0 신설 / tasks[] / dependencies[] / adrs[] (alternatives ≥3) / nfr_allocation[] / risks[]) — discovery 산출 `discovery-spec.json` 과 명독 분리
 - 운영 정책 (DEC-2026-05-21 §8): task granularity 1~3 AC 묶음 / ADR 5 자동 판정 기준 / NFR hard gate / risk 3중 망 / estimation_ai+estimation_human 분리
+- **★ v11.0.0 contract 강제 양 axis** (DEC-2026-05-26-v11-paradigm-결단 #8): BE task (`layer=='be'`) = `openapi_endpoint_ref` (swagger operationId 연결) 의무 / FE task (`layer=='fe'`) = `component_ref` + state-map + visual-manifest + DTCG token 연결 의무. task-plan.schema.json if/then 강제 / plan-coverage-validator BE↔FE 1:1 matching 검증.
 
 ★ plan hard gate = **gate #3 본격 활성** (v10.0.0 / gate #1~#5 = discovery/spec/plan/test/implement / chain N = gate #N 1:1 / `plan-coverage-validator` NFR allocation hard gate).
 
@@ -297,8 +298,8 @@ input (implement stage 가 받음):
 │   ├── manifest.{json,md}           #   scope 전체 status / analysis_refs / sync_state
 │   ├── analysis/                    #   (선택) scope local subset — 큰 프로젝트 context 부담 ↓
 │   │   └── business-rules.subset.json
-│   ├── discovery/                  #   chain 1 (planning-spec / 산출물명 reuse)
-│   │   ├── planning-spec.{json,md}
+│   ├── discovery/                  #   chain 1 (discovery-spec)
+│   │   ├── discovery-spec.{json,md}
 │   │   └── manifest.{json,md}
 │   ├── spec/                        #   chain 2 (behavior-spec + acceptance-criteria + traceability-matrix)
 │   ├── plan/                        #   chain 3 (task-plan / gate #3)
@@ -382,7 +383,7 @@ retract 영역 (chain harness 안에서 정식 허용):
 
 - **chain stage axis** (`flows/sdlc-4stage-flow.json` ★ sub-plan-4 신설) — stages + revisit_edges + sub_flow 통합
 - **6 신규 도구** (★ sub-plan-3) — discovery-extraction-validator / chain-coverage-validator / spec-test-link-validator / **test-impl-pass-validator** (★ ★ ★ 진짜 runner 호출) / traceability-matrix-builder / chain-revisit-detector
-- **6 신규 schema** (★ sub-plan-2) — planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
+- **6 신규 schema** (★ sub-plan-2) — discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
 - **3 신규 ADR + 3 ADR v2 확장** (★ sub-plan-2) — ADR-CHAIN-001 / ADR-CHAIN-002 (go/stop gate UX) / ADR-CHAIN-003 (revisit loop) + ADR-008/009/010 v2
 - **14 신규 skill + 4 agent 갱신 + 5 flow** (★ sub-plan-4)
 - **hooks 확장** (★ sub-plan-5) — PostToolUse / PreToolUse / UserPromptSubmit

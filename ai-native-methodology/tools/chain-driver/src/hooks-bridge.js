@@ -93,7 +93,7 @@ export function suggestAgentForPrompt(prompt) {
 // 파일명 → artifact_subkind 매핑. 한 파일이 여러 노드(예: behavior-spec.json = 다수 BHV)에 대응하므로
 // hook 은 "어떤 종류의 artifact 가 바뀌었나"만 판정하고, per-node 영향 분석은 `chain-driver impact` 로 분리.
 const ARTIFACT_FILENAME_TO_SUBKIND = Object.freeze({
-  'planning-spec.json': 'UC',
+  'discovery-spec.json': 'UC',   // ★ v11.0.0 planning-spec → discovery-spec rename (DEC-2026-05-26-discovery-spec-rename)
   'behavior-spec.json': 'BHV',
   'acceptance-criteria.json': 'AC',
   'test-spec.json': 'TC',

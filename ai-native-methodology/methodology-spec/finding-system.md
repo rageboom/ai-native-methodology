@@ -351,6 +351,8 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 007 | **resolved** | spec-test-link README finding-kind → validator.js emit(underscore)+chain.tc.no_ac_ref 정합 |
 > | 008 | **resolved** | test-impl-pass README adapter 경로 src/adapters→src/runners |
 > | **009** | **deferred** (★ 신규 / LL-i-55 함정존) | tool src·test·scripts·PHASE/SPIKE-history 의 `rules.json` literal = test fixture / migration script / 역사 측정기록 가능성 → blanket sweep 시 release gate 자해. forensic 파일별 disposition = 별건 (revisit) |
+> | **010** | **resolved** (v11.1.0) + 잔여 carry | v11.0.0 planning-spec→discovery-spec rename cascade 미완료 (flows+docs+chain-driver runtime). hard replace 시행 / PoC frozen 보존 / builder.js·formal-spec-link-validator(`planning_spec_path` 필드)=C-dep-graph carry 합치 |
+> | **011** | **resolved** (v11.1.0) | drift-validator phase-flow outputs[]↔mermaid 산출물명 비교 맹점 (F-MB-010 발산 0 breaking 통과 = 이중 렌더링 간판 반례). compare-phase-flow.js 비교 블록 + 4 회귀 test 추가 |
 >
 > ★ ground-truth-before-edit 가 재작업 1건 추가 차단: cross_links `to_artifact: rules` = lifecycle-contract SSOT logical 자산명(불변) → blanket 변경 시 6 deliverable logical id 파괴 (3번째 위생 적발 / LL-plugin-04 재확인).
 >
@@ -445,6 +447,26 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Evidence:** `grep -rnE 'rules(\.subset)?\.(json|schema\.json)' tools/` minus business-rules (다수 / 위 분류)
 - **Action:** **deferred** — 파일별 forensic disposition (각 literal = stale doc vs intentional fixture vs live code path 판정) 별건 audit. blanket ❌ (품질 1순위·재작업 최소화 / LL-i-55 정합). history 부분 = wontfix(immutable).
 - **Status:** deferred (revisit — 별건 forensic audit / 본 cycle scope 외 명시)
+
+### F-MB-010: v11.0.0 `planning-spec`→`discovery-spec` rename cascade 미완료 (flows/docs/runtime)
+
+- **Phase:** cross-validation (end-to-end 흐름 점검 2026-05-27)
+- **Confidence:** verified (결정적 grep + drift-validator RED 실증)
+- **Type:** gap (incomplete migration / 선언↔실상 모순)
+- **Description:** DEC-2026-05-26-discovery-spec-rename §2~§3 = hard replace (v9.0.0 "산출물명 reuse 유지" 명시 retract). CHANGELOG/CLAUDE.md 는 "active doc cascade" 완료 기재했으나 실제로는 flows + docs + chain-driver runtime 미흡수: ① flows `discovery.phase-flow.mermaid` OUT 노드 + `sdlc-4stage-flow.{json,mermaid}` + `spec.phase-flow.{json,mermaid}` (입력/NEXT) = `planning-spec` 잔존 (★ discovery.json↔mermaid 산출물명 발산을 drift-validator 가 0 breaking 통과 = F-MB-011) ② docs `lifecycle-contract.md`·`README.md`·`guides/{chain-harness-guide,first-prompt-cookbook}.md`·`agents/README.md` = `planning-spec`/`plan-spec` 잔존 (chain 3 산출물 = `task-plan` 인데 `plan-spec` 표기 별건 동반) ③ runtime `chain-driver/src/{hooks-bridge:96,revisit-detect:11,work-unit:49}` = 옛 파일명 keying → 신규 `discovery-spec.json` 산출물 dep-graph 노드 인식·revisit 감지·traceability 추출 누락 (기능 결함).
+- **Evidence:** `grep -rn planning-spec flows/ methodology-spec/lifecycle-contract.md README.md guides/ agents/README.md tools/chain-driver/src/` (2026-05-27 점검) / drift-validator `flows/discovery.phase-flow.json` → 2 breaking (planning-spec.{json,md})
+- **Action:** flows/docs/runtime hard replace `planning-spec`→`discovery-spec` + `plan-spec`→`task-plan` (PoC artifact 는 frozen 보존 = 사용자 결단 / runtime hard replace). spec.phase-flow.mermaid 동반 stale (NEXT="chain 3 (test)"→"(plan)" / revisit:planning→discovery) 정정.
+- **Status:** resolved (v11.1.0 — 본 cascade). ★ **잔여 carry**: `tools/traceability-matrix-builder/src/builder.js:192 derived_from` + `tools/formal-spec-link-validator` (CHAIN_ARTIFACT_BY_NAME + `planning_spec_path` schema 필드) + characterization message = PoC artifact + behavior-spec `planning_spec_path` 필드명에 bound → 교체 시 PoC 깨짐 (discovery-spec=chain 1 backward link 없어 실효 영향 ≈ 0). C-dep-graph-v11-paradigm-cascade carry 와 합치 (별건 / PoC 보존 결정 정합).
+
+### F-MB-011: drift-validator phase-flow 산출물명(outputs[]↔mermaid 노드) 비교 맹점
+
+- **Phase:** cross-validation (2026-05-27)
+- **Confidence:** verified (실증 — F-MB-010 발산을 0 breaking 통과)
+- **Type:** gap (validator coverage 공백 / 간판 가치 명제 반례)
+- **Description:** `compare-phase-flow.js` 가 phase id + dependencies 만 비교하고 `phases[].outputs[]` ↔ mermaid 노드 라벨 산출물 파일명을 전혀 비교 안 함. → `discovery.phase-flow.json`(discovery-spec) ↔ `.mermaid`(planning-spec) 산출물명 발산을 0 breaking 통과 (이중 렌더링 "drift 0 자가 입증" 간판의 실증 반례).
+- **Evidence:** tools/drift-validator/src/compare-phase-flow.js (5번 비교 블록 부재) / normalize-phase-flow.js (artifact_files 미추출)
+- **Action:** normalize-phase-flow.js 에 산출물 파일명 추출(`extractArtifactFiles` / `*.phase-flow.*` 메타파일 제외) + compare-phase-flow.js 에 비교 블록 추가 — mermaid 산출물명이 JSON inputs/outputs 에 부재 → breaking / JSON 만 → info (중간 산출물 정상). RED→GREEN (discovery 2 breaking → 0).
+- **Status:** resolved (v11.1.0 — test/compare-phase-flow-artifacts.test.js 4 케이스 회귀 고정)
 
 ---
 
@@ -931,7 +953,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
   | analysis-html-template | JSP/Thymeleaf | 없음 — 외부 static analyzer 실 실행 의무 + "LLM 자체 count ❌" (figma 보다 강) | 적절 (no-action) |
 - **Evidence:**
   - `tools/discovery-extraction-validator` 존재 vs analysis-extraction-validator 류 0건 (analysis stage hard gate 부재)
-  - `schemas/{swagger,plan-doc}-extract.schema.json` evidence/provenance 필드 0건 (figma/html-template 만 보유)
+  - `schemas/swagger-extract.schema.json` + `schemas/plan-doc-extract.schema.json` evidence/provenance 필드 0건 (figma/html-template 만 보유)
   - `schemas/prompt-extract.schema.json` confidence/assumption 필드 5건 (prompt 는 이미 적절)
   - `skills/analysis-html-template/SKILL.md:26,37` (외부 도구 실 실행 + LLM count 금지)
   - `skills/discovery-from-*/SKILL.md` (4종 모두 source_grounded + grep_hit / 대조군)

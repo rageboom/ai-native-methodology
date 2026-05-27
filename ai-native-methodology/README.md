@@ -18,13 +18,13 @@ INPUT (1차 = legacy single-case):
 
   ↓ analysis stage (chain 1 진입 전 / 한 방향 추출)
   ↓
-[CHAIN 1] planning-spec (discovery stage)      ── go/stop gate #1
+[CHAIN 1] discovery-spec (discovery stage)      ── go/stop gate #1
   ↓
 [CHAIN 2] behavior-spec
         + acceptance-criteria
         + 7대 산출물 통합              ── go/stop gate #2
   ↓
-[CHAIN 3] plan-spec (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
+[CHAIN 3] task-plan (task 분해 / ADR / NFR / risk)  ── go/stop gate #3
   ↓
 [CHAIN 4] test-spec + 실 test 코드 (RED 의무)  ── go/stop gate #4
   ↓
@@ -265,7 +265,7 @@ dist/ai-native-methodology-v3.6.9/
 │   └── be-fe-separation.md
 │
 └── schemas/                          ★ 19+ JSON Schema (BE 5 + FE 8 + chain v2 6 + state + intervention-log)
-    ├── chain v2: planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
+    ├── chain v2: discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix
     ├── state.schema.json             chain-driver state 영속
     ├── intervention-log.schema.json  사용자 결단 로그
     └── (BE/FE 공통 13종 — meta-confidence / architecture / domain / api / db / rules / antipatterns / ui / inventory / formal-spec / finding-system / etc)

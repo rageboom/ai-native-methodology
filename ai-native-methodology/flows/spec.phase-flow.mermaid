@@ -8,7 +8,7 @@ flowchart TB
     subgraph C2["★ Chain 2 — spec"]
         direction TB
 
-        P_input_integrate["Phase input-integrate — input 통합<br/>planning-spec + Phase 4.5 + 7대"]
+        P_input_integrate["Phase input-integrate — input 통합<br/>discovery-spec + Phase 4.5 + 7대"]
         P_behavior_spec_compose["Phase behavior-spec-compose — behavior-spec 합성 (BHV-*)<br/>spec-compose-behavior-spec / 1 UC = 1+ BHV"]
         P_acceptance_criteria_derive["Phase acceptance-criteria-derive — acceptance-criteria 분해 (AC-*)<br/>spec-derive-acceptance-criteria / Gherkin BDD"]
         P_cross_link_7_deliverables["Phase cross-link-7-deliverables — 7대 cross-link 통합<br/>spec-integrate-deliverables"]
@@ -25,8 +25,8 @@ flowchart TB
         P_behavior_diagrams_render --> P_gate_2
     end
 
-    subgraph IN["chain 1 (planning) + analysis"]
-        IN_OUT["planning-spec.json<br/>+ 7대 + 8 FE + Phase 4.5 + finding"]
+    subgraph IN["chain 1 (discovery) + analysis"]
+        IN_OUT["discovery-spec.json<br/>+ 7대 + 8 FE + Phase 4.5 + finding"]
     end
 
     subgraph OUT["chain 2 산출물"]
@@ -36,8 +36,8 @@ flowchart TB
         OUT_MD["behavior-spec.md + behavior-diagrams.mermaid<br/>acceptance-criteria.md"]
     end
 
-    subgraph NEXT["chain 3 (test) 진입"]
-        N1["test-generate-test-spec skill"]
+    subgraph NEXT["chain 3 (plan) 진입"]
+        N1["plan-decompose-and-sequence skill<br/>plan.phase-flow.json"]
     end
 
     IN --> P_input_integrate
@@ -46,7 +46,7 @@ flowchart TB
     P_behavior_diagrams_render --> OUT_MD
     P_gate_2 -->|"go"| NEXT
     P_gate_2 -.->|"stop"| STOP["sprint 중단"]
-    P_gate_2 -.->|"revisit:planning"| IN
+    P_gate_2 -.->|"revisit:discovery"| IN
 
     classDef chain2 fill:#fff8e1,stroke:#ef6c00,stroke-width:3px
     classDef gate fill:#fff3cd,stroke:#856404,stroke-width:3px

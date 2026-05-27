@@ -44,7 +44,7 @@ describe('executeQuery', () => {
   it('--scope + --stage returns stage manifest', () => {
     const root = join(tmp, 'q2');
     seedScope(root, 'user-registration', {
-      stages: { discovery: { status: 'complete', linked_artifacts: ['planning-spec.json'] } },
+      stages: { discovery: { status: 'complete', linked_artifacts: ['discovery-spec.json'] } },
     });
     const result = executeQuery(root, { scope: 'user-registration', stage: 'discovery' });
     assert.equal(result.length, 1);

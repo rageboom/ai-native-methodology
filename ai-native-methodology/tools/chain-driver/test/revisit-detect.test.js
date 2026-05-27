@@ -6,8 +6,8 @@ import {
 } from '../src/revisit-detect.js';
 
 describe('revisit-detect', () => {
-  it('classifyPath maps .aimd planning-spec.json to discovery', () => {
-    assert.equal(classifyPath('.aimd/output/planning-spec.json'), 'discovery'); // ★ v9.0 산출물 파일명 reuse / chain=discovery
+  it('classifyPath maps .aimd discovery-spec.json to discovery', () => {
+    assert.equal(classifyPath('.aimd/output/discovery-spec.json'), 'discovery'); // ★ v11.0.0 planning-spec → discovery-spec rename / chain=discovery
   });
 
   it('classifyPath maps src/foo.ts to implement', () => {

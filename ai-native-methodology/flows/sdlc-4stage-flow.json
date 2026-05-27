@@ -40,7 +40,7 @@
       "chain": 1,
       "depends_on": ["analysis"],
       "sub_flow": "discovery.phase-flow.json",
-      "outputs_summary": ["planning-spec.json (deliverable 17 / discovery 산출물 — 파일명 reuse)", "planning-spec.md"],
+      "outputs_summary": ["discovery-spec.json (deliverable 17 / discovery 산출물)", "discovery-spec.md"],
       "introduced": "v2.0 (★ v9.0 planning→discovery 개칭 + 입력 어댑터 4종 확장 / DEC-2026-05-21)",
       "gate": "#1",
       "user_review_pct": "≤ 20",

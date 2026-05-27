@@ -26,9 +26,9 @@ describe('detectGraphArtifactWrite', () => {
     assert.equal(r.filename, 'behavior-spec.json');
   });
 
-  it('chain artifacts 전체 매핑 (planning/behavior/acceptance/test/impl)', () => {
+  it('chain artifacts 전체 매핑 (discovery/behavior/acceptance/test/impl)', () => {
     const map = {
-      'planning-spec.json': 'UC',
+      'discovery-spec.json': 'UC',
       'behavior-spec.json': 'BHV',
       'acceptance-criteria.json': 'AC',
       'test-spec.json': 'TC',
