@@ -914,3 +914,29 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 - **Severity:** **high** — no-simulation 절대 우선순위 직접 구멍 / FE 트랙 전 PoC 영향 / 외부 실 피해 실증 (spec ≠ Figma 8건).
 - **Proposed fix:** (본 cycle 시행 ✅) schema 2 필드 추가 + SKILL 절차 의무화. (carry) analysis-figma 전용 source-grounded validator 신설 (`discovery-extraction-validator` 패턴 차용 / grep_hit 대신 provenance=inferred 비율 임계) — δ 후속.
 - **Status:** **resolved** (본 cycle schema + SKILL fix / validator 신설은 carry)
+
+### F-163: ★ ★ ★ input-adapter source-grounded 비대칭 전수 점검 (F-162 후속 sweep)
+
+- **Phase:** F-162 corrective fix 직후 carry 청산 — input-adapter 5종 (analysis-from-*) vs discovery-adapter 4종 (discovery-from-*) source-grounded 의무 전수 대조 (2026-05-27 / 사용자 요청)
+- **Confidence:** verified (9 SKILL.md + 5 extract schema 직접 grep 대조 + tools/ validator 목록 실측)
+- **Type:** gap (stage-level source-grounded 게이트 비대칭)
+- **Description:** F-162 (analysis-from-figma) 가 단발 누락이 아니라 **analysis stage 전반의 구조적 비대칭**임을 전수 점검으로 확인. discovery stage 4 adapter 는 모두 `discovery-extraction-validator` 공통 hard gate + `source_grounded_evidence` schema-required 보유. analysis stage 5 adapter 는 **대응 validator 부재** + adapter 별 source-grounded 의무 편차 큼:
+
+  | adapter | source 본질 | figma 동형 위험 | 판정 |
+  |---|---|---|---|
+  | analysis-from-figma | Figma visual | (F-162 resolved) | ✅ fix 완료 |
+  | analysis-from-plan-doc | 문서 (MD/PDF/Notion) | **MEDIUM** — UC명/정의/의도를 원문 인용 없이 LLM 요약으로 채울 여지 (source_section heading 만 / verbatim quote·provenance 부재) | ★ 본 cycle fix |
+  | analysis-from-swagger | openapi.yaml (machine-readable) | LOW — parser verbatim 추출 / 단 domain·rules "추정" + evidence 필드 0 | carry |
+  | analysis-from-prompt | 자연어 prompt | 없음 — source 가 텍스트 자체 + 이미 `assumptions`+`confidence` 의무 (no-simulation 정합) | 적절 (no-action) |
+  | analysis-html-template | JSP/Thymeleaf | 없음 — 외부 static analyzer 실 실행 의무 + "LLM 자체 count ❌" (figma 보다 강) | 적절 (no-action) |
+- **Evidence:**
+  - `tools/discovery-extraction-validator` 존재 vs analysis-extraction-validator 류 0건 (analysis stage hard gate 부재)
+  - `schemas/{swagger,plan-doc}-extract.schema.json` evidence/provenance 필드 0건 (figma/html-template 만 보유)
+  - `schemas/prompt-extract.schema.json` confidence/assumption 필드 5건 (prompt 는 이미 적절)
+  - `skills/analysis-html-template/SKILL.md:26,37` (외부 도구 실 실행 + LLM count 금지)
+  - `skills/discovery-from-*/SKILL.md` (4종 모두 source_grounded + grep_hit / 대조군)
+- **Spec gap:** analysis stage 에 discovery-extraction-validator 대응 source-grounded hard gate 부재. adapter 별 source-grounded 의무가 SKILL prose 양심 의존 (코드 enforcement ❌).
+- **Decision made:** ★ self-referential drift 아님 (F-162 와 동일 외부 dogfood 후속 / 사용자 명시 요청 / SKILL+schema consistency gap). **본 cycle = plan-doc fix** (figma 동형 MEDIUM / source_excerpt verbatim + provenance schema 필드 + SKILL no-simulation 절 + 산출 자격 조건). swagger evidence 필드 + analysis-extraction-validator 신설은 carry.
+- **Severity:** **medium** — plan-doc 1건 실 위험 / 나머지는 LOW 또는 이미 적절. 구조적 validator 부재는 carry.
+- **Proposed fix:** (본 cycle ✅) plan-doc schema+SKILL fix. (carry) swagger-extract 에 evidence 필드 + analysis-extraction-validator 신설 (`discovery-extraction-validator` 패턴 / provenance=inferred 비율 hard gate / analysis 5 adapter 공통 적용).
+- **Status:** **resolved** (plan-doc 본 cycle fix / swagger·validator carry)

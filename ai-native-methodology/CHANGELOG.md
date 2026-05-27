@@ -9,6 +9,33 @@
 
 ---
 
+## [11.0.2] — 2026-05-27 PATCH — F-163 input-adapter source-grounded 비대칭 전수 점검 + plan-doc fix
+
+> F-162 후속 sweep. analysis stage 5 adapter vs discovery stage 4 adapter 의 source-grounded 의무 전수 대조 — figma 단발 누락이 아닌 stage 전반 구조적 비대칭 확인.
+
+### 점검 결과 (F-163)
+
+| adapter | figma 동형 위험 | 조치 |
+|---|---|---|
+| analysis-from-figma | (F-162 resolved) | — |
+| **analysis-from-plan-doc** | **MEDIUM** (UC명/정의를 원문 인용 없이 LLM 요약) | ★ 본 cycle fix |
+| analysis-from-swagger | LOW (parser verbatim / domain·rules 추정) | carry |
+| analysis-from-prompt | 없음 (assumptions+confidence 이미 보유) | no-action |
+| analysis-html-template | 없음 (외부 analyzer 실행 의무) | no-action |
+
+### Fixed
+
+- **`schemas/plan-doc-extract.schema.json`**: `uc_candidates[]` + `glossary[]` 에 `source_excerpt` (verbatim quote) + `provenance` (verbatim|inferred) 필드 추가. (optional — PATCH 호환)
+- **`skills/analysis-from-plan-doc/SKILL.md`**: 절차 6/7 원문 인용 의무 + "no-simulation 의무 / 산출 자격 조건" 절 신설 (verbatim 우선 / inferred 명시 / inferred 비율 > 0 시 GO-STOP gate 노출).
+- **`methodology-spec/finding-system.md`**: F-163 등록 (resolved / plan-doc fix / swagger·validator carry).
+
+### Carry (δ 후속)
+
+- `swagger-extract` evidence 필드 추가 (LOW / parser verbatim 이라 후순위).
+- **analysis-extraction-validator 신설** — `discovery-extraction-validator` 패턴 차용 / provenance=inferred 비율 hard gate / analysis 5 adapter 공통 적용 (구조적 비대칭 근본 해소).
+
+---
+
 ## [11.0.1] — 2026-05-27 PATCH — F-162 analysis-from-figma verbatim 검증 의무화 (외부 dogfood 발견)
 
 > ★ δ Type 2 외부 consumer repo (mis-fe-admin EAM 통합권한조회) 실전 dogfood 에서 자연 표면화한 첫 corrective fix. `feedback_self_referential_corrective_drift.md` 가 명시적으로 기다리던 외부 채널 발견 → self-referential drift 아님 → 본 cycle fix 정당.

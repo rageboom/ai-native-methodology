@@ -83,6 +83,15 @@
             "type": "string",
             "description": "어느 section heading 에서 도출 (역추적용)."
           },
+          "source_excerpt": {
+            "type": "string",
+            "description": "★ ★ F-163: UC 후보 도출 근거가 된 문서 원문 발췌 (verbatim quote). LLM 요약 ❌ — 문서 본문 그대로. provenance=verbatim 시 의무."
+          },
+          "provenance": {
+            "type": "string",
+            "enum": ["verbatim", "inferred"],
+            "description": "★ ★ F-163: verbatim = 문서 원문에 명시 (source_excerpt 동반). inferred = 문서 내용 기반 LLM 추론·종합 (출처 섹션은 있으나 원문 직접 인용 ❌ / 후속 chain stage 에서 사용자 확인 의무)."
+          },
           "priority_hint": {
             "type": "string",
             "enum": ["must", "should", "could", "wont"]
@@ -99,8 +108,13 @@
         "required": ["term", "definition"],
         "properties": {
           "term": { "type": "string" },
-          "definition": { "type": "string" },
-          "source_section": { "type": "string" }
+          "definition": { "type": "string", "description": "★ F-163: 문서에 명시된 정의는 verbatim 인용 (provenance=verbatim). 추론 정의는 provenance=inferred." },
+          "source_section": { "type": "string" },
+          "provenance": {
+            "type": "string",
+            "enum": ["verbatim", "inferred"],
+            "description": "★ F-163: verbatim = 문서 원문 정의 그대로 / inferred = LLM 종합 정의 (사용자 확인 의무)."
+          }
         }
       }
     },
