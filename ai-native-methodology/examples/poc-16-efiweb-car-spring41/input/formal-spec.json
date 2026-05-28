@@ -1,0 +1,241 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T07:30:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.75,
+    "raw_confidence": 0.75,
+    "warnings": [
+      "★ formal-spec partial coverage — 12 BR 중 3개만 본격 (Car-CostAccept FSM / UC-CAR-COST-001 sequence / BR-CAR-MGT-006 DT) / 나머지 9 BR carry",
+      "★ invariants + property_tests 빈 array — 분석 stage 단계 / TypeScript 마이그레이션 target 코드 미생성 / impl stage 진입 후 carry",
+      "★ no-simulation 정합 — 외부 정적 분석 도구 실 실행 ❌ (Daikon / CodeQL 부재) / formal-spec-link-validator 만 실행 / 신뢰도 -5%p 패널티 명시"
+    ]
+  },
+  "state_machines": [
+    {
+      "aggregate_root": "E-CAR-COST-Cost",
+      "id": "Car-CostAccept",
+      "initial": "unaccepted",
+      "states": {
+        "unaccepted": {
+          "on": {
+            "SAVE_ACCEPT": {
+              "target": "pending",
+              "guard": "cost_accept_cd != null",
+              "actions": [
+                "saveCarCostAccept MERGE"
+              ]
+            }
+          }
+        },
+        "pending": {
+          "on": {
+            "ADMIN_APPROVE": {
+              "target": "approved",
+              "guard": "admin role + saveCarCostAccept (cost_accept_cd='Y')",
+              "actions": [
+                "cost_accept_cd → 'Y'"
+              ]
+            },
+            "ADMIN_REJECT": {
+              "target": "rejected",
+              "guard": "admin role + saveCarCostAccept (cost_accept_cd='N')",
+              "actions": [
+                "cost_accept_cd → 'N'"
+              ]
+            }
+          }
+        },
+        "approved": {
+          "on": {
+            "REVERT": {
+              "target": "pending",
+              "guard": "admin role + saveCarCostAccept",
+              "actions": [
+                "cost_accept_cd → null"
+              ]
+            }
+          }
+        },
+        "rejected": {
+          "on": {
+            "REVERT": {
+              "target": "pending",
+              "guard": "admin role"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "uc_id": "UC-CAR-COST-001",
+      "title": "차량비용 → ERP 회계전표 IF 전송 (BR-CAR-COST-003 anchor)",
+      "actors": [
+        {
+          "id": "admin",
+          "type": "user"
+        },
+        {
+          "id": "carCostController",
+          "type": "controller"
+        },
+        {
+          "id": "carCostServiceImpl",
+          "type": "service"
+        },
+        {
+          "id": "carCostDAO",
+          "type": "repository"
+        },
+        {
+          "id": "ibatis",
+          "type": "external"
+        },
+        {
+          "id": "sgerp_sp",
+          "type": "external"
+        },
+        {
+          "id": "ifrs_db",
+          "type": "external"
+        }
+      ],
+      "messages": [
+        {
+          "from": "admin",
+          "to": "carCostController",
+          "label": "POST /ifrs/car/costingCalculateAjax",
+          "type": "request"
+        },
+        {
+          "from": "carCostController",
+          "to": "carCostServiceImpl",
+          "label": "selectCarCostingCalculateList(param)",
+          "type": "call"
+        },
+        {
+          "from": "carCostServiceImpl",
+          "to": "carCostDAO",
+          "label": "selectCarCostCalculate(param)",
+          "type": "call"
+        },
+        {
+          "from": "carCostDAO",
+          "to": "ibatis",
+          "label": "queryForList('selectCarCostCalculate')",
+          "type": "call"
+        },
+        {
+          "from": "ibatis",
+          "to": "sgerp_sp",
+          "label": "EXEC SG_SACSlipRowCarManagementIFQuery(useComCd, 0, strDate, endDate, userNm, '', '')",
+          "type": "external_call"
+        },
+        {
+          "from": "sgerp_sp",
+          "to": "ibatis",
+          "label": "result rows (slip_id list)",
+          "type": "response"
+        },
+        {
+          "from": "ibatis",
+          "to": "carCostDAO",
+          "label": "List<EgovMap>",
+          "type": "response"
+        },
+        {
+          "from": "carCostDAO",
+          "to": "carCostServiceImpl",
+          "label": "List<Map>",
+          "type": "response"
+        },
+        {
+          "from": "admin",
+          "to": "carCostController",
+          "label": "POST /ifrs/car/saveCostingList",
+          "type": "request"
+        },
+        {
+          "from": "carCostController",
+          "to": "carCostServiceImpl",
+          "label": "saveCostingList(list, sessionId)",
+          "type": "call"
+        },
+        {
+          "from": "carCostServiceImpl",
+          "to": "carCostDAO",
+          "label": "insertCarCostSlip(map) -- FN_SPLIT(carCostSlipseqs)",
+          "type": "call"
+        },
+        {
+          "from": "carCostDAO",
+          "to": "ibatis",
+          "label": "insert into tb_car_cost_slip",
+          "type": "call"
+        },
+        {
+          "from": "ibatis",
+          "to": "ifrs_db",
+          "label": "INSERT INTO TB_CAR_COST_SLIP (cost_idx, slip_id, cost_gubun, car_cost_type)",
+          "type": "external_call"
+        },
+        {
+          "from": "ifrs_db",
+          "to": "ibatis",
+          "label": "OK",
+          "type": "response"
+        },
+        {
+          "from": "carCostServiceImpl",
+          "to": "carCostController",
+          "label": "void",
+          "type": "response"
+        },
+        {
+          "from": "carCostController",
+          "to": "admin",
+          "label": "200 OK",
+          "type": "response"
+        }
+      ]
+    }
+  ],
+  "decision_tables": [
+    {
+      "br_id": "BR-CAR-MGT-006",
+      "br_type": "security",
+      "trigger": "selectLeaderUserId 호출 (HTTP /ifrs/car/* endpoint 진입 시 세션 사용자가 Leader 인지 확인)",
+      "condition": "FIM.dbo.TB_USER WHERE PFLE_STATUS_CD = 'PS10' AND USER_FG_HR = 'E10' AND USER_ID = sessionId",
+      "action": "USER_ID 반환 (Leader 사용자 확정)",
+      "expected_result": "Leader = 세션 USER_ID 반환 / non-Leader = null",
+      "rejection_method": "Service layer 가 null 시 권한 거부 처리",
+      "verification_location": "source/sqlmap/carMgt.xml selectLeaderUserId + CarMgtServiceImpl.getLeaderUserId",
+      "current_state": "partial",
+      "current_state_note": "FIM 외부 DB 의존 / 'PS10' = 활성 + 'E10' = 직원 의미는 컬럼명 + 사내 컨벤션 추정",
+      "rendered_md_path": "input/formal-spec/decision-tables/BR-CAR-MGT-006.md",
+      "http_status": null,
+      "error_message": null
+    }
+  ],
+  "invariants": [],
+  "property_tests": [],
+  "cross_validation": {
+    "performed": false,
+    "validators": [
+      {
+        "type": "main_agent",
+        "real_tool": false,
+        "simulation_reason": "본 PoC 환경 외부 정적 분석 도구 (Daikon / CodeQL / SonarQube) 부재 — formal-spec partial / impl stage 진입 후 carry",
+        "tool_name": "manual-cross-read",
+        "findings_discovered": 0
+      }
+    ],
+    "simulation_only": true
+  },
+  "code_pointers_na": true
+}

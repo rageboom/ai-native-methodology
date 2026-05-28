@@ -1,0 +1,34 @@
+%% PoC #15 EFI-WEB car — Domain Model (Bounded Context × Aggregate)
+%% domain.json 와 의미 동등 (이중 렌더링)
+
+graph TB
+    subgraph BC_MGT["BC-CAR-MGT (차량 관리)"]
+        Car["E-CAR-Car<br/>(Aggregate Root)<br/>22 attrs"]
+        Term["E-CAR-CarUserTerm<br/>1:N (car_idx)"]
+        Drive["E-CAR-CarDrive<br/>1:N (car_idx)"]
+
+        Car --> Term
+        Car --> Drive
+    end
+
+    subgraph BC_COST["BC-CAR-COST (차량 비용)"]
+        Cost["E-CAR-COST-Cost<br/>(Aggregate Root)<br/>22 attrs (gas/insurance/repair/tax/etc + adj)"]
+        Slip["E-CAR-COST-CostSlip<br/>1:N (cost_idx)<br/>composite PK ⚠️"]
+        NoLog["E-CAR-COST-CostNolog<br/>(별도 Aggregate)<br/>회사별 통합"]
+
+        Cost --> Slip
+    end
+
+    subgraph EXT_DB["External (out of scope)"]
+        SGERP_Slip[["SGERP._TACSlip<br/>(외부 FK)"]]
+        SGERP_SP{{"SGERP.SG_SACSlipRowCarManagementIFQuery<br/>(SP — 회계 IF)"}}
+        FIM_User[["FIM.TB_USER<br/>(Leader 인증)"]]
+    end
+
+    Term -- "1:N (term_idx)" --> Cost
+    Slip -. "외부 FK (slip_id)" .-> SGERP_Slip
+    Cost -. "SP call (BR-CAR-COST-003)" .-> SGERP_SP
+    Car -. "BR-CAR-MGT-006" .-> FIM_User
+
+    classDef root fill:#fff3cd,stroke:#856404
+    class Car,Cost,NoLog root

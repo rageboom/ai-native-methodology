@@ -1,0 +1,254 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T06:20:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "config_files"
+    ],
+    "confidence": 0.92,
+    "raw_confidence": 0.92,
+    "warnings": [
+      "★ external IFRS 모듈 (cmm / common / connect / egov) 본 PoC scope 외 — source 부재 / 호출 시그니처만 확보 (Java import 기반)",
+      "Spring 4.1 + iBATIS 2 paradigm = layered 3-tier 표준 / clean architecture 의 application/domain/infrastructure 분리 ❌ → Clean Architecture layer 매핑 = approximation"
+    ],
+    "related_chain_ids": [
+      "UC-CAR-MGT-001",
+      "UC-CAR-COST-001"
+    ]
+  },
+  "system_name": "EFI-WEB / smilegate.ifrs.car",
+  "architecture_style": "layered",
+  "modules": [
+    {
+      "id": "MOD-CAR-WEB",
+      "name": "Car Web (Controller)",
+      "path": "source/java/smilegate/ifrs/car/web",
+      "layer": "presentation",
+      "responsibility": "HTTP request 라우팅 / view 렌더링 / DTO ↔ Service 변환. 34 endpoint (CarMgt 16 + CarCost 18).",
+      "loc": 792,
+      "file_count": 2,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-SVC-API",
+      "name": "Car Service Interface",
+      "path": "source/java/smilegate/ifrs/car/service",
+      "layer": "application",
+      "responsibility": "비즈니스 로직 API 정의 (interface) — CarMgtService + CarCostService",
+      "loc": 175,
+      "file_count": 2,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-SVC-IMPL",
+      "name": "Car Service Implementation",
+      "path": "source/java/smilegate/ifrs/car/service/impl",
+      "layer": "application",
+      "responsibility": "비즈니스 로직 구현 — CarMgtServiceImpl (8 method) + CarCostServiceImpl (5 method)",
+      "loc": 471,
+      "file_count": 2,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-DAO",
+      "name": "Car DAO (Repository)",
+      "path": "source/java/smilegate/ifrs/car/service/impl",
+      "layer": "infrastructure",
+      "responsibility": "iBATIS sqlmap 호출 / DB 접근. CarMgtDAO (17 method) + CarCostDAO (8 method). ★ package anti-pattern: service/impl/ 안에 위치",
+      "loc": 312,
+      "file_count": 2,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-SQLMAP",
+      "name": "Car SQL Map (iBATIS)",
+      "path": "source/sqlmap",
+      "layer": "infrastructure",
+      "responsibility": "SQL 정의 — carMgt.xml + carCost.xml / 37 statement / 4 외부 DB cross-join + SP 1건",
+      "loc": 831,
+      "file_count": 2,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-JSP",
+      "name": "Car JSP Views",
+      "path": "source/jsp",
+      "layer": "presentation",
+      "responsibility": "server-rendered view templates (Scenario C) — 14 JSP / 3110 code LOC",
+      "loc": 3110,
+      "file_count": 14,
+      "related_bounded_context": "car-mgt + car-cost"
+    },
+    {
+      "id": "MOD-CAR-DDL",
+      "name": "Car DDL (own tables + functions)",
+      "path": "source/ddl",
+      "layer": "infrastructure",
+      "responsibility": "own 6 table + 3 function (TB_CAR* + fn_Get_CarUserListView + FN_split)",
+      "loc": 263,
+      "file_count": 9,
+      "related_bounded_context": "car-mgt + car-cost"
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "MOD-CAR-WEB",
+      "to": "MOD-CAR-SVC-API",
+      "type": "import",
+      "description": "Controller → Service interface"
+    },
+    {
+      "from": "MOD-CAR-SVC-IMPL",
+      "to": "MOD-CAR-SVC-API",
+      "type": "inheritance",
+      "description": "Impl implements interface"
+    },
+    {
+      "from": "MOD-CAR-SVC-IMPL",
+      "to": "MOD-CAR-DAO",
+      "type": "import",
+      "description": "ServiceImpl → DAO (composition via @Resource)"
+    },
+    {
+      "from": "MOD-CAR-DAO",
+      "to": "MOD-CAR-SQLMAP",
+      "type": "import",
+      "description": "DAO → sqlmap (iBATIS SqlMapClient call)"
+    },
+    {
+      "from": "MOD-CAR-SQLMAP",
+      "to": "MOD-CAR-DDL",
+      "type": "shared_db",
+      "description": "sqlmap SQL → DDL 6 table + 3 function"
+    },
+    {
+      "from": "MOD-CAR-WEB",
+      "to": "MOD-CAR-JSP",
+      "type": "import",
+      "description": "Controller → JSP view (ModelMap forward)"
+    }
+  ],
+  "circular_dependencies": [],
+  "external_dependencies": [
+    {
+      "id": "EXT-DB-IFRS",
+      "name": "MSSQL IFRS DB (own)",
+      "type": "storage",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP"
+      ]
+    },
+    {
+      "id": "EXT-DB-FIM",
+      "name": "MSSQL FIM DB (사내 사용자/회사 마스터)",
+      "type": "storage",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP"
+      ]
+    },
+    {
+      "id": "EXT-DB-SGERP",
+      "name": "MSSQL SGERP DB (ERP 회계/조직)",
+      "type": "storage",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP"
+      ]
+    },
+    {
+      "id": "EXT-DB-EHR",
+      "name": "MSSQL e_hr DB (인사 / 휴일)",
+      "type": "storage",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP"
+      ]
+    },
+    {
+      "id": "EXT-DB-EKPORG",
+      "name": "MSSQL ekporg DB (조직)",
+      "type": "storage",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP"
+      ]
+    },
+    {
+      "id": "EXT-SP-SGERP-CAR-IF",
+      "name": "SGERP.dbo.SG_SACSlipRowCarManagementIFQuery (차량비용 회계전표 IF SP)",
+      "type": "messaging",
+      "protocol": "other",
+      "called_from_modules": [
+        "MOD-CAR-SQLMAP",
+        "MOD-CAR-DAO"
+      ]
+    },
+    {
+      "id": "EXT-IFRS-CMM",
+      "name": "smilegate.ifrs.cmm (공통 util — DateUtil / StringUtil / IfrsUtil)",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-SVC-IMPL",
+        "MOD-CAR-WEB"
+      ]
+    },
+    {
+      "id": "EXT-IFRS-COMMON",
+      "name": "smilegate.ifrs.common (공통 서비스)",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-SVC-IMPL"
+      ]
+    },
+    {
+      "id": "EXT-IFRS-CONNECT",
+      "name": "smilegate.ifrs.connect (외부 시스템 연결)",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-SVC-IMPL"
+      ]
+    },
+    {
+      "id": "EXT-IFRS-EGOV",
+      "name": "smilegate.ifrs.egov (eGov 추상 DAO)",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-DAO"
+      ]
+    },
+    {
+      "id": "EXT-FRAMEWORK-SPRING",
+      "name": "Spring MVC 4.1.2 (org.springframework)",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-WEB",
+        "MOD-CAR-SVC-IMPL",
+        "MOD-CAR-DAO"
+      ]
+    },
+    {
+      "id": "EXT-FRAMEWORK-EGOVRTE",
+      "name": "eGov Runtime (egovframework.rte) — PropertyService / EgovMap / PaginationInfo",
+      "type": "other",
+      "protocol": "SDK",
+      "called_from_modules": [
+        "MOD-CAR-WEB",
+        "MOD-CAR-SVC-IMPL"
+      ]
+    }
+  ],
+  "diagram_files": {
+    "architecture": "input/architecture.mermaid",
+    "dependency_graph": "input/dependency-graph.mermaid"
+  },
+  "code_pointers_na": true
+}

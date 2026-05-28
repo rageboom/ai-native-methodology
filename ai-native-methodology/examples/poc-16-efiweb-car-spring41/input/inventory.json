@@ -1,0 +1,151 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T05:45:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "erd",
+      "orm",
+      "config_files"
+    ],
+    "confidence": 0.92,
+    "raw_confidence": 0.92,
+    "confidence_breakdown": {
+      "deterministic_loc": 0.7,
+      "stack_detection": 0.15,
+      "module_structure": 0.07
+    },
+    "warnings": [
+      "external 4 DB (FIM/SGERP/e_hr/ekporg) 18 object source 부재 — sqlmap 추론 + external_only:true 마커",
+      "EFI-WEB ifrs/pom.xml 본 사본 외부 / 메인 dependency tree 추출 위해 원본 참조 의무 (mvn dependency:tree 실행 ❌ — 본 환경 java 25 / EFI-WEB target java 1.8 호환성 문제 가능)"
+    ],
+    "extra": {
+      "cloc_version": "2.08",
+      "loc_extraction_tool": "cloc"
+    }
+  },
+  "repo": {
+    "name": "EFI-WEB/ifrs/smilegate.ifrs.car",
+    "total_files": 36,
+    "total_loc": 9982,
+    "loc_extraction_method": "deterministic",
+    "primary_languages": [
+      {
+        "lang": "xml",
+        "loc": 5747,
+        "pct": 57.6
+      },
+      {
+        "lang": "jsp",
+        "loc": 3110,
+        "pct": 31.2
+      },
+      {
+        "lang": "java",
+        "loc": 798,
+        "pct": 8.0
+      },
+      {
+        "lang": "sql",
+        "loc": 263,
+        "pct": 2.6
+      },
+      {
+        "lang": "markdown",
+        "loc": 64,
+        "pct": 0.6
+      }
+    ]
+  },
+  "stack": {
+    "backend": {
+      "language": "Java 1.8",
+      "framework": "Spring MVC 4.1.2 + eGov 3.6.0",
+      "orm": [
+        {
+          "name": "iBATIS 2.3.4",
+          "confidence": 0.99,
+          "evidence": [
+            "carCost.xml + carMgt.xml 안 `<!DOCTYPE sqlMap PUBLIC \"-//iBATIS.com//DTD SQL Map 2.0//EN\">` directive",
+            "CarMgtDAO + CarCostDAO 가 `extends EgovComAbstractDAO` (iBATIS 2 SqlMapClientDaoSupport 기반)",
+            "sqlmap 안 `#paramName#` 파라미터 표기 (iBATIS 2 고전 / MyBatis 3 = `#{paramName}` 와 다름)"
+          ]
+        }
+      ],
+      "db": "MSSQL (SQL Server / 사용된 dialect: WITH(NOLOCK), GETDATE(), NVARCHAR, ISNULL)"
+    },
+    "frontend": {
+      "language": "JSP 2.0 + JSTL 0 (★ taglib 미사용)",
+      "framework": "Spring MVC 4.1.2 server-rendered (Scenario C)",
+      "ui_library_indicators": [
+        "JSP 14 (List + Form + Popup + Ajax + Confirm patterns)",
+        "JSTL taglib 0건 — scriptlet + raw expression 사용 강도 ↑",
+        "Resin servlet container (public-config.xml present)"
+      ]
+    },
+    "infra": {
+      "language": "Maven 2",
+      "framework": "Resin 4 (servlet container) + Apache Maven build (.war packaging)"
+    }
+  },
+  "architecture_style_candidates": [
+    {
+      "style": "layered",
+      "confidence": 0.7,
+      "evidence": [
+        "3-tier classic: Controller (web/) → Service (service/) → DAO (service/impl/) → DB",
+        "@Controller / @Service / @Repository annotation 명확",
+        "Service interface (CarMgtService / CarCostService) + Impl 분리 (CarMgtServiceImpl / CarCostServiceImpl)",
+        "Spring 4.1 + eGov 3.6 표준 paradigm 정합"
+      ]
+    },
+    {
+      "style": "monolith",
+      "confidence": 0.6,
+      "evidence": [
+        "단일 war / Resin 단일 deployment",
+        "EFI-WEB ifrs 단일 모듈 / 23 도메인 모듈 (car/billing/exchange/...) 모두 같은 war 안",
+        "iBATIS sqlmap-config 중앙 집중 (sql-map-config-mssql.xml — 본 PoC scope 외)"
+      ]
+    }
+  ],
+  "modules_for_priority_analysis": [
+    {
+      "path": "java/smilegate/ifrs/car/web/CarCostController.java",
+      "reason": "car 모듈 가장 큰 controller (418 LOC / 18 endpoint) / Cost 책임 분기 anchor",
+      "loc": 418,
+      "file_count": 1
+    },
+    {
+      "path": "java/smilegate/ifrs/car/web/CarMgtController.java",
+      "reason": "car 모듈 Mgt 책임 분기 anchor (374 LOC / 16 endpoint)",
+      "loc": 374,
+      "file_count": 1
+    },
+    {
+      "path": "java/smilegate/ifrs/car/service/impl/CarMgtServiceImpl.java",
+      "reason": "Mgt 책임 핵심 비즈니스 로직 (247 LOC / 8 method)",
+      "loc": 247,
+      "file_count": 1
+    },
+    {
+      "path": "java/smilegate/ifrs/car/service/impl/CarCostServiceImpl.java",
+      "reason": "Cost 책임 핵심 비즈니스 로직 (224 LOC / 5 method) + SP `SG_SACSlipRowCarManagementIFQuery` 호출 anchor 후보",
+      "loc": 224,
+      "file_count": 1
+    },
+    {
+      "path": "java/smilegate/ifrs/car/service/impl/CarMgtDAO.java",
+      "reason": "Mgt DAO (202 LOC / 17 method) — sqlmap call 가장 무거움",
+      "loc": 202,
+      "file_count": 1
+    }
+  ],
+  "directory_tree_extraction": {
+    "method": "filesystem",
+    "truncated": false,
+    "total_entries": 11
+  },
+  "code_pointers_na": true
+}

@@ -1,0 +1,11 @@
+%% PoC #15 EFI-WEB car — Car-CostAccept FSM
+%% Car-CostAccept.json 와 의미 동등 (이중 렌더링 / drift-validator pair)
+
+stateDiagram-v2
+    [*] --> unaccepted
+
+    unaccepted --> pending: SAVE_ACCEPT<br/>(cost_accept_cd != null)<br/>saveCarCostAccept MERGE
+    pending --> approved: ADMIN_APPROVE<br/>(admin + cost_accept_cd='Y')
+    pending --> rejected: ADMIN_REJECT<br/>(admin + cost_accept_cd='N')
+    approved --> pending: REVERT<br/>(admin + cost_accept_cd=null)
+    rejected --> pending: REVERT<br/>(admin)

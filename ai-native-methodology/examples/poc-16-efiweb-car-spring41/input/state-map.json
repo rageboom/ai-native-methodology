@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T09:25:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.85,
+    "raw_confidence": 0.85,
+    "warnings": [
+      "★ Scenario C (JSP) — Modern FE 상태관리 라이브러리 0건 / state_sources 5 진실 detected=false (server-side state paradigm)",
+      "★ machines 빈 array — server-side state 본질 / Modern FE migration 시 신설"
+    ],
+    "related_chain_ids": [
+      "AC-CAR-MGT-001",
+      "AC-CAR-COST-001"
+    ]
+  },
+  "framework": "jsp_template",
+  "state_sources": [
+    {
+      "source_type": "server_cache",
+      "detected": false,
+      "note": "TanStack/SWR/Apollo 미사용 (Scenario C / JSP)"
+    },
+    {
+      "source_type": "client_state",
+      "detected": false,
+      "note": "Zustand/Redux/Jotai 미사용 (JSP server-rendered)"
+    },
+    {
+      "source_type": "url_state",
+      "detected": false,
+      "note": "request.getParameter 만 / URL state library 미사용"
+    },
+    {
+      "source_type": "form_state",
+      "detected": false,
+      "note": "form action=/submit 만 / React Hook Form 미사용"
+    },
+    {
+      "source_type": "dom_state",
+      "detected": false,
+      "note": "<input value=...> + JSP `<%= %>` 직접 출력 / state library 미사용"
+    }
+  ],
+  "machines": [],
+  "code_pointers_na": true
+}

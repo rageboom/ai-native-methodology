@@ -1,0 +1,176 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T08:50:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.72,
+    "raw_confidence": 0.72,
+    "warnings": [
+      "★ Spring MVC 4.1 + JSP server-rendered paradigm — REST API 아님 / 모든 method = public String 반환 (JSP view name)",
+      "★ ResponseEntity / @ResponseBody / @ExceptionHandler 모두 0건 (grep 결정적) → OpenAPI spec = 추정 / 현 시스템 ≠ OpenAPI 정합",
+      "★ 본 OpenAPI = 마이그레이션 시 REST API 변환 anchor / 현재 상태 추출이 아닌 target spec"
+    ]
+  },
+  "openapi_file": "input/openapi.yaml",
+  "openapi_version": "3.0.3",
+  "operations": [
+    {
+      "operation_id": "carList",
+      "method": "GET",
+      "path": "/ifrs/car/carList",
+      "related_use_case_id": "UC-CAR-MGT-003",
+      "related_rules": [
+        "BR-CAR-MGT-006"
+      ],
+      "reads_aggregates": [
+        "E-CAR-Car"
+      ],
+      "auth_required": true,
+      "required_roles": [
+        "LEADER"
+      ]
+    },
+    {
+      "operation_id": "insertCar",
+      "method": "POST",
+      "path": "/ifrs/car/insertCar",
+      "related_use_case_id": "UC-CAR-MGT-001",
+      "related_rules": [
+        "BR-CAR-MGT-001",
+        "BR-CAR-MGT-005",
+        "BR-CAR-MGT-006"
+      ],
+      "affects_aggregates": [
+        "E-CAR-Car"
+      ],
+      "auth_required": true,
+      "required_roles": [
+        "LEADER"
+      ]
+    },
+    {
+      "operation_id": "carDriveRowSave",
+      "method": "POST",
+      "path": "/ifrs/car/carDriveRowSave",
+      "related_use_case_id": "UC-CAR-MGT-002",
+      "related_rules": [
+        "BR-CAR-MGT-004"
+      ],
+      "affects_aggregates": [
+        "E-CAR-Car"
+      ],
+      "auth_required": true
+    },
+    {
+      "operation_id": "costingCalculateAjax",
+      "method": "POST",
+      "path": "/ifrs/car/cost/costingCalculateAjax",
+      "related_use_case_id": "UC-CAR-COST-001",
+      "related_rules": [
+        "BR-CAR-COST-003"
+      ],
+      "reads_aggregates": [
+        "E-CAR-COST-Cost"
+      ],
+      "auth_required": true
+    },
+    {
+      "operation_id": "saveCostingList",
+      "method": "POST",
+      "path": "/ifrs/car/cost/saveCostingList",
+      "related_use_case_id": "UC-CAR-COST-001",
+      "related_rules": [
+        "BR-CAR-COST-003",
+        "BR-CAR-COST-006"
+      ],
+      "affects_aggregates": [
+        "E-CAR-COST-Cost"
+      ],
+      "auth_required": true
+    },
+    {
+      "operation_id": "saveConfirmList",
+      "method": "POST",
+      "path": "/ifrs/car/cost/saveConfirmList",
+      "related_use_case_id": "UC-CAR-COST-002",
+      "related_rules": [
+        "BR-CAR-COST-002"
+      ],
+      "affects_aggregates": [
+        "E-CAR-COST-Cost"
+      ],
+      "auth_required": true,
+      "required_roles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "operation_id": "costingNoLogCalculateAjax",
+      "method": "POST",
+      "path": "/ifrs/car/cost/costingNoLogCalculateAjax",
+      "related_use_case_id": "UC-CAR-COST-003",
+      "related_rules": [
+        "BR-CAR-COST-004"
+      ],
+      "reads_aggregates": [
+        "E-CAR-COST-CostNolog"
+      ],
+      "auth_required": true
+    },
+    {
+      "operation_id": "saveCostingNoLog",
+      "method": "POST",
+      "path": "/ifrs/car/cost/saveCostingNoLog",
+      "related_use_case_id": "UC-CAR-COST-003",
+      "related_rules": [
+        "BR-CAR-COST-004"
+      ],
+      "affects_aggregates": [
+        "E-CAR-COST-CostNolog"
+      ],
+      "auth_required": true
+    },
+    {
+      "operation_id": "costSumSystem",
+      "method": "GET",
+      "path": "/ifrs/car/cost/costSumSystem",
+      "related_use_case_id": "UC-CAR-COST-004",
+      "related_rules": [
+        "BR-CAR-COST-005"
+      ],
+      "auth_required": true,
+      "required_roles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "operation_id": "costing",
+      "method": "GET",
+      "path": "/ifrs/car/cost/costing",
+      "related_use_case_id": "UC-CAR-COST-001",
+      "auth_required": true
+    }
+  ],
+  "schemas_to_entities": [
+    {
+      "openapi_schema": "CarInsertForm",
+      "entity_id": "E-CAR-Car"
+    },
+    {
+      "openapi_schema": "CarDriveForm",
+      "entity_id": "E-CAR-CarDrive"
+    },
+    {
+      "openapi_schema": "CarCostCalculateRequest",
+      "entity_id": "E-CAR-COST-Cost (read input)"
+    },
+    {
+      "openapi_schema": "CarCostSlipRow",
+      "entity_id": "E-CAR-COST-CostSlip"
+    }
+  ],
+  "code_pointers_na": true
+}

@@ -1,0 +1,49 @@
+{
+  "$comment": "phase characterization coverage matrix / UC ↔ snapshot 매핑",
+  "generated_at": "2026-05-28T08:00:00Z",
+  "matrix": [
+    {
+      "uc": "UC-CAR-COST-001",
+      "controller_method": "CarCostController#costingCalculateAjax+saveCostingList",
+      "service_method": "selectCarCostingCalculateList+saveCostingList",
+      "sql_id": "selectCarCostCalculate+insertCarCostSlip",
+      "scope": "BC-CAR-COST",
+      "snapshot": "✅"
+    },
+    {
+      "uc": "UC-CAR-MGT-001",
+      "controller_method": "CarMgtController#insertCar",
+      "service_method": "CarMgtServiceImpl#insertCar",
+      "sql_id": "insertCar+insertCarUserTerm",
+      "scope": "BC-CAR-MGT",
+      "snapshot": "✅"
+    },
+    {
+      "uc": "UC-CAR-MGT-002",
+      "controller_method": "CarMgtController#carDriveInsertForm+carDriveRowSave",
+      "service_method": "saveCarDriveRow",
+      "sql_id": "insertCarDrive+updateCarTotDist",
+      "scope": "BC-CAR-MGT",
+      "snapshot": "⏳"
+    },
+    {
+      "uc": "UC-CAR-COST-002",
+      "controller_method": "CarCostController#saveConfirmList",
+      "service_method": "saveConfirmList",
+      "sql_id": "saveCarCostAccept (MERGE)",
+      "scope": "BC-CAR-COST",
+      "snapshot": "⏳"
+    }
+  ],
+  "coverage_target": 0.3,
+  "coverage_strategy": "absolute",
+  "stats": {
+    "uc_total_endpoint": 34,
+    "uc_snapshot_complete": 2,
+    "uc_snapshot_pending": 2,
+    "coverage_pct": 0.06,
+    "named_classified_ratio": 0.81,
+    "ambiguous_carry": 4,
+    "self_recognized_satd": 3
+  }
+}

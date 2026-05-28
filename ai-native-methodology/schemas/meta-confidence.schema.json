@@ -248,6 +248,15 @@
       "additionalProperties": true,
       "description": "★ v8.6.0+ F-V2C2-1-02 R#1 fix — PoC / 사용자 부가 metadata 격리 영역. 본 객체 안 임의 keys 허용 (additionalProperties: true). schema 본체의 strict 정신 유지하면서 R4 (재사용성) 마찰 해소. 의도 외 키는 본 extra 안 위치 의무 (drift attractor 회피)."
     },
+    "related_chain_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(UC|BHV|AC|TASK|TC|IMPL)-[A-Z0-9_-]+$"
+      },
+      "uniqueItems": true,
+      "description": "★ v11.2.0 신설 (ADR-CHAIN-013 / DEC-2026-05-28-analysis-chain-link-일관성). analysis/aspect 산출물이 권고/제약하는 chain artifact id 목록 (UC/BHV/AC/TASK/TC/IMPL). graph-synthesizer 가 cross_reference (analysis→chain, soft) 또는 informs (aspect→chain, soft) edge 합성에 사용. optional — chain-side ref (BHV.br_refs / AC.related_brs 등) 또는 analysis-side instance ref (formal-spec.sequences[].uc_id / characterization-spec.snapshots[].use_case 등 6 kinds) 가 이미 있는 경우 본 필드 생략 가능 (3중 fallback / DRY). graph-synthesizer 가 chain 노드 존재 시만 emit (dangling 방지)."
+    },
     "$comment": {
       "type": "string",
       "description": "★ v8.6.0+ — JSON Schema 표준 $comment field (산출물 작성자 메모 / consumer 무시 의무)."

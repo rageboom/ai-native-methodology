@@ -1,7 +1,6 @@
 {
   "$comment": "★ PoC #05 — Business Rules. legacy 결함 분석 결과 자동 도출. chain 1 planning-spec.business_rules_intent 의 source.",
   "project_id": "poc-05-sample-user-register",
-  "code_pointers_na": true,
   "meta": {
     "generated_at": "2026-05-14T00:00:00Z",
     "confidence": 0.92,

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="CarMgtDAO">
+ 
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+
+	<insert id="insertCar" parameterClass="HashMap">
+		/* CarMgtDAO.insertCar */
+		<selectKey resultClass="int" keyProperty="carIdx">
+		insert into tb_car
+			( CAR_NO
+			, CAR_TYPE
+			, COM_CD
+			, BIZ_NO
+			, USER_HOME_ADDR
+			, USER_WORK_ADDR
+			, DISTANCE
+			, DEPT_CD
+			, DUTY
+			, USER_ID
+			, USER_NM
+			, STATE
+			, CAR_GET_DATE
+			, CAR_DISPOSE_DATE
+			, use_yn
+			, ins_id
+			, ins_dt
+			  )
+		values
+			( #carNo#
+			 ,#carType#
+			 ,#comCd#
+			 ,#bizNo#
+			 ,#userHomeAddr#
+			 ,#userWorkAddr#
+			 ,#distance#
+			 ,#deptCd#
+			 ,#duty#
+			 ,#userId#
+			 ,#userNm#
+			 ,#state#
+			 ,#carGetDate#
+			 ,#carDisposeDate#
+			 , 'Y'
+			 ,#sessionId#
+			 ,getdate()
+			)
+		select scope_identity() as carIdx	
+		</selectKey>	
+	</insert>
+	
+	
+	<update id="updateCar" parameterClass="HashMap">
+		/* CarMgtDAO.updateCar */
+		update tb_car
+		set car_no = #carNo#
+			,car_type = #carType#
+			,com_cd = #comCd#
+			,biz_no = #bizNo#
+			,user_home_addr = #userHomeAddr#
+			,user_work_addr = #userWorkAddr#
+			,distance = #distance#
+			,dept_cd = #deptCd#
+			,duty = #duty#
+			,user_id = #userId#
+			,user_nm = #userNm#
+			,state = #state#
+			,car_get_date = #carGetDate#
+			,car_dispose_date = #carDisposeDate#
+			,upt_id = #sessionId#
+			,upt_dt = getdate()
+		where idx = #carIdx#	
+	</update>
+	
+	
+	<select id="selectCarInfo" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectCarInfo */
+		select idx as car_idx 
+			, CAR_NO
+			, CAR_TYPE
+			, COM_CD
+			, (SELECT CompanyName FROM SGERP.._TCACompany WITH(NOLOCK) WHERE CompanySeq = C.com_cd ) AS com_nm
+			, BIZ_NO
+			, BIZ_YEAR
+			, USER_HOME_ADDR
+			, USER_WORK_ADDR
+			, DISTANCE
+			, DEPT_CD
+			, (SELECT DeptName FROM SGERP.dbo.SG_VHRIFDeptQuery WITH(NOLOCK) WHERE DeptSeq = C.dept_cd and CompanySeq = C.com_cd ) AS dept_nm
+			, DUTY
+			, USER_ID
+			, user_nm
+			, state  
+			, convert(varchar(10), car_get_date, 121)  car_get_date
+			, convert(varchar(10), car_dispose_date, 121)  car_dispose_date
+			, TOT_DIST	AS totDist  
+		from TB_CAR C WITH(NOLOCK)
+		where idx = #carIdx#
+	</select>
+	
+	<select id="selectCarList" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectCarList */
+		select M.*
+		from (
+			select idx as car_idx 
+				, CAR_NO
+				, CAR_TYPE
+				, convert(varchar(10), car_get_date, 121) car_get_date
+				, convert(varchar(10), car_dispose_date, 121) car_dispose_date
+				, C.COM_CD
+				, (SELECT CompanyName FROM SGERP.._TCACompany WITH(NOLOCK) WHERE CompanySeq = C.com_cd ) AS com_nm
+				, C.BIZ_NO
+				, BIZ_YEAR
+				, USER_HOME_ADDR
+				, USER_WORK_ADDR
+				, DISTANCE
+				, C.DEPT_CD
+				, (SELECT DeptName FROM SGERP.dbo.SG_VHRIFDeptQuery WITH(NOLOCK) WHERE DeptSeq = C.dept_cd and CompanySeq = C.com_cd ) AS dept_nm
+				, DUTY
+				, C.USER_ID
+				, C.user_nm 
+				, CD.code_name as stateNm
+				, C.state
+				,row_number() over(order by C.state, ISNULL(TC.SORT, 1000) ) as rno   
+        		,count(*) over() as cnt   
+			from TB_CAR C WITH(NOLOCK)
+				left join FIM.dbo.tb_user U WITH(NOLOCK) on U.user_id = C.USER_ID
+				left join tb_company  TC WITH(NOLOCK) on TC.COM_NO = C.COM_CD
+				left join tb_code CD WITH(NOLOCK) on CD.code = C.state and CD.code_type= 'carState'
+				<isNotEmpty property="sessionId">
+				INNER JOIN IFRS.dbo.fn_Get_CarUserListView(#sessionId#) CU ON CU.CAR_USERID	= C.USER_ID
+				</isNotEmpty> 
+			where C.use_yn = 'Y'
+			<isNotEmpty property="carType">
+			and car_type like '%' + #carType# + '%'
+			</isNotEmpty>
+			<isNotEmpty property="userNm">
+			and U.user_nm like '%' + #userNm# + '%'
+			</isNotEmpty>
+			<isNotEmpty property="state">
+			and C.state = #state#
+			</isNotEmpty>
+			<isNotEmpty property="carNo">
+			and CAR_NO like '%' + #carNo# + '%'
+			</isNotEmpty>
+			<isNotEmpty property="companySeq">
+			and C.COM_CD = #companySeq#
+			</isNotEmpty>
+			) M
+		where rno between #firstIndex# AND #lastIndex# 	
+	</select>
+	
+	<select id="selectLeaderUserIdBySec" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectLeaderUserIdBySec */
+		SELECT DISTINCT 
+			STUFF((
+				SELECT ',' + EXECUTIVE_ID 
+				FROM FIM.dbo.TB_SECRETARY TS WITH(NOLOCK)
+				LEFT JOIN FIM.dbo.TB_USER TBU WITH(NOLOCK) ON TS.SECRETARY_ID = TBU.USER_ID
+				WHERE TBU.PFLE_STATUS_CD = 'PS10'
+				AND TS.SECRETARY_ID = #sessionId#
+				FOR XML PATH ('')
+			), 1, 1, '') AS 'userId'
+		FROM FIM.dbo.TB_SECRETARY WITH(NOLOCK)
+	</select>
+	
+	<select id="selectLeaderUserId" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectLeaderUserId */
+		SELECT USER_ID as userId
+		FROM FIM.dbo.TB_USER WITH(NOLOCK)
+		WHERE PFLE_STATUS_CD = 'PS10'
+		AND USER_FG_HR = 'E10'
+		AND USER_ID = #sessionId#
+	</select>
+	
+	<update id="deleteCar" parameterClass="HashMap">
+		/* CarMgtDAO.deleteCar */
+		update tb_car
+		set use_yn = 'N'
+		where idx = #carIdx#
+	</update>
+	
+	<select id="selectCarDriveList" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectCarDriveList */
+		select 	DRIVE_IDX
+				, d.CAR_IDX
+				, DRIVE_NO
+				, PURPOSE_CD
+				, convert(varchar(10), DRIVE_DATE, 121) as drive_date
+				, DEP_POINT
+				, DEP_ACC_DIST
+				, ARR_POINT
+				, ARR_ACC_DIST
+				, DRIVE_DIST
+				, DRIVE_WORK_DIST
+				, d.REMARK
+				, dept.deptName as dept_nm
+				, c.DUTY
+				, d.user_id
+				, d.com_cd
+				, d.dept_cd
+				, u.user_nm
+				, cd.code_name as purpose
+				, d.distance
+				, case when h.HOLIDAY is null then 0 else 1 end as holidayYn
+        		, datename(dw, drive_date) as yoil
+		from tb_car_drive d WITH(NOLOCK)
+	     	inner join tb_car c  WITH(NOLOCK) on d.CAR_IDX = c.idx
+	     	left join FIM.dbo.tb_user u WITH(NOLOCK) on d.user_id = u.user_id
+	     	left join tb_code cd  WITH(NOLOCK) on cd.code_type = 'drivePurpose' and cd.code = d.purpose_cd
+	     	left join sgerp.dbo.SG_VHRIFDeptQuery dept WITH(NOLOCK) on d.com_cd = dept.companyseq and dept.deptSeq = d.DEPT_CD
+	     	left join e_hr.dbo.TB_HOLIDAY h WITH(NOLOCK) on d.DRIVE_DATE = h.HOLIDAY_DATE and h.COM_CD = 'H0000000'
+     	where CAR_IDX = #carIdx#
+		and  convert(varchar, d.drive_date, 23) like #year# + '-' + #month# + '%'
+		<isNotEmpty property="recentDays">
+        and  d.DRIVE_DATE >= convert(varchar, (select isnull(max(DRIVE_DATE), getdate()) from TB_CAR_DRIVE WITH(NOLOCK) where CAR_IDX = #carIdx# and year = #year# ) - convert(int, #recentDays#) , 23)
+        </isNotEmpty>
+		order by DRIVE_DATE
+	</select>
+	
+	<insert id="insertCarDrive" parameterClass="HashMap">
+		/* CarMgtDAO.insertCarDrive */
+		insert into tb_car_drive
+			( CAR_IDX
+			 , [YEAR]
+			 , DRIVE_DATE
+			 , USER_ID
+			 , COM_CD
+			 , DEPT_CD
+			 , DEP_ACC_DIST
+			 , ARR_ACC_DIST
+			 , DRIVE_DIST
+			 , DRIVE_WORK_DIST
+			 , DISTANCE
+			 , REMARK
+			 , INS_ID
+			 , INS_DT
+			 )
+		values	 
+			( #carIdx#
+			  , substring(convert(varchar, #driveDate#, 121), 1, 4)
+			  , #driveDate#
+			  , #userId#
+			  , #comCd#
+			  , #deptCd#
+			  , round(#depAccDist#, 2)
+			  , round(#arrAccDist#, 2)
+			  , round(#driveDist#, 2)
+			  , round(#driveWorkDist#, 2)
+			  , round(#distance#, 2)
+			  , #remark#
+			  , #sessionId#
+			  , getdate()	
+			)
+	</insert>
+	
+	<update id="updateCarNo" parameterClass="HashMap">
+		/* CarMgtDAO.updateCarNo */
+		with drive as
+		(
+		  select drive_idx,
+<!-- 		         de.COM_NM_EN -->
+		         de.COMPANY_ID	/* HSLA-7948 : [EFIS] EKPORG 참조 로직 추가 처리 ( 2022-06-13 : 김연준 ) */
+		         + '-' + replace(substring(convert(varchar(10), drive_date, 121), 3, 8), '-', '')
+		         + '-' + dbo.fn_lpad(convert(varchar, car_idx), 3,  '0')
+		         + '-' + dbo.fn_lpad(convert(varchar,row_number() over(order by arr_acc_dist )),3, '0') as drive_no
+		  FROM tb_car_drive d WITH(NOLOCK)
+		       inner join tb_car c WITH(NOLOCK) on d.car_idx = c.idx
+		       left join sgerp.dbo.SG_VHRIFDeptQuery v WITH(NOLOCK) on ComCd = DeptCd and v.companyseq = c.com_cd
+<!-- 		       left join ekporg.dbo.DEF_GROUP_INTO_COMPANY_LIST de on v.comCd = de.com_Cd -->
+			   left join FIM.dbo.TB_COMPANY de WITH(NOLOCK) on v.comCd = de.com_Cd	/* HSLA-7948 : [EFIS] EKPORG 참조 로직 추가 처리 ( 2022-06-13 : 김연준 ) */
+		  where drive_date = #driveDate#
+		   and car_idx = #carIdx#
+		)
+		update tb_car_drive
+		set drive_no = drive.drive_no
+		from tb_car_drive b, drive
+		where b.DRIVE_IDX = drive.drive_idx
+	</update>
+	
+	<update id="updateCarDrive" parameterClass="HashMap">
+		/* CarMgtDAO.updateCarDrive */
+		update tb_car_drive
+		   set DRIVE_DATE = #driveDate#
+		     , year = substring(convert(varchar, #driveDate#, 121), 1, 4)
+			 , DEP_ACC_DIST = round(#depAccDist#, 2)
+			 , ARR_ACC_DIST = round(#arrAccDist#, 2)
+			 , DRIVE_DIST = round(#driveDist#, 2)
+			 , DRIVE_WORK_DIST = round(#driveWorkDist#, 2)
+			 , DISTANCE = round(#distance#, 2)
+			 , REMARK = #remark#
+			 , UPT_ID = #sessionId#
+			 , UPT_DT = getdate()
+		where drive_idx = #driveIdx#
+		and   car_idx = #carIdx#
+		and   year = #year#
+	</update>
+	
+	<delete id="deleteCarDrive" parameterClass="HashMap">
+		/* CarMgtDAO.deleteCarDrive */
+		delete from tb_car_drive where drive_idx = #deleteIdx#
+	</delete>
+	
+	<update id="updateCarTotDist" parameterClass="HashMap">
+		/* CarMgtDAO.updateCarTotDist */
+		UPDATE 	TB_CAR
+		SET 	TOT_DIST = #totDist#
+		WHERE	idx = #carIdx#
+	</update>
+	
+	<select id="selectErpComList" resultClass="egovMap">
+		/* CarMgtDAO.selectErpComList */
+		select CompanySeq, CompanyName
+		from SGERP.._TCACompany
+		order by CompanySeq
+	</select>
+	
+	<select id="selectErpDeptList" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectErpDeptList */
+		select M.*
+		       ,( select DeptName From sgerp.dbo.SG_VHRIFDeptQuery D WITH(NOLOCK) where DeptSeq = C.UppDeptSeq and CompanySeq = C.CompanySeq ) as upp_dept_nm 
+		from (
+		      select  (select CompanyName from SGERP.._TCACompany B WITH(NOLOCK) where A.CompanySeq = B.CompanySeq) as comNm
+		      		        ,DeptName
+		      		        ,CompanySeq
+		      		        ,DeptSeq 
+		      		        ,isUse
+		                  ,row_number() over(order by A.CompanySeq, A.Deptname ) as rnum
+		      from sgerp.dbo.SG_VHRIFDeptQuery A  WITH(NOLOCK) 
+		      where 1 = 1
+		      <isNotEqual property="isDelDept" compareValue="1">
+		      and IsUse = '사용'
+		      </isNotEqual> 
+		      and companySeq = #companySeq#
+		      and deptName like '%' + #searchDept# + '%'
+		      ) M
+		      left join sgerp.dbo._thrOrgDept C on M.DeptSeq = C.DeptSeq  and C.CompanySeq = M.CompanySeq
+		<!-- where rnum between 11 and 20 -->
+		order by rnum
+	</select>
+	
+	
+	<insert id="insertCarUserTerm" parameterClass="HashMap" >
+		/* CarMgtDAO.insertCarUserTerm */
+		insert into tb_car_user_term
+			( car_idx, user_id, com_cd, dept_cd, str_date, end_date )
+		values
+			( #carIdx#, #userId#, #userComCd#, #userDeptCd#, #strDate#, #endDate# )	
+	</insert>
+	
+	<update id="updateCarUserTerm" parameterClass="HashMap" >
+		/* CarMgtDAO.updateCarUserTerm */
+		update tb_car_user_term
+		set    user_id = #userId#
+			  ,com_cd = #userComCd#
+			  ,dept_cd = #userDeptCd#
+			  ,str_date = #strDate#
+			  ,end_date = #endDate#
+		where term_idx = #termIdx# 	
+	</update>
+	
+	<select id="selectCarUserTermList" parameterClass="HashMap" resultClass="egovMap">
+		/* CarMgtDAO.selectCarUserTermList */
+		select term_idx
+		      , CAR_IDX
+		      , [USER_ID]
+		      , COM_CD
+		      , ( select companyName from SGERP.._TCACompany WITH(NOLOCK) where CompanySeq = a.COM_CD ) as com_nm
+		      , DEPT_CD
+		      , ( select deptName from SGERP..SG_VHRIFDeptQuery WITH(NOLOCK) where CompanySeq = a.COM_CD and deptSeq = a.dept_cd) as dept_nm
+		      , STR_DATE
+		      , END_DATE 
+		from tb_car_user_term a WITH(NOLOCK)
+		where CAR_IDX = #carIdx#
+		order by a.STR_DATE asc
+	</select>
+	
+	<delete id="deleteCarUserTerm" parameterClass="HashMap">
+		/* CarMgtDAO.deleteCarUserTerm */
+		delete from tb_car_user_term 
+		where car_idx = #carIdx#
+		and term_idx not in
+		<iterate open="(" close=")" property="termIdx_arr" conjunction=",">
+		   	#termIdx_arr[]#
+		</iterate> 
+	</delete>
+	
+	<delete id="deleteCarCost" parameterClass="HashMap">
+		/* CarMgtDAO.deleteCarCost */
+		delete from tb_car_cost 
+		where term_idx in
+		( select term_idx from tb_car_user_term 
+		  where car_idx = #carIdx# 
+			and term_idx not in
+		 <iterate open="(" close=")" property="termIdx_arr" conjunction=",">
+		   	#termIdx_arr[]#
+		 </iterate>   
+		 )
+	</delete>
+	
+	<select id="selectCarUserTermCost" parameterClass="HashMap" resultClass="Integer">
+		/* CarMgtDAO.selectCarUserTermCost */
+		select count(*) as cnt
+		from tb_car_cost WITH(NOLOCK)
+		where term_idx = #termIdx#
+	</select>
+</sqlMap>

@@ -1,0 +1,1000 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T06:00:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "erd"
+    ],
+    "confidence": 0.88,
+    "raw_confidence": 0.88,
+    "warnings": [
+      "★ FK CONSTRAINT 명시 부재 — 모든 FK 관계는 컬럼명 컨벤션 (CAR_IDX → TB_CAR.idx) 기반 추론 / DDL 안 외래키 미정의 (legacy iBATIS 2 paradigm 정합)",
+      "★ table/column 이름 = MSSQL native = 대문자 (TB_CAR / CAR_NO) / schema pattern 정합 위해 소문자화 본격 + drift_note 명시 의무",
+      "★ external 4 DB 18 object — DDL source 부재 / sqlmap 추론 만 / 본 schema scope 외 (consistency_report 에 carry)",
+      "★ TB_CAR_COST_SLIP 복합 PK (COST_IDX + SLIP_ID + COST_GUBUN) — schema description 의 anti-pattern 정합 / finding 등재 의무",
+      "★ ERD 파일 (car.erd 60K + ifrs.erd 188K) 형식 unknown — viewer 부재 / manual_extraction ❌ / DDL 사본만 source / ERD ↔ DDL drift 확인 불가"
+    ],
+    "related_chain_ids": [
+      "UC-CAR-MGT-001",
+      "UC-CAR-COST-001"
+    ]
+  },
+  "database_type": "sqlserver",
+  "schema_name": "dbo",
+  "tables": [
+    {
+      "name": "tb_car",
+      "description": "차량 마스터 (Mgt 책임 anchor)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "idx",
+          "type": "INT IDENTITY(1,1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "차량 PK / auto-increment",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_no",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "차량 번호",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_type",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "차량 종류 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "com_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "회사 코드 (FIM 외부 추정)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "biz_no",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "description": "사업자 번호",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "biz_year",
+          "type": "VARCHAR(4)",
+          "nullable": true,
+          "description": "사업 연도",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "user_home_addr",
+          "type": "NVARCHAR(100)",
+          "nullable": true,
+          "description": "사용자 자택 주소",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "user_work_addr",
+          "type": "NVARCHAR(100)",
+          "nullable": true,
+          "description": "사용자 근무지 주소",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "distance",
+          "type": "NUMERIC(18,2)",
+          "nullable": true,
+          "description": "출퇴근 거리 (자택-근무지)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "dept_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "부서 코드 (SGERP 외부 추정)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "duty",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "직책",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "사용자 ID (FIM 외부 추정)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "user_nm",
+          "type": "NVARCHAR(50)",
+          "nullable": true,
+          "description": "사용자 이름",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "use_yn",
+          "type": "CHAR(1)",
+          "nullable": true,
+          "description": "사용 여부 (Y/N)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "ins_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "등록자 ID",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "ins_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "등록 일시",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "upt_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "수정자 ID",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "upt_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "수정 일시",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "tot_dist",
+          "type": "DECIMAL(18,2)",
+          "nullable": true,
+          "description": "총 누적 거리",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "state",
+          "type": "CHAR(1)",
+          "nullable": true,
+          "description": "상태 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_get_date",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "차량 취득 일자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_dispose_date",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "차량 처분 일자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "driver_user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "운전자 ID (user_id 와 다를 수 있음)",
+          "sources": [
+            "operational_db"
+          ]
+        }
+      ],
+      "primary_key": [
+        "idx"
+      ]
+    },
+    {
+      "name": "tb_car_user_term",
+      "description": "차량 ↔ 사용자 기간별 할당 (Mgt)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "term_idx",
+          "type": "INT IDENTITY(1,1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "기간 PK",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_idx",
+          "type": "INT",
+          "nullable": false,
+          "description": "차량 FK (DDL 미정의 / 컬럼명 컨벤션 추론)",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "FK CONSTRAINT 명시 ❌ → tb_car.idx 참조 추론"
+        },
+        {
+          "name": "user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "사용자 ID",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "com_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "회사 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "dept_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "부서 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "str_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 시작일",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "end_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 종료일",
+          "sources": [
+            "operational_db"
+          ]
+        }
+      ],
+      "primary_key": [
+        "term_idx"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_tb_car_user_term__car_idx",
+          "columns": [
+            "car_idx"
+          ],
+          "references_table": "tb_car",
+          "references_columns": [
+            "idx"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tb_car_drive",
+      "description": "차량 운행 로그 (Mgt 책임)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "drive_idx",
+          "type": "INT IDENTITY(1,1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "운행 PK",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_idx",
+          "type": "INT",
+          "nullable": true,
+          "description": "차량 FK (CONSTRAINT ❌)",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "FK CONSTRAINT 명시 ❌ → tb_car.idx 참조 추론"
+        },
+        {
+          "name": "year",
+          "type": "VARCHAR(4)",
+          "nullable": true,
+          "description": "운행 연도",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "drive_no",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "운행 번호",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "purpose_cd",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "description": "용도 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "drive_date",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "운행 일자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "운전자 ID",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "com_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "회사 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "dept_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "부서 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "dep_point",
+          "type": "NVARCHAR(100)",
+          "nullable": true,
+          "description": "출발지",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "dep_acc_dist",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "출발지 누적 거리",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "arr_point",
+          "type": "NVARCHAR(100)",
+          "nullable": true,
+          "description": "도착지",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "arr_acc_dist",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "도착지 누적 거리",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "drive_dist",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "운행 거리",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "drive_work_dist",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "업무 운행 거리",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "remark",
+          "type": "NVARCHAR(200)",
+          "nullable": true,
+          "description": "비고",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "ins_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "등록자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "ins_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "등록 일시",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "upt_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "수정자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "upt_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "수정 일시",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "distance",
+          "type": "DECIMAL(10,2)",
+          "nullable": true,
+          "description": "거리 (drive_dist 와 중복 추정 — schema drift)",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "drive_dist 와 의미 중복 / drift 가능성 / business-rules phase 정밀 확인 carry"
+        }
+      ],
+      "primary_key": [
+        "drive_idx"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_tb_car_drive__car_idx",
+          "columns": [
+            "car_idx"
+          ],
+          "references_table": "tb_car",
+          "references_columns": [
+            "idx"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tb_car_cost",
+      "description": "차량 비용 (Cost 책임 anchor / 항목별 GAS/INSURANCE/REPAIR/TAX/ETC + 조정 + 임차/감가)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "cost_idx",
+          "type": "INT IDENTITY(1,1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "비용 PK",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "term_idx",
+          "type": "INT",
+          "nullable": false,
+          "description": "사용자 기간 FK",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "FK CONSTRAINT 명시 ❌ → tb_car_user_term.term_idx 참조 추론"
+        },
+        {
+          "name": "use_com_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "사용 회사 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "use_str_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 시작일",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "use_end_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 종료일",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "cost_accept_cd",
+          "type": "CHAR(1)",
+          "nullable": true,
+          "description": "비용 승인 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "gas_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "주유 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "insurance_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "보험 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "repair_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "수리 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "tax_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "세금 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "etc_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "기타 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "rent_type_cd",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "description": "임차 종류 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "insurance_yn",
+          "type": "CHAR(1)",
+          "nullable": true,
+          "description": "보험 여부",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "tax_depr_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "세무 감가상각 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "depr_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "감가상각 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "rent_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "임차 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "last_upt_user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "최종 수정자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "last_upt_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "최종 수정 일시",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "gas_cost_adj",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "주유 비용 조정",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "insurance_cost_adj",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "보험 비용 조정",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "repair_cost_adj",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "수리 비용 조정",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "tax_cost_adj",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "세금 비용 조정",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "etc_cost_adj",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "기타 비용 조정",
+          "sources": [
+            "operational_db"
+          ]
+        }
+      ],
+      "primary_key": [
+        "cost_idx"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_tb_car_cost__term_idx",
+          "columns": [
+            "term_idx"
+          ],
+          "references_table": "tb_car_user_term",
+          "references_columns": [
+            "term_idx"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "tb_car_cost_nolog",
+      "description": "운행 로그 없는 차량 비용 (Cost 책임 / 회사 별 통합 추정)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "idx",
+          "type": "INT IDENTITY(1,1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "PK",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "com_cd",
+          "type": "INT",
+          "nullable": true,
+          "description": "회사 코드",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "use_str_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 시작일",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "use_end_date",
+          "type": "DATE",
+          "nullable": true,
+          "description": "사용 종료일",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "gas_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "주유 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "insurance_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "보험 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "repair_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "수리 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "tax_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "세금 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "etc_cost",
+          "type": "NUMERIC(18,0)",
+          "nullable": true,
+          "description": "기타 비용",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "last_upt_user_id",
+          "type": "NVARCHAR(20)",
+          "nullable": true,
+          "description": "최종 수정자",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "last_upt_dt",
+          "type": "DATETIME",
+          "nullable": true,
+          "description": "최종 수정 일시",
+          "sources": [
+            "operational_db"
+          ]
+        }
+      ],
+      "primary_key": [
+        "idx"
+      ]
+    },
+    {
+      "name": "tb_car_cost_slip",
+      "description": "차량 비용 회계전표 IF (★ 복합 PK / SGERP._TACSlip 연동 anchor)",
+      "sources": [
+        "operational_db"
+      ],
+      "columns": [
+        {
+          "name": "cost_idx",
+          "type": "INT",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "비용 FK + PK 일부 (composite)",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "FK CONSTRAINT 명시 ❌ → tb_car_cost.cost_idx 참조 추론"
+        },
+        {
+          "name": "slip_id",
+          "type": "VARCHAR(30)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "회계전표 ID (SGERP._TACSlip.slip_id 외부 FK 추정)",
+          "sources": [
+            "operational_db"
+          ],
+          "drift_note": "외부 DB SGERP 참조 / FK CONSTRAINT 명시 ❌"
+        },
+        {
+          "name": "cost_gubun",
+          "type": "CHAR(1)",
+          "nullable": false,
+          "is_primary_key": true,
+          "description": "비용 구분 (composite PK / Y/N 추정)",
+          "sources": [
+            "operational_db"
+          ]
+        },
+        {
+          "name": "car_cost_type",
+          "type": "VARCHAR(5)",
+          "nullable": true,
+          "description": "차량 비용 종류",
+          "sources": [
+            "operational_db"
+          ]
+        }
+      ],
+      "primary_key": [
+        "cost_idx",
+        "slip_id",
+        "cost_gubun"
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_tb_car_cost_slip__cost_idx",
+          "columns": [
+            "cost_idx"
+          ],
+          "references_table": "tb_car_cost",
+          "references_columns": [
+            "cost_idx"
+          ]
+        }
+      ]
+    }
+  ],
+  "stored_procedures": [
+    {
+      "name": "sg_sacsliprowcarmanagementifquery",
+      "description": "★ 외부 SP — 차량비용 → SGERP 회계전표 IF 전송 (signature only / source ❌)",
+      "external": true,
+      "host_db": "SGERP",
+      "called_from": [
+        "source/sqlmap/carCost.xml:328 (<procedure id=\"selectCarCostCalculate\">)"
+      ],
+      "parameter_count": 6,
+      "note": "carCost.xml selectCarCostCalculateMap parameterMap 으로 6 input parameter 추출 가능 / 본 schema scope = signature 만 / business-rules anchor 후보"
+    }
+  ],
+  "views": [
+    {
+      "name": "fn_get_caruserlistview",
+      "description": "★ UDF (table-valued function) — 차량 사용자 list 조회 / IFRS own (ddl/functions/fn_Get_CarUserListView.sql)",
+      "external": false
+    },
+    {
+      "name": "fn_get_caruserlistview_2",
+      "description": "★ UDF 변형 — date param 추가 추정 / IFRS own (ddl/functions/fn_Get_CarUserListView_2.sql)",
+      "external": false
+    },
+    {
+      "name": "fn_split",
+      "description": "★ 공통 utility UDF — string split / sqlmap 안 'from ifrs.dbo.FN_SPLIT' 호출 정합",
+      "external": false
+    }
+  ],
+  "consistency_report_file": "input/db-schema-consistency-report.md",
+  "diagram_files": {
+    "erd": "input/erd.mermaid"
+  },
+  "code_pointers_na": true
+}

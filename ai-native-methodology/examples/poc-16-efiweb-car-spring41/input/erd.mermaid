@@ -1,0 +1,121 @@
+%% PoC #16 EFI-WEB car — ERD (이중 렌더링 / schema.json 와 의미 동등)
+%% 6 own tables (IFRS.dbo.*) + 1 external SP (SGERP) + 3 UDF (IFRS own)
+%% FK CONSTRAINT 명시 ❌ — 컬럼명 컨벤션 추론
+
+erDiagram
+    TB_CAR ||--o{ TB_CAR_USER_TERM : "1:N (car_idx)"
+    TB_CAR ||--o{ TB_CAR_DRIVE     : "1:N (car_idx)"
+    TB_CAR_USER_TERM ||--o{ TB_CAR_COST : "1:N (term_idx)"
+    TB_CAR_COST     ||--o{ TB_CAR_COST_SLIP : "1:N (cost_idx)"
+    TB_CAR_COST_SLIP }o--|| SGERP_TACSlip : "외부 FK (slip_id)"
+
+    TB_CAR {
+        int idx PK
+        nvarchar(20) car_no
+        varchar(50) car_type
+        int com_cd
+        varchar(50) biz_no
+        varchar(4) biz_year
+        nvarchar(100) user_home_addr
+        nvarchar(100) user_work_addr
+        numeric(18,2) distance
+        int dept_cd
+        nvarchar(20) duty
+        nvarchar(20) user_id
+        nvarchar(50) user_nm
+        char(1) use_yn
+        nvarchar(20) ins_id
+        datetime ins_dt
+        nvarchar(20) upt_id
+        datetime upt_dt
+        decimal(18,2) tot_dist
+        char(1) state
+        datetime car_get_date
+        datetime car_dispose_date
+        nvarchar(20) driver_user_id
+    }
+
+    TB_CAR_USER_TERM {
+        int term_idx PK
+        int car_idx FK
+        nvarchar(20) user_id
+        int com_cd
+        int dept_cd
+        date str_date
+        date end_date
+    }
+
+    TB_CAR_DRIVE {
+        int drive_idx PK
+        int car_idx FK
+        varchar(4) year
+        nvarchar(20) drive_no
+        varchar(20) purpose_cd
+        datetime drive_date
+        nvarchar(20) user_id
+        int com_cd
+        int dept_cd
+        nvarchar(100) dep_point
+        decimal(10,2) dep_acc_dist
+        nvarchar(100) arr_point
+        decimal(10,2) arr_acc_dist
+        decimal(10,2) drive_dist
+        decimal(10,2) drive_work_dist
+        nvarchar(200) remark
+        nvarchar(20) ins_id
+        datetime ins_dt
+        nvarchar(20) upt_id
+        datetime upt_dt
+        decimal(10,2) distance "★ drift candidate vs drive_dist"
+    }
+
+    TB_CAR_COST {
+        int cost_idx PK
+        int term_idx FK
+        int use_com_cd
+        date use_str_date
+        date use_end_date
+        char(1) cost_accept_cd
+        numeric(18,0) gas_cost
+        numeric(18,0) insurance_cost
+        numeric(18,0) repair_cost
+        numeric(18,0) tax_cost
+        numeric(18,0) etc_cost
+        varchar(20) rent_type_cd
+        char(1) insurance_yn
+        numeric(18,0) tax_depr_cost
+        numeric(18,0) depr_cost
+        numeric(18,0) rent_cost
+        nvarchar(20) last_upt_user_id
+        datetime last_upt_dt
+        numeric(18,0) gas_cost_adj
+        numeric(18,0) insurance_cost_adj
+        numeric(18,0) repair_cost_adj
+        numeric(18,0) tax_cost_adj
+        numeric(18,0) etc_cost_adj
+    }
+
+    TB_CAR_COST_NOLOG {
+        int idx PK
+        int com_cd
+        date use_str_date
+        date use_end_date
+        numeric(18,0) gas_cost
+        numeric(18,0) insurance_cost
+        numeric(18,0) repair_cost
+        numeric(18,0) tax_cost
+        numeric(18,0) etc_cost
+        nvarchar(20) last_upt_user_id
+        datetime last_upt_dt
+    }
+
+    TB_CAR_COST_SLIP {
+        int cost_idx PK_FK "composite PK part 1"
+        varchar(30) slip_id PK_FK "composite PK part 2 / 외부 SGERP._TACSlip"
+        char(1) cost_gubun PK "composite PK part 3"
+        varchar(5) car_cost_type
+    }
+
+    SGERP_TACSlip {
+        varchar(30) slip_id PK "외부 DB SGERP / signature 추론"
+    }

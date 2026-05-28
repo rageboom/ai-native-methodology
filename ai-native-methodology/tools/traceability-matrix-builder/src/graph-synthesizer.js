@@ -105,6 +105,34 @@ const CHAIN_TO_ANALYSIS_REFS = Object.freeze({
   AC: { related_brs: 'business-rules', related_aps: 'antipatterns' },
 });
 
+// ★ v11.2.0 (ADR-CHAIN-013) — analysis instance 가 chain artifact 로 가지는 자체 ref 권위 표.
+// "analysis kind 의 어떤 path 가 어떤 chain artifact id 를 가리키는가" — yield chain ids per analysis data.
+// graph-synthesizer 가 analysis-{kind} → chain instance 로 cross_reference (soft) edge 합성.
+// dangling 가드: chain node 존재 시만 emit.
+const ANALYSIS_TO_CHAIN_REFS = Object.freeze({
+  'formal-spec': [
+    (d) => (d?.sequences ?? []).map((s) => s.uc_id).filter(Boolean),
+  ],
+  'characterization-spec': [
+    (d) => (d?.snapshots ?? []).map((s) => s.use_case).filter(Boolean),
+  ],
+  api: [
+    (d) => (d?.operations ?? []).map((op) => op.related_use_case_id).filter(Boolean),
+  ],
+  'ui-ux': [
+    (d) => (d?.pages ?? []).flatMap((p) => p.related_use_cases ?? []),
+    (d) => (d?.components ?? []).flatMap((c) => c.related_use_cases ?? []),
+  ],
+  'sql-inventory': [
+    (d) => (d?.inventory ?? []).map((i) => i.uc_link).filter(Boolean),
+  ],
+  domain: [
+    (d) => (d?.bounded_contexts ?? []).flatMap((bc) =>
+      (bc.aggregates ?? []).flatMap((a) => a.related_use_cases ?? []),
+    ),
+  ],
+});
+
 // ============================================================================
 // Node 헬퍼
 // ============================================================================
@@ -429,6 +457,35 @@ export function synthesizeGraph(input) {
   }
   emitAnalysisCrossRefs(behavior?.behaviors, 'BHV');
   emitAnalysisCrossRefs(acceptance?.criteria, 'AC');
+
+  // --- ★ v11.2.0 cross_reference (soft, analysis instance → chain) — ADR-CHAIN-013 Layer 2 ---
+  // analysis 산출물 안 자체 ref 필드 (sequences[].uc_id / snapshots[].use_case / operations[].related_use_case_id /
+  //  pages[].related_use_cases / inventory[].uc_link / bounded_contexts[].aggregates[].related_use_cases)
+  // 가 가리키는 chain id 로 cross_reference edge 합성. dangling 가드: nodeIds.has(target).
+  for (const [analysisKind, accessors] of Object.entries(ANALYSIS_TO_CHAIN_REFS)) {
+    if (!analysisLoaded.has(analysisKind)) continue;
+    const data = analysis[analysisKind];
+    if (!data) continue;
+    for (const accessor of accessors) {
+      for (const target of accessor(data)) {
+        if (!nodeIds.has(target)) continue;
+        edges.push(makeEdge(`analysis-${analysisKind}`, target, 'cross_reference'));
+      }
+    }
+  }
+
+  // --- ★ v11.2.0 cross_reference (soft, analysis → chain) — ADR-CHAIN-013 Layer 3 meta fallback ---
+  // 5 schemas (architecture / db-schema / state-map / type-spec / error-mapping-spec) 가 자체 ref 필드 부재.
+  // meta.related_chain_ids[] 가 있으면 fallback 으로 cross_reference 합성 (aspect informs 동형).
+  // 모든 analysis kind 가 본 경로 활용 가능 (3중 fallback / DRY).
+  for (const subkind of ANALYSIS_SUBKINDS) {
+    const data = analysis[subkind];
+    if (!data) continue;
+    for (const target of data.meta?.related_chain_ids ?? []) {
+      if (!nodeIds.has(target)) continue;
+      edges.push(makeEdge(`analysis-${subkind}`, target, 'cross_reference'));
+    }
+  }
 
   // --- informs (soft, aspect → chain) ---
   // aspect 산출물이 어떤 chain 노드에 권고를 거는지의 명시적 schema 필드가 아직 없음.

@@ -1,0 +1,1292 @@
+{
+  "derived_from": [
+    "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+    "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+    "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+    "examples/poc-16-efiweb-car-spring41/input/architecture.json",
+    "examples/poc-16-efiweb-car-spring41/input/domain.json",
+    "examples/poc-16-efiweb-car-spring41/input/openapi-extension.json",
+    "examples/poc-16-efiweb-car-spring41/input/db-schema.json",
+    "examples/poc-16-efiweb-car-spring41/input/formal-spec.json",
+    "examples/poc-16-efiweb-car-spring41/input/business-rules.json",
+    "examples/poc-16-efiweb-car-spring41/input/antipatterns.json",
+    "examples/poc-16-efiweb-car-spring41/input/ui-spec.json",
+    "examples/poc-16-efiweb-car-spring41/input/state-map.json",
+    "examples/poc-16-efiweb-car-spring41/input/visual-manifest.json",
+    "examples/poc-16-efiweb-car-spring41/input/type-spec.json",
+    "examples/poc-16-efiweb-car-spring41/input/error-mapping-spec.json",
+    "examples/poc-16-efiweb-car-spring41/input/characterization-spec.json",
+    "examples/poc-16-efiweb-car-spring41/input/sql-inventory.json"
+  ],
+  "do_not_edit_manually": true,
+  "schema": {
+    "node": "artifact-graph-node.schema.json",
+    "edge": "artifact-graph-edge.schema.json"
+  },
+  "synthesized_at": "2026-05-28T09:19:21.052Z",
+  "nodes": [
+    {
+      "id": "UC-CAR-MGT-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "차량 신규 등록",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-MGT-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "차량 운행 등록",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-MGT-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "차량 목록 조회",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-MGT-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "차량 정보 수정",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-MGT-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "차량 처분",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-COST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-COST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "비용 승인 (cost_accept_cd)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-COST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "운행 로그 없는 비용 계산 (NoLog)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-COST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "비용 합산 시스템 (CostSumSystem)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "UC-CAR-COST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "비용 항목별 조회 (5종 + 조정)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-MGT-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "차량 신규 등록 동작",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-MGT-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "차량 운행 등록 + 누적거리 자동 갱신",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-MGT-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "차량 목록 조회",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-MGT-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "차량 정보 수정",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-MGT-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "차량 처분 (ambiguous)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-COST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "★ 차량비용 → ERP 회계전표 IF (cross-DB)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-COST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "비용 승인 (MERGE)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-COST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "NoLog 비용 계산 / 저장",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-COST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "비용 합산 시스템 (CostSumSystem)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "BHV-CAR-COST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "비용 항목별 조회",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-MGT-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "Leader 차량 신규 등록",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-MGT-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "차량 운행 등록 + TOT_DIST 자동 갱신",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-MGT-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "차량 목록 조회 (pagination)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-MGT-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "차량 정보 수정",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-MGT-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "차량 처분 (★ ambiguous)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-COST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "★ ★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-COST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "비용 승인 (cost_accept_cd) MERGE",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-COST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "NoLog 비용 계산 + 저장",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-COST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "비용 합산 시스템",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "AC-CAR-COST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "비용 항목별 조회",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-architecture",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "architecture",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/architecture.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-domain",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "domain",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/domain.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-api",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "api",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/openapi-extension.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-db-schema",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "db-schema",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/db-schema.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-formal-spec",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "formal-spec",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/formal-spec.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-business-rules",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/business-rules.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-antipatterns",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "antipatterns",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/antipatterns.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-ui-ux",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "ui-ux",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/ui-spec.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-state-map",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "state-map",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/state-map.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-visual-manifest",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "visual-manifest",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/visual-manifest.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-type-spec",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "type-spec",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/type-spec.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-error-mapping-spec",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "error-mapping-spec",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/error-mapping-spec.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-characterization-spec",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "characterization-spec",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/characterization-spec.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    },
+    {
+      "id": "analysis-sql-inventory",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "sql-inventory",
+      "source_path": "examples/poc-16-efiweb-car-spring41/input/sql-inventory.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-16-car"
+    }
+  ],
+  "edges": [
+    {
+      "source": "UC-CAR-MGT-001",
+      "target": "BHV-CAR-MGT-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-MGT-002",
+      "target": "BHV-CAR-MGT-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-MGT-003",
+      "target": "BHV-CAR-MGT-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-MGT-004",
+      "target": "BHV-CAR-MGT-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-MGT-005",
+      "target": "BHV-CAR-MGT-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-COST-001",
+      "target": "BHV-CAR-COST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-COST-002",
+      "target": "BHV-CAR-COST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-COST-003",
+      "target": "BHV-CAR-COST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-COST-004",
+      "target": "BHV-CAR-COST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "UC-CAR-COST-005",
+      "target": "BHV-CAR-COST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-MGT-001",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-MGT-002",
+      "target": "AC-CAR-MGT-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-MGT-003",
+      "target": "AC-CAR-MGT-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-MGT-004",
+      "target": "AC-CAR-MGT-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-MGT-005",
+      "target": "AC-CAR-MGT-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-COST-001",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-COST-002",
+      "target": "AC-CAR-COST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-COST-003",
+      "target": "AC-CAR-COST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-COST-004",
+      "target": "AC-CAR-COST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "BHV-CAR-COST-005",
+      "target": "AC-CAR-COST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-CAR-COST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-CAR-COST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-formal-spec",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-characterization-spec",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-characterization-spec",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-api",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-ui-ux",
+      "target": "UC-CAR-COST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-MGT-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-MGT-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-MGT-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-MGT-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-CAR-COST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-architecture",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-architecture",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-db-schema",
+      "target": "UC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-db-schema",
+      "target": "UC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-state-map",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-state-map",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-visual-manifest",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-visual-manifest",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-type-spec",
+      "target": "AC-CAR-MGT-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-type-spec",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    },
+    {
+      "source": "analysis-error-mapping-spec",
+      "target": "AC-CAR-COST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+    }
+  ],
+  "stats": {
+    "node_count": 44,
+    "edge_count": 109,
+    "by_kind": {
+      "chain": 30,
+      "plan": 0,
+      "analysis": 14,
+      "aspect": 0
+    },
+    "by_state": {
+      "active": 44,
+      "drift": 0,
+      "propose": 0,
+      "deprecated": 0
+    },
+    "by_edge_type": {
+      "derived_from": 20,
+      "implements": 0,
+      "tests": 0,
+      "depends_on": 0,
+      "conforms_to": 0,
+      "cross_reference": 89,
+      "informs": 0,
+      "groups": 0
+    }
+  },
+  "scope_id": "poc-16-car",
+  "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
+}

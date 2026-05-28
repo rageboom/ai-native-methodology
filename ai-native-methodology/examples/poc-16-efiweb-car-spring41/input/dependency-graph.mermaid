@@ -1,0 +1,26 @@
+%% PoC #16 EFI-WEB car — Module Dependency Graph
+%% architecture.json dependencies 배열과 의미 동등
+
+graph LR
+    WEB["MOD-CAR-WEB"]
+    JSP["MOD-CAR-JSP"]
+    SVCAPI["MOD-CAR-SVC-API"]
+    SVCIMPL["MOD-CAR-SVC-IMPL"]
+    DAO["MOD-CAR-DAO"]
+    SQLMAP["MOD-CAR-SQLMAP"]
+    DDL["MOD-CAR-DDL"]
+
+    WEB -->|import| SVCAPI
+    WEB -->|view| JSP
+    SVCIMPL -.implements.-> SVCAPI
+    SVCIMPL -->|import / @Resource| DAO
+    DAO -->|SqlMapClient call| SQLMAP
+    SQLMAP -->|shared_db| DDL
+
+    classDef pres fill:#e1f5ff,stroke:#0277bd
+    classDef app fill:#fff3e0,stroke:#ef6c00
+    classDef infra fill:#f3e5f5,stroke:#7b1fa2
+
+    class WEB,JSP pres
+    class SVCAPI,SVCIMPL app
+    class DAO,SQLMAP,DDL infra

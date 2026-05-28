@@ -1,0 +1,47 @@
+{
+  "aggregate_root": "E-CAR-COST-Cost",
+  "id": "Car-CostAccept",
+  "initial": "unaccepted",
+  "states": {
+    "unaccepted": {
+      "on": {
+        "SAVE_ACCEPT": {
+          "target": "pending",
+          "guard": "cost_accept_cd != null",
+          "actions": ["saveCarCostAccept MERGE"]
+        }
+      }
+    },
+    "pending": {
+      "on": {
+        "ADMIN_APPROVE": {
+          "target": "approved",
+          "guard": "admin role + saveCarCostAccept (cost_accept_cd='Y')",
+          "actions": ["cost_accept_cd → 'Y'"]
+        },
+        "ADMIN_REJECT": {
+          "target": "rejected",
+          "guard": "admin role + saveCarCostAccept (cost_accept_cd='N')",
+          "actions": ["cost_accept_cd → 'N'"]
+        }
+      }
+    },
+    "approved": {
+      "on": {
+        "REVERT": {
+          "target": "pending",
+          "guard": "admin role + saveCarCostAccept",
+          "actions": ["cost_accept_cd → null"]
+        }
+      }
+    },
+    "rejected": {
+      "on": {
+        "REVERT": {
+          "target": "pending",
+          "guard": "admin role"
+        }
+      }
+    }
+  }
+}

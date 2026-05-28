@@ -1,0 +1,174 @@
+openapi: 3.0.3
+info:
+  title: EFI-WEB car module API (analyzed)
+  version: "1.0.0"
+  description: |
+    ★ PoC #15 EFI-WEB car 모듈의 @RequestMapping endpoint 추출 OpenAPI.
+    ★ 본 시스템 = Spring MVC 4.1 + JSP server-rendered / REST API 아님 (모든 method = public String 반환 = JSP view name)
+    ★ Ajax endpoint 도 ModelMap forward → JSP fragment / Content-Type = text/html
+    ★ 본 OpenAPI = 마이그레이션 시 REST API 변환 시 anchor / 현재 상태 ≠ OpenAPI spec 정합
+servers:
+  - url: https://ifrs.smilegate.net
+    description: production
+tags:
+  - name: car-mgt
+    description: 차량 관리 (CarMgtController / 16 endpoint)
+  - name: car-cost
+    description: 차량 비용 (CarCostController / 18 endpoint)
+
+paths:
+  /ifrs/car/carList:
+    get:
+      tags: [car-mgt]
+      operationId: carList
+      summary: 차량 목록 조회 (Leader)
+      x-controller-method: CarMgtController#carList
+      x-br-anchor: BR-CAR-MGT-006
+      x-response-paradigm: server-rendered-jsp
+      responses:
+        '200':
+          description: 차량 목록 JSP (carList.jsp)
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /ifrs/car/insertCar:
+    post:
+      tags: [car-mgt]
+      operationId: insertCar
+      summary: ★ 차량 신규 등록 (BR-CAR-MGT-001 + 005 + 006)
+      x-controller-method: CarMgtController#insertCar
+      x-br-anchor: [BR-CAR-MGT-001, BR-CAR-MGT-005, BR-CAR-MGT-006]
+      x-sql-ids: [insertCar, insertCarUserTerm]
+      x-form-action: carInsertForm.jsp action="/ifrs/car/insertCar" method=post
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [carNo, carType, comCd, userId, userNm]
+              properties:
+                carNo: {type: string, maxLength: 20}
+                carType: {type: string, maxLength: 50}
+                comCd: {type: integer}
+                bizNo: {type: string}
+                userId: {type: string, maxLength: 20}
+                userNm: {type: string, maxLength: 50}
+                carGetDate: {type: string, format: date-time}
+      responses:
+        '200':
+          description: 등록 후 carList redirect (server-rendered)
+
+  /ifrs/car/carDriveRowSave:
+    post:
+      tags: [car-mgt]
+      operationId: carDriveRowSave
+      summary: 차량 운행 저장 (TOT_DIST 누적 trigger / BR-CAR-MGT-004)
+      x-controller-method: CarMgtController#carDriveRowSave
+      x-br-anchor: BR-CAR-MGT-004
+      x-sql-ids: [insertCarDrive, updateCarTotDist]
+      x-side-effect: TOT_DIST 자동 갱신
+      responses:
+        '200':
+          description: 저장 완료
+
+  /ifrs/car/cost/costing:
+    get:
+      tags: [car-cost]
+      operationId: costing
+      summary: 차량비용 계산 화면 (carCosting.jsp)
+      x-controller-method: CarCostController#costing
+      responses:
+        '200':
+          description: carCosting.jsp
+
+  /ifrs/car/cost/costingCalculateAjax:
+    post:
+      tags: [car-cost]
+      operationId: costingCalculateAjax
+      summary: ★ ★ 차량비용 계산 (SGERP SP IF / BR-CAR-COST-003 anchor)
+      x-controller-method: CarCostController#costingCalculateAjax
+      x-br-anchor: BR-CAR-COST-003
+      x-sql-ids: [selectCarCostCalculate]
+      x-statement-type: CALLABLE
+      x-external-sp: SGERP.dbo.SG_SACSlipRowCarManagementIFQuery
+      x-transaction-guarantee: false
+      x-consistency: eventual
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [useComCd, strDate, endDate, userNm]
+              properties:
+                useComCd: {type: integer}
+                strDate: {type: string, format: date}
+                endDate: {type: string, format: date}
+                userNm: {type: string}
+      responses:
+        '200':
+          description: slip_id list (Ajax JSP fragment)
+
+  /ifrs/car/cost/saveCostingList:
+    post:
+      tags: [car-cost]
+      operationId: saveCostingList
+      summary: 회계전표 IF 저장 (FN_SPLIT bulk insert / BR-CAR-COST-006)
+      x-controller-method: CarCostController#saveCostingList
+      x-br-anchor: BR-CAR-COST-006
+      x-sql-ids: [insertCarCostSlip]
+      x-side-effect: tb_car_cost_slip bulk insert
+      responses:
+        '200':
+          description: 저장 완료
+
+  /ifrs/car/cost/saveConfirmList:
+    post:
+      tags: [car-cost]
+      operationId: saveConfirmList
+      summary: 비용 승인 저장 (MERGE / BR-CAR-COST-002)
+      x-controller-method: CarCostController#saveConfirmList
+      x-br-anchor: BR-CAR-COST-002
+      x-sql-ids: [saveCarCostAccept]
+      responses:
+        '200':
+          description: 저장 완료
+
+  /ifrs/car/cost/costingNoLogCalculateAjax:
+    post:
+      tags: [car-cost]
+      operationId: costingNoLogCalculateAjax
+      summary: 운행 로그 없는 비용 계산 (BR-CAR-COST-004)
+      x-controller-method: CarCostController#costingNoLogCalculateAjax
+      x-br-anchor: BR-CAR-COST-004
+      x-sql-ids: [selectCarCostNoLog]
+      responses:
+        '200':
+          description: 계산 결과 fragment
+
+  /ifrs/car/cost/saveCostingNoLog:
+    post:
+      tags: [car-cost]
+      operationId: saveCostingNoLog
+      summary: NoLog 비용 저장 (BR-CAR-COST-004)
+      x-controller-method: CarCostController#saveCostingNoLog
+      x-br-anchor: BR-CAR-COST-004
+      x-sql-ids: [insertCarCostNoLog]
+      responses:
+        '200':
+          description: 저장 완료
+
+  /ifrs/car/cost/costSumSystem:
+    get:
+      tags: [car-cost]
+      operationId: costSumSystem
+      summary: 비용 합산 시스템 화면 (BR-CAR-COST-005)
+      x-controller-method: CarCostController#costSumSystem
+      x-br-anchor: BR-CAR-COST-005
+      responses:
+        '200':
+          description: carCostSumSystem.jsp
+
+# 본격 추출 = 10 endpoint / 전체 = 34 endpoint
+# 24 partial = api-extension.json operations 배열 ID-only carry

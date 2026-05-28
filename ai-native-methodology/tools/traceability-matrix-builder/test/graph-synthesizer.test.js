@@ -574,3 +574,141 @@ describe('synthesizeGraph — ★ v11.0.0 6-layer chain + plan 조직 + contract
     assert.equal(confidenceFor('groups'), 'soft');
   });
 });
+
+// ============================================================================
+// ★ v11.2.0 — analysis schema chain-link 일관성 (ADR-CHAIN-013)
+//   3 layer 매핑 검증:
+//     Layer 1 — chain-side ref (BHV.br_refs / AC.related_brs+aps) — 기존 검증
+//     Layer 2 — analysis-side self-ref (6 kinds: formal-spec / characterization / api / ui-ux / sql-inventory / domain)
+//     Layer 3 — meta.related_chain_ids fallback (5 kinds: architecture / db-schema / state-map / type-spec / error-mapping-spec)
+//   PoC #16 발견 (12 analysis 적재 시 83% orphan) 회귀 차단.
+// ============================================================================
+
+describe('synthesizeGraph — ★ v11.2.0 analysis chain-link 일관성 (ADR-CHAIN-013)', () => {
+  // miniInput 확장 — 6 analysis self-ref + 5 meta fallback + minimal chain/plan layer
+  const v112Input = {
+    discovery: { use_cases: [{ id: 'UC-USER-001' }, { id: 'UC-USER-002' }] },
+    behavior: {
+      behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'] }],
+    },
+    acceptance: {
+      criteria: [
+        { id: 'AC-USER-001', behavior_ref: 'BHV-USER-001' },
+      ],
+    },
+    analysis: {
+      // Layer 2 — analysis-side self-ref
+      'formal-spec': { sequences: [{ uc_id: 'UC-USER-001' }] },
+      'characterization-spec': { snapshots: [{ snapshot_id: 'SNAP-1', use_case: 'UC-USER-001' }] },
+      api: { operations: [{ operation_id: 'foo', related_use_case_id: 'UC-USER-001' }] },
+      'ui-ux': {
+        pages: [{ id: 'PAGE-1', related_use_cases: ['UC-USER-001'] }],
+        components: [{ id: 'CMP-1', related_use_cases: ['UC-USER-002'] }],
+      },
+      'sql-inventory': { inventory: [{ sql_id: 'q1', uc_link: 'UC-USER-001' }] },
+      domain: {
+        bounded_contexts: [{
+          id: 'BC-USER',
+          aggregates: [{ id: 'AGG-USER', related_use_cases: ['UC-USER-001'] }],
+        }],
+      },
+      // Layer 3 — meta.related_chain_ids fallback (5 schemas 의무)
+      architecture: { meta: { related_chain_ids: ['BHV-USER-001'] } },
+      'db-schema': { meta: { related_chain_ids: ['BHV-USER-001'] } },
+      'state-map': { meta: { related_chain_ids: ['AC-USER-001'] } },
+      'type-spec': { meta: { related_chain_ids: ['AC-USER-001'] } },
+      'error-mapping-spec': { meta: { related_chain_ids: ['AC-USER-001'] } },
+    },
+  };
+
+  it('Layer 2 — formal-spec.sequences[].uc_id → analysis-formal-spec→UC cross_reference', () => {
+    const g = synthesizeGraph(v112Input);
+    const found = g.edges.find((e) =>
+      e.source === 'analysis-formal-spec' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(found, 'formal-spec.sequences[].uc_id → UC 매핑 의무');
+  });
+
+  it('Layer 2 — characterization-spec.snapshots[].use_case → UC', () => {
+    const g = synthesizeGraph(v112Input);
+    const found = g.edges.find((e) =>
+      e.source === 'analysis-characterization-spec' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(found);
+  });
+
+  it('Layer 2 — api.operations[].related_use_case_id → UC', () => {
+    const g = synthesizeGraph(v112Input);
+    const found = g.edges.find((e) =>
+      e.source === 'analysis-api' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(found);
+  });
+
+  it('Layer 2 — ui-ux.pages[].related_use_cases + components[].related_use_cases → UC (양쪽)', () => {
+    const g = synthesizeGraph(v112Input);
+    const toUc1 = g.edges.find((e) =>
+      e.source === 'analysis-ui-ux' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    const toUc2 = g.edges.find((e) =>
+      e.source === 'analysis-ui-ux' && e.target === 'UC-USER-002' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(toUc1 && toUc2, 'ui-ux 의 pages + components 모두 매핑 의무');
+  });
+
+  it('Layer 2 — sql-inventory.inventory[].uc_link → UC (12 컬럼 정합)', () => {
+    const g = synthesizeGraph(v112Input);
+    const found = g.edges.find((e) =>
+      e.source === 'analysis-sql-inventory' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(found);
+  });
+
+  it('Layer 2 — domain.bounded_contexts[].aggregates[].related_use_cases → UC (nested 2-deep)', () => {
+    const g = synthesizeGraph(v112Input);
+    const found = g.edges.find((e) =>
+      e.source === 'analysis-domain' && e.target === 'UC-USER-001' && e.edge_type === 'cross_reference',
+    );
+    assert.ok(found, 'domain bounded_context.aggregate 안 nested ref 도 cross_reference');
+  });
+
+  it('Layer 3 — meta.related_chain_ids (5 schemas fallback)', () => {
+    const g = synthesizeGraph(v112Input);
+    const expected = [
+      { source: 'analysis-architecture', target: 'BHV-USER-001' },
+      { source: 'analysis-db-schema', target: 'BHV-USER-001' },
+      { source: 'analysis-state-map', target: 'AC-USER-001' },
+      { source: 'analysis-type-spec', target: 'AC-USER-001' },
+      { source: 'analysis-error-mapping-spec', target: 'AC-USER-001' },
+    ];
+    for (const exp of expected) {
+      const found = g.edges.find((e) =>
+        e.source === exp.source && e.target === exp.target && e.edge_type === 'cross_reference',
+      );
+      assert.ok(found, `${exp.source} → ${exp.target} 매핑 의무 (meta.related_chain_ids)`);
+    }
+  });
+
+  it('orphan 회귀 차단 — 11 analysis 모두 ≥ 1 cross_reference edge (PoC #16 발견 정합)', () => {
+    const g = synthesizeGraph(v112Input);
+    const analysisIds = g.nodes.filter((n) => n.artifact_kind === 'analysis').map((n) => n.id);
+    const inOrOut = new Set();
+    for (const e of g.edges) { inOrOut.add(e.source); inOrOut.add(e.target); }
+    const orphan = analysisIds.filter((id) => !inOrOut.has(id));
+    assert.deepEqual(orphan, [], `analysis orphan = 0 의무 (실제: ${orphan.join(', ') || 'none'})`);
+  });
+
+  it('dangling 가드 — 존재하지 않는 chain id 는 edge emit ❌', () => {
+    const dangling = {
+      ...v112Input,
+      analysis: {
+        ...v112Input.analysis,
+        'formal-spec': { sequences: [{ uc_id: 'UC-NONEXISTENT-999' }] },
+        architecture: { meta: { related_chain_ids: ['UC-NONEXISTENT-999'] } },
+      },
+    };
+    const g = synthesizeGraph(dangling);
+    const danglingEdges = g.edges.filter((e) => e.target === 'UC-NONEXISTENT-999');
+    assert.equal(danglingEdges.length, 0, 'nodeIds.has(target) 가드 통과 의무');
+  });
+});

@@ -1,0 +1,81 @@
+{
+  "snapshot_id": "SNAP-UC-CAR-COST-001",
+  "use_case": "UC-CAR-COST-001",
+  "feature": "차량비용 → ERP 회계전표 IF 전송 (BR-CAR-COST-003 anchor)",
+  "endpoint": "POST /ifrs/car/costingCalculateAjax → POST /ifrs/car/saveCostingList",
+  "controller_method": "CarCostController#costingCalculateAjax + CarCostController#saveCostingList",
+  "service_method": "CarCostServiceImpl#selectCarCostingCalculateList + CarCostServiceImpl#saveCostingList",
+  "sql_id": "selectCarCostCalculate + insertCarCostSlip",
+  "layer": "integration",
+  "data_source_status": "code_only",
+  "scenarios": [
+    {
+      "id": "SCN-CAR-COST-001-happy",
+      "name": "happy path — 정상 회계전표 IF 전송",
+      "tags": ["@happy", "@anchor", "@BR-CAR-COST-003"],
+      "given": {
+        "session_user": "admin_user_id",
+        "request_body": {
+          "useComCd": 1,
+          "strDate": "2026-01-01",
+          "endDate": "2026-03-31",
+          "userNm": "차량사용자"
+        },
+        "state_before": {
+          "tb_car_user_term_rows": 1,
+          "tb_car_cost_slip_rows": 0
+        }
+      },
+      "when": "POST /ifrs/car/costingCalculateAjax → SP 호출 (4 input) → POST /ifrs/car/saveCostingList (slip_id list 전달)",
+      "then": {
+        "expected_response_1": {"status": 200, "body": "list of slip rows"},
+        "expected_response_2": {"status": 200, "body": "OK"},
+        "state_after": {
+          "tb_car_cost_slip_rows": "≥ 1 (FN_SPLIT 결과 수 만큼)",
+          "ifrs_db_consistency": "OK",
+          "sgerp_consistency": "OK (SP side 변경 ❌ — read-only)"
+        }
+      },
+      "intent_classification": [
+        {"rule": "BR-CAR-COST-003", "type": "intent"},
+        {"rule": "BR-CAR-COST-006", "type": "intent"}
+      ]
+    },
+    {
+      "id": "SCN-CAR-COST-001-likely-bug",
+      "name": "★ likely bug — cross-DB transaction 보장 ❌ (eventual consistency)",
+      "tags": ["@bug", "@cross-db", "@AP-DB-003", "@AP-EXT-001"],
+      "given": {
+        "session_user": "admin_user_id",
+        "scenario_setup": "SP 호출 성공 + tb_car_cost_slip INSERT 실패 (DB 다운 / network)"
+      },
+      "when": "SP 호출 성공 → IFRS DB INSERT 실패",
+      "then": {
+        "expected_legacy": "기존 EFI-WEB 는 SP 결과 (slip_id) 가 SGERP 에 만들어졌으나 IFRS 에 미저장 → orphan slip / 데이터 불일치",
+        "expected_modern": "saga pattern 또는 outbox table 도입 / compensating transaction (SGERP slip 취소)",
+        "modern_alternative": "Spring TransactionalEventListener + outbox + retry / 또는 ChainedTransactionManager (legacy 호환)"
+      },
+      "intent_classification": [
+        {"rule": "AP-DB-003", "type": "bug"},
+        {"rule": "AP-EXT-001", "type": "bug"}
+      ]
+    },
+    {
+      "id": "SCN-CAR-COST-001-edge-empty",
+      "name": "edge — 빈 slip_id list (SP 가 0 row 반환)",
+      "tags": ["@edge"],
+      "given": {
+        "request_body": {"useComCd": 1, "strDate": "2026-01-01", "endDate": "2026-01-01", "userNm": "비사용자"},
+        "state_before": {"tb_car_user_term_rows": 0}
+      },
+      "when": "SP 호출 → 결과 0 row → saveCostingList(빈 list)",
+      "then": {
+        "expected_response": {"status": 200, "body": "[]"},
+        "state_after": {"tb_car_cost_slip_rows": "변경 ❌"}
+      },
+      "intent_classification": [
+        {"rule": "BR-CAR-COST-003", "type": "intent"}
+      ]
+    }
+  ]
+}

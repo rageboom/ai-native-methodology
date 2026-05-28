@@ -14,7 +14,7 @@
     "node": "artifact-graph-node.schema.json",
     "edge": "artifact-graph-edge.schema.json"
   },
-  "synthesized_at": "2026-05-27T09:28:14.864Z",
+  "synthesized_at": "2026-05-28T09:17:40.397Z",
   "nodes": [
     {
       "id": "UC-USER-001",
@@ -23,7 +23,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json",
       "state": "active",
       "title": "신규 사용자 등록",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "UC-USER-002",
@@ -32,7 +34,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json",
       "state": "active",
       "title": "로그인",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "BHV-USER-001",
@@ -41,7 +45,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json",
       "state": "active",
       "title": "신규 사용자 등록 동작",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "BHV-USER-002",
@@ -50,7 +56,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json",
       "state": "active",
       "title": "로그인 동작",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "AC-USER-001",
@@ -59,7 +67,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
       "state": "active",
       "title": "이메일 중복 등록 시 409 Conflict (BR-USER-DATA-001).",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "AC-USER-002",
@@ -68,7 +78,9 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
       "state": "active",
       "title": "올바른 자격증명으로 login 시 user 객체 반환 / 불일치 시 401.",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "TASK-USER-001",
@@ -78,7 +90,9 @@
       "state": "active",
       "title": "신규 사용자 등록 — email unique 강제 + password 해싱 + 409 Conflict",
       "layer": "be",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "TASK-USER-002",
@@ -88,7 +102,9 @@
       "state": "active",
       "title": "로그인 — credential 검증 + 401 / user 객체 반환",
       "layer": "be",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "TC-USER-001",
@@ -101,7 +117,9 @@
           "path": "target/src/user.service.test.ts",
           "anchor_type": "strict_path"
         }
-      ]
+      ],
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "TC-USER-002",
@@ -114,7 +132,9 @@
           "path": "target/src/user.service.test.ts",
           "anchor_type": "strict_path"
         }
-      ]
+      ],
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "IMPL-USER-001",
@@ -138,7 +158,9 @@
           "anchor_type": "strict_path",
           "commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
         }
-      ]
+      ],
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "IMPL-USER-002",
@@ -157,7 +179,9 @@
           "anchor_type": "strict_path",
           "commit_hash": "321eeb3bb15f476b3fd0e55fbd8523901992bd20"
         }
-      ]
+      ],
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "SCREEN-AUTH",
@@ -165,7 +189,9 @@
       "artifact_subkind": "EPIC",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
       "state": "active",
-      "title": "인증 화면 (회원가입 + 로그인) — FE Epic"
+      "title": "인증 화면 (회원가입 + 로그인) — FE Epic",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "STORY-USER-001",
@@ -173,7 +199,9 @@
       "artifact_subkind": "STORY",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
       "state": "active",
-      "title": "회원가입 Story (cross-cut BHV-USER-001 / AC-USER-001)"
+      "title": "회원가입 Story (cross-cut BHV-USER-001 / AC-USER-001)",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "STORY-USER-002",
@@ -181,7 +209,9 @@
       "artifact_subkind": "STORY",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
       "state": "active",
-      "title": "로그인 Story (cross-cut BHV-USER-002 / AC-USER-002)"
+      "title": "로그인 Story (cross-cut BHV-USER-002 / AC-USER-002)",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "OP-USER-001",
@@ -189,7 +219,9 @@
       "artifact_subkind": "OP",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
       "state": "active",
-      "title": "users 테이블 email UNIQUE constraint + 인덱스 마이그레이션 (race-safe)"
+      "title": "users 테이블 email UNIQUE constraint + 인덱스 마이그레이션 (race-safe)",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "analysis-business-rules",
@@ -197,7 +229,9 @@
       "artifact_subkind": "business-rules",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/business-rules.json",
       "state": "active",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     },
     {
       "id": "analysis-antipatterns",
@@ -205,7 +239,9 @@
       "artifact_subkind": "antipatterns",
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/antipatterns.json",
       "state": "active",
-      "code_pointers_na": true
+      "code_pointers_na": true,
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
+      "scope_id": "poc-05"
     }
   ],
   "edges": [
@@ -213,55 +249,64 @@
       "source": "UC-USER-001",
       "target": "BHV-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "UC-USER-002",
       "target": "BHV-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "BHV-USER-001",
       "target": "AC-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "BHV-USER-002",
       "target": "AC-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "AC-USER-001",
       "target": "TASK-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "TASK-USER-001",
       "target": "TC-USER-001",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "AC-USER-002",
       "target": "TASK-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "TASK-USER-002",
       "target": "TC-USER-002",
       "edge_type": "derived_from",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "TC-USER-001",
       "target": "IMPL-USER-001",
       "edge_type": "tests",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "IMPL-USER-001",
@@ -288,7 +333,8 @@
       "source": "TC-USER-002",
       "target": "IMPL-USER-002",
       "edge_type": "tests",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "IMPL-USER-002",
@@ -308,85 +354,99 @@
       "source": "SCREEN-AUTH",
       "target": "STORY-USER-001",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "SCREEN-AUTH",
       "target": "STORY-USER-002",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "STORY-USER-001",
       "target": "TASK-USER-001",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "OP-USER-001",
       "target": "TASK-USER-001",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "TASK-USER-001",
       "target": "contract:openapi:POST /api/users",
       "edge_type": "conforms_to",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "STORY-USER-002",
       "target": "TASK-USER-002",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "OP-USER-001",
       "target": "TASK-USER-002",
       "edge_type": "groups",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "TASK-USER-002",
       "target": "contract:openapi:POST /api/users/login",
       "edge_type": "conforms_to",
-      "confidence": "hard"
+      "confidence": "hard",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-business-rules",
       "target": "BHV-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-business-rules",
       "target": "BHV-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-business-rules",
       "target": "AC-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-business-rules",
       "target": "AC-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-antipatterns",
       "target": "AC-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     },
     {
       "source": "analysis-antipatterns",
       "target": "AC-USER-001",
       "edge_type": "cross_reference",
-      "confidence": "soft"
+      "confidence": "soft",
+      "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
     }
   ],
   "stats": {
@@ -414,5 +474,7 @@
       "informs": 0,
       "groups": 6
     }
-  }
+  },
+  "scope_id": "poc-05",
+  "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c"
 }

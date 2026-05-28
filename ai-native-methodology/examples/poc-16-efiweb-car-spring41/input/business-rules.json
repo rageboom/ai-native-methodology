@@ -1,0 +1,396 @@
+{
+  "$schema_origin": "schemas/business-rules.schema.json",
+  "project_id": "poc-15-efiweb-car-spring41",
+  "paradigm": "BE",
+  "meta": {
+    "generated_at": "2026-05-28T06:50:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.78,
+    "raw_confidence": 0.78,
+    "warnings": [
+      "Spring 4.1 + iBATIS 2 paradigm = BR 가 service / sqlmap 안 분산 / DTO 명시 ❌ / HashMap 사용",
+      "★ source_grounded_evidence 의 file_paths 는 모두 source/ 사본 기준 / 원본 EFI-WEB path 와 차이 (immutable snapshot)",
+      "BR 추출 한계 = LLM 의미 추론 + 결정적 grep 혼합 / R1' axis paradigm 53~55% ceiling 정합"
+    ]
+  },
+  "business_rules": [
+    {
+      "id": "BR-CAR-MGT-001",
+      "name": "차량 등록 의무 필드",
+      "title": "Car insertion required fields",
+      "natural_language": "차량 등록 시 CAR_NO, CAR_TYPE, COM_CD, USER_ID, USE_YN 등 17 필드 모두 INSERT 의무 / 일부 nullable but service 검증 필요",
+      "category": "validation",
+      "type": "constraint",
+      "severity": "high",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "insertCar",
+          "file_paths": [
+            "source/sqlmap/carMgt.xml"
+          ]
+        },
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "related_db_tables": [
+        "tb_car"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.85
+    },
+    {
+      "id": "BR-CAR-MGT-002",
+      "name": "차량 사용 여부 (USE_YN)",
+      "natural_language": "USE_YN = 'Y' 인 차량만 active state / 'N' = 처분/정지 / 운행 등록 ✅ 가능 여부는 추가 검증 필요 (BR-CAR-MGT-005 정합)",
+      "category": "policy",
+      "type": "constraint",
+      "severity": "medium",
+      "source": "ddl + sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car.use_yn",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "medium",
+      "related_db_tables": [
+        "tb_car"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.7
+    },
+    {
+      "id": "BR-CAR-MGT-003",
+      "name": "차량 상태 코드 (STATE)",
+      "natural_language": "STATE 필드 = 차량 lifecycle 상태 (등록 / 사용중 / 처분) — 코드 마스터 외부 추정 / sqlmap 안 명시 패턴 ❌",
+      "category": "policy",
+      "type": "constraint",
+      "severity": "low",
+      "source": "ddl",
+      "source_grounded_evidence": [
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car.state",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "weak",
+      "current_state_note": "STATE 코드 값 분포 = sqlmap 안 명시 ❌ / business-rules cross-consistency Layer 2 검증 carry",
+      "related_db_tables": [
+        "tb_car"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.5
+    },
+    {
+      "id": "BR-CAR-MGT-004",
+      "name": "총 누적 거리 자동 갱신",
+      "natural_language": "TB_CAR.TOT_DIST 는 saveCarDriveRow (운행 등록) 시 자동 update — updateCarTotDist SQL 호출 / 별도 service layer transaction 결합 추정",
+      "category": "calculation",
+      "type": "trigger",
+      "severity": "medium",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "updateCarTotDist",
+          "file_paths": [
+            "source/sqlmap/carMgt.xml"
+          ]
+        },
+        {
+          "artifact": "code",
+          "file_paths": [
+            "source/java/smilegate/ifrs/car/service/impl/CarMgtServiceImpl.java"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "related_db_tables": [
+        "tb_car",
+        "tb_car_drive"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.85
+    },
+    {
+      "id": "BR-CAR-MGT-005",
+      "name": "사용자 기간 매칭 (CarUserTerm)",
+      "natural_language": "TB_CAR_USER_TERM 은 같은 차량 (car_idx) 에 다른 사용자 (user_id) 가 시기별 (str_date ~ end_date) 할당 가능 / 동시에 1 user 만 active (DDL 미강제 / service 검증 필요)",
+      "category": "policy",
+      "type": "uniqueness",
+      "severity": "high",
+      "source": "ddl + sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car_user_term",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR_USER_TERM.sql"
+          ]
+        },
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "insertCarUserTerm + updateCarUserTerm",
+          "file_paths": [
+            "source/sqlmap/carMgt.xml"
+          ]
+        }
+      ],
+      "evidence_strength": "medium",
+      "current_state_note": "동시 1 user uniqueness DB CONSTRAINT 미설정 / service layer 검증 의무 carry",
+      "related_db_tables": [
+        "tb_car_user_term",
+        "tb_car"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.7
+    },
+    {
+      "id": "BR-CAR-MGT-006",
+      "name": "리더 사용자 식별",
+      "natural_language": "Leader user = FIM.dbo.TB_USER 의 PFLE_STATUS_CD='PS10' (활성) + USER_FG_HR='E10' (직원) + USER_ID=세션 사용자 / 인증/권한 BR",
+      "category": "authorization",
+      "type": "constraint",
+      "severity": "high",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "selectLeaderUserId",
+          "file_paths": [
+            "source/sqlmap/carMgt.xml"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "current_state_note": "FIM 외부 DB 참조 / FIM source ❌",
+      "related_db_tables": [
+        "fim.tb_user"
+      ],
+      "bounded_context": "BC-CAR-MGT",
+      "confidence": 0.85,
+      "tags": [
+        "external-db",
+        "fim"
+      ]
+    },
+    {
+      "id": "BR-CAR-COST-001",
+      "name": "비용 항목 5종 + 조정",
+      "natural_language": "TB_CAR_COST 안 비용 = 5종 (GAS / INSURANCE / REPAIR / TAX / ETC) × 2 (원본 + 조정 ADJ) = 10 컬럼 + 임차 + 감가 3종 (RENT / DEPR / TAX_DEPR)",
+      "category": "policy",
+      "type": "decomposition",
+      "severity": "high",
+      "source": "ddl",
+      "source_grounded_evidence": [
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car_cost",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR_COST.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "related_db_tables": [
+        "tb_car_cost"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.9
+    },
+    {
+      "id": "BR-CAR-COST-002",
+      "name": "비용 승인 코드 (cost_accept_cd)",
+      "natural_language": "TB_CAR_COST.cost_accept_cd 는 saveCarCostAccept (MERGE) 로만 변경 / admin 결정 / 직접 update ❌",
+      "category": "authorization",
+      "type": "state_transition",
+      "severity": "high",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "saveCarCostAccept (MERGE)",
+          "file_paths": [
+            "source/sqlmap/carCost.xml"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "current_state_note": "MERGE pattern = upsert / 코드 값 분포 = sqlmap 안 명시 ❌ / cross-consistency carry",
+      "related_db_tables": [
+        "tb_car_cost"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.85
+    },
+    {
+      "id": "BR-CAR-COST-003",
+      "name": "★ 차량비용 → ERP 회계전표 IF (SP 호출)",
+      "title": "Car cost → SGERP slip interface (Stored Procedure)",
+      "natural_language": "selectCarCostCalculate = SGERP.dbo.SG_SACSlipRowCarManagementIFQuery SP 호출 (useComCd, strDate, endDate, userNm + hardcoded 0/'',''). 결과로 회계전표 row 생성. 후속 insertCarCostSlip 으로 TB_CAR_COST_SLIP 등록. cross-DB transaction 보장 ❌ → eventual consistency.",
+      "category": "integration",
+      "type": "side_effect",
+      "severity": "critical",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "selectCarCostCalculate (procedure) + selectCarCostCalculateMap",
+          "file_paths": [
+            "source/sqlmap/carCost.xml"
+          ]
+        },
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car_cost_slip",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR_COST_SLIP.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "current_state_note": "외부 SGERP DB SP source ❌ / signature only / cross-DB transaction 보장 부재 / 본 BR = 본 PoC 핵심 anchor",
+      "related_db_tables": [
+        "tb_car_cost",
+        "tb_car_cost_slip",
+        "sgerp._tacslip"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.9,
+      "tags": [
+        "external-sp",
+        "sgerp",
+        "anchor",
+        "erp-if"
+      ]
+    },
+    {
+      "id": "BR-CAR-COST-004",
+      "name": "운행 로그 없는 비용 (NoLog)",
+      "natural_language": "TB_CAR_COST_NOLOG = 회사 (com_cd) + 기간 (use_str_date~use_end_date) 별 비용 통합 / 개별 차량 ❌ / 별도 lifecycle (selectCarCostingNoLogCalculate + saveCostingNoLog)",
+      "category": "policy",
+      "type": "alternative_aggregate",
+      "severity": "medium",
+      "source": "sqlmap + ddl",
+      "source_grounded_evidence": [
+        {
+          "artifact": "ddl",
+          "artifact_ref": "tb_car_cost_nolog",
+          "file_paths": [
+            "source/ddl/tables/TB_CAR_COST_NOLOG.sql"
+          ]
+        },
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "saveCarCostingNoLog + insertCarCostNoLog",
+          "file_paths": [
+            "source/sqlmap/carCost.xml"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "related_db_tables": [
+        "tb_car_cost_nolog"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.85
+    },
+    {
+      "id": "BR-CAR-COST-005",
+      "name": "비용 합산 시스템 (CostSumSystem)",
+      "natural_language": "selectCarCostSumSystemList + saveCostSumSystemList = 회사 단위 비용 합산 + 저장. 별도 UI (carCostSumSystem.jsp) 로 admin 가시화.",
+      "category": "calculation",
+      "type": "aggregation",
+      "severity": "low",
+      "source": "sqlmap + jsp",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "selectCarCostSumSystemList + updateCostSumSystem",
+          "file_paths": [
+            "source/sqlmap/carCost.xml"
+          ]
+        },
+        {
+          "artifact": "jsp",
+          "file_paths": [
+            "source/jsp/carCostSumSystem.jsp"
+          ]
+        }
+      ],
+      "evidence_strength": "medium",
+      "related_pages": [
+        "carCostSumSystem.jsp"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.7
+    },
+    {
+      "id": "BR-CAR-COST-006",
+      "name": "회계전표 다중 ID 등록 (FN_SPLIT)",
+      "natural_language": "insertCarCostSlip = FN_SPLIT(carCostSlipseqs, ',') 으로 comma-separated 회계전표 ID 분리 → 다중 row INSERT. 1 호출에 여러 슬립 매핑.",
+      "category": "calculation",
+      "type": "bulk_insert",
+      "severity": "medium",
+      "source": "sqlmap",
+      "source_grounded_evidence": [
+        {
+          "artifact": "sqlmap",
+          "artifact_ref": "insertCarCostSlip (uses FN_SPLIT)",
+          "file_paths": [
+            "source/sqlmap/carCost.xml"
+          ]
+        },
+        {
+          "artifact": "ddl",
+          "artifact_ref": "FN_split.sql",
+          "file_paths": [
+            "source/ddl/functions/FN_split.sql"
+          ]
+        }
+      ],
+      "evidence_strength": "strong",
+      "related_db_tables": [
+        "tb_car_cost_slip"
+      ],
+      "bounded_context": "BC-CAR-COST",
+      "confidence": 0.9
+    }
+  ],
+  "summary": {
+    "total_count": 12,
+    "by_bounded_context": {
+      "BC-CAR-MGT": 6,
+      "BC-CAR-COST": 6
+    },
+    "by_severity": {
+      "critical": 1,
+      "high": 5,
+      "medium": 4,
+      "low": 2
+    }
+  },
+  "br_count": 12,
+  "concerns": [
+    "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = BR 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 패턴)",
+    "★ STATE 코드 + cost_accept_cd 같은 enum 값 분포 = source 안 명시 ❌ / cross-consistency Layer 2 carry"
+  ]
+}

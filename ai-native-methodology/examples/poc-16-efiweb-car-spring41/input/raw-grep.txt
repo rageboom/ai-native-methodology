@@ -1,0 +1,42 @@
+# PoC #15 EFI-WEB car — sqlmap raw grep
+# generated 2026-05-28
+
+## carCost.xml
+8:	<select id="selectCarCostConfirmList" parameterClass="HashMap" resultClass="egovMap">
+32:	<update id="saveCarCostAccept" parameterClass="HashMap">
+60:	<update id="saveCarCost" parameterClass="HashMap">
+102:	<select id="selectCarCostingList" parameterClass="HashMap" resultClass="egovMap">
+170:	<select id="selectCarCostSumSystemList" parameterClass="HashMap" resultClass="egovMap">
+223:	<select id="selectCarCostStatementList" parameterClass="HashMap" resultClass="egovMap">
+277:	<update id="updateCostSumSystem" parameterClass="HashMap">
+295:	<select id="selectCarCostSlipList" parameterClass="HashMap" resultClass="egovMap">
+328:	<procedure id="selectCarCostCalculate" parameterMap="selectCarCostCalculateMap" resultClass="egovMap">
+332:	<delete id="deleteCarCostSlip" parameterClass="HashMap">
+336:	<insert id="insertCarCostSlip" parameterClass="HashMap">
+343:	<insert id="insertCarCostNoLog" parameterClass="HashMap">
+373:	<select id="selectCarCostNoLog" parameterClass="HashMap" resultClass="egovMap">
+423:	<delete id="deleteCarCostNoLog" parameterClass="HashMap">
+
+## carMgt.xml
+7:	<insert id="insertCar" parameterClass="HashMap">
+53:	<update id="updateCar" parameterClass="HashMap">
+76:	<select id="selectCarInfo" parameterClass="HashMap" resultClass="egovMap">
+101:	<select id="selectCarList" parameterClass="HashMap" resultClass="egovMap">
+153:	<select id="selectLeaderUserIdBySec" parameterClass="HashMap" resultClass="egovMap">
+167:	<select id="selectLeaderUserId" parameterClass="HashMap" resultClass="egovMap">
+176:	<update id="deleteCar" parameterClass="HashMap">
+183:	<select id="selectCarDriveList" parameterClass="HashMap" resultClass="egovMap">
+221:	<insert id="insertCarDrive" parameterClass="HashMap">
+257:	<update id="updateCarNo" parameterClass="HashMap">
+281:	<update id="updateCarDrive" parameterClass="HashMap">
+299:	<delete id="deleteCarDrive" parameterClass="HashMap">
+304:	<update id="updateCarTotDist" parameterClass="HashMap">
+311:	<select id="selectErpComList" resultClass="egovMap">
+318:	<select id="selectErpDeptList" parameterClass="HashMap" resultClass="egovMap">
+343:	<insert id="insertCarUserTerm" parameterClass="HashMap" >
+351:	<update id="updateCarUserTerm" parameterClass="HashMap" >
+362:	<select id="selectCarUserTermList" parameterClass="HashMap" resultClass="egovMap">
+378:	<delete id="deleteCarUserTerm" parameterClass="HashMap">
+388:	<delete id="deleteCarCost" parameterClass="HashMap">
+401:	<select id="selectCarUserTermCost" parameterClass="HashMap" resultClass="Integer">
+

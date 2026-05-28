@@ -1,0 +1,18 @@
+%% PoC #15 EFI-WEB car — UI page hierarchy
+%% ui-spec.json 와 의미 동등 (이중 렌더링)
+%% Scenario C (JSP server-rendered) / 10 named page
+
+graph LR
+    A[carList<br/>PAGE-CAR-MGT-001] --> B[carInsertForm<br/>PAGE-CAR-MGT-002]
+    A --> C[carUpdateForm<br/>PAGE-CAR-MGT-003]
+    A --> D[carSelectPopup<br/>PAGE-CAR-MGT-004]
+    A --> E[carDriveInsertForm<br/>PAGE-CAR-MGT-005]
+
+    F[costing<br/>PAGE-CAR-COST-001] -.SP IF.-> G[saveCostingList<br/>→ tb_car_cost_slip]
+    H[confirmList<br/>PAGE-CAR-COST-002] -.MERGE.-> I[saveCarCostAccept]
+    J[costSumSystem<br/>PAGE-CAR-COST-003]
+    K[costingNoDriveLog<br/>PAGE-CAR-COST-004]
+    L[popCarCostSlip<br/>PAGE-CAR-COST-005]
+
+    classDef anchor fill:#ffe6e6,stroke:#c00
+    class F,G anchor

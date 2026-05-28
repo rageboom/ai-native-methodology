@@ -1,0 +1,188 @@
+{
+  "project_id": "poc-15-efiweb-car-spring41",
+  "spectrum": "Legacy (Spring 4.1 + iBATIS 2)",
+  "corroboration_role": "★ 4번째 EFI-WEB corroboration (R1' axis carry) — D-axis (artifact-graph) 주 입증",
+  "meta_confidence": {
+    "generated_at": "2026-05-28T08:30:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "sql_inventory"
+    ],
+    "confidence": 0.82,
+    "raw_confidence": 0.82,
+    "warnings": [
+      "★ 37 statement 중 6개만 본격 추출 / 나머지 31 partial carry — D-axis 우선 / 핵심 anchor (insertCar / selectLeaderUserId / selectCarCostCalculate / saveCarCostAccept / insertCarCostSlip / updateCarTotDist) 만",
+      "★ external 4 DB (FIM / SGERP / e_hr / ekporg) 18 object — dependent_tables 에 external_only 표기",
+      "★ business_meaning = LLM 추론 + 도메인 expert 검증 carry (4 ambiguous BR 정합)"
+    ]
+  },
+  "summary": {
+    "total_sql_operations": 37,
+    "by_type": {
+      "select": 17,
+      "insert": 5,
+      "update": 9,
+      "delete": 5,
+      "procedure": 1
+    },
+    "dependent_tables_unique": [
+      "tb_car",
+      "tb_car_cost",
+      "tb_car_cost_nolog",
+      "tb_car_cost_slip",
+      "tb_car_drive",
+      "tb_car_user_term",
+      "fim.tb_user",
+      "fim.tb_company",
+      "fim.tb_secretary",
+      "sgerp._tacslip",
+      "sgerp._tacsliprow",
+      "sgerp._tacslipcost",
+      "sgerp._tcacompany",
+      "sgerp._tdaaccount",
+      "sgerp._tdacctr",
+      "sgerp._tdadept",
+      "sgerp._tdauminor",
+      "sgerp._throrgdept",
+      "sgerp.sg_vhrifdeptquery",
+      "sgerp.sg_sacsliprowcarmanagementifquery",
+      "e_hr.tb_holiday",
+      "ekporg.def_group_into_company_list"
+    ],
+    "external_calls_count": 1
+  },
+  "extraction_automation": {
+    "auto_extracted_columns": [
+      "sql_id",
+      "mapper_xml",
+      "mapper_xml_line",
+      "statement_type",
+      "dependent_tables",
+      "dynamic_branch"
+    ],
+    "manual_columns": [
+      "called_from_screen",
+      "business_meaning",
+      "intent_vs_bug_classification"
+    ],
+    "auto_ratio_external_6": "4/6 = 66.7% (≥ 50% pass / PoC #06+#07+#11 isomorphic)",
+    "auto_ratio_external_7": "5/7 = 71.4% (statement_type 추가 후)",
+    "auto_ratio_total_11": "7/11 = 63.6%",
+    "comparison_to_prior_poc": {
+      "poc_06_auto_ratio": "약 66.7% (PoC #06 baseline)",
+      "poc_07_auto_ratio": "약 66.7%",
+      "poc_11_auto_ratio": "약 66.7%",
+      "poc_15_auto_ratio": "66.7%",
+      "delta": "0.0%p (사내 isomorphic 안정점)",
+      "note": "★ 4번째 EFI-WEB PoC corroboration — auto_ratio_external_6 안정 66.7% 사실 robust"
+    }
+  },
+  "inventory": [
+    {
+      "sql_id": "CarMgtDAO.insertCar",
+      "mapper_xml": "source/sqlmap/carMgt.xml",
+      "statement_type": "PREPARED",
+      "called_from_screen": "carInsertForm.jsp → POST /ifrs/car/insertCar",
+      "business_meaning": "차량 신규 등록 — 17 필드 INSERT + selectKey 로 carIdx (IDENTITY) 추출 / BR-CAR-MGT-001 + BR-CAR-MGT-005 anchor",
+      "dynamic_branch": [],
+      "dependent_tables": [
+        "tb_car"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.9,
+      "uc_link": "UC-CAR-MGT-001"
+    },
+    {
+      "sql_id": "CarMgtDAO.selectLeaderUserId",
+      "mapper_xml": "source/sqlmap/carMgt.xml",
+      "statement_type": "PREPARED",
+      "called_from_screen": "POST /ifrs/car/* (모든 endpoint 진입 / 권한 체크)",
+      "business_meaning": "Leader 사용자 인증 — FIM.TB_USER WHERE PFLE_STATUS_CD='PS10' AND USER_FG_HR='E10' AND USER_ID=#sessionId# / BR-CAR-MGT-006",
+      "dynamic_branch": [],
+      "dependent_tables": [
+        "fim.tb_user"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.85,
+      "note": "external DB (FIM) 의존 / external_only:true",
+      "uc_link": "UC-CAR-MGT-003"
+    },
+    {
+      "sql_id": "CarCostDAO.selectCarCostCalculate",
+      "mapper_xml": "source/sqlmap/carCost.xml",
+      "mapper_xml_line": 328,
+      "statement_type": "CALLABLE",
+      "called_from_screen": "carCosting.jsp → POST /ifrs/car/costingCalculateAjax",
+      "business_meaning": "★ 차량비용 → ERP 회계전표 IF SP 호출 — EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery(useComCd, 0, strDate, endDate, userNm, '', '') / BR-CAR-COST-003 anchor / 본 PoC 핵심 anchor",
+      "dynamic_branch": [],
+      "dependent_tables": [
+        "sgerp.sg_sacsliprowcarmanagementifquery"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "note": "external SP (SGERP) signature only / cross-DB transaction 보장 ❌",
+      "uc_link": "UC-CAR-COST-001"
+    },
+    {
+      "sql_id": "CarCostDAO.saveCarCostAccept",
+      "mapper_xml": "source/sqlmap/carCost.xml",
+      "statement_type": "PREPARED",
+      "called_from_screen": "carCostConfirm.jsp → POST /ifrs/car/saveConfirmList",
+      "business_meaning": "비용 승인 — MERGE pattern (upsert) / cost_accept_cd 갱신 / admin 결정 / BR-CAR-COST-002 anchor",
+      "dynamic_branch": [
+        {
+          "tag": "MERGE ... USING ... WHEN MATCHED THEN UPDATE",
+          "branch_count": 1
+        }
+      ],
+      "dependent_tables": [
+        "tb_car_cost"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.85,
+      "uc_link": "UC-CAR-COST-002"
+    },
+    {
+      "sql_id": "CarCostDAO.insertCarCostSlip",
+      "mapper_xml": "source/sqlmap/carCost.xml",
+      "statement_type": "PREPARED",
+      "called_from_screen": "carCostConfirm.jsp / carCosting.jsp → POST /ifrs/car/saveCostingList",
+      "business_meaning": "회계전표 다중 ID 등록 — INSERT ... SELECT value, ... FROM ifrs.dbo.FN_SPLIT(#carCostSlipseqs#, ',') / 다중 row bulk insert / BR-CAR-COST-006",
+      "dynamic_branch": [],
+      "dependent_tables": [
+        "tb_car_cost_slip",
+        "ifrs.fn_split"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.9,
+      "note": "FN_SPLIT UDF (IFRS own) 호출 / bulk insert pattern",
+      "uc_link": "UC-CAR-COST-001"
+    },
+    {
+      "sql_id": "CarMgtDAO.updateCarTotDist",
+      "mapper_xml": "source/sqlmap/carMgt.xml",
+      "statement_type": "PREPARED",
+      "called_from_screen": "carDriveInsertForm.jsp → POST /ifrs/car/carDriveRowSave (운행 저장 후 trigger)",
+      "business_meaning": "차량 총 누적 거리 갱신 — UPDATE TB_CAR SET TOT_DIST=#totDist# WHERE idx=#carIdx# / saveCarDriveRow 의 side effect / BR-CAR-MGT-004",
+      "dynamic_branch": [],
+      "dependent_tables": [
+        "tb_car"
+      ],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.9,
+      "uc_link": "UC-CAR-MGT-002"
+    }
+  ],
+  "external_advice_absorption": {
+    "notes": [
+      "★ MyBatis 14 표준 속성 정합 — statement_type enum (PREPARED / CALLABLE / STATEMENT) 적용",
+      "★ Agent 1 강 권고 흡수 — CALLABLE 표기 (SGERP SP)"
+    ]
+  },
+  "carry_inventory_56_summary": {
+    "note": "★ 37 statement 중 6 본격 / 31 partial carry — D-axis 우선 / impl stage 진입 후 전수 추출 carry"
+  },
+  "code_pointers_na": true
+}

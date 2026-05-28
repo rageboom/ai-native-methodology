@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd"> 
+<sqlMap namespace="CarCostDAO">
+ 
+	<typeAlias  alias="egovMap" type="egovframework.rte.psl.dataaccess.util.EgovMap"/>
+	<typeAlias  alias="LinkedTreeMap" type="com.google.gson.internal.LinkedTreeMap"/> 
+	
+	<select id="selectCarCostConfirmList" parameterClass="HashMap" resultClass="egovMap">
+		select 	b.car_idx, b.term_idx, cc.cost_idx
+				,(select CompanyName from sgerp.dbo._TCACompany WITH(NOLOCK) where CompanySeq = a.COM_CD) as com_nm
+				,convert(varchar(10), a.CAR_GET_DATE, 121) as car_get_date, a.CAR_TYPE, a.CAR_NO, u.user_nm
+		        ,case when a.state = '2' then c.code_name + '(' + convert(varchar(10),a.CAR_DISPOSE_DATE, 121) + ')' 
+		             else c.code_name
+		         end  as state 
+		        ,convert(varchar(10), b.STR_DATE, 121) + ' ~ ' + convert(varchar(10), b.END_DATE, 121) as sosok_gigan
+		        ,(select CompanyName from sgerp.dbo._TCACompany WITH(NOLOCK) where CompanySeq = b.COM_CD) as user_com_nm
+		        ,isnull(cc.USE_COM_CD, b.com_cd) as use_com_cd
+		        ,isnull(cc.USE_STR_DATE, case when b.str_date <![CDATA[ < ]]> convert(date, #year# + '-01-01') then convert(date,#year# + '-01-01') else b.str_date end ) as use_str_date
+		        ,isnull(cc.USE_END_DATE, case when b.end_date <![CDATA[ > ]]> convert(date, #year# + '-12-31') then convert(date,#year# + '-12-31') else b.end_date end ) as use_end_date
+		        ,cc.COST_ACCEPT_CD
+		from tb_car a WITH(NOLOCK)
+		inner join TB_CAR_USER_TERM b WITH(NOLOCK) on a.idx = b.car_idx
+		left join tb_car_cost cc WITH(NOLOCK) on b.term_idx = cc.term_idx 
+		left join tb_code c WITH(NOLOCK) on a.state = c.CODE and c.code_type= 'carState'
+		left join FIM.dbo.TB_USER u WITH(NOLOCK) on a.[USER_ID] = u.[USER_ID]
+		where a.use_yn = 'Y'
+		and b.STR_DATE <![CDATA[ <= ]]> #year# + '-12-31'
+		and b.end_date <![CDATA[ >= ]]> #year# + '-01-01'
+		and a.com_cd = #comCd#
+	</select>
+	
+	<update id="saveCarCostAccept" parameterClass="HashMap">
+		merge tb_car_cost cc
+		using ( select #costIdx# as cost_idx 
+					 ,#termIdx# as term_idx
+		 			 ,#useComCd# as use_com_cd
+		 			 ,#useStrDate# as use_str_date
+		 			 ,#useEndDate# as use_end_date
+		 			 ,#costAcceptCd# as cost_accept_cd
+		 			 ,#sessionId# as last_upt_user_id
+		 	   ) b
+		 on	 ( cc.cost_idx = b.cost_idx )		 
+		 when matched then	
+			update 
+			   set term_idx = b.term_idx
+			   	   ,use_com_cd  = b.use_com_cd
+			   	   ,use_str_date = b.use_str_date
+			   	   ,use_end_date = b.use_end_date
+			   	   ,cost_accept_cd = b.cost_accept_cd	
+			   	   ,last_upt_user_id = b.last_upt_user_id
+			   	   ,last_upt_dt = getdate()
+		 when not matched then
+			insert 
+				( term_idx, use_com_cd, use_str_date, use_end_date, cost_accept_cd, last_upt_user_id, last_upt_dt  )
+			values
+				( b.term_idx, b.use_com_cd, b.use_str_date, b.use_end_date, b.cost_accept_cd, b.last_upt_user_id, getdate() );
+	</update>
+	
+	
+	<update id="saveCarCost" parameterClass="HashMap">
+	<!-- 
+		merge tb_car_cost cc
+		using ( select #costIdx# as cost_idx
+					 ,#termIdx# as term_idx
+		 			 ,#gasCost# as gas_cost
+		 			 ,#insuranceCost# as insurance_cost
+		 			 ,#repairCost# as repair_cost
+		 			 ,#taxCost# as tax_cost
+		 			 ,#etcCost# as etc_cost
+		 			 ,#sessionId# as last_upt_user_id ) b
+		 on	 ( cc.cost_idx = b.cost_idx )		 
+		 when matched then	
+			update 
+			   set term_idx = b.term_idx 
+			   	   ,gas_cost = b.gas_cost
+			   	   ,insurance_cost = b.insurance_cost
+			   	   ,repair_cost = b.repair_cost
+			   	   ,tax_cost = b.tax_cost
+			   	   ,etc_cost = b.etc_cost
+			   	   ,last_upt_user_id = b.last_upt_user_id 
+			   	   ,last_upt_dt = getdate()
+			 where cost_idx = b.cost_idx	   			
+		 when not matched then
+			insert 
+				( term_idx, gas_cost, insurance_cost, repair_cost, tax_cost, etc_cost, last_upt_user_id, last_upt_dt  )
+			values
+				( b.term_idx, b.gas_cost, b.insurance_cost, b.repair_cost#, b.tax_cost, b.etc_cost, b.last_upt_user_id, getdate() )
+	 -->	
+ 		update tb_car_cost
+		   set term_idx = #termIdx# 
+		   	   ,gas_cost = #gasCost#
+		   	   ,insurance_cost = #insuranceCost#
+		   	   ,repair_cost = #repairCost#
+		   	   ,tax_cost = #taxCost#
+		   	   ,etc_cost = #etcCost#
+		   	   ,last_upt_user_id = #sessionId# 
+		   	   ,last_upt_dt = getdate()
+		 where cost_idx = #costIdx#	
+	</update>
+	
+	
+	<select id="selectCarCostingList" parameterClass="HashMap" resultClass="egovMap">
+		select 	b.car_idx, b.term_idx
+				,convert(varchar(10), a.CAR_GET_DATE, 121) as car_get_date, a.CAR_TYPE, a.CAR_NO, u.user_nm,
+				(select CompanyName from sgerp.dbo._TCACompany WITH(NOLOCK) where CompanySeq = a.COM_CD) as com_nm,
+		        case when a.state = '2' then c.code_name + '(' + convert(varchar(10),a.CAR_DISPOSE_DATE, 121) + ')' 
+		             else c.code_name
+		        end  as state, 
+		       (select CompanyName from sgerp.dbo._TCACompany WITH(NOLOCK) where CompanySeq = b.COM_CD) as user_com_nm,
+		        cc.USE_COM_CD,
+		        (select CompanyName from sgerp.dbo._TCACompany WITH(NOLOCK) where CompanySeq = cc.USE_COM_CD) as use_com_nm,
+		        cc.USE_STR_DATE,
+		        cc.USE_END_DATE,
+		        cc.COST_ACCEPT_CD,
+		        cc.cost_idx,
+		        cc.gas_cost, cc.insurance_cost, cc.repair_cost, cc.tax_cost, cc.etc_cost,
+		        STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.cost_idx
+			            AND CS.COST_GUBUN = '1'  
+			            AND CS.CAR_COST_TYPE = 'G' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS gas_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.cost_idx
+			            AND CS.COST_GUBUN = '1'  
+			            AND CS.CAR_COST_TYPE = 'I' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS insurance_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.cost_idx
+			            AND CS.COST_GUBUN = '1'  
+			            AND CS.CAR_COST_TYPE = 'R' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS repair_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.cost_idx
+			            AND CS.COST_GUBUN = '1'  
+			            AND CS.CAR_COST_TYPE = 'T' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS tax_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.cost_idx
+			            AND CS.COST_GUBUN = '1'  
+			            AND CS.CAR_COST_TYPE = 'E' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS etc_slipseq
+		from tb_car a WITH(NOLOCK)
+		inner join TB_CAR_USER_TERM b WITH(NOLOCK) on a.idx = b.car_idx
+		left join tb_car_cost cc WITH(NOLOCK) on b.term_idx = cc.term_idx
+		left join tb_code c WITH(NOLOCK) on a.state = c.CODE and c.code_type= 'carState'
+		left join FIM.dbo.TB_USER u WITH(NOLOCK) on a.[USER_ID] = u.[USER_ID]
+		where a.use_yn = 'Y'
+		and cc.USE_STR_DATE <![CDATA[ >= ]]> #year# + '-01-01'
+		and cc.USE_end_date <![CDATA[ <= ]]> #year# + '-12-31'
+		and cc.COST_ACCEPT_CD = #costAcceptCd#
+		and a.com_cd = #comCd#
+	</select>
+	
+	
+	<select id="selectCarCostSumSystemList" parameterClass="HashMap" resultClass="egovMap">
+		select CAR_IDX
+		      ,TERM_IDX
+		      ,COST_IDX
+		      ,MAX(CAR_NO) AS CAR_NO
+		      ,MAX(CAR_TYPE) AS CAR_TYPE
+		      ,MAX(USER_ID) AS USER_ID
+		      ,MAX(RENT_TYPE_CD) AS RENT_TYPE_CD
+		      ,MAX(INSURANCE_YN) AS INSURANCE_YN
+		      ,SUM(DRIVE_DIST) AS DRIVE_DIST
+		      ,SUM(DRIVE_WORK_DIST) AS DRIVE_WORK_DIST
+		      ,CASE WHEN SUM(DRIVE_DIST) = 0 OR SUM(DRIVE_DIST) IS NULL THEN '0' ELSE convert(varchar, convert(decimal(10,4), SUM(DRIVE_WORK_DIST) /SUM(DRIVE_DIST) * 100)) END + '%' AS DRIVE_WORK_PCT    
+		      ,MAX(TAX_DEPR_COST) AS TAX_DEPR_COST
+		      ,MAX(RENT_COST) AS RENT_COST
+		      ,MAX(DEPR_COST) AS DEPR_COST
+		      ,MAX(GAS_COST) AS GAS_COST
+		      ,MAX(INSURANCE_COST) AS INSURANCE_COST
+		      ,MAX(REPAIR_COST) AS REPAIR_COST
+		      ,MAX(TAX_COST) AS TAX_COST
+		      ,MAX(ETC_COST) AS ETC_COST
+		from (
+		    select cut.CAR_IDX
+		          ,cut.TERM_IDX
+		          ,cc.COST_IDX
+		          ,c.CAR_NO
+		          ,c.CAR_TYPE
+		          ,cut.[USER_ID]
+		          ,cc.RENT_TYPE_CD
+		          ,cc.INSURANCE_YN
+		          ,cd.DRIVE_DATE  
+		          ,cd.DRIVE_DIST
+		          ,ISNULL(cd.DRIVE_WORK_DIST, 0) + ISNULL(cd.DISTANCE, 0) as DRIVE_WORK_DIST
+		          ,cc.TAX_DEPR_COST
+		          ,cc.RENT_COST
+		          ,cc.DEPR_COST
+		          ,cc.GAS_COST
+		          ,cc.INSURANCE_COST
+		          ,cc.REPAIR_COST
+		          ,cc.TAX_COST
+		          ,cc.ETC_COST
+		    from tb_car_cost cc WITH(NOLOCK)
+		    inner join TB_CAR_user_term cut WITH(NOLOCK) on cc.TERM_IDX = cut.TERM_IDX
+		    inner join TB_CAR c WITH(NOLOCK) on c.IDX = cut.CAR_IDX 
+		  <!--   left join TB_CAR_DRIVE cd on cd.CAR_IDX = cut.CAR_IDX and cd.[USER_ID] = cut.[USER_ID] and cd.DRIVE_DATE between cc.USE_STR_DATE and cc.USE_END_DATE -->
+		  	left join TB_CAR_DRIVE cd WITH(NOLOCK) on cd.CAR_IDX = cut.CAR_IDX and cd.[USER_ID] = cut.[USER_ID] and cd.DRIVE_DATE between #year# +  '-01-01' and #year# + '-12-31'  
+		    where cc.USE_STR_DATE  <![CDATA[ >= ]]> #year# +  '-01-01'
+		    and   cc.USE_END_DATE  <![CDATA[ <= ]]> #year# + '-12-31'
+		    and   c.COM_CD = #comCd#
+		    and   cc.COST_ACCEPT_CD IN (1, 2)
+		      ) M
+		group by CAR_IDX, TERM_IDX, COST_IDX    
+	</select>
+	
+	<select id="selectCarCostStatementList" parameterClass="HashMap" resultClass="egovMap">
+		select CAR_IDX
+		      ,TERM_IDX
+		      ,COST_IDX
+		      ,MAX(CAR_NO) AS CAR_NO
+		      ,MAX(CAR_TYPE) AS CAR_TYPE
+		      ,MAX(USER_ID) AS USER_ID
+		      ,MAX(RENT_TYPE_CD) AS RENT_TYPE_CD
+		      ,MAX(INSURANCE_YN) AS INSURANCE_YN
+		      ,SUM(DRIVE_DIST) AS DRIVE_DIST
+		      ,SUM(DRIVE_WORK_DIST) AS DRIVE_WORK_DIST
+		      ,CASE WHEN SUM(DRIVE_DIST) = 0 OR SUM(DRIVE_DIST) IS NULL THEN '0' ELSE convert(varchar, convert(decimal(10,4), SUM(DRIVE_WORK_DIST) /SUM(DRIVE_DIST) * 100)) END + '%' AS DRIVE_WORK_PCT    
+		      ,MAX(TAX_DEPR_COST) AS TAX_DEPR_COST
+		      ,MAX(RENT_COST) AS RENT_COST
+		      ,MAX(DEPR_COST) AS DEPR_COST
+		      ,MAX(GAS_COST_ADJ) AS GAS_COST
+		      ,MAX(INSURANCE_COST_ADJ) AS INSURANCE_COST
+		      ,MAX(REPAIR_COST_ADJ) AS REPAIR_COST
+		      ,MAX(TAX_COST_ADJ) AS TAX_COST
+		      ,MAX(ETC_COST_ADJ) AS ETC_COST
+		from (
+		    select cut.CAR_IDX
+		          ,cut.TERM_IDX
+		          ,cc.COST_IDX
+		          ,c.CAR_NO
+		          ,c.CAR_TYPE
+		          ,cut.[USER_ID]
+		          ,cc.RENT_TYPE_CD
+		          ,cc.INSURANCE_YN
+		          ,cd.DRIVE_DATE  
+		          ,cd.DRIVE_DIST
+		          ,ISNULL(cd.DRIVE_WORK_DIST, 0) + ISNULL(cd.DISTANCE, 0) as DRIVE_WORK_DIST
+		          ,cc.TAX_DEPR_COST
+		          ,cc.RENT_COST
+		          ,cc.DEPR_COST
+		          ,cc.GAS_COST_ADJ
+		          ,cc.INSURANCE_COST_ADJ
+		          ,cc.REPAIR_COST_ADJ
+		          ,cc.TAX_COST_ADJ
+		          ,cc.ETC_COST_ADJ
+		    from tb_car_cost cc WITH(NOLOCK)
+		    inner join TB_CAR_user_term cut WITH(NOLOCK) on cc.TERM_IDX = cut.TERM_IDX
+		    inner join TB_CAR c WITH(NOLOCK) on c.IDX = cut.CAR_IDX 
+		  <!--   left join TB_CAR_DRIVE cd on cd.CAR_IDX = cut.CAR_IDX and cd.[USER_ID] = cut.[USER_ID] and cd.DRIVE_DATE between cc.USE_STR_DATE and cc.USE_END_DATE -->
+		  	left join TB_CAR_DRIVE cd WITH(NOLOCK) on cd.CAR_IDX = cut.CAR_IDX and cd.[USER_ID] = cut.[USER_ID] and cd.DRIVE_DATE between #year# +  '-01-01' and #year# + '-12-31'  
+		    where cc.USE_STR_DATE  <![CDATA[ >= ]]> #year# +  '-01-01'
+		    and   cc.USE_END_DATE  <![CDATA[ <= ]]> #year# + '-12-31'
+		    and   c.COM_CD = #comCd#
+		    and   cc.COST_ACCEPT_CD IN (1, 2)
+		    and   cc.GAS_COST_ADJ IS NOT NULL
+		      ) M
+		group by CAR_IDX, TERM_IDX, COST_IDX    
+	</select>
+	
+	<update id="updateCostSumSystem" parameterClass="HashMap">
+		update tb_car_cost
+		set rent_type_cd = #rentTypeCd#
+			,insurance_yn = #insuranceYn#	
+			,tax_depr_cost = #taxDeprCost#
+			,rent_cost = #rentCost#
+			,depr_cost = #deprCost#
+			,gas_cost_adj = #gasCost#
+			,insurance_cost_adj = #insuranceCost#
+			,repair_cost_adj = #repairCost#
+			,tax_cost_adj = #taxCost#
+			,etc_cost_adj = #etcCost#
+			,last_upt_user_id = #sessionId# 
+		   	,last_upt_dt = getdate()
+		where cost_idx = #costIdx#
+		and   term_idx = #termIdx#
+	</update>
+	
+	<select id="selectCarCostSlipList" parameterClass="HashMap" resultClass="egovMap">
+		SELECT	D.AccName,  
+				D.AccSeq,
+				G.MinorSeq,
+				G.MinorName,
+				C.CrAmt,
+				C.DrAmt,
+				A.AccDate,
+				B.Summary,
+				B.SlipID,
+				E.DeptName,
+				F.CCtrName
+		FROM SGERP.dbo._TACSlip AS A WITH(NOLOCK)
+		inner JOIN SGERP.dbo._TACSlipRow AS B  WITH(NOLOCK) ON A.CompanySeq = B.CompanySeq AND A.SlipMstSeq = B.SlipMstSeq
+		LEFT OUTER JOIN SGERP.dbo._TACSlipCost AS C WITH(NOLOCK) ON A.CompanySeq = C.CompanySeq AND B.SlipSeq = C.SlipSeq
+		LEFT OUTER JOIN SGERP.dbo._TDAAccount AS D WITH(NOLOCK) ON B.AccSeq = D.AccSeq AND B.CompanySeq = D.CompanySeq
+		LEFT OUTER JOIN SGERP.dbo._TDADept AS E WITH(NOLOCK) ON  C.CostDeptSeq = E.DeptSeq AND C.CompanySeq= E.CompanySeq
+		LEFT OUTER JOIN SGERP.dbo._TDACCtr AS F WITH(NOLOCK) ON C.CostCCtrSeq = F.CCtrSeq AND C.CompanySeq = F.CompanySeq
+		LEFT OUTER JOIN SGERP.dbo._TDAUMinor AS G WITH(NOLOCK) ON B.UMCostType = G.MinorSeq AND B.CompanySeq = G.CompanySeq
+		WHERE A.companyseq = #companySeq#
+		AND  B.Slipseq IN
+			<iterate open="(" close=")" property="slipSeqArr" conjunction=",">
+		   		#slipSeqArr[]#
+			</iterate> 
+	</select>
+	
+	<parameterMap id="selectCarCostCalculateMap" class="egovMap">
+	  	<parameter property="useComCd"  	mode="IN" />
+	  	<parameter property="strDate"  		mode="IN" />
+	  	<parameter property="endDate"  		mode="IN" />
+	  	<parameter property="userNm"  		mode="IN" />
+	</parameterMap>
+	
+	<procedure id="selectCarCostCalculate" parameterMap="selectCarCostCalculateMap" resultClass="egovMap">
+	  	EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery ?, 0, ?, ?, ?, '', ''
+	</procedure>
+	
+	<delete id="deleteCarCostSlip" parameterClass="HashMap">
+		delete from tb_car_cost_slip where cost_idx = #costIdx# and cost_gubun = #costGubun#
+	</delete>
+	
+	<insert id="insertCarCostSlip" parameterClass="HashMap">
+		insert into tb_car_cost_slip
+		select #costIdx#,  value, #costGubun#, #carCostType#
+		from ifrs.dbo.FN_SPLIT( #carCostSlipseqs#,  ',' )
+	</insert>
+	
+	
+	<insert id="insertCarCostNoLog" parameterClass="HashMap">
+		<selectKey resultClass="int" keyProperty="idx">
+		insert into tb_car_cost_nolog
+			( COM_CD
+			, USE_STR_DATE
+			, USE_END_DATE
+			, GAS_COST
+			, INSURANCE_COST
+			, REPAIR_COST
+			, TAX_COST
+			, ETC_COST
+			, LAST_UPT_USER_ID
+			, LAST_UPT_DT
+			  )
+		values
+			( #comCd#
+			 ,#useStrDate#
+			 ,#useEndDate#
+			 ,#gasCost#
+			 ,#insuranceCost#
+			 ,#repairCost#
+			 ,#taxCost#
+			 ,#etcCost#
+			 ,#sessionId#
+			 ,getdate()
+			)
+		select scope_identity() as idx	
+		</selectKey>	
+	</insert>
+	
+	<select id="selectCarCostNoLog" parameterClass="HashMap" resultClass="egovMap">
+		select cc.idx, cc.com_cd, tc.com_nm, cc.use_str_date, cc.use_end_date,
+		       gas_cost, insurance_cost, repair_cost, tax_cost, etc_cost,
+		  	    STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.idx
+			            AND CS.COST_GUBUN = '2'  
+			            AND CS.CAR_COST_TYPE = 'G' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS gas_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.idx
+			            AND CS.COST_GUBUN = '2'  
+			            AND CS.CAR_COST_TYPE = 'I' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS insurance_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.idx
+			            AND CS.COST_GUBUN = '2'  
+			            AND CS.CAR_COST_TYPE = 'R' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS repair_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.idx
+			            AND CS.COST_GUBUN = '2'  
+			            AND CS.CAR_COST_TYPE = 'T' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS tax_slipseq,
+		      	STUFF(
+			        (SELECT ',' + SLIP_ID  
+			           FROM TB_CAR_COST_SLIP CS WITH(NOLOCK)
+			          WHERE CS.COST_IDX = cc.idx
+			            AND CS.COST_GUBUN = '2'  
+			            AND CS.CAR_COST_TYPE = 'E' 
+			           FOR XML PATH('') )
+		      	,1, 1, '') AS etc_slipseq
+		from TB_CAR_COST_NOLOG cc WITH(NOLOCK)
+		inner join  TB_COMPANY tc WITH(NOLOCK) on cc.com_cd = tc.com_no  		
+		where com_cd = #comCd#
+		and use_str_date <![CDATA[ <= ]]> #useEndDate#
+		and use_end_date <![CDATA[ >= ]]> #useStrDate#
+	</select>
+	
+	<delete id="deleteCarCostNoLog" parameterClass="HashMap">
+		delete from tb_car_cost_nolog where idx = #idx#
+	</delete>
+</sqlMap>	

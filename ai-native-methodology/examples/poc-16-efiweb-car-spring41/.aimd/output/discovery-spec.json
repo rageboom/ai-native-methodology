@@ -1,0 +1,382 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T10:00:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "characterization",
+      "sql_inventory"
+    ],
+    "confidence": 0.82,
+    "raw_confidence": 0.82,
+    "warnings": [
+      "★ chain 1 discovery-from-analysis-output 산출 — analysis stage 11 phase 산출물 종합 / 12 BR + 9 AP + 6 sql_inventory + 2 UC snapshot 흡수",
+      "★ AC reference = chain 2 spec stage 에서 생성 의무 / 본 시점 placeholder AC-XXX-001 1건 per UC (minItems 1 정합)"
+    ]
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "input/architecture.json",
+      "input/sql-inventory.json",
+      "input/characterization-spec.json",
+      "input/antipatterns.json",
+      "input/api-extension.json",
+      "input/_cross-db-dependencies.md"
+    ],
+    "source_handling": "in_place_read",
+    "source_root_absolute": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/ai-native-methodology/examples/poc-16-efiweb-car-spring41"
+  },
+  "business_intent": {
+    "domain_purpose": "사내 차량 운영 (등록 / 운행 / 비용 관리 / ERP 회계전표 IF 전송) 통합 관리 — EFI-WEB IFRS 회계 시스템의 차량 모듈",
+    "stakeholders": [
+      "Leader 사용자 (차량 등록 / 운행 등록 / 조회 / FIM 인증)",
+      "Admin 사용자 (비용 승인 / 합산 시스템 관리)",
+      "IFRS 회계팀 (도메인 결단 / cost_accept_cd / STATE 코드 / NoLog 의미)",
+      "SGERP 운영팀 (ERP 회계전표 IF SP 본체 보유 / 운영)",
+      "FIM 운영팀 (사내 사용자 마스터)",
+      "e_hr / ekporg 운영팀 (인사 / 조직 마스터)"
+    ],
+    "success_criteria": [
+      "차량비용 → SGERP 회계전표 IF 100% 전송 보장 (eventual consistency / outbox 또는 saga)",
+      "Leader 인증 통과 후만 차량 CRUD",
+      "운행 등록 시 TOT_DIST 자동 갱신 (BR-CAR-MGT-004)",
+      "비용 승인 (cost_accept_cd) admin 결정 enforcement (BR-CAR-COST-002)",
+      "외부 4 DB 의존 격리 (마이그레이션 시) — strangler fig pattern"
+    ]
+  },
+  "use_cases": [
+    {
+      "id": "UC-CAR-MGT-001",
+      "name": "차량 신규 등록",
+      "description": "Leader 가 신규 차량 정보 입력 (CAR_NO + USER + COM_CD + 기간) → tb_car INSERT + tb_car_user_term INSERT (cross-aggregate / single transaction)",
+      "actors": [
+        "Leader"
+      ],
+      "preconditions": [
+        "Leader 인증 통과 (BR-CAR-MGT-006)",
+        "FIM 사용자 ID 유효"
+      ],
+      "postconditions": [
+        "tb_car.idx 신규 (IDENTITY)",
+        "tb_car_user_term.car_idx FK 연결",
+        "use_yn='Y'"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-001"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:insertCar",
+        "sqlmap:insertCarUserTerm",
+        "BR-CAR-MGT-001",
+        "BR-CAR-MGT-005",
+        "BR-CAR-MGT-006"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-MGT-002",
+      "name": "차량 운행 등록",
+      "description": "운전자가 운행 1회 단위 (CAR + 일자 + 거리) 등록 → tb_car_drive INSERT + tb_car.TOT_DIST 자동 갱신 (side effect)",
+      "actors": [
+        "Driver"
+      ],
+      "preconditions": [
+        "대상 차량 active (use_yn='Y')",
+        "CarUserTerm 범위 내 일자"
+      ],
+      "postconditions": [
+        "tb_car_drive 신규 row",
+        "tb_car.tot_dist = 누적 거리"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-002"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:insertCarDrive",
+        "sqlmap:updateCarTotDist",
+        "BR-CAR-MGT-004"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-MGT-003",
+      "name": "차량 목록 조회",
+      "description": "Leader 가 본인 권한 차량 목록 조회 (pagination)",
+      "actors": [
+        "Leader"
+      ],
+      "preconditions": [
+        "Leader 인증 통과"
+      ],
+      "postconditions": [
+        "차량 list 반환"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-003"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:selectCarList",
+        "BR-CAR-MGT-006"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-MGT-004",
+      "name": "차량 정보 수정",
+      "description": "Leader 가 등록된 차량 정보 수정 (CAR_NO / TYPE / USER 등)",
+      "actors": [
+        "Leader"
+      ],
+      "preconditions": [
+        "대상 차량 존재 + Leader 권한"
+      ],
+      "postconditions": [
+        "tb_car update + upt_dt 갱신"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-004"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:updateCar",
+        "BR-CAR-MGT-002",
+        "BR-CAR-MGT-005"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-MGT-005",
+      "name": "차량 처분",
+      "description": "Leader 가 차량 처분 (use_yn='N' 또는 STATE 변경 / DDL HARD DELETE ❌ 추정)",
+      "actors": [
+        "Leader"
+      ],
+      "preconditions": [
+        "대상 차량 active"
+      ],
+      "postconditions": [
+        "use_yn='N' 또는 STATE='처분' (★ BR-CAR-MGT-003 ambiguous carry)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-005"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:deleteCar",
+        "BR-CAR-MGT-002",
+        "BR-CAR-MGT-003"
+      ],
+      "note": "★ ambiguous — '처분' = soft delete (use_yn='N') vs hard delete vs STATE 변경 어느 것인지 domain expert 결단 carry",
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-COST-001",
+      "name": "★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "description": "Admin 이 기간 / 회사 / 사용자 지정 → SGERP SP 호출 (회계전표 row 생성) → IFRS tb_car_cost_slip 등록 (FN_SPLIT 다중 ID)",
+      "actors": [
+        "Admin"
+      ],
+      "preconditions": [
+        "Admin 인증",
+        "useComCd / strDate / endDate / userNm 유효"
+      ],
+      "postconditions": [
+        "SGERP._TACSlip 신규 row (외부)",
+        "tb_car_cost_slip INSERT (다중 / FN_SPLIT)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-001"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:selectCarCostCalculate (CALLABLE)",
+        "sqlmap:insertCarCostSlip",
+        "BR-CAR-COST-003",
+        "BR-CAR-COST-006"
+      ],
+      "note": "★ cross-DB transaction 보장 ❌ → eventual consistency / impl stage 진입 시 saga 또는 outbox 결단 의무",
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-COST-002",
+      "name": "비용 승인 (cost_accept_cd)",
+      "description": "Admin 이 비용 row 별로 승인 코드 갱신 (MERGE pattern)",
+      "actors": [
+        "Admin"
+      ],
+      "preconditions": [
+        "Admin 인증",
+        "cost row 존재"
+      ],
+      "postconditions": [
+        "tb_car_cost.cost_accept_cd 갱신 ('Y'/'N' ambiguous carry)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-002"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:saveCarCostAccept (MERGE)",
+        "BR-CAR-COST-002"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-COST-003",
+      "name": "운행 로그 없는 비용 계산 (NoLog)",
+      "description": "Admin 이 회사 단위 비용 통합 입력 (차량 무관 / 별도 aggregate)",
+      "actors": [
+        "Admin"
+      ],
+      "preconditions": [
+        "Admin 인증"
+      ],
+      "postconditions": [
+        "tb_car_cost_nolog INSERT"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-003"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:insertCarCostNoLog",
+        "sqlmap:saveCarCostingNoLog",
+        "BR-CAR-COST-004"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-COST-004",
+      "name": "비용 합산 시스템 (CostSumSystem)",
+      "description": "Admin 이 회사 단위 비용 합산 view + 저장 (★ admin role + scope ambiguous carry)",
+      "actors": [
+        "Admin"
+      ],
+      "preconditions": [
+        "Admin 인증"
+      ],
+      "postconditions": [
+        "합산 데이터 저장"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-004"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:selectCarCostSumSystemList",
+        "sqlmap:updateCostSumSystem",
+        "BR-CAR-COST-005"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "UC-CAR-COST-005",
+      "name": "비용 항목별 조회 (5종 + 조정)",
+      "description": "Admin 이 5 비용 항목 (gas / insurance / repair / tax / etc) + 조정 + 임차 + 감가 조회",
+      "actors": [
+        "Admin"
+      ],
+      "preconditions": [
+        "Admin 인증"
+      ],
+      "postconditions": [
+        "비용 항목별 list 반환"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-005"
+      ],
+      "source_grounded_evidence": [
+        "sqlmap:selectCarCostingList",
+        "sqlmap:selectCarCostStatementList",
+        "BR-CAR-COST-001"
+      ],
+      "code_pointers_na": true
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-CAR-MGT-001",
+      "reasoning": "차량 등록 의무 필드 (17 column INSERT) — 데이터 무결성 보장 / sqlmap insertCar SQL 명시",
+      "source_grounded_evidence": "source/sqlmap/carMgt.xml insertCar + source/ddl/tables/TB_CAR.sql"
+    },
+    {
+      "br_id": "BR-CAR-MGT-002",
+      "reasoning": "use_yn = 사용 여부 — 차량 lifecycle (active / 처분) 관리 / 운행/비용 등록 가능 여부 결정",
+      "source_grounded_evidence": "source/ddl/tables/TB_CAR.sql (use_yn CHAR(1))"
+    },
+    {
+      "br_id": "BR-CAR-MGT-003",
+      "reasoning": "STATE 코드 — 차량 lifecycle 상태 (★ ambiguous / 값 분포 미명시 / 도메인 expert 결단 carry)",
+      "source_grounded_evidence": "source/ddl/tables/TB_CAR.sql (state CHAR(1))"
+    },
+    {
+      "br_id": "BR-CAR-MGT-004",
+      "reasoning": "TOT_DIST 자동 갱신 — saveCarDriveRow 시 updateCarTotDist 호출 / 운행 거리 누적 계산",
+      "source_grounded_evidence": "source/sqlmap/carMgt.xml updateCarTotDist + CarMgtServiceImpl.saveCarDriveRow"
+    },
+    {
+      "br_id": "BR-CAR-MGT-005",
+      "reasoning": "CarUserTerm 매칭 — 같은 차량에 다른 사용자 시기별 할당 가능 (동시 1 user 제약은 service 검증 필요 / DDL CONSTRAINT ❌)",
+      "source_grounded_evidence": "source/ddl/tables/TB_CAR_USER_TERM.sql + source/sqlmap/carMgt.xml insertCarUserTerm"
+    },
+    {
+      "br_id": "BR-CAR-MGT-006",
+      "reasoning": "Leader 인증 — FIM.TB_USER PFLE_STATUS_CD='PS10' + USER_FG_HR='E10' + USER_ID=sessionId / 차량 모든 endpoint 권한 체크",
+      "source_grounded_evidence": "source/sqlmap/carMgt.xml selectLeaderUserId"
+    },
+    {
+      "br_id": "BR-CAR-COST-001",
+      "reasoning": "비용 항목 5종 (gas/insurance/repair/tax/etc) × 2 (원본 + ADJ 조정) = 10 컬럼 + 임차/감가 3종 — 회계 도메인 분류",
+      "source_grounded_evidence": "source/ddl/tables/TB_CAR_COST.sql (24 컬럼)"
+    },
+    {
+      "br_id": "BR-CAR-COST-002",
+      "reasoning": "cost_accept_cd 승인 — saveCarCostAccept MERGE 만 변경 가능 / admin 결정 (★ 값 분포 ambiguous carry)",
+      "source_grounded_evidence": "source/sqlmap/carCost.xml saveCarCostAccept"
+    },
+    {
+      "br_id": "BR-CAR-COST-003",
+      "reasoning": "★ ★ 차량비용 → SGERP 회계전표 IF SP 호출 / cross-DB transaction ❌ → eventual consistency / 본 PoC 핵심 anchor",
+      "source_grounded_evidence": "source/sqlmap/carCost.xml selectCarCostCalculate (procedure CALLABLE) + EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery"
+    },
+    {
+      "br_id": "BR-CAR-COST-004",
+      "reasoning": "NoLog 비용 — 회사 단위 통합 / 별도 aggregate (★ 의미 ambiguous carry)",
+      "source_grounded_evidence": "source/ddl/tables/TB_CAR_COST_NOLOG.sql + source/sqlmap/carCost.xml"
+    },
+    {
+      "br_id": "BR-CAR-COST-005",
+      "reasoning": "CostSumSystem 합산 — admin scope (★ admin role ambiguous carry)",
+      "source_grounded_evidence": "source/sqlmap/carCost.xml selectCarCostSumSystemList + updateCostSumSystem"
+    },
+    {
+      "br_id": "BR-CAR-COST-006",
+      "reasoning": "FN_SPLIT 다중 ID 등록 — comma-separated slip_id 를 row 분리 bulk INSERT",
+      "source_grounded_evidence": "source/sqlmap/carCost.xml insertCarCostSlip + source/ddl/functions/FN_split.sql"
+    }
+  ],
+  "out_of_scope": [
+    "EFI-WEB 다른 22 도메인 모듈 (billing / exchange / capital 등) — car 모듈 분리 분석",
+    "외부 4 DB (FIM / SGERP / e_hr / ekporg) 본체 소스 / 운영팀 협업 carry",
+    "Modern FE (React / Vue) 마이그레이션 target — 본 PoC = legacy analysis",
+    "TypeScript invariants / property_tests — impl stage carry"
+  ],
+  "excluded_antipatterns": [],
+  "risks_and_constraints": [
+    "★ ★ ★ AP-API-001 + AP-SEC-001 + AP-FE-001 = critical/high 위험 동시 해소 의무",
+    "★ ★ BR-CAR-COST-003 cross-DB transaction 결단 (saga / outbox / chained TM) 의무",
+    "★ ambiguous 4 BR (STATE / cost_accept_cd / NoLog / CostSumSystem) domain expert 결단 의무",
+    "★ SATD 3건 (임시적용 한국어 + IDE 자동 stub 2건) 처리 의무",
+    "★ 외부 DB 18 object 격리 = strangler fig pattern carry (현 cross-DB join 강결합)",
+    "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = analysis automation 50%대 ceiling (4 PoC corroboration 안정)"
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "input/architecture.json",
+      "input/sql-inventory.json",
+      "input/characterization-spec.json",
+      "input/antipatterns.json",
+      "input/api-extension.json"
+    ]
+  }
+}

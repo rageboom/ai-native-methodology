@@ -1,0 +1,324 @@
+{
+  "meta_confidence": {
+    "generated_at": "2026-05-28T08:00:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "characterization"
+    ],
+    "confidence": 0.78,
+    "raw_confidence": 0.78,
+    "warnings": [
+      "★ data_source_status = code_only — MSSQL 운영 DB 직접 접근 ❌ / 도메인 expert 인터뷰 ❌ / ambiguous 1건 carry",
+      "★ 본 PoC characterization = 2 UC 본격 snapshot (UC-CAR-COST-001 + UC-CAR-MGT-001) — 전체 34 endpoint 중 2건만 / 나머지 partial carry",
+      "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = characterization 추출 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 isomorphic)"
+    ]
+  },
+  "snapshots": [
+    {
+      "snapshot_id": "SNAP-UC-CAR-COST-001",
+      "use_case": "UC-CAR-COST-001",
+      "feature": "차량비용 → ERP 회계전표 IF 전송 (BR-CAR-COST-003 anchor)",
+      "endpoint": "POST /ifrs/car/costingCalculateAjax → POST /ifrs/car/saveCostingList",
+      "controller_method": "CarCostController#costingCalculateAjax + saveCostingList",
+      "service_method": "CarCostServiceImpl#selectCarCostingCalculateList + saveCostingList",
+      "sql_id": "selectCarCostCalculate + insertCarCostSlip",
+      "layer": "integration",
+      "data_source_status": "code_only",
+      "scenarios": [
+        {
+          "id": "SCN-CAR-COST-001-happy",
+          "name": "happy path — 정상 회계전표 IF 전송",
+          "tags": [
+            "@happy",
+            "@anchor",
+            "@BR-CAR-COST-003"
+          ],
+          "given": {
+            "session_user": "admin_user_id",
+            "request_body": {
+              "useComCd": 1,
+              "strDate": "2026-01-01",
+              "endDate": "2026-03-31",
+              "userNm": "차량사용자"
+            }
+          },
+          "when": "POST /ifrs/car/costingCalculateAjax → SP 호출 → POST /ifrs/car/saveCostingList",
+          "then": {
+            "expected_response_1": {
+              "status": 200,
+              "body": "list of slip rows"
+            },
+            "expected_response_2": {
+              "status": 200,
+              "body": "OK"
+            },
+            "state_after": {
+              "tb_car_cost_slip_rows": "≥ 1"
+            }
+          },
+          "intent_classification": [
+            {
+              "rule": "BR-CAR-COST-003",
+              "type": "intent"
+            },
+            {
+              "rule": "BR-CAR-COST-006",
+              "type": "intent"
+            }
+          ]
+        },
+        {
+          "id": "SCN-CAR-COST-001-likely-bug",
+          "name": "★ likely bug — cross-DB transaction 보장 ❌",
+          "tags": [
+            "@bug",
+            "@cross-db",
+            "@AP-DB-003",
+            "@AP-EXT-001"
+          ],
+          "given": {
+            "scenario_setup": "SP 호출 성공 + IFRS INSERT 실패"
+          },
+          "when": "SP 호출 성공 → IFRS DB INSERT 실패",
+          "then": {
+            "expected_legacy": "orphan slip / 데이터 불일치",
+            "expected_modern": "saga pattern 또는 outbox",
+            "modern_alternative": "Spring TransactionalEventListener + outbox + retry"
+          },
+          "intent_classification": [
+            {
+              "rule": "AP-DB-003",
+              "type": "bug"
+            },
+            {
+              "rule": "AP-EXT-001",
+              "type": "bug"
+            }
+          ],
+          "behavior_likely_bug": [
+            "orphan slip / 데이터 불일치",
+            "modern_alternative: Spring TransactionalEventListener + outbox + retry"
+          ]
+        },
+        {
+          "id": "SCN-CAR-COST-001-edge-empty",
+          "name": "edge — 빈 slip_id list",
+          "tags": [
+            "@edge"
+          ],
+          "given": {
+            "request_body": {
+              "useComCd": 1,
+              "strDate": "2026-01-01",
+              "endDate": "2026-01-01",
+              "userNm": "비사용자"
+            }
+          },
+          "when": "SP 호출 0 row → saveCostingList(빈 list)",
+          "then": {
+            "expected_response": {
+              "status": 200,
+              "body": "[]"
+            },
+            "state_after": {
+              "tb_car_cost_slip_rows": "변경 ❌"
+            }
+          },
+          "intent_classification": [
+            {
+              "rule": "BR-CAR-COST-003",
+              "type": "intent"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "snapshot_id": "SNAP-UC-CAR-MGT-001",
+      "use_case": "UC-CAR-MGT-001",
+      "feature": "차량 등록 + 사용자 기간 할당 (BR-CAR-MGT-001 + BR-CAR-MGT-005 anchor)",
+      "endpoint": "POST /ifrs/car/insertCar",
+      "controller_method": "CarMgtController#insertCar",
+      "service_method": "CarMgtServiceImpl#insertCar",
+      "sql_id": "insertCar + insertCarUserTerm",
+      "layer": "integration",
+      "data_source_status": "code_only",
+      "scenarios": [
+        {
+          "id": "SCN-CAR-MGT-001-happy",
+          "name": "happy path — 정상 차량 등록 + 사용자 기간 할당",
+          "tags": [
+            "@happy",
+            "@BR-CAR-MGT-001"
+          ],
+          "given": {
+            "session_user": "leader_user_id",
+            "request_body": {
+              "carNo": "12가3456",
+              "carType": "PASSENGER",
+              "comCd": 1,
+              "userId": "user001",
+              "userNm": "홍길동",
+              "carGetDate": "2026-01-01"
+            }
+          },
+          "when": "POST /ifrs/car/insertCar → insertCar SQL + insertCarUserTerm SQL",
+          "then": {
+            "expected_response": {
+              "status": 200,
+              "redirect": "/ifrs/car/carList"
+            },
+            "state_after": {
+              "tb_car_rows": "+1",
+              "tb_car_user_term_rows": "+1"
+            }
+          },
+          "intent_classification": [
+            {
+              "rule": "BR-CAR-MGT-001",
+              "type": "intent"
+            },
+            {
+              "rule": "BR-CAR-MGT-005",
+              "type": "intent"
+            },
+            {
+              "rule": "BR-CAR-MGT-006",
+              "type": "intent"
+            }
+          ]
+        },
+        {
+          "id": "SCN-CAR-MGT-001-non-leader",
+          "name": "edge — non-Leader 가 등록 시도",
+          "tags": [
+            "@edge",
+            "@authorization",
+            "@BR-CAR-MGT-006"
+          ],
+          "given": {
+            "session_user": "non_leader_user_id",
+            "request_body": "정상 입력"
+          },
+          "when": "POST /ifrs/car/insertCar → selectLeaderUserId 0 row",
+          "then": {
+            "expected_legacy": "Service layer 권한 거부 (정확 분기 위치 carry)",
+            "expected_modern": "Spring Security @PreAuthorize('hasRole(LEADER)') / 401 Unauthorized"
+          },
+          "intent_classification": [
+            {
+              "rule": "BR-CAR-MGT-006",
+              "type": "ambiguous"
+            }
+          ],
+          "behavior_to_preserve": [
+            "도메인 expert 결단 carry / 결단 후 보존 또는 modern_alternative 분기"
+          ],
+          "behavior_likely_bug": [
+            "도메인 expert 결단 후 likely_bug 분류 여부 결단 / 본 시점 carry"
+          ]
+        },
+        {
+          "id": "SCN-CAR-MGT-001-todo-stub",
+          "name": "★ self_recognized — TODO Auto-generated method stub",
+          "tags": [
+            "@self_recognized",
+            "@satd"
+          ],
+          "given": {
+            "code_location": "source/java/smilegate/ifrs/car/service/impl/CarMgtDAO.java:138",
+            "comment_text": "// TODO Auto-generated method stub"
+          },
+          "when": "코드 inspection / SATD pattern detection",
+          "then": {
+            "satd_classification": "self_recognized (Maldonado & Shihab 2015)",
+            "modern_alternative": "IDE auto-generated stub 제거 / 실 구현 또는 throw"
+          },
+          "intent_classification": [
+            {
+              "rule": "AP-DOMAIN-001",
+              "type": "self_recognized"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "intent_vs_bug": {
+    "br_total": 12,
+    "br_intent": 8,
+    "br_bug": 0,
+    "br_ambiguous": 4,
+    "br_self_recognized": 0,
+    "ap_total": 9,
+    "ap_intent": 0,
+    "ap_bug": 6,
+    "ap_ambiguous": 0,
+    "ap_self_recognized": 3,
+    "named_classified_ratio": 0.81,
+    "self_recognized_grep_count": 3,
+    "ambiguous_carry": [
+      {
+        "rule_id": "BR-CAR-MGT-003",
+        "carry_owner": "domain_expert",
+        "carry_reason": "STATE 코드 값 분포 — sqlmap 안 명시 ❌"
+      },
+      {
+        "rule_id": "BR-CAR-COST-002",
+        "carry_owner": "domain_expert",
+        "carry_reason": "cost_accept_cd enum 값 분포 — 사용자 결단"
+      },
+      {
+        "rule_id": "BR-CAR-COST-004",
+        "carry_owner": "domain_expert",
+        "carry_reason": "NoLog 비용 의미 — 마이그레이션 시 별도 entity 가능성"
+      },
+      {
+        "rule_id": "BR-CAR-COST-005",
+        "carry_owner": "domain_expert",
+        "carry_reason": "CostSumSystem admin role + scope"
+      }
+    ]
+  },
+  "coverage": {
+    "matrix": [
+      {
+        "uc": "UC-CAR-COST-001",
+        "controller_method": "CarCostController#costingCalculateAjax+saveCostingList",
+        "service_method": "selectCarCostingCalculateList+saveCostingList",
+        "sql_id": "selectCarCostCalculate+insertCarCostSlip",
+        "scope": "BC-CAR-COST",
+        "snapshot": "✅"
+      },
+      {
+        "uc": "UC-CAR-MGT-001",
+        "controller_method": "CarMgtController#insertCar",
+        "service_method": "CarMgtServiceImpl#insertCar",
+        "sql_id": "insertCar+insertCarUserTerm",
+        "scope": "BC-CAR-MGT",
+        "snapshot": "✅"
+      },
+      {
+        "uc": "UC-CAR-MGT-002",
+        "controller_method": "CarMgtController#carDriveInsertForm+carDriveRowSave",
+        "service_method": "saveCarDriveRow",
+        "sql_id": "insertCarDrive+updateCarTotDist",
+        "scope": "BC-CAR-MGT",
+        "snapshot": "❌"
+      },
+      {
+        "uc": "UC-CAR-COST-002",
+        "controller_method": "CarCostController#saveConfirmList",
+        "service_method": "saveConfirmList",
+        "sql_id": "saveCarCostAccept (MERGE)",
+        "scope": "BC-CAR-COST",
+        "snapshot": "❌"
+      }
+    ],
+    "coverage_target": 0.3,
+    "coverage_strategy": "absolute"
+  },
+  "code_pointers_na": true
+}

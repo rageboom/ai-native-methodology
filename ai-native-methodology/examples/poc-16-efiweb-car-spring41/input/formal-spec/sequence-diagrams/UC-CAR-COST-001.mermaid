@@ -1,0 +1,35 @@
+%% PoC #15 EFI-WEB car — UC-CAR-COST-001 시퀀스
+%% UC-CAR-COST-001.json 와 의미 동등 (이중 렌더링)
+%% 차량비용 → ERP 회계전표 IF 전송 (BR-CAR-COST-003)
+
+sequenceDiagram
+    participant admin as Admin (user)
+    participant ctrl as CarCostController
+    participant svc as CarCostServiceImpl
+    participant dao as CarCostDAO
+    participant ibatis as iBATIS SqlMapClient
+    participant sgerp as SGERP SP (외부)
+    participant ifrsdb as IFRS DB
+
+    admin->>ctrl: POST /ifrs/car/costingCalculateAjax
+    ctrl->>svc: selectCarCostingCalculateList(param)
+    svc->>dao: selectCarCostCalculate(param)
+    dao->>ibatis: queryForList('selectCarCostCalculate')
+    ibatis->>sgerp: EXEC SG_SACSlipRowCarManagementIFQuery<br/>(useComCd, 0, strDate, endDate, userNm, '', '')
+    sgerp-->>ibatis: result rows (slip_id list)
+    ibatis-->>dao: List<EgovMap>
+    dao-->>svc: List<Map>
+    svc-->>ctrl: List<Map>
+
+    Note over ctrl,admin: ★ Cross-DB transaction 보장 ❌<br/>(eventual consistency)
+
+    admin->>ctrl: POST /ifrs/car/saveCostingList
+    ctrl->>svc: saveCostingList(list, sessionId)
+    svc->>dao: insertCarCostSlip(map)<br/>FN_SPLIT(carCostSlipseqs, ',')
+    dao->>ibatis: insert into tb_car_cost_slip
+    ibatis->>ifrsdb: INSERT INTO TB_CAR_COST_SLIP<br/>(cost_idx, slip_id, cost_gubun, car_cost_type)
+    ifrsdb-->>ibatis: OK
+    ibatis-->>dao: OK
+    dao-->>svc: void
+    svc-->>ctrl: void
+    ctrl-->>admin: 200 OK

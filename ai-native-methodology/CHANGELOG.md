@@ -9,6 +9,44 @@
 
 ---
 
+## [11.2.0] — 2026-05-28 MINOR — analysis schema chain-link 일관성 정정 (ADR-CHAIN-013 / PoC #15 dogfood 발견)
+
+> PoC #15 (디렉토리 `examples/poc-16-efiweb-car-spring41/`) 의 12 analysis 적재 후 artifact-graph 안 **83% (10/12) orphan** 발견. 본 결함 = graph-synthesizer 도구 매핑 부족 아닌 ★ **methodology 본체 schema 의 chain-link 일관성 결함**. 3 layer 매핑 표준 (chain-side + analysis-side self-ref + meta fallback) 영구 명문화.
+
+### Added
+- `schemas/meta-confidence.schema.json`: optional `related_chain_ids[]` 필드 신설 — 15 analysis + 4 aspect 모두 `$ref` 공유 (DRY / 단일 파일 = 19 schemas 동시 확장). pattern `^(UC|BHV|AC|TASK|TC|IMPL)-[A-Z0-9_-]+$`.
+- `tools/traceability-matrix-builder/src/graph-synthesizer.js`:
+  - `CHAIN_TO_ANALYSIS_REFS` 확장 — AC 안 추가 매핑 가능 (현 BHV/AC 유지)
+  - `ANALYSIS_TO_CHAIN_REFS` 신설 (Layer 2) — 6 kinds 의 self-ref iteration: formal-spec.sequences[].uc_id / characterization-spec.snapshots[].use_case / api.operations[].related_use_case_id / ui-ux.pages[].related_use_cases + components[].related_use_cases / sql-inventory.inventory[].uc_link / domain.bounded_contexts[].aggregates[].related_use_cases (nested 2-deep)
+  - meta.related_chain_ids loop (Layer 3 fallback) — 5 schemas (architecture/db-schema/state-map/type-spec/error-mapping-spec) 의무 + universal optional
+- `docs/adr/ADR-CHAIN-013-analysis-chain-link-consistency.md`: 3 layer chain-link 매핑 표준 정식 ADR (PoC #15 dogfood 발견 + Layer 1/2/3 권위 표 + 향후 PoC 작성자 의무)
+- `tools/traceability-matrix-builder/test/graph-synthesizer.test.js`: `★ v11.2.0 analysis chain-link 일관성 (ADR-CHAIN-013)` describe block 신설 (9 신규 test — Layer 2 6종 + Layer 3 fallback + orphan 회귀 차단 + dangling 가드)
+
+### Changed
+- PoC #15 (poc-16-efiweb-car-spring41):
+  - artifact-graph 재합성: nodes 42 → **44** / edges 54 → **109** (cross_reference 34 → 89) / orphan **10 → 0**
+  - 산출물 파일명 정합: `api-extension.json` → `openapi-extension.json` / `schema.json` → `db-schema.json` (ANALYSIS_FILENAMES 정합)
+  - 6 산출물 backfill: domain.aggregates / ui-spec.pages / sql-inventory.inventory 안 ref 필드 명시
+  - 6 산출물 meta.related_chain_ids backfill (architecture / db-schema / state-map / type-spec / error-mapping-spec / visual-manifest)
+- PoC #15 REPORT.md: D-axis 100% 본격 달성 (4/4 axis pass) + F-POC15-S5-004 (graph-synthesizer 한계 carry) 정식 해소 표기
+
+### Fixed
+- F-POC15-S5-004: graph-synthesizer 의 `CHAIN_TO_ANALYSIS_REFS` 매핑 부족 = 본체 schema 결함 = ★ ★ ★ 정식 해소
+
+### Verified
+- workspace test: 770 → **779 pass** / 0 fail (신규 9 + 기존 770)
+- PoC #05 (sample-user-register) 회귀 0: nodes 18 / edges 29 / orphan 0 / cycle 0 (analysis 2 = BR+AP 만 적재 → 신규 매핑 trigger ❌)
+- PoC #15 (poc-16-efiweb-car-spring41) graph-integrity passed=true: orphan 10→0 / cycle 0 / unknown_edges 0
+- PoC #15 code-pointer-validator strict: coverage.ratio=1.0 / missing=0 / findings=0 회귀 유지
+- 3-way version sync 11.2.0: package.json + plugin.json + CHANGELOG entry
+
+### STOP-3
+workspace test 779/779 pass ✅ + 3-way version sync 11.2.0 ✅ + PoC #05 회귀 0 ✅ + PoC #15 orphan 0 ✅. release-readiness 22/22 검증 = §scripts/release-readiness.js 실행.
+
+**DEC**: DEC-2026-05-28-analysis-chain-link-일관성
+
+---
+
 ## [11.1.0] — 2026-05-27 MINOR — v11 discovery-spec cascade 완결 + drift-validator outputs 비교 신설 (F-MB-010·F-MB-011)
 
 > end-to-end 흐름 점검 결과, v11.0.0 이 "active doc cascade 완료" 로 기재했으나 실제로는 `planning-spec`→`discovery-spec` rename 이 flows·docs·chain-driver runtime 에 미흡수 (선언↔실상 모순). 본 release 가 잔여 cascade 를 완결하고, 동종 발산을 재발 차단할 drift-validator 산출물명 비교를 신설. RED→GREEN paradigm 정합.

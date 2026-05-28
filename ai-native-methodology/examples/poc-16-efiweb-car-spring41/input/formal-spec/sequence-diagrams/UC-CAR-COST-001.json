@@ -1,0 +1,36 @@
+{
+  "uc_id": "UC-CAR-COST-001",
+  "title": "차량비용 → ERP 회계전표 IF 전송 (BR-CAR-COST-003 anchor)",
+  "actors": [
+    {"id": "admin", "type": "user"},
+    {"id": "carCostController", "type": "controller"},
+    {"id": "carCostServiceImpl", "type": "service"},
+    {"id": "carCostDAO", "type": "repository"},
+    {"id": "ibatis", "type": "external_system"},
+    {"id": "sgerp_sp", "type": "external_system"},
+    {"id": "ifrs_db", "type": "external_system"}
+  ],
+  "messages": [
+    {"from": "admin", "to": "carCostController", "label": "POST /ifrs/car/costingCalculateAjax", "type": "request"},
+    {"from": "carCostController", "to": "carCostServiceImpl", "label": "selectCarCostingCalculateList(param)", "type": "call"},
+    {"from": "carCostServiceImpl", "to": "carCostDAO", "label": "selectCarCostCalculate(param)", "type": "call"},
+    {"from": "carCostDAO", "to": "ibatis", "label": "queryForList('selectCarCostCalculate')", "type": "call"},
+    {"from": "ibatis", "to": "sgerp_sp", "label": "EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery(useComCd, 0, strDate, endDate, userNm, '', '')", "type": "external_call"},
+    {"from": "sgerp_sp", "to": "ibatis", "label": "result rows (slip_id list)", "type": "response"},
+    {"from": "ibatis", "to": "carCostDAO", "label": "List<EgovMap>", "type": "response"},
+    {"from": "carCostDAO", "to": "carCostServiceImpl", "label": "List<Map>", "type": "response"},
+    {"from": "admin", "to": "carCostController", "label": "POST /ifrs/car/saveCostingList", "type": "request"},
+    {"from": "carCostController", "to": "carCostServiceImpl", "label": "saveCostingList(list, sessionId)", "type": "call"},
+    {"from": "carCostServiceImpl", "to": "carCostDAO", "label": "insertCarCostSlip(map) -- FN_SPLIT(carCostSlipseqs)", "type": "call"},
+    {"from": "carCostDAO", "to": "ibatis", "label": "insert into tb_car_cost_slip", "type": "call"},
+    {"from": "ibatis", "to": "ifrs_db", "label": "INSERT INTO TB_CAR_COST_SLIP (cost_idx, slip_id, cost_gubun, car_cost_type)", "type": "external_call"},
+    {"from": "ifrs_db", "to": "ibatis", "label": "OK", "type": "response"},
+    {"from": "carCostServiceImpl", "to": "carCostController", "label": "void", "type": "response"},
+    {"from": "carCostController", "to": "admin", "label": "200 OK", "type": "response"}
+  ],
+  "notes": [
+    "★ Cross-DB transaction 보장 ❌ — SGERP SP 호출 + IFRS INSERT 가 별도 transaction → eventual consistency",
+    "★ 마이그레이션: saga pattern 또는 outbox table 도입 권고",
+    "★ BR-CAR-COST-003 + BR-CAR-COST-006 (FN_SPLIT) 정합"
+  ]
+}

@@ -1,10 +1,10 @@
 # AI-Native 개발 방법론 v11.1.0 ★ ★ ★ ★ ★ ★
 
-> 사내 표준 AI 기반 개발 방법론. **Legacy 분석 → 발견 → 스펙 → 계획 → 테스트 → 구현** SDLC 6-stage chain harness.
+> 조직의 개발 방식을 AI-Native로 전환하는 **AX(AI Transformation) 마이그레이션** 사내 표준 방법론. **분석 → 발견 → 스펙 → 계획 → 테스트 → 구현** SDLC 6-stage chain harness — AI가 단계별 산출물을 생성하고 사람은 gate에서 검토·결단 (AI 자동화 ~85% / 사람 ≤15%).
 >
 > **현재**: v11.1.0 (2026-05-27) — ★ ★ ★ ★ ★ ★ ★ **v11 paradigm cascade 완결 (BE/FE 산출물 분리 + contract 강제 양 axis)** / 사용자 요구사항 18 모두 청산 (R1~R18 / R16·R17 영구 scope-out) / release-readiness **22/22** strict 통과 / CLAUDE.md ↔ plugin.json drift 자동 enforcement (R2) / **skill 55종 / 도구 22종 / 스키마 46종 / PoC 14종** / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill (React/Vue/Playwright/state-map/visual-manifest/type-spec) / scope·stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT / workspace test **770/770** pass.
 >
-> ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수). v2.0 paradigm = legacy 분석 위에 chain harness + revisit loop + 70~80% 한계 명시. v3.x = Gap 청산 + enforcement cadence 정착 + 자산 대칭 완성. ★ v9.0 = 6-stage chain (analysis→discovery→spec→plan→test→implement). ★ v10.0.0 = 5 gate 본격 (discovery #1 / spec #2 / plan #3 / test #4 / impl #5 / chain N = gate #N 1:1 INTERNAL CONVENTION). ★ v11.0.0 = BE/FE 산출물 분리 paradigm + contract 강제 양 axis (BE = swagger / FE = state-map + visual-manifest + DTCG token) + ticket = plan stage 단일 (Epic/Story/OP/TASK 4-level).
+> ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수 / AX 전환의 출발 입력). v2.0 paradigm = 분석 stage 위에 chain harness + revisit loop + 70~80% 한계 명시. v3.x = Gap 청산 + enforcement cadence 정착 + 자산 대칭 완성. ★ v9.0 = 6-stage chain (analysis→discovery→spec→plan→test→implement). ★ v10.0.0 = 5 gate 본격 (discovery #1 / spec #2 / plan #3 / test #4 / impl #5 / chain N = gate #N 1:1 INTERNAL CONVENTION). ★ v11.0.0 = BE/FE 산출물 분리 paradigm + contract 강제 양 axis (BE = swagger / FE = state-map + visual-manifest + DTCG token) + ticket = plan stage 단일 (Epic/Story/OP/TASK 4-level).
 >
 > 자세한 변경 이력 = [CHANGELOG.md](./CHANGELOG.md) (v2.6+) / [CHANGELOG-HISTORY.md](./CHANGELOG-HISTORY.md) (v8.x 이전).
 
@@ -12,11 +12,13 @@
 
 ## 무엇을 하는가
 
-```
-INPUT (1차 = legacy single-case):
-  legacy 코드베이스 (소스 / ERD / ORM / 운영 DB / 기획 문서 / 디자인 명세)
+조직의 SDLC 를 **AI-Native** 협업 구조로 전환한다. AI 가 단계별 산출물을 자동 생성하고, 사람은 각 gate 에서 검토·결단한다. 입력은 기존 시스템 자산(소스/스키마/문서/디자인), 출력은 검증 가능한 산출물 체인과 그 결과로 운영되는 시스템.
 
-  ↓ analysis stage (chain 1 진입 전 / 한 방향 추출)
+```
+INPUT:
+  기존 시스템 자산 (소스 / ERD / ORM / 운영 DB / 기획 문서 / 디자인 명세)
+
+  ↓ analysis stage (chain 1 진입 전 / 한 방향 추출 — AX 전환 출발 입력)
   ↓
 [CHAIN 1] discovery-spec (discovery stage)      ── go/stop gate #1
   ↓
@@ -30,7 +32,7 @@ INPUT (1차 = legacy single-case):
   ↓
 [CHAIN 5] impl-spec + 실 impl 코드 (GREEN / 100% test pass)  ── go/stop gate #5
   ↓
-OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TASK→TC→IMPL+commit_hash)
+OUTPUT: AI-Native 로 운영되는 시스템 + traceability-matrix (UC→BHV→AC→TASK→TC→IMPL+commit_hash)
 ```
 
 ★ AI 자동화 ≥ 85% / 사람 검토 (gate별) ≤ 15% / **70~80% 한계 명시 잔존** (★ **chain harness 전체 자동화 axis** / process 통과율 metric / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용).
@@ -86,7 +88,7 @@ OUTPUT: prod 시스템 + traceability-matrix (UC→BHV→AC→TASK→TC→IMPL+c
 ### 사전 요구사항
 
 - Claude Code 설치 (★ plugin 시스템 지원)
-- 분석 대상 사내 legacy 프로젝트 git clone
+- 분석 대상 사내 프로젝트 git clone (analysis stage 입력 자산)
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
 - Node ≥ 18 (chain-driver / 22 workspace tool 실행)
@@ -165,11 +167,11 @@ npm run release:check       # §8.1 strict 22/22 자동 검사
 npm run test                # workspace 22 tool unit test (770 test pass)
 ```
 
-★ 분석 대상 사내 legacy 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 ("chain harness ready") 표시 시 정상 작동.
+★ 분석 대상 사내 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 ("chain harness ready") 표시 시 정상 작동.
 
 ### 사용법 — chain harness 진입 시나리오
 
-#### 시나리오 A — Analysis stage 만 (legacy 분석 / chain 1 미진입)
+#### 시나리오 A — Analysis stage 만 (분석 단독 / chain 1 미진입)
 
 자연어 prompt → skill 자동 발동:
 

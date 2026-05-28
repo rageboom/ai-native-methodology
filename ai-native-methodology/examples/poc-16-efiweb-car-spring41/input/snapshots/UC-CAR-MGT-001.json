@@ -1,0 +1,77 @@
+{
+  "snapshot_id": "SNAP-UC-CAR-MGT-001",
+  "use_case": "UC-CAR-MGT-001",
+  "feature": "차량 등록 + 사용자 기간 할당 (BR-CAR-MGT-001 + BR-CAR-MGT-005 anchor)",
+  "endpoint": "POST /ifrs/car/insertCar",
+  "controller_method": "CarMgtController#insertCar",
+  "service_method": "CarMgtServiceImpl#insertCar",
+  "sql_id": "insertCar + insertCarUserTerm",
+  "layer": "integration",
+  "data_source_status": "code_only",
+  "scenarios": [
+    {
+      "id": "SCN-CAR-MGT-001-happy",
+      "name": "happy path — 정상 차량 등록 + 사용자 기간 할당",
+      "tags": ["@happy", "@BR-CAR-MGT-001"],
+      "given": {
+        "session_user": "leader_user_id",
+        "request_body": {
+          "carNo": "12가3456",
+          "carType": "PASSENGER",
+          "comCd": 1,
+          "userId": "user001",
+          "userNm": "홍길동",
+          "carGetDate": "2026-01-01"
+        }
+      },
+      "when": "POST /ifrs/car/insertCar (Leader 인증 + 의무 필드 검증) → insertCar SQL + insertCarUserTerm SQL",
+      "then": {
+        "expected_response": {"status": 200, "redirect": "/ifrs/car/carList"},
+        "state_after": {
+          "tb_car_rows": "+1 (idx auto-generated)",
+          "tb_car_user_term_rows": "+1 (car_idx FK)"
+        }
+      },
+      "intent_classification": [
+        {"rule": "BR-CAR-MGT-001", "type": "intent"},
+        {"rule": "BR-CAR-MGT-005", "type": "intent"},
+        {"rule": "BR-CAR-MGT-006", "type": "intent"}
+      ]
+    },
+    {
+      "id": "SCN-CAR-MGT-001-non-leader",
+      "name": "edge — non-Leader 가 등록 시도 (selectLeaderUserId null)",
+      "tags": ["@edge", "@authorization", "@BR-CAR-MGT-006"],
+      "given": {
+        "session_user": "non_leader_user_id (FIM.TB_USER PFLE_STATUS_CD != 'PS10' 또는 USER_FG_HR != 'E10')",
+        "request_body": "정상 입력"
+      },
+      "when": "POST /ifrs/car/insertCar → selectLeaderUserId 0 row",
+      "then": {
+        "expected_legacy": "Service layer 권한 거부 / 정확한 분기 위치 = LLM 추정 carry (current_state_note 의무)",
+        "expected_modern": "Spring Security @PreAuthorize('hasRole(LEADER)') / 401 Unauthorized"
+      },
+      "intent_classification": [
+        {"rule": "BR-CAR-MGT-006", "type": "ambiguous"}
+      ]
+    },
+    {
+      "id": "SCN-CAR-MGT-001-todo-stub",
+      "name": "★ self_recognized — TODO Auto-generated method stub",
+      "tags": ["@self_recognized", "@satd"],
+      "given": {
+        "code_location": "source/java/smilegate/ifrs/car/service/impl/CarMgtDAO.java:138",
+        "comment_text": "// TODO Auto-generated method stub"
+      },
+      "when": "코드 inspection / SATD pattern detection",
+      "then": {
+        "satd_classification": "self_recognized (Maldonado & Shihab 2015)",
+        "modern_alternative": "IDE auto-generated stub 제거 / 실 구현 또는 throw new UnsupportedOperationException 명시",
+        "current_state_note": "Eclipse / IntelliJ 자동 생성 잔재 / 마이그레이션 시 확인 의무"
+      },
+      "intent_classification": [
+        {"rule": "AP-DOMAIN-001", "type": "self_recognized"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "$comment": "phase discovery (analysis 내부) 통계 요약 / cloc 2.08 결정적 + grep 결정적 보완 / no-simulation 정합",
+  "generated_at": "2026-05-28T05:50:00Z",
+  "extraction_tools": {
+    "loc": "cloc 2.08",
+    "endpoint_count": "grep (deterministic / @RequestMapping)",
+    "method_count": "grep (public method 시그니처)",
+    "sqlmap_statement_count": "grep + xml parse (deterministic)"
+  },
+  "files": {
+    "total": 36,
+    "by_extension": {
+      ".java": 8,
+      ".jsp": 14,
+      ".xml": 2,
+      ".sql": 9,
+      ".erd": 2,
+      ".md": 1
+    }
+  },
+  "loc": {
+    "total_code": 9982,
+    "total_blank": 1074,
+    "total_comment": 921,
+    "total_raw": 11977,
+    "by_language": {
+      "xml": {"files": 4, "code": 5747, "blank": 45, "comment": 33},
+      "jsp": {"files": 14, "code": 3110, "blank": 532, "comment": 341},
+      "java": {"files": 8, "code": 798, "blank": 450, "comment": 502},
+      "sql": {"files": 9, "code": 263, "blank": 29, "comment": 45},
+      "markdown": {"files": 1, "code": 64, "blank": 18, "comment": 0}
+    },
+    "note": "cloc XML 4 = sqlmap 2 + 다른 xml 2 (cloc 내부 분류 / 본 PoC sqlmap 만 = 2 / 831 raw LOC)"
+  },
+  "java_classes": {
+    "total": 8,
+    "by_layer": {
+      "web_controller": 2,
+      "service_interface": 2,
+      "service_impl": 2,
+      "dao": 2
+    },
+    "by_responsibility": {
+      "mgt": ["CarMgtController", "CarMgtService", "CarMgtServiceImpl", "CarMgtDAO"],
+      "cost": ["CarCostController", "CarCostService", "CarCostServiceImpl", "CarCostDAO"]
+    },
+    "loc_distribution": {
+      "CarCostController": 418,
+      "CarMgtController": 374,
+      "CarMgtServiceImpl": 247,
+      "CarCostServiceImpl": 224,
+      "CarMgtDAO": 202,
+      "CarCostDAO": 110,
+      "CarMgtService": 99,
+      "CarCostService": 76
+    }
+  },
+  "endpoints": {
+    "total": 34,
+    "by_controller": {
+      "CarMgtController": 16,
+      "CarCostController": 18
+    },
+    "extraction_method": "grep @RequestMapping(value=\"<path>\") deterministic"
+  },
+  "service_methods": {
+    "total_impl_public": 13,
+    "by_class": {
+      "CarMgtServiceImpl": 8,
+      "CarCostServiceImpl": 5
+    }
+  },
+  "dao_methods": {
+    "total": 25,
+    "by_class": {
+      "CarMgtDAO": 17,
+      "CarCostDAO": 8
+    }
+  },
+  "ibatis_statements": {
+    "total": 37,
+    "by_file": {
+      "carMgt.xml": "TBD (전체 추출 carry / discovery scope 외)",
+      "carCost.xml": "TBD (전체 추출 carry / discovery scope 외)"
+    },
+    "by_type": {
+      "select": 17,
+      "insert": 5,
+      "update": 9,
+      "delete": 5,
+      "procedure": 1
+    },
+    "dao_call_count": 36,
+    "note": "DAO call 36 ↔ sqlmap statement 37 = 차이 1건 (DAO 호출 없는 statement 1 또는 동일 statement 중복 호출 / sql-inventory phase 정밀 확인 carry)"
+  },
+  "jsp": {
+    "total": 14,
+    "scriptlet_count": 8,
+    "raw_expression_count": 20,
+    "static_include_count": 14,
+    "dynamic_include_count": 11,
+    "jstl_taglib_count": 0,
+    "form_action_count": 1,
+    "pmd_parse_success": 4,
+    "pmd_parse_failure": 10,
+    "pmd_violation_count": 28,
+    "note": "scriptlet 8건 = v3.4.0 G4 policy violation (critical) / PMD parse failure 10 = HTML5 doctype 한계"
+  },
+  "ddl": {
+    "tables_total": 6,
+    "functions_total": 3,
+    "tables": ["TB_CAR", "TB_CAR_COST", "TB_CAR_COST_NOLOG", "TB_CAR_COST_SLIP", "TB_CAR_DRIVE", "TB_CAR_USER_TERM"],
+    "functions": ["fn_Get_CarUserListView", "fn_Get_CarUserListView_2", "FN_split"],
+    "ddl_loc_code": 263
+  },
+  "cross_db_dependencies": {
+    "external_db_count": 4,
+    "external_object_count": 18,
+    "external_dbs": ["FIM", "SGERP", "e_hr", "ekporg"],
+    "stored_procedure_count": 1,
+    "sp_signature_only": true
+  },
+  "axis_summary": {
+    "primary_axis": "D-axis (artifact-graph e2e 입증)",
+    "secondary_axis": "R1' Spring 4.1 + iBATIS 2 paradigm (4번째 corroboration / carry)",
+    "scale_position": "1750 LOC code (중간 / PoC #06 345 ~ PoC #07 3752 사이) / 책임 분기 이중 (Mgt + Cost)"
+  }
+}

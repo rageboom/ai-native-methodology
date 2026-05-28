@@ -1,0 +1,33 @@
+/****** Object:  Table [dbo].[TB_CAR_DRIVE]    Script Date: 2026-05-20 오후 4:40:07 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[TB_CAR_DRIVE](
+	[DRIVE_IDX] [int] IDENTITY(1,1) NOT NULL,
+	[CAR_IDX] [int] NULL,
+	[YEAR] [varchar](4) NULL,
+	[DRIVE_NO] [nvarchar](20) NULL,
+	[PURPOSE_CD] [varchar](20) NULL,
+	[DRIVE_DATE] [datetime] NULL,
+	[USER_ID] [nvarchar](20) NULL,
+	[COM_CD] [int] NULL,
+	[DEPT_CD] [int] NULL,
+	[DEP_POINT] [nvarchar](100) NULL,
+	[DEP_ACC_DIST] [decimal](10, 2) NULL,
+	[ARR_POINT] [nvarchar](100) NULL,
+	[ARR_ACC_DIST] [decimal](10, 2) NULL,
+	[DRIVE_DIST] [decimal](10, 2) NULL,
+	[DRIVE_WORK_DIST] [decimal](10, 2) NULL,
+	[REMARK] [nvarchar](200) NULL,
+	[INS_ID] [nvarchar](20) NULL,
+	[INS_DT] [datetime] NULL,
+	[UPT_ID] [nvarchar](20) NULL,
+	[UPT_DT] [datetime] NULL,
+	[DISTANCE] [decimal](10, 2) NULL,
+ CONSTRAINT [PK__TB_CAR_D__2C91D02B1A9EF37A] PRIMARY KEY CLUSTERED 
+(
+	[DRIVE_IDX] ASC
+)WITH (PAD_INDEX = ON, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, FILLFACTOR = 90, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO

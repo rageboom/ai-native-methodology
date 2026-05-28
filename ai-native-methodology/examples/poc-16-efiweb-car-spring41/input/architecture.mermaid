@@ -1,0 +1,48 @@
+%% PoC #16 EFI-WEB car — Architecture (layer × module)
+%% layered 3-tier + Clean Architecture layer 매핑 (approximation)
+%% architecture.json 와 의미 동등
+
+flowchart TB
+    subgraph PRES["Presentation Layer"]
+        WEB["MOD-CAR-WEB<br/>CarMgtController (16 ep)<br/>CarCostController (18 ep)"]
+        JSP["MOD-CAR-JSP<br/>14 JSP / 3110 LOC<br/>(★ scriptlet 8 / XSS 20)"]
+    end
+
+    subgraph APP["Application Layer"]
+        SVCAPI["MOD-CAR-SVC-API<br/>CarMgtService (interface)<br/>CarCostService (interface)"]
+        SVCIMPL["MOD-CAR-SVC-IMPL<br/>CarMgtServiceImpl (8 method)<br/>CarCostServiceImpl (5 method)"]
+    end
+
+    subgraph INFRA["Infrastructure Layer"]
+        DAO["MOD-CAR-DAO<br/>CarMgtDAO (17 method)<br/>CarCostDAO (8 method)<br/>(⚠️ package anti-pattern)"]
+        SQLMAP["MOD-CAR-SQLMAP<br/>carMgt.xml + carCost.xml<br/>37 statement"]
+        DDL["MOD-CAR-DDL<br/>6 tables + 3 functions"]
+    end
+
+    subgraph EXT["External (out-of-scope)"]
+        DB_IFRS[("IFRS DB (own)")]
+        DB_FIM[("FIM DB")]
+        DB_SGERP[("SGERP DB<br/>+ SP IF")]
+        DB_EHR[("e_hr DB")]
+        DB_EKPORG[("ekporg DB")]
+        EGOV{{"eGov Runtime"}}
+        SPRING{{"Spring MVC 4.1"}}
+        CMM_COMMON_CONNECT{{"smilegate.ifrs.cmm/common/connect"}}
+    end
+
+    WEB --> JSP
+    WEB --> SVCAPI
+    SVCIMPL -.implements.-> SVCAPI
+    SVCIMPL --> DAO
+    DAO --> SQLMAP
+    SQLMAP --> DDL
+    SQLMAP -.cross-db.-> DB_FIM
+    SQLMAP -.cross-db.-> DB_SGERP
+    SQLMAP -.cross-db.-> DB_EHR
+    SQLMAP -.cross-db.-> DB_EKPORG
+    DDL --> DB_IFRS
+    SQLMAP -.SP IF.-> DB_SGERP
+    SVCIMPL -.import.-> CMM_COMMON_CONNECT
+    DAO -.extends.-> EGOV
+    WEB -.framework.-> SPRING
+    SVCIMPL -.framework.-> SPRING

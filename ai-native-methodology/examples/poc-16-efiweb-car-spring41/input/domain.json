@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T06:40:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code",
+      "erd"
+    ],
+    "confidence": 0.85,
+    "raw_confidence": 0.85,
+    "warnings": [
+      "Spring 4.1 + iBATIS 2 paradigm = entity 명시 ❌ / DTO + HashMap Map 사용 / domain entity 는 schema 추론",
+      "ubiquitous_language 한국어 용어 일부 = sqlmap 주석 + JSP 한글 label 추출 + 추정"
+    ]
+  },
+  "ubiquitous_language": [
+    {
+      "term": "차량",
+      "term_en": "Car",
+      "definition": "회사 운영 차량 마스터 (tb_car)"
+    },
+    {
+      "term": "차량 번호",
+      "term_en": "Car No",
+      "definition": "차량 식별 번호 (car_no)"
+    },
+    {
+      "term": "차량 종류",
+      "term_en": "Car Type",
+      "definition": "차량 유형 코드 (car_type / 코드 마스터 외부)"
+    },
+    {
+      "term": "운행",
+      "term_en": "Drive",
+      "definition": "차량 사용 1회 단위 (tb_car_drive)"
+    },
+    {
+      "term": "사용자 기간",
+      "term_en": "User Term",
+      "definition": "차량을 특정 사용자가 사용한 기간 (tb_car_user_term)"
+    },
+    {
+      "term": "비용",
+      "term_en": "Cost",
+      "definition": "차량 운영 비용 (gas / insurance / repair / tax / etc)"
+    },
+    {
+      "term": "비용 승인",
+      "term_en": "Cost Accept",
+      "definition": "비용 항목별 승인 코드 (cost_accept_cd)"
+    },
+    {
+      "term": "회계전표",
+      "term_en": "Slip",
+      "definition": "비용 → SGERP ERP 회계전표 IF 전송 결과 (tb_car_cost_slip)"
+    },
+    {
+      "term": "리더",
+      "term_en": "Leader",
+      "definition": "사내 리더 사용자 (FIM.TB_USER 의 PFLE_STATUS_CD=PS10 + USER_FG_HR=E10)"
+    },
+    {
+      "term": "임차",
+      "term_en": "Rent",
+      "definition": "차량 임대 (rent_type_cd / rent_cost)"
+    },
+    {
+      "term": "감가상각",
+      "term_en": "Depreciation",
+      "definition": "차량 감가상각 비용 (depr_cost / tax_depr_cost)"
+    }
+  ],
+  "bounded_contexts": [
+    {
+      "id": "BC-CAR-MGT",
+      "name": "차량 관리",
+      "description": "차량 마스터 / 운행 로그 / 사용자 기간별 할당 / 등록·수정·삭제",
+      "related_modules": [
+        "MOD-CAR-WEB",
+        "MOD-CAR-SVC-API",
+        "MOD-CAR-SVC-IMPL",
+        "MOD-CAR-DAO",
+        "MOD-CAR-SQLMAP",
+        "MOD-CAR-DDL"
+      ],
+      "aggregates": [
+        {
+          "root_entity_id": "E-CAR-Car",
+          "members": [
+            "E-CAR-CarUserTerm",
+            "E-CAR-CarDrive"
+          ],
+          "invariants": [
+            {
+              "description": "Car 는 use_yn='Y' (사용 중) state 가 아니면 운행 등록 불가 (추정 / DDL CONSTRAINT 명시 ❌)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/java/smilegate/ifrs/car/service/impl/CarMgtServiceImpl.java"
+                }
+              ]
+            },
+            {
+              "description": "CarDrive 는 반드시 CarUserTerm 의 시작일 ≤ drive_date ≤ 종료일 범위 (추정 — service 검증 필요)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/sqlmap/carMgt.xml"
+                }
+              ]
+            },
+            {
+              "description": "TOT_DIST = saveCarDriveRow 시 운행 거리 누적 (updateCarTotDist 호출)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/sqlmap/carMgt.xml",
+                  "anchor": "<update id='updateCarTotDist'>"
+                }
+              ]
+            }
+          ],
+          "transaction_boundary": true,
+          "consistency": "strong",
+          "related_use_cases": [
+            "UC-CAR-MGT-001",
+            "UC-CAR-MGT-002",
+            "UC-CAR-MGT-003",
+            "UC-CAR-MGT-004",
+            "UC-CAR-MGT-005"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "BC-CAR-COST",
+      "name": "차량 비용",
+      "description": "비용 항목 5종 (gas/insurance/repair/tax/etc) + 조정 + 임차/감가 + 승인 + 회계전표 IF",
+      "related_modules": [
+        "MOD-CAR-WEB",
+        "MOD-CAR-SVC-API",
+        "MOD-CAR-SVC-IMPL",
+        "MOD-CAR-DAO",
+        "MOD-CAR-SQLMAP",
+        "MOD-CAR-DDL"
+      ],
+      "aggregates": [
+        {
+          "root_entity_id": "E-CAR-COST-Cost",
+          "members": [
+            "E-CAR-COST-CostSlip",
+            "E-CAR-COST-CostNolog"
+          ],
+          "invariants": [
+            {
+              "description": "Cost 는 반드시 CarUserTerm (term_idx) 에 종속 (DDL NOT NULL — schema 정합)",
+              "enforced_by": "db_constraint",
+              "evidence": [
+                {
+                  "file": "source/ddl/tables/TB_CAR_COST.sql",
+                  "anchor": "[TERM_IDX] [int] NOT NULL"
+                }
+              ]
+            },
+            {
+              "description": "CostSlip 은 Cost (cost_idx) 와 SGERP._TACSlip (slip_id) 의 cross-DB FK (DDL 명시 ❌ / 운영 추론)",
+              "enforced_by": "unknown",
+              "evidence": [
+                {
+                  "file": "source/sqlmap/carCost.xml",
+                  "anchor": "<insert id='insertCarCostSlip'>"
+                }
+              ]
+            },
+            {
+              "description": "cost_accept_cd (비용 승인 코드) 는 saveCarCostAccept (MERGE) 로만 변경 가능 (admin 결정)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/sqlmap/carCost.xml",
+                  "anchor": "<update id='saveCarCostAccept'>"
+                }
+              ]
+            },
+            {
+              "description": "회계전표 IF = SGERP.SG_SACSlipRowCarManagementIFQuery SP 호출 후 tb_car_cost_slip 등록 (cross-DB transaction 보장 부재 → eventual consistency)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/sqlmap/carCost.xml",
+                  "anchor": "<procedure id='selectCarCostCalculate'>"
+                }
+              ]
+            }
+          ],
+          "transaction_boundary": false,
+          "consistency": "eventual",
+          "related_use_cases": [
+            "UC-CAR-COST-001",
+            "UC-CAR-COST-002",
+            "UC-CAR-COST-003",
+            "UC-CAR-COST-004",
+            "UC-CAR-COST-005"
+          ]
+        },
+        {
+          "root_entity_id": "E-CAR-COST-CostNolog",
+          "members": [],
+          "invariants": [
+            {
+              "description": "CarCostNolog 는 회사 단위 (com_cd) 비용 집계 / 차량/사용자 무관 (독립 aggregate)",
+              "enforced_by": "service_check",
+              "evidence": [
+                {
+                  "file": "source/ddl/tables/TB_CAR_COST_NOLOG.sql"
+                }
+              ]
+            }
+          ],
+          "transaction_boundary": true,
+          "consistency": "strong",
+          "related_use_cases": [
+            "UC-CAR-COST-001",
+            "UC-CAR-COST-002",
+            "UC-CAR-COST-003",
+            "UC-CAR-COST-004",
+            "UC-CAR-COST-005"
+          ]
+        }
+      ]
+    }
+  ],
+  "diagram_files": {
+    "domain": "input/domain.mermaid"
+  },
+  "code_pointers_na": true
+}

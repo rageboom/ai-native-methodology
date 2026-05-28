@@ -1,0 +1,376 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T07:00:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.9,
+    "raw_confidence": 0.9,
+    "warnings": [
+      "본 산출 = phase business-logic 의 partial / phase quality 의 antipatterns.json (full) merge 대상 / 잔존 anti-pattern carry"
+    ]
+  },
+  "antipatterns": [
+    {
+      "id": "AP-FE-001",
+      "category": "FE",
+      "name": "JSP scriptlet 0-absolute policy 위반",
+      "description": "4 JSP 안 year-loop scriptlet `<% final int thisYear = Calendar.getInstance()... %>` copy-paste (각 2건 × 4 파일 = 8건 isomorphic). JSTL `<c:forEach>` 또는 EL `${}` 권장.",
+      "severity": "critical",
+      "why_avoid": "JSP scriptlet 은 JSP 2.0 (2003년) 이후 deprecated paradigm. 비즈니스 로직 view 침투 + maintainability 저하 + XSS risk + EL/JSTL auto-escape 미적용.",
+      "evidence": [
+        {
+          "file": "source/jsp/carDriveInsertForm.jsp",
+          "line": 655
+        },
+        {
+          "file": "source/jsp/carDriveInsertForm.jsp",
+          "line": 658
+        },
+        {
+          "file": "source/jsp/carCostSumSystem.jsp",
+          "line": 393
+        },
+        {
+          "file": "source/jsp/carCostSumSystem.jsp",
+          "line": 396
+        },
+        {
+          "file": "source/jsp/carCosting.jsp",
+          "line": 426
+        },
+        {
+          "file": "source/jsp/carCosting.jsp",
+          "line": 429
+        },
+        {
+          "file": "source/jsp/carCostConfirm.jsp",
+          "line": 409
+        },
+        {
+          "file": "source/jsp/carCostConfirm.jsp",
+          "line": 412
+        }
+      ],
+      "occurrences": 8,
+      "recommended_alternative": "JSTL `<c:forEach var='i' begin='startYear' end='endYear'>` + EL `${i}` (auto-escape) 패턴",
+      "migration_advice": "Year 루프 = Controller 에서 model.addAttribute('thisYear', Calendar.getInstance().get(Calendar.YEAR)) 후 JSP 안 `<c:forEach begin='1900' end='${thisYear}'>` 사용. 4 JSP 일괄 변경.",
+      "related_modules": [
+        "MOD-CAR-JSP"
+      ],
+      "detected_by": "static_analysis",
+      "confidence": 0.95,
+      "tags": [
+        "security",
+        "maintainability",
+        "policy-violation"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-SEC-001",
+      "category": "SECURITY",
+      "name": "JSP unsanitized expression (XSS risk)",
+      "description": "JSP `<%= %>` raw expression 20건 (PMD 19 + grep 1) — auto-escape 미적용. EL `${}` (auto-escape default) 권장.",
+      "severity": "critical",
+      "why_avoid": "Stored / Reflected XSS attack vector. 외부 입력 (request.getParameter / SM_USER header) 이 unsanitized 상태로 HTML body 에 삽입.",
+      "evidence": [
+        {
+          "file": "source/jsp/carInclude.jsp",
+          "line": 6,
+          "comment": "USERID = SM_USER header (signed but unsanitized)"
+        },
+        {
+          "file": "source/jsp/carSelectPopupAjax.jsp",
+          "line": 41,
+          "comment": "10건 — XSS 가장 무거운 파일"
+        },
+        {
+          "file": "source/jsp/carListAjax.jsp",
+          "line": 30,
+          "comment": "6건"
+        },
+        {
+          "file": "source/jsp/loading.jsp",
+          "line": 14
+        }
+      ],
+      "occurrences": 20,
+      "recommended_alternative": "EL `${var}` + JSTL `<c:out value='${var}'/>` (auto-escape) / Controller 에서 sanitize",
+      "migration_advice": "전체 14 JSP 의 `<%= %>` → `${...}` 또는 `<c:out value='${...}'/>` 일괄 변경. SM_USER header 같은 외부 입력은 server-side sanitize 우선.",
+      "related_modules": [
+        "MOD-CAR-JSP"
+      ],
+      "detected_by": "static_analysis",
+      "confidence": 0.95,
+      "tags": [
+        "xss",
+        "security",
+        "owasp-top10"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-ARCH-001",
+      "category": "ARCH",
+      "name": "DAO package 위치 — Spring 컨벤션 위반",
+      "description": "CarMgtDAO + CarCostDAO 가 `smilegate.ifrs.car.service.impl` 안 위치. Spring 컨벤션 = repository / dao 별도 패키지.",
+      "severity": "medium",
+      "why_avoid": "3-tier 의 layer 경계 흐려짐. service.impl 패키지 안 service 구현 + DAO 혼재. DDD layer 분리 부적합. 마이그레이션 시 패키지 분리 cost 증가.",
+      "evidence": [
+        {
+          "file": "source/java/smilegate/ifrs/car/service/impl/CarMgtDAO.java"
+        },
+        {
+          "file": "source/java/smilegate/ifrs/car/service/impl/CarCostDAO.java"
+        }
+      ],
+      "occurrences": 2,
+      "recommended_alternative": "`smilegate.ifrs.car.repository.{CarMgtRepository, CarCostRepository}` 또는 `smilegate.ifrs.car.dao.*` 별도 패키지",
+      "migration_advice": "패키지 이동 + import 갱신 + @Repository 어노테이션 유지 (Spring DI 영향 ❌)",
+      "related_modules": [
+        "MOD-CAR-DAO"
+      ],
+      "detected_by": "pattern_match",
+      "confidence": 0.95,
+      "tags": [
+        "package-structure",
+        "layered-violation"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-DB-001",
+      "category": "DB",
+      "name": "Composite Primary Key (TB_CAR_COST_SLIP)",
+      "description": "TB_CAR_COST_SLIP PK = (COST_IDX, SLIP_ID, COST_GUBUN) composite. domain entity 매핑 시 composite identifier 처리 의무.",
+      "severity": "medium",
+      "why_avoid": "ORM mapping 복잡 / JPA @EmbeddedId 필요 / single surrogate PK 권장 (DDD value object + UNIQUE CONSTRAINT 분리).",
+      "evidence": [
+        {
+          "file": "source/ddl/tables/TB_CAR_COST_SLIP.sql",
+          "line": 11,
+          "comment": "PRIMARY KEY CLUSTERED (cost_idx, slip_id, cost_gubun)"
+        }
+      ],
+      "occurrences": 1,
+      "recommended_alternative": "surrogate PK (slip_pk INT IDENTITY) + (cost_idx, slip_id, cost_gubun) UNIQUE CONSTRAINT",
+      "migration_advice": "신규 PK column 추가 + 기존 composite PK 를 UNIQUE 로 변환 + 모든 sqlmap join 갱신 (WHERE cost_idx=? AND slip_id=? AND cost_gubun=? → WHERE slip_pk=?)",
+      "related_modules": [
+        "MOD-CAR-DDL",
+        "MOD-CAR-SQLMAP"
+      ],
+      "detected_by": "static_analysis",
+      "confidence": 0.95,
+      "tags": [
+        "pk-design",
+        "orm-migration"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-DB-002",
+      "category": "DB",
+      "name": "FK CONSTRAINT 명시 부재",
+      "description": "6 own table 모두 CONSTRAINT FK ❌ — 모든 관계가 컬럼명 컨벤션 (car_idx → tb_car.idx) 기반 추론. referential integrity DB 미보장.",
+      "severity": "high",
+      "why_avoid": "Orphan row 가능성 / 잘못된 cascade 동작 / 마이그레이션 시 잘못된 FK 매핑 risk.",
+      "evidence": [
+        {
+          "file": "source/ddl/tables/TB_CAR_USER_TERM.sql"
+        },
+        {
+          "file": "source/ddl/tables/TB_CAR_DRIVE.sql"
+        },
+        {
+          "file": "source/ddl/tables/TB_CAR_COST.sql"
+        },
+        {
+          "file": "source/ddl/tables/TB_CAR_COST_SLIP.sql"
+        }
+      ],
+      "occurrences": 4,
+      "recommended_alternative": "ALTER TABLE ADD CONSTRAINT FOREIGN KEY 추가 (car_idx, term_idx, cost_idx, slip_id)",
+      "migration_advice": "기존 데이터 cleanup (orphan row 식별 + 처리) 후 FK 추가. cross-DB FK (SGERP._TACSlip) 는 service-layer 검증으로만 가능.",
+      "related_modules": [
+        "MOD-CAR-DDL"
+      ],
+      "detected_by": "static_analysis",
+      "confidence": 0.95,
+      "tags": [
+        "referential-integrity",
+        "legacy"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-DB-003",
+      "category": "DB",
+      "name": "Cross-DB Join (4 외부 DB)",
+      "description": "sqlmap 안 `<DB>.dbo.<TABLE>` cross-DB join 패턴 — IFRS / FIM / SGERP / e_hr / ekporg 5 DB 간 직접 join.",
+      "severity": "high",
+      "why_avoid": "강결합 / 단일 deployment 가정 / 마이그레이션 시 도메인 분리 ❌ / network latency / transaction 보장 ❌.",
+      "evidence": [
+        {
+          "file": "source/sqlmap/carMgt.xml",
+          "comment": "FIM.dbo.TB_USER / SGERP.* / e_hr.dbo.TB_HOLIDAY / ekporg.dbo.DEF_GROUP_INTO_COMPANY_LIST"
+        },
+        {
+          "file": "source/sqlmap/carCost.xml",
+          "comment": "SGERP.dbo._TACSlip / _TACSlipRow / _TACSlipCost / SP IF"
+        }
+      ],
+      "occurrences": 5,
+      "recommended_alternative": "각 외부 DB → REST API 또는 Event-driven 통합 / 도메인 별 독립 DB 운영",
+      "migration_advice": "Strangler fig pattern — Phase 1: 외부 DB 호출을 wrapper service (FimClient / SgerpClient / HrClient / EkporgClient) 격리 / Phase 2: REST API 또는 messaging 으로 대체",
+      "related_modules": [
+        "MOD-CAR-SQLMAP"
+      ],
+      "detected_by": "pattern_match",
+      "confidence": 0.95,
+      "tags": [
+        "coupling",
+        "monolith-anti-pattern"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-EXT-001",
+      "category": "EXTERNAL",
+      "name": "Stored Procedure 외부 호출 (SGERP IF)",
+      "description": "SGERP.dbo.SG_SACSlipRowCarManagementIFQuery SP 호출 — 외부 DB SP / source ❌ / signature only.",
+      "severity": "high",
+      "why_avoid": "외부 SP 본체 모름 / business logic 분산 / 변경 영향 추적 ❌ / 테스트 격리 ❌.",
+      "evidence": [
+        {
+          "file": "source/sqlmap/carCost.xml",
+          "line": 328,
+          "comment": "<procedure id='selectCarCostCalculate'> EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery"
+        }
+      ],
+      "occurrences": 1,
+      "recommended_alternative": "SP 본체 → service layer Java 코드로 흡수 또는 ERP API 호출로 대체",
+      "migration_advice": "SP source 확보 → 의미 추출 → Java service 로 재구현 또는 ERP REST API 호출",
+      "related_modules": [
+        "MOD-CAR-SQLMAP",
+        "MOD-CAR-DAO"
+      ],
+      "detected_by": "pattern_match",
+      "confidence": 0.95,
+      "tags": [
+        "external-sp",
+        "sgerp",
+        "anchor",
+        "BR-CAR-COST-003"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-DOMAIN-001",
+      "category": "DOMAIN",
+      "name": "HashMap-based DTO (paradigm)",
+      "description": "Service method 시그니처 = `Map param` / `Map<String, String>` / `EgovMap` (Spring 4.1 + iBATIS 2 paradigm). 도메인 entity / DTO class ❌.",
+      "severity": "medium",
+      "why_avoid": "타입 안전성 ❌ / IDE refactor 지원 ❌ / 도메인 의미 매핑 약함 / 컴파일 시 검증 ❌.",
+      "evidence": [
+        {
+          "file": "source/java/smilegate/ifrs/car/service/impl/CarMgtServiceImpl.java",
+          "comment": "public void insertCar(Map param)"
+        },
+        {
+          "file": "source/java/smilegate/ifrs/car/service/impl/CarCostServiceImpl.java",
+          "comment": "public List<Map> selectCarCostingList(Map param)"
+        }
+      ],
+      "occurrences": 13,
+      "recommended_alternative": "도메인 entity class (Car, CarCost, CarUserTerm 등) + DTO record / Spring Bean Validation",
+      "migration_advice": "각 service method 의 Map param → typed DTO 로 변환 + 도메인 entity 신설. 점진적 (HashMap 유지 + typed 추가) 도 가능.",
+      "related_modules": [
+        "MOD-CAR-SVC-IMPL",
+        "MOD-CAR-DAO"
+      ],
+      "detected_by": "pattern_match",
+      "confidence": 0.9,
+      "tags": [
+        "paradigm",
+        "type-safety",
+        "spring41-ibatis2-legacy"
+      ],
+      "formal_spec_links": {}
+    },
+    {
+      "id": "AP-DB-004",
+      "category": "DB",
+      "name": "Column 의미 중복 (drive_dist ↔ distance)",
+      "description": "TB_CAR_DRIVE 안 거리 컬럼 2개 (drive_dist + distance) — 의미 중복 가능성.",
+      "severity": "medium",
+      "why_avoid": "schema drift / 어느 컬럼이 정답인지 불명확 / dead column 가능.",
+      "evidence": [
+        {
+          "file": "source/ddl/tables/TB_CAR_DRIVE.sql",
+          "line": 20,
+          "comment": "drive_dist + distance"
+        }
+      ],
+      "occurrences": 1,
+      "recommended_alternative": "sqlmap 사용 패턴 분석 → 한 컬럼 deprecation / 명확한 의미 부여 (출퇴근 거리 vs 운행 거리)",
+      "migration_advice": "sql-inventory phase 에서 컬럼 사용 패턴 확인 → 사용 안 되는 컬럼 제거 또는 의미 명확화",
+      "related_modules": [
+        "MOD-CAR-DDL"
+      ],
+      "detected_by": "pattern_match",
+      "confidence": 0.7,
+      "tags": [
+        "schema-drift",
+        "dead-column"
+      ],
+      "formal_spec_links": {}
+    }
+  ],
+  "summary": {
+    "total_count": 9,
+    "critical_count": 2,
+    "by_category": {
+      "FE": {
+        "count": 1,
+        "by_severity": {
+          "critical": 1
+        }
+      },
+      "SECURITY": {
+        "count": 1,
+        "by_severity": {
+          "critical": 1
+        }
+      },
+      "ARCH": {
+        "count": 1,
+        "by_severity": {
+          "medium": 1
+        }
+      },
+      "DB": {
+        "count": 4,
+        "by_severity": {
+          "medium": 2,
+          "high": 2
+        }
+      },
+      "EXTERNAL": {
+        "count": 1,
+        "by_severity": {
+          "high": 1
+        }
+      },
+      "DOMAIN": {
+        "count": 1,
+        "by_severity": {
+          "medium": 1
+        }
+      }
+    }
+  },
+  "code_pointers_na": true
+}

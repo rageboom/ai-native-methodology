@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T09:20:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.75,
+    "raw_confidence": 0.75,
+    "warnings": [
+      "★ Scenario C (JSP server-rendered) — Modern FE (React/Vue) 미적용 / state management = HTTP session + DOM",
+      "★ 14 JSP 중 10 ParseException (PMD 한계) — html-template-extract.json 정합"
+    ]
+  },
+  "framework": "jsp_template",
+  "design_system_approach": "ad_hoc",
+  "pages": [
+    {
+      "id": "PAGE-CAR-MGT-001",
+      "name": "차량 목록",
+      "route": "/ifrs/car/carList",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "required_roles": [
+        "LEADER"
+      ],
+      "description": "차량 마스터 list view (carList.jsp)",
+      "related_use_cases": [
+        "UC-CAR-MGT-001"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-MGT-002",
+      "name": "차량 등록 폼",
+      "route": "/ifrs/car/carInsertForm",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "required_roles": [
+        "LEADER"
+      ],
+      "description": "carInsertForm.jsp / action=/ifrs/car/insertCar",
+      "related_use_cases": [
+        "UC-CAR-MGT-002"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-MGT-003",
+      "name": "차량 수정 폼",
+      "route": "/ifrs/car/carUpdateForm",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "required_roles": [
+        "LEADER"
+      ],
+      "description": "carInsertForm.jsp 재사용 (insert/update mode)",
+      "related_use_cases": [
+        "UC-CAR-MGT-003"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-MGT-004",
+      "name": "차량 선택 popup",
+      "route": "/ifrs/car/carSelectPopup",
+      "layout": "popup",
+      "auth_required": true,
+      "description": "carSelectPopup.jsp",
+      "related_use_cases": [
+        "UC-CAR-MGT-004"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-MGT-005",
+      "name": "차량 운행 등록 폼",
+      "route": "/ifrs/car/carDriveInsertForm",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "description": "carDriveInsertForm.jsp / year-loop scriptlet (★ AP-FE-001)",
+      "related_use_cases": [
+        "UC-CAR-MGT-005"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-COST-001",
+      "name": "차량 비용 계산",
+      "route": "/ifrs/car/cost/costing",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "description": "carCosting.jsp / SP IF anchor (BR-CAR-COST-003)",
+      "related_use_cases": [
+        "UC-CAR-COST-001"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-COST-002",
+      "name": "차량 비용 확정",
+      "route": "/ifrs/car/cost/confirmList",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "required_roles": [
+        "ADMIN"
+      ],
+      "description": "carCostConfirm.jsp (★ scriptlet 2건)",
+      "related_use_cases": [
+        "UC-CAR-COST-002"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-COST-003",
+      "name": "비용 합산 시스템",
+      "route": "/ifrs/car/cost/costSumSystem",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "required_roles": [
+        "ADMIN"
+      ],
+      "description": "carCostSumSystem.jsp (★ scriptlet 2건)",
+      "related_use_cases": [
+        "UC-CAR-COST-003"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-COST-004",
+      "name": "운행 로그 없는 비용 계산",
+      "route": "/ifrs/car/cost/costingNoDriveLog",
+      "layout": "common/include.jsp",
+      "auth_required": true,
+      "description": "carCostingNoDriveLog.jsp",
+      "related_use_cases": [
+        "UC-CAR-COST-004"
+      ]
+    },
+    {
+      "id": "PAGE-CAR-COST-005",
+      "name": "회계전표 popup",
+      "route": "/ifrs/car/cost/popCarCostSlip",
+      "layout": "popup",
+      "auth_required": true,
+      "description": "popCarCostSlip.jsp",
+      "related_use_cases": [
+        "UC-CAR-COST-005"
+      ]
+    }
+  ],
+  "code_pointers_na": true
+}

@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T09:00:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.85,
+    "raw_confidence": 0.85,
+    "warnings": [
+      "★ @ExceptionHandler / @ControllerAdvice = grep 0건 (negative-space corroboration / ADR-BE-001)",
+      "★ ResponseEntity / @ResponseStatus / @ResponseBody = grep 0건",
+      "★ 모든 controller method 가 throws Exception propagation → Spring DispatcherServlet 기본 처리 → implicit_default 만 발생"
+    ],
+    "related_chain_ids": [
+      "AC-CAR-COST-001"
+    ]
+  },
+  "scope": {
+    "framework": "spring",
+    "modules": [
+      "smilegate.ifrs.car.web"
+    ]
+  },
+  "exception_handlers": [],
+  "http_status_mapping": [
+    {
+      "exception_class": "Exception",
+      "http_status": 500,
+      "mapping_mechanism": "implicit_default",
+      "note": "★ Controller method 가 throws Exception propagation / 별도 @ExceptionHandler / @ControllerAdvice ❌ → Spring DispatcherServlet 의 DefaultHandlerExceptionResolver 또는 Servlet container (Resin) 기본 500 처리 / view = error.jsp 또는 web.xml <error-page>"
+    },
+    {
+      "exception_class": "smilegate.ifrs.car.service.* (custom domain exception 추정)",
+      "http_status": 500,
+      "mapping_mechanism": "throw_unmapped",
+      "note": "★ ★ AP-API-001 trigger 후보 — 도메인 예외가 HTTP 매핑 없이 throw / Modern 마이그레이션 시 @ResponseStatus 또는 @ExceptionHandler 도입 의무",
+      "evidence_file": "source/java/smilegate/ifrs/car/web/CarMgtController.java",
+      "evidence_line": 45,
+      "rfc_compliance": {
+        "compliant": false,
+        "violation_note": "도메인 예외가 HTTP 매핑 없이 throw — RFC 9457 ProblemDetail 미적용 / 500 implicit only"
+      }
+    }
+  ],
+  "negative_evidence": {
+    "contract_absent": {
+      "evidence_type": "grep_zero_hit",
+      "details": "grep -rn '@ExceptionHandler\\|@ControllerAdvice\\|@RestControllerAdvice' source/java/.../car/web/ → 0 hit / @ResponseStatus 0 hit / @ResponseBody 0 hit / ResponseEntity 0 hit"
+    },
+    "negative_effect": "exception 발생 시 client (browser) 가 받는 응답 = Resin servlet container 의 기본 error page (HTML 500) — JSON / structured error 응답 ❌",
+    "industry_standard": [
+      "Spring MVC 4.1 (2014) paradigm 에서 @ExceptionHandler / @ControllerAdvice 는 사용 가능했지만 본 코드베이스는 미적용 / Spring Boot 2+ paradigm 의 ProblemDetail (RFC 7807) 비교 시 격차 큼"
+    ],
+    "automatic_regression_capable": {
+      "tool": "semgrep_custom_rule",
+      "rule_path": "tools/static-runner/rules/error-mapping-controller-advice-absent.yml"
+    }
+  },
+  "framework_neutrality_score": 0.95,
+  "ap_links": [
+    {
+      "ap_id": "AP-API-001",
+      "linkage_type": "discovers"
+    }
+  ],
+  "summary": {
+    "exception_handler_count": 0,
+    "explicit_status_mapping_count": 0,
+    "implicit_500_count": 1,
+    "throw_unmapped_count": 1,
+    "framework_paradigm": "Spring MVC 4.1 + JSP server-rendered / no structured error response",
+    "modern_alternative": "@RestControllerAdvice + @ExceptionHandler(DomainException.class) + @ResponseStatus + ProblemDetail (RFC 7807) — Spring Boot 3.x 권장",
+    "carry_note": "★ AP-API-001 등재 후 marix migration plan 의무 (chain 3 진입 시)"
+  },
+  "code_pointers_na": true
+}

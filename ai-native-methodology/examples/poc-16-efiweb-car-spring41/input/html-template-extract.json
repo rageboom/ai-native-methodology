@@ -1,0 +1,527 @@
+{
+  "$schema_origin": "schemas/html-template-extract.schema.json",
+  "scope": "poc-15-car",
+  "created_at": "2026-05-28T05:30:00Z",
+  "scenario": "C",
+  "template_engine": "jsp",
+  "templates": [
+    {
+      "path": "source/jsp/carInclude.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carList.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carListAjax.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carInsertForm.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": [
+        {
+          "action_url": "/ifrs/car/insertCar",
+          "method": "post",
+          "hardcoded": true,
+          "spring_endpoint_ref": "CarMgtController#insertCar (analysis-openapi seed)"
+        }
+      ]
+    },
+    {
+      "path": "source/jsp/carDriveInsertForm.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carDriveListAjax.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carSelectPopup.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carSelectPopupAjax.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carCosting.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/loading.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carCostingNoDriveLog.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/loading.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carCostConfirm.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/loading.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/carCostSumSystem.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp",
+        "/WEB-INF/jsp/car/loading.jsp",
+        "/WEB-INF/jsp/car/carInclude.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/popCarCostSlip.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    },
+    {
+      "path": "source/jsp/loading.jsp",
+      "engine": "jsp",
+      "includes": [
+        "/WEB-INF/jsp/config/include.jsp"
+      ],
+      "form_actions": []
+    }
+  ],
+  "external_tool_output": {
+    "tool": "pmd-jsp",
+    "executed": true,
+    "tool_version": "PMD 7.24.0 (e9787d8e01a596a9995d04949bfb7f10c9ffc422, 2026-04-24)",
+    "command_line": "pmd check -d examples/poc-16-efiweb-car-spring41/source/jsp -R category/jsp/bestpractices.xml,category/jsp/codestyle.xml,category/jsp/design.xml,category/jsp/errorprone.xml,category/jsp/performance.xml,category/jsp/security.xml -f text -r examples/poc-16-efiweb-car-spring41/input/pmd-jsp-report.txt",
+    "output_path": "input/pmd-jsp-report.txt",
+    "exit_code": 0
+  },
+  "scriptlet_findings": [
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carInclude.jsp",
+      "line": 3,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoLongScripts",
+      "severity": "minor",
+      "file_path": "source/jsp/carInclude.jsp",
+      "line": 5,
+      "message": "Avoid having long scripts (e.g. Javascript) inside a JSP file."
+    },
+    {
+      "rule_id": "PMD:NoInlineScript",
+      "severity": "minor",
+      "file_path": "source/jsp/carInclude.jsp",
+      "line": 5,
+      "message": "Avoiding inlining HTML script content"
+    },
+    {
+      "rule_id": "PMD:NoClassAttribute",
+      "severity": "minor",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 4,
+      "message": "Do not use an attribute called class."
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 30,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 30,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 31,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 32,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 33,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 34,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 35,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoClassAttribute",
+      "severity": "minor",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 4,
+      "message": "Do not use an attribute called class."
+    },
+    {
+      "rule_id": "PMD:NoInlineStyleInformation",
+      "severity": "minor",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 4,
+      "message": "Avoid having style information in JSP files."
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 32,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 33,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 34,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 35,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 36,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 37,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoClassAttribute",
+      "severity": "minor",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "message": "Do not use an attribute called class."
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "PMD:JspEncoding",
+      "severity": "minor",
+      "file_path": "source/jsp/loading.jsp",
+      "line": 1,
+      "message": "JSP file should use UTF-8 encoding"
+    },
+    {
+      "rule_id": "PMD:NoHtmlComments",
+      "severity": "minor",
+      "file_path": "source/jsp/loading.jsp",
+      "line": 2,
+      "message": "Use JSP comments instead of HTML comments"
+    },
+    {
+      "rule_id": "PMD:NoClassAttribute",
+      "severity": "minor",
+      "file_path": "source/jsp/loading.jsp",
+      "line": 13,
+      "message": "Do not use an attribute called class."
+    },
+    {
+      "rule_id": "PMD:NoUnsanitizedJSPExpression",
+      "severity": "critical",
+      "file_path": "source/jsp/loading.jsp",
+      "line": 14,
+      "message": "Using unsanitized JSP expression can lead to Cross Site Scripting (XSS) attacks"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carDriveInsertForm.jsp",
+      "line": 655,
+      "message": "JSP scriptlet (`<% ... %>`) detected — PMD parse failed (HTML5 doctype) so grep fallback used. JSP scriptlet 0-absolute policy violation (v3.4.0 G4)."
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carDriveInsertForm.jsp",
+      "line": 658,
+      "message": "JSP scriptlet closing brace (`<% } %>`) — paired with line 655"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCostSumSystem.jsp",
+      "line": 393,
+      "message": "JSP scriptlet — same year-loop pattern (Calendar.getInstance) / 4 JSP isomorphic copy-paste anti-pattern"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCostSumSystem.jsp",
+      "line": 396,
+      "message": "JSP scriptlet closing brace"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCosting.jsp",
+      "line": 426,
+      "message": "JSP scriptlet — same year-loop pattern"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCosting.jsp",
+      "line": 429,
+      "message": "JSP scriptlet closing brace"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCostConfirm.jsp",
+      "line": 409,
+      "message": "JSP scriptlet — same year-loop pattern"
+    },
+    {
+      "rule_id": "grep-fallback:JspScriptletCheck",
+      "severity": "critical",
+      "file_path": "source/jsp/carCostConfirm.jsp",
+      "line": 412,
+      "message": "JSP scriptlet closing brace"
+    }
+  ],
+  "xss_markers": [
+    {
+      "file_path": "source/jsp/carInclude.jsp",
+      "line": 3,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carInclude.jsp",
+      "line": 6,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 30,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 31,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 32,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 33,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 34,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carListAjax.jsp",
+      "line": 35,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 32,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 33,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 34,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 35,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 36,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 37,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carSelectPopupAjax.jsp",
+      "line": 41,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/loading.jsp",
+      "line": 14,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carDriveInsertForm.jsp",
+      "line": 657,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carCostSumSystem.jsp",
+      "line": 395,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carCosting.jsp",
+      "line": 428,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    },
+    {
+      "file_path": "source/jsp/carCostConfirm.jsp",
+      "line": 411,
+      "pattern": "jsp-expression",
+      "severity": "critical"
+    }
+  ],
+  "policy_check": {
+    "scriptlet_zero_absolute": false,
+    "total_scriptlet_count": 8
+  },
+  "code_pointers_na": true
+}
