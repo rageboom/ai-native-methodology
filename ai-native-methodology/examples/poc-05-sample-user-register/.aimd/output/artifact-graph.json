@@ -5,14 +5,16 @@
     "examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json",
     "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
     "examples/poc-05-sample-user-register/.aimd/output/test-spec.json",
-    "examples/poc-05-sample-user-register/.aimd/output/impl-spec.json"
+    "examples/poc-05-sample-user-register/.aimd/output/impl-spec.json",
+    "examples/poc-05-sample-user-register/.aimd/output/business-rules.json",
+    "examples/poc-05-sample-user-register/.aimd/output/antipatterns.json"
   ],
   "do_not_edit_manually": true,
   "schema": {
     "node": "artifact-graph-node.schema.json",
     "edge": "artifact-graph-edge.schema.json"
   },
-  "synthesized_at": "2026-05-27T02:23:42.748Z",
+  "synthesized_at": "2026-05-27T09:28:14.864Z",
   "nodes": [
     {
       "id": "UC-USER-001",
@@ -188,6 +190,22 @@
       "source_path": "examples/poc-05-sample-user-register/.aimd/output/task-plan.json",
       "state": "active",
       "title": "users 테이블 email UNIQUE constraint + 인덱스 마이그레이션 (race-safe)"
+    },
+    {
+      "id": "analysis-business-rules",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/business-rules.json",
+      "state": "active",
+      "code_pointers_na": true
+    },
+    {
+      "id": "analysis-antipatterns",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "antipatterns",
+      "source_path": "examples/poc-05-sample-user-register/.aimd/output/antipatterns.json",
+      "state": "active",
+      "code_pointers_na": true
     }
   ],
   "edges": [
@@ -333,19 +351,55 @@
       "target": "contract:openapi:POST /api/users/login",
       "edge_type": "conforms_to",
       "confidence": "hard"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
+    },
+    {
+      "source": "analysis-antipatterns",
+      "target": "AC-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft"
     }
   ],
   "stats": {
-    "node_count": 16,
-    "edge_count": 23,
+    "node_count": 18,
+    "edge_count": 29,
     "by_kind": {
       "chain": 12,
       "plan": 4,
-      "analysis": 0,
+      "analysis": 2,
       "aspect": 0
     },
     "by_state": {
-      "active": 16,
+      "active": 18,
       "drift": 0,
       "propose": 0,
       "deprecated": 0
@@ -356,7 +410,7 @@
       "tests": 2,
       "depends_on": 0,
       "conforms_to": 2,
-      "cross_reference": 0,
+      "cross_reference": 6,
       "informs": 0,
       "groups": 6
     }
