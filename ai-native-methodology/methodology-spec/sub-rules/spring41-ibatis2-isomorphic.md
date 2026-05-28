@@ -252,6 +252,43 @@
 - ★ **C-automation-ceiling-paradigm** = ★ 본 §X 등재로 **resolved**
 - **C-poc-11-0-satd-해석-정정** (★ §6 carry 잔존 / Day 3.5 PoC #11 종결 시 일괄 처리)
 
+### X-H. ★ ★ ★ R1' sub-axis 본격 분리 (★ poc-17 dogfooding 신설 — 2026-05-28 / DEC-2026-05-28-db-assets-always-on)
+
+R1' axis (Spring 4.1 + iBATIS 2 ~53~55%) 는 **단일 paradigm-종속 ceiling** 이지만, 비즈니스 로직의 **3 sub-layer 분포** 가 별도 axis 로 분리되어야 하는 사실이 poc-17 dogfooding 진입 시 본격 노출:
+
+#### sub-axis 매트릭스
+
+| Sub-layer | 위치 | 자동 추출 | 측정 paradigm | 비고 |
+|---|---|---|---|---|
+| (a) **Java app** | Controller / Service / DAO | △ 부분 | codegraph Java ⭐⭐⭐ | LOC 기반 / 의미 추론 한계 — 본격 자동화 ceiling 의 본격 부분 |
+| (b) **iBATIS sqlMap XML** | DAO mapper | ❌ | codegraph 미지원 (DEC-2026-05-28-codegraph-probe-결과) | string literal 의미 추론 불가 — 수동 SQL Inventory 의무 (35 SQL 평균) |
+| (c) **DB SP / Function SQL 파일** | Stored Procedure / Function | ★ ★ **✅ 정적 분석 ✅** | SQL AST parse / body extract | **R1' axis 의 carry 측정 자산** (paradigm sub-axis 사실) |
+
+#### 함의 (DEC-2026-05-28-db-assets-always-on cascade)
+
+1. **본격 자동화율은 3 sub-axis 합산** — (a) + (b) + (c) 통합 측정 ↔ 기존 §3-A 53~55% 측정은 (a)+(b) 만 가능 (legacy 측정 ❌ (c))
+2. **(c) layer 추가 시 §3-A axis 분모 변동** — DB 자산 always-on 정책 (ADR-CHAIN-014) 적용 후 baseline 재측정 의무
+3. **paradigm-cross corroboration ≥ 3 (§8.1 strict)** — poc-17 + 다른 도메인 확대 측정 시 sub-axis 정량 자산화 (carry)
+
+#### poc-17 ifrs/car 첫 측정 (carry — Phase 1 완료 후)
+
+| 자산 | 갯수 | sub-axis 기여 |
+|---|---|---|
+| Java | 8 파일 / 1,750 LOC | (a) 측정 baseline |
+| iBATIS sqlMap | carMgt 21 + carCost 14 = 35 SQL | (b) 측정 — 수동 정리 |
+| DB Tables | TB_CAR_* 5 | (c) — schema axis |
+| DB Functions | fn_Get_CarUserListView* 2 | (c) — 정적 분석 ✅ |
+| DB SP (자체) | 0 | (c) — car 비종속 |
+| DB SP (외부 SGERP 호출) | 1 | (c) — γ 분류 (SP 전환 정책 ADR-CHAIN-015) |
+
+→ poc-17 = **(c) sub-axis 본격 측정 첫 사례**. 다른 도메인 (capital / payroll / bspl) 확대 시 (c) sub-axis 비중 ↑ 예상 (capital 71 SQL + payroll 다수 SP) — paradigm-cross corroboration 본격 가치.
+
+#### sub-axis 분리 carry
+
+- C-sub-axis-3-poc-corroboration (★ 신규 / poc-17 + 다른 도메인 ≥ 2 추가 측정 의무 — §8.1 strict)
+- C-c-layer-baseline-재측정 (★ DB 자산 always-on 정책 적용 후 (a)+(b)+(c) 통합 baseline 재측정)
+- C-codegraph-c-layer-support (★ external — codegraph v0.x 의 SP/Function AST parse 지원 carry / scope-out 가능)
+
 ---
 
 ## 7. 참조 (★ v1.1 갱신)

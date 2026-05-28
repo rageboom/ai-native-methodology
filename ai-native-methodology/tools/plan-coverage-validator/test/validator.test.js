@@ -7,7 +7,8 @@ import {
   validateDependencyCycle,
   validateRiskSeverity,
   validateBETaskOpenapiRef,
-  validateFETaskComponentRef
+  validateFETaskComponentRef,
+  validateSpConversions
 } from '../src/validator.js';
 
 // ──────────────────────────────────────────────────────────────────────
@@ -496,5 +497,106 @@ describe('validateFETaskComponentRef (★ v11.0.0)', () => {
     const feR = validateFETaskComponentRef(taskPlan);
     assert.equal(beR.findings.length, 0);
     assert.equal(feR.findings.length, 0);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────
+// 9. ★ v11.3.0 validateSpConversions (SP 4 분류 매트릭스 / DEC-2026-05-28-sp-conversion-policy)
+// ──────────────────────────────────────────────────────────────────────
+
+describe('validateSpConversions (★ v11.3.0)', () => {
+  it('sp_conversions 부재 → no finding (legacy carry / backward-compat)', () => {
+    const r = validateSpConversions({ tasks: [] });
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('α (code-convert) 정합 → no finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_calc_simple',
+        sp_conversion_class: 'alpha',
+        rationale: '단순 CRUD logic / ORM 으로 안전 전환 가능 (체크리스트 §4.1~4.3 모두 NO / §4.4 default)'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('γ (외부 시스템) classification 정합 (external=true + adr_ref) → no finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'SGERP.dbo.SG_SACSlipRowCarManagementIFQuery',
+        sp_conversion_class: 'gamma',
+        external: true,
+        rationale: '외부 SGERP 시스템 SP / 변경 권한 부재 / 보존 + thin wrapper 의무',
+        verification_oracle: 'SP signature 1:1 + return type 정합',
+        adr_ref: 'ADR-CHAIN-015-sp-conversion-policy'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.equal(r.findings.length, 0);
+  });
+
+  it('γ classification + adr_ref 부재 → high finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_external_x',
+        sp_conversion_class: 'gamma',
+        external: true,
+        rationale: '외부 시스템 SP / 보존 의무 / contract 양식'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.ok(r.findings.some(f => f.kind === 'plan.sp_conversion.no_adr_for_gamma' && f.severity === 'high'));
+  });
+
+  it('γ classification + external≠true → medium inconsistency finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_y',
+        sp_conversion_class: 'gamma',
+        external: false,
+        rationale: 'γ 라 적었지만 external false / inconsistency 표지',
+        adr_ref: 'ADR-CHAIN-015-sp-conversion-policy'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.ok(r.findings.some(f => f.kind === 'plan.sp_conversion.gamma_not_external' && f.severity === 'medium'));
+  });
+
+  it('rationale 길이 부족 (< 10) → medium weak_rationale finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_z',
+        sp_conversion_class: 'alpha',
+        rationale: 'short'  // length 5 (passes schema minLength 5 but flagged by validator)
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.ok(r.findings.some(f => f.kind === 'plan.sp_conversion.weak_rationale' && f.severity === 'medium'));
+  });
+
+  it('δ classification + verification_oracle 부재 → medium delta_no_oracle finding', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_recursive_cte',
+        sp_conversion_class: 'delta',
+        rationale: 'recursive CTE 의존 / Oracle CONNECT BY 사용 / ORM 표현 어려움 case-by-case'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.ok(r.findings.some(f => f.kind === 'plan.sp_conversion.delta_no_oracle' && f.severity === 'medium'));
+  });
+
+  it('β (preserve-batch) 정합 → no finding (adr_ref optional / external optional)', () => {
+    const taskPlan = {
+      sp_conversions: [{
+        sp_id: 'sp_year_settlement_batch',
+        sp_conversion_class: 'beta',
+        rationale: '100만+ row 야간 batch / set 기반 처리 / app layer round-trip 폭발 회피 / cursor 의존'
+      }]
+    };
+    const r = validateSpConversions(taskPlan);
+    assert.equal(r.findings.length, 0);
   });
 });

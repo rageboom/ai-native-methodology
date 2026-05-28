@@ -1,5 +1,5 @@
 // plan-coverage-validator core
-// 검증 (Senior BLOCKER-2 흡수 / Phase 4-1 / ★ v11.0.0 Phase 1 잔여 확장):
+// 검증 (Senior BLOCKER-2 흡수 / Phase 4-1 / ★ v11.0.0 Phase 1 잔여 확장 / ★ v11.3.0 SP 분류):
 //   1. TASK ↔ AC backward link coverage (chain 2 ↔ chain 3)
 //   2. TASK ↔ TC forward link coverage (chain 3 ↔ chain 4 / optional / chain 4 진입 전 placeholder 허용)
 //   3. validateNfrAllocation — high+critical NFR 누락 시 high finding (★ DO-178C 정신 기반 사내 해석 / Cluster 2 결단)
@@ -8,10 +8,12 @@
 //   6. validateRiskSeverity — risk.severity high+critical 누락 시 medium finding (additive)
 //   7. ★ v11.0.0 — validateBETaskOpenapiRef — layer=be 시 openapi_endpoint_ref 본격 required (high finding)
 //   8. ★ v11.0.0 — validateFETaskComponentRef — layer=fe 시 component_ref 본격 required (high finding)
+//   9. ★ v11.3.0 — validateSpConversions — chain 3 plan stage SP 4 분류 매트릭스 (α/β/γ/δ) 결단 검증
+//                  (sp-conversion-policy §4 정합 / γ 시 adr_ref required / γ + external=false 시 inconsistency)
 //
 // exit code contract (cli.js):
 //   exit 0 = ok
-//   exit 1 = blocking findings (critical / high / NFR allocation 누락 / TASK dependency cycle / coverage_pct < threshold / BE/FE contract 부재)
+//   exit 1 = blocking findings (critical / high / NFR allocation 누락 / TASK dependency cycle / coverage_pct < threshold / BE/FE contract 부재 / SP γ adr 부재)
 //   exit 2 = usage-error (invalid args)
 //
 // chain-coverage-validator 동형 paradigm (autoDetectProjectRoot + loadJson + finding {kind, severity, ...domain, message}).
@@ -384,6 +386,68 @@ export function validateFETaskComponentRef(taskPlan) {
         severity: 'high',
         task_id: t.id,
         message: `FE TASK ${t.id} component_ref missing package or name (package=${pkg ?? 'null'} / name=${name ?? 'null'})`
+      });
+    }
+  }
+
+  return {
+    findings,
+    summary: aggregateSummary(findings)
+  };
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// 7. ★ v11.3.0 — SP 분류 결단 (sp-conversion-policy §4 정합)
+//   γ (외부 시스템 SP) classification 시 adr_ref required → high finding
+//   γ classification 인데 external=false (또는 missing) → medium inconsistency
+//   rationale 누락 (schema minLength 보완) → high finding
+//   ★ DEC-2026-05-28-sp-conversion-policy / ADR-CHAIN-015 정합
+// ──────────────────────────────────────────────────────────────────────
+
+export function validateSpConversions(taskPlan) {
+  const findings = [];
+  const conversions = taskPlan?.sp_conversions ?? [];
+
+  for (const c of conversions) {
+    // γ classification 시 adr_ref required (외부 시스템 contract ADR 인용 의무)
+    if (c.sp_conversion_class === 'gamma') {
+      if (!c.adr_ref) {
+        findings.push({
+          kind: 'plan.sp_conversion.no_adr_for_gamma',
+          severity: 'high',
+          sp_id: c.sp_id,
+          message: `SP ${c.sp_id} γ classification (외부 시스템 SP 보존) 인데 adr_ref 부재 (★ sp-conversion-policy §6.2 외부 시스템 contract ADR 의무)`
+        });
+      }
+      // γ classification 인데 external=false (또는 missing) → inconsistency
+      if (c.external !== true) {
+        findings.push({
+          kind: 'plan.sp_conversion.gamma_not_external',
+          severity: 'medium',
+          sp_id: c.sp_id,
+          message: `SP ${c.sp_id} γ classification 인데 external≠true (sp-conversion-policy §2 γ = 외부 시스템 SP 보존 / external=true 의무)`
+        });
+      }
+    }
+
+    // rationale 약함 (schema minLength 5 = 형식 / 본 validator 는 의미 보강 — 단순 placeholder 차단)
+    if (c.rationale && c.rationale.length < 10) {
+      findings.push({
+        kind: 'plan.sp_conversion.weak_rationale',
+        severity: 'medium',
+        sp_id: c.sp_id,
+        rationale_length: c.rationale.length,
+        message: `SP ${c.sp_id} rationale 길이 ${c.rationale.length} < 10 (★ sp-conversion-policy §4 분류 결단 근거 빈약 의심 / 체크리스트 §4.1~4.4 정합 의무)`
+      });
+    }
+
+    // δ classification 인데 verification_oracle 부재 → medium (DB-specific 기능은 검증 어려움 = oracle 강하게 권고)
+    if (c.sp_conversion_class === 'delta' && !c.verification_oracle) {
+      findings.push({
+        kind: 'plan.sp_conversion.delta_no_oracle',
+        severity: 'medium',
+        sp_id: c.sp_id,
+        message: `SP ${c.sp_id} δ classification (DB-specific 기능) 인데 verification_oracle 부재 (★ ORM 표현 어려움 → numeric/row equivalence oracle 강하게 권고)`
       });
     }
   }

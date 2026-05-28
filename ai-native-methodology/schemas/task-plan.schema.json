@@ -6,7 +6,7 @@
   "type": "object",
   "required": ["meta", "derivation_source", "tasks"],
   "additionalProperties": false,
-  "$comment": "★ additionalProperties:false strict (cleanup round 9 정합 / drift attractor 차단). meta + derivation_source + tasks 의무 / adrs + risks + nfr_allocation + rollback_strategy + cross_links + epic_refs + story_refs + op_task_refs 권장.",
+  "$comment": "★ additionalProperties:false strict (cleanup round 9 정합 / drift attractor 차단). meta + derivation_source + tasks 의무 / adrs + risks + nfr_allocation + rollback_strategy + cross_links + epic_refs + story_refs + op_task_refs + sp_conversions(★ v11.3.0) 권장.",
   "properties": {
     "meta": {
       "$ref": "./meta-confidence.schema.json"
@@ -491,6 +491,48 @@
         "verification": {
           "type": "string",
           "description": "rollback 가능성 검증 (★ v4.2+ carry — 실제 rollback 가능성 검증 도구)"
+        }
+      }
+    },
+    "sp_conversions": {
+      "type": "array",
+      "description": "★ v11.3.0 신설 (DEC-2026-05-28-sp-conversion-policy / ADR-CHAIN-015 / sp-conversion-policy.md §8). chain 3 plan stage SP 전환 결단 — 모든 scope-관련 SP 가 (α/β/γ/δ) 분류 결단 의무. ★ plan-coverage-validator validateSpConversions 동반 — γ classification 시 adr_ref required (high finding) / γ + external=false 시 inconsistency (medium finding).",
+      "items": {
+        "type": "object",
+        "required": ["sp_id", "sp_conversion_class", "rationale"],
+        "additionalProperties": false,
+        "properties": {
+          "sp_id": {
+            "type": "string",
+            "description": "SP 식별자 (work-unit-manifest analysis_refs.db_procedures[].id 와 정합)"
+          },
+          "sp_name": {
+            "type": "string",
+            "description": "SP 표시 이름 (optional / 사람 읽기 용)"
+          },
+          "external": {
+            "type": "boolean",
+            "description": "외부 시스템 SP 여부 (γ classification 시 true 의무 — 다른 DB schema 또는 외부 ERP/금융/회계 시스템 SP)"
+          },
+          "sp_conversion_class": {
+            "type": "string",
+            "enum": ["alpha", "beta", "gamma", "delta"],
+            "description": "α=code-convert (default — SP body → Java/신규 stack service) / β=preserve-batch (대용량 set 처리 SP 보존 + thin wrapper) / γ=preserve-external (외부 시스템 SP 보존 + thin wrapper) / δ=db-specific-case-by-case (window function / hierarchical / CTE — ORM 능력 별 (α) 또는 (β) 결단)"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 5,
+            "description": "분류 결단 근거 (체크리스트 §4 정합 / 예: 'set 기반 정산 batch 100만+ row / app layer 가면 round-trip 폭발 → β 보존')"
+          },
+          "verification_oracle": {
+            "type": "string",
+            "description": "legacy SP vs 신규 code/wrapper 결과 정합성 검증 oracle (예: 'numeric equivalence — 2자리 반올림 paradigm / row count match')"
+          },
+          "adr_ref": {
+            "type": "string",
+            "pattern": "^ADR-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "★ γ (외부 시스템 SP 보존) classification 시 required — 외부 시스템 contract 의 ADR 인용 의무 (validator high finding)."
+          }
         }
       }
     },

@@ -66,13 +66,49 @@
     "analysis_refs": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ scope manifest 의 canonical global 5 이식성 산출물 역인덱스 — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern.",
+      "description": "★ scope manifest 의 canonical global 9 이식성 산출물 역인덱스 (5 + DB 자산 4 / ★ v11.3.0 신설 — DEC-2026-05-28-db-assets-always-on / ADR-CHAIN-014) — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern + DB tables / SP / functions / views.",
       "properties": {
         "rules":        { "type": "array", "items": { "type": "string" } },
         "endpoints":    { "type": "array", "items": { "type": "string" } },
         "schemas":      { "type": "array", "items": { "type": "string" } },
         "domain":       { "type": "array", "items": { "type": "string" } },
-        "antipatterns": { "type": "array", "items": { "type": "string" } }
+        "antipatterns": { "type": "array", "items": { "type": "string" } },
+        "db_tables": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Table 식별자 (CREATE TABLE 명 또는 schema.json 안 entry ID)."
+        },
+        "db_procedures": {
+          "type": "array",
+          "description": "★ v11.3.0 신설 (db-assets-always-on §5 + sp-conversion-policy §8) — scope 관련 Stored Procedure list. sp_conversion_class 는 chain 3 plan stage 진입 시 채워짐 (discovery 까지 nullable).",
+          "items": {
+            "type": "object",
+            "required": ["id"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "description": "SP 식별자 (예: SGERP.dbo.SG_SACSlipRowCarManagementIFQuery)" },
+              "sp_conversion_class": {
+                "type": "string",
+                "enum": ["alpha", "beta", "gamma", "delta"],
+                "description": "α=code-convert (default) / β=preserve-batch / γ=preserve-external / δ=db-specific-case-by-case (sp-conversion-policy §2 정합)"
+              },
+              "external": {
+                "type": "boolean",
+                "description": "외부 시스템 SP 여부 (γ classification 시 true 의무)"
+              }
+            }
+          }
+        },
+        "db_functions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Function 식별자."
+        },
+        "db_views": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB View 식별자."
+        }
       }
     },
     "sync_state": {

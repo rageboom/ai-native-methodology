@@ -18,6 +18,7 @@ import {
   validateRiskSeverity,
   validateBETaskOpenapiRef,
   validateFETaskComponentRef,
+  validateSpConversions,
   loadJson
 } from './validator.js';
 
@@ -50,7 +51,8 @@ function parseArgs(argv) {
   5. Dependency cycle — DAG cycle 검출 (cycle 시 critical)
   6. Risk severity — high+critical risk mitigation/human_review 검증
   7. ★ v11.0.0 — BE TASK ↔ openapi_endpoint_ref 1:1 matching (layer=be 시 hard / DEC-2026-05-26-contract-강제-양-axis)
-  8. ★ v11.0.0 — FE TASK ↔ component_ref 1:1 matching (layer=fe 시 hard)`);
+  8. ★ v11.0.0 — FE TASK ↔ component_ref 1:1 matching (layer=fe 시 hard)
+  9. ★ v11.3.0 — SP 4 분류 (α/β/γ/δ) 결단 검증 (γ 시 adr_ref required / γ + external=false inconsistency / DEC-2026-05-28-sp-conversion-policy)`);
       process.exit(0);
     }
   }
@@ -74,6 +76,7 @@ const cycleResult = validateDependencyCycle(taskPlan);
 const riskResult = validateRiskSeverity(taskPlan);
 const beOpenapiResult = validateBETaskOpenapiRef(taskPlan);
 const feComponentResult = validateFETaskComponentRef(taskPlan);
+const spConversionResult = validateSpConversions(taskPlan);
 
 const allFindings = [
   ...taskCoverageResult.findings,
@@ -82,7 +85,8 @@ const allFindings = [
   ...cycleResult.findings,
   ...riskResult.findings,
   ...beOpenapiResult.findings,
-  ...feComponentResult.findings
+  ...feComponentResult.findings,
+  ...spConversionResult.findings
 ];
 
 const summary = {
@@ -102,6 +106,7 @@ if (args.json) {
     risk_severity: riskResult,
     be_openapi_ref: beOpenapiResult,
     fe_component_ref: feComponentResult,
+    sp_conversions: spConversionResult,
     summary
   }, null, 2));
 } else {

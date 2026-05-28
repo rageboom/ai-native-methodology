@@ -9,6 +9,66 @@
 
 ---
 
+## [11.3.0] — 2026-05-28 MINOR — DB 자산 always-on 정책 + SP 4 분류 매트릭스 (poc-17 ifrs/car dogfooding cascade / ADR-CHAIN-014/015)
+
+> poc-17 ifrs/car dogfooding Phase 1.5 (2026-05-28 / 사용자 명시) carry — K (DB always-on) + L (SP 전환) 정책 cascade. 직전 release 가 methodology-spec 신설 + DEC + ADR 만 정공 → 본 release 가 **schema cascade + validator gate + docs cascade + finding 자산화** 본격 완결. additive only / breaking 0. 첫 carry F-CHA-poc17-001 (chain-driver `init` paradigm 명세 부재) Type 2 외부 사용자 channel 자연 발현 사례 등재.
+
+### Added
+
+- **`schemas/work-unit-manifest.schema.json`** `analysis_refs` 4 DB 자산 필드 additive (★ db-assets-always-on.md §5 정합):
+  - `db_tables[]` (string array) — scope 관련 DB Table 식별자
+  - `db_procedures[]` (object array — `id` required / `sp_conversion_class` enum α|β|γ|δ / `external` boolean) — scope 관련 SP list + plan stage 결단 carry
+  - `db_functions[]` (string array)
+  - `db_views[]` (string array)
+  - description 갱신: "canonical global 5 이식성 산출물" → "canonical global 9 이식성 산출물 (5 + DB 자산 4)"
+- **`schemas/task-plan.schema.json`** `sp_conversions[]` 필드 additive (★ sp-conversion-policy.md §8 정합):
+  - 7 properties: `sp_id` / `sp_name` / `external` / `sp_conversion_class` (α/β/γ/δ enum) / `rationale` (minLength 5) / `verification_oracle` / `adr_ref` (pattern `^ADR-[A-Z0-9_-]+-[0-9]{3}$`)
+  - `additionalProperties: false` strict / required: sp_id + sp_conversion_class + rationale
+  - top-level $comment 권장 필드 list 갱신 (sp_conversions 추가)
+- **`tools/plan-coverage-validator/`** gate #3 SP 분류 검증 본격 활성 (★ chain 3 plan stage):
+  - `validateSpConversions(taskPlan)` 신규 export — 4 finding kinds:
+    - `plan.sp_conversion.no_adr_for_gamma` (high) — γ classification 시 adr_ref required
+    - `plan.sp_conversion.gamma_not_external` (medium) — γ + external≠true inconsistency
+    - `plan.sp_conversion.weak_rationale` (medium) — rationale 길이 < 10
+    - `plan.sp_conversion.delta_no_oracle` (medium) — δ classification + verification_oracle 부재
+  - cli.js 갱신 — `--json` 출력에 `sp_conversions` 결과 포함 + help text §9 추가
+  - test 8 신규 (β / γ 정합 / γ no adr / γ not external / weak rationale / δ no oracle / α 정합 / empty)
+- **`methodology-spec/finding-system.md`** F-CHA namespace F-CHA-poc17-001 정식 등재:
+  - chain-driver `init <project>` cwd 기준 상대경로 paradigm 명세 부재 — 자기 디렉토리 안 자기 이름 인수 호출 시 중첩 hit
+  - Severity: low~medium / Status: **logged** (v11.3.0 doc fix 시행)
+  - Type 2 외부 사용자 dogfood channel 자연 발현 첫 사례 (poc-17 ifrs/car / `feedback_live_probe_vs_retroactive` 정합)
+- **`tools/chain-driver/README.md`** `## ★ init <project> 호출 paradigm` 절 신설 — 두 권고 paradigm (부모 디렉토리 호출 / `init .`) + 안티패턴 회피 명세 / 사용자 양심 의존 우회 표지
+
+### Changed
+
+- **`methodology-spec/lifecycle-contract.md`** §자산 매핑 매트릭스 5 column → **6 column** (DB 자산 입력 axis 추가 / db-assets-always-on §6 정합):
+  - 9 row 의 DB 자산 의무 명세 — input/analysis(전체)/discovery(scope-related)/spec(schema 변경)/plan(SP 결단)/test(fixture)/implement(migration script)/design(❌)/cross-cut(traceability/aspect)
+- **`methodology-spec/baseline-delta-operating-model.md`** canonical global 디렉토리 명시 (★ db-assets-always-on §4 정합):
+  - §2 자산 지도에 `.aimd/output/stored-procedures/` + `.aimd/output/functions/` 디렉토리 row 신설 (기존 `schema.json` + `erd.mermaid` 보존)
+  - `related_artifacts` (자연어) ↔ `analysis_refs` (schema 정공 명) 동의어 명문화 (SSOT prose drift 정정)
+  - §3 운영 cadence (1) baseline 수립 단계에 DB 자산 always-on 정책 인용
+  - §4 baseline carry 규약에 DB 자산 drift cascade 항목 추가
+  - §6 인용에 db-assets-always-on + sp-conversion-policy 2 SSOT 추가
+- `tools/plan-coverage-validator/src/validator.js` 검증 list header 8 → 9 (validateSpConversions 추가)
+
+### Verified
+
+- workspace test: plan-coverage-validator 36 → **44 pass** (8 신규 sp_conversions describe block / 0 fail)
+- 3-way version sync: package.json + plugin.json + CHANGELOG = **11.3.0**
+- backward-compat: legacy task-plan (sp_conversions 부재) → validateSpConversions = 0 findings (legacy carry 정합 / breaking 0)
+- schema additive: work-unit-manifest analysis_refs / task-plan sp_conversions 모두 optional → 기존 PoC 14종 ratchet 분모 미영향
+
+### STOP-3
+
+workspace test 전수 pass ✅ + 3-way version sync 11.3.0 ✅ + breaking 0 (전부 additive 또는 doc cascade) ✅. release-readiness 22/22 검증 = `scripts/release-readiness.js` 실행 의무.
+
+**DEC**: DEC-2026-05-28-db-assets-always-on + DEC-2026-05-28-sp-conversion-policy (직전 cycle 신설)
+**ADR**: ADR-CHAIN-014-db-assets-always-on + ADR-CHAIN-015-sp-conversion-policy (직전 cycle 신설)
+
+**Trigger**: poc-17 ifrs/car dogfooding Phase 1.5 (2026-05-28 / 사용자 명시 듀얼 목표 / `decisions/PROGRESS-poc-17-dogfooding.md` 정합).
+
+---
+
 ## [11.2.0] — 2026-05-28 MINOR — analysis schema chain-link 일관성 정정 (ADR-CHAIN-013 / PoC #15 dogfood 발견)
 
 > PoC #15 (디렉토리 `examples/poc-16-efiweb-car-spring41/`) 의 12 analysis 적재 후 artifact-graph 안 **83% (10/12) orphan** 발견. 본 결함 = graph-synthesizer 도구 매핑 부족 아닌 ★ **methodology 본체 schema 의 chain-link 일관성 결함**. 3 layer 매핑 표준 (chain-side + analysis-side self-ref + meta fallback) 영구 명문화.

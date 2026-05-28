@@ -18,6 +18,35 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 | state migration | `chain-driver migrate` | schema version mismatch 시 |
 | chain-revisit 감지 | `chain-driver revisit-detect` | (보조 / git diff 기반) |
 
+## ★ `init <project>` 호출 paradigm (★ v11.3.0 / F-CHA-poc17-001 자산화)
+
+`init` 의 `<project>` 인수 = **cwd 기준 상대경로**. 다음 두 paradigm 중 하나 채택 의무 — 작업 디렉토리 중첩 회피:
+
+### (a) 부모 디렉토리에서 호출 (권고)
+```bash
+cd ~/Documents/Development/Study/
+chain-driver init poc-17-ifrs-car-migration
+# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/.aimd/state.json 생성
+```
+
+### (b) 작업 디렉토리 안에서 호출
+```bash
+cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
+chain-driver init .
+# → 현 디렉토리 .aimd/state.json 생성
+```
+
+### ❌ 안티패턴 (회피)
+```bash
+cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
+chain-driver init poc-17-ifrs-car-migration   # ★ 자기 이름 인수 → 중첩 hit
+# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/poc-17-ifrs-car-migration/.aimd/state.json ❌
+```
+
+**자기 디렉토리 안에서 자기 이름 인수로 호출 시 `{cwd}/{project_name}/.aimd/` 중첩 생성**. 사용자 신규 진입 시 자연스러운 패턴이라 hit 가능성 ↑ — `init .` 또는 부모 디렉토리 호출 paradigm 정공.
+
+(carry: `cli.js cmdInit` 안 자기참조 감지 + warning enforcement = v11.x backlog. 본 README paradigm 절 = 사용자 양심 의존 우회 표지 / `methodology-spec/finding-system.md` F-CHA-poc17-001 정합.)
+
 ## Inputs
 
 - `<project-dir>/.aimd/state.json` — chain harness state (★ schema/state.schema.json 정합)

@@ -837,6 +837,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 > | 001 | low~medium | **deferred** (Type 2 dogfood channel) | gate #4 Auto Mode 차단 = `gate-eval.js` 코드 부재 / `_base-invoke-go-stop-gate/SKILL.md:62-67` skill body Korean prose 만 인코딩 (양심 의존 잔존) |
 > | 002 | low | **deferred** (Type 2 dogfood channel) | implement→analysis revisit "rare / 가장 큰 cycle" friction 코드 부재 / retry_cap=3 = ADR-CHAIN-003 §4 PoC-only / sp5-c5 carry |
 > | ★ 003 | **★ ★ ★ ★ ★ paradigm-level** | **deferred** (Type 2 dogfood channel / 1순위 표면화 대상) | plan stage = stage 자격 미달 / methodology paradigm 위배 (gate `null` + `gate_deferred` / AI macro HOW 양심 결정 / traceability TASK·ADR·NFR·RISK layer 부재 / DEC-2026-05-21 진단 자기모순). ★ ★ ★ ★ ★ 사용자 직관 채널 발견 (2026-05-25) |
+> | ★ poc17-001 | low~medium | **logged** (v11.3.0 doc fix 시행) | chain-driver `init <project>` 호출 paradigm 명세 부재 — cwd 기준 상대경로 → 자기 디렉토리 내부에서 자기 이름 인수 호출 시 `{cwd}/{project}/.aimd/` 중첩 생성. ★ poc-17 ifrs/car dogfooding 첫 carry 노출 (2026-05-28 / Type 2 외부 사용자 channel = 실 새 프로젝트 live probe / `feedback_live_probe_vs_retroactive` 정합) |
 >
 > ★ ★ ★ 모두 `Status: deferred` (★ self-referential corrective fix ❌ / δ Type 2 외부 사용자 channel close 의무 명시). ζ-1 (plan + gate #plan 동시 신설) / ζ-2 (plan retract) / ζ-3 (informal 표기) 모두 본 cycle 시행 ❌ — 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
 >
@@ -910,6 +911,24 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
   - **ζ-3**: plan stage = gate 없는 informal stage 로 정합 표기 (외부 표기 변경 / paradigm 정합 양보 / 5-stage harness + informal plan helper).
   ★ ★ ★ ★ ★ ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 ★ 1순위 자연 표면화 대상. 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
 - **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / ★ ★ ★ ★ ★ 1순위 표면화 대상 / paradigm-level finding 자격 외부 사용자 channel 의무)
+
+### F-CHA-poc17-001: chain-driver `init <project>` 호출 paradigm 명세 부재 (★ Type 2 외부 dogfood 채널 자연 발현)
+
+- **Phase:** poc-17 ifrs/car dogfooding Phase 0 환경 준비 (2026-05-28 / 외부 작업 디렉토리 init 진입)
+- **Confidence:** verified (실 `chain-driver init poc-17-ifrs-car-migration` 호출 → `~/Documents/Development/Study/poc-17-ifrs-car-migration/poc-17-ifrs-car-migration/.aimd/state.json` 중첩 생성 확인 / cli.js cmdInit `resolve(args.project)` 동작 확인)
+- **Type:** gap (UX paradigm 명세 부재 / 양심 의존)
+- **Description:** `chain-driver init <project>` 의 project 인수 paradigm 명세 부재. 작업 디렉토리 내부에서 자기 이름 인수로 호출 시 `{cwd}/{project_name}/.aimd/state.json` 중첩 생성 — 의도 vs 실 동작 mismatch. 신규 사용자가 작업 디렉토리 안 들어가서 자기 폴더명 인수로 호출하는 자연스러운 패턴이 hit. 첫 사용 시 `~/foo/poc-17-x/poc-17-x/.aimd/` 발견.
+  - 원인: `tools/chain-driver/src/cli.js cmdInit` 의 `resolve(args.project)` = cwd 기준 상대경로 / 사용자 작업 디렉토리 자기참조 감지 ❌
+  - 회피: (a) 부모 디렉토리에서 `chain-driver init <project>` 호출 또는 (b) 작업 디렉토리에서 `chain-driver init .` (현 디렉토리 정확 지정)
+- **Evidence:**
+  - `decisions/PROGRESS-poc-17-dogfooding.md` lines 56~82 (실 사례 + 회피 결단)
+  - `tools/chain-driver/src/cli.js` cmdInit (resolve 동작)
+  - memory `feedback_live_probe_vs_retroactive` (Type 2 외부 사용자 dogfood channel 정합)
+- **Spec gap:** `tools/chain-driver/README.md` 또는 `guides/getting-started.md` 의 호출 paradigm 절 부재. 첫 사용자가 명세만 보고 결정 ❌ → "신규 사용자 진입 장벽" (`finding-system.md` §6.1 closed 효과 정합).
+- **Decision made:** poc-17 작업 = 부모 디렉토리에서 호출 paradigm 채택 (PROGRESS log line 76 결정). 본 cycle = doc fix 시행 (README + getting-started / cli enforcement = v11.x carry).
+- **Severity:** **low~medium** — 결정적 차단 ❌ (사용자 회피 가능) / 단 ★ 신규 사용자 첫 진입 시 동일 hit 가능성 ↑ + ★ 본 plan SSOT (`scalable-exploring-tarjan.md` §M.3 carry 노출 paradigm) 의 첫 실증.
+- **Proposed fix:** (a) ✅ 본 cycle — `tools/chain-driver/README.md` 호출 paradigm 절 신설 (작업 디렉토리 paradigm + 권고 호출 형태 정공). (b) v11.x carry — `cli.js cmdInit` 안 cwd 자기참조 감지 + warning 추가 (예: `args.project === path.basename(cwd)` 시 "이미 작업 디렉토리 안에 있는 듯합니다 — `chain-driver init .` 의도하셨나요?").
+- **Status:** **logged** (v11.3.0 doc fix 정공 — README 호출 paradigm 절 신설 / cli enforcement carry queue / Type 2 외부 dogfood channel 자연 발현 자산화)
 
 ### F-162: ★ ★ ★ ★ analysis-from-figma = verbatim 검증 의무 부재 / input-adapter source-grounded 비대칭 (δ Type 2 외부 dogfood 채널 발견)
 
