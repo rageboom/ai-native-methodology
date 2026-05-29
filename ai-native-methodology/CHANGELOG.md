@@ -9,6 +9,42 @@
 
 ---
 
+## [11.5.1] — 2026-05-29 PATCH — discovery-extraction-validator multi-path BR lookup (paradigm-level resilience / DEC-2026-05-29-validator-multi-path-br-lookup)
+
+> ★ ★ ★ session 54차 = poc-17 chain 1 forward 차단 추정 결함 (LL-poc-17-15 / session 53차 carry queue 본격 promotion `C-validator-dual-key-businessrules`) → Phase 1 validator src + test 시행 → ★ Phase 2 외부 PoC 실측 시점 ★ ★ 본격 사실 정정 발견 ★ ★ — **pre-fix 도 GREEN** (사용자 chain 1 진입 직전 normalize 우회로 chain 1 forward 자격 이미 충족). 본 fix 실제 가치 = ★ paradigm-level resilience 추가 ★ (test 4 신규 / 미래 PoC dual-key + suffix 일관 paradigm 산출 시 자연 인식 / 외부 normalize 우회 불필요). additive only / breaking 0 / 본 PoC 영향 0.
+
+> ★ ★ ★ ★ ★ paradigm A (self-referential drift 회피) 본격 가치 self-입증 사례 ★ ★ ★ ★ ★ — session 53차 LL-poc-17-15 본문 "Phase 3 validator 실행 결과 = 12 CRITICAL" narrative + chain-intervention-log root_cause "validator 는 rules array 만 lookup" 본문 = ★ 실제 validator 코드와 mismatch ★ (validator 는 `rules.business_rules` 를 봄). self-기록 사실 검증 부족 cycle 의 본격 본격 자기-차단 사례 — paradigm A retract 자격 자연 ❌ / paradigm A 본격 강화 axis 자연.
+
+### Added
+- `decisions/DEC-2026-05-29-validator-multi-path-br-lookup.md` — 본 release SSOT
+- `tools/discovery-extraction-validator/src/validator.js` BR lookup 다중 경로 본격 보강 (additive backward-compat):
+  - `analysis?.rules?.business_rules` (기존 가정 / backward-compat / v11.0.0~v11.5.0)
+  - `analysis?.business_rules` (top-level array / poc-17 chain 1 normalize paradigm)
+  - `analysis?.rules` (top-level rules array / analysis baseline 자연 paradigm)
+  - `analysis?.rules_step_4c_carcost` (dual key 두번째 / poc-17 Phase 4c paradigm)
+- `tools/discovery-extraction-validator/test/validator.test.js` neuer `describe('multi-path BR lookup (v11.5.1)')` block — 신규 test 4종 (additive):
+  - top-level `business_rules` array (poc-17 normalize) 매치 입증
+  - top-level `rules` array (suffix 없음 / analysis baseline) 매치 입증
+  - `rules_step_4c_carcost` (dual key) 매치 입증
+  - 어느 경로에도 없으면 critical 본격 발생 (회귀 차단)
+
+### Changed
+- (없음 — 본 release = additive only / 기존 path 보존 / breaking 0)
+
+### Test 영향
+- workspace test 787 → **791 (+4)** / 0 fail ✅
+- 본 PoC `~/Documents/Development/Study/poc-17-ifrs-car-migration/.aimd/output/` 안 validator 직접 실행 = **0 findings / UC coverage 100%** (pre-fix + post-fix 동일 / 본 PoC 영향 0 입증)
+
+### Carry resolved
+- ✅ `C-validator-dual-key-businessrules` (session 52차 LL-poc-17-09 + session 53차 LL-poc-17-15 promotion) — paradigm-level resilience 본격 추가로 본격 종결
+- ★ ★ paradigm A 본격 강화 axis 본격 자산화 (LL-validator-dual-key-01~03 / 본 plan §8)
+
+### Carry (★ 별 cycle)
+- C-schema-regex-paradigm-completion (axis 3 Layer 1 schema 자체 본격 검토 / Type 2 외부 사용자 자연 trigger 의무)
+- 본 PoC 안 통합 array (`business_rules` top-level / -001 suffix) = 자연 폐기 자격 (선택적 / 본 fix 후 자연 가능 / 본 PoC 차기 cycle 또는 다음 PoC 자연 처분)
+
+---
+
 ## [11.5.0] — 2026-05-29 MINOR — analysis-business-rules skill 본문 BR id strict instruction 본격 추가 (axis 3 / paradigm drift 영구 차단 / DEC-2026-05-29-axis-3-skill-strict-instruction)
 
 > ★ ★ ★ poc-17 chain 1 discovery 첫 사내 live 시행 시 표면화된 paradigm drift (★ schema strict regex `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` vs analysis-from-* skill enforcement 부재 → AI meaningful name 자유 paradigm 산출 → chain 진입 시 schema-validator RED → patch fix 임시 우회) 의 ★ ★ 영구 해결 (Path 2 / skill 본문 enforcement). 사용자 의제 결단 ("포맷팅 대로 되는게 좋다" / context engineering 본격 답: prefix 의미 + suffix 식별자 양수 가치 본격). additive only / breaking 0 / methodology body 1 파일 갱신 (skill 본문).

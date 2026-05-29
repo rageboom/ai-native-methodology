@@ -252,16 +252,49 @@
 
 ---
 
-## 8. Lessons Learned (★ 4원칙 4단계 / 시행 후 채움 / placeholder)
+## 8. Lessons Learned (★ 4원칙 4단계 / 본 plan 종결 시점 자산화 / 2026-05-29)
 
-> **placeholder** — 본 plan 시행 후 자산화.
+본 plan 시행 결과 LL 5종 본격 자산화. 사용자 결단 (Phase 4 gate cluster 5) = 의제 1.A (axis 3 carry 보류 유지) + 의제 2.A (LL 자산화 + carry queue 등록 + 본 session 종결).
 
-### 8.1 후보 LL (예상 / 시행 전 sketch)
+### LL-poc-17-11 — chain harness round-trip paradigm 첫 사내 full cycle 본격 입증
 
-- LL-poc-17-11 (chain harness round-trip paradigm 첫 사내 full cycle 본격 입증 — chain 1 → revisit:analysis → analysis 보강 → chain 1 재진입 자격 검증)
-- LL-poc-17-12 (axis 분리 결단 paradigm 본격 입증 — methodology body 영역 axis 3 분리 의무 / self-referential drift 회피)
-- LL-poc-17-13 (F-RBAC-BYPASS-001 보안 invariant chain 1 단에서 의제화 paradigm — chain 2 AC 명세 의무 forward link)
-- LL-poc-17-14 (business_intent 재작성 paradigm — domain.json + business-rules.json additive 보강 path / cluster 1 사용자 결단 axis 본격)
+**Why**: chain 1 discovery gate #1 stop + revisit:analysis 결단 → analysis baseline 본격 보강 → chain 1 forward 자격 재검증 cycle = ★ 본 방법론 chain harness paradigm 의 ★ 첫 사내 live full cycle 사례. 본 PoC = R1' axis 4번째 corroboration 자산.
+
+**How to apply**: chain N gate stop + revisit:N-K 결단 시 (a) 별 plan ladder 본격 생성 (revisit 의제 분리) + (b) 외부 디렉토리 산출물 additive only + (c) 본 레포 commit ❌ + (d) validator 재실행 = chain N+0 forward 자격 재검증 의무. round-trip = chain harness gate 안에서 정식 허용 (DEC-2026-05-06 정합) + 단 자동 코드 생성 ❌ (지정된 stage 별 산출물 한정).
+
+### LL-poc-17-12 — axis 분리 결단 paradigm 본격 입증 + ★ ★ ★ severity 재평가 사례
+
+**Why**: 본 plan 시행 시점 (Phase 4 gate) 사용자 결단 = "axis 3 = cosmetic drift / 분리 carry / self-referential drift 회피". Phase 3 validator 실행 결과 = **★ ★ ★ axis 3 가 cosmetic ❌ / structural / chain 1 forward 자격 자체 차단 본격 결함** 임이 실측 폭로. 즉 axis 분리 결단 paradigm 이 ★ severity 실측 사실 출현 시점에 재평가 의제 trigger 본격.
+
+**How to apply**: axis 분리 결단 (LL-codegraph-01 self-referential drift 회피) 시 (a) 결단 시점 severity 추정 명시 의무 (cosmetic / structural / blocker) + (b) 실측 phase (validator 또는 e2e) 시 severity 재평가 hook + (c) cosmetic 추정 axis 가 structural 격상 시 carry queue 본격 promotion (Type 2 외부 사용자 trigger 자연 충족 시점 즉시 본격 시행) + (d) 본 LL 사례 인용 의무. axis 3 본 경우 = self-referential drift 회피 paradigm 우선 (Type 2 외부 사용자 자연 trigger 대기 유지) — ★ ★ trade-off 명시.
+
+### LL-poc-17-13 — F-RBAC-BYPASS-001 보안 invariant chain 1 단에서 의제화 paradigm
+
+**Why**: 본 finding 은 analysis baseline (Phase 4b) 시점 = `<isNotEmpty>` 조건부 join paradigm 사실 검출만 (intent ambiguous). chain 1 discovery gate #1 사용자 결단 = "B. 보안 invariant 본격 의문" → analysis 단계로 backward 의제 push → 본 plan Phase 2.1~2.4 본격 명세 + chain 2 AC-CAR-003 forward 명세 의무 link. 본격 발동 path 미실측 = 본격 발견 path 4 종 enumerate (interceptor 미검증 USER_ID 키 + 인터셉터 우회 + 세션 부분 손상 + 사용자 마스터 path 미검증) + recommendation = 즉시 정정 ❌ + chain 2 명세 의무 + 신규 stack 자연 해결.
+
+**How to apply**: 보안 invariant 후보 finding 시 (a) ambiguous category 등재 + (b) 본격 발동 path enumerate 의무 (≥ 3 attack path) + (c) interceptor / controller / DAO / SQL layer 본격 call-path 검증 의무 + (d) 즉시 정정 vs chain 2 spec stage AC 명세 결단 + (e) 신규 stack 마이그레이션 시 자연 해결 path 명시 + (f) characterization-spec.json verdict 후보 enumerate (bug / intent / ambiguous).
+
+### LL-poc-17-14 — business_intent 재작성 paradigm + ★ DDD stakeholder 본격 자산화 경로
+
+**Why**: 사용자 cluster 1 결단 "재작성하자" trigger → analysis baseline `domain.json` 안 `business_intent_summary` + `stakeholders[]` 필드 부재 사실 표면화 → F-DOMAIN-PURPOSE-001 신규 finding + Phase 1.1 본격 보강 path. business-rules.json 12 BR 도 동시 additive boost (intent / rationale / stakeholders / security_invariant 5 신규 필드). discovery-spec.json 의 stakeholder 5종 = 본격 사실 source / domain.json + business-rules.json 으로 1:1 migration.
+
+**How to apply**: chain 1 discovery 단에서 사용자가 "재작성" 결단 시 (a) discovery-spec.json#business_intent 안 stakeholder 본격 enumeration 의무 + (b) 동일 stakeholder set 을 domain.json (bounded_contexts.stakeholders) + business-rules.json (rules.stakeholders) 의 본격 cross-link migration + (c) F-DOMAIN-PURPOSE 후보 finding 자동 등재 (process finding / medium / additive 보강 후 resolved) + (d) chain 2 spec stage 의 UC/BHV/AC 본격 stakeholder backward link.
+
+### LL-poc-17-15 — ★ ★ ★ cosmetic 추정 axis 가 structural 격상 사례 (★ ★ severity re-evaluation hook)
+
+**Why**: ★ 본 plan 의 ★ 본격 발견. Phase 4 gate 시점 사용자 결단 = "axis 3 = cosmetic / 분리 carry" 가설 (LL-codegraph-01 self-referential drift 회피 paradigm 우선). Phase 3 validator 실행 결과 = **discovery-extraction-validator 12 CRITICAL `discovery.br_intent.unknown_br`** — axis 3 paradigm drift 가 chain 1 forward 자격 자체 차단 본격 결함임이 실측 폭로. 즉 cosmetic 추정 axis 가 structural / blocker 격상.
+
+**How to apply**: methodology body axis 분리 결단 시 (a) 결단 시점 = cosmetic / structural / blocker 추정 명시 의무 + (b) Phase 3 (validator 단) = severity 재평가 hook 의무 (cosmetic → structural 격상 trigger) + (c) structural 격상 시 carry queue 본격 promotion (★ Type 2 외부 사용자 자연 trigger 자격 자연 충족 / 별 session 본격 시행 의제) + (d) chain N forward 자격 차단 본격 결함 인 경우 = ★ ★ ★ self-referential drift 회피 paradigm vs chain 자격 trade-off 의제 / 본격 결단 의무 / 본 LL 인용 의무. 본 PoC 경우 = self-referential drift 회피 paradigm 우선 (사용자 결단) — Type 2 외부 사용자 자연 trigger 대기 paradigm 유지. ★ ★ 단 본 paradigm = self-imposed brake (★ 본 PoC 가 본격 Type 2 자연 trigger 사실 인 본격 발견 = paradigm 재해석 의제 trigger 자격 본격 충족).
+
+### 8.2 carry queue 본격 등록 (★ 본 plan 결과 / 별 session 본격 시행 대기)
+
+| Carry ID | 내용 | Type 2 외부 사용자 trigger 사실 | severity 추정 |
+|---|---|---|---|
+| **C-validator-dual-key-businessrules** | `tools/discovery-extraction-validator` + `tools/schema-validator` 가 business-rules.json 의 `business_rules` array (v11.5.0 strict / -001 suffix) 도 lookup 의무 / 현 paradigm = `rules` array 만 lookup → chain 1 forward 자격 차단. methodology body 영역. | ✅ 본 PoC = R1' axis 4번째 사내 PoC + 본 plan Phase 3 실측 사실 = Type 2 자연 trigger 자격 자연 충족 | ★ ★ structural (chain 1 forward 자격 차단 본격 결함) |
+| **C-schema-regex-paradigm-completion** | `schemas/business-rules.schema.json` 의 strict regex `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` vs analysis baseline pre-strict (`BR-XXX-XXX`) paradigm drift 본격 정합 결단 (옵션 X = validator lookup 양방향 / 옵션 Y = analysis baseline rename / 옵션 Z = schema regex 완화) | ✅ 동일 (본 PoC 실측 trigger) | ★ ★ structural (LL-poc-17-15 promotion) |
+| C-sub-rule-pii-detection | `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X-H 안 AP-PII-HARDCODE 본격 등재 (LLM grounded review only) | ★ 본 PoC F-PII-HARDCODE-001 trigger | medium |
+| C-sub-rule-rbac-fail-open-detection | §X-H 안 `<isNotEmpty>` parameter 가 보안 RBAC join 의존하는 case 자동 검출 paradigm (LLM grounded review only) | ★ 본 plan F-RBAC-BYPASS-001 trigger | medium |
+| C-domain-schema-stakeholders-mandatory | `schemas/domain.schema.json` 안 bounded_context 의 stakeholders + business_intent_summary 필수 또는 권장 결단 | ★ 본 plan F-DOMAIN-PURPOSE-001 trigger | medium |
 
 ---
 

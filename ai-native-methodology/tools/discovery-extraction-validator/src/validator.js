@@ -26,11 +26,21 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   }
 
   // 2. BR-INTENT match
+  // v11.5.1: multi-path BR lookup (LL-validator-dual-key-02 / additive backward-compat)
+  // 분석 산출물 paradigm 다양화 (v11.0.0 rename + chain 1 normalize + dual key 등) 대응
   const brsIntent = discoverySpec?.business_rules_intent ?? [];
   const analysisBrs = new Set();
-  if (analysis?.rules?.business_rules) {
-    for (const br of analysis.rules.business_rules) {
-      if (br.id) analysisBrs.add(br.id);
+  const brCandidates = [
+    analysis?.rules?.business_rules,    // 기존 가정 (backward-compat / v11.0.0~v11.5.0)
+    analysis?.business_rules,            // top-level array (poc-17 chain 1 normalize)
+    analysis?.rules,                     // top-level rules array (analysis baseline)
+    analysis?.rules_step_4c_carcost,    // dual key 두번째 (poc-17 Phase 4c)
+  ];
+  for (const arr of brCandidates) {
+    if (Array.isArray(arr)) {
+      for (const br of arr) {
+        if (br?.id) analysisBrs.add(br.id);
+      }
     }
   }
   for (const intent of brsIntent) {
