@@ -9,6 +9,32 @@
 
 ---
 
+## [11.5.0] — 2026-05-29 MINOR — analysis-business-rules skill 본문 BR id strict instruction 본격 추가 (axis 3 / paradigm drift 영구 차단 / DEC-2026-05-29-axis-3-skill-strict-instruction)
+
+> ★ ★ ★ poc-17 chain 1 discovery 첫 사내 live 시행 시 표면화된 paradigm drift (★ schema strict regex `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` vs analysis-from-* skill enforcement 부재 → AI meaningful name 자유 paradigm 산출 → chain 진입 시 schema-validator RED → patch fix 임시 우회) 의 ★ ★ 영구 해결 (Path 2 / skill 본문 enforcement). 사용자 의제 결단 ("포맷팅 대로 되는게 좋다" / context engineering 본격 답: prefix 의미 + suffix 식별자 양수 가치 본격). additive only / breaking 0 / methodology body 1 파일 갱신 (skill 본문).
+
+### Added
+- `decisions/DEC-2026-05-29-axis-3-skill-strict-instruction.md` — 본 release SSOT
+- `skills/analysis-business-rules/SKILL.md` §3 안 ★ BR id 형식 의무 instruction 본격 추가 (1 unit / additive):
+  - regex `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 정합 의무
+  - form = `BR-<DOMAIN>-<SUBJECT>-<NNN>` (예: `BR-USER-VERIFY-001` / `BR-RBAC-PRIORITY-001` / `BR-CARLIST-PAGINATION-001`)
+  - prefix 의미 직관 (LLM 컨텍스트 read) + suffix 식별자 (machine 매칭 / typo silent fail 차단)
+  - meaningful name 단독 산출 ❌ / patch fix 본격 발생 차단
+  - paradigm 본격 정합 근거 = poc-17 chain 1 first 표면화 (사실 기록)
+
+### Changed
+- (없음 — 본 release = additive only / breaking 0 / 기존 paradigm 본격 보존 / 기 산출 PoC #01~#16 BR id 본격 보존 자격 / 새 PoC analysis baseline 진입 시점 부터 본 instruction 본격 적용)
+
+### Migrated / Backward-compatible
+- 본 PoC poc-17 analysis baseline 안 business-rules.json `rules` + `rules_step_4c_carcost` array (legacy meaningful name paradigm) = ★ ★ 본격 보존 (cross-link 자산 영향 회피)
+- 본 PoC chain 1 discovery 시행 시 동시 normalize 시행한 `business_rules` 통합 array (additive normalize / -001 suffix) = ★ 본 instruction 본격 1:1 정합 사실
+
+### Carry (★ Type 2 외부 사용자 자연 trigger 시점)
+- C-other-analysis-skills-strict-cascade — analysis-api-rule-mapping + discovery-identify-business-intent 등 cross-skill 본격 strict 정합 의무 검토 (paradigm coherence)
+- C-other-id-patterns-strict — AP id (`^AP-[A-Z0-9_-]+-[0-9]{3}$`) + UC id + AC id + BHV id + TASK id + TC id + IMPL id 본격 strict pattern 동일 paradigm 정합 의무 검토
+
+---
+
 ## [11.4.0] — 2026-05-29 MINOR — sub-rule §X-H v1.2.0 본격 cascade + methodology-spec §사례 3 갱신 (poc-17 Phase 1 첫 corroboration / DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration)
 
 > ★ ★ ★ poc-17 ifrs/car 도메인 Phase 1 analysis baseline 본격 종결 (12 phase 전수 / 25+ 산출물 / 43 finding / 16 AP / cross-DB 18 자산) 직후 본격 사실 누적 본격 자산화 cycle (A+B+C+D 전체 시행 / 사용자 결단). additive only / breaking 0.

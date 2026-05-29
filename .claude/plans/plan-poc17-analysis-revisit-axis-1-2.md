@@ -1,0 +1,289 @@
+# plan-poc17-analysis-revisit-axis-1-2
+
+> **세션 52차 — 2 번째 plan ladder** (직전 = `plan-poc17-chain1-discovery-car-list.md` § Gate #1 = stop + revisit:analysis).
+> **4원칙 1단계** (깊은 숙지 → plan.md 작성 / 본 plan = analysis stage 재진입 trigger 의제).
+> **paradigm 정합** — DEC-2026-05-06-round-trip-부분-허용 (chain harness gate 안 정식 허용) + LL-codegraph-01 (self-referential drift 회피) + LL-codegraph-07 (외부 source 격리).
+
+---
+
+## 1. 목적 / scope
+
+### 1.1 trigger 사실
+
+직전 plan ladder gate #1 결단 (사용자 cluster 1 + 3 + 4_5 결단 묶음):
+- **cluster 1**: business_intent 재작성 (C)
+- **cluster 3**: BR-CARLIST-RBAC-FILTER sessionId 부재 우회 본격 의문 (B / F-RBAC-BYPASS-001 보안 invariant 명세 의무)
+- **cluster 4_5**: D revisit:analysis (chain 2 spec 진입 보류)
+
+★ **3 axis 의제 분리 결단** (★ ★ ★ 본 plan 본격 결단 / LL-codegraph-01 정합 의무):
+
+| axis | scope | 본 plan 처리 |
+|---|---|---|
+| **axis 1** = business_intent 재정합 | analysis baseline domain.json / business-rules.json 보강 | ✅ scope-in (본 plan 본격) |
+| **axis 2** = F-RBAC-BYPASS-001 보안 invariant 명세 | analysis baseline characterization-spec.json / formal-spec 보강 | ✅ scope-in (본 plan 본격) |
+| **axis 3** = BR id naming convention paradigm | methodology body schema regex 완화 또는 analysis stage paradigm enforcement | ❌ scope-out (★ ★ self-referential drift / LL-codegraph-01 정합 / **carry C-schema-regex-paradigm-completion** 등록 보류 / Type 2 외부 사용자 trigger 의무) |
+
+★ 본 plan = **axis 1 + axis 2 통합 본격 / 외부 디렉토리 layer / methodology body 변경 ❌**.
+
+### 1.2 듀얼 목표 정합 (memory `feedback_dual_goal_migration_plus_plugin.md`)
+
+| axis | 본 plan 시행 | 자산 |
+|---|---|---|
+| 마이그레이션 | car-list pilot scope analysis baseline 보강 (chain 1 forward 자격 본격) | 외부 디렉토리 산출물 |
+| 플러그인 axis | chain harness round-trip paradigm 본격 입증 (chain 1 → revisit:analysis → chain 1 재진입 forward 자격 cycle 완성) | 본 plan / DEC / LL 후보 |
+
+### 1.3 scope-in (axis 1 + 2)
+
+**Axis 1 — business_intent 재정합**:
+- `business-rules.json` 안 car-list bound 12 BR 의 **business intent reasoning** 보강 (rule 본문에 intent + rationale + stakeholder 명시 추가).
+- `domain.json` 안 BC-CAR-MGT 의 **stakeholder 본격 enumeration** (cluster 1 사용자 결단 "재작성" 의제 — 사용자 차원의 본격 검토 의무 / 본 plan 결단 의제 안 정의).
+- `findings/` 안 F-DOMAIN-PURPOSE-001 (★ 신규 finding 가능성 — domain_purpose 정확도 검토 결과).
+
+**Axis 2 — F-RBAC-BYPASS-001 보안 invariant 명세**:
+- `findings/F-RBAC-BYPASS-001.md` 신설 (현재 findings-index.md 안 reference 만 있음 / 본 finding 본격 body 부재).
+- `characterization-spec.json` 보강 — BR-CARLIST-RBAC-FILTER intent-vs-bug 본격 분류 + sessionId 부재 시 ambiguous category 등록.
+- `formal-spec/sequence-diagrams/` 안 RBAC 3 branch sequence 보강 (sessionId 부재 path 추가 / 보안 invariant 도출).
+- `business-rules.json#BR-CARLIST-RBAC-FILTER` 의 `verifiable` 필드 강화 (sessionId 부재 시 동작 명세 의무).
+
+### 1.4 scope-out (★ ★ axis 3 분리 + carry)
+
+- **Axis 3 = paradigm drift #2 (schema regex BR naming)** — methodology body 영역 / self-referential drift 위험 (LL-codegraph-01) / carry `C-schema-regex-paradigm-completion` 등록 / Type 2 외부 사용자 자연 trigger 의무.
+- **chain 1 discovery-spec.{json,md}** = ★ frozen 보존 (revert ❌ / 본 plan 종결 후 별 plan ladder 결단 의제 — analysis 보강 결과 흡수 시 chain 1 재진입 + 재검증).
+- **chain 2 spec stage 진입** — 본 plan scope 외 / analysis 보강 종결 후 별 ladder.
+- **paradigm drift #1 (validator dual-key)** = ★ ★ 별 carry `C-validator-dual-key-businessrules` (methodology body 영역).
+- **화면 2~6** + **F-PII-HARDCODE-001** + **외부 SP γ** = 본 PoC 의 다른 axis (별 cycle).
+
+---
+
+## 2. 입력 (analysis baseline + chain 1 frozen 산출물)
+
+### 2.1 1차 입력 (외부 절대경로 read-only / LL-codegraph-07 정합)
+
+| 산출물 | 본 plan 활용 |
+|---|---|
+| `~/.../.aimd/output/business-rules.json` | 12 car-list BR 의 본문 보강 + business_rules 통합 array 정합 유지 |
+| `~/.../.aimd/output/domain.json` | BC-CAR-MGT stakeholder + bounded_context responsibility 보강 |
+| `~/.../.aimd/output/characterization-spec.json` | intent-vs-bug 분류 보강 (RBAC + F-RBAC-BYPASS-001) |
+| `~/.../.aimd/output/findings/findings-index.md` | F-RBAC-BYPASS-001 본문 신설 / F-DOMAIN-PURPOSE-001 신규 등록 |
+| `~/.../.aimd/output/discovery-spec.{json,md}` (frozen) | 본 plan 분석 결과 forward 자격 검증 (cluster 1 + 3 fix 완료 시 chain 1 재진입 자격 충족 의무) |
+| `~/.../.aimd/output/sequence-diagrams/*` | RBAC 3 branch sequence 보강 (sessionId 부재 path) |
+
+### 2.2 2차 입력 (본 레포 / SSOT)
+
+| 자산 | 본 plan 활용 |
+|---|---|
+| sub-rule `spring41-ibatis2-isomorphic.md` v1.2.0 | §X-H 정합 (RBAC + cross-DB AP) |
+| `methodology-spec/finding-system.md` | F-RBAC-BYPASS-001 + F-DOMAIN-PURPOSE-001 finding 등록 paradigm |
+| `methodology-spec/baseline-delta-operating-model.md` | analysis baseline delta 갱신 paradigm |
+
+---
+
+## 3. 산출물
+
+### 3.1 1차 산출물 (외부 디렉토리 / 본 PoC analysis baseline 갱신)
+
+| 산출물 | 위치 | format |
+|---|---|---|
+| `findings/F-RBAC-BYPASS-001.md` | 외부 (신규) | 본문 medium finding 본격 명세 |
+| `findings/F-DOMAIN-PURPOSE-001.md` | 외부 (신규 / 조건부) | business_intent 재작성 결과 신규 finding 자격 검토 |
+| `findings/findings-index.md` (갱신) | 외부 | medium 14 → 15+ 갱신 (F-RBAC-BYPASS-001 본격 등재) |
+| `business-rules.json` (갱신 / additive) | 외부 | 12 car-list BR 의 intent + rationale + stakeholder 필드 보강 |
+| `domain.json` (갱신 / additive) | 외부 | BC-CAR-MGT stakeholder enumeration 본격 / business_intent 재정합 |
+| `characterization-spec.json` (갱신) | 외부 | BR-CARLIST-RBAC-FILTER intent-vs-bug 본격 분류 + sessionId 부재 ambiguous |
+| `sequence-diagrams/rbac-3-branch.mermaid` (갱신 또는 신규) | 외부 | sessionId 부재 path 추가 / 보안 invariant 도출 |
+| `chain-intervention-log.jsonl` (append) | 외부 | analysis revisit 진행 사실 + 결과 record |
+
+### 3.2 2차 산출물 (본 plan 자산화 / 본 레포 / commit 정책)
+
+| 산출물 | 위치 | 조건 |
+|---|---|---|
+| LL-poc-17-11~14 추가 | 본 plan §8 | 시행 종결 후 자산화 |
+| memory `project_poc17_dogfooding.md` 갱신 | `~/.claude/projects/.../memory/` | analysis revisit 사실 누적 |
+| **carry queue 본격 등록** = `C-schema-regex-paradigm-completion` + `C-validator-dual-key-businessrules` | (도구화 carry list 부재 / decisions 안 or LL 안) | 본 plan 종결 후 명시 |
+
+★ **본 레포 commit ❌** (LL-codegraph-07 정합 / 외부 디렉토리 산출물만 + 본 plan + LL 자산만 본 레포 자격).
+
+---
+
+## 4. 절차 (analysis stage 재진입 시 phase 정합)
+
+### Phase 1. business_intent 재정합 (axis 1)
+
+#### 1.1 domain.json#BC-CAR-MGT 본격 검토
+
+- 현재 `domain.json#bounded_contexts.BC-CAR-MGT.responsibilities` = 3 항목 (차량 등록/조회/수정/해지 + TERM 관리 + DRIVE 관리). cluster 1 재작성 의제 = ★ 본격 보강 의무.
+- 추가 정합 의무:
+  - `stakeholders[]` field 신설 (현재 부재 / 본 PoC discovery-spec 의 5 stakeholder 본격 backward link)
+  - `business_intent_summary` field 신설 (domain_purpose 본격 명시)
+- **★ ★ ★ Auto Mode ❌ — 사용자 결단 의무**: stakeholder 명세는 본격 사내 비즈니스 axis = 사용자 결단 본격 의제.
+
+#### 1.2 business-rules.json 12 BR 의 intent 본문 보강
+
+- 현재 BR entry = `id + title + screen + code_grounding + logic + verifiable + category` 7 필드.
+- **추가 필드 의무** (axis 1 본격):
+  - `intent` (1 줄 자연어 / "왜 이 BR 인가" 본격)
+  - `rationale` (1~3 줄 / 비즈니스 reason)
+  - `stakeholders` (해당 BR 의 주 이해관계자 enumeration)
+- **★ ★ ★ axis 3 정합 의무**: BR id rename ❌ (paradigm drift #2 = methodology body / 별 carry).
+
+#### 1.3 findings/F-DOMAIN-PURPOSE-001 (조건부 신규)
+
+- Phase 1.1 결과 도출 사실 = "domain_purpose 본격 미명세 / cluster 1 재작성 trigger 정합" → 본 finding 자격 발생 시 등록.
+- severity = medium (process finding / 결과 도출 사실).
+
+### Phase 2. F-RBAC-BYPASS-001 보안 invariant 명세 (axis 2)
+
+#### 2.1 findings/F-RBAC-BYPASS-001.md 본격 신설
+
+- 현재 = findings-index.md 의 reference 만 / 본문 부재.
+- 본격 본문 구조:
+  - severity: medium (현재 인덱스 표기 정합)
+  - title: BR-CARLIST-RBAC-FILTER sessionId 부재 시 INNER JOIN 우회 가능성
+  - description: sessionId 가 fn_Get_CarUserListView_2 호출 시 부재 → INNER JOIN 자체 우회 → RBAC 분기 미적용 → 전체 차량 노출 위험
+  - evidence: `carMgt.xml#selectCarList L130-133 + CarMgtServiceImpl.getCarUserList (★ sessionId 검증 chain manual grep 의무)`
+  - impact: high (보안 본격 / 그러나 본격 발동 path 미실측)
+  - recommendation: chain 2 spec stage AC-CAR-003 보안 invariant 명세 의무 (sessionId null 시 RBAC 분기 적용 또는 reject)
+  - cross_link: BR-CARLIST-RBAC-FILTER + UC-CAR-003 + ★ chain 2 forward 의제
+
+#### 2.2 characterization-spec.json 보강
+
+- BR-CARLIST-RBAC-FILTER intent-vs-bug 본격 분류:
+  - intent vs bug = ★ ambiguous (sessionId 부재 가 의도 vs 결함 모호)
+  - rationale = "sessionId 부재 path 가 legacy code 안 본격 발동 path 미실측 / 그러나 NULL check 부재 = 결함 marker / chain 2 AC 명세 의무"
+- characterization-spec.intent_vs_bug.ambiguous category 신규 추가.
+
+#### 2.3 sequence-diagrams 안 RBAC 3 branch 보강
+
+- 현재 sequence-diagram = RBAC 3 분기 mermaid (1 file / decision-tables/ sibling).
+- **sessionId 부재 path** 신규 분기 추가 의무 (security invariant trigger 본격).
+
+#### 2.4 business-rules.json#BR-CARLIST-RBAC-FILTER verifiable 강화
+
+- 현재 verifiable = "차량관리자 로그인 = 전체 / 비서 = 담당 임원 / 일반 = 본인".
+- **추가**: "sessionId NULL / undefined 시 = reject 또는 default 분기 (★ chain 2 AC-CAR-003 명세 의무 / F-RBAC-BYPASS-001 cross-link)".
+
+### Phase 3. chain-intervention-log append + 검증
+
+- chain-intervention-log.jsonl append (analysis revisit 진행 사실).
+- validator 2종 재실행:
+  - discovery-extraction-validator: 본 plan 산출물 갱신 후 chain 1 discovery-spec.json forward 자격 검증.
+  - schema-validator: 본 plan 산출물 (business-rules.json + domain.json + characterization-spec.json) schema 정합 검증.
+
+### Phase 4. gate (analysis revisit 종결 cluster 보고)
+
+- 사용자 검토 cluster 4~5:
+  1. business_intent 재정합 결과 정확성 (cluster 1 fix 확인)
+  2. F-RBAC-BYPASS-001 본격 명세 정확성 (cluster 3 fix 확인)
+  3. axis 3 (BR id naming paradigm) carry 보류 확인
+  4. ★ chain 1 재진입 자격 충족 여부 (discovery-spec frozen 갱신 의무 발생 여부)
+  5. 본 session 종결 vs chain 1 재진입 결단
+
+---
+
+## 5. 사용자 승인 묶음 (3원칙 / 5 핵심 결정)
+
+★ 본 plan 안 결단 5 — 본 plan §4 시행 전 사용자 확정 의무.
+
+### 결단 1. business_intent 재정합 본격 scope (axis 1)
+
+- **A. domain.json + business-rules.json 동시 보강** (추천 / Phase 1.1 + 1.2 통합 / 본격)
+- B. domain.json 만 보강 (Phase 1.1 만 / business-rules.json 본문 보강은 별 cycle)
+- C. business-rules.json 12 BR 본문 보강 만 (Phase 1.2 만 / domain.json 별 cycle)
+
+### 결단 2. F-RBAC-BYPASS-001 보안 invariant 명세 본격 scope (axis 2)
+
+- **A. 4 sub-phase 통합 본격** (추천 / Phase 2.1 + 2.2 + 2.3 + 2.4 / finding 본문 + characterization + sequence + verifiable 강화)
+- B. finding 본문만 (Phase 2.1 만 / 나머지 별 cycle)
+- C. finding 본문 + characterization (Phase 2.1 + 2.2 / sequence + verifiable 별 cycle)
+
+### 결단 3. axis 3 (paradigm drift #2 BR naming) 분리 의제 확정
+
+- **A. carry 보류 (추천 / LL-codegraph-01 정합)** — `C-schema-regex-paradigm-completion` 등록 / Type 2 외부 사용자 자연 trigger 의무
+- B. ★ ★ 본 plan 안 본격 시행 — 56 BR rename + 다른 산출물 cross-link 갱신 (★ ★ ★ self-referential drift 위험 / 본 plan §1.4 정합 위반 risk)
+
+### 결단 4. F-DOMAIN-PURPOSE-001 신규 finding 등록 자격
+
+- **A. Phase 1.1 결과 도출 시 등록** (추천 / 결과 사실 의존 / 조건부)
+- B. 등록 ❌ (cluster 1 재작성 자체로 finding 충분 / 추가 finding 등록 ❌)
+
+### 결단 5. 본 plan 종결 후 chain 1 재진입 결단
+
+- **A. 본 plan 종결 후 사용자 검토 후 결단** (추천 / 본 plan §4 Phase 4 gate cluster 5 본격)
+- B. 본 plan 안 통합 시행 (chain 1 재진입 + 재검증 + 새 gate #1 cluster) — scope 부풀림 risk
+- C. 본 session 종결 (analysis 보강 만 / chain 1 재진입 = 별 session)
+
+---
+
+## 6. 위험 / 제약
+
+| ID | 위험 | severity | 완화 |
+|---|---|---|---|
+| R-001 | self-referential drift (LL-codegraph-01 위반) — axis 3 본격 trigger 시 methodology body sweep | ★ ★ critical | 결단 3.A 본격 / axis 3 = carry 보류 / 본 plan §1.4 정합 |
+| R-002 | analysis baseline 갱신 시 chain 1 frozen discovery-spec 와 forward 자격 mismatch | medium | Phase 3 validator 2종 재실행 + chain 1 재진입 자격 사전 검증 |
+| R-003 | F-RBAC-BYPASS-001 본격 발동 path 실측 부재 = chain 2 AC 명세 시 over-engineer 위험 | medium | severity = medium 유지 + recommendation = "chain 2 AC 명세 의무" 한정 (★ legacy 보존 paradigm 정합) |
+| R-004 | business-rules.json 12 BR 본문 보강 시 다른 산출물 cross-link 영향 | low | additive only (기존 필드 무변경 + intent + rationale + stakeholders 신규 필드 추가) |
+| R-005 | F-DOMAIN-PURPOSE-001 신규 finding 등록 자격 = Phase 1.1 결과 의존 (조건부) | low | 결단 4.A 정합 / 결과 사실 따른 등록 |
+| R-006 | session 안 4 release cap (LL-v930-02) — 본 plan = doc trail 만 / release ❌ | low | 본 plan 시행 결과 = release ❌ (외부 산출물만 / 본 레포 commit ❌) |
+| R-007 | F-021 finding 임계 (legacy paradigm 30~60) — 본 plan 시행 시 finding 1~2 추가 가능 | low | medium 14 → 15~17 (임계 안 / 정합) |
+
+---
+
+## 7. 검증 (4원칙 STOP-3 정합)
+
+### 7.1 외부 산출물 검증
+
+- F-RBAC-BYPASS-001.md 본격 신설 ✅ (Phase 2.1)
+- characterization-spec.json + sequence-diagrams 보강 ✅ (Phase 2.2 + 2.3)
+- domain.json + business-rules.json additive 보강 ✅ (Phase 1.1 + 1.2)
+- chain-intervention-log.jsonl append ✅
+- 사내 source 사본 0건 verify ✅
+
+### 7.2 검증 도구
+
+- schema-validator: discovery-spec.json (frozen / 무변경) + business-rules.json (additive / 정합 의무).
+- discovery-extraction-validator: chain 1 forward 자격 재검증.
+
+### 7.3 본 레포 axis (영향 0)
+
+- workspace test 영향 0 (본 plan = 외부 작업)
+- release-readiness 22/22 보존 ✅
+- skill-citation 0 stale ✅
+- version 3-way 11.4.0 유지 (release ❌)
+
+---
+
+## 8. Lessons Learned (★ 4원칙 4단계 / 시행 후 채움 / placeholder)
+
+> **placeholder** — 본 plan 시행 후 자산화.
+
+### 8.1 후보 LL (예상 / 시행 전 sketch)
+
+- LL-poc-17-11 (chain harness round-trip paradigm 첫 사내 full cycle 본격 입증 — chain 1 → revisit:analysis → analysis 보강 → chain 1 재진입 자격 검증)
+- LL-poc-17-12 (axis 분리 결단 paradigm 본격 입증 — methodology body 영역 axis 3 분리 의무 / self-referential drift 회피)
+- LL-poc-17-13 (F-RBAC-BYPASS-001 보안 invariant chain 1 단에서 의제화 paradigm — chain 2 AC 명세 의무 forward link)
+- LL-poc-17-14 (business_intent 재작성 paradigm — domain.json + business-rules.json additive 보강 path / cluster 1 사용자 결단 axis 본격)
+
+---
+
+## 9. 참고 / 인용
+
+- DEC-2026-05-06-round-trip-부분-허용 — chain harness gate 안 정식 허용
+- LL-codegraph-01 — self-referential drift 회피 (★ ★ ★ axis 3 분리 의무)
+- LL-codegraph-07 — 사내 source 외부 위치 paradigm
+- 직전 plan ladder = `.claude/plans/plan-poc17-chain1-discovery-car-list.md` (gate #1 = stop + revisit:analysis trigger)
+- 직전 chain 1 산출물 = `~/.../poc-17-ifrs-car-migration/.aimd/output/discovery-spec.{json,md}` (frozen)
+- DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration — sub-rule §X-H v1.2.0
+- methodology-spec/baseline-delta-operating-model.md — analysis delta 갱신 paradigm
+- memory `feedback_dual_goal_migration_plus_plugin.md` — 듀얼 목표
+
+---
+
+## 10. 4원칙 ladder 다음 단계
+
+- **1원칙 종결** ✅ (본 plan.md 작성 + axis 분리 본격 결단 / scope-in 2 axis + scope-out 1 axis)
+- **2원칙 research** — 가벼운 sub-agent (Case 생략 + 시간 cap):
+  - sequence-diagrams + characterization-spec schema 정합 확인
+  - F-RBAC-BYPASS-001 본격 본문 구조 (finding-system.md 정합)
+  - additive field 갱신 paradigm verify (business-rules.json + domain.json schema 안 additionalProperties:true 정합)
+- **3원칙 사용자 승인** — 본 plan §5 결단 5 묶음 보고 (★ 결단 3 = axis 3 분리 본격 의제 / 자기-confirmation 의무)
+- **4원칙 실패 시 revert** — 본 plan §6 R-001~007 정합 / 어느 axis 라도 self-referential drift 발생 시 revert + LL 기록 + 1원칙 재시작

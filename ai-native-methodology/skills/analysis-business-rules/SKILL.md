@@ -40,6 +40,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    ```
    - BR item = `required:["id"]` + (`name`|`title`) + (GWT `given`/`when`/`then` | `natural_language`) 2종 표현 (v6.0.0 / $defs.businessRule).
    - FE form validation 은 `business_rules[]` 안 `auto_extracted=true` BR + top-level `auto_extracted_br_refs` cross-link (★ 별도 top-level 키 아님).
+   - ★ ★ ★ **BR id 형식 의무** (★ ★ AI 본격 instruction / 자유 paradigm ❌): `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 정합 의무 = **`BR-<DOMAIN>-<SUBJECT>-<NNN>`** form (예: `BR-USER-VERIFY-001` / `BR-RBAC-PRIORITY-001` / `BR-CARLIST-PAGINATION-001`).
+     - prefix `BR-<DOMAIN>-<SUBJECT>` = 의미 본격 (LLM 컨텍스트 read 시 의미 직관)
+     - numeric suffix `-NNN` = 단순 식별자 / machine 매칭 (★ chain-coverage-validator + schema-validator strict regex 매칭 / typo silent fail 차단)
+     - **★ ★ meaningful name 만 산출 ❌** (예: `BR-RBAC-PRIORITY` 단독 = 본 instruction 본격 위반 / chain 진입 시 schema-validator RED → patch fix 의무 발생). 본 instruction 본격 정합 시 patch 의무 ❌ / chain 진입 시 GREEN 직진.
+     - **scope 안 다중 BR 산출 시점 = numeric suffix 단순 순차 부여** (001, 002, ...). suffix 자체 의미 결정 ❌ / 의미는 prefix 부분 본격 담당.
+     - **★ ★ ★ paradigm 본격 정합 근거** = poc-17 chain 1 discovery 첫 사내 live 시점 표면화 (★ schema strict regex vs analysis-from-* meaningful name 본격 mismatch → patch fix 임시 우회). 본 instruction 본격 추가 = drift 영구 차단.
 4. **decision-table-validator 자동 호출** — DMN 5-check (duplicate / conflict / gap / overlap / type) 정합 검증
 5. **finding 등재** — 검출된 conflict / gap / overlap → `log-finding`
 
