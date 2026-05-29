@@ -3,11 +3,12 @@
 > ★ ★ ★ v2.3.0 Phase 2 신설 (v1.0) → ★ ★ ★ ★ v1.1 갱신 (2026-05-12 / DEC-2026-05-12-sub-rule-v1.1-갱신) — PoC #11 (billing / 작은 단일책임) corroboration #3 추가 + KL-SATD 인용 정정 + §X automation ceiling R1' 신설.
 > ★ ★ **v1.1.1 PATCH** (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화) — Agent 1 F-015 cross-validation 인용 정정 3건 (Zhang → **Wang et al.** / LongCodeBench **2025** (2026 ❌) / "Not All Code Is Equal" 검증 carry 분리) + Agent 2 외부 권위 보강 (AWS SCT + Amazon Q + ThoughtWorks isomorphic corroboration 3건) + §X-C-2 신설.
 > ★ ★ **v1.1.2 PATCH** (2026-05-13 session 2차 / DEC-2026-05-13-not-all-code-인용-복원) — ★ Agent 1 finding "★ arxiv 2601.21894 검증 실패 가능성" ★ ★ **정정** (★ 메인 WebFetch + WebSearch 직접 검증 결과 = arxiv ID 정확 / Twist et al. 2026 / 2026-01-29 submission). ★ "Not All Code Is Equal" 인용 ★ **복원** + 저자명 정확 명시. C-not-all-code-검증 carry ✅ resolved. ★ ★ critical lesson F-015 sub-agent 한계 (★ WebFetch 직접 못 한 가능성 / fallback 메인 cross-check 의무).
+> ★ ★ ★ **v1.2.0 MINOR** (2026-05-29 / DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration) — ★ poc-17 Phase 1 analysis baseline 12 phase 전수 종결 시점 본격 입증 사실 누적. **§X-H sub-axis (R1'-c DB axis) 첫 corroboration 본격** (poc-17 = 4번째 사내 PoC 사실 — PoC #06+#07+#11+#17 / scale-cross 4 spectrum). **§X-H-11 신축 AP 본격 등재** (AP-LEGACY-IBATIS2-DB-001~011 / N+1 / cross-DB / SP-EXEC / raw-JSP / ★ PII-하드코딩 / dead-SQL / magic / insert-as-update / debug-stdout / parallel-array / N1-cross-DB). **sub-axis 자동화율 81.25% 본격 측정** (★ AP detection sub-axis만 한정 / R1' axis ceiling 53~55% 와 별 metric). additive only / breaking 0 / sub-rule §2 core 5 AP 변경 ❌.
 > **trigger**: Spring 4.x + iBATIS 2.x stack 분석 시 본 5종 우선 후보 AP.
 > **자격 (v1.1)**: ≥ 3 사내 PoC isomorphic (PoC #06 단일책임 + PoC #07 다중책임 + ★ PoC #11 작은 단일책임 spectrum) — ★ scale-cross 3 spectrum 충족 (v1.0 ≥ 2 PoC → v1.1 ≥ 3 사내 PoC 강화).
 > **schema 참조**: `schemas/antipatterns.schema.json` AP-* 정합.
 > **ADR**: ADR-CHAIN-010 (Spring 4.1 + iBATIS 2 spectrum sub-rule 정식 자산화 / v1.0 origin).
-> **version**: v1.1.2 (PATCH / Not All Code 인용 복원 + Agent 1 finding 정정 / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌ / 본체 v2.3.4 PATCH 정합).
+> **version**: v1.2.0 (MINOR / 2026-05-29 / poc-17 §X-H sub-axis 첫 corroboration + §X-H-11 신축 AP 본격 등재 / additive only / breaking 0 / §2 core 5 AP 변경 ❌ / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌).
 
 ---
 
@@ -252,9 +253,9 @@
 - ★ **C-automation-ceiling-paradigm** = ★ 본 §X 등재로 **resolved**
 - **C-poc-11-0-satd-해석-정정** (★ §6 carry 잔존 / Day 3.5 PoC #11 종결 시 일괄 처리)
 
-### X-H. ★ ★ ★ R1' sub-axis 본격 분리 (★ poc-17 dogfooding 신설 — 2026-05-28 / DEC-2026-05-28-db-assets-always-on)
+### X-H. ★ ★ ★ R1' sub-axis 본격 분리 (★ poc-17 dogfooding 신설 — 2026-05-28 / ★ ★ poc-17 Phase 1 첫 live 본격 입증 — 2026-05-29 / DEC-2026-05-28-db-assets-always-on)
 
-R1' axis (Spring 4.1 + iBATIS 2 ~53~55%) 는 **단일 paradigm-종속 ceiling** 이지만, 비즈니스 로직의 **3 sub-layer 분포** 가 별도 axis 로 분리되어야 하는 사실이 poc-17 dogfooding 진입 시 본격 노출:
+R1' axis (Spring 4.1 + iBATIS 2 ~53~55%) 는 **단일 paradigm-종속 ceiling** 이지만, 비즈니스 로직의 **3 sub-layer 분포** 가 별도 axis 로 분리되어야 하는 사실이 poc-17 dogfooding 진입 시 본격 노출 / **2026-05-29 Phase 1 analysis baseline 12 phase 전수 산출 종결 시점 본격 입증**:
 
 #### sub-axis 매트릭스
 
@@ -270,24 +271,70 @@ R1' axis (Spring 4.1 + iBATIS 2 ~53~55%) 는 **단일 paradigm-종속 ceiling** 
 2. **(c) layer 추가 시 §3-A axis 분모 변동** — DB 자산 always-on 정책 (ADR-CHAIN-014) 적용 후 baseline 재측정 의무
 3. **paradigm-cross corroboration ≥ 3 (§8.1 strict)** — poc-17 + 다른 도메인 확대 측정 시 sub-axis 정량 자산화 (carry)
 
-#### poc-17 ifrs/car 첫 측정 (carry — Phase 1 완료 후)
+#### poc-17 ifrs/car 첫 측정 (★ ★ ★ 2026-05-29 Phase 1 본격 종결 / 실측 사실 본격 누적)
 
-| 자산 | 갯수 | sub-axis 기여 |
+##### (1) 자산 실측 (Phase 1 종결)
+
+| 자산 | 실측 갯수 | sub-axis 기여 |
 |---|---|---|
-| Java | 8 파일 / 1,750 LOC | (a) 측정 baseline |
-| iBATIS sqlMap | carMgt 21 + carCost 14 = 35 SQL | (b) 측정 — 수동 정리 |
-| DB Tables | TB_CAR_* 5 | (c) — schema axis |
-| DB Functions | fn_Get_CarUserListView* 2 | (c) — 정적 분석 ✅ |
+| Java | 8 파일 / **1,750 LOC** (Controllers 792 + Services interface 175 + Impls 471 + DAOs 312) | (a) 측정 baseline |
+| iBATIS sqlMap | carMgt 22 + carCost 13 = **35 SQL id** (★ PROGRESS.md 추정 정합) + 1 procedure tag (★ 외부 SP γ EXEC) | (b) 측정 — 수동 정리 |
+| JSP (★ Scenario C 본격 발견) | 14 파일 / **3,980 LOC** | (★ d) — view layer / Scenario C 활성 / template-analyze phase |
+| DB Tables | **6** (TB_CAR + TB_CAR_USER_TERM + TB_CAR_DRIVE + TB_CAR_COST + TB_CAR_COST_NOLOG + TB_CAR_COST_SLIP / 163 LOC / ★ PROGRESS.md 추정 5건 정정 6건) | (c) — schema axis |
+| DB Functions | **2** (fn_Get_CarUserListView{,_2} / 127 LOC) | (c) — 정적 분석 ✅ |
 | DB SP (자체) | 0 | (c) — car 비종속 |
-| DB SP (외부 SGERP 호출) | 1 | (c) — γ 분류 (SP 전환 정책 ADR-CHAIN-015) |
+| DB SP (외부 SGERP 호출) | **1** (SGERP.dbo.SG_SACSlipRowCarManagementIFQuery / `<procedure>` tag) | (c) — γ 분류 (SP 전환 정책 ADR-CHAIN-015) |
+| ★ ★ Cross-DB 자산 | **18** (FIM 3 + MDI 2 + SGERP 10 + e_hr 1 + IFRS 사내 fn 2) | ★ ★ ★ K 정책 first live 본격 가치 입증 |
 
-→ poc-17 = **(c) sub-axis 본격 측정 첫 사례**. 다른 도메인 (capital / payroll / bspl) 확대 시 (c) sub-axis 비중 ↑ 예상 (capital 71 SQL + payroll 다수 SP) — paradigm-cross corroboration 본격 가치.
+##### (2) sub-axis 자동화율 본격 측정 (★ AP detection sub-axis / 별 metric)
 
-#### sub-axis 분리 carry
+★ 본 측정 = §3-A 전체 자동화율 (R1' axis ceiling 53~55%) 와는 **별 metric**. AP detection sub-axis 만 한정 측정.
 
-- C-sub-axis-3-poc-corroboration (★ 신규 / poc-17 + 다른 도메인 ≥ 2 추가 측정 의무 — §8.1 strict)
-- C-c-layer-baseline-재측정 (★ DB 자산 always-on 정책 적용 후 (a)+(b)+(c) 통합 baseline 재측정)
-- C-codegraph-c-layer-support (★ external — codegraph v0.x 의 SP/Function AST parse 지원 carry / scope-out 가능)
+| sub-axis 영역 | 측정값 | grounding |
+|---|---|---|
+| ★ AP detection sub-axis (16 AP / fully automated 11 + partial 2 + manual 3) | **81.25%** | core 5 (Map / NOLOCK / Anemic / Shared SQL / SATD) + §X-H 신축 11 (아래 §X-H-11) 통합 |
+| sub-axis 자동화율 분포 | fully automated = 11 / partial = 2 / manual = 3 | grep + PMD 7.24.0 실 실행 + manual review 분리 |
+| 외부 도구 실 실행 | PMD 7.24.0 (JSP) — 28 violations / 14 파일 중 10 ParseException (★ PMD 7.x JSP grammar 한계) | F-PMD-PARSE-001 |
+| simulation 적용 | **0건** (LLM persona ❌ / 진짜 도구 실행 + LLM grounded review 분리 명시) | feedback_no_static_tool_simulation 정합 |
+
+→ ★ ★ ★ sub-axis 81.25% = **R1' axis ceiling 53~55% 보다 sub-axis 본격 上** (★ 별 metric / sub-axis 만 / 외부 인용 시 axis 혼동 회피 의무). 본 사실 = ★ poc-17 = sub-axis 정량 자산화 **첫 corroboration**.
+
+##### (3) ★ ★ ★ §X-H-11 신축 AP 본격 등재 (poc-17 첫 live)
+
+R1' core 5 AP (§2) 외에 sub-axis (R1'-c DB layer + cross-cutting) 영역의 신축 AP 11종:
+
+| ID | 제목 | severity | 자동화 | poc-17 사실 |
+|---|---|---|---|---|
+| AP-LEGACY-IBATIS2-DB-001 | N+1 / N+5 subquery (cross-DB row by row) | medium | partial (grep) | 2건 (selectCarList N+1 / selectCarCostingList N+5 STUFF) |
+| AP-LEGACY-IBATIS2-DB-002 | cross-DB 직접 참조 (schema.table cross-system) | high | fully (grep) | 18 자산 (FIM/MDI/SGERP/e_hr) |
+| AP-LEGACY-IBATIS2-DB-003 | 외부 stored procedure EXEC (iBATIS `<procedure>`) | medium | fully (grep) | 1건 (SGERP SP γ) |
+| AP-LEGACY-IBATIS2-DB-004 | JSP unsanitized expression (XSS marker) | high | fully (PMD) | 19건 (PMD NoUnsanitizedJSPExpression) |
+| AP-LEGACY-IBATIS2-DB-005 | ★ ★ PII (개인정보) 하드코딩 | **critical** | **manual only (LLM grounded review)** | 5명 실명 + 마스킹 패턴 운영 코드 잔존 (F-PII-HARDCODE-001) |
+| AP-LEGACY-IBATIS2-DB-006 | 주석 처리된 SQL 본문 잔존 (dead code) | low | fully (grep) | ≥4 (saveCarCost MERGE 47줄 등) |
+| AP-LEGACY-IBATIS2-DB-007 | Magic constants (하드코딩 코드/숫자/문자열) | medium | manual assisted | 11종 ('IF000000096' / PS10 / E10 / 99999999 / state '2' / 비서 예외 3종 등) |
+| AP-LEGACY-IBATIS2-DB-008 | iBATIS DAO insert() 호출이 실제는 sqlMap `<update>` | low | manual | 1건 (CarMgtDAO.updateCarDrive) |
+| AP-LEGACY-IBATIS2-DB-009 | System.out.println debug 로그 운영 잔존 | medium | fully (grep) | 1건 (CarCostController.saveConfirmList) |
+| AP-LEGACY-IBATIS2-DB-010 | Parallel array iterate (index 동기화 / DTO 부재) | medium | manual | 2건 (saveCarUserTerm 5 array + saveCarDriveRow 12 array) |
+| AP-LEGACY-IBATIS2-DB-011 | N+1 cross-DB subquery (선행 N+1 정합) | medium | fully (grep) | 매 row com_nm/dept_nm cross-DB subquery |
+
+★ ★ ★ **AP-LEGACY-IBATIS2-DB-005 (PII 하드코딩) = LLM grounded review only** — 외부 자동 도구 부재. sub-rule §X-H 의 본격 자산 + memory `feedback_no_static_tool_simulation` 정합 (manual review 도 인정 paradigm).
+
+##### (4) R1'-c (DB axis) 첫 corroboration 사실
+
+| sub-layer | poc-17 측정 사실 |
+|---|---|
+| (a) Java | 1,750 LOC / 8 파일 / codegraph Java ⭐⭐⭐ 정합 (PoC #15 사실) |
+| (b) iBATIS sqlMap | 35 SQL id / 1 procedure tag / codegraph 미지원 = sqlMap layer 정적 분석 ❌ (PoC #15 사실 정합) |
+| (c) DB SP/Function | ★ **F-FN-EMPTY-001** (fn_Get_CarUserListView.sql 빈 파일 / IFRS_split export 누락) + **F-MISSING-FN-001** (ifrs.dbo.FN_SPLIT 사내 fn 사용 / export 부재 = K 정책 위반) |
+| (★ d) JSP (Scenario C) | 14 파일 / 3,980 LOC / PMD 7.x grammar 14중 10 ParseException = 71% (★ 도구 한계 보강 carry) |
+
+##### (5) sub-axis 분리 carry (갱신)
+
+- ✅ **C-c-layer-baseline-측정** (★ poc-17 Phase 1 종결 시점 본격 측정 완료 — 18 cross-DB 자산 + 35 SQL + DB 자산 8 사실)
+- ⏳ **C-sub-axis-3-poc-corroboration** (★ poc-17 첫 sub-axis 측정 — ≥ 2 추가 도메인 측정 의무 / 자격 1/3)
+- ⏳ **C-codegraph-c-layer-support** (★ external — codegraph v0.9.6 = iBATIS 2 미지원 + SP/Function AST parse 미지원 / scope-out 결정 = DEC-2026-05-27 / 본 PoC 본격 정합)
+- ⏳ **C-jsp-parser-augment** (★ poc-17 신규 — PMD 7.x JSP grammar 71% parse fail → SonarQube/jsp-lint 보강 의무)
+- ⏳ **C-scenario-c-jsp-paradigm** (★ poc-17 첫 사내 Scenario C 적용 사례 본격 자산화 / 다른 사내 도메인 JSP 도메인 첫 입증)
 
 ---
 

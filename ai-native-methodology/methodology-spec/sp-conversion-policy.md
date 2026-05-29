@@ -177,16 +177,34 @@ SP 정적 분석 = **R1' sub-axis 본격 입증** (`sub-rules/spring41-ibatis2-i
 
 → analysis Phase 4 business-logic 의 자동화 가능성 ↑ (SP body 추출). §3-A axis 의 ceiling 을 살짝 높일 수 있다 (carry 측정 자산).
 
-## 10. 사례 (poc-17 ifrs/car / 첫 적용)
+## 10. 사례 (poc-17 ifrs/car / 첫 적용 + Phase 1 본격 입증)
+
+### 10.1 SP 분류 사실 (2026-05-28 plan + 2026-05-29 Phase 1 종결 본격 실측)
 
 | SP source | 갯수 | 분류 결단 |
 |---|---|---|
 | IFRS_split/04_StoredProcedures/ 자체 SP (car 관련 grep) | **0** | 적용 ❌ — car 비종속 |
-| 외부 SP 호출 (`carCost.xml:328`) | **1**: `SGERP.dbo.SG_SACSlipRowCarManagementIFQuery` | **(γ) 외부 시스템 SP — 보존 + thin wrapper** / 화면 4 차량비용산출 |
+| 외부 SP 호출 (`carCost.xml` `<procedure>` tag) | **1**: `SGERP.dbo.SG_SACSlipRowCarManagementIFQuery` | **(γ) 외부 시스템 SP — 보존 + thin wrapper** / 화면 4 차량비용산출 |
+| ★ 사내 utility function (★ Phase 1 추가 발견) | **2** | `ifrs.dbo.FN_SPLIT` (comma 분할 / insertCarCostSlip) + `dbo.fn_lpad` (zero-pad / updateCarNo CTE) ★ F-MISSING-FN-001 (IFRS_split/03_Functions/ export 부재 = K 정책 위반) |
 
-→ car 도메인 SP 전환 부담 사실상 **0 (보존 1만)**. 다른 도메인 (capital / payroll / bspl) 확대 시 (α/β/γ/δ) 본격 적용 측정 가치.
+### 10.2 L 정책 본격 적용 사실 (★ 첫 live)
 
-→ poc-17 가 **첫 live 적용 사례**. 다른 도메인 확대 시 (β) 대용량 batch / (δ) DB-specific 사례 노출 예상.
+- **γ (외부 시스템 SP)** 1건 본격 입증 = `<procedure>` tag iBATIS 2 + parameterMap (4 IN parameter) + magic 위치 2,6,7 하드 (F-SP-PARAM-MAGIC-001)
+- **EXEC paradigm 본격 발견**: `EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery ?, 0, ?, ?, ?, '', ''`
+- 마이그레이션 결단 (chain 3 plan stage / sp-conversion-policy.md §6 정합):
+  - 옵션 A: DB link / linked server (SQL 직접 EXEC)
+  - 옵션 B: API wrapping (SGERP API 신설)
+  - 옵션 C: SP 호출 service layer wrapper (DAO 단)
+
+### 10.3 sub-rule §X-H R1'-c (DB axis) 정합 사실
+
+- (c) sub-layer 측정 본격: SP 1건 + Function 2건 + 사내 utility 2건 = **★ AST parse 가능 layer 5종 본격 발견**
+- (a) Java + (b) sqlMap 만으로는 노출 ❌ (사내 utility function 2건 = sqlMap 안 EXEC string literal만 / 의미 추론 불가)
+- **K + L 정책 통합 적용 시점 = sub-axis (R1'-c) 본격 측정 cycle**
+
+→ poc-17 가 **첫 live 적용 사례**. 다른 도메인 (capital / payroll / bspl) 확대 시 (α/β/δ) 본격 적용 측정 가치 예상.
+
+→ ★ ★ ★ **car 도메인 SP 전환 부담 사실상 0 (γ 1건 자명) BUT 사내 utility function 2건 추가 발견 = K 정책 본격 가치 본격 입증**.
 
 ## 11. 인용
 

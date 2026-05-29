@@ -214,3 +214,116 @@
 - 목표 2 (본질 / 플러그인 완성도): **★ ★ ★ schema 2 + validator 1 + docs 2 + finding 1 + version bump = 본 plugin SSOT 본격 paradigm 통합 완결**
 
 → ★ ★ ★ 본 세션 = **플러그인 완성도 강화 본격 cascade 완결** (직전 세션 paradigm 신설 → 본 세션 본체 cascade). v11.3.0 MINOR release-ready.
+
+---
+
+### 2026-05-29 — Phase 1 analysis baseline 본격 진입 + 12 phase 전수 (★ ★ ★ canonical global 완성 / dogfooding 본격 measurement)
+
+**상태**: 완료 (analysis stage 12 phase 전수 산출 / 본 PoC analysis baseline 종결)
+
+**작업 paradigm**:
+- chain-driver state.json = analysis/input.0 진입점 (직전 세션 carry)
+- 4 phase Plan agent + 사용자 결단 3종 + 추가 결단 1종:
+  1. analysis phase 범위 = **전체 11 phase** (사용자 결단)
+  2. scope 단위 = **전체 car 도메인 (6 화면) baseline** (사용자 결단)
+  3. spring41-ibatis2 sub-rule **자동 적용** (사용자 결단)
+  4. Scenario C 발견 → **12 phase 확장** (template-analyze 활성 / 사용자 결단)
+- 본격 시행 paradigm: 사내 source 격리 (외부 절대경로 read-only / 본 레포 commit ❌ / LL-codegraph-07 정합)
+
+**산출 12 phase 전수** (외부 `.aimd/output/`):
+1. **input** — `_manifest.yml` + `input-summary.json` (K 정책 본격 적용)
+2. **discovery** — `inventory.json` + `tree.md` + `stack-detection.md` + `stats.json`
+3. **template-analyze** (★ Scenario C 활성) — `html-template-extract.json` + PMD 7.24.0 실측 raw
+4. **db-schema** (K 정책 first live) — `schema.json` + `erd.mermaid` + `db-schema-validation-report.md`
+5. **architecture** — `architecture.json` + `architecture.mermaid` (8 layer + cross-DB)
+6. **business-logic** — `domain.json` + `domain.mermaid` + `domain.md` + `business-rules.json` + `rules.md` + `antipatterns-partial.json`
+7. **formal-spec** — `decision-tables/rbac-3-branch.md` + `state-machines/cost-lifecycle.mermaid` + `sequence-diagrams/cost-calculation-with-sp-gamma.mermaid`
+8. **characterization** — `characterization-spec.json` (intent vs bug 20 항목)
+9. **sql-inventory** — `sql-inventory.json` (35 SQL id × table × screen 매트릭스)
+10. **api** — `openapi.yaml` (28 endpoint / x-business-rules BR-* link)
+11. **ui** — `ui-spec.md` (Scenario C scope-out 명시)
+12. **quality** — `antipatterns.json` (16 AP 통합 + 5 Composite View) + `avoid-list.md` + `migration-cautions.md`
+13. **finding 집계** — `findings/F-PII-HARDCODE-001.md` + `findings/findings-index.md`
+
+**M.2 측정 axis 본격 진입 (10종 중 9종)**:
+| Axis | 측정 사실 |
+|---|---|
+| R1' §3-A automation | sub-axis (AP detection) 자동화율 **81.25%** (16 AP 중 fully automated 11 + partial 2 + manual 3) ★ R1' axis ceiling 53~55% 보다 sub-axis 本격 上 (별 metric) |
+| R1' sub-axis (Java △ / sqlMap ❌ / SP·Function ✅) | ★ 본 PoC 첫 live 입증 — Java codegraph ⭐⭐⭐ / sqlMap PoC #15 한계 정합 / SP·Function 사실 1건 (γ 보존) |
+| K (DB always-on) | ★ ★ **18 cross-DB 자산 발견** (FIM 3 + MDI 2 + SGERP 10 + e_hr 1 + IFRS 사내 fn 2) — Java/sqlMap layer 만으로 노출 ❌ / **K 정책 본격 가치 본격 입증** |
+| L (SP α/β/γ/δ) | 외부 SGERP SP 1건 = γ 분류 (보존 + thin wrapper) / 자체 SP 0건 / 사내 utility function 2건 (FN_SPLIT + fn_lpad) |
+| baseline-delta 운영 | canonical global `.aimd/output/` 첫 본격 적용 + scope `discovery/spec/plan/test/impl/` 디렉토리 ready |
+| chain harness 5 gate | analysis stage chain 0 / 12 phase 전수 통과 |
+| 사전 PoC reuse | poc-15 (codegraph 한계 사실) + poc-16 (cross-reference) 본격 활용 |
+| 사내 source 격리 | LL-codegraph-07 첫 live — 위반 0건 confirm |
+| R20-prime "Epic = FE 화면" | 6 Epic (6 화면) baseline 완성 / chain 1 discovery 진입 ready |
+| numeric equivalence oracle | 사용자 도메인 oracle (소수점 2자리 paradigm) 본격 정합 입증 — F-NUMERIC-001/002 해소 |
+
+**car 도메인 실측 (마스킹된 일반 사실)**:
+- Java 8 / 1,750 LOC + sqlMap 2 / 831 LOC / 35 SQL id + JSP 14 / 3,980 LOC
+- DB Tables 6 + Functions 2 (1 빈 파일) + 외부 SP 1 (γ)
+- Stack 정정 사실: Spring 4.1.2.RELEASE (NOT 4.1.7) / Java 1.8 (NOT 1.7) / Egov RTE 3.6.0 — F-STACK-VER-001
+- sqlMap id 35 사실 (PROGRESS.md 추정 정합) — F-SQLID-COUNT-001 해소
+- DB Tables 6 사실 (PROGRESS.md 추정 5 → 정정) — F-DBTBL-COUNT-001 해소
+
+**Composite View 5 적용 (memory `feedback_composite_view_pattern` 본격 활용 / PoC #02 1건 → 본 PoC 5건 본격 확장)**:
+- CV-1 RBAC 3 분기 paradigm
+- CV-2 비용 산출 파이프라인 (★ critical PII + 외부 SP γ)
+- CV-3 차량 cascade paradigm
+- CV-4 Cross-DB 18 자산 의존성
+- CV-5 Legacy 잔존 하드코드 군집
+
+**Finding 누적 ★ ★ ★ 43건 (F-021 임계 15+ 본격 초과)**:
+- **critical 1** — F-PII-HARDCODE-001 (★ 즉시 정정 카테고리)
+- **high 6** — F-CROSS-DB / F-RBAC-EXCEPTION / F-XSS-MARKER / F-SCRIPTLET / F-ERR-SWALLOW / F-RBAC-FN-3-BRANCH (preserve)
+- **medium 14** / **low 16** / **observation 6** (3 해소)
+- **F-021 해석**: legacy 사내 source analysis baseline = 일반 PoC 보다 finding 본격 누적 / 마이그레이션 결단 항목 다수 / 명세 부실 ❌
+
+**carry / finding ★ ★ ★ paradigm 강화 carry 20+ 누적**:
+- **sub-rule 갱신**:
+  - C-sub-rule-db-axis: `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X-H 에 R1'-c DB axis 본격 등재 (본 PoC 첫 corroboration)
+  - C-sub-rule-pii-detection: §X-H 에 AP-PII-HARDCODE 본격 등재 (LLM grounded review only 명시)
+  - C-sub-rule-extended-11-ap: §X-H 11 신축 AP 본격 등재 (N+1 / cross-DB / SP-EXEC / raw-jsp / pii / dead-sql / magic / insert-as-update / debug-stdout / parallel-array / N1-cross-db)
+- **methodology body 확장**:
+  - C-r1-prime-corroboration-4: R1' axis ceiling 사실 1건 누적 (PoC #06+#07+#11+#17)
+  - C-composite-view-5-cases: memory `feedback_composite_view_pattern` 갱신 (PoC #02 1건 → 본 PoC 5건)
+  - C-scenario-c-jsp-paradigm: Scenario C (JSP) 본격 적용 사례 자산화
+- **본격 자산화 (별 commit cycle)**:
+  - F-CHA-poc17-001 → 이미 v11.3.0 등재 ✅
+  - F-021 임계 초과 사실 → memory `feedback_finding_threshold` 갱신 (legacy paradigm 별 케이스)
+  - K/L 정책 first live 사실 → `methodology-spec/db-assets-always-on.md` §사례 + `methodology-spec/sp-conversion-policy.md` §사례
+
+**결정**:
+- ★ ★ ★ **본 세션 = 본 PoC 의 첫 analysis baseline 본격 완성** (12 phase 전수 / canonical global / 사내 source 격리 paradigm 첫 live 입증)
+- ★ ★ **듀얼 목표 본 세션 기여도**:
+  - 목표 1 (수단 / 마이그레이션): ★ ★ ★ **baseline 본격 완성 — chain 1 discovery 진입 ready**
+  - 목표 2 (본질 / 플러그인 완성도): ★ ★ ★ **K + L 정책 첫 live 입증 + sub-rule §X-H 첫 corroboration + Composite View 5 + Scenario C 첫 적용**
+- ★ no-simulation 정책 본격 정합: PMD 7.24.0 실 실행 + LLM grounded review 분리 명시 / 시뮬레이션 0건 / -5%p 패널티 ❌
+
+**다음** (carry queue):
+- 사용자 결단 — F-PII-HARDCODE-001 즉시 정정 (즉시 카테고리 / chain 결단 대기 ❌)
+- chain 1 discovery 진입 결단 — 6 scope 중 car-list pilot 선택
+- 잔여 carry 본 레포 본격 자산화 cycle:
+  - sub-rule §X-H 본격 cascade (C-sub-rule-db-axis + C-sub-rule-pii-detection + C-sub-rule-extended-11-ap)
+  - `methodology-spec/db-assets-always-on.md` §사례 + `sp-conversion-policy.md` §사례 갱신
+  - memory 2 갱신 (composite-view + finding-threshold)
+  - v11.4.0 또는 v12.0 release ceremony 결단
+
+---
+
+## ★ ★ ★ 본 세션 종결 보고 (2026-05-29 / Phase 1 analysis baseline 본격 완성)
+
+**듀얼 목표 본 세션 기여도**:
+- 목표 1 (수단 / 마이그레이션): **★ ★ ★ canonical global baseline 12 phase 전수 산출** — 25+ 외부 산출물 / chain 1 discovery 진입 ready
+- 목표 2 (본질 / 플러그인 완성도): **★ ★ ★ paradigm 본격 입증 cycle**:
+  - K 정책 first live (18 cross-DB 자산)
+  - L 정책 first live (γ 1건)
+  - R1' axis 4번째 corroboration
+  - sub-rule §X-H 첫 live (16 AP / 81.25% sub-axis 자동화)
+  - Composite View 패턴 5건 사내 적용
+  - Scenario C 첫 사내 적용
+  - no-simulation 정책 본격 정합 (PMD 실 실행 + LLM grounded 분리)
+  - 43 finding 본격 누적 (F-021 임계 초과 = legacy paradigm 첫 사례)
+- 잔여 carry 20+ 누적 — 본 레포 본격 자산화 cycle 진입 ready
+
+→ ★ ★ ★ 본 세션 = **dogfooding live probe paradigm 본격 입증** (memory `feedback_live_probe_vs_retroactive` 정합). 단순 마이그레이션 수단 ❌ / 본격 플러그인 axis 강화 첫 사실 누적.

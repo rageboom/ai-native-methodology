@@ -9,6 +9,51 @@
 
 ---
 
+## [11.4.0] — 2026-05-29 MINOR — sub-rule §X-H v1.2.0 본격 cascade + methodology-spec §사례 3 갱신 (poc-17 Phase 1 첫 corroboration / DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration)
+
+> ★ ★ ★ poc-17 ifrs/car 도메인 Phase 1 analysis baseline 본격 종결 (12 phase 전수 / 25+ 산출물 / 43 finding / 16 AP / cross-DB 18 자산) 직후 본격 사실 누적 본격 자산화 cycle (A+B+C+D 전체 시행 / 사용자 결단). additive only / breaking 0.
+
+### Added
+- `decisions/DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration.md` — 본 release SSOT
+- sub-rule `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X-H 4 sub-section 본격 신축:
+  - (1) 자산 실측 / (2) sub-axis 자동화율 **81.25%** 본격 측정 / (3) §X-H-11 신축 AP / (4) R1'-c DB axis 첫 corroboration
+- ★ ★ ★ §X-H-11 신축 AP 11종 본격 자산화 (`AP-LEGACY-IBATIS2-DB-001~011`):
+  - N+1 / N+5 subquery / cross-DB direct / 외부 SP EXEC / raw JSP / **★ PII 하드코딩 critical** / dead SQL / magic constants / insert-as-update / debug stdout / parallel array / N1 cross-DB
+- methodology-spec §사례 본격 확장 3:
+  - `db-assets-always-on.md` §8 — DB Tables 6 정정 + ★ cross-DB 18 자산 본격 가치 입증 + 자동 validator 부재 carry
+  - `sp-conversion-policy.md` §10 — γ 1건 + 사내 utility function 2건 (FN_SPLIT + fn_lpad) + `<procedure>` tag 본격 입증
+  - `baseline-delta-operating-model.md` §5 신설 — canonical global baseline 첫 본격 적용 + cadence 3 단계 + K + L 정책 통합 입증
+
+### Changed
+- `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` v1.1.2 → **v1.2.0 MINOR**
+- `decisions/PROGRESS-poc-17-dogfooding.md` Phase 1 본격 종결 entry (마스킹)
+- `decisions/INDEX.md` 시간순 entry 등록
+- memory 2 갱신 (외부 / release 본문 변경 ❌):
+  - `feedback_composite_view_pattern.md` — PoC #02 4건 → **PoC #17 5건** 본격 확장
+  - `feedback_finding_threshold.md` — F-021 임계 paradigm 갱신 (legacy paradigm 별 30~60 신축)
+
+### Preserved (★ 본 cycle 변경 ❌)
+- sub-rule §2 core 5 AP (AP-LEGACY-IBATIS2-001~005) 변경 ❌
+- ADR-CHAIN-010/014/015 변경 ❌ / schema 변경 ❌ / skill·agent body 변경 ❌
+- workspace test 본격 추가 ❌
+
+### M.2 측정 axis 사실 누적 (9종)
+K (DB always-on) first live (18 cross-DB) / L (SP α/β/γ/δ) first live (γ 1 + 사내 utility 2) / R1' axis 4번째 corroboration (PoC #06+#07+#11+#17) / R1'-c (DB axis) 첫 sub-axis corroboration / sub-rule §X-H 첫 live (sub-axis 81.25%) / chain harness 5 gate (analysis chain 0 / 12 phase 전수) / baseline-delta (canonical global 첫 본격) / 사내 source 격리 (LL-codegraph-07) 첫 live / Composite View 5건 사내 + Scenario C 첫 사내.
+
+### Finding 누적 (★ ★ ★ 43건 / F-021 임계 본격 초과)
+critical 1 (F-PII-HARDCODE-001) / high 6 / medium 14 / low 16 / observation 6 (3 해소). **legacy paradigm 별 임계 신축** (memory): 일반 PoC 5~15 vs legacy PoC 30~60 → poc-17 = 43건 정합 / 명세 부실 ❌.
+
+### LL 후보 4
+LL-poc-17-01 (dogfooding live probe 첫 본격 입증) / LL-poc-17-02 (legacy PoC finding 본격 누적 자연 사실) / LL-poc-17-03 (sub-axis = R1' axis 별 metric) / LL-poc-17-04 (Composite View 본격 압축 가치 입증).
+
+### STOP-3 통과
+workspace test 영향 ❌ + release-readiness 22/22 보존 + skill-citation 0 stale + version 3-way 11.4.0 + breaking 0 = MINOR.
+
+### carry queue 본 cycle 외
+C-sub-axis-3-poc-corroboration (자격 1/3) / C-c-layer-baseline-재측정 / C-jsp-parser-augment / C-db-autoval / F-PII-HARDCODE-001 즉시 정정 (사내 source / 사용자 결단) / chain 1 discovery 진입 (poc-17 car-list pilot).
+
+---
+
 ## [11.3.0] — 2026-05-28 MINOR — DB 자산 always-on 정책 + SP 4 분류 매트릭스 (poc-17 ifrs/car dogfooding cascade / ADR-CHAIN-014/015)
 
 > poc-17 ifrs/car dogfooding Phase 1.5 (2026-05-28 / 사용자 명시) carry — K (DB always-on) + L (SP 전환) 정책 cascade. 직전 release 가 methodology-spec 신설 + DEC + ADR 만 정공 → 본 release 가 **schema cascade + validator gate + docs cascade + finding 자산화** 본격 완결. additive only / breaking 0. 첫 carry F-CHA-poc17-001 (chain-driver `init` paradigm 명세 부재) Type 2 외부 사용자 channel 자연 발현 사례 등재.
