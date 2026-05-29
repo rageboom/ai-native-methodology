@@ -327,3 +327,81 @@
 - 잔여 carry 20+ 누적 — 본 레포 본격 자산화 cycle 진입 ready
 
 → ★ ★ ★ 본 세션 = **dogfooding live probe paradigm 본격 입증** (memory `feedback_live_probe_vs_retroactive` 정합). 단순 마이그레이션 수단 ❌ / 본격 플러그인 axis 강화 첫 사실 누적.
+
+---
+
+## ★ ★ ★ session 55차 entry — chain 4 (implement) car-list pilot AI scope 종결 (2026-05-29)
+
+**상태**: chain 4 AI scope 종결 / 사용자 mvn test 대기 (RED → GREEN 분리)
+**작업 (마스킹 / 도메인 일반화)**:
+
+### 1. 결단 2.B paradigm shift 본격 시행
+- session 54차 plan ladder `plan-poc17-chain4-impl-*.md` 의 결단 5 묶음 본격 보고 → 사용자 결단:
+  - 결단 1.A — 풀 시행 (impl 20 file)
+  - **결단 2 = "프로시저는 없애고 싶다"** → SP + Function 통합 의미 / 옵션 B / Stored Function 117 LOC SQL 폐기 / Java service dispatch 변환
+  - 결단 3.A — SecurityFilterChain + custom OncePerRequestFilter
+  - 결단 4.A — 사용자 직접 환경 준비
+  - 결단 5.A (cap 4 / default 가정) — 사용자 mvn stdout → AI in-place edit (다음 session)
+- ★ ★ ★ **L 정책 (α) Default — 코드 전환 첫 사내 corroboration** (DEC-2026-05-28-sp-conversion-policy.md §사례 확장 carry / `methodology-spec/sp-conversion-policy.md` §사례 +1 carry)
+
+### 2. chain 1 → chain 3 → chain 4 retroactive cascade 사실
+- 결단 2.B paradigm shift = chain 1 산출 (business-rules.json / discovery-spec.md) + chain 3 산출 (test 3 file) retroactive 영향
+- paradigm A self-referential drift 회피 정합 — **외부 PoC 산출만 변경 / methodology body 변경 ❌**
+- cascade 영향 본격:
+  - business-rules.json BR-RBAC-FN-3-BRANCH 2-section 4 entry (preservation BR → equivalence BR)
+  - business-rules.json BR-CARLIST-RBAC-FILTER 2-section 4 entry (INNER JOIN → application dispatch)
+  - discovery-spec.md UC-CAR-003 §
+  - chain 3 test 3 file (UserAccessRepository wrapper → UserAccessService mock)
+
+### 3. chain 4 RED→GREEN 단계 분리 paradigm 첫 입증
+- **AI scope (RED 단계)** = impl 코드 generate (20 Java file)
+- **사용자 scope (GREEN 단계)** = mvn test 실 실행 + commit_hash + test_pass_evidence
+- ★ no-simulation 정합 — AI 시뮬레이션 ❌
+
+### 4. impl-spec.json schema 강제 사실 표면화
+- plan ladder §4 P-12 = "schema-validator GREEN (placeholder string 형식 정합)" 가정
+- 실제 schema 안 commit_hash (sha1 hex 40) + test_pass_evidence.fail_count (const 0) + result_hash (sha256 hex 64) 강제 패턴
+- placeholder = schema RED 본격
+- 본 session 안 산출 paradigm = **impl-spec.md (narrative) 만 / json = 사용자 mvn 후 다음 session 안 본격 채움**
+- LL-poc-17-27 자산화 후보 (★ plan ladder 안 schema cardinality 가정 부족 사례)
+
+### 5. F-RBAC-BYPASS-001 medium 본격 chain 1 → chain 4 forward link 완성
+- 3 layer enforce:
+  1. SecurityFilter (SessionIdEnforceFilter) — sessionId null 시 302 redirect
+  2. UserAccessService — SessionIdMissingException throw
+  3. CarRepository — accessibleUserIds empty 시 0 행 반환 (★ fail-closed)
+
+**산출물 (본 레포 / 마스킹된 형태만)**:
+- 본 entry (PROGRESS-poc-17-dogfooding.md)
+- DEC-2026-05-29-fn-conversion-alpha (★ ★ ★ 본 session 안 carry / 다음 cycle 본격 작성 / 마스킹 SSOT)
+
+**산출물 (외부 디렉토리 / 사내 source 격리 / 본 레포 commit ❌)**:
+- impl 20 Java file
+- chain 3 test 3 file retroactive
+- business-rules.json + discovery-spec.md 갱신
+- impl-spec.md
+- chain-intervention-log +4 entry
+- PROGRESS.md 외부 갱신
+
+**측정 (M.2 axis)**:
+- ★ ★ ★ L 정책 (α) 첫 사내 corroboration (★ DB Stored Function 117 LOC → Java service 본격 변환 입증)
+- ★ chain 4 RED→GREEN 분리 paradigm 첫 사내 입증
+- ★ F-RBAC-BYPASS-001 chain 1 → chain 4 forward link 완성 (3 layer enforce)
+- ★ retroactive cascade 실 사례 (★ paradigm A 외부 산출 변경 trade-off)
+- ★ impl-spec.json schema cardinality 강제 사실 표면화 (plan ladder 가정 부족)
+- ★ chain harness gate axis = chain 4 RED 단계 (gate #4 = pending_user_mvn)
+
+**carry queue (★ 다음 session 의제)**:
+- **C-impl-spec-json-completion** (★ 사용자 mvn 후 AI in-place edit / chain 4 GREEN 단계)
+- **C-fn-conversion-alpha-decision** (★ DEC-2026-05-29-fn-conversion-alpha 본격 작성)
+- **C-traceability-matrix-builder** (★ impl-spec.json GREEN 후 실행)
+- **C-jsp-template-migration** (★ JSP view 별 cycle)
+- **C-sub-rule-§X-H-extension** (★ fn Java 변환 사례 +1)
+- **C-sp-conversion-policy-§사례-extension** (★ L 정책 (α) 첫 사내 corroboration 자산화)
+- **LL-poc-17-24~28 본격 자산화** (★ memory 또는 sub-rule 본격)
+
+**결정**: 본 session = chain 4 AI scope 종결 (★ 결단 2.B paradigm shift 본격 시행) / 사용자 mvn test 대기 / 다음 session = GREEN 단계 + DEC 작성 + carry 자산화.
+
+**듀얼 목표 본 session 기여도**:
+- 목표 1 (마이그레이션): ★ ★ car-list pilot chain 4 RED 단계 본격 종결 (impl 20 file / 결단 2.B paradigm shift 본격 시행)
+- 목표 2 (플러그인 axis): ★ ★ ★ **L 정책 (α) 첫 사내 corroboration** + **chain 4 RED→GREEN 분리 paradigm 첫 입증** + **retroactive cascade 사실 노출** + **impl-spec.json schema cardinality 사실 표면화**
