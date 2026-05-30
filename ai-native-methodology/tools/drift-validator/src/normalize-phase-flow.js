@@ -18,8 +18,18 @@ const stripDecor = (s) => String(s).replace(/[★⚠️✅❌⏳]/g, '').replace
 const ARTIFACT_FILE_RE = /[\w.\-]+\.(?:json|jsonl|md|mermaid|yaml|yml)\b/gi;
 // flow 정의 파일(`*.phase-flow.json|mermaid`)은 산출물 아님 — next_chain/이웃 chain 교차참조용. 제외.
 const META_FILE_RE = /\.phase-flow\.(?:json|mermaid)$/i;
+// 횡단(cross-cutting) 메타 / SSOT 자기참조 / 결정·finding 로그 — phase data-contract 산출물 아님.
+//   mermaid 가 횡단 노드(CC_FIND/CC_DEC)나 주석에서 참조하나 JSON inputs/outputs 계약 대상 아님 → false positive 차단.
+//   v11.1.0 META_FILE_RE 와 동일 패러다임(비-deliverable 제외) 확장.
+const NON_DELIVERABLE_META = new Set([
+  'phase-flow.json',                 // SSOT 자기참조 (mermaid 주석/노트)
+  'poc-findings.md', 'findings.md',  // finding-system 횡단 (CC_FIND 노드)
+  'index.md', 'status.md',           // decisions 로그 횡단 (CC_DEC 노드)
+]);
 function extractArtifactFiles(str) {
-  return (String(str).match(ARTIFACT_FILE_RE) ?? []).filter((f) => !META_FILE_RE.test(f));
+  return (String(str).match(ARTIFACT_FILE_RE) ?? []).filter(
+    (f) => !META_FILE_RE.test(f) && !NON_DELIVERABLE_META.has(f.toLowerCase()),
+  );
 }
 
 // ★ phase id 정규화 — 공백/대소문자 무시. "input" / "formal-spec" / "api" 등 의미 ID 그대로 보존 (state-machine normalizer 와 다름 — phase id 는 의미 있는 구분자).
@@ -33,7 +43,7 @@ export function detectPhaseFlowJson(json) {
 }
 
 export function detectPhaseFlowMermaid(text) {
-  const lines = text.split('\n').map(stripComment);
+  const lines = text.split(/\r?\n/).map(stripComment);
   let hasFlowchart = false;
   let phaseSubgraphCount = 0;     // analysis 패턴 — phase 단위 subgraph (P_* prefix)
   let phasePlainNodeCount = 0;    // chain v2 패턴 — phase plain node (P_*[label])
@@ -76,7 +86,7 @@ export function normalizePhaseFlowJson(json) {
 }
 
 export function normalizePhaseFlow(text) {
-  const lines = text.split('\n').map(stripComment);
+  const lines = text.split(/\r?\n/).map(stripComment);
   const subgraphs = new Map();    // node/subgraph raw id → derived phase id
   const phases = new Set();
   const dependencies = [];        // { from, to } — derived phase id

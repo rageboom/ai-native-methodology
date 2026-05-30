@@ -9,6 +9,20 @@
 
 ---
 
+## [11.10.1] — 2026-05-30 PATCH — drift-validator phase-flow false-positive 정리 (CRLF 주석 + 횡단 메타 노드) (DEC-2026-05-30-phase-flow-drift-false-positive)
+
+`drift-validator flows` directory mode 가 `analysis.phase-flow.mermaid` 에서 **4 breaking 오탐** (`phase-flow.json` / `poc-findings.md` / `INDEX.md` / `STATUS.md`). 모두 phase data-contract 산출물이 아님 — root cause 2종:
+- **CRLF 주석 누출**: `stripComment` 의 `/%%.*$/` 가 CRLF 파일에서 작동 안 함 (JS `.` 는 `\r` 미매치 + `$` 가 trailing `\r` 앞 미매치 → 주석 전체 미제거). Windows CRLF mermaid 의 `%%` 주석 내용(`phase-flow.json`)이 artifact 스캔에 누출. → `normalizePhaseFlow`/`detectPhaseFlowMermaid` 의 `text.split('\n')` → `split(/\r?\n/)` (CRLF-safe / `\r` 제거).
+- **횡단 메타 노드**: `CC_FIND["findings/poc-findings.md…"]` + `CC_DEC["… INDEX.md / STATUS.md"]` = cross-cutting 노드(finding-system / decisions 로그) — phase 산출물 아님. → `NON_DELIVERABLE_META` 제외 집합 추가 (`extractArtifactFiles` 에서 `phase-flow.json`/`poc-findings.md`/`findings.md`/`index.md`/`status.md` 필터 / v11.1.0 `META_FILE_RE` 와 동일 패러다임).
+
+배경: v11.1.0 이 "drift-validator flows 5/5 0 breaking" 기재했으나 이후 CRLF/횡단노드 표면화로 regression. **RED→GREEN 정공법** — `compare-phase-flow-artifacts.test.js` +2 회귀 test (CRLF 주석 / 횡단 메타). mermaid·json 산출물 본문 무변경 (validator 로직만 / 진짜 rename drift 검출력 보존).
+
+**+ 3번째 fix (test wiring 정직 정정)**: `compare-phase-flow-artifacts.test.js` 가 v11.1.0 신설 이후 **drift-validator `package.json` test script 에 미등록 = orphaned** (CI 미실행 / v11.1.0 의 4 회귀 test 가 실제로는 안 돌고 있었음). 본 release 에서 test script 에 추가 → 4 기존(미실행) + 2 신규 = **+6 test** 실 wiring.
+
+**STOP-3**: drift-validator 71→**77** (compare-phase-flow-artifacts 4→6 + orphaned wiring) + `flows` 5/5 **0 breaking** ✅ + workspace test 847→**853(+6)** + release-readiness 22/22 ready + skill-citation 0 stale + version 3-way 11.10.1 + breaking 0 = PATCH.
+
+---
+
 ## [11.10.0] — 2026-05-30 MINOR — greenfield 산출물 bootstrap (C-use-scenario-taxonomy-impl Slice 2 / greenfield-bootstrap 도구 + 5 skill greenfield-mode) (DEC-2026-05-30-use-scenario-greenfield-bootstrap-slice2)
 
 v11.9.0 Slice 1(시나리오 선언 + gate)의 토대 위에서, **greenfield(신규 / legacy 코드 없음)가 7대 산출물을 실제로 생성해 chain 에 진입**하게 만드는 Slice 2. 사용자 1차 want("신규도 산출물이 나와야 chain 으로 개발·운영"). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 / "analysis 는 코드가 아니라 입력을 요구" 재프레이밍.

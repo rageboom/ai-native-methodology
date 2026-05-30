@@ -10,7 +10,7 @@
     "drift-validator": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test test/corpus.test.js test/baseline.test.js test/check-phase-skills.test.js test/topological-sort.test.js test/cross-schema-enum.test.js test/cross-consistency-check.test.js test/canonical-single-alias.test.js",
+    "test": "node --test test/corpus.test.js test/baseline.test.js test/check-phase-skills.test.js test/topological-sort.test.js test/cross-schema-enum.test.js test/cross-consistency-check.test.js test/canonical-single-alias.test.js test/compare-phase-flow-artifacts.test.js",
     "spike": "node src/spike-mermaid-parser.js"
   },
   "dependencies": {
