@@ -44,7 +44,8 @@
       "source_grounded_evidence": [
         "src/domain/Service.java:30-60",
         "business-rules.json#BR-DOMAIN-001"
-      ]
+      ],
+      "code_pointers_na": true
     }
   ],
   "business_rules_intent": [

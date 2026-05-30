@@ -37,9 +37,12 @@ discovery-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
     "src/main/java/io/spring/api/UsersApi.java:50",
     "business-rules.json#BR-AUTH-LOGIN-001",
     "domain.json#User"
-  ]
+  ],
+  "code_pointers_na": true
 }
 ```
+
+> ★ **code_pointers_na 기본** (F-DOGFOOD-009) — UC 는 의도 노드 → 코드 anchor 는 하위 IMPL/TC 가 보유. UC 산출 시 `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직 표기). builder backstop 이 누락 시 자동 보강하나 산출 시점 명시 권장.
 
 ## 분해 원칙
 

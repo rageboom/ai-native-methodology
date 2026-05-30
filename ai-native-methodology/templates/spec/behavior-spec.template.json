@@ -52,7 +52,7 @@
         "business-rules.json#BR-DOMAIN-RULE-001"
       ],
       "code_pointers": [],
-      "code_pointers_na": false
+      "code_pointers_na": true
     }
   ],
   "cross_links": {

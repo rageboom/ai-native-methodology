@@ -25,6 +25,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - `<project>/.aimd/output/behavior-spec.md` (사람 눈)
 - `<project>/.aimd/output/behavior-diagrams.mermaid` (★ ADR-008 v2 §10 / 통합 view)
 
+> ★ **code_pointers_na 기본** (F-DOGFOOD-009) — BHV 는 의도 노드(executable contract) → 코드 anchor 는 하위 IMPL/TC 가 보유. 각 BHV `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
+
 ## ★ UC → BHV 1:N forward link 의무
 
 각 BHV 는 ≥ 1 `use_case_refs` (UC-* backward link) + ≥ 1 `acceptance_criteria_refs` (AC-* forward link / chain spec → chain test).

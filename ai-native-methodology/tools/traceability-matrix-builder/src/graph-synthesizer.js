@@ -216,6 +216,24 @@ function implCodePointers(impl) {
   });
 }
 
+// ★ v11.x (F-DOGFOOD-009) — 의도/집계 노드 code_pointers_na 기본값 backstop.
+// 노드 조립 완료 후 1회 호출하는 정규화 패스. UC/BHV/AC/TASK + analysis/aspect 는 본질이
+// 의도/집계 노드 → 코드 anchor 없음이 정상 = na=true 가 정직한 상태 (code_pointer-validator 결정 3).
+// IMPL/TC 제외 — source_files/source_file fallback 이 code_pointers 를 채움. 없으면 의도적 flagged
+//   (code-bearing 노드인데 코드 없음 = 실 결함이므로 missing 으로 노출 유지).
+// ★ Senior REVISE — state==='active' 게이트 (신규 노드만). carry-over deprecated/propose 노드는
+//   payload 무변조 (재합성 시 silent content drift 회피 / synthesizeGraph 내 drift state 부재).
+const CODE_BEARING_SUBKINDS = new Set(['IMPL', 'TC']);
+function defaultNaForIntentNodes(nodes) {
+  for (const n of nodes) {
+    if (n.state !== 'active') continue;
+    if (!['chain', 'analysis', 'aspect'].includes(n.artifact_kind)) continue;
+    if (CODE_BEARING_SUBKINDS.has(n.artifact_subkind)) continue;
+    const hasPtr = Array.isArray(n.code_pointers) && n.code_pointers.length > 0;
+    if (!hasPtr && n.code_pointers_na !== true) n.code_pointers_na = true;
+  }
+}
+
 // ============================================================================
 // Edge 헬퍼
 // ============================================================================
@@ -534,6 +552,10 @@ export function synthesizeGraph(input) {
     if (e.edge_type !== 'groups') continue;
     if (!nodeIds.has(e.source) || !nodeIds.has(e.target)) edges.splice(i, 1);
   }
+
+  // --- ★ v11.x (F-DOGFOOD-009) 의도 노드 code_pointers_na 기본 backstop ---
+  // carry-over (deprecated/propose 재추가) + IMPL/TC inline pointer 부여 이후 시점. active 노드만 정규화.
+  defaultNaForIntentNodes(nodes);
 
   // --- commit_hash / scope_id 스탬프 ---
   for (const n of nodes) {

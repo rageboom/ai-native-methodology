@@ -38,7 +38,8 @@
         "path": "/api/domain/resource",
         "operationId": "createDomainResource",
         "method": "post"
-      }
+      },
+      "code_pointers_na": true
     },
     {
       "$comment": "★ Example 2: layer=fe (★ component_ref 의무)",
@@ -60,7 +61,8 @@
         "name": "DomainCreateForm",
         "state_map_ref": "dashboard.modal.create",
         "dtcg_token_set": "default"
-      }
+      },
+      "code_pointers_na": true
     },
     {
       "$comment": "★ Example 3: layer=e2e (cross-cut Story anchor / contract ref ❌)",
@@ -72,7 +74,8 @@
       "module": "domain",
       "dependencies": ["TASK-DOMAIN-002"],
       "execution_order": 3,
-      "story_ref": "STORY-DOMAIN-001"
+      "story_ref": "STORY-DOMAIN-001",
+      "code_pointers_na": true
     }
   ],
   "epic_refs": [

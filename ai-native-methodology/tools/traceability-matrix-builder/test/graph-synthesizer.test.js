@@ -712,3 +712,81 @@ describe('synthesizeGraph — ★ v11.2.0 analysis chain-link 일관성 (ADR-CHA
     assert.equal(danglingEdges.length, 0, 'nodeIds.has(target) 가드 통과 의무');
   });
 });
+
+// ============================================================================
+// ★ F-DOGFOOD-009 — 의도/집계 노드 code_pointers_na 기본값 backstop
+//   RealWorld dogfood 실측 (coverage 21.7% / missing 90) 기반. UC/BHV/AC/TASK + analysis/aspect
+//   = 의도/집계 노드 → 코드 anchor 없음이 정상 = na=true 자동. IMPL/TC 제외 (source fallback / 무source 시
+//   missing 노출 유지). plan(EPIC/STORY/OP) 무관 (Tier-1 외). active 노드만 (carry-over deprecated 무변조).
+//   Senior REVISE (state==='active' 게이트) 정합.
+// ============================================================================
+
+describe('synthesizeGraph — ★ F-DOGFOOD-009 의도 노드 code_pointers_na backstop', () => {
+  const intentInput = {
+    discovery: { use_cases: [{ id: 'UC-USER-001' }] },
+    behavior: { behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'] }] },
+    acceptance: { criteria: [{ id: 'AC-USER-001', behavior_ref: 'BHV-USER-001' }] },
+    taskPlan: { tasks: [{ id: 'TASK-USER-001', ac_refs: ['AC-USER-001'], tc_refs: ['TC-USER-001'], layer: 'be' }] },
+    testSpec: { test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'test/user.test.ts' }] },
+    implSpec: { modules: [{ id: 'IMPL-USER-001', tc_refs: ['TC-USER-001'], source_files: ['src/user.ts'] }] },
+    analysis: { domain: { meta: { title: 'D' } } },
+    aspect: { i18n: { meta: { title: 'I' } } },
+  };
+
+  it('1) UC/BHV/AC/TASK (의도 노드, 포인터 없음) → code_pointers_na=true 자동', () => {
+    const g = synthesizeGraph(intentInput);
+    for (const id of ['UC-USER-001', 'BHV-USER-001', 'AC-USER-001', 'TASK-USER-001']) {
+      assert.equal(g.nodes.find((n) => n.id === id).code_pointers_na, true, `${id} backstop 의무`);
+    }
+  });
+
+  it('2) 이미 code_pointers 보유 노드 → backstop no-op (na 미설정 / validator na_conflict 회피)', () => {
+    const g = synthesizeGraph({
+      behavior: { behaviors: [{
+        id: 'BHV-X', use_case_refs: [],
+        code_pointers: [{ path: 'docs/bhv.md', anchor_type: 'doc_link' }],
+      }] },
+    });
+    const bhv = g.nodes.find((n) => n.id === 'BHV-X');
+    assert.equal(bhv.code_pointers.length, 1);
+    assert.equal(bhv.code_pointers_na, undefined, 'pointer 있으면 na 미설정 (na_conflict 회피)');
+  });
+
+  it('3) IMPL/TC 가 source 없으면 missing 유지 (na 미설정 / ★ anti-regression — code-bearing 결함 노출)', () => {
+    const g = synthesizeGraph({
+      testSpec: { test_cases: [{ id: 'TC-NO-SRC', ac_ref: 'AC-Y' }] },
+      implSpec: { modules: [{ id: 'IMPL-NO-SRC', tc_refs: [] }] },
+    });
+    const tc = g.nodes.find((n) => n.id === 'TC-NO-SRC');
+    const impl = g.nodes.find((n) => n.id === 'IMPL-NO-SRC');
+    assert.equal(tc.code_pointers_na, undefined, 'TC 무source → na 미설정 (missing 노출 유지)');
+    assert.ok(!tc.code_pointers, 'TC code_pointers 부재');
+    assert.equal(impl.code_pointers_na, undefined, 'IMPL 무source → na 미설정');
+    assert.ok(!impl.code_pointers, 'IMPL code_pointers 부재');
+  });
+
+  it('4) analysis/aspect (포인터 없음) → na=true / plan(EPIC) 노드는 무변경', () => {
+    const g = synthesizeGraph({
+      ...intentInput,
+      taskPlan: { ...intentInput.taskPlan, epic_refs: [{ screen_id: 'SCREEN-X', title: 'X' }] },
+    });
+    assert.equal(g.nodes.find((n) => n.id === 'analysis-domain').code_pointers_na, true);
+    assert.equal(g.nodes.find((n) => n.id === 'aspect-i18n').code_pointers_na, true);
+    const epic = g.nodes.find((n) => n.id === 'SCREEN-X');
+    assert.equal(epic.artifact_kind, 'plan');
+    assert.equal(epic.code_pointers_na, undefined, 'plan 노드는 backstop 대상 외');
+  });
+
+  it('5) carried-over deprecated 의도 노드 → na 미stamp (★ Senior (a) 회귀 anchor / 무음 변조 차단)', () => {
+    const previousGraph = {
+      nodes: [{
+        id: 'UC-GONE-999', artifact_kind: 'chain', artifact_subkind: 'UC',
+        source_path: 'discovery-spec.json', state: 'active',
+      }],
+    };
+    const g = synthesizeGraph({ ...intentInput, previousGraph });
+    const gone = g.nodes.find((n) => n.id === 'UC-GONE-999');
+    assert.equal(gone.state, 'deprecated', '이번 입력에 없는 노드는 deprecated 로 보존');
+    assert.equal(gone.code_pointers_na, undefined, 'deprecated 노드엔 na stamp ❌ (state!==active 게이트)');
+  });
+});

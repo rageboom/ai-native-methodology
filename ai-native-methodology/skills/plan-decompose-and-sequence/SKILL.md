@@ -71,6 +71,8 @@ implicit 의존 추론 source:
 - 같은 cache key / 같은 file 수정 → blocks
 - code_pointer 동일 range overlap → blocks
 
+> ★ **TASK code_pointers 정책** (F-DOGFOOD-009) — TASK 는 `code_pointers_na: true` 기본(의도 노드). 단 **수정 예정 코드 file/range 를 알면 `code_pointers` 를 채워라** — 위 implicit 의존 추론(range overlap → blocks)의 정확도가 올라간다. builder backstop 이 누락 시 na 로 보강하나, code_pointers 를 채우는 편이 dep-graph 활용 가치가 크다.
+
 cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (gate #3 block 의무).
 
 ## 절차

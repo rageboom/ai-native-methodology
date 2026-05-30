@@ -9,6 +9,22 @@
 
 ---
 
+## [11.12.0] — 2026-05-30 MINOR — dep-graph 의도 노드 code_pointers_na 기본 backstop (F-DOGFOOD-009 / DEC-2026-05-30-code-pointers-intent-na-backstop)
+
+dep-graph `code-pointer-validator`(release-readiness #16)는 모든 Tier-1 노드(artifact_kind ∈ {chain,analysis,aspect}, state ∈ {active,drift})가 `code_pointers`(≥1) 또는 `code_pointers_na=true` 를 갖길 요구한다. 그러나 UC/BHV/AC/TASK + analysis/aspect 는 본질이 **의도/집계 노드**(코드 anchor 는 하위 IMPL/TC 가 보유)이고, 어떤 템플릿/skill 도 na 를 안 박아 RealWorld dogfood 실측에서 **coverage 21.7%**(covered=25 TC / na=0 / **missing=90** = UC19+BHV19+AC25+TASK19+analysis8)로 나타났다. 본 release = synthesizer 가 의도 노드 na 를 자동 기본하는 **3-layer backstop**.
+
+**시행 (additive / breaking 0)**:
+- **Layer 1 (load-bearing)** `tools/traceability-matrix-builder/src/graph-synthesizer.js` — `defaultNaForIntentNodes(nodes)` 정규화 패스 신설 + 호출 1회. `state==='active'` + kind∈{chain,analysis,aspect} + subkind∉{IMPL,TC} + `code_pointers` 없음 → `code_pointers_na=true`. ★ Senior REVISE 반영 — `state==='active'` 게이트로 carry-over deprecated/propose 노드 payload 무변조 (재합성 시 silent content drift 회피). IMPL/TC 제외 = source fallback 으로 채우거나, 무source 시 `missing` 으로 노출 유지(code-bearing 결함 surfacing 보존).
+- **Layer 2** template 4종 — `behavior-spec.template.json`(`na:false→true`) + `discovery-spec`(use_cases) / `acceptance-criteria`(criteria 3) / `task-plan`(tasks 3) 각 item 에 `code_pointers_na:true` 추가 (schema 가 이미 item-level 에 `code_pointers_na`(default:false) 정의 → additive / schema-valid).
+- **Layer 3** skill 4종 — `discovery-decompose-use-cases`/`spec-compose-behavior-spec`/`spec-derive-acceptance-criteria`(UC/BHV/AC=의도 노드 → na 기본) + `plan-decompose-and-sequence`(TASK=na 기본이되 수정 코드 range 알면 `code_pointers` 채워 의존성 추론 정확도↑).
+- **test** +5 (graph-synthesizer.test.js) — ①intent 노드 na 자동 ②포인터 보유 시 no-op(na_conflict 회피) ③IMPL/TC 무source→missing 유지(anti-regression) ④analysis/aspect na + plan(EPIC) 무변경 ⑤carried-over deprecated intent → na 미stamp(★ Senior 게이트 회귀 anchor). builder 105→**110**.
+
+**★ §8.1 1차 corroboration (RealWorld / Type 1.5 external repo / no-simulation)**: 실 production 경로(builder CLI → patched synthesizer → code-pointer-validator)로 RealWorld 그래프 재합성 실측 — **BEFORE** covered=25/na=0/missing=90/**ratio=21.7%** → **AFTER** covered=25/**na=90/missing=0/ratio=100%** (node parity 115=115 / na_conflict=0 / coverage_missing=0). release-readiness #16 은 정적 poc-05 corpus(이미 100% 백필) read 라 **무영향**(무회귀) — 본 패치 가치 = 신규/외부 프로젝트가 hand-backfill 없이 coverage 확보.
+
+**carry**: ① analysis/aspect `code_pointers` enrich (Layer 1 backstop na 가 가린 부분 / analysis skill 大 변경 → 별 cycle / 사용자 결단 2026-05-30) ② §8.1 2차 corroboration (RealWorld 외 1 PoC 재합성 21.7%대→100% / standing).
+
+**STOP-3**: workspace 868→**873(+5)** ✅ + release-readiness 22/22 ✅ + skill-citation 252 doc 0 stale + version 3-way 11.12.0 + breaking 0 = MINOR.
+
 ## [11.11.0] — 2026-05-30 MINOR — use-scenario S2(AX전환) gate: characterization GREEN + augmentation RED 분리 enforcement (C-use-scenario-s2-gate Track α / DEC-2026-05-30-s2-gate-slice)
 
 use-scenario taxonomy(v11.7.0)가 **S2(AX전환)를 주 타깃**으로 선언했으나 Slice 1(v11.9.0)의 gate 매트릭스는 `S2: { test: 'all_fail' }` = S1 fallback 으로 공백이었다. S2 의 본질 = legacy **in-place 증강** → test 산출물이 **characterization**(기존 동작 포착 / impl 존재 → GREEN) + **augmentation**(신규 증강분 / impl 부재 → RED) 혼합인데, aggregate `all_fail` 은 characterization 까지 RED 를 요구해 정상 산출물을 오탐 block (= F-DOGFOOD-007 재현). 본 release = gate 를 **per_tc_outcome 분기**로 구현해 혼합을 검증.

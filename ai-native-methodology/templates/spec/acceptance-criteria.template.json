@@ -35,7 +35,8 @@
       "related_brs": ["BR-DOMAIN-RULE-001"],
       "related_aps": [],
       "layer": "cross-cut",
-      "story_ref": "STORY-DOMAIN-001"
+      "story_ref": "STORY-DOMAIN-001",
+      "code_pointers_na": true
     },
     {
       "$comment": "★ Example 2: layer=be (★ openapi_path + operationId 본격 required / DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate)",
@@ -59,7 +60,8 @@
       "layer": "be",
       "story_ref": "STORY-DOMAIN-001",
       "openapi_path": "/api/domain/resource",
-      "operationId": "createDomainResource"
+      "operationId": "createDomainResource",
+      "code_pointers_na": true
     },
     {
       "$comment": "★ Example 3: layer=fe (★ state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 required)",
@@ -84,7 +86,8 @@
       "story_ref": "STORY-DOMAIN-001",
       "state_map_ref": "dashboard.modal.create",
       "dtcg_token_ref": "default",
-      "visual_manifest_ref": "screen.dashboard"
+      "visual_manifest_ref": "screen.dashboard",
+      "code_pointers_na": true
     }
   ]
 }
