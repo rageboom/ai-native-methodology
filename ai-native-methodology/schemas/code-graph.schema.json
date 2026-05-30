@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://ai-native-methodology/schemas/code-graph.schema.json",
+  "title": "code-graph.json — codegraph 산출물 (reference-lens / NOT gate-injected)",
+  "description": "★ CodeGraph OSS (@colbymchenry/codegraph) index 결과 요약 산출물. analysis 단계 필수 도구 codegraph-runner 가 생성 (DEC-2026-05-30-codegraph-essential). code↔code 구조 = LLM 운영 컨텍스트의 reference lens. ★ trust 모델 (DEC-2026-05-28 §4.2): 어떤 결정적 gate 에도 inject 되지 않는다.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "target_path", "index_stats", "evidence"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "do_not_edit_manually", "derived_from", "trust_note"],
+      "properties": {
+        "schema": { "const": "code-graph.schema.json" },
+        "generated_by": { "const": "codegraph-runner" },
+        "do_not_edit_manually": { "const": true },
+        "derived_from": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["tool", "method"],
+            "properties": {
+              "tool": { "type": "string" },
+              "version": { "type": ["string", "null"] },
+              "method": { "type": "string" }
+            }
+          }
+        },
+        "trust_note": {
+          "type": "string",
+          "description": "reference-lens / NOT gate-injected 명시 (trust 모델 enforcement)."
+        }
+      }
+    },
+    "target_path": { "type": "string" },
+    "index_stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_count", "node_count", "edge_count", "languages", "nodes_by_kind"],
+      "properties": {
+        "file_count": { "type": "integer", "minimum": 0 },
+        "node_count": { "type": "integer", "minimum": 0 },
+        "edge_count": { "type": "integer", "minimum": 0 },
+        "db_size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+        "backend": { "type": ["string", "null"] },
+        "languages": { "type": "array", "items": { "type": "string" } },
+        "nodes_by_kind": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_stdout_path",
+        "tool_stderr_path",
+        "tool_version",
+        "invocation_timestamp",
+        "duration_ms",
+        "result_hash",
+        "reproduction_command",
+        "evidence_trust"
+      ],
+      "properties": {
+        "tool_stdout_path": { "type": "string" },
+        "tool_stderr_path": { "type": "string" },
+        "tool_version": { "type": "string" },
+        "invocation_timestamp": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "result_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "reproduction_command": { "type": "string" },
+        "evidence_trust": {
+          "enum": ["real_tool", "simulated"],
+          "description": "★ no-simulation. codegraph-runner 는 real_tool 만 산출 (simulated 영구 reject)."
+        }
+      }
+    }
+  }
+}

@@ -9,6 +9,25 @@
 
 ---
 
+## [11.8.0] — 2026-05-30 MINOR — codegraph-runner 신설 (C-codegraph-essential-impl Slice 1 / CodeGraph OSS 필수 도구 wiring) (DEC-2026-05-30-codegraph-essential-impl-slice1)
+
+직전 v11.7.0 이 codegraph = analysis 필수 도구로 결정(DEC-2026-05-30-codegraph-essential)하고 실 wiring 은 carry(`C-codegraph-essential-impl`)했음. 사용자 "C-codegraph-essential-impl 부터 진행" → Slice 1 (도구 실행 + reference-lens 산출물) 시행. **federation(dep-graph 결합)은 Slice 2 carry**.
+
+**사전 검증 (LL-codegraph-02 교훈)**: codegraph v0.9.7 이 환경에 실제 설치·실행 가능 확인 (no-simulation 전제) + CLI 모델 확인 (`init -i`/`index` → `status --json` / SARIF 아님).
+
+**시행 (additive / breaking 0)**:
+- `tools/codegraph-runner/` 신설 (23번째 workspace tool) — `codegraph index` 실제 실행(real exec / 7-field evidence / evidence_trust=real_tool) + `codegraph status --json` 통계 → `code-graph.json` manifest. 환경 부재 시 exit 3 정직 신호 (no-simulation / persona 시뮬레이션 ❌). **cross-platform**: Windows 전역 npm bin `.cmd` shim = shell 경유 (Node 22 CVE-2024-27980 완화 정합 / execFileSync('.cmd')=EINVAL → execSync + 경로 quoting). 9 test (manifest 단위 + 실 smoke / §8.1 JS+Java ≥2 stack).
+- `schemas/code-graph.schema.json` 신설 — code-graph.json shape (meta/index_stats/evidence) / additionalProperties:false strict / evidence_trust enum {real_tool, simulated}.
+- `skills/analysis-code-graph/SKILL.md` 신설 — analysis 단계 cross-cutting aspect (codegraph 필수 도구) / `flows/analysis.phase-flow.json` cross_cutting.aspects.skills[] 등록.
+
+**★ trust 모델 (DEC-2026-05-28 §4.2 준수)**: code-graph.json = **reference-lens / finding 으로만 수용 / 어떤 결정적 gate 에도 inject ❌** (manifest.trust_note 명시 / gate-eval·release-readiness validator 목록 무변경).
+
+**구현 carry (Slice 2 / `C-codegraph-federation`)**: dep-graph navigate 증강 (codegraph callers/impact) + code-pointer staleness query + cross-domain undeclared 호출 finding + MCP serve. → Senior REVISE @ 40% 영역 / §8.1 corroboration 후 별도.
+
+**STOP-3**: workspace test 795 → **804 (+9)** ✅ + release-readiness 22/22 ready ✅ + skill-citation 0 stale + version 3-way 11.8.0 + breaking 0 = MINOR. drift-validator check-phase-skills (신규 aspect skill 등록) 정합.
+
+---
+
 ## [11.7.0] — 2026-05-30 MINOR — use-scenario taxonomy + AX 운영 정체성 형식화 + codegraph 필수화 (DEC-2026-05-30-use-scenario-taxonomy + DEC-2026-05-30-codegraph-essential)
 
 session 55차 `/clear` 후 사용자 방법론 정체성 재진술 chain (ExitPlanMode 5회 거절 = 정체성 정밀화 루프) → 직전 v11.6.0 이 carry 한 `C-use-scenario-taxonomy` 의 **형식화 시행**. **본 release = 형식화 문서만** (설계 SSOT 확립 / 코드·스키마·greenfield 실제 빌드 = carry).

@@ -79,7 +79,7 @@ DEC-2026-05-27 의 "v1.0+ ≥6mo maturity + 외부 사용자 ≥1" 게이트는 
 ---
 
 ## 6. carry
-- `C-codegraph-essential-impl` — codegraph 실제 도구 wiring (analysis 도구 등재 + 의무 실행 + dep-graph federation). PoC ≥2 code_pointers corroboration + STOP-3. (DEC-2026-05-27 carry (c) 흡수.)
+- `C-codegraph-essential-impl` — **Slice 1 RESOLVED (2026-05-30) by [DEC-2026-05-30-codegraph-essential-impl-slice1](DEC-2026-05-30-codegraph-essential-impl-slice1.md)** (v11.8.0 / `tools/codegraph-runner/` 신설 + code-graph.json reference-lens). 잔여 = **Slice 2 `C-codegraph-federation`** (dep-graph navigate 증강 + code-pointer staleness + cross-domain finding + MCP serve / §8.1 ≥2 corroboration 후).
 - `C-honesty-tool-cleanup` — CLAUDE.md no-simulation 절 실행불가 도구(SpotBugs/Daikon) cleanup (memory `feedback_no_unrunnable_tool_citation`).
 
 ## 7. 한 줄 결론

@@ -1,0 +1,12 @@
+{
+  "name": "@ai-native-methodology/codegraph-runner",
+  "version": "0.1.0",
+  "description": "CodeGraph OSS (@colbymchenry/codegraph) 실제 실행 runner — analysis 단계 필수 도구 (Semgrep 동급 / R19 Tier 1 in-env / no-simulation). codegraph index + status --json → code-graph.json (code↔code 구조 reference-lens 산출물 / NOT gate-injected / DEC-2026-05-30-codegraph-essential). 7-field evidence + evidence_trust=real_tool / 환경 부재 시 exit 3 정직 신호.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "codegraph-runner": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/manifest.test.js test/runner.test.js" },
+  "license": "UNLICENSED"
+}
