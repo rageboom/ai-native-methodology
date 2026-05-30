@@ -30,15 +30,14 @@ discovery-spec 에 들어갈 `use_cases[]` 배열. 각 UC:
   "name": "사용자 로그인",
   "description": "이메일+비밀번호로 인증 → JWT 발급",
   "actors": ["User"],
-  "primary_domain": "User",
+  "acceptance_criteria_refs": ["AC-USER-001"],
   "br_refs": ["BR-AUTH-LOGIN-001", "BR-AUTH-PASSWORD-002"],
   "api_refs": ["postLogin"],
-  "state_machine_ref": "state-machines/auth-flow.json",
   "source_grounded_evidence": [
-    { "artifact": "domain", "element_id": "User",                "grep_hit_count": 14, "file_paths": ["domain.json"] },
-    { "artifact": "rules",  "element_id": "BR-AUTH-LOGIN-001",   "grep_hit_count": 3,  "file_paths": ["business-rules.json"] }
-  ],
-  "priority": "critical"
+    "src/main/java/io/spring/api/UsersApi.java:50",
+    "business-rules.json#BR-AUTH-LOGIN-001",
+    "domain.json#User"
+  ]
 }
 ```
 

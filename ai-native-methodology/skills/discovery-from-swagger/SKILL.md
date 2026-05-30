@@ -26,7 +26,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 `.aimd/output/discovery-spec.json` 의 다음 entries:
 
 - `use_cases[]` — operation 별 사용자 의도 → UC-* (id + name + description + acceptance_criteria_refs[])
-- `business_rules_intent[]` — request/response schema 의 constraint (required / enum / format / pattern) → BR-INTENT-*
+- `business_rules_intent[]` — request/response schema 의 constraint (required / enum / format / pattern) → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-* id 없음)
 - `nfr[]` (부 채널) — `security` (auth 의무) / `x-ratelimit-*` (rate limit) / `responses` 4xx/5xx (error contract) → NFR-*
 - `io_contracts[]` — operation 별 request/response schema reference (path:operationId → $ref chain)
 
@@ -43,7 +43,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 1. **spec parse**: openapi.yaml / swagger.json Read → JSON / YAML 파싱. 형식 자동 감지.
 2. **scope filter 적용**: orchestrator inject scope filter 가 있으면 해당 paths / tags 만 추출.
 3. **operation 별 UC 추출**: 각 operation (path + method) → UC-* entry. summary/description 을 사용자 의도로 paraphrase. source_grounded_evidence = `openapi:<path>:<operationId>`.
-4. **request/response schema → BR-INTENT 추출**: `required` 필드 / `enum` 값 / `format` (date / email / uuid) / `pattern` regex → BR-INTENT-*. schema `$ref` 추적해 nested constraint 도 포함.
+4. **request/response schema → business_rules_intent 추출**: `required` 필드 / `enum` 값 / `format` (date / email / uuid) / `pattern` regex → entry (br_id + reasoning). schema `$ref` 추적해 nested constraint 도 포함.
 5. **NFR (부 채널) 추출**: `security` schemes (auth 의무) / `x-ratelimit-*` (rate limit) / `responses` 의 4xx/5xx (error contract) → NFR-*.
 6. **I/O contracts entries**: operation 별 request/response schema reference 저장 (chain 2 spec stage 의 behavior-spec 작성 시 참조).
 7. **baseline cross-check** (있을 시): `.aimd/output/openapi.yaml` baseline 의 endpoint 목록과 비교 — 새 endpoint 인지 / 기존 modification 인지 / deprecated 인지 식별 → intent 정확화.

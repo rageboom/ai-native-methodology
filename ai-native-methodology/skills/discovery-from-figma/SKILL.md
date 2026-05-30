@@ -26,7 +26,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 `.aimd/output/discovery-spec.json` 의 다음 entries (source_grounded_evidence 의무):
 
 - `use_cases[]` — frame 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
-- `business_rules_intent[]` — interaction 에 함축된 BR (예: 카드 만료 가림 / 폼 validation 시각화 / 조건부 button enable) → BR-INTENT-*
+- `business_rules_intent[]` — interaction 에 함축된 BR (예: 카드 만료 가림 / 폼 validation 시각화 / 조건부 button enable) → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-* id 없음)
 - `nfr[]` (부 채널) — a11y (color contrast / aria hints) / responsive breakpoints / transition timing → NFR-*
 - `cross_links.to_visual_manifest` — `analysis-from-figma` baseline 산출 reference (있을 시)
 
@@ -45,7 +45,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 3. **variables / tokens 참조**: `mcp__figma-desktop__get_variable_defs` 호출 → 사용된 design tokens (a11y / responsive vars 추출 보조).
 4. **screenshot (선택)**: `mcp__figma-desktop__get_screenshot` 호출 → 시각 cross-check (LLM 환각 차단 보조 / large frame 시 skip 가능).
 5. **UC 추출**: frame 별 사용자 flow 식별 (starting node + target node + 행동 sequence) → UC-* entry. source_grounded_evidence = `figma:<file_id>:<node_id>`.
-6. **BR-INTENT 추출**: UI interaction 에 함축된 비즈니스 규칙 식별 (마스킹 / 조건부 enable / error state) → BR-INTENT-* + node reference.
+6. **business_rules_intent 추출**: UI interaction 에 함축된 비즈니스 규칙 식별 (마스킹 / 조건부 enable / error state) → entry (br_id + reasoning) + node reference.
 7. **NFR (부 채널) 추출**: a11y / responsive / transition — `analysis-from-figma` 의 visual-manifest 와 cross-check.
 8. **`cross_links.to_visual_manifest`** 채움 (baseline 있을 시) — discovery 가 analysis baseline 위에 UC axis 추가하는 paradigm.
 9. **discovery-spec.json append/merge** — discovery-agent 가 다른 어댑터 산출과 통합 (multi-source 시).

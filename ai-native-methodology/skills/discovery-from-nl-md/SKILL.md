@@ -26,7 +26,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 `.aimd/output/discovery-spec.json` 의 다음 entries:
 
 - `use_cases[]` — paragraph / scenario 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
-- `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → BR-INTENT-*
+- `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-* id 없음)
 - `nfr[]` (★ 1차 채널) — 응답시간 / 가용성 / 동시접속 / 보안 / a11y / 데이터 보존 등 명시 NFR → NFR-*
 - `risks[]` — 명시 risk / concern 언급 → R-*
 - `intent_summary` — section heading 또는 1-line 요약
@@ -46,7 +46,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 2. **structural parse** (markdown 시): heading hierarchy (H1/H2/H3) → section 단위 / paragraph index assign / sentence index assign. source_grounded_evidence ref 정확성 보장.
 3. **scope filter 적용** (있으면): 해당 section / scenario 만 추출.
 4. **UC 추출**: paragraph / scenario 별 사용자 flow 식별. "사용자가 X 한다 / 시스템이 Y 응답" 패턴 → UC-* + source ref.
-5. **BR-INTENT 추출**: "X 는 Y 해야 한다" / "Z 시 W 차단" / "A 만 가능" 등 명시 BR → BR-INTENT-* + source ref + verbatim quote 권장.
+5. **business_rules_intent 추출**: "X 는 Y 해야 한다" / "Z 시 W 차단" / "A 만 가능" 등 명시 BR → entry (br_id + reasoning + source_grounded_evidence) + verbatim quote 권장.
 6. **NFR 추출 (★ 1차 책임)**: 응답시간 / 가용성 / 동시 사용자 / 보안 / a11y / 데이터 보존 기간 등 명시 NFR → NFR-*. **명시되지 않은 NFR fabricate ❌** (no-simulation 의무 핵심).
 7. **risks / concerns 추출**: 명시 위험 / 불확실성 / open-question → R-*.
 8. **intent classification**: orchestrator inject `intent` (new/modify/bug-fix) 와 NL 안 키워드 cross-check — 모순 시 finding emit (예: intent=bug-fix 인데 NL 은 신규 기능 묘사).

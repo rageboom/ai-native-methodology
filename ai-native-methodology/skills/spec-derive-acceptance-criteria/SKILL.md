@@ -115,7 +115,7 @@ AC 안 `story_ref` 본격 부여 (Jira Story ID 또는 자유 string). Story = B
 
 1. **각 BHV 마다 1+ AC 분해** — happy path + ≥ 1 edge case + ≥ 1 negative path 권고.
 2. **Gherkin 작성** — Given/When/Then 단순 사용자어. step 본문에 specific value (★ random 변수 ❌ / property test 는 별도 chain 2 property_tests).
-3. **severity 채움** — BR-INTENT.criticality 매핑 (critical / high / medium / low).
+3. **severity 채움** — 관련 analysis BR (br_id) 의 `severity` 매핑 (business-rules.json / critical / high / medium / low). ★ v11.0.0 — business_rules_intent 에 criticality 필드 폐기 (Senior B1) → severity 는 analysis BR 가 SSOT (br_id backward link 로 조회).
 4. **moscow 채움** — release 우선순위 / 사용자 검토 필수 (default = MUST 단, exploratory = SHOULD).
 5. **test_case_refs 채움 (forward link)** — chain 3 (test) 진입 후 `generate-test-spec` skill 이 backward 채움. 본 skill 단계에서는 placeholder `["TC-{BHV}-001"]` 사전 등록 + chain 3 step 1 에서 검증.
 6. **자동 검증** (compose-behavior-spec step 7 에서 합산):

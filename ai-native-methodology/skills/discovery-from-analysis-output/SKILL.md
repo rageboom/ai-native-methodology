@@ -46,7 +46,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 3. **use_cases 분해** — `decompose-use-cases` skill 호출. 산출 = `UC-{domain}-NNN` 목록.
 
-4. **business_rules_intent 채움** — `identify-business-intent` skill 호출. 산출 = `BR-INTENT-NNN` 목록 + br_refs (business-rules.json 매핑).
+4. **business_rules_intent 채움** — `identify-business-intent` skill 호출. 산출 = `business_rules_intent[]` (각 entry `br_id` = analysis business-rules.json BR-* 1:1 backward link / 별도 BR-INTENT-* id 없음).
 
 5. **cross_links.to_analysis_artifacts 채움** — analysis 산출물 path 모두 backward link.
 
@@ -90,7 +90,7 @@ chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT
 | `decisions[].topic` | string | 결단 주제 (예: "system default value for first option") |
 | `decisions[].source` | enum | `user-explicit` \| `AI-default` \| `AI-investigation-complete` \| `carry` |
 | `decisions[].rationale` | string | 결단 사유 (★ AI-default 시 1차 default 선택 근거 명시 의무) |
-| `decisions[].affected_ids` | array | 영향받는 `UC-*` / `BR-INTENT-*` ID 목록 |
+| `decisions[].affected_ids` | array | 영향받는 `UC-*` / `BR-*` (br_id) ID 목록 |
 | `decisions[].revisit_required` | boolean | 후속 stage gate 에서 사용자 confirm 의무 여부 (★ `AI-default` 시 true 의무) |
 | `pending_decisions[]` | array | ★ 미결단 항목 (carry 대상 / Auto Mode 미활성 시 gate #1 에서 user-explicit 으로 전환 의무) |
 | `meta.auto_mode_default_count` | integer | Auto Mode 에서 AI-default 적용된 결단 수 (★ 후속 gate 사용자 confirm 부담 sizing) |
