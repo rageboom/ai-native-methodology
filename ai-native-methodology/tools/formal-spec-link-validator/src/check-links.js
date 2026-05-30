@@ -184,8 +184,8 @@ const CHAIN_ARTIFACT_BY_NAME = {
 // derivation_source 내부의 path 필드 — chain 단계별 의무 backward link.
 const CHAIN_DERIVATION_PATHS = {
   'planning-spec':       [],  // planning 은 chain 1차 — analysis 만 backward (cross_links 별도)
-  'behavior-spec':       ['planning_spec_path'],
-  'acceptance-criteria': ['behavior_spec_path', 'planning_spec_path'],
+  'behavior-spec':       ['discovery_spec_path'],
+  'acceptance-criteria': ['behavior_spec_path', 'discovery_spec_path'],
   'test-spec':           ['acceptance_criteria_path', 'behavior_spec_path'],
   'impl-spec':           ['test_spec_path', 'behavior_spec_path'],
   'traceability-matrix': [],  // matrix 는 derivation_source 가 별도 — items 단위로 검증

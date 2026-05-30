@@ -158,7 +158,7 @@ function setupChainFixture() {
   const dir = mkdtempSync(join(tmpdir(), 'fsl-chain-'));
   // analysis 산출물 reference 대상
   writeFileSync(join(dir, 'rules.json'), '{}\n');
-  writeFileSync(join(dir, 'planning-spec.json'), '{}\n');
+  writeFileSync(join(dir, 'discovery-spec.json'), '{}\n');
   writeFileSync(join(dir, 'behavior-spec.json'), '{}\n');
   writeFileSync(join(dir, 'acceptance-criteria.json'), '{}\n');
   writeFileSync(join(dir, 'test-spec.json'), '{}\n');
@@ -178,7 +178,7 @@ test('★ chain detectChainArtifact — 6 artifact 인식', () => {
   assert.equal(detectChainArtifact('foo.json'), null);
 });
 
-test('★ chain behavior-spec — derivation_source.planning_spec_path 부재 → ≥1 breaking', () => {
+test('★ chain behavior-spec — derivation_source.discovery_spec_path 부재 → ≥1 breaking', () => {
   const dir = setupChainFixture();
   try {
     const json = {
@@ -187,7 +187,7 @@ test('★ chain behavior-spec — derivation_source.planning_spec_path 부재 �
     };
     const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'behavior-spec.json'), artifact: 'behavior-spec', json }, baseDir: dir });
     const s = summarize(findings);
-    assert.ok(s.breaking >= 1, `expected ≥1 breaking (planning_spec_path missing), got ${JSON.stringify(s)}`);
+    assert.ok(s.breaking >= 1, `expected ≥1 breaking (discovery_spec_path missing), got ${JSON.stringify(s)}`);
     assert.ok(findings.some(f => f.kind === 'chain.backward-link.missing'), `expected chain.backward-link.missing, got ${JSON.stringify(findings)}`);
   } finally {
     rmSync(dir, { recursive: true, force: true });
@@ -199,7 +199,7 @@ test('★ chain behavior-spec — 정합 link → 0 breaking', () => {
   try {
     const json = {
       derivation_source: {
-        planning_spec_path: './planning-spec.json',
+        discovery_spec_path: './discovery-spec.json',
         analysis_artifacts: ['./rules.json'],
       },
       behaviors: [
@@ -218,7 +218,7 @@ test('★ chain behavior-spec — id pattern mismatch → ≥1 non-breaking', ()
   const dir = setupChainFixture();
   try {
     const json = {
-      derivation_source: { planning_spec_path: './planning-spec.json', analysis_artifacts: ['./rules.json'] },
+      derivation_source: { discovery_spec_path: './discovery-spec.json', analysis_artifacts: ['./rules.json'] },
       behaviors: [
         { id: 'BHV-USER-001', use_case_refs: ['INVALID-FORMAT'], acceptance_criteria_refs: ['AC-USER-001'] },
       ],
