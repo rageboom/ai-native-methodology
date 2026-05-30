@@ -85,10 +85,12 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
    - source_file path 결정 (framework convention).
    - expected_outcome = "fail" (★ RED 의무 / impl 부재 가정).
 
-4. **실 test 코드 generate** — Gherkin → framework idiom:
-   - jest: `describe('UC-USER-001 / BHV-USER-001', () => { test('AC-USER-001 — happy path login', () => { ... }) })`
-   - junit5: `@Test @DisplayName("AC-USER-001") void testHappyPath() { ... }`
-   - pytest: `def test_user_login_happy_path(): ...`
+4. **실 test 코드 generate** — Gherkin → framework idiom. ★ **test name 에 TC-id 포함 의무** (아래):
+   - jest: `describe('UC-USER-001 / BHV-USER-001', () => { test('TC-USER-001 — happy path login', () => { ... }) })`
+   - junit5: `@Test @DisplayName("TC-USER-001 — happy path login") void register_success() { ... }`
+   - pytest: `def test_TC_USER_001_login_happy_path(): ...`
+
+   > ★ **TC-id-in-name 규약** (DEC-2026-05-30-s2-exec-corroboration / S2 RealWorld 2차 dogfood 실측): test 의 **display name 또는 메서드명에 TC-id 를 포함**하라. S2(AX전환) per_tc_outcome gate 는 실 runner 결과(JUnit/pytest XML 의 `name`)를 TC-id 로 상관(`test-impl-pass-validator correlateByTcId`)해 characterization(GREEN) ↔ augmentation(RED) 을 per-TC 대조한다. TC-id 가 주석에만 있으면 XML `name` 에 안 실려 상관 실패(missing_actual). ★ JUnit5+Gradle 은 XML `name`=@DisplayName 이므로 **@DisplayName 에 TC-id 가 가장 안전** (메서드명은 하이픈 불가 — correlateByTcId 가 하이픈/언더스코어 정규화로 양쪽 허용). 풀-컨텍스트 통합 test(@SpringBootTest 등)는 격리 DB profile(@ActiveProfiles 등) 명시.
 
 5. **property_tests 코드 generate** — behavior-spec.behaviors[].property_tests[].arbitrary_stub → fast-check / Hypothesis / jqwik 코드 채움.
 

@@ -53,10 +53,19 @@ export function reconcileOutcomes(testCases, actualByTcId = {}) {
   return { outcome_mismatches, evaluated, missing_actual, details };
 }
 
+// 상관 정규화 — 대문자화 + 비영숫자 제거. 'TC-CAR-001'(하이픈 @DisplayName) 와
+//   'tc_CAR_001_...'(언더스코어 Java 메서드명) 를 동일 토큰('TCCAR001')으로 환원.
+//   ★ S2 RealWorld 2차 dogfood 실측 보강 (DEC-2026-05-30-s2-exec-corroboration): JUnit XML `name`=@DisplayName 이
+//   기본이나 generator/reporter 에 따라 메서드명(하이픈 불가)일 수 있어 양쪽 규약을 모두 상관 (모듈 원 주석의 "규약 보강").
+function normalizeForMatch(s) {
+  return String(s).toUpperCase().replace(/[^A-Z0-9]/g, '');
+}
+
 /**
  * 실 runner 의 test-name 별 결과를 TC-id 키 맵으로 상관(correlate)한다.
- * 규약: test-name 안에 TC-id (예: 'TC-CAR-001') 가 substring 으로 포함된다고 가정.
- *   (S2 dogfood 가 이 규약의 적합성을 실측·검증 — 부적합 시 finding + 규약 보강.)
+ * 규약: test-name(@DisplayName 또는 method name) 안에 TC-id 가 (정규화 후) substring 으로 포함.
+ *   - 'TC-CAR-001 returns active cars' (하이픈 displayName) → 매칭
+ *   - 'tc_CAR_001_returnsActiveCars' (언더스코어 메서드명) → 매칭 (정규화로 하이픈/언더스코어 무관)
  * 충돌(같은 TC-id 가 여러 test-name): 하나라도 fail 이면 fail (보수적).
  *
  * @param {Array<{name: string, status: 'pass'|'fail'|'skip'}>} testResults  per-test 결과
@@ -67,7 +76,10 @@ export function correlateByTcId(testResults, testCases) {
   const tcIds = (testCases ?? []).map((t) => t?.id).filter(Boolean);
   const out = {};
   for (const tcId of tcIds) {
-    const matched = (testResults ?? []).filter((r) => typeof r?.name === 'string' && r.name.includes(tcId));
+    const normTc = normalizeForMatch(tcId);
+    const matched = (testResults ?? []).filter(
+      (r) => typeof r?.name === 'string' && normalizeForMatch(r.name).includes(normTc),
+    );
     if (matched.length === 0) continue; // 상관 실패 → reconcile 에서 missing_actual.
     // skip 은 무시, 하나라도 fail 이면 fail.
     const anyFail = matched.some((r) => r.status === FAIL);

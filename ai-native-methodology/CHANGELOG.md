@@ -9,6 +9,24 @@
 
 ---
 
+## [11.13.0] — 2026-05-30 MINOR — S2(AX전환) gate 2차 execution corroboration: RealWorld 실 구동 + 상관 규약 보강 (DEC-2026-05-30-s2-exec-corroboration)
+
+`C-use-scenario-s2-gate` Track α(v11.11.0)의 1차 corroboration 은 characterization GREEN 을 **"impl 존재의 구조적 귀결"로 추론**했을 뿐 실측이 아니었다(Java/Gradle 부재 = RISK-ENV-001). 본 release = **RealWorld 를 실제로 구동해 execution-grade corroboration** 확보 (no-simulation).
+
+**환경 확보 (admin-free)**: Temurin JDK 11.0.31 zip + Gradle 7.4 + Spring Boot 2.6.3 + sqlite::memory:(test profile). `gradlew compileTestJava` BUILD SUCCESSFUL → **RISK-ENV-001(RealWorld arm) 해소**.
+
+**생성 test 통합 (결정적 변환 / `.aimd/transform-gen-tests.mjs`)**: 생성 characterization test 6파일을 RealWorld test sourceSet 으로 — package `io.spring.api_gen`(충돌 회피) + `@ActiveProfiles("test")`(DB 격리) + @DisplayName TC-id prefix(상관). + augmentation `AccountDeletionAugTest`(TC-USER-007 / `DELETE /user` 미구현 / expected_outcome=fail).
+
+**실측 (`gradlew test --tests io.spring.api_gen.*`)**: **26 testcases = 25 PASS(characterization) + 1 FAIL(augmentation)** (JUnit XML 물증). gate 파이프라인(`.aimd/s2-exec-harness.mjs` / 실 methodology 모듈): correlateByTcId(26/26 / missing_actual=0) → reconcileOutcomes(**outcome_mismatches=0**) → evaluateGate('test',·,'S2') = **blocked=false / go-eligible**. augmentation TC-USER-007: expected=fail ↔ actual=fail match. **음성 대조**(characterization 회귀 가정→fail): outcome_mismatches=1 → `s2_outcome_mismatch` → user 'go' → go-with-warnings(rank 2 WARN) = 회귀 탐지 입증.
+
+**methodology 변경 (상관 규약 보강 / additive / breaking 0)**: dogfood 발견 — JUnit5+Gradle XML `name`=@DisplayName(메서드명 아님) + Java 메서드명 하이픈 불가 → TC-id 상관 규약 보강:
+- `tools/test-impl-pass-validator/src/s2-outcome-check.js` — `correlateByTcId` 정규화(`normalizeForMatch`=대문자화+비영숫자 제거) 후 substring → 하이픈 displayName ↔ 언더스코어 메서드명 양쪽 상관 (+2 test / 40→42 / backward-compat).
+- `skills/test-generate-test-spec/SKILL.md` — step 4 "TC-id-in-name 규약"(display name/메서드명에 TC-id / JUnit5+Gradle 은 @DisplayName 권장 / 풀-컨텍스트 통합 test 는 @ActiveProfiles).
+
+**§8.1 평가 (정직)**: RealWorld arm = execution-grade 도달이나 §8.1 ≥2 **distinct domain** 미충족(RealWorld 단일 도메인 / structural+execution 양 grade) → gate enforcement = **WARN 유지**(`s2_outcome_mismatch` rank 2 / hard-block ❌). **WARN→block 격상 = 2nd distinct domain(poc-17 사내 Java / 타 OSS Spring) 후 별 release** — speculative hardening 회피(cooling-off 폐기 + §8.1 strict paradigm 정합).
+
+**STOP-3**: workspace 873→**875(+2)** ✅ + release-readiness 22/22 ✅ + skill-citation 0 stale + version 3-way 11.13.0 + breaking 0 = MINOR. carry: ① C-use-scenario-s2-gate 격상(2nd distinct domain) ② augmentation impl 후 GREEN 격상.
+
 ## [11.12.0] — 2026-05-30 MINOR — dep-graph 의도 노드 code_pointers_na 기본 backstop (F-DOGFOOD-009 / DEC-2026-05-30-code-pointers-intent-na-backstop)
 
 dep-graph `code-pointer-validator`(release-readiness #16)는 모든 Tier-1 노드(artifact_kind ∈ {chain,analysis,aspect}, state ∈ {active,drift})가 `code_pointers`(≥1) 또는 `code_pointers_na=true` 를 갖길 요구한다. 그러나 UC/BHV/AC/TASK + analysis/aspect 는 본질이 **의도/집계 노드**(코드 anchor 는 하위 IMPL/TC 가 보유)이고, 어떤 템플릿/skill 도 na 를 안 박아 RealWorld dogfood 실측에서 **coverage 21.7%**(covered=25 TC / na=0 / **missing=90** = UC19+BHV19+AC25+TASK19+analysis8)로 나타났다. 본 release = synthesizer 가 의도 노드 na 를 자동 기본하는 **3-layer backstop**.

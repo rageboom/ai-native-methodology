@@ -87,4 +87,20 @@ describe('correlateByTcId (test-name → TC-id 상관 규약)', () => {
     const m = correlateByTcId([{ name: 'TC-CAR-001 x', status: 'skip' }], cases);
     assert.equal('TC-CAR-001' in m, false);
   });
+
+  // ★ S2 RealWorld 2차 dogfood 보강 — JUnit XML name 이 메서드명(언더스코어 / 하이픈 불가)인 경우도 상관.
+  it('언더스코어 메서드명(tc_CAR_001_...) → 정규화로 TC-CAR-001 상관 (Java 메서드명 하이픈 불가 현실)', () => {
+    const results = [
+      { name: 'tc_CAR_001_returnsActiveCars()', status: 'pass' },
+      { name: 'tc_CAR_010_supportsNewFilter()', status: 'fail' },
+    ];
+    const m = correlateByTcId(results, cases);
+    assert.equal(m['TC-CAR-001'], 'pass');
+    assert.equal(m['TC-CAR-010'], 'fail');
+  });
+
+  it('하이픈 @DisplayName("TC-CAR-001 — ...") → 정규화 후에도 상관 유지 (회귀 차단)', () => {
+    const results = [{ name: 'TC-CAR-001 — 활성 차량 목록 반환', status: 'pass' }];
+    assert.equal(correlateByTcId(results, cases)['TC-CAR-001'], 'pass');
+  });
 });
