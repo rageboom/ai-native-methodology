@@ -9,6 +9,30 @@
 
 ---
 
+## [11.11.0] — 2026-05-30 MINOR — use-scenario S2(AX전환) gate: characterization GREEN + augmentation RED 분리 enforcement (C-use-scenario-s2-gate Track α / DEC-2026-05-30-s2-gate-slice)
+
+use-scenario taxonomy(v11.7.0)가 **S2(AX전환)를 주 타깃**으로 선언했으나 Slice 1(v11.9.0)의 gate 매트릭스는 `S2: { test: 'all_fail' }` = S1 fallback 으로 공백이었다. S2 의 본질 = legacy **in-place 증강** → test 산출물이 **characterization**(기존 동작 포착 / impl 존재 → GREEN) + **augmentation**(신규 증강분 / impl 부재 → RED) 혼합인데, aggregate `all_fail` 은 characterization 까지 RED 를 요구해 정상 산출물을 오탐 block (= F-DOGFOOD-007 재현). 본 release = gate 를 **per_tc_outcome 분기**로 구현해 혼합을 검증.
+
+**시행 (additive / breaking 0)**:
+- **schema** `schemas/test-spec.schema.json` — test_cases[].items 에 optional `test_intent` enum `[characterization, augmentation]` (미지정 = aggregate fallback / additionalProperties:false 정합).
+- **gate** `tools/chain-driver/src/gate-eval.js` — `SCENARIO_EXPECTED.S2.test = 'per_tc_outcome'` + evaluateGate test stage 분기 (`findings.outcome_mismatches > 0` → reason `s2_outcome_mismatch` / severityRank 2 = coverage_threshold 수준 / go-with-warnings 허용). **S1/greenfield/S3 매트릭스 무변경** (S2 분기 격리).
+- **validator** `tools/test-impl-pass-validator/src/s2-outcome-check.js` (신규) — 순수 모듈: `reconcileOutcomes(testCases, actualByTcId)` (per-TC expected_outcome ↔ 실 결과 대조 → outcome_mismatches/evaluated/missing_actual) + `correlateByTcId(testResults, testCases)` (test-name → TC-id substring 상관 규약).
+- **test** +15 — scenario.test.js +5 (per_tc_outcome mismatch=0 통과 / mismatch>0 block / all-pass 허용 / WARN override / implement GREEN) + s2-outcome-check.test.js +10 (reconcile 6 + correlate 4).
+
+**per_tc_outcome 매트릭스**: characterization → expected_outcome='pass' (legacy 존재 GREEN) / augmentation → 'fail' (impl 부재 RED). gate = aggregate 가 아니라 per-TC expected ↔ actual 일치(`outcome_mismatches`)로 판정. implement stage = S2 도 all_pass.
+
+**★ §8.1 ≥2 S2 corroboration = 1/2 → WARN enforcement** (intent_certainty v11.6.0 optional-WARN 선례):
+- **1차 corroboration (RealWorld / Track α)**: RealWorld(brownfield) 25 TC 전부 characterization → S2 reframe(`test-spec.s2-reframe.json`) **schema-valid** + real gate 코드로 **S1 false-block(F-DOGFOOD-007) → S2 해소** 실증 (`evaluateGate` S1 blocked=true `evidence_missing` / S2 blocked=false). 측정 = `_dogfood-realworld/.../s2-gate-probe.md` + finding F-DOGFOOD-012.
+- **2차 = carry**: 실 characterization GREEN **execution** corroboration = Java/Gradle 부재(RISK-ENV-001) → no-simulation 정책상 GREEN 날조 ❌ / runnable S2 환경(poc-17 사내 Java / RealWorld CI) 의무 + augmentation arm 미실증(RealWorld 신규 기능 부재).
+
+→ enforcement = **WARN** (`s2_outcome_mismatch` rank 2 / 사용자 go → go-with-warnings 허용 / hard-block ❌). ≥2 충족 후 rank 격상 = 별 release.
+
+**paradigm 정합**: gate 를 추측으로 hard-lock ❌ — 실 S2 dogfood(RealWorld)가 구동 (dogfood-first / F-007 = real high finding 해결 = self-referential 아님). brownfield 토글(단순 GREEN 패치) ❌ — 시나리오별 매트릭스로 교정 (S1 의 test 대상=생성될 코드 보존 / taxonomy §2.2).
+
+**STOP-3**: workspace test (chain-driver 250 + test-impl-pass-validator 40 / +15 신규) ✅ + release-readiness 22/22 ✅ + skill-citation 0 stale + version 3-way 11.11.0 + breaking 0 = MINOR. **carry**: `C-use-scenario-s2-gate` 부분 시행 (잔여 = ≥2 execution corroboration + augmentation arm → WARN→block 격상). F-DOGFOOD-007 → resolving.
+
+---
+
 ## [11.10.1] — 2026-05-30 PATCH — drift-validator phase-flow false-positive 정리 (CRLF 주석 + 횡단 메타 노드) (DEC-2026-05-30-phase-flow-drift-false-positive)
 
 `drift-validator flows` directory mode 가 `analysis.phase-flow.mermaid` 에서 **4 breaking 오탐** (`phase-flow.json` / `poc-findings.md` / `INDEX.md` / `STATUS.md`). 모두 phase data-contract 산출물이 아님 — root cause 2종:

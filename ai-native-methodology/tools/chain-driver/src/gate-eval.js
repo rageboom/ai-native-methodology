@@ -34,12 +34,15 @@ const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무 (S1 default)
 // ★ v11.9.0 — use-scenario taxonomy 별 RED/GREEN 기대 (DEC-2026-05-30-use-scenario-taxonomy §2.2 / F-DOGFOOD-007 구조 해소).
 //   S1(재생성)/greenfield(신규) = forward: test all_fail(RED=생성될 코드 부재) → implement all_pass(GREEN).
 //   S3(특성화/문서화만) = snapshot: RED 강제 ❌ (기존 동작 snapshot GREEN / test 단계 RED 미요구).
-//   S2(AX전환) = Slice 1 = S1 fallback (characterization GREEN + augmentation RED 분리 enforcement = Slice 3 carry C-use-scenario-s2-gate / test-intent labeling 필요).
+//   S2(AX전환) = per_tc_outcome (★ v11.11.0 / DEC-2026-05-30-s2-gate-slice / C-use-scenario-s2-gate Track α):
+//     legacy in-place 증강 → characterization TC(expected_outcome='pass' / 기존 동작 GREEN) + augmentation TC(expected_outcome='fail' / 신규 RED) 혼합.
+//     aggregate all_fail 대신 per-TC expected_outcome ↔ 실 결과 일치 검사 (validator 가 outcome_mismatches emit).
+//     ★ corroboration 0 동안 WARN severity (s2_outcome_mismatch rank 2 / go-with-warnings 허용 / intent_certainty optional-WARN 선례) — ≥2 S2 PoC 후 rank 격상.
 //   미지정 → 'S1' default (backward-compat / 기존 동작 동일).
 const SCENARIO_EXPECTED = Object.freeze({
   S1:         { test: 'all_fail', implement: 'all_pass' },
   greenfield: { test: 'all_fail', implement: 'all_pass' },
-  S2:         { test: 'all_fail', implement: 'all_pass' }, // Slice 1 fallback (Slice 3 carry)
+  S2:         { test: 'per_tc_outcome', implement: 'all_pass' }, // ★ v11.11.0 characterization GREEN + augmentation RED 분리
   S3:         { test: 'snapshot_green', implement: 'all_pass' },
 });
 
@@ -90,11 +93,20 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
 
   // Stage-specific outcome enforcement (★ v11.9.0 — scenario-aware / SCENARIO_EXPECTED 매트릭스).
   if (stage === 'test') {
-    // RED 요구는 forward 시나리오(S1/greenfield/S2-fallback)만. S3(snapshot_green) = RED 강제 ❌.
+    // RED 요구는 forward 시나리오(S1/greenfield)만. S3(snapshot_green) = RED 강제 ❌.
     if (expected.test === 'all_fail' && findings.tests_total != null && findings.tests_failed === 0) {
       reasons.push({
         code: 'evidence_missing',
         detail: `chain 3 expected all_fail (RED) for scenario ${scenario}, but all tests passed — RED proof missing (RED 대상 = 생성될 코드)`,
+      });
+    }
+    // ★ v11.11.0 — S2(AX전환) per_tc_outcome: characterization(expected_outcome='pass') GREEN + augmentation(='fail') RED 혼합.
+    //   validator(test-impl-pass-validator)가 per-TC expected_outcome vs 실 결과 비교 → outcome_mismatches emit.
+    //   corroboration 0 동안 WARN (s2_outcome_mismatch rank 2 / go-with-warnings 허용 / DEC-2026-05-30-s2-gate-slice).
+    if (expected.test === 'per_tc_outcome' && (findings.outcome_mismatches ?? 0) > 0) {
+      reasons.push({
+        code: 's2_outcome_mismatch',
+        detail: `chain 3 (S2 AX전환) per-TC expected_outcome mismatch ×${findings.outcome_mismatches} — characterization 은 GREEN(pass) / augmentation 은 RED(fail) 기대 (test_intent ↔ expected_outcome 정합 / WARN until ≥2 S2 corroboration)`,
       });
     }
   }
@@ -127,6 +139,7 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     validator_high: 1,
     coverage_threshold: 2,
     layer2_threshold: 2,         // ★ ★ session 14차 / Senior 권장 / coverage_threshold 수준 / user go → go-with-warnings 허용 / semantic drift Phase D carry
+    s2_outcome_mismatch: 2,      // ★ v11.11.0 / S2 per-TC outcome mismatch / coverage_threshold 수준 / go-with-warnings 허용 (corroboration 0 동안 WARN) / DEC-2026-05-30-s2-gate-slice
     evidence_missing: 3,
     schema_migration_required: 4,
     user_stop: 5,

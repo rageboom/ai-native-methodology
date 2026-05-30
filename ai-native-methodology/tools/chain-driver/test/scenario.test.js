@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import { createScopeManifest, renderManifestMd, SCENARIOS } from '../src/work-unit.js';
 import { ensureScopeDir, readManifest } from '../src/state-store.js';
-import { evaluateGate } from '../src/gate-eval.js';
+import { evaluateGate, applyUserDecision } from '../src/gate-eval.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCHEMA = JSON.parse(
@@ -103,6 +103,45 @@ describe('scenario-aware gate matrix (gate-eval / F-DOGFOOD-007 구조 해소)',
 
   it('unknown scenario → falls back to S1 matrix (no crash)', () => {
     const r = evaluateGate('test', greenTests, 'UNKNOWN');
+    assert.equal(r.blocked, true);
+  });
+});
+
+// ★ v11.11.0 — S2(AX전환) per_tc_outcome gate (C-use-scenario-s2-gate / DEC-2026-05-30-s2-gate-slice).
+//   characterization(expected_outcome='pass') GREEN + augmentation(='fail') RED 혼합 → per-TC 일치 검사.
+//   aggregate all_fail/all_pass 가 아니라 validator 의 outcome_mismatches 로 판정.
+describe('★ S2 AX전환 per_tc_outcome gate (characterization GREEN + augmentation RED)', () => {
+  // S2 의 test stage 는 aggregate(all_fail) 가 아니라 outcome_mismatches 로만 판정.
+  it('S2: per-TC 모두 기대 일치 (outcome_mismatches=0) → RED 강제 ❌ / s2 사유 없음', () => {
+    // characterization 3 pass + augmentation 2 fail = 정상 S2 산출물 (aggregate 로는 all_fail 도 all_pass 도 아님).
+    const r = evaluateGate('test', { tests_total: 5, tests_failed: 2, outcome_mismatches: 0, llm_status: 'skipped' }, 'S2');
+    assert.equal(r.reasons.some((x) => x.code === 's2_outcome_mismatch'), false);
+    // aggregate all_fail 오탐도 없어야 함 (S2 는 all_fail 매트릭스 아님).
+    assert.equal(r.reasons.some((x) => x.detail && x.detail.includes('RED proof missing')), false);
+    assert.equal(r.blocked, false);
+  });
+
+  it('S2: characterization 이 fail 나거나 augmentation 이 pass (outcome_mismatches>0) → block (s2_outcome_mismatch)', () => {
+    const r = evaluateGate('test', { tests_total: 5, tests_failed: 1, outcome_mismatches: 2, llm_status: 'skipped' }, 'S2');
+    assert.equal(r.blocked, true);
+    assert.ok(r.reasons.some((x) => x.code === 's2_outcome_mismatch'));
+  });
+
+  it('S2: all-pass(aggregate) 라도 outcome_mismatches=0 이면 NOT blocked (characterization 만 있는 scope 허용)', () => {
+    // characterization 전용 scope (증강분 아직 없음) — 전부 GREEN 이 정상.
+    const r = evaluateGate('test', { tests_total: 5, tests_failed: 0, outcome_mismatches: 0, llm_status: 'skipped' }, 'S2');
+    assert.equal(r.blocked, false);
+  });
+
+  it('★ s2_outcome_mismatch = WARN (corroboration 0) → user go → go-with-warnings 허용 (block 격상 ❌)', () => {
+    const gate = evaluateGate('test', { tests_total: 5, tests_failed: 1, outcome_mismatches: 2, llm_status: 'skipped' }, 'S2');
+    const decided = applyUserDecision(gate, 'go');
+    assert.equal(decided.blocked, false);
+    assert.equal(decided.decision, 'go-with-warnings');
+  });
+
+  it('S2 implement stage = all_pass GREEN 유지 (augmentation GREEN 전환 + characterization GREEN) — test fail → blocked', () => {
+    const r = evaluateGate('implement', { tests_total: 5, tests_failed: 1, llm_status: 'skipped' }, 'S2');
     assert.equal(r.blocked, true);
   });
 });

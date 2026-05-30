@@ -66,7 +66,7 @@ greenfield 은 "전환(convert)"이 아니라 **처음부터 AX-native 로 태�
 | `C-use-scenario-taxonomy-impl` | ✅ **Slice 1 (v11.9.0)** = scenario 선언 plumbing + gate 매트릭스 / ✅ **Slice 2 (v11.10.0)** = greenfield 옵션 A 재배선 (`analysis-greenfield-bootstrap` + `tools/greenfield-bootstrap` elevation/N-A + 5 skill greenfield-mode) | — (Slice 1·2 RESOLVED) |
 | `C-use-scenario-greenfield-dogfood-2nd-channel` | greenfield AI code-optional mode 의 figma/PRD 2nd 입력 채널 실 dogfood (§8.1 ≥2 완성 / 현 swagger 1채널) | 실 figma/PRD 입력 (Type 1.5 dogfood) |
 | `C-use-scenario-greenfield-schema-synthesis` | PRD 에 ER/DDL 부재 시 domain entity→table schema 합성 (신규 synthesis) | domain.json entity 안착 + ≥1 실 PRD |
-| `C-use-scenario-s2-gate` | S2 characterization GREEN + augmentation RED 분리 enforcement (test-impl-pass-validator 확장 / test-intent labeling) | §8.1 ≥2 S2 PoC corroboration |
+| `C-use-scenario-s2-gate` | ✅ **부분 시행 (v11.11.0 / Track α / DEC-2026-05-30-s2-gate-slice)** = per_tc_outcome gate 분기 + `test_intent` enum + reconcileOutcomes 모듈 + 1차 corroboration(RealWorld reframe schema-valid + S1→S2 false-block 해소). **잔여 = WARN→block 격상**: ① execution corroboration 2차(Java 부재 RISK-ENV-001 → runnable S2 환경) ② augmentation arm 실증 | §8.1 ≥2 S2 PoC corroboration (현 1/2) |
 | `C-codegraph-essential-impl` | codegraph 실제 도구 wiring (`../decisions/DEC-2026-05-30-codegraph-essential.md`) | ✅ Slice 1 (v11.8.0) codegraph-runner / federation = 잔여 |
 
 ## 6. 한 줄 요약

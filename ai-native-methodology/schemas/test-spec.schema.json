@@ -68,6 +68,11 @@
             "enum": ["pass", "fail"],
             "description": "★ chain test RED 의무 = 'fail' (impl 부재 / chain impl GREEN 시 'pass' 격상)"
           },
+          "test_intent": {
+            "type": "string",
+            "enum": ["characterization", "augmentation"],
+            "description": "★ v11.11.0 — use-scenario S2(AX전환) gate (C-use-scenario-s2-gate / DEC-2026-05-30-s2-gate-slice). characterization = 기존 legacy 동작 포착 (in-place 증강 시 expected_outcome='pass' 정합 / legacy 코드 존재 → GREEN 기대) / augmentation = 신규 증강분 (impl 부재 → expected_outcome='fail'(test stage) RED 정합). optional (additive / S2 외 시나리오 미사용 / 미지정 = aggregate 매트릭스 fallback). gate per_tc_outcome 분기가 expected_outcome ↔ test_intent 정합으로 characterization GREEN + augmentation RED 혼합을 검증."
+          },
           "fail_mode": {
             "type": "string",
             "enum": ["compile_import_fail", "assertion_fail", "dry_run_placeholder", "pending"],
