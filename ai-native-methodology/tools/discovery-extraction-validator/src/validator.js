@@ -43,6 +43,7 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
       }
     }
   }
+  const INTENT_CERTAINTY_ENUM = ['observed', 'inferred-consequence', 'unverified-intent', 'source-refuted'];
   for (const intent of brsIntent) {
     if (!analysisBrs.has(intent.br_id)) {
       findings.push({
@@ -50,6 +51,17 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
         severity: 'critical',
         br_id: intent.br_id,
         message: `BR-INTENT references unknown BR ${intent.br_id} (not in analysis business-rules.json)`
+      });
+    }
+    // v11.6.0 (F-DOGFOOD-003 / Option B): intent_certainty 구조 라벨 nudge.
+    // over-attribution 을 검증 가능하게 — 부재 시 WARN(low / non-blocking / backward-compat).
+    // enum 자체 validity 는 schema-validator 가 강제 (여기선 부재만 nudge).
+    if (intent.intent_certainty === undefined || intent.intent_certainty === null) {
+      findings.push({
+        kind: 'discovery.br_intent.missing_intent_certainty',
+        severity: 'low',
+        br_id: intent.br_id,
+        message: `BR-INTENT ${intent.br_id} 에 intent_certainty 라벨 부재 — over-attribution 차단을 위해 ${INTENT_CERTAINTY_ENUM.join('|')} 중 하나 권장 (F-DOGFOOD-003)`
       });
     }
   }

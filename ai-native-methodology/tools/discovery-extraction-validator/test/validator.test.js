@@ -131,4 +131,50 @@ describe('discovery-extraction-validator', () => {
       assert.ok(r.findings.some(f => f.kind === 'discovery.br_intent.unknown_br' && f.severity === 'critical'));
     });
   });
+
+  // v11.6.0: intent_certainty 구조 라벨 (F-DOGFOOD-003 / Option B / MyBatis+JPA arm ≥2 corroboration)
+  describe('intent_certainty (v11.6.0 / F-DOGFOOD-003)', () => {
+    const analysis = { business_rules: [{ id: 'BR-USER-EMAIL-001' }] };
+    const baseDiscovery = (intent) => ({
+      use_cases: [{ id: 'UC-USER-001', source_grounded_evidence: ['x.java:1'] }],
+      business_rules_intent: [intent],
+      cross_links: { to_analysis_artifacts: ['business-rules.json'] }
+    });
+
+    it('WARNs (low) when intent_certainty is absent', () => {
+      const r = validateDiscoveryExtraction(
+        baseDiscovery({ br_id: 'BR-USER-EMAIL-001', reasoning: 'r', source_grounded_evidence: 'x' }),
+        analysis
+      );
+      const f = r.findings.find(x => x.kind === 'discovery.br_intent.missing_intent_certainty');
+      assert.ok(f, 'missing_intent_certainty finding present');
+      assert.equal(f.severity, 'low', 'non-blocking WARN');
+    });
+
+    it('does NOT WARN when intent_certainty present (observed)', () => {
+      const r = validateDiscoveryExtraction(
+        baseDiscovery({ br_id: 'BR-USER-EMAIL-001', reasoning: 'r', source_grounded_evidence: 'x', intent_certainty: 'observed' }),
+        analysis
+      );
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.br_intent.missing_intent_certainty'));
+    });
+
+    it('accepts source-refuted (honest over-attribution flag)', () => {
+      const r = validateDiscoveryExtraction(
+        baseDiscovery({ br_id: 'BR-USER-EMAIL-001', reasoning: 'r', source_grounded_evidence: 'x', intent_certainty: 'source-refuted' }),
+        analysis
+      );
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.br_intent.missing_intent_certainty'));
+      assert.equal(r.summary.critical, 0);
+    });
+
+    it('missing_intent_certainty stays non-blocking (no critical/high)', () => {
+      const r = validateDiscoveryExtraction(
+        baseDiscovery({ br_id: 'BR-USER-EMAIL-001', reasoning: 'r', source_grounded_evidence: 'x' }),
+        analysis
+      );
+      assert.equal(r.summary.critical, 0);
+      assert.equal(r.summary.high, 0);
+    });
+  });
 });

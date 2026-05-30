@@ -9,6 +9,24 @@
 
 ---
 
+## [11.6.0] — 2026-05-30 MINOR — discovery `intent_certainty` enum (F-DOGFOOD-003 / MyBatis+JPA arm ≥2 corroboration / DEC-2026-05-30-fdogfood-003-intent-certainty)
+
+RealWorld dogfood 2nd arm(JPA / `1chz/realworld-java21-springboot3`)이 F-DOGFOOD-003(discovery BR-INTENT reasoning 의 intent 과잉귀속)을 재현 → MyBatis arm(#1) + JPA arm(#2) **§8.1 ≥2 corroboration 충족** → 보류 패치(Option B) 잠금 해제 시행.
+
+**문제**: discovery `business_rules_intent.reasoning` 의 의도 과잉귀속을 Option C guardrail(prose marker `[관찰]/[결과]/[미검증]`)로만 막는데, **검사 validator 부재**(skill 자인 / discovery-extraction-validator 는 br_id match 만) = 양심 의존 = no-simulation 안티패턴. JPA arm 에서 validator 0 findings 인데 reasoning 엔 unverified-intent 존재로 재입증 (동일 3 패턴: login 단일메시지 / slug→SEO / updatedAt-vs-createdAt정렬 소스반증).
+
+**해결 (additive / breaking 0)**:
+- `schemas/discovery-spec.schema.json` — business_rules_intent.items 에 `intent_certainty` enum (`observed`/`inferred-consequence`/`unverified-intent`/`source-refuted`) **optional** 추가. prose marker 의 구조화 승격.
+- `tools/discovery-extraction-validator` — `intent_certainty` 부재 시 **WARN**(low / non-blocking / 채택 nudge) + test 4 신규 (13/13 pass).
+- `skills/discovery-identify-business-intent/SKILL.md` — intent_certainty 구조 라벨 의무 instruction + enum↔marker 매핑표 + line 61 "비결정적" 문구 갱신.
+- dogfood 산출물 소급: JPA + MyBatis discovery-spec 14 BRI 에 intent_certainty 부여 (분포 observed 8 / unverified-intent 3~4 / inferred-consequence 1~2 / source-refuted 1).
+
+**Patch B (F-DOGFOOD-007 / brownfield RED) = 본 release 제외 / carry** — 사용자 재진단: "brownfield 토글" ❌ / use-scenario(S1 재생성 / S2 AX 전환 / S3 특성화) taxonomy 필요. F-007 은 S1(코드 재생성)에서 대부분 오관측(test 대상=생성될 코드). 별도 설계 결단 (DEC-2026-05-30-fdogfood-003-intent-certainty §carry).
+
+**STOP-3**: workspace test (discovery-extraction-validator 9→13 / +4) + skill-citation **0 stale** (poc-17 forward-ref hygiene 동반 정정) + version 3-way 11.6.0 + breaking 0 = MINOR.
+
+---
+
 ## [11.5.1] — 2026-05-29 PATCH — discovery-extraction-validator multi-path BR lookup (paradigm-level resilience / DEC-2026-05-29-validator-multi-path-br-lookup)
 
 > ★ ★ ★ session 54차 = poc-17 chain 1 forward 차단 추정 결함 (LL-poc-17-15 / session 53차 carry queue 본격 promotion `C-validator-dual-key-businessrules`) → Phase 1 validator src + test 시행 → ★ Phase 2 외부 PoC 실측 시점 ★ ★ 본격 사실 정정 발견 ★ ★ — **pre-fix 도 GREEN** (사용자 chain 1 진입 직전 normalize 우회로 chain 1 forward 자격 이미 충족). 본 fix 실제 가치 = ★ paradigm-level resilience 추가 ★ (test 4 신규 / 미래 PoC dual-key + suffix 일관 paradigm 산출 시 자연 인식 / 외부 normalize 우회 불필요). additive only / breaking 0 / 본 PoC 영향 0.

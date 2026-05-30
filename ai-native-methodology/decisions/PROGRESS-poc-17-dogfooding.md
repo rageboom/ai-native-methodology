@@ -393,7 +393,7 @@
 
 **carry queue (★ 다음 session 의제)**:
 - **C-impl-spec-json-completion** (★ 사용자 mvn 후 AI in-place edit / chain 4 GREEN 단계)
-- **C-fn-conversion-alpha-decision** (★ DEC-2026-05-29-fn-conversion-alpha 본격 작성)
+- **C-fn-conversion-alpha-decision** (★ fn-conversion-alpha DEC 본격 작성 — 미작성/예정 / 작성 시 `DEC-<날짜>-fn-conversion-alpha` 부여)
 - **C-traceability-matrix-builder** (★ impl-spec.json GREEN 후 실행)
 - **C-jsp-template-migration** (★ JSP view 별 cycle)
 - **C-sub-rule-§X-H-extension** (★ fn Java 변환 사례 +1)

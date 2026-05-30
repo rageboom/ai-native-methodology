@@ -134,6 +134,11 @@
           "source_grounded_evidence": {
             "type": "string",
             "description": "★ source-grounded 의무 (예: src/user/UserValidator.java:23 + git blame author)"
+          },
+          "intent_certainty": {
+            "type": "string",
+            "enum": ["observed", "inferred-consequence", "unverified-intent", "source-refuted"],
+            "description": "★ v11.6.0 (F-DOGFOOD-003 / MyBatis+JPA arm ≥2 corroboration) — reasoning 의 intent 귀속 확실성 구조화 라벨. observed=코드에서 직접 관찰된 동작(fact) / inferred-consequence=동작의 사실적 결과는 맞으나 의도는 추론 / unverified-intent=의도 귀속이나 소스 근거(주석/ADR/commit) 부재 / source-refuted=귀속하려던 의도를 소스가 반증함. prose marker `[관찰]/[결과]/[미검증]` 의 구조화 승격 — over-attribution 을 validator 검증 가능하게 함 (Option C guardrail 미강제 보완). optional (backward-compat) / discovery-extraction-validator 가 부재 시 WARN."
           }
         }
       }
