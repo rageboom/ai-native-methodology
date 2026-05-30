@@ -9,6 +9,27 @@
 
 ---
 
+## [11.10.0] — 2026-05-30 MINOR — greenfield 산출물 bootstrap (C-use-scenario-taxonomy-impl Slice 2 / greenfield-bootstrap 도구 + 5 skill greenfield-mode) (DEC-2026-05-30-use-scenario-greenfield-bootstrap-slice2)
+
+v11.9.0 Slice 1(시나리오 선언 + gate)의 토대 위에서, **greenfield(신규 / legacy 코드 없음)가 7대 산출물을 실제로 생성해 chain 에 진입**하게 만드는 Slice 2. 사용자 1차 want("신규도 산출물이 나와야 chain 으로 개발·운영"). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 / "analysis 는 코드가 아니라 입력을 요구" 재프레이밍.
+
+**시행 (additive / breaking 0)**:
+- **신규 도구 `tools/greenfield-bootstrap/` (24번째 / zero-dep)** — 결정적·testable anchor: ① `swagger-extract.json → openapi.yaml` elevation (zero-dep block-YAML emitter / 이미 파싱된 OpenAPI 의 결정적 승격 / AI 추론 0) ② legacy-only 산출물 N/A 생성 — `antipatterns.json` 빈 배열 + **`meta.na_reason` embed** (top-level `additionalProperties:false` 회피 / `antipatterns.schema.json` strict 정합) + `migration-cautions.md` stub. CLI `--output [--swagger-extract] [--scope] [--channel]` / 순수 변환(환경 의존 0). **29 test** (yaml-emit 12 + elevate 14 + na-artifacts 5 / §8.1 ≥2 swagger fixture = minimal + RealWorld).
+- **5 analysis skill greenfield code-optional mode** — `analysis-{architecture,domain-model,business-rules,db-schema-erd,openapi}` 에 "scenario=greenfield 시 코드 대신 입력어댑터 extract 에서 산출 / `source_grounded_evidence`=입력 출처 인용 / `code_pointers`=N/A" 절 추가. schema 는 code_pointers hard-require ❌ → greenfield 산출물 schema-valid.
+- **신규 skill `analysis-greenfield-bootstrap`** (57번째 / analysis input phase 등록) — greenfield 진입점. 입력어댑터 패스(코드-고고학 skip) → 결정적 산출(elevation/N-A) → AI 5종 code-optional 산출 → 검증 조율.
+- `analysis-input-orchestrate` greenfield 분기(5단계) + `analysis-input-collection` greenfield redirect note.
+- doc: `lifecycle-contract.md`(analysis = 코드-고고학[legacy] + 입력어댑터[greenfield] 두 패스 / asset matrix input row) + `use-scenario-taxonomy.md` §3.2 bootstrap 구체 절차 + §5 carry 갱신.
+
+**1 실 dogfood (no-simulation)**: RealWorld(Conduit) swagger-extract → `tools/greenfield-bootstrap` → `openapi.yaml`(3 endpoint/5 schema) = `@readme/openapi-parser` **valid:true / warnings:[]** + `antipatterns.json` = `schema-validator` PASS (antipatterns.schema.json). **정직 표기**: swagger **1채널** 입증 / figma·PRD 2nd 채널 = carry.
+
+**backward-compat**: scenario ≠ greenfield → 모든 greenfield-mode 절 무시 (legacy 코드 추출 경로 그대로 / 기존 818 test 무회귀).
+
+**Slice 2 잔여 carry**: `C-use-scenario-greenfield-dogfood-2nd-channel` (figma/PRD 실 dogfood / §8.1 ≥2 완성) + `C-use-scenario-greenfield-schema-synthesis` (PRD ER 부재 시 entity→table 합성) + `C-use-scenario-s2-gate` (S2 characterization+augmentation 분리 gate).
+
+**STOP-3**: workspace test 818 → **847 (+29)** ✅ + release-readiness 22/22 ready ✅ + skill-citation 0 stale (252 doc) + version 3-way 11.10.0 + drift layout/chain-layout 0 orphan + breaking 0 = MINOR.
+
+---
+
 ## [11.9.0] — 2026-05-30 MINOR — use-scenario 선언 plumbing + scenario-aware gate matrix (C-use-scenario-taxonomy-impl Slice 1) (DEC-2026-05-30-use-scenario-impl-slice1)
 
 v11.7.0 use-scenario taxonomy 형식화의 실 구현 carry(`C-use-scenario-taxonomy-impl`) Slice 1. **시나리오 선언 plumbing + RED/GREEN gate 의 scenario 분기** — taxonomy 의 원인인 F-DOGFOOD-007(brownfield RED 오관측 / gate-eval 이 시나리오 모른 채 하드코딩)을 **구조적 해소**. **greenfield 산출물 bootstrap 은 Slice 2 carry**.

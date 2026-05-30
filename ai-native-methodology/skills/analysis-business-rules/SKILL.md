@@ -53,6 +53,17 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 `<user-project>/.aimd/output/business-rules.json`
 
+## ★ greenfield (code-optional) mode
+
+`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A) 일 때 — if/switch/policy 코드 스캔 대신 **입력어댑터 extract** 에서 산출:
+- 입력 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점).
+- BR 후보 = swagger `rules_seed[]` (enum/pattern/min/max/required/format 제약) + PRD acceptance rule (NL md 기획문서) + form-validation-spec (FE 검증).
+- `source_grounded_evidence` = **입력 출처 인용** (코드 grep ❌): `swagger:User.email` / `doc:§3.2` (verbatim quote 권장 / LLM fabrication 회피).
+- `code_pointers` = N/A (`meta.code_pointers_na` 동형 / 가리킬 코드 부재). business-rules.schema.json 은 code_pointers hard-require ❌.
+- ★ **BR id 형식 의무는 greenfield 에서도 동일** (`BR-<DOMAIN>-<SUBJECT>-<NNN>` strict regex / 위 §3 참조).
+- intent_certainty = `inferred-consequence`/`unverified-intent` (설계 의도 / 코드 반증 불가 — F-DOGFOOD-003 정합).
+- 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy 코드 rule 추출 경로 그대로).
+
 ## 본체 명세
 
 - `methodology-spec/workflow/business-logic.md` (§5 — 4영역 병렬 추출 / rules 매핑 = §5.A SQL CASE/WHERE + §5.B FE validation + §5.C 매직 넘버 / v3.0.0 phase 의미 ID rename 정합)

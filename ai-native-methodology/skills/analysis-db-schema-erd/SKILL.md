@@ -46,6 +46,15 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - `<user-project>/.aimd/output/schema.json`
 - `<user-project>/.aimd/output/erd.mermaid`
 
+## ★ greenfield (code-optional) mode
+
+`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A) 일 때 — DDL/ORM 스캔 대신 **설계 의도** 에서 산출:
+- 입력 = PRD ER 다이어그램 (있으면 직접 매핑) / `domain.json` entity (DDL 부재 시 entity 에서 table 추론).
+- ★ **PRD 에 ER/DDL 부재 + domain 만 있을 때 = schema 합성** (entity→table) 은 신규 synthesis → **carry `C-use-scenario-greenfield-schema-synthesis`** (현 Slice 미구현 / 정직 표기). 이 경우 `schema.json` 미산출 또는 stub + finding 등재.
+- `source_grounded_evidence` = 입력 출처 인용 (`doc:ER` / `domain:Entity`). `code_pointers` = N/A (`meta.code_pointers_na` 동형).
+- 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy DDL/ORM 추출 경로 그대로).
+- 진입점 = `analysis-greenfield-bootstrap`.
+
 ## 본체 명세
 
 - `methodology-spec/deliverables/4-5-formal-spec.md` (db 부분)

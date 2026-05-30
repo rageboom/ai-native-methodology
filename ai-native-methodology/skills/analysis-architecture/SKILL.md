@@ -40,6 +40,15 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
 - `<user-project>/.aimd/output/architecture.json`
 - `<user-project>/.aimd/output/architecture.mermaid`
 
+## ★ greenfield (code-optional) mode
+
+`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A) 일 때 — 의존성 방향 코드 분석 대신 **설계 의도** 에서 산출:
+- 입력 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점) + 사용자 stack 선택.
+- pattern = PRD 아키텍처 의도 / swagger tag grouping / figma 화면 구조에서 추론, 없으면 **stack 권장 패턴** 제시 + `inferred` 명시 (예: Spring Boot 3 → layered or hexagonal 권고).
+- `circular_dependencies` = `[]` (신규 빌드 / 아직 코드 없음). `source_grounded_evidence` = 입력 출처 인용.
+- `code_pointers` = N/A (`meta.code_pointers_na` 동형 / 가리킬 코드 부재).
+- 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy inventory→의존성 추출 경로 그대로).
+
 ## 본체 명세
 
 - `methodology-spec/workflow/architecture.md`

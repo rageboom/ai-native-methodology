@@ -38,6 +38,14 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 ★ design stage = ★ v2.x carry (1차 = analysis 자산 deliverable 7~9 reuse / sub-plan 분할 정책 정합).
 ★ 1차 구현 (v2.0.0) = legacy single-case (use case 4종 분기 = v2.1+ carry K-1).
 
+### ★ analysis stage = 두 패스 (코드-고고학[legacy] + 입력어댑터[greenfield]) — v11.10.0
+
+analysis 는 legacy *코드* 가 아니라 *입력* 을 요구한다 (DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A / LL-usc-03 재프레이밍):
+- **코드-고고학 패스** (S1/S2/S3 / legacy 코드 있음) — `analysis-input-collection` 진입 → source-inventory·characterization·sql-inventory 등 코드 기반 phase.
+- **입력어댑터 패스** (greenfield / 코드 없음) — `analysis-greenfield-bootstrap` 진입 → `analysis-input-orchestrate` greenfield 분기로 PRD·디자인·계약 흡수 → 각 analysis skill 의 **greenfield code-optional mode** 로 7대 산출물 subset(architecture/domain/business-rules/openapi/schema) 생성. legacy 전용 산출물(antipatterns/migration-cautions) = N/A (빈/정당화). swagger 채널은 `tools/greenfield-bootstrap` 가 swagger-extract→openapi.yaml 을 **결정적 승격**.
+- 두 패스 모두 같은 7대 산출물 → 같은 정상 상태(AX 운영)로 수렴. greenfield = 산출물이 빌드 부산물로 나오며 처음부터 AX-native.
+- ★ 정직 한계: greenfield AI code-optional mode = swagger 1채널 dogfood 입증 / figma·PRD 2nd 채널 = carry. DB schema 합성(entity→table) = carry.
+
 ## 5 영역 axis (★ 사용자 시나리오 2026-05-02 / ★ v2.0 갱신)
 
 매 stage 가 5 영역 (`기획 / 디자인 / FE / BE / DB`) 을 다른 강도로 다룸. 강 = stage 의 핵심 / 약 = 부수 / ❌ = 적용 안 됨.
@@ -68,7 +76,7 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 
 | Stage / Cross-cut | Agent | Skill | Hook | Tool / Validator | ★ DB 자산 입력 (v11.3.0) |
 |---|---|---|---|---|---|
-| **input** (analysis 진입) | [`agents/analysis-agent.md`](../agents/analysis-agent.md) (★ v4.0 입력 6 skill 책임 통합) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-from-{prompt,swagger,plan-doc,figma}` (★ 부 매트릭스 §자산 매핑 매트릭스 detail 참조) | `SessionStart` (chain-driver hooks-bridge / D21' suppressOutput) | (input-summary.schema.json validation only) | (DB 자산 수집 진입점만 — analysis stage 가 본격 수집) |
+| **input** (analysis 진입) | [`agents/analysis-agent.md`](../agents/analysis-agent.md) (★ v4.0 입력 6 skill 책임 통합) | `analysis-input-collection`, `analysis-input-orchestrate`, `analysis-greenfield-bootstrap` (★ v11.10.0 / scenario=greenfield 진입점), `analysis-from-{prompt,swagger,plan-doc,figma}` (★ 부 매트릭스 §자산 매핑 매트릭스 detail 참조) | `SessionStart` (chain-driver hooks-bridge / D21' suppressOutput) | `greenfield-bootstrap` (★ v11.10.0 / swagger-extract→openapi.yaml elevation + N-A / 결정적), input-summary.schema.json validation | (DB 자산 수집 진입점만 — analysis stage 가 본격 수집 / greenfield 는 legacy-only DB 자산 N/A) |
 | **analysis** (chain 1 sub) | [`agents/analysis-agent.md`](../agents/analysis-agent.md) (★ v4.0 / 22 analysis skill + 6 input skill + 3 base = 31 skill 사전 주입) | `analysis-source-inventory`, `analysis-db-schema-erd`, `analysis-architecture`, `analysis-domain-model`, `analysis-business-rules`, `analysis-openapi`, `analysis-api-rule-mapping`, `analysis-error-mapping`, `analysis-quality-antipattern`, `analysis-formal-spec-validation`, `analysis-characterization-test`, `analysis-sql-inventory`, `analysis-form-validation-fe`, `analysis-type-spec-fe`, `analysis-ui-state-map-fe`, `analysis-ui-visual-manifest-fe`, `analysis-br-cross-consistency-check`, `analysis-html-template` (★ v3.4.0) | `PostToolUse(Write/Edit → lint)`, `Stop(rollup)` | `drift-validator`, `schema-validator`, `formal-spec-link-validator`, `spectral-runner` (사용자 명시 호출), `static-runner`, `decision-table-validator` | ★ **전체 DB 자산 의무** — Tables DDL + Views + Functions + Stored Procedures + ERD + 도메인 노트 모두 입력 자산 (`db-assets-always-on.md` §3) |
 | **discovery** (chain 1) | [`agents/discovery-agent.md`](../agents/discovery-agent.md) (★ v9.0 / 6 discovery skill + 4 base = 10 skill 사전 주입) | `discovery-from-analysis-output`, `discovery-from-swagger`, `discovery-from-figma`, `discovery-from-nl-md`, `discovery-decompose-use-cases`, `discovery-identify-business-intent`, `_base-build-traceability-matrix`, `_base-apply-template`, `_base-log-finding`, `_base-invoke-go-stop-gate` | `PreToolUse(deny secrets)`, `Stop(gate-1 evidence)` | `discovery-extraction-validator`, `br-cross-consistency-validator`, `schema-validator` | ★ scope 관련 DB 자산 — `analysis_refs.db_tables/db_procedures/db_functions/db_views` 역인덱스 자동 첨부 (work-unit-manifest.schema §v11.3.0) |
 | **spec** (chain 2) | [`agents/spec-agent.md`](../agents/spec-agent.md) (★ v4.0 / 3 spec skill + 4 base = 7 skill 사전 주입) | `spec-compose-behavior-spec`, `spec-derive-acceptance-criteria`, `spec-integrate-deliverables`, `_base-build-traceability-matrix` | `PostToolUse(spec lint)` | `chain-coverage-validator`, `formal-spec-link-validator`, `schema-validator` | DB schema 변경 사항 명시 (신규 stack schema 매핑 draft) |

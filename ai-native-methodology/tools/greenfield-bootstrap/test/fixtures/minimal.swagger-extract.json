@@ -1,0 +1,24 @@
+{
+  "scope": "minimal-greenfield",
+  "spec_source": { "path_or_url": "minimal.yaml", "fetch_method": "file" },
+  "spec_version": "openapi-3.0",
+  "info": { "title": "Minimal API", "version": "1.0.0" },
+  "endpoints": [
+    {
+      "path": "/ping",
+      "method": "get",
+      "operation_id": "ping",
+      "summary": "Health check",
+      "responses": {
+        "200": { "description": "pong" }
+      }
+    }
+  ],
+  "schemas": {
+    "Pong": {
+      "type": "object",
+      "required": ["message"],
+      "properties": { "message": { "type": "string" } }
+    }
+  }
+}

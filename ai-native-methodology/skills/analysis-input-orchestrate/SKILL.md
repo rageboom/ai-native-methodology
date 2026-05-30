@@ -68,6 +68,14 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 - 다중 swagger (백오피스 + 프론트) → 사용자 명시 구분 의무 (인라인 마커 권장)
 - 의도만 있고 입력 부재 → `analysis-from-prompt` 만 발동 + 다른 자료 보강 권장 안내
 
+### 5단계 — ★ greenfield 분기 (scenario=greenfield)
+
+`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4) 일 때:
+- **no-code 감지** — 분석 대상 코드 디렉토리 부재 / 입력이 PRD·디자인·계약(swagger·figma·plan-doc·prompt)뿐.
+- **입력어댑터만 dispatch** — BCDE 그대로 (code-archaeology 패스 skip / legacy 전용 phase = `source-inventory`/`db-schema`(코드)/`characterization`/`sql-inventory` 미발동).
+- **`analysis-greenfield-bootstrap` 로 위임** — input-summary 산출 후, 5종 산출물(architecture/domain/business-rules/openapi/schema)을 각 analysis skill 의 **greenfield code-optional mode** 로 생성 + legacy-only 산출물(antipatterns/migration-cautions) N/A + (swagger 채널) openapi.yaml 결정적 elevation 을 조율.
+- backward-compat: scenario ≠ greenfield → 본 분기 무시 (기존 4단계 흐름 그대로).
+
 ## 산출물
 
 - `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json`)

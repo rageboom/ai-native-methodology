@@ -51,5 +51,5 @@ allowed-tools: Read, Glob, Grep, Bash
 
 ## When NOT to invoke
 
-- 사용자가 신규 시스템 구축 (legacy 없음) — 기획→설계→구현 흐름이라 본 skill 부적합. v2.0 lifecycle 확장 시 planning skill 안내.
+- ★ 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A — analysis 는 legacy *코드* 가 아니라 *입력* 을 요구).
 - ADR-010 baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.

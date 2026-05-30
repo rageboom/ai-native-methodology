@@ -1,0 +1,12 @@
+{
+  "name": "@ai-native-methodology/greenfield-bootstrap",
+  "version": "0.1.0",
+  "description": "greenfield 시나리오 결정적 bootstrap helper — swagger-extract.json → canonical openapi.yaml elevation (zero-dep block-YAML emitter / 이미 파싱된 OpenAPI 의 결정적 승격) + legacy-only 산출물 N/A 생성 (antipatterns.json meta-embedded na_reason / migration-cautions.md stub). use-scenario taxonomy greenfield = 입력어댑터 analysis 로 산출물 생성 (옵션 A / DEC-2026-05-30-use-scenario-taxonomy §2.4). 결정적·testable 부분만 (AI greenfield-mode skill = 별 axis).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "greenfield-bootstrap": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/yaml-emit.test.js test/elevate.test.js test/na-artifacts.test.js" },
+  "license": "UNLICENSED"
+}
