@@ -54,7 +54,7 @@ function usage(code = 3) {
     'usage: chain-driver <command> [options]',
     '',
     'commands:',
-    '  init <project> [--scope <slug>]',
+    '  init <project> [--scope <slug>] [--scenario <S1|S2|S3|greenfield>]',
     '  state <project> [--json]',
     '  next <project> [--findings <path>] [--user-decision <go|stop|revisit:STAGE>] [--dry-run]',
     '  query <project> [--scope <slug>] [--stage <s>] [--ref <id>] [--stale]',
@@ -90,6 +90,7 @@ function parseArgs(argv) {
     else if (a === '--base') out.baseSha = rest[++i];
     else if (a === '--repo-root') out.repoRoot = rest[++i];
     else if (a === '--scope') out.scope = rest[++i];
+    else if (a === '--scenario') out.scenario = rest[++i];
     else if (a === '--stage') out.stage = rest[++i];
     else if (a === '--ref') out.ref = rest[++i];
     else if (a === '--stale') out.stale = true;
@@ -147,7 +148,7 @@ function cmdInit(args) {
       state = initState(root, projectId);
     }
     if (args.scope) {
-      ensureScopeDir(root, args.scope);
+      ensureScopeDir(root, args.scope, args.scenario); // ★ v11.9.0 use-scenario taxonomy seed
       state = writeStateCAS(root, (s) => {
         s.current_scope = args.scope;
         return s;
@@ -207,7 +208,10 @@ function cmdNext(args) {
 
   const stage = state.current_chain === 'analysis' ? 'discovery' : state.current_chain;
   const findings = loadFindings(args.findingsPath);
-  const gateResult = evaluateGate(stage === 'analysis' ? 'discovery' : stage, findings);
+  // ★ v11.9.0 — use-scenario taxonomy: scope manifest.scenario → gate matrix (미지정 → 'S1' default / backward-compat).
+  let scenario;
+  try { scenario = state.current_scope ? readManifest(root, state.current_scope)?.scenario : undefined; } catch { scenario = undefined; }
+  const gateResult = evaluateGate(stage === 'analysis' ? 'discovery' : stage, findings, scenario);
   const finalDecision = applyUserDecision(gateResult, args.userDecision);
 
   if (args.dryRun) {

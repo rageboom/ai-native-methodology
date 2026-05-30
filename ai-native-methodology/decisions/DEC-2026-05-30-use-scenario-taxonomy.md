@@ -105,7 +105,7 @@ greenfield 진입 불가(gap B)는 외부 사용자 발화로 트리거된 **실
 ---
 
 ## 6. carry
-- `C-use-scenario-taxonomy-impl` — 본 설계의 실제 구현 (chain-driver --scenario + manifest.scenario 스키마 + greenfield 옵션 A 재배선 + RED/GREEN gate 매트릭스). §8.1 ≥2 greenfield 입력 채널 corroboration + STOP-3 의무.
+- `C-use-scenario-taxonomy-impl` — **Slice 1 RESOLVED (2026-05-30) by [DEC-2026-05-30-use-scenario-impl-slice1](DEC-2026-05-30-use-scenario-impl-slice1.md)** (v11.9.0 / 시나리오 선언 plumbing manifest.scenario + chain-driver init --scenario + scenario-aware gate matrix = F-007 구조 해소). 잔여: **`C-use-scenario-greenfield-bootstrap`** (greenfield 옵션 A 재배선 + planning→output elevation / §8.1 ≥2 입력 채널) + **`C-use-scenario-s2-gate`** (S2 characterization+augmentation 분리 gate).
 - `C-honesty-tool-cleanup` — CLAUDE.md no-simulation 절의 실행불가 도구(SpotBugs/Daikon) 정직 cleanup (별도 / DEC-2026-05-30-codegraph-essential 와 합치).
 
 ## 7. 한 줄 결론

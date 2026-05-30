@@ -6,8 +6,15 @@
 // ★ v9.0 — manifest stage dirs (planning→discovery 개칭 + plan 신설 / 'impl' = implement 단축).
 export const STAGES = Object.freeze(['discovery', 'spec', 'plan', 'test', 'impl']);
 
-export function createScopeManifest(scope) {
-  return {
+// ★ v11.9.0 — use-scenario taxonomy (S1 재생성 / S2 AX전환 / S3 특성화 / greenfield 신규).
+//   DEC-2026-05-30-use-scenario-taxonomy. scenario = optional (미지정 시 필드 부재 → gate-eval default 'S1').
+export const SCENARIOS = Object.freeze(['S1', 'S2', 'S3', 'greenfield']);
+
+export function createScopeManifest(scope, scenario) {
+  if (scenario != null && !SCENARIOS.includes(scenario)) {
+    throw new Error(`createScopeManifest: invalid scenario "${scenario}" (expected one of ${SCENARIOS.join('/')})`);
+  }
+  const m = {
     scope,
     status: 'pending',
     current_stage: 'discovery',
@@ -25,6 +32,8 @@ export function createScopeManifest(scope) {
       drift_detected: false,
     },
   };
+  if (scenario != null) m.scenario = scenario;
+  return m;
 }
 
 export function createStageManifest(scope, stage) {
@@ -81,6 +90,7 @@ export function renderManifestMd(m) {
   lines.push(`# ${m.scope}${m.stage ? ` / ${m.stage}` : ''}`);
   lines.push('');
   lines.push(`- **Status**: \`${m.status}\``);
+  if (m.scenario) lines.push(`- **Scenario**: \`${m.scenario}\` (use-scenario taxonomy)`);
   if (m.stage) lines.push(`- **Stage**: \`${m.stage}\``);
   if (m.current_stage) lines.push(`- **Current stage**: \`${m.current_stage}\``);
   if (m.created_at) lines.push(`- **Created**: ${m.created_at}`);

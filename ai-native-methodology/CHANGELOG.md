@@ -9,6 +9,24 @@
 
 ---
 
+## [11.9.0] — 2026-05-30 MINOR — use-scenario 선언 plumbing + scenario-aware gate matrix (C-use-scenario-taxonomy-impl Slice 1) (DEC-2026-05-30-use-scenario-impl-slice1)
+
+v11.7.0 use-scenario taxonomy 형식화의 실 구현 carry(`C-use-scenario-taxonomy-impl`) Slice 1. **시나리오 선언 plumbing + RED/GREEN gate 의 scenario 분기** — taxonomy 의 원인인 F-DOGFOOD-007(brownfield RED 오관측 / gate-eval 이 시나리오 모른 채 하드코딩)을 **구조적 해소**. **greenfield 산출물 bootstrap 은 Slice 2 carry**.
+
+**시행 (additive / breaking 0)**:
+- `schemas/work-unit-manifest.schema.json` — top-level optional `scenario` enum `[S1,S2,S3,greenfield]` (scope manifest only / required ❌).
+- `tools/chain-driver/` — `init --scenario` flag (cli.js) + `createScopeManifest(scope, scenario)` + `ensureScopeDir` passthrough (state-store) + `renderManifestMd` Scenario 줄 (work-unit.js). 소비자는 readManifest 자동 접근.
+- `tools/chain-driver/src/gate-eval.js` — `evaluateGate(stage, findings, scenario='S1')` + `SCENARIO_EXPECTED` 매트릭스. **S1/greenfield**=forward(test all_fail RED="생성될 코드 부재" → implement all_pass GREEN) / **S3 특성화**=snapshot(RED 강제 ❌ / mis-gate 수정) / **S2**=Slice 1 S1 fallback (characterization+augmentation 분리 = Slice 3 carry). cmdNext 가 manifest.scenario 전달.
+- `tools/chain-driver/test/scenario.test.js` (신규 14 test) — plumbing + schema enum + gate matrix.
+
+**backward-compat**: scenario 미지정 → gate-eval default 'S1' → 기존 동작 동일 (6/6 e2e + gate-eval/state-store test 무회귀 / 기존 PoC manifest 무영향).
+
+**Slice 2+ carry**: `C-use-scenario-greenfield-bootstrap` (analysis-from-* 재사용 orchestration + planning→output elevation + lifecycle greenfield 경로 / §8.1 ≥2 입력 채널) + `C-use-scenario-s2-gate` (S2 characterization GREEN + augmentation RED 분리 / test-intent labeling).
+
+**STOP-3**: workspace test 804 → **818 (+14)** ✅ + release-readiness 22/22 ready ✅ + skill-citation 0 stale + version 3-way 11.9.0 + breaking 0 = MINOR.
+
+---
+
 ## [11.8.0] — 2026-05-30 MINOR — codegraph-runner 신설 (C-codegraph-essential-impl Slice 1 / CodeGraph OSS 필수 도구 wiring) (DEC-2026-05-30-codegraph-essential-impl-slice1)
 
 직전 v11.7.0 이 codegraph = analysis 필수 도구로 결정(DEC-2026-05-30-codegraph-essential)하고 실 wiring 은 carry(`C-codegraph-essential-impl`)했음. 사용자 "C-codegraph-essential-impl 부터 진행" → Slice 1 (도구 실행 + reference-lens 산출물) 시행. **federation(dep-graph 결합)은 Slice 2 carry**.

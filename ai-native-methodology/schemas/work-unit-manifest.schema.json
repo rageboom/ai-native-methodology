@@ -29,6 +29,11 @@
       "type": "string",
       "enum": ["pending", "in_progress", "complete", "blocked"]
     },
+    "scenario": {
+      "type": "string",
+      "enum": ["S1", "S2", "S3", "greenfield"],
+      "description": "★ v11.9.0 use-scenario taxonomy (S1=재생성 / S2=AX전환 / S3=특성화 / greenfield=신규). scope manifest only / optional / chain-driver init --scenario 로 선언 → 전 stage 일관 참조 + gate-eval RED/GREEN 매트릭스 분기. 미지정 → gate-eval default 'S1'. DEC-2026-05-30-use-scenario-taxonomy."
+    },
     "created_at": {
       "type": "string",
       "format": "date-time"

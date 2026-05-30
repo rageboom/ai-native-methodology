@@ -274,17 +274,17 @@ export function scopeDirPath(projectRoot, scope, stage) {
     : join(projectRoot, '.aimd', scope);
 }
 
-export function ensureScopeDir(projectRoot, scope) {
+export function ensureScopeDir(projectRoot, scope, scenario) {
   validateScopeSlug(scope);
   ensureAimdDir(projectRoot);
 
   const scopeDir = join(projectRoot, '.aimd', scope);
   if (!existsSync(scopeDir)) mkdirSync(scopeDir, { recursive: true });
 
-  // Seed scope manifest (idempotent — only when absent).
+  // Seed scope manifest (idempotent — only when absent). ★ v11.9.0 scenario passthrough (use-scenario taxonomy).
   const scopeManifestPath = join(scopeDir, 'manifest.json');
   if (!existsSync(scopeManifestPath)) {
-    writeManifest(projectRoot, scope, null, createScopeManifest(scope));
+    writeManifest(projectRoot, scope, null, createScopeManifest(scope, scenario));
   }
 
   // 4 stage dirs + seeds (idempotent).

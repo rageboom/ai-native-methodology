@@ -28,15 +28,28 @@ const REQUIRED_VALIDATORS_PER_STAGE = {
 //   ★ Q-C4 (a) Layer 1 AND Layer 2 양쪽 통과 paradigm + Q-S2 (b) aggregate block + coverage_threshold 수준 severity.
 //   ★ ★ Senior STOP-3 흡수 (Q-S3 (a) Phase C 종결 자격 유일 paradigm).
 
-const TEST_STAGE_EXPECTED = 'all_fail';   // RED 의무
-const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무
+const TEST_STAGE_EXPECTED = 'all_fail';   // RED 의무 (S1 default)
+const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무 (S1 default)
+
+// ★ v11.9.0 — use-scenario taxonomy 별 RED/GREEN 기대 (DEC-2026-05-30-use-scenario-taxonomy §2.2 / F-DOGFOOD-007 구조 해소).
+//   S1(재생성)/greenfield(신규) = forward: test all_fail(RED=생성될 코드 부재) → implement all_pass(GREEN).
+//   S3(특성화/문서화만) = snapshot: RED 강제 ❌ (기존 동작 snapshot GREEN / test 단계 RED 미요구).
+//   S2(AX전환) = Slice 1 = S1 fallback (characterization GREEN + augmentation RED 분리 enforcement = Slice 3 carry C-use-scenario-s2-gate / test-intent labeling 필요).
+//   미지정 → 'S1' default (backward-compat / 기존 동작 동일).
+const SCENARIO_EXPECTED = Object.freeze({
+  S1:         { test: 'all_fail', implement: 'all_pass' },
+  greenfield: { test: 'all_fail', implement: 'all_pass' },
+  S2:         { test: 'all_fail', implement: 'all_pass' }, // Slice 1 fallback (Slice 3 carry)
+  S3:         { test: 'snapshot_green', implement: 'all_pass' },
+});
 
 export function requiredValidators(stage) {
   return REQUIRED_VALIDATORS_PER_STAGE[stage] || [];
 }
 
-export function evaluateGate(stage, findings) {
+export function evaluateGate(stage, findings, scenario = 'S1') {
   const reasons = [];
+  const expected = SCENARIO_EXPECTED[scenario] || SCENARIO_EXPECTED.S1;
 
   if ((findings.critical ?? 0) > 0) {
     reasons.push({ code: 'validator_critical', detail: `critical findings = ${findings.critical}` });
@@ -75,20 +88,21 @@ export function evaluateGate(stage, findings) {
     }
   }
 
-  // Stage-specific outcome enforcement
+  // Stage-specific outcome enforcement (★ v11.9.0 — scenario-aware / SCENARIO_EXPECTED 매트릭스).
   if (stage === 'test') {
-    if (findings.tests_total != null && findings.tests_failed === 0) {
+    // RED 요구는 forward 시나리오(S1/greenfield/S2-fallback)만. S3(snapshot_green) = RED 강제 ❌.
+    if (expected.test === 'all_fail' && findings.tests_total != null && findings.tests_failed === 0) {
       reasons.push({
         code: 'evidence_missing',
-        detail: `chain 3 expected ${TEST_STAGE_EXPECTED} (RED), but all tests passed — RED proof missing`,
+        detail: `chain 3 expected all_fail (RED) for scenario ${scenario}, but all tests passed — RED proof missing (RED 대상 = 생성될 코드)`,
       });
     }
   }
   if (stage === 'implement') {
-    if (findings.tests_total != null && findings.tests_failed > 0) {
+    if (expected.implement === 'all_pass' && findings.tests_total != null && findings.tests_failed > 0) {
       reasons.push({
         code: 'evidence_missing',
-        detail: `chain 4 expected ${IMPL_STAGE_EXPECTED} (GREEN), but ${findings.tests_failed} tests failed`,
+        detail: `chain 4 expected all_pass (GREEN) for scenario ${scenario}, but ${findings.tests_failed} tests failed`,
       });
     }
     // ★ ★ ★ v8.6.0 — R19 evidence_trust 3-tier chain-strict mode 격상 (Senior STRONG-STOP 흡수).
