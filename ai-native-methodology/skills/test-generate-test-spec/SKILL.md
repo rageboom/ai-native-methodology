@@ -85,6 +85,8 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
    - source_file path 결정 (framework convention).
    - expected_outcome = "fail" (★ RED 의무 / impl 부재 가정).
 
+   > ★ **S2 augmentation 재동기화** (P4 양방향 역동기화 / DEC-2026-05-30-s2-augmentation-green-roundtrip): `test_intent=augmentation` TC 는 생성 시 `expected_outcome="fail"`(RED / 증강분 미구현). impl 완료 후엔 spec 의 `expected_outcome` 을 **fail→pass 로 재동기화**(증강분이 시스템 동작 = characterization-grade 승격). 재동기화 누락 시 S2 per_tc_outcome gate 가 actual(pass) ↔ expected(fail) 불일치를 `s2_outcome_mismatch` WARN 으로 신호(impl 이 spec 보다 앞섬 = drift) — 이 신호가 운영자에게 역동기화를 요구한다. RealWorld dogfood RED→GREEN round-trip 실측 (DELETE /user).
+
 4. **실 test 코드 generate** — Gherkin → framework idiom. ★ **test name 에 TC-id 포함 의무** (아래):
    - jest: `describe('UC-USER-001 / BHV-USER-001', () => { test('TC-USER-001 — happy path login', () => { ... }) })`
    - junit5: `@Test @DisplayName("TC-USER-001 — happy path login") void register_success() { ... }`
