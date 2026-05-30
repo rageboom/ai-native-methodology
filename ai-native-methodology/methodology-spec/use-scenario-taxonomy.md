@@ -1,0 +1,59 @@
+# Use-Scenario Taxonomy (S2 AX전환 / S1 재생성 / S3 특성화 / greenfield)
+
+> **사상**: 산출물 = LLM 의 운영 컨텍스트 그 자체. 방법론의 가장 큰 목적 중 하나 = 이 컨텍스트를 평생 유지·동기화하여 프로젝트를 **AX 로 운영**하는 것. 4 시나리오는 bootstrap 입력에서만 갈리고 모두 같은 정상 상태(AX 운영)로 수렴한다.
+> **trigger**: session 55차 사용자 정체성 재진술 (2026-05-30) — "산출물 동기화의 1순위 이유 = AX 운영 컨텍스트 유지" + F-DOGFOOD-007 use-scenario 재진단.
+> **관련**: `../decisions/DEC-2026-05-30-use-scenario-taxonomy.md` (SSOT 결단) · `../decisions/DEC-2026-05-30-fdogfood-003-intent-certainty.md` §3 · `baseline-delta-operating-model.md` · `db-assets-always-on.md` · `lifecycle-contract.md` §가치명세.
+
+## 1. 정체성 명제 (P0~P4)
+
+| # | 명제 |
+|---|---|
+| **P0** | 방법론의 가장 큰 목적 중 하나 = **AX 운영을 위한 LLM 컨텍스트의 유지·동기화**. |
+| P1 | 산출물 = "시스템 설명 문서"가 아니라 **LLM 의 운영 컨텍스트 그 자체** (전 생애 유지·동기화). |
+| P2 | **bootstrap 입력만 다르고 컨텍스트 유지는 동일** — 모든 시나리오가 같은 정상 상태(AX 운영)로 수렴. |
+| P3 | dep-graph(artifact↔artifact + artifact↔code) = 내부 동기화 SSOT / codegraph(code↔code) = **필수 도구** (`../decisions/DEC-2026-05-30-codegraph-essential.md`). |
+| P4 | 산출물 = **모든 chain stage 의 base + 양방향 루프** (base 품질 = 전체 품질 / 전 단계 사용 / 기능추가 → 역동기화). |
+
+**용어 구분**: **AX 운영(operation)** = 모든 시나리오가 도달하는 정상 상태(LLM 이 동기화 컨텍스트로 프로젝트를 굴림) ≠ **AX전환(S2)** = legacy 를 AX 운영 모드로 전환하는 *행위*.
+
+## 2. 4 시나리오 매트릭스 (★ 주 타깃 = S2)
+
+| 시나리오 | 입력(bootstrap) | analysis 패스 | intent_certainty 강조 | chain 4 RED / chain 5 GREEN |
+|---|---|---|---|---|
+| ★ **S2 AX전환** (in-place 증강) **= 주 타깃** | legacy 코드 + 의도 | 코드-고고학 + characterization | **verified intent** | characterization GREEN(기존) + 증강분 RED→GREEN(신규) |
+| **S1 재생성** (forward / 신규 스택) | legacy 코드 | 코드-고고학 + 입력어댑터 | **observed** | RED=생성될 코드 부재 / GREEN=생성 코드 통과. **test 대상 = 생성될 코드(legacy 아님)** |
+| **S3 특성화** (문서/스냅샷만) | legacy 코드 | 코드-고고학 | observed | 기존 동작 snapshot GREEN (재생성 없음) |
+| **greenfield** (신규) | PRD / 디자인 / 계약 (코드 없음) | **입력어댑터 analysis 만** | inferred/intent | S1 동형 (forward) |
+
+### 2.1 주 타깃 = S2 함의
+S2 는 기존 코드를 in-place 로 살린다 → **characterization(기존 동작 포착) + verified intent(왜 존재하나)** 가 핵심. `intent_certainty` enum (F-DOGFOOD-003) 과 codegraph(기존 코드 구조 파악) = S2 의 도구. enforcement·검증·예시·기본값 = S2 우선 정렬.
+
+### 2.2 F-DOGFOOD-007 교정
+F-007(brownfield RED)은 S1/S2/S3 를 뭉갬. 단순 "brownfield=GREEN" 패치는 S1 을 틀리게 만듦 (S1 의 test 대상 = legacy 가 아니라 생성될 코드). 올바른 fix = **시나리오 선언 → 시나리오별 RED/GREEN 매트릭스** (본 표).
+
+## 3. greenfield = 처음부터 AX-native
+
+greenfield 은 "전환(convert)"이 아니라 **처음부터 AX-native 로 태어남**. 바꿀 legacy 가 없으므로 별도 전환 단계 없이, 방법론으로 빌드하는 과정에서 **산출물이 나오는 것 자체가 AX 운영 진입** (AX = 빌드 부산물). 전제 = **산출물이 반드시 나와야 함**.
+
+### 3.1 greenfield 산출물 생성 (gap B / 옵션 A)
+- **문제**: discovery 어댑터(swagger/figma/nl-md)는 discovery-spec 만 생성, 7대 산출물 미생성. spec stage 는 7대 hard-depend → greenfield 진입 막힘.
+- **옵션 A (확정)**: 기존 `analysis-from-{swagger,figma,plan-doc,prompt}` 재사용. greenfield = 코드-고고학 패스만 생략, 입력어댑터 analysis 로 산출물 생성.
+- **재프레이밍**: "analysis stage" = 코드-고고학 패스(legacy 전용) + **입력어댑터 패스(공통)**. analysis 는 legacy *코드* 가 아니라 *입력* 을 요구한다.
+- greenfield 에서 비는 산출물(legacy 전용 antipatterns / migration-cautions) = 빈/N-A 정당화 명시 (code_pointers_na 동형).
+
+## 4. 시나리오 선언 위치
+
+`chain-driver init --scenario <S1|S2|S3|greenfield>` flag 로 입력 → **`work-unit-manifest.scenario` 에 저장** → analysis~implement 전 단계가 manifest.scenario 일관 참조.
+
+- discovery-spec 에 박지 ❌ (discovery 단계에서야 정해지면 그 앞 analysis 가 시나리오 모름).
+- S2 가 주 타깃이라 analysis 단계부터 시나리오 인지 필요(코드-고고학 + characterization 강도 조절) → manifest 가 정답.
+
+## 5. 구현 carry (본 명세 = 설계 SSOT / 코드는 별도 세션)
+
+| carry | 내용 | 자격 게이트 |
+|---|---|---|
+| `C-use-scenario-taxonomy-impl` | `chain-driver init --scenario` + `work-unit-manifest.scenario` enum + greenfield 옵션 A 재배선 + RED/GREEN gate 매트릭스 enforcement | §8.1 ≥2 greenfield 입력 채널 corroboration + STOP-3 |
+| `C-codegraph-essential-impl` | codegraph 실제 도구 wiring (`../decisions/DEC-2026-05-30-codegraph-essential.md`) | PoC ≥2 code_pointers corroboration + STOP-3 |
+
+## 6. 한 줄 요약
+> 4 시나리오(S2 주 타깃 / S1 / S3 / greenfield)는 bootstrap 입력만 다르고 모두 AX 운영으로 수렴. greenfield 도 입력어댑터 analysis 로 산출물을 만들어(옵션 A) 처음부터 AX-native. 시나리오는 `chain-driver init --scenario` → manifest 선언. 본 명세 = 설계 SSOT / 구현 carry.

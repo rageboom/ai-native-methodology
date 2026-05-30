@@ -9,7 +9,7 @@
 > ★ v8.6.3 (2026-05-18) — **R20 구조 강제** (parent_ticket_id schema 의무 + link_type enum + jira_structure_add_issues 통합 + F-TICKETSYNC-002 missing_parent finding / DEC-2026-05-18-r20 §v8.6.3).
 > ★ ★ ★ ★ ★ v11.0.0 결단 의제 carry (2026-05-26 / Phase 0 결단 문서화만) — **R20-prime** = ticket = plan stage 단일 paradigm (R20 v8.6.x phase enum {enter, exit} 본격 retract / DEC-2026-05-26-ticket-plan-단일 / Phase 1+ 본격 시행 / 차기 세션 cascade) + templates §2 R4 = templates/{analysis, **discovery (★ planning→rename)**, **spec (★ 신설)**, plan, test, implement, design}/ 정합 (DEC-2026-05-26-discovery-spec-rename / DEC-2026-05-26-v11-paradigm-결단).
 
-## §1 사용자 요구사항 20 (must-have / ★ R20 v8.6.1 신설 / R19 v8.6.0 / R18 v7.1.0 / R16·R17 영구 scope-out)
+## §1 사용자 요구사항 21 (must-have / ★ R21 v11.7.0 신설 / R20 v8.6.1 / R19 v8.6.0 / R18 v7.1.0 / R16·R17 영구 scope-out)
 
 | # | 요구 | 범주 |
 |---|------|------|
@@ -33,6 +33,7 @@
 | R18 | **플러그인 자산(Skill/Hook/Agent/packaging)은 Anthropic 공식 best practice 정합** + 공식 docs 변경 시 재검증 — `plugin-authoring-spec.md` 단일 SSOT (★ v7.1.0 신설 / 사용자 결단 = 정식 R / §5 backlog ❌) | plugin-authoring |
 | R19 | **외부 도구 의존 분류** — Tier 1 (in-plugin native / JVM 의존 0) / Tier 2 (사용자 환경 SARIF import / JVM 의존 도구) / Tier 3 (simulated 영구 reject). 4 조건 schema-level 강제 (driver allowlist + non-empty results + reproduction_command + evidence_trust 3-tier) — ★ v8.6.0 신설 (Senior STRONG-STOP 전면 흡수 / no-simulation 정책 정합 / sub-axis evolution paradigm 정합) | tool-ecosystem |
 | R20 | **MCP Ticket Sync Channel** — chain stage 종료 동기로 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 호출 / 모든 호출 직전 사용자 confirmation gate 의무 / 7-field evidence 캡쳐 / Tier 2.5 (MCP delegation) only — Tier 3 (자체 platform adapter) = v9.0+ carry. R16/R17 부활 ❌ — DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path "별도 charter 요구 신설 (R18+)" 정합. ★ v8.6.1 신설 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) | ticket-lifecycle |
+| R21 | **use-scenario 선택 + AX 운영 컨텍스트 동기화** — (1) 4 use-scenario(S2 AX전환=주 타깃 / S1 재생성 / S3 특성화 / greenfield)를 `chain-driver init --scenario` 로 선언 (→ work-unit-manifest.scenario / 전 stage 일관 참조) (2) **greenfield 도 산출물 생성 의무** (입력어댑터 analysis 재사용 / "분석 없음=산출물 없음" ❌) (3) 산출물 = LLM 운영 컨텍스트 = 모든 stage base + 기능추가 역동기화 (4) **codegraph = analysis 필수 도구** (Semgrep 동급 / DEC-2026-05-30-codegraph-essential). ★ v11.7.0 신설 (DEC-2026-05-30-use-scenario-taxonomy / 설계 SSOT — 구현 carry) | use-scenario |
 
 ## §2 현 구현 매핑 (v3.1.0 기준 / 2026-05-15)
 
@@ -59,7 +60,9 @@
 | R19 | ✅ | (★ v8.6.0 신설 / DEC-2026-05-18-runtime-tool-exclusion / ★ v8.14.3 sub-axis patch — DEC-2026-05-23-fsim-016-environment-dependent-scope-out) `tools/static-runner/src/runner.js` 의 `IMPORTED_DRIVER_ALLOWLIST` + `importSarif` 함수 = 4 조건 강제 (driver allowlist `[pmd, spotbugs, codeql, daikon]` + non-empty results 또는 `non_use_rationale` 의무 + `reproduction_command` 의무 + `EVIDENCE_TRUST` enum `[real_tool, imported_sarif, simulated]`). Tier 3 (simulated) = chain gate -5%p + block. F-015 6/6 verbatim (Semgrep Python pipx / Spectral Node.js / PMD Java 8 or above / SpotBugs JRE 11+ / SARIF 2.1.0 Plus Errata 01). Senior STRONG-STOP 전면 흡수 (confidence 0.84) — `feedback_no_static_tool_simulation.md` 정합. ★ ★ **v8.14.3 sub-axis patch**: Tier 2 안 **environment-dependent risk sub-axis** 본격 명시 — 사용자 환경 부재 (Semgrep Windows MSYS2 / argon2+Node 22+Windows native build / sqlite3 native rebuild 등) = Tier 3 격상 ❌ (simulated 아님) + carry 정직 표기 의무 (deadline 없음). pre-flight smoke STOP-3 hard gate paradigm (LL-fsim-15) + Senior 사실 검증 보강 paradigm (LL-fsim-11) 정합. memory `feedback_environment_dependent_tools_scope_out.md` 참조. F-SIM-016 closed v8.14.3. |
 | R20 | ✅ | (★ v8.6.1 신설 / v8.6.2 확장 / DEC-2026-05-18-r20-mcp-ticket-sync-channel) `skills/ticket-sync/SKILL.md` 5 stage × 2 phase matrix (analysis/planning/spec/test/implement × enter/exit) + `mcp__wiki-jira-assistant__*` 위임 (jira 18 + wiki 13 tools) + confirmation gate 의무 (preview MD → yes/no/dry-run halt) + 7-field evidence (`schemas/ticket-sync-evidence.schema.json` / static-runner `REQUIRED_EVIDENCE` 재사용) + `traceability-matrix.ticket_ref.status_history` + `enter_task_ids` (v8.6.2) + search-first idempotency + `hooks/hooks.json` PreToolUse matcher 에 `mcp__wiki-jira-assistant__.*` 추가 (state.blocked 시 deny). ★ v8.6.2 phase=enter (stage 진입 시 의무 작업 Task 1개 / analysis-planning = 도메인 단위 / spec-test-implement = per UC 단위) + phase=exit (기존 결과 batch + enter Task 자동 종결 / backward compat). R16/R17 부활 ❌ — 신규 채널. |
 
-**요약 (v8.6.2 갱신)**: ✅ **17** / ⚠️ **1** / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **18/18** 자산 대칭 (★ R20 v8.6.1 신설 + v8.6.2 phase=enter 확장 / R19 v8.6.0).
+| R21 | ◐ 설계 SSOT | (★ v11.7.0 신설 / DEC-2026-05-30-use-scenario-taxonomy + DEC-2026-05-30-codegraph-essential) `methodology-spec/use-scenario-taxonomy.md` 단일 SSOT (4 시나리오 매트릭스 + P0~P4 정체성 + greenfield 옵션 A + 선언 위치 `chain-driver init --scenario`→manifest) + 가치명세(CLAUDE.md/lifecycle-contract) 갱신. **설계 형식화 완료 / 구현 carry** = `C-use-scenario-taxonomy-impl` (chain-driver flag + manifest.scenario 스키마 + greenfield 재배선 + RED/GREEN gate / §8.1 ≥2 corroboration) + `C-codegraph-essential-impl` (codegraph 도구 wiring). |
+
+**요약 (v11.7.0 갱신)**: ✅ **17** / ⚠️ **1** / ◐ **1** (R21 설계 SSOT / 구현 carry) / ❌ 0 / ★ **scope-out 2** (R16/R17 영구 폐기). 활성 요구 = **19/19** 자산 대칭 (★ R21 v11.7.0 신설 / R20 v8.6.1 + v8.6.2 / R19 v8.6.0).
 
 ## §3 Gap 우선순위
 

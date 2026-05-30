@@ -4,11 +4,13 @@
 
 > ★ ★ ★ ★ ★ **v11.0.0 paradigm 결단 의제 carry** (2026-05-26 / Phase 0 결단 문서화만 / 차기 세션 cascade) — 산출물 polymorphism cascade: chain harness anchor entity = UC(discovery cross-cut) → BHV/AC(spec cross-cut) → Epic/Story/OP/TASK(plan layer 분기) → TC(test framework 분기) → IMPL(implement stack 분기). planning-spec → discovery-spec rename + ticket = plan 단일 + Epic = FE 화면 + OP-* 신설 + contract 강제 양 axis. 본 매트릭스 Phase 1+ 본격 갱신 의무. SSOT: [`../decisions/DEC-2026-05-26-v11-paradigm-결단.md`](../decisions/DEC-2026-05-26-v11-paradigm-결단.md).
 
-## 본 방법론 가치 명세 (★ v2.0 / CLAUDE.md ★★★)
+## 본 방법론 가치 명세 (★ v11.7.0 / use-scenario taxonomy + AX 운영 정체성 / CLAUDE.md ★★★)
+
+> ★ ★ ★ **가장 큰 목적 (P0)**: 산출물 = LLM 의 운영 컨텍스트 그 자체. 방법론의 가장 큰 목적 중 하나 = 이 컨텍스트를 평생 유지·동기화하여 프로젝트를 **AX 로 운영**하는 것. 4 use-scenario(★ **S2 AX전환=주 타깃** / S1 재생성 / S3 특성화 / greenfield)는 bootstrap 입력만 다르고 모두 AX 운영으로 수렴. greenfield 도 입력어댑터 analysis 로 산출물 생성(처음부터 AX-native). 산출물 = 전 stage base + 기능추가 역동기화. SSOT = `use-scenario-taxonomy.md` / `../decisions/DEC-2026-05-30-use-scenario-taxonomy.md`.
 
 ```
-INPUT (1차 = legacy single-case):  legacy 코드베이스
-  ↓ analysis stage (chain 진입 전 = 현 v1.5.x 자산 / 단방향 추출)
+INPUT (★ 4 use-scenario):  S2 AX전환(주 타깃)/S1 재생성/S3 특성화 = legacy 코드 / greenfield = PRD·디자인·계약
+  ↓ analysis stage = 코드-고고학(legacy) + 입력어댑터(공통 / greenfield 는 이것만 / 현 v1.5.x 자산 / 단방향 추출)
   ↓
 OUTPUT chain:
   [CHAIN 1] discovery-spec (discovery stage)      ── go/stop gate #1

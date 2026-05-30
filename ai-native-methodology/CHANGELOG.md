@@ -9,6 +9,30 @@
 
 ---
 
+## [11.7.0] — 2026-05-30 MINOR — use-scenario taxonomy + AX 운영 정체성 형식화 + codegraph 필수화 (DEC-2026-05-30-use-scenario-taxonomy + DEC-2026-05-30-codegraph-essential)
+
+session 55차 `/clear` 후 사용자 방법론 정체성 재진술 chain (ExitPlanMode 5회 거절 = 정체성 정밀화 루프) → 직전 v11.6.0 이 carry 한 `C-use-scenario-taxonomy` 의 **형식화 시행**. **본 release = 형식화 문서만** (설계 SSOT 확립 / 코드·스키마·greenfield 실제 빌드 = carry).
+
+**가장 큰 목적 (P0)**: 산출물 = "시스템 설명 문서"가 아니라 **LLM 의 운영 컨텍스트 그 자체**. 방법론의 가장 큰 목적 중 하나 = 이 컨텍스트를 평생 유지·동기화하여 **프로젝트를 AX 로 운영**(LLM 이 정확한 컨텍스트로 develop·run·modify·evolve)하는 것. (P1 산출물=LLM 컨텍스트 / P2 bootstrap 입력만 다르고 유지 동일 / P3 dep-graph+codegraph 동기화 / P4 산출물=전 stage base+양방향 역동기화)
+
+**use-scenario taxonomy 4종** (★ **S2 AX전환 = 주 타깃** / S1 재생성 / S3 특성화 / greenfield): bootstrap 입력에서만 갈리고 모두 같은 정상 상태(AX 운영)로 수렴. 시나리오별 RED/GREEN 매트릭스 = F-DOGFOOD-007 교정 (S1 의 test 대상 = legacy 아니라 생성될 코드). **greenfield = 처음부터 AX-native** — 입력어댑터 analysis(`analysis-from-*`) 재사용(옵션 A)으로 산출물 생성 → gap B(discovery 어댑터가 7대 산출물 미생성 / spec hard-dep 막힘) 해소 설계. 시나리오 선언 = `chain-driver init --scenario`→`work-unit-manifest.scenario` (전 stage 일관 참조).
+
+**codegraph 필수화** (DEC-2026-05-30-codegraph-essential): CodeGraph OSS = analysis 단계 필수 도구(Semgrep 동급 / no-simulation 무조건 실행). **DEC-2026-05-27 codegraph scope-out 의 게이트 폐기** (외부 사용자 = 사용자 직접 결정 / maturity = R19 Tier 2 environment-risk 강등 / probe #1~#3 작동 입증). "폐기" 대상 = codegraph ❌ / 막던 게이트 ✅.
+
+**시행 (additive / breaking 0)**:
+- `decisions/DEC-2026-05-30-use-scenario-taxonomy.md` + `decisions/DEC-2026-05-30-codegraph-essential.md` 신설 (SSOT)
+- `methodology-spec/use-scenario-taxonomy.md` 신설 (4-case 매트릭스 + greenfield 옵션 A + 선언 위치)
+- `CLAUDE.md` + `methodology-spec/lifecycle-contract.md` §가치명세 — INPUT "1차 = legacy single-case" → 4 시나리오 + P0~P4 (additive)
+- `methodology-spec/plugin-charter.md` — R21 신설 (요구 20→21 / 활성 19/19) + §2 매핑 ◐ 설계 SSOT
+- `decisions/DEC-2026-05-27-codegraph-integration-scope-out.md` — superseded 표기 (역사 trail 보존)
+- `decisions/DEC-2026-05-30-fdogfood-003-intent-certainty.md` §6 — carry `C-use-scenario-taxonomy` resolved
+
+**구현 carry (본 release 제외 / §8.1 ≥2 corroboration + STOP-3 의무)**: `C-use-scenario-taxonomy-impl` (chain-driver --scenario flag + manifest.scenario 스키마 + greenfield 재배선 + RED/GREEN gate enforcement) + `C-codegraph-essential-impl` (codegraph 도구 wiring + dep-graph federation) + `C-honesty-tool-cleanup` (no-simulation 절 실행불가 도구 SpotBugs/Daikon 정직 cleanup).
+
+**STOP-3**: workspace test 영향 0 (형식화 문서만) + release-readiness 22/22 ready + skill-citation 0 stale + version 3-way 11.7.0 + breaking 0 = MINOR. 5 LL (LL-usc-01~03 + LL-codegraph-essential-01~02).
+
+---
+
 ## [11.6.0] — 2026-05-30 MINOR — discovery `intent_certainty` enum (F-DOGFOOD-003 / MyBatis+JPA arm ≥2 corroboration / DEC-2026-05-30-fdogfood-003-intent-certainty)
 
 RealWorld dogfood 2nd arm(JPA / `1chz/realworld-java21-springboot3`)이 F-DOGFOOD-003(discovery BR-INTENT reasoning 의 intent 과잉귀속)을 재현 → MyBatis arm(#1) + JPA arm(#2) **§8.1 ≥2 corroboration 충족** → 보류 패치(Option B) 잠금 해제 시행.

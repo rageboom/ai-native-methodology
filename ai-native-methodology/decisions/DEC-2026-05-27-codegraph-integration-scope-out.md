@@ -1,5 +1,7 @@
 # DEC-2026-05-27-codegraph-integration-scope-out
 
+> ⚠️ **SUPERSEDED by [DEC-2026-05-30-codegraph-essential](DEC-2026-05-30-codegraph-essential.md)** (2026-05-30). 본 scope-out 의 게이트 (carry 조건 (a) 외부 사용자 ≥1 + (b) v1.0+ ≥6mo maturity)는 **폐기** — 사용자가 codegraph 를 analysis 단계 필수 도구(Semgrep 동급)로 직접 결정. probe #1~#3(iBATIS/MyBatis/JPA) 작동 입증. 본 doc = 역사 trail 보존 (당시 self-referential trigger 판단은 그 시점 정합). 실 도구 wiring 은 `C-codegraph-essential-impl` carry.
+
 **결단**: `colbymchenry/codegraph` OSS bridge 통합 design 전면 scope-out. plan-codegraph-integration.md §3 채택안 (A4 + B + C + D + E + F2 + G1 + H4) 전면 폐기. carry queue 등록 (Type 2 외부 사용자 자연 요구 발생 시 재발동 조건).
 
 **작성일**: 2026-05-27 (session 49차 — 본 session 직전 v11.0.0 MAJOR pull 후 codegraph axis 진입 시도).

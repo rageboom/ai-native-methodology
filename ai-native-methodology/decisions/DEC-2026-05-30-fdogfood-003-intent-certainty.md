@@ -58,7 +58,7 @@ prose marker(자유텍스트)는 validator 가 해석 불가 → 미강제. over
 §8.1 ≥2 corroboration 은 "패치 자격"을 주지만 "패치 설계"를 결정하지 않음. F-007 은 재현됐으나(자격 충족) 사용자 재진단으로 fix 방향(use-scenario taxonomy)이 단순 toggle 과 다름이 드러남 → **자격 ≠ 설계 / 성급한 paradigm 변경 회피** (quality 1순위). Patch A(설계 명확)만 시행 / Patch B(설계 미정) carry.
 
 ## 6. carry
-- `C-use-scenario-taxonomy` — F-007 의 올바른 fix. 방법론 주 타깃 시나리오(S1 재생성 / S2 AX 전환 / S3 특성화) 선언 구조 + 시나리오별 RED/GREEN 매트릭스 ADR. 사용자 전략 결단 의존.
+- ~~`C-use-scenario-taxonomy`~~ — ✅ **RESOLVED (2026-05-30) by [DEC-2026-05-30-use-scenario-taxonomy](DEC-2026-05-30-use-scenario-taxonomy.md)** (v11.7.0). 4 시나리오 형식화 (★ 주 타깃 = S2) + P0~P4 정체성 + 시나리오별 RED/GREEN 매트릭스 + greenfield gap B 옵션 A + 선언 위치(`chain-driver init --scenario`→manifest). 본 release = 설계 SSOT / 구현 carry (`C-use-scenario-taxonomy-impl`).
 - `intent_certainty` required 승격 — PoC 채택 누적 후 major (현 optional).
 
 ## 7. 한 줄 결론
