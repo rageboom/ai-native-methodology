@@ -9,6 +9,19 @@
 
 ---
 
+## [11.13.1] — 2026-05-30 PATCH — no-simulation 절 정직성 cleanup: CLAUDE.md R19 Tier 정합 (C-honesty-tool-cleanup 종결 / DEC-2026-05-30-honesty-tool-cleanup)
+
+CLAUDE.md "Static Tool 시뮬레이션 절대 금지" 절이 R19(DEC-2026-05-18-runtime-tool-exclusion) 이전의 **flat 표현**으로 남아 6개 도구(Semgrep / PMD / SpotBugs / Daikon / CodeQL / SonarQube)를 모두 "**진짜 외부 도구 실제 실행 의무**"로 나열 — 그러나 SpotBugs·Daikon·CodeQL·SonarQube 는 본 방법론 환경에서 **실 실행 이력 없음**(매 PoC "미실행"/"부재" 표기). 실행 못 하는 도구를 "실행 의무"로 적는 것은 no-simulation 정책 자체의 형해화 (사용자 지적 "쓰지도 못하는데 왜 자꾸 써있냐"). 본 PATCH = 해당 절을 **R19 Tier 정합**으로 reframe (정직 표기).
+
+**시행 (CLAUDE.md only / breaking 0)**:
+- ❌ **Tier 3 (simulated)** — AI persona 시뮬레이션 = 영구 reject + -5%p.
+- ✅ **Tier 1 (in-plugin 실제 실행)** — Semgrep / ESLint / Spectral / axe-core·Playwright / 테스트 stack runner(Gradle·JUnit·vitest). 실 실행 입증 채널.
+- ✅ **Tier 2 (사용자 환경 SARIF import / plugin 자동 실행 ❌)** — PMD / SpotBugs / CodeQL / Daikon / SonarQube. 사용자가 자기 환경서 실행·import 시만 `evidence_trust=imported_sarif`(`tool_stdout_path=null`). 부재=carry(날조 ❌). ★ PMD 는 poc-17 사용자 환경 실 실행 / SpotBugs·Daikon·CodeQL·SonarQube 는 본 환경 실 실행 이력 없음 = 정직 인지.
+
+**scope 정직**: 활성 doc 중 flat-framing 은 CLAUDE.md 가 유일 (agents/methodology-spec/ADR/charter/static-runner 는 이미 R19 Tier framing = 정직). R19 Tier 2 분류·`IMPORTED_DRIVER_ALLOWLIST=[pmd,spotbugs,codeql,daikon]` 는 schema-enforced 정식 기능이라 **이름 삭제 ❌**(reframe = "plugin 미실행/import-only" 명시로 정직 해소 / R19 보존). archive/dist-history·decisions·HISTORY 는 동결 이력 무변경.
+
+**STOP-3**: workspace 875/875 (영향 0) + release-readiness 22/22 + skill-citation 0 stale + version 3-way 11.13.1 + breaking 0 = PATCH. carry `C-honesty-tool-cleanup` ✅ 종결.
+
 ## [11.13.0] — 2026-05-30 MINOR — S2(AX전환) gate 2차 execution corroboration: RealWorld 실 구동 + 상관 규약 보강 (DEC-2026-05-30-s2-exec-corroboration)
 
 `C-use-scenario-s2-gate` Track α(v11.11.0)의 1차 corroboration 은 characterization GREEN 을 **"impl 존재의 구조적 귀결"로 추론**했을 뿐 실측이 아니었다(Java/Gradle 부재 = RISK-ENV-001). 본 release = **RealWorld 를 실제로 구동해 execution-grade corroboration** 확보 (no-simulation).
