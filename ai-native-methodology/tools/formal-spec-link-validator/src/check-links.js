@@ -160,7 +160,7 @@ export function checkFeCrossLinks({ source }) {
 }
 
 // ★ ★ v2.0 sub-plan-3a — chain-mode 검증.
-// chain 산출물 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec /
+// chain 산출물 (discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec /
 //   traceability-matrix) 내부의 backward link path (derivation_source.*_path /
 //   cross_links.to_analysis_artifacts[] / item-level *_ref) 가 실제 파일을 가리키는지 검증.
 //
@@ -173,7 +173,7 @@ export function checkFeCrossLinks({ source }) {
 // chain 단계는 path/ID 만 검증 — semantic coverage (UC→BHV 1:N 등) 은 chain-coverage-validator 책임.
 
 const CHAIN_ARTIFACT_BY_NAME = {
-  'planning-spec.json': 'planning-spec',
+  'discovery-spec.json': 'discovery-spec',
   'behavior-spec.json': 'behavior-spec',
   'acceptance-criteria.json': 'acceptance-criteria',
   'test-spec.json': 'test-spec',
@@ -183,7 +183,7 @@ const CHAIN_ARTIFACT_BY_NAME = {
 
 // derivation_source 내부의 path 필드 — chain 단계별 의무 backward link.
 const CHAIN_DERIVATION_PATHS = {
-  'planning-spec':       [],  // planning 은 chain 1차 — analysis 만 backward (cross_links 별도)
+  'discovery-spec':      [],  // discovery 는 chain 1차 — analysis 만 backward (cross_links 별도)
   'behavior-spec':       ['discovery_spec_path'],
   'acceptance-criteria': ['behavior_spec_path', 'discovery_spec_path'],
   'test-spec':           ['acceptance_criteria_path', 'behavior_spec_path'],

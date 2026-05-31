@@ -174,8 +174,6 @@ export function dispatchValidator(validatorName, output) {
   switch (validatorName) {
     case 'discovery-extraction-validator':
       return transformDiscoveryExtraction(JSON.parse(output));
-    case 'planning-extraction-validator': // backward-compat alias (deprecated)
-      return transformDiscoveryExtraction(JSON.parse(output));
     case 'chain-coverage-validator':
       return transformChainCoverage(JSON.parse(output));
     case 'schema-validator':

@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 // discovery-extraction-validator CLI (v11.0.0 / renamed from planning-extraction-validator)
 // usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]
-// backward-compat: --planning alias kept for legacy PoC artifact carry (deprecated / Phase 4 sweep 후 제거)
 
-import { validatePlanningExtraction, loadJson } from './validator.js';
+import { validateDiscoveryExtraction, loadJson } from './validator.js';
 
 function parseArgs(argv) {
   const out = { dryRun: false, json: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--discovery' || a === '--planning') out.discovery = argv[++i];
+    if (a === '--discovery') out.discovery = argv[++i];
     else if (a === '--rules') out.rules = argv[++i];
     else if (a === '--domain') out.domain = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
@@ -24,7 +23,7 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv);
 if (!args.discovery) {
-  console.error('error: --discovery required (or legacy --planning)');
+  console.error('error: --discovery required');
   process.exit(2);
 }
 
@@ -38,7 +37,7 @@ const analysis = {
   domain: args.domain ? loadJson(args.domain) : null,
 };
 
-const result = validatePlanningExtraction(discovery, analysis);
+const result = validateDiscoveryExtraction(discovery, analysis);
 
 if (args.json) {
   console.log(JSON.stringify(result, null, 2));

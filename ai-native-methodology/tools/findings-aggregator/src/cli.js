@@ -2,7 +2,7 @@
 // findings-aggregator CLI — chain-driver next --findings 자동 입력 통합 도구
 // ★ ★ v2.3.6 PATCH / "양심 의존 차단" 정책 강화
 // usage:
-//   findings-aggregator --target <project-dir> --stage <planning|spec|test|implement> [--output <findings.json>] [--dry-run] [--json]
+//   findings-aggregator --target <project-dir> --stage <discovery|spec|plan|test|implement> [--output <findings.json>] [--dry-run] [--json]
 
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
@@ -38,13 +38,13 @@ function parseArgs(argv) {
 
 function printUsage() {
   console.error([
-    'usage: findings-aggregator --target <project-dir> --stage <planning|spec|test|implement> [--output <findings.json>] [--dry-run] [--json]',
+    'usage: findings-aggregator --target <project-dir> --stage <discovery|spec|plan|test|implement> [--output <findings.json>] [--dry-run] [--json]',
     '',
     'stage 별 REQUIRED_VALIDATORS_PER_STAGE 실행 → findings JSON 통합 → chain-driver next --findings 입력 정합.',
     '',
     'options:',
     '  --target   PoC 디렉토리 (예: examples/poc-11-efiweb-billing-spring41)',
-    '  --stage    planning / spec / test / implement (★ chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)',
+    '  --stage    discovery / spec / plan / test / implement (★ chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)',
     '  --output   findings JSON 저장 경로 (default: <target>/.aimd/output/findings-<stage>.json)',
     '  --dry-run  파일 저장 ❌ / stdout 만',
     '  --json     JSON 출력 (default: text)',
@@ -78,7 +78,6 @@ function runValidator(validatorName, projectDir) {
 function buildValidatorArgs(validatorName, projectDir) {
   switch (validatorName) {
     case 'discovery-extraction-validator':
-    case 'planning-extraction-validator': // backward-compat alias (deprecated)
       return [
         '--discovery', join(projectDir, '.aimd/output/discovery-spec.json'),
         '--rules', join(projectDir, 'input/business-rules.json'),

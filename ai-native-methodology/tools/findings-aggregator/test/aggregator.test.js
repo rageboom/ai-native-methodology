@@ -183,11 +183,6 @@ describe('dispatchValidator', () => {
     const f = dispatchValidator('discovery-extraction-validator', output);
     assert.equal(f.high, 1);
   });
-  it('★ planning-extraction-validator backward-compat alias still works', () => {
-    const output = JSON.stringify({ summary: { critical: 0, high: 1 } });
-    const f = dispatchValidator('planning-extraction-validator', output);
-    assert.equal(f.high, 1);
-  });
   it('★ schema-validator → stdout text transform', () => {
     const f = dispatchValidator('schema-validator', '  valid: 0  invalid: 1  skipped: 0');
     assert.equal(f.critical, 1);

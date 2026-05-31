@@ -23,12 +23,12 @@ allowed-tools: Read, Write, Edit, Bash
 
 ## 절차
 
-1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.aimd/output/` 안의 `planning-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
+1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.aimd/output/` 안의 `discovery-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
 
 2. **traceability-matrix-builder 도구 호출**:
    ```bash
    node tools/traceability-matrix-builder/src/cli.js \
-     --planning   <project>/.aimd/output/planning-spec.json \
+     --discovery  <project>/.aimd/output/discovery-spec.json \
      --behavior   <project>/.aimd/output/behavior-spec.json \
      --acceptance <project>/.aimd/output/acceptance-criteria.json \
      --test-spec  <project>/.aimd/output/test-spec.json \

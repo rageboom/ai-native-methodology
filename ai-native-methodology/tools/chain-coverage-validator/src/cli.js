@@ -11,7 +11,7 @@ function parseArgs(argv) {
   const out = { dryRun: false, json: false, threshold: 0.85, strictPaths: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--planning') out.planning = argv[++i];
+    if (a === '--discovery' || a === '--planning') out.planning = argv[++i];     // ★ --discovery primary / --planning legacy alias
     else if (a === '--behavior') out.behavior = argv[++i];
     else if (a === '--acceptance') out.acceptance = argv[++i];
     else if (a === '--antipatterns') out.antipatterns = argv[++i];
@@ -23,7 +23,7 @@ function parseArgs(argv) {
     else if (a === '--project-root') out.projectRoot = argv[++i];
     else if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: chain-coverage-validator --planning <path> --behavior <path> --acceptance <path>
+      console.log(`usage: chain-coverage-validator --discovery <path> --behavior <path> --acceptance <path>
                               [--threshold 0.85] [--dry-run] [--json]
                               [--strict-paths] [--project-root <dir>] [--repo-root <dir>]
 

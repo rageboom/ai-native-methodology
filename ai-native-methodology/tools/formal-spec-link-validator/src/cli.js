@@ -7,7 +7,7 @@
 //   --mode=be (default) — formal_spec_links 의 모든 link 가 실제 파일 존재 + br_id pattern 정합
 //   --mode=fe (★ v1.4 Stage 3-2) — FE 산출물의 cross_links[] 형식 검증 (to_artifact / link_type / to_id pattern)
 //   --mode=both — BE + FE 양쪽 검증
-//   --mode=chain (★ ★ v2.0 sub-plan-3a) — chain 산출물 backward link / id pattern 검증 (planning-spec / behavior-spec /
+//   --mode=chain (★ ★ v2.0 sub-plan-3a) — chain 산출물 backward link / id pattern 검증 (discovery-spec / behavior-spec /
 //     acceptance-criteria / test-spec / impl-spec / traceability-matrix)
 //   --chain-mode — alias for --mode=chain (★ S3 명문화 / sub-plan-3 plan D11 정합)
 //   --dry-run — exit 0 강제 (violation report only / S3 정합 — write-baseline 차단 / prompt 차단 / exit 0 강제)
@@ -27,7 +27,7 @@ const FE_TARGETS = new Set([
   'legacy-spectrum.json',
 ]);
 const CHAIN_TARGETS = new Set([
-  'planning-spec.json',
+  'discovery-spec.json',
   'behavior-spec.json',
   'acceptance-criteria.json',
   'test-spec.json',

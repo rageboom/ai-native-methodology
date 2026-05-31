@@ -113,9 +113,6 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   };
 }
 
-// backward-compat alias (deprecated / Phase 4 PoC sweep 후 제거)
-export const validatePlanningExtraction = validateDiscoveryExtraction;
-
 export function loadJson(path) {
   if (!existsSync(path)) return null;
   try {

@@ -22,8 +22,6 @@ node src/cli.js \
   [--dry-run] [--json]
 ```
 
-★ `--planning` flag = backward-compat alias (deprecated / v11.0.0 PoC sweep 후 제거).
-
 ## Outputs
 
 | kind | severity | 의미 |

@@ -85,7 +85,6 @@
 - **PostToolUse `Write|Edit|MultiEdit`** → prettier / eslint `--fix` 자동 실행 (BE 는 spotless / black 등 언어별 분기)
 - **PreToolUse Bash matcher `git commit`** → 테스트 + 정적 검사 통과 강제 (실패 시 `permissionDecision: "deny"` — bypassPermissions 도 차단)
 - **PreToolUse sensitive-file deny** (`.env`, `credentials.json`, `*secret*`, `*.pem`)
-- **Stop hook** → chain stage 완료 시 ITSM 티켓 코멘트 자동 등록 (R16/R17 연동)
 - **Notification hook** → gate fail 시 desktop / Slack 알림 (`async: true`)
 - 모든 hook 은 **단순 / 빠를 것** (수 초 이상 작업은 skill 로 분리, log 류는 `async: true`)
 
@@ -111,9 +110,9 @@
 - `plugin.json.version` 누락 = cached copy 그대로 (silent override 위험) → 매 release 갱신 강제
 - 사내 배포 전 단계 (`project_pre_deployment_stage.md` 정합) — semver 라벨 의미 약하나 본격 외부 배포 시 SemVer 준수
 
-### §4.6 ITSM / MCP 통합 (R16/R17 실현용)
+### §4.6 MCP 통합 (R20 ticket-sync)
 - `mcp__wiki-jira-assistant__*` 활용 (이미 등록된 MCP server)
-- skill `itsm-ticket-emit` 신설 — chain stage 완료 시 자동 호출
+- skill `ticket-sync` (R20 / plan stage) — Epic/Story/OP/Sub-task 4-level 일괄 생성 (모든 MCP 호출 직전 사용자 confirmation gate 의무)
 - `.mcp.json` 의 `mcpServers` 활성 + plugin install 시 사용자 토큰 확인 guide
 
 ## §5 추가 권장 (Claude 제안)

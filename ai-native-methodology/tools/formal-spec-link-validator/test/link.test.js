@@ -169,7 +169,7 @@ function setupChainFixture() {
 }
 
 test('★ chain detectChainArtifact — 6 artifact 인식', () => {
-  assert.equal(detectChainArtifact('planning-spec.json'), 'planning-spec');
+  assert.equal(detectChainArtifact('discovery-spec.json'), 'discovery-spec');
   assert.equal(detectChainArtifact('behavior-spec.json'), 'behavior-spec');
   assert.equal(detectChainArtifact('acceptance-criteria.json'), 'acceptance-criteria');
   assert.equal(detectChainArtifact('test-spec.json'), 'test-spec');

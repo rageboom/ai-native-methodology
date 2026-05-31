@@ -422,7 +422,7 @@ describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
   });
 
   it('Windows backslash path 도 .aimd/output 패턴 자동 감지', () => {
-    const specPath = 'C:\\repo\\examples\\poc-14\\.aimd\\output\\planning-spec.json';
+    const specPath = 'C:\\repo\\examples\\poc-14\\.aimd\\output\\discovery-spec.json';
     const result = autoDetectProjectRoot(specPath);
     assert.ok(result.endsWith('poc-14') || result.endsWith('poc-14\\') || result.endsWith('poc-14/'),
       `expected PoC root ending with 'poc-14', got: ${result}`);

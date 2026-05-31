@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 20/20 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상 + v10.0.0 Phase 4-4' 3 criterion 격상).
+// release-readiness — ★ ★ ★ §8.1 strict 22/22 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상 + v10.0.0 Phase 4-4' 3 criterion 격상 + v11.x dep-graph/template/plan criterion).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
-// 13 자격 (ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
+// 22 자격 (★ #1~#13 상세 아래 + #14~#22 = main() check14~check22 inline 주석 / ADR-CHAIN-005 부재 ❌ — Senior F3 흡수 / file presence 만 검사하는 criterion 0개 의무):
 //   1. ≥ 2 PoC corroboration (poc-05 + poc-03 retrofit)
 //   2. 진짜 도구 5종 물증 7 필드 (test-impl-pass-validator schema 검증)
 //   3. validator violation 0 (planning-extraction + chain-coverage + spec-test-link + drift state-flow)
@@ -31,7 +31,7 @@
 //       실존 결정적 검사 / doc 재구조화 후 stale dead-link 자동 차단 / AI 추론 0% / 기존 validator 사각 회복 /
 //       ADR-PLUGIN-001 §7 patch v2 / DEC-2026-05-17-skill-citation-integrity).
 //
-// exit 0 = 13/13 ready / 1 = 1+ regress.
+// exit 0 = 22/22 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -79,15 +79,15 @@ function check1_pocCorroboration() {
   const candidates = readdirSync(join(ROOT, 'examples'))
     .filter((d) => d.startsWith('poc-'))
     .filter((d) => {
-      // ★ v11.0.0 — discovery-spec.json 우선 / planning-spec.json legacy carry
+      // ★ v11.0.0 — discovery-spec.json (planning-spec.json legacy 별칭 제거 / refactor: tooling-audit-cleanup)
       const base = join(ROOT, 'examples', d, '.aimd/output');
-      return existsSync(join(base, 'discovery-spec.json')) || existsSync(join(base, 'planning-spec.json'));
+      return existsSync(join(base, 'discovery-spec.json'));
     });
   return {
     id: 'poc_corroboration',
     pass: candidates.length >= 2,
     detail: `found ${candidates.length} PoC with chain harness output: ${candidates.join(', ')}`,
-    delegated_to: 'examples/*/.aimd/output/discovery-spec.json (★ v11.0.0) or planning-spec.json (legacy) existence + valid schema',
+    delegated_to: 'examples/*/.aimd/output/discovery-spec.json (★ v11.0.0) existence + valid schema',
   };
 }
 
@@ -137,7 +137,7 @@ function check3_validatorsViolation() {
       name: 'chain-coverage (poc-05)',
       cmd: [
         'tools/chain-coverage-validator/src/cli.js',
-        '--planning', 'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
+        '--discovery', 'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
         '--behavior', 'examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json',
         '--acceptance', 'examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json',
         '--test-spec', 'examples/poc-05-sample-user-register/.aimd/output/test-spec.json',
@@ -270,7 +270,6 @@ function check7_e2eCyclePass() {
 const ANALYSIS_VALIDATOR_TARGETS = new Set([
   'business-rules.json',        // analysis stage (R15 baseline / br-cross-consistency 의무)
   'discovery-spec.json',        // chain 1 (★ v11.0.0 — DEC-2026-05-26-discovery-spec-rename)
-  'planning-spec.json',         // chain 1 (legacy carry / v10.x 산출물 호환)
   'behavior-spec.json',         // chain 2
   'acceptance-criteria.json',   // chain 2
   'task-plan.json',             // chain 3 (★ v9.x plan stage)

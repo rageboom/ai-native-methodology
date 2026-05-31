@@ -153,7 +153,7 @@ linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
 ```bash
 node tools/schema-validator/src/cli.js .aimd/output/impl-spec.json
 node tools/traceability-matrix-builder/src/cli.js \
-  --planning   .aimd/output/discovery-spec.json \
+  --discovery  .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   --test-spec  .aimd/output/test-spec.json \

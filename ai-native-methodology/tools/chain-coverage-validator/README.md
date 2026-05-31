@@ -2,7 +2,7 @@
 
 ## Purpose
 
-★ ★ v2.0 chain harness 의 **chain 2 (spec → test) gate #2 validator**. `behavior-spec.json` + `acceptance-criteria.json` (+ `planning-spec.json`) 사이의 forward link 정합성 (UC → BHV 1:N / BHV → AC 1:N) + coverage threshold (0.85) 강제.
+★ ★ v2.0 chain harness 의 **chain 2 (spec → test) gate #2 validator**. `behavior-spec.json` + `acceptance-criteria.json` (+ `discovery-spec.json`) 사이의 forward link 정합성 (UC → BHV 1:N / BHV → AC 1:N) + coverage threshold (0.85) 강제.
 
 ## When to call
 
@@ -14,7 +14,7 @@
 
 ```bash
 node src/cli.js \
-  --planning .aimd/output/planning-spec.json \
+  --discovery .aimd/output/discovery-spec.json \
   --behavior .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   [--threshold 0.85] [--dry-run] [--json]

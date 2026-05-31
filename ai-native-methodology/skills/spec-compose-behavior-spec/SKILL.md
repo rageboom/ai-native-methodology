@@ -70,7 +70,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    ```bash
    # chain coverage (UC → BHV / BHV → AC)
    node tools/chain-coverage-validator/src/cli.js \
-     --planning   .aimd/output/discovery-spec.json \
+     --discovery  .aimd/output/discovery-spec.json \
      --behavior   .aimd/output/behavior-spec.json \
      --acceptance .aimd/output/acceptance-criteria.json
 

@@ -69,7 +69,7 @@ severity_floor (DO-178C DAL A) 검증:
 `_base-build-traceability-matrix` skill 호출:
 ```bash
 node tools/traceability-matrix-builder/src/cli.js \
-  --planning   .aimd/output/discovery-spec.json \
+  --discovery  .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   --test-spec  .aimd/output/test-spec.json \
