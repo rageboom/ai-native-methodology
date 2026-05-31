@@ -12,7 +12,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateCodePointers, applyContentDrift, checkGraphFreshness, computeGateFail } from '../src/validator.js';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -153,6 +153,26 @@ describe('anchor_type 별 검증', () => {
     const r = validateCodePointers(graph, { repoRoot: repo });
     const f = r.findings.find(x => x.kind === 'code_pointer.glob_no_match');
     assert.ok(f);
+    rmSync(repo, { recursive: true });
+  });
+
+  // ★ v11.23.0 Slice 2 (REVISE-C) — architecture dir glob anchor (glob 필드 부재 / '*' 없음).
+  //   synthesizer 가 modules[].path 디렉토리를 {path:dir, anchor_type:'glob'} 로 emit → validator
+  //   simpleGlobMatch 가 '*' 부재 시 existsSync(dir) 로 매칭 → glob_no_match 0 + covered 집계.
+  //   commit_hash 미부여(synthesizer strict_path 한정)라 A2 분기(gitRunner && commit_hash) 미진입 = A2 제외.
+  it('glob: 디렉토리 앵커(glob 필드 부재) → existsSync(dir) 매칭 → glob_no_match 0 + covered', () => {
+    const repo = makeRepoRoot();
+    mkdirSync(join(repo, 'src', 'api'), { recursive: true });
+    const graph = {
+      nodes: [node('analysis-architecture', {
+        kind: 'analysis', subkind: 'architecture',
+        code_pointers: [{ path: 'src/api', anchor_type: 'glob' }], // glob 필드 부재 = dir 단위 앵커
+      })],
+    };
+    const r = validateCodePointers(graph, { repoRoot: repo });
+    assert.equal(r.findings.filter(f => f.kind === 'code_pointer.glob_no_match').length, 0, 'dir 존재 → glob_no_match 0');
+    assert.equal(r.coverage.covered, 1, 'glob dir anchor = covered 집계');
+    assert.equal(r.coverage.missing, 0);
     rmSync(repo, { recursive: true });
   });
 

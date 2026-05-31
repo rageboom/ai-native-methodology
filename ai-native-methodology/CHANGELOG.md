@@ -9,6 +9,26 @@
 
 ---
 
+## [11.23.0] — 2026-06-01 MINOR — Living-graph Slice 2: analysis 노드 sql-inventory + architecture code-pointer enrich (C-codepointer-analysis-aspect-enrich 해소)
+
+v11.22.0 carry ① C-codepointer-analysis-aspect-enrich 해소. v11.22.0 가 business-rules/domain/error-mapping 노드를 실 src 에 앵커했으나 **sql-inventory(mapper resource-prefix)·architecture(dir glob)** 두 kind 는 na fall-through. Slice 2 = 두 kind 도 실 코드에 앵커 → 그래프가 **SQL mapper layer + module 디렉토리**까지 cover. sql-inventory mapper XML = strict_path + commit_hash 스탬프 → **A2 content-drift 가 SQL mapper layer 변경 탐지(실 P0 가치)** / architecture = glob dir 앵커(A2 제외 = dir-diff false-drift 회피 의도) = navigation·coverage grounding. 접근 A 연장(additive / schema·skill·CLI 무변경 / graph-synthesizer.js only). 4원칙 §2 3-agent research 만장 GO (official-docs `GO_WITH_REVISE`@0.88 / industry `GO`@0.88 / senior `GO_WITH_REVISE`@0.83 / REVISE 5종 흡수).
+
+### fix — graph-synthesizer resolver 일반화 (additive / schema·skill·CLI 무변경)
+- **`graph-synthesizer.js`** — `ANALYSIS_TO_CODE_POINTERS` 를 `kind→accessor` 에서 `kind→{mode, accessor, prefixes?}` 로 일반화. 기존 3 kind = `mode:'file', prefixes:['']` 명시 선언 = byte-identical 보존 (test 4/5 동형).
+- **sql-inventory (신규)** — `mode:'file', prefixes:['', 'src/main/resources/', 'src/main/resources/mybatis/']` / accessor=`inventory[].mapper_xml`. 논리경로 `mapper/X.xml` → resource-prefix 역산 strict_path (Spring PathMatchingResourcePatternResolver / Maven Standard Layout isomorphic / research wf_8a8aa7ef). sentinel('inline'/'jpa'/'typeorm'/'prisma') = 확장자 없음 → hasCodeExtension 자동 필터. `src/main/java/` 임베디드 XML(비표준) = 의도적 scope-out(existence-gate→na).
+- **architecture (신규)** — `mode:'dir'` / accessor=`modules[].path`. 디렉토리 → glob anchor (glob 필드 부재 → validator `existsSync(dir)` 매칭 / `glob:'**/*'` 부여 시 simpleGlobMatch depth-1 한계로 glob_no_match → 필드 부재가 정답 / LSP 3.17 dir-level glob + IntelliJ content-root=module dir isomorphic). commit_hash 미스탬프(strict_path 한정 스탬프 루프) → A2 content-drift 자동 제외(dir-diff false-drift 회피).
+- **`resolveAnchor(raw, cfg, existsFn)` 헬퍼 (신규)** — file: hasCodeExtension 게이트 → prefixes 순서대로 첫 existsFn-통과 candidate (kind-specific prefix / 전역 기본값 의존 ❌ / REVISE-B) / dir: 확장자 게이트 skip → existsFn → glob anchor. dedup=해소경로 기준 + cap 10.
+
+### 검증 (no-simulation / 실 CLI·실 git)
+- graph-synthesizer **+9 test** (sql-inventory resolve/prefix-order/sentinel/dedup/commit_hash-stamp + architecture dir-glob/missing-na/no-stamp + REVISE-B business-rules kind-specific 회귀) + code-pointer-validator **+1 test** (dir glob anchor → glob_no_match 0 + covered). workspace 993→**1003** / 0 fail. release-readiness **26/26**.
+- **RealWorld dogfood** (`--repo-root <RW> --commit-hash ee17e31`): analysis-sql-inventory na→**covered (10 strict_path mapper XML / 전부 `src/main/resources/mapper/` 역산 / 10/10 commit_hash 스탬프 = A2 참여)** + analysis-architecture na→**covered (10 glob dir / cap 10 of 12 modules / commit_hash 미스탬프 = A2 제외)**. coverage covered **28→30** / na 87→85 / missing 0 / **glob_no_match 0** / mapper·src-main path_missing 0 / Slice 2 신규 앵커 **0 new findings** (25 medium = 전부 pre-existing TC `generated-tests/` / 무관).
+- **A2 positive demo** (sql-inventory mapper 앵커 baseline=root commit ee946e3 / `--git` / 실 114-commit history): **10 mapper XML 전부 `content_drift` 발화** = A2 동기화 루프가 SQL mapper layer production 변경 탐지 (Slice 2 이전 = sql-inventory na = A2 inert / 불가능했음). medium/non-gating (v11.20.0 cap). evidence = `_dogfood-realworld/.../slice2-codepointer-probe.md`.
+
+### §8.1 / carry
+- read-class·additive·결정론 → **gate-class 아님** / MINOR. 단일 RealWorld 도메인 = mechanism 입증 (ceiling 주장 ❌). coverage 보고 = strict_path(sql-inventory / A2 참여) vs glob(architecture dir / A2 제외) 분해 정직 표기 (REVISE-D). **carry**: ① db-schema(.sql DDL)/state-map/type-spec 등 나머지 analysis kind 앵커 = 후속 micro-slice ② 접근 C(명시 schema 필드 code_pointers 격상) = A 가치 입증 후 ③ ≥2 distinct domain A2 usability corroboration(gate-class) ④ F-DF-A2-003 working-tree 모드 ⑤ A3 relocation dogfood.
+
+DEC-2026-06-01-slice2-codepointer-enrich. Extends DEC-2026-06-01-df-anchor-002.
+
 ## [11.22.0] — 2026-06-01 MINOR — analysis 노드 실 src/main 앵커 derive (F-DF-ANCHOR-002 해소 / RealWorld A2 가 실 production 코드 drift 탐지)
 
 v11.21.0 carry F-DF-ANCHOR-002 해소. RealWorld(S2/주 타깃) 그래프가 실 `src/main/java` production 코드에 앵커 **0건** → Loop A/A2 content-drift 가 production 코드 변경을 못 봄(inert). 그러나 analysis 산출물(business-rules/domain/error-mapping)은 **이미 실 src/main 경로를 evidence 로 보유** — surface 안 됐을 뿐. 합성기가 이 evidence 를 node code_pointers 로 derive → A2 가 실 production drift 탐지. carry 제목 "IMPL 노드"는 조사 결과 S2 현실(IMPL 노드 부재)과 어긋남 → analysis 노드가 같은 목표를 정확히 달성(연계 carry C-codepointer-analysis-aspect-enrich 동시 해소). 접근 A 채택(4원칙 §2 3-agent research / Senior GO@0.80 / Sourcegraph SCIP auto-derive 선례).

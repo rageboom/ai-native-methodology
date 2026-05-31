@@ -236,30 +236,57 @@ function defaultNaForIntentNodes(nodes) {
 }
 
 // ============================================================================
-// ★ v11.x (F-DF-ANCHOR-002) — analysis instance evidence → node code_pointers derive.
-//   "이미 analysis 산출물에 존재하는 file evidence 를 그래프 node code_pointers 로 surface"
-//   (Sourcegraph SCIP auto-derive 동형 / best-effort / §2 research wf_07929e3d).
-//   ★ per-kind 명시 field allowlist — 자동 *.java 재귀 ❌ (persisted_to 테이블명·부수 문자열 오수집 회피 / Senior REVISE).
-//   ★ 첫 슬라이스 kind = business-rules / domain / error-mapping-spec (전부 full src/main 경로 = resolving).
-//     sql-inventory(mapper resource prefix) / architecture(dir glob) = 후속 slice (C-codepointer-analysis-aspect-enrich).
-//   accessor(data) → file path 후보 string[] (schema-canonical evidence 필드).
+// ★ v11.x (F-DF-ANCHOR-002 / v11.23.0 Slice 2 C-codepointer-analysis-aspect-enrich) —
+//   analysis instance evidence → node code_pointers derive.
+//   "이미 analysis 산출물에 존재하는 file/dir evidence 를 그래프 node code_pointers 로 surface"
+//   (Sourcegraph SCIP auto-derive 동형 / best-effort / §2 research wf_07929e3d + wf_8a8aa7ef).
+//   ★ per-kind 명시 config — 자동 *.java 재귀 ❌ (persisted_to 테이블명·부수 문자열 오수집 회피 / Senior REVISE).
+//
+//   config[kind] = { mode, accessor, prefixes? }:
+//     mode 'file' = strict_path 단일 파일. hasCodeExtension 게이트 + prefixes 순서대로 첫 존재 경로 해소.
+//       ★ prefixes 는 kind-specific 명시 선언 (전역 기본값 의존 ❌ / REVISE-B). 기존 3 kind = [''] = raw 그대로
+//         (byte-identical 보존 / business-rules 의 mapper-prefix 류는 미해소 유지 = test 4/5 동형).
+//     mode 'dir'  = glob anchor (glob 필드 부재 → validator existsSync(dir) 매칭 / commit_hash 미스탬프 → A2 제외).
+//       LSP 3.17 dir-level glob + IntelliJ content-root=module dir isomorphic (research wf_8a8aa7ef).
+//   accessor(data) → 경로 후보 string[] (schema-canonical evidence 필드).
 // ============================================================================
 const ANALYSIS_TO_CODE_POINTERS = Object.freeze({
-  'business-rules': (d) =>
-    (d?.business_rules ?? []).flatMap((br) =>
+  'business-rules': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => (d?.business_rules ?? []).flatMap((br) =>
       (br?.source_evidence ?? []).map((e) => e?.file)),
-  domain: (d) =>
-    (d?.bounded_contexts ?? []).flatMap((bc) => [
+  },
+  domain: {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => (d?.bounded_contexts ?? []).flatMap((bc) => [
       ...(bc?.aggregates ?? []).flatMap((a) =>
         (a?.invariants ?? []).flatMap((inv) =>
           (inv?.evidence ?? []).map((e) => e?.file))),
       ...(bc?.value_objects ?? []).flatMap((vo) =>
         (vo?.evidence ?? []).map((e) => e?.file)),
     ]),
-  'error-mapping-spec': (d) => [
-    ...(d?.exception_handlers ?? []).map((h) => h?.source_file),
-    ...(d?.http_status_mapping ?? []).map((m) => m?.evidence_file),
-  ],
+  },
+  'error-mapping-spec': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => [
+      ...(d?.exception_handlers ?? []).map((h) => h?.source_file),
+      ...(d?.http_status_mapping ?? []).map((m) => m?.evidence_file),
+    ],
+  },
+  // ★ v11.23.0 Slice 2 — sql-inventory: mapper_xml 논리경로('mapper/X.xml') → resource-prefix 역산 strict_path.
+  //   prefixes 순서 = bare → Maven classpath root → mybatis variant (첫 존재 채택 / existence-gate false-positive 0).
+  //   Spring PathMatchingResourcePatternResolver / Maven Standard Layout isomorphic (research wf_8a8aa7ef).
+  //   sentinel 'inline'/'jpa'/'typeorm'/'prisma' = 확장자 없음 → hasCodeExtension 자동 필터.
+  //   src/main/java/ 임베디드 XML(비표준) = 의도적 scope-out (existence-gate→na 정직 / REVISE-A).
+  'sql-inventory': {
+    mode: 'file', prefixes: ['', 'src/main/resources/', 'src/main/resources/mybatis/'],
+    accessor: (d) => (d?.inventory ?? []).map((r) => r?.mapper_xml),
+  },
+  // ★ v11.23.0 Slice 2 — architecture: modules[].path(디렉토리) → glob anchor.
+  architecture: {
+    mode: 'dir',
+    accessor: (d) => (d?.modules ?? []).map((m) => m?.path),
+  },
 });
 
 // 확장자 화이트리스트 — strict_path emit 前 게이트 (table-name·dir·dotted-class false-anchor 차단 / Senior REVISE).
@@ -278,12 +305,32 @@ export function hasCodeExtension(p) {
 
 const ANALYSIS_DERIVE_CAP = 10; // 노드당 derive 앵커 상한 (그래프 폭증 회피 / §2).
 
+// per-anchor 해소 — mode 별 pointer 생성. 미해소/미존재/확장자외 → null (→ backstop 가 na 처리).
+//   file: hasCodeExtension 게이트 → prefixes 순서대로 첫 existsFn-통과 candidate (kind-specific prefix / REVISE-B).
+//         existsFn 미주입 = no-gate best-effort 첫 후보 (synthesizeGraph 는 항상 effectiveExistsFn 주입).
+//   dir : 확장자 게이트 skip (디렉토리는 확장자 없음) → existsFn 게이트 → glob anchor (glob 필드 부재 / A2 제외).
+function resolveAnchor(raw, cfg, existsFn) {
+  if (typeof raw !== 'string' || raw.length === 0) return null;
+  const hasGate = typeof existsFn === 'function';
+  if (cfg.mode === 'dir') {
+    if (hasGate && !existsFn(raw)) return null;        // existence-gate (정직 불변식)
+    return { path: raw, anchor_type: 'glob' };
+  }
+  // mode 'file' (default)
+  if (!hasCodeExtension(raw)) return null;             // 확장자 화이트리스트 (table-name·dir·sentinel 차단)
+  for (const pfx of (cfg.prefixes ?? [''])) {
+    const candidate = pfx ? pfx + raw : raw;           // prefix 는 trailing '/' 포함 (resource-prefix 역산)
+    if (!hasGate || existsFn(candidate)) return { path: candidate, anchor_type: 'strict_path' };
+  }
+  return null;                                         // 어떤 prefix 도 미해소
+}
+
 // derive 패스 — defaultNaForIntentNodes 直前 호출. active analysis 노드 + code_pointers 부재 일 때만.
 //   existsFn 으로 미검증 경로 차단 (정직 불변식: 미검증 경로 emit ❌ → 후속 backstop 가 na 처리).
-//   commit_hash 는 하류 스탬프 루프(strict_path + graph commitHash)가 부여 (IMPL/TC 와 동형).
+//   commit_hash 는 하류 스탬프 루프(strict_path + graph commitHash)가 부여 (IMPL/TC 와 동형 / glob=미스탬프=A2 제외).
 export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
   const byId = new Map(nodes.map((n) => [n.id, n]));
-  for (const [kind, accessor] of Object.entries(ANALYSIS_TO_CODE_POINTERS)) {
+  for (const [kind, cfg] of Object.entries(ANALYSIS_TO_CODE_POINTERS)) {
     const data = analysis?.[kind];
     if (!data) continue;
     const node = byId.get(`analysis-${kind}`);
@@ -291,13 +338,13 @@ export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
     if (Array.isArray(node.code_pointers) && node.code_pointers.length > 0) continue; // 이미 보유 = 무변경
     const seen = new Set();
     const pointers = [];
-    for (const raw of accessor(data)) {
-      if (!hasCodeExtension(raw)) continue;                          // 확장자 화이트리스트
-      if (seen.has(raw)) continue;                                   // dedup
-      if (typeof existsFn === 'function' && !existsFn(raw)) continue; // existence-gate (정직)
-      seen.add(raw);
-      pointers.push({ path: raw, anchor_type: 'strict_path' });
-      if (pointers.length >= ANALYSIS_DERIVE_CAP) break;             // cap
+    for (const raw of cfg.accessor(data)) {
+      const ptr = resolveAnchor(raw, cfg, existsFn);   // mode-aware (file=strict_path+prefix / dir=glob)
+      if (!ptr) continue;                              // 미해소/미존재/확장자외 → skip
+      if (seen.has(ptr.path)) continue;                // dedup (해소 경로 기준)
+      seen.add(ptr.path);
+      pointers.push(ptr);
+      if (pointers.length >= ANALYSIS_DERIVE_CAP) break; // cap
     }
     if (pointers.length > 0) node.code_pointers = pointers;
   }

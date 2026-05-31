@@ -996,3 +996,127 @@ describe('synthesizeGraph — ★ F-DF-ANCHOR-002 analysis evidence → code_poi
     assert.ok(!nodes[0].code_pointers, 'deprecated 노드 derive skip (active 게이트)');
   });
 });
+
+// ============================================================================
+// ★ v11.23.0 Slice 2 (C-codepointer-analysis-aspect-enrich) — sql-inventory + architecture
+//   sql-inventory: mapper_xml 논리경로 → resource-prefix 역산 strict_path (A2 참여).
+//   architecture : modules[].path 디렉토리 → glob anchor (glob 필드 부재 / A2 제외).
+//   research wf_8a8aa7ef (Spring PathMatchingResourcePatternResolver / Maven layout / LSP 3.17 / IntelliJ isomorphic).
+// ============================================================================
+describe('synthesizeGraph — ★ v11.23.0 Slice 2 sql-inventory + architecture code-pointer enrich', () => {
+  const yes = () => true;
+
+  it('S2-1) sql-inventory mapper_xml bare → src/main/resources/ prefix 역산 strict_path', () => {
+    // bare 'mapper/UserMapper.xml' 는 미존재 / 'src/main/resources/mapper/UserMapper.xml' 만 존재.
+    const onlyResource = (p) => p === 'src/main/resources/mapper/UserMapper.xml';
+    const g = synthesizeGraph({
+      analysis: { 'sql-inventory': { inventory: [{ sql_id: 'UserMapper.findById', mapper_xml: 'mapper/UserMapper.xml' }] } },
+      existsFn: onlyResource,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-sql-inventory');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), ['src/main/resources/mapper/UserMapper.xml']);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'strict_path'), 'strict_path');
+    assert.equal(n.code_pointers_na, undefined, 'derive 성공 → covered');
+  });
+
+  it('S2-2) sql-inventory prefix 첫 존재 채택 — bare 존재 시 bare 우선 (결정적 순서)', () => {
+    // '' 가 prefixes[0] → bare 가 존재하면 bare 채택 (deterministic tie-break).
+    const bareExists = (p) => p === 'mapper/X.xml';
+    const g = synthesizeGraph({
+      analysis: { 'sql-inventory': { inventory: [{ sql_id: 'q', mapper_xml: 'mapper/X.xml' }] } },
+      existsFn: bareExists,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-sql-inventory');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), ['mapper/X.xml']);
+  });
+
+  it('S2-3) sql-inventory sentinel(inline/jpa/typeorm) → 미수집 (확장자 없음)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'sql-inventory': { inventory: [
+        { sql_id: 'a', mapper_xml: 'inline' },
+        { sql_id: 'b', mapper_xml: 'jpa' },
+        { sql_id: 'c', mapper_xml: 'typeorm' },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-sql-inventory');
+    assert.ok(!n.code_pointers, 'sentinel 확장자 없음 → 0 수집');
+    assert.equal(n.code_pointers_na, true, 'backstop na');
+  });
+
+  it('S2-4) sql-inventory dedup — 같은 mapper_xml 다수 record → 단일 pointer (해소경로 기준)', () => {
+    const onlyResource = (p) => p === 'src/main/resources/mapper/UserMapper.xml';
+    const g = synthesizeGraph({
+      analysis: { 'sql-inventory': { inventory: [
+        { sql_id: 'UserMapper.a', mapper_xml: 'mapper/UserMapper.xml' },
+        { sql_id: 'UserMapper.b', mapper_xml: 'mapper/UserMapper.xml' },
+        { sql_id: 'UserMapper.c', mapper_xml: 'mapper/UserMapper.xml' },
+      ] } },
+      existsFn: onlyResource,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-sql-inventory');
+    assert.equal(n.code_pointers.length, 1, 'dedup 후 1 pointer');
+  });
+
+  it('S2-5) sql-inventory strict_path 는 commit_hash 스탬프 (A2 content-drift 참여)', () => {
+    const onlyResource = (p) => p === 'src/main/resources/mapper/UserMapper.xml';
+    const g = synthesizeGraph({
+      analysis: { 'sql-inventory': { inventory: [{ sql_id: 'q', mapper_xml: 'mapper/UserMapper.xml' }] } },
+      existsFn: onlyResource,
+      commitHash: 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-sql-inventory');
+    assert.equal(n.code_pointers[0].commit_hash, 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a', 'A2 baseline 스탬프');
+  });
+
+  it('S2-6) architecture modules[].path dir → glob anchor (glob 필드 부재 / 확장자 게이트 우회)', () => {
+    const g = synthesizeGraph({
+      analysis: { architecture: { modules: [
+        { id: 'MOD-API', name: 'api', path: 'src/main/java/io/spring/api', layer: 'presentation' },
+        { id: 'MOD-CORE', name: 'core', path: 'src/main/java/io/spring/core/user', layer: 'domain' },
+      ] } },
+      existsFn: yes, // 디렉토리 존재 가정
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-architecture');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), [
+      'src/main/java/io/spring/api',
+      'src/main/java/io/spring/core/user',
+    ]);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'glob'), 'glob anchor');
+    assert.ok(n.code_pointers.every((p) => p.glob === undefined), 'glob 필드 부재 (validator existsSync(dir) 매칭)');
+    assert.equal(n.code_pointers_na, undefined, 'covered');
+  });
+
+  it('S2-7) architecture 미존재 dir → 미수집 → backstop na (existence-gate)', () => {
+    const g = synthesizeGraph({
+      analysis: { architecture: { modules: [{ id: 'MOD-X', name: 'x', path: 'src/main/java/gone', layer: 'domain' }] } },
+      existsFn: () => false,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-architecture');
+    assert.ok(!n.code_pointers, '미존재 dir emit ❌');
+    assert.equal(n.code_pointers_na, true, 'backstop na (정직)');
+  });
+
+  it('S2-8) architecture glob anchor 는 commitHash 지정에도 commit_hash 미스탬프 (A2 제외)', () => {
+    const g = synthesizeGraph({
+      analysis: { architecture: { modules: [{ id: 'MOD-API', name: 'api', path: 'src/main/java/io/spring/api', layer: 'presentation' }] } },
+      existsFn: yes,
+      commitHash: 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-architecture');
+    assert.equal(n.code_pointers[0].commit_hash, undefined, 'glob 미스탬프 → A2 dir-diff false-drift 회피');
+  });
+
+  it('S2-9) ★ REVISE-B 회귀 — business-rules 는 resource-prefix 미적용 (kind-specific prefix leak 차단)', () => {
+    // 'src/main/resources/mapper/X.xml' 만 존재 / bare 'mapper/X.xml' 부재.
+    // business-rules prefixes=[''] → bare 만 시도 → 미해소 → na. (sql-inventory 였다면 S2-1 처럼 해소됐을 것.)
+    const onlyResource = (p) => p === 'src/main/resources/mapper/X.xml';
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [{ id: 'BR-1', source_evidence: [{ file: 'mapper/X.xml' }] }] } },
+      existsFn: onlyResource,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.ok(!n.code_pointers, 'business-rules 는 resource-prefix 미적용 → 미해소');
+    assert.equal(n.code_pointers_na, true, 'na (전역 prefix 기본값 의존 ❌ 입증)');
+  });
+});
