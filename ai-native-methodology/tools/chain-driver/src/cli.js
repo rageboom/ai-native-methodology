@@ -93,6 +93,7 @@ function parseArgs(argv) {
     else if (a === '--scope') out.scope = rest[++i];
     else if (a === '--scenario') out.scenario = rest[++i];
     else if (a === '--stage') out.stage = rest[++i];
+    else if (a === '--direction') out.direction = rest[++i];
     else if (a === '--ref') out.ref = rest[++i];
     else if (a === '--stale') out.stale = true;
     // dep-graph P3 impact 명령
@@ -364,6 +365,14 @@ const STAGE_SUBKINDS = {
   implement: ['IMPL'],
 };
 
+// ★ F4 (Loop B / 소비 루프) — stage별 기본 방향 프리셋 ("각 단계가 던질 기본 질문").
+//   discovery/spec/implement = backward (상류 honor 강조) / plan/test = forward (하류 affects 강조).
+//   --direction forward|backward|both 로 override. presentation-only (analyzeImpact 알고리즘 무변경).
+const STAGE_DIRECTION = {
+  discovery: 'backward', spec: 'backward', implement: 'backward',
+  plan: 'forward', test: 'forward',
+};
+
 // ★ F3 — stage/scope 단위 일괄 의존성 rollup ("이 단계가 무엇을 honor/affect 하나" 한 번에).
 //   단일 --origin 대신 --stage <s> 또는 --scope <id> → 해당 노드 전부의 backward(honor)/forward(affects) 집계.
 //   AI 추론 0% — analyzeImpact (결정론 BFS) 재사용. dep-graph-navigator skill 및 stage agent consult 의 단계-일괄 채널.
@@ -372,6 +381,12 @@ function cmdNavigateRollup(graph, args) {
     console.error(`[chain-driver] navigate --stage: unknown stage '${args.stage}' (discovery|spec|plan|test|implement)`);
     process.exit(3);
   }
+  if (args.direction && !['forward', 'backward', 'both'].includes(args.direction)) {
+    console.error(`[chain-driver] navigate --direction: forward|backward|both`);
+    process.exit(3);
+  }
+  // ★ F4 — emphasis = --direction override > stage 기본 프리셋 > 'both'.
+  const emphasis = args.direction ?? (args.stage ? STAGE_DIRECTION[args.stage] : 'both');
   const subkinds = args.stage ? new Set(STAGE_SUBKINDS[args.stage]) : null;
   const TRAVERSABLE = new Set(['active', 'drift']);
   const target = (graph.nodes ?? []).filter(n =>
@@ -411,6 +426,8 @@ function cmdNavigateRollup(graph, args) {
 
   const result = {
     query: { stage: args.stage ?? null, scope: args.scope ?? null },
+    emphasis,
+    emphasis_source: args.direction ? 'override' : (args.stage ? 'stage-default' : 'none'),
     count: items.length,
     nodes: items,
     top_impact_roots: topRoots,
@@ -419,10 +436,18 @@ function cmdNavigateRollup(graph, args) {
   if (args.json) {
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   } else {
-    process.stdout.write(`[dep-graph-navigator] rollup — stage=${args.stage ?? '-'} scope=${args.scope ?? '-'} / ${items.length} 노드\n`);
+    process.stdout.write(`[dep-graph-navigator] rollup — stage=${args.stage ?? '-'} scope=${args.scope ?? '-'} / ${items.length} 노드 / emphasis=${emphasis}\n`);
     for (const it of items) {
       process.stdout.write(`  ${it.id} (${it.artifact_subkind}) state=${it.state}\n`);
-      process.stdout.write(`    honor(MUST): ${it.by_grade.MUST.length ? it.by_grade.MUST.join(', ') : '-'}\n`);
+      if (emphasis === 'backward') {
+        const ids = it.backward.map(x => x.id).sort();
+        process.stdout.write(`    honor(backward): ${ids.length ? ids.join(', ') : '-'}\n`);
+      } else if (emphasis === 'forward') {
+        const ids = it.forward.map(x => x.id).sort();
+        process.stdout.write(`    affects(forward): ${ids.length ? ids.join(', ') : '-'}\n`);
+      } else {
+        process.stdout.write(`    honor(MUST): ${it.by_grade.MUST.length ? it.by_grade.MUST.join(', ') : '-'}\n`);
+      }
     }
     process.stdout.write(`  top-3 impact root (graph-wide): ${topRoots.map(r => `${r.id}(${r.score})`).join(', ')}\n`);
   }

@@ -106,7 +106,8 @@ describe('chain-driver navigate --stage / --scope rollup (★ F3 / Loop B)', () 
     const r = run(['navigate', '--graph', path, '--stage', 'spec']);
     assert.equal(r.status, 0);
     assert.match(r.stdout, /rollup — stage=spec/);
-    assert.match(r.stdout, /honor\(MUST\)/);
+    assert.match(r.stdout, /emphasis=backward/);
+    assert.match(r.stdout, /honor\(backward\)/);
     rmSync(dir, { recursive: true });
   });
 
@@ -123,6 +124,50 @@ describe('chain-driver navigate --stage / --scope rollup (★ F3 / Loop B)', () 
     assert.equal(r.status, 0);
     const out = JSON.parse(r.stdout);
     assert.equal(out.count, 0);
+    rmSync(dir, { recursive: true });
+  });
+});
+
+describe('chain-driver navigate stage emphasis / --direction (★ F4)', () => {
+  it('--stage spec → emphasis backward (stage-default)', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec', '--json']);
+    assert.equal(r.status, 0);
+    const out = JSON.parse(r.stdout);
+    assert.equal(out.emphasis, 'backward');
+    assert.equal(out.emphasis_source, 'stage-default');
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--stage plan → emphasis forward (count 0 이어도 프리셋 적용)', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'plan', '--json']);
+    const out = JSON.parse(r.stdout);
+    assert.equal(out.emphasis, 'forward');
+    assert.equal(out.count, 0);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--direction override > stage 기본', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec', '--direction', 'forward', '--json']);
+    const out = JSON.parse(r.stdout);
+    assert.equal(out.emphasis, 'forward');
+    assert.equal(out.emphasis_source, 'override');
+    rmSync(dir, { recursive: true });
+  });
+
+  it('잘못된 --direction → exit 3', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec', '--direction', 'sideways']);
+    assert.equal(r.status, 3);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('backward emphasis text → honor(backward) 라인', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec']);
+    assert.match(r.stdout, /honor\(backward\)/);
     rmSync(dir, { recursive: true });
   });
 });
