@@ -74,6 +74,19 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 - 현 commit 안 frontmatter `skills:` 사전 등록된 `discovery-from-*` 4 어댑터 + `discovery-decompose-use-cases` / `discovery-identify-business-intent` skill 파일은 후속 commit 안 신설/rename — Claude Code SessionStart 시점에 frontmatter 사전 주입 paradigm 정합 (Sub-agents.md spec line 407~429)
 - lifecycle-contract §자산 매핑 매트릭스 §Agent column discovery row = 본 agent path
 
+## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
+
+★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+
+```bash
+node tools/chain-driver/src/cli.js navigate \
+  --graph .aimd/output/artifact-graph.json --origin <node-id>
+```
+
+- 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).
+- **Loop A 정합**: graph.stale 또는 노드 state=drift 표시 시 **먼저 재합성 후 consult** (stale 그래프 신뢰 ❌). 부재 시 dep-graph-navigator skill 이 합성 안내.
+- 본 stage 노드: UC-<scope>-NNN (use case) — backward 로 analysis/BR 의도 정합 확인.
+
 ## When NOT to invoke
 
 - chain (analysis) 진입 시 → `analysis-agent` 권한 (baseline 산출)

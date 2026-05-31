@@ -76,6 +76,19 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #2 사용자 결단 로그)
 
+## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
+
+★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+
+```bash
+node tools/chain-driver/src/cli.js navigate \
+  --graph .aimd/output/artifact-graph.json --origin <node-id>
+```
+
+- 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).
+- **Loop A 정합**: graph.stale 또는 노드 state=drift 표시 시 **먼저 재합성 후 consult** (stale 그래프 신뢰 ❌). 부재 시 dep-graph-navigator skill 이 합성 안내.
+- 본 stage 노드: BHV-<scope>-NNN / AC-<scope>-NNN — backward 로 UC honor, forward 로 TC 영향 파악.
+
 ## When NOT to invoke
 
 - analysis ~ discovery(chain 1) 진입 시 → 이전 stage agent 권한
