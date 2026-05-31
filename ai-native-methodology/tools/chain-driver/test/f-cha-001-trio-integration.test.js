@@ -163,3 +163,28 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
     assert.equal(r.length, 2, 'canonical 2종 (★ v9.1.1 + v10.0.0 정합)');
   });
 });
+
+// ★ ★ F-AUDIT-SOFTGATE-001 (=C-13 해소) — chain-driver next 가 --findings 미제출 시 fail-closed (silent soft-pass 제거).
+describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => {
+  it('bare `next` (--findings 없이) → exit 1 + state.blocked=findings_unverified (e2e)', () => {
+    const root = join(tmp, 'softgate-bare');
+    mkdirSync(root, { recursive: true });
+    initState(root, 'softgate-bare');
+    // ★ --findings 미전달 = loadFindings __findings_absent sentinel → evaluateGate findings_unverified block.
+    const result = spawnSync('node', [CLI_PATH, 'next', root], { encoding: 'utf-8', timeout: 20000 });
+    assert.equal(result.status, 1, `bare next 는 fail-closed exit 1 의무 (got ${result.status}) / stderr: ${result.stderr}`);
+    const state = readState(root);
+    assert.equal(state.blocked, true, 'state.blocked=true 영속 의무');
+    assert.equal(state.block_reason, 'findings_unverified', 'block_reason=findings_unverified 영속 의무');
+  });
+
+  it('`next --user-decision go` (--findings 없이) → exit 0 + advanced (명시 ack escape / intervention-log actor:user)', () => {
+    const root = join(tmp, 'softgate-ack');
+    mkdirSync(root, { recursive: true });
+    initState(root, 'softgate-ack');
+    const result = spawnSync('node', [CLI_PATH, 'next', root, '--user-decision', 'go'], { encoding: 'utf-8', timeout: 20000 });
+    assert.equal(result.status, 0, `명시 go ack 시 전진 exit 0 의무 (got ${result.status}) / stderr: ${result.stderr}`);
+    const state = readState(root);
+    assert.equal(state.blocked, false, '명시 ack 후 state.blocked=false (go-with-warnings 전진)');
+  });
+});

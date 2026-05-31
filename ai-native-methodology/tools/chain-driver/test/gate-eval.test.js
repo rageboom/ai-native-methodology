@@ -125,4 +125,25 @@ describe('gate-eval', () => {
     assert.equal(final.blocked, false);
     assert.equal(final.decision, 'go-with-warnings');
   });
+
+  // ★ ★ ★ F-AUDIT-SOFTGATE-001 (=C-13 해소 / 2026-05-31) — findings 미제출 fail-closed (no-simulation / 양심 의존 차단)
+  it('★ F-AUDIT-SOFTGATE-001: __findings_absent → blocked with findings_unverified (fail-closed / silent soft-pass 제거)', () => {
+    const r = evaluateGate('discovery', { __findings_absent: true, critical: 0, high: 0, medium: 0, low: 0, info: 0 });
+    assert.equal(r.blocked, true);
+    assert.equal(r.primary_reason, 'findings_unverified');
+  });
+
+  it('★ F-AUDIT-SOFTGATE-001: __findings_absent + user go → go-with-warnings (명시 ack escape / rank 2 overridable)', () => {
+    const gateResult = evaluateGate('discovery', { __findings_absent: true, critical: 0, high: 0, medium: 0, low: 0, info: 0 });
+    assert.equal(gateResult.blocked, true);
+    assert.equal(gateResult.primary_reason, 'findings_unverified');
+    const final = applyUserDecision(gateResult, 'go');
+    assert.equal(final.blocked, false);
+    assert.equal(final.decision, 'go-with-warnings');
+  });
+
+  it('★ F-AUDIT-SOFTGATE-001: 명시 findings 객체(sentinel 없음)는 영향 없음 — backward-compat (regression)', () => {
+    const r = evaluateGate('spec', { critical: 0, high: 0, medium: 0 });
+    assert.equal(r.blocked, false);
+  });
 });

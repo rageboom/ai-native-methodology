@@ -185,7 +185,10 @@ function cmdState(args) {
 }
 
 function loadFindings(path) {
-  if (!path) return { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+  // ★ F-AUDIT-SOFTGATE-001 (=C-13 해소) — --findings 미제출 = 검증 증거 부재 → sentinel 표시 (fail-closed).
+  //   기존엔 all-zeros 반환으로 gate 무음 통과(soft). __findings_absent 로 evaluateGate 가 findings_unverified block.
+  //   (zero counts 도 유지 — cmdNext validator_findings 기록부가 critical||0 등으로 안전 참조.)
+  if (!path) return { __findings_absent: true, critical: 0, high: 0, medium: 0, low: 0, info: 0 };
   if (!existsSync(path)) {
     console.error(`[chain-driver] findings file not found: ${path}`);
     process.exit(3);

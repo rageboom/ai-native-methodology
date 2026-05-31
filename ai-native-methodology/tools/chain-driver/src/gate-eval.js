@@ -54,6 +54,17 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
   const reasons = [];
   const expected = SCENARIO_EXPECTED[scenario] || SCENARIO_EXPECTED.S1;
 
+  // ★ F-AUDIT-SOFTGATE-001 (=C-13 해소) — findings 미제출 = fail-closed.
+  //   chain-driver next 가 --findings 없이 호출되면 loadFindings 가 __findings_absent sentinel 반환.
+  //   silent soft-pass 제거 (no-simulation / 양심 의존 차단 원칙). rank 2 = --user-decision go 로 명시 ack 가능 (escape).
+  //   gate-eval 순수성 보존 — sentinel in, reason out (validator 실행은 caller 책임).
+  if (findings.__findings_absent) {
+    reasons.push({
+      code: 'findings_unverified',
+      detail: 'no --findings supplied — gate 검증 증거 부재 (fail-closed). 진짜 validator findings 를 --findings <path> 로 공급하거나, --user-decision go 로 명시 ack(intervention-log 기록) 후 전진.',
+    });
+  }
+
   if ((findings.critical ?? 0) > 0) {
     reasons.push({ code: 'validator_critical', detail: `critical findings = ${findings.critical}` });
   }
@@ -140,6 +151,7 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     coverage_threshold: 2,
     layer2_threshold: 2,         // ★ ★ session 14차 / Senior 권장 / coverage_threshold 수준 / user go → go-with-warnings 허용 / semantic drift Phase D carry
     s2_outcome_mismatch: 2,      // ★ v11.11.0 / S2 per-TC outcome mismatch / coverage_threshold 수준 / go-with-warnings 허용 (corroboration 0 동안 WARN) / DEC-2026-05-30-s2-gate-slice
+    findings_unverified: 2,      // ★ F-AUDIT-SOFTGATE-001 (=C-13) / findings 미제출 fail-closed / coverage_threshold 수준 / --user-decision go 로 명시 ack 가능 (silent pass ❌)
     evidence_missing: 3,
     schema_migration_required: 4,
     user_stop: 5,

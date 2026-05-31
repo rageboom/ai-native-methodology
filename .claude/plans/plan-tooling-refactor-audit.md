@@ -177,21 +177,21 @@ placeholder를 complete로 위장 / broken ref / 양심 의존 강제 / gate 없
 
 ## 부록 — 본 브랜치 실행 기록 (refactor/tooling-audit-cleanup)
 
-> 2026-05-31 / base main v11.14.0. 검증 = 실제 `npm test --workspaces` 874/874 + `release-readiness` 22/22 + `test:release` 14/14 (no-simulation).
+> 2026-05-31 / base main v11.14.0. 검증 = 실제 `npm test --workspaces` 879/879 + `release-readiness` 22/22 + `test:release` 14/14 (no-simulation).
 
 | Phase | 커밋 | 내용 |
 |---|---|---|
 | A+B | `9b3dec9` | planning→discovery rename 잔재 정리 (alias/dispatch/flag 정규화) + R16/R17 vestigial §4.1/§4.6 제거(retarget) — 18 files |
 | C | `a3776f4` | check21 dead-gate 복구(machine marker + .template.* 전수 + fail-closed) + check22 baseline broken-ref 해소 + self-test 17→22(5 fail→14 pass) + charter 카운트 21/19 단일화 — 5 files |
-| B4 | (본 커밋) | findings-aggregator = **① 주장 교정** (도구 유지 / "mandatory 자동 auto-feeder" 거짓 선언 정정 → "선택적 operator 보조") — cli.js/aggregator.js header + guides + tools/README |
+| B4 | `ac7f12d` | findings-aggregator = **① 주장 교정** (도구 유지 / "mandatory 자동 auto-feeder" 거짓 선언 정정 → "선택적 operator 보조") — cli.js/aggregator.js header + guides + tools/README |
+| F-SOFTGATE | (본 커밋) | **F-AUDIT-SOFTGATE-001(=C-13) fail-closed — Option C**: findings 미제출 시 `next` block(reason=findings_unverified, rank 2) + `--user-decision go` 명시 ack(intervention-log actor:user) escape. gate-eval 순수성 보존(sentinel in, reason out). chain-driver cli.js+gate-eval.js + 5 test (255/255) |
 
 ### 신규 발견 (audit 후속)
 
-- **F-AUDIT-SOFTGATE-001 — `chain-driver next` 의 finding-count 게이트가 soft (양심 의존)**: `loadFindings`(chain-driver/src/cli.js:188) 가 `--findings` 미입력 시 `{critical:0,...}` 반환 → finding-count 차원이 0 findings 로 무조건 통과. 즉 finding 기반 차단은 "operator 가 findings 를 넣어줄 때만" 작동. 실 enforcement 는 gate-eval(coverage/state) + CI(각 validator 직접 실행)에 의존. findings-aggregator 가 거의 안 쓰이는(11 PoC 중 1) 근본 원인. **findings-aggregator 보다 큰 게이트-설계 결정 영역** — 본 cleanup scope 외 / 사용자 판단 대기 (옵션: next 가 findings 필수화 vs 현 soft 유지 + "CI 직접 validator 실행"을 정식 enforcement 로 명문화).
+- **F-AUDIT-SOFTGATE-001 — `chain-driver next` 의 finding-count 게이트가 soft (양심 의존)**: `loadFindings`(chain-driver/src/cli.js:188) 가 `--findings` 미입력 시 `{critical:0,...}` 반환 → finding-count 차원이 0 findings 로 무조건 통과. 즉 finding 기반 차단은 "operator 가 findings 를 넣어줄 때만" 작동. 실 enforcement 는 gate-eval(coverage/state) + CI(각 validator 직접 실행)에 의존. findings-aggregator 가 거의 안 쓰이는(11 PoC 중 1) 근본 원인. ✅ **RESOLVED (본 브랜치 / Option C — 3-agent fail-closed 수렴 + Senior minimal-diff)**: `loadFindings` 가 미제출 시 `__findings_absent` sentinel 반환 → `evaluateGate` 가 `findings_unverified` block(rank 2). 통과 = 진짜 `--findings` 공급 OR `--user-decision go` 명시 ack(intervention-log actor:user 기록). silent soft-pass 제거 / gate-eval 순수성 보존 / 기존 테스트 0 깨짐 + 5 신규 test. **C-13**(2026-05-07 PoC-06 PROGRESS:252 carry) 동시 해소.
 
 ### 잔여 (deferred / 사용자 판단)
 
-- F-AUDIT-SOFTGATE-001 처분 (게이트 설계).
 - release-readiness CI 미연동 → self-test silent rot 재발 가능 (`test:release` 를 CI/workspace 에 wiring 할지).
 - CHANGELOG 의 phantom alias 주장("transformPlanningExtraction 보존") — 역사 기록이라 미수정 / 향후 release writeup 시 정정.
 - `tools/README.md` gate 번호 표기 (spec-test-link "gate #3" 등) v10 재번호 미반영 의심 — 별도 doc-sync.
