@@ -194,8 +194,8 @@ node tools/static-runner/src/cli.js --plugin semgrep --target ./src --output ./o
 node tools/br-cross-consistency-validator/src/cli.js <output>/business-rules.json
 # (Layer 1 결정적 + Layer 2 LLM strict mode 옵션)
 
-# ★ v2.3.6+ findings aggregator (전체 finding 단일 stream)
-node tools/findings-aggregator/src/cli.js <output>/
+# ★ (선택) findings aggregator — stage 별 validator 를 한 번에 실행해 findings JSON 생성 (chain-driver next --findings 입력 편의 / 필수 아님 — next 는 findings 없이도 동작)
+node tools/findings-aggregator/src/cli.js --target <project-dir> --stage <discovery|spec|plan|test|implement>
 ```
 
 자세한 도구 cadence = [`../tools/README.md`](../tools/README.md).

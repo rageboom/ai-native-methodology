@@ -1,6 +1,6 @@
-// aggregator.js — chain-driver next --findings 자동 입력 통합 핵심 로직
+// aggregator.js — findings 통합 핵심 로직 (★ 선택적 operator 보조 / chain-driver next --findings 입력 편의)
 // ★ ★ v2.3.6 PATCH (DEC-2026-05-13-chain-driver-findings-integration-v2.3.6)
-// ★ ★ "양심 의존 차단" 정책 강화 — chain-driver tool 직접 실행 + validator findings 자동 입력 의무
+// ★ 실상 정정 (refactor: tooling-audit-cleanup) — 본 도구는 자동 호출되지 않으며(harness/CI/gate-eval invoker 0) `next` 도 findings 를 필수로 요구하지 않음(미입력 → 0 findings → pass). v2.3.6 의 '자동 입력 의무' 는 설계 의도였으나 실제론 우회됨(11 PoC 중 1) → 선택적 보조로 표기. gate 강제 = gate-eval + CI(각 validator 직접 실행).
 // ★ chain harness 5 요소 변경 ❌ (chain-driver 외부 자산 / findings shape 정합만)
 
 import { execFileSync } from 'node:child_process';

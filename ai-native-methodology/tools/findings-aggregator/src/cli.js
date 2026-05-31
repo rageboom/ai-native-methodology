@@ -1,6 +1,7 @@
 #!/usr/bin/env node
-// findings-aggregator CLI — chain-driver next --findings 자동 입력 통합 도구
-// ★ ★ v2.3.6 PATCH / "양심 의존 차단" 정책 강화
+// findings-aggregator CLI — ★ 선택적 operator 보조 도구 (mandatory 아님).
+// stage 별 REQUIRED_VALIDATORS_PER_STAGE 를 한 번에 실행해 findings JSON 생성 → chain-driver `next --findings <path>` 입력 편의.
+// ★ gate 강제는 gate-eval + CI(chain-check.yml 가 각 validator 직접 실행)가 담당 / `next` 는 findings 미입력 시 0 findings 로 동작 = 본 도구 필수 ❌ (refactor: tooling-audit-cleanup — v2.3.6 'auto 입력 의무' 선언 정정).
 // usage:
 //   findings-aggregator --target <project-dir> --stage <discovery|spec|plan|test|implement> [--output <findings.json>] [--dry-run] [--json]
 

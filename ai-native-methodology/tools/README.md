@@ -24,7 +24,7 @@
 | [`chain-coverage-validator/`](./chain-coverage-validator/) | — | — | **gate #2** | — | — | — | gate auto |
 | [`spec-test-link-validator/`](./spec-test-link-validator/) | — | — | — | **gate #3** | — | — | gate auto |
 | [`test-impl-pass-validator/`](./test-impl-pass-validator/) | — | — | — | — | **gate #4** | — | gate auto (`--allow-execute` 의무) |
-| [`findings-aggregator/`](./findings-aggregator/) ★ v2.3.6 | — | gate aux | gate aux | gate aux | gate aux | — | chain-driver auto (★ ★ validator findings 자동 입력 통합) |
+| [`findings-aggregator/`](./findings-aggregator/) ★ v2.3.6 | — | aux | aux | aux | aux | — | user 수동 (★ 선택적 findings 생성 보조 / 자동 호출 ❌ / gate 강제는 gate-eval·CI) |
 | [`traceability-matrix-builder/`](./traceability-matrix-builder/) | — | — | — | — | — | ★ | user (수동) |
 
 ★ ★ ★ **mechanical gate trio**: gate auto 호출 시 finding 발견 → state.blocked=true / cli exit 2 / PreToolUse permissionDecision=deny. LLM "통과한 척" 시뮬레이션 차단 (ADR-CHAIN-005 §3).
