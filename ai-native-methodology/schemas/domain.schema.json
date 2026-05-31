@@ -10,6 +10,15 @@
     "meta": {
       "$ref": "./meta-confidence.schema.json"
     },
+    "stakeholders": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "★ v11.16.0 (C-domain-schema-stakeholders) — 도메인 모델 actor / 이해관계자 목록 (예: 차량관리자, 회계담당자). optional / additive — discovery-spec business_intent.stakeholders 와 동형(string array) / domain 은 도메인 actor 초점 (전체 비즈니스 이해관계자는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+    },
+    "business_intent_summary": {
+      "type": "string",
+      "description": "★ v11.16.0 (C-domain-schema-stakeholders) — 도메인 비즈니스 의도 한 줄 요약. optional / additive — discovery-spec business_intent.domain_purpose 의 도메인 측 요약(summary / full 의도는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+    },
     "ubiquitous_language": {
       "type": "array",
       "description": "보편 언어 (도메인 용어집). 비즈니스 측과 코드 측이 같은 단어 사용",

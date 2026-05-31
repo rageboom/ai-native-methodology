@@ -11,7 +11,7 @@
 
 **활용**: chain 3 test stage 의 핵심 input. acceptance-criteria 추출 source.
 
-`formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + planning-spec.use_cases 흡수.
+`formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + discovery-spec.use_cases 흡수.
 
 ## 2. 형식
 
@@ -27,13 +27,13 @@
 
 | 항목 | 출처 | 도구 | 신뢰도 |
 |---|---|---|---|
-| behaviors (BHV-*) | planning-spec UC-* + analysis `formal-spec` phase | 결정적 + LLM | 85% |
+| behaviors (BHV-*) | discovery-spec UC-* + analysis `formal-spec` phase | 결정적 + LLM | 85% |
 | preconditions / postconditions / invariants | `formal-spec` phase 산출물 | 결정적 | 95% |
 | state_transition / decision_table / sequence ref | `formal-spec` phase 산출물 경로 | 결정적 | 100% |
 | property_tests stub | LLM + framework_status | LLM with grounding | 75% |
 | acceptance_criteria_refs | chain 2 forward link | chain-coverage-validator | 100% |
 
-**입력**: planning-spec.json + analysis stage 1~16 산출물 (★ "현 7대 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
+**입력**: discovery-spec.json + analysis stage 1~16 산출물 (★ "현 7대 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
 
 ## 4. 검증 도구
 

@@ -1,7 +1,7 @@
 # sql-inventory phase: sql-inventory (SQL 단위 11 컬럼 인벤토리 + extraction_automation)
 
 > **명령어**: `/analyze-sql-inventory` · **사상**: ADR-CHAIN-007 (phase 4.8 정식 도입) + Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP) + Opus 4.7 외부 조언 6 컬럼
-> **핵심 책임**: rules + antipatterns + characterization 만으로는 SQL 단위 추적 ❌ → SQL 단위 11 컬럼 인벤토리 (외부 6 + 본 추가 5) + extraction_automation metric → chain 1 planning-spec UC↔sql_id mapping 입력 보강
+> **핵심 책임**: rules + antipatterns + characterization 만으로는 SQL 단위 추적 ❌ → SQL 단위 11 컬럼 인벤토리 (외부 6 + 본 추가 5) + extraction_automation metric → chain 1 discovery-spec UC↔sql_id mapping 입력 보강
 > **introduced**: v2.2.0-rc1
 > **RDB only**: ✅ (NoSQL/Prisma 단독 환경 시 skip)
 
@@ -125,10 +125,10 @@ Exit codes:
 
 ## 7. chain 1 입력 보강
 
-phase 4.8 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
+phase 4.8 산출물 = ★ chain 1 (discovery-spec) 입력 핵심:
 
 - sql_id ↔ uc_link → use_case 의 SQL 단위 추적
-- intent_vs_bug_classification → planning-spec carry 의무
+- intent_vs_bug_classification → discovery-spec carry 의무
 - carry_flags external_call_out_of_scope → 새 시스템 외부 의존 명시
 - DBA-read + proc-body → 새 시스템 SP body 재구현 차단
 

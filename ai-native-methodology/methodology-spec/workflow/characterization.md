@@ -1,14 +1,14 @@
 # characterization phase: characterization (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
 
 > **명령어**: `/analyze-characterization` · **사상**: ADR-CHAIN-006 (phase 4.7 정식 도입) + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + SATD/KL-SATD (Maldonado & Shihab 2015)
-> **핵심 책임**: business-rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 planning-spec 입력 보강
+> **핵심 책임**: business-rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 discovery-spec 입력 보강
 > **introduced**: v2.1.0
 
 ---
 
 ## 1. 목적
 
-`business-logic` phase (rules + domain) + `formal-spec` phase 후에도 ★ "어떤 BR 을 보존하고 어떤 AP 를 버릴지" 명시 ❌ → ★ acceptance oracle 부재 → chain 1 planning-spec use_cases 추출 시 의도/버그 혼재.
+`business-logic` phase (rules + domain) + `formal-spec` phase 후에도 ★ "어떤 BR 을 보존하고 어떤 AP 를 버릴지" 명시 ❌ → ★ acceptance oracle 부재 → chain 1 discovery-spec use_cases 추출 시 의도/버그 혼재.
 
 **답하는 질문**:
 - 새 시스템에서 어떤 비즈니스 행위를 그대로 보존해야 하나? (intent)
@@ -64,7 +64,7 @@ grep -rn -E "TODO|FIXME|HACK|XXX|폐해|임시|나중에|폐기|deprecate|workar
 
 ```yaml
 snapshot_id: "SNAP-UC-USER-SIGNUP-001"
-use_case: "UC-USER-SIGNUP-001"          # ★ planning-spec UC ↔ link 의무
+use_case: "UC-USER-SIGNUP-001"          # ★ discovery-spec UC ↔ link 의무
 feature: "User Signup"                  # (Cucumber Feature / optional)
 scenarios:
   - id: "SCN-SIGNUP-001"

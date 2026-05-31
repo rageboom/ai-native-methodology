@@ -12,7 +12,7 @@
 **답하는 질문**: "business-rules.json + antipatterns.json 만으로 새 시스템 동작이 결정되는가? — ★ ❌. 어떤 BR 을 보존하고 어떤 AP 를 버릴지 ★ ★ 명시 의무."
 
 **AI 재구현 시 활용**:
-- chain 1 planning-spec 입력 보강 (use_cases 추출 시 acceptance oracle 직접 적용)
+- chain 1 discovery-spec 입력 보강 (use_cases 추출 시 acceptance oracle 직접 적용)
 - chain 4 GREEN 검증 시 snapshot 이 acceptance test 로 작동 (AI 자동 생성 코드의 의도 보존 검증)
 - ambiguous 영역 = 도메인 expert 결단 강제 (carry 명시 의무)
 
@@ -82,7 +82,7 @@ PoC #06 Spring 4.1 = ambiguous 1~3건 (D2 결단 후 1건). 도메인 expert (IF
 ```yaml
 snapshots[]:
   snapshot_id: "SNAP-UC-USER-SIGNUP-001"
-  use_case: "UC-USER-SIGNUP-001"           # ★ planning-spec UC ↔ link
+  use_case: "UC-USER-SIGNUP-001"           # ★ discovery-spec UC ↔ link
   feature: "User Signup"                   # (★ Cucumber Gherkin 정합 / optional)
   endpoint: "POST /api/users"
   controller_method: "UserController.create"
@@ -163,7 +163,7 @@ PoC #06 단일 모듈 = 0.43 → ratchet 정합. `trend_required` 충족 시 통
 cross_links:
   - {to_artifact: rules, link_type: classifies_br}                # ★ BR ↔ intent_classification
   - {to_artifact: antipatterns, link_type: classifies_ap}         # ★ AP ↔ intent_classification
-  - {to_artifact: planning-spec, link_type: provides_use_cases_oracle}  # ★ chain 1 입력
+  - {to_artifact: discovery-spec, link_type: provides_use_cases_oracle}  # ★ chain 1 입력
   - {to_artifact: behavior-spec, link_type: validates_bhv_intent} # chain 2
   - {to_artifact: acceptance-criteria, link_type: snapshot_oracle}# chain 2 (Gherkin)
   - {to_artifact: test-spec, link_type: snapshot_to_tc}           # chain 3

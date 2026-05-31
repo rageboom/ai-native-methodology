@@ -1,6 +1,6 @@
 ---
 name: _base-build-traceability-matrix
-description: ★ ★ v2.0 cross-gate skill. 4 chain 산출물 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec) 합성하여 traceability-matrix.{json,md,mermaid} 생성. UC → BHV → AC → TC → IMPL forward+backward link + coverage_summary + status (green/yellow/red). DO-178C / IEC 62304 bidirectional traceability 차용 (★ S5 정합 — header derived_from + do_not_edit_manually:true). 매 gate 갱신 의무.
+description: ★ ★ v2.0 cross-gate skill. 4 chain 산출물 (discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec) 합성하여 traceability-matrix.{json,md,mermaid} 생성. UC → BHV → AC → TC → IMPL forward+backward link + coverage_summary + status (green/yellow/red). DO-178C / IEC 62304 bidirectional traceability 차용 (★ S5 정합 — header derived_from + do_not_edit_manually:true). 매 gate 갱신 의무.
 allowed-tools: Read, Write, Edit, Bash
 ---
 

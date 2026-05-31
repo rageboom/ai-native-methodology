@@ -92,4 +92,4 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 - 사용자가 legacy 코드만 분석 → `analysis-input-collection` 호출 (본 skill 우회)
 - 단일 입력만 (예: openapi.yaml 한 건만) → 해당 BCDE skill 직접 호출 가능 (orchestrate 우회)
-- chain 1+ 진입 후 (planning-spec 작성 중 추가 자료 흡수) → revisit-loop 으로 input 재진입 의무
+- chain 1+ 진입 후 (discovery-spec 작성 중 추가 자료 흡수) → revisit-loop 으로 input 재진입 의무

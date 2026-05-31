@@ -45,7 +45,7 @@
     "linked_artifacts": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "이 폴더 안 산출물 상대 경로 (예: planning-spec.json)."
+      "description": "이 폴더 안 산출물 상대 경로 (예: discovery-spec.json)."
     },
     "linked_state_version": {
       "type": "string",

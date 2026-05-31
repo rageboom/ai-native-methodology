@@ -16,7 +16,7 @@ stage 마다 등급 체계가 다름 (실측):
 | analysis (회귀 정책) | ADR-010 baseline+ratchet | `critical / high / medium / low` | **4** |
 | chain 2 | `acceptance-criteria.json` severity (MoSCoW) | `must / should / nice` | **3** |
 
-현 상태 — acceptance-criteria.severity 는 `planning-spec.business_intent + LLM` 추론 (75%) 으로만 도출 / business-rules.json BR severity 와 ★ 직접 정합 매핑 부재. ratchet 4종 ↔ rules 5종 (`info` 차이) 도 암묵. → cross-stage drift 잠재.
+현 상태 — acceptance-criteria.severity 는 `discovery-spec.business_intent + LLM` 추론 (75%) 으로만 도출 / business-rules.json BR severity 와 ★ 직접 정합 매핑 부재. ratchet 4종 ↔ rules 5종 (`info` 차이) 도 암묵. → cross-stage drift 잠재.
 
 ---
 

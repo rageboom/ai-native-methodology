@@ -126,7 +126,7 @@
     },
     "rules_seed": {
       "type": "array",
-      "description": "BR-* 후보 — schema 의 enum/pattern/minimum/maximum/required 제약에서 도출. 정식 BR-* ID 는 chain 1 planning-spec 에서 부여.",
+      "description": "BR-* 후보 — schema 의 enum/pattern/minimum/maximum/required 제약에서 도출. 정식 BR-* ID 는 chain 1 discovery-spec 에서 부여.",
       "items": {
         "type": "object",
         "additionalProperties": false,

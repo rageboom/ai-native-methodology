@@ -55,6 +55,8 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 
 ## 70~80% 한계 명시
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 - NL ambiguity → LLM interpretation 신뢰도 ~70~75% (모든 채널 중 가장 낮음).
 - gate #1 `br-cross-consistency-validator` Layer 2 LLM 의무 통과 (semantic_drift_detected / confidence_cap_exceeded 차단).
 - **NFR fabrication 위험 가장 높음** — source_grounded_evidence verbatim quote 강제로 차단.

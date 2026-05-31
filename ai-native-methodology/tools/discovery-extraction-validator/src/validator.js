@@ -92,6 +92,25 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
     }
   }
 
+  // 3.5 domain 비즈니스 컨텍스트 nudge (v11.16.0 / C-domain-schema-stakeholders).
+  // analysis domain.json 제공 시 stakeholders / business_intent_summary 부재 = WARN(low / non-blocking / backward-compat).
+  // schema 는 optional(additive) — skill 본문이 신규 산출 시 작성 의무 / 여기선 부재만 nudge.
+  if (analysis?.domain && typeof analysis.domain === 'object') {
+    const missing = [];
+    const stakeholders = analysis.domain.stakeholders;
+    if (!Array.isArray(stakeholders) || stakeholders.length === 0) missing.push('stakeholders');
+    const summary = analysis.domain.business_intent_summary;
+    if (typeof summary !== 'string' || summary.trim().length === 0) missing.push('business_intent_summary');
+    if (missing.length > 0) {
+      findings.push({
+        kind: 'discovery.domain.missing_business_context',
+        severity: 'low',
+        missing,
+        message: `domain.json 에 ${missing.join(' / ')} 부재 — 도메인 actor / 비즈니스 의도 명시 권장 (C-domain-schema-stakeholders / analysis-domain-model skill 본문 의무)`
+      });
+    }
+  }
+
   // 4. cross_links.to_analysis_artifacts
   const xLinks = discoverySpec?.cross_links?.to_analysis_artifacts ?? [];
   if (xLinks.length === 0) {

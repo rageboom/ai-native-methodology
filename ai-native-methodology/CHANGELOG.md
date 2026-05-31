@@ -9,6 +9,65 @@
 
 ---
 
+## [11.17.0] — 2026-05-31 MINOR — agents·skills 정책 SSOT dedup + chain/gate 번호 정합(System Y) + F-MB-010 종결
+
+`프로젝트 자산(agents/skills/hooks) 리팩토링` 요청 → 3 묶음 (중복 제거 → 정합성 → 잔여 cascade) 순차 시행. 모두 비파괴 / gate-neutral (release-readiness pass-count 비감소 / npm test 24 ws fail-0 / citation 0 / drift 0 breaking).
+
+### 정책 SSOT dedup (methodology-spec/policies/ 신설)
+- 공통 정책 boilerplate(no-simulation / 70~80% / Tier 3.1·3.2 / Absolute priorities)가 agents 4곳·skills 33곳에 복붙된 것을 단일 SSOT로 추출. canonical 3종 신설(`no-simulation.md` / `automation-boundary.md` / `honesty-tiers.md`) + `plugin-charter.md` §7(agent 공통 우선순위 / 새 R 아님).
+- "스텁+포인터" granularity: skill 고유 delta(도구 Tier 매핑 / modality별 자동화 %)는 inline 유지 + 1줄 포인터. baseline+delta 모델. spec/test/implement agent "호출 절차"의 Tier merge-bug(중복 step 번호) 동반 정리.
+- gate-safe 근거: validator는 prose 문자열 아닌 field 값·파일 존재·digest 검사 / skill-citation-validator는 인용 경로 존재만 확인(포인터 추가 = 통과·강화).
+
+### chain/gate 번호 schism 정합 (System X→Y)
+- v10.0.0 plan-gate(#3) 삽입 후 test/implement prose가 한 칸 stale("System X": test=3/#3, implement=4/#4)였던 것을 machine SSOT(state.schema + sdlc-flow + "chain N = gate #N" 규약)에 맞춰 정정: **test=chain 4/gate #4, implement=chain 5/gate #5**.
+- 범위: agents(test/implement/spec forward-ref/analysis/README) + test·implement 스킬 8개 + CLAUDE.md 다이어그램(plan gate #3 명시 / test #4 / implement #5 / gate #1~#5 / chain 1~5). plan/spec/discovery 불변 / ADR 파일명 불변.
+- spec-agent 입력 계약 정정: `planning-spec.json` → `discovery-spec.json` (discovery 가 산출하지 않던 파일 참조 = 기능 결함 해소).
+
+### F-MB-010 잔여 cascade 종결 (planning-spec→discovery-spec rename)
+- hard replace: deliverables/ticket-policy/id-conventions/skills-axis/workflow docs + schemas(description) + analysis skills (이력 주석·frozen PoC evidence·finding-system 보존).
+- flows: `plan-spec-compose` phase id → `task-plan-compose` (json+mermaid 동시 / drift 0 breaking) + implement.phase-flow inputs `planning`→`discovery`.
+- runtime(chain-driver keying)는 v11.1.0 에서 이미 resolved 확인 (npm test 24 ws 통과 입증).
+
+## [11.16.0] — 2026-05-31 MINOR — 잔여 actionable carry sweep 3종 (DB always-on validator 신설 + domain schema stakeholders + chain-coverage strict default)
+
+`잔여 작업 남은거 있나?` 질문 → **91-item carry audit (workflow / 5 소스 fan-out → 검증 → 분류)** → 즉시 착수 가능 actionable 4종 도출. 그 중 **P2(analysis/aspect code_pointers enrich) 보류** (§8.1 — real code_pointers semantics 가 live PoC 없이 모호 = HIGH 과적합 위험 / 현 na=true backstop 이 이미 coverage 100% 라 infra-only 는 소비자 부재). **P1·P3·P4 시행** (각 추천안 / 사용자 batch 승인).
+
+### P1 — `tools/db-assets-validator` 신설 (25번째 validator / F-DB-AUTOVAL-001 ✅ 해소 / db-assets-always-on §8.4)
+
+DB 자산 always-on 정책이 매뉴얼 체크리스트뿐이던 공백을 자동 게이트로 해소. `work-unit-manifest.json` 의 `analysis_refs` 안 `db_tables`/`db_procedures`/`db_functions`/`db_views` 4 필드 검사:
+- **finding 6종**: `sp_missing_id`(critical) / `sp_invalid_class`(critical) / `sp_unclassified_at_plan`(critical — plan stage 이후 hard-gate / discovery 까지 nullable) / `external_class_mismatch`(high — external=true ↔ γ 일관성) / `gamma_external_unset`(medium) / `db_assets_absent`(medium — 비-DB 자산만 있고 DB 0 / **greenfield 면제** paradigm-aware).
+- **결정론 axis** (feedback_chain_driver_deterministic_axis 정합): manifest **완성도** 검사 only / canonical global cross-resolution 은 `drift-validator` 영역.
+- exit 0(pass) / 1(critical·high / --strict 시 finding≥1) / 2(usage). `--warn`... 아니라 `--strict` flag (CI/pre-chain audit).
+- **release-readiness #23** = golden fixture 판별 (compliant→PASS(critical/high 0) / violations→FAIL(`sp_unclassified_at_plan`+`external_class_mismatch`) / content-aware — file presence ❌). 커밋된 PoC 에 `analysis_refs.db_*` manifest 부재(poc-17 외부 격리) → 실 corpus 대신 validator discrimination 입증 / db-asset manifest 커밋 시 corpus scan 확장(`C-db-autoval-corpus-extension`).
+- **17 test** (unit + CLI exit code spawn).
+
+### P3 — domain.schema `stakeholders` + `business_intent_summary` (C-domain-schema-stakeholders / optional·additive)
+
+carry 명칭은 'mandatory' 이나 `domain.schema.json` = strict(additionalProperties:false) — required 로 넣으면 기존 PoC domain.json 11종 깨짐 → **schema optional + skill 본문 강제** 결단(breaking 회피 / v11.6.0 intent_certainty 선례 동형):
+- `schemas/domain.schema.json` 에 `stakeholders`(string array / discovery-spec business_intent.stakeholders 동형) + `business_intent_summary`(string) optional 추가 (required 미추가 / additive).
+- `skills/analysis-domain-model/SKILL.md` 절차에 비즈니스 컨텍스트 추출 **의무 step** + 예시 JSON 반영.
+- `templates/analysis/domain.template.md` 비즈니스 컨텍스트 절 신설.
+- `discovery-extraction-validator` 부재 WARN(`discovery.domain.missing_business_context` / low / non-blocking / +4 test).
+- SSOT 경계: 전체 비즈니스 이해관계자·성공 기준 = discovery-spec business_intent / domain = 도메인 actor 초점.
+- **backward-compat 실측**: 기존 domain.json(이미 pre-existing 사유로 prelim) 에 2 필드 추가 전후 schema-validator 에러 집합 **동일**(새 에러 미추가) 입증.
+
+### P4 — F-SIM-003 chain-coverage-validator strict default flip + `--warn-paths` escape hatch
+
+cross-ref broken-path 검사를 **strict(high/blocking) 기본**으로 전환. cooling-off paradigm 영구 폐기(v10.0.0) + autoDetectProjectRoot fix(v9.0.4) + 5 PoC 0 broken sweep(v9.0.5)로 false-positive 해소 → §8.1 ≥2 corroboration 충족:
+- `tools/chain-coverage-validator/src/cli.js` `strictPaths` 기본 `false`→`true`. `--warn-paths`(옛 warn-mode / 비상 escape hatch / release 시 ❌) 신설. `--strict-paths` = 이제 default no-op(backward-compat 보존).
+- **poc-05 strict default 무회귀 실측**: release-readiness check3 호출(--strict-paths 없음) = strict_mode true / broken_path_count 0 / exit 0.
+- +3 CLI spawn test (default→exit 1 / --warn-paths→exit 0 / --strict-paths→no-op).
+
+**STOP-3 (전 구간 no-simulation 실측)**: workspace 879→**903 (+24)** / release-readiness 22→**23/23** (target v11.16.0 / check23 신설) / test:release **14/14** (self-test criteria_total 22→23 정합) / skill-citation 0 stale / version 3-way 11.16.0.
+
+**breaking 0**: P1 신규 standalone tool / P3 optional additive / P4 `--warn-paths` escape hatch + poc-05 무회귀 → MINOR.
+
+**carry**: P2 `C-codepointer-analysis-aspect-enrich`(보류 / live PoC 시점 — semantics 결정) + `C-db-autoval-corpus-extension`(db-asset manifest 커밋 시 corpus scan) + README v11.1.0 stale(레포 기존 per-release 미갱신 cadence / 별도).
+
+DEC-2026-05-31-db-assets-validator + DEC-2026-05-31-domain-stakeholders + DEC-2026-05-31-fsim003-strict-default.
+
+---
+
 ## [11.15.0] — 2026-05-31 MINOR — tooling-audit cleanup + 2 gate 강화 (planning→discovery 잔재 / dead-gate 복구 / soft-gate fail-closed / git pre-push gate)
 
 multi-agent tooling audit (195 asset / 42 verified finding / 기록 SSOT `.claude/plans/plan-tooling-refactor-audit.md`) 후속 정리 5 commit. **정직 표기**: 대부분 audit self-referential cleanup + soft-gate·pre-push 2 enforcement teeth — 본격 신규 prod feature 아님.

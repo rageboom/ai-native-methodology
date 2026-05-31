@@ -83,7 +83,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 
 ★ ★ ★ **v2.0 schema 변경 window 시작 (2026-05-06)** — DEC-2026-05-06-v2.0-i-strict-채택 으로 chain 4단계 SDLC harness 정식 채택. 본 window 안에서:
 
-- ✅ 6 신규 schema 신설 허용 (planning-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix — sub-plan-2)
+- ✅ 6 신규 schema 신설 허용 (discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec / traceability-matrix — sub-plan-2)
 - ✅ ★ chain stage axis 신설 — `flows/sdlc-4stage-flow.json` (★ sub-plan-4 신설 / stages + revisit_edges + sub_flow 통합)
 - ✅ chain stage 별 manifest phase-flow 신설 — `flows/{planning,spec,test,implement}.phase-flow.json`
 - ✅ skills 디렉토리 chain stage axis 확장 — `skills/{planning,spec,test,implement}-<name>/` 1-depth + category prefix (★ sub-plan-4 / v2.5.1 paradigm 정합)
@@ -96,7 +96,7 @@ aspect skill 4종 (`analysis-aspect-a11y` / `analysis-aspect-i18n` / `analysis-a
 | chain | stage | flow file | skills 디렉토리 | 산출물 |
 |---|---|---|---|---|
 | 0 (input) | (analysis stage 의 phase 0) | analysis.phase-flow.json | skills/analysis-input-collection/ + ★ v3.3.0 G2 신규 5종 (`analysis-input-orchestrate` + `analysis-from-{prompt,swagger,plan-doc,figma}`) | inventory + tree + input-summary.json (cross-ref + conflict) |
-| 1 | discovery | discovery.phase-flow.json | skills/discovery-*/ (★ 6 / discovery-from-{analysis-output,swagger,figma,nl-md} + discovery-decompose-use-cases + discovery-identify-business-intent) | planning-spec (산출물명 reuse) |
+| 1 | discovery | discovery.phase-flow.json | skills/discovery-*/ (★ 6 / discovery-from-{analysis-output,swagger,figma,nl-md} + discovery-decompose-use-cases + discovery-identify-business-intent) | discovery-spec |
 | 1 sub | analysis | analysis.phase-flow.json | skills/analysis-*/ (현 28 / aspect 4 + br-cross 1 + ★ v3.3.0 G2 5종 + ★ v3.4.0 G4 `analysis-html-template` 1종 포함) | 7대 + 8 FE 산출물 + input-summary.json (★ v3.3.0) + html-template-extract.json (★ v3.4.0 Scenario C) |
 | 2 | spec | spec.phase-flow.json | skills/spec-*/ (★ 3 / spec-compose-behavior-spec 등) | behavior-spec / acceptance-criteria |
 | 3 | plan | plan.phase-flow.json | skills/plan-*/ (★ 3 / plan-decompose-and-sequence 등) | task-plan (★ v10.0.0 gate #3) |
@@ -290,7 +290,7 @@ paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (★ commit
 # main agent (orchestrator) → stage agent dispatch
 main agent → Task(subagent_type="discovery-agent", prompt="""
 target: <project-path>
-goal: planning-spec 추출 (discovery stage / 산출물명 reuse)
+goal: discovery-spec 추출 (discovery stage)
 input: .aimd/output/{business-rules,domain,inventory,antipatterns}.json + findings.md
 """)
 

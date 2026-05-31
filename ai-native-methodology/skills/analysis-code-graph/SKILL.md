@@ -8,12 +8,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ★ DEC-2026-05-30-codegraph-essential: CodeGraph OSS = analysis 단계 필수 도구 (Semgrep 동급 / 무조건 실행). code↔code 구조(method/class/route/call)는 LLM 운영 컨텍스트의 reference lens.
 
-## ★★★ no-simulation 절대 금지 (CLAUDE.md)
+## ★★★ no-simulation 절대 금지
 
-- ❌ AI sub-agent 에 "code graph / call graph persona" 부여 시뮬레이션 금지 (★ ADR-009 단계 4 = -5%p 패널티)
-- ✅ 진짜 CodeGraph OSS 실행 의무 (R19 Tier 1 in-env / `codegraph index` AST 결정적 추출) → ADR-009 단계 5
-- ✅ 환경 부재 시 `codegraph-runner` exit 3 (정직 "환경 부재" 신호) → 사용자 설치 (`npm i -g @colbymchenry/codegraph`) 또는 CI 위임 명시. **LLM 추론 대체 ❌**.
-- ✅ 7 evidence 필드 의무 (`tool_stdout_path` / `tool_stderr_path` / `tool_version` / `invocation_timestamp` / `duration_ms` / `result_hash` / `reproduction_command` + `evidence_trust=real_tool`)
+baseline → `methodology-spec/policies/no-simulation.md`.
+
+- 본 skill 도구: 진짜 CodeGraph OSS (R19 Tier 1 in-env / `codegraph index` AST 결정적 추출). 환경 부재 시 `codegraph-runner` exit 3 (정직 신호) → 사용자 설치 (`npm i -g @colbymchenry/codegraph`) 또는 CI 위임. **LLM 추론 대체 ❌**.
 
 ## ★ trust 모델 (DEC-2026-05-28 §4.2 — 본격 결합 의무)
 

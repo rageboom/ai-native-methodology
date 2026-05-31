@@ -62,7 +62,7 @@
       "id": "matrix-finalize",
       "name": "traceability-matrix 최종 갱신",
       "depends_on": ["green-evidence", "static-analysis"],
-      "inputs": ["planning + behavior + acceptance + test + impl-spec"],
+      "inputs": ["discovery + behavior + acceptance + test + impl-spec"],
       "outputs": ["traceability-matrix.{json,md,mermaid} (★ red_count == 0)"],
       "skills": ["_base-build-traceability-matrix"],
       "automated_validation": ["traceability-matrix-builder"]

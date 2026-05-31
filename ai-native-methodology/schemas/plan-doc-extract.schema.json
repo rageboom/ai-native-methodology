@@ -68,7 +68,7 @@
     },
     "uc_candidates": {
       "type": "array",
-      "description": "use case 후보. 정식 UC-* ID 는 chain 1 planning-spec.",
+      "description": "use case 후보. 정식 UC-* ID 는 chain 1 discovery-spec.",
       "items": {
         "type": "object",
         "additionalProperties": false,

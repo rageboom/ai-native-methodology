@@ -39,13 +39,11 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 | 2 | Skill 병렬 dispatch 허용 | 입력 다중 시 4 어댑터 병렬 dispatch (skill 간 독립) |
 | 3 | NFR 게이트 = soft | NFR 누락 시 `intent: unknown` 표지 carry 허용 (강제 ❌ — Plan 에서 hard 게이트) |
 
-## Absolute priorities (CLAUDE.md 정합)
+## Absolute priorities (CLAUDE.md ★★★ 정합)
 
-1. 품질 1순위 + 재작업 최소화 2순위
-2. No simulation — 모든 BR-INTENT + UC 는 `source_grounded_evidence` 의무 (어댑터 별 출처 ref 형식 carry)
+1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
+2. No simulation (discovery 적용) — 모든 BR-INTENT + UC 는 `source_grounded_evidence` 의무 (어댑터 별 출처 ref 형식 carry)
 3. AI 환각 차단 1차 목적 — Intent unknown 강제 채움 ❌ / unknown 표지 carry 허용
-4. v8.8.0 Tier 3.1 정직 톤 의무 — 산출물 markdown 안 별표 남발 ❌ / 과장 형용사 신중
-5. v8.8.0 Tier 3.2 보고 schema 의무 — `reported_count` + `actual_count_from_artifact` 두 field 명시
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -66,7 +64,9 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 ## 70~80% 한계 명시
 
-자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 UC / BR-INTENT / I/O contract / UI spec / NFR 는 사용자 검토 의무. 100% 자동화 ❌ (DEC-2026-05-06-v2.0-i-strict-채택 정합).
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
+자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 UC / BR-INTENT / I/O contract / UI spec / NFR 는 사용자 검토 의무.
 
 ## paradigm 정합 (v4.1)
 

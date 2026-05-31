@@ -23,14 +23,14 @@
 
 | 항목 | 출처 | 도구 | 신뢰도 |
 |---|---|---|---|
-| criteria (AC-*) | behavior-spec BHV-* + planning-spec UC-* | LLM with grounding | 85% |
+| criteria (AC-*) | behavior-spec BHV-* + discovery-spec UC-* | LLM with grounding | 85% |
 | gherkin (Given/When/Then) | LLM 추출 | LLM | 80% |
-| severity (must/should/nice) | planning-spec.business_intent + LLM | LLM | 75% |
+| severity (must/should/nice) | discovery-spec.business_intent + LLM | LLM | 75% |
 | verifiable | ★ schema if/then 강제 (verifiable=true ⇔ ≥1 TC-*) | 결정적 | 100% |
 | automated_runnable | LLM 분석 | LLM | 80% |
 | test_case_refs | chain 3 forward link | chain-coverage-validator | 100% |
 
-**입력**: behavior-spec.json + planning-spec.json.
+**입력**: behavior-spec.json + discovery-spec.json.
 
 ## 4. 검증 도구
 

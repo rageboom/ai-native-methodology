@@ -33,7 +33,7 @@
 | severity (critical/high/medium/low) | acceptance-criteria.severity | 결정적 | 100% |
 | coverage_summary (forward/backward) | matrix scan | 결정적 | 100% |
 
-**입력**: planning-spec.json + behavior-spec.json + acceptance-criteria.json + test-spec.json + impl-spec.json.
+**입력**: discovery-spec.json + behavior-spec.json + acceptance-criteria.json + test-spec.json + impl-spec.json.
 
 ## 4. 검증 도구
 

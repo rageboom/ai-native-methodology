@@ -33,6 +33,19 @@
 
 ---
 
+## 비즈니스 컨텍스트
+
+> ★ v11.16.0 (C-domain-schema-stakeholders) — 도메인 actor + 비즈니스 의도 요약.
+> 전체 비즈니스 이해관계자 / 성공 기준은 `discovery-spec` business_intent 가 SSOT (본 절 = 도메인 actor 초점).
+
+**비즈니스 의도 요약**: {business_intent_summary}
+
+| 이해관계자 (도메인 actor) |
+|---|
+| {stakeholders 목록} |
+
+---
+
 ## 보편 언어 (Ubiquitous Language)
 
 > 도메인 전문가와 개발자가 같은 단어를 같은 뜻으로 사용해야 한다.

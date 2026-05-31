@@ -1,14 +1,17 @@
 #!/usr/bin/env node
 // chain-coverage-validator CLI
 // $comment exit codes (cli.js authoritative): 0=ok / 1=findings(blocking) / 2=usage-error
-// ★ F-SIM-003 (2026-05-18): --strict-paths flag + --project-root / --repo-root
-//   default: warn-mode (broken-path = medium / non-blocking) — F-MB-009 LL-i-55 함정존 회피
-//   --strict-paths: broken-path = high / blocking — release-readiness #14 baseline ratchet 진입 후 v+1 default 전환
+// ★ F-SIM-003: cross-ref broken-path 검사.
+//   ★ v11.16.0 default 전환 — broken-path = high / blocking (strict 기본). cooling-off paradigm 영구 폐기(v10.0.0)
+//     + autoDetectProjectRoot fix(v9.0.4) + 5 PoC 0 broken sweep(v9.0.5) 로 false-positive 해소 → §8.1 ≥2 corroboration 충족.
+//   --warn-paths : broken-path = medium / non-blocking (옛 default / 비상용 escape hatch / release 시 ❌).
+//   --strict-paths : (이제 default = no-op / backward-compat 보존).
 
 import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateRisksForm, validateFailModeDistribution, autoDetectProjectRoot, loadJson } from './validator.js';
 
 function parseArgs(argv) {
-  const out = { dryRun: false, json: false, threshold: 0.85, strictPaths: false };
+  // ★ v11.16.0 (F-SIM-003): strictPaths 기본 true. --warn-paths 로 옛 warn-mode 복귀 (escape hatch).
+  const out = { dryRun: false, json: false, threshold: 0.85, strictPaths: true };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--discovery' || a === '--planning') out.planning = argv[++i];     // ★ --discovery primary / --planning legacy alias
@@ -19,16 +22,19 @@ function parseArgs(argv) {
     else if (a === '--threshold') out.threshold = parseFloat(argv[++i]);
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
-    else if (a === '--strict-paths') out.strictPaths = true;
+    else if (a === '--strict-paths') out.strictPaths = true;     // ★ 이제 default = no-op (backward-compat 보존)
+    else if (a === '--warn-paths') out.strictPaths = false;      // ★ v11.16.0 escape hatch — 옛 warn-mode 복귀
     else if (a === '--project-root') out.projectRoot = argv[++i];
     else if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--help' || a === '-h') {
       console.log(`usage: chain-coverage-validator --discovery <path> --behavior <path> --acceptance <path>
                               [--threshold 0.85] [--dry-run] [--json]
-                              [--strict-paths] [--project-root <dir>] [--repo-root <dir>]
+                              [--warn-paths] [--project-root <dir>] [--repo-root <dir>]
 
-★ F-SIM-003 (2026-05-18):
-  --strict-paths : cross-ref broken-path = high (blocking). default = warn (medium / non-blocking).
+★ F-SIM-003 (★ v11.16.0 default = strict):
+  (default)      : cross-ref broken-path = high (blocking). cooling-off 영구 폐기 + autoDetect fix + 5 PoC 0 broken sweep.
+  --warn-paths   : broken-path = medium (warn / non-blocking). 옛 default / 비상 escape hatch (release 시 ❌ 의무).
+  --strict-paths : (이제 default = no-op / backward-compat 보존).
   --project-root : project base for relative path resolution (default = ★ v9.0.4 autoDetectProjectRoot — .aimd/output/ 패턴 시 PoC root 자동 감지 / 그 외 dirname(behavior) fallback / F-MB-VAL-001).
   --repo-root    : repo base for repo-absolute (examples/...) paths (default = process.cwd()).`);
       process.exit(0);

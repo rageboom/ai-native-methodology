@@ -8,11 +8,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ★ ★ ★ ADR-CHAIN-007 phase 4.8 정식 도입 정합 + DEC-2026-05-08-poc-06-sql-inventory-retrofit + DEC-2026-05-08-poc-07-종결 §4. ≥ 2 PoC scale-cross 입증 (PoC #06 단일책임 6 SQL + PoC #07 다중책임 71 SQL / 양쪽 외부 6 컬럼 자동화 4/6 = 66.7%).
 
-## ★★★ no-simulation 절대 금지 (CLAUDE.md)
+## ★★★ no-simulation 절대 금지
 
-- ❌ AI sub-agent persona 시뮬레이션 ❌ — "DBA persona" / "도메인 expert persona" 부여 시뮬 = ★ ★ ★ ADR-009 단계 4 → -5%p 패널티
-- ✅ 실 코드 grep + mapper XML grep + Java DAO grep 의무
-- ✅ DB function (FN_*) / Stored Procedure (S_* / SP_*) 호출 시 → ★ DBA-read carry 명시 의무 (proc-body 부재)
+baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = ADR-009 단계 4 / -5%p.)
+
+- ✅ 실 코드 grep + mapper XML grep + Java DAO grep 의무 (외부 analyzer 아님)
+- ✅ DB function (FN_*) / Stored Procedure (S_* / SP_*) 호출 시 → DBA-read carry 명시 의무 (proc-body 부재)
 - ✅ business_meaning 자연어 = LLM ~70% / 도메인 expert 검증 carry 의무
 
 ## 사전 조건
@@ -103,7 +104,7 @@ grep -rn -E '/(ajax|api|do)/' <src>/ --include="*.jsp" --include="*.html"
 
 | 컬럼 | 출처 |
 |---|---|
-| uc_link | planning-spec UC ID 매핑 (또는 `'N/A — supplementary'`) |
+| uc_link | discovery-spec UC ID 매핑 (또는 `'N/A — supplementary'`) |
 | intent_vs_bug_classification | characterization-spec.json `intent_classification` cross-link 자연어 (4 분류 키워드 ≥ 1 의무) |
 | confidence | meta-confidence 단계별 가중 [0.0, 1.0] |
 | carry_flags | enum 8종 (DBA-read / proc-body / external_call_out_of_scope / domain-expert-review / domain-expert / scope-decision-carry / cross-domain / DRY-violation) |
@@ -155,10 +156,10 @@ node ../../tools/sql-inventory-validator/src/cli.js \
 
 ## chain 1 입력 보강
 
-phase 4.8 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
+phase 4.8 산출물 = ★ chain 1 (discovery-spec) 입력 핵심:
 
 - sql_id ↔ uc_link → use_case 의 SQL 단위 추적
-- intent_vs_bug_classification → planning-spec carry 의무
+- intent_vs_bug_classification → discovery-spec carry 의무
 - carry_flags external_call_out_of_scope → 새 시스템 외부 의존 명시
 - DBA-read + proc-body → 새 시스템 SP body 재구현 차단
 

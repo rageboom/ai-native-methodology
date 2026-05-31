@@ -12,7 +12,7 @@
 **답하는 질문**: "business-rules.json + antipatterns.json + characterization-spec.json 만으로는 SQL 단위 추적 ❌. 새 시스템 재구현 시 ★ 어떤 sql_id 가 어느 UC + intent 분류에 속하고, 어느 DB function/SP 가 외부 의존인지 ★ ★ 명시 의무."
 
 **AI 재구현 시 활용**:
-- chain 1 planning-spec 입력 보강 (UC ↔ sql_id ↔ intent_classification cross-link)
+- chain 1 discovery-spec 입력 보강 (UC ↔ sql_id ↔ intent_classification cross-link)
 - chain 4 GREEN 검증 시 sql_id 별 dependent_tables / external_calls 자동 식별
 - carry_flags 명시 = DBA-read / external_call_out_of_scope / domain-expert-review 차단 의무
 
@@ -62,7 +62,7 @@ output/sql-inventory/
 | dependent_tables | FROM/JOIN regex | regex + SchemaSpy 검증 | 85~95% (★ 자동) |
 | called_from_screen | JSP / Controller recursive trace | LLM + 매뉴얼 | 60~80% (★ 매뉴얼) |
 | business_meaning | LLM 자연어 요약 + 도메인 expert 검증 carry | LLM ~70% | 50~80% (★ 매뉴얼 + carry) |
-| uc_link | planning-spec UC ID | 매뉴얼 매핑 | 80~95% |
+| uc_link | discovery-spec UC ID | 매뉴얼 매핑 | 80~95% |
 | intent_vs_bug_classification | characterization-spec.json 분류 reference | cross-link | 80~95% |
 | confidence | meta-confidence 단계별 가중 | 자동 | 90% |
 | carry_flags | DBA-read / external_call_out_of_scope / domain-expert-review enum | 매뉴얼 | 90% |
@@ -92,7 +92,7 @@ output/sql-inventory/
 | 5 | business_meaning | 외부 | ❌ 매뉴얼 (LLM ~70%) | 자연어 요약 + 도메인 expert 검증 carry |
 | 6 | dynamic_branch | 외부 | ✅ grep | array of {tag, line, branch_count} |
 | 7 | dependent_tables | 외부 | ✅ regex | array of FROM/JOIN 테이블 |
-| 8 | uc_link | 본 추가 | ❌ 매뉴얼 | planning-spec UC ID (예: `UC-EXCHANGE-002`) 또는 `'N/A — supplementary'` |
+| 8 | uc_link | 본 추가 | ❌ 매뉴얼 | discovery-spec UC ID (예: `UC-EXCHANGE-002`) 또는 `'N/A — supplementary'` |
 | 9 | intent_vs_bug_classification | 본 추가 | ❌ cross-link | characterization 4 분류 자연어 (예: `'intent (BR-002 정합) + bug 동반 (AP-006)'`) |
 | 10 | confidence | 본 추가 | ✅ 자동 | meta-confidence 단계별 가중 [0.0, 1.0] |
 | 11 | carry_flags | 본 추가 | ❌ 매뉴얼 | enum: `DBA-read` / `proc-body` / `external_call_out_of_scope` / `domain-expert-review` / `scope-decision-carry` |
@@ -166,7 +166,7 @@ PoC #07 D12 결단 (b) nested patterns object 패턴. ★ optional / Legacy iBAT
 ```yaml
 cross_links:
   - {to_artifact: characterization, link_type: aligns_with_intent_classification}     # ★ phase 4.7 양방향
-  - {to_artifact: planning-spec, link_type: provides_uc_to_sql_mapping}               # ★ chain 1 입력 핵심
+  - {to_artifact: discovery-spec, link_type: provides_uc_to_sql_mapping}               # ★ chain 1 입력 핵심
   - {to_artifact: rules, link_type: groups_br_by_sql_id}                              # BR ↔ sql_id
   - {to_artifact: antipatterns, link_type: signals_ap}                                # ★ AP-X-011/012 (shared_sql_fragments=0 신호) 등
   - {to_artifact: domain, link_type: cross_table_dependency}                          # dependent_tables ↔ aggregate

@@ -95,6 +95,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 70~80% 한계 명시
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. 특히 reasoning + invariants 는 ★ 사용자 검토 의무. property_tests stub 은 fast-check arbitrary 자동 생성 권고.
 
 ## 인용

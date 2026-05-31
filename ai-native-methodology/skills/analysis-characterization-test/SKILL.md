@@ -8,11 +8,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ★ ★ ★ ADR-CHAIN-006 phase 4.7 정식 도입 정합 + DEC-2026-05-07-poc-06-종결 + DEC-2026-05-07-poc-06-domain-결단 + DEC-2026-05-07-poc-07-poc03-phase7-retrofit. ≥ 2 PoC corroboration 입증 (PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern).
 
-## ★★★ no-simulation 절대 금지 (CLAUDE.md)
+## ★★★ no-simulation 절대 금지
 
-- ❌ AI sub-agent persona 시뮬레이션 ❌ — "도메인 expert persona" / "DBA persona" / "기획자 persona" 부여 시뮬 = ★ ★ ★ ADR-009 단계 4 → -5%p 패널티
+baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = ADR-009 단계 4 / -5%p.)
+
 - ✅ 실 코드 grep + 코드 자조 코멘트 search 의무
-- ✅ ambiguous 영역 → ★ 도메인 expert (사용자 본인 또는 IFRS 회계 / DBA / 기획자) 결단 강제 (carry 명시)
+- ✅ ambiguous 영역 → 도메인 expert (사용자 본인 또는 IFRS 회계 / DBA / 기획자) 결단 강제 (carry 명시)
 - ✅ 실 환경 (DB 접속) 부재 시 `data_source_status: "code_only"` + 도메인 expert carry 의무
 
 ## 사전 조건
@@ -55,7 +56,7 @@ grep -rn -E "TODO|FIXME|HACK|XXX|폐해|임시|나중에|폐기|deprecate|workar
 
 ```yaml
 snapshot_id: "SNAP-UC-USER-SIGNUP-001"
-use_case: "UC-USER-SIGNUP-001"          # ★ planning-spec UC ↔ link 의무
+use_case: "UC-USER-SIGNUP-001"          # ★ discovery-spec UC ↔ link 의무
 feature: "User Signup"                  # (Cucumber Gherkin / optional)
 endpoint: "POST /api/users"
 controller_method: "UserController.create"
@@ -147,11 +148,11 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
 
 ## chain 1 입력 보강
 
-phase 4.7 산출물 = ★ chain 1 (planning-spec) 입력 핵심:
+phase 4.7 산출물 = ★ chain 1 (discovery-spec) 입력 핵심:
 
 - intent 분류 BR → use_cases 의무 보존
 - bug 분류 AP → modern_alternative 적용
-- ambiguous → planning-spec carry / 결단 전 chain 2 진입 ❌
+- ambiguous → discovery-spec carry / 결단 전 chain 2 진입 ❌
 - self_recognized → SATD 처분 (자조 위치 새 시스템에서 자동 fix)
 
 ## 본체 명세

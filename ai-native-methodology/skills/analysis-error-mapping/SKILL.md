@@ -8,12 +8,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ★ ★ ★ ADR-BE-001 negative-space corroboration 정식화 정합. ★ ★ AP-API-001 의 ★ 자동 회귀 도구 + ★ 신규 시스템 설계 시 contract 의무 명시.
 
-## ★★★ no-simulation 절대 금지 (CLAUDE.md)
+## ★★★ no-simulation 절대 금지
 
-- ❌ AI sub-agent 에 "Spring docs / NestJS docs persona" 부여 시뮬레이션 금지 (★ ADR-009 단계 4 = -5%p 패널티)
-- ✅ 진짜 Semgrep custom rule 실행 의무 (`tools/static-runner/rules/error-mapping-missing.yml`)
-- ✅ 환경 부재 시 사용자 위임 (CI / drift-check.yml) 명시
-- ✅ 5종 물증 의무 (`tool_version` / `stdout_path` / `stderr_path` / `invocation_timestamp` + `duration_ms` / `result_hash`)
+baseline → `methodology-spec/policies/no-simulation.md`.
+
+- 본 skill 도구: 진짜 Semgrep custom rule 실행 의무 (`tools/static-runner/rules/error-mapping-missing.yml`). 환경 부재 시 CI / drift-check.yml 위임 명시.
 
 ## 사전 조건
 

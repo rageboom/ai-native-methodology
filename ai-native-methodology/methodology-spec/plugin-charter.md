@@ -137,3 +137,11 @@
 - ★ R18 (v7.1.0) = §5 backlog 격상 아닌 **신규 정식 R** (사용자 결단 / enforcement 강제력 = `plugin-authoring-spec.md` SSOT + release-readiness #12). 저작 규칙·공식 docs pin 변경은 본 charter 아닌 `plugin-authoring-spec.md` 에서만 (재선언 ❌)
 - gap (§3) 해소 작업은 **품질 우선 + 재작업 최소화** 원칙 (memory `feedback_quality_priority.md`) 적용
 - §5 추가 제안은 charter 항목과 **별도 backlog** — 사용자 결단 후 §1 / §4 로 격상 가능
+
+## §7 Agent 공통 절대 우선순위 (운영 cross-reference / 새 R 아님)
+
+> 모든 stage agent 의 'Absolute priorities' 공통 항목 SSOT. 각 agent 는 본 §7 을 가리키고 agent 고유 항목만 inline 으로 유지한다. R1~R21 카운트와 무관한 운영 참조 섹션이다.
+
+1. 품질 1순위 + 재작업 최소화 2순위 (속도 / quick-win / context 신선도 후순위). CLAUDE.md §절대 우선순위.
+2. No simulation — 진짜 도구 (R19 Tier 1 in-plugin / Tier 2 SARIF import) 실행 의무. AI persona 시뮬 금지 / -5%p. → `methodology-spec/policies/no-simulation.md`
+3. Tier 3.1 정직 톤 + Tier 3.2 보고 schema. → `methodology-spec/policies/honesty-tiers.md`

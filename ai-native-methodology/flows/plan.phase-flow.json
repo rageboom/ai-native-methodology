@@ -32,7 +32,7 @@
       "skills": ["plan-risk-and-nfr"]
     },
     {
-      "id": "plan-spec-compose",
+      "id": "task-plan-compose",
       "name": "task-plan 합성 (task + adr + risks + nfr_allocation)",
       "depends_on": ["architect-decisions", "risk-nfr"],
       "inputs": ["tasks", "adr", "risks", "nfr_allocation"],
@@ -42,7 +42,7 @@
     {
       "id": "gate-3",
       "name": "go/stop gate #3",
-      "depends_on": ["plan-spec-compose"],
+      "depends_on": ["task-plan-compose"],
       "inputs": ["task-plan.json", "validator_findings"],
       "outputs": ["chain-intervention-log.jsonl", "go|stop|revisit"],
       "skills": ["_base-invoke-go-stop-gate"],

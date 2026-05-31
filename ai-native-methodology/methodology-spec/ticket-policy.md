@@ -10,7 +10,7 @@
 | 항목 | 결정 |
 |---|---|
 | Ticket 단위 | **UC = Story** (Plugin 의 UC ID 가 grep-hit 검증된 유일 단위 = Jira Story 의 사용자 가치 단위 정합) |
-| Ticket 생성 시점 | **★ Chain 1 종료 시점** (planning-spec.json schema-valid + grep-hit 증거 확보 직후) |
+| Ticket 생성 시점 | **★ Chain 1 종료 시점** (discovery-spec.json schema-valid + grep-hit 증거 확보 직후) |
 | 상위 단위 | Domain = Epic / 분석 stage 결과 = Initiative |
 | 하위 단위 (선택) | Chain stage 4개 = Sub-task |
 | BHV / AC / TC / IMPL | **별도 ticket X** — Story 본문에 link / 또는 sub-task acceptance criteria |
@@ -35,7 +35,7 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 |---|---|
 | **Analysis 종료** | Initiative 생성 / Domain 별 Epic batch 생성 / Antipattern P0 = Tech Debt Story 별도 생성 (횡단) |
 | Chain 1 시작 | (Epic 1개 in-progress / 도메인 결정) |
-| **★ Chain 1 종료** | **planning-spec.json 의 use_cases[] 각각 = Story 생성** + 각 Story 에 sub-task 4개 batch 생성 (chain1 = done) |
+| **★ Chain 1 종료** | **discovery-spec.json 의 use_cases[] 각각 = Story 생성** + 각 Story 에 sub-task 4개 batch 생성 (chain1 = done) |
 | Chain 2 종료 | Story 의 chain2 sub-task done / BHV/AC 본문 link 갱신 |
 | Chain 3 종료 | chain3 sub-task done / RED test evidence 첨부 |
 | Chain 4 종료 | chain4 sub-task done / GREEN evidence 첨부 / **Story close** |
@@ -78,7 +78,7 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 |---|---|---|
 | Initiative | `[MIG] {프로젝트} legacy → {target stack} 전환` | analysis 산출물 4종 요약 + R# carry |
 | Epic | `[MIG/{domain}] {도메인} 마이그레이션` | inventory / architecture / sql-inventory 의 해당 domain 부분 |
-| **Story** | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}` | planning-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
+| **Story** | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}` | discovery-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
 | Sub-task | `chain{N}/{stage_name} — {UC ID}` | (e.g., `chain1/planning — UC-CAR-007`) |
 | Tech Debt Story (AP P0) | `[AP-{cat}] {antipattern.name}` | antipatterns.json 의 AP 본문 |
 | Spike (BR) | `[BR-{도메인}-{이름}] 정책 결단` | rules.json BR 본문 + 도메인 전문가 위임 |

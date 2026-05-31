@@ -177,4 +177,43 @@ describe('discovery-extraction-validator', () => {
       assert.equal(r.summary.high, 0);
     });
   });
+
+  // v11.16.0: domain 비즈니스 컨텍스트 nudge (C-domain-schema-stakeholders)
+  describe('domain business_context (v11.16.0 / C-domain-schema-stakeholders)', () => {
+    const discovery = {
+      use_cases: [{ id: 'UC-USER-001', source_grounded_evidence: ['x.java:1'] }],
+      cross_links: { to_analysis_artifacts: ['business-rules.json'] }
+    };
+
+    it('WARNs (low) when domain lacks stakeholders + business_intent_summary', () => {
+      const r = validateDiscoveryExtraction(discovery, { domain: { use_cases: [{ id: 'UC-USER-001' }] } });
+      const f = r.findings.find(x => x.kind === 'discovery.domain.missing_business_context');
+      assert.ok(f, 'missing_business_context finding present');
+      assert.equal(f.severity, 'low', 'non-blocking WARN');
+      assert.deepEqual(f.missing.sort(), ['business_intent_summary', 'stakeholders']);
+      assert.equal(r.summary.critical, 0);
+      assert.equal(r.summary.high, 0);
+    });
+
+    it('does NOT WARN when both present', () => {
+      const r = validateDiscoveryExtraction(discovery, {
+        domain: { use_cases: [{ id: 'UC-USER-001' }], stakeholders: ['차량관리자'], business_intent_summary: '차량 자산 관리' }
+      });
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.domain.missing_business_context'));
+    });
+
+    it('WARNs only for the missing field (partial)', () => {
+      const r = validateDiscoveryExtraction(discovery, {
+        domain: { stakeholders: ['회계담당자'] }
+      });
+      const f = r.findings.find(x => x.kind === 'discovery.domain.missing_business_context');
+      assert.ok(f);
+      assert.deepEqual(f.missing, ['business_intent_summary']);
+    });
+
+    it('does NOT WARN when domain not provided (discovery-only validation)', () => {
+      const r = validateDiscoveryExtraction(discovery, {});
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.domain.missing_business_context'));
+    });
+  });
 });

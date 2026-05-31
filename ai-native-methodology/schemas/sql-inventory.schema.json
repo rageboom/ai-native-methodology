@@ -148,7 +148,7 @@
         },
         "uc_link": {
           "type": "string",
-          "description": "★ 본 추가 / planning-spec UC ID 또는 'N/A — supplementary' (cross-module 의존 시)."
+          "description": "★ 본 추가 / discovery-spec UC ID 또는 'N/A — supplementary' (cross-module 의존 시)."
         },
         "intent_vs_bug_classification": {
           "type": "string",

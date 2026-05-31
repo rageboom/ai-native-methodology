@@ -11,14 +11,14 @@ flowchart TB
         P_task_decompose["Phase task-decompose — task 분해 + 의존성<br/>plan-decompose-and-sequence / 1~3 AC 묶음"]
         P_architect_decisions["Phase architect-decisions — ADR<br/>plan-architect-decisions / Nygard 5 기준"]
         P_risk_nfr["Phase risk-nfr — risk + NFR allocation<br/>plan-risk-and-nfr / 3중 망"]
-        P_plan_spec_compose["Phase plan-spec-compose — task-plan 합성<br/>task-plan.json + task-plan.md"]
+        P_task_plan_compose["Phase task-plan-compose — task-plan 합성<br/>task-plan.json + task-plan.md"]
         P_gate_3["★ ★ ★ Phase gate-3 — go/stop gate #3 (사용자 결단)<br/>_base-invoke-go-stop-gate<br/>plan-coverage-validator + schema-validator<br/>★ trio: state.blocked + cli exit 2 + PreToolUse deny"]
 
         P_task_decompose --> P_architect_decisions
         P_task_decompose --> P_risk_nfr
-        P_architect_decisions --> P_plan_spec_compose
-        P_risk_nfr --> P_plan_spec_compose
-        P_plan_spec_compose --> P_gate_3
+        P_architect_decisions --> P_task_plan_compose
+        P_risk_nfr --> P_task_plan_compose
+        P_task_plan_compose --> P_gate_3
     end
 
     subgraph IN["chain 2 (spec) 산출물 (input)"]

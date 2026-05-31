@@ -122,7 +122,9 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 ## 70~80% 한계 명시
 
-자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 use_case / BR-INTENT 는 **사용자 검토 의무**. 100% 자동화 ❌ (DEC-2026-05-06-v2.0-i-strict-채택 §70~80% 한계 정합).
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
+자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 use_case / BR-INTENT 는 **사용자 검토 의무**.
 
 ## 인용
 

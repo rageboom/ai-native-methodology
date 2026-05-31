@@ -1,10 +1,10 @@
 ---
 name: implement-vue
-description: Use when chain 4 impl generation for Vue 3 SFC. Reads test-spec + behavior-spec + acceptance-criteria, generates .vue files (Composition API + <script setup> default). Track = FE. Vue 3 only (Vue 2 legacy = carry). Vue Test Utils 2.x 통합 + vitest GREEN 100% pass 의무.
+description: Use when chain 5 impl generation for Vue 3 SFC. Reads test-spec + behavior-spec + acceptance-criteria, generates .vue files (Composition API + <script setup> default). Track = FE. Vue 3 only (Vue 2 legacy = carry). Vue Test Utils 2.x 통합 + vitest GREEN 100% pass 의무.
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 ---
 
-# implement-vue — Vue 3 SFC impl 생성 (chain 4 FE 트랙)
+# implement-vue — Vue 3 SFC impl 생성 (chain 5 FE 트랙)
 
 `implement-generate-impl-spec` 의 FE-Vue 분기 위임. Vue 3 Composition API paradigm.
 
@@ -12,7 +12,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 사전 조건
 
-- chain 3 (test) 종결 + gate #3 go 결단 후
+- chain 4 (test) 종결 + gate #4 go 결단 후
 - inventory.json 안 Vue 3 stack signals (`vue` ≥ 3.0 / `@vue/test-utils` 2.x)
 - test-spec.json 의 TC-* 중 Vue Test Utils pattern 검출
 
@@ -107,6 +107,8 @@ Vue 2 Options API + filter + Vue.extend 패턴 = 본 skill ❌ / 별도 carry sk
 - fail 발생 시 revisit cycle (test/spec/planning)
 
 ## 70~80% 한계 명시
+
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
 
 자동 generate ≥ 80% / 사용자 검토 ≤ 20% (composition vs options 결단 / composable 추출 / Pinia store 통합 등).
 

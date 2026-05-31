@@ -20,15 +20,15 @@ DDD 원칙 (ADR-004) 기반. Entity / Aggregate / Value Object / Bounded Context
 3. **Value Object 식별** — immutable / no-identity 객체
 4. **Bounded Context 분리** — 같은 도메인 용어가 다른 의미로 쓰이는 경계
 5. **Ubiquitous Language 기록** — 한국어/영어 용어 매핑 (ADR-005 한국어 정책)
-6. **domain.json 작성** — `schemas/domain.schema.json`:
+6. **★ 비즈니스 컨텍스트 추출 (의무 / C-domain-schema-stakeholders v11.16.0)** — `stakeholders[]` (도메인 actor / 이해관계자 — 코드 주석·docs·도메인 노트 source-grounded 추출 / 예: 차량관리자, 회계담당자) + `business_intent_summary` (도메인 비즈니스 의도 한 줄 요약) 작성. 신규 산출 시 **두 필드 모두 채움 의무** (source 신호 부재 시 hallucination ❌ — 미상은 생략하되 `meta.confidence` 반영). 전체 비즈니스 이해관계자 / 성공 기준은 discovery-spec `business_intent` 가 SSOT — domain 은 도메인 actor 초점.
+7. **domain.json 작성** — `schemas/domain.schema.json`:
    ```json
    {
-     "entities": [...],
-     "aggregates": [...],
-     "value_objects": [...],
+     "meta": {...},
+     "stakeholders": ["차량관리자", "회계담당자"],
+     "business_intent_summary": "차량 자산 등록·비용 산출·ERP 슬립 연계",
      "bounded_contexts": [...],
-     "ubiquitous_language": {...},
-     "meta_confidence": {...}
+     "ubiquitous_language": [...]
    }
    ```
 

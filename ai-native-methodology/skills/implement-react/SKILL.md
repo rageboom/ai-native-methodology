@@ -1,10 +1,10 @@
 ---
 name: implement-react
-description: Use when chain 4 impl generation for React 19 components / hooks / contexts. Reads test-spec + behavior-spec + acceptance-criteria, generates React component files (.tsx/.jsx) following React 19 paradigm (forwardRef deprecated / ref prop direct / class component 분기 보존). Track = FE. RTL test 100% pass GREEN 의무.
+description: Use when chain 5 impl generation for React 19 components / hooks / contexts. Reads test-spec + behavior-spec + acceptance-criteria, generates React component files (.tsx/.jsx) following React 19 paradigm (forwardRef deprecated / ref prop direct / class component 분기 보존). Track = FE. RTL test 100% pass GREEN 의무.
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 ---
 
-# implement-react — React 19 컴포넌트/hook impl 생성 (chain 4 FE 트랙)
+# implement-react — React 19 컴포넌트/hook impl 생성 (chain 5 FE 트랙)
 
 `implement-generate-impl-spec` 의 FE-React 분기 위임. React 19 paradigm + RTL 통합.
 
@@ -12,7 +12,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 사전 조건
 
-- chain 3 (test) 종결 + gate #3 go 결단 후
+- chain 4 (test) 종결 + gate #4 go 결단 후
 - inventory.json 안 React 19 / Tailwind / TanStack 같은 stack signals 검출
 - test-spec.json 의 TC-* 중 `framework: "jest"` 또는 `"vitest"` + RTL pattern 검출
 
@@ -76,12 +76,14 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 7. **RTL test 진짜 호출** — `npx jest` 또는 `npx vitest` (사용자 명시 / auto-invoke ❌). 100% pass GREEN 의무 (fail_count = 0).
 8. **impl-spec.json `modules[].framework` 에 `"react-19"` 명시** — drift-validator 추적용 (★ schema modules.items.framework 기존 필드 / top-level react_version ❌ = additionalProperties:false reject).
 
-## GREEN 의무 (chain 4 종결 조건)
+## GREEN 의무 (chain 5 종결 조건)
 
 - 모든 RTL test 100% pass (test-impl-pass-validator ok=true / fail_count=0)
 - fail 발생 시 revisit:test / revisit:spec / revisit:planning 결단
 
 ## 70~80% 한계 명시
+
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
 
 자동 generate ≥ 80% (boilerplate / Gherkin 매칭 코드) / 사용자 검토 ≤ 20% (component composition / hook abstraction / performance).
 
@@ -89,7 +91,7 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 
 - `methodology-spec/plugin-charter.md` §1 R14 + §3 G4
 - `skills/implement-generate-impl-spec/SKILL.md` (본 skill 의 BE sibling)
-- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (이중 렌더링 chain 4) §3 (no-simulation)
+- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (이중 렌더링 chain 5) §3 (no-simulation)
 - React 19 공식: https://react.dev/blog/2024/12/05/react-19
 
 ## When NOT to invoke

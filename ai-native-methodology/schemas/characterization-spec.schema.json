@@ -41,7 +41,7 @@
         "use_case": {
           "type": "string",
           "pattern": "^UC-",
-          "description": "★ planning-spec UC ↔ link 의무."
+          "description": "★ discovery-spec UC ↔ link 의무."
         },
         "feature": {
           "type": "string",

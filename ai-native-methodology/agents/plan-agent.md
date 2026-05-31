@@ -28,8 +28,8 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
-1. **품질 1순위 + 재작업 최소화 2순위**
-2. **No simulation** — task-plan 안 risks[].industry_case_refs 는 진짜 industry-case-researcher sub-agent dispatch 결과 (Tier 1 in-plugin / 학습 corpus persona ❌)
+1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
+2. **No simulation (plan 적용)** — task-plan 안 risks[].industry_case_refs 는 진짜 industry-case-researcher sub-agent dispatch 결과 (Tier 1 in-plugin / 학습 corpus persona ❌)
 3. **AC → TASK → TC forward link 의무** — plan-coverage-validator 자동 차단 (★ DO-178C 6 layer 정합)
 4. **NFR allocation hard gate** — high+critical NFR 의 task_refs 누락 시 plan-coverage-validator high finding emit → gate #3 block (Discovery soft 와 비대칭)
 5. **ADR alternatives ≥3 강제** — schemas/task-plan.schema.json adrs[].alternatives.minItems:3 schema-level enforce (사후 정당화 회피 / LL-v4.1-04 정합)

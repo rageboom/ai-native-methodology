@@ -99,6 +99,8 @@ DEC-2026-05-21 §plan-risk-and-nfr 정합. 본 task-plan 시행 후 회귀 시 r
 
 ## ★ 70~80% 한계
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 자동 risk + NFR 도출 ≥ 60% / 사용자 검토 ≤ 40%. 특히:
 - risk 누락 cost 큼 → 3중 망 본격 시행 의무
 - NFR allocation hard gate = critical/high severity 누락 = ★ ★ block (사용자 명시 결단 의무)

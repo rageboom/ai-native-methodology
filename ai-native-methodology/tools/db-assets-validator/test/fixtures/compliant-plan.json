@@ -1,0 +1,20 @@
+{
+  "scope": "car-list",
+  "status": "in_progress",
+  "current_stage": "impl",
+  "scenario": "S2",
+  "analysis_refs": {
+    "rules": ["BR-CAR-LIST-001"],
+    "domain": ["Car"],
+    "db_tables": ["TB_CAR", "TB_CAR_COST"],
+    "db_procedures": [
+      {
+        "id": "SGERP.dbo.SG_SACSlipRowCarManagementIFQuery",
+        "sp_conversion_class": "gamma",
+        "external": true
+      }
+    ],
+    "db_functions": ["dbo.FN_SPLIT"],
+    "db_views": []
+  }
+}

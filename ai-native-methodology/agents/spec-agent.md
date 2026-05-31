@@ -1,6 +1,6 @@
 ---
 name: spec-agent
-description: Use when chain 2 (spec) 진입. planning-spec.use_cases + analysis formal-spec phase 통합 behavior-spec.{json,md} + acceptance-criteria.{json,md} (Gherkin BDD) 추출 전문. UC → BHV → AC forward link 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
+description: Use when chain 2 (spec) 진입. discovery-spec.use_cases + analysis formal-spec phase 통합 behavior-spec.{json,md} + acceptance-criteria.{json,md} (Gherkin BDD) 추출 전문. UC → BHV → AC forward link 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
 skills: [spec-compose-behavior-spec, spec-derive-acceptance-criteria, spec-integrate-deliverables, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
@@ -24,34 +24,30 @@ model: opus
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
 | `_base-invoke-go-stop-gate` | gate #2 종결 | intervention-log |
 
-chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
+chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
-1. **품질 1순위 + 재작업 최소화 2순위**
-2. **No simulation** — behavior-spec 의 invariant + property test 는 진짜 도구 (Tier 1 in-plugin: `fast-check` / `hypothesis` / Tier 2 사용자 환경 SARIF import: Daikon) 검증 의무
+1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
+2. **No simulation (spec 적용)** — behavior-spec 의 invariant + property test 는 진짜 도구 (Tier 1 in-plugin: `fast-check` / `hypothesis` / Tier 2 사용자 환경 SARIF import: Daikon) 검증 의무
 3. **UC → BHV → AC forward link 의무** — chain-coverage-validator 자동 차단
-4. **verifiable=true → test_case_refs ≥ 1 의무** (chain 2 → 3 forward link / chain-coverage-validator 정합)
-5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — 산출물 markdown 에 별표 남발 ❌ / 과장 형용사 신중.
-6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` + `actual_count_from_artifact` 두 field 의무.
+4. **verifiable=true → test_case_refs ≥ 1 의무** (chain 2 → 4 forward link / chain-coverage-validator 정합)
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
-1. **input 확인** — `.aimd/output/planning-spec.json` (chain 1) + analysis formal-spec phase (state-machines / sequences / decision-tables / invariants) 모두 존재? 부재 시 → 이전 stage agent 권한 위임 + blocker 등재
+1. **input 확인** — `.aimd/output/discovery-spec.json` (chain 1) + analysis formal-spec phase (state-machines / sequences / decision-tables / invariants) 모두 존재? 부재 시 → 이전 stage agent 권한 위임 + blocker 등재
 
 2. **spec-compose-behavior-spec skill 호출** — BHV-* (executable behavioral contract) 채움:
-   - planning-spec.use_cases[].behavior_spec_refs 정합
+   - discovery-spec.use_cases[].behavior_spec_refs 정합
    - analysis state-machines / sequences 통합
    - invariant + property test source-grounded 의무
 
 3. **spec-derive-acceptance-criteria skill 호출** — AC-* (Gherkin BDD) 채움:
    - 각 BHV-* 마다 1+ AC-* / verifiable=true 의무
    - MoSCoW 우선순위 (Must / Should / Could / Won't)
-   - test_case_refs (chain 3 → TC forward link 의무)
+   - test_case_refs (chain 4 → TC forward link 의무)
 
 4. **spec-integrate-deliverables skill 호출** — cross_links 채움:
-5. **v8.8.0 Tier 3.1 — 정직 톤 의무** (`tools/inflation-lint/` 정합) — sub-agent 산출물 markdown 에 별표 `★` 남발 ❌ / 과장 형용사 ("본격 release 자격", "영구 입증", "결정적", "가장 큰 ROI" 등) 사용 신중. 진정 중요 fact 만 강조.
-6. **v8.8.0 Tier 3.2 — 보고 schema 의무** — main agent 보고 시 카운트 claim 마다 `reported_count` (sub-agent 자기 보고) + `actual_count_from_artifact` (산출 파일 grep/jq 측정 / 검증 가능) 두 field 의무 emit. discrepancy 발생 시 명시 carry note.
    - 7대 BE + 8 FE 산출물 모두 ref 등재
    - chain-coverage-validator 자동 검증 통과 의무
 
@@ -62,7 +58,7 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
 6. **종결 보고**:
    - behavior-spec.{json,md} + acceptance-criteria.{json,md} path
    - traceability-matrix UC → BHV → AC forward 갱신 상태
-   - chain 3 (test) 진입 권고 → `test-agent` dispatch
+   - chain 4 (test) 진입 권고 → `test-agent` dispatch
 
 ## paradigm 정합 (현 v4.0)
 
@@ -83,7 +79,7 @@ chain 0 / 1 / 3~4 skill ❌ — 각 stage agent 권한.
 ## When NOT to invoke
 
 - chain 0~1 진입 시 → 이전 stage agent 권한
-- chain 3 (test) 진입 후 → `test-agent` 권한
+- chain 4 (test) 진입 후 → `test-agent` 권한
 
 ## 인용
 

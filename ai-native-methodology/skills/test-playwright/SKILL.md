@@ -1,6 +1,6 @@
 ---
 name: test-playwright
-description: Use when chain 3 test generation for e2e scenarios via Playwright. Reads acceptance-criteria.AC-*, generates Page Object (locator only) + spec.ts (assertion only / web-first) test files following POM paradigm. Track = FE / Scenario B 풀스택 e2e. Stage = test (chain 3). RED 의무 (impl 부재 시 모든 e2e fail / runner 사용자 명시 호출 / auto-invoke ❌).
+description: Use when chain 4 test generation for e2e scenarios via Playwright. Reads acceptance-criteria.AC-*, generates Page Object (locator only) + spec.ts (assertion only / web-first) test files following POM paradigm. Track = FE / Scenario B 풀스택 e2e. Stage = test (chain 4). RED 의무 (impl 부재 시 모든 e2e fail / runner 사용자 명시 호출 / auto-invoke ❌).
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 ---
 
@@ -81,7 +81,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
    });
    ```
 7. **test-spec.json 갱신** — e2e TC-* type 명시 (`type: "e2e"` + `framework: "playwright"` + `source_file: "tests/e2e/*.spec.ts"`).
-8. **RED 의무** — impl 부재 시 모든 e2e fail / runner 호출 = chain 4 (test-impl-pass-validator) 시점 / 본 chain 3 = generate 만.
+8. **RED 의무** — impl 부재 시 모든 e2e fail / runner 호출 = chain 5 (test-impl-pass-validator) 시점 / 본 chain 4 = generate 만.
 
 ## paradigm 명문화 (★ research 갱신)
 

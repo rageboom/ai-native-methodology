@@ -146,11 +146,14 @@ analysis 입력에서 (c) layer 누락 시 **비즈니스 로직 일부 누락 =
 - sub-axis (AP detection / 16 AP) 자동화율 **81.25%** 본격 측정 (★ AP detection sub-axis만 / R1' axis ceiling 53~55% 와 별 metric)
 - §X-H-11 신축 AP 본격 등재 (`spring41-ibatis2-isomorphic.md` v1.2.0 / 2026-05-29)
 
-### 8.4 자동 validator 부재 carry (F-DB-AUTOVAL-001)
+### 8.4 자동 validator (F-DB-AUTOVAL-001 ✅ 해소 — v11.16.0)
 
-★ K 정책 = 매뉴얼 체크리스트 + manifest yml 작성 의무 / **자동 validator 부재** (★ 별 carry):
-- 본 PoC Phase 1 진행 중 발견 — `tools/db-assets-validator/` 신규 신축 carry 등록 (P2 / Phase 2 진입 시 우선 결단)
-- 현재 = `_manifest.yml` + `input-summary.json` 의 `db_assets` 필드 매뉴얼 작성 / 검증 = 사람 눈
+★ K 정책 = 본래 매뉴얼 체크리스트 + manifest yml 작성 의무 / 자동 validator 부재였으나 **v11.16.0 에서 `tools/db-assets-validator/` 신축으로 해소** (25번째 validator / release-readiness #23):
+- 검사 = `work-unit-manifest.json` 의 `analysis_refs` 안 `db_tables`/`db_procedures`/`db_functions`/`db_views` 4 필드 구조·논리·stage 정책 (sp-conversion-policy §2 4 분류 정합).
+- finding 6종: `sp_missing_id`(critical) / `sp_invalid_class`(critical) / `sp_unclassified_at_plan`(critical, plan 이후 hard-gate / discovery 까지 nullable) / `external_class_mismatch`(high) / `gamma_external_unset`(medium) / `db_assets_absent`(medium, greenfield 면제).
+- ★ axis 분리 (결정론) — manifest **완성도** 검사 only / canonical global cross-resolution 은 `drift-validator` 영역.
+- release-readiness #23 = golden fixture 판별 (compliant→PASS / violations→FAIL-with-codes / content-aware). 커밋된 PoC 에 `analysis_refs.db_*` manifest 가 생기면 corpus scan 으로 확장 (`C-db-autoval-corpus-extension`).
+- standalone (`db-assets-validator <manifest> --strict`) = chain `--next` 진입 전 scope manifest audit.
 
 → car 도메인 = K 정책 첫 live 적용 + 본격 입증 사례. **SP 전환 부담 사실상 0** (γ 1건 자명) but **cross-DB 18 자산 발견 = K 정책 본격 가치 입증**.
 

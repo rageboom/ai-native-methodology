@@ -2,8 +2,12 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { validateChainCoverage, validateCrossRefPaths, validateAntipatternCoverage, validateConfidenceCoverage, validateRisksForm, validateFailModeDistribution, autoDetectProjectRoot } from '../src/validator.js';
+
+const CLI = join(dirname(fileURLToPath(import.meta.url)), '..', 'src', 'cli.js');
 
 const validPlanning = { use_cases: [{ id: 'UC-USER-001' }] };
 const validBehavior = {
@@ -440,5 +444,61 @@ describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
     assert.equal(autoDetectProjectRoot(null), null);
     assert.equal(autoDetectProjectRoot(''), null);
     assert.equal(autoDetectProjectRoot(undefined), null);
+  });
+});
+
+// ★ v11.16.0 (F-SIM-003) — CLI default = strict 전환 + --warn-paths escape hatch.
+describe('F-SIM-003 CLI default-strict (v11.16.0)', () => {
+  function makeFixtures() {
+    const dir = mkdtempSync(join(tmpdir(), 'cc-cli-'));
+    // 깨끗한 coverage (critical/high 0) + behavior cross_link 1건 broken (empty projectRoot 라 해소 ❌)
+    writeFileSync(join(dir, 'discovery.json'), JSON.stringify({ use_cases: [{ id: 'UC-USER-001' }] }));
+    writeFileSync(join(dir, 'behavior.json'), JSON.stringify({
+      behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'] }],
+      cross_links: { to_analysis_artifacts: ['rules.json'] }
+    }));
+    writeFileSync(join(dir, 'acceptance.json'), JSON.stringify({
+      criteria: [{ id: 'AC-USER-001', behavior_ref: 'BHV-USER-001', use_case_ref: 'UC-USER-001',
+        verifiable: true, automated_runnable: true, test_case_refs: ['TC-USER-001'] }]
+    }));
+    return dir;
+  }
+  function run(dir, extra) {
+    return spawnSync('node', [CLI,
+      '--discovery', join(dir, 'discovery.json'),
+      '--behavior', join(dir, 'behavior.json'),
+      '--acceptance', join(dir, 'acceptance.json'),
+      '--project-root', dir, '--repo-root', dir, '--json', ...extra], { encoding: 'utf8' });
+  }
+
+  it('default (no flag) → broken-path = high / blocking → exit 1', () => {
+    const dir = makeFixtures();
+    try {
+      const r = run(dir, []);
+      assert.equal(r.status, 1, `default strict 는 broken-path 시 exit 1 / stderr=${r.stderr}`);
+      const out = JSON.parse(r.stdout);
+      assert.equal(out.cross_refs.summary.strict_mode, true);
+      assert.ok(out.cross_refs.findings.some(f => f.kind === 'chain.cross_links.broken_path' && f.severity === 'high'));
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it('--warn-paths → broken-path = medium / non-blocking → exit 0 (escape hatch)', () => {
+    const dir = makeFixtures();
+    try {
+      const r = run(dir, ['--warn-paths']);
+      assert.equal(r.status, 0, `--warn-paths 는 broken-path 가 warn(medium) 이라 exit 0 / stderr=${r.stderr}`);
+      const out = JSON.parse(r.stdout);
+      assert.equal(out.cross_refs.summary.strict_mode, false);
+      assert.ok(out.cross_refs.findings.some(f => f.kind === 'chain.cross_links.broken_path_warning' && f.severity === 'medium'));
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it('--strict-paths (이제 default) = no-op / exit 1 동일 (backward-compat)', () => {
+    const dir = makeFixtures();
+    try {
+      const r = run(dir, ['--strict-paths']);
+      assert.equal(r.status, 1);
+      assert.equal(JSON.parse(r.stdout).cross_refs.summary.strict_mode, true);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 });

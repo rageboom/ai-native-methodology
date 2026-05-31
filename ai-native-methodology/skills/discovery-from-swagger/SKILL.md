@@ -52,6 +52,8 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 
 ## 70~80% 한계 명시
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 - swagger spec 은 contract 만 표현 ❌ — 사용자 시나리오 / 화면 흐름 ❌ → `discovery-from-figma` 보강 권장 (multi-source / orchestrator 자동 dispatch).
 - LLM 의 endpoint 의도 paraphrase 신뢰도 ~80% (spec description 충실도 의존 / 빈 description 시 신뢰도 ↓).
 

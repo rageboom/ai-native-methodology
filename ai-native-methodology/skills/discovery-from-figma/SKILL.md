@@ -53,6 +53,8 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 
 ## 70~80% 한계 명시
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 - figma 디자인이 UC 의 전부를 표현 ❌ — UI flow 만 / business logic 은 `discovery-from-swagger` / `discovery-from-nl-md` 보강 필요. **multi-source 권장** (orchestrator 자동 dispatch).
 - LLM 의 frame interpretation 신뢰도 ~75% 베이스 → gate #1 `br-cross-consistency-validator` Layer 2 LLM 통과 의무.
 

@@ -48,15 +48,15 @@
 - **skill 사전 주입**: 3 spec skill + 4 base utility = 7 skill
 - **호출 시기**: chain 2 gate 진입 자연어 trigger 시
 
-### `test-agent.md` (★ chain 3 / RED)
+### `test-agent.md` (★ chain 4 / RED)
 - **책임**: test-spec + 실 test 코드 (RED 의무) + 5종 물증 7 필드
 - **skill 사전 주입**: 4 test skill + 4 base utility = 8 skill
-- **호출 시기**: chain 3 gate 진입 자연어 trigger 시
+- **호출 시기**: chain 4 gate 진입 자연어 trigger 시
 
-### `implement-agent.md` (★ chain 4 / GREEN)
+### `implement-agent.md` (★ chain 5 / GREEN)
 - **책임**: impl-spec + 실 impl 코드 (GREEN 의무 / 100% test pass) + traceability-matrix 100% green
 - **skill 사전 주입**: 4 implement skill + 4 base utility = 8 skill
-- **호출 시기**: chain 4 gate 진입 자연어 trigger 시
+- **호출 시기**: chain 5 gate 진입 자연어 trigger 시
 
 ### `design-agent.md` (★ ★ ★ PLACEHOLDER — v4.0 가시화만 / dispatch 무의미)
 - **책임**: design stage 의 단일 책임 entry point (★ v4.1+ carry / 현 책임 ❌)

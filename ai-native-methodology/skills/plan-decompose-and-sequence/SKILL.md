@@ -111,6 +111,8 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 
 ## ★ 70~80% 한계
 
+원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
+
 자동 task 분해 ≥ 70% / 사용자 검토 ≤ 30%. 특히 dependency implicit 의존 추론 + estimation_human 은 ★ 사용자 명시 결단 의무.
 
 ## 인용

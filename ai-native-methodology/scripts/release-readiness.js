@@ -1064,6 +1064,54 @@ function check20_planGateOperational() {
   }
 }
 
+// ★ ★ v11.16.0 신설 — DB 자산 always-on 정책 자동 게이트 (F-DB-AUTOVAL-001 해소 / db-assets-always-on §8.4).
+// db-assets-validator 가 work-unit-manifest analysis_refs 안 db_tables/db_procedures/db_functions/db_views 검사.
+// ★ content-aware (file presence ❌) — golden fixture 판별 검사: compliant→pass / violations→fail-with-codes.
+//   커밋된 PoC 에 analysis_refs.db_* manifest 가 부재 (poc-17 외부 격리) → 실 corpus 대신 validator discrimination 입증.
+//   PoC 에 db-asset manifest 가 커밋되면 corpus scan 으로 확장 (C-db-autoval-corpus-extension).
+function check23_dbAssetsValidator() {
+  const CLI = 'tools/db-assets-validator/src/cli.js';
+  const compliant = 'tools/db-assets-validator/test/fixtures/compliant-plan.json';
+  const violations = 'tools/db-assets-validator/test/fixtures/violations-plan.json';
+  const issues = [];
+
+  // (1) compliant manifest → exit 0 + passed=true + critical/high 0
+  const rOk = spawnSync('node', [CLI, compliant, '--json'], { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 });
+  let okParsed;
+  try {
+    okParsed = JSON.parse(rOk.stdout || '{}');
+  } catch {
+    okParsed = null;
+  }
+  if (rOk.status !== 0) issues.push(`compliant fixture exit ${rOk.status} (expected 0)`);
+  if (!okParsed?.passed) issues.push('compliant fixture passed≠true');
+  if ((okParsed?.summary?.critical ?? -1) !== 0 || (okParsed?.summary?.high ?? -1) !== 0) {
+    issues.push(`compliant fixture critical/high ≠ 0`);
+  }
+
+  // (2) violations manifest → exit 1 + sp_unclassified_at_plan(critical) + external_class_mismatch(high)
+  const rBad = spawnSync('node', [CLI, violations, '--json'], { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 });
+  let badParsed;
+  try {
+    badParsed = JSON.parse(rBad.stdout || '{}');
+  } catch {
+    badParsed = null;
+  }
+  const badCodes = new Set((badParsed?.findings || []).map((f) => f.code));
+  if (rBad.status !== 1) issues.push(`violations fixture exit ${rBad.status} (expected 1)`);
+  if (!badCodes.has('sp_unclassified_at_plan')) issues.push("violations fixture missing 'sp_unclassified_at_plan' (critical)");
+  if (!badCodes.has('external_class_mismatch')) issues.push("violations fixture missing 'external_class_mismatch' (high)");
+
+  return {
+    id: 'db_assets_validator',
+    pass: issues.length === 0,
+    detail: issues.length === 0
+      ? `db-assets-validator 판별 정상 — compliant→PASS(critical/high 0) / violations→FAIL(sp_unclassified_at_plan + external_class_mismatch) / DB always-on 게이트 작동 (F-DB-AUTOVAL-001 해소)`
+      : `db-assets gate 결함: ${issues.join(' | ')}`,
+    delegated_to: 'tools/db-assets-validator (★ 25번째 validator / db-assets-always-on §8.4 / content-aware golden fixture 판별 — file presence ❌)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1091,6 +1139,7 @@ function main() {
     check20_planGateOperational(),
     check21_templateCountDrift(),
     check22_beTaskOpenapiRefRatchet(),
+    check23_dbAssetsValidator(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

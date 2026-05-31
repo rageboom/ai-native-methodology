@@ -102,7 +102,7 @@
         "properties": {
           "uc_candidate": {
             "type": "string",
-            "description": "UC-* 후보 ID (chain 1 planning-spec 진입 시 정식 ID 부여)."
+            "description": "UC-* 후보 ID (chain 1 discovery-spec 진입 시 정식 ID 부여)."
           },
           "from": {
             "type": "array",

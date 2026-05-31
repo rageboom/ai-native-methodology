@@ -1,17 +1,17 @@
 ---
 name: test-verify-coverage
-description: ★ ★ v2.0 chain 3 sub-skill. AC → TC coverage 측정 + ratchet (0.85 → 0.90 → 0.95). 3 metric 분리 (link_coverage / test_pass_rate / line+branch_coverage). coverage-auditor persona 책임. ADR-010 v2 + ADR-CHAIN-001 §2 정합.
+description: ★ ★ v2.0 chain 4 sub-skill. AC → TC coverage 측정 + ratchet (0.85 → 0.90 → 0.95). 3 metric 분리 (link_coverage / test_pass_rate / line+branch_coverage). coverage-auditor persona 책임. ADR-010 v2 + ADR-CHAIN-001 §2 정합.
 allowed-tools: Read, Bash
 ---
 
 # verify-coverage
 
-★ ★ v2.0 chain 3 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
+★ ★ v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
 
 ## 언제 사용
 
-- chain 3 종결 시 의무 (gate #3 진입 prerequisite).
-- chain 4 종결 시 final coverage 검증.
+- chain 4 종결 시 의무 (gate #4 진입 prerequisite).
+- chain 5 종결 시 final coverage 검증.
 - 사용자: "coverage 보여줘" / "ratchet 갱신".
 
 ## 입력
@@ -27,11 +27,11 @@ allowed-tools: Read, Bash
 
 | metric | 정의 | source | gate 임계 |
 |---|---|---|---|
-| **link_coverage** | AC.test_case_refs 의 비율 | spec-test-link-validator | ≥ 0.85 (chain 2→3 forward link) |
-| **test_pass_rate** | pass_count / (pass+fail) | test-impl-pass-validator | chain 4 = 1.0 의무 |
-| **line+branch_coverage** | impl 코드 line+branch hit 비율 | LCOV / JaCoCo / Cobertura | ≥ 0.80 (★ 정보 / chain 4 권고) |
+| **link_coverage** | AC.test_case_refs 의 비율 | spec-test-link-validator | ≥ 0.85 (chain 2→4 forward link) |
+| **test_pass_rate** | pass_count / (pass+fail) | test-impl-pass-validator | chain 5 = 1.0 의무 |
+| **line+branch_coverage** | impl 코드 line+branch hit 비율 | LCOV / JaCoCo / Cobertura | ≥ 0.80 (★ 정보 / chain 5 권고) |
 
-★ 정책: `test_pass_rate` 는 chain 4 GREEN 의무 (강제) / `link_coverage` 는 chain 2-3 의무 (강제) / `line+branch_coverage` 는 정보 (사용자 검토 권고 / 본 방법론 강제 ❌).
+★ 정책: `test_pass_rate` 는 chain 5 GREEN 의무 (강제) / `link_coverage` 는 chain 2-4 의무 (강제) / `line+branch_coverage` 는 정보 (사용자 검토 권고 / 본 방법론 강제 ❌).
 
 ## ratchet 정책 (★ ADR-010 v2 §2.6)
 
@@ -60,7 +60,7 @@ node tools/spec-test-link-validator/src/cli.js \
 
 산출 — `result.coverage.ac_to_tc` (0.0~1.0).
 
-### 2. test_pass_rate 측정 (chain 4 진입 후)
+### 2. test_pass_rate 측정 (chain 5 진입 후)
 
 ```bash
 node tools/test-impl-pass-validator/src/cli.js \
@@ -99,8 +99,8 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 
 ### 6. 결과 채움
 
-- chain 3 → test-spec.coverage_summary 갱신.
-- chain 4 → impl-spec.coverage 갱신 (link_coverage / test_pass_rate / line+branch_coverage).
+- chain 4 → test-spec.coverage_summary 갱신.
+- chain 5 → impl-spec.coverage 갱신 (link_coverage / test_pass_rate / line+branch_coverage).
 
 ## ★ ★ no-simulation — coverage 위조 차단
 
@@ -115,7 +115,7 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 - ADR-CHAIN-001 §2 (cross-link coverage ratchet)
 - ADR-010 v2 §2.6 (baseline+ratchet 0.85→0.90→0.95)
 - DO-178C DAL A (severity_floor)
-- master plan §B chain 3 / §J §coverage 책임 분리
+- master plan §B chain 4 / §J §coverage 책임 분리
 
 ## Carry
 

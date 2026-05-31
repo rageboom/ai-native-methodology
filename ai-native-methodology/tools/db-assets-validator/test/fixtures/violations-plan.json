@@ -1,0 +1,15 @@
+{
+  "scope": "car-cost",
+  "status": "in_progress",
+  "current_stage": "impl",
+  "scenario": "S2",
+  "analysis_refs": {
+    "db_tables": ["TB_CAR_COST"],
+    "db_procedures": [
+      { "id": "SP_UNCLASSIFIED" },
+      { "id": "SP_EXTERNAL_MISMATCH", "sp_conversion_class": "alpha", "external": true }
+    ],
+    "db_functions": [],
+    "db_views": []
+  }
+}
