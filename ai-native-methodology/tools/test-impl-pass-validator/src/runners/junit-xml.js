@@ -10,6 +10,7 @@ export function parseJunitXml(xmlText) {
   const testcaseRe = /<testcase\s+([^>]+?)(?:\/>|>([\s\S]*?)<\/testcase>)/g;
   const attrRe = /(\w+)="([^"]*)"/g;
   const test_names = [];
+  const tests = [];  // ★ F-I05 — per-test {name,status} (S2 correlateByTcId 용 / additive).
   let pass_count = 0;
   let fail_count = 0;
   let skip_count = 0;
@@ -25,14 +26,21 @@ export function parseJunitXml(xmlText) {
     const inner = m[2] ?? '';
 
     const fullName = (attrs.classname ?? '') + (attrs.classname ? '.' : '') + (attrs.name ?? '');
-    if (fullName) test_names.push(fullName);
 
+    let status;
     if (/<failure\b/.test(inner) || /<error\b/.test(inner)) {
       fail_count++;
+      status = 'fail';
     } else if (/<skipped\b/.test(inner)) {
       skip_count++;
+      status = 'skip';
     } else {
       pass_count++;
+      status = 'pass';
+    }
+    if (fullName) {
+      test_names.push(fullName);
+      tests.push({ name: fullName, status });
     }
   }
 
@@ -57,6 +65,7 @@ export function parseJunitXml(xmlText) {
           skip_count: s,
           total,
           test_names,
+          tests,
           success: f === 0 && e === 0 && total > 0,
         };
       }
@@ -70,6 +79,7 @@ export function parseJunitXml(xmlText) {
     skip_count,
     total: pass_count + fail_count + skip_count,
     test_names,
+    tests,
     success: fail_count === 0 && (pass_count + skip_count) > 0,
   };
 }

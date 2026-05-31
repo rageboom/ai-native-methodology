@@ -5,7 +5,7 @@
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "test_code"],
     "confidence": 0.85,
-    "$comment": "★ v11.0.0 test-spec.json template placeholder (chain 4 / test 산출물). confidence=bare number (schema:number / meta-confidence.schema.json). 근거: AC-* 마다 실 test 코드 생성 (RED 의무 / impl 부재 / 모든 test fail) + 5종 물증 7 필드 실 runner. framework 별 분기 (vitest/junit5/pytest/playwright/schemathesis/axe-core 등). ★ BE contract framework → openapi_contract_ref 의무 / FE visual framework → visual_regression_ref 의무. test_cases Example 1=BE unit(junit5 / contract ❌ → openapi_contract_ref 불필요) / Example 2=BE contract(schemathesis → openapi_contract_ref required) / Example 3=FE visual(playwright-visual → visual_regression_ref required). _base-apply-template instantiate."
+    "$comment": "★ v11.0.0 test-spec.json template placeholder (chain 4 / test 산출물). confidence=bare number (schema:number / meta-confidence.schema.json). 근거: AC-* 마다 실 test 코드 생성 (RED 의무 / impl 부재 / 모든 test fail) + 5종 물증 7 필드 실 runner. framework 별 분기 (vitest/junit5/pytest/playwright/schemathesis/axe-core 등). ★ BE contract framework → openapi_contract_ref 의무 / FE visual framework → visual_regression_ref 의무. test_cases Example 1=BE unit(junit5 / contract ❌ → openapi_contract_ref 불필요) / Example 2=BE contract(schemathesis → openapi_contract_ref required) / Example 3=FE visual(playwright-visual → visual_regression_ref required) / ★ Example 4=S2(AX전환) characterization(test_intent=characterization / expected_outcome=pass / 기존 legacy GREEN) / Example 5=S2 augmentation(test_intent=augmentation / expected_outcome=fail / 신규 RED) — gate-eval per_tc_outcome 분기 scaffold (DEC-2026-05-30-s2-gate-slice / v11.11.0). _base-apply-template instantiate."
   },
   "derivation_source": {
     "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
@@ -88,6 +88,53 @@
         "fail_count": 1,
         "skip_count": 0,
         "reproduction_command": "npx playwright test dashboard.spec.ts",
+        "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "report_format": "junit_xml"
+      }
+    },
+    {
+      "id": "TC-DOMAIN-004",
+      "ac_ref": "AC-DOMAIN-004",
+      "bhv_ref": "BHV-DOMAIN-002",
+      "type": "integration",
+      "framework": "junit5",
+      "source_file": "src/test/java/com/example/domain/LegacyCharacterizationTest.java",
+      "source_evidence": "@DisplayName(\"TC-DOMAIN-004 legacy createResource 기존 동작 보존\") @Test void createResource_preservesLegacy() { ... }",
+      "expected_outcome": "pass",
+      "test_intent": "characterization",
+      "test_run_evidence": {
+        "test_runner_version": "junit-jupiter 5.10.0",
+        "test_runner_stdout_path": ".aimd/output/test-evidence/TC-DOMAIN-004.stdout.log",
+        "invocation_timestamp": "2026-01-01T00:00:00+09:00",
+        "duration_ms": 980,
+        "pass_count": 1,
+        "fail_count": 0,
+        "skip_count": 0,
+        "reproduction_command": "./gradlew test --tests LegacyCharacterizationTest",
+        "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "report_format": "junit_xml"
+      }
+    },
+    {
+      "id": "TC-DOMAIN-005",
+      "ac_ref": "AC-DOMAIN-005",
+      "bhv_ref": "BHV-DOMAIN-002",
+      "type": "integration",
+      "framework": "junit5",
+      "source_file": "src/test/java/com/example/domain/ResourceAugmentationTest.java",
+      "source_evidence": "@DisplayName(\"TC-DOMAIN-005 신규 soft-delete 증강\") @Test void softDelete_newBehavior() { ... }",
+      "expected_outcome": "fail",
+      "test_intent": "augmentation",
+      "fail_mode": "assertion_fail",
+      "test_run_evidence": {
+        "test_runner_version": "junit-jupiter 5.10.0",
+        "test_runner_stdout_path": ".aimd/output/test-evidence/TC-DOMAIN-005.stdout.log",
+        "invocation_timestamp": "2026-01-01T00:00:00+09:00",
+        "duration_ms": 1010,
+        "pass_count": 0,
+        "fail_count": 1,
+        "skip_count": 0,
+        "reproduction_command": "./gradlew test --tests ResourceAugmentationTest",
         "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
         "report_format": "junit_xml"
       }

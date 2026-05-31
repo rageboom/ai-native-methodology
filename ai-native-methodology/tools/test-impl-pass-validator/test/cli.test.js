@@ -122,3 +122,75 @@ test('★ CLI — inventory.stack_signals 자동 추론 + dry-run', () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+// ★ F-I05 — S2 per-TC outcome reconcile end-to-end (node -e 로 jest --json stdout 모사).
+function jestRunnerScript(jestOut) {
+  return `process.stdout.write(${JSON.stringify(JSON.stringify(jestOut))})`;
+}
+function setupS2(dir, jestOut) {
+  const cfg = { framework: 'jest', test_cmd: process.execPath, test_cmd_args: ['-e', jestRunnerScript(jestOut)] };
+  writeFileSync(join(dir, '.aimd', 'config', 'test-cmd.json'), JSON.stringify(cfg));
+  const specPath = join(dir, 'test-spec.json');
+  writeFileSync(specPath, JSON.stringify({ test_cases: [
+    { id: 'TC-CHAR-001', expected_outcome: 'pass', test_intent: 'characterization' },
+    { id: 'TC-AUG-001', expected_outcome: 'fail', test_intent: 'augmentation' },
+  ]}));
+  return specPath;
+}
+
+test('★ F-I05 — S2 reconcile: characterization pass + augmentation fail = 전부 일치 → outcome_mismatches 0', () => {
+  const dir = setupProject();
+  try {
+    const jestOut = {
+      success: false, numTotalTests: 2, numPassedTests: 1, numFailedTests: 1, numPendingTests: 0,
+      testResults: [{ assertionResults: [
+        { fullName: 'TC-CHAR-001 legacy login works', status: 'passed' },
+        { fullName: 'TC-AUG-001 new feature missing impl', status: 'failed' },
+      ]}],
+    };
+    const specPath = setupS2(dir, jestOut);
+    const r = runCli(['--project', dir, '--allow-execute', '--json', '--scenario', 'S2', '--test-spec', specPath]);
+    const parsed = JSON.parse(r.stdout);
+    assert.equal(parsed.outcome_mismatches, 0, `stdout=${r.stdout} stderr=${r.stderr}`);
+    assert.equal(parsed.missing_actual, 0);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ F-I05 — S2 reconcile: augmentation 이 예상외 pass → outcome_mismatches 1 (gate s2_outcome_mismatch WARN)', () => {
+  const dir = setupProject();
+  try {
+    const jestOut = {
+      success: true, numTotalTests: 2, numPassedTests: 2, numFailedTests: 0, numPendingTests: 0,
+      testResults: [{ assertionResults: [
+        { fullName: 'TC-CHAR-001 legacy login works', status: 'passed' },
+        { fullName: 'TC-AUG-001 new feature', status: 'passed' },
+      ]}],
+    };
+    const specPath = setupS2(dir, jestOut);
+    const r = runCli(['--project', dir, '--allow-execute', '--json', '--scenario', 'S2', '--test-spec', specPath]);
+    const parsed = JSON.parse(r.stdout);
+    assert.equal(parsed.outcome_mismatches, 1, `stdout=${r.stdout} stderr=${r.stderr}`);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('★ F-I05 — --scenario 부재 → outcome_mismatches 필드 omit (S1 backward-compat)', () => {
+  const dir = setupProject();
+  try {
+    const jestOut = {
+      success: true, numTotalTests: 1, numPassedTests: 1, numFailedTests: 0, numPendingTests: 0,
+      testResults: [{ assertionResults: [{ fullName: 'TC-CHAR-001 x', status: 'passed' }] }],
+    };
+    const cfg = { framework: 'jest', test_cmd: process.execPath, test_cmd_args: ['-e', jestRunnerScript(jestOut)] };
+    writeFileSync(join(dir, '.aimd', 'config', 'test-cmd.json'), JSON.stringify(cfg));
+    const r = runCli(['--project', dir, '--allow-execute', '--json']);
+    const parsed = JSON.parse(r.stdout);
+    assert.equal(parsed.outcome_mismatches, undefined);
+    assert.equal(parsed.s2_reconcile, undefined);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

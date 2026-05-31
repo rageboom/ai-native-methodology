@@ -42,10 +42,10 @@
     },
     {
       "id": "red-evidence",
-      "name": "RED 검증 + evidence (5종 물증 7 필드)",
+      "name": "RED 검증 + evidence (5종 물증 10 필드)",
       "depends_on": ["test-code-generate", "ac-tc-backlink"],
       "inputs": ["test source files", ".aimd/config/test-cmd.json"],
-      "outputs": ["test-spec.test_invocation_evidence (RED / fail_count > 0)"],
+      "outputs": ["test-spec.test_cases[].test_run_evidence (RED / S1·greenfield fail_count > 0 / S2 per_tc_outcome)"],
       "skills": ["test-run-test-evidence"],
       "automated_validation": ["test-impl-pass-validator (--allow-execute / expected: all_fail)", "schema-validator", "spec-test-link-validator", "lint-no-simulation (chain-strict)"]
     },
@@ -54,7 +54,7 @@
       "name": "coverage 측정 (3 metric 분리)",
       "depends_on": ["red-evidence"],
       "inputs": ["test-spec.json", "acceptance-criteria.json"],
-      "outputs": ["test-spec.coverage_summary"],
+      "outputs": ["test-spec.coverage"],
       "skills": ["test-verify-coverage"]
     },
     {

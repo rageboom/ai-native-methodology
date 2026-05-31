@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// test-impl-pass-validator — ★ ★ ★ chain 4 (impl → done) gate validator.
+// test-impl-pass-validator — ★ ★ ★ shared test-runner gate validator (test=chain 4/gate#4 RED · implement=chain 5/gate#5 GREEN).
 //
 // 사용:
 //   node src/cli.js --project <dir> [--inventory <path>] [--test-cmd '<json>']
@@ -29,6 +29,8 @@ import { parseJunitXml } from './runners/junit-xml.js';
 import { parsePytestJson } from './runners/pytest.js';
 import { parseStdout as parseOtherStdout } from './runners/other.js';
 import { detectMockImplementation } from './mock-detect.js';
+import { normalizeReportFormat } from './report-format.js';
+import { reconcileOutcomes, correlateByTcId } from './s2-outcome-check.js';
 
 function usage(code = 2) {
   console.error([
@@ -42,6 +44,10 @@ function usage(code = 2) {
     '  --json                   JSON output',
     '  --timeout <ms>           runner timeout (default 600000)',
     '  --flaky-retry <n>        per-test retry cap (default 2 / max 5)',
+    '',
+    '★ v11.19 F-I05 — S2(AX전환) per-TC outcome reconciliation:',
+    '  --test-spec <path>          test-spec.json (test_cases[].id/expected_outcome/test_intent 상관용)',
+    '  --scenario <S1|S2|S3|greenfield>  use-scenario (S2 시 outcome_mismatches emit / gate-eval per_tc_outcome)',
     '',
     'v8.8.0 Tier 1.1 — mock_implementation_ratio (experimental opt-in / §8.1 ≥2 PoC carry):',
     '  --detect-mock-impl <mode>   off (default) | experimental (measure + warn) | enforce (degrade ok)',
@@ -65,6 +71,8 @@ function parseArgs(argv) {
     if (a === '--project') out.project = argv[++i];
     else if (a === '--inventory') out.inventory = argv[++i];
     else if (a === '--test-cmd') out.testCmdInline = argv[++i];
+    else if (a === '--test-spec') out.testSpecPath = argv[++i];
+    else if (a === '--scenario') out.scenario = argv[++i];
     else if (a === '--out') out.outPath = argv[++i];
     else if (a === '--allow-execute') out.allowExecute = true;
     else if (a === '--dry-run') out.dryRun = true;
@@ -177,7 +185,10 @@ function parseRunnerOutput(testCmd, runResult, framework, projectDir) {
     return adapter.parser(runResult.stdout);
   }
 
-  throw new Error(`unsupported framework: ${framework}`);
+  // ★ T16 (no-simulation honesty) — adapter 보유 framework = jest/vitest/junit5/pytest.
+  //   그 외(go-test/rspec/phpunit/mocha/cargo-test/dotnet-test 등)는 test-cmd 에
+  //   framework:'other' + stdout_parser 명시 의무 (미보유 adapter 가짜 지원 ❌).
+  throw new Error(`unsupported framework: ${framework} — adapter 보유 = jest/vitest/junit5/pytest. 그 외는 framework:'other' + stdout_parser(+필요시 count_mode:'occurrences') 명시.`);
 }
 
 function buildEvidence(testCmd, framework, parsed, runResult, projectDir, retryCount) {
@@ -205,7 +216,8 @@ function buildEvidence(testCmd, framework, parsed, runResult, projectDir, retryC
     skip_count: parsed.skip_count,
     reproduction_command: reproduction,
     result_hash,
-    report_format: testCmd.report_format ?? 'json',
+    // ★ T14 — test-cmd enum(하이픈) → test-spec enum(언더스코어) 정규화 (무효 enum 누수 차단).
+    report_format: normalizeReportFormat(testCmd.report_format ?? 'json', framework),
     flaky_retries_count: retryCount,
     coverage_report_path: testCmd.coverage_report_path
       ? resolvePath(testCmd.coverage_report_path, projectDir)
@@ -226,6 +238,23 @@ function writeEvidenceFiles(evidence, runResult, outPath, projectDir) {
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify(evidence, null, 2));
   return out;
+}
+
+// ★ F-I05 (INSPECTION-2026-05-31-implement) — S2(AX전환) per-TC outcome reconciliation.
+//   scenario==='S2' + --test-spec 시: characterization(expected pass) + augmentation(expected fail) 혼합을
+//   per-TC 대조 → outcome_mismatches (gate-eval.js per_tc_outcome → s2_outcome_mismatch WARN).
+//   adapter 가 per-test status(parsed.tests) 미제공(other/stdout) → 상관 실패 = missing_actual (날조 ❌ / no-simulation).
+//   비-S2 / --test-spec 부재 → null 반환 → output 필드 omit (S1/greenfield/S3 backward-compat = gate `?? 0`).
+function computeS2Reconcile(args, parsed) {
+  if (args.scenario !== 'S2' || !args.testSpecPath) return null;
+  const specPath = resolve(args.testSpecPath);
+  if (!existsSync(specPath)) return { error: `test-spec not found: ${specPath}` };
+  let testSpec;
+  try { testSpec = JSON.parse(readFileSync(specPath, 'utf-8')); }
+  catch (e) { return { error: `test-spec parse error: ${e.message}` }; }
+  const testCases = Array.isArray(testSpec.test_cases) ? testSpec.test_cases : [];
+  const actualByTcId = correlateByTcId(parsed.tests ?? [], testCases);
+  return reconcileOutcomes(testCases, actualByTcId);
 }
 
 function main() {
@@ -350,6 +379,9 @@ function main() {
     }
   }
 
+  // ★ F-I05 — S2 per-TC outcome reconcile (scenario S2 + --test-spec 시만 / 그 외 null).
+  const s2 = computeS2Reconcile(args, parsed);
+
   const out = {
     ok: okState === 'ok' || okState === 'degraded_mock',
     ok_state: okState,
@@ -364,6 +396,15 @@ function main() {
     evidence_path: evidencePath,
     mock_detect: mockReport,
   };
+  if (s2) {
+    if (s2.error) {
+      out.s2_reconcile_error = s2.error;  // ★ 정직 표기 — outcome_mismatches omit (gate `?? 0` / under-enforce 인지).
+    } else {
+      out.outcome_mismatches = s2.outcome_mismatches;
+      out.missing_actual = s2.missing_actual;
+      out.s2_reconcile = { evaluated: s2.evaluated, details: s2.details };
+    }
+  }
 
   if (args.json) {
     console.log(JSON.stringify(out, null, 2));
@@ -378,10 +419,10 @@ function main() {
       const fileThr = (mockReport.file_threshold * 100).toFixed(0);
       console.log(`  mock_detect: score=${scorePct}% (≥${scoreThr}%?) / file=${filePct}% (${mockReport.files_with_indicators}/${mockReport.files_scanned} ≥${fileThr}%?) / locations=${mockReport.mock_locations_total} / mode=${mockReport.mode}`);
       if (mockReport.exceeded) {
-        console.log(`  ⚠️  mock threshold 초과 — chain 4 GREEN false signal 의심 (v8.8.0 Tier 1.1 / experimental)`);
+        console.log(`  ⚠️  mock threshold 초과 — chain 5(implement) GREEN false signal 의심 (v8.8.0 Tier 1.1 / experimental)`);
       }
     }
-    if (okState === 'ok') console.log('✅ 100% pass (gate #4 통과)');
+    if (okState === 'ok') console.log('✅ 100% pass (gate 판정은 chain-driver gate-eval / scenario별 RED·GREEN: test=gate#4 / implement=gate#5)');
     else if (okState === 'degraded_mock') console.log('⚠️  100% pass but mock_ratio 초과 — degraded_mock (experimental warning / chain blocking ❌)');
     else if (okState === 'fail_mock') console.log('❌ mock_ratio 초과 / enforce mode');
     else console.log(`❌ fail / fail_count=${parsed.fail_count}`);

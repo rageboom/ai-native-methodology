@@ -9,6 +9,23 @@
 
 ---
 
+## [11.19.0] — 2026-06-01 MINOR — 배포 6단계 점검 carry-queue 6종 종결 + 결정론 gate 1종 신설 (check26)
+
+v11.18.0(배포 6단계 점검)이 deferred 한 `decisions/INSPECTION-LEDGER.md §3` carry-queue 6종을 전부 종결 (additive / breaking 0 / release-readiness 25→26). 점검이 스스로 찾아 "별도 묶음"으로 미뤄둔 자기 finding — 실제 correctness/결정론 구멍(cosmetic doc drift 아님).
+
+### ★ 신규 결정론 gate (req8 "누가 돌려도 같은 품질")
+- `check26` gate-validator-list-consistency (F-S07) — gate validator 목록의 cross-source 정합을 결정론으로 검사. 데코레이션(`(...)`/`--flag`) 정규화 후: gate-eval `REQUIRED_VALIDATORS_PER_STAGE`(blocking) ⊆ `sdlc-4stage-flow.json` gates[].validators(매트릭스) + sdlc gate ≡ `<stage>.phase-flow.json` cross_cutting.validators (`conditional_validators` allowlist 차이 허용). drift-validator 가 gate/validator 목록을 미비교하던 구조적 사각(SEED-3/S10류) 차단. 정정: sdlc gate#1 +br-cross+formal-spec-link / gate#2 conditional spectral / discovery·plan cross_cutting.
+
+### carry 6종 종결
+- **F-T05** (evidence 필드명 SSOT / high) — Option α canonical 확정 (per-TC `test_run_evidence` / impl root `test_pass_evidence` = schema 정식 / top-level `test_invocation_evidence` = schema 금지 = runner standalone 산출물명). validator 가 schema-금지 필드를 read 하던 모순 해소 (check-links per-TC+impl read = non-breaking + sentinel skip + base-tolerant `.aimd` resolve / legacy 병존 + lint-no-simulation grep 3-shape alternation) + skill/flow/agent/template prose α 전환. examples PoC 0 신규 finding 실측.
+- **F-I05** (S2 gate 배선 / med) — `s2-outcome-check.js` producer 를 test-impl-pass-validator cli 에 배선 (`--scenario S2 --test-spec` → reconcile → `outcome_mismatches` → findings-aggregator → gate-eval `per_tc_outcome`) + adapter per-test `tests[{name,status}]`. ★ findings-aggregator `transformTestImplPass` latent 버그 동반 수정 (cli.js `pass_count` shape 에서 `tests_total` 무음 0 → I9 GREEN fail-closed guard 정합).
+- **F-T06** (runner hardening / med) — T9 FRAMEWORK_HINTS contract/visual bypass + T14 report_format enum 정규화(`report-format.js` / `stdout_regex` enum additive) + T16 inference 정직(mocha·go → `framework:'other'` + stdout_parser scaffold / `count_mode:'occurrences'` 신설) + T11 test-spec.template S2 characterization+augmentation 쌍.
+- **F-X01** (med) — `code-graph.schema.json` `$schema` draft-07→2020-12 (Ajv2020 메타스키마 로드실패 경고 해소).
+- **F-X02** (low) — skill-citation-validator HISTORY_FILE += `decisions/INSPECTION-` (점검 리포트 finding-quote stale 경로 false-positive 차단).
+
+### 검증 / carry
+release-readiness **26/26** · workspace test **950/950 pass / 0 fail** · drift 0 · 0 stale citation · version 3-way. 신규/확장 test ~31건(report-format/load-test-cmd/adapter/aggregator/spec-test-link/link/lint-chain/cli/citation/release-readiness). 점검 ledger = `decisions/INSPECTION-LEDGER.md`(§3 carry 6종 resolved / §5 로그). carry: 없음 (전부 종결).
+
 ## [11.18.0] — 2026-05-31 MINOR — 배포 6단계 chain harness 전수 점검 + 결정론 gate 2종 신설 (check24/check25)
 
 `배포 플러그인이 프레임워크처럼 동작(LLM=언어 / 플러그인=Spring)` 목표로 analysis→discovery→spec→plan→test→implement 6단계 자산 + 10 패러다임 전수 점검 (Workflow 6회 / ~155 자산 / adversarial 검증 confirmed 99 / CUT 0). 비파괴 / gate 강화 (release-readiness 23→25 / npm test all-pass / drift 0 / 0 stale citation / build 4686).

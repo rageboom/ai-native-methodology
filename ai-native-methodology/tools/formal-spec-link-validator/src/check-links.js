@@ -199,7 +199,7 @@ const ID_PATTERN = {
   IMPL: /^IMPL-[A-Z0-9_-]+-\d+$/,
 };
 
-function pushDeadIfMissing(findings, source, baseDir, p, kind, extra = {}) {
+function pushDeadIfMissing(findings, source, baseDir, p, kind, extra = {}, severity = 'breaking') {
   if (!p) return;
   let resolvedPath;
   try {
@@ -207,7 +207,7 @@ function pushDeadIfMissing(findings, source, baseDir, p, kind, extra = {}) {
     statSync(resolvedPath);
   } catch {
     findings.push({
-      severity: 'breaking',
+      severity,
       kind,
       link: p,
       source_file: source.file,
@@ -215,6 +215,19 @@ function pushDeadIfMissing(findings, source, baseDir, p, kind, extra = {}) {
       ...extra,
     });
   }
+}
+
+// ★ F-T05 (INSPECTION-2026-05-31-test) — evidence stdout-path 보조 검증.
+//   sentinel "(not generated)" / "(not run …)" = 의도적 placeholder (retrofit dry-run) → dead-link 아님.
+const isRealEvidencePath = (p) => typeof p === 'string' && p.length > 0 && !p.startsWith('(');
+
+// evidence dump 존재 — baseDir(artifact dir) 와 project-root(.aimd/ 관례 / project-root-relative) 양 base 허용.
+//   (poc-05 evidence path = '.aimd/output/evidence/…' = project-root-relative / test-spec.json 은 .aimd/output/ 위치.)
+function evidenceDumpExists(baseDir, p) {
+  const candidates = [resolve(baseDir, p)];
+  const idx = baseDir.replace(/\\/g, '/').indexOf('/.aimd/');
+  if (idx >= 0) candidates.push(resolve(baseDir.slice(0, idx), p));
+  return candidates.some((c) => { try { statSync(c); return true; } catch { return false; } });
 }
 
 function pushIdMismatch(findings, source, prefix, id, where) {
@@ -315,8 +328,14 @@ export function checkChainLinks({ source, baseDir }) {
         if (tc.bhv_ref) pushIdMismatch(findings, source, 'BHV', tc.bhv_ref, `test_cases[${tc.id}].bhv_ref`);
         if (tc.impl_module_ref) pushIdMismatch(findings, source, 'IMPL', tc.impl_module_ref, `test_cases[${tc.id}].impl_module_ref`);
         if (tc.source_file) pushDeadIfMissing(findings, source, baseDir, tc.source_file, 'chain.dead-reference', { where: `test_cases[${tc.id}].source_file` });
+        // ★ F-T05 (α canonical) — schema 정식 필드 = test_cases[].test_run_evidence (top-level test_invocation_evidence 는 schema 금지).
+        //   sentinel skip + non-breaking (no-sim 1차 enforcement = lint-no-simulation·test-impl-pass-validator / 경로 base 관례 모호).
+        const tcStdout = tc.test_run_evidence?.test_runner_stdout_path;
+        if (isRealEvidencePath(tcStdout) && !evidenceDumpExists(baseDir, tcStdout)) {
+          findings.push({ severity: 'non-breaking', kind: 'chain.dead-reference', link: tcStdout, source_file: source.file, where: `test_cases[${tc.id}].test_run_evidence.test_runner_stdout_path`, message: `evidence dump not found: ${tcStdout}` });
+        }
       }
-      // test_invocation_evidence.test_runner_stdout_path
+      // legacy top-level test_invocation_evidence (schema 금지 / dormant — backward-compat 만 유지).
       if (json.test_invocation_evidence?.test_runner_stdout_path) {
         pushDeadIfMissing(findings, source, baseDir, json.test_invocation_evidence.test_runner_stdout_path, 'chain.dead-reference', { where: 'test_invocation_evidence.test_runner_stdout_path' });
       }
@@ -334,6 +353,12 @@ export function checkChainLinks({ source, baseDir }) {
           pushDeadIfMissing(findings, source, baseDir, sf, 'chain.dead-reference', { where: `impl_modules[${im.id}].source_files[]` });
         }
       }
+      // ★ F-T05 (α canonical) — impl-spec root test_pass_evidence (chain 5 GREEN evidence / schema 정식 root 필드).
+      const implStdout = json.test_pass_evidence?.test_runner_stdout_path;
+      if (isRealEvidencePath(implStdout) && !evidenceDumpExists(baseDir, implStdout)) {
+        findings.push({ severity: 'non-breaking', kind: 'chain.dead-reference', link: implStdout, source_file: source.file, where: 'test_pass_evidence.test_runner_stdout_path', message: `evidence dump not found: ${implStdout}` });
+      }
+      // legacy top-level test_invocation_evidence (dormant — backward-compat).
       if (json.test_invocation_evidence?.test_runner_stdout_path) {
         pushDeadIfMissing(findings, source, baseDir, json.test_invocation_evidence.test_runner_stdout_path, 'chain.dead-reference', { where: 'test_invocation_evidence.test_runner_stdout_path' });
       }

@@ -63,6 +63,8 @@ describe('skill-citation-validator (repo-wide v8.1.1)', () => {
       w('CHANGELOG.md', '`schemas/ghost.schema.json` (구 이름 보존)');
       // docs/adr/ = history-class → 전체 skip
       w('docs/adr/ADR-X-1.md', '`schemas/ghost.schema.json`');
+      // ★ F-X02 — decisions/INSPECTION-* = 워크스페이스 점검 리포트 → history-class skip (finding-quote stale 경로 FP 차단)
+      w('decisions/INSPECTION-2026-05-31-x.md', '`schemas/ghost.schema.json` (점검 finding-quote 안 decision-time stale 경로 인용)');
 
       const r = checkCitations(tmp);
       const byFile = (f) => r.findings.filter((x) => x.file === f);
@@ -71,6 +73,7 @@ describe('skill-citation-validator (repo-wide v8.1.1)', () => {
       assert.equal(byFile('methodology-spec/good.md').length, 0, `good.md FP: ${JSON.stringify(byFile('methodology-spec/good.md'))}`);
       assert.equal(byFile('CHANGELOG.md').length, 0, 'CHANGELOG history-exclude');
       assert.equal(byFile('docs/adr/ADR-X-1.md').length, 0, 'docs/adr history-exclude');
+      assert.equal(byFile('decisions/INSPECTION-2026-05-31-x.md').length, 0, '★ F-X02 — INSPECTION-* history-exclude');
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

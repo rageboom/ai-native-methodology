@@ -9,18 +9,27 @@ import { readFileSync, existsSync } from 'node:fs';
 
 // analysis-source-inventory.json 의 detected stack 시그널 → 허용 framework 매핑
 const FRAMEWORK_HINTS = {
-  java: ['junit5', 'junit', 'spock', 'testng'],
-  spring: ['junit5', 'junit'],
-  kotlin: ['junit5', 'kotest'],
-  nodejs: ['jest', 'vitest', 'mocha', 'jasmine', 'supertest', 'playwright', 'cypress'],
-  typescript: ['jest', 'vitest', 'mocha', 'jasmine', 'supertest', 'playwright', 'cypress'],
+  java: ['junit5', 'junit', 'spock', 'testng', 'spring-cloud-contract', 'pact', 'testcontainers'],
+  spring: ['junit5', 'junit', 'spring-cloud-contract', 'pact', 'testcontainers'],
+  kotlin: ['junit5', 'kotest', 'spring-cloud-contract'],
+  nodejs: ['jest', 'vitest', 'mocha', 'jasmine', 'supertest', 'playwright', 'cypress', 'playwright-visual', 'axe-core', 'percy', 'chromatic'],
+  typescript: ['jest', 'vitest', 'mocha', 'jasmine', 'supertest', 'playwright', 'cypress', 'playwright-visual', 'axe-core', 'percy', 'chromatic'],
   nestjs: ['jest', 'vitest'],
-  react: ['jest', 'vitest', 'testing-library', 'cypress', 'playwright'],
-  python: ['pytest', 'unittest'],
+  react: ['jest', 'vitest', 'testing-library', 'cypress', 'playwright', 'playwright-visual', 'axe-core', 'percy', 'chromatic'],
+  python: ['pytest', 'unittest', 'schemathesis'],
   rails: ['rspec', 'minitest'],
   ruby: ['rspec', 'minitest'],
-  go: ['gotest'],
+  go: ['gotest', 'go-test'],  // ★ T16 token 정합 (load-test-cmd / test-cmd.schema = 'go-test')
 };
+
+// ★ T9 (INSPECTION-2026-05-31-test) — v11.0.0 contract/visual framework.
+//   test-spec.schema.json if/then 이 openapi_contract_ref / visual_regression_ref 로 검증 (hard gate)
+//   → stack-allowlist 추론과 무관 → framework_mismatch(soft medium) 검사 bypass (false-positive 제거).
+//   (DEC-2026-05-26-contract-강제-양-axis §1 layer 3 정합.)
+const CONTRACT_VISUAL_FRAMEWORKS = new Set([
+  'schemathesis', 'dredd', 'pact', 'spring-cloud-contract',  // contract (BE axis)
+  'playwright-visual', 'axe-core', 'percy', 'chromatic',     // visual / a11y (FE axis)
+]);
 
 export function validateSpecTestLink(behavior, acceptance, testSpec, inventory, threshold = 0.85) {
   const findings = [];
@@ -83,7 +92,9 @@ export function validateSpecTestLink(behavior, acceptance, testSpec, inventory, 
   }
   if (allowed.size > 0) {
     for (const tc of testSpec?.test_cases ?? []) {
-      if (tc.framework && !allowed.has(tc.framework)) {
+      // ★ T9 — contract/visual framework 는 schema if/then(openapi_contract_ref/visual_regression_ref)이
+      //   검증 → stack-mismatch 검사 bypass (false-positive medium 제거).
+      if (tc.framework && !CONTRACT_VISUAL_FRAMEWORKS.has(tc.framework) && !allowed.has(tc.framework)) {
         findings.push({
           kind: 'chain.tc.framework_mismatch',
           severity: 'medium',

@@ -50,7 +50,7 @@
     }
   ],
   "cross_cutting": {
-    "validators": ["discovery-extraction-validator", "schema-validator", "formal-spec-link-validator (--chain-mode)"],
+    "validators": ["discovery-extraction-validator", "schema-validator", "formal-spec-link-validator (--chain-mode)", "br-cross-consistency-validator"],
     "no_simulation": true,
     "source_grounded_required": true
   },

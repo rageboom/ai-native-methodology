@@ -30,11 +30,11 @@ flowchart TB
         IN_OUT["acceptance-criteria.json + behavior-spec.json<br/>+ inventory.json + .aimd/config/test-cmd.json"]
     end
 
-    subgraph OUT["chain 3 산출물"]
+    subgraph OUT["chain 4 (test) 산출물"]
         direction LR
         OUT_TS["test-spec.json (deliverable 20)"]
-        OUT_CODE["실 test 코드 (RED — 모든 test fail)"]
-        OUT_EV["test_invocation_evidence (5종 물증 7 필드)"]
+        OUT_CODE["실 test 코드 (RED — S1/greenfield fail / S2 per_tc_outcome)"]
+        OUT_EV["test_cases[].test_run_evidence (5종 물증 10 필드)"]
     end
 
     subgraph NEXT["chain 5 (impl) 진입"]

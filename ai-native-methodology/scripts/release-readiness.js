@@ -1195,6 +1195,76 @@ function check25_templateSchemaValid() {
   };
 }
 
+// ★ F-S07 (INSPECTION-2026-05-31-spec / S10+S14) — gate validator 목록 cross-source 정합 결정론 gate.
+//   drift-validator 가 gate/validator 목록을 비교 안 해 4-소스(sdlc gate / phase-flow cross_cutting /
+//   automated_validation / gate-eval) drift 가 구조적 uncaught 였음. check18/check24 패턴 미러.
+//   관계 모델: gate-eval REQUIRED(blocking) ⊆ sdlc gates[].validators(매트릭스) / sdlc gate ≡ cross_cutting
+//   (데코레이션 정규화 후 / conditional_validators allowlist 차이 허용).
+function check26_gateValidatorListConsistency() {
+  try {
+    // 데코레이션 정규화 — " (...)" 괄호 / " --flag …" 접미사 strip → canonical tool 명.
+    const norm = (v) => String(v).replace(/\s*\([^)]*\)\s*/g, ' ').replace(/\s*--\S+.*$/, '').trim();
+    const STAGES = ['discovery', 'spec', 'plan', 'test', 'implement'];
+
+    // gate-eval REQUIRED_VALIDATORS_PER_STAGE (코드 SSOT / regex-extract — check18 패턴)
+    const geSrc = readFileSync(join(ROOT, 'tools/chain-driver/src/gate-eval.js'), 'utf-8');
+    const reqMatch = geSrc.match(/const\s+REQUIRED_VALIDATORS_PER_STAGE\s*=\s*\{([^}]+)\}/);
+    if (!reqMatch) return { id: 'gate_validator_list_consistency', pass: false, detail: 'gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 패턴 미발견', delegated_to: 'tools/chain-driver/src/gate-eval.js' };
+    const required = {};
+    const reqRe = /(\w+):\s*\[([^\]]*)\]/g;
+    let rm;
+    while ((rm = reqRe.exec(reqMatch[1])) !== null) {
+      required[rm[1]] = new Set(rm[2].split(',').map((s) => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean).map(norm));
+    }
+
+    // sdlc-4stage-flow gates[].validators (+ conditional_validators)
+    const sdlc = JSON.parse(readFileSync(join(ROOT, 'flows/sdlc-4stage-flow.json'), 'utf-8'));
+    const gateByStage = {}, condByStage = {};
+    for (const g of sdlc.gates ?? []) {
+      gateByStage[g.stage] = new Set((g.validators ?? []).map(norm));
+      condByStage[g.stage] = new Set((g.conditional_validators ?? []).map(norm));
+    }
+
+    // <stage>.phase-flow.json cross_cutting.validators
+    const ccByStage = {};
+    for (const stage of STAGES) {
+      const fp = join(ROOT, 'flows', `${stage}.phase-flow.json`);
+      if (!existsSync(fp)) continue;
+      const cc = JSON.parse(readFileSync(fp, 'utf-8')).cross_cutting?.validators;
+      if (Array.isArray(cc)) ccByStage[stage] = new Set(cc.map(norm));
+    }
+
+    const drift = [];
+    for (const stage of STAGES) {
+      const A = gateByStage[stage] ?? new Set();   // sdlc gate matrix (documented full set)
+      const B = ccByStage[stage];                   // phase-flow cross_cutting (may be absent)
+      const C = condByStage[stage] ?? new Set();    // conditional allowlist
+      const R = required[stage] ?? new Set();       // gate-eval blocking subset
+      // 1. blocking ⊆ documented gate matrix
+      const missingReq = [...R].filter((x) => !A.has(x));
+      if (missingReq.length) drift.push(`${stage}: gate-eval REQUIRED 가 sdlc gate matrix 미등재 [${missingReq.join(',')}]`);
+      // 2. sdlc gate ≡ cross_cutting (symmetric diff ⊆ conditional allowlist)
+      if (B) {
+        const union = new Set([...A, ...B]);
+        const unexpected = [...union].filter((x) => !(A.has(x) && B.has(x)) && !C.has(x));
+        if (unexpected.length) drift.push(`${stage}: sdlc-gate ↔ cross_cutting 불일치(conditional 외) [${unexpected.join(',')}]`);
+      } else {
+        drift.push(`${stage}: ${stage}.phase-flow.json cross_cutting.validators 부재 (gate matrix 대조 불가)`);
+      }
+    }
+    return {
+      id: 'gate_validator_list_consistency',
+      pass: drift.length === 0,
+      detail: drift.length === 0
+        ? `5 stage gate validator 목록 정합 (sdlc-4stage gates[] ≡ <stage>.phase-flow cross_cutting.validators [conditional 제외] + gate-eval REQUIRED ⊆ gate matrix / 데코레이션 정규화 / F-S07)`
+        : `drift: ${drift.join(' | ')}`,
+      delegated_to: 'flows/sdlc-4stage-flow.json gates[].validators ↔ flows/<stage>.phase-flow.json cross_cutting.validators ↔ tools/chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE (F-S07 / S10+S14 / 데코레이션 strip + conditional_validators allowlist)',
+    };
+  } catch (e) {
+    return { id: 'gate_validator_list_consistency', pass: false, detail: `error: ${e.message}`, delegated_to: 'flows/sdlc-4stage-flow.json ↔ flows/*.phase-flow.json ↔ gate-eval.js' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1225,6 +1295,7 @@ function main() {
     check23_dbAssetsValidator(),
     check24_agentSkillsPhaseFlowSync(),
     check25_templateSchemaValid(),
+    check26_gateValidatorListConsistency(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

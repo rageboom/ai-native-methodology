@@ -1,6 +1,6 @@
 # test-spec — <scope>
 
-★ v11.0.0 paradigm — chain 4 (test) 산출물 (사람 검토용 / 이중 렌더링). **RED 의무** (impl 부재 / 모든 test fail). 5종 물증 7 필드 본격 / no-simulation.
+★ v11.0.0 paradigm — chain 4 (test) 산출물 (사람 검토용 / 이중 렌더링). **RED 의무** (★ scenario-conditioned: S1/greenfield = 모든 test fail / S2(AX전환) = per_tc_outcome / S3 = snapshot_green). 5종 물증 10 필드 본격 / no-simulation.
 
 ## 메타
 
@@ -55,6 +55,15 @@
 
 ★ FE visual framework (playwright-visual / axe-core / percy / chromatic) = visual_regression_ref 본격 required.
 
+### TC-DOMAIN-004 / 005 — ★ S2(AX전환) characterization + augmentation 쌍 (per_tc_outcome scaffold)
+
+| TC | test_intent | expected_outcome | 의미 |
+|---|---|---|---|
+| TC-DOMAIN-004 | characterization | **pass** | 기존 legacy 동작 포착 (코드 존재 → GREEN) |
+| TC-DOMAIN-005 | augmentation | **fail** | 신규 증강분 (impl 부재 → RED / impl 후 pass 격상) |
+
+★ S2 는 aggregate all_fail 대신 per-TC `expected_outcome ↔ test_intent` 정합 검사 (`test-impl-pass-validator --scenario S2 --test-spec` → `outcome_mismatches` → gate-eval `per_tc_outcome` / s2_outcome_mismatch WARN). DEC-2026-05-30-s2-gate-slice / v11.11.0.
+
 ## 2. coverage
 
 | metric | 값 | threshold |
@@ -62,16 +71,19 @@
 | link_coverage.by_acceptance_criteria | 1.0 | 0.85 |
 | **test_pass_rate** | **0.0** | RED 의무 |
 
-## 3. 5종 물증 7 필드 (★ no-simulation)
+## 3. 5종 물증 10 필드 (★ no-simulation)
 
-각 TC 의 `test_run_evidence` 안:
+각 TC 의 `test_run_evidence` 안 (★ test-spec.schema required = 10 필드 / top-level `test_invocation_evidence` ❌ = schema 금지 / standalone `test-invocation-evidence.json` = runner 별도 산출물):
 1. test_runner_version (실 runner --version)
 2. test_runner_stdout_path (불변 보존)
 3. invocation_timestamp (ISO 8601)
 4. duration_ms (실 측정)
-5. pass_count / fail_count / skip_count (★ RED 시 fail_count > 0)
-6. reproduction_command (재현 가능)
-7. result_hash (sha256: stdout 정규화 hash)
+5. pass_count
+6. fail_count (★ S1/greenfield RED 시 > 0)
+7. skip_count
+8. reproduction_command (재현 가능)
+9. result_hash (sha256: stdout 정규화 hash)
+10. report_format (★ test-spec enum 언더스코어: jest_json / junit_xml / stdout_regex …)
 
 ## 검증
 

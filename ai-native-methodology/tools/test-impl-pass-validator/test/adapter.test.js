@@ -43,6 +43,25 @@ test('★ vitest adapter — jest 호환 schema 정합 (fixture reuse)', () => {
   assert.equal(r.pass_count, 3);
 });
 
+test('★ F-I05 — adapter 가 per-test tests:[{name,status}] 노출 (S2 correlateByTcId 용)', () => {
+  const jest = parseJestJson(fix('jest.json'));
+  assert.ok(Array.isArray(jest.tests) && jest.tests.length === 3);
+  assert.ok(jest.tests.every(t => t.name && (t.status === 'pass' || t.status === 'fail' || t.status === 'skip')));
+  assert.deepEqual(jest.tests.map(t => t.status), ['pass', 'pass', 'pass']);
+
+  // ★ junit fixture 는 summary(tests="4")와 실 testcase 수(5)가 의도적 불일치 (summary-priority 테스트용).
+  //   aggregate count 는 summary 우선(pass_count=2)이나 per-test tests[] 는 실 testcase(5: 3 pass/1 fail/1 skip) 반영.
+  const junit = parseJunitXml(fix('junit.xml'));
+  assert.equal(junit.tests.length, 5);
+  assert.equal(junit.tests.filter(t => t.status === 'fail').length, 1);
+  assert.equal(junit.tests.filter(t => t.status === 'skip').length, 1);
+  assert.equal(junit.tests.filter(t => t.status === 'pass').length, 3);
+
+  const pytest = parsePytestJson(fix('pytest.json'));  // 4 pass / 1 skip
+  assert.equal(pytest.tests.filter(t => t.status === 'pass').length, 4);
+  assert.equal(pytest.tests.filter(t => t.status === 'skip').length, 1);
+});
+
 test('★ junit-xml adapter — testsuites attribute 우선 (4 tests / 1 fail / 1 skip)', () => {
   const r = parseJunitXml(fix('junit.xml'));
   assert.equal(r.framework, 'junit5');
@@ -88,6 +107,40 @@ test foo::qux failed
 
 test('★ other adapter — parser 부재 → throw (★ ADR-CHAIN-004 §1 if/then 정합)', () => {
   assert.throws(() => parseStdout('foo', null), /의무/);
+});
+
+test('★ T16 — other adapter count_mode:occurrences (go `--- PASS:` per-test 라인 집계)', () => {
+  const stdout = [
+    '=== RUN   TestFoo',
+    '--- PASS: TestFoo (0.00s)',
+    '=== RUN   TestBar',
+    '--- FAIL: TestBar (0.01s)',
+    '=== RUN   TestBaz',
+    '--- SKIP: TestBaz (0.00s)',
+    '=== RUN   TestQux',
+    '--- PASS: TestQux (0.00s)',
+    'FAIL',
+  ].join('\n');
+  const r = parseStdout(stdout, {
+    pass_regex: '^--- PASS:',
+    fail_regex: '^--- FAIL:',
+    skip_regex: '^--- SKIP:',
+    test_name_regex: '^--- (?:PASS|FAIL|SKIP): (\\S+)',
+    count_mode: 'occurrences',
+  });
+  assert.equal(r.pass_count, 2);
+  assert.equal(r.fail_count, 1);
+  assert.equal(r.skip_count, 1);
+  assert.equal(r.test_names.length, 4);
+  assert.equal(r.success, false);
+});
+
+test('★ T16 — count_mode 부재(default capture)는 기존 group-1 동작 보존 (회귀 차단)', () => {
+  const r = parseStdout('3 passed; 1 failed; 0 skipped', {
+    pass_regex: '(\\d+) passed', fail_regex: '(\\d+) failed', skip_regex: '(\\d+) skipped',
+  });
+  assert.equal(r.pass_count, 3);
+  assert.equal(r.fail_count, 1);
 });
 
 test('★ jest adapter — fail count → success=false', () => {

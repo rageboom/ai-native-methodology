@@ -113,13 +113,15 @@
     {
       "id": "#1",
       "stage": "discovery",
-      "validators": ["discovery-extraction-validator", "schema-validator"],
+      "validators": ["discovery-extraction-validator", "schema-validator", "br-cross-consistency-validator", "formal-spec-link-validator (--chain-mode)"],
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
       "id": "#2",
       "stage": "spec",
       "validators": ["chain-coverage-validator", "chain-coverage-validator --antipatterns (★ F-SIM-001 ap-coverage lane)", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
+      "conditional_validators": ["spectral-runner (OpenAPI)"],
+      "$comment_conditional": "★ F-S07 (S10/S14) — spectral-runner 는 OpenAPI 존재 시만 조건부 (cross_cutting.validators 에 등재 / gate-eval REQUIRED·gate matrix 비포함 = 정당 차이). check26 conditional allowlist.",
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {

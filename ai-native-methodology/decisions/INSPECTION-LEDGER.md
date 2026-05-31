@@ -30,7 +30,7 @@
 | 5 | implement | chain5 / gate#5 (GREEN) | ✅ done (점검+수정 / 24/24) | 27 | 0 | 13적용+4carry | `INSPECTION-2026-05-31-implement.md` |
 | ★ | 패러다임 글로벌 mini-pass | 횡단 | ✅ done (25/25) | – | – | – | `INSPECTION-2026-05-31-paradigm-global.md` |
 
-★ **신규 결정론 gate 2종**: release-readiness `check24`(agent-skills-phaseflow-sync / C12) + `check25`(template-schema-valid / capstone) → **23→25 criteria**. + gate-eval I9 GREEN fail-closed 보강.
+★ **신규 결정론 gate 3종**: release-readiness `check24`(agent-skills-phaseflow-sync / C12) + `check25`(template-schema-valid / capstone) + ★ v11.19 `check26`(gate-validator-list-consistency / F-S07) → **23→26 criteria**. + gate-eval I9 GREEN fail-closed 보강.
 
 **자산 인벤토리(2026-05-31 실측)**: agents 8(+3 `_base`) / skills 57(analysis-* 30) / hooks 1(`hooks.json`) / flows 7 phase-flow + `sdlc-4stage-flow` / tools 26 / schemas 48 / templates(analysis) 21.
 
@@ -64,7 +64,7 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 | F-D03 | stale 명칭 (D5/D6/D11 + BR-INTENT-* sweep) | med | resolved (extract-from-legacy→discovery-from-analysis-output / planning-agent.md→discovery-agent.md / 헤더·chain번호 / BR-INTENT id-implying 3곳) |
 | F-D04 | validator under-enforce (D9 over-decomp / D10 summary medium·low) | med | resolved (over/under-decomposition lane 신설 + summary medium/low 집계 / 회귀테스트 12건) |
 | F-D05 | README Outputs 표 stale (D12) | low | resolved (11 finding kind 전수 반영 + BR-INTENT prose 정정) |
-| F-X01 | (부수) `schemas/code-graph.schema.json` draft-07 `$ref` 로드 실패 경고 (analysis code-graph schema) — cross-stage | med | candidate (미조치 / analysis 재방문 or 별도) |
+| F-X01 | (부수) `schemas/code-graph.schema.json` draft-07 `$ref` 로드 실패 경고 (analysis code-graph schema) — cross-stage | med | **resolved** (★ v11.19 — `$schema` draft-07→2020-12 / Ajv2020 메타스키마 로드실패 경고 재현→정정 입증 / 본문 2020-12 호환) |
 **discovery 검증: release-readiness 24/24 · workspace test all-pass(919) · 0 stale citation · PoC discovery-spec 11/11 schema valid · 템플릿 schema-valid 재확인 · 새 drift 0. 미커밋.**
 
 ### spec 단계 carry (점검 완료 / 수정 gate 대기)
@@ -76,7 +76,7 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 | F-S04 | path drift decision-table formal-spec/ 누락 (S8) | med | resolved (compose 경로 prefix) |
 | F-S05 | ★ SEED-3 scenario gate 문서 미반영 (S2) | high | resolved (sdlc-4stage gate#4/#5 scenario_expected = gate-eval SCENARIO_EXPECTED 미러) |
 | F-S06 | check-links.js:40 연산자 우선순위 버그 (S15) | med | resolved (괄호 교정 / 17 test pass) |
-| F-S07 | **gate-consistency 강화 묶음 (S10 validator-list reconcile + S14 drift gate-consistency check)** — 상호 연동 / drift-validator 가 gate 매트릭스·cross_cutting.validators 미비교 = SEED-3·S10류 구조적 uncaught | med | **carry** (C12류 결정론 gate 신설 — 별도 묶음 / req8 고가치 follow-up) |
+| F-S07 | **gate-consistency 강화 묶음 (S10 validator-list reconcile + S14 drift gate-consistency check)** — 상호 연동 / drift-validator 가 gate 매트릭스·cross_cutting.validators 미비교 = SEED-3·S10류 구조적 uncaught | med | **resolved** (★ v11.19 — `check26` gate_validator_list_consistency 신설 / 데코레이션 정규화 / gate-eval REQUIRED ⊆ sdlc gate matrix + sdlc gate ≡ cross_cutting [conditional allowlist] / 정정: sdlc gate#1 +br-cross+formal-spec-link, gate#2 conditional spectral, discovery·plan cross_cutting / release-readiness 25→26) |
 
 ### plan 단계 carry (점검+수정 완료 / 24/24)
 | id | item | severity | status |
@@ -85,7 +85,7 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 | F-P02 | SP 4분류 wiring 공백 (P8 skill 부재 / P9 agent db-assets 미호출 / P10 gate-eval) — 2026-05-28 mandate runtime 미결선 | high | resolved (plan-risk-and-nfr SP 4분류 절 신설 + plan-agent gate step db-assets-validator 호출 / ★ P10 = db-assets는 조건부라 gate-eval 정적 required 목록 미수정·P9 agent 호출로 findings→gate critical block 결선이 정답·테스트 안전) |
 | F-P03 | manifest stage enum stale [planning,spec,test,impl] System Y 미전파 (P13) | med | resolved (additive 확장 [discovery,planning,spec,plan,test,impl,implement] 3곳 / PoC 무회귀) |
 | F-P04 | plan-agent:95 "명독" 오타 (P15) | low | resolved (명확히 분리) |
-| F-X02 | (meta) skill-citation-validator 가 `decisions/INSPECTION-*.md` 워크스페이스 점검 리포트를 스캔해 finding-quote(stale 경로 인용)를 false-positive stale 로 검출 — analysis/discovery/plan 3회 발생 (매번 토큰 중화로 해소). validator scope 를 shipped skills 로 제한(decisions/INSPECTION-* 제외) 검토 | low | candidate (carry / 점검 자체 산출물이 dead-link 도입 회피 paradigm) |
+| F-X02 | (meta) skill-citation-validator 가 `decisions/INSPECTION-*.md` 워크스페이스 점검 리포트를 스캔해 finding-quote(stale 경로 인용)를 false-positive stale 로 검출 — analysis/discovery/plan 3회 발생 (매번 토큰 중화로 해소). validator scope 를 shipped skills 로 제한(decisions/INSPECTION-* 제외) 검토 | low | **resolved** (★ v11.19 — check-citations.js HISTORY_FILE 정규식 += `decisions/INSPECTION-` / synthetic 회귀 test + 실 repo 0 stale 재확인) |
 
 ### test 단계 carry (점검+수정 완료 / 24/24)
 | id | item | severity | status |
@@ -94,8 +94,8 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 | F-T02 | coverage_summary→coverage drift (T4/T5) | med | resolved (test-verify-coverage + test-agent / test-spec schema canonical=coverage / coverage_summary는 traceability·characterization schema 실필드라 test맥락만 정정) |
 | F-T03 | RED 무조건 all_fail 단언 (T7) — S2 per_tc_outcome/S3 snapshot_green 충돌 | med | resolved (test-agent RED scenario-conditioned / gate-eval SCENARIO_EXPECTED·test_intent 인용) |
 | F-T04 | 번호·라벨·README (T6/T13/T12/T15) | med/low | resolved (validator README chain/gate System Y / gate-eval prose chain3→4 / 7필드→10필드 / README severity critical) |
-| F-T05 | ★ **evidence 필드명 SSOT reconciliation (T1/T10)** — test_run_evidence(schema per-TC) vs test_invocation_evidence(★ validator 3곳 read / check-links·lint-no-sim·test-impl-pass) vs test_pass_evidence(impl chain5 bleed). schema가 금지한 필드를 validator가 read → naive rename 시 validator 파손 | high | **carry** (schema↔validator 3곳↔skill↔flow↔agent 다자 결단 필요 / 신중) |
-| F-T06 | test-runner framework/enum/adapter hardening (T9 FRAMEWORK_HINTS contract/visual / T14 report_format enum 교집합 0 / T16 adapter mismatch) + T11(S2 test_intent 템플릿 scaffold) | med | **carry** (moderate code + S2 scaffold 묶음) |
+| F-T05 | ★ **evidence 필드명 SSOT reconciliation (T1/T10)** — test_run_evidence(schema per-TC) vs test_invocation_evidence(★ validator 3곳 read / check-links·lint-no-sim·test-impl-pass) vs test_pass_evidence(impl chain5 bleed). schema가 금지한 필드를 validator가 read → naive rename 시 validator 파손 | high | **resolved** (★ v11.19 — Option α canonical [per-TC test_run_evidence / impl root test_pass_evidence]: check-links per-TC+impl read [non-breaking + sentinel "(not generated)" skip + base-tolerant .aimd resolve / legacy 병존] + lint-no-simulation grep 3-shape alternation + skill/flow/agent/template prose α 전환 / examples PoC 0 신규 finding 실측) |
+| F-T06 | test-runner framework/enum/adapter hardening (T9 FRAMEWORK_HINTS contract/visual / T14 report_format enum 교집합 0 / T16 adapter mismatch) + T11(S2 test_intent 템플릿 scaffold) | med | **resolved** (★ v11.19 — T9 FRAMEWORK_HINTS contract/visual bypass set + gotest↔go-test 토큰 / T14 report-format.js normalize + `stdout_regex` enum additive / T16 inference 정직(mocha·go→other+stdout_parser scaffold / `count_mode:occurrences` 신설) + cli throw 정직 / T11 test-spec.template S2 characterization+augmentation 쌍) |
 | F-X03 | (process) test 점검 Workflow audit agent 가 audit 중 templates/test/* 2파일 **직접 write**. 결과 정확·수용. ★ **implement 점검에 read-only 가드 명시 → 무단 write 0 재발 방지 확인**. 향후 모든 워크플로 audit agent prompt 에 read-only 가드 표준화 | med | resolved-as-mitigated (implement 가드 작동 입증) |
 
 ### implement 단계 carry (점검+수정 완료 / 24/24 / ★ read-only 가드 작동 — agent write 0)
@@ -105,7 +105,7 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 | F-I02 | System Y 번호 prose stale 대량 (I4/I6/I11/I12/I13/I14) | med/low | resolved (gate-eval:128·:10 / impl-spec.schema prose ×5 / _base-traceability #1~#5 / phase-flow:50 chain5) |
 | F-I03 | no-simulation honesty + dist + count (I5/I10/I7) | med | resolved (static-runner inflated "6 plugin"→정직 Tier framing / generate:234 DEC dist-dangling 중화 / release-readiness 22/22→24/24 ×3) |
 | F-I04 | ★ I9 GREEN fail-OPEN guard — implement GREEN 강제가 tests_total!=null guard 의존 → test evidence 없이 go-eligible | med | resolved (gate-eval 에 tests_total==null → evidence_missing fail-closed 추가 / 257 test pass / 결정론 누수 차단) |
-| F-I05 | **carry: I8 s2-outcome-check.js producer 미배선** (gate가 기대하는 outcome_mismatches 를 live 도구 미emit) + **I15/I16/I17 shared-runner(test-impl-pass-validator) System Y prose sweep** (cli.js/README/mock-detect / test=gate#4·impl=gate#5 nuance) | med | **carry** (F-T05/F-T06 evidence-naming 묶음과 연동 / shared-runner prose 신중) |
+| F-I05 | **carry: I8 s2-outcome-check.js producer 미배선** (gate가 기대하는 outcome_mismatches 를 live 도구 미emit) + **I15/I16/I17 shared-runner(test-impl-pass-validator) System Y prose sweep** (cli.js/README/mock-detect / test=gate#4·impl=gate#5 nuance) | med | **resolved** (★ v11.19 — s2-outcome-check.js producer cli.js 배선 [`--scenario S2 --test-spec` → correlate→reconcile→outcome_mismatches] + adapter tests[{name,status}] + ★ findings-aggregator latent tests_total 무음 0 버그 동반 수정 [test_results/pass_count 양 shape] + outcome_mismatches surface/merge + gate-eval 주석 참 + I15/16/17 System Y prose) |
 
 ---
 
@@ -145,3 +145,15 @@ severity: high/med/low · status: candidate/confirmed/refuted/resolved/resolved-
 ### 2026-05-31 (세션 종료 / 6단계 완료)
 - **한 일**: analysis·discovery·spec·plan·test·implement 6단계 점검(Workflow 6회 / ~155 자산 / confirmed 99 / CUT 0) + 전체적용(systemic 템플릿 5종 schema-valid화 / skill over-claim 정직화 / System Y 번호 정정 / 결정론 사각 차단) + 패러다임 글로벌 mini-pass. ★ 신규 결정론 gate 2(check24/check25) + fail-closed 1(I9). 리포트 7종(`INSPECTION-2026-05-31-*.md`). 검증 25/25.
 - **남은 일**: carry 5종(위) — 별도 묶음. 미커밋(작업트리 ~63 파일). (옵션) v11.18.0 release.
+
+### 2026-06-01 (carry-queue 종결 / 별도 묶음 v11.19 후보)
+- **한 일**: ledger §3 carry **6종 전부 resolved** (사용자 지시 "배포 6단계 점검 이어서 / inspection-ledger 보고 이어서" → 순서 ① Evidence 클러스터 → ② F-S07 → ③ optionals).
+  - **F-T05** (high / evidence 필드명 SSOT) — Option α canonical 확정(schema/템플릿/PoC 강제). check-links per-TC `test_run_evidence`+impl root `test_pass_evidence` read(non-breaking + sentinel skip + base-tolerant `.aimd` resolve / legacy 병존) + lint-no-simulation grep 3-shape alternation + skill/flow/agent/template prose α 전환. ★ examples PoC(05/03/04/14) 0 신규 finding 실측.
+  - **F-I05** (med / S2 gate 형해화) — s2-outcome-check.js producer cli.js 배선(`--scenario S2 --test-spec`) + adapter `tests[{name,status}]` + ★ **findings-aggregator latent `tests_total` 무음 0 버그 동반 수정**(test_results/pass_count 양 shape 관용 = I9 GREEN guard 정합) + outcome_mismatches surface/merge + gate-eval 주석 참 + I15/16/17 System Y prose.
+  - **F-T06** (med) — T9 FRAMEWORK_HINTS contract/visual bypass / T14 report-format.js normalize(+`stdout_regex` enum additive) / T16 inference 정직(mocha·go→other+stdout_parser scaffold / `count_mode:occurrences` 신설) / T11 test-spec.template S2 characterization+augmentation 쌍.
+  - **F-S07** (med) — ★ `check26` gate_validator_list_consistency 신설(데코레이션 정규화 / gate-eval REQUIRED ⊆ sdlc gate matrix + sdlc gate ≡ cross_cutting [conditional allowlist]). 정정: sdlc gate#1 +br-cross+formal-spec-link / gate#2 conditional spectral / discovery·plan cross_cutting. **release-readiness 25→26**.
+  - **F-X01** (med) — code-graph.schema `$schema` draft-07→2020-12(Ajv2020 메타스키마 로드실패 경고 재현→해소).
+  - **F-X02** (low) — check-citations HISTORY_FILE += `decisions/INSPECTION-` + synthetic 회귀 test.
+- **검증**: ★ **release-readiness 26/26 ready** · workspace **950/950 pass / 0 fail** · drift 0 · 0 stale citation · check24/25/26 green. 신규/확장 test ~31건(report-format/load-test-cmd/adapter/aggregator/spec-test-link/link/lint-chain/cli) + release-readiness 26-count.
+- **남은 일**: 없음 (carry 전부 종결).
+- **release**: ★ **v11.19.0 MINOR commit + tag + push 시행** (사용자 "둘 다 진행" 결단). version 3-way(plugin.json/package.json/CHANGELOG) + CLAUDE.md sync + release-readiness 26/26 + pre-push gate(test:release) 통과. dist = gitignored(`source:"./"` 설치 / 재생성 불요).

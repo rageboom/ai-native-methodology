@@ -303,3 +303,66 @@ test('★ C8 chain discovery-spec — use_cases[].id invalid → id-pattern-mism
   const mism = findings.filter((f) => f.kind === 'chain.id-pattern-mismatch');
   assert.equal(mism.length, 1, `expected exactly 1 UC mismatch (INVALID-UC), got ${JSON.stringify(findings)}`);
 });
+
+// ★ F-T05 (INSPECTION-2026-05-31-test) — canonical evidence 필드 (test_run_evidence per-TC / test_pass_evidence root).
+//   validator 가 schema-금지 필드(top-level test_invocation_evidence) 대신 정식 필드를 read + sentinel skip + non-breaking.
+function evWhere(findings) {
+  return findings.filter((f) => f.where && (f.where.includes('test_run_evidence') || f.where.includes('test_pass_evidence')));
+}
+
+test('★ F-T05 — test-spec per-TC test_run_evidence stdout dump 존재 → evidence finding 0', () => {
+  const dir = setupChainFixture();
+  try {
+    writeFileSync(join(dir, 'src', 'ev-stdout.txt'), 'PASS\n');
+    const json = {
+      derivation_source: { acceptance_criteria_path: './acceptance-criteria.json', behavior_spec_path: './behavior-spec.json' },
+      test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', bhv_ref: 'BHV-USER-001', type: 'unit', framework: 'jest', source_file: './src/user.test.ts', expected_outcome: 'fail',
+        test_run_evidence: { test_runner_stdout_path: './src/ev-stdout.txt' } }],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'test-spec.json'), artifact: 'test-spec', json }, baseDir: dir });
+    assert.equal(evWhere(findings).length, 0, `dump 존재 → 0, got ${JSON.stringify(evWhere(findings))}`);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ F-T05 — test-spec per-TC test_run_evidence dump 부재(실경로) → non-breaking (breaking 아님)', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: { acceptance_criteria_path: './acceptance-criteria.json', behavior_spec_path: './behavior-spec.json' },
+      test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', bhv_ref: 'BHV-USER-001', type: 'unit', framework: 'jest', source_file: './src/user.test.ts', expected_outcome: 'fail',
+        test_run_evidence: { test_runner_stdout_path: './src/NOPE-stdout.txt' } }],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'test-spec.json'), artifact: 'test-spec', json }, baseDir: dir });
+    const ev = evWhere(findings);
+    assert.equal(ev.length, 1);
+    assert.equal(ev[0].severity, 'non-breaking', '★ no-sim 1차 enforcement 별도 → non-breaking');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ F-T05 — test-spec sentinel "(not generated)" → evidence finding 0 (retrofit placeholder skip)', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: { acceptance_criteria_path: './acceptance-criteria.json', behavior_spec_path: './behavior-spec.json' },
+      test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', bhv_ref: 'BHV-USER-001', type: 'unit', framework: 'jest', source_file: './src/user.test.ts', expected_outcome: 'fail',
+        test_run_evidence: { test_runner_stdout_path: '(not generated)' } }],
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'test-spec.json'), artifact: 'test-spec', json }, baseDir: dir });
+    assert.equal(evWhere(findings).length, 0, 'sentinel → dead-ref 아님');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('★ F-T05 — impl-spec root test_pass_evidence dump 부재 → non-breaking', () => {
+  const dir = setupChainFixture();
+  try {
+    const json = {
+      derivation_source: { test_spec_path: './test-spec.json', behavior_spec_path: './behavior-spec.json' },
+      impl_modules: [{ id: 'IMPL-USER-001', tc_refs: ['TC-USER-001'], bhv_refs: ['BHV-USER-001'], framework: 'nestjs', source_files: ['./src/user.controller.ts'], commit_hash: 'abc123' }],
+      test_pass_evidence: { test_runner_stdout_path: './src/NOPE-green.txt' },
+    };
+    const findings = checkChainLinks({ source: { type: 'chain', file: join(dir, 'impl-spec.json'), artifact: 'impl-spec', json }, baseDir: dir });
+    const ev = evWhere(findings);
+    assert.equal(ev.length, 1);
+    assert.equal(ev[0].severity, 'non-breaking');
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

@@ -26,10 +26,11 @@ const SKIP_DIR = new Set([
 ]);
 // history-class / 의도적 구 이름 보존 (LL-i-52) — 검사 제외:
 //  - CHANGELOG* / *HISTORY* / decisions/STATUS* / decisions/DEC-* / decisions/INDEX*
+//  - decisions/INSPECTION-* = 워크스페이스 점검 리포트 (★ F-X02 — finding-quote 안 decision-time stale 경로 인용 / shipped SSOT ❌ / DEC·STATUS 동류). 점검 산출물이 자기 dead-link 도입 회피.
 //  - docs/adr/  = ADR = accepted immutable decision record (decision-time 인용 / DEC·CHANGELOG 와 동일 rationale)
 //  - templates/adoption/ = downstream-project scaffold (placeholder 예시 content 설계 / methodology SSOT ❌)
 const HISTORY_FILE =
-  /(^|\/)CHANGELOG|HISTORY|(^|\/)decisions\/STATUS|(^|\/)decisions\/DEC-|(^|\/)decisions\/INDEX|(^|\/)docs\/adr\/|(^|\/)templates\/adoption\//;
+  /(^|\/)CHANGELOG|HISTORY|(^|\/)decisions\/STATUS|(^|\/)decisions\/DEC-|(^|\/)decisions\/INDEX|(^|\/)decisions\/INSPECTION-|(^|\/)docs\/adr\/|(^|\/)templates\/adoption\//;
 // 명백 FP (외부 URL fragment / placeholder).
 const FP_LINE = /docs\/en\/|poc-NN|poc-\{|\bNN-layer|<[a-z-]+>/;
 // 의도적 부재 / supersession / future-carry — 현재-dead-link 주장 아님 → skip.

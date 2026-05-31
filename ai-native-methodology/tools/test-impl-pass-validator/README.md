@@ -10,14 +10,15 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 
 | 시점 | command | 호출자 |
 |---|---|---|
-| chain 4 (impl) stage 종결 시 | `test-impl-pass-validator --allow-execute` | gate auto (chain-driver next) |
+| test(chain 4 RED) / implement(chain 5 GREEN) stage 종결 시 | `test-impl-pass-validator --allow-execute` | gate auto (chain-driver next) |
+| S2(AX전환) per-TC outcome 검사 | `test-impl-pass-validator --allow-execute --scenario S2 --test-spec <path>` | gate auto (chain-driver next) |
 | dry-run (사용자 fix 검증) | `test-impl-pass-validator --dry-run` | user (수동) |
 
 ## Inputs
 
-- `<project-dir>/.aimd/output/test/test-cmd.json` — test runner 명세 (★ schemas/test-cmd.schema.json 정합)
+- `<project-dir>/.aimd/config/test-cmd.json` — test runner 명세 (★ schemas/test-cmd.schema.json 정합)
 - `<project-dir>/.aimd/output/test/` + `<project-dir>/.aimd/output/impl/` — 실 test code + 실 impl code
-- `<project-dir>/.aimd/output/test-spec.json` + `impl-spec.json` — chain 3+4 산출물
+- `<project-dir>/.aimd/output/test-spec.json` (chain 4) + `impl-spec.json` (chain 5) 산출물
 
 ## Outputs
 
@@ -43,7 +44,7 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 
 진짜 test runner 호출 = system level command 실행. 사용자 명시 동의 없이 실행 ❌:
 
-- `--allow-execute` 없을 시 dry-run only fallback (exit 3)
+- `--allow-execute` (또는 `--dry-run`) 부재 시 → exit 2 (실행 거부 / cli.js:16-19 header 권위)
 - CI 자동화 시 `--allow-execute` opt-in
 - shell injection 차단: `shell:false` array argument (DEC-2026-05-06-sub-plan-3b-종결)
 
@@ -55,9 +56,9 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 | vitest | `src/runners/vitest.js` | --json + vitest-result.json |
 | junit5 (xml) | `src/runners/junit-xml.js` | xunit-style XML |
 | pytest | `src/runners/pytest.js` | --junit-xml |
-| other | `src/runners/other.js` | `stdout_parser` 의무 (test-cmd.schema if/then strict) |
+| other | `src/runners/other.js` | `stdout_parser` 의무 (test-cmd.schema if/then strict / `count_mode: occurrences` 지원) |
 
-★ mocha / cargo / dotnet / phpunit / go-test = v2.1+ carry.
+★ T16 (no-simulation) — mocha / go-test 는 inventory 추론 시 `framework:'other'` + stdout_parser scaffold 로 자동 매핑(실행 가능). cargo / dotnet / phpunit = `framework:'other'` 명시 설정 carry (전용 adapter 미보유 — 가짜 지원 ❌).
 
 ## result_hash 정규화 (★ SARIF Appendix F 정합)
 
@@ -86,7 +87,7 @@ result_hash = sha256(
 ## Test
 
 ```bash
-npm test --workspace=tools/test-impl-pass-validator   # 25 unit test pass
+npm test --workspace=tools/test-impl-pass-validator   # unit test pass (result-hash/adapter/cli/mock-detect/s2-outcome-check/report-format/load-test-cmd)
 ```
 
 ★ `test/fixtures/` (3 files) = workspace only / dist 자동 제외.
@@ -96,4 +97,4 @@ npm test --workspace=tools/test-impl-pass-validator   # 25 unit test pass
 - ADR-CHAIN-004 — test-runner-invocation-contract (Aider 패턴 + `.aimd/config/test-cmd.json` 우선 + `--allow-execute` 의무 + result_hash 정규화)
 - DEC-2026-05-06-sub-plan-3b-종결 — workspace 11번째 신설 + 5 adapter + Senior Blocker 1 해결
 - [`../../schemas/test-cmd.schema.json`](../../schemas/test-cmd.schema.json) — test runner 명세 schema
-- [`../../schemas/impl-spec.schema.json`](../../schemas/impl-spec.schema.json) — chain 4 산출물 schema
+- [`../../schemas/impl-spec.schema.json`](../../schemas/impl-spec.schema.json) — chain 5 (implement) 산출물 schema

@@ -29,12 +29,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-  it('happy path — 24/25 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-    // ★ skip 시 check11(workspace_test) = pass=false / total 24/25 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+  it('happy path — 25/26 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+    // ★ skip 시 check11(workspace_test) = pass=false / total 25/26 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 25);
-    assert.equal(out.criteria_passed, 24);
+    assert.equal(out.criteria_total, 26);
+    assert.equal(out.criteria_passed, 25);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.detail.includes('skipped via --skip-workspace-test'), 'skip detail 명시 의무');
     const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
@@ -43,7 +43,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(cite.pass, `check13 skill citation must pass — detail: ${cite.detail}`);
   });
 
-  it('all 25 criterion ids are present in output (no skipped)', () => {
+  it('all 26 criterion ids are present in output (no skipped)', () => {
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
@@ -59,6 +59,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'db_assets_validator',
       'e2e_cycle_pass',
       'gate_enum_consistency',
+      'gate_validator_list_consistency',
       'graph_integrity',
       'layer_2_consistency',
       'legacy_4_stage_expression_absent',
@@ -194,11 +195,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 25 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 26 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
-    // even with bogus target, should still evaluate 25 checks against current artifacts.
+    // even with bogus target, should still evaluate 26 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 25);
+    assert.equal(out.criteria_total, 26);
   });
 
   it('missing --target → exit 2 (usage error)', () => {
@@ -214,8 +215,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.pass, `workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`);
     assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-    assert.equal(out.criteria_total, 25);
-    assert.equal(out.criteria_passed, 25);
+    assert.equal(out.criteria_total, 26);
+    assert.equal(out.criteria_passed, 26);
     assert.equal(out.ready, true);
     assert.equal(r.status, 0);
   });

@@ -12,10 +12,14 @@ export function parseJestJson(jsonOrText) {
   }
 
   const test_names = [];
+  const tests = [];  // ★ F-I05 — per-test {name,status} (S2 correlateByTcId 용 / additive).
   for (const file of (data.testResults ?? [])) {
     for (const a of (file.assertionResults ?? [])) {
       const name = a.fullName ?? a.title;
-      if (name) test_names.push(name);
+      if (!name) continue;
+      test_names.push(name);
+      const status = a.status === 'passed' ? 'pass' : a.status === 'failed' ? 'fail' : 'skip';
+      tests.push({ name, status });
     }
   }
 
@@ -26,6 +30,7 @@ export function parseJestJson(jsonOrText) {
     skip_count: data.numPendingTests ?? 0,
     total: data.numTotalTests ?? test_names.length,
     test_names,
+    tests,
     success: (data.success === true) || ((data.numFailedTests ?? 0) === 0 && (data.numTotalTests ?? 0) > 0),
   };
 }

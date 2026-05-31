@@ -93,10 +93,16 @@
       "description": "★ `framework: other` 시 의무. stdout regex pattern 으로 pass/fail/skip count 추출",
       "additionalProperties": false,
       "properties": {
-        "pass_regex": {"type": "string", "description": "pass count 추출 regex (group 1 = count)"},
+        "pass_regex": {"type": "string", "description": "pass count 추출 regex (count_mode=capture 시 group 1 = count / occurrences 시 match 횟수)"},
         "fail_regex": {"type": "string", "description": "fail count 추출 regex"},
         "skip_regex": {"type": "string", "description": "skip count 추출 regex"},
-        "test_name_regex": {"type": "string", "description": "개별 test name 추출 regex (result_hash 정규화용)"}
+        "test_name_regex": {"type": "string", "description": "개별 test name 추출 regex (result_hash 정규화용)"},
+        "count_mode": {
+          "type": "string",
+          "enum": ["capture", "occurrences"],
+          "default": "capture",
+          "description": "★ T16 — capture(default): group 1 숫자 추출(집계 라인 보유 framework, 예 mocha '5 passing'). occurrences: regex global match 횟수(per-test 라인 framework, 예 go '--- PASS:')."
+        }
       }
     },
     "extra_env": {

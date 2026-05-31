@@ -112,7 +112,8 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
       });
     }
     // ★ v11.11.0 — S2(AX전환) per_tc_outcome: characterization(expected_outcome='pass') GREEN + augmentation(='fail') RED 혼합.
-    //   validator(test-impl-pass-validator)가 per-TC expected_outcome vs 실 결과 비교 → outcome_mismatches emit.
+    //   ★ v11.19 F-I05 — test-impl-pass-validator `--scenario S2 --test-spec <path>` 호출 시 s2-outcome-check.js(reconcileOutcomes)가
+    //   per-TC expected_outcome vs 실 결과 비교 → outcome_mismatches emit → findings-aggregator 가 surface → 본 gate read (live producer 배선).
     //   corroboration 0 동안 WARN (s2_outcome_mismatch rank 2 / go-with-warnings 허용 / DEC-2026-05-30-s2-gate-slice).
     if (expected.test === 'per_tc_outcome' && (findings.outcome_mismatches ?? 0) > 0) {
       reasons.push({

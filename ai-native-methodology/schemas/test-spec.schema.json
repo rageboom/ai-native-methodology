@@ -174,8 +174,8 @@
               },
               "report_format": {
                 "type": "string",
-                "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml"],
-                "description": "★ B5 — SARIF 2.1.0 (OASIS / GitHub Code Scanning native) 우선 권고"
+                "enum": ["sarif_2_1_0", "junit_xml", "jest_json", "pytest_json", "vitest_json", "lcov", "cobertura_xml", "jacoco_xml", "stdout_regex"],
+                "description": "★ B5 — SARIF 2.1.0 (OASIS / GitHub Code Scanning native) 우선 권고. ★ v11.19 stdout_regex = test-cmd `stdout-regex`(framework:other) 정규화 대응 (T14 / honesty — stdout 파싱 결과를 *_json 거짓 라벨 ❌)"
               },
               "flaky_retries_count": {
                 "type": "integer",

@@ -1,6 +1,6 @@
 // mock-detect — v8.8.0 Tier 1.1 (experimental opt-in)
 //
-// chain 4 GREEN false signal 검출. cycle-7 dogfood 표면화:
+// chain 5(implement) GREEN false signal 검출. cycle-7 dogfood 표면화:
 //   car.service.ts 가 prisma: unknown + scenarioState module-level counter +
 //   hardcoded return fixture 로 vitest pass=44 fail=0 line cov 92.59% 만족시킴.
 //   plugin test-impl-pass-validator 가 ok=true → 진정 비즈니스 검증 0 / false signal.

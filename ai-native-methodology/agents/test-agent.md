@@ -52,8 +52,9 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
 
 4. **test-run-test-evidence skill 호출** — 진짜 runner 실행:
    - `--allow-execute` flag 의무 (ADR-CHAIN-004 정합)
-   - 5종 물증 10 필드 산출 + result_hash sha256 정규화
-   - RED 검증 (fail_count > 0 / impl 부재)
+   - 5종 물증 10 필드 산출 + result_hash sha256 정규화 → test-spec `test_cases[].test_run_evidence` per-TC (★ top-level test_invocation_evidence ❌ = schema 금지)
+   - RED 검증 (S1/greenfield: fail_count > 0 / impl 부재)
+   - ★ S2(AX전환) 시 `--scenario S2 --test-spec <path>` flag → characterization GREEN + augmentation RED per-TC `outcome_mismatches` (gate-eval `per_tc_outcome` / s2_outcome_mismatch WARN)
 
 5. **test-verify-coverage skill 호출** — coverage 측정:
    - link_coverage (AC → TC) / test_pass_rate / line+branch_coverage 3 metric 분리
@@ -79,7 +80,7 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
 - `.aimd/output/test-spec.json` (★ schemas/test-spec.schema.json 의무)
 - `.aimd/output/test-spec.md` (★ 사람 눈)
 - 실 test 파일 (`*.test.ts` / `*.test.tsx` / `*Test.java` / `test_*.py` 등)
-- `.aimd/output/test_pass_evidence.json` (5종 물증 10 필드 + RED)
+- `.aimd/output/evidence/test-invocation-evidence.json` (★ runner standalone 산출물 / 5종 물증 10 필드 / RED — test-spec 는 per-TC `test_run_evidence` / `test_pass_evidence` 는 chain 5 impl-spec)
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #4)
 

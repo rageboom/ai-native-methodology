@@ -90,21 +90,32 @@ export function transformSchemaValidator(stdout) {
   };
 }
 
-// ★ test-impl-pass-validator JSON → findings 변환 (chain 3/4 한정)
-// 출력 shape: { test_results: { total, passed, failed }, findings: [], summary: {...} }
+// ★ test-impl-pass-validator JSON → findings 변환 (test=gate#4 / implement=gate#5 shared runner)
+// ★ F-I05 (INSPECTION-2026-05-31-implement) — cli.js 는 {pass_count,fail_count,skip_count} shape 를 emit하고
+//   test_results.{total,passed,failed} 는 부재 → 두 shape 모두 관용 (live 경로 tests_* 무음 0 차단 = I9 GREEN fail-closed guard 정합).
+// 출력 shape(legacy): { test_results: {total,passed,failed}, summary: {...} }
+// 출력 shape(cli.js):  { pass_count, fail_count, skip_count, ok_state, outcome_mismatches?, missing_actual? }
 export function transformTestImplPass(json) {
   const summary = json.summary ?? {};
   const testResults = json.test_results ?? {};
-  return {
+  const passed = testResults.passed ?? json.pass_count ?? 0;
+  const failed = testResults.failed ?? json.fail_count ?? 0;
+  const skipped = json.skip_count ?? 0;
+  const total = testResults.total ?? (passed + failed + skipped);
+  const out = {
     critical: summary.critical ?? 0,
     high: summary.high ?? 0,
     medium: summary.medium ?? 0,
     low: summary.low ?? 0,
     info: summary.info ?? 0,
-    tests_total: testResults.total ?? 0,
-    tests_passed: testResults.passed ?? 0,
-    tests_failed: testResults.failed ?? 0,
+    tests_total: total,
+    tests_passed: passed,
+    tests_failed: failed,
   };
+  // ★ F-I05 — S2 per_tc_outcome reconcile 결과 (cli.js --scenario S2 시 emit) → gate-eval.js outcome_mismatches 로 surface.
+  if (json.outcome_mismatches != null) out.outcome_mismatches = json.outcome_mismatches;
+  if (json.missing_actual != null) out.missing_actual = json.missing_actual;
+  return out;
 }
 
 // ★ generic JSON findings → severity count
@@ -160,11 +171,18 @@ export function mergeFindings(a, b) {
     merged.coverage_pct = Math.min(ap ?? 1, bp ?? 1);
     merged.coverage_threshold = a.coverage_threshold ?? b.coverage_threshold ?? 0.85;
   }
-  // ★ tests_* = chain 3/4 only / preserve b (latest) over a
+  // ★ tests_* = test(gate#4)/implement(gate#5) only / preserve b (latest) over a
   if (b.tests_total != null || a.tests_total != null) {
     merged.tests_total = b.tests_total ?? a.tests_total;
     merged.tests_passed = b.tests_passed ?? a.tests_passed;
     merged.tests_failed = b.tests_failed ?? a.tests_failed;
+  }
+  // ★ F-I05 — S2 per_tc_outcome reconcile 결과 보존 (tests_* 와 동일 latest non-null).
+  if (b.outcome_mismatches != null || a.outcome_mismatches != null) {
+    merged.outcome_mismatches = b.outcome_mismatches ?? a.outcome_mismatches;
+  }
+  if (b.missing_actual != null || a.missing_actual != null) {
+    merged.missing_actual = b.missing_actual ?? a.missing_actual;
   }
   return merged;
 }

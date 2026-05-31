@@ -50,6 +50,7 @@
     }
   ],
   "cross_cutting": {
+    "validators": ["plan-coverage-validator", "schema-validator"],
     "no_simulation": true,
     "gate": "#3 (★ v10.0.0 MAJOR Phase 4-4' 본격 hard gate 진입 / v9.3.0 deferred '#plan' placeholder 폐기)"
   },

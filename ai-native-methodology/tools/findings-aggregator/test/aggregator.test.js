@@ -97,7 +97,7 @@ describe('transformSchemaValidator', () => {
 });
 
 describe('transformTestImplPass', () => {
-  it('★ tests_total/passed/failed 정합 (chain 3/4 only)', () => {
+  it('★ legacy test_results shape — tests_total/passed/failed 정합', () => {
     const json = {
       summary: { critical: 0, high: 0 },
       test_results: { total: 12, passed: 10, failed: 2 },
@@ -106,6 +106,28 @@ describe('transformTestImplPass', () => {
     assert.equal(f.tests_total, 12);
     assert.equal(f.tests_passed, 10);
     assert.equal(f.tests_failed, 2);
+  });
+  it('★ F-I05 — cli.js shape(pass_count/fail_count/skip_count) → tests_* 정합 (무음 0 버그 차단)', () => {
+    // test-impl-pass-validator cli.js --json 실제 출력 shape (test_results 부재)
+    const json = { ok_state: 'fail', pass_count: 10, fail_count: 2, skip_count: 1 };
+    const f = transformTestImplPass(json);
+    assert.equal(f.tests_total, 13, '★ pass+fail+skip 합산 (예전엔 0 으로 무음 → I9 guard 무력)');
+    assert.equal(f.tests_passed, 10);
+    assert.equal(f.tests_failed, 2);
+  });
+  it('★ F-I05 — GREEN cli.js shape → tests_total>0 / failed=0 (I9 fail-closed guard 정합)', () => {
+    const f = transformTestImplPass({ ok_state: 'ok', pass_count: 5, fail_count: 0, skip_count: 0 });
+    assert.equal(f.tests_total, 5);
+    assert.equal(f.tests_failed, 0);
+  });
+  it('★ F-I05 — S2 outcome_mismatches/missing_actual surface', () => {
+    const f = transformTestImplPass({ pass_count: 3, fail_count: 0, skip_count: 0, outcome_mismatches: 1, missing_actual: 2 });
+    assert.equal(f.outcome_mismatches, 1);
+    assert.equal(f.missing_actual, 2);
+  });
+  it('★ F-I05 — outcome_mismatches 부재 시 필드 omit (S1/greenfield/S3 backward-compat)', () => {
+    const f = transformTestImplPass({ pass_count: 3, fail_count: 0, skip_count: 0 });
+    assert.equal(f.outcome_mismatches, undefined);
   });
 });
 
@@ -146,6 +168,13 @@ describe('mergeFindings', () => {
     const b = { critical: 0, high: 0, medium: 0, low: 0, info: 0, evidence_missing: ['e2', 'e3'] };
     const m = mergeFindings(a, b);
     assert.deepEqual(m.evidence_missing, ['e1', 'e2', 'e3']);
+  });
+  it('★ F-I05 — outcome_mismatches preserve latest (b)', () => {
+    const a = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
+    const b = { critical: 0, high: 0, medium: 0, low: 0, info: 0, outcome_mismatches: 2, missing_actual: 1 };
+    const m = mergeFindings(a, b);
+    assert.equal(m.outcome_mismatches, 2);
+    assert.equal(m.missing_actual, 1);
   });
 });
 

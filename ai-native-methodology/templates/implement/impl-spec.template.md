@@ -64,7 +64,7 @@
 
 ## 4. human_review (★ 70~80% 한계 schema 정합)
 
-- gate_4_intervention_pct: 0.10 (사용자 검토 ≤ 30%)
+- gate_4_intervention_pct: 0.10 (사용자 검토 ≤ 30% / ★ I17 — schema 필드명 잔재 / impl-spec 맥락 의미 = gate #5)
 - intervention_log: <gate #5 결단 trace>
 
 ## 검증

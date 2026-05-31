@@ -13,6 +13,14 @@ export function parsePytestJson(jsonOrText) {
 
   const summary = data.summary ?? {};
   const test_names = (data.tests ?? []).map(t => t.nodeid).filter(Boolean);
+  // ★ F-I05 — per-test {name,status} (S2 correlateByTcId 용 / additive).
+  const tests = (data.tests ?? [])
+    .filter(t => t.nodeid)
+    .map(t => ({
+      name: t.nodeid,
+      status: (t.outcome === 'passed' || t.outcome === 'xpassed') ? 'pass'
+        : (t.outcome === 'failed' || t.outcome === 'error') ? 'fail' : 'skip',
+    }));
 
   const pass_count = summary.passed ?? 0;
   const fail_count = (summary.failed ?? 0) + (summary.error ?? 0);
@@ -25,6 +33,7 @@ export function parsePytestJson(jsonOrText) {
     skip_count,
     total: summary.total ?? (pass_count + fail_count + skip_count),
     test_names,
+    tests,
     success: fail_count === 0 && pass_count > 0,
   };
 }
