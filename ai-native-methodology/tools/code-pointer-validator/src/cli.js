@@ -10,7 +10,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { validateCodePointers } from './validator.js';
+import { validateCodePointers, makeGitRunner, checkGraphFreshness } from './validator.js';
 
 function usage(code = 2) {
   console.error([
@@ -19,6 +19,7 @@ function usage(code = 2) {
     'options:',
     '  --repo-root <dir>       code_pointer.path 해석 base (default: cwd)',
     '  --strict                missing/path-not-found 를 high severity 로 (blocking)',
+    '  --git                   ★ Loop A — git 신호 활성 (A3 relocation→suggested_path / A2 content-drift). opt-in / 비-gating (medium)',
     '  --format text|json      출력 형식 (default: text)',
     '  --help / -h             도움말',
     '',
@@ -36,6 +37,7 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--strict') out.strict = true;
+    else if (a === '--git') out.git = true;
     else if (a === '--format') out.format = argv[++i];
     else if (a === '--help' || a === '-h') usage(0);
     else if (!out.graphPath) out.graphPath = a;
@@ -54,19 +56,27 @@ try {
   process.exit(2);
 }
 
+const repoRoot = args.repoRoot ?? process.cwd();
+const gitRunner = args.git ? makeGitRunner(repoRoot) : undefined;
 const result = validateCodePointers(graph, {
-  repoRoot: args.repoRoot ?? process.cwd(),
-  opts: { strict: args.strict },
+  repoRoot,
+  opts: { strict: args.strict, ...(gitRunner ? { gitRunner } : {}) },
 });
 
+// ★ Loop A / A1 — freshness (git 무관 / 항상 계산, stale 일 때만 노출)
+const freshness = checkGraphFreshness(graph, { repoRoot });
+
 if (args.format === 'json') {
-  console.log(JSON.stringify(result, null, 2));
+  console.log(JSON.stringify({ ...result, freshness }, null, 2));
 } else {
   const cv = result.coverage;
   const sum = result.summary;
   const status = (sum.high === 0 && (args.strict ? sum.medium === 0 : true)) ? 'PASS' : 'FAIL';
   console.log(`[code-pointer-validator] ${status} — coverage ${(cv.ratio * 100).toFixed(1)}% (covered=${cv.covered} / na=${cv.explicit_na} / missing=${cv.missing}) / pointers=${sum.pointers_checked}`);
   console.log(`  findings: high=${sum.high} medium=${sum.medium} low=${sum.low}`);
+  if (freshness.stale) {
+    console.log(`  ⚠ MEDIUM [graph] graph.stale — ${freshness.finding.message}`);
+  }
   for (const f of result.findings) {
     const tag = f.artifact_id ? `[${f.artifact_id}]` : '';
     console.log(`  ${f.severity.toUpperCase()} ${tag} ${f.kind} — ${f.message}`);

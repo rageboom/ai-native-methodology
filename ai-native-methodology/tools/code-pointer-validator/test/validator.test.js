@@ -11,7 +11,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateCodePointers } from '../src/validator.js';
+import { validateCodePointers, applyContentDrift, checkGraphFreshness } from '../src/validator.js';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -298,5 +298,150 @@ describe('mixed coverage — 통합 시나리오', () => {
     assert.doesNotThrow(() => validateCodePointers({}));
     assert.doesNotThrow(() => validateCodePointers({ nodes: null }));
     assert.doesNotThrow(() => validateCodePointers(null));
+  });
+});
+
+// ============================================================================
+// 6. ★ Loop A (동기화 루프) — A3 relocation / A2 content-drift / A1 freshness
+//    git 신호는 opt-in (opts.gitRunner). 미주입 = 기존 behavior (회귀 가드).
+// ============================================================================
+
+// 설정 가능한 fake gitRunner — 실 git 없이 결정적 단위테스트.
+function fakeGit({ renameTo = null, changed = false, throwCmd = null } = {}) {
+  return (args) => {
+    if (throwCmd && args[0] === throwCmd) throw new Error('git unavailable');
+    const last = args[args.length - 1];
+    if (args[0] === 'log') return renameTo ? `R100\t${last}\t${renameTo}\n` : '';
+    if (args[0] === 'diff') return changed ? `${last}\n` : '';
+    return '';
+  };
+}
+
+describe('Loop A / A3 — relocation → suggested_path', () => {
+  it('path_missing + gitRunner 이동추적 성공(새 경로 존재) → finding.suggested_path', () => {
+    const repo = makeRepoRoot();
+    writeFileSync(join(repo, 'moved.kt'), 'fun signup() {}'); // 이동처 실제 존재
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'ghost.kt', anchor_type: 'strict_path' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ renameTo: 'moved.kt' }) } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.path_missing');
+    assert.ok(f);
+    assert.equal(f.suggested_path, 'moved.kt');
+    rmSync(repo, { recursive: true });
+  });
+
+  it('이동처가 현재 존재하지 않으면 제안 안 함 (날조 ❌)', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'ghost.kt', anchor_type: 'strict_path' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ renameTo: 'nonexistent.kt' }) } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.path_missing');
+    assert.ok(f);
+    assert.equal(f.suggested_path, undefined);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('gitRunner throw (git 부재) → graceful, suggested_path 없음', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'ghost.kt', anchor_type: 'strict_path' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ throwCmd: 'log' }) } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.path_missing');
+    assert.ok(f);
+    assert.equal(f.suggested_path, undefined);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('회귀 가드 — gitRunner 미주입이면 suggested_path 시도 안 함', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'ghost.kt', anchor_type: 'strict_path' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo });
+    const f = r.findings.find(x => x.kind === 'code_pointer.path_missing');
+    assert.ok(f);
+    assert.equal(f.suggested_path, undefined);
+    rmSync(repo, { recursive: true });
+  });
+});
+
+describe('Loop A / A2 — content-drift 탐지', () => {
+  it('파일 존재 + commit_hash + git 변경감지 → content_drift finding', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ changed: true }) } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.content_drift');
+    assert.ok(f);
+    assert.equal(f.artifact_id, 'IMPL-1');
+    assert.equal(f.base_commit, 'abc1234');
+    rmSync(repo, { recursive: true });
+  });
+
+  it('변경 없음 → content_drift 없음', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ changed: false }) } });
+    assert.equal(r.findings.find(x => x.kind === 'code_pointer.content_drift'), undefined);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('회귀 가드 — gitRunner 미주입이면 commit_hash 있어도 content_drift 없음', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo });
+    assert.equal(r.findings.length, 0);
+    rmSync(repo, { recursive: true });
+  });
+});
+
+describe('Loop A / A2 producer — applyContentDrift (state machine)', () => {
+  it('active → drift + drift_reason / propose·drift 보존', () => {
+    const graph = { nodes: [
+      node('X', { state: 'active' }),
+      node('Y', { state: 'propose' }),
+      node('Z', { state: 'drift' }),
+    ] };
+    const findings = [
+      { kind: 'code_pointer.content_drift', artifact_id: 'X' },
+      { kind: 'code_pointer.content_drift', artifact_id: 'Y' },
+      { kind: 'code_pointer.content_drift', artifact_id: 'Z' },
+    ];
+    const res = applyContentDrift(graph, findings);
+    assert.equal(res.applied, 1);
+    assert.equal(graph.nodes[0].state, 'drift');
+    assert.ok(graph.nodes[0].drift_reason);
+    assert.equal(graph.nodes[1].state, 'propose'); // content_changed 무효 전이 → 보존
+    assert.equal(graph.nodes[2].state, 'drift');
+  });
+
+  it('content_drift finding 없으면 무변경', () => {
+    const graph = { nodes: [node('X', { state: 'active' })] };
+    const res = applyContentDrift(graph, [{ kind: 'code_pointer.path_missing', artifact_id: 'X' }]);
+    assert.equal(res.applied, 0);
+    assert.equal(graph.nodes[0].state, 'active');
+  });
+});
+
+describe('Loop A / A1 — checkGraphFreshness', () => {
+  it('source 가 synthesized_at 이후 변경 → stale + finding', () => {
+    const repo = makeRepoRoot();
+    writeFileSync(join(repo, 'spec.json'), '{}'); // mtime = now
+    const graph = { synthesized_at: '2000-01-01T00:00:00.000Z', derived_from: ['spec.json'] };
+    const fr = checkGraphFreshness(graph, { repoRoot: repo });
+    assert.equal(fr.stale, true);
+    assert.ok(fr.finding);
+    assert.deepEqual(fr.stale_sources, ['spec.json']);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('source 가 synthesized_at 이전 → not stale', () => {
+    const repo = makeRepoRoot();
+    writeFileSync(join(repo, 'spec.json'), '{}');
+    const graph = { synthesized_at: '2999-01-01T00:00:00.000Z', derived_from: ['spec.json'] };
+    const fr = checkGraphFreshness(graph, { repoRoot: repo });
+    assert.equal(fr.stale, false);
+    assert.equal(fr.finding, null);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('source 부재 → skip (stale 아님)', () => {
+    const graph = { synthesized_at: '2000-01-01T00:00:00.000Z', derived_from: ['nonexistent-xyz.json'] };
+    const fr = checkGraphFreshness(graph, { repoRoot: tmpdir() });
+    assert.equal(fr.stale, false);
   });
 });

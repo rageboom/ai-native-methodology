@@ -17,6 +17,7 @@
 
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, basename, isAbsolute, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const TRAVERSABLE_STATES = new Set(['active', 'drift']);
 const VALID_ANCHOR_TYPES = new Set(['strict_path', 'glob', 'ast_symbol', 'doc_link']);
@@ -40,6 +41,58 @@ function simpleGlobMatch(repoRoot, p) {
   }
   const regex = new RegExp('^' + pat.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$');
   return entries.filter(e => regex.test(e)).map(e => join(dir, e));
+}
+
+// ============================================================================
+// ★ Loop A (동기화 루프 / docs/dependency-graph.md §3 Loop A) — 결정론 git 신호.
+//   A3 relocation → suggested_path / A2 content-drift → drift 생산자.
+//   전부 opt-in (opts.gitRunner 주입 시에만 동작) → 기존 호출부 behavior 무변경 (release-readiness #16 포함).
+//   git 부재·repo 아님·추적 불가 = graceful null (no-simulation: 날조 ❌ / 환경 부재 정직 skip).
+// ============================================================================
+
+// 실 git 호출 래퍼 (cross-platform — git 은 native exe). 실패 시 throw → 호출부가 catch.
+export function makeGitRunner(repoRoot = process.cwd()) {
+  return (args) => execFileSync('git', args, {
+    cwd: repoRoot,
+    encoding: 'utf-8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+    timeout: 5000,
+    windowsHide: true,
+  });
+}
+
+// A3 — path 가 사라졌을 때 git rename 이력에서 새 경로 추정 (blob-hash + 유사도).
+//   gitRunner(args)->stdout. 추적 불가/실패/새 경로 부재 = null (제안 없음).
+export function findRelocation(path, { gitRunner, repoRoot = process.cwd() } = {}) {
+  if (typeof gitRunner !== 'function') return null;
+  let out;
+  try {
+    out = gitRunner(['log', '-M', '--diff-filter=R', '--name-status', '--format=', '--', path]);
+  } catch {
+    return null; // git 부재 / repo 아님 / 추적 불가
+  }
+  if (!out) return null;
+  for (const line of out.split('\n')) {
+    const m = line.match(/^R\d*\t(.+?)\t(.+)$/); // R<score>\told\tnew (log 최신순 → 첫 매치 = 최근 이동)
+    if (m && m[1] === path) {
+      const candidate = m[2].trim();
+      const full = isAbsolute(candidate) ? candidate : join(repoRoot, candidate);
+      return existsSync(full) ? candidate : null; // 현재 실제 존재할 때만 제안
+    }
+  }
+  return null;
+}
+
+// A2 — commit_hash 시점 대비 HEAD 에서 path 내용 변경 여부. 변경=true / 무변경=false / 판정불가=null.
+export function detectContentDrift(path, commitHash, { gitRunner } = {}) {
+  if (typeof gitRunner !== 'function' || !commitHash) return null;
+  let out;
+  try {
+    out = gitRunner(['diff', '--name-only', commitHash, 'HEAD', '--', path]);
+  } catch {
+    return null; // commit 무효 / git 부재
+  }
+  return out.trim().length > 0;
 }
 
 function validateOnePointer(pointer, { repoRoot, opts = {} }) {
@@ -68,13 +121,36 @@ function validateOnePointer(pointer, { repoRoot, opts = {} }) {
   if (anchor_type === 'strict_path') {
     const full = isAbsolute(path) ? path : join(repoRoot, path);
     if (!existsSync(full)) {
-      findings.push({
+      const finding = {
         kind: 'code_pointer.path_missing',
         severity: opts.strict ? 'high' : 'medium',
         anchor_type, path,
         resolved_path: full,
         message: `strict_path '${path}' 가 존재하지 않음`,
-      });
+      };
+      // ★ Loop A / A3 — git rename 이력에서 이동처 추정 → suggested_path (opt-in / opts.gitRunner).
+      if (opts.gitRunner) {
+        const reloc = findRelocation(path, { gitRunner: opts.gitRunner, repoRoot });
+        if (reloc) {
+          finding.suggested_path = reloc;
+          finding.message += ` — git 이동 추적: '${reloc}' (suggested_path)`;
+        }
+      }
+      findings.push(finding);
+      return findings;
+    }
+    // ★ Loop A / A2 — 파일 존재하나 commit_hash 시점 이후 내용 변경 = content-drift (opt-in).
+    if (opts.gitRunner && pointer.commit_hash) {
+      const drifted = detectContentDrift(path, pointer.commit_hash, { gitRunner: opts.gitRunner });
+      if (drifted === true) {
+        findings.push({
+          kind: 'code_pointer.content_drift',
+          severity: opts.strict ? 'high' : 'medium',
+          anchor_type, path,
+          base_commit: pointer.commit_hash,
+          message: `strict_path '${path}' 내용이 commit_hash(${pointer.commit_hash.slice(0, 7)}) 이후 변경됨 — anchor content-drift (노드 state→drift 권고)`,
+        });
+      }
     }
     return findings;
   }
@@ -211,5 +287,60 @@ export function validateCodePointers(graph, { repoRoot = process.cwd(), opts = {
       low: findings.filter(f => f.severity === 'low').length,
       pointers_checked: pointersChecked,
     },
+  };
+}
+
+// ============================================================================
+// ★ Loop A 그래프 레벨 헬퍼 (validateCodePointers 와 분리 — 기존 반환 shape 무변경)
+// ============================================================================
+
+// A2 producer→state — content_drift finding 을 노드 상태로 적용.
+//   active --content_changed--> drift (graph-synthesizer TRANSITIONS 와 동형 / cross-package import 회피로 inline).
+//   drift = 유지 / propose·deprecated = content_changed 무효 전이이므로 skip.
+//   ※ graph 객체 in-place 변형. 디스크 기록(live graph 반영)은 호출부(SessionStart/driver) 책임 = 별도 wiring slice.
+export function applyContentDrift(graph, findings) {
+  const driftedIds = new Set(
+    (findings ?? [])
+      .filter(f => f.kind === 'code_pointer.content_drift' && f.artifact_id)
+      .map(f => f.artifact_id)
+  );
+  let applied = 0;
+  for (const n of graph?.nodes ?? []) {
+    if (!driftedIds.has(n.id)) continue;
+    if (n.state === 'active') {
+      n.state = 'drift';
+      if (!n.drift_reason) n.drift_reason = 'code content changed since validated commit (Loop A content-drift)';
+      applied++;
+    }
+  }
+  return { applied, drifted_ids: [...driftedIds] };
+}
+
+// A1 freshness — graph.synthesized_at vs derived_from source mtime. source 가 더 최신이면 stale.
+//   (graph 파일 부재=absent 는 호출부가 파일 IO 단계에서 판단 / 본 함수는 로드된 graph 대상)
+export function checkGraphFreshness(graph, { repoRoot = process.cwd() } = {}) {
+  const synthAt = graph?.synthesized_at ? Date.parse(graph.synthesized_at) : NaN;
+  const sources = Array.isArray(graph?.derived_from) ? graph.derived_from : [];
+  const staleSources = [];
+  let newest = 0;
+  for (const src of sources) {
+    const full = isAbsolute(src) ? src : join(repoRoot, src);
+    let mt;
+    try { mt = statSync(full).mtimeMs; } catch { continue; } // source 부재 = skip
+    if (mt > newest) newest = mt;
+    if (!Number.isNaN(synthAt) && mt > synthAt) staleSources.push(src);
+  }
+  const stale = staleSources.length > 0;
+  return {
+    stale,
+    synthesized_at: graph?.synthesized_at ?? null,
+    newest_source_mtime: newest || null,
+    stale_sources: staleSources,
+    finding: stale ? {
+      kind: 'graph.stale',
+      severity: 'medium',
+      message: `artifact-graph stale — ${staleSources.length} 개 source 가 synthesized_at(${graph.synthesized_at ?? '?'}) 이후 변경: ${staleSources.slice(0, 5).join(', ')}${staleSources.length > 5 ? ' …' : ''}`,
+      stale_sources: staleSources,
+    } : null,
   };
 }
