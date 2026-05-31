@@ -1,0 +1,2 @@
+# git hook 스크립트는 LF 고정 — CRLF 면 Unix 에서 shebang/sh 가 깨짐 (/bin/sh^M: bad interpreter).
+pre-push text eol=lf

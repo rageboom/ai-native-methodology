@@ -1,0 +1,33 @@
+#!/bin/sh
+# pre-push — AI-Native methodology release gate (F-AUDIT-SOFTGATE-001 후속 / 사내 CI(GitHub Actions) 부재 대응).
+#
+# git push 직전 release-readiness self-test (npm run test:release) 실행 → 실패 시 push 중단.
+#   - 검증 범위: self-test 정합(17→22 류 rot 차단) + A1 case 가 full release-readiness(22/22) + workspace test(879) 전수 실행.
+#   - 사내(GitHub Actions 없음)에서도 작동 — git 만 있으면 됨. 서버 CI 불필요.
+#   - bypass: git push --no-verify   (escape hatch — 책임은 사용자 / intervention)
+#
+# 설치(클론마다 1회): node ai-native-methodology/scripts/setup-git-hooks.js
+#   (git 은 보안상 버전관리된 hook 을 자동 실행하지 않음 → core.hooksPath 설정 필요)
+
+# 본 스크립트 위치 = <methodology>/scripts/githooks/pre-push → ../.. = methodology root (package.json 위치)
+HOOK_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+METH_ROOT=$(CDPATH= cd -- "$HOOK_DIR/../.." && pwd)
+
+echo "[pre-push] release gate: npm run test:release (self-test + full release-readiness + workspace 879) — ~1-2min"
+echo "[pre-push] 우회가 필요하면: git push --no-verify"
+
+cd "$METH_ROOT" || { echo "[pre-push] methodology root 진입 실패: $METH_ROOT" >&2; exit 1; }
+
+if [ ! -d node_modules ]; then
+  echo "[pre-push] node_modules 부재 — 먼저 'npm ci'(또는 npm install) 후 재시도. (push 차단)" >&2
+  exit 1
+fi
+
+npm run test:release
+rc=$?
+if [ "$rc" -ne 0 ]; then
+  echo "[pre-push] FAIL: release gate (test:release exit $rc) — push 중단. 수정 후 재시도하거나 'git push --no-verify' 로 우회." >&2
+  exit "$rc"
+fi
+echo "[pre-push] OK: release gate pass — push 진행."
+exit 0

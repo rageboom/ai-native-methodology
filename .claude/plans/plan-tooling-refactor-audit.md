@@ -184,7 +184,8 @@ placeholder를 complete로 위장 / broken ref / 양심 의존 강제 / gate 없
 | A+B | `9b3dec9` | planning→discovery rename 잔재 정리 (alias/dispatch/flag 정규화) + R16/R17 vestigial §4.1/§4.6 제거(retarget) — 18 files |
 | C | `a3776f4` | check21 dead-gate 복구(machine marker + .template.* 전수 + fail-closed) + check22 baseline broken-ref 해소 + self-test 17→22(5 fail→14 pass) + charter 카운트 21/19 단일화 — 5 files |
 | B4 | `ac7f12d` | findings-aggregator = **① 주장 교정** (도구 유지 / "mandatory 자동 auto-feeder" 거짓 선언 정정 → "선택적 operator 보조") — cli.js/aggregator.js header + guides + tools/README |
-| F-SOFTGATE | (본 커밋) | **F-AUDIT-SOFTGATE-001(=C-13) fail-closed — Option C**: findings 미제출 시 `next` block(reason=findings_unverified, rank 2) + `--user-decision go` 명시 ack(intervention-log actor:user) escape. gate-eval 순수성 보존(sentinel in, reason out). chain-driver cli.js+gate-eval.js + 5 test (255/255) |
+| F-SOFTGATE | `04a6a0b` | **F-AUDIT-SOFTGATE-001(=C-13) fail-closed — Option C**: findings 미제출 시 `next` block(reason=findings_unverified, rank 2) + `--user-decision go` 명시 ack(intervention-log actor:user) escape. gate-eval 순수성 보존(sentinel in, reason out). chain-driver cli.js+gate-eval.js + 5 test (255/255) |
+| CI-GATE | (본 커밋) | **release-readiness CI 미연동 해소 — git pre-push hook** (사내 GitHub Actions 부재 / 사용자 결정 G): `scripts/githooks/pre-push`(npm run test:release) + `setup-git-hooks.js`(core.hooksPath 설정). git push 시 self-test+게이트+workspace(879) 자동 강제. e2e smoke exit 0. 한계: 클론마다 1회 install / `--no-verify` 우회 / 터미널 push 포함(Claude Code PreToolUse hook 무관 / §4.1 "빠를 것" 무관) |
 
 ### 신규 발견 (audit 후속)
 
@@ -192,7 +193,6 @@ placeholder를 complete로 위장 / broken ref / 양심 의존 강제 / gate 없
 
 ### 잔여 (deferred / 사용자 판단)
 
-- release-readiness CI 미연동 → self-test silent rot 재발 가능 (`test:release` 를 CI/workspace 에 wiring 할지).
 - CHANGELOG 의 phantom alias 주장("transformPlanningExtraction 보존") — 역사 기록이라 미수정 / 향후 release writeup 시 정정.
 - `tools/README.md` gate 번호 표기 (spec-test-link "gate #3" 등) v10 재번호 미반영 의심 — 별도 doc-sync.
 - 라인엔딩(CRLF/LF) 노이즈 ~20 파일 — repo `.gitattributes` 정규화 별건.
