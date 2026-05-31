@@ -10,7 +10,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { validateCodePointers, makeGitRunner, checkGraphFreshness, applyContentDrift } from './validator.js';
+import { validateCodePointers, makeGitRunner, checkGraphFreshness, applyContentDrift, computeGateFail } from './validator.js';
 
 function usage(code = 2) {
   console.error([
@@ -26,7 +26,7 @@ function usage(code = 2) {
     '',
     'exit codes:',
     '  0 = pass',
-    '  1 = fail (severity high 또는 strict 모드의 medium)',
+    '  1 = fail (severity high 또는 strict 모드의 medium / ★ content_drift 는 §8.1 non-gating = 제외)',
     '  2 = usage error',
   ].join('\n'));
   process.exit(code);
@@ -79,12 +79,15 @@ if (args.applyDrift) {
   }
 }
 
+// ★ gate(fail) — content_drift 제외 (computeGateFail / §8.1 non-gating). status 표시와 exit code 동일 logic 사용.
+const fail = computeGateFail(result.findings, { strict: args.strict });
+
 if (args.format === 'json') {
   console.log(JSON.stringify({ ...result, freshness }, null, 2));
 } else {
   const cv = result.coverage;
   const sum = result.summary;
-  const status = (sum.high === 0 && (args.strict ? sum.medium === 0 : true)) ? 'PASS' : 'FAIL';
+  const status = fail ? 'FAIL' : 'PASS';
   console.log(`[code-pointer-validator] ${status} — coverage ${(cv.ratio * 100).toFixed(1)}% (covered=${cv.covered} / na=${cv.explicit_na} / missing=${cv.missing}) / pointers=${sum.pointers_checked}`);
   console.log(`  findings: high=${sum.high} medium=${sum.medium} low=${sum.low}`);
   if (freshness.stale) {
@@ -99,5 +102,4 @@ if (args.format === 'json') {
   }
 }
 
-const fail = result.summary.high > 0 || (args.strict && result.summary.medium > 0);
 process.exit(fail ? 1 : 0);

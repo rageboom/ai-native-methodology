@@ -9,6 +9,31 @@
 
 ---
 
+## [11.20.0] — 2026-06-01 MINOR — Living dep-graph: 동기화 루프(Loop A) + 소비 루프(Loop B) v1 (P0 양방향 역동기화 배선 / 결정론·read-class)
+
+dep-graph 가 "만들기"만 하고 비어 있던 **두 루프**(상태↔그래프 동기화 / 각 stage 의 그래프 소비)를 결정론·read-class 로 채움. P0(산출물 = LLM 운영 컨텍스트를 평생 양방향 역동기화하여 AX 운영)의 운영 배선. trust 선 §2 준수 — 결정론 git 신호만 권위적, 휴리스틱 active 자동쓰기 ❌. gate-class 후보(A4/A5/B5/contract/coverage)는 §8.1 ≥2 distinct 도메인 전 전부 DEFER.
+
+### Loop A — 동기화 루프 (code-pointer-validator / 결정론 git 신호 / 전부 opt-in)
+- **A1 freshness** — `checkGraphFreshness()`: graph.synthesized_at vs derived_from source mtime → `graph.stale` finding. git 무관·상시 계산·display-only (exit code 무영향).
+- **A2 content-drift** — `detectContentDrift()`: 저장된 commit_hash 기준 git blob-diff(`git diff --name-only <hash> HEAD`) → `code_pointer.content_drift` finding (opt-in `--git`). `applyContentDrift()` 생산자 (active→drift / graph-synthesizer TRANSITIONS 와 isomorphic).
+- **A2-wire** — `--apply-drift`: content-drift 노드를 state=drift 로 live artifact-graph.json 에 기록 (변경 시에만 write / 어떤 hook·gate·release-readiness 도 자동 호출 ❌ = 수동 opt-in).
+- **A3 relocation** — `findRelocation()`: git `log -M --diff-filter=R` rename 이력 → `path_missing` finding 에 `suggested_path` 첨부 (제안만 / auto-commit ❌ / 이동처 실존 시에만 = 날조 ❌). dead schema 필드 활성화.
+- 전부 opt-in (`--git`/`--apply-drift`) / git 부재·repo 아님 = graceful null (no-simulation). 기존 `validateCodePointers` 반환 shape + release-readiness #16(`--git` 미전달) 무영향.
+
+### Loop B — 소비 루프 (chain-driver navigate F3/F4 + 5 stage agent consult / read-class)
+- **consult** — discovery/spec/plan/test/implement agent body 에 "dep-graph 소비" 섹션: stage 진입 시 작업 노드를 `chain-driver navigate` 로 조회 (backward=honor / forward=영향 / code_pointers), AI 추론 0% verbatim. PLAN 의 의존성 AI-재유추 → 그래프 조회 전환 명시. frontmatter skills[] 무변경 (Bash+CLI / skills≡phase-flow invariant 보존).
+- **F3** — `navigate --stage <s>` / `--scope <id>`: 단일노드→단계 일괄 의존성 rollup (STAGE_SUBKINDS / scope_id·state filter / analyzeImpact·centrality 재사용).
+- **F4** — stage 방향 프리셋 (discovery/spec/implement=backward / plan/test=forward) + `--direction` override. presentation-only (analyzeImpact 무변경).
+
+### ★ A2 §8.1 hardening (release 검증 sub-agent finding 흡수)
+- content_drift 가 `--strict` 에서 high→exit1 로 격상되던 **latent 단일 도메인 hard-gate 제거**: severity **medium 고정**(--strict 와 무관) + 신규 `computeGateFail()` 가 content_drift 를 gate(fail) 계산에서 **제외** (medium 보고만 / 가시성 유지). ≥2 distinct 도메인 corroboration 전까지 non-gating (trust 선 §2 / §8.1 정합). CLI usage·exit-code 문구 정합. ※ A1 freshness 는 애초에 result.findings 외부 → 자동 non-gating.
+
+### 검증
+- code-pointer-validator 35→**39** test (content_drift medium-under-strict + computeGateFail decouple anti-regression anchor 3종) / chain-driver navigate 20/20 / workspace 973→**977** / drift-validator chain-layout 0 orphan·0 missing / skill-citation 0 stale / release-readiness 26/26 + version 3-way 11.20.0.
+- 실 CLI 실측 (no-simulation): poc-05 `--git --strict` → 5 MEDIUM content_drift / **PASS exit 0** (decouple 입증).
+
+DEC-2026-06-01-living-dep-graph-loops.
+
 ## [11.19.0] — 2026-06-01 MINOR — 배포 6단계 점검 carry-queue 6종 종결 + 결정론 gate 1종 신설 (check26)
 
 v11.18.0(배포 6단계 점검)이 deferred 한 `decisions/INSPECTION-LEDGER.md §3` carry-queue 6종을 전부 종결 (additive / breaking 0 / release-readiness 25→26). 점검이 스스로 찾아 "별도 묶음"으로 미뤄둔 자기 finding — 실제 correctness/결정론 구멍(cosmetic doc drift 아님).

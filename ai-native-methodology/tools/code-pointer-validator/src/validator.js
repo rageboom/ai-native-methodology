@@ -144,11 +144,14 @@ function validateOnePointer(pointer, { repoRoot, opts = {} }) {
       const drifted = detectContentDrift(path, pointer.commit_hash, { gitRunner: opts.gitRunner });
       if (drifted === true) {
         findings.push({
+          // ★ §8.1 (DEC-2026-06-01-living-dep-graph-loops) — content_drift 는 --strict 와 무관하게 medium 고정.
+          //   단일 도메인(RealWorld/poc-05) git blob-diff verdict → ≥2 distinct 도메인 corroboration 전까지 non-gating.
+          //   gate(fail) 제외는 computeGateFail() 가 kind 로 필터 (medium 으로 보고만 / 가시성 유지).
           kind: 'code_pointer.content_drift',
-          severity: opts.strict ? 'high' : 'medium',
+          severity: 'medium',
           anchor_type, path,
           base_commit: pointer.commit_hash,
-          message: `strict_path '${path}' 내용이 commit_hash(${pointer.commit_hash.slice(0, 7)}) 이후 변경됨 — anchor content-drift (노드 state→drift 권고)`,
+          message: `strict_path '${path}' 내용이 commit_hash(${pointer.commit_hash.slice(0, 7)}) 이후 변경됨 — anchor content-drift (노드 state→drift 권고 / non-gating)`,
         });
       }
     }
@@ -288,6 +291,18 @@ export function validateCodePointers(graph, { repoRoot = process.cwd(), opts = {
       pointers_checked: pointersChecked,
     },
   };
+}
+
+// gate(fail) 판정 — CLI exit code + release-readiness #16 의 PASS/FAIL 결정.
+//   high severity = 항상 gating / medium = --strict 일 때만 gating.
+//   ★ §8.1 (DEC-2026-06-01-living-dep-graph-loops): content_drift 는 단일 도메인 git verdict →
+//   ≥2 distinct 도메인 corroboration 전까지 gate 제외 (medium 으로 보고만 / --strict 와도 decouple).
+//   ※ A1 freshness(graph.stale)는 애초에 result.findings 외부(checkGraphFreshness 별도) → 자동 제외.
+export function computeGateFail(findings, { strict = false } = {}) {
+  const gating = (findings ?? []).filter(f => f.kind !== 'code_pointer.content_drift');
+  const high = gating.filter(f => f.severity === 'high').length;
+  const medium = gating.filter(f => f.severity === 'medium').length;
+  return high > 0 || (strict && medium > 0);
 }
 
 // ============================================================================

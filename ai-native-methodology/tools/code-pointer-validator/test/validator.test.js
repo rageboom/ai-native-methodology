@@ -11,7 +11,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateCodePointers, applyContentDrift, checkGraphFreshness } from '../src/validator.js';
+import { validateCodePointers, applyContentDrift, checkGraphFreshness, computeGateFail } from '../src/validator.js';
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -386,6 +386,39 @@ describe('Loop A / A2 — content-drift 탐지', () => {
     const r = validateCodePointers(graph, { repoRoot: repo });
     assert.equal(r.findings.length, 0);
     rmSync(repo, { recursive: true });
+  });
+
+  it('★ §8.1 — content_drift 는 --strict(opts.strict) 여도 medium 고정 (단일 도메인 latent hard-gate 회피)', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ changed: true }), strict: true } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.content_drift');
+    assert.ok(f);
+    assert.equal(f.severity, 'medium'); // --strict 에도 high 로 격상 ❌ — content_drift 는 gate-eligible 아님 (§8.1)
+    rmSync(repo, { recursive: true });
+  });
+});
+
+describe('computeGateFail — ★ §8.1 content_drift 는 gate(fail) 제외', () => {
+  it('content_drift(medium) 단독은 --strict 여도 fail 아님 (decouple)', () => {
+    const findings = [{ kind: 'code_pointer.content_drift', severity: 'medium', artifact_id: 'X' }];
+    assert.equal(computeGateFail(findings, { strict: false }), false);
+    assert.equal(computeGateFail(findings, { strict: true }), false); // ★ --strict 와 decouple — 핵심 anti-regression
+  });
+
+  it('high finding 은 strict 무관 fail / 일반 medium 은 --strict 일 때만 fail', () => {
+    assert.equal(computeGateFail([{ kind: 'code_pointer.path_missing', severity: 'high' }], {}), true);
+    const med = [{ kind: 'code_pointer.coverage_missing', severity: 'medium' }];
+    assert.equal(computeGateFail(med, { strict: false }), false);
+    assert.equal(computeGateFail(med, { strict: true }), true);
+  });
+
+  it('content_drift + 실제 gating finding 공존 시 gating finding 으로 fail (content_drift 는 무영향)', () => {
+    const findings = [
+      { kind: 'code_pointer.content_drift', severity: 'medium' },
+      { kind: 'code_pointer.path_missing', severity: 'high' },
+    ];
+    assert.equal(computeGateFail(findings, { strict: false }), true);
   });
 });
 
