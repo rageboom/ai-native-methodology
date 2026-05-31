@@ -78,6 +78,55 @@ describe('chain-driver navigate', () => {
   });
 });
 
+describe('chain-driver navigate --stage / --scope rollup (★ F3 / Loop B)', () => {
+  it('--stage spec → BHV/AC 노드 rollup (--json)', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec', '--json']);
+    assert.equal(r.status, 0);
+    const out = JSON.parse(r.stdout);
+    assert.equal(out.query.stage, 'spec');
+    assert.equal(out.count, 2);
+    assert.deepEqual(out.nodes.map(n => n.id).sort(), ['AC-1', 'BHV-1']);
+    assert.ok(out.nodes[0].by_grade);
+    assert.ok(Array.isArray(out.top_impact_roots));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--stage discovery → UC 만', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'discovery', '--json']);
+    assert.equal(r.status, 0);
+    const out = JSON.parse(r.stdout);
+    assert.deepEqual(out.nodes.map(n => n.id), ['UC-1']);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--stage text 출력: rollup 헤더 + honor 라인', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'spec']);
+    assert.equal(r.status, 0);
+    assert.match(r.stdout, /rollup — stage=spec/);
+    assert.match(r.stdout, /honor\(MUST\)/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('미지원 stage → exit 3', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--stage', 'bogus']);
+    assert.equal(r.status, 3);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--scope 필터 (매칭 노드 없으면 count 0)', () => {
+    const { dir, path } = makeGraph();
+    const r = run(['navigate', '--graph', path, '--scope', 'nonexistent', '--json']);
+    assert.equal(r.status, 0);
+    const out = JSON.parse(r.stdout);
+    assert.equal(out.count, 0);
+    rmSync(dir, { recursive: true });
+  });
+});
+
 describe('SessionStart 그래프 주입 (dep-graph P4 결정 7)', () => {
   it('artifact-graph.json 있으면 dirty count + top-3 impact root 주입', () => {
     const dir = mkdtempSync(join(tmpdir(), 'dg-session-'));

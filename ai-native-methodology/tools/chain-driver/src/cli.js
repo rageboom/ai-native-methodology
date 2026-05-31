@@ -62,6 +62,7 @@ function usage(code = 3) {
     '  sync <project> [--scope <slug>]',
     '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
     '  navigate --graph <artifact-graph.json> --origin <node-id> [--json]   (dep-graph-navigator backend)',
+    '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
     '  suggest-skill --prompt <text>',
     '  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
     '  migrate <project>',
@@ -354,12 +355,87 @@ function cmdQuery(args) {
   process.exit(0);
 }
 
+// ★ F3 (Loop B / 소비 루프) — stage → artifact_subkind 매핑 (각 단계 일괄 조회용).
+const STAGE_SUBKINDS = {
+  discovery: ['UC'],
+  spec: ['BHV', 'AC'],
+  plan: ['TASK', 'EPIC', 'STORY', 'OP'],
+  test: ['TC'],
+  implement: ['IMPL'],
+};
+
+// ★ F3 — stage/scope 단위 일괄 의존성 rollup ("이 단계가 무엇을 honor/affect 하나" 한 번에).
+//   단일 --origin 대신 --stage <s> 또는 --scope <id> → 해당 노드 전부의 backward(honor)/forward(affects) 집계.
+//   AI 추론 0% — analyzeImpact (결정론 BFS) 재사용. dep-graph-navigator skill 및 stage agent consult 의 단계-일괄 채널.
+function cmdNavigateRollup(graph, args) {
+  if (args.stage && !STAGE_SUBKINDS[args.stage]) {
+    console.error(`[chain-driver] navigate --stage: unknown stage '${args.stage}' (discovery|spec|plan|test|implement)`);
+    process.exit(3);
+  }
+  const subkinds = args.stage ? new Set(STAGE_SUBKINDS[args.stage]) : null;
+  const TRAVERSABLE = new Set(['active', 'drift']);
+  const target = (graph.nodes ?? []).filter(n =>
+    TRAVERSABLE.has(n.state)
+    && (!subkinds || subkinds.has(n.artifact_subkind))
+    && (!args.scope || n.scope_id === args.scope)
+  );
+
+  const policyPath = args.policyPath
+    || join(resolveRepoRoot(process.cwd()), 'policies', 'propagation-policy.json');
+  let policy = null;
+  try { policy = loadPolicy(policyPath); } catch { policy = null; }
+  const nonTraversable = policy?.non_traversable_states ?? ['propose'];
+
+  const items = [];
+  for (const n of target) {
+    let impact;
+    try {
+      impact = analyzeImpact(graph, n.id, {
+        baseGradeOverrides: policy?.edge_grade_overrides ?? undefined,
+        nonTraversableStates: nonTraversable,
+      });
+    } catch { continue; }
+    items.push({
+      id: n.id,
+      artifact_subkind: n.artifact_subkind,
+      state: n.state,
+      by_grade: impact.by_grade,
+      forward: impact.forward,
+      backward: impact.backward,
+      code_pointers: (n.code_pointers ?? []).length,
+      code_pointers_na: n.code_pointers_na ?? false,
+    });
+  }
+  items.sort((a, b) => a.id.localeCompare(b.id));
+  const topRoots = topKImpactRoot(graph, { k: 3, nonTraversableStates: nonTraversable });
+
+  const result = {
+    query: { stage: args.stage ?? null, scope: args.scope ?? null },
+    count: items.length,
+    nodes: items,
+    top_impact_roots: topRoots,
+  };
+
+  if (args.json) {
+    process.stdout.write(JSON.stringify(result, null, 2) + '\n');
+  } else {
+    process.stdout.write(`[dep-graph-navigator] rollup — stage=${args.stage ?? '-'} scope=${args.scope ?? '-'} / ${items.length} 노드\n`);
+    for (const it of items) {
+      process.stdout.write(`  ${it.id} (${it.artifact_subkind}) state=${it.state}\n`);
+      process.stdout.write(`    honor(MUST): ${it.by_grade.MUST.length ? it.by_grade.MUST.join(', ') : '-'}\n`);
+    }
+    process.stdout.write(`  top-3 impact root (graph-wide): ${topRoots.map(r => `${r.id}(${r.score})`).join(', ')}\n`);
+  }
+  process.exit(0);
+}
+
 // ★ dep-graph P4 (operation.md 결정 7) — dep-graph-navigator skill 의 backend.
 // node 상세 + 영향 트리(BFS) + code_pointers + top-K impact root (centrality) 통합.
 // usage: chain-driver navigate --graph <path> --origin <node-id> [--json]
+//        chain-driver navigate --graph <path> --stage <s>|--scope <id> [--json]   (★ F3 일괄 rollup)
 function cmdNavigate(args) {
-  if (!args.graphPath || !args.origin) {
-    console.error('[chain-driver] navigate: --graph <path> and --origin <node-id> required');
+  if (!args.graphPath) {
+    console.error('[chain-driver] navigate: --graph <path> required');
     process.exit(3);
   }
   if (!existsSync(args.graphPath)) {
@@ -369,6 +445,15 @@ function cmdNavigate(args) {
   let graph;
   try { graph = JSON.parse(readFileSync(args.graphPath, 'utf-8')); }
   catch (e) { console.error(`[chain-driver] navigate parse error: ${e.message}`); process.exit(3); }
+
+  // ★ F3 — stage/scope 일괄 rollup (단일 노드 --origin 없이 "이 단계의 의존성" 한 번에)
+  if (!args.origin && (args.stage || args.scope)) {
+    return cmdNavigateRollup(graph, args);
+  }
+  if (!args.origin) {
+    console.error('[chain-driver] navigate: --origin <node-id> OR --stage/--scope required');
+    process.exit(3);
+  }
 
   const node = (graph.nodes ?? []).find(n => n.id === args.origin);
   if (!node) {
