@@ -415,6 +415,20 @@ describe('Loop A / A2 producer — applyContentDrift (state machine)', () => {
     assert.equal(res.applied, 0);
     assert.equal(graph.nodes[0].state, 'active');
   });
+
+  it('통합(A2-wire) — 탐지(validateCodePointers+git) → applyContentDrift → 노드 drift', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', {
+      subkind: 'IMPL', state: 'active',
+      code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }],
+    })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGit({ changed: true }) } });
+    const res = applyContentDrift(graph, r.findings);
+    assert.equal(res.applied, 1);
+    assert.equal(graph.nodes[0].state, 'drift');
+    assert.ok(graph.nodes[0].drift_reason);
+    rmSync(repo, { recursive: true });
+  });
 });
 
 describe('Loop A / A1 — checkGraphFreshness', () => {

@@ -8,9 +8,9 @@
 //   1 = fail (high/medium severity finding 존재 — strict 모드에서)
 //   2 = usage error / 파일 읽기 실패
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { validateCodePointers, makeGitRunner, checkGraphFreshness } from './validator.js';
+import { validateCodePointers, makeGitRunner, checkGraphFreshness, applyContentDrift } from './validator.js';
 
 function usage(code = 2) {
   console.error([
@@ -20,6 +20,7 @@ function usage(code = 2) {
     '  --repo-root <dir>       code_pointer.path 해석 base (default: cwd)',
     '  --strict                missing/path-not-found 를 high severity 로 (blocking)',
     '  --git                   ★ Loop A — git 신호 활성 (A3 relocation→suggested_path / A2 content-drift). opt-in / 비-gating (medium)',
+    '  --apply-drift           ★ Loop A / A2-wire — content-drift 노드를 state=drift 로 그래프 파일에 기록 (--git 자동 활성 / 변경 시에만 write)',
     '  --format text|json      출력 형식 (default: text)',
     '  --help / -h             도움말',
     '',
@@ -38,6 +39,7 @@ function parseArgs(argv) {
     if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--strict') out.strict = true;
     else if (a === '--git') out.git = true;
+    else if (a === '--apply-drift') { out.applyDrift = true; out.git = true; } // ★ A2-wire (git 자동)
     else if (a === '--format') out.format = argv[++i];
     else if (a === '--help' || a === '-h') usage(0);
     else if (!out.graphPath) out.graphPath = a;
@@ -66,6 +68,17 @@ const result = validateCodePointers(graph, {
 // ★ Loop A / A1 — freshness (git 무관 / 항상 계산, stale 일 때만 노출)
 const freshness = checkGraphFreshness(graph, { repoRoot });
 
+// ★ Loop A / A2-wire — content-drift 노드를 state=drift 로 그래프 파일에 기록 (변경 시에만 write).
+//   graph-synthesizer 는 재합성 시 drift→active 리셋 (carry-over 설계) → 본 스캔이 drift 재부여 생산자.
+let driftApplied = 0;
+if (args.applyDrift) {
+  const res = applyContentDrift(graph, result.findings);
+  driftApplied = res.applied;
+  if (driftApplied > 0) {
+    writeFileSync(resolve(args.graphPath), JSON.stringify(graph, null, 2) + '\n');
+  }
+}
+
 if (args.format === 'json') {
   console.log(JSON.stringify({ ...result, freshness }, null, 2));
 } else {
@@ -76,6 +89,9 @@ if (args.format === 'json') {
   console.log(`  findings: high=${sum.high} medium=${sum.medium} low=${sum.low}`);
   if (freshness.stale) {
     console.log(`  ⚠ MEDIUM [graph] graph.stale — ${freshness.finding.message}`);
+  }
+  if (args.applyDrift) {
+    console.log(`  [A2-wire] content-drift → state=drift 적용: ${driftApplied} 노드${driftApplied > 0 ? ` (그래프 파일 갱신: ${args.graphPath})` : ' (변경 없음 / write 생략)'}`);
   }
   for (const f of result.findings) {
     const tag = f.artifact_id ? `[${f.artifact_id}]` : '';
