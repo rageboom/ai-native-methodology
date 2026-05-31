@@ -9,6 +9,26 @@
 
 ---
 
+## [11.22.0] — 2026-06-01 MINOR — analysis 노드 실 src/main 앵커 derive (F-DF-ANCHOR-002 해소 / RealWorld A2 가 실 production 코드 drift 탐지)
+
+v11.21.0 carry F-DF-ANCHOR-002 해소. RealWorld(S2/주 타깃) 그래프가 실 `src/main/java` production 코드에 앵커 **0건** → Loop A/A2 content-drift 가 production 코드 변경을 못 봄(inert). 그러나 analysis 산출물(business-rules/domain/error-mapping)은 **이미 실 src/main 경로를 evidence 로 보유** — surface 안 됐을 뿐. 합성기가 이 evidence 를 node code_pointers 로 derive → A2 가 실 production drift 탐지. carry 제목 "IMPL 노드"는 조사 결과 S2 현실(IMPL 노드 부재)과 어긋남 → analysis 노드가 같은 목표를 정확히 달성(연계 carry C-codepointer-analysis-aspect-enrich 동시 해소). 접근 A 채택(4원칙 §2 3-agent research / Senior GO@0.80 / Sourcegraph SCIP auto-derive 선례).
+
+### fix — graph-synthesizer analysis evidence → code_pointers derive (additive / schema·skill 무변경)
+- **`graph-synthesizer.js`** — `ANALYSIS_TO_CODE_POINTERS` per-kind 명시 field allowlist (business-rules `business_rules[].source_evidence[].file` / domain `aggregates[].invariants[].evidence[].file`+`value_objects[].evidence[].file` / error-mapping `exception_handlers[].source_file`+`http_status_mapping[].evidence_file`) + `deriveAnalysisCodePointers()` 패스. `defaultNaForIntentNodes` **直前** 호출 (derive→backstop 순서 / hasPtr 면 backstop skip → covered / 추출0 → na).
+- **fragility 완화 (Senior REVISE)**: ① 명시 allowlist (자동 `*.java` 재귀 ❌ = `persisted_to` 테이블명 오수집 회피) ② 확장자 화이트리스트 (dir/dotted-class/table-name false-anchor 차단) ③ **existence-gate** (`existsFn` / 미존재 경로 emit ❌ = 정직 불변식 / `mapper/` resource-prefix 류 false `path_missing` 회피) ④ dedup + cap(10).
+- **결정성 보존**: `synthesizeGraph({repoRoot, existsFn})` 주입 — default = `existsSync(repoRoot 기준)` / test 는 mock predicate 주입 (execFileSync 미주입 = v11.21 purity 정합). **builder cli `--repo-root`** (default cwd) 추가.
+- commit_hash 전파 = 하류 strict_path 스탬프 루프(v11.21.0)가 graph commitHash 부여 (A2 baseline / IMPL·TC 동형).
+
+### 검증 (no-simulation / 실 CLI·실 git)
+- traceability-matrix-builder 114→**126** test (+12: per-kind derive 3 + 확장자 negative + existence-gate + dedup + cap + commit_hash + backward-compat 무회귀 + no-op + hasCodeExtension + active-gate). workspace 981→**993** / 0 fail. release-readiness **26/26** (poc-05 graph 정적 read = 무영향 / #16 covered=4/na=10/missing=0 불변).
+- **RealWorld dogfood** (`--repo-root <RW> --commit-hash ee17e31`): BEFORE src/main 앵커 0 → AFTER **13 distinct** (`UserService.java`/`User.java`/`UsersApi.java`/exception handlers 등) / coverage 21.7%→**100%**(covered=28/na=87/missing=0) / false `path_missing` on src/main **0**(existence-gate). `mapper/`(sql-inventory)·dir(architecture) = na fall-through(후속 slice).
+- **A2 positive demo** (temp graph / `git fetch --unshallow` 로 실 history / baseline=root commit / working-tree 무변경): content_drift **14건** 실 production 파일 탐지 + `--apply-drift` → analysis 노드 3개(domain/business-rules/error-mapping) `state=drift` 기록. **Loop A 동기화 루프가 RealWorld production 코드 변경 실 탐지 end-to-end 실증.**
+
+### §8.1 / carry
+- derive 메커니즘 = read-class·additive·결정론 → **gate-class 아님**. A2 content_drift = medium/non-gating (v11.20.0 cap 유지). 단일 RealWorld 도메인 = usability threshold 격상 ❌ → carry. **carry**: ① C-codepointer-analysis-aspect-enrich 잔여 (sql-inventory mapper-prefix resolve / architecture dir glob / 후속 slice) ② ≥2 distinct 도메인 A2 usability corroboration ③ F-DF-A2-003 working-tree 모드 ④ A3 relocation dogfood.
+
+DEC-2026-06-01-df-anchor-002. Extends DEC-2026-06-01-dep-graph-loop-dogfood-a2-stamp.
+
 ## [11.21.0] — 2026-06-01 MINOR — dep-graph Loop A/B RealWorld dogfood + A2 commit_hash auto-stamp (F-DF-A2-001 해소 / A2 out-of-box usable)
 
 v11.20.0 가 ship 한 Loop A/B 를 실 RealWorld 그래프에서 no-simulation dogfood → P0("만들어도 못 쓰면 답 없다 → 쓰게 하라") 직접 검증. **Loop B navigate + Loop A/A1 freshness = 작동·유용 입증 / A2 content-drift = 메커니즘 정상이나 실 그래프 inert(commit_hash 부재)** 발견 → fix 1 시행.

@@ -19,6 +19,8 @@ import {
   confidenceFor,
   NODE_STATES,
   TIER1_CATALOG,
+  deriveAnalysisCodePointers,
+  hasCodeExtension,
 } from '../src/graph-synthesizer.js';
 
 // ============================================================================
@@ -829,5 +831,168 @@ describe('synthesizeGraph — ★ F-DOGFOOD-009 의도 노드 code_pointers_na b
     const gone = g.nodes.find((n) => n.id === 'UC-GONE-999');
     assert.equal(gone.state, 'deprecated', '이번 입력에 없는 노드는 deprecated 로 보존');
     assert.equal(gone.code_pointers_na, undefined, 'deprecated 노드엔 na stamp ❌ (state!==active 게이트)');
+  });
+});
+
+// ============================================================================
+// ★ F-DF-ANCHOR-002 — analysis evidence → node code_pointers derive
+//   RealWorld dogfood 실측 (실 src/main 무앵커 → A2 inert) 기반. analysis 산출물의 evidence 필드
+//   (business-rules source_evidence / domain invariants·VO evidence / error-mapping source_file·evidence_file)
+//   에서 실 코드 경로를 derive → A2 content-drift 가 production 코드 변경 탐지. existence-gate + 확장자
+//   화이트리스트 + dedup + cap. derive→backstop 순서 (Senior REVISE / 정직 불변식). §2 research wf_07929e3d.
+// ============================================================================
+
+describe('synthesizeGraph — ★ F-DF-ANCHOR-002 analysis evidence → code_pointers derive', () => {
+  const yes = () => true; // 모든 경로 존재 가정 (결정성)
+
+  it('1) business-rules source_evidence[].file → analysis-business-rules 노드 strict_path 앵커 (na 미설정)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [
+        { id: 'BR-1', source_evidence: [{ file: 'src/main/java/io/spring/core/user/User.java', line: 10 }] },
+        { id: 'BR-2', source_evidence: [{ file: 'src/main/java/io/spring/application/user/UserService.java' }] },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.ok(Array.isArray(n.code_pointers), 'derive 된 code_pointers 보유');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), [
+      'src/main/java/io/spring/core/user/User.java',
+      'src/main/java/io/spring/application/user/UserService.java',
+    ]);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'strict_path'), 'strict_path');
+    assert.equal(n.code_pointers_na, undefined, 'derive 성공 → backstop na 미설정 (covered)');
+  });
+
+  it('2) domain invariants/value_objects evidence[].file → derive', () => {
+    const g = synthesizeGraph({
+      analysis: { domain: { bounded_contexts: [{
+        id: 'BC-USER', name: 'User',
+        aggregates: [{ root_entity_id: 'E-USER', invariants: [
+          { description: 'unique', evidence: [{ file: 'src/main/java/io/spring/application/article/DuplicatedArticleValidator.java', line: 5 }] },
+        ] }],
+        value_objects: [{ id: 'VO-EMAIL', name: 'Email', evidence: [{ file: 'src/main/java/io/spring/core/user/Email.java' }] }],
+      }] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-domain');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), [
+      'src/main/java/io/spring/application/article/DuplicatedArticleValidator.java',
+      'src/main/java/io/spring/core/user/Email.java',
+    ]);
+  });
+
+  it('3) error-mapping exception_handlers.source_file + http_status_mapping.evidence_file → derive', () => {
+    const g = synthesizeGraph({
+      analysis: { 'error-mapping-spec': {
+        exception_handlers: [{ handler_class: 'H', handler_type: 'advice', source_file: 'src/main/java/io/spring/api/exception/CustomizeExceptionHandler.java' }],
+        http_status_mapping: [{ evidence_file: 'src/main/java/io/spring/api/exception/ResourceNotFoundException.java' }],
+      } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-error-mapping-spec');
+    assert.equal(n.code_pointers.length, 2);
+    assert.ok(n.code_pointers.some((p) => p.path.endsWith('CustomizeExceptionHandler.java')));
+    assert.ok(n.code_pointers.some((p) => p.path.endsWith('ResourceNotFoundException.java')));
+  });
+
+  it('4) ★ 확장자 화이트리스트 — 테이블명/디렉토리/dotted-class 는 미수집 → na (Senior false-anchor 차단)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [
+        { id: 'BR-T', source_evidence: [{ file: 'users' }] },                         // 테이블명 (persisted_to 류)
+        { id: 'BR-D', source_evidence: [{ file: 'src/main/java/io/spring/api' }] },     // 디렉토리
+        { id: 'BR-C', source_evidence: [{ file: 'io.spring.core.user.User' }] },        // dotted class
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.ok(!n.code_pointers, '확장자 외 후보 0개 → code_pointers 미설정');
+    assert.equal(n.code_pointers_na, true, '추출0 → backstop na (정직)');
+  });
+
+  it('5) ★ existence-gate — 미존재 경로는 emit ❌ → na (정직 불변식)', () => {
+    const onlyUser = (p) => p.endsWith('User.java');
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [
+        { id: 'BR-1', source_evidence: [{ file: 'src/main/java/io/spring/core/user/User.java' }] },
+        { id: 'BR-2', source_evidence: [{ file: 'mapper/Gone.xml' }] }, // 미존재 (mapper prefix 류)
+      ] } },
+      existsFn: onlyUser,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), ['src/main/java/io/spring/core/user/User.java']);
+    assert.ok(!n.code_pointers.some((p) => p.path === 'mapper/Gone.xml'), '미존재 경로 emit ❌');
+  });
+
+  it('6) dedup — 같은 파일 중복 evidence → 단일 pointer', () => {
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [
+        { id: 'BR-1', source_evidence: [{ file: 'src/main/java/A.java' }] },
+        { id: 'BR-2', source_evidence: [{ file: 'src/main/java/A.java' }, { file: 'src/main/java/A.java' }] },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.equal(n.code_pointers.length, 1);
+  });
+
+  it('7) cap — >10 distinct 파일 → 10개로 제한', () => {
+    const evid = Array.from({ length: 15 }, (_, i) => ({ file: `src/main/java/F${i}.java` }));
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [{ id: 'BR-1', source_evidence: evid }] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.equal(n.code_pointers.length, 10, 'ANALYSIS_DERIVE_CAP');
+  });
+
+  it('8) commit_hash 전파 — derive strict_path + graph commitHash → pointer 스탬프', () => {
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [{ id: 'BR-1', source_evidence: [{ file: 'src/main/java/A.java' }] }] } },
+      existsFn: yes,
+      commitHash: 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.equal(n.code_pointers[0].commit_hash, 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a');
+  });
+
+  it('9) ★ backward-compat 무회귀 — existsFn 미주입 + 합성 cwd 미존재 경로 → derive 0 → na (구 거동 동일)', () => {
+    // existsFn 미주입 → default = existsSync(cwd 기준). 합성 fixture 의 synthetic 경로는 cwd 에 부재 → derive 0.
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': { business_rules: [{ id: 'BR-1', source_evidence: [{ file: 'src/main/java/io/spring/NOPE-synthetic-xyz.java' }] }] } },
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.ok(!n.code_pointers, '미존재 → derive 0');
+    assert.equal(n.code_pointers_na, true, 'backstop na = 구 거동 동일');
+  });
+
+  it('10) 이미 code_pointers 보유 analysis 노드 → derive no-op', () => {
+    const g = synthesizeGraph({
+      analysis: { 'business-rules': {
+        code_pointers: [{ path: 'docs/br.md', anchor_type: 'doc_link' }],
+        business_rules: [{ id: 'BR-1', source_evidence: [{ file: 'src/main/java/A.java' }] }],
+      } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-business-rules');
+    assert.equal(n.code_pointers.length, 1, '기존 code_pointers 보존 (derive 미덮어씀)');
+    assert.equal(n.code_pointers[0].anchor_type, 'doc_link');
+  });
+
+  it('11) hasCodeExtension — 확장자 판별', () => {
+    assert.equal(hasCodeExtension('src/main/java/User.java'), true);
+    assert.equal(hasCodeExtension('mapper/X.xml'), true);
+    assert.equal(hasCodeExtension('src/main/java/io/spring/api'), false); // dir
+    assert.equal(hasCodeExtension('users'), false);                       // table name
+    assert.equal(hasCodeExtension('io.spring.core.User'), false);         // dotted class (확장자 .User 비화이트)
+    assert.equal(hasCodeExtension(null), false);
+    assert.equal(hasCodeExtension('.gitignore'), false);                  // dotfile (dot<=0)
+  });
+
+  it('12) deriveAnalysisCodePointers 직접 호출 — active 외 노드는 skip', () => {
+    const nodes = [
+      { id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', state: 'deprecated' },
+    ];
+    deriveAnalysisCodePointers(nodes, { 'business-rules': { business_rules: [{ id: 'BR-1', source_evidence: [{ file: 'src/main/java/A.java' }] }] } }, { existsFn: yes });
+    assert.ok(!nodes[0].code_pointers, 'deprecated 노드 derive skip (active 게이트)');
   });
 });

@@ -12,6 +12,7 @@
 // schemas: artifact-graph-node.schema.json + artifact-graph-edge.schema.json + code-pointer.schema.json
 
 import { readFileSync, existsSync } from 'node:fs';
+import { join, isAbsolute } from 'node:path';
 
 // ============================================================================
 // State machine (결정 1) — 4 state × event 전이표
@@ -235,6 +236,74 @@ function defaultNaForIntentNodes(nodes) {
 }
 
 // ============================================================================
+// ★ v11.x (F-DF-ANCHOR-002) — analysis instance evidence → node code_pointers derive.
+//   "이미 analysis 산출물에 존재하는 file evidence 를 그래프 node code_pointers 로 surface"
+//   (Sourcegraph SCIP auto-derive 동형 / best-effort / §2 research wf_07929e3d).
+//   ★ per-kind 명시 field allowlist — 자동 *.java 재귀 ❌ (persisted_to 테이블명·부수 문자열 오수집 회피 / Senior REVISE).
+//   ★ 첫 슬라이스 kind = business-rules / domain / error-mapping-spec (전부 full src/main 경로 = resolving).
+//     sql-inventory(mapper resource prefix) / architecture(dir glob) = 후속 slice (C-codepointer-analysis-aspect-enrich).
+//   accessor(data) → file path 후보 string[] (schema-canonical evidence 필드).
+// ============================================================================
+const ANALYSIS_TO_CODE_POINTERS = Object.freeze({
+  'business-rules': (d) =>
+    (d?.business_rules ?? []).flatMap((br) =>
+      (br?.source_evidence ?? []).map((e) => e?.file)),
+  domain: (d) =>
+    (d?.bounded_contexts ?? []).flatMap((bc) => [
+      ...(bc?.aggregates ?? []).flatMap((a) =>
+        (a?.invariants ?? []).flatMap((inv) =>
+          (inv?.evidence ?? []).map((e) => e?.file))),
+      ...(bc?.value_objects ?? []).flatMap((vo) =>
+        (vo?.evidence ?? []).map((e) => e?.file)),
+    ]),
+  'error-mapping-spec': (d) => [
+    ...(d?.exception_handlers ?? []).map((h) => h?.source_file),
+    ...(d?.http_status_mapping ?? []).map((m) => m?.evidence_file),
+  ],
+});
+
+// 확장자 화이트리스트 — strict_path emit 前 게이트 (table-name·dir·dotted-class false-anchor 차단 / Senior REVISE).
+const CODE_FILE_EXTENSIONS = Object.freeze(new Set([
+  '.java', '.kt', '.kts', '.xml', '.ts', '.tsx', '.js', '.jsx',
+  '.py', '.sql', '.go', '.rb', '.cs', '.php', '.scala', '.vue',
+]));
+export function hasCodeExtension(p) {
+  if (typeof p !== 'string') return false;
+  const slash = Math.max(p.lastIndexOf('/'), p.lastIndexOf('\\'));
+  const base = slash >= 0 ? p.slice(slash + 1) : p;
+  const dot = base.lastIndexOf('.');
+  if (dot <= 0) return false; // 확장자 없음 (디렉토리) 또는 dotfile
+  return CODE_FILE_EXTENSIONS.has(base.slice(dot).toLowerCase());
+}
+
+const ANALYSIS_DERIVE_CAP = 10; // 노드당 derive 앵커 상한 (그래프 폭증 회피 / §2).
+
+// derive 패스 — defaultNaForIntentNodes 直前 호출. active analysis 노드 + code_pointers 부재 일 때만.
+//   existsFn 으로 미검증 경로 차단 (정직 불변식: 미검증 경로 emit ❌ → 후속 backstop 가 na 처리).
+//   commit_hash 는 하류 스탬프 루프(strict_path + graph commitHash)가 부여 (IMPL/TC 와 동형).
+export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  for (const [kind, accessor] of Object.entries(ANALYSIS_TO_CODE_POINTERS)) {
+    const data = analysis?.[kind];
+    if (!data) continue;
+    const node = byId.get(`analysis-${kind}`);
+    if (!node || node.state !== 'active') continue;
+    if (Array.isArray(node.code_pointers) && node.code_pointers.length > 0) continue; // 이미 보유 = 무변경
+    const seen = new Set();
+    const pointers = [];
+    for (const raw of accessor(data)) {
+      if (!hasCodeExtension(raw)) continue;                          // 확장자 화이트리스트
+      if (seen.has(raw)) continue;                                   // dedup
+      if (typeof existsFn === 'function' && !existsFn(raw)) continue; // existence-gate (정직)
+      seen.add(raw);
+      pointers.push({ path: raw, anchor_type: 'strict_path' });
+      if (pointers.length >= ANALYSIS_DERIVE_CAP) break;             // cap
+    }
+    if (pointers.length > 0) node.code_pointers = pointers;
+  }
+}
+
+// ============================================================================
 // Edge 헬퍼
 // ============================================================================
 
@@ -286,11 +355,23 @@ export function synthesizeGraph(input) {
     previousGraph = null,
     scopeId,
     commitHash,
+    repoRoot,
+    existsFn,
   } = input;
 
   // ★ v11.0.0 — discovery 우선, planning 은 backward-compat alias.
   const discoverySpec = discovery ?? planning;
   const discoveryPath = sourcePaths.discovery ?? sourcePaths.planning;
+
+  // ★ v11.x (F-DF-ANCHOR-002) — derive existence-gate predicate.
+  //   주입 existsFn 우선 (test 결정성) / 미주입 시 repoRoot(또는 cwd) 기준 실 existsSync.
+  //   미존재 경로는 derive 가 emit 안 함 → backstop 이 정직하게 na 처리 (Senior 정직 불변식).
+  const effectiveExistsFn = typeof existsFn === 'function'
+    ? existsFn
+    : (p) => {
+        try { return existsSync(isAbsolute(p) ? p : join(repoRoot ?? process.cwd(), p)); }
+        catch { return false; }
+      };
 
   const nodes = [];
   const edges = [];
@@ -553,8 +634,12 @@ export function synthesizeGraph(input) {
     if (!nodeIds.has(e.source) || !nodeIds.has(e.target)) edges.splice(i, 1);
   }
 
+  // --- ★ v11.x (F-DF-ANCHOR-002) analysis evidence → code_pointers derive (backstop 直前) ---
+  // 실 src 앵커 surface → A2 content-drift 가 production 코드 변경 탐지. 추출0/미검증 경로 → 아래 backstop na.
+  deriveAnalysisCodePointers(nodes, analysis, { existsFn: effectiveExistsFn });
+
   // --- ★ v11.x (F-DOGFOOD-009) 의도 노드 code_pointers_na 기본 backstop ---
-  // carry-over (deprecated/propose 재추가) + IMPL/TC inline pointer 부여 이후 시점. active 노드만 정규화.
+  // carry-over (deprecated/propose 재추가) + IMPL/TC inline pointer 부여 + analysis derive 이후 시점. active 노드만 정규화.
   defaultNaForIntentNodes(nodes);
 
   // --- commit_hash / scope_id 스탬프 ---

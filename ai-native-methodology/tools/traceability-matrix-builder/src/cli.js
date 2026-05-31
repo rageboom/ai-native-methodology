@@ -66,6 +66,7 @@ function parseArgs(argv) {
     else if (a === '--previous-graph') out.previousGraph = argv[++i];
     else if (a === '--scope-id') out.scopeId = argv[++i];
     else if (a === '--commit-hash') out.commitHash = argv[++i];
+    else if (a === '--repo-root') out.repoRoot = argv[++i]; // ★ F-DF-ANCHOR-002 — analysis derive existence-gate base (default cwd)
     // ──────────────────────────────────────────────────────────────
     else if (a === '--help' || a === '-h') {
       console.log(`usage: traceability-matrix-builder --behavior <path> --acceptance <path> \\
@@ -73,9 +74,10 @@ function parseArgs(argv) {
             [--test-spec <path>] [--impl-spec <path>] \\
             [--out-dir <dir>] [--dry-run] \\
             [--graph] [--analysis-dir <dir>] [--aspect-dir <dir>] \\
-            [--previous-graph <path>] [--scope-id <id>] [--commit-hash <sha>]
+            [--previous-graph <path>] [--scope-id <id>] [--commit-hash <sha>] [--repo-root <dir>]
 
 ★ --graph 옵션: artifact-graph.json 도 함께 산출 (P1 — operation.md 결정 8).
+★ --repo-root: analysis evidence → code_pointers derive (F-DF-ANCHOR-002) 의 존재 확인 base (default cwd).
   analysis-dir / aspect-dir 의 well-known filename 자동 scan (총 ${TIER1_CATALOG.total} Tier-1 artifact).`);
       process.exit(0);
     }
@@ -159,6 +161,7 @@ if (args.graph) {
     previousGraph,
     scopeId: args.scopeId,
     commitHash,
+    repoRoot: args.repoRoot, // ★ F-DF-ANCHOR-002 — analysis derive existence-gate base
   });
   console.log(`[graph-synthesizer] nodes=${graph.stats.node_count} edges=${graph.stats.edge_count} chain=${graph.stats.by_kind.chain} plan=${graph.stats.by_kind.plan} analysis=${graph.stats.by_kind.analysis} aspect=${graph.stats.by_kind.aspect}`);
   console.log(`  by_state: ${JSON.stringify(graph.stats.by_state)}`);
