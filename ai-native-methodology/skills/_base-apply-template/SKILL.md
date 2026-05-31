@@ -8,7 +8,10 @@ allowed-tools: Read, Glob, Write, Bash
 
 Generate an artifact from a template, filling it with project-specific context.
 
-★ v11.0.0 — chain stage 산출물 6종 template body 본격 추가 (DEC-2026-05-26-v11-paradigm-결단 Phase 3 정합). 인식 artifact list 27종 (analysis 21 + chain 6).
+★ v11.0.0 — chain stage 산출물 6종 template body 본격 추가 (DEC-2026-05-26-v11-paradigm-결단 Phase 3 정합). 인식 artifact 종류 = analysis 21 + chain 6 type.
+
+<!-- check21 SSOT: total 34 templates (.template.* 전수 = analysis 21 + chain 13). 템플릿 파일 추가/삭제 시 본 숫자 갱신 의무 — release-readiness check21 가 본 숫자 ↔ templates/*/*.template.* 실측을 대조 (LL-v85-01 silent_omission attractor 차단). -->
+
 
 ## How to invoke
 
@@ -32,9 +35,9 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
 
 ## Steps
 
-1. **Identify target artifact.** Match user request to one of the 27 templates (analysis 21 + chain 6).
+1. **Identify target artifact.** Match user request to one of the 34 template files (analysis 21 + chain 13).
    - analysis: `ls templates/analysis/*.template.*` — current count = 21. ★ Count mismatch 시 finding emit (drift recurrence carry per LL-v85-01 + release-readiness criterion #14).
-   - chain: `ls templates/{discovery,spec,plan,test,implement}/*.template.*` — current count = 11 (.json + .md pairs + epic-story-op.md). ★ Count mismatch 시 동일 finding.
+   - chain: `ls templates/{discovery,spec,plan,test,implement}/*.template.*` — current count = 13 (.json + .md pairs + epic-story-op.md). ★ Count mismatch 시 동일 finding.
 2. **Read the template.** Use `Read` on the matched `.template.<ext>` file (both `.json` + `.md` for chain stage 산출물 / ★ ADR-008 v2 이중 렌더링).
 3. **Read prerequisite artifacts.** Per `methodology-spec/lifecycle-contract.md` and the artifact's stage ordering:
    - **analysis** stage (21 산출물):

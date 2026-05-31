@@ -912,13 +912,14 @@ function check21_templateCountDrift() {
       return { id: 'template_count_drift', pass: false, detail: '_base-apply-template SKILL.md 부재' };
     }
     const skillText = readFileSync(skillPath, 'utf-8');
-    // SKILL.md 안 "21 artifact" 또는 유사 enumerated count 추출 (정규)
-    const countMatch = skillText.match(/(\d+)\s*artifact/i);
+    // SKILL.md 안 machine marker "check21 SSOT: total <N> templates" 추출 (★ refactor: tooling-audit-cleanup — 모호한 'N artifact' regex 교정 + fail-closed)
+    const countMatch = skillText.match(/check21 SSOT:\s*total\s*(\d+)\s*templates/i);
     if (!countMatch) {
       return {
         id: 'template_count_drift',
-        pass: true,
-        detail: '_base-apply-template SKILL.md 안 enumerated artifact count 패턴 부재 (skip / Phase 3 carry)',
+        pass: false,
+        detail: '_base-apply-template SKILL.md 안 machine marker "check21 SSOT: total <N> templates" 부재 (fail-closed / 모호 카운트 회피 SSOT 의무 / LL-v85-01)',
+        delegated_to: '_base-apply-template/SKILL.md machine marker ↔ templates/*/*.template.* 실측 count',
       };
     }
     const enumeratedCount = parseInt(countMatch[1], 10);
@@ -933,7 +934,7 @@ function check21_templateCountDrift() {
         missingDirs.push(d);
         continue;
       }
-      const files = readdirSync(dirPath).filter((f) => f.match(/\.template\.(json|md)$/));
+      const files = readdirSync(dirPath).filter((f) => f.match(/\.template\.[a-z0-9]+$/i));
       actualCount += files.length;
     }
 
@@ -951,8 +952,8 @@ function check21_templateCountDrift() {
       id: 'template_count_drift',
       pass: !drift,
       detail: drift
-        ? `drift: _base-apply-template SKILL.md 안 ${enumeratedCount} artifact vs templates/ 실제 ${actualCount} (LL-v85-01 silent_omission attractor)`
-        : `template count 정합 ✅ (_base-apply-template = ${enumeratedCount} = templates/ 실제 ${actualCount})`,
+        ? `drift: _base-apply-template marker ${enumeratedCount} vs templates/ 실측 ${actualCount} (.template.* 전수 / LL-v85-01 silent_omission attractor)`
+        : `template count 정합 ✅ (_base-apply-template marker ${enumeratedCount} = templates/ 실측 ${actualCount} / .template.* 전수)`,
       delegated_to: '_base-apply-template/SKILL.md ↔ templates/*/ count drift (LL-v85-01 / Phase 3 본격)',
     };
   } catch (e) {

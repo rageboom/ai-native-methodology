@@ -2,7 +2,7 @@
 
 > 본 플러그인이 **반드시 가져야 하는 능력**의 단일 SSOT.
 > 작성일 2026-05-15 / 작성자 윤주스 (TF Lead).
-> 신규 기능 / 변경 시 본 charter 의 20 항목 + §4 권장 디폴트 정합 의무.
+> 신규 기능 / 변경 시 본 charter 의 21 항목 + §4 권장 디폴트 정합 의무.
 > ★ v8.6.0 (2026-05-18) — **R19 신설** (Tool Ecosystem Dependency Classification).
 > ★ v8.6.1 (2026-05-18) — **R20 신설** (MCP Ticket Sync Channel / Tier 2.5 — MCP delegation only).
 > ★ v8.6.2 (2026-05-18) — **R20 확장** (phase=enter — stage 진입 시 의무 작업 Task 1개 / analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 / DEC-2026-05-18-r20 §확장).
@@ -117,7 +117,7 @@
 
 ## §5 추가 권장 (Claude 제안)
 
-본 charter 17 항목 외, Claude Code 2026-05 best practice 기반 추가 후보:
+본 charter 21 항목 외, Claude Code 2026-05 best practice 기반 추가 후보:
 
 | # | 제안 | ROI | 우선순위 |
 |---|------|-----|---------|
@@ -132,7 +132,7 @@
 
 ## §6 적용 정책
 
-- 본 charter 는 **단일 SSOT** — 18 항목 (R1~R18 / R16·R17 scope-out / 활성 16) + §4 디폴트는 모든 신규 기능 / PR 의 정합 기준
+- 본 charter 는 **단일 SSOT** — 21 항목 (R1~R21 / R16·R17 scope-out / 활성 19) + §4 디폴트는 모든 신규 기능 / PR 의 정합 기준
 - charter 변경은 `decisions/DEC-YYYY-MM-DD-*.md` 결정 로그 필수
 - ★ R18 (v7.1.0) = §5 backlog 격상 아닌 **신규 정식 R** (사용자 결단 / enforcement 강제력 = `plugin-authoring-spec.md` SSOT + release-readiness #12). 저작 규칙·공식 docs pin 변경은 본 charter 아닌 `plugin-authoring-spec.md` 에서만 (재선언 ❌)
 - gap (§3) 해소 작업은 **품질 우선 + 재작업 최소화** 원칙 (memory `feedback_quality_priority.md`) 적용
