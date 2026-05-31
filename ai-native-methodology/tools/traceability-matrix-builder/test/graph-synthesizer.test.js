@@ -283,6 +283,47 @@ describe('synthesizeGraph — node/edge 구성', () => {
     assert.equal(impl.code_pointers[0].anchor_type, 'strict_path');
   });
 
+  // ★ A2 content-drift baseline — strict_path pointer commit_hash auto-stamp (DEC-2026-06-01 dogfood F-DF-A2-001)
+  it('A2 baseline — commitHash 지정 시 strict_path pointer 에 commit_hash 스탬프', () => {
+    const input = {
+      behavior: { behaviors: [{ id: 'BHV-S', use_case_refs: [], code_pointers: [{ path: 'src/x.ts', anchor_type: 'strict_path' }] }] },
+      commitHash: 'feed1234',
+    };
+    const g = synthesizeGraph(input);
+    const bhv = g.nodes.find(n => n.id === 'BHV-S');
+    assert.equal(bhv.code_pointers[0].commit_hash, 'feed1234');
+  });
+
+  it('A2 baseline — commitHash 미지정 → strict_path pointer commit_hash 미스탬프 (기존 behavior / backward-compat)', () => {
+    const input = {
+      behavior: { behaviors: [{ id: 'BHV-S', use_case_refs: [], code_pointers: [{ path: 'src/x.ts', anchor_type: 'strict_path' }] }] },
+    };
+    const g = synthesizeGraph(input);
+    const bhv = g.nodes.find(n => n.id === 'BHV-S');
+    assert.equal(bhv.code_pointers[0].commit_hash, undefined);
+  });
+
+  it('A2 baseline — strict_path 외(glob/ast_symbol/doc_link)는 미스탬프 (false-drift 회피)', () => {
+    const input = {
+      behavior: { behaviors: [{ id: 'BHV-G', use_case_refs: [], code_pointers: [
+        { path: 'src/*.ts', anchor_type: 'glob' },
+        { path: 'Svc.foo', anchor_type: 'ast_symbol', symbol: 'Svc.foo' },
+        { path: 'docs/x.md', anchor_type: 'doc_link' },
+      ] }] },
+      commitHash: 'feed1234',
+    };
+    const g = synthesizeGraph(input);
+    const bhv = g.nodes.find(n => n.id === 'BHV-G');
+    assert.ok(bhv.code_pointers.every(p => p.commit_hash === undefined), 'strict_path 외엔 미스탬프');
+  });
+
+  it('A2 baseline — 상류 impl.commit_hash(:214) 보존 / commitHash 로 덮어쓰기 ❌', () => {
+    // miniInput: impl.commit_hash=abc...(40char) → :214 가 pointer 에 스탬프 / commitHash=abc1234 와 다름
+    const g = synthesizeGraph(miniInput);
+    const impl = g.nodes.find(n => n.id === 'IMPL-USER-001');
+    assert.equal(impl.code_pointers[0].commit_hash, 'abc1234567890123456789012345678901234567');
+  });
+
   it('cross_reference 엣지 (analysis ↔ chain, soft) — BR→BHV/AC + AP→AC', () => {
     const g = synthesizeGraph(miniInput);
     const xrefs = g.edges.filter(e => e.edge_type === 'cross_reference');

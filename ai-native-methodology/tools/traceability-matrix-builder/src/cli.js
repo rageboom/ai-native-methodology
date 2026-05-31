@@ -1,8 +1,23 @@
 #!/usr/bin/env node
 import { writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { buildMatrix, renderMarkdown, renderMermaid, loadJson } from './builder.js';
 import { synthesizeGraph, TIER1_CATALOG } from './graph-synthesizer.js';
+
+// ★ A2 baseline (DEC-2026-06-01 dogfood F-DF-A2-001) — --commit-hash 미지정 시 현 git HEAD auto-derive.
+//   synth-time HEAD = strict_path code_pointer 의 content-drift baseline (graph-synthesizer 가 스탬프 / SLSA 동형).
+//   git 부재/비-repo/throw = undefined (graceful / no-simulation: 날조 ❌ / commitHash 없으면 기존 behavior 무변경).
+//   ※ cross-package import 회피 — makeGitRunner(code-pointer-validator)와 동일 패턴 inline (methodology 컨벤션).
+function gitHeadSha(cwd = process.cwd()) {
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], {
+      cwd, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000, windowsHide: true,
+    }).trim() || undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 // ★ operation.md 결정 8 P1 — artifact-graph.json 산출 (23번째 산출물)
 // analysis/aspect input 은 directory scan 으로 자동 인식 (well-known filename).
@@ -128,6 +143,8 @@ if (args.graph) {
     }
   }
   const previousGraph = args.previousGraph ? loadJson(args.previousGraph) : null;
+  // ★ A2 baseline (DEC-2026-06-01) — 명시 --commit-hash 우선, 없으면 현 git HEAD auto-derive (graceful undefined).
+  const commitHash = args.commitHash || gitHeadSha();
   const graph = synthesizeGraph({
     discovery: chain.planning, behavior: chain.behavior, acceptance: chain.acceptance,
     taskPlan: chain.taskPlan, operationalTask: operationalTaskData,
@@ -141,7 +158,7 @@ if (args.graph) {
     },
     previousGraph,
     scopeId: args.scopeId,
-    commitHash: args.commitHash,
+    commitHash,
   });
   console.log(`[graph-synthesizer] nodes=${graph.stats.node_count} edges=${graph.stats.edge_count} chain=${graph.stats.by_kind.chain} plan=${graph.stats.by_kind.plan} analysis=${graph.stats.by_kind.analysis} aspect=${graph.stats.by_kind.aspect}`);
   console.log(`  by_state: ${JSON.stringify(graph.stats.by_state)}`);

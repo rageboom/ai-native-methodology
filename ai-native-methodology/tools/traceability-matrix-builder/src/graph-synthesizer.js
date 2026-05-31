@@ -561,6 +561,15 @@ export function synthesizeGraph(input) {
   for (const n of nodes) {
     if (commitHash && !n.commit_hash) n.commit_hash = commitHash;
     if (scopeId && !n.scope_id) n.scope_id = scopeId;
+    // ★ A2 content-drift baseline (DEC-2026-06-01 dogfood F-DF-A2-001) — strict_path pointer 에
+    //   commit_hash 스탬프 → code-pointer-validator A2 가 `git diff <hash> HEAD -- path` baseline 확보.
+    //   uniform synth-time HEAD frame (SLSA provenance 동형 / 공식 docs 검증). 없을 때만 = 상류 :214
+    //   impl.commit_hash 보존. strict_path 만 (glob/ast_symbol/doc_link 제외 = git diff -- path 무의미 → false-drift 회피).
+    if (commitHash && Array.isArray(n.code_pointers)) {
+      for (const ptr of n.code_pointers) {
+        if (ptr.anchor_type === 'strict_path' && !ptr.commit_hash) ptr.commit_hash = commitHash;
+      }
+    }
   }
   for (const e of edges) {
     if (commitHash && !e.commit_hash) e.commit_hash = commitHash;

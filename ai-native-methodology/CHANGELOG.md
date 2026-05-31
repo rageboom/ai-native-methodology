@@ -9,6 +9,30 @@
 
 ---
 
+## [11.21.0] — 2026-06-01 MINOR — dep-graph Loop A/B RealWorld dogfood + A2 commit_hash auto-stamp (F-DF-A2-001 해소 / A2 out-of-box usable)
+
+v11.20.0 가 ship 한 Loop A/B 를 실 RealWorld 그래프에서 no-simulation dogfood → P0("만들어도 못 쓰면 답 없다 → 쓰게 하라") 직접 검증. **Loop B navigate + Loop A/A1 freshness = 작동·유용 입증 / A2 content-drift = 메커니즘 정상이나 실 그래프 inert(commit_hash 부재)** 발견 → fix 1 시행.
+
+### dogfood 실측 (실 RealWorld 그래프 + 실 git)
+- **Loop B navigate** ✅ — `navigate --stage spec` → 44 노드 rollup, 각 AC 의 honor(backward)=BHV·UC·analysis-business-rules 표시 ("grep 없이 무엇 honor" 답함).
+- **Loop A / A1 freshness** ✅ — `graph.stale` 발화 (discovery-spec mtime > synth 정확 탐지 = 동기화 루프 핵심 신호).
+- **Loop A / A2 content-drift** ⚠️ — positive demo 로 메커니즘 정상 입증 / 실 그래프 0건 (25 pointer 전부 commit_hash 부재 = F-DF-A2-001).
+
+### fix 1 — synthesizer commit_hash auto-stamp (read-class·결정론·additive / 경량 research GO@0.85 + 공식docs 검증)
+- **graph-synthesizer.js `:560`** — strict_path code_pointer 에 `commit_hash` 스탬프 (uniform synth-time HEAD frame / SLSA provenance 동형). `!ptr.commit_hash`(상류 `:214` impl.commit_hash 보존) + strict_path 만 (glob/ast_symbol/doc_link 제외 = `git diff -- path` 무의미 → false-drift 회피).
+- **builder cli.js** — `--commit-hash` 미지정 시 `git rev-parse HEAD` auto-derive (graceful undefined / makeGitRunner 패턴 inline = cross-package import 회피). execFileSync 를 순수 synthesizer 에 안 넣어 결정성 보존 (derive=cli / stamp=synthesizer 분리).
+- 설계: D1 uniform HEAD(per-file last-touch 는 false-drift 위험으로 반증) / D2 derive-in-cli+stamp-in-synthesizer / D3 graceful / D4 default-on additive. `computeGateFail`(v11.20.0)이 content_drift 를 gate 제외하므로 stamp 가 release-readiness #16 fail 유발 불가.
+- → **F-DF-A2-001 RESOLVED** (A2 out-of-box usable).
+
+### 검증 (no-simulation / 실 CLI·실 git)
+- traceability-matrix-builder 110→**114** test (stamp / backward-compat 미지정→미스탬프 / anchor-restriction strict_path만 / no-overwrite :214 보존) / workspace 977→**981** / 0 fail.
+- **CLI 실 smoke**: `--graph`(--commit-hash 미지정 / cwd=git repo) → auto-derive HEAD `776dc00…`(40char) → strict_path pointer.commit_hash 스탬프 확인. A2 positive demo content_drift 발화(non-gating cap 준수).
+
+### carry (별 cycle / §8.1)
+- **F-DF-ANCHOR-002** — IMPL 노드 실 src/main 앵커 (RealWorld A2 가 실 코드 변경 보려면 / C-codepointer-analysis-aspect-enrich 연계). **F-DF-A2-003** — A2 working-tree 모드(uncommitted 탐지 / opt-in). A3 relocation dogfood 미실측.
+
+DEC-2026-06-01-dep-graph-loop-dogfood-a2-stamp. Extends DEC-2026-06-01-living-dep-graph-loops.
+
 ## [11.20.0] — 2026-06-01 MINOR — Living dep-graph: 동기화 루프(Loop A) + 소비 루프(Loop B) v1 (P0 양방향 역동기화 배선 / 결정론·read-class)
 
 dep-graph 가 "만들기"만 하고 비어 있던 **두 루프**(상태↔그래프 동기화 / 각 stage 의 그래프 소비)를 결정론·read-class 로 채움. P0(산출물 = LLM 운영 컨텍스트를 평생 양방향 역동기화하여 AX 운영)의 운영 배선. trust 선 §2 준수 — 결정론 git 신호만 권위적, 휴리스틱 active 자동쓰기 ❌. gate-class 후보(A4/A5/B5/contract/coverage)는 §8.1 ≥2 distinct 도메인 전 전부 DEFER.
