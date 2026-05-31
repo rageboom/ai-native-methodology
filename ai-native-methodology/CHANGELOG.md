@@ -9,6 +9,24 @@
 
 ---
 
+## [11.15.0] — 2026-05-31 MINOR — tooling-audit cleanup + 2 gate 강화 (planning→discovery 잔재 / dead-gate 복구 / soft-gate fail-closed / git pre-push gate)
+
+multi-agent tooling audit (195 asset / 42 verified finding / 기록 SSOT `.claude/plans/plan-tooling-refactor-audit.md`) 후속 정리 5 commit. **정직 표기**: 대부분 audit self-referential cleanup + soft-gate·pre-push 2 enforcement teeth — 본격 신규 prod feature 아님.
+
+1. **rename 잔재 정리** (refactor) — `planning`→`discovery` rename(v11.0.0)의 미완 cascade: discovery-extraction-validator `--planning` alias + `validatePlanningExtraction` export 제거(canonical 교체) / findings-aggregator `planning-extraction-validator` dispatch case 2벌 + backward-compat test 제거 / chain-coverage·formal-spec-link `--planning`·`planning-spec.json` → `--discovery`·`discovery-spec.json` 정규화 / release-readiness `planning-spec.json` fallback 제거 / 라이브 4 skill 호출 정규화 / charter §4.1 Stop-hook ITSM + §4.6(R16/R17 vestigial) → R20 ticket-sync retarget.
+2. **release gate 진실성** (fix) — `check21`(template-count-drift) dead regex 복구(machine marker `check21 SSOT: total N templates` + `.template.*` 전수 + fail-closed) / `check22` baseline broken-ref 해소(`scripts/baseline-data/`) / release-readiness self-test 17→22 stale 정합(5 fail → **14/14**) / charter 요구사항 카운트 자기모순(20/17/18/16) → 21항목·활성 19 단일화.
+3. **findings-aggregator 선언 정정** (docs) — "mandatory 양심-차단 auto-feeder"(자동 호출 0 + `next` 필수 아님 + 11 PoC 중 1 사용 = 이중 거짓) → "선택적 operator 보조". 도구·로직 무변경.
+4. **F-AUDIT-SOFTGATE-001(=C-13) fail-closed** (feat) — `chain-driver next` 가 `--findings` 미제출 시 0 findings 로 silent 통과하던 soft-gate를 block(`findings_unverified` / rank 2)으로. 통과 = 진짜 `--findings` 공급 OR `--user-decision go` 명시 ack(intervention-log actor:user). gate-eval 순수성 보존(sentinel in, reason out). 4원칙 3-agent research(공식문서 fail-safe defaults·OPA·GitHub required-check·Sigstore·DO-178C 전부 fail-closed) → 사용자 Option C 결단. C-13(2026-05-07 PoC-06 carry) 동시 해소.
+5. **git pre-push release gate** (feat) — 사내 GitHub Actions 부재 대응. `scripts/githooks/pre-push`(push 시 `npm run test:release` 강제) + `scripts/setup-git-hooks.js`(core.hooksPath / 클론마다 1회). Claude Code PreToolUse hook 아님(§4.1 "빠를 것" 무관) — 터미널 push 까지 커버. 사용자 Option G 결단. 한계(정직): 클라이언트 hook / `--no-verify` 우회.
+
+**검증 (전 구간 no-simulation 실측)**: chain-driver 255/255 / workspace 875→**879** / release-readiness **22/22** (target v11.15.0) / test:release **14/14** / skill-citation 0 stale / version 3-way 11.15.0. **pre-push gate 도그푸딩** — 본 release push 가 실제 게이트(test:release 14/14)를 통과해 진행.
+
+**breaking 0**: soft-gate fail-closed = `--user-decision go` escape hatch + 기존 테스트 0 깨짐(bare `next` 의존 테스트/스크립트/PoC 부재 확인) → MINOR. (default 동작 변경이나 실 영향 ≈ 0.)
+
+**잔여 (deferred / audit 부록)**: CHANGELOG phantom-alias 문구("transformPlanningExtraction 보존" — 역사 기록) / `tools/README.md` gate 번호 표기 staleness / 라인엔딩(CRLF/LF) 정규화.
+
+---
+
 ## [11.14.0] — 2026-05-30 MINOR — S2(AX전환) gate augmentation arm RED→GREEN round-trip: P4 양방향 역동기화 end-to-end 실측 (carry ② RESOLVED / DEC-2026-05-30-s2-augmentation-green-roundtrip)
 
 `/clear` 후 사용자 "다음 작업 시작해줘" → audit 리포트 후속 vs prod 가치 carry AskUserQuestion → **"리팩토링 보류 — prod 가치 carry"** 선택 → feasibility triage → carry ②(augmentation impl 후 GREEN 격상) 추천 + plan 제시 → "진행".
