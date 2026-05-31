@@ -92,6 +92,27 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
     }
   }
 
+  // 3.x UC over/under-decomposition nudge (D9 / INSPECTION-2026-05-31-discovery).
+  // discovery-decompose-use-cases SKILL 이 'gate#1 cluster 항목'으로 명시한 임계를 결정론 lane 으로 결선.
+  // non-blocking WARN (intent_certainty 와 동일 패턴) — 사용자 cluster 검토 nudge / gate block ❌.
+  if (useCases.length >= 30) {
+    findings.push({
+      kind: 'discovery.uc.over_decomposition',
+      severity: 'low',
+      uc_count: useCases.length,
+      message: `use_cases ${useCases.length}개 ≥ 30 — over-decomposition cluster 검토 권장 (gate#1 cluster 항목 / discovery-decompose-use-cases SKILL §임계)`
+    });
+  }
+  const domainEntities = Array.isArray(analysis?.domain?.entities) ? analysis.domain.entities.length : 0;
+  if (domainEntities > 0 && useCases.length > 0 && (useCases.length / domainEntities) < 1.5) {
+    findings.push({
+      kind: 'discovery.uc.under_decomposition',
+      severity: 'low',
+      uc_per_entity: useCases.length / domainEntities,
+      message: `UC/entity ${(useCases.length / domainEntities).toFixed(2)} < 1.5 (UC ${useCases.length} / entity ${domainEntities}) — 추가 분해 권고 (discovery-decompose-use-cases SKILL §임계)`
+    });
+  }
+
   // 3.5 domain 비즈니스 컨텍스트 nudge (v11.16.0 / C-domain-schema-stakeholders).
   // analysis domain.json 제공 시 stakeholders / business_intent_summary 부재 = WARN(low / non-blocking / backward-compat).
   // schema 는 optional(additive) — skill 본문이 신규 산출 시 작성 의무 / 여기선 부재만 nudge.
@@ -121,6 +142,41 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
     });
   }
 
+  // 5. decisions[] / pending_decisions[] 거버넌스 (D4 / INSPECTION-2026-05-31-discovery).
+  // discovery-from-analysis-output SKILL §v8.7.5 가 명시한 3 check 를 실제 결정론 강제로 결선
+  // (이전엔 prose 만 'critical/gate stop' 단언하고 validator 미구현 = honesty-tier 위반이었음).
+  const PATH_HINT = /(\.(json|md|ya?ml|java|ts|tsx|js|jsx|py|kt|go|rb|cs|sql)\b)|(:\d+)|#[A-Z]/;
+  for (const dec of (discoverySpec?.decisions ?? [])) {
+    // (a) AI-default 인데 revisit_required != true → critical (cluster 재검토 누락)
+    if (dec.source === 'AI-default' && dec.revisit_required !== true) {
+      findings.push({
+        kind: 'discovery.ai-default-revisit-flag-missing',
+        severity: 'critical',
+        decision_id: dec.id,
+        message: `decision ${dec.id ?? '(no id)'} source=AI-default 인데 revisit_required != true — chain 2 gate#2 cluster 재확인 누락 (SKILL §v8.7.5 a)`
+      });
+    }
+    // (c) carry decision 인데 rationale 에 evidence path 단서 부재 → high
+    if (dec.source === 'carry' && !(typeof dec.rationale === 'string' && PATH_HINT.test(dec.rationale)) && !dec.evidence_path) {
+      findings.push({
+        kind: 'discovery.carry-decision-missing-evidence-path',
+        severity: 'high',
+        decision_id: dec.id,
+        message: `decision ${dec.id ?? '(no id)'} source=carry 인데 rationale 에 evidence path 단서 부재 (SKILL §v8.7.5 c)`
+      });
+    }
+  }
+  // (b) pending_decisions[] non-empty → critical (gate stop). gate#1 에서 user-explicit 전환 의무.
+  const pending = discoverySpec?.pending_decisions ?? [];
+  if (Array.isArray(pending) && pending.length > 0) {
+    findings.push({
+      kind: 'discovery.pending-decisions-not-resolved',
+      severity: 'critical',
+      pending_count: pending.length,
+      message: `pending_decisions[] ${pending.length}건 미해결 — gate#1 에서 user-explicit 전환 의무 (보류 시 gate stop / SKILL §v8.7.5 b)`
+    });
+  }
+
   return {
     findings,
     coverage: { use_case: ucCoverageRatio },
@@ -128,6 +184,8 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
       total_findings: findings.length,
       critical: findings.filter(f => f.severity === 'critical').length,
       high: findings.filter(f => f.severity === 'high').length,
+      medium: findings.filter(f => f.severity === 'medium').length,
+      low: findings.filter(f => f.severity === 'low').length,
     }
   };
 }

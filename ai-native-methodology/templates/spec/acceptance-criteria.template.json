@@ -1,14 +1,11 @@
 {
-  "$comment": "★ v11.0.0 — acceptance-criteria.json template placeholder. chain 2 (spec) 산출물. BHV-* 마다 Gherkin (Given/When/Then) AC-* 추출. verifiable=true ⇔ ≥ 1 TC forward link. ★ layer 분기 본격 (DEC-2026-05-26-contract-강제-양-axis §1) — layer=be → openapi_path+operationId 의무 / layer=fe → state_map_ref+dtcg_token_ref+visual_manifest_ref 의무.",
   "meta": {
     "generated_at": "2026-01-01T00:00:00+09:00",
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "documentation"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ BHV → AC Gherkin 분해 / MoSCoW 우선순위 결단 정합"
-    }
+    "confidence": 0.85,
+    "$comment": "acceptance-criteria template placeholder (chain 2). confidence=bare number (schema:number). BHV-*마다 Gherkin AC-* 추출 / verifiable=true ⇔ ≥1 TC forward link. layer 분기(DEC-2026-05-26-contract §1): be→openapi_path+operationId 의무 / fe→state_map_ref+dtcg_token_ref+visual_manifest_ref 의무. 근거: BHV→AC Gherkin 분해 / MoSCoW."
   },
   "derivation_source": {
     "behavior_spec_path": ".aimd/output/behavior-spec.json",
@@ -16,9 +13,8 @@
   },
   "criteria": [
     {
-      "$comment": "★ Example 1: layer=cross-cut Story anchor (BE+FE 모두 포함)",
       "id": "AC-DOMAIN-001",
-      "description": "<AC 설명>",
+      "description": "<AC 설명> (예시 1: layer=cross-cut Story anchor / BE+FE 모두 포함)",
       "behavior_ref": "BHV-DOMAIN-001",
       "use_case_ref": "UC-DOMAIN-001",
       "gherkin": {
@@ -39,9 +35,8 @@
       "code_pointers_na": true
     },
     {
-      "$comment": "★ Example 2: layer=be (★ openapi_path + operationId 본격 required / DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate)",
       "id": "AC-DOMAIN-002",
-      "description": "BE API 시나리오",
+      "description": "BE API 시나리오 (예시 2: layer=be / openapi_path+operationId required / DEC-2026-05-26-contract §1 hard gate)",
       "behavior_ref": "BHV-DOMAIN-001",
       "use_case_ref": "UC-DOMAIN-001",
       "gherkin": {
@@ -64,9 +59,8 @@
       "code_pointers_na": true
     },
     {
-      "$comment": "★ Example 3: layer=fe (★ state_map_ref + dtcg_token_ref + visual_manifest_ref 본격 required)",
       "id": "AC-DOMAIN-003",
-      "description": "FE UI 시나리오",
+      "description": "FE UI 시나리오 (예시 3: layer=fe / state_map_ref+dtcg_token_ref+visual_manifest_ref required)",
       "behavior_ref": "BHV-DOMAIN-001",
       "use_case_ref": "UC-DOMAIN-001",
       "gherkin": {

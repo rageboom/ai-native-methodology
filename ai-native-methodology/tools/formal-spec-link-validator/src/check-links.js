@@ -37,7 +37,7 @@ export function checkLinks({ source, baseDir }) {
       }
 
       // 추가 검증 — decision_tables 일 때 br_id 가 source 의 related_rules 또는 finding_refs 와 정합?
-      if (category === 'decision_tables' && linkPath.endsWith('.md') || linkPath.endsWith('.json')) {
+      if (category === 'decision_tables' && (linkPath.endsWith('.md') || linkPath.endsWith('.json'))) {
         const expectedBrId = basename(linkPath, linkPath.endsWith('.json') ? '.json' : '.md');
         const linkedRules = source.item.related_rules ?? source.item.finding_refs ?? [];
         // related_rules 가 비었으면 정합성 검증 skip (optional)
@@ -277,7 +277,9 @@ export function checkChainLinks({ source, baseDir }) {
 
   // 3) item-level path/ref 검증 (artifact 별 분기)
   switch (artifact) {
-    case 'planning-spec':
+    case 'discovery-spec':
+      // discovery-spec.json 은 detectChainArtifact 가 반환하는 실 chain 1차 산출물. use_cases[].id UC 패턴 검증.
+      // (구 'planning-spec' case = F-MB-010 rename 잔존 dead code 였음 — discovery-spec 으로 활성화 / C8)
       for (const uc of (json.use_cases ?? [])) {
         if (uc.id) pushIdMismatch(findings, source, 'UC', uc.id, `use_cases[id=${uc.id}]`);
       }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// release-readiness — ★ ★ ★ §8.1 strict 22/22 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상 + v10.0.0 Phase 4-4' 3 criterion 격상 + v11.x dep-graph/template/plan criterion).
+// release-readiness — ★ ★ ★ §8.1 strict 24/24 자동 검사 (sub-plan-6 + v2.4.0 sub-plan §3 + v2.5.0 Phase D 격상 + v3.6.4 R2 격상 + v3.6.7 A1 격상 + v7.1.0 R18 격상 + v8.1.0 R18 내부정합 격상 + v10.0.0 Phase 4-4' 3 criterion 격상 + v11.x dep-graph/template/plan criterion + INSPECTION-2026-05-31 C12 check24 agent-skills-phaseflow-sync).
 //
 // 사용: node scripts/release-readiness.js --target v2.5.0 [--json]
 //
@@ -31,7 +31,7 @@
 //       실존 결정적 검사 / doc 재구조화 후 stale dead-link 자동 차단 / AI 추론 0% / 기존 validator 사각 회복 /
 //       ADR-PLUGIN-001 §7 patch v2 / DEC-2026-05-17-skill-citation-integrity).
 //
-// exit 0 = 22/22 ready / 1 = 1+ regress.
+// exit 0 = 24/24 ready / 1 = 1+ regress.
 //
 // ★ ★ ★ ★ ★ MINOR bump 자격 (Senior session 8차 STOP signal soft 흡수 / additive change paradigm / LL-i-42 정합):
 //   v2.4.0 → v2.5.0 = Layer 2 LLM paradigm 본격 도입 + chain 1 gate Layer 2 통합 (session 14차) + release-readiness 9th 격상.
@@ -1112,6 +1112,89 @@ function check23_dbAssetsValidator() {
   };
 }
 
+// ★ C12 (INSPECTION-2026-05-31-analysis) — agent frontmatter skills:[] ⊇ 해당 stage phase-flow 등록 skill.
+// dispatch 레이어(agent preload)가 orchestration SSOT(phase-flow)와 silent drift 하는 D5 결정론 구멍 차단.
+// 단방향 COVER(agent ⊇ flow) — _base-* 공유 util 이 agent 에만 더 있는 것은 정상(허용).
+function check24_agentSkillsPhaseFlowSync() {
+  const STAGE_AGENT = {
+    analysis: 'analysis-agent.md',
+    discovery: 'discovery-agent.md',
+    spec: 'spec-agent.md',
+    plan: 'plan-agent.md',
+    test: 'test-agent.md',
+    implement: 'implement-agent.md',
+  };
+  const collectFlowSkills = (obj, acc) => {
+    if (Array.isArray(obj)) { for (const x of obj) collectFlowSkills(x, acc); return; }
+    if (obj && typeof obj === 'object') {
+      for (const [k, v] of Object.entries(obj)) {
+        if (k === 'skills' && Array.isArray(v)) { for (const s of v) if (typeof s === 'string') acc.add(s); }
+        if (k === 'skill' && typeof v === 'string') acc.add(v);
+        collectFlowSkills(v, acc);
+      }
+    }
+  };
+  const drift = [];
+  for (const [stage, agentFile] of Object.entries(STAGE_AGENT)) {
+    const agentPath = join(ROOT, 'agents', agentFile);
+    const flowPath = join(ROOT, 'flows', `${stage}.phase-flow.json`);
+    if (!existsSync(agentPath)) { drift.push(`${stage}: agent ${agentFile} 부재`); continue; }
+    if (!existsSync(flowPath)) { drift.push(`${stage}: ${stage}.phase-flow.json 부재`); continue; }
+    const m = readFileSync(agentPath, 'utf-8').match(/skills:\s*\[([^\]]*)\]/);
+    const aSet = new Set(m ? m[1].split(',').map((s) => s.trim()).filter(Boolean) : []);
+    let flow;
+    try { flow = JSON.parse(readFileSync(flowPath, 'utf-8')); }
+    catch (e) { drift.push(`${stage}: flow parse fail ${e.message}`); continue; }
+    const fSet = new Set();
+    collectFlowSkills(flow, fSet);
+    const missing = [...fSet].filter((s) => !aSet.has(s)).sort();
+    if (missing.length) drift.push(`${stage}-agent missing: ${missing.join(', ')}`);
+  }
+  return {
+    id: 'agent_skills_phaseflow_sync',
+    pass: drift.length === 0,
+    detail: drift.length === 0
+      ? `6 agent frontmatter skills ⊇ 해당 stage phase-flow 등록 skill (dispatch preload ↔ orchestration SSOT 정합 / C12 결정론 gate)`
+      : `drift: ${drift.join(' | ')}`,
+    delegated_to: 'agents/<stage>-agent.md frontmatter skills:[] ⊇ flows/<stage>.phase-flow.json 등록 skill (C12 / INSPECTION-2026-05-31-analysis — dispatch 레이어 silent drift 결정론 차단 / _base-* extra 허용)',
+  };
+}
+
+// ★ capstone (INSPECTION-2026-05-31 paradigm mini-pass) — 전 chain stage 산출물 골조(template)가 대응 schema 에 valid.
+//   #1 systemic 발견(meta.confidence object≠number 가 discovery/spec/plan/test/implement 5/5 템플릿)을 어떤 gate 도 못 잡던 사각 영구 차단.
+//   _base-apply-template 가 invalid shape 를 LLM 에 학습시키는 것을 release gate 로 fail-closed.
+function check25_templateSchemaValid() {
+  const PAIRS = [
+    ['templates/discovery/discovery-spec.template.json', 'schemas/discovery-spec.schema.json'],
+    ['templates/spec/behavior-spec.template.json', 'schemas/behavior-spec.schema.json'],
+    ['templates/spec/acceptance-criteria.template.json', 'schemas/acceptance-criteria.schema.json'],
+    ['templates/plan/task-plan.template.json', 'schemas/task-plan.schema.json'],
+    ['templates/test/test-spec.template.json', 'schemas/test-spec.schema.json'],
+    ['templates/implement/impl-spec.template.json', 'schemas/impl-spec.schema.json'],
+  ];
+  const CLI = join(ROOT, 'tools/schema-validator/src/cli.js');
+  const invalid = [];
+  for (const [tpl, sch] of PAIRS) {
+    const tPath = join(ROOT, tpl);
+    const sPath = join(ROOT, sch);
+    if (!existsSync(tPath)) { invalid.push(`${tpl} 부재`); continue; }
+    if (!existsSync(sPath)) { invalid.push(`${sch} 부재`); continue; }
+    const r = spawnSync('node', [CLI, tPath, '--schema', sPath], { cwd: ROOT, encoding: 'utf-8', shell: false, timeout: 30000 });
+    // schema-validator stdout: "valid: 1  invalid: 0" 형태. valid:1 이고 invalid:[1-9] 부재 = 통과.
+    const out = r.stdout || '';
+    const passed = /valid:\s*1\b/.test(out) && !/invalid:\s*[1-9]/.test(out);
+    if (!passed) invalid.push(tpl);
+  }
+  return {
+    id: 'template_schema_valid',
+    pass: invalid.length === 0,
+    detail: invalid.length === 0
+      ? `6 chain stage 템플릿 모두 대응 schema valid (discovery/behavior/acceptance/task-plan/test-spec/impl-spec) — _base-apply-template 골조 invalid shape 주입 차단 (capstone / INSPECTION-2026-05-31 #1 systemic 영구 lock)`
+      : `template schema-INVALID: ${invalid.join(', ')}`,
+    delegated_to: 'templates/<stage>/*.template.json ↔ schemas/<X>.schema.json (★ meta.confidence object≠number systemic 차단 / _base-apply-template instantiate base / content-aware)',
+  };
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1140,6 +1223,8 @@ function main() {
     check21_templateCountDrift(),
     check22_beTaskOpenapiRefRatchet(),
     check23_dbAssetsValidator(),
+    check24_agentSkillsPhaseFlowSync(),
+    check25_templateSchemaValid(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

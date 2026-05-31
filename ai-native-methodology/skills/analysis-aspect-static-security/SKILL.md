@@ -1,6 +1,6 @@
 ---
 name: analysis-aspect-static-security
-description: Use when Semgrep / SpotBugs / PMD / Bandit / ESLint / Snyk / OSV-Scanner is configurable for the project's stack. Generates static-security.json (산출물 12). Track-agnostic (BE+FE+DB). Real tool execution MANDATORY — CLAUDE.md ★★★ no-simulation. ADR-009 단계 5 도달 의무 (★ 단계 4 = AI persona simulation 차단). Stage = analysis, aspect = cross-cutting.
+description: Use when Semgrep / SpotBugs / PMD / Bandit / ESLint / Snyk / OSV-Scanner is configurable for the project's stack. Generates static-security-spec.json (산출물 12). Track-agnostic (BE+FE+DB). Real tool execution MANDATORY — CLAUDE.md ★★★ no-simulation. ADR-009 단계 5 도달 의무 (★ 단계 4 = AI persona simulation 차단). Stage = analysis, aspect = cross-cutting.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -71,17 +71,17 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
 6. **환경 부재 시** — 사용자에게 준비 요청 또는 CI 위임 명시. finding 등재 (`Type: gap, Action: 환경 X 준비 또는 CI Y 추가`).
 7. **결과 통합** — severity / category / CWE mapping. SARIF → finding 어댑터 (sarif-to-finding.js).
 8. **AP-SECURITY-XXX 등재** — anti-pattern (`quality` phase 통합). 4 PoC isomorphic 패턴은 본체 antipattern 카탈로그 (ADR-FE-007) 격상 검토.
-9. **static-security.json 작성** — `schemas/static-security-spec.schema.json` (v1.4 신규)
+9. **static-security-spec.json 작성** — `schemas/static-security-spec.schema.json` (v1.4 신규)
 
 ## 산출물
 
-- `<user-project>/.aimd/output/static-security.json`
+- `<user-project>/.aimd/output/static-security-spec.json`
 - 각 도구의 raw 출력 (`<user-project>/.aimd/output/tool-runs/`)
 - baseline 파일 (`<user-project>/.aimd/baseline/<tool>-baseline.json`) — ADR-010
 
-## CI 통합 (drift-check.yml 정합)
+## CI 통합 (ADR-010 ratchet)
 
-`.github/workflows/drift-check.yml` 의 PoC #04 full FE 트랙 step 패턴 참고 (★ v1.4.2 첫 운영 입증 / ratchet exit 1 정상 작동).
+ADR-010 baseline+ratchet 를 사용자 CI 에 통합 — 변경 시 ratchet exit 1 로 회귀 차단. 예시 워크플로 패턴은 repo CI 가이드 참조 (★ dist 미포함 CI 경로 직접 인용은 case-by-case dist-dangling 정책으로 제거).
 
 ## 본체 명세
 

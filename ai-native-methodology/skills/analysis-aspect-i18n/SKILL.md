@@ -1,6 +1,6 @@
 ---
 name: analysis-aspect-i18n
-description: Use when project contains i18next / react-intl / vue-i18n / FormatJS / lingui / ICU MessageFormat. Generates i18n.json (산출물 11). Stage = analysis, aspect = cross-cutting (FE).
+description: Use when project contains i18next / react-intl / vue-i18n / FormatJS / lingui / ICU MessageFormat. Generates i18n-spec.json (산출물 11). Stage = analysis, aspect = cross-cutting (FE).
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -24,11 +24,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 3. **Message format 분석** — 단순 string vs ICU (plural / select / number / date)
 4. **Untranslated string 검출** — 코드에 hardcoded string 있는지
 5. **AP-I18N-XXX 등재** — anti-pattern (`quality` phase 통합)
-6. **i18n.json 작성** — `schemas/i18n-spec.schema.json` (v1.4 신규)
+6. **i18n-spec.json 작성** — `schemas/i18n-spec.schema.json` (v1.4 신규)
 
 ## 산출물
 
-`<user-project>/.aimd/output/i18n.json`
+`<user-project>/.aimd/output/i18n-spec.json`
 
 ## 본체 명세
 

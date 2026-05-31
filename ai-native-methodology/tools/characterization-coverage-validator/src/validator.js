@@ -72,7 +72,7 @@ export function validateCharacterization(targetDir, threshold = 0.80, options = 
       findings.push({ kind: 'snapshot.missing_id', severity: 'high', file: s.file, message: `${s.file}: snapshot_id missing` });
     }
     if (!d.use_case) {
-      findings.push({ kind: 'snapshot.missing_use_case', severity: 'high', file: s.file, message: `${s.file}: use_case missing (★ planning-spec UC link 의무)` });
+      findings.push({ kind: 'snapshot.missing_use_case', severity: 'high', file: s.file, message: `${s.file}: use_case missing (★ discovery-spec UC link 의무)` });
     } else {
       ucIdsInSnapshots.add(d.use_case);
     }

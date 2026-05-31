@@ -2,13 +2,13 @@
 name: analysis-agent
 description: Use when chain 1 sub (analysis stage) 진입. legacy 코드베이스 분석 + 7대 BE 산출물 + 8 FE 산출물 + finding + antipatterns + migration-cautions 추출 전문. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택) 정합.
 tools: Read, Glob, Grep, Bash, Write
-skills: [analysis-input-collection, analysis-input-orchestrate, analysis-from-prompt, analysis-from-swagger, analysis-from-plan-doc, analysis-from-figma, analysis-source-inventory, analysis-architecture, analysis-domain-model, analysis-business-rules, analysis-db-schema-erd, analysis-openapi, analysis-api-rule-mapping, analysis-error-mapping, analysis-quality-antipattern, analysis-formal-spec-validation, analysis-characterization-test, analysis-sql-inventory, analysis-form-validation-fe, analysis-type-spec-fe, analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy, analysis-br-cross-consistency-check, analysis-html-template, _base-apply-baseline-ratchet, _base-apply-template, _base-log-finding]
+skills: [analysis-input-collection, analysis-input-orchestrate, analysis-greenfield-bootstrap, analysis-from-prompt, analysis-from-swagger, analysis-from-plan-doc, analysis-from-figma, analysis-source-inventory, analysis-architecture, analysis-domain-model, analysis-business-rules, analysis-db-schema-erd, analysis-code-graph, analysis-openapi, analysis-api-rule-mapping, analysis-error-mapping, analysis-quality-antipattern, analysis-formal-spec-validation, analysis-characterization-test, analysis-sql-inventory, analysis-form-validation-fe, analysis-type-spec-fe, analysis-ui-state-map-fe, analysis-ui-visual-manifest-fe, analysis-aspect-a11y, analysis-aspect-i18n, analysis-aspect-static-security, analysis-aspect-legacy, analysis-br-cross-consistency-check, analysis-html-template, _base-apply-baseline-ratchet, _base-apply-template, _base-log-finding]
 model: opus
 ---
 
 # analysis-agent — chain 1 sub (analysis stage) 전문 agent
 
-★ v4.0 multi-agent paradigm 정합. legacy 코드베이스 분석 stage 전문. 22 analysis skill + 6 input skill + 3 base utility = 31 skill 사전 주입.
+★ v4.0 multi-agent paradigm 정합. legacy 코드베이스 분석 stage 전문. **사전 주입 invariant**: 디스크 `analysis-*` 전 skill = `flows/analysis.phase-flow.json` 등록 = 본 frontmatter `skills:` (+ `_base-*` 3 utility). 개별 카운트 대신 invariant 로 drift 자기방지 (drift-validator 가 검사).
 
 ## 책임 범위
 
@@ -23,7 +23,7 @@ model: opus
 | **baseline+ratchet** | `_base-apply-baseline-ratchet` | baseline.json / ratchet threshold |
 | **finding** | `_base-log-finding` | findings.md |
 
-chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent` / `test-agent` / `implement-agent` 권한.
+chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-agent` / `spec-agent` / `plan-agent` / `test-agent` / `implement-agent` 권한.
 
 ## Absolute priorities (CLAUDE.md ★★★ 정합)
 
@@ -53,7 +53,7 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 
 5. **finding 즉시 등재** — `_base-log-finding` 으로 5~15 healthy / 20+ suspect 임계 (memory `feedback_finding_threshold.md` 정합)
 
-6. **chain 1 (planning) gate 진입 prep** — analysis 산출물 schema valid 확인 후 main agent 에 보고 + `planning-agent` dispatch 권고
+6. **chain 1 (discovery) gate#1 진입 prep** — analysis 산출물 schema valid 확인 후 main agent 에 보고 + `discovery-agent` dispatch 권고
 
 ## paradigm 정합 (현 v4.0 본격 진입 정합)
 
@@ -65,13 +65,13 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 ## 산출 자산 (chain 1 sub / analysis stage)
 
 - `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` + `erd.mermaid` / `openapi.yaml` / `antipatterns.json` / `migration-cautions.md`
-- `.aimd/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y.json` / `i18n.json` / `static-security.json` / `form-validation-spec.json` / `type-spec.json` / `legacy.json`
+- `.aimd/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
 - `.aimd/output/state-machines.{json,mermaid}` / `sequences.mermaid` / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
 - `.aimd/output/findings.md`
 
 ## When NOT to invoke
 
-- chain 1 (planning) 진입 후 → `planning-agent` 권한
+- chain 1 (discovery) 진입 후 → `discovery-agent` 권한
 - chain 2~5 진입 → 각 stage agent 권한
 - v3.x release 검증 → 본 paradigm 자격 부재
 
@@ -79,6 +79,6 @@ chain 2+ (spec / test / implement) skill ❌ — `planning-agent` / `spec-agent`
 
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 agent 의 모 결단)
 - DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (★ retract 대상 — "stage 별 분리 ❌" 폐기)
-- `archive/v4-spike/_spike-planning-agent.md` (★ paradigm 가능 입증 spike / archive 이동 / 역사 기록)
+- v4-spike paradigm 가능 입증 (★ workspace archive 역사 기록 / dist 미포함 — 경로 인용 제거: case-by-case dist-dangling 정책)
 - `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스
 - `flows/analysis.phase-flow.json` (★ phase 의존 그래프 SSOT)

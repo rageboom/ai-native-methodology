@@ -132,12 +132,15 @@
       "id": "#4",
       "stage": "test",
       "validators": ["test-impl-pass-validator (expected: all_fail)", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
+      "scenario_expected": { "S1": "all_fail", "greenfield": "all_fail", "S2": "per_tc_outcome", "S3": "snapshot_green" },
+      "$comment_scenario": "★ SEED-3 fix (S2 / INSPECTION-2026-05-31-spec) — gate-eval.js SCENARIO_EXPECTED 미러 (use-scenario taxonomy / DEC-2026-05-30 + v11.11.0 characterization GREEN + augmentation RED 분리). gate-eval 이 코드 SSOT, 본 필드는 문서 정합.",
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
       "id": "#5",
       "stage": "implement",
       "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
+      "scenario_expected": { "S1": "all_pass", "greenfield": "all_pass", "S2": "all_pass", "S3": "all_pass" },
       "skill": "skills/_base-invoke-go-stop-gate"
     }
   ],

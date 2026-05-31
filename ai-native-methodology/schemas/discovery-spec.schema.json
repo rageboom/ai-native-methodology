@@ -211,6 +211,70 @@
         ]
       }
     },
+    "decisions": {
+      "type": "array",
+      "description": "★ v8.7.5 결단 정식화 (Auto Mode 호환). discovery-extraction-validator §v8.7.5 거버넌스 검증 결선 (D4 / INSPECTION-2026-05-31).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source"],
+        "properties": {
+          "$comment": { "type": "string" },
+          "id": { "type": "string" },
+          "topic": { "type": "string" },
+          "source": { "type": "string", "enum": ["user-explicit", "AI-default", "AI-investigation-complete", "carry"] },
+          "rationale": { "type": "string" },
+          "affected_ids": { "type": "array", "items": { "type": "string" } },
+          "revisit_required": { "type": "boolean" },
+          "evidence_path": { "type": "string" }
+        }
+      }
+    },
+    "pending_decisions": {
+      "type": "array",
+      "description": "미결단 항목. non-empty 시 gate#1 user-explicit 전환 의무 (discovery-extraction-validator critical / gate stop / D4).",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "topic": { "type": "string" }
+        }
+      }
+    },
+    "nfr": {
+      "type": "array",
+      "description": "비기능 요구 (swagger/figma/nl-md 어댑터 1차 추출). D3 / INSPECTION-2026-05-31 — schema 정의로 gate#1 schema-validator 검증 표면 확보 (이전 additionalProperties silent pass).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "statement", "source_grounded_evidence"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^NFR-[A-Z0-9_-]+-[0-9]+$", "description": "예: NFR-PERF-001" },
+          "category": { "type": "string", "description": "ISO 25010 품질 특성 (performance_efficiency / security / reliability ...)" },
+          "statement": { "type": "string", "minLength": 5 },
+          "source_grounded_evidence": { "type": "string", "description": "출처 ref (no-simulation / openapi:path / doc:para / figma:node)" }
+        }
+      }
+    },
+    "io_contracts": {
+      "type": "array",
+      "description": "I/O 계약 (swagger 어댑터). D3 / INSPECTION-2026-05-31.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["operation_ref"],
+        "properties": {
+          "operation_ref": { "type": "string", "description": "openapi operationId 등" },
+          "request_ref": { "type": "string" },
+          "response_ref": { "type": "string" }
+        }
+      }
+    },
+    "intent_summary": {
+      "type": "string",
+      "description": "도메인 의도 요약 (nl-md 어댑터). business_intent.domain_purpose 와 중복 시 후자 우선 (D3 / INSPECTION-2026-05-31)."
+    },
     "cross_links": {
       "type": "object",
       "description": "★ DO-178C bidirectional traceability 차용",

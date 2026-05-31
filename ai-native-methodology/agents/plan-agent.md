@@ -75,8 +75,11 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
    # schema validation (additionalProperties:false strict)
    node tools/schema-validator/src/cli.js .aimd/output/task-plan.json --schemas schemas/
+
+   # ★ SP 4분류 hard-gate — DB 자산(stored procedure) 보유 시 (sp_unclassified_at_plan critical / db-assets-always-on + sp-conversion-policy 2026-05-28 mandate / P9)
+   node tools/db-assets-validator/src/cli.js .aimd/output/task-plan.json
    ```
-   exit 0 = ok / exit 1 = blocking findings.
+   exit 0 = ok / exit 1 = blocking findings (plan-coverage + schema + db-assets 합산 → gate#3 block).
 
 7. **gate #3 진입** — `_base-invoke-go-stop-gate` skill 호출:
    - ★ v10.0.0 MAJOR Phase 4-4' — plan = hard gate #3 본격 활성 (chain 3 = gate #3 1:1 INTERNAL CONVENTION / trio enforcement: state.blocked + cli exit 2 + PreToolUse deny)
@@ -92,7 +95,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합 (현 v10.0.0)
 
 - **본 agent = v9.1.0 Phase 4-2 agent body 진입 / v10.0.0 MAJOR gate #3 hard gate 본격 활성** (DEC-2026-05-25-axis-a-phase-4-1 + DEC-2026-05-25-axis-a-phase-4-4-prime)
-- **본체 산출 경로** = `.aimd/output/task-plan.{json,md}` (★ Cluster 6 결단 / discovery-spec.json (discovery 산출) 과 명독 분리)
+- **본체 산출 경로** = `.aimd/output/task-plan.{json,md}` (★ Cluster 6 결단 / discovery-spec.json (discovery 산출) 과 명확히 분리)
 - **lifecycle-contract §Agent column plan row** = 본 agent (★ Phase 4-3 carry — traceability-matrix.schema.json subtask_ids.chain3_plan additive 동반)
 
 ## 산출 자산 (chain 3)

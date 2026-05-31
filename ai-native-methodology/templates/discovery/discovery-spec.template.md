@@ -33,13 +33,14 @@
 - **AC 묶음**: AC-DOMAIN-001
 - **source-grounded evidence**:
   - `src/domain/Service.java:30-60`
-  - `business-rules.json#BR-DOMAIN-001`
+  - `business-rules.json#BR-DOMAIN-RULE-001`
 
-## 3. Business Rule Intent (BR-INTENT-*)
+## 3. Business Rule Intent (br_id backward link)
 
-### BR-INTENT-001 → BR-DOMAIN-001
+### BR-DOMAIN-RULE-001 (intent)
 
 - **reasoning**: <왜 이 비즈니스 룰이 필요한가>
+- **intent_certainty**: observed  <!-- observed | inferred-consequence | unverified-intent | source-refuted -->
 - **source-grounded evidence**: `src/domain/Validator.java:23`
 
 ## 4. 결단 (decisions)
@@ -66,7 +67,7 @@
 
 - `tools/discovery-extraction-validator/` (gate #1) — source-grounded coverage ≥ 0.80 / no-hallucination
 - `tools/schema-validator/` — `schemas/discovery-spec.schema.json` 구조 정합
-- `tools/br-cross-consistency-validator/` (★ v2.5+ Layer 2 LLM 의무) — BR-INTENT 정합
+- `tools/br-cross-consistency-validator/` (★ v2.5+ Layer 2 LLM 의무) — br_id ↔ analysis BR 정합
 
 ## 다음
 

@@ -4,13 +4,13 @@ description: v4.1 chain (discovery) 공통 sub-skill. 어댑터 (discovery-from-
 allowed-tools: Read, Glob, Grep
 ---
 
-# decompose-use-cases
+# discovery-decompose-use-cases
 
-`extract-from-legacy` skill 의 sub-skill. UC 단위 분해 책임.
+`discovery-from-analysis-output` (및 discovery-from-* 입력 어댑터) 의 sub-skill. UC 단위 분해 책임.
 
 ## 언제 사용
 
-- `extract-from-legacy` 의 step 3 에서 자동 호출.
+- discovery 어댑터의 use-cases-decompose phase 에서 자동 호출.
 - 사용자 직접 호출 (수동 분해 검토 시).
 
 ## 입력

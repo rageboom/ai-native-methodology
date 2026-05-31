@@ -40,7 +40,7 @@ import { evaluateGate, applyUserDecision, requiredValidators } from './gate-eval
 import { loadSkill, formatSkillSuggestion } from './invoke-skill.js';
 import {
   parseHookInput, buildSuggestOutput, buildBlockOutput,
-  suggestSkillForPrompt, shouldBlockToolUse,
+  suggestSkillForPrompt, suggestAgentForPrompt, shouldBlockToolUse,
   detectGraphArtifactWrite, evaluatePolicyForEdges,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
@@ -548,7 +548,9 @@ function cmdHooksBridge(args) {
     const repoRoot = args.repoRoot || resolveRepoRoot(process.cwd());
     let meta = null;
     try { meta = loadSkill(repoRoot, skillId).meta; } catch { /* ok */ }
-    const out = buildSuggestOutput({ skillId, meta, sessionId: payload.session_id });
+    // ★ v4.0 multi-agent paradigm (DEC-2026-05-17) — agent dispatch 권고 동봉 (C19: 기존 dead export 결선).
+    const agentId = suggestAgentForPrompt(payload.prompt);
+    const out = buildSuggestOutput({ skillId, meta, sessionId: payload.session_id, agentId });
     process.stdout.write(JSON.stringify(out) + '\n');
     process.stderr.write(formatSkillSuggestion(skillId, meta) + '\n');
     process.exit(0);

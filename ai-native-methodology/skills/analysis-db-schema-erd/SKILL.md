@@ -11,7 +11,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 사전 조건
 
 - inventory.json 존재 (DDL / ORM entity 시그널 위치 / analysis-source-inventory 완료)
-- domain.json 존재 (entity ↔ table 매핑 reference / analysis-domain-model 완료)
+- (optional) domain.json 있으면 entity ↔ table 매핑 cross-check 에 활용 — ★ phase-flow 위상순서상 domain(business-logic)은 db-schema 보다 **뒤**이므로 hard 사전조건 ❌. 예외: greenfield/DDL 부재 시 §greenfield mode 의 domain→table 추론(아래).
 - DB 트랙 (DDL / ORM entity 시그널 검출)
 
 ## 절차
@@ -28,16 +28,17 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - PK / FK / unique / index
    - check constraint / trigger
 3. **Relationship 추론** — FK 기반 1:1 / 1:N / N:M
-4. **schema.json 작성** — `schemas/db-schema.schema.json`:
+4. **schema.json 작성** — `schemas/db-schema.schema.json` (strict / SSOT):
    ```json
    {
+     "meta": {...},
+     "database_type": "...",
      "tables": [...],
-     "relationships": [...],
-     "indexes": [...],
-     "constraints": [...],
-     "meta_confidence": {...}
+     "stored_procedures": [...],
+     "views": [...]
    }
    ```
+   ★ top-level required = `meta` · `tables` (strict). index/constraint/relationship 은 각 `tables[]` item **내부** nested (top-level 아님). 위 키 외 필드 추가 시 schema-validator fail.
 5. **erd.mermaid 생성** — Mermaid ER diagram syntax
 6. **drift-validator 자동 호출** — `.json ↔ .mermaid` 의미 동등성
 
@@ -57,6 +58,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 본체 명세
 
-- `methodology-spec/deliverables/4-5-formal-spec.md` (db 부분)
+- `methodology-spec/deliverables/4-db-schema.md` (★ dedicated deliverable / db phase SSOT — README.md:22 정합)
 - `schemas/db-schema.schema.json`
 - ADR-008 (이중 렌더링)
+- cross-ref: `methodology-spec/deliverables/4-5-formal-spec.md` (formal 형식화 — DB DDL 자체 명세 ❌)

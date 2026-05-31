@@ -21,7 +21,7 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "(discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)",
+        "matcher": "(분석|검토|legacy|레거시|analysis|discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)",
         "hooks": [
           {
             "type": "command",

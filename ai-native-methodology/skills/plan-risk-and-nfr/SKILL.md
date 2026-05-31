@@ -17,7 +17,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 - `<project>/.aimd/output/task-plan.json` (★ chain 3 진행 중 / tasks[] + adrs[] 채워진 상태)
 - `<project>/.aimd/output/acceptance-criteria.json` (★ AC-* / NFR 관련 AC 식별 source)
-- `<project>/.aimd/output/analysis-output/static-security.json` (★ analysis stage 산출 / risk source)
+- `<project>/.aimd/output/analysis-output/static-security-spec.json` (★ analysis stage 산출 / risk source)
 - `<project>/.aimd/output/analysis-output/antipatterns.json` (★ AP-* / risk source)
 
 ## 산출
@@ -70,11 +70,21 @@ DEC-2026-05-21 §plan-risk-and-nfr 정합. 본 task-plan 시행 후 회귀 시 r
 - `rollback_strategy.strategy` (필수 / 예: 'git revert + feature flag toggle')
 - `rollback_strategy.verification` (★ v4.2+ carry — 실제 rollback 가능성 검증 도구)
 
+## ★ SP → 코드 4분류 (DB 자산 always-on / 2026-05-28 mandate / P8)
+
+DB 자산(stored procedure) 존재 시 — `task-plan.sp_conversions[]` 에 각 SP 의 `sp_conversion_class` 결단 (analysis db_procedures[] 순회):
+- **α** (default) — 코드 전환 (SP 비즈니스 로직 → service 코드)
+- **β** — 보존 + thin wrapper
+- **γ** — 보존 + ADR 필수 (`adr_ref` / ★ external SP 만 γ — `gamma_not_external` 회피)
+- **δ** — 보존 + oracle 필요 (characterization test)
+
+★ gate#3 hard-gate: `db-assets-validator` 가 `sp_unclassified_at_plan`(class 부재 → critical) + `plan-coverage-validator` 가 `sp_conversion.{weak_rationale,no_adr_for_gamma,gamma_not_external,delta_no_oracle}` 강제. 미분류 SP = gate stop. (sp-conversion-policy.md / db-assets-always-on.md SSOT.) greenfield(db_assets_absent) = 면제.
+
 ## 절차
 
 1. **task-plan + acceptance-criteria + static-security + antipatterns 로드**.
 
-2. **NFR 후보 도출** — acceptance-criteria.criteria[] 안 verifiable=false AC (예: "p95 latency < 200ms") + static-security.json critical/high finding + antipatterns.json critical/high AP 모두 NFR 후보:
+2. **NFR 후보 도출** — acceptance-criteria.criteria[] 안 verifiable=false AC (예: "p95 latency < 200ms") + static-security-spec.json critical/high finding + antipatterns.json critical/high AP 모두 NFR 후보:
    - characteristic 매핑 (ISO 25010:2023 9 enum)
    - severity 매핑 (BR/AP severity → critical/high/medium/low)
    - acceptance_criteria_ref (Cluster 4 cross-cut bidirectional link)

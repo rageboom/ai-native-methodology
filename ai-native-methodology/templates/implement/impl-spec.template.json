@@ -1,14 +1,11 @@
 {
-  "$comment": "★ v11.0.0 — impl-spec.json template placeholder. chain 5 (implement) 산출물. test-spec → 실 impl 코드 (GREEN 의무 / 모든 test 100% pass / fail_count=0). 실 코드 = 산출물 ❌ / commit_hash 만 보존 (i-strict). stack 분기 본격 (be/fe/db/e2e/infra).",
   "meta": {
     "generated_at": "2026-01-01T00:00:00+09:00",
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "test_code"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ 실 runner GREEN 100% pass / 5종 물증 7 필드"
-    }
+    "confidence": 0.85,
+    "$comment": "impl-spec template placeholder (chain 5 / implement). confidence=bare number (schema:number). test-spec → 실 impl 코드 (GREEN 의무 / 100% test pass / fail_count=0). 실 코드=산출물 ❌ / commit_hash 보존 (i-strict). stack 분기(be/fe/db/e2e/infra). 근거: 실 runner GREEN 100% pass + 5종 물증 10 필드. _base-apply-template instantiate."
   },
   "derivation_source": {
     "test_spec_path": ".aimd/output/test-spec.json",
@@ -16,7 +13,6 @@
   },
   "modules": [
     {
-      "$comment": "★ Example 1: BE (spring-boot-3)",
       "id": "IMPL-DOMAIN-001",
       "tc_refs": ["TC-DOMAIN-001", "TC-DOMAIN-002"],
       "bhv_refs": ["BHV-DOMAIN-001"],
@@ -31,7 +27,6 @@
       "source_evidence": "@Service public class DomainService { ... public Resource create(Input input) { ... } }"
     },
     {
-      "$comment": "★ Example 2: FE (react-18)",
       "id": "IMPL-DOMAIN-002",
       "tc_refs": ["TC-DOMAIN-003"],
       "bhv_refs": ["BHV-DOMAIN-001"],

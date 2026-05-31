@@ -58,7 +58,7 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 6. **종결 보고**:
    - behavior-spec.{json,md} + acceptance-criteria.{json,md} path
    - traceability-matrix UC → BHV → AC forward 갱신 상태
-   - chain 4 (test) 진입 권고 → `test-agent` dispatch
+   - chain 3 (plan) 진입 권고 → `plan-agent` dispatch (★ phase-flow next_chain=plan / plan stage 건너뜀 금지)
 
 ## paradigm 정합 (현 v4.0)
 
@@ -78,8 +78,8 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 
 ## When NOT to invoke
 
-- chain 0~1 진입 시 → 이전 stage agent 권한
-- chain 4 (test) 진입 후 → `test-agent` 권한
+- analysis ~ discovery(chain 1) 진입 시 → 이전 stage agent 권한
+- chain 3 (plan) 진입 후 → `plan-agent` 권한 (이후 test/implement 는 각 stage agent)
 
 ## 인용
 
@@ -87,4 +87,4 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 - ADR-CHAIN-001 §1 (이중 렌더링 chain 2)
 - ADR-CHAIN-002 (gate UX)
 - `schemas/behavior-spec.schema.json` + `schemas/acceptance-criteria.schema.json` (deliverable 18 + 19)
-- DEC-2026-05-06-round-trip-부분-허용 (revisit:planning 가능)
+- DEC-2026-05-06-round-trip-부분-허용 (revisit:discovery 가능 / sdlc-4stage revisit_edges spec→discovery)

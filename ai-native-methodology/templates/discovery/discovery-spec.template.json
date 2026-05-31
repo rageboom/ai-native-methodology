@@ -5,10 +5,8 @@
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "planning_docs"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ 신뢰도 근거 — analysis stage 7대 산출물 source-grounded coverage + 사용자 검토 1회"
-    }
+    "confidence": 0.85,
+    "$comment": "confidence = bare number (schema: number / 0.0~0.98 cap). 근거: analysis stage 7대 산출물 source-grounded coverage + 사용자 검토 1회."
   },
   "derivation_source": {
     "type": "legacy-extraction",
@@ -43,16 +41,16 @@
       "acceptance_criteria_refs": ["AC-DOMAIN-001"],
       "source_grounded_evidence": [
         "src/domain/Service.java:30-60",
-        "business-rules.json#BR-DOMAIN-001"
+        "business-rules.json#BR-DOMAIN-RULE-001"
       ],
       "code_pointers_na": true
     }
   ],
   "business_rules_intent": [
     {
-      "id": "BR-INTENT-001",
-      "br_id": "BR-DOMAIN-001",
+      "br_id": "BR-DOMAIN-RULE-001",
       "reasoning": "<왜 이 비즈니스 룰이 필요한가 — 도메인 의도 1~2줄>",
+      "intent_certainty": "observed",
       "source_grounded_evidence": "src/domain/Validator.java:23"
     }
   ],

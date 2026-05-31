@@ -9,6 +9,30 @@
 
 ---
 
+## [11.18.0] — 2026-05-31 MINOR — 배포 6단계 chain harness 전수 점검 + 결정론 gate 2종 신설 (check24/check25)
+
+`배포 플러그인이 프레임워크처럼 동작(LLM=언어 / 플러그인=Spring)` 목표로 analysis→discovery→spec→plan→test→implement 6단계 자산 + 10 패러다임 전수 점검 (Workflow 6회 / ~155 자산 / adversarial 검증 confirmed 99 / CUT 0). 비파괴 / gate 강화 (release-readiness 23→25 / npm test all-pass / drift 0 / 0 stale citation / build 4686).
+
+### ★ 신규 결정론 gate 2종 (req8 "누가 돌려도 같은 품질")
+- `check24` agent-skills-phaseflow-sync (C12) — agent frontmatter `skills:[]` ⊇ 해당 stage phase-flow 등록 skill. dispatch preload ↔ orchestration SSOT silent drift 차단 (analysis-agent code-graph/greenfield + implement-agent test-run-test-evidence 누락 노출·정정).
+- `check25` template-schema-valid (capstone) — 6 chain stage 템플릿(discovery-spec/behavior-spec/acceptance-criteria/task-plan/test-spec/impl-spec)이 대응 schema 에 valid. ★ #1 systemic(meta.confidence object≠number 가 5/5 템플릿)을 어떤 gate 도 못 잡던 사각 영구 lock — _base-apply-template 가 invalid shape 를 LLM 에 학습시키는 것 차단.
+- gate-eval `I9` — implement GREEN gate 가 test 증거(tests_total) 없이 통과하던 fail-OPEN → evidence_missing fail-closed 보강.
+
+### 단계별 정정 (confirmed 99)
+- **analysis**: aspect 파일명 canonical `-spec`/`-spectrum` 전수 / dist-dangling case-by-case 정책 / planning-agent→discovery-agent.
+- **discovery**: discovery-spec.schema 확장(nfr/io_contracts/intent_summary/decisions/pending_decisions) + discovery-extraction-validator D4 거버넌스 3 check 구현 + UC over/under-decomposition lane + summary medium/low.
+- **spec**: handoff plan-agent 교정(plan stage 건너뜀 차단) + integrate over-claim 정직-격하 + SEED-3 scenario_expected 문서화 + check-links BE-mode 연산자 버그 교정.
+- **plan**: SP 4분류 wiring(plan-risk-and-nfr + plan-agent db-assets-validator) + work-unit-manifest stage enum System Y additive 확장.
+- **test**: RED scenario-conditioned(S2 per_tc_outcome / S3 snapshot_green) + coverage_summary→coverage + validator README System Y.
+- **implement**: System Y 번호 prose 정정 + static-runner inflated tool-count 정직화.
+- 5 chain stage 템플릿 schema-valid 화(systemic meta.confidence object≠number) + System Y 번호 prose 정정.
+
+### honesty-tier 테마
+skill prose 가 validator 미구현 강제를 과대 주장하던 패턴(spec integrate / discovery decisions / implement static-count)을 *구현* 또는 *정직-격하* 로 정정 (self-recorded-fact-validation paradigm 정확 적용).
+
+### 검증 / carry
+release-readiness **25/25** · workspace test all-pass · 0 stale · drift 0 · build 4686 · version 3-way. 점검 리포트 7종 + 진행 ledger = `decisions/INSPECTION-2026-05-31-*.md` (워크스페이스 전용 / dist 미포함). ★ test 점검 중 audit agent 무단 write 발견 → implement 점검에 read-only 가드 명시(재발 0). carry(별도 묶음): evidence 필드명 SSOT reconcile(test_run/test_invocation/test_pass) · gate-consistency check · test-runner framework/enum hardening · code-graph.schema draft-07 · skill-citation scope.
+
 ## [11.17.0] — 2026-05-31 MINOR — agents·skills 정책 SSOT dedup + chain/gate 번호 정합(System Y) + F-MB-010 종결
 
 `프로젝트 자산(agents/skills/hooks) 리팩토링` 요청 → 3 묶음 (중복 제거 → 정합성 → 잔여 cascade) 순차 시행. 모두 비파괴 / gate-neutral (release-readiness pass-count 비감소 / npm test 24 ws fail-0 / citation 0 / drift 0 breaking).

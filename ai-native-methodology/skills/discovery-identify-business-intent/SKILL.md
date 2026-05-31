@@ -1,16 +1,16 @@
 ---
 name: discovery-identify-business-intent
-description: v4.1 chain (discovery) 공통 sub-skill. 어댑터 (discovery-from-*) 결과 + business-rules.json BR-* + antipatterns + finding 을 분석하여 BR-INTENT-NNN 추출 ("왜 이 규칙인가" reasoning). 모든 BR-INTENT 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임. 사용자 (자연어 직접 호출 시): "business intent 추출" / "BR-INTENT 분석". v4.0 planning-identify-business-intent 의 rename (DEC-2026-05-21 정합).
+description: v4.1 chain (discovery) 공통 sub-skill. 어댑터 (discovery-from-*) 결과 + business-rules.json BR-* + antipatterns + finding 을 분석하여 business_rules_intent (br_id backward link) 추출 ("왜 이 규칙인가" reasoning). 모든 entry 는 1+ analysis BR-* 매핑 의무 + source_grounded_evidence 의무. legacy-archaeologist persona 책임. 사용자 (자연어 직접 호출 시): "business intent 추출" / "BR-INTENT 분석". v4.0 planning-identify-business-intent 의 rename (DEC-2026-05-21 정합).
 allowed-tools: Read, Glob, Grep
 ---
 
-# identify-business-intent
+# discovery-identify-business-intent
 
-`extract-from-legacy` skill 의 sub-skill. **legacy-archaeologist persona** (★ v4.0 multi-agent / `agents/planning-agent.md` system prompt 흡수) 책임.
+`discovery-from-analysis-output` (및 discovery-from-* 입력 어댑터) 의 sub-skill. **legacy-archaeologist persona** (★ v4.0 multi-agent / `agents/discovery-agent.md` system prompt 흡수 / planning-agent→discovery-agent rename) 책임.
 
 ## 언제 사용
 
-- `extract-from-legacy` 의 step 4 에서 자동 호출.
+- discovery 어댑터의 br-intent-extract phase 에서 자동 호출.
 - 사용자가 BR-INTENT 보강 시 직접 호출.
 
 ## 입력

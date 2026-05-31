@@ -29,12 +29,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-  it('happy path — 22/23 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-    // ★ skip 시 check11(workspace_test) = pass=false / total 22/23 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+  it('happy path — 24/25 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+    // ★ skip 시 check11(workspace_test) = pass=false / total 24/25 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 23);
-    assert.equal(out.criteria_passed, 22);
+    assert.equal(out.criteria_total, 25);
+    assert.equal(out.criteria_passed, 24);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.detail.includes('skipped via --skip-workspace-test'), 'skip detail 명시 의무');
     const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
@@ -43,12 +43,13 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(cite.pass, `check13 skill citation must pass — detail: ${cite.detail}`);
   });
 
-  it('all 23 criterion ids are present in output (no skipped)', () => {
+  it('all 25 criterion ids are present in output (no skipped)', () => {
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
     assert.deepEqual(ids, [
       'adr_registry',
+      'agent_skills_phaseflow_sync',
       'analysis_validator_violation',
       'authoring_spec_staleness',
       'be_task_openapi_ref_ratchet',
@@ -69,6 +70,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'real_tool_evidence',
       'skill_citation_integrity',
       'template_count_drift',
+      'template_schema_valid',
       'validators_violation',
       'workspace_test_pass',
     ]);
@@ -192,11 +194,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 23 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 25 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
-    // even with bogus target, should still evaluate 23 checks against current artifacts.
+    // even with bogus target, should still evaluate 25 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 23);
+    assert.equal(out.criteria_total, 25);
   });
 
   it('missing --target → exit 2 (usage error)', () => {
@@ -204,7 +206,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.equal(r.status, 2);
   });
 
-  it('★ A1 본격 spawn — workspace test + 22/22 pass (★ npm test --workspaces 실시간 실행 / timeout 600s)', () => {
+  it('★ A1 본격 spawn — workspace test + 25/25 pass (★ npm test --workspaces 실시간 실행 / timeout 600s)', () => {
     // ★ ★ A1 본격 검증 — check11 spawn → npm test --workspaces 실시간 실행 → fail=0 의무 입증.
     // 본 case = release 본격 시행 cadence 정합 (다른 case 는 SKIP_WS 사용 / 본 case 만 본격 spawn).
     const r = runScript(['--target', 'v8.1.0', '--json'], {}, 600_000);
@@ -212,8 +214,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.pass, `workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`);
     assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-    assert.equal(out.criteria_total, 23);
-    assert.equal(out.criteria_passed, 23);
+    assert.equal(out.criteria_total, 25);
+    assert.equal(out.criteria_passed, 25);
     assert.equal(out.ready, true);
     assert.equal(r.status, 0);
   });

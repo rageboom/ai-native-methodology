@@ -1,6 +1,6 @@
 ---
 name: analysis-aspect-legacy
-description: Use when migration scenario detected (Strangler Pattern triggers — old + new codepath coexistence, deprecated API usage, version-pin technical debt, scheduled deprecation). Generates legacy.json (산출물 13). Stage = analysis, aspect = cross-cutting (BE+FE+DB).
+description: Use when migration scenario detected (Strangler Pattern triggers — old + new codepath coexistence, deprecated API usage, version-pin technical debt, scheduled deprecation). Generates legacy-spectrum.json (산출물 13). Stage = analysis, aspect = cross-cutting (BE+FE+DB).
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -40,7 +40,7 @@ Strangler Pattern 적용 가능성 / migration debt 식별.
 
 ## 산출물
 
-`<user-project>/.aimd/output/legacy.json`
+`<user-project>/.aimd/output/legacy-spectrum.json`
 
 ## 본체 명세
 

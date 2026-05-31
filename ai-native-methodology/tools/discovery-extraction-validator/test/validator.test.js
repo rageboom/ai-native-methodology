@@ -216,4 +216,80 @@ describe('discovery-extraction-validator', () => {
       assert.ok(!r.findings.some(x => x.kind === 'discovery.domain.missing_business_context'));
     });
   });
+
+  // D4: decisions / pending_decisions 거버넌스 (INSPECTION-2026-05-31-discovery / SKILL §v8.7.5)
+  describe('decisions governance (D4)', () => {
+    const base = (extra) => ({
+      use_cases: [{ id: 'UC-USER-001', source_grounded_evidence: ['x.java:1'] }],
+      cross_links: { to_analysis_artifacts: ['business-rules.json'] },
+      ...extra,
+    });
+    it('(a) AI-default without revisit_required=true → critical', () => {
+      const r = validateDiscoveryExtraction(base({ decisions: [{ id: 'DEC-1', source: 'AI-default', revisit_required: false }] }), {});
+      assert.ok(r.findings.some(f => f.kind === 'discovery.ai-default-revisit-flag-missing' && f.severity === 'critical'));
+    });
+    it('(a) AI-default WITH revisit_required=true → no finding', () => {
+      const r = validateDiscoveryExtraction(base({ decisions: [{ id: 'DEC-1', source: 'AI-default', revisit_required: true }] }), {});
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.ai-default-revisit-flag-missing'));
+    });
+    it('user-explicit decision → no governance finding', () => {
+      const r = validateDiscoveryExtraction(base({ decisions: [{ id: 'DEC-1', source: 'user-explicit', revisit_required: false }] }), {});
+      assert.ok(!r.findings.some(f => f.kind.startsWith('discovery.ai-default') || f.kind.startsWith('discovery.carry')));
+    });
+    it('(b) pending_decisions non-empty → critical (gate stop)', () => {
+      const r = validateDiscoveryExtraction(base({ pending_decisions: [{ id: 'PD-1', topic: 'x' }] }), {});
+      assert.ok(r.findings.some(f => f.kind === 'discovery.pending-decisions-not-resolved' && f.severity === 'critical'));
+    });
+    it('(b) empty pending_decisions → no finding', () => {
+      const r = validateDiscoveryExtraction(base({ pending_decisions: [] }), {});
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.pending-decisions-not-resolved'));
+    });
+    it('(c) carry decision without evidence path → high', () => {
+      const r = validateDiscoveryExtraction(base({ decisions: [{ id: 'DEC-1', source: 'carry', rationale: '추후 결정' }] }), {});
+      assert.ok(r.findings.some(f => f.kind === 'discovery.carry-decision-missing-evidence-path' && f.severity === 'high'));
+    });
+    it('(c) carry decision WITH evidence path in rationale → no finding', () => {
+      const r = validateDiscoveryExtraction(base({ decisions: [{ id: 'DEC-1', source: 'carry', rationale: 'src/x.java:42 참조' }] }), {});
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.carry-decision-missing-evidence-path'));
+    });
+  });
+
+  // D9: UC over/under-decomposition lane (INSPECTION-2026-05-31-discovery)
+  describe('UC over/under-decomposition (D9)', () => {
+    const mkUCs = (n) => Array.from({ length: n }, (_, i) => ({ id: `UC-X-${String(i + 1).padStart(3, '0')}`, source_grounded_evidence: ['x.java:1'] }));
+    it('≥30 UC → over_decomposition (low / non-blocking)', () => {
+      const r = validateDiscoveryExtraction({ use_cases: mkUCs(30), cross_links: { to_analysis_artifacts: ['x'] } }, {});
+      const f = r.findings.find(x => x.kind === 'discovery.uc.over_decomposition');
+      assert.ok(f);
+      assert.equal(f.severity, 'low');
+      assert.equal(r.summary.critical, 0);
+    });
+    it('<30 UC → no over_decomposition', () => {
+      const r = validateDiscoveryExtraction({ use_cases: mkUCs(5), cross_links: { to_analysis_artifacts: ['x'] } }, {});
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.uc.over_decomposition'));
+    });
+    it('UC/entity < 1.5 → under_decomposition (low)', () => {
+      const r = validateDiscoveryExtraction(
+        { use_cases: mkUCs(1), cross_links: { to_analysis_artifacts: ['x'] } },
+        { domain: { entities: [{ name: 'A' }, { name: 'B' }] } }
+      );
+      const f = r.findings.find(x => x.kind === 'discovery.uc.under_decomposition');
+      assert.ok(f);
+      assert.equal(f.severity, 'low');
+    });
+    it('no entities provided → no under_decomposition', () => {
+      const r = validateDiscoveryExtraction({ use_cases: mkUCs(1), cross_links: { to_analysis_artifacts: ['x'] } }, {});
+      assert.ok(!r.findings.some(x => x.kind === 'discovery.uc.under_decomposition'));
+    });
+  });
+
+  // D10: summary medium/low 집계 (sibling validator 정합)
+  describe('summary medium/low aggregation (D10)', () => {
+    it('summary includes medium + low counts', () => {
+      const r = validateDiscoveryExtraction({ use_cases: [{ id: 'UC-X-001', source_grounded_evidence: ['x.java:1'] }] }, {});
+      assert.equal(typeof r.summary.medium, 'number');
+      assert.equal(typeof r.summary.low, 'number');
+      assert.ok(r.summary.medium >= 1, 'cross_links.empty (medium) counted in summary');
+    });
+  });
 });

@@ -288,10 +288,10 @@ input (implement stage 가 받음):
 │       ├── erd.mermaid              # DB
 │       ├── state-map.json           # FE
 │       ├── visual-manifest.json     # FE
-│       ├── a11y.json                # FE
-│       ├── i18n.json                # FE
-│       ├── static-security.json     # BE+FE
-│       ├── legacy.json              # 공통
+│       ├── a11y-spec.json           # FE
+│       ├── i18n-spec.json           # FE
+│       ├── static-security-spec.json # BE+FE
+│       ├── legacy-spectrum.json     # 공통
 │       ├── form-validation-spec.json # FE
 │       ├── type-spec.json           # FE (TS)
 │       ├── antipatterns.json        # 공통

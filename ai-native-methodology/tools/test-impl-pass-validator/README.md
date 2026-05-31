@@ -1,8 +1,8 @@
-# test-impl-pass-validator/ — chain 4 (impl) gate (★ ★ ★ no-simulation 정책 핵심 enforcement)
+# test-impl-pass-validator/ — chain 4 test (RED) + chain 5 implement (GREEN) 공유 gate runner (★ ★ ★ no-simulation 정책 핵심 enforcement)
 
 ## Purpose
 
-chain harness **gate #4** (impl → done) 의 핵심 validator. 진짜 test runner (jest / vitest / junit5 / pytest 등) 호출 + 100% test pass 의무 + result_hash deterministic.
+chain harness 의 핵심 test-runner validator (★ test+implement 공유 / System Y): **gate #4 (chain 4 test / RED — expected all_fail / fail_count > 0)** + **gate #5 (chain 5 implement / GREEN — expected all_pass / fail_count = 0)**. 진짜 test runner (jest / vitest / junit5 / pytest 등) `--allow-execute` 호출 + result_hash deterministic.
 
 DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contract) / Aider 패턴 정합.
 

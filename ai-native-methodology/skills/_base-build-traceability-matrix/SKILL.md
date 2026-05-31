@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 ## 언제 사용
 
-- 매 gate (#1~#4) 종결 시 의무 갱신.
+- 매 gate (#1~#5) 종결 시 의무 갱신.
 - chain-revisit-detector 가 변경 감지하면 자동 trigger (sub-plan-5 통합).
 - 사용자가 "traceability matrix 보여줘" / "matrix 갱신해줘" 자연어 prompt.
 

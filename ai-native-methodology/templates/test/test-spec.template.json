@@ -1,14 +1,11 @@
 {
-  "$comment": "★ v11.0.0 — test-spec.json template placeholder. chain 4 (test) 산출물. AC-* 마다 실 test 코드 생성 (RED 의무 / impl 부재 / 모든 test fail). framework 별 분기 (vitest/junit5/pytest/playwright/schemathesis/axe-core 등). ★ BE contract framework → openapi_contract_ref 의무 / FE visual framework → visual_regression_ref 의무.",
   "meta": {
     "generated_at": "2026-01-01T00:00:00+09:00",
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "test_code"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ AC → TC RED 본격 / 5종 물증 7 필드 실 runner"
-    }
+    "confidence": 0.85,
+    "$comment": "★ v11.0.0 test-spec.json template placeholder (chain 4 / test 산출물). confidence=bare number (schema:number / meta-confidence.schema.json). 근거: AC-* 마다 실 test 코드 생성 (RED 의무 / impl 부재 / 모든 test fail) + 5종 물증 7 필드 실 runner. framework 별 분기 (vitest/junit5/pytest/playwright/schemathesis/axe-core 등). ★ BE contract framework → openapi_contract_ref 의무 / FE visual framework → visual_regression_ref 의무. test_cases Example 1=BE unit(junit5 / contract ❌ → openapi_contract_ref 불필요) / Example 2=BE contract(schemathesis → openapi_contract_ref required) / Example 3=FE visual(playwright-visual → visual_regression_ref required). _base-apply-template instantiate."
   },
   "derivation_source": {
     "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
@@ -16,7 +13,6 @@
   },
   "test_cases": [
     {
-      "$comment": "★ Example 1: BE unit test (★ junit5 / Spring) — contract framework ❌ → openapi_contract_ref 불필요",
       "id": "TC-DOMAIN-001",
       "ac_ref": "AC-DOMAIN-001",
       "bhv_ref": "BHV-DOMAIN-001",
@@ -41,7 +37,6 @@
       }
     },
     {
-      "$comment": "★ Example 2: BE contract test (★ schemathesis / swagger) — openapi_contract_ref 본격 required",
       "id": "TC-DOMAIN-002",
       "ac_ref": "AC-DOMAIN-002",
       "bhv_ref": "BHV-DOMAIN-001",
@@ -69,7 +64,6 @@
       }
     },
     {
-      "$comment": "★ Example 3: FE visual regression (★ playwright-visual) — visual_regression_ref 본격 required",
       "id": "TC-DOMAIN-003",
       "ac_ref": "AC-DOMAIN-003",
       "bhv_ref": "BHV-DOMAIN-001",

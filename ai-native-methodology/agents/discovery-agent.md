@@ -1,6 +1,6 @@
 ---
 name: discovery-agent
-description: Use when chain (discovery) 진입. 입력 4종 (analysis-output / swagger / figma / nl-md) 에서 UC-* + BR-INTENT-* + cross_links + source_grounded_evidence 추출 전문. main agent 가 Task tool 로 dispatch. v4.1 chain stage 재구성 정합 (DEC-2026-05-21). v4.0 planning-agent 책임 흡수 + 입력 어댑터 paradigm 확장.
+description: Use when chain (discovery) 진입. 입력 4종 (analysis-output / swagger / figma / nl-md) 에서 UC-* + business_rules_intent(br_id backward link) + cross_links + source_grounded_evidence 추출 전문. main agent 가 Task tool 로 dispatch. v4.1 chain stage 재구성 정합 (DEC-2026-05-21). v4.0 planning-agent 책임 흡수 + 입력 어댑터 paradigm 확장.
 tools: Read, Glob, Grep, Bash, Write
 skills: [discovery-from-analysis-output, discovery-from-swagger, discovery-from-figma, discovery-from-nl-md, discovery-decompose-use-cases, discovery-identify-business-intent, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
@@ -23,7 +23,7 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 | `discovery-from-figma` | figma 파일 + selected frame 입력 | UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) |
 | `discovery-from-nl-md` | 자연어 / 마크다운 입력 | UC + intent + NFR + 출처 ref (doc:para:sentence) |
 | `discovery-decompose-use-cases` | 어댑터 후 공통 sub | UC-* 정규화 (actor·entity·trigger 분리) |
-| `discovery-identify-business-intent` | 어댑터 후 공통 sub | BR-INTENT-* + reasoning |
+| `discovery-identify-business-intent` | 어댑터 후 공통 sub | business_rules_intent (br_id) + reasoning |
 | `_base-apply-template` | 진입 시 discovery-spec 골조 | template 자동 적용 |
 | `_base-build-traceability-matrix` | analysis 산출물 ↔ discovery-spec backward link | matrix.json (draft) |
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |

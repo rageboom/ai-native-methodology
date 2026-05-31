@@ -99,7 +99,7 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 
 ### 6. 결과 채움
 
-- chain 4 → test-spec.coverage_summary 갱신.
+- chain 4 → test-spec.coverage 갱신 (schema canonical = `coverage`, `coverage_summary` 아님 / link_coverage ratchet).
 - chain 5 → impl-spec.coverage 갱신 (link_coverage / test_pass_rate / line+branch_coverage).
 
 ## ★ ★ no-simulation — coverage 위조 차단

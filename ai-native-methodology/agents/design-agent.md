@@ -33,7 +33,7 @@ design stage 의 일부 책임 = ★ analysis stage 의 deliverable 7~9 안 cros
 - `analysis-ui-visual-manifest-fe` skill → visual-manifest.json (deliverable 9)
 - `analysis-form-validation-fe` skill → form-validation-spec.json (deliverable 14)
 - `analysis-type-spec-fe` skill → type-spec.json (deliverable 15)
-- `analysis-aspect-a11y` skill → a11y.json (deliverable 10)
+- `analysis-aspect-a11y` skill → a11y-spec.json (deliverable 10)
 
 본 cross-cutting 자산은 `analysis-agent.md` frontmatter `skills: [...]` 안 사전 주입 / 본 design-agent 책임 ❌.
 

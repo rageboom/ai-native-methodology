@@ -75,9 +75,10 @@
 
 ## 검증
 
-- `tools/test-impl-pass-validator/` (gate #4 / RED) — 모든 test fail 입증 (`--dry-run` 시 placeholder ❌)
+- `tools/test-impl-pass-validator/` (gate #4 / RED) — 모든 test fail 입증. ★ RED evidence 는 `--allow-execute` (실 runner 실행 / ADR-CHAIN-004 §4) 의무 (`expected: all_fail`). `--dry-run` = config 검증만 / 실행 ❌ → RED evidence ❌.
 - `tools/spec-test-link-validator/` (gate #4) — AC → TC link coverage ≥ 0.85
 - `tools/schema-validator/` — `schemas/test-spec.schema.json` if/then (BE contract / FE visual)
+- `lint-no-simulation` (chain-strict / gate #4) — ★ no-simulation 핵심 게이트. Tier 3 simulated 영구 reject / RED evidence 날조 차단.
 
 ## 다음
 

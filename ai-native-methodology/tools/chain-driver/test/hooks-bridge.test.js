@@ -1,9 +1,10 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import {
   parseHookInput, buildSuggestOutput, buildBlockOutput,
-  suggestSkillForPrompt, shouldBlockToolUse,
+  suggestSkillForPrompt, suggestAgentForPrompt, shouldBlockToolUse,
 } from '../src/hooks-bridge.js';
 
 describe('hooks-bridge', () => {
@@ -45,6 +46,21 @@ describe('hooks-bridge', () => {
 
   it('suggestSkillForPrompt returns null for unrelated prompt', () => {
     assert.equal(suggestSkillForPrompt('hello world'), null);
+  });
+
+  it('★ C10/C20 — analysis trigger maps to analysis skill + agent (5 stage 모두 커버)', () => {
+    assert.equal(suggestSkillForPrompt('분석 시작해줘'), 'analysis-input-collection');
+    assert.equal(suggestAgentForPrompt('분석 시작해줘'), 'analysis-agent');
+    assert.equal(suggestSkillForPrompt('legacy 분석 드라이브'), 'analysis-input-collection');
+  });
+
+  it('★ C20 — hooks.json UserPromptSubmit matcher ⊇ TRIGGER_PATTERNS 키워드 (dead-entry 회귀 차단)', () => {
+    const hooks = JSON.parse(readFileSync(new URL('../../../hooks/hooks.json', import.meta.url), 'utf8'));
+    const matcher = hooks.hooks.UserPromptSubmit[0].matcher;
+    // analysis trigger 키워드가 matcher 에 없으면 hook 자체가 발화 안 함 (C10 dead-entry).
+    for (const kw of ['분석', '검토', 'legacy', '레거시', 'analysis', 'discovery', 'spec', 'plan', 'test', 'implement']) {
+      assert.ok(matcher.includes(kw), `hooks.json matcher 에 '${kw}' 누락 — UserPromptSubmit hook 발화 실패 위험 (C10)`);
+    }
   });
 
   it('shouldBlockToolUse blocks Write under .aimd/output/ when state.blocked', () => {

@@ -7,7 +7,7 @@
 //   coverage_pct: 0.92,             // chain-coverage 결과
 //   coverage_threshold: 0.85,       // ratchet
 //   evidence_missing: [],           // chain-strict lint
-//   tests_total: 100, tests_passed: 100, tests_failed: 0,  // chain 3/4 only
+//   tests_total: 100, tests_passed: 100, tests_failed: 0,  // chain 4/5 only (test/implement)
 //   // ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm (ADR-CHAIN-011 §5.4.6 B 정합)
 //   llm_consistency_score: 0.85,    // aggregate mean (★ br-cross-consistency-validator Layer 2 / null = skipped)
 //   llm_threshold: 0.7,             // semantic threshold (★ default 0.7 / caller-configurable)
@@ -108,7 +108,7 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     if (expected.test === 'all_fail' && findings.tests_total != null && findings.tests_failed === 0) {
       reasons.push({
         code: 'evidence_missing',
-        detail: `chain 3 expected all_fail (RED) for scenario ${scenario}, but all tests passed — RED proof missing (RED 대상 = 생성될 코드)`,
+        detail: `chain 4 (test) expected all_fail (RED) for scenario ${scenario}, but all tests passed — RED proof missing (RED 대상 = 생성될 코드)`,
       });
     }
     // ★ v11.11.0 — S2(AX전환) per_tc_outcome: characterization(expected_outcome='pass') GREEN + augmentation(='fail') RED 혼합.
@@ -117,7 +117,7 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     if (expected.test === 'per_tc_outcome' && (findings.outcome_mismatches ?? 0) > 0) {
       reasons.push({
         code: 's2_outcome_mismatch',
-        detail: `chain 3 (S2 AX전환) per-TC expected_outcome mismatch ×${findings.outcome_mismatches} — characterization 은 GREEN(pass) / augmentation 은 RED(fail) 기대 (test_intent ↔ expected_outcome 정합 / WARN until ≥2 S2 corroboration)`,
+        detail: `chain 4 (test, S2 AX전환) per-TC expected_outcome mismatch ×${findings.outcome_mismatches} — characterization 은 GREEN(pass) / augmentation 은 RED(fail) 기대 (test_intent ↔ expected_outcome 정합 / WARN until ≥2 S2 corroboration)`,
       });
     }
   }
@@ -125,7 +125,15 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     if (expected.implement === 'all_pass' && findings.tests_total != null && findings.tests_failed > 0) {
       reasons.push({
         code: 'evidence_missing',
-        detail: `chain 4 expected all_pass (GREEN) for scenario ${scenario}, but ${findings.tests_failed} tests failed`,
+        detail: `chain 5 (implement) expected all_pass (GREEN) for scenario ${scenario}, but ${findings.tests_failed} tests failed`,
+      });
+    }
+    // ★ I9 (INSPECTION-2026-05-31-implement) — GREEN fail-OPEN 차단: implement GREEN 의무인데 test 결과(tests_total) 부재 시 evidence_missing.
+    //   기존엔 tests_failed>0 만 검사 → tests_total==null(진짜 runner 미실행/미제출)이면 GREEN gate 통과하던 결정론 누수 해소 (fail-closed / no-simulation).
+    if (expected.implement === 'all_pass' && findings.tests_total == null) {
+      reasons.push({
+        code: 'evidence_missing',
+        detail: `chain 5 (implement) GREEN 의무인데 test-impl-pass-validator 결과(tests_total) 부재 — 진짜 runner 미실행/미제출 (fail-closed / I9)`,
       });
     }
     // ★ ★ ★ v8.6.0 — R19 evidence_trust 3-tier chain-strict mode 격상 (Senior STRONG-STOP 흡수).

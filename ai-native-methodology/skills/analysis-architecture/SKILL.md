@@ -21,17 +21,17 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
    - micro (서비스 boundary 식별)
 2. **계층 / 모듈 매핑** — inventory 의 패키지를 계층에 할당.
 3. **순환 의존성 검출** — ADR-006 (순환의존 정책) 적용. 발견 시 finding 등재.
-4. **architecture.json 작성** — `schemas/architecture.schema.json`:
+4. **architecture.json 작성** — `schemas/architecture.schema.json` (strict / SSOT):
    ```json
    {
-     "pattern": "hexagonal",
-     "layers": [...],
-     "modules_by_layer": {...},
-     "boundaries": [...],
-     "circular_dependencies": [],
-     "meta_confidence": {...}
+     "meta": {...},
+     "architecture_style": "hexagonal",
+     "modules": [...],
+     "dependencies": [...],
+     "circular_dependencies": []
    }
    ```
+   ★ top-level required = `meta` · `modules` · `dependencies` (strict). 패턴 후보는 `architecture_style` (inventory 의 `architecture_style_candidates` 와 정합). 위 키 외 필드 추가 시 schema-validator fail.
 5. **architecture.mermaid 생성** — layer / module 다이어그램 (ADR-008 이중 렌더링).
 6. **drift-validator 검증** — `.json ↔ .mermaid` 의미 동등성 자동 확인.
 

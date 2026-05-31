@@ -48,9 +48,9 @@ allowed-tools: Read, Glob, Bash, Edit
 }
 ```
 
-★ chain-coverage-validator §integration check 가 다음 강제:
-- 모든 7대 산출물 (inventory 제외) 이 ≥ 1 BHV 의 cross_links / *_ref / br_refs 에 등장 의무.
-- 미참조 산출물 ≥ 1 → `chain.7대.unreferenced` finding (medium).
+★ 7대 산출물 통합 검토 (LLM/사람 영역 — gate#2 결정론 강제 ❌ / S7 정직 격하):
+- 모든 7대 산출물 (inventory 제외) 이 ≥ 1 BHV 의 cross_links / *_ref / br_refs 에 등장하도록 검토 권고.
+- ★ 주의: chain-coverage-validator 는 `behavior.cross_links` **non-empty + path 유효성**만 결정론 검사 — per-artifact 7대 reference(`chain.7대.unreferenced`)는 **미구현**. 7대 중 1개만 등록해도 gate 통과하므로 본 통합은 LLM/사람 검토 의존 (over-claim 정직 격하 / carry `C-spec-7대-ref-lane` = chain-coverage-validator lane 신설 후보).
 
 ## 절차
 

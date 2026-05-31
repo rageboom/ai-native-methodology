@@ -4,9 +4,9 @@ description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). an
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
-# extract-from-legacy
+# discovery-from-analysis-output
 
-★ ★ v2.0 chain 1 (planning) 의 **진입 skill**. 사용자 답변 1번 정합 — 1차 use case = legacy 추출 single-case (use case 4종 분기 = v2.1+ carry K-1).
+★ chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 사용자 답변 1번 정합 — 1차 use case = legacy 추출 single-case (use case 4종 분기 = v2.1+ carry K-1).
 
 ## 언제 사용
 
@@ -44,9 +44,9 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 2. **business_intent 추출** — domain.json + business-rules.json 에서 도메인 의도 (e.g., "user authentication" / "article lifecycle") 추출. 자연어 prompt + 사용자 검토 후 채움.
 
-3. **use_cases 분해** — `decompose-use-cases` skill 호출. 산출 = `UC-{domain}-NNN` 목록.
+3. **use_cases 분해** — `discovery-decompose-use-cases` skill 호출. 산출 = `UC-{domain}-NNN` 목록.
 
-4. **business_rules_intent 채움** — `identify-business-intent` skill 호출. 산출 = `business_rules_intent[]` (각 entry `br_id` = analysis business-rules.json BR-* 1:1 backward link / 별도 BR-INTENT-* id 없음).
+4. **business_rules_intent 채움** — `discovery-identify-business-intent` skill 호출. 산출 = `business_rules_intent[]` (각 entry `br_id` = analysis business-rules.json BR-* 1:1 backward link / 별도 BR-INTENT-* id 없음).
 
 5. **cross_links.to_analysis_artifacts 채움** — analysis 산출물 path 모두 backward link.
 

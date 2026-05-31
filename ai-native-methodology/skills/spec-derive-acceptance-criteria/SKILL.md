@@ -117,16 +117,10 @@ AC 안 `story_ref` 본격 부여 (Jira Story ID 또는 자유 string). Story = B
 
 1. **각 BHV 마다 1+ AC 분해** — happy path + ≥ 1 edge case + ≥ 1 negative path 권고.
 2. **Gherkin 작성** — Given/When/Then 단순 사용자어. step 본문에 specific value (★ random 변수 ❌ / property test 는 별도 chain 2 property_tests).
-3. **severity 채움** — 관련 analysis BR (br_id) 의 `severity` 매핑 (business-rules.json / critical / high / medium / low). ★ v11.0.0 — business_rules_intent 에 criticality 필드 폐기 (Senior B1) → severity 는 analysis BR 가 SSOT (br_id backward link 로 조회).
+3. **severity + related_aps 채움** — 관련 analysis BR (br_id) 의 `severity` 매핑 (business-rules.json / critical / high / medium / low). ★ v11.0.0 — business_rules_intent 에 criticality 필드 폐기 (Senior B1) → severity 는 analysis BR 가 SSOT (br_id backward link 로 조회). ★ severe AP coverage (S13): antipatterns.json 의 critical/high AP 를 cover 하는 AC 는 `related_aps[]` 에 해당 AP-* 등재 — gate#2 chain-coverage `--antipatterns` lane(`chain.ap.uncovered_severe` critical/blocking / F-SIM-001) 정합 (related_brs 와 병렬).
 4. **moscow 채움** — release 우선순위 / 사용자 검토 필수 (default = MUST 단, exploratory = SHOULD).
 5. **test_case_refs 채움 (forward link)** — chain 3 (test) 진입 후 `generate-test-spec` skill 이 backward 채움. 본 skill 단계에서는 placeholder `["TC-{BHV}-001"]` 사전 등록 + chain 3 step 1 에서 검증.
-6. **자동 검증** (compose-behavior-spec step 7 에서 합산):
-   ```bash
-   node tools/spec-test-link-validator/src/cli.js \
-     --behavior   .aimd/output/behavior-spec.json \
-     --acceptance .aimd/output/acceptance-criteria.json \
-     --test-spec  .aimd/output/test-spec.json
-   ```
+6. **자동 검증 (chain 2 시점)** — chain-coverage-validator 의 `chain.ac.verifiable_no_tc` (verifiable=true ⇔ test_case_refs ≥ 1) check 로 위임 (compose-behavior-spec step 7 합산). ★ `spec-test-link-validator` 는 chain **test(4)** 의 generate-test-spec 가 `test-spec.json` 을 산출한 *후* 호출 — chain 2 시점엔 test-spec.json 부재라 `--test-spec` 호출 시 usage error(exit 2). 따라서 chain 2 에서 spec-test-link-validator 호출 ❌ (S12 / test 단계로 이관).
 
 ## ★ Gherkin 본문 작성 가이드
 

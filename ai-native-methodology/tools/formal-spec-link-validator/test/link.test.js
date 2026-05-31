@@ -286,3 +286,20 @@ test('★ chain traceability-matrix — rows ID pattern 검증', () => {
   assert.equal(s.breaking, 0);
   assert.ok(s['non-breaking'] >= 1, `expected ≥1 non-breaking (UC-* mismatch), got ${JSON.stringify(s)}`);
 });
+
+// ★ C8 (INSPECTION-2026-05-31-analysis) — discovery-spec case 활성화 회귀 가드.
+// 구 'planning-spec' case 는 detectChainArtifact 가 반환하지 않아 영구 dead 였음 (F-MB-010 rename 잔존).
+// discovery-spec.json 의 use_cases[].id UC 패턴 검증이 실제로 동작하는지 골든 케이스로 고정.
+test('★ C8 chain discovery-spec — use_cases[].id valid UC pattern → 0 mismatch', () => {
+  const json = { use_cases: [{ id: 'UC-LOGIN-001' }, { id: 'UC-USER-002' }] };
+  const findings = checkChainLinks({ source: { type: 'chain', file: '/tmp/discovery-spec.json', artifact: 'discovery-spec', json }, baseDir: '/tmp' });
+  const mism = findings.filter((f) => f.kind === 'chain.id-pattern-mismatch');
+  assert.equal(mism.length, 0, `expected 0 UC mismatch, got ${JSON.stringify(findings)}`);
+});
+
+test('★ C8 chain discovery-spec — use_cases[].id invalid → id-pattern-mismatch (dead case 활성화 입증)', () => {
+  const json = { use_cases: [{ id: 'UC-LOGIN-001' }, { id: 'INVALID-UC' }] };
+  const findings = checkChainLinks({ source: { type: 'chain', file: '/tmp/discovery-spec.json', artifact: 'discovery-spec', json }, baseDir: '/tmp' });
+  const mism = findings.filter((f) => f.kind === 'chain.id-pattern-mismatch');
+  assert.equal(mism.length, 1, `expected exactly 1 UC mismatch (INVALID-UC), got ${JSON.stringify(findings)}`);
+});

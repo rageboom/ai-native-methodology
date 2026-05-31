@@ -16,6 +16,9 @@ const DEFAULT_INFERRED_RATIO_THRESHOLD = 0.5;
 export function detectAdapterType(extract) {
   if (!extract || typeof extract !== 'object') return 'unknown';
   if (Array.isArray(extract.components) || Array.isArray(extract.screens)) return 'figma';
+  // prompt-extract 도 uc_candidates 를 갖지만 confidence 메커니즘(assumptions[].confidence)이라 source-grounded 검증 대상 외.
+  // raw_prompt 시그니처로 plan-doc 보다 먼저 분류 → plan-doc 오분류 false-positive 차단 (C21 / README §32 코드 승격).
+  if (typeof extract.raw_prompt === 'string') return 'prompt';
   if (Array.isArray(extract.uc_candidates) || Array.isArray(extract.glossary)) return 'plan-doc';
   return 'unknown';
 }
@@ -76,6 +79,16 @@ export function validateAnalysisExtraction(extract, opts = {}) {
       findings,
       coverage: { verbatim_ratio: null },
       summary: summarize(findings),
+    };
+  }
+
+  // prompt-extract = confidence 메커니즘 (source-grounded provenance 검증 대상 외 / README §32) — false-positive 방지 위해 명시 skip.
+  if (adapter === 'prompt') {
+    return {
+      adapter,
+      findings: [],
+      coverage: { verbatim_ratio: null },
+      summary: summarize([]),
     };
   }
 

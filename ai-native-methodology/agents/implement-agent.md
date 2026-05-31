@@ -2,13 +2,13 @@
 name: implement-agent
 description: Use when chain 5 (implement / GREEN 의무 / i-strict) 진입. test-spec 기반 impl 코드 자동 생성 + impl-spec.{json,md} 산출. GREEN 의무 (모든 test 100% pass). traceability-matrix 100% green 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
-skills: [implement-generate-impl-spec, implement-verify-test-pass, implement-react, implement-vue, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
+skills: [implement-generate-impl-spec, implement-verify-test-pass, implement-react, implement-vue, test-run-test-evidence, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
 ---
 
 # implement-agent — chain 5 (implement / GREEN / i-strict) 전문 agent
 
-★ v4.0 multi-agent paradigm 정합. GREEN impl 코드 + 100% test pass 산출 전문. 4 implement skill + 4 base utility = 8 skill 사전 주입.
+★ v4.0 multi-agent paradigm 정합. GREEN impl 코드 + 100% test pass 산출 전문. **사전 주입 invariant**: `flows/implement.phase-flow.json` 등록 skill 전부 = 본 frontmatter `skills:` (implement-* + GREEN 증거용 `test-run-test-evidence` + `_base-*`). drift-validator 가 검사.
 
 ## 책임 범위
 
@@ -95,7 +95,7 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 - 실 impl 코드 파일 (`*.ts` / `*.tsx` / `*.vue` / `*.java` / `*.py` 등)
 - `.aimd/output/test_pass_evidence.json` (5종 물증 7 필드 + GREEN)
 - `.aimd/output/matrix.json` + `matrix.md` + `matrix.mermaid` (100% green)
-- `.aimd/output/static-runner-evidence.json` (★ 6 plugin 결과)
+- `.aimd/output/static-runner-evidence.json` (★ Tier 1 in-plugin Semgrep 실 실행 + Tier 2 SARIF import 흡수 결과 / PLUGINS registry = semgrep 단일 / no-simulation inflated-count ❌)
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #5 / chain 종결)
 
@@ -111,4 +111,4 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 - ADR-CHAIN-004 (★ Aider 패턴 + `--allow-execute`)
 - `schemas/impl-spec.schema.json` (deliverable 21)
 - DEC-2026-05-06-v2.0-i-strict-채택 (★ i-strict GREEN 의무)
-- DEC-2026-05-06-round-trip-부분-허용 (revisit:test / revisit:spec / revisit:planning / revisit:analysis 가능)
+- DEC-2026-05-06-round-trip-부분-허용 (revisit:test / revisit:plan / revisit:spec / revisit:discovery / revisit:analysis 가능 / sdlc-4stage revisit_edges 정합)

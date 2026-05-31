@@ -1,8 +1,8 @@
-# spec-test-link-validator/ — chain 3 (test) gate validator
+# spec-test-link-validator/ — chain 4 (test) gate validator
 
 ## Purpose
 
-★ ★ v2.0 chain harness 의 **chain 3 (test → impl) gate #3 validator**. `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-source-inventory stack signal) + coverage threshold (0.85) 강제.
+★ chain harness 의 **chain 4 (test → implement) gate #4 validator** (System Y / 구 chain 3 — v9.0 plan 신설 재번호). `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-source-inventory stack signal) + coverage threshold (0.85) 강제.
 
 ## When to call
 
@@ -30,7 +30,7 @@ node src/cli.js \
 | `chain.ac_coverage.below_threshold` | critical | AC → TC coverage < threshold |
 | `chain.tc.no_ac_ref` | critical | TC.ac_ref 누락 (validator.js:37) |
 | `chain.tc.unknown_ac` | critical | TC.ac_ref 가 acceptance 에 없음 |
-| `chain.tc.unknown_bhv` | high | TC.bhv_ref 가 behavior 에 없음 |
+| `chain.tc.unknown_bhv` | critical | TC.bhv_ref 가 behavior 에 없음 (validator.js emit = critical / 권위 일치) |
 | `chain.ac.no_tc` | high | verifiable=true AC 인데 test_case_refs 빈 배열 |
 | `chain.tc.framework_mismatch` | medium | TC.framework 가 inventory.stack_signals 와 어긋남 (★ ADR-CHAIN-004 정합) |
 

@@ -113,7 +113,7 @@
     },
     "test_pass_evidence": {
       "type": "object",
-      "description": "★ ★ ★ chain 4 GREEN 의무 — 진짜 runner 100% pass 입증. 5종 물증 7 필드 (B5 정규화)",
+      "description": "★ ★ ★ chain 5 GREEN 의무 — 진짜 runner 100% pass 입증. 5종 물증 7 필드 (B5 정규화)",
       "required": ["test_runner_version", "test_runner_stdout_path", "invocation_timestamp", "duration_ms", "pass_count", "fail_count", "skip_count", "reproduction_command", "result_hash", "report_format"],
       "additionalProperties": false,
       "properties": {
@@ -123,7 +123,7 @@
         "invocation_timestamp": {"type": "string", "format": "date-time"},
         "duration_ms": {"type": "integer", "minimum": 0},
         "pass_count": {"type": "integer", "minimum": 0},
-        "fail_count": {"type": "integer", "const": 0, "description": "★ chain 4 GREEN 의무 — 0 만 허용"},
+        "fail_count": {"type": "integer", "const": 0, "description": "★ chain 5 GREEN 의무 — 0 만 허용"},
         "skip_count": {"type": "integer", "minimum": 0},
         "reproduction_command": {
           "oneOf": [
@@ -142,7 +142,7 @@
           "type": "integer",
           "minimum": 0,
           "default": 0,
-          "description": "★ ★ ADR-CHAIN-004 §5 — Playwright per-test cap 2 정합. 실제 retry 발생 횟수 누적 (chain 4 GREEN 의무 = fail_count 0 이지만 retry 발생 시 본 필드로 trace)"
+          "description": "★ ★ ADR-CHAIN-004 §5 — Playwright per-test cap 2 정합. 실제 retry 발생 횟수 누적 (chain 5 GREEN 의무 = fail_count 0 이지만 retry 발생 시 본 필드로 trace)"
         }
       }
     },
@@ -175,7 +175,7 @@
         "test_pass_rate": {
           "type": "number",
           "const": 1.0,
-          "description": "★ chain 4 GREEN 의무 (1.0 fixed)"
+          "description": "★ chain 5 GREEN 의무 (1.0 fixed)"
         },
         "line_coverage": {"type": "number", "minimum": 0, "maximum": 1},
         "branch_coverage": {"type": "number", "minimum": 0, "maximum": 1}
@@ -211,7 +211,7 @@
     },
     "real_integration_axis": {
       "type": "object",
-      "description": "★ v8.8.0 Tier 1.2 — chain 4 GREEN 의 진정성 측정 axis (informational / v8.9+ mandatory carry). chain 4 가 unit-only mock fixture 통과인지 실 외부 의존성 통합 통과인지 구분. 본 field 부재 시 unknown 처리 / breaking 0.",
+      "description": "★ v8.8.0 Tier 1.2 — chain 5 GREEN 의 진정성 측정 axis (informational / v8.9+ mandatory carry). chain 4 가 unit-only mock fixture 통과인지 실 외부 의존성 통합 통과인지 구분. 본 field 부재 시 unknown 처리 / breaking 0.",
       "additionalProperties": false,
       "properties": {
         "prisma_client_injected": {

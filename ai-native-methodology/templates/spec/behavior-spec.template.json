@@ -1,14 +1,11 @@
 {
-  "$comment": "★ v11.0.0 — behavior-spec.json template placeholder. chain 2 (spec) 산출물. discovery-spec.use_cases + analysis Phase 4.5 (state-machine / sequence / decision-table / invariant / property-test) 통합 → executable behavioral contract. cross-cut 단일 (BE/FE 양쪽 가로지름).",
   "meta": {
     "generated_at": "2026-01-01T00:00:00+09:00",
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "documentation"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ discovery-spec UC forward + Phase 4.5 state-machine/sequence 정합"
-    }
+    "confidence": 0.85,
+    "$comment": "behavior-spec template placeholder (chain 2 / executable behavioral contract). confidence=bare number (schema:number). 근거: discovery-spec UC forward + Phase 4.5 state-machine·sequence·decision-table·invariant·property-test 통합. _base-apply-template instantiate."
   },
   "derivation_source": {
     "discovery_spec_path": ".aimd/output/discovery-spec.json",

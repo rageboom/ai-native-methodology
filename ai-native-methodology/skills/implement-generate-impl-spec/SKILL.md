@@ -231,7 +231,7 @@ Auto Mode 활성 시 — 이전 branch 의 코드가 살아있고 chain 4 의 ca
 ### 인용 (G-007 보강 추가)
 
 - mis-fe-admin DWPD-1774 5 stage 테스트 §G-007 — case study reference (본 보강의 impl-spec.json 이 reference 자격).
-- `decisions/DEC-2026-05-21-G007-impl-strategy-enum.md` — 본 결단 record.
+- DEC-2026-05-21-G007 (impl-strategy enum 원본 결단 record / workspace decisions/ — dist 미포함이라 경로 직접 인용 제거: case-by-case dist-dangling 정책 / 상세는 task-plan.adrs[] + impl-spec.strategy enum).
 - DEC-2026-05-06-round-trip-부분-허용 — revisit:test 가능 (strategy 전환 시 chain 4 재진입).
 
 ## 기술 스택 분기 (★ skills-axis 정합 / 본문 분기)

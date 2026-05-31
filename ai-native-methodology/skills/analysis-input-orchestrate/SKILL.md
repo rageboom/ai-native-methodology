@@ -86,7 +86,7 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 - `methodology-spec/workflow/input.md` (수동 + skill 호출 옵션 + orchestrator 자동 dispatch 3중)
 - `methodology-spec/plugin-charter.md` §1 R8 + §3 G2
-- `decisions/DEC-2026-05-15-g2-orchestrate-skill-분리-채택.md`
+  (G2 orchestrate skill 분리 결단 = DEC-2026-05-15 / 상세는 decisions/ 워크스페이스 로그 — dist 미포함이라 경로 직접 인용 제거: case-by-case dist-dangling 정책)
 
 ## When NOT to invoke
 

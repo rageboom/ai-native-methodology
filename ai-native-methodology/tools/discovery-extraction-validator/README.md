@@ -4,7 +4,7 @@
 
 ## Purpose
 
-★ ★ v11.0.0 chain harness 의 **chain 1 (discovery → spec) gate #1 validator**. `discovery-spec.json` 의 모든 `BR-INTENT-*` 가 analysis 산출물 (`business-rules.json` / `domain.json`) 의 BR/도메인 객체에 grep-hit 으로 source-grounded 인지 검증. **AI 환각 방지가 1차 목적**.
+★ ★ v11.0.0 chain harness 의 **chain 1 (discovery → spec) gate #1 validator**. `discovery-spec.json` 의 모든 `business_rules_intent[]` (br_id backward link) 가 analysis 산출물 (`business-rules.json` / `domain.json`) 의 BR/도메인 객체에 grep-hit 으로 source-grounded 인지 검증 + UC 분해 임계 + 결단 거버넌스. **AI 환각 방지가 1차 목적**.
 
 ## When to call
 
@@ -26,10 +26,17 @@ node src/cli.js \
 
 | kind | severity | 의미 |
 |---|---|---|
-| `discovery.br_intent.unknown_br` | critical | `BR-INTENT-*.br_id` 가 analysis 의 BR-* 와 매칭 ❌ |
+| `discovery.br_intent.unknown_br` | critical | `business_rules_intent[].br_id` 가 analysis 의 BR-* 와 매칭 ❌ |
+| `discovery.ai-default-revisit-flag-missing` | critical | `decisions[].source=AI-default` 인데 `revisit_required != true` (D4 / §v8.7.5 a) |
+| `discovery.pending-decisions-not-resolved` | critical | `pending_decisions[]` non-empty → gate#1 user-explicit 전환 의무 (gate stop / D4 / §v8.7.5 b) |
 | `discovery.source_grounded.missing` | high | `source_grounded_evidence` 부재 / 빈 배열 |
 | `discovery.uc_coverage.below_threshold` | high | UC coverage < 0.80 |
+| `discovery.carry-decision-missing-evidence-path` | high | `decisions[].source=carry` 인데 rationale 에 evidence path 단서 부재 (D4 / §v8.7.5 c) |
 | `discovery.cross_links.empty` | medium | `cross_links.to_analysis_artifacts` 빈 배열 |
+| `discovery.br_intent.missing_intent_certainty` | low | `intent_certainty` 라벨 부재 (v11.6.0 / over-attribution nudge) |
+| `discovery.domain.missing_business_context` | low | domain.json 에 stakeholders / business_intent_summary 부재 (v11.16.0) |
+| `discovery.uc.over_decomposition` | low | `use_cases` ≥ 30 — cluster 검토 nudge (D9 / gate#1 cluster 항목) |
+| `discovery.uc.under_decomposition` | low | UC/entity < 1.5 — 추가 분해 권고 (D9) |
 
 ## Exit codes
 

@@ -17,7 +17,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 - `<project>/.aimd/output/discovery-spec.json` (★ chain 1 산출)
 - `<project>/.aimd/output/business-rules.json` + `domain.json` + 7대 산출물
-- `<project>/.aimd/output/state-machines/*.json` + `sequences/*.json` + `decision-tables/*.json` + `invariants/*.ts` (`formal-spec` phase 산출)
+- `<project>/.aimd/output/formal-spec/state-machines/*.json` + `formal-spec/sequences/*.json` + `formal-spec/decision-tables/*.json` + `formal-spec/invariants/*.ts` (`formal-spec` phase 산출 / ★ formal-spec/ prefix = schema·template convention 정합 S8)
 
 ## 산출물
 
@@ -68,11 +68,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 7. **자동 검증**:
    ```bash
-   # chain coverage (UC → BHV / BHV → AC)
+   # chain coverage (UC → BHV / BHV → AC) + severe-AP coverage (gate#2 blocking lane / S13)
    node tools/chain-coverage-validator/src/cli.js \
      --discovery  .aimd/output/discovery-spec.json \
      --behavior   .aimd/output/behavior-spec.json \
-     --acceptance .aimd/output/acceptance-criteria.json
+     --acceptance .aimd/output/acceptance-criteria.json \
+     --antipatterns .aimd/output/antipatterns.json
 
    # behavior chain 2 drift (state-machine + sequence 짝)
    node tools/drift-validator/src/cli.js .aimd/output/behavior-spec.json
@@ -81,7 +82,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    node tools/formal-spec-link-validator/src/cli.js .aimd/output/ --chain-mode
 
    # decision-table 5-check
-   node tools/decision-table-validator/src/cli.js .aimd/output/decision-tables/
+   node tools/decision-table-validator/src/cli.js .aimd/output/formal-spec/decision-tables/
    ```
 
 8. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).

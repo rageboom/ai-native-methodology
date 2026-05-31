@@ -1,14 +1,11 @@
 {
-  "$comment": "★ v11.0.0 — task-plan.json template placeholder. chain 3 (plan) 산출물. macro HOW (task 분해 / 의존성 / ADR / NFR / risk / rollback). 본 stage = ticket 생성 시점 (4-level cascade: Epic + Story + OP-* + TASK-*). ★ layer 분기 본격 — be → openapi_endpoint_ref 의무 / fe → component_ref 의무.",
   "meta": {
     "generated_at": "2026-01-01T00:00:00+09:00",
     "source_commit_sha": "<git commit SHA>",
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "documentation"],
-    "confidence": {
-      "level": 0.85,
-      "rationale": "★ AC → TASK 분해 + ADR alternatives ≥3 + NFR allocation + risk 3중 망"
-    }
+    "confidence": 0.85,
+    "$comment": "task-plan template placeholder (chain 3 / macro HOW: task 분해·의존성·ADR·NFR·risk·rollback / 4-level Epic+Story+OP+TASK cascade). confidence=bare number (schema:number). layer 분기: be→openapi_endpoint_ref / fe→component_ref. 근거: AC→TASK 분해 + ADR alternatives≥3 + NFR allocation + risk 3중 망."
   },
   "derivation_source": {
     "behavior_spec_path": ".aimd/output/behavior-spec.json",
@@ -17,10 +14,9 @@
   },
   "tasks": [
     {
-      "$comment": "★ Example 1: layer=be (★ openapi_endpoint_ref 의무)",
       "id": "TASK-DOMAIN-001",
       "title": "BE API endpoint 구현",
-      "description": "<설명>",
+      "description": "<설명> (예시 1: layer=be / openapi_endpoint_ref 의무)",
       "ac_refs": ["AC-DOMAIN-002"],
       "behavior_ref": "BHV-DOMAIN-001",
       "layer": "be",
@@ -42,10 +38,9 @@
       "code_pointers_na": true
     },
     {
-      "$comment": "★ Example 2: layer=fe (★ component_ref 의무)",
       "id": "TASK-DOMAIN-002",
       "title": "FE 화면 컴포넌트 구현",
-      "description": "<설명>",
+      "description": "<설명> (예시 2: layer=fe / component_ref 의무)",
       "ac_refs": ["AC-DOMAIN-003"],
       "behavior_ref": "BHV-DOMAIN-001",
       "layer": "fe",
@@ -65,9 +60,8 @@
       "code_pointers_na": true
     },
     {
-      "$comment": "★ Example 3: layer=e2e (cross-cut Story anchor / contract ref ❌)",
       "id": "TASK-DOMAIN-003",
-      "title": "E2E 시나리오 자동화",
+      "title": "E2E 시나리오 자동화 (예시 3: layer=e2e / cross-cut Story anchor / contract ref ❌)",
       "ac_refs": ["AC-DOMAIN-001"],
       "behavior_ref": "BHV-DOMAIN-001",
       "layer": "e2e",
@@ -140,21 +134,18 @@
       "id": "NFR-DOMAIN-001",
       "characteristic": "performance_efficiency",
       "severity": "high",
-      "description": "<NFR 설명 — 예: 응답시간 p95 < 500ms>"
+      "description": "<NFR 설명 — 예: 응답시간 p95 < 500ms>",
+      "measurement": "p95 latency < 500ms",
+      "task_refs": ["TASK-DOMAIN-001"]
     }
   ],
   "rollback_strategy": {
-    "approach": "<rollback 전략 — 예: feature flag / blue-green / backward-compat shim>",
-    "trigger_conditions": ["<rollback 발동 조건>"],
-    "data_migration_reversibility": "reversible"
+    "strategy": "feature flag / blue-green / backward-compat shim — 발동 조건: <조건> / data migration reversible",
+    "verification": "rollback 후 회귀 test GREEN + data 무결성 확인 (실제 rollback 가능성 검증)"
   },
   "cross_links": {
-    "to_spec_artifacts": [
-      ".aimd/output/behavior-spec.json",
-      ".aimd/output/acceptance-criteria.json"
-    ],
-    "to_discovery_artifacts": [
-      ".aimd/output/discovery-spec.json"
-    ]
+    "to_behavior_spec": [".aimd/output/behavior-spec.json"],
+    "to_acceptance_criteria": [".aimd/output/acceptance-criteria.json"],
+    "to_discovery_spec": [".aimd/output/discovery-spec.json"]
   }
 }

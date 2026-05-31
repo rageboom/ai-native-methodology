@@ -21,10 +21,10 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 ## 절차
 
 1. **이중 렌더링 정합 (ADR-008)** — `architecture.json ↔ architecture.mermaid` / `decision-table.json ↔ .mermaid` drift-validator 자동 호출
-2. **cross-link 검증** — formal-spec-link-validator:
-   - business-rules.json 의 domain reference 가 domain.json 에 존재하는지
-   - architecture.json 의 module 이 inventory.json 에 존재하는지
-   - openapi.yaml endpoint 가 business-rules.json 의 rule 과 매칭되는지
+2. **cross-link 검토 (LLM/사람 — analysis 무-gate / 결정론 강제 ❌)** — 아래 3 정합은 LLM·사람 검토 영역. ★ formal-spec-link-validator 는 analysis-stage 이 3종을 결정론 강제하지 **않음** (FE/chain cross-link id-pattern + ADR-008 이중렌더링 drift 만 자동 검사). 따라서 본 3종은 정직하게 "검토 권고"로 표기:
+   - business-rules.json 의 domain reference ∈ domain.json
+   - architecture.json 의 module ∈ inventory.json
+   - openapi.yaml endpoint ↔ business-rules.json rule 매칭
 3. **진짜 도구 실행** (해당 stack 에 한해 / R19 Tier 명시):
    - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx)
    - **Tier 2 (사용자 환경 SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+ + bytecode) / Daikon (Java + runtime trace) / CodeQL (JDK + DB build) / SonarQube

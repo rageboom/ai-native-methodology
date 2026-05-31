@@ -20,16 +20,17 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - Python: `pyproject.toml` packages
 2. **모듈 / 패키지 트리 작성** — Glob 으로 디렉토리 구조 / Read 로 manifest 파일.
 3. **의존성 그래프** — package manager 출력 (npm ls / mvn dependency:tree / pip freeze) 또는 manifest 파싱.
-4. **inventory.json 작성** — `templates/analysis/inventory.template.md` 또는 schema `schemas/inventory.schema.json` 기준:
+4. **inventory.json 작성** — `schemas/inventory.schema.json` (strict / SSOT) 기준:
    ```json
    {
-     "modules": [...],
-     "external_dependencies": [...],
-     "internal_dependencies": [...],
-     "file_count_by_type": { ".java": 245, ".xml": 12, ... },
-     "meta_confidence": { "level": "high", "evidence": "..." }
+     "meta": { "...": "..." },
+     "repo": { "...": "..." },
+     "stack": { "...": "..." },
+     "architecture_style_candidates": ["..."],
+     "modules_for_priority_analysis": ["..."]
    }
    ```
+   ★ top-level required = `meta` · `repo` · `stack` (strict `additionalProperties:false`). 정확한 하위 구조는 `schemas/inventory.schema.json` 이 SSOT — 위 키 외 필드 추가 시 schema-validator fail.
 5. **drift-validator 검증** — schema 정합 자동 확인 (PostToolUse hook).
 6. **finding 등재** — gap / unclear module ownership 등 발견 시 `log-finding`.
 

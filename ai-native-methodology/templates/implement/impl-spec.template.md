@@ -76,5 +76,5 @@
 
 ## 다음
 
-- 사용자 검토 → release-readiness 22/22 ready → version 3-way sync → commit + tag + push
+- 사용자 검토 → release-readiness 24/24 ready → version 3-way sync → commit + tag + push
 - traceability-matrix 100% green 의무

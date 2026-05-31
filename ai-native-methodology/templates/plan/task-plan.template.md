@@ -90,9 +90,8 @@
 
 ## 6. Rollback 전략
 
-- **approach**: feature flag / blue-green / backward-compat shim
-- **trigger_conditions**: <rollback 발동 조건>
-- **data_migration_reversibility**: reversible
+- **strategy**: feature flag / blue-green / backward-compat shim — 발동 조건: <조건> / data migration reversible
+- **verification**: rollback 후 회귀 test GREEN + data 무결성 확인
 
 ## 검증
 
