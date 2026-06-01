@@ -294,6 +294,14 @@ const ANALYSIS_TO_CODE_POINTERS = Object.freeze({
     mode: 'dir',
     accessor: (d) => (d?.modules ?? []).map((m) => m?.path),
   },
+  // ★ v11.26.0 Slice 4 — db-schema: source_files[](스키마가 추출된 DDL/migration .sql) → strict_path.
+  //   db-schema = DDL 의 semantic owner → A2 가 DDL 변경 시 db-schema 노드 drift 탐지 (접근 C / carry ③).
+  //   business-rules 동형(file / prefixes ['']). .sql ∈ CODE_FILE_EXTENSIONS / erd .mmd·미존재 = 게이트 skip → 0 해소 시 na.
+  //   ★ §8.1 정직: RealWorld 단일 도메인에선 antipatterns(Slice 3)가 같은 DDL 앵커 = A2 탐지 겹침 / 독립 가치 = ≥2 도메인 carry.
+  'db-schema': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => d?.source_files ?? [],
+  },
 });
 
 // 확장자 화이트리스트 — strict_path emit 前 게이트 (table-name·dir·dotted-class false-anchor 차단 / Senior REVISE).

@@ -9,6 +9,18 @@
 
 ---
 
+## [11.26.0] — 2026-06-01 MINOR — dep-graph Slice 4: db-schema → DDL 앵커 (접근 C / carry ③)
+
+**db-schema 분석 노드가 한 번도 코드에 앵커된 적 없던(항상 na) 것을, 스키마에 optional `source_files`(추출 DDL/migration 경로) 추가로 실 DDL(.sql)에 앵커 → A2 가 DDL 변경 시 db-schema drift 탐지** (db-schema = DDL 의 semantic owner / 기존 `code_pointers=N/A` 해소).
+
+- **`schemas/db-schema.schema.json`** (additive / breaking 0): optional top-level `source_files: string[]` 신설 (required 미추가 → 4 poc + RealWorld 무회귀). description 으로 "DDL/migration .sql repo-relative 경로; ERD 는 diagram_files.erd; live 운영DB·ORM entity 는 미나열(ORM entity 는 domain.json 이 앵커)" 제약 (Senior REVISE-2).
+- **`tools/traceability-matrix-builder/src/graph-synthesizer.js`**: `ANALYSIS_TO_CODE_POINTERS['db-schema'] = { mode:'file', prefixes:[''], accessor:(d)=>d?.source_files ?? [] }` (business-rules/antipatterns 동형). 기존 derive 경로(existence-gate + 확장자 화이트리스트 CODE_FILE_EXTENSIONS(.sql 포함) + commit_hash strict_path 스탬프) 재사용 → `.mmd`(erd)·미존재 = 게이트 skip → 0 해소 시 na.
+- **`skills/analysis-db-schema-erd/SKILL.md`**: step4 schema.json 예시에 `source_files` + 지시(DDL/migration 추출 시 경로 나열 → 앵커 + A2 / N/A 해소) + greenfield 절(DDL 부재 → source_files 비움 → na 유지) 갱신.
+- **검증 (no-simulation / 실 CLI)**: graph-synthesizer **+5 test** (source_files→strict_path / 부재→na / commit_hash 스탬프 / existence-gate / .mmd 확장자 skip) → 139→144 / workspace **1013→1018** / 0 fail / schema-validator 35/35 회귀 / release-readiness **26/26**. **additive 안전 입증**: source_files 있음·없음 둘 다 db-schema.schema.json valid.
+- **RealWorld dogfood** (외부 repo / 실 CLI / probe analysis-dir): **BEFORE** db-schema `na=true`(code_pointers 0) → **AFTER**(source_files 추가) `na=false` / **covered 1 strict_path** `src/main/resources/db/migration/V1__create_tables.sql` @ee17e31(A2-eligible). code-pointer-validator covered 6→7·missing 0·analysis-db-schema findings 0. evidence = `_dogfood-realworld/.../.aimd/slice4-dbschema-ddl-probe.md`.
+- **§8.1 (정직 / Senior CONCERN-D)**: ship = **메커니즘 + coverage gap 해소**(db-schema 가 이제 DDL 앵커 가능 = 일반-케이스 독립 가치). **★ RealWorld A2 가치 = redundant — 부풀리기 ❌**: RealWorld 선 Slice 3 antipatterns 가 이미 같은 DDL 앵커 → A2 탐지 겹침 → "covered +1" 을 새 A2 가치로 주장 안 함. **독립 A2 가치 = db-schema 가 antipatterns 와 다른 DDL 을 앵커하는 ≥2번째 distinct 도메인 carry**. read-class·additive 결정론 infra → gate-class 아님.
+- **잔여 carry**: ① `source_files` `[{path,kind}]` 분해(2nd 도메인 mixed-kind drift 입증 시 / Senior REVISE-2 defer) ② ≥2 distinct 도메인 A2 usability(gate-class) ③ FE kinds 앵커(실 FE 프로젝트) ④ A3 relocation dogfood ⑤ committed↔uncommitted 분해(v11.25.0 carry). DEC-2026-06-01-slice4-dbschema-ddl.
+
 ## [11.25.0] — 2026-06-01 MINOR — dep-graph A2 working-tree 모드 (커밋 안 한 변경 탐지 / F-DF-A2-003 해소)
 
 **A2 content-drift 가 커밋된 변경(base→HEAD)만 보던 한계를 opt-in `--worktree` 모드로 확장 — 작업 중(uncommitted) 코드 변경도 탐지** (P0 = LLM 운영 컨텍스트 live 동기화 / 개발 중 실시간 drift).

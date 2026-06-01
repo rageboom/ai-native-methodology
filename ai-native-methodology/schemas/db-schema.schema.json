@@ -185,6 +185,11 @@
         }
       }
     },
+    "source_files": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "스키마가 추출된 DDL/migration 정의 파일의 repo-relative 경로 (예: Flyway/Liquibase .sql). dep-graph 앵커 + A2 가 DDL 변경 탐지 (db-schema = DDL 의 semantic owner). ERD 다이어그램은 여기 ❌ → diagram_files.erd / live operational_db·ORM entity 는 미나열 (ORM entity 는 domain.json evidence 가 앵커). 미DDL 출처 = 비움 (→ code_pointers na 유지)."
+    },
     "consistency_report_file": {
       "type": "string",
       "description": "출처 간 정합성 검증 보고서 파일 경로 (Phase 2 산출물)"

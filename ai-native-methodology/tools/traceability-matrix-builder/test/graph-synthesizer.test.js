@@ -1182,3 +1182,68 @@ describe('synthesizeGraph — ★ v11.24.0 Slice 3 antipatterns code-pointer enr
     assert.equal(n.code_pointers_na, true, 'na (정직)');
   });
 });
+
+// ============================================================================
+// ★ v11.26.0 Slice 4 (접근 C / carry ③) — db-schema source_files[] → code_pointers derive
+//   db-schema = DDL 의 semantic owner. source_files(스키마가 추출된 DDL/migration .sql) → strict_path (A2 참여).
+//   business-rules/antipatterns 동형 (mode:'file' / prefixes:['']). erd .mmd = 확장자 게이트 skip.
+//   ★ §8.1 정직: RealWorld 단일 도메인에선 antipatterns(Slice 3)와 같은 DDL 앵커 = A2 탐지 겹침 / 독립 가치 = ≥2 도메인 carry.
+// ============================================================================
+describe('synthesizeGraph — ★ v11.26.0 Slice 4 db-schema source_files code-pointer enrich', () => {
+  const yes = () => true;
+
+  it('S4-1) db-schema source_files[] → analysis-db-schema strict_path 앵커 (na 미설정 / 기존 N/A 해소)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'db-schema': { meta: { title: 'schema' }, tables: [{ name: 'users', sources: ['migration'] }],
+        source_files: ['src/main/resources/db/migration/V1__create_tables.sql'] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-db-schema');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), ['src/main/resources/db/migration/V1__create_tables.sql']);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'strict_path'), 'strict_path');
+    assert.equal(n.code_pointers_na, undefined, 'derive 성공 → covered');
+  });
+
+  it('S4-2) db-schema source_files 부재 → na (backstop / greenfield·운영DB-only)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'db-schema': { meta: { title: 'schema' }, tables: [{ name: 'users', sources: ['operational_db'] }] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-db-schema');
+    assert.ok(!n.code_pointers, 'source_files 부재 → 0 수집');
+    assert.equal(n.code_pointers_na, true, 'backstop na');
+  });
+
+  it('S4-3) db-schema strict_path 는 commit_hash 스탬프 (A2 content-drift 참여 / DDL 변경 탐지)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'db-schema': { meta: { title: 's' }, tables: [{ name: 't', sources: ['migration'] }],
+        source_files: ['src/main/resources/db/migration/V1__create_tables.sql'] } },
+      existsFn: yes,
+      commitHash: 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-db-schema');
+    assert.equal(n.code_pointers[0].commit_hash, 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a', 'A2 baseline 스탬프');
+  });
+
+  it('S4-4) existence-gate — 미존재 DDL → emit ❌ → na (정직 불변식)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'db-schema': { meta: { title: 's' }, tables: [{ name: 't', sources: ['migration'] }],
+        source_files: ['src/main/resources/db/migration/V99__gone.sql'] } },
+      existsFn: () => false,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-db-schema');
+    assert.ok(!n.code_pointers, '미존재 → derive 0');
+    assert.equal(n.code_pointers_na, true, 'na (정직)');
+  });
+
+  it('S4-5) erd .mmd/.mermaid 는 확장자 게이트 skip (코드 아님 → diagram_files.erd 영역) → na', () => {
+    const g = synthesizeGraph({
+      analysis: { 'db-schema': { meta: { title: 's' }, tables: [{ name: 't', sources: ['erd'] }],
+        source_files: ['erd.mermaid', 'docs/schema.mmd'] } }, // 비코드 확장자만
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-db-schema');
+    assert.ok(!n.code_pointers, '.mermaid/.mmd 는 CODE_FILE_EXTENSIONS 외 → 미수집');
+    assert.equal(n.code_pointers_na, true, 'na (erd 다이어그램은 앵커 대상 아님)');
+  });
+});
