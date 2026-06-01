@@ -83,12 +83,19 @@ export function findRelocation(path, { gitRunner, repoRoot = process.cwd() } = {
   return null;
 }
 
-// A2 — commit_hash 시점 대비 HEAD 에서 path 내용 변경 여부. 변경=true / 무변경=false / 판정불가=null.
-export function detectContentDrift(path, commitHash, { gitRunner } = {}) {
+// A2 — commit_hash 시점 대비 내용 변경 여부. 변경=true / 무변경=false / 판정불가=null.
+//   includeWorktree=false (기본) → base→HEAD (커밋된 변경만 / 기존 behavior byte-identical).
+//   includeWorktree=true  → base→작업트리 ('HEAD' 인자 제거) = 커밋된 변경 + 미커밋(staged/unstaged) 포함 superset.
+//     근거: git-diff(1) Form 4 "changes you have in your working tree relative to the named <commit>" (VERIFIED / 공식문서).
+//     untracked(신규·미add) 파일은 git diff 가 미포함 → 본 기능은 "이미 앵커된(추적되는) 파일"만 보므로 무관.
+export function detectContentDrift(path, commitHash, { gitRunner, includeWorktree = false } = {}) {
   if (typeof gitRunner !== 'function' || !commitHash) return null;
   let out;
   try {
-    out = gitRunner(['diff', '--name-only', commitHash, 'HEAD', '--', path]);
+    const args = includeWorktree
+      ? ['diff', '--name-only', commitHash, '--', path]          // base→작업트리 (미커밋 포함)
+      : ['diff', '--name-only', commitHash, 'HEAD', '--', path]; // base→HEAD (커밋된 것만)
+    out = gitRunner(args);
   } catch {
     return null; // commit 무효 / git 부재
   }
@@ -140,18 +147,23 @@ function validateOnePointer(pointer, { repoRoot, opts = {} }) {
       return findings;
     }
     // ★ Loop A / A2 — 파일 존재하나 commit_hash 시점 이후 내용 변경 = content-drift (opt-in).
+    //   opts.worktree=true → 미커밋(작업트리) 변경도 탐지 (F-DF-A2-003 / detectContentDrift includeWorktree).
     if (opts.gitRunner && pointer.commit_hash) {
-      const drifted = detectContentDrift(path, pointer.commit_hash, { gitRunner: opts.gitRunner });
+      const wt = opts.worktree === true;
+      const drifted = detectContentDrift(path, pointer.commit_hash, { gitRunner: opts.gitRunner, includeWorktree: wt });
       if (drifted === true) {
         findings.push({
           // ★ §8.1 (DEC-2026-06-01-living-dep-graph-loops) — content_drift 는 --strict 와 무관하게 medium 고정.
           //   단일 도메인(RealWorld/poc-05) git blob-diff verdict → ≥2 distinct 도메인 corroboration 전까지 non-gating.
           //   gate(fail) 제외는 computeGateFail() 가 kind 로 필터 (medium 으로 보고만 / 가시성 유지).
+          //   ★ worktree 모드(미커밋 포함)도 동일 kind 재사용 → computeGateFail 의 content_drift 제외 자동 상속
+          //     (신규 kind 신설 시 kind-필터 우회 → gating 격상 = §8.1 위반 / Senior REVISE-B).
           kind: 'code_pointer.content_drift',
           severity: 'medium',
           anchor_type, path,
           base_commit: pointer.commit_hash,
-          message: `strict_path '${path}' 내용이 commit_hash(${pointer.commit_hash.slice(0, 7)}) 이후 변경됨 — anchor content-drift (노드 state→drift 권고 / non-gating)`,
+          ...(wt ? { worktree: true } : {}),
+          message: `strict_path '${path}' 내용이 commit_hash(${pointer.commit_hash.slice(0, 7)}) 이후 변경됨${wt ? ' (working-tree 모드 — 미커밋 변경 포함)' : ''} — anchor content-drift (노드 state→drift 권고 / non-gating)`,
         });
       }
     }

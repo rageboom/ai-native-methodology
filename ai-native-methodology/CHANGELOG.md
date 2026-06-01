@@ -9,6 +9,19 @@
 
 ---
 
+## [11.25.0] — 2026-06-01 MINOR — dep-graph A2 working-tree 모드 (커밋 안 한 변경 탐지 / F-DF-A2-003 해소)
+
+**A2 content-drift 가 커밋된 변경(base→HEAD)만 보던 한계를 opt-in `--worktree` 모드로 확장 — 작업 중(uncommitted) 코드 변경도 탐지** (P0 = LLM 운영 컨텍스트 live 동기화 / 개발 중 실시간 drift).
+
+- **`tools/code-pointer-validator/src/validator.js`** (additive / breaking 0):
+  - `detectContentDrift(path, hash, { gitRunner, includeWorktree=false })` — `includeWorktree=true` 면 git diff args 에서 `'HEAD'` 제거 → `git diff --name-only <base> -- <path>` = base→작업트리 (커밋된 변경 + staged + unstaged 포함 superset / git-diff(1) Form 4 "working tree relative to <commit>" / 공식문서 VERIFIED). untracked 신규파일은 미포함(추적 파일만 = 앵커 대상과 정합). 반환 boolean|null 보존 (레거시 무인자 호출 무영향).
+  - `validateOnePointer` — `opts.worktree===true` → `includeWorktree` 전달 + finding 에 `worktree:true` 마커 + 메시지 부기. **kind=`code_pointer.content_drift` 유지** → `computeGateFail` 의 content_drift 제외(§8.1 non-gating)를 자동 상속 (신규 kind 신설 시 kind-필터 우회 → gating 격상 = §8.1 위반 / Senior REVISE-B).
+- **`cli.js`**: `--worktree` 플래그(→ `--git` 자동) + opts 전달 + usage. **★ `--worktree` + `--apply-drift` = exit 2 하드 차단** (Senior REVISE-C — 미커밋 WIP 를 그래프 corpus 에 drift 로 영구 기록하면 재합성 전까지 git 오염 = 데이터 무결성 위험 / 문서 경고 아닌 코드 차단).
+- **검증 (no-simulation / 실 git·실 CLI)**: code-pointer-validator **+5 test** (worktree 탐지 + `worktree:true` / committed 모드 미커밋-only 회귀가드 / args-shape spy(HEAD 유무) / §8.1 medium·computeGateFail 제외 / detectContentDrift boolean) → 40→45 / workspace **1008→1013** / 0 fail / release-readiness **26/26**(#16 = committed 모드 = 무영향). CLI smoke: `--worktree --apply-drift` exit 2 / `--worktree` 단독 exit 0 / help 노출.
+- **RealWorld dogfood** (외부 repo / 실 git / read-only — 세션 57 S2 augmentation 미커밋 5파일 사전 존재): probe graph(`--repo-root --commit-hash ee17e31`=HEAD / 25 strict_path 앵커) → **committed 모드 content_drift 0** (base==HEAD, 미커밋 못 봄) vs **worktree 모드 content_drift 1** (`analysis-sql-inventory → src/main/resources/mapper/UserMapper.xml` / `worktree:true` / medium) = 미커밋 `<delete>` 변경 탐지 입증. worktree exit 0(non-gating) / `--worktree --apply-drift` exit 2 / RW src 무변경(5 M 유지) / 그래프 corpus 무오염. evidence = `_dogfood-realworld/.../.aimd/a2-worktree-probe.md`.
+- **§8.1 (정직)**: read-class·additive·opt-in·non-gating (content_drift kind 재사용) → gate-class 아님. 단일 RealWorld 도메인 = uncommitted-detection **mechanism 입증** (ceiling ❌ / ≥2 distinct 도메인 A2 usability = gate-class carry 유지). self-referential 아님 (새 capability / 실 외부 repo measurement).
+- **잔여 carry**: ① committed vs uncommitted **분해 보고**(2nd git call / v2 후보) ② ≥2 distinct 도메인 A2 usability(gate-class) ③ db-schema→DDL 앵커(접근 C) ④ A3 relocation dogfood ⑤ FE kinds 앵커(실 FE 프로젝트). DEC-2026-06-01-a2-worktree-mode.
+
 ## [11.24.0] — 2026-06-01 MINOR — Living-graph Slice 3: antipatterns code-pointer enrich + db-schema 파일명 drift fix
 
 v11.23.0 후속. "나머지 analysis kind 일괄 앵커"는 **Phase 1 정직 평가로 재조정** — formal-spec/characterization-spec/state-map/visual-manifest = code-file 필드 없음(na 유지 정직 / 앵커 불가) / type-spec·ui-ux·form-validation = source_file 보유하나 RealWorld(BE) 부재 = speculative carry / 실 dogfoodable = **antipatterns 뿐**. 대신 antipatterns 앵커(실측) + **db-schema 파일명 drift(진짜 latent 버그)** 로 재조정 (사용자 승인).

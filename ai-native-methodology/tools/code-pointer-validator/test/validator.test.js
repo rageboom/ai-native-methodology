@@ -11,7 +11,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateCodePointers, applyContentDrift, checkGraphFreshness, computeGateFail } from '../src/validator.js';
+import { validateCodePointers, applyContentDrift, checkGraphFreshness, computeGateFail, detectContentDrift } from '../src/validator.js';
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -415,6 +415,70 @@ describe('Loop A / A2 — content-drift 탐지', () => {
     const f = r.findings.find(x => x.kind === 'code_pointer.content_drift');
     assert.ok(f);
     assert.equal(f.severity, 'medium'); // --strict 에도 high 로 격상 ❌ — content_drift 는 gate-eligible 아님 (§8.1)
+    rmSync(repo, { recursive: true });
+  });
+});
+
+// ============================================================================
+// ★ Loop A / A2 — working-tree 모드 (커밋 안 한 변경 탐지 / F-DF-A2-003)
+//   committed 모드(base→HEAD) 는 미커밋 변경을 못 봄. worktree 모드(base→작업트리 / HEAD 인자 제거) 는 봄 (superset).
+// ============================================================================
+
+// worktree vs committed 구분 fake — args 에 'HEAD' 유무로 분기.
+//   committed: ['diff','--name-only',<base>,'HEAD','--',<path>]  → 'HEAD' 포함
+//   worktree : ['diff','--name-only',<base>,'--',<path>]          → 'HEAD' 없음
+function fakeGitWorktree({ committedChanged = false, worktreeChanged = false } = {}) {
+  return (args) => {
+    if (args[0] !== 'diff') return '';
+    const last = args[args.length - 1];
+    const isCommitted = args.includes('HEAD');
+    return (isCommitted ? committedChanged : worktreeChanged) ? `${last}\n` : '';
+  };
+}
+
+describe('Loop A / A2 — working-tree 모드 (커밋 안 한 변경 탐지 / F-DF-A2-003)', () => {
+  it('worktree 모드 — 미커밋-only 변경 탐지 (committed 무변경 + worktree 변경) → content_drift + worktree:true', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGitWorktree({ committedChanged: false, worktreeChanged: true }), worktree: true } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.content_drift');
+    assert.ok(f, 'worktree 모드는 미커밋 변경을 탐지해야 함');
+    assert.equal(f.worktree, true);
+    assert.equal(f.severity, 'medium');
+    rmSync(repo, { recursive: true });
+  });
+
+  it('회귀 가드 — committed(기본) 모드는 미커밋-only 변경 미탐지 (worktree opt 무 → HEAD 비교 = 기존 behavior 보존)', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGitWorktree({ committedChanged: false, worktreeChanged: true }) } });
+    assert.equal(r.findings.find(x => x.kind === 'code_pointer.content_drift'), undefined);
+    rmSync(repo, { recursive: true });
+  });
+
+  it('args shape — worktree 모드는 HEAD 인자 제거 / committed 모드는 HEAD 포함 (detectContentDrift spy)', () => {
+    const calls = [];
+    const spy = (args) => { calls.push(args); return ''; };
+    detectContentDrift('real.kt', 'abc1234', { gitRunner: spy, includeWorktree: true });
+    detectContentDrift('real.kt', 'abc1234', { gitRunner: spy, includeWorktree: false });
+    assert.deepEqual(calls[0], ['diff', '--name-only', 'abc1234', '--', 'real.kt']);       // worktree: HEAD 없음
+    assert.deepEqual(calls[1], ['diff', '--name-only', 'abc1234', 'HEAD', '--', 'real.kt']); // committed: HEAD 있음
+  });
+
+  it('detectContentDrift includeWorktree — worktree 변경만 있을 때 true / committed diff 는 false', () => {
+    const g = fakeGitWorktree({ committedChanged: false, worktreeChanged: true });
+    assert.equal(detectContentDrift('real.kt', 'abc1234', { gitRunner: g, includeWorktree: true }), true);
+    assert.equal(detectContentDrift('real.kt', 'abc1234', { gitRunner: g, includeWorktree: false }), false);
+  });
+
+  it('★ §8.1 — worktree content_drift 도 medium 고정 + computeGateFail 제외 (strict 여도 gate ❌)', () => {
+    const repo = makeRepoRoot();
+    const graph = { nodes: [node('IMPL-1', { subkind: 'IMPL', code_pointers: [{ path: 'real.kt', anchor_type: 'strict_path', commit_hash: 'abc1234' }] })] };
+    const r = validateCodePointers(graph, { repoRoot: repo, opts: { gitRunner: fakeGitWorktree({ worktreeChanged: true }), worktree: true, strict: true } });
+    const f = r.findings.find(x => x.kind === 'code_pointer.content_drift');
+    assert.ok(f);
+    assert.equal(f.severity, 'medium');
+    assert.equal(computeGateFail(r.findings, { strict: true }), false); // worktree content_drift 도 gate 제외 (kind 재사용 상속)
     rmSync(repo, { recursive: true });
   });
 });

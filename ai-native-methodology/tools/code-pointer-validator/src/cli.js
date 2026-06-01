@@ -20,6 +20,7 @@ function usage(code = 2) {
     '  --repo-root <dir>       code_pointer.path 해석 base (default: cwd)',
     '  --strict                missing/path-not-found 를 high severity 로 (blocking)',
     '  --git                   ★ Loop A — git 신호 활성 (A3 relocation→suggested_path / A2 content-drift). opt-in / 비-gating (medium)',
+    '  --worktree              ★ Loop A / A2 — content-drift 가 커밋 안 한(작업트리) 변경도 탐지 (--git 자동 / F-DF-A2-003). --apply-drift 와 동시 사용 ❌',
     '  --apply-drift           ★ Loop A / A2-wire — content-drift 노드를 state=drift 로 그래프 파일에 기록 (--git 자동 활성 / 변경 시에만 write)',
     '  --format text|json      출력 형식 (default: text)',
     '  --help / -h             도움말',
@@ -39,6 +40,7 @@ function parseArgs(argv) {
     if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--strict') out.strict = true;
     else if (a === '--git') out.git = true;
+    else if (a === '--worktree') { out.worktree = true; out.git = true; } // ★ A2 worktree 모드 (git 자동 / F-DF-A2-003)
     else if (a === '--apply-drift') { out.applyDrift = true; out.git = true; } // ★ A2-wire (git 자동)
     else if (a === '--format') out.format = argv[++i];
     else if (a === '--help' || a === '-h') usage(0);
@@ -49,6 +51,13 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv);
 if (!args.graphPath) usage(2);
+
+// ★ Senior REVISE-C — --worktree(미커밋 변경) + --apply-drift(그래프 파일 영구 기록) 조합 하드 차단.
+//   미커밋 WIP 가 커밋된 그래프 corpus 에 drift 로 영구 기록되면 재합성 전까지 git 오염 (데이터 무결성 위험).
+if (args.worktree && args.applyDrift) {
+  console.error('[code-pointer-validator] ERROR — --worktree 와 --apply-drift 는 함께 사용할 수 없음: 미커밋(작업트리) 변경을 그래프 파일에 영구 기록하면 corpus 오염 (Senior REVISE-C). worktree 모드는 보고 전용 / drift 영구 기록은 커밋된 변경(--git --apply-drift)만.');
+  process.exit(2);
+}
 
 let graph;
 try {
@@ -62,7 +71,7 @@ const repoRoot = args.repoRoot ?? process.cwd();
 const gitRunner = args.git ? makeGitRunner(repoRoot) : undefined;
 const result = validateCodePointers(graph, {
   repoRoot,
-  opts: { strict: args.strict, ...(gitRunner ? { gitRunner } : {}) },
+  opts: { strict: args.strict, ...(gitRunner ? { gitRunner } : {}), ...(args.worktree ? { worktree: true } : {}) },
 });
 
 // ★ Loop A / A1 — freshness (git 무관 / 항상 계산, stale 일 때만 노출)
