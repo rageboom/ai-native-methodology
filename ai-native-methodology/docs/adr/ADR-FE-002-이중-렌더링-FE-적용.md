@@ -7,6 +7,8 @@
 
 > **본 ADR 의 위치** — ADR-008 의 FE 영역 적용. ADR-FE-001 과 짝. ADR-008 = "AI 눈 + 사람 눈" 사상 / ADR-FE-002 = FE 영역의 정합 매트릭스 + ★ visual 예외.
 
+> ★ **v12 amend ([ADR-011](ADR-011-json-only-ax-native.md) / 2026-06-01)**: ADR-008 supersede 에 따라 FE 의 "사람 눈 = `.mermaid`/`.md`" 채널(명제 1·2 / §2.2 매트릭스 "사람 눈" column 의 state-map.mermaid·component-tree.mermaid·user-flows.mermaid·*.md)은 **retire** — FE 산출물도 json 단독(`state-map.json` / `ui-spec.json` 의 components·user_flows). drift-validator FE 의 `.json↔.mermaid` 비교는 moot. ★ **§2.3 visual 예외(snapshot PNG hash 진실 모델 + `captured_by` enum + no-simulation)는 UNAFFECTED** — 애초에 dual-rendering 이 아니라 binary 진실이며 Playwright snapshot diff 가 진실 모델 (ADR-011 무관).
+
 ---
 
 ## 1. 컨텍스트

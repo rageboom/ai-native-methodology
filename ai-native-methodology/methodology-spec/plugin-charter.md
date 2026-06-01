@@ -45,7 +45,7 @@
 | R4 | ✅ | `schemas/` 31종 + `templates/{analysis,planning,spec,test,implement,design}/` |
 | R5 | ✅ | `tools/chain-driver/src/state-store.js` `ensureScopeDir` + `chain-driver init --scope <s>` + SessionStart hook 자동 발동 (v3.2 G3 종결 / DEC-2026-05-15-g3-scope-folder-종결) |
 | R6 | ✅ | `hooks/hooks.json` (SessionStart + UserPromptSubmit + PreToolUse) + `CLAUDE.md` 23 policies |
-| R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{discovery,spec,plan,test,impl}/` + manifest 이중 렌더링 (`manifest.json` + `manifest.md`) 자동 생성. `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
+| R7 | ✅ | scope/stage 폴더 컨벤션 `.aimd/<scope>/{discovery,spec,plan,test,impl}/` + manifest **`manifest.json` 단독** 자동 생성 (★ v12 ADR-011 — 구 `manifest.md` 이중 렌더링 폐기 / json 단독 SSOT / DEC-2026-06-01-json-only-ax-native). `lifecycle-contract.md` §파일 위치 컨벤션 + `id-conventions.md` §scope slug 명문화 (v3.2 G3 종결) |
 | R8 | ✅ | (★ v3.3.0 G2 종결 / 2026-05-15) 5종 모두 자산 대칭. (a) `analysis-input-collection` + `analysis-source-inventory` 22 skill / (b) **`analysis-from-figma`** (Figma desktop MCP 4 도구) / (c) **`analysis-from-swagger`** (`@readme/openapi-parser`) / (d) **`analysis-from-plan-doc`** (md + pdf + Notion export) / (e) **`analysis-from-prompt`** + **`analysis-input-orchestrate`** (자연어 1발화 → 자동 dispatch + cross-ref + conflict) |
 | R9 | ✅ | `flows/spec.phase-flow.json` (chain 2) + `skills/spec-compose-behavior-spec/` |
 | R10 | ✅ | `flows/test.phase-flow.json` (chain 4 / RED 의무) + `tools/test-impl-pass-validator/` |
