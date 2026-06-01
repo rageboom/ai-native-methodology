@@ -326,6 +326,24 @@ const ANALYSIS_TO_CODE_POINTERS = Object.freeze({
     mode: 'file', prefixes: [''],
     accessor: (d) => d?.source_files ?? [],
   },
+  // ★ v11.x (F-FE-ANCHOR-001) FE kinds — type-spec/ui-ux/form-validation source_file → strict_path.
+  //   실 FE 프로젝트(React/TS) dogfood 표면화: FE 산출물은 source_file 보유하나 미배선 → na. BE slice 2~4 의 FE 대응.
+  //   mode 'file' / prefixes [''] (source_file = repo-relative .ts/.tsx). state-map/visual-manifest = source 필드 부재 → 영구 na (미배선 유지).
+  'type-spec': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => (d?.types ?? []).map((t) => t?.source_file),
+  },
+  'ui-ux': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => [
+      ...(d?.pages ?? []).map((p) => p?.source_file),
+      ...(d?.components ?? []).map((c) => c?.source_file),
+    ],
+  },
+  'form-validation-spec': {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => (d?.validations ?? []).map((v) => v?.source_file),
+  },
 });
 
 // 확장자 화이트리스트 — strict_path emit 前 게이트 (table-name·dir·dotted-class false-anchor 차단 / Senior REVISE).

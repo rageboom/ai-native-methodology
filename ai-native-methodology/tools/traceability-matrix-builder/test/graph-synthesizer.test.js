@@ -1306,3 +1306,85 @@ describe('synthesizeGraph — ★ v11.26.0 Slice 4 db-schema source_files code-p
     assert.equal(n.code_pointers_na, true, 'na (erd 다이어그램은 앵커 대상 아님)');
   });
 });
+
+// ============================================================================
+// ★ v11.x F-FE-ANCHOR-001 — FE kinds (type-spec/ui-ux/form-validation) source_file → code_pointers derive
+//   실 FE 프로젝트(React/TS) dogfood (yurisldk/realworld-react-fsd) 표면화: FE 산출물 source_file 미배선 → na.
+//   BE slice 2~4 의 FE 대응. type-spec types[] / ui-ux pages[]+components[] / form-validation validations[].
+// ============================================================================
+describe('synthesizeGraph — ★ F-FE-ANCHOR-001 FE kinds code-pointer enrich', () => {
+  const yes = () => true;
+
+  it('FE-1) type-spec types[].source_file → analysis-type-spec strict_path (na 해소)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'type-spec': { meta: { title: 't' }, types: [
+        { id: 'T-X-001', name: 'A', kind: 'interface', source_file: 'src/shared/api/action-result.ts' },
+        { id: 'T-X-002', name: 'B', kind: 'type_alias', source_file: 'src/pages/login/login.ui.tsx' },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-type-spec');
+    assert.deepEqual(n.code_pointers.map((p) => p.path).sort(),
+      ['src/pages/login/login.ui.tsx', 'src/shared/api/action-result.ts']);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'strict_path'));
+    assert.equal(n.code_pointers_na, undefined);
+  });
+
+  it('FE-2) form-validation validations[].source_file → analysis-form-validation-spec strict_path', () => {
+    const g = synthesizeGraph({
+      analysis: { 'form-validation-spec': { meta: { title: 'f' }, validations: [
+        { id: 'F-VAL-X-001', field_name: 'email', validation_type: 'email', source_format: 'zod',
+          source_file: 'src/pages/register/actions/user-register.action.ts' },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-form-validation-spec');
+    assert.deepEqual(n.code_pointers.map((p) => p.path),
+      ['src/pages/register/actions/user-register.action.ts']);
+    assert.equal(n.code_pointers_na, undefined);
+  });
+
+  it('FE-3) ui-ux pages[]+components[].source_file 양쪽 → analysis-ui-ux strict_path', () => {
+    const g = synthesizeGraph({
+      analysis: { 'ui-ux': { meta: { title: 'u' },
+        pages: [{ id: 'PAGE-X-001', name: 'Login', route: '/login', source_file: 'src/pages/login/login.ui.tsx' }],
+        components: [{ id: 'CMP-SPIN', name: 'Spinner', level: 'shared', source_file: 'src/shared/ui/spinner/spinner.ui.tsx' }] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-ui-ux');
+    assert.deepEqual(n.code_pointers.map((p) => p.path).sort(),
+      ['src/pages/login/login.ui.tsx', 'src/shared/ui/spinner/spinner.ui.tsx']);
+  });
+
+  it('FE-4) source_file 부재 → na (backstop)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'type-spec': { meta: { title: 't' }, types: [{ id: 'T-X-001', name: 'A', kind: 'interface' }] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-type-spec');
+    assert.ok(!n.code_pointers);
+    assert.equal(n.code_pointers_na, true);
+  });
+
+  it('FE-5) existence-gate — 미존재 .tsx → emit X → na', () => {
+    const g = synthesizeGraph({
+      analysis: { 'ui-ux': { meta: { title: 'u' },
+        components: [{ id: 'CMP-GONE', name: 'Gone', level: 'shared', source_file: 'src/shared/ui/gone/gone.ui.tsx' }] } },
+      existsFn: () => false,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-ui-ux');
+    assert.ok(!n.code_pointers);
+    assert.equal(n.code_pointers_na, true);
+  });
+
+  it('FE-6) FE strict_path 는 commit_hash 스탬프 (A2 content-drift 참여)', () => {
+    const g = synthesizeGraph({
+      analysis: { 'type-spec': { meta: { title: 't' }, types: [
+        { id: 'T-X-001', name: 'A', kind: 'interface', source_file: 'src/shared/api/action-result.ts' }] } },
+      existsFn: yes,
+      commitHash: '969709a379b13935b4e1caae0ad8cad548e5879a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-type-spec');
+    assert.equal(n.code_pointers[0].commit_hash, '969709a379b13935b4e1caae0ad8cad548e5879a');
+  });
+});

@@ -9,6 +9,15 @@
 
 ---
 
+## [11.32.0] — 2026-06-01 MINOR — dep-graph synthesizer: FE kinds code-pointer 앵커 (type-spec/ui-ux/form-validation source_file → strict_path / F-FE-ANCHOR-001 / 실 React+TS dogfood)
+
+**FE 3rd-codebase dogfood (`yurisldk/realworld-react-fsd` React 19 + TS + Zod + React Query / FSD) 가 표면화 — FE 산출물(type-spec/ui-ux/form-validation)은 `source_file` 필드 보유하나 `ANALYSIS_TO_CODE_POINTERS` 에 미배선(BE kinds 만) → dep-graph 에서 FE analysis 노드가 na(미앵커). BE slice 2~4(sql-inventory/architecture/antipatterns/db-schema)의 FE 대응 gap.**
+
+- **변경 (additive / breaking 0)**: `graph-synthesizer.js` `ANALYSIS_TO_CODE_POINTERS` 에 FE kinds 3종 accessor 배선 — type-spec `types[].source_file` / ui-ux `pages[]`+`components[].source_file` / form-validation `validations[].source_file` (mode file / prefixes [''] / 확장자게이트 .ts·.tsx + existence-gate + commit_hash 스탬프 → A2 참여). state-map/visual-manifest = source 필드 부재 → 영구 na (미배선 유지).
+- **검증 (no-simulation / 실 CLI)**: graph-synthesizer +6 test(FE-1~6 emit/2-array/backstop/existence/commit_hash) → builder 149→155 / workspace **1048 pass/0 fail** / release-readiness 30/30 / version 3-way 11.32.0. ★ **실 react-fsd dogfood**: FE 산출물 3종 schema-valid(captured_by=manual_extraction 정직 / ts-morph 미실행) + dep-graph FE 노드 **BEFORE na:true(0) → AFTER covered(type-spec 6 + form-validation 3 + ui-ux 8 = 17 strict_path / commit_hash 969709a 스탬프)**.
+- **§8.1**: FE-kind 앵커링 mechanism 입증(단위 test + 실 FE 코드베이스). 도메인=RealWorld(BE dogfood 와 문제 도메인 겹침) / **distinct FE 스택·코드베이스**(React·TS vs Java·Spring) 충족 — "distinct 문제 도메인" 은 별 carry. **② "FE kinds" carry RESOLVED**.
+- **잔여 carry**: state-map/visual-manifest 영구 na(앵커 대상 아님) · committed PoC graph cosmetic lag(v11.31.0) · S2 gate WARN→block · Type 2 외부 채택. DEC-2026-06-01-fe-anchor-001.
+
 ## [11.31.0] — 2026-06-01 MINOR — dep-graph synthesizer Layer 4: cross_links.to_analysis_artifacts → cross_reference edge (F-ECOM-004 graph orphan 해소)
 
 **② ecommerce-backend dogfood 가 표면화한 F-ECOM-004 — graph-integrity FAIL (orphans=5: analysis-architecture/domain/db-schema/form-validation/error-mapping = edge 0). root cause: graph-synthesizer 가 discovery/behavior 의 spec-level `cross_links.to_analysis_artifacts`(generic 산출물 path 리스트)에서 cross_reference edge 를 합성 안 함 — Layer 1(br_refs)/2(analysis 자체 ref)/3(meta.related_chain_ids) 만 edge화 → 특정 ref 가 없는 analysis 노드가 orphan.**
