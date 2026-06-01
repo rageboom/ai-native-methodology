@@ -1,6 +1,6 @@
 ---
 name: spec-agent
-description: Use when chain 2 (spec) 진입. discovery-spec.use_cases + analysis formal-spec phase 통합 behavior-spec.{json,md} + acceptance-criteria.{json,md} (Gherkin BDD) 추출 전문. UC → BHV → AC forward link 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
+description: Use when chain 2 (spec) 진입. discovery-spec.use_cases + analysis formal-spec phase 통합 behavior-spec.json + acceptance-criteria.json (Gherkin BDD) 추출 전문. UC → BHV → AC forward link 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
 skills: [spec-compose-behavior-spec, spec-derive-acceptance-criteria, spec-integrate-deliverables, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
@@ -16,10 +16,10 @@ model: opus
 
 | skill | 호출 시기 | 산출 |
 |---|---|---|
-| `spec-compose-behavior-spec` | chain 2 진입 / behavior-spec 본격 작성 | behavior-spec.{json,md} (BHV-* + state machine + sequence + invariant + property test) |
-| `spec-derive-acceptance-criteria` | behavior-spec 채움 후 sub | acceptance-criteria.{json,md} (AC-* Gherkin Given/When/Then + MoSCoW) |
+| `spec-compose-behavior-spec` | chain 2 진입 / behavior-spec 본격 작성 | behavior-spec.json (BHV-* + state machine + sequence + invariant + property test) |
+| `spec-derive-acceptance-criteria` | behavior-spec 채움 후 sub | acceptance-criteria.json (AC-* Gherkin Given/When/Then + MoSCoW) |
 | `spec-integrate-deliverables` | cross_links.to_analysis_artifacts backward link | 7대 + 8 FE 산출물 모두 ref 등재 |
-| `_base-apply-template` | 진입 시 behavior-spec.{json,md} 골조 | template 자동 적용 |
+| `_base-apply-template` | 진입 시 behavior-spec.json 골조 | template 자동 적용 |
 | `_base-build-traceability-matrix` | UC → BHV → AC forward link 갱신 | matrix.json (갱신) |
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
 | `_base-invoke-go-stop-gate` | gate #2 종결 | intervention-log |
@@ -56,23 +56,20 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
    - intervention-log 본체 등재
 
 6. **종결 보고**:
-   - behavior-spec.{json,md} + acceptance-criteria.{json,md} path
+   - behavior-spec.json + acceptance-criteria.json path
    - traceability-matrix UC → BHV → AC forward 갱신 상태
    - chain 3 (plan) 진입 권고 → `plan-agent` dispatch (★ phase-flow next_chain=plan / plan stage 건너뜀 금지)
 
 ## paradigm 정합 (현 v4.0)
 
 - **본 agent = 새 paradigm 표준**
-- **본체 산출 경로** = `.aimd/output/behavior-spec.{json,md}` + `acceptance-criteria.{json,md}`
+- **본체 산출 경로** = `.aimd/output/behavior-spec.json` + `acceptance-criteria.json`
 - **lifecycle-contract §Agent column spec row** = 본 agent
 
 ## 산출 자산 (chain 2)
 
-- `.aimd/output/behavior-spec.json` (★ schemas/behavior-spec.schema.json 의무)
-- `.aimd/output/behavior-spec.md` (★ 사람 눈 / ADR-008 v2)
-- `.aimd/output/behavior-diagrams.mermaid` (state machine + sequence)
-- `.aimd/output/acceptance-criteria.json` (★ schemas/acceptance-criteria.schema.json 의무)
-- `.aimd/output/acceptance-criteria.md`
+- `.aimd/output/behavior-spec.json` (★ schemas/behavior-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
+- `.aimd/output/acceptance-criteria.json` (★ schemas/acceptance-criteria.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #2 사용자 결단 로그)
 
@@ -97,7 +94,7 @@ node tools/chain-driver/src/cli.js navigate \
 ## 인용
 
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 agent 의 모 결단)
-- ADR-CHAIN-001 §1 (이중 렌더링 chain 2)
+- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
 - ADR-CHAIN-002 (gate UX)
 - `schemas/behavior-spec.schema.json` + `schemas/acceptance-criteria.schema.json` (deliverable 18 + 19)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:discovery 가능 / sdlc-4stage revisit_edges spec→discovery)

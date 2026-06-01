@@ -57,8 +57,7 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 ## 산출 자산
 
-- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema)
-- `.aimd/output/discovery-spec.md` (사람 눈 / ADR-008 v2 이중 렌더링)
+- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema / ★ json 단독 SSOT / ADR-011)
 - `.aimd/output/findings.md` (discovery stage 의 발견 사항 누적)
 - `.aimd/output/intervention-log.json` (discovery gate 사용자 결단 로그)
 
@@ -99,7 +98,7 @@ node tools/chain-driver/src/cli.js navigate \
 - DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 agent 의 모 결단)
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리 paradigm)
 - v4.0 planning-agent (git history 보존 / 본 작업 안 discovery-agent 로 rename — `agents/discovery-agent.md`)
-- ADR-CHAIN-001 (이중 렌더링)
+- ADR-CHAIN-001 (json 단독 / ADR-011)
 - ADR-CHAIN-002 (gate UX)
 - `schemas/discovery-spec.schema.json` (carry — v4.1 신설)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)

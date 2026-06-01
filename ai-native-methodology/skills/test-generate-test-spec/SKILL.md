@@ -1,6 +1,6 @@
 ---
 name: test-generate-test-spec
-description: ★ ★ ★ v2.0 chain 4 진입 skill. acceptance-criteria.AC-* 마다 실 test 코드 자동 생성 + test-spec.{json,md} 산출. RED 의무 (chain 4 종결 시 모든 test fail / impl 부재). framework = inventory.stack_signals 추론 (★ ADR-CHAIN-004 정합). QA-architect + test-engineer persona 책임.
+description: ★ ★ ★ v2.0 chain 4 진입 skill. acceptance-criteria.AC-* 마다 실 test 코드 자동 생성 + test-spec.json 산출. RED 의무 (chain 4 종결 시 모든 test fail / impl 부재). framework = inventory.stack_signals 추론 (★ ADR-CHAIN-004 정합). QA-architect + test-engineer persona 책임.
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 ---
 
@@ -22,8 +22,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 산출물
 
-- `<project>/.aimd/output/test-spec.json` (★ schemas/test-spec.schema.json 의무)
-- `<project>/.aimd/output/test-spec.md` (사람 눈)
+- `<project>/.aimd/output/test-spec.json` (★ schemas/test-spec.schema.json 의무 / ★ json 단독 / ADR-011)
 - 실 test 코드:
   - jest/vitest: `<project>/<src>/**/*.test.{ts,js}`
   - junit5: `<project>/src/test/java/**/*Test.java`
@@ -100,9 +99,7 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
 
 7. **test_invocation_evidence 부재 명시** — chain 4 단계 = ★ test 만 generate / runner 호출 ❌ (RED 의무 / chain 5 에서 호출). test-spec.json 의 `test_invocation_evidence` 는 빈 객체 또는 부재.
 
-8. **test-spec.md 렌더** — TC-* 목록 + framework 분포 + 추가 generate 명령 매뉴얼.
-
-9. **자동 검증** (★ schema-validator + spec-test-link-validator):
+8. **자동 검증** (★ schema-validator + spec-test-link-validator):
    ```bash
    node tools/schema-validator/src/cli.js .aimd/output/test-spec.json
 
@@ -113,7 +110,7 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
      --inventory  .aimd/output/inventory.json
    ```
 
-10. **test-impl-pass-validator dry-run 호출** — 진짜 실행 ❌ / config 검증만:
+9. **test-impl-pass-validator dry-run 호출** — 진짜 실행 ❌ / config 검증만:
     ```bash
     node tools/test-impl-pass-validator/src/cli.js \
       --project <project> \
@@ -121,7 +118,7 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
       --dry-run --json
     ```
 
-11. **gate #4 호출** — `_base-invoke-go-stop-gate` (cluster 5~6 / RED 상태 명시).
+10. **gate #4 호출** — `_base-invoke-go-stop-gate` (cluster 5~6 / RED 상태 명시).
 
 ## ★ ★ ★ no-simulation — runner 호출 의무 ❌ (chain 4 단계)
 

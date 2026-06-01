@@ -10,7 +10,7 @@ Generate an artifact from a template, filling it with project-specific context.
 
 ★ v11.0.0 — chain stage 산출물 6종 template body 본격 추가 (DEC-2026-05-26-v11-paradigm-결단 Phase 3 정합). 인식 artifact 종류 = analysis 21 + chain 6 type.
 
-<!-- check21 SSOT: total 34 templates (.template.* 전수 = analysis 21 + chain 13). 템플릿 파일 추가/삭제 시 본 숫자 갱신 의무 — release-readiness check21 가 본 숫자 ↔ templates/*/*.template.* 실측을 대조 (LL-v85-01 silent_omission attractor 차단). -->
+<!-- check21 SSOT: ★ v12.0.0 — .template.md + .template.mermaid 폐지, .template.json 만 카운트 (산출물 = json 단독 SSOT / ADR-011). TODO: C4 삭제 후 .template.json 정확 개수 재확정 (숫자 추정 금지 — release-readiness check21 와 동기). 템플릿 파일 추가/삭제 시 본 숫자 갱신 의무 — release-readiness check21 가 본 숫자 ↔ templates/*/*.template.json 실측을 대조 (LL-v85-01 silent_omission attractor 차단). -->
 
 
 ## How to invoke
@@ -26,19 +26,19 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
 
 ### chain stage (6 templates / `templates/{discovery,spec,plan,test,implement}/` — ★ v11.0.0 신설)
 
-- "discovery-spec 시작" → fills `templates/discovery/discovery-spec.template.{json,md}`
-- "behavior-spec 작성" → fills `templates/spec/behavior-spec.template.{json,md}`
-- "acceptance-criteria 작성" → fills `templates/spec/acceptance-criteria.template.{json,md}`
-- "task-plan 작성" → fills `templates/plan/task-plan.template.{json,md}` (+ `epic-story-op.template.md` 참조)
-- "test-spec 작성" → fills `templates/test/test-spec.template.{json,md}`
-- "impl-spec 작성" → fills `templates/implement/impl-spec.template.{json,md}`
+- "discovery-spec 시작" → fills `templates/discovery/discovery-spec.template.json`
+- "behavior-spec 작성" → fills `templates/spec/behavior-spec.template.json`
+- "acceptance-criteria 작성" → fills `templates/spec/acceptance-criteria.template.json`
+- "task-plan 작성" → fills `templates/plan/task-plan.template.json` (+ `epic-story-op.template.md` 참조)
+- "test-spec 작성" → fills `templates/test/test-spec.template.json`
+- "impl-spec 작성" → fills `templates/implement/impl-spec.template.json`
 
 ## Steps
 
-1. **Identify target artifact.** Match user request to one of the 34 template files (analysis 21 + chain 13).
-   - analysis: `ls templates/analysis/*.template.*` — current count = 21. ★ Count mismatch 시 finding emit (drift recurrence carry per LL-v85-01 + release-readiness criterion #14).
-   - chain: `ls templates/{discovery,spec,plan,test,implement}/*.template.*` — current count = 13 (.json + .md pairs + epic-story-op.md). ★ Count mismatch 시 동일 finding.
-2. **Read the template.** Use `Read` on the matched `.template.<ext>` file (both `.json` + `.md` for chain stage 산출물 / ★ ADR-008 v2 이중 렌더링).
+1. **Identify target artifact.** Match user request to one of the `.template.json` files (analysis + chain / ★ v12.0.0 — .template.md/.template.mermaid 폐지로 .template.json 만 카운트 / 정확 개수는 C4 삭제 후 재확정 = TODO, 숫자 추정 금지).
+   - analysis: `ls templates/analysis/*.template.json` — count = TODO (C4 삭제 후 재확정 / release-readiness check21 와 동기). ★ Count mismatch 시 finding emit (drift recurrence carry per LL-v85-01 + release-readiness criterion #14).
+   - chain: `ls templates/{discovery,spec,plan,test,implement}/*.template.json` — count = TODO (.template.json 만 / epic-story-op.md = 참조 문서). ★ Count mismatch 시 동일 finding.
+2. **Read the template.** Use `Read` on the matched `.template.json` file (chain stage 산출물 = json 단독 SSOT / ★ ADR-011 — .template.md/.template.mermaid 폐지).
 3. **Read prerequisite artifacts.** Per `methodology-spec/lifecycle-contract.md` and the artifact's stage ordering:
    - **analysis** stage (21 산출물):
      - inventory: no prerequisite
@@ -57,7 +57,7 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
      - test-spec: requires acceptance-criteria + behavior-spec (★ framework 분기 — BE contract → openapi_contract_ref / FE visual → visual_regression_ref / RED 의무 / fail_count > 0)
      - impl-spec: requires test-spec + behavior-spec (★ GREEN 의무 / fail_count=0 enforce / commit_hash 보존)
 4. **Fill placeholders** (`<placeholder>` / `<...>`) with project-specific data extracted from the codebase / analysis 산출물 / chain backward link.
-5. **Write to user's output directory.** Default: `<user-project>/.aimd/output/<artifact>.<ext>` or as user specifies.
+5. **Write to user's output directory.** Default: `<user-project>/.aimd/output/<artifact>.json` (★ json 단독 SSOT / ADR-011) or as user specifies.
 6. **Log finding** if any placeholder cannot be filled with confidence — invoke `_base-log-finding` skill.
 
 ## Per-artifact prerequisites

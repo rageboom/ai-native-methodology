@@ -1,6 +1,6 @@
 ---
 name: _base-build-traceability-matrix
-description: ★ ★ v2.0 cross-gate skill. 4 chain 산출물 (discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec) 합성하여 traceability-matrix.{json,md,mermaid} 생성. UC → BHV → AC → TC → IMPL forward+backward link + coverage_summary + status (green/yellow/red). DO-178C / IEC 62304 bidirectional traceability 차용 (★ S5 정합 — header derived_from + do_not_edit_manually:true). 매 gate 갱신 의무.
+description: ★ ★ v2.0 cross-gate skill. 4 chain 산출물 (discovery-spec / behavior-spec / acceptance-criteria / test-spec / impl-spec) 합성하여 traceability-matrix.json 생성. UC → BHV → AC → TC → IMPL forward+backward link + coverage_summary + status (green/yellow/red). DO-178C / IEC 62304 bidirectional traceability 차용 (★ S5 정합 — header derived_from + do_not_edit_manually:true). 매 gate 갱신 의무.
 allowed-tools: Read, Write, Edit, Bash
 ---
 
@@ -16,10 +16,8 @@ allowed-tools: Read, Write, Edit, Bash
 
 ## 산출물
 
-3종 (이중 렌더링 사상 정합 / ADR-008 v2 §10):
-- `traceability-matrix.json` — single source of truth (★ DO-178C / `derived_from` + `do_not_edit_manually: true` header 의무).
-- `traceability-matrix.md` — 사람 눈 (markdown table + coverage_summary + status legend).
-- `traceability-matrix.mermaid` — 사람 눈 (graph view / ≥ 100 cell subgraph 분할 정책 = sp3-c1 carry).
+1종 (json 단독 / ADR-011):
+- `traceability-matrix.json` — single source of truth (★ json 단독 SSOT / ADR-011 / DO-178C / `derived_from` + `do_not_edit_manually: true` header 의무).
 
 ## 절차
 
@@ -36,7 +34,7 @@ allowed-tools: Read, Write, Edit, Bash
      --out-dir    <project>/.aimd/output/traceability/
    ```
 
-3. **matrix.md / matrix.mermaid 사람 눈 검토** — 사용자에게 link 제공 + status 분포 (green/yellow/red 카운트) 요약.
+3. **matrix.json 검토** — 사용자에게 `coverage_summary` / `status` 요약 (green/yellow/red 카운트) 제공.
 
 4. **coverage_summary 임계 검사**:
    - `red_count > 0` → ★ ADR-CHAIN-001 §2 violation (chain coupling) → 사용자 결단 prompt (go/stop-gate skill 호출).
@@ -61,11 +59,10 @@ allowed-tools: Read, Write, Edit, Bash
 ## 인용
 
 - ADR-CHAIN-001 §2 (cross-link coverage ≥ 0.85 ratchet)
-- ADR-008 v2 §10 (chain 단계 이중 렌더링)
+- ADR-011 (json 단독 / chain 산출물 .md·.mermaid twin 폐지)
 - DO-178C / IEC 62304 bidirectional traceability
 - master plan §B deliverable 22
 
 ## Carry
 
-- mermaid graph view ≥ 100 cell subgraph 분할 정책 (sp3-c1) — sub-plan-6 PoC #05 시점.
 - chain-revisit-detector 통합 자동 trigger (sub-plan-5).

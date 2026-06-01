@@ -122,5 +122,5 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 - `agents/plan-agent.md` (본 skill 의 caller)
 - `schemas/task-plan.schema.json` (산출 schema)
 - `tools/plan-coverage-validator/` (검증 도구)
-- ADR-CHAIN-001 §1 (이중 렌더링)
+- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
 - ADR-CHAIN-002 (gate UX)

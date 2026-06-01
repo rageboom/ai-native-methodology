@@ -1,6 +1,6 @@
 ---
 name: spec-compose-behavior-spec
-description: ★ ★ v2.0 chain 2 진입 skill. discovery-spec.use_cases + analysis 의 `formal-spec` phase (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.{json,md} 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
+description: ★ ★ v2.0 chain 2 진입 skill. discovery-spec.use_cases + analysis 의 `formal-spec` phase (state-machine / sequence / decision-table / invariant / property-test) 를 통합하여 behavior-spec.json 추출. executable behavioral contract. UC → BHV 1:N forward link 의무. spec-architect persona 책임.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -21,9 +21,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-- `<project>/.aimd/output/behavior-spec.json` (★ schemas/behavior-spec.schema.json 의무)
-- `<project>/.aimd/output/behavior-spec.md` (사람 눈)
-- `<project>/.aimd/output/behavior-diagrams.mermaid` (★ ADR-008 v2 §10 / 통합 view)
+- `<project>/.aimd/output/behavior-spec.json` (★ schemas/behavior-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 
 > ★ **code_pointers_na 기본** (F-DOGFOOD-009) — BHV 는 의도 노드(executable contract) → 코드 anchor 는 하위 IMPL/TC 가 보유. 각 BHV `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 
@@ -64,9 +62,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 5. **spec-integrate-deliverables skill 호출** — analysis 산출물 모두 `cross_links.to_analysis_artifacts` 에 등록.
 
-6. **behavior-diagrams.mermaid 통합 렌더** — 모든 BHV 의 state_machine + sequence 합성 (★ ≥ 100 cell 시 subgraph 분할 / sp3-c1 carry).
-
-7. **자동 검증**:
+6. **자동 검증**:
    ```bash
    # chain coverage (UC → BHV / BHV → AC) + severe-AP coverage (gate#2 blocking lane / S13)
    node tools/chain-coverage-validator/src/cli.js \
@@ -85,7 +81,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    node tools/decision-table-validator/src/cli.js .aimd/output/formal-spec/decision-tables/
    ```
 
-8. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).
+7. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).
 
 ## ★ ★ ★ property_tests 의무 (chain 2 quality)
 

@@ -1,6 +1,6 @@
 ---
 name: implement-agent
-description: Use when chain 5 (implement / GREEN 의무 / i-strict) 진입. test-spec 기반 impl 코드 자동 생성 + impl-spec.{json,md} 산출. GREEN 의무 (모든 test 100% pass). traceability-matrix 100% green 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
+description: Use when chain 5 (implement / GREEN 의무 / i-strict) 진입. test-spec 기반 impl 코드 자동 생성 + impl-spec.json 산출. GREEN 의무 (모든 test 100% pass). traceability-matrix 100% green 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
 skills: [implement-generate-impl-spec, implement-verify-test-pass, implement-react, implement-vue, test-run-test-evidence, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
@@ -16,11 +16,11 @@ model: opus
 
 | skill | 호출 시기 | 산출 |
 |---|---|---|
-| `implement-generate-impl-spec` | chain 5 진입 / IMPL-* + 실 impl 코드 자동 생성 | impl-spec.{json,md} draft + 실 코드 파일 |
+| `implement-generate-impl-spec` | chain 5 진입 / IMPL-* + 실 impl 코드 자동 생성 | impl-spec.json draft + 실 코드 파일 |
 | `implement-react` | Scenario A/B (React 19) 진입 | .tsx / .jsx 파일 (forwardRef deprecated / ref prop direct) |
 | `implement-vue` | Vue 3 SFC 진입 | .vue (Composition API + `<script setup>` default) |
 | `implement-verify-test-pass` | impl 작성 후 진짜 runner 호출 / GREEN 검증 | 5종 물증 7 필드 (fail_count: 0 / pass_count > 0) + 100% pass 입증 |
-| `_base-apply-template` | 진입 시 impl-spec.{json,md} 골조 | template 자동 적용 |
+| `_base-apply-template` | 진입 시 impl-spec.json 골조 | template 자동 적용 |
 | `_base-build-traceability-matrix` | UC → BHV → AC → TC → IMPL forward+backward link green 의무 | matrix.json (100% green) |
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
 | `_base-invoke-go-stop-gate` | gate #5 종결 | intervention-log |
@@ -72,7 +72,7 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
    - intervention-log 본체 등재
 
 8. **종결 보고**:
-   - impl-spec.{json,md} + 실 코드 paths
+   - impl-spec.json + 실 코드 paths
    - 5종 물증 7 필드 (GREEN 입증 / fail_count: 0)
    - traceability-matrix 100% green
    - chain harness e2e 1 cycle 종결 ✅
@@ -86,15 +86,14 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합 (현 v4.0)
 
 - **본 agent = 새 paradigm 표준**
-- **본체 산출 경로** = `.aimd/output/impl-spec.{json,md}` + 실 코드
+- **본체 산출 경로** = `.aimd/output/impl-spec.json` + 실 코드
 
 ## 산출 자산 (chain 5)
 
-- `.aimd/output/impl-spec.json` (★ schemas/impl-spec.schema.json 의무)
-- `.aimd/output/impl-spec.md` (★ 사람 눈)
+- `.aimd/output/impl-spec.json` (★ schemas/impl-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 - 실 impl 코드 파일 (`*.ts` / `*.tsx` / `*.vue` / `*.java` / `*.py` 등)
 - `.aimd/output/test_pass_evidence.json` (5종 물증 7 필드 + GREEN)
-- `.aimd/output/matrix.json` + `matrix.md` + `matrix.mermaid` (100% green)
+- `.aimd/output/matrix.json` (100% green)
 - `.aimd/output/static-runner-evidence.json` (★ Tier 1 in-plugin Semgrep 실 실행 + Tier 2 SARIF import 흡수 결과 / PLUGINS registry = semgrep 단일 / no-simulation inflated-count ❌)
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #5 / chain 종결)

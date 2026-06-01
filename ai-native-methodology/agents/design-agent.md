@@ -18,9 +18,9 @@ model: opus
 
 | 영역 (carry) | skill (v4.1+ 신설 carry) | 산출 (carry) |
 |---|---|---|
-| wireframe 설계 | `design-wireframe-spec` (carry) | wireframe-spec.{json,md} |
-| component 설계 | `design-component-spec` (carry) | component-spec.{json,md} (props/state/behavior) |
-| DTCG token (W3C 2025.10) | `design-tokens-extract` (carry) | design-tokens.{json,md} 이중 렌더링 |
+| wireframe 설계 | `design-wireframe-spec` (carry) | wireframe-spec.json |
+| component 설계 | `design-component-spec` (carry) | component-spec.json (props/state/behavior) |
+| DTCG token (W3C 2025.10) | `design-tokens-extract` (carry) | design-tokens.json (json 단독 / ADR-011) |
 | visual regression | `design-visual-regression` (carry) | Playwright snapshot binary 진실 |
 | accessibility 사전 검증 | `design-a11y-prep` (carry) | a11y 사전 spec |
 

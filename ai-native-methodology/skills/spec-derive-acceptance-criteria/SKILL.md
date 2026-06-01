@@ -21,8 +21,7 @@ allowed-tools: Read, Grep, Bash, Write
 
 ## 산출
 
-- `<project>/.aimd/output/acceptance-criteria.json` (★ schemas/acceptance-criteria.schema.json 의무)
-- `<project>/.aimd/output/acceptance-criteria.md` (사람 눈 / Gherkin block)
+- `<project>/.aimd/output/acceptance-criteria.json` (★ schemas/acceptance-criteria.schema.json 의무 / ★ json 단독 / ADR-011 — Gherkin 은 json gherkin 필드)
 
 > ★ **code_pointers_na 기본** (F-DOGFOOD-009) — AC 는 의도 노드(Gherkin) → 코드 anchor 는 하위 TC/IMPL 가 보유. 각 AC `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 

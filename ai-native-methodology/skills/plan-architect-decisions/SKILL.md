@@ -103,4 +103,4 @@ Nygard 원본 5 category (`task-plan.schema.json` adrs[].trigger_category enum �
 - Michael Nygard "Documenting Architecture Decisions" — https://www.cognitect.com/blog/2011/11/15/documenting-architecture-decisions
 - AWS Prescriptive Guidance ADR process — https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html
 - Microsoft Azure Well-Architected ADR — https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record
-- ADR-CHAIN-001 (이중 렌더링)
+- ADR-CHAIN-001 (json 단독 / ADR-011)

@@ -91,7 +91,7 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 
 - `methodology-spec/plugin-charter.md` §1 R14 + §3 G4
 - `skills/implement-generate-impl-spec/SKILL.md` (본 skill 의 BE sibling)
-- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (이중 렌더링 chain 5) §3 (no-simulation)
+- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (json 단독 / ADR-011) §3 (no-simulation)
 - React 19 공식: https://react.dev/blog/2024/12/05/react-19
 
 ## When NOT to invoke

@@ -1,6 +1,6 @@
 ---
 name: plan-agent
-description: Use when chain 3 (plan) 진입. behavior-spec + acceptance-criteria 입력으로 task-plan.{json,md} 추출 전문. macro HOW (task 분해 + 의존성 + ADR + NFR allocation + risk + rollback) 명시. AC → TASK → TC + ADR/NFR/RISK cross-cut forward link 의무. main agent 가 Task tool 로 dispatch. v10.0.0 MAJOR — gate #3 hard gate 본격 활성 (DEC-2026-05-25-axis-a-phase-4-4-prime / v9.1.0 Phase 4-2 agent body 이후 gate 재번호 정합).
+description: Use when chain 3 (plan) 진입. behavior-spec + acceptance-criteria 입력으로 task-plan.json 추출 전문. macro HOW (task 분해 + 의존성 + ADR + NFR allocation + risk + rollback) 명시. AC → TASK → TC + ADR/NFR/RISK cross-cut forward link 의무. main agent 가 Task tool 로 dispatch. v10.0.0 MAJOR — gate #3 hard gate 본격 활성 (DEC-2026-05-25-axis-a-phase-4-4-prime / v9.1.0 Phase 4-2 agent body 이후 gate 재번호 정합).
 tools: Read, Glob, Grep, Bash, Write
 skills: [plan-decompose-and-sequence, plan-architect-decisions, plan-risk-and-nfr, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
 model: opus
@@ -19,7 +19,7 @@ model: opus
 | `plan-decompose-and-sequence` | chain 3 진입 / task-plan 본격 작성 | task-plan.tasks[] + dependencies[] + execution_order[] |
 | `plan-architect-decisions` | task 채움 후 ADR 자동 판정 trigger 검출 시 | task-plan.adrs[] + integration_points[] |
 | `plan-risk-and-nfr` | tasks + adrs 채움 후 | task-plan.risks[] + nfr_allocation[] + rollback_strategy |
-| `_base-apply-template` | 진입 시 task-plan.{json,md} 골조 | template 자동 적용 |
+| `_base-apply-template` | 진입 시 task-plan.json 골조 | template 자동 적용 |
 | `_base-build-traceability-matrix` | UC → BHV → AC → TASK forward link 갱신 | matrix.json (갱신) |
 | `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
 | `_base-invoke-go-stop-gate` | gate #3 종결 (★ v10.0.0 MAJOR Phase 4-4' hard gate 활성 / chain 3 = gate #3 1:1) | intervention-log |
@@ -64,7 +64,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
 5. **traceability-matrix 갱신** — `_base-build-traceability-matrix` 호출:
    - UC → BHV → AC → **TASK** forward link 갱신 (★ DO-178C 6 layer / Cluster 3 결단 AC→TASK→TC)
-   - matrix.json + matrix.md + matrix.mermaid
+   - matrix.json
 
 6. **자동 검증**:
    ```bash
@@ -95,13 +95,12 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합 (현 v10.0.0)
 
 - **본 agent = v9.1.0 Phase 4-2 agent body 진입 / v10.0.0 MAJOR gate #3 hard gate 본격 활성** (DEC-2026-05-25-axis-a-phase-4-1 + DEC-2026-05-25-axis-a-phase-4-4-prime)
-- **본체 산출 경로** = `.aimd/output/task-plan.{json,md}` (★ Cluster 6 결단 / discovery-spec.json (discovery 산출) 과 명확히 분리)
+- **본체 산출 경로** = `.aimd/output/task-plan.json` (★ Cluster 6 결단 / discovery-spec.json (discovery 산출) 과 명확히 분리)
 - **lifecycle-contract §Agent column plan row** = 본 agent (★ Phase 4-3 carry — traceability-matrix.schema.json subtask_ids.chain3_plan additive 동반)
 
 ## 산출 자산 (chain 3)
 
-- `.aimd/output/task-plan.json` (★ schemas/task-plan.schema.json 의무)
-- `.aimd/output/task-plan.md` (★ 사람 눈 / ADR-008 v2)
+- `.aimd/output/task-plan.json` (★ schemas/task-plan.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 - `.aimd/output/findings.md` (★ 누적)
 - `.aimd/output/intervention-log.json` (★ gate #3 사용자 결단 로그)
 
@@ -131,7 +130,7 @@ node tools/chain-driver/src/cli.js navigate \
 - DEC-2026-05-23-discovery-stage-v9 (v9.0.0 machine SSOT / plan placeholder carry §carry)
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리 paradigm)
 - `agents/spec-agent.md` (★ 본 agent 의 동형 paradigm source)
-- ADR-CHAIN-001 §1 (이중 렌더링 chain 3)
+- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
 - ADR-CHAIN-002 (gate UX)
 - ADR-CHAIN-005 §3 (mechanical gate enforcement trio — Phase 4-4' 본격 활성)
 - `schemas/task-plan.schema.json` (산출 schema)

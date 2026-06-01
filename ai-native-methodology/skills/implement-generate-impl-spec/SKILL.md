@@ -1,6 +1,6 @@
 ---
 name: implement-generate-impl-spec
-description: ★ ★ ★ v2.0 chain 5 진입 skill (i-strict). test-spec 기반 impl 코드 자동 generate + impl-spec.{json,md} 산출. GREEN 의무 (모든 test 100% pass). full-stack-implementer persona 책임. ADR-CHAIN-001 §1 (이중 렌더링) + DEC-2026-05-06-v2.0-i-strict-채택 정합.
+description: ★ ★ ★ v2.0 chain 5 진입 skill (i-strict). test-spec 기반 impl 코드 자동 generate + impl-spec.json 산출. GREEN 의무 (모든 test 100% pass). full-stack-implementer persona 책임. ADR-CHAIN-001 §1 (json 단독 / ADR-011) + DEC-2026-05-06-v2.0-i-strict-채택 정합.
 allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 ---
 
@@ -26,8 +26,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 산출물
 
-- `<project>/.aimd/output/impl-spec.json` (★ schemas/impl-spec.schema.json 의무)
-- `<project>/.aimd/output/impl-spec.md` (사람 눈)
+- `<project>/.aimd/output/impl-spec.json` (★ schemas/impl-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 - 실 impl 코드 (framework 별):
   - nestjs: `<project>/<src>/{module,controller,service,repository}.ts`
   - spring: `<project>/src/main/java/**/{Controller,Service,Repository}.java`
@@ -282,7 +281,7 @@ async def login(req: LoginRequest, svc: AuthService = Depends()):
 
 ## 인용
 
-- ADR-CHAIN-001 §1 (이중 렌더링 chain 5) §3 (no-simulation 강화)
+- ADR-CHAIN-001 §1 (json 단독 / ADR-011) §3 (no-simulation 강화)
 - ADR-CHAIN-004 §4 (--allow-execute 의무)
 - impl-spec.schema.json (deliverable 21) `fail_count const 0`
 - master plan §B chain 5

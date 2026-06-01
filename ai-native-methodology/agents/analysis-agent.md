@@ -19,7 +19,7 @@ model: opus
 | **입력** | `analysis-input-collection` / `analysis-input-orchestrate` / `analysis-from-{prompt,swagger,plan-doc,figma}` | input.json / input-summary.json |
 | **7대 BE 산출물** | `analysis-source-inventory` / `analysis-architecture` / `analysis-domain-model` / `analysis-business-rules` / `analysis-db-schema-erd` / `analysis-openapi` / `analysis-quality-antipattern` | inventory / architecture / domain / rules / schema / openapi / antipatterns |
 | **8 FE 산출물** | `analysis-form-validation-fe` / `analysis-type-spec-fe` / `analysis-ui-state-map-fe` / `analysis-ui-visual-manifest-fe` / `analysis-aspect-{a11y,i18n,static-security,legacy}` / `analysis-html-template` | ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum |
-| **formal-spec** | `analysis-formal-spec-validation` / `analysis-characterization-test` / `analysis-sql-inventory` / `analysis-br-cross-consistency-check` / `analysis-api-rule-mapping` / `analysis-error-mapping` | state-machines / sequences / decision-tables / invariants / characterization-spec / sql-inventory / error-mapping-spec |
+| **formal-spec** | `analysis-formal-spec-validation` / `analysis-characterization-test` / `analysis-sql-inventory` / `analysis-br-cross-consistency-check` / `analysis-api-rule-mapping` / `analysis-error-mapping` | state-machines (sequence 포함) / decision-tables / invariants / characterization-spec / sql-inventory / error-mapping-spec |
 | **baseline+ratchet** | `_base-apply-baseline-ratchet` | baseline.json / ratchet threshold |
 | **finding** | `_base-log-finding` | findings.md |
 
@@ -44,10 +44,10 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
    - `analysis-architecture` (phase 3) → 레이어 / 모듈 / 경계 (architecture.json)
    - `analysis-domain-model` (phase 4) → 엔티티 / aggregate / VO (domain.json)
    - `analysis-business-rules` (phase 4) → BR-* 의 DMN-style decision table (rules.json)
-   - `analysis-db-schema-erd` (phase 2) → DDL / Prisma / JPA / TypeORM → schema.json + erd.mermaid
+   - `analysis-db-schema-erd` (phase 2) → DDL / Prisma / JPA / TypeORM → schema.json
    - `analysis-openapi` (phase 5-1) → REST endpoint → openapi.yaml
    - FE stack 시 → 8 FE 산출물 단계 (form-validation / type-spec / state-map / visual-manifest / a11y / i18n / static-security / legacy)
-   - `analysis-quality-antipattern` (phase 6) → 통합 antipatterns.json + migration-cautions.md
+   - `analysis-quality-antipattern` (phase 6) → 통합 antipatterns.json + migration-cautions.json
 
 4. **formal-spec phase 도달 시** — `analysis-formal-spec-validation` 단계 5 (no-simulation 진짜 도구) 의무
 
@@ -64,9 +64,9 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 
 ## 산출 자산 (chain 1 sub / analysis stage)
 
-- `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` + `erd.mermaid` / `openapi.yaml` / `antipatterns.json` / `migration-cautions.md`
+- `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (★ json 단독 SSOT / ADR-011) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (★ json 단독 SSOT / ADR-011)
 - `.aimd/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
-- `.aimd/output/state-machines.{json,mermaid}` / `sequences.mermaid` / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
+- `.aimd/output/state-machines.json` (★ json 단독 SSOT / ADR-011 / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
 - `.aimd/output/findings.md`
 
 ## When NOT to invoke

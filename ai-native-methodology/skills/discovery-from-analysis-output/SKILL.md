@@ -20,12 +20,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - 8 FE 산출물 (있으면): ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum
 - `formal-spec` phase: state-machines / sequences / decision-tables / invariants
 - finding-system: findings.json
-- migration-cautions.md
+- migration-cautions.json
 
 ## 산출물
 
-- `<project>/.aimd/output/discovery-spec.json` (★ schemas/discovery-spec.schema.json 의무)
-- `<project>/.aimd/output/discovery-spec.md` (★ 사람 눈 / ADR-008 v2)
+- `<project>/.aimd/output/discovery-spec.json` (★ schemas/discovery-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
 
 ## ★ ★ ★ no-simulation 의무 (source-grounded)
 
@@ -65,9 +64,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
    node tools/schema-validator/src/cli.js .aimd/output/discovery-spec.json
    ```
 
-8. **discovery-spec.md 렌더링** — json 의 use_cases / business_intent / business_rules_intent 를 markdown 으로 변환 (★ ADR-008 v2 이중 렌더링).
-
-9. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
+8. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
    1. business_intent 정확성?
    2. 누락 use case 추가?
    3. 의문 BR-INTENT?
@@ -128,7 +125,7 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 ## 인용
 
-- ADR-CHAIN-001 §1 (이중 렌더링 chain 1)
+- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
 - ADR-CHAIN-002 (gate UX)
 - discovery-spec.schema.json (deliverable 17)
 - master plan §B chain 1

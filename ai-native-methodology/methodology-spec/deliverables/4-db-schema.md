@@ -1,7 +1,7 @@
 # 산출물 #4: DB 스키마 (Database Schema)
 
 > **사상**: Schema-First (ADR-001 — 다중 출처 통합 시 운영 DB > ORM > ERD 우선순위)
-> **schema**: `schemas/db-schema.schema.json` · **template**: `templates/analysis/erd.template.mermaid`
+> **schema**: `schemas/db-schema.schema.json` (★ json 단독 SSOT / ADR-011 — `.template.mermaid` 폐지)
 > **생성 phase**: `db-schema` phase (`/analyze-db`)
 
 ---
@@ -18,9 +18,8 @@
 
 ```
 output/db/
-├── schema.json                    # AI용 (구조화)
+├── schema.json                    # ★ json 단독 SSOT / ADR-011 (구조화 / ERD relationships 포함)
 ├── schema.sql                     # 통합 SQL (CREATE TABLE)
-├── erd.mermaid                    # ERD (Mermaid erDiagram)
 ├── 정합성-검증-보고서.md           # 다중 출처 시 (보조)
 └── tables/                        # 테이블별 상세 (선택)
     ├── orders.md
@@ -56,7 +55,6 @@ output/db/
 
 ```
 □ schema.json schema 검증 통과
-□ erd.mermaid 렌더링 확인
 □ 모든 테이블에 PK 명시
 □ FK 명시 또는 부재 사유 기록
 □ 정합성 검증 보고서 사람 검토 (다중 출처 시)
