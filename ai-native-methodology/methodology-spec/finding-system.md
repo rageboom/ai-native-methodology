@@ -899,7 +899,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
   - `agents/plan-agent.md:5` (`skills: []` 빈 배열)
   - `flows/plan.phase-flow.json:4` (`"placeholder": true`) + `:45` (gate_deferred)
   - `skills/plan-{decompose-and-sequence,architect-decisions,risk-and-nfr}/SKILL.md` (모두 description 첫 문구 = "PLACEHOLDER 2026-05-21 (v4.1 paradigm 가시화만)")
-  - `methodology-spec/lifecycle-contract.md:153-171` ("plan-agent = PLACEHOLDER (`skills: []` / dispatch 무의미)")
+  - `methodology-spec/lifecycle-contract.md` (당시 plan stage 절 = "plan-agent = PLACEHOLDER (`skills: []` / dispatch 무의미)" / ★ 현재 = "plan-agent = 본격 (v9.1.0 body) / gate #3 본격 활성 (v10.0.0)" 으로 정합화됨 = 본 finding 해소 반영)
   - `decisions/DEC-2026-05-21-chain-discovery-plan-stage-도입.md` (진단 + 신설 결정 + 진단 자기모순 본질)
   - Glob `ai-native-methodology/examples/poc-*/plan-spec.json` = 0건 (실 PoC 14종 plan stage 산출물 부재)
 - **Spec gap:** v9.0 chain harness 가 6-stage 라 외부 표기하지만 실질 4-stage harness + 1 input stage + 1 ★ ★ ★ ghost stage (plan). stage 자격 미달. 본 plugin 의 "AI 자동 ≥ 85% + 사람 검토 ≤ 15%" 정합 양보.
@@ -910,7 +910,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
   - **ζ-2**: plan stage 폐기 (v9.0 paradigm retract / DEC-2026-05-21 진단 재검증 / spec → test 직접 회귀 / macro HOW = spec 흡수 vs test 흡수 결단 / v9.x MAJOR breaking).
   - **ζ-3**: plan stage = gate 없는 informal stage 로 정합 표기 (외부 표기 변경 / paradigm 정합 양보 / 5-stage harness + informal plan helper).
   ★ ★ ★ ★ ★ ★ 본 cycle 시행 ❌ — δ Type 2 외부 사용자 dogfood 안 ★ 1순위 자연 표면화 대상. 자기 결단으로 paradigm fix = `feedback_self_referential_corrective_drift.md` 위배.
-- **Status:** **deferred** (Type 2 dogfood channel / 차기 session δ 의제 의존 / ★ ★ ★ ★ ★ 1순위 표면화 대상 / paradigm-level finding 자격 외부 사용자 channel 의무)
+- **Status:** **resolved** (★ v10.0.0 / session 47차 — proposed fix **ζ-1** ("plan stage 본격 구현 + gate #3 동시")가 axis A plan stage 트랙으로 전부 시행됨: DEC-2026-05-25-axis-a-phase-4-1 ~ -4-4-prime + DEC-2026-05-26-gate-renumber-coherence. ★ ★ 5 axis 종결 — `stage-graph.js getGateForStage('plan')`='#3' / `state.schema.json` enum +'plan' / chain N = gate #N 1:1 / `plan.phase-flow.json` placeholder=false / revisit_edges 9 — 근거 = DEC-2026-05-25-axis-a-phase-4-4-prime §3-1 + CHANGELOG v10.0.0 "F-CHA-003 5 axis 본격 해소". ★ self-referential corrective drift 아님 — 사용자 명시 결단 trigger 의 paradigm-level stage 신설 (LL-v910-01 legitimate retract). ★ 단 본 finding 항목 deferred→resolved 갱신은 2026-06-01 registry sync 시점에 반영 — 결정 기록(CHANGELOG+DEC)은 v10.0.0 종결, finding-system.md 항목만 갱신 누락분.)
 
 ### F-CHA-poc17-001: chain-driver `init <project>` 호출 paradigm 명세 부재 (★ Type 2 외부 dogfood 채널 자연 발현)
 
