@@ -1,7 +1,7 @@
 # DEC-2026-06-01-json-only-ax-native
 
 > ★ **v12.0.0 MAJOR release SSOT**. 산출물 = **`.json` 단독 (완전 AX-native)** 로 전환 — committed deliverable/phase-flow `.mermaid` + deliverable `.md` dual-rendering twin 을 **전면 폐기**. ADR-008(이중 렌더링 사상) **완전 Superseded** / ADR-002·ADR-009·ADR-FE-002·plugin-charter R7 **Amend** / ADR-011 **신설**.
-> 상태: **승인 + 시행 진행중** (2026-06-01 / 사용자 결단 "json 단독 / 완전 AX"). 시행 chunk C1~C5 commit+main FF 완료 (main=`902e54f`) / C6(거버넌스 / 본 DEC) 진행 / C7(lifecycle-contract·deliverables·figure)~C8(version 12.0.0) 차기.
+> 상태: **승인 + 시행 완료** (C1~C8 / 2026-06-02 / 사용자 결단 "json 단독 / 완전 AX"). 시행 chunk C1(`ec8a6f6`)·C2(`17bd6ce`+`aed4d1c`)·DT-json(`3582e10`)·C3(`cb8530d`)·C4(`9f7673a`)·C5(`902e54f`)·C6(`d995516`)·C7(`5363060`)·C8(version 12.0.0) 전부 commit+main FF 완료. ★ C7 figure 삭제 subtree = 사용자 결정으로 DROP(category-C figure 전부 KEEP / drift무관 미관 churn). origin push = 직전 사용자 확인.
 
 ## 배경 — two-eyes 사상의 비용·편익 역전
 

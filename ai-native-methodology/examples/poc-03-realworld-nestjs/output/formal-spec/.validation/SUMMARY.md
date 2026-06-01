@@ -1,5 +1,7 @@
 # Phase 4.5 자동 검증 결과 — PoC #03 NestJS
 
+> ⚠️ **pre-v12 historical record** (2026-04-30 / pair-mode era / frozen 보존). v12.0.0(ADR-011)에서 drift-validator `.json↔.mermaid` pair-mode + `.mermaid` 산출물 + `drift-result.json` 폐기 → 본 보고서의 drift/`.mermaid` 참조는 **당시 기록** (현 도구 미적용 / decision-table dmn-check 도 DT-json 흡수). 역사 자산으로만 보존.
+
 > **일자**: 2026-04-30 (Phase 4.5 + 4.5+1 통합)
 > **도구**: drift-validator v0.1.0 + decision-table-validator v0.1.0
 > **Source**: `output/formal-spec/.validation/{drift-result,dmn-check-result}.json`

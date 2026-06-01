@@ -9,6 +9,23 @@
 
 ---
 
+## [12.0.0] — 2026-06-02 MAJOR — json-only 산출물 (.mermaid + .md twin 폐기 / ADR-008 Superseded / ADR-002·009·FE-002·charter R7 Amend / ADR-011)
+
+**committed deliverable/phase-flow `.mermaid` + deliverable `.md` dual-rendering twin 을 전면 폐기하고 산출물을 `.json` 단독 SSOT (완전 AX-native) 로 전환.** P0(AX 운영 / 산출물 = LLM 운영 컨텍스트) 이동 + LLM-무관 실측(2 distinct domain RealWorld·ecommerce: 모든 검증 도구가 json 만 입력으로 read / `.md`·`.mermaid` twin = LLM 운영 컨텍스트 0 기여 + 2차 렌더링 drift 표면만 추가)으로 ADR-008 two-eyes 사상 완전 역전 (honest self-reversal / corrective drift 아님). SSOT = `decisions/DEC-2026-06-01-json-only-ax-native.md`.
+
+- **거버넌스**: ADR-008(이중 렌더링) **Superseded by ADR-011** + ADR-002(7대 산출물 사람용 column 폐기)·ADR-009(retitle "산출물 신뢰 모델" / §2.3·2.4 diagram rung moot / ★ 도구 종류 구분·no-simulation SSOT UNCHANGED)·ADR-FE-002(FE 사람눈 .mermaid retire / visual snapshot-hash UNAFFECTED)·plugin-charter R7(manifest.json 단독) **Amend** + **ADR-011 신설**.
+- **C1** schema ADDITIVE — cosmetic 흡수처(relationship_label/note/detail) + `migration-cautions.schema.json` 신설.
+- **C2** skill/agent/builder `.mermaid`+`.md` twin emit 중단 + ADR-011 신설.
+- **DT-json** decision-table grid → formal-spec.json `decision_grids[]` 흡수 (DMN-inspired / 문서용 / hit_policy 만 DMN 어휘 차용).
+- **C3** 원자 BREAKING cut — drift-validator `.json↔.mermaid` pair-mode 4 모듈 폐기 + JSON-only handoff detector(`check-handoff-consistency.js`) + `flows/artifact-registry.json`.
+- **C4** `.mermaid`+`.md` twin 파일·flow 토큰·template 삭제 + check21 template count finalize.
+- **C5** schema `.mermaid`/`.md` path 필드 7 schema 제거(diagram_files/rendered_mermaid_path/rendered_md_path/consistency_report_file/rendered_paths) + examples 23 data 재emit + ★ cosmetic 흡수(poc-01 9 FK relationship_label — 삭제된 erd.mermaid edge 라벨 git 복원 / 날조 0).
+- **C6** 거버넌스(ADR supersede/amend + DEC + INDEX).
+- **C7** lifecycle-contract 대수술 + deliverables/workflow twin-emit 산문 제거 (json 단독). ★ figure(```mermaid 블록)·functional report(violations/test-report/conflicts/types.d.ts/error-mapping/sql-inventory)·findings.md = KEEP. category-C figure 삭제 = 사용자 결정으로 DROP (drift 무관·무해·미관 churn).
+- **C8** version 12.0.0 3-way(plugin.json+package.json+CHANGELOG)+CLAUDE.md sync + STATUS/INDEX.
+
+**MAJOR 정당성**: schema optional 필드 제거 + 실 산출물 재emit 필요 + ADR-008 supersede + charter R7 amend = breaking paradigm. **carry**: 사람 gate-검토 prose `.md` → raw `.json` (on-demand viz DEFER) · poc-03 `.validation/drift-result.json` stale pair-mode artifact 정리.
+
 ## [11.33.0] — 2026-06-01 MINOR — S2(AX전환 주 타깃) gate WARN→block 격상 (§8.1 ≥2 distinct domain 충족: RealWorld + ecommerce / s2_outcome_mismatch hard-block)
 
 **S2(AX전환 = 주 타깃) gate 의 `s2_outcome_mismatch` 를 WARN(go-with-warnings 허용) → block(hard-block / 사용자 'go' 거부)으로 격상. 자격 게이트 = §8.1 ≥2 distinct domain S2 execution corroboration — 직전 1/2(RealWorld Spring/JUnit) → ecommerce(NestJS+Prisma+jest / e-commerce 도메인)로 2/2 충족. WARN 은 v11.11.0 부터 명시적 임시 placeholder("corroboration 0 동안 WARN ... ≥2 후 격상")였고 본 release 가 계획된 maturation.**
