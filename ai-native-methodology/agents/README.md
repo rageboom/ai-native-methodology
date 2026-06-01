@@ -1,11 +1,11 @@
 # agents/ — Sub-agent paradigm (★ v4.0 multi-agent / DEC-2026-05-17 정합)
 
-본 디렉토리 = 본 방법론의 sub-agent 자산. ★ v4.0 paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택) — **stage 별 sub-agent 5종 + 3 base cross-cutting agent + spike 자산 1종 병존**. Claude Code plugin 표준 = 1-depth flat (`agents/<name>.md`).
+본 디렉토리 = 본 방법론의 sub-agent 자산. ★ v4.0 paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택) — **stage 별 sub-agent 6종 본격 + design placeholder 1종 + 3 base cross-cutting agent + spike 자산 1종 병존**. Claude Code plugin 표준 = 1-depth flat (`agents/<name>.md`).
 
 ## paradigm (★ v4.0)
 
 - **main agent** = orchestrator (skill 직접 호출 ❌ 권고 / Task tool 로 stage agent dispatch)
-- **stage 별 sub-agent 5종 본격 + 2종 placeholder** (`analysis-agent` / `discovery-agent` / `spec-agent` / `test-agent` / `implement-agent` 본격 + `plan-agent` ★ PLACEHOLDER + `design-agent` ★ PLACEHOLDER) — 각 chain stage 의 단일 책임 entry point. ★ v9.0 6-stage (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21+DEC-2026-05-23-discovery-stage-v9). plan = HOW 단계(task/ADR/NFR/risk) / skill 3종 placeholder / hard gate deferred. design = v4.0 가시화만 / skill 부재.
+- **stage 별 sub-agent 6종 본격 + 1종 placeholder** (`analysis-agent` / `discovery-agent` / `spec-agent` / `plan-agent` / `test-agent` / `implement-agent` 본격 + `design-agent` ★ PLACEHOLDER) — 각 chain stage 의 단일 책임 entry point. ★ v9.0 6-stage (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21+DEC-2026-05-23-discovery-stage-v9). plan = HOW 단계(task/ADR/NFR/risk) / skill 3종 body + gate #3 hard gate 활성 (v9.1.0 body / v10.0.0 gate / plan-coverage-validator trio). design = v4.0 가시화만 / skill 부재.
 - **3 base cross-cutting agent** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`) — research / critique 등 cross-cutting 책임
 - **spike agent** (`archive/v4-spike/_spike-planning-agent.md`) — paradigm 가능 입증 자산 / 역사 기록 / EXPERIMENTAL (★ ★ ★ v4.0 정식 진입 후 archive 이동 / commit `8605652` 안 source 보존)
 - **frontmatter `skills: [...]` 사전 주입** — 각 stage agent 가 자기 책임 skill 들을 startup 시점에 인지 (Sub-agents.md spec line 407~429 정합)
@@ -20,13 +20,13 @@
 | analysis | `analysis-agent.md` (★ chain 1 sub 22 skill + 6 input skill 책임) |
 | discovery | `discovery-agent.md` (★ chain 1 / planning 개칭 / 6 discovery skill[4 어댑터 + 2 공통] + 4 base 책임) |
 | spec | `spec-agent.md` (★ chain 2 / 3 spec skill + 4 base 책임) |
-| plan | `plan-agent.md` (★ chain 3 / HOW / skill 3종 placeholder / hard gate deferred) |
+| plan | `plan-agent.md` (★ chain 3 / HOW / skill 3종 body + gate #3 hard gate 활성) |
 | test | `test-agent.md` (★ chain 4 / 4 test skill + 4 base 책임) |
 | implement | `implement-agent.md` (★ chain 5 / 4 implement skill + 4 base 책임) |
 | cross-cut (traceability) | `_base-senior-engineer.md` (gate 검토 시 critique 위임) + `_base-build-traceability-matrix` skill |
 | cross-cut (aspects) | `_base-official-docs-checker.md` + `_base-industry-case-researcher.md` (research 트랙 dispatch) |
 
-## stage agent 5종
+## stage agent 6종 (+ design placeholder)
 
 ### `analysis-agent.md` (★ chain 1 sub)
 - **책임**: legacy 코드베이스 분석 + 7대 BE 산출물 + 8 FE 산출물 + finding + antipatterns + migration-cautions
@@ -109,7 +109,7 @@ expected: .aimd/output/{inventory,architecture,domain,rules,schema,openapi,antip
 """)
 
 # 산출물 hand-off via filesystem
-main agent → analysis-agent → discovery-agent → spec-agent → plan-agent(placeholder) → test-agent → implement-agent
+main agent → analysis-agent → discovery-agent → spec-agent → plan-agent → test-agent → implement-agent
             (.aimd/output/*.json 매개)
 ```
 
