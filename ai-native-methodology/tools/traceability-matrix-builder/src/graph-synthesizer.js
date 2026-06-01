@@ -87,12 +87,36 @@ const CHAIN_SUBKINDS = Object.freeze(['UC', 'BHV', 'AC', 'TASK', 'TC', 'IMPL']);
 //   (DEC-2026-05-26-ticket-plan-단일)
 const PLAN_SUBKINDS = Object.freeze(['EPIC', 'STORY', 'OP']);
 
-const ANALYSIS_SUBKINDS = Object.freeze([
+export const ANALYSIS_SUBKINDS = Object.freeze([
   'architecture', 'domain', 'api', 'db-schema', 'formal-spec',
   'business-rules', 'antipatterns', 'ui-ux', 'state-map', 'visual-manifest',
   'form-validation-spec', 'type-spec', 'error-mapping-spec',
   'characterization-spec', 'sql-inventory',
 ]);
+
+// ★ v11.x (F-ECOM-004) — analysis 산출물 basename → kind 역매핑.
+//   cross_links.to_analysis_artifacts (spec-level generic path 리스트) 의 Layer 4 edge 합성용.
+//   ANALYSIS_FILENAMES (cli.js) 와 정합 — 파일명 ≠ kind 인 경우(api / db-schema / ui-ux) + alias(openapi.yaml / db-schema.json) 포함.
+//   guard test: 모든 ANALYSIS_SUBKINDS 가 ≥1 basename 으로 매핑 (drift 차단 / graph-synthesizer.test.js).
+export const ANALYSIS_BASENAME_TO_KIND = Object.freeze({
+  'architecture.json': 'architecture',
+  'domain.json': 'domain',
+  'openapi-extension.json': 'api',
+  'openapi.yaml': 'api',
+  'schema.json': 'db-schema',
+  'db-schema.json': 'db-schema',
+  'formal-spec.json': 'formal-spec',
+  'business-rules.json': 'business-rules',
+  'antipatterns.json': 'antipatterns',
+  'ui-spec.json': 'ui-ux',
+  'state-map.json': 'state-map',
+  'visual-manifest.json': 'visual-manifest',
+  'form-validation-spec.json': 'form-validation-spec',
+  'type-spec.json': 'type-spec',
+  'error-mapping-spec.json': 'error-mapping-spec',
+  'characterization-spec.json': 'characterization-spec',
+  'sql-inventory.json': 'sql-inventory',
+});
 
 const ASPECT_SUBKINDS = Object.freeze([
   'a11y', 'i18n', 'static-security', 'legacy-spectrum',
@@ -645,6 +669,46 @@ export function synthesizeGraph(input) {
     for (const target of data.meta?.related_chain_ids ?? []) {
       if (!nodeIds.has(target)) continue;
       edges.push(makeEdge(`analysis-${subkind}`, target, 'cross_reference'));
+    }
+  }
+
+  // --- ★ v11.x (F-ECOM-004) Layer 4 cross_reference (soft, analysis → chain) — spec-level to_analysis_artifacts ---
+  //   discovery/behavior/operational-task 의 cross_links.to_analysis_artifacts (generic 산출물 path 리스트)를
+  //   basename→kind 역매핑(ANALYSIS_BASENAME_TO_KIND) 후 cross_reference edge 합성. Layer 1~3 (특정 ref 필드)이
+  //   못 잡는 산출물(architecture/db-schema/domain 등 = 특정 ref 부재)을 연결 → graph-integrity orphan 해소.
+  //   spec-level(coarse) 이므로 layer anchor 1개(정렬 첫 id)에만 연결 = fan-out 회피 (per-item 정밀 edge 는 Layer 1).
+  //   guard: analysisLoaded.has(kind) + nodeIds.has(anchor) (dangling) + 기존 cross_reference edge 중복 회피 (dedup).
+  {
+    const xrefKeys = new Set(
+      edges.filter((e) => e.edge_type === 'cross_reference').map((e) => `${e.source} ${e.target}`)
+    );
+    const anchorOf = (items) => {
+      const ids = (items ?? [])
+        .map((it) => it?.id)
+        .filter((id) => typeof id === 'string' && nodeIds.has(id))
+        .sort();
+      return ids[0] ?? null;
+    };
+    const specLayers = [
+      [discoverySpec, discoverySpec?.use_cases],
+      [behavior, behavior?.behaviors],
+      [operationalTask, operationalTask?.op_tasks],
+    ];
+    for (const [spec, layerItems] of specLayers) {
+      const refs = spec?.cross_links?.to_analysis_artifacts;
+      if (!Array.isArray(refs) || refs.length === 0) continue;
+      const anchor = anchorOf(layerItems);
+      if (!anchor) continue;
+      for (const raw of refs) {
+        const base = String(raw).split(/[\\/]/).pop();
+        const kind = ANALYSIS_BASENAME_TO_KIND[base];
+        if (!kind || !analysisLoaded.has(kind)) continue; // dangling guard
+        const src = `analysis-${kind}`;
+        const key = `${src} ${anchor}`;
+        if (xrefKeys.has(key)) continue; // dedup (Layer 1~3 / 자기 중복)
+        xrefKeys.add(key);
+        edges.push(makeEdge(src, anchor, 'cross_reference'));
+      }
     }
   }
 

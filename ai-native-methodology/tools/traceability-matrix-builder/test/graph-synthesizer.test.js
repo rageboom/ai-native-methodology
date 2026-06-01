@@ -21,6 +21,8 @@ import {
   TIER1_CATALOG,
   deriveAnalysisCodePointers,
   hasCodeExtension,
+  ANALYSIS_SUBKINDS,
+  ANALYSIS_BASENAME_TO_KIND,
 } from '../src/graph-synthesizer.js';
 
 // ============================================================================
@@ -360,6 +362,63 @@ describe('synthesizeGraph — node/edge 구성', () => {
     };
     const g = synthesizeGraph(input);
     assert.equal(g.edges.filter(e => e.edge_type === 'informs').length, 0);
+  });
+
+  // --- ★ v11.x (F-ECOM-004) Layer 4 — cross_links.to_analysis_artifacts → cross_reference ---
+  const layer4Input = {
+    discovery: {
+      use_cases: [{ id: 'UC-B' }, { id: 'UC-A' }], // anchor = UC-A (정렬 첫)
+      cross_links: { to_analysis_artifacts: ['.aimd/output/domain.json', 'schema.json', 'state-map.json'] },
+    },
+    behavior: {
+      behaviors: [{ id: 'BHV-1', use_case_refs: ['UC-A'], br_refs: ['BR-1'] }],
+      cross_links: { to_analysis_artifacts: ['business-rules.json'] },
+    },
+    analysis: {
+      'domain': { meta: { title: 'D' } },
+      'db-schema': { meta: { title: 'S' } },
+      'business-rules': { meta: { title: 'BR' } },
+      // state-map 미로드
+    },
+  };
+
+  it('F-ECOM-004 Layer 4: to_analysis_artifacts → cross_reference edge + orphan 해소 (anchor)', () => {
+    const g = synthesizeGraph(layer4Input);
+    const xrefs = g.edges.filter(e => e.edge_type === 'cross_reference').map(e => `${e.source}->${e.target}`);
+    assert.ok(xrefs.includes('analysis-domain->UC-A'), 'domain → discovery anchor UC-A');
+    assert.ok(xrefs.includes('analysis-db-schema->UC-A'), 'schema.json → db-schema → UC-A (basename alias)');
+    // orphan 해소: domain/db-schema 노드가 ≥1 edge
+    const deg = id => g.edges.filter(e => e.source === id || e.target === id).length;
+    assert.ok(deg('analysis-domain') > 0 && deg('analysis-db-schema') > 0);
+    assert.ok(g.edges.filter(e => e.edge_type === 'cross_reference').every(e => e.confidence === 'soft'));
+  });
+
+  it('F-ECOM-004 Layer 4: 미로드 kind dangling 안 emit (state-map)', () => {
+    const g = synthesizeGraph(layer4Input);
+    assert.equal(g.edges.filter(e => e.source === 'analysis-state-map').length, 0);
+    assert.ok(!g.nodes.some(n => n.id === 'analysis-state-map'));
+  });
+
+  it('F-ECOM-004 Layer 4: dedup — Layer 1 (br_refs) 과 동일 (src,anchor) 중복 안 만듦', () => {
+    const g = synthesizeGraph(layer4Input);
+    // behavior anchor=BHV-1, br_refs 로 Layer1 이 이미 analysis-business-rules→BHV-1 생성 → Layer4 dedup
+    const dup = g.edges.filter(e => e.edge_type === 'cross_reference'
+      && e.source === 'analysis-business-rules' && e.target === 'BHV-1');
+    assert.equal(dup.length, 1, '중복 edge 없어야 함');
+  });
+
+  it('F-ECOM-004 Layer 4: anchor 부재(빈 layer) → no edge / no crash', () => {
+    const g = synthesizeGraph({
+      discovery: { use_cases: [], cross_links: { to_analysis_artifacts: ['domain.json'] } },
+      analysis: { 'domain': { meta: {} } },
+    });
+    assert.equal(g.edges.filter(e => e.source === 'analysis-domain').length, 0);
+  });
+
+  it('F-ECOM-004: ANALYSIS_BASENAME_TO_KIND drift guard — 모든 ANALYSIS_SUBKINDS 매핑됨', () => {
+    const mappedKinds = new Set(Object.values(ANALYSIS_BASENAME_TO_KIND));
+    const missing = ANALYSIS_SUBKINDS.filter(k => !mappedKinds.has(k));
+    assert.deepEqual(missing, [], `미매핑 kind: ${missing.join(',')}`);
   });
 
   it('scope_id / commit_hash 스탬프 — code-pointer commit 우선 보존', () => {

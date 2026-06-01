@@ -9,6 +9,15 @@
 
 ---
 
+## [11.31.0] — 2026-06-01 MINOR — dep-graph synthesizer Layer 4: cross_links.to_analysis_artifacts → cross_reference edge (F-ECOM-004 graph orphan 해소)
+
+**② ecommerce-backend dogfood 가 표면화한 F-ECOM-004 — graph-integrity FAIL (orphans=5: analysis-architecture/domain/db-schema/form-validation/error-mapping = edge 0). root cause: graph-synthesizer 가 discovery/behavior 의 spec-level `cross_links.to_analysis_artifacts`(generic 산출물 path 리스트)에서 cross_reference edge 를 합성 안 함 — Layer 1(br_refs)/2(analysis 자체 ref)/3(meta.related_chain_ids) 만 edge화 → 특정 ref 가 없는 analysis 노드가 orphan.**
+
+- **변경 (additive / breaking 0)**: `graph-synthesizer.js` **Layer 4** 신설 — discovery/behavior/operational-task 의 `cross_links.to_analysis_artifacts` → `ANALYSIS_BASENAME_TO_KIND` 역매핑(파일명≠kind: api/db-schema/ui-ux + alias openapi.yaml/db-schema.json) → `analysis-{kind}` → layer anchor(정렬 첫 UC/BHV/OP id) cross_reference edge. dangling guard(analysisLoaded + nodeIds.has) + dedup(기존 cross_reference key) + fan-out 회피(anchor 1개 / per-item 정밀 edge 는 Layer 1). `ANALYSIS_BASENAME_TO_KIND` const 신설 + `ANALYSIS_SUBKINDS`/`ANALYSIS_BASENAME_TO_KIND` export.
+- **B(enforcement) = 기존 graph-integrity-validator**: orphan=hard-FAIL 이 이미 enforcement (chain-coverage 에 filesystem coverage 검사 신설 ❌ — poc-16 orphan=0 정상인데 db-schema 미참조 false-positive 회피). Layer 4 가 to_analysis_artifacts 를 edge 통로로 만들어 "미참조 → orphan → FAIL"이 의미를 가짐.
+- **검증 (no-simulation / 실 CLI)**: graph-synthesizer +5 test(emit/dangling/dedup/anchor부재/basename drift-guard) → builder 144→149 / workspace **1042 pass / 0 fail** / release-readiness **30/30** / graph_integrity #13(poc-05) 불변 / version 3-way 11.31.0. ★ ecommerce 실 그래프 측정: orphan **5→2**(Layer 4 단독 / domain·error-mapping·form-validation 해소) **→0**(+discovery·behavior to_analysis_artifacts 완전체 보정 = architecture·db-schema) / graph-integrity passed:true. dogfood findings/stats = F-ECOM-004 resolved.
+- **잔여 carry**: committed poc-05/16 그래프 snapshot = Layer 4 edge cosmetic lag(orphan 0 유지 / gate 무영향 / regen script 부재라 원본 command 없이 재생성=위험 → 유지) · F-ECOM-005(skill db-schema source_files 안내) · S2 gate WARN→block · FE kinds(BE-only repo → FE 3rd 도메인 dogfood). DEC-2026-06-01-fecom-004-orphan-edge.
+
 ## [11.30.0] — 2026-06-01 MINOR — db-schema 명명 패턴 legacy 편향 완화 (Modern ORM PascalCase/camelCase 수용 / F-ECOM-001 / ② ecommerce-backend dogfood 표면화)
 
 **② ≥2 distinct 도메인 dogfood (`alvaromrveiga/ecommerce-backend` NestJS+Prisma+PostgreSQL / Type 1.5) 가 표면화 — `schemas/db-schema.schema.json` 의 table·column `name` 패턴 `^[a-z][a-z0-9_]*$` (소문자 snake_case 강제) 가 Prisma 기본 매핑(model명=PascalCase `User`/`UserTokens`/`_CategoryToProduct` / field명=camelCase `userId`/`urlName`/`discountPercentage`) 을 첫 검증부터 RED. 1st 도메인(RealWorld MyBatis/SQLite snake_case)=통과 / 2nd 도메인(Prisma)=11+ pattern 위반 = 패턴이 우연히 legacy 명명 관행에만 맞은 편향. Modern ORM(Prisma/TypeORM default/JPA naming-strategy 미설정) 외부 사용자 차단.**
