@@ -9,6 +9,17 @@
 
 ---
 
+## [11.33.0] — 2026-06-01 MINOR — S2(AX전환 주 타깃) gate WARN→block 격상 (§8.1 ≥2 distinct domain 충족: RealWorld + ecommerce / s2_outcome_mismatch hard-block)
+
+**S2(AX전환 = 주 타깃) gate 의 `s2_outcome_mismatch` 를 WARN(go-with-warnings 허용) → block(hard-block / 사용자 'go' 거부)으로 격상. 자격 게이트 = §8.1 ≥2 distinct domain S2 execution corroboration — 직전 1/2(RealWorld Spring/JUnit) → ecommerce(NestJS+Prisma+jest / e-commerce 도메인)로 2/2 충족. WARN 은 v11.11.0 부터 명시적 임시 placeholder("corroboration 0 동안 WARN ... ≥2 후 격상")였고 본 release 가 계획된 maturation.**
+
+- **★ ★ behavioral note (override 계약 변경 / breaking 아님 / MINOR)**: S2 시나리오 chain 4(test)에서 `outcome_mismatches > 0`(characterization 이 GREEN 아니거나 augmentation 이 RED 아님) 시, **이전엔 사용자 'go' 로 go-with-warnings 전진 가능 → 이제 hard-block('go' 거부 / user_override_rejected)**. S2 scenario 에만 영향 / S1·greenfield·S3 무영향 / API·schema·config signature 무변경 (chain-driver gate-eval 내부 / typescript-eslint 'internal-only=minor' 선례).
+- **시행 (gate decision flip / breaking 0)**: `gate-eval.js` — ① **`HARD_BLOCK_CODES` Set 신설**(`validator_critical`/`validator_high`/`s2_outcome_mismatch` / Senior REVISE @0.88 — `hasCriticalOrHigh` 술어 의미 오염 회피 / layer2_threshold·coverage_threshold·findings_unverified WARN 의도 명시 분리) ② `applyUserDecision` 가 `HARD_BLOCK_CODES.has` 검사 ③ `severityRank.s2_outcome_mismatch: 2 → 1`. `scenario.test.js` WARN 테스트 block 반전 + isolation 회귀 추가(layer2/findings_unverified 여전히 go-with-warnings).
+- **2차 corroboration (no-simulation / 실 jest + 실 모듈 / 본 session 직접 실행)**: ecommerce `npx jest` = **56 char GREEN** 재현 + `PurchaseService.refund()` 미구현 augmentation spec(TC-PURCHASE-REFUND-001) → 실 jest **RED** + gate harness(실 correlateByTcId/reconcileOutcomes/evaluateGate import) → 정상 S2 `outcome_mismatches=0` blocked=false / 음성대조 `outcome_mismatches=1` blocked=true(s2_outcome_mismatch) / 격상 후 'go'→block. RealWorld `DELETE /user` isomorphic.
+- **검증**: chain-driver 268→**269**(+1 isolation) / test-impl-pass-validator 59 / findings-aggregator 31 / workspace **1049 pass/0 fail** / release-readiness **30/30** / version 3-way 11.33.0 / breaking 0.
+- **§8.1**: 실 외부 repo(ecommerce) 실 jest 실행 measurement-driven = self-referential 아님(주 타깃 S2 gate advisory→enforcing) / ≥2 충분(≥3=speculative hardening=cooling-off 폐기 위반) / round-trip 불요(carry 분리). **carry ① WARN→block RESOLVED**.
+- **잔여 carry**: distinct **문제** 도메인 S2 corroboration(3rd / 현 RealWorld blog + ecommerce e-commerce = 2 distinct) · committed PoC graph cosmetic lag · Type 2 외부 채택. DEC-2026-06-01-s2-gate-block-upgrade.
+
 ## [11.32.0] — 2026-06-01 MINOR — dep-graph synthesizer: FE kinds code-pointer 앵커 (type-spec/ui-ux/form-validation source_file → strict_path / F-FE-ANCHOR-001 / 실 React+TS dogfood)
 
 **FE 3rd-codebase dogfood (`yurisldk/realworld-react-fsd` React 19 + TS + Zod + React Query / FSD) 가 표면화 — FE 산출물(type-spec/ui-ux/form-validation)은 `source_file` 필드 보유하나 `ANALYSIS_TO_CODE_POINTERS` 에 미배선(BE kinds 만) → dep-graph 에서 FE analysis 노드가 na(미앵커). BE slice 2~4(sql-inventory/architecture/antipatterns/db-schema)의 FE 대응 gap.**

@@ -158,7 +158,7 @@ test('★ F-I05 — S2 reconcile: characterization pass + augmentation fail = �
   }
 });
 
-test('★ F-I05 — S2 reconcile: augmentation 이 예상외 pass → outcome_mismatches 1 (gate s2_outcome_mismatch WARN)', () => {
+test('★ F-I05 — S2 reconcile: augmentation 이 예상외 pass → outcome_mismatches 1 (gate s2_outcome_mismatch block / v11.33.0 격상)', () => {
   const dir = setupProject();
   try {
     const jestOut = {

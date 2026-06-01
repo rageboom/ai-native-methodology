@@ -48,7 +48,7 @@
 → RealWorld arm = execution-grade 도달이나 §8.1 ≥2 **distinct domain** 미충족 → gate enforcement = **WARN 유지** (`s2_outcome_mismatch` rank 2 / go-with-warnings / hard-block ❌). **WARN→block 격상 = 2nd distinct domain(poc-17 사내 Java / 타 OSS Spring) 후 별 release** — speculative hardening 회피 (cooling-off 영구 폐기 + §8.1 strict + self-referential drift 회피 paradigm 정합).
 
 ## carry
-1. **C-use-scenario-s2-gate 격상** — WARN→block 격상 = 2nd distinct domain S2 execution corroboration 후 (gate-eval `s2_outcome_mismatch` severityRank 2→격상).
+1. ✅ **C-use-scenario-s2-gate 격상 (RESOLVED / v11.33.0 / DEC-2026-06-01-s2-gate-block-upgrade)** — 2nd distinct domain = ecommerce(NestJS/Prisma/jest / 실 jest 56 char GREEN + refund augmentation RED) execution corroboration 확보 → gate-eval `s2_outcome_mismatch` severityRank 2→1 + HARD_BLOCK_CODES 등재 → WARN→block 격상 완료.
 2. augmentation impl 후 GREEN 격상 실증 (TC-USER-007 = 미구현 RED → impl 시 expected_outcome pass 전환).
 
 ## STOP-3

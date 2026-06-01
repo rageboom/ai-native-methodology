@@ -37,7 +37,8 @@ const IMPL_STAGE_EXPECTED = 'all_pass';   // GREEN 의무 (S1 default)
 //   S2(AX전환) = per_tc_outcome (★ v11.11.0 / DEC-2026-05-30-s2-gate-slice / C-use-scenario-s2-gate Track α):
 //     legacy in-place 증강 → characterization TC(expected_outcome='pass' / 기존 동작 GREEN) + augmentation TC(expected_outcome='fail' / 신규 RED) 혼합.
 //     aggregate all_fail 대신 per-TC expected_outcome ↔ 실 결과 일치 검사 (validator 가 outcome_mismatches emit).
-//     ★ corroboration 0 동안 WARN severity (s2_outcome_mismatch rank 2 / go-with-warnings 허용 / intent_certainty optional-WARN 선례) — ≥2 S2 PoC 후 rank 격상.
+//     ★ v11.33.0 — §8.1 ≥2 distinct domain execution corroboration 충족(RealWorld Spring/JUnit + ecommerce NestJS/jest) → WARN→block 격상.
+//       s2_outcome_mismatch rank 1(validator_high 수준) + HARD_BLOCK_CODES 등재 → 사용자 'go' 거부(hard-block). DEC-2026-06-01-s2-gate-block-upgrade.
 //   미지정 → 'S1' default (backward-compat / 기존 동작 동일).
 const SCENARIO_EXPECTED = Object.freeze({
   S1:         { test: 'all_fail', implement: 'all_pass' },
@@ -118,7 +119,7 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     if (expected.test === 'per_tc_outcome' && (findings.outcome_mismatches ?? 0) > 0) {
       reasons.push({
         code: 's2_outcome_mismatch',
-        detail: `chain 4 (test, S2 AX전환) per-TC expected_outcome mismatch ×${findings.outcome_mismatches} — characterization 은 GREEN(pass) / augmentation 은 RED(fail) 기대 (test_intent ↔ expected_outcome 정합 / WARN until ≥2 S2 corroboration)`,
+        detail: `chain 4 (test, S2 AX전환) per-TC expected_outcome mismatch ×${findings.outcome_mismatches} — characterization 은 GREEN(pass) / augmentation 은 RED(fail) 기대 (test_intent ↔ expected_outcome 정합 / ★ v11.33.0 hard-block: §8.1 ≥2 distinct domain corroboration 충족)`,
       });
     }
   }
@@ -157,9 +158,9 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
     validator_critical: 0,
     state_corrupt: 0,
     validator_high: 1,
+    s2_outcome_mismatch: 1,      // ★ v11.33.0 / S2 per-TC outcome mismatch / WARN→block 격상 (§8.1 ≥2 distinct domain 충족: RealWorld+ecommerce) / validator_high 수준 / HARD_BLOCK_CODES 등재 → 'go' 거부 / DEC-2026-06-01-s2-gate-block-upgrade (직전 v11.11.0 rank 2 WARN / DEC-2026-05-30-s2-gate-slice)
     coverage_threshold: 2,
     layer2_threshold: 2,         // ★ ★ session 14차 / Senior 권장 / coverage_threshold 수준 / user go → go-with-warnings 허용 / semantic drift Phase D carry
-    s2_outcome_mismatch: 2,      // ★ v11.11.0 / S2 per-TC outcome mismatch / coverage_threshold 수준 / go-with-warnings 허용 (corroboration 0 동안 WARN) / DEC-2026-05-30-s2-gate-slice
     findings_unverified: 2,      // ★ F-AUDIT-SOFTGATE-001 (=C-13) / findings 미제출 fail-closed / coverage_threshold 수준 / --user-decision go 로 명시 ack 가능 (silent pass ❌)
     evidence_missing: 3,
     schema_migration_required: 4,
@@ -175,7 +176,15 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
   };
 }
 
-// Auto Mode override 차단 — critical/high 위반 시 사용자 명시 결단도 'go' 거부.
+// ★ v11.33.0 — hard-block code 집합 (사용자 'go' override 거부 / Auto Mode 차단).
+//   validator_critical/high = 항상 hard-block. s2_outcome_mismatch = §8.1 ≥2 distinct domain execution corroboration
+//   충족(RealWorld Spring/JUnit + ecommerce NestJS/jest)으로 WARN→block 격상 (DEC-2026-06-01-s2-gate-block-upgrade).
+//   ★ 별도 집합 = layer2_threshold/coverage_threshold/findings_unverified(rank 2, WARN 의도) 와 명시 분리
+//     (hasCriticalOrHigh 술어 = "critical/high severity" 의미 오염 회피 / Senior REVISE @0.88).
+//   ★ state_corrupt 미포함 = 본 격상 scope 외(기존 override 거부 집합 = critical/high 뿐 / 별도 latent 이슈로 carry / 무관 behavior 변경 회피).
+const HARD_BLOCK_CODES = new Set(['validator_critical', 'validator_high', 's2_outcome_mismatch']);
+
+// Auto Mode override 차단 — HARD_BLOCK_CODES 위반 시 사용자 명시 결단도 'go' 거부.
 // ★ ★ v2.5.0 Phase C session 14차 — layer2_threshold = ★ ★ critical/high 영역 ❌ / user go → go-with-warnings 허용 (★ ★ semantic drift 도메인 전문가 검토 carry 영역 / Phase D 흐름 정합).
 export function applyUserDecision(gateResult, userDecision) {
   if (!gateResult.blocked) {
@@ -190,13 +199,11 @@ export function applyUserDecision(gateResult, userDecision) {
     return { ...gateResult, decision: userDecision };
   }
   if (userDecision === 'go') {
-    const hasCriticalOrHigh = gateResult.reasons.some(
-      (r) => r.code === 'validator_critical' || r.code === 'validator_high'
-    );
-    if (hasCriticalOrHigh) {
+    const hasHardBlock = gateResult.reasons.some((r) => HARD_BLOCK_CODES.has(r.code));
+    if (hasHardBlock) {
       return { ...gateResult, decision: 'block', user_override_rejected: true };
     }
-    // medium/low only — allow with warning (★ ★ layer2_threshold 영역 정합)
+    // medium/low only — allow with warning (★ ★ layer2_threshold/coverage_threshold/findings_unverified 영역 정합)
     return { blocked: false, decision: 'go-with-warnings', reasons: gateResult.reasons };
   }
   return gateResult;

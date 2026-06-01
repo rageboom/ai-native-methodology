@@ -133,11 +133,28 @@ describe('★ S2 AX전환 per_tc_outcome gate (characterization GREEN + augmenta
     assert.equal(r.blocked, false);
   });
 
-  it('★ s2_outcome_mismatch = WARN (corroboration 0) → user go → go-with-warnings 허용 (block 격상 ❌)', () => {
+  // ★ v11.33.0 — WARN→block 격상 (§8.1 ≥2 distinct domain corroboration 충족: RealWorld Spring/JUnit + ecommerce NestJS/jest).
+  //   DEC-2026-06-01-s2-gate-block-upgrade. 직전 = WARN(go-with-warnings 허용 / DEC-2026-05-30-s2-gate-slice / 명시적 임시 상태).
+  it('★ s2_outcome_mismatch = block (격상 후) → user go 거부 (hard-block / user_override_rejected)', () => {
     const gate = evaluateGate('test', { tests_total: 5, tests_failed: 1, outcome_mismatches: 2, llm_status: 'skipped' }, 'S2');
     const decided = applyUserDecision(gate, 'go');
-    assert.equal(decided.blocked, false);
-    assert.equal(decided.decision, 'go-with-warnings');
+    assert.equal(decided.blocked, true);
+    assert.equal(decided.decision, 'block');
+    assert.equal(decided.user_override_rejected, true);
+  });
+
+  // ★ v11.33.0 isolation 회귀 (Senior REVISE Q2) — s2 격상이 다른 rank-2 reason 의 WARN 의도를 깨지 않음.
+  it('★ isolation: layer2_threshold / findings_unverified 는 여전히 WARN (user go → go-with-warnings)', () => {
+    const l2 = applyUserDecision(
+      evaluateGate('spec', { llm_status: 'evaluated', llm_consistency_score: 0.5, llm_threshold: 0.7 }, 'S1'),
+      'go',
+    );
+    assert.equal(l2.blocked, false);
+    assert.equal(l2.decision, 'go-with-warnings');
+
+    const unv = applyUserDecision(evaluateGate('test', { __findings_absent: true }, 'S1'), 'go');
+    assert.equal(unv.blocked, false);
+    assert.equal(unv.decision, 'go-with-warnings');
   });
 
   it('S2 implement stage = all_pass GREEN 유지 (augmentation GREEN 전환 + characterization GREEN) — test fail → blocked', () => {
