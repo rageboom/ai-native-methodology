@@ -10,30 +10,30 @@ source_commit_sha: "c1c2cc4e448b279ff083272df1ac50d20c3304fa"
 # ----------------------------------------------------------------------
 artifacts:
   state_machines:
-    User: { json: "./state-machines/User.json", mermaid: "./state-machines/User.mermaid" }
-    Follows: { json: "./state-machines/Follows.json", mermaid: "./state-machines/Follows.mermaid" }
-    Article: { json: "./state-machines/Article.json", mermaid: "./state-machines/Article.mermaid" }
+    User: { json: "./state-machines/User.json" }
+    Follows: { json: "./state-machines/Follows.json" }
+    Article: { json: "./state-machines/Article.json" }
   sequence_diagrams:
-    UC-USER-SIGNUP: { json: "./sequence-diagrams/UC-USER-SIGNUP.json", mermaid: "./sequence-diagrams/UC-USER-SIGNUP.mermaid" }
-    UC-USER-LOGIN: { json: "./sequence-diagrams/UC-USER-LOGIN.json", mermaid: "./sequence-diagrams/UC-USER-LOGIN.mermaid" }
-    UC-USER-DELETE: { json: "./sequence-diagrams/UC-USER-DELETE.json", mermaid: "./sequence-diagrams/UC-USER-DELETE.mermaid" }
-    UC-PROFILE-FOLLOW: { json: "./sequence-diagrams/UC-PROFILE-FOLLOW.json", mermaid: "./sequence-diagrams/UC-PROFILE-FOLLOW.mermaid" }
-    UC-ARTICLE-CREATE: { json: "./sequence-diagrams/UC-ARTICLE-CREATE.json", mermaid: "./sequence-diagrams/UC-ARTICLE-CREATE.mermaid" }
-    UC-ARTICLE-FAVORITE: { json: "./sequence-diagrams/UC-ARTICLE-FAVORITE.json", mermaid: "./sequence-diagrams/UC-ARTICLE-FAVORITE.mermaid" }
+    UC-USER-SIGNUP: { json: "./sequence-diagrams/UC-USER-SIGNUP.json" }
+    UC-USER-LOGIN: { json: "./sequence-diagrams/UC-USER-LOGIN.json" }
+    UC-USER-DELETE: { json: "./sequence-diagrams/UC-USER-DELETE.json" }
+    UC-PROFILE-FOLLOW: { json: "./sequence-diagrams/UC-PROFILE-FOLLOW.json" }
+    UC-ARTICLE-CREATE: { json: "./sequence-diagrams/UC-ARTICLE-CREATE.json" }
+    UC-ARTICLE-FAVORITE: { json: "./sequence-diagrams/UC-ARTICLE-FAVORITE.json" }
   decision_tables:
-    BR-USER-USERNAME-EMAIL-UNIQUE-001: { json: "./decision-tables/BR-USER-USERNAME-EMAIL-UNIQUE-001.json", md: "./decision-tables/BR-USER-USERNAME-EMAIL-UNIQUE-001.md" }
-    BR-USER-DELETE-AUTH-001: { json: "./decision-tables/BR-USER-DELETE-AUTH-001.json", md: "./decision-tables/BR-USER-DELETE-AUTH-001.md" }
-    BR-FOLLOWS-NO-SELF-001: { json: "./decision-tables/BR-FOLLOWS-NO-SELF-001.json", md: "./decision-tables/BR-FOLLOWS-NO-SELF-001.md" }
-    BR-FOLLOWS-PAIR-UNIQUE-001: { json: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.json", md: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.md" }
-    BR-USER-JWT-EXPIRY-001: { json: "./decision-tables/BR-USER-JWT-EXPIRY-001.json", md: "./decision-tables/BR-USER-JWT-EXPIRY-001.md" }
-    BR-USER-LOGIN-VERIFY-001: { json: "./decision-tables/BR-USER-LOGIN-VERIFY-001.json", md: "./decision-tables/BR-USER-LOGIN-VERIFY-001.md" }
+    BR-USER-USERNAME-EMAIL-UNIQUE-001: { json: "./decision-tables/BR-USER-USERNAME-EMAIL-UNIQUE-001.json" }
+    BR-USER-DELETE-AUTH-001: { json: "./decision-tables/BR-USER-DELETE-AUTH-001.json" }
+    BR-FOLLOWS-NO-SELF-001: { json: "./decision-tables/BR-FOLLOWS-NO-SELF-001.json" }
+    BR-FOLLOWS-PAIR-UNIQUE-001: { json: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.json" }
+    BR-USER-JWT-EXPIRY-001: { json: "./decision-tables/BR-USER-JWT-EXPIRY-001.json" }
+    BR-USER-LOGIN-VERIFY-001: { json: "./decision-tables/BR-USER-LOGIN-VERIFY-001.json" }
     # ★ B 추가 6 BR (Phase 4.5 풍부화)
-    BR-USER-EMAIL-FORMAT-001: { json: "./decision-tables/BR-USER-EMAIL-FORMAT-001.json", md: "./decision-tables/BR-USER-EMAIL-FORMAT-001.md" }
-    BR-USER-PASSWORD-HASH-001: { json: "./decision-tables/BR-USER-PASSWORD-HASH-001.json", md: "./decision-tables/BR-USER-PASSWORD-HASH-001.md" }
-    BR-ARTICLE-SLUG-AUTO-001: { json: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.json", md: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.md" }
-    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.json", md: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.md" }
-    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.json", md: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.md" }
-    BR-ARTICLE-COMMENT-EAGER-001: { json: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.json", md: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.md" }
+    BR-USER-EMAIL-FORMAT-001: { json: "./decision-tables/BR-USER-EMAIL-FORMAT-001.json" }
+    BR-USER-PASSWORD-HASH-001: { json: "./decision-tables/BR-USER-PASSWORD-HASH-001.json" }
+    BR-ARTICLE-SLUG-AUTO-001: { json: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.json" }
+    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.json" }
+    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.json" }
+    BR-ARTICLE-COMMENT-EAGER-001: { json: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.json" }
   invariants:
     User: "./invariants/User.ts"
     Follows: "./invariants/Follows.ts"
@@ -114,7 +114,7 @@ cross_validation:
       status: "executed"
       invocation_timestamp: "2026-04-30"
       tool_stdout_path: "./.validation/drift-result.json"
-      reproduction_command: "node ai-native-methodology/tools/drift-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/"
+      reproduction_command: "node ai-native-methodology/tools/schema-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/ (★ v12 ADR-011: drift-validator .json↔.mermaid dir pair-mode 폐기 — formal-spec json 검증은 schema-validator + formal-spec-link-validator 로 이관)"
       result_summary:
         first_run:
           pairs: 9

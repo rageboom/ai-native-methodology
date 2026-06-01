@@ -1,40 +1,38 @@
 # templates/ — 산출물 template
 
-본 디렉토리 = phase / chain stage 별 산출물 placeholder template. plugin user 가 자기 산출물 작성 시 출발점.
+본 디렉토리 = phase / chain stage 별 산출물 placeholder template. plugin user 가 자기 산출물 작성 시 출발점. ★ v12.0.0 (ADR-011) — 산출물 = json 단독 SSOT / `.template.md`·`.template.mermaid` twin 폐지.
 
 ## 디렉토리 구성
 
 | 디렉토리 | 상태 | 내용 |
 |---|---|---|
-| [`analysis/`](./analysis/) | ★ ★ 활성 (21 template / flat layout) | BE 7대 + 4.5 formal-spec + 부속 (FE 8 + aspect 4 = skills/ 본문 inline) |
+| [`analysis/`](./analysis/) | ★ ★ 활성 (json 단독 / flat layout) | inventory + openapi-extension `.template.json` + 작성가이드 `.template.md` 3 + 부속 `.template.yaml` 2. 그 외 산출물 = schema-driven inline |
 | [`adoption/`](./adoption/) | ★ build alias source | `CLAUDE.md` (사내 정책 inline) — build script 가 dist root CLAUDE.md 로 별칭 복사 |
-| [`discovery/`](./discovery/) | ★ 활성 (v11.0.0 rename) | chain 1 (discovery) / discovery-spec template + 기획서 입력 형식 design notes |
+| [`discovery/`](./discovery/) | ★ 활성 (v11.0.0 rename) | chain 1 (discovery) / discovery-spec template |
 | [`spec/`](./spec/) | ★ 활성 (v11.0.0 신설) | chain 2 (spec) / behavior-spec + acceptance-criteria template |
-| [`plan/`](./plan/) | ★ 활성 (v11.0.0 신설) | chain 3 (plan) / task-plan template + epic-story-op 매핑 |
+| [`plan/`](./plan/) | ★ 활성 (v11.0.0 신설) | chain 3 (plan) / task-plan template |
 | [`test/`](./test/) | ★ 활성 (v11.0.0 신설) | chain 4 (test) / test-spec template (framework 분기 inline 주석) |
 | [`implement/`](./implement/) | ★ 활성 (v11.0.0 신설) | chain 5 (implement) / impl-spec template (stack 분기 inline 주석) |
 | [`design/`](./design/) | ☐ placeholder | design stage (v12.x carry) |
 
-## analysis/ 템플릿 (21 / flat layout)
+## analysis/ 템플릿 (★ v12 json 단독 / ADR-011)
 
-BE 7대 + 4.5 formal-spec:
-- 1 architecture — `architecture.template.md` + `architecture.template.mermaid`
-- 2 domain — `domain.template.md` + `domain.template.mermaid`
-- 3 api — `api.template.md` + `api.template.yaml`
-- 4 db-schema — `db-schema.template.md` + `erd.template.mermaid`
-- 4.5 formal-spec — `formal-spec.template.md` + `decision-table.template.md` + `sequence.template.mermaid` + `state-machine.template.mermaid`
-- 5 rules — `rules.template.md`
-- 6 antipatterns — `antipatterns.template.md`
-- 7 ui-spec — `ui-spec.template.md` + `ui-spec.template.mermaid`
+★ v12.0.0 — `.template.md`·`.template.mermaid` twin 폐지. 산출물 = json 단독 SSOT.
 
-부속 (4):
-- `inventory.template.md` + `inventory.template.json`
-- `meta-confidence.template.yaml`
+`.template.json` (2):
+- `inventory.template.json`
 - `openapi-extension.template.json`
-- `finding.template.md`
 
-★ FE 8 (state-map / visual-manifest / form-validation / type-spec / error-mapping + a11y / i18n / static-security / legacy-spectrum) + aspect 4 → skill SKILL.md 본문 inline placeholder (별도 template 파일 ❌)
-★ `phase-flow.template.mermaid` 영역 → [`../flows/*.mermaid`](../flows/) SSOT (template 영역 X)
+작성 가이드 `.template.md` (3 / json twin 아님 — 보존):
+- `formal-spec.template.md` — Phase 4.5 형식 명세 5 산출물 작성 가이드 (산출물 = state-machines/sequence-diagrams/decision-tables `.json` + invariants `.ts` + property-tests)
+- `decision-table.template.md` — decision table 작성 가이드 (json SSOT = formal-spec/business-rules decision_grids — DT-json)
+- `finding.template.md` — finding-system 작성 가이드 (audit registry / findings.md)
+
+부속 `.template.yaml` (2):
+- `api.template.yaml`
+- `meta-confidence.template.yaml`
+
+★ 그 외 analysis 산출물 (architecture / domain / business-rules / antipatterns / db-schema / ui-spec + FE 8 + aspect 4) = 해당 schema 기반 skill SKILL.md 본문 inline placeholder (별도 template 파일 ❌).
 
 ## adoption/ build alias
 
@@ -48,15 +46,15 @@ BE 7대 + 4.5 formal-spec:
 
 ## chain stage template (discovery/spec/plan/test/implement)
 
-★ v11.0.0 (DEC-2026-05-26-v11-paradigm-결단) — 5 chain stage 모두 본격 template body 채움. Phase 3 시행.
+★ v11.0.0 (DEC-2026-05-26-v11-paradigm-결단) — 5 chain stage template body. ★ v12.0.0 — json 단독 (`.template.json` / `.md` twin 폐지).
 
-| 디렉토리 | template body | source skill |
+| 디렉토리 | template | source skill |
 |---|---|---|
-| discovery/ | discovery-spec.template.{json,md} | discovery-from-analysis-output |
-| spec/ | behavior-spec.template.{json,md} + acceptance-criteria.template.{json,md} | spec-compose-behavior-spec + spec-derive-acceptance-criteria |
-| plan/ | task-plan.template.{json,md} + epic-story-op.template.md | plan-decompose-and-sequence + plan-architect-decisions + plan-risk-and-nfr |
-| test/ | test-spec.template.{json,md} | test-generate-test-spec |
-| implement/ | impl-spec.template.{json,md} | implement-generate-impl-spec |
+| discovery/ | discovery-spec.template.json | discovery-from-analysis-output |
+| spec/ | behavior-spec.template.json + acceptance-criteria.template.json | spec-compose-behavior-spec + spec-derive-acceptance-criteria |
+| plan/ | task-plan.template.json (Epic/Story/OP cascade = task-plan.json + ticket-sync skill) | plan-decompose-and-sequence + plan-architect-decisions + plan-risk-and-nfr |
+| test/ | test-spec.template.json | test-generate-test-spec |
+| implement/ | impl-spec.template.json | implement-generate-impl-spec |
 
 ## 호출
 
@@ -64,7 +62,7 @@ template 은 [`../skills/`](../skills/) 의 `_base-apply-template` skill 을 통
 
 ```bash
 # Skill 안에서
-@templates/analysis/api.template.md → instantiate
+@templates/analysis/inventory.template.json → instantiate
 ```
 
 ## 참조

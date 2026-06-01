@@ -1,7 +1,7 @@
 # 산출물 #5: 비즈니스 규칙 (Business Rules)
 
 > **사상**: DDD-Lite (ADR-004) + 4영역 추출 (DB / FE / 설정 / 외부)
-> **schema**: `schemas/business-rules.schema.json` · **template**: `templates/analysis/rules.template.md`
+> **schema**: `schemas/business-rules.schema.json` · **template**: schema-driven inline placeholder (★ v12 ADR-011 — .template.md twin 폐지)
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---

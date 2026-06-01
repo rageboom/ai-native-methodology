@@ -1,7 +1,7 @@
 # 산출물 #6: 안티패턴 (Antipatterns)
 
 > **사상**: 회피 후보 (단정적 표현 지양 — 시니어 채택 저항 완화)
-> **schema**: `schemas/antipatterns.schema.json` · **template**: `templates/analysis/antipatterns.template.md`
+> **schema**: `schemas/antipatterns.schema.json` · **template**: schema-driven inline placeholder (★ v12 ADR-011 — .template.md twin 폐지)
 > **생성 phase**: 각 phase 에서 부분 발견 → `quality` phase (`/analyze-quality`) 에서 통합
 
 ---
@@ -114,7 +114,7 @@ ADR-008 (이중 렌더링) 정합 — AP 가 BR / state-machine / sequence-diagr
 
 ```yaml
 formal_spec_links:
-  decision_tables: ["../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.md"]
+  decision_tables: ["../formal-spec/decision-tables/BR-USER-DELETE-AUTH-001.json"]
   state_machines:  ["../formal-spec/state-machines/User.json"]
   sequence_diagrams: ["../formal-spec/sequences/login-flow.json"]
   invariants:      ["../formal-spec/invariants/User.ts"]

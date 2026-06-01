@@ -1,10 +1,9 @@
 {
-  "$comment": "★ ★ ★ v2.0 chain 5 (implement) phase flow — AI 눈 짝 (implement.phase-flow.mermaid 의 SSOT). (★ v9.0 plan 신설로 재번호 / 구 chain 4 / ★ v10.0.0 MAJOR gate #4→#5 재번호 chain N=gate #N) DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동 / `static-analysis` phase 명 = tools/static-runner 와 axis 분리).",
+  "$comment": "★ ★ ★ v2.0 chain 5 (implement) phase flow — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). (★ v9.0 plan 신설로 재번호 / 구 chain 4 / ★ v10.0.0 MAJOR gate #4→#5 재번호 chain N=gate #N) DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §6 + ADR-CHAIN-004 정합. test-spec → impl 코드 자동 generate (GREEN 의무 / 100% test pass). i-strict 정통. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동 / `static-analysis` phase 명 = tools/static-runner 와 axis 분리).",
   "id": "implement-phase-flow",
   "version": "3.1.0",
   "stage": "implement",
   "chain": 5,
-  "rendered_mermaid_path": "./implement.phase-flow.mermaid",
   "phases": [
     {
       "id": "input-plan",
@@ -63,7 +62,7 @@
       "name": "traceability-matrix 최종 갱신",
       "depends_on": ["green-evidence", "static-analysis"],
       "inputs": ["discovery + behavior + acceptance + test + impl-spec"],
-      "outputs": ["traceability-matrix.{json,md,mermaid} (★ red_count == 0)"],
+      "outputs": ["matrix.json (★ red_count == 0)"],
       "skills": ["_base-build-traceability-matrix"],
       "automated_validation": ["traceability-matrix-builder"]
     },
