@@ -29,8 +29,7 @@
 
 ```
 output/characterization/
-├── characterization-spec.json     # AI 눈 / 통합 entry
-├── intent-vs-bug.md               # ★ 사람 눈 / 분류표
+├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / ★ v12 ADR-011 / D-6)
 ├── coverage.json                  # UC ↔ snapshot 매핑 + threshold
 └── snapshots/
     └── UC-*.json                  # ★ Given/When/Then BDD 형식 / 1 UC 당 1 snapshot
@@ -182,7 +181,7 @@ cross_links:
 
 ### 8.1 ambiguous 정책 (★ 핵심)
 
-- ambiguous > 0 시 → 도메인 expert carry 명시 의무 (snapshot 또는 intent-vs-bug.md 본문)
+- ambiguous > 0 시 → 도메인 expert carry 명시 의무 (snapshot 또는 characterization-spec.json 의 intent_vs_bug)
 - 결단 전까지 chain 4 (impl-spec GREEN) 진입 ❌
 - 결단 후 갱신 의무 (PoC #06 D2 패턴)
 

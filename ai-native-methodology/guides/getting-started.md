@@ -117,7 +117,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 - "비즈니스 규칙 의미 일관성 검증" → `analysis-br-cross-consistency-check` (★ v2.5 신규 / Layer 2 LLM)
 - "antipattern 정리" → `analysis-quality-antipattern`
 
-각 phase 종결 시 산출물 `<project>/.aimd/output/` 에 .json + .md 이중 렌더링.
+각 phase 종결 시 산출물 `<project>/.aimd/output/` 에 .json 단독 SSOT (★ v12 ADR-011 / 시각화는 view-time 도구).
 
 자세한 prompt → skill 매핑 = [first-prompt-cookbook.md](./first-prompt-cookbook.md).
 
@@ -138,7 +138,7 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-3. chain 1 (discovery) 진입 (1분 / ★ v2.5: Layer 2 LLM 의무 통과)
 "발견 단계 시작" (또는 "기획 단계 시작")
 → discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent skill 자동 발동
-→ discovery-spec.{json,md} 산출 (★ v11.0.0 rename)
+→ discovery-spec.json 산출 (★ v11.0.0 rename / v12 json 단독 ADR-011)
 → gate #1 자동 호출:
   · discovery-extraction-validator (입출력 무결성)
   · ★ br-cross-consistency-validator Layer 1 (결정적) + Layer 2 (Claude Code sub-agent / Sonnet 4.6) 양쪽 통과
@@ -153,7 +153,7 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-5. chain 3 (plan) 진입 (1분 / ★ v10.0.0 gate #3 본격)
 "plan / 계획 / task 분해"
 → plan-decompose-and-sequence / plan-architect-decisions / plan-risk-and-nfr
-→ task-plan.{json,md} 산출 (tasks / ADR alternatives ≥3 / NFR allocation / risks)
+→ task-plan.json 산출 (tasks / ADR alternatives ≥3 / NFR allocation / risks)
 → gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR ≥3 + dependency cycle)
 
 # 5-6. chain 4 (test) 진입 (1분 / ★ RED 의무)

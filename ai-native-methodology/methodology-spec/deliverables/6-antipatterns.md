@@ -18,8 +18,7 @@
 
 ```
 output/antipatterns/
-├── antipatterns.json               # AI용 (구조화)
-├── avoid-list.md                   # 사람용 체크리스트
+├── antipatterns.json               # json 단독 SSOT (★ v12 ADR-011)
 └── (선택) details/                 # 개별 안티패턴 상세
     └── AP-DB-N-PLUS-ONE-001.md
 ```
@@ -94,7 +93,7 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 
 ## 5. `formal-spec` phase cross-link (formal_spec_links)
 
-ADR-008 (이중 렌더링) 정합 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p.
+json 단독 SSOT (ADR-011 / ADR-008 supersede) 정합 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p.
 
 ### 5.1 의무 vs 선택 (category 별)
 

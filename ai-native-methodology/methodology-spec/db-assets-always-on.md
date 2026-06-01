@@ -123,7 +123,7 @@ analysis 입력에서 (c) layer 누락 시 **비즈니스 로직 일부 누락 =
 | Functions (fn_Get_CarUserListView*) | 2 (★ 1 빈 파일 — F-FN-EMPTY-001) | analysis Phase 4 business-logic 보조 ✅ / 117 LOC (활성) |
 | Stored Procedures (자체) | 0 | car 비종속 — 적용 없음 |
 | Stored Procedures (외부 호출) | 1 (`SGERP.dbo.SG_SACSlipRowCarManagementIFQuery`) | **γ 분류 (외부 시스템 SP — 보존 + thin wrapper)** / 화면 4 차량비용산출 / `<procedure>` tag iBATIS 2 |
-| ERD | 1 (`erd.mermaid` 생성 산출 — Phase 3 산출물) | analysis Phase 3 산출 ✅ / 6 Tables 관계 + 외부 DB cross-ref 시각화 |
+| ERD | `schema.json` 내 foreign_keys (★ v12 ADR-011 — 구 erd.mermaid 폐기) | analysis Phase 3 산출 ✅ / 6 Tables 관계 + 외부 DB cross-ref |
 | 도메인 노트 (`Develop_Issue.txt` + `README.md` + `PROGRESS.md`) | 3 | phase 4.7 characterization known intent oracle ✅ (소수점 2자리 paradigm = round(...,2) 5종 + decimal(10,2) 거리 컬럼 정합 본격 입증) |
 
 ### 8.2 ★ ★ ★ K 정책 본격 가치 입증 (Phase 1 종결 사실)

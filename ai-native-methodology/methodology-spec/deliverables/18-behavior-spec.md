@@ -1,6 +1,6 @@
 # 산출물 #18: Behavior Spec (★ v2.0 chain 2)
 
-> **사상**: ADR-CHAIN-001 §1 / ADR-008 v2 §10 / ADR-009 v2 §2.5 (spec trust 0.88)
+> **사상**: ADR-CHAIN-001 §1 / ADR-011 (json 단독 SSOT / ADR-008 이중 렌더링 supersede) / ADR-009 v2 §2.5 (spec trust 0.88)
 > **schema**: `schemas/behavior-spec.schema.json`
 > **생성 phase**: chain 2 (spec) — `/spec-compose-behavior-spec` (skill / sub-plan-4)
 > **gate**: go/stop gate #2
@@ -17,9 +17,7 @@
 
 ```
 .aimd/output/chain-2-spec/
-├── behavior-spec.json
-├── behavior-spec.md
-├── behavior-diagrams.mermaid   # ★ 사람 눈 (graph view)
+├── behavior-spec.json   # ★ json 단독 SSOT (ADR-011)
 └── _manifest.yml
 ```
 

@@ -19,15 +19,15 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-architecture`](../skills/analysis-architecture/) | `architecture.{json,md}` / `dependency-graph.mermaid` / `circular-dependencies.md` |
-| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석" | [`analysis-db-schema-erd`](../skills/analysis-db-schema-erd/) | `schema.{json,sql}` / `erd.mermaid` |
+| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-architecture`](../skills/analysis-architecture/) | `architecture.json` (json 단독 SSOT) / `circular-dependencies.md` |
+| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석" | [`analysis-db-schema-erd`](../skills/analysis-db-schema-erd/) | `schema.{json,sql}` (json 단독 SSOT) |
 
 ### 1.3 Domain + Rules (★ v2.4 dual representation)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-domain-model`](../skills/analysis-domain-model/) | `domain.{json,md}` |
-| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-business-rules`](../skills/analysis-business-rules/) | `rules.{json,md}` (★ natural_language + given/when/then dual) |
+| "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-domain-model`](../skills/analysis-domain-model/) | `domain.json` (json 단독 SSOT) |
+| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-business-rules`](../skills/analysis-business-rules/) | `rules.json` (★ json 단독 SSOT / natural_language + given/when/then dual) |
 | "`formal-spec` phase 형식 명세 검증" / "drift 검증" | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/) | drift / DMN / cross-link finding |
 | "characterization 추출" / "의도 vs 버그 분류" | [`analysis-characterization-test`](../skills/analysis-characterization-test/) | `characterization-spec.json` (v2.1) |
 | "SQL inventory 추출" / "매퍼 SQL 정리" | [`analysis-sql-inventory`](../skills/analysis-sql-inventory/) | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority) |
@@ -37,7 +37,7 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/) | `openapi.yaml` + `api.md` |
+| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/) | `openapi.yaml` (json/yaml 단독 SSOT) |
 | "UI rules 추출" / "FE rules" | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/) | `business-rules.json` (FE 영역) |
 | "state-map 추출" / "FE state machine" | [`analysis-ui-state-map-fe`](../skills/analysis-ui-state-map-fe/) | `state-map.json` (FE) |
 | "visual-manifest 추출" / "Playwright snapshot" | [`analysis-ui-visual-manifest-fe`](../skills/analysis-ui-visual-manifest-fe/) | `visual-manifest.json` (binary) |
@@ -49,7 +49,7 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "antipattern 정리" / "안티패턴 통합" / "AP 도출" | [`analysis-quality-antipattern`](../skills/analysis-quality-antipattern/) | `antipatterns.json` / `avoid-list.md` / `migration-cautions.md` |
+| "antipattern 정리" / "안티패턴 통합" / "AP 도출" | [`analysis-quality-antipattern`](../skills/analysis-quality-antipattern/) | `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT) |
 
 ### 1.6 Aspect (cross-cutting / phase 무관)
 
@@ -68,7 +68,7 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `discovery-spec.{json,md}` |
+| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `discovery-spec.json` (json 단독 SSOT) |
 | "Swagger/OpenAPI 에서 추출" | [`discovery-from-swagger`](../skills/discovery-from-swagger/) | UC + intent (API spec 입력 어댑터) |
 | "Figma 에서 추출" | [`discovery-from-figma`](../skills/discovery-from-figma/) | UC + intent (디자인 입력 어댑터) |
 | "기획문서/자연어 md 에서 추출" | [`discovery-from-nl-md`](../skills/discovery-from-nl-md/) | UC + intent (NL 입력 어댑터) |
@@ -83,15 +83,15 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "behavior spec 만들어" / "BHV 도출" / "executable contract" | [`spec-compose-behavior-spec`](../skills/spec-compose-behavior-spec/) | `behavior-spec.{json,md}` (BHV-*) |
-| "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.{json,md}` (AC-*) |
+| "behavior spec 만들어" / "BHV 도출" / "executable contract" | [`spec-compose-behavior-spec`](../skills/spec-compose-behavior-spec/) | `behavior-spec.json` (json 단독 SSOT / BHV-*) |
+| "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.json` (json 단독 SSOT / AC-*) |
 | "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/) | analysis 7대 산출물 통합 |
 
 ### 2.3 Chain 3 (plan / ★ v10.0.0 gate #3 본격)
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "plan / 계획 / task 분해" | [`plan-decompose-and-sequence`](../skills/plan-decompose-and-sequence/) | `task-plan.{json,md}` (tasks / dependencies) |
+| "plan / 계획 / task 분해" | [`plan-decompose-and-sequence`](../skills/plan-decompose-and-sequence/) | `task-plan.json` (json 단독 SSOT / tasks / dependencies) |
 | "ADR / 아키텍처 결정" | [`plan-architect-decisions`](../skills/plan-architect-decisions/) | ADR (alternatives ≥3) + integration points |
 | "risk / NFR allocation" | [`plan-risk-and-nfr`](../skills/plan-risk-and-nfr/) | risks[] + nfr_allocation[] (hard gate) |
 
@@ -101,7 +101,7 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "test spec 생성" / "TC 도출" / "test case 분해" | [`test-generate-test-spec`](../skills/test-generate-test-spec/) | `test-spec.{json,md}` (TC-*) |
+| "test spec 생성" / "TC 도출" / "test case 분해" | [`test-generate-test-spec`](../skills/test-generate-test-spec/) | `test-spec.json` (json 단독 SSOT / TC-*) |
 | "test code RED" / "test 실 실행 RED" / "5종 물증 RED" | [`test-run-test-evidence`](../skills/test-run-test-evidence/) | 실 test code + 5종 물증 (★ no-simulation) |
 | "AC→TC coverage 검증" / "test coverage 검증" | [`test-verify-coverage`](../skills/test-verify-coverage/) | coverage finding |
 
@@ -109,14 +109,14 @@
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "impl spec 생성" / "구현 코드 작성" / "impl GREEN" | [`implement-generate-impl-spec`](../skills/implement-generate-impl-spec/) | `impl-spec.{json,md}` (IMPL-*) + 실 impl code |
+| "impl spec 생성" / "구현 코드 작성" / "impl GREEN" | [`implement-generate-impl-spec`](../skills/implement-generate-impl-spec/) | `impl-spec.json` (json 단독 SSOT / IMPL-*) + 실 impl code |
 | "test pass 검증" / "100% GREEN" / "test runner 실 실행" | [`implement-verify-test-pass`](../skills/implement-verify-test-pass/) | 실 test runner + 5종 물증 (★ --allow-execute) |
 
 ### 2.6 Release matrix
 
 | 자연어 prompt | 발동 skill | 산출 |
 |---|---|---|
-| "traceability matrix" / "release matrix" / "matrix 산출" | [`_base-build-traceability-matrix`](../skills/_base-build-traceability-matrix/) | `matrix.{json,md,mermaid}` (UC→BHV→AC→TC→IMPL+commit_hash) |
+| "traceability matrix" / "release matrix" / "matrix 산출" | [`_base-build-traceability-matrix`](../skills/_base-build-traceability-matrix/) | `matrix.json` (json 단독 SSOT / UC→BHV→AC→TC→IMPL+commit_hash) |
 
 ## 3. Skill auto-invoke 매커니즘
 

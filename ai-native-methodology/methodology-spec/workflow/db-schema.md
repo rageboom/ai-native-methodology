@@ -100,10 +100,9 @@ Q1. 마이그레이션 도구 (Flyway/Liquibase) 도입 가능?
 
 ```
 .ai-analysis/output/db/
-├── schema.json                       # AI용
-├── schema.sql                        # 통합 SQL (CREATE TABLE)
-├── erd.mermaid                       # ERD (Mermaid)
-├── 정합성-검증-보고서.md              # 다중 출처 시 (보조)
+├── schema.json                       # json 단독 SSOT (★ v12 ADR-011)
+├── schema.sql                        # 통합 SQL (CREATE TABLE / DDL source)
+├── 정합성-검증-보고서.md              # 다중 출처 시 (보조 / functional report)
 └── tables/                           # 테이블별 상세 (선택)
     ├── orders.md
     └── users.md
@@ -157,7 +156,7 @@ findings:
 
 ```
 □ schema.json schema 검증 통과
-□ erd.mermaid 렌더링 검증
+□ ERD 관계 정합 검증 (schema.json 내 foreign_keys / ★ v12 ADR-011 — 시각화는 view-time)
 □ 모든 테이블에 PK 명시
 □ FK 명시 또는 부재 사유 기록
 □ 정합성 검증 보고서 사람 검토 (있는 경우)

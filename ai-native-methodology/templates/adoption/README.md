@@ -135,7 +135,7 @@ internal-v1.3/
     └── poc-03-realworld-nestjs/        NestJS 팀 reference (NestJS 정책 4건 출처)
 ```
 
-> `examples/` 는 매 세션 **자동 로드되지 않음**. 필요 시 명시적 Read (`@examples/poc-02-realworld-springboot3/output/antipatterns/avoid-list.md` 등).
+> `examples/` 는 매 세션 **자동 로드되지 않음**. 필요 시 명시적 Read (`@examples/poc-02-realworld-springboot3/output/antipatterns/antipatterns.json` 등).
 
 ---
 

@@ -28,15 +28,11 @@
 
 ```
 output/ui/
-├── ui-spec.json             # AI용 (통합)
-├── pages.md                 # 페이지 인벤토리
-├── user-flows.mermaid       # 사용자 흐름 다이어그램
-├── components.md            # 컴포넌트 트리
-├── design-tokens.json       # 디자인 토큰
-└── scenarios.md             # 사용자 시나리오
+├── ui-spec.json             # json 단독 SSOT (pages / components / user-flows / scenarios 통합)
+└── design-tokens.json       # 디자인 토큰 (DTCG)
 ```
 
-**5개 하위 항목**: pages / user-flows / components / design-tokens / scenarios
+**하위 항목** (ui-spec.json 내 구조화): pages / user-flows / components / design-tokens / scenarios
 
 ---
 
@@ -101,7 +97,7 @@ output/ui/
 
 ---
 
-## 5. 사용자 흐름 형식 (Mermaid flowchart)
+## 5. 사용자 흐름 형식 (ui-spec.json 에 구조화 / 아래는 view-time 시각화 예시)
 
 ```mermaid
 flowchart LR
@@ -266,7 +262,7 @@ design_tokens:
 ```
 □ schema 검증 통과
 □ 모든 PAGE 에 ID, route, auth, roles 명시
-□ 사용자 흐름 Mermaid 렌더링
+□ 사용자 흐름 ui-spec.json 에 구조화 (시각화는 view-time 도구)
 □ 컴포넌트 분류 방식 (Atomic / FSD) 명시
 □ 디자인 토큰 명세 (없으면 안티패턴 등록)
 □ 사용자 시나리오 = 기획자 검토 완료

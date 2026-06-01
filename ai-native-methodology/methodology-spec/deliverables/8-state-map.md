@@ -1,6 +1,6 @@
 # 산출물 #8: State Map (분산 상태 5 진실)
 
-> **사상**: 이중 렌더링 FE 적용 (ADR-FE-002) + W3C SCXML 1.0 + XState v5+ 호환 (ADR-FE-005)
+> **사상**: json 단독 SSOT (ADR-011, ADR-008 supersede) + W3C SCXML 1.0 + XState v5+ 호환 (ADR-FE-005)
 > **schema**: `schemas/state-map.schema.json`
 > **생성 phase**: `ui` phase 5-2-b (`/analyze-state`)
 
@@ -26,12 +26,7 @@
 
 ```
 output/state-map/
-├── state-map.json              # AI 눈 (SCXML 1.0 + XState v5+ 호환)
-├── state-map.mermaid           # 사람 눈 (overview)
-├── per-machine/
-│   ├── FSM-FE-LOGIN-001.mermaid
-│   ├── FSM-FE-CART-001.mermaid
-│   └── ...
+├── state-map.json              # json 단독 SSOT (SCXML 1.0 + XState v5+ 호환 / 시각화는 view-time 도구)
 └── _manifest.yml               # trust_level + validation_history
 ```
 
@@ -88,7 +83,7 @@ state_machines:
   - id: FSM-FE-LOGIN-001
     scxml_compliant: true
     xstate_compatible: true
-    rendered_mermaid_path: per-machine/FSM-FE-LOGIN-001.mermaid
+    # 시각화는 view-time 도구 (json 의 states/transitions 로 렌더 / 별도 .mermaid emit ❌)
 
 # Stage 5+ 검증 (★ 단계 5 진짜 도구)
 # scxml_export_validated: true
@@ -97,9 +92,11 @@ state_machines:
 
 ---
 
-## 5. 다이어그램 형식 (이중 렌더링 정합)
+## 5. 다이어그램 형식 (json 단독 SSOT / 시각화는 view-time 도구)
 
-### 5.1 overview (state-map.mermaid)
+> 아래 ```mermaid 블록은 문서 설명용 figure (view-time 렌더 예시). 산출물은 state-map.json 단독 — 별도 .mermaid 파일 emit ❌ (ADR-011).
+
+### 5.1 overview (state-map.json 의 machines 를 view-time 렌더)
 
 ```mermaid
 flowchart TB
@@ -109,7 +106,7 @@ flowchart TB
     M4["FSM-FE-USER-PROFILE-001<br/>scope: global"]
 ```
 
-### 5.2 per-machine (FSM-FE-XXX-NNN.mermaid)
+### 5.2 per-machine (state-map.json 의 개별 FSM 을 view-time 렌더)
 
 ```mermaid
 stateDiagram-v2
@@ -121,7 +118,7 @@ stateDiagram-v2
     authenticated --> [*]
 ```
 
-→ drift-validator FE 적용 대상 (state-map.json ↔ state-map.mermaid 의미 동일성).
+→ drift-validator FE 적용 대상 (state-map.json ↔ 코드 source 의미 동일성).
 
 ---
 
@@ -153,8 +150,7 @@ cross_links:
 □ schema 검증 (state-map.schema.json) 통과
 □ state_sources 5 항목 (server/client/URL/form/DOM) 모두 detected 명시
 □ 모든 machine 에 ID, scope, initial, states 명시
-□ rendered_mermaid_path 경로 존재 (이중 렌더링 정합)
-□ drift-validator FE 통과 (state-map.json ↔ .mermaid 의미 동일성)
+□ drift-validator FE 통과 (state-map.json ↔ 코드 source 의미 동일성)
 □ cross_links 의무 (api / ui-spec / rules 중 1개 이상)
 □ scxml_compliant=true 머신 → SCXML XML 변환 가능 (Stage 5+ 검증)
 □ trust_step 명시 (1~8)
@@ -172,7 +168,7 @@ cross_links:
 | SM → RULES | validates BR |
 | SM → AP | 회피 (5 진실 안티패턴) |
 
-→ ADR-008 (이중 렌더링 사상) + ADR-FE-002 정합.
+→ json 단독 SSOT (ADR-011 / ADR-008·ADR-FE-002 이중 렌더링 사상 supersede).
 
 ---
 

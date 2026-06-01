@@ -60,8 +60,7 @@ paths:
 ```
 .ai-analysis/output/api/
 ├── openapi.yaml             # 표준 (외부 공유 가능)
-├── api-extension.json       # AI 분석 메타
-├── api.md                   # 사람용 요약
+├── api-extension.json       # json 단독 SSOT (AI 분석 메타 / ★ v12 ADR-011)
 └── (선택) swagger-ui-build/
 ```
 

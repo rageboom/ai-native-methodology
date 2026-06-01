@@ -21,7 +21,7 @@
 | scope work-unit | feature/도메인 단위 작업 격리 | `.aimd/<scope>/manifest.{json,md}` (`work-unit-manifest.schema.json`) |
 | `analysis_refs` (★ schema 정공 명) | scope ↔ canonical global 역인덱스 — 5 이식성 + ★ v11.3.0 DB 자산 4 (BR/endpoint/schemas/domain/antipattern + db_tables/db_procedures/db_functions/db_views) | scope manifest 내부 (자연어 "related_artifacts" 와 동의어 / schema 필드 = `analysis_refs`) |
 | scope-local analysis (선택) | 대형 프로젝트 context ↓ 용 subset | `.aimd/<scope>/analysis/*.subset.json` |
-| ★ canonical global DB 자산 디렉토리 (v11.3.0) | DB always-on 정책 (`db-assets-always-on.md` §4) 의 실 저장 위치 | `.aimd/output/stored-procedures/` (SP 정적 분석) + `.aimd/output/functions/` (Function 정리) — 기존 `schema.json` + `erd.mermaid` 보존 (Tables + ERD axis) |
+| ★ canonical global DB 자산 디렉토리 (v11.3.0) | DB always-on 정책 (`db-assets-always-on.md` §4) 의 실 저장 위치 | `.aimd/output/stored-procedures/` (SP 정적 분석) + `.aimd/output/functions/` (Function 정리) — 기존 `schema.json` 보존 (Tables + ERD axis / ★ v12 ADR-011 — erd 는 schema.json 내 관계) |
 | `sync_state` (M4) | canonical global 변경 → scope drift 표지 | scope manifest 내부 (`drift_detected` / `last_synced_at` / `sync_sources`) |
 | `chain-driver sync` | drift scope 에 cascade (통제된 동기) | `chain-driver sync <project> --scope <slug>` |
 
@@ -32,7 +32,7 @@
 chain-driver init <project>
 "이 코드베이스 분석 시작"        → analysis stage full run
 ```
-→ canonical global `.aimd/output/` (15종 중 해당분 + ★ v11.3.0 DB 자산 — `stored-procedures/` + `functions/` + 기존 `schema.json` + `erd.mermaid`) + `baseline-<date>.json` 생성. 이것이 **이후 모든 scope 의 기준선**. ★ 1회성 — 매번 반복 ❌. ★ DB always-on 정책 (`db-assets-always-on.md` §3) — Tables/Views/Functions/SP/ERD/도메인 노트 모두 입력 의무 (누락 시 사용자 결단).
+→ canonical global `.aimd/output/` (15종 중 해당분 + ★ v11.3.0 DB 자산 — `stored-procedures/` + `functions/` + 기존 `schema.json`) + `baseline-<date>.json` 생성. 이것이 **이후 모든 scope 의 기준선**. ★ 1회성 — 매번 반복 ❌. ★ DB always-on 정책 (`db-assets-always-on.md` §3) — Tables/Views/Functions/SP/ERD/도메인 노트 모두 입력 의무 (누락 시 사용자 결단).
 
 ### (2) 신규 건마다 — scope delta
 ```
@@ -83,7 +83,7 @@ poc-17 ifrs/car 도메인 = **canonical global baseline 첫 본격 적용 사례
 ### 5.3 ★ ★ K + L 정책 통합 적용 (canonical global 디렉토리 구조 본격 입증)
 
 - `.aimd/output/schema.json` = K 정책 본격 (6 Tables + 2 Functions + cross-DB 18 자산)
-- `.aimd/output/erd.mermaid` = K 정책 ERD
+- ERD = `schema.json` 내 foreign_keys (★ v12 ADR-011 — 구 erd.mermaid 폐기)
 - `.aimd/output/db-schema-validation-report.md` = K 정책 정합성 검증 (7 finding + 6 carry)
 - `.aimd/output/sql-inventory.json` = (b) sqlMap layer 정리 (35 SQL id + 1 procedure)
 - ★ K 정책 본격 가치 본격 입증: Java/sqlMap layer 만으로 cross-DB 4 자산 노출 ❌ → DB Function (fn_Get_CarUserListView) 안의 cross-DB ref 본격 발견

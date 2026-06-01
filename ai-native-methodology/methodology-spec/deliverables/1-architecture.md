@@ -1,7 +1,7 @@
 # 산출물 #1: 아키텍처/의존성 (Architecture & Dependencies)
 
 > **사상**: Schema-First (ADR-001 — 코드 전 스키마 합의)
-> **schema**: `schemas/architecture.schema.json` · **template**: `templates/architecture.template.{md,mermaid}`
+> **schema**: `schemas/architecture.schema.json` · **template**: (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 > **생성 phase**: `architecture` phase (`/analyze-architecture`)
 
 ---
@@ -18,15 +18,12 @@
 
 ```
 output/architecture/
-├── architecture.json              # AI용 (구조화)
-├── architecture.md                # 사람용 요약
-├── architecture.mermaid           # C4 Level 3 컴포넌트 다이어그램
-├── dependency-graph.mermaid       # 모듈 간 의존성 그래프
+├── architecture.json              # json 단독 SSOT (구조화 / dependency graph 포함)
 └── circular-dependencies.md       # 순환 의존성 보고서 (있을 경우)
 ```
 
 **핵심 결정**:
-- Mermaid `flowchart` 로 C4 Level 3 표현 (도구 의존성 없음, git diff 가능)
+- C4 Level 3 컴포넌트 구조 + 모듈 간 의존성 그래프를 `architecture.json` 에 구조화 (★ v12 json 단독 SSOT / 시각화는 view-time 도구)
 - 모듈 = 패키지/디렉토리 단위 (언어별 관례)
 
 ---
@@ -45,7 +42,7 @@ output/architecture/
 | 아키텍처 스타일 추론 | 디렉토리 패턴 + 의존 방향 | LLM | 0.70 | 모듈 간 의존성 |
 
 **입력**: 소스 코드 + `discovery` phase inventory
-**출력**: `architecture.{json,md,mermaid}` + `dependency-graph.mermaid` + `circular-dependencies.md` (있을 시)
+**출력**: `architecture.json` (모듈 간 의존성 그래프 포함) + `circular-dependencies.md` (있을 시)
 **사람 검토 필수**: 아키텍처 스타일 추론
 
 ### 3.2 미추출 (의도적)
@@ -74,7 +71,7 @@ output/architecture/
 
 ```
 □ architecture.json schema 검증 통과
-□ Mermaid 렌더링 확인
+□ 의존성 그래프 노드/엣지 정합 (architecture.json 내 / 시각화는 view-time 도구)
 □ 모든 모듈에 ID 부여
 □ 순환 의존성 있으면 안티패턴(#6) 에도 등록
 □ 아키텍처 스타일 = 사용자 확인

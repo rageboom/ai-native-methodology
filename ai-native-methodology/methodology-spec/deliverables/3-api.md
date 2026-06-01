@@ -19,8 +19,7 @@
 ```
 output/api/
 ├── openapi.yaml                     # 표준 OpenAPI 3.1 (산업 표준 그대로)
-├── api-extension.json               # AI 분석 메타 (operationId ↔ UC 매핑 등)
-├── api.md                           # 사람용 요약
+├── api-extension.json               # AI 분석 메타 (operationId ↔ UC 매핑 등 / json 단독 SSOT)
 └── (선택) swagger-ui-build/          # Swagger UI 정적 빌드
 ```
 

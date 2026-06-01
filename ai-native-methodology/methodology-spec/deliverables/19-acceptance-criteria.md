@@ -15,8 +15,7 @@
 
 ```
 .aimd/output/chain-2-spec/
-├── acceptance-criteria.json
-└── acceptance-criteria.md   # ★ Gherkin scenario 평문 + tag (@must / @should / @nice)
+└── acceptance-criteria.json   # json 단독 SSOT (Gherkin scenario + tag = criteria[] 안 / ★ v12 ADR-011)
 ```
 
 ## 3. 추출 범위
@@ -73,7 +72,7 @@ criteria:
     test_case_refs: [TC-USER-003]
 ```
 
-## 사람 눈 (acceptance-criteria.md)
+## Gherkin 표현 (criteria[] 안 / 예시 — ★ v12 ADR-011 json 단독)
 
 ```gherkin
 Feature: User Signup
@@ -91,5 +90,5 @@ Feature: User Signup
 ## 6. 의무 (Cucumber 표준 정합)
 
 - Gherkin 본문 = ★ Cucumber 사실상 표준 (Official research) / W3C 표준 ❌
-- Cucumber tag (`@must` 등) = MoSCoW severity 자동 매핑 (★ ADR-008 v2 §10 이중 렌더링)
+- Cucumber tag (`@must` 등) = MoSCoW severity 자동 매핑 (criteria[].severity)
 - AC-* ID 산업 표준 부재 → 본 방법론 자체 정의 (ADR-CHAIN-001 명시)

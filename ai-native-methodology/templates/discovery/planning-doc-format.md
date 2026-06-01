@@ -103,7 +103,7 @@ USE:    analysis stage 의 7대 산출물 빈칸 채우기 / LLM 직접 소비
   - Why: 법적 의무 / 변경 시 법무팀 승인 필수
 ```
 
-★ 매핑: `migration-cautions.md` + `architecture.json`. **why 는 자연어가 우월** (구조화 못 함 / 의사결정 맥락 보존).
+★ 매핑: `migration-cautions.json` + `architecture.json`. **why 는 자연어가 우월** (구조화 못 함 / 의사결정 맥락 보존).
 
 ### C6. 회피 / 비범위 → 명시 list
 
@@ -118,7 +118,7 @@ USE:    analysis stage 의 7대 산출물 빈칸 채우기 / LLM 직접 소비
 - 정수 → enum 매직 넘버 ❌ (AP-CFG-001 가능성)
 ```
 
-★ 매핑: `antipatterns.json` + `migration-cautions.md`. **본 레포 누적 antipattern 카탈로그 재활용** (4 PoC 누적 finding 카탈로그 → 기획 단계 회피 가이드 역제공).
+★ 매핑: `antipatterns.json` + `migration-cautions.json`. **본 레포 누적 antipattern 카탈로그 재활용** (4 PoC 누적 finding 카탈로그 → 기획 단계 회피 가이드 역제공).
 
 ---
 
@@ -130,8 +130,8 @@ USE:    analysis stage 의 7대 산출물 빈칸 채우기 / LLM 직접 소비
 | C2 entity table | domain.json + schema.json | `domain.schema.json` + `db-schema.schema.json` | ★ ★ ★ |
 | C3 use case | openapi.yaml + error-mapping | `openapi-extension.schema.json` + `error-mapping-spec.schema.json` | ★ ★ ★ |
 | C4 flow | state-map.json | `state-map.schema.json` | ★ ★ |
-| C5 NFR / why | migration-cautions.md + architecture.json | `architecture.schema.json` | ★ ★ |
-| C6 비범위 / 회피 | antipatterns.json + migration-cautions.md | `antipatterns.schema.json` | ★ ★ |
+| C5 NFR / why | migration-cautions.json + architecture.json | `architecture.schema.json` | ★ ★ |
+| C6 비범위 / 회피 | antipatterns.json + migration-cautions.json | `antipatterns.schema.json` | ★ ★ |
 
 ---
 

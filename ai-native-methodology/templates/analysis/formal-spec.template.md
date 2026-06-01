@@ -16,45 +16,42 @@
 5. Property Test (Invariants 와 짝)
 ```
 
-각 산출물은 **이중 렌더링 의무** (ADR-008): AI 눈 + 사람 눈.
+각 산출물은 **json 단독 SSOT** (ADR-011 / 구 ADR-008 이중 렌더링 supersede). 시각화는 view-time 도구.
 
 ---
 
 ## 1. State Machine
 
 ### 위치
-- AI 눈: `output/formal-spec/state-machines/<AggregateRoot>.json`
-- 사람 눈: `output/formal-spec/state-machines/<AggregateRoot>.mermaid`
+- `output/formal-spec/state-machines/<AggregateRoot>.json` (json 단독 SSOT / ADR-011)
 
 ### 작성 가이드
 - Aggregate Root 1개 = State Machine 1개
 - domain.json 의 lifecycle_states 참조
 - 전이 (transition) 마다 이벤트 + 가드 명시
 - 거부/실패 상태도 별도 명시 (Reject_*, Failed_*)
-- 참조 template: `state-machine.template.mermaid`
+- (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 
 ---
 
 ## 2. Sequence Diagram
 
 ### 위치
-- AI 눈: `output/formal-spec/sequence-diagrams/UC-<UseCase>.json`
-- 사람 눈: `output/formal-spec/sequence-diagrams/UC-<UseCase>.mermaid`
+- `output/formal-spec/sequence-diagrams/UC-<UseCase>.json` (json 단독 SSOT / ADR-011)
 
 ### 작성 가이드
 - 핵심 UC 만 (전부 X) — domain.json `use_cases` 의 priority 참조
 - actor: user / controller / service / domain / repository / external
 - alt/else 분기 명시 (BR 분기 정합)
 - DB 호출 / 외부 API 호출은 별도 lane
-- 참조 template: `sequence.template.mermaid`
+- (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 
 ---
 
 ## 3. Decision Table (★ 자연어 빈약성 보완 핵심)
 
 ### 위치
-- AI 눈: `output/formal-spec/decision-tables/BR-<RuleId>.json`
-- 사람 눈: `output/formal-spec/decision-tables/BR-<RuleId>.md`
+- `output/formal-spec/decision-tables/BR-<RuleId>.json` (json 단독 SSOT / ADR-011 — grid 가 json 에 흡수됨, DT-json)
 
 ### 9 항목 의무 (자연어 빈약성 100% 보완)
 
@@ -73,8 +70,8 @@ current_state: "complete | partial | absent | needs_review"
 
 ★ = 자연어 누락 빈번 — 형식화 시 결단 의무.
 
-### 참조 template
-`decision-table.template.md`
+### 참조
+(★ v12 ADR-011 / DT-json — grid 가 json 단독 SSOT 에 흡수 / 별도 template 파일 ❌, schema-driven)
 
 ---
 
@@ -179,6 +176,6 @@ describe('<AggregateRoot> properties', () => {
 - rules.json 자연어로 충분하다고 착각
 - → Decision Table 9 항목 점검 (자연어 표현 < 5 개 시 형식화 필수)
 
-### 이중 렌더링 갭
-- .mermaid 만 / .json 만
-- → ADR-008 강제 — 양쪽 의무. drift 검증.
+### json 단독 SSOT (★ v12 ADR-011 — 구 "이중 렌더링 갭" 폐기)
+- 산출물은 json 단독 (구 ADR-008 .mermaid/.md twin emit 폐기 / supersede).
+- → 시각화가 필요하면 view-time 도구로 json 에서 렌더 (twin 파일 emit ❌ / drift 원천 제거).

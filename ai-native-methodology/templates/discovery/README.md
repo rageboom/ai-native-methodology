@@ -6,8 +6,7 @@
 
 | file | role |
 |---|---|
-| [`discovery-spec.template.json`](./discovery-spec.template.json) | discovery-spec.json placeholder (UC + BR-INTENT + business_intent + cross_links + decisions) |
-| [`discovery-spec.template.md`](./discovery-spec.template.md) | discovery-spec.md placeholder (사람 검토용 / 이중 렌더링 / ADR-008 v2) |
+| [`discovery-spec.template.json`](./discovery-spec.template.json) | discovery-spec.json placeholder (UC + BR-INTENT + business_intent + cross_links + decisions) — ★ v12 ADR-011 json 단독 SSOT |
 | [`planning-doc-format.md`](./planning-doc-format.md) | ★ **기획서 입력 형식 design notes** / 6 component (decision table, entity, use case, flow, NFR, 회피) → 7대 산출물 빈칸 매핑 / 미래 기획서 템플릿 툴 요구사항 source |
 
 ## 향후 채움 후보 (v12.x carry)

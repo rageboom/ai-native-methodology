@@ -94,15 +94,10 @@
 
 ```
 .ai-analysis/output/domain/           # 도메인 모델 (#2)
-├── domain.json
-├── domain.md
-├── domain.mermaid
-├── use-cases.md
-└── ubiquitous-language.md
+└── domain.json                       # json 단독 SSOT (엔티티·UC·보편 언어 / ★ v12 ADR-011)
 
 .ai-analysis/output/rules/            # 비즈니스 규칙 (#5) — 부분
 ├── business-rules.json
-├── rules.md
 └── state-diagrams/
 
 .ai-analysis/output/antipatterns/      # 안티패턴 (#6) — 부분

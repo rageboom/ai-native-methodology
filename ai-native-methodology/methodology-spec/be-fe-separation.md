@@ -126,7 +126,7 @@ JSP_통합_산출_절차:
     - visual-manifest = ✅ Playwright 진짜 실행 (rendering 후 동일)
 
   quality phase:
-    - BE migration-cautions.md + FE migration-cautions-fe.md 양쪽 의무
+    - BE migration-cautions.json + FE migration-cautions-fe.json 양쪽 의무
     - JSP-specific 함정: XSS escape ★ <c:out> 사용 / form action 분산 / scriptlet 잔존
 ```
 

@@ -1,7 +1,7 @@
 # Migration Cautions — FE 영역 가이드
 
 > **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + 위험 기록 한 방향 추출기) FE 적용 + ADR-FE-001 (Tier 1~4 spectrum) + ADR-FE-003 (Strangler Pattern)
-> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.md` (BE) + `migration-cautions-fe.md` (FE)
+> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.json` (BE) + `migration-cautions-fe.json` (FE / ★ v12 ADR-011)
 > **생성 phase**: `quality` phase (`/analyze-quality`) — FE 산출물 (deliverable 7~13) 통합 후
 
 ---
@@ -14,7 +14,7 @@
 
 ### 1.1 BE migration-cautions 와의 분담
 
-| 영역 | migration-cautions.md (BE) | migration-cautions-fe.md (본 doc) |
+| 영역 | migration-cautions.json (BE) | migration-cautions-fe.json (FE) |
 |---|---|---|
 | API / DB / Security / Architecture / Domain | ✅ | (cross-link 만) |
 | FE state 5 진실 / visual baseline / a11y / i18n / 정적보안 / legacy 4 Tier | (cross-link 만) | ✅ |

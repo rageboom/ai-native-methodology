@@ -1,7 +1,7 @@
 # 산출물 #2: 도메인 모델 (Domain Model — DDD-Lite B)
 
 > **사상**: DDD-Lite B 강도 (ADR-004 — Entity/VO/Aggregate/Repository/UbiquitousLanguage 까지 추출, Context Map / Subdomain / Domain Event / Saga 미추출)
-> **schema**: `schemas/domain.schema.json` · **template**: `templates/domain.template.{md,mermaid}`
+> **schema**: `schemas/domain.schema.json` · **template**: (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
@@ -18,11 +18,7 @@
 
 ```
 output/domain/
-├── domain.json                    # AI용 (구조화)
-├── domain.md                      # 사람용 요약
-├── domain.mermaid                 # classDiagram (엔티티 관계)
-├── use-cases.md                   # 유스케이스 카탈로그
-└── ubiquitous-language.md         # 보편 언어 사전
+└── domain.json                    # json 단독 SSOT (엔티티·UC·보편 언어 / 시각화는 view-time 도구)
 ```
 
 **DDD-Lite B 적용 범위** (ADR-004):
@@ -121,7 +117,7 @@ output/domain/
 
 ```
 □ domain.json schema 검증 통과
-□ classDiagram Mermaid 렌더링
+□ 엔티티 관계 (classDiagram) 가 domain.json 에 구조화 (시각화는 view-time 도구)
 □ 모든 Entity 에 ID 표준 (E-{도메인}-{이름}) 적용
 □ Aggregate Root 명시 (ORM cascade=ALL 기준)
 □ Use Case ↔ API operationId 매핑 일관성

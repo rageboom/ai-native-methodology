@@ -1,6 +1,6 @@
 # formal-spec phase: formal-spec (형식 명세)
 
-> **명령어**: `/analyze-formal-spec` · **사상**: 이중 렌더링 (ADR-008) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무 (ADR-009)
+> **명령어**: `/analyze-formal-spec` · **사상**: json 단독 SSOT (ADR-011 / ADR-008 이중 렌더링 supersede) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무 (ADR-009)
 > **핵심 책임**: business-rules.json 자연어 한계를 형식 명세로 보완 / AI 코드 생성 정확도 향상
 
 ---
@@ -33,17 +33,17 @@
 
 ## 3. 처리 — 5 산출물 동시 생성
 
-| 산출물 | AI 눈 | 사람 눈 |
-|---|---|---|
-| State Machine | `state-machines/<AggregateRoot>.json` (XState) | `.mermaid` (stateDiagram-v2) |
-| Sequence | `sequence-diagrams/UC-<UseCase>.json` | `.mermaid` (sequenceDiagram) |
-| Decision Table | `decision-tables/BR-<RuleId>.json` | `.md` (markdown 표) |
-| Invariants | `invariants/<AggregateRoot>.ts` (실행 가능) | (공용) |
-| Property Test | `property-tests/<AggregateRoot>.spec.ts` (실행 가능) | (공용) |
+| 산출물 | json 단독 SSOT (ADR-011) |
+|---|---|
+| State Machine | `state-machines/<AggregateRoot>.json` (XState / 시각화는 view-time 도구) |
+| Sequence | `sequence-diagrams/UC-<UseCase>.json` (시각화는 view-time 도구) |
+| Decision Table | `decision-tables/BR-<RuleId>.json` (DMN-inspired grid) |
+| Invariants | `invariants/<AggregateRoot>.ts` (실행 가능) |
+| Property Test | `property-tests/<AggregateRoot>.spec.ts` (실행 가능) |
 
 ### 3.1 State Machine — Aggregate Root 생애주기
 
-각 Aggregate Root 의 상태/전이/이벤트/가드를 XState 호환 JSON + Mermaid stateDiagram-v2 로 산출.
+각 Aggregate Root 의 상태/전이/이벤트/가드를 XState 호환 JSON 으로 구조화 (시각화는 view-time 도구가 stateDiagram-v2 로 렌더).
 
 **예시**:
 - User-Account: anonymous → registered → authenticated → updated_profile
@@ -51,7 +51,7 @@
 
 ### 3.2 Sequence — Use Case 오케스트레이션
 
-각 핵심 UC 의 호출 흐름 (actor / message / sync / guard) 을 JSON + Mermaid sequenceDiagram 로 산출.
+각 핵심 UC 의 호출 흐름 (actor / message / sync / guard) 을 JSON 으로 구조화 (시각화는 view-time 도구가 sequenceDiagram 으로 렌더).
 
 **예시**:
 - UC-USER-SIGNUP: Controller → Service → Repository → JWT
@@ -111,7 +111,7 @@ invariants 가 모든 입력에 대해 성립함을 fast-check 등 property-base
 |---|---|---|
 | Senior Engineer (sub-agent) | drift 검출 / 산출물 정합성 | 12분 |
 | Static Analyzer (★ 진짜 도구) | 코드 ↔ 명세 정합 / 실제 위반 탐지 | 환경 의존 |
-| **drift-validator (자동)** | `.json ↔ .mermaid` 의미 동일성 자동 비교 | <10초 |
+| **drift-validator (자동)** | json 산출물 ↔ 소스 코드 정합 자동 검증 | <10초 |
 | **decision-table-validator (자동)** | dmn-check 5종 (duplicate/conflict/gap/overlap/type) | <10초 |
 
 ### 4.1 자동 검증 step (의무)
@@ -131,7 +131,7 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 **해석 / 처리**:
 - `breaking` — structural drift. 즉시 finding 등록 (severity = high). 산출물 재작성 또는 정합 보정.
 - `non-breaking` — interpretive drift / 추상화 layer 차이. finding 등록 (severity = medium / low) — 자연어 ambiguity 노출 = `formal-spec` phase 본질적 가치.
-- `info` — 한쪽이 더 자세 (mermaid 가 sub-state 까지). 의도된 패턴 — finding 미등록.
+- `info` — json 산출물이 소스보다 더 자세 (sub-state 까지 명세). 의도된 패턴 — finding 미등록.
 
 수동 ad-hoc 검증 **금지** — "drift 0" 보고가 7+3 자동 검출로 한계 노출 사례 있음. 자동 도구 미실행 시 신뢰도 -5%p 패널티.
 
@@ -170,22 +170,19 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 ```
 output/formal-spec/
 ├── state-machines/
-│   ├── <AggregateRoot>.json     # AI 눈 (XState)
-│   └── <AggregateRoot>.mermaid  # 사람 눈 (stateDiagram-v2)
+│   └── <AggregateRoot>.json     # json 단독 SSOT (XState / 시각화는 view-time)
 ├── sequence-diagrams/
-│   ├── UC-<UseCase>.json        # AI 눈
-│   └── UC-<UseCase>.mermaid     # 사람 눈 (sequenceDiagram)
+│   └── UC-<UseCase>.json        # json 단독 SSOT (시각화는 view-time)
 ├── decision-tables/
-│   ├── BR-<RuleId>.json         # AI 눈
-│   └── BR-<RuleId>.md           # 사람 눈 (markdown 표)
+│   └── BR-<RuleId>.json         # json 단독 SSOT (DMN-inspired grid)
 ├── invariants/
-│   └── <AggregateRoot>.ts       # 실행 가능 (AI + 사람 공용)
+│   └── <AggregateRoot>.ts       # 실행 가능
 ├── property-tests/
-│   └── <AggregateRoot>.spec.ts  # 실행 가능 (AI + 사람 공용)
+│   └── <AggregateRoot>.spec.ts  # 실행 가능
 └── _manifest.yml                # meta-confidence
 ```
 
-ADR-008 정합: 모든 영역에 AI 눈 + 사람 눈 동시 산출 의무.
+ADR-011 정합: 모든 영역 json 단독 SSOT 산출 (ADR-008 이중 렌더링 supersede / 시각화는 view-time 도구).
 
 ---
 
@@ -208,7 +205,7 @@ ADR-008 정합: 모든 영역에 AI 눈 + 사람 눈 동시 산출 의무.
 
 ## 7. 종료 조건
 
-- 5 산출물 모두 작성 (이중 렌더링 정합 100%)
+- 5 산출물 모두 작성 (json 단독 SSOT / ADR-011)
 - **drift-validator + decision-table-validator 자동 실행 완료** (breaking 0 또는 finding 등록 / non-breaking + interpretive drift 모두 finding 등록)
 - Cross-validation 완료 — Senior + 진짜 static tool (또는 환경 부재 명시 보고). **시뮬 결과 사용 금지**
 - `cross_validation.real_tool: true` 시 5종 물증 schema 검증 통과 / `false` 시 `simulation_reason` 명시

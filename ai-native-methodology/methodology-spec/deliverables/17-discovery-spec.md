@@ -1,6 +1,6 @@
 # 산출물 #17: Planning Spec (★ v2.0 chain 1)
 
-> **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-008 v2 §10 (이중 렌더링 chain 단계) / ADR-009 v2 §2.5 (planning trust 0.85)
+> **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-011 (json 단독 SSOT / ADR-008 이중 렌더링 supersede) / ADR-009 v2 §2.5 (planning trust 0.85)
 > **schema**: `schemas/discovery-spec.schema.json`
 > **생성 phase**: chain 1 (discovery) — `/discovery-from-analysis-output` (skill / ★ v9.0 planning→discovery 개칭 / 산출물 파일명 `discovery-spec.json` 은 reuse 유지)
 > **gate**: go/stop gate #1 (ADR-CHAIN-002)
@@ -19,8 +19,7 @@
 
 ```
 .aimd/output/chain-1-discovery/
-├── discovery-spec.json   # AI 눈
-├── discovery-spec.md     # 사람 눈 (★ ADR-008 v2 §10 의무)
+├── discovery-spec.json   # json 단독 SSOT (★ v12 ADR-011)
 └── _manifest.yml
 ```
 
@@ -34,7 +33,7 @@
 | out_of_scope / risks | analysis finding + AP | LLM 분석 | 70% |
 | cross_links | 결정적 grep | 결정적 | 95% |
 
-**입력**: analysis stage 7대 + 8 FE 산출물 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.md + `formal-spec` phase 산출물 + 8 FE).
+**입력**: analysis stage 7대 + 8 FE 산출물 (business-rules.json / domain.json / openapi.yaml / schema.json / antipatterns.json / migration-cautions.json + `formal-spec` phase 산출물 + 8 FE).
 
 ## 4. 검증 도구
 
@@ -42,7 +41,7 @@
 |---|---|
 | **discovery-extraction-validator** (★ sub-plan-3 신설 / v11.0.0 rename) | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
 | schema-validator (Ajv 8) | discovery-spec.schema.json 구조 정합 |
-| traceability-matrix-builder | UC-* row 채움 (matrix.json + matrix.md + matrix.mermaid) |
+| traceability-matrix-builder | UC-* row 채움 (matrix.json — json 단독 SSOT / ★ v12 ADR-011) |
 
 ## 5. 예시 (chain 1 sample)
 

@@ -6,10 +6,8 @@
 
 | file | role |
 |---|---|
-| [`behavior-spec.template.json`](./behavior-spec.template.json) | behavior-spec.json placeholder (BHV-* executable contract / state-machine + sequence + invariant + property-test 통합) |
-| [`behavior-spec.template.md`](./behavior-spec.template.md) | behavior-spec.md placeholder (사람 검토용 / 이중 렌더링 / ADR-008 v2) |
-| [`acceptance-criteria.template.json`](./acceptance-criteria.template.json) | acceptance-criteria.json placeholder (AC-* Gherkin Given/When/Then / verifiable=true 의무 / MoSCoW) |
-| [`acceptance-criteria.template.md`](./acceptance-criteria.template.md) | acceptance-criteria.md placeholder (사람 검토용) |
+| [`behavior-spec.template.json`](./behavior-spec.template.json) | behavior-spec.json placeholder (BHV-* executable contract / state-machine + sequence + invariant + property-test 통합 / json 단독 SSOT — ADR-011) |
+| [`acceptance-criteria.template.json`](./acceptance-criteria.template.json) | acceptance-criteria.json placeholder (AC-* Gherkin Given/When/Then / verifiable=true 의무 / MoSCoW / json 단독 SSOT — ADR-011) |
 
 ## 산출물 paradigm 정합 (v11.0.0)
 

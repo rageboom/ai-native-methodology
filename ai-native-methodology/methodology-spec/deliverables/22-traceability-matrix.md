@@ -1,6 +1,6 @@
 # 산출물 #22: Traceability Matrix (★ v2.0 cross-cutting)
 
-> **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (★ 산업 권위 — Official research) / ADR-008 v2 §10 (matrix.json + matrix.md + matrix.mermaid 이중 렌더링)
+> **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (★ 산업 권위 — Official research) / matrix.json 단독 SSOT (ADR-011 / ADR-008 v2 §10 이중 렌더링 supersede)
 > **schema**: `schemas/traceability-matrix.schema.json`
 > **생성 phase**: cross-cutting — `/_base-build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
 > **gate**: 매 gate #1~#5 prerequisite
@@ -17,9 +17,7 @@
 
 ```
 .aimd/output/_traceability/
-├── matrix.json       # ★ AI 눈 (단일 진실)
-├── matrix.md         # ★ 사람 눈 (표 형식)
-└── matrix.mermaid    # ★ graph view (≥ 100 cell 분할 정책 = sub-plan-3 carry sp2-c4)
+└── matrix.json       # ★ json 단독 SSOT (ADR-011 / 시각화·표는 view-time 도구)
 ```
 
 ## 3. 추출 범위
@@ -39,7 +37,7 @@
 
 | 도구 | 검증 |
 |---|---|
-| **traceability-matrix-builder** (★ sub-plan-3 신설) | matrix.json + matrix.md + matrix.mermaid 동시 산출 |
+| **traceability-matrix-builder** (★ sub-plan-3 신설) | matrix.json 단독 산출 (ADR-011 / 표·graph 는 view-time 도구) |
 | chain-coverage-validator | forward+backward coverage ≥ 0.85 (★ ADR-010 v2 §2.6 ratchet) |
 | schema-validator | severity_floor (critical=1.0 const) |
 
@@ -78,7 +76,7 @@ coverage_summary:
   red_count: 1
 ```
 
-## 6. 사람 눈 (matrix.md 발췌)
+## 6. view-time 표 렌더 예시 (matrix.json → 표)
 
 ```markdown
 | UC-* | BHV-* | AC-* | TC-* | IMPL-* | commit | status | severity |
@@ -87,7 +85,7 @@ coverage_summary:
 | UC-USER-002 | BHV-USER-002 | AC-USER-005 | — | — | — | 🔴 red | must |
 ```
 
-## 7. mermaid graph view
+## 7. graph view (figure 예시 / 산출물 아님 / ★ v12 ADR-011)
 
 ```mermaid
 graph LR
@@ -109,7 +107,7 @@ graph LR
 
 | # | 항목 | 시점 |
 |---|---|---|
-| sp2-c4 | matrix mermaid ≥ 100 cell 시 분할 정책 | sub-plan-3 |
+| sp2-c4 | matrix ≥ 100 cell 시 view-time graph 분할 정책 (mermaid twin emit 폐기 — ADR-011) | sub-plan-3 |
 | sp2-c3 | impl-spec binary artifact 보존 정책 | sub-plan-5 (PoC #05) |
 
 ## 9. 산업 권위 (★ Official research)

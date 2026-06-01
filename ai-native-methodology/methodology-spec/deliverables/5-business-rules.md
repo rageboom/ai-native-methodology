@@ -20,11 +20,8 @@
 
 ```
 output/rules/
-├── business-rules.json            # AI용 (구조화, Given/When/Then) — ★ v7.0.0 묶음 Q ⑦ rename (구 rules.json)
-├── rules.md                       # 사람용 카탈로그
-├── state-diagrams/                # 상태 다이어그램 (있을 경우)
-│   └── order-status.mermaid
-└── conflicts.md                   # 규칙 간 충돌 보고서 (있을 경우)
+├── business-rules.json            # json 단독 SSOT (구조화, Given/When/Then) — ★ v7.0.0 묶음 Q ⑦ rename (구 rules.json) / ★ v12 ADR-011
+└── conflicts.md                   # 규칙 간 충돌 보고서 (있을 경우 / functional report)
 ```
 
 ### 2.1 Given/When/Then 형식 (핵심)
@@ -86,7 +83,7 @@ output/rules/
 □ 추출 영역 (5.A/5.B/5.C/5.D) 명시
 □ human_review_required 항목 사용자 검토 완료
 □ FE-BE 검증 중복/누락 → 안티패턴(#6) 에 등록
-□ 상태 다이어그램 Mermaid 렌더링 (있을 경우)
+□ 상태 다이어그램 = formal-spec.json state_machines (★ v12 ADR-011 — 시각화는 view-time)
 □ 규칙 간 충돌 검토
 □ ★ v4.0.1 — auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
 □ ★ v4.0.1 — intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)

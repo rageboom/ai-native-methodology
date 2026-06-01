@@ -64,7 +64,7 @@ USE: AI 자동 생성 + 사용자 검토 (gate #1~#5) / prod 시스템 + traceab
 - chain 4 (test) = **RED 의무** (실 test code / 실패 입증 / impl 부재) / chain 5 (implement) = **GREEN 의무** (100% test pass).
 - contract 강제 양 axis: BE = OpenAPI(swagger) / FE = state-map + visual-manifest + DTCG token.
 - legacy 도입 시: **Baseline + Ratchet** 점진 quality gate (zero-defect 즉시 강제 금지 / 신규 결함만 차단).
-- Phase 6 antipatterns 작성 시: `migration_advice` 필드 + `migration-cautions.md` 신규 시스템 회피 가이드 산출.
+- Phase 6 antipatterns 작성 시: `migration_advice` 필드 + `migration-cautions.json` 신규 시스템 회피 가이드 산출.
 
 ## chain harness 5 요소 (★ mechanical enforcement)
 
@@ -83,7 +83,7 @@ USE: AI 자동 생성 + 사용자 검토 (gate #1~#5) / prod 시스템 + traceab
 | Chain | Stage | Gate | 산출물 | Skill prefix |
 |---|---|---|---|---|
 | (pre) | analysis | — | 7대 산출물 (architecture/domain/api/db-schema/rules/antipatterns/ui-ux) + finding + antipatterns + migration-cautions | `analysis-` |
-| 1 | discovery | gate #1 | `discovery-spec.{json,md}` (입력 어댑터 4종: analysis-output/swagger/figma/nl-md) | `discovery-` |
+| 1 | discovery | gate #1 | `discovery-spec.json` (입력 어댑터 4종: analysis-output/swagger/figma/nl-md) | `discovery-` |
 | 2 | spec | gate #2 | `behavior-spec` + `acceptance-criteria` (Gherkin BDD) + 7대 통합 | `spec-` |
 | 3 | plan | gate #3 | `task-plan` (task 분해 / 의존성 / ADR / NFR / risk / rollback) | `plan-` |
 | 4 | test | gate #4 | `test-spec` + 실 test code (RED 의무) | `test-` |

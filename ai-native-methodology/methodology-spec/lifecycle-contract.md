@@ -149,7 +149,6 @@ analysis 는 legacy *코드* 가 아니라 *입력* 을 요구한다 (DEC-2026-0
 
 산출물 (discovery stage 가 만듦):
 - **discovery-spec.json** (deliverable 17 / `schemas/discovery-spec.schema.json` ★ sub-plan-2 신설 / ★ v11.0.0 planning-spec → discovery-spec rename / DEC-2026-05-26-discovery-spec-rename)
-- **discovery-spec.md** (이중 렌더링 / ADR-008 v2 정합)
 
 기존 placeholder (v2.0 carry 였던 PRD / story / domain-priority) = ★ discovery-spec.json 의 sub-section 으로 흡수 (1차 = legacy-extraction 모드 / 후속 use case 분기 시 source_format 분기 정책).
 
@@ -167,8 +166,8 @@ input (spec stage 가 받음):
 | 약 | 약 | 강 | 강 | 강 | 강 |
 
 산출물 (spec stage 가 만듦):
-- **behavior-spec.json + .md** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + discovery-spec.use_cases 흡수
-- **acceptance-criteria.json + .md** (deliverable 19 / `schemas/acceptance-criteria.schema.json` ★ sub-plan-2 신설) — Gherkin (Given/When/Then) BDD 정합 / verifiable=true 의무 / MoSCoW (must/should/nice)
+- **behavior-spec.json** (deliverable 18 / `schemas/behavior-spec.schema.json` ★ sub-plan-2 신설) — `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + discovery-spec.use_cases 흡수
+- **acceptance-criteria.json** (deliverable 19 / `schemas/acceptance-criteria.schema.json` ★ sub-plan-2 신설) — Gherkin (Given/When/Then) BDD 정합 / verifiable=true 의무 / MoSCoW (must/should/nice)
 - **현 7대 산출물 통합** (변경 ❌) — behavior-spec.cross_links 가 모든 7대 산출물 reference (cross-link coverage 강제)
 
 ★ ★ chain-coverage-validator (★ sub-plan-3 신설) = AC-* / BHV-* / UC-* 정합 ≥ 0.85 ratchet.
@@ -188,7 +187,7 @@ input (plan stage 가 받음):
 | 약 | 약 | 약 | 약 | 약 | 강 |
 
 산출물 (plan stage 가 만듦):
-- **task-plan.{json,md}** (★ `schemas/task-plan.schema.json` / v10.0.0 신설 / tasks[] / dependencies[] / adrs[] (alternatives ≥3) / nfr_allocation[] / risks[]) — discovery 산출 `discovery-spec.json` 과 명독 분리
+- **task-plan.json** (★ `schemas/task-plan.schema.json` / v10.0.0 신설 / tasks[] / dependencies[] / adrs[] (alternatives ≥3) / nfr_allocation[] / risks[]) — discovery 산출 `discovery-spec.json` 과 명독 분리
 - 운영 정책 (DEC-2026-05-21 §8): task granularity 1~3 AC 묶음 / ADR 5 자동 판정 기준 / NFR hard gate / risk 3중 망 / estimation_ai+estimation_human 분리
 - **★ v11.0.0 contract 강제 양 axis** (DEC-2026-05-26-v11-paradigm-결단 #8): BE task (`layer=='be'`) = `openapi_endpoint_ref` (swagger operationId 연결) 의무 / FE task (`layer=='fe'`) = `component_ref` + state-map + visual-manifest + DTCG token 연결 의무. task-plan.schema.json if/then 강제 / plan-coverage-validator BE↔FE 1:1 matching 검증.
 
@@ -208,7 +207,7 @@ input (test stage 가 받음):
 | ❌ | 약 (visual-regression) | 강 | 강 | 강 | 강 |
 
 산출물 (test stage 가 만듦):
-- **test-spec.json + .md** (deliverable 20 / `schemas/test-spec.schema.json` ★ sub-plan-2 신설) — TC-* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / framework (jest/vitest/junit/pytest/playwright)
+- **test-spec.json** (deliverable 20 / `schemas/test-spec.schema.json` ★ sub-plan-2 신설) — TC-* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / framework (jest/vitest/junit/pytest/playwright)
 - **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 4 종결 시 모든 test fail / impl 부재)
 - **5종 물증 7 필드** (★ ★ ★ no-simulation 강화 — runner_version + stdout + stderr + timestamp + pass/fail count + duration + reproduction + result_hash)
 
@@ -228,7 +227,7 @@ input (implement stage 가 받음):
 | ❌ | 약 | 강 | 강 | 강 | 강 |
 
 산출물 (implement stage 가 만듦):
-- **impl-spec.json + .md** (deliverable 21 / `schemas/impl-spec.schema.json` ★ sub-plan-2 신설) — IMPL-* / framework / source_files / commit_hash
+- **impl-spec.json** (deliverable 21 / `schemas/impl-spec.schema.json` ★ sub-plan-2 신설) — IMPL-* / framework / source_files / commit_hash
 - **실 impl 코드** (사용자 프로젝트) — GREEN 의무 (모든 test 100% pass)
 - **5종 물증 7 필드** (★ ★ ★ no-simulation — chain 4 (test) 의 5종 물증 + impl_test_pass_rate 100% + coverage_report + linter)
 - **production code + 빌드 artifact**
@@ -250,11 +249,11 @@ input (implement stage 가 받음):
 | # | 산출물 | Schema | 트랙 (6 enum: `공통 / BE / FE / DB / 기획 / 디자인`) |
 |---|---|---|---|
 | 1 | inventory | `inventory.schema.json` | 공통 |
-| 2 | architecture (+ .mermaid) | `architecture.schema.json` | 공통 |
+| 2 | architecture | `architecture.schema.json` | 공통 |
 | 3 | domain | `domain.schema.json` | 공통 |
 | 4 | rules | `business-rules.schema.json` | BE+FE |
 | 5-a | openapi | `openapi-extension.schema.json` | BE |
-| 5-b | schema + erd (.mermaid) | `db-schema.schema.json` | DB |
+| 5-b | schema + erd | `db-schema.schema.json` | DB |
 | 6 | finding-list | (`finding-system.md` 형식) | 공통 |
 | 7 | ui-ux | (`deliverable 7-ui-ux.md` 형식) | FE+디자인 |
 | 7' | antipatterns + migration-cautions | `antipatterns.schema.json` | 공통 |
@@ -280,12 +279,10 @@ input (implement stage 가 받음):
 │   └── output/                      # 분석 stage 산출물 (15종 중 해당분)
 │       ├── inventory.json
 │       ├── architecture.json
-│       ├── architecture.mermaid
 │       ├── domain.json
 │       ├── business-rules.json
 │       ├── openapi.yaml             # BE
 │       ├── schema.json              # DB
-│       ├── erd.mermaid              # DB
 │       ├── state-map.json           # FE
 │       ├── visual-manifest.json     # FE
 │       ├── a11y-spec.json           # FE
@@ -295,7 +292,7 @@ input (implement stage 가 받음):
 │       ├── form-validation-spec.json # FE
 │       ├── type-spec.json           # FE (TS)
 │       ├── antipatterns.json        # 공통
-│       ├── migration-cautions.md    # 공통
+│       ├── migration-cautions.json   # 공통
 │       └── tool-runs/               # 진짜 도구 raw 출력 보존
 ```
 
@@ -305,12 +302,12 @@ input (implement stage 가 받음):
 <user-project>/.aimd/
 ├── output/                          # ↑ canonical global = scope 와 무관 (위 layout 그대로)
 ├── <scope>/                         # ★ G3 — feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case)
-│   ├── manifest.{json,md}           #   scope 전체 status / analysis_refs / sync_state
+│   ├── manifest.json                #   scope 전체 status / analysis_refs / sync_state
 │   ├── analysis/                    #   (선택) scope local subset — 큰 프로젝트 context 부담 ↓
 │   │   └── business-rules.subset.json
 │   ├── discovery/                  #   chain 1 (discovery-spec)
-│   │   ├── discovery-spec.{json,md}
-│   │   └── manifest.{json,md}
+│   │   ├── discovery-spec.json
+│   │   └── manifest.json
 │   ├── spec/                        #   chain 2 (behavior-spec + acceptance-criteria + traceability-matrix)
 │   ├── plan/                        #   chain 3 (task-plan / gate #3)
 │   ├── test/                        #   chain 4 (test-spec + 실 test 코드 / RED)
@@ -321,7 +318,7 @@ input (implement stage 가 받음):
 규칙:
 - **scope slug** = kebab-case / `^[a-z0-9][a-z0-9-]{1,63}$` / ASCII only (`id-conventions.md` §scope slug 정합).
 - **stage 폴더명** = `discovery` / `spec` / `plan` / `test` / `impl` (chain prefix ❌ / v2.6.0 의미 ID paradigm 정합 / ★ v9.0 planning→discovery 개칭 + plan 신설).
-- **manifest 이중 렌더링** = `manifest.json` (단일 진실) + `manifest.md` (사람 눈) 의무 — ADR-008 v2.
+- **manifest** = `manifest.json` 단독 (단일 진실 SSOT / ★ v12 ADR-011 — 구 manifest.md 사람-눈 이중 렌더링 폐기).
 - **M4 sync** = canonical global 변경 시 SessionStart hook 이 `sync_state.drift_detected=true` 자동 set / cascade 는 사용자 명시 `chain-driver sync --scope <s>` 호출 시만 (안전 · 통제 · 자동 균형).
 
 CLI:
@@ -346,7 +343,7 @@ design stage 기존 자산 (analysis stage 안에 일부 포함됨 / v2.x carry 
 design stage 산출물 (v2.x 시점에 정식 분리 시):
 - wireframe spec
 - component-spec.json
-- DTCG token (`design-tokens.json` + `design-tokens.md` 이중 렌더링)
+- DTCG token (`design-tokens.json` 단독 / ★ v12 ADR-011)
 
 ## 가치 경계 충돌 deferral (★ resolved 2026-05-06 / DEC-2026-05-06-v2.0-i-strict-채택)
 
@@ -381,7 +378,7 @@ retract 영역 (chain harness 안에서 정식 허용):
 
 - skill description trigger: 코드베이스 시그널 기반 자동 발동
 - formal-spec-link-validator: cross-link 정합 (분석 stage 내부)
-- drift-validator: 이중 렌더링 정합 (.json ↔ .mermaid)
+- drift-validator: handoff/layout 정합 (★ v12 ADR-011 — 구 `.json↔.mermaid` pair-mode 폐기 / JSON-only handoff + artifact-registry detector)
 - decision-table-validator: DMN 5-check
 - spectral-runner: OpenAPI 정합
 - static-runner: 외부 정적 분석 hook — R19 Tier 1 (in-plugin Semgrep) + Tier 2 (사용자 환경 SARIF import / PMD / SpotBugs / CodeQL / Daikon)

@@ -37,7 +37,7 @@
 | 산출물 | AI 눈 | 사람 눈 |
 |---|---|---|
 | Characterization Spec entry | `output/characterization/characterization-spec.json` | (없음 / md 별도) |
-| Intent vs Bug 분류표 | (없음 / json 별도) | `output/characterization/intent-vs-bug.md` |
+| Intent vs Bug 분류표 | `characterization-spec.json` (intent_vs_bug) | ★ v12 ADR-011 — 구 intent-vs-bug.md 폐기 |
 | Coverage matrix | `output/characterization/coverage.json` | (없음) |
 | Snapshots | `output/characterization/snapshots/UC-*.json` (Given/When/Then BDD) | (옵션 .md 변환 / v2.1.x carry) |
 
@@ -104,8 +104,7 @@ trend_required: false              # ratchet 시 true 의무
 
 ```
 output/characterization/
-├── characterization-spec.json     # AI 눈 / 통합 entry
-├── intent-vs-bug.md               # 사람 눈 / 분류표
+├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / ★ v12 ADR-011 / D-6)
 ├── coverage.json
 └── snapshots/
     └── UC-*.json                  # Given/When/Then BDD
@@ -195,7 +194,7 @@ phase 4.7 출력 ↔ 다른 산출물:
 - `schemas/characterization-spec.schema.json` (★ 30번째)
 - `skills/analysis-characterization-test/SKILL.md` (★ skills 19 → 20)
 - `tools/characterization-coverage-validator/` (★ workspace 13번째)
-- `flows/analysis.phase-flow.{json,mermaid}` v2.1.0
+- `flows/analysis.phase-flow.json` v2.1.0
 - ADR-CHAIN-006 phase 4.7 정식 도입
 - DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
 - DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)

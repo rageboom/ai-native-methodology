@@ -39,7 +39,7 @@
 | 패턴 매칭 | SQL 정책 박힘 / 매직 넘버 분산 / FE-BE 검증 누락 | 준결정적 |
 | LLM 추론 | Anemic Domain Model 판정 / 복합 안티패턴 (여러 phase 결합) | LLM |
 
-후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` + `avoid-list.md`
+후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` (★ v12 ADR-011 — json 단독)
 
 ### 3.1 단순 통합 (`business-logic` phase 가 만든 부분 안티패턴)
 
@@ -120,16 +120,15 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ```
 .ai-analysis/output/antipatterns/
-├── antipatterns.json           # AI용 (통합 + migration_advice 필드)
-├── avoid-list.md               # 사람용 체크리스트 (기존 시스템 fix 가이드)
-├── migration-cautions.md       # ★ 신규 시스템 회피 가이드 (BE 영역 의무)
-├── migration-cautions-fe.md    # ★ v1.4 신규 — FE 영역 회피 가이드 (의무, FE 분석 시)
-└── composite-patterns.md       # 복합 패턴 별도 (가독성)
+├── antipatterns.json           # json 단독 SSOT (통합 + migration_advice / ★ v12 ADR-011 — 구 avoid-list.md twin 폐기)
+├── migration-cautions.json     # ★ 신규 시스템 회피 가이드 (BE 영역 의무 / migration-cautions.schema.json)
+├── migration-cautions-fe.json  # ★ FE 영역 회피 가이드 (의무, FE 분석 시)
+└── composite-patterns.md       # 복합 패턴 별도 (가독성 / functional report)
 ```
 
 ★ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-cautions-fe.md` 본체 spec 정합. 카테고리 7종 (state 5 진실 / visual baseline / a11y baseline+ratchet / i18n MF1 폴백 / 정적보안 / legacy 4 Tier strangle / quality gate FE).
 
-### 6.1 migration-cautions.md 의무 산출물
+### 6.1 migration-cautions.json 의무 산출물
 
 **근거**: 본 방법론 가치 명세 (코드 → 형식 명세 + **위험 기록** 한 방향 추출기) 정합.
 
@@ -141,9 +140,9 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 - **Platform-specific 변형 섹션** — 분석 대상 stack 별 함정 + 학습 효과 입증 표
 - **사내 도입 quality gate 정책 (ADR-010 정합)** — Baseline + Ratchet 패턴
 
-**avoid-list.md 와의 차이**:
-- avoid-list.md = "기존 시스템에서 발견된 패턴 + 즉시 fix"
-- migration-cautions.md = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
+**antipatterns.json 과의 차이** (★ v12 ADR-011 — 구 avoid-list.md twin 폐기):
+- antipatterns.json = "기존 시스템에서 발견된 패턴 + 즉시 fix"
+- migration-cautions.json = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
 
 #### 6.1.1 Platform-specific 변형 섹션
 
@@ -197,7 +196,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 → Slack/GitLab/Dropbox/Figma/Shopify 산업 표준.
 
-### 6.2 avoid-list.md 예시
+### 6.2 antipatterns 사람-읽기 표현 예시 (구 avoid-list.md / 현 antipatterns.json view-time 렌더)
 
 ```markdown
 # 재구현 시 회피 후보 체크리스트
@@ -228,7 +227,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 □ severity 분포 확인
 □ `db-schema` phase 정합성 보고서 → 안티패턴 격상 완료
 □ 복합 안티패턴 검출 (`quality` phase 부가가치)
-□ avoid-list.md 사용자 검토
+□ antipatterns.json 사용자 검토
 □ 시니어 BE 검토 ✋ (특히 high 항목)
 ```
 

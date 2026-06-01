@@ -1,7 +1,7 @@
 # 산출물 #4.5: 형식 명세 (Formal Spec)
 
-> **사상**: 이중 렌더링 (ADR-008 — AI 눈 JSON + 사람 눈 mermaid) + 자연어 빈약성 보완 (자연어 60% → 형식 90%)
-> **schema**: `schemas/formal-spec.schema.json` · **template**: `templates/analysis/formal-spec.template.md` 외 4건
+> **사상**: json 단독 SSOT (ADR-011 — ADR-008 이중 렌더링 supersede) + 자연어 빈약성 보완 (자연어 60% → 형식 90%)
+> **schema**: `schemas/formal-spec.schema.json` · **template**: (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 > **생성 phase**: `formal-spec` phase (`workflow/formal-spec.md`)
 
 ---
@@ -19,21 +19,18 @@
 
 ---
 
-## 2. 형식 (5 산출물 — 이중 렌더링 정합)
+## 2. 형식 (5 산출물 — json 단독 SSOT / ADR-011)
 
 ### 2.1 파일 구성
 
 ```
 output/formal-spec/
 ├── state-machines/
-│   ├── <AggregateRoot>.json     # AI 눈 (XState 호환)
-│   └── <AggregateRoot>.mermaid  # 사람 눈 (stateDiagram-v2)
+│   └── <AggregateRoot>.json     # json 단독 SSOT (XState 호환)
 ├── sequence-diagrams/
-│   ├── UC-<UseCase>.json        # AI 눈
-│   └── UC-<UseCase>.mermaid     # 사람 눈 (sequenceDiagram)
+│   └── UC-<UseCase>.json        # json 단독 SSOT
 ├── decision-tables/
-│   ├── BR-<RuleId>.json         # AI 눈
-│   └── BR-<RuleId>.md           # 사람 눈 (markdown 표)
+│   └── BR-<RuleId>.json         # json 단독 SSOT (DMN-inspired grid)
 ├── invariants/
 │   └── <AggregateRoot>.ts       # 실행 가능 (AI + 사람 공용)
 ├── property-tests/
@@ -134,13 +131,13 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 
 ```
 [ 자동 — 도구 실행 ]
-□ tools/drift-validator 실행: state-machine + sequence breaking 0 (또는 finding 등록)
+□ state-machine + sequence json = formal-spec.schema.json 통과 (★ v12 ADR-011 — json 단독 / pair-mode 폐기)
 □ tools/decision-table-validator 실행: dmn-check 5종 (duplicate / conflict / gap / overlap / type) breaking 0
 □ formal-spec.schema.json 통과 (cross_validation.real_tool 5종 물증 if/then 강제)
 □ tools/static-runner/lint-no-simulation.sh 통과 (CI 게이트)
 
 [ 사람 — 의사결정 ]
-□ 5 산출물 모두 작성 (이중 렌더링 정합 100%)
+□ 5 산출물 모두 작성 (json 단독 SSOT / ADR-011 정합)
 □ Cross-validation 완료 (Senior + Static — 진짜 도구 우선)
 □ Static tool 시뮬레이션 사용 시 cross_validation.simulation_reason 명시 + 신뢰도 -5%p 패널티
 □ 자동 도구 미실행 시 -5%p 추가
@@ -185,11 +182,11 @@ test('BR-USER-FOLLOW-NO-SELF-001: self-follow always rejected', () => {
 - 대응: 진짜 도구 의무. 시뮬 시 `cross_validation.simulation_reason` 명시 + -5%p 패널티
 - **enforcement**: `tools/static-runner/lint-no-simulation.sh` 가 CI 단계에서 5종 물증 누락 + simulation_only:true 자동 fail
 
-### 6.4 이중 렌더링 갭
-- 증상: .mermaid 만 / .json 만 작성
-- 대응: ADR-008 강제 — 양쪽 의무
-- **enforcement**: `tools/drift-validator/` + `tools/decision-table-validator/` 자동 검증 (수동 점검은 한계 — drift 0 보고했던 산출물에서 자동 도구가 7 breaking + 3 non-breaking 발견 사례 있음)
+### 6.4 json 외 산출물 SSOT 혼동 (★ v12 ADR-011)
+- 증상: `.mermaid`/`.md` 미러를 SSOT 로 취급하거나 별도 emit (v12 폐기 — json 단독)
+- 대응: 산출물 = `.json` 단독 SSOT (ADR-011 / ADR-008 supersede). 시각화는 view-time 도구 (on-demand viz / carry)
+- **enforcement**: `tools/decision-table-validator/` 가 json grid 의 dmn-check 5종 자동 검증 (수동 점검은 한계 — drift 0 보고했던 산출물에서 자동 도구가 7 breaking + 3 non-breaking 발견 사례 있음)
 
 ### 6.5 자동 도구 미실행
-- 증상: drift-validator / decision-table-validator 안 돌리고 "수동 점검 OK" 로 종결
+- 증상: schema 검증 / decision-table-validator 안 돌리고 "수동 점검 OK" 로 종결
 - 대응: `formal-spec` phase 종료 조건에 자동 실행 결과 첨부 의무. 미실행 시 신뢰도 -5%p

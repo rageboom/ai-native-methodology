@@ -115,9 +115,7 @@ ORM 엔티티 → 모듈 (소속 패키지) → 테이블 (`db-schema` phase 결
 
 ```
 .ai-analysis/output/architecture/
-├── architecture.json                 # AI용
-├── architecture.md                   # 사람용
-├── architecture.mermaid              # Component diagram
+├── architecture.json                 # json 단독 SSOT (★ v12 ADR-011)
 ├── dependency-graph.json             # 의존성 그래프 raw
 └── module-table-mapping.json         # 모듈 ↔ 테이블 그룹
 ```
@@ -180,7 +178,7 @@ layer_violations:
     routed_to_antipattern: AP-ARCH-002
 ```
 
-### 4.3 architecture.mermaid 예시
+### 4.3 architecture 다이어그램 예시 (figure / 산출물 아님 / ★ v12 ADR-011)
 
 ```mermaid
 flowchart TB
@@ -216,7 +214,7 @@ flowchart TB
 
 ```
 □ architecture.json schema 검증 통과
-□ Mermaid Component diagram 렌더링
+□ architecture.json 의존성 그래프 정합 (시각화는 view-time / ★ v12 ADR-011)
 □ 모든 모듈에 ID/책임 명시
 □ 순환 의존성 = 0 또는 발견 시 안티패턴 등록
 □ 모듈 ↔ 테이블 매핑 = 사용자 검토 (시니어 BE)
