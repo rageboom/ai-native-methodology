@@ -11,13 +11,17 @@
   "error_message": "validation errors (class-validator default)",
   "current_state": "partial",
   "current_state_note": "★ signup 만 검증 / ★★ F-143 update 검증 우회 가능 (UpdateUserDto 0 validator + UserService.update validate 미호출)",
-  "rendered_md_path": "./BR-USER-EMAIL-FORMAT-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "현재 상태"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "현재 상태"
+    ],
     "missing_items": [
       "거부 방식 (signup vs update — 비대칭)",
       "검증 위치 (Entity 데코 vs Service 호출 — 두 곳 의존)",
@@ -27,11 +31,130 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "ValidationPipe + class-validator HttpException 400", "rationale": "NestJS 표준 / signup 정합"},
-    {"item": "검증 위치", "decision": "★ UserEntity @IsEmail (현재) + ★★ UpdateUserDto @IsEmail 의무 (F-143 fix)", "rationale": "★ DTO 단독 검증 의무 — Entity 데코는 비-validation 책임 (Sairyss DDD-Hexagon 정설)"},
-    {"item": "HTTP status", "decision": "400 (validation errors)", "rationale": "RFC 9110 §15.5.1 정합"},
-    {"item": "에러 메시지", "decision": "★ class-validator default + customMessages 권고", "rationale": "OWASP A07 (사용자 enumeration 회피 — email format error vs duplicate error 구분)"},
-    {"item": "update 시 검증 정책", "decision": "★★ UserService.update 가 validate(newUser) 호출 + UpdateUserDto @IsEmail 적용 (F-143 fix)", "rationale": "★★ 신규 입력 boundary = 검증 의무 / signup-only 비대칭 ❌"}
+    {
+      "item": "거부 방식",
+      "decision": "ValidationPipe + class-validator HttpException 400",
+      "rationale": "NestJS 표준 / signup 정합"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★ UserEntity @IsEmail (현재) + ★★ UpdateUserDto @IsEmail 의무 (F-143 fix)",
+      "rationale": "★ DTO 단독 검증 의무 — Entity 데코는 비-validation 책임 (Sairyss DDD-Hexagon 정설)"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "400 (validation errors)",
+      "rationale": "RFC 9110 §15.5.1 정합"
+    },
+    {
+      "item": "에러 메시지",
+      "decision": "★ class-validator default + customMessages 권고",
+      "rationale": "OWASP A07 (사용자 enumeration 회피 — email format error vs duplicate error 구분)"
+    },
+    {
+      "item": "update 시 검증 정책",
+      "decision": "★★ UserService.update 가 validate(newUser) 호출 + UpdateUserDto @IsEmail 적용 (F-143 fix)",
+      "rationale": "★★ 신규 입력 boundary = 검증 의무 / signup-only 비대칭 ❌"
+    }
   ],
-  "related_findings": ["F-143", "F-128"]
+  "related_findings": [
+    "F-143",
+    "F-128"
+  ],
+  "decision_grids": [
+    {
+      "context": "signup (POST /api/users)",
+      "inputs": [
+        "email blank",
+        "email 형식 정합",
+        "검증 호출"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "O (blank)",
+            "*",
+            "(CreateUserDto @IsNotEmpty)"
+          ],
+          "then": [
+            "email blank",
+            "400",
+            "ValidationPipe"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "O",
+            "UserService.create validate(newUser)"
+          ],
+          "then": [
+            "OK → DB INSERT",
+            "201",
+            "정상"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "UserService.create validate(newUser)"
+          ],
+          "then": [
+            "validation failed",
+            "400",
+            "@IsEmail"
+          ]
+        }
+      ],
+      "note": "2-A. signup 분기. row1 의 email blank=O 행이 email 형식 정합=* (wildcard) 로 다른 두 행과 겹치는 의도적 우선 행 → FIRST."
+    },
+    {
+      "context": "update (PUT /api/user) — F-143",
+      "inputs": [
+        "email 형식 정합",
+        "UpdateUserDto @IsEmail",
+        "UserService.update validate"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "O",
+            "X (부재)",
+            "X (미호출 — F-143)"
+          ],
+          "then": [
+            "OK → DB UPDATE",
+            "200",
+            "검증 우회"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X (부재)",
+            "X (미호출)"
+          ],
+          "then": [
+            "OK → 잘못된 email 저장",
+            "200",
+            "critical"
+          ]
+        }
+      ],
+      "note": "2-B. update 분기 (F-143 critical — PUT /api/user 가 email format 검증 우회). 두 행이 email 형식 정합(O/X)으로만 갈라지고 겹침 없음 → UNIQUE."
+    }
+  ]
 }

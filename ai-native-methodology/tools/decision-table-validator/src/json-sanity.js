@@ -67,13 +67,7 @@ export function checkJsonSanity(json, source) {
     });
   }
 
-  if (!json.rendered_md_path) {
-    findings.push({
-      severity: 'non-breaking',
-      kind: 'json.missing-md-link',
-      message: `rendered_md_path missing — paired markdown not linked from JSON`,
-    });
-  }
+  // ★ v12 (json-only / ADR-011) — rendered_md_path missing-md-link 검사 폐기 (.md twin 제거 / json SSOT).
 
   return findings;
 }

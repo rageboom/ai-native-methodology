@@ -10,7 +10,6 @@
   "http_status": 400,
   "error_message": "email must not be null or blank / email or username already exists",
   "current_state": "partial",
-  "rendered_md_path": "./BR-USER-EMAIL-UNIQUE-001.md",
   "natural_language_gap": {
     "explicit": [
       "email 중복 차단",
@@ -47,5 +46,129 @@
       "race_safe": true,
       "note": "F-058 ConstraintViolation → IAE 변환 미구현"
     }
-  ]
+  ],
+  "decision_grids": [
+    {
+      "context": "signup",
+      "hit_policy": "FIRST",
+      "inputs": [
+        "email null/blank",
+        "email 중복(DB)",
+        "email 중복(App pre-check race window)"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "안전 등급"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O",
+            "*",
+            "*"
+          ],
+          "then": [
+            "throw IAE \"email must not be null or blank\"",
+            "400",
+            "Domain"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "X"
+          ],
+          "then": [
+            "persist OK",
+            "201",
+            "Happy path"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "O",
+            "X"
+          ],
+          "then": [
+            "throw IAE \"email or username already exists\"",
+            "400",
+            "App 1중"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "O (race)"
+          ],
+          "then": [
+            "throw IAE 또는 DB ConstraintViolation",
+            "400/500",
+            "App miss + DB catch"
+          ],
+          "note": "★ race window — DataIntegrityViolationException 미처리 시 500 노출 (F-058)"
+        },
+        {
+          "when": [
+            "X",
+            "O",
+            "O"
+          ],
+          "then": [
+            "throw IAE (App pre catch)",
+            "400",
+            "App 1중"
+          ]
+        }
+      ],
+      "note": "App pre-check + DB UQ 2중 안전망 + race window 1건(F-058)"
+    },
+    {
+      "context": "updateUserDetails",
+      "inputs": [
+        "현재 email 과 동일",
+        "새 email 중복(DB)"
+      ],
+      "outputs": [
+        "결과",
+        "안전 등급"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O",
+            "*"
+          ],
+          "then": [
+            "변경 없음 (skip)",
+            "OK"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X"
+          ],
+          "then": [
+            "persist OK",
+            "OK"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "O"
+          ],
+          "then": [
+            "throw IAE \"email is already exists\"",
+            "Adapter 1중 (★ F-071 Hexagonal 위반)"
+          ]
+        }
+      ]
+    }
+  ],
+  "refinement_ref": "../invariants/User.ts"
 }

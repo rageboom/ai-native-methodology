@@ -12,10 +12,65 @@
   "error_message": "follower or username not provided",
   "current_state": "complete",
   "current_state_note": "★ App 1중 / DTO validator 부재 (Senior 위험 3 합산 — F-128)",
-  "rendered_md_path": "./BR-FOLLOWS-FOLLOWER-OR-USERNAME-PRESENT-001.md",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "follow — follower/username 입력 존재 검증",
+      "hit_policy": "FIRST",
+      "inputs": [
+        "follower null",
+        "username null"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O",
+            "*"
+          ],
+          "then": [
+            "\"not provided\"",
+            "400"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "O"
+          ],
+          "then": [
+            "\"not provided\"",
+            "400"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "X"
+          ],
+          "then": [
+            "\"not provided\" (ProfileController.follow 의 @User('email') 부재 시)",
+            "400"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X"
+          ],
+          "then": [
+            "(다음 — self check)",
+            "—"
+          ]
+        }
+      ]
+    }
+  ]
 }

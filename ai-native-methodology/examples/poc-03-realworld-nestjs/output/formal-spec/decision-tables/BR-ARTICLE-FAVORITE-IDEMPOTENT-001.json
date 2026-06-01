@@ -11,13 +11,17 @@
   "error_message": null,
   "current_state": "partial",
   "current_state_note": "★★ App 1중 idempotent / DB level race window — F-135 critical (★ favoriteCount = favorites.length 단조성 보장 부재)",
-  "rendered_md_path": "./BR-ARTICLE-FAVORITE-IDEMPOTENT-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "기대 결과"
+    ],
     "missing_items": [
       "거부 방식 (silent skip vs 409 Conflict)",
       "검증 위치 (App 1중 / DB FOR UPDATE 부재)",
@@ -27,11 +31,125 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "★ App pre-check 제거 + DB UQ pair (user_id, article_id) + catch QueryFailedError → silent skip (idempotent)", "rationale": "★ Sairyss DDD-Hexagon — race-safe + idempotent 동시 보장"},
-    {"item": "검증 위치", "decision": "★★ DB UQ pair + atomic UPDATE counter (★ F-135 fix)", "rationale": "★★ App 1중 isNewFavorite check → 동시 favorite 시 둘 다 isNewFavorite=true 통과 → favoriteCount 2회 증가 race"},
-    {"item": "HTTP status", "decision": "200 (idempotent — RFC 9110 §15.3.1 정합) — NestJS @Post default 201 ❌ → @HttpCode(200) 권고", "rationale": "★ AP-API-001 합산 (F-158)"},
-    {"item": "favoriteCount 보장", "decision": "★★ atomic UPDATE article SET favoriteCount = favoriteCount + 1 (DB level) + @Version optimistic lock 또는 FOR UPDATE", "rationale": "★★ F-135 fix — App 1중 → DB 1중 격상"},
-    {"item": "race window 처리", "decision": "★★ DB UQ pair (user_id, article_id) + atomic counter — App 1중 isNewFavorite check 제거", "rationale": "★★ industry 정설 = race-safe pattern"}
+    {
+      "item": "거부 방식",
+      "decision": "★ App pre-check 제거 + DB UQ pair (user_id, article_id) + catch QueryFailedError → silent skip (idempotent)",
+      "rationale": "★ Sairyss DDD-Hexagon — race-safe + idempotent 동시 보장"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★★ DB UQ pair + atomic UPDATE counter (★ F-135 fix)",
+      "rationale": "★★ App 1중 isNewFavorite check → 동시 favorite 시 둘 다 isNewFavorite=true 통과 → favoriteCount 2회 증가 race"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "200 (idempotent — RFC 9110 §15.3.1 정합) — NestJS @Post default 201 ❌ → @HttpCode(200) 권고",
+      "rationale": "★ AP-API-001 합산 (F-158)"
+    },
+    {
+      "item": "favoriteCount 보장",
+      "decision": "★★ atomic UPDATE article SET favoriteCount = favoriteCount + 1 (DB level) + @Version optimistic lock 또는 FOR UPDATE",
+      "rationale": "★★ F-135 fix — App 1중 → DB 1중 격상"
+    },
+    {
+      "item": "race window 처리",
+      "decision": "★★ DB UQ pair (user_id, article_id) + atomic counter — App 1중 isNewFavorite check 제거",
+      "rationale": "★★ industry 정설 = race-safe pattern"
+    }
   ],
-  "related_findings": ["F-135", "F-151", "F-158"]
+  "related_findings": [
+    "F-135",
+    "F-151",
+    "F-158"
+  ],
+  "decision_grids": [
+    {
+      "context": "일반 분기 (POST /api/articles/:slug/favorite)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "user.favorites 에 article 존재",
+        "isNewFavorite",
+        "App push 실행",
+        "favoriteCount++"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "❌ (신규)",
+            "true",
+            "✅",
+            "✅"
+          ],
+          "then": [
+            "DB 저장",
+            "201 (NestJS default — RFC 위반 / F-158)"
+          ]
+        },
+        {
+          "when": [
+            "✅ (이미)",
+            "false",
+            "❌ (skip)",
+            "❌"
+          ],
+          "then": [
+            "silent skip",
+            "201"
+          ]
+        }
+      ]
+    },
+    {
+      "context": "race-window (F-135 critical)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "시점 T0 동시성"
+      ],
+      "outputs": [
+        "A 결과",
+        "B 결과",
+        "최종 count",
+        "정합성"
+      ],
+      "rules": [
+        {
+          "when": [
+            "1건만"
+          ],
+          "then": [
+            "OK",
+            "(skip)",
+            "N+1",
+            "✅"
+          ]
+        },
+        {
+          "when": [
+            "2건 동시"
+          ],
+          "then": [
+            "push",
+            "push",
+            "N+2",
+            "손실"
+          ]
+        },
+        {
+          "when": [
+            "2건 동시 (DB UQ pair)"
+          ],
+          "then": [
+            "push",
+            "catch ConflictException → silent skip",
+            "N+1",
+            "✅ (fix 후)"
+          ]
+        }
+      ]
+    }
+  ]
 }

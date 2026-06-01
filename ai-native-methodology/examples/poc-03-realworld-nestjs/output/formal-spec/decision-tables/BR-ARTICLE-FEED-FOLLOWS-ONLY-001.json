@@ -11,10 +11,42 @@
   "http_status": 200,
   "error_message": null,
   "current_state": "complete",
-  "rendered_md_path": "./BR-ARTICLE-FEED-FOLLOWS-ONLY-001.md",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "일반",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "user.follows"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "[] (빈)"
+          ],
+          "then": [
+            "{articles: [], articlesCount: 0}",
+            "200"
+          ]
+        },
+        {
+          "when": [
+            "존재"
+          ],
+          "then": [
+            "follows 의 article 만 반환 (검증 OK)",
+            "200"
+          ]
+        }
+      ]
+    }
+  ]
 }

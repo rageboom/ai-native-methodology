@@ -11,13 +11,17 @@
   "error_message": "(uncaught throw → 500/503)",
   "current_state": "partial",
   "current_state_note": "★★ verify 무방어 + 60일 + refresh 부재 + blacklist 부재",
-  "rendered_md_path": "./BR-USER-JWT-EXPIRY-001.md",
   "round_trip_pattern": "Decision Table 형식 — 만료/갱신/블랙리스트 3차원 (Senior 권고)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "현재 상태"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "현재 상태"
+    ],
     "missing_items": [
       "거부 방식 (try/catch 부재 → uncaught)",
       "검증 위치 (3곳 DRY 위반)",
@@ -28,12 +32,150 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "try/catch + UnauthorizedException 401", "rationale": "RFC 9110 §11.6.1 — JWT 만료 = 인증 실패"},
-    {"item": "검증 위치", "decision": "JwtAuthGuard 단일 (DRY) + verify 1곳", "rationale": "★ NestJS 7+ industry 정설 (F-118 fix)"},
-    {"item": "HTTP status", "decision": "401 (만료) — 현재 503 ❌", "rationale": "★ F-118 — try/catch 부재로 uncaught"},
-    {"item": "expiry", "decision": "★ 60일 → 7일 단축 + refresh token 도입 권장", "rationale": "관행 7~14일 (F-119 fix)"},
-    {"item": "refresh policy", "decision": "★ refresh token endpoint 도입 (현재 부재) — separate JWT (refresh exp 30일)", "rationale": "stateless 환경 권장"},
-    {"item": "blacklist policy", "decision": "★ logout endpoint + Redis blacklist (현재 둘 다 부재) — 또는 짧은 expiry 의존", "rationale": "JWT stateless 한계 인지"}
+    {
+      "item": "거부 방식",
+      "decision": "try/catch + UnauthorizedException 401",
+      "rationale": "RFC 9110 §11.6.1 — JWT 만료 = 인증 실패"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "JwtAuthGuard 단일 (DRY) + verify 1곳",
+      "rationale": "★ NestJS 7+ industry 정설 (F-118 fix)"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "401 (만료) — 현재 503 ❌",
+      "rationale": "★ F-118 — try/catch 부재로 uncaught"
+    },
+    {
+      "item": "expiry",
+      "decision": "★ 60일 → 7일 단축 + refresh token 도입 권장",
+      "rationale": "관행 7~14일 (F-119 fix)"
+    },
+    {
+      "item": "refresh policy",
+      "decision": "★ refresh token endpoint 도입 (현재 부재) — separate JWT (refresh exp 30일)",
+      "rationale": "stateless 환경 권장"
+    },
+    {
+      "item": "blacklist policy",
+      "decision": "★ logout endpoint + Redis blacklist (현재 둘 다 부재) — 또는 짧은 expiry 의존",
+      "rationale": "JWT stateless 한계 인지"
+    }
   ],
-  "related_findings": ["F-118", "F-119", "F-149"]
+  "related_findings": [
+    "F-118",
+    "F-119",
+    "F-149"
+  ],
+  "decision_grids": [
+    {
+      "context": "JWT 생성",
+      "inputs": [
+        "시점",
+        "exp"
+      ],
+      "outputs": [
+        "결과",
+        "권고"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "login",
+            "now + 60 days"
+          ],
+          "then": [
+            "token 발급",
+            "7일 + refresh 도입"
+          ]
+        },
+        {
+          "when": [
+            "findById",
+            "now + 60 days"
+          ],
+          "then": [
+            "매번 재생성 (F-118 DRY)",
+            "findById 시 재생성 ❌"
+          ]
+        },
+        {
+          "when": [
+            "findByEmail",
+            "now + 60 days"
+          ],
+          "then": [
+            "매번 재생성",
+            "동일"
+          ]
+        }
+      ]
+    },
+    {
+      "context": "JWT 검증",
+      "inputs": [
+        "Authorization header",
+        "jwt.verify",
+        "exp 검사"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "검증 위치"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "X",
+            "—",
+            "—"
+          ],
+          "then": [
+            "(AuthMiddleware 미적용 시 통과 — F-140)",
+            "200",
+            "(Auth 부재)"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "OK",
+            "exp > now"
+          ],
+          "then": [
+            "req.user 주입 → 통과",
+            "200",
+            "AuthMiddleware"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "OK",
+            "exp <= now"
+          ],
+          "then": [
+            "verify exception → uncaught (F-118)",
+            "503",
+            "try/catch 부재"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "invalid",
+            "—"
+          ],
+          "then": [
+            "verify exception → uncaught",
+            "503",
+            "try/catch 부재"
+          ]
+        }
+      ]
+    }
+  ]
 }

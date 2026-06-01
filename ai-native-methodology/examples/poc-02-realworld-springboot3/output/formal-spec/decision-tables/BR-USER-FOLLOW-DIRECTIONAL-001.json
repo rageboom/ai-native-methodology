@@ -10,7 +10,6 @@
   "http_status": 201,
   "error_message": "(없음 — 정상 흐름)",
   "current_state": "complete",
-  "rendered_md_path": "./BR-USER-FOLLOW-DIRECTIONAL-001.md",
   "natural_language_gap": {
     "explicit": [
       "단방향 UQ",
@@ -32,5 +31,121 @@
       "(A,B) → (B,A) — mutual 정상",
       "(A,A) — self-follow ★ F-074 별도 CHECK 필요"
     ]
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "follow-directional (일반)",
+      "inputs": [
+        "follower",
+        "following",
+        "기존 (A→B)"
+      ],
+      "outputs": [
+        "결과",
+        "의미"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "A",
+            "B",
+            "X"
+          ],
+          "then": [
+            "persist (A→B)",
+            "A 가 B 를 follow"
+          ]
+        },
+        {
+          "when": [
+            "A",
+            "B",
+            "O"
+          ],
+          "then": [
+            "NoOp (idempotent)",
+            "BR-IDEMPOTENT-001"
+          ]
+        },
+        {
+          "when": [
+            "B",
+            "A",
+            "X"
+          ],
+          "then": [
+            "persist (B→A)",
+            "A→B 와 별개 — mutual follow 가능"
+          ]
+        },
+        {
+          "when": [
+            "B",
+            "A",
+            "O"
+          ],
+          "then": [
+            "NoOp (idempotent)",
+            "-"
+          ]
+        },
+        {
+          "when": [
+            "A",
+            "A",
+            "*"
+          ],
+          "then": [
+            "F-074 fix 후 IAE",
+            "BR-FOLLOW-NO-SELF-001"
+          ],
+          "note": "self-follow — F-074 fix 후 IllegalArgumentException"
+        }
+      ],
+      "note": "§2 L1 결정표. 기존(A→B) 컬럼: X=미존재(원문 ❌) / O=존재(원문 ✅). follower/following 쌍이 모두 distinct → UNIQUE."
+    },
+    {
+      "context": "uq-constraint (UQ 위반 / 역방향·self 점검)",
+      "inputs": [
+        "시나리오"
+      ],
+      "outputs": [
+        "UQ 위반?",
+        "결과"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "(A, B) → (A, B)"
+          ],
+          "then": [
+            "O",
+            "DataIntegrityViolation (App pre-check 가 회피)"
+          ]
+        },
+        {
+          "when": [
+            "(A, B) → (B, A)"
+          ],
+          "then": [
+            "X",
+            "정상 persist (mutual)"
+          ]
+        },
+        {
+          "when": [
+            "(A, B) → (A, A)"
+          ],
+          "then": [
+            "X",
+            "F-074 — UQ 가 self-follow 차단 못함 (별도 CHECK 필요)"
+          ]
+        }
+      ],
+      "note": "§3 UQ 분석 (DB constraint) 표. UQ 위반?: O=위반(원문 ✅) / X=위반아님(원문 ❌). uk_user_follow_follower_following UNIQUE(follower_id, following_id) 기준 — 역방향(B,A)·self(A,A) 비위반 확인."
+    }
+  ],
+  "refinement_ref": "../invariants/UserFollow.ts"
 }

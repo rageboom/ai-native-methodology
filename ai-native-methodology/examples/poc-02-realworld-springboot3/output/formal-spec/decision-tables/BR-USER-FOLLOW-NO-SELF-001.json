@@ -10,7 +10,6 @@
   "http_status": 400,
   "error_message": "follower and following must be different",
   "current_state": "absent",
-  "rendered_md_path": "./BR-USER-FOLLOW-NO-SELF-001.md",
   "round_trip_pattern": "F-074 단방향 (Direction A — 자연어 → 형식 → 코드 / Sprint 1 self-reference 함정 회피)",
   "natural_language_gap_quantified": {
     "explicit": 4,
@@ -67,5 +66,147 @@
     "userfollow_constructor_added_lines": 4,
     "db_check_constraint_added_lines": 1,
     "total_code_change": "1글자 변경급 — 형식화 → 작은 코드 + 강한 invariant"
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "follow 시점",
+      "inputs": [
+        "follower null/unknown",
+        "following null/unknown",
+        "follower.id == following.id",
+        "이미 isFollowing"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "검증 위치"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "O",
+            "*",
+            "*",
+            "*"
+          ],
+          "then": [
+            "IAE \"follower is null or unknown user.\"",
+            "400",
+            "UserFollow 생성자 (기존)"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "O",
+            "*",
+            "*"
+          ],
+          "then": [
+            "IAE \"following is null or unknown user.\"",
+            "400",
+            "UserFollow 생성자 (기존)"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "O",
+            "*"
+          ],
+          "then": [
+            "IAE \"follower and following must be different\"",
+            "400",
+            "UserFollow 생성자 (NEW)"
+          ],
+          "note": "F-074 신규 추가 행 (현재 코드 부재)"
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "X",
+            "O"
+          ],
+          "then": [
+            "silent return (BR-IDEMPOTENT-001)",
+            "200",
+            "UserRelationshipService.follow line 27"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X",
+            "X",
+            "X"
+          ],
+          "then": [
+            "persist OK (UQ check)",
+            "201",
+            "DB UQ"
+          ]
+        }
+      ],
+      "note": "★ = F-074 신규 추가 행 (현재 코드 부재). 행1·행2 의 follower.id==following.id 및 isFollowing 컬럼은 원문에서 * (wildcard) 로 표기됨."
+    },
+    {
+      "context": "unfollow 시점 — 일관성 점검",
+      "inputs": [
+        "follower.id == following.id",
+        "isFollowing(A, A)"
+      ],
+      "outputs": [
+        "결과",
+        "비고"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "O",
+            "X"
+          ],
+          "then": [
+            "silent return (애초에 isFollowing=false)",
+            "자연어 unfollow 명세 미적용"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "O"
+          ],
+          "then": [
+            "DELETE",
+            "발생 불가 (follow 자체가 차단됨)"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "X"
+          ],
+          "then": [
+            "silent return",
+            "기존 idempotent 패턴"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "O"
+          ],
+          "then": [
+            "DELETE",
+            "정상 unfollow"
+          ]
+        }
+      ],
+      "note": "F-074 fix 후 self-follow 데이터가 DB 에 존재할 수 없으므로 unfollow self 는 자동으로 NoOp."
+    }
+  ],
+  "refinement_ref": "../invariants/UserFollow.ts"
 }

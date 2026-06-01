@@ -9,5 +9,63 @@
   "verification_location": "source/sqlmap/carMgt.xml selectLeaderUserId + source/java/.../CarMgtServiceImpl.java",
   "current_state": "partial",
   "current_state_note": "FIM 외부 DB 의존 — PFLE_STATUS_CD / USER_FG_HR 코드 분포 본 PoC source ❌ / 'PS10' = 활성 + 'E10' = 직원 의미는 컬럼명 + 사내 컨벤션 추정",
-  "rendered_md_path": "input/formal-spec/decision-tables/BR-CAR-MGT-006.md"
+  "decision_grids": [
+    {
+      "context": "Leader 사용자 식별 (selectLeaderUserId / 일반)",
+      "hit_policy": "FIRST",
+      "inputs": [
+        "PFLE_STATUS_CD",
+        "USER_FG_HR",
+        "USER_ID match"
+      ],
+      "outputs": [
+        "Result"
+      ],
+      "rules": [
+        {
+          "when": [
+            "'PS10' (활성)",
+            "'E10' (직원)",
+            "sessionId == DB USER_ID"
+          ],
+          "then": [
+            "Leader / USER_ID 반환"
+          ]
+        },
+        {
+          "when": [
+            "'PS10'",
+            "'E10'",
+            "sessionId != DB USER_ID"
+          ],
+          "then": [
+            "non-Leader / 0 row"
+          ]
+        },
+        {
+          "when": [
+            "!= 'PS10'",
+            "*",
+            "*"
+          ],
+          "then": [
+            "non-Leader / 0 row"
+          ]
+        },
+        {
+          "when": [
+            "*",
+            "!= 'E10'",
+            "*"
+          ],
+          "then": [
+            "non-Leader / 0 row"
+          ]
+        }
+      ],
+      "note": "단일 L1 결정표 (## 결정 표). 장식 glyph(✅/❌) 제거, Leader/non-Leader 의미 텍스트 보존. 행 3·4 wildcard 가 겹치고 # 순번 존재 → FIRST."
+    }
+  ],
+  "http_status": null,
+  "error_message": null
 }

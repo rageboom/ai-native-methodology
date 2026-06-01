@@ -10,7 +10,6 @@
   "http_status": 200,
   "error_message": "(없음 — silent return)",
   "current_state": "partial",
-  "rendered_md_path": "./BR-USER-FOLLOW-IDEMPOTENT-001.md",
   "natural_language_gap": {
     "explicit": [
       "silent return",
@@ -25,5 +24,76 @@
   "related_findings": [
     "F-095"
   ],
-  "race_window": "AP-API-001 isomorphic — DataIntegrityViolation 미처리 → 500 Error 위험. 해결: try/catch + UQ violation → silent return (idempotent 정합)"
+  "race_window": "AP-API-001 isomorphic — DataIntegrityViolation 미처리 → 500 Error 위험. 해결: try/catch + UQ violation → silent return (idempotent 정합)",
+  "decision_grids": [
+    {
+      "context": "follow 시점",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "이미 isFollowing"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O"
+          ],
+          "then": [
+            "NoOp silent (UserRelationshipService.follow:27 `if (isFollowing) return`)",
+            "200",
+            "RFC 7231 §4.2.2"
+          ]
+        },
+        {
+          "when": [
+            "X"
+          ],
+          "then": [
+            "persist 새 UserFollow",
+            "201",
+            "신규 follow 관계"
+          ]
+        }
+      ]
+    },
+    {
+      "context": "unfollow 시점",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "이미 isFollowing"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O"
+          ],
+          "then": [
+            "DELETE",
+            "204",
+            "정상 unfollow"
+          ]
+        },
+        {
+          "when": [
+            "X"
+          ],
+          "then": [
+            "NoOp silent (UserRelationshipService.unfollow:36 `if (isFollowing) deleteBy`)",
+            "200",
+            "idempotent — 자연어 미명시 (DIRECTIONAL/IDEMPOTENT 어디에도)"
+          ]
+        }
+      ]
+    }
+  ],
+  "refinement_ref": "../invariants/UserFollow.ts"
 }

@@ -11,10 +11,43 @@
   "http_status": null,
   "error_message": null,
   "current_state": "complete",
-  "rendered_md_path": "./BR-ARTICLE-AUTHOR-AUTO-001.md",
   "natural_language_gap_quantified": {
     "explicit": 3,
     "total": 9,
     "coverage_percent": 33
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "create (article author auto-assignment)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "userId 유효",
+        "findOne 결과"
+      ],
+      "outputs": [
+        "결과"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O",
+            "user found"
+          ],
+          "then": [
+            "author 매핑 → article 저장"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "null (user 삭제됨 등)"
+          ],
+          "then": [
+            "uncaught — Article.author = null FK 위반 (F-121 동형)"
+          ]
+        }
+      ],
+      "note": "br_type: domain_invariant — http_status / error_message 부재 의도"
+    }
+  ]
 }

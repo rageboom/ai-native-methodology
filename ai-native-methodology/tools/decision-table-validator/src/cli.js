@@ -1,12 +1,14 @@
 #!/usr/bin/env node
-// decision-table-validator CLI — `npx decision-table-validator <dir-or-file>`.
-// 입력: decision-tables 디렉토리 (또는 단일 .md / .json).
-// 출력: 5종 dmn-check 결과 + JSON sanity. exit code: 0 / 1 (breaking found).
+// decision-table-validator CLI — `npx decision-table-validator <dir-or-file.json>`.
+// 입력: decision-tables 디렉토리 (또는 단일 .json).
+// ★ v12 (json-only / ADR-011) — decision-table = json SSOT. .md 파싱 경로 폐기.
+//   json 필드 sanity 검사 (checkJsonSanity). decision_grids[] = 데이터(LLM SSOT) — 자동 DMN 검사 ❌
+//   (사람-작성 grid 는 비-UNIQUE-hit-policy / 의도적 wildcard 겹침 → 결정적 DMN conflict/overlap 오발).
+//   dmn-check.js (DMN 5종) + parse-md-table.js 는 dormant 유지 (synthetic 단위테스트 / hit_policy='unique' grid 한정 향후 적용).
+// 출력: JSON sanity 결과. exit code: 0 / 1 (breaking found).
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, extname, relative } from 'node:path';
-import { parseMarkdownTables } from './parse-md-table.js';
-import { checkDecisionTable } from './dmn-check.js';
 import { checkJsonSanity } from './json-sanity.js';
 import { readBaseline, classifyAgainstBaseline, writeBaseline, ratchetCheck } from '../../_shared/baseline.js';
 
@@ -19,38 +21,26 @@ function findTargets(dir) {
     let st;
     try { st = statSync(full); } catch { continue; }
     if (st.isDirectory()) continue;
-    if (extname(name) === '.md') {
-      const base = basename(name, '.md');
-      const jsonPath = join(dir, base + '.json');
-      let hasJson = false;
-      try { statSync(jsonPath); hasJson = true; } catch { /* missing */ }
-      out.push({ mdPath: full, jsonPath: hasJson ? jsonPath : null, base });
+    if (extname(name) === '.json') {
+      out.push({ jsonPath: full, base: basename(name, '.json') });
     }
   }
   return out;
 }
 
-function processOne({ mdPath, jsonPath, base }) {
-  const result = { base, mdPath, jsonPath, findings: [] };
-  if (mdPath) {
-    const md = readFileSync(mdPath, 'utf-8');
-    const tables = parseMarkdownTables(md);
-    result.tables_found = tables.length;
-    tables.forEach((t, idx) => {
-      // 첫 번째 컬럼이 "입력 ... " 으로 시작하는 표만 본격 dmn-check (휴리스틱).
-      const looksLikeDecisionTable = t.headers.some((h) => /^(입력|input)/i.test(h)) || t.headers.length >= 2;
-      if (!looksLikeDecisionTable) return;
-      const fs = checkDecisionTable({ ...t, source: `${base}.md table#${idx + 1}` });
-      for (const f of fs) result.findings.push({ ...f, table_index: idx, location: `${base}.md table#${idx + 1}` });
-    });
+function processOne({ jsonPath, base }) {
+  const result = { base, jsonPath, findings: [] };
+  let json;
+  try {
+    json = JSON.parse(readFileSync(jsonPath, 'utf-8'));
+  } catch (e) {
+    result.findings.push({ severity: 'breaking', kind: 'json.parse-error', location: `${base}.json`, message: e.message });
+    return result;
   }
-  if (jsonPath) {
-    const json = JSON.parse(readFileSync(jsonPath, 'utf-8'));
-    const fs = checkJsonSanity(json, jsonPath);
-    for (const f of fs) result.findings.push({ ...f, location: `${base}.json` });
-  } else {
-    result.findings.push({ severity: 'non-breaking', kind: 'pair.json-missing', location: `${base}`, message: `${base}.md has no paired .json` });
-  }
+  const fs = checkJsonSanity(json, jsonPath);
+  for (const f of fs) result.findings.push({ ...f, location: `${base}.json` });
+  // ★ v12 — decision_grids[] = 데이터 (자동 DMN 검사 ❌). grid 구조는 formal-spec.schema.json 이 강제.
+  result.grids_found = Array.isArray(json.decision_grids) ? json.decision_grids.length : 0;
   return result;
 }
 
@@ -69,7 +59,7 @@ function getArgValue(args, name) {
 function main() {
   const args = process.argv.slice(2);
   if (args.length === 0) {
-    console.error('usage: decision-table-validator <dir> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
+    console.error('usage: decision-table-validator <dir-or-file.json> [--json] [--baseline <path>] [--ratchet] [--write-baseline <path>]');
     process.exit(2);
   }
   const target = args[0];
@@ -83,18 +73,14 @@ function main() {
   let targets = [];
   if (st.isDirectory()) {
     targets = findTargets(target);
-  } else if (target.endsWith('.md')) {
-    const base = basename(target, '.md');
-    const jsonPath = target.replace(/\.md$/, '.json');
-    let hasJson = false;
-    try { statSync(jsonPath); hasJson = true; } catch {}
-    targets = [{ mdPath: target, jsonPath: hasJson ? jsonPath : null, base }];
+  } else if (target.endsWith('.json')) {
+    targets = [{ jsonPath: target, base: basename(target, '.json') }];
   } else {
-    console.error(`unsupported target: ${target}`); process.exit(2);
+    console.error(`unsupported target: ${target} (need dir or .json)`); process.exit(2);
   }
 
   const results = targets.map(processOne);
-  const totals = { tables: results.length, breaking: 0, 'non-breaking': 0, info: 0 };
+  const totals = { files: results.length, breaking: 0, 'non-breaking': 0, info: 0 };
   let allFindings = [];
   for (const r of results) {
     const s = summarize(r.findings);
@@ -131,13 +117,13 @@ function main() {
   if (jsonOut) {
     console.log(JSON.stringify({ totals, results, baselineReport }, null, 2));
   } else {
-    console.log(`decision-table-validator — ${results.length} markdown table file(s)`);
+    console.log(`decision-table-validator — ${results.length} decision-table json file(s)`);
     console.log(`  breaking: ${totals.breaking}  non-breaking: ${totals['non-breaking']}  info: ${totals.info}`);
     for (const r of results) {
-      const rel = relative(process.cwd(), r.mdPath);
+      const rel = relative(process.cwd(), r.jsonPath);
       const s = summarize(r.findings);
       console.log(`\n[${r.base}] ${rel}`);
-      console.log(`  ${s.breaking} breaking / ${s['non-breaking']} non-breaking / ${s.info} info — ${r.tables_found ?? 0} table(s) parsed`);
+      console.log(`  ${s.breaking} breaking / ${s['non-breaking']} non-breaking / ${s.info} info — ${r.grids_found ?? 0} decision_grid(s)`);
       for (const f of r.findings.slice(0, 25)) {
         console.log(`  - [${f.severity}] ${f.kind}${f.message ? ' — ' + f.message : ''}`);
       }

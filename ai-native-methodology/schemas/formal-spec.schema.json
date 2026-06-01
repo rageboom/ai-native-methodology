@@ -167,8 +167,63 @@
           },
           "br_type": {
             "type": "string",
-            "enum": ["api", "lifecycle", "domain_invariant", "performance", "security"],
-            "description": "★ v1.2.3 — BR 분류. lifecycle = http_status/error_message null 허용. domain_invariant = entity 생성자 기반. v1.3 격상 시 enum 추가 가능."
+            "enum": ["api", "lifecycle", "domain_invariant", "performance", "security", "authorization"],
+            "description": "★ v1.2.3 — BR 분류. lifecycle = http_status/error_message null 허용. domain_invariant = entity 생성자 기반. ★ v12 — authorization 추가 (poc-16)."
+          },
+          "decision_grids": {
+            "type": "array",
+            "description": "★ v12 (json-only) — 결정 격자 데이터 (★ DMN-inspired / 실행용 아님). .md §L1 결정표 흡수 → json SSOT (LLM 이 결정논리를 json 에서 읽음). ★ 엄밀 DMN/JDM conformant 아님 — DMN/JDM 은 엔진(Drools/ZEN)이 런타임 데이터에 대고 FEEL/ZEN 표현식을 *평가*하는 실행 포맷(컬럼=데이터필드 바인딩 객체 / 셀=FEEL식). 본 grid 는 LLM 이 읽는 *문서* (셀=O/X/* 분석 표식). 따라서 의도적으로 단순 positional shape + 셀 토큰. ★ 셀 범례: \"O\"=true / \"X\"=false / \"*\"=any(don't-care) / 그 외=literal. ★ hit_policy 만 DMN 어휘를 차용해 LLM 이 결정-의미론을 인지(아래). ★ 자동 DMN 결정성 검사(conflict/overlap/gap) 대상 아님 — 사람-grid 는 비-UNIQUE hit-policy(의도적 겹침) 라 오발. hit_policy='UNIQUE' 명시 grid 한정 선택 검사 향후 가능.",
+            "items": {
+              "type": "object",
+              "required": ["context", "inputs", "outputs", "rules"],
+              "properties": {
+                "context": {"type": "string", "description": "시점/분기 (예: signup / updateUserDetails / follow / unfollow / create / 일반 / race-window / 역방향-일관성)."},
+                "hit_policy": {"type": "string", "enum": ["UNIQUE", "FIRST", "PRIORITY", "ANY", "COLLECT"], "description": "DMN hit-policy 의미론 차용 (LLM 결정-의미론 인지용 / 대문자 = DMN 어휘). UNIQUE=규칙 겹침 불가 / FIRST=첫 매칭 승(순서 의미) / PRIORITY=출력 우선순위 / ANY=겹쳐도 동일 출력이면 OK / COLLECT=전부 수집. 선택 (미지정=데이터). key 는 methodology snake_case (값만 DMN 어휘)."},
+                "inputs": {"type": "array", "items": {"type": "string"}, "description": "입력 조건 컬럼명 (DMN input clause label 에 대응 / 단 실행 바인딩 없음)."},
+                "outputs": {"type": "array", "items": {"type": "string"}, "description": "출력/결과 컬럼명 (DMN output clause label 에 대응 — 결과/http/검증위치/안전등급 등)."},
+                "rules": {
+                  "type": "array",
+                  "description": "각 rule = 한 행 (DMN rule 의 positional inputEntry/outputEntry 에 대응). when = 입력 entry 배열(inputs 순서), then = 출력 entry 배열(outputs 순서). ★ DMN inputEntry/outputEntry 는 FEEL 식이나 본 grid 는 O/X/* 분석 표식 (실행용 아님).",
+                  "items": {
+                    "type": "object",
+                    "required": ["when", "then"],
+                    "properties": {
+                      "when": {"type": "array", "items": {"type": ["string", "number", "boolean", "null"]}, "description": "입력 entry — \"O\"/\"X\"/\"*\" 토큰 또는 literal (범례는 decision_grids description)."},
+                      "then": {"type": "array", "items": {"type": ["string", "number", "boolean", "null"]}, "description": "출력 entry — 결과/http/위치 등."},
+                      "note": {"type": "string"}
+                    }
+                  }
+                },
+                "note": {"type": "string", "description": "격자 부가 설명 (★ 행/race window 등)."}
+              }
+            }
+          },
+          "formalization_decisions": {
+            "type": "array",
+            "description": "★ v12 정식화 — .md §형식화 결단 흡수. 자연어 미명시 항목에 대한 의도적 결단 (거부방식/검증위치/HTTP/메시지/일관성 등).",
+            "items": {
+              "type": "object",
+              "required": ["item", "decision"],
+              "properties": {
+                "item": {"type": "string", "description": "미명시 항목."},
+                "decision": {"type": "string", "description": "형식화 시점 결단."},
+                "rationale": {"type": "string", "description": "근거."}
+              }
+            }
+          },
+          "related_findings": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^F-[A-Za-z0-9-]+$"},
+            "description": "★ v12 정식화 — finding-system F-id cross-ref (상세는 finding-system SSOT)."
+          },
+          "refinement_ref": {
+            "type": "string",
+            "description": "★ v12 — L2 Refinement Type / invariant 파일 참조 (invariants/<AggregateRoot>.ts|java). 코드 embed 대신 참조 (가독·중복 회피)."
+          },
+          "generated_code_refs": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "★ v12 — 코드 생성안(Direction D) 파일 참조 (generated-code/...). 코드 embed 대신 참조."
           }
         }
       }

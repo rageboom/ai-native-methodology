@@ -11,10 +11,46 @@
   "http_status": 400,
   "error_message": "email should not be empty",
   "current_state": "complete",
-  "rendered_md_path": "./BR-USER-EMAIL-NOT-BLANK-001.md",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "signup/login email blank 검증 (@IsNotEmpty)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "email 입력",
+        "@IsNotEmpty"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "(blank)",
+            "trigger"
+          ],
+          "then": [
+            "400 BadRequest",
+            "400"
+          ]
+        },
+        {
+          "when": [
+            "(non-blank)",
+            "pass"
+          ],
+          "then": [
+            "(다음 — @IsEmail)",
+            "—"
+          ]
+        }
+      ],
+      "note": "표 제목에 별도 시점 라벨 없음 — @IsNotEmpty validator 분기. valid email 셀은 원문 ✅ (장식 glyph) 만 있어 의미(non-blank)로 보존."
+    }
+  ]
 }

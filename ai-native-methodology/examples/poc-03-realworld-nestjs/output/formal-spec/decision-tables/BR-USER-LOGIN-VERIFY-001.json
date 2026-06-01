@@ -11,13 +11,17 @@
   "error_message": "User not found",
   "current_state": "partial",
   "current_state_note": "★ 메시지 모호 (★ F-150) + Passport ❌ (manual auth)",
-  "rendered_md_path": "./BR-USER-LOGIN-VERIFY-001.md",
   "round_trip_pattern": "B + Senior 권고 D1 (cross-platform 핵심 검증 데이터)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "기대 결과"
+    ],
     "missing_items": [
       "거부 방식 (user 부재 vs password mismatch — 메시지 분리?)",
       "검증 위치 (Passport vs manual)",
@@ -27,16 +31,89 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "throw HttpException 401 (현재 동일)", "rationale": "RealWorld API 관행"},
-    {"item": "검증 위치", "decision": "★ NestJS Passport + LocalStrategy + JwtStrategy (industry 정설) — 현재 manual ❌", "rationale": "F-118 / F-119 / F-150 합산 fix"},
-    {"item": "HTTP status", "decision": "401 (인증 실패)", "rationale": "RFC 9110 §11.6.1"},
-    {"item": "에러 메시지", "decision": "★ 'Invalid credentials' 통일 (정보 노출 회피)", "rationale": "OWASP A07 — user enumeration 방어 (현재 'User not found' 는 user 부재 정보 노출)"},
-    {"item": "rate limiting", "decision": "★ 신규 — @nestjs/throttler 도입 권장 (현재 부재)", "rationale": "OWASP A04 — brute force 방어"}
+    {
+      "item": "거부 방식",
+      "decision": "throw HttpException 401 (현재 동일)",
+      "rationale": "RealWorld API 관행"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★ NestJS Passport + LocalStrategy + JwtStrategy (industry 정설) — 현재 manual ❌",
+      "rationale": "F-118 / F-119 / F-150 합산 fix"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "401 (인증 실패)",
+      "rationale": "RFC 9110 §11.6.1"
+    },
+    {
+      "item": "에러 메시지",
+      "decision": "★ 'Invalid credentials' 통일 (정보 노출 회피)",
+      "rationale": "OWASP A07 — user enumeration 방어 (현재 'User not found' 는 user 부재 정보 노출)"
+    },
+    {
+      "item": "rate limiting",
+      "decision": "★ 신규 — @nestjs/throttler 도입 권장 (현재 부재)",
+      "rationale": "OWASP A04 — brute force 방어"
+    }
   ],
-  "related_findings": ["F-150", "F-153"],
+  "related_findings": [
+    "F-150",
+    "F-153"
+  ],
   "cross_platform_diff": {
     "poc02_spring_security": "UsernamePasswordAuthenticationToken + AuthenticationManager + UserDetailsService — framework-managed (verify 무방어 자동 차단)",
     "poc03_manual": "★ findOne + argon2.verify manual — Passport 미사용 → AP-AUTH-NEST-001 critical 후보",
     "industry_standard_violation": "NestJS 7+ 권장 = @nestjs/passport + LocalStrategy + JwtStrategy"
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "login-verify (L1 결정표)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "user 존재",
+        "argon2.verify"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "메시지"
+      ],
+      "rules": [
+        {
+          "when": [
+            "X",
+            "—"
+          ],
+          "then": [
+            "throw 401",
+            "401",
+            "\"User not found\""
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "X"
+          ],
+          "then": [
+            "throw 401",
+            "401",
+            "\"User not found\" (F-150 모호 — password mismatch 도 같은 메시지)"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "O"
+          ],
+          "then": [
+            "jwt.sign + 200",
+            "200",
+            "(token 반환)"
+          ]
+        }
+      ]
+    }
+  ]
 }

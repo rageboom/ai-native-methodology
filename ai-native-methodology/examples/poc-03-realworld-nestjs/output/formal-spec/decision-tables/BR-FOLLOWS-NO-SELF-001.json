@@ -11,13 +11,17 @@
   "error_message": "FollowerEmail and FollowingId cannot be equal / FollowerId and FollowingId cannot be equal",
   "current_state": "partial",
   "current_state_note": "★ Service 1중 (Domain 부재 + DB CHECK 부재)",
-  "rendered_md_path": "./BR-FOLLOWS-NO-SELF-001.md",
   "round_trip_pattern": "B+A (코드 + 자연어 빈약 보완)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "현재 상태"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "현재 상태"
+    ],
     "missing_items": [
       "검증 위치 (Service / Domain / DB CHECK)",
       "HTTP status (400 vs 422)",
@@ -27,12 +31,205 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "Service throw + Domain invariant + DB CHECK (3중 안전망)", "rationale": "PoC #02 BR-USER-FOLLOW-NO-SELF-001 Sprint 2 결단 동일 — 외부 검증 cross-val ★"},
-    {"item": "검증 위치", "decision": "**Domain (FollowsEntity 생성자)** + Service 보조 + DB CHECK", "rationale": "★ Sairyss DDD-Hexagon 정설 (PoC #02 isomorphic)"},
-    {"item": "HTTP status", "decision": "400 (관행) / RFC 9110 §15.5.21 422 더 적합하나 RealWorld 관행 우선", "rationale": "PoC #02 동일 결단 정합"},
-    {"item": "에러 메시지", "decision": "★ follow / unFollow 메시지 통일 — 'follower and following must be different'", "rationale": "★ F-144 일관성 결여 fix — id 통일"},
-    {"item": "self-check 차원", "decision": "★★ id 통일 (number 비교)", "rationale": "Domain invariant FollowsEntity 생성자에서 id 비교 — string email 비교 ❌"},
-    {"item": "unfollow self", "decision": "silent NoOp (애초에 isFollowing=false)", "rationale": "기존 idempotent 패턴 정합"}
+    {
+      "item": "거부 방식",
+      "decision": "Service throw + Domain invariant + DB CHECK (3중 안전망)",
+      "rationale": "PoC #02 BR-USER-FOLLOW-NO-SELF-001 Sprint 2 결단 동일 — 외부 검증 cross-val ★"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "**Domain (FollowsEntity 생성자)** + Service 보조 + DB CHECK",
+      "rationale": "★ Sairyss DDD-Hexagon 정설 (PoC #02 isomorphic)"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "400 (관행) / RFC 9110 §15.5.21 422 더 적합하나 RealWorld 관행 우선",
+      "rationale": "PoC #02 동일 결단 정합"
+    },
+    {
+      "item": "에러 메시지",
+      "decision": "★ follow / unFollow 메시지 통일 — 'follower and following must be different'",
+      "rationale": "★ F-144 일관성 결여 fix — id 통일"
+    },
+    {
+      "item": "self-check 차원",
+      "decision": "★★ id 통일 (number 비교)",
+      "rationale": "Domain invariant FollowsEntity 생성자에서 id 비교 — string email 비교 ❌"
+    },
+    {
+      "item": "unfollow self",
+      "decision": "silent NoOp (애초에 isFollowing=false)",
+      "rationale": "기존 idempotent 패턴 정합"
+    }
   ],
-  "related_findings": ["F-144", "F-147"]
+  "related_findings": [
+    "F-144",
+    "F-147"
+  ],
+  "decision_grids": [
+    {
+      "context": "follow",
+      "inputs": [
+        "follower null",
+        "username null",
+        "follower.email == following.email",
+        "이미 _follows"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "❌",
+            "*",
+            "*",
+            "*"
+          ],
+          "then": [
+            "follower or username not provided",
+            "400",
+            "NULL guard"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "❌",
+            "*",
+            "*"
+          ],
+          "then": [
+            "follower or username not provided",
+            "400",
+            "NULL guard"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "✅ (email 비교)",
+            "*"
+          ],
+          "then": [
+            "FollowerEmail and FollowingId cannot be equal",
+            "400",
+            "self-check email"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "❌",
+            "✅"
+          ],
+          "then": [
+            "silent skip",
+            "200",
+            "idempotent"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "❌",
+            "❌"
+          ],
+          "then": [
+            "save (FK + UQ pair 부재 = race window)",
+            "200",
+            "F-121"
+          ]
+        }
+      ]
+    },
+    {
+      "context": "unFollow (F-144 일관성 결여)",
+      "inputs": [
+        "follower null",
+        "username null",
+        "follower.id == following.id",
+        "_follows 존재"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "❌",
+            "*",
+            "*",
+            "*"
+          ],
+          "then": [
+            "follower or username not provided",
+            "400",
+            "NULL guard"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "❌",
+            "*",
+            "*"
+          ],
+          "then": [
+            "follower or username not provided",
+            "400",
+            "NULL guard"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "✅ (id 비교)",
+            "*"
+          ],
+          "then": [
+            "FollowerId and FollowingId cannot be equal",
+            "400",
+            "F-144 — id 비교 / email 비교 ❌"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "❌",
+            "❌"
+          ],
+          "then": [
+            "silent NoOp (deleteIndex < 0)",
+            "200",
+            "idempotent"
+          ]
+        },
+        {
+          "when": [
+            "✅",
+            "✅",
+            "❌",
+            "✅"
+          ],
+          "then": [
+            "DELETE",
+            "200",
+            "정상 unfollow"
+          ]
+        }
+      ]
+    }
+  ]
 }

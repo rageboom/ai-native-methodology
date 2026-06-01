@@ -11,10 +11,46 @@
   "http_status": 400,
   "error_message": "username should not be empty",
   "current_state": "complete",
-  "rendered_md_path": "./BR-USER-USERNAME-NOT-BLANK-001.md",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44
-  }
+  },
+  "decision_grids": [
+    {
+      "context": "일반",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "username 입력",
+        "@IsNotEmpty"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "blank",
+            "trigger"
+          ],
+          "then": [
+            "username should not be empty",
+            "400"
+          ]
+        },
+        {
+          "when": [
+            "valid",
+            "pass"
+          ],
+          "then": [
+            "(다음 단계 — duplicate check)",
+            "—"
+          ]
+        }
+      ],
+      "note": ".md \"## 1. 결정표\" 의 단일 L1 표. 셀의 ❌(blank)→\"blank\", ✅ trigger→\"trigger\", ✅→\"valid\", ✅ pass→\"pass\" 로 장식 glyph 제거 후 의미 텍스트 보존."
+    }
+  ]
 }

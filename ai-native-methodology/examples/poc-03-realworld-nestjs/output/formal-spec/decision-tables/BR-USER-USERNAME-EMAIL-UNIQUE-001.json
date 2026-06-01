@@ -11,13 +11,17 @@
   "error_message": "Username and email must be unique.",
   "current_state": "partial",
   "current_state_note": "★ App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
-  "rendered_md_path": "./BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
   "round_trip_pattern": "B (코드 → 형식) — 자연어 빈약 보완",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "액션", "기대 결과", "현재 상태"],
+    "explicit_items": [
+      "트리거",
+      "액션",
+      "기대 결과",
+      "현재 상태"
+    ],
     "missing_items": [
       "거부 방식 (HttpException vs return null vs throw 의 차이)",
       "검증 위치 (Service / Domain / DB UQ — 본 PoC = Service only)",
@@ -27,11 +31,88 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "throw HttpException 400 (현재) / 권장 = 409 ConflictException", "rationale": "RealWorld API 관행 + RFC 9110 권장"},
-    {"item": "검증 위치", "decision": "현재 Service 만 / 권장 = DB UQ 단독 + catch QueryFailedError → ConflictException", "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe"},
-    {"item": "HTTP status", "decision": "400 (현재) / 권장 = 409", "rationale": "RFC 9110 §15.5.10 — 정확한 의미"},
-    {"item": "에러 메시지", "decision": "분리 권장 — 'Username already exists' / 'Email already exists' / 'Both already exist'", "rationale": "Senior Engineer ★ medium (PoC #02 Sprint 1.5 동일 발견)"},
-    {"item": "race window 처리", "decision": "★★ DB UQ 추가 + catch + ConflictException 변환", "rationale": "현재 = undefined behavior (F-120 critical)"}
+    {
+      "item": "거부 방식",
+      "decision": "throw HttpException 400 (현재) / 권장 = 409 ConflictException",
+      "rationale": "RealWorld API 관행 + RFC 9110 권장"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "현재 Service 만 / 권장 = DB UQ 단독 + catch QueryFailedError → ConflictException",
+      "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "400 (현재) / 권장 = 409",
+      "rationale": "RFC 9110 §15.5.10 — 정확한 의미"
+    },
+    {
+      "item": "에러 메시지",
+      "decision": "분리 권장 — 'Username already exists' / 'Email already exists' / 'Both already exist'",
+      "rationale": "Senior Engineer ★ medium (PoC #02 Sprint 1.5 동일 발견)"
+    },
+    {
+      "item": "race window 처리",
+      "decision": "★★ DB UQ 추가 + catch + ConflictException 변환",
+      "rationale": "현재 = undefined behavior (F-120 critical)"
+    }
   ],
-  "related_findings": ["F-120", "F-145", "F-150"]
+  "related_findings": [
+    "F-120",
+    "F-145",
+    "F-150"
+  ],
+  "decision_grids": [
+    {
+      "context": "signup 시점",
+      "inputs": [
+        "App pre 통과",
+        "DB INSERT 충돌"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "검증 위치"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "row 존재",
+            "—"
+          ],
+          "then": [
+            "Username and email must be unique.",
+            "400",
+            "Service"
+          ]
+        },
+        {
+          "when": [
+            "통과",
+            "충돌 (race window)"
+          ],
+          "then": [
+            "undefined — 양쪽 INSERT 성공",
+            "(정합성 손실)",
+            "DB UQ 없음"
+          ],
+          "note": "F-120 critical race window 행 (PoC #02 = 500 / PoC #03 = 양쪽 row 모두 INSERT 성공 = 더 나쁨)"
+        },
+        {
+          "when": [
+            "통과",
+            "INSERT OK"
+          ],
+          "then": [
+            "201 Created",
+            "201",
+            "DB"
+          ]
+        }
+      ],
+      "note": "## 2. L1 결정표 (signup 시점). App pre-check 통과/DB INSERT 충돌 조합. 1행은 DB INSERT 충돌 무관 wildcard(—) → 겹침 의도 = FIRST."
+    }
+  ],
+  "refinement_ref": "../invariants/User.ts"
 }

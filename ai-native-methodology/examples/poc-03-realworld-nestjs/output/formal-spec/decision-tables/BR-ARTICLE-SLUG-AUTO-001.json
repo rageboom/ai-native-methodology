@@ -11,13 +11,17 @@
   "error_message": null,
   "current_state": "partial",
   "current_state_note": "★ DB UQ 부재 (F-120-slug) + ★ slug update 미구현 (F-126 TODO 주석) + ★ random suffix 의존 (F-053-variant — PoC #02 cross-val 변형 재현)",
-  "rendered_md_path": "./BR-ARTICLE-SLUG-AUTO-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "기대 결과"
+    ],
     "missing_items": [
       "거부 방식 (random suffix 충돌 시 — 현재 undefined behavior)",
       "검증 위치 (App 1중 / DB 0중)",
@@ -27,11 +31,126 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "★ DB UQ + catch QueryFailedError → ConflictException 또는 재생성 retry", "rationale": "★ F-120-slug fix — race-safe pattern (Sairyss DDD-Hexagon 정설)"},
-    {"item": "검증 위치", "decision": "★ DB UQ 단독 + App pre-check 제거", "rationale": "★ App pre-check 는 race-prone — DB UQ 가 ground truth"},
-    {"item": "HTTP status", "decision": "충돌 시 409 Conflict (RFC 9110 §15.5.10)", "rationale": "★ slug 가 user 입력 derivative → 의미적으로 conflict"},
-    {"item": "random suffix 정책", "decision": "★ 5 chars (현재 36^5 ≈ 60M) → ★ 7 chars (36^7 ≈ 78B / 충돌 0.001% N=1M) 또는 nanoid 도입 권고", "rationale": "★ N=100K 도달 시 충돌 위험 정량 — 현재 0.08% N=10K"},
-    {"item": "update 정책", "decision": "★★ Article setTitle 시 slug regenerate 의무 (F-126 fix — TODO 주석 해소)", "rationale": "★★ SEO 손실 회피 + 일관성"}
+    {
+      "item": "거부 방식",
+      "decision": "★ DB UQ + catch QueryFailedError → ConflictException 또는 재생성 retry",
+      "rationale": "★ F-120-slug fix — race-safe pattern (Sairyss DDD-Hexagon 정설)"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★ DB UQ 단독 + App pre-check 제거",
+      "rationale": "★ App pre-check 는 race-prone — DB UQ 가 ground truth"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "충돌 시 409 Conflict (RFC 9110 §15.5.10)",
+      "rationale": "★ slug 가 user 입력 derivative → 의미적으로 conflict"
+    },
+    {
+      "item": "random suffix 정책",
+      "decision": "★ 5 chars (현재 36^5 ≈ 60M) → ★ 7 chars (36^7 ≈ 78B / 충돌 0.001% N=1M) 또는 nanoid 도입 권고",
+      "rationale": "★ N=100K 도달 시 충돌 위험 정량 — 현재 0.08% N=10K"
+    },
+    {
+      "item": "update 정책",
+      "decision": "★★ Article setTitle 시 slug regenerate 의무 (F-126 fix — TODO 주석 해소)",
+      "rationale": "★★ SEO 손실 회피 + 일관성"
+    }
   ],
-  "related_findings": ["F-053-variant", "F-120-slug", "F-126"]
+  "related_findings": [
+    "F-053-variant",
+    "F-120-slug",
+    "F-126"
+  ],
+  "decision_grids": [
+    {
+      "context": "create 분기 (POST /api/articles)",
+      "inputs": [
+        "title 정합",
+        "slug-base 생성",
+        "random suffix 생성",
+        "DB INSERT"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP",
+        "비고"
+      ],
+      "hit_policy": "FIRST",
+      "rules": [
+        {
+          "when": [
+            "X (blank)",
+            "*",
+            "*",
+            "*"
+          ],
+          "then": [
+            "title required",
+            "400",
+            "(DTO validator 부재 — F-162)"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "O",
+            "O (60M)",
+            "O"
+          ],
+          "then": [
+            "DB 저장",
+            "201",
+            "정상 (0.08% 충돌 N=10K)"
+          ]
+        },
+        {
+          "when": [
+            "O",
+            "O",
+            "O",
+            "충돌"
+          ],
+          "then": [
+            "undefined behavior",
+            "?",
+            "DB UQ 부재 = 양쪽 row INSERT 성공 (정합성 손실)"
+          ]
+        }
+      ],
+      "note": "row 1 wildcard(*)가 row 2/3 과 의도적 겹침 → FIRST. row 3 = F-120-slug critical race window."
+    },
+    {
+      "context": "update 분기 (PUT /api/articles/:slug)",
+      "inputs": [
+        "title 변경"
+      ],
+      "outputs": [
+        "현재 코드",
+        "결과"
+      ],
+      "hit_policy": "UNIQUE",
+      "rules": [
+        {
+          "when": [
+            "X (title 동일)"
+          ],
+          "then": [
+            "slug 유지",
+            "정상"
+          ]
+        },
+        {
+          "when": [
+            "O (title 변경)"
+          ],
+          "then": [
+            "slug 미업데이트 (TODO 주석)",
+            "SEO 손실 + slug 일관성 결여"
+          ]
+        }
+      ],
+      "note": "F-126: update 시 slug 미업데이트 TODO (article.controller.ts:61). 겹침 없는 유일 매칭 → UNIQUE."
+    }
+  ]
 }

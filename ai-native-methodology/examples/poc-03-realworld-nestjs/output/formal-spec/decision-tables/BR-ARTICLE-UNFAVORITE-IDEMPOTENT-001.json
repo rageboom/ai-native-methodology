@@ -11,13 +11,17 @@
   "error_message": null,
   "current_state": "partial",
   "current_state_note": "★ App level idempotent / ★ DB level race window — favoriteCount 감소 atomic ❌ (F-135 동형) + ApiResponse 201 RFC 위반 (F-158)",
-  "rendered_md_path": "./BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 4,
     "total": 9,
     "coverage_percent": 44,
-    "explicit_items": ["트리거", "조건", "액션", "기대 결과"],
+    "explicit_items": [
+      "트리거",
+      "조건",
+      "액션",
+      "기대 결과"
+    ],
     "missing_items": [
       "거부 방식 (deleteIndex < 0 = silent skip)",
       "검증 위치 (App 1중 / DB FOR UPDATE 부재)",
@@ -27,11 +31,125 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "거부 방식", "decision": "★ DB DELETE WHERE userId AND articleId + 결과 affected_rows 조회 (idempotent)", "rationale": "★ App 1중 deleteIndex check → DB 1중 격상"},
-    {"item": "검증 위치", "decision": "★★ DB level DELETE + atomic UPDATE counter (★ F-135 동형 race window fix)", "rationale": "★★ DB UQ pair (user_id, article_id) 의존 — 양쪽 row 보장"},
-    {"item": "HTTP status", "decision": "204 No Content (RFC 9110 §15.3.5 권고) — NestJS @Delete default 200 ❌ → @HttpCode(204) 권고", "rationale": "★ AP-API-001 합산 (F-158)"},
-    {"item": "favoriteCount 보장", "decision": "★ atomic UPDATE article SET favoriteCount = favoriteCount - 1 (DB level) — App level splice 만 의존 ❌", "rationale": "★ F-135 동형 race window — 동시 unfavorite 시 count 2회 감소 가능"},
-    {"item": "race window 처리", "decision": "★ favorite 와 동일 — DB UQ pair + atomic counter pattern", "rationale": "★ pair 표준 + idempotent 동시 보장"}
+    {
+      "item": "거부 방식",
+      "decision": "★ DB DELETE WHERE userId AND articleId + 결과 affected_rows 조회 (idempotent)",
+      "rationale": "★ App 1중 deleteIndex check → DB 1중 격상"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★★ DB level DELETE + atomic UPDATE counter (★ F-135 동형 race window fix)",
+      "rationale": "★★ DB UQ pair (user_id, article_id) 의존 — 양쪽 row 보장"
+    },
+    {
+      "item": "HTTP status",
+      "decision": "204 No Content (RFC 9110 §15.3.5 권고) — NestJS @Delete default 200 ❌ → @HttpCode(204) 권고",
+      "rationale": "★ AP-API-001 합산 (F-158)"
+    },
+    {
+      "item": "favoriteCount 보장",
+      "decision": "★ atomic UPDATE article SET favoriteCount = favoriteCount - 1 (DB level) — App level splice 만 의존 ❌",
+      "rationale": "★ F-135 동형 race window — 동시 unfavorite 시 count 2회 감소 가능"
+    },
+    {
+      "item": "race window 처리",
+      "decision": "★ favorite 와 동일 — DB UQ pair + atomic counter pattern",
+      "rationale": "★ pair 표준 + idempotent 동시 보장"
+    }
   ],
-  "related_findings": ["F-135", "F-151", "F-158"]
+  "related_findings": [
+    "F-135",
+    "F-151",
+    "F-158"
+  ],
+  "decision_grids": [
+    {
+      "context": "일반 분기 (DELETE /api/articles/:slug/favorite)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "user.favorites 에 article 존재",
+        "deleteIndex",
+        "App splice",
+        "favoriteCount--"
+      ],
+      "outputs": [
+        "결과",
+        "HTTP"
+      ],
+      "rules": [
+        {
+          "when": [
+            "O",
+            ">= 0",
+            "O",
+            "O"
+          ],
+          "then": [
+            "DB UPDATE",
+            "201 (ApiResponse 201 / RFC 위반 — F-158)"
+          ]
+        },
+        {
+          "when": [
+            "X",
+            "-1",
+            "X (skip)",
+            "X"
+          ],
+          "then": [
+            "silent skip",
+            "201"
+          ]
+        }
+      ]
+    },
+    {
+      "context": "race-window (F-135 동형)",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "시점 T0 동시성"
+      ],
+      "outputs": [
+        "A 결과",
+        "B 결과",
+        "최종 count",
+        "정합성"
+      ],
+      "rules": [
+        {
+          "when": [
+            "1건만"
+          ],
+          "then": [
+            "OK",
+            "(skip)",
+            "N-1",
+            "O"
+          ]
+        },
+        {
+          "when": [
+            "2건 동시"
+          ],
+          "then": [
+            "splice",
+            "splice (App 1중)",
+            "N-2",
+            "손실"
+          ]
+        },
+        {
+          "when": [
+            "2건 동시 (DB UQ pair)"
+          ],
+          "then": [
+            "DELETE",
+            "DELETE 0 row affected → silent",
+            "N-1",
+            "O (fix 후)"
+          ]
+        }
+      ]
+    }
+  ]
 }

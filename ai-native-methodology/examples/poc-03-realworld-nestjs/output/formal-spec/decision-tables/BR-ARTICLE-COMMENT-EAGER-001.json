@@ -11,13 +11,16 @@
   "error_message": null,
   "current_state": "partial",
   "current_state_note": "★ N+1 위험 — F-124 (PoC #02 F-051 cross-val 재현 / 3 PoC 권위 → AP-PERFORMANCE-001 medium → high 격상 후보)",
-  "rendered_md_path": "./BR-ARTICLE-COMMENT-EAGER-001.md",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 3,
     "total": 9,
     "coverage_percent": 33,
-    "explicit_items": ["트리거", "액션", "기대 결과"],
+    "explicit_items": [
+      "트리거",
+      "액션",
+      "기대 결과"
+    ],
     "missing_items": [
       "조건 (eager 적용 조건 — 언제든)",
       "거부 방식 (eager loading 자체 — 거부 의미 없음)",
@@ -28,11 +31,80 @@
     ]
   },
   "formalization_decisions": [
-    {"item": "조건 적용 시점", "decision": "★ 모든 Article find — list (findAll) 시 N개 article × M개 comment = N×M+1 queries", "rationale": "★ EAGER default — 명시적 fetch 권고 위반"},
-    {"item": "검증 위치", "decision": "★★ eager:false default + 명시적 relations: ['comments'] 또는 @EntityGraph 사용 (F-124 fix)", "rationale": "★★ Hibernate / TypeORM 정설 = LAZY default + 명시적 fetch"},
-    {"item": "fetch 전략", "decision": "★ relations: ['comments'] (find 시) + @QueryBuilder leftJoinAndSelect (특수 쿼리 시)", "rationale": "★ 명시적 — N+1 회피"},
-    {"item": "성능 측정", "decision": "★ jest + typeorm-query-counter — N+1 detection unit test", "rationale": "★ 회귀 방지"},
-    {"item": "캐싱 전략", "decision": "★ Redis cache for hot articles (별 작업 / Sprint 5+)", "rationale": "★ N+1 fix 후 추가 최적화"}
+    {
+      "item": "조건 적용 시점",
+      "decision": "★ 모든 Article find — list (findAll) 시 N개 article × M개 comment = N×M+1 queries",
+      "rationale": "★ EAGER default — 명시적 fetch 권고 위반"
+    },
+    {
+      "item": "검증 위치",
+      "decision": "★★ eager:false default + 명시적 relations: ['comments'] 또는 @EntityGraph 사용 (F-124 fix)",
+      "rationale": "★★ Hibernate / TypeORM 정설 = LAZY default + 명시적 fetch"
+    },
+    {
+      "item": "fetch 전략",
+      "decision": "★ relations: ['comments'] (find 시) + @QueryBuilder leftJoinAndSelect (특수 쿼리 시)",
+      "rationale": "★ 명시적 — N+1 회피"
+    },
+    {
+      "item": "성능 측정",
+      "decision": "★ jest + typeorm-query-counter — N+1 detection unit test",
+      "rationale": "★ 회귀 방지"
+    },
+    {
+      "item": "캐싱 전략",
+      "decision": "★ Redis cache for hot articles (별 작업 / Sprint 5+)",
+      "rationale": "★ N+1 fix 후 추가 최적화"
+    }
   ],
-  "related_findings": ["F-124"]
+  "related_findings": [
+    "F-124"
+  ],
+  "decision_grids": [
+    {
+      "context": "find-시점-분기",
+      "hit_policy": "UNIQUE",
+      "inputs": [
+        "호출"
+      ],
+      "outputs": [
+        "comments eager:true",
+        "쿼리 수",
+        "메모리"
+      ],
+      "rules": [
+        {
+          "when": [
+            "findOne(slug)"
+          ],
+          "then": [
+            "O",
+            "1 (article) + 1 (comments) = 2",
+            "적음"
+          ]
+        },
+        {
+          "when": [
+            "findAll() N article"
+          ],
+          "then": [
+            "O",
+            "1 (article list) + N (comments) = N+1",
+            "N×M scale"
+          ]
+        },
+        {
+          "when": [
+            "findFeed() N follow article"
+          ],
+          "then": [
+            "O",
+            "1 (feed) + N (comments) = N+1",
+            "N×M scale"
+          ]
+        }
+      ],
+      "note": "§2-A 'find 시점 분기' — 유일 L1 결정표. §2-B(N+1 정량)는 코드블록·산식이라 표 아님→제외. §3 L2 Refinement, §4 코드생성, §5 finding표, §6 PoC cross-val 은 cruft 제외."
+    }
+  ]
 }
