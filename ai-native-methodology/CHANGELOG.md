@@ -9,6 +9,17 @@
 
 ---
 
+## [11.28.0] — 2026-06-01 MINOR — README.md stale 동기화 (front door v11.1.0→현행) + drift-resistant 재구성 + version-sync 가드 (check29)
+
+**plugin user 진입점 README 가 v11.1.0(26 버전 stale) + 카운트(skill 55·도구 22·스키마 46·770 test·22 criterion) 전부 stale → front-door 신뢰도 붕괴 (감사 EXT-MISS-08·EXT-DOC-DRIFT-01). 버전 동기화 + drift-resistant 재구성 + 재발 차단 가드.**
+
+- **버전 동기화**: title `v11.1.0`→`v11.28.0` + `현재` 표기 + install/dist 트리 stale 버전 → `v<version>` placeholder (8 spot). 사내 GHE install URL 은 유지(사내 표준 = 현행 / public-OSS 는 별도 carry).
+- **★ drift-resistant 재구성 (감사 EXT-DOC-DRIFT 교훈 — 카운트 재-stale 회피)**: ① 22-criterion 하드코딩 열거 리스트 → **영역별 요약 + `release:check`/`scripts/release-readiness.js` 출력 pointer**(개수 하드코딩 제거) ② 헤더·dir-tree·prose 의 브리틀 카운트(skill 55·도구 22·스키마 46·analysis 28·770 test) → 제거 또는 "CHANGELOG·/plugin 참조" 위임 ③ "분석 대상 사내 프로젝트"→"분석 대상 프로젝트"(EXT-SCOPE 중립화) ④ 라이선스 절 → `UNLICENSED` 명시(plugin.json 정합).
+- **★ 회귀 가드 check29 `readme_version_sync` (release-readiness 28→29)**: README canonical current-stamp(title `# … vX.Y.Z` + `현재 … vX.Y.Z`) ↔ plugin.json.version sync (check10/CLAUDE.md 동형). ★ history 언급(`v9.0=`/`v11.0.0=`)·`v<version>` placeholder 는 제외 = 오탐 회피.
+- **검증 (no-simulation)**: release-readiness self-test 14/14 (count 28→29 + 신규 id 등재) / **discrimination 실증**(check29 title+현재 추출·history 미추출 오탐 ❌·stale stamp 탐지) / README 잔존 `v11.1.0` 0·stale count 0 검증 / skill-citation 0 stale / workspace 1018 / release-readiness **29/29** / version 3-way 11.28.0.
+- **§8.1 (정직)**: front-door 외부-노출 stale 결함 cleanup (self-referential 과 구분 — plugin user 가 실제로 받는 진입점 / EXT-MISS-08) / check29 = R2 drift enforcement (version 26-버전 stale 재발 차단). ★ 본 release 로 ① "지금 가능한 진짜 결함" bucket **사실상 소진** — 잔여는 ②③(≥2 distinct 도메인 / Type 2 외부 채택 / public-OSS = 새 도메인·조직 결정).
+- **잔여 carry**: dep-graph ≥2 distinct 도메인(A2 usability·FE kinds·A3 dogfood) · Type 2 외부 채택(43 장벽) · public-OSS 공개(조직) · README count-drift 종합 가드(현 version-only / count 가드는 브리틀로 보류). DEC-2026-06-01-readme-sync.
+
 ## [11.27.0] — 2026-06-01 MINOR — 외부-적합성 진짜 결함 cleanup (사내 신원 누출 + 깨진 license + stale adoption 템플릿) + 회귀 가드 2종
 
 **Type 2 외부-준비 감사에서 교차검증된 출하 자산의 진짜 결함 3종 정리 (정직성 / P0 무결성 / 새 도메인 불필요) + 재발 차단 enforcement 2종.**

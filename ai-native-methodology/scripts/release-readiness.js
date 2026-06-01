@@ -1332,6 +1332,39 @@ function check28_adoptionParadigmDrift() {
   }
 }
 
+// ★ check29 (v11.28.0 / EXT-MISS-08·EXT-DOC-DRIFT 회귀 가드) — README.md current-version 표기 ↔ plugin.json sync.
+//   README = plugin user 진입점 front door. version drift(예: title v11.1.0 인데 plugin v11.27.0 = 26 버전 stale)
+//   = 신뢰도 붕괴 + install 오판. check10(CLAUDE.md) 동형 — ★ canonical current-stamp 만 강제
+//   (title `# … vX.Y.Z` + `현재 … vX.Y.Z`). 본문 history 언급(v9.0=/v11.0.0= 등)·`v<version>` placeholder 는 제외(오탐 회피).
+function check29_readmeVersionSync() {
+  try {
+    const pluginJsonPath = join(ROOT, '.claude-plugin/plugin.json');
+    const readmePath = join(ROOT, 'README.md');
+    if (!existsSync(readmePath)) return { id: 'readme_version_sync', pass: false, detail: 'README.md missing', delegated_to: 'README.md' };
+    const pluginVer = JSON.parse(readFileSync(pluginJsonPath, 'utf-8')).version;
+    const readme = readFileSync(readmePath, 'utf-8');
+    const stamps = [];
+    const titleM = readme.match(/^#\s+.*?\bv(\d+\.\d+\.\d+)/m);
+    if (titleM) stamps.push(['title', titleM[1]]);
+    const nowM = readme.match(/현재[^\n]{0,8}\bv(\d+\.\d+\.\d+)/);
+    if (nowM) stamps.push(['현재', nowM[1]]);
+    if (!stamps.some(([k]) => k === 'title')) {
+      return { id: 'readme_version_sync', pass: false, detail: 'README.md title 안 canonical "vX.Y.Z" 표기 부재 (R2 cadence 의무)', delegated_to: 'README.md title ↔ plugin.json.version' };
+    }
+    const mismatches = stamps.filter(([, v]) => v !== pluginVer).map(([k, v]) => `${k} v${v} ↔ plugin.json v${pluginVer}`);
+    return {
+      id: 'readme_version_sync',
+      pass: mismatches.length === 0,
+      detail: mismatches.length === 0
+        ? `README.md canonical version 표기(${stamps.map(([k]) => k).join('+')}) 모두 plugin.json v${pluginVer} 정합 (history 언급·v<version> placeholder 제외 / EXT-MISS-08 회귀 가드 / R2 / check10 동형)`
+        : `drift: ${mismatches.join(' | ')} — README front-door 버전 stale`,
+      delegated_to: 'README.md title `# … vX.Y.Z` + `현재 … vX.Y.Z` ↔ .claude-plugin/plugin.json.version (R2 / check10 동형 / history·placeholder 제외)',
+    };
+  } catch (e) {
+    return { id: 'readme_version_sync', pass: false, detail: `error: ${e.message}`, delegated_to: 'README.md ↔ plugin.json.version' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1365,6 +1398,7 @@ function main() {
     check26_gateValidatorListConsistency(),
     check27_shippedIdentityLeak(),
     check28_adoptionParadigmDrift(),
+    check29_readmeVersionSync(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

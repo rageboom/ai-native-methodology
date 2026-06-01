@@ -1,8 +1,8 @@
-# AI-Native 개발 방법론 v11.1.0 ★ ★ ★ ★ ★ ★
+# AI-Native 개발 방법론 v11.28.0 ★ ★ ★ ★ ★ ★
 
 > 조직의 개발 방식을 AI-Native로 전환하는 **AX(AI Transformation) 마이그레이션** 사내 표준 방법론. **분석 → 발견 → 스펙 → 계획 → 테스트 → 구현** SDLC 6-stage chain harness — AI가 단계별 산출물을 생성하고 사람은 gate에서 검토·결단 (AI 자동화 ~85% / 사람 ≤15%).
 >
-> **현재**: v11.1.0 (2026-05-27) — ★ ★ ★ ★ ★ ★ ★ **v11 paradigm cascade 완결 (BE/FE 산출물 분리 + contract 강제 양 axis)** / 사용자 요구사항 18 모두 청산 (R1~R18 / R16·R17 영구 scope-out) / release-readiness **22/22** strict 통과 / CLAUDE.md ↔ plugin.json drift 자동 enforcement (R2) / **skill 55종 / 도구 22종 / 스키마 46종 / PoC 14종** / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill (React/Vue/Playwright/state-map/visual-manifest/type-spec) / scope·stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT / workspace test **770/770** pass.
+> **현재**: v11.28.0 (2026-06-01) — ★ ★ ★ ★ ★ ★ ★ **v11 paradigm (BE/FE 산출물 분리 + contract 강제 양 axis) + Living dep-graph (analysis↔code 앵커 / A2 drift 동기화)** / 사용자 요구사항 18 모두 청산 (R1~R18 / R16·R17 영구 scope-out) / release-readiness strict 전수 통과 / CLAUDE.md·README ↔ plugin.json version drift 자동 enforcement (R2) / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill (React/Vue/Playwright/state-map/visual-manifest/type-spec) / scope·stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT. (★ 자산 개수·테스트 수 등 정확한 인벤토리는 [CHANGELOG.md](./CHANGELOG.md) 최신 entry 또는 `/plugin` manager 참조 — 본 README 는 버전·카운트 하드코딩을 최소화.)
 >
 > ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수 / AX 전환의 출발 입력). v2.0 paradigm = 분석 stage 위에 chain harness + revisit loop + 70~80% 한계 명시. v3.x = Gap 청산 + enforcement cadence 정착 + 자산 대칭 완성. ★ v9.0 = 6-stage chain (analysis→discovery→spec→plan→test→implement). ★ v10.0.0 = 5 gate 본격 (discovery #1 / spec #2 / plan #3 / test #4 / impl #5 / chain N = gate #N 1:1 INTERNAL CONVENTION). ★ v11.0.0 = BE/FE 산출물 분리 paradigm + contract 강제 양 axis (BE = swagger / FE = state-map + visual-manifest + DTCG token) + ticket = plan stage 단일 (Epic/Story/OP/TASK 4-level).
 >
@@ -48,36 +48,20 @@ OUTPUT: AI-Native 로 운영되는 시스템 + traceability-matrix (UC→BHV→A
 
 ---
 
-## ★ ★ chain harness validated 자격 (§8.1 strict / release-readiness 22/22)
+## ★ ★ chain harness validated 자격 (§8.1 strict / release-readiness)
 
-`npm run release:check` 가 검사하는 22 criterion (전부 ✅ = release-ready):
+`npm run release:check --target v<version>` 가 **§8.1 strict criterion 전수**를 검사 — 전부 ✅ 일 때만 release-ready. 검사 영역(대표):
 
-```
-✅  1. poc_corroboration         10 PoC 본격 (poc-03/04-mini/05/06~11/14)
-✅  2. real_tool_evidence        5종 물증 10 필드 all present / sha256 valid
-✅  3. validators_violation      4 chain validators 0 critical/high
-✅  4. chain_coverage            by_acceptance_criteria=1.0 / threshold 0.85
-✅  5. adr_registry              12 ADR-CHAIN status: 승인됨 + 결정 section
-✅  6. matrix_greenness          forward=1 / backward=1 / green cells
-✅  7. e2e_cycle_pass            pass=6 / fail=0 (chain GREEN)
-✅  8. analysis_validator        schema + br-cross-consistency 0 critical/high
-✅  9. layer_2_consistency       Layer 2 per-PoC mean ≥ 0.7 + drift 0
-✅ 10. claude_md_version_sync    CLAUDE.md "plugin.json vX.Y.Z" 표기 일치 (R2)
-✅ 11. workspace_test_pass       npm test --workspaces 770/770 pass / 0 fail
-✅ 12. authoring_spec_staleness  plugin-authoring-spec §6 공식 docs pin ≤ 60d fresh (R18)
-✅ 13. skill_citation_integrity  active doc 인용 0 stale dead-link
-✅ 14. preflight_tools           core(node+npm) + analysis 외부 도구 present
-✅ 15. graph_integrity           artifact-graph cycle=0 / orphan=0 / unknown=0
-✅ 16. code_pointer_coverage     coverage 100%
-✅ 17. marketplace_stage_sync    marketplace.json ↔ 6-stage chain 표기 일치
-✅ 18. gate_enum_consistency     gate enum 정합 (stage-graph = state.schema = {#1~#5})
-✅ 19. legacy_4_stage_absent     user-facing 문서에 구버전 chain stage·gate 개수 표현 잔존 ❌
-✅ 20. plan_gate_operational     plan stage gate=#3 + validators 등록 ✅
-✅ 21. template_count_drift      _base-apply-template artifact count drift 부재
-✅ 22. be_task_openapi_ref       BE TASK ↔ openapi_endpoint_ref ratchet (missing=0)
-```
+- **PoC corroboration / real-tool evidence (5종 물증)** — 다수 PoC 본격 + sha256 검증된 실 도구 물증 (no-simulation R19 Tier).
+- **chain·matrix coverage / e2e GREEN** — UC→BHV→AC link ≥ 0.85 + traceability matrix green + chain RED→GREEN cycle pass.
+- **validators / analysis / Layer 2 정합** — chain·analysis validator 0 critical/high + Layer 2 per-PoC drift 0.
+- **drift enforcement (R2)** — CLAUDE.md·README ↔ plugin.json version sync + 출하 자산 사내 신원 누출 0 + adoption 템플릿 paradigm 정합.
+- **graph / code-pointer / gate / template 정합** — artifact-graph cycle 0 + code_pointer coverage 100% + gate enum {#1~#5} + template count drift 0.
+- **authoring-spec staleness (R18) / skill-citation / preflight** — 공식 docs pin fresh + active doc 인용 0 stale + 외부 도구 환경 진단.
 
-★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + Modern ORM (MyBatis 3 / TypeORM / JPA QueryDSL) + 사내 Spring 4.1 + iBATIS 2 (PoC #01~#14).
+★ 전체 criterion 목록·개수·상세 = `scripts/release-readiness.js` 또는 `release:check` 출력 (★ 본 README 는 criterion 개수를 하드코딩하지 않음 — drift 회피 / self-test 가 개수·id 정합 보증).
+
+★ ★ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + TypeScript/React FSD + Modern ORM (MyBatis 3 / TypeORM / JPA QueryDSL) + 사내 Spring 4.1 + iBATIS 2 (PoC #01~#16).
 
 ---
 
@@ -88,12 +72,12 @@ OUTPUT: AI-Native 로 운영되는 시스템 + traceability-matrix (UC→BHV→A
 ### 사전 요구사항
 
 - Claude Code 설치 (★ plugin 시스템 지원)
-- 분석 대상 사내 프로젝트 git clone (analysis stage 입력 자산)
+- 분석 대상 프로젝트 git clone (analysis stage 입력 자산)
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 - (★ Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
-- Node ≥ 18 (chain-driver / 22 workspace tool 실행)
+- Node ≥ 18 (chain-driver / workspace tool 실행)
 
-### 사용법 — Plugin install (★ v11.1.0)
+### 사용법 — Plugin install
 
 #### A. 편집자 — 워크스페이스 직접 등록 (Phase A self-iteration)
 
@@ -104,7 +88,7 @@ OUTPUT: AI-Native 로 운영되는 시스템 + traceability-matrix (UC→BHV→A
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
 /plugin install ai-native-methodology@mis-plugins
 /reload-plugins
-/plugin                  # 대화형 manager — Installed 탭에서 v11.1.0 확인
+/plugin                  # 대화형 manager — Installed 탭에서 최신 버전 확인
 ```
 
 #### B. 배포 수신자 — 사내 사용자 install (★ 사내 표준)
@@ -126,7 +110,7 @@ gh auth login --hostname github.smilegate.net
 특정 버전 pin (★ 권장 — git tag):
 
 ```bash
-/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v11.1.0
+/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v<version>
 /plugin install ai-native-methodology@mis-plugins
 ```
 
@@ -163,8 +147,8 @@ npm run version:check       # 3-way sync 검증 단독
 npm run build               # version-check 강제 → dist/ 생성 + CHECKSUMS.txt
 npm run build:check         # dry-run (file count 만 출력)
 npm run build:diff-check    # build 후 git diff exit-code 0 검증 (CI 용)
-npm run release:check       # §8.1 strict 22/22 자동 검사
-npm run test                # workspace 22 tool unit test (770 test pass)
+npm run release:check       # §8.1 strict criterion 전수 자동 검사
+npm run test                # workspace tool unit test (전수 pass / 0 fail)
 ```
 
 ★ 분석 대상 사내 프로젝트 디렉토리에서 새 Claude Code 세션 시작 → SessionStart hook 메시지 ("chain harness ready") 표시 시 정상 작동.
@@ -188,7 +172,7 @@ npm run test                # workspace 22 tool unit test (770 test pass)
 
 ★ aspect skill 4종 (a11y / i18n / static-security / legacy) = 코드베이스 시그널 자동 매칭. cross_cutting (phase 무관).
 
-#### 시나리오 B — chain harness e2e (★ v11.1.0 paradigm)
+#### 시나리오 B — chain harness e2e (★ 6-stage paradigm)
 
 ```
 1. chain-driver init <project>      → state.json 초기화
@@ -229,9 +213,9 @@ npm run test                # workspace 22 tool unit test (770 test pass)
 ## 디렉토리 구조 (dist artifact 기준)
 
 ```
-dist/ai-native-methodology-v11.1.0/
+dist/ai-native-methodology-v<version>/
 ├── .claude-plugin/
-│   ├── plugin.json                   v11.1.0 manifest
+│   ├── plugin.json                   v<version> manifest
 │   └── marketplace.json              git-subdir source (자기완결)
 ├── CLAUDE.md                         ★ 사내 적용 정책 inline (자동 로드)
 ├── README.md                         ← 본 파일 (plugin user 진입점)
@@ -240,9 +224,9 @@ dist/ai-native-methodology-v11.1.0/
 ├── CHECKSUMS.txt                     SHA256 manifest (무결성 검증)
 │
 ├── agents/                           6 chain stage agent (analysis/discovery/spec/plan/test/implement) + design placeholder + _base 3 persona
-├── skills/                           ★ 55 skill (flat 디렉토리 / 의미 ID)
-│   ├── _base-*                       5 — invoke-go-stop-gate / build-traceability-matrix / log-finding / apply-template / apply-baseline-ratchet
-│   ├── analysis-*                    28 — phase 0~6 + aspect 4 (a11y/i18n/static-security/legacy) + 입력 어댑터(figma/swagger/plan-doc/prompt) + FE(form/type/ui-state-map/ui-visual-manifest/html)
+├── skills/                           ★ skill (flat 디렉토리 / 의미 ID / 개수는 CHANGELOG·/plugin 참조)
+│   ├── _base-*                       invoke-go-stop-gate / build-traceability-matrix / log-finding / apply-template / apply-baseline-ratchet
+│   ├── analysis-*                    phase 0~6 + aspect 4 (a11y/i18n/static-security/legacy) + 입력 어댑터(figma/swagger/plan-doc/prompt) + FE(form/type/ui-state-map/ui-visual-manifest/html)
 │   ├── discovery-*                   6 — from-{analysis-output,swagger,figma,nl-md} / decompose-use-cases / identify-business-intent
 │   ├── spec-*                        3 — compose-behavior-spec / derive-acceptance-criteria / integrate-deliverables
 │   ├── plan-*                        3 — decompose-and-sequence / architect-decisions / risk-and-nfr (★ v10.0.0 본격)
@@ -257,7 +241,7 @@ dist/ai-native-methodology-v11.1.0/
 │   ├── analysis.phase-flow.{json,mermaid}  v1.x 자산 (chain 1 진입 전)
 │   └── {discovery,spec,plan,test,implement}.phase-flow.{json,mermaid}
 │
-├── tools/                            ★ 22 workspace tool (npm workspace / 770 unit test)
+├── tools/                            ★ workspace tool (npm workspace / 개수·test 수는 CHANGELOG 참조)
 │   ├── chain-driver/                 ★ harness driver (cli + module / gate trio enforcement)
 │   ├── drift-validator/              .json ↔ .md/.mermaid 동일성 + chain layout + state-flow + outputs 비교
 │   ├── schema-validator/             chain 산출물 schema 검증
@@ -289,7 +273,7 @@ dist/ai-native-methodology-v11.1.0/
 │   ├── skills-axis.md                ★ phase ID ↔ skills 디렉토리 axis 분리 정책
 │   ├── glossary-ko.md / id-conventions.md / finding-system.md / be-fe-separation.md
 │
-└── schemas/                          ★ 46 JSON Schema (모두 top-level additionalProperties:false strict)
+└── schemas/                          ★ JSON Schema (모두 top-level additionalProperties:false strict / 개수는 CHANGELOG 참조)
     ├── chain: discovery-spec / behavior-spec / acceptance-criteria / task-plan / test-spec / impl-spec / traceability-matrix
     ├── contract: openapi-extension / state-map / visual-manifest / (DTCG token)
     ├── dep-graph: artifact-graph-node / artifact-graph-edge / code-pointer
@@ -314,7 +298,7 @@ dist/ai-native-methodology-v11.1.0/
 
 ---
 
-## 검증 도구 사용 (22 workspace tool / npm workspace)
+## 검증 도구 사용 (workspace tool / npm workspace)
 
 ```bash
 # Chain harness driver (★ 진입)
@@ -384,7 +368,7 @@ CI 자동화 = `.github/workflows/drift-check.yml` (PR / nightly / manual dispat
 
 ## 라이선스
 
-(사내 표준 — 외부 공개 시 결정)
+**UNLICENSED** (사내 표준 / 외부 미공개 — de facto all-rights-reserved). `plugin.json.license` 정합. 외부 OSS 공개는 별도 조직 결단 시 SPDX 라이선스 신설.
 
 ---
 
