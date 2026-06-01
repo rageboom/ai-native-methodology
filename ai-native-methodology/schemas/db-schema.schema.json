@@ -28,8 +28,8 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "테이블 이름 (snake_case)",
-            "pattern": "^[a-z][a-z0-9_]*$"
+            "description": "테이블 이름 (snake_case 또는 Modern ORM 매핑 — Prisma/TypeORM default PascalCase / camelCase / 선두 _ join 테이블 허용)",
+            "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
           },
           "description": {
             "type": "string"
@@ -55,7 +55,8 @@
               "properties": {
                 "name": {
                   "type": "string",
-                  "pattern": "^[a-z][a-z0-9_]*$"
+                  "description": "컬럼 이름 (snake_case 또는 Modern ORM camelCase — Prisma/TypeORM)",
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
                 },
                 "type": {
                   "type": "string",

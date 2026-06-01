@@ -9,6 +9,15 @@
 
 ---
 
+## [11.30.0] — 2026-06-01 MINOR — db-schema 명명 패턴 legacy 편향 완화 (Modern ORM PascalCase/camelCase 수용 / F-ECOM-001 / ② ecommerce-backend dogfood 표면화)
+
+**② ≥2 distinct 도메인 dogfood (`alvaromrveiga/ecommerce-backend` NestJS+Prisma+PostgreSQL / Type 1.5) 가 표면화 — `schemas/db-schema.schema.json` 의 table·column `name` 패턴 `^[a-z][a-z0-9_]*$` (소문자 snake_case 강제) 가 Prisma 기본 매핑(model명=PascalCase `User`/`UserTokens`/`_CategoryToProduct` / field명=camelCase `userId`/`urlName`/`discountPercentage`) 을 첫 검증부터 RED. 1st 도메인(RealWorld MyBatis/SQLite snake_case)=통과 / 2nd 도메인(Prisma)=11+ pattern 위반 = 패턴이 우연히 legacy 명명 관행에만 맞은 편향. Modern ORM(Prisma/TypeORM default/JPA naming-strategy 미설정) 외부 사용자 차단.**
+
+- **변경 (additive / 회귀 0 구조적 보장)**: table name(schema L32) + column name(L58) 패턴 → `^[A-Za-z_][A-Za-z0-9_]*$` (대소문자 + 선두 `_` 허용). snake_case ⊂ 신패턴 = strictly more permissive → 기존 valid schema 전부 valid 유지. 선두 `_` = Prisma 암묵 join 테이블(`_CategoryToProduct`) 수용. description 갱신("snake_case" → "snake_case 또는 Modern ORM PascalCase/camelCase").
+- **검증 (no-simulation / 실 실행)**: 구패턴 reject 단언 test 부재 확인 + ecommerce schema.json naming 위반 5→0 (통과) + workspace **1037 pass / 0 fail** (회귀 0 / v11.29.0 baseline 유지) + schema-validator canonical 40/40 + 3-way version 11.30.0.
+- **★ ② dogfood 동반 성과 (Type 1.5 / .aimd 산출물 = dogfood repo 한정 / 본 release 미포함)**: chain 1~5 완주 全 schema-valid + traceability 30 cells forward/backward 100% green + **실 GREEN 56 jest test**(RealWorld env-blocked 넘어선 chain 5 GREEN 게이트 2nd-domain 첫 실증) + A2 worktree 라이브 content_drift 탐지 + Slice4 db-schema→DDL Prisma migration 앵커(synthesizer "독립가치 ≥2 도메인 carry" 해소). §8.1 corroboration: A2/code-pointer/Slice4 = 2nd distinct domain 충족 방향.
+- **잔여 carry**: F-ECOM-004 (graph orphan edge 미합성 / generic to_analysis_artifacts → cross_reference edge / RealWorld F-DOGFOOD-010 corroboration) · F-ECOM-005 (skill 본문 db-schema source_files 안내 보강) · S2 gate WARN→block(도구 자체 미실행) · FE kinds(BE-only repo → FE 2nd 도메인 부재) · Type 2(외부 사용자). DEC-2026-06-01-db-schema-naming-modern-orm.
+
 ## [11.29.0] — 2026-06-01 MINOR — Type 2 adopter corroboration 캡처 배선 (schema + packager 도구 + check30 + suggest 트리거 / EXT-CAPTURE 해소)
 
 **Phase 1 외부-준비 감사가 capture readiness 0.08(최대 공백) 진단 — 외부 adopter(Type 2)가 chain harness 1 cycle 완주해도 결과를 담을 schema·트리거·익명화·수집경로 전무. 그 '배선'을 신설 (★ 정직: 배선 = necessary not sufficient / Type 2 '측정'은 실 외부 adopter 실행 시 발생 / 본 release 측정=0).**
