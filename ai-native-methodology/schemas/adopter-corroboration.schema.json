@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/adopter-corroboration.schema.json",
+  "title": "Adopter Corroboration (Type 2 외부 채택 evidence)",
+  "description": "★ v11.29.0 — 외부 adopter(Type 2)가 자기 실 프로젝트에 plugin install → chain harness 1 cycle 완주 시 캡처되는 익명화 corroboration evidence 데이터 계약. plan-type2-external-adoption.md §Phase 1 감사 EXT-CAPTURE-01 해소. adopter-evidence-packager 가 .aimd/state.json + scope manifest + findings + traceability-matrix 합성 → PII 익명화 → 본 schema 검증 → .aimd/output/adopter-corroboration.json. ★ 정직: 본 schema 존재 = 캡처 '배선' / Type 2 '측정'은 실 adopter 실행 시 발생 (no-simulation). work-unit-manifest.scenario + state.last_gate 재사용.",
+  "type": "object",
+  "required": ["schema_version", "plugin_version", "captured_at", "adopter", "project", "chain_run", "findings_summary", "anonymization"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema_origin": {
+      "type": "string",
+      "description": "참조 schema 상대 경로 (관행)."
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "본 corroboration schema 버전 (forward-only)."
+    },
+    "plugin_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+",
+      "description": "adopter 가 실행한 방법론 plugin 버전 (plugin.json.version)."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "adopter": {
+      "type": "object",
+      "required": ["adopter_id", "org_type"],
+      "additionalProperties": false,
+      "properties": {
+        "adopter_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8,64}$",
+          "description": "★ opaque 가명화 ID = sha256(salt + adopter 식별자) 선두 hex (비가역 / PII 아님 / 업계 가명화 관행 — salt=rainbow-table 회피). 실명·이메일·사내 host 금지."
+        },
+        "org_type": {
+          "type": "string",
+          "enum": ["internal-team", "external-oss", "individual", "undisclosed"],
+          "description": "채택 주체 분류 (PII 아님 / 익명 집계용)."
+        }
+      }
+    },
+    "project": {
+      "type": "object",
+      "required": ["project_hash", "stack_signals", "scenario"],
+      "additionalProperties": false,
+      "properties": {
+        "project_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8,64}$",
+          "description": "★ opaque project 식별 = sha256(salt + project 식별자) 선두 hex (비가역). 프로젝트명·경로 금지."
+        },
+        "stack_signals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "description": "기술 스택 신호 (예: nestjs, prisma, postgres). free-text → packager redaction 통과 (사내 host 등 제거)."
+        },
+        "scenario": {
+          "type": "string",
+          "enum": ["S1", "S2", "S3", "greenfield"],
+          "description": "use-scenario taxonomy (work-unit-manifest.scenario 재사용 / S2=AX전환 주 타깃)."
+        },
+        "loc_bucket": {
+          "type": "string",
+          "enum": ["<1k", "1k-10k", "10k-100k", "100k+", "undisclosed"],
+          "description": "★ REVISE-4 — 정확 LOC 는 re-identification vector → 구간 enum 고정 (drift 방지). optional."
+        }
+      }
+    },
+    "chain_run": {
+      "type": "object",
+      "required": ["completed", "gates"],
+      "additionalProperties": false,
+      "properties": {
+        "completed": {
+          "type": "boolean",
+          "description": "chain harness 1 cycle (discovery→implement / gate #1~#5) 완주 여부."
+        },
+        "terminal_stage": {
+          "type": "string",
+          "enum": ["discovery", "spec", "plan", "test", "implement"],
+          "description": "도달한 마지막 stage (중단 시 stop 지점)."
+        },
+        "gates": {
+          "type": "array",
+          "description": "★ state.last_gate shape 재사용 — gate #1~#5 별 결정 + validator finding 카운트.",
+          "items": {
+            "type": "object",
+            "required": ["id", "stage", "decision"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "enum": ["#1", "#2", "#3", "#4", "#5"] },
+              "stage": { "type": "string", "enum": ["discovery", "spec", "plan", "test", "implement"] },
+              "decision": { "type": "string", "enum": ["go", "stop", "revisit"] },
+              "validator_findings": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "critical": { "type": "integer", "minimum": 0 },
+                  "high": { "type": "integer", "minimum": 0 },
+                  "medium": { "type": "integer", "minimum": 0 },
+                  "low": { "type": "integer", "minimum": 0 },
+                  "info": { "type": "integer", "minimum": 0 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings_summary": {
+      "type": "object",
+      "required": ["total"],
+      "additionalProperties": false,
+      "properties": {
+        "critical": { "type": "integer", "minimum": 0 },
+        "high": { "type": "integer", "minimum": 0 },
+        "medium": { "type": "integer", "minimum": 0 },
+        "low": { "type": "integer", "minimum": 0 },
+        "info": { "type": "integer", "minimum": 0 },
+        "total": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "optional — chain 4/5 coverage metric (3 metric 분리 / ADR-010 v2 정합).",
+      "properties": {
+        "link_coverage": { "type": "number", "minimum": 0, "maximum": 1 },
+        "test_pass_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+        "line_branch_coverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "user_feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "optional — adopter 자유 피드백 (packager redaction 통과 / PII 제거).",
+      "properties": {
+        "summary": { "type": "string", "maxLength": 2000 },
+        "friction_points": {
+          "type": "array",
+          "items": { "type": "string", "maxLength": 500 }
+        }
+      }
+    },
+    "anonymization": {
+      "type": "object",
+      "required": ["applied", "redaction_count", "method"],
+      "additionalProperties": false,
+      "description": "★ PII 제거 provenance (EXT-CAPTURE-03).",
+      "properties": {
+        "applied": { "type": "boolean" },
+        "redaction_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "redact 된 free-text PII 토큰 수."
+        },
+        "method": {
+          "type": "string",
+          "description": "★ 정직 — 'best-effort regex (false-negative 가능) + post-redaction leak guard' (official-docs VERIFIED: regex redaction=best-effort)."
+        }
+      }
+    }
+  }
+}

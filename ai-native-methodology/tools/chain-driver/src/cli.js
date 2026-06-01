@@ -320,6 +320,21 @@ function cmdNext(args) {
     `mode=verification + parent_epic=<existing-epic-key>. ` +
     `R20 / DEC-2026-05-20-r20-verification-mode.\n`
   );
+  // ★ v11.29.0 — Type 2 adopter corroboration 캡처 auto-suggest (terminal 전용 / EXT-CAPTURE-05).
+  //   gate #5(implement→terminal / !next) 통과 = chain 1 cycle 완주 → adopter-evidence-packager 안내.
+  //   ★ suggest-not-autofire (Senior REVISE-1 / official-docs consent): adopter proprietary 코드 hash/stack 을
+  //      동의 없이 auto-write ❌ — adopter 명시 실행 의무 (ticket-sync R20 confirmation gate 동질 / 데이터 주권).
+  if (!next) {
+    process.stderr.write(
+      `[chain-driver] ★ adopter-corroboration capture suggest (chain 1 cycle 완주 / terminal): ` +
+      `외부 채택(Type 2) corroboration 을 남기려면 adopter-evidence-packager 실행 권장 (opt-in) — ` +
+      `node tools/adopter-evidence-packager/src/cli.js --state .aimd/state.json ` +
+      `[--manifest .aimd/<scope>/manifest.json --findings <f> --matrix .aimd/output/matrix.json ` +
+      `--stack <csv> --org-type <enum> --salt <s>]. ` +
+      `익명화(PII redaction + leak guard) 후 .aimd/output/adopter-corroboration.json 생성. ` +
+      `자동 전송 ❌ (데이터 주권 / 명시 공유 시 maintainer 에 전달). EXT-CAPTURE-05.\n`
+    );
+  }
   process.stdout.write(JSON.stringify({ stage, advanced_to: next, gate: finalDecision }, null, 2) + '\n');
   process.exit(0);
 }

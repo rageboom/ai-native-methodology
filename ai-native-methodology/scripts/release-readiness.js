@@ -42,6 +42,8 @@ import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+// ★ v11.29.0 REVISE-2 — PII / 사내 신원 패턴 SSOT (regex 복사 ❌ / drift attractor 회피). check27 + adopter-evidence-packager 공용.
+import { INTERNAL_IDENTITY_RE } from '../tools/_shared/pii-patterns.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1271,7 +1273,7 @@ function check26_gateValidatorListConsistency() {
 function check27_shippedIdentityLeak() {
   try {
     const SHIPPED_DIRS = ['skills', 'agents', 'templates'];
-    const IDENTITY_RE = /smilegate\.(com|net)|sangcl/i;
+    const IDENTITY_RE = INTERNAL_IDENTITY_RE; // ★ v11.29.0 REVISE-2 — SSOT (tools/_shared/pii-patterns.js / byte-identical)
     const hits = [];
     for (const dir of SHIPPED_DIRS) {
       const base = join(ROOT, dir);
@@ -1365,6 +1367,49 @@ function check29_readmeVersionSync() {
   }
 }
 
+// ★ check30 (v11.29.0 / EXT-CAPTURE-01·05 캡처 채널 drift enforcement) — Type 2 adopter corroboration 배선 무결.
+//   content-aware (file-presence ❌ / Senior F3): ① schema draft-2020-12+strict ② packager bin ③ golden round-trip
+//   (fixture → exit 0 + ok) ④ leak-guard discrimination (poisoned --no-redact → exit 1). 배선만 보증 / 측정 ❌.
+function check30_adopterCorroborationCapture() {
+  try {
+    const schemaPath = join(ROOT, 'schemas/adopter-corroboration.schema.json');
+    const cli = join(ROOT, 'tools/adopter-evidence-packager/src/cli.js');
+    const fixtureState = join(ROOT, 'tools/adopter-evidence-packager/test/fixtures/state.json');
+    if (!existsSync(schemaPath)) return { id: 'adopter_corroboration_capture', pass: false, detail: 'adopter-corroboration.schema.json missing', delegated_to: 'schemas/adopter-corroboration.schema.json' };
+    if (!existsSync(cli)) return { id: 'adopter_corroboration_capture', pass: false, detail: 'adopter-evidence-packager bin missing', delegated_to: 'tools/adopter-evidence-packager' };
+    if (!existsSync(fixtureState)) return { id: 'adopter_corroboration_capture', pass: false, detail: 'packager fixture state.json missing', delegated_to: 'tools/adopter-evidence-packager/test/fixtures' };
+
+    const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+    if (schema.$schema !== 'https://json-schema.org/draft/2020-12/schema') return { id: 'adopter_corroboration_capture', pass: false, detail: 'schema $schema ≠ draft-2020-12', delegated_to: 'schemas/adopter-corroboration.schema.json' };
+    if (schema.additionalProperties !== false) return { id: 'adopter_corroboration_capture', pass: false, detail: 'schema top-level additionalProperties ≠ false (strict 의무)', delegated_to: 'schemas/adopter-corroboration.schema.json' };
+
+    const pluginVer = JSON.parse(readFileSync(join(ROOT, '.claude-plugin/plugin.json'), 'utf-8')).version;
+    const base = ['--state', fixtureState, '--stack', 'nestjs', '--salt', 'rr', '--captured-at', '2026-06-01T00:00:00Z', '--plugin-version', pluginVer, '--json'];
+
+    // ③ golden round-trip — dry-run (파일 미작성) → exit 0 + ok.
+    const golden = spawnSync('node', [cli, ...base, '--dry-run'], { cwd: ROOT, encoding: 'utf-8', shell: false });
+    let goldenOk = false;
+    try { goldenOk = golden.status === 0 && JSON.parse(golden.stdout).ok === true; } catch { goldenOk = false; }
+
+    // ④ leak-guard discrimination — poisoned(--no-redact + email) → exit 1 + reason pii_leak (content-aware 입증).
+    const poisoned = spawnSync('node', [cli, ...base, '--no-redact', '--feedback', 'reach dev@example.com'], { cwd: ROOT, encoding: 'utf-8', shell: false });
+    let leakCaught = false;
+    try { leakCaught = poisoned.status === 1 && JSON.parse(poisoned.stdout).reason === 'pii_leak'; } catch { leakCaught = false; }
+
+    const pass = goldenOk && leakCaught;
+    return {
+      id: 'adopter_corroboration_capture',
+      pass,
+      detail: pass
+        ? `Type 2 캡처 배선 무결 — schema draft-2020-12+strict + packager golden round-trip exit 0 + leak-guard discrimination(poisoned exit 1 pii_leak) (★ 배선만 보증 / Type 2 측정=실 adopter 의존 / EXT-CAPTURE-01·05)`
+        : `캡처 배선 결함 — golden_ok=${goldenOk} leak_caught=${leakCaught} (golden exit ${golden.status} / poisoned exit ${poisoned.status})`,
+      delegated_to: 'tools/adopter-evidence-packager (golden+poisoned round-trip) + schemas/adopter-corroboration.schema.json',
+    };
+  } catch (e) {
+    return { id: 'adopter_corroboration_capture', pass: false, detail: `error: ${e.message}`, delegated_to: 'tools/adopter-evidence-packager + schemas/adopter-corroboration.schema.json' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1399,6 +1444,7 @@ function main() {
     check27_shippedIdentityLeak(),
     check28_adoptionParadigmDrift(),
     check29_readmeVersionSync(),
+    check30_adopterCorroborationCapture(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

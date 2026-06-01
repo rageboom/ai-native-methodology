@@ -97,6 +97,23 @@ bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --cha
 - stop → carry 등재.
 - revisit:<stage> → §3 분류 결과 적용.
 
+### 9. (외부 채택 / opt-in) adopter corroboration 캡처
+
+★ gate #5 go = chain 1 cycle (discovery→implement) 완주 = terminal. 외부 adopter(Type 2)가 자기 실 프로젝트에 적용한 경우, corroboration evidence 를 남길지 **사용자 명시 결단** (opt-in / consent — 자동 캡처 ❌ / 데이터 주권):
+
+```bash
+node tools/adopter-evidence-packager/src/cli.js \
+  --state .aimd/state.json \
+  --manifest .aimd/<scope>/manifest.json \
+  --findings <findings.json> \
+  --matrix .aimd/output/matrix.json \
+  --stack <csv> --org-type <internal-team|external-oss|individual|undisclosed> --salt <s>
+```
+
+- 익명화 (PII best-effort redaction + post-redaction leak guard) 후 `.aimd/output/adopter-corroboration.json` 생성 (schema = `schemas/adopter-corroboration.schema.json`).
+- ★ 자동 전송 ❌ — adopter 가 명시 공유할 때만 maintainer 에 전달 (§8.1 ≥2 distinct domain corroboration 채널 / EXT-CAPTURE-05).
+- ★ 정직: 본 단계 = 캡처 '배선' / Type 2 '측정'은 실 외부 adopter 실행 시 발생 (no-simulation).
+
 ## ★ ★ ★ no-simulation 강화 (chain 5 핵심)
 
 본 skill = **★ ★ ★ no-simulation 정책 chain 5 단계 핵심 enforcement**:

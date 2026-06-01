@@ -1,0 +1,21 @@
+{
+  "version": "2.0",
+  "project_id": "demo-adopter-project",
+  "current_chain": "implement",
+  "stage_progress": {
+    "analysis": { "status": "complete", "gate_decision": "go" },
+    "discovery": { "status": "complete", "gate_decision": "go" },
+    "spec": { "status": "complete", "gate_decision": "go" },
+    "plan": { "status": "complete", "gate_decision": "go" },
+    "test": { "status": "complete", "gate_decision": "go" },
+    "implement": { "status": "complete", "gate_decision": "go" }
+  },
+  "last_gate": {
+    "id": "#5",
+    "stage": "implement",
+    "decision": "go",
+    "decision_at": "2026-06-01T10:00:00Z",
+    "validator_findings": { "critical": 0, "high": 0, "medium": 2, "low": 1, "info": 0 }
+  },
+  "blocked": false
+}

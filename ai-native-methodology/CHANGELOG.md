@@ -9,6 +9,19 @@
 
 ---
 
+## [11.29.0] — 2026-06-01 MINOR — Type 2 adopter corroboration 캡처 배선 (schema + packager 도구 + check30 + suggest 트리거 / EXT-CAPTURE 해소)
+
+**Phase 1 외부-준비 감사가 capture readiness 0.08(최대 공백) 진단 — 외부 adopter(Type 2)가 chain harness 1 cycle 완주해도 결과를 담을 schema·트리거·익명화·수집경로 전무. 그 '배선'을 신설 (★ 정직: 배선 = necessary not sufficient / Type 2 '측정'은 실 외부 adopter 실행 시 발생 / 본 release 측정=0).**
+
+- **C1 schema** `schemas/adopter-corroboration.schema.json` (신규 / 47번째): plugin_version / adopter{opaque adopter_id, org_type} / project{opaque project_hash, stack_signals, scenario(work-unit-manifest 재사용), loc_bucket enum 고정) / chain_run{gates #1~#5 = state.last_gate shape 재사용} / findings_summary / coverage / user_feedback / anonymization{applied, redaction_count, method}. top-level `additionalProperties:false` strict.
+- **C2 도구** `tools/adopter-evidence-packager` (26번째): .aimd/state.json + scope manifest + findings + matrix → 익명화 corroboration 합성 → ajv 검증 → leak guard → `.aimd/output/adopter-corroboration.json`. opaque ID = sha256(salt+id) (업계 가명화 관행 / rainbow-table 회피). **PII best-effort redaction**(email/절대경로/private-key/IP/사내host) + **post-redaction leak guard**(잔존 PII → exit 1 + 위반 필드 경로 보고). AI 추론 0% (결정론). 14 test.
+- **C3 트리거 (suggest-not-autofire / consent)**: chain-driver `cmdNext` 가 gate #5(implement→terminal / `!next`) 통과 시에만 stderr auto-suggest (ticket-sync 패턴 동형 / 별도 라인) + `implement-verify-test-pass` skill step 9. ★ adopter proprietary 코드 hash/stack 을 동의 없이 auto-write ❌ (데이터 주권 / official-docs: opt-in 업계표준 ❌[Next.js·.NET=opt-out]이나 adopter 데이터엔 consent 모델 정당).
+- **C4 게이트 check30 `adopter_corroboration_capture` (release-readiness 29→30)**: schema draft-2020-12+strict + packager bin + **golden round-trip(exit 0)** + **leak-guard discrimination(poisoned --no-redact → exit 1 pii_leak)** = content-aware (file-presence ❌).
+- **REVISE 5종 흡수 (Senior GO_WITH_REVISE@0.82)**: ① terminal-only 트리거(ticket-sync 충돌 회피) ② **PII regex SSOT** `tools/_shared/pii-patterns.js`(check27 import / 복사 ❌ drift attractor 회피) ③ leak-guard 필드 경로 보고(silent wall ❌) ④ loc_bucket enum 고정 ⑤ negative fixture(leak guard exit 1) anti-regression.
+- **검증 (no-simulation / 실 CLI)**: packager 14 test(round-trip/redaction/leak-guard/결정론/write) + schema-validator +5(valid/required/pattern/enum/strict) + release self-test 14→15(check30 discrimination) / workspace **1037** / release-readiness **30/30** / version 3-way 11.29.0 / skill-citation 0 stale / breaking 0 = MINOR.
+- **§8.1 (정직 / Senior 확인)**: forward-looking capability (corrective drift ❌ / 외부 adopter 가 필요로 하는 missing rail) — 단 ★ green check30 ≠ "Type 2 corroboration 달성": **배선 출하 / Type 2 측정=0 / 실 adopter 대기**. EXT-CAPTURE-01·03·05 해소.
+- **잔여 carry**: ② ≥2 distinct 도메인 dogfood (확정: `alvaromrveiga/ecommerce-backend` NestJS+Prisma) · ③ public-OSS 공개(조직) + preflight codegraph/gradle + `${CLAUDE_PLUGIN_ROOT}` 경로(EXT-PATH/PREFLIGHT) + ledger 산입 자동화(EXT-CAPTURE-04). DEC-2026-06-01-type2-capture-wiring.
+
 ## [11.28.0] — 2026-06-01 MINOR — README.md stale 동기화 (front door v11.1.0→현행) + drift-resistant 재구성 + version-sync 가드 (check29)
 
 **plugin user 진입점 README 가 v11.1.0(26 버전 stale) + 카운트(skill 55·도구 22·스키마 46·770 test·22 criterion) 전부 stale → front-door 신뢰도 붕괴 (감사 EXT-MISS-08·EXT-DOC-DRIFT-01). 버전 동기화 + drift-resistant 재구성 + 재발 차단 가드.**

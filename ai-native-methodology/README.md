@@ -1,8 +1,8 @@
-# AI-Native 개발 방법론 v11.28.0 ★ ★ ★ ★ ★ ★
+# AI-Native 개발 방법론 v11.29.0 ★ ★ ★ ★ ★ ★
 
 > 조직의 개발 방식을 AI-Native로 전환하는 **AX(AI Transformation) 마이그레이션** 사내 표준 방법론. **분석 → 발견 → 스펙 → 계획 → 테스트 → 구현** SDLC 6-stage chain harness — AI가 단계별 산출물을 생성하고 사람은 gate에서 검토·결단 (AI 자동화 ~85% / 사람 ≤15%).
 >
-> **현재**: v11.28.0 (2026-06-01) — ★ ★ ★ ★ ★ ★ ★ **v11 paradigm (BE/FE 산출물 분리 + contract 강제 양 axis) + Living dep-graph (analysis↔code 앵커 / A2 drift 동기화)** / 사용자 요구사항 18 모두 청산 (R1~R18 / R16·R17 영구 scope-out) / release-readiness strict 전수 통과 / CLAUDE.md·README ↔ plugin.json version drift 자동 enforcement (R2) / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill (React/Vue/Playwright/state-map/visual-manifest/type-spec) / scope·stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT. (★ 자산 개수·테스트 수 등 정확한 인벤토리는 [CHANGELOG.md](./CHANGELOG.md) 최신 entry 또는 `/plugin` manager 참조 — 본 README 는 버전·카운트 하드코딩을 최소화.)
+> **현재**: v11.29.0 (2026-06-01) — ★ ★ ★ ★ ★ ★ ★ **v11 paradigm (BE/FE 산출물 분리 + contract 강제 양 axis) + Living dep-graph (analysis↔code 앵커 / A2 drift 동기화) + Type 2 adopter corroboration 캡처 배선** / 사용자 요구사항 18 모두 청산 (R1~R18 / R16·R17 영구 scope-out) / release-readiness strict 전수 통과 / CLAUDE.md·README ↔ plugin.json version drift 자동 enforcement (R2) / 분석 입력 5종 orchestrate (코드 + Figma + Swagger + 기획문서 + 자연어 prompt) / FE skill (React/Vue/Playwright/state-map/visual-manifest/type-spec) / scope·stage 자동 폴더 + manifest 이중 렌더링 / lifecycle 자산 매핑 매트릭스 단일 SSOT. (★ 자산 개수·테스트 수 등 정확한 인벤토리는 [CHANGELOG.md](./CHANGELOG.md) 최신 entry 또는 `/plugin` manager 참조 — 본 README 는 버전·카운트 하드코딩을 최소화.)
 >
 > ★ Analysis stage = 한 방향 추출 (v1.x 자산 = chain 1 진입 전 단계로 흡수 / AX 전환의 출발 입력). v2.0 paradigm = 분석 stage 위에 chain harness + revisit loop + 70~80% 한계 명시. v3.x = Gap 청산 + enforcement cadence 정착 + 자산 대칭 완성. ★ v9.0 = 6-stage chain (analysis→discovery→spec→plan→test→implement). ★ v10.0.0 = 5 gate 본격 (discovery #1 / spec #2 / plan #3 / test #4 / impl #5 / chain N = gate #N 1:1 INTERNAL CONVENTION). ★ v11.0.0 = BE/FE 산출물 분리 paradigm + contract 강제 양 axis (BE = swagger / FE = state-map + visual-manifest + DTCG token) + ticket = plan stage 단일 (Epic/Story/OP/TASK 4-level).
 >
