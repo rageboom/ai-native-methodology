@@ -1,12 +1,12 @@
 ---
 name: analysis-db-schema-erd
-description: Use when project contains DDL .sql files, Prisma schema, JPA @Entity, TypeORM @Entity, SQLAlchemy model, Mongoose schema, or database migration files. Generates schema.json (산출물 5-b) + erd.mermaid (DB structure). Drift-validator auto-checks .json ↔ .mermaid equivalence. Stage = analysis, track = DB.
+description: Use when project contains DDL .sql files, Prisma schema, JPA @Entity, TypeORM @Entity, SQLAlchemy model, Mongoose schema, or database migration files. Generates schema.json (산출물 5-b / json 단독 SSOT). Stage = analysis, track = DB.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # analysis-db-schema-erd — DB Schema + ERD 산출
 
-데이터베이스 구조 → schema.json + erd.mermaid 이중 렌더링.
+데이터베이스 구조 → schema.json (★ json 단독 SSOT / ADR-011 — erd.mermaid·db-schema.md 미산출).
 
 ## 사전 조건
 
@@ -27,7 +27,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - column type / nullable / default
    - PK / FK / unique / index
    - check constraint / trigger
-3. **Relationship 추론** — FK 기반 1:1 / 1:N / N:M
+3. **Relationship 추론** — FK 기반 1:1 / 1:N / N:M. ★ 각 FK 의 관계 동사(참조되는 부모-테이블 관점 / 예: `articles.user_id→users` = "authors")는 `foreign_keys[].relationship_label` 에 기록 — 구 erd.mermaid edge 라벨 흡수 (ADR-011 / json 단독).
 4. **schema.json 작성** — `schemas/db-schema.schema.json` (strict / SSOT):
    ```json
    {
@@ -41,13 +41,9 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    ```
    ★ top-level required = `meta` · `tables` (strict). index/constraint/relationship 은 각 `tables[]` item **내부** nested (top-level 아님). 위 키 외 필드 추가 시 schema-validator fail.
    ★ **`source_files`** (선택 / v11.26.0 Slice 4) — 스키마를 **DDL/migration 파일**(Flyway/Liquibase `.sql` 등)에서 추출했으면 그 repo-relative 경로를 나열 → dep-graph 가 db-schema 노드를 그 DDL 에 앵커 + A2 가 DDL 변경 시 drift 탐지 (db-schema = DDL 의 semantic owner / 기존 `code_pointers=N/A` 해소). ERD 다이어그램은 ❌(→ `diagram_files.erd`) / live 운영DB·ORM entity 는 미나열(ORM entity 는 domain.json 이 앵커). DDL 출처 없으면 비움(na 유지).
-5. **erd.mermaid 생성** — Mermaid ER diagram syntax
-6. **drift-validator 자동 호출** — `.json ↔ .mermaid` 의미 동등성
-
 ## 산출물
 
-- `<user-project>/.aimd/output/schema.json`
-- `<user-project>/.aimd/output/erd.mermaid`
+- `<user-project>/.aimd/output/schema.json` (★ json 단독 SSOT — erd.mermaid·db-schema.md 미산출 / ADR-011)
 
 ## ★ greenfield (code-optional) mode
 
@@ -62,5 +58,5 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 - `methodology-spec/deliverables/4-db-schema.md` (★ dedicated deliverable / db phase SSOT — README.md:22 정합)
 - `schemas/db-schema.schema.json`
-- ADR-008 (이중 렌더링)
+- ADR-011 (json 단독 / .mermaid·.md 미산출)
 - cross-ref: `methodology-spec/deliverables/4-5-formal-spec.md` (formal 형식화 — DB DDL 자체 명세 ❌)

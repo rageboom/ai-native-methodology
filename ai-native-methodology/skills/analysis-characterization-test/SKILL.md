@@ -141,8 +141,7 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.aimd/output/characterization/characterization-spec.json` (★ 산출물 23 / 통합 entry)
-- `<user-project>/.aimd/output/characterization/intent-vs-bug.md` (★ 사람 눈 / 분류표)
+- `<user-project>/.aimd/output/characterization/characterization-spec.json` (★ 산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지 ADR-011)
 - `<user-project>/.aimd/output/characterization/coverage.json`
 - `<user-project>/.aimd/output/characterization/snapshots/UC-*.json`
 
@@ -162,7 +161,7 @@ phase 4.7 산출물 = ★ chain 1 (discovery-spec) 입력 핵심:
 - `tools/characterization-coverage-validator/` (★ workspace 13번째)
 - `flows/analysis.phase-flow.json` v2.1.0 phase 4.7 entry
 - ADR-CHAIN-006 phase 4.7 정식 도입
-- ADR-008 (이중 렌더링 — characterization-spec.json + intent-vs-bug.md)
+- ADR-011 (json 단독 — characterization-spec.json 에 intent_vs_bug 통합 / 구 intent-vs-bug.md twin 폐지)
 - ADR-009 (5단계 신뢰도 모델 — 단계 5 = 도메인 expert 결단 후)
 - DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
 - DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)

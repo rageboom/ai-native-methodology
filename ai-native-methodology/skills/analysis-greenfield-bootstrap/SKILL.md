@@ -26,7 +26,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Task
 
 swagger-extract 가 있으면 `node tools/greenfield-bootstrap/src/cli.js --output <user-project>/.aimd/output --swagger-extract .aimd/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
 - `openapi.yaml` (deliverable 5-a) — swagger-extract(이미 파싱된 OpenAPI)의 **결정적 승격** (AI 추론 0).
-- `antipatterns.json` + `migration-cautions.md` — legacy-only 산출물 **N/A** (빈 배열 + `meta.na_reason` 정당화 / `antipatterns.schema.json` 정합).
+- `antipatterns.json` + `migration-cautions.json` — legacy-only 산출물 **N/A** (빈 배열 + `meta.na_reason` 정당화 / `antipatterns.schema.json` + `migration-cautions.schema.json` 정합 / ADR-011 json 단독).
 
 swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--output` 만), openapi 는 4단계에서 AI 도출.
 
@@ -49,7 +49,7 @@ swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--o
 ## 산출물
 
 - `<user-project>/.aimd/output/{architecture,domain,business-rules,schema}.json` + `openapi.yaml` (7대 subset)
-- `<user-project>/.aimd/output/antipatterns.json` (N/A 빈) + `migration-cautions.md` (N/A stub)
+- `<user-project>/.aimd/output/antipatterns.json` (N/A 빈) + `migration-cautions.json` (N/A stub / ADR-011 json 단독)
 
 ## 본체 명세 참조
 

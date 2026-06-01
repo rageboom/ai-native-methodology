@@ -1,6 +1,6 @@
 ---
 name: analysis-architecture
-description: Use after analysis-source-inventory to extract architecture (layers, modules, dependencies, boundaries). Generates architecture.json (산출물 1) + ERD-style architecture diagram. Required prerequisite for analysis-domain-model. Stage = analysis. 사용자: "아키텍처 분석" / "레이어 추출" / "의존성 그래프".
+description: Use after analysis-source-inventory to extract architecture (layers, modules, dependencies, boundaries). Generates architecture.json (산출물 1 / json 단독 SSOT). Required prerequisite for analysis-domain-model. Stage = analysis. 사용자: "아키텍처 분석" / "레이어 추출" / "의존성 그래프".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -32,13 +32,11 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
    }
    ```
    ★ top-level required = `meta` · `modules` · `dependencies` (strict). 패턴 후보는 `architecture_style` (inventory 의 `architecture_style_candidates` 와 정합). 위 키 외 필드 추가 시 schema-validator fail.
-5. **architecture.mermaid 생성** — layer / module 다이어그램 (ADR-008 이중 렌더링).
-6. **drift-validator 검증** — `.json ↔ .mermaid` 의미 동등성 자동 확인.
+   ★ 의존 edge 에 사람-눈 설명 라벨이 있으면 `dependencies[].note` (긴 근거 = `detail`) 에 기록 — 구 architecture.mermaid edge 라벨 흡수 (ADR-011 / json 단독 / .mermaid·.md 미산출).
 
 ## 산출물
 
-- `<user-project>/.aimd/output/architecture.json`
-- `<user-project>/.aimd/output/architecture.mermaid`
+- `<user-project>/.aimd/output/architecture.json` (★ json 단독 SSOT — .mermaid·.md 미산출 / ADR-011)
 
 ## ★ greenfield (code-optional) mode
 

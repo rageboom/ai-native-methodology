@@ -43,8 +43,8 @@ Markdown / PDF / Notion export 문서를 입력 받아 비즈니스 의도 + UC 
 
 ## 산출물
 
-- `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false)
-- 이중 렌더링 (`plan-doc-extract.md`) 은 orchestrate merge 단계에서 `input-summary.md` 안 통합
+- `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false / ★ json 단독 — ADR-011)
+- 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
 
 ## 본체 명세 참조
 

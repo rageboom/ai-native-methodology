@@ -27,8 +27,8 @@ allowed-tools: Read
 
 ## 산출물
 
-- `.aimd/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false)
-- 이중 렌더링 (`prompt-extract.md`) 은 본 skill scope 외 (orchestrate merge 단계에서 `input-summary.md` 안 통합)
+- `.aimd/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false / ★ json 단독 — ADR-011)
+- 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
 
 ## 본체 명세 참조
 

@@ -42,7 +42,7 @@ URL/path 패턴 + 한국어/영어 키워드 매칭 + **인라인 마커 우선*
 
 ### 3단계 — merge / cross-ref / conflict 검출
 
-4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합. 이중 렌더링 의무 = `input-summary.md` 동시 생성 (ADR-008 v2 정합).
+4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합 (★ json 단독 / ADR-011 — input-summary.md 미산출).
 
 #### cross-ref 3-tier severity + 정량 기준
 
@@ -78,8 +78,7 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 ## 산출물
 
-- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json`)
-- `.aimd/<scope>/planning/input-summary.md` (이중 렌더링 / 사람 눈)
+- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / ★ json 단독 SSOT — ADR-011)
 - 4 sub-skill extract 파일 (각 skill 책임)
 
 ## 본체 명세 참조

@@ -1,6 +1,6 @@
 ---
 name: analysis-quality-antipattern
-description: Use after all `api` + `ui` phase outputs to consolidate antipatterns.json + migration-cautions.md (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis. 사용자: "안티패턴 추출" / "migration cautions" / "회피 가이드".
+description: Use after all `api` + `ui` phase outputs to consolidate antipatterns.json + migration-cautions.json (산출물 6 + 7). Final SDLC analysis stage step. Composite View 패턴 거절 (PoC #02 정착). Stage = analysis. 사용자: "안티패턴 추출" / "migration cautions" / "회피 가이드".
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -25,17 +25,15 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - AP-FE-I18N-XXX (FE / 다국어)
    - AP-VALIDATION-XXX / AP-CONFIG-XXX / AP-SECURITY-XXX / AP-PERFORMANCE-XXX (cross-cutting)
 2. **★ Composite View 패턴 거절** — 복합 AP 등록 거절. 단일 패턴별로만 등재. (memory `feedback_composite_view_pattern.md`)
-3. **migration_advice 의무** — 각 anti-pattern 마다 `migration-cautions.md` 의 회피 방법 명시 (DEC-2026-04-29-안티패턴-마이그레이션-가이드)
-4. **antipatterns.json 작성** — `schemas/antipatterns.schema.json`
-5. **avoid-list.md 작성** — 기존 시스템에서 발견된 패턴 + 즉시 fix 체크리스트 (사람-눈 렌더링 / two-eyes). `migration-cautions.md`(신규 시스템 설계·리뷰 가이드)와 구분 (deliverable 6 §6.1). flows/analysis.phase-flow.json quality.outputs 의무 3종 중 하나.
-6. **migration-cautions.md 작성** — 사람이 읽는 회피 가이드 (신규 시스템 대상)
-7. **§8.1 단일 PoC 과적합 회피** — 격상 / 처분 / 순서 결정 시 ≥2 PoC corroboration 의무 (CLAUDE.md ★★★)
+3. **migration_advice 의무** — 각 anti-pattern 마다 `migration-cautions.json` 의 회피 방법 (`caution_groups[].cautions[].migration_guidance`) 명시 (DEC-2026-04-29-안티패턴-마이그레이션-가이드)
+4. **antipatterns.json 작성** — `schemas/antipatterns.schema.json` (기존 시스템 발견 패턴 + 즉시 fix 체크리스트 = `antipatterns.json` 항목으로 통합 / 구 avoid-list.md 사람-눈 twin 폐지 — ADR-011 json 단독)
+5. **migration-cautions.json 작성** — `schemas/migration-cautions.schema.json` (신규 시스템 설계·리뷰 회피 가이드 / 구 migration-cautions.md 대체 — ADR-011)
+6. **§8.1 단일 PoC 과적합 회피** — 격상 / 처분 / 순서 결정 시 ≥2 PoC corroboration 의무 (CLAUDE.md ★★★)
 
 ## 산출물
 
 - `<user-project>/.aimd/output/antipatterns.json`
-- `<user-project>/.aimd/output/avoid-list.md`
-- `<user-project>/.aimd/output/migration-cautions.md`
+- `<user-project>/.aimd/output/migration-cautions.json` (★ json 단독 / 구 migration-cautions.md + avoid-list.md twin 폐지 — ADR-011)
 
 ## 본체 명세
 

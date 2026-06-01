@@ -130,7 +130,7 @@ PoC #07 D12 (b) nested patterns object 패턴. 4 패턴:
 ★ patterns_extension_v3 (cache / discriminator / typeHandler) = C-v2.2.0-3 carry / 본 v2.2.0-rc1 scope ❌.
 ★ iBATIS 2 전용 `<dynamic>` / `<iterate>` / `<isPropertyAvailable>` sub-classification = C-v2.2.0-7 carry.
 
-### 10. sql-inventory.json 작성 + sql-inventory.md 사람 눈
+### 10. sql-inventory.json 작성 (★ json 단독 SSOT / ADR-011 — sql-inventory.md 미산출)
 
 `schemas/sql-inventory.schema.json` 정합. 4 sub-section (meta_confidence + summary + extraction_automation + inventory + (optional) patterns_extension_v2).
 
@@ -150,8 +150,7 @@ node ../../tools/sql-inventory-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.aimd/output/sql-inventory/sql-inventory.json` (★ 산출물 24 / 통합 entry)
-- `<user-project>/.aimd/output/sql-inventory/sql-inventory.md` (★ 사람 눈 / 11 컬럼 표)
+- `<user-project>/.aimd/output/sql-inventory/sql-inventory.json` (★ 산출물 24 / 통합 entry / json 단독 SSOT — ADR-011)
 - `<user-project>/.aimd/output/sql-inventory/raw-grep.txt` (1차 산출)
 
 ## chain 1 입력 보강
@@ -170,7 +169,7 @@ phase 4.8 산출물 = ★ chain 1 (discovery-spec) 입력 핵심:
 - `tools/sql-inventory-validator/` (★ workspace 14번째 / ★ v8.7 rename from sql-inventory-extractor — bin alias 양쪽 보존)
 - `flows/analysis.phase-flow.json` v2.2.0-rc1 phase 4.8 entry
 - ADR-CHAIN-007 phase 4.8 정식 도입
-- ADR-008 (이중 렌더링)
+- ADR-011 (json 단독 / .md 미산출)
 - ADR-009 (5단계 신뢰도 모델)
 - DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
 - DEC-2026-05-08-poc-07-종결 (corroboration #2)
