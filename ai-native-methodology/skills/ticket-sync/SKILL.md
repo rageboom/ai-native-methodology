@@ -433,7 +433,7 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
 ### 단계 9 — intervention-log append
 
 ```jsonl
-{"timestamp":"2026-05-26T14:30:00Z","skill":"ticket-sync","stage":"plan","phase":"exit","scope":"car","decision":"ticket_sync_confirmed","mcp_invocation_count":38,"idempotency_skip_count":0,"cascade_complete":true,"evidence_ref":".aimd/output/evidence/ticket-sync-plan-exit-20260526T143000.json","user":"sangcl@smilegate.com"}
+{"timestamp":"2026-05-26T14:30:00Z","skill":"ticket-sync","stage":"plan","phase":"exit","scope":"car","decision":"ticket_sync_confirmed","mcp_invocation_count":38,"idempotency_skip_count":0,"cascade_complete":true,"evidence_ref":".aimd/output/evidence/ticket-sync-plan-exit-20260526T143000.json","user":"reviewer@example.com"}
 ```
 
 ## 금지 / 강제력

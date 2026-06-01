@@ -54,7 +54,7 @@ allowed-tools: Read, Write, Edit
 
 4. **intervention_log 기록** (`<project>/.aimd/output/chain-intervention-log.jsonl`):
    ```jsonl
-   {"timestamp":"2026-05-06T11:00:00Z","gate":"#1","stage_in":"analysis","stage_out":"planning","decision":"go","cluster_size":5,"approved_items":[1,2,3,4,5],"rejected_items":[],"revisit_target":null,"user":"sangcl@smilegate.com"}
+   {"timestamp":"2026-05-06T11:00:00Z","gate":"#1","stage_in":"analysis","stage_out":"discovery","decision":"go","cluster_size":5,"approved_items":[1,2,3,4,5],"rejected_items":[],"revisit_target":null,"user":"reviewer@example.com"}
    ```
 
 5. **traceability-matrix 갱신** — `_base-build-traceability-matrix` skill 호출 (gate 종결 의무 / forward_coverage 갱신).

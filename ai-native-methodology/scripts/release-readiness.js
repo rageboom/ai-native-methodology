@@ -1265,6 +1265,73 @@ function check26_gateValidatorListConsistency() {
   }
 }
 
+// ★ check27 (v11.27.0 / EXT-MISS-01 회귀 가드) — 출하 dir(skills/agents/templates) 사내 신원 누출 차단.
+//   이들은 build-plugin INCLUDE → dist·git-URL 양 채널 출하 → 안 example payload 의 사내 신원을 adopter LLM 이
+//   자기 로그에 복제 위험. content-aware(파일 존재 아닌 내용 grep). allow-identity: 주석 = 정당 author 귀속 예외.
+function check27_shippedIdentityLeak() {
+  try {
+    const SHIPPED_DIRS = ['skills', 'agents', 'templates'];
+    const IDENTITY_RE = /smilegate\.(com|net)|sangcl/i;
+    const hits = [];
+    for (const dir of SHIPPED_DIRS) {
+      const base = join(ROOT, dir);
+      if (!existsSync(base)) continue;
+      const entries = readdirSync(base, { recursive: true, withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile()) continue;
+        const full = join(ent.parentPath ?? ent.path, ent.name);
+        let content;
+        try { content = readFileSync(full, 'utf-8'); } catch { continue; }
+        const lines = content.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (IDENTITY_RE.test(lines[i]) && !/allow-identity:/.test(lines[i])) {
+            hits.push(`${full.slice(ROOT.length + 1).replace(/\\/g, '/')}:${i + 1}`);
+          }
+        }
+      }
+    }
+    return {
+      id: 'shipped_identity_leak',
+      pass: hits.length === 0,
+      detail: hits.length === 0
+        ? `출하 dir(skills/agents/templates) 사내 신원(smilegate.com|net / sangcl) 0건 — example payload 누출 차단 (allow-identity: 주석 예외 / EXT-MISS-01 회귀 가드 / content-aware)`
+        : `사내 신원 누출 ${hits.length}건: ${hits.slice(0, 8).join(', ')}${hits.length > 8 ? ' …' : ''} — placeholder(reviewer@example.com) 치환 또는 allow-identity: 주석`,
+      delegated_to: 'skills/ agents/ templates/ (build-plugin INCLUDE 출하 대상) / regex smilegate\\.(com|net)|sangcl',
+    };
+  } catch (e) {
+    return { id: 'shipped_identity_leak', pass: false, detail: `error: ${e.message}`, delegated_to: 'skills/ agents/ templates/' };
+  }
+}
+
+// ★ check28 (v11.27.0 / EXT-MISS-06 회귀 가드) — adopter repo-root 자동로드 templates/adoption/CLAUDE.md 가
+//   현 6-stage paradigm 정합인지. build-plugin alias → dist root CLAUDE.md = adopter 첫 LLM 운영 컨텍스트(P0).
+//   ★ 단일파일 scope (Senior REVISE-B-ii) / 양성 assertion primary(robust) + 음성 stale 토큰 secondary.
+//   '4-stage'(hyphen) ≠ 'sdlc-4stage-flow'(합법 flow 파일명) — substring 충돌 없음.
+function check28_adoptionParadigmDrift() {
+  try {
+    const fp = join(ROOT, 'templates/adoption/CLAUDE.md');
+    if (!existsSync(fp)) return { id: 'adoption_paradigm_drift', pass: false, detail: 'templates/adoption/CLAUDE.md 부재', delegated_to: 'templates/adoption/CLAUDE.md' };
+    const txt = readFileSync(fp, 'utf-8');
+    const REQUIRED = ['gate #5', 'discovery', 'implement']; // 현 6-stage 핵심 마커 (양성 / primary)
+    const STALE = ['planning-spec', '4-stage', '4단계', 'v2.0.0-rc1']; // stale paradigm (음성 / secondary)
+    const missing = REQUIRED.filter((t) => !txt.includes(t));
+    const present = STALE.filter((t) => txt.includes(t));
+    const problems = [];
+    if (missing.length) problems.push(`현 paradigm 마커 누락 [${missing.join(',')}]`);
+    if (present.length) problems.push(`stale paradigm 토큰 잔존 [${present.join(',')}]`);
+    return {
+      id: 'adoption_paradigm_drift',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `adoption CLAUDE.md 현 6-stage paradigm 정합 (양성 ${REQUIRED.join('/')} 포함 + stale 토큰 0 / EXT-MISS-06 회귀 가드 / adopter 첫 LLM 운영 컨텍스트 P0)`
+        : `adoption CLAUDE.md paradigm drift: ${problems.join(' | ')} — 현 6-stage(analysis→discovery→spec→plan→test→implement / gate #1~#5) 동기화 의무`,
+      delegated_to: 'templates/adoption/CLAUDE.md (build-plugin → dist root CLAUDE.md alias / 단일파일 / 양성 assertion primary)',
+    };
+  } catch (e) {
+    return { id: 'adoption_paradigm_drift', pass: false, detail: `error: ${e.message}`, delegated_to: 'templates/adoption/CLAUDE.md' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1296,6 +1363,8 @@ function main() {
     check24_agentSkillsPhaseFlowSync(),
     check25_templateSchemaValid(),
     check26_gateValidatorListConsistency(),
+    check27_shippedIdentityLeak(),
+    check28_adoptionParadigmDrift(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

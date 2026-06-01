@@ -9,6 +9,20 @@
 
 ---
 
+## [11.27.0] — 2026-06-01 MINOR — 외부-적합성 진짜 결함 cleanup (사내 신원 누출 + 깨진 license + stale adoption 템플릿) + 회귀 가드 2종
+
+**Type 2 외부-준비 감사에서 교차검증된 출하 자산의 진짜 결함 3종 정리 (정직성 / P0 무결성 / 새 도메인 불필요) + 재발 차단 enforcement 2종.**
+
+- **결함 1 — 사내 신원 누출 (정직성 / R15)**: `skills/ticket-sync/SKILL.md` + `skills/_base-invoke-go-stop-gate/SKILL.md` 의 example payload `"user":"sangcl@smilegate.com"` (둘 다 출하 skill → adopter LLM 이 자기 로그에 복제 위험) → `"reviewer@example.com"` placeholder. (동시: gate-log 예시의 stale `"stage_out":"planning"` → `"discovery"` 정합.)
+- **결함 2 — 깨진 license 참조**: `plugin.json` `"license":"SEE LICENSE IN LICENSE"` 인데 top-level LICENSE 파일 부재(존재않는 파일 참조 = manifest 결함) → **`"UNLICENSED"`** (정직 / 사내 표준·외부 미공개 = de facto all-rights-reserved / OSS 공개 결단 = public-OSS carry).
+- **결함 3 — stale adoption 템플릿 (P0 직격)**: `templates/adoption/CLAUDE.md` = v2.0.0-rc1 / SDLC 4-stage / planning-spec / gate #1~#4 (현 6-stage 대비 4 major 버전 stale). build-plugin alias → dist root CLAUDE.md = **adopter 의 첫 LLM 운영 컨텍스트** → 틀린 paradigm 주입 = P0(LLM 운영 컨텍스트) 직격 → **현 6-stage 전면 재작성**(analysis→discovery→spec→plan→test→implement / gate #1~#5 / chain N=gate #N INTERNAL CONVENTION / 4 use-scenario S1·S2·S3·greenfield / BE·FE 분리 / no-simulation R19 Tier / stack 정책 유지). ★ **drift-resistant**: 브리틀 카운트(skill/tool/schema 개수) 하드코딩 회피(감사 EXT-DOC-DRIFT 교훈) + 도구 호출 `${CLAUDE_PLUGIN_ROOT}/...`(EXT-PATH-01) + 버전·인벤토리는 CHANGELOG 위임.
+- **회귀 가드 2종 (release-readiness 26→28 / enforcement criterion — 양심 의존 ❌ paradigm)**:
+  - **check27 `shipped_identity_leak`**: 출하 dir(skills/agents/templates) 사내 신원 정규식(`smilegate\.(com|net)|sangcl`) content-aware grep → 발견 시 fail (provenance allowlist `allow-identity:` 주석 예외 / Senior REVISE-B-i / EXT-MISS-01 회귀 차단).
+  - **check28 `adoption_paradigm_drift`**: `templates/adoption/CLAUDE.md` 단일파일(Senior REVISE-B-ii) — 양성 assertion primary(`gate #5`/`discovery`/`implement` 포함) + 음성 secondary(`planning-spec`/`4-stage`/`4단계`/`v2.0.0-rc1` 부재). `sdlc-4stage-flow`(합법 flow) 미충돌 (EXT-MISS-06 회귀 차단).
+- **검증 (no-simulation)**: release-readiness self-test 14/14 (count 26→28 + 신규 2 id 등재) / **discrimination 실증**(check27 planted 위반 탐지+allowlist 면제 / check28 stale 토큰 탐지+sdlc-4stage-flow 오탐 ❌) / skill-citation 0 stale / workspace 1018 유지 / release-readiness **28/28** / version 3-way 11.27.0. **Senior 사실 검증**: ADOPTION-README alias 비활성(:192 / Senior E-2 반증) + templates/ 내 stale 토큰은 adoption/CLAUDE.md 단독 = 단일파일 scope 정당.
+- **§8.1 (정직)**: 정직성·P0 무결성 cleanup (self-referential corrective 와 구분 — 출하 자산의 외부-노출 결함 = adopter 영향 실재 / R15·P0 정합). 회귀 가드 2종 = drift enforcement (`feedback_drift_enforcement_via_release_readiness`).
+- **잔여 carry**: README.md stale(v11.1.0 / 카운트·GHE-pinned URL / 별도 doc-sync — adoption 템플릿보다 P0 낮음) · Type 2 외부 채택(43 장벽 / 사용자 결단) · public-OSS 공개(조직 결정). DEC-2026-06-01-genuine-defects-cleanup.
+
 ## [11.26.0] — 2026-06-01 MINOR — dep-graph Slice 4: db-schema → DDL 앵커 (접근 C / carry ③)
 
 **db-schema 분석 노드가 한 번도 코드에 앵커된 적 없던(항상 na) 것을, 스키마에 optional `source_files`(추출 DDL/migration 경로) 추가로 실 DDL(.sql)에 앵커 → A2 가 DDL 변경 시 db-schema drift 탐지** (db-schema = DDL 의 semantic owner / 기존 `code_pointers=N/A` 해소).
