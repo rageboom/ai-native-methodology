@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/migration-cautions.schema.json",
+  "title": "마이그레이션 주의사항 (Migration Cautions)",
+  "description": "재구현/이관 시 시스템-specific 주의사항. 산출물 #7' (legacy-only). ★ v12.0.0 — 구 migration-cautions.md(standalone 사람-눈)를 대체하는 json 단일 SSOT (ADR-011 / json-only AX-native). greenfield = caution_groups 빈 배열 + meta.warnings 정당화 N/A.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "system_context", "caution_groups"],
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "system_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system_name"],
+      "properties": {
+        "system_name": { "type": "string", "description": "대상 시스템 이름" },
+        "commit_hash": { "type": "string", "pattern": "^[a-f0-9]{7,40}$", "description": "스냅샷 commit SHA" },
+        "snapshot_date": { "type": "string", "description": "스냅샷 시점 (ISO 8601)" }
+      }
+    },
+    "caution_groups": {
+      "type": "array",
+      "description": "영역별 주의사항 묶음 (예: DB 이관 / 환경·도구 / 인증 / API 표면 / 보존 의무). greenfield = 빈 배열.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "title", "cautions"],
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["database", "infrastructure", "authentication", "api_surface", "preservation", "performance", "frontend", "security", "build", "other"],
+            "description": "주의사항 카테고리"
+          },
+          "title": { "type": "string", "description": "그룹 제목 (예: 'DB 이관 (SQLite → prod RDB)')" },
+          "description": { "type": "string", "description": "그룹 개요 (선택)" },
+          "cautions": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "title", "description"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^MC-[A-Z0-9_-]+$", "description": "주의사항 ID (예: MC-DB-TYPE-001)" },
+                "title": { "type": "string" },
+                "description": { "type": "string", "description": "주의 내용 (구 .md bullet 본문)" },
+                "affected_scope": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": ["database", "api", "frontend", "authentication", "infrastructure", "build", "security", "all"]
+                  },
+                  "description": "영향 영역"
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": ["critical", "high", "medium", "low"],
+                  "default": "medium"
+                },
+                "related_antipatterns": {
+                  "type": "array",
+                  "items": { "type": "string", "pattern": "^AP-[A-Z0-9_-]+$" },
+                  "description": "연관 안티패턴 ID (antipatterns.json)"
+                },
+                "related_carry": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "연관 carry/finding ID (예: C-realworld-baseline-tool-env)"
+                },
+                "preservation_refs": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "보존 의무 시 characterization 참조 (SCN-* / BR-*)"
+                },
+                "migration_guidance": { "type": "string", "description": "어떻게 이관할지 지침" },
+                "evidence": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "detection_method": {
+                      "type": "string",
+                      "enum": ["code_inspection", "characterization_test", "finding_system", "tool_run", "manual_review"]
+                    },
+                    "location_hints": {
+                      "type": "array",
+                      "items": { "type": "string" },
+                      "description": "코드/설정 위치 힌트 (예: application.properties)"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

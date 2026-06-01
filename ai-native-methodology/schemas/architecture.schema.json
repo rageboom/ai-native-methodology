@@ -92,6 +92,14 @@
           "violates_layer": {
             "type": "boolean",
             "description": "계층 의존 방향을 위반하는가? (예: domain → infrastructure)"
+          },
+          "note": {
+            "type": "string",
+            "description": "의존 edge 사람-눈 설명 라벨 (예: '예외 매핑', '@Public 데코레이터 / 순환'). on-demand 시각화 시 edge 라벨 (ADR-011 / 구 architecture.mermaid edge 라벨 `-.->|...|` 흡수). note=짧은 라벨 / detail=긴 근거. OPTIONAL."
+          },
+          "detail": {
+            "type": "string",
+            "description": "edge 코드 근거 상세 (긴 형식). OPTIONAL."
           }
         }
       }
@@ -166,6 +174,10 @@
           "antipattern_id": {
             "type": "string",
             "description": "안티패턴 산출물에서의 ID (AP-ARCH-XXX)"
+          },
+          "detail": {
+            "type": "string",
+            "description": "순환 edge 코드 근거 상세 (긴 형식). ecommerce dogfood 산출물이 이미 emit 하던 비공식 필드 명문화. OPTIONAL."
           }
         }
       }

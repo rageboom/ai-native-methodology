@@ -26,9 +26,9 @@ function ensureTmp() {
   mkdirSync(TMP, { recursive: true });
 }
 
-test('F-V2-01 — 39 schemas 모두 Ajv 2020 로 정상 로드 (no "failed to load" stderr)', () => {
+test('F-V2-01 — 40 schemas 모두 Ajv 2020 로 정상 로드 (no "failed to load" stderr)', () => {
   ensureTmp();
-  // valid 한 dummy 산출물 — schema 미발견으로 skip 되더라도 39 schema 사전 로드는 발생
+  // valid 한 dummy 산출물 — schema 미발견으로 skip 되더라도 40 schema 사전 로드는 발생 (★ v12.0.0 migration-cautions.schema.json 추가)
   const dummy = join(TMP, 'dummy.json');
   writeFileSync(dummy, JSON.stringify({ foo: 'bar' }));
   const r = runCli([dummy]);
