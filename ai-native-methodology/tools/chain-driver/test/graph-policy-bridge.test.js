@@ -47,6 +47,16 @@ describe('detectGraphArtifactWrite', () => {
     assert.equal(r.artifact_subkind, 'business-rules');
   });
 
+  // ★ v11.24.0 Slice 3 — db-schema 두 파일명 모두 매핑 (schema.json=canonical skill output / db-schema.json=poc-16 compat)
+  it('db-schema: schema.json + db-schema.json 모두 → analysis/db-schema', () => {
+    for (const fname of ['schema.json', 'db-schema.json']) {
+      const r = detectGraphArtifactWrite({ toolName: 'Write', toolInput: { file_path: `/p/.aimd/output/${fname}` } });
+      assert.ok(r, `${fname} 매핑 존재`);
+      assert.equal(r.artifact_kind, 'analysis', fname);
+      assert.equal(r.artifact_subkind, 'db-schema', fname);
+    }
+  });
+
   it('aspect artifact (a11y-spec.json) → aspect/a11y', () => {
     const r = detectGraphArtifactWrite({ toolName: 'Write', toolInput: { file_path: '/p/.aimd/a11y-spec.json' } });
     assert.equal(r.artifact_kind, 'aspect');

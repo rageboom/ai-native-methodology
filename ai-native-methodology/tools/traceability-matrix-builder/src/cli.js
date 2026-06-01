@@ -25,7 +25,10 @@ const ANALYSIS_FILENAMES = {
   'architecture': 'architecture.json',
   'domain': 'domain.json',
   'api': 'openapi-extension.json',
-  'db-schema': 'db-schema.json',
+  // ★ v11.24.0 Slice 3 — db-schema 파일명 drift fix (multi-candidate / 첫 존재 채택).
+  //   canonical 출력명 = schema.json (skill analysis-db-schema-erd + poc-01/02/03/14 + RealWorld).
+  //   db-schema.json = poc-16 migration(CHANGELOG v11.2.0) fallback. 양 convention 흡수 = zero-breakage.
+  'db-schema': ['schema.json', 'db-schema.json'],
   'formal-spec': 'formal-spec.json',
   'business-rules': 'business-rules.json',
   'antipatterns': 'antipatterns.json',
@@ -125,11 +128,16 @@ if (args.graph) {
   const analysis = {};
   const analysisPaths = {};
   if (args.analysisDir) {
-    for (const [kind, fname] of Object.entries(ANALYSIS_FILENAMES)) {
-      const p = join(args.analysisDir, fname);
-      if (existsSync(p)) {
-        analysis[kind] = loadJson(p);
-        analysisPaths[kind] = p;
+    for (const [kind, fnameOrList] of Object.entries(ANALYSIS_FILENAMES)) {
+      // ★ v11.24.0 — filename 은 string 또는 후보 배열 (db-schema multi-candidate). 첫 존재 채택.
+      const candidates = Array.isArray(fnameOrList) ? fnameOrList : [fnameOrList];
+      for (const fname of candidates) {
+        const p = join(args.analysisDir, fname);
+        if (existsSync(p)) {
+          analysis[kind] = loadJson(p);
+          analysisPaths[kind] = p;
+          break; // 첫 존재 후보 채택 (canonical 우선 순서)
+        }
       }
     }
   }

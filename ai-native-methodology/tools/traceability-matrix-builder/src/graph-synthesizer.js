@@ -273,6 +273,13 @@ const ANALYSIS_TO_CODE_POINTERS = Object.freeze({
       ...(d?.http_status_mapping ?? []).map((m) => m?.evidence_file),
     ],
   },
+  // ★ v11.24.0 Slice 3 — antipatterns: evidence[].file (full repo-relative path / .sql DDL·소스 파일).
+  //   business-rules 와 동형 (prefixes=[''] / strict_path / commit_hash 스탬프 → A2 가 DDL·schema migration 변경 탐지).
+  antipatterns: {
+    mode: 'file', prefixes: [''],
+    accessor: (d) => (d?.antipatterns ?? []).flatMap((ap) =>
+      (ap?.evidence ?? []).map((e) => e?.file)),
+  },
   // ★ v11.23.0 Slice 2 — sql-inventory: mapper_xml 논리경로('mapper/X.xml') → resource-prefix 역산 strict_path.
   //   prefixes 순서 = bare → Maven classpath root → mybatis variant (첫 존재 채택 / existence-gate false-positive 0).
   //   Spring PathMatchingResourcePatternResolver / Maven Standard Layout isomorphic (research wf_8a8aa7ef).

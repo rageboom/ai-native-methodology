@@ -1120,3 +1120,65 @@ describe('synthesizeGraph — ★ v11.23.0 Slice 2 sql-inventory + architecture 
     assert.equal(n.code_pointers_na, true, 'na (전역 prefix 기본값 의존 ❌ 입증)');
   });
 });
+
+// ============================================================================
+// ★ v11.24.0 Slice 3 — antipatterns evidence[].file → code_pointers derive
+//   business-rules 동형 (mode:'file' / prefixes:['']). .sql DDL·소스 파일 = A2 content-drift 참여.
+// ============================================================================
+describe('synthesizeGraph — ★ v11.24.0 Slice 3 antipatterns code-pointer enrich', () => {
+  const yes = () => true;
+
+  it('S3-1) antipatterns evidence[].file → analysis-antipatterns strict_path 앵커 (na 미설정)', () => {
+    const g = synthesizeGraph({
+      analysis: { antipatterns: { antipatterns: [
+        { id: 'AP-DB-001', evidence: [{ file: 'src/main/resources/db/migration/V1__create_tables.sql', line: 27 }] },
+        { id: 'AP-USER-003', evidence: [{ file: 'src/main/java/io/spring/core/user/User.java' }] },
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-antipatterns');
+    assert.deepEqual(n.code_pointers.map((p) => p.path), [
+      'src/main/resources/db/migration/V1__create_tables.sql',
+      'src/main/java/io/spring/core/user/User.java',
+    ]);
+    assert.ok(n.code_pointers.every((p) => p.anchor_type === 'strict_path'), 'strict_path');
+    assert.equal(n.code_pointers_na, undefined, 'derive 성공 → covered');
+  });
+
+  it('S3-2) antipatterns evidence 없음/file 없음 → na (backstop)', () => {
+    const g = synthesizeGraph({
+      analysis: { antipatterns: { antipatterns: [
+        { id: 'AP-X', name: 'no-evidence' },                       // evidence 부재
+        { id: 'AP-Y', evidence: [{ line: 5, snippet: 'x' }] },     // file 부재
+      ] } },
+      existsFn: yes,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-antipatterns');
+    assert.ok(!n.code_pointers, '추출 0 → code_pointers 미설정');
+    assert.equal(n.code_pointers_na, true, 'backstop na');
+  });
+
+  it('S3-3) antipatterns strict_path 는 commit_hash 스탬프 (A2 content-drift 참여 / DDL 변경 탐지)', () => {
+    const g = synthesizeGraph({
+      analysis: { antipatterns: { antipatterns: [
+        { id: 'AP-DB-001', evidence: [{ file: 'src/main/resources/db/migration/V1__create_tables.sql' }] },
+      ] } },
+      existsFn: yes,
+      commitHash: 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a',
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-antipatterns');
+    assert.equal(n.code_pointers[0].commit_hash, 'ee17e31aafe733d98c4853c8b9a74d7f2f6c924a', 'A2 baseline 스탬프');
+  });
+
+  it('S3-4) existence-gate — 미존재 evidence file → emit ❌ → na', () => {
+    const g = synthesizeGraph({
+      analysis: { antipatterns: { antipatterns: [
+        { id: 'AP-GONE', evidence: [{ file: 'src/main/resources/db/migration/V99__gone.sql' }] },
+      ] } },
+      existsFn: () => false,
+    });
+    const n = g.nodes.find((x) => x.id === 'analysis-antipatterns');
+    assert.ok(!n.code_pointers, '미존재 → derive 0');
+    assert.equal(n.code_pointers_na, true, 'na (정직)');
+  });
+});

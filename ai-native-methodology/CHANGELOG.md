@@ -9,6 +9,25 @@
 
 ---
 
+## [11.24.0] — 2026-06-01 MINOR — Living-graph Slice 3: antipatterns code-pointer enrich + db-schema 파일명 drift fix
+
+v11.23.0 후속. "나머지 analysis kind 일괄 앵커"는 **Phase 1 정직 평가로 재조정** — formal-spec/characterization-spec/state-map/visual-manifest = code-file 필드 없음(na 유지 정직 / 앵커 불가) / type-spec·ui-ux·form-validation = source_file 보유하나 RealWorld(BE) 부재 = speculative carry / 실 dogfoodable = **antipatterns 뿐**. 대신 antipatterns 앵커(실측) + **db-schema 파일명 drift(진짜 latent 버그)** 로 재조정 (사용자 승인).
+
+### fix — antipatterns 앵커 + db-schema multi-candidate (additive)
+- **`graph-synthesizer.js`** — `ANALYSIS_TO_CODE_POINTERS` 에 `antipatterns: { mode:'file', prefixes:[''], accessor:(d)=>(d?.antipatterns??[]).flatMap(ap=>(ap?.evidence??[]).map(e=>e?.file)) }` 추가. business-rules 동형 (strict_path / commit_hash 스탬프 → **A2 가 schema migration·DDL 변경 탐지**).
+- **`cli.js` ANALYSIS_FILENAMES + `hooks-bridge.js` ANALYSIS_FILENAME_TO_SUBKIND** — db-schema 파일명 drift fix. canonical 출력명 = `schema.json`(skill `analysis-db-schema-erd` + poc-01/02/03/14 + RealWorld)인데 builder 는 `db-schema.json` 만 스캔 → **db-schema 노드가 어떤 그래프에도 미로드** latent 버그. → **multi-candidate** `'db-schema': ['schema.json', 'db-schema.json']` (첫 존재 채택 / schema.json 우선) + scan loop string|array 정규화 + hooks-bridge 두 파일명 모두 매핑. poc-16(CHANGELOG v11.2.0 migration = db-schema.json producer) + 나머지(schema.json) ecosystem split 양쪽 흡수 = **zero-breakage**(producer 무변경).
+- **★ Senior 사실 정정** (feedback_senior_fact_check_supplement): Senior GO@0.84 = "db-schema.json producer 0건 → 단일 rename" 전제였으나, broader grep(CHANGELOG:627 PoC#15 migration + poc-16 graph:392 source_path)으로 **poc-16 = db-schema.json producer** 반증 → 단일 rename(poc-16 깸) 대신 multi-candidate 전환. Senior 권위 ≠ 사실 정합 보증.
+
+### 검증 (no-simulation / 실 CLI·실 git)
+- graph-synthesizer **+4 test** (antipatterns derive/na/commit_hash-stamp/existence-gate) + graph-policy-bridge **+1 test** (db-schema schema.json+db-schema.json 둘 다 → db-schema). workspace 1003→**1008** / 0 fail / release-readiness **26/26**(#16 poc-05 static 무영향).
+- **RealWorld dogfood** (`--repo-root <RW> --commit-hash ee17e31`): analysis-antipatterns na→**covered (1 strict_path DDL `V1__create_tables.sql` @ee17e31 = A2 참여)** + analysis-db-schema **ABSENT→present(na)** (schema.json multi-candidate 로드 / analysis 8→9). covered **30→31** / na 85 / missing 0 / **glob_no_match 0** / 신규앵커 **0 new findings**.
+- **A2 positive demo** (antipatterns DDL 앵커 baseline=root ee946e3 / `--git`): DDL **content_drift 발화** = A2 가 schema migration 변경 탐지(Slice 3 이전 = antipatterns na = inert). medium/non-gating.
+
+### §8.1 / carry
+- read-class·additive(antipatterns) + correctness fix(db-schema 노드 등장) → gate-class 아님 / MINOR(db-schema 노드 observable delta = PATCH 아님 / Senior 정합). 단일 RealWorld 도메인 = mechanism 입증(antipatterns 1 anchor = 작음 / 과대표기 ❌). **carry**: FE kinds(type-spec/ui-ux/form-validation) 앵커 = 실 FE 프로젝트 dogfood 시 / db-schema → DDL 앵커(schema source 필드 = 접근 C) / formal-spec·characterization·state-map·visual-manifest = code-file 필드 부재 = 영구 na.
+
+DEC-2026-06-01-slice3-antipatterns-dbschema. Extends DEC-2026-06-01-slice2-codepointer-enrich.
+
 ## [11.23.0] — 2026-06-01 MINOR — Living-graph Slice 2: analysis 노드 sql-inventory + architecture code-pointer enrich (C-codepointer-analysis-aspect-enrich 해소)
 
 v11.22.0 carry ① C-codepointer-analysis-aspect-enrich 해소. v11.22.0 가 business-rules/domain/error-mapping 노드를 실 src 에 앵커했으나 **sql-inventory(mapper resource-prefix)·architecture(dir glob)** 두 kind 는 na fall-through. Slice 2 = 두 kind 도 실 코드에 앵커 → 그래프가 **SQL mapper layer + module 디렉토리**까지 cover. sql-inventory mapper XML = strict_path + commit_hash 스탬프 → **A2 content-drift 가 SQL mapper layer 변경 탐지(실 P0 가치)** / architecture = glob dir 앵커(A2 제외 = dir-diff false-drift 회피 의도) = navigation·coverage grounding. 접근 A 연장(additive / schema·skill·CLI 무변경 / graph-synthesizer.js only). 4원칙 §2 3-agent research 만장 GO (official-docs `GO_WITH_REVISE`@0.88 / industry `GO`@0.88 / senior `GO_WITH_REVISE`@0.83 / REVISE 5종 흡수).

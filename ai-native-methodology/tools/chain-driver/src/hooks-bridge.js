@@ -104,6 +104,8 @@ const ANALYSIS_FILENAME_TO_SUBKIND = Object.freeze({
   'architecture.json': 'architecture',
   'domain.json': 'domain',
   'openapi-extension.json': 'api',
+  // ★ v11.24.0 Slice 3 — db-schema 두 파일명 모두 매핑 (schema.json=canonical skill output / db-schema.json=poc-16 compat).
+  'schema.json': 'db-schema',
   'db-schema.json': 'db-schema',
   'formal-spec.json': 'formal-spec',
   'business-rules.json': 'business-rules',
