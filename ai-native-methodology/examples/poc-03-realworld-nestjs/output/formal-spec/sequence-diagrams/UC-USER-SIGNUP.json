@@ -1,7 +1,6 @@
 {
   "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
   "uc_id": "UC-USER-SIGNUP",
-  "rendered_mermaid_path": "./UC-USER-SIGNUP.mermaid",
   "source_of_truth": "code",
   "direction": "B",
   "evidence_files": [

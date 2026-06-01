@@ -211,24 +211,6 @@
           }
         }
       }
-    },
-    "diagram_files": {
-      "type": "object",
-      "description": "동반 다이어그램 파일 경로",
-      "properties": {
-        "module_overview": {
-          "type": "string",
-          "description": "모듈 개요 Mermaid 파일 경로"
-        },
-        "layer_view": {
-          "type": "string",
-          "description": "계층 시각화 Mermaid 파일 경로"
-        },
-        "dependency_graph": {
-          "type": "string",
-          "description": "의존성 그래프 Mermaid 파일 경로"
-        }
-      }
     }
   }
 }

@@ -292,14 +292,16 @@
           "columns": ["follower_id"],
           "references_table": "users",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "follower"
         },
         {
           "name": "fk_followee",
           "columns": ["followee_id"],
           "references_table": "users",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "followee"
         }
       ],
       "indexes": [],
@@ -384,6 +386,7 @@
           "references_table": "users",
           "references_columns": ["id"],
           "on_delete": "NO ACTION",
+          "relationship_label": "author",
           "drift_note": "DRIFT-007 (medium 본 PoC / high 사내 적용, RESOLVED 2026-04-28): ON DELETE 정책 부재 (다른 6 FK 는 CASCADE). 윤주스 결정: NO ACTION 유지 (RealWorld spec 보존). 사내 적용 시 hard delete + NO ACTION 운영 사고 위험 — REC-002 (soft delete + author placeholder) 적용 필수. Phase 6 안티패턴 후보 AP-DB-FK-INCONSISTENT-XXX 등록."
         }
       ],
@@ -457,14 +460,16 @@
           "columns": ["article_id"],
           "references_table": "articles",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "article"
         },
         {
           "name": "fk_tag",
           "columns": ["tag_id"],
           "references_table": "tags",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "tag"
         }
       ],
       "indexes": [],
@@ -496,14 +501,16 @@
           "columns": ["article_id"],
           "references_table": "articles",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "article"
         },
         {
           "name": "fk_user",
           "columns": ["user_id"],
           "references_table": "users",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "user"
         }
       ],
       "indexes": [],
@@ -567,14 +574,16 @@
           "columns": ["author_id"],
           "references_table": "users",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "author"
         },
         {
           "name": "fk_comment_article",
           "columns": ["article_id"],
           "references_table": "articles",
           "references_columns": ["id"],
-          "on_delete": "CASCADE"
+          "on_delete": "CASCADE",
+          "relationship_label": "article"
         }
       ],
       "indexes": [],
@@ -594,9 +603,5 @@
       {"name": "UserName", "parent_entity": "Profile", "level": 2, "fields": ["name"]},
       {"name": "Image", "parent_entity": "Profile", "level": 2, "fields": ["image (address)"]}
     ]
-  },
-  "consistency_report_file": "정합성-검증-보고서.md",
-  "diagram_files": {
-    "erd": "erd.mermaid"
   }
 }

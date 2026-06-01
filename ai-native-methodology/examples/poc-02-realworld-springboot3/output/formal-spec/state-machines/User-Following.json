@@ -3,7 +3,6 @@
   "aggregate_root": "UserFollow",
   "id": "User-Following",
   "initial": "notFollowing",
-  "rendered_mermaid_path": "./User-Following.mermaid",
   "source_of_truth": "natural_language",
   "direction": "A",
   "round_trip_pattern": "F-074 단방향 (코드 부재 → 자연어 → 형식 → 코드 생성)",

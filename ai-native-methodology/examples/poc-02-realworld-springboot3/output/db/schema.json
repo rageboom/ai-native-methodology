@@ -292,10 +292,6 @@
   ],
   "stored_procedures": [],
   "views": [],
-  "consistency_report_file": "정합성-검증-보고서.md",
-  "diagram_files": {
-    "erd": "erd.mermaid"
-  },
   "comparison_with_poc_01": {
     "domain_same": true,
     "stack_family_same": true,

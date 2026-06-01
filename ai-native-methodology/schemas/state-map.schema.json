@@ -211,10 +211,6 @@
               }
             }
           },
-          "rendered_mermaid_path": {
-            "type": "string",
-            "description": "★ 이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로 (ADR-008 + ADR-FE-002 정합). drift-validator FE 적용 대상."
-          },
           "source_files": {
             "type": "array",
             "items": {"type": "string"},
@@ -275,20 +271,6 @@
             "description": "관계 유형. implements=BR/UC 구현, derives_from=API 응답에서 파생, validates=form rules 검증, triggers=API 호출 트리거, depends_on=다른 machine 의존."
           },
           "description": {"type": "string"}
-        }
-      }
-    },
-    "diagram_files": {
-      "type": "object",
-      "description": "사람 눈 다이어그램 파일 경로 (ADR-008 + ADR-FE-002 정합).",
-      "properties": {
-        "state_overview": {
-          "type": "string",
-          "description": "전체 상태 머신 overview mermaid 파일 경로."
-        },
-        "per_machine_dir": {
-          "type": "string",
-          "description": "machine 별 mermaid 파일 디렉토리."
         }
       }
     },

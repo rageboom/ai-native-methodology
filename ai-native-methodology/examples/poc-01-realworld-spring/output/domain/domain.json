@@ -518,10 +518,6 @@
       ]
     }
   ],
-  "diagram_files": {
-    "class_diagram": "domain.mermaid",
-    "aggregate_overview": "domain.mermaid"
-  },
   "v12_reserved": {
     "context_map_relationships": null,
     "subdomain_classification": null

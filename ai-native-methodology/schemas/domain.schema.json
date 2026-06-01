@@ -340,19 +340,6 @@
         }
       }
     },
-    "diagram_files": {
-      "type": "object",
-      "properties": {
-        "class_diagram": {
-          "type": "string",
-          "description": "엔티티/VO 클래스 다이어그램 (Mermaid classDiagram)"
-        },
-        "aggregate_overview": {
-          "type": "string",
-          "description": "Aggregate 경계 시각화"
-        }
-      }
-    },
     "v12_reserved": {
       "type": "object",
       "description": "v1.2에서 추가될 영역 (현재는 비워둠) — Strategic Design (Context Map)",

@@ -29,7 +29,6 @@
       "constraints": [{ "type": "fk", "name": "fk_todos_user", "from": "user_id", "to": "users.id", "on_delete": "CASCADE" }]
     }
   ],
-  "rendered_paths": { "erd_mermaid": "output/db/erd.mermaid" },
   "meta": {
     "generated_at": "2026-05-18T16:04:00Z",
     "skill_used": "analysis-db-schema-erd"

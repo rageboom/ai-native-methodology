@@ -230,15 +230,6 @@
           "description": "★ F-SIM-002 (2026-05-18) — businessRules / antipatterns 입력 통과 여부 (false 시 propagation 미적용 → 회귀 위험)."
         }
       }
-    },
-    "rendered_paths": {
-      "type": "object",
-      "description": "★ ADR-008 v2 이중 렌더링 — .json + .md + .mermaid",
-      "additionalProperties": false,
-      "properties": {
-        "markdown_path": {"type": "string", "description": "matrix.md 경로"},
-        "mermaid_path": {"type": "string", "description": "matrix.mermaid 경로 (graph view / ≥ 100 cell 분할 정책 = sub-plan-3 carry sp2-c4)"}
-      }
     }
   }
 }

@@ -246,9 +246,5 @@
       ]
     }
   ],
-  "diagram_files": {
-    "architecture": "input/architecture.mermaid",
-    "dependency_graph": "input/dependency-graph.mermaid"
-  },
   "code_pointers_na": true
 }

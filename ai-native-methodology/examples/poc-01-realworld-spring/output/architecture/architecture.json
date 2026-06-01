@@ -319,10 +319,5 @@
       "_routing": "Phase 6 안티패턴 (AP-DOMAIN-FRAMEWORK-LEAK-001) 후보",
       "_note": "Pure POJO 미달성. 한국 SI 에서 거의 100% 발생 패턴 (Senior §1). source-info.md ground truth 와 부분 차이. F-022."
     }
-  ],
-  "diagram_files": {
-    "module_overview": "architecture.mermaid",
-    "dependency_graph": "dependency-graph.mermaid",
-    "circular_dependencies_md": "circular-dependencies.md"
-  }
+  ]
 }

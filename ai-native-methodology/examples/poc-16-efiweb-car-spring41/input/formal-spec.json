@@ -217,7 +217,6 @@
       "verification_location": "source/sqlmap/carMgt.xml selectLeaderUserId + CarMgtServiceImpl.getLeaderUserId",
       "current_state": "partial",
       "current_state_note": "FIM 외부 DB 의존 / 'PS10' = 활성 + 'E10' = 직원 의미는 컬럼명 + 사내 컨벤션 추정",
-      "rendered_md_path": "input/formal-spec/decision-tables/BR-CAR-MGT-006.md",
       "http_status": null,
       "error_message": null
     }

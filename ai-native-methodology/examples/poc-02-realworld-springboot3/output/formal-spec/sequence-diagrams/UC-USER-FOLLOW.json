@@ -1,7 +1,6 @@
 {
   "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
   "uc_id": "UC-USER-FOLLOW",
-  "rendered_mermaid_path": "./UC-USER-FOLLOW.mermaid",
   "source_of_truth": "code+natural_language",
   "direction": "B+A",
   "covers_use_cases": ["UC-USER-FOLLOW", "UC-USER-UNFOLLOW"],

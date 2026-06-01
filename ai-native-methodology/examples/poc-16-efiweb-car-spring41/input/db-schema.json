@@ -992,9 +992,5 @@
       "external": false
     }
   ],
-  "consistency_report_file": "input/db-schema-consistency-report.md",
-  "diagram_files": {
-    "erd": "input/erd.mermaid"
-  },
   "code_pointers_na": true
 }

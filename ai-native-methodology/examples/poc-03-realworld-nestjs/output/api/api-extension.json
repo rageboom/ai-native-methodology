@@ -90,9 +90,9 @@
         "annotations_seen": ["@UsePipes(new ValidationPipe())", "@Post('users')", "@Body('user')"]
       },
       "x-formal-spec-link": {
-        "decision_table": "BR-USER-USERNAME-EMAIL-UNIQUE-001.md",
+        "decision_table": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
         "state_machine": "User.json (anonymous → validatingSignup → checkingDuplicate → persistingUser → registered)",
-        "sequence_diagram": "UC-USER-SIGNUP.mermaid"
+        "sequence_diagram": "UC-USER-SIGNUP.json"
       },
       "x-related-findings": ["F-120", "F-145", "F-150"]
     },
@@ -120,8 +120,8 @@
         "phase_6_candidate": "AP-AUTH-NEST-001 critical"
       },
       "x-formal-spec-link": {
-        "decision_table": "BR-USER-DELETE-AUTH-001.md (current_state: absent)",
-        "sequence_diagram": "UC-USER-DELETE.mermaid"
+        "decision_table": "BR-USER-DELETE-AUTH-001 (current_state: absent)",
+        "sequence_diagram": "UC-USER-DELETE.json"
       },
       "x-related-findings": ["F-140", "F-146", "F-152"]
     },
@@ -152,8 +152,8 @@
         "phase_6_candidate": "AP-API-001 high"
       },
       "x-formal-spec-link": {
-        "decision_table": "BR-USER-LOGIN-VERIFY-001.md",
-        "sequence_diagram": "UC-USER-LOGIN.mermaid"
+        "decision_table": "BR-USER-LOGIN-VERIFY-001",
+        "sequence_diagram": "UC-USER-LOGIN.json"
       },
       "x-related-findings": ["F-118", "F-150", "F-153", "F-158"]
     },
@@ -249,7 +249,7 @@
         "annotations_seen": ["@ApiOperation", "@ApiResponse 201", "@ApiResponse 403", "@Post()", "@User('id')", "@Body('article')"]
       },
       "x-formal-spec-link": {
-        "sequence_diagram": "UC-ARTICLE-CREATE.mermaid",
+        "sequence_diagram": "UC-ARTICLE-CREATE.json",
         "state_machine": "Article.json (creating → persistingArticle → published_count0)"
       },
       "x-related-findings": ["F-053-variant", "F-120-slug", "F-162"]
@@ -396,7 +396,7 @@
         "phase_6_candidate": "AP-DB-001 critical (cumul)"
       },
       "x-formal-spec-link": {
-        "sequence_diagram": "UC-ARTICLE-FAVORITE.mermaid"
+        "sequence_diagram": "UC-ARTICLE-FAVORITE.json"
       },
       "x-related-findings": ["F-135", "F-151"]
     },
@@ -463,9 +463,9 @@
         "annotations_seen": ["@Post(':username/follow')", "@User('email')", "@Param('username')"]
       },
       "x-formal-spec-link": {
-        "decision_table": "BR-FOLLOWS-NO-SELF-001.md + BR-FOLLOWS-PAIR-UNIQUE-001.md",
+        "decision_table": "BR-FOLLOWS-NO-SELF-001 + BR-FOLLOWS-PAIR-UNIQUE-001",
         "state_machine": "Follows.json",
-        "sequence_diagram": "UC-PROFILE-FOLLOW.mermaid"
+        "sequence_diagram": "UC-PROFILE-FOLLOW.json"
       },
       "x-related-findings": ["F-121", "F-144", "F-147", "F-148"]
     },

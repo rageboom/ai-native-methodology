@@ -39,7 +39,6 @@ npx decision-table-validator <dir> --baseline path/to/baseline.json --ratchet # 
 - 필수 필드: `br_id`, `trigger`, `condition`, `action`, `expected_result`, `rejection_method`, `verification_location`, `http_status`, `error_message`, `current_state`
 - enum: `current_state` ∈ {`complete`, `partial`, `absent`}
 - HTTP code 100~599
-- `rendered_md_path` (markdown 짝 링크)
 
 ## Exit codes
 

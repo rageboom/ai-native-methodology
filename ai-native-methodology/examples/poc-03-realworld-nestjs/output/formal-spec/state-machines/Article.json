@@ -3,7 +3,6 @@
   "aggregate_root": "Article",
   "id": "Article",
   "initial": "draft_unrepresented",
-  "rendered_mermaid_path": "./Article.mermaid",
   "source_of_truth": "code",
   "direction": "B",
   "focus": "counter aggregate (favoriteCount 단조성 + slug 가변성) — Senior 권고 (research-poc03 §3.1)",

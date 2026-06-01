@@ -231,8 +231,5 @@
       ]
     }
   ],
-  "diagram_files": {
-    "domain": "input/domain.mermaid"
-  },
   "code_pointers_na": true
 }

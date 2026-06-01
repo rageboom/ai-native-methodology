@@ -173,10 +173,6 @@
                 "condition": {"type": "string"}
               }
             }
-          },
-          "diagram_file": {
-            "type": "string",
-            "description": "Mermaid flowchart 파일 경로"
           }
         }
       }
@@ -389,14 +385,6 @@
             "description": "★ v1.4 Stage 3-1 신규. 기획자 검토 메모 (caveat / rejection 사유 등)."
           }
         }
-      }
-    },
-    "diagram_files": {
-      "type": "object",
-      "properties": {
-        "site_map": {"type": "string"},
-        "user_flows": {"type": "string"},
-        "component_tree": {"type": "string"}
       }
     }
   }

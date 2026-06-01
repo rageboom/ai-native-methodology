@@ -54,10 +54,6 @@
                 "type": {"type": "string", "enum": ["final", "history", "compound"]}
               }
             }
-          },
-          "rendered_mermaid_path": {
-            "type": "string",
-            "description": "이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로."
           }
         }
       }
@@ -98,9 +94,6 @@
                 "guard": {"type": "string"}
               }
             }
-          },
-          "rendered_mermaid_path": {
-            "type": "string"
           }
         }
       }
@@ -161,9 +154,6 @@
           "current_state_note": {
             "type": "string",
             "description": "★ v1.2.3 — current_state 부가 설명. enum 위반 회피 (★ PoC #03 F-156 패턴 — 한국어 prefix 분리). 'partial' / 'absent' 만 enum 으로, 부가 설명은 본 필드."
-          },
-          "rendered_md_path": {
-            "type": "string"
           },
           "br_type": {
             "type": "string",

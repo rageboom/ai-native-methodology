@@ -3,7 +3,6 @@
   "aggregate_root": "Follows",
   "id": "Follows",
   "initial": "not_following",
-  "rendered_mermaid_path": "./Follows.mermaid",
   "source_of_truth": "code",
   "direction": "B",
   "evidence_files": [

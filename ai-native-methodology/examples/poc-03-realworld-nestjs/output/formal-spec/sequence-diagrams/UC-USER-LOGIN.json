@@ -1,7 +1,6 @@
 {
   "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/sequences/items",
   "uc_id": "UC-USER-LOGIN",
-  "rendered_mermaid_path": "./UC-USER-LOGIN.mermaid",
   "source_of_truth": "code",
   "direction": "B",
   "rationale": "★ Senior 권고 D1+D3 추가 — JWT 발급 흐름이 NestJS Passport ↔ Spring Security cross-platform 핵심 검증 데이터 (PoC #02 UC-USER-LOGIN 부재 → 첫 비교 데이터)",

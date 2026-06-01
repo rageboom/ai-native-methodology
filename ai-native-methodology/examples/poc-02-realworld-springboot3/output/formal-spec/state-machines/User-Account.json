@@ -3,7 +3,6 @@
   "aggregate_root": "User",
   "id": "User-Account",
   "initial": "anonymous",
-  "rendered_mermaid_path": "./User-Account.mermaid",
   "source_of_truth": "code",
   "direction": "B",
   "evidence_files": [
