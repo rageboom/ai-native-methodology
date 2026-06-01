@@ -119,7 +119,7 @@ function check2_realToolEvidence() {
 }
 
 function check3_validatorsViolation() {
-  // 4 validator delegated.
+  // 5 validator delegated.
   const checks = [
     {
       name: 'drift state-flow consistency',
@@ -157,6 +157,10 @@ function check3_validatorsViolation() {
         '--json',
       ],
     },
+    {
+      name: 'drift handoff-consistency',
+      cmd: ['tools/drift-validator/src/cli.js', '--check-handoff-consistency', '--json'],
+    },
   ];
   const failures = [];
   for (const c of checks) {
@@ -168,8 +172,8 @@ function check3_validatorsViolation() {
   return {
     id: 'validators_violation',
     pass: failures.length === 0,
-    detail: failures.length === 0 ? `4 validators all 0 critical/high` : `failures: ${failures.join(' | ')}`,
-    delegated_to: '4 validator subprocesses (drift / planning / chain-coverage / spec-test-link)',
+    detail: failures.length === 0 ? `5 validators all 0 critical/high` : `failures: ${failures.join(' | ')}`,
+    delegated_to: '5 validator subprocesses (drift state-flow + handoff / discovery-extraction / chain-coverage / spec-test-link)',
   };
 }
 

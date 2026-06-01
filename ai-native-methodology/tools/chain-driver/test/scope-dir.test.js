@@ -107,17 +107,6 @@ describe('ensureScopeDir', () => {
     }
   });
 
-  it('writes manifest.md alongside manifest.json (이중 렌더링)', () => {
-    const root = join(tmp, 'p4');
-    ensureScopeDir(root, 'user-registration');
-    const scopeMd = join(root, '.aimd', 'user-registration', 'manifest.md');
-    assert.ok(existsSync(scopeMd));
-    for (const stage of STAGES) {
-      assert.ok(existsSync(join(root, '.aimd', 'user-registration', stage, 'manifest.md')),
-        `${stage}/manifest.md missing`);
-    }
-  });
-
   it('is idempotent — second call preserves manifests', () => {
     const root = join(tmp, 'p5');
     ensureScopeDir(root, 'user-registration');
@@ -205,19 +194,5 @@ describe('writeManifest / readManifest', () => {
     const root = join(tmp, 'p12');
     const m = readManifest(root, 'nonexistent');
     assert.equal(m, null);
-  });
-
-  it('writeManifest also writes manifest.md', () => {
-    const root = join(tmp, 'p13');
-    ensureScopeDir(root, 'user-registration');
-    writeManifest(root, 'user-registration', null, {
-      scope: 'user-registration',
-      status: 'in_progress',
-    });
-    const md = join(root, '.aimd', 'user-registration', 'manifest.md');
-    assert.ok(existsSync(md));
-    const content = readFileSync(md, 'utf-8');
-    assert.match(content, /user-registration/);
-    assert.match(content, /in_progress/);
   });
 });

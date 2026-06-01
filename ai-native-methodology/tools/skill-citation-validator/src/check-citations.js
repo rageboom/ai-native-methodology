@@ -1,7 +1,7 @@
 // skill-citation-validator — 결정적 내부 인용 정합 검사 (AI 추론 0%).
 //
 // scope = repo-wide **active shipped 표면** (v8.1.1 — SKILL.md 한정 → 전 활성 doc 확장).
-//   대상 확장자: .md / .mermaid
+//   대상 확장자: .md (★ v12 ADR-011 — .mermaid 산출물 폐기 / scan 제외)
 //   EXCLUDE (역사 보존 LL-i-52 / 생성물 / 외부): node_modules·.git·.aimd·.claude·.github·briefing·dist·examples·archive
 //             + CHANGELOG*·*HISTORY*·decisions/DEC-*·decisions/STATUS*·decisions/INDEX*(과거 DEC 서술 = history-summary)
 //
@@ -19,7 +19,7 @@
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join, resolve, extname, relative, sep } from 'node:path';
 
-const SCAN_EXT = new Set(['.md', '.mermaid']);
+const SCAN_EXT = new Set(['.md']);
 const SKIP_DIR = new Set([
   'node_modules', '.git', '.aimd', '.claude', '.github', 'briefing',
   'dist', 'examples', 'archive',

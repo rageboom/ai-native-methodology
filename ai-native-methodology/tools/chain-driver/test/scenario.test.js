@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { createScopeManifest, renderManifestMd, SCENARIOS } from '../src/work-unit.js';
+import { createScopeManifest, SCENARIOS } from '../src/work-unit.js';
 import { ensureScopeDir, readManifest } from '../src/state-store.js';
 import { evaluateGate, applyUserDecision } from '../src/gate-eval.js';
 
@@ -48,11 +48,6 @@ describe('use-scenario plumbing (work-unit + state-store)', () => {
     ensureScopeDir(root, 'legacy-feature');
     const m = readManifest(root, 'legacy-feature');
     assert.equal(m.scenario, undefined);
-  });
-
-  it('renderManifestMd includes Scenario line when present, omits when absent', () => {
-    assert.match(renderManifestMd(createScopeManifest('x', 'S1')), /- \*\*Scenario\*\*: `S1`/);
-    assert.doesNotMatch(renderManifestMd(createScopeManifest('x')), /Scenario/);
   });
 });
 

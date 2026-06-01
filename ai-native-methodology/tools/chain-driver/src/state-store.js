@@ -242,7 +242,6 @@ import {
   STAGES as STAGES_LIST,
   createScopeManifest,
   createStageManifest,
-  renderManifestMd,
 } from './work-unit.js';
 
 const SCOPE_SLUG_RE = /^[a-z0-9][a-z0-9-]{1,63}$/;
@@ -319,7 +318,6 @@ export function writeManifest(projectRoot, scope, stage, manifest) {
   };
 
   atomicWrite(path, JSON.stringify(enriched, null, 2) + '\n');
-  atomicWrite(join(dir, 'manifest.md'), renderManifestMd(enriched));
   return enriched;
 }
 

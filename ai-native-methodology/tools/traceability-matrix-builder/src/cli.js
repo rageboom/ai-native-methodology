@@ -2,7 +2,7 @@
 import { writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { buildMatrix, renderMarkdown, renderMermaid, loadJson } from './builder.js';
+import { buildMatrix, loadJson } from './builder.js';
 import { synthesizeGraph, TIER1_CATALOG } from './graph-synthesizer.js';
 
 // ★ A2 baseline (DEC-2026-06-01 dogfood F-DF-A2-001) — --commit-hash 미지정 시 현 git HEAD auto-derive.
@@ -105,8 +105,6 @@ const chain = {
 const operationalTaskData = args.operationalTask ? loadJson(args.operationalTask) : null;
 
 const matrix = buildMatrix(chain);
-const md = renderMarkdown(matrix);
-const mermaid = renderMermaid(matrix);
 
 const cs = matrix.coverage_summary;
 console.log(`[traceability-matrix-builder] ${matrix.matrix.length} cells / forward=${(cs.forward_coverage * 100).toFixed(1)}% / backward=${(cs.backward_coverage * 100).toFixed(1)}%`);
@@ -118,9 +116,7 @@ if (args.dryRun) {
 
 if (args.outDir) {
   writeFileSync(`${args.outDir}/matrix.json`, JSON.stringify(matrix, null, 2));
-  writeFileSync(`${args.outDir}/matrix.md`, md);
-  writeFileSync(`${args.outDir}/matrix.mermaid`, mermaid);
-  console.log(`written: ${args.outDir}/matrix.{json,md,mermaid}`);
+  console.log(`written: ${args.outDir}/matrix.json`);
 }
 
 // ★ --graph: artifact-graph.json 합성 (operation.md 결정 8 P1)

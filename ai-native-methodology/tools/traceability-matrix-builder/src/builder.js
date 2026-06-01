@@ -1,6 +1,6 @@
 // traceability-matrix-builder core
 // 입력: 4 chain 산출물 (planning + behavior + acceptance + test + impl) + analysis (businessRules + antipatterns optional)
-// 출력: matrix.json + matrix.md + matrix.mermaid
+// 출력: matrix.json (★ v12 ADR-011 — .md/.mermaid twin 폐기 / json 단독)
 // ★ S5: matrix.json header 의무 — derived_from + do_not_edit_manually:true
 // ★ F-SIM-002 (2026-05-18): severity = source-grounded max-propagation (BR/AP severity + AC.MoSCoW) — SSOT methodology-spec/severity-cross-stage-mapping.md.
 //   권위: ISO 26262 Part 9 ASIL inheritance + IEC 62304 Class A/B/C propagation (F-015 Claim B VERIFIED-WITH-DELTA).
@@ -212,70 +212,6 @@ export function buildMatrix(chain) {
       severity_propagation_active: businessRules !== null || antipatterns !== null,
     }
   };
-}
-
-export function renderMarkdown(matrixData) {
-  const lines = [];
-  lines.push('# Traceability Matrix');
-  lines.push('');
-  lines.push('> ★ S5: do_not_edit_manually = true. derived_from = ' + matrixData.derived_from.join(', '));
-  lines.push('');
-  const cs = matrixData.coverage_summary;
-  lines.push(`**Coverage**: forward=${(cs.forward_coverage * 100).toFixed(1)}% / backward=${(cs.backward_coverage * 100).toFixed(1)}% (threshold ${cs.threshold})`);
-  lines.push(`green=${cs.green_count} / yellow=${cs.yellow_count} / red=${cs.red_count}`);
-  if (cs.severity_propagation_active !== undefined) {
-    lines.push(`severity_propagation_active=${cs.severity_propagation_active} / severity_distinct_count=${cs.severity_distinct_count}`);
-  }
-  lines.push('');
-  // ★ F-SIM-004: BR 컬럼 추가
-  lines.push('| UC | BR | BHV | AC | TC | IMPL | commit | status | severity |');
-  lines.push('|---|---|---|---|---|---|---|---|---|');
-  for (const c of matrixData.matrix) {
-    const icon = c.status === 'green' ? '🟢' : c.status === 'yellow' ? '🟡' : '🔴';
-    const brList = (c.business_rule_ids && c.business_rule_ids.length > 0) ? c.business_rule_ids.join(',') : '—';
-    lines.push(`| ${c.use_case_id ?? '—'} | ${brList} | ${c.behavior_id ?? '—'} | ${c.acceptance_id ?? '—'} | ${c.test_id ?? '—'} | ${c.impl_id ?? '—'} | ${(c.impl_commit_hash ?? '—').slice(0, 8)} | ${icon} ${c.status} | ${c.severity} |`);
-  }
-  return lines.join('\n');
-}
-
-export function renderMermaid(matrixData) {
-  const lines = ['graph LR'];
-  // ★ sp3-c1: ≥ 100 cell 일 때 분할 정책 — 1차 = subgraph chain stage 별
-  if (matrixData.matrix.length > 100) {
-    lines.push('  %% ≥ 100 cell — subgraph 분할 권고 (sp3-c1 / sub-plan-3 carry)');
-  }
-  const seen = new Set();
-  for (const c of matrixData.matrix) {
-    const ucNode = c.use_case_id;
-    const bhvNode = c.behavior_id;
-    const acNode = c.acceptance_id;
-    const tcNode = c.test_id;
-    const implNode = c.impl_id;
-    // ★ F-SIM-004: BR 노드를 BHV 의 source 로 표현 (BR → BHV)
-    for (const brId of c.business_rule_ids ?? []) {
-      if (bhvNode && !seen.has(`${brId}->${bhvNode}`)) {
-        lines.push(`  ${brId} --> ${bhvNode}`);
-        seen.add(`${brId}->${bhvNode}`);
-      }
-    }
-    if (ucNode && bhvNode && !seen.has(`${ucNode}->${bhvNode}`)) {
-      lines.push(`  ${ucNode} --> ${bhvNode}`);
-      seen.add(`${ucNode}->${bhvNode}`);
-    }
-    if (bhvNode && acNode && !seen.has(`${bhvNode}->${acNode}`)) {
-      lines.push(`  ${bhvNode} --> ${acNode}`);
-      seen.add(`${bhvNode}->${acNode}`);
-    }
-    if (acNode && tcNode && !seen.has(`${acNode}->${tcNode}`)) {
-      lines.push(`  ${acNode} --> ${tcNode}`);
-      seen.add(`${acNode}->${tcNode}`);
-    }
-    if (tcNode && implNode && !seen.has(`${tcNode}->${implNode}`)) {
-      lines.push(`  ${tcNode} --> ${implNode}`);
-      seen.add(`${tcNode}->${implNode}`);
-    }
-  }
-  return lines.join('\n');
 }
 
 export function loadJson(path) {

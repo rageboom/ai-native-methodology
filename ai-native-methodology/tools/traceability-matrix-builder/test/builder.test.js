@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMatrix, renderMarkdown, renderMermaid, deriveCellSeverity } from '../src/builder.js';
+import { buildMatrix, deriveCellSeverity } from '../src/builder.js';
 
 const fullChain = {
   planning: { use_cases: [{ id: 'UC-USER-001' }] },
@@ -33,24 +33,6 @@ describe('traceability-matrix-builder', () => {
     const chain = { ...fullChain, acceptance: { criteria: [] } };
     const m = buildMatrix(chain);
     assert.equal(m.matrix[0].status, 'red');
-  });
-
-  it('renders markdown table with BR column (F-SIM-004)', () => {
-    const m = buildMatrix(fullChain);
-    const md = renderMarkdown(m);
-    assert.ok(md.includes('UC-USER-001'));
-    assert.ok(md.includes('🟢'));
-    assert.ok(md.includes('do_not_edit_manually'));
-    // ★ F-SIM-004 — BR 컬럼 header
-    assert.ok(md.includes('| UC | BR | BHV | AC |'), 'BR column header must be present');
-  });
-
-  it('renders mermaid graph', () => {
-    const m = buildMatrix(fullChain);
-    const mm = renderMermaid(m);
-    assert.ok(mm.includes('graph LR'));
-    assert.ok(mm.includes('UC-USER-001 --> BHV-USER-001'));
-    assert.ok(mm.includes('IMPL-USER-001'));
   });
 
   it('respects severity_floor in coverage_summary', () => {
@@ -178,16 +160,6 @@ describe('traceability-matrix-builder', () => {
       };
       const m = buildMatrix(chain);
       assert.deepEqual(m.matrix[0].business_rule_ids.sort(), ['BR-A', 'BR-B']);
-    });
-
-    it('mermaid renders BR --> BHV edge', () => {
-      const chain = {
-        ...fullChain,
-        behavior: { behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'], br_refs: ['BR-USER-DATA-001'] }] }
-      };
-      const m = buildMatrix(chain);
-      const mm = renderMermaid(m);
-      assert.ok(mm.includes('BR-USER-DATA-001 --> BHV-USER-001'), 'BR axis must appear in mermaid graph');
     });
   });
 });

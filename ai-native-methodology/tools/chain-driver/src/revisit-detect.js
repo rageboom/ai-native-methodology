@@ -8,13 +8,13 @@ const MIN_NON_COMMENT_LOC = 5;   // < 5 미만은 자동 ignore + log only
 
 // path-to-chain whitelist
 const PATH_PATTERNS = [
-  { regex: /\.aimd\/.*discovery-spec\.(json|md)$/,      chain: 'discovery' },  // ★ v11.0.0 planning-spec → discovery-spec rename
-  { regex: /\.aimd\/.*behavior-spec\.(json|md|mermaid)$/, chain: 'spec' },
-  { regex: /\.aimd\/.*acceptance-criteria\.(json|md)$/,   chain: 'spec' },
-  { regex: /\.aimd\/.*test-spec\.(json|md)$/,             chain: 'test' },
+  { regex: /\.aimd\/.*discovery-spec\.json$/,      chain: 'discovery' },  // ★ v11.0.0 planning-spec → discovery-spec rename / v12 json 단독
+  { regex: /\.aimd\/.*behavior-spec\.json$/, chain: 'spec' },
+  { regex: /\.aimd\/.*acceptance-criteria\.json$/,   chain: 'spec' },
+  { regex: /\.aimd\/.*test-spec\.json$/,             chain: 'test' },
   { regex: /\.test\.[tj]sx?$/,                            chain: 'test' },
   { regex: /test\/.*\.(py|java|kt|go|rb|cs)$/,            chain: 'test' },
-  { regex: /\.aimd\/.*impl-spec\.(json|md)$/,             chain: 'implement' },
+  { regex: /\.aimd\/.*impl-spec\.json$/,             chain: 'implement' },
   { regex: /^src\/.*\.(ts|tsx|js|jsx|py|java|kt|go|rb|cs)$/, chain: 'implement' },
   { regex: /\.aimd\/.*\/(rules|domain|api-extension)\.json$/, chain: 'analysis' },
 ];

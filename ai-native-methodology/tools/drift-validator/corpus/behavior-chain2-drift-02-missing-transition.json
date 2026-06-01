@@ -1,9 +1,0 @@
-{
-  "id": "BHV-ORDER-002",
-  "initial": "draft",
-  "states": {
-    "draft": { "on": { "SUBMIT": "pending" } },
-    "pending": { "on": { "APPROVE": "shipped", "REJECT": "draft" } },
-    "shipped": {}
-  }
-}

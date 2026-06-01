@@ -1,8 +1,0 @@
-sequenceDiagram
-    participant Producer
-    participant Queue
-    participant Consumer
-
-    Producer->>Queue: publish event
-    Queue-)Consumer: deliver async
-    Consumer--)Queue: ack
