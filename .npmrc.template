@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# .npmrc.template — 사내 Nexus npm registry (repo.smiledev.net) 용 템플릿
+#
+#  사용법: 필요한 프로필을 복사해 실제 .npmrc(또는 ~/.npmrc)에 붙여넣고 placeholder 치환.
+#  ★ 실제 .npmrc 는 절대 커밋 금지 (자격증명 포함). 이 .template 만 커밋.
+#  ★ 인증 방식 2종 (택1): _authToken=NpmToken.xxx (User Token) | _auth=<base64(user:pass)> (Basic)
+#
+#  실 Nexus repo (2026-06-02 확인):
+#    - consume(group):  https://repo.smiledev.net/repository/npm-public/   ← 익명 read 허용됨(토큰 불요)
+#    - publish(hosted): https://repo.smiledev.net/repository/npm-hosted/   ← write 인증 필요
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ========== [A] CONSUME — 플러그인 사용자 (설치 + 자동갱신) ==========
+#  ★ npm-public group repo 는 익명 read 허용 → 일반 사용자는 이 프로필조차 불필요(무토큰 설치).
+#    (사내망에서 registry 가 group 으로 향하기만 하면 됨. Claude Code 는 marketplace.json 의
+#     source.registry 로 직접 받으므로 보통 .npmrc 도 불요.)
+#  아래는 npm CLI 로 직접 받을 때만 참고:
+@ai-native-methodology:registry=https://repo.smiledev.net/repository/npm-public/
+# (익명 read 이므로 토큰 라인 불요. 만약 환경상 인증 요구되면 아래 주석 해제)
+# //repo.smiledev.net/repository/npm-public/:_authToken=${NEXUS_NPM_TOKEN}
+
+# ========== [B] PUBLISH — 배포자 전용 (npm publish / scripts/publish.js) ==========
+#  hosted repo write 권한 보유 계정의 토큰 필요. publish.js 가 --registry 로 hosted 를 명시 전달하므로
+#  배포자는 hosted host 토큰 라인만 있으면 됨.
+//repo.smiledev.net/repository/npm-hosted/:_authToken=${NEXUS_NPM_PUBLISH_TOKEN}
+# (Basic 인증 대안)
+# //repo.smiledev.net/repository/npm-hosted/:_auth=${NEXUS_BASE64_USERPASS}
