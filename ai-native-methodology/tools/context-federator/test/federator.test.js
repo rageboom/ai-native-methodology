@@ -5,7 +5,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { federate, selectOriginNodes, isAnchoredOrigin, makeCodegraphAdapter, cacheStaleness } from '../src/federator.js';
+import { federate, selectOriginNodes, isAnchoredOrigin, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes } from '../src/federator.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = join(HERE, '../../../schemas/context-cache.schema.json');
@@ -261,6 +261,43 @@ test('cacheStaleness — no prev=stale / 일치=fresh / graph↔dep · codegraph
   assert.ok(s2.dep_stale && !s2.code_stale, 'graph 변경 = dep_stale 만');
   const s3 = cacheStaleness(prev, { graphStamp: 'g1', codegraphIndexedAt: 'cX' });
   assert.ok(s3.code_stale && !s3.dep_stale, 'codegraph 변경 = code_stale 만');
+});
+
+// ── ★ Phase 3 — resolvePromptToNodes (자연어 진입 결정론 매칭) ─────────────────
+const RG = { nodes: [
+  node('IMPL-USER-001', 'chain', 'IMPL', 'active', [
+    { path: 'src/user.service.ts', anchor_type: 'strict_path' },
+    { path: 'src/guard.ts', anchor_type: 'ast_symbol', symbol: 'assertAvailable' },
+  ]),
+  node('BHV-AUTH-002', 'chain', 'BHV', 'active', [{ path: 'src/auth.ts', anchor_type: 'strict_path' }]),
+] };
+
+test('resolvePromptToNodes — 노드 id 직접 언급 = 최상위', () => {
+  const hits = resolvePromptToNodes('IMPL-USER-001 바꾸려는데', RG);
+  assert.equal(hits[0].node_id, 'IMPL-USER-001');
+  assert.ok(hits[0].score >= 5);
+});
+
+test('resolvePromptToNodes — 파일 stem 언급 매칭', () => {
+  const hits = resolvePromptToNodes('user.service 로직 수정', RG);
+  assert.equal(hits[0].node_id, 'IMPL-USER-001');
+  assert.ok(hits[0].matched.some(m => m.startsWith('file:')));
+});
+
+test('resolvePromptToNodes — ast_symbol 언급 매칭', () => {
+  const hits = resolvePromptToNodes('assertAvailable 변경', RG);
+  assert.equal(hits[0].node_id, 'IMPL-USER-001');
+  assert.ok(hits[0].matched.some(m => m === 'symbol:assertAvailable'));
+});
+
+test('resolvePromptToNodes — 식별자 없는 한글 산문 = 빈 결과 (정직 / 임베딩 carry)', () => {
+  assert.deepEqual(resolvePromptToNodes('회원가입 화면이 깨졌어요', RG), []);
+});
+
+test('resolvePromptToNodes — 매칭 多 = 높은 score 랭킹', () => {
+  const hits = resolvePromptToNodes('IMPL-USER-001 의 user.service 와 assertAvailable', RG);
+  assert.equal(hits[0].node_id, 'IMPL-USER-001');
+  assert.ok(hits[0].score >= 10, `id+file+symbol 합산 (got ${hits[0].score})`);
 });
 
 // ── ★ env-gated 실 codegraph smoke (no-simulation / 부재 시 honest skip) ──────

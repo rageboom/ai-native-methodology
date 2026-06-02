@@ -52,6 +52,45 @@ export function selectOriginNodes(graph, originIds = null) {
   return picked;
 }
 
+// ── Phase 3 — prompt → dep-graph 노드 결정론 매칭 (자연어 진입) ────────────────
+//   ★ 결정론 only: prompt 안에 등장하는 식별자(node id / code_pointer 파일·심볼)를 substring 매칭해 후보 랭킹.
+//     의미·동의어·임베딩(예: "로그인"↔"login") 매칭 ❌ = propose-only carry (결정론 vs LLM axis 분리 / STRONG-STOP).
+//   ★ 한글 산문만 있고 식별자 0 → 빈 결과 (정직 / 호출부가 --origin 안내 또는 임베딩 carry).
+//   반환: [{ node_id, score, matched:[reasons] }] score desc, 동점 id asc (결정성).
+export function resolvePromptToNodes(prompt, graph, { topN = 5, originIds = null } = {}) {
+  const p = String(prompt ?? '').toLowerCase();
+  if (!p.trim()) return [];
+  const candidates = selectOriginNodes(graph, originIds);
+  const scored = [];
+  for (const node of candidates) {
+    let score = 0;
+    const matched = [];
+    const idLc = node.id.toLowerCase();
+    if (p.includes(idLc)) {
+      score += 5; matched.push(`id:${node.id}`);
+    } else {
+      for (const part of idLc.split(/[-_./]/).filter(x => x.length >= 3)) {
+        if (p.includes(part)) { score += 1; matched.push(`id-part:${part}`); }
+      }
+    }
+    for (const cp of (node.code_pointers ?? [])) {
+      if (cp?.symbol) {
+        const s = cp.symbol.toLowerCase();
+        if (s.length >= 3 && p.includes(s)) { score += 3; matched.push(`symbol:${cp.symbol}`); }
+      }
+      if (cp?.path) {
+        const base = basename(cp.path).toLowerCase();
+        const stem = basename(cp.path, extname(cp.path)).toLowerCase();
+        if (base.length >= 3 && p.includes(base)) { score += 2; matched.push(`file:${base}`); }
+        else if (stem.length >= 3 && p.includes(stem)) { score += 2; matched.push(`file:${stem}`); }
+      }
+    }
+    if (score > 0) scored.push({ node_id: node.id, score, matched });
+  }
+  scored.sort((a, b) => b.score - a.score || a.node_id.localeCompare(b.node_id));
+  return scored.slice(0, topN);
+}
+
 function absFile(base, p) {
   return isAbsolute(p) ? resolve(p) : resolve(base, p);
 }

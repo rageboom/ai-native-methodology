@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { federate, makeNavigateRunner, makeCodegraphAdapter, cacheStaleness } from './federator.js';
+import { federate, makeNavigateRunner, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes } from './federator.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // 도구→도구 import 회피 = chain-driver CLI 를 child process black-box 로 호출 (navigate SKILL 동형).
@@ -28,6 +28,7 @@ function usage(code = 2) {
     '  --repo-root <dir>            code_pointer.path 해석 base (default: cwd)',
     '  --codegraph-project <dir>    codegraph 인덱스(.codegraph) 위치 (default: --repo-root)',
     '  --origin <id>                특정 노드만 federate (반복 가능 / 미지정 = 모든 anchored Tier-1)',
+    '  --prompt "<text>"            ★ Phase 3 — 자연어 프롬프트의 식별자(노드ID/파일명/심볼)를 결정론 매칭해 노드 선택 (의미·임베딩 ❌=carry)',
     '  --out <file>                 context-cache.json 출력 경로 (default: stdout / 디렉토리 자동 생성)',
     '  --delta                      ★ Phase 2 — 기존 --out 캐시 재사용: 바뀐 노드만 재계산 (2축: graph→dep / codegraph→code)',
     '  --no-callers                 codegraph callers 조회 생략 (빠름)',
@@ -48,6 +49,7 @@ function parseArgs(argv) {
     else if (a === '--repo-root') out.repoRoot = argv[++i];
     else if (a === '--codegraph-project') out.codegraphProject = argv[++i];
     else if (a === '--origin') out.origins.push(argv[++i]);
+    else if (a === '--prompt') out.prompt = argv[++i];
     else if (a === '--out') out.outPath = argv[++i];
     else if (a === '--delta') out.delta = true;
     else if (a === '--no-callers') out.withCallers = false;
@@ -91,12 +93,25 @@ function main() {
     console.error(`[context-federator] delta: ${f.stale ? '변경 → ' + f.reasons.join('; ') : 'fresh — 전부 carry (재계산 0)'}`);
   }
 
+  // ★ Phase 3 — 자연어 프롬프트 → 노드 결정론 매칭 (식별자/파일명/심볼 substring).
+  let originIds = args.origins.length ? args.origins : null;
+  if (args.prompt) {
+    const hits = resolvePromptToNodes(args.prompt, graph, { topN: 8 });
+    if (hits.length) {
+      originIds = hits.map(h => h.node_id);
+      console.error('[context-federator] prompt 매칭 ' + hits.length + ': ' + hits.map(h => `${h.node_id}(${h.score})`).join(', '));
+    } else {
+      console.error('[context-federator] prompt 에서 노드 미발견 — 식별자(노드ID/파일명/심볼)가 프롬프트에 있어야 결정론 매칭. --origin <id> 지정 또는 임베딩 의미검색(carry).');
+      originIds = ['__no_match__']; // 매칭 0 = federate 0 (전체 federate 방지)
+    }
+  }
+
   const cache = federate(graph, {
     repoRoot,
     codegraphProjectDir,
     navigate,
     codegraph,
-    originIds: args.origins.length ? args.origins : null,
+    originIds,
     withCallers: args.withCallers,
     maxSymbols: args.maxSymbols,
     graphPath,

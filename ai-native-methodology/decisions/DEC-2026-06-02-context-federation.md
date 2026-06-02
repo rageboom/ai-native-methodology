@@ -1,6 +1,6 @@
 # DEC-2026-06-02-context-federation
 
-**결단**: `C-codegraph-federation` (Slice 2 / DEC-2026-05-30-codegraph-essential-impl-slice1 carry) **착수** — dep-graph(의미) × codegraph(코드 구조)를 노드 `code_pointers` 로 join 하는 `tools/context-federator/` 신설. **Phase 0(본 DEC = 결정 잠금) + Phase 1(read-only federate 코어 + `context-cache.json` + `context-cache.schema.json`) + Phase 2(캐시 재사용·델타 = 2축 무효화)** 시행. 사용자 P0 운영 형태("prompt → dep-graph 검색 → codegraph 연동 → 통합 컨텍스트 회수·재사용") 의 첫 실 배선. **gate 무개입 / non-gating / opt-in.**
+**결단**: `C-codegraph-federation` (Slice 2 / DEC-2026-05-30-codegraph-essential-impl-slice1 carry) **착수** — dep-graph(의미) × codegraph(코드 구조)를 노드 `code_pointers` 로 join 하는 `tools/context-federator/` 신설. **Phase 0(결정 잠금) + Phase 1(federate 코어 + context-cache.json/schema) + Phase 2(캐시 재사용·델타 = 2축 무효화) + Phase 3a(자연어 prompt→node 결정론 매칭 + CLI --prompt + SKILL lens)** 시행. 사용자 P0 운영 형태("prompt → dep-graph 검색 → codegraph 연동 → 통합 컨텍스트 회수·재사용") 의 첫 실 배선. **gate 무개입 / non-gating / opt-in.**
 
 **작성일**: 2026-06-02 (worktree `session-wt` / 사용자 승인 — "Phase 0+1 구현" + "디폴트 가드 그대로").
 
@@ -56,11 +56,17 @@
 - **신설**: `federate(graph,{prevCache,graphStamp,codegraphIndexedAt,stampFn})` 델타 + `cacheStaleness()` export + adapter `indexedAt()` + CLI `--delta` + schema(meta 2 stamp / pack `anchor_stamp` / stats `dep_recomputed·code_recomputed·carried_packs`).
 - **실증**: poc-05 1차 full(dep4/code4/carry0) → 2차 무변경 **carry4 / 재계산0**(navigate·codegraph 호출 0) = 순수 재사용. 단위 테스트 16/16(델타 6: 양축 carry/단축 재계산/신규·삭제/anchor_stamp 민감/cacheStaleness). workspace **1031/0**.
 
+## 8. Phase 3a 추가 시행 (同 2026-06-02 / 자연어 진입 = prompt→node)
+
+- **`resolvePromptToNodes(prompt, graph)`** = 결정론 only. prompt 안 식별자(node id / code_pointer 파일명·심볼)를 substring 매칭·랭킹(id 5 / symbol 3 / file 2 / id-part 1). 의미·동의어·임베딩 = propose-only carry (결정론 vs LLM axis 분리). 식별자 0(한글 산문) → 빈 결과 정직.
+- **CLI `--prompt "<text>"`** → 매칭 노드 federate. + dep-graph-navigator SKILL '코드 흐름 lens' 섹션(LLM skill → 결정론 tool 호출 = axis 정합 / hook 아님).
+- **실증**: poc-05 `--prompt "user.service 의 register..."` → 4노드 자동 선택 federate / 식별자 없는 산문 → 0 매칭 정직. 단위 21/21(resolve 5) + workspace **1036/0**.
+
 ## 5. carry
 
 1. **Phase 1.5** — legacy 스택 데이터 반쪽 = db-schema/sql-inventory/business-rules 조인 소스 분기.
 2. **Phase 2 잔여** — `context-cache.json` 을 work-unit `sync_sources` 자동 등재(living-loop markDrift 연동). 코어 델타는 ✅ 시행(§7).
-3. **Phase 3** — `resolvePromptToNodes()` 결정론 prompt→node 매칭 + SessionStart/UserPromptSubmit hook 주입 + dep-graph-navigator SKILL '코드 흐름 lens' 섹션.
+3. **Phase 3b 잔여** — SessionStart/UserPromptSubmit **hook 자동 주입**(B2-full / "무거움"으로 DEC-2026-06-01 DEFER / env 결합 = codegraph 부재 시 graceful 의무). Phase 3a(resolve+CLI+SKILL) = ✅ 시행(§8). hook 자동주입은 별도 사용자 결정.
 4. **Phase 4** — 2nd distinct domain corroboration 후 격상 검토(여전히 finding-only) + MCP serve 별도 슬라이스.
 5. INDEX.md / STATUS.md entry + (release 시) CHANGELOG.
 
