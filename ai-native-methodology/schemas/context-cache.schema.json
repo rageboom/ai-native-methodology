@@ -38,11 +38,13 @@
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["graph_path", "repo_root", "codegraph_project_dir"],
+      "required": ["graph_path", "repo_root", "codegraph_project_dir", "sql_inventory_path", "db_schema_path"],
       "properties": {
         "graph_path": { "type": ["string", "null"] },
         "repo_root": { "type": "string" },
-        "codegraph_project_dir": { "type": "string" }
+        "codegraph_project_dir": { "type": "string" },
+        "sql_inventory_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — legacy 데이터 반쪽 소스 (analysis-sql-inventory source_path 자동발견 또는 --sql-inventory)." },
+        "db_schema_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — db-schema 소스 (dependent_tables 컬럼 보강)." }
       }
     },
     "codegraph": {
@@ -60,9 +62,48 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["node_id", "artifact_kind", "artifact_subkind", "state", "dep_impact", "top_impact_roots", "code_anchors", "code_refs", "anchor_stamp"],
+        "required": ["node_id", "artifact_kind", "artifact_subkind", "state", "dep_impact", "top_impact_roots", "code_anchors", "code_refs", "data_refs", "anchor_stamp"],
         "properties": {
           "anchor_stamp": { "type": "string", "description": "★ Phase 2 — 노드 코드-side 입력 지문(state+code_pointers). 동일 + codegraph index 무변경 = code_refs verbatim carry." },
+          "data_refs": {
+            "type": "array",
+            "description": "★ Phase 1.5 — legacy 데이터 반쪽 (sql-inventory/db-schema). codegraph 가 못 보는 SQL/테이블 층 = sql_id·dependent_tables. uc_link/mapper_xml 조인. reference-lens / non-gating.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["sql_id", "statement_type", "mapper_xml", "business_meaning", "dependent_tables", "source"],
+              "properties": {
+                "sql_id": { "type": ["string", "null"] },
+                "statement_type": { "type": ["string", "null"] },
+                "mapper_xml": { "type": ["string", "null"] },
+                "business_meaning": { "type": ["string", "null"] },
+                "dependent_tables": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name", "columns"],
+                    "properties": {
+                      "name": { "type": ["string", "null"] },
+                      "columns": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["name", "type"],
+                          "properties": {
+                            "name": { "type": ["string", "null"] },
+                            "type": { "type": ["string", "null"] }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "source": { "type": "string" }
+              }
+            }
+          },
           "node_id": { "type": "string" },
           "artifact_kind": { "type": "string" },
           "artifact_subkind": { "type": ["string", "null"] },
@@ -138,7 +179,7 @@
     "stats": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pack_count", "anchored_nodes", "symbols_resolved", "anchors_unresolved", "codegraph_available", "dep_recomputed", "code_recomputed", "carried_packs"],
+      "required": ["pack_count", "anchored_nodes", "symbols_resolved", "anchors_unresolved", "codegraph_available", "dep_recomputed", "code_recomputed", "carried_packs", "data_anchored_nodes", "data_refs_count", "data_source_available"],
       "properties": {
         "pack_count": { "type": "integer" },
         "anchored_nodes": { "type": "integer" },
@@ -147,7 +188,10 @@
         "codegraph_available": { "type": "boolean" },
         "dep_recomputed": { "type": "integer", "description": "★ Phase 2 — navigate(dep) 재계산 노드 수." },
         "code_recomputed": { "type": "integer", "description": "★ Phase 2 — codegraph(code) 재계산 노드 수." },
-        "carried_packs": { "type": "integer", "description": "★ Phase 2 — prevCache 에서 통째로 carry 한 노드 수 (재계산 0)." }
+        "carried_packs": { "type": "integer", "description": "★ Phase 2 — prevCache 에서 통째로 carry 한 노드 수 (재계산 0)." },
+        "data_anchored_nodes": { "type": "integer", "description": "★ Phase 1.5 — sql-inventory uc_link 로만 편입된 노드 수 (code_pointers 0 legacy)." },
+        "data_refs_count": { "type": "integer", "description": "★ Phase 1.5 — 전체 data_refs(SQL 문) 수." },
+        "data_source_available": { "type": "boolean", "description": "★ Phase 1.5 — sql-inventory 로드 여부." }
       }
     }
   }

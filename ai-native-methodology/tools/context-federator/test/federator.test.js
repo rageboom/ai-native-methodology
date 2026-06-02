@@ -5,7 +5,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { federate, selectOriginNodes, isAnchoredOrigin, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes } from '../src/federator.js';
+import { federate, selectOriginNodes, isAnchoredOrigin, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes, loadLegacyDataSource } from '../src/federator.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA_PATH = join(HERE, '../../../schemas/context-cache.schema.json');
@@ -298,6 +298,87 @@ test('resolvePromptToNodes — 매칭 多 = 높은 score 랭킹', () => {
   const hits = resolvePromptToNodes('IMPL-USER-001 의 user.service 와 assertAvailable', RG);
   assert.equal(hits[0].node_id, 'IMPL-USER-001');
   assert.ok(hits[0].score >= 10, `id+file+symbol 합산 (got ${hits[0].score})`);
+});
+
+// ── ★ Phase 1.5 — legacy 데이터 반쪽 (sql-inventory + db-schema) ──────────────
+const DS_GRAPH = { nodes: [
+  { id: 'analysis-sql-inventory', artifact_kind: 'analysis', source_path: 'input/sql-inventory.json' },
+  { id: 'analysis-db-schema', artifact_kind: 'analysis', source_path: 'input/db-schema.json' },
+] };
+const DS_JSON = {
+  '/repo/input/sql-inventory.json': { inventory: [
+    { sql_id: 'selectCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'SELECT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 조회' },
+    { sql_id: 'insertCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'INSERT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 등록' },
+  ] },
+  '/repo/input/db-schema.json': { tables: [
+    { name: 'tb_car', columns: [{ name: 'car_idx', type: 'int' }, { name: 'car_name', type: 'varchar' }] },
+  ] },
+};
+function loadDS() {
+  return loadLegacyDataSource(DS_GRAPH, { repoRoot: '/repo', readJson: (p) => DS_JSON[p] ?? null, existsFn: (p) => p in DS_JSON });
+}
+
+test('loadLegacyDataSource — source_path 자동발견 + byUc/byMapper/tableByName 인덱스', () => {
+  const ds = loadDS();
+  assert.equal(ds.available, true);
+  assert.equal(ds.sql_loaded, true);
+  assert.equal(ds.db_loaded, true);
+  assert.equal(ds.byUc.get('UC-CAR-001').length, 2);
+  assert.ok(ds.byMapper.has('carMgt.xml'));
+  assert.deepEqual(ds.tableByName.get('tb_car').columns.map(c => c.name), ['car_idx', 'car_name']);
+});
+
+test('loadLegacyDataSource — 산출물 부재 = available:false (graceful / no-sim)', () => {
+  const ds = loadLegacyDataSource(DS_GRAPH, { repoRoot: '/repo', readJson: () => null, existsFn: () => false });
+  assert.equal(ds.available, false);
+  assert.equal(ds.byUc.size, 0);
+});
+
+test('federate — data-anchored: code_pointers 0 인 UC 노드도 sql-inventory 로 federate + db-schema 컬럼 보강', () => {
+  const graph = { nodes: [node('UC-CAR-001', 'chain', 'UC', 'active', [])] }; // code_pointers 0 (legacy)
+  const cache = federate(graph, {
+    repoRoot: '/repo',
+    navigate: fakeNavigate({ MUST: ['BHV-CAR-001'], SHOULD: [], FYI: [] }),
+    codegraph: { available: false, version: null, reason: 'legacy iBATIS2' },
+    dataSource: loadDS(),
+    now: () => FIXED_NOW,
+  });
+  assert.equal(cache.packs.length, 1, 'code_pointers 0 이어도 data-anchored 로 편입');
+  assert.equal(cache.stats.data_anchored_nodes, 1);
+  assert.equal(cache.stats.data_source_available, true);
+  const p = cache.packs[0];
+  assert.deepEqual(p.dep_impact.must, ['BHV-CAR-001'], 'dep 반쪽도 navigate 로 채워짐');
+  assert.equal(p.data_refs.length, 2, 'uc_link 매칭 SQL 2건');
+  assert.equal(p.data_refs[0].sql_id, 'selectCar');
+  assert.equal(p.data_refs[0].dependent_tables[0].name, 'tb_car');
+  assert.deepEqual(p.data_refs[0].dependent_tables[0].columns.map(c => c.name), ['car_idx', 'car_name'], 'db-schema 컬럼 보강');
+});
+
+test('federate — mapper_xml 조인 (code_pointer 파일명 → sql-inventory)', () => {
+  const graph = { nodes: [node('IMPL-CAR-001', 'chain', 'IMPL', 'active', [
+    { path: 'src/main/resources/sqlmap/carMgt.xml', anchor_type: 'strict_path' },
+  ])] };
+  const cache = federate(graph, {
+    repoRoot: '/repo',
+    navigate: fakeNavigate({ MUST: [], SHOULD: [], FYI: [] }),
+    codegraph: { available: false, version: null, reason: 'x' },
+    dataSource: loadDS(),
+    now: () => FIXED_NOW,
+  });
+  assert.equal(cache.packs[0].data_refs.length, 2, 'mapper basename(carMgt.xml) 매칭 SQL 2건');
+});
+
+test('federate — dataSource 없음: data_refs 전부 [] + 기존 동작 무변경', () => {
+  const graph = { nodes: [node('IMPL-1', 'chain', 'IMPL', 'active', [{ path: 'src/x.ts', anchor_type: 'ast_symbol', symbol: 'foo' }])] };
+  const cache = federate(graph, {
+    repoRoot: '/repo',
+    navigate: fakeNavigate({ MUST: ['UC-1'], SHOULD: [], FYI: [] }),
+    codegraph: fakeCodegraph({ callers: { foo: [] } }),
+    now: () => FIXED_NOW, // dataSource 미주입
+  });
+  assert.deepEqual(cache.packs[0].data_refs, []);
+  assert.equal(cache.stats.data_source_available, false);
+  assert.equal(cache.stats.data_anchored_nodes, 0);
 });
 
 // ── ★ env-gated 실 codegraph smoke (no-simulation / 부재 시 honest skip) ──────

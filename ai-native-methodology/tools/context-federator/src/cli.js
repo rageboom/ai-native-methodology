@@ -12,7 +12,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
-import { federate, makeNavigateRunner, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes } from './federator.js';
+import { federate, makeNavigateRunner, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes, loadLegacyDataSource } from './federator.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 // 도구→도구 import 회피 = chain-driver CLI 를 child process black-box 로 호출 (navigate SKILL 동형).
@@ -31,6 +31,8 @@ function usage(code = 2) {
     '  --prompt "<text>"            ★ Phase 3 — 자연어 프롬프트의 식별자(노드ID/파일명/심볼)를 결정론 매칭해 노드 선택 (의미·임베딩 ❌=carry)',
     '  --out <file>                 context-cache.json 출력 경로 (default: stdout / 디렉토리 자동 생성)',
     '  --delta                      ★ Phase 2 — 기존 --out 캐시 재사용: 바뀐 노드만 재계산 (2축: graph→dep / codegraph→code)',
+    '  --sql-inventory <file>       ★ Phase 1.5 — legacy 데이터 반쪽 소스 override (기본: analysis-sql-inventory 노드 source_path 자동발견)',
+    '  --db-schema <file>           ★ Phase 1.5 — db-schema override (dependent_tables 컬럼 보강 / 기본: 자동발견)',
     '  --no-callers                 codegraph callers 조회 생략 (빠름)',
     '  --max-symbols <n>            strict_path 앵커당 최대 심볼 수 (default: 12)',
     '  --format text|json           stdout 출력 형식 (default: json / --out 지정 시 항상 json 파일)',
@@ -51,6 +53,8 @@ function parseArgs(argv) {
     else if (a === '--origin') out.origins.push(argv[++i]);
     else if (a === '--prompt') out.prompt = argv[++i];
     else if (a === '--out') out.outPath = argv[++i];
+    else if (a === '--sql-inventory') out.sqlInventory = argv[++i];
+    else if (a === '--db-schema') out.dbSchema = argv[++i];
     else if (a === '--delta') out.delta = true;
     else if (a === '--no-callers') out.withCallers = false;
     else if (a === '--max-symbols') out.maxSymbols = Number(argv[++i]);
@@ -79,6 +83,8 @@ function main() {
 
   const navigate = makeNavigateRunner({ graphPath, chainDriverCli: CHAIN_DRIVER_CLI, repoRoot });
   const codegraph = makeCodegraphAdapter({ codegraphProjectDir });
+  // ★ Phase 1.5 — legacy 데이터 반쪽 (sql-inventory/db-schema 자동발견 또는 override).
+  const dataSource = loadLegacyDataSource(graph, { repoRoot, sqlInventoryPath: args.sqlInventory, dbSchemaPath: args.dbSchema });
   // ★ Phase 2 stamps — graph_stamp(파일 내용 해시) = dep 축 / codegraph indexedAt(DB mtime) = code 축.
   const graphStamp = createHash('sha256').update(rawGraph).digest('hex');
   const codegraphIndexedAt = typeof codegraph.indexedAt === 'function' ? codegraph.indexedAt() : null;
@@ -118,6 +124,7 @@ function main() {
     prevCache,
     graphStamp,
     codegraphIndexedAt,
+    dataSource,
   });
 
   if (args.outPath) {
@@ -129,16 +136,21 @@ function main() {
       `[context-federator] ${outPath}\n`
       + `  packs=${s.pack_count} anchored_nodes=${s.anchored_nodes} symbols_resolved=${s.symbols_resolved} `
       + `anchors_unresolved=${s.anchors_unresolved} codegraph=${s.codegraph_available ? cache.codegraph.version : 'unavailable'}\n`
-      + `  delta: dep_recomputed=${s.dep_recomputed} code_recomputed=${s.code_recomputed} carried=${s.carried_packs}`,
+      + `  delta: dep_recomputed=${s.dep_recomputed} code_recomputed=${s.code_recomputed} carried=${s.carried_packs}\n`
+      + `  data(legacy): sql_inventory=${s.data_source_available ? 'loaded' : 'none'} data_anchored_nodes=${s.data_anchored_nodes} data_refs=${s.data_refs_count}`,
     );
   } else if (args.format === 'text') {
     const s = cache.stats;
-    console.log(`[context-federator] codegraph=${s.codegraph_available ? cache.codegraph.version : 'unavailable'} / packs=${s.pack_count}`);
+    console.log(`[context-federator] codegraph=${s.codegraph_available ? cache.codegraph.version : 'unavailable'} / sql-inventory=${s.data_source_available ? 'loaded' : 'none'} / packs=${s.pack_count}`);
     for (const p of cache.packs) {
       const code = p.code_refs.reduce((a, r) => a + r.symbols.length, 0);
       console.log(`  ${p.node_id} (${p.artifact_kind}/${p.artifact_subkind}) state=${p.state}`);
       console.log(`    dep_impact MUST=${p.dep_impact.must.length} SHOULD=${p.dep_impact.should.length} FYI=${p.dep_impact.fyi.length}`);
       console.log(`    code_anchors=${p.code_anchors.length} code_symbols=${code}${p.code_refs.some(r => r.unresolved) ? ' (일부 unresolved)' : ''}`);
+      if (p.data_refs.length) {
+        const tables = [...new Set(p.data_refs.flatMap(d => d.dependent_tables.map(t => t.name)))];
+        console.log(`    data_refs=${p.data_refs.length} SQL (legacy / tables: ${tables.join(', ') || '-'})`);
+      }
     }
   } else {
     console.log(JSON.stringify(cache, null, 2));

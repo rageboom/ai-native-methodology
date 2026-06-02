@@ -20,7 +20,7 @@
 
 import { resolve, relative, isAbsolute, basename, extname, join } from 'node:path';
 import { execSync, execFileSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, statSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 
@@ -89,6 +89,85 @@ export function resolvePromptToNodes(prompt, graph, { topN = 5, originIds = null
   }
   scored.sort((a, b) => b.score - a.score || a.node_id.localeCompare(b.node_id));
   return scored.slice(0, topN);
+}
+
+// ── Phase 1.5 — legacy 데이터 반쪽 (분석 산출물 sql-inventory + db-schema) ───────
+//   ★ codegraph 가 못 보는 legacy SQL/테이블 층을 분석 산출물에서 채운다.
+//     sql-inventory item = { sql_id, mapper_xml, statement_type, dependent_tables[], uc_link, business_meaning }.
+//     uc_link → 그래프 UC 노드 직접 조인(code_pointers 0 인 legacy 도 연결) / mapper_xml → code_pointer 파일 조인.
+//   ★ trust: 분석 산출물 = LLM 추출 → data_refs 도 reference-lens / non-gating (codegraph 와 동일).
+//   ★ no-simulation: 산출물 부재 = available:false (빈 인덱스 / data_refs 없음).
+function defaultReadJson(p) {
+  try { return JSON.parse(readFileSync(p, 'utf-8')); } catch { return null; }
+}
+function sourcePathOf(graph, nodeId, repoRoot, existsFn = existsSync) {
+  const n = (graph?.nodes ?? []).find(x => x?.id === nodeId);
+  if (!n?.source_path) return null;
+  const full = isAbsolute(n.source_path) ? n.source_path : resolve(repoRoot, n.source_path);
+  return existsFn(full) ? full : null;
+}
+function pushMap(map, key, val) {
+  if (key == null) return;
+  if (!map.has(key)) map.set(key, []);
+  map.get(key).push(val);
+}
+
+// 데이터 소스 로딩 (CLI 가 호출 = fs read / readJson 주입 testable). 자동 발견 = analysis 노드 source_path.
+export function loadLegacyDataSource(graph, { repoRoot = process.cwd(), sqlInventoryPath = null, dbSchemaPath = null, readJson = defaultReadJson, existsFn = existsSync } = {}) {
+  const sqlPath = sqlInventoryPath ?? sourcePathOf(graph, 'analysis-sql-inventory', repoRoot, existsFn);
+  const dbPath = dbSchemaPath ?? sourcePathOf(graph, 'analysis-db-schema', repoRoot, existsFn);
+  const byUc = new Map();
+  const byMapper = new Map();
+  const tableByName = new Map();
+  let sqlLoaded = false, dbLoaded = false;
+
+  const inv = sqlPath ? readJson(sqlPath) : null;
+  if (inv && Array.isArray(inv.inventory)) {
+    sqlLoaded = true;
+    for (const e of inv.inventory) {
+      if (e?.uc_link) pushMap(byUc, e.uc_link, e);
+      if (e?.mapper_xml) pushMap(byMapper, basename(e.mapper_xml), e);
+    }
+  }
+  const db = dbPath ? readJson(dbPath) : null;
+  if (db && Array.isArray(db.tables)) {
+    dbLoaded = true;
+    for (const t of db.tables) if (t?.name) tableByName.set(t.name, t);
+  }
+  return {
+    available: sqlLoaded,
+    byUc, byMapper, tableByName,
+    sql_inventory_path: sqlPath, db_schema_path: dbPath,
+    sql_loaded: sqlLoaded, db_loaded: dbLoaded,
+  };
+}
+
+// 노드 → data_refs (sql-inventory entries / uc_link + mapper_xml 조인 / dependent_tables db-schema 컬럼 보강).
+function buildDataRefs(node, dataSource) {
+  if (!dataSource || !dataSource.available) return [];
+  const refs = [];
+  const seen = new Set();
+  const add = (e) => {
+    const key = `${e?.mapper_xml ?? ''}#${e?.sql_id ?? ''}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    refs.push({
+      sql_id: e?.sql_id ?? null,
+      statement_type: e?.statement_type ?? null,
+      mapper_xml: e?.mapper_xml ?? null,
+      business_meaning: e?.business_meaning ?? null,
+      dependent_tables: (e?.dependent_tables ?? []).map(t => ({
+        name: t,
+        columns: (dataSource.tableByName.get(t)?.columns ?? []).map(c => ({ name: c?.name ?? null, type: c?.type ?? null })),
+      })),
+      source: 'sql-inventory',
+    });
+  };
+  for (const e of (dataSource.byUc.get(node.id) ?? [])) add(e);
+  for (const cp of (node.code_pointers ?? [])) {
+    if (cp?.path) for (const e of (dataSource.byMapper.get(basename(cp.path)) ?? [])) add(e);
+  }
+  return refs;
 }
 
 function absFile(base, p) {
@@ -245,13 +324,29 @@ export function federate(graph, opts = {}) {
     graphStamp = null,
     codegraphIndexedAt = null,
     stampFn = defaultStampFn,
+    dataSource = null,
   } = opts;
 
   if (typeof navigate !== 'function') {
     throw new Error('federate: navigate runner 가 필요합니다 (opts.navigate / makeNavigateRunner)');
   }
 
-  const origins = selectOriginNodes(graph, originIds);
+  // origin = code-anchored(code_pointers) ∪ data-anchored(sql-inventory uc_link / Phase 1.5).
+  //   → code_pointers 0 인 legacy 노드도 sql-inventory 로 federate 대상 편입.
+  const picked = new Map();
+  for (const n of selectOriginNodes(graph, originIds)) picked.set(n.id, n);
+  let dataAnchoredCount = 0;
+  if (dataSource && dataSource.available) {
+    const want = (Array.isArray(originIds) && originIds.length) ? new Set(originIds) : null;
+    for (const n of (graph?.nodes ?? [])) {
+      if (!n || picked.has(n.id) || !TRAVERSABLE_STATES.has(n.state)) continue;
+      if (!dataSource.byUc.has(n.id)) continue;
+      if (want && !want.has(n.id)) continue;
+      picked.set(n.id, n);
+      dataAnchoredCount++;
+    }
+  }
+  const origins = [...picked.values()];
   const ctx = { codegraph, repoRoot, codegraphProjectDir, withCallers, maxSymbols };
   const prevPacks = new Map((prevCache?.packs ?? []).map(p => [p.node_id, p]));
   // 2축 무효화: prevCache 없거나 stamp 불일치 = 변경으로 간주 (보수적).
@@ -260,7 +355,7 @@ export function federate(graph, opts = {}) {
 
   const packs = [];
   let symbolsResolved = 0, anchorsUnresolved = 0;
-  let depRecomputed = 0, codeRecomputed = 0, carriedPacks = 0;
+  let depRecomputed = 0, codeRecomputed = 0, carriedPacks = 0, dataRefsCount = 0;
 
   for (const node of origins) {
     const anchorStamp = anchorStampOf(node, stampFn);
@@ -276,6 +371,10 @@ export function federate(graph, opts = {}) {
     if (carryCode) { codePart = { code_anchors: prev.code_anchors, code_refs: prev.code_refs }; }
     else { codePart = buildCodePart(node, ctx); codeRecomputed++; }
 
+    // ★ Phase 1.5 data_refs = sql-inventory/db-schema (legacy 데이터 반쪽). 항상 fresh (cheap in-memory lookup / IO 는 loadLegacyDataSource 가 사전 처리).
+    const dataRefs = buildDataRefs(node, dataSource);
+    dataRefsCount += dataRefs.length;
+
     if (carryDep && carryCode) carriedPacks++;
     for (const r of codePart.code_refs) { symbolsResolved += r.symbols.length; if (r.unresolved) anchorsUnresolved++; }
 
@@ -286,6 +385,7 @@ export function federate(graph, opts = {}) {
       state: node.state,
       ...depPart,
       ...codePart,
+      data_refs: dataRefs,
       anchor_stamp: anchorStamp,
     });
   }
@@ -305,6 +405,8 @@ export function federate(graph, opts = {}) {
       graph_path: graphPath,
       repo_root: repoRoot,
       codegraph_project_dir: codegraphProjectDir,
+      sql_inventory_path: dataSource?.sql_inventory_path ?? null,
+      db_schema_path: dataSource?.db_schema_path ?? null,
     },
     codegraph: {
       available: !!codegraph.available,
@@ -321,6 +423,9 @@ export function federate(graph, opts = {}) {
       dep_recomputed: depRecomputed,
       code_recomputed: codeRecomputed,
       carried_packs: carriedPacks,
+      data_anchored_nodes: dataAnchoredCount,
+      data_refs_count: dataRefsCount,
+      data_source_available: !!(dataSource && dataSource.available),
     },
   };
 }
