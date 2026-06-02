@@ -304,14 +304,19 @@ test('resolvePromptToNodes — 매칭 多 = 높은 score 랭킹', () => {
 const DS_GRAPH = { nodes: [
   { id: 'analysis-sql-inventory', artifact_kind: 'analysis', source_path: 'input/sql-inventory.json' },
   { id: 'analysis-db-schema', artifact_kind: 'analysis', source_path: 'input/db-schema.json' },
+  { id: 'analysis-business-rules', artifact_kind: 'analysis', source_path: 'input/business-rules.json' },
 ] };
 const DS_JSON = {
   '/repo/input/sql-inventory.json': { inventory: [
     { sql_id: 'selectCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'SELECT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 조회' },
-    { sql_id: 'insertCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'INSERT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 등록' },
+    { sql_id: 'insertCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'INSERT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 등록 — BR-CAR-001 + BR-CAR-002 anchor' },
   ] },
   '/repo/input/db-schema.json': { tables: [
     { name: 'tb_car', columns: [{ name: 'car_idx', type: 'int' }, { name: 'car_name', type: 'varchar' }] },
+  ] },
+  '/repo/input/business-rules.json': { business_rules: [
+    { id: 'BR-CAR-001', name: '차량 등록 의무 필드', natural_language: '차량 등록 시 17 필드 필수', severity: 'high' },
+    { id: 'BR-CAR-002', name: 'carIdx IDENTITY', natural_language: 'carIdx 는 selectKey 로 추출', severity: 'medium' },
   ] },
 };
 function loadDS() {
@@ -352,6 +357,29 @@ test('federate — data-anchored: code_pointers 0 인 UC 노드도 sql-inventory
   assert.equal(p.data_refs[0].sql_id, 'selectCar');
   assert.equal(p.data_refs[0].dependent_tables[0].name, 'tb_car');
   assert.deepEqual(p.data_refs[0].dependent_tables[0].columns.map(c => c.name), ['car_idx', 'car_name'], 'db-schema 컬럼 보강');
+});
+
+test('loadLegacyDataSource — business-rules 인덱스(byId) 로드', () => {
+  const ds = loadDS();
+  assert.equal(ds.br_loaded, true);
+  assert.equal(ds.brById.get('BR-CAR-001').name, '차량 등록 의무 필드');
+});
+
+test('federate — data_refs.business_rules: business_meaning 의 BR id 조인 (Phase 1.5b)', () => {
+  const graph = { nodes: [node('UC-CAR-001', 'chain', 'UC', 'active', [])] };
+  const cache = federate(graph, {
+    repoRoot: '/repo',
+    navigate: fakeNavigate({ MUST: [], SHOULD: [], FYI: [] }),
+    codegraph: { available: false, version: null, reason: 'legacy' },
+    dataSource: loadDS(),
+    now: () => FIXED_NOW,
+  });
+  const insertRef = cache.packs[0].data_refs.find(d => d.sql_id === 'insertCar');
+  assert.equal(insertRef.business_rules.length, 2, 'business_meaning 의 BR-CAR-001/002 조인');
+  assert.deepEqual(insertRef.business_rules.map(b => b.id), ['BR-CAR-001', 'BR-CAR-002']);
+  assert.equal(insertRef.business_rules[0].name, '차량 등록 의무 필드');
+  const selectRef = cache.packs[0].data_refs.find(d => d.sql_id === 'selectCar');
+  assert.deepEqual(selectRef.business_rules, [], 'BR 참조 없는 SQL = 빈 배열');
 });
 
 test('federate — mapper_xml 조인 (code_pointer 파일명 → sql-inventory)', () => {

@@ -68,10 +68,11 @@
 - **신설**: `loadLegacyDataSource(graph,{repoRoot,...})` — `analysis-sql-inventory`/`analysis-db-schema` 노드 `source_path` **자동발견** → `byUc`(uc_link→entries) / `byMapper`(파일명→entries) / `tableByName`. federate **origin 확장**(code-anchored ∪ **data-anchored** = uc_link 가 가리키는 노드 → code_pointers 0 legacy 도 편입) + pack `data_refs`(sql_id·statement_type·dependent_tables[+db-schema 컬럼]·business_meaning / `source:'sql-inventory'`). CLI `--sql-inventory`/`--db-schema` override.
 - **trust**: 분석 산출물=LLM 추출 → data_refs 도 **reference-lens / non-gating**. 결정론(read+lookup / AI 재유추 ❌). additive(기존 code_refs/델타/prompt 무변경).
 - **실증(no-sim)**: poc-16(efiweb-car / code_pointers 0 / sql-inventory 6 entries) → **5 UC 노드 data-anchored 편입 + data_refs**(`tb_car`/`tb_car_cost`/`ifrs.fn_split` 등 / codegraph 없이 SQL·테이블 반쪽 확보) + dep navigate 동반. 단위 26/26(Phase 1.5 +5: loadDS/data-anchored/db-schema 보강/mapper 조인/graceful) + workspace **1041/0**.
+- **★ Phase 1.5b (同일 추가 / business-rules 조인)**: `loadLegacyDataSource` 가 `analysis-business-rules` source_path 도 자동발견 → `brById` 인덱스. `data_refs[].business_rules` = `business_meaning` 텍스트의 BR id(`BR-XXX`) 추출 → 조회({id,name,natural_language,severity}). → legacy 데이터 반쪽 = **SQL + 테이블/컬럼 + 규칙(intent)** 완성. 실증: poc-16 `UC-CAR-MGT-001`→`insertCar`→`tb_car` + `BR-CAR-MGT-001/005(high)`. 단위 28/28(+2) + workspace **1043/0**.
 
 ## 5. carry
 
-1. **Phase 1.5b** — business-rules 조인(business_meaning↔BR id) + modern ORM(poc-08/09/10) sql-inventory data_refs 동작 검증(메커니즘 동일 / legacy 우선 완료). Phase 1.5 코어 = ✅ 시행(§9).
+1. **modern ORM data_refs 검증** — poc-08/09/10(MyBatis3/TypeORM/JPA) sql-inventory data_refs 동작(메커니즘 동일이나 그래프 미합성 = traceability-matrix-builder 선행 필요 / blocked). business-rules 조인 = ✅ 시행(§9 Phase 1.5b / business_meaning↔BR id).
 2. **Phase 2 잔여** — `context-cache.json` 을 work-unit `sync_sources` 자동 등재(living-loop markDrift 연동). 코어 델타는 ✅ 시행(§7).
 3. **Phase 3b 잔여** — SessionStart/UserPromptSubmit **hook 자동 주입**(B2-full / "무거움"으로 DEC-2026-06-01 DEFER / env 결합 = codegraph 부재 시 graceful 의무). Phase 3a(resolve+CLI+SKILL) = ✅ 시행(§8). hook 자동주입은 별도 사용자 결정.
 4. **Phase 4** — 2nd distinct domain corroboration 후 격상 검토(여전히 finding-only) + MCP serve 별도 슬라이스.

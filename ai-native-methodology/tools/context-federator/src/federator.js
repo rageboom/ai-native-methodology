@@ -113,13 +113,15 @@ function pushMap(map, key, val) {
 }
 
 // 데이터 소스 로딩 (CLI 가 호출 = fs read / readJson 주입 testable). 자동 발견 = analysis 노드 source_path.
-export function loadLegacyDataSource(graph, { repoRoot = process.cwd(), sqlInventoryPath = null, dbSchemaPath = null, readJson = defaultReadJson, existsFn = existsSync } = {}) {
+export function loadLegacyDataSource(graph, { repoRoot = process.cwd(), sqlInventoryPath = null, dbSchemaPath = null, businessRulesPath = null, readJson = defaultReadJson, existsFn = existsSync } = {}) {
   const sqlPath = sqlInventoryPath ?? sourcePathOf(graph, 'analysis-sql-inventory', repoRoot, existsFn);
   const dbPath = dbSchemaPath ?? sourcePathOf(graph, 'analysis-db-schema', repoRoot, existsFn);
+  const brPath = businessRulesPath ?? sourcePathOf(graph, 'analysis-business-rules', repoRoot, existsFn);
   const byUc = new Map();
   const byMapper = new Map();
   const tableByName = new Map();
-  let sqlLoaded = false, dbLoaded = false;
+  const brById = new Map();
+  let sqlLoaded = false, dbLoaded = false, brLoaded = false;
 
   const inv = sqlPath ? readJson(sqlPath) : null;
   if (inv && Array.isArray(inv.inventory)) {
@@ -134,12 +136,27 @@ export function loadLegacyDataSource(graph, { repoRoot = process.cwd(), sqlInven
     dbLoaded = true;
     for (const t of db.tables) if (t?.name) tableByName.set(t.name, t);
   }
+  const br = brPath ? readJson(brPath) : null;
+  if (br && Array.isArray(br.business_rules)) {
+    brLoaded = true;
+    for (const r of br.business_rules) if (r?.id) brById.set(r.id, r);
+  }
   return {
     available: sqlLoaded,
-    byUc, byMapper, tableByName,
-    sql_inventory_path: sqlPath, db_schema_path: dbPath,
-    sql_loaded: sqlLoaded, db_loaded: dbLoaded,
+    byUc, byMapper, tableByName, brById,
+    sql_inventory_path: sqlPath, db_schema_path: dbPath, business_rules_path: brPath,
+    sql_loaded: sqlLoaded, db_loaded: dbLoaded, br_loaded: brLoaded,
   };
+}
+
+// sql-inventory business_meaning 텍스트에서 BR id 추출 (BR-XXX-YYY...). dedupe.
+function extractBrIds(text) {
+  const out = [];
+  const seen = new Set();
+  for (const m of String(text ?? '').match(/BR-[A-Z0-9]+(?:-[A-Z0-9]+)*/g) ?? []) {
+    if (!seen.has(m)) { seen.add(m); out.push(m); }
+  }
+  return out;
 }
 
 // 노드 → data_refs (sql-inventory entries / uc_link + mapper_xml 조인 / dependent_tables db-schema 컬럼 보강).
@@ -160,6 +177,10 @@ function buildDataRefs(node, dataSource) {
         name: t,
         columns: (dataSource.tableByName.get(t)?.columns ?? []).map(c => ({ name: c?.name ?? null, type: c?.type ?? null })),
       })),
+      business_rules: extractBrIds(e?.business_meaning)
+        .map(id => (dataSource.brById ?? new Map()).get(id))
+        .filter(Boolean)
+        .map(r => ({ id: r.id, name: r?.name ?? null, natural_language: r?.natural_language ?? null, severity: r?.severity ?? null })),
       source: 'sql-inventory',
     });
   };
@@ -407,6 +428,7 @@ export function federate(graph, opts = {}) {
       codegraph_project_dir: codegraphProjectDir,
       sql_inventory_path: dataSource?.sql_inventory_path ?? null,
       db_schema_path: dataSource?.db_schema_path ?? null,
+      business_rules_path: dataSource?.business_rules_path ?? null,
     },
     codegraph: {
       available: !!codegraph.available,

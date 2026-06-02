@@ -38,13 +38,14 @@
     "target": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["graph_path", "repo_root", "codegraph_project_dir", "sql_inventory_path", "db_schema_path"],
+      "required": ["graph_path", "repo_root", "codegraph_project_dir", "sql_inventory_path", "db_schema_path", "business_rules_path"],
       "properties": {
         "graph_path": { "type": ["string", "null"] },
         "repo_root": { "type": "string" },
         "codegraph_project_dir": { "type": "string" },
         "sql_inventory_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — legacy 데이터 반쪽 소스 (analysis-sql-inventory source_path 자동발견 또는 --sql-inventory)." },
-        "db_schema_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — db-schema 소스 (dependent_tables 컬럼 보강)." }
+        "db_schema_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — db-schema 소스 (dependent_tables 컬럼 보강)." },
+        "business_rules_path": { "type": ["string", "null"], "description": "★ Phase 1.5b — business-rules 소스 (data_refs.business_rules 조인)." }
       }
     },
     "codegraph": {
@@ -71,7 +72,7 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["sql_id", "statement_type", "mapper_xml", "business_meaning", "dependent_tables", "source"],
+              "required": ["sql_id", "statement_type", "mapper_xml", "business_meaning", "dependent_tables", "business_rules", "source"],
               "properties": {
                 "sql_id": { "type": ["string", "null"] },
                 "statement_type": { "type": ["string", "null"] },
@@ -97,6 +98,21 @@
                           }
                         }
                       }
+                    }
+                  }
+                },
+                "business_rules": {
+                  "type": "array",
+                  "description": "★ Phase 1.5b — business_meaning 의 BR id(BR-XXX)를 business-rules.json 에서 조회. legacy 데이터 반쪽에 규칙(intent) 부착.",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["id", "name", "natural_language", "severity"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "name": { "type": ["string", "null"] },
+                      "natural_language": { "type": ["string", "null"] },
+                      "severity": { "type": ["string", "null"] }
                     }
                   }
                 },
