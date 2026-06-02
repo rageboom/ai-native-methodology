@@ -1,9 +1,43 @@
 {
-  "name": "ai-native-methodology",
+  "name": "@ai-native-methodology/plugin",
   "version": "12.0.0",
-  "private": true,
+  "private": false,
   "type": "module",
-  "description": "AI-Native Development Methodology — workspace root (build orchestrator + ★ v2.4 chain harness 20 tools workspace). chain validator 4종 + 기존 6 도구 + spectral-runner + ★ ★ ★ chain-driver (sub-plan-5 / harness 5 요소 enforcement) + ★ characterization-coverage-validator (v2.1.0 phase 4.7 본체 격상) + ★ ★ sql-inventory-validator (v2.2.0 phase 4.8 본체 격상 / ★ v2.3.0-rc1 migration_priority 12번째 컬럼 + ADR-CHAIN-009 / ★ v8.7 rename from sql-inventory-extractor — bin alias 양쪽 보존) + ★ ★ ★ br-cross-consistency-validator (v2.4.0 sub-plan §1 / ADR-CHAIN-011 BR dual representation paradigm) + inflation-lint + ★ code-pointer-validator + ★ graph-integrity-validator (★ v8.9.0 dep-graph P1~P4) + skill-citation-validator (v8.1.0 R18) = 단일 npm workspace (★ S1 / dep drift 회피 / 도구별 package.json 독립 유지).",
+  "description": "AI-Native 개발 방법론 — SDLC 6단계 chain harness Claude Code plugin (사내 표준). npm 배포 페이로드(source:npm) + chain/analysis 검증 도구 workspace. 산출물 json 단독 SSOT (v12).",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "ai-native-methodology"
+  },
+  "files": [
+    ".claude-plugin",
+    "agents",
+    "skills",
+    "hooks",
+    "flows",
+    "tools",
+    "templates",
+    "methodology-spec",
+    "schemas",
+    "guides",
+    "CHANGELOG.md",
+    "CHANGELOG-HISTORY.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/fixtures",
+    "!**/corpus",
+    "!**/coverage",
+    "!**/*.test.js",
+    "!templates/adoption"
+  ],
   "workspaces": [
     "tools/drift-validator",
     "tools/decision-table-validator",
@@ -42,12 +76,26 @@
     "test:tools": "npm run test --workspaces --if-present",
     "test:chain": "npm run test --workspace=tools/discovery-extraction-validator --workspace=tools/chain-coverage-validator --workspace=tools/spec-test-link-validator --workspace=tools/traceability-matrix-builder --workspace=tools/test-impl-pass-validator --workspace=tools/chain-driver",
     "test:release": "node --test scripts/test/release-readiness.test.js",
-    "release:check": "node scripts/release-readiness.js"
+    "release:check": "node scripts/release-readiness.js",
+    "publish:plugin": "node scripts/publish.js",
+    "publish:plugin:dry": "node scripts/publish.js --dry-run",
+    "publish:catalog": "node scripts/publish-catalog.js",
+    "publish:catalog:dry": "node scripts/publish-catalog.js --dry-run"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "ai-native-methodology": "file:"
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "bundledDependencies": [
+    "ajv",
+    "ajv-formats",
+    "fast-xml-parser"
+  ],
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
   }
 }
