@@ -33,6 +33,20 @@ npm run publish:plugin           # publishConfig.registry(npm-hosted)로 publish
 
 > ⚠️ npm 레지스트리는 보통 **같은 버전 재publish 불가**. release 마다 plugin.json+package.json+CHANGELOG 3-way 버전 bump 후 publish (version-check 강제).
 
+## 4b. 카탈로그(marketplace.json) URL 호스팅 — 통일 설치 경로
+
+모든 사용자(git 계정 無 포함)가 동일 URL 로 설치하도록, 카탈로그를 Nexus raw repo(`serving-static`)에 올립니다.
+
+- **canonical URL**: `https://repo.smiledev.net/repository/serving-static/mis-plugins/marketplace.json` (익명 read)
+- 업로드 (raw write 권한 계정 / 비밀번호는 prompt):
+  ```bash
+  cd ai-native-methodology
+  npm run publish:catalog:dry            # 검증 + 미리보기
+  npm run publish:catalog -- --user <nexus-id>   # 업로드 (curl 이 비번 prompt)
+  ```
+- **cadence**: 카탈로그 version 은 RANGE(`^12.0.0`) → 일반 release(patch/minor)에는 **불변, 재업로드 불요**. 사용자 autoUpdate 가 범위를 Nexus 에 재해석해 새 버전 수신. **MAJOR range 이동(^12→^13) / description / 새 플러그인 추가 시에만** `publish:catalog` 재실행.
+- npm 패키지 publish(`publish:plugin`, npm-hosted, npm 토큰)와 **별개 채널·별개 인증**(raw, HTTP Basic).
+
 ## 4. 검증 (실 Nexus end-to-end)
 
 ```bash

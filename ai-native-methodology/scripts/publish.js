@@ -74,6 +74,10 @@ function main() {
   }
 
   console.log(`\n[publish] ✅ ${DRY_RUN ? 'dry-run 완료 (업로드 없음)' : `published ${pkg.name}@${pkg.version} → ${registry}`}`);
+  if (!DRY_RUN) {
+    console.log('[publish] ℹ 카탈로그(marketplace.json)는 version RANGE(^x) 라 patch/minor 에는 불변 — 사용자 autoUpdate 가 자동 재해석.');
+    console.log('[publish] ℹ MAJOR range/description/새 플러그인 변경 시에만: npm run publish:catalog --user <nexus-id>');
+  }
 }
 
 main();

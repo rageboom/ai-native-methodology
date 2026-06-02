@@ -77,7 +77,9 @@
     "test:release": "node --test scripts/test/release-readiness.test.js",
     "release:check": "node scripts/release-readiness.js",
     "publish:plugin": "node scripts/publish.js",
-    "publish:plugin:dry": "node scripts/publish.js --dry-run"
+    "publish:plugin:dry": "node scripts/publish.js --dry-run",
+    "publish:catalog": "node scripts/publish-catalog.js",
+    "publish:catalog:dry": "node scripts/publish-catalog.js --dry-run"
   },
   "engines": {
     "node": ">=18.0.0"
