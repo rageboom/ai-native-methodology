@@ -30,7 +30,8 @@
     "tools/codegraph-runner",
     "tools/greenfield-bootstrap",
     "tools/db-assets-validator",
-    "tools/adopter-evidence-packager"
+    "tools/adopter-evidence-packager",
+    "tools/context-federator"
   ],
   "scripts": {
     "build": "node scripts/build-plugin.js",

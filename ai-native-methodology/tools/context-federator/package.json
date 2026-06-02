@@ -1,0 +1,10 @@
+{
+  "name": "@ai-native-methodology/context-federator",
+  "version": "0.1.0",
+  "description": "★ dep-graph × codegraph federation — code_pointers 조인으로 의미(dep-graph)+구조(codegraph) 통합 컨텍스트(context-cache.json / reference-lens / non-gating) 생성. DEC-2026-06-02-context-federation Phase 1 (read-only / gate 무개입 / no-simulation).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "context-federator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/federator.test.js" },
+  "license": "UNLICENSED"
+}

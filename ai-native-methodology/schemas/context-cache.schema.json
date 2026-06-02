@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/context-cache.schema.json",
+  "title": "context-cache.json — dep-graph × codegraph federation 산출물 (reference-lens / NOT gate-injected)",
+  "description": "★ context-federator 산출물. dep-graph(의미/artifact 의존성) 와 codegraph(코드 구조) 를 노드 code_pointers 로 join 한 통합 컨텍스트 캐시. 사용자 P0: prompt→dep-graph→codegraph→재사용. ★ trust 모델 (DEC-2026-06-02 / DEC-2026-05-28 §4.2): codegraph = 휴리스틱 → reference-lens / 어떤 결정론 gate 에도 inject ❌ (meta.trust_note 의무 / computeGateFail 제외 / non-gating). ★ no-simulation: codegraph 부재 = codegraph.available=false 정직 표기.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "target", "codegraph", "packs", "stats"],
+  "$defs": {
+    "symbolRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "kind", "file_path", "start_line"],
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "kind": { "type": ["string", "null"] },
+        "file_path": { "type": ["string", "null"] },
+        "start_line": { "type": ["integer", "null"] }
+      }
+    }
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "do_not_edit_manually", "trust_note", "derived_from", "synthesized_at", "graph_stamp", "codegraph_indexed_at"],
+      "properties": {
+        "schema": { "const": "context-cache.schema.json" },
+        "generated_by": { "const": "context-federator" },
+        "do_not_edit_manually": { "const": true },
+        "trust_note": { "type": "string", "description": "reference-lens / NOT gate-injected 명시 (trust 모델 enforcement)." },
+        "derived_from": { "type": "array", "items": { "type": "string" } },
+        "synthesized_at": { "type": "string" },
+        "graph_stamp": { "type": ["string", "null"], "description": "★ Phase 2 — artifact-graph 내용 지문 (dep 축 무효화). 변경 시 dep_impact 재계산." },
+        "codegraph_indexed_at": { "type": ["string", "null"], "description": "★ Phase 2 — codegraph 인덱스 시점(.codegraph DB mtime / code 축 무효화). 변경 시 code_refs 재계산." }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph_path", "repo_root", "codegraph_project_dir"],
+      "properties": {
+        "graph_path": { "type": ["string", "null"] },
+        "repo_root": { "type": "string" },
+        "codegraph_project_dir": { "type": "string" }
+      }
+    },
+    "codegraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "version", "reason"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "version": { "type": ["string", "null"] },
+        "reason": { "type": ["string", "null"], "description": "available=false 시 환경 부재 사유 (no-simulation 정직 신호)." }
+      }
+    },
+    "packs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["node_id", "artifact_kind", "artifact_subkind", "state", "dep_impact", "top_impact_roots", "code_anchors", "code_refs", "anchor_stamp"],
+        "properties": {
+          "anchor_stamp": { "type": "string", "description": "★ Phase 2 — 노드 코드-side 입력 지문(state+code_pointers). 동일 + codegraph index 무변경 = code_refs verbatim carry." },
+          "node_id": { "type": "string" },
+          "artifact_kind": { "type": "string" },
+          "artifact_subkind": { "type": ["string", "null"] },
+          "state": { "type": "string" },
+          "dep_impact": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["must", "should", "fyi"],
+            "description": "dep-graph navigate 의 결정론 BFS 영향 등급 (verbatim / AI 재계산 ❌).",
+            "properties": {
+              "must": { "type": "array", "items": { "type": "string" } },
+              "should": { "type": "array", "items": { "type": "string" } },
+              "fyi": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "top_impact_roots": { "type": "array", "description": "navigate 의 graph-wide top-K centrality (verbatim)." },
+          "code_anchors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["path", "anchor_type", "symbol", "commit_hash"],
+              "properties": {
+                "path": { "type": ["string", "null"] },
+                "anchor_type": { "type": ["string", "null"] },
+                "symbol": { "type": ["string", "null"] },
+                "commit_hash": { "type": ["string", "null"] }
+              }
+            }
+          },
+          "code_refs": {
+            "type": "array",
+            "description": "anchor 별 codegraph 코드 구조 ref. unresolved=true = 코드 반쪽 비어있음(legacy SQL 층 / codegraph 부재 / 미인덱싱) 정직 표기.",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["anchor_path", "anchor_type", "symbols", "unresolved", "note"],
+              "properties": {
+                "anchor_path": { "type": ["string", "null"] },
+                "anchor_type": { "type": ["string", "null"] },
+                "unresolved": { "type": "boolean" },
+                "note": { "type": ["string", "null"] },
+                "symbols": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["name", "kind", "file_path", "start_line"],
+                    "properties": {
+                      "name": { "type": ["string", "null"] },
+                      "kind": { "type": ["string", "null"] },
+                      "file_path": { "type": ["string", "null"] },
+                      "start_line": { "type": ["integer", "null"] },
+                      "callers": { "type": "array", "items": { "$ref": "#/$defs/symbolRef" } },
+                      "impact": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["node_count", "affected"],
+                        "properties": {
+                          "node_count": { "type": "integer" },
+                          "affected": { "type": "array", "items": { "$ref": "#/$defs/symbolRef" } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pack_count", "anchored_nodes", "symbols_resolved", "anchors_unresolved", "codegraph_available", "dep_recomputed", "code_recomputed", "carried_packs"],
+      "properties": {
+        "pack_count": { "type": "integer" },
+        "anchored_nodes": { "type": "integer" },
+        "symbols_resolved": { "type": "integer" },
+        "anchors_unresolved": { "type": "integer" },
+        "codegraph_available": { "type": "boolean" },
+        "dep_recomputed": { "type": "integer", "description": "★ Phase 2 — navigate(dep) 재계산 노드 수." },
+        "code_recomputed": { "type": "integer", "description": "★ Phase 2 — codegraph(code) 재계산 노드 수." },
+        "carried_packs": { "type": "integer", "description": "★ Phase 2 — prevCache 에서 통째로 carry 한 노드 수 (재계산 0)." }
+      }
+    }
+  }
+}
