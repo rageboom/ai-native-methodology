@@ -18,7 +18,7 @@
 //     navigate/codegraph 는 CLI black-box 로 shell-out (makeNavigateRunner/makeCodegraphAdapter / cli.js 주입).
 //     core(federate)는 runner 주입 = pure & testable (gitRunner 주입 패턴 동형 / code-pointer-validator).
 
-import { resolve, relative, isAbsolute, basename, extname, join } from 'node:path';
+import { resolve, relative, isAbsolute, basename, extname, join, sep } from 'node:path';
 import { execSync, execFileSync } from 'node:child_process';
 import { existsSync, statSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -252,7 +252,8 @@ function codeRefForAnchor(anchor, ctx) {
   //   2차(best-effort): 파일명 stem query → sameFile 필터 (DB 미가용/구 Node 시 / filenames=ASCII → 한글 0매칭 회피).
   //   둘 다 0 = unresolved 정직 표기 (legacy SQL 층 / 미인덱싱 / 다른 언어 = 코드 반쪽 비어있음).
   if (anchor.anchor_type === 'strict_path' && anchor.path) {
-    const cgRel = relative(codegraphProjectDir, absFile(repoRoot, anchor.path));
+    // ★ F-FED-WIN-001: forward-slash 정규화 (Windows path.relative = 백슬래시 / codegraph DB = forward-slash 저장).
+    const cgRel = relative(codegraphProjectDir, absFile(repoRoot, anchor.path)).split(sep).join('/');
     let nodes = null;
     if (typeof codegraph.symbolsInFile === 'function') {
       try { nodes = codegraph.symbolsInFile(cgRel); } catch { nodes = null; }
@@ -273,7 +274,7 @@ function codeRefForAnchor(anchor, ctx) {
     }
     if (ref.symbols.length === 0) {
       ref.unresolved = true;
-      ref.note = 'codegraph 가 이 파일의 심볼을 해석하지 못함 (legacy SQL 층 / 미인덱싱 / 다른 언어) — 코드 반쪽 비어있음 (no-simulation 정직 표기)';
+      ref.note = 'codegraph 인덱스에 이 path 의 심볼 row 없음 (path 매핑 불일치 / 인덱스 범위 밖 / 미인덱싱 언어 / legacy SQL 층) — 코드 반쪽 비어있음 (no-simulation 정직 표기)';
     }
     return ref;
   }
@@ -490,6 +491,7 @@ export function makeCodegraphAdapter({ codegraphProjectDir, exec = 'codegraph' }
     available: true,
     version,
     reason: null,
+    sqliteReader: loadSqlite() !== null,
     query: (s) => cgReadJson(exec, `query ${cgQuote(s)} -p ${P} --json`),
     callers: (s) => cgReadJson(exec, `callers ${cgQuote(s)} -p ${P} --json`),
     impact: (s) => cgReadJson(exec, `impact ${cgQuote(s)} -p ${P} --json`),
@@ -499,6 +501,7 @@ export function makeCodegraphAdapter({ codegraphProjectDir, exec = 'codegraph' }
     symbolsInFile: (cgRelPath) => {
       const sqlite = loadSqlite();
       if (!sqlite || !existsSync(dbPath)) return null;
+      // ★ cgRelPath = forward-slash repo-relative (codeRefForAnchor 가 정규화 / F-FED-WIN-001).
       try {
         const db = new sqlite.DatabaseSync(dbPath, { readOnly: true });
         const rows = db.prepare(

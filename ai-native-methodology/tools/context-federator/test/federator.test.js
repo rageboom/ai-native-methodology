@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { execSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, dirname } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { federate, selectOriginNodes, isAnchoredOrigin, makeCodegraphAdapter, cacheStaleness, resolvePromptToNodes, loadLegacyDataSource } from '../src/federator.js';
 
@@ -306,21 +306,22 @@ const DS_GRAPH = { nodes: [
   { id: 'analysis-db-schema', artifact_kind: 'analysis', source_path: 'input/db-schema.json' },
   { id: 'analysis-business-rules', artifact_kind: 'analysis', source_path: 'input/business-rules.json' },
 ] };
+const DS_REPO = resolve('/repo'); // ★ OS-native 절대경로 (Windows C:\repo / POSIX /repo) — fixture 이식성 (C-fedwin-test-portability).
 const DS_JSON = {
-  '/repo/input/sql-inventory.json': { inventory: [
+  [resolve(DS_REPO, 'input/sql-inventory.json')]: { inventory: [
     { sql_id: 'selectCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'SELECT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 조회' },
     { sql_id: 'insertCar', mapper_xml: 'source/sqlmap/carMgt.xml', statement_type: 'INSERT', dependent_tables: ['tb_car'], uc_link: 'UC-CAR-001', business_meaning: '차량 등록 — BR-CAR-001 + BR-CAR-002 anchor' },
   ] },
-  '/repo/input/db-schema.json': { tables: [
+  [resolve(DS_REPO, 'input/db-schema.json')]: { tables: [
     { name: 'tb_car', columns: [{ name: 'car_idx', type: 'int' }, { name: 'car_name', type: 'varchar' }] },
   ] },
-  '/repo/input/business-rules.json': { business_rules: [
+  [resolve(DS_REPO, 'input/business-rules.json')]: { business_rules: [
     { id: 'BR-CAR-001', name: '차량 등록 의무 필드', natural_language: '차량 등록 시 17 필드 필수', severity: 'high' },
     { id: 'BR-CAR-002', name: 'carIdx IDENTITY', natural_language: 'carIdx 는 selectKey 로 추출', severity: 'medium' },
   ] },
 };
 function loadDS() {
-  return loadLegacyDataSource(DS_GRAPH, { repoRoot: '/repo', readJson: (p) => DS_JSON[p] ?? null, existsFn: (p) => p in DS_JSON });
+  return loadLegacyDataSource(DS_GRAPH, { repoRoot: DS_REPO, readJson: (p) => DS_JSON[p] ?? null, existsFn: (p) => p in DS_JSON });
 }
 
 test('loadLegacyDataSource — source_path 자동발견 + byUc/byMapper/tableByName 인덱스', () => {
@@ -429,6 +430,7 @@ test('smoke: 실 codegraph index → federate 가 실제 심볼/호출자 해석
     }
     adapter = makeCodegraphAdapter({ codegraphProjectDir: dir });
     if (!adapter.available) { t.skip(`codegraph adapter unavailable: ${adapter.reason}`); return; }
+    if (adapter.sqliteReader === false) { t.skip("node:sqlite 미가용 (Node <22.13 / --experimental-sqlite 부재) — 파일→심볼 직행 불가 / honest skip"); return; }
 
     // 합성 graph: IMPL 노드가 src/m.js 를 strict_path 로 앵커 (repoRoot=dir → codegraph filePath 'src/m.js' 와 동일파일)
     const graph = { nodes: [node('IMPL-X', 'chain', 'IMPL', 'active', [{ path: 'src/m.js', anchor_type: 'strict_path' }])] };
@@ -448,4 +450,18 @@ test('smoke: 실 codegraph index → federate 가 실제 심볼/호출자 해석
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+// ── F-FED-WIN-001: strict_path cgRel forward-slash 정규화 (Windows 백슬래시 회귀 가드 / 순수·node:sqlite 불요) ──
+test('F-FED-WIN-001: symbolsInFile 조회키가 forward-slash 로 정규화된다 (Windows 백슬래시 회귀 가드)', () => {
+  const root = join(tmpdir(), 'fed-win-001-root');
+  // strict_path 앵커 = 하위경로(구분자 포함). Windows 에서 relative() = 백슬래시 'models\\x\\y.ts'.
+  const graph = { nodes: [node('IMPL-WIN', 'chain', 'IMPL', 'active', [{ path: 'src/models/x/y.ts', anchor_type: 'strict_path' }])] };
+  // fake codegraph 의 symbolsInFile 은 codegraph DB 규약대로 forward-slash 키로만 보유.
+  const cg = fakeCodegraph({ symbolsByFile: { 'src/models/x/y.ts': [{ name: 'Y', kind: 'class', filePath: 'src/models/x/y.ts', startLine: 1 }] } });
+  const cache = federate(graph, { repoRoot: root, codegraphProjectDir: root, navigate: fakeNavigate(), codegraph: cg, now: () => FIXED_NOW });
+  const ref = cache.packs[0].code_refs[0];
+  // 정규화 전(버그)엔 백슬래시 키 조회 → 0 심볼 → unresolved. 정규화 후 해소돼야 한다.
+  assert.equal(ref.unresolved, false, 'forward-slash 정규화로 심볼 해소돼야 (백슬래시 키 미스 회귀 가드)');
+  assert.deepEqual(ref.symbols.map(s => s.name), ['Y']);
 });

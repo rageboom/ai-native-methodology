@@ -127,6 +127,9 @@ function main() {
     dataSource,
   });
 
+  if (codegraph.available && codegraph.sqliteReader === false && cache.stats.anchors_unresolved > 0) {
+    console.error('[context-federator] node:sqlite 미가용 → 파일→심볼(code 반쪽) 대부분 미해소. Node >=22.13 또는 node --experimental-sqlite 로 실행 (F-FED-WIN-001).');
+  }
   if (args.outPath) {
     const outPath = resolve(args.outPath);
     mkdirSync(dirname(outPath), { recursive: true });
