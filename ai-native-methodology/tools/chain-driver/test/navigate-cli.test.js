@@ -240,3 +240,166 @@ describe('chain-driver query --graph', () => {
     assert.equal(r.status, 3);
   });
 });
+
+// ★ 의도③ — navigate --with-spec (스펙 본문 lazy-read / reference-lens / display-only).
+function makeSpecGraph() {
+  const dir = mkdtempSync(join(tmpdir(), 'navspec-'));
+  const discPath = join(dir, 'discovery-spec.json');
+  const bhvPath = join(dir, 'behavior-spec.json');
+  const acPath = join(dir, 'acceptance-criteria.json');
+  writeFileSync(discPath, JSON.stringify({
+    use_cases: [
+      { id: 'UC-1', name: '가입', description: '방문자가 계정을 만든다', actors: ['Anonymous'], preconditions: ['p1'], postconditions: ['q1', 'q2'] },
+    ],
+  }));
+  writeFileSync(bhvPath, JSON.stringify({
+    behaviors: [
+      { id: 'BHV-1', name: '가입동작', description: '계정 생성', preconditions: ['pre1'], postconditions: ['post1'], invariants: ['inv1'] },
+      { id: 'BHV-CAP5', name: '정확히5', preconditions: ['a', 'b', 'c', 'd', 'e'] },
+      { id: 'BHV-CAP6', name: '여섯개', preconditions: ['a', 'b', 'c', 'd', 'e', 'f'] },
+    ],
+  }));
+  writeFileSync(acPath, JSON.stringify({
+    criteria: [
+      { id: 'AC-1', description: '성공', severity: 'must', gherkin: { given: ['g1'], when: 'POST /users', then: ['t1', 't2'], tags: ['@must'] } },
+      { id: 'AC-EMPTY', description: '빈then', gherkin: { given: ['g1'], when: 'w1', then: [] } },
+    ],
+  }));
+  const graph = {
+    nodes: [
+      { id: 'UC-1', artifact_kind: 'chain', artifact_subkind: 'UC', source_path: discPath, state: 'active', title: '가입제목' },
+      { id: 'BHV-1', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: bhvPath, state: 'active' },
+      { id: 'BHV-CAP5', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: bhvPath, state: 'active' },
+      { id: 'BHV-CAP6', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: bhvPath, state: 'active' },
+      { id: 'AC-1', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: acPath, state: 'active' },
+      { id: 'AC-EMPTY', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: acPath, state: 'active' },
+      { id: 'BHV-NOSRC', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: join(dir, 'nonexistent.json'), state: 'active' },
+      { id: 'BHV-IDMISS', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: bhvPath, state: 'active' },
+      { id: 'TASK-1', artifact_kind: 'chain', artifact_subkind: 'TASK', source_path: join(dir, 't.json'), state: 'active' },
+    ],
+    edges: [
+      { source: 'UC-1', target: 'BHV-1', edge_type: 'derived_from', confidence: 'hard' },
+      { source: 'BHV-1', target: 'AC-1', edge_type: 'derived_from', confidence: 'hard' },
+    ],
+  };
+  const path = join(dir, 'artifact-graph.json');
+  writeFileSync(path, JSON.stringify(graph));
+  return { dir, path };
+}
+
+describe('chain-driver navigate --with-spec (★ 의도③ 스펙 본문)', () => {
+  it('UC → use_cases 본문 (actors/pre/post) + reference_lens', () => {
+    const { dir, path } = makeSpecGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'UC-1', '--with-spec', '--json']);
+    assert.equal(r.status, 0);
+    const sp = JSON.parse(r.stdout).spec;
+    assert.equal(sp.reference_lens, true);
+    assert.equal(sp.available, true);
+    assert.equal(sp.subkind, 'UC');
+    assert.equal(sp.title, '가입제목');
+    assert.deepEqual(sp.actors, ['Anonymous']);
+    assert.deepEqual(sp.postconditions, ['q1', 'q2']);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('BHV → behaviors 본문 (invariants 포함)', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.equal(sp.subkind, 'BHV');
+    assert.deepEqual(sp.invariants, ['inv1']);
+    assert.deepEqual(sp.preconditions, ['pre1']);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('AC → gherkin given/when/then/tags + severity', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.equal(sp.severity, 'must');
+    assert.deepEqual(sp.gherkin.given, ['g1']);
+    assert.equal(sp.gherkin.when, 'POST /users');
+    assert.deepEqual(sp.gherkin.then, ['t1', 't2']);
+    assert.deepEqual(sp.gherkin.tags, ['@must']);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('AC 빈 then → graceful 빈 배열 render', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-EMPTY', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.deepEqual(sp.gherkin.then, []);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ 회귀 0 — --with-spec OFF 시 spec 키 부재', () => {
+    const { dir, path } = makeSpecGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-1', '--json']).stdout);
+    assert.equal('spec' in out, false);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('cap 경계: 정확히 5 항목 → "(+N more)" 없음', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-CAP5', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.preconditions.length, 5);
+    assert.ok(!sp.preconditions.some(x => /\+\d+ more/.test(x)));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('cap 경계: 6 항목 → 5 + "… (+1 more)"', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-CAP6', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.preconditions.length, 6);
+    assert.match(sp.preconditions[5], /\(\+1 more\)/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('source 부재 → available:false reason "source 부재" (절대경로 graceful / must-fix #1)', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-NOSRC', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, false);
+    assert.match(sp.reason, /source 부재/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('id miss → available:false reason "id miss"', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-IDMISS', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, false);
+    assert.match(sp.reason, /id miss/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('subkind 미지원 (TASK) → available:false reason 미지원', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'TASK-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, false);
+    assert.match(sp.reason, /미지원/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('rollup + --with-spec → spec 키 부재 (본문 폭증 방지)', () => {
+    const { dir, path } = makeSpecGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--stage', 'spec', '--with-spec', '--json']).stdout);
+    assert.equal('spec' in out, false);
+    assert.ok(out.count >= 1);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('text 출력: reference-lens 라벨 + 본문 라인', () => {
+    const { dir, path } = makeSpecGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'BHV-1', '--with-spec']);
+    assert.equal(r.status, 0);
+    assert.match(r.stdout, /spec 본문 \(reference-lens \/ gate 주입 ❌\)/);
+    assert.match(r.stdout, /description: 계정 생성/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('text 출력: source 부재 → (불가 — source 부재)', () => {
+    const { dir, path } = makeSpecGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'BHV-NOSRC', '--with-spec']);
+    assert.match(r.stdout, /\(불가 — source 부재\)/);
+    rmSync(dir, { recursive: true });
+  });
+});

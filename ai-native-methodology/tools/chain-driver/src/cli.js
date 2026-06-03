@@ -21,7 +21,7 @@
 //   4 = state-corrupt
 
 import { existsSync, readFileSync, appendFileSync, mkdirSync } from 'node:fs';
-import { basename, dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve, isAbsolute } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
@@ -66,7 +66,7 @@ function usage(code = 3) {
     '  query --graph <artifact-graph.json> [--ref <node-id>]   (graph JSON 출력 / 툴링용)',
     '  sync <project> [--scope <slug>]',
     '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
-    '  navigate --graph <artifact-graph.json> --origin <node-id> [--json]   (dep-graph-navigator backend)',
+    '  navigate --graph <artifact-graph.json> --origin <node-id> [--with-spec] [--json]   (dep-graph-navigator backend)',
     '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
     '  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (★ Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
     '  suggest-skill --prompt <text>',
@@ -110,6 +110,7 @@ function parseArgs(argv) {
     else if (a === '--policy') out.policyPath = rest[++i];
     else if (a === '--out-jsonl') out.outJsonl = rest[++i];
     else if (a === '--code-pointer-only') out.codePointerOnly = true;
+    else if (a === '--with-spec') out.withSpec = true;
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
   }
@@ -476,9 +477,69 @@ function cmdNavigateRollup(graph, args) {
   process.exit(0);
 }
 
+// ★ dep-graph 의도③ (navigate --with-spec / s68 triage → 본 slice) — 스펙 본문 lazy-read.
+//   노드 source 파일에서 본문(UC/BHV/AC)을 읽어 reference-lens 로 표시. display-only / 결정론 fs read / 회귀 0.
+//   ★ trust: 본문 = reference-lens — 어떤 결정적 gate(gate-eval/s2-outcome-check/findings-aggregator)에도 inject ❌
+//      (DEC-2026-05-28 §4.2 codegraph trust 동형 / skills/dep-graph-navigator/SKILL.md trust 절). result.spec.reference_lens 항상 true.
+//   source_path 절대(dogfood 실측)·상대·placeholder('(behavior)') 모두 graceful: existsSync 가 모든 branch gate (절대 포함 / 회귀 차단).
+const SPEC_SUBKIND_CONFIG = Object.freeze({
+  UC:  { array: 'use_cases', scalars: ['name', 'description'], arrays: ['actors', 'preconditions', 'postconditions'] },
+  BHV: { array: 'behaviors', scalars: ['name', 'description'], arrays: ['preconditions', 'postconditions', 'invariants'] },
+  AC:  { array: 'criteria',  scalars: ['description', 'severity'], gherkin: true },
+});
+const SPEC_CAP = 5; // 배열 항목 표시 상한 (초과분은 "… (+N more)" 정직 표기 / silent truncation 금지).
+
+function capSpecArray(arr) {
+  if (!Array.isArray(arr)) return [];
+  if (arr.length <= SPEC_CAP) return arr.slice();
+  return [...arr.slice(0, SPEC_CAP), `… (+${arr.length - SPEC_CAP} more)`];
+}
+
+// hybrid source 해석 — graph-dir 우선(co-located 실측) → repoRoot(schema 계약) → basename(lossy 최후) → cwd.
+//   existsSync 가 모든 후보(절대 포함) gate — stale 절대경로 readFileSync throw 회귀 차단 (must-fix #1).
+function resolveSpecSource(sourcePath, graphPath) {
+  if (!sourcePath) return null;
+  const candidates = isAbsolute(sourcePath)
+    ? [sourcePath]
+    : [
+        join(dirname(graphPath), sourcePath),               // graph-dir 구조보존 (co-located)
+        join(resolveRepoRoot(process.cwd()), sourcePath),   // repoRoot (schema "plugin-root 상대")
+        join(dirname(graphPath), basename(sourcePath)),     // basename (lossy 최후)
+        resolve(sourcePath),                                // cwd
+      ];
+  return candidates.find((c) => existsSync(c)) ?? null;
+}
+
+// 노드 → 스펙 본문 (reference-lens). 항상 reference_lens:true. 불가 시 {available:false, reason}.
+function readSpecBody(node, graphPath) {
+  const base = { reference_lens: true, subkind: node.artifact_subkind, id: node.id };
+  const cfg = SPEC_SUBKIND_CONFIG[node.artifact_subkind];
+  if (!cfg) return { ...base, available: false, reason: `subkind ${node.artifact_subkind} 본문 미지원 (UC/BHV/AC 한정 / carry)` };
+  const full = resolveSpecSource(node.source_path, graphPath);
+  if (!full) return { ...base, available: false, reason: 'source 부재' };
+  let obj;
+  try { obj = JSON.parse(readFileSync(full, 'utf-8')); }
+  catch { return { ...base, available: false, reason: 'source parse 실패' }; }
+  const entry = (obj[cfg.array] ?? []).find((e) => e && e.id === node.id);
+  if (!entry) return { ...base, available: false, reason: 'id miss' };
+  const body = { ...base, available: true };
+  if (node.title) body.title = node.title;
+  for (const k of cfg.scalars ?? []) if (entry[k] != null) body[k] = entry[k];
+  for (const k of cfg.arrays ?? []) if (Array.isArray(entry[k])) body[k] = capSpecArray(entry[k]);
+  if (cfg.gherkin && entry.gherkin && typeof entry.gherkin === 'object') {
+    body.gherkin = {
+      given: capSpecArray(entry.gherkin.given),
+      when: entry.gherkin.when ?? null,
+      then: capSpecArray(entry.gherkin.then),
+      tags: capSpecArray(entry.gherkin.tags),
+    };
+  }
+  return body;
+}
+
 // ★ dep-graph P4 (operation.md 결정 7) — dep-graph-navigator skill 의 backend.
 // node 상세 + 영향 트리(BFS) + code_pointers + top-K impact root (centrality) 통합.
-// usage: chain-driver navigate --graph <path> --origin <node-id> [--json]
+// usage: chain-driver navigate --graph <path> --origin <node-id> [--with-spec] [--json]
 //        chain-driver navigate --graph <path> --stage <s>|--scope <id> [--json]   (★ F3 일괄 rollup)
 function cmdNavigate(args) {
   if (!args.graphPath) {
@@ -539,6 +600,9 @@ function cmdNavigate(args) {
     stats: impact.stats,
   };
 
+  // ★ 의도③ — --with-spec 일 때만 reference-lens 스펙 본문 첨부 (off 시 출력 무변경 = 회귀 0).
+  if (args.withSpec) result.spec = readSpecBody(node, args.graphPath);
+
   if (args.json) {
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   } else {
@@ -551,6 +615,27 @@ function cmdNavigate(args) {
       }
     } else {
       process.stdout.write(`  code_pointers: ${result.node.code_pointers_na ? '(N/A 명시)' : '(없음)'}\n`);
+    }
+    if (args.withSpec) {
+      const sp = result.spec;
+      process.stdout.write(`  spec 본문 (reference-lens / gate 주입 ❌):\n`);
+      if (!sp.available) {
+        process.stdout.write(`    (불가 — ${sp.reason})\n`);
+      } else {
+        if (sp.title) process.stdout.write(`    title: ${sp.title}\n`);
+        if (sp.name) process.stdout.write(`    name: ${sp.name}\n`);
+        if (sp.description) process.stdout.write(`    description: ${sp.description}\n`);
+        if (sp.actors) process.stdout.write(`    actors: ${sp.actors.join(', ')}\n`);
+        if (sp.preconditions) process.stdout.write(`    preconditions: ${sp.preconditions.join(' / ')}\n`);
+        if (sp.postconditions) process.stdout.write(`    postconditions: ${sp.postconditions.join(' / ')}\n`);
+        if (sp.invariants) process.stdout.write(`    invariants: ${sp.invariants.join(' / ')}\n`);
+        if (sp.severity) process.stdout.write(`    severity: ${sp.severity}\n`);
+        if (sp.gherkin) {
+          process.stdout.write(`    given: ${sp.gherkin.given.join(' / ') || '-'}\n`);
+          process.stdout.write(`    when: ${sp.gherkin.when || '-'}\n`);
+          process.stdout.write(`    then: ${sp.gherkin.then.join(' / ') || '-'}\n`);
+        }
+      }
     }
     process.stdout.write(`  영향 트리:\n`);
     process.stdout.write(`    MUST: ${impact.by_grade.MUST.join(', ') || '-'}\n`);

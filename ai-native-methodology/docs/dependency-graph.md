@@ -70,9 +70,15 @@ node tools/traceability-matrix-builder/src/cli.js \
 # 영향 트리 + code_pointers + top-3 impact root
 node tools/chain-driver/src/cli.js navigate \
   --graph .aimd/output/artifact-graph.json --origin BHV-USER-001
+
+# ★ 의도③ — 스펙 본문까지 함께 (UC/BHV/AC 의 title·description·precondition·gherkin lazy-read)
+node tools/chain-driver/src/cli.js navigate \
+  --graph .aimd/output/artifact-graph.json --origin BHV-USER-001 --with-spec
 ```
 
 또는 skill: `/dep-graph-navigator BHV-USER-001`
+
+> ★ `--with-spec` (default off / v12.3.0): 노드의 `source_path` 파일에서 본문(UC=`use_cases[]` / BHV=`behaviors[]` / AC=`criteria[].gherkin`)을 **lazy-read** 해 `spec 본문 (reference-lens / gate 주입 ❌)` 블록으로 표시. **본문은 reference-lens** — 어떤 결정적 gate 에도 inject ❌ (release-readiness check31 강제). 배열은 5개 cap + `… (+N more)`. UC/BHV/AC 외 subkind(TASK/TC/IMPL/analysis) 또는 source 부재·id miss = `(불가 — <reason>)` graceful. ★ placeholder `source_path`(`'(behavior)'` 등 — 합성 시 입력 경로 미전달) 는 결정론적으로 `(불가 — source 부재)` 로 해석되니 부재를 버그로 오인 ❌. rollup(`--stage`/`--scope`) 모드에는 미적용(본문 폭증 회피).
 
 ### 4-3. 정책 평가 (변경 종류 지정)
 

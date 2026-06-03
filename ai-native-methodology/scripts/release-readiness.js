@@ -1414,6 +1414,48 @@ function check30_adopterCorroborationCapture() {
   }
 }
 
+// ★ check31 (v12.3.0 / 의도③ navigate --with-spec trust enforcement / DEC-2026-06-03-living-graph-spec-body) —
+//   스펙 본문(UC/BHV/AC)은 reference-lens. 결정적 gate 가 절대 소비 ❌ (라벨=주석일 뿐 → 코드 강제 / Senior trust_model_ok=false 해소).
+//   content-aware (file-presence ❌): ① gate-decision 모듈(gate-eval + findings-aggregator)에 spec-body accessor 토큰 0 (음성)
+//   ② cli.js readSpecBody 호출부 = cmdNavigate 단 1곳 (gate 경로 cmdNext 침투 차단) ③ reference_lens:true 라벨 존재 (양성).
+function check31_specBodyReferenceLensTrust() {
+  try {
+    const SPEC_TOKENS = ['readSpecBody', 'SPEC_SUBKIND_CONFIG', 'withSpec', 'with-spec'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = SPEC_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 spec-body 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 reference-lens 본문 소비 = trust 위반`);
+    }
+    const cliPath = join(ROOT, 'tools/chain-driver/src/cli.js');
+    if (!existsSync(cliPath)) {
+      problems.push('chain-driver/src/cli.js 부재');
+    } else {
+      const cli = readFileSync(cliPath, 'utf-8');
+      const callCount = (cli.match(/result\.spec\s*=\s*readSpecBody\(/g) || []).length;
+      if (callCount !== 1) problems.push(`cli.js readSpecBody 호출부 ${callCount}곳 (cmdNavigate 단일 1곳 의무 / gate 경로 cmdNext 침투 차단)`);
+      if (!/reference_lens:\s*true/.test(cli)) problems.push('cli.js readSpecBody base 에 reference_lens:true 라벨 부재 (양성 trust 라벨 의무)');
+    }
+    return {
+      id: 'spec_body_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `navigate --with-spec 스펙 본문 = reference-lens 강제 — gate-eval/findings-aggregator spec-body 토큰 0 + cli.js readSpecBody 호출 1곳(cmdNavigate) + reference_lens:true 라벨 (결정적 gate inject ❌ / DEC-2026-06-03 의도③ trust / Senior trust_model 해소)`
+        : `spec-body trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'tools/chain-driver/src/gate-eval.js + tools/findings-aggregator/src/ (음성 0) + cli.js cmdNavigate readSpecBody (양성 1곳 + reference_lens:true)',
+    };
+  } catch (e) {
+    return { id: 'spec_body_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + cli.js readSpecBody' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1449,6 +1491,7 @@ function main() {
     check28_adoptionParadigmDrift(),
     check29_readmeVersionSync(),
     check30_adopterCorroborationCapture(),
+    check31_specBodyReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;
