@@ -1609,6 +1609,81 @@ function check34_codegraphCoverageReferenceLensTrust() {
   }
 }
 
+// ★ check35 (v12.10.0 / codegraph→finding-list STEP 2 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) —
+//   finding 채널: coverage-hole → finding-system promote-ready 레코드 (discoverer:'codegraph' + code_graph_ref). 결정적 gate 절대 소비 ❌ (check34 4-part isomorphic).
+//   ① 음성 — gate-decision 모듈(gate-eval + findings-aggregator)에 STEP 2 토큰 0 (code_graph_ref / 신규 emit·edge 함수명)
+//   ② 양성 — finding-system.schema.json 에 code_graph_ref optional + allOf conditional(code_graph_ref ⟹ severity ⊆ {low,medium}) 구조 존재 (STEP 1 enum-cut ceiling 정합)
+//   ③ 양성 — finding-export.js ceiling 코드 강제 (SEVERITY_CEILING/pinSeverity 재사용 + high/critical 리터럴 0)
+//   ④ 양성 — finding-export.js + enumerate.js 가 gate 모듈 import 0 (check33 import 정밀매칭 — 출력 gate 역류 차단).
+function check35_codegraphFindingReferenceLensTrust() {
+  try {
+    const STEP2_TOKENS = ['code_graph_ref', 'toPromoteReadyFindings', 'enumerateEdges', 'finding-export'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = STEP2_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 STEP 2 finding 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 codegraph finding 소비 = trust 위반`);
+    }
+    // 양성 ② — finding-system.schema.json code_graph_ref optional + allOf conditional ceiling.
+    const fsSchemaPath = join(ROOT, 'schemas/finding-system.schema.json');
+    if (!existsSync(fsSchemaPath)) {
+      problems.push('schemas/finding-system.schema.json 부재');
+    } else {
+      try {
+        const schema = JSON.parse(readFileSync(fsSchemaPath, 'utf-8'));
+        if (!schema?.properties?.code_graph_ref || schema.properties.code_graph_ref.type !== 'object') {
+          problems.push('finding-system.schema.json 에 code_graph_ref optional object 부재 (STEP 2 schema additive 의무)');
+        }
+        const allowed = new Set(['low', 'medium']);
+        const cond = Array.isArray(schema?.allOf) ? schema.allOf.find((c) =>
+          Array.isArray(c?.if?.required) && c.if.required.includes('code_graph_ref')) : null;
+        const condEnum = cond?.then?.properties?.severity?.enum ?? null;
+        if (!cond || !Array.isArray(condEnum) || condEnum.some((s) => !allowed.has(s))) {
+          problems.push(`finding-system.schema.json allOf conditional(code_graph_ref ⟹ severity ⊆ {low,medium}) 부재/위반 (실제 then.severity.enum: ${JSON.stringify(condEnum)})`);
+        }
+      } catch (e) { problems.push(`finding-system schema parse 실패: ${e.message}`); }
+    }
+    // 양성 ③ — finding-export.js ceiling 코드 강제.
+    const fePath = join(ROOT, 'tools/codegraph-coverage/src/finding-export.js');
+    if (!existsSync(fePath)) {
+      problems.push('codegraph-coverage/src/finding-export.js 부재');
+    } else {
+      const fe = readFileSync(fePath, 'utf-8');
+      if (!/SEVERITY_CEILING/.test(fe) || !/pinSeverity/.test(fe)) {
+        problems.push('finding-export.js 가 SEVERITY_CEILING/pinSeverity 재사용 부재 (severity ceiling 코드 강제 의무)');
+      }
+      if (/\b(high|critical)\b/.test(fe)) {
+        problems.push('finding-export.js 에 high/critical 리터럴 존재 — codegraph finding 은 low|medium 만 (gate leak 차단 불변식 위반)');
+      }
+    }
+    // 양성 ④ — finding-export.js + enumerate.js gate 모듈 import 0 (출력 gate 역류 차단).
+    const importGateRe = /^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m;
+    for (const rel of ['tools/codegraph-coverage/src/finding-export.js', 'tools/codegraph-coverage/src/enumerate.js']) {
+      const fp = join(ROOT, rel);
+      if (existsSync(fp) && importGateRe.test(readFileSync(fp, 'utf-8'))) {
+        problems.push(`${rel} 가 gate 모듈(gate-eval/findings-aggregator) import — codegraph finding 이 gate 결정에 결합 = trust 위반`);
+      }
+    }
+    return {
+      id: 'codegraph_finding_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `codegraph→finding-list (STEP 2) = reference-lens 강제 — gate-eval/findings-aggregator STEP 2 토큰 0 + finding-system.schema.json code_graph_ref ⟹ severity ⊆ {low,medium} conditional + finding-export.js SEVERITY_CEILING 재사용(high/critical 리터럴 0) + finding-export/enumerate gate 모듈 import 0 (결정적 gate inject ❌ / 비차단 ceiling 코드+구조 강제 / DEC-2026-06-03 §5 STEP 2 / check31·33·34 동형)`
+        : `codegraph→finding-list trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'gate modules (음성 0) + finding-system.schema.json(code_graph_ref conditional) + codegraph-coverage/src/finding-export.js(ceiling + gate-import 0)',
+    };
+  } catch (e) {
+    return { id: 'codegraph_finding_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + finding-system.schema.json + finding-export.js' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1648,6 +1723,7 @@ function main() {
     check32_shippedRepoRelativeToolPath(),
     check33_traceViewReferenceLensTrust(),
     check34_codegraphCoverageReferenceLensTrust(),
+    check35_codegraphFindingReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

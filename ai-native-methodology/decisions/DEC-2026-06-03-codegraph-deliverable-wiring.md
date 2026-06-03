@@ -41,7 +41,7 @@
 | **business-rules** | R✗(semantic) / I medium(Modern) auth/route coverage-hole·anchor 검증 / A source_evidence node_id·related_api 교차 / N low 정책분기 후보(finding) |
 | **error-mapping-spec** | R✗ / I medium(Spring한정) handler↔exception 연결·throw 도달 / A low / N✗. NestJS=none |
 | **antipatterns** | R 부분(ARCH "AST분석" 표기를 *진짜 AST*로) / I ARCH 완전성·N+1 call-edge / A evidence pointer / N coverage-hole. DB/DOMAIN/SECURITY=none |
-| **finding-list** | R✗ / I evidence anchor·double_hit 2nd-hitter / A `code_graph_ref`+discoverer 'codegraph' / N ★cycle/orphan/coverage-hole seed = **sanctioned 채널 본체** |
+| **finding-list** | R✗ / I evidence anchor·double_hit 2nd-hitter / A `code_graph_ref`+discoverer 'codegraph' / N ~~★cycle/orphan/coverage-hole seed = sanctioned 채널 본체~~ **(★ §10 정정 — cycle/orphan = 실측 false-positive 압도 반증 → STEP 3+ carry / coverage-hole-as-finding + handler-set 만 v12.10.0 시행)** |
 | **acceptance-criteria** | R✗ / I medium layer=be `openapi_path`↔codegraph route 대조 / A AC.code_pointers suggested / N route coverage-hole *(medium 의외)* |
 | **impl-spec** | R✗(runner SSOT) / I ★medium source_files 정확성·누락 협력파일 / A ★`ast_symbol` anchor(**함수단위**) / N ★orphan-impl coverage-hole(S2). NestJS/Java 실측 공백 |
 | **artifact-graph(dep-graph)** | R✗(부분 implements/ast_symbol 심볼실재) / I stale-anchor 교차검증·navigate 코드 blast-radius(**federator 일부 구현**) / A✗(context-cache로) / N ★code→requirement orphan coverage-hole |
@@ -92,7 +92,7 @@
 | STEP | 적용 산출물 (Part A) | 렌즈 |
 |---|---|---|
 | **STEP 1 coverage-hole 공통 메커니즘** [HIGH ROI·최저위험] | openapi-api·discovery-spec·acceptance-criteria·behavior-spec·characterization·test-spec·impl-spec·artifact-graph·db-schema·antipatterns·business-rules **(11)** | N |
-| **STEP 2 finding 채널(codegraph→finding-list)** [sanctioned·schema 0] | finding-list·antipatterns·domain·error-mapping·artifact-graph **(5)** | I/N |
+| **STEP 2 finding 채널(codegraph→finding-list)** [sanctioned] (★ §10 — 시행 시 2-mechanism 으로 축소: coverage-hole-as-finding + handler-set / cycle·orphan carry) | finding-list·~~antipatterns·domain·error-mapping~~·artifact-graph **(초안 5 → 시행 1.5)** | I/N |
 | **STEP 3 architecture 대치(+inventory)** [유일한 진짜 R] | architecture·inventory **(2)** | R/I |
 | **STEP 4 impl/test ast_symbol 앵커** [함수단위 추적성] | impl-spec·test-spec·acceptance-criteria·behavior-spec·code-pointer·artifact-graph·traceability-matrix **(6)** | A |
 | **STEP 5 context-cache 증분** [이미 실현된 통합 확장] | context-cache·code-graph.json **(2)** | I/A |
@@ -115,7 +115,7 @@
 
 ## 8. carry
 
-- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 시행 완료 (§9 참조)** / C-codegraph-wiring-step2 ~ step6 (위 로드맵 잔여)
+- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 (§9)** / ~~C-codegraph-wiring-step2~~ **STEP 2 = v12.10.0 시행 완료 (§10 / cycle·orphan 은 실측 반증 → STEP 3+ carry)** / C-codegraph-wiring-step3 ~ step6 (위 로드맵 잔여)
 - iBATIS2·FE/TS·NestJS BE codegraph 실측 공백 (Modern 한정 정직 표기)
 - coverage-hole false-positive 회피(런타임 와이어링·동적 라우팅 = "검출불가" 스택-게이트)
 - Strangler caller 맵 = STEP 6 migration api_surface 흡수(독립 신규 아님 / 초안 하향)
@@ -161,3 +161,37 @@
 
 - 검증(no-sim/실 CLI): codegraph-coverage test 28 + release-readiness self-test 34(check34 discrimination) + workspace 0 fail + RR **34/34** + version 3-way 12.9.0 + 2 도메인 실 dogfood schema-valid.
 - carry: 9 deliverable 약축 STEP 2~6 · method axis 2nd full-density 도메인 · openapi.yaml verb-단위 직접 diff(YAML 파서 — 무의존성 유지로 JSON 산출물 경유) · NestJS route↔OpenAPI 완전성·TS interface(=1) unverified · codegraph schema 결합(PRAGMA 완화 잔여).
+
+---
+
+## 10. STEP 2 시행 완료 (v12.10.0 MINOR / 2026-06-04 / 로드맵 2번째 슬라이스)
+
+**§5 STEP 2 (finding 채널 / codegraph→finding-list) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step2.md` (workflow `wf_015e95b1-432` 7-agent: investigation 3 + official-docs/industry/Senior 0.80 + synthesis → 사용자 4-결단 gate #3 묶음 승인). 본 DEC = SSOT (별도 구현 DEC 미생성).
+
+### 10.1 ★ 진입점 메모 'cycle·orphan seed' 실측 반증 (STEP 1 핸드오프 2사실 반증 선례 동형)
+
+§3 finding-list 행(line 44) + 진입점 메모가 'cycle/orphan/coverage-hole seed = sanctioned 채널 본체' 로 적었으나, **양 도메인 실 `.codegraph` DB 직접 쿼리 결과 cycle/orphan = false-positive 압도** → 반증:
+
+| 메모/초안 | 반증 (no-sim 실측 + 공식문서 + 업계) |
+|---|---|
+| cycle/orphan seed = 본체 | ❌ orphan(non-contains in-edge 0): RealWorld method 178/class 87, ecommerce method 109/class 16. **필터 후에도 RealWorld 51~75 / ecommerce 23~29 survivor 전부 live** (@DgsComponent GraphQL·JUnit @Test·DI 주입 service 메서드). cycle: self-call=정상 재귀/lifecycle, SCC=sibling wrapper. 근본원인=call provenance 미해소(RealWorld 519/590 null). → in-degree 0 → dead 단정 = no-simulation 위배. |
+| codegraph 가 cycle/dead-code 내장 | ❌ official-docs(@colbymchenry/codegraph): cycle/orphan/SCC/dead-code 내장 CLI **부재** / synthesized edge = `provenance:'heuristic'` 명시. |
+| graph-finding = gate-blocker 가능 | ❌ 업계 6도구(dependency-cruiser circular=warn / knip --no-exit-code / NDepend /ForceReturnZeroExitCode / SonarQube cycle=code smell / ArchUnit FreezingArchRule / shipmonk advisory) 만장일치 = advisory. |
+
+### 10.2 시행 범위 — 5 산출물 초안 → 2-mechanism 최소 코어 (Senior 0.80 / §8.1 과적합 회피 / STEP 1 11→2 칼날 동형)
+
+1. **coverage-hole → finding-system promote-ready export** (`finding-export.js` 신규 / `--emit-findings`): STEP 1 F-CGCOV → finding-system shape (`discoverer:'codegraph'` + `code_graph_ref` + `status:'candidate'`). ★ **decision (c)** — finding_id 미부여(사람 promote 시 F-XXX 배정 / 자동 ledger emit ❌ / seed_id 추적). 신규 seed 계산 0.
+2. **finding-system.schema.json `code_graph_ref` optional additive + allOf conditional**(code_graph_ref ⟹ severity ⊆ {low,medium}) — STEP 1 enum-cut ceiling 이식. discoverer 자유텍스트 'codegraph'(enum 격상 ❌ = 권위 누출 / 사용자 결단). 회귀 0(실 Ajv 3-fixture).
+3. (보조) **handler-set reading-aid** (`enumerateEdges` implements/extends): error-mapping 보조 / ★ ecommerce 1-도메인 정직표기(handler-relevant 태깅 / RealWorld test-base noise 필터) / http_status·mechanism=semantic carry.
+
+cycle·orphan = STEP 3+ carry (사용자 결단 "전면 carry").
+
+### 10.3 trust 경계 + 회귀 가드 check35
+
+- codegraph finding 은 `REQUIRED_VALIDATORS_PER_STAGE` 미등록(findings-aggregator=validator 출력만 count) + severity ceiling low|medium + finding-export/enumerate gate-import 0 → gate 누출 구조 차단.
+- **check35** `codegraph_finding_reference_lens_trust` (release-readiness 34→35 / check34 4-part isomorphic): ① gate 모듈 STEP 2 토큰 0 ② schema code_graph_ref⟹severity conditional ③ finding-export ceiling(상위등급 리터럴 0) ④ finding-export·enumerate gate-import 0.
+
+### 10.4 검증 / carry
+
+- 검증(no-sim/실 CLI): codegraph-coverage test 28→48 + workspace **1164/0** + release-readiness **35/35**(self-test 19/19) + version 3-way 12.10.0 + 2 도메인 실 dogfood `--emit-findings`(RealWorld seeds 0+handler-set / ecommerce seeds 4+handler-set). 실 Ajv conditional 3-fixture(medium valid / high INVALID / no-ref-high valid = 회귀 0).
+- carry(STEP 3+): cycle·orphan(call-graph provenance 개선 후) · error-mapping http_status/mechanism(semantic) · handler-set 2nd Spring 도메인 · domain orphan-repo(semantic) · antipatterns ARCH cycle(detected_by enum) · artifact-graph code→requirement orphan(직교/dep-graph inject 절대 금지) · F-CGCOV↔F-XXX promote 번호정책.

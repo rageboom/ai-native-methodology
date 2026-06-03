@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, mkdirSync, writeFileSync, utimesSync } from 'node:
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createRequire } from 'node:module';
-import { enumerateNodes, distinctFiles, checkIndexFreshness, sourceRootForDb } from '../src/enumerate.js';
+import { enumerateNodes, enumerateEdges, distinctFiles, checkIndexFreshness, sourceRootForDb } from '../src/enumerate.js';
 
 const require = createRequire(import.meta.url);
 function sqliteOrSkip() { try { return require('node:sqlite'); } catch { return null; } }
@@ -75,6 +75,60 @@ describe('enumerate — 실 SQLite read (no-simulation)', () => {
     assert.equal(fr.available, true);
     assert.equal(fr.stale, true);
     assert.equal(fr.stale_count, 1);
+  });
+
+  it('cleanup', () => { rmSync(base, { recursive: true, force: true }); assert.ok(true); });
+});
+
+// ★ v12.10.0 STEP 2 — enumerateEdges (handler-set reading-aid 용 / implements·extends edge 전수 + source/target 해소).
+describe('enumerateEdges — 실 SQLite edges read (no-simulation)', () => {
+  const sqlite = sqliteOrSkip();
+  if (!sqlite) { it('node:sqlite 부재 → skip', () => assert.ok(true)); return; }
+  const base = mkdtempSync(join(tmpdir(), 'cgcov-edge-'));
+
+  function makeEdgeDb({ withEdges = true } = {}) {
+    const root = mkdtempSync(join(base, 'cg-'));
+    mkdirSync(join(root, '.codegraph'), { recursive: true });
+    const dbPath = join(root, '.codegraph', 'codegraph.db');
+    const db = new sqlite.DatabaseSync(dbPath);
+    db.exec(`CREATE TABLE nodes (id TEXT, kind TEXT, name TEXT, qualified_name TEXT, file_path TEXT)`);
+    const insN = db.prepare('INSERT INTO nodes (id,kind,name,qualified_name,file_path) VALUES (?,?,?,?,?)');
+    insN.run('h1', 'class', 'JwtExceptionHandler', 'JwtExceptionHandler', 'handlers/jwt.handler.ts');
+    insN.run('i1', 'interface', 'ExceptionHandler', 'ExceptionHandler', 'handlers/handler.interface.ts');
+    insN.run('e1', 'class', 'InvalidPasswordException', 'InvalidPasswordException', 'auth/x.exception.ts');
+    insN.run('b1', 'class', 'AuthServiceInputException', 'AuthServiceInputException', 'auth/base.exception.ts');
+    if (withEdges) {
+      db.exec(`CREATE TABLE edges (id TEXT, source TEXT, target TEXT, kind TEXT, metadata TEXT, line INTEGER, col INTEGER, provenance TEXT)`);
+      const insE = db.prepare('INSERT INTO edges (id,source,target,kind,line,provenance) VALUES (?,?,?,?,?,?)');
+      insE.run('ed1', 'h1', 'i1', 'implements', 10, null);
+      insE.run('ed2', 'e1', 'b1', 'extends', 5, 'heuristic');
+    }
+    db.close();
+    return dbPath;
+  }
+
+  it('implements/extends edge 전수 + source/target 노드 해소', () => {
+    const dbPath = makeEdgeDb();
+    const r = enumerateEdges(dbPath, ['implements', 'extends']);
+    assert.equal(r.available, true);
+    assert.equal(r.byKind.implements.length, 1);
+    assert.equal(r.byKind.implements[0].source.name, 'JwtExceptionHandler');
+    assert.equal(r.byKind.implements[0].target.name, 'ExceptionHandler');
+    assert.equal(r.byKind.implements[0].source.file, 'handlers/jwt.handler.ts');
+    assert.equal(r.byKind.extends.length, 1);
+    assert.equal(r.byKind.extends[0].provenance, 'heuristic');
+  });
+
+  it('edges 테이블 부재 = graceful available:false (codegraph 버전 변경 방어 / 날조 ❌)', () => {
+    const dbPath = makeEdgeDb({ withEdges: false });
+    const r = enumerateEdges(dbPath, ['implements']);
+    assert.equal(r.available, false);
+    assert.match(r.reason, /edges schema 불일치/);
+  });
+
+  it('DB 부재 = graceful available:false', () => {
+    const r = enumerateEdges(join(base, 'nope', '.codegraph', 'codegraph.db'), ['implements']);
+    assert.equal(r.available, false);
   });
 
   it('cleanup', () => { rmSync(base, { recursive: true, force: true }); assert.ok(true); });

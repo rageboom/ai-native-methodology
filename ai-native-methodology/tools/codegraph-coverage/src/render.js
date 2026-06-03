@@ -6,7 +6,7 @@
 // ★ 허용 severity 화이트리스트 — 이 배열 밖 값은 throw (코드 강제 / pin).
 export const SEVERITY_CEILING = Object.freeze(['low', 'medium']);
 
-function pinSeverity(s) {
+export function pinSeverity(s) {
   if (!SEVERITY_CEILING.includes(s)) {
     throw new Error(`[codegraph-coverage] severity ceiling 위반: '${s}' — coverage-hole 은 ${SEVERITY_CEILING.join('|')} 만 (gate blocker ❌ / trust 경계)`);
   }
@@ -24,12 +24,15 @@ export function toFindings(coverage) {
 
   if (coverage.axes.route?.holes?.length) {
     for (const h of coverage.axes.route.holes) {
+      const sym = `${h.verb ? h.verb + ' ' : ''}${h.path}`.trim();
       findings.push({
         id: next(),
         axis: 'route',
         severity: pinSeverity('medium'),
         message: `route ${h.verb ? h.verb + ' ' : ''}${h.path} 가 코드에 존재하나 어떤 산출물(AC/discovery/impl/test) 도 미참조 — endpoint coverage-hole`,
         evidence: h.file ? [h.file] : [],
+        // ★ v12.10.0 STEP 2 — codegraph 코드 앵커 (auto-seed / promote 시 finding-system code_graph_ref 로 이식).
+        code_graph_ref: { kind: 'route', symbol: sym, ...(h.file ? { file: h.file } : {}) },
       });
     }
   }
@@ -41,6 +44,7 @@ export function toFindings(coverage) {
         severity: pinSeverity('low'),
         message: `public 메서드 ${h.symbol} 가 코드에 존재하나 어떤 산출물(impl/test/AC code_pointers) 도 미참조 — orphan-impl coverage-hole (noise-prone / 사람 확인)`,
         evidence: h.file ? [h.file] : [],
+        code_graph_ref: { kind: 'method', symbol: h.symbol, ...(h.file ? { file: h.file } : {}) },
       });
     }
   }

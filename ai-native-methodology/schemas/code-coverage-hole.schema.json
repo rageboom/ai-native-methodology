@@ -124,7 +124,22 @@
           "axis": { "type": "string" },
           "severity": { "enum": ["low", "medium"] },
           "message": { "type": "string" },
-          "evidence": { "type": "array", "items": { "type": "string" } }
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "code_graph_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "★ v12.10.0 STEP 2 — coverage-hole 의 codegraph 코드 앵커 (auto-seed). finding-system.schema.json code_graph_ref 와 동형. promote 시 F-XXX ledger 로 그대로 이식.",
+            "required": ["kind"],
+            "properties": {
+              "kind": { "type": "string" },
+              "symbol": { "type": "string" },
+              "file": { "type": "string" },
+              "line": { "type": "integer", "minimum": 0 },
+              "edge_kind": { "type": "string", "enum": ["contains", "imports", "calls", "references", "instantiates", "extends", "implements", "decorates"] },
+              "node_id": { "type": "string" },
+              "db_path": { "type": "string" }
+            }
+          }
         }
       }
     }

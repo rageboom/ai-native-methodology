@@ -85,6 +85,21 @@
         }
       }
     },
+    "code_graph_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "★ v12.10.0 codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — codegraph 도출 finding 의 코드 앵커(reference-lens). 존재 시 severity 는 low|medium 강제(top-level allOf conditional / STEP 1 enum-cut ceiling 정합). discoverer:'codegraph' 와 함께 사용. 최종 evidence = 실코드 grep (앵커는 reading-aid).",
+      "required": ["kind"],
+      "properties": {
+        "kind": { "type": "string", "description": "codegraph node kind (route|method|class|interface 등) 또는 edge-derived." },
+        "symbol": { "type": "string", "description": "Class.method 또는 route 'VERB /path'." },
+        "file": { "type": "string" },
+        "line": { "type": "integer", "minimum": 0 },
+        "edge_kind": { "type": "string", "enum": ["contains", "imports", "calls", "references", "instantiates", "extends", "implements", "decorates"] },
+        "node_id": { "type": "string" },
+        "db_path": { "type": "string" }
+      }
+    },
     "status": {
       "type": "string",
       "enum": ["open", "candidate", "promoted", "closed", "deferred", "rejected", "merged", "logged"],
@@ -187,5 +202,12 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "$comment": "★ codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — code_graph_ref 보유 finding(=codegraph 도출 / discoverer:'codegraph')은 severity low|medium 만 (high·critical 구조 차단). reference-lens 도구가 gate 차단등급(findings-aggregator high/critical)을 획득하지 못하게 STEP 1 enum-cut ceiling 을 finding-system 에 conditional 로 이식. code_graph_ref 부재 finding(기존 전부)은 무영향 = 회귀 0.",
+      "if": { "required": ["code_graph_ref"] },
+      "then": { "properties": { "severity": { "enum": ["low", "medium"] } } }
+    }
+  ]
 }

@@ -111,6 +111,66 @@ export function checkIndexFreshness(dbPath, indexedFiles = [], sourceRoot = null
   };
 }
 
+// ★ v12.10.0 STEP 2 — edges 테이블 전수 열거 (handler-set reading-aid 용 / DEC §5 STEP 2).
+//   edges(id,source,target,kind,metadata,line,col,provenance) — source/target = node id(text) → nodes JOIN 으로 name/kind/file 해소.
+//   ★ no-simulation: 실 DB read 만. edges 테이블/컬럼 부재 = available:false (graceful / 호출부 정직 carry note).
+//   ★ STEP 2 는 cycle/orphan 미산출(실측 FP 압도 → STEP 3+ carry) — 본 함수는 implements/extends 등 결정적 edge 의 reading-aid 열거 전용.
+const REQUIRED_EDGE_COLS = ['id', 'source', 'target', 'kind'];
+const EDGE_SELECT = [
+  'e.kind AS kind', 'e.provenance AS provenance', 'e.line AS line',
+  'sn.name AS sourceName', 'sn.kind AS sourceKind', 'sn.qualified_name AS sourceQn', 'sn.file_path AS sourceFile',
+  'tn.name AS targetName', 'tn.kind AS targetKind', 'tn.qualified_name AS targetQn', 'tn.file_path AS targetFile',
+].join(', ');
+
+function probeEdgesSchema(db) {
+  try {
+    const cols = db.prepare('PRAGMA table_info(edges)').all().map((r) => r.name);
+    const missing = REQUIRED_EDGE_COLS.filter((c) => !cols.includes(c));
+    return { ok: missing.length === 0, missing, cols };
+  } catch (e) {
+    return { ok: false, missing: REQUIRED_EDGE_COLS, cols: [], error: e.message };
+  }
+}
+
+/**
+ * 주어진 edge kind 들의 edge 전수 열거 (source/target 노드 해소). 결정론 — read-only SQLite.
+ * @returns {{available:boolean, reason:string|null, byKind:Object<string,Array>}}
+ */
+export function enumerateEdges(dbPath, kinds) {
+  const sqlite = loadSqlite();
+  if (!sqlite) return { available: false, reason: 'node:sqlite 부재 (Node 22.13+ 필요)', byKind: {} };
+  if (!existsSync(dbPath)) return { available: false, reason: `codegraph DB 부재: ${dbPath}`, byKind: {} };
+  let db;
+  try {
+    db = new sqlite.DatabaseSync(dbPath, { readOnly: true });
+  } catch (e) {
+    return { available: false, reason: `DB open 실패: ${e.message}`, byKind: {} };
+  }
+  try {
+    const probe = probeEdgesSchema(db);
+    if (!probe.ok) {
+      db.close();
+      return { available: false, reason: `codegraph edges schema 불일치 (컬럼 누락: ${probe.missing.join(',')}) — 버전 변경 추정`, byKind: {} };
+    }
+    const stmt = db.prepare(`SELECT ${EDGE_SELECT} FROM edges e LEFT JOIN nodes sn ON e.source = sn.id LEFT JOIN nodes tn ON e.target = tn.id WHERE e.kind = ?`);
+    const byKind = {};
+    for (const kind of kinds) {
+      byKind[kind] = stmt.all(kind).map((r) => ({
+        kind: r.kind,
+        provenance: r.provenance ?? null,
+        line: r.line ?? null,
+        source: { name: r.sourceName ?? null, kind: r.sourceKind ?? null, qualified_name: r.sourceQn ?? null, file: r.sourceFile ?? null },
+        target: { name: r.targetName ?? null, kind: r.targetKind ?? null, qualified_name: r.targetQn ?? null, file: r.targetFile ?? null },
+      }));
+    }
+    db.close();
+    return { available: true, reason: null, byKind };
+  } catch (e) {
+    try { db.close(); } catch { /* noop */ }
+    return { available: false, reason: `edges query 실패: ${e.message}`, byKind: {} };
+  }
+}
+
 // DISTINCT file_path 열거 (freshness 용). read-only.
 export function distinctFiles(dbPath) {
   const sqlite = loadSqlite();

@@ -3,19 +3,24 @@
 //   code→artifact coverage-hole 공통 메커니즘: codegraph 코드 엔티티(route/method) 전수 → 산출물 ref set-diff → hole.
 //   ★ reference-lens / 비차단(severity low|medium) / 결정적 gate inject ❌ / no-simulation(실 SQLite / 환경부재 exit 3).
 //
+//   ★ v12.10.0 STEP 2 (DEC §5 STEP 2 / finding 채널) — --emit-findings: coverage-hole → finding-system promote-ready 레코드
+//     (discoverer:'codegraph' + code_graph_ref / finding_id 미부여 = 사람 promote) + handler-set reading-aid (implements/extends).
+//
 //   usage:
 //     codegraph-coverage --target <projectDir> [--deliverables <dir>] [--inventory <path>] [--axes route,method] [--out <file>] [--json]
 //     codegraph-coverage --db <codegraph.db> --deliverables <dir> [--inventory <path>] [--out <file>] [--json]
+//     codegraph-coverage --target <projectDir> --emit-findings [--out-findings <file>] [--json]   # STEP 2 finding 채널
 //
 //   exit: 0=ok / 2=invariant-violation / 3=codegraph DB 부재 또는 usage-error.
 
 import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, resolve, isAbsolute, dirname } from 'node:path';
-import { enumerateNodes, distinctFiles, checkIndexFreshness, sourceRootForDb } from './enumerate.js';
+import { enumerateNodes, enumerateEdges, distinctFiles, checkIndexFreshness, sourceRootForDb } from './enumerate.js';
 import { classifyStack } from './detect.js';
 import { collectRefs } from './collect.js';
 import { buildCoverage } from './coverage.js';
 import { renderMarkdown, toFindings, SEVERITY_CEILING } from './render.js';
+import { toPromoteReadyFindings, buildHandlerSet, renderPromoteFindingsMarkdown } from './finding-export.js';
 
 const DELIVERABLE_FILES = {
   'acceptance-criteria': 'acceptance-criteria.json',
@@ -29,6 +34,7 @@ function usage(code = 3) {
   console.error([
     'usage: codegraph-coverage --target <projectDir> [--deliverables <dir>] [--inventory <path>] [--axes route,method] [--out <file>] [--json]',
     '       codegraph-coverage --db <codegraph.db> --deliverables <dir> [--inventory <path>] [--out <file>] [--json]',
+    '       codegraph-coverage --target <projectDir> --emit-findings [--out-findings <file>] [--json]   # STEP 2 finding 채널',
     '',
     'exit: 0=ok / 2=invariant / 3=codegraph DB 부재·usage',
   ].join('\n'));
@@ -46,6 +52,8 @@ function parseArgs(argv) {
     else if (a === '--deliverables') out.deliverables = rest[++i];
     else if (a === '--inventory') out.inventory = rest[++i];
     else if (a === '--out') out.out = rest[++i];
+    else if (a === '--emit-findings') out.emitFindings = true;
+    else if (a === '--out-findings') out.outFindings = rest[++i];
     else if (a === '--axes') out.axes = String(rest[++i] || '').split(',').map((s) => s.trim()).filter(Boolean);
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
@@ -123,6 +131,35 @@ function main() {
     coverage,
     findings,
   };
+
+  // ★ v12.10.0 STEP 2 — finding 채널 export (--emit-findings): coverage-hole → finding-system promote-ready 레코드 + handler-set reading-aid.
+  //   stdout 을 promote-ready view 로 전환 (STEP 1 coverage report 는 --out 으로 계속 기록 가능). edges 부재 = graceful note.
+  if (args.emitFindings) {
+    const promote = toPromoteReadyFindings(report);
+    const edgeRes = enumerateEdges(dbPath, ['implements', 'extends']);
+    const handlerSet = edgeRes.available
+      ? buildHandlerSet(edgeRes.byKind)
+      : { channel: 'reading-aid', note: `handler-set 미산출 — ${edgeRes.reason} (정직 carry)`, implements: [], extends: [], handler_relevant_count: 0 };
+    const findingsReport = {
+      meta: {
+        schema: 'finding-system.schema.json',
+        generated_by: 'codegraph-coverage --emit-findings',
+        reference_lens: true,
+        do_not_edit_manually: true,
+        trust_note: 'promote-ready reference-lens. finding_id 미부여 (사람이 promote 시 F-XXX 배정). 결정적 gate inject ❌. severity low|medium ceiling. discoverer:codegraph.',
+        generated_at: report.meta.generated_at,
+        severity_ceiling: [...SEVERITY_CEILING],
+      },
+      target: report.target,
+      promote_ready_findings: promote,
+      handler_set: handlerSet,
+    };
+    if (args.outFindings) writeFileSync(resolve(args.outFindings), JSON.stringify(findingsReport, null, 2) + '\n');
+    if (args.out) writeFileSync(resolve(args.out), JSON.stringify(report, null, 2) + '\n');
+    if (args.json) process.stdout.write(JSON.stringify(findingsReport, null, 2) + '\n');
+    else process.stdout.write(renderPromoteFindingsMarkdown(promote, handlerSet, report) + '\n');
+    process.exit(0);
+  }
 
   if (args.out) {
     writeFileSync(resolve(args.out), JSON.stringify(report, null, 2) + '\n');
