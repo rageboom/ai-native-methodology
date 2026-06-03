@@ -29,12 +29,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-  it('happy path — 32/33 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-    // ★ skip 시 check11(workspace_test) = pass=false / total 32/33 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+  it('happy path — 33/34 pass for v2.5.0 (★ A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+    // ★ skip 시 check11(workspace_test) = pass=false / total 33/34 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 33);
-    assert.equal(out.criteria_passed, 32);
+    assert.equal(out.criteria_total, 34);
+    assert.equal(out.criteria_passed, 33);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.detail.includes('skipped via --skip-workspace-test'), 'skip detail 명시 의무');
     const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
@@ -43,7 +43,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(cite.pass, `check13 skill citation must pass — detail: ${cite.detail}`);
   });
 
-  it('all 33 criterion ids are present in output (no skipped)', () => {
+  it('all 34 criterion ids are present in output (no skipped)', () => {
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
@@ -58,6 +58,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'chain_coverage',
       'claude_md_version_sync',
       'code_pointer_coverage',
+      'codegraph_coverage_reference_lens_trust',
       'db_assets_validator',
       'e2e_cycle_pass',
       'gate_enum_consistency',
@@ -202,11 +203,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 33 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 34 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
     // even with bogus target, should still evaluate all checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 33);
+    assert.equal(out.criteria_total, 34);
   });
 
   // ★ v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -249,6 +250,17 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(c.delegated_to.includes('trace-view.js'), 'content-aware (trace-view.js gate-import 0 + reference_lens:true / file-presence ❌)');
   });
 
+  // ★ v12.9.0 check34 discrimination — codegraph-coverage reference-lens trust (STEP 1 / DEC-2026-06-03-codegraph-deliverable-wiring §5).
+  it('codegraph_coverage_reference_lens_trust — gate 모듈 coverage 토큰 0 + severity ceiling 코드+구조 강제 + reference_lens:true', () => {
+    const r = runScript(['--target', 'v12.9.0', '--json', ...SKIP_WS]);
+    const out = JSON.parse(r.stdout);
+    const c = out.results.find((x) => x.id === 'codegraph_coverage_reference_lens_trust');
+    assert.ok(c.pass, `check34 must pass (codegraph-coverage reference-lens) — detail: ${c.detail}`);
+    assert.match(c.detail, /reference-lens/);
+    assert.match(c.detail, /low.*medium/);
+    assert.ok(c.delegated_to.includes('render.js'), 'content-aware (render.js severity ceiling + schema enum / file-presence ❌)');
+  });
+
   it('missing --target → exit 2 (usage error)', () => {
     const r = runScript([]);
     assert.equal(r.status, 2);
@@ -262,8 +274,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.pass, `workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`);
     assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-    assert.equal(out.criteria_total, 33);
-    assert.equal(out.criteria_passed, 33);
+    assert.equal(out.criteria_total, 34);
+    assert.equal(out.criteria_passed, 34);
     assert.equal(out.ready, true);
     assert.equal(r.status, 0);
   });

@@ -1543,6 +1543,72 @@ function check33_traceViewReferenceLensTrust() {
   }
 }
 
+// ★ check34 (v12.9.0 / codegraph-coverage STEP 1 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 1) —
+//   codegraph code→artifact coverage-hole = reference-lens / 비차단. 결정적 gate 가 절대 소비 ❌ (check31/33 동형).
+//   content-aware: ① gate-decision 모듈(gate-eval + findings-aggregator)에 coverage 토큰 0 (음성)
+//   ② severity ceiling 코드 강제 — render.js SEVERITY_CEILING=['low','medium'] + high/critical 리터럴 부재 (양성 / §2 invariant 를 prose→코드)
+//   ③ schema severity enum ⊆ {low,medium} (구조적 ceiling — findings-aggregator high/critical gate leak 차단) ④ cli.js reference_lens:true 라벨.
+function check34_codegraphCoverageReferenceLensTrust() {
+  try {
+    const COVERAGE_TOKENS = ['codegraph-coverage', 'buildCoverage', 'enumerateNodes', 'code-coverage-hole'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = COVERAGE_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 coverage 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 reference-lens coverage-hole 소비 = trust 위반`);
+    }
+    // 양성 ② — severity ceiling 코드 강제 (render.js).
+    const renderPath = join(ROOT, 'tools/codegraph-coverage/src/render.js');
+    if (!existsSync(renderPath)) {
+      problems.push('codegraph-coverage/src/render.js 부재');
+    } else {
+      const render = readFileSync(renderPath, 'utf-8');
+      if (!/SEVERITY_CEILING\s*=\s*Object\.freeze\(\s*\[\s*'low'\s*,\s*'medium'\s*\]\s*\)/.test(render)) {
+        problems.push("render.js SEVERITY_CEILING = Object.freeze(['low','medium']) 부재 (severity ceiling 코드 강제 의무)");
+      }
+      if (/\b(high|critical)\b/.test(render)) {
+        problems.push('render.js 에 high/critical 리터럴 존재 — coverage-hole 은 low|medium 만 (gate leak 차단 불변식 위반)');
+      }
+    }
+    // 양성 ③ — schema severity enum ⊆ {low,medium} (구조적 ceiling).
+    const schemaPath = join(ROOT, 'schemas/code-coverage-hole.schema.json');
+    if (!existsSync(schemaPath)) {
+      problems.push('schemas/code-coverage-hole.schema.json 부재');
+    } else {
+      try {
+        const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+        const sev = schema?.properties?.findings?.items?.properties?.severity?.enum ?? null;
+        const allowed = new Set(['low', 'medium']);
+        if (!Array.isArray(sev) || sev.some((s) => !allowed.has(s))) {
+          problems.push(`code-coverage-hole.schema.json findings.severity enum ⊄ {low,medium} (실제: ${JSON.stringify(sev)}) — 구조적 ceiling 위반`);
+        }
+      } catch (e) { problems.push(`schema parse 실패: ${e.message}`); }
+    }
+    // 양성 ④ — cli.js reference_lens 라벨.
+    const cliPath = join(ROOT, 'tools/codegraph-coverage/src/cli.js');
+    if (existsSync(cliPath) && !/reference_lens:\s*true/.test(readFileSync(cliPath, 'utf-8'))) {
+      problems.push('cli.js report meta 에 reference_lens:true 라벨 부재 (양성 trust 라벨 의무)');
+    }
+    return {
+      id: 'codegraph_coverage_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `codegraph coverage-hole = reference-lens 강제 — gate-eval/findings-aggregator coverage 토큰 0 + render.js SEVERITY_CEILING=['low','medium'](high/critical 리터럴 0) + schema severity enum ⊆ {low,medium} + cli.js reference_lens:true (결정적 gate inject ❌ / 비차단 ceiling 코드+구조 강제 / DEC-2026-06-03 §5 STEP 1 / check31·33 동형)`
+        : `codegraph-coverage trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'gate modules (음성 0) + codegraph-coverage/src/render.js(ceiling) + schemas/code-coverage-hole.schema.json(enum) + cli.js(reference_lens)',
+    };
+  } catch (e) {
+    return { id: 'codegraph_coverage_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + codegraph-coverage' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1581,6 +1647,7 @@ function main() {
     check31_specBodyReferenceLensTrust(),
     check32_shippedRepoRelativeToolPath(),
     check33_traceViewReferenceLensTrust(),
+    check34_codegraphCoverageReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;
