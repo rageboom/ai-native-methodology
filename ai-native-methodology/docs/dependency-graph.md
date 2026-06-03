@@ -74,10 +74,16 @@ node tools/chain-driver/src/cli.js navigate \
 # ★ 의도③ — 스펙 본문까지 함께 (UC/BHV/AC 의 title·description·precondition·gherkin lazy-read)
 node tools/chain-driver/src/cli.js navigate \
   --graph .aimd/output/artifact-graph.json --origin BHV-USER-001 --with-spec
+
+# ★ 의도③ (a) NL 라우팅 — 정확 id 몰라도 자연어로 (id/title/symbol/file 결정론 매칭)
+node tools/chain-driver/src/cli.js navigate \
+  --graph .aimd/output/artifact-graph.json --prompt "회원가입 BHV 바꾸려는데" [--with-spec]
 ```
 
 또는 skill: `/dep-graph-navigator BHV-USER-001`
 
+> ★ `--prompt "<자연어>"` (v12.4.0): 정확 node-id 몰라도 자연어에서 노드를 **결정론 substring 매칭**(id+5 / id-part+1 / title+2 / symbol+3 / file+2)해 해소. confident(top.score≥3 AND 동점 아님)면 top-1 자동 탐색, **tie·약매칭이면 후보 list 만**(오답 권위화 차단 / `--origin <id>` 로 명시). 결정론 only — 의미·동의어·임베딩 ❌(예 "로그인"↔"signin" / 임베딩 의미검색=carry). `--prompt`+`--origin`=origin 우선 / `--prompt`+`--stage`=rollup 우선.
+>
 > ★ `--with-spec` (default off / v12.3.0): 노드의 `source_path` 파일에서 본문(UC=`use_cases[]` / BHV=`behaviors[]` / AC=`criteria[].gherkin`)을 **lazy-read** 해 `spec 본문 (reference-lens / gate 주입 ❌)` 블록으로 표시. **본문은 reference-lens** — 어떤 결정적 gate 에도 inject ❌ (release-readiness check31 강제). 배열은 5개 cap + `… (+N more)`. UC/BHV/AC 외 subkind(TASK/TC/IMPL/analysis) 또는 source 부재·id miss = `(불가 — <reason>)` graceful. ★ placeholder `source_path`(`'(behavior)'` 등 — 합성 시 입력 경로 미전달) 는 결정론적으로 `(불가 — source 부재)` 로 해석되니 부재를 버그로 오인 ❌. rollup(`--stage`/`--scope`) 모드에는 미적용(본문 폭증 회피).
 
 ### 4-3. 정책 평가 (변경 종류 지정)

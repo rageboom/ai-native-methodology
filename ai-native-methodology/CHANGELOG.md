@@ -9,6 +9,17 @@
 
 ---
 
+## [12.4.0] — 2026-06-03 MINOR — dep-graph 의도③ (a) NL 라우팅: `navigate --prompt` (자연어 → 노드 결정론 해소)
+
+**dep-graph 의도③ "질의 → 영향 + 스펙 + 코드"의 자연어 진입 — `chain-driver navigate --prompt "<자연어>"` 신설.** 기존 navigate 는 `--origin <node-id>` 정확 id 필수 → 리뷰어가 "회원가입 관련 뭐 바뀌나"를 물으려면 id 를 이미 알아야 함. `--prompt` 로 자연어에서 노드를 **결정론 substring 매칭**(id/title/symbol/file)해 해소. SSOT = `decisions/DEC-2026-06-03-living-graph-nl-routing.md` (4원칙 = plan-dep-graph-nl-routing → Senior 적대적 리뷰 0.86 + main empirical fact-check → 사용자 "순서대로 진행" 승인).
+
+- **★ recon 발견 (triage 가정 REFUTE / no-simulation 실측)**: triage 는 "저위험 / `resolvePromptToNodes`(federator) 재사용 glue" 라 봤으나, 실측 — `resolvePromptToNodes` 는 `isAnchoredOrigin`(code_pointers>0) 후보만 매칭 + title 매칭 부재 → dogfood 체인 노드(UC/BHV/AC = code_pointers_na)엔 부적합(prompt "BHV-USER-001 회원가입" → BHV 미반환 / "회원가입" → 빈결과 / anchored 31/116 뿐). → federator scoring 을 `_shared/prompt-node-match.js` 로 일반화.
+- **시행**: ① `_shared/prompt-node-match.js` 신설 — `matchPromptToNodes(prompt, candidates, {topN, includeTitle})` (id-full+5 / id-part+1 / **title+2** / symbol+3 / file+2 / 결정론 sort) + `isConfidentTop`(strong≥3 AND unique). graph-freshness `_shared` 추출 선례 동형. ② **federator** `resolvePromptToNodes` = `matchPromptToNodes(p, selectOriginNodes(...), {includeTitle:false})` 위임 → 거동 **byte-identical**(federator 29 test 무회귀). ③ **navigate** `--prompt` — traversable(active/drift) 전 노드 + `includeTitle:true` (selectOriginNodes 의 anchored 필터 ❌ = REFUTE 근본원인 / Senior must-fix #2).
+- **★ tie/약매칭 degrade (Senior must-fix #1)**: confident(top.score≥3 AND 동점 아님) 만 top-1 자동 탐색 / tie 또는 약매칭 = **list-only**(후보+점수 노출 후 종료 / 오답 권위화 차단). `--prompt`+`--origin` = origin 우선 + `skipped_reason`(silent drop ❌). `--prompt`+`--stage` = rollup 우선.
+- **정직한 한계**: 결정론 substring only — 의미·동의어·임베딩(예 "로그인"↔"signin") 매칭 ❌. 한글 산문+식별자 0 = 빈 결과 graceful("식별자/제목 substring 만 / 동의어·임베딩 ❌"). 임베딩 의미검색 = carry.
+
+**MINOR 정당성**: 신규 CLI 플래그(additive) + 신규 `_shared` 모듈 / 공개 API·schema·산출물 무변경 / federator 거동 byte-identical / breaking 0. **검증 (no-simulation / 실 CLI·실 그래프)**: 새 test 21(matchPromptToNodes 단위 12[id/title/symbol/file/tie/빈/★includeTitle:false 거동동결] + navigate --prompt 통합 9[명시id auto·title tie list-only·title+idpart auto·0매칭 graceful·origin우선·with-spec조합·stage rollup우선·text·회귀0]) + federator 29 무회귀 + **2 distinct 도메인**(RealWorld "BHV-USER-001"→auto / "회원가입"→tie list-only + ecommerce 동형) + workspace **1084 pass/0 fail** + release-readiness **31/31** + version 3-way 12.4.0. **carry**: 의도③ 잔여 (b) what-if(가설 변경 영향 / in-memory 비파괴+사용자 명시입력) · 임베딩 의미검색 · TASK·TC·IMPL spec 본문. DEC-2026-06-03-living-graph-nl-routing. Extends DEC-2026-06-03-living-graph-spec-body.
+
 ## [12.3.0] — 2026-06-03 MINOR — dep-graph 의도③ 첫 슬라이스: `navigate --with-spec` (스펙 본문 lazy-read / reference-lens)
 
 **dep-graph 의도③ "질의 → 영향 + 스펙 + 코드"의 스펙 본문 절반 — `chain-driver navigate --with-spec` 신설.** 기존 navigate 는 영향 트리(BFS)·centrality·code anchor 는 줬지만 **노드의 스펙 본문(title 조차)을 안 노출** → 리뷰어가 "이 `BHV-USER-001` 이 뭘 하나?"를 알려면 source 파일을 직접 grep 해야 했음(소비 루프 P0 통증 / `project_living_dep_graph_two_loops` — navigate 가 답을 다 줘야). 본 release 가 `--with-spec`(default off) 로 노드의 source 파일에서 UC/BHV/AC 본문을 **lazy-read** 해 reference-lens 로 표시. SSOT = `decisions/DEC-2026-06-03-living-graph-spec-body.md` (4원칙 = plan-dep-graph-spec-body → 2-agent research[Senior 적대적 0.83 + 코드사실 F-015 독립검증] → 사용자 승인 D1·D4).

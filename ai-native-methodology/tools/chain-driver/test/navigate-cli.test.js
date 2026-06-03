@@ -403,3 +403,102 @@ describe('chain-driver navigate --with-spec (★ 의도③ 스펙 본문)', () =
     rmSync(dir, { recursive: true });
   });
 });
+
+// ★ 의도③ (a) NL 라우팅 — navigate --prompt (자연어 → 노드 결정론 해소).
+function makePromptGraph() {
+  const dir = mkdtempSync(join(tmpdir(), 'navprompt-'));
+  const graph = {
+    nodes: [
+      { id: 'UC-USER-001', artifact_kind: 'chain', artifact_subkind: 'UC', source_path: 'd.json', state: 'active', title: '회원가입' },
+      { id: 'BHV-USER-001', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: 'b.json', state: 'active', title: '회원가입',
+        code_pointers: [{ path: 'src/SignupService.kt', anchor_type: 'strict_path', symbol: 'checkDuplicate' }] },
+      { id: 'AC-USER-001', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: 'a.json', state: 'active', title: '회원가입 성공' },
+      { id: 'BHV-ARTICLE-001', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: 'b.json', state: 'active', title: '게시글' },
+    ],
+    edges: [
+      { source: 'UC-USER-001', target: 'BHV-USER-001', edge_type: 'derived_from', confidence: 'hard' },
+      { source: 'BHV-USER-001', target: 'AC-USER-001', edge_type: 'derived_from', confidence: 'hard' },
+    ],
+  };
+  const path = join(dir, 'artifact-graph.json');
+  writeFileSync(path, JSON.stringify(graph));
+  return { dir, path };
+}
+
+describe('chain-driver navigate --prompt (★ 의도③ NL 라우팅)', () => {
+  it('명시 id → strong unique → top-1 자동 탐색 (node 동봉)', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--prompt', 'BHV-USER-001 바꾸려는데', '--json']).stdout);
+    assert.equal(out.prompt_resolution.resolved, 'BHV-USER-001');
+    assert.equal(out.node.id, 'BHV-USER-001');
+    assert.ok(out.impact); // 자동 탐색 = 영향 트리까지
+    rmSync(dir, { recursive: true });
+  });
+
+  it('title 동점 → list-only degrade (탐색 ❌ / node 부재)', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--prompt', '회원가입 관련', '--json']).stdout);
+    assert.equal(out.prompt_resolution.resolved, null);
+    assert.equal('node' in out, false); // 탐색 안 함
+    const ids = out.prompt_resolution.matches.map((m) => m.node_id).sort();
+    assert.deepEqual(ids, ['BHV-USER-001', 'UC-USER-001']); // title="회원가입" (AC="회원가입 성공"은 substring 아님)
+    rmSync(dir, { recursive: true });
+  });
+
+  it('title + id-part → strong unique → 자동 탐색', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--prompt', '회원가입 BHV', '--json']).stdout);
+    assert.equal(out.prompt_resolution.resolved, 'BHV-USER-001'); // title+2 + id-part bhv +1 = 3 unique
+    assert.equal(out.node.id, 'BHV-USER-001');
+    rmSync(dir, { recursive: true });
+  });
+
+  it('0 매칭 → graceful (resolved null / node 부재)', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--prompt', 'zzz없음qqq', '--json']).stdout);
+    assert.equal(out.prompt_resolution.matches.length, 0);
+    assert.equal(out.prompt_resolution.resolved, null);
+    assert.match(out.prompt_resolution.reason, /매칭 0/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--prompt + --origin 동시 = origin 우선 + skipped_reason', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'UC-USER-001', '--prompt', 'BHV-USER-001', '--json']).stdout);
+    assert.equal(out.node.id, 'UC-USER-001'); // origin 우선
+    assert.match(out.prompt_resolution.skipped_reason, /origin 우선/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--prompt + --with-spec 조합 → 자동 탐색 노드에 spec 본문', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--prompt', 'BHV-USER-001', '--with-spec', '--json']).stdout);
+    assert.equal(out.node.id, 'BHV-USER-001');
+    assert.equal(out.spec.reference_lens, true); // source 부재라 available:false 이지만 graceful
+    rmSync(dir, { recursive: true });
+  });
+
+  it('--prompt + --stage 동시 = rollup 우선 (prompt 무시)', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--stage', 'spec', '--prompt', 'BHV-USER-001', '--json']).stdout);
+    assert.ok('query' in out); // rollup 출력 (prompt_resolution 아님)
+    assert.equal('prompt_resolution' in out, false);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('text 출력: 후보 list + 점수 + top 탐색', () => {
+    const { dir, path } = makePromptGraph();
+    const r = run(['navigate', '--graph', path, '--prompt', 'BHV-USER-001 바꾸려는데']);
+    assert.match(r.stdout, /프롬프트 "BHV-USER-001 바꾸려는데" → 매칭/);
+    assert.match(r.stdout, /BHV-USER-001 \(score 5\)/);
+    assert.match(r.stdout, /→ top 탐색: BHV-USER-001/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ 회귀 0 — --prompt 없으면 prompt_resolution 키 부재', () => {
+    const { dir, path } = makePromptGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-USER-001', '--json']).stdout);
+    assert.equal('prompt_resolution' in out, false);
+    rmSync(dir, { recursive: true });
+  });
+});

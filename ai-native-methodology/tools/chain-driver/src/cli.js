@@ -53,6 +53,8 @@ import { topKImpactRoot } from './centrality.js';
 // ★ Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
+// ★ 의도③ (a) NL 라우팅 (navigate --prompt) — prompt → 노드 결정론 매칭 (_shared / federator 와 DRY 공유).
+import { matchPromptToNodes, isConfidentTop } from '../../_shared/prompt-node-match.js';
 
 function usage(code = 3) {
   console.error([
@@ -67,6 +69,7 @@ function usage(code = 3) {
     '  sync <project> [--scope <slug>]',
     '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
     '  navigate --graph <artifact-graph.json> --origin <node-id> [--with-spec] [--json]   (dep-graph-navigator backend)',
+    '  navigate --graph <artifact-graph.json> --prompt "<자연어>" [--with-spec] [--json]   (★ 의도③ NL 라우팅 — id/title 결정론 해소)',
     '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
     '  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (★ Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
     '  suggest-skill --prompt <text>',
@@ -537,9 +540,28 @@ function readSpecBody(node, graphPath) {
   return body;
 }
 
+// ★ 의도③ (a) NL 라우팅 — prompt 해소 결과 텍스트 출력 (후보 list + 점수 / 탐색 top / list-only / 0매칭 / skip).
+function writePromptResolution(pr) {
+  if (pr.skipped_reason) {
+    process.stdout.write(`[dep-graph-navigator] 프롬프트 "${pr.prompt}" → ${pr.skipped_reason}\n`);
+    return;
+  }
+  const n = pr.matches.length;
+  const head = pr.resolved
+    ? `매칭 ${n} (top: ${pr.resolved})`
+    : (n === 0 ? '매칭 0' : `매칭 ${n} (동점/약매칭 — 자동 탐색 억제)`);
+  process.stdout.write(`[dep-graph-navigator] 프롬프트 "${pr.prompt}" → ${head}\n`);
+  for (const m of pr.matches) {
+    process.stdout.write(`    ${m.node_id} (score ${m.score}) [${m.matched.join(', ')}]\n`);
+  }
+  if (pr.resolved) process.stdout.write(`  → top 탐색: ${pr.resolved}\n`);
+  else process.stdout.write(`  ${pr.reason}\n`);
+}
+
 // ★ dep-graph P4 (operation.md 결정 7) — dep-graph-navigator skill 의 backend.
 // node 상세 + 영향 트리(BFS) + code_pointers + top-K impact root (centrality) 통합.
 // usage: chain-driver navigate --graph <path> --origin <node-id> [--with-spec] [--json]
+//        chain-driver navigate --graph <path> --prompt "<자연어>" [--with-spec] [--json]   (★ 의도③ NL 라우팅)
 //        chain-driver navigate --graph <path> --stage <s>|--scope <id> [--json]   (★ F3 일괄 rollup)
 function cmdNavigate(args) {
   if (!args.graphPath) {
@@ -555,11 +577,46 @@ function cmdNavigate(args) {
   catch (e) { console.error(`[chain-driver] navigate parse error: ${e.message}`); process.exit(3); }
 
   // ★ F3 — stage/scope 일괄 rollup (단일 노드 --origin 없이 "이 단계의 의존성" 한 번에)
+  //   ★ rollup 우선 — --prompt + --stage/--scope 동시 시 rollup 이 이김 (prompt 해소는 그 뒤 / 회귀 보존).
   if (!args.origin && (args.stage || args.scope)) {
     return cmdNavigateRollup(graph, args);
   }
+
+  // ★ 의도③ (a) NL 라우팅 — --prompt 자연어 → 노드 결정론 해소 (origin 미지정 시).
+  //   traversable(active/drift) 전 노드 후보 + includeTitle (selectOriginNodes 의 anchored 필터 ❌ = REFUTE 근본원인).
+  //   confident(strong+unique) 만 top-1 자동 탐색 / tie·약매칭 = list-only degrade (오답 권위화 차단 / Senior must-fix).
+  let promptResolution = null;
+  if (!args.origin && args.prompt) {
+    const TRAVERSABLE = new Set(['active', 'drift']);
+    const candidates = (graph.nodes ?? []).filter((n) => TRAVERSABLE.has(n.state));
+    const matches = matchPromptToNodes(args.prompt, candidates, { topN: 5, includeTitle: true });
+    const confident = isConfidentTop(matches);
+    promptResolution = {
+      prompt: args.prompt,
+      matches,
+      resolved: confident ? matches[0].node_id : null,
+      reason: matches.length === 0
+        ? '매칭 0 — 식별자/제목 substring 만(동의어·임베딩 ❌). --origin <id> 명시 또는 표현 구체화.'
+        : (confident ? null : '동점/약매칭 — top-1 자동 탐색 억제. 후보 중 --origin <id> 로 명시.'),
+    };
+    if (confident) {
+      args.origin = matches[0].node_id; // top-1 자동 탐색
+    } else {
+      // list-only — 후보만 노출하고 종료 (탐색 ❌ / 오답 권위화 차단).
+      if (args.json) {
+        process.stdout.write(JSON.stringify({ prompt_resolution: promptResolution }, null, 2) + '\n');
+      } else {
+        writePromptResolution(promptResolution);
+      }
+      process.exit(0);
+    }
+  } else if (args.origin && args.prompt) {
+    // --prompt + --origin 동시 = origin 우선 (명시 id 권위) / prompt skip (silent drop ❌ — 기록).
+    promptResolution = { prompt: args.prompt, matches: [], resolved: args.origin, skipped_reason: '--origin 우선 — prompt 무시 (명시 id 권위)' };
+  }
+
   if (!args.origin) {
-    console.error('[chain-driver] navigate: --origin <node-id> OR --stage/--scope required');
+    console.error('[chain-driver] navigate: --origin <node-id> OR --prompt <text> OR --stage/--scope required');
     process.exit(3);
   }
 
@@ -602,10 +659,13 @@ function cmdNavigate(args) {
 
   // ★ 의도③ — --with-spec 일 때만 reference-lens 스펙 본문 첨부 (off 시 출력 무변경 = 회귀 0).
   if (args.withSpec) result.spec = readSpecBody(node, args.graphPath);
+  // ★ 의도③ (a) NL 라우팅 — prompt 로 해소됐으면 어떻게 해소됐는지 동봉 (투명성).
+  if (promptResolution) result.prompt_resolution = promptResolution;
 
   if (args.json) {
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   } else {
+    if (promptResolution) writePromptResolution(promptResolution);
     process.stdout.write(`[dep-graph-navigator] ${node.id} (${node.artifact_kind}/${node.artifact_subkind}) state=${node.state}\n`);
     process.stdout.write(`  source: ${node.source_path}\n`);
     if (result.node.code_pointers.length > 0) {

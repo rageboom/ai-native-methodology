@@ -23,6 +23,8 @@ import { execSync, execFileSync } from 'node:child_process';
 import { existsSync, statSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+// ★ v12.4.0 — prompt→노드 결정론 매칭 코어 (_shared / navigate --prompt 와 DRY 공유 / graph-freshness 선례).
+import { matchPromptToNodes } from '../../_shared/prompt-node-match.js';
 
 const require = createRequire(import.meta.url);
 // node:sqlite = Node 22.5+ (실험). 부재(구 Node) = null → 호출부 graceful fallback.
@@ -57,38 +59,11 @@ export function selectOriginNodes(graph, originIds = null) {
 //     의미·동의어·임베딩(예: "로그인"↔"login") 매칭 ❌ = propose-only carry (결정론 vs LLM axis 분리 / STRONG-STOP).
 //   ★ 한글 산문만 있고 식별자 0 → 빈 결과 (정직 / 호출부가 --origin 안내 또는 임베딩 carry).
 //   반환: [{ node_id, score, matched:[reasons] }] score desc, 동점 id asc (결정성).
+//   ★ v12.4.0 — scoring 코어를 `_shared/prompt-node-match.js` 로 추출 (navigate --prompt 와 DRY 공유).
+//     federation = code-anchored 후보(selectOriginNodes) + includeTitle:false → 거동 byte-identical 보존
+//     (title 매칭은 navigate 전용 / federation 축 무영향 / federator.test 무회귀).
 export function resolvePromptToNodes(prompt, graph, { topN = 5, originIds = null } = {}) {
-  const p = String(prompt ?? '').toLowerCase();
-  if (!p.trim()) return [];
-  const candidates = selectOriginNodes(graph, originIds);
-  const scored = [];
-  for (const node of candidates) {
-    let score = 0;
-    const matched = [];
-    const idLc = node.id.toLowerCase();
-    if (p.includes(idLc)) {
-      score += 5; matched.push(`id:${node.id}`);
-    } else {
-      for (const part of idLc.split(/[-_./]/).filter(x => x.length >= 3)) {
-        if (p.includes(part)) { score += 1; matched.push(`id-part:${part}`); }
-      }
-    }
-    for (const cp of (node.code_pointers ?? [])) {
-      if (cp?.symbol) {
-        const s = cp.symbol.toLowerCase();
-        if (s.length >= 3 && p.includes(s)) { score += 3; matched.push(`symbol:${cp.symbol}`); }
-      }
-      if (cp?.path) {
-        const base = basename(cp.path).toLowerCase();
-        const stem = basename(cp.path, extname(cp.path)).toLowerCase();
-        if (base.length >= 3 && p.includes(base)) { score += 2; matched.push(`file:${base}`); }
-        else if (stem.length >= 3 && p.includes(stem)) { score += 2; matched.push(`file:${stem}`); }
-      }
-    }
-    if (score > 0) scored.push({ node_id: node.id, score, matched });
-  }
-  scored.sort((a, b) => b.score - a.score || a.node_id.localeCompare(b.node_id));
-  return scored.slice(0, topN);
+  return matchPromptToNodes(prompt, selectOriginNodes(graph, originIds), { topN, includeTitle: false });
 }
 
 // ── Phase 1.5 — legacy 데이터 반쪽 (분석 산출물 sql-inventory + db-schema) ───────
