@@ -19,6 +19,7 @@ import { enumerateNodes, enumerateEdges, distinctFiles, checkIndexFreshness, sou
 import { classifyStack } from './detect.js';
 import { collectRefs } from './collect.js';
 import { buildCoverage } from './coverage.js';
+import { MODULE_EDGE_KINDS } from './module-graph.js';
 import { renderMarkdown, toFindings, SEVERITY_CEILING } from './render.js';
 import { toPromoteReadyFindings, buildHandlerSet, renderPromoteFindingsMarkdown } from './finding-export.js';
 
@@ -42,7 +43,7 @@ function usage(code = 3) {
 }
 
 function parseArgs(argv) {
-  const out = { json: false, axes: ['route', 'method'] };
+  const out = { json: false, axes: ['route', 'method', 'module'] };
   const rest = argv.slice(2);
   for (let i = 0; i < rest.length; i++) {
     const a = rest[i];
@@ -103,6 +104,15 @@ function main() {
   }
   const refs = collectRefs(deliverables);
 
+  // ★ v12.11.0 STEP 3 — module axis 입력: architecture.json(modules[]+dependencies[]) + cross-file edge 전수 열거.
+  //   arch.json 부재 = module axis unverified (graceful / buildCoverage 가 note). edges 부재 = undetectable note.
+  const arch = (() => { const fp = join(delivDir, 'architecture.json'); return existsSync(fp) ? readJson(fp) : null; })();
+  let moduleEdgesByKind = null;
+  if (args.axes.includes('module')) {
+    const modEdges = enumerateEdges(dbPath, MODULE_EDGE_KINDS);
+    moduleEdgesByKind = modEdges.available ? modEdges.byKind : null;
+  }
+
   // coverage 엔진 (순수).
   const coverage = buildCoverage({
     routeNodes: enumResult.byKind.route || [],
@@ -110,6 +120,8 @@ function main() {
     refs,
     detect,
     axes: args.axes,
+    moduleEdgesByKind,
+    arch,
   });
   const findings = toFindings(coverage);
 

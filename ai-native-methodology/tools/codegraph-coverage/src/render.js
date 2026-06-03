@@ -48,6 +48,22 @@ export function toFindings(coverage) {
       });
     }
   }
+  // ★ v12.11.0 STEP 3 — module dependency coverage-hole (codegraph有 / arch.json無 = LLM 놓친 결정론 의존).
+  //   ★ ★ holes 만 순회 — informational_notes(onlyArch=codegraph 사각)는 finding 채널 진입 절대 ❌ (구조적 절단 / Senior must-fix#3 / check36 가드).
+  if (coverage.axes.module?.holes?.length) {
+    for (const h of coverage.axes.module.holes) {
+      const sym = `${h.from} → ${h.to}`;
+      const ek = Array.isArray(h.edge_kinds) ? h.edge_kinds.join(',') : '';
+      findings.push({
+        id: next(),
+        axis: 'module',
+        severity: pinSeverity('low'),
+        message: `module 의존 ${sym} (weight ${h.weight}${ek ? ' / ' + ek : ''}) 가 코드에 존재(codegraph cross-file edge)하나 architecture.json dependencies[] 미문서화 — module dependency coverage-hole (LLM 의존그래프 불완전 / 사람 확인)`,
+        evidence: h.sample_file ? [h.sample_file] : [],
+        code_graph_ref: { kind: 'module_dependency', symbol: sym, ...(h.sample_file ? { file: h.sample_file } : {}) },
+      });
+    }
+  }
   return findings;
 }
 
@@ -69,7 +85,8 @@ export function renderMarkdown(report) {
   L.push('');
 
   const s = report.coverage.stats;
-  L.push(`**route**: ${s.route_holes}/${s.route_total} hole · **method**: ${s.method_holes}/${s.method_total} hole · **undetectable axis**: ${s.undetectable_axes}`);
+  const moduleStat = report.coverage.axes.module ? ` · **module**: ${s.module_holes ?? 0}/${s.module_total ?? 0} hole (+${s.module_informational ?? 0} informational)` : '';
+  L.push(`**route**: ${s.route_holes}/${s.route_total} hole · **method**: ${s.method_holes}/${s.method_total} hole${moduleStat} · **undetectable axis**: ${s.undetectable_axes}`);
   L.push('');
 
   const r = report.coverage.axes.route;
@@ -86,6 +103,22 @@ export function renderMarkdown(report) {
     for (const h of m.holes.slice(0, 80)) L.push(`- ⚠ \`${h.symbol}\`  (${h.file})`);
     if (m.holes.length > 80) L.push(`- … (+${m.holes.length - 80} more)`);
     L.push('');
+  }
+  const mod = report.coverage.axes.module;
+  if (mod) {
+    L.push(`## module dependency coverage (detectable / codegraph 결정론 의존=${mod.total} corroborated=${mod.covered} hole=${mod.holes.length} / modules=${mod.module_count})`);
+    L.push('> ★ "대치" 아니라 결정론 corroboration lens — arch.json dependencies[] 를 codegraph cross-file edge 로 corroborate + LLM 놓친 의존 노출. arch.json 무수정.');
+    if (mod.holes.length === 0) L.push('_module dependency hole 없음 — codegraph 결정론 의존이 모두 architecture.json 에 문서화됨._');
+    for (const h of mod.holes.slice(0, 80)) L.push(`- ⚠ \`${h.from} → ${h.to}\`  weight=${h.weight}${Array.isArray(h.edge_kinds) && h.edge_kinds.length ? ' [' + h.edge_kinds.join(',') + ']' : ''}  (${h.sample_file})`);
+    if (mod.holes.length > 80) L.push(`- … (+${mod.holes.length - 80} more)`);
+    L.push('');
+    // ★ informational_notes (onlyArch = codegraph 사각) — 결함 보고 ❌ / severity 부재 / finding 채널 진입 ❌.
+    if (mod.informational_notes?.length) {
+      L.push('### informational notes (arch.json有 / codegraph無 = codegraph 사각 — ★ not a defect / 부재 ≠ 거짓)');
+      L.push('> codegraph 가 못 본 의존(런타임 DI/decorator/config 와이어링 등). 결함 아님 — coverage-hole/finding 으로 보고 ❌. 최종 판단 = 사람.');
+      for (const n of mod.informational_notes) L.push(`- \`${n.from} → ${n.to}\`${n.type ? ' (' + n.type + ')' : ''} — codegraph 미검출 (런타임 와이어링/iBATIS2/동적 가능 / 부재≠거짓)`);
+      L.push('');
+    }
   }
   if (report.coverage.undetectable.length) {
     L.push('## undetectable / unverified axes (검출불가 — 정직 carry / per-entity hole ❌)');

@@ -56,3 +56,10 @@ const DATA_CLASS_FILE_RE = /(?:\.(?:dto|entity|entities|model|schema|response|re
 export function isDataClassFile(filePath) {
   return DATA_CLASS_FILE_RE.test(String(filePath || ''));
 }
+
+// test 파일 skip (module axis rollup 한정) — test 기원 cross-file edge 가 production module 의존으로 집계되면 FP.
+//   업계 정합: ArchUnit ImportOption.DoNotIncludeTests / dependency-cruiser test exclude (industry FP#1 — 미제외 시 최빈 FP).
+const TEST_FILE_RE = /(?:\/tests?\/)|(?:\.(?:test|spec)\.[jt]sx?$)|(?:Test(?:s|Case|Base)?\.(?:java|kt)$)|(?:\/src\/test\/)|(?:[Ss]pec\.(?:java|kt)$)/;
+export function isTestFile(filePath) {
+  return TEST_FILE_RE.test(String(filePath || ''));
+}

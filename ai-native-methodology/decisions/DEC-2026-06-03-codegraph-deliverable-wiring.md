@@ -82,7 +82,7 @@
 1. **coverage-hole이 압도적 단일 패턴** — 10+ 산출물에서 가장 깨끗한 N(신규). codegraph 가 내용 생성 없이 *전수 나열→set-diff* 만 → trust 가장 안전 / 공통 메커니즘 1개로 다수 동시 적용.
 2. **codegraph 통합 일부 이미 실현**(context-cache/dep-graph via context-federator) — 완전 신규 아닌 **증분**.
 3. **finding 채널이 trust-축복 본체** = finding-list.
-4. **architecture만이 진짜 R(대치)** — 현 "결정적 0.98" 표기가 실은 LLM sampling.
+4. **architecture만이 진짜 R(대치)** — 현 "결정적 0.98" 표기가 실은 LLM sampling. (★ §11 정정: "대치"=거짓 자기최면 → **"module dependency coverage-hole / 결정론 corroboration lens"**. arch.json 무수정 reference-lens 가 그 표기를 corroborate / Option B[직접 emit] reject.)
 5. **iBATIS2(주 타깃 S2)=0 이 거의 모든 verdict 를 깎음** → high/medium 기여는 **Modern(Java/Spring/MyBatis3/JPA) 한정**. 사내 EFI-WEB·FE·DB경계·런타임와이어링은 정직히 none/low.
 6. **교정**: migration-cautions·legacy-spectrum 의 "Strangler caller 맵 신규" = **과대평가였음** → 둘 다 LOW(semantic/judgment+FE/JSP). Strangler 는 Modern-Java 한정 finding 으로만 생존(독립 신규 아님).
 7. **"decision-tree 같은거"**: codegraph 는 코드 *구조* 트리(call/impact)는 만들지만 의미 *로직* 트리(decision-tree/DMN)는 ✗(decision-table/business-rules=semantic).
@@ -93,7 +93,7 @@
 |---|---|---|
 | **STEP 1 coverage-hole 공통 메커니즘** [HIGH ROI·최저위험] | openapi-api·discovery-spec·acceptance-criteria·behavior-spec·characterization·test-spec·impl-spec·artifact-graph·db-schema·antipatterns·business-rules **(11)** | N |
 | **STEP 2 finding 채널(codegraph→finding-list)** [sanctioned] (★ §10 — 시행 시 2-mechanism 으로 축소: coverage-hole-as-finding + handler-set / cycle·orphan carry) | finding-list·~~antipatterns·domain·error-mapping~~·artifact-graph **(초안 5 → 시행 1.5)** | I/N |
-| **STEP 3 architecture 대치(+inventory)** [유일한 진짜 R] | architecture·inventory **(2)** | R/I |
+| **STEP 3 architecture** [~~유일한 진짜 R / "대치"~~ → ★ §11: **module dependency coverage-hole / 결정론 corroboration lens** (arch.json 무수정)] (★ §11 — (a) 1축 시행 / inventory·SCC·layer = carry STEP4+) | architecture **(1)** ~~·inventory~~ | ~~R/I~~ → N(coverage-hole) |
 | **STEP 4 impl/test ast_symbol 앵커** [함수단위 추적성] | impl-spec·test-spec·acceptance-criteria·behavior-spec·code-pointer·artifact-graph·traceability-matrix **(6)** | A |
 | **STEP 5 context-cache 증분** [이미 실현된 통합 확장] | context-cache·code-graph.json **(2)** | I/A |
 | **STEP 6 (후속) Modern-scoped reading-aid** | sql-inventory·formal-spec›sequence·migration-cautions·task-plan·plan-org·input-adapters **(6)** | I |
@@ -115,7 +115,7 @@
 
 ## 8. carry
 
-- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 (§9)** / ~~C-codegraph-wiring-step2~~ **STEP 2 = v12.10.0 시행 완료 (§10 / cycle·orphan 은 실측 반증 → STEP 3+ carry)** / C-codegraph-wiring-step3 ~ step6 (위 로드맵 잔여)
+- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 (§9)** / ~~C-codegraph-wiring-step2~~ **STEP 2 = v12.10.0 (§10)** / ~~C-codegraph-wiring-step3~~ **STEP 3 = v12.11.0 시행 완료 (§11 / "대치"→corroboration lens 개명 / (a) module dependency coverage-hole 1축 / SCC·layer·inventory = carry STEP4)** / C-codegraph-wiring-step4 ~ step6 (위 로드맵 잔여)
 - iBATIS2·FE/TS·NestJS BE codegraph 실측 공백 (Modern 한정 정직 표기)
 - coverage-hole false-positive 회피(런타임 와이어링·동적 라우팅 = "검출불가" 스택-게이트)
 - Strangler caller 맵 = STEP 6 migration api_surface 흡수(독립 신규 아님 / 초안 하향)
@@ -195,3 +195,36 @@ cycle·orphan = STEP 3+ carry (사용자 결단 "전면 carry").
 
 - 검증(no-sim/실 CLI): codegraph-coverage test 28→48 + workspace **1164/0** + release-readiness **35/35**(self-test 19/19) + version 3-way 12.10.0 + 2 도메인 실 dogfood `--emit-findings`(RealWorld seeds 0+handler-set / ecommerce seeds 4+handler-set). 실 Ajv conditional 3-fixture(medium valid / high INVALID / no-ref-high valid = 회귀 0).
 - carry(STEP 3+): cycle·orphan(call-graph provenance 개선 후) · error-mapping http_status/mechanism(semantic) · handler-set 2nd Spring 도메인 · domain orphan-repo(semantic) · antipatterns ARCH cycle(detected_by enum) · artifact-graph code→requirement orphan(직교/dep-graph inject 절대 금지) · F-CGCOV↔F-XXX promote 번호정책.
+
+---
+
+## 11. STEP 3 시행 완료 (v12.11.0 MINOR / 2026-06-04 / 로드맵 3번째 슬라이스)
+
+**§5 STEP 3 (architecture / 4-렌즈 분석의 "유일한 진짜 R") 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step3.md` (workflow `wf_b66c8b85-e4a` 4-agent: official-docs / industry / Senior 적대 0.85 REVISE / synthesis → 사용자 gate #3 3-결단 승인). 본 DEC = SSOT.
+
+### 11.1 ★ "대치" 라벨 정정 (Senior must-fix#1 / 3-결과 만장일치 / §3 line 32·85 + §4-4 + §5 STEP 3 + §8 라벨 폐기)
+
+§3·§4·§5 가 architecture 를 **"유일한 진짜 R(대치)"** 로 적었으나 = **"거짓 자기최면"** (Senior). 정정:
+- "대치" = arch.json 을 codegraph 가 **덮어쓰는** 게 아니다 → **"module dependency coverage-hole / 결정론 corroboration lens"** 로 개명.
+- arch.json 의 determinism 표기(`detection.algorithm:'tarjan_scc'` / weight)를 진실로 만드는 일 = arch.json 덮어쓰기가 아니라 **codegraph 결정론 cross-file edge 로 그 표기를 corroborate + LLM 놓친 의존(coverage-hole)을 노출**하는 reference-lens (STEP 1·2 동형 / arch.json 무수정 / SKILL codegraph 호출 0).
+- Option B(SKILL 이 dependencies[] 직접 emit) **reject**: reference-lens→authoritative 전환 = check34/35 동형 가드 적용불가(trust 경계 붕괴) + ecommerce onlyArch 7건(런타임 DI/decorator 사각) 소실로 LLM 근사(conf 0.9)보다 **퇴화** + greenfield/iBATIS2/FE graceful 분기 폭증 + 결정론 dogfood 불가.
+
+### 11.2 시행 범위 — (a) dependency coverage-hole 1축 단독 (Senior must-fix#2 / STEP1 11→2·STEP2 5→2 칼날)
+
+- 신규 `tools/codegraph-coverage/src/module-graph.js` (순수): codegraph cross-file edge(`calls/references/instantiates/extends/implements` / source.file≠target.file 둘다 내부 / **imports edge 제외** = target placeholder 실측·industry 정합) → architecture.json modules[] file→module rollup(`fileInModule` src-prefix suffix-tolerant / normalize.js 재사용) → module→module 그래프 → arch.json dependencies[] set-diff.
+- `coverage.js` buildModuleAxis(arch.json modules[] 부재=unverified / method-axis 게이트 동형) + `cli.js` module axis(기본 axes += module / `enumerateEdges` 재사용) + `render.js` module 섹션 + `finding-export.js` AXIS_PHASE/SPEC_GAP module 추가(phase=architecture).
+- **(b)module-SCC·(c)layer-violation·(d)inventory = CUT→carry STEP4+**: (b) 7-모듈 blob over-claim(업계=개별 cycle path / ArchUnit Issue#361) + path-format 민감 + STEP2 call-cycle carry 함정 동형 / (c) module layer=LLM 비결정 입력(schema modules[].layer required·결정성마커 부재)→codegraph(결정)×layer(비결정) 혼합 trust 오염 / (d) inventory=detect.js classifyStack 중복 + centrality=gold-plating.
+
+### 11.3 ★ onlyArch(codegraph 사각) 구조적 절단 (Senior must-fix#3 / 3중 강제 / industry FP#6 corroborate)
+
+arch.json有/codegraph無 의존 = codegraph 정직 사각(런타임 DI/decorator/config 와이어링). 부재 ≠ 거짓 → **`informational_notes[]`로 데이터 격리**: ① schema `moduleAxis.informational_notes.items` **severity 필드 부재 + additionalProperties:false**(구조적 promote 불가) ② `toFindings`/`toPromoteReadyFindings` **holes 만 순회**(onlyArch 도달 불가) ③ check36 가드. "not a defect / 부재≠거짓" 명시. ecommerce onlyArch 7건 전부 →MOD-CONFIG·MOD-COMMON = hole 보고 시 거짓양성 즉시 over-claim.
+
+### 11.4 trust 가드 check36 (RR 35→36 / check34·35 4-part isomorphic)
+
+`codegraph_module_reference_lens_trust`: ① gate-eval/findings-aggregator module-axis 토큰 0 ② schema informational_notes severity 부재 ③ module-graph.js high/critical 리터럴 0 + render.js 'not a defect/부재' 마커 ④ module-graph.js gate 모듈 import 0. severity ceiling low|medium(SEVERITY_CEILING/pinSeverity 재사용 / module hole=low).
+
+### 11.5 검증 / carry
+
+- 검증(no-sim/실 CLI / 2 distinct 도메인): module axis **RealWorld(Spring+MyBatis3) module 43/corroborated 21/hole +22/info 0** + **ecommerce(NestJS+Prisma) module 16/corroborated 8/hole +8/info 7** (동일 코드경로 재현 §8.1 / must-fix#4) + 실 Ajv schema-valid + finding-system conditional(module low+code_graph_ref valid / high INVALID). codegraph-coverage test 48→64(module-graph 16) + workspace **1180/0** + release-readiness **36/36**(self-test 20/20) + version 3-way 12.11.0 + build dist v12.11.0.
+- official-docs(F-015): codegraph module-dep/SCC/circular 내장 CLI 부재 confirmed(JS API findCircularDependencies 존재하나 CLI/MCP 미노출) / provenance=null 은 'tree-sitter' 명시생략(공식값 아님 / resolvedBy·confidence=Edge 인터페이스 부재) — STEP 3 코드는 provenance/resolvedBy/confidence 미사용(cross-file edge 존재만) → 무영향.
+- carry(STEP 4+): (b)module-SCC cycle · (c)layer-violation(module layer LLM 비결정) · (d)inventory corroboration·centrality · onlyArch DI vs config 의미 분류(semantic) · module-axis 2nd full-density 도메인(arch.json modules[] 부재=unverified) · STEP1 carry 유지(iBATIS2 sql-blind / table-blind / NestJS route↔OpenAPI / TS interface=1 unverified) · STEP 5~6(openapi/context-cache HIGH 등 4-렌즈 로드맵 잔여).

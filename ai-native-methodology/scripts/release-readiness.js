@@ -1684,6 +1684,79 @@ function check35_codegraphFindingReferenceLensTrust() {
   }
 }
 
+// ★ check36 (v12.11.0 / module dependency coverage-hole STEP 3 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 3) —
+//   module axis: codegraph cross-file edge rollup ∖ architecture.json dependencies[] = coverage-hole (결정론 corroboration lens / "대치" 아님). 결정적 gate 절대 소비 ❌ (check34/35 4-part isomorphic).
+//   ① 음성 — gate-decision 모듈(gate-eval + findings-aggregator)에 STEP 3 module-axis 토큰 0
+//   ② 양성 (구조적 절단) — code-coverage-hole.schema.json moduleAxis.informational_notes(=onlyArch/codegraph 사각) items 에 severity 필드 부재 + additionalProperties:false → onlyArch 가 finding 채널 진입 물리적 불가 (Senior must-fix#3)
+//   ③ 양성 — module-graph.js high/critical 리터럴 0 (ceiling) + render.js informational 'not a defect/부재' 정직 마커 존재
+//   ④ 양성 — module-graph.js gate 모듈 import 0 (출력 gate 역류 차단).
+function check36_codegraphModuleReferenceLensTrust() {
+  try {
+    const MODULE3_TOKENS = ['buildModuleAxis', 'module-graph', 'rollupModuleEdges', 'diffModuleDeps', 'informational_notes', 'MODULE_EDGE_KINDS'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = MODULE3_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 STEP 3 module-axis 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 codegraph module coverage-hole 소비 = trust 위반`);
+    }
+    // 양성 ② — schema moduleAxis.informational_notes 구조적 severity 부재 (onlyArch finding 채널 차단).
+    const schemaPath = join(ROOT, 'schemas/code-coverage-hole.schema.json');
+    if (!existsSync(schemaPath)) {
+      problems.push('schemas/code-coverage-hole.schema.json 부재');
+    } else {
+      try {
+        const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+        const info = schema?.$defs?.moduleAxis?.properties?.informational_notes?.items ?? null;
+        if (!info) {
+          problems.push('code-coverage-hole.schema.json $defs.moduleAxis.informational_notes.items 부재 (STEP 3 additive 의무)');
+        } else {
+          if (info.additionalProperties !== false) problems.push('moduleAxis.informational_notes.items additionalProperties:false 아님 (onlyArch 임의필드 차단 의무)');
+          if (info.properties && 'severity' in info.properties) {
+            problems.push('★ moduleAxis.informational_notes.items 에 severity 필드 존재 — onlyArch(codegraph 사각)가 severity 획득 = finding 채널 누출 위험 (Senior must-fix#3 위반)');
+          }
+        }
+        // moduleAxis.holes 는 severity 부재 (severity 는 render.js toFindings 가 pinSeverity 로 부여) — 구조 확인.
+      } catch (e) { problems.push(`code-coverage-hole schema parse 실패: ${e.message}`); }
+    }
+    // 양성 ③ — module-graph.js ceiling (high/critical 리터럴 0) + render.js informational 정직 마커.
+    const mgPath = join(ROOT, 'tools/codegraph-coverage/src/module-graph.js');
+    if (!existsSync(mgPath)) {
+      problems.push('codegraph-coverage/src/module-graph.js 부재');
+    } else if (/\b(high|critical)\b/.test(readFileSync(mgPath, 'utf-8'))) {
+      problems.push('module-graph.js 에 high/critical 리터럴 존재 — module coverage-hole 은 low|medium 만 (gate leak 차단 불변식 위반)');
+    }
+    const renderPath = join(ROOT, 'tools/codegraph-coverage/src/render.js');
+    if (existsSync(renderPath)) {
+      const render = readFileSync(renderPath, 'utf-8');
+      if (!/not a defect/i.test(render) || !/부재/.test(render)) {
+        problems.push("render.js informational_notes 섹션에 'not a defect / 부재' 정직 마커 부재 (onlyArch=결함 아님 명시 의무)");
+      }
+    }
+    // 양성 ④ — module-graph.js gate 모듈 import 0.
+    const importGateRe = /^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m;
+    if (existsSync(mgPath) && importGateRe.test(readFileSync(mgPath, 'utf-8'))) {
+      problems.push('module-graph.js 가 gate 모듈(gate-eval/findings-aggregator) import — codegraph module coverage-hole 이 gate 결정에 결합 = trust 위반');
+    }
+    return {
+      id: 'codegraph_module_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `codegraph module dependency coverage-hole (STEP 3) = reference-lens 강제 — gate-eval/findings-aggregator module-axis 토큰 0 + schema informational_notes severity 필드 부재(onlyArch finding 채널 구조 차단) + module-graph.js high/critical 리터럴 0 + render.js 'not a defect/부재' 마커 + module-graph.js gate 모듈 import 0 (결정적 gate inject ❌ / "대치" 아니라 결정론 corroboration lens / DEC-2026-06-03 §5 STEP 3 / check31·33·34·35 동형)`
+        : `codegraph module coverage-hole trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'gate modules (음성 0) + code-coverage-hole.schema.json(informational_notes severity 부재) + codegraph-coverage/src/module-graph.js(ceiling + gate-import 0) + render.js(not-a-defect 마커)',
+    };
+  } catch (e) {
+    return { id: 'codegraph_module_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + code-coverage-hole.schema.json + module-graph.js' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1724,6 +1797,7 @@ function main() {
     check33_traceViewReferenceLensTrust(),
     check34_codegraphCoverageReferenceLensTrust(),
     check35_codegraphFindingReferenceLensTrust(),
+    check36_codegraphModuleReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

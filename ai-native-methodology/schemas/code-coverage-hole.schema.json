@@ -83,7 +83,8 @@
           "additionalProperties": false,
           "properties": {
             "route": { "$ref": "#/$defs/routeAxis" },
-            "method": { "$ref": "#/$defs/methodAxis" }
+            "method": { "$ref": "#/$defs/methodAxis" },
+            "module": { "$ref": "#/$defs/moduleAxis" }
           }
         },
         "undetectable": {
@@ -108,6 +109,9 @@
             "route_holes": { "type": "integer", "minimum": 0 },
             "method_total": { "type": "integer", "minimum": 0 },
             "method_holes": { "type": "integer", "minimum": 0 },
+            "module_total": { "type": "integer", "minimum": 0 },
+            "module_holes": { "type": "integer", "minimum": 0 },
+            "module_informational": { "type": "integer", "minimum": 0 },
             "undetectable_axes": { "type": "integer", "minimum": 0 }
           }
         }
@@ -204,6 +208,58 @@
               "symbol": { "type": "string" },
               "name": { "type": "string" },
               "file": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "moduleAxis": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "★ v12.11.0 STEP 3 — module dependency coverage-hole (codegraph cross-file edge rollup ∖ architecture.json dependencies[]). '대치' 아니라 결정론 corroboration lens. holes = codegraph有/arch無(LLM 놓침). informational_notes = arch有/codegraph無(codegraph 사각 / NOT a defect / severity 부재).",
+      "required": ["detectable", "total", "covered", "holes"],
+      "properties": {
+        "detectable": { "type": "boolean" },
+        "total": { "type": "integer", "minimum": 0, "description": "codegraph 결정론 module→module 의존 수 (coverage 분모)." },
+        "covered": { "type": "integer", "minimum": 0, "description": "arch.json dependencies[] 가 이미 문서화 (corroborated)." },
+        "module_count": { "type": "integer", "minimum": 0 },
+        "rollup_stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cross_file": { "type": "integer", "minimum": 0 },
+            "test_skipped": { "type": "integer", "minimum": 0 },
+            "unmapped": { "type": "integer", "minimum": 0 },
+            "intra_module": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "holes": {
+          "type": "array",
+          "description": "codegraph 결정론 의존인데 arch.json 미문서화 = coverage-hole (안전 방향 / finding 채널 진입).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "weight"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "weight": { "type": "integer", "minimum": 1 },
+              "edge_kinds": { "type": "array", "items": { "type": "string" } },
+              "sample_file": { "type": "string" }
+            }
+          }
+        },
+        "informational_notes": {
+          "type": "array",
+          "description": "★ onlyArch (arch.json有 / codegraph無 = codegraph 사각: 런타임 DI/decorator/config 와이어링·iBATIS2·동적). NOT a defect / 부재≠거짓. ★ ★ severity 필드 구조적 부재 (additionalProperties:false) — finding/coverage-hole 채널 진입 절대 ❌ (Senior must-fix#3 / check36 가드).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "type": { "type": "string" }
             }
           }
         }

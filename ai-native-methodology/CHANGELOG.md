@@ -9,6 +9,33 @@
 
 ---
 
+## [12.11.0] — 2026-06-04 MINOR — codegraph wiring STEP 3 (module dependency coverage-hole / 결정론 corroboration lens)
+
+**§5 STEP 3 (architecture / 4-렌즈 분석의 유일한 R) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step3.md` (workflow `wf_b66c8b85-e4a` — official-docs / industry / Senior 적대 0.85 REVISE / synthesis → 사용자 gate #3 3-결단 승인). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §11.
+
+### ★ "대치" 라벨 정정 (Senior must-fix#1 / 3-결과 만장일치)
+DEC §3·§5 의 architecture "유일한 진짜 R(대치)" 라벨 = **"거짓 자기최면" → "module dependency coverage-hole / 결정론 corroboration lens"로 개명**. arch.json 을 codegraph 가 덮는 게 아니라(Option B = trust 경계 붕괴 + onlyArch 사각 소실로 LLM 근사보다 퇴화 → reject), codegraph 결정론 cross-file edge 로 arch.json 의 의존그래프를 **corroborate + LLM 놓친 의존 노출**. **arch.json 무수정 / analysis-architecture SKILL codegraph 호출 0** (Option A = STEP 1·2 reference-lens 동형).
+
+### 시행 범위 — (a) dependency coverage-hole 1축 단독 (Senior must-fix#2 / §8.1 / STEP1 11→2·STEP2 5→2 칼날)
+- 신규 `tools/codegraph-coverage/src/module-graph.js` (순수): codegraph cross-file edge(`calls/references/instantiates/extends/implements`, source.file≠target.file 둘다 내부) → architecture.json modules[] 로 file→module rollup → module→module 그래프 → arch.json dependencies[] set-diff. **imports edge 명시 제외**(target=importing 파일 placeholder 실측 / industry 정합).
+- `coverage.js` buildModuleAxis + `cli.js` module axis(기본 axes += module / architecture.json read + `enumerateEdges` 재사용) + `render.js` module 섹션.
+- **path-format 정규화**(must-fix#4): `normalize.js` normalizeFile 재사용 + `fileInModule`(src-prefix suffix-tolerant) → RealWorld(repo-relative) + ecommerce(src-relative) **2-도메인 동일 코드경로**.
+- (b)module-SCC·(c)layer-violation·(d)inventory = **carry STEP4+** (blob over-claim / module layer=LLM 비결정 입력 / inventory=detect.js 중복).
+
+### ★ onlyArch(codegraph 사각) 구조적 절단 (Senior must-fix#3 / 3중 강제)
+arch.json有/codegraph無 의존(런타임 DI/decorator/config 와이어링 = codegraph 정직 사각)은 **`informational_notes[]`로 데이터 격리** — ① schema `moduleAxis.informational_notes.items` **severity 필드 부재 + additionalProperties:false** (구조적 promote 불가) ② `toFindings`/`toPromoteReadyFindings` 가 **holes 만 순회**(onlyArch 도달 불가) ③ check36 회귀가드. "부재 ≠ 거짓 / not a defect" 명시. (ecommerce onlyArch 7건 전부 →CONFIG·COMMON = hole 보고시 거짓양성 즉시 over-claim 회피.)
+
+### trust 가드 — check36 (release-readiness 35→36 / check34·35 4-part isomorphic)
+`codegraph_module_reference_lens_trust`: ① gate-eval/findings-aggregator module-axis 토큰 0 ② schema informational_notes severity 부재(onlyArch finding 채널 구조 차단) ③ module-graph.js high/critical 리터럴 0 + render.js 'not a defect/부재' 마커 ④ module-graph.js gate 모듈 import 0. severity ceiling low|medium(`SEVERITY_CEILING`/`pinSeverity` 재사용 / module hole = low).
+
+### 검증 (no-simulation / 실 CLI / 2 distinct 도메인)
+- **module axis 2-도메인 corroborated**: RealWorld(Spring+MyBatis3) **module 43 / corroborated 21 / hole +22 / informational 0** + ecommerce(NestJS+Prisma) **module 16 / corroborated 8 / hole +8 / informational 7**. 둘 다 동일 코드경로 재현(§8.1) + 실 Ajv schema-valid + finding-system conditional(module low+code_graph_ref valid / high INVALID).
+- codegraph-coverage test 48→64 (module-graph 16) + workspace **1180 pass / 0 fail** + release-readiness **36/36**(self-test 20/20) + version 3-way 12.11.0.
+- official-docs(F-015): codegraph module-dep/SCC/circular 내장 CLI 부재 confirmed / provenance=null 은 'tree-sitter' 명시생략(공식값 아님) — STEP 3 코드는 provenance 미사용(cross-file edge 존재만) → 무영향.
+
+### carry (STEP 4+)
+(b) module-SCC cycle(blob over-claim / path-format 민감 / STEP2 call-cycle 함정 동형) · (c) layer-violation(module layer LLM 비결정) · (d) inventory corroboration·centrality · onlyArch DI vs config 의미 분류(semantic) · module-axis 2nd full-density 도메인(arch.json modules[] 부재=unverified) · STEP1 carry 유지(iBATIS2 sql-blind / table-blind / NestJS route↔OpenAPI / TS interface) · STEP 5~6(4-렌즈 로드맵 잔여). DEC §11.
+
 ## [12.10.0] — 2026-06-04 MINOR — codegraph wiring STEP 2 (finding 채널 / codegraph→finding-list)
 
 **codegraph wiring 로드맵 STEP 2 시행** (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2 / §10 실행 로그). "finding 채널 (codegraph→finding-list)". ★ research(workflow 7-agent: investigation 3 + official-docs/industry/Senior 0.80 + synthesis)가 **진입점 메모 'cycle·orphan seed = 본체' 를 실측 반증** (STEP 1 의 핸드오프 2사실 반증 선례 동형) → 정직한 minimal core = **신규 seed 종류가 아니라 2-mechanism 어댑터/배선**. release ❌ 아님 — 본 MINOR.

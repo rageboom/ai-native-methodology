@@ -5,6 +5,7 @@
 
 import { parseRouteName, normalizePath, normalizeFile, normalizeSymbol, fileMatches } from './normalize.js';
 import { isFrameworkRoute, isDynamicRoute, isNoiseMethod, isNonPublic, isDataClassFile } from './filters.js';
+import { rollupModuleEdges, diffModuleDeps } from './module-graph.js';
 
 // file 커버 판정 — 산출물 file ref(suffix-정렬) 매칭.
 function makeFileCovered(refFiles) {
@@ -69,16 +70,38 @@ function buildMethodAxis(methodNodes, refs, fileCovered) {
   return { detectable: true, total: seen.size, covered, filtered, holes };
 }
 
+// ★ v12.11.0 STEP 3 — module dependency coverage-hole (codegraph cross-file edge rollup ∖ arch.json dependencies[]).
+//   "대치" 가 아니라 결정론 corroboration lens (DEC §11 / Senior must-fix#1): arch.json 의 LLM 손-작성 의존 그래프를
+//   codegraph 결정론 edge 로 corroborate(covered) + LLM 놓친 의존(holes) 노출. arch.json 무수정 / 비차단.
+//   ★ onlyArch(codegraph 사각)는 informational_notes 로 격리 — hole 아님 / severity 부재 / finding 채널 진입 ❌.
+function buildModuleAxis(moduleEdgesByKind, arch) {
+  const modules = Array.isArray(arch?.modules) ? arch.modules : [];
+  const dependencies = Array.isArray(arch?.dependencies) ? arch.dependencies : [];
+  const { pairs, stats } = rollupModuleEdges(moduleEdgesByKind, modules);
+  const diff = diffModuleDeps(pairs, dependencies);
+  return {
+    detectable: true,
+    total: diff.total,
+    covered: diff.covered,
+    holes: diff.holes,
+    informational_notes: diff.informational_notes,
+    module_count: modules.length,
+    rollup_stats: stats,
+  };
+}
+
 /**
  * @param {Object} args
  * @param {Array}  args.routeNodes
  * @param {Array}  args.methodNodes
  * @param {Object} args.refs        collectRefs 결과
  * @param {Object} args.detect      classifyStack 결과
- * @param {string[]} [args.axes]    활성 axis (STEP 1 = ['route','method'])
- * @returns {Object} { axes:{route?,method?}, undetectable:[], stats:{} }
+ * @param {string[]} [args.axes]    활성 axis (STEP 1 = route/method, STEP 3 += module)
+ * @param {Object} [args.moduleEdgesByKind]  enumerateEdges(MODULE_EDGE_KINDS) byKind — module axis 입력 (cli 가 열거)
+ * @param {Object|null} [args.arch]  architecture.json (modules[] + dependencies[]) — module axis 입력
+ * @returns {Object} { axes:{route?,method?,module?}, undetectable:[], stats:{} }
  */
-export function buildCoverage({ routeNodes = [], methodNodes = [], refs, detect, axes = ['route', 'method'] }) {
+export function buildCoverage({ routeNodes = [], methodNodes = [], refs, detect, axes = ['route', 'method'], moduleEdgesByKind = null, arch = null }) {
   const fileCovered = makeFileCovered(refs.files);
   const out = { axes: {}, undetectable: [], stats: {} };
 
@@ -100,6 +123,18 @@ export function buildCoverage({ routeNodes = [], methodNodes = [], refs, detect,
     }
   }
 
+  if (axes.includes('module')) {
+    // ★ module axis 의미성 게이트 (method-axis 'impl-spec 부재=unverified' 동형 / Senior overfit_cut):
+    //   arch.json modules[] 부재(greenfield/analysis-only) = bucket 없음 → hole 폭증 무의미 → unverified note.
+    if (!arch || !Array.isArray(arch.modules) || arch.modules.length === 0) {
+      out.undetectable.push({ axis: 'module', state: 'unverified', reason: 'architecture.json modules[] 부재 — module dependency coverage 무의미 (greenfield/analysis-only 가능 / file→module bucket 부재 / hole 폭증 회피)' });
+    } else if (!moduleEdgesByKind) {
+      out.undetectable.push({ axis: 'module', state: 'undetectable', reason: 'codegraph edges 미열거 (edges 테이블 부재 또는 module axis 비활성)' });
+    } else {
+      out.axes.module = buildModuleAxis(moduleEdgesByKind, arch);
+    }
+  }
+
   // carry axes (STEP 2~6) — detectable 아니면 정직 note (per-entity hole 절대 ❌).
   for (const ax of ['interface', 'sql', 'table']) {
     if (detect.axes[ax] && detect.axes[ax].state !== 'detectable') {
@@ -112,6 +147,9 @@ export function buildCoverage({ routeNodes = [], methodNodes = [], refs, detect,
     route_holes: out.axes.route?.holes.length ?? 0,
     method_total: out.axes.method?.total ?? 0,
     method_holes: out.axes.method?.holes.length ?? 0,
+    module_total: out.axes.module?.total ?? 0,
+    module_holes: out.axes.module?.holes.length ?? 0,
+    module_informational: out.axes.module?.informational_notes?.length ?? 0,
     undetectable_axes: out.undetectable.length,
   };
   return out;

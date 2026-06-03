@@ -11,8 +11,8 @@
 
 import { SEVERITY_CEILING, pinSeverity } from './render.js';
 
-// route → 'api' / method → 'quality' (finding-system.schema.json phase enum 정합).
-const AXIS_PHASE = { route: 'api', method: 'quality' };
+// route → 'api' / method → 'quality' / module → 'architecture' (finding-system.schema.json phase enum 정합).
+const AXIS_PHASE = { route: 'api', method: 'quality', module: 'architecture' };
 
 function dateOf(report) {
   const ts = report?.meta?.generated_at;
@@ -22,6 +22,7 @@ function dateOf(report) {
 const SPEC_GAP = {
   route: 'openapi.yaml / acceptance-criteria.openapi_path / discovery-spec / impl-spec / test-spec 중 본 endpoint 미참조 (코드 route 有 / 산출물 ref 無).',
   method: 'impl-spec.source_files / test-spec / acceptance-criteria.code_pointers 중 본 public 메서드 미참조 (production-impl 有 / 산출물 ref 無 / noise-prone).',
+  module: 'architecture.json dependencies[] 에 본 module→module 의존 미문서화 (codegraph cross-file edge 有 / arch.json 의존그래프 不完全). 결정론 corroboration lens.',
 };
 
 /**
