@@ -65,20 +65,20 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 6. **자동 검증**:
    ```bash
    # chain coverage (UC → BHV / BHV → AC) + severe-AP coverage (gate#2 blocking lane / S13)
-   node tools/chain-coverage-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/chain-coverage-validator/src/cli.js \
      --discovery  .aimd/output/discovery-spec.json \
      --behavior   .aimd/output/behavior-spec.json \
      --acceptance .aimd/output/acceptance-criteria.json \
      --antipatterns .aimd/output/antipatterns.json
 
    # behavior chain 2 drift (state-machine + sequence 짝)
-   node tools/drift-validator/src/cli.js .aimd/output/behavior-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output/behavior-spec.json
 
    # formal-spec link chain mode
-   node tools/formal-spec-link-validator/src/cli.js .aimd/output/ --chain-mode
+   node ${CLAUDE_PLUGIN_ROOT}/tools/formal-spec-link-validator/src/cli.js .aimd/output/ --chain-mode
 
    # decision-table 5-check
-   node tools/decision-table-validator/src/cli.js .aimd/output/formal-spec/decision-tables/
+   node ${CLAUDE_PLUGIN_ROOT}/tools/decision-table-validator/src/cli.js .aimd/output/formal-spec/decision-tables/
    ```
 
 7. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).

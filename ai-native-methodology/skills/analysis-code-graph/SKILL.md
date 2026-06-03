@@ -27,7 +27,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 1. **codegraph-runner 실 실행** — `tools/codegraph-runner/` 가 codegraph CLI 통합 (init -i / index → status --json):
    ```bash
-   node tools/codegraph-runner/src/cli.js --target <project-dir> --output <user-project>/.aimd/output
+   node ${CLAUDE_PLUGIN_ROOT}/tools/codegraph-runner/src/cli.js --target <project-dir> --output <user-project>/.aimd/output
    ```
    - 최초 = `codegraph init -i <target>` (인덱싱) / 재실행 = `codegraph index <target>` (증분).
    - cross-platform (Windows 전역 npm bin `.cmd` shim = shell 경유 정상 / Node 22 정합).

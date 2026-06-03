@@ -130,7 +130,7 @@ git rev-parse HEAD  # → impl_modules[].commit_hash
 ### 5. test 진짜 호출 → 100% pass 확인
 
 ```bash
-node tools/test-impl-pass-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
   --inventory <project>/.aimd/output/inventory.json \
   --allow-execute --json
@@ -144,7 +144,7 @@ node tools/test-impl-pass-validator/src/cli.js \
 
 ```bash
 # static-runner R19 Tier 1 (Semgrep in-plugin) + Tier 2 (SARIF import / PMD / SpotBugs / CodeQL / Daikon)
-bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
 ```
 
 linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
@@ -152,8 +152,8 @@ linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
 ### 7. schema-validator + traceability-matrix-builder 회귀
 
 ```bash
-node tools/schema-validator/src/cli.js .aimd/output/impl-spec.json
-node tools/traceability-matrix-builder/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/impl-spec.json
+node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
   --discovery  .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \

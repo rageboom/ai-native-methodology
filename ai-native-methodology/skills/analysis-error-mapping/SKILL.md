@@ -38,7 +38,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 3. **★ Semgrep custom rule 실행** — `tools/static-runner/` 의 rules/error-mapping-missing.yml:
    ```bash
-   PYTHONUTF8=1 node tools/static-runner/src/cli.js \
+   PYTHONUTF8=1 node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <src>/ \
      --output <output>/ \
@@ -51,9 +51,9 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 4. **★ ADR-010 baseline + ratchet 통합 의무** — legacy 진입 시 첫 분석 = baseline 등재 / 신규 결함만 차단:
    ```bash
    # 첫 run — baseline 작성
-   node tools/static-runner/src/cli.js ... --write-baseline <output>/error-mapping-baseline.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js ... --write-baseline <output>/error-mapping-baseline.json
    # CI run — ratchet
-   node tools/static-runner/src/cli.js ... --baseline <output>/error-mapping-baseline.json --ratchet
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js ... --baseline <output>/error-mapping-baseline.json --ratchet
    ```
    - ★ critical/high severity = baseline 등재 ❌ (★ ADR-010 §2.3 = production blocker)
 

@@ -25,7 +25,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 2. **traceability-matrix-builder 도구 호출**:
    ```bash
-   node tools/traceability-matrix-builder/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
      --discovery  <project>/.aimd/output/discovery-spec.json \
      --behavior   <project>/.aimd/output/behavior-spec.json \
      --acceptance <project>/.aimd/output/acceptance-criteria.json \

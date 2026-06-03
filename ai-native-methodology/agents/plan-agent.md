@@ -69,15 +69,15 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 6. **자동 검증**:
    ```bash
    # plan stage coverage (Senior BLOCKER-2 exit code contract 본격 작동)
-   node tools/plan-coverage-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
      --task-plan  .aimd/output/task-plan.json \
      --acceptance .aimd/output/acceptance-criteria.json
 
    # schema validation (additionalProperties:false strict)
-   node tools/schema-validator/src/cli.js .aimd/output/task-plan.json --schemas schemas/
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/task-plan.json
 
    # ★ SP 4분류 hard-gate — DB 자산(stored procedure) 보유 시 (sp_unclassified_at_plan critical / db-assets-always-on + sp-conversion-policy 2026-05-28 mandate / P9)
-   node tools/db-assets-validator/src/cli.js .aimd/output/task-plan.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/db-assets-validator/src/cli.js .aimd/output/task-plan.json
    ```
    exit 0 = ok / exit 1 = blocking findings (plan-coverage + schema + db-assets 합산 → gate#3 block).
 
@@ -109,7 +109,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 ★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
-node tools/chain-driver/src/cli.js navigate \
+node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
   --graph .aimd/output/artifact-graph.json --origin <node-id>
 ```
 

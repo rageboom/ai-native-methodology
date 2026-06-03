@@ -35,8 +35,8 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
 ## Steps
 
 1. **Identify target artifact.** Match user request to a `.template.json` file (chain 6 + analysis inventory/openapi-extension) or — for schema-driven analysis 산출물 — the artifact's `schemas/<artifact>.schema.json` (★ v12.0.0 ADR-011 — .template.md·.template.mermaid twin 폐지).
-   - analysis: `ls templates/analysis/*.template.json` (inventory + openapi-extension) — 그 외 산출물은 schema-driven inline placeholder. ★ Count mismatch 시 finding emit (LL-v85-01 + release-readiness check21).
-   - chain: `ls templates/{discovery,spec,plan,test,implement}/*.template.json` (6종). ★ Count mismatch 시 동일 finding.
+   - analysis: `ls ${CLAUDE_PLUGIN_ROOT}/templates/analysis/*.template.json` (inventory + openapi-extension) — 그 외 산출물은 schema-driven inline placeholder. ★ Count mismatch 시 finding emit (LL-v85-01 + release-readiness check21).
+   - chain: `ls ${CLAUDE_PLUGIN_ROOT}/templates/{discovery,spec,plan,test,implement}/*.template.json` (6종). ★ Count mismatch 시 동일 finding.
 2. **Read the template.** Use `Read` on the matched `.template.json` file (chain stage 산출물 = json 단독 SSOT / ★ ADR-011 — .template.md/.template.mermaid 폐지).
 3. **Read prerequisite artifacts.** Per `methodology-spec/lifecycle-contract.md` and the artifact's stage ordering:
    - **analysis** stage (21 산출물):

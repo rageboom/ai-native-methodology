@@ -29,25 +29,25 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
    - **Tier 2 — Python (사용자 환경)**: Bandit
    - **Tier 2 — dependency (사용자 환경)**: OSV-Scanner / Snyk / Dependabot
 2. **static-runner 호출** — `tools/static-runner/` 가 도구 hook 통합 (Plugin host 패턴)
-3. **도구별 실 실행** — `node tools/static-runner/src/cli.js --plugin <semgrep|pmd> --target <dir> --output <dir>` (★ cli.mjs MCP wrapper = carry-over)
+3. **도구별 실 실행** — `node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js --plugin <semgrep|pmd> --target <dir> --output <dir>` (★ cli.mjs MCP wrapper = carry-over)
 4. **★ 번들 룰 우선 사용** — `tools/semgrep-rules/` 가 git subtree 로 vendor (install 시 자동 동봉, 사내 정책으로 semgrep registry 막힌 환경 1차 대응):
    ```bash
    # 번들 룰 (registry 의존 0 — 권장 default)
-   node tools/static-runner/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <dir> \
      --output <dir> \
      --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/python
 
    # registry pack (registry 접근 가능 환경에서만)
-   node tools/static-runner/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <dir> \
      --output <dir> \
      --ruleset p/owasp-top-ten
 
    # ★ v1.4.2 — `--extra-rules <path>` 사내 custom rule 병행 (멀티 지정 가능)
-   node tools/static-runner/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <dir> \
      --output <dir> \
@@ -61,9 +61,9 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
 5. **★ ADR-010 baseline + ratchet 통합 의무** — legacy 진입 시 첫 분석 = baseline 등재 / 신규 결함만 차단:
    ```bash
    # 첫 run — baseline 작성
-   node tools/static-runner/src/cli.js ... --write-baseline <path>/semgrep-baseline.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js ... --write-baseline <path>/semgrep-baseline.json
    # CI run — ratchet
-   node tools/static-runner/src/cli.js ... --baseline <path>/semgrep-baseline.json --ratchet
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js ... --baseline <path>/semgrep-baseline.json --ratchet
    # exit 0 = baseline + 신규 0 / exit 1 = 신규 ≥ 1
    ```
    - critical/high severity = baseline 등재 ❌ (★ ADR-010 §2.3 = production blocker)

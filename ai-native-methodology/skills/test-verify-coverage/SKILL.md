@@ -49,7 +49,7 @@ allowed-tools: Read, Bash
 ### 1. link_coverage 측정
 
 ```bash
-node tools/spec-test-link-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
   --test-spec  .aimd/output/test-spec.json \
@@ -63,7 +63,7 @@ node tools/spec-test-link-validator/src/cli.js \
 ### 2. test_pass_rate 측정 (chain 5 진입 후)
 
 ```bash
-node tools/test-impl-pass-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
   --inventory .aimd/output/inventory.json \
   --allow-execute --json

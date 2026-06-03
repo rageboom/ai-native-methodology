@@ -68,7 +68,7 @@ severity_floor (DO-178C DAL A) 검증:
 
 `_base-build-traceability-matrix` skill 호출:
 ```bash
-node tools/traceability-matrix-builder/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
   --discovery  .aimd/output/discovery-spec.json \
   --behavior   .aimd/output/behavior-spec.json \
   --acceptance .aimd/output/acceptance-criteria.json \
@@ -82,7 +82,7 @@ node tools/traceability-matrix-builder/src/cli.js \
 ### 7. lint-no-simulation chain-strict (★ static-runner)
 
 ```bash
-bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
 ```
 
 ★ chain 5 strict 의무:
@@ -102,7 +102,7 @@ bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --cha
 ★ gate #5 go = chain 1 cycle (discovery→implement) 완주 = terminal. 외부 adopter(Type 2)가 자기 실 프로젝트에 적용한 경우, corroboration evidence 를 남길지 **사용자 명시 결단** (opt-in / consent — 자동 캡처 ❌ / 데이터 주권):
 
 ```bash
-node tools/adopter-evidence-packager/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/adopter-evidence-packager/src/cli.js \
   --state .aimd/state.json \
   --manifest .aimd/<scope>/manifest.json \
   --findings <findings.json> \

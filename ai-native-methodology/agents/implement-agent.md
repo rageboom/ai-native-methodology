@@ -103,7 +103,7 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 ★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
-node tools/chain-driver/src/cli.js navigate \
+node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
   --graph .aimd/output/artifact-graph.json --origin <node-id>
 ```
 

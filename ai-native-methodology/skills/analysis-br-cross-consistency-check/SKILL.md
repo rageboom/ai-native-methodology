@@ -37,7 +37,7 @@ Layer 2 LLM 호출 paradigm = Claude Code sub-agent (Task tool / Agent tool) inv
 ### Step 1 — Layer 1 결정적 영역 사전 시행
 
 ```bash
-node tools/br-cross-consistency-validator/src/cli.js --target <business-rules.json>
+node ${CLAUDE_PLUGIN_ROOT}/tools/br-cross-consistency-validator/src/cli.js --target <business-rules.json>
 ```
 
 Layer 1 만 시행 (structural sanity check / BR id 4토막 / overlap > 0 등) — Layer 1 fail 시 = Layer 2 진입 자격 ❌.
@@ -80,7 +80,7 @@ sub-agent 가 Write 도구로 `<project>/.aimd/output/layer-2-results/<poc_id>-l
 ### Step 4 — validator 재실측 (Layer 1 + Layer 2 통합)
 
 ```bash
-node tools/br-cross-consistency-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/br-cross-consistency-validator/src/cli.js \
   --target <business-rules.json> \
   --strict \
   --llm-results <path-to-layer-2-results.json>

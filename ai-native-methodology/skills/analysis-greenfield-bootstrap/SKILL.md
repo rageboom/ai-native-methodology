@@ -24,7 +24,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Task
 
 ### 2단계 — 결정적 산출 (swagger 채널 / testable)
 
-swagger-extract 가 있으면 `node tools/greenfield-bootstrap/src/cli.js --output <user-project>/.aimd/output --swagger-extract .aimd/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
+swagger-extract 가 있으면 `node ${CLAUDE_PLUGIN_ROOT}/tools/greenfield-bootstrap/src/cli.js --output <user-project>/.aimd/output --swagger-extract .aimd/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
 - `openapi.yaml` (deliverable 5-a) — swagger-extract(이미 파싱된 OpenAPI)의 **결정적 승격** (AI 추론 0).
 - `antipatterns.json` + `migration-cautions.json` — legacy-only 산출물 **N/A** (빈 배열 + `meta.na_reason` 정당화 / `antipatterns.schema.json` + `migration-cautions.schema.json` 정합 / ADR-011 json 단독).
 

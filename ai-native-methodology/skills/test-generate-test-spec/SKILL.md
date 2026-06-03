@@ -101,9 +101,9 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
 
 8. **자동 검증** (★ schema-validator + spec-test-link-validator):
    ```bash
-   node tools/schema-validator/src/cli.js .aimd/output/test-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/test-spec.json
 
-   node tools/spec-test-link-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
      --behavior   .aimd/output/behavior-spec.json \
      --acceptance .aimd/output/acceptance-criteria.json \
      --test-spec  .aimd/output/test-spec.json \
@@ -112,7 +112,7 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
 
 9. **test-impl-pass-validator dry-run 호출** — 진짜 실행 ❌ / config 검증만:
     ```bash
-    node tools/test-impl-pass-validator/src/cli.js \
+    node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
       --project <project> \
       --inventory <project>/.aimd/output/inventory.json \
       --dry-run --json

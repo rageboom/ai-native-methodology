@@ -99,7 +99,7 @@ DB 자산(stored procedure) 존재 시 — `task-plan.sp_conversions[]` 에 각 
 
 5. **자동 검증**:
    ```bash
-   node tools/plan-coverage-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
      --task-plan  .aimd/output/task-plan.json \
      --acceptance .aimd/output/acceptance-criteria.json
    ```

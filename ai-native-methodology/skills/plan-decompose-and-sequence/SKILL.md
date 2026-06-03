@@ -99,7 +99,7 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 
 7. **자동 검증**:
    ```bash
-   node tools/plan-coverage-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
      --task-plan  .aimd/output/task-plan.json \
      --acceptance .aimd/output/acceptance-criteria.json
    ```

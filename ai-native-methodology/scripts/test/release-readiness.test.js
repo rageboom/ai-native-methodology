@@ -33,8 +33,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     // ★ skip 시 check11(workspace_test) = pass=false / total 30/31 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 31);
-    assert.equal(out.criteria_passed, 30);
+    assert.equal(out.criteria_total, 32);
+    assert.equal(out.criteria_passed, 31);
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.detail.includes('skipped via --skip-workspace-test'), 'skip detail 명시 의무');
     const stale = out.results.find((x) => x.id === 'authoring_spec_staleness');
@@ -43,7 +43,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(cite.pass, `check13 skill citation must pass — detail: ${cite.detail}`);
   });
 
-  it('all 31 criterion ids are present in output (no skipped)', () => {
+  it('all 32 criterion ids are present in output (no skipped)', () => {
     const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
     const out = JSON.parse(r.stdout);
     const ids = out.results.map((x) => x.id).sort();
@@ -73,6 +73,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
       'readme_version_sync',
       'real_tool_evidence',
       'shipped_identity_leak',
+      'shipped_repo_relative_tool_path',
       'skill_citation_integrity',
       'spec_body_reference_lens_trust',
       'template_count_drift',
@@ -200,11 +201,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.ok(ev.pass_count > 0);
   });
 
-  it('non-existent target version still runs all 31 checks (target is metadata)', () => {
+  it('non-existent target version still runs all 32 checks (target is metadata)', () => {
     const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
     // even with bogus target, should still evaluate 31 checks against current artifacts.
     const out = JSON.parse(r.stdout);
-    assert.equal(out.criteria_total, 31);
+    assert.equal(out.criteria_total, 32);
   });
 
   // ★ v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -216,6 +217,25 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     assert.match(c.detail, /golden round-trip/);
     assert.match(c.detail, /leak-guard discrimination/);
     assert.ok(c.delegated_to.includes('adopter-evidence-packager'), 'content-aware (packager round-trip 위임 / file-presence ❌)');
+  });
+
+  // ★ v12.7.0 check32 discrimination — 출하 skill/agent repo-relative 실행 경로 가드 (EXT-PATH / DEC-2026-06-03-plugin-root-path).
+  it('shipped_repo_relative_tool_path — skills/agents 본문 node|bash tools/ 0 + 검출 regex discrimination (배포버그 가드 / content-aware)', () => {
+    const r = runScript(['--target', 'v12.7.0', '--json', ...SKIP_WS]);
+    const out = JSON.parse(r.stdout);
+    const c = out.results.find((x) => x.id === 'shipped_repo_relative_tool_path');
+    assert.ok(c.pass, `check32 must pass (0 repo-relative tool paths) — detail: ${c.detail}`);
+    assert.ok(c.delegated_to.includes('CLAUDE_PLUGIN_ROOT'), 'delegated_to references the required prefix');
+    // discrimination — canonical regex (release-readiness.js check32 미러 / digest_sha test 패턴 동형 / 단순 안정 regex).
+    const BROKEN_RE = /(?:[A-Za-z_][A-Za-z0-9_]*=\S+\s+)*\b(?:node|bash)\s+["']?(?:tools|scripts)\//;
+    const isViolation = (line) =>
+      !line.includes('${CLAUDE_PLUGIN_ROOT}') && !/allow-repo-path:/.test(line) && BROKEN_RE.test(line);
+    assert.ok(isViolation('   node tools/chain-driver/src/cli.js next'), 'bare node tools/ = violation');
+    assert.ok(isViolation('   PYTHONUTF8=1 node tools/static-runner/src/cli.js'), 'env-prefix node tools/ = violation');
+    assert.ok(isViolation('bash tools/static-runner/src/lint-no-simulation.sh out'), 'bash tools/ = violation');
+    assert.ok(!isViolation('node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js next'), 'prefixed = OK');
+    assert.ok(!isViolation('the `tools/` directory holds validators'), 'prose tools/ (no node|bash) = OK');
+    assert.ok(!isViolation('node tools/x.js  <!-- allow-repo-path: doc example -->'), 'allow-repo-path: exempt');
   });
 
   it('missing --target → exit 2 (usage error)', () => {
@@ -231,8 +251,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
     const ws = out.results.find((x) => x.id === 'workspace_test_pass');
     assert.ok(ws.pass, `workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`);
     assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-    assert.equal(out.criteria_total, 31);
-    assert.equal(out.criteria_passed, 31);
+    assert.equal(out.criteria_total, 32);
+    assert.equal(out.criteria_passed, 32);
     assert.equal(out.ready, true);
     assert.equal(r.status, 0);
   });

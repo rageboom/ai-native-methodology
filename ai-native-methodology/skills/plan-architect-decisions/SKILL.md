@@ -79,7 +79,7 @@ Nygard 원본 5 category (`task-plan.schema.json` adrs[].trigger_category enum �
 
 5. **자동 검증** (plan-coverage-validator 통합 검증 단계에서 schema validation 자동):
    ```bash
-   node tools/schema-validator/src/cli.js .aimd/output/task-plan.json --schemas schemas/
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/task-plan.json
    ```
 
 6. **industry-case-researcher sub-agent 호출 권장** — risk 도출 3중 망 paradigm 안 ADR 대안 도출 보강 (외부 유사 결정 사례 carry).

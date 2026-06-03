@@ -1456,6 +1456,48 @@ function check31_specBodyReferenceLensTrust() {
   }
 }
 
+// ★ check32 (v12.7.0 / ③ Type 2 (A) EXT-PATH 회귀 가드 / DEC-2026-06-03-plugin-root-path) — 출하 skill/agent 본문의
+//   repo-relative 실행 경로(`node|bash tools|scripts/...`) 차단. plugin-install 시 cwd=사용자 프로젝트 → repo-relative
+//   미해소 = 실 배포버그. plugins-reference.md L630 "substituted inline … skill content, agent content" → 본문의
+//   ${CLAUDE_PLUGIN_ROOT} 는 install 절대경로로 inline 치환되므로 prefix 가 정답(hooks.json + 2 skill precedent).
+//   content-aware(파일 존재 ❌): env-prefix(PYTHONUTF8=1 …) 허용 / ${CLAUDE_PLUGIN_ROOT} 포함 라인=정합 / allow-repo-path: 주석 예외.
+//   scope = skills/ + agents/ (inline-substitution 적용 model-executed 본문 / human-facing guides·adoption README 는 별도 carry).
+function check32_shippedRepoRelativeToolPath() {
+  try {
+    const SHIPPED_DIRS = ['skills', 'agents'];
+    // (env-prefix)* (node|bash) [quote]? (tools|scripts)/ — ${CLAUDE_PLUGIN_ROOT} 미포함 시 위반.
+    const BROKEN_RE = /(?:[A-Za-z_][A-Za-z0-9_]*=\S+\s+)*\b(?:node|bash)\s+["']?(?:tools|scripts)\//;
+    const hits = [];
+    for (const dir of SHIPPED_DIRS) {
+      const base = join(ROOT, dir);
+      if (!existsSync(base)) continue;
+      const entries = readdirSync(base, { recursive: true, withFileTypes: true });
+      for (const ent of entries) {
+        if (!ent.isFile() || !ent.name.endsWith('.md')) continue;
+        const full = join(ent.parentPath ?? ent.path, ent.name);
+        let content;
+        try { content = readFileSync(full, 'utf-8'); } catch { continue; }
+        const lines = content.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes('${CLAUDE_PLUGIN_ROOT}') || /allow-repo-path:/.test(line)) continue;
+          if (BROKEN_RE.test(line)) hits.push(`${full.slice(ROOT.length + 1).replace(/\\/g, '/')}:${i + 1}`);
+        }
+      }
+    }
+    return {
+      id: 'shipped_repo_relative_tool_path',
+      pass: hits.length === 0,
+      detail: hits.length === 0
+        ? `출하 skill/agent 본문 repo-relative 실행 경로(node|bash tools|scripts/) 0건 — plugin-install cwd 미해소 배포버그 차단 (\${CLAUDE_PLUGIN_ROOT}/ prefix 의무 / env-prefix 허용 / allow-repo-path: 예외 / EXT-PATH 회귀 가드 / content-aware)`
+        : `repo-relative 실행 경로 ${hits.length}건: ${hits.slice(0, 8).join(', ')}${hits.length > 8 ? ' …' : ''} — \${CLAUDE_PLUGIN_ROOT}/ prefix 치환 또는 allow-repo-path: 주석`,
+      delegated_to: 'skills/ agents/ (build-plugin INCLUDE / inline-substitution) / regex (node|bash) (tools|scripts)/ without ${CLAUDE_PLUGIN_ROOT} (EXT-PATH / plugins-reference.md L630 / DEC-2026-06-03-plugin-root-path)',
+    };
+  } catch (e) {
+    return { id: 'shipped_repo_relative_tool_path', pass: false, detail: `error: ${e.message}`, delegated_to: 'skills/ agents/' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1492,6 +1534,7 @@ function main() {
     check29_readmeVersionSync(),
     check30_adopterCorroborationCapture(),
     check31_specBodyReferenceLensTrust(),
+    check32_shippedRepoRelativeToolPath(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

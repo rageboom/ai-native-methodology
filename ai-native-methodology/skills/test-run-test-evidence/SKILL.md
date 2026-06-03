@@ -43,7 +43,7 @@ allowed-tools: Read, Bash, Write
 ### 2. test-impl-pass-validator 호출
 
 ```bash
-node tools/test-impl-pass-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
   --inventory <project>/.aimd/output/inventory.json \
   --out <project>/.aimd/output/evidence/test-invocation-evidence.json \
@@ -56,7 +56,7 @@ node tools/test-impl-pass-validator/src/cli.js \
 ★ S2(AX전환 / use-scenario taxonomy) per-TC outcome 검사 시 추가 flag (characterization GREEN + augmentation RED 혼합 → `outcome_mismatches` emit → gate-eval `per_tc_outcome`):
 
 ```bash
-node tools/test-impl-pass-validator/src/cli.js \
+node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> --allow-execute \
   --scenario S2 --test-spec <project>/.aimd/output/test-spec.json \
   --json
@@ -98,14 +98,14 @@ test-impl-pass-validator 산출 evidence 를 test-spec.json 의 `test_cases[].te
 ### 5. schema-validator 회귀
 
 ```bash
-node tools/schema-validator/src/cli.js .aimd/output/test-spec.json
-node tools/schema-validator/src/cli.js .aimd/output/impl-spec.json  # chain 5
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/test-spec.json
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/impl-spec.json  # chain 5
 ```
 
 ### 6. lint-no-simulation chain-strict
 
 ```bash
-bash tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
 ```
 
 ★ chain 5 시 strict 모드 의무 (evidence 10 필드 — `test_run_evidence`/`test_pass_evidence`/legacy `test_invocation_evidence` 모두 인식 + impl-spec source_files commit_hash 자동 검증 / sub-plan-3a §static-runner chain mode).

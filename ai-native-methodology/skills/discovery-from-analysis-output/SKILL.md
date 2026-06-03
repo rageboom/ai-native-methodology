@@ -51,7 +51,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 6. **`discovery-extraction-validator` 자동 검증**:
    ```bash
-   node tools/discovery-extraction-validator/src/cli.js \
+   node ${CLAUDE_PLUGIN_ROOT}/tools/discovery-extraction-validator/src/cli.js \
      --discovery .aimd/output/discovery-spec.json \
      --rules     .aimd/output/business-rules.json \
      --domain    .aimd/output/domain.json \
@@ -61,7 +61,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 7. **schema-validator 자동 검증**:
    ```bash
-   node tools/schema-validator/src/cli.js .aimd/output/discovery-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/discovery-spec.json
    ```
 
 8. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
