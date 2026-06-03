@@ -9,6 +9,17 @@
 
 ---
 
+## [12.6.0] — 2026-06-03 MINOR — dep-graph 의도③ `navigate --with-spec` 확장: TASK/TC/IMPL 본문 (chain leaf 6 subkind 대칭)
+
+**dep-graph 의도③ `navigate --with-spec` 의 본문 reference-lens 를 plan/test/implement stage leaf 로 확장 — UC/BHV/AC(v12.3.0) → + TASK/TC/IMPL = chain leaf 6 subkind.** navigate 가 노드 영향 트리만 주던 한계를 v12.3.0 가 UC/BHV/AC 본문으로 풀었으나, plan/test/implement stage 노드(TASK/TC/IMPL)로 navigate 하면 `available:false "미지원"` 만 떠 동일 소비 통증이 남아 있었음. graph-synthesizer 가 이미 TASK/TC/IMPL 노드에 source_path 를 UC/BHV/AC 와 **대칭 배선**해 둠(실측) → synthesizer 무변경 / `SPEC_SUBKIND_CONFIG`(`chain-driver/src/cli.js`) 에 3 entry 추가만. SSOT = `decisions/DEC-2026-06-03-living-graph-with-spec-task-tc-impl.md` (4원칙 = `plan-dep-graph-with-spec-task-tc-impl.md` → Senior 적대적 0.86[must-fix A/B/C] → 사용자 옵션 2 승인).
+
+- **시행** (frozen-config 3 entry): TASK(`tasks[]` / scalars[description·**behavior_ref**·layer·module·execution_order] / arrays[ac_refs·tc_refs·dependencies]) + TC(`test_cases[]` / scalars[type·framework·framework_status·ac_ref·bhv_ref·expected_outcome·test_intent·source_file]) + IMPL(`modules[]` / scalars[framework·layer·stack·commit_hash] / arrays[tc_refs·bhv_refs·source_files]). 기존 `readSpecBody` graceful(`if entry[k]!=null`/`isArray`) + `capSpecArray` 5-cap 재사용.
+- **★ Senior must-fix 반영**: A(TASK `behavior_ref` 추가 = required trace 필드) + C(TC `expected_outcome`·`test_intent` = "기대 스펙값(실행 결과 아님)" 표기 / 코드상 gate-eval 는 reconcile 사전계산값만 소비 = raw TC 필드와 단절).
+- **★ IMPL 정직 표기 (사용자 옵션 2 / Senior B override)**: IMPL corroboration = **ecommerce 1-도메인만**(RealWorld·react-fsd IMPL=0 / chain5 env-blocked). impl-spec.schema 필드명은 도메인-무관 계약이라 기계적 작동은 보장되나 **Java/Gradle IMPL 실 shape 검증 = carry**(RealWorld chain5 unblock 자연 close). 2-도메인 주장 ❌. TASK·TC 는 2 distinct 도메인(RealWorld Spring/JUnit + ecommerce NestJS/Prisma) corroborate = §8.1 충족.
+- **trust 무변경**: config 추가는 `SPEC_SUBKIND_CONFIG` 내부만 → check31(`spec_body_reference_lens_trust`) spec-token 0(gate-eval/findings-aggregator) + readSpecBody 호출부 1곳 + reference_lens:true 그대로 통과(실측). carry 경계 = EPIC/STORY/OP·analysis/aspect 미지원 유지.
+
+**MINOR 정당성**: 신규 navigate 표면 확장(additive config) / 공개 API·schema·산출물·노드 스키마 무변경 / synthesizer·readSpecBody algorithm 무변경 / breaking 0. **검증 (no-simulation / 실 CLI·실 그래프)**: 새 test 3 + 미지원 테스트 TASK→EPIC 전환(navigate-cli 53→56) + 실 dogfood render 실측(RealWorld TASK-USER-001·TC-USER-001 + ecommerce IMPL-AUTH-001[source_files cap "+2 more"] + carry 경계 analysis-architecture→available:false) + withSpec off 회귀0 + chain-driver 320 + workspace **1098 pass/0 fail** + release-readiness **31/31**(check31 green 유지) + version 3-way 12.6.0 + CLAUDE/README sync. **carry**: IMPL 2nd distinct 도메인 shape 검증 · 임베딩 의미검색(NL 라우팅) · what-if 확장(deprecate-node·remove-edge·add-node) · EPIC/STORY/OP 본문 · 의도①④(codegraph 코드축). DEC-2026-06-03-living-graph-with-spec-task-tc-impl. Extends DEC-2026-06-03-living-graph-spec-body.
+
 ## [12.5.0] — 2026-06-03 MINOR — dep-graph 의도③ (b) what-if: `navigate --what-if` (가설 변경 영향 / in-memory 비파괴)
 
 **dep-graph 의도③ "질의 → 영향 + 스펙 + 코드"의 가설(what-if) 진입 — `chain-driver navigate --origin X --what-if "<op>"` 신설.** navigate 는 기존 노드의 영향만 봄 → "이 artifact 를 **삭제하면** 뭐가 끊기나 / 이 의존성을 **추가하면** 영향이 어떻게 커지나" = 그래프에 **아직 없는 변경**을 물을 수 없었음. `--what-if` 가 사용자 명시 가설 op 을 **in-memory 사본**에 적용해 baseline 대비 영향 diff 를 결정론 계산. SSOT = `decisions/DEC-2026-06-03-living-graph-what-if.md` (4원칙 = plan-dep-graph-what-if → Senior 적대적 리뷰 0.82[value 정직 판정 = gold-plating 경계] → 사용자 "순서대로 진행" 승인).

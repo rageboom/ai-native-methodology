@@ -483,7 +483,7 @@ function cmdNavigateRollup(graph, args) {
 }
 
 // ★ dep-graph 의도③ (navigate --with-spec / s68 triage → 본 slice) — 스펙 본문 lazy-read.
-//   노드 source 파일에서 본문(UC/BHV/AC)을 읽어 reference-lens 로 표시. display-only / 결정론 fs read / 회귀 0.
+//   노드 source 파일에서 본문(UC/BHV/AC + TASK/TC/IMPL = chain leaf 6 subkind)을 읽어 reference-lens 로 표시. display-only / 결정론 fs read / 회귀 0.
 //   ★ trust: 본문 = reference-lens — 어떤 결정적 gate(gate-eval/s2-outcome-check/findings-aggregator)에도 inject ❌
 //      (DEC-2026-05-28 §4.2 codegraph trust 동형 / skills/dep-graph-navigator/SKILL.md trust 절). result.spec.reference_lens 항상 true.
 //   source_path 절대(dogfood 실측)·상대·placeholder('(behavior)') 모두 graceful: existsSync 가 모든 branch gate (절대 포함 / 회귀 차단).
@@ -491,6 +491,11 @@ const SPEC_SUBKIND_CONFIG = Object.freeze({
   UC:  { array: 'use_cases', scalars: ['name', 'description'], arrays: ['actors', 'preconditions', 'postconditions'] },
   BHV: { array: 'behaviors', scalars: ['name', 'description'], arrays: ['preconditions', 'postconditions', 'invariants'] },
   AC:  { array: 'criteria',  scalars: ['description', 'severity'], gherkin: true },
+  // ★ 의도③ with-spec 확장 (s70) — plan/test/implement stage leaf 본문 (graph-synthesizer 가 이미 source_path 배선 / UC·BHV·AC 와 대칭).
+  //   TASK·TC = 2 distinct 도메인(RealWorld+ecommerce) corroborate / IMPL = ecommerce 1-도메인 (사용자 옵션 2 / Java IMPL shape 검증=carry / 정직 표기).
+  TASK: { array: 'tasks',      scalars: ['description', 'behavior_ref', 'layer', 'module', 'execution_order'], arrays: ['ac_refs', 'tc_refs', 'dependencies'] },
+  TC:   { array: 'test_cases', scalars: ['type', 'framework', 'framework_status', 'ac_ref', 'bhv_ref', 'expected_outcome', 'test_intent', 'source_file'] },
+  IMPL: { array: 'modules',    scalars: ['framework', 'layer', 'stack', 'commit_hash'], arrays: ['tc_refs', 'bhv_refs', 'source_files'] },
 });
 const SPEC_CAP = 5; // 배열 항목 표시 상한 (초과분은 "… (+N more)" 정직 표기 / silent truncation 금지).
 
@@ -519,7 +524,7 @@ function resolveSpecSource(sourcePath, graphPath) {
 function readSpecBody(node, graphPath) {
   const base = { reference_lens: true, subkind: node.artifact_subkind, id: node.id };
   const cfg = SPEC_SUBKIND_CONFIG[node.artifact_subkind];
-  if (!cfg) return { ...base, available: false, reason: `subkind ${node.artifact_subkind} 본문 미지원 (UC/BHV/AC 한정 / carry)` };
+  if (!cfg) return { ...base, available: false, reason: `subkind ${node.artifact_subkind} 본문 미지원 (chain leaf 6 subkind=UC/BHV/AC/TASK/TC/IMPL 한정 — EPIC/STORY/OP·analysis/aspect = carry)` };
   const full = resolveSpecSource(node.source_path, graphPath);
   if (!full) return { ...base, available: false, reason: 'source 부재' };
   let obj;

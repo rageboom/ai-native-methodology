@@ -265,6 +265,24 @@ function makeSpecGraph() {
       { id: 'AC-EMPTY', description: '빈then', gherkin: { given: ['g1'], when: 'w1', then: [] } },
     ],
   }));
+  const taskPath = join(dir, 'task-plan.json');
+  const tcPath = join(dir, 'test-spec.json');
+  const implPath = join(dir, 'impl-spec.json');
+  writeFileSync(taskPath, JSON.stringify({
+    tasks: [
+      { id: 'TASK-1', title: '가입작업', description: '회원가입 구현', behavior_ref: 'BHV-1', layer: 'be', module: 'user', execution_order: 1, ac_refs: ['AC-1'], tc_refs: ['TC-1'], dependencies: [] },
+    ],
+  }));
+  writeFileSync(tcPath, JSON.stringify({
+    test_cases: [
+      { id: 'TC-1', type: 'integration', framework: 'junit5', framework_status: 'active', ac_ref: 'AC-1', bhv_ref: 'BHV-1', expected_outcome: 'fail', test_intent: 'characterization', source_file: 'UserApiTest.java' },
+    ],
+  }));
+  writeFileSync(implPath, JSON.stringify({
+    modules: [
+      { id: 'IMPL-1', framework: 'nestjs', layer: 'be', stack: 'nestjs', commit_hash: 'abc1234', tc_refs: ['TC-1'], bhv_refs: ['BHV-1'], source_files: ['src/a.ts', 'src/b.ts', 'src/c.ts', 'src/d.ts', 'src/e.ts', 'src/f.ts'] },
+    ],
+  }));
   const graph = {
     nodes: [
       { id: 'UC-1', artifact_kind: 'chain', artifact_subkind: 'UC', source_path: discPath, state: 'active', title: '가입제목' },
@@ -275,7 +293,10 @@ function makeSpecGraph() {
       { id: 'AC-EMPTY', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: acPath, state: 'active' },
       { id: 'BHV-NOSRC', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: join(dir, 'nonexistent.json'), state: 'active' },
       { id: 'BHV-IDMISS', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: bhvPath, state: 'active' },
-      { id: 'TASK-1', artifact_kind: 'chain', artifact_subkind: 'TASK', source_path: join(dir, 't.json'), state: 'active' },
+      { id: 'TASK-1', artifact_kind: 'chain', artifact_subkind: 'TASK', source_path: taskPath, state: 'active', title: '가입작업제목' },
+      { id: 'TC-1', artifact_kind: 'chain', artifact_subkind: 'TC', source_path: tcPath, state: 'active' },
+      { id: 'IMPL-1', artifact_kind: 'chain', artifact_subkind: 'IMPL', source_path: implPath, state: 'active' },
+      { id: 'EPIC-1', artifact_kind: 'plan', artifact_subkind: 'EPIC', source_path: taskPath, state: 'active' },
     ],
     edges: [
       { source: 'UC-1', target: 'BHV-1', edge_type: 'derived_from', confidence: 'hard' },
@@ -371,11 +392,50 @@ describe('chain-driver navigate --with-spec (★ 의도③ 스펙 본문)', () =
     rmSync(dir, { recursive: true });
   });
 
-  it('subkind 미지원 (TASK) → available:false reason 미지원', () => {
+  it('subkind 미지원 (EPIC plan-org / carry 경계) → available:false reason 미지원', () => {
     const { dir, path } = makeSpecGraph();
-    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'TASK-1', '--with-spec', '--json']).stdout).spec;
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'EPIC-1', '--with-spec', '--json']).stdout).spec;
     assert.equal(sp.available, false);
     assert.match(sp.reason, /미지원/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ s70 — TASK → tasks 본문 (behavior_ref·layer·module·ac_refs)', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'TASK-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.equal(sp.subkind, 'TASK');
+    assert.equal(sp.behavior_ref, 'BHV-1');
+    assert.equal(sp.layer, 'be');
+    assert.equal(sp.module, 'user');
+    assert.deepEqual(sp.ac_refs, ['AC-1']);
+    assert.deepEqual(sp.tc_refs, ['TC-1']);
+    assert.equal(sp.reference_lens, true);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ s70 — TC → test_cases 본문 (expected_outcome·test_intent = 기대 스펙값)', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'TC-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.equal(sp.subkind, 'TC');
+    assert.equal(sp.framework, 'junit5');
+    assert.equal(sp.expected_outcome, 'fail');
+    assert.equal(sp.test_intent, 'characterization');
+    assert.equal(sp.ac_ref, 'AC-1');
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ s70 — IMPL → modules 본문 (commit_hash·source_files cap 6→5+more / ecommerce 1-도메인 정직)', () => {
+    const { dir, path } = makeSpecGraph();
+    const sp = JSON.parse(run(['navigate', '--graph', path, '--origin', 'IMPL-1', '--with-spec', '--json']).stdout).spec;
+    assert.equal(sp.available, true);
+    assert.equal(sp.subkind, 'IMPL');
+    assert.equal(sp.framework, 'nestjs');
+    assert.equal(sp.commit_hash, 'abc1234');
+    assert.equal(sp.source_files.length, 6);
+    assert.ok(sp.source_files[5].includes('+1 more'));
+    assert.deepEqual(sp.tc_refs, ['TC-1']);
     rmSync(dir, { recursive: true });
   });
 
