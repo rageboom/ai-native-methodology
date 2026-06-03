@@ -30,7 +30,8 @@
 > - **A2** content-drift 탐지(`code_pointer.content_drift` finding, opt-in `--git`) + `applyContentDrift()` 생산자(active→drift, transition 정합). ✅
 > - **A3** `findRelocation()` (git `--follow` rename) → `path_missing` finding 에 `suggested_path` 첨부 (opt-in `--git`). ✅ dead 필드 활성.
 > - 전부 **opt-in/비-gating(medium)** → 기존 #16 게이트·950 test 무영향. **962/962 + release-logic 14/14 green**. 실 git Windows 실행 확인(Tier-1/no-simulation).
-> - **DEFER (다음 slice)**: A2-wire(SessionStart/driver 가 `applyContentDrift` 를 **live artifact-graph.json 에 기록**) · A1-surface(navigate/SessionStart 노출) · A4(ts-morph/JaCoCo) · A5(edge propose-state). §8.1 ≥2 도메인 전 gate 격상 ❌.
+> - **DEFER (다음 slice)**: A2-wire(SessionStart/driver 가 `applyContentDrift` 를 **live artifact-graph.json 에 기록**) · ~~A1-surface(navigate/SessionStart 노출)~~ · A4(ts-morph/JaCoCo) · A5(edge propose-state). §8.1 ≥2 도메인 전 gate 격상 ❌.
+> - **★ A1-surface SHIPPED (2026-06-03 / v12.1.0 MINOR / DEC-2026-06-03-living-graph-a1-surface)** — B-minimal: `checkGraphFreshness` → `_shared/graph-freshness.js` 추출(DRY) + chain-driver `buildGraphSessionContext` 가 stale 시 `⚠️ STALE` 배너 prepend (false-health 방지 / display-only / 자동 write ❌). 새 test 2 + workspace 1046/0 + RR 30/30. dep-graph 4-의도 점검(워크플로우 감사) 결과 의도② 첫 슬라이스. ★ **A2-wire(자동 apply-drift) = Senior REJECT** (소비자 0 = P0 역전 + committed-path fixture 오염 가드 부재) → consumer+guard 선행 의무로 DEFER 강화. A(PostToolUse 증분 재합성)도 hot-path·previousGraph 부분재합성 미검증으로 DEFER 유지.
 
 | 기여 | 후보(출처) | 신호 | trust | effort | 비고 |
 |---|---|---|---|---|---|

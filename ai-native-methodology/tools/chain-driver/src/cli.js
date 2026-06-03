@@ -48,6 +48,9 @@ import { analyzeImpact } from './impact-analyzer.js';
 import { loadPolicy, evaluatePolicy, appendProposeRecord } from './policy-evaluator.js';
 import { topologicalOrder, cascadeOrder } from './propagation-orderer.js';
 import { topKImpactRoot } from './centrality.js';
+// ★ Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
+//   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
+import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
 
 function usage(code = 3) {
   console.error([
@@ -619,6 +622,17 @@ function buildGraphSessionContext(root) {
   const rootStr = topRoots.map(r => `${r.id}(${r.score})`).join(', ');
 
   const parts = [`[dep-graph] ${nodes.length} nodes`];
+  // ★ Loop A / A1 (B-minimal / DEC-2026-06-03 C-living-graph-autotrigger) — freshness 정직 노출.
+  //   synthesized_at 이후 변경된 source 가 있으면 "건강(0 drift)"으로 오인될 stale 그래프를 ⚠️ STALE 로
+  //   prominent 표기 (false-health 방지). display-only — 자동 재합성·drift write ❌ (사용자가 수동 재합성).
+  //   결정론 fs mtime / 실패=non-fatal skip.
+  let fresh = null;
+  try { fresh = checkGraphFreshness(graph, { repoRoot: root }); } catch { /* non-fatal */ }
+  if (fresh?.stale) {
+    const names = fresh.stale_sources.slice(0, 3).map(s => basename(s)).join(', ');
+    const more = fresh.stale_sources.length > 3 ? ' …' : '';
+    parts.push(`⚠️ STALE — ${fresh.stale_sources.length} source 변경(${names}${more}) → 재합성: traceability-matrix-builder --graph`);
+  }
   if (driftCount > 0) parts.push(`⚠️ ${driftCount} drift`);
   if (proposeCount > 0) parts.push(`${proposeCount} propose 대기`);
   parts.push(`top-3 impact root: ${rootStr || '-'}`);

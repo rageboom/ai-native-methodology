@@ -15,7 +15,7 @@
 // 입력: artifact-graph.json (graph-synthesizer 산출). code_pointers 가 node 에 평탄화돼 있음.
 // 출력: { findings, coverage, summary }
 
-import { existsSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join, dirname, basename, isAbsolute, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 
@@ -343,31 +343,6 @@ export function applyContentDrift(graph, findings) {
   return { applied, drifted_ids: [...driftedIds] };
 }
 
-// A1 freshness — graph.synthesized_at vs derived_from source mtime. source 가 더 최신이면 stale.
-//   (graph 파일 부재=absent 는 호출부가 파일 IO 단계에서 판단 / 본 함수는 로드된 graph 대상)
-export function checkGraphFreshness(graph, { repoRoot = process.cwd() } = {}) {
-  const synthAt = graph?.synthesized_at ? Date.parse(graph.synthesized_at) : NaN;
-  const sources = Array.isArray(graph?.derived_from) ? graph.derived_from : [];
-  const staleSources = [];
-  let newest = 0;
-  for (const src of sources) {
-    const full = isAbsolute(src) ? src : join(repoRoot, src);
-    let mt;
-    try { mt = statSync(full).mtimeMs; } catch { continue; } // source 부재 = skip
-    if (mt > newest) newest = mt;
-    if (!Number.isNaN(synthAt) && mt > synthAt) staleSources.push(src);
-  }
-  const stale = staleSources.length > 0;
-  return {
-    stale,
-    synthesized_at: graph?.synthesized_at ?? null,
-    newest_source_mtime: newest || null,
-    stale_sources: staleSources,
-    finding: stale ? {
-      kind: 'graph.stale',
-      severity: 'medium',
-      message: `artifact-graph stale — ${staleSources.length} 개 source 가 synthesized_at(${graph.synthesized_at ?? '?'}) 이후 변경: ${staleSources.slice(0, 5).join(', ')}${staleSources.length > 5 ? ' …' : ''}`,
-      stale_sources: staleSources,
-    } : null,
-  };
-}
+// A1 freshness — _shared/graph-freshness.js 로 추출 (chain-driver SessionStart 배너와 DRY 단일 출처 공유).
+//   export 표면 무변경 — 본 모듈 import 처(cli.js / test)는 그대로 동작 (re-export).
+export { checkGraphFreshness } from '../../_shared/graph-freshness.js';
