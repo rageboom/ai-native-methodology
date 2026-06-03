@@ -1498,6 +1498,51 @@ function check32_shippedRepoRelativeToolPath() {
   }
 }
 
+// ★ check33 (v12.8.0 / 옵션 A+B trace-view reference-lens trust / DEC-2026-06-03-dep-graph-trace-view) —
+//   trace-view 사람-눈 렌더(map + coverage 매트릭스)는 reference-lens / display-only. 결정적 gate 가 절대 소비 ❌.
+//   content-aware (file-presence ❌): ① gate-decision 모듈(gate-eval + findings-aggregator)에 trace-view 토큰 0 (음성)
+//   ② trace-view.js 가 gate 모듈(gate-eval/findings-aggregator) import 0 (출력 gate 역류 차단) ③ reference_lens:true 라벨 존재 (양성).
+//   check31(with-spec) 동형 — navigate --with-spec 본문과 같은 trust 경계 (렌더는 stdout display-only / 파일 write 0).
+function check33_traceViewReferenceLensTrust() {
+  try {
+    const TRACE_TOKENS = ['buildTraceView', 'renderTraceViewMarkdown', 'cmdTraceView', 'trace-view'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = TRACE_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 trace-view 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 reference-lens 렌더 소비 = trust 위반`);
+    }
+    const tvPath = join(ROOT, 'tools/chain-driver/src/trace-view.js');
+    if (!existsSync(tvPath)) {
+      problems.push('chain-driver/src/trace-view.js 부재');
+    } else {
+      const tv = readFileSync(tvPath, 'utf-8');
+      // ★ import 문만 정밀 매칭 — trust 설명 주석("gate-eval / findings-aggregator 에 inject ❌")은 위반 아님 (substring false-positive 회피).
+      if (/^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m.test(tv)) {
+        problems.push('trace-view.js 가 gate 모듈(gate-eval/findings-aggregator) import — 렌더가 gate 결정에 결합 = trust 위반');
+      }
+      if (!/reference_lens:\s*true/.test(tv)) problems.push('trace-view.js 에 reference_lens:true 라벨 부재 (양성 trust 라벨 의무)');
+    }
+    return {
+      id: 'trace_view_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `trace-view 렌더(map + coverage 매트릭스) = reference-lens 강제 — gate-eval/findings-aggregator trace-view 토큰 0 + trace-view.js gate 모듈 import 0 + reference_lens:true 라벨 (display-only / stdout / 결정적 gate inject ❌ / DEC-2026-06-03-dep-graph-trace-view / check31 동형)`
+        : `trace-view trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'tools/chain-driver/src/gate-eval.js + findings-aggregator (음성 0) + trace-view.js (gate-import 0 + reference_lens:true)',
+    };
+  } catch (e) {
+    return { id: 'trace_view_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + trace-view.js' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1535,6 +1580,7 @@ function main() {
     check30_adopterCorroborationCapture(),
     check31_specBodyReferenceLensTrust(),
     check32_shippedRepoRelativeToolPath(),
+    check33_traceViewReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

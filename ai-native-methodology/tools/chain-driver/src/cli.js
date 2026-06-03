@@ -55,6 +55,8 @@ import { topKImpactRoot } from './centrality.js';
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
 // ★ 의도③ (a) NL 라우팅 (navigate --prompt) — prompt → 노드 결정론 매칭 (_shared / federator 와 DRY 공유).
 import { matchPromptToNodes, isConfidentTop } from '../../_shared/prompt-node-match.js';
+// ★ trace-view (옵션 A+B / DEC-2026-06-03-dep-graph-trace-view) — 사람 gate-검토용 view-time 렌더러 (순수 formatter / stdout only).
+import { buildTraceView, renderTraceViewMarkdown } from './trace-view.js';
 
 function usage(code = 3) {
   console.error([
@@ -72,6 +74,7 @@ function usage(code = 3) {
     '  navigate --graph <artifact-graph.json> --prompt "<자연어>" [--with-spec] [--json]   (★ 의도③ NL 라우팅 — id/title 결정론 해소)',
     '  navigate --graph <artifact-graph.json> --origin <id> --what-if "remove-node:ID|add-edge:SRC>TGT[:type]" [--json]   (★ 의도③ 가설 변경 영향 / 비파괴)',
     '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
+    '  trace-view --graph <artifact-graph.json> [--scope <id>] [--no-matrix] [--json]   (★ 사람 gate-검토용 추적성 맵 + coverage 매트릭스 / stdout)',
     '  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (★ Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
     '  suggest-skill --prompt <text>',
     '  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
@@ -116,6 +119,7 @@ function parseArgs(argv) {
     else if (a === '--code-pointer-only') out.codePointerOnly = true;
     else if (a === '--with-spec') out.withSpec = true;
     else if (a === '--what-if') out.whatIf = rest[++i];
+    else if (a === '--no-matrix') out.noMatrix = true; // trace-view: coverage 매트릭스 억제 (기본 ON).
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
   }
@@ -802,6 +806,37 @@ function cmdNavigate(args) {
   process.exit(0);
 }
 
+// ★ trace-view (옵션 A+B / DEC-2026-06-03-dep-graph-trace-view) — 사람 gate-검토용 view-time 렌더러.
+//   navigate(쿼리 단위) 와 분리: stage/feature 조망 + UC→단계 coverage hole. 순수 formatter (새 순회 0) / stdout only / 파일 write 0.
+//   ★ reference-lens / display-only — 출력은 어떤 결정적 gate 에도 inject ❌ (release-readiness check 가 구조 검증).
+function cmdTraceView(args) {
+  if (!args.graphPath) {
+    console.error('[chain-driver] trace-view: --graph <artifact-graph.json> required');
+    process.exit(3);
+  }
+  if (!existsSync(args.graphPath)) {
+    console.error(`[chain-driver] trace-view: graph not found: ${args.graphPath}`);
+    process.exit(3);
+  }
+  let graph;
+  try { graph = JSON.parse(readFileSync(args.graphPath, 'utf-8')); }
+  catch (e) { console.error(`[chain-driver] trace-view parse error: ${e.message}`); process.exit(3); }
+
+  const view = buildTraceView(graph, {
+    scope: args.scope ?? null,
+    includeMatrix: !args.noMatrix,
+    graphName: basename(args.graphPath),
+    repoRoot: args.repoRoot ?? resolveRepoRoot(process.cwd()),
+  });
+
+  if (args.json) {
+    process.stdout.write(JSON.stringify(view, null, 2) + '\n');
+  } else {
+    process.stdout.write(renderTraceViewMarkdown(view));
+  }
+  process.exit(0);
+}
+
 function cmdSync(args) {
   if (!args.project) usage(3);
   const root = resolve(args.project);
@@ -1272,6 +1307,7 @@ function main() {
     case 'sync':           return cmdSync(args);
     case 'impact':         return cmdImpact(args);
     case 'navigate':       return cmdNavigate(args);
+    case 'trace-view':     return cmdTraceView(args);
     case 'resync-graph':   return cmdResyncGraph(args);
     case 'suggest-skill':  return cmdSuggestSkill(args);
     case 'hooks-bridge':   return cmdHooksBridge(args);

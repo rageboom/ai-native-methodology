@@ -43,6 +43,7 @@
 | P4 | `chain-driver/src/centrality.js` | top-K impact root | weighted out-degree / PageRank |
 | P4 | `traceability-matrix-builder/src/renderers/diff-view.js` | 그래프 git diff 재투영 | set diff |
 | P4 | `skills/dep-graph-navigator/SKILL.md` | `/dep-graph-navigator <node-id>` | (위 통합) |
+| P4 | `chain-driver/src/trace-view.js` | `trace-view` — 사람 gate-검토용 view-time 렌더 (map + coverage 매트릭스) | 순수 formatter (analyzeImpact 재사용 / 새 순회 0) |
 
 ## 4. 일상 사용법
 
@@ -62,7 +63,7 @@ node tools/traceability-matrix-builder/src/cli.js \
 
 > ★ v11.0.0 — `--discovery` (구 `--planning` alias 보존) + `--task-plan` (plan stage TASK/Epic/Story/OP) + `--operational-task` (OP 보강 optional).
 
-→ `.aimd/output/artifact-graph.json` 산출 (matrix.{json,md,mermaid} 와 함께).
+→ `.aimd/output/artifact-graph.json` 산출 (matrix.json 와 함께 / ★ v12 ADR-011 — .md/.mermaid twin 폐기 / json 단독).
 
 ### 4-2. 변경 영향 분석 (변경 전)
 
@@ -112,6 +113,24 @@ node tools/code-pointer-validator/src/cli.js .aimd/output/artifact-graph.json --
 ```
 
 또는 통합: `node scripts/release-readiness.js --target vX.Y.Z` (#15 graph-integrity / #16 code-pointer).
+
+### 4-5. 사람 gate-검토용 추적성 맵 (★ v12.8.0 / 옵션 A+B / DEC-2026-06-03-dep-graph-trace-view)
+
+```bash
+# 추적 맵(feature별 UC→하류) + UC→단계 coverage 매트릭스 → stdout Markdown
+node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json
+
+# 매트릭스 억제(긴 그래프) / scope 필터 / 구조화 JSON
+node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --no-matrix
+node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --scope <scope_id>
+node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --json
+```
+
+> ★ `navigate`(쿼리 단위 = 노드 하나의 영향 트리) 와 분리: `trace-view` = **stage/feature 조망 + UC→단계 coverage hole** (사람 gate #1~#5 검토용). 순수 formatter — `analyzeImpact`/`topKImpactRoot`/`graph.stats` 재사용 (새 그래프 순회 0).
+> 출력 4블록: freshness 배너(stale 시 ⚠️ — false-health 가드) → stats 요약 → 추적 맵(feature별 UC→BHV→AC→TASK→TC→IMPL + `⚠ hole`) → coverage 매트릭스(✓ 도달 / ✗ 미도달(stage 존재) / `–` stage 부재).
+> ★ **reference-lens / display-only — stdout only (파일 write 0 / git commit 0)**. 어떤 결정적 gate(gate-eval/findings-aggregator/release-readiness)에도 inject ❌ (release-readiness check33 강제 / check31 with-spec 동형). committed mirror = v12.0.0 가 폐기한 .md/.mermaid drift-repeat = REJECT.
+> ★ **LLM 은 `navigate --stage --json`(+`--with-spec`)으로 이미 holistic 구조 뷰 served** — trace-view 는 사람-눈 전용 (LLM 타깃 자산 신설 ❌ / YAGNI 회피).
+> ★ 정직 명명: '설계도/blueprint' ❌ — 그래프 내용 = 요구사항→구현 추적성 (시스템 아키텍처 아님 / 아키텍처 슬라이스 = analysis-architecture 노드뿐). 시각 다이어그램(SVG/HTML)은 carry.
 
 ## 5. 영향 등급 산정 규칙 (operation.md 결정 4)
 

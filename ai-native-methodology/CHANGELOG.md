@@ -9,6 +9,19 @@
 
 ---
 
+## [12.8.0] — 2026-06-03 MINOR — dep-graph trace-view (사람 gate-검토용 view-time 렌더러 / 옵션 A+B)
+
+**dep-graph(artifact-graph.json / 운영 SSOT)를 사람 gate #1~#5 검토용으로 view-time 렌더 — `chain-driver trace-view` 신설.** 통증: 사람 검토가 raw json 위에서 일어남(v12.0.0 ADR-011 L54 가 정직하게 인정한 carry `C-on-demand-viz` / L29 DEFER 의 사람-눈 절반). navigate(쿼리 단위 = 노드 하나)와 분리하여 stage/feature 조망 + UC→단계 coverage hole 을 stdout Markdown 으로. SSOT = `decisions/DEC-2026-06-03-dep-graph-trace-view.md` (4원칙 = `.claude/plans/dep-graph-trace-view.md` → 3-agent research(테크기업 선례+렌더링기술+Senior 적대 0.78) → 사용자 결정 "옵션 A+B / 정직 개명" → "진행").
+
+- **신규 `trace-view` 서브커맨드** (`tools/chain-driver/src/trace-view.js` + cli.js 배선): `trace-view --graph <path> [--scope <id>] [--no-matrix] [--json]`. 출력 4블록 = freshness 배너(stale 시 ⚠️) → stats 요약(graph.stats) → **map 뷰(A)** feature별 UC→BHV→AC→TASK→TC→IMPL 인접 + `⚠ hole` 인라인 → **coverage 매트릭스(B)** 행=UC 열=각 단계 셀=✓(도달)/✗(미도달·stage 존재)/`–`(stage 부재).
+- **순수 formatter (새 그래프 순회 0)**: 기존 `analyzeImpact`/`topKImpactRoot`/`graph.stats`/`checkGraphFreshness` 재사용 = self-referential corrective drift 위험 최소. 의존성 0 (graphviz/JS 라이브러리 불필요).
+- **5대 제약 정합**: json-SSOT(read-only) / **on-demand stdout only — 파일 write 0 / git commit 0**(committed mirror = v12.0.0 가 죽인 .md/.mermaid drift-repeat = REJECT / ADR-011 L29 sanctioned view-time 경로) / no-engineification(stateless formatter / 서버·auto-render ❌) / reference-lens(display-only / gate inject ❌) / minimal-additive(breaking 0).
+- **회귀 가드 check33 `trace_view_reference_lens_trust`** (release-readiness 32→33): content-aware — gate-decision 모듈(gate-eval + findings-aggregator)에 trace-view 토큰 0 + trace-view.js gate 모듈 import 0(import 문 정밀 매칭 / trust 주석 false-positive 회피) + reference_lens:true 라벨. check31(with-spec) 동형. self-test 33/33 + check33 discrimination it.
+- **정직 명명 (사용자 결정)**: '설계도/blueprint' ❌ → `[traceability-map]` — 그래프 내용 = 요구사항→구현 추적성 (시스템 아키텍처 아님 / 아키텍처 슬라이스 = analysis-architecture 노드뿐). audience-expectation mismatch 회피.
+- **LLM 절반 = YAGNI 명시**: `navigate --stage --json`(+`--with-spec`)가 이미 holistic 구조 뷰 제공(RealWorld 116노드 실측) → LLM 타깃 자산 신설 ❌ / trace-view = 사람-눈 전용.
+
+**MINOR 정당성**: 신규 서브커맨드 + release-readiness criterion(check33) 추가 / 공개 API·schema·산출물·노드 스키마 무변경 / breaking 0 (check31=v12.3.0 MINOR precedent). **검증 (no-simulation / 실 CLI)**: §8.1 = **2 distinct 실도메인 corroboration** — RealWorld(116노드 / UC→TC 매트릭스 ✓ / IMPL 부재 `–`) + ecommerce(138노드 / 풀체인 IMPL ✓) 실 render + 음성대조 poc-16(TASK/TC/IMPL `–`). IMPL 열 = ecommerce 1 실도메인 정직 표기(v12.6.0 IMPL 옵션 2 선례). 신규 test 18(trace-view.test.js / map·매트릭스 셀·hole 탐지·stale 배너·--no-matrix·--json·graceful) + chain-driver 320→338 + release-readiness 32→33 + version 3-way 12.8.0. **부수**: docs/dependency-graph.md §4-1 stale `matrix.{json,md,mermaid}` 문구 v12.0.0 doc-drift 정정. **carry**: 시각 다이어그램(옵션 C / SVG·인터랙티브 HTML — 사람이 텍스트 뷰 "조망 부족" 실측 호소 후 trigger) · `--stage` 필터(navigate 경유) · Mermaid subgraph emit. DEC-2026-06-03-dep-graph-trace-view.
+
 ## [12.7.0] — 2026-06-03 MINOR — ③ Type 2 (A) `${CLAUDE_PLUGIN_ROOT}` 경로 치환 (plugin-install 실 배포버그 fix + check32 회귀 가드)
 
 **출하 skill 17 + agent 5 의 본문 실행 경로가 repo-relative(`node tools/...`)라 plugin-install 시 cwd=사용자 프로젝트에서 미해소 = 실 배포버그(Type 2 차단) → `${CLAUDE_PLUGIN_ROOT}/` prefix 일괄 치환.** STATUS 다음 의제 ③ Type 2 (A) frontier (dep-graph 루프 무관 / 자율 가능 prod-value). SSOT = `decisions/DEC-2026-06-03-plugin-root-path.md` (4원칙 = `plan-plugin-root-path-fix.md` → 공식문서 raw fetch + Senior 적대적 0.88 → 사용자 "진행/MINOR" 승인).
