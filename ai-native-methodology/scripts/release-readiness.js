@@ -1757,6 +1757,86 @@ function check36_codegraphModuleReferenceLensTrust() {
   }
 }
 
+// ★ check37 (v12.12.0 / ast_symbol stale-anchor verify STEP 4 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 4) —
+//   anchor verify: 산출물 ast_symbol 앵커 ∖ codegraph 심볼 = stale-anchor (역방향 set-diff). 결정적 gate 절대 소비 ❌ (check34/35/36 4-part isomorphic).
+//   ① 음성 — gate-decision 모듈(gate-eval + findings-aggregator)에 STEP 4 anchor-verify 토큰 0 + REQUIRED_VALIDATORS_PER_STAGE 미등록 (Senior)
+//   ② 양성 (구조적 절단) — code-anchor-verify.schema.json anchor_verify.informational_notes(=codegraph 사각) items 에 severity 필드 부재 + additionalProperties:false → informational 이 finding 채널 진입 물리적 불가
+//   ③ 양성 — anchor-verify.js 상위 차단등급 리터럴 0 (ceiling) + 'not a defect/부재' 정직 마커 + reference-lens 라벨
+//   ④ 양성 — anchor-verify.js gate 모듈 import 0 (출력 gate 역류 차단).
+function check37_codegraphAnchorVerifyReferenceLensTrust() {
+  try {
+    const STEP4_TOKENS = ['buildAnchorVerify', 'anchor-verify', 'collectSymbolAnchors', 'verifyAnchors', 'verify-anchors', 'F-CGANCH', 'code-anchor-verify', 'toAnchorFindings'];
+    const gateModules = [
+      'tools/chain-driver/src/gate-eval.js',
+      'tools/findings-aggregator/src/aggregator.js',
+      'tools/findings-aggregator/src/cli.js',
+    ];
+    const problems = [];
+    for (const rel of gateModules) {
+      const fp = join(ROOT, rel);
+      if (!existsSync(fp)) { problems.push(`${rel} 부재`); continue; }
+      const txt = readFileSync(fp, 'utf-8');
+      const hit = STEP4_TOKENS.filter((t) => txt.includes(t));
+      if (hit.length) problems.push(`${rel} 가 STEP 4 anchor-verify 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 codegraph stale-anchor 소비 = trust 위반`);
+    }
+    // ① 추가 (Senior) — gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 anchor-verify 미등록 (verify 리포트가 stage 필수 validator 로 격상 ❌).
+    const gePath = join(ROOT, 'tools/chain-driver/src/gate-eval.js');
+    if (existsSync(gePath)) {
+      const geSrc = readFileSync(gePath, 'utf-8');
+      const m = geSrc.match(/const\s+REQUIRED_VALIDATORS_PER_STAGE\s*=\s*\{([^}]+)\}/);
+      if (m && /anchor[-_]?verify|verify[-_]?anchor/i.test(m[1])) {
+        problems.push('gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 anchor-verify 등록됨 — verify 리포트가 stage 필수 validator 로 격상 = reference-lens trust 위반 (Senior must)');
+      }
+    }
+    // 양성 ② — schema anchor_verify.informational_notes 구조적 severity 부재 (codegraph 사각 finding 채널 차단).
+    const schemaPath = join(ROOT, 'schemas/code-anchor-verify.schema.json');
+    if (!existsSync(schemaPath)) {
+      problems.push('schemas/code-anchor-verify.schema.json 부재 (STEP 4 신규 의무)');
+    } else {
+      try {
+        const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+        const info = schema?.properties?.anchor_verify?.properties?.informational_notes?.items ?? null;
+        if (!info) {
+          problems.push('code-anchor-verify.schema.json anchor_verify.informational_notes.items 부재 (STEP 4 의무)');
+        } else {
+          if (info.additionalProperties !== false) problems.push('anchor_verify.informational_notes.items additionalProperties:false 아님 (codegraph 사각 임의필드 차단 의무)');
+          if (info.properties && 'severity' in info.properties) {
+            problems.push('★ anchor_verify.informational_notes.items 에 severity 필드 존재 — codegraph 사각이 severity 획득 = finding 채널 누출 위험 (Senior 위반)');
+          }
+        }
+        // findings.severity enum ⊆ {low,medium} 구조 확인 (gate leak 차단).
+        const sevEnum = schema?.properties?.findings?.items?.properties?.severity?.enum ?? null;
+        if (!Array.isArray(sevEnum) || sevEnum.some((s) => s !== 'low' && s !== 'medium')) {
+          problems.push('code-anchor-verify.schema.json findings.severity enum ⊄ {low,medium} (상위 차단등급 구조 차단 의무)');
+        }
+      } catch (e) { problems.push(`code-anchor-verify schema parse 실패: ${e.message}`); }
+    }
+    // 양성 ③ — anchor-verify.js ceiling(상위 차단등급 리터럴 0) + 'not a defect/부재' 마커 + reference-lens 라벨.
+    const avPath = join(ROOT, 'tools/codegraph-coverage/src/anchor-verify.js');
+    if (!existsSync(avPath)) {
+      problems.push('codegraph-coverage/src/anchor-verify.js 부재');
+    } else {
+      const av = readFileSync(avPath, 'utf-8');
+      if (/\b(high|critical)\b/.test(av)) problems.push('anchor-verify.js 에 상위 차단등급 리터럴 존재 — stale-anchor 은 low|medium 만 (gate leak 차단 불변식 위반)');
+      if (!/not a defect/i.test(av) || !/부재/.test(av)) problems.push("anchor-verify.js informational 섹션에 'not a defect / 부재' 정직 마커 부재 (codegraph 사각=결함 아님 명시 의무)");
+      if (!/reference-lens/i.test(av)) problems.push('anchor-verify.js 에 reference-lens 라벨 부재 (양성 trust 라벨 의무)');
+      // ④ — anchor-verify.js gate 모듈 import 0.
+      const importGateRe = /^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m;
+      if (importGateRe.test(av)) problems.push('anchor-verify.js 가 gate 모듈(gate-eval/findings-aggregator) import — stale-anchor 이 gate 결정에 결합 = trust 위반');
+    }
+    return {
+      id: 'codegraph_anchor_verify_reference_lens_trust',
+      pass: problems.length === 0,
+      detail: problems.length === 0
+        ? `codegraph ast_symbol stale-anchor verify (STEP 4) = reference-lens 강제 — gate-eval/findings-aggregator anchor-verify 토큰 0 + REQUIRED_VALIDATORS_PER_STAGE 미등록 + schema informational_notes severity 필드 부재(codegraph 사각 finding 채널 구조 차단) + findings.severity ⊆ {low,medium} + anchor-verify.js 상위등급 리터럴 0 + 'not a defect/부재' 마커 + gate 모듈 import 0 (결정적 gate inject ❌ / 역방향 set-diff / DEC-2026-06-03 §5 STEP 4 / check31·33·34·35·36 동형)`
+        : `codegraph anchor-verify trust 위반: ${problems.join(' | ')}`,
+      delegated_to: 'gate modules (음성 0 + REQUIRED_VALIDATORS 미등록) + code-anchor-verify.schema.json(informational_notes severity 부재) + codegraph-coverage/src/anchor-verify.js(ceiling + gate-import 0 + not-a-defect 마커)',
+    };
+  } catch (e) {
+    return { id: 'codegraph_anchor_verify_reference_lens_trust', pass: false, detail: `error: ${e.message}`, delegated_to: 'gate modules + code-anchor-verify.schema.json + anchor-verify.js' };
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   if (!args.target) usage(2);
@@ -1798,6 +1878,7 @@ function main() {
     check34_codegraphCoverageReferenceLensTrust(),
     check35_codegraphFindingReferenceLensTrust(),
     check36_codegraphModuleReferenceLensTrust(),
+    check37_codegraphAnchorVerifyReferenceLensTrust(),
   ];
   const passCount = results.filter((r) => r.pass).length;
   const total = results.length;

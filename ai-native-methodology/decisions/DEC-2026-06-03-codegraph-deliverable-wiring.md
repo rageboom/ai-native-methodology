@@ -228,3 +228,44 @@ arch.json有/codegraph無 의존 = codegraph 정직 사각(런타임 DI/decorato
 - 검증(no-sim/실 CLI / 2 distinct 도메인): module axis **RealWorld(Spring+MyBatis3) module 43/corroborated 21/hole +22/info 0** + **ecommerce(NestJS+Prisma) module 16/corroborated 8/hole +8/info 7** (동일 코드경로 재현 §8.1 / must-fix#4) + 실 Ajv schema-valid + finding-system conditional(module low+code_graph_ref valid / high INVALID). codegraph-coverage test 48→64(module-graph 16) + workspace **1180/0** + release-readiness **36/36**(self-test 20/20) + version 3-way 12.11.0 + build dist v12.11.0.
 - official-docs(F-015): codegraph module-dep/SCC/circular 내장 CLI 부재 confirmed(JS API findCircularDependencies 존재하나 CLI/MCP 미노출) / provenance=null 은 'tree-sitter' 명시생략(공식값 아님 / resolvedBy·confidence=Edge 인터페이스 부재) — STEP 3 코드는 provenance/resolvedBy/confidence 미사용(cross-file edge 존재만) → 무영향.
 - carry(STEP 4+): (b)module-SCC cycle · (c)layer-violation(module layer LLM 비결정) · (d)inventory corroboration·centrality · onlyArch DI vs config 의미 분류(semantic) · module-axis 2nd full-density 도메인(arch.json modules[] 부재=unverified) · STEP1 carry 유지(iBATIS2 sql-blind / table-blind / NestJS route↔OpenAPI / TS interface=1 unverified) · STEP 5~6(openapi/context-cache HIGH 등 4-렌즈 로드맵 잔여).
+
+---
+
+## 12. STEP 4 시행 완료 (v12.12.0 MINOR / 2026-06-04 / 로드맵 4번째 슬라이스)
+
+**§5 STEP 4 (impl/test ast_symbol 앵커 / 함수단위 추적성) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step4.md` (3-agent: 공식문서 F-015 / 업계사례 / Senior 적대 0.84 REVISE + 실 `.codegraph` DB probe → 사용자 gate #3 "4-A 지금 시행" 결단). 본 DEC = SSOT.
+
+### 12.1 ★ negative-space — code-pointer-validator 가 못 하는 symbol 실재 검증 (STEP 4 의 정직한 정의)
+
+`tools/code-pointer-validator/src/validator.js` (ast_symbol 분기) = path 존재만 `existsSync` 확인 + **symbol 자체(예 `SignupService.checkDup`)의 실재는 검증 안 함** ("symbol 검증은 AST parser 외부 / warn-only"). dependency-free validator 가 구조적으로 못 하는 일. codegraph = AST 심볼 인덱스 보유 → 이 공백을 reference-lens 로 채움 = STEP 1~3 coverage-hole 의 **역방향 set-diff**: 산출물 ast_symbol 앵커 ∖ codegraph 심볼 = **stale/dangling anchor** ("산출물 앵커有 / 코드 심볼無").
+
+### 12.2 ★ 실데이터 제약 + fork (plan 이 드러냄)
+
+전 4 dogfood 도메인 anchor_type 실측 = **ast_symbol 0** (strict_path 629/420/238/17 + glob 만). 함의: (β)역방향 검증은 지금 검증할 입력이 0 = vacuous / (α)제안만 실데이터 corroboratable. fork 4-A(β 메커니즘)/4-B(α 제안)/4-C(defer→STEP5/6)/4-D(하이브리드) → 사용자 gate #3 = **4-A**.
+
+### 12.3 시행 범위 — 단일 축 `--verify-anchors` (Senior 6산출물→1축 / STEP1 11→2·STEP2 5→2·STEP3 4→1 칼날)
+
+- `collect.js` **`collectSymbolAnchors`** (provenance 보존 — Set 평탄화는 출처 소실로 역방향 불가 / collectRefs 무회귀).
+- 신규 `tools/codegraph-coverage/src/anchor-verify.js` (순수): `enumerateNodes(SYMBOL_KINDS=class/interface/function/method/enum/type_alias)` → `buildSymbolIndex`(byQn2=끝2세그 Class.method / byName=bare) → `anchorMatches`(2-세그 앵커=byQn2 정확매칭 / 1-세그=byName / loose bare-method fallback ❌ false-live 회피) → live·stale·informational 분류.
+- `cli.js` `--verify-anchors` 모드 (coverage 와 분리 self-contained early-exit / 비차단 exit 0). 앵커 0 = **unverified note** (method-axis 'impl-spec 부재=unverified' 동형 / false-health 회피).
+- ★ **(α) "파일앵커→함수 제안"은 federator `symbolsInFile` 소관 = 전면 cut** (Senior jurisdiction / 중복 회피 / 4-B·4-D 동반 소멸). (γ)skill emit·traceability dead-cell·artifact-graph blast-radius = carry.
+
+### 12.4 ★ informational(codegraph 사각) 구조적 절단 (STEP 3 패턴 동형)
+
+앵커 file 이 codegraph 미인덱스 = codegraph 정직 사각(iBATIS2 sql/xml·동적 dispatch·미지원 언어·freshness stale·path 부재). 부재 ≠ stale → **`informational_notes[]`로 격리**: ① schema `anchor_verify.informational_notes.items` **severity 필드 부재 + additionalProperties:false** ② `toAnchorFindings` 가 **stale_anchors 만 순회**(informational 도달 불가) ③ check37. "not a defect / 부재≠stale" 명시.
+
+### 12.5 trust 가드 check37 (RR 36→37 / check34·35·36 4-part isomorphic)
+
+`codegraph_anchor_verify_reference_lens_trust`: ① gate-eval/findings-aggregator anchor-verify 토큰 0 + **REQUIRED_VALIDATORS_PER_STAGE 미등록**(Senior — verify 리포트가 stage 필수 validator 격상 ❌) ② schema informational_notes severity 부재 + findings.severity ⊆ {low,medium} ③ anchor-verify.js 상위 차단등급 리터럴 0 + 'not a defect/부재' 마커 + reference-lens 라벨 ④ anchor-verify.js gate 모듈 import 0. severity ceiling low|medium (stale=medium / SEVERITY_CEILING·pinSeverity 재사용).
+
+### 12.6 ★ §8.1 정직 경계 — mechanism corroboration only (data-corroboration 아님)
+
+- ast_symbol 앵커 = 전 도메인 0 → **in-the-wild stale 미관찰 (unverified)**. STEP 1~3 식 "2-도메인 data-corroborated" 주장 ❌ (fake corroboration / commit-block 꼼수 회피 / feedback_commit_block_no_cheat).
+- **메커니즘 = real-symbol probe 2-도메인 입증** (no-sim 실 `.codegraph` DB): 실존 심볼 2 + 비실존(indexed file) 1 + codegraph-blind(xml) 1 주입 → RealWorld(Spring/Java) **live 2 / stale 1 / informational 1** + ecommerce(NestJS/TS) **live 2 / stale 1 / informational 1** 정확 분류 (true-positive + true-negative + 사각 격리). STEP 1 route-axis "0/19 true-negative" 프레이밍 동형.
+
+### 12.7 검증 / carry
+
+- 검증(no-sim/실 CLI): codegraph-coverage test 64→79(anchor-verify 15) + workspace **1195/0** + release-readiness **37/37**(self-test 21/21) + version 3-way 12.12.0 + build dist v12.12.0. 실 Ajv(`ajv/dist/2020`): verify 리포트 valid + finding severity='high' INVALID(enum cut) + informational severity 추가 INVALID(additionalProperties:false cut) = gate-leak 구조 차단. 신규 schema code-anchor-verify.schema.json.
+- official-docs(F-015): codegraph `NODE_KINDS` 에 class/interface/function/method/enum/type_alias 실재(실 DB probe: RealWorld class141/interface16/method415, ecommerce class66/method189/function7) / symbol-existence·dead-code 내장 CLI 부재(직접 SQLite set-diff 정답) / Figma Code Connect non-existent node-id 검증 = 미구현 오픈이슈(#337) → STEP 4 가 먼저 해결 / SCIP·LSIF = re-index 후 set-diff 패턴 정합.
+- 업계: 함수단위 추적성 = safety-critical(ISO26262/DO-178C)에서 "Traceable 자동생성 + 앵커참조 수동 + stale-on-compile" 패턴 / (α)자동제안 = production ROI 선례 無(gold-plating 신호) / Knip = 코드↔코드 dead-symbol(≠요구사항 앵커) → β 정직 방향.
+- carry(STEP 5+): (α)함수앵커 제안(federator 소관) · (γ)skill ast_symbol emit · traceability dead-cell green · artifact-graph code blast-radius · **in-the-wild stale**(ast_symbol 앵커가 실제 산출물에 도입된 후 재측정) · STEP1~3 carry 유지 · STEP 5(context-cache 증분) · STEP 6(Modern-scoped reading-aid + openapi HIGH).

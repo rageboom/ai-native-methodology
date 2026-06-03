@@ -17,11 +17,12 @@ import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, resolve, isAbsolute, dirname } from 'node:path';
 import { enumerateNodes, enumerateEdges, distinctFiles, checkIndexFreshness, sourceRootForDb } from './enumerate.js';
 import { classifyStack } from './detect.js';
-import { collectRefs } from './collect.js';
+import { collectRefs, collectSymbolAnchors } from './collect.js';
 import { buildCoverage } from './coverage.js';
 import { MODULE_EDGE_KINDS } from './module-graph.js';
 import { renderMarkdown, toFindings, SEVERITY_CEILING } from './render.js';
 import { toPromoteReadyFindings, buildHandlerSet, renderPromoteFindingsMarkdown } from './finding-export.js';
+import { buildAnchorVerify, toAnchorFindings, renderAnchorVerifyMarkdown, SYMBOL_KINDS } from './anchor-verify.js';
 
 const DELIVERABLE_FILES = {
   'acceptance-criteria': 'acceptance-criteria.json',
@@ -35,7 +36,8 @@ function usage(code = 3) {
   console.error([
     'usage: codegraph-coverage --target <projectDir> [--deliverables <dir>] [--inventory <path>] [--axes route,method] [--out <file>] [--json]',
     '       codegraph-coverage --db <codegraph.db> --deliverables <dir> [--inventory <path>] [--out <file>] [--json]',
-    '       codegraph-coverage --target <projectDir> --emit-findings [--out-findings <file>] [--json]   # STEP 2 finding 채널',
+    '       codegraph-coverage --target <projectDir> --emit-findings [--out-findings <file>] [--json]    # STEP 2 finding 채널',
+    '       codegraph-coverage --target <projectDir> --verify-anchors [--out-verify <file>] [--json]    # STEP 4 ast_symbol 역방향 검증',
     '',
     'exit: 0=ok / 2=invariant / 3=codegraph DB 부재·usage',
   ].join('\n'));
@@ -55,6 +57,8 @@ function parseArgs(argv) {
     else if (a === '--out') out.out = rest[++i];
     else if (a === '--emit-findings') out.emitFindings = true;
     else if (a === '--out-findings') out.outFindings = rest[++i];
+    else if (a === '--verify-anchors') out.verifyAnchors = true;
+    else if (a === '--out-verify') out.outVerify = rest[++i];
     else if (a === '--axes') out.axes = String(rest[++i] || '').split(',').map((s) => s.trim()).filter(Boolean);
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
@@ -103,6 +107,39 @@ function main() {
     if (existsSync(fp)) { const obj = readJson(fp); if (obj) deliverables[key] = obj; }
   }
   const refs = collectRefs(deliverables);
+
+  // ★ v12.12.0 STEP 4 — ast_symbol 역방향 검증 (--verify-anchors): 산출물 앵커 ∖ codegraph 심볼 = stale-anchor.
+  //   coverage(정방향)와 분리된 self-contained 모드 (early-exit). 앵커 0 = unverified note (false-health 회피).
+  if (args.verifyAnchors) {
+    const { anchors, sources: anchorSources } = collectSymbolAnchors(deliverables);
+    const symEnum = enumerateNodes(dbPath, SYMBOL_KINDS);
+    const symbolNodesByKind = symEnum.available ? symEnum.byKind : {};
+    const verify = buildAnchorVerify({ anchors, symbolNodesByKind, indexedFiles: distinctFiles(dbPath), freshness: fresh });
+    const dbPathFwd = dbPath.replace(/\\/g, '/');
+    const verifyFindings = toAnchorFindings(verify, dbPathFwd);
+    const verifyReport = {
+      meta: {
+        schema: 'code-anchor-verify.schema.json',
+        generated_by: 'codegraph-coverage --verify-anchors',
+        do_not_edit_manually: true,
+        reference_lens: true,
+        trust_note: 'reference-lens / NOT gate-injected. stale-anchor = 비차단(severity low|medium). 결정적 gate inject ❌. informational(codegraph 사각)=결함 아님/severity 부재. 최종 evidence = 실코드 grep.',
+        generated_at: new Date().toISOString(),
+        severity_ceiling: [...SEVERITY_CEILING],
+      },
+      target: resolve(args.target || dirname(dirname(dbPath))).replace(/\\/g, '/'),
+      stack: { language: detect.language, backend_known: detect.backend_known, orm: detect.orm, signals: detect.signals },
+      codegraph: { available: true, db_path: dbPathFwd, freshness: fresh },
+      ref_sources: anchorSources,
+      anchor_verify: verify,
+      findings: verifyFindings,
+    };
+    if (args.outVerify) writeFileSync(resolve(args.outVerify), JSON.stringify(verifyReport, null, 2) + '\n');
+    if (args.out) writeFileSync(resolve(args.out), JSON.stringify(verifyReport, null, 2) + '\n');
+    if (args.json) process.stdout.write(JSON.stringify(verifyReport, null, 2) + '\n');
+    else process.stdout.write(renderAnchorVerifyMarkdown(verifyReport) + '\n');
+    process.exit(0); // 비차단 — stale-anchor 있어도 gate block ❌.
+  }
 
   // ★ v12.11.0 STEP 3 — module axis 입력: architecture.json(modules[]+dependencies[]) + cross-file edge 전수 열거.
   //   arch.json 부재 = module axis unverified (graceful / buildCoverage 가 note). edges 부재 = undetectable note.

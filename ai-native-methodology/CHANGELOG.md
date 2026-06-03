@@ -9,6 +9,40 @@
 
 ---
 
+## [12.12.0] — 2026-06-04 MINOR — codegraph wiring STEP 4 (ast_symbol stale-anchor verify / 함수단위 추적성)
+
+**§5 STEP 4 (impl/test ast_symbol 앵커 / 함수단위 추적성) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step4.md` (3-agent: 공식문서 F-015 / 업계사례 / Senior 적대 0.84 REVISE + 실 `.codegraph` DB probe → 사용자 gate #3 "4-A 지금 시행" 결단). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §12.
+
+### ★ negative-space — code-pointer-validator 가 못 하는 symbol 실재 검증
+`code-pointer-validator` 는 `ast_symbol` 앵커에 대해 **path 존재만 확인하고 symbol 실재는 검증 안 함**(`validator.js` "symbol 검증은 AST parser 외부 / warn-only"). codegraph(AST 심볼 인덱스 보유)가 이 정확한 공백을 reference-lens 로 채움 = STEP 1~3 coverage-hole 의 **역방향 set-diff**: 산출물 ast_symbol 앵커 ∖ codegraph 심볼 = **stale/dangling anchor** ("산출물 앵커有 / 코드 심볼無").
+
+### 시행 범위 — 단일 축 `--verify-anchors` (Senior 6산출물→1축 / STEP1 11→2·STEP2 5→2·STEP3 4→1 칼날)
+- `collect.js` **`collectSymbolAnchors`**(provenance 보존 — Set 평탄화는 출처 소실로 역방향 불가 / collectRefs 무회귀).
+- 신규 `tools/codegraph-coverage/src/anchor-verify.js`(순수): `enumerateNodes(SYMBOL_KINDS=class/interface/function/method/enum/type_alias)` → byQn2(끝2세그 Class.method)+byName(bare) 인덱스 → 앵커 매칭. live(실재) / stale(file 인덱싱됨+symbol 부재) / **informational**(앵커 file 미인덱스 = codegraph 사각: iBATIS2 sql/xml·동적·미지원 언어·freshness stale·path 부재).
+- `cli.js` `--verify-anchors` 모드(coverage 와 분리 self-contained early-exit / 비차단 exit 0). 앵커 0 = **unverified note**(method-axis 'impl-spec 부재=unverified' 동형 / false-health 회피).
+- ★ (α) "파일앵커→함수 제안"은 **federator `symbolsInFile` 소관 = 전면 cut**(Senior jurisdiction / 중복 회피). (γ) skill emit·traceability dead-cell·artifact-graph blast-radius = carry.
+
+### ★ informational(codegraph 사각) 구조적 절단 (STEP 3 패턴 동형)
+앵커 file 이 codegraph 미인덱스 = codegraph 정직 사각. 부재 ≠ stale → **`informational_notes[]`로 격리** — schema **severity 필드 부재 + additionalProperties:false** + `toAnchorFindings` 가 **stale_anchors 만 순회**(informational 도달 불가) + check37. "not a defect / 부재≠stale" 명시.
+
+### trust 가드 — check37 (release-readiness 36→37 / check34·35·36 4-part isomorphic)
+`codegraph_anchor_verify_reference_lens_trust`: ① gate-eval/findings-aggregator anchor-verify 토큰 0 + **REQUIRED_VALIDATORS_PER_STAGE 미등록**(Senior / verify 리포트가 stage 필수 validator 격상 ❌) ② schema informational_notes severity 부재 + findings.severity ⊆ {low,medium} ③ anchor-verify.js 상위 차단등급 리터럴 0 + 'not a defect/부재' 마커 + reference-lens 라벨 ④ anchor-verify.js gate 모듈 import 0. severity ceiling low|medium(stale=medium / `SEVERITY_CEILING`/`pinSeverity` 재사용).
+
+### ★ §8.1 정직 경계 — mechanism corroboration only (data-corroboration 아님)
+- 전 dogfood 도메인 ast_symbol 앵커 = **0**(strict_path/glob 만) → **in-the-wild stale 미관찰(unverified)**. STEP 1~3 식 "2-도메인 data-corroborated" 주장 ❌ (fake corroboration 회피).
+- **메커니즘은 real-symbol probe 2-도메인 입증**(no-simulation / 실 `.codegraph` DB): 실존 심볼 2 + 비실존(indexed file) 1 + codegraph-blind(xml) 1 주입 → RealWorld(Spring) **live 2/stale 1/informational 1** + ecommerce(NestJS) **live 2/stale 1/informational 1** 정확 분류 (true-positive + true-negative + 사각 격리). STEP 1 route-axis "0/19 true-negative" 프레이밍 동형.
+
+### 검증 (no-simulation / 실 CLI)
+- codegraph-coverage test 64→79 (anchor-verify 15) + workspace **1195 pass / 0 fail** + release-readiness **37/37**(self-test 21/21) + version 3-way 12.12.0 + build dist v12.12.0.
+- 실 Ajv(`ajv/dist/2020`): verify 리포트 valid + finding severity='high' INVALID(enum cut) + informational severity 추가 INVALID(additionalProperties:false cut) = gate-leak 구조 차단 입증.
+- 신규 schema `code-anchor-verify.schema.json`.
+- official-docs(F-015): codegraph `NODE_KINDS` 에 class/interface/function/method/enum/type_alias 실재 / symbol-existence 내장 CLI 부재(직접 set-diff 정답) / Figma Code Connect non-existent node-id 검증 = 미구현 오픈이슈(#337) → STEP 4 가 먼저 해결.
+
+### carry (STEP 5~6)
+- (α) 함수앵커 제안(federator 소관) · (γ) skill ast_symbol emit · traceability dead-cell green · artifact-graph code blast-radius · in-the-wild stale(ast_symbol 앵커가 실제 산출물에 도입된 후 재측정) · STEP1~3 carry 유지(iBATIS2 sql-blind / table-blind / method 2nd full-density 도메인 / module-SCC·layer-violation) · STEP 5(context-cache 증분) · STEP 6(Modern-scoped reading-aid + openapi HIGH 잔여).
+
+---
+
 ## [12.11.0] — 2026-06-04 MINOR — codegraph wiring STEP 3 (module dependency coverage-hole / 결정론 corroboration lens)
 
 **§5 STEP 3 (architecture / 4-렌즈 분석의 유일한 R) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step3.md` (workflow `wf_b66c8b85-e4a` — official-docs / industry / Senior 적대 0.85 REVISE / synthesis → 사용자 gate #3 3-결단 승인). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §11.
