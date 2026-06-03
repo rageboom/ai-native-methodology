@@ -4,7 +4,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -499,6 +499,117 @@ describe('chain-driver navigate --prompt (★ 의도③ NL 라우팅)', () => {
     const { dir, path } = makePromptGraph();
     const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'BHV-USER-001', '--json']).stdout);
     assert.equal('prompt_resolution' in out, false);
+    rmSync(dir, { recursive: true });
+  });
+});
+
+// ★ 의도③ (b) what-if — 가설 변경 영향 (in-memory 비파괴 / core_two: remove-node + add-edge).
+function makeWhatIfGraph() {
+  const dir = mkdtempSync(join(tmpdir(), 'navwhatif-'));
+  const graph = {
+    nodes: [
+      { id: 'UC-1', artifact_kind: 'chain', artifact_subkind: 'UC', source_path: 'd.json', state: 'active' },
+      { id: 'BHV-1', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: 'b.json', state: 'active' },
+      { id: 'AC-1', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: 'a.json', state: 'active' },
+      { id: 'ORPHAN-1', artifact_kind: 'chain', artifact_subkind: 'AC', source_path: 'a.json', state: 'active' },
+    ],
+    edges: [
+      { source: 'UC-1', target: 'BHV-1', edge_type: 'derived_from', confidence: 'hard' },
+      { source: 'BHV-1', target: 'AC-1', edge_type: 'derived_from', confidence: 'hard' },
+    ],
+  };
+  const path = join(dir, 'artifact-graph.json');
+  writeFileSync(path, JSON.stringify(graph));
+  return { dir, path };
+}
+
+describe('chain-driver navigate --what-if (★ 의도③ 가설 변경 영향)', () => {
+  it('remove-node → newly orphaned delta + unsaved:true', () => {
+    const { dir, path } = makeWhatIfGraph();
+    // origin=AC-1, BHV-1 제거 → AC-1 backward 의 BHV-1 + (BHV 통해서만 닿던) UC-1 orphan.
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1', '--json']).stdout);
+    assert.equal(out.what_if.unsaved, true);
+    assert.equal(out.what_if.kind, 'remove-node');
+    assert.deepEqual(out.what_if.delta.MUST.removed.sort(), ['BHV-1', 'UC-1']);
+    assert.deepEqual(out.what_if.delta.MUST.added, []);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('add-edge → newly reachable delta + edge_type 명시', () => {
+    const { dir, path } = makeWhatIfGraph();
+    // origin=UC-1, UC-1>ORPHAN-1 가설 엣지 → ORPHAN-1 newly reachable.
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'UC-1', '--what-if', 'add-edge:UC-1>ORPHAN-1', '--json']).stdout);
+    assert.equal(out.what_if.kind, 'add-edge');
+    assert.equal(out.what_if.edge_type, 'derived_from'); // 기본
+    assert.ok(out.what_if.delta.MUST.added.includes('ORPHAN-1'));
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ 불변성 (must-fix #2) — --what-if 후 그래프 파일 byte-identical (비파괴 / do_not_edit_manually)', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const before = readFileSync(path, 'utf-8');
+    run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1', '--json']);
+    run(['navigate', '--graph', path, '--origin', 'UC-1', '--what-if', 'add-edge:UC-1>ORPHAN-1']);
+    assert.equal(readFileSync(path, 'utf-8'), before); // 파일 write 0
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ baseline 불변 (must-fix #2/#3) — --what-if 의 result.impact 는 --what-if 없을 때와 동일 (가설이 baseline 오염 ❌)', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const base = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--json']).stdout);
+    const withWi = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1', '--json']).stdout);
+    assert.deepEqual(withWi.impact, base.impact); // baseline = 원본 그래프 기준 / 가설 무관
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ 결정론/provenance (must-fix #3) — 동일 op 2회 = 동일 delta (op 가 SOLE source)', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const a = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1', '--json']).stdout).what_if.delta;
+    const b = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1', '--json']).stdout).what_if.delta;
+    assert.deepEqual(a, b);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('origin == 제거 대상 → graceful exit 3 (downstream consumer 안내)', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'BHV-1', '--what-if', 'remove-node:BHV-1']);
+    assert.equal(r.status, 3);
+    assert.match(r.stderr, /제거 대상과 동일/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('대상 노드 부재 → exit 3', () => {
+    const { dir, path } = makeWhatIfGraph();
+    assert.equal(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:GHOST']).status, 3);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('add-edge 미지 edge_type → exit 3 (EDGE_TYPE_CATALOG 검증)', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'UC-1', '--what-if', 'add-edge:UC-1>ORPHAN-1:bogus']);
+    assert.equal(r.status, 3);
+    assert.match(r.stderr, /미지 edge_type/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('미지원 op (deprecate-node = carry) → exit 3', () => {
+    const { dir, path } = makeWhatIfGraph();
+    assert.equal(run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'deprecate-node:BHV-1']).status, 3);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('text 출력: what-if (가설 / 미저장) 라벨 + delta', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const r = run(['navigate', '--graph', path, '--origin', 'AC-1', '--what-if', 'remove-node:BHV-1']);
+    assert.match(r.stdout, /what-if \(가설 \/ 미저장\): remove-node:BHV-1/);
+    assert.match(r.stdout, /newly orphaned/);
+    rmSync(dir, { recursive: true });
+  });
+
+  it('★ 회귀 0 — --what-if 없으면 what_if 키 부재', () => {
+    const { dir, path } = makeWhatIfGraph();
+    const out = JSON.parse(run(['navigate', '--graph', path, '--origin', 'AC-1', '--json']).stdout);
+    assert.equal('what_if' in out, false);
     rmSync(dir, { recursive: true });
   });
 });

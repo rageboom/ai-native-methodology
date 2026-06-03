@@ -46,7 +46,7 @@ import {
   detectGraphArtifactWrite, evaluatePolicyForEdges,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
-import { analyzeImpact } from './impact-analyzer.js';
+import { analyzeImpact, EDGE_TYPE_CATALOG } from './impact-analyzer.js';
 import { loadPolicy, evaluatePolicy, appendProposeRecord } from './policy-evaluator.js';
 import { topologicalOrder, cascadeOrder } from './propagation-orderer.js';
 import { topKImpactRoot } from './centrality.js';
@@ -70,6 +70,7 @@ function usage(code = 3) {
     '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
     '  navigate --graph <artifact-graph.json> --origin <node-id> [--with-spec] [--json]   (dep-graph-navigator backend)',
     '  navigate --graph <artifact-graph.json> --prompt "<자연어>" [--with-spec] [--json]   (★ 의도③ NL 라우팅 — id/title 결정론 해소)',
+    '  navigate --graph <artifact-graph.json> --origin <id> --what-if "remove-node:ID|add-edge:SRC>TGT[:type]" [--json]   (★ 의도③ 가설 변경 영향 / 비파괴)',
     '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
     '  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (★ Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
     '  suggest-skill --prompt <text>',
@@ -114,6 +115,7 @@ function parseArgs(argv) {
     else if (a === '--out-jsonl') out.outJsonl = rest[++i];
     else if (a === '--code-pointer-only') out.codePointerOnly = true;
     else if (a === '--with-spec') out.withSpec = true;
+    else if (a === '--what-if') out.whatIf = rest[++i];
     else if (a === '--help' || a === '-h') usage(0);
     else if (a.startsWith('--')) usage(3);
   }
@@ -558,9 +560,42 @@ function writePromptResolution(pr) {
   else process.stdout.write(`  ${pr.reason}\n`);
 }
 
+// ★ 의도③ (b) what-if — 가설 변경 영향 (in-memory 비파괴 / 사용자 명시 op 만 / DEC-2026-06-03-living-graph-what-if).
+//   op 문자열 = 변경의 SOLE source (LLM/heuristic 엣지 추론 ❌ = trust선). v1 scope = core_two (Senior).
+//     remove-node:ID            — 노드+인접 엣지 제거 ("삭제하면 뭐 끊기나")
+//     add-edge:SRC>TGT[:type]   — 가설 엣지 추가 (기본 derived_from / "이 의존 추가하면?")
+//   deprecate-node·remove-edge·add-node = carry (§8.1 external pull 필요 / gold-plating 회피).
+function parseWhatIfOp(opStr) {
+  const parts = String(opStr ?? '').split(':');
+  const kind = parts[0];
+  if (kind === 'remove-node') {
+    if (parts.length !== 2 || !parts[1]) return { error: 'remove-node:ID 형식' };
+    return { kind, nodeId: parts[1] };
+  }
+  if (kind === 'add-edge') {
+    if (parts.length < 2 || !parts[1].includes('>')) return { error: 'add-edge:SRC>TGT[:edge_type] 형식' };
+    const [src, tgt] = parts[1].split('>');
+    if (!src || !tgt) return { error: 'add-edge:SRC>TGT[:edge_type] 형식' };
+    return { kind, src, tgt, edge_type: parts[2] || 'derived_from' };
+  }
+  return { error: `미지원 op '${kind}' — remove-node | add-edge (deprecate-node·remove-edge·add-node = carry)` };
+}
+
+// 가설 op 를 graph 사본에 적용 (★ 호출부가 structuredClone 한 copy 만 넘김 / 원본 무변경).
+function applyWhatIfOp(copy, op) {
+  if (op.kind === 'remove-node') {
+    copy.nodes = (copy.nodes ?? []).filter((n) => n.id !== op.nodeId);
+    copy.edges = (copy.edges ?? []).filter((e) => e.source !== op.nodeId && e.target !== op.nodeId);
+  } else if (op.kind === 'add-edge') {
+    copy.edges = copy.edges ?? [];
+    const confidence = EDGE_TYPE_CATALOG.hard.includes(op.edge_type) ? 'hard' : 'soft';
+    copy.edges.push({ source: op.src, target: op.tgt, edge_type: op.edge_type, confidence });
+  }
+}
+
 // ★ dep-graph P4 (operation.md 결정 7) — dep-graph-navigator skill 의 backend.
 // node 상세 + 영향 트리(BFS) + code_pointers + top-K impact root (centrality) 통합.
-// usage: chain-driver navigate --graph <path> --origin <node-id> [--with-spec] [--json]
+// usage: chain-driver navigate --graph <path> --origin <node-id> [--with-spec] [--what-if "<op>"] [--json]
 //        chain-driver navigate --graph <path> --prompt "<자연어>" [--with-spec] [--json]   (★ 의도③ NL 라우팅)
 //        chain-driver navigate --graph <path> --stage <s>|--scope <id> [--json]   (★ F3 일괄 rollup)
 function cmdNavigate(args) {
@@ -642,6 +677,47 @@ function cmdNavigate(args) {
 
   const topRoots = topKImpactRoot(graph, { k: 3, nonTraversableStates: nonTraversable });
 
+  // ★ 의도③ (b) what-if — 가설 변경 영향 (in-memory 비파괴 diff / origin 기준 baseline vs 가설).
+  let whatIf = null;
+  if (args.whatIf) {
+    const op = parseWhatIfOp(args.whatIf);
+    if (op.error) { console.error(`[chain-driver] navigate --what-if: ${op.error}`); process.exit(3); }
+    const ids = new Set((graph.nodes ?? []).map((n) => n.id));
+    if (op.kind === 'remove-node') {
+      if (!ids.has(op.nodeId)) { console.error(`[chain-driver] navigate --what-if: 대상 노드 '${op.nodeId}' 부재`); process.exit(3); }
+      if (op.nodeId === args.origin) { console.error(`[chain-driver] navigate --what-if: origin '${args.origin}' 이 제거 대상과 동일 — 제거 후 영향 분석 불가. downstream consumer 를 --origin 으로 지정.`); process.exit(3); }
+    } else if (op.kind === 'add-edge') {
+      if (!ids.has(op.src) || !ids.has(op.tgt)) { console.error(`[chain-driver] navigate --what-if: add-edge src/tgt 노드 부재 (${op.src}>${op.tgt})`); process.exit(3); }
+      const validTypes = new Set([...EDGE_TYPE_CATALOG.hard, ...EDGE_TYPE_CATALOG.soft]);
+      if (!validTypes.has(op.edge_type)) { console.error(`[chain-driver] navigate --what-if: 미지 edge_type '${op.edge_type}' (${[...validTypes].join('|')})`); process.exit(3); }
+    }
+    const copy = structuredClone(graph); // ★ 원본 무변경 — 가설은 사본에만 (do_not_edit_manually 계약).
+    applyWhatIfOp(copy, op);
+    let hypo;
+    try {
+      hypo = analyzeImpact(copy, args.origin, {
+        baseGradeOverrides: policy?.edge_grade_overrides ?? undefined,
+        nonTraversableStates: nonTraversable,
+      });
+    } catch (e) { console.error(`[chain-driver] navigate --what-if: ${e.message}`); process.exit(3); }
+    const deltaFor = (b, h) => {
+      const bs = new Set(b), hs = new Set(h);
+      return { added: h.filter((x) => !bs.has(x)).sort(), removed: b.filter((x) => !hs.has(x)).sort() };
+    };
+    whatIf = {
+      op: args.whatIf,
+      kind: op.kind,
+      unsaved: true, // ★ 가설 — 그래프 파일 미저장 (in-memory only).
+      ...(op.kind === 'add-edge' ? { edge_type: op.edge_type } : {}),
+      hypothetical_by_grade: hypo.by_grade,
+      delta: {
+        MUST: deltaFor(impact.by_grade.MUST, hypo.by_grade.MUST),
+        SHOULD: deltaFor(impact.by_grade.SHOULD, hypo.by_grade.SHOULD),
+        FYI: deltaFor(impact.by_grade.FYI, hypo.by_grade.FYI),
+      },
+    };
+  }
+
   const result = {
     node: {
       id: node.id,
@@ -661,6 +737,8 @@ function cmdNavigate(args) {
   if (args.withSpec) result.spec = readSpecBody(node, args.graphPath);
   // ★ 의도③ (a) NL 라우팅 — prompt 로 해소됐으면 어떻게 해소됐는지 동봉 (투명성).
   if (promptResolution) result.prompt_resolution = promptResolution;
+  // ★ 의도③ (b) what-if — 가설 변경 영향 (baseline=result.impact / 가설 delta = result.what_if / 미저장).
+  if (whatIf) result.what_if = whatIf;
 
   if (args.json) {
     process.stdout.write(JSON.stringify(result, null, 2) + '\n');
@@ -702,6 +780,19 @@ function cmdNavigate(args) {
     process.stdout.write(`    SHOULD: ${impact.by_grade.SHOULD.join(', ') || '-'}\n`);
     process.stdout.write(`    FYI: ${impact.by_grade.FYI.join(', ') || '-'}\n`);
     process.stdout.write(`  top-3 impact root (graph-wide): ${topRoots.map(r => `${r.id}(${r.score})`).join(', ')}\n`);
+    if (whatIf) {
+      const attribAdded = whatIf.kind === 'add-edge' ? 'newly reachable' : 'added';
+      const attribRemoved = whatIf.kind === 'remove-node' ? 'newly orphaned' : 'removed';
+      const etNote = whatIf.kind === 'add-edge' ? ` (가설 엣지 ${whatIf.edge_type})` : '';
+      process.stdout.write(`  what-if (가설 / 미저장): ${whatIf.op}${etNote}\n`);
+      for (const g of ['MUST', 'SHOULD', 'FYI']) {
+        const d = whatIf.delta[g];
+        const notes = [];
+        if (d.added.length) notes.push(`${attribAdded}: ${d.added.join(', ')}`);
+        if (d.removed.length) notes.push(`${attribRemoved}: ${d.removed.join(', ')}`);
+        process.stdout.write(`    ${g}: +${d.added.length} / -${d.removed.length}${notes.length ? ` (${notes.join(' / ')})` : ''}\n`);
+      }
+    }
   }
   process.exit(0);
 }
