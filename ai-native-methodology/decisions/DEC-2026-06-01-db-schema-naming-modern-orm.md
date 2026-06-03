@@ -9,6 +9,7 @@
 ## 문제 (F-ECOM-001 / HIGH)
 
 `schemas/db-schema.schema.json` 의 table `name`(L32) + column `name`(L58) 패턴 = `^[a-z][a-z0-9_]*$` (소문자 시작 snake_case 강제).
+
 - Prisma 기본 매핑: model명 = table명 PascalCase(`User`/`UserTokens`/`_CategoryToProduct`), field명 = column명 camelCase(`userId`/`urlName`/`discountPercentage`).
 - 1st 도메인(RealWorld MyBatis/SQLite snake_case) = 통과 / 2nd 도메인(Prisma) = 11+ pattern 위반 RED.
 - 패턴이 우연히 1st 도메인 명명 관행에만 맞은 **legacy 편향**. Modern ORM(Prisma / TypeORM default / JPA naming-strategy 미설정) 사용 외부 프로젝트는 db-schema 산출물이 첫 검증부터 RED → 정직한 실명(實名) 사용 시 통과 불가.
@@ -18,7 +19,7 @@
 - table name + column name 패턴 → `^[A-Za-z_][A-Za-z0-9_]*$` (대소문자 + 선두 `_` 허용).
 - snake_case ⊂ 신패턴 = strictly more permissive → 기존 valid schema 전부 valid 유지 (relaxation 은 valid→invalid 전이 불가).
 - 선두 `_` = Prisma 암묵 다대다 join 테이블(`_CategoryToProduct`) 수용.
-- description 갱신: "snake_case" → "snake_case 또는 Modern ORM PascalCase/camelCase / 선두 _ join".
+- description 갱신: "snake*case" → "snake_case 또는 Modern ORM PascalCase/camelCase / 선두 * join".
 
 ## 검증 (no-simulation / 실 실행)
 
@@ -29,16 +30,17 @@
 
 ## ② dogfood 동반 corroboration (Type 1.5 / .aimd 산출물 = dogfood repo 한정 / 본 release 코드 미포함)
 
-| 항목 | 결과 |
-|---|---|
-| chain 1~5 | discovery(UC 100%)→spec(21 BHV/30 AC)→plan(22 task/4 ADR)→test(30 TC)→impl 全 schema-valid |
-| traceability | 30 cells / forward·backward **100%** / green 30 / red 0 |
-| ★ 실 GREEN | jest 28.1.1 **56 tests PASS / 0 fail** (result_hash sha256:4fb73bc9…) — ★ RealWorld(env-blocked Java/Gradle)를 넘어선 **chain 5 GREEN 게이트 2nd-domain 첫 실증** |
-| code-pointer | coverage **100%** (covered 40 / na 98 / missing 0 / 87 pointers) |
-| ★ A2 worktree | clean=drift 0 / purchase.service.ts 미커밋 수정 → **2 노드 content_drift 라이브 탐지** → revert |
-| ★ Slice4 db-schema→DDL | Prisma migration .sql **10 strict_path 앵커**(commit_hash 스탬프) = synthesizer "독립가치 ≥2 도메인 carry" 해소 |
+| 항목                 | 결과                                                                                                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| chain 1~5            | discovery(UC 100%)→spec(21 BHV/30 AC)→plan(22 task/4 ADR)→test(30 TC)→impl 全 schema-valid                                                                      |
+| traceability         | 30 cells / forward·backward **100%** / green 30 / red 0                                                                                                         |
+| 실 GREEN             | jest 28.1.1 **56 tests PASS / 0 fail** (result_hash sha256:4fb73bc9…) — RealWorld(env-blocked Java/Gradle)를 넘어선 **chain 5 GREEN 게이트 2nd-domain 첫 실증** |
+| code-pointer         | coverage **100%** (covered 40 / na 98 / missing 0 / 87 pointers)                                                                                                |
+| A2 worktree          | clean=drift 0 / purchase.service.ts 미커밋 수정 → **2 노드 content_drift 라이브 탐지** → revert                                                                 |
+| Slice4 db-schema→DDL | Prisma migration .sql **10 strict_path 앵커**(commit_hash 스탬프) = synthesizer "독립가치 ≥2 도메인 carry" 해소                                                 |
 
 ### §8.1 ≥2 distinct domain 재평가 (격상은 후속 결단)
+
 - A2 usability / code-pointer 백스톱·src앵커 / Slice4 DDL = 2nd distinct domain(Prisma) 실증 → corroboration **충족 방향** (WARN→통과 격상 = 후속 사용자 결단).
 - S2 gate WARN→block: characterization GREEN 실증되나 **s2-outcome-check/gate-eval 도구 자체 미실행** → 추가 carry.
 - FE kinds: 본 repo BE-only → **FE 2nd 도메인 부재** carry 유지.

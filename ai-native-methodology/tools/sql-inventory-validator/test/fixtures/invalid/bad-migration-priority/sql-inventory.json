@@ -1,5 +1,5 @@
 {
-  "$comment": "★ invalid fixture — migration_priority enum 외 값 (PX) / ADR-CHAIN-009 정합 검증",
+  "$comment": "invalid fixture — migration_priority enum 외 값 (PX) / ADR-CHAIN-009 정합 검증",
   "meta_confidence": {
     "generated_at": "2026-05-12T00:00:00Z",
     "confidence": 0.85,
@@ -15,7 +15,7 @@
     {
       "sql_id": "FooDAO.select",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ 잘못된 migration_priority",
+      "business_meaning": "잘못된 migration_priority",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent",
       "confidence": 0.80,

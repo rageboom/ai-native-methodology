@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/i18n-spec.schema.json",
   "title": "I18n Spec (ICU MF1 stable + MF2 spec stable / runtime preview)",
-  "description": "Deliverable #11 (v1.4 신설). 정적 분석 가능 i18n 검증. ICU MessageFormat 1 (stable) + MF2 (★ runtime Technical Preview / MF1 폴백 의무). ADR-FE-005 §2.2.3 정합.",
+  "description": "Deliverable #11 (v1.4 신설). 정적 분석 가능 i18n 검증. ICU MessageFormat 1 (stable) + MF2 (runtime Technical Preview / MF1 폴백 의무). ADR-FE-005 §2.2.3 정합.",
   "x-spec-source": {
     "icu_mf1": "https://unicode-org.github.io/icu/userguide/format_parse/messages/",
     "icu_mf2": "https://unicode-org.github.io/icu/userguide/format_parse/messages/mf2.html",
@@ -57,11 +57,11 @@
         "supports_mf1": { "type": "boolean" },
         "supports_mf2": {
           "type": "boolean",
-          "description": "★ MF2 runtime 지원 여부. ICU4J/ICU4C = Technical Preview (ADR-FE-005 §2.2.3)."
+          "description": "MF2 runtime 지원 여부. ICU4J/ICU4C = Technical Preview (ADR-FE-005 §2.2.3)."
         },
         "mf1_fallback_present": {
           "type": "boolean",
-          "description": "★ MF2 사용 시 의무 — MF1 폴백 병기 여부. supports_mf2=true & mf1_fallback_present=false → finding 등록."
+          "description": "MF2 사용 시 의무 — MF1 폴백 병기 여부. supports_mf2=true & mf1_fallback_present=false → finding 등록."
         }
       }
     },
@@ -95,13 +95,13 @@
                 "uses_select_rule": {"type": "boolean"},
                 "uses_gender_select": {
                   "type": "boolean",
-                  "description": "★ 영문만 gender select / locale 별 차이 (예: 한국어 무성). finding 의무."
+                  "description": "영문만 gender select / locale 별 차이 (예: 한국어 무성). finding 의무."
                 },
                 "uses_date_format": {"type": "boolean"},
                 "uses_number_format": {"type": "boolean"},
                 "icu_mf2_features_used": {
                   "type": "array",
-                  "description": "★ MF2 사용 시 features 명시. default function (★ Draft) 사용 시 finding 의무.",
+                  "description": "MF2 사용 시 features 명시. default function (Draft) 사용 시 finding 의무.",
                   "items": {
                     "type": "string",
                     "enum": ["plural_match", "select_match", "number_function", "date_function", "u_namespace_draft"]
@@ -148,12 +148,12 @@
         "mf2_used": {"type": "boolean"},
         "mf1_fallback_present": {
           "type": "boolean",
-          "description": "★ MF2 사용 시 본 필드 true 의무 (ADR-FE-005 §2.2.3)."
+          "description": "MF2 사용 시 본 필드 true 의무 (ADR-FE-005 §2.2.3)."
         },
         "captured_by": {
           "type": "string",
           "enum": ["icu_real", "formatjs_real", "i18next_real", "static_extraction", "simulation"],
-          "description": "★ static_extraction = source 코드만 read (정적). 진짜 runtime 검증은 simulation 아님."
+          "description": "static_extraction = source 코드만 read (정적). 진짜 runtime 검증은 simulation 아님."
         },
         "simulation_reason": {"type": "string"}
       },

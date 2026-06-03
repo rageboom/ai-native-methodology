@@ -16,7 +16,7 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → ru
 ## 절차
 
 1. **Validation lib 식별** — package.json + import 분석:
-   - **Zod** (★ ADR-FE-005 매개체 13 — schema-first / TypeScript-first)
+   - **Zod** ( ADR-FE-005 매개체 13 — schema-first / TypeScript-first)
    - Yup
    - Joi
    - react-hook-form (RHF) + resolver
@@ -25,7 +25,7 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → ru
    - Vest
 2. **Schema 추출** — `z.object()`, `Yup.object()`, `IsEmail()` decorator 등
 3. **Constraint 분류** — required / format / range / pattern / cross-field / async
-4. **rules.json 의 fe_validation 등재** (★ ADR-FE-005):
+4. **rules.json 의 fe_validation 등재** ( ADR-FE-005):
    ```json
    {
      "fe_validation": [

@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-002 법인 기본정보 갱신 (sub-domain A). ★ ★ DAO 다중 호출 (TB_COMPANY update + Stored Procedure 호출) — 트랜잭션 boundary 모호 핵심 케이스.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-CAPITAL-002 법인 기본정보 갱신 (sub-domain A). DAO 다중 호출 (TB_COMPANY update + Stored Procedure 호출) — 트랜잭션 boundary 모호 핵심 케이스.",
   "snapshot_id": "SNAP-UC-CAPITAL-002",
   "use_case": "UC-CAPITAL-002",
   "endpoint": "POST /ifrs/capital/IfrsComINSetSave",
@@ -7,7 +7,7 @@
   "service_method": "CapitalService.insertComINSetList",
   "sql_id": "CapitalDAO.updateComCapitalInfo + CapitalDAO.insertComINSetList (Stored Procedure _IFRSCapitalSetCom)",
   "layer": "integration",
-  "data_source_status": "★ 실 DB 환경 부재 — Stored Procedure 본문 미확인 (DBA carry)",
+  "data_source_status": "실 DB 환경 부재 — Stored Procedure 본문 미확인 (DBA carry)",
   "scenarios": [
     {
       "id": "SCN-CAPITAL-002-001",
@@ -24,7 +24,7 @@
       "then": {
         "expected_TB_COMPANY_after": { "COM_NO": "001", "CAPITAL_YN": "Y", "CAPITAL_CURR_CD": "USD" },
         "expected_SP_call": "EXEC IFRS.dbo._IFRSCapitalSetCom (?, ?, ?, ?, ?) — 본문 미확인",
-        "transaction_scope": "★ ★ 명시 부재 — @Transactional 부재 + 2 단계 호출 → 부분 실패 시 TB_COMPANY 만 갱신 / SP 실패 가능성 ↑ (atomicity 부재)",
+        "transaction_scope": "명시 부재 — @Transactional 부재 + 2 단계 호출 → 부분 실패 시 TB_COMPANY 만 갱신 / SP 실패 가능성 ↑ (atomicity 부재)",
         "_BR_link": "BR-CAPITAL-TXBOUND-003 — 단일 트랜잭션 ❌ / DAO 다중 호출"
       },
       "intent_classification": [
@@ -35,22 +35,22 @@
         "Stored Procedure _IFRSCapitalSetCom 실행 결과를 ifrs_admin 검토 가능 (intent)"
       ],
       "behavior_likely_bug": [
-        "★ ★ ★ atomicity 부재 — 2 호출 단일 트랜잭션 ❌ → 새 시스템 = @Transactional + 단일 unit of work 의무",
-        "★ AP-CAPITAL-002 (Map 캐스팅) + AP-CAPITAL-003 (Anemic Service / 단순 위임)"
+        "atomicity 부재 — 2 호출 단일 트랜잭션 ❌ → 새 시스템 = @Transactional + 단일 unit of work 의무",
+        "AP-CAPITAL-002 (Map 캐스팅) + AP-CAPITAL-003 (Anemic Service / 단순 위임)"
       ]
     },
     {
       "id": "SCN-CAPITAL-002-002",
-      "name": "★ likely bug — SP 실패 시 부분 commit",
+      "name": "likely bug — SP 실패 시 부분 commit",
       "given": { "request_params": { "comNo": "001", "capitalCurrCd": "EUR", "sType": "1" }, "external_state": "SGERP DB 일시 disconnect" },
       "when": "insertComINSetList(param)",
       "then": {
         "step_1_TB_COMPANY_update": "✅ commit (capital_curr_cd = 'EUR')",
         "step_2_SP_call": "❌ SP 실패 (SGERP disconnect)",
-        "result_state": "★ inconsistent — TB_COMPANY 만 갱신 + SP 셋업 ❌ / 새 시스템 재구현 시 rollback 의무",
+        "result_state": "inconsistent — TB_COMPANY 만 갱신 + SP 셋업 ❌ / 새 시스템 재구현 시 rollback 의무",
         "_validation_missing": "@Transactional 부재 + try-catch rollback 부재"
       },
-      "behavior_to_preserve": "(★ 부분 commit 자체는 보존 ❌ — 새 시스템에서 의도된 atomicity 추가 의무)",
+      "behavior_to_preserve": "(부분 commit 자체는 보존 ❌ — 새 시스템에서 의도된 atomicity 추가 의무)",
       "intent_classification": [{ "rule": "(atomicity 부재)", "type": "bug" }]
     }
   ],

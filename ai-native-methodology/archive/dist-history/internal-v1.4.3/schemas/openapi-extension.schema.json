@@ -99,7 +99,7 @@
           },
           "formal_spec_links": {
             "type": "object",
-            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치 정식 입증). PoC #03 자발적 입증 9/21 op (43%) → schema 의무화 (optional but recommended).",
+            "description": " v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치 정식 입증). PoC #03 자발적 입증 9/21 op (43%) → schema 의무화 (optional but recommended).",
             "properties": {
               "decision_tables": {
                 "type": "array",

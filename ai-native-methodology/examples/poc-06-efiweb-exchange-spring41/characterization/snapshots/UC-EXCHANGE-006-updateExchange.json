@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-006 updateExchange (연간 환율 일괄 입력/수정). 12개월 × N 통화 × {E, A} MERGE.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-006 updateExchange (연간 환율 일괄 입력/수정). 12개월 × N 통화 × {E, A} MERGE.",
   "snapshot_id": "SNAP-UC-EXCHANGE-006",
   "use_case": "UC-EXCHANGE-006",
   "endpoint": "POST /ifrs/exchange/updateExchange",
@@ -7,7 +7,7 @@
   "service_method": "ExchangeService.updateExchange",
   "sql_id": "ExchangeDAO.updateExchange (MERGE TB_EXCHANGE)",
   "layer": "integration",
-  "data_source_status": "★ 실 DB 환경 부재 — MERGE 결과는 코드 + iBATIS XML 분석 기반 추정",
+  "data_source_status": "실 DB 환경 부재 — MERGE 결과는 코드 + iBATIS XML 분석 기반 추정",
   "scenarios": [
     {
       "id": "SCN-006-001",
@@ -27,7 +27,7 @@
       },
       "when": "Map param = IfrsUtil.parameterToHm(request); userMap.get('USER_ID') → param.put('sessionId', ...); exchangeService.updateExchange(param);",
       "then": {
-        "behavior_inside_service": "★ for (int i=0; i<currCdArr.length; i++) {  /* 콤마 제거 → map.put → exchangeDAO.updateExchange(map) 호출 */  }",
+        "behavior_inside_service": "for (int i=0; i<currCdArr.length; i++) {  /* 콤마 제거 → map.put → exchangeDAO.updateExchange(map) 호출 */  }",
         "loop_iterations": 4,
         "expected_TB_EXCHANGE_after": [
           { "CURR_CD": "USD", "YEAR": "2025", "GUBUN": "E", "MON1": 1300.50, "MON2": 1310.00, "_": "MON3~MON12 콤마 제거 후 저장", "MON12": 1295.00, "_action": "MATCHED → UPDATE" },
@@ -35,8 +35,8 @@
           { "CURR_CD": "EUR", "YEAR": "2025", "GUBUN": "E", "MON1": 1400.00, "MON12": 1395.00, "_action": "NOT MATCHED → INSERT" },
           { "CURR_CD": "EUR", "YEAR": "2025", "GUBUN": "A", "MON1": 1395.50, "MON12": 1390.00, "_action": "NOT MATCHED → INSERT" }
         ],
-        "transaction_isolation": "★ 명시 부재 — Spring 4.1 + iBATIS 2 default (READ_COMMITTED 추정)",
-        "transaction_scope": "★ 명시 부재 — for 루프 4회 호출이 단일 트랜잭션인지 4개 트랜잭션인지 코드만으로 불명 / @Transactional 부재 + EgovComAbstractDAO.update 동작 의존"
+        "transaction_isolation": "명시 부재 — Spring 4.1 + iBATIS 2 default (READ_COMMITTED 추정)",
+        "transaction_scope": "명시 부재 — for 루프 4회 호출이 단일 트랜잭션인지 4개 트랜잭션인지 코드만으로 불명 / @Transactional 부재 + EgovComAbstractDAO.update 동작 의존"
       },
       "intent_classification": [
         { "rule": "BR-EXCHANGE-COMMA-004", "type": "intent", "note": "콤마 자동 제거 — UX 친화" },
@@ -49,8 +49,8 @@
         "session USER_ID → sessionId 파라미터 매핑 (감사 추정)"
       ],
       "behavior_likely_bug": [
-        "★ for 루프 4회 호출 = 4 트랜잭션 가능성 ↑ → 부분 실패 시 일부 row 만 저장 (atomicity 부재). 새 시스템에서는 단일 트랜잭션 명시 의무.",
-        "★ sessionId 파라미터 → updateExchange map 에 들어가지만 sql-map 의 #sessionId# 사용 부재 → 감사 컬럼 미저장 가능성 ↑ (DEAD parameter)"
+        "for 루프 4회 호출 = 4 트랜잭션 가능성 ↑ → 부분 실패 시 일부 row 만 저장 (atomicity 부재). 새 시스템에서는 단일 트랜잭션 명시 의무.",
+        "sessionId 파라미터 → updateExchange map 에 들어가지만 sql-map 의 #sessionId# 사용 부재 → 감사 컬럼 미저장 가능성 ↑ (DEAD parameter)"
       ]
     },
     {
@@ -67,15 +67,15 @@
     },
     {
       "id": "SCN-006-003",
-      "name": "★ likely bug — 음수 환율 입력",
+      "name": "likely bug — 음수 환율 입력",
       "given": { "request_params": { "year": "2025", "currCd_arr": ["USD"], "gubun_arr": ["E"], "mon1_arr": ["-100.00"] } },
       "when": "exchangeService.updateExchange(param);",
       "then": {
-        "expected_TB_EXCHANGE_after": "★ 음수 환율 그대로 저장 — 검증 부재 (-100.00 저장)",
+        "expected_TB_EXCHANGE_after": "음수 환율 그대로 저장 — 검증 부재 (-100.00 저장)",
         "_validation_missing": "Service / SQL / DB constraint 모두 음수 검증 ❌",
         "_downstream_impact": "FN_Get_ExcRate 가 음수 반환 → 외화 → 원화 환산 시 잘못된 부호"
       },
-      "behavior_to_preserve": "(★ 검증 부재 자체는 보존 ❌ — 새 시스템에서 의도된 검증 추가 의무)",
+      "behavior_to_preserve": "(검증 부재 자체는 보존 ❌ — 새 시스템에서 의도된 검증 추가 의무)",
       "intent_classification": [{ "rule": "(검증 부재)", "type": "bug" }]
     }
   ],

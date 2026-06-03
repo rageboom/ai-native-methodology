@@ -22,15 +22,15 @@
     "applied_modifiers": [
       {"name": "orm_full", "value": 0.05, "reason": "TypeORM 0.2 (G6 enum)"},
       {"name": "domain_context_md", "value": 0.03, "reason": "research-poc03 + Sairyss reference"},
-      {"name": "openapi_static_extraction", "value": 0.04, "reason": "★ runtime ground truth 부재 (PoC #02 +0.07 → +0.04)"},
-      {"name": "phase_4_5_formal_spec_cross_link", "value": 0.04, "reason": "★★ Phase 4.5 cross-link 9/21 op 입증"},
+      {"name": "openapi_static_extraction", "value": 0.04, "reason": " runtime ground truth 부재 (PoC #02 +0.07 → +0.04)"},
+      {"name": "phase_4_5_formal_spec_cross_link", "value": 0.04, "reason": " Phase 4.5 cross-link 9/21 op 입증"},
       {"name": "cross_phase_aggregation", "value": 0.03, "reason": "Phase 1~5-1 누적 검증"},
-      {"name": "poc_01_02_isomorphic_pattern", "value": 0.03, "reason": "★ 5 재현 + 2 비재현 (Bearer 학습 효과 ★) — §8.1 cross-platform 입증"},
+      {"name": "poc_01_02_isomorphic_pattern", "value": 0.03, "reason": " 5 재현 + 2 비재현 (Bearer 학습 효과 ) — §8.1 cross-platform 입증"},
       {"name": "schema_compliance_100", "value": 0.01, "reason": "id pattern ^AP-[A-Z]+-\\d+$ 11/11 정합"}
     ],
     "applied_penalties": [
       {"name": "no_operational_db", "value": -0.03, "reason": "MySQL 운영 DB 미접근 + nest start 부재"},
-      {"name": "static_only_caveat", "value": -0.03, "reason": "★ Phase 5-1 정적 추출만 (-3p)"}
+      {"name": "static_only_caveat", "value": -0.03, "reason": " Phase 5-1 정적 추출만 (-3p)"}
     ],
     "raw_confidence": 0.94,
     "cap_applied": false,
@@ -38,11 +38,11 @@
     "expected_confidence_average": 0.93,
     "human_review_required": true,
     "human_review_reasons": [
-      "★★★ AP-AUTH-NEST-001 critical (5 endpoint cumul) — 사내 적용 시 즉시 수정 의무",
-      "★ AP-DB-001 critical — DB UQ + FK + race window 4건 cumul",
-      "★ AP-PERFORMANCE-001 medium → high 격상 (PoC #01+#02+#03 3 PoC 재현 권위)",
-      "★ Phase 4.5 cross-link 9 op = 방법론 본질 가치 입증 데이터",
-      "★ F-161 positive (Bearer 표준) = NestJS 학습 효과 입증 ★"
+      " AP-AUTH-NEST-001 critical (5 endpoint cumul) — 사내 적용 시 즉시 수정 의무",
+      " AP-DB-001 critical — DB UQ + FK + race window 4건 cumul",
+      " AP-PERFORMANCE-001 medium → high 격상 (PoC #01+#02+#03 3 PoC 재현 권위)",
+      " Phase 4.5 cross-link 9 op = 방법론 본질 가치 입증 데이터",
+      " F-161 positive (Bearer 표준) = NestJS 학습 효과 입증 "
     ]
   },
 
@@ -68,9 +68,9 @@
         "team_training": "OWASP API Security Top 10 + NestJS Authentication 공식 docs"
       },
       "cross_poc_validation": {
-        "poc_01": "AP-SECURITY-001 (JWT 21byte critical) — 변형 재현 (★ JWT 자체 약점 / PoC #03 = scope 결여)",
-        "poc_02": "AP-SECURITY-001 (RSA git commit critical) — 변형 재현 (★ key management / PoC #03 = scope 결여)",
-        "poc_03_unique": "★★ Auth scope 결여 — 3 PoC 모두 SECURITY critical 동형 영역 ✅"
+        "poc_01": "AP-SECURITY-001 (JWT 21byte critical) — 변형 재현 ( JWT 자체 약점 / PoC #03 = scope 결여)",
+        "poc_02": "AP-SECURITY-001 (RSA git commit critical) — 변형 재현 ( key management / PoC #03 = scope 결여)",
+        "poc_03_unique": " Auth scope 결여 — 3 PoC 모두 SECURITY critical 동형 영역 ✅"
       }
     },
     {
@@ -94,8 +94,8 @@
         "team_training": "Joe Celko's SQL for Smarties §UNIQUE constraint + Vlad Mihalcea High-Performance Java Persistence §16 (Optimistic Locking)"
       },
       "cross_poc_validation": {
-        "poc_02": "★★ AP-DOMAIN-002 (race-prone unique) — isomorphic + 더 나쁨 (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
-        "poc_03_addition": "★ FK 자체 부재 (PoC #02 는 FK 있음 / PoC #03 은 FK 도 부재) + favoriteCount race"
+        "poc_02": " AP-DOMAIN-002 (race-prone unique) — isomorphic + 더 나쁨 (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+        "poc_03_addition": " FK 자체 부재 (PoC #02 는 FK 있음 / PoC #03 은 FK 도 부재) + favoriteCount race"
       }
     },
     {
@@ -119,13 +119,13 @@
         "team_training": "RFC 9110 (HTTP Semantics) + NestJS HttpCode 공식 docs"
       },
       "cross_poc_validation": {
-        "poc_02": "★ AP-API-001 (favorite RFC 7231 §4.2.2) + F-085 (login status drift) + F-083 (DELETE 200) — isomorphic 합산 ★ 재현"
+        "poc_02": " AP-API-001 (favorite RFC 7231 §4.2.2) + F-085 (login status drift) + F-083 (DELETE 200) — isomorphic 합산  재현"
       },
       "static_rule_link": {
         "rule_path": "tools/static-runner/rules/error-mapping-missing.yml",
         "rule_id": "internal.be.api.error-mapping-nestjs-delete-201-decorator-drift",
         "introduced_in": "v1.4.5-pre",
-        "scope": "@Delete + @ApiResponse({status: 201}) decorator drift 자동 회귀. ★ article.controller.ts:65,68 + 81,85 + 97,99 ★ 4 op 정확 매칭. login @Post default 201 (RFC 9110 §15.3.2) = ★ 별 mechanism / pattern-not-inside @HttpCode 의 정확한 Semgrep 표현 한계 → ts-morph carry (v1.5+).",
+        "scope": "@Delete + @ApiResponse({status: 201}) decorator drift 자동 회귀.  article.controller.ts:65,68 + 81,85 + 97,99  4 op 정확 매칭. login @Post default 201 (RFC 9110 §15.3.2) =  별 mechanism / pattern-not-inside @HttpCode 의 정확한 Semgrep 표현 한계 → ts-morph carry (v1.5+).",
         "carry": "ts-morph NestJS @HttpCode + @Post + @ApiResponse 결합 decorator semantic 분석 (v1.5+ 진입 시점)"
       }
     },
@@ -151,15 +151,15 @@
         "team_training": "Sairyss DDD-Hexagon README §5 (Domain Invariants) + class-validator docs"
       },
       "cross_poc_validation": {
-        "poc_02": "PoC #02 = Bean Validation 풍부 (UserCreateRequest 7+ validator) — ★★ 학습 효과 반대 (PoC #03 부족 식별)"
+        "poc_02": "PoC #02 = Bean Validation 풍부 (UserCreateRequest 7+ validator) —  학습 효과 반대 (PoC #03 부족 식별)"
       }
     },
     {
       "id": "AP-PERFORMANCE-001",
       "category": "PERFORMANCE",
       "severity": "high",
-      "title": "EAGER N+1 + favoriteCount race window — 3 PoC 재현 권위 (medium → high 격상 ★)",
-      "description": "@OneToMany comments eager:true → article list/find 시 N+1 쿼리. favoriteCount = favorites.length App level 보장 / DB level FOR UPDATE 부재 → 동시 favorite 시 count 2회 증가 race window. 3 PoC (PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124+F-135) 모두 재현 → ★★ medium → high 격상 권위 충분.",
+      "title": "EAGER N+1 + favoriteCount race window — 3 PoC 재현 권위 (medium → high 격상 )",
+      "description": "@OneToMany comments eager:true → article list/find 시 N+1 쿼리. favoriteCount = favorites.length App level 보장 / DB level FOR UPDATE 부재 → 동시 favorite 시 count 2회 증가 race window. 3 PoC (PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124+F-135) 모두 재현 →  medium → high 격상 권위 충분.",
       "evidence_files": [
         {"path": "src/article/article.entity.ts — @OneToMany comments eager:true"},
         {"path": "src/article/article.service.ts favorite — isNewFavorite check + push + favoriteCount++ (App 1중)"}
@@ -175,8 +175,8 @@
       "cross_poc_validation": {
         "poc_01": "F-006 EAGER N+1 ✅ 재현",
         "poc_02": "F-051 EAGER N+1 ✅ 재현 (medium → high 격상 후보)",
-        "poc_03": "F-124 EAGER + F-135 race window ★ 재현 + 추가 결함",
-        "promotion_authority": "★★ 3 PoC 재현 권위 — v1.3 격상 시 high 격상 정식 데이터"
+        "poc_03": "F-124 EAGER + F-135 race window  재현 + 추가 결함",
+        "promotion_authority": " 3 PoC 재현 권위 — v1.3 격상 시 high 격상 정식 데이터"
       }
     },
     {
@@ -199,7 +199,7 @@
         "team_training": "Stripe API Versioning + OWASP API Top 10"
       },
       "cross_poc_validation": {
-        "poc_02": "AP-API-003 (versioning) + AP-API-004 (limit cap) ★ 재현"
+        "poc_02": "AP-API-003 (versioning) + AP-API-004 (limit cap)  재현"
       }
     },
     {
@@ -221,7 +221,7 @@
         "team_training": "RFC 5789 + RFC 7396 (JSON Merge Patch)"
       },
       "cross_poc_validation": {
-        "poc_02": "AP-API-005 (UpdateUser + UpdateArticle PUT) ★ 재현"
+        "poc_02": "AP-API-005 (UpdateUser + UpdateArticle PUT)  재현"
       }
     },
     {
@@ -244,7 +244,7 @@
         "team_training": "Eric Evans DDD §5 (A Model Expressed in Software) + Sairyss DDD-Hexagon"
       },
       "cross_poc_validation": {
-        "poc_02": "★★ double_hit — BR-USER-FOLLOW-NO-SELF-001 코드 부재 (PoC #02) ↔ 코드 존재 + 차원 불일치 (PoC #03)"
+        "poc_02": " double_hit — BR-USER-FOLLOW-NO-SELF-001 코드 부재 (PoC #02) ↔ 코드 존재 + 차원 불일치 (PoC #03)"
       }
     },
     {
@@ -266,7 +266,7 @@
         "team_training": "Vernon IDDD §13 (Integrating Bounded Contexts) + Sairyss DDD-Hexagon README"
       },
       "cross_poc_validation": {
-        "poc_02": "★ J 묶음 (Hexagonal port-adapter) 반대 패턴 — PoC #02 = multi-module Hexagonal / PoC #03 = 단일 module 함정"
+        "poc_02": " J 묶음 (Hexagonal port-adapter) 반대 패턴 — PoC #02 = multi-module Hexagonal / PoC #03 = 단일 module 함정"
       }
     },
     {
@@ -324,13 +324,13 @@
 
   "_composite_view_metadata": [
     {
-      "view_id": "§A. NestJS Auth scope 결여 (★★★ critical)",
+      "view_id": "§A. NestJS Auth scope 결여 ( critical)",
       "ap_refs": ["AP-AUTH-NEST-001"],
       "summary": "5 endpoint anonymous 호출 + JWT verify 무방어 + login 모호. Phase 4.5 cross-link: BR-USER-DELETE-AUTH-001 (current_state: absent) + BR-USER-LOGIN-VERIFY-001 + BR-USER-JWT-EXPIRY-001",
       "fix_priority": 1
     },
     {
-      "view_id": "§B. DB 데이터 무결성 (★★ critical + high)",
+      "view_id": "§B. DB 데이터 무결성 ( critical + high)",
       "ap_refs": ["AP-DB-001", "AP-PERFORMANCE-001"],
       "summary": "DB UQ + FK + race window. PoC #02 isomorphic + 더 나쁨. Phase 4.5 cross-link: BR-USER-USERNAME-EMAIL-UNIQUE-001 + BR-FOLLOWS-PAIR-UNIQUE-001 + BR-ARTICLE-FAVORITE-IDEMPOTENT-001",
       "fix_priority": 2
@@ -338,7 +338,7 @@
     {
       "view_id": "§C. API 계약 결함 (high + 2 medium)",
       "ap_refs": ["AP-API-001", "AP-API-002", "AP-API-003"],
-      "summary": "spec/runtime drift + versioning + PUT vs PATCH. PoC #02 5 isomorphic 합산 재현 ★",
+      "summary": "spec/runtime drift + versioning + PUT vs PATCH. PoC #02 5 isomorphic 합산 재현 ",
       "fix_priority": 3
     },
     {
@@ -352,7 +352,7 @@
   "_id_normalization_mapping": {
     "phase_4_partial_to_phase_6": [
       {"from": "AP-DB-001-poc03 (가칭)", "to": "AP-DB-001"},
-      {"from": "AP-AUTH-NEST-001-poc03 (가칭) ★★", "to": "AP-AUTH-NEST-001"},
+      {"from": "AP-AUTH-NEST-001-poc03 (가칭) ", "to": "AP-AUTH-NEST-001"},
       {"from": "AP-VALIDATION-001-poc03 (가칭)", "to": "AP-VALIDATION-001"},
       {"from": "AP-PERFORMANCE-001-poc03 (가칭)", "to": "AP-PERFORMANCE-001"},
       {"from": "AP-DOMAIN-001-poc03 (가칭)", "to": "AP-DOMAIN-001"},
@@ -367,7 +367,7 @@
     ],
     "merged_or_dropped": [
       {"action": "AP-AUTH-NEST-001 cumul 격상", "rationale": "F-164 critical 추가 (Phase 5-1) + F-150 추가 → 5 endpoint cumul critical"},
-      {"action": "AP-PERFORMANCE-001 medium → high 격상", "rationale": "★ 3 PoC 재현 권위 (PoC #01 + #02 + #03)"}
+      {"action": "AP-PERFORMANCE-001 medium → high 격상", "rationale": " 3 PoC 재현 권위 (PoC #01 + #02 + #03)"}
     ]
   },
 
@@ -393,10 +393,10 @@
         "AP-API-008 (307 internal redirect) — NestJS framework 차이 (ModelAndView 미사용)",
         "AP-API-007 (x-codegen swagger 2.x legacy) — @nestjs/swagger 4.x 자동 생성"
       ],
-      "F-084_token_apikey_to_F-161_bearer_standard": "★★ 학습 효과 입증 ✅ — NestJS addBearerAuth() 표준 (PoC #02 Token apiKey 비표준 비재현)"
+      "F-084_token_apikey_to_F-161_bearer_standard": " 학습 효과 입증 ✅ — NestJS addBearerAuth() 표준 (PoC #02 Token apiKey 비표준 비재현)"
     },
     "poc_03_unique": [
-      "AP-AUTH-NEST-001 ★★ (NestJS Passport 미사용 + Auth scope 결여 — 5 endpoint critical)",
+      "AP-AUTH-NEST-001  (NestJS Passport 미사용 + Auth scope 결여 — 5 endpoint critical)",
       "AP-CONTROLLER-001 (NestJS @Controller() 빈 prefix 함정)",
       "F-144 (dimensional inconsistency follow=email / unFollow=id)",
       "F-126 (TODO slug 미업데이트)"
@@ -407,7 +407,7 @@
     "ap_with_phase_4_5_link": [
       {"ap": "AP-AUTH-NEST-001", "links": ["BR-USER-DELETE-AUTH-001 (absent)", "BR-USER-LOGIN-VERIFY-001 (partial)", "BR-USER-JWT-EXPIRY-001 (partial)", "User.json state-machine"]},
       {"ap": "AP-DB-001", "links": ["BR-USER-USERNAME-EMAIL-UNIQUE-001", "BR-FOLLOWS-PAIR-UNIQUE-001", "Follows.json state-machine", "Article.json state-machine"]},
-      {"ap": "AP-VALIDATION-001", "links": ["BR-FOLLOWS-NO-SELF-001 (★ F-144 차원 불일치)"]},
+      {"ap": "AP-VALIDATION-001", "links": ["BR-FOLLOWS-NO-SELF-001 ( F-144 차원 불일치)"]},
       {"ap": "AP-DOMAIN-001", "links": ["BR-FOLLOWS-NO-SELF-001 (Domain invariant 부재)", "FollowsEntity 생성자"]}
     ],
     "ap_without_phase_4_5_link": [
@@ -419,10 +419,10 @@
   "_positive_findings_logged": [
     {
       "id": "F-161",
-      "title": "★★ Bearer JWT 표준 준수 ✅",
+      "title": " Bearer JWT 표준 준수 ✅",
       "evidence": "main.ts:15 addBearerAuth() + ApiBearerAuth 데코",
-      "cross_poc_value": "★ PoC #02 F-084 (Token apiKey 비표준) 비재현 = NestJS framework 학습 효과 입증",
-      "v13_promotion_candidate": "★ positive finding 패턴 정식 도입 후보 (memory feedback_positive_finding_pattern.md 신규)"
+      "cross_poc_value": " PoC #02 F-084 (Token apiKey 비표준) 비재현 = NestJS framework 학습 효과 입증",
+      "v13_promotion_candidate": " positive finding 패턴 정식 도입 후보 (memory feedback_positive_finding_pattern.md 신규)"
     }
   ]
 }

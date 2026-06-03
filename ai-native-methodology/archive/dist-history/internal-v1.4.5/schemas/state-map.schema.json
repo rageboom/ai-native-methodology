@@ -124,7 +124,7 @@
               "dom_state",
               "mixed"
             ],
-            "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (★ 분산 위험 — finding 등록 의무)."
+            "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (분산 위험 — finding 등록 의무)."
           },
           "initial": {
             "type": "string",
@@ -212,7 +212,7 @@
           },
           "rendered_mermaid_path": {
             "type": "string",
-            "description": "★ 이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로 (ADR-008 + ADR-FE-002 정합). drift-validator FE 적용 대상."
+            "description": "이중 렌더링 정합 — 사람 눈 .mermaid 파일 경로 (ADR-008 + ADR-FE-002 정합). drift-validator FE 적용 대상."
           },
           "source_files": {
             "type": "array",
@@ -250,7 +250,7 @@
     },
     "cross_links": {
       "type": "array",
-      "description": "★ Phase 4.5 cross-link 패턴 정합. state-map ↔ ui-spec / api / rules 의 관계.",
+      "description": "Phase 4.5 cross-link 패턴 정합. state-map ↔ ui-spec / api / rules 의 관계.",
       "items": {
         "type": "object",
         "required": ["from_machine", "to_artifact", "to_id", "link_type"],
@@ -302,7 +302,7 @@
         "drift_count_tool_limitation": {"type": "integer", "minimum": 0},
         "scxml_export_validated": {
           "type": "boolean",
-          "description": "XState v5+ SCXML import 시도 통과 여부 (★ 단계 5 진짜 도구 검증)."
+          "description": "XState v5+ SCXML import 시도 통과 여부 (단계 5 진짜 도구 검증)."
         },
         "scxml_export_artifact_path": {"type": "string"}
       }

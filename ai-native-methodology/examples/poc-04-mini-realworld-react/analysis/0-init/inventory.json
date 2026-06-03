@@ -48,25 +48,25 @@
   },
   "authority_carriers_detected": {
     "ADR-FE-005_match": {
-      "openapi_3_1": "✅ openapi.yaml 3.0.1 (★ 3.1 미달이지만 정합)",
-      "msw": "✅ msw 2.12.10 (★ 매개체 #4 OAS+MSW)",
-      "zod": "✅ zod 4.3.6 (★ 매개체 #13 신규)",
-      "tanstack_react_query": "✅ 5.90.20 (★ 5 진실 #1 server cache)",
-      "react_router_v7": "✅ 7.13.0 (★ 5 진실 #3 URL state)",
-      "axe_core": "❌ 부재 (★ Phase 6 a11y 검증 시 npm install 의무)",
-      "playwright": "❌ 부재 (★ Phase 5-2-c visual 검증 시 npm install 의무)",
-      "ts_morph": "❌ 부재 (★ Phase 6 type-spec 검증 시 npm install 의무)",
-      "scxml_xstate": "❌ 부재 (★ state-map 수동 모델링)",
-      "icu_messageformat": "❌ 부재 (★ i18n 부재 — deliverable 11 N/A 가능성)",
+      "openapi_3_1": "✅ openapi.yaml 3.0.1 ( 3.1 미달이지만 정합)",
+      "msw": "✅ msw 2.12.10 ( 매개체 #4 OAS+MSW)",
+      "zod": "✅ zod 4.3.6 ( 매개체 #13 신규)",
+      "tanstack_react_query": "✅ 5.90.20 ( 5 진실 #1 server cache)",
+      "react_router_v7": "✅ 7.13.0 ( 5 진실 #3 URL state)",
+      "axe_core": "❌ 부재 ( Phase 6 a11y 검증 시 npm install 의무)",
+      "playwright": "❌ 부재 ( Phase 5-2-c visual 검증 시 npm install 의무)",
+      "ts_morph": "❌ 부재 ( Phase 6 type-spec 검증 시 npm install 의무)",
+      "scxml_xstate": "❌ 부재 ( state-map 수동 모델링)",
+      "icu_messageformat": "❌ 부재 ( i18n 부재 — deliverable 11 N/A 가능성)",
       "wcag_wai_aria": "△ eslint-plugin-jsx-a11y (a11y lint only)",
       "dtcg_design_tokens": "❌ 부재",
       "storybook_csf": "❌ 부재"
     },
     "non_adr_fe_005_pattern": {
-      "react_router_v7_form_action": "✅ ★ 신규 패턴 (login.ui.tsx <Form method=POST> + actions/*.action.ts)",
-      "html5_native_validation": "✅ ★ form-validation fallback 4 (required / type=email / autoComplete)",
-      "feature_sliced_design": "✅ ★ ADR-FE-001 §FSD 100% 정합 (3 layer 약식)",
-      "zod_from_openapi": "✅ ★★★ orval generate 패턴 — OpenAPI 3.0.1 → Zod schema 자동 (★ ADR-FE-005 매개체 #4 + #13 통합)"
+      "react_router_v7_form_action": "✅  신규 패턴 (login.ui.tsx <Form method=POST> + actions/*.action.ts)",
+      "html5_native_validation": "✅  form-validation fallback 4 (required / type=email / autoComplete)",
+      "feature_sliced_design": "✅  ADR-FE-001 §FSD 100% 정합 (3 layer 약식)",
+      "zod_from_openapi": "✅  orval generate 패턴 — OpenAPI 3.0.1 → Zod schema 자동 ( ADR-FE-005 매개체 #4 + #13 통합)"
     }
   },
   "scope_boundaries": {
@@ -81,9 +81,9 @@
       "jest.config.js"
     ],
     "out_of_scope_reason": {
-      "generated": "★ .gitignore (clone 시 부재) — openapi.yaml + orval.config.ts 직접 분석으로 대체",
+      "generated": " .gitignore (clone 시 부재) — openapi.yaml + orval.config.ts 직접 분석으로 대체",
       "node_modules": "표준",
-      "test": "★ Stage 5 carry"
+      "test": " Stage 5 carry"
     }
   },
   "stats": {
@@ -100,9 +100,9 @@
     "routes_count": 9
   },
   "scenario_classification": {
-    "be_fe_separation": "Scenario A (★ 분리 default — frontend only / backend = api.realworld.io 외부)",
+    "be_fe_separation": "Scenario A ( 분리 default — frontend only / backend = api.realworld.io 외부)",
     "adr_fe_004_match": "✅ Scenario A 정합 — Stage 6 적용 검증",
-    "legacy_tier": "Tier 1 (★ Modern SPA — React 19 / TS / FSD)",
+    "legacy_tier": "Tier 1 ( Modern SPA — React 19 / TS / FSD)",
     "adr_fe_001_match": "✅ Tier 1 정합 — ADR-FE-001 §spectrum"
   }
 }

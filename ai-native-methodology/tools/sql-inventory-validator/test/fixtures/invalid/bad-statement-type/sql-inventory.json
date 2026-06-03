@@ -1,5 +1,5 @@
 {
-  "$comment": "★ invalid fixture — statement_type enum 외 값",
+  "$comment": "invalid fixture — statement_type enum 외 값",
   "meta_confidence": {
     "generated_at": "2026-05-08T00:00:00Z",
     "confidence": 0.85,
@@ -16,7 +16,7 @@
       "sql_id": "FooDAO.select",
       "mapper_xml": "source/sqlmap/foo.xml",
       "statement_type": "BATCH",
-      "business_meaning": "★ 잘못된 statement_type",
+      "business_meaning": "잘못된 statement_type",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent",
       "confidence": 0.80

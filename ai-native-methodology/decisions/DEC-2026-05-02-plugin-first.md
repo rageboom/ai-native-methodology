@@ -10,24 +10,24 @@
 
 ### 핵심 결단 14건 압축
 
-| # | 핵심 결단 | 사유 |
-|---|---|---|
-| 1차 | 초안 zip+npm hybrid | (사용자 거절) |
-| 2차 | plugin-first hybrid | "프로젝트 그대로 다운로드 vs plugin?" 사용자 질문 → Claude Code plugin 시스템 정합 확인 |
-| 3차 | 8가지 사내 risk 정직 평가 | InfoSec / GHE 인증 / Node 의존 / 버전 drift 등 검증 |
-| 4차 | 축 1 (사내 인프라) + 축 2 (현재 프로젝트) 분리 / GHE 풀어쓰기 | "어떤 것 필요 vs 현재 프로젝트 문제 구분" |
-| 5차 | Phase × Track 분기 (BE/FE/DB) + description 자동 발동 | "FE/BE/DB 따른 구분 자연스러운가?" |
-| **6차** | **본체 = plugin source / adoption/dist = artifact (sync 부담 0)** | "분리, sync 를 왜 해야 하나?" |
-| **7차** | **Track 별 plugin 분리 거절 / 단일 plugin 확정** | "plugin 을 나누는게 좋은건가?" — 7대 산출물 통합 가치 / 풀스택 부자연 |
-| **8차** | **lifecycle stage organize (`_base/` + `analysis/` 채움 + 4 stage placeholder)** | 미래 lifecycle 확장 비전 보존 (기획→분석→설계→테스트→구현) |
-| 9차 | Runtime G1~G6 gap 식별 | stage 별 자동 동작 보장 메커니즘 |
-| 10차 | 옵션 4 (G1~G6 v2.0 carry) | (11차로 부분 수정) |
-| **11차** | **G3/G4/G5/G6 v1.3.x 자연 포함 (본체 자산 재조합) / G1+G2 만 v2.0 carry** | "이미 만들어진 것들 있지 않나?" — 진짜 신규 작업 G1/G2 ~2일뿐 |
-| **12차** | **self-iteration first (Phase A 무기한) → 사내 배포는 후 (Phase B)** | 사용자 모드 = 본인이 돌려보며 다듬음 / 4원칙 §4 정합 |
-| 13차 | plan 정체성 재확인 | "사내 배포용 SDLC plugin 만드는 작업 맞지?" 사용자 의도 오독 철회 |
-| **14차** | **워크스페이스 = 본체 / 결과물 = adoption/dist 명확화** | "ai-native-methodology = 워크스페이스, adoption = 결과물 보관소" 사용자 핵심 정의 |
+| #        | 핵심 결단                                                                        | 사유                                                                                    |
+| -------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 1차      | 초안 zip+npm hybrid                                                              | (사용자 거절)                                                                           |
+| 2차      | plugin-first hybrid                                                              | "프로젝트 그대로 다운로드 vs plugin?" 사용자 질문 → Claude Code plugin 시스템 정합 확인 |
+| 3차      | 8가지 사내 risk 정직 평가                                                        | InfoSec / GHE 인증 / Node 의존 / 버전 drift 등 검증                                     |
+| 4차      | 축 1 (사내 인프라) + 축 2 (현재 프로젝트) 분리 / GHE 풀어쓰기                    | "어떤 것 필요 vs 현재 프로젝트 문제 구분"                                               |
+| 5차      | Phase × Track 분기 (BE/FE/DB) + description 자동 발동                            | "FE/BE/DB 따른 구분 자연스러운가?"                                                      |
+| **6차**  | **본체 = plugin source / adoption/dist = artifact (sync 부담 0)**                | "분리, sync 를 왜 해야 하나?"                                                           |
+| **7차**  | **Track 별 plugin 분리 거절 / 단일 plugin 확정**                                 | "plugin 을 나누는게 좋은건가?" — 7대 산출물 통합 가치 / 풀스택 부자연                   |
+| **8차**  | **lifecycle stage organize (`_base/` + `analysis/` 채움 + 4 stage placeholder)** | 미래 lifecycle 확장 비전 보존 (기획→분석→설계→테스트→구현)                              |
+| 9차      | Runtime G1~G6 gap 식별                                                           | stage 별 자동 동작 보장 메커니즘                                                        |
+| 10차     | 옵션 4 (G1~G6 v2.0 carry)                                                        | (11차로 부분 수정)                                                                      |
+| **11차** | **G3/G4/G5/G6 v1.3.x 자연 포함 (본체 자산 재조합) / G1+G2 만 v2.0 carry**        | "이미 만들어진 것들 있지 않나?" — 진짜 신규 작업 G1/G2 ~2일뿐                           |
+| **12차** | **self-iteration first (Phase A 무기한) → 사내 배포는 후 (Phase B)**             | 사용자 모드 = 본인이 돌려보며 다듬음 / 4원칙 §4 정합                                    |
+| 13차     | plan 정체성 재확인                                                               | "사내 배포용 SDLC plugin 만드는 작업 맞지?" 사용자 의도 오독 철회                       |
+| **14차** | **워크스페이스 = 본체 / 결과물 = adoption/dist 명확화**                          | "ai-native-methodology = 워크스페이스, adoption = 결과물 보관소" 사용자 핵심 정의       |
 
-## 작업 위치 정의 (★★★ 14차 핵심)
+## 작업 위치 정의 ( 14차 핵심)
 
 - **`ai-native-methodology/` (본체)** = 워크스페이스 (지속 진화 — v1.3.x → v1.4.x → ...). Phase A 작업 위치.
 - **`ai-native-methodology-adoption/`** = 결과물 보관소 (사내 배포 위해 넣을 것들). adoption/dist/internal-v1.X/ = plugin artifact.
@@ -41,7 +41,7 @@
 - `agents/_base/` 3종 (senior-engineer / official-docs-checker / industry-case-researcher)
 - `agents/{analysis,planning,design,test,implement}/README.md` placeholder 5종
 - `skills/_base/` 메타 3종 (apply-template / log-finding / apply-baseline-ratchet)
-- `skills/analysis/` 18종 (Phase 0~6 + Phase 5 BE/FE/DB 분기 + aspect-* 4종)
+- `skills/analysis/` 18종 (Phase 0~6 + Phase 5 BE/FE/DB 분기 + aspect-\* 4종)
 - `skills/{planning,design,test,implement}/README.md` placeholder 4종
 - `hooks/hooks.json` — SessionStart + PostToolUse Write/Edit
 - `methodology-spec/lifecycle-contract.md` — 단계 간 산출물 인터페이스
@@ -75,6 +75,6 @@
 - `feedback_work_principles.md` (4원칙)
 - `project_methodology_scope.md` (한 방향 추출기)
 - `feedback_no_static_tool_simulation.md` (no-simulation)
-- `project_adoption_workspace.md` (★ 갱신 필요 — 14차 결단 반영)
+- `project_adoption_workspace.md` ( 갱신 필요 — 14차 결단 반영)
 - `project_v140_fe_track.md` (v1.4.0 release 반영)
-- `project_plugin_first_distribution.md` (★ 신규 — 본 결단)
+- `project_plugin_first_distribution.md` ( 신규 — 본 결단)

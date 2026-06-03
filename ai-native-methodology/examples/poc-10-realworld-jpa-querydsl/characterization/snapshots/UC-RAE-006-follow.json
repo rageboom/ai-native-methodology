@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RAE-006 Follow (★ uniqueness check).",
+  "$comment": " phase 4.7 snapshot — UC-RAE-006 Follow ( uniqueness check).",
   "snapshot_id": "SNAP-UC-RAE-006",
   "use_case": "UC-RAE-006",
   "endpoint": "POST /profiles/{username}/follow",

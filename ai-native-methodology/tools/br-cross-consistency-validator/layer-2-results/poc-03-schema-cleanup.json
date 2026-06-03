@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 18,
   "poc_id": "poc-03-realworld-nestjs",
-  "$comment": "★ ★ ★ session 23차 Sprint 1-J / ★ pre-pre-prerequisite 발견 sub-sprint (Sprint 1-I 진입 중 PoC #03 INVALID 76 errors 발견 — LL-phase2-prereq-01 재현). BR ID 는 이미 4토막 valid (rename ❌). 의미 변경 ❌ / provenance 보존. title 합성 = Sonnet 4.6 sub-agent / batch / 6초.",
+  "$comment": "session 23차 Sprint 1-J / pre-pre-prerequisite 발견 sub-sprint (Sprint 1-I 진입 중 PoC #03 INVALID 76 errors 발견 — LL-phase2-prereq-01 재현). BR ID 는 이미 4토막 valid (rename ❌). 의미 변경 ❌ / provenance 보존. title 합성 = Sonnet 4.6 sub-agent / batch / 6초.",
   "transformation": {
     "meta_standardized": {
       "honesty_disclosures→warnings": "array of string 정합 이동",

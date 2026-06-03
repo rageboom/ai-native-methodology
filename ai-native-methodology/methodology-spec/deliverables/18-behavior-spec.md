@@ -1,4 +1,4 @@
-# 산출물 #18: Behavior Spec (★ v2.0 chain 2)
+# 산출물 #18: Behavior Spec (v2.0 chain 2)
 
 > **사상**: ADR-CHAIN-001 §1 / ADR-011 (json 단독 SSOT / ADR-008 이중 렌더링 supersede) / ADR-009 v2 §2.5 (spec trust 0.88)
 > **schema**: `schemas/behavior-spec.schema.json`
@@ -17,58 +17,58 @@
 
 ```
 .aimd/output/chain-2-spec/
-├── behavior-spec.json   # ★ json 단독 SSOT (ADR-011)
+├── behavior-spec.json   # json 단독 SSOT (ADR-011)
 └── _manifest.yml
 ```
 
 ## 3. 추출 범위
 
-| 항목 | 출처 | 도구 | 신뢰도 |
-|---|---|---|---|
-| behaviors (BHV-*) | discovery-spec UC-* + analysis `formal-spec` phase | 결정적 + LLM | 85% |
-| preconditions / postconditions / invariants | `formal-spec` phase 산출물 | 결정적 | 95% |
-| state_transition / decision_table / sequence ref | `formal-spec` phase 산출물 경로 | 결정적 | 100% |
-| property_tests stub | LLM + framework_status | LLM with grounding | 75% |
-| acceptance_criteria_refs | chain 2 forward link | chain-coverage-validator | 100% |
+| 항목                                             | 출처                                                | 도구                     | 신뢰도 |
+| ------------------------------------------------ | --------------------------------------------------- | ------------------------ | ------ |
+| behaviors (BHV-\*)                               | discovery-spec UC-\* + analysis `formal-spec` phase | 결정적 + LLM             | 85%    |
+| preconditions / postconditions / invariants      | `formal-spec` phase 산출물                          | 결정적                   | 95%    |
+| state_transition / decision_table / sequence ref | `formal-spec` phase 산출물 경로                     | 결정적                   | 100%   |
+| property_tests stub                              | LLM + framework_status                              | LLM with grounding       | 75%    |
+| acceptance_criteria_refs                         | chain 2 forward link                                | chain-coverage-validator | 100%   |
 
-**입력**: discovery-spec.json + analysis stage 1~16 산출물 (★ "현 7대 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
+**입력**: discovery-spec.json + analysis stage 1~16 산출물 ("현 7대 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
 
 ## 4. 검증 도구
 
-| 도구 | 검증 |
-|---|---|
-| **chain-coverage-validator** (★ sub-plan-3) | UC→BHV 1:N + BHV→AC 1:N + 7대 cross-link |
-| drift-validator (★ chain 모드 확장) | state-machine + sequence drift |
-| decision-table-validator | DMN 5-check |
-| formal-spec-link-validator (chain 모드) | planning ↔ behavior cross-link |
-| schema-validator | behavior-spec.schema.json |
+| 도구                                      | 검증                                     |
+| ----------------------------------------- | ---------------------------------------- |
+| **chain-coverage-validator** (sub-plan-3) | UC→BHV 1:N + BHV→AC 1:N + 7대 cross-link |
+| drift-validator (chain 모드 확장)         | state-machine + sequence drift           |
+| decision-table-validator                  | DMN 5-check                              |
+| formal-spec-link-validator (chain 모드)   | planning ↔ behavior cross-link           |
+| schema-validator                          | behavior-spec.schema.json                |
 
 ## 5. 예시
 
 ```yaml
 behaviors:
   - id: BHV-USER-001
-    name: "User signup with unique email"
+    name: 'User signup with unique email'
     use_case_refs: [UC-USER-001]
     br_refs: [BR-USER-EMAIL-001]
     preconditions:
-      - "email format valid (RFC 5322)"
-      - "email NOT IN users.email"
+      - 'email format valid (RFC 5322)'
+      - 'email NOT IN users.email'
     postconditions:
-      - "user.id assigned"
-      - "user.status = ACTIVE"
+      - 'user.id assigned'
+      - 'user.status = ACTIVE'
     invariants:
-      - "user.email is unique"
-    state_transition_ref: ".aimd/output/formal-spec/state-machines/user-signup.json"
-    decision_table_ref: ".aimd/output/formal-spec/decision-tables/user-signup.json"
+      - 'user.email is unique'
+    state_transition_ref: '.aimd/output/formal-spec/state-machines/user-signup.json'
+    decision_table_ref: '.aimd/output/formal-spec/decision-tables/user-signup.json'
     property_tests:
-      - property: "email always unique after signup"
+      - property: 'email always unique after signup'
         framework: fast-check
         framework_status: active
-        arbitrary_stub: "fc.string().filter(isValidEmail)"
+        arbitrary_stub: 'fc.string().filter(isValidEmail)'
     acceptance_criteria_refs: [AC-USER-001, AC-USER-002]
     source_grounded_evidence:
-      - "src/user/UserService.java:30-60"
+      - 'src/user/UserService.java:30-60'
 cross_links:
   to_analysis_artifacts:
     - .aimd/output/business-rules.json
@@ -79,6 +79,6 @@ cross_links:
 
 ## 6. carry
 
-| # | 항목 | 시점 |
-|---|---|---|
+| #      | 항목                                  | 시점 |
+| ------ | ------------------------------------- | ---- |
 | sp2-c2 | acceptance-criteria ICU MF2 i18n 통합 | v2.x |

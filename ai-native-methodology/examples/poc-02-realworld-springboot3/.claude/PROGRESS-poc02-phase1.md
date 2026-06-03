@@ -7,13 +7,15 @@
 ## T+0 (2026-04-29) — Phase 1 진입 + 1원칙 plan 작성 ✅
 
 ### 진입 컨텍스트
-- Phase 0 ✅ 종료 (raw confidence 0.95 예상치 / source-info.md + inputs/_manifest.yml + PROGRESS-poc02-phase0.md)
+
+- Phase 0 ✅ 종료 (raw confidence 0.95 예상치 / source-info.md + inputs/\_manifest.yml + PROGRESS-poc02-phase0.md)
 - 분석 대상: `1chz/realworld-java21-springboot3` (HEAD `93e018e`, 2025-09-19)
 - Auto Mode 활성 (윤주스 명시) → 4원칙 사이클 자율 진행
 
 ### 1원칙 — plan-phase1-poc02.md 작성
 
 전수 조사 완료:
+
 - ✅ phase-1-init.md (256 줄)
 - ✅ schemas/inventory.schema.json + meta-confidence.schema.json
 - ✅ PoC #1 plan-phase1.md (참조)
@@ -25,6 +27,7 @@
   - api-docs/ ground truth (openapi.yaml + Postman + run-api-tests.sh)
 
 산출:
+
 - ✅ `.claude/plans/plan-phase1-poc02.md` (~390 줄)
 - 핵심 결정: 11가지 차이 변수 / Hexagonal 가설 / finding PF-001~004 사전 후보
 
@@ -53,11 +56,11 @@
 
 ### 3 sub-agent (백그라운드 실행)
 
-| Agent | prompt 핵심 | 산출 |
-|---|---|---|
+| Agent               | prompt 핵심                                                                                                                                              | 산출                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | Document Researcher | 공식 docs / RFC / 표준 spec — Phase 1 명세 §3.2 fit / 모듈 패턴 / OAuth2 RS / Jakarta / Specifications / Cache / p6spy + PoC #1 finding cross-validation | `.claude/researches/document-phase1-poc02.md` (~433 줄) |
-| Case Researcher | Netflix / 우형 / 카카오 / Tech Radar / 한국 multi-module 사례 / Specifications vs QueryDSL / p6spy 운영 | `.claude/researches/case-phase1-poc02.md` (~528 줄) |
-| Senior BE Engineer | 함정 / 실패 패턴 / Architecture 정체성 평가 / multi-module 함정 / JWT 비대칭 키 함정 / Phase 1 명세 fit | `.claude/researches/senior-phase1-poc02.md` (~674 줄) |
+| Case Researcher     | Netflix / 우형 / 카카오 / Tech Radar / 한국 multi-module 사례 / Specifications vs QueryDSL / p6spy 운영                                                  | `.claude/researches/case-phase1-poc02.md` (~528 줄)     |
+| Senior BE Engineer  | 함정 / 실패 패턴 / Architecture 정체성 평가 / multi-module 함정 / JWT 비대칭 키 함정 / Phase 1 명세 fit                                                  | `.claude/researches/senior-phase1-poc02.md` (~674 줄)   |
 
 각 prompt 에 메인 사전 fetch raw data 를 포함 (F-015 cross-check 의무).
 
@@ -66,17 +69,18 @@
 ## T+3 (2026-04-29) — sub-agent 결과 + research 통합
 
 ### 산출
+
 - Document: F-015 cross-check 5/5 정합. 명세 §3.2 fit ~70%. 신규 finding 2건 (PF-001/002 high) 권고.
 - Case: 글로벌/한국 Hexagonal 정합도 95%+. PoC #1 AP-SECURITY-001 비재현 → variant 격상. PF-005~007 신규.
-- Senior: ★ **메인 사전 fetch 단언 정정** — 루트 subprojects 블록 + UserService @Service + User @Entity 실측. architecture_style_candidates Pure Hexagonal 단정 회피 → "Modular Monolith with Ports & Adapters Naming" hybrid (cap 0.65). 신규 finding 7건 + Phase 6 candidate 9건.
+- Senior: **메인 사전 fetch 단언 정정** — 루트 subprojects 블록 + UserService @Service + User @Entity 실측. architecture_style_candidates Pure Hexagonal 단정 회피 → "Modular Monolith with Ports & Adapters Naming" hybrid (cap 0.65). 신규 finding 7건 + Phase 6 candidate 9건.
 
 ### 충돌 해소 (메인 결정)
 
-| 충돌 | 해소 |
-|---|---|
-| Architecture 분류 | **Senior 결정 채택** (Pure Hexagonal 단정 회피, hybrid cap 0.65) |
-| core Spring 의존성 | **Senior 정정 채택** (실측 우선) |
-| Specifications 분류 | **Case PF-006 medium 채택** (한국 사례 권위) |
+| 충돌                | 해소                                                             |
+| ------------------- | ---------------------------------------------------------------- |
+| Architecture 분류   | **Senior 결정 채택** (Pure Hexagonal 단정 회피, hybrid cap 0.65) |
+| core Spring 의존성  | **Senior 정정 채택** (실측 우선)                                 |
+| Specifications 분류 | **Case PF-006 medium 채택** (한국 사례 권위)                     |
 
 ### research-phase1-poc02.md 통합 ✅
 
@@ -92,13 +96,13 @@
 
 Auto Mode → 5 핵심 결정 일괄 자율 적용:
 
-| 결정 | 채택 |
-|---|---|
-| Architecture 분류 = Modular Monolith hybrid (cap 0.65) | ✅ |
-| 메인 사전 fetch 정정 채택 (F-044 등록) | ✅ |
-| PoC #1 finding 외부 검증 분류 | ✅ |
-| 신규 finding 6건 정식 등록 (F-042~F-047) | ✅ |
-| inventory.json 표현 확장 (modules / orm.secondary / candidates.caveats) | ✅ |
+| 결정                                                                    | 채택 |
+| ----------------------------------------------------------------------- | ---- |
+| Architecture 분류 = Modular Monolith hybrid (cap 0.65)                  | ✅   |
+| 메인 사전 fetch 정정 채택 (F-044 등록)                                  | ✅   |
+| PoC #1 finding 외부 검증 분류                                           | ✅   |
+| 신규 finding 6건 정식 등록 (F-042~F-047)                                | ✅   |
+| inventory.json 표현 확장 (modules / orm.secondary / candidates.caveats) | ✅   |
 
 → 4단계 진입.
 
@@ -123,6 +127,7 @@ grep -nE "(@Service|@Entity|@Column|@Table|@Id|jakarta\.|javax\.)" module/core/s
 ```
 
 결과:
+
 - UserService.java: `import org.springframework.stereotype.Service;` + `@Service` ✅
 - User.java: `import jakarta.persistence.{Column,Entity,GeneratedValue,GenerationType,Id,Table};` + `@Entity` + `@Table(name="users")` + `@Column` ✅
 
@@ -130,13 +135,13 @@ grep -nE "(@Service|@Entity|@Column|@Table|@Id|jakarta\.|javax\.)" module/core/s
 
 ### output/inventory/ 5종 작성 ✅
 
-| 파일 | 분량 | 핵심 |
-|---|---|---|
-| `inventory.json` | ~270 줄 | schema 정합 + repo.modules[] + stack.backend.orm.{primary,secondary} + architecture_style_candidates.caveats[] + meta.warnings + human_review_required |
-| `tree.md` | ~210 줄 | 최상위 / 3 모듈 / 통계 요약 / PoC #1 비교 표 |
-| `stats.json` | ~90 줄 | 모듈별 + source set 별 + 확장자별 + non-Java assets + PoC #1 비교 |
+| 파일                 | 분량    | 핵심                                                                                                                                                    |
+| -------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inventory.json`     | ~270 줄 | schema 정합 + repo.modules[] + stack.backend.orm.{primary,secondary} + architecture_style_candidates.caveats[] + meta.warnings + human_review_required  |
+| `tree.md`            | ~210 줄 | 최상위 / 3 모듈 / 통계 요약 / PoC #1 비교 표                                                                                                            |
+| `stats.json`         | ~90 줄  | 모듈별 + source set 별 + 확장자별 + non-Java assets + PoC #1 비교                                                                                       |
 | `stack-detection.md` | ~210 줄 | 한 줄 요약 + 기술 스택 표 + ORM 4단서 점검 + 인증/JWT + 모듈 구조 그래프 + Architecture 분류 + 분석 우선순위 + ground truth + PoC #1 비교 + 신뢰도 자평 |
-| `_manifest.yml` | ~200 줄 | 신뢰도 산정 (raw 0.95 → weighted_avg 0.93) + 5 핵심 결정 + KPI + 한계 + 6 finding + 다음 단계 |
+| `_manifest.yml`      | ~200 줄 | 신뢰도 산정 (raw 0.95 → weighted_avg 0.93) + 5 핵심 결정 + KPI + 한계 + 6 finding + 다음 단계                                                           |
 
 ---
 
@@ -145,17 +150,18 @@ grep -nE "(@Service|@Entity|@Column|@Table|@Id|jakarta\.|javax\.)" module/core/s
 ### findings/poc-findings.md 신규 작성
 
 `examples/poc-02-realworld-springboot3/findings/poc-findings.md` 작성:
+
 - F-042 (high / promoted / 묶음 H 신규)
 - F-043 (medium / promoted / 묶음 H)
-- F-044 (medium / promoted / 묶음 A 보강 ★)
+- F-044 (medium / promoted / 묶음 A 보강 )
 - F-045 / F-046 / F-047 (low / deferred)
 - PoC #1 finding 33건 외부 검증 분류
 
 ### 누적 통계 갱신
 
 ```yaml
-cumulative_total: 39  # PoC #1 33 + PoC #2 6
-v120_bundles: 8  # +1 (H 신규)
+cumulative_total: 39 # PoC #1 33 + PoC #2 6
+v120_bundles: 8 # +1 (H 신규)
 ```
 
 ---
@@ -177,7 +183,7 @@ raw confidence: 0.93
 - ✅ **finding 6건 정식 등록** (목표 5~15 건강 범위 정합)
 - ✅ schema 검증 통과 (v1.1.2 inventory.schema.json)
 - ✅ 5 핵심 결정 (DEC-PHASE1-POC02-001~005) — Senior 권고 일괄 적용
-- ✅ F-015 메인 정정 케이스 ★ — v1.2.0 묶음 A 강한 외부 검증 데이터 확보
+- ✅ F-015 메인 정정 케이스 — v1.2.0 묶음 A 강한 외부 검증 데이터 확보
 - ✅ multi-module 환경 검증 데이터 확보 (PF-001 → F-042 묶음 H 신규)
 - ⭐ Phase 1 부가가치 — PoC #1 finding 4건 (Phase 1 영역) 외부 검증 완료 + Phase 2~6 영역 9건 시그널 분류
 

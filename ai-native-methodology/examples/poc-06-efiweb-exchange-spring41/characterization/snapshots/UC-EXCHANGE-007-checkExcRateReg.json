@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-007 checkExcRateReg (특정 통화·월의 환율 등록 여부 확인). cnt == 2 면 'Y' / else 'N'.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-007 checkExcRateReg (특정 통화·월의 환율 등록 여부 확인). cnt == 2 면 'Y' / else 'N'.",
   "snapshot_id": "SNAP-UC-EXCHANGE-007",
   "use_case": "UC-EXCHANGE-007",
   "endpoint": "GET /ifrs/exchange/checkExcRateReg",
@@ -50,7 +50,7 @@
     },
     {
       "id": "SCN-007-003",
-      "name": "★ likely bug — 환율 0 등록",
+      "name": "likely bug — 환율 0 등록",
       "given": {
         "request_params": { "currCd": "USD", "year": "2025", "month": "01" },
         "TB_EXCHANGE_state": [
@@ -70,7 +70,7 @@
       ],
       "behavior_to_preserve": "0 환율 = 미등록 (UI 가 빈 input 을 0 으로 INSERT 하면 등록 미완 신호)",
       "behavior_likely_bug": [
-        "★ EXC_RATE = NULL (LEFT JOIN 미등록) 와 EXC_RATE = 0 (등록 후 0) 동치 처리 — 의도 vs 우연한 정합 ❌ 명시 부재 / 새 시스템에서 명시화 필요"
+        "EXC_RATE = NULL (LEFT JOIN 미등록) 와 EXC_RATE = 0 (등록 후 0) 동치 처리 — 의도 vs 우연한 정합 ❌ 명시 부재 / 새 시스템에서 명시화 필요"
       ]
     },
     {
@@ -79,17 +79,17 @@
       "given": { "request_params": { "currCd": "USD", "year": "2025", "month": "13" } },
       "when": "(동일)",
       "then": {
-        "sql_inner_select": "★ CASE WHEN 모든 분기 미해당 → EXC_RATE = NULL",
+        "sql_inner_select": "CASE WHEN 모든 분기 미해당 → EXC_RATE = NULL",
         "sql_outer_count": 0,
         "expected_response": { "excRateReg": "N" }
       },
-      "behavior_to_preserve": "(★ 검증 부재 — month=13 도 'N' 으로 그냥 통과 / 새 시스템에서 month 1~12 검증 의무)",
+      "behavior_to_preserve": "(검증 부재 — month=13 도 'N' 으로 그냥 통과 / 새 시스템에서 month 1~12 검증 의무)",
       "intent_classification": [{ "rule": "(검증 부재)", "type": "bug" }]
     }
   ],
   "intent_vs_bug_summary": {
     "intent": ["BR-EXCHANGE-COMPLETE-002 (E + A 모두 등록 의무)", "EXC_RATE != 0 = 미등록 동치"],
-    "bug": ["NULL vs 0 동치 처리 명시 부재", "month 1~12 검증 부재", "★ AP-EXCHANGE-007 자조 코멘트 자체 — '환율관리 페이지만 생각하고 설계한 폐해' 자체 인지"],
+    "bug": ["NULL vs 0 동치 처리 명시 부재", "month 1~12 검증 부재", "AP-EXCHANGE-007 자조 코멘트 자체 — '환율관리 페이지만 생각하고 설계한 폐해' 자체 인지"],
     "ambiguous": []
   },
   "phase_4_7_coverage_contribution": {

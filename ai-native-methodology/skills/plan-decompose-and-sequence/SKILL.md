@@ -1,12 +1,12 @@
 ---
 name: plan-decompose-and-sequence
-description: ★ ★ v9.x MINOR chain 3 (plan) sub-skill. behavior-spec.behaviors[] + acceptance-criteria.criteria[] 입력에서 task 분해 + 의존성 그래프 + 실행 순서 추출. task granularity = 1~3 AC 묶음 (같은 BHV + 같은 layer + 같은 module 강제). plan-agent 가 호출. DEC-2026-05-25-axis-a-phase-4-1 정합.
+description: v9.x MINOR chain 3 (plan) sub-skill. behavior-spec.behaviors[] + acceptance-criteria.criteria[] 입력에서 task 분해 + 의존성 그래프 + 실행 순서 추출. task granularity = 1~3 AC 묶음 (같은 BHV + 같은 layer + 같은 module 강제). plan-agent 가 호출. DEC-2026-05-25-axis-a-phase-4-1 정합.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
 # plan-decompose-and-sequence
 
-★ ★ v9.x chain 3 (plan) 의 **task 분해 sub-skill**. spec(BHV/AC) → task-plan.tasks[] + dependencies[] + execution_order[].
+v9.x chain 3 (plan) 의 **task 분해 sub-skill**. spec(BHV/AC) → task-plan.tasks[] + dependencies[] + execution_order[].
 
 ## 언제 사용
 
@@ -16,62 +16,64 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 입력
 
-- `<project>/.aimd/output/behavior-spec.json` (★ chain 2 산출 / BHV-*)
-- `<project>/.aimd/output/acceptance-criteria.json` (★ chain 2 산출 / AC-*)
-- `<project>/.aimd/output/discovery-spec.json` (★ chain 1 산출 / UC + intent context — cross-validation)
+- `<project>/.aimd/output/behavior-spec.json` (chain 2 산출 / BHV-\*)
+- `<project>/.aimd/output/acceptance-criteria.json` (chain 2 산출 / AC-\*)
+- `<project>/.aimd/output/discovery-spec.json` (chain 1 산출 / UC + intent context — cross-validation)
 
 ## 산출
 
-- `<project>/.aimd/output/task-plan.json` (★ schemas/task-plan.schema.json 의무 / tasks[] + dependencies[] + execution_order field)
+- `<project>/.aimd/output/task-plan.json` (schemas/task-plan.schema.json 의무 / tasks[] + dependencies[] + execution_order field)
 
-## ★ ★ task granularity 강제 (1~3 AC 묶음)
+## task granularity 강제 (1~3 AC 묶음)
 
 DEC-2026-05-21 §정책4 — task 안 ac_refs.length 1~3 imperative:
-- 같은 BHV-* 안 AC 들만 묶음 (cross-BHV ❌)
-- 같은 layer (★ v11.0.0 — tech-track 5종 `be` / `fe` / `db` / `e2e` / `infra` 권장 / hexagonal 5종 `domain` / `application` / `infrastructure` / `presentation` / `cross-cutting` = legacy carry) 안 묶음 (cross-layer ❌)
+
+- 같은 BHV-\* 안 AC 들만 묶음 (cross-BHV ❌)
+- 같은 layer (v11.0.0 — tech-track 5종 `be` / `fe` / `db` / `e2e` / `infra` 권장 / hexagonal 5종 `domain` / `application` / `infrastructure` / `presentation` / `cross-cutting` = legacy carry) 안 묶음 (cross-layer ❌)
 - 같은 module 안 묶음 (cross-module ❌)
 - 4+ AC = `plan-coverage-validator validateTaskGranularity` warn (medium / `--strict` 시 high)
 
-## ★ v11.0.0 Epic/Story/OP-*/TASK-* 4-level cascade (DEC-2026-05-26-ticket-plan-단일 §3 + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6)
+## v11.0.0 Epic/Story/OP-_/TASK-_ 4-level cascade (DEC-2026-05-26-ticket-plan-단일 §3 + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6)
 
 본 skill 안 task-plan.json 산출 시 4-level matrix 본격:
 
-| Jira | 본 방법론 entity | 정의 | 본 skill 책임 |
-|---|---|---|---|
-| **Epic** | task-plan.epic_refs[] | ★ FE 화면 단위 (UI screen / route) | screen_id / route 추출 + jira_id placeholder |
-| **Story** | task-plan.story_refs[] | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id placeholder |
-| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | ★ OP-* (운영/인프라/마이그레이션 / BE only) | OP-* 검출 + jira_id placeholder |
-| **Sub-task** | task-plan.tasks[] | TASK-* (1~3 AC 묶음 / layer 분기) | 본 skill 의 주 산출 |
+| Jira                     | 본 방법론 entity                                             | 정의                                            | 본 skill 책임                                     |
+| ------------------------ | ------------------------------------------------------------ | ----------------------------------------------- | ------------------------------------------------- |
+| **Epic**                 | task-plan.epic_refs[]                                        | FE 화면 단위 (UI screen / route)                | screen_id / route 추출 + jira_id placeholder      |
+| **Story**                | task-plan.story_refs[]                                       | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id placeholder |
+| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | OP-\* (운영/인프라/마이그레이션 / BE only)      | OP-\* 검출 + jira_id placeholder                  |
+| **Sub-task**             | task-plan.tasks[]                                            | TASK-\* (1~3 AC 묶음 / layer 분기)              | 본 skill 의 주 산출                               |
 
-★ 본 skill = Sub-task (TASK-*) 본격 책임 + Epic/Story 식별 (jira_id 부여 ❌ — ticket-sync skill 책임).
+본 skill = Sub-task (TASK-\*) 본격 책임 + Epic/Story 식별 (jira_id 부여 ❌ — ticket-sync skill 책임).
 
-★ OP-* = 운영 작업 anchor (예: argon2 라이브러리 도입 / column migration / cron job) — 본 skill 안 별도 검출 (AC 부재 + 사용자 가시 없음 — analysis 산출물 안 migration-cautions / static-security-spec 검출).
+OP-\* = 운영 작업 anchor (예: argon2 라이브러리 도입 / column migration / cron job) — 본 skill 안 별도 검출 (AC 부재 + 사용자 가시 없음 — analysis 산출물 안 migration-cautions / static-security-spec 검출).
 
-## ★ v11.0.0 layer 분기 본격 (DEC-2026-05-26-be-fe-산출물-분리 §1)
+## v11.0.0 layer 분기 본격 (DEC-2026-05-26-be-fe-산출물-분리 §1)
 
 본 skill 산출 task-plan.tasks[].layer 본격 부여:
 
-| layer | 산출 의무 추가 필드 |
-|---|---|
-| `be` | ★ `openapi_endpoint_ref` (path + operationId) 본격 required — DEC-2026-05-26-contract-강제-양-axis §1 layer 2 |
-| `fe` | ★ `component_ref` (package + name + state_map_ref + dtcg_token_set) 본격 required |
-| `db` | (선택 / schema migration ref carry) |
-| `e2e` | (선택 / e2e test target ref carry) |
-| `infra` | (선택) |
-| hexagonal 5종 | legacy carry / backward-compat |
+| layer         | 산출 의무 추가 필드                                                                                         |
+| ------------- | ----------------------------------------------------------------------------------------------------------- |
+| `be`          | `openapi_endpoint_ref` (path + operationId) 본격 required — DEC-2026-05-26-contract-강제-양-axis §1 layer 2 |
+| `fe`          | `component_ref` (package + name + state_map_ref + dtcg_token_set) 본격 required                             |
+| `db`          | (선택 / schema migration ref carry)                                                                         |
+| `e2e`         | (선택 / e2e test target ref carry)                                                                          |
+| `infra`       | (선택)                                                                                                      |
+| hexagonal 5종 | legacy carry / backward-compat                                                                              |
 
-★ schema-level if/then hard gate 본격 적용 (task-plan.schema.json allOf if/then). plan-coverage-validator validateBETaskOpenapiRef + validateFETaskComponentRef 가 추가 finding emit.
+schema-level if/then hard gate 본격 적용 (task-plan.schema.json allOf if/then). plan-coverage-validator validateBETaskOpenapiRef + validateFETaskComponentRef 가 추가 finding emit.
 
-## ★ ★ 의존성 graph (DAG)
+## 의존성 graph (DAG)
 
 task.dependencies[] = `["TASK-*"]` (topological order).
 
 implicit 의존 추론 source:
+
 - 같은 DB table 수정 → blocks
 - 같은 cache key / 같은 file 수정 → blocks
 - code_pointer 동일 range overlap → blocks
 
-> ★ **TASK code_pointers 정책** (F-DOGFOOD-009) — TASK 는 `code_pointers_na: true` 기본(의도 노드). 단 **수정 예정 코드 file/range 를 알면 `code_pointers` 를 채워라** — 위 implicit 의존 추론(range overlap → blocks)의 정확도가 올라간다. builder backstop 이 누락 시 na 로 보강하나, code_pointers 를 채우는 편이 dep-graph 활용 가치가 크다.
+> **TASK code_pointers 정책** (F-DOGFOOD-009) — TASK 는 `code_pointers_na: true` 기본(의도 노드). 단 **수정 예정 코드 file/range 를 알면 `code_pointers` 를 채워라** — 위 implicit 의존 추론(range overlap → blocks)의 정확도가 올라간다. builder backstop 이 누락 시 na 로 보강하나, code_pointers 를 채우는 편이 dep-graph 활용 가치가 크다.
 
 cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (gate #3 block 의무).
 
@@ -79,8 +81,8 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 
 1. **behavior-spec + acceptance-criteria 로드** — `behaviors[]` + `criteria[]` 파싱.
 
-2. **각 BHV-* 마다 task 묶음 후보 생성**:
-   - AC-* 들을 layer + module 별 sub-group 분류
+2. **각 BHV-\* 마다 task 묶음 후보 생성**:
+   - AC-\* 들을 layer + module 별 sub-group 분류
    - 같은 (BHV + layer + module) 안 1~3 AC 묶음 → 1 task 후보
    - 4+ AC 시 sub-group 재분해 또는 사용자 review
 
@@ -95,25 +97,27 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 6. **estimation_ai + estimation_human 분리 채움**:
    - estimation_ai = AI 추정 (S/M/L/XL 또는 hours)
    - estimation_human = 사람 명시 결단 영역 (placeholder 'TBD' 허용 / chain 3 종결 전 채움 의무)
-   - ★ AI hallucination/over-confidence risk 학술 근거 (ResearchGate 2026-01 'Confident but Incorrect: Mitigating Hallucination and Overconfidence in Agentic AI Coders') — 표준 외 신설 paradigm
+   - AI hallucination/over-confidence risk 학술 근거 (ResearchGate 2026-01 'Confident but Incorrect: Mitigating Hallucination and Overconfidence in Agentic AI Coders') — 표준 외 신설 paradigm
 
 7. **자동 검증**:
+
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
      --task-plan  .aimd/output/task-plan.json \
      --acceptance .aimd/output/acceptance-criteria.json
    ```
+
    exit 0 = ok / exit 1 = blocking findings (Senior BLOCKER-2 exit code contract).
 
 8. **plan-architect-decisions skill 호출** (ADR 자동 판정 trigger 검출 시).
 
 9. **plan-risk-and-nfr skill 호출** (risk + NFR allocation 채움).
 
-## ★ 70~80% 한계
+## 70~80% 한계
 
 원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
 
-자동 task 분해 ≥ 70% / 사용자 검토 ≤ 30%. 특히 dependency implicit 의존 추론 + estimation_human 은 ★ 사용자 명시 결단 의무.
+자동 task 분해 ≥ 70% / 사용자 검토 ≤ 30%. 특히 dependency implicit 의존 추론 + estimation_human 은 사용자 명시 결단 의무.
 
 ## 인용
 

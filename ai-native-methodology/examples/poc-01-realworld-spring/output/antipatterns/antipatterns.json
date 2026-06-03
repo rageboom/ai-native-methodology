@@ -16,7 +16,7 @@
       {"name": "postman_or_api_test", "value": 0.05, "reason": "doc/Conduit.postman_collection.json"},
       {"name": "diagrams_other", "value": 0.02, "reason": "drawio 3개"},
       {"name": "cross_phase_aggregation", "value": 0.03, "reason": "Phase 1~5 누적 검증 — Phase 6 부가"},
-      {"name": "document_case_alignment", "value": 0.02, "reason": "11/15 AP 외부 검증 통과 (Case 73% ★★★)"},
+      {"name": "document_case_alignment", "value": 0.02, "reason": "11/15 AP 외부 검증 통과 (Case 73% )"},
       {"name": "schema_compliance_100", "value": 0.01, "reason": "id pattern 정규화 매핑 표 명시"}
     ],
     "applied_penalties": [

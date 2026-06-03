@@ -8,18 +8,18 @@
 
 ## 1. 본 세션 작업 시퀀스
 
-| 단계 | 작업 | 산출 | 상태 |
-|---|---|---|---|
-| 0 | CLAUDE.md 슬림 + STATUS.md 분리 | 236→72줄 / decisions/STATUS.md 신규 | ✅ |
-| 1원칙 | plan-c-sprint-4.md | 5 핵심 결정 + 5.5h→8h 견적 | ✅ |
-| 2원칙 | 3 agent research (Document/테크기업/Senior) | research-c-sprint-4.md 6 수렴 항목 | ✅ |
-| 3원칙 | 6 결정 일괄 승인 | 사용자 "진행해줘" → all approve | ✅ |
-| Phase A | 환경 점검 + 사상 정합 | Node ✅ / Java/Semgrep/PMD ❌ | ✅ |
-| Phase B | drift-validator (state + sequence) | 6/6 test pass | ✅ |
-| Phase B' | decision-table-validator (dmn-check 5종) | 7/7 test pass | ✅ |
-| Phase C | static-runner + 차단 룰 + schema 갱신 | 4/4 test pass + 5종 물증 enforce | ✅ |
-| Phase D | PoC #02 자가 검증 + finding 등록 | 7+3 drift 검출 / 11 신규 finding (F-107~F-117) | ✅ |
-| Phase E | CI workflow + DEC + STATUS + INDEX + wrap-up | drift-check.yml 이중 모드 + 본 보고서 | ✅ |
+| 단계     | 작업                                         | 산출                                           | 상태 |
+| -------- | -------------------------------------------- | ---------------------------------------------- | ---- |
+| 0        | CLAUDE.md 슬림 + STATUS.md 분리              | 236→72줄 / decisions/STATUS.md 신규            | ✅   |
+| 1원칙    | plan-c-sprint-4.md                           | 5 핵심 결정 + 5.5h→8h 견적                     | ✅   |
+| 2원칙    | 3 agent research (Document/테크기업/Senior)  | research-c-sprint-4.md 6 수렴 항목             | ✅   |
+| 3원칙    | 6 결정 일괄 승인                             | 사용자 "진행해줘" → all approve                | ✅   |
+| Phase A  | 환경 점검 + 사상 정합                        | Node ✅ / Java/Semgrep/PMD ❌                  | ✅   |
+| Phase B  | drift-validator (state + sequence)           | 6/6 test pass                                  | ✅   |
+| Phase B' | decision-table-validator (dmn-check 5종)     | 7/7 test pass                                  | ✅   |
+| Phase C  | static-runner + 차단 룰 + schema 갱신        | 4/4 test pass + 5종 물증 enforce               | ✅   |
+| Phase D  | PoC #02 자가 검증 + finding 등록             | 7+3 drift 검출 / 11 신규 finding (F-107~F-117) | ✅   |
+| Phase E  | CI workflow + DEC + STATUS + INDEX + wrap-up | drift-check.yml 이중 모드 + 본 보고서          | ✅   |
 
 ---
 
@@ -29,11 +29,11 @@
 
 ```
 ai-native-methodology/tools/
-├── drift-validator/         ★ 6/6 test pass + corpus 4쌍 + spike 결과 기록
-├── decision-table-validator/ ★ 7/7 test pass + dmn-check 5종
-└── static-runner/           ★ 4/4 test pass + Plugin host + 5종 물증 + lint-no-simulation.sh
+├── drift-validator/          6/6 test pass + corpus 4쌍 + spike 결과 기록
+├── decision-table-validator/  7/7 test pass + dmn-check 5종
+└── static-runner/            4/4 test pass + Plugin host + 5종 물증 + lint-no-simulation.sh
 
-.github/workflows/drift-check.yml  ★ 이중 모드 (PR diff-aware + nightly full)
+.github/workflows/drift-check.yml   이중 모드 (PR diff-aware + nightly full)
 ```
 
 ### 갱신 파일
@@ -59,15 +59,15 @@ examples/poc-02-.../.claude/SESSION-WRAPUP-2026-04-30-sprint4.md (본 파일)
 
 ---
 
-## 3. ★ 본 세션의 본질적 가치 (Sprint 4 핵심)
+## 3. 본 세션의 본질적 가치 (Sprint 4 핵심)
 
 ### Sprint 3 "drift 0" 보고가 수동 검증 한계 노출 (F-117 메타)
 
 - Sprint 3 wrap-up: "Mermaid JSON 짝 일괄 / drift 0건"
 - Sprint 4 drift-validator 자동 실행: **state-machine 7 breaking + decision-table 3 non-breaking**
-- → **자동화 ROI 정량 입증 ★** — 묶음 N (Drift CI) 의 강한 권위 데이터
+- → **자동화 ROI 정량 입증 ** — 묶음 N (Drift CI) 의 강한 권위 데이터
 
-### ★★★ no-simulation 정책 자가 정합
+### no-simulation 정책 자가 정합
 
 - 본 Sprint 환경: Java/Semgrep/PMD 미설치
 - 시뮬 유혹 회피 ✅ — static-runner Phase D 환경 부재 명시 + Sprint 5 carry-over
@@ -85,12 +85,12 @@ examples/poc-02-.../.claude/SESSION-WRAPUP-2026-04-30-sprint4.md (본 파일)
 
 ```yaml
 finding_total: 117 (+11)
-finding_new_sprint4: 11           # F-107~F-117 (high 4 / medium 4 / low 3)
-unit_tests: 17/17 pass            # drift-validator 6 + dmn-check 7 + static-runner 4
-new_tools: 3                      # drift-validator / decision-table-validator / static-runner
-new_ci_workflows: 1               # drift-check.yml
+finding_new_sprint4: 11 # F-107~F-117 (high 4 / medium 4 / low 3)
+unit_tests: 17/17 pass # drift-validator 6 + dmn-check 7 + static-runner 4
+new_tools: 3 # drift-validator / decision-table-validator / static-runner
+new_ci_workflows: 1 # drift-check.yml
 schema_갱신: formal-spec.schema.json (5종 물증 if/then + simulation_only)
-v120_bundles_ready: 16/16 ★       # A~P 전체 — N+O 인프라 100% 산출
+v120_bundles_ready: 16/16 # A~P 전체 — N+O 인프라 100% 산출
 이중_렌더링_정합_검증: 자동화 ✅
 신뢰도: 80-87% (시뮬 패널티 정직 유지 — Sprint 5 진짜 도구 실행 시 90-95%)
 ```

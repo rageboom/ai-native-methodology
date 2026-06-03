@@ -5,7 +5,7 @@
     "inputs_used": ["source_code", "design_specs"],
     "confidence": 0.80,
     "formula_version": "v1",
-    "$comment": "★ ★ ★ PoC #11 chain 2 종결 시점 partial traceability matrix. ★ UC → BHV → AC 채움 ✅ / TC + IMPL = chain 3+4 placeholder (★ chain 3 진입 시 TC 채움 + chain 4 종결 후 IMPL + commit_hash 채움). status = 'yellow' (★ 부분 link / chain 4 종결 후 'green' 전환 자격)."
+    "$comment": " PoC #11 chain 2 종결 시점 partial traceability matrix. UC → BHV → AC 채움 ✅ / TC + IMPL = chain 3+4 placeholder ( chain 3 진입 시 TC 채움 + chain 4 종결 후 IMPL + commit_hash 채움). status = 'yellow' ( 부분 link / chain 4 종결 후 'green' 전환 자격)."
   },
   "matrix": [
     {
@@ -30,7 +30,7 @@
       "acceptance_id": "AC-BILLING-003",
       "status": "yellow",
       "severity": "medium",
-      "gaps": ["TC-BILLING-003 부재 (chain 3 placeholder)", "IMPL-BILLING-001 부재 (chain 4 placeholder)", "★ BR-BILLING-ENTITY-006 ambiguous → C-domain-PoC11-1 carry"]
+      "gaps": ["TC-BILLING-003 부재 (chain 3 placeholder)", "IMPL-BILLING-001 부재 (chain 4 placeholder)", " BR-BILLING-ENTITY-006 ambiguous → C-domain-PoC11-1 carry"]
     },
     {
       "use_case_id": "UC-BILLING-002",
@@ -46,7 +46,7 @@
       "acceptance_id": "AC-BILLING-005",
       "status": "yellow",
       "severity": "high",
-      "gaps": ["TC-BILLING-005 부재", "IMPL-BILLING-002 부재", "★ AP-BILLING-006 cross-DB invariant chain 4 정합 의무"]
+      "gaps": ["TC-BILLING-005 부재", "IMPL-BILLING-002 부재", " AP-BILLING-006 cross-DB invariant chain 4 정합 의무"]
     },
     {
       "use_case_id": "UC-BILLING-002",
@@ -54,7 +54,7 @@
       "acceptance_id": "AC-BILLING-006",
       "status": "yellow",
       "severity": "medium",
-      "gaps": ["TC-BILLING-006 부재", "IMPL-BILLING-002 부재", "★ cross-DB simulation 환경 의무 (chain 3 carry)"]
+      "gaps": ["TC-BILLING-006 부재", "IMPL-BILLING-002 부재", " cross-DB simulation 환경 의무 (chain 3 carry)"]
     },
     {
       "use_case_id": "UC-BILLING-003",
@@ -70,7 +70,7 @@
       "acceptance_id": "AC-BILLING-008",
       "status": "yellow",
       "severity": "critical",
-      "gaps": ["TC-BILLING-008 부재 (★ ★ critical / 부분 commit assertion / TDD intent 정면 위배)", "IMPL-BILLING-003 부재", "★ ★ ★ characterization mode invariant = 새 시스템 @Transactional 의무 / carry C-stack-결단-chain-3-4-plan"]
+      "gaps": ["TC-BILLING-008 부재 ( critical / 부분 commit assertion / TDD intent 정면 위배)", "IMPL-BILLING-003 부재", " characterization mode invariant = 새 시스템 @Transactional 의무 / carry C-stack-결단-chain-3-4-plan"]
     },
     {
       "use_case_id": "UC-BILLING-003",
@@ -86,7 +86,7 @@
       "acceptance_id": "AC-BILLING-010",
       "status": "yellow",
       "severity": "high",
-      "gaps": ["TC-BILLING-010 부재", "IMPL-BILLING-003 부재", "★ SCOPE_IDENTITY T-SQL 종속 / 새 시스템 RETURNING 대안 carry"]
+      "gaps": ["TC-BILLING-010 부재", "IMPL-BILLING-003 부재", " SCOPE_IDENTITY T-SQL 종속 / 새 시스템 RETURNING 대안 carry"]
     },
     {
       "use_case_id": "UC-BILLING-003",
@@ -102,7 +102,7 @@
       "acceptance_id": "AC-BILLING-012",
       "status": "yellow",
       "severity": "medium",
-      "gaps": ["TC-BILLING-012 부재", "IMPL-BILLING-005 부재", "★ URL hardcoded 새 시스템 환경 변수 invariant carry"]
+      "gaps": ["TC-BILLING-012 부재", "IMPL-BILLING-005 부재", " URL hardcoded 새 시스템 환경 변수 invariant carry"]
     }
   ],
   "coverage_summary": {

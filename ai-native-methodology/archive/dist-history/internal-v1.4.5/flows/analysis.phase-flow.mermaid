@@ -44,11 +44,11 @@ flowchart TB
         P4D --> P4_OUT
     end
 
-    %% ═════════════ Phase 4.5 (★ v1.2.0 신설 / v1.2.1 자동 검증) ═════════════
-    subgraph P45["Phase 4.5 — 형식 명세 (★ v1.2.0)"]
+    %% ═════════════ Phase 4.5 ( v1.2.0 신설 / v1.2.1 자동 검증) ═════════════
+    subgraph P45["Phase 4.5 — 형식 명세 ( v1.2.0)"]
         direction LR
         P45_OUT["state-machines/*.json + .mermaid<br/>sequence-diagrams/*.json + .mermaid<br/>decision-tables/*.json + .md<br/>invariants/*.ts<br/>property-tests/*.spec.ts"]
-        P45_VAL["★ v1.2.1 자동 검증<br/>drift-validator + decision-table-validator"]
+        P45_VAL[" v1.2.1 자동 검증<br/>drift-validator + decision-table-validator"]
         P45_OUT --> P45_VAL
     end
 
@@ -63,7 +63,7 @@ flowchart TB
     %% ═════════════ Phase 6 ═════════════
     subgraph P6["Phase 6 — quality (안티패턴 통합)"]
         direction LR
-        P6_OUT["antipatterns.json<br/>avoid-list.md<br/>migration-cautions.md (★ v1.2.0)"]
+        P6_OUT["antipatterns.json<br/>avoid-list.md<br/>migration-cautions.md ( v1.2.0)"]
     end
 
     %% ═════════════ Cross-cutting (모든 phase) ═════════════

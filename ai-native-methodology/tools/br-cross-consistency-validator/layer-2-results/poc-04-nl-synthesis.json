@@ -5,7 +5,7 @@
   "batch_size": 3,
   "poc_id": "poc-04-full-realworld-react",
   "direction": "GWT→NL",
-  "$comment": "★ ★ session 23차 Sprint 2 / dual-representation 합성 (session 13차 isomorphic). GWT → natural_language 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 7초). FE 트랙 rules_manual_authored / additive only / Layer 2 cross-validation 입력 자산.",
+  "$comment": "session 23차 Sprint 2 / dual-representation 합성 (session 13차 isomorphic). GWT → natural_language 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 7초). FE 트랙 rules_manual_authored / additive only / Layer 2 cross-validation 입력 자산.",
   "results": [
     { "br_id": "BR-FE-AUTH-REQUIRED-001", "natural_language": "로그인하지 않은 사용자가 인증이 필요한 기능(설정, 글 작성/수정, 삭제, 즐겨찾기, 팔로우, 댓글)에 접근하면 서비스는 해당 사용자를 로그인 화면으로 이동시켜 접근을 차단한다." },
     { "br_id": "BR-FE-AUTH-OWNERSHIP-001", "natural_language": "게시글 또는 댓글을 조회할 때, 해당 콘텐츠의 작성자 본인에게만 수정 및 삭제 기능이 제공되며 다른 사용자에게는 해당 기능이 노출되지 않는다." },

@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 15,
   "poc_id": "poc-07-efiweb-capital-spring41",
-  "$comment": "★ ★ session 23차 Sprint 1-B / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (★ implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 15 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "$comment": "session 23차 Sprint 1-B / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 15 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
   "results": [
     { "old_id": "BR-CAPITAL-001", "new_id": "BR-CAPITAL-CORPYN-001", "sub_domain": "CORPYN", "rationale": "capital_yn / cms_use_yn 플래그로 '자본 보고 대상 법인' 여부를 분류하는 것이 규칙의 핵심 — 법인(CORP) 자격 플래그(YN)" },
     { "old_id": "BR-CAPITAL-002", "new_id": "BR-CAPITAL-STYPE-002", "sub_domain": "STYPE", "rationale": "sType=1(표준)/sType=2(비즈니스) 구분이 Capital 조회 API 분기의 핵심 비즈니스 식별자" },

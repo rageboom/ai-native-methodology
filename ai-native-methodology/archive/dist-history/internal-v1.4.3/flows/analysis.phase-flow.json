@@ -46,7 +46,7 @@
     },
     {
       "id": "4.5",
-      "name": "formal-spec (★ v1.2.0 신설)",
+      "name": "formal-spec ( v1.2.0 신설)",
       "spec_file": "phase-4-5-formal-spec.md",
       "depends_on": ["4"],
       "inputs": ["domain.json", "rules.json", "code_evidence"],

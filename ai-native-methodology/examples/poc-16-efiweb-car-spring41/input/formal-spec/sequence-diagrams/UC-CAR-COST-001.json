@@ -29,8 +29,8 @@
     {"from": "carCostController", "to": "admin", "label": "200 OK", "type": "response"}
   ],
   "notes": [
-    "★ Cross-DB transaction 보장 ❌ — SGERP SP 호출 + IFRS INSERT 가 별도 transaction → eventual consistency",
-    "★ 마이그레이션: saga pattern 또는 outbox table 도입 권고",
-    "★ BR-CAR-COST-003 + BR-CAR-COST-006 (FN_SPLIT) 정합"
+    "Cross-DB transaction 보장 ❌ — SGERP SP 호출 + IFRS INSERT 가 별도 transaction → eventual consistency",
+    "마이그레이션: saga pattern 또는 outbox table 도입 권고",
+    "BR-CAR-COST-003 + BR-CAR-COST-006 (FN_SPLIT) 정합"
   ]
 }

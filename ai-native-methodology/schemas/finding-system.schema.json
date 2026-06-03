@@ -57,7 +57,7 @@
     "severity": {
       "type": "string",
       "enum": ["low", "medium", "high", "critical", "positive"],
-      "description": "영향 범위 × 차단 강도. low: 환경 의존/케이스별 무시 가능. medium: 단일 phase 영향/우회 가능. high: 모든 산출물 또는 복수 phase 영향/표준화 시급. critical: 즉시 수정 의무 (PoC #02 AP-API-001 등) — v1.2.0 추가. ★ positive: 학습 효과 입증 / 모범 사례 — cross-PoC 비재현 (이전 PoC 결함이 본 PoC 에서 자연 회피) — v1.2.3 신설 (★ PoC #03 F-161 Bearer 표준 패턴 / DEC-2026-04-30-poc03-phase6-종결 정합)."
+      "description": "영향 범위 × 차단 강도. low: 환경 의존/케이스별 무시 가능. medium: 단일 phase 영향/우회 가능. high: 모든 산출물 또는 복수 phase 영향/표준화 시급. critical: 즉시 수정 의무 (PoC #02 AP-API-001 등) — v1.2.0 추가. positive: 학습 효과 입증 / 모범 사례 — cross-PoC 비재현 (이전 PoC 결함이 본 PoC 에서 자연 회피) — v1.2.3 신설 (PoC #03 F-161 Bearer 표준 패턴 / DEC-2026-04-30-poc03-phase6-종결 정합)."
     },
     "proposed_fix": {
       "type": "string",
@@ -88,7 +88,7 @@
     "code_graph_ref": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ v12.10.0 codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — codegraph 도출 finding 의 코드 앵커(reference-lens). 존재 시 severity 는 low|medium 강제(top-level allOf conditional / STEP 1 enum-cut ceiling 정합). discoverer:'codegraph' 와 함께 사용. 최종 evidence = 실코드 grep (앵커는 reading-aid).",
+      "description": "v12.10.0 codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — codegraph 도출 finding 의 코드 앵커(reference-lens). 존재 시 severity 는 low|medium 강제(top-level allOf conditional / STEP 1 enum-cut ceiling 정합). discoverer:'codegraph' 와 함께 사용. 최종 evidence = 실코드 grep (앵커는 reading-aid).",
       "required": ["kind"],
       "properties": {
         "kind": { "type": "string", "description": "codegraph node kind (route|method|class|interface 등) 또는 edge-derived." },
@@ -103,11 +103,11 @@
     "status": {
       "type": "string",
       "enum": ["open", "candidate", "promoted", "closed", "deferred", "rejected", "merged", "logged"],
-      "description": "현재 상태. open: 등록만. candidate: Phase 진행 중 후보 (PoC #02 도입). promoted: 다음 MINOR 후보 등재. closed: 명세 정식 반영. deferred: PoC 데이터 추가 필요. rejected: 명세 책임 밖. merged: 다른 finding 으로 통합. ★ logged: positive finding 등재 — 학습 효과 입증 (★ v1.2.3 신설 / F-161 패턴)."
+      "description": "현재 상태. open: 등록만. candidate: Phase 진행 중 후보 (PoC #02 도입). promoted: 다음 MINOR 후보 등재. closed: 명세 정식 반영. deferred: PoC 데이터 추가 필요. rejected: 명세 책임 밖. merged: 다른 finding 으로 통합. logged: positive finding 등재 — 학습 효과 입증 (v1.2.3 신설 / F-161 패턴)."
     },
     "positive_finding_meta": {
       "type": "object",
-      "description": "★ v1.2.3 신설 — severity:positive 시 사용. cross-PoC 학습 효과 정량 입증.",
+      "description": "v1.2.3 신설 — severity:positive 시 사용. cross-PoC 학습 효과 정량 입증.",
       "properties": {
         "previous_poc_finding": {
           "type": "string",
@@ -183,7 +183,7 @@
     },
     "cross_validation": {
       "type": "object",
-      "description": "Cross-validation 메타 (Sprint 1.5+ 정합). 양쪽 발견 시 신뢰도 ★★ 격.",
+      "description": "Cross-validation 메타 (Sprint 1.5+ 정합). 양쪽 발견 시 신뢰도격.",
       "properties": {
         "double_hit": {
           "type": "boolean",
@@ -198,14 +198,14 @@
         },
         "confidence_boost": {
           "type": "string",
-          "description": "신뢰도 부스트 표기 (예: '★★', '+15%p')."
+          "description": "신뢰도 부스트 표기 (예: '', '+15%p')."
         }
       }
     }
   },
   "allOf": [
     {
-      "$comment": "★ codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — code_graph_ref 보유 finding(=codegraph 도출 / discoverer:'codegraph')은 severity low|medium 만 (high·critical 구조 차단). reference-lens 도구가 gate 차단등급(findings-aggregator high/critical)을 획득하지 못하게 STEP 1 enum-cut ceiling 을 finding-system 에 conditional 로 이식. code_graph_ref 부재 finding(기존 전부)은 무영향 = 회귀 0.",
+      "$comment": "codegraph wiring STEP 2 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 2) — code_graph_ref 보유 finding(=codegraph 도출 / discoverer:'codegraph')은 severity low|medium 만 (high·critical 구조 차단). reference-lens 도구가 gate 차단등급(findings-aggregator high/critical)을 획득하지 못하게 STEP 1 enum-cut ceiling 을 finding-system 에 conditional 로 이식. code_graph_ref 부재 finding(기존 전부)은 무영향 = 회귀 0.",
       "if": { "required": ["code_graph_ref"] },
       "then": { "properties": { "severity": { "enum": ["low", "medium"] } } }
     }

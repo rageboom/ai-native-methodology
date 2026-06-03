@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 5,
   "poc_id": "poc-10-realworld-jpa-querydsl",
-  "$comment": "★ ★ session 23차 Sprint 1-E / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 11 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "$comment": "session 23차 Sprint 1-E / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 11 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
   "results": [
     { "old_id": "BR-RAE-001", "new_id": "BR-RAE-AUTH-001", "sub_domain": "AUTH", "rationale": "User 등록 동시 JWT 즉시 발급 = 인증 도메인 핵심" },
     { "old_id": "BR-RAE-002", "new_id": "BR-RAE-SEARCH-002", "sub_domain": "SEARCH", "rationale": "Article 4 조건 분기 검색 = 비즈니스 검색 요건" },

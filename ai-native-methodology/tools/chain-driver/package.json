@@ -1,7 +1,7 @@
 {
   "name": "@ai-native-methodology/chain-driver",
   "version": "0.2.0",
-  "description": "★ ★ ★ ★ v2.5.0 MINOR — chain harness driver (5 요소 본격 구현). state.json + atomic write CAS + mechanical gate trio + skill auto-invoke (D21' / suppressOutput) + chain-revisit-detector + ★ ★ chain 1 gate Layer 2 통합 (gate-eval.js findings shape 안 llm_consistency_score+llm_threshold+llm_status + evaluateGate layer2_threshold block reason + severityRank rank 2 + applyUserDecision user go → go-with-warnings / session 14차 additive change paradigm 정합 / LL-i-42+43). 72/72 test pass. ADR-CHAIN-005 + ADR-CHAIN-011 §11 patch v8+v9 정합. harness 호칭 자격 본격 보존.",
+  "description": "v2.5.0 MINOR — chain harness driver (5 요소 본격 구현). state.json + atomic write CAS + mechanical gate trio + skill auto-invoke (D21' / suppressOutput) + chain-revisit-detector + chain 1 gate Layer 2 통합 (gate-eval.js findings shape 안 llm_consistency_score+llm_threshold+llm_status + evaluateGate layer2_threshold block reason + severityRank rank 2 + applyUserDecision user go → go-with-warnings / session 14차 additive change paradigm 정합 / LL-i-42+43). 72/72 test pass. ADR-CHAIN-005 + ADR-CHAIN-011 §11 patch v8+v9 정합. harness 호칭 자격 본격 보존.",
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": {

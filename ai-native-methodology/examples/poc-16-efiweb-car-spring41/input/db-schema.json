@@ -10,11 +10,11 @@
     "confidence": 0.88,
     "raw_confidence": 0.88,
     "warnings": [
-      "★ FK CONSTRAINT 명시 부재 — 모든 FK 관계는 컬럼명 컨벤션 (CAR_IDX → TB_CAR.idx) 기반 추론 / DDL 안 외래키 미정의 (legacy iBATIS 2 paradigm 정합)",
-      "★ table/column 이름 = MSSQL native = 대문자 (TB_CAR / CAR_NO) / schema pattern 정합 위해 소문자화 본격 + drift_note 명시 의무",
-      "★ external 4 DB 18 object — DDL source 부재 / sqlmap 추론 만 / 본 schema scope 외 (consistency_report 에 carry)",
-      "★ TB_CAR_COST_SLIP 복합 PK (COST_IDX + SLIP_ID + COST_GUBUN) — schema description 의 anti-pattern 정합 / finding 등재 의무",
-      "★ ERD 파일 (car.erd 60K + ifrs.erd 188K) 형식 unknown — viewer 부재 / manual_extraction ❌ / DDL 사본만 source / ERD ↔ DDL drift 확인 불가"
+      "FK CONSTRAINT 명시 부재 — 모든 FK 관계는 컬럼명 컨벤션 (CAR_IDX → TB_CAR.idx) 기반 추론 / DDL 안 외래키 미정의 (legacy iBATIS 2 paradigm 정합)",
+      "table/column 이름 = MSSQL native = 대문자 (TB_CAR / CAR_NO) / schema pattern 정합 위해 소문자화 본격 + drift_note 명시 의무",
+      "external 4 DB 18 object — DDL source 부재 / sqlmap 추론 만 / 본 schema scope 외 (consistency_report 에 carry)",
+      "TB_CAR_COST_SLIP 복합 PK (COST_IDX + SLIP_ID + COST_GUBUN) — schema description 의 anti-pattern 정합 / finding 등재 의무",
+      "ERD 파일 (car.erd 60K + ifrs.erd 188K) 형식 unknown — viewer 부재 / manual_extraction ❌ / DDL 사본만 source / ERD ↔ DDL drift 확인 불가"
     ],
     "related_chain_ids": [
       "UC-CAR-MGT-001",
@@ -896,7 +896,7 @@
     },
     {
       "name": "tb_car_cost_slip",
-      "description": "차량 비용 회계전표 IF (★ 복합 PK / SGERP._TACSlip 연동 anchor)",
+      "description": "차량 비용 회계전표 IF (복합 PK / SGERP._TACSlip 연동 anchor)",
       "sources": [
         "operational_db"
       ],
@@ -965,7 +965,7 @@
   "stored_procedures": [
     {
       "name": "sg_sacsliprowcarmanagementifquery",
-      "description": "★ 외부 SP — 차량비용 → SGERP 회계전표 IF 전송 (signature only / source ❌)",
+      "description": "외부 SP — 차량비용 → SGERP 회계전표 IF 전송 (signature only / source ❌)",
       "external": true,
       "host_db": "SGERP",
       "called_from": [
@@ -978,17 +978,17 @@
   "views": [
     {
       "name": "fn_get_caruserlistview",
-      "description": "★ UDF (table-valued function) — 차량 사용자 list 조회 / IFRS own (ddl/functions/fn_Get_CarUserListView.sql)",
+      "description": "UDF (table-valued function) — 차량 사용자 list 조회 / IFRS own (ddl/functions/fn_Get_CarUserListView.sql)",
       "external": false
     },
     {
       "name": "fn_get_caruserlistview_2",
-      "description": "★ UDF 변형 — date param 추가 추정 / IFRS own (ddl/functions/fn_Get_CarUserListView_2.sql)",
+      "description": "UDF 변형 — date param 추가 추정 / IFRS own (ddl/functions/fn_Get_CarUserListView_2.sql)",
       "external": false
     },
     {
       "name": "fn_split",
-      "description": "★ 공통 utility UDF — string split / sqlmap 안 'from ifrs.dbo.FN_SPLIT' 호출 정합",
+      "description": "공통 utility UDF — string split / sqlmap 안 'from ifrs.dbo.FN_SPLIT' 호출 정합",
       "external": false
     }
   ],

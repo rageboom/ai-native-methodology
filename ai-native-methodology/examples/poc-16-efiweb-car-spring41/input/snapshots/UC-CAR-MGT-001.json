@@ -57,7 +57,7 @@
     },
     {
       "id": "SCN-CAR-MGT-001-todo-stub",
-      "name": "★ self_recognized — TODO Auto-generated method stub",
+      "name": "self_recognized — TODO Auto-generated method stub",
       "tags": ["@self_recognized", "@satd"],
       "given": {
         "code_location": "source/java/smilegate/ifrs/car/service/impl/CarMgtDAO.java:138",

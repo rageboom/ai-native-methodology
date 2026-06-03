@@ -1,4 +1,4 @@
-# drift-validator/ — 이중 렌더링 의미 동일성 검증 (★ ADR-008 enforcement)
+# drift-validator/ — 이중 렌더링 의미 동일성 검증 (ADR-008 enforcement)
 
 ## Purpose
 
@@ -19,13 +19,13 @@ npx drift-validator <dir>
 # 단일 짝
 npx drift-validator path/to/User-Account.json
 
-# 3-way layout 검증 (★ v1.4.4 — manifest ↔ workflow ↔ skills)
+# 3-way layout 검증 (v1.4.4 — manifest ↔ workflow ↔ skills)
 npx drift-validator --check-layout
 
-# Chain layout 검증 (★ sub-plan-4 신설)
+# Chain layout 검증 (sub-plan-4 신설)
 npx drift-validator --check-chain-layout
 
-# State-flow 정합 (★ sub-plan-6 신설 / state.schema enum ↔ sdlc-4stage stages)
+# State-flow 정합 (sub-plan-6 신설 / state.schema enum ↔ sdlc-4stage stages)
 npx drift-validator --check-state-flow-consistency
 
 # 기계 판독
@@ -35,6 +35,7 @@ npx drift-validator <dir> --json
 ## Outputs
 
 각 diff 항목 (oasdiff 식):
+
 ```json
 {
   "severity": "breaking" | "non-breaking" | "info",
@@ -45,21 +46,21 @@ npx drift-validator <dir> --json
 }
 ```
 
-| severity | 의미 | 예시 |
-|---|---|---|
-| **breaking** | structural drift — JSON 의 의미가 mermaid 에 없음. **CI fail** | state/transition 누락, message tuple 불일치 |
-| **non-breaking** | 의미 일부 차이 — 라벨 fuzzy / actor 한쪽만 등 | message label drift |
-| **info** | 한쪽이 더 자세 (의도된 패턴) | mermaid sub-state |
+| severity         | 의미                                                           | 예시                                        |
+| ---------------- | -------------------------------------------------------------- | ------------------------------------------- |
+| **breaking**     | structural drift — JSON 의 의미가 mermaid 에 없음. **CI fail** | state/transition 누락, message tuple 불일치 |
+| **non-breaking** | 의미 일부 차이 — 라벨 fuzzy / actor 한쪽만 등                  | message label drift                         |
+| **info**         | 한쪽이 더 자세 (의도된 패턴)                                   | mermaid sub-state                           |
 
 ## Exit codes
 
-| code | 의미 |
-|---|---|
-| 0 | no breaking |
-| 1 | breaking ≥ 1 또는 error |
-| 2 | usage error |
+| code | 의미                    |
+| ---- | ----------------------- |
+| 0    | no breaking             |
+| 1    | breaking ≥ 1 또는 error |
+| 2    | usage error             |
 
-## Baseline + Ratchet (★ ADR-010 정합)
+## Baseline + Ratchet (ADR-010 정합)
 
 ```bash
 # ① baseline 생성 (legacy 첫 분석 시)
@@ -74,11 +75,11 @@ npx drift-validator <dir> --baseline .ai-native-methodology/drift-baseline.json
 
 severity 별 강도 (ADR-010 §2.3):
 
-| severity | baseline 등재 | novel 차단 |
-|---|---|---|
-| critical | ❌ (즉시 차단) | ✅ |
-| breaking / high / medium | ✅ | ✅ |
-| low / info | ✅ | ❌ (경고만) |
+| severity                 | baseline 등재  | novel 차단  |
+| ------------------------ | -------------- | ----------- |
+| critical                 | ❌ (즉시 차단) | ✅          |
+| breaking / high / medium | ✅             | ✅          |
+| low / info               | ✅             | ❌ (경고만) |
 
 ## 지원 다이어그램
 
@@ -103,9 +104,9 @@ severity 별 강도 (ADR-010 §2.3):
 
 - `@mermaid-js/parser` v1.1.0 미지원 → 정규식 fallback (`src/normalize-mermaid.js`)
 - Fuzzy match 정책: state id case-insensitive + prefix match / message label 토큰 50% / mermaid sub-state = info
-- corpus 24+쌍 self-test (★ tools/drift-validator/corpus/ — workspace developer only / dist 자동 제외)
+- corpus 24+쌍 self-test (tools/drift-validator/corpus/ — workspace developer only / dist 자동 제외)
 - ESM-only (Node 18+ + `"type":"module"`)
 
-## ★★★ no-simulation 정합
+## no-simulation 정합
 
 본 도구는 AI 추론 0% — 정규식 + 명시적 비교 알고리즘만. memory `feedback_no_static_tool_simulation.md` 정합.

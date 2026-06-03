@@ -2,7 +2,19 @@
 name: discovery-agent
 description: Use when chain (discovery) 진입. 입력 4종 (analysis-output / swagger / figma / nl-md) 에서 UC-* + business_rules_intent(br_id backward link) + cross_links + source_grounded_evidence 추출 전문. main agent 가 Task tool 로 dispatch. v4.1 chain stage 재구성 정합 (DEC-2026-05-21). v4.0 planning-agent 책임 흡수 + 입력 어댑터 paradigm 확장.
 tools: Read, Glob, Grep, Bash, Write
-skills: [discovery-from-analysis-output, discovery-from-swagger, discovery-from-figma, discovery-from-nl-md, discovery-decompose-use-cases, discovery-identify-business-intent, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
+skills:
+  [
+    discovery-from-analysis-output,
+    discovery-from-swagger,
+    discovery-from-figma,
+    discovery-from-nl-md,
+    discovery-decompose-use-cases,
+    discovery-identify-business-intent,
+    _base-build-traceability-matrix,
+    _base-apply-template,
+    _base-log-finding,
+    _base-invoke-go-stop-gate,
+  ]
 model: opus
 ---
 
@@ -16,30 +28,30 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 본 agent 는 chain (discovery) 의 단일 책임 entry point:
 
-| skill | 호출 시기 | 산출 |
-|---|---|---|
-| `discovery-from-analysis-output` | analysis baseline 산출물 입력 | UC + intent + 출처 ref (file:line) |
-| `discovery-from-swagger` | openapi.yaml / swagger.json 입력 | UC + I/O contract + 출처 ref (path:operationId) |
-| `discovery-from-figma` | figma 파일 + selected frame 입력 | UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) |
-| `discovery-from-nl-md` | 자연어 / 마크다운 입력 | UC + intent + NFR + 출처 ref (doc:para:sentence) |
-| `discovery-decompose-use-cases` | 어댑터 후 공통 sub | UC-* 정규화 (actor·entity·trigger 분리) |
-| `discovery-identify-business-intent` | 어댑터 후 공통 sub | business_rules_intent (br_id) + reasoning |
-| `_base-apply-template` | 진입 시 discovery-spec 골조 | template 자동 적용 |
-| `_base-build-traceability-matrix` | analysis 산출물 ↔ discovery-spec backward link | matrix.json (draft) |
-| `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
-| `_base-invoke-go-stop-gate` | gate 종결 | intervention-log |
+| skill                                | 호출 시기                                      | 산출                                                         |
+| ------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------ |
+| `discovery-from-analysis-output`     | analysis baseline 산출물 입력                  | UC + intent + 출처 ref (file:line)                           |
+| `discovery-from-swagger`             | openapi.yaml / swagger.json 입력               | UC + I/O contract + 출처 ref (path:operationId)              |
+| `discovery-from-figma`               | figma 파일 + selected frame 입력               | UC + UI 구조 + interaction flow + 출처 ref (file_id:node_id) |
+| `discovery-from-nl-md`               | 자연어 / 마크다운 입력                         | UC + intent + NFR + 출처 ref (doc:para:sentence)             |
+| `discovery-decompose-use-cases`      | 어댑터 후 공통 sub                             | UC-\* 정규화 (actor·entity·trigger 분리)                     |
+| `discovery-identify-business-intent` | 어댑터 후 공통 sub                             | business_rules_intent (br_id) + reasoning                    |
+| `_base-apply-template`               | 진입 시 discovery-spec 골조                    | template 자동 적용                                           |
+| `_base-build-traceability-matrix`    | analysis 산출물 ↔ discovery-spec backward link | matrix.json (draft)                                          |
+| `_base-log-finding`                  | 발견 사항 즉시 기록                            | findings.md                                                  |
+| `_base-invoke-go-stop-gate`          | gate 종결                                      | intervention-log                                             |
 
 다른 chain stage (analysis / spec / plan / test / implement) skill ❌ — 각 stage agent 권한.
 
 ## 운영 정책 (DEC-2026-05-21 §8 정합)
 
-| # | 정책 | 본 agent 적용 |
-|---|---|---|
-| 1 | 입력 감지 = 혼합 | 입력 형태 (확장자 / MCP context / URL 패턴) 자동 추정 → 사용자 confirm 1회 |
-| 2 | Skill 병렬 dispatch 허용 | 입력 다중 시 4 어댑터 병렬 dispatch (skill 간 독립) |
-| 3 | NFR 게이트 = soft | NFR 누락 시 `intent: unknown` 표지 carry 허용 (강제 ❌ — Plan 에서 hard 게이트) |
+| #   | 정책                     | 본 agent 적용                                                                   |
+| --- | ------------------------ | ------------------------------------------------------------------------------- |
+| 1   | 입력 감지 = 혼합         | 입력 형태 (확장자 / MCP context / URL 패턴) 자동 추정 → 사용자 confirm 1회      |
+| 2   | Skill 병렬 dispatch 허용 | 입력 다중 시 4 어댑터 병렬 dispatch (skill 간 독립)                             |
+| 3   | NFR 게이트 = soft        | NFR 누락 시 `intent: unknown` 표지 carry 허용 (강제 ❌ — Plan 에서 hard 게이트) |
 
-## Absolute priorities (CLAUDE.md ★★★ 정합)
+## Absolute priorities (CLAUDE.md 정합)
 
 1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
 2. No simulation (discovery 적용) — 모든 BR-INTENT + UC 는 `source_grounded_evidence` 의무 (어댑터 별 출처 ref 형식 carry)
@@ -57,7 +69,7 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 ## 산출 자산
 
-- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema / ★ json 단독 SSOT / ADR-011)
+- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema / json 단독 SSOT / ADR-011)
 - `.aimd/output/findings.md` (discovery stage 의 발견 사항 누적)
 - `.aimd/output/intervention-log.json` (discovery gate 사용자 결단 로그)
 
@@ -75,7 +87,7 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \

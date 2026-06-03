@@ -6,7 +6,7 @@
 -- 스택: Spring Boot 3.3.0 / Hibernate 6 / Jakarta Persistence 3.x / H2 (in-memory MODE=MYSQL)
 -- 통합 우선순위: ORM 단일 (DEC-PHASE2-POC02-001)
 --
--- ★ 출처 의존성 caveat ★
+--  출처 의존성 caveat 
 -- 본 schema.sql 은 Hibernate `NamingHelper.generateHashedFkName` 자동 생성 결과의
 -- 캡쳐본임이 확정 (FK/UQ 제약명 100% MD5 hash 패턴 — 예: fkmjgtny2i22jf4dqncmd436s0u).
 -- 즉 DDL = ORM derivative. 정합성 검증 의미 약화 — 정합성-검증-보고서.md caveat 참조.
@@ -39,7 +39,7 @@ create table article
     author_id   uuid          not null,                -- F-057 PK FK 타입 혼재 (UUID + Integer)
     description varchar(50)   not null,                -- F-055 한국어 50자 부족
     slug        varchar(50)   not null unique,         -- RealWorld spec 정합 (URL 식별자)
-    title       varchar(50)   not null unique,         -- F-052 over-constraint anti-pattern ★
+    title       varchar(50)   not null unique,         -- F-052 over-constraint anti-pattern 
     content     varchar(1000) not null,
     primary key (id)
 );
@@ -94,7 +94,7 @@ create table user_follow
 -- ============================================================================
 -- Foreign Key Constraints (9개)
 -- ============================================================================
--- ★ 모두 ON DELETE / ON UPDATE 미명시 = H2 default NO ACTION (실질 RESTRICT)
+--  모두 ON DELETE / ON UPDATE 미명시 = H2 default NO ACTION (실질 RESTRICT)
 -- DRIFT-007 (PoC #01) 재현 — stack-conditional caveat (H2 in-memory 환경)
 -- 운영 환경 가정 시 ON DELETE 정책 명시 필요
 -- ============================================================================

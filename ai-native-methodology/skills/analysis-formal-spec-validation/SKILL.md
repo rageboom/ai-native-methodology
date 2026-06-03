@@ -6,13 +6,13 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # analysis-formal-spec-validation — Cross-validation
 
-도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. `formal-spec` phase (★★★ no-simulation 정책 첫 실현 단계).
+도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. `formal-spec` phase (no-simulation 정책 첫 실현 단계).
 
 ## 사전 조건
 
 - inventory.json / architecture.json / domain.json / business-rules.json 모두 존재
 
-## ★★★ no-simulation 절대 금지
+## no-simulation 절대 금지
 
 baseline → `methodology-spec/policies/no-simulation.md`.
 
@@ -20,7 +20,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 절차
 
-1. **cross-link 검토 (LLM/사람 — analysis 무-gate / 결정론 강제 ❌)** — 아래 3 정합은 LLM·사람 검토 영역. ★ formal-spec-link-validator 는 analysis-stage 이 3종을 결정론 강제하지 **않음** (FE/chain cross-link id-pattern 만 자동 검사 / ★ v12.0.0 — 구 `.json ↔ .mermaid` 이중렌더링 drift 검사는 json 단독 전환으로 폐지 / ADR-011). 따라서 본 3종은 정직하게 "검토 권고"로 표기:
+1. **cross-link 검토 (LLM/사람 — analysis 무-gate / 결정론 강제 ❌)** — 아래 3 정합은 LLM·사람 검토 영역. formal-spec-link-validator 는 analysis-stage 이 3종을 결정론 강제하지 **않음** (FE/chain cross-link id-pattern 만 자동 검사 / v12.0.0 — 구 `.json ↔ .mermaid` 이중렌더링 drift 검사는 json 단독 전환으로 폐지 / ADR-011). 따라서 본 3종은 정직하게 "검토 권고"로 표기:
    - business-rules.json 의 domain reference ∈ domain.json
    - architecture.json 의 module ∈ inventory.json
    - openapi.yaml endpoint ↔ business-rules.json rule 매칭

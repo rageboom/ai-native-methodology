@@ -1,14 +1,14 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/static-security-spec.schema.json (★ Stage 3-2)",
+  "$schema_origin": "ai-native-methodology/schemas/static-security-spec.schema.json ( Stage 3-2)",
   "meta": {
     "poc_id": "poc-04-mini",
     "phase": "quality",
     "captured_at": "2026-05-02",
-    "captured_by": "real (★ Semgrep carry — Windows 환경 부재 / grep 1차 fallback)",
-    "tool_primary": "Semgrep CLI (★ research G2 결단 → carry)",
+    "captured_by": "real ( Semgrep carry — Windows 환경 부재 / grep 1차 fallback)",
+    "tool_primary": "Semgrep CLI ( research G2 결단 → carry)",
     "tool_primary_status": "carry_to_user",
-    "tool_primary_reason": "★ Windows native build 부재 (WSL/Docker 필요) — research Senior Q4 + plan §2.2 R2 정합",
-    "tool_fallback": "grep -E (★ XSS / eval / direct DOM manipulation / process.env)"
+    "tool_primary_reason": " Windows native build 부재 (WSL/Docker 필요) — research Senior Q4 + plan §2.2 R2 정합",
+    "tool_fallback": "grep -E ( XSS / eval / direct DOM manipulation / process.env)"
   },
   "scan_targets": ["INPUT/src/**/*.ts", "INPUT/src/**/*.tsx"],
   "rules_applied_via_grep": [
@@ -67,9 +67,9 @@
           "file": "src/shared/api/auth-storage.ts",
           "lines": [12, 20, 28],
           "snippet": "window.localStorage.setItem(TOKEN_STORAGE_KEY, token)",
-          "rationale": "★ JWT 토큰 localStorage 저장 — XSS 공격 시 token 노출 위험. RealWorld 표준 패턴이며 React 에코시스템에서 흔함. ★ httpOnly cookie + CSRF token 패턴 권장 (BE 협조 필요).",
+          "rationale": " JWT 토큰 localStorage 저장 — XSS 공격 시 token 노출 위험. RealWorld 표준 패턴이며 React 에코시스템에서 흔함.  httpOnly cookie + CSRF token 패턴 권장 (BE 협조 필요).",
           "owasp_top_10_2021": ["A02", "A07"],
-          "cross_poc_isomorphic": "★ PoC #01 AP-SECURITY-001 (JWT 21byte critical) + PoC #02 RSA git commit critical 의 FE side variant — 본 mini-PoC 검증 시점"
+          "cross_poc_isomorphic": " PoC #01 AP-SECURITY-001 (JWT 21byte critical) + PoC #02 RSA git commit critical 의 FE side variant — 본 mini-PoC 검증 시점"
         }
       ]
     }
@@ -84,10 +84,10 @@
   },
   "deliverable_12_compliance": {
     "semgrep_real_run": false,
-    "semgrep_carry_reason": "★ Windows 환경 부재 / WSL/Docker 필요 — research G2 결단 + plan R2",
+    "semgrep_carry_reason": " Windows 환경 부재 / WSL/Docker 필요 — research G2 결단 + plan R2",
     "grep_fallback_real_run": true,
     "simulation_used": false,
-    "user_action_required": "★ ★ Stage 5 시 Semgrep CLI 진짜 실행 의무 (사용자 위임 — WSL 또는 Linux runner)",
-    "no_simulation_penalty": "★ -5%p 신뢰도 패널티 (★ memory `feedback_no_static_tool_simulation.md` 정합)"
+    "user_action_required": "  Stage 5 시 Semgrep CLI 진짜 실행 의무 (사용자 위임 — WSL 또는 Linux runner)",
+    "no_simulation_penalty": " -5%p 신뢰도 패널티 ( memory `feedback_no_static_tool_simulation.md` 정합)"
   }
 }

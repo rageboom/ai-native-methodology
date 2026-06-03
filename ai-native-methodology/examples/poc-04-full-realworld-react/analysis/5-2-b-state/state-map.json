@@ -1,5 +1,5 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json (★ Stage 3-1 / SCXML 1.0 + XState v5 호환)",
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json (Stage 3-1 / SCXML 1.0 + XState v5 호환)",
   "meta": {
     "poc_id": "poc-04-full",
     "stage": "5",
@@ -7,8 +7,8 @@
     "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
-    "framework_neutral_format": "★ XState JSON 단일 진실 + SCXML subset compatible",
-    "stage_4_mini_cross_reference": "★ Stage 4 = 5 SM / Stage 5 = 9 SM (★ 4 추가 / 산출물 재사용 ❌)"
+    "framework_neutral_format": "XState JSON 단일 진실 + SCXML subset compatible",
+    "stage_4_mini_cross_reference": "Stage 4 = 5 SM / Stage 5 = 9 SM (4 추가 / 산출물 재사용 ❌)"
   },
   "five_truths_coverage": {
     "1_server_cache": "✅ 4 SM (favorite + follow + comment + 1 추가 / TanStack Query)",
@@ -20,7 +20,7 @@
   "state_machines": [
     {
       "id": "SM-LOGIN-FORM",
-      "purpose": "★ 진실 #4 form — Login form lifecycle",
+      "purpose": "진실 #4 form — Login form lifecycle",
       "five_truths": ["form"],
       "binding_component": "LoginPage",
       "initial_state": "idle",
@@ -35,7 +35,7 @@
     },
     {
       "id": "SM-REGISTER-FORM",
-      "purpose": "★ 진실 #4 form — Register form (★ Stage 5 신규 SM)",
+      "purpose": "진실 #4 form — Register form (Stage 5 신규 SM)",
       "five_truths": ["form"],
       "binding_component": "RegisterPage",
       "initial_state": "idle",
@@ -51,7 +51,7 @@
     },
     {
       "id": "SM-FEED-NAVIGATION-HOME",
-      "purpose": "★ 진실 #3 URL — Home feed switch",
+      "purpose": "진실 #3 URL — Home feed switch",
       "five_truths": ["url"],
       "binding_component": "HomePage HomeFeed",
       "initial_state": "global",
@@ -60,11 +60,11 @@
         "personal": {"on": {"SWITCH_GLOBAL": "global", "SELECT_TAG": "tag", "AUTH_LOST": {"target": "global", "actions": ["normalize_url"]}}},
         "tag": {"on": {"SWITCH_GLOBAL": "global", "SWITCH_PERSONAL": {"target": "personal", "guard": "isAuthenticated"}, "CLEAR_TAG": "global"}}
       },
-      "url_state_validation": {"source": "★ Zod-mini (home.state.ts)", "schemas": ["PaginationSchema", "HomeArticleFilterSchema"]}
+      "url_state_validation": {"source": "Zod-mini (home.state.ts)", "schemas": ["PaginationSchema", "HomeArticleFilterSchema"]}
     },
     {
       "id": "SM-FEED-NAVIGATION-PROFILE",
-      "purpose": "★ ★ ★ 진실 #3 URL — Profile feed switch (★ Stage 5 신규 SM / SM-FEED-NAVIGATION-HOME 와 isomorphic)",
+      "purpose": "진실 #3 URL — Profile feed switch (Stage 5 신규 SM / SM-FEED-NAVIGATION-HOME 와 isomorphic)",
       "five_truths": ["url"],
       "binding_component": "ProfilePage ProfileFeed",
       "initial_state": "author",
@@ -72,15 +72,15 @@
         "author": {"on": {"SWITCH_FAVORITED": "favorited"}},
         "favorited": {"on": {"SWITCH_AUTHOR": "author"}}
       },
-      "url_state_validation": {"source": "★ Zod-mini (profile.state.ts)", "schemas": ["PaginationSchema", "ProfileArticleFilterSchema"]},
-      "★_isomorphic_with": "SM-FEED-NAVIGATION-HOME (★ ★ 2 page 동일 패턴 / Stage 5 정식화 입증 시점 / deliverable 14 schema 확장 후보)"
+      "url_state_validation": {"source": "Zod-mini (profile.state.ts)", "schemas": ["PaginationSchema", "ProfileArticleFilterSchema"]},
+      "_isomorphic_with": "SM-FEED-NAVIGATION-HOME (2 page 동일 패턴 / Stage 5 정식화 입증 시점 / deliverable 14 schema 확장 후보)"
     },
     {
       "id": "SM-FAVORITE-TOGGLE",
-      "purpose": "★ optimistic update — favorite article (★ 3 컴포넌트 isomorphic)",
+      "purpose": "optimistic update — favorite article (3 컴포넌트 isomorphic)",
       "five_truths": ["server_cache", "dom"],
-      "binding_component": ["HomeFavoriteButton", "FavoriteArticleButton (article)", "ProfileFavoriteButton (★ Stage 5 신규)"],
-      "★_3_components_isomorphic": true,
+      "binding_component": ["HomeFavoriteButton", "FavoriteArticleButton (article)", "ProfileFavoriteButton (Stage 5 신규)"],
+      "_3_components_isomorphic": true,
       "initial_state": "inactive",
       "states": {
         "inactive": {"on": {"FAVORITE": {"target": "pending-favorite", "guard": "isAuthenticated", "actions": ["set_optimistic('favorite')"]}}},
@@ -92,10 +92,10 @@
     },
     {
       "id": "SM-FOLLOW-TOGGLE",
-      "purpose": "★ optimistic update — follow author (★ 2 컴포넌트 isomorphic)",
+      "purpose": "optimistic update — follow author (2 컴포넌트 isomorphic)",
       "five_truths": ["server_cache", "dom"],
-      "binding_component": ["FollowAuthorButton (article)", "ProfileFollowButton (★ Stage 5 신규)"],
-      "★_2_components_isomorphic": true,
+      "binding_component": ["FollowAuthorButton (article)", "ProfileFollowButton (Stage 5 신규)"],
+      "_2_components_isomorphic": true,
       "initial_state": "not-following",
       "states": {
         "not-following": {"on": {"FOLLOW": {"target": "pending-follow", "guard": "isAuthenticated", "actions": ["set_optimistic('follow')"]}}},
@@ -107,7 +107,7 @@
     },
     {
       "id": "SM-COMMENT-FORM",
-      "purpose": "★ 진실 #4 form — Comment create with reset key",
+      "purpose": "진실 #4 form — Comment create with reset key",
       "five_truths": ["form"],
       "binding_component": "CreateCommentForm",
       "initial_state": "idle",
@@ -120,7 +120,7 @@
     },
     {
       "id": "SM-EDITOR-FORM",
-      "purpose": "★ ★ 진실 #4 form — Editor (Article Create/Update / Stage 5 신규 SM / dual-use)",
+      "purpose": "진실 #4 form — Editor (Article Create/Update / Stage 5 신규 SM / dual-use)",
       "five_truths": ["form"],
       "binding_component": "EditorForm (CreatePage + UpdatePage 공유)",
       "initial_state": "idle",
@@ -134,24 +134,24 @@
         "submit-error": {"on": {"RETRY": "idle"}},
         "success-redirect": {"type": "final", "actions": ["redirect(/article/:slug)"]}
       },
-      "validation_br": {"title_required": "★ Zod (form-validation-spec) / HTML5 native ❌ — F-FE-005 Stage 5 신규 finding", "body_required": "★ Zod / HTML5 native ❌ — F-FE-005"}
+      "validation_br": {"title_required": "Zod (form-validation-spec) / HTML5 native ❌ — F-FE-005 Stage 5 신규 finding", "body_required": "Zod / HTML5 native ❌ — F-FE-005"}
     },
     {
       "id": "SM-SETTINGS-FORM",
-      "purpose": "★ ★ 진실 #4 form — Settings (User Update + Logout 분리 / Stage 5 신규 SM)",
+      "purpose": "진실 #4 form — Settings (User Update + Logout 분리 / Stage 5 신규 SM)",
       "five_truths": ["form"],
       "binding_component": "SettingsPage",
       "initial_state": "idle",
       "states": {
         "idle": {"on": {"SUBMIT_UPDATE": "validating-update", "LOGOUT": "logging-out"}},
         "validating-update": {"invoke": {"src": "validateSchema (Zod UpdateUserRequest)", "onDone": "updating", "onError": "validation-error"}},
-        "updating": {"invoke": {"src": "PUT /user", "onDone": "idle (★ form 유지)", "onError": "update-error"}},
-        "logging-out": {"invoke": {"src": "★ FE clearToken + queryClient.removeQueries", "onDone": "logged-out"}},
+        "updating": {"invoke": {"src": "PUT /user", "onDone": "idle (form 유지)", "onError": "update-error"}},
+        "logging-out": {"invoke": {"src": "FE clearToken + queryClient.removeQueries", "onDone": "logged-out"}},
         "validation-error": {"on": {"RETRY": "validating-update"}},
         "update-error": {"on": {"RETRY": "validating-update"}},
         "logged-out": {"type": "final", "actions": ["redirect(/)"]}
       },
-      "validation_br": {"username_required": "Zod + HTML5 native", "email_required": "Zod + HTML5 native", "password_optional": "Zod (★ optional update)"}
+      "validation_br": {"username_required": "Zod + HTML5 native", "email_required": "Zod + HTML5 native", "password_optional": "Zod (optional update)"}
     }
   ],
   "summary": {
@@ -164,15 +164,15 @@
       "dom": 0
     },
     "optimistic_update_machines": 2,
-    "framework_neutrality": "★ 100% (★ XState+SCXML 호환 / React idiom in IR = 0)",
+    "framework_neutrality": "100% (XState+SCXML 호환 / React idiom in IR = 0)",
     "ir_react_idioms_in_spec": 0,
     "validation_br_extracted": 14,
-    "★_isomorphic_machines_detected": {
-      "feed_navigation": "★ Home + Profile = 2 isomorphic (★ Stage 5 정식화 시점)",
-      "favorite_toggle": "★ 3 컴포넌트 isomorphic (Home + Article + Profile)",
-      "follow_toggle": "★ 2 컴포넌트 isomorphic (Article + Profile)"
+    "_isomorphic_machines_detected": {
+      "feed_navigation": "Home + Profile = 2 isomorphic (Stage 5 정식화 시점)",
+      "favorite_toggle": "3 컴포넌트 isomorphic (Home + Article + Profile)",
+      "follow_toggle": "2 컴포넌트 isomorphic (Article + Profile)"
     },
-    "★_stage_5_vs_stage_4_diff": {
+    "_stage_5_vs_stage_4_diff": {
       "machines_added": 4,
       "isomorphic_patterns_validated": 3,
       "new_findings_via_state_analysis": 1

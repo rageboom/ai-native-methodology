@@ -3,7 +3,7 @@
 > **일자**: 2026-05-23
 > **session**: 36차 (현 session) / v8.13.0 MINOR release
 > **카테고리**: methodology / sql-inventory-validator Tier 1 in-plugin XML parser 격상 (xmllint → fast-xml-parser)
-> **상태**: 승인 (★ 사용자 "ㄱㄱ" → "Option A: Tier 1 격상 (fast-xml-parser 도입)" 2026-05-23)
+> **상태**: 승인 ( 사용자 "ㄱㄱ" → "Option A: Tier 1 격상 (fast-xml-parser 도입)" 2026-05-23)
 > **Resolves**: DEC-2026-05-23-legacy-risks-migration §7 carry C-xmllint-env-absent (medium / v8.9.0~v8.12.0 보존 carry)
 > **Cross-link**: DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classification) paradigm 정합
 
@@ -23,6 +23,7 @@ v8.9.0 release ceremony 안 carry "C-xmllint-env-absent" — sql-inventory-valid
 ## 2. R19 paradigm 정합 분석
 
 DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classification):
+
 - **Tier 1** in-plugin (Semgrep + Spectral / Node-native)
 - **Tier 2** user-environment SARIF import (PMD + SpotBugs + CodeQL + Daikon / JVM/CLI binary)
 - **Tier 3** simulated 영구 reject
@@ -30,16 +31,16 @@ DEC-2026-05-18-runtime-tool-exclusion §R19 (Tool Ecosystem Dependency Classific
 xmllint = libxml2 binary (C-native CLI / JVM 아니지만 OS-native) = **Tier 2 axis 상**.
 fast-xml-parser = npm pure JS package = **Tier 1 in-plugin**.
 
-★ R19 권고: "Tier 1 in-plugin 우선" — xmllint 가 Tier 2 였지만 Node-native 대체 존재 시 격상 정당. **본 release = R19 paradigm 본격 완결**.
+R19 권고: "Tier 1 in-plugin 우선" — xmllint 가 Tier 2 였지만 Node-native 대체 존재 시 격상 정당. **본 release = R19 paradigm 본격 완결**.
 
 ## 3. 결단 (4 cluster)
 
-| # | 결단 | 채택 |
-|---|---|---|
-| D1 | Option A — Tier 1 격상 (fast-xml-parser ^4.5.0 도입) | ✅ |
-| D2 | field name backward-compat (xmllint_total / xmllint_version 보존 / value 만 `fast-xml-parser:<ver>` marker) | ✅ |
-| D3 | `xmllint_unavailable` status 분기 제거 (v8.13.0+ 도달 불가 / dead code clean) | ✅ |
-| D4 | v8.13.0 MINOR (additive — Node-native parser 격상 / breaking 0 / field 보존) | ✅ |
+| #   | 결단                                                                                                        | 채택 |
+| --- | ----------------------------------------------------------------------------------------------------------- | ---- |
+| D1  | Option A — Tier 1 격상 (fast-xml-parser ^4.5.0 도입)                                                        | ✅   |
+| D2  | field name backward-compat (xmllint_total / xmllint_version 보존 / value 만 `fast-xml-parser:<ver>` marker) | ✅   |
+| D3  | `xmllint_unavailable` status 분기 제거 (v8.13.0+ 도달 불가 / dead code clean)                               | ✅   |
+| D4  | v8.13.0 MINOR (additive — Node-native parser 격상 / breaking 0 / field 보존)                                | ✅   |
 
 ## 4. 시행 (4원칙 4단계)
 
@@ -79,13 +80,13 @@ fast-xml-parser = npm pure JS package = **Tier 1 in-plugin**.
 
 ## 5. STOP-3 hard gate 실측
 
-| Gate | 결과 |
-|---|---|
-| sql-inventory-validator test | **31/31 pass** ✅ (v8.7.1 iBATIS test #25+#26 회복) |
-| workspace test | **690/690 pass** ✅ (v8.12.0 688/690 → v8.13.0 690/690 / 2 fail 회복) |
-| release-readiness | **16/16 ready** ✅ (v8.12.0 15/16 → v8.13.0 16/16 / xmllint carry 종결) |
-| version 3-way sync | plugin.json 8.13.0 / package.json 8.13.0 / sql-inventory-validator 0.3.0 / CHANGELOG v8.13.0 ✅ |
-| breaking | 0 = MINOR (additive — Node-native parser / field name backward-compat) |
+| Gate                         | 결과                                                                                            |
+| ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| sql-inventory-validator test | **31/31 pass** ✅ (v8.7.1 iBATIS test #25+#26 회복)                                             |
+| workspace test               | **690/690 pass** ✅ (v8.12.0 688/690 → v8.13.0 690/690 / 2 fail 회복)                           |
+| release-readiness            | **16/16 ready** ✅ (v8.12.0 15/16 → v8.13.0 16/16 / xmllint carry 종결)                         |
+| version 3-way sync           | plugin.json 8.13.0 / package.json 8.13.0 / sql-inventory-validator 0.3.0 / CHANGELOG v8.13.0 ✅ |
+| breaking                     | 0 = MINOR (additive — Node-native parser / field name backward-compat)                          |
 
 ## 6. Lessons Learned 신규
 
@@ -95,15 +96,16 @@ fast-xml-parser = npm pure JS package = **Tier 1 in-plugin**.
 
 ## 7. 차기 session carry
 
-| carry | 우선순위 | 비고 |
-|---|---|---|
-| C-operation-md-work-folder | low | v8.9.0 carry 보존 / work/dep-graph/operation.md 가 git tracked 아님 / docs/ 흡수 후보 |
+| carry                      | 우선순위 | 비고                                                                                  |
+| -------------------------- | -------- | ------------------------------------------------------------------------------------- |
+| C-operation-md-work-folder | low      | v8.9.0 carry 보존 / work/dep-graph/operation.md 가 git tracked 아님 / docs/ 흡수 후보 |
 
-★ ★ ★ ★ ★ ★ ★ ★ **본 session (33차~36차) 누적 5 release** = v8.9.0 (dep-graph ceremony) → v8.10.0 (schema 진화) → v8.11.0 (forward warn lane) → v8.12.0 (legacy 청산) → v8.13.0 (R19 Tier 1 격상). **2 carry 종결** (analysis_validator carry + Senior REVISE-1 carry + legacy carry + xmllint carry) / **1 carry 잔존** (operation.md / low).
+        **본 session (33차~36차) 누적 5 release** = v8.9.0 (dep-graph ceremony) → v8.10.0 (schema 진화) → v8.11.0 (forward warn lane) → v8.12.0 (legacy 청산) → v8.13.0 (R19 Tier 1 격상). **2 carry 종결** (analysis_validator carry + Senior REVISE-1 carry + legacy carry + xmllint carry) / **1 carry 잔존** (operation.md / low).
 
 ---
 
 **참고**:
+
 - 직전 release: v8.12.0 (DEC-2026-05-23-legacy-risks-migration §7 carry C-xmllint-env-absent)
 - DEC-2026-05-18-runtime-tool-exclusion (R19 paradigm SSOT)
 - v8.9.0 ~ v8.12.0 carry 보존 (4 release) → v8.13.0 종결 (cascade 최종)

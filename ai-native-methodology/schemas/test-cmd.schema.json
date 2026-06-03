@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/test-cmd.schema.json",
-  "title": "Test Command Contract (★ ★ ADR-CHAIN-004 §1)",
-  "description": "★ ★ v2.0 sub-plan-3b — `.aimd/config/test-cmd.json` 사용자 명시 contract. ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) §1 정합. test-impl-pass-validator 가 본 contract 를 single source 로 참조하여 진짜 runner shell 호출.",
+  "title": "Test Command Contract (ADR-CHAIN-004 §1)",
+  "description": "v2.0 sub-plan-3b — `.aimd/config/test-cmd.json` 사용자 명시 contract. ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) §1 정합. test-impl-pass-validator 가 본 contract 를 single source 로 참조하여 진짜 runner shell 호출.",
   "type": "object",
   "required": ["framework", "test_cmd"],
   "additionalProperties": false,
@@ -26,7 +26,7 @@
         "dotnet-test",
         "other"
       ],
-      "description": "test framework. ★ ADR-CHAIN-004 §1 정합 / `other` 시 `report_format` + `stdout_parser` 의무"
+      "description": "test framework. ADR-CHAIN-004 §1 정합 / `other` 시 `report_format` + `stdout_parser` 의무"
     },
     "framework_version": {
       "type": "string",
@@ -36,61 +36,61 @@
     "test_cmd": {
       "type": "string",
       "minLength": 1,
-      "description": "★ shell command (binary 경로 + 첫 인자). 예: 'npm', 'npx', 'mvn', 'python', './gradlew'. ★ shell:true ❌ — array argument 강제 (test_cmd_args 와 합침)",
+      "description": "shell command (binary 경로 + 첫 인자). 예: 'npm', 'npx', 'mvn', 'python', './gradlew'. shell:true ❌ — array argument 강제 (test_cmd_args 와 합침)",
       "examples": ["npm", "npx", "mvn", "./gradlew", "python", "go", "cargo"]
     },
     "test_cmd_args": {
       "type": "array",
       "items": {"type": "string"},
       "default": [],
-      "description": "test_cmd 에 이어지는 array argument (예: ['test', '--', '--ci', '--coverage']). ★ shell injection 차단",
+      "description": "test_cmd 에 이어지는 array argument (예: ['test', '--', '--ci', '--coverage']). shell injection 차단",
       "examples": [["test", "--", "--ci"], ["-B", "test"], ["test", "./..."]]
     },
     "timeout_ms": {
       "type": "integer",
       "minimum": 1000,
       "default": 600000,
-      "description": "★ ADR-CHAIN-004 §2 / Senior Blocker 2 §3 — runner 무한 루프 / OOM 차단. default 600000ms (10분)"
+      "description": "ADR-CHAIN-004 §2 / Senior Blocker 2 §3 — runner 무한 루프 / OOM 차단. default 600000ms (10분)"
     },
     "flaky_retry_per_test": {
       "type": "integer",
       "minimum": 0,
       "maximum": 5,
       "default": 2,
-      "description": "★ ADR-CHAIN-004 §5 — Playwright 정합. per-test cap (3+ retry ❌). 3회째 fail = 진짜 fail / 모든 retry trace 는 flaky_retries_count 필드로 기록"
+      "description": "ADR-CHAIN-004 §5 — Playwright 정합. per-test cap (3+ retry ❌). 3회째 fail = 진짜 fail / 모든 retry trace 는 flaky_retries_count 필드로 기록"
     },
     "report_format": {
       "type": "string",
       "enum": ["sarif-2.1.0", "junit-xml", "json", "stdout-regex"],
       "default": "json",
-      "description": "★ runner output format. sarif-2.1.0 우선 권고. junit-xml = JVM / pytest+plugin / stdout-regex = `framework: other` 의 fallback"
+      "description": "runner output format. sarif-2.1.0 우선 권고. junit-xml = JVM / pytest+plugin / stdout-regex = `framework: other` 의 fallback"
     },
     "report_path": {
       "type": "string",
-      "description": "★ runner 산출 report 의 절대/상대 경로. sarif/junit-xml 형식 시 의무 (json 형식은 stdout 캡처 가능 시 optional)"
+      "description": "runner 산출 report 의 절대/상대 경로. sarif/junit-xml 형식 시 의무 (json 형식은 stdout 캡처 가능 시 optional)"
     },
     "stdout_path": {
       "type": "string",
       "default": ".aimd/output/evidence/test-stdout.txt",
-      "description": "★ stdout 캡처 경로. test_invocation_evidence.test_runner_stdout_path 에 매핑 (5종 물증 의무 필드)"
+      "description": "stdout 캡처 경로. test_invocation_evidence.test_runner_stdout_path 에 매핑 (5종 물증 의무 필드)"
     },
     "stderr_path": {
       "type": "string",
       "default": ".aimd/output/evidence/test-stderr.txt",
-      "description": "stderr 캡처 경로. test_invocation_evidence.test_runner_stderr_path 에 매핑 (★ B5 optional)"
+      "description": "stderr 캡처 경로. test_invocation_evidence.test_runner_stderr_path 에 매핑 (B5 optional)"
     },
     "coverage_report_path": {
       "type": "string",
-      "description": "LCOV / JaCoCo / Cobertura 등 coverage 산출 경로. impl-spec.test_invocation_evidence.coverage_report_path 매핑 (★ chain-coverage-validator 와 책임 분리 / 본 schema 는 path 만 보유)"
+      "description": "LCOV / JaCoCo / Cobertura 등 coverage 산출 경로. impl-spec.test_invocation_evidence.coverage_report_path 매핑 (chain-coverage-validator 와 책임 분리 / 본 schema 는 path 만 보유)"
     },
     "allow_execute": {
       "type": "boolean",
       "default": false,
-      "description": "★ ★ ★ ADR-CHAIN-004 §4 — 사용자 명시 동의. true 일 때만 실제 실행 / false 또는 부재 시 dry-run only. CI 자동화 시 explicit allowlist 의무"
+      "description": "ADR-CHAIN-004 §4 — 사용자 명시 동의. true 일 때만 실제 실행 / false 또는 부재 시 dry-run only. CI 자동화 시 explicit allowlist 의무"
     },
     "stdout_parser": {
       "type": "object",
-      "description": "★ `framework: other` 시 의무. stdout regex pattern 으로 pass/fail/skip count 추출",
+      "description": "`framework: other` 시 의무. stdout regex pattern 으로 pass/fail/skip count 추출",
       "additionalProperties": false,
       "properties": {
         "pass_regex": {"type": "string", "description": "pass count 추출 regex (count_mode=capture 시 group 1 = count / occurrences 시 match 횟수)"},
@@ -101,7 +101,7 @@
           "type": "string",
           "enum": ["capture", "occurrences"],
           "default": "capture",
-          "description": "★ T16 — capture(default): group 1 숫자 추출(집계 라인 보유 framework, 예 mocha '5 passing'). occurrences: regex global match 횟수(per-test 라인 framework, 예 go '--- PASS:')."
+          "description": "T16 — capture(default): group 1 숫자 추출(집계 라인 보유 framework, 예 mocha '5 passing'). occurrences: regex global match 횟수(per-test 라인 framework, 예 go '--- PASS:')."
         }
       }
     },
@@ -123,7 +123,7 @@
       },
       "then": {
         "required": ["stdout_parser", "report_format"],
-        "description": "★ framework=other 시 stdout_parser + report_format 의무 (시뮬 위험 차단)"
+        "description": "framework=other 시 stdout_parser + report_format 의무 (시뮬 위험 차단)"
       }
     },
     {
@@ -133,7 +133,7 @@
       },
       "then": {
         "required": ["report_path"],
-        "description": "★ sarif-2.1.0 / junit-xml 형식 시 report_path 의무"
+        "description": "sarif-2.1.0 / junit-xml 형식 시 report_path 의무"
       }
     }
   ]

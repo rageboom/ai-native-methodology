@@ -24,7 +24,7 @@
       "on": {
         "SIGNUP": {"target": "validatingSignup", "actions": ["startSignupFlow"]},
         "LOGIN": {"target": "validatingLogin", "actions": ["startLoginFlow"]},
-        "DELETE_REQUEST": {"target": "deleted", "actions": ["★ F-140 critical — AuthMiddleware 미적용 → anonymous 가 직접 삭제"], "guard": "★★ Auth scope 결여 — 누구나 가능"}
+        "DELETE_REQUEST": {"target": "deleted", "actions": [" F-140 critical — AuthMiddleware 미적용 → anonymous 가 직접 삭제"], "guard": " Auth scope 결여 — 누구나 가능"}
       }
     },
     "validatingSignup": {
@@ -39,7 +39,7 @@
       "type": "compound",
       "on": {
         "NOT_DUPLICATE": "persistingUser",
-        "DUPLICATE_FOUND": {"target": "anonymous", "actions": ["throwHttpException400_AlreadyUnique"], "guard": "★ F-120 critical — App 1중 race-prone (DB UQ 부재)"}
+        "DUPLICATE_FOUND": {"target": "anonymous", "actions": ["throwHttpException400_AlreadyUnique"], "guard": " F-120 critical — App 1중 race-prone (DB UQ 부재)"}
       }
     },
     "persistingUser": {
@@ -47,12 +47,12 @@
       "on": {
         "BEFORE_INSERT_HOOK": "hashingPassword",
         "INSERT_OK": "registered",
-        "RACE_RACE_WINDOW": {"target": "anonymous", "actions": ["★ undefined behavior — DB UQ 자체 부재 → 양쪽 row 모두 INSERT 성공 (정합성 손실)"], "guard": "★★ DB UQ 부재 = 0중 race-safe"}
+        "RACE_RACE_WINDOW": {"target": "anonymous", "actions": [" undefined behavior — DB UQ 자체 부재 → 양쪽 row 모두 INSERT 성공 (정합성 손실)"], "guard": " DB UQ 부재 = 0중 race-safe"}
       }
     },
     "hashingPassword": {
       "on": {
-        "ARGON2_HASH": {"target": "persistingUser", "actions": ["password ← argon2.hash(plain)"], "guard": "@BeforeInsert hook (★ @BeforeUpdate 부재 — F-141)"}
+        "ARGON2_HASH": {"target": "persistingUser", "actions": ["password ← argon2.hash(plain)"], "guard": "@BeforeInsert hook ( @BeforeUpdate 부재 — F-141)"}
       }
     },
     "registered": {
@@ -71,23 +71,23 @@
       "type": "compound",
       "on": {
         "ARGON2_VERIFY_OK": {"target": "authenticated", "actions": ["jwt.sign({email, exp: now+60days})"]},
-        "ARGON2_VERIFY_FAIL": {"target": "anonymous", "actions": ["throwHttpException401_UserNotFound"], "guard": "★ 메시지 'User not found' 가 password mismatch 도 포괄 (모호)"}
+        "ARGON2_VERIFY_FAIL": {"target": "anonymous", "actions": ["throwHttpException401_UserNotFound"], "guard": " 메시지 'User not found' 가 password mismatch 도 포괄 (모호)"}
       }
     },
     "authenticated": {
       "on": {
-        "FIND_BY_EMAIL": {"target": "authenticated", "actions": ["regenerateJWT (★ 매번 호출 — F-118 DRY 위반 + 무방어 verify)"]},
+        "FIND_BY_EMAIL": {"target": "authenticated", "actions": ["regenerateJWT ( 매번 호출 — F-118 DRY 위반 + 무방어 verify)"]},
         "UPDATE_PROFILE": "updatingProfile",
-        "DELETE_OWN": {"target": "deleted", "actions": ["repository.delete({email})"], "guard": "★★ 실제 코드 = 누구나 삭제 (F-140) — 본 전이는 권장 동작만 명세"},
-        "JWT_EXPIRES_60D": {"target": "anonymous", "actions": ["★ 60일 후 verify 실패 → throw uncaught (F-118 try/catch 부재) + 모든 보호 endpoint 503 위험"]},
-        "LOGOUT": {"target": "anonymous", "actions": ["★ logout endpoint 부재 — JWT stateless / blacklist 없음"]}
+        "DELETE_OWN": {"target": "deleted", "actions": ["repository.delete({email})"], "guard": " 실제 코드 = 누구나 삭제 (F-140) — 본 전이는 권장 동작만 명세"},
+        "JWT_EXPIRES_60D": {"target": "anonymous", "actions": [" 60일 후 verify 실패 → throw uncaught (F-118 try/catch 부재) + 모든 보호 endpoint 503 위험"]},
+        "LOGOUT": {"target": "anonymous", "actions": [" logout endpoint 부재 — JWT stateless / blacklist 없음"]}
       }
     },
     "updatingProfile": {
       "type": "compound",
       "on": {
         "APPLY_OK": "authenticated",
-        "REJECT_DUPLICATE": {"target": "authenticated", "actions": ["★ F-143 — UserService.update 가 validate(newUser) 미호출 → @IsEmail 우회 가능"], "guard": "★ signup 만 validate, update 누락"}
+        "REJECT_DUPLICATE": {"target": "authenticated", "actions": [" F-143 — UserService.update 가 validate(newUser) 미호출 → @IsEmail 우회 가능"], "guard": " signup 만 validate, update 누락"}
       }
     },
     "deleted": {
@@ -99,7 +99,7 @@
     {"id": "F-120", "summary": "App 1중 race-prone — DB UQ 자체 부재 (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)"},
     {"id": "F-118", "summary": "JWT verify 3곳 try/catch 부재 + DRY 위반"},
     {"id": "F-119", "summary": "JWT 60일 expiry 길음 + refresh token 부재"},
-    {"id": "F-140", "summary": "★★ critical — UC-USER-DELETE 가 AuthMiddleware 미적용 (user.module.ts forRoutes DELETE 누락)"},
+    {"id": "F-140", "summary": " critical — UC-USER-DELETE 가 AuthMiddleware 미적용 (user.module.ts forRoutes DELETE 누락)"},
     {"id": "F-141", "summary": "@BeforeUpdate hook 부재 — password change 시 hash 자동 호출 안 됨 (현재 password change endpoint 자체 부재)"},
     {"id": "F-143", "summary": "UserService.update 가 validate(newUser) 미호출 — @IsEmail 우회 가능"}
   ]

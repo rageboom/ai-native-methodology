@@ -1,13 +1,13 @@
-# 산출물 #22: Traceability Matrix (★ v2.0 cross-cutting)
+# 산출물 #22: Traceability Matrix (v2.0 cross-cutting)
 
-> **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (★ 산업 권위 — Official research) / matrix.json 단독 SSOT (ADR-011 / ADR-008 v2 §10 이중 렌더링 supersede)
+> **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (산업 권위 — Official research) / matrix.json 단독 SSOT (ADR-011 / ADR-008 v2 §10 이중 렌더링 supersede)
 > **schema**: `schemas/traceability-matrix.schema.json`
 > **생성 phase**: cross-cutting — `/_base-build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
 > **gate**: 매 gate #1~#5 prerequisite
 
 ## 1. 목적
 
-**답하는 질문**: "UC → BHV → AC → TASK → TC → IMPL + commit_hash chain end-to-end 추적성은?" (★ v10.0.0 TASK layer)
+**답하는 질문**: "UC → BHV → AC → TASK → TC → IMPL + commit_hash chain end-to-end 추적성은?" (v10.0.0 TASK layer)
 
 **활용**: 사용자 검토 / 감사 / 산업 표준 (DO-178C / IEC 62304) 정합 입증.
 
@@ -17,29 +17,29 @@
 
 ```
 .aimd/output/_traceability/
-└── matrix.json       # ★ json 단독 SSOT (ADR-011 / 시각화·표는 view-time 도구)
+└── matrix.json       # json 단독 SSOT (ADR-011 / 시각화·표는 view-time 도구)
 ```
 
 ## 3. 추출 범위
 
-| 항목 | 출처 | 도구 | 신뢰도 |
-|---|---|---|---|
-| matrix cells | 4 chain 산출물 | 결정적 | 100% |
-| use_case_id / behavior_id / acceptance_id / test_id / impl_id | 4 chain forward+backward link | 결정적 | 100% |
-| impl_commit_hash | git rev-parse | 결정적 | 100% |
-| status (green/yellow/red) | gap detect 결과 | 결정적 | 100% |
-| severity (critical/high/medium/low) | acceptance-criteria.severity | 결정적 | 100% |
-| coverage_summary (forward/backward) | matrix scan | 결정적 | 100% |
+| 항목                                                          | 출처                          | 도구   | 신뢰도 |
+| ------------------------------------------------------------- | ----------------------------- | ------ | ------ |
+| matrix cells                                                  | 4 chain 산출물                | 결정적 | 100%   |
+| use_case_id / behavior_id / acceptance_id / test_id / impl_id | 4 chain forward+backward link | 결정적 | 100%   |
+| impl_commit_hash                                              | git rev-parse                 | 결정적 | 100%   |
+| status (green/yellow/red)                                     | gap detect 결과               | 결정적 | 100%   |
+| severity (critical/high/medium/low)                           | acceptance-criteria.severity  | 결정적 | 100%   |
+| coverage_summary (forward/backward)                           | matrix scan                   | 결정적 | 100%   |
 
 **입력**: discovery-spec.json + behavior-spec.json + acceptance-criteria.json + test-spec.json + impl-spec.json.
 
 ## 4. 검증 도구
 
-| 도구 | 검증 |
-|---|---|
-| **traceability-matrix-builder** (★ sub-plan-3 신설) | matrix.json 단독 산출 (ADR-011 / 표·graph 는 view-time 도구) |
-| chain-coverage-validator | forward+backward coverage ≥ 0.85 (★ ADR-010 v2 §2.6 ratchet) |
-| schema-validator | severity_floor (critical=1.0 const) |
+| 도구                                              | 검증                                                         |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| **traceability-matrix-builder** (sub-plan-3 신설) | matrix.json 단독 산출 (ADR-011 / 표·graph 는 view-time 도구) |
+| chain-coverage-validator                          | forward+backward coverage ≥ 0.85 (ADR-010 v2 §2.6 ratchet)   |
+| schema-validator                                  | severity_floor (critical=1.0 const)                          |
 
 ## 5. 예시 (matrix cells)
 
@@ -50,17 +50,17 @@ matrix:
     acceptance_id: AC-USER-001
     test_id: TC-USER-001
     impl_id: IMPL-USER-001
-    impl_commit_hash: "abc123def4567890abc123def4567890abc12345"
+    impl_commit_hash: 'abc123def4567890abc123def4567890abc12345'
     status: green
     severity: must
   - use_case_id: UC-USER-002
     behavior_id: BHV-USER-002
     acceptance_id: AC-USER-005
-    test_id: ~   # gap
+    test_id: ~ # gap
     impl_id: ~
     status: red
     severity: must
-    gaps: ["TC-* 부재 / chain-coverage-validator violation"]
+    gaps: ['TC-* 부재 / chain-coverage-validator violation']
 
 coverage_summary:
   forward_coverage: 0.92
@@ -79,13 +79,13 @@ coverage_summary:
 ## 6. view-time 표 렌더 예시 (matrix.json → 표)
 
 ```markdown
-| UC-* | BHV-* | AC-* | TC-* | IMPL-* | commit | status | severity |
-|---|---|---|---|---|---|---|---|
-| UC-USER-001 | BHV-USER-001 | AC-USER-001 | TC-USER-001 | IMPL-USER-001 | abc123de | 🟢 green | must |
-| UC-USER-002 | BHV-USER-002 | AC-USER-005 | — | — | — | 🔴 red | must |
+| UC-\*       | BHV-\*       | AC-\*       | TC-\*       | IMPL-\*       | commit   | status   | severity |
+| ----------- | ------------ | ----------- | ----------- | ------------- | -------- | -------- | -------- |
+| UC-USER-001 | BHV-USER-001 | AC-USER-001 | TC-USER-001 | IMPL-USER-001 | abc123de | 🟢 green | must     |
+| UC-USER-002 | BHV-USER-002 | AC-USER-005 | —           | —             | —        | 🔴 red   | must     |
 ```
 
-## 7. graph view (figure 예시 / 산출물 아님 / ★ v12 ADR-011)
+## 7. graph view (figure 예시 / 산출물 아님 / v12 ADR-011)
 
 ```mermaid
 graph LR
@@ -105,12 +105,12 @@ graph LR
 
 ## 8. carry
 
-| # | 항목 | 시점 |
-|---|---|---|
-| sp2-c4 | matrix ≥ 100 cell 시 view-time graph 분할 정책 (mermaid twin emit 폐기 — ADR-011) | sub-plan-3 |
-| sp2-c3 | impl-spec binary artifact 보존 정책 | sub-plan-5 (PoC #05) |
+| #      | 항목                                                                              | 시점                 |
+| ------ | --------------------------------------------------------------------------------- | -------------------- |
+| sp2-c4 | matrix ≥ 100 cell 시 view-time graph 분할 정책 (mermaid twin emit 폐기 — ADR-011) | sub-plan-3           |
+| sp2-c3 | impl-spec binary artifact 보존 정책                                               | sub-plan-5 (PoC #05) |
 
-## 9. 산업 권위 (★ Official research)
+## 9. 산업 권위 (Official research)
 
 - **DO-178C** (avionics) — bidirectional traceability 의무 (System Req ↔ HLR ↔ LLR ↔ Source ↔ Test 5 layer)
 - **IEC 62304** (의료기기 SW) — class C (life-threatening) 100% coverage

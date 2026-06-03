@@ -1,5 +1,5 @@
 {
-  "$comment": "AI-Native 방법론 phase 흐름 — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). ★ ★ ★ v3.0.0 MAJOR — phase ID 의미 ID 본격 자산화 (D-3 paradigm). 11 phase 숫자 ID → 의미 ID (input/discovery/db-schema/architecture/business-logic/formal-spec/characterization/sql-inventory/api/ui/quality). order 필드 ❌ / depends_on 그래프만 SSOT / 위상정렬로 순서 자동 도출 + lexicographic tiebreak. alias map ❌ / 즉시 cutover. v2.2.0-rc1 phase 4.8 sql-inventory + v2.1.0 phase 4.7 characterization + v1.2.0 phase 4.5 formal-spec 모두 의미 ID 보존. drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) + 위상정렬 검증 강제.",
+  "$comment": "AI-Native 방법론 phase 흐름 — json 단독 SSOT (v12 ADR-011 / .mermaid 짝 폐기). v3.0.0 MAJOR — phase ID 의미 ID 본격 자산화 (D-3 paradigm). 11 phase 숫자 ID → 의미 ID (input/discovery/db-schema/architecture/business-logic/formal-spec/characterization/sql-inventory/api/ui/quality). order 필드 ❌ / depends_on 그래프만 SSOT / 위상정렬로 순서 자동 도출 + lexicographic tiebreak. alias map ❌ / 즉시 cutover. v2.2.0-rc1 phase 4.8 sql-inventory + v2.1.0 phase 4.7 characterization + v1.2.0 phase 4.5 formal-spec 모두 의미 ID 보존. drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) + 위상정렬 검증 강제.",
   "id": "phase-flow",
   "version": "3.0.0",
   "phases": [
@@ -14,7 +14,7 @@
     },
     {
       "id": "template-analyze",
-      "name": "★ v3.4.0 G4: server-rendered template 흡수 (Scenario C only)",
+      "name": "v3.4.0 G4: server-rendered template 흡수 (Scenario C only)",
       "spec_file": null,
       "depends_on": ["input"],
       "inputs": ["template files (.jsp / .thymeleaf / .ejs / .erb / .razor)", "scenario_detection_result"],
@@ -62,7 +62,7 @@
     },
     {
       "id": "formal-spec",
-      "name": "형식 명세 (★ v1.2.0 신설)",
+      "name": "형식 명세 (v1.2.0 신설)",
       "spec_file": "formal-spec.md",
       "depends_on": ["business-logic"],
       "inputs": ["domain.json", "business-rules.json", "code_evidence"],
@@ -74,7 +74,7 @@
     },
     {
       "id": "characterization",
-      "name": "특성화 (★ v2.1.0 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)",
+      "name": "특성화 (v2.1.0 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)",
       "spec_file": "characterization.md",
       "depends_on": ["business-logic", "formal-spec"],
       "inputs": ["business-rules.json", "antipatterns.json", "formal-spec_optional", "domain_expert_interview_optional"],
@@ -85,7 +85,7 @@
     },
     {
       "id": "sql-inventory",
-      "name": "SQL 인벤토리 (★ v2.2.0-rc1 신설 — SQL 단위 11 컬럼 인벤토리 + extraction_automation / RDB only)",
+      "name": "SQL 인벤토리 (v2.2.0-rc1 신설 — SQL 단위 11 컬럼 인벤토리 + extraction_automation / RDB only)",
       "spec_file": "sql-inventory.md",
       "depends_on": ["discovery", "business-logic", "characterization"],
       "inputs": ["inventory.json", "business-rules.json", "antipatterns.json", "characterization-spec.json"],
@@ -139,12 +139,12 @@
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     },
     "aspects": {
-      "$comment": "★ v1.4.4 신설 — aspect skill 은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. ★ ★ ★ v2.5.0 Phase C session 13차 추가 — analysis-br-cross-consistency-check (★ Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger). ★ v11.8.0 추가 — analysis-code-graph (CodeGraph OSS 필수 도구 / code↔code reference-lens / DEC-2026-05-30-codegraph-essential / NOT gate-injected).",
+      "$comment": "v1.4.4 신설 — aspect skill 은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. v2.5.0 Phase C session 13차 추가 — analysis-br-cross-consistency-check (Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger). v11.8.0 추가 — analysis-code-graph (CodeGraph OSS 필수 도구 / code↔code reference-lens / DEC-2026-05-30-codegraph-essential / NOT gate-injected).",
       "skills": ["analysis-aspect-a11y", "analysis-aspect-i18n", "analysis-aspect-static-security", "analysis-aspect-legacy", "analysis-br-cross-consistency-check", "analysis-code-graph"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
     },
     "base": {
-      "$comment": "★ ★ ★ v2.6.0 신설 — _base- skill 3종은 phase 무관 cross-invocation 영역 (★ ★ 다른 skill 본문 안 본격 호출). apply-baseline-ratchet = analysis-input-collection input phase 진입 시 prerequisite / apply-template = template 적용 본격 / log-finding = finding 등재 본격 모든 skill cross-invocation 영역. ★ skills-axis.md §5 cross-cutting (base) row 본격 정합 / drift-validator 고아 0 의무 회피.",
+      "$comment": "v2.6.0 신설 — _base- skill 3종은 phase 무관 cross-invocation 영역 (다른 skill 본문 안 본격 호출). apply-baseline-ratchet = analysis-input-collection input phase 진입 시 prerequisite / apply-template = template 적용 본격 / log-finding = finding 등재 본격 모든 skill cross-invocation 영역. skills-axis.md §5 cross-cutting (base) row 본격 정합 / drift-validator 고아 0 의무 회피.",
       "skills": ["_base-apply-baseline-ratchet", "_base-apply-template", "_base-log-finding"],
       "applies_to": ["all phases — cross-invocation only / flow stage 직접 매핑 ❌"]
     }
@@ -154,9 +154,9 @@
     "v1.2.1": ["drift-validator + decision-table-validator + static-runner 도구 산출", "drift-check.yml CI", "Phase formal-spec cross_validation 5종 물증 if/then"],
     "v1.2.2": ["묶음 M-P2-3 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template"],
     "v1.4.4": ["manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md)", "각 phase 에 skills 매핑 명시", "cross_cutting.aspects 신설 (aspect skill 4종)", "skills-axis.md 명세 신설", "drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제"],
-    "v1.5.0": ["★ ★ ★ ADR-BE-001 negative-space corroboration 정식화 (★ ADR-FE-007 positive-space variant)", "schemas/error-mapping-spec.schema.json 신설 (deliverable 16)", "skills/analysis-error-mapping/ 신설", "★ AP-API-001 자동 회귀 도구 본체 격상 (Spring + NestJS 양 framework)"],
-    "v2.1.0": ["★ ★ phase characterization 정식 단계 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle", "ADR-CHAIN-006 phase characterization 정식 도입 (Michael Feathers + Specification by Example + SATD/KL-SATD)", "deliverable 23 + schemas/characterization-spec.schema.json 신설", "skills/analysis-characterization-test/ 신설", "tools/characterization-coverage-validator/ 신설", "★ ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern"],
-    "v2.2.0-rc1": ["★ ★ phase sql-inventory 정식 단계 신설 — SQL 단위 11 컬럼 인벤토리 + RDB 한정 sub-phase", "ADR-CHAIN-007 phase sql-inventory 정식 도입 (Michael Feathers + Gartner TIME + AWS MAP)", "deliverable 24 + schemas/sql-inventory.schema.json 신설", "skills/analysis-sql-inventory/ 신설", "tools/sql-inventory-extractor/ 신설", "★ ≥ 2 PoC scale-cross corroboration: PoC #06 단일책임 + PoC #07 다중책임"],
-    "v3.0.0": ["★ ★ ★ ★ phase ID 의미 ID 본격 자산화 — 11 phase 숫자 ID (0/1/2/3/4/4.5/4.7/4.8/5-1/5-2/6) → 의미 ID (input/discovery/db-schema/architecture/business-logic/formal-spec/characterization/sql-inventory/api/ui/quality)", "★ D-3 paradigm — order 필드 ❌ / depends_on 그래프만 SSOT / 위상정렬 자동 도출 + lexicographic tiebreak", "★ workflow file rename — phase-N-*.md → <id>.md 11건 (git mv)", "★ drift-validator 위상정렬 + 순환 의존 검출 신규 검증", "★ alias map ❌ / 즉시 cutover (v2.6.0 paradigm 정합)", "★ 사내 배포 전 / 실 사용자 0 / migration 코드 ❌"]
+    "v1.5.0": ["ADR-BE-001 negative-space corroboration 정식화 (ADR-FE-007 positive-space variant)", "schemas/error-mapping-spec.schema.json 신설 (deliverable 16)", "skills/analysis-error-mapping/ 신설", "AP-API-001 자동 회귀 도구 본체 격상 (Spring + NestJS 양 framework)"],
+    "v2.1.0": ["phase characterization 정식 단계 신설 — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle", "ADR-CHAIN-006 phase characterization 정식 도입 (Michael Feathers + Specification by Example + SATD/KL-SATD)", "deliverable 23 + schemas/characterization-spec.schema.json 신설", "skills/analysis-characterization-test/ 신설", "tools/characterization-coverage-validator/ 신설", "≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern"],
+    "v2.2.0-rc1": ["phase sql-inventory 정식 단계 신설 — SQL 단위 11 컬럼 인벤토리 + RDB 한정 sub-phase", "ADR-CHAIN-007 phase sql-inventory 정식 도입 (Michael Feathers + Gartner TIME + AWS MAP)", "deliverable 24 + schemas/sql-inventory.schema.json 신설", "skills/analysis-sql-inventory/ 신설", "tools/sql-inventory-extractor/ 신설", "≥ 2 PoC scale-cross corroboration: PoC #06 단일책임 + PoC #07 다중책임"],
+    "v3.0.0": ["phase ID 의미 ID 본격 자산화 — 11 phase 숫자 ID (0/1/2/3/4/4.5/4.7/4.8/5-1/5-2/6) → 의미 ID (input/discovery/db-schema/architecture/business-logic/formal-spec/characterization/sql-inventory/api/ui/quality)", "D-3 paradigm — order 필드 ❌ / depends_on 그래프만 SSOT / 위상정렬 자동 도출 + lexicographic tiebreak", "workflow file rename — phase-N-*.md → <id>.md 11건 (git mv)", "drift-validator 위상정렬 + 순환 의존 검출 신규 검증", "alias map ❌ / 즉시 cutover (v2.6.0 paradigm 정합)", "사내 배포 전 / 실 사용자 0 / migration 코드 ❌"]
   }
 }

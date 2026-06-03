@@ -1,13 +1,13 @@
-# spectral-runner/ — Spectral OpenAPI lint wrapper (★ 진짜 외부 도구 / no-simulation 1호)
+# spectral-runner/ — Spectral OpenAPI lint wrapper (진짜 외부 도구 / no-simulation 1호)
 
 ## Purpose
 
-`@stoplight/spectral-cli` wrapper. Phase 5-1 openapi.yaml 의 **진짜 외부 도구 lint** (Stoplight Spectral). ★ ★ ★ no-simulation 정책 1호 실현 (DEC-2026-05-01 v1.3.0 release).
+`@stoplight/spectral-cli` wrapper. Phase 5-1 openapi.yaml 의 **진짜 외부 도구 lint** (Stoplight Spectral). no-simulation 정책 1호 실현 (DEC-2026-05-01 v1.3.0 release).
 
 ## When to call
 
 - **trigger**: Phase 5-1 (api) openapi.yaml 산출 후
-- **호출자**: ★ **사용자 또는 orchestrate 명시 호출** (no-simulation 정합 / auto-invoke ❌ / G2 LL-G2-06 정합 / 2026-05-15 carry 정정)
+- **호출자**: **사용자 또는 orchestrate 명시 호출** (no-simulation 정합 / auto-invoke ❌ / G2 LL-G2-06 정합 / 2026-05-15 carry 정정)
 - **방식**: `npx spectral lint ...` (CLI passthrough / wrapper Node 진입 함수 부재)
 - **carry** (v3.x): skill `analysis-openapi` 의 auto-invoke 통합은 chain-driver hooks-bridge 정합 결단 후 별도 시행. 현재 = LLM 양심 의존 auto-invoke ❌ / 사용자 명시 호출 의무 ([[feedback_no_static_tool_simulation]] 정합)
 
@@ -20,7 +20,7 @@ npx spectral lint <openapi.yaml> \
   --format pretty
 ```
 
-★ npm install 의존성 (package-lock.json 128KB) — Spectral 공식 도구 정합. plugin install 후 wrapper 사용 시 `npm install` 필요.
+npm install 의존성 (package-lock.json 128KB) — Spectral 공식 도구 정합. plugin install 후 wrapper 사용 시 `npm install` 필요.
 
 ## Outputs
 
@@ -36,14 +36,14 @@ npx spectral lint <openapi.yaml> \
   - `operation-tags` (1) — root endpoint tags 부재
   - `oas3-unused-component` (1) — GenericError schema 미사용
 
-→ 신뢰도 80-87% → **85-92% 도달** (★ ADR-009 단계 4 — 진짜 도구 1회 실행).
+→ 신뢰도 80-87% → **85-92% 도달** (ADR-009 단계 4 — 진짜 도구 1회 실행).
 
 ## Exit codes
 
-| code | 의미 |
-|---|---|
-| 0 | no errors (warnings 가능) |
-| 1 | errors ≥ 1 |
+| code | 의미                      |
+| ---- | ------------------------- |
+| 0    | no errors (warnings 가능) |
+| 1    | errors ≥ 1                |
 
 ## ruleset
 
@@ -65,9 +65,9 @@ npx spectral lint <openapi.yaml> \
 ```bash
 # baseline 생성
 npx spectral lint <openapi.yaml> --format json > baseline.json
-# ratchet (CI) — 신규 결함만 차단 (★ wrapper 별도 implementation 필요 / sub-plan 후속 carry)
+# ratchet (CI) — 신규 결함만 차단 (wrapper 별도 implementation 필요 / sub-plan 후속 carry)
 ```
 
-## ★★★ no-simulation 정합
+## no-simulation 정합
 
 본 도구는 진짜 외부 lint 도구 (Stoplight Spectral) wrapper. AI 추론 0%.

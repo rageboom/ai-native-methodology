@@ -1,6 +1,6 @@
 # DEC-2026-05-26-discovery-spec-rename
 
-> ★ v11.0.0 #1 결단 — `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename. SSOT: [DEC-2026-05-26-v11-paradigm-결단](DEC-2026-05-26-v11-paradigm-결단.md).
+> v11.0.0 #1 결단 — `planning-spec.{json,md}` → `discovery-spec.{json,md}` rename. SSOT: [DEC-2026-05-26-v11-paradigm-결단](DEC-2026-05-26-v11-paradigm-결단.md).
 
 **일자**: 2026-05-26 (session 48차)
 **카테고리**: paradigm / naming coherence — stage 이름 vs 산출물 이름 비대칭 drift 해소
@@ -9,16 +9,16 @@
 
 ## 1. 현재 상태 (drift 본격 표면화)
 
-| 자산 | 명명 | stage 명명 정합 |
-|---|---|---|
-| skills/ | `discovery-*` 6종 | discovery ✅ |
-| agents/ | `discovery-agent.md` | discovery ✅ |
-| flows/ | `discovery.phase-flow.json` | discovery ✅ |
-| **산출물** | **`planning-spec.{json,md}`** | discovery ❌ ★ ★ ★ |
-| **schema** | **`planning-spec.schema.json`** | discovery ❌ |
-| **tool** | **`tools/planning-extraction-validator`** | discovery ❌ |
+| 자산       | 명명                                      | stage 명명 정합 |
+| ---------- | ----------------------------------------- | --------------- |
+| skills/    | `discovery-*` 6종                         | discovery ✅    |
+| agents/    | `discovery-agent.md`                      | discovery ✅    |
+| flows/     | `discovery.phase-flow.json`               | discovery ✅    |
+| **산출물** | **`planning-spec.{json,md}`**             | discovery ❌    |
+| **schema** | **`planning-spec.schema.json`**           | discovery ❌    |
+| **tool**   | **`tools/planning-extraction-validator`** | discovery ❌    |
 
-★ 산출물 이름이 stage 이름과 비대칭 = chain harness 6-stage paradigm (v9.0.0) 진화 안 누락된 sub-task. DEC-2026-05-21 §3 backward-compat 결단으로 의도된 미루어짐 / v9.0.0 안 schema reuse 의무 정합 / 그러나 본격 drift attractor 로 확인됨.
+산출물 이름이 stage 이름과 비대칭 = chain harness 6-stage paradigm (v9.0.0) 진화 안 누락된 sub-task. DEC-2026-05-21 §3 backward-compat 결단으로 의도된 미루어짐 / v9.0.0 안 schema reuse 의무 정합 / 그러나 본격 drift attractor 로 확인됨.
 
 ## 2. 결단 본격
 
@@ -26,15 +26,16 @@
 
 ### 명명 정합 대안 비교
 
-| 후보 | 정합성 | 비고 |
-|---|---|---|
-| **discovery-spec** ★ 채택 | stage 명명 정합 (다른 stage 와 동형 / spec/plan/test/implement) | 자연 선택 |
-| use-case-spec | 핵심 entity 정합 (UC-* 명시) | 미채택 — UC 는 entity 일 뿐 / spec 산출물은 UC + business_intent + source_grounded_evidence 종합 |
-| requirements-spec | 전통 SE 정합 | 미채택 — Adzic Specification by Example paradigm 안 "requirements" 용어 본격 retract (Gojko Adzic 의 BDD 사상 정합) |
+| 후보                    | 정합성                                                          | 비고                                                                                                                |
+| ----------------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **discovery-spec** 채택 | stage 명명 정합 (다른 stage 와 동형 / spec/plan/test/implement) | 자연 선택                                                                                                           |
+| use-case-spec           | 핵심 entity 정합 (UC-\* 명시)                                   | 미채택 — UC 는 entity 일 뿐 / spec 산출물은 UC + business_intent + source_grounded_evidence 종합                    |
+| requirements-spec       | 전통 SE 정합                                                    | 미채택 — Adzic Specification by Example paradigm 안 "requirements" 용어 본격 retract (Gojko Adzic 의 BDD 사상 정합) |
 
 ## 3. 영향 면적 (breaking change scope)
 
 ### 직접 영향
+
 - `schemas/planning-spec.schema.json` → `schemas/discovery-spec.schema.json` (git mv)
 - 산출물 file path `planning-spec.{json,md}` → `discovery-spec.{json,md}` (`.aimd/<scope>/discovery/`)
 - `tools/planning-extraction-validator` → `tools/discovery-extraction-validator` (workspace rename)
@@ -44,6 +45,7 @@
 - `methodology-spec/deliverables/17-planning-spec.md` → `17-discovery-spec.md` (git mv + 본문)
 
 ### 간접 영향 (cross_links)
+
 - 5 PoC artifact (poc-04-mini / poc-05 / poc-03 / poc-14 / poc-11) `planning-spec.json` 모두 rename + cross_links 갱신
 - traceability-matrix entries (`source_artifact_ref` 산출물명) 본격 갱신
 - ADR-CHAIN-001 §1 (이중 렌더링) 본문 인용 갱신
@@ -52,6 +54,7 @@
 - `tools/chain-coverage-validator` discovery stage 산출물명 갱신
 
 ### CLAUDE.md / charter 인용
+
 - CLAUDE.md "산출물 5종 이식성" 표 (`rules.json`, `domain.json`, `openapi.yaml`, `schema.json`, `antipatterns.json`) — discovery-spec 본격 추가 ❌ (이식성은 analysis 자산만)
 - CLAUDE.md "v2.0 신규 chain 산출물 6종" 표 `planning-spec` → `discovery-spec` rename
 - `methodology-spec/lifecycle-contract.md` 본문 인용 갱신
@@ -60,6 +63,7 @@
 ### backward-compat 결단
 
 DEC-2026-05-21 §3 "산출물명 reuse keep" = **본격 retract**. v11.0.0 MAJOR breaking 자격으로 본격 rename. 이유:
+
 1. v9.0.0 의 산출물명 reuse 의도 (schema reuse minimize) 가 실제 사용자 진입 시 cognitive load 증가
 2. 1 release 안 본격 rename = 한번에 본격 일관 / 단계적 rename = drift attractor 본격 증가 risk
 3. v11.0.0 MAJOR 다른 결단 (BE/FE 분리 / Epic 재정의 등) 와 함께 시행 = 사용자 학습 곡선 한 번에 흡수
@@ -94,6 +98,7 @@ DEC-2026-05-21 §3 "산출물명 reuse keep" = **본격 retract**. v11.0.0 MAJOR
 ```
 
 ### test cascade
+
 - chain-driver REQUIRED_VALIDATORS_PER_STAGE.discovery 안 validator 명 갱신 (planning-extraction-validator → discovery-extraction-validator)
 - 모든 test 안 산출물명 reference 갱신
 - traceability-matrix-builder source_artifact_ref 갱신
@@ -102,7 +107,8 @@ DEC-2026-05-21 §3 "산출물명 reuse keep" = **본격 retract**. v11.0.0 MAJOR
 ## 5. ratchet (legacy carry 대응)
 
 기존 PoC 산출물 (`planning-spec.{json,md}`) 의 backward-compat:
-- v11.0.0 = ★ ★ ★ 의도적 breaking. legacy file 본격 rename 의무. backward-compat shim ❌.
+
+- v11.0.0 = 의도적 breaking. legacy file 본격 rename 의무. backward-compat shim ❌.
 - 5 PoC sweep = Phase 4 안 본격 시행. v11.0.0 release 안 본격 종결.
 - 차후 외부 사용자 (Type 2) = v11.0.0 release note 안 본격 명시. legacy 산출물 보유 사용자는 v10.x 호환 layer 없이 본격 rename 의무 (1-shot migration script 제공 가능).
 

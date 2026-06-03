@@ -1,5 +1,5 @@
 {
-  "$comment": "★ invalid fixture — dynamic_branch.tag_type enum 외 / C-v2.2.0-7",
+  "$comment": "invalid fixture — dynamic_branch.tag_type enum 외 / C-v2.2.0-7",
   "meta_confidence": {
     "generated_at": "2026-05-12T00:00:00Z",
     "confidence": 0.85,
@@ -15,7 +15,7 @@
     {
       "sql_id": "FooDAO.select",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ 잘못된 tag_type",
+      "business_meaning": "잘못된 tag_type",
       "dependent_tables": ["TB_FOO"],
       "dynamic_branch": [
         { "tag": "<unknown>", "tag_type": "unknown:tag", "branch_count": 1 }

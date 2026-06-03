@@ -3,38 +3,45 @@
 // greenfield 시나리오 = 코드-고고학 패스 없음 (legacy 코드 부재) → antipatterns / migration-cautions
 // 는 본질적으로 N/A. "빈/N-A 정당화 명시" (use-scenario-taxonomy.md §3.1 / code_pointers_na 동형).
 //
-// ★ schema 정합 주의: antipatterns.schema.json = top-level additionalProperties:false (required meta+antipatterns).
+// schema 정합 주의: antipatterns.schema.json = top-level additionalProperties:false (required meta+antipatterns).
 //   → N/A 사유는 meta(additionalProperties:true) 안에 embed. top-level 신규 필드 금지.
 
 // meta-confidence.schema.json inputs_used enum 중 greenfield 입력 채널 매핑.
 const CHANNEL_INPUTS = Object.freeze({
-  swagger: 'design_specs', // API 계약 = design spec
-  figma: 'design_specs',
-  'plan-doc': 'planning_docs',
-  prompt: 'documentation',
+	swagger: 'design_specs', // API 계약 = design spec
+	figma: 'design_specs',
+	'plan-doc': 'planning_docs',
+	prompt: 'documentation',
 });
 
-export function buildNaAntipatterns({ channel = 'swagger', generatedAt, methodologyVersion = 'v11.10.0' } = {}) {
-  const inputUsed = CHANNEL_INPUTS[channel] || 'design_specs';
-  return {
-    meta: {
-      generated_at: generatedAt,
-      confidence: 0.98,
-      inputs_used: [inputUsed],
-      methodology_version: methodologyVersion,
-      generated_by: 'greenfield-bootstrap',
-      scenario: 'greenfield',
-      na_reason:
-        'greenfield scenario — legacy 코드가 없어 코드-고고학 패스를 수행하지 않음. ' +
-        'antipatterns 카탈로그는 legacy 전용(회피 후보 추출) 산출물이므로 N/A. ' +
-        '빈 배열은 설계상 정당(누락 ❌). 향후 S2(AX전환)/S3(특성화) 진입 시 채워짐.',
-    },
-    antipatterns: [],
-  };
+export function buildNaAntipatterns({
+	channel = 'swagger',
+	generatedAt,
+	methodologyVersion = 'v11.10.0',
+} = {}) {
+	const inputUsed = CHANNEL_INPUTS[channel] || 'design_specs';
+	return {
+		meta: {
+			generated_at: generatedAt,
+			confidence: 0.98,
+			inputs_used: [inputUsed],
+			methodology_version: methodologyVersion,
+			generated_by: 'greenfield-bootstrap',
+			scenario: 'greenfield',
+			na_reason:
+				'greenfield scenario — legacy 코드가 없어 코드-고고학 패스를 수행하지 않음. ' +
+				'antipatterns 카탈로그는 legacy 전용(회피 후보 추출) 산출물이므로 N/A. ' +
+				'빈 배열은 설계상 정당(누락 ❌). 향후 S2(AX전환)/S3(특성화) 진입 시 채워짐.',
+		},
+		antipatterns: [],
+	};
 }
 
-export function buildMigrationCautionsMd({ scope = 'greenfield', channel = 'swagger' } = {}) {
-  return `# Migration Cautions — N/A (greenfield)
+export function buildMigrationCautionsMd({
+	scope = 'greenfield',
+	channel = 'swagger',
+} = {}) {
+	return `# Migration Cautions — N/A (greenfield)
 
 > **scenario**: \`greenfield\` — 신규 프로젝트 (legacy 코드 없음 / bootstrap 입력 채널 = \`${channel}\`).
 > **scope**: \`${scope}\`

@@ -3,7 +3,7 @@ info:
   title: Todo API (poc-14 / refined by analysis-openapi)
   version: 0.1.0
   description: |
-    ★ analysis-openapi skill 이 source/main.py + schemas.py 에서 추출.
+    analysis-openapi skill 이 source/main.py + schemas.py 에서 추출.
     input/swagger.yaml 사용자 제공 swagger 와 정합 + source code ground-truth 추가 보강.
 servers:
   - url: http://localhost:8000
@@ -18,9 +18,20 @@ paths:
           application/json:
             schema: { $ref: '#/components/schemas/UserCreate' }
       responses:
-        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/UserResponse' } } } }
-        '422': { description: Validation error (Pydantic) — password < 8자 또는 email 형식 위배 }
-        '409': { description: "★ Spec 명시 / 현 구현 미수행 (AP-FSIM-DATA-001)" }
+        '201':
+          {
+            description: Created,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/UserResponse' } },
+              },
+          }
+        '422':
+          {
+            description: Validation error (Pydantic) — password < 8자 또는 email 형식 위배,
+          }
+        '409': { description: 'Spec 명시 / 현 구현 미수행 (AP-FSIM-DATA-001)' }
   /users/login:
     post:
       summary: 로그인 (JWT 발급)
@@ -31,7 +42,15 @@ paths:
           application/json:
             schema: { $ref: '#/components/schemas/UserLogin' }
       responses:
-        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/AuthToken' } } } }
+        '200':
+          {
+            description: OK,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/AuthToken' } },
+              },
+          }
         '401': { description: Invalid credentials }
   /todos:
     get:
@@ -41,7 +60,21 @@ paths:
         - { in: query, name: offset, schema: { type: integer, default: 0 } }
         - { in: query, name: limit, schema: { type: integer, default: 20 } }
       responses:
-        '200': { description: OK, content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/TodoResponse' } } } } }
+        '200':
+          {
+            description: OK,
+            content:
+              {
+                application/json:
+                  {
+                    schema:
+                      {
+                        type: array,
+                        items: { $ref: '#/components/schemas/TodoResponse' },
+                      },
+                  },
+              },
+          }
         '401': { description: Unauthorized }
     post:
       summary: Todo 생성
@@ -49,26 +82,41 @@ paths:
       requestBody:
         required: true
         content:
-          application/json: { schema: { $ref: '#/components/schemas/TodoCreate' } }
+          application/json:
+            { schema: { $ref: '#/components/schemas/TodoCreate' } }
       responses:
-        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/TodoResponse' } } } }
+        '201':
+          {
+            description: Created,
+            content:
+              {
+                application/json:
+                  { schema: { $ref: '#/components/schemas/TodoResponse' } },
+              },
+          }
         '401': { description: Unauthorized }
   /todos/{id}:
     put:
       summary: Todo 수정 (본인만)
       security: [{ bearerAuth: [] }]
-      parameters: [{ in: path, name: id, required: true, schema: { type: integer } }]
+      parameters:
+        [{ in: path, name: id, required: true, schema: { type: integer } }]
       requestBody:
         required: true
         content:
-          application/json: { schema: { $ref: '#/components/schemas/TodoUpdate' } }
+          application/json:
+            { schema: { $ref: '#/components/schemas/TodoUpdate' } }
       responses:
         '200': { description: OK }
-        '404': { description: "Not found (본인 todo 아닐 시 / 현 구현 404 = ownership 위배 시도 — 정상은 403 권장)" }
+        '404':
+          {
+            description: 'Not found (본인 todo 아닐 시 / 현 구현 404 = ownership 위배 시도 — 정상은 403 권장)',
+          }
     delete:
       summary: Todo 삭제 (본인만)
       security: [{ bearerAuth: [] }]
-      parameters: [{ in: path, name: id, required: true, schema: { type: integer } }]
+      parameters:
+        [{ in: path, name: id, required: true, schema: { type: integer } }]
       responses:
         '204': { description: No content }
         '404': { description: Not found }
@@ -89,7 +137,11 @@ components:
       properties: { id: { type: integer }, email: { type: string } }
     AuthToken:
       type: object
-      properties: { access_token: { type: string }, token_type: { type: string, default: bearer } }
+      properties:
+        {
+          access_token: { type: string },
+          token_type: { type: string, default: bearer },
+        }
     TodoCreate:
       type: object
       required: [title]

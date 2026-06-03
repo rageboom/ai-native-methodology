@@ -5,51 +5,51 @@ phase: stage-5-sprint-5-4
 captured_at: 2026-05-02
 captured_by: real
 
-# ★ ★ ★ Stage 5 신뢰도 산출 (ADR-009 §2.4 + ADR-010 ratchet 정합)
+# Stage 5 신뢰도 산출 (ADR-009 §2.4 + ADR-010 ratchet 정합)
 
 base_confidence: 0.70
-stage_4_baseline: 0.85   # Stage 4 mini ratchet baseline
+stage_4_baseline: 0.85 # Stage 4 mini ratchet baseline
 
 increments:
-  - factor: "★ 진짜 도구 5종 실행 (ts-morph + Playwright + axe + drift-FE + schema-validator + formal-spec-link FE)"
+  - factor: '진짜 도구 5종 실행 (ts-morph + Playwright + axe + drift-FE + schema-validator + formal-spec-link FE)'
     delta: +0.10
-    reason: "★ ADR-009 단계 5 도달 (★ Stage 4 단계 4 → Stage 5 단계 5 / no-simulation 정책 진화)"
-  - factor: "★ ★ ★ 본체 도구 2건 격상 (★ G2 정합)"
+    reason: 'ADR-009 단계 5 도달 (Stage 4 단계 4 → Stage 5 단계 5 / no-simulation 정책 진화)'
+  - factor: '본체 도구 2건 격상 (G2 정합)'
     delta: +0.05
-    reason: "★ drift-validator FE 모드 신설 (F-FE-004 closed) + schema-validator (Ajv 8) 신설"
-  - factor: "★ ★ ★ ★ 본체 antipattern 2건 격상 (★ G4 strict / ADR-FE-007)"
+    reason: 'drift-validator FE 모드 신설 (F-FE-004 closed) + schema-validator (Ajv 8) 신설'
+  - factor: '본체 antipattern 2건 격상 (G4 strict / ADR-FE-007)'
     delta: +0.05
-    reason: "★ AP-FE-SECURITY-001 (4 PoC isomorphic) + AP-FE-OPTIMISTIC-DRY (3 컴포넌트) / Stage 7 자격 #6 충족"
-  - factor: "★ 9 deliverable 본격 (★ 11 의무 + i18n carry)"
+    reason: 'AP-FE-SECURITY-001 (4 PoC isomorphic) + AP-FE-OPTIMISTIC-DRY (3 컴포넌트) / Stage 7 자격 #6 충족'
+  - factor: '9 deliverable 본격 (11 의무 + i18n carry)'
     delta: +0.03
-    reason: "★ Stage 4 mini scope (8) → Stage 5 full (11)"
-  - factor: "★ Playwright 32 snapshot + axe 16 scan (★ 8 page × 4 viewport)"
+    reason: 'Stage 4 mini scope (8) → Stage 5 full (11)'
+  - factor: 'Playwright 32 snapshot + axe 16 scan (8 page × 4 viewport)'
     delta: +0.02
-    reason: "★ Stage 4 2 → Stage 5 32 / 16배 격상"
-  - factor: "★ form-validation 90 / 77 BR 자동 등록 (★ deliverable 14 본격)"
+    reason: 'Stage 4 2 → Stage 5 32 / 16배 격상'
+  - factor: 'form-validation 90 / 77 BR 자동 등록 (deliverable 14 본격)'
     delta: +0.02
-    reason: "★ Stage 4 72 → Stage 5 77 / URL params 신규 패턴 정식화 (★ 2 page isomorphic)"
-  - factor: "★ V1 검증 통과 (drift-FE + schema-validator + formal-spec-link FE)"
+    reason: 'Stage 4 72 → Stage 5 77 / URL params 신규 패턴 정식화 (2 page isomorphic)'
+  - factor: 'V1 검증 통과 (drift-FE + schema-validator + formal-spec-link FE)'
     delta: +0.02
-    reason: "★ 본체 도구 첫 외부 적용 + 6/6 file 인식"
+    reason: '본체 도구 첫 외부 적용 + 6/6 file 인식'
 
 decrements:
-  - factor: "Semgrep Docker 진짜 실행 부재 (carry)"
+  - factor: 'Semgrep Docker 진짜 실행 부재 (carry)'
     delta: -0.05
-    reason: "★ no-simulation 정책 패널티 / Docker 부재 / 사용자 위임 명시"
-  - factor: "본 PoC 산출물 schema 정합 부족 (F-FE-006)"
+    reason: 'no-simulation 정책 패널티 / Docker 부재 / 사용자 위임 명시'
+  - factor: '본 PoC 산출물 schema 정합 부족 (F-FE-006)'
     delta: -0.02
-    reason: "★ 270+ violation / Sprint 5-4 carry resolve / 도구 의의 입증"
+    reason: '270+ violation / Sprint 5-4 carry resolve / 도구 의의 입증'
 
-raw_confidence: 0.92    # 0.70 + 0.10 + 0.05 + 0.05 + 0.03 + 0.02 + 0.02 + 0.02 - 0.05 - 0.02
+raw_confidence: 0.92 # 0.70 + 0.10 + 0.05 + 0.05 + 0.03 + 0.02 + 0.02 + 0.02 - 0.05 - 0.02
 
-# ★★★ 단계 평가 (ADR-009)
+# 단계 평가 (ADR-009)
 adr_009_stage:
   current: 5
-  description: "★ ★ ★ no-simulation 정책 단계 5 도달 — 진짜 외부 도구 5종 + 본체 도구 격상 + 산출물 schema 자동 검증"
-  next_target: "v1.4.0 release / adoption 트랙 합산"
+  description: 'no-simulation 정책 단계 5 도달 — 진짜 외부 도구 5종 + 본체 도구 격상 + 산출물 schema 자동 검증'
+  next_target: 'v1.4.0 release / adoption 트랙 합산'
 
-# ★ Stage 5 진입 자격 → 종결 자격 평가
+# Stage 5 진입 자격 → 종결 자격 평가
 stage_5_종결_자격:
   사상_정합: ✅ 비협상 충족 (round-trip ❌ / framework-neutral 100% / 이중 렌더링)
   IR_정합도_ratchet: ✅ 0.99 (target 0.95 / 4%p 초과 / Stage 4 ratchet 단조 비감소)
@@ -57,33 +57,33 @@ stage_5_종결_자격:
   finding: ✅ 6 finding (F-FE-001~006 / 5~15 건강 임계 정합)
   신뢰도: ✅ 0.92 (target 0.90 / 2%p 초과)
   carry_items: 2 (Semgrep + schema 정합 부분)
-  ★_본체_격상_2건_적용: ✅ ADR-FE-007 (★ Stage 7 자격 #6 충족)
-  결단: "★ ★ ★ Stage 5 종결 ✅ / Stage 7 v1.4.0 MINOR release 진입 자격 6/7 충족 (★ Sprint 5-5 #7 ADR carry 평가)"
+  _본체_격상_2건_적용: ✅ ADR-FE-007 (Stage 7 자격 #6 충족)
+  결단: 'Stage 5 종결 ✅ / Stage 7 v1.4.0 MINOR release 진입 자격 6/7 충족 (Sprint 5-5 #7 ADR carry 평가)'
 
 # 정합
 no_simulation_compliance:
   static_tool_simulated: false
   ai_persona_used: false
-  evidence: "★ ★ ★ 진짜 도구 6종 실행 + 본체 도구 2건 격상 + 본체 antipattern 2건 격상"
-  semgrep_carry: "★ Docker 부재 / 사용자 위임 의무"
+  evidence: '진짜 도구 6종 실행 + 본체 도구 2건 격상 + 본체 antipattern 2건 격상'
+  semgrep_carry: 'Docker 부재 / 사용자 위임 의무'
 
 section_8_1_compliance:
   단일_poc_과적합_회피: ✅
-  cross_poc_patterns_평가: ✅ ★ ★ ★ 본 Stage 5 첫 입증 — 4 PoC isomorphic strict 임계 도달 후 본체 격상
-  본체_격상_절차_정식화: "★ ★ ★ §8.1 strict + G4 strict + ADR-FE-007 정식 절차 입증"
+  cross_poc_patterns_평가: ✅ 본 Stage 5 첫 입증 — 4 PoC isomorphic strict 임계 도달 후 본체 격상
+  본체_격상_절차_정식화: '§8.1 strict + G4 strict + ADR-FE-007 정식 절차 입증'
 
 adr_fe_006_compliance:
-  명제_1_framework_neutral: ✅ 100% (★ react_idiom_in_IR 0)
+  명제_1_framework_neutral: ✅ 100% (react_idiom_in_IR 0)
   명제_2_screen_journey_priority: ✅ 정합
   명제_3_4계층_매핑: ✅ 100%
   ratchet: ✅ Stage 4 0.99 → Stage 5 0.99 단조 비감소
 
 # 사용자 7 요구사항 검증 (Stage 5 본격)
 user_7_requirements_verified:
-  1_산출물_마이그_테스트: "★ ★ form-validation 90/77 BR + 본체 antipattern 격상 + migration-cautions strict 의무"
-  2_AI_사람_동시이해: "★ drift-validator FE + schema-validator + formal-spec-link 6/6"
-  3_UI_visible: "★ 32 snapshot binary 진실 (8 page × 4 viewport)"
-  4_비즈니스로직_동일: "★ 9 SM + 80 BR (form 77 auto + 3 manual) + cross-link"
-  5_BE_FE_분리: "★ Scenario A 분리 default + openapi.yaml ground truth + orval auto-gen 정식 입증"
-  6_큰_뭉텅이_승인제: "★ Sprint 게이트 4건 (5-1 / 5-2 / 5-3 / 5-4) + 본체 격상 결단 의뢰"
-  7_모든_단계_기록: "★ Day 1~ Sprint 5-4 commit 다수 + 6 finding + 4 DEC + ADR-FE-007"
+  1_산출물_마이그_테스트: 'form-validation 90/77 BR + 본체 antipattern 격상 + migration-cautions strict 의무'
+  2_AI_사람_동시이해: 'drift-validator FE + schema-validator + formal-spec-link 6/6'
+  3_UI_visible: '32 snapshot binary 진실 (8 page × 4 viewport)'
+  4_비즈니스로직_동일: '9 SM + 80 BR (form 77 auto + 3 manual) + cross-link'
+  5_BE_FE_분리: 'Scenario A 분리 default + openapi.yaml ground truth + orval auto-gen 정식 입증'
+  6_큰_뭉텅이_승인제: 'Sprint 게이트 4건 (5-1 / 5-2 / 5-3 / 5-4) + 본체 격상 결단 의뢰'
+  7_모든_단계_기록: 'Day 1~ Sprint 5-4 commit 다수 + 6 finding + 4 DEC + ADR-FE-007'

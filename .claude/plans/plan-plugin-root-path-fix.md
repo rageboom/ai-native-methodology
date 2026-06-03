@@ -15,8 +15,8 @@ plugin-install 시 cwd = **사용자 프로젝트**(plugin root 아님). skill/a
 
 1. **`node tools/...`** — 17 skill + 5 agent(plan/discovery/spec/test/implement + plan dup) = ~24+ 라인. (`PYTHONUTF8=1 node tools/...` env-prefix 1건 = error-mapping:41 포함)
 2. **`bash tools/static-runner/src/lint-no-simulation.sh`** — 3 skill(implement-generate-impl-spec:147 / implement-verify-test-pass:85 / test-run-test-evidence:108)
-3. **`--schemas schemas/`** — plan-architect-decisions:82 / plan-agent.md:77. ★ schema-validator 실 플래그 = `--schema-dir` + `DEFAULT_SCHEMA_DIR=resolve(__dirname,'../../../schemas')`(번들 자동 해소) → `--schemas` = **미인식 플래그**(런타임 무시 / 이미 default 로 동작) → **잘못된 문서 = drop**.
-4. **`ls templates/...`** — _base-apply-template:38-39
+3. **`--schemas schemas/`** — plan-architect-decisions:82 / plan-agent.md:77. schema-validator 실 플래그 = `--schema-dir` + `DEFAULT_SCHEMA_DIR=resolve(__dirname,'../../../schemas')`(번들 자동 해소) → `--schemas` = **미인식 플래그**(런타임 무시 / 이미 default 로 동작) → **잘못된 문서 = drop**.
+4. **`ls templates/...`** — \_base-apply-template:38-39
 
 ## 시행 (Senior GO_WITH_REVISE@0.88 / must-fix 반영)
 
@@ -37,5 +37,6 @@ plugin-install 시 cwd = **사용자 프로젝트**(plugin root 아님). skill/a
 workspace test 1098+ / 0 fail · release-readiness **32/32** · skill-citation-validator 0 stale(SKILL.md 편집 후) · build dist + token grep · version 3-way 12.7.0 · git diff CRLF 노이즈 0(byte-preserving).
 
 ## Lessons / 사실
+
 - claude-code-guide sub-agent self-contradiction → F-015 raw fetch 가 sub-agent 오답 차단(LL).
 - STATUS "skill 16개" = 불완전(agents 5 + adoption + guides 누락) → 완전 인벤토리 grep 가 핵심.

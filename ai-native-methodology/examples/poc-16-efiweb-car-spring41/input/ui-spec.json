@@ -9,8 +9,8 @@
     "confidence": 0.75,
     "raw_confidence": 0.75,
     "warnings": [
-      "★ Scenario C (JSP server-rendered) — Modern FE (React/Vue) 미적용 / state management = HTTP session + DOM",
-      "★ 14 JSP 중 10 ParseException (PMD 한계) — html-template-extract.json 정합"
+      "Scenario C (JSP server-rendered) — Modern FE (React/Vue) 미적용 / state management = HTTP session + DOM",
+      "14 JSP 중 10 ParseException (PMD 한계) — html-template-extract.json 정합"
     ]
   },
   "framework": "jsp_template",
@@ -75,7 +75,7 @@
       "route": "/ifrs/car/carDriveInsertForm",
       "layout": "common/include.jsp",
       "auth_required": true,
-      "description": "carDriveInsertForm.jsp / year-loop scriptlet (★ AP-FE-001)",
+      "description": "carDriveInsertForm.jsp / year-loop scriptlet (AP-FE-001)",
       "related_use_cases": [
         "UC-CAR-MGT-005"
       ]
@@ -100,7 +100,7 @@
       "required_roles": [
         "ADMIN"
       ],
-      "description": "carCostConfirm.jsp (★ scriptlet 2건)",
+      "description": "carCostConfirm.jsp (scriptlet 2건)",
       "related_use_cases": [
         "UC-CAR-COST-002"
       ]
@@ -114,7 +114,7 @@
       "required_roles": [
         "ADMIN"
       ],
-      "description": "carCostSumSystem.jsp (★ scriptlet 2건)",
+      "description": "carCostSumSystem.jsp (scriptlet 2건)",
       "related_use_cases": [
         "UC-CAR-COST-003"
       ]

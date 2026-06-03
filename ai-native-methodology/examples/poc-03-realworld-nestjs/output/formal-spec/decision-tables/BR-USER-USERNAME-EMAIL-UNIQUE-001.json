@@ -3,14 +3,14 @@
   "br_id": "BR-USER-USERNAME-EMAIL-UNIQUE-001",
   "trigger": "POST /api/users (signup) — username 또는 email 입력",
   "condition": "username 또는 email 이 DB user 테이블에 이미 존재 (race window 가능)",
-  "action": "App pre-check (createQueryBuilder username OR email) → DB INSERT (★ DB UQ 자체 부재)",
+  "action": "App pre-check (createQueryBuilder username OR email) → DB INSERT ( DB UQ 자체 부재)",
   "expected_result": "중복 시 400 'Username and email must be unique.' (현재) / 권장 = 409 Conflict (RFC 9110 §15.5.10)",
   "rejection_method": "throw HttpException 400 (Service 단)",
-  "verification_location": "Service (UserService.create:47) ★ App 1중 / Domain ❌ / DB ❌ (UQ 부재 — F-120)",
+  "verification_location": "Service (UserService.create:47)  App 1중 / Domain ❌ / DB ❌ (UQ 부재 — F-120)",
   "http_status": 400,
   "error_message": "Username and email must be unique.",
   "current_state": "partial",
-  "current_state_note": "★ App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
+  "current_state_note": " App 1중 race-prone (PoC #02 = App+DB 2중 / PoC #03 = App 1중 only)",
   "round_trip_pattern": "B (코드 → 형식) — 자연어 빈약 보완",
   "natural_language_gap_quantified": {
     "explicit": 4,
@@ -39,7 +39,7 @@
     {
       "item": "검증 위치",
       "decision": "현재 Service 만 / 권장 = DB UQ 단독 + catch QueryFailedError → ConflictException",
-      "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe"
+      "rationale": " Sairyss DDD-Hexagon 정설 + race-safe"
     },
     {
       "item": "HTTP status",
@@ -49,11 +49,11 @@
     {
       "item": "에러 메시지",
       "decision": "분리 권장 — 'Username already exists' / 'Email already exists' / 'Both already exist'",
-      "rationale": "Senior Engineer ★ medium (PoC #02 Sprint 1.5 동일 발견)"
+      "rationale": "Senior Engineer  medium (PoC #02 Sprint 1.5 동일 발견)"
     },
     {
       "item": "race window 처리",
-      "decision": "★★ DB UQ 추가 + catch + ConflictException 변환",
+      "decision": " DB UQ 추가 + catch + ConflictException 변환",
       "rationale": "현재 = undefined behavior (F-120 critical)"
     }
   ],

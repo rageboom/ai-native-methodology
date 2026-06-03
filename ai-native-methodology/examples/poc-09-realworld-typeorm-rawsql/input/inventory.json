@@ -1,23 +1,23 @@
 {
-  "$comment": "★ ★ ★ PoC #09 Day 1 — lujakob/nestjs-realworld-example-app analysis. ★ paradigm + platform-cross corroboration #2 (★ MEDIUM 자격 / source 정탐 후 strong → MEDIUM 솔직 인정 — pure raw `query()` 부재 / createQueryBuilder 3건만). v2.2.0 final 격상 trigger ❌ (MEDIUM 한정 / strong corroboration 별도 carry).",
+  "$comment": " PoC #09 Day 1 — lujakob/nestjs-realworld-example-app analysis. paradigm + platform-cross corroboration #2 ( MEDIUM 자격 / source 정탐 후 strong → MEDIUM 솔직 인정 — pure raw `query()` 부재 / createQueryBuilder 3건만). v2.2.0 final 격상 trigger ❌ (MEDIUM 한정 / strong corroboration 별도 carry).",
   "project_id": "poc-09-realworld-typeorm-rawsql",
   "language": "TypeScript",
   "language_version": "ES2017",
   "stack_signals": [
-    "★ NestJS 5.4.0 (Node.js Modern stack)",
-    "★ TypeORM 0.2.7 — ORM annotation-driven + ★ createQueryBuilder fluent API 3건 (raw query() ❌)",
+    " NestJS 5.4.0 (Node.js Modern stack)",
+    " TypeORM 0.2.7 — ORM annotation-driven + createQueryBuilder fluent API 3건 (raw query() ❌)",
     "MySQL — ormconfig.json.example",
-    "argon2 — 비밀번호 해시 (★ ★ vs PoC #08 평문 password / 보안 정합)",
+    "argon2 — 비밀번호 해시 ( vs PoC #08 평문 password / 보안 정합)",
     "jsonwebtoken — JWT 인증",
     "class-validator — DTO validation",
-    "Prisma — prisma/ 디렉토리 (★ alternate ORM / 본 PoC scope 외)",
-    "Jest — test runner (★ tag.controller.spec.ts 1건만)",
+    "Prisma — prisma/ 디렉토리 ( alternate ORM / 본 PoC scope 외)",
+    "Jest — test runner ( tag.controller.spec.ts 1건만)",
     "Docker — docker-compose 가능"
   ],
   "framework": "nestjs-5-typeorm-0.2-mysql-typescript",
-  "test_runner_inferred": "Jest (★ jest.json + tag.controller.spec.ts)",
+  "test_runner_inferred": "Jest ( jest.json + tag.controller.spec.ts)",
   "source_files": [
-    "source/src/main.ts (★ NestJS bootstrap)",
+    "source/src/main.ts ( NestJS bootstrap)",
     "source/src/app.module.ts + app.controller.ts",
     "source/src/user/{user.controller.ts, user.service.ts, user.entity.ts, user.module.ts, user.interface.ts, user.decorator.ts, auth.middleware.ts, dto/*}",
     "source/src/article/{article.controller.ts, article.service.ts, article.entity.ts, comment.entity.ts, article.module.ts, article.interface.ts, dto/*}",
@@ -28,13 +28,13 @@
   "loc_total": 1174,
   "loc_breakdown": {
     "typescript": 1174,
-    "$comment_loc": "★ ★ Modern small codebase / vs PoC #06 345 / PoC #07 3752 / PoC #08 9234 → ★ smallest = 작업 cap ↓"
+    "$comment_loc": " Modern small codebase / vs PoC #06 345 / PoC #07 3752 / PoC #08 9234 → smallest = 작업 cap ↓"
   },
   "modules": [
     {
       "name": "user (BC-USER)",
       "type": "Authentication + User Management",
-      "files": ["user.controller.ts (5 endpoint)", "user.service.ts (★ createQueryBuilder 1)", "user.entity.ts", "auth.middleware.ts"],
+      "files": ["user.controller.ts (5 endpoint)", "user.service.ts ( createQueryBuilder 1)", "user.entity.ts", "auth.middleware.ts"],
       "endpoint_count": 5,
       "endpoints": ["GET user", "PUT user", "POST users", "DELETE users/:slug", "POST users/login"],
       "sql_patterns": {
@@ -43,13 +43,13 @@
         "repository_save_update_delete": 3
       },
       "antipatterns_flagged": [
-        "AP-RW-001 (★ DELETE users/:slug 의 :slug = REST 표준 URL 부정합 / username 으로 사용)"
+        "AP-RW-001 ( DELETE users/:slug 의 :slug = REST 표준 URL 부정합 / username 으로 사용)"
       ]
     },
     {
       "name": "article (BC-ARTICLE + BC-COMMENT)",
       "type": "Blog post + Comment + Favorite",
-      "files": ["article.controller.ts (11 endpoint)", "article.service.ts (★ createQueryBuilder 2)", "article.entity.ts", "comment.entity.ts"],
+      "files": ["article.controller.ts (11 endpoint)", "article.service.ts ( createQueryBuilder 2)", "article.entity.ts", "comment.entity.ts"],
       "endpoint_count": 11,
       "endpoints": ["GET / (list with query)", "GET /feed", "GET /:slug", "GET /:slug/comments", "POST /", "PUT /:slug", "DELETE /:slug", "POST /:slug/comments", "DELETE /:slug/comments/:id", "POST /:slug/favorite", "DELETE /:slug/favorite"],
       "sql_patterns": {
@@ -58,13 +58,13 @@
         "repository_save_delete": 4
       },
       "antipatterns_flagged": [
-        "AP-RW-002 (★ ★ findAll 내부 4 dynamic where 조건 + getCount + limit/offset = ★ ★ ★ TypeORM dynamic SQL paradigm corroboration #1 핵심)"
+        "AP-RW-002 ( findAll 내부 4 dynamic where 조건 + getCount + limit/offset = TypeORM dynamic SQL paradigm corroboration #1 핵심)"
       ]
     },
     {
       "name": "profile (BC-PROFILE)",
       "type": "User profile + Follow",
-      "files": ["profile.controller.ts (3 endpoint)", "profile.service.ts (★ createQueryBuilder ❌)", "follows.entity.ts"],
+      "files": ["profile.controller.ts (3 endpoint)", "profile.service.ts ( createQueryBuilder ❌)", "follows.entity.ts"],
       "endpoint_count": 3,
       "endpoints": ["GET /:username", "POST /:username/follow", "DELETE /:username/follow"],
       "sql_patterns": {
@@ -76,7 +76,7 @@
     {
       "name": "tag (BC-TAG)",
       "type": "Tag listing",
-      "files": ["tag.controller.ts (1 endpoint)", "tag.service.ts", "tag.entity.ts", "tag.controller.spec.ts (★ 1 unit test)"],
+      "files": ["tag.controller.ts (1 endpoint)", "tag.service.ts", "tag.entity.ts", "tag.controller.spec.ts ( 1 unit test)"],
       "endpoint_count": 1,
       "endpoints": ["GET /"],
       "sql_patterns": {
@@ -91,12 +91,12 @@
       "MySQL (TypeORM connection)",
       "argon2 (password hash)",
       "jsonwebtoken (JWT)",
-      "★ Prisma — alternate ORM (★ scope 외 / 본 PoC = TypeORM only)"
+      " Prisma — alternate ORM ( scope 외 / 본 PoC = TypeORM only)"
     ]
   },
   "database": {
     "tables": [
-      {"name": "user", "role": "사용자 마스터 (★ argon2 password hash)"},
+      {"name": "user", "role": "사용자 마스터 ( argon2 password hash)"},
       {"name": "article", "role": "Blog post"},
       {"name": "comment", "role": "Article comment"},
       {"name": "tag", "role": "Article tag"},
@@ -106,10 +106,10 @@
     "table_count": 6,
     "external_sp_function": [],
     "external_sp_count": 0,
-    "$comment_db": "★ ★ vs PoC #06+#07+#08 — Modern Node.js stack 정합 / SP 부재 / external schema 부재 / TypeORM auto-migration"
+    "$comment_db": " vs PoC #06+#07+#08 — Modern Node.js stack 정합 / SP 부재 / external schema 부재 / TypeORM auto-migration"
   },
   "sql_paradigm_analysis": {
-    "$comment": "★ ★ ★ paradigm-cross 측정 — TypeORM SQL 추적 paradigm",
+    "$comment": " paradigm-cross 측정 — TypeORM SQL 추적 paradigm",
     "createQueryBuilder_count": 3,
     "createQueryBuilder_locations": [
       "user.service.ts:43 (uniqueness check / where + orWhere)",
@@ -118,15 +118,15 @@
     ],
     "raw_query_count": 0,
     "raw_query_locations": [],
-    "repository_orm_count": "★ ★ 다수 (find / findOne / save / delete / update / count)",
-    "paradigm_cross_strength": "★ ★ MEDIUM (★ strong ❌ 솔직 인정 / pure raw `query()` 부재 / createQueryBuilder fluent API 만)",
-    "v2_2_0_final_trigger_capability": "❌ (★ strong corroboration 의무 / 본 PoC = MEDIUM #2 만)"
+    "repository_orm_count": " 다수 (find / findOne / save / delete / update / count)",
+    "paradigm_cross_strength": " MEDIUM ( strong ❌ 솔직 인정 / pure raw `query()` 부재 / createQueryBuilder fluent API 만)",
+    "v2_2_0_final_trigger_capability": "❌ ( strong corroboration 의무 / 본 PoC = MEDIUM #2 만)"
   },
   "phase_3a_automation_measurement": {
-    "$comment": "★ plan §3-A 자동화율 측정 — TypeScript + TypeORM + NestJS",
+    "$comment": " plan §3-A 자동화율 측정 — TypeScript + TypeORM + NestJS",
     "auto_extracted_fields": {
       "endpoint_count": "✅ grep '@Get|@Post|@Put|@Delete' (20)",
-      "sql_id_count": "✅ ★ ★ 3 createQueryBuilder + ORM 추상화 = 직접 SQL ❌ / inventory total = 'logical query' 추론",
+      "sql_id_count": "✅ 3 createQueryBuilder + ORM 추상화 = 직접 SQL ❌ / inventory total = 'logical query' 추론",
       "dependent_tables": "✅ TypeORM `@Entity` + `@ManyToMany/ManyToOne/OneToMany` 분석 (6 tables)",
       "createQueryBuilder_dynamic_branches": "✅ grep 'andWhere|orWhere' (article.service findAll 4 + findFeed 1 = 5)",
       "test_class_count": "✅ find *.spec.ts (1)",
@@ -137,21 +137,21 @@
       "business_meaning": "❌ LLM ~85% (Modern + 도메인 단순)",
       "antipatterns_flagged": "❌ 매뉴얼 + LLM cross-check",
       "table_role": "❌ LLM ~85%",
-      "logical_sql_inference": "❌ ★ ★ TypeORM ORM 추상화 SQL 추론 (find → SELECT * FROM x WHERE / save → INSERT 또는 UPDATE / delete → DELETE)"
+      "logical_sql_inference": "❌ TypeORM ORM 추상화 SQL 추론 (find → SELECT * FROM x WHERE / save → INSERT 또는 UPDATE / delete → DELETE)"
     },
     "estimated_ratio": {
       "auto_count": 7,
       "manual_count": 4,
       "ratio": "7/11 = 63.6%",
-      "comparison": "★ ★ vs PoC #06 38.75% (+24.9%p) / vs PoC #07 53.8% (+9.8%p) / vs PoC #08 66.7% (-3.1%p)",
-      "plan_3a_estimation": "55~65% — 실측 63.6% → ★ in range / pass (paradigm shift 정확도 손실 약함)"
+      "comparison": " vs PoC #06 38.75% (+24.9%p) / vs PoC #07 53.8% (+9.8%p) / vs PoC #08 66.7% (-3.1%p)",
+      "plan_3a_estimation": "55~65% — 실측 63.6% → in range / pass (paradigm shift 정확도 손실 약함)"
     }
   },
   "scope_constraint": {
-    "$comment": "★ R1 시간 cap 정합 — 본 PoC = analysis 4종 + sql-inventory + phase 4.7 + chain 1 만. chain 2~4 명시 제외.",
+    "$comment": " R1 시간 cap 정합 — 본 PoC = analysis 4종 + sql-inventory + phase 4.7 + chain 1 만. chain 2~4 명시 제외.",
     "core_modules": ["user (5 endpoint)", "article (11 endpoint)", "profile (3 endpoint)", "tag (1 endpoint)"],
     "total_endpoint_count": 20,
-    "core_sql_count": "★ ★ logical query ~24 (★ createQueryBuilder 3 + ORM repository 21 추론)",
+    "core_sql_count": " logical query ~24 ( createQueryBuilder 3 + ORM repository 21 추론)",
     "phase_4_7_uc_count": "5~7 핵심 (login + register + article create + article list + comment + favorite + follow)"
   }
 }

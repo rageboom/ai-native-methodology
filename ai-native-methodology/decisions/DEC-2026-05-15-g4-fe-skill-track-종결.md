@@ -17,14 +17,14 @@ charter §3 G4 (R14 BE/FE 자산 비대칭 / FE skill 보강) 종결.
 
 ## paradigm 결단 (Senior critique 흡수)
 
-| paradigm | 결단 | 근거 |
-|---|---|---|
-| paradigm 후보 | **C** (4 skill + RTL 본문 분기) | `test-jest` 중복 회피 / BE 트랙 paradigm 일관 / 본문 비대화 risk 회피 |
-| Vue 1차 지원 | **Vue 3 만** | Vue 2 legacy = carry / Composition API + `<script setup>` 우선 |
-| Scenario B `/analyze-fullstack` | **G6 carry** | 명령어 axis ≠ skill axis (G4) / axis 별 진화 분리 |
-| JSP scriptlet 정책 | **scriptlet 0 absolute** | JSP 2.0 / Servlet 2.4 (2003) 이후 deprecated paradigm 정합 |
-| `analysis-html-template` 매핑 phase | **신규 phase `template-analyze` 신설** | input phase 부담 ↓ / Scenario C 만 활성 / drift-validator 3-way 추적 명확 |
-| JSP/Thymeleaf 정량 검출 | **진짜 외부 도구 의무** (SonarQube `Web:JspScriptletCheck` `rspec-1459` `rspec-1932` / PMD JSP / jsp-lint) | LLM 양심 count ❌ (Senior STRONG-STOP risk / -5%p 패널티 회피 / no-simulation 정합) |
+| paradigm                            | 결단                                                                                                       | 근거                                                                                |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| paradigm 후보                       | **C** (4 skill + RTL 본문 분기)                                                                            | `test-jest` 중복 회피 / BE 트랙 paradigm 일관 / 본문 비대화 risk 회피               |
+| Vue 1차 지원                        | **Vue 3 만**                                                                                               | Vue 2 legacy = carry / Composition API + `<script setup>` 우선                      |
+| Scenario B `/analyze-fullstack`     | **G6 carry**                                                                                               | 명령어 axis ≠ skill axis (G4) / axis 별 진화 분리                                   |
+| JSP scriptlet 정책                  | **scriptlet 0 absolute**                                                                                   | JSP 2.0 / Servlet 2.4 (2003) 이후 deprecated paradigm 정합                          |
+| `analysis-html-template` 매핑 phase | **신규 phase `template-analyze` 신설**                                                                     | input phase 부담 ↓ / Scenario C 만 활성 / drift-validator 3-way 추적 명확           |
+| JSP/Thymeleaf 정량 검출             | **진짜 외부 도구 의무** (SonarQube `Web:JspScriptletCheck` `rspec-1459` `rspec-1932` / PMD JSP / jsp-lint) | LLM 양심 count ❌ (Senior STRONG-STOP risk / -5%p 패널티 회피 / no-simulation 정합) |
 
 ## 사용자 메타 발견 본격 흡수
 
@@ -34,12 +34,12 @@ charter §3 G4 (R14 BE/FE 자산 비대칭 / FE skill 보강) 종결.
 
 ## 신설 자산 (실측)
 
-- `skills/implement-react/SKILL.md` (★ 신설 / React 19 paradigm + class 분기 보존 + 신규 hooks + schema marker `react_version: "19"`)
-- `skills/implement-vue/SKILL.md` (★ 신설 / Vue 3 only / Composition API + `<script setup>` / Options API legacy 분기 본문)
-- `skills/test-playwright/SKILL.md` (★ 신설 / POM 분리 / web-first assertion / parallel + shard / `npx playwright install` 의존 명시)
-- `skills/analysis-html-template/SKILL.md` (★ 신설 / 외부 도구 의무 / JSP 2.0 기준점 / scriptlet 0 absolute)
-- `schemas/html-template-extract.schema.json` (★ 신설 / strict / external_tool_output.executed required / scriptlet_findings + xss_markers + policy_check)
-- `tools/schema-validator/test/html-template-extract.test.js` (★ 신설 / 5 case)
+- `skills/implement-react/SKILL.md` ( 신설 / React 19 paradigm + class 분기 보존 + 신규 hooks + schema marker `react_version: "19"`)
+- `skills/implement-vue/SKILL.md` ( 신설 / Vue 3 only / Composition API + `<script setup>` / Options API legacy 분기 본문)
+- `skills/test-playwright/SKILL.md` ( 신설 / POM 분리 / web-first assertion / parallel + shard / `npx playwright install` 의존 명시)
+- `skills/analysis-html-template/SKILL.md` ( 신설 / 외부 도구 의무 / JSP 2.0 기준점 / scriptlet 0 absolute)
+- `schemas/html-template-extract.schema.json` ( 신설 / strict / external_tool_output.executed required / scriptlet_findings + xss_markers + policy_check)
+- `tools/schema-validator/test/html-template-extract.test.js` ( 신설 / 5 case)
 
 ## 수정 자산
 
@@ -74,10 +74,10 @@ charter §3 G4 (R14 BE/FE 자산 비대칭 / FE skill 보강) 종결.
 - ADR-CHAIN-001 §1 (이중 렌더링 chain 4) + §6 (no-simulation 강화)
 - ADR-009 (no-simulation / 외부 도구 auto-invoke 금지)
 
-## Lessons Learned (★ paradigm 진화 자산화)
+## Lessons Learned ( paradigm 진화 자산화)
 
 - **LL-G4-01**: charter §3 후속 표는 "후보 안" — 본격 1원칙 plan 단계에서 기존 자산과 중복 평가 의무.
 - **LL-G4-02**: paradigm 분리 vs 본문 분기 결단 시 자산 비대화 + drift 추적 + 명시성 3축 평가.
-- **LL-G4-03 (★ Senior 흡수)**: framework 본문 분기 paradigm 충돌 (예: React 18 forwardRef vs React 19 ref prop) 시 RED test fixture = 판단 기준 + schema marker (`react_version: "19"`) 의무.
-- **LL-G4-04 (★ research 정정)**: 외부 framework 사실 (React 19 forwardRef 폐기 / userEvent v14 async / Playwright POM assertion 분리 등) 추정 ❌ — research 실 fetch 의무.
-- **LL-G4-05 (★ Senior STRONG-STOP)**: 정성 검출 (scriptlet count / form action 분산) = **반드시 진짜 외부 도구 실행** (PMD / SonarQube / 등). LLM 본문 분기 양심 정량 = no-simulation -5%p 패널티.
+- **LL-G4-03 ( Senior 흡수)**: framework 본문 분기 paradigm 충돌 (예: React 18 forwardRef vs React 19 ref prop) 시 RED test fixture = 판단 기준 + schema marker (`react_version: "19"`) 의무.
+- **LL-G4-04 ( research 정정)**: 외부 framework 사실 (React 19 forwardRef 폐기 / userEvent v14 async / Playwright POM assertion 분리 등) 추정 ❌ — research 실 fetch 의무.
+- **LL-G4-05 ( Senior STRONG-STOP)**: 정성 검출 (scriptlet count / form action 분산) = **반드시 진짜 외부 도구 실행** (PMD / SonarQube / 등). LLM 본문 분기 양심 정량 = no-simulation -5%p 패널티.

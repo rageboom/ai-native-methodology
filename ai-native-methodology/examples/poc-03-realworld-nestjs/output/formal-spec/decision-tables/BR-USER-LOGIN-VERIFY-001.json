@@ -5,12 +5,12 @@
   "condition": "email + password 입력",
   "action": "argon2.verify(user.password, plainPassword)",
   "expected_result": "match ✅ → JWT / mismatch ❌ → 401",
-  "rejection_method": "throw HttpException 'User not found' 401 (★ password mismatch 도 같은 메시지)",
+  "rejection_method": "throw HttpException 'User not found' 401 ( password mismatch 도 같은 메시지)",
   "verification_location": "UserService.findOne — Repository findOne + argon2.verify",
   "http_status": 401,
   "error_message": "User not found",
   "current_state": "partial",
-  "current_state_note": "★ 메시지 모호 (★ F-150) + Passport ❌ (manual auth)",
+  "current_state_note": " 메시지 모호 ( F-150) + Passport ❌ (manual auth)",
   "round_trip_pattern": "B + Senior 권고 D1 (cross-platform 핵심 검증 데이터)",
   "natural_language_gap_quantified": {
     "explicit": 4,
@@ -26,7 +26,7 @@
       "거부 방식 (user 부재 vs password mismatch — 메시지 분리?)",
       "검증 위치 (Passport vs manual)",
       "HTTP status (401 vs 403)",
-      "에러 메시지 (★ 정보 노출 회피 / 명료성 균형)",
+      "에러 메시지 ( 정보 노출 회피 / 명료성 균형)",
       "rate limiting / brute force 방어"
     ]
   },
@@ -38,7 +38,7 @@
     },
     {
       "item": "검증 위치",
-      "decision": "★ NestJS Passport + LocalStrategy + JwtStrategy (industry 정설) — 현재 manual ❌",
+      "decision": " NestJS Passport + LocalStrategy + JwtStrategy (industry 정설) — 현재 manual ❌",
       "rationale": "F-118 / F-119 / F-150 합산 fix"
     },
     {
@@ -48,12 +48,12 @@
     },
     {
       "item": "에러 메시지",
-      "decision": "★ 'Invalid credentials' 통일 (정보 노출 회피)",
+      "decision": " 'Invalid credentials' 통일 (정보 노출 회피)",
       "rationale": "OWASP A07 — user enumeration 방어 (현재 'User not found' 는 user 부재 정보 노출)"
     },
     {
       "item": "rate limiting",
-      "decision": "★ 신규 — @nestjs/throttler 도입 권장 (현재 부재)",
+      "decision": " 신규 — @nestjs/throttler 도입 권장 (현재 부재)",
       "rationale": "OWASP A04 — brute force 방어"
     }
   ],
@@ -63,7 +63,7 @@
   ],
   "cross_platform_diff": {
     "poc02_spring_security": "UsernamePasswordAuthenticationToken + AuthenticationManager + UserDetailsService — framework-managed (verify 무방어 자동 차단)",
-    "poc03_manual": "★ findOne + argon2.verify manual — Passport 미사용 → AP-AUTH-NEST-001 critical 후보",
+    "poc03_manual": " findOne + argon2.verify manual — Passport 미사용 → AP-AUTH-NEST-001 critical 후보",
     "industry_standard_violation": "NestJS 7+ 권장 = @nestjs/passport + LocalStrategy + JwtStrategy"
   },
   "decision_grids": [

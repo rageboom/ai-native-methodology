@@ -1,4 +1,4 @@
-# chain-driver/ — ★ ★ ★ chain harness driver (5 요소 enforcement)
+# chain-driver/ — chain harness driver (5 요소 enforcement)
 
 ## Purpose
 
@@ -8,21 +8,22 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 
 ## When to call
 
-| 시점 | command | 호출자 |
-|---|---|---|
-| 사용자 첫 chain harness 진입 | `chain-driver init <project>` | ★ user (cli 직접) |
-| 다음 stage 진입 | `chain-driver next` | user / chain-driver hooks-bridge |
-| 현재 state 조회 | `chain-driver state` | user (debug) |
-| 다음 skill 권고 | `chain-driver suggest-skill` | hooks UserPromptSubmit (auto) |
-| Write/Edit 시 차단 검증 | `chain-driver hooks-bridge` | hooks PreToolUse (auto) |
-| state migration | `chain-driver migrate` | schema version mismatch 시 |
-| chain-revisit 감지 | `chain-driver revisit-detect` | (보조 / git diff 기반) |
+| 시점                         | command                       | 호출자                           |
+| ---------------------------- | ----------------------------- | -------------------------------- |
+| 사용자 첫 chain harness 진입 | `chain-driver init <project>` | user (cli 직접)                  |
+| 다음 stage 진입              | `chain-driver next`           | user / chain-driver hooks-bridge |
+| 현재 state 조회              | `chain-driver state`          | user (debug)                     |
+| 다음 skill 권고              | `chain-driver suggest-skill`  | hooks UserPromptSubmit (auto)    |
+| Write/Edit 시 차단 검증      | `chain-driver hooks-bridge`   | hooks PreToolUse (auto)          |
+| state migration              | `chain-driver migrate`        | schema version mismatch 시       |
+| chain-revisit 감지           | `chain-driver revisit-detect` | (보조 / git diff 기반)           |
 
-## ★ `init <project>` 호출 paradigm (★ v11.3.0 / F-CHA-poc17-001 자산화)
+## `init <project>` 호출 paradigm (v11.3.0 / F-CHA-poc17-001 자산화)
 
 `init` 의 `<project>` 인수 = **cwd 기준 상대경로**. 다음 두 paradigm 중 하나 채택 의무 — 작업 디렉토리 중첩 회피:
 
 ### (a) 부모 디렉토리에서 호출 (권고)
+
 ```bash
 cd ~/Documents/Development/Study/
 chain-driver init poc-17-ifrs-car-migration
@@ -30,6 +31,7 @@ chain-driver init poc-17-ifrs-car-migration
 ```
 
 ### (b) 작업 디렉토리 안에서 호출
+
 ```bash
 cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
 chain-driver init .
@@ -37,9 +39,10 @@ chain-driver init .
 ```
 
 ### ❌ 안티패턴 (회피)
+
 ```bash
 cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
-chain-driver init poc-17-ifrs-car-migration   # ★ 자기 이름 인수 → 중첩 hit
+chain-driver init poc-17-ifrs-car-migration   # 자기 이름 인수 → 중첩 hit
 # → ~/Documents/Development/Study/poc-17-ifrs-car-migration/poc-17-ifrs-car-migration/.aimd/state.json ❌
 ```
 
@@ -49,10 +52,10 @@ chain-driver init poc-17-ifrs-car-migration   # ★ 자기 이름 인수 → 중
 
 ## Inputs
 
-- `<project-dir>/.aimd/state.json` — chain harness state (★ schema/state.schema.json 정합)
+- `<project-dir>/.aimd/state.json` — chain harness state (schema/state.schema.json 정합)
 - `<project-dir>/.aimd/output/**` — chain stage 산출물
 - `<project-dir>/.aimd/intervention-log.jsonl` — 사용자 결단 로그
-- `flows/sdlc-4stage-flow.json` — stage 순서 + 5 gate SSOT (★ v10.0.0 / chain N = gate #N 1:1)
+- `flows/sdlc-4stage-flow.json` — stage 순서 + 5 gate SSOT (v10.0.0 / chain N = gate #N 1:1)
 
 ## Outputs
 
@@ -62,34 +65,35 @@ chain-driver init poc-17-ifrs-car-migration   # ★ 자기 이름 인수 → 중
 
 ## Exit codes
 
-> ★ 권위 = `src/cli.js` header (ADR-CHAIN-005 §7). 본 표는 cli.js 와 일치 의무.
+> 권위 = `src/cli.js` header (ADR-CHAIN-005 §7). 본 표는 cli.js 와 일치 의무.
 
-| code | 의미 |
-|---|---|
-| 0 | ok / next stage 진입 가능 |
-| **1** | ★ ★ blocked-by-gate — gate validator finding / state.blocked=true |
-| **2** | invariant-violation (mechanical trio (ii)) |
-| 3 | usage-error |
-| 4 | state-corrupt |
+| code  | 의미                                                          |
+| ----- | ------------------------------------------------------------- |
+| 0     | ok / next stage 진입 가능                                     |
+| **1** | blocked-by-gate — gate validator finding / state.blocked=true |
+| **2** | invariant-violation (mechanical trio (ii))                    |
+| 3     | usage-error                                                   |
+| 4     | state-corrupt                                                 |
 
-## Sibling tools (gate validator 5종 / ★ v10.0.0)
+## Sibling tools (gate validator 5종 / v10.0.0)
 
 chain-driver `next` 진입 시 자동 호출:
+
 - chain 1 (discovery) → [`../discovery-extraction-validator/`](../discovery-extraction-validator/) (gate #1)
 - chain 2 (spec) → [`../chain-coverage-validator/`](../chain-coverage-validator/) (gate #2)
-- chain 3 (plan) → [`../plan-coverage-validator/`](../plan-coverage-validator/) (gate #3 / ★ v10.0.0 신규 hard gate)
+- chain 3 (plan) → [`../plan-coverage-validator/`](../plan-coverage-validator/) (gate #3 / v10.0.0 신규 hard gate)
 - chain 4 (test) → [`../spec-test-link-validator/`](../spec-test-link-validator/) + [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #4 / RED 의무)
 - chain 5 (implement) → [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (gate #5 / GREEN 의무)
 
-## 5 요소 enforcement (★ ★ ★ ADR-CHAIN-005)
+## 5 요소 enforcement (ADR-CHAIN-005)
 
-| 요소 | 구현 위치 |
-|---|---|
-| 1. Driver / Orchestrator | `src/cli.js` + 6 module |
-| 2. State 영속 | `src/state-store.js` (atomic CAS / fdatasync / Windows fallback) |
-| 3. Mechanical gate trio | `src/gate-eval.js` + cli exit 2 + `../../hooks/hooks.json` PreToolUse deny |
-| 4. Skill auto-invoke (D21') | `src/hooks-bridge.js` (suppressOutput=true / additionalContext 차단 문구) |
-| 5. Chain-revisit detector | `src/revisit-detect.js` (git diff --numstat + LOC threshold + revisit_ignore_globs) |
+| 요소                        | 구현 위치                                                                           |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| 1. Driver / Orchestrator    | `src/cli.js` + 6 module                                                             |
+| 2. State 영속               | `src/state-store.js` (atomic CAS / fdatasync / Windows fallback)                    |
+| 3. Mechanical gate trio     | `src/gate-eval.js` + cli exit 2 + `../../hooks/hooks.json` PreToolUse deny          |
+| 4. Skill auto-invoke (D21') | `src/hooks-bridge.js` (suppressOutput=true / additionalContext 차단 문구)           |
+| 5. Chain-revisit detector   | `src/revisit-detect.js` (git diff --numstat + LOC threshold + revisit_ignore_globs) |
 
 ## Test (workspace developer 만)
 
@@ -97,7 +101,7 @@ chain-driver `next` 진입 시 자동 호출:
 npm test --workspace=tools/chain-driver       # 60 unit test + 8 chaos test = 68 pass
 ```
 
-★ `test/` + `test/fixtures/` 디렉토리 = workspace only / dist 자동 제외 (build-plugin.js EXCLUDE).
+`test/` + `test/fixtures/` 디렉토리 = workspace only / dist 자동 제외 (build-plugin.js EXCLUDE).
 
 ## 참조
 
@@ -106,4 +110,4 @@ npm test --workspace=tools/chain-driver       # 60 unit test + 8 chaos test = 68
 - DEC-2026-05-06-sub-plan-6-종결 §sp6-c8 — chaos test (CAS race detection + JSONL concurrency + interrupted mid-stage recovery)
 - [`../../hooks/README.md`](../../hooks/README.md) — hooks 진입 + chain-driver 호출 cadence
 - [`../../schemas/state.schema.json`](../../schemas/state.schema.json) — state 영속 schema
-- [`../../flows/sdlc-4stage-flow.json`](../../flows/sdlc-4stage-flow.json) — stage 순서 + 5 gate SSOT (★ v10.0.0 / chain N = gate #N 1:1)
+- [`../../flows/sdlc-4stage-flow.json`](../../flows/sdlc-4stage-flow.json) — stage 순서 + 5 gate SSOT (v10.0.0 / chain N = gate #N 1:1)

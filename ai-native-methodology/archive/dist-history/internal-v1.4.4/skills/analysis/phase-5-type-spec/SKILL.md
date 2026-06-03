@@ -15,7 +15,7 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
 
 ## 절차
 
-1. **ts-morph 실행** — TypeScript AST parsing (★ 진짜 도구 실행 의무 / no-simulation):
+1. **ts-morph 실행** — TypeScript AST parsing ( 진짜 도구 실행 의무 / no-simulation):
    ```bash
    npx ts-morph <project>
    ```

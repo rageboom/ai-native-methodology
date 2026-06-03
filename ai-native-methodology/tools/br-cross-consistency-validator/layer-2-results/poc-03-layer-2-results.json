@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-14T00:00:00Z",
   "batch_size": 18,
   "poc_id": "poc-03-realworld-nestjs",
-  "self_evaluation_bias_disclosure": "★★★★★★★★ same-model evaluation bias 위험 명시: 본 sub-agent(Sonnet 4.6) = step 6-a NL 합성 sub-agent(Sonnet 4.6)와 동일 모델. 동일 모델이 합성한 NL을 동일 모델이 평가하므로 구조적 편향(self-consistency bias) 존재. 점수가 실제보다 높게 측정될 가능성 있음. Phase D 도메인 전문가 검토 및 이종 모델 교차 검증 carry 의무.",
+  "self_evaluation_bias_disclosure": "same-model evaluation bias 위험 명시: 본 sub-agent(Sonnet 4.6) = step 6-a NL 합성 sub-agent(Sonnet 4.6)와 동일 모델. 동일 모델이 합성한 NL을 동일 모델이 평가하므로 구조적 편향(self-consistency bias) 존재. 점수가 실제보다 높게 측정될 가능성 있음. Phase D 도메인 전문가 검토 및 이종 모델 교차 검증 carry 의무.",
   "results": [
     {
       "br_id": "BR-USER-USERNAME-NOT-BLANK-001",
@@ -157,10 +157,10 @@
       "BR-ARTICLE-COMMENT-EAGER-001"
     ],
     "phase_d_carry": [
-      "★★★ same-model evaluation bias carry: Sonnet 4.6이 Sonnet 4.6 합성 NL을 평가 — self-consistency bias로 점수 상향 편향 가능성",
-      "★ BR-USER-DELETE-AUTH-001 semantic inversion: absent/결함 BR의 GWT-NL 합성 패러다임 정책 수립 carry",
-      "★ BR-USER-JWT-EXPIRY-001 specificity loss: 구체적 파라미터(60일)를 포함하는 NL 재합성 검토 carry",
-      "★ BR-ARTICLE-SLUG-AUTO-001 semantic strengthening: random suffix 구현 한계 vs 고유성 보장 의도 불일치 도메인 전문가 판단 carry"
+      "same-model evaluation bias carry: Sonnet 4.6이 Sonnet 4.6 합성 NL을 평가 — self-consistency bias로 점수 상향 편향 가능성",
+      "BR-USER-DELETE-AUTH-001 semantic inversion: absent/결함 BR의 GWT-NL 합성 패러다임 정책 수립 carry",
+      "BR-USER-JWT-EXPIRY-001 specificity loss: 구체적 파라미터(60일)를 포함하는 NL 재합성 검토 carry",
+      "BR-ARTICLE-SLUG-AUTO-001 semantic strengthening: random suffix 구현 한계 vs 고유성 보장 의도 불일치 도메인 전문가 판단 carry"
     ]
   }
 }

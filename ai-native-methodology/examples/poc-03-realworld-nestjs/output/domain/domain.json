@@ -23,7 +23,7 @@
       "modules": ["MOD-ARTICLE", "MOD-TAG"],
       "tables": ["article", "comment", "tag", "user_entity_favorites_article_entity"],
       "responsibility": "Article / Comment / Favorite / Tag",
-      "aggregate_roots": ["Article", "Tag (★ F-122 dead 의문)"],
+      "aggregate_roots": ["Article", "Tag ( F-122 dead 의문)"],
       "external_systems": []
     },
     {
@@ -32,7 +32,7 @@
       "modules": ["MOD-PROFILE"],
       "tables": ["follows"],
       "responsibility": "Follow / Unfollow",
-      "aggregate_roots": ["Follows (★ semantic 모호 — F-138)"],
+      "aggregate_roots": ["Follows ( semantic 모호 — F-138)"],
       "external_systems": []
     }
   ],
@@ -44,8 +44,8 @@
       "table": "user",
       "fields": {
         "id": "int (auto)",
-        "username": "string ★ UQ 부재",
-        "email": "string @IsEmail ★ UQ 부재",
+        "username": "string  UQ 부재",
+        "email": "string @IsEmail  UQ 부재",
         "bio": "string default ''",
         "image": "string default ''",
         "password": "string (argon2 hash via @BeforeInsert)",
@@ -56,22 +56,22 @@
         "anonymous (system entry)",
         "registered (signup 후)",
         "authenticated (JWT 보유)",
-        "(★ logout 명시적 endpoint 부재 — JWT stateless)"
+        "( logout 명시적 endpoint 부재 — JWT stateless)"
       ],
       "behaviors": [
         "signup (username/email/password) → argon2 hash → save",
         "login (email/password) → argon2.verify → JWT 60일",
         "update (username/email/bio/image — password 명시 제외)",
-        "delete (★ id 가 아닌 email 기반)",
+        "delete ( id 가 아닌 email 기반)",
         "findById / findByEmail",
-        "generateJWT (★ 60일 expiry)"
+        "generateJWT ( 60일 expiry)"
       ],
       "concerns": [
-        "★ F-120 — DB UQ 부재 → race-prone signup",
-        "★ F-119 — JWT 60일 expiry 길음",
-        "★ F-118 — JWT verify 3곳 DRY 위반",
-        "★ password 변경 endpoint 부재 (UpdateUserDto 에 password 필드 X)",
-        "★ generateJWT 가 매번 호출 (findById / findByEmail / login) — 불필요"
+        " F-120 — DB UQ 부재 → race-prone signup",
+        " F-119 — JWT 60일 expiry 길음",
+        " F-118 — JWT verify 3곳 DRY 위반",
+        " password 변경 endpoint 부재 (UpdateUserDto 에 password 필드 X)",
+        " generateJWT 가 매번 호출 (findById / findByEmail / login) — 불필요"
       ]
     },
     {
@@ -81,25 +81,25 @@
       "table": "article",
       "fields": {
         "id": "int (auto)",
-        "slug": "string ★ UQ 부재 (slugify random suffix)",
+        "slug": "string  UQ 부재 (slugify random suffix)",
         "title": "string",
         "description": "string default ''",
-        "body": "string ★ varchar(255) — text 권장 (F-133)",
+        "body": "string  varchar(255) — text 권장 (F-133)",
         "created": "timestamp default CURRENT_TIMESTAMP",
         "updated": "timestamp BeforeUpdate",
         "tagList": "string[] @Column('simple-array')",
-        "favoriteCount": "int default 0 ★ race 위험 (F-135)",
+        "favoriteCount": "int default 0  race 위험 (F-135)",
         "author": "ManyToOne UserEntity",
-        "comments": "OneToMany Comment {eager: true} ★ N+1 (F-124)"
+        "comments": "OneToMany Comment {eager: true}  N+1 (F-124)"
       },
       "lifecycle_states": [
-        "draft (★ 명시 부재 — DB 가 즉시 published 단일 상태)",
+        "draft ( 명시 부재 — DB 가 즉시 published 단일 상태)",
         "published (저장 즉시)",
-        "(★ archived / deleted 명시 부재)"
+        "( archived / deleted 명시 부재)"
       ],
       "behaviors": [
         "create (title/description/body/tagList) → slugify(title) + random suffix → save",
-        "update (★ slug 미업데이트 — TODO 주석)",
+        "update ( slug 미업데이트 — TODO 주석)",
         "delete (slug 기반)",
         "findAll (filter: tag/author/favorited + pagination)",
         "findFeed (follows 의 author 만)",
@@ -108,13 +108,13 @@
         "addComment / deleteComment"
       ],
       "concerns": [
-        "★ F-120 — slug UQ 부재",
-        "★ F-124 — comments eager:true N+1",
-        "★ F-125 — slugify random suffix (slug unique 회피)",
-        "★ F-126 — Update 시 slug 미업데이트",
-        "★ F-135 — favoriteCount race",
-        "★ tagList ↔ TagEntity 두 SoT (F-123)",
-        "★ favorite/unFavorite idempotent 처리 (App level — race window 존재)"
+        " F-120 — slug UQ 부재",
+        " F-124 — comments eager:true N+1",
+        " F-125 — slugify random suffix (slug unique 회피)",
+        " F-126 — Update 시 slug 미업데이트",
+        " F-135 — favoriteCount race",
+        " tagList ↔ TagEntity 두 SoT (F-123)",
+        " favorite/unFavorite idempotent 처리 (App level — race window 존재)"
       ]
     },
     {
@@ -125,7 +125,7 @@
       "is_sub_aggregate_of": "Article",
       "fields": {
         "id": "int (auto)",
-        "body": "string ★ varchar(255) (F-133)",
+        "body": "string  varchar(255) (F-133)",
         "article": "ManyToOne ArticleEntity"
       },
       "lifecycle_states": ["created", "deleted"],
@@ -134,8 +134,8 @@
         "deleteComment (article slug + comment id)"
       ],
       "concerns": [
-        "★ F-134 — @Entity() default — 다른 entity 명시 (비일관)",
-        "★ Article.comments eager:true 로 항상 로드"
+        " F-134 — @Entity() default — 다른 entity 명시 (비일관)",
+        " Article.comments eager:true 로 항상 로드"
       ]
     },
     {
@@ -145,14 +145,14 @@
       "table": "tag",
       "fields": {
         "id": "int (auto)",
-        "tag": "string ★ UQ 부재"
+        "tag": "string  UQ 부재"
       },
       "lifecycle_states": [],
       "behaviors": ["findAll (TagService.findAll)"],
       "concerns": [
-        "★★ F-122 — insert 코드 부재 → dead code 가능성",
-        "★ F-123 — Article.tagList (simple-array) 와 별개 — 두 SoT",
-        "★ Phase 4 결정: Aggregate Root ❌ — value object 또는 dead code (F-139 신규)"
+        " F-122 — insert 코드 부재 → dead code 가능성",
+        " F-123 — Article.tagList (simple-array) 와 별개 — 두 SoT",
+        " Phase 4 결정: Aggregate Root ❌ — value object 또는 dead code (F-139 신규)"
       ]
     },
     {
@@ -162,8 +162,8 @@
       "table": "follows",
       "fields": {
         "id": "int (auto)",
-        "followerId": "int ★ FK 부재 (F-121)",
-        "followingId": "int ★ FK 부재 (F-121)"
+        "followerId": "int  FK 부재 (F-121)",
+        "followingId": "int  FK 부재 (F-121)"
       },
       "lifecycle_states": ["not_following", "following"],
       "behaviors": [
@@ -171,10 +171,10 @@
         "unFollow (follower/following pair) → delete"
       ],
       "concerns": [
-        "★ F-121 — FK 제약 부재",
-        "★ F-138 — 위치 모호 (profile/ vs user/)",
-        "★ self-follow 차단 service 단 (email==email / id==id 분리 — 일관성 결여)",
-        "★ Aggregate Root vs Value Object 모호 — Phase 4 결정: 약한 Aggregate (id 기반 lookup 만)"
+        " F-121 — FK 제약 부재",
+        " F-138 — 위치 모호 (profile/ vs user/)",
+        " self-follow 차단 service 단 (email==email / id==id 분리 — 일관성 결여)",
+        " Aggregate Root vs Value Object 모호 — Phase 4 결정: 약한 Aggregate (id 기반 lookup 만)"
       ]
     }
   ],
@@ -183,7 +183,7 @@
     {"id": "UC-USER-LOGIN",                 "actor": "Anonymous",     "endpoint": "POST /api/users/login",            "service": "UserService.findOne + generateJWT"},
     {"id": "UC-USER-FIND-CURRENT",          "actor": "Authenticated", "endpoint": "GET /api/user",                    "service": "UserService.findByEmail"},
     {"id": "UC-USER-UPDATE",                "actor": "Authenticated", "endpoint": "PUT /api/user",                    "service": "UserService.update"},
-    {"id": "UC-USER-DELETE",                "actor": "Anonymous (★ guard 부재)", "endpoint": "DELETE /api/users/:slug", "service": "UserService.delete (email)"},
+    {"id": "UC-USER-DELETE",                "actor": "Anonymous ( guard 부재)", "endpoint": "DELETE /api/users/:slug", "service": "UserService.delete (email)"},
     {"id": "UC-PROFILE-GET",                "actor": "Optional",      "endpoint": "GET /api/profiles/:username",       "service": "ProfileService.findProfile"},
     {"id": "UC-PROFILE-FOLLOW",             "actor": "Authenticated", "endpoint": "POST /api/profiles/:username/follow", "service": "ProfileService.follow"},
     {"id": "UC-PROFILE-UNFOLLOW",           "actor": "Authenticated", "endpoint": "DELETE /api/profiles/:username/follow","service": "ProfileService.unFollow"},
@@ -191,14 +191,14 @@
     {"id": "UC-ARTICLE-FEED",               "actor": "Authenticated", "endpoint": "GET /api/articles/feed",             "service": "ArticleService.findFeed"},
     {"id": "UC-ARTICLE-GET",                "actor": "Optional",      "endpoint": "GET /api/articles/:slug",            "service": "ArticleService.findOne"},
     {"id": "UC-ARTICLE-CREATE",             "actor": "Authenticated", "endpoint": "POST /api/articles",                 "service": "ArticleService.create"},
-    {"id": "UC-ARTICLE-UPDATE",             "actor": "Authenticated", "endpoint": "PUT /api/articles/:slug",            "service": "ArticleService.update (★ slug 미업데이트)"},
+    {"id": "UC-ARTICLE-UPDATE",             "actor": "Authenticated", "endpoint": "PUT /api/articles/:slug",            "service": "ArticleService.update ( slug 미업데이트)"},
     {"id": "UC-ARTICLE-DELETE",             "actor": "Authenticated", "endpoint": "DELETE /api/articles/:slug",         "service": "ArticleService.delete"},
     {"id": "UC-ARTICLE-FAVORITE",           "actor": "Authenticated", "endpoint": "POST /api/articles/:slug/favorite",  "service": "ArticleService.favorite"},
     {"id": "UC-ARTICLE-UNFAVORITE",         "actor": "Authenticated", "endpoint": "DELETE /api/articles/:slug/favorite","service": "ArticleService.unFavorite"},
     {"id": "UC-COMMENT-LIST",               "actor": "Optional",      "endpoint": "GET /api/articles/:slug/comments",   "service": "ArticleService.findComments"},
     {"id": "UC-COMMENT-CREATE",             "actor": "Authenticated", "endpoint": "POST /api/articles/:slug/comments",  "service": "ArticleService.addComment"},
     {"id": "UC-COMMENT-DELETE",             "actor": "Authenticated", "endpoint": "DELETE /api/articles/:slug/comments/:id", "service": "ArticleService.deleteComment"},
-    {"id": "UC-TAG-LIST",                   "actor": "Anonymous",     "endpoint": "GET /api/tags",                       "service": "TagService.findAll (★ F-122 dead — 빈 배열 가능성)"}
+    {"id": "UC-TAG-LIST",                   "actor": "Anonymous",     "endpoint": "GET /api/tags",                       "service": "TagService.findAll ( F-122 dead — 빈 배열 가능성)"}
   ],
   "use_case_count": 20,
   "concerns": {
@@ -208,7 +208,7 @@
       "UC-TAG-CREATE — TagEntity insert 코드 부재 (F-122)"
     ],
     "guard_missing": [
-      "UC-USER-DELETE — AuthMiddleware 적용 없음 → 무차별 삭제 가능 ★★ critical 후보 (F-140 신규)"
+      "UC-USER-DELETE — AuthMiddleware 적용 없음 → 무차별 삭제 가능  critical 후보 (F-140 신규)"
     ]
   }
 }

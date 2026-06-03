@@ -21,7 +21,7 @@
     {"id": "Random", "type": "external", "name": "Math.random().toString(36)"},
     {"id": "UserRepo", "type": "repository", "name": "Repository<UserEntity>"},
     {"id": "ArticleRepo", "type": "repository", "name": "Repository<ArticleEntity>"},
-    {"id": "DB", "type": "external", "name": "MySQL article (★ slug UQ 부재)"}
+    {"id": "DB", "type": "external", "name": "MySQL article ( slug UQ 부재)"}
   ],
   "messages": [
     {"from": "Authenticated", "to": "AuthMiddleware", "label": "POST /api/articles {article: CreateArticleDto}", "sync": "sync"},
@@ -30,7 +30,7 @@
 
     {"from": "Service", "to": "Slugify", "label": "slug(title, {lower: true})", "sync": "sync"},
     {"from": "Slugify", "to": "Service", "label": "slug-base", "sync": "return"},
-    {"from": "Service", "to": "Random", "label": "Math.random().toString(36).substring(7)", "sync": "sync", "guard": "★ F-053 변형 — 충돌 회피용 random suffix"},
+    {"from": "Service", "to": "Random", "label": "Math.random().toString(36).substring(7)", "sync": "sync", "guard": " F-053 변형 — 충돌 회피용 random suffix"},
     {"from": "Random", "to": "Service", "label": "abc12 (e.g.)", "sync": "return"},
     {"from": "Service", "to": "Service", "label": "slug = slug-base + '-' + abc12", "sync": "sync"},
 
@@ -42,7 +42,7 @@
     {"from": "Service", "to": "ArticleRepo", "label": "save(new ArticleEntity({slug, title, body, tagList, author}))", "sync": "sync"},
     {"from": "ArticleRepo", "to": "DB", "label": "INSERT INTO article", "sync": "sync"},
 
-    {"from": "DB", "to": "ArticleRepo", "label": "★ slug UQ 부재 → 충돌 시 row 모두 INSERT 성공 (정합성 손실)", "sync": "return", "guard": "★ F-120"},
+    {"from": "DB", "to": "ArticleRepo", "label": " slug UQ 부재 → 충돌 시 row 모두 INSERT 성공 (정합성 손실)", "sync": "return", "guard": " F-120"},
     {"from": "DB", "to": "ArticleRepo", "label": "1 row inserted", "sync": "return", "guard": "정상"},
     {"from": "ArticleRepo", "to": "Service", "label": "ArticleEntity (persisted)", "sync": "return"},
 
@@ -52,11 +52,11 @@
   "slug_uniqueness_analysis": {
     "current": "Math.random().toString(36) suffix — 36^5 ≈ 60M 가능성",
     "collision_probability": "1 - exp(-N²/(2*60M)) ≈ N=10000 시 0.08%",
-    "db_protection": "★ slug UQ 부재 = 충돌 시 정합성 손실",
+    "db_protection": " slug UQ 부재 = 충돌 시 정합성 손실",
     "industry_standard": "DB UQ 단독 + catch QueryFailedError → 재생성 또는 ConflictException (Sairyss)"
   },
   "findings": [
-    {"id": "F-120-slug", "summary": "★ slug UQ 부재 — random suffix 충돌 시 undefined behavior"},
-    {"id": "F-053-variant", "summary": "★ random suffix (slug unique 회피) — PoC #02 F-053 cross-val 변형 재현"}
+    {"id": "F-120-slug", "summary": " slug UQ 부재 — random suffix 충돌 시 undefined behavior"},
+    {"id": "F-053-variant", "summary": " random suffix (slug unique 회피) — PoC #02 F-053 cross-val 변형 재현"}
   ]
 }

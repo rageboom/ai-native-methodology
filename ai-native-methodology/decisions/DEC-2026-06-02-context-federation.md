@@ -5,6 +5,7 @@
 **작성일**: 2026-06-02 (worktree `session-wt` / 사용자 승인 — "Phase 0+1 구현" + "디폴트 가드 그대로").
 
 **relates to**:
+
 - `DEC-2026-05-30-codegraph-essential-impl-slice1.md` (Slice 1 = codegraph-runner / federation = Slice 2 carry)
 - `DEC-2026-05-28-codegraph-probe-결과.md` §4.2 (trust 모델 — gate inject ❌) + iBATIS2 SQL 층 효용 0
 - `DEC-2026-06-01-living-dep-graph-loops.md` §2 (결정론 vs 휴리스틱 trust 선 / propose-only)
@@ -20,20 +21,24 @@
 ## 2. 결단 상세 (Phase 0 = 결정 잠금)
 
 ### trust 모델 (절대 / DEC-2026-05-28 §4.2 + DEC-2026-06-01 §2 정합)
+
 - codegraph = **휴리스틱 신호** → `context-cache.json` = **reference-lens / NOT gate-injected**. 어떤 결정론 gate(gate-eval / release-readiness)에도 inject ❌.
 - 삼중 잠금: ① `meta.trust_note` 의무 필드(schema const) ② release-readiness 미배선(non-gating) ③ context-federator 는 `state` 를 쓰지 않음(소비 전용 / propose 격리 무관).
 - 실증된 함정: codegraph `query "selectDataConfirmList"` 가 SQL 아닌 **동명 Java 메서드**를 자신만만하게 히트 + legacy `impact` 가 DB 영향 0줄 → gate 가 믿으면 SQL-breaking 통과. 그래서 reference-lens 고정.
 
 ### axis 분리 (feedback_chain_driver_deterministic_axis / STRONG-STOP)
+
 - context-federator = **결정론 only**. navigate(BFS/centrality) + codegraph(static index) 의 결정론 출력을 join 만. AI 의미 재유추 ❌.
 - **자연어 의미매핑(임베딩) = propose-only carry** (본 Phase 미포함). Phase 3 의 prompt→node 매칭은 결정론 토큰/path 매칭만.
 
-### ★ 스택별 "코드 반쪽" 소스 분기 (실증 기반 결단)
+### 스택별 "코드 반쪽" 소스 분기 (실증 기반 결단)
+
 - **modern**(JPA/MyBatis3/TS) → codegraph 가 데이터 접근까지 봄 (poc-05 end-to-end 실증: `assertAvailable`←`register` 8심볼).
 - **legacy**(Spring4.1+iBATIS2) → codegraph 코드 반쪽은 Java 구조까지만. **SQL/테이블 층 암흑** (실증: EFI-WEB ifrs 인덱스 — `sql/table` 노드 kind 0 / DAO `callees=0` / XML 56개 file 로만). → 데이터 지식은 codegraph 아닌 **분석 산출물(db-schema/sql-inventory/business-rules)** 에서 조인 (Phase 1.5).
 - federate 는 미해결 anchor 를 `unresolved:true` 로 **정직 표기** (반쪽 비는 것 숨기지 않음 / no-simulation).
 
 ### 디폴트 가드 (사용자 승인 "디폴트 그대로")
+
 - 임베딩 의미검색 = propose-only 분리 / MCP serve(`codegraph serve`) = 후순위(1차 로컬 CLI query·callers·impact 만) / §8.1 corroboration = PoC#15 1건뿐 → **gate-class 격상 전면 DEFER**.
 - write-scope = `.aimd/output` 만 (tracked fixture 변조 금지 / DEC-2026-06-01 carry 3 정합).
 
@@ -41,7 +46,7 @@
 
 - **신설**: `tools/context-federator/{federator.js, cli.js}` + `schemas/context-cache.schema.json` + 워크스페이스 등재.
   - `federate(graph, {repoRoot, codegraphProjectDir, navigate, codegraph, ...})` = pure. anchored Tier-1(active/drift) 노드별 → navigate(dep 의미: by_grade + top_impact_roots) + codegraph(코드: ast_symbol 직행 callers/impact / strict_path 파일명 stem query → sameFile 필터) join → `context-cache.json`.
-- **도구→도구 import 회피** (workspace 컨벤션 = `_shared` 만 공유): navigate/codegraph 는 CLI black-box 로 shell-out(`makeNavigateRunner`=chain-driver navigate / `makeCodegraphAdapter`=codegraph read). core 는 runner 주입 = testable (gitRunner 주입 패턴 동형). → ★ plan 의 "codegraph-runner cgExec/q 재사용"은 **패턴 재사용**으로 조정(WRITE/index 7-field evidence 경로는 codegraph-runner 단독 소유 / READ 경로만 어댑터 자체 보유).
+- **도구→도구 import 회피** (workspace 컨벤션 = `_shared` 만 공유): navigate/codegraph 는 CLI black-box 로 shell-out(`makeNavigateRunner`=chain-driver navigate / `makeCodegraphAdapter`=codegraph read). core 는 runner 주입 = testable (gitRunner 주입 패턴 동형). → plan 의 "codegraph-runner cgExec/q 재사용"은 **패턴 재사용**으로 조정(WRITE/index 7-field evidence 경로는 codegraph-runner 단독 소유 / READ 경로만 어댑터 자체 보유).
 - **no-simulation**: codegraph 부재 = `codegraph.available=false` 정직 반환(throw 아님) → dep 반쪽은 그대로 emit.
 
 ## 4. 검증 (no-simulation / 실 CLI·실 codegraph)
@@ -68,7 +73,7 @@
 - **신설**: `loadLegacyDataSource(graph,{repoRoot,...})` — `analysis-sql-inventory`/`analysis-db-schema` 노드 `source_path` **자동발견** → `byUc`(uc_link→entries) / `byMapper`(파일명→entries) / `tableByName`. federate **origin 확장**(code-anchored ∪ **data-anchored** = uc_link 가 가리키는 노드 → code_pointers 0 legacy 도 편입) + pack `data_refs`(sql_id·statement_type·dependent_tables[+db-schema 컬럼]·business_meaning / `source:'sql-inventory'`). CLI `--sql-inventory`/`--db-schema` override.
 - **trust**: 분석 산출물=LLM 추출 → data_refs 도 **reference-lens / non-gating**. 결정론(read+lookup / AI 재유추 ❌). additive(기존 code_refs/델타/prompt 무변경).
 - **실증(no-sim)**: poc-16(efiweb-car / code_pointers 0 / sql-inventory 6 entries) → **5 UC 노드 data-anchored 편입 + data_refs**(`tb_car`/`tb_car_cost`/`ifrs.fn_split` 등 / codegraph 없이 SQL·테이블 반쪽 확보) + dep navigate 동반. 단위 26/26(Phase 1.5 +5: loadDS/data-anchored/db-schema 보강/mapper 조인/graceful) + workspace **1041/0**.
-- **★ Phase 1.5b (同일 추가 / business-rules 조인)**: `loadLegacyDataSource` 가 `analysis-business-rules` source_path 도 자동발견 → `brById` 인덱스. `data_refs[].business_rules` = `business_meaning` 텍스트의 BR id(`BR-XXX`) 추출 → 조회({id,name,natural_language,severity}). → legacy 데이터 반쪽 = **SQL + 테이블/컬럼 + 규칙(intent)** 완성. 실증: poc-16 `UC-CAR-MGT-001`→`insertCar`→`tb_car` + `BR-CAR-MGT-001/005(high)`. 단위 28/28(+2) + workspace **1043/0**.
+- ** Phase 1.5b (同일 추가 / business-rules 조인)**: `loadLegacyDataSource` 가 `analysis-business-rules` source_path 도 자동발견 → `brById` 인덱스. `data_refs[].business_rules` = `business_meaning` 텍스트의 BR id(`BR-XXX`) 추출 → 조회({id,name,natural_language,severity}). → legacy 데이터 반쪽 = **SQL + 테이블/컬럼 + 규칙(intent)** 완성. 실증: poc-16 `UC-CAR-MGT-001`→`insertCar`→`tb_car` + `BR-CAR-MGT-001/005(high)`. 단위 28/28(+2) + workspace **1043/0**.
 
 ## 5. carry
 

@@ -14,14 +14,17 @@
 ## 결정 (A + C / B = 기존 graph-integrity)
 
 ### A. graph-synthesizer Layer 4 (additive / breaking 0)
+
 - `ANALYSIS_BASENAME_TO_KIND` const 신설 (basename → kind 역매핑 / 파일명≠kind: api/db-schema/ui-ux + alias openapi.yaml/db-schema.json / ANALYSIS_FILENAMES 정합).
 - Layer 3(meta.related_chain_ids) 직후 Layer 4: discovery/behavior/operational-task 의 `cross_links.to_analysis_artifacts` → basename→kind → `analysisLoaded.has(kind)` guard → `analysis-{kind}` → **layer anchor**(정렬 첫 UC/BHV/OP id) cross_reference edge. dangling guard(nodeIds.has anchor) + dedup(기존 cross_reference key Set) + fan-out 회피(anchor 1개 / per-item 정밀 edge 는 Layer 1).
 - `ANALYSIS_SUBKINDS`/`ANALYSIS_BASENAME_TO_KIND` export (drift-guard test).
 
 ### B. enforcement = 기존 graph-integrity-validator
+
 - orphan=FAIL 이 곧 "미참조 → 강제 실패". Layer 4 가 to_analysis_artifacts 를 edge 통로로 만들어 의미 부여. 신규 filesystem coverage 검사 ❌ (poc-16 false-positive 회피).
 
 ### C. ecommerce dogfood 데이터 보정 (corroboration / 외부 repo)
+
 - discovery+behavior `cross_links.to_analysis_artifacts` 를 present analysis 산출물 완전체(architecture/domain/business-rules/schema/antipatterns/openapi/error-mapping/form-validation)로 보정 → 실 그래프 재생성.
 
 ## 검증 (no-simulation / 실 CLI·실 git)
@@ -30,7 +33,7 @@
 - workspace **1042 pass / 0 fail** (v11.30.0 1037 baseline + 5).
 - release-readiness **30/30** (graph_integrity #13 poc-05 nodes=18/edges=29/orphan=0 불변 / code_pointer #16 불변).
 - skill-citation 0 stale / version 3-way 11.31.0 / CRLF→LF 정규화(Edit 툴 노이즈 제거).
-- **★ ecommerce 실 그래프 측정**: orphan **5**(원본) → **2**(Part A 단독 / domain·error-mapping·form-validation 해소) → **0**(Part A + C / architecture·db-schema) / graph-integrity passed:true / cycles 0 / unknown 0. dogfood findings·stats = F-ECOM-004 **resolved** 갱신.
+- ** ecommerce 실 그래프 측정**: orphan **5**(원본) → **2**(Part A 단독 / domain·error-mapping·form-validation 해소) → **0**(Part A + C / architecture·db-schema) / graph-integrity passed:true / cycles 0 / unknown 0. dogfood findings·stats = F-ECOM-004 **resolved** 갱신.
 
 ## §8.1 (정직)
 

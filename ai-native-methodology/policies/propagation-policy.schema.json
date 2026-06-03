@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/policies/propagation-policy.schema.json",
   "title": "Propagation Policy",
-  "description": "★ dep-graph operation.md 결정 4·5 — 변경 종류 × chain 인접 단계 매트릭스 + edge 등급 override + code_pointer anchor 규칙.",
+  "description": "dep-graph operation.md 결정 4·5 — 변경 종류 × chain 인접 단계 매트릭스 + edge 등급 override + code_pointer anchor 규칙.",
   "type": "object",
   "additionalProperties": false,
   "properties": {

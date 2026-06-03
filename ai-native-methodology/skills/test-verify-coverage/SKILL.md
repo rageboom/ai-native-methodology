@@ -1,12 +1,12 @@
 ---
 name: test-verify-coverage
-description: ★ ★ v2.0 chain 4 sub-skill. AC → TC coverage 측정 + ratchet (0.85 → 0.90 → 0.95). 3 metric 분리 (link_coverage / test_pass_rate / line+branch_coverage). coverage-auditor persona 책임. ADR-010 v2 + ADR-CHAIN-001 §2 정합.
+description: v2.0 chain 4 sub-skill. AC → TC coverage 측정 + ratchet (0.85 → 0.90 → 0.95). 3 metric 분리 (link_coverage / test_pass_rate / line+branch_coverage). coverage-auditor persona 책임. ADR-010 v2 + ADR-CHAIN-001 §2 정합.
 allowed-tools: Read, Bash
 ---
 
 # verify-coverage
 
-★ ★ v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
+v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
 
 ## 언제 사용
 
@@ -16,29 +16,29 @@ allowed-tools: Read, Bash
 
 ## 입력
 
-- `<project>/.aimd/output/acceptance-criteria.json` (AC-* / verifiable)
-- `<project>/.aimd/output/test-spec.json` (TC-* / framework)
+- `<project>/.aimd/output/acceptance-criteria.json` (AC-\* / verifiable)
+- `<project>/.aimd/output/test-spec.json` (TC-\* / framework)
 - `<project>/.aimd/output/impl-spec.json` — 있으면 (line/branch coverage path)
 - `<project>/<coverage>/lcov.info` 또는 `coverage.xml` 등 (framework 별)
 
-## 3 metric 분리 (★ ADR-CHAIN-001 §2)
+## 3 metric 분리 (ADR-CHAIN-001 §2)
 
 본 skill 핵심 정책 — 한 metric 으로 합치지 않고 3 분리 측정:
 
-| metric | 정의 | source | gate 임계 |
-|---|---|---|---|
-| **link_coverage** | AC.test_case_refs 의 비율 | spec-test-link-validator | ≥ 0.85 (chain 2→4 forward link) |
-| **test_pass_rate** | pass_count / (pass+fail) | test-impl-pass-validator | chain 5 = 1.0 의무 |
-| **line+branch_coverage** | impl 코드 line+branch hit 비율 | LCOV / JaCoCo / Cobertura | ≥ 0.80 (★ 정보 / chain 5 권고) |
+| metric                   | 정의                           | source                    | gate 임계                       |
+| ------------------------ | ------------------------------ | ------------------------- | ------------------------------- |
+| **link_coverage**        | AC.test_case_refs 의 비율      | spec-test-link-validator  | ≥ 0.85 (chain 2→4 forward link) |
+| **test_pass_rate**       | pass_count / (pass+fail)       | test-impl-pass-validator  | chain 5 = 1.0 의무              |
+| **line+branch_coverage** | impl 코드 line+branch hit 비율 | LCOV / JaCoCo / Cobertura | ≥ 0.80 (정보 / chain 5 권고)    |
 
-★ 정책: `test_pass_rate` 는 chain 5 GREEN 의무 (강제) / `link_coverage` 는 chain 2-4 의무 (강제) / `line+branch_coverage` 는 정보 (사용자 검토 권고 / 본 방법론 강제 ❌).
+정책: `test_pass_rate` 는 chain 5 GREEN 의무 (강제) / `link_coverage` 는 chain 2-4 의무 (강제) / `line+branch_coverage` 는 정보 (사용자 검토 권고 / 본 방법론 강제 ❌).
 
-## ratchet 정책 (★ ADR-010 v2 §2.6)
+## ratchet 정책 (ADR-010 v2 §2.6)
 
 - 1차 baseline: 0.85
 - 1+ PoC 누적 후: 0.90
 - 2+ PoC 누적 후: 0.95
-- ★ severity_floor (DO-178C DAL A 차용):
+- severity_floor (DO-178C DAL A 차용):
   - critical: 1.0 (모든 critical AC 가 100% test 의무)
   - high: 0.95
   - medium: 0.90
@@ -71,18 +71,19 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
 
 산출 — `pass_count / (pass_count + fail_count)`.
 
-### 3. line+branch_coverage 측정 (★ 정보 only)
+### 3. line+branch_coverage 측정 (정보 only)
 
 framework 별 LCOV / JaCoCo / Cobertura 파싱:
+
 - jest/vitest: `coverage/lcov.info` (lcov-parse npm package 또는 정규식).
 - junit5: `target/site/jacoco/jacoco.xml`.
 - pytest: `coverage.xml` (Cobertura format).
 
-본 skill 은 path 만 검출 → impl-spec.test_pass_evidence.coverage_report_path 필드 채움. 진짜 metric 측정 = ★ 도구 본격 통합 v2.x carry.
+본 skill 은 path 만 검출 → impl-spec.test_pass_evidence.coverage_report_path 필드 채움. 진짜 metric 측정 = 도구 본격 통합 v2.x carry.
 
 ### 4. severity_floor 검증
 
-- AC 의 severity=critical 인데 test_case_refs 부재 → ★ critical 위반 → finding (chain.severity-floor.critical-no-tc).
+- AC 의 severity=critical 인데 test_case_refs 부재 → critical 위반 → finding (chain.severity-floor.critical-no-tc).
 - AC severity=high 의 link_coverage < 0.95 → finding (chain.severity-floor.high-below-threshold).
 
 ### 5. ratchet 갱신
@@ -90,21 +91,21 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 - baseline 갱신 시 `<project>/.aimd/baseline-coverage.json` 작성:
   ```json
   {
-    "baseline_date": "2026-05-06",
-    "link_coverage_baseline": 0.87,
-    "ratchet_target_next": 0.90
+  	"baseline_date": "2026-05-06",
+  	"link_coverage_baseline": 0.87,
+  	"ratchet_target_next": 0.9
   }
   ```
-- 다음 cycle 진입 시 link_coverage < baseline → ★ ratchet violation → 차단.
+- 다음 cycle 진입 시 link_coverage < baseline → ratchet violation → 차단.
 
 ### 6. 결과 채움
 
 - chain 4 → test-spec.coverage 갱신 (schema canonical = `coverage`, `coverage_summary` 아님 / link_coverage ratchet).
 - chain 5 → impl-spec.coverage 갱신 (link_coverage / test_pass_rate / line+branch_coverage).
 
-## ★ ★ no-simulation — coverage 위조 차단
+## no-simulation — coverage 위조 차단
 
-`line+branch_coverage` 는 진짜 LCOV/JaCoCo/Cobertura 파일 path 의무. 추측치 ❌ / 사용자 명시 입력 ❌ (path 만 허용 / 측정은 ★ 외부 도구 책임).
+`line+branch_coverage` 는 진짜 LCOV/JaCoCo/Cobertura 파일 path 의무. 추측치 ❌ / 사용자 명시 입력 ❌ (path 만 허용 / 측정은 외부 도구 책임).
 
 ## §8.1 strict 정합
 

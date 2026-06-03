@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/sql-inventory.schema.json",
   "title": "SQL Inventory — phase 4.8 SQL 단위 12 컬럼 인벤토리 + extraction_automation + patterns_extension_v2 (optional Legacy) + patterns_extension_v3 (optional MyBatis 3+)",
-  "description": "Deliverable #24 (★ v2.2.0-rc1 신설 / ★ v2.3.0-rc1 Phase 1 migration_priority 12번째 컬럼 추가 / ★ v2.3.0 Phase 2 patterns_extension_v3 신설). ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / migration_priority 대체) + ADR-CHAIN-010 (patterns_extension_v3 정식 도입 / MyBatis 3 advanced features 한정) 정합. Michael Feathers Characterization Testing (2004) + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 6 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags + migration_priority). ≥ 2 PoC isomorphic (★ scale-cross + paradigm + ORM + platform-cross MEDIUM × 5 PoC robust strong / ADR-CHAIN-008): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum) + PoC #08+#09+#10 Modern.",
+  "description": "Deliverable #24 (v2.2.0-rc1 신설 / v2.3.0-rc1 Phase 1 migration_priority 12번째 컬럼 추가 / v2.3.0 Phase 2 patterns_extension_v3 신설). ADR-CHAIN-007 phase 4.8 + ADR-CHAIN-009 (Gartner TIME SQL 단위 보류 / migration_priority 대체) + ADR-CHAIN-010 (patterns_extension_v3 정식 도입 / MyBatis 3 advanced features 한정) 정합. Michael Feathers Characterization Testing (2004) + AWS Migration Acceleration Program (MAP) Assess phase + Opus 4.7 외부 조언 6 컬럼 + 본 방법론 추가 6 컬럼 (statement_type + uc_link + intent_vs_bug_classification + confidence + carry_flags + migration_priority). ≥ 2 PoC isomorphic (scale-cross + paradigm + ORM + platform-cross MEDIUM × 5 PoC robust strong / ADR-CHAIN-008): PoC #06 단일책임 + PoC #07 다중책임 (Spring 4.1 + iBATIS 2 spectrum) + PoC #08+#09+#10 Modern.",
   "x-spec-source": {
     "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004)",
     "feathers_characterization": "https://michaelfeathers.silvrback.com/characterization-testing",
@@ -27,7 +27,7 @@
     },
     "corroboration_role": {
       "type": "string",
-      "description": "예: '★ scale-cross corroboration #1 / Spring 4.1 + iBATIS 2 단일책임' / 'paradigm-cross carry — C-v2.2.0-6'"
+      "description": "예: 'scale-cross corroboration #1 / Spring 4.1 + iBATIS 2 단일책임' / 'paradigm-cross carry — C-v2.2.0-6'"
     },
     "meta_confidence": { "$ref": "./meta-confidence.schema.json" },
     "summary": { "$ref": "#/$defs/summary" },
@@ -41,7 +41,7 @@
     "patterns_extension_v3": { "$ref": "#/$defs/patternsExtensionV3" },
     "phase_4_7_corroboration_role": {
       "type": "object",
-      "description": "★ phase 4.7 cross-link role 명시 — corroboration #1/#2/#3 또는 N/A.",
+      "description": "phase 4.7 cross-link role 명시 — corroboration #1/#2/#3 또는 N/A.",
       "additionalProperties": true
     },
     "external_advice_absorption": {
@@ -56,7 +56,7 @@
     "carry_inventory_56_summary": {
       "type": "object",
       "additionalProperties": true,
-      "description": "★ 시간 cap 정합 / 일부 record 만 cover / 나머지 carry summary."
+      "description": "시간 cap 정합 / 일부 record 만 cover / 나머지 carry summary."
     }
   },
   "$defs": {
@@ -64,15 +64,15 @@
       "type": "object",
       "required": ["sql_id", "mapper_xml", "business_meaning", "dependent_tables", "intent_vs_bug_classification", "confidence"],
       "additionalProperties": true,
-      "$comment": "★ additionalProperties: true — 사용자/PoC retrofit 단계 자연어 finding 용 (예: 'note' / 'cross-module-source' 등). 핵심 필드는 required + 명시 정의 / 향후 사용자 확장 친화.",
+      "$comment": "additionalProperties: true — 사용자/PoC retrofit 단계 자연어 finding 용 (예: 'note' / 'cross-module-source' 등). 핵심 필드는 required + 명시 정의 / 향후 사용자 확장 친화.",
       "properties": {
         "sql_id": {
           "type": "string",
-          "description": "★ 외부 6 / DAO.method 또는 mapper namespace.id (예: 'ExchangeDAO.selectExchangeList' / 'capital.selectLoadSaveData')."
+          "description": "외부 6 / DAO.method 또는 mapper namespace.id (예: 'ExchangeDAO.selectExchangeList' / 'capital.selectLoadSaveData')."
         },
         "mapper_xml": {
           "type": "string",
-          "description": "★ 외부 6 / XML 파일 path 또는 'inline' (Spring JDBC) / 'jpa' (JPA Repository) / 'typeorm' (TypeORM) / 'prisma' ($queryRaw)."
+          "description": "외부 6 / XML 파일 path 또는 'inline' (Spring JDBC) / 'jpa' (JPA Repository) / 'typeorm' (TypeORM) / 'prisma' ($queryRaw)."
         },
         "mapper_xml_line": {
           "oneOf": [
@@ -84,19 +84,19 @@
           "type": "string",
           "enum": ["PREPARED", "CALLABLE", "STATEMENT"],
           "default": "PREPARED",
-          "description": "★ ★ Agent 1 강 권고 흡수 (MyBatis 14 표준 속성) — PREPARED (default / 일반 SQL) / CALLABLE (★ Stored Procedure 호출 / S_ExRateMigration / S_* prefix) / STATEMENT (드물게 사용)."
+          "description": "Agent 1 강 권고 흡수 (MyBatis 14 표준 속성) — PREPARED (default / 일반 SQL) / CALLABLE (Stored Procedure 호출 / S_ExRateMigration / S_* prefix) / STATEMENT (드물게 사용)."
         },
         "called_from_screen": {
           "type": "string",
-          "description": "★ 외부 6 / JSP recursive trace / Modern 시 'N/A — REST API only'."
+          "description": "외부 6 / JSP recursive trace / Modern 시 'N/A — REST API only'."
         },
         "business_meaning": {
           "type": "string",
-          "description": "★ 외부 6 / LLM ~70% + 도메인 expert 검증 carry."
+          "description": "외부 6 / LLM ~70% + 도메인 expert 검증 carry."
         },
         "dynamic_branch": {
           "type": "array",
-          "description": "★ 외부 6 / iBATIS dynamic tags + SQL CASE WHEN.",
+          "description": "외부 6 / iBATIS dynamic tags + SQL CASE WHEN.",
           "items": {
             "type": "object",
             "required": ["tag", "branch_count"],
@@ -123,7 +123,7 @@
                   "sql:case_when",
                   "other"
                 ],
-                "description": "★ v2.3.1 PATCH (C-v2.2.0-7) / optional sub-classification — iBATIS 2 dynamic tag (16종) + MyBatis 3 dynamic tag (8종) + SQL native (case_when) + other. tag (자연어) 와 tag_type (정형 enum) 양방향 link 의무."
+                "description": "v2.3.1 PATCH (C-v2.2.0-7) / optional sub-classification — iBATIS 2 dynamic tag (16종) + MyBatis 3 dynamic tag (8종) + SQL native (case_when) + other. tag (자연어) 와 tag_type (정형 enum) 양방향 link 의무."
               },
               "line": {
                 "oneOf": [
@@ -144,21 +144,21 @@
         "dependent_tables": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ 외부 6 / FROM/JOIN regex / SchemaSpy 검증 가능."
+          "description": "외부 6 / FROM/JOIN regex / SchemaSpy 검증 가능."
         },
         "uc_link": {
           "type": "string",
-          "description": "★ 본 추가 / discovery-spec UC ID 또는 'N/A — supplementary' (cross-module 의존 시)."
+          "description": "본 추가 / discovery-spec UC ID 또는 'N/A — supplementary' (cross-module 의존 시)."
         },
         "intent_vs_bug_classification": {
           "type": "string",
-          "description": "★ 본 추가 / characterization-spec.json 4 분류 자연어 (intent / bug / ambiguous / self_recognized 키워드 ≥ 1 의무). 예: 'intent (BR-EXCHANGE-002 정합) + bug 동반 (AP-EXCHANGE-006)'."
+          "description": "본 추가 / characterization-spec.json 4 분류 자연어 (intent / bug / ambiguous / self_recognized 키워드 ≥ 1 의무). 예: 'intent (BR-EXCHANGE-002 정합) + bug 동반 (AP-EXCHANGE-006)'."
         },
         "confidence": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "description": "★ 본 추가 / meta-confidence 단계별 가중. carry_flags 에 'external_call_out_of_scope' 또는 'DBA-read' 시 ≤ 0.80 의무 (validator if/then)."
+          "description": "본 추가 / meta-confidence 단계별 가중. carry_flags 에 'external_call_out_of_scope' 또는 'DBA-read' 시 ≤ 0.80 의무 (validator if/then)."
         },
         "carry_flags": {
           "type": "array",
@@ -175,7 +175,7 @@
               "DRY-violation"
             ]
           },
-          "description": "★ 본 추가 / scope_decision 명시 enum. PoC #07 추가 (cross-domain / domain-expert / DRY-violation)."
+          "description": "본 추가 / scope_decision 명시 enum. PoC #07 추가 (cross-domain / domain-expert / DRY-violation)."
         },
         "scope_decision": {
           "type": "string",
@@ -183,12 +183,12 @@
         },
         "patterns": {
           "$ref": "#/$defs/patternObject",
-          "description": "★ optional / Legacy iBATIS 한정 / patterns_extension_v2 nested per record."
+          "description": "optional / Legacy iBATIS 한정 / patterns_extension_v2 nested per record."
         },
         "migration_priority": {
           "type": "string",
           "enum": ["P0", "P1", "P2", "P3"],
-          "description": "★ 본 추가 (v2.3.0-rc1) / 12번째 컬럼 / SQL 단위 modernization priority. P0=즉시(critical/차단 risk) / P1=短期(3개월 이내/high) / P2=中期(6~12개월/medium) / P3=후순위(12개월+/low or maintain). Gartner TIME (application portfolio 단위) 와 분리 axis — ADR-CHAIN-009 정합. optional — 기존 11 컬럼 row backward-compat 의무."
+          "description": "본 추가 (v2.3.0-rc1) / 12번째 컬럼 / SQL 단위 modernization priority. P0=즉시(critical/차단 risk) / P1=短期(3개월 이내/high) / P2=中期(6~12개월/medium) / P3=후순위(12개월+/low or maintain). Gartner TIME (application portfolio 단위) 와 분리 axis — ADR-CHAIN-009 정합. optional — 기존 11 컬럼 row backward-compat 의무."
         }
       },
       "allOf": [
@@ -209,7 +209,7 @@
             "properties": {
               "confidence": { "type": "number", "maximum": 0.80 }
             },
-            "$comment": "★ external_call_out_of_scope 또는 DBA-read carry 시 confidence ≤ 0.80 의무."
+            "$comment": "external_call_out_of_scope 또는 DBA-read carry 시 confidence ≤ 0.80 의무."
           }
         }
       ]
@@ -262,11 +262,11 @@
         "auto_ratio_external_6": {
           "type": "string",
           "pattern": "^\\d+/6 = \\d+(\\.\\d+)?% ?",
-          "description": "★ 외부 6 컬럼 (sql_id / mapper_xml / called_from_screen / business_meaning / dynamic_branch / dependent_tables) 자동/수동 비율. 예: '4/6 = 66.7% (≥ 50% pass)'."
+          "description": "외부 6 컬럼 (sql_id / mapper_xml / called_from_screen / business_meaning / dynamic_branch / dependent_tables) 자동/수동 비율. 예: '4/6 = 66.7% (≥ 50% pass)'."
         },
         "auto_ratio_external_7": {
           "type": "string",
-          "description": "★ statement_type 추가 후 비율 (예: '5/7 = 71.4%')."
+          "description": "statement_type 추가 후 비율 (예: '5/7 = 71.4%')."
         },
         "auto_ratio_total_11": {
           "type": "string",
@@ -281,7 +281,7 @@
     },
     "patternsExtensionV2": {
       "type": "object",
-      "description": "★ optional / Legacy iBATIS 한정 / 4 패턴 nested. patterns_extension_v3 (cache / discriminator / typeHandler) carry C-v2.2.0-3.",
+      "description": "optional / Legacy iBATIS 한정 / 4 패턴 nested. patterns_extension_v3 (cache / discriminator / typeHandler) carry C-v2.2.0-3.",
       "additionalProperties": true,
       "properties": {
         "schema_version": { "type": "string" },
@@ -304,12 +304,12 @@
     },
     "patternObject": {
       "type": "object",
-      "description": "★ per record nested patterns (optional / Legacy 한정).",
+      "description": "per record nested patterns (optional / Legacy 한정).",
       "additionalProperties": true
     },
     "patternsExtensionV3": {
       "type": "object",
-      "description": "★ ★ v2.3.0 Phase 2 신설 / optional / MyBatis 3+ advanced features 한정 / 3 패턴 nested. ADR-CHAIN-010 정합. iBATIS 2 단독 stack 부적합 (별도 axis / patterns_extension_v2 사용).",
+      "description": "v2.3.0 Phase 2 신설 / optional / MyBatis 3+ advanced features 한정 / 3 패턴 nested. ADR-CHAIN-010 정합. iBATIS 2 단독 stack 부적합 (별도 axis / patterns_extension_v2 사용).",
       "additionalProperties": true,
       "properties": {
         "schema_version": { "type": "string", "description": "예: 'v3 (2026-05-12)'" },
@@ -338,7 +338,7 @@
         "core_record_extension": {
           "type": "object",
           "additionalProperties": true,
-          "description": "★ per record patterns_extension_v3 예시 (cache_namespace / discriminator_column / typeHandler_class 등)."
+          "description": "per record patterns_extension_v3 예시 (cache_namespace / discriminator_column / typeHandler_class 등)."
         }
       }
     }

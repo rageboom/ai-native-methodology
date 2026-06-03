@@ -1,5 +1,5 @@
 {
-  "$comment": "★ v2.3.0 Phase 2 신규 fixture / patterns_extension_v3 (cache / discriminator / typeHandler) / ADR-CHAIN-010 정합 / MyBatis 3+ Modern stack 가정",
+  "$comment": "v2.3.0 Phase 2 신규 fixture / patterns_extension_v3 (cache / discriminator / typeHandler) / ADR-CHAIN-010 정합 / MyBatis 3+ Modern stack 가정",
   "meta_confidence": {
     "generated_at": "2026-05-12T00:00:00Z",
     "methodology_version": "v2.3.0",
@@ -20,7 +20,7 @@
       "sql_id": "UserMapper.selectByRole",
       "mapper_xml": "src/main/resources/mappers/UserMapper.xml",
       "statement_type": "PREPARED",
-      "business_meaning": "★ role discriminator 기반 user 조회 / MyBatis 3 advanced",
+      "business_meaning": "role discriminator 기반 user 조회 / MyBatis 3 advanced",
       "dependent_tables": ["users"],
       "intent_vs_bug_classification": "intent (role inheritance mapping)",
       "confidence": 0.92,
@@ -30,7 +30,7 @@
       "sql_id": "OrderMapper.selectByStatus",
       "mapper_xml": "src/main/resources/mappers/OrderMapper.xml",
       "statement_type": "PREPARED",
-      "business_meaning": "★ typeHandler 기반 OrderStatus enum 매핑",
+      "business_meaning": "typeHandler 기반 OrderStatus enum 매핑",
       "dependent_tables": ["orders"],
       "intent_vs_bug_classification": "intent (typeHandler 매핑)",
       "confidence": 0.90,

@@ -1,42 +1,58 @@
 manifest:
-  generated_at: "2026-04-29"
-  poc_id: "poc-02-realworld-springboot3"
-  phase: "1 (init)"
-  target_repo: "1chz/realworld-java21-springboot3"
-  target_head: "93e018e9a769dadae5a80b922d649bd7c79545cd"
-  methodology_version: "v1.1.2"
+  generated_at: '2026-04-29'
+  poc_id: 'poc-02-realworld-springboot3'
+  phase: '1 (init)'
+  target_repo: '1chz/realworld-java21-springboot3'
+  target_head: '93e018e9a769dadae5a80b922d649bd7c79545cd'
+  methodology_version: 'v1.1.2'
 
 # 산출물 5종 (output/inventory/)
 deliverables:
   - file: inventory.json
-    purpose: "AI 용 구조화 데이터 (schema 정합)"
-    schema: "schemas/inventory.schema.json"
+    purpose: 'AI 용 구조화 데이터 (schema 정합)'
+    schema: 'schemas/inventory.schema.json'
   - file: tree.md
-    purpose: "사람용 디렉토리 트리"
+    purpose: '사람용 디렉토리 트리'
   - file: stats.json
-    purpose: "파일/LOC 통계 (모듈별 + source set 별)"
+    purpose: '파일/LOC 통계 (모듈별 + source set 별)'
   - file: stack-detection.md
-    purpose: "사람용 스택 감지 종합 보고서"
+    purpose: '사람용 스택 감지 종합 보고서'
   - file: _manifest.yml
-    purpose: "본 파일 — Phase 1 메타 + 신뢰도 자평"
+    purpose: '본 파일 — Phase 1 메타 + 신뢰도 자평'
 
 # 신뢰도 자평 (formula v1)
 confidence:
-  formula_version: "v1"
+  formula_version: 'v1'
   base: 0.75
   applied_modifiers:
-    - {name: "orm_full", value: 0.10, reason: "JPA + Specifications + Cache + p6spy 4단서 + secondary"}
-    - {name: "domain_context_md", value: 0.03, reason: "PoC #1 inputs/domain-context.md 재사용 (RealWorld spec 동일)"}
-    - {name: "postman_or_api_test", value: 0.05, reason: "api-docs/Conduit.postman_collection.json + run-api-tests.sh"}
-    - {name: "diagrams_other", value: 0.02, reason: "README ERD 이미지 (외부 호스팅)"}
+    - {
+        name: 'orm_full',
+        value: 0.10,
+        reason: 'JPA + Specifications + Cache + p6spy 4단서 + secondary',
+      }
+    - {
+        name: 'domain_context_md',
+        value: 0.03,
+        reason: 'PoC #1 inputs/domain-context.md 재사용 (RealWorld spec 동일)',
+      }
+    - {
+        name: 'postman_or_api_test',
+        value: 0.05,
+        reason: 'api-docs/Conduit.postman_collection.json + run-api-tests.sh',
+      }
+    - {
+        name: 'diagrams_other',
+        value: 0.02,
+        reason: 'README ERD 이미지 (외부 호스팅)',
+      }
   applied_penalties: []
   raw: 0.95
-  cap_applied: false   # raw 0.95 < 0.98
-  weighted_average: 0.93   # architecture_style_candidates cap 0.65 반영
-  cap_reason: "architecture_style_candidates Phase 1 cap 0.7 + Senior 정정으로 0.65"
+  cap_applied: false # raw 0.95 < 0.98
+  weighted_average: 0.93 # architecture_style_candidates cap 0.65 반영
+  cap_reason: 'architecture_style_candidates Phase 1 cap 0.7 + Senior 정정으로 0.65'
   expected_phase_average_from_plan: 0.95
   delta_vs_plan: -0.02
-  delta_reason: "Senior 가 메인 사전 fetch 정정 (core Spring 의존성 0 단언 → 정정) → architecture_style_candidates Pure Hexagonal 단정 회피 → 0.65 cap. 정직성 ↑ (단일 PoC 과적합 회피)."
+  delta_reason: 'Senior 가 메인 사전 fetch 정정 (core Spring 의존성 0 단언 → 정정) → architecture_style_candidates Pure Hexagonal 단정 회피 → 0.65 cap. 정직성 ↑ (단일 PoC 과적합 회피).'
 
 confidence_breakdown:
   directory_tree:
@@ -49,18 +65,18 @@ confidence_breakdown:
     extraction_method: deterministic
   package_manifests:
     confidence: 0.98
-    element_count: 6   # root + module/core + module/persistence + server/api + libs.versions.toml + settings.gradle.kts
+    element_count: 6 # root + module/core + module/persistence + server/api + libs.versions.toml + settings.gradle.kts
     extraction_method: deterministic
   orm_detection:
     confidence: 0.97
-    element_count: 4   # primary 1 + secondary 3
+    element_count: 4 # primary 1 + secondary 3
     extraction_method: pattern_matching
   stack_summary:
     confidence: 0.92
     element_count: 1
     extraction_method: llm_with_grounding
   architecture_style_candidates:
-    confidence: 0.65   # ★ Senior 정정 반영 cap
+    confidence: 0.65 #  Senior 정정 반영 cap
     element_count: 3
     extraction_method: llm_with_grounding
   modules_for_priority_analysis:
@@ -71,93 +87,93 @@ confidence_breakdown:
 # 5 핵심 결정 (DEC-PHASE1-POC02-001 ~ DEC-PHASE1-POC02-005)
 key_decisions:
   - id: DEC-PHASE1-POC02-001
-    title: "Architecture 분류 = Modular Monolith with Ports & Adapters Naming (hybrid)"
-    rationale: "Pure Hexagonal 단정 회피. core 모듈에 @Service/@Entity 사용 + root subprojects 가 spring-boot 강제. Senior 결정 채택. confidence 0.65, 확정은 Phase 3."
+    title: 'Architecture 분류 = Modular Monolith with Ports & Adapters Naming (hybrid)'
+    rationale: 'Pure Hexagonal 단정 회피. core 모듈에 @Service/@Entity 사용 + root subprojects 가 spring-boot 강제. Senior 결정 채택. confidence 0.65, 확정은 Phase 3.'
   - id: DEC-PHASE1-POC02-002
-    title: "메인 사전 fetch 정정 — F-015 cross-validation 메인 정정 케이스"
+    title: '메인 사전 fetch 정정 — F-015 cross-validation 메인 정정 케이스'
     rationale: "메인 1차 단언 'core Spring 의존성 0' → Senior 가 root build.gradle.kts §59~99 subprojects 블록 + 어노테이션 실측으로 정정. v1.2.0 묶음 A (F-015 격상) 의 강한 외부 검증 데이터. F-044 등록."
   - id: DEC-PHASE1-POC02-003
-    title: "PoC #1 finding 33건 외부 검증 분류"
-    rationale: "비재현(해소): F-007/F-009/F-041 / 비재현(stack 마이그레이션 권고): AP-SECURITY-001/AP-ARCH-001/002 / 재현 강함: F-015/F-017 / 재현 시그널: AP-DOMAIN-001/002, AP-PERFORMANCE-002 → Phase 2~6 검증 이월"
+    title: 'PoC #1 finding 33건 외부 검증 분류'
+    rationale: '비재현(해소): F-007/F-009/F-041 / 비재현(stack 마이그레이션 권고): AP-SECURITY-001/AP-ARCH-001/002 / 재현 강함: F-015/F-017 / 재현 시그널: AP-DOMAIN-001/002, AP-PERFORMANCE-002 → Phase 2~6 검증 이월'
   - id: DEC-PHASE1-POC02-004
-    title: "신규 finding 6건 정식 등록 (F-042 ~ F-047)"
-    rationale: "high 1 (F-042 multi-module inventory) / medium 2 (F-043 ports/adapters 자동 감지, F-044 F-015 보강) / low 3 (F-045 p6spy / F-046 Specifications vs QueryDSL / F-047 orm secondary). KPI 정합 (5~15 건강 범위)."
+    title: '신규 finding 6건 정식 등록 (F-042 ~ F-047)'
+    rationale: 'high 1 (F-042 multi-module inventory) / medium 2 (F-043 ports/adapters 자동 감지, F-044 F-015 보강) / low 3 (F-045 p6spy / F-046 Specifications vs QueryDSL / F-047 orm secondary). KPI 정합 (5~15 건강 범위).'
   - id: DEC-PHASE1-POC02-005
-    title: "inventory.json 표현 확장"
-    rationale: "repo.modules[] 신규 (F-042 격상 데이터) / stack.backend.orm.{primary, secondary} 분리 (F-047) / architecture_style_candidates[].caveats[] 신규"
+    title: 'inventory.json 표현 확장'
+    rationale: 'repo.modules[] 신규 (F-042 격상 데이터) / stack.backend.orm.{primary, secondary} 분리 (F-047) / architecture_style_candidates[].caveats[] 신규'
 
 # 인풋 (Phase 0 manifest 정합)
 inputs_used:
-  - source_code           # git clone 완료
-  - config_files          # build.gradle.kts + libs.versions.toml + application.yaml (Phase 2 read)
-  - documentation         # README §Considerations 12 항목
-  - domain_context_md     # PoC #1 재사용 (RealWorld spec 동일)
-  - postman_or_api_test   # api-docs/
-  - diagrams_other        # README ERD 이미지
+  - source_code # git clone 완료
+  - config_files # build.gradle.kts + libs.versions.toml + application.yaml (Phase 2 read)
+  - documentation # README §Considerations 12 항목
+  - domain_context_md # PoC #1 재사용 (RealWorld spec 동일)
+  - postman_or_api_test # api-docs/
+  - diagrams_other # README ERD 이미지
 
 # Phase 1 KPI 평가
 phase_1_kpi:
-  - "✅ 1원칙 plan-phase1-poc02.md 작성 (~390 줄)"
-  - "✅ 2원칙 3 sub-agent 병렬 (1,635 줄 합계) + research-phase1-poc02.md 통합 (~430 줄)"
-  - "✅ 3원칙 — Auto Mode 자율 일괄 진행 (5 핵심 결정 채택)"
-  - "✅ 4단계 — output/inventory/ 5종 작성"
-  - "✅ KPI: finding 6건 신규 등록 = 건강 범위 5~15 정합"
-  - "✅ F-015 cross-validation 메인 정정 케이스 ★ — v1.2.0 묶음 A 강한 외부 검증 1건 확보"
-  - "✅ schema 검증 통과 (v1.1.2 inventory.schema.json)"
+  - '✅ 1원칙 plan-phase1-poc02.md 작성 (~390 줄)'
+  - '✅ 2원칙 3 sub-agent 병렬 (1,635 줄 합계) + research-phase1-poc02.md 통합 (~430 줄)'
+  - '✅ 3원칙 — Auto Mode 자율 일괄 진행 (5 핵심 결정 채택)'
+  - '✅ 4단계 — output/inventory/ 5종 작성'
+  - '✅ KPI: finding 6건 신규 등록 = 건강 범위 5~15 정합'
+  - '✅ F-015 cross-validation 메인 정정 케이스  — v1.2.0 묶음 A 강한 외부 검증 1건 확보'
+  - '✅ schema 검증 통과 (v1.1.2 inventory.schema.json)'
 
 # 한계 / 명시 caveats
 limitations:
-  - "module/core 가 Spring 의존성 0 인지 단언 회피 — root subprojects 강제로 Spring 의존. Pure Hexagonal 아님."
-  - "architecture_style_candidates Phase 1 cap 0.7 (Senior 정정 후 0.65). 확정은 Phase 3."
+  - 'module/core 가 Spring 의존성 0 인지 단언 회피 — root subprojects 강제로 Spring 의존. Pure Hexagonal 아님.'
+  - 'architecture_style_candidates Phase 1 cap 0.7 (Senior 정정 후 0.65). 확정은 Phase 3.'
   - "Phase 2 application.yaml read 전까지 ddl-auto / open-in-view 정확 설정 미확인 (HEAD commit 메시지 'Disable JPA open-in-view' 단서로만 추정)."
-  - "JPA Specifications 의 안티패턴 여부 = Phase 6 candidate (PF-006 → F-046)."
-  - "p6spy production 활성화 여부 = Phase 2 application.yaml read 후 확정."
+  - 'JPA Specifications 의 안티패턴 여부 = Phase 6 candidate (PF-006 → F-046).'
+  - 'p6spy production 활성화 여부 = Phase 2 application.yaml read 후 확정.'
 
 # Findings during Phase 1 (PoC #02 신규 — 6건 정식 등록)
 findings_phase_1:
   - finding_id: F-042
     severity: high
-    title: "multi-module 환경 inventory.json 표현 가이드 부재"
-    spec_gap: "phase-1-init.md §4.2 의 inventory.json 예제는 single module 가정. multi-module 의 modules[] 배열 + depends_on scope (compileOnly/runtimeOnly) 표현 가이드 없음."
-    proposed_fix: "v1.2.0 묶음 H 신규 — phase-1-init.md §4.2 보강 + inventory.schema.json 의 repo.modules 정식화"
+    title: 'multi-module 환경 inventory.json 표현 가이드 부재'
+    spec_gap: 'phase-1-init.md §4.2 의 inventory.json 예제는 single module 가정. multi-module 의 modules[] 배열 + depends_on scope (compileOnly/runtimeOnly) 표현 가이드 없음.'
+    proposed_fix: 'v1.2.0 묶음 H 신규 — phase-1-init.md §4.2 보강 + inventory.schema.json 의 repo.modules 정식화'
     status: promoted
   - finding_id: F-043
     severity: medium
-    title: "ports/adapters 자동 감지 단서 명세 부재"
-    spec_gap: "phase-1-init.md §3.2 가 ORM 만 다룸. architecture_style_candidates 추론용 단서 (Adapter 명명 / 모듈 의존성 방향 / port 인터페이스) 명세 없음."
-    proposed_fix: "v1.2.0 묶음 H — phase-1-init.md §3.2 architecture 단서 표 추가"
+    title: 'ports/adapters 자동 감지 단서 명세 부재'
+    spec_gap: 'phase-1-init.md §3.2 가 ORM 만 다룸. architecture_style_candidates 추론용 단서 (Adapter 명명 / 모듈 의존성 방향 / port 인터페이스) 명세 없음.'
+    proposed_fix: 'v1.2.0 묶음 H — phase-1-init.md §3.2 architecture 단서 표 추가'
     status: promoted
   - finding_id: F-044
     severity: medium
-    title: "F-015 cross-validation 메인 정정 케이스 (학습 코퍼스/단편 fetch 한계)"
-    spec_gap: "F-015 (v1.2.0 묶음 A 후보) 가 sub-agent 검증을 명세화하나, 메인 (Claude) 자신도 학습 코퍼스 의존 / 단편 fetch 함정에 빠질 수 있음. 메인 sub-agent 양방향 검증 절차 명세 부재."
-    proposed_fix: "v1.2.0 묶음 A 보강 — Work Principles 2원칙에 sub-agent → 메인 정정 케이스 절차 추가"
+    title: 'F-015 cross-validation 메인 정정 케이스 (학습 코퍼스/단편 fetch 한계)'
+    spec_gap: 'F-015 (v1.2.0 묶음 A 후보) 가 sub-agent 검증을 명세화하나, 메인 (Claude) 자신도 학습 코퍼스 의존 / 단편 fetch 함정에 빠질 수 있음. 메인 sub-agent 양방향 검증 절차 명세 부재.'
+    proposed_fix: 'v1.2.0 묶음 A 보강 — Work Principles 2원칙에 sub-agent → 메인 정정 케이스 절차 추가'
     status: promoted
   - finding_id: F-045
     severity: low
-    title: "p6spy production 활성화 가이드 부재"
-    spec_gap: "phase-6-quality.md 에 SQL 모니터링 도구의 production vs development-only 구분 가이드 없음. Tech Radar Hold 등급 (Case Researcher 보고)."
-    proposed_fix: "v1.2 후보 — phase-6-quality.md 또는 6-antipatterns.md 보강"
+    title: 'p6spy production 활성화 가이드 부재'
+    spec_gap: 'phase-6-quality.md 에 SQL 모니터링 도구의 production vs development-only 구분 가이드 없음. Tech Radar Hold 등급 (Case Researcher 보고).'
+    proposed_fix: 'v1.2 후보 — phase-6-quality.md 또는 6-antipatterns.md 보강'
     status: deferred
   - finding_id: F-046
     severity: low
-    title: "JPA Specifications vs QueryDSL 선택 가이드 부재"
-    spec_gap: "phase-6-quality.md 또는 ADR 에 동적 쿼리 라이브러리 선택 가이드 없음. 한국 사례에서 Specifications 단독 사용 = 비주류 (Case Researcher 보고)."
-    proposed_fix: "v1.2 후보 — phase-6-quality.md 보강"
+    title: 'JPA Specifications vs QueryDSL 선택 가이드 부재'
+    spec_gap: 'phase-6-quality.md 또는 ADR 에 동적 쿼리 라이브러리 선택 가이드 없음. 한국 사례에서 Specifications 단독 사용 = 비주류 (Case Researcher 보고).'
+    proposed_fix: 'v1.2 후보 — phase-6-quality.md 보강'
     status: deferred
   - finding_id: F-047
     severity: low
-    title: "stack.backend.orm secondary 영역 (Specifications/Cache/p6spy) 가이드 부재"
-    spec_gap: "inventory.schema.json 의 stack.backend.orm 은 단일 배열. primary vs secondary 분류 표현 없음."
-    proposed_fix: "v1.2 후보 — schemas/inventory.schema.json 의 stack.backend.orm 객체화"
+    title: 'stack.backend.orm secondary 영역 (Specifications/Cache/p6spy) 가이드 부재'
+    spec_gap: 'inventory.schema.json 의 stack.backend.orm 은 단일 배열. primary vs secondary 분류 표현 없음.'
+    proposed_fix: 'v1.2 후보 — schemas/inventory.schema.json 의 stack.backend.orm 객체화'
     status: deferred
 
 # 다음 단계 (Phase 2 인계)
-next_phase: "Phase 2 (db)"
+next_phase: 'Phase 2 (db)'
 next_actions:
-  - "module/persistence/src/main/resources/schema.sql read (DDL ground truth)"
-  - "module/persistence/src/main/resources/application.yaml + server/api/src/main/resources/application.yaml read"
-  - "module/core/model/*.java 의 @Entity 클래스 직접 read (User / Article / Comment 등)"
+  - 'module/persistence/src/main/resources/schema.sql read (DDL ground truth)'
+  - 'module/persistence/src/main/resources/application.yaml + server/api/src/main/resources/application.yaml read'
+  - 'module/core/model/*.java 의 @Entity 클래스 직접 read (User / Article / Comment 등)'
   - "ORM ddl-auto 설정 확정 (HEAD 'Disable open-in-view' 단서)"
-  - "DRIFT 체크 — PoC #1 9건 DRIFT 본 환경 재현 검증"
-  - "PoC #1 promoted 10 / deferred 13 finding cross-validation 이월 분석"
+  - 'DRIFT 체크 — PoC #1 9건 DRIFT 본 환경 재현 검증'
+  - 'PoC #1 promoted 10 / deferred 13 finding cross-validation 이월 분석'

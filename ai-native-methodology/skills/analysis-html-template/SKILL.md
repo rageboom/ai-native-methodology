@@ -1,6 +1,6 @@
 ---
 name: analysis-html-template
-description: Use when project contains JSP / Thymeleaf / EJS / ERB / Razor server-rendered templates. Extracts template hierarchy, form actions, scriptlet warnings, XSS risk markers using external static analyzers (SonarQube / PMD JSP / jsp-lint). LLM 양심 정량 ❌ (no-simulation 의무). Track = Scenario C (JSP) — state-map ❌ / server-side state 본질. Stage = analysis (★ 신규 phase `template-analyze`).
+description: Use when project contains JSP / Thymeleaf / EJS / ERB / Razor server-rendered templates. Extracts template hierarchy, form actions, scriptlet warnings, XSS risk markers using external static analyzers (SonarQube / PMD JSP / jsp-lint). LLM 양심 정량 ❌ (no-simulation 의무). Track = Scenario C (JSP) — state-map ❌ / server-side state 본질. Stage = analysis (신규 phase `template-analyze`).
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -10,7 +10,7 @@ JSP / Thymeleaf / EJS / ERB / Razor 같은 server-side template 을 입력 받�
 
 > **단일 책임**: server-rendered template 흡수 + anti-pattern 검출 (외부 도구). state-map 은 본 skill scope 외 (server-side state 본질 / BE rules 담당).
 
-## 사전 조건 (★ 의무 / no-simulation 정합)
+## 사전 조건 (의무 / no-simulation 정합)
 
 - **진짜 외부 정적 분석 도구 가용**:
   - JSP = SonarQube (`Web:JspScriptletCheck` `rspec-1459` `rspec-1932`) 또는 PMD JSP ruleset 또는 `jsp-lint`
@@ -42,7 +42,7 @@ JSP / Thymeleaf / EJS / ERB / Razor 같은 server-side template 을 입력 받�
 
 - `.aimd/<scope>/planning/html-template-extract.json` (strict / additionalProperties:false)
 
-## 정책 (★ v3.4.0 G4)
+## 정책 (v3.4.0 G4)
 
 - **JSP scriptlet 정책 = 0 absolute** (사용자 결단 2026-05-15 / JSP 2.0 / Servlet 2.4 기준 deprecated 이후 / EL + JSTL paradigm 정합). scriptlet 1건 이상 검출 시 finding severity = critical / migration-cautions.json 등재 의무.
 - **외부 도구 finding 정량 = 그대로 인용** — LLM 가공 ❌ / 양심 count ❌. `external_tool_output.output_path` schema 필드 의무 (역추적용).

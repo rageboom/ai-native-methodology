@@ -21,7 +21,7 @@
         "target/src/user_store.py"
       ],
       "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
-      "source_evidence": "UserService.register — store.find_by_email check + raises EmailDuplicateError. ★ AP-FSIM-DATA-001 fix."
+      "source_evidence": "UserService.register — store.find_by_email check + raises EmailDuplicateError. AP-FSIM-DATA-001 fix."
     },
     {
       "id": "IMPL-USER-FSIM-002",
@@ -33,7 +33,7 @@
         "target/src/user_store.py"
       ],
       "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
-      "source_evidence": "UserService.login — find_by_email + plaintext compare (★ AP-FSIM-SEC-001 carry) + secrets.token_urlsafe."
+      "source_evidence": "UserService.login — find_by_email + plaintext compare (AP-FSIM-SEC-001 carry) + secrets.token_urlsafe."
     },
     {
       "id": "IMPL-TODO-FSIM-001",

@@ -12,7 +12,7 @@ end-to-end 흐름 점검 (`flows/` + 문서 + runtime 정합). DEC-2026-05-26-di
 
 ## 2. 발견 (F-MB-010 / F-MB-011)
 
-- **flows**: `discovery.phase-flow.mermaid` OUT 노드 + `sdlc-4stage-flow.{json,mermaid}` + `spec.phase-flow.{json,mermaid}` (입력/NEXT) = `planning-spec` 잔존. ★ `discovery.phase-flow.json`(discovery-spec) ↔ `.mermaid`(planning-spec) 산출물명 발산을 **drift-validator 가 0 breaking 통과** = 이중 렌더링 "drift 0 자가 입증" 간판의 실증 반례 (F-MB-011).
+- **flows**: `discovery.phase-flow.mermaid` OUT 노드 + `sdlc-4stage-flow.{json,mermaid}` + `spec.phase-flow.{json,mermaid}` (입력/NEXT) = `planning-spec` 잔존. `discovery.phase-flow.json`(discovery-spec) ↔ `.mermaid`(planning-spec) 산출물명 발산을 **drift-validator 가 0 breaking 통과** = 이중 렌더링 "drift 0 자가 입증" 간판의 실증 반례 (F-MB-011).
 - **docs**: `lifecycle-contract.md` / `README.md` / `guides/{chain-harness-guide,first-prompt-cookbook}.md` / `agents/README.md` = `planning-spec` + chain 3 산출물 `plan-spec`(실 = `task-plan`) 잔존.
 - **runtime (기능 결함)**: `chain-driver/src/{hooks-bridge,revisit-detect,work-unit}` = 옛 파일명 keying → 신규 `discovery-spec.json` 산출물 dep-graph 노드 인식·revisit 감지·traceability 추출 누락.
 

@@ -15,38 +15,39 @@ PoC-EFI 검증 cycle 2 종결 후 사용자 (sangcl@smilegate.com) 가 일감/ti
 > "지금 이 티켓 정책도 우리 플러그인의 정책으로 넣을 수 있나?"
 
 검토 결과:
-- Plugin 의 ID convention (UC-* / BHV-* / AC-* 등) + traceability matrix = ticket 시스템과 자연 정합
+
+- Plugin 의 ID convention (UC-_ / BHV-_ / AC-\* 등) + traceability matrix = ticket 시스템과 자연 정합
 - 다만 ticket = process layer / R4 artifact 5종 = artifact layer / 두 영역 분리 의무
 - 사용자/조직별 ticket 정책 다양 (Jira Standard vs Premium / Linear / GitHub Issues / Azure DevOps) → validator 강제 X / 권고만
 
 ## 대안 비교
 
-| 옵션 | 채택 여부 | 사유 |
-|---|---|---|
-| A) ticket 정책 plugin scope 외 / 사용자 자율 | ❌ | 사용자 마이그레이션 시 매 organization 마다 결단 반복 → plugin 가치 손실 |
-| **B) Tier 1 (정책 + schema field + id-convention) 만 v8.6.0 진입 ★** | **✅ 채택** | 강제력 X / additive / breaking 0 / 즉시 활용 가능 |
-| C) Tier 1 + Tier 2 (ticket emit skill) v8.7.0 batch | △ carry | skill 의무 vs 선택 결단 별도 필요 → MINOR 별도 |
-| D) Tier 1+2+3 (API adapter 포함) v9.0 batch | △ carry | platform 종속 / R# 카테고리 신설 의무 → charter review |
+| 옵션                                                                | 채택 여부   | 사유                                                                     |
+| ------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------ |
+| A) ticket 정책 plugin scope 외 / 사용자 자율                        | ❌          | 사용자 마이그레이션 시 매 organization 마다 결단 반복 → plugin 가치 손실 |
+| **B) Tier 1 (정책 + schema field + id-convention) 만 v8.6.0 진입 ** | **✅ 채택** | 강제력 X / additive / breaking 0 / 즉시 활용 가능                        |
+| C) Tier 1 + Tier 2 (ticket emit skill) v8.7.0 batch                 | △ carry     | skill 의무 vs 선택 결단 별도 필요 → MINOR 별도                           |
+| D) Tier 1+2+3 (API adapter 포함) v9.0 batch                         | △ carry     | platform 종속 / R# 카테고리 신설 의무 → charter review                   |
 
 ## R# 정합 점검
 
-| R | 영향 | 결과 |
-|---|---|---|
-| R4 재사용성 5종 (antipatterns/rules/domain/openapi/schema) | 충돌? | ❌ 없음 — ticket = process layer / R4 = artifact layer 분리 |
-| Mechanical gate (state.blocked + CLI exit 2 + PreToolUse deny) | 충돌? | ❌ 없음 — Tier 1 은 권고만 / validator 강제 X |
-| R15 no-simulation | 영향 | ✅ 일관 — Tier 3 platform adapter 시 real API + evidence 의무 |
-| ID convention (UC-* / BHV-* etc.) | 영향 | ✅ 정합 — UC = Story 1:1 매핑 자연스러움 |
-| Traceability matrix bidirectional | 영향 | ✅ 정합 — `ticket_ref` 가 외부 system 으로 link 1개 추가 |
+| R                                                              | 영향  | 결과                                                          |
+| -------------------------------------------------------------- | ----- | ------------------------------------------------------------- |
+| R4 재사용성 5종 (antipatterns/rules/domain/openapi/schema)     | 충돌? | ❌ 없음 — ticket = process layer / R4 = artifact layer 분리   |
+| Mechanical gate (state.blocked + CLI exit 2 + PreToolUse deny) | 충돌? | ❌ 없음 — Tier 1 은 권고만 / validator 강제 X                 |
+| R15 no-simulation                                              | 영향  | ✅ 일관 — Tier 3 platform adapter 시 real API + evidence 의무 |
+| ID convention (UC-_ / BHV-_ etc.)                              | 영향  | ✅ 정합 — UC = Story 1:1 매핑 자연스러움                      |
+| Traceability matrix bidirectional                              | 영향  | ✅ 정합 — `ticket_ref` 가 외부 system 으로 link 1개 추가      |
 
 ## 영향 범위 (additive / breaking 0)
 
-| 파일 | 변경 | breaking |
-|---|---|---|
-| `methodology-spec/ticket-policy.md` | **NEW** | 0 |
-| `decisions/DEC-2026-05-18-ticket-binding-policy.md` | **NEW** (본 문서) | 0 |
-| `schemas/traceability-matrix.schema.json` | matrix.items.properties.ticket_ref optional 추가 | 0 (필수 X) |
-| `methodology-spec/id-conventions.md` | "Ticket Binding" section 추가 | 0 (단순 문서 추가) |
-| `tools/schema-validator/test/ticket-binding.test.js` | **NEW** (회귀 test) | 0 |
+| 파일                                                 | 변경                                             | breaking           |
+| ---------------------------------------------------- | ------------------------------------------------ | ------------------ |
+| `methodology-spec/ticket-policy.md`                  | **NEW**                                          | 0                  |
+| `decisions/DEC-2026-05-18-ticket-binding-policy.md`  | **NEW** (본 문서)                                | 0                  |
+| `schemas/traceability-matrix.schema.json`            | matrix.items.properties.ticket_ref optional 추가 | 0 (필수 X)         |
+| `methodology-spec/id-conventions.md`                 | "Ticket Binding" section 추가                    | 0 (단순 문서 추가) |
+| `tools/schema-validator/test/ticket-binding.test.js` | **NEW** (회귀 test)                              | 0                  |
 
 ## 검증
 
@@ -71,7 +72,7 @@ PoC-EFI 검증 cycle 2 종결 후 사용자 (sangcl@smilegate.com) 가 일감/ti
 
 ## 후속 — v8.6.1 R20 신설 (Tier 2.5 MCP delegation)
 
-★ 본 Tier 1 DEC = manual only. v8.6.1 (2026-05-18) 에 **R20 신설 = Tier 2.5 MCP delegation 자동화** 진입 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
+본 Tier 1 DEC = manual only. v8.6.1 (2026-05-18) 에 **R20 신설 = Tier 2.5 MCP delegation 자동화** 진입 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
 
 - 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임 → chain stage 동기 ticket lifecycle 자동
 - 모든 MCP 호출 직전 사용자 confirmation gate 의무

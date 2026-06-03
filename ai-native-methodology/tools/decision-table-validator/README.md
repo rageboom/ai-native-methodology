@@ -26,12 +26,12 @@ npx decision-table-validator <dir> --baseline path/to/baseline.json --ratchet # 
 
 ### 5종 dmn-check
 
-| ID | 의미 | severity |
-|---|---|---|
-| **rule.duplicate** | 입력 동일 + 출력 동일 두 row — 중복 | non-breaking |
-| **rule.conflict** | 입력 동일 + 출력 다름 — UNIQUE hit policy 위반 | **breaking** |
-| **rule.gap** | bool 입력의 모든 (2^N) 조합 중 누락 | non-breaking |
-| **rule.overlap** | wildcard `*` 가 다른 구체 row 와 출력이 다른데도 cover | **breaking** |
+| ID                    | 의미                                                                 | severity     |
+| --------------------- | -------------------------------------------------------------------- | ------------ |
+| **rule.duplicate**    | 입력 동일 + 출력 동일 두 row — 중복                                  | non-breaking |
+| **rule.conflict**     | 입력 동일 + 출력 다름 — UNIQUE hit policy 위반                       | **breaking** |
+| **rule.gap**          | bool 입력의 모든 (2^N) 조합 중 누락                                  | non-breaking |
+| **rule.overlap**      | wildcard `*` 가 다른 구체 row 와 출력이 다른데도 cover               | **breaking** |
 | **type.mixed-column** | 같은 입력 컬럼 내 cell kind 혼합 (bool / literal) — 자연어 ambiguity | non-breaking |
 
 ### JSON sanity (formal-spec.schema.decision_tables[] 정합)
@@ -42,11 +42,11 @@ npx decision-table-validator <dir> --baseline path/to/baseline.json --ratchet # 
 
 ## Exit codes
 
-| code | 의미 |
-|---|---|
-| 0 | no breaking finding |
-| 1 | breaking ≥ 1 |
-| 2 | usage error |
+| code | 의미                |
+| ---- | ------------------- |
+| 0    | no breaking finding |
+| 1    | breaking ≥ 1        |
+| 2    | usage error         |
 
 ## Sibling tools
 
@@ -67,6 +67,6 @@ npx decision-table-validator <dir> --baseline path/to/baseline.json --ratchet # 
 - gap 계산 = 입력 컬럼 모두 bool 일 때만 (literal 입력 도메인 무한 — 미지원).
 - `red6/dmn-check` 의 FEEL expression evaluator = 미차용 (자연어 위주).
 
-## ★★★ no-simulation 정합
+## no-simulation 정합
 
 본 도구는 AI 추론 0% — 정규식 + 명시 알고리즘만. lint-no-simulation 정합.

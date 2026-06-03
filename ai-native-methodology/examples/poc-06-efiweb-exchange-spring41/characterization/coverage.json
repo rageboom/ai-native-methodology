@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) coverage matrix — 어떤 행위 (UC × Controller method × Service method × SQL) 가 snapshot 으로 고정됐는지. 임계 ≥0.80 (PoC #05 정합).",
+  "$comment": "phase 4.7 (characterization) coverage matrix — 어떤 행위 (UC × Controller method × Service method × SQL) 가 snapshot 으로 고정됐는지. 임계 ≥0.80 (PoC #05 정합).",
   "project_id": "poc-06-efiweb-exchange-spring41",
   "snapshot_count": 3,
   "scenario_count": 10,
@@ -89,22 +89,22 @@
     "sql_coverage_ratio": "0.50 (3/6)",
     "weighted_coverage": "0.50 (UC + service + sql 평균)",
     "threshold_target": "≥0.80 (PoC #05 정합)",
-    "threshold_status": "★ 미달 (-0.30) — Day 2 시간 cap (1일) 내 핵심 3 UC 만 / 나머지 4 UC + selectExchangeRate carry",
+    "threshold_status": "미달 (-0.30) — Day 2 시간 cap (1일) 내 핵심 3 UC 만 / 나머지 4 UC + selectExchangeRate carry",
     "remediation": [
       "Day 3 시간 여유 시 UC-004 (getDayExchangeList) 추가 (BR-EXCHANGE-DECIMAL-003 검증 보강)",
       "selectExchangeRate (FN_Get_ExcRate) 는 다른 모듈 통합 시 carry — exchange 모듈 단독 phase 4.7 scope 외",
-      "★ phase 4.7 본체 격상 시 (v2.1.0) — coverage threshold 재정의 의무: 단일 모듈 내 핵심 UC 3개 = 0.5 도 정합 가능?"
+      "phase 4.7 본체 격상 시 (v2.1.0) — coverage threshold 재정의 의무: 단일 모듈 내 핵심 UC 3개 = 0.5 도 정합 가능?"
     ]
   },
   "phase_4_7_first_application_findings": {
     "$comment": "PoC #06 의 phase 4.7 첫 적용에서 발견한 본체 격상 carry 사항.",
-    "F-PHASE7-001": "★ snapshot 작성에 실 환경 (DB 접속) 부재 시 정확도 한계. 도메인 expert 검증 carry 의무.",
-    "F-PHASE7-002": "★ intent_vs_bug ambiguous 영역이 BR/AP 마다 등장 — 분류표 자체가 phase 4.7 의 핵심 산출.",
-    "F-PHASE7-003": "★ scenario 형식 = Given/When/Then BDD 스타일. PoC #05 의 acceptance-criteria.json (Gherkin) 과 형식 정합 — phase 4.7 산출물 schema 본체 격상 시 통합 검토 carry.",
-    "F-PHASE7-004": "★ behavior_likely_bug 항목이 새 시스템 재구현 시 핵심 — '검증 추가 의무' 신호. external 조언 4단계 (유지 vs 버려) 의 직접 입증."
+    "F-PHASE7-001": "snapshot 작성에 실 환경 (DB 접속) 부재 시 정확도 한계. 도메인 expert 검증 carry 의무.",
+    "F-PHASE7-002": "intent_vs_bug ambiguous 영역이 BR/AP 마다 등장 — 분류표 자체가 phase 4.7 의 핵심 산출.",
+    "F-PHASE7-003": "scenario 형식 = Given/When/Then BDD 스타일. PoC #05 의 acceptance-criteria.json (Gherkin) 과 형식 정합 — phase 4.7 산출물 schema 본체 격상 시 통합 검토 carry.",
+    "F-PHASE7-004": "behavior_likely_bug 항목이 새 시스템 재구현 시 핵심 — '검증 추가 의무' 신호. external 조언 4단계 (유지 vs 버려) 의 직접 입증."
   },
   "acceptance_oracle_status": {
-    "$comment": "★ D2 (DEC-2026-05-07-poc-06-domain-결단) 후 갱신. ambiguous 3 → 1.",
+    "$comment": "D2 (DEC-2026-05-07-poc-06-domain-결단) 후 갱신. ambiguous 3 → 1.",
     "day_2_initial": {
       "intent": 6,
       "bug": 7,
@@ -117,7 +117,7 @@
       "bug": 9,
       "self_recognized": 1,
       "ambiguous": 1,
-      "named_classified_ratio": "★ 17/18 = 0.94 (+12%p)",
+      "named_classified_ratio": "17/18 = 0.94 (+12%p)",
       "remaining_ambiguous": ["AP-EXCHANGE-008 (S_ExRateMigration / DBA read carry)"]
     }
   }

@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #06 prelim — Use Cases. 7 Controller endpoint 기반 추출. chain 1 planning-spec.use_cases 의 source.",
+  "$comment": "PoC #06 prelim — Use Cases. 7 Controller endpoint 기반 추출. chain 1 planning-spec.use_cases 의 source.",
   "project_id": "poc-06-efiweb-exchange-spring41",
   "use_cases": [
     {
@@ -47,7 +47,7 @@
         "line_range": "68-80",
         "function_name": "exchangeMigration"
       },
-      "note": "★ S_ExRateMigration 의 정확한 비즈니스 의도는 코드만으로 추론 불가 — 도메인 expert 인터뷰 carry / phase 4.7 intent-vs-bug 분류표 후보"
+      "note": "S_ExRateMigration 의 정확한 비즈니스 의도는 코드만으로 추론 불가 — 도메인 expert 인터뷰 carry / phase 4.7 intent-vs-bug 분류표 후보"
     },
     {
       "id": "UC-EXCHANGE-004",
@@ -116,7 +116,7 @@
       "title": "연간 환율 (TB_EXCHANGE)",
       "key": ["CURR_CD", "YEAR", "GUBUN"],
       "fields": ["MON1", "MON2", "MON3", "MON4", "MON5", "MON6", "MON7", "MON8", "MON9", "MON10", "MON11", "MON12"],
-      "note": "★ MON1~MON12 정규화 부재 — AP-EXCHANGE-006 / 다만 row 단위 12개월 한 번에 보는 IFRS 회계 정합성 의도 가능성 ↑ (intent-vs-bug 분류 carry)"
+      "note": "MON1~MON12 정규화 부재 — AP-EXCHANGE-006 / 다만 row 단위 12개월 한 번에 보는 IFRS 회계 정합성 의도 가능성 ↑ (intent-vs-bug 분류 carry)"
     },
     {
       "id": "AGG-DAY-EXCHANGE",
@@ -136,7 +136,7 @@
       "id": "EXT-EXCHANGE-MIGRATION",
       "title": "외부 환율 마이그레이션 (S_ExRateMigration 프로시저)",
       "interface": "MSSQL Stored Procedure",
-      "note": "★ 의도 코드만으로 추론 불가 — 한국은행/외환은행 공시 환율 일괄 가져오기 추정 / 도메인 expert 인터뷰 carry"
+      "note": "의도 코드만으로 추론 불가 — 한국은행/외환은행 공시 환율 일괄 가져오기 추정 / 도메인 expert 인터뷰 carry"
     }
   ],
   "phase_3a_automation_measurement": {
@@ -157,6 +157,6 @@
     ],
     "manual_required_count": 5,
     "auto_ratio": "44% (4 / 9) — plan §3-B 추정 75% 보다 -31%p / 단 plan §3-B 는 chain 1 planning 의도 추출 / domain.json 자체는 plan §3-A 분석에 속함",
-    "note": "★ domain.json 의 use_case 자체 추출은 plan §3-A 의 'rules.json (BR) 55%' 에 가까움 — 자연어 description 비중 ↑."
+    "note": "domain.json 의 use_case 자체 추출은 plan §3-A 의 'rules.json (BR) 55%' 에 가까움 — 자연어 description 비중 ↑."
   }
 }

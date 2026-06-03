@@ -7,7 +7,7 @@
   ],
   "messages": [
     {"from": "Client", "to": "Server", "label": "request", "sync": "sync"},
-    {"from": "Server", "to": "Auth", "label": "verify (★ fail)", "sync": "sync"},
+    {"from": "Server", "to": "Auth", "label": "verify ( fail)", "sync": "sync"},
     {"from": "Auth", "to": "Server", "label": "401 unauthorized", "sync": "return"},
     {"from": "Server", "to": "Client", "label": "401", "sync": "return"}
   ]

@@ -1,66 +1,66 @@
 manifest:
-  generated_at: "2026-04-29"
-  poc_id: "poc-02-realworld-springboot3"
+  generated_at: '2026-04-29'
+  poc_id: 'poc-02-realworld-springboot3'
   phase: 4
-  phase_name: "비즈니스 로직 (4영역 병렬) — domain"
-  methodology_version: "v1.1.2"
+  phase_name: '비즈니스 로직 (4영역 병렬) — domain'
+  methodology_version: 'v1.1.2'
 
 deliverables:
-  - file: "domain.json"
+  - file: 'domain.json'
     confidence: 0.83
-  - file: "domain.md"
+  - file: 'domain.md'
     confidence: 0.85
-  - file: "domain.mermaid"
+  - file: 'domain.mermaid'
     confidence: 0.90
-  - file: "use-cases.md"
+  - file: 'use-cases.md'
     confidence: 0.92
-  - file: "ubiquitous-language.md"
+  - file: 'ubiquitous-language.md'
     confidence: 0.85
-  - file: "_manifest.yml"
+  - file: '_manifest.yml'
     confidence: 0.95
 
 phase_4_areas:
-  area_5a_db: "★ 핵심 (5 @Service 25 UC + 7 @Entity Rich Domain + ORM 제약)"
-  area_5b_fe: "0건 (BE only — F-026 재현)"
-  area_5c_config: "빈약 (application.yaml ~10 lines)"
-  area_5d_external: "0건 (HTTP/MQ 부재 — F-026 재현)"
+  area_5a_db: ' 핵심 (5 @Service 25 UC + 7 @Entity Rich Domain + ORM 제약)'
+  area_5b_fe: '0건 (BE only — F-026 재현)'
+  area_5c_config: '빈약 (application.yaml ~10 lines)'
+  area_5d_external: '0건 (HTTP/MQ 부재 — F-026 재현)'
 
 aggregate_summary:
-  aggregate_roots: 4  # User / Article / ArticleComment / Tag
-  small_aggregates: 4  # UserFollow / ArticleFavorite / ArticleTag (+Tag 자체가 small Reference)
-  value_objects: 3  # UserRegistry / ArticleFacets / ArticleDetails
-  bounded_contexts: 2  # BC-CONTENT 단일 + BC-AUTH cross-cutting
+  aggregate_roots: 4 # User / Article / ArticleComment / Tag
+  small_aggregates: 4 # UserFollow / ArticleFavorite / ArticleTag (+Tag 자체가 small Reference)
+  value_objects: 3 # UserRegistry / ArticleFacets / ArticleDetails
+  bounded_contexts: 2 # BC-CONTENT 단일 + BC-AUTH cross-cutting
   total_use_cases: 25
   command: 13
   query: 12
 
 key_decisions:
-  - id: "DEC-PHASE4-POC02-001"
-    title: "F-070 (favorite RFC 7231 위반) high promoted ★"
-  - id: "DEC-PHASE4-POC02-002"
-    title: "F-071 + F-072 (port-adapter 경계 위반) high/medium 묶음"
-  - id: "DEC-PHASE4-POC02-003"
-    title: "F-075 (Hexagonal 가이드 방법론 본체) medium promoted"
-  - id: "DEC-PHASE4-POC02-004"
-    title: "Phase 4 raw confidence 0.83 (PoC #01 정합)"
-  - id: "DEC-PHASE4-POC02-005"
-    title: "4 Aggregate Root + BC-CONTENT 단일 채택"
-  - id: "DEC-PHASE4-POC02-006"
-    title: "9 finding 등록 (F-070~F-078)"
+  - id: 'DEC-PHASE4-POC02-001'
+    title: 'F-070 (favorite RFC 7231 위반) high promoted '
+  - id: 'DEC-PHASE4-POC02-002'
+    title: 'F-071 + F-072 (port-adapter 경계 위반) high/medium 묶음'
+  - id: 'DEC-PHASE4-POC02-003'
+    title: 'F-075 (Hexagonal 가이드 방법론 본체) medium promoted'
+  - id: 'DEC-PHASE4-POC02-004'
+    title: 'Phase 4 raw confidence 0.83 (PoC #01 정합)'
+  - id: 'DEC-PHASE4-POC02-005'
+    title: '4 Aggregate Root + BC-CONTENT 단일 채택'
+  - id: 'DEC-PHASE4-POC02-006'
+    title: '9 finding 등록 (F-070~F-078)'
 
 phase_5_handoff:
-  - "22 endpoint × 25 UC 매핑 — RealWorld API spec"
-  - "F-070 (favorite RFC 위반) Phase 5-1 API 계약 검증 시 합산"
-  - "F-051 (EAGER + Specification) Phase 6 합산"
+  - '22 endpoint × 25 UC 매핑 — RealWorld API spec'
+  - 'F-070 (favorite RFC 위반) Phase 5-1 API 계약 검증 시 합산'
+  - 'F-051 (EAGER + Specification) Phase 6 합산'
 
 phase_6_handoff:
-  - "F-070 / F-071 / F-072 / F-073 / F-074 — 5 medium~high 안티패턴 합산"
-  - "F-051 EAGER + Specification + Pageable HHH000104 합산"
-  - "F-048 critical (TagJpaRepository) Phase 6 즉시 등록"
+  - 'F-070 / F-071 / F-072 / F-073 / F-074 — 5 medium~high 안티패턴 합산'
+  - 'F-051 EAGER + Specification + Pageable HHH000104 합산'
+  - 'F-048 critical (TagJpaRepository) Phase 6 즉시 등록'
 
 cumulative_finding_summary:
-  poc_02_phase_4_new: 9   # F-070~F-078
-  poc_02_phase_4_promoted: 6  # F-070~F-075
-  poc_02_phase_4_candidate: 3  # F-076~F-078
-  poc_02_total: 35  # Phase 1-4 누적
-  cumulative_total: 68  # PoC #1 33 + PoC #2 35
+  poc_02_phase_4_new: 9 # F-070~F-078
+  poc_02_phase_4_promoted: 6 # F-070~F-075
+  poc_02_phase_4_candidate: 3 # F-076~F-078
+  poc_02_total: 35 # Phase 1-4 누적
+  cumulative_total: 68 # PoC #1 33 + PoC #2 35

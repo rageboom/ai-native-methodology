@@ -1,36 +1,36 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-015 상품 검색 (★ AP-PETSTORE-005 N+1 검색 / BR-PETSTORE-PRODSRCH-003 keyword split LIKE).",
+  "$comment": " phase 4.7 golden snapshot — UC-PETSTORE-015 상품 검색 ( AP-PETSTORE-005 N+1 검색 / BR-PETSTORE-PRODSRCH-003 keyword split LIKE).",
   "snapshot_id": "SNAP-UC-PETSTORE-015",
   "use_case": "UC-PETSTORE-015",
   "endpoint": "GET /catalog/searchProducts.action?keyword=...",
   "controller_method": "CatalogActionBean.searchProducts",
   "service_method": "CatalogService.searchProductList(keywords)",
-  "sql_id": "ProductMapper.searchProductList (★ keyword 별 호출)",
+  "sql_id": "ProductMapper.searchProductList ( keyword 별 호출)",
   "layer": "controller",
-  "data_source_status": "★ HSQLDB test data",
+  "data_source_status": " HSQLDB test data",
   "scenarios": [
     {
       "id": "SCN-PETSTORE-015-001",
-      "name": "happy path — multi-keyword 검색 (★ ★ N+1 — keyword.split 후 keyword 별 SQL 호출)",
+      "name": "happy path — multi-keyword 검색 ( N+1 — keyword.split 후 keyword 별 SQL 호출)",
       "given": {
         "request_params": { "keyword": "dog cat" },
         "PRODUCT_state": "FI-SW-01 (Angelfish), K9-BD-01 (Bulldog), FL-DSH-01 (Manx) ..."
       },
       "when": "CatalogActionBean.searchProducts() → CatalogService.searchProductList('dog cat') → keywords.split('\\\\s+') = ['dog', 'cat'] → 각 keyword 별 productMapper.searchProductList('%' + lower(keyword) + '%')",
       "then": {
-        "expected_sql_call_count": "★ ★ 2 SQL (split된 keyword 수만큼 — N+1 like)",
+        "expected_sql_call_count": " 2 SQL (split된 keyword 수만큼 — N+1 like)",
         "expected_response": "List<Product> aggregate (dog 매칭 + cat 매칭)",
         "expected_view": "ForwardResolution to SearchProducts.jsp",
         "_note": "client-side aggregation — DB 단일 쿼리 ❌"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-PRODSRCH-003", "type": "ambiguous", "note": "★ ★ keyword split + LIKE = 의도된 multi-keyword 검색 / 그러나 N+1 패턴 = AP-005 동반" }
+        { "rule": "BR-PETSTORE-PRODSRCH-003", "type": "ambiguous", "note": " keyword split + LIKE = 의도된 multi-keyword 검색 / 그러나 N+1 패턴 = AP-005 동반" }
       ],
       "behavior_to_preserve": [
         "multi-keyword 검색 contract (whitespace split)"
       ],
       "behavior_likely_bug": [
-        "★ ★ AP-PETSTORE-005 — keyword 별 SQL 호출 (N+1 검색) — 모범 = MyBatis `<foreach>` 단일 SQL OR 또는 FULL TEXT SEARCH"
+        " AP-PETSTORE-005 — keyword 별 SQL 호출 (N+1 검색) — 모범 = MyBatis `<foreach>` 단일 SQL OR 또는 FULL TEXT SEARCH"
       ]
     }
   ],

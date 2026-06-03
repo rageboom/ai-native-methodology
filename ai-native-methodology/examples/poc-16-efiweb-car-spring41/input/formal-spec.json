@@ -9,9 +9,9 @@
     "confidence": 0.75,
     "raw_confidence": 0.75,
     "warnings": [
-      "★ formal-spec partial coverage — 12 BR 중 3개만 본격 (Car-CostAccept FSM / UC-CAR-COST-001 sequence / BR-CAR-MGT-006 DT) / 나머지 9 BR carry",
-      "★ invariants + property_tests 빈 array — 분석 stage 단계 / TypeScript 마이그레이션 target 코드 미생성 / impl stage 진입 후 carry",
-      "★ no-simulation 정합 — 외부 정적 분석 도구 실 실행 ❌ (Daikon / CodeQL 부재) / formal-spec-link-validator 만 실행 / 신뢰도 -5%p 패널티 명시"
+      "formal-spec partial coverage — 12 BR 중 3개만 본격 (Car-CostAccept FSM / UC-CAR-COST-001 sequence / BR-CAR-MGT-006 DT) / 나머지 9 BR carry",
+      "invariants + property_tests 빈 array — 분석 stage 단계 / TypeScript 마이그레이션 target 코드 미생성 / impl stage 진입 후 carry",
+      "no-simulation 정합 — 외부 정적 분석 도구 실 실행 ❌ (Daikon / CodeQL 부재) / formal-spec-link-validator 만 실행 / 신뢰도 -5%p 패널티 명시"
     ]
   },
   "state_machines": [

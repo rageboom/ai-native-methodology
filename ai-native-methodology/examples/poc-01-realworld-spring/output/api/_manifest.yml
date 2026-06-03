@@ -1,93 +1,103 @@
 manifest:
-  generated_at: "2026-04-29"
-  poc_id: "poc-01-realworld-spring"
-  phase: "5-1"
-  phase_name: "api (API 계약)"
-  methodology_version: "v1.1.2"
+  generated_at: '2026-04-29'
+  poc_id: 'poc-01-realworld-spring'
+  phase: '5-1'
+  phase_name: 'api (API 계약)'
+  methodology_version: 'v1.1.2'
 
 # 상위 phase 인계
 phase_3_input:
-  source: "../architecture/_manifest.yml"
-  consistency: "10 모듈 / LV-001 / Layered+Spring-DDD-Lite ✅ / 22 endpoint 4 controller 매핑 정합"
+  source: '../architecture/_manifest.yml'
+  consistency: '10 모듈 / LV-001 / Layered+Spring-DDD-Lite ✅ / 22 endpoint 4 controller 매핑 정합'
 phase_4_input:
-  source: "../domain/_manifest.yml + ../rules/_manifest.yml + ../antipatterns-partial/_manifest.yml"
+  source: '../domain/_manifest.yml + ../rules/_manifest.yml + ../antipatterns-partial/_manifest.yml'
   consistency: |
     UC 25 → 19 operationId 매핑 ✅ (14 1:1 + 1 1:4 GetArticles + 5 system_internal 잔존)
     BR 13 → endpoint 매핑 ✅ (validation 2 + policy 6 + authorization 5 모두 매핑)
     AP partial 6 → openapi.yaml 노출 ✅ (F-027 3중 표기 / LV-001 api-extension.json 격리)
   corrections:
-    - phase_4_finding: "F-035 — UC-USER-FIND-BY-ID system_internal 분류 정정"
-    - phase_4_finding: "BR-AUTH-STATELESS-001 source_evidence 정밀화 (F-034)"
-    - phase_4_finding: "BR-AUTH-PUBLIC-001 source_evidence 정밀화 (F-036)"
+    - phase_4_finding: 'F-035 — UC-USER-FIND-BY-ID system_internal 분류 정정'
+    - phase_4_finding: 'BR-AUTH-STATELESS-001 source_evidence 정밀화 (F-034)'
+    - phase_4_finding: 'BR-AUTH-PUBLIC-001 source_evidence 정밀화 (F-036)'
 
 # Phase 5-1 산출물 4종
 deliverables:
-  - file: "openapi.yaml"
-    purpose: "산업 표준 OpenAPI 3.1 (외부 공유 가능 — x-extension 분리)"
-    schema: "OpenAPI 3.1.0 spec compliant"
+  - file: 'openapi.yaml'
+    purpose: '산업 표준 OpenAPI 3.1 (외부 공유 가능 — x-extension 분리)'
+    schema: 'OpenAPI 3.1.0 spec compliant'
     confidence: 0.93
     line_count: 471
     operations: 19
     paths: 16
     components_schemas: 19
-  - file: "api-extension.json"
-    purpose: "AI 분석 메타 (operations[] + schemas_to_entities[] + x-architectural-debt + x-known-bug)"
-    schema: "schemas/openapi-extension.schema.json ✅"
+  - file: 'api-extension.json'
+    purpose: 'AI 분석 메타 (operations[] + schemas_to_entities[] + x-architectural-debt + x-known-bug)'
+    schema: 'schemas/openapi-extension.schema.json ✅'
     confidence: 0.93
     operations: 19
     schemas_to_entities: 18
-  - file: "api.md"
-    purpose: "사람용 요약 + 운영 시나리오 + 사내 적용 권고 41건 + warning 표"
+  - file: 'api.md'
+    purpose: '사람용 요약 + 운영 시나리오 + 사내 적용 권고 41건 + warning 표'
     confidence: 0.93
-  - file: "_manifest.yml"
-    purpose: "Phase 5-1 매니페스트 (본 파일)"
+  - file: '_manifest.yml'
+    purpose: 'Phase 5-1 매니페스트 (본 파일)'
     confidence: 0.98
 
 # 결정적 처리 결과 (web_fetch + sampling)
 deterministic_results:
   raw_fetch:
-    main_agent: 9   # Phase 5 plan §2 사전 검증 (RestController 4 + comment subdir + Postman + SecurityConfiguration)
-    sub_agent_document: 26  # OpenAPI 3.1 / Spring REST / Spring Security / RFC 7519/7515/8725 / Spectral
-    sub_agent_case: 34       # RealWorld 공식 spec / Netflix / Stripe / GitHub / 카카오 / Postman 변환
-    sub_agent_senior: 5      # Spring 공식 + 실무 경험 기반
-    total_research_lines: 4449  # document 1232 + case 1261 + senior 1956
+    main_agent: 9 # Phase 5 plan §2 사전 검증 (RestController 4 + comment subdir + Postman + SecurityConfiguration)
+    sub_agent_document: 26 # OpenAPI 3.1 / Spring REST / Spring Security / RFC 7519/7515/8725 / Spectral
+    sub_agent_case: 34 # RealWorld 공식 spec / Netflix / Stripe / GitHub / 카카오 / Postman 변환
+    sub_agent_senior: 5 # Spring 공식 + 실무 경험 기반
+    total_research_lines: 4449 # document 1232 + case 1261 + senior 1956
   endpoint_count: 22
-  operation_id_count: 19   # 4 GET /articles 변형 통합
+  operation_id_count: 19 # 4 GET /articles 변형 통합
   use_case_mapped_one_to_one: 14
-  use_case_mapped_one_to_many: 1   # GetArticles → UC 4건
+  use_case_mapped_one_to_many: 1 # GetArticles → UC 4건
   use_case_system_internal_remaining: 5
-  business_rule_mapped: 13   # rules.json 13 → endpoint 모두 매핑
+  business_rule_mapped: 13 # rules.json 13 → endpoint 모두 매핑
   components_schemas: 19
   components_securitySchemes: 1
-  layer_violation_affected_operations: 18   # LV-001 (UserApi/ProfileApi/ArticleApi/CommentApi) — Tag 제외
-  rate_limit_after_phase_5_1: 22  # 60 - 38 (누적, Phase 5 sub-agent 65 tool_uses)
+  layer_violation_affected_operations: 18 # LV-001 (UserApi/ProfileApi/ArticleApi/CommentApi) — Tag 제외
+  rate_limit_after_phase_5_1: 22 # 60 - 38 (누적, Phase 5 sub-agent 65 tool_uses)
 
 # 5 핵심 결정 (3 sub-agent 합의 + 윤주스 승인 2026-04-29)
 key_decisions:
-  - id: "DEC-API-001"
-    decision: "Authorization: Token <jwt> → OpenAPI apiKey security scheme (Bearer 아님)"
-    rationale: "RFC 6750 비표준이지만 OpenAPI 3.1 apiKey 가 모든 헤더 토큰 수용. 카카오 KakaoAK / GitHub 사례 정당화."
-    sources: ["document-phase5.md §2.4 / §9.1", "case-phase5.md 토픽 6", "senior-phase5.md 영역 14"]
-  - id: "DEC-API-002"
-    decision: "Wrapped DTO ({user/article/...:{...}}) → wrapper schema 분리 (3-tier 명명)"
-    rationale: "Inner schema (User/Article/Comment/Profile) = Aggregate. Wrapper Response/Request 분리 — 명명 충돌 회피."
-    sources: ["document-phase5.md §2.2", "case-phase5.md 토픽 4", "senior-phase5.md 영역 2"]
-  - id: "DEC-API-003"
-    decision: "F-027 De Morgan 명시 — description + x-warning + x-known-bug 3중 표기"
-    rationale: "Senior critical 권고 ★ — description 만으로는 client codegen 누락. Phase 6 critical AP cross-link 필수."
-    sources: ["senior-phase5.md 영역 6"]
-  - id: "DEC-API-004"
-    decision: "LV-001 → api-extension.json `x-architectural-debt` 만 노출 (openapi.yaml 표준 보전)"
-    rationale: "GitHub `x-github` extension 패턴 isomorphic 모방 ★★★ — 사내 메타 노출 vs 표준 spec 분리."
-    sources: ["case-phase5.md 토픽 4", "document-phase5.md §7.4"]
-  - id: "DEC-API-005"
-    decision: "4 GET /articles 변형 → 단일 operationId GetArticles + query parameters + UC 4건 통합"
-    rationale: "OpenAPI 3.1 Spectral operation-operationId-unique 룰 + RealWorld 공식 spec 일치."
-    sources: ["document-phase5.md §6", "case-phase5.md 토픽 1"]
+  - id: 'DEC-API-001'
+    decision: 'Authorization: Token <jwt> → OpenAPI apiKey security scheme (Bearer 아님)'
+    rationale: 'RFC 6750 비표준이지만 OpenAPI 3.1 apiKey 가 모든 헤더 토큰 수용. 카카오 KakaoAK / GitHub 사례 정당화.'
+    sources:
+      [
+        'document-phase5.md §2.4 / §9.1',
+        'case-phase5.md 토픽 6',
+        'senior-phase5.md 영역 14',
+      ]
+  - id: 'DEC-API-002'
+    decision: 'Wrapped DTO ({user/article/...:{...}}) → wrapper schema 분리 (3-tier 명명)'
+    rationale: 'Inner schema (User/Article/Comment/Profile) = Aggregate. Wrapper Response/Request 분리 — 명명 충돌 회피.'
+    sources:
+      [
+        'document-phase5.md §2.2',
+        'case-phase5.md 토픽 4',
+        'senior-phase5.md 영역 2',
+      ]
+  - id: 'DEC-API-003'
+    decision: 'F-027 De Morgan 명시 — description + x-warning + x-known-bug 3중 표기'
+    rationale: 'Senior critical 권고 — description 만으로는 client codegen 누락. Phase 6 critical AP cross-link 필수.'
+    sources: ['senior-phase5.md 영역 6']
+  - id: 'DEC-API-004'
+    decision: 'LV-001 → api-extension.json `x-architectural-debt` 만 노출 (openapi.yaml 표준 보전)'
+    rationale: 'GitHub `x-github` extension 패턴 isomorphic 모방 — 사내 메타 노출 vs 표준 spec 분리.'
+    sources: ['case-phase5.md 토픽 4', 'document-phase5.md §7.4']
+  - id: 'DEC-API-005'
+    decision: '4 GET /articles 변형 → 단일 operationId GetArticles + query parameters + UC 4건 통합'
+    rationale: 'OpenAPI 3.1 Spectral operation-operationId-unique 룰 + RealWorld 공식 spec 일치.'
+    sources: ['document-phase5.md §6', 'case-phase5.md 토픽 1']
 
 # 신뢰도 산정 (formula v1)
 confidence_calculation:
-  formula_version: "v1"
+  formula_version: 'v1'
   base: 0.75
   modifiers:
     orm_full: +0.10
@@ -97,8 +107,8 @@ confidence_calculation:
     no_operational_db: -0.03
   subtotal: 0.92
   cross_validation_modifiers:
-    f015_22_endpoint_consensus: +0.02   # 3 sub-agent 100% 합의
-    phase4_inconsistency_3_items: -0.01   # F-034/F-035/F-036
+    f015_22_endpoint_consensus: +0.02 # 3 sub-agent 100% 합의
+    phase4_inconsistency_3_items: -0.01 # F-034/F-035/F-036
   raw_confidence: 0.93
   per_area:
     endpoint_identification: 0.97
@@ -112,136 +122,146 @@ confidence_calculation:
 
 # 명세 §5 + research-phase5 §10 승인 게이트 체크리스트
 approval_gate:
-  - check: "openapi.yaml 표준 lint 통과 (spectral manual fallback)"
-    status: "✅ — operationId unique 19/19 / required field 명시 / response 4xx-5xx 표준화"
-  - check: "모든 operationId unique"
-    status: "✅ 19/19"
-  - check: "DTO 스키마 = JSON Schema 호환"
-    status: "✅ — wrapper schema 분리 + Inner schema (Aggregate 명명)"
-  - check: "에러 응답 표준화 (4xx/5xx)"
-    status: "✅ — UnauthorizedResponse / ForbiddenResponse / NotFoundResponse / GenericErrorModelResponse"
-  - check: "x-related-use-cases 매핑 = 사용자 검토"
-    status: "✅ Phase 4 pre-매핑 + F-035 갱신 (UC-USER-FIND-BY-ID system_internal=false)"
-  - check: "x-related-rules 매핑 = 사용자 검토"
-    status: "✅ BR 13 → endpoint 모두 매핑 (rules.json 역매핑)"
-  - check: "5.D inbound webhook 합쳐짐"
-    status: "N/A (5.D 0건)"
-  - check: "Swagger UI 렌더링 검증"
-    status: "🔄 manual (TokenAuth 비표준 — Authorize 버튼 호환 가능, 로컬 테스트 권장)"
+  - check: 'openapi.yaml 표준 lint 통과 (spectral manual fallback)'
+    status: '✅ — operationId unique 19/19 / required field 명시 / response 4xx-5xx 표준화'
+  - check: '모든 operationId unique'
+    status: '✅ 19/19'
+  - check: 'DTO 스키마 = JSON Schema 호환'
+    status: '✅ — wrapper schema 분리 + Inner schema (Aggregate 명명)'
+  - check: '에러 응답 표준화 (4xx/5xx)'
+    status: '✅ — UnauthorizedResponse / ForbiddenResponse / NotFoundResponse / GenericErrorModelResponse'
+  - check: 'x-related-use-cases 매핑 = 사용자 검토'
+    status: '✅ Phase 4 pre-매핑 + F-035 갱신 (UC-USER-FIND-BY-ID system_internal=false)'
+  - check: 'x-related-rules 매핑 = 사용자 검토'
+    status: '✅ BR 13 → endpoint 모두 매핑 (rules.json 역매핑)'
+  - check: '5.D inbound webhook 합쳐짐'
+    status: 'N/A (5.D 0건)'
+  - check: 'Swagger UI 렌더링 검증'
+    status: '🔄 manual (TokenAuth 비표준 — Authorize 버튼 호환 가능, 로컬 테스트 권장)'
 
 # 5 핵심 결정 + 신규 finding + Phase 6 AP candidate (윤주스 2026-04-29 승인)
 user_decisions_2026_04_29:
-  scope_approval: "5 핵심 결정 + 22 endpoint 일괄 승인"
-  findings_registration: "F-034 ~ F-040 7건 모두 등록"
-  v120_bundle_g_addition: "ADR-007 OpenAPI x-extension 표준 가이드 신설 (6 → 7 묶음)"
-  phase6_ap_candidates_preview: "6건 등록 예고 (final merge 시 등록)"
+  scope_approval: '5 핵심 결정 + 22 endpoint 일괄 승인'
+  findings_registration: 'F-034 ~ F-040 7건 모두 등록'
+  v120_bundle_g_addition: 'ADR-007 OpenAPI x-extension 표준 가이드 신설 (6 → 7 묶음)'
+  phase6_ap_candidates_preview: '6건 등록 예고 (final merge 시 등록)'
 
 # Phase 4 산출 갱신 항목 (F-034/F-035/F-036)
 phase_4_update_required:
-  - file: "../domain/domain.json"
-    change: "use_cases[].UC-USER-FIND-BY-ID — system_internal=true → false + related_api_operation_id=GetCurrentUser"
-    finding: "F-035"
-    severity: "high"
-  - file: "../rules/rules.json"
-    change: "rules[].BR-AUTH-STATELESS-001.source_evidence 정밀화 (sessionCreationPolicy 명시 부재 + filter chain 의존 명시)"
-    finding: "F-034"
-    severity: "medium"
-  - file: "../rules/rules.json"
-    change: "rules[].BR-AUTH-PUBLIC-001.source_evidence 정밀화 (WebSecurity#ignoring filter 우회 명시)"
-    finding: "F-036"
-    severity: "low"
+  - file: '../domain/domain.json'
+    change: 'use_cases[].UC-USER-FIND-BY-ID — system_internal=true → false + related_api_operation_id=GetCurrentUser'
+    finding: 'F-035'
+    severity: 'high'
+  - file: '../rules/rules.json'
+    change: 'rules[].BR-AUTH-STATELESS-001.source_evidence 정밀화 (sessionCreationPolicy 명시 부재 + filter chain 의존 명시)'
+    finding: 'F-034'
+    severity: 'medium'
+  - file: '../rules/rules.json'
+    change: 'rules[].BR-AUTH-PUBLIC-001.source_evidence 정밀화 (WebSecurity#ignoring filter 우회 명시)'
+    finding: 'F-036'
+    severity: 'low'
 
 # Findings (Phase 5-1 진행 중 발견)
 findings_phase_5_1:
-  - id: "F-034"
-    title: "sessionCreationPolicy(STATELESS) SecurityConfiguration 명시 부재"
-    severity: "medium"
-    proposed_fix: "v1.2.0 묶음 G (ADR-007 OpenAPI x-extension 표준 가이드)"
-    status: "promoted"
-    sources: ["document-phase5.md §3.5", "case-phase5.md 토픽 1", "senior-phase5.md 영역 14"]
-  - id: "F-035"
-    title: "GET /user UC 매핑 — Phase 4 system_internal=true 오분류"
-    severity: "high"
-    proposed_fix: "domain.json UC-USER-FIND-BY-ID 갱신 (즉시)"
-    status: "closed (Phase 5 갱신으로 종결 예정)"
-    sources: ["senior-phase5.md 영역 14", "case-phase5.md 토픽 1"]
-  - id: "F-036"
-    title: "WebSecurity#ignoring vs permitAll 의미 차이 (Spring Security 권고 = permitAll)"
-    severity: "low"
-    proposed_fix: "v1.2.0 묶음 G + Phase 6 AP candidate (AP-SECURITY-CONFIG-WEBSEC-IGNORING-001)"
-    status: "promoted"
-    sources: ["document-phase5.md §3.4", "case-phase5.md 토픽 1", "senior-phase5.md 영역 14"]
-  - id: "F-037"
-    title: "JWT iss/aud/iat/jti 4 claim 부재 (RFC 7519 §4.1 권고 위반)"
-    severity: "low"
-    proposed_fix: "deferred (PoC #02 후 합산)"
-    status: "deferred"
-    sources: ["document-phase5.md §4.5"]
-  - id: "F-038"
-    title: "API 버저닝 부재 (info.version + servers[].url + path /v1)"
-    severity: "medium"
-    proposed_fix: "v1.2.0 묶음 G (deliverable 03 보강)"
-    status: "promoted"
-    sources: ["senior-phase5.md 영역 9"]
-  - id: "F-039"
-    title: "WebSecurityConfigurerAdapter deprecated (Spring Security 5.7+)"
-    severity: "medium"
-    proposed_fix: "deferred (사내 코드 영향만)"
-    status: "deferred"
-    sources: ["senior-phase5.md 영역 8"]
-  - id: "F-040"
-    title: "HTTP status code 일관성 (@ResponseStatus 부재 → default 200, DELETE 표준은 204)"
-    severity: "medium"
-    proposed_fix: "deferred (PoC #02 후 합산)"
-    status: "deferred"
-    sources: ["senior-phase5.md 영역 10"]
+  - id: 'F-034'
+    title: 'sessionCreationPolicy(STATELESS) SecurityConfiguration 명시 부재'
+    severity: 'medium'
+    proposed_fix: 'v1.2.0 묶음 G (ADR-007 OpenAPI x-extension 표준 가이드)'
+    status: 'promoted'
+    sources:
+      [
+        'document-phase5.md §3.5',
+        'case-phase5.md 토픽 1',
+        'senior-phase5.md 영역 14',
+      ]
+  - id: 'F-035'
+    title: 'GET /user UC 매핑 — Phase 4 system_internal=true 오분류'
+    severity: 'high'
+    proposed_fix: 'domain.json UC-USER-FIND-BY-ID 갱신 (즉시)'
+    status: 'closed (Phase 5 갱신으로 종결 예정)'
+    sources: ['senior-phase5.md 영역 14', 'case-phase5.md 토픽 1']
+  - id: 'F-036'
+    title: 'WebSecurity#ignoring vs permitAll 의미 차이 (Spring Security 권고 = permitAll)'
+    severity: 'low'
+    proposed_fix: 'v1.2.0 묶음 G + Phase 6 AP candidate (AP-SECURITY-CONFIG-WEBSEC-IGNORING-001)'
+    status: 'promoted'
+    sources:
+      [
+        'document-phase5.md §3.4',
+        'case-phase5.md 토픽 1',
+        'senior-phase5.md 영역 14',
+      ]
+  - id: 'F-037'
+    title: 'JWT iss/aud/iat/jti 4 claim 부재 (RFC 7519 §4.1 권고 위반)'
+    severity: 'low'
+    proposed_fix: 'deferred (PoC #02 후 합산)'
+    status: 'deferred'
+    sources: ['document-phase5.md §4.5']
+  - id: 'F-038'
+    title: 'API 버저닝 부재 (info.version + servers[].url + path /v1)'
+    severity: 'medium'
+    proposed_fix: 'v1.2.0 묶음 G (deliverable 03 보강)'
+    status: 'promoted'
+    sources: ['senior-phase5.md 영역 9']
+  - id: 'F-039'
+    title: 'WebSecurityConfigurerAdapter deprecated (Spring Security 5.7+)'
+    severity: 'medium'
+    proposed_fix: 'deferred (사내 코드 영향만)'
+    status: 'deferred'
+    sources: ['senior-phase5.md 영역 8']
+  - id: 'F-040'
+    title: 'HTTP status code 일관성 (@ResponseStatus 부재 → default 200, DELETE 표준은 204)'
+    severity: 'medium'
+    proposed_fix: 'deferred (PoC #02 후 합산)'
+    status: 'deferred'
+    sources: ['senior-phase5.md 영역 10']
 
 # 누적 finding 통계 (윤주스 2026-04-29 승인 후)
 findings_cumulative:
   total: 32
-  closed: 9    # +0 (F-035 종결 후 +1 예정)
+  closed: 9 # +0 (F-035 종결 후 +1 예정)
   promoted: 10 # +3 (F-034, F-036, F-038)
   deferred: 12 # +3 (F-037, F-039, F-040)
   rejected: 0
-  v120_bundles: 7   # +1 (G. ADR-007 OpenAPI x-extension)
-  threshold_exceeded: true   # F-021 임계 20+ 초과
-  threshold_policy: "PoC #02 후 v1.2.0 합산 격상 (윤주스 절대 우선순위 유지)"
+  v120_bundles: 7 # +1 (G. ADR-007 OpenAPI x-extension)
+  threshold_exceeded: true # F-021 임계 20+ 초과
+  threshold_policy: 'PoC #02 후 v1.2.0 합산 격상 (윤주스 절대 우선순위 유지)'
 
 # Phase 6 진입 시 인계 (안티패턴 후보)
 phase_6_handoff:
-  partial_count: 6   # Phase 4 산출
-  candidate_count: 6   # Phase 5 발굴
+  partial_count: 6 # Phase 4 산출
+  candidate_count: 6 # Phase 5 발굴
   expected_final_count: 12
   candidates:
-    - id: "AP-PERFORMANCE-001"
+    - id: 'AP-PERFORMANCE-001'
       severity: high
-      source: "Senior 영역 5 + REC-DOS-001/002"
-      description: "Pageable / limit cap 부재 → DoS 위험 (GetArticles / GetArticlesFeed)"
-    - id: "AP-SECURITY-CONFIG-IMPLICIT-001"
+      source: 'Senior 영역 5 + REC-DOS-001/002'
+      description: 'Pageable / limit cap 부재 → DoS 위험 (GetArticles / GetArticlesFeed)'
+    - id: 'AP-SECURITY-CONFIG-IMPLICIT-001'
       severity: medium
-      source: "F-034"
-      description: "sessionCreationPolicy(STATELESS) 명시 부재 — Spring 5.x default IF_REQUIRED 와 의도 충돌"
-    - id: "AP-SECURITY-CONFIG-WEBSEC-IGNORING-001"
+      source: 'F-034'
+      description: 'sessionCreationPolicy(STATELESS) 명시 부재 — Spring 5.x default IF_REQUIRED 와 의도 충돌'
+    - id: 'AP-SECURITY-CONFIG-WEBSEC-IGNORING-001'
       severity: medium
-      source: "F-036 / Document §3.4"
-      description: "WebSecurity#ignoring 사용 시 HSTS/CSRF/security headers 미적용"
-    - id: "AP-ARCH-DEPRECATED-001"
+      source: 'F-036 / Document §3.4'
+      description: 'WebSecurity#ignoring 사용 시 HSTS/CSRF/security headers 미적용'
+    - id: 'AP-ARCH-DEPRECATED-001'
       severity: medium
-      source: "F-039 / Senior 영역 8"
-      description: "WebSecurityConfigurerAdapter (Spring Security 5.7+ deprecated)"
-    - id: "AP-API-VERSIONING-001"
+      source: 'F-039 / Senior 영역 8'
+      description: 'WebSecurityConfigurerAdapter (Spring Security 5.7+ deprecated)'
+    - id: 'AP-API-VERSIONING-001'
       severity: medium
-      source: "F-038 / Senior 영역 9"
-      description: "API 버저닝 부재 — info.version / servers[].url / path /v1"
-    - id: "AP-API-STATUS-INCONSISTENT-001"
+      source: 'F-038 / Senior 영역 9'
+      description: 'API 버저닝 부재 — info.version / servers[].url / path /v1'
+    - id: 'AP-API-STATUS-INCONSISTENT-001'
       severity: low
-      source: "F-040 / Senior 영역 10"
-      description: "@ResponseStatus 부재 → default 200 (DELETE 표준은 204)"
+      source: 'F-040 / Senior 영역 10'
+      description: '@ResponseStatus 부재 → default 200 (DELETE 표준은 204)'
 
 # 다음 단계
 next_actions:
-  - "Phase 4 산출 갱신 (domain.json UC-USER-FIND-BY-ID + rules.json BR-AUTH-STATELESS-001 / BR-AUTH-PUBLIC-001 source_evidence)"
-  - "findings/poc-findings.md 갱신 (F-034 ~ F-040 7건 등록)"
-  - "PROGRESS-poc01-phase5.md 시간순 마감 (T+6 ~ T+12)"
-  - "Phase 6 진입 (윤주스 승인 후) — antipatterns.json final merge (partial 6 + candidate 6 = 12 AP)"
-  - "Phase 6 후 7대 산출물 7/7 (UI/UX 만 N/A — BE only)"
+  - 'Phase 4 산출 갱신 (domain.json UC-USER-FIND-BY-ID + rules.json BR-AUTH-STATELESS-001 / BR-AUTH-PUBLIC-001 source_evidence)'
+  - 'findings/poc-findings.md 갱신 (F-034 ~ F-040 7건 등록)'
+  - 'PROGRESS-poc01-phase5.md 시간순 마감 (T+6 ~ T+12)'
+  - 'Phase 6 진입 (윤주스 승인 후) — antipatterns.json final merge (partial 6 + candidate 6 = 12 AP)'
+  - 'Phase 6 후 7대 산출물 7/7 (UI/UX 만 N/A — BE only)'

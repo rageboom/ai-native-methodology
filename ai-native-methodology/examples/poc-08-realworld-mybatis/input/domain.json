@@ -1,11 +1,11 @@
 {
-  "$comment": "★ PoC #08 Day 1 — jpetstore-6 도메인 추출. ★ ★ 4 BC (catalog/account/cart/order) + 19 endpoint UC. Modern stack + 단순 도메인 → UC trivially clear (vs PoC #07 capital 87 endpoint 다중책임).",
+  "$comment": " PoC #08 Day 1 — jpetstore-6 도메인 추출. 4 BC (catalog/account/cart/order) + 19 endpoint UC. Modern stack + 단순 도메인 → UC trivially clear (vs PoC #07 capital 87 endpoint 다중책임).",
   "project_id": "poc-08-realworld-mybatis",
   "domain_layer": "L0 (자연어) — Pet Store 전자상거래 도메인 (CRUD 표준 / 4 BC)",
   "bounded_contexts": [
     {"id": "BC-CATALOG", "name": "상품 카탈로그", "tables": ["category", "product", "item", "inventory", "supplier"], "actions": ["CatalogActionBean"], "service": "CatalogService"},
     {"id": "BC-ACCOUNT", "name": "사용자 계정", "tables": ["account", "signon", "profile", "bannerdata"], "actions": ["AccountActionBean"], "service": "AccountService"},
-    {"id": "BC-CART", "name": "장바구니 (session 보관)", "tables": [], "actions": ["CartActionBean"], "service": "(★ session-only / DB persistence ❌)"},
+    {"id": "BC-CART", "name": "장바구니 (session 보관)", "tables": [], "actions": ["CartActionBean"], "service": "( session-only / DB persistence ❌)"},
     {"id": "BC-ORDER", "name": "주문 처리", "tables": ["orders", "orderstatus", "lineitem"], "actions": ["OrderActionBean"], "service": "OrderService"}
   ],
   "use_cases": [
@@ -25,7 +25,7 @@
       "action_method": "AccountActionBean.newAccount()",
       "sql_ids": ["insertAccount", "insertProfile", "insertSignon"],
       "bc": "BC-ACCOUNT",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-ACCREG-001"]
     },
     {
@@ -44,7 +44,7 @@
       "action_method": "AccountActionBean.editAccount()",
       "sql_ids": ["updateAccount", "updateProfile", "updateSignon (조건부)"],
       "bc": "BC-ACCOUNT",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-ACCUPD-002"]
     },
     {
@@ -58,14 +58,14 @@
     },
     {
       "id": "UC-PETSTORE-006",
-      "name": "★ 로그인 (★ ★ 평문 password 검증)",
+      "name": " 로그인 ( 평문 password 검증)",
       "endpoint": "/account/signon",
       "action_method": "AccountActionBean.signon()",
       "sql_ids": ["getAccountByUsernameAndPassword"],
       "bc": "BC-ACCOUNT",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-PASSWD-006"],
-      "note": "★ ★ 보안 취약 BR → AP-PETSTORE-004"
+      "note": " 보안 취약 BR → AP-PETSTORE-004"
     },
     {
       "id": "UC-PETSTORE-007",
@@ -83,7 +83,7 @@
       "action_method": "CartActionBean.addItemToCart()",
       "sql_ids": ["getItem", "getInventoryQuantity"],
       "bc": "BC-CART",
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered ( 핵심)"
     },
     {
       "id": "UC-PETSTORE-009",
@@ -96,7 +96,7 @@
     },
     {
       "id": "UC-PETSTORE-010",
-      "name": "장바구니 수량 갱신 (★ form-based bulk update)",
+      "name": "장바구니 수량 갱신 ( form-based bulk update)",
       "endpoint": "/cart/updateCartQuantities",
       "action_method": "CartActionBean.updateCartQuantities()",
       "sql_ids": [],
@@ -141,12 +141,12 @@
     },
     {
       "id": "UC-PETSTORE-015",
-      "name": "★ 상품 검색 (keyword split + LIKE + N+1 risk)",
+      "name": " 상품 검색 (keyword split + LIKE + N+1 risk)",
       "endpoint": "/catalog/searchProducts",
       "action_method": "CatalogActionBean.searchProducts()",
-      "sql_ids": ["searchProductList (★ keyword 별 호출)"],
+      "sql_ids": ["searchProductList ( keyword 별 호출)"],
       "bc": "BC-CATALOG",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-PRODSRCH-003"]
     },
     {
@@ -169,22 +169,22 @@
     },
     {
       "id": "UC-PETSTORE-018",
-      "name": "★ 주문 등록 (5 단계 단일 트랜잭션 / sequence + inventory + order + status + lineItem)",
+      "name": " 주문 등록 (5 단계 단일 트랜잭션 / sequence + inventory + order + status + lineItem)",
       "endpoint": "/order/newOrder",
       "action_method": "OrderActionBean.newOrder()",
       "sql_ids": ["getSequence", "updateSequence", "updateInventoryQuantity (per lineItem)", "insertOrder", "insertOrderStatus", "insertLineItem (per lineItem)"],
       "bc": "BC-ORDER",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-ORDCRT-004", "BR-PETSTORE-SEQMGR-008"]
     },
     {
       "id": "UC-PETSTORE-019",
-      "name": "★ 주문 상세 조회 (★ ★ N+1 fetch)",
+      "name": " 주문 상세 조회 ( N+1 fetch)",
       "endpoint": "/order/viewOrder",
       "action_method": "OrderActionBean.viewOrder()",
       "sql_ids": ["getOrder", "getLineItemsByOrderId", "getItem (per lineItem)", "getInventoryQuantity (per lineItem)"],
       "bc": "BC-ORDER",
-      "scope_decision": "covered (★ 핵심)",
+      "scope_decision": "covered ( 핵심)",
       "linked_brs": ["BR-PETSTORE-ORDQRY-005"]
     }
   ],
@@ -193,6 +193,6 @@
     "by_bc": {"BC-ACCOUNT": 7, "BC-CART": 3, "BC-CATALOG": 5, "BC-ORDER": 4},
     "covered_uc": 19,
     "carry_uc": 0,
-    "$comment_summary": "★ 19 UC 모두 covered (★ R1 시간 cap 정합 — small PoC). chain 1 planning-extraction-validator UC coverage 자격 100% expectation. ★ pet store 도메인 trivially clear → phase 4.7 oracle 신호 약화 risk (carry C-poc-08-domain-ambiguity-deficit)."
+    "$comment_summary": " 19 UC 모두 covered ( R1 시간 cap 정합 — small PoC). chain 1 planning-extraction-validator UC coverage 자격 100% expectation. pet store 도메인 trivially clear → phase 4.7 oracle 신호 약화 risk (carry C-poc-08-domain-ambiguity-deficit)."
   }
 }

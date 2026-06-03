@@ -13,7 +13,7 @@ package io.zhc1.realworld.service;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import org.springframework.dao.DataIntegrityViolationException;  // ★ Sprint 1 발견 — 원본 누락
+import org.springframework.dao.DataIntegrityViolationException;  //  Sprint 1 발견 — 원본 누락
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -30,11 +30,11 @@ import io.zhc1.realworld.model.UserRepository;
  * <ul>
  *   <li>signup: existsBy → User constructor → encryptPassword → save (race-safe 보강)</li>
  *   <li>login: null/blank check → findByEmail → matches</li>
- *   <li>updateUserDetails: ★ F-071 정합 (UserService 가 검증, Adapter 는 save)</li>
+ *   <li>updateUserDetails:  F-071 정합 (UserService 가 검증, Adapter 는 save)</li>
  *   <li>getUser by id/username: findOrThrow</li>
  * </ul>
  *
- * <p>★ 형식화 발견 갭 (원본 대비 개선 사항):
+ * <p> 형식화 발견 갭 (원본 대비 개선 사항):
  * <ul>
  *   <li>F-058: DataIntegrityViolationException catch + IAE 변환 (race window 보강)</li>
  *   <li>F-071: updateUserDetails 검증을 Service 가 수행 (Hexagonal 정합)</li>
@@ -60,7 +60,7 @@ public class UserService {
         var requester = new User(registry);
         requester.encryptPassword(passwordEncoder, registry.password());
 
-        // L3 DB UQ (race-safe) + ★ F-058 fix: race window catch
+        // L3 DB UQ (race-safe) +  F-058 fix: race window catch
         try {
             return userRepository.save(requester);
         } catch (DataIntegrityViolationException ex) {
@@ -83,7 +83,7 @@ public class UserService {
     }
 
     /**
-     * ★ F-071 정합: 검증을 Service 가 수행 (원본은 Adapter 가 위반).
+     *  F-071 정합: 검증을 Service 가 수행 (원본은 Adapter 가 위반).
      * Adapter 는 단순 save 만 (리팩터 권고).
      */
     public User updateUserDetails(
@@ -110,7 +110,7 @@ public class UserService {
         user.setBio(bio);
         user.setImageUrl(imageUrl);
 
-        // ★ F-058 동일 fix: race window catch (updateUserDetails 도 동일 위험)
+        //  F-058 동일 fix: race window catch (updateUserDetails 도 동일 위험)
         try {
             return userRepository.save(user);
         } catch (DataIntegrityViolationException ex) {

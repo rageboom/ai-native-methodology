@@ -4,14 +4,14 @@ info:
   description: |
     The Realworld API description.
 
-    ★ Static extraction from `@nestjs/swagger` decorators + `@Controller` / DTO + interface.
+     Static extraction from `@nestjs/swagger` decorators + `@Controller` / DTO + interface.
     Source: lujakob/nestjs-realworld-example-app HEAD c1c2cc4 (2021-01-18).
 
     NOT generated from `nest start` (runtime). Runtime ground-truth diff = Sprint 5 carry-over.
   version: '1.0'
 servers:
   - url: /api
-    description: Global prefix (main.ts setGlobalPrefix('api')) / ★ no /v1 (F-159)
+    description: Global prefix (main.ts setGlobalPrefix('api')) /  no /v1 (F-159)
 
 # ----------------------------------------------------------------------
 # Tags (controller decorator @ApiTags)
@@ -97,19 +97,19 @@ paths:
   /users/{slug}:
     delete:
       tags: [user]
-      summary: Delete user (★★ F-140 + F-164 — slug parameter is actually email)
+      summary: Delete user ( F-140 + F-164 — slug parameter is actually email)
       operationId: DeleteUser
       parameters:
         - in: path
           name: slug
           required: true
           schema: { type: string }
-          description: '★ F-152 — slug param is actually email (param naming confusion)'
+          description: ' F-152 — slug param is actually email (param naming confusion)'
       responses:
         '200':
           description: Deleted
         '401':
-          description: 'Should require auth (★★ F-140 critical — AuthMiddleware NOT applied)'
+          description: 'Should require auth ( F-140 critical — AuthMiddleware NOT applied)'
       x-security-defect:
         finding: 'F-140 critical'
         evidence: 'src/user/user.module.ts:17 forRoutes — DELETE method missing'
@@ -136,10 +136,10 @@ paths:
               schema: { $ref: '#/components/schemas/UserResponse' }
         '401':
           description: |
-            Invalid credentials (★ F-150 'User not found' message — 모호 / OWASP A07 user enumeration)
+            Invalid credentials ( F-150 'User not found' message — 모호 / OWASP A07 user enumeration)
       x-spec-runtime-drift:
         rfc: 'RFC 9110 §15.3.2 (201 Created 신규 자원 URI 시만)'
-        evaluation: '★ login 신규 자원 ❌ → 200 OK 권고 (PoC #02 F-085 isomorphic / F-158 묶음)'
+        evaluation: ' login 신규 자원 ❌ → 200 OK 권고 (PoC #02 F-085 isomorphic / F-158 묶음)'
       x-rate-limit:
         finding: 'F-153 medium — @nestjs/throttler 미적용 (OWASP A04 brute force)'
 
@@ -162,7 +162,7 @@ paths:
         - in: query
           name: limit
           schema: { type: integer, default: 20 }
-          description: '★ no maximum cap (PoC #02 F-080 isomorphic — OWASP API4)'
+          description: ' no maximum cap (PoC #02 F-080 isomorphic — OWASP API4)'
         - in: query
           name: offset
           schema: { type: integer, default: 0 }
@@ -188,7 +188,7 @@ paths:
                 article: { $ref: '#/components/schemas/CreateArticleDto' }
       responses:
         '201':
-          description: 'Article created (★ F-053 변형 — slug = slugify + Math.random) / ApiResponse 201 ✅'
+          description: 'Article created ( F-053 변형 — slug = slugify + Math.random) / ApiResponse 201 ✅'
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ArticleResponse' }
@@ -236,7 +236,7 @@ paths:
               schema: { $ref: '#/components/schemas/ArticleResponse' }
     put:
       tags: [articles]
-      summary: Update article (★★ F-164 critical — no @User auth check)
+      summary: Update article ( F-164 critical — no @User auth check)
       operationId: UpdateArticle
       parameters:
         - in: path
@@ -269,7 +269,7 @@ paths:
         finding: 'F-126 — slug 미업데이트'
     delete:
       tags: [articles]
-      summary: Delete article (★★ F-164 critical — no @User auth check)
+      summary: Delete article ( F-164 critical — no @User auth check)
       operationId: DeleteArticle
       parameters:
         - in: path
@@ -278,10 +278,10 @@ paths:
           schema: { type: string }
       responses:
         '201':
-          description: 'Article deleted (★★ ApiResponse 201 — RFC 9110 §15.3.5 위반: DELETE 204)'
+          description: 'Article deleted ( ApiResponse 201 — RFC 9110 §15.3.5 위반: DELETE 204)'
       x-spec-runtime-drift:
         rfc: 'RFC 9110 §15.3.5 (DELETE → 204 No Content 권고)'
-        evaluation: '★★ ApiResponse 201 / NestJS DELETE 기본 200 / RFC 권고 204 — 3중 위반 (F-158 묶음)'
+        evaluation: ' ApiResponse 201 / NestJS DELETE 기본 200 / RFC 권고 204 — 3중 위반 (F-158 묶음)'
       x-security-defect:
         finding: 'F-164 critical — auth 부재'
 
@@ -303,7 +303,7 @@ paths:
               schema: { $ref: '#/components/schemas/CommentsResponse' }
     post:
       tags: [articles]
-      summary: Add comment (★★ F-164 critical — no @User auth check)
+      summary: Add comment ( F-164 critical — no @User auth check)
       operationId: AddArticleComment
       parameters:
         - in: path
@@ -327,7 +327,7 @@ paths:
   /articles/{slug}/comments/{id}:
     delete:
       tags: [articles]
-      summary: Delete comment (★★ F-164 critical — no @User auth check)
+      summary: Delete comment ( F-164 critical — no @User auth check)
       operationId: DeleteArticleComment
       parameters:
         - in: path
@@ -340,7 +340,7 @@ paths:
           schema: { type: integer }
       responses:
         '201':
-          description: '★★ ApiResponse 201 — RFC 9110 §15.3.5 위반 + auth 부재 (F-158 + F-164)'
+          description: ' ApiResponse 201 — RFC 9110 §15.3.5 위반 + auth 부재 (F-158 + F-164)'
       x-spec-runtime-drift:
         rfc: 'RFC 9110 §15.3.5'
         evaluation: 'ApiResponse 201 / DELETE 권고 204'
@@ -361,7 +361,7 @@ paths:
           schema: { type: string }
       responses:
         '201':
-          description: '★ ApiResponse 201 — POST favorite 정합 (★ F-135 race window 별 결함)'
+          description: ' ApiResponse 201 — POST favorite 정합 ( F-135 race window 별 결함)'
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ArticleResponse' }
@@ -383,7 +383,7 @@ paths:
           schema: { type: string }
       responses:
         '201':
-          description: '★★ ApiResponse 201 — RFC 9110 §15.3.5 위반 (DELETE 권고 204) + favorite/unfavorite ApiResponse 통일성 (F-158 묶음)'
+          description: ' ApiResponse 201 — RFC 9110 §15.3.5 위반 (DELETE 권고 204) + favorite/unfavorite ApiResponse 통일성 (F-158 묶음)'
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ArticleResponse' }
@@ -425,7 +425,7 @@ paths:
           schema: { type: string }
       responses:
         '201':
-          description: 'Followed (★ F-144 self-check email 비교 / F-121 FK + UQ pair 부재)'
+          description: 'Followed ( F-144 self-check email 비교 / F-121 FK + UQ pair 부재)'
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ProfileResponse' }
@@ -437,7 +437,7 @@ paths:
         sequence_diagram: 'UC-PROFILE-FOLLOW.mermaid'
     delete:
       tags: [profiles]
-      summary: Unfollow user (★ F-144 dimensional inconsistency — uses id 비교 instead of email)
+      summary: Unfollow user ( F-144 dimensional inconsistency — uses id 비교 instead of email)
       operationId: UnfollowUser
       security:
         - bearerAuth: []
@@ -453,7 +453,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ProfileResponse' }
         '400':
-          description: '''FollowerId and FollowingId cannot be equal'' (★ F-144 — id 비교 / follow=email 비교 차원 불일치)'
+          description: '''FollowerId and FollowingId cannot be equal'' ( F-144 — id 비교 / follow=email 비교 차원 불일치)'
 
   # ====================== TagController (1) =========================
   /tags:
@@ -494,7 +494,7 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: |
-        ★ Bearer JWT 표준 (★ PoC #02 Token apiKey 비표준 F-084 비재현 = 학습 효과 / F-161 positive)
+         Bearer JWT 표준 ( PoC #02 Token apiKey 비표준 F-084 비재현 = 학습 효과 / F-161 positive)
         그러나 verify 무방어 (F-118 try/catch 부재) + 60일 expiry (F-119) + refresh 부재 (F-149)
 
   schemas:
@@ -505,17 +505,17 @@ components:
       properties:
         username:
           type: string
-          description: '@IsNotEmpty (★ class-validator coverage 12% — 본 DTO 만 validator 적용)'
+          description: '@IsNotEmpty ( class-validator coverage 12% — 본 DTO 만 validator 적용)'
         email:
           type: string
-          description: '@IsNotEmpty (★ @IsEmail 부재 — UserEntity 데코로만 검증 / F-128)'
+          description: '@IsNotEmpty ( @IsEmail 부재 — UserEntity 데코로만 검증 / F-128)'
         password:
           type: string
-          description: '@IsNotEmpty (★ length / strength validator 부재 — F-128)'
+          description: '@IsNotEmpty ( length / strength validator 부재 — F-128)'
 
     UpdateUserDto:
       type: object
-      description: '★ F-162 — 모든 필드 optional + 0 validator (★ F-143 UserService.update validate 미호출 합산)'
+      description: ' F-162 — 모든 필드 optional + 0 validator ( F-143 UserService.update validate 미호출 합산)'
       properties:
         username: { type: string }
         email: { type: string }
@@ -531,11 +531,11 @@ components:
           description: '@IsNotEmpty'
         password:
           type: string
-          description: '@IsNotEmpty (★ F-150 — User not found 메시지 모호 / OWASP A07)'
+          description: '@IsNotEmpty ( F-150 — User not found 메시지 모호 / OWASP A07)'
 
     CreateArticleDto:
       type: object
-      description: '★ F-162 — 0 validator (★ F-128 합산)'
+      description: ' F-162 — 0 validator ( F-128 합산)'
       required: [title, description, body]
       properties:
         title: { type: string }
@@ -547,7 +547,7 @@ components:
 
     CreateCommentDto:
       type: object
-      description: '★ F-162 — 0 validator + ★ F-164 anonymous 가능'
+      description: ' F-162 — 0 validator +  F-164 anonymous 가능'
       required: [body]
       properties:
         body: { type: string }
@@ -557,7 +557,7 @@ components:
       type: object
       properties:
         email: { type: string }
-        token: { type: string, description: 'Bearer JWT (★ 60일 expiry — F-119)' }
+        token: { type: string, description: 'Bearer JWT ( 60일 expiry — F-119)' }
         username: { type: string }
         bio: { type: string, nullable: true }
         image: { type: string, nullable: true }
@@ -573,7 +573,7 @@ components:
         username: { type: string }
         bio: { type: string, nullable: true }
         image: { type: string, nullable: true }
-        following: { type: boolean, description: '★ App level 계산 (Domain invariant 부재 F-147)' }
+        following: { type: boolean, description: ' App level 계산 (Domain invariant 부재 F-147)' }
 
     ProfileResponse:
       type: object
@@ -593,7 +593,7 @@ components:
       properties:
         slug:
           type: string
-          description: '★ F-053 변형 — slug = slugify(title) + Math.random().toString(36).substring(7)'
+          description: ' F-053 변형 — slug = slugify(title) + Math.random().toString(36).substring(7)'
         title: { type: string }
         description: { type: string }
         body: { type: string }
@@ -605,7 +605,7 @@ components:
         favorited: { type: boolean }
         favoritesCount:
           type: integer
-          description: '★ F-135 race window — App 1중 isNewFavorite check'
+          description: ' F-135 race window — App 1중 isNewFavorite check'
         author: { $ref: '#/components/schemas/Author' }
 
     ArticleResponse:
@@ -639,17 +639,17 @@ components:
 
     Tag:
       type: object
-      description: 'TagEntity 직접 노출 (★ Sairyss DDD-Hexagon 위반 — Repository 결과 직접 반환)'
+      description: 'TagEntity 직접 노출 ( Sairyss DDD-Hexagon 위반 — Repository 결과 직접 반환)'
       properties:
         id: { type: integer }
         name: { type: string }
 
     GenericError:
       type: object
-      description: '★ F-118 + F-150 — HttpException 형식 (RFC 7807 미준수 — REC-API-PROBLEM-DETAILS)'
+      description: ' F-118 + F-150 — HttpException 형식 (RFC 7807 미준수 — REC-API-PROBLEM-DETAILS)'
       properties:
         statusCode: { type: integer }
         message: { type: string }
         errors:
           type: object
-          description: '★ login: {User: '' not found''} 형식'
+          description: ' login: {User: '' not found''} 형식'

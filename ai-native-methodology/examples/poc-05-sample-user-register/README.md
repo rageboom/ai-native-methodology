@@ -1,4 +1,4 @@
-# PoC #05 — sample user-register (★ ★ ★ chain harness 4-stage e2e corroboration #1)
+# PoC #05 — sample user-register (chain harness 4-stage e2e corroboration #1)
 
 > v2.0.0-rc1 sub-plan-6 — chain harness 4-stage e2e single-cycle 입증.
 > Senior F1 흡수 — 1 UC → 2 UC (register + login) 확장 / multi-UC chain coverage.
@@ -10,20 +10,20 @@ scope **마이크로** (LOC ≤ 200 / RealWorld scale ❌). chain harness 4 stag
 
 ## 도메인
 
-| ID | 정의 |
-|---|---|
-| BR-USER-DATA-001 | 이메일 중복 ❌ (UNIQUE constraint / 중복 시 409 Conflict) |
-| BR-USER-VALIDATION-001 | 비밀번호 최소 8자 (validation 실패 시 400 Bad Request) |
-| UC-USER-001 | POST /users — 신규 사용자 등록 (register) |
-| UC-USER-002 | POST /users/login — 이메일/비밀번호 로그인 (login) |
-| BHV-001 | UC-USER-001 happy path: 새 user → user.id 반환 / 중복 → 409 |
-| BHV-002 | UC-USER-002 happy path: 일치 시 user 반환 / 불일치 → 401 |
-| AC-USER-001 | Gherkin: register 동일 이메일 가입자 존재 → 409 |
-| AC-USER-002 | Gherkin: login 비밀번호 불일치 → 401 |
-| TC-USER-001 | UserService.register — vitest unit |
-| TC-USER-002 | UserService.login — vitest unit |
-| IMPL-USER-001 | UserService.register + EmailUniquenessGuard |
-| IMPL-USER-002 | UserService.login + PasswordComparator |
+| ID                     | 정의                                                        |
+| ---------------------- | ----------------------------------------------------------- |
+| BR-USER-DATA-001       | 이메일 중복 ❌ (UNIQUE constraint / 중복 시 409 Conflict)   |
+| BR-USER-VALIDATION-001 | 비밀번호 최소 8자 (validation 실패 시 400 Bad Request)      |
+| UC-USER-001            | POST /users — 신규 사용자 등록 (register)                   |
+| UC-USER-002            | POST /users/login — 이메일/비밀번호 로그인 (login)          |
+| BHV-001                | UC-USER-001 happy path: 새 user → user.id 반환 / 중복 → 409 |
+| BHV-002                | UC-USER-002 happy path: 일치 시 user 반환 / 불일치 → 401    |
+| AC-USER-001            | Gherkin: register 동일 이메일 가입자 존재 → 409             |
+| AC-USER-002            | Gherkin: login 비밀번호 불일치 → 401                        |
+| TC-USER-001            | UserService.register — vitest unit                          |
+| TC-USER-002            | UserService.login — vitest unit                             |
+| IMPL-USER-001          | UserService.register + EmailUniquenessGuard                 |
+| IMPL-USER-002          | UserService.login + PasswordComparator                      |
 
 ## 4 stage 운영
 
@@ -49,7 +49,7 @@ node ../../tools/chain-driver/src/cli.js init .
 # 3. 진짜 test runner (chain 4 GREEN)
 cd target && npm test
 
-# 4. test-impl-pass-validator (★ ★ ★ no-simulation enforcement)
+# 4. test-impl-pass-validator (no-simulation enforcement)
 cd ../../.. && \
   node tools/test-impl-pass-validator/src/cli.js \
     --project examples/poc-05-sample-user-register \
@@ -102,12 +102,12 @@ poc-05-sample-user-register/
 
 ## §8.1 strict 7/7 매핑
 
-| # | 자격 | 본 PoC 입증 |
-|---|---|---|
-| 1 | ≥ 2 PoC corroboration | ★ corroboration #1 (PoC #03 retrofit = #2) |
-| 2 | 진짜 도구 5종 물증 | test-invocation-evidence.json 7 필드 |
-| 3 | validator violation 0 | chain 1~4 각 validator pass |
-| 4 | chain coverage ≥ 0.85 | chain-coverage-validator 산출 |
-| 5 | ADR registry | (release-readiness.js §5) |
-| 6 | matrix 100% green | UC-USER-001/002 → BHV → AC → TC → IMPL |
-| 7 | e2e 1 cycle pass | 본 PoC 자체 |
+| #   | 자격                  | 본 PoC 입증                              |
+| --- | --------------------- | ---------------------------------------- |
+| 1   | ≥ 2 PoC corroboration | corroboration #1 (PoC #03 retrofit = #2) |
+| 2   | 진짜 도구 5종 물증    | test-invocation-evidence.json 7 필드     |
+| 3   | validator violation 0 | chain 1~4 각 validator pass              |
+| 4   | chain coverage ≥ 0.85 | chain-coverage-validator 산출            |
+| 5   | ADR registry          | (release-readiness.js §5)                |
+| 6   | matrix 100% green     | UC-USER-001/002 → BHV → AC → TC → IMPL   |
+| 7   | e2e 1 cycle pass      | 본 PoC 자체                              |

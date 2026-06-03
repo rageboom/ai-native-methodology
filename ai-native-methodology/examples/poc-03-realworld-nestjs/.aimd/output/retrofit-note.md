@@ -1,6 +1,6 @@
 # PoC #03 Retrofit Note — chain corroboration #2 (sub-plan-6 / D26')
 
-> 본 retrofit = ★ ★ chain harness corroboration #2 (PoC #05 = #1).
+> 본 retrofit = chain harness corroboration #2 (PoC #05 = #1).
 > Senior F2 권고 흡수 — chain 1~2 + chain 3 RED **dry-run** 까지 강제 / 진짜 test/impl 미실행.
 
 ## 의도
@@ -10,12 +10,14 @@
 ## scope
 
 **IN**:
+
 - chain 1 — `planning-spec.{json}` (UC subset 2개 / signup + login)
 - chain 2 — `behavior-spec.{json}` + `acceptance-criteria.{json}` (BHV 2 / AC 2)
 - chain 3 — `test-spec.{json}` dry-run (TC 2 / `expected_outcome: fail` / 진짜 test runner 미실행 — D26' 정합)
 - traceability-matrix (chain 1~3 / forward = 0% — impl 부재 yellow 2)
 
 **OUT** (sub-plan-6 시간 제약):
+
 - 진짜 jest 실행 — RealWorld NestJS scale e2e cycle 비용 ↑
 - chain 4 (impl-spec) — corroboration #1 (PoC #05) 가 e2e 단독 책임
 - 4개 추가 UC (FIND-CURRENT / UPDATE / DELETE / Article / Comment / Tag / Profile)
@@ -59,6 +61,6 @@ node tools/traceability-matrix-builder/src/cli.js \
 # → 2 cells / forward=0% (chain 4 OUT) / backward=100% / yellow=2
 ```
 
-## ★ ★ ★ corroboration 인정 사유
+## corroboration 인정 사유
 
-본 retrofit 은 ★ chain 1~3 자체의 dry-run 정합을 증명한다 (실제 진짜 test/impl 부재 명시). PoC #05 (corroboration #1) 가 e2e GREEN 단독 책임을 가지고, PoC #03 (본 retrofit) 가 "harness 가 다른 도메인/언어/framework 에도 적용 가능" 을 입증한다. ★ ★ §8.1 strict 7/7 #1 의 "≥ 2 PoC corroboration" 자격 충족.
+본 retrofit 은 chain 1~3 자체의 dry-run 정합을 증명한다 (실제 진짜 test/impl 부재 명시). PoC #05 (corroboration #1) 가 e2e GREEN 단독 책임을 가지고, PoC #03 (본 retrofit) 가 "harness 가 다른 도메인/언어/framework 에도 적용 가능" 을 입증한다. §8.1 strict 7/7 #1 의 "≥ 2 PoC corroboration" 자격 충족.

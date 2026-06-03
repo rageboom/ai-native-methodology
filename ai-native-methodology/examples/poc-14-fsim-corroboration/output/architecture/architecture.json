@@ -1,5 +1,5 @@
 {
-  "$comment": "★ analysis-architecture skill 산출 — phase=architecture.3",
+  "$comment": "analysis-architecture skill 산출 — phase=architecture.3",
   "project_id": "poc-14-fsim-corroboration",
   "layers": [
     { "name": "interface", "modules": ["main"], "responsibility": "FastAPI routing + HTTP request/response" },
@@ -19,7 +19,7 @@
     {
       "name": "User authentication boundary",
       "modules": ["auth"],
-      "notes": "★ AP-FSIM-SEC-001 + AP-FSIM-AUTH-001 concentration — antipattern hotspot"
+      "notes": "AP-FSIM-SEC-001 + AP-FSIM-AUTH-001 concentration — antipattern hotspot"
     },
     {
       "name": "Todo ownership boundary",

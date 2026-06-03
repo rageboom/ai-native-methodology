@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-008 자금일보 임시 저장 / 저장 / 초기화 (sub-domain D. SaveLoad). ★ ★ saveType R/B/A 3 분기 state machine 핵심.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-CAPITAL-008 자금일보 임시 저장 / 저장 / 초기화 (sub-domain D. SaveLoad). saveType R/B/A 3 분기 state machine 핵심.",
   "snapshot_id": "SNAP-UC-CAPITAL-008",
   "use_case": "UC-CAPITAL-008",
   "endpoint": "POST /ifrs/capital/IfrsLoadSaveData",
@@ -7,7 +7,7 @@
   "service_method": "CapitalService.selectLoadSaveData",
   "sql_id": "CapitalDAO.selectLoadSaveData (iBATIS 2 dynamic <isEqual property=\"SaveType\">) + CapitalDAO.IfrsCapitalDeleteAjax",
   "layer": "integration",
-  "data_source_status": "★ 실 DB 환경 부재",
+  "data_source_status": "실 DB 환경 부재",
   "scenarios": [
     {
       "id": "SCN-CAPITAL-008-001",
@@ -30,7 +30,7 @@
         "정식 저장 row 와 임시 저장 row 의 별도 테이블 분리 (TB_CAPITAL_ASSET vs TB_CAPITAL_ASSET_BAK)"
       ],
       "behavior_likely_bug": [
-        "★ AP-CAPITAL-004 (WITH(NOLOCK) Dirty Read 위험 / 회계 데이터)"
+        "AP-CAPITAL-004 (WITH(NOLOCK) Dirty Read 위험 / 회계 데이터)"
       ]
     },
     {
@@ -49,20 +49,20 @@
     },
     {
       "id": "SCN-CAPITAL-008-003",
-      "name": "★ ★ ambiguous — saveType=A (초기화) / iBATIS XML 분기 부재",
+      "name": "ambiguous — saveType=A (초기화) / iBATIS XML 분기 부재",
       "given": { "request_params": { "comNo": "001", "sdate2": "20260507", "SaveType": "A" } },
       "when": "selectLoadSaveData(param)",
       "then": {
-        "iBATIS_dynamic_branch": "★ ★ XML 의 <isEqual property=\"SaveType\" compareValue=\"A\"> 분기 부재 → 빈 SQL 실행 가능 / runtime fail 가능",
+        "iBATIS_dynamic_branch": "XML 의 <isEqual property=\"SaveType\" compareValue=\"A\"> 분기 부재 → 빈 SQL 실행 가능 / runtime fail 가능",
         "expected_query": "(빈 SQL — iBATIS 가 dynamic branch 모두 fail 시 ParseException 또는 빈 result)",
         "_BR_link": "BR-CAPITAL-SAVTYPE-005 명시 — saveType A 는 초기화 / 그러나 selectLoadSaveData 가 read 만 → A case 는 별도 endpoint (IfrsCapitalDeleteAjax) 의무"
       },
       "intent_classification": [
-        { "rule": "BR-CAPITAL-SAVTYPE-005", "type": "ambiguous", "note": "★ saveType=A 분기 의도 부재 — Controller / DAO 어디서 분기 결단? domain expert carry" }
+        { "rule": "BR-CAPITAL-SAVTYPE-005", "type": "ambiguous", "note": "saveType=A 분기 의도 부재 — Controller / DAO 어디서 분기 결단? domain expert carry" }
       ],
-      "behavior_to_preserve": "(★ ambiguous — domain expert (사용자 또는 IFRS 회계 담당자) 결단 필요)",
+      "behavior_to_preserve": "(ambiguous — domain expert (사용자 또는 IFRS 회계 담당자) 결단 필요)",
       "behavior_likely_bug": [
-        "★ saveType=A 가 selectLoadSaveData 와 IfrsCapitalDeleteAjax 두 흐름 어느 쪽인지 모호 → 새 시스템 명시 의무"
+        "saveType=A 가 selectLoadSaveData 와 IfrsCapitalDeleteAjax 두 흐름 어느 쪽인지 모호 → 새 시스템 명시 의무"
       ]
     }
   ],

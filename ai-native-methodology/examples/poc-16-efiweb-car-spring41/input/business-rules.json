@@ -13,7 +13,7 @@
     "raw_confidence": 0.78,
     "warnings": [
       "Spring 4.1 + iBATIS 2 paradigm = BR 가 service / sqlmap 안 분산 / DTO 명시 ❌ / HashMap 사용",
-      "★ source_grounded_evidence 의 file_paths 는 모두 source/ 사본 기준 / 원본 EFI-WEB path 와 차이 (immutable snapshot)",
+      "source_grounded_evidence 의 file_paths 는 모두 source/ 사본 기준 / 원본 EFI-WEB path 와 차이 (immutable snapshot)",
       "BR 추출 한계 = LLM 의미 추론 + 결정적 grep 혼합 / R1' axis paradigm 53~55% ceiling 정합"
     ]
   },
@@ -243,7 +243,7 @@
     },
     {
       "id": "BR-CAR-COST-003",
-      "name": "★ 차량비용 → ERP 회계전표 IF (SP 호출)",
+      "name": "차량비용 → ERP 회계전표 IF (SP 호출)",
       "title": "Car cost → SGERP slip interface (Stored Procedure)",
       "natural_language": "selectCarCostCalculate = SGERP.dbo.SG_SACSlipRowCarManagementIFQuery SP 호출 (useComCd, strDate, endDate, userNm + hardcoded 0/'',''). 결과로 회계전표 row 생성. 후속 insertCarCostSlip 으로 TB_CAR_COST_SLIP 등록. cross-DB transaction 보장 ❌ → eventual consistency.",
       "category": "integration",
@@ -390,7 +390,7 @@
   },
   "br_count": 12,
   "concerns": [
-    "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = BR 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 패턴)",
-    "★ STATE 코드 + cost_accept_cd 같은 enum 값 분포 = source 안 명시 ❌ / cross-consistency Layer 2 carry"
+    "R1' axis Spring 4.1 + iBATIS 2 paradigm = BR 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 패턴)",
+    "STATE 코드 + cost_accept_cd 같은 enum 값 분포 = source 안 명시 ❌ / cross-consistency Layer 2 carry"
   ]
 }

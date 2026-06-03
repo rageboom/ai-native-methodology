@@ -76,7 +76,7 @@
       "db": "MSSQL (SQL Server / 사용된 dialect: WITH(NOLOCK), GETDATE(), NVARCHAR, ISNULL)"
     },
     "frontend": {
-      "language": "JSP 2.0 + JSTL 0 (★ taglib 미사용)",
+      "language": "JSP 2.0 + JSTL 0 (taglib 미사용)",
       "framework": "Spring MVC 4.1.2 server-rendered (Scenario C)",
       "ui_library_indicators": [
         "JSP 14 (List + Form + Popup + Ajax + Confirm patterns)",

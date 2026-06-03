@@ -1,17 +1,17 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-019 주문 상세 조회 (★ ★ N+1 fetch chain / AP-PETSTORE-006 critical bug).",
+  "$comment": " phase 4.7 golden snapshot — UC-PETSTORE-019 주문 상세 조회 ( N+1 fetch chain / AP-PETSTORE-006 critical bug).",
   "snapshot_id": "SNAP-UC-PETSTORE-019",
   "use_case": "UC-PETSTORE-019",
   "endpoint": "GET /order/viewOrder.action?orderId=...",
   "controller_method": "OrderActionBean.viewOrder",
-  "service_method": "OrderService.getOrder (★ @Transactional)",
+  "service_method": "OrderService.getOrder ( @Transactional)",
   "sql_id": "OrderMapper.getOrder + LineItemMapper.getLineItemsByOrderId + ItemMapper.getItem (per lineItem) + ItemMapper.getInventoryQuantity (per lineItem)",
   "layer": "integration",
-  "data_source_status": "★ HSQLDB test data — OrderServiceTest 존재",
+  "data_source_status": " HSQLDB test data — OrderServiceTest 존재",
   "scenarios": [
     {
       "id": "SCN-PETSTORE-019-001",
-      "name": "happy path — 2 lineItem 주문 조회 (★ ★ N+1 fetch — 2 + 2N = 6 SQL)",
+      "name": "happy path — 2 lineItem 주문 조회 ( N+1 fetch — 2 + 2N = 6 SQL)",
       "given": {
         "request_params": { "orderId": "1000" },
         "ORDERS_state": "1000 = 2 lineItem (EST-1 quantity=2, EST-2 quantity=1)"
@@ -19,17 +19,17 @@
       "when": "OrderActionBean.viewOrder() → OrderService.getOrder(1000)",
       "then": {
         "expected_response_order": "Order { orderId=1000, lineItems=[{itemId=EST-1, quantity=2, item=Item{...inventoryQty=9998}}, {itemId=EST-2, quantity=1, item=Item{...inventoryQty=9999}}] }",
-        "expected_sql_call_count": "★ ★ ★ 6 SQL = 1 (getOrder) + 1 (getLineItemsByOrderId) + 2 (getItem per lineItem) + 2 (getInventoryQuantity per lineItem) = 1+1+N×2 with N=2",
+        "expected_sql_call_count": " 6 SQL = 1 (getOrder) + 1 (getLineItemsByOrderId) + 2 (getItem per lineItem) + 2 (getInventoryQuantity per lineItem) = 1+1+N×2 with N=2",
         "expected_response_view": "ForwardResolution to ViewOrder.jsp"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-ORDQRY-005", "type": "bug", "note": "★ ★ ★ N+1 fetch chain (AP-PETSTORE-006) — production 차단 의무 / 모범 = JOIN 또는 nested resultMap" }
+        { "rule": "BR-PETSTORE-ORDQRY-005", "type": "bug", "note": " N+1 fetch chain (AP-PETSTORE-006) — production 차단 의무 / 모범 = JOIN 또는 nested resultMap" }
       ],
       "behavior_to_preserve": [
         "Order header + lineItems + item 조회 (도메인 contract)"
       ],
       "behavior_likely_bug": [
-        "★ ★ ★ AP-PETSTORE-006 — N+1 fetch (lineItem 수 N → 1+1+N×2 = 2+2N SQL) — 모범 = 단일 SQL JOIN 또는 nested resultMap"
+        " AP-PETSTORE-006 — N+1 fetch (lineItem 수 N → 1+1+N×2 = 2+2N SQL) — 모범 = 단일 SQL JOIN 또는 nested resultMap"
       ]
     }
   ],

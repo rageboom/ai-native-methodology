@@ -1,92 +1,106 @@
 manifest:
-  generated_at: "2026-04-30"
-  poc_id: "poc-03-realworld-nestjs"
-  phase: "3"
-  phase_name: "arch (아키텍처)"
-  methodology_version: "v1.2.2"
-  actor: "AI (Claude Opus 4.7) — 메인 직접"
+  generated_at: '2026-04-30'
+  poc_id: 'poc-03-realworld-nestjs'
+  phase: '3'
+  phase_name: 'arch (아키텍처)'
+  methodology_version: 'v1.2.2'
+  actor: 'AI (Claude Opus 4.7) — 메인 직접'
 
 upstream_handoff:
-  - source: "../inventory/_manifest.yml"
-    consistency: "✅ 5 module / NestJS Module = DI 경계 정합"
-  - source: "../db/_manifest.yml"
-    consistency: "✅ 5 entity → 3 BC 매핑 (BC-USER 1 / BC-CONTENT 4 / BC-PROFILE 1)"
+  - source: '../inventory/_manifest.yml'
+    consistency: '✅ 5 module / NestJS Module = DI 경계 정합'
+  - source: '../db/_manifest.yml'
+    consistency: '✅ 5 entity → 3 BC 매핑 (BC-USER 1 / BC-CONTENT 4 / BC-PROFILE 1)'
 
 deliverables:
-  - file: "architecture.json"
-    schema: "schemas/architecture.schema.json"
+  - file: 'architecture.json'
+    schema: 'schemas/architecture.schema.json'
     confidence: 0.85
-  - file: "architecture.md"
+  - file: 'architecture.md'
     confidence: 0.92
-  - file: "architecture.mermaid"
-    purpose: "C4 Level 3 component diagram (5 module + cross-module 시각화)"
+  - file: 'architecture.mermaid'
+    purpose: 'C4 Level 3 component diagram (5 module + cross-module 시각화)'
     confidence: 0.95
-  - file: "dependency-graph.mermaid"
-    purpose: "Module DI 의존 그래프 (단방향 DAG)"
+  - file: 'dependency-graph.mermaid'
+    purpose: 'Module DI 의존 그래프 (단방향 DAG)'
     confidence: 0.95
-  - file: "circular-dependencies.md"
-    purpose: "CIRCULAR 0건 보고 + F-066 cross-val (다른 메커니즘 재현)"
+  - file: 'circular-dependencies.md'
+    purpose: 'CIRCULAR 0건 보고 + F-066 cross-val (다른 메커니즘 재현)'
     confidence: 0.92
-  - file: "_manifest.yml"
+  - file: '_manifest.yml'
     confidence: 0.95
 
 raw_confidence:
   current: 0.85
   cap: 0.85
-  delta: "+0.00"
-  delta_direction: "validated"
-  rationale: "Phase 1 추정 cap 0.85 정합 — 단일 NestJS module tree = 분류 단순. PoC #02 Δ +0.20 격상 패턴과 다름."
+  delta: '+0.00'
+  delta_direction: 'validated'
+  rationale: 'Phase 1 추정 cap 0.85 정합 — 단일 NestJS module tree = 분류 단순. PoC #02 Δ +0.20 격상 패턴과 다름.'
 
 trust_level:
   current: 0.85
   current_step: 1
   validation_history:
-    - {step: "1차 작성", at: "2026-04-30", actor: "AI", tool_type: "ai_subagent", note: "메인 직접 module imports + cross-module file imports grep"}
-  next_validation: "Phase 4 도메인 의미 검증"
+    - {
+        step: '1차 작성',
+        at: '2026-04-30',
+        actor: 'AI',
+        tool_type: 'ai_subagent',
+        note: '메인 직접 module imports + cross-module file imports grep',
+      }
+  next_validation: 'Phase 4 도메인 의미 검증'
 
 cross_validation:
   performed: false
-  note: "Phase 3 = cross-validation 의무 X (Phase 4.5+ 부터)"
+  note: 'Phase 3 = cross-validation 의무 X (Phase 4.5+ 부터)'
   simulation_only: false
 
 deterministic_results:
   raw_fetch:
-    main_agent: "5 module imports grep + cross-module file imports grep"
-    sub_agent_document: "(생략)"
-    sub_agent_case: "(생략)"
-    sub_agent_senior: "(생략 — research 흡수)"
+    main_agent: '5 module imports grep + cross-module file imports grep'
+    sub_agent_document: '(생략)'
+    sub_agent_case: '(생략)'
+    sub_agent_senior: '(생략 — research 흡수)'
   module_count: 5
   domain_module_count: 4
   dependency_edge_count: 8
   circular_dependency_count: 0
   layer_violation_count: 0
   external_dependency_count: 0
-  cross_module_entity_uses: 3  # ★ F-137 후보
-  rate_limit_after_phase_3: "filesystem 환경 — N/A"
+  cross_module_entity_uses: 3 #  F-137 후보
+  rate_limit_after_phase_3: 'filesystem 환경 — N/A'
 
 architecture_style_decision:
-  primary: "modular_monolith_nestjs_module"
+  primary: 'modular_monolith_nestjs_module'
   primary_confidence: 0.85
-  secondary: "layered_controller_service_repository"
+  secondary: 'layered_controller_service_repository'
   secondary_confidence: 0.75
-  naming_pattern: "domain_per_directory"
+  naming_pattern: 'domain_per_directory'
   naming_pattern_confidence: 0.95
   refuted:
-    - {style: "hexagonal", confidence: 0.10, reason: "port-adapter convention 부재 (Senior 위험 5)"}
-    - {style: "clean_architecture", confidence: 0.10, reason: "use-case / boundary 부재"}
+    - {
+        style: 'hexagonal',
+        confidence: 0.10,
+        reason: 'port-adapter convention 부재 (Senior 위험 5)',
+      }
+    - {
+        style: 'clean_architecture',
+        confidence: 0.10,
+        reason: 'use-case / boundary 부재',
+      }
   phase_1_correction:
     phase_1_cap: 0.85
     phase_3_confidence: 0.85
     delta: 0.00
-    direction: "validated"
-    rationale: "Phase 1 추정 즉시 일치 (격상 0). PoC #02 Δ +0.20 격상 패턴과 다름 — 단일 module tree = 모호성 ↓"
+    direction: 'validated'
+    rationale: 'Phase 1 추정 즉시 일치 (격상 0). PoC #02 Δ +0.20 격상 패턴과 다름 — 단일 module tree = 모호성 ↓'
 
 bounded_context_candidates:
   BC-USER:
     modules: [MOD-USER]
     tables: [user]
     aggregate_candidates: [User]
-    note: "auth + JWT 책임 흡수"
+    note: 'auth + JWT 책임 흡수'
   BC-CONTENT:
     modules: [MOD-ARTICLE, MOD-TAG]
     tables: [article, comment, tag, user_entity_favorites_article_entity]
@@ -95,93 +109,93 @@ bounded_context_candidates:
     modules: [MOD-PROFILE]
     tables: [follows]
     aggregate_candidates: [Follows_semantic_모호?]
-    concern: "★ FollowsEntity 위치 (F-138) — semantic = user 관계 / 위치 = profile"
+    concern: ' FollowsEntity 위치 (F-138) — semantic = user 관계 / 위치 = profile'
 
 key_decisions:
-  - id: "DEC-PHASE3-PoC03-001"
-    title: "Phase 1 cap 0.85 → Phase 3 0.85 정합 (Δ +0.00)"
-    decision: "단일 NestJS module tree = 분류 단순. PoC #02 Δ +0.20 격상 패턴과 다름."
+  - id: 'DEC-PHASE3-PoC03-001'
+    title: 'Phase 1 cap 0.85 → Phase 3 0.85 정합 (Δ +0.00)'
+    decision: '단일 NestJS module tree = 분류 단순. PoC #02 Δ +0.20 격상 패턴과 다름.'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-PoC03-002"
-    title: "NestJS Module = DI 경계 분류 ❌ port-adapter (Senior 위험 5 정합)"
-    decision: "Hexagonal / Clean Architecture 후보 0.10 거절. layered 0.75. modular_monolith_nestjs_module 0.85 1차."
+  - id: 'DEC-PHASE3-PoC03-002'
+    title: 'NestJS Module = DI 경계 분류 ❌ port-adapter (Senior 위험 5 정합)'
+    decision: 'Hexagonal / Clean Architecture 후보 0.10 거절. layered 0.75. modular_monolith_nestjs_module 0.85 1차.'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-PoC03-003"
-    title: "F-137 medium 신규 — 도메인 경계 약함 (cross-module entity)"
-    decision: "ArticleModule + ProfileModule 가 다른 도메인 entity InjectRepository → 도메인 경계 약함."
-    rationale: "★ PoC #02 multi-module Hexagonal vs PoC #03 단일 module 본질적 차이 시그널"
+  - id: 'DEC-PHASE3-PoC03-003'
+    title: 'F-137 medium 신규 — 도메인 경계 약함 (cross-module entity)'
+    decision: 'ArticleModule + ProfileModule 가 다른 도메인 entity InjectRepository → 도메인 경계 약함.'
+    rationale: ' PoC #02 multi-module Hexagonal vs PoC #03 단일 module 본질적 차이 시그널'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-PoC03-004"
-    title: "F-138 low 신규 — FollowsEntity 위치 모호"
-    decision: "profile/ 디렉토리 / semantic = user 관계."
+  - id: 'DEC-PHASE3-PoC03-004'
+    title: 'F-138 low 신규 — FollowsEntity 위치 모호'
+    decision: 'profile/ 디렉토리 / semantic = user 관계.'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-PoC03-005"
-    title: "F-066 (PoC #02 positive) cross-val — 재현 (다른 메커니즘)"
-    decision: "Service 간 직접 의존 0 — 재현. 단 PoC #02 = Hexagonal 회피 / PoC #03 = NestJS tree 본질."
+  - id: 'DEC-PHASE3-PoC03-005'
+    title: 'F-066 (PoC #02 positive) cross-val — 재현 (다른 메커니즘)'
+    decision: 'Service 간 직접 의존 0 — 재현. 단 PoC #02 = Hexagonal 회피 / PoC #03 = NestJS tree 본질.'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-PoC03-006"
-    title: "Phase 3 신규 finding 2건 (F-137 / F-138)"
-    decision: "5~15 건강 범위 하한 — 단일 module = 분류 단순 → finding 적게 발생 (PoC #02 Phase 3 9건 대비)"
+  - id: 'DEC-PHASE3-PoC03-006'
+    title: 'Phase 3 신규 finding 2건 (F-137 / F-138)'
+    decision: '5~15 건강 범위 하한 — 단일 module = 분류 단순 → finding 적게 발생 (PoC #02 Phase 3 9건 대비)'
     auto_mode_applied: true
 
 approval_gate:
-  - check: "architecture.json schema 검증 (architecture.schema.json 정합)"
-    status: "✅"
-  - check: "이중 렌더링 정합 (.json + .md + .mermaid 동시 산출)"
-    status: "✅ 5 산출물"
-  - check: "circular 0건"
-    status: "✅"
-  - check: "Phase 1 cap 0.85 검증"
-    status: "✅ Δ +0.00"
-  - check: "★ Senior 위험 5 정합 — NestJS Module = DI 경계 명시"
-    status: "✅ architecture.md §1 + circular-dependencies.md §3"
+  - check: 'architecture.json schema 검증 (architecture.schema.json 정합)'
+    status: '✅'
+  - check: '이중 렌더링 정합 (.json + .md + .mermaid 동시 산출)'
+    status: '✅ 5 산출물'
+  - check: 'circular 0건'
+    status: '✅'
+  - check: 'Phase 1 cap 0.85 검증'
+    status: '✅ Δ +0.00'
+  - check: ' Senior 위험 5 정합 — NestJS Module = DI 경계 명시'
+    status: '✅ architecture.md §1 + circular-dependencies.md §3'
 
 downstream_handoff:
-  - "BC 후보 3개 — Phase 4 도메인 분석 입력"
-  - "Aggregate 후보 4개 (User / Article / Comment_sub / Follows_semantic_모호) — Tag dead 의문"
-  - "F-137 / F-138 — Phase 4 도메인 의미 결정 시 합산"
-  - "외부 의존성 0건 (RealWorld 한계 — Phase 4 5.D 빈약 caveat)"
-  - "★ Senior 위험 5 정합 후속 — templates/architecture.template.md 에 NestJS Module 가이드 추가 후보 (Sprint 5+ carry-over)"
+  - 'BC 후보 3개 — Phase 4 도메인 분석 입력'
+  - 'Aggregate 후보 4개 (User / Article / Comment_sub / Follows_semantic_모호) — Tag dead 의문'
+  - 'F-137 / F-138 — Phase 4 도메인 의미 결정 시 합산'
+  - '외부 의존성 0건 (RealWorld 한계 — Phase 4 5.D 빈약 caveat)'
+  - ' Senior 위험 5 정합 후속 — templates/architecture.template.md 에 NestJS Module 가이드 추가 후보 (Sprint 5+ carry-over)'
 
 findings_phase:
-  - id: "F-137"
-    title: "★ 도메인 경계 약함 — ArticleModule + ProfileModule 가 다른 도메인 entity InjectRepository"
-    severity: "medium"
-    proposed_fix: "각 BC 의 entity 는 자체 module 에서만 forFeature. 다른 BC 의 read 가 필요하면 Service injection (예: UserService.findById) 사용"
-    status: "promoted"
-    cross_val_signal: "★ PoC #02 multi-module Hexagonal port-adapter 와 본질적 차이 — F-075 (J 묶음) 반대 패턴"
-  - id: "F-138"
-    title: "★ FollowsEntity 위치 모호 — profile/ 디렉토리 / semantic = user 관계"
-    severity: "low"
-    proposed_fix: "FollowsEntity 를 user/ 또는 별 follow/ 디렉토리. 또는 명시적 domain rationale 주석"
-    status: "candidate"
+  - id: 'F-137'
+    title: ' 도메인 경계 약함 — ArticleModule + ProfileModule 가 다른 도메인 entity InjectRepository'
+    severity: 'medium'
+    proposed_fix: '각 BC 의 entity 는 자체 module 에서만 forFeature. 다른 BC 의 read 가 필요하면 Service injection (예: UserService.findById) 사용'
+    status: 'promoted'
+    cross_val_signal: ' PoC #02 multi-module Hexagonal port-adapter 와 본질적 차이 — F-075 (J 묶음) 반대 패턴'
+  - id: 'F-138'
+    title: ' FollowsEntity 위치 모호 — profile/ 디렉토리 / semantic = user 관계'
+    severity: 'low'
+    proposed_fix: 'FollowsEntity 를 user/ 또는 별 follow/ 디렉토리. 또는 명시적 domain rationale 주석'
+    status: 'candidate'
 
 cumulative_statistics:
   poc_phase1_phase2_phase3_total: 23
   poc_phase3_new: 2
-  cumulative_total: 140  # PoC #01 33 + #02 43 + Sprint 4.5/4 41 + PoC #03 P1+P2+P3 23
+  cumulative_total: 140 # PoC #01 33 + #02 43 + Sprint 4.5/4 41 + PoC #03 P1+P2+P3 23
   threshold_status: |
     Phase 3 신규 2건 = 5~15 건강 범위 하한 (단일 module = 분류 단순 정합).
     누적 140건 — F-021 임계 적용 — 비중 분석:
     - PoC #03 Phase 1~3 = 23건 (p1: 15 / p2: 6 / p3: 2)
-    - cross-val 강함 (F-120 ★★ / F-118 / F-124 / F-125)
+    - cross-val 강함 (F-120  / F-118 / F-124 / F-125)
     - TypeScript 학습 효과 (F-048 비재현)
     - NestJS 특이 (F-122 dead / F-127 / F-130 / F-137 / F-138)
     - 메타 finding (F-132 G7 / F-136 G6) — v1.2.2 template 자가 검증
     → §8.1 통과 — Phase 4 즉시 진입 권고.
 
 phase_kpi:
-  - "✅ Phase 3 신규 finding 2건 (단일 module = 하한 정합)"
-  - "✅ schema 검증 통과 (architecture.schema.json)"
-  - "✅ 6 핵심 결정 (DEC-PHASE3-PoC03-001~006) Auto Mode"
-  - "★ Δ +0.00 — Phase 1 추정 즉시 일치 (PoC #02 Δ +0.20 패턴과 다름 = 본 PoC 본질)"
-  - "★ F-066 (PoC #02 positive) cross-val 재현 — 다른 메커니즘 (DAG 본질)"
-  - "★ F-137 신규 — 도메인 경계 약함 (PoC #02 J 묶음 반대 패턴)"
-  - "★★★ no-simulation 정합 — sub-agent 생략 정직 표기"
+  - '✅ Phase 3 신규 finding 2건 (단일 module = 하한 정합)'
+  - '✅ schema 검증 통과 (architecture.schema.json)'
+  - '✅ 6 핵심 결정 (DEC-PHASE3-PoC03-001~006) Auto Mode'
+  - ' Δ +0.00 — Phase 1 추정 즉시 일치 (PoC #02 Δ +0.20 패턴과 다름 = 본 PoC 본질)'
+  - ' F-066 (PoC #02 positive) cross-val 재현 — 다른 메커니즘 (DAG 본질)'
+  - ' F-137 신규 — 도메인 경계 약함 (PoC #02 J 묶음 반대 패턴)'
+  - ' no-simulation 정합 — sub-agent 생략 정직 표기'
 
 next_actions:
-  - "Phase 4 (비즈니스 로직 — 4영역 병렬) 진입"
-  - "BC 후보 3 + Aggregate 4 도메인 행동 분석"
-  - "BR 추출: class-validator (DTO + entity 양쪽) + service.ts manual throw"
-  - "★ Senior 위험 3 정합 — DTO 단독 BR 누락 위험 검증"
-  - "F-137 / F-138 Phase 4 도메인 의미 결정"
+  - 'Phase 4 (비즈니스 로직 — 4영역 병렬) 진입'
+  - 'BC 후보 3 + Aggregate 4 도메인 행동 분석'
+  - 'BR 추출: class-validator (DTO + entity 양쪽) + service.ts manual throw'
+  - ' Senior 위험 3 정합 — DTO 단독 BR 누락 위험 검증'
+  - 'F-137 / F-138 Phase 4 도메인 의미 결정'

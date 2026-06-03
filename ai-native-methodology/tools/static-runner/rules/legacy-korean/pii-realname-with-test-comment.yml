@@ -1,7 +1,7 @@
 rules:
   - id: legacy-korean.pii-realname-with-test-comment
     message: |
-      ★ Production 코드 내 hardcoded 한글 실명 PII + 인접 "// 테스트용" 또는 "// 라이브용" annotation 검출.
+      Production 코드 내 hardcoded 한글 실명 PII + 인접 "// 테스트용" 또는 "// 라이브용" annotation 검출.
       cycle-7 F-CYCLE7-001 — CarCostServiceImpl.java:92 의 "장인*"→"장인아", "양동*"→"양동기" 등 5인 hardcoded
       production code 활성 / "// 테스트용" toggle ON / "// 라이브용" 비활성.
       → production data leak risk. git history scrub 의무.

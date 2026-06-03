@@ -3,7 +3,7 @@ rules:
     message: |
       Generic Java exception (IllegalArgumentException / IllegalStateException / RuntimeException)
       thrown inside Spring-managed bean (@Service / @Controller / @RestController / @Component).
-      ★ AP-API-001 critical / PoC #02 F-070+F-079+F-085 묶음 학습.
+      AP-API-001 critical / PoC #02 F-070+F-079+F-085 묶음 학습.
       Spring default ResponseStatusExceptionResolver 는 IllegalArgumentException 을 매핑 ❌ → 500 leak.
       RFC 7231 §4.2.2 + RFC 9110 §15.3 위반 — client receives unmapped 5xx (spec/runtime drift).
       권고: 도메인 specific exception (ConflictException / NotFoundException + @ResponseStatus)
@@ -42,17 +42,17 @@ rules:
               class $C { ... }
     paths:
       exclude:
-        - "*Test.java"
-        - "*Tests.java"
-        - "*test/*"
-        - "*tests/*"
-        - "*__tests__/*"
-        - "*/test/*"
-        - "tools/static-runner/rules/*"   # ★ 본 rule 의 fixture 자기 매칭 exclude
-        # ★ Phase 4.5 round-trip 재생성/생성 코드 exclude — legacy AP 패턴 ★ 의도적 reproduce
+        - '*Test.java'
+        - '*Tests.java'
+        - '*test/*'
+        - '*tests/*'
+        - '*__tests__/*'
+        - '*/test/*'
+        - 'tools/static-runner/rules/*' # 본 rule 의 fixture 자기 매칭 exclude
+        # Phase 4.5 round-trip 재생성/생성 코드 exclude — legacy AP 패턴 의도적 reproduce
         # (re-)generated 코드는 source-of-truth 가 아닌 round-trip 검증 산출물 (ADR-008 정합).
-        - "*/formal-spec/regenerated-code/*"
-        - "*/formal-spec/generated-code/*"
+        - '*/formal-spec/regenerated-code/*'
+        - '*/formal-spec/generated-code/*'
     metadata:
       cwe: 'CWE-755'
       owasp: ['A09:2021']
@@ -67,9 +67,9 @@ rules:
         antipattern: AP-API-001
         applies_to: BE
         cross_poc_evidence:
-          - "PoC #02 (Spring 3.3 Hexagonal) — F-070+F-079+F-085 묶음 critical (ArticleService throw IllegalArgumentException — favorite spec/runtime drift)"
-          - "PoC #01 (Spring 2.5) — @ExceptionHandler 부재 (★ negative space / 신뢰도 0.65)"
-          - "PoC #03 (NestJS) — AP-API-001 high (@Post default 201 + @ApiResponse decorator drift / ★ 별 mechanism / 본 yml 의 NestJS sub-rule + ts-morph v1.5+ carry)"
+          - 'PoC #02 (Spring 3.3 Hexagonal) — F-070+F-079+F-085 묶음 critical (ArticleService throw IllegalArgumentException — favorite spec/runtime drift)'
+          - 'PoC #01 (Spring 2.5) — @ExceptionHandler 부재 (negative space / 신뢰도 0.65)'
+          - 'PoC #03 (NestJS) — AP-API-001 high (@Post default 201 + @ApiResponse decorator drift / 별 mechanism / 본 yml 의 NestJS sub-rule + ts-morph v1.5+ carry)'
         cross_poc_isomorphic_count: 2
         introduced_in: v1.4.4-pre
 
@@ -77,7 +77,7 @@ rules:
     message: |
       NestJS @Delete + @ApiResponse({status: 201}) decorator drift.
       RFC 9110 §15.3.5 위반 — DELETE 성공 = 204 No Content 권고 / 201 Created = ❌.
-      ★ AP-API-001 high (PoC #03 article.controller.ts:65-99 5 op 학습).
+      AP-API-001 high (PoC #03 article.controller.ts:65-99 5 op 학습).
       Spec/runtime drift via decorator misuse — client 가 spec 따라 204 기대 → 201 수신 → 잘못된 후속 처리.
       권고: @HttpCode(204) + @ApiResponse({status: 204, description: 'deleted'}).
     severity: ERROR
@@ -102,12 +102,12 @@ rules:
               async $M(...): $T { ... }
     paths:
       exclude:
-        - "*.test.ts"
-        - "*.spec.ts"
-        - "*test/*"
-        - "*tests/*"
-        - "*__tests__/*"
-        - "tools/static-runner/rules/*"
+        - '*.test.ts'
+        - '*.spec.ts'
+        - '*test/*'
+        - '*tests/*'
+        - '*__tests__/*'
+        - 'tools/static-runner/rules/*'
     metadata:
       cwe: 'CWE-755'
       owasp: ['A09:2021']
@@ -122,7 +122,7 @@ rules:
         applies_to: BE
         mechanism: decorator-drift
         cross_poc_evidence:
-          - "PoC #03 (NestJS) — article.controller.ts:65,68 + 81,85 + 97,99 (★ 4 op @ApiResponse status:201 description:'deleted' / RFC 9110 §15.3.5 위반)"
-          - "PoC #02 (Spring) — F-083 DELETE 200 변형 (★ isomorphic 정합 / 다른 framework / 같은 RFC 위반)"
+          - "PoC #03 (NestJS) — article.controller.ts:65,68 + 81,85 + 97,99 (4 op @ApiResponse status:201 description:'deleted' / RFC 9110 §15.3.5 위반)"
+          - 'PoC #02 (Spring) — F-083 DELETE 200 변형 (isomorphic 정합 / 다른 framework / 같은 RFC 위반)'
         cross_poc_isomorphic_count: 2
         introduced_in: v1.4.5-pre

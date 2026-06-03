@@ -6,7 +6,7 @@
   "action": "이미 같은 상태 시 silent return (RFC 7231 §4.2.2 idempotent)",
   "expected_result": "재요청에도 상태 변화 없음 — 200 OK 반환",
   "rejection_method": "(거부 X — silent return)",
-  "verification_location": "App (UserRelationshipService.follow:27 + .unfollow:36 — isFollowing 분기) ★ DB UQ race window 미처리 (AP-API-001 isomorphic)",
+  "verification_location": "App (UserRelationshipService.follow:27 + .unfollow:36 — isFollowing 분기)  DB UQ race window 미처리 (AP-API-001 isomorphic)",
   "http_status": 200,
   "error_message": "(없음 — silent return)",
   "current_state": "partial",

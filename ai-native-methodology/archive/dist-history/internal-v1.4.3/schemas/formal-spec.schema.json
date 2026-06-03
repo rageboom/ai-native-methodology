@@ -106,7 +106,7 @@
     },
     "decision_tables": {
       "type": "array",
-      "description": "BR 의사결정 테이블. 자연어 빈약성 9 항목 보완 핵심. ★ v1.2.3 — required 필드 분리 (always vs api). lifecycle hook BR / 비-API BR 의 http_status/error_message 등은 null 의도 부재 허용 (★ DEC-2026-04-30-B-phase45-enrichment 정합).",
+      "description": "BR 의사결정 테이블. 자연어 빈약성 9 항목 보완 핵심. v1.2.3 — required 필드 분리 (always vs api). lifecycle hook BR / 비-API BR 의 http_status/error_message 등은 null 의도 부재 허용 ( DEC-2026-04-30-B-phase45-enrichment 정합).",
       "items": {
         "type": "object",
         "required": ["br_id", "trigger", "condition", "action", "expected_result", "verification_location", "current_state"],
@@ -134,7 +134,7 @@
           },
           "rejection_method": {
             "type": ["string", "null"],
-            "description": "★ v1.2.3 — null 허용 (lifecycle hook BR 등 거부 의미 없음). API 영역 BR 의 거부 방식 — 자연어 누락 빈번."
+            "description": " v1.2.3 — null 허용 (lifecycle hook BR 등 거부 의미 없음). API 영역 BR 의 거부 방식 — 자연어 누락 빈번."
           },
           "verification_location": {
             "type": "string",
@@ -142,7 +142,7 @@
           },
           "http_status": {
             "type": ["integer", "null"],
-            "description": "★ v1.2.3 — null 허용 (lifecycle / 비-API BR). API 영역 BR 의 HTTP status code."
+            "description": " v1.2.3 — null 허용 (lifecycle / 비-API BR). API 영역 BR 의 HTTP status code."
           },
           "error_code": {
             "type": ["string", "null"],
@@ -150,7 +150,7 @@
           },
           "error_message": {
             "type": ["string", "null"],
-            "description": "★ v1.2.3 — null 허용 (lifecycle BR / silent skip). 사용자 노출 메시지."
+            "description": " v1.2.3 — null 허용 (lifecycle BR / silent skip). 사용자 노출 메시지."
           },
           "current_state": {
             "type": "string",
@@ -159,7 +159,7 @@
           },
           "current_state_note": {
             "type": "string",
-            "description": "★ v1.2.3 — current_state 부가 설명. enum 위반 회피 (★ PoC #03 F-156 패턴 — 한국어 prefix 분리). 'partial' / 'absent' 만 enum 으로, 부가 설명은 본 필드."
+            "description": " v1.2.3 — current_state 부가 설명. enum 위반 회피 ( PoC #03 F-156 패턴 — 한국어 prefix 분리). 'partial' / 'absent' 만 enum 으로, 부가 설명은 본 필드."
           },
           "rendered_md_path": {
             "type": "string"
@@ -167,7 +167,7 @@
           "br_type": {
             "type": "string",
             "enum": ["api", "lifecycle", "domain_invariant", "performance", "security"],
-            "description": "★ v1.2.3 — BR 분류. lifecycle = http_status/error_message null 허용. domain_invariant = entity 생성자 기반. v1.3 격상 시 enum 추가 가능."
+            "description": " v1.2.3 — BR 분류. lifecycle = http_status/error_message null 허용. domain_invariant = entity 생성자 기반. v1.3 격상 시 enum 추가 가능."
           }
         }
       }
@@ -263,7 +263,7 @@
               },
               "real_tool": {
                 "type": "boolean",
-                "description": "★★★ DEC-static-tool-실행-의무화 정합. true: 진짜 외부 도구 (Semgrep/PMD/SpotBugs/Daikon/CodeQL) → 5종 물증 의무. false: AI persona 시뮬 → simulation_reason 의무 + -5%p 패널티."
+                "description": " DEC-static-tool-실행-의무화 정합. true: 진짜 외부 도구 (Semgrep/PMD/SpotBugs/Daikon/CodeQL) → 5종 물증 의무. false: AI persona 시뮬 → simulation_reason 의무 + -5%p 패널티."
               },
               "simulation_reason": {
                 "type": "string",
@@ -319,11 +319,11 @@
         },
         "simulation_only": {
           "type": "boolean",
-          "description": "★★★ Sprint 4 묶음 O — validators 전체가 시뮬인 경우 자동 fail. lint-no-simulation.sh enforcement."
+          "description": " Sprint 4 묶음 O — validators 전체가 시뮬인 경우 자동 fail. lint-no-simulation.sh enforcement."
         },
         "double_hits": {
           "type": "integer",
-          "description": "Senior + Static 양쪽 발견 finding 수 (★★ 격상 후보)."
+          "description": "Senior + Static 양쪽 발견 finding 수 ( 격상 후보)."
         },
         "drift_detected": {
           "type": "integer",

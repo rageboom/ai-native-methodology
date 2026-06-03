@@ -17,7 +17,7 @@
         "vanilla_js", "jquery_legacy", "jsp_template",
         "unknown"
       ],
-      "description": "감지된 FE 프레임워크. ★ v1.4 Stage 3-1 — ADR-FE-001 spectrum Tier 1~4 정합 (Tier 1=react/vue/angular/svelte/solid/qwik/astro/next/nuxt/remix / Tier 2=jquery_legacy / Tier 3=vanilla_js / Tier 4=jsp_template)."
+      "description": "감지된 FE 프레임워크. v1.4 Stage 3-1 — ADR-FE-001 spectrum Tier 1~4 정합 (Tier 1=react/vue/angular/svelte/solid/qwik/astro/next/nuxt/remix / Tier 2=jquery_legacy / Tier 3=vanilla_js / Tier 4=jsp_template)."
     },
     "design_system_approach": {
       "type": "string",
@@ -60,7 +60,7 @@
           },
           "api_calls": {
             "type": "array",
-            "description": "★ v1.4 Stage 3-1 신규. API 호출 상세 명세 (OpenAPI 3.1 + MSW handler cross-link).",
+            "description": " v1.4 Stage 3-1 신규. API 호출 상세 명세 (OpenAPI 3.1 + MSW handler cross-link).",
             "items": {
               "type": "object",
               "required": ["operationId"],
@@ -94,7 +94,7 @@
           },
           "event_handlers": {
             "type": "array",
-            "description": "★ v1.4 Stage 3-1 신규. 페이지 이벤트 핸들러 (state-map cross-link).",
+            "description": " v1.4 Stage 3-1 신규. 페이지 이벤트 핸들러 (state-map cross-link).",
             "items": {
               "type": "object",
               "required": ["event"],
@@ -208,7 +208,7 @@
               "legacy_widget",
               "unknown"
             ],
-            "description": "Atomic Design (atom~page) 또는 FSD (feature/entity/shared/widget) 레벨. ★ v1.4 Stage 3-1 — legacy_template / legacy_widget 추가 (Tier 2-4 spectrum 정합)."
+            "description": "Atomic Design (atom~page) 또는 FSD (feature/entity/shared/widget) 레벨. v1.4 Stage 3-1 — legacy_template / legacy_widget 추가 (Tier 2-4 spectrum 정합)."
           },
           "description": {"type": "string"},
           "uses_components": {
@@ -227,7 +227,7 @@
           },
           "suspense_boundary": {
             "type": "object",
-            "description": "★ v1.4 Stage 3-1 신규. React Suspense / Vue async / Solid Resource 경계 명세.",
+            "description": " v1.4 Stage 3-1 신규. React Suspense / Vue async / Solid Resource 경계 명세.",
             "properties": {
               "enabled": {
                 "type": "boolean",
@@ -252,23 +252,23 @@
     },
     "design_tokens": {
       "type": "object",
-      "description": "디자인 토큰. ★ v1.4 Stage 3-1 — DTCG Design Tokens Format Module 2025.10 (Final Community Group Report) 정합. ADR-FE-005 §2.2.1 + spec URL 고정.",
+      "description": "디자인 토큰. v1.4 Stage 3-1 — DTCG Design Tokens Format Module 2025.10 (Final Community Group Report) 정합. ADR-FE-005 §2.2.1 + spec URL 고정.",
       "properties": {
         "spec_source": {
           "type": "string",
           "format": "uri",
           "default": "https://www.designtokens.org/TR/2025.10/format/",
-          "description": "★ v1.4 신규. DTCG spec URL 고정 (cross-check 1차 사료). ADR-FE-005 §2.2.1 W3C Standard ❌ / Community Group Report 명시."
+          "description": " v1.4 신규. DTCG spec URL 고정 (cross-check 1차 사료). ADR-FE-005 §2.2.1 W3C Standard ❌ / Community Group Report 명시."
         },
         "spec_status": {
           "type": "string",
           "enum": ["w3c_standard", "community_group_report", "draft", "unknown"],
           "default": "community_group_report",
-          "description": "★ v1.4 신규. DTCG = Community Group Report (Standard 아님). ADR-FE-005 §2.2.1 명시 의무."
+          "description": " v1.4 신규. DTCG = Community Group Report (Standard 아님). ADR-FE-005 §2.2.1 명시 의무."
         },
         "uses_dtcg_field_names": {
           "type": "boolean",
-          "description": "★ v1.4 신규. $value (required) / $type (optional) / $description (optional) 사용 여부."
+          "description": " v1.4 신규. $value (required) / $type (optional) / $description (optional) 사용 여부."
         },
         "extracted_from": {
           "type": "array",
@@ -381,11 +381,11 @@
               "needs_planner_review",
               "rejected_planner_note"
             ],
-            "description": "기획자 검토 상태. ★ v1.4 Stage 3-1 — confirmed_with_caveat (조건부 승인) / rejected_planner_note (반려 + 사유) 추가."
+            "description": "기획자 검토 상태. v1.4 Stage 3-1 — confirmed_with_caveat (조건부 승인) / rejected_planner_note (반려 + 사유) 추가."
           },
           "human_review_note": {
             "type": "string",
-            "description": "★ v1.4 Stage 3-1 신규. 기획자 검토 메모 (caveat / rejection 사유 등)."
+            "description": " v1.4 Stage 3-1 신규. 기획자 검토 메모 (caveat / rejection 사유 등)."
           }
         }
       }

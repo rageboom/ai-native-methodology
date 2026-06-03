@@ -26,16 +26,20 @@ allowed-tools: Read, Glob, Grep, Bash
 3. **트랙 분기 신호** — 코드베이스가 BE / FE / DB / 풀스택 중 무엇? 신호 기록 (다음 phase 의 skill 자동 발동 trigger)
 4. **분석 가치 명시** — 사용자에게:
    - 본 방법론은 한 방향 추출기 (legacy → 7대 산출물). round-trip 검증 안 함.
-   - 가치 명세 (CLAUDE.md ★★★) 사용자 확인.
+   - 가치 명세 (CLAUDE.md) 사용자 확인.
 5. **메타 정보 기록** — `<user-project>/.aimd/input.json`:
    ```json
    {
-     "target": { "repo": "...", "commit": "...", "scope": "module-X" },
-     "stack": { "language": "java", "framework": "spring-boot-3", "db": "postgresql" },
-     "tracks": ["BE", "DB"],
-     "baseline_applied": true,
-     "baseline_ref": ".aimd/baseline-2026-05-02.json",
-     "phase_0_completed_at": "..."
+   	"target": { "repo": "...", "commit": "...", "scope": "module-X" },
+   	"stack": {
+   		"language": "java",
+   		"framework": "spring-boot-3",
+   		"db": "postgresql"
+   	},
+   	"tracks": ["BE", "DB"],
+   	"baseline_applied": true,
+   	"baseline_ref": ".aimd/baseline-2026-05-02.json",
+   	"phase_0_completed_at": "..."
    }
    ```
 6. **다음 단계 안내** — `analysis-source-inventory` 호출 권장.
@@ -51,5 +55,5 @@ allowed-tools: Read, Glob, Grep, Bash
 
 ## When NOT to invoke
 
-- ★ 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A — analysis 는 legacy *코드* 가 아니라 *입력* 을 요구).
+- 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A — analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
 - ADR-010 baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.

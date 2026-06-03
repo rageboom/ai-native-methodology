@@ -11,8 +11,8 @@
     "confidence": 0.82,
     "raw_confidence": 0.82,
     "warnings": [
-      "★ chain 1 discovery-from-analysis-output 산출 — analysis stage 11 phase 산출물 종합 / 12 BR + 9 AP + 6 sql_inventory + 2 UC snapshot 흡수",
-      "★ AC reference = chain 2 spec stage 에서 생성 의무 / 본 시점 placeholder AC-XXX-001 1건 per UC (minItems 1 정합)"
+      "chain 1 discovery-from-analysis-output 산출 — analysis stage 11 phase 산출물 종합 / 12 BR + 9 AP + 6 sql_inventory + 2 UC snapshot 흡수",
+      "AC reference = chain 2 spec stage 에서 생성 의무 / 본 시점 placeholder AC-XXX-001 1건 per UC (minItems 1 정합)"
     ]
   },
   "derivation_source": {
@@ -158,7 +158,7 @@
         "대상 차량 active"
       ],
       "postconditions": [
-        "use_yn='N' 또는 STATE='처분' (★ BR-CAR-MGT-003 ambiguous carry)"
+        "use_yn='N' 또는 STATE='처분' (BR-CAR-MGT-003 ambiguous carry)"
       ],
       "acceptance_criteria_refs": [
         "AC-CAR-MGT-005"
@@ -168,12 +168,12 @@
         "BR-CAR-MGT-002",
         "BR-CAR-MGT-003"
       ],
-      "note": "★ ambiguous — '처분' = soft delete (use_yn='N') vs hard delete vs STATE 변경 어느 것인지 domain expert 결단 carry",
+      "note": "ambiguous — '처분' = soft delete (use_yn='N') vs hard delete vs STATE 변경 어느 것인지 domain expert 결단 carry",
       "code_pointers_na": true
     },
     {
       "id": "UC-CAR-COST-001",
-      "name": "★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "name": "차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
       "description": "Admin 이 기간 / 회사 / 사용자 지정 → SGERP SP 호출 (회계전표 row 생성) → IFRS tb_car_cost_slip 등록 (FN_SPLIT 다중 ID)",
       "actors": [
         "Admin"
@@ -195,7 +195,7 @@
         "BR-CAR-COST-003",
         "BR-CAR-COST-006"
       ],
-      "note": "★ cross-DB transaction 보장 ❌ → eventual consistency / impl stage 진입 시 saga 또는 outbox 결단 의무",
+      "note": "cross-DB transaction 보장 ❌ → eventual consistency / impl stage 진입 시 saga 또는 outbox 결단 의무",
       "code_pointers_na": true
     },
     {
@@ -247,7 +247,7 @@
     {
       "id": "UC-CAR-COST-004",
       "name": "비용 합산 시스템 (CostSumSystem)",
-      "description": "Admin 이 회사 단위 비용 합산 view + 저장 (★ admin role + scope ambiguous carry)",
+      "description": "Admin 이 회사 단위 비용 합산 view + 저장 (admin role + scope ambiguous carry)",
       "actors": [
         "Admin"
       ],
@@ -304,7 +304,7 @@
     },
     {
       "br_id": "BR-CAR-MGT-003",
-      "reasoning": "STATE 코드 — 차량 lifecycle 상태 (★ ambiguous / 값 분포 미명시 / 도메인 expert 결단 carry)",
+      "reasoning": "STATE 코드 — 차량 lifecycle 상태 (ambiguous / 값 분포 미명시 / 도메인 expert 결단 carry)",
       "source_grounded_evidence": "source/ddl/tables/TB_CAR.sql (state CHAR(1))"
     },
     {
@@ -329,22 +329,22 @@
     },
     {
       "br_id": "BR-CAR-COST-002",
-      "reasoning": "cost_accept_cd 승인 — saveCarCostAccept MERGE 만 변경 가능 / admin 결정 (★ 값 분포 ambiguous carry)",
+      "reasoning": "cost_accept_cd 승인 — saveCarCostAccept MERGE 만 변경 가능 / admin 결정 (값 분포 ambiguous carry)",
       "source_grounded_evidence": "source/sqlmap/carCost.xml saveCarCostAccept"
     },
     {
       "br_id": "BR-CAR-COST-003",
-      "reasoning": "★ ★ 차량비용 → SGERP 회계전표 IF SP 호출 / cross-DB transaction ❌ → eventual consistency / 본 PoC 핵심 anchor",
+      "reasoning": "차량비용 → SGERP 회계전표 IF SP 호출 / cross-DB transaction ❌ → eventual consistency / 본 PoC 핵심 anchor",
       "source_grounded_evidence": "source/sqlmap/carCost.xml selectCarCostCalculate (procedure CALLABLE) + EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery"
     },
     {
       "br_id": "BR-CAR-COST-004",
-      "reasoning": "NoLog 비용 — 회사 단위 통합 / 별도 aggregate (★ 의미 ambiguous carry)",
+      "reasoning": "NoLog 비용 — 회사 단위 통합 / 별도 aggregate (의미 ambiguous carry)",
       "source_grounded_evidence": "source/ddl/tables/TB_CAR_COST_NOLOG.sql + source/sqlmap/carCost.xml"
     },
     {
       "br_id": "BR-CAR-COST-005",
-      "reasoning": "CostSumSystem 합산 — admin scope (★ admin role ambiguous carry)",
+      "reasoning": "CostSumSystem 합산 — admin scope (admin role ambiguous carry)",
       "source_grounded_evidence": "source/sqlmap/carCost.xml selectCarCostSumSystemList + updateCostSumSystem"
     },
     {
@@ -361,12 +361,12 @@
   ],
   "excluded_antipatterns": [],
   "risks_and_constraints": [
-    "★ ★ ★ AP-API-001 + AP-SEC-001 + AP-FE-001 = critical/high 위험 동시 해소 의무",
-    "★ ★ BR-CAR-COST-003 cross-DB transaction 결단 (saga / outbox / chained TM) 의무",
-    "★ ambiguous 4 BR (STATE / cost_accept_cd / NoLog / CostSumSystem) domain expert 결단 의무",
-    "★ SATD 3건 (임시적용 한국어 + IDE 자동 stub 2건) 처리 의무",
-    "★ 외부 DB 18 object 격리 = strangler fig pattern carry (현 cross-DB join 강결합)",
-    "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = analysis automation 50%대 ceiling (4 PoC corroboration 안정)"
+    "AP-API-001 + AP-SEC-001 + AP-FE-001 = critical/high 위험 동시 해소 의무",
+    "BR-CAR-COST-003 cross-DB transaction 결단 (saga / outbox / chained TM) 의무",
+    "ambiguous 4 BR (STATE / cost_accept_cd / NoLog / CostSumSystem) domain expert 결단 의무",
+    "SATD 3건 (임시적용 한국어 + IDE 자동 stub 2건) 처리 의무",
+    "외부 DB 18 object 격리 = strangler fig pattern carry (현 cross-DB join 강결합)",
+    "R1' axis Spring 4.1 + iBATIS 2 paradigm = analysis automation 50%대 ceiling (4 PoC corroboration 안정)"
   ],
   "cross_links": {
     "to_analysis_artifacts": [

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/migration-cautions.schema.json",
   "title": "마이그레이션 주의사항 (Migration Cautions)",
-  "description": "재구현/이관 시 시스템-specific 주의사항. 산출물 #7' (legacy-only). ★ v12.0.0 — 구 migration-cautions.md(standalone 사람-눈)를 대체하는 json 단일 SSOT (ADR-011 / json-only AX-native). greenfield = caution_groups 빈 배열 + meta.warnings 정당화 N/A.",
+  "description": "재구현/이관 시 시스템-specific 주의사항. 산출물 #7' (legacy-only). v12.0.0 — 구 migration-cautions.md(standalone 사람-눈)를 대체하는 json 단일 SSOT (ADR-011 / json-only AX-native). greenfield = caution_groups 빈 배열 + meta.warnings 정당화 N/A.",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "system_context", "caution_groups"],

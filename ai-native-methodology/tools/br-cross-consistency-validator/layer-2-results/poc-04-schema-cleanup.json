@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 3,
   "poc_id": "poc-04-full-realworld-react",
-  "$comment": "★ ★ session 23차 Sprint 1-H / FE 트랙 schema cleanup. BR ID 는 이미 4토막 valid (rename ❌). schema invalid 원인 4종 보정 — 의미 변경 ❌ / provenance 보존 / additive+type-fix. Sprint 1-A isomorphic (paradigm).",
+  "$comment": "session 23차 Sprint 1-H / FE 트랙 schema cleanup. BR ID 는 이미 4토막 valid (rename ❌). schema invalid 원인 4종 보정 — 의미 변경 ❌ / provenance 보존 / additive+type-fix. Sprint 1-A isomorphic (paradigm).",
   "transformation": {
     "meta_standardized": {
       "from": "비표준 키 (poc_id/stage/sprint/captured_at/captured_by/tool)",

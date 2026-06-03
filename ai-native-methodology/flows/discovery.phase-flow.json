@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ v11.0.0 chain 1 (discovery) phase flow — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 + ★ v9.0 DEC-2026-05-21 (planning→discovery 개칭 + 입력 어댑터 4종 확장) + ★ v11.0.0 DEC-2026-05-26-discovery-spec-rename (산출물명 본격 rename) 정합. analysis stage 산출물 + 외부 입력(swagger/figma/nl-md) → discovery-spec.{json,md} 산출. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
+  "$comment": "v11.0.0 chain 1 (discovery) phase flow — json 단독 SSOT (v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 + v9.0 DEC-2026-05-21 (planning→discovery 개칭 + 입력 어댑터 4종 확장) + v11.0.0 DEC-2026-05-26-discovery-spec-rename (산출물명 본격 rename) 정합. analysis stage 산출물 + 외부 입력(swagger/figma/nl-md) → discovery-spec.{json,md} 산출. v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
   "id": "discovery-phase-flow",
   "version": "3.1.0",
   "stage": "discovery",

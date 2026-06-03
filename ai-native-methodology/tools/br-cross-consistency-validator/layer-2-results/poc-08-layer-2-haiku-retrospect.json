@@ -9,8 +9,8 @@
     { "br_id": "BR-PETSTORE-ACCUPD-002", "semantic_score": 0.96, "rationale": "Optional filter(length>0) = '비번 입력시만 갱신'. 조건부 갱신 정확 매칭.", "confidence": 0.98 },
     { "br_id": "BR-PETSTORE-PRODSRCH-003", "semantic_score": 0.92, "rationale": "keyword split + LIKE = 키워드 분리 부분일치. N+1 = 구현 메커니즘 / 비즈니스 계약 불변.", "confidence": 0.93 },
     { "br_id": "BR-PETSTORE-ORDCRT-004", "semantic_score": 0.94, "rationale": "5단계 단일 트랜잭션 = 원자적 주문생성. 구현 단계 ↔ 원자성 계약 일치.", "confidence": 0.96 },
-    { "br_id": "BR-PETSTORE-ORDQRY-005", "semantic_score": 0.58, "rationale": "★ DRIFT — NL 은 명시적 anti-pattern (is_likely_bug=true) 이나 GWT 는 '순차 개별조회'를 의도된 동작처럼 기술. N+1 = 성능 버그 ≠ 비즈니스 요구. GWT 가 버그를 정상 기능으로 정규화 → 의도 불일치.", "confidence": 0.89 },
-    { "br_id": "BR-PETSTORE-PASSWD-006", "semantic_score": 0.55, "rationale": "★ CRITICAL DRIFT — NL 은 is_intent=false / is_likely_bug=true (보안 취약점). GWT 가 '평문 저장+비교' 보안 결함을 intentional 기능처럼 정규화. 비즈니스 의도 근본 상충.", "confidence": 0.91 },
+    { "br_id": "BR-PETSTORE-ORDQRY-005", "semantic_score": 0.58, "rationale": "DRIFT — NL 은 명시적 anti-pattern (is_likely_bug=true) 이나 GWT 는 '순차 개별조회'를 의도된 동작처럼 기술. N+1 = 성능 버그 ≠ 비즈니스 요구. GWT 가 버그를 정상 기능으로 정규화 → 의도 불일치.", "confidence": 0.89 },
+    { "br_id": "BR-PETSTORE-PASSWD-006", "semantic_score": 0.55, "rationale": "CRITICAL DRIFT — NL 은 is_intent=false / is_likely_bug=true (보안 취약점). GWT 가 '평문 저장+비교' 보안 결함을 intentional 기능처럼 정규화. 비즈니스 의도 근본 상충.", "confidence": 0.91 },
     { "br_id": "BR-PETSTORE-BANNER-007", "semantic_score": 0.95, "rationale": "favcategory→bannername = 선호 기반 배너 개인화. 구현 ↔ 비즈니스 정확 대응.", "confidence": 0.96 },
     { "br_id": "BR-PETSTORE-SEQMGR-008", "semantic_score": 0.81, "rationale": "자체 sequence(multi-RDBMS) + race risk ↔ GWT 별도 테이블 채번+중복위험. 트레이드오프 양쪽 인정 / 주요 의도(다중DB 호환) vs 부수 우려(race) 가중치 부분 편차.", "confidence": 0.85 }
   ],
@@ -21,5 +21,5 @@
     "below_0.7_count": 2,
     "below_0.7_brs": ["BR-PETSTORE-ORDQRY-005", "BR-PETSTORE-PASSWD-006"]
   },
-  "cross_validation_notes": "★ ★ ★ blind retrospect / Sonnet 미열람. ★ 2 critical drift 검출: BR-PETSTORE-ORDQRY-005 (N+1 anti-pattern 정규화) + BR-PETSTORE-PASSWD-006 (보안 버그 정규화). 두 BR 모두 metadata is_intent=false / is_likely_bug=true 인데 Sprint 2 GWT 합성(Sonnet 4.6)이 이를 무시하고 의도적 기능처럼 재기술. 동일 모델 Sonnet Layer 2 = 미검출 (echo chamber) / Haiku blind = 검출. ★ ★ industry-first paradigm 본격 입증 — same-model self-eval bias 정량 + Adzic SBE 함정 회피. rules.json schema §6 (intent_vs_bug_classification) → GWT 합성 시 분류 보존 강화 대상 식별 (Phase D 도메인 검토 carry)."
+  "cross_validation_notes": "blind retrospect / Sonnet 미열람. 2 critical drift 검출: BR-PETSTORE-ORDQRY-005 (N+1 anti-pattern 정규화) + BR-PETSTORE-PASSWD-006 (보안 버그 정규화). 두 BR 모두 metadata is_intent=false / is_likely_bug=true 인데 Sprint 2 GWT 합성(Sonnet 4.6)이 이를 무시하고 의도적 기능처럼 재기술. 동일 모델 Sonnet Layer 2 = 미검출 (echo chamber) / Haiku blind = 검출. industry-first paradigm 본격 입증 — same-model self-eval bias 정량 + Adzic SBE 함정 회피. rules.json schema §6 (intent_vs_bug_classification) → GWT 합성 시 분류 보존 강화 대상 식별 (Phase D 도메인 검토 carry)."
 }

@@ -17,7 +17,7 @@ import { createHash } from 'node:crypto';
  * }
  *
  * 정규화 절차:
- *   1. test_names — sort 알파벳 ascending (★ order 비결정 차단)
+ *   1. test_names — sort 알파벳 ascending (order 비결정 차단)
  *   2. join with '\n'
  *   3. + '\n' + pass:fail:skip
  *   4. + '\n' + framework:framework_version
@@ -25,22 +25,30 @@ import { createHash } from 'node:crypto';
  *
  * 절대경로 / timestamp / duration_ms / random seed → 입력 ❌.
  */
-export function computeResultHash({ test_names, pass_count, fail_count, skip_count, framework, framework_version }) {
-  if (!Array.isArray(test_names)) {
-    throw new TypeError('test_names must be array');
-  }
-  for (const tn of test_names) {
-    if (typeof tn !== 'string') throw new TypeError(`test_names entry must be string: ${tn}`);
-  }
+export function computeResultHash({
+	test_names,
+	pass_count,
+	fail_count,
+	skip_count,
+	framework,
+	framework_version,
+}) {
+	if (!Array.isArray(test_names)) {
+		throw new TypeError('test_names must be array');
+	}
+	for (const tn of test_names) {
+		if (typeof tn !== 'string')
+			throw new TypeError(`test_names entry must be string: ${tn}`);
+	}
 
-  const sorted = [...test_names].sort();
-  const lines = [
-    sorted.join('\n'),
-    `${pass_count}:${fail_count}:${skip_count}`,
-    `${framework}:${framework_version ?? 'unknown'}`,
-  ].join('\n');
+	const sorted = [...test_names].sort();
+	const lines = [
+		sorted.join('\n'),
+		`${pass_count}:${fail_count}:${skip_count}`,
+		`${framework}:${framework_version ?? 'unknown'}`,
+	].join('\n');
 
-  return 'sha256:' + createHash('sha256').update(lines, 'utf-8').digest('hex');
+	return 'sha256:' + createHash('sha256').update(lines, 'utf-8').digest('hex');
 }
 
 /**
@@ -48,7 +56,7 @@ export function computeResultHash({ test_names, pass_count, fail_count, skip_cou
  * 본 도구의 invariant 입증용 (CI dry-run / unit test).
  */
 export function isDeterministic(input1, input2) {
-  return computeResultHash(input1) === computeResultHash(input2);
+	return computeResultHash(input1) === computeResultHash(input2);
 }
 
 /**
@@ -56,13 +64,13 @@ export function isDeterministic(input1, input2) {
  * 절대경로 → relative / timestamps → null / random seed → null.
  */
 export function normalizeForHash(raw) {
-  const cleaned = {
-    test_names: raw.test_names ?? [],
-    pass_count: Number(raw.pass_count ?? 0),
-    fail_count: Number(raw.fail_count ?? 0),
-    skip_count: Number(raw.skip_count ?? 0),
-    framework: String(raw.framework ?? 'unknown'),
-    framework_version: String(raw.framework_version ?? 'unknown'),
-  };
-  return cleaned;
+	const cleaned = {
+		test_names: raw.test_names ?? [],
+		pass_count: Number(raw.pass_count ?? 0),
+		fail_count: Number(raw.fail_count ?? 0),
+		skip_count: Number(raw.skip_count ?? 0),
+		framework: String(raw.framework ?? 'unknown'),
+		framework_version: String(raw.framework_version ?? 'unknown'),
+	};
+	return cleaned;
 }

@@ -9,8 +9,8 @@
     "confidence": 0.5,
     "raw_confidence": 0.5,
     "warnings": [
-      "★ Playwright / Storybook 실 실행 ❌ — Scenario C (JSP) / 본 PoC 환경 가용 ❌",
-      "★ snapshots 빈 array — no-simulation 정합 / 시뮬 ❌ / impl stage 또는 사용자 환경에서 실 실행 carry"
+      "Playwright / Storybook 실 실행 ❌ — Scenario C (JSP) / 본 PoC 환경 가용 ❌",
+      "snapshots 빈 array — no-simulation 정합 / 시뮬 ❌ / impl stage 또는 사용자 환경에서 실 실행 carry"
     ],
     "related_chain_ids": [
       "AC-CAR-MGT-001",
@@ -24,7 +24,7 @@
     "captured_count": 0,
     "simulated_count": 0,
     "carry_count": 14,
-    "note": "★ 14 JSP all carry — Playwright 미실행 (no-simulation 정합) / Modern 마이그레이션 시 visual regression 의무",
+    "note": "14 JSP all carry — Playwright 미실행 (no-simulation 정합) / Modern 마이그레이션 시 visual regression 의무",
     "baseline_count": 0,
     "drift_count": 0
   },

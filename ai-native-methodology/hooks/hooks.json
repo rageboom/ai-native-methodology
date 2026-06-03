@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver hooks 통합. ADR-CHAIN-005 §3 (mechanical gate trio (iii)) + §4 (D21' suppressOutput=true / stderr only) 정합. UserPromptSubmit + PreToolUse + SessionStart 3 event 활용. ★ ★ ★ v4.0 (DEC-2026-05-17-v4-multi-agent-paradigm-채택): hooks-bridge 가 stage 별 agent dispatch 권고 동봉 (TRIGGER_PATTERNS 의 agentId 매핑). main agent = orchestrator + Task tool 로 stage agent dispatch paradigm.",
+  "$comment": "v2.0 sub-plan-5 — chain harness driver hooks 통합. ADR-CHAIN-005 §3 (mechanical gate trio (iii)) + §4 (D21' suppressOutput=true / stderr only) 정합. UserPromptSubmit + PreToolUse + SessionStart 3 event 활용. v4.0 (DEC-2026-05-17-v4-multi-agent-paradigm-채택): hooks-bridge 가 stage 별 agent dispatch 권고 동봉 (TRIGGER_PATTERNS 의 agentId 매핑). main agent = orchestrator + Task tool 로 stage agent dispatch paradigm.",
   "hooks": {
     "SessionStart": [
       {
@@ -8,7 +8,7 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
             "statusMessage": "Loading AI-Native methodology context (G3 drift check + scope manifest recover)...",
-            "$comment": "★ G3 R5/R7 (v3.2) — SessionStart hook 가 recoverTmpFiles + markDrift (M4 자동 drift 감지). drift_detected=true scope 있으면 stderr 로 사용자 안내. additionalContext 에도 동봉."
+            "$comment": "G3 R5/R7 (v3.2) — SessionStart hook 가 recoverTmpFiles + markDrift (M4 자동 drift 감지). drift_detected=true scope 있으면 stderr 로 사용자 안내. additionalContext 에도 동봉."
           },
           {
             "type": "command",
@@ -26,7 +26,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "★ D21' 정합 — suppressOutput=true 응답 + stderr 만 사용자 콘솔 노출. additionalContext 에 'LLM SHALL NOT auto-invoke' 차단 문구 동봉. LLM 양심 의존 회피."
+            "$comment": "D21' 정합 — suppressOutput=true 응답 + stderr 만 사용자 콘솔 노출. additionalContext 에 'LLM SHALL NOT auto-invoke' 차단 문구 동봉. LLM 양심 의존 회피."
           }
         ]
       }
@@ -38,7 +38,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "★ ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .aimd/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — mcp__wiki-jira-assistant__.* (jira-confluence MCP) 호출도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
+            "$comment": "ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .aimd/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — mcp__wiki-jira-assistant__.* (jira-confluence MCP) 호출도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
           }
         ]
       }
@@ -50,7 +50,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "★ dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.aimd/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
+            "$comment": "dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.aimd/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
           }
         ]
       }

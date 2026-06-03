@@ -26,7 +26,7 @@ REST API 표면 → OpenAPI 3.x spec.
 3. **path / query / body / header parameter** 분류
 4. **status code + error response** 명세
 5. **openapi.yaml 작성** — `templates/analysis/openapi.template.yaml` 기반. ADR-007 부재 → `openapi-extension.schema.json` 활용 (custom extension)
-6. **spectral-runner 자동 호출** — OpenAPI 정합 검증 (★ no-simulation 정책 첫 실현 단계 — ADR-009 단계 5 도구 실 실행 evidence)
+6. **spectral-runner 자동 호출** — OpenAPI 정합 검증 ( no-simulation 정책 첫 실현 단계 — ADR-009 단계 5 도구 실 실행 evidence)
 7. **rules / domain cross-link** — phase-5-rules 에서 사용
 
 ## 산출물

@@ -15,14 +15,14 @@
 
 ## 2. 실 `.codegraph` DB probe (no-sim / Senior 선결 점검 / 본 세션 직접)
 
-| 도메인 | DB | class | interface | method | function | qn 예시 |
-|---|---|---|---|---|---|---|
-| RealWorld (Spring Java) | `spring-boot-realworld-example-app/.codegraph/codegraph.db` | 141 | 16 | 415 | 0 | `io.spring.core.article::ArticleRepository` / `Pkg::Class::method` |
-| ecommerce (NestJS TS) | `ecommerce-backend/src/.codegraph/codegraph.db` | 66 | 1 | 189 | 7 | `AccessJwtAuthGuard::canActivate` / `AppModule` |
+| 도메인                  | DB                                                          | class | interface | method | function | qn 예시                                                            |
+| ----------------------- | ----------------------------------------------------------- | ----- | --------- | ------ | -------- | ------------------------------------------------------------------ |
+| RealWorld (Spring Java) | `spring-boot-realworld-example-app/.codegraph/codegraph.db` | 141   | 16        | 415    | 0        | `io.spring.core.article::ArticleRepository` / `Pkg::Class::method` |
+| ecommerce (NestJS TS)   | `ecommerce-backend/src/.codegraph/codegraph.db`             | 66    | 1         | 189    | 7        | `AccessJwtAuthGuard::canActivate` / `AppModule`                    |
 
 - **결론**: 양 도메인 class/method 풍부 → probe true-positive arm(실존 심볼) 충분. 2-도메인 mechanism corroboration 가능.
-- ★ **정규화 nuance (설계 디테일)**: `normalizeSymbol` 은 끝 2 세그먼트 → Java `io.spring.core.article::ArticleRepository` → `article.ArticleRepository`. ast_symbol 앵커가 `ArticleRepository`(1seg) 면 mismatch / `ArticleRepository.findById` 면 match. → codegraph 심볼 Set 을 **정규화 qn + bare name 둘 다**로 빌드해야 class-level 앵커도 매칭. (해결 가능 / 시행 시 반영.)
-- ★ ecommerce DB 경로 = `.../src/.codegraph/...` (src-relative / STEP 3 경로차 동일).
+- **정규화 nuance (설계 디테일)**: `normalizeSymbol` 은 끝 2 세그먼트 → Java `io.spring.core.article::ArticleRepository` → `article.ArticleRepository`. ast_symbol 앵커가 `ArticleRepository`(1seg) 면 mismatch / `ArticleRepository.findById` 면 match. → codegraph 심볼 Set 을 **정규화 qn + bare name 둘 다**로 빌드해야 class-level 앵커도 매칭. (해결 가능 / 시행 시 반영.)
+- ecommerce DB 경로 = `.../src/.codegraph/...` (src-relative / STEP 3 경로차 동일).
 
 ## 3. 업계 (cautious — defer-until-burden 신호)
 
@@ -36,17 +36,19 @@
 ## 4. Senior 적대 (REVISE → 4-A minimal / 신뢰도 0.84)
 
 4 plan 주장 전부 실소스 검증 (no-sim):
+
 1. negative-space 정확 (`validator.js:204` symbol 검증 외부 = warn-only) — 진짜 wiring.
 2. 스키마 완비(code-pointer) = 스키마 아닌 메커니즘 문제 = plus(drift 표면 0).
 3. `collect.js:14` symbol 평탄화 = provenance 소실 = `collectSymbolAnchors` 진짜 net-new.
 4. **federator `symbolsInFile`(federator.js:233,476) = (α) 거의 정확 중복** / Windows-fix(v12.0.1) 됨.
 
 판정:
-- **Q1 fork → 4-A** (β verify), NOT 4-B/4-C-default. ★ **4-C(defer)는 "다른 방향의 부정직"** — validator.js:204 symbol-blind 공백은 **앵커 수와 무관하게 오늘 실재**하고 STEP 5/6 이 안 채움.
-- **Q2 vacuous → real-symbol probe = 정당 corroboration** (STEP1 route 0/19 동형 / 실 CLI+실 DB no-sim). ★ 단 "§8.1 2-도메인 data-corroborated"라 STEP1~3 처럼 말하면 **부정직** → **mechanism-corroboration only / in-the-wild stale=0 unverified** 로 표기. **최대 정직 리스크 — gate flag.**
-- **Q3 jurisdiction → (α) = federator/navigate 소관, 이미 구현. codegraph-coverage 에 (α) 지으면 잘못된 집 = 재작업 + 심볼열거 코드 2벌. ★ (α) 전면 cut → 4-B·4-D 도 동반 소멸.**
+
+- **Q1 fork → 4-A** (β verify), NOT 4-B/4-C-default. **4-C(defer)는 "다른 방향의 부정직"** — validator.js:204 symbol-blind 공백은 **앵커 수와 무관하게 오늘 실재**하고 STEP 5/6 이 안 채움.
+- **Q2 vacuous → real-symbol probe = 정당 corroboration** (STEP1 route 0/19 동형 / 실 CLI+실 DB no-sim). 단 "§8.1 2-도메인 data-corroborated"라 STEP1~3 처럼 말하면 **부정직** → **mechanism-corroboration only / in-the-wild stale=0 unverified** 로 표기. **최대 정직 리스크 — gate flag.**
+- **Q3 jurisdiction → (α) = federator/navigate 소관, 이미 구현. codegraph-coverage 에 (α) 지으면 잘못된 집 = 재작업 + 심볼열거 코드 2벌. (α) 전면 cut → 4-B·4-D 도 동반 소멸.**
 - **Q4 scope → 6산출물→1축(`--verify-anchors`)**. carry: (α)제안·(γ)skill emit·traceability dead-cell·artifact-graph blast-radius. 칼날 trajectory 6→1 정합.
-- **Q5 check37 → STEP3 4-part isomorphic 충분 + informational_notes split verbatim 재사용. ★ 추가: `--verify-anchors` 리포트가 `REQUIRED_VALIDATORS_PER_STAGE` 미등록임을 가드에 명시**(plan §6.7 누락).
+- **Q5 check37 → STEP3 4-part isomorphic 충분 + informational_notes split verbatim 재사용. 추가: `--verify-anchors` 리포트가 `REQUIRED_VALIDATORS_PER_STAGE` 미등록임을 가드에 명시**(plan §6.7 누락).
 
 ## 5. 수렴 결론 (gate #3 입력)
 
@@ -57,5 +59,6 @@
 - **trust**: check37 4-part isomorphic + REQUIRED_VALIDATORS_PER_STAGE 미등록 가드.
 
 ## 6. Lessons (research 단계)
+
 - STEP 4 ≠ STEP 1~3 역방향 복붙. 실데이터(ast_symbol=0) + 소관(federator α 중복) 이 scope 를 1축으로 강제.
 - 업계는 함수단위 추적성 자동화에 신중(defer 신호) / Senior 는 validator 공백의 즉시성 강조 → gate 가 do-now vs defer 를 정직히 분기.

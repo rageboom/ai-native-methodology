@@ -2,148 +2,195 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  evaluateGate, applyUserDecision, requiredValidators,
+	evaluateGate,
+	applyUserDecision,
+	requiredValidators,
 } from '../src/gate-eval.js';
 
 describe('gate-eval', () => {
-  it('clean findings → not blocked', () => {
-    const r = evaluateGate('spec', { critical: 0, high: 0, medium: 0 });
-    assert.equal(r.blocked, false);
-  });
+	it('clean findings → not blocked', () => {
+		const r = evaluateGate('spec', { critical: 0, high: 0, medium: 0 });
+		assert.equal(r.blocked, false);
+	});
 
-  it('critical finding → blocked with validator_critical reason', () => {
-    const r = evaluateGate('spec', { critical: 1, high: 0 });
-    assert.equal(r.blocked, true);
-    assert.equal(r.primary_reason, 'validator_critical');
-  });
+	it('critical finding → blocked with validator_critical reason', () => {
+		const r = evaluateGate('spec', { critical: 1, high: 0 });
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'validator_critical');
+	});
 
-  it('coverage below threshold → blocked', () => {
-    const r = evaluateGate('spec', { critical: 0, high: 0, coverage_pct: 0.7, coverage_threshold: 0.85 });
-    assert.equal(r.blocked, true);
-    assert.equal(r.primary_reason, 'coverage_threshold');
-  });
+	it('coverage below threshold → blocked', () => {
+		const r = evaluateGate('spec', {
+			critical: 0,
+			high: 0,
+			coverage_pct: 0.7,
+			coverage_threshold: 0.85,
+		});
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'coverage_threshold');
+	});
 
-  it('evidence_missing → blocked with evidence_missing', () => {
-    const r = evaluateGate('test', { critical: 0, high: 0, evidence_missing: ['stdout_path'] });
-    assert.equal(r.blocked, true);
-    assert.equal(r.primary_reason, 'evidence_missing');
-  });
+	it('evidence_missing → blocked with evidence_missing', () => {
+		const r = evaluateGate('test', {
+			critical: 0,
+			high: 0,
+			evidence_missing: ['stdout_path'],
+		});
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'evidence_missing');
+	});
 
-  it('chain test stage with all_pass → blocked (RED proof missing)', () => {
-    const r = evaluateGate('test', { critical: 0, high: 0, tests_total: 100, tests_failed: 0 });
-    assert.equal(r.blocked, true);
-    assert.match(r.reasons[0].detail, /RED/);
-  });
+	it('chain test stage with all_pass → blocked (RED proof missing)', () => {
+		const r = evaluateGate('test', {
+			critical: 0,
+			high: 0,
+			tests_total: 100,
+			tests_failed: 0,
+		});
+		assert.equal(r.blocked, true);
+		assert.match(r.reasons[0].detail, /RED/);
+	});
 
-  it('chain implement stage with failing tests → blocked (GREEN missing)', () => {
-    const r = evaluateGate('implement', { critical: 0, high: 0, tests_total: 100, tests_failed: 5 });
-    assert.equal(r.blocked, true);
-    assert.match(r.reasons[0].detail, /GREEN/);
-  });
+	it('chain implement stage with failing tests → blocked (GREEN missing)', () => {
+		const r = evaluateGate('implement', {
+			critical: 0,
+			high: 0,
+			tests_total: 100,
+			tests_failed: 5,
+		});
+		assert.equal(r.blocked, true);
+		assert.match(r.reasons[0].detail, /GREEN/);
+	});
 
-  it('user go on critical → still blocked (Auto Mode override rejected)', () => {
-    const gateResult = evaluateGate('spec', { critical: 2 });
-    const final = applyUserDecision(gateResult, 'go');
-    assert.equal(final.blocked, true);
-    assert.equal(final.user_override_rejected, true);
-  });
+	it('user go on critical → still blocked (Auto Mode override rejected)', () => {
+		const gateResult = evaluateGate('spec', { critical: 2 });
+		const final = applyUserDecision(gateResult, 'go');
+		assert.equal(final.blocked, true);
+		assert.equal(final.user_override_rejected, true);
+	});
 
-  it('user go on medium-only → unblocked with warnings', () => {
-    const gateResult = evaluateGate('spec', { critical: 0, high: 0, medium: 3 });
-    // medium alone → not blocked at gate-eval level
-    assert.equal(gateResult.blocked, false);
-    const final = applyUserDecision(gateResult, 'go');
-    assert.equal(final.blocked, false);
-  });
+	it('user go on medium-only → unblocked with warnings', () => {
+		const gateResult = evaluateGate('spec', {
+			critical: 0,
+			high: 0,
+			medium: 3,
+		});
+		// medium alone → not blocked at gate-eval level
+		assert.equal(gateResult.blocked, false);
+		const final = applyUserDecision(gateResult, 'go');
+		assert.equal(final.blocked, false);
+	});
 
-  it('user stop → blocked decision=stop', () => {
-    const gateResult = evaluateGate('discovery', { critical: 0, high: 0 });
-    const final = applyUserDecision(gateResult, 'stop');
-    assert.equal(final.blocked, true);
-    assert.equal(final.decision, 'stop');
-  });
+	it('user stop → blocked decision=stop', () => {
+		const gateResult = evaluateGate('discovery', { critical: 0, high: 0 });
+		const final = applyUserDecision(gateResult, 'stop');
+		assert.equal(final.blocked, true);
+		assert.equal(final.decision, 'stop');
+	});
 
-  it('requiredValidators returns canonical list per stage', () => {
-    assert.ok(requiredValidators('discovery').includes('discovery-extraction-validator'));
-    assert.ok(requiredValidators('test').includes('test-impl-pass-validator'));
-    assert.deepEqual(requiredValidators('unknown'), []);
-  });
+	it('requiredValidators returns canonical list per stage', () => {
+		assert.ok(
+			requiredValidators('discovery').includes(
+				'discovery-extraction-validator',
+			),
+		);
+		assert.ok(requiredValidators('test').includes('test-impl-pass-validator'));
+		assert.deepEqual(requiredValidators('unknown'), []);
+	});
 
-  // ★ v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2)
-  it('★ v9.1.x: requiredValidators(plan) includes plan-coverage-validator + schema-validator', () => {
-    const r = requiredValidators('plan');
-    assert.ok(r.includes('plan-coverage-validator'));
-    assert.ok(r.includes('schema-validator'));
-    assert.equal(r.length, 2);
-  });
+	// v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2)
+	it('v9.1.x: requiredValidators(plan) includes plan-coverage-validator + schema-validator', () => {
+		const r = requiredValidators('plan');
+		assert.ok(r.includes('plan-coverage-validator'));
+		assert.ok(r.includes('schema-validator'));
+		assert.equal(r.length, 2);
+	});
 
-  // ★ ★ ★ ★ ★ v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm test (★ Q-S1+S2+S3 결단 정합)
+	// v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm test (Q-S1+S2+S3 결단 정합)
 
-  it('★ v2.5.0 Phase C: llm_status=skipped → block 없음 (backward-compat)', () => {
-    const r = evaluateGate('discovery', {
-      critical: 0, high: 0,
-      llm_consistency_score: null,
-      llm_threshold: 0.7,
-      llm_status: 'skipped',
-    });
-    assert.equal(r.blocked, false);
-  });
+	it('v2.5.0 Phase C: llm_status=skipped → block 없음 (backward-compat)', () => {
+		const r = evaluateGate('discovery', {
+			critical: 0,
+			high: 0,
+			llm_consistency_score: null,
+			llm_threshold: 0.7,
+			llm_status: 'skipped',
+		});
+		assert.equal(r.blocked, false);
+	});
 
-  it('★ v2.5.0 Phase C: llm_status=evaluated + score >= threshold → block 없음 (pass)', () => {
-    const r = evaluateGate('discovery', {
-      critical: 0, high: 0,
-      llm_consistency_score: 0.85,
-      llm_threshold: 0.7,
-      llm_status: 'evaluated',
-    });
-    assert.equal(r.blocked, false);
-  });
+	it('v2.5.0 Phase C: llm_status=evaluated + score >= threshold → block 없음 (pass)', () => {
+		const r = evaluateGate('discovery', {
+			critical: 0,
+			high: 0,
+			llm_consistency_score: 0.85,
+			llm_threshold: 0.7,
+			llm_status: 'evaluated',
+		});
+		assert.equal(r.blocked, false);
+	});
 
-  it('★ v2.5.0 Phase C: llm_status=evaluated + score < threshold → block with layer2_threshold', () => {
-    const r = evaluateGate('discovery', {
-      critical: 0, high: 0,
-      llm_consistency_score: 0.65,
-      llm_threshold: 0.7,
-      llm_status: 'evaluated',
-    });
-    assert.equal(r.blocked, true);
-    assert.equal(r.primary_reason, 'layer2_threshold');
-    assert.ok(r.reasons[0].detail.includes('0.65'));
-    assert.ok(r.reasons[0].detail.includes('0.7'));
-  });
+	it('v2.5.0 Phase C: llm_status=evaluated + score < threshold → block with layer2_threshold', () => {
+		const r = evaluateGate('discovery', {
+			critical: 0,
+			high: 0,
+			llm_consistency_score: 0.65,
+			llm_threshold: 0.7,
+			llm_status: 'evaluated',
+		});
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'layer2_threshold');
+		assert.ok(r.reasons[0].detail.includes('0.65'));
+		assert.ok(r.reasons[0].detail.includes('0.7'));
+	});
 
-  it('★ v2.5.0 Phase C: layer2_threshold + user go → go-with-warnings (★ semantic drift Phase D carry)', () => {
-    const gateResult = evaluateGate('discovery', {
-      critical: 0, high: 0,
-      llm_consistency_score: 0.65,
-      llm_threshold: 0.7,
-      llm_status: 'evaluated',
-    });
-    assert.equal(gateResult.blocked, true);
-    assert.equal(gateResult.primary_reason, 'layer2_threshold');
-    const final = applyUserDecision(gateResult, 'go');
-    assert.equal(final.blocked, false);
-    assert.equal(final.decision, 'go-with-warnings');
-  });
+	it('v2.5.0 Phase C: layer2_threshold + user go → go-with-warnings (semantic drift Phase D carry)', () => {
+		const gateResult = evaluateGate('discovery', {
+			critical: 0,
+			high: 0,
+			llm_consistency_score: 0.65,
+			llm_threshold: 0.7,
+			llm_status: 'evaluated',
+		});
+		assert.equal(gateResult.blocked, true);
+		assert.equal(gateResult.primary_reason, 'layer2_threshold');
+		const final = applyUserDecision(gateResult, 'go');
+		assert.equal(final.blocked, false);
+		assert.equal(final.decision, 'go-with-warnings');
+	});
 
-  // ★ ★ ★ F-AUDIT-SOFTGATE-001 (=C-13 해소 / 2026-05-31) — findings 미제출 fail-closed (no-simulation / 양심 의존 차단)
-  it('★ F-AUDIT-SOFTGATE-001: __findings_absent → blocked with findings_unverified (fail-closed / silent soft-pass 제거)', () => {
-    const r = evaluateGate('discovery', { __findings_absent: true, critical: 0, high: 0, medium: 0, low: 0, info: 0 });
-    assert.equal(r.blocked, true);
-    assert.equal(r.primary_reason, 'findings_unverified');
-  });
+	// F-AUDIT-SOFTGATE-001 (=C-13 해소 / 2026-05-31) — findings 미제출 fail-closed (no-simulation / 양심 의존 차단)
+	it('F-AUDIT-SOFTGATE-001: __findings_absent → blocked with findings_unverified (fail-closed / silent soft-pass 제거)', () => {
+		const r = evaluateGate('discovery', {
+			__findings_absent: true,
+			critical: 0,
+			high: 0,
+			medium: 0,
+			low: 0,
+			info: 0,
+		});
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'findings_unverified');
+	});
 
-  it('★ F-AUDIT-SOFTGATE-001: __findings_absent + user go → go-with-warnings (명시 ack escape / rank 2 overridable)', () => {
-    const gateResult = evaluateGate('discovery', { __findings_absent: true, critical: 0, high: 0, medium: 0, low: 0, info: 0 });
-    assert.equal(gateResult.blocked, true);
-    assert.equal(gateResult.primary_reason, 'findings_unverified');
-    const final = applyUserDecision(gateResult, 'go');
-    assert.equal(final.blocked, false);
-    assert.equal(final.decision, 'go-with-warnings');
-  });
+	it('F-AUDIT-SOFTGATE-001: __findings_absent + user go → go-with-warnings (명시 ack escape / rank 2 overridable)', () => {
+		const gateResult = evaluateGate('discovery', {
+			__findings_absent: true,
+			critical: 0,
+			high: 0,
+			medium: 0,
+			low: 0,
+			info: 0,
+		});
+		assert.equal(gateResult.blocked, true);
+		assert.equal(gateResult.primary_reason, 'findings_unverified');
+		const final = applyUserDecision(gateResult, 'go');
+		assert.equal(final.blocked, false);
+		assert.equal(final.decision, 'go-with-warnings');
+	});
 
-  it('★ F-AUDIT-SOFTGATE-001: 명시 findings 객체(sentinel 없음)는 영향 없음 — backward-compat (regression)', () => {
-    const r = evaluateGate('spec', { critical: 0, high: 0, medium: 0 });
-    assert.equal(r.blocked, false);
-  });
+	it('F-AUDIT-SOFTGATE-001: 명시 findings 객체(sentinel 없음)는 영향 없음 — backward-compat (regression)', () => {
+		const r = evaluateGate('spec', { critical: 0, high: 0, medium: 0 });
+		assert.equal(r.blocked, false);
+	});
 });

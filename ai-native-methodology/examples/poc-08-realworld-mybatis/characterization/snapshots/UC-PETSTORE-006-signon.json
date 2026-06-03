@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-006 로그인 (★ ★ ★ 평문 password 비교 / BR-PETSTORE-PASSWD-006 / AP-PETSTORE-004 critical bug).",
+  "$comment": " phase 4.7 golden snapshot — UC-PETSTORE-006 로그인 ( 평문 password 비교 / BR-PETSTORE-PASSWD-006 / AP-PETSTORE-004 critical bug).",
   "snapshot_id": "SNAP-UC-PETSTORE-006",
   "use_case": "UC-PETSTORE-006",
   "endpoint": "POST /account/signon.action (Stripes convention)",
@@ -7,14 +7,14 @@
   "service_method": "AccountService.getAccount(username, password)",
   "sql_id": "AccountMapper.getAccountByUsernameAndPassword",
   "layer": "integration",
-  "data_source_status": "★ HSQLDB test data — AccountMapperTest 존재",
+  "data_source_status": " HSQLDB test data — AccountMapperTest 존재",
   "scenarios": [
     {
       "id": "SCN-PETSTORE-006-001",
       "name": "happy path — 정확한 username/password 로 로그인",
       "given": {
         "request_params": { "username": "j2ee", "password": "j2ee" },
-        "ACCOUNT_state": "USERID='j2ee' 존재 + SIGNON.USERNAME='j2ee' / PASSWORD='j2ee' (★ ★ 평문)"
+        "ACCOUNT_state": "USERID='j2ee' 존재 + SIGNON.USERNAME='j2ee' / PASSWORD='j2ee' ( 평문)"
       },
       "when": "AccountActionBean.signon() → AccountService.getAccount('j2ee', 'j2ee') → SQL: SELECT ... WHERE ACCOUNT.USERID = #{param1} AND SIGNON.PASSWORD = #{param2}",
       "then": {
@@ -22,10 +22,10 @@
         "expected_session_state": "session.authenticated=true / account=Account(j2ee, ...)"
       },
       "intent_classification": [
-        { "rule": "BR-PETSTORE-PASSWD-006", "type": "bug", "note": "★ ★ ★ 평문 password 비교 (AP-PETSTORE-004) — 보안 critical" }
+        { "rule": "BR-PETSTORE-PASSWD-006", "type": "bug", "note": " 평문 password 비교 (AP-PETSTORE-004) — 보안 critical" }
       ],
       "behavior_likely_bug": [
-        "★ ★ ★ AP-PETSTORE-004 — 평문 password 비교 (해시 ❌) — production 차단 의무"
+        " AP-PETSTORE-004 — 평문 password 비교 (해시 ❌) — production 차단 의무"
       ]
     },
     {

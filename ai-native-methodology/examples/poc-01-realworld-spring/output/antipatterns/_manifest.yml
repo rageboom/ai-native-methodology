@@ -1,43 +1,43 @@
 manifest:
-  generated_at: "2026-04-29"
-  poc_id: "poc-01-realworld-spring"
-  phase: "6"
-  phase_name: "quality (안티패턴 통합)"
-  methodology_version: "v1.1.2"
+  generated_at: '2026-04-29'
+  poc_id: 'poc-01-realworld-spring'
+  phase: '6'
+  phase_name: 'quality (안티패턴 통합)'
+  methodology_version: 'v1.1.2'
 
 # 상위 phase 인계
 phase_4_input:
-  source: "../antipatterns-partial/_manifest.yml + ../domain/_manifest.yml + ../rules/_manifest.yml"
-  consistency: "Phase 4 partial 6 AP → 결정적 통합 ✅. UC 25 / BR 13 / 모든 AP 의 related_rules → rules.json 100% 매칭."
+  source: '../antipatterns-partial/_manifest.yml + ../domain/_manifest.yml + ../rules/_manifest.yml'
+  consistency: 'Phase 4 partial 6 AP → 결정적 통합 ✅. UC 25 / BR 13 / 모든 AP 의 related_rules → rules.json 100% 매칭.'
 phase_5_input:
-  source: "../api/_manifest.yml"
-  consistency: "Phase 5 candidate 6 AP → 정규화 + Phase 6 final 통합 ✅. operationId 매핑 일치."
+  source: '../api/_manifest.yml'
+  consistency: 'Phase 5 candidate 6 AP → 정규화 + Phase 6 final 통합 ✅. operationId 매핑 일치.'
 phase_4_additional_candidate_input:
-  source: "../antipatterns-partial/antipatterns-partial.json _phase_4_partial_meta.phase_6_additional_candidates"
-  consistency: "Phase 4 추가 candidate 3 AP (EAGER N+1 / F-017 / F-028) → Phase 6 final 추가 ✅"
+  source: '../antipatterns-partial/antipatterns-partial.json _phase_4_partial_meta.phase_6_additional_candidates'
+  consistency: 'Phase 4 추가 candidate 3 AP (EAGER N+1 / F-017 / F-028) → Phase 6 final 추가 ✅'
 
 # Phase 6 산출물 3종
 deliverables:
-  - file: "antipatterns.json"
-    purpose: "AI용 final 통합 (15 AP / schema 검증 통과)"
-    schema: "schemas/antipatterns.schema.json ✅"
+  - file: 'antipatterns.json'
+    purpose: 'AI용 final 통합 (15 AP / schema 검증 통과)'
+    schema: 'schemas/antipatterns.schema.json ✅'
     confidence: 0.96
     antipattern_count: 15
-  - file: "avoid-list.md"
-    purpose: "사람용 체크리스트 (severity 별 + composite view + 사내 권고 41 통합 + 부록 매트릭스)"
+  - file: 'avoid-list.md'
+    purpose: '사람용 체크리스트 (severity 별 + composite view + 사내 권고 41 통합 + 부록 매트릭스)'
     confidence: 0.96
-  - file: "_manifest.yml"
-    purpose: "Phase 6 매니페스트 (본 파일)"
+  - file: '_manifest.yml'
+    purpose: 'Phase 6 매니페스트 (본 파일)'
     confidence: 0.98
 
 # 결정적 처리 결과
 deterministic_results:
   raw_fetch:
-    main_agent_phase_6: 8   # workflow + deliverable + schema + partial + Phase 4/5 cross-validation
-    sub_agent_document: 36  # OWASP + RFC + Spring + JPA + OpenAPI lint
-    sub_agent_case: 4       # Tech Radar + 한국 5사 + 글로벌
-    sub_agent_senior: "stalled (메인 fallback ~700 line)"
-    total_research_lines: 4100   # document 1500 + case 1900 + senior 700
+    main_agent_phase_6: 8 # workflow + deliverable + schema + partial + Phase 4/5 cross-validation
+    sub_agent_document: 36 # OWASP + RFC + Spring + JPA + OpenAPI lint
+    sub_agent_case: 4 # Tech Radar + 한국 5사 + 글로벌
+    sub_agent_senior: 'stalled (메인 fallback ~700 line)'
+    total_research_lines: 4100 # document 1500 + case 1900 + senior 700
   antipattern_count: 15
   by_category:
     DOMAIN: 4
@@ -52,35 +52,39 @@ deterministic_results:
     medium: 7
     low: 4
   human_review_required: 4
-  rate_limit_after_phase_6: 14   # 60 - 46 (누적, Phase 6 sub-agent 40 tool_uses)
+  rate_limit_after_phase_6: 14 # 60 - 46 (누적, Phase 6 sub-agent 40 tool_uses)
 
 # 5 핵심 결정 (윤주스 Auto Mode 자율 승인 — Senior 권고 일괄 적용 2026-04-29)
 key_decisions:
-  - id: "DEC-AP-001"
-    decision: "복합 AP 등록 거절 (Document 권고 채택, Case 가독성은 avoid-list.md composite view 섹션화)"
-    rationale: "윤주스 절대 우선순위 (품질 1순위 + 재작업 최소화 2순위) + 단일 PoC 과적합 회피 §8.1. OWASP/CWE/RFC 모두 개별 결함 단위 분류 표준."
-    sources: ["document-phase6.md §복합 AP 검토", "senior-phase6.md §1.3"]
-  - id: "DEC-AP-002"
-    decision: "severity 재산정 — AP-PERFORMANCE-001 medium 유지 (본 PoC) / AP-ARCH-003 medium → low"
-    rationale: "AP-PERFORMANCE-001: RealWorld 학습 spec 한정 medium / 사내 적용 시 high 격상 권고. AP-ARCH-003: Spring Boot 마이그레이션 점진적 가능 (Case 권고 채택)."
-    sources: ["case-phase6.md §6 (severity 재산정)", "senior-phase6.md §2"]
-  - id: "DEC-AP-003"
-    decision: "Phase 4 추가 candidate 3건 모두 등록 (AP-PERFORMANCE-001 EAGER / AP-DOMAIN-003 F-017 / AP-DOMAIN-004 F-028)"
-    rationale: "Phase 4 partial _meta 의 phase_6_additional_candidates 명시. Tech Radar Hold (Vol.32) 매핑 (F-017 + F-028)."
-    sources: ["antipatterns-partial.json _phase_4_partial_meta", "case-phase6.md 토픽 1"]
-  - id: "DEC-AP-004"
-    decision: "사내 권고 41건 통합 형식 — severity 별 + 영역 별 + composite view + 부록 매트릭스 (Senior §6 채택)"
-    rationale: "가독성 손상 회피 + AP cross-link 보존."
-    sources: ["senior-phase6.md §6"]
-  - id: "DEC-AP-005"
-    decision: "신규 finding F-041 (JWT alg explicit 검증 부재) 등록 — low / deferred"
-    rationale: "Document 발굴 (RFC 8725 §3.1 alg=none 공격 회피 표준). F-037 (claim 부재) / F-034 (STATELESS 보강) 와 별도 영역."
-    sources: ["document-phase6.md §JWT BCP", "senior-phase6.md §4"]
+  - id: 'DEC-AP-001'
+    decision: '복합 AP 등록 거절 (Document 권고 채택, Case 가독성은 avoid-list.md composite view 섹션화)'
+    rationale: '윤주스 절대 우선순위 (품질 1순위 + 재작업 최소화 2순위) + 단일 PoC 과적합 회피 §8.1. OWASP/CWE/RFC 모두 개별 결함 단위 분류 표준.'
+    sources: ['document-phase6.md §복합 AP 검토', 'senior-phase6.md §1.3']
+  - id: 'DEC-AP-002'
+    decision: 'severity 재산정 — AP-PERFORMANCE-001 medium 유지 (본 PoC) / AP-ARCH-003 medium → low'
+    rationale: 'AP-PERFORMANCE-001: RealWorld 학습 spec 한정 medium / 사내 적용 시 high 격상 권고. AP-ARCH-003: Spring Boot 마이그레이션 점진적 가능 (Case 권고 채택).'
+    sources: ['case-phase6.md §6 (severity 재산정)', 'senior-phase6.md §2']
+  - id: 'DEC-AP-003'
+    decision: 'Phase 4 추가 candidate 3건 모두 등록 (AP-PERFORMANCE-001 EAGER / AP-DOMAIN-003 F-017 / AP-DOMAIN-004 F-028)'
+    rationale: 'Phase 4 partial _meta 의 phase_6_additional_candidates 명시. Tech Radar Hold (Vol.32) 매핑 (F-017 + F-028).'
+    sources:
+      [
+        'antipatterns-partial.json _phase_4_partial_meta',
+        'case-phase6.md 토픽 1',
+      ]
+  - id: 'DEC-AP-004'
+    decision: '사내 권고 41건 통합 형식 — severity 별 + 영역 별 + composite view + 부록 매트릭스 (Senior §6 채택)'
+    rationale: '가독성 손상 회피 + AP cross-link 보존.'
+    sources: ['senior-phase6.md §6']
+  - id: 'DEC-AP-005'
+    decision: '신규 finding F-041 (JWT alg explicit 검증 부재) 등록 — low / deferred'
+    rationale: 'Document 발굴 (RFC 8725 §3.1 alg=none 공격 회피 표준). F-037 (claim 부재) / F-034 (STATELESS 보강) 와 별도 영역.'
+    sources: ['document-phase6.md §JWT BCP', 'senior-phase6.md §4']
 
 # 신뢰도 산정 (formula v1)
 confidence_calculation:
-  formula_version: "v1"
-  base: 0.80   # phase-6-quality.md §8 — 가장 높은 phase
+  formula_version: 'v1'
+  base: 0.80 # phase-6-quality.md §8 — 가장 높은 phase
   modifiers:
     orm_full: +0.05
     domain_context_md: +0.03
@@ -90,16 +94,16 @@ confidence_calculation:
     no_operational_db: -0.03
   subtotal: 0.95
   cross_validation_modifiers:
-    document_case_alignment: +0.02   # 11/15 AP 외부 검증 통과 (Case 73% ★★★)
-    composite_ap_decision_resolved: 0   # 충돌 해소 — 거절 채택
-    schema_compliance_100: +0.01   # id pattern 정규화 매핑 표 명시
-  raw_confidence: 0.96   # cap 0.98 미만
+    document_case_alignment: +0.02 # 11/15 AP 외부 검증 통과 (Case 73% )
+    composite_ap_decision_resolved: 0 # 충돌 해소 — 거절 채택
+    schema_compliance_100: +0.01 # id pattern 정규화 매핑 표 명시
+  raw_confidence: 0.96 # cap 0.98 미만
   per_area:
     simple_merge_partial_to_final: 0.98
     cyclic_dependency_check: 1.0
     drift_promotion: 1.0
     id_normalization: 0.98
-    composite_ap: 0.0   # 등록 거절
+    composite_ap: 0.0 # 등록 거절
     severity_recalculation: 0.85
     tone_check: 0.95
     recommendation_integration: 0.85
@@ -108,79 +112,89 @@ confidence_calculation:
 
 # 명세 §7 (workflow) + §9 (cross-validation) 승인 게이트
 approval_gate:
-  - check: "antipatterns.json schema 검증 (id pattern / category / severity)"
+  - check: 'antipatterns.json schema 검증 (id pattern / category / severity)'
     status: "✅ 15/15 통과 — id pattern ^AP-[A-Z]+-\\d+$ + category enum 6 (DOMAIN/SECURITY/ARCH/DB/API/PERFORMANCE) + severity enum 4 (critical/high/medium/low)"
-  - check: "모든 항목에 evidence + recommended_alternative"
-    status: "✅ 15/15"
-  - check: "톤 점검 완료 (비난 표현 0)"
-    status: "✅ 모두 회피 후보 톤 (정상화 권장 / 회피 권장)"
-  - check: "severity 분포 확인"
-    status: "✅ critical 2 / high 2 / medium 7 / low 4"
-  - check: "Phase 2 정합성 보고서 → 안티패턴 격상 완료"
-    status: "✅ DRIFT-007 → AP-DB-001 / DRIFT-010 → AP-DOMAIN-002 (medium → high) — 나머지 7 DRIFT 는 NO ACTION"
-  - check: "복합 안티패턴 검출 (Phase 6 부가가치)"
-    status: "✅ 검토 완료 — 등록 거절 (composite view 섹션으로 가독성 보존)"
-  - check: "avoid-list.md 사용자 검토"
-    status: "🔄 윤주스 검토 권장 (critical 2 + high 2 항목)"
-  - check: "시니어 BE 검토"
-    status: "✅ critical/high 항목 4건 human_review_required 명시"
+  - check: '모든 항목에 evidence + recommended_alternative'
+    status: '✅ 15/15'
+  - check: '톤 점검 완료 (비난 표현 0)'
+    status: '✅ 모두 회피 후보 톤 (정상화 권장 / 회피 권장)'
+  - check: 'severity 분포 확인'
+    status: '✅ critical 2 / high 2 / medium 7 / low 4'
+  - check: 'Phase 2 정합성 보고서 → 안티패턴 격상 완료'
+    status: '✅ DRIFT-007 → AP-DB-001 / DRIFT-010 → AP-DOMAIN-002 (medium → high) — 나머지 7 DRIFT 는 NO ACTION'
+  - check: '복합 안티패턴 검출 (Phase 6 부가가치)'
+    status: '✅ 검토 완료 — 등록 거절 (composite view 섹션으로 가독성 보존)'
+  - check: 'avoid-list.md 사용자 검토'
+    status: '🔄 윤주스 검토 권장 (critical 2 + high 2 항목)'
+  - check: '시니어 BE 검토'
+    status: '✅ critical/high 항목 4건 human_review_required 명시'
 
 # 7대 산출물 cross-validation (workflow §9)
 seven_deliverables_cross_validation:
   all_id_standards_consistent: true
   id_cross_reference_integrity:
-    x_related_rules_to_rules_json: "✅ 100% 매칭 (BR-COMMENT-DELETE-001 / BR-USER-EMAIL-001 / BR-USER-USERNAME-001 / BR-AUTH-JWT-001/002 / BR-AUTH-STATELESS-001 / BR-AUTH-PUBLIC-001)"
-    operation_id_to_domain_json: "✅ Phase 5-1 매핑 완료 + F-035 정정 적용"
-    related_table_to_db_schema: "✅ users / articles / comments 모두 schema.sql 존재"
+    x_related_rules_to_rules_json: '✅ 100% 매칭 (BR-COMMENT-DELETE-001 / BR-USER-EMAIL-001 / BR-USER-USERNAME-001 / BR-AUTH-JWT-001/002 / BR-AUTH-STATELESS-001 / BR-AUTH-PUBLIC-001)'
+    operation_id_to_domain_json: '✅ Phase 5-1 매핑 완료 + F-035 정정 적용'
+    related_table_to_db_schema: '✅ users / articles / comments 모두 schema.sql 존재'
   all_artifacts_have_confidence_meta: true
   human_review_required_count: 4
   status_per_deliverable:
-    "1_architecture": "✅ Phase 3 (0.91) + ARCH-STYLE 정정 트레이스"
-    "2_domain": "✅ Phase 4 (0.90) + Phase 5 F-035 정정"
-    "3_api": "✅ Phase 5-1 (0.93)"
-    "4_db": "✅ Phase 2 (0.92)"
-    "5_rules": "✅ Phase 4 + Phase 5 F-034/F-036 정정"
-    "6_antipatterns": "✅ Phase 6 (0.96) — 본 산출"
-    "7_ui_ux": "❌ N/A (BE only)"
-  total_completion: "6/7 (UI/UX 제외 100%)"
+    '1_architecture': '✅ Phase 3 (0.91) + ARCH-STYLE 정정 트레이스'
+    '2_domain': '✅ Phase 4 (0.90) + Phase 5 F-035 정정'
+    '3_api': '✅ Phase 5-1 (0.93)'
+    '4_db': '✅ Phase 2 (0.92)'
+    '5_rules': '✅ Phase 4 + Phase 5 F-034/F-036 정정'
+    '6_antipatterns': '✅ Phase 6 (0.96) — 본 산출'
+    '7_ui_ux': '❌ N/A (BE only)'
+  total_completion: '6/7 (UI/UX 제외 100%)'
 
 # Phase 6 부가가치 (workflow §3 — 복합 AP 검출)
 phase_6_value_added:
   composite_ap_review:
-    candidate: "AP-COMPOSITE-001 / AP-SECURITY-004 (JWT/Auth 종합)"
-    decision: "거절 (Document 권고 채택)"
-    rationale: "OWASP/CWE/RFC 개별 분류 표준. 단일 PoC 과적합 회피. avoid-list.md composite view 섹션으로 가독성 보존."
+    candidate: 'AP-COMPOSITE-001 / AP-SECURITY-004 (JWT/Auth 종합)'
+    decision: '거절 (Document 권고 채택)'
+    rationale: 'OWASP/CWE/RFC 개별 분류 표준. 단일 PoC 과적합 회피. avoid-list.md composite view 섹션으로 가독성 보존.'
   drift_promotion_audit:
     total_drift: 9
     promoted: 2
-    audit_date: "2026-04-29"
-    no_action_drift: ["DRIFT-001", "DRIFT-002", "DRIFT-003", "DRIFT-004", "DRIFT-005", "DRIFT-006", "DRIFT-008", "DRIFT-009"]
+    audit_date: '2026-04-29'
+    no_action_drift:
+      [
+        'DRIFT-001',
+        'DRIFT-002',
+        'DRIFT-003',
+        'DRIFT-004',
+        'DRIFT-005',
+        'DRIFT-006',
+        'DRIFT-008',
+        'DRIFT-009',
+      ]
   severity_recalculation_count: 2
   tone_check_passed: true
 
 # Findings (Phase 6 진행 중 발견)
 findings_phase_6:
-  - id: "F-041"
-    title: "JWT alg explicit 검증 부재 (RFC 8725 §3.1 alg=none 공격 회피 표준 위반)"
-    severity: "low"
-    proposed_fix: "deferred (PoC #02 후 v1.2.0 합산 격상 평가)"
-    status: "deferred"
-    sources: ["document-phase6.md §JWT BCP"]
-    related_AP: "AP-SECURITY-001"
+  - id: 'F-041'
+    title: 'JWT alg explicit 검증 부재 (RFC 8725 §3.1 alg=none 공격 회피 표준 위반)'
+    severity: 'low'
+    proposed_fix: 'deferred (PoC #02 후 v1.2.0 합산 격상 평가)'
+    status: 'deferred'
+    sources: ['document-phase6.md §JWT BCP']
+    related_AP: 'AP-SECURITY-001'
 
 # 누적 finding 통계 (Phase 6 종료)
 findings_cumulative:
-  total: 33    # +1 (F-041)
-  closed: 10   # 변경 없음
+  total: 33 # +1 (F-041)
+  closed: 10 # 변경 없음
   promoted: 10 # 변경 없음
   deferred: 13 # +1 (F-041)
   rejected: 0
-  v120_bundles: 7   # 변경 없음 (G 추가는 Phase 5)
-  threshold_status: "F-021 임계 20+ 초과 (60%+) — 윤주스 절대 우선순위 (PoC #02 후 v1.2.0 합산 격상) 유지"
+  v120_bundles: 7 # 변경 없음 (G 추가는 Phase 5)
+  threshold_status: 'F-021 임계 20+ 초과 (60%+) — 윤주스 절대 우선순위 (PoC #02 후 v1.2.0 합산 격상) 유지'
 
 # 다음 단계 (PoC #01 종료 후)
 next_actions:
-  - "PoC #01 종료 — 7대 산출물 6/7 (UI/UX 제외 100%) ✅"
-  - "사내 적용 권고 (시니어 BE 검토) — critical 2 즉시 차단 + high 2 1 스프린트"
-  - "PoC #02 진입 (다른 스택, deferred 13 + promoted 10 외부 검증 + v1.2.0 합산 격상 데이터)"
-  - "v1.2.0 격상 (PoC #01 + #02 합산) — 7 묶음 (A~G) 일괄 처리"
+  - 'PoC #01 종료 — 7대 산출물 6/7 (UI/UX 제외 100%) ✅'
+  - '사내 적용 권고 (시니어 BE 검토) — critical 2 즉시 차단 + high 2 1 스프린트'
+  - 'PoC #02 진입 (다른 스택, deferred 13 + promoted 10 외부 검증 + v1.2.0 합산 격상 데이터)'
+  - 'v1.2.0 격상 (PoC #01 + #02 합산) — 7 묶음 (A~G) 일괄 처리'

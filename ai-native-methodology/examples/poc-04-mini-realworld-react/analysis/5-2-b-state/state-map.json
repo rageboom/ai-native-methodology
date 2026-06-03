@@ -1,12 +1,12 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json (★ Stage 3-1 신설 / SCXML 1.0 + XState v5 호환)",
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json ( Stage 3-1 신설 / SCXML 1.0 + XState v5 호환)",
   "meta": {
     "poc_id": "poc-04-mini",
     "phase": "ui",
     "captured_at": "2026-05-02",
     "captured_by": "real",
-    "framework_neutral_format": "★ XState JSON 단일 진실 + SCXML subset compatible (states/transitions/events/guards)",
-    "scxml_xstate_round_trip_compatibility": "★ 부분 (research Q9 출처 부재 — 본 모델은 framework-neutral spec 만 사용)"
+    "framework_neutral_format": " XState JSON 단일 진실 + SCXML subset compatible (states/transitions/events/guards)",
+    "scxml_xstate_round_trip_compatibility": " 부분 (research Q9 출처 부재 — 본 모델은 framework-neutral spec 만 사용)"
   },
   "five_truths_coverage": {
     "1_server_cache": "✅ 본 mini scope (TanStack React Query)",
@@ -18,7 +18,7 @@
   "state_machines": [
     {
       "id": "SM-LOGIN-FORM",
-      "purpose": "★ 진실 #4 form state — Login form submit lifecycle",
+      "purpose": " 진실 #4 form state — Login form submit lifecycle",
       "five_truths": ["form"],
       "binding_component": "LoginPage (PAGE-LOGIN)",
       "initial_state": "idle",
@@ -64,7 +64,7 @@
     },
     {
       "id": "SM-FEED-NAVIGATION",
-      "purpose": "★ 진실 #3 URL state — Home feed switch (global / personal / tag)",
+      "purpose": " 진실 #3 URL state — Home feed switch (global / personal / tag)",
       "five_truths": ["url"],
       "binding_component": "HomePage § HomeFeed",
       "initial_state": "global",
@@ -106,13 +106,13 @@
         }
       },
       "url_state_validation": {
-        "source": "★ Zod-mini (home.state.ts) — PaginationSchema + HomeArticleFilterSchema",
-        "br_auto_extraction_target": "★ deliverable 14 § URL state validation BR (★ 신규 패턴)"
+        "source": " Zod-mini (home.state.ts) — PaginationSchema + HomeArticleFilterSchema",
+        "br_auto_extraction_target": " deliverable 14 § URL state validation BR ( 신규 패턴)"
       }
     },
     {
       "id": "SM-FAVORITE-TOGGLE",
-      "purpose": "★ optimistic update — favorite article (★ 진실 #1 server cache + #5 DOM)",
+      "purpose": " optimistic update — favorite article ( 진실 #1 server cache + #5 DOM)",
       "five_truths": ["server_cache", "dom"],
       "binding_component": ["HomeFavoriteButton", "FavoriteArticleButton (article)"],
       "initial_state": "inactive",
@@ -161,12 +161,12 @@
       },
       "validation_br": {
         "operation_enum": ["favorite", "unfavorite"],
-        "br_auto_extraction_target": "★ deliverable 14 § FormData operation validation"
+        "br_auto_extraction_target": " deliverable 14 § FormData operation validation"
       }
     },
     {
       "id": "SM-FOLLOW-TOGGLE",
-      "purpose": "★ optimistic update — follow author",
+      "purpose": " optimistic update — follow author",
       "five_truths": ["server_cache", "dom"],
       "binding_component": "FollowAuthorButton (article)",
       "initial_state": "not-following",
@@ -221,7 +221,7 @@
     },
     {
       "id": "SM-COMMENT-FORM",
-      "purpose": "★ 진실 #4 form — Comment create lifecycle with reset key",
+      "purpose": " 진실 #4 form — Comment create lifecycle with reset key",
       "five_truths": ["form"],
       "binding_component": "CreateCommentForm",
       "initial_state": "idle",
@@ -244,7 +244,7 @@
             "src": "POST /article/:slug/comments",
             "onDone": {
               "target": "idle",
-              "actions": ["update_resetKey", "form_remount (★ React key pattern)"]
+              "actions": ["update_resetKey", "form_remount ( React key pattern)"]
             },
             "onError": "error"
           }
@@ -273,7 +273,7 @@
       "dom": 2
     },
     "optimistic_update_machines": 2,
-    "framework_neutrality": "★ 100% (모든 SM = SCXML+XState 호환 형식 / React 관용구 0)",
+    "framework_neutrality": " 100% (모든 SM = SCXML+XState 호환 형식 / React 관용구 0)",
     "ir_react_idioms_in_spec": 0,
     "validation_br_extracted": 9
   }

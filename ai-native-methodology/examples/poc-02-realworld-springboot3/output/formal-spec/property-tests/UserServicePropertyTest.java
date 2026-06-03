@@ -126,7 +126,7 @@ class UserServicePropertyTest {
     // ========================================================================
 
     @Test
-    @DisplayName("★ Critical: TOCTOU race - DataIntegrityViolation 미처리 검증")
+    @DisplayName(" Critical: TOCTOU race - DataIntegrityViolation 미처리 검증")
     void tocTouRaceMustNormalizeException() throws Exception {
         // 동시 signup 으로 race window 트리거
         String sameEmail = "race@example.com";
@@ -146,10 +146,10 @@ class UserServicePropertyTest {
             .filter(e -> e != null)
             .collect(Collectors.toList());
 
-        // ★ 핵심 assertion — Sprint 1.5 발견: race 시에도 IAE 만 노출
+        //  핵심 assertion — Sprint 1.5 발견: race 시에도 IAE 만 노출
         assertThat(exceptions).allSatisfy(e ->
             assertThat(e).isInstanceOf(IllegalArgumentException.class)
-                .as("★ DataIntegrityViolationException 노출 ❌ — F-058 fix 적용 필수")
+                .as(" DataIntegrityViolationException 노출 ❌ — F-058 fix 적용 필수")
         );
 
         // 정확히 1건 성공
@@ -160,7 +160,7 @@ class UserServicePropertyTest {
     }
 
     @Test
-    @DisplayName("★ High: @Transactional 부재 — 부수 효과 부분 commit 위험")
+    @DisplayName(" High: @Transactional 부재 — 부수 효과 부분 commit 위험")
     void transactionalBoundaryAbsence() {
         // 본 test 는 정성 테스트 — Service 메서드 어노테이션 검사
         // 실행 가능 형태로 변환 시 Spring AOP / TestContext 활용 필요
@@ -175,14 +175,14 @@ class UserServicePropertyTest {
             org.springframework.transaction.annotation.Transactional.class
         );
 
-        // ★ Sprint 1.5 발견: signup() 에 @Transactional 부재
+        //  Sprint 1.5 발견: signup() 에 @Transactional 부재
         assertThat(hasTransactional)
-            .as("★ Sprint 2 권고: @Transactional 추가로 race window 축소")
+            .as(" Sprint 2 권고: @Transactional 추가로 race window 축소")
             .isFalse();  // 현재 false — 권고 적용 후 true 로 변경 예상
     }
 
     @Test
-    @DisplayName("★ Medium: 거절 메시지 분기 (현재 결합 / 권고 분리)")
+    @DisplayName(" Medium: 거절 메시지 분기 (현재 결합 / 권고 분리)")
     void duplicateMessageSpecificity() {
         userService.signup(new UserRegistry("a@x.com", "alice", "pwd"));
 
@@ -198,17 +198,17 @@ class UserServicePropertyTest {
     }
 
     @Test
-    @DisplayName("★ Low (Hidden Bug): case-sensitive email 정규화 부재")
+    @DisplayName(" Low (Hidden Bug): case-sensitive email 정규화 부재")
     void caseSensitiveEmailHiddenBug() {
         userService.signup(new UserRegistry("Alice@X.com", "a1", "pwd"));
 
-        // 현재 동작: case 다르면 DB UQ case-sensitive 라 통과 가능 ★
+        // 현재 동작: case 다르면 DB UQ case-sensitive 라 통과 가능 
         try {
             User second = userService.signup(new UserRegistry("alice@x.com", "a2", "pwd"));
             // hidden bug 입증 — 두 User 동시 존재
             assertThat(second).isNotNull();
             assertThat(userRepository.findAll())
-                .as("★ 정규화 도입 후 1건만 존재해야 함")
+                .as(" 정규화 도입 후 1건만 존재해야 함")
                 .hasSize(2);
         } catch (IllegalArgumentException e) {
             // 정규화 도입 후 expected 동작
@@ -217,19 +217,19 @@ class UserServicePropertyTest {
     }
 
     @Test
-    @DisplayName("★ Low: Equality on transient entity")
+    @DisplayName(" Low: Equality on transient entity")
     void equalsOnTransientEntity() {
         User user1 = new User("a@x.com", "alice", "pwd");
         User user2 = new User("b@x.com", "bob", "pwd");
 
-        // ★ Sprint 1.5 Static Analyzer 발견: 둘 다 id==null → equals true
+        //  Sprint 1.5 Static Analyzer 발견: 둘 다 id==null → equals true
         assertThat(user1).isEqualTo(user2);
 
         // HashSet 사용 시 collision 위험 입증
         Set<User> set = new java.util.HashSet<>();
         set.add(user1);
         set.add(user2);
-        assertThat(set).hasSize(1);  // ★ 의도와 다름 — 두 User 가 1개로 줄어듦
+        assertThat(set).hasSize(1);  //  의도와 다름 — 두 User 가 1개로 줄어듦
     }
 
     // ========================================================================

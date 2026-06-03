@@ -11,6 +11,7 @@
 FE 코드의 **시각 산출** (snapshot PNG + a11y 검증 결과) 추출.
 
 ⚠️ 본 Phase 는 **binary 진실 모델**:
+
 - 다른 6 산출물 = JSON 진실 + drift-validator 적용 ✅
 - 본 phase = **snapshot PNG (binary) 진실 + drift-validator ❌ / Playwright snapshot diff ✅**
 
@@ -18,39 +19,39 @@ FE 코드의 **시각 산출** (snapshot PNG + a11y 검증 결과) 추출.
 
 ## 2. 입력
 
-| 입력 | 비고 |
-|---|---|
-| FE 빌드 (production-like) | dev server 또는 static build |
-| Phase 5-2-a 결과 | ui-spec.json (PAGE-XXX cross-link) |
-| Phase 5-2-b 결과 | state-map.json (FSM-XXX cross-link / state setup) |
-| 디자인 baseline (있을 시) | git-lfs 또는 별도 baseline branch |
-| Playwright config | viewport matrix |
-| axe-core config | WCAG level (2.1-AA / 2.2-AA) |
+| 입력                      | 비고                                              |
+| ------------------------- | ------------------------------------------------- |
+| FE 빌드 (production-like) | dev server 또는 static build                      |
+| Phase 5-2-a 결과          | ui-spec.json (PAGE-XXX cross-link)                |
+| Phase 5-2-b 결과          | state-map.json (FSM-XXX cross-link / state setup) |
+| 디자인 baseline (있을 시) | git-lfs 또는 별도 baseline branch                 |
+| Playwright config         | viewport matrix                                   |
+| axe-core config           | WCAG level (2.1-AA / 2.2-AA)                      |
 
 ---
 
 ## 3. 처리 흐름
 
-| 단계 | 작업 | 도구 |
-|---|---|---|
-| S1 | snapshot 캡처 (viewport matrix × pages) | Playwright `toHaveScreenshot()` |
-| S2 | a11y 검증 | axe-core `axe.run()` per page |
-| S3 | SHA-256 hash 계산 | (계산 — 결정적) |
-| S4 | baseline 비교 (있을 시) | pixel diff + threshold |
-| S5 | visual-manifest.json 통합 | — |
-| S6 | drift-validator ❌ (semantic 비교 불가) / 사람 검토 (baseline 승인) | — |
+| 단계 | 작업                                                                | 도구                            |
+| ---- | ------------------------------------------------------------------- | ------------------------------- |
+| S1   | snapshot 캡처 (viewport matrix × pages)                             | Playwright `toHaveScreenshot()` |
+| S2   | a11y 검증                                                           | axe-core `axe.run()` per page   |
+| S3   | SHA-256 hash 계산                                                   | (계산 — 결정적)                 |
+| S4   | baseline 비교 (있을 시)                                             | pixel diff + threshold          |
+| S5   | visual-manifest.json 통합                                           | —                               |
+| S6   | drift-validator ❌ (semantic 비교 불가) / 사람 검토 (baseline 승인) | —                               |
 
 ### 3.1 viewport matrix 정의 (의무)
 
 ```yaml
 viewport_matrix:
-  - {label: desktop,         width: 1440, height: 900,  dpr: 1.0}
-  - {label: tablet,          width: 768,  height: 1024, dpr: 2.0}
-  - {label: mobile-portrait, width: 375,  height: 667,  dpr: 2.0}
-  - {label: mobile-landscape, width: 667, height: 375,  dpr: 2.0}
+  - { label: desktop, width: 1440, height: 900, dpr: 1.0 }
+  - { label: tablet, width: 768, height: 1024, dpr: 2.0 }
+  - { label: mobile-portrait, width: 375, height: 667, dpr: 2.0 }
+  - { label: mobile-landscape, width: 667, height: 375, dpr: 2.0 }
 ```
 
-### 3.2 no-simulation 정책 강제 (★★★)
+### 3.2 no-simulation 정책 강제 ()
 
 본 Phase 는 **진짜 도구 실행 의무**:
 
@@ -61,7 +62,7 @@ captured_by enum:
   ✅ chromatic_real
   ✅ puppeteer_real
   ✅ cypress_real
-  ❌ simulation         # ★ -5%p 패널티 + simulation_reason 의무
+  ❌ simulation         # -5%p 패널티 + simulation_reason 의무
 
 5종_물증_의무 (real 도구 시):
   - captured_by_version    # 도구 버전
@@ -81,8 +82,8 @@ const { AxeBuilder } = require('@axe-core/playwright');
 
 await page.goto(pageUrl);
 const results = await new AxeBuilder({ page })
-    .withTags(['wcag21aa', 'wcag22aa'])  // ADR-FE-005 §2.2.2 ratchet path
-    .analyze();
+	.withTags(['wcag21aa', 'wcag22aa']) // ADR-FE-005 §2.2.2 ratchet path
+	.analyze();
 ```
 
 → `a11y_violations[]` inline 저장. `wcag_level` enum (`2.1-AA` / `2.2-AA`) 명시.
@@ -109,7 +110,7 @@ stateDiagram-v2
 ├── visual-manifest.json
 ├── snapshots/
 │   ├── desktop/
-│   │   ├── PAGE-HOME-001.png         # ★ binary 진실
+│   │   ├── PAGE-HOME-001.png         # binary 진실
 │   │   └── ...
 │   ├── tablet/
 │   ├── mobile-portrait/
@@ -128,9 +129,9 @@ stateDiagram-v2
 □ 모든 snapshot 에 ID, page_id, viewport_label, snapshot_path, snapshot_hash 명시
 □ snapshot_path 파일 실제 존재
 □ snapshot_hash = SHA-256 64 hex chars
-□ ★ captured_by ∈ [playwright_real, percy_real, chromatic_real, puppeteer_real, cypress_real]
-□ ★ captured_by=simulation 시 simulation_reason 의무 + -5%p 패널티 표기
-□ ★ real 도구 시 5종 물증 의무 (version / stdout / duration / reproduction / result_hash)
+□ captured_by ∈ [playwright_real, percy_real, chromatic_real, puppeteer_real, cypress_real]
+□ captured_by=simulation 시 simulation_reason 의무 + -5%p 패널티 표기
+□ real 도구 시 5종 물증 의무 (version / stdout / duration / reproduction / result_hash)
 □ baseline_hash 비교 결과 diff_status 명시
 □ a11y_violations inline (있으면) — wcag_level 명시
 □ cross_links 의무 (ui-spec 또는 state-map 중 1개 이상)
@@ -141,12 +142,12 @@ stateDiagram-v2
 
 ## 6. 신뢰도 (ADR-009 §2.4.2 binary trust path)
 
-| 단계 | 조건 | 신뢰도 |
-|---|---|---|
-| 1-2-3 | mermaid 검증 ❌ | ❌ N/A |
-| 5 | Playwright/Percy/Chromatic 진짜 실행 | 85-92% |
-| 6 | snapshot baseline + diff 0건 도달 | 90-95% |
-| 7 | 사람 디자이너 리뷰 통과 | 95%+ |
+| 단계  | 조건                                 | 신뢰도 |
+| ----- | ------------------------------------ | ------ |
+| 1-2-3 | mermaid 검증 ❌                      | ❌ N/A |
+| 5     | Playwright/Percy/Chromatic 진짜 실행 | 85-92% |
+| 6     | snapshot baseline + diff 0건 도달    | 90-95% |
+| 7     | 사람 디자이너 리뷰 통과              | 95%+   |
 
 simulation 시 -5%p 패널티.
 
@@ -155,6 +156,7 @@ simulation 시 -5%p 패널티.
 ## 7. 흔한 함정
 
 deliverable 9 §10 정합:
+
 - flaky test (애니메이션 / 폰트 race)
 - dynamic content (timestamp / random)
 - font drift (폰트 로딩 안 됨)
@@ -167,5 +169,5 @@ deliverable 9 §10 정합:
 
 ## 8. 다음
 
-- Phase 6 (`/analyze-quality`) AP-FE-VISUAL-* 안티패턴 등록
+- Phase 6 (`/analyze-quality`) AP-FE-VISUAL-\* 안티패턴 등록
 - (Stage 4+) mini-PoC = 진짜 도구 실행 검증 / 단계 5 도달

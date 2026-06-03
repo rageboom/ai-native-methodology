@@ -7,7 +7,7 @@
 
 codegraph 가 코드 엔티티(route/method/interface)를 **전수 열거 → 산출물 code-ref 와 set-diff → "코드有 산출물無" coverage-hole** 을 **비차단 finding** 으로 산출. trust 경계(reference-lens / gate inject ❌) 절대 유지. Modern/verified 스택만 hole 보고, blind 셀은 "검출불가" 정직 표기(false positive 회피).
 
-## 2. ★ research 가 바꾼 것 (DEC 초안 대비 정정)
+## 2. research 가 바꾼 것 (DEC 초안 대비 정정)
 
 1. **route 노드 verb 저장됨**(실측) → openapi axis 가 DEC `△` 보다 강함. path+method 직접 매칭.
 2. **ecommerce .codegraph 실재**(721노드) → §8.1 2-도메인 corroboration 을 기존 인덱스로 즉시 가능(신규 probe 불요 / route·method axis 한정).
@@ -38,13 +38,13 @@ tools/codegraph-coverage/            # 신규 standalone 도구 (28번째 worksp
 
 ## 4. detectability matrix (false-positive 핵심)
 
-| axis \ stack | Spring-legacy(iBATIS2) | Spring-modern(MyBatis3) | JPA | NestJS-TS | FE |
-|---|---|---|---|---|---|
-| route | ✅ detectable | ✅ | ✅ | ⚠ unverified(완전성) | — undetectable |
-| method/symbol | ✅ | ✅ | ✅ | ⚠ unverified | — |
-| interface | ✅ | ✅ | ✅ | ✗ undetectable(thin=1) | — |
-| sql/mapper | ✗ undetectable(=0) | (carry) | (carry) | — | — |
-| db-table | ✗ undetectable(보편 blind) | ✗ | ✗ | ✗ | — |
+| axis \ stack  | Spring-legacy(iBATIS2)     | Spring-modern(MyBatis3) | JPA     | NestJS-TS              | FE             |
+| ------------- | -------------------------- | ----------------------- | ------- | ---------------------- | -------------- |
+| route         | ✅ detectable              | ✅                      | ✅      | ⚠ unverified(완전성)   | — undetectable |
+| method/symbol | ✅                         | ✅                      | ✅      | ⚠ unverified           | —              |
+| interface     | ✅                         | ✅                      | ✅      | ✗ undetectable(thin=1) | —              |
+| sql/mapper    | ✗ undetectable(=0)         | (carry)                 | (carry) | —                      | —              |
+| db-table      | ✗ undetectable(보편 blind) | ✗                       | ✗       | ✗                      | —              |
 
 - gate 입력 = `inventory.json` `stack.backend.orm[]`(name) + `languages`. Modern flag 아님.
 - **detectable** 셀만 per-entity hole. **undetectable/unverified** 셀은 per-entity hole ❌ → "이 axis 는 이 스택에서 분석 불가(이유)" 1줄 note 만(억제 ❌ / Specmatic·knip 패턴).

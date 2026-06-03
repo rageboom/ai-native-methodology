@@ -5,6 +5,7 @@
 **작성일**: 2026-05-30 (session 55차 — 잔여 carry 점검 → 추천 = S2 gate(주 타깃 공백) → 사용자 결단 "이 순서로 진행" + AskUserQuestion Track α + target=RealWorld).
 
 **relates to**:
+
 - `DEC-2026-05-30-use-scenario-taxonomy.md` §5 (carry 출처 / 자격 게이트 = §8.1 ≥2 S2 corroboration)
 - `DEC-2026-05-30-use-scenario-impl-slice1.md` (Slice 1 = `S2=S1 fallback` 잔여 명시)
 - `DEC-2026-05-30-fdogfood-003-intent-certainty.md` §3 (F-DOGFOOD-007 brownfield RED — 본 gate 가 구조적 해소)
@@ -18,23 +19,25 @@ use-scenario taxonomy(v11.7.0)가 **S2(AX전환)를 주 타깃**으로 선언했
 
 ## 2. 시행 (additive / breaking 0)
 
-| 영역 | 변경 |
-|---|---|
-| `schemas/test-spec.schema.json` | test_cases[].items 에 optional `test_intent` enum `[characterization, augmentation]` (additive / additionalProperties:false 정합 / 미지정 = aggregate fallback). |
-| `tools/chain-driver/src/gate-eval.js` | `SCENARIO_EXPECTED.S2.test = 'per_tc_outcome'` + evaluateGate test stage 분기 (`findings.outcome_mismatches > 0` → reason `s2_outcome_mismatch`) + severityRank `s2_outcome_mismatch: 2`(coverage_threshold 수준 / go-with-warnings 허용). S1/greenfield/S3 매트릭스 무변경. |
-| `tools/test-impl-pass-validator/src/s2-outcome-check.js` (신규) | 순수 모듈 — `reconcileOutcomes(testCases, actualByTcId)` (per-TC expected_outcome ↔ 실 결과 대조 → outcome_mismatches/evaluated/missing_actual) + `correlateByTcId(testResults, testCases)` (test-name→TC-id substring 상관 규약). |
-| `tools/chain-driver/test/scenario.test.js` | +5 test (S2 per_tc_outcome: mismatch=0 통과 / mismatch>0 block / all-pass 허용 / WARN override / implement GREEN). |
-| `tools/test-impl-pass-validator/test/s2-outcome-check.test.js` (신규) | +10 test (reconcile 6 + correlate 4). |
+| 영역                                                                  | 변경                                                                                                                                                                                                                                                                         |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schemas/test-spec.schema.json`                                       | test_cases[].items 에 optional `test_intent` enum `[characterization, augmentation]` (additive / additionalProperties:false 정합 / 미지정 = aggregate fallback).                                                                                                             |
+| `tools/chain-driver/src/gate-eval.js`                                 | `SCENARIO_EXPECTED.S2.test = 'per_tc_outcome'` + evaluateGate test stage 분기 (`findings.outcome_mismatches > 0` → reason `s2_outcome_mismatch`) + severityRank `s2_outcome_mismatch: 2`(coverage_threshold 수준 / go-with-warnings 허용). S1/greenfield/S3 매트릭스 무변경. |
+| `tools/test-impl-pass-validator/src/s2-outcome-check.js` (신규)       | 순수 모듈 — `reconcileOutcomes(testCases, actualByTcId)` (per-TC expected_outcome ↔ 실 결과 대조 → outcome_mismatches/evaluated/missing_actual) + `correlateByTcId(testResults, testCases)` (test-name→TC-id substring 상관 규약).                                           |
+| `tools/chain-driver/test/scenario.test.js`                            | +5 test (S2 per_tc_outcome: mismatch=0 통과 / mismatch>0 block / all-pass 허용 / WARN override / implement GREEN).                                                                                                                                                           |
+| `tools/test-impl-pass-validator/test/s2-outcome-check.test.js` (신규) | +10 test (reconcile 6 + correlate 4).                                                                                                                                                                                                                                        |
 
 ### 2.1 per_tc_outcome 매트릭스
+
 - characterization → `expected_outcome='pass'` (legacy 코드 존재 → GREEN 기대).
 - augmentation → `expected_outcome='fail'` (impl 부재 → RED 기대 / impl 후 pass 격상).
 - gate = aggregate all_fail/all_pass 가 아니라 **per-TC expected ↔ actual 일치**(`outcome_mismatches`)로 판정. characterization 이 fail 나거나 augmentation 이 pass 나면 mismatch → block.
 - implement stage = S2 도 `all_pass`(augmentation GREEN 전환 + characterization GREEN 유지).
 
-## 3. ★ §8.1 corroboration + WARN (정직)
+## 3. §8.1 corroboration + WARN (정직)
 
 자격 게이트 = "§8.1 ≥2 S2 PoC corroboration". 현 보유 = **1/2**:
+
 - **1차 corroboration (RealWorld / Track α)**: RealWorld(brownfield) 25 TC 전부 characterization → S2 reframe(`test-spec.s2-reframe.json`) **schema-valid** + real gate 코드로 **S1 false-block(F-007) → S2 해소** 실증 (`evaluateGate` S1 blocked=true `evidence_missing` / S2 blocked=false). 측정 = `_dogfood-realworld/.../s2-gate-probe.md` + finding F-DOGFOOD-012.
 - **2차 = carry**: 실 characterization GREEN **execution** corroboration = Java/Gradle 부재(RISK-ENV-001)로 미측정 / no-simulation 정책상 GREEN 날조 ❌ → runnable S2 환경(poc-17 사내 Java / RealWorld CI) 의무. **augmentation arm** 도 미실증(RealWorld 신규 기능 부재).
 

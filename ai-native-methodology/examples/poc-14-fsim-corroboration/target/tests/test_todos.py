@@ -1,7 +1,7 @@
 """TC-TODO-FSIM-001 + TC-TODO-FSIM-002 — pytest tests.
 
-★ chain 3 (RED): impl 부재 → ModuleNotFoundError.
-★ chain 4 (GREEN): target/src/* impl 작성 후 모두 pass.
+chain 3 (RED): impl 부재 → ModuleNotFoundError.
+chain 4 (GREEN): target/src/* impl 작성 후 모두 pass.
 """
 import pytest
 

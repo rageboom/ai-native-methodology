@@ -62,7 +62,7 @@
     {
       "br_id": "BR-COMMENT-DELETE-001",
       "semantic_score": 0.62,
-      "rationale": "NL '작성자 OR article 작성자 삭제 가능' ≠ GWT actual_behavior 'AND 동작 (De Morgan 버그)'. BR 의도는 OR 명시 / GWT then은 실제 버그 상태 기술. ★ 본질 괴리 = F-027 신규 finding 핵심.",
+      "rationale": "NL '작성자 OR article 작성자 삭제 가능' ≠ GWT actual_behavior 'AND 동작 (De Morgan 버그)'. BR 의도는 OR 명시 / GWT then은 실제 버그 상태 기술. 본질 괴리 = F-027 신규 finding 핵심.",
       "confidence": 0.71
     },
     {
@@ -110,8 +110,8 @@
     ]
   },
   "cross_validation_notes": {
-    "echo_chamber_risk": "★ Haiku model class (4.5) ≠ Sonnet (4.6) — cross-validation baseline 자격 정합",
-    "drift_detection": "★ BR-COMMENT-DELETE-001 (score 0.62) = De Morgan 버그 적확 포착 — semantic drift 측정 paradigm 유효성 입증",
-    "confidence_cap_rationale": "★ confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
+    "echo_chamber_risk": "Haiku model class (4.5) ≠ Sonnet (4.6) — cross-validation baseline 자격 정합",
+    "drift_detection": "BR-COMMENT-DELETE-001 (score 0.62) = De Morgan 버그 적확 포착 — semantic drift 측정 paradigm 유효성 입증",
+    "confidence_cap_rationale": "confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
   }
 }

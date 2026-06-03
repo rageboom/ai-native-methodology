@@ -48,7 +48,7 @@ class UserRelationshipServicePropertyTest {
     }
 
     // ========================================================================
-    // ★ F-074 — BR-USER-FOLLOW-NO-SELF-001 (Phase 4.5 Sprint 2 신규)
+    //  F-074 — BR-USER-FOLLOW-NO-SELF-001 (Phase 4.5 Sprint 2 신규)
     // ========================================================================
 
     @Property(tries = 100)
@@ -89,7 +89,7 @@ class UserRelationshipServicePropertyTest {
     }
 
     // ========================================================================
-    // ★ Sprint 1.5 #13 isomorphic — Equality on transient (UserFollow)
+    //  Sprint 1.5 #13 isomorphic — Equality on transient (UserFollow)
     // ========================================================================
 
     @Property(tries = 100)
@@ -103,13 +103,13 @@ class UserRelationshipServicePropertyTest {
         UserFollow ab = new UserFollow(a, b);
         UserFollow bc = new UserFollow(b, c);
         // UserFollow.equals 가 id 기반 → 둘 다 id null → equals true 위험
-        // 본 property 가 통과하면 equals 가 id-only 라는 증거 (★ 위험 신호)
+        // 본 property 가 통과하면 equals 가 id-only 라는 증거 ( 위험 신호)
         assertThat(ab.equals(bc)).isFalse();  // 의도된 동치성 검증
-        // ★ 실제로는 equals true 가 나올 가능성 (id null collision) → fail 시 finding 등록
+        //  실제로는 equals true 가 나올 가능성 (id null collision) → fail 시 finding 등록
     }
 
     // ========================================================================
-    // ★ F-095 isomorphic — race window (BR-IDEMPOTENT 와 충돌)
+    //  F-095 isomorphic — race window (BR-IDEMPOTENT 와 충돌)
     // ========================================================================
 
     // 본 테스트는 Spring @Transactional + 동시성 제어 필요 → 별도 통합 테스트
@@ -119,6 +119,6 @@ class UserRelationshipServicePropertyTest {
 /*
  * Property test 5건 (jqwik) — 실행 환경 부재로 사용자 위임.
  * 실행 통과 = 형식 명세 ↔ 코드 정합 자동 보장.
- * ★ Sprint 1.5 #13 (Equality on transient) 검증 자동화 — 본 sprint 신규 부각.
+ *  Sprint 1.5 #13 (Equality on transient) 검증 자동화 — 본 sprint 신규 부각.
  * F-095 (race window) 는 통합 테스트 영역 — 본 scope 외.
  */

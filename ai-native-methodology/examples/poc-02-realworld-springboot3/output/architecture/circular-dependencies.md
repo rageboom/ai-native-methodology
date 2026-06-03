@@ -13,6 +13,7 @@
 **결과: 0건** ✅
 
 검증 방법:
+
 1. **메인 직접 grep** — Service 간 io.zhc1 import 분석:
    - ArticleService → `io.zhc1.realworld.model.*` 만 의존 (Repository port + Entity)
    - UserService → `io.zhc1.realworld.model.*` 만 의존
@@ -37,11 +38,11 @@
 
 ## 2. PoC #01 비교
 
-| PoC #01 | PoC #02 |
-|---|---|
-| CIRCULAR-001 (User domain ↔ Article application 등) — same_bc severity low | **0건** ✅ |
-| Service 간 직접 호출 다수 | Service 가 Repository port 만 사용 |
-| 단일 모놀리스 → cross-package import 자유 | multi-module compileOnly + runtimeOnly 차단 |
+| PoC #01                                                                    | PoC #02                                     |
+| -------------------------------------------------------------------------- | ------------------------------------------- |
+| CIRCULAR-001 (User domain ↔ Article application 등) — same_bc severity low | **0건** ✅                                  |
+| Service 간 직접 호출 다수                                                  | Service 가 Repository port 만 사용          |
+| 단일 모놀리스 → cross-package import 자유                                  | multi-module compileOnly + runtimeOnly 차단 |
 
 → **PoC #01 CIRCULAR-001 본 환경 비재현 확정** (DEC-PHASE3-POC02-001)
 
@@ -50,12 +51,14 @@
 ## 3. v1.1.2 §3.1.1 BC 분류 절차 — 0건 케이스 적용
 
 ### 3.1 명세 §3.1.1 5단계 절차
+
 - Step 1. Tarjan SCC 알고리즘 (검출) → **결과 0건**
 - Step 2~5. 분류 / severity 산정 / 도구 분기 / Phase 4 라우팅 → **적용 부재 (skip)**
 
-### 3.2 closed F-023 외부 검증 한계 노출 ★
+### 3.2 closed F-023 외부 검증 한계 노출
 
 **phase-3-arch.md §3.1.1 의 0건 케이스 명시 부재** 발견:
+
 - Step 1 결과 0 → Step 2~5 자동 skip 가정만 있음 (line 208 `circular_dependencies: []` 한 줄 주석)
 - 분류 표 (5행) 에 "N/A (no cycle)" 행 부재
 - architecture.json 0건 케이스 메타 표기 가이드 부재
@@ -64,10 +67,10 @@
 
 ### 3.3 closed 명세 한계 누적 2건
 
-| Phase | finding | closed 항목 | 한계 |
-|---|---|---|---|
-| Phase 2 | F-049 | F-016 (Decision Tree §3.4) | Q3 (DDL auto-generated 분별) 누락 |
-| **Phase 3** | **F-060** | **F-023 (BC 분류 §3.1.1)** | **0건 케이스 명시 부재** |
+| Phase       | finding   | closed 항목                | 한계                              |
+| ----------- | --------- | -------------------------- | --------------------------------- |
+| Phase 2     | F-049     | F-016 (Decision Tree §3.4) | Q3 (DDL auto-generated 분별) 누락 |
+| **Phase 3** | **F-060** | **F-023 (BC 분류 §3.1.1)** | **0건 케이스 명시 부재**          |
 
 → finding-system 의 **closed → reopened 절차 정식화 권위 강화**. v1.2.0 묶음 I (메타 finding) 신설 강한 근거.
 
@@ -77,11 +80,11 @@
 
 ### 4.1 본 PoC 도구 도입 현황
 
-| 도구 | 도입 |
-|---|---|
-| Spring Modulith verify() | ❌ |
-| ArchUnit slices().beFreeOfCycles() | ❌ |
-| ArchUnit FreezingArchRule | ❌ |
+| 도구                               | 도입 |
+| ---------------------------------- | ---- |
+| Spring Modulith verify()           | ❌   |
+| ArchUnit slices().beFreeOfCycles() | ❌   |
+| ArchUnit FreezingArchRule          | ❌   |
 
 → §3.1.1 Step 4 의 "도구 도입됨" 가정 미충족.
 
@@ -108,6 +111,7 @@
 ### 5.2 BC 후보 (Phase 4 입력)
 
 본 phase architecture.json 의 module_table_mapping:
+
 - BC-CONTENT (5 테이블 / Article aggregate)
 - BC-USER (2 테이블 / User aggregate)
 - BC-AUTH (cross-cutting / 0 테이블 / JWT stateless)

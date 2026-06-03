@@ -1,7 +1,7 @@
 # PoC #16 — EFI-WEB car 모듈 e2e (D-axis 그래프/코드 연결 입증)
 
 > 2026-05-28 / 등재 = `decisions/DEC-2026-05-28-poc-15-신설.md` (사후 작성 예정)
-> ★ **D-axis** = 산출물 ↔ artifact-graph ↔ 코드 pointer 100% 연결 e2e 검증 / R1' axis paradigm ceiling 측정과 ★ 별도 axis.
+> **D-axis** = 산출물 ↔ artifact-graph ↔ 코드 pointer 100% 연결 e2e 검증 / R1' axis paradigm ceiling 측정과 별도 axis.
 
 ## 의도
 
@@ -28,15 +28,15 @@
 
 ## paradigm 매트릭스
 
-| dimension | PoC #06 exchange | PoC #07 capital | PoC #11 billing | **PoC #16 car** | axis |
-|---|---|---|---|---|---|
-| 프레임워크 | Spring 4.1.2 | Spring 4.1.2 | Spring 4.1.2 | **Spring 4.1.2** | 동일 |
-| ORM | iBATIS 2 | iBATIS 2 | iBATIS 2 | **iBATIS 2** | 동일 |
-| LOC | 345 | 3,752 | 257 | **1,750** | scale 중간 |
-| 책임 분기 | 단일 | 다중 | 작은 단일 | **이중 (Mgt + Cost)** | ★ 책임 분기 신규 |
-| ERD 자산 | ❌ | ❌ | ❌ | **car.erd 60K** | ★ ground truth 비교 |
-| chain 도달 | gate #1 | gate #1 | gate #2 | **gate #2 (목표)** | 동등 |
-| **D-axis** | ❌ | ❌ | ❌ | ✅ **artifact-graph 합성 + 검증** | ★ 신규 입증 |
+| dimension  | PoC #06 exchange | PoC #07 capital | PoC #11 billing | **PoC #16 car**                   | axis              |
+| ---------- | ---------------- | --------------- | --------------- | --------------------------------- | ----------------- |
+| 프레임워크 | Spring 4.1.2     | Spring 4.1.2    | Spring 4.1.2    | **Spring 4.1.2**                  | 동일              |
+| ORM        | iBATIS 2         | iBATIS 2        | iBATIS 2        | **iBATIS 2**                      | 동일              |
+| LOC        | 345              | 3,752           | 257             | **1,750**                         | scale 중간        |
+| 책임 분기  | 단일             | 다중            | 작은 단일       | **이중 (Mgt + Cost)**             | 책임 분기 신규    |
+| ERD 자산   | ❌               | ❌              | ❌              | **car.erd 60K**                   | ground truth 비교 |
+| chain 도달 | gate #1          | gate #1         | gate #2         | **gate #2 (목표)**                | 동등              |
+| **D-axis** | ❌               | ❌              | ❌              | ✅ **artifact-graph 합성 + 검증** | 신규 입증         |
 
 → **PoC #16 신규 입증** = **D-axis** (artifact-graph e2e 합성 + cycle/orphan/unknown=0 + code-pointer coverage 100% strict). R1' axis paradigm ceiling 측정은 carry (사내 EFI-WEB 4번째 corroboration).
 
@@ -44,13 +44,13 @@
 
 상세 plan = `~/.claude/plans/groovy-enchanting-zebra.md`
 
-| Step | 행동 | DoD |
-|---|---|---|
-| 1 | 폴더 init + 소스 사본 + chain-driver init | state='analysis' / blocked=false ✅ |
-| 2 | analysis 11 phase + aspect 4 + 자동 검증 6종 | 6 validator 모두 exit 0 |
-| 3 | chain 1 (discovery) 4 phase | discovery-extraction-validator source_grounded≥1 / br_id grep 100% / UC≥0.80 |
-| 4 | gate #1 통과 | state='spec' / blocked=false |
-| 5 | chain 2 spec + artifact-graph + 검증 | **graph cycle/orphan/unknown=0 + code-pointer coverage=1.0** ★ |
+| Step | 행동                                         | DoD                                                                          |
+| ---- | -------------------------------------------- | ---------------------------------------------------------------------------- |
+| 1    | 폴더 init + 소스 사본 + chain-driver init    | state='analysis' / blocked=false ✅                                          |
+| 2    | analysis 11 phase + aspect 4 + 자동 검증 6종 | 6 validator 모두 exit 0                                                      |
+| 3    | chain 1 (discovery) 4 phase                  | discovery-extraction-validator source_grounded≥1 / br_id grep 100% / UC≥0.80 |
+| 4    | gate #1 통과                                 | state='spec' / blocked=false                                                 |
+| 5    | chain 2 spec + artifact-graph + 검증         | **graph cycle/orphan/unknown=0 + code-pointer coverage=1.0**                 |
 
 ## 폴더 구조
 

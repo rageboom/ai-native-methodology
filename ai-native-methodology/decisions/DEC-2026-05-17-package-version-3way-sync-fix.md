@@ -1,7 +1,7 @@
 # DEC-2026-05-17-package-version-3way-sync-fix
 
-- **상태**: 승인 (★ 선행 housekeeping / 본 feature 무관 / 별도 commit / no version bump)
-- **일자**: 2026-05-17 (★ session 26차 후속 / plugin-authoring-spec feature 진입 전 선행)
+- **상태**: 승인 ( 선행 housekeeping / 본 feature 무관 / 별도 commit / no version bump)
+- **일자**: 2026-05-17 ( session 26차 후속 / plugin-authoring-spec feature 진입 전 선행)
 - **결정자**: 윤주스 (TF Lead) — plugin-authoring-spec plan OD-4 "먼저 별도 housekeeping 로 수정 후 진행"
 - **관련**: scripts/version-check.js (3-way sync SSOT) / DEC-2026-05-17-plugin-authoring-spec (후속 feature / 본 housekeeping 선행 의존) / plan `skill-hooks-tender-stonebraker`
 
@@ -33,7 +33,7 @@
 
 ## Lessons Learned
 
-- **LL-housekeeping** — release bump 시 3-way sync (plugin.json ↔ CHANGELOG ↔ root package.json) 전수 동반 의무. 과거 release 가 root package.json 누락 → version-check 가 검출했으나 release-readiness criterion 부재로 silent. (★ 본 feature 의 외부-권위 staleness 가드와 동형 교훈 — drift 는 결정적 gate 가 잡아야 / 후속 DEC-2026-05-17-plugin-authoring-spec §검토 시 release-readiness 에 version-check 통합 여부 별도 평가 후보)
+- **LL-housekeeping** — release bump 시 3-way sync (plugin.json ↔ CHANGELOG ↔ root package.json) 전수 동반 의무. 과거 release 가 root package.json 누락 → version-check 가 검출했으나 release-readiness criterion 부재로 silent. ( 본 feature 의 외부-권위 staleness 가드와 동형 교훈 — drift 는 결정적 gate 가 잡아야 / 후속 DEC-2026-05-17-plugin-authoring-spec §검토 시 release-readiness 에 version-check 통합 여부 별도 평가 후보)
 
 ---
 

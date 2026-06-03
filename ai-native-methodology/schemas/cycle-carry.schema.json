@@ -62,12 +62,12 @@
         },
         "original_intent": {
           "type": "string",
-          "description": "★ Tier 4.1 — 본 carry 가 원래 의도한 작업 (예: 'v8.7 PATCH 적용 후 산출물 redo' / 'NestApp bootstrap supertest 통합'). 본 field 가 비어 있으면 resolution drift 검출 어려움."
+          "description": "Tier 4.1 — 본 carry 가 원래 의도한 작업 (예: 'v8.7 PATCH 적용 후 산출물 redo' / 'NestApp bootstrap supertest 통합'). 본 field 가 비어 있으면 resolution drift 검출 어려움."
         },
         "resolution_kind": {
           "type": "string",
           "enum": ["intended", "alternative", "drift", "pending"],
-          "description": "★ Tier 4.1 — 본 carry 의 실제 resolution 방식. 'intended' = 원 의도 그대로 완료. 'alternative' = 다른 방식으로 동등한 결과 도달 (예: redo 대신 신규 분석). 'drift' = 원 의도와 다른 방향으로 흘러간 resolution. 'pending' = 아직 미해결."
+          "description": "Tier 4.1 — 본 carry 의 실제 resolution 방식. 'intended' = 원 의도 그대로 완료. 'alternative' = 다른 방식으로 동등한 결과 도달 (예: redo 대신 신규 분석). 'drift' = 원 의도와 다른 방향으로 흘러간 resolution. 'pending' = 아직 미해결."
         },
         "resolution_note": {
           "type": "string",
@@ -109,7 +109,7 @@
           "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
           "then": {
             "required": ["resolution_kind", "resolved_at", "resolved_in_cycle"],
-            "description": "★ Tier 4.1 — status=completed 시 resolution_kind 의무 (drift 검출 가능)"
+            "description": "Tier 4.1 — status=completed 시 resolution_kind 의무 (drift 검출 가능)"
           }
         }
       ]

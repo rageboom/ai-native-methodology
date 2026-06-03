@@ -1,6 +1,6 @@
 # Phase A Self-Iteration Guide
 
-> ★ ★ ★ DEC-2026-05-02-plugin-first / 12차 결단 정합. Phase A = self-iteration 무기한 / 사내 배포 (Phase B) 진입 전 의무 단계.
+> DEC-2026-05-02-plugin-first / 12차 결단 정합. Phase A = self-iteration 무기한 / 사내 배포 (Phase B) 진입 전 의무 단계.
 >
 > 본 가이드 = 사용자가 본인 다른 프로젝트 (사내 legacy 코드베이스 1개) 에서 본 plugin 을 install + 1회 self-iteration 돌릴 때 절차 + 마찰점 등재 패턴.
 
@@ -8,24 +8,24 @@
 
 ## 0. 사전 조건
 
-- Claude Code 설치 (★ 본 plugin 은 Claude Code plugin 시스템 기반)
-- 분석 대상 사내 legacy 프로젝트 1개 선정 (★ 본 레포 자체로 self-iteration ❌ — 의미 약함)
+- Claude Code 설치 (본 plugin 은 Claude Code plugin 시스템 기반)
+- 분석 대상 사내 legacy 프로젝트 1개 선정 (본 레포 자체로 self-iteration ❌ — 의미 약함)
 - 본 레포 git clone 또는 absolute path 확보
-- (★ 권장) Windows 한국어 환경에서 Semgrep 사용 시 `PYTHONUTF8=1` 환경변수 설정
+- (권장) Windows 한국어 환경에서 Semgrep 사용 시 `PYTHONUTF8=1` 환경변수 설정
 
 ---
 
 ## 1. Plugin install (Phase A.0 진입 자격)
 
-★ Phase B (사내 marketplace 정식 배포) 미진입 = local path 또는 git URL 직접 등재.
+Phase B (사내 marketplace 정식 배포) 미진입 = local path 또는 git URL 직접 등재.
 
-### 1.0 ★ ★ 사전 의무 — `marketplace.json` 부재 시 차단 (★ F-PA-007 / Phase A.0 진입 자격)
+### 1.0 사전 의무 — `marketplace.json` 부재 시 차단 (F-PA-007 / Phase A.0 진입 자격)
 
-`<plugin-dir>/.claude-plugin/marketplace.json` 부재 = `claude plugin marketplace add` fail. Phase B 가정과 다름 (★ marketplace.json 은 Phase A.0 자격).
+`<plugin-dir>/.claude-plugin/marketplace.json` 부재 = `claude plugin marketplace add` fail. Phase B 가정과 다름 (marketplace.json 은 Phase A.0 자격).
 
-본 레포 = ★ ★ ★ 이미 작성 완료 (v1.4.2 commit 29f040e+ 후속).
+본 레포 = 이미 작성 완료 (v1.4.2 commit 29f040e+ 후속).
 
-### 1.1 Local path install (★ 권장 / 본 세션 검증 완료)
+### 1.1 Local path install (권장 / 본 세션 검증 완료)
 
 ```bash
 # Claude Code CLI 또는 in-session slash command — 둘 다 작동:
@@ -34,9 +34,9 @@ claude plugin install ai-native-methodology@ai-native-methodology
 claude plugin list   # 검증
 ```
 
-★ ★ marketplace.json 의 plugin source 표기 = ★ `"./"` (★ trailing slash 의무 / `"."` 단순 문자열은 v2.1.126 미지원 — F-PA-008).
+marketplace.json 의 plugin source 표기 = `"./"` (trailing slash 의무 / `"."` 단순 문자열은 v2.1.126 미지원 — F-PA-008).
 
-★ 두 번째 인자 (`@ai-native-methodology`) = marketplace 명 (= directory 명 기본값).
+두 번째 인자 (`@ai-native-methodology`) = marketplace 명 (= directory 명 기본값).
 
 ### 1.2 Git URL install (사내 git 사용 시 / Phase B carry)
 
@@ -59,6 +59,7 @@ claude plugin list
 ### 1.4 in-session slash command (대안)
 
 Claude Code 세션 안에서:
+
 ```
 /plugin                                                  # 대화형 plugin manager
 /plugin marketplace add <local-path-or-git-url>
@@ -77,12 +78,13 @@ cd <legacy-repo>
 claude code
 ```
 
-★ ★ 정상 동작 시 SessionStart hook 메시지:
+정상 동작 시 SessionStart hook 메시지:
+
 ```
-[ai-native-methodology] Plugin loaded. Read CLAUDE.md for the 23 policies + 4원칙 + ★★★ no-simulation. Stage = analysis (v1.4.x default). See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.
+[ai-native-methodology] Plugin loaded. Read CLAUDE.md for the 23 policies + 4원칙 + no-simulation. Stage = analysis (v1.4.x default). See methodology-spec/lifecycle-contract.md for SDLC stage interfaces.
 ```
 
-★ 메시지 부재 / 다른 hook 출력 = ★ 마찰점 #1 finding 등재 (§5).
+메시지 부재 / 다른 hook 출력 = 마찰점 #1 finding 등재 (§5).
 
 ---
 
@@ -95,9 +97,9 @@ Claude 에게 다음 자연어 prompt:
 phase 0 input 부터 가자.
 ```
 
-★ ★ 정상 동작 시 `phase-0-input` skill 자동 발동 (description trigger 매칭). Bash + Glob + Grep + Read 사용해서 input 메타 추출 → `<legacy-repo>/.aimd/phase-0-input.json` 산출.
+정상 동작 시 `phase-0-input` skill 자동 발동 (description trigger 매칭). Bash + Glob + Grep + Read 사용해서 input 메타 추출 → `<legacy-repo>/.aimd/phase-0-input.json` 산출.
 
-★ skill 미발동 / 잘못된 skill 발동 = ★ 마찰점 finding 등재.
+skill 미발동 / 잘못된 skill 발동 = 마찰점 finding 등재.
 
 ---
 
@@ -105,33 +107,36 @@ phase 0 input 부터 가자.
 
 Claude 가 어떤 파일 Write 또는 Edit 후 (예: `.aimd/output/inventory.json` 작성):
 
-★ ★ hooks.json 의 PostToolUse trigger:
+hooks.json 의 PostToolUse trigger:
+
 ```
 [hook] node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output 2>&1 || true
 ```
 
-★ ★ ★ 검증 항목:
-- `${CLAUDE_PLUGIN_ROOT}` 변수 해석 정상? (★ Claude Code 자동 치환 / 미해석 시 ENOENT — F-PA-002 후보)
+검증 항목:
+
+- `${CLAUDE_PLUGIN_ROOT}` 변수 해석 정상? (Claude Code 자동 치환 / 미해석 시 ENOENT — F-PA-002 후보)
 - user project cwd 에 `.aimd/output/` 디렉토리 존재 시 — drift-validator 가 정상 실행 + json/mermaid 짝 발견 → drift 체크
-- `.aimd/output/` 부재 시 — `path not found` → exit 2 → `|| true` 로 무시 (★ silent fail-soft)
-- drift ≥ 1 시 — Claude Code 가 hook 출력 표시 (★ 사용자 인지 가능)
+- `.aimd/output/` 부재 시 — `path not found` → exit 2 → `|| true` 로 무시 (silent fail-soft)
+- drift ≥ 1 시 — Claude Code 가 hook 출력 표시 (사용자 인지 가능)
 
-★ ★ 위 4건 중 하나라도 실패 = ★ 마찰점 finding (★ 도구 격상 trigger 가능성 높음).
+위 4건 중 하나라도 실패 = 마찰점 finding (도구 격상 trigger 가능성 높음).
 
-### 4.1 ★ 도구 격상 carry — drift-validator graceful 모드
+### 4.1 도구 격상 carry — drift-validator graceful 모드
 
-본 hook command 는 ★ 단순 fail-soft 패턴. 본격 hook 통합 = drift-validator 격상 carry:
-- ★ `.aimd/output` 부재 시 silent exit 0 (★ "path not found" stderr 출력 안 함)
-- ★ `--plugin-mode` 옵션 신설 — 점진/빠른 hook 반응 모드 (recently edited 파일만 비교)
-- ★ `--recently-edited` 옵션 신설 — git 또는 mtime 기반 최근 N분 파일 필터
+본 hook command 는 단순 fail-soft 패턴. 본격 hook 통합 = drift-validator 격상 carry:
 
-→ ★ Phase A.1 carry 등재 (★ feedback_methodology_body_priority — 본체 도구 격상 후 plugin sync).
+- `.aimd/output` 부재 시 silent exit 0 ("path not found" stderr 출력 안 함)
+- `--plugin-mode` 옵션 신설 — 점진/빠른 hook 반응 모드 (recently edited 파일만 비교)
+- `--recently-edited` 옵션 신설 — git 또는 mtime 기반 최근 N분 파일 필터
+
+→ Phase A.1 carry 등재 (feedback_methodology_body_priority — 본체 도구 격상 후 plugin sync).
 
 ---
 
 ## 5. 마찰점 finding 등재 패턴
 
-★ 모든 마찰점은 `<legacy-repo>/.aimd/findings.md` 에 누적 (★ skills/_base/log-finding 정합):
+모든 마찰점은 `<legacy-repo>/.aimd/findings.md` 에 누적 (skills/\_base/log-finding 정합):
 
 ### finding template
 
@@ -175,17 +180,17 @@ Claude 가 어떤 파일 Write 또는 Edit 후 (예: `.aimd/output/inventory.jso
 
 마찰점 발견 → plugin 즉시 수정 → 재시도. 한 iteration 종료 조건:
 
-| 종료 조건 | 다음 단계 |
-|---|---|
-| ★ 7대 산출물 1개 이상 정상 산출 + 마찰점 0~3건 (모두 plugin 즉시 수정 완료) | ★ Phase A iteration #N+1 진입 (★ 다른 사내 프로젝트 또는 다른 phase) |
-| ★ ★ 마찰점 4건+ 또는 본체 격상 trigger 1건 + | ★ Phase A iteration 일시 중단 → 본체 격상 → plugin sync → iteration #N 재시도 |
-| ★ ★ ★ Phase A 전체 자격 충족 (사용자 만족 결단 + 7대 산출물 안정 동작 + G1/G2 v2.0 carry 결단 검증) | ★ ★ ★ Phase B 진입 (release.yml + marketplace.json + LICENSE 정식 + InfoSec audit + BE 1팀 pilot) |
+| 종료 조건                                                                                     | 다음 단계                                                                                   |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 7대 산출물 1개 이상 정상 산출 + 마찰점 0~3건 (모두 plugin 즉시 수정 완료)                     | Phase A iteration #N+1 진입 (다른 사내 프로젝트 또는 다른 phase)                            |
+| 마찰점 4건+ 또는 본체 격상 trigger 1건 +                                                      | Phase A iteration 일시 중단 → 본체 격상 → plugin sync → iteration #N 재시도                 |
+| Phase A 전체 자격 충족 (사용자 만족 결단 + 7대 산출물 안정 동작 + G1/G2 v2.0 carry 결단 검증) | Phase B 진입 (release.yml + marketplace.json + LICENSE 정식 + InfoSec audit + BE 1팀 pilot) |
 
 ---
 
 ## 7. Phase A iteration 결과 보고 패턴
 
-★ 한 iteration 종료 시 본 레포에 commit:
+한 iteration 종료 시 본 레포에 commit:
 
 ```
 git checkout -b phase-a-iteration-N
@@ -195,31 +200,32 @@ git commit -m "Phase A iteration N — <대상 프로젝트> / 마찰점 X건 / 
 ```
 
 보고서 핵심 항목:
-- 대상 사내 프로젝트 (★ 익명화 가능 / project_alias)
+
+- 대상 사내 프로젝트 (익명화 가능 / project_alias)
 - iteration 일자 + 소요 시간
 - 발견 마찰점 (F-PA-NNN 목록 + severity 분포)
-- plugin 즉시 수정 (★ commit hash)
-- 본체 격상 trigger (★ 별도 commit / DEC 등재)
+- plugin 즉시 수정 (commit hash)
+- 본체 격상 trigger (별도 commit / DEC 등재)
 - 산출 7대 산출물 중 정상 작동 항목
 - 다음 iteration 권고 (다른 phase / 다른 stack / Phase B 진입 자격 평가)
 
 ---
 
-## 8. 의도적 carry (★ Phase A iteration 중 만나면 즉시 종료 ❌ — Phase B 또는 v2.0 carry 등재)
+## 8. 의도적 carry (Phase A iteration 중 만나면 즉시 종료 ❌ — Phase B 또는 v2.0 carry 등재)
 
-| carry | 분류 | 사유 |
-|---|---|---|
-| `tools/*/cli.mjs` MCP wrapper | Phase A.1 | 현재 standalone CLI (`src/cli.js`) 직접 호출 fallback / MCP 미사용 |
-| **★ drift-validator graceful 모드 + `--plugin-mode` + `--recently-edited`** | Phase A.1 | ★ ★ ★ F-PA-001 즉시 fix 시 발견 / 본체 도구 격상 후 hooks.json command 강화 |
-| `adoption/dist/internal-v1.4/` 빌드 | Phase B | release.yml 자동화 후 |
-| `marketplace.json` | Phase B | 사내 marketplace 진입점 |
-| LICENSE 정식 | Phase B | 현재 placeholder |
-| InfoSec audit | Phase B | 사내 보안팀 결단 |
-| BE 1팀 pilot | Phase B | 사용자 만족 결단 후 |
-| G1 `.aimd/state.json` (사용자 프로젝트 stage 추적) | v2.0 | analysis stage only / lifecycle 확장 시 |
-| G2 stage-aware hook routing | v2.0 | analysis stage only |
-| `enter-stage` skill | v2.0 | lifecycle 확장 시 |
-| `lifecycle-contract-validator` runtime | v2.0 | lifecycle 확장 시 |
+| carry                                                                     | 분류      | 사유                                                                  |
+| ------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------- |
+| `tools/*/cli.mjs` MCP wrapper                                             | Phase A.1 | 현재 standalone CLI (`src/cli.js`) 직접 호출 fallback / MCP 미사용    |
+| **drift-validator graceful 모드 + `--plugin-mode` + `--recently-edited`** | Phase A.1 | F-PA-001 즉시 fix 시 발견 / 본체 도구 격상 후 hooks.json command 강화 |
+| `adoption/dist/internal-v1.4/` 빌드                                       | Phase B   | release.yml 자동화 후                                                 |
+| `marketplace.json`                                                        | Phase B   | 사내 marketplace 진입점                                               |
+| LICENSE 정식                                                              | Phase B   | 현재 placeholder                                                      |
+| InfoSec audit                                                             | Phase B   | 사내 보안팀 결단                                                      |
+| BE 1팀 pilot                                                              | Phase B   | 사용자 만족 결단 후                                                   |
+| G1 `.aimd/state.json` (사용자 프로젝트 stage 추적)                        | v2.0      | analysis stage only / lifecycle 확장 시                               |
+| G2 stage-aware hook routing                                               | v2.0      | analysis stage only                                                   |
+| `enter-stage` skill                                                       | v2.0      | lifecycle 확장 시                                                     |
+| `lifecycle-contract-validator` runtime                                    | v2.0      | lifecycle 확장 시                                                     |
 
 ---
 

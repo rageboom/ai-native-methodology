@@ -10,7 +10,7 @@
   "http_status": null,
   "error_message": null,
   "current_state": "partial",
-  "current_state_note": "★ N+1 위험 — F-124 (PoC #02 F-051 cross-val 재현 / 3 PoC 권위 → AP-PERFORMANCE-001 medium → high 격상 후보)",
+  "current_state_note": " N+1 위험 — F-124 (PoC #02 F-051 cross-val 재현 / 3 PoC 권위 → AP-PERFORMANCE-001 medium → high 격상 후보)",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 3,
@@ -27,34 +27,34 @@
       "검증 위치 (Entity decorator vs Query)",
       "HTTP status (해당 없음)",
       "에러 메시지 (해당 없음)",
-      "★ N+1 위험 정량 (★ 1 query → N+1 query)"
+      " N+1 위험 정량 ( 1 query → N+1 query)"
     ]
   },
   "formalization_decisions": [
     {
       "item": "조건 적용 시점",
-      "decision": "★ 모든 Article find — list (findAll) 시 N개 article × M개 comment = N×M+1 queries",
-      "rationale": "★ EAGER default — 명시적 fetch 권고 위반"
+      "decision": " 모든 Article find — list (findAll) 시 N개 article × M개 comment = N×M+1 queries",
+      "rationale": " EAGER default — 명시적 fetch 권고 위반"
     },
     {
       "item": "검증 위치",
-      "decision": "★★ eager:false default + 명시적 relations: ['comments'] 또는 @EntityGraph 사용 (F-124 fix)",
-      "rationale": "★★ Hibernate / TypeORM 정설 = LAZY default + 명시적 fetch"
+      "decision": " eager:false default + 명시적 relations: ['comments'] 또는 @EntityGraph 사용 (F-124 fix)",
+      "rationale": " Hibernate / TypeORM 정설 = LAZY default + 명시적 fetch"
     },
     {
       "item": "fetch 전략",
-      "decision": "★ relations: ['comments'] (find 시) + @QueryBuilder leftJoinAndSelect (특수 쿼리 시)",
-      "rationale": "★ 명시적 — N+1 회피"
+      "decision": " relations: ['comments'] (find 시) + @QueryBuilder leftJoinAndSelect (특수 쿼리 시)",
+      "rationale": " 명시적 — N+1 회피"
     },
     {
       "item": "성능 측정",
-      "decision": "★ jest + typeorm-query-counter — N+1 detection unit test",
-      "rationale": "★ 회귀 방지"
+      "decision": " jest + typeorm-query-counter — N+1 detection unit test",
+      "rationale": " 회귀 방지"
     },
     {
       "item": "캐싱 전략",
-      "decision": "★ Redis cache for hot articles (별 작업 / Sprint 5+)",
-      "rationale": "★ N+1 fix 후 추가 최적화"
+      "decision": " Redis cache for hot articles (별 작업 / Sprint 5+)",
+      "rationale": " N+1 fix 후 추가 최적화"
     }
   ],
   "related_findings": [

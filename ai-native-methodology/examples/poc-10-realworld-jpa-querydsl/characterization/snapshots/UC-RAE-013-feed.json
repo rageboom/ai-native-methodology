@@ -1,11 +1,11 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RAE-013 Article feed (★ ★ AP-RAE-002 N+1 risk).",
+  "$comment": " phase 4.7 snapshot — UC-RAE-013 Article feed ( AP-RAE-002 N+1 risk).",
   "snapshot_id": "SNAP-UC-RAE-013",
   "use_case": "UC-RAE-013",
   "endpoint": "GET /articles/feed",
   "controller_method": "ArticleRestController.getFeed",
   "scenarios": [
-    {"id": "SCN-RAE-013-001", "name": "happy path — follow 기반 feed (★ N+1 risk)", "given": {"user_follows": ["alice", "bob"]}, "when": "★ ArticleRepository.findAllByAuthor IN follow → ★ ★ Lazy fetch 시 N+1 (★ tag/comment lazy load per article)", "then": {"expected_response": "Page<Article>", "_note": "★ ★ AP-RAE-002 — @EntityGraph 또는 fetch join 명시 의무 (Modern recommendation)"}, "intent_classification": [{"rule": "AP-RAE-002", "type": "bug", "note": "★ ★ N+1 risk on lazy fetch"}], "behavior_likely_bug": ["★ Spring Data JPA Lazy fetch default = N+1 / @EntityGraph 또는 dto projection 의무"]}
+    {"id": "SCN-RAE-013-001", "name": "happy path — follow 기반 feed ( N+1 risk)", "given": {"user_follows": ["alice", "bob"]}, "when": " ArticleRepository.findAllByAuthor IN follow → Lazy fetch 시 N+1 ( tag/comment lazy load per article)", "then": {"expected_response": "Page<Article>", "_note": " AP-RAE-002 — @EntityGraph 또는 fetch join 명시 의무 (Modern recommendation)"}, "intent_classification": [{"rule": "AP-RAE-002", "type": "bug", "note": " N+1 risk on lazy fetch"}], "behavior_likely_bug": [" Spring Data JPA Lazy fetch default = N+1 / @EntityGraph 또는 dto projection 의무"]}
   ],
   "intent_vs_bug_summary": {"intent": [], "bug": ["AP-RAE-002 N+1"], "ambiguous": [], "self_recognized": []}
 }

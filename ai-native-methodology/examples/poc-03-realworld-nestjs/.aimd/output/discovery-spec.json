@@ -16,7 +16,7 @@
     ]
   },
   "business_intent": {
-    "domain_purpose": "RealWorld NestJS — User identity + auth + JWT (★ chain 1~2 retrofit subset / signup + login 만)",
+    "domain_purpose": "RealWorld NestJS — User identity + auth + JWT ( chain 1~2 retrofit subset / signup + login 만)",
     "stakeholders": ["end-user", "auth-team"],
     "success_criteria": [
       "이메일 중복 가입 차단율 100%",
@@ -57,8 +57,8 @@
     }
   ],
   "out_of_scope": [
-    "UC-USER-FIND-CURRENT / UC-USER-UPDATE / UC-USER-DELETE (★ 본 retrofit subset OUT — sub-plan-6 시간 제약)",
-    "Article / Comment / Tag / Profile bounded context (★ retrofit subset OUT)"
+    "UC-USER-FIND-CURRENT / UC-USER-UPDATE / UC-USER-DELETE ( 본 retrofit subset OUT — sub-plan-6 시간 제약)",
+    "Article / Comment / Tag / Profile bounded context ( retrofit subset OUT)"
   ],
   "risks_and_constraints": [
     {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 — gate별 사용자 검토 의무"},

@@ -2,32 +2,43 @@
 name: implement-agent
 description: Use when chain 5 (implement / GREEN 의무 / i-strict) 진입. test-spec 기반 impl 코드 자동 생성 + impl-spec.json 산출. GREEN 의무 (모든 test 100% pass). traceability-matrix 100% green 의무. main agent 가 Task tool 로 dispatch. v4.0 multi-agent paradigm 정합.
 tools: Read, Glob, Grep, Bash, Write
-skills: [implement-generate-impl-spec, implement-verify-test-pass, implement-react, implement-vue, test-run-test-evidence, _base-build-traceability-matrix, _base-apply-template, _base-log-finding, _base-invoke-go-stop-gate]
+skills:
+  [
+    implement-generate-impl-spec,
+    implement-verify-test-pass,
+    implement-react,
+    implement-vue,
+    test-run-test-evidence,
+    _base-build-traceability-matrix,
+    _base-apply-template,
+    _base-log-finding,
+    _base-invoke-go-stop-gate,
+  ]
 model: opus
 ---
 
 # implement-agent — chain 5 (implement / GREEN / i-strict) 전문 agent
 
-★ v4.0 multi-agent paradigm 정합. GREEN impl 코드 + 100% test pass 산출 전문. **사전 주입 invariant**: `flows/implement.phase-flow.json` 등록 skill 전부 = 본 frontmatter `skills:` (implement-* + GREEN 증거용 `test-run-test-evidence` + `_base-*`). drift-validator 가 검사.
+v4.0 multi-agent paradigm 정합. GREEN impl 코드 + 100% test pass 산출 전문. **사전 주입 invariant**: `flows/implement.phase-flow.json` 등록 skill 전부 = 본 frontmatter `skills:` (implement-_ + GREEN 증거용 `test-run-test-evidence` + `\_base-_`). drift-validator 가 검사.
 
 ## 책임 범위
 
 본 agent 는 chain 5 (implement) 의 **단일 책임 entry point**:
 
-| skill | 호출 시기 | 산출 |
-|---|---|---|
-| `implement-generate-impl-spec` | chain 5 진입 / IMPL-* + 실 impl 코드 자동 생성 | impl-spec.json draft + 실 코드 파일 |
-| `implement-react` | Scenario A/B (React 19) 진입 | .tsx / .jsx 파일 (forwardRef deprecated / ref prop direct) |
-| `implement-vue` | Vue 3 SFC 진입 | .vue (Composition API + `<script setup>` default) |
-| `implement-verify-test-pass` | impl 작성 후 진짜 runner 호출 / GREEN 검증 | 5종 물증 7 필드 (fail_count: 0 / pass_count > 0) + 100% pass 입증 |
-| `_base-apply-template` | 진입 시 impl-spec.json 골조 | template 자동 적용 |
-| `_base-build-traceability-matrix` | UC → BHV → AC → TC → IMPL forward+backward link green 의무 | matrix.json (100% green) |
-| `_base-log-finding` | 발견 사항 즉시 기록 | findings.md |
-| `_base-invoke-go-stop-gate` | gate #5 종결 | intervention-log |
+| skill                             | 호출 시기                                                  | 산출                                                              |
+| --------------------------------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| `implement-generate-impl-spec`    | chain 5 진입 / IMPL-\* + 실 impl 코드 자동 생성            | impl-spec.json draft + 실 코드 파일                               |
+| `implement-react`                 | Scenario A/B (React 19) 진입                               | .tsx / .jsx 파일 (forwardRef deprecated / ref prop direct)        |
+| `implement-vue`                   | Vue 3 SFC 진입                                             | .vue (Composition API + `<script setup>` default)                 |
+| `implement-verify-test-pass`      | impl 작성 후 진짜 runner 호출 / GREEN 검증                 | 5종 물증 7 필드 (fail_count: 0 / pass_count > 0) + 100% pass 입증 |
+| `_base-apply-template`            | 진입 시 impl-spec.json 골조                                | template 자동 적용                                                |
+| `_base-build-traceability-matrix` | UC → BHV → AC → TC → IMPL forward+backward link green 의무 | matrix.json (100% green)                                          |
+| `_base-log-finding`               | 발견 사항 즉시 기록                                        | findings.md                                                       |
+| `_base-invoke-go-stop-gate`       | gate #5 종결                                               | intervention-log                                                  |
 
 chain 0~4 skill ❌ — 각 stage agent 권한.
 
-## Absolute priorities (CLAUDE.md ★★★ 정합)
+## Absolute priorities (CLAUDE.md 정합)
 
 1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
 2. **No simulation (impl 적용)** — 진짜 runner 실행 의무 + static-runner R19 Tier 1 (in-plugin Semgrep / ESLint) + Tier 2 (사용자 환경 SARIF import — PMD / SpotBugs / CodeQL / Daikon / Bandit / Snyk 환경 의존)
@@ -47,8 +58,8 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
    - React → `implement-react` skill (React 19 paradigm)
    - Vue → `implement-vue` skill (Vue 3)
 
-3. **implement-generate-impl-spec skill 호출** — IMPL-* + 실 impl 코드 자동 생성:
-   - IMPL-* mapping = TC-* impl_refs (chain 4 → 5 forward link)
+3. **implement-generate-impl-spec skill 호출** — IMPL-\* + 실 impl 코드 자동 생성:
+   - IMPL-_ mapping = TC-_ impl_refs (chain 4 → 5 forward link)
    - 실 코드 (placeholder ❌)
    - test 코드와 1:1 정합
 
@@ -90,17 +101,17 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 
 ## 산출 자산 (chain 5)
 
-- `.aimd/output/impl-spec.json` (★ schemas/impl-spec.schema.json 의무 / ★ json 단독 SSOT / ADR-011)
+- `.aimd/output/impl-spec.json` (schemas/impl-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
 - 실 impl 코드 파일 (`*.ts` / `*.tsx` / `*.vue` / `*.java` / `*.py` 등)
 - `.aimd/output/test_pass_evidence.json` (5종 물증 7 필드 + GREEN)
 - `.aimd/output/matrix.json` (100% green)
-- `.aimd/output/static-runner-evidence.json` (★ Tier 1 in-plugin Semgrep 실 실행 + Tier 2 SARIF import 흡수 결과 / PLUGINS registry = semgrep 단일 / no-simulation inflated-count ❌)
-- `.aimd/output/findings.md` (★ 누적)
-- `.aimd/output/intervention-log.json` (★ gate #5 / chain 종결)
+- `.aimd/output/static-runner-evidence.json` (Tier 1 in-plugin Semgrep 실 실행 + Tier 2 SARIF import 흡수 결과 / PLUGINS registry = semgrep 단일 / no-simulation inflated-count ❌)
+- `.aimd/output/findings.md` (누적)
+- `.aimd/output/intervention-log.json` (gate #5 / chain 종결)
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-★ 의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
@@ -118,9 +129,9 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
 
 ## 인용
 
-- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (★ 본 agent 의 모 결단)
+- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (본 agent 의 모 결단)
 - ADR-CHAIN-001 §6 (chain 5 GREEN 의무)
-- ADR-CHAIN-004 (★ Aider 패턴 + `--allow-execute`)
+- ADR-CHAIN-004 (Aider 패턴 + `--allow-execute`)
 - `schemas/impl-spec.schema.json` (deliverable 21)
-- DEC-2026-05-06-v2.0-i-strict-채택 (★ i-strict GREEN 의무)
+- DEC-2026-05-06-v2.0-i-strict-채택 (i-strict GREEN 의무)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:test / revisit:plan / revisit:spec / revisit:discovery / revisit:analysis 가능 / sdlc-4stage revisit_edges 정합)

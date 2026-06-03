@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/adopter-corroboration.schema.json",
   "title": "Adopter Corroboration (Type 2 외부 채택 evidence)",
-  "description": "★ v11.29.0 — 외부 adopter(Type 2)가 자기 실 프로젝트에 plugin install → chain harness 1 cycle 완주 시 캡처되는 익명화 corroboration evidence 데이터 계약. plan-type2-external-adoption.md §Phase 1 감사 EXT-CAPTURE-01 해소. adopter-evidence-packager 가 .aimd/state.json + scope manifest + findings + traceability-matrix 합성 → PII 익명화 → 본 schema 검증 → .aimd/output/adopter-corroboration.json. ★ 정직: 본 schema 존재 = 캡처 '배선' / Type 2 '측정'은 실 adopter 실행 시 발생 (no-simulation). work-unit-manifest.scenario + state.last_gate 재사용.",
+  "description": "v11.29.0 — 외부 adopter(Type 2)가 자기 실 프로젝트에 plugin install → chain harness 1 cycle 완주 시 캡처되는 익명화 corroboration evidence 데이터 계약. plan-type2-external-adoption.md §Phase 1 감사 EXT-CAPTURE-01 해소. adopter-evidence-packager 가 .aimd/state.json + scope manifest + findings + traceability-matrix 합성 → PII 익명화 → 본 schema 검증 → .aimd/output/adopter-corroboration.json. 정직: 본 schema 존재 = 캡처 '배선' / Type 2 '측정'은 실 adopter 실행 시 발생 (no-simulation). work-unit-manifest.scenario + state.last_gate 재사용.",
   "type": "object",
   "required": ["schema_version", "plugin_version", "captured_at", "adopter", "project", "chain_run", "findings_summary", "anonymization"],
   "additionalProperties": false,
@@ -33,7 +33,7 @@
         "adopter_id": {
           "type": "string",
           "pattern": "^[a-f0-9]{8,64}$",
-          "description": "★ opaque 가명화 ID = sha256(salt + adopter 식별자) 선두 hex (비가역 / PII 아님 / 업계 가명화 관행 — salt=rainbow-table 회피). 실명·이메일·사내 host 금지."
+          "description": "opaque 가명화 ID = sha256(salt + adopter 식별자) 선두 hex (비가역 / PII 아님 / 업계 가명화 관행 — salt=rainbow-table 회피). 실명·이메일·사내 host 금지."
         },
         "org_type": {
           "type": "string",
@@ -50,7 +50,7 @@
         "project_hash": {
           "type": "string",
           "pattern": "^[a-f0-9]{8,64}$",
-          "description": "★ opaque project 식별 = sha256(salt + project 식별자) 선두 hex (비가역). 프로젝트명·경로 금지."
+          "description": "opaque project 식별 = sha256(salt + project 식별자) 선두 hex (비가역). 프로젝트명·경로 금지."
         },
         "stack_signals": {
           "type": "array",
@@ -65,7 +65,7 @@
         "loc_bucket": {
           "type": "string",
           "enum": ["<1k", "1k-10k", "10k-100k", "100k+", "undisclosed"],
-          "description": "★ REVISE-4 — 정확 LOC 는 re-identification vector → 구간 enum 고정 (drift 방지). optional."
+          "description": "REVISE-4 — 정확 LOC 는 re-identification vector → 구간 enum 고정 (drift 방지). optional."
         }
       }
     },
@@ -85,7 +85,7 @@
         },
         "gates": {
           "type": "array",
-          "description": "★ state.last_gate shape 재사용 — gate #1~#5 별 결정 + validator finding 카운트.",
+          "description": "state.last_gate shape 재사용 — gate #1~#5 별 결정 + validator finding 카운트.",
           "items": {
             "type": "object",
             "required": ["id", "stage", "decision"],
@@ -149,7 +149,7 @@
       "type": "object",
       "required": ["applied", "redaction_count", "method"],
       "additionalProperties": false,
-      "description": "★ PII 제거 provenance (EXT-CAPTURE-03).",
+      "description": "PII 제거 provenance (EXT-CAPTURE-03).",
       "properties": {
         "applied": { "type": "boolean" },
         "redaction_count": {
@@ -159,7 +159,7 @@
         },
         "method": {
           "type": "string",
-          "description": "★ 정직 — 'best-effort regex (false-negative 가능) + post-redaction leak guard' (official-docs VERIFIED: regex redaction=best-effort)."
+          "description": "정직 — 'best-effort regex (false-negative 가능) + post-redaction leak guard' (official-docs VERIFIED: regex redaction=best-effort)."
         }
       }
     }

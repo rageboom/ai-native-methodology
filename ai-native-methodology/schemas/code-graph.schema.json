@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/code-graph.schema.json",
   "title": "code-graph.json — codegraph 산출물 (reference-lens / NOT gate-injected)",
-  "description": "★ CodeGraph OSS (@colbymchenry/codegraph) index 결과 요약 산출물. analysis 단계 필수 도구 codegraph-runner 가 생성 (DEC-2026-05-30-codegraph-essential). code↔code 구조 = LLM 운영 컨텍스트의 reference lens. ★ trust 모델 (DEC-2026-05-28 §4.2): 어떤 결정적 gate 에도 inject 되지 않는다.",
+  "description": "CodeGraph OSS (@colbymchenry/codegraph) index 결과 요약 산출물. analysis 단계 필수 도구 codegraph-runner 가 생성 (DEC-2026-05-30-codegraph-essential). code↔code 구조 = LLM 운영 컨텍스트의 reference lens. trust 모델 (DEC-2026-05-28 §4.2): 어떤 결정적 gate 에도 inject 되지 않는다.",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "target_path", "index_stats", "evidence"],
@@ -76,7 +76,7 @@
         "reproduction_command": { "type": "string" },
         "evidence_trust": {
           "enum": ["real_tool", "simulated"],
-          "description": "★ no-simulation. codegraph-runner 는 real_tool 만 산출 (simulated 영구 reject)."
+          "description": "no-simulation. codegraph-runner 는 real_tool 만 산출 (simulated 영구 reject)."
         }
       }
     }

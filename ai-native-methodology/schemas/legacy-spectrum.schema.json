@@ -25,7 +25,7 @@
             "4_server_side_template",
             "mixed"
           ],
-          "description": "★ ADR-FE-001 spectrum Tier 1~4 정합. mixed=2개 이상 Tier 혼재."
+          "description": "ADR-FE-001 spectrum Tier 1~4 정합. mixed=2개 이상 Tier 혼재."
         },
         "signals": {
           "type": "array",
@@ -64,7 +64,7 @@
         },
         "mixed_breakdown": {
           "type": "object",
-          "description": "★ primary_tier=mixed 시 의무. 각 Tier 별 비율 (코드 line / file 단위).",
+          "description": "primary_tier=mixed 시 의무. 각 Tier 별 비율 (코드 line / file 단위).",
           "properties": {
             "tier_1_pct": {"type": "number", "minimum": 0, "maximum": 100},
             "tier_2_pct": {"type": "number", "minimum": 0, "maximum": 100},
@@ -80,7 +80,7 @@
     },
     "bootstrap_flow": {
       "type": "object",
-      "description": "초기 데이터 진실 source 추출 (★ Tier 2/3/4 핵심).",
+      "description": "초기 데이터 진실 source 추출 (Tier 2/3/4 핵심).",
       "properties": {
         "entry_html": {
           "type": "string",
@@ -107,7 +107,7 @@
                   "localstorage_initial",
                   "none"
                 ],
-                "description": "★ Tier 별 흔한 패턴 — server_render = Next.js / Nuxt / 직접 inline / data_attribute = jQuery 패턴 / jsp_request_attribute = Tier 4."
+                "description": "Tier 별 흔한 패턴 — server_render = Next.js / Nuxt / 직접 inline / data_attribute = jQuery 패턴 / jsp_request_attribute = Tier 4."
               },
               "initial_data_keys": {
                 "type": "array",
@@ -119,7 +119,7 @@
               },
               "ssr_safe": {
                 "type": "boolean",
-                "description": "★ XSS 위험 평가 (server_render 시 escape 의무 / static-security-spec cross-link)."
+                "description": "XSS 위험 평가 (server_render 시 escape 의무 / static-security-spec cross-link)."
               }
             }
           }
@@ -143,7 +143,7 @@
             "edge_proxy",
             "big_bang_rewrite_not_recommended"
           ],
-          "description": "★ big_bang_rewrite_not_recommended = 산업 사례 모두 strangle 권고 (ADR-FE-003 §5.3)."
+          "description": "big_bang_rewrite_not_recommended = 산업 사례 모두 strangle 권고 (ADR-FE-003 §5.3)."
         },
         "estimated_phases": {"type": "integer", "minimum": 1},
         "phase_breakdown": {
@@ -191,7 +191,7 @@
         },
         "tier_4_be_fe_split_carry": {
           "type": "boolean",
-          "description": "★ DEPRECATED (Stage 6 종결). primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무 — Stage 6 종결로 carry-over resolved. 신규 산출물은 tier_4_be_fe_handling 사용 권장."
+          "description": "DEPRECATED (Stage 6 종결). primary_tier=4_server_side_template 또는 mixed (Tier 4 포함) 시 true 의무 — Stage 6 종결로 carry-over resolved. 신규 산출물은 tier_4_be_fe_handling 사용 권장."
         },
         "tier_4_be_fe_handling": {
           "type": "string",
@@ -200,7 +200,7 @@
             "scenario_c_integrated",
             "legacy_carry_over_resolved_v14"
           ],
-          "description": "★ v1.4 Stage 6 신설 — Tier 4 (JSP / Thymeleaf / ERB) 처리 정책. ADR-FE-004 §2.4 + be-fe-separation.md §5 정합. not_applicable=Tier 4 부재 / scenario_c_integrated=Scenario C 통합 산출 (BE Spring controller + JSP 통합 분석) / legacy_carry_over_resolved_v14=v1.4 carry-over resolved 명시."
+          "description": "v1.4 Stage 6 신설 — Tier 4 (JSP / Thymeleaf / ERB) 처리 정책. ADR-FE-004 §2.4 + be-fe-separation.md §5 정합. not_applicable=Tier 4 부재 / scenario_c_integrated=Scenario C 통합 산출 (BE Spring controller + JSP 통합 분석) / legacy_carry_over_resolved_v14=v1.4 carry-over resolved 명시."
         },
         "captured_by": {
           "type": "string",

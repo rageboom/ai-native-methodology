@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/characterization-spec.schema.json",
   "title": "Characterization Spec — phase 4.7 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle",
-  "description": "Deliverable #23 (v2.1.0 신설). ★ ADR-CHAIN-006 phase 4.7 정합. Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context + SATD/KL-SATD (Maldonado & Shihab 2015) 합성. ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern.",
+  "description": "Deliverable #23 (v2.1.0 신설). ADR-CHAIN-006 phase 4.7 정합. Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context + SATD/KL-SATD (Maldonado & Shihab 2015) 합성. ≥ 2 PoC corroboration: PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern.",
   "x-spec-source": {
     "feathers_2004": "Michael Feathers, Working Effectively with Legacy Code (2004) §13",
     "gojko_sbe_2011": "https://gojko.net/2020/03/17/sbe-10-years.html",
@@ -21,7 +21,7 @@
     "snapshots": {
       "type": "array",
       "minItems": 1,
-      "description": "★ Given/When/Then BDD 형식 snapshot 배열. 1 UC 당 1 snapshot 권장.",
+      "description": "Given/When/Then BDD 형식 snapshot 배열. 1 UC 당 1 snapshot 권장.",
       "items": { "$ref": "#/$defs/snapshot" }
     },
     "intent_vs_bug": { "$ref": "#/$defs/intentVsBug" },
@@ -41,11 +41,11 @@
         "use_case": {
           "type": "string",
           "pattern": "^UC-",
-          "description": "★ discovery-spec UC ↔ link 의무."
+          "description": "discovery-spec UC ↔ link 의무."
         },
         "feature": {
           "type": "string",
-          "description": "(★ Cucumber Gherkin Feature 정합 / optional) 상위 그룹핑 이름."
+          "description": "(Cucumber Gherkin Feature 정합 / optional) 상위 그룹핑 이름."
         },
         "endpoint": {
           "type": "string",
@@ -69,7 +69,7 @@
         "data_source_status": {
           "type": "string",
           "enum": ["real_db", "real_environment", "code_only", "domain_expert_interview", "carry"],
-          "description": "★ no-simulation 정책 — code_only 시 도메인 expert carry 의무."
+          "description": "no-simulation 정책 — code_only 시 도메인 expert carry 의무."
         },
         "scenarios": {
           "type": "array",
@@ -96,24 +96,24 @@
         "tags": {
           "type": "array",
           "items": { "type": "string", "pattern": "^@" },
-          "description": "(★ Cucumber Gherkin 도구 관례 / optional / dual encoding traceability) 예: ['@happy', '@bug', '@AP-DB-001']. ★ v4.0.1 housekeeping H-1 — '★ Gherkin tag 표준' 표기 = 오표기 (Cucumber 공식 spec 안 tag 의미 표준화 ❌ / @ prefix 만 표준 / MoSCoW 매핑은 본 방법론 독자 관례) → 'Cucumber 도구 관례' 명시 (★ session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
+          "description": "(Cucumber Gherkin 도구 관례 / optional / dual encoding traceability) 예: ['@happy', '@bug', '@AP-DB-001']. v4.0.1 housekeeping H-1 — 'Gherkin tag 표준' 표기 = 오표기 (Cucumber 공식 spec 안 tag 의미 표준화 ❌ / @ prefix 만 표준 / MoSCoW 매핑은 본 방법론 독자 관례) → 'Cucumber 도구 관례' 명시 (session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
         },
         "given": {
           "type": "object",
-          "description": "★ 사전 조건 (request_body + state_before 등). 자유 형식 / 핵심 = 재현 가능성."
+          "description": "사전 조건 (request_body + state_before 등). 자유 형식 / 핵심 = 재현 가능성."
         },
         "when": {
           "type": "string",
-          "description": "★ 행위 — endpoint / method 호출 흐름."
+          "description": "행위 — endpoint / method 호출 흐름."
         },
         "then": {
           "type": "object",
-          "description": "★ 기대 결과 — expected_response + state_after + validators_passed 등."
+          "description": "기대 결과 — expected_response + state_after + validators_passed 등."
         },
         "intent_classification": {
           "type": "array",
           "minItems": 1,
-          "description": "★ ★ ★ 4 분류 핵심. rule + type 매핑.",
+          "description": "4 분류 핵심. rule + type 매핑.",
           "items": {
             "type": "object",
             "required": ["rule", "type"],
@@ -125,7 +125,7 @@
               },
               "type": {
                 "$ref": "./intent-classification.schema.json",
-                "description": "★ ★ ★ v4.0.1 — schemas/intent-classification.schema.json SSOT $ref (business-rules.schema.json businessRule.intent_vs_bug_classification 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상). 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (★ ★ housekeeping H-2 — 코드 주석 안 SATD-style 자기 인정 부채 / Maldonado & Shihab 2015 SATD 개념 차용 / 'self_recognized' 분류명 자체는 본 방법론 고유 합성 / 논문 안 SATD 5 분류 = design/defect/documentation/test/requirement 와 ★ 별개 / session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
+                "description": "v4.0.1 — schemas/intent-classification.schema.json SSOT $ref (business-rules.schema.json businessRule.intent_vs_bug_classification 와 cross-stage 정합 의무 / drift-validator cross-schema enum 정합 check 대상). 4 분류 — intent (보존 의무) / bug (modern_alternative) / ambiguous (도메인 expert carry) / self_recognized (housekeeping H-2 — 코드 주석 안 SATD-style 자기 인정 부채 / Maldonado & Shihab 2015 SATD 개념 차용 / 'self_recognized' 분류명 자체는 본 방법론 고유 합성 / 논문 안 SATD 5 분류 = design/defect/documentation/test/requirement 와 별개 / session 2026-05-17 official-docs cross-check CONTRADICTS 흡수)."
               },
               "reason": {
                 "type": "string",
@@ -137,12 +137,12 @@
         "behavior_to_preserve": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ 새 시스템에서도 동일 동작 보존 의무 항목."
+          "description": "새 시스템에서도 동일 동작 보존 의무 항목."
         },
         "behavior_likely_bug": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ 새 시스템에서 의도적 다른 결과 (modern_alternative)."
+          "description": "새 시스템에서 의도적 다른 결과 (modern_alternative)."
         }
       },
       "if": {
@@ -178,16 +178,16 @@
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "description": "★ (intent + bug + self_recognized) / (br_total + ap_total) 비율. ambiguous 미포함. ≥ 0.80 권장 (default threshold)."
+          "description": "(intent + bug + self_recognized) / (br_total + ap_total) 비율. ambiguous 미포함. ≥ 0.80 권장 (default threshold)."
         },
         "self_recognized_grep_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ TODO / FIXME / HACK / XXX / '폐해' 등 grep 결과 건수. 0 도 정합 (Modern 스택 자연 부재 / PoC #03 retrofit 입증)."
+          "description": "TODO / FIXME / HACK / XXX / '폐해' 등 grep 결과 건수. 0 도 정합 (Modern 스택 자연 부재 / PoC #03 retrofit 입증)."
         },
         "ambiguous_carry": {
           "type": "array",
-          "description": "★ ambiguous 분류 항목의 도메인 expert carry 명시 의무.",
+          "description": "ambiguous 분류 항목의 도메인 expert carry 명시 의무.",
           "items": {
             "type": "object",
             "required": ["rule_id", "carry_owner", "carry_reason"],
@@ -234,7 +234,7 @@
               "snapshot": {
                 "type": "string",
                 "enum": ["✅", "❌"],
-                "description": "★ snapshot 작성 여부."
+                "description": "snapshot 작성 여부."
               },
               "covered_by": {
                 "type": "array",
@@ -257,29 +257,29 @@
           "minimum": 0.0,
           "maximum": 1.0,
           "default": 0.80,
-          "description": "★ default 0.80 (PIT/Stryker/BullseyeCoverage 산업 표준)."
+          "description": "default 0.80 (PIT/Stryker/BullseyeCoverage 산업 표준)."
         },
         "coverage_minimum_legacy": {
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
           "default": 0.40,
-          "description": "★ ratchet 진입점 (legacy 시). PoC #06 단일 모듈 0.43 정합."
+          "description": "ratchet 진입점 (legacy 시). PoC #06 단일 모듈 0.43 정합."
         },
         "coverage_strategy": {
           "type": "string",
           "enum": ["absolute", "ratchet"],
           "default": "absolute",
-          "description": "★ absolute = actual ≥ coverage_target / ratchet = actual ≥ coverage_minimum_legacy + trend positive."
+          "description": "absolute = actual ≥ coverage_target / ratchet = actual ≥ coverage_minimum_legacy + trend positive."
         },
         "trend_required": {
           "type": "boolean",
           "default": false,
-          "description": "★ ratchet 시 true 의무 — 이전 측정 대비 단조 비감소 검증."
+          "description": "ratchet 시 true 의무 — 이전 측정 대비 단조 비감소 검증."
         },
         "threshold_status": {
           "type": "string",
-          "description": "★ 통과 / 미달 / ratchet 통과 등 자연어 명시."
+          "description": "통과 / 미달 / ratchet 통과 등 자연어 명시."
         },
         "remediation": {
           "type": "array",

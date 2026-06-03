@@ -125,7 +125,7 @@
               "dom_state",
               "mixed"
             ],
-            "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (★ 분산 위험 — finding 등록 의무)."
+            "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (분산 위험 — finding 등록 의무)."
           },
           "initial": {
             "type": "string",
@@ -247,7 +247,7 @@
     },
     "cross_links": {
       "type": "array",
-      "description": "★ Phase 4.5 cross-link 패턴 정합. state-map ↔ ui-spec / api / rules 의 관계.",
+      "description": "Phase 4.5 cross-link 패턴 정합. state-map ↔ ui-spec / api / rules 의 관계.",
       "items": {
         "type": "object",
         "required": ["from_machine", "to_artifact", "to_id", "link_type"],
@@ -263,7 +263,7 @@
           },
           "to_id": {
             "type": "string",
-            "description": "참조 대상 ID (★ BR 은 4토막 strict / 예: PAGE-LOGIN-001, operationId, BR-AUTH-JWT-001)."
+            "description": "참조 대상 ID (BR 은 4토막 strict / 예: PAGE-LOGIN-001, operationId, BR-AUTH-JWT-001)."
           },
           "link_type": {
             "type": "string",
@@ -285,7 +285,7 @@
         "drift_count_tool_limitation": {"type": "integer", "minimum": 0},
         "scxml_export_validated": {
           "type": "boolean",
-          "description": "XState v5+ SCXML import 시도 통과 여부 (★ 단계 5 진짜 도구 검증)."
+          "description": "XState v5+ SCXML import 시도 통과 여부 (단계 5 진짜 도구 검증)."
         },
         "scxml_export_artifact_path": {"type": "string"}
       }

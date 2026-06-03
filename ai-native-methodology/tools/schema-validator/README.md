@@ -8,23 +8,23 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 
 ## When to call
 
-| 시점 | command | 호출자 |
-|---|---|---|
+| 시점                  | command                         | 호출자                        |
+| --------------------- | ------------------------------- | ----------------------------- |
 | 모든 chain stage 종결 | `schema-validator <output-dir>` | gate auto (chain-driver next) |
-| 산출물 add/edit | `schema-validator <output-dir>` | skill auto-invoke |
+| 산출물 add/edit       | `schema-validator <output-dir>` | skill auto-invoke             |
 
 ## Inputs
 
 - `<project-dir>/.aimd/output/**/*.json` — 검증 대상 산출물
-- chain 6 schema (자동 등록 / ★ v11.0.0 — planning-spec → discovery-spec rename):
+- chain 6 schema (자동 등록 / v11.0.0 — planning-spec → discovery-spec rename):
   - `discovery-spec.schema.json`
   - `behavior-spec.schema.json`
   - `acceptance-criteria.schema.json`
   - `test-spec.schema.json`
   - `impl-spec.schema.json`
   - `traceability-matrix.schema.json`
-  - `operational-task.schema.json` (★ v11.0.0 신설 / Story sibling OP-* anchor)
-  - `task-plan.schema.json` (★ v9.x / v11.0.0 확장)
+  - `operational-task.schema.json` (v11.0.0 신설 / Story sibling OP-\* anchor)
+  - `task-plan.schema.json` (v9.x / v11.0.0 확장)
 - 기타 schema (state / intervention-log / 19+ BE/FE 공용)
 
 ## Outputs
@@ -35,11 +35,12 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 ## Exit codes
 
 | code | 의미 |
-|---|---|
-> ★ 권위 = `src/cli.js:15` header.
+| ---- | ---- |
+
+> 권위 = `src/cli.js:15` header.
 
 | 0 | 모든 산출물 schema valid (모두 통과) |
-| 1 | ★ schema violation ≥ 1 (gate blocked) |
+| 1 | schema violation ≥ 1 (gate blocked) |
 | 2 | usage error |
 
 ## Ajv 8 strict mode
@@ -52,6 +53,7 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 ## Sibling tools
 
 chain harness gate validator 4종이 본 도구를 sub-invoke:
+
 - [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — chain 1 / discovery-spec schema 의존
 - [`../chain-coverage-validator/`](../chain-coverage-validator/) — chain 2 / behavior + acceptance schema 의존
 - [`../spec-test-link-validator/`](../spec-test-link-validator/) — chain 3 / test-spec schema 의존

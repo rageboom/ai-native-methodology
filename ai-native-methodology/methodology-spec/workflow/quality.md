@@ -9,6 +9,7 @@
 전 phase 모두의 결과를 **통합 분석**하여 최종 안티패턴 카탈로그 생성.
 
 **왜 마지막인가**: 안티패턴은 단일 영역만 봐서는 알 수 없음. 예:
+
 - 정합성 검증 결과(`db-schema` phase) + 비즈니스 로직(`business-logic` phase) → "ERD-코드 불일치 + SQL 에 정책 박힘" 동일 영역에서 발견되면 심각도↑
 - API(`api` phase) + 도메인(`business-logic` phase) → "API 에 정책 박힘 + Anemic Domain Model" 결합
 
@@ -16,34 +17,35 @@
 
 ## 2. 입력
 
-| Phase | 입력 |
-|---|---|
-| `discovery` phase | inventory.json (스택, 모듈) |
-| `db-schema` phase | schema.json + 정합성-검증-보고서.md |
-| `architecture` phase | architecture.json (순환/레이어 위반) |
-| `business-logic` phase | 4영역 부분 안티패턴 |
-| `api` phase | API 안티패턴 후보 |
-| `ui` phase | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c) |
-| ★ deliverable 10 | a11y-spec.json (★ v1.4 — WCAG 2.1+2.2 ratchet) |
-| ★ deliverable 11 | i18n-spec.json (★ v1.4 — ICU MF1+MF2 / MF1 폴백) |
-| ★ deliverable 12 | static-security-spec.json (★ v1.4 — XSS / CSRF / CSP) |
-| ★ deliverable 13 | legacy-spectrum.json (★ v1.4 — Tier 1~4 + Strangler) |
+| Phase                  | 입력                                                |
+| ---------------------- | --------------------------------------------------- |
+| `discovery` phase      | inventory.json (스택, 모듈)                         |
+| `db-schema` phase      | schema.json + 정합성-검증-보고서.md                 |
+| `architecture` phase   | architecture.json (순환/레이어 위반)                |
+| `business-logic` phase | 4영역 부분 안티패턴                                 |
+| `api` phase            | API 안티패턴 후보                                   |
+| `ui` phase             | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c)            |
+| deliverable 10         | a11y-spec.json (v1.4 — WCAG 2.1+2.2 ratchet)        |
+| deliverable 11         | i18n-spec.json (v1.4 — ICU MF1+MF2 / MF1 폴백)      |
+| deliverable 12         | static-security-spec.json (v1.4 — XSS / CSRF / CSP) |
+| deliverable 13         | legacy-spectrum.json (v1.4 — Tier 1~4 + Strangler)  |
 
 ---
 
 ## 3. 처리 흐름
 
-| 분석 종류 | 결과 | 결정성 |
-|---|---|---|
-| 정적 분석 | 순환 의존성 / 레이어 위반 후보 | 결정적 |
-| 패턴 매칭 | SQL 정책 박힘 / 매직 넘버 분산 / FE-BE 검증 누락 | 준결정적 |
-| LLM 추론 | Anemic Domain Model 판정 / 복합 안티패턴 (여러 phase 결합) | LLM |
+| 분석 종류 | 결과                                                       | 결정성   |
+| --------- | ---------------------------------------------------------- | -------- |
+| 정적 분석 | 순환 의존성 / 레이어 위반 후보                             | 결정적   |
+| 패턴 매칭 | SQL 정책 박힘 / 매직 넘버 분산 / FE-BE 검증 누락           | 준결정적 |
+| LLM 추론  | Anemic Domain Model 판정 / 복합 안티패턴 (여러 phase 결합) | LLM      |
 
-후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` (★ v12 ADR-011 — json 단독)
+후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` (v12 ADR-011 — json 단독)
 
 ### 3.1 단순 통합 (`business-logic` phase 가 만든 부분 안티패턴)
 
 `business-logic` phase 의 4영역이 이미 등록한 것:
+
 - 5.A: AP-DB-XXX
 - 5.B: AP-FE-XXX
 - 5.C: AP-CFG-XXX
@@ -57,7 +59,7 @@
 
 ```yaml
 - id: AP-COMPOSITE-001
-  composite_pattern: "Anemic Domain + SQL 에 비즈니스 로직"
+  composite_pattern: 'Anemic Domain + SQL 에 비즈니스 로직'
   evidence_phases: [business-logic-5A, business-logic-domain]
   description: |
     `business-logic` phase 도메인 분석에서 Order 엔티티가 데이터 holder 만 됨 (Anemic).
@@ -95,11 +97,11 @@ DRIFT-001: column_only_in_db (severity: high)
 
 ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 자동 변환:
 
-| Bad | Good |
-|---|---|
+| Bad           | Good                    |
+| ------------- | ----------------------- |
 | "잘못 작성됨" | "재구현 시 정상화 권장" |
-| "나쁜 패턴" | "회피 후보" |
-| "문제 코드" | "개선 가능 영역" |
+| "나쁜 패턴"   | "회피 후보"             |
+| "문제 코드"   | "개선 가능 영역"        |
 
 ---
 
@@ -107,12 +109,12 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 영역별 severity 가 다르면 통합 시 재산정:
 
-| 영역 | 영향 |
-|---|---|
-| 보안 (FE 에만 검증) | high 강제 |
+| 영역                              | 영향      |
+| --------------------------------- | --------- |
+| 보안 (FE 에만 검증)               | high 강제 |
 | 데이터 손실 위험 (drift, FK 누락) | high 강제 |
-| 비즈니스 로직 분산 (SQL 박힘) | medium |
-| 명명 규칙 비일관 | low |
+| 비즈니스 로직 분산 (SQL 박힘)     | medium    |
+| 명명 규칙 비일관                  | low       |
 
 ---
 
@@ -120,19 +122,20 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ```
 .ai-analysis/output/antipatterns/
-├── antipatterns.json           # json 단독 SSOT (통합 + migration_advice / ★ v12 ADR-011 — 구 avoid-list.md twin 폐기)
-├── migration-cautions.json     # ★ 신규 시스템 회피 가이드 (BE 영역 의무 / migration-cautions.schema.json)
-├── migration-cautions-fe.json  # ★ FE 영역 회피 가이드 (의무, FE 분석 시)
+├── antipatterns.json           # json 단독 SSOT (통합 + migration_advice / v12 ADR-011 — 구 avoid-list.md twin 폐기)
+├── migration-cautions.json     # 신규 시스템 회피 가이드 (BE 영역 의무 / migration-cautions.schema.json)
+├── migration-cautions-fe.json  # FE 영역 회피 가이드 (의무, FE 분석 시)
 └── composite-patterns.md       # 복합 패턴 별도 (가독성 / functional report)
 ```
 
-★ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-cautions-fe.md` 본체 spec 정합. 카테고리 7종 (state 5 진실 / visual baseline / a11y baseline+ratchet / i18n MF1 폴백 / 정적보안 / legacy 4 Tier strangle / quality gate FE).
+FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-cautions-fe.md` 본체 spec 정합. 카테고리 7종 (state 5 진실 / visual baseline / a11y baseline+ratchet / i18n MF1 폴백 / 정적보안 / legacy 4 Tier strangle / quality gate FE).
 
 ### 6.1 migration-cautions.json 의무 산출물
 
 **근거**: 본 방법론 가치 명세 (코드 → 형식 명세 + **위험 기록** 한 방향 추출기) 정합.
 
 **구조**:
+
 - 카테고리별 신규 시스템 회피 가이드 (API / DB / Security / Architecture / Domain / Performance)
 - design 단계 / CI 단계 / Review 단계 체크리스트
 - severity 기반 적용 우선순위
@@ -140,7 +143,8 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 - **Platform-specific 변형 섹션** — 분석 대상 stack 별 함정 + 학습 효과 입증 표
 - **사내 도입 quality gate 정책 (ADR-010 정합)** — Baseline + Ratchet 패턴
 
-**antipatterns.json 과의 차이** (★ v12 ADR-011 — 구 avoid-list.md twin 폐기):
+**antipatterns.json 과의 차이** (v12 ADR-011 — 구 avoid-list.md twin 폐기):
+
 - antipatterns.json = "기존 시스템에서 발견된 패턴 + 즉시 fix"
 - migration-cautions.json = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
 
@@ -152,13 +156,15 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 ## NestJS 특이 패턴 (PoC #03 정합 — ADR-NEST-001~004)
 
 ### NestJS 학습 효과 (자연 회피 — 비재현)
-| 패턴 | 이전 PoC negative | NestJS 결과 |
-|---|---|---|
-| Bearer JWT | Token apiKey 비표준 | addBearerAuth() 표준 ✅ |
-| 307 internal redirect | ModelAndView leak | NestJS 미사용 |
-| TS generic | Java erasure | TypeScript 정적 차단 |
+
+| 패턴                  | 이전 PoC negative   | NestJS 결과             |
+| --------------------- | ------------------- | ----------------------- |
+| Bearer JWT            | Token apiKey 비표준 | addBearerAuth() 표준 ✅ |
+| 307 internal redirect | ModelAndView leak   | NestJS 미사용           |
+| TS generic            | Java erasure        | TypeScript 정적 차단    |
 
 ### NestJS 함정 (신규 — design 단계 의무 적용)
+
 - @Controller() 빈 prefix → @Controller('users') 의무
 - @Post default 201 → @HttpCode 명시 의무 (ADR-NEST-003)
 - @Delete default 200 → @HttpCode(204) 의무 (ADR-NEST-003)
@@ -173,22 +179,26 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ```markdown
 ### Baseline 도입 의무
+
 - 본 방법론 도구 (drift-validator + dmn-check + static-runner) 첫 분석 결과 baseline 등재
 - `.ai-native-methodology/baseline.yml` git 추적 의무
 - 현존 결함 = grandfathered (CI 통과)
 
 ### Ratchet 정책
+
 - baseline 외 신규 결함 = CI fail (점진 격상)
 - baseline 결함 fix → fingerprint 자동 제거 (한 방향)
 - severity 격상 시 baseline 갱신 의무
 
 ### Severity 별 강도
+
 - critical: 즉시 차단 (baseline 등재 ❌ — production blocker)
 - high / medium: 신규 차단 / baseline grandfathered
 - low: 신규 경고만 / baseline grandfathered
 - positive: 등재만 (모범 사례)
 
 ### Quarterly review
+
 - baseline 결함 감소율 정량
 - severity 격상 시 즉시 갱신
 - 2년 자동 expiry
@@ -237,14 +247,14 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 전체 산출물 중 **가장 신뢰도 높음**:
 
-| 영역 | 신뢰도 |
-|---|---|
-| 순환 의존성 | 1.0 |
-| 정합성 drift | 1.0 |
-| SQL 정책 박힘 (패턴) | 0.95 |
-| 매직 넘버 분산 | 0.95 |
-| Anemic Domain Model 판정 | 0.75 |
-| 복합 안티패턴 | 0.70 |
+| 영역                     | 신뢰도 |
+| ------------------------ | ------ |
+| 순환 의존성              | 1.0    |
+| 정합성 drift             | 1.0    |
+| SQL 정책 박힘 (패턴)     | 0.95   |
+| 매직 넘버 분산           | 0.95   |
+| Anemic Domain Model 판정 | 0.75   |
+| 복합 안티패턴            | 0.70   |
 
 ---
 
@@ -268,6 +278,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 ## 10. 분석 워크플로우 종료
 
 `quality` phase 완료 → 전체 산출물 검증 → 최종 발행:
+
 - TF 멤버 검토
 - 재구현 단계 입력 (v3)
 - 사내 자산화

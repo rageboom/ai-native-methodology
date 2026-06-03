@@ -1,9 +1,9 @@
 # ADR-CHAIN-013 — Analysis Schema Chain-Link 일관성 의무 (3 layer 매핑)
 
-- 상태: 승인됨 (Accepted) — ★ ★ ★ v11.2.0 MINOR release / PoC #15 dogfood 발견 본격 정정
+- 상태: 승인됨 (Accepted) — v11.2.0 MINOR release / PoC #15 dogfood 발견 본격 정정
 - **결정 시각**: 2026-05-28
 - **연관 결정**: DEC-2026-05-28-analysis-chain-link-일관성
-- **연관 PoC**: poc-16-efiweb-car-spring41 (★ dogfood 발견 site)
+- **연관 PoC**: poc-16-efiweb-car-spring41 (dogfood 발견 site)
 - **연관 도구**: tools/traceability-matrix-builder/src/graph-synthesizer.js
 - **연관 schema**: schemas/meta-confidence.schema.json (related_chain_ids 신설)
 - **버전**: v11.2.0 MINOR
@@ -27,24 +27,24 @@ PoC #15 (디렉토리 `examples/poc-16-efiweb-car-spring41/`) 의 12 analysis �
 
 chain artifact 안 `*_ref` / `related_*` 필드가 analysis kind 를 가리킴. graph-synthesizer 의 `CHAIN_TO_ANALYSIS_REFS` 표 권위.
 
-| chain subkind | 필드 → analysis kind |
-|---|---|
-| BHV | `br_refs` → business-rules |
-| AC | `related_brs` → business-rules, `related_aps` → antipatterns |
-| AC | `state_map_ref` → state-map (v11.2.0 신규), `visual_manifest_ref` → visual-manifest (v11.2.0 신규) |
+| chain subkind | 필드 → analysis kind                                                                               |
+| ------------- | -------------------------------------------------------------------------------------------------- |
+| BHV           | `br_refs` → business-rules                                                                         |
+| AC            | `related_brs` → business-rules, `related_aps` → antipatterns                                       |
+| AC            | `state_map_ref` → state-map (v11.2.0 신규), `visual_manifest_ref` → visual-manifest (v11.2.0 신규) |
 
 ### Layer 2 — analysis-side instance self-ref (v11.2.0 신설)
 
 analysis 산출물 안 자체 ref 필드. graph-synthesizer 의 `ANALYSIS_TO_CHAIN_REFS` 표 권위. 6 kinds 가 본 layer 활용:
 
-| analysis kind | self-ref path | target chain |
-|---|---|---|
-| formal-spec | `sequences[].uc_id` | UC |
-| characterization-spec | `snapshots[].use_case` | UC |
-| api (openapi-extension) | `operations[].related_use_case_id` | UC |
-| ui-ux (ui-spec) | `pages[].related_use_cases[]` + `components[].related_use_cases[]` | UC |
-| sql-inventory | `inventory[].uc_link` | UC (12 컬럼 정합) |
-| domain | `bounded_contexts[].aggregates[].related_use_cases[]` | UC (nested 2-deep) |
+| analysis kind           | self-ref path                                                      | target chain       |
+| ----------------------- | ------------------------------------------------------------------ | ------------------ |
+| formal-spec             | `sequences[].uc_id`                                                | UC                 |
+| characterization-spec   | `snapshots[].use_case`                                             | UC                 |
+| api (openapi-extension) | `operations[].related_use_case_id`                                 | UC                 |
+| ui-ux (ui-spec)         | `pages[].related_use_cases[]` + `components[].related_use_cases[]` | UC                 |
+| sql-inventory           | `inventory[].uc_link`                                              | UC (12 컬럼 정합)  |
+| domain                  | `bounded_contexts[].aggregates[].related_use_cases[]`              | UC (nested 2-deep) |
 
 ### Layer 3 — meta.related_chain_ids fallback (v11.2.0 신설 / universal)
 
@@ -65,12 +65,12 @@ graph-synthesizer 의 신규 loop (line 461~470 동형 / aspect 의 informs 패�
 
 ```javascript
 for (const subkind of ANALYSIS_SUBKINDS) {
-  const data = analysis[subkind];
-  if (!data) continue;
-  for (const target of data.meta?.related_chain_ids ?? []) {
-    if (!nodeIds.has(target)) continue;
-    edges.push(makeEdge(`analysis-${subkind}`, target, 'cross_reference'));
-  }
+	const data = analysis[subkind];
+	if (!data) continue;
+	for (const target of data.meta?.related_chain_ids ?? []) {
+		if (!nodeIds.has(target)) continue;
+		edges.push(makeEdge(`analysis-${subkind}`, target, 'cross_reference'));
+	}
 }
 ```
 
@@ -84,9 +84,9 @@ dangling 가드 (3 layer 공통): `nodeIds.has(target)` — 존재하지 않는 
 
 ### 즉시 효과
 
-- ★ PoC #15 (poc-16-efiweb-car-spring41) graph-integrity orphan 10 → 0 (★ 본 PoC 의 핵심 D-axis 100% 달성)
-- ★ PoC #05 (sample-user-register) 회귀 0 (analysis 2 = BR+AP 만 적재 → 신규 매핑 trigger ❌ / nodes 18 / edges 29 그대로)
-- ★ 25 Tier-1 (chain 6 + analysis 15 + aspect 4) 정합 — 모든 analysis kind 가 chain link 표현 가능
+- PoC #15 (poc-16-efiweb-car-spring41) graph-integrity orphan 10 → 0 (본 PoC 의 핵심 D-axis 100% 달성)
+- PoC #05 (sample-user-register) 회귀 0 (analysis 2 = BR+AP 만 적재 → 신규 매핑 trigger ❌ / nodes 18 / edges 29 그대로)
+- 25 Tier-1 (chain 6 + analysis 15 + aspect 4) 정합 — 모든 analysis kind 가 chain link 표현 가능
 
 ### 향후 영향
 
@@ -109,7 +109,7 @@ dangling 가드 (3 layer 공통): `nodeIds.has(target)` — 존재하지 않는 
 - `tools/traceability-matrix-builder/src/graph-synthesizer.js:103-138` (`CHAIN_TO_ANALYSIS_REFS` + `ANALYSIS_TO_CHAIN_REFS`)
 - `tools/traceability-matrix-builder/src/graph-synthesizer.js:445-480` (3 emit loop)
 - `schemas/meta-confidence.schema.json` (related_chain_ids 신설)
-- `tools/traceability-matrix-builder/test/graph-synthesizer.test.js` (★ v11.2.0 describe block / 9 신규 test)
+- `tools/traceability-matrix-builder/test/graph-synthesizer.test.js` (v11.2.0 describe block / 9 신규 test)
 
 ## 검증
 

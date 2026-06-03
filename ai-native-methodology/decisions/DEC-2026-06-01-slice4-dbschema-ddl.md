@@ -9,6 +9,7 @@ session 62차 후속 — 사용자 "계속 이어 진행" → dep-graph 남은 c
 ## 결정
 
 접근 C (additive / breaking 0):
+
 1. `db-schema.schema.json` optional top-level `source_files: string[]` (스키마가 추출된 DDL/migration .sql repo-relative 경로 / required 미추가). ERD=diagram_files.erd, live DB·ORM entity 미나열(ORM=domain.json 앵커) — description 제약 (Senior REVISE-2).
 2. `graph-synthesizer.js` `ANALYSIS_TO_CODE_POINTERS['db-schema'] = { mode:'file', prefixes:[''], accessor:(d)=>d?.source_files ?? [] }` (business-rules 동형 / existence-gate + CODE_FILE_EXTENSIONS + commit_hash strict_path 스탬프 재사용).
 3. skill `analysis-db-schema-erd` step4 + greenfield 절 갱신.
@@ -16,7 +17,7 @@ session 62차 후속 — 사용자 "계속 이어 진행" → dep-graph 남은 c
 ## 근거 (4원칙)
 
 - §1 plan = `.claude/plans/plan-slice4-dbschema-ddl.md`. §2 Senior **GO_WITH_REVISE@0.82** (REVISE-1 schema-validation 우회 사실 / REVISE-2 string[] + description / **CONCERN-D RealWorld A2 redundant**). §3 사용자 승인 "진행 (정직 modest 버전)".
-- ★ Senior 사실 검증 (feedback_senior_fact_check_supplement): inferSchemaName($schema_origin→$schema→filename) + RealWorld schema.json($schema* 부재 → schema.schema.json infer → db-schema.schema.json 미검증) 직접 확인 → "additive vacuously safe" 정직 framing.
+- Senior 사실 검증 (feedback_senior_fact_check_supplement): inferSchemaName($schema_origin→$schema→filename) + RealWorld schema.json($schema\* 부재 → schema.schema.json infer → db-schema.schema.json 미검증) 직접 확인 → "additive vacuously safe" 정직 framing.
 
 ## 검증 (no-simulation)
 

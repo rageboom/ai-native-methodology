@@ -1,12 +1,12 @@
 # DEC-2026-05-06-cooling-off-정책-폐기
 
-| 항목 | 값 |
-|---|---|
-| 결정자 | 윤주스 (TF Lead) |
-| 일자 | 2026-05-06 |
-| 상태 | 승인 (★ ★ 24h cooling-off 의무 영구 제거 / 큰 결단 즉시 진행 가능) |
-| 카테고리 | methodology / 결단 절차 / 사용자 명시 결단 |
-| 관련 | DEC-2026-05-02-adoption-폐기-build-step-신설 (cooling-off 정책 origin), DEC-2026-05-02-adoption-carry-OFF (면제 사례 1), DEC-2026-05-06-v2.0-i-strict-채택 (예정 / 본 결단 즉시 효력 적용) |
+| 항목     | 값                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 결정자   | 윤주스 (TF Lead)                                                                                                                                                                           |
+| 일자     | 2026-05-06                                                                                                                                                                                 |
+| 상태     | 승인 ( 24h cooling-off 의무 영구 제거 / 큰 결단 즉시 진행 가능)                                                                                                                            |
+| 카테고리 | methodology / 결단 절차 / 사용자 명시 결단                                                                                                                                                 |
+| 관련     | DEC-2026-05-02-adoption-폐기-build-step-신설 (cooling-off 정책 origin), DEC-2026-05-02-adoption-carry-OFF (면제 사례 1), DEC-2026-05-06-v2.0-i-strict-채택 (예정 / 본 결단 즉시 효력 적용) |
 
 ---
 
@@ -19,6 +19,7 @@
 memory `feedback_decision_cadence_24h_cooling_off.md` 자산화는 carry 만 등재 / 실 파일 작성 ❌ (carry 상태 유지).
 
 본 정책 적용 사례:
+
 - v1.5.0 MINOR release: 사용자 "나머지 진행" 명시로 즉시 면제
 - DEC-2026-05-02-adoption-carry-OFF: 자산 변경 0 / 방향 선언으로 면제
 - v2.0 정체성 결단: 보류 / 다음 세션 prerequisite (2026-05-05 INDEX.md open-question)
@@ -55,16 +56,16 @@ SDLC 4단계 harness (기획 → 스펙 → 테스트 → 구현) 의 go/stop ga
 
 ### 4. 14차 결단 retract 의 진짜 lesson
 
-"cooling-off 부재" 가 retract 원인이 아님 — adoption/dist artifact 발상이 ★ 단일 source-of-truth 위배 + Babel/Yarn/Sentry 3 사례 동일 lesson 인지 부재가 진짜 원인. **리서치 / 검증** 강화로 해결 가능 / cooling-off 는 우회적 처방이었음.
+"cooling-off 부재" 가 retract 원인이 아님 — adoption/dist artifact 발상이 단일 source-of-truth 위배 + Babel/Yarn/Sentry 3 사례 동일 lesson 인지 부재가 진짜 원인. **리서치 / 검증** 강화로 해결 가능 / cooling-off 는 우회적 처방이었음.
 
 ## 영향
 
 ### 활성 정책 갱신 (즉시)
 
-| 위치 | 변경 |
-|---|---|
-| `decisions/STATUS.md` line 6 | "24h cooling-off 정합" 제거 |
-| `decisions/INDEX.md` line 11 (v2.0 carry) | "보류 (★ 24h cooling-off / 다음 세션 prerequisite)" → "보류 (사용자 결단 대기)" |
+| 위치                                      | 변경                                                                                                              |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `decisions/STATUS.md` line 6              | "24h cooling-off 정합" 제거                                                                                       |
+| `decisions/INDEX.md` line 11 (v2.0 carry) | "보류 ( 24h cooling-off / 다음 세션 prerequisite)" → "보류 (사용자 결단 대기)"                                    |
 | `methodology-spec/skills-axis.md` line 79 | "24h cooling-off + 사용자 명시 결단 + ≥2 PoC corroboration 의무" → "사용자 명시 결단 + ≥2 PoC corroboration 의무" |
 
 ### 보존 (역사 기록)
@@ -73,8 +74,8 @@ DEC 파일 / CHANGELOG / lessons-learned-2026-05-02 / docs/adoption/README.md / 
 
 ### 미진입 carry 종결
 
-- carry `feedback_decision_cadence_24h_cooling_off.md` memory 자산화 → ★ 영구 ❌
-- DEC-2026-05-02-adoption-폐기-build-step-신설 §6.1 D6 의 "cadence ≥ 24h cooling-off carry" → ★ 종결
+- carry `feedback_decision_cadence_24h_cooling_off.md` memory 자산화 → 영구 ❌
+- DEC-2026-05-02-adoption-폐기-build-step-신설 §6.1 D6 의 "cadence ≥ 24h cooling-off carry" → 종결
 
 ### v2.0 결단 즉시 진입 가능
 

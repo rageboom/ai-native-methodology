@@ -18,7 +18,7 @@
       "type": "integration",
       "framework": "vitest",
       "framework_status": "active",
-      "source_file": "src/pages/login/login-page.test.tsx (★ retrofit dry-run / 본 파일 미작성 / 진짜 React Testing Library 미실행)",
+      "source_file": "src/pages/login/login-page.test.tsx ( retrofit dry-run / 본 파일 미작성 / 진짜 React Testing Library 미실행)",
       "source_evidence": "describe('LoginPage — happy path') { it('redirects to /settings on valid login'); it('shows error on invalid credentials'); }",
       "expected_outcome": "fail",
       "test_run_evidence": {

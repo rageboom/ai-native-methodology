@@ -4,39 +4,46 @@
 export const FRAMEWORK = 'jest';
 
 export function parseJestJson(jsonOrText) {
-  let data;
-  try {
-    data = typeof jsonOrText === 'string' ? JSON.parse(jsonOrText) : jsonOrText;
-  } catch (e) {
-    throw new Error(`jest adapter — invalid JSON: ${e.message}`);
-  }
+	let data;
+	try {
+		data = typeof jsonOrText === 'string' ? JSON.parse(jsonOrText) : jsonOrText;
+	} catch (e) {
+		throw new Error(`jest adapter — invalid JSON: ${e.message}`);
+	}
 
-  const test_names = [];
-  const tests = [];  // ★ F-I05 — per-test {name,status} (S2 correlateByTcId 용 / additive).
-  for (const file of (data.testResults ?? [])) {
-    for (const a of (file.assertionResults ?? [])) {
-      const name = a.fullName ?? a.title;
-      if (!name) continue;
-      test_names.push(name);
-      const status = a.status === 'passed' ? 'pass' : a.status === 'failed' ? 'fail' : 'skip';
-      tests.push({ name, status });
-    }
-  }
+	const test_names = [];
+	const tests = []; // F-I05 — per-test {name,status} (S2 correlateByTcId 용 / additive).
+	for (const file of data.testResults ?? []) {
+		for (const a of file.assertionResults ?? []) {
+			const name = a.fullName ?? a.title;
+			if (!name) continue;
+			test_names.push(name);
+			const status =
+				a.status === 'passed'
+					? 'pass'
+					: a.status === 'failed'
+						? 'fail'
+						: 'skip';
+			tests.push({ name, status });
+		}
+	}
 
-  return {
-    framework: FRAMEWORK,
-    pass_count: data.numPassedTests ?? 0,
-    fail_count: data.numFailedTests ?? 0,
-    skip_count: data.numPendingTests ?? 0,
-    total: data.numTotalTests ?? test_names.length,
-    test_names,
-    tests,
-    success: (data.success === true) || ((data.numFailedTests ?? 0) === 0 && (data.numTotalTests ?? 0) > 0),
-  };
+	return {
+		framework: FRAMEWORK,
+		pass_count: data.numPassedTests ?? 0,
+		fail_count: data.numFailedTests ?? 0,
+		skip_count: data.numPendingTests ?? 0,
+		total: data.numTotalTests ?? test_names.length,
+		test_names,
+		tests,
+		success:
+			data.success === true ||
+			((data.numFailedTests ?? 0) === 0 && (data.numTotalTests ?? 0) > 0),
+	};
 }
 
 // 반환 명령 — caller 가 spawnSync 에 사용.
 export function buildArgs(testCmdArgs = []) {
-  // jest 의 reporter args 와 충돌 방지. caller 가 args 에 --json 붙이도록 권장.
-  return ['--json', ...testCmdArgs];
+	// jest 의 reporter args 와 충돌 방지. caller 가 args 에 --json 붙이도록 권장.
+	return ['--json', ...testCmdArgs];
 }

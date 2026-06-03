@@ -33,7 +33,7 @@
       "type": "compound",
       "on": {
         "NOT_SELF": "checkingPairUnique",
-        "REJECT_SELF": {"target": "not_following", "actions": ["throw HttpException 'FollowerEmail and FollowingId cannot be equal'"], "guard": "★ F-144 — follower.email == following.email (이메일 비교)"}
+        "REJECT_SELF": {"target": "not_following", "actions": ["throw HttpException 'FollowerEmail and FollowingId cannot be equal'"], "guard": " F-144 — follower.email == following.email (이메일 비교)"}
       }
     },
     "checkingPairUnique": {
@@ -47,7 +47,7 @@
       "type": "compound",
       "on": {
         "INSERT_OK": "following",
-        "RACE_WINDOW": {"target": "following", "actions": ["★★ FK 부재 (F-121) + UQ pair 부재 → 양쪽 row INSERT 성공 = 중복 follows row"], "guard": "★ App 1중 + DB 0중"}
+        "RACE_WINDOW": {"target": "following", "actions": [" FK 부재 (F-121) + UQ pair 부재 → 양쪽 row INSERT 성공 = 중복 follows row"], "guard": " App 1중 + DB 0중"}
       }
     },
     "following": {
@@ -67,7 +67,7 @@
       "type": "compound",
       "on": {
         "NOT_SELF_ID": "deletingFollow",
-        "REJECT_SELF_ID": {"target": "following", "actions": ["throw HttpException 'FollowerId and FollowingId cannot be equal'"], "guard": "★ F-144 일관성 결여 — follow=email 비교 / unFollow=id 비교 / 검증 차원 불일치"}
+        "REJECT_SELF_ID": {"target": "following", "actions": ["throw HttpException 'FollowerId and FollowingId cannot be equal'"], "guard": " F-144 일관성 결여 — follow=email 비교 / unFollow=id 비교 / 검증 차원 불일치"}
       }
     },
     "deletingFollow": {
@@ -77,8 +77,8 @@
     }
   },
   "findings": [
-    {"id": "F-121", "summary": "★★ FK 부재 (followerId / followingId 가 user.id 참조 ❌) + (followerId, followingId) UQ pair 부재"},
-    {"id": "F-144", "summary": "★ self-check 차원 불일치 — follow = email 비교 / unFollow = id 비교 (Domain invariant 부재)"},
+    {"id": "F-121", "summary": " FK 부재 (followerId / followingId 가 user.id 참조 ❌) + (followerId, followingId) UQ pair 부재"},
+    {"id": "F-144", "summary": " self-check 차원 불일치 — follow = email 비교 / unFollow = id 비교 (Domain invariant 부재)"},
     {"id": "F-138", "summary": "FollowsEntity 위치 모호 — profile/ vs user/ (Aggregate Root 약함)"}
   ]
 }

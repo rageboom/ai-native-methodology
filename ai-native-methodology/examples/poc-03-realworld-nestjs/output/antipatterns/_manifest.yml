@@ -1,92 +1,92 @@
 manifest:
-  generated_at: "2026-04-30"
-  poc_id: "poc-03-realworld-nestjs"
+  generated_at: '2026-04-30'
+  poc_id: 'poc-03-realworld-nestjs'
   phase: 6
-  phase_name: "anti-patterns final merge (quality)"
-  methodology_version: "v1.2.2"
+  phase_name: 'anti-patterns final merge (quality)'
+  methodology_version: 'v1.2.2'
 
 # 상위 phase 인계
 phase_4_input:
-  source: "../antipatterns-partial/antipatterns-partial.json"
-  consistency: "Phase 4 partial 8 AP candidate → Phase 6 final 통합 (★ critical 2 + high 1 + medium 4 + low 1 — 8 candidate ID 정규화 후 11 final 합산)"
+  source: '../antipatterns-partial/antipatterns-partial.json'
+  consistency: 'Phase 4 partial 8 AP candidate → Phase 6 final 통합 ( critical 2 + high 1 + medium 4 + low 1 — 8 candidate ID 정규화 후 11 final 합산)'
 
 phase_4_5_input:
-  source: "../formal-spec/_manifest.yml + decision-tables/* + state-machines/*"
-  consistency: "★★ 4/11 AP 가 Phase 4.5 산출물 직접 cross-link (BR + state-machine) — 방법론 본질 가치 입증"
+  source: '../formal-spec/_manifest.yml + decision-tables/* + state-machines/*'
+  consistency: ' 4/11 AP 가 Phase 4.5 산출물 직접 cross-link (BR + state-machine) — 방법론 본질 가치 입증'
 
 phase_5_input:
-  source: "../api/_manifest.yml.phase_6_handoff"
-  consistency: "Phase 5-1 candidate 4 AP → Phase 6 final 통합 + ★★★ F-164 critical 신규 → AP-AUTH-NEST-001 cumul 격상"
+  source: '../api/_manifest.yml.phase_6_handoff'
+  consistency: 'Phase 5-1 candidate 4 AP → Phase 6 final 통합 +  F-164 critical 신규 → AP-AUTH-NEST-001 cumul 격상'
 
-# Phase 6 산출물 4종 (★ migration-cautions.md = v1.2.0 묶음 P 의무)
+# Phase 6 산출물 4종 ( migration-cautions.md = v1.2.0 묶음 P 의무)
 deliverables:
-  - file: "antipatterns.json"
-    purpose: "11 AP final + _composite_view_metadata 4 + _id_normalization_mapping + _cross_poc_validation_summary + _phase_4_5_cross_link_summary + _positive_findings_logged"
+  - file: 'antipatterns.json'
+    purpose: '11 AP final + _composite_view_metadata 4 + _id_normalization_mapping + _cross_poc_validation_summary + _phase_4_5_cross_link_summary + _positive_findings_logged'
     schema: "schemas/antipatterns.schema.json (id pattern ^AP-[A-Z]+-\\d+$)"
     confidence: 0.94
     antipatterns_count: 11
-    by_severity: "critical 2 / high 3 / medium 4 / low 2"
-  - file: "avoid-list.md"
-    purpose: "사람용 priority order + 4 composite view + cross-PoC matrix + 4 부록 (REC × AP / 검증 점검표 / 모범 사례 / Phase 4.5 cross-link)"
+    by_severity: 'critical 2 / high 3 / medium 4 / low 2'
+  - file: 'avoid-list.md'
+    purpose: '사람용 priority order + 4 composite view + cross-PoC matrix + 4 부록 (REC × AP / 검증 점검표 / 모범 사례 / Phase 4.5 cross-link)'
     confidence: 0.94
-  - file: "migration-cautions.md"
-    purpose: "★ v1.2.0 묶음 P 의무 — 신규 시스템 (NestJS) 구축 시 design/CI 단계 차단 가이드. NestJS 특이 8 함정 + 학습 효과 3건"
+  - file: 'migration-cautions.md'
+    purpose: ' v1.2.0 묶음 P 의무 — 신규 시스템 (NestJS) 구축 시 design/CI 단계 차단 가이드. NestJS 특이 8 함정 + 학습 효과 3건'
     confidence: 0.93
-  - file: "_manifest.yml"
-    purpose: "Phase 6 매니페스트 (본 파일)"
+  - file: '_manifest.yml'
+    purpose: 'Phase 6 매니페스트 (본 파일)'
     confidence: 0.96
 
 # 결정적 처리 결과
 deterministic_results:
   raw_fetch:
-    main_agent: 7   # Phase 4 partial + Phase 5-1 _manifest + Phase 4.5 산출 (decision-tables, state-machines) + PoC #02 antipatterns (3 파일)
-    sub_agent: 0    # ★ 가벼운 sub-agent 전략 (Phase 4~6 영역 정합)
-    poc_02_cross_ref: 4   # antipatterns.json + avoid-list.md + migration-cautions.md + _manifest.yml
+    main_agent: 7 # Phase 4 partial + Phase 5-1 _manifest + Phase 4.5 산출 (decision-tables, state-machines) + PoC #02 antipatterns (3 파일)
+    sub_agent: 0 #  가벼운 sub-agent 전략 (Phase 4~6 영역 정합)
+    poc_02_cross_ref: 4 # antipatterns.json + avoid-list.md + migration-cautions.md + _manifest.yml
   antipatterns_total: 11
   antipatterns_critical: 2
   antipatterns_high: 3
   antipatterns_medium: 4
   antipatterns_low: 2
   composite_view_count: 4
-  positive_findings_count: 1   # ★ F-161 Bearer 표준
-  cross_poc_validation_count: 12   # PoC #01 + PoC #02 cross-val 합산
+  positive_findings_count: 1 #  F-161 Bearer 표준
+  cross_poc_validation_count: 12 # PoC #01 + PoC #02 cross-val 합산
 
 # 7 핵심 결정 (K1~K7)
 key_decisions:
-  - id: "DEC-PHASE6-POC03-K1"
-    decision: "research.md 생략 (가벼운 sub-agent 전략)"
-    rationale: "본 단계 = 결정적 통합 + cross-validation / 새 설계 ❌ → research 불필요 (memory feedback_lightweight_sub_agent.md 정합)"
-  - id: "DEC-PHASE6-POC03-K2"
-    decision: "AP-AUTH-NEST-001 cumul 격상 — 5 endpoint + JWT 무방어 + login 모호"
-    rationale: "★★★ F-140 + F-164 + F-118 + F-119 + F-150 합산 critical (사내 적용 시 즉시 수정 의무)"
-  - id: "DEC-PHASE6-POC03-K3"
-    decision: "AP-DB-001 cumul 격상 — UQ + FK + race window 4건"
-    rationale: "★ F-120 + F-121 + F-133 + F-135 합산 critical / PoC #02 isomorphic + 더 나쁨 (App 1중 only)"
-  - id: "DEC-PHASE6-POC03-K4"
-    decision: "AP-PERFORMANCE-001 medium → high 격상"
-    rationale: "★★ 3 PoC 재현 권위 (PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124+F-135) → v1.3 격상 정식 데이터"
-  - id: "DEC-PHASE6-POC03-K5"
-    decision: "F-161 positive finding 등재 (★ Bearer 표준 ✅ — PoC #02 학습 효과)"
-    rationale: "★★ negative-only finding 관행 깸 + cross-PoC 학습 효과 입증 데이터 / v1.3 격상 시 'positive finding 패턴' 정식 도입 후보"
-  - id: "DEC-PHASE6-POC03-K6"
-    decision: "composite view 4건 도입 (PoC #02 4건 → 4건 동일 패턴)"
-    rationale: "§A NestJS Auth scope (★★★) + §B DB 무결성 (★★) + §C API 계약 + §D Domain 경계 약함 — 가독성 + Phase 4.5 cross-link 표기"
-  - id: "DEC-PHASE6-POC03-K7"
-    decision: "★ migration-cautions.md NestJS 특이 8 함정 표기"
-    rationale: "v1.2.0 묶음 P 의무 + NestJS framework 자연 회피 학습 효과 3건 + 함정 8건 = 사내 표준 v1.3 격상 핵심 데이터"
+  - id: 'DEC-PHASE6-POC03-K1'
+    decision: 'research.md 생략 (가벼운 sub-agent 전략)'
+    rationale: '본 단계 = 결정적 통합 + cross-validation / 새 설계 ❌ → research 불필요 (memory feedback_lightweight_sub_agent.md 정합)'
+  - id: 'DEC-PHASE6-POC03-K2'
+    decision: 'AP-AUTH-NEST-001 cumul 격상 — 5 endpoint + JWT 무방어 + login 모호'
+    rationale: ' F-140 + F-164 + F-118 + F-119 + F-150 합산 critical (사내 적용 시 즉시 수정 의무)'
+  - id: 'DEC-PHASE6-POC03-K3'
+    decision: 'AP-DB-001 cumul 격상 — UQ + FK + race window 4건'
+    rationale: ' F-120 + F-121 + F-133 + F-135 합산 critical / PoC #02 isomorphic + 더 나쁨 (App 1중 only)'
+  - id: 'DEC-PHASE6-POC03-K4'
+    decision: 'AP-PERFORMANCE-001 medium → high 격상'
+    rationale: ' 3 PoC 재현 권위 (PoC #01 F-006 + PoC #02 F-051 + PoC #03 F-124+F-135) → v1.3 격상 정식 데이터'
+  - id: 'DEC-PHASE6-POC03-K5'
+    decision: 'F-161 positive finding 등재 ( Bearer 표준 ✅ — PoC #02 학습 효과)'
+    rationale: " negative-only finding 관행 깸 + cross-PoC 학습 효과 입증 데이터 / v1.3 격상 시 'positive finding 패턴' 정식 도입 후보"
+  - id: 'DEC-PHASE6-POC03-K6'
+    decision: 'composite view 4건 도입 (PoC #02 4건 → 4건 동일 패턴)'
+    rationale: '§A NestJS Auth scope () + §B DB 무결성 () + §C API 계약 + §D Domain 경계 약함 — 가독성 + Phase 4.5 cross-link 표기'
+  - id: 'DEC-PHASE6-POC03-K7'
+    decision: ' migration-cautions.md NestJS 특이 8 함정 표기'
+    rationale: 'v1.2.0 묶음 P 의무 + NestJS framework 자연 회피 학습 효과 3건 + 함정 8건 = 사내 표준 v1.3 격상 핵심 데이터'
 
 # 신뢰도 산정 (formula v1)
 confidence_calculation:
-  formula_version: "v1"
+  formula_version: 'v1'
   base: 0.75
   modifiers:
-    orm_full: +0.05   # TypeORM 0.2 (G6 enum)
-    domain_context_md: +0.03   # Sairyss reference + research-poc03
-    openapi_static_extraction: +0.04   # ★ runtime ground truth 부재 (PoC #02 +0.07 → +0.04)
-    phase_4_5_formal_spec_cross_link: +0.04   # ★★ 4/11 AP cross-link
+    orm_full: +0.05 # TypeORM 0.2 (G6 enum)
+    domain_context_md: +0.03 # Sairyss reference + research-poc03
+    openapi_static_extraction: +0.04 #  runtime ground truth 부재 (PoC #02 +0.07 → +0.04)
+    phase_4_5_formal_spec_cross_link: +0.04 #  4/11 AP cross-link
     cross_phase_aggregation: +0.03
-    poc_01_02_isomorphic_pattern: +0.03   # ★ 5 재현 + 2 비재현 (Bearer 학습 효과)
-    schema_compliance_100: +0.01   # 11/11
+    poc_01_02_isomorphic_pattern: +0.03 #  5 재현 + 2 비재현 (Bearer 학습 효과)
+    schema_compliance_100: +0.01 # 11/11
   subtotal: 0.98
   cross_validation_modifiers:
     static_only_caveat: -0.03
@@ -96,116 +96,116 @@ confidence_calculation:
     simple_merge_partial_to_final: 0.96
     id_normalization: 0.98
     phase_5_candidate_merge: 0.95
-    severity_promotion_PERFORMANCE: 0.95   # 3 PoC 권위
-    severity_promotion_AUTH_NEST: 0.92    # cumul 격상
-    composite_view_decision: 0.0          # human_review
+    severity_promotion_PERFORMANCE: 0.95 # 3 PoC 권위
+    severity_promotion_AUTH_NEST: 0.92 # cumul 격상
+    composite_view_decision: 0.0 # human_review
     tone_check: 0.95
     poc_01_02_cross_validation: 0.94
     phase_4_5_cross_link: 0.95
-    positive_finding_registration: 0.85   # ★ 신규 패턴
+    positive_finding_registration: 0.85 #  신규 패턴
   expected_in_phase_0_manifest: 0.94
-  delta_from_phase_0: 0.00   # 정확 일치
-  poc_01_02_comparison: "PoC #01 0.96 / PoC #02 0.96 — 동급 ✅ (정적 추출 caveat 만 -2p)"
+  delta_from_phase_0: 0.00 # 정확 일치
+  poc_01_02_comparison: 'PoC #01 0.96 / PoC #02 0.96 — 동급 ✅ (정적 추출 caveat 만 -2p)'
 
 # 명세 §5 + 검증 게이트 체크리스트
 approval_gate:
   - check: "schema 검증 통과 (^AP-[A-Z]+-\\d+$ unique)"
-    status: "✅ 11/11"
-  - check: "tone check (비난 표현 0)"
-    status: "✅ — 모두 회피 후보 톤"
-  - check: "critical/high 5건 human_review_required 명시"
-    status: "✅ AP-AUTH-NEST-001 / AP-DB-001 / AP-API-001 / AP-VALIDATION-001 / AP-PERFORMANCE-001"
-  - check: "composite view 별도 표기"
-    status: "✅ _composite_view_metadata 4건 (§A~§D)"
-  - check: "cross-PoC validation 결과"
-    status: "✅ PoC #01 4건 + PoC #02 12건 = 12 cross-val (재현 6 + 변형 재현 3 + 비재현 3)"
-  - check: "_id_normalization_mapping"
-    status: "✅ phase_4_partial 8 + phase_5_1_candidate 3"
-  - check: "모든 AP finding_ref 양방향 cross-link"
-    status: "✅ 11/11"
-  - check: "★★ Phase 4.5 cross-link 명시"
-    status: "✅ 4/11 AP — _phase_4_5_cross_link_summary"
-  - check: "★ positive finding 등재 (F-161 Bearer 표준)"
-    status: "✅ _positive_findings_logged"
-  - check: "★ migration-cautions.md 신규 — v1.2.0 묶음 P 의무"
-    status: "✅ NestJS 특이 8 함정 + 학습 효과 3건 + 4 ADR 후보"
-  - check: "PoC #03 7대 산출물 6/7 도달"
-    status: "✅ — UI/UX 만 N/A (BE only)"
+    status: '✅ 11/11'
+  - check: 'tone check (비난 표현 0)'
+    status: '✅ — 모두 회피 후보 톤'
+  - check: 'critical/high 5건 human_review_required 명시'
+    status: '✅ AP-AUTH-NEST-001 / AP-DB-001 / AP-API-001 / AP-VALIDATION-001 / AP-PERFORMANCE-001'
+  - check: 'composite view 별도 표기'
+    status: '✅ _composite_view_metadata 4건 (§A~§D)'
+  - check: 'cross-PoC validation 결과'
+    status: '✅ PoC #01 4건 + PoC #02 12건 = 12 cross-val (재현 6 + 변형 재현 3 + 비재현 3)'
+  - check: '_id_normalization_mapping'
+    status: '✅ phase_4_partial 8 + phase_5_1_candidate 3'
+  - check: '모든 AP finding_ref 양방향 cross-link'
+    status: '✅ 11/11'
+  - check: ' Phase 4.5 cross-link 명시'
+    status: '✅ 4/11 AP — _phase_4_5_cross_link_summary'
+  - check: ' positive finding 등재 (F-161 Bearer 표준)'
+    status: '✅ _positive_findings_logged'
+  - check: ' migration-cautions.md 신규 — v1.2.0 묶음 P 의무'
+    status: '✅ NestJS 특이 8 함정 + 학습 효과 3건 + 4 ADR 후보'
+  - check: 'PoC #03 7대 산출물 6/7 도달'
+    status: '✅ — UI/UX 만 N/A (BE only)'
 
 # Findings (Phase 6 진행 중 발견 — 0건 / 모두 Phase 1-5 누적)
 findings_phase_6:
-  new_findings: 0   # Phase 6 = 분류/통합 / 신규 발견 0
+  new_findings: 0 # Phase 6 = 분류/통합 / 신규 발견 0
   cross_validation_findings: |
     - F-140 + F-164 cumul → AP-AUTH-NEST-001 critical 단일 등록
     - F-120 + F-121 + F-133 + F-135 cumul → AP-DB-001 critical 단일 등록
     - F-128 + F-127 + F-143 + F-144 + F-162 cumul → AP-VALIDATION-001 high 단일 등록
-    - F-124 + F-135 cumul → AP-PERFORMANCE-001 medium → high 격상 (★ 3 PoC 재현 권위)
+    - F-124 + F-135 cumul → AP-PERFORMANCE-001 medium → high 격상 ( 3 PoC 재현 권위)
     - F-161 positive 등재 (Bearer 표준 ✅)
 
 # 누적 finding 통계 (Phase 6 종료 시 — 변동 없음)
 findings_cumulative:
-  poc_03_total: 49           # Phase 1~5-1 누적
-  cumulative_total: 168      # PoC #01 33 + PoC #02 43 + 시퀀스 C/Sprint 4 41 + PoC #03 49 + Phase 4.5 추가 2
-  closed: 10                 # PoC #01 10
-  promoted: 50               # PoC #01 10 + PoC #02 31 + PoC #03 9
-  positive_finding: 1        # ★ F-161
+  poc_03_total: 49 # Phase 1~5-1 누적
+  cumulative_total: 168 # PoC #01 33 + PoC #02 43 + 시퀀스 C/Sprint 4 41 + PoC #03 49 + Phase 4.5 추가 2
+  closed: 10 # PoC #01 10
+  promoted: 50 # PoC #01 10 + PoC #02 31 + PoC #03 9
+  positive_finding: 1 #  F-161
   deferred: 18
   rejected: 0
-  v120_bundles: 16           # A~P
-  threshold_status: "F-021 임계 168건 — §8.1 정합 (PoC #03 종결 후 v1.3 격상 데이터 충분)"
+  v120_bundles: 16 # A~P
+  threshold_status: 'F-021 임계 168건 — §8.1 정합 (PoC #03 종결 후 v1.3 격상 데이터 충분)'
 
-# 7대 산출물 도달 (PoC #03 종결 ★★)
+# 7대 산출물 도달 (PoC #03 종결 )
 seven_deliverables_status:
-  1_architecture: "✅ Phase 3 (raw 0.85)"
-  2_domain: "✅ Phase 4 (raw 0.83)"
-  3_api: "✅ Phase 5-1 (raw 0.90 / 정적 추출 caveat)"
-  4_db: "✅ Phase 2 (raw 0.85)"
-  5_rules: "✅ Phase 4 (raw 0.78)"
-  6_antipatterns: "✅ Phase 6 (raw 0.94 — 본 산출)"
-  7_ui_ux: "❌ N/A (BE only — F-026 / F-095 PoC #02 동일 패턴)"
+  1_architecture: '✅ Phase 3 (raw 0.85)'
+  2_domain: '✅ Phase 4 (raw 0.83)'
+  3_api: '✅ Phase 5-1 (raw 0.90 / 정적 추출 caveat)'
+  4_db: '✅ Phase 2 (raw 0.85)'
+  5_rules: '✅ Phase 4 (raw 0.78)'
+  6_antipatterns: '✅ Phase 6 (raw 0.94 — 본 산출)'
+  7_ui_ux: '❌ N/A (BE only — F-026 / F-095 PoC #02 동일 패턴)'
   deliverables_completed: 6
   deliverables_total: 7
-  ui_ux_excluded_completion_rate: "100% (6/6) ★★ PoC #03 종결"
+  ui_ux_excluded_completion_rate: '100% (6/6)  PoC #03 종결'
 
-# v1.3 격상 합산 데이터 (PoC #01 + PoC #02 + PoC #03 종결 후 ★★)
+# v1.3 격상 합산 데이터 (PoC #01 + PoC #02 + PoC #03 종결 후 )
 v13_bundle_status:
   total_pocs: 3
-  poc_01_data: "15 AP final + 33 finding (closed 10 / promoted 10 / deferred 13)"
-  poc_02_data: "21 AP final + 43 finding (closed 0 / promoted 31 / deferred 4 / candidate 8)"
-  poc_03_data: "11 AP final + 49 finding + 1 positive (promoted 9 / candidate ★ Phase 4.5 12)"
-  cumulative_ap: 47   # PoC #01 15 + PoC #02 21 + PoC #03 11
+  poc_01_data: '15 AP final + 33 finding (closed 10 / promoted 10 / deferred 13)'
+  poc_02_data: '21 AP final + 43 finding (closed 0 / promoted 31 / deferred 4 / candidate 8)'
+  poc_03_data: '11 AP final + 49 finding + 1 positive (promoted 9 / candidate  Phase 4.5 12)'
+  cumulative_ap: 47 # PoC #01 15 + PoC #02 21 + PoC #03 11
   cumulative_finding: 168
   bundles_with_3_poc_validation:
-    - "★ AP-PERFORMANCE-001 (EAGER N+1) — 3 PoC 재현 권위 → high 격상"
-    - "★ AP-AUTH/SECURITY 영역 — 3 PoC SECURITY critical 동형 영역 (JWT 21byte / RSA git commit / Auth scope)"
-    - "★ AP-DB-001 (race-prone unique) — 2 PoC 재현 + PoC #03 더 나쁨"
-    - "★★ Bearer 표준 학습 효과 — PoC #02 → PoC #03 비재현 ✅"
+    - ' AP-PERFORMANCE-001 (EAGER N+1) — 3 PoC 재현 권위 → high 격상'
+    - ' AP-AUTH/SECURITY 영역 — 3 PoC SECURITY critical 동형 영역 (JWT 21byte / RSA git commit / Auth scope)'
+    - ' AP-DB-001 (race-prone unique) — 2 PoC 재현 + PoC #03 더 나쁨'
+    - ' Bearer 표준 학습 효과 — PoC #02 → PoC #03 비재현 ✅'
   bundles_phase_4_5_validated:
-    - "★ Phase 4.5 cross-link 9/21 op + 4/11 AP — 방법론 본질 가치 입증 데이터 ★★"
-    - "★ drift-validator + decision-table-validator 첫 외부 적용 ROI"
-    - "★ F-154 transitionFuzzyMatch 60% false positive — Sprint 5 우선순위 격상"
+    - ' Phase 4.5 cross-link 9/21 op + 4/11 AP — 방법론 본질 가치 입증 데이터 '
+    - ' drift-validator + decision-table-validator 첫 외부 적용 ROI'
+    - ' F-154 transitionFuzzyMatch 60% false positive — Sprint 5 우선순위 격상'
   v13_promotion_candidates:
-    - "★ AP-PERFORMANCE-001 medium → high 정식 격상"
-    - "★ Bearer 표준 = NestJS 학습 효과 정식 등재"
-    - "★ positive finding 패턴 정식 도입 (memory feedback_positive_finding_pattern.md)"
-    - "★ 묶음 R (NestJS 특이 4 ADR — Auth / Validation / HttpCode / TypeORM)"
-    - "★ Phase 4.5 cross-link 9 op = 방법론 본질 가치 데이터"
+    - ' AP-PERFORMANCE-001 medium → high 정식 격상'
+    - ' Bearer 표준 = NestJS 학습 효과 정식 등재'
+    - ' positive finding 패턴 정식 도입 (memory feedback_positive_finding_pattern.md)'
+    - ' 묶음 R (NestJS 특이 4 ADR — Auth / Validation / HttpCode / TypeORM)'
+    - ' Phase 4.5 cross-link 9 op = 방법론 본질 가치 데이터'
 
 # PoC #03 종결 — 다음 단계
 next_actions:
-  - "DEC-2026-04-30-poc03-phase6-종결.md 작성 (★ PoC #03 종결 통합)"
-  - "STATUS.md + INDEX.md 갱신 (★★ PoC #03 종결 표기)"
-  - "git commit (★ PoC #03 종결 commit)"
-  - "★ Sprint 5 (환경 부재) — F-154 transitionFuzzyMatch 보완 + 진짜 static tool"
-  - "★ v1.3 격상 데이터 정리 — PoC #01+#02+#03 통합 보고 (사내 적용 가능 시점)"
-  - "★ memory 갱신 (project_poc03_workflow.md → 7대 산출물 6/7 종결)"
+  - 'DEC-2026-04-30-poc03-phase6-종결.md 작성 ( PoC #03 종결 통합)'
+  - 'STATUS.md + INDEX.md 갱신 ( PoC #03 종결 표기)'
+  - 'git commit ( PoC #03 종결 commit)'
+  - ' Sprint 5 (환경 부재) — F-154 transitionFuzzyMatch 보완 + 진짜 static tool'
+  - ' v1.3 격상 데이터 정리 — PoC #01+#02+#03 통합 보고 (사내 적용 가능 시점)'
+  - ' memory 갱신 (project_poc03_workflow.md → 7대 산출물 6/7 종결)'
 
-# 정직 표기 (★★★ no-simulation 정합)
+# 정직 표기 ( no-simulation 정합)
 honesty_disclosure:
-  - "★ 정적 추출만 (-3p) — runtime nest start 환경 부재 / Sprint 5 carry-over"
-  - "★ no_operational_db (-3p) — MySQL 미접근"
-  - "★ spectral / vacuum / openapi-changes 미실행 — Sprint 5 carry-over"
-  - "★★★ AP-AUTH-NEST-001 critical 5 endpoint — Phase 5-1 산출 시 F-164 추가 발견 (★ 결정적 분석 ROI)"
-  - "★★ F-161 positive finding — negative-only 관행 깸 (★ NestJS 학습 효과 입증)"
-  - "★ 가벼운 sub-agent 전략 — research.md 생략 (Phase 6 영역 정합)"
-  - "★★ Phase 4.5 cross-link 4 AP / 9 op — 방법론 본질 가치 자발적 입증"
+  - ' 정적 추출만 (-3p) — runtime nest start 환경 부재 / Sprint 5 carry-over'
+  - ' no_operational_db (-3p) — MySQL 미접근'
+  - ' spectral / vacuum / openapi-changes 미실행 — Sprint 5 carry-over'
+  - ' AP-AUTH-NEST-001 critical 5 endpoint — Phase 5-1 산출 시 F-164 추가 발견 ( 결정적 분석 ROI)'
+  - ' F-161 positive finding — negative-only 관행 깸 ( NestJS 학습 효과 입증)'
+  - ' 가벼운 sub-agent 전략 — research.md 생략 (Phase 6 영역 정합)'
+  - ' Phase 4.5 cross-link 4 AP / 9 op — 방법론 본질 가치 자발적 입증'

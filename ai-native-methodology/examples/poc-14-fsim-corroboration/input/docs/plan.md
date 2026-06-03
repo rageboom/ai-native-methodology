@@ -9,32 +9,38 @@ email 기반 단일 사용자 인증 + 개인 Todo CRUD REST API.
 ## Use Case
 
 ### UC-1. 사용자 등록 (POST /users)
+
 - email + password 로 신규 사용자 등록
 - 응답 = user.id (201 Created)
-- 이메일 중복 시 → 409 Conflict (★ ★ ★ 현 구현 미수행 / antipattern 후보)
+- 이메일 중복 시 → 409 Conflict (현 구현 미수행 / antipattern 후보)
 - password 8자 미만 시 → 400 Bad Request
 
 ### UC-2. 로그인 (POST /users/login)
+
 - email + password 검증
 - 일치 시 JWT 발급 (200 OK)
 - 불일치 시 → 401 Unauthorized
-- JWT 만료 시간 = 명시 부재 (★ 현 구현 누락 — refresh token 부재)
+- JWT 만료 시간 = 명시 부재 (현 구현 누락 — refresh token 부재)
 
 ### UC-3. Todo 생성 (POST /todos)
+
 - 인증 필요 (JWT bearer)
 - title (required, 1~200자) + body (optional) + due_date (ISO 8601, optional)
 - 응답 = todo.id (201 Created)
 
 ### UC-4. Todo 목록 조회 (GET /todos)
+
 - 인증 필요
 - 본인 todos 만 (user_id filter)
 - 페이징: `?offset=N&limit=N` (default limit=20)
 
 ### UC-5. Todo 수정 (PUT /todos/{id})
+
 - 인증 + 본인 소유 확인
 - title / body / due_date / status (pending → done)
 
 ### UC-6. Todo 삭제 (DELETE /todos/{id})
+
 - 인증 + 본인 소유 확인
 - soft delete (deleted_at) — 본 sample 은 hard delete 로 임시 시행
 

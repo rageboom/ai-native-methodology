@@ -6,8 +6,8 @@
   "batch_size": 2,
   "sample_mode": true,
   "corroboration_eligible": false,
-  "sample_mode_note": "★ PoC #05 = sample mode / n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only. Senior STOP-4 흡수 정합.",
-  "self_eval_bias_note": "★ step 7-a GWT 합성 agent (Sonnet 4.6) ↔ step 7-b 검증 agent (Sonnet 4.6) = 동일 모델 → self-evaluation echo chamber 위험 존재. confidence cap 0.85 적용. Phase D 도메인 전문가 검토 carry 보존.",
+  "sample_mode_note": "PoC #05 = sample mode / n=2 BR / statistical power ≈ 0 → ≥ 2 PoC corroboration count 산입 ❌ / spot check only. Senior STOP-4 흡수 정합.",
+  "self_eval_bias_note": "step 7-a GWT 합성 agent (Sonnet 4.6) ↔ step 7-b 검증 agent (Sonnet 4.6) = 동일 모델 → self-evaluation echo chamber 위험 존재. confidence cap 0.85 적용. Phase D 도메인 전문가 검토 carry 보존.",
   "results": [
     {
       "br_id": "BR-USER-DATA-001",

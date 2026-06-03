@@ -1,60 +1,60 @@
 manifest:
-  generated_at: "2026-04-30"
-  poc_id: "poc-03-realworld-nestjs"
-  phase: "4 (5.A rules)"
-  methodology_version: "v1.2.2"
+  generated_at: '2026-04-30'
+  poc_id: 'poc-03-realworld-nestjs'
+  phase: '4 (5.A rules)'
+  methodology_version: 'v1.2.2'
 
 deliverables:
-  - { file: "rules.json", confidence: 0.78 }
-  - { file: "rules.md",   confidence: 0.92 }
+  - { file: 'rules.json', confidence: 0.78 }
+  - { file: 'rules.md', confidence: 0.92 }
 
 raw_confidence:
   current: 0.78
   cap: 0.85
-  delta: "-0.05 (class-validator coverage 12% — Senior 위험 3 정합 — PoC #02 0.85 대비)"
+  delta: '-0.05 (class-validator coverage 12% — Senior 위험 3 정합 — PoC #02 0.85 대비)'
 
 trust_level:
   current: 0.78
   current_step: 1
-  next_validation: "Phase 4.5 형식화 — 5 BR decision-table"
+  next_validation: 'Phase 4.5 형식화 — 5 BR decision-table'
 
 br_count: 18
 br_complete: 9
 br_partial: 8
 br_absent: 1
-race_safe_br_count: 0  # ★★ PoC #02 5+ 대비
+race_safe_br_count: 0 # PoC #02 5+ 대비
 
 key_decisions:
-  - id: "DEC-PHASE4-PoC03-006"
-    title: "★ Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 표현 28~33%"
+  - id: 'DEC-PHASE4-PoC03-006'
+    title: 'Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 표현 28~33%'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-007"
-    title: "race-safe BR 0건 — PoC #02 본질적으로 위험"
+  - id: 'DEC-PHASE4-PoC03-007'
+    title: 'race-safe BR 0건 — PoC #02 본질적으로 위험'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-008"
-    title: "Phase 4.5 형식화 5 BR 우선순위 (★★ DELETE-AUTH critical 포함)"
+  - id: 'DEC-PHASE4-PoC03-008'
+    title: 'Phase 4.5 형식화 5 BR 우선순위 (DELETE-AUTH critical 포함)'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-009"
-    title: "F-143 / F-144 신규 등록"
+  - id: 'DEC-PHASE4-PoC03-009'
+    title: 'F-143 / F-144 신규 등록'
     auto_mode_applied: true
 
 findings_phase:
-  - id: "F-143"
-    title: "★ UserService.update 시 validate() 미호출 — 형식 검증 우회"
-    severity: "medium"
-    proposed_fix: "UserService.update 에 validate(updated) 호출 추가"
-    status: "promoted"
-  - id: "F-144"
-    title: "★ follow self-check (email) vs unFollow self-check (id) 일관성 결여"
-    severity: "low"
-    proposed_fix: "둘 다 id 기반으로 통일"
-    status: "candidate"
+  - id: 'F-143'
+    title: 'UserService.update 시 validate() 미호출 — 형식 검증 우회'
+    severity: 'medium'
+    proposed_fix: 'UserService.update 에 validate(updated) 호출 추가'
+    status: 'promoted'
+  - id: 'F-144'
+    title: 'follow self-check (email) vs unFollow self-check (id) 일관성 결여'
+    severity: 'low'
+    proposed_fix: '둘 다 id 기반으로 통일'
+    status: 'candidate'
 
 cumulative_statistics:
   poc_phase4_5a_new: 2
-  poc_phase4_total: 6  # 5.B 4 + 5.A 2
+  poc_phase4_total: 6 # 5.B 4 + 5.A 2
 
 next_actions:
-  - "5.C antipatterns-partial 산출"
-  - "5.D ui-domain (RealWorld 빈약 caveat)"
-  - "Phase 4.5 형식화 5 BR (★★ DELETE-AUTH 포함)"
+  - '5.C antipatterns-partial 산출'
+  - '5.D ui-domain (RealWorld 빈약 caveat)'
+  - 'Phase 4.5 형식화 5 BR (DELETE-AUTH 포함)'

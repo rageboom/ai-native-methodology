@@ -1,11 +1,12 @@
 # DEC-2026-06-03-plugin-root-path
 
-> ★ v12.7.0 MINOR release SSOT. ③ Type 2 (A) `${CLAUDE_PLUGIN_ROOT}` 경로 치환 — 출하 skill/agent 본문 repo-relative 실행 경로 plugin-install 배포버그 fix + check32 회귀 가드.
+> v12.7.0 MINOR release SSOT. ③ Type 2 (A) `${CLAUDE_PLUGIN_ROOT}` 경로 치환 — 출하 skill/agent 본문 repo-relative 실행 경로 plugin-install 배포버그 fix + check32 회귀 가드.
 > 상태: **승인 + 시행 완료** (2026-06-03). 4원칙 = `plan-plugin-root-path-fix.md` → 공식문서 raw fetch(F-015) + Senior 적대적 리뷰 0.88(must-fix #1~#4) → 사용자 "진행/MINOR" + "guides=별도 carry" 승인.
 
 **작성일**: 2026-06-03
 
 **relates to**:
+
 - `plan-type2-external-adoption.md` — Phase 1 감사 EXT-MISS-03 / EXT-PATH(repo-relative `node tools/` → `${CLAUDE_PLUGIN_ROOT}`). 본 DEC 가 (A) plugin-install 실행 경로 슬라이스를 소진.
 - `feedback_self_referential_corrective_drift` — dep-graph 루프(s60~70) 탈출 / 외부-가치 frontier(Type 2 install). self-referential 아님(출하물의 실 배포버그 / adopter 영향 실재).
 
@@ -29,23 +30,27 @@ STATUS 다음 세션 의제 ③ Type 2 (A) = "자율 가능 prod-value frontier"
 ## 3. 결단
 
 ### D1 — 4 클래스 / skills + agents (model-executed 본문)
+
 - ① `node tools/...` → `node ${CLAUDE_PLUGIN_ROOT}/tools/...` (17 skill + 5 agent)
 - ② `bash tools/static-runner/.../lint-no-simulation.sh` → 동형 (3 skill)
 - ③ `--schemas schemas/` **drop** — schema-validator 미인식 플래그(실 플래그 `--schema-dir` + `DEFAULT_SCHEMA_DIR=resolve(__dirname,'../../../schemas')` 번들 자동 해소) → 런타임 무시되던 잘못된 문서 제거 (plan-architect-decisions·plan-agent 2곳)
-- ④ `ls templates/...` → `ls ${CLAUDE_PLUGIN_ROOT}/templates/...` (_base-apply-template)
+- ④ `ls templates/...` → `ls ${CLAUDE_PLUGIN_ROOT}/templates/...` (\_base-apply-template)
 
 ### D2 — unquoted (Senior must-fix #1)
+
 hooks.json + 2 작동 skill precedent 일치. 인용 도입은 reference impl 과 불일치 생성 + 모델이 명령 구성 시 인용 boundary 오류 위험. 경로-공백 일률 안전화는 hooks 포함 별도 follow-up(현 scope 아님).
 
 ### D3 — 회귀 가드 check32 `shipped_repo_relative_tool_path` (release-readiness 31→32)
+
 content-aware grep `skills/` + `agents/` (build-plugin INCLUDE / inline-substitution 적용 dir). 검출 regex `(?:[A-Za-z_][A-Za-z0-9_]*=\S+\s+)*\b(?:node|bash)\s+["']?(?:tools|scripts)/` 가 `${CLAUDE_PLUGIN_ROOT}` 미포함 라인에서 hit → FAIL. **env-prefix(`PYTHONUTF8=1` 등) 허용**(Senior must-fix #2 / analysis-error-mapping:41). `allow-repo-path:` 주석 = 정당 예외(check27 `allow-identity:` 동형). self-test 15→16(discrimination it: bare/env-prefix/bash=violation / prefixed/prose/allow-repo-path=OK).
 
 ### D4 — scope-out = human-facing 문서 (Senior must-fix #4 / 사용자 "별도 carry")
+
 `guides/`(16) + `templates/adoption/README.md`(5) 의 `node tools/` = human 복사-붙여넣기 대상. `${CLAUDE_PLUGIN_ROOT}` 는 **human 셸에 미주입** → prefix 가 오히려 깨뜨림 → literal install-path 또는 "도구는 skill 자동 실행(직접 호출 불필요)" 프레이밍 = 별도 설계. check32 는 human 문서 미스캔. **finding `F-EXT-PATH-DOCS-001` 등재**(아래 §6). adoption/CLAUDE.md(dist root alias)는 이미 올바른 `${CLAUDE_PLUGIN_ROOT}` 패턴 + "repo-relative 는 install 동작 ❌" 경고 보유 = SSOT 근거.
 
 ## 4. §8.1 (정직)
 
-self-referential corrective 아님 — **출하물의 실 배포버그**(adopter 가 plugin install 시 chain 도구 실행 자체 불가) / R15·P0 정합("우리 도구 우리가 고치기"가 아니라 출하 skill/agent 결함 수정). check32 = drift enforcement criterion(양심 의존 ❌). ★ green check32 ≠ "Type 2 corroboration 달성": 배포버그 제거(necessary) / Type 2 **측정**은 실 사내 팀 self-serve 시 발생(측정=0 유지).
+self-referential corrective 아님 — **출하물의 실 배포버그**(adopter 가 plugin install 시 chain 도구 실행 자체 불가) / R15·P0 정합("우리 도구 우리가 고치기"가 아니라 출하 skill/agent 결함 수정). check32 = drift enforcement criterion(양심 의존 ❌). green check32 ≠ "Type 2 corroboration 달성": 배포버그 제거(necessary) / Type 2 **측정**은 실 사내 팀 self-serve 시 발생(측정=0 유지).
 
 ## 5. 검증 (no-simulation / 실 CLI)
 

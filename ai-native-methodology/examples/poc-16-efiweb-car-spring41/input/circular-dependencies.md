@@ -1,7 +1,7 @@
 # PoC #16 EFI-WEB car — Circular Dependencies 검출 보고
 
 > phase architecture 출력 / `architecture.json` 의 `circular_dependencies` 배열 부속 보고서.
-> ★ 검출 알고리즘: 정적 import 그래프 수동 분석 (Java import 전수 grep) — 본 PoC 환경 tarjan_scc 자동 도구 ❌ (mvn dependency:tree 호환성 / ArchUnit 미적용)
+> 검출 알고리즘: 정적 import 그래프 수동 분석 (Java import 전수 grep) — 본 PoC 환경 tarjan_scc 자동 도구 ❌ (mvn dependency:tree 호환성 / ArchUnit 미적용)
 
 ## 결론
 
@@ -32,6 +32,7 @@ cycle ❌. ADR-006 (순환 의존 정책) 정합.
 ## 외부 IFRS 모듈 의존 (carry / 본 PoC scope 외)
 
 car 모듈 → 외부 4 사내 모듈 (smilegate.ifrs.cmm / common / connect / egov):
+
 - 외부 4 모듈 source ❌ → 외부 4 모듈 → car 호출 여부 확인 ❌
 - 가정: 사내 IFRS 전체 codebase 안 cmm/common 같은 공통 모듈은 car 같은 도메인 모듈을 import ❌ (정상 layered)
 - 만약 외부 모듈이 car 를 import 한다면 → cross-domain cycle (carry)

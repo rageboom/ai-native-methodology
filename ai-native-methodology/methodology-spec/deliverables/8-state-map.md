@@ -14,11 +14,11 @@
 
 ### 1.1 deliverable 7 / 9 와의 분담
 
-| 산출물 | 영역 |
-|---|---|
-| **#7 ui-spec** | pages / components / design-tokens / scenarios / user-flows (정적 구조) |
-| **#8 state-map** (본 문서) | 분산 상태 5 진실 + state machine (동적 행동) |
-| **#9 visual-manifest** | snapshot PNG (시각 진실) |
+| 산출물                     | 영역                                                                    |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **#7 ui-spec**             | pages / components / design-tokens / scenarios / user-flows (정적 구조) |
+| **#8 state-map** (본 문서) | 분산 상태 5 진실 + state machine (동적 행동)                            |
+| **#9 visual-manifest**     | snapshot PNG (시각 진실)                                                |
 
 ---
 
@@ -30,15 +30,15 @@ output/state-map/
 └── _manifest.yml               # trust_level + validation_history
 ```
 
-### 2.1 5 진실 분류 (★ 핵심)
+### 2.1 5 진실 분류 (핵심)
 
-| 진실 | 흔한 라이브러리 | 흔한 안티패턴 |
-|---|---|---|
-| 1. server cache | TanStack Query, SWR, Apollo Cache, RTK Query | local state 에 fetch 결과 복사 (★ stale cache) |
-| 2. client state | Zustand, Redux, Jotai, Recoil, MobX | 모든 데이터 global store 에 (★ over-globalization) |
-| 3. URL state | React Router, Next.js, TanStack Router | URL 진실 무시 (★ 새로고침 시 상태 손실) |
-| 4. form state | React Hook Form, Formik, native form | client state 에 form 값 직접 (★ re-render 폭발) |
-| 5. DOM state | useRef, refs API | controlled input 으로 DOM 진실 무시 |
+| 진실            | 흔한 라이브러리                              | 흔한 안티패턴                                    |
+| --------------- | -------------------------------------------- | ------------------------------------------------ |
+| 1. server cache | TanStack Query, SWR, Apollo Cache, RTK Query | local state 에 fetch 결과 복사 (stale cache)     |
+| 2. client state | Zustand, Redux, Jotai, Recoil, MobX          | 모든 데이터 global store 에 (over-globalization) |
+| 3. URL state    | React Router, Next.js, TanStack Router       | URL 진실 무시 (새로고침 시 상태 손실)            |
+| 4. form state   | React Hook Form, Formik, native form         | client state 에 form 값 직접 (re-render 폭발)    |
+| 5. DOM state    | useRef, refs API                             | controlled input 으로 DOM 진실 무시              |
 
 **모든 5 진실의 detected 여부 명시 의무** (`state_sources` 배열 minItems=5/maxItems=5).
 → 진실 별 안티패턴 = AP-FE-XXX 등록 (Phase 6).
@@ -49,15 +49,15 @@ output/state-map/
 
 ### 3.1 추출 대상 (출처 / 방법 / 신뢰도 / 의존)
 
-| 항목 | 출처 | 방법 | 신뢰도 (단계 1 / 3 / 5) | 선행 의존 |
-|---|---|---|---|---|
-| state_sources (5 진실) | 라이브러리 import 그래프 | 결정적 | 0.85 / 0.90 / 0.95 | — |
-| machines (FSM) | useReducer / Zustand store / Redux slice / XState | 결정적 + LLM | 0.70 / 0.80 / 0.90 | state_sources |
-| transitions | dispatch / setState / mutate 호출 추적 | 결정적 + LLM | 0.65 / 0.78 / 0.88 | machines |
-| guards | if 조건 / 검증 함수 | LLM 추론 | 0.50 / 0.65 / 0.85 (XState type-check 통과 시) | transitions |
-| parallel regions | 동시 active region 감지 | LLM 추론 | 0.40 / 0.55 / 0.80 | machines |
-| history nodes | route restore / modal 복원 | LLM 추론 | 0.40 / 0.55 / 0.80 | machines |
-| cross_links | `api` phase + `business-logic` phase (rules) + `ui` phase 5-2-a (ui-spec) | 결정적 + LLM | 0.75 / 0.85 / 0.90 | machines |
+| 항목                   | 출처                                                                      | 방법         | 신뢰도 (단계 1 / 3 / 5)                        | 선행 의존     |
+| ---------------------- | ------------------------------------------------------------------------- | ------------ | ---------------------------------------------- | ------------- |
+| state_sources (5 진실) | 라이브러리 import 그래프                                                  | 결정적       | 0.85 / 0.90 / 0.95                             | —             |
+| machines (FSM)         | useReducer / Zustand store / Redux slice / XState                         | 결정적 + LLM | 0.70 / 0.80 / 0.90                             | state_sources |
+| transitions            | dispatch / setState / mutate 호출 추적                                    | 결정적 + LLM | 0.65 / 0.78 / 0.88                             | machines      |
+| guards                 | if 조건 / 검증 함수                                                       | LLM 추론     | 0.50 / 0.65 / 0.85 (XState type-check 통과 시) | transitions   |
+| parallel regions       | 동시 active region 감지                                                   | LLM 추론     | 0.40 / 0.55 / 0.80                             | machines      |
+| history nodes          | route restore / modal 복원                                                | LLM 추론     | 0.40 / 0.55 / 0.80                             | machines      |
+| cross_links            | `api` phase + `business-logic` phase (rules) + `ui` phase 5-2-a (ui-spec) | 결정적 + LLM | 0.75 / 0.85 / 0.90                             | machines      |
 
 **입력**: FE 소스
 **평균 신뢰도** (단계 3 / ADR-009 §2.4.1 정합): ~78% (drift-validator FE 적용 시)
@@ -71,7 +71,7 @@ output/state-map/
 
 ---
 
-## 4. SCXML + XState 호환 (★ 권위 매개체)
+## 4. SCXML + XState 호환 (권위 매개체)
 
 - **W3C SCXML 1.0** (REC 2015-09-01): https://www.w3.org/TR/scxml/
   - state element: `<state>` / `<parallel>` / `<final>` / `<history>` 모두 지원
@@ -85,7 +85,7 @@ state_machines:
     xstate_compatible: true
     # 시각화는 view-time 도구 (json 의 states/transitions 로 렌더 / 별도 .mermaid emit ❌)
 
-# Stage 5+ 검증 (★ 단계 5 진짜 도구)
+# Stage 5+ 검증 (단계 5 진짜 도구)
 # scxml_export_validated: true
 # scxml_export_artifact_path: output/state-map/scxml/FSM-FE-LOGIN-001.scxml
 ```
@@ -130,7 +130,7 @@ stateDiagram-v2
 cross_links:
   - from_machine: FSM-FE-LOGIN-001
     to_artifact: api
-    to_id: postLogin           # OpenAPI operationId
+    to_id: postLogin # OpenAPI operationId
     link_type: triggers
   - from_machine: FSM-FE-LOGIN-001
     to_artifact: ui-spec
@@ -161,12 +161,12 @@ cross_links:
 
 ## 8. 산출물 간 참조
 
-| 방향 | 의미 |
-|---|---|
-| SM → UI | implements UC |
-| SM → API | triggers operationId |
-| SM → RULES | validates BR |
-| SM → AP | 회피 (5 진실 안티패턴) |
+| 방향       | 의미                   |
+| ---------- | ---------------------- |
+| SM → UI    | implements UC          |
+| SM → API   | triggers operationId   |
+| SM → RULES | validates BR           |
+| SM → AP    | 회피 (5 진실 안티패턴) |
 
 → json 단독 SSOT (ADR-011 / ADR-008·ADR-FE-002 이중 렌더링 사상 supersede).
 
@@ -175,21 +175,26 @@ cross_links:
 ## 9. 흔한 함정
 
 ### 9.1 race condition (server cache ↔ client state)
+
 - 증상: TanStack Query cache 와 Zustand mirror state 가 어긋남
 - 대응: server cache 가 진실 / client state 는 derived 만 / mirror 금지
 
 ### 9.2 stale cache
+
 - 증상: refetch 안 한 server cache 가 outdated
 - 대응: invalidation 정책 (mutation 후 invalidateQueries) 명시
 
 ### 9.3 split brain (URL state ↔ form state)
+
 - 증상: 새로고침 시 form 값이 URL 과 어긋남
 - 대응: URL 진실 우선 / form 은 URL 에서 hydrate
 
 ### 9.4 over-globalization
+
 - 증상: 모든 데이터를 Redux/Zustand 에 put → re-render 폭발
 - 대응: scope 최소화 (component < feature < global 순)
 
 ### 9.5 controlled input 으로 DOM 진실 무시
+
 - 증상: focus / scroll 위치 손실
 - 대응: useRef 로 DOM 진실 보존

@@ -139,7 +139,7 @@
         },
         "allOf": [
           {
-            "$comment": "★ v1.4 격상 — formal_spec_links 카테고리별 conditional required. DOMAIN / API / FE 카테고리는 BR/state-machine 직결 → 의무. ARCH / DB / PERFORMANCE / SECURITY / 그 외는 BR 무관 → 선택 (강제 시 boilerplate 양산). PoC #03 36% 자발적 입증 + §8.1 단일 PoC 과적합 회피 정합. 적용 시점 = v1.4 신규 PoC 부터 (기존 PoC #01~03 산출물은 v1.3.x release 보존).",
+            "$comment": " v1.4 격상 — formal_spec_links 카테고리별 conditional required. DOMAIN / API / FE 카테고리는 BR/state-machine 직결 → 의무. ARCH / DB / PERFORMANCE / SECURITY / 그 외는 BR 무관 → 선택 (강제 시 boilerplate 양산). PoC #03 36% 자발적 입증 + §8.1 단일 PoC 과적합 회피 정합. 적용 시점 = v1.4 신규 PoC 부터 (기존 PoC #01~03 산출물은 v1.3.x release 보존).",
             "if": {
               "properties": {
                 "category": {

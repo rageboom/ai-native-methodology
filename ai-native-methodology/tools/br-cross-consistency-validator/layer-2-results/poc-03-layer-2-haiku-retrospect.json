@@ -150,7 +150,7 @@
       {
         "id": "BR-USER-DELETE-AUTH-001",
         "score": 0.45,
-        "reason": "★ 본질 괴리 — NL='의도된 규칙' vs GWT='규칙 부재 (F-140 critical)'"
+        "reason": "본질 괴리 — NL='의도된 규칙' vs GWT='규칙 부재 (F-140 critical)'"
       },
       {
         "id": "BR-ARTICLE-SLUG-AUTO-001",
@@ -165,9 +165,9 @@
     ]
   },
   "cross_validation_notes": {
-    "echo_chamber_risk": "★ Haiku model class (4.5) ≠ Sonnet (4.6) — different reasoning capacity maturity (4.5 has lower synthetic drift risk but also lower semantic precision ceiling)",
-    "critical_finding": "★ BR-USER-DELETE-AUTH-001 (score 0.45) = **missing control** — AuthMiddleware 자체 부재 → 규칙이 아닌 구현 gap. PoC #03 critical flaw.",
-    "validation_gap_pattern": "★ PoC #03 = class-validator 12% coverage + manual throw 주요 source → NL 과 GWT 간 'concern (F-###) 미반영' 패턴 반복. PoC #01 이 추가 명시적.",
-    "confidence_cap_rationale": "★ confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
+    "echo_chamber_risk": "Haiku model class (4.5) ≠ Sonnet (4.6) — different reasoning capacity maturity (4.5 has lower synthetic drift risk but also lower semantic precision ceiling)",
+    "critical_finding": "BR-USER-DELETE-AUTH-001 (score 0.45) = **missing control** — AuthMiddleware 자체 부재 → 규칙이 아닌 구현 gap. PoC #03 critical flaw.",
+    "validation_gap_pattern": "PoC #03 = class-validator 12% coverage + manual throw 주요 source → NL 과 GWT 간 'concern (F-###) 미반영' 패턴 반복. PoC #01 이 추가 명시적.",
+    "confidence_cap_rationale": "confidence ceiling 0.85 적용 — static tool 시뮬레이션 금지 정책 준수"
   }
 }

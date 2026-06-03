@@ -17,13 +17,13 @@
       "module_identification":     {"confidence": 0.99, "element_count": 5, "extraction_method": "deterministic"},
       "dependency_graph":          {"confidence": 0.98, "element_count": 8, "extraction_method": "deterministic"},
       "circular_dependency_check": {"confidence": 0.95, "element_count": 0, "extraction_method": "deterministic"},
-      "layer_violation_check":     {"confidence": 0.90, "element_count": 0, "extraction_method": "llm_with_grounding", "note": "★ NestJS Module = DI 경계 ≠ port. layered violation 검증을 디렉토리 기반 재정의 (Senior 위험 5 정합)"},
+      "layer_violation_check":     {"confidence": 0.90, "element_count": 0, "extraction_method": "llm_with_grounding", "note": " NestJS Module = DI 경계 ≠ port. layered violation 검증을 디렉토리 기반 재정의 (Senior 위험 5 정합)"},
       "architecture_style":        {"confidence": 0.85, "element_count": 1, "extraction_method": "llm_with_grounding"}
     },
     "warnings": [
-      "★ NestJS @Module = DI container 경계, architectural 경계 ❌. Hexagonal port-adapter 분류기 적용 ❌ (Senior 위험 5).",
-      "★ PoC #02 LV-001 (BoundedContext violation) 비재현 — 단일 NestJS module tree 본질 / 분류기 학습 효과 X (PoC #02 = multi-module hybrid 차이).",
-      "★ PoC #02 CIRCULAR-001 비재현 — circular 0건 (단 ArticleModule ↔ UserModule ManyToMany favorites 잠재적 의존 분석 §3.2)."
+      " NestJS @Module = DI container 경계, architectural 경계 ❌. Hexagonal port-adapter 분류기 적용 ❌ (Senior 위험 5).",
+      " PoC #02 LV-001 (BoundedContext violation) 비재현 — 단일 NestJS module tree 본질 / 분류기 학습 효과 X (PoC #02 = multi-module hybrid 차이).",
+      " PoC #02 CIRCULAR-001 비재현 — circular 0건 (단 ArticleModule ↔ UserModule ManyToMany favorites 잠재적 의존 분석 §3.2)."
     ]
   },
   "architecture_style": {
@@ -42,8 +42,8 @@
       "5 도메인 디렉토리 (article / user / profile / tag / shared) — 각 도메인이 자체 module + controller + service + entity",
       "ApplicationModule (root) imports 4 sub-module — 단일 tree 구조",
       "TypeOrmModule.forRoot() (app) + forFeature() (sub) — TypeORM 표준 NestJS 패턴",
-      "★ AuthMiddleware (legacy NestJS) 사용 — Guards 미사용",
-      "★ NestJS 7 시점 권장 패턴 일부 사용"
+      " AuthMiddleware (legacy NestJS) 사용 — Guards 미사용",
+      " NestJS 7 시점 권장 패턴 일부 사용"
     ]
   },
   "modules": [
@@ -80,8 +80,8 @@
       "exports_count": 0,
       "responsibility": "Article CRUD + comments + favorites",
       "concerns": [
-        "★ TypeOrmModule.forFeature 에 UserEntity / FollowsEntity 포함 — 다른 도메인의 entity 직접 사용 (도메인 경계 위반 ⚠️)",
-        "★ Phase 1 F-127 합산 — Validation 미적용"
+        " TypeOrmModule.forFeature 에 UserEntity / FollowsEntity 포함 — 다른 도메인의 entity 직접 사용 (도메인 경계 위반 ⚠️)",
+        " Phase 1 F-127 합산 — Validation 미적용"
       ]
     },
     {
@@ -95,8 +95,8 @@
       "exports_count": 0,
       "responsibility": "Profile + follow/unfollow",
       "concerns": [
-        "★ UserEntity 직접 사용 (다른 모듈 entity) — 도메인 경계 약함",
-        "★ FollowsEntity 가 profile 디렉토리 — domain semantic 으로는 user 관계지만 위치는 profile"
+        " UserEntity 직접 사용 (다른 모듈 entity) — 도메인 경계 약함",
+        " FollowsEntity 가 profile 디렉토리 — domain semantic 으로는 user 관계지만 위치는 profile"
       ]
     },
     {
@@ -108,10 +108,10 @@
       "depends_on_external": ["@nestjs/typeorm (forFeature TagEntity)"],
       "imports_count": 2,
       "exports_count": 0,
-      "responsibility": "Tag list (★ F-122 dead code 가능성 — insert 코드 부재)",
+      "responsibility": "Tag list ( F-122 dead code 가능성 — insert 코드 부재)",
       "concerns": [
-        "★ UserModule import 가 형식적 — 실 service 가 UserService 사용 안 함 (TagService 단일 method findAll 만)",
-        "★ F-122 dead code"
+        " UserModule import 가 형식적 — 실 service 가 UserService 사용 안 함 (TagService 단일 method findAll 만)",
+        " F-122 dead code"
       ]
     },
     {
@@ -122,8 +122,8 @@
       "depends_on": [],
       "responsibility": "ValidationPipe + BaseController",
       "concerns": [
-        "★ 정식 NestJS Module 으로 등록 안 됨 — 단순 디렉토리 + 직접 import (UserController → ValidationPipe)",
-        "★ shared/base.controller.ts dead code 가능성 (사용처 부재)"
+        " 정식 NestJS Module 으로 등록 안 됨 — 단순 디렉토리 + 직접 import (UserController → ValidationPipe)",
+        " shared/base.controller.ts dead code 가능성 (사용처 부재)"
       ]
     }
   ],
@@ -135,7 +135,7 @@
       {"from": "MOD-APP",      "to": "MOD-TAG",     "kind": "module_import"},
       {"from": "MOD-ARTICLE",  "to": "MOD-USER",    "kind": "module_import (UserModule import for AuthMiddleware)"},
       {"from": "MOD-PROFILE",  "to": "MOD-USER",    "kind": "module_import"},
-      {"from": "MOD-TAG",      "to": "MOD-USER",    "kind": "module_import (★ 형식적 — TagService 미사용)"},
+      {"from": "MOD-TAG",      "to": "MOD-USER",    "kind": "module_import ( 형식적 — TagService 미사용)"},
       {"from": "MOD-USER",     "to": "MOD-SHARED",  "kind": "file_import (ValidationPipe)"}
     ],
     "edge_count": 8,
@@ -144,11 +144,11 @@
   "circular_dependencies": [],
   "layer_violations": {
     "violations": [],
-    "note": "★ NestJS Module = DI 경계 ≠ architectural layer. PoC #02 의 LV-001 분류기 비재현 (학습 효과 X — 본질적 차이).",
+    "note": " NestJS Module = DI 경계 ≠ architectural layer. PoC #02 의 LV-001 분류기 비재현 (학습 효과 X — 본질적 차이).",
     "potential_concerns": [
-      "★ ArticleModule 가 UserEntity / FollowsEntity 직접 사용 (TypeOrmModule.forFeature) — 도메인 경계 약함 (★ F-137 신규 medium 후보)",
-      "★ ProfileModule 가 UserEntity 사용 — 위와 동일 패턴",
-      "★ FollowsEntity 가 profile/ 디렉토리 — semantic 으로는 user 관계 (★ F-138 신규 low 후보)"
+      " ArticleModule 가 UserEntity / FollowsEntity 직접 사용 (TypeOrmModule.forFeature) — 도메인 경계 약함 ( F-137 신규 medium 후보)",
+      " ProfileModule 가 UserEntity 사용 — 위와 동일 패턴",
+      " FollowsEntity 가 profile/ 디렉토리 — semantic 으로는 user 관계 ( F-138 신규 low 후보)"
     ]
   },
   "cross_module_imports_analysis": {
@@ -161,7 +161,7 @@
       {"from": "ArticleController", "to": "user/User decorator", "concern": "decorator 위치"},
       {"from": "ProfileController", "to": "user/User decorator", "concern": "상동"}
     ],
-    "concern": "★ 도메인 경계 약함 — F-137 후보. PoC #02 multi-module Hexagonal 의 명시적 port-adapter 와 본질적 차이 (단일 module tree 패턴 본질)"
+    "concern": " 도메인 경계 약함 — F-137 후보. PoC #02 multi-module Hexagonal 의 명시적 port-adapter 와 본질적 차이 (단일 module tree 패턴 본질)"
   },
   "bounded_context_candidates": {
     "BC-USER": {
@@ -173,23 +173,23 @@
     "BC-CONTENT": {
       "modules": ["MOD-ARTICLE", "MOD-TAG"],
       "tables": ["article", "comment", "tag", "user_entity_favorites_article_entity"],
-      "aggregate_candidates": ["Article", "Comment (Article 의 일부)", "Tag (★ F-122 dead — 의문)"]
+      "aggregate_candidates": ["Article", "Comment (Article 의 일부)", "Tag ( F-122 dead — 의문)"]
     },
     "BC-PROFILE": {
       "modules": ["MOD-PROFILE"],
       "tables": ["follows"],
-      "aggregate_candidates": ["Follows (★ User 관계의 표현 — semantic 모호)"],
-      "concern": "★ FollowsEntity 가 user/ 가 아닌 profile/ 위치 — F-138"
+      "aggregate_candidates": ["Follows ( User 관계의 표현 — semantic 모호)"],
+      "concern": " FollowsEntity 가 user/ 가 아닌 profile/ 위치 — F-138"
     }
   },
   "phase_4_handoff": {
     "bc_count": 3,
     "aggregate_candidates": ["User", "Article", "Comment (sub of Article)", "Follows (?)"],
-    "tag_status": "★ F-122 dead code — Aggregate Root 후보 ❌",
+    "tag_status": " F-122 dead code — Aggregate Root 후보 ❌",
     "external_dependencies": "0건 (RealWorld 한계 — PoC #02 와 동일 패턴)",
     "concerns_for_phase_4": [
-      "★ Article + UserEntity / FollowsEntity 합산 — Service 가 다른 도메인 repository 직접 사용 → 도메인 경계 약함",
-      "★ Profile 의 Follows 위치 모호 — Phase 4 도메인 의미 결정"
+      " Article + UserEntity / FollowsEntity 합산 — Service 가 다른 도메인 repository 직접 사용 → 도메인 경계 약함",
+      " Profile 의 Follows 위치 모호 — Phase 4 도메인 의미 결정"
     ]
   }
 }

@@ -60,7 +60,7 @@ class MockUserService {
       throw new IllegalArgumentException('email or username is already exists.');
     }
 
-    // L3 DB UQ (race-safe) — Sprint 1.5 ★ catch 추가 (재생성 코드 정합)
+    // L3 DB UQ (race-safe) — Sprint 1.5  catch 추가 (재생성 코드 정합)
     try {
       const user: User = {
         id: crypto.randomUUID(),
@@ -86,7 +86,7 @@ class MockUserService {
   getAllUsers(): User[] { return Array.from(this.users.values()); }
 }
 
-class IllegalArgumentException extends Error {}
+class IllegalArgumentException extends Error { }
 
 function bcryptEncode(plain: string): string {
   return `$2a$10$mockedhash${plain.length}`;  // Mocked BCrypt
@@ -220,10 +220,10 @@ describe('UserService Properties — Sprint 1 산출물 검증', () => {
 describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)', () => {
 
   // -----------------------------------------------------
-  // ★ Property 6: TOCTOU race 시 정확히 1건 성공
+  //  Property 6: TOCTOU race 시 정확히 1건 성공
   // 출처: Sprint 1.5 Static Analyzer + Senior Engineer 동시 지적
   // -----------------------------------------------------
-  test('★ TOCTOU race: 동시 signup 시 정확히 1건 성공 (DB UQ defense)', async () => {
+  test(' TOCTOU race: 동시 signup 시 정확히 1건 성공 (DB UQ defense)', async () => {
     const svc = new MockUserService();
     const sameEmail = 'race@example.com';
     const sameUsername = 'raceuser';
@@ -242,10 +242,10 @@ describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)
   });
 
   // -----------------------------------------------------
-  // ★ Property 7: 거절 시 IllegalArgumentException (NOT 500 Error)
-  // 출처: Sprint 1.5 ★ critical 발견 (DataIntegrityViolationException 가 IAE 로 정규화)
+  //  Property 7: 거절 시 IllegalArgumentException (NOT 500 Error)
+  // 출처: Sprint 1.5  critical 발견 (DataIntegrityViolationException 가 IAE 로 정규화)
   // -----------------------------------------------------
-  test('★ Critical: race 거절 시에도 IllegalArgumentException (500 Error ❌)', async () => {
+  test(' Critical: race 거절 시에도 IllegalArgumentException (500 Error ❌)', async () => {
     const svc = new MockUserService();
     await svc.signup({ email: 'a@x.com', username: 'a', password: 'p' });
 
@@ -255,11 +255,11 @@ describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)
   });
 
   // -----------------------------------------------------
-  // ★ Property 8: 메시지 결합 ("email or username") - Sprint 1.5 발견
-  // 출처: Senior Engineer ★ medium
+  //  Property 8: 메시지 결합 ("email or username") - Sprint 1.5 발견
+  // 출처: Senior Engineer  medium
   // 권고: 분리 가능한 메시지 (DuplicateEmailException / DuplicateUsernameException)
   // -----------------------------------------------------
-  test('★ Medium: 거절 메시지 분기 가능성 (현재 결합, 권고 분리)', async () => {
+  test(' Medium: 거절 메시지 분기 가능성 (현재 결합, 권고 분리)', async () => {
     const svc = new MockUserService();
     await svc.signup({ email: 'a@x.com', username: 'a', password: 'p' });
 
@@ -274,10 +274,10 @@ describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)
   });
 
   // -----------------------------------------------------
-  // ★ Property 9: case-sensitive email - Sprint 1.5 hidden bug 발견
-  // 출처: Senior Engineer ★ low
+  //  Property 9: case-sensitive email - Sprint 1.5 hidden bug 발견
+  // 출처: Senior Engineer  low
   // -----------------------------------------------------
-  test('★ Low (Hidden Bug): case-sensitive email 동시 등록 가능성', async () => {
+  test(' Low (Hidden Bug): case-sensitive email 동시 등록 가능성', async () => {
     const svc = new MockUserService();
     await svc.signup({ email: 'Alice@X.com', username: 'a1', password: 'p' });
 
@@ -285,7 +285,7 @@ describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)
     try {
       await svc.signup({ email: 'alice@x.com', username: 'a2', password: 'p' });
       // 권고: lowercase 정규화 후 거절되어야 함
-      // 현재 통과 = ★ hidden bug
+      // 현재 통과 =  hidden bug
       expect(svc.getAllUsers().length).toBe(2);
     } catch (e) {
       // 정규화 도입 후 expected 동작
@@ -294,10 +294,10 @@ describe('UserService Properties — Sprint 1.5 신규 발견 (Cross-validation)
   });
 
   // -----------------------------------------------------
-  // ★ Property 10: createdAt timestamp consistency
-  // 출처: Senior Engineer ★ low (LocalDateTime.now 하드코딩 — 테스트 어려움)
+  //  Property 10: createdAt timestamp consistency
+  // 출처: Senior Engineer  low (LocalDateTime.now 하드코딩 — 테스트 어려움)
   // -----------------------------------------------------
-  test('★ Low: createdAt 가 signup 시각과 거의 일치 (±1초)', async () => {
+  test(' Low: createdAt 가 signup 시각과 거의 일치 (±1초)', async () => {
     const svc = new MockUserService();
     const before = Date.now();
     const user = await svc.signup({ email: 'time@x.com', username: 'time', password: 'p' });

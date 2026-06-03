@@ -1,6 +1,6 @@
 {
   "$schema_origin": "./propagation-policy.schema.json",
-  "_comment": "★ operation.md 결정 4 (BFS base 등급) + 결정 5 (3-tier × 4-edge 매트릭스). dep-graph operation.md SSOT.",
+  "_comment": "operation.md 결정 4 (BFS base 등급) + 결정 5 (3-tier × 4-edge 매트릭스). dep-graph operation.md SSOT.",
   "_format_note": "operation.md 는 propagation-policy.yaml 로 명시 — 본 plugin 은 dependency-free 원칙으로 JSON 사용 (operation.md drift fix 필요).",
 
   "edge_grade_overrides": {

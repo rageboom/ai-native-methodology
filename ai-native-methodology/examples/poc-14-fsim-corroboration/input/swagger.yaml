@@ -4,7 +4,7 @@ info:
   version: 0.1.0
   description: |
     Small Todo REST API — 외부 사용자 사이드 프로젝트.
-    ★ 의도된 결함 포함 (production 직전 외부 컨설팅 대상).
+    의도된 결함 포함 (production 직전 외부 컨설팅 대상).
 servers:
   - url: http://localhost:8000
     description: Local development
@@ -30,7 +30,7 @@ paths:
         '400':
           description: Validation error (password < 8자)
         '409':
-          description: Email already exists (★ 현 구현 미수행 — antipattern AP-FSIM-DATA-001)
+          description: Email already exists (현 구현 미수행 — antipattern AP-FSIM-DATA-001)
 
   /users/login:
     post:

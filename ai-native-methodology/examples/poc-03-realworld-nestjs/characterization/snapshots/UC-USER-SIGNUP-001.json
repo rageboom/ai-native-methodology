@@ -1,12 +1,12 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-USER-SIGNUP-001 (PoC #03 NestJS retrofit / corroboration #2 / 2026-05-07). PoC #06 형식 정합 검증 — Modern 스택에서도 동일 schema 동작.",
+  "$comment": " phase 4.7 (characterization) golden snapshot — UC-USER-SIGNUP-001 (PoC #03 NestJS retrofit / corroboration #2 / 2026-05-07). PoC #06 형식 정합 검증 — Modern 스택에서도 동일 schema 동작.",
   "snapshot_id": "SNAP-UC-USER-SIGNUP-001-poc03",
   "use_case": "UC-USER-SIGNUP-001",
   "endpoint": "POST /api/users",
   "controller_method": "UserController.create",
   "service_method": "UserService.create",
   "layer": "integration (Controller → Service → ORM → MySQL)",
-  "data_source_status": "★ 실 DB 환경 부재 — TypeORM + RealWorld example 코드 분석 기반",
+  "data_source_status": " 실 DB 환경 부재 — TypeORM + RealWorld example 코드 분석 기반",
   "scenarios": [
     {
       "id": "SCN-SIGNUP-001",
@@ -27,7 +27,7 @@
         { "rule": "BR-USER-USERNAME-NOT-BLANK-001", "type": "intent" },
         { "rule": "BR-USER-EMAIL-FORMAT-001", "type": "intent" },
         { "rule": "BR-USER-PASSWORD-NOT-BLANK-001", "type": "intent" },
-        { "rule": "BR-USER-USERNAME-EMAIL-UNIQUE-001 (App-level pre-check)", "type": "intent (★ but race-prone — AP-DB-001 영향)" }
+        { "rule": "BR-USER-USERNAME-EMAIL-UNIQUE-001 (App-level pre-check)", "type": "intent ( but race-prone — AP-DB-001 영향)" }
       ],
       "behavior_to_preserve": ["validation 4종", "JWT 응답", "password 해시 (BeforeInsert)"]
     },
@@ -42,18 +42,18 @@
       "then": {
         "expected_response_400": {
           "errors": { "username": ["must be unique"] },
-          "_message": "★ 'Username and email must be unique.' — UserService.create:47 createQueryBuilder pre-check"
+          "_message": " 'Username and email must be unique.' — UserService.create:47 createQueryBuilder pre-check"
         },
         "TB_USER_after": "변화 없음"
       },
       "intent_classification": [{ "rule": "BR-USER-USERNAME-EMAIL-UNIQUE-001", "type": "intent" }],
       "behavior_likely_bug": [
-        "★ DB UQ 부재 (AP-DB-001) — App pre-check 만으로는 race window 존재. 새 시스템 = TypeORM @Index({unique: true}) + catch QueryFailedError → 409 Conflict 의무"
+        " DB UQ 부재 (AP-DB-001) — App pre-check 만으로는 race window 존재. 새 시스템 = TypeORM @Index({unique: true}) + catch QueryFailedError → 409 Conflict 의무"
       ]
     },
     {
       "id": "SCN-SIGNUP-003",
-      "name": "★ likely bug — invalid email format",
+      "name": " likely bug — invalid email format",
       "given": {
         "request_body": { "user": { "username": "alice", "email": "not-an-email", "password": "SecurePass" } }
       },
@@ -64,7 +64,7 @@
       },
       "intent_classification": [{ "rule": "BR-USER-EMAIL-FORMAT-001", "type": "intent" }],
       "behavior_likely_bug": [
-        "★ AP-VALIDATION-001 (F-143) — UserService.update 시 validate(newUser) 미호출 → email 형식 검증 우회. 새 시스템 update 도 @IsEmail 검증 의무"
+        " AP-VALIDATION-001 (F-143) — UserService.update 시 validate(newUser) 미호출 → email 형식 검증 우회. 새 시스템 update 도 @IsEmail 검증 의무"
       ]
     }
   ],
@@ -74,7 +74,7 @@
     "ambiguous": []
   },
   "phase_4_7_corroboration_role": {
-    "$comment": "★ ≥2 PoC corroboration 위한 PoC #03 phase 4.7 retrofit. snapshot schema 가 PoC #06 (Legacy / Spring 4.1) + PoC #03 (Modern / NestJS) 두 spectrum 에서 동작 입증.",
+    "$comment": " ≥2 PoC corroboration 위한 PoC #03 phase 4.7 retrofit. snapshot schema 가 PoC #06 (Legacy / Spring 4.1) + PoC #03 (Modern / NestJS) 두 spectrum 에서 동작 입증.",
     "schema_compatibility": "✅ 100% — given/when/then + intent_classification + behavior_to_preserve + behavior_likely_bug 필드 모두 정합",
     "format_validation": "Given/When/Then BDD 스타일 (F-PHASE7-003) + Gherkin acceptance-criteria.json 정합 (chain 2)",
     "stack_spectrum": "Modern NestJS — PoC #06 Legacy Spring 4.1 + iBATIS 와 다른 spectrum"

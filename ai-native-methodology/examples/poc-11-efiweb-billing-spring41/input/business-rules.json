@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #11 — billing 모듈 BR 추출. ★ 작은 단일책임 → BR 적음 expected (vs PoC #07 capital ~15 BR). 핵심 ~8 BR + likely_bug 분류.",
+  "$comment": "PoC #11 — billing 모듈 BR 추출. 작은 단일책임 → BR 적음 expected (vs PoC #07 capital ~15 BR). 핵심 ~8 BR + likely_bug 분류.",
   "project_id": "poc-11-efiweb-billing-spring41",
   "business_rules": [
     {
@@ -13,24 +13,24 @@
     },
     {
       "id": "BR-BILLING-CONFIRM-002",
-      "title": "★ ★ ★ 데이터 확정처리 = delete + insert 4 SQL 비트랜잭션 (likely bug)",
+      "title": "데이터 확정처리 = delete + insert 4 SQL 비트랜잭션 (likely bug)",
       "natural_language": "saveDataConfirm 4 SQL operation (selectConfirmDataCount + delete + insert + insertHistory + insertHistoryData) = @Transactional ❌ / 비원자성. ERP 데이터 ↔ 자체 DB 동기화 실패 시 부분 commit 위험.",
       "source": "BillingServiceImpl.saveDataConfirm (BillingServiceImpl.java:31-42) — @Transactional 어노테이션 ❌",
       "evidence_strength": "high",
       "br_type": "transaction",
       "is_intent": false,
       "is_likely_bug": true,
-      "domain_carry": "★ 결제 도메인 expert — 부분 commit 시 정합성 영향 정탐 의무"
+      "domain_carry": "결제 도메인 expert — 부분 commit 시 정합성 영향 정탐 의무"
     },
     {
       "id": "BR-BILLING-OVERWRITE-003",
       "title": "데이터 확정 = 기존 데이터 삭제 후 재삽입 (full overwrite)",
-      "natural_language": "saveDataConfirm 시 if(insertCount > 0) → delete + insert (★ 기존 row 전체 삭제 후 SGERPMA.dbo.TB_RG_RESULTS 에서 다시 복사). 변경 추적 ❌ / 이력은 TB_SGMA_CONFIRM_HIS 에만 기록.",
+      "natural_language": "saveDataConfirm 시 if(insertCount > 0) → delete + insert (기존 row 전체 삭제 후 SGERPMA.dbo.TB_RG_RESULTS 에서 다시 복사). 변경 추적 ❌ / 이력은 TB_SGMA_CONFIRM_HIS 에만 기록.",
       "source": "BillingServiceImpl.saveDataConfirm + billing.xml deleteConfirmData + insertConfirmData",
       "evidence_strength": "high",
       "br_type": "data_overwrite",
       "is_intent": true,
-      "domain_carry": "★ 결제 도메인 expert — full overwrite 정책 의도 확인"
+      "domain_carry": "결제 도메인 expert — full overwrite 정책 의도 확인"
     },
     {
       "id": "BR-BILLING-ERPDATA-004",
@@ -43,25 +43,25 @@
     },
     {
       "id": "BR-BILLING-BASEYEAR-005",
-      "title": "★ ★ 시작년도 2015 hardcoded (magic year)",
-      "natural_language": "dataConfirm.jsp 년도 select option = currYear - 2015 (★ 2015 hardcoded). 매년 자동 +1 / 2015 = 시스템 시작 년도 추정 / time-sensitive.",
+      "title": "시작년도 2015 hardcoded (magic year)",
+      "natural_language": "dataConfirm.jsp 년도 select option = currYear - 2015 (2015 hardcoded). 매년 자동 +1 / 2015 = 시스템 시작 년도 추정 / time-sensitive.",
       "source": "dataConfirm.jsp:159 (c:forEach begin='0' end='${currYear - 2015}')",
       "evidence_strength": "high",
       "br_type": "configuration",
       "is_intent": true,
       "is_likely_bug": false,
-      "domain_carry": "★ 결제 도메인 expert — 2015 의미 확인 (시스템 가동 시점?)"
+      "domain_carry": "결제 도메인 expert — 2015 의미 확인 (시스템 가동 시점?)"
     },
     {
       "id": "BR-BILLING-ENTITY-006",
-      "title": "★ ★ ★ 법인 COM_NO == 2 hardcoded (특정 법인만 노출)",
-      "natural_language": "법인 select option = userService.getCompanyList(auth) 결과 중 ★ COM_NO == 2 만 노출. userService 가 권한별 법인 목록 반환하지만 본 화면 = 특정 법인 (2번) 만 데이터 확정 대상.",
+      "title": "법인 COM_NO == 2 hardcoded (특정 법인만 노출)",
+      "natural_language": "법인 select option = userService.getCompanyList(auth) 결과 중 COM_NO == 2 만 노출. userService 가 권한별 법인 목록 반환하지만 본 화면 = 특정 법인 (2번) 만 데이터 확정 대상.",
       "source": "dataConfirm.jsp:169 (c:if test='${list.COM_NO == 2}')",
       "evidence_strength": "high",
       "br_type": "filtering",
       "is_intent": false,
       "is_likely_bug": true,
-      "domain_carry": "★ ★ 결제 도메인 expert — 법인 2 = 어떤 법인? 다른 법인 확정 처리 부재 의도?"
+      "domain_carry": "결제 도메인 expert — 법인 2 = 어떤 법인? 다른 법인 확정 처리 부재 의도?"
     },
     {
       "id": "BR-BILLING-HISTPK-007",
@@ -80,7 +80,7 @@
       "evidence_strength": "high",
       "br_type": "external_integration",
       "is_intent": true,
-      "domain_carry": "★ Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)"
+      "domain_carry": "Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)"
     }
   ],
   "summary": {

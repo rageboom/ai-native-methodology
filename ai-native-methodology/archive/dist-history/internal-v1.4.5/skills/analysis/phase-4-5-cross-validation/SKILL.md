@@ -6,13 +6,13 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # phase-4-5-cross-validation — Cross-validation
 
-도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. Phase 4.5 (★★★ no-simulation 정책 첫 실현 단계).
+도메인 ↔ 규칙 ↔ 인벤토리 ↔ 아키텍처 정합성 검증. Phase 4.5 ( no-simulation 정책 첫 실현 단계).
 
 ## 사전 조건
 
 - inventory.json / architecture.json / domain.json / rules.json 모두 존재
 
-## ★★★ no-simulation 절대 금지 (CLAUDE.md)
+## no-simulation 절대 금지 (CLAUDE.md)
 
 - ❌ AI sub-agent 에 "Static Analyzer / Daikon / Semgrep persona" 부여 금지
 - ✅ 진짜 외부 도구 실행 의무 (Semgrep / PMD / SpotBugs / Daikon / CodeQL / SonarQube)

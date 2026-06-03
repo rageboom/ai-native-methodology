@@ -10,9 +10,9 @@ stateDiagram-v2
     state <ValidatingState> {
         [*] --> CheckingCondition1
         CheckingCondition1 --> CheckingCondition2: <조건1 통과>
-        CheckingCondition1 --> Rejected_Reason1: <조건1 위반> ★ BR-<RuleId>-001<br/>(거부 방식 / 검증 위치 명시 의무)
+        CheckingCondition1 --> Rejected_Reason1: <조건1 위반> BR-<RuleId>-001<br/>(거부 방식 / 검증 위치 명시 의무)
         CheckingCondition2 --> Persisting: <조건2 통과>
-        CheckingCondition2 --> NoOp_Idempotent: <중복 요청> ★ BR-<RuleId>-002<br/>(silent return)
+        CheckingCondition2 --> NoOp_Idempotent: <중복 요청> BR-<RuleId>-002<br/>(silent return)
     }
 
     state Persisting {
@@ -28,7 +28,7 @@ stateDiagram-v2
     <SuccessState> --> [*]
 
     note left of Rejected_Reason1
-        ★ BR-<RuleId>-001 형식화 결단
+        BR-<RuleId>-001 형식화 결단
         ──────────────────────────────────
         rules.json 자연어 (예시):
           given: <조건>
@@ -49,7 +49,7 @@ stateDiagram-v2
     end note
 
     note right of NoOp_Idempotent
-        ★ BR-<RuleId>-002 (idempotency)
+        BR-<RuleId>-002 (idempotency)
         RFC 7231 §4.2.2 정합
         - 이미 동일 상태에서 같은 요청
         - silent return (변경 없음)

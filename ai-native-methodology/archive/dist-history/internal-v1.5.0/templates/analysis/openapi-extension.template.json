@@ -32,7 +32,7 @@
         "annotations_seen": ["@PostMapping", "@PreAuthorize", "@RequestBody"]
       },
 
-      "_comment_v123": "★ v1.2.3 — Phase 4.5 cross-link (operations 의무: BR/state/sequence 직결 카테고리). antipatterns.schema.json allOf if-then 정합 (DOMAIN/API/FE 의무).",
+      "_comment_v123": " v1.2.3 — Phase 4.5 cross-link (operations 의무: BR/state/sequence 직결 카테고리). antipatterns.schema.json allOf if-then 정합 (DOMAIN/API/FE 의무).",
       "formal_spec_links": {
         "decision_tables": [
           "../formal-spec/decision-tables/BR-ORDER-001.md"

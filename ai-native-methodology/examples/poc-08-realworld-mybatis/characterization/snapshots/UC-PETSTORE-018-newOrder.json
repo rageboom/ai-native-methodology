@@ -1,13 +1,13 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-018 주문 등록 (★ ★ 5 단계 단일 트랜잭션 / BR-PETSTORE-ORDCRT-004 + BR-PETSTORE-SEQMGR-008 sequence).",
+  "$comment": " phase 4.7 golden snapshot — UC-PETSTORE-018 주문 등록 ( 5 단계 단일 트랜잭션 / BR-PETSTORE-ORDCRT-004 + BR-PETSTORE-SEQMGR-008 sequence).",
   "snapshot_id": "SNAP-UC-PETSTORE-018",
   "use_case": "UC-PETSTORE-018",
-  "endpoint": "POST /order/newOrder.action (★ confirmed=true 후)",
+  "endpoint": "POST /order/newOrder.action ( confirmed=true 후)",
   "controller_method": "OrderActionBean.newOrder",
-  "service_method": "OrderService.insertOrder (★ @Transactional / 5 단계 atomic)",
+  "service_method": "OrderService.insertOrder ( @Transactional / 5 단계 atomic)",
   "sql_id": "SequenceMapper.getSequence + updateSequence + ItemMapper.updateInventoryQuantity (per lineItem) + OrderMapper.insertOrder + insertOrderStatus + LineItemMapper.insertLineItem (per lineItem)",
   "layer": "integration",
-  "data_source_status": "★ HSQLDB test data — OrderServiceTest 존재",
+  "data_source_status": " HSQLDB test data — OrderServiceTest 존재",
   "scenarios": [
     {
       "id": "SCN-PETSTORE-018-001",
@@ -21,18 +21,18 @@
       "when": "OrderActionBean.newOrder() → OrderService.insertOrder(order)",
       "then": {
         "expected_db_state_after": [
-          "SEQUENCE.ordernum NEXTID = 1001 (★ getSequence + updateSequence race window)",
-          "★ ★ INVENTORY EST-1 QTY = 10000 - 2 = 9998 + EST-2 QTY = 10000 - 1 = 9999 (lineItem 수 N+1 update)",
+          "SEQUENCE.ordernum NEXTID = 1001 ( getSequence + updateSequence race window)",
+          " INVENTORY EST-1 QTY = 10000 - 2 = 9998 + EST-2 QTY = 10000 - 1 = 9999 (lineItem 수 N+1 update)",
           "ORDERS row 신규 (ORDERID=1000 / 25 컬럼 ship/bill+credit)",
           "ORDERSTATUS row 신규 (ORDERID=1000 / LINENUM=1000 / TIMESTAMP / STATUS='OK')",
           "LINEITEM row 2건 (ORDERID=1000 / LINENUM=1,2 / itemId/quantity/unitPrice)"
         ],
         "expected_response": "ForwardResolution to ViewOrder.jsp",
-        "transaction_boundary": "★ 5 단계 모두 commit 또는 모두 rollback"
+        "transaction_boundary": " 5 단계 모두 commit 또는 모두 rollback"
       },
       "intent_classification": [
         { "rule": "BR-PETSTORE-ORDCRT-004", "type": "intent", "note": "5 단계 단일 트랜잭션 atomic 보장" },
-        { "rule": "BR-PETSTORE-SEQMGR-008", "type": "ambiguous", "note": "★ ★ 자체 sequence (DB native ❌) = multi-RDBMS 호환 의도 + race risk 동반" }
+        { "rule": "BR-PETSTORE-SEQMGR-008", "type": "ambiguous", "note": " 자체 sequence (DB native ❌) = multi-RDBMS 호환 의도 + race risk 동반" }
       ],
       "behavior_to_preserve": [
         "5 단계 @Transactional atomic",
@@ -40,9 +40,9 @@
         "OrderStatus = 'OK' 초기 status"
       ],
       "behavior_likely_bug": [
-        "★ AP-PETSTORE-006 — N+1 inventory update (lineItem 수 N → N SQL)",
-        "★ AP-PETSTORE-007 — sequence race condition (getSequence + updateSequence non-atomic 읽기-쓰기 race)",
-        "★ ORDERSTATUS LINENUM = ORDERID duplicate (schema design 의도 ambiguous)"
+        " AP-PETSTORE-006 — N+1 inventory update (lineItem 수 N → N SQL)",
+        " AP-PETSTORE-007 — sequence race condition (getSequence + updateSequence non-atomic 읽기-쓰기 race)",
+        " ORDERSTATUS LINENUM = ORDERID duplicate (schema design 의도 ambiguous)"
       ]
     }
   ],

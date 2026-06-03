@@ -86,7 +86,7 @@
       "artifact_subkind": "UC",
       "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/discovery-spec.json",
       "state": "active",
-      "title": "★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "title": "차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
       "code_pointers_na": true,
       "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
       "scope_id": "poc-16-car"
@@ -196,7 +196,7 @@
       "artifact_subkind": "BHV",
       "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/behavior-spec.json",
       "state": "active",
-      "title": "★ 차량비용 → ERP 회계전표 IF (cross-DB)",
+      "title": "차량비용 → ERP 회계전표 IF (cross-DB)",
       "code_pointers_na": true,
       "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
       "scope_id": "poc-16-car"
@@ -295,7 +295,7 @@
       "artifact_subkind": "AC",
       "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
       "state": "active",
-      "title": "차량 처분 (★ ambiguous)",
+      "title": "차량 처분 (ambiguous)",
       "code_pointers_na": true,
       "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
       "scope_id": "poc-16-car"
@@ -306,7 +306,7 @@
       "artifact_subkind": "AC",
       "source_path": "examples/poc-16-efiweb-car-spring41/.aimd/output/acceptance-criteria.json",
       "state": "active",
-      "title": "★ ★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "title": "차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
       "code_pointers_na": true,
       "commit_hash": "1392c28d02f4ce789314948de11c5e4bc622317c",
       "scope_id": "poc-16-car"

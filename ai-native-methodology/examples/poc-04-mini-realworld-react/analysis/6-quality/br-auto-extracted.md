@@ -1,13 +1,13 @@
 # br-auto-extracted.md
 
-> ★ deliverable 14 form-validation-spec.json → rules.json fe_validation BR 자동 등록 입증
+> deliverable 14 form-validation-spec.json → rules.json fe_validation BR 자동 등록 입증
 > 일자: 2026-05-01 (Stage 4 Day 3)
 
 ---
 
 **총 72 BR 자동 추출** (OpenAPI 67 + Zod-mini URL 5)
 
-## 1. OpenAPI → Zod (orval) BR (★ ADR-FE-005 매개체 #4 + #13)
+## 1. OpenAPI → Zod (orval) BR ( ADR-FE-005 매개체 #4 + #13)
 
 - **BR-FE-LoginUser-email** — email (string) [REQUIRED]
 - **BR-FE-LoginUser-password** — password (string) [REQUIRED]
@@ -42,7 +42,7 @@
 
 (... 37 more)
 
-## 2. Zod-mini URL params BR (★ 신규 패턴 — form 외 URL state validation)
+## 2. Zod-mini URL params BR ( 신규 패턴 — form 외 URL state validation)
 
 - **BR-FE-URL-offset** — offset — int / min=0 / max=Number.MAX_SAFE_INTEGER
 - **BR-FE-URL-limit** — limit — int / max=MAX_LIMIT / min=1
@@ -50,7 +50,7 @@
 - **BR-FE-URL-pagination** — pagination — default=DEFAULT_LIMIT
 - **BR-FE-URL-homearticlefilter** — homearticlefilter — default=undefined / enum / optional
 
-## 3. HTML5 native BR (★ form-validation fallback)
+## 3. HTML5 native BR ( form-validation fallback)
 
 - **BR-FE-HTML5-PAGE-LOGIN-email** — email (input) — required / type=email / email
 - **BR-FE-HTML5-PAGE-LOGIN-password** — password (input) — required / type=password
@@ -68,4 +68,4 @@
 
 ---
 
-★ ★ ★ deliverable 14 § rules.json fe_validation BR 자동 등록 절차 1회 입증 (★ Stage 7-pre 신설 deliverable 검증).
+deliverable 14 § rules.json fe_validation BR 자동 등록 절차 1회 입증 ( Stage 7-pre 신설 deliverable 검증).

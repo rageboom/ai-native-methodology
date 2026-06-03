@@ -4,12 +4,12 @@ Phase 4.5 decision-tables 산출물에 **dmn-check 5종** (red6/dmn-check, Apach
 
 ## 5종 dmn-check
 
-| ID | 의미 | severity |
-|---|---|---|
-| **rule.duplicate** | 입력 동일 + 출력 동일 두 row — 중복 | non-breaking |
-| **rule.conflict** | 입력 동일 + 출력 다름 — UNIQUE hit policy 위반 | **breaking** |
-| **rule.gap** | bool 입력의 모든 (2^N) 조합 중 누락 | non-breaking |
-| **rule.overlap** | wildcard `*` 가 다른 구체 row 와 출력이 다른데도 cover | **breaking** |
+| ID                    | 의미                                                                 | severity     |
+| --------------------- | -------------------------------------------------------------------- | ------------ |
+| **rule.duplicate**    | 입력 동일 + 출력 동일 두 row — 중복                                  | non-breaking |
+| **rule.conflict**     | 입력 동일 + 출력 다름 — UNIQUE hit policy 위반                       | **breaking** |
+| **rule.gap**          | bool 입력의 모든 (2^N) 조합 중 누락                                  | non-breaking |
+| **rule.overlap**      | wildcard `*` 가 다른 구체 row 와 출력이 다른데도 cover               | **breaking** |
 | **type.mixed-column** | 같은 입력 컬럼 내 cell kind 혼합 (bool / literal) — 자연어 ambiguity | non-breaking |
 
 ## JSON sanity (formal-spec.schema decision_tables[] 정합)
@@ -37,4 +37,4 @@ exit code: `0` (no breaking) / `1` (breaking ≥ 1).
 
 ## 시뮬레이션 금지 정책 정합
 
-본 도구는 **AI 추론 0%** — 정규식 + 명시적 알고리즘만. ★★★ no simulation 원칙 정합.
+본 도구는 **AI 추론 0%** — 정규식 + 명시적 알고리즘만. no simulation 원칙 정합.

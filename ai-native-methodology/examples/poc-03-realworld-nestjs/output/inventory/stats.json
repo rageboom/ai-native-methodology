@@ -1,5 +1,5 @@
 {
-  "$comment": "Phase 1 deterministic stats. wc -l + find. AI 추론 0%. ★★★ no-simulation 정합.",
+  "$comment": "Phase 1 deterministic stats. wc -l + find. AI 추론 0%. no-simulation 정합.",
   "meta": {
     "generated_at": "2026-04-30",
     "extraction_method": "deterministic (find + wc -l)",
@@ -52,7 +52,7 @@
     "@ApiTags_controllers": 4,
     "controllers_full_coverage": ["ArticleController"],
     "controllers_partial_coverage": ["UserController", "ProfileController", "TagController"],
-    "concern": "★ Senior 위험 6 정합 — coverage 불균형. Article 만 풀세트. silent 빈약 위험."
+    "concern": "Senior 위험 6 정합 — coverage 불균형. Article 만 풀세트. silent 빈약 위험."
   },
   "class_validator_decorator_coverage": {
     "decorators_total": 6,
@@ -73,10 +73,10 @@
       "TagEntity (2 필드)",
       "FollowsEntity (3 필드)"
     ],
-    "concern": "★ Senior 위험 3 정합 — class-validator 커버리지 12% (6/50+). Phase 4 BR 추출 시 service.ts manual throw 추가 read 의무."
+    "concern": "Senior 위험 3 정합 — class-validator 커버리지 12% (6/50+). Phase 4 BR 추출 시 service.ts manual throw 추가 read 의무."
   },
   "auth_middleware_application": {
-    "middleware": "AuthMiddleware (★ legacy NestJS — 현재 권장 Guards)",
+    "middleware": "AuthMiddleware (legacy NestJS — 현재 권장 Guards)",
     "applied_routes": [
       { "module": "UserModule",    "path": "user",                                 "method": "GET" },
       { "module": "UserModule",    "path": "user",                                 "method": "PUT" },
@@ -94,8 +94,8 @@
     "jwt_verify_locations": [
       { "file": "src/user/auth.middleware.ts:18",      "context": "AuthMiddleware.use" },
       { "file": "src/user/user.decorator.ts:14",        "context": "@User() decorator" },
-      { "file": "src/shared/base.controller.ts:9",      "context": "BaseController.getUserIdFromToken (★ 사용처 부재 — dead code)" }
+      { "file": "src/shared/base.controller.ts:9",      "context": "BaseController.getUserIdFromToken (사용처 부재 — dead code)" }
     ],
-    "concern": "★ JWT verify 3곳 DRY 위반 + 모두 try/catch 없이 verify → invalid token → 500 Internal"
+    "concern": "JWT verify 3곳 DRY 위반 + 모두 try/catch 없이 verify → invalid token → 500 Internal"
   }
 }

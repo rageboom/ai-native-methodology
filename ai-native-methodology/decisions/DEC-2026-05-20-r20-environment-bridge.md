@@ -22,11 +22,11 @@ DEC-2026-05-20-r20-verification-mode 적용 v8.7.2 plugin 으로 mis-fe-admin EA
 - **F-VERIFY-006** — SKILL.md §단계 1.2 의 `.aimd/<scope>/state.json` path 와 `chain-driver init` 의 실 산출 위치 `.aimd/state.json` (scope=current_scope 필드) drift.
 - **F-VERIFY-007** — SKILL.md §단계 1.4 가 명시한 산출물 list (planning-spec/behavior-spec/AC/test-spec/impl-spec) 와 §단계 5b verification analysis 가 enumerate 하는 산출물 list (inventory/architecture/domain/business-rules/antipatterns/state-map/...) 불일치 — analysis 14건 누락.
 - **F-VERIFY-008** — SKILL.md §단계 1.2 "gate 미통과 시 reject" vs verification meta-cycle 의 gate 부재 자연성 충돌. `mode=verification` 의 본질상 정식 chain harness gate 부재가 자연.
-- **F-VERIFY-009** (★ ★ HIGH) — SKILL.md §단계 5b 가 issuetype="Story" hardcode 하지만 DWPD project 환경:
+- **F-VERIFY-009** ( HIGH) — SKILL.md §단계 5b 가 issuetype="Story" hardcode 하지만 DWPD project 환경:
   - "스토리" issuetype 0건 사용 (1565 issue 표본 검증).
   - 실 사용 issuetype = 작업 / 버그 / 하위 작업 / 개선 / 새 기능 / epic.
   - 결과: `jira_create` 400 "issue type is required" + 사용자 우회 path 강제.
-- **F-VERIFY-010** (★ ★ HIGH) — SKILL.md §v8.6.3+ "orphan ticket ❌ — parent_ticket_id 의무" vs DWPD 환경:
+- **F-VERIFY-010** ( HIGH) — SKILL.md §v8.6.3+ "orphan ticket ❌ — parent_ticket_id 의무" vs DWPD 환경:
   - 일반 issue (작업/새 기능) 는 `parent` 필드 직접 매핑 ❌ → `customfield_10006` Epic Link 사용 의무.
   - Sub-task (하위 작업) 만 `parent_key` 정합.
   - 결과: `jira_create` 400 "이슈 유형 10401 은 하위 작업이 아니지만 상위가 지정" + 사용자 우회 path 강제.
@@ -37,20 +37,21 @@ DEC-2026-05-20-r20-verification-mode 적용 v8.7.2 plugin 으로 mis-fe-admin EA
 
 R20 채널 charter (DEC-2026-05-18-r20-mcp-ticket-sync-channel §사용자 결단 1) 는 "Jira workflow transition target IDs — project-specific / `jira_transitions` 사전 lookup 의무" 만 environment-specific 으로 인정. 다만 실제로는:
 
-| 축 | v8.7.2 plugin spec | mis-fe-admin DWPD 환경 실측 | drift 종류 |
-|---|---|---|---|
-| Workflow transition ID | env-config 의무 (sec 1) | OK (jira_transitions lookup) | spec 정합 |
-| issuetype 명명 | hardcode "Story" / "Sub-task" / ... | "작업" / "하위 작업" / "epic" / "개선" | ★ ★ ★ HIGH drift |
-| parent linking | hardcode `parent` 필드 | customfield_10006 Epic Link | ★ ★ ★ HIGH drift |
-| state.json path | `.aimd/<scope>/state.json` | `.aimd/state.json` + scope 필드 | ★ ★ HIGH drift |
-| MCP probe | `ListMcpResourcesTool` | tools deferred list | ★ HIGH drift |
-| gate-pass | 의무 | verification 본질상 부재 자연 | ★ HIGH drift |
+| 축                     | v8.7.2 plugin spec                  | mis-fe-admin DWPD 환경 실측            | drift 종류 |
+| ---------------------- | ----------------------------------- | -------------------------------------- | ---------- |
+| Workflow transition ID | env-config 의무 (sec 1)             | OK (jira_transitions lookup)           | spec 정합  |
+| issuetype 명명         | hardcode "Story" / "Sub-task" / ... | "작업" / "하위 작업" / "epic" / "개선" | HIGH drift |
+| parent linking         | hardcode `parent` 필드              | customfield_10006 Epic Link            | HIGH drift |
+| state.json path        | `.aimd/<scope>/state.json`          | `.aimd/state.json` + scope 필드        | HIGH drift |
+| MCP probe              | `ListMcpResourcesTool`              | tools deferred list                    | HIGH drift |
+| gate-pass              | 의무                                | verification 본질상 부재 자연          | HIGH drift |
 
 → universal claim 보존하려면 6축 environment-config 화 정합.
 
 ### 3. R15 no-simulation / R20 confirmation gate 본질 보존
 
 env resolve prelude 도 standard / verification mode 와 동일:
+
 - real MCP 호출 의무 (7-field evidence)
 - confirmation gate 의무 (preview MD → yes/no/dry-run / payload resolve 결과도 preview 에 표기)
 - Sequential MCP 호출 (parallel ❌)
@@ -62,6 +63,7 @@ env resolve 가 R20 본질 위반 ❌ — resolve 은 SKILL.md spec 의 hardcode
 ### 4. v8.7.3 PATCH vs MINOR 결단
 
 PATCH (8.7.2 → 8.7.3) 자격:
+
 - standard mode 본문 무변경 (issuetype 명명 default = Atlassian 표준 / parent_strategy=auto default 가 기존 parent_key 동치)
 - verification mode 본문 무변경
 - 신규 args 3개 (issuetype_map / parent_strategy / epic_link_customfield_id) 모두 default 가 v8.7.2 동치 행동

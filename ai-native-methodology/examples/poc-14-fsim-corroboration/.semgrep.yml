@@ -6,7 +6,7 @@ rules:
     pattern: |
       user.password = $X
     message: |
-      ★ AP-FSIM-SEC-001 (critical) — Plaintext password 저장. bcrypt/argon2 hash 적용 의무.
+      AP-FSIM-SEC-001 (critical) — Plaintext password 저장. bcrypt/argon2 hash 적용 의무.
     severity: ERROR
     languages: [python]
 
@@ -15,7 +15,7 @@ rules:
       - pattern: Column(String, ...)
       - pattern-not: Column(String, ..., unique=True, ...)
     message: |
-      ★ AP-FSIM-DATA-001 (high) — email column 에 unique constraint 부재 가능성. 검토 의무.
+      AP-FSIM-DATA-001 (high) — email column 에 unique constraint 부재 가능성. 검토 의무.
     severity: WARNING
     languages: [python]
 
@@ -24,8 +24,8 @@ rules:
       jwt.encode($PAYLOAD, ...)
     paths:
       include:
-        - "*auth*"
+        - '*auth*'
     message: |
-      ★ AP-FSIM-AUTH-001 (medium) — JWT payload 에 'exp' claim 부재 가능성. 만료 시간 설정 의무.
+      AP-FSIM-AUTH-001 (medium) — JWT payload 에 'exp' claim 부재 가능성. 만료 시간 설정 의무.
     severity: INFO
     languages: [python]

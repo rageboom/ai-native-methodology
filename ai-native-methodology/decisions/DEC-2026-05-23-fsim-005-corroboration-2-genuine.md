@@ -2,7 +2,7 @@
 
 > F-SIM-005 P1 carry 본격 해소 — Type 분류 3계층화 paradigm 진화 + fail_mode_qualification boolean 강제 + poc-02 carry 정직 표기.
 
-- **결단 일자**: 2026-05-23 (★ session 39차 / v8.14.0 MINOR release)
+- **결단 일자**: 2026-05-23 ( session 39차 / v8.14.0 MINOR release)
 - **결단자**: 윤주스 (TF Lead) — 사용자 "ㄱㄱ" (4원칙 §1+§2+§3 ladder full / 3-agent Senior REVISE-3 흡수 + 옵션 α 채택)
 - **범주**: methodology / F-SIM-005 P1 carry 본격 해소 + paradigm 진화 (Type 분류 3계층화 / fail_mode 4종 enum + boolean 강제 / Adzic SBE 함정 직접 회피)
 - **상태**: 승인 / additive / breaking 0
@@ -46,11 +46,11 @@
 
 `flows/sdlc-4stage-flow.json` `release_eligibility.corroboration_type_levels` 신설:
 
-| Type | 정의 | 자격 | 권위 동형 |
-|---|---|---|---|
-| **Type 1** | Claude self-run / same session / 외부 사용자 ❌ | corroboration 자격 부분 (boolean ❌) | Anthropic Bloom auto-eval |
-| **Type 1.5** | 본 user 가 별도 PoC 적용 / same plugin SSOT / 외부 사용자 ❌ | corroboration 자격 ✅ (boolean) | Rust/GCC Stage 3 identity check |
-| **Type 2** | 외부 사용자 / 외부 repo / 별도 Claude Code session | corroboration 자격 ✅ (boolean) / ★ deadline 없는 carry | NIST/AISI 외부 pre-deployment eval |
+| Type         | 정의                                                         | 자격                                                  | 권위 동형                          |
+| ------------ | ------------------------------------------------------------ | ----------------------------------------------------- | ---------------------------------- |
+| **Type 1**   | Claude self-run / same session / 외부 사용자 ❌              | corroboration 자격 부분 (boolean ❌)                  | Anthropic Bloom auto-eval          |
+| **Type 1.5** | 본 user 가 별도 PoC 적용 / same plugin SSOT / 외부 사용자 ❌ | corroboration 자격 ✅ (boolean)                       | Rust/GCC Stage 3 identity check    |
+| **Type 2**   | 외부 사용자 / 외부 repo / 별도 Claude Code session           | corroboration 자격 ✅ (boolean) / deadline 없는 carry | NIST/AISI 외부 pre-deployment eval |
 
 ### §2. fail_mode_qualification boolean 강제 (REVISE-3 MED 흡수)
 
@@ -64,14 +64,16 @@
 ### §3. test-spec.schema.json fail_mode enum 4종 추가 (additive)
 
 `test_cases.items.properties.fail_mode` enum:
+
 - `compile_import_fail` — Beck-canonical (Kent Beck 2002 preface p.x verbatim 정합)
 - `assertion_fail` — per-TC RED 표준
-- `dry_run_placeholder` — ★ corroboration 자격 ❌ (Adzic SBE 함정 회피)
+- `dry_run_placeholder` — corroboration 자격 ❌ (Adzic SBE 함정 회피)
 - `pending` — Cucumber yellow (skipped) 정합 (Senior REVISE-1 추가 권고)
 
 ### §4. chain-coverage-validator validateFailModeDistribution 7번째 export (warn-only)
 
 `tools/chain-coverage-validator/src/validator.js`:
+
 - 7번째 export (utility loadJson 제외 시 6번째)
 - `dry_run_placeholder` 존재 시 low severity finding emit (warn-only / blocking ❌)
 - `corroboration_qualified` boolean 반환
@@ -80,20 +82,20 @@
 
 ### §5. corroboration #2 자격 본격 달성 (옵션 α 채택)
 
-| PoC | Type | stack | fail_mode | corroboration_qualified |
-|---|---|---|---|---|
-| **poc-05** | **Type 1.5** | TypeScript+vitest | assertion_fail 2건 | ✅ true |
-| **poc-14** | Type 1 | Python+pytest | assertion_fail 4건 | ✅ true |
-| ~~poc-02~~ | ~~Type 1.5 second arm~~ | (Spring Boot 3 / source empty 발견) | — | **carry 정직 표기 (deadline 없음)** |
+| PoC        | Type                    | stack                               | fail_mode          | corroboration_qualified             |
+| ---------- | ----------------------- | ----------------------------------- | ------------------ | ----------------------------------- |
+| **poc-05** | **Type 1.5**            | TypeScript+vitest                   | assertion_fail 2건 | ✅ true                             |
+| **poc-14** | Type 1                  | Python+pytest                       | assertion_fail 4건 | ✅ true                             |
+| ~~poc-02~~ | ~~Type 1.5 second arm~~ | (Spring Boot 3 / source empty 발견) | —                  | **carry 정직 표기 (deadline 없음)** |
 
 corroboration count = 2 (Type 1.5 single arm + Type 1 partial / 양측 fail_mode_qualification=true).
 
 ### §6. Carry 정직 표기 (paradigm 정합 / commit-block 회피 꼼수 ❌)
 
-| Carry | 사유 | Deadline |
-|---|---|---|
+| Carry                                                                                                                                           | 사유                                                  | Deadline |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | -------- |
 | **Type 1.5 second arm** (poc-02 Spring Boot 3 본격 / 또는 poc-03 NestJS chain 4 yellow → green / 또는 poc-04-mini React chain 4 yellow → green) | poc-02 source empty 발견 (Senior 사실 검증 누락 보강) | **없음** |
-| **Type 2** (외부 사용자 / 외부 repo / 별도 Claude Code session) | OSS 채택 트리거 의존 | **없음** |
+| **Type 2** (외부 사용자 / 외부 repo / 별도 Claude Code session)                                                                                 | OSS 채택 트리거 의존                                  | **없음** |
 
 두 carry 모두 commit-block 회피 꼼수 ❌ = release-readiness 자기 enforcement 본격 입증대 (paradigm maturity signal).
 
@@ -125,21 +127,21 @@ corroboration count = 2 (Type 1.5 single arm + Type 1 partial / 양측 fail_mode
 
 ## 자산 변경 (additive / breaking 0)
 
-| 영역 | 변경 |
-|---|---|
-| `schemas/test-spec.schema.json` | `test_cases.items.properties.fail_mode` enum 4종 추가 (additive optional) |
-| `tools/chain-coverage-validator/src/validator.js` | `validateFailModeDistribution` 7번째 export 신설 (warn-only) |
-| `tools/chain-coverage-validator/src/cli.js` | `--test-spec <path>` flag wire + JSON/human output |
-| `tools/chain-coverage-validator/test/validator.test.js` | 신규 4 test 추가 (34/34 pass) |
-| `flows/sdlc-4stage-flow.json` | `release_eligibility.corroboration_type_levels` 3계층화 + `fail_mode_qualification` boolean 강제 + items 갱신 + self_consistency_note 정직 표기 |
-| `examples/poc-05-sample-user-register/.aimd/output/test-spec.json` | `fail_mode: assertion_fail` 표기 (2건 / additive) |
-| `examples/poc-14-fsim-corroboration/.aimd/output/test-spec.json` | `fail_mode: assertion_fail` 표기 (4건 / additive) |
-| `plugin.json` | 8.13.3 → 8.14.0 |
-| `package.json` | 8.13.3 → 8.14.0 (3-way sync) |
-| `CHANGELOG.md` | v8.14.0 MINOR entry |
-| `decisions/INDEX.md` | 본 DEC 최상단 entry |
-| `decisions/STATUS.md` | session 39차 entry |
-| `CLAUDE.md` | "plugin.json v8.14.0" sync + 본 release 본문 |
+| 영역                                                               | 변경                                                                                                                                            |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `schemas/test-spec.schema.json`                                    | `test_cases.items.properties.fail_mode` enum 4종 추가 (additive optional)                                                                       |
+| `tools/chain-coverage-validator/src/validator.js`                  | `validateFailModeDistribution` 7번째 export 신설 (warn-only)                                                                                    |
+| `tools/chain-coverage-validator/src/cli.js`                        | `--test-spec <path>` flag wire + JSON/human output                                                                                              |
+| `tools/chain-coverage-validator/test/validator.test.js`            | 신규 4 test 추가 (34/34 pass)                                                                                                                   |
+| `flows/sdlc-4stage-flow.json`                                      | `release_eligibility.corroboration_type_levels` 3계층화 + `fail_mode_qualification` boolean 강제 + items 갱신 + self_consistency_note 정직 표기 |
+| `examples/poc-05-sample-user-register/.aimd/output/test-spec.json` | `fail_mode: assertion_fail` 표기 (2건 / additive)                                                                                               |
+| `examples/poc-14-fsim-corroboration/.aimd/output/test-spec.json`   | `fail_mode: assertion_fail` 표기 (4건 / additive)                                                                                               |
+| `plugin.json`                                                      | 8.13.3 → 8.14.0                                                                                                                                 |
+| `package.json`                                                     | 8.13.3 → 8.14.0 (3-way sync)                                                                                                                    |
+| `CHANGELOG.md`                                                     | v8.14.0 MINOR entry                                                                                                                             |
+| `decisions/INDEX.md`                                               | 본 DEC 최상단 entry                                                                                                                             |
+| `decisions/STATUS.md`                                              | session 39차 entry                                                                                                                              |
+| `CLAUDE.md`                                                        | "plugin.json v8.14.0" sync + 본 release 본문                                                                                                    |
 
 ## Cross-link
 

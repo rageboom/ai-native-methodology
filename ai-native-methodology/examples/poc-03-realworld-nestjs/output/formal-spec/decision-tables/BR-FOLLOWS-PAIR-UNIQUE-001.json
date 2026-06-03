@@ -6,11 +6,11 @@
   "action": "if (!_follows) save (App 1중 idempotent)",
   "expected_result": "중복 follow X (idempotent)",
   "rejection_method": "service if 분기 (silent skip)",
-  "verification_location": "★ Service 1중 / DB UQ pair 부재 / FK 부재 (F-121)",
+  "verification_location": " Service 1중 / DB UQ pair 부재 / FK 부재 (F-121)",
   "http_status": 200,
   "error_message": "(silent — 중복 시 200 OK)",
   "current_state": "partial",
-  "current_state_note": "★ App 1중 race-prone (DB UQ pair + FK 자체 부재)",
+  "current_state_note": " App 1중 race-prone (DB UQ pair + FK 자체 부재)",
   "round_trip_pattern": "B (코드 → 형식)",
   "natural_language_gap_quantified": {
     "explicit": 4,
@@ -34,12 +34,12 @@
     {
       "item": "거부 방식",
       "decision": "App pre-check 제거 + DB UQ pair + catch QueryFailedError → silent (idempotent)",
-      "rationale": "★ Sairyss DDD-Hexagon 정설 + race-safe + idempotent 보장"
+      "rationale": " Sairyss DDD-Hexagon 정설 + race-safe + idempotent 보장"
     },
     {
       "item": "검증 위치",
       "decision": "DB UQ (followerId, followingId) + FK 양쪽 user.id 참조",
-      "rationale": "★ F-121 fix — race-safe"
+      "rationale": " F-121 fix — race-safe"
     },
     {
       "item": "HTTP status",
@@ -53,7 +53,7 @@
     },
     {
       "item": "race window 처리",
-      "decision": "★★ DB UQ pair 추가 + catch → silent skip",
+      "decision": " DB UQ pair 추가 + catch → silent skip",
       "rationale": "현재 = race window 시 중복 row 잠입"
     }
   ],
@@ -109,7 +109,7 @@
           ]
         }
       ],
-      "note": "§2 코드 생성안(Direction D) / §3 finding 표는 cruft 로 제외. ★★/★/✅ 장식 glyph 제거, ✅→O / ❌→X / —→* 토큰화, race window 의미 텍스트는 row3 입력 셀에 'O (race window)' 로 보존."
+      "note": "§2 코드 생성안(Direction D) / §3 finding 표는 cruft 로 제외. //✅ 장식 glyph 제거, ✅→O / ❌→X / —→* 토큰화, race window 의미 텍스트는 row3 입력 셀에 'O (race window)' 로 보존."
     }
   ]
 }

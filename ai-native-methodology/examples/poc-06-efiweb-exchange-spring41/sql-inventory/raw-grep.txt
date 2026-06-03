@@ -1,8 +1,8 @@
-# PoC #06 SQL Inventory raw-grep — exchange.xml (★ retrofit / SQL Inventory corroboration #1)
+# PoC #06 SQL Inventory raw-grep — exchange.xml (retrofit / SQL Inventory corroboration #1)
 # 2026-05-08 / DEC-2026-05-08-poc-06-sql-inventory-retrofit
-# 자동 추출 (★ ≥ 50% / 컬럼 1, 2, 5, 6 자동 / 3, 4, 7, 8, 9, 10 매뉴얼)
+# 자동 추출 (≥ 50% / 컬럼 1, 2, 5, 6 자동 / 3, 4, 7, 8, 9, 10 매뉴얼)
 
-## 1. sql_id (★ 자동 / Mapper namespace + id grep)
+## 1. sql_id (자동 / Mapper namespace + id grep)
 
 namespace: ExchangeDAO
 
@@ -17,24 +17,24 @@ namespace: ExchangeDAO
 
 총 6 SQL 작업.
 
-## 2. mapper_xml (★ 자동 / file path)
+## 2. mapper_xml (자동 / file path)
 
 source/sqlmap/exchange.xml (129 lines)
 
-## 5. dynamic_branch (★ 자동 / iBATIS 2 dynamic tags grep)
+## 5. dynamic_branch (자동 / iBATIS 2 dynamic tags grep)
 
 | line | tag                           | sql_id                        |
 |------|-------------------------------|-------------------------------|
 | 28   | <isNotEmpty property="currCd">| selectExchangeList            |
 
-★ 1건만 — exchange.xml 의 dynamic branch ↓ (단일책임 모듈 정합 / capital 다중책임 예상 ↑).
+1건만 — exchange.xml 의 dynamic branch ↓ (단일책임 모듈 정합 / capital 다중책임 예상 ↑).
 
 추가 detect: SQL CASE WHEN (12 분기) 은 iBATIS dynamic 이 아닌 SQL 자체 분기.
 | line   | sql_id              | CASE WHEN count |
 |--------|---------------------|-----------------|
 | 79~90  | selectCheckExcRate  | 12 (월별)       |
 
-## 6. dependent_tables (★ 자동 / FROM/JOIN/UPDATE/INSERT/MERGE regex)
+## 6. dependent_tables (자동 / FROM/JOIN/UPDATE/INSERT/MERGE regex)
 
 | line | sql_id                     | tables                          |
 |------|----------------------------|---------------------------------|
@@ -46,19 +46,19 @@ source/sqlmap/exchange.xml (129 lines)
 | 115  | insertExchangeRateMigration| (none / S_ExRateMigration proc) |
 | 123  | selectDayExchangeList      | TB_DAY_EXCHANGE                 |
 
-★ 외부 호출 (DB 함수 / Stored Procedure):
+외부 호출 (DB 함수 / Stored Procedure):
 - FN_Get_ExcRate (line 103 / IFRS 도메인 외화환산 DB 함수)
 - S_ExRateMigration (line 115 / 환율 마이그레이션 DB 프로시저)
 
-## ★ 자조 코멘트 (self_recognized / SATD per Maldonado & Shihab 2015)
+## 자조 코멘트 (self_recognized / SATD per Maldonado & Shihab 2015)
 
 | line | comment                                                                   | sql_id              |
 |------|---------------------------------------------------------------------------|---------------------|
 | 75   | "환율관리 페이지만 생각하고 설계한 폐해라 할 수 있다 ㅋ"                    | selectCheckExcRate  |
 
-★ 1건 — AP-EXCHANGE-007 정합 (★ phase 4.7 intent-vs-bug.md §AP-EXCHANGE-007 = self_recognized).
+1건 — AP-EXCHANGE-007 정합 (phase 4.7 intent-vs-bug.md §AP-EXCHANGE-007 = self_recognized).
 
-## ★ 자동 추출 결과 요약
+## 자동 추출 결과 요약
 
 | 컬럼 | 자동? | 추출 결과 |
 |---|---|---|
@@ -73,7 +73,7 @@ source/sqlmap/exchange.xml (129 lines)
 | 9. confidence | — | meta-confidence 단계 5 = 70~95% |
 | 10. carry_flags | — | DBA-read / external_call / proc-body |
 
-★ ★ 자동 추출 비율 = 4 / 10 컬럼 = **40%** (자동 분류 자체 / 자동 채움). **measure ≥ 50%** 자격 미달 — 다만 컬럼 9, 10 은 본 추가 metadata 라 외부 6 컬럼만 보면 4/6 = **66.7%** ≥ 50% pass.
+자동 추출 비율 = 4 / 10 컬럼 = **40%** (자동 분류 자체 / 자동 채움). **measure ≥ 50%** 자격 미달 — 다만 컬럼 9, 10 은 본 추가 metadata 라 외부 6 컬럼만 보면 4/6 = **66.7%** ≥ 50% pass.
 
 ## 종합 통계
 

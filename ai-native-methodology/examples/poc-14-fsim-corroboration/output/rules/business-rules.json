@@ -1,6 +1,6 @@
 {
   "$schema_origin": "../../../../schemas/business-rules.schema.json",
-  "$comment": "★ analysis-business-rules skill 산출 — phase=business-logic.4 (sub: business-rules) / v6.0.0 표현 2종 (GWT + natural_language)",
+  "$comment": "analysis-business-rules skill 산출 — phase=business-logic.4 (sub: business-rules) / v6.0.0 표현 2종 (GWT + natural_language)",
   "project_id": "poc-14-fsim-corroboration",
   "meta": {
     "generated_at": "2026-05-18T16:03:00Z",
@@ -18,7 +18,7 @@
       "title": "이메일 시스템 내 unique",
       "type": "uniqueness_constraint",
       "description": "사용자 등록 시 이메일은 시스템 내 유일해야 한다. 중복 등록 시 409 Conflict 응답.",
-      "current_state_note": "★ 현 구현 위배 — auth.register_user() 가 중복 검사 미수행 / models.User.email 에 unique=True 부재 (AP-FSIM-DATA-001 high)",
+      "current_state_note": "현 구현 위배 — auth.register_user() 가 중복 검사 미수행 / models.User.email 에 unique=True 부재 (AP-FSIM-DATA-001 high)",
       "source_grounded_evidence": {
         "file": "source/auth.py",
         "line_range": "21-30",
@@ -43,7 +43,7 @@
       "title": "비밀번호 최소 8자",
       "type": "validation",
       "description": "신규 등록 시 비밀번호 최소 8자. Pydantic Field(min_length=8) 로 자동 검증.",
-      "current_state_note": "Pydantic 자동 검증 정상 동작 — schemas.UserCreate.password 명시. ★ severity medium 으로 medium 보안 (storage 결함 별개 AP-FSIM-SEC-001).",
+      "current_state_note": "Pydantic 자동 검증 정상 동작 — schemas.UserCreate.password 명시. severity medium 으로 medium 보안 (storage 결함 별개 AP-FSIM-SEC-001).",
       "source_grounded_evidence": {
         "file": "source/schemas.py",
         "line_range": "11",

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/figma-extract.schema.json",
   "title": "Figma Extract (analysis-from-figma output)",
-  "description": "★ ★ v3.3 G2 / R8 (b) Figma 디자인 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.figma.extract_ref 로 참조. FE 트랙 한정.",
+  "description": "v3.3 G2 / R8 (b) Figma 디자인 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.figma.extract_ref 로 참조. FE 트랙 한정.",
   "type": "object",
   "required": ["scope", "source", "screens", "components"],
   "additionalProperties": false,
@@ -78,19 +78,19 @@
         "required": ["id", "name", "node_type"],
         "properties": {
           "id": { "type": "string" },
-          "name": { "type": "string", "description": "★ Figma 레이어명 (layer name) — 실 표시 텍스트 ❌. TEXT 노드의 verbatim 표시 텍스트는 text_content 에 별도 기록 (F-162)." },
+          "name": { "type": "string", "description": "Figma 레이어명 (layer name) — 실 표시 텍스트 ❌. TEXT 노드의 verbatim 표시 텍스트는 text_content 에 별도 기록 (F-162)." },
           "node_type": {
             "type": "string",
             "enum": ["FRAME", "COMPONENT", "INSTANCE", "GROUP", "TEXT", "RECTANGLE", "VECTOR", "ELLIPSE", "LINE", "OTHER"]
           },
           "text_content": {
             "type": "string",
-            "description": "★ ★ F-162: node_type=TEXT 의 실 표시 텍스트 (Figma characters / get_design_context 가 반환한 verbatim). 라벨/버튼/헤더 등 사용자 가시 문자열은 반드시 본 필드에 verbatim 기록 (name=레이어명과 구분). LLM 추론 ❌ — MCP 호출 결과 그대로."
+            "description": "F-162: node_type=TEXT 의 실 표시 텍스트 (Figma characters / get_design_context 가 반환한 verbatim). 라벨/버튼/헤더 등 사용자 가시 문자열은 반드시 본 필드에 verbatim 기록 (name=레이어명과 구분). LLM 추론 ❌ — MCP 호출 결과 그대로."
           },
           "provenance": {
             "type": "string",
             "enum": ["verbatim", "inferred"],
-            "description": "★ ★ F-162: 본 노드의 텍스트/구조 출처. verbatim = get_design_context MCP 호출로 실 추출 (no-simulation 정합). inferred = LLM 추론 (★ TEXT 노드는 inferred 금지 / verbatim 미확보 시 scope_out_notes 로 명시). 미기재 시 verbatim 으로 간주하지 않음 — 산출 자격 조건에서 TEXT 노드 provenance 의무."
+            "description": "F-162: 본 노드의 텍스트/구조 출처. verbatim = get_design_context MCP 호출로 실 추출 (no-simulation 정합). inferred = LLM 추론 (TEXT 노드는 inferred 금지 / verbatim 미확보 시 scope_out_notes 로 명시). 미기재 시 verbatim 으로 간주하지 않음 — 산출 자격 조건에서 TEXT 노드 provenance 의무."
           },
           "parent_id": {
             "anyOf": [

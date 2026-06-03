@@ -1,6 +1,6 @@
 # PoC #14 — F-SIM Corroboration #2 (FastAPI + SQLAlchemy + Pydantic / external-user dogfood)
 
-> ★ ★ ★ **본 PoC = 사용자 외부 시점 시뮬레이션** (`.claude/plans/peaceful-dreaming-dragonfly.md`). poc-05(TypeScript+vitest) 와 **stack 횡단** corroboration #2 자격 달성용.
+> **본 PoC = 사용자 외부 시점 시뮬레이션** (`.claude/plans/peaceful-dreaming-dragonfly.md`). poc-05(TypeScript+vitest) 와 **stack 횡단** corroboration #2 자격 달성용.
 > DEC-2026-05-17-chain-harness-e2e-simulation-audit §4.1.2 P1 deadline 2026-06-01 흡수.
 
 ## 의도 (배경)
@@ -24,33 +24,33 @@ v8.3.0 release 후 사용자 메타 질문 "지금 한 것들이 어떤 의미�
 
 ## 의도된 결함 (3 antipattern)
 
-| ID | severity | 결함 | 검증 lane |
-|---|---|---|---|
-| AP-FSIM-SEC-001 | **critical** | 비밀번호 plaintext 저장 (bcrypt/argon2 부재) | F-SIM-001 antipattern-coverage lane (chain-coverage-validator) |
-| AP-FSIM-DATA-001 | **high** | 이메일 unique constraint 부재 (DB level + service level 양쪽) | F-SIM-001 lane |
-| AP-FSIM-AUTH-001 | **medium** | JWT 만료 시간 부재 | F-SIM-002 severity max-propagation |
+| ID               | severity     | 결함                                                          | 검증 lane                                                      |
+| ---------------- | ------------ | ------------------------------------------------------------- | -------------------------------------------------------------- |
+| AP-FSIM-SEC-001  | **critical** | 비밀번호 plaintext 저장 (bcrypt/argon2 부재)                  | F-SIM-001 antipattern-coverage lane (chain-coverage-validator) |
+| AP-FSIM-DATA-001 | **high**     | 이메일 unique constraint 부재 (DB level + service level 양쪽) | F-SIM-001 lane                                                 |
+| AP-FSIM-AUTH-001 | **medium**   | JWT 만료 시간 부재                                            | F-SIM-002 severity max-propagation                             |
 
 → critical 1 + high 1 + medium 1 = AC 매핑 또는 `excluded_antipatterns` carry 명시 의무. silent omission 시 chain-coverage-validator 가 차단.
 
 ## 의도된 stack signal 분포 (element coverage 최대화)
 
-| signal | 포함 여부 | 영향 element (예상) |
-|---|---|---|
-| FastAPI REST endpoint | ✅ | analysis-openapi / analysis-error-mapping fire |
-| SQLAlchemy entity + DDL | ✅ | analysis-db-schema-erd fire |
-| Pydantic schema | ✅ | analysis-form-validation-fe? (★ 명목 FE / 실 fire 여부 확인) |
-| Semgrep config (.semgrep.yml) | ✅ | analysis-aspect-static-security fire (★ no-simulation 의무) |
-| SQLite (RDB) | ✅ | analysis-sql-inventory fire |
-| Swagger YAML 별도 input | ✅ | analysis-from-swagger fire |
-| 기획 문서 (input/docs/plan.md) | ✅ | analysis-from-plan-doc fire |
-| TypeScript / .tsx | ❌ | analysis-type-spec-fe **non-fire** |
-| React / Vue / Svelte | ❌ | implement-react/vue + analysis-ui-* **non-fire** |
-| i18n library | ❌ | analysis-aspect-i18n **non-fire** |
-| Strangler / deprecated API | ❌ | analysis-aspect-legacy **non-fire** |
-| Figma URL | ❌ | analysis-from-figma **non-fire** |
-| JSP / Thymeleaf | ❌ | analysis-html-template **non-fire** |
-| Design token / Tailwind | ❌ | analysis-ui-visual-manifest-fe **non-fire** |
-| State management lib | ❌ | analysis-ui-state-map-fe **non-fire** |
+| signal                         | 포함 여부 | 영향 element (예상)                                        |
+| ------------------------------ | --------- | ---------------------------------------------------------- |
+| FastAPI REST endpoint          | ✅        | analysis-openapi / analysis-error-mapping fire             |
+| SQLAlchemy entity + DDL        | ✅        | analysis-db-schema-erd fire                                |
+| Pydantic schema                | ✅        | analysis-form-validation-fe? (명목 FE / 실 fire 여부 확인) |
+| Semgrep config (.semgrep.yml)  | ✅        | analysis-aspect-static-security fire (no-simulation 의무)  |
+| SQLite (RDB)                   | ✅        | analysis-sql-inventory fire                                |
+| Swagger YAML 별도 input        | ✅        | analysis-from-swagger fire                                 |
+| 기획 문서 (input/docs/plan.md) | ✅        | analysis-from-plan-doc fire                                |
+| TypeScript / .tsx              | ❌        | analysis-type-spec-fe **non-fire**                         |
+| React / Vue / Svelte           | ❌        | implement-react/vue + analysis-ui-\* **non-fire**          |
+| i18n library                   | ❌        | analysis-aspect-i18n **non-fire**                          |
+| Strangler / deprecated API     | ❌        | analysis-aspect-legacy **non-fire**                        |
+| Figma URL                      | ❌        | analysis-from-figma **non-fire**                           |
+| JSP / Thymeleaf                | ❌        | analysis-html-template **non-fire**                        |
+| Design token / Tailwind        | ❌        | analysis-ui-visual-manifest-fe **non-fire**                |
+| State management lib           | ❌        | analysis-ui-state-map-fe **non-fire**                      |
 
 **예상 결과**: fire ≈ 30~35 skill / non-fire ≈ 12~17 skill.
 
@@ -77,7 +77,7 @@ poc-14-fsim-corroboration/
 ├── .aimd/
 │   ├── state.json                    # chain-driver state
 │   ├── output/                       # chain 1~4 산출물 (planning/behavior/AC/test/impl/matrix)
-│   └── simulation/                   # ★ ★ ★ 본 PoC 핵심 산출 (사용자 시점 기록)
+│   └── simulation/                   # 본 PoC 핵심 산출 (사용자 시점 기록)
 │       ├── invocation-log.md         # sequential log (timestamp + element + result)
 │       ├── element-frequency.json    # 47 skill × stage × fire count + agent/tool/hook
 │       └── non-use-rationale.md      # 미 fire element + 사유 + 재현 조건
@@ -87,19 +87,20 @@ poc-14-fsim-corroboration/
 
 ## §8.1 strict 7/7 corroboration #2 자격 매핑
 
-| # | 자격 | 본 PoC 입증 |
-|---|---|---|
-| 1 | ≥ 2 PoC corroboration (L2) | ✅ poc-05 + poc-14 (stack 횡단 BE) |
-| 2 | 진짜 도구 5종 물증 | pytest (poc-05 = vitest / 별도 framework) |
-| 3 | validator violation 0 | chain 1~4 각 validator pass + F-SIM-001 lane |
-| 4 | chain coverage ≥ 0.85 | chain-coverage-validator |
-| 5 | ADR registry | (기존) |
-| 6 | matrix 100% green (L3) | UC→BR→BHV→AC→TC→IMPL forward+backward |
-| 7 | e2e 1 cycle pass | 본 PoC + poc-05 = 2 cycle |
+| #   | 자격                       | 본 PoC 입증                                  |
+| --- | -------------------------- | -------------------------------------------- |
+| 1   | ≥ 2 PoC corroboration (L2) | ✅ poc-05 + poc-14 (stack 횡단 BE)           |
+| 2   | 진짜 도구 5종 물증         | pytest (poc-05 = vitest / 별도 framework)    |
+| 3   | validator violation 0      | chain 1~4 각 validator pass + F-SIM-001 lane |
+| 4   | chain coverage ≥ 0.85      | chain-coverage-validator                     |
+| 5   | ADR registry               | (기존)                                       |
+| 6   | matrix 100% green (L3)     | UC→BR→BHV→AC→TC→IMPL forward+backward        |
+| 7   | e2e 1 cycle pass           | 본 PoC + poc-05 = 2 cycle                    |
 
-## ★ ★ ★ 본 PoC 의 v8.3.0 패러독스 해소
+## 본 PoC 의 v8.3.0 패러독스 해소
 
 `flows/sdlc-4stage-flow.json` `release_eligibility.self_consistency_note`:
+
 - v8.3.0: "정의 강화 / 사실 미충족 패러독스 잔존" (current_corroboration_count_at_required_strength=1)
 - **v8.4.0 (본 PoC 종결 후)**: "패러독스 해소" (count = 2)
 
@@ -137,6 +138,6 @@ node /path/to/plugin/tools/chain-driver/src/cli.js init ./poc-14-fsim-corroborat
 
 ## 진행 cadence (다음 session 시 본격 실행)
 
-- ★ ★ ★ plan: `.claude/plans/peaceful-dreaming-dragonfly.md` (Step 1~9)
+- plan: `.claude/plans/peaceful-dreaming-dragonfly.md` (Step 1~9)
 - 각 stage 진행 시 invocation-log.md 실시간 append + frequency.json 갱신
 - 종결 시 STOP-3 9-gate + v8.4.0 MINOR release

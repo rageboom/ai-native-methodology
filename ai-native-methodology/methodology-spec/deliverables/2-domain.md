@@ -1,7 +1,7 @@
 # 산출물 #2: 도메인 모델 (Domain Model — DDD-Lite B)
 
 > **사상**: DDD-Lite B 강도 (ADR-004 — Entity/VO/Aggregate/Repository/UbiquitousLanguage 까지 추출, Context Map / Subdomain / Domain Event / Saga 미추출)
-> **schema**: `schemas/domain.schema.json` · **template**: (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
+> **schema**: `schemas/domain.schema.json` · **template**: (v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
@@ -23,8 +23,8 @@ output/domain/
 
 **DDD-Lite B 적용 범위** (ADR-004):
 
-| ✅ 추출 | ❌ 미추출 (v1.2 이후) |
-|---|---|
+| ✅ 추출                                                                                                                                 | ❌ 미추출 (v1.2 이후)                           |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Bounded Context, Entity, Value Object, Aggregate, Aggregate Root, Invariants, Repository, Domain Service, Use Case, Ubiquitous Language | Context Map, Subdomain 분류, Domain Event, Saga |
 
 ---
@@ -33,17 +33,17 @@ output/domain/
 
 ### 3.1 추출 대상 (출처 / 방법 / 신뢰도 / 의존)
 
-| 항목 | 추출 출처 | 방법 | 신뢰도 (ORM 있음 / 없음) | 선행 의존 |
-|---|---|---|---|---|
-| Entity | ORM `@Entity` | 결정적 | 0.95 / 0.60 | — |
-| Aggregate Root | `@OneToMany cascade=ALL, orphanRemoval=true` | 결정적 | 0.90 / 0.50 | Entity |
-| Value Object | `@Embeddable` | 결정적 | 0.95 / 0.55 | Entity |
-| Repository | Repository 클래스 | 결정적 | 0.95 / 0.70 | Entity |
-| Domain Service | Service 클래스 안 도메인 로직 | LLM 추론 | 0.70 | Entity |
-| Invariants | 메서드 안 가드 절, DB CHECK | LLM 추론 | 0.65 | Entity |
-| Bounded Context | 패키지 구조 + 모듈 경계 | LLM 추론 | 0.60 / 0.50 | `architecture` phase |
-| Ubiquitous Language | 클래스명 + 메서드명 + ERD 컬럼 | LLM 추출 | 0.75 / 0.65 | Entity, DB schema |
-| Use Case | 서비스 메서드 + Controller 매핑 | LLM 추론 | 0.75 / 0.60 | Entity, API |
+| 항목                | 추출 출처                                    | 방법     | 신뢰도 (ORM 있음 / 없음) | 선행 의존            |
+| ------------------- | -------------------------------------------- | -------- | ------------------------ | -------------------- |
+| Entity              | ORM `@Entity`                                | 결정적   | 0.95 / 0.60              | —                    |
+| Aggregate Root      | `@OneToMany cascade=ALL, orphanRemoval=true` | 결정적   | 0.90 / 0.50              | Entity               |
+| Value Object        | `@Embeddable`                                | 결정적   | 0.95 / 0.55              | Entity               |
+| Repository          | Repository 클래스                            | 결정적   | 0.95 / 0.70              | Entity               |
+| Domain Service      | Service 클래스 안 도메인 로직                | LLM 추론 | 0.70                     | Entity               |
+| Invariants          | 메서드 안 가드 절, DB CHECK                  | LLM 추론 | 0.65                     | Entity               |
+| Bounded Context     | 패키지 구조 + 모듈 경계                      | LLM 추론 | 0.60 / 0.50              | `architecture` phase |
+| Ubiquitous Language | 클래스명 + 메서드명 + ERD 컬럼               | LLM 추출 | 0.75 / 0.65              | Entity, DB schema    |
+| Use Case            | 서비스 메서드 + Controller 매핑              | LLM 추론 | 0.75 / 0.60              | Entity, API          |
 
 **입력**: 소스 코드 + `db-schema` phase schema + `architecture` phase 아키텍처
 **평균 신뢰도**: ORM 있음 ~85%, 없음 ~60%
@@ -74,13 +74,13 @@ output/domain/
 
   children:
     - entity: E-ORDER-OrderItem
-      relation: "1:N"
+      relation: '1:N'
       cascade: ALL
       orphan_removal: true
 
   invariants:
-    - "주문 상태가 PENDING/PAID 일 때만 취소 가능"
-    - "totalAmount = Σ(items.price × items.quantity)"
+    - '주문 상태가 PENDING/PAID 일 때만 취소 가능'
+    - 'totalAmount = Σ(items.price × items.quantity)'
 
   repository: OrderRepository (JpaRepository)
 
@@ -95,13 +95,13 @@ output/domain/
 
 ```yaml
 - id: UC-ORDER-001
-  name: "주문 생성"
-  actor: "인증된 사용자"
+  name: '주문 생성'
+  actor: '인증된 사용자'
   preconditions:
-    - "장바구니에 1개 이상 상품"
+    - '장바구니에 1개 이상 상품'
   postconditions:
-    - "Order 생성 (status=PENDING)"
-    - "재고 차감"
+    - 'Order 생성 (status=PENDING)'
+    - '재고 차감'
 
   related_entities: [E-ORDER-Order, E-ORDER-OrderItem, E-PRODUCT-Product]
   related_apis: [createOrder]
@@ -128,25 +128,28 @@ output/domain/
 
 ## 7. 산출물 간 참조
 
-| 방향 | 의미 |
-|---|---|
-| DOM → API | UC ↔ operationId 매핑 |
-| DOM → DB | Entity ↔ Table |
-| DOM → RULES | Invariants 근거 |
-| DOM → ARCH | Bounded Context 경계 |
+| 방향        | 의미                  |
+| ----------- | --------------------- |
+| DOM → API   | UC ↔ operationId 매핑 |
+| DOM → DB    | Entity ↔ Table        |
+| DOM → RULES | Invariants 근거       |
+| DOM → ARCH  | Bounded Context 경계  |
 
 ---
 
 ## 8. 흔한 함정
 
 ### 8.1 Anemic Domain Model
+
 - 증상: Entity 에 getter/setter 만 있고 도메인 로직이 Service 에
 - 대응: AP-DOMAIN-ANEMIC-XXX 등록 + 도메인 로직 위치 기록
 
 ### 8.2 Aggregate 과잉
+
 - 증상: 모든 Entity 를 Aggregate Root 로 판정
 - 대응: cascade=ALL + orphanRemoval 기준 엄격 적용
 
 ### 8.3 ORM 없는 프로젝트
+
 - 증상: MyBatis 만 사용 → @Entity 없음 → Entity 자동 감지 실패
 - 대응: SQL Mapper + DTO 클래스에서 LLM 추론, 신뢰도↓ 표기

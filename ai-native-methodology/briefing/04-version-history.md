@@ -21,11 +21,11 @@
 
 ### 어떻게 입증했나
 
-| PoC | 대상 | 의의 |
-|---|---|---|
-| #01 | RealWorld Spring Boot 2.5 | 첫 성공 |
+| PoC | 대상                        | 의의                     |
+| --- | --------------------------- | ------------------------ |
+| #01 | RealWorld Spring Boot 2.5   | 첫 성공                  |
 | #02 | Spring Boot 3.3 + Hexagonal | 다른 아키텍처에서도 작동 |
-| #03 | NestJS (TypeScript) | **플랫폼 무관성 입증** |
+| #03 | NestJS (TypeScript)         | **플랫폼 무관성 입증**   |
 
 ### 다음으로 남긴 숙제
 
@@ -100,7 +100,7 @@
 
 ### 무엇을 추가했나
 
-- **Phase 4.7 Characterization** — Michael Feathers 의 *Working Effectively with Legacy Code* 에서 가져옴
+- **Phase 4.7 Characterization** — Michael Feathers 의 _Working Effectively with Legacy Code_ 에서 가져옴
 - **Given/When/Then 스냅샷** — 레거시 동작을 BDD 시나리오로 박제
 - **4가지 분류**:
   1. 의도된 동작
@@ -133,31 +133,31 @@
 - **Phase 4.8 SQL Inventory** — RDB 한정 sub-phase
 - **11개 컬럼**:
 
-  | 자동 (6) | 사람 검토 (5) |
-  |---|---|
-  | sql_id | business_meaning |
-  | mapper_xml | uc_link |
+  | 자동 (6)           | 사람 검토 (5)                |
+  | ------------------ | ---------------------------- |
+  | sql_id             | business_meaning             |
+  | mapper_xml         | uc_link                      |
   | called_from_screen | intent_vs_bug_classification |
-  | dynamic_branch | confidence |
-  | dependent_tables | carry_flags |
-  | statement_type | |
+  | dynamic_branch     | confidence                   |
+  | dependent_tables   | carry_flags                  |
+  | statement_type     |                              |
 
 - **자동화율 metric** — ≥ 50% 통과 의무 (5 개 PoC 평균 66.7%)
 - **sql-inventory-extractor 도구** + 단위 테스트 10 개
 - **ADR-CHAIN-007** + **ADR-CHAIN-008**
 
-### 어떻게 입증했나 (★ 본 방법론 사상 가장 강한 입증)
+### 어떻게 입증했나 (본 방법론 사상 가장 강한 입증)
 
 **5 개 PoC × 6 개 차원 동형 입증**:
 
-| 차원 | 변동성 |
-|---|---|
+| 차원     | 변동성                                               |
+| -------- | ---------------------------------------------------- |
 | 패러다임 | iBATIS 2 / MyBatis 3 / TypeORM raw / Spring Data JPA |
-| ORM | 4 종 |
-| 플랫폼 | Java / TypeScript |
-| 언어 | Java / TypeScript |
-| 책임 | 단일 / 다중 |
-| 규모 | 4 BC ~ 25 SQL |
+| ORM      | 4 종                                                 |
+| 플랫폼   | Java / TypeScript                                    |
+| 언어     | Java / TypeScript                                    |
+| 책임     | 단일 / 다중                                          |
+| 규모     | 4 BC ~ 25 SQL                                        |
 
 → **ADR-CHAIN-008 신정책** 채택: "MEDIUM 강도 × 5 PoC 동형 = strong corroboration 자격 충족".
 
@@ -184,9 +184,9 @@
 ### 무엇을 추가했나
 
 - **v2.3.0-rc1**: `migration_priority` P0~P3 12번째 컬럼 + ADR-CHAIN-009 (Gartner TIME SQL 단위 4분면 매핑 사상).
-- **v2.3.0 MINOR FINAL**: patterns_extension_v3 + ★ ★ ★ **Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule** + ADR-CHAIN-010.
+- **v2.3.0 MINOR FINAL**: patterns_extension_v3 + **Spring 4.1 + iBATIS 2 spectrum AP isomorphic 5종 sub-rule** + ADR-CHAIN-010.
 - **v2.3.1 ~ v2.3.7 PATCH 일련**:
-  - `findings-aggregator` 도구 신설 (★ workspace 15번째 / "양심 의존 차단" 정책 완성).
+  - `findings-aggregator` 도구 신설 (workspace 15번째 / "양심 의존 차단" 정책 완성).
   - chain-driver `next --findings` 자동 입력 정식 통합.
   - rules.schema.json BR pattern 4토막 strict 정합 + id-conventions enforcement 강화.
   - PoC #11 사내 EFI-WEB billing 본격 chain 2 진입 (첫 realworld 사내 PoC chain 2 실증).
@@ -212,10 +212,10 @@
 
 ### 무엇을 추가했나
 
-- **BR dual representation paradigm 본격 도입** — natural_language + given_when_then 양쪽 executable (★ Gherkin description = runtime 무시 paradigm 과 명확히 다름).
-- **★ ★ ★ `br-cross-consistency-validator` 신설** — workspace 16번째 도구.
+- **BR dual representation paradigm 본격 도입** — natural_language + given_when_then 양쪽 executable (Gherkin description = runtime 무시 paradigm 과 명확히 다름).
+- **`br-cross-consistency-validator` 신설** — workspace 16번째 도구.
   - **Layer 1 (결정적)**: 두 표현 ≥ 1 의무 / keyword overlap (intersection / max) / structure 검증 / BR id 4토막 strict.
-  - **Layer 2 (★ LLM advisory)**: ★ v2.4 시점 = placeholder + interface 정의 / v2.5.0 본격 구현.
+  - **Layer 2 (LLM advisory)**: v2.4 시점 = placeholder + interface 정의 / v2.5.0 본격 구현.
 - **chain 1 gate REQUIRED_VALIDATORS_PER_STAGE 통합** — br-cross-consistency-validator 가 chain 1 gate 의무 통과 요소로 격상.
 - **release-readiness §8.1 strict 7/7 → 8/8 격상** — analysis_validator_violation criterion 신설.
 - **ADR-CHAIN-011 본격 작성** — dual representation paradigm + Adzic SBE 위험 신호 + industry 공백 사실.
@@ -223,16 +223,17 @@
 ### 어떻게 입증했나
 
 - **11 PoC 호환 회복** (PoC #01 13 BR + PoC #05 sample / VALID gate pass).
-- **★ ★ industry-first 자격 본격 임상 threshold 측정** — MDPI 2025 paraphrase optimal=0.671 / Cucumber + DMN + Spectral 부재 / 본 방법론 원조 자격.
+- **industry-first 자격 본격 임상 threshold 측정** — MDPI 2025 paraphrase optimal=0.671 / Cucumber + DMN + Spectral 부재 / 본 방법론 원조 자격.
 
-### v2.4 carry session 9~14차 (★ no version bump / no release / no tag)
+### v2.4 carry session 9~14차 (no version bump / no release / no tag)
 
 본 v2.4 release 후 v2.5.0 본격 release 까지 6 차례 SESSION-WRAPUP carry update:
+
 - **session 9차**: Layer 1 keyword overlap = structural sanity check 격하 / Layer 2 LLM 의무 격상 paradigm 결단 / SPIKE v2 자산화 / ≥0.85 hypothesis empirical 정면 부정 결정적 사실.
 - **session 10차 Phase A**: description vs natural_language paradigm 재정의 (Agent 3 (c) hybrid).
 - **session 11차 Phase B**: PoC #03 18 BR + PoC #05 dual representation 마이그레이션 / Layer 1 keyword threshold 자체 제거.
-- **session 12~13차 Phase C**: Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 구현 (★ Anthropic API ❌ / Claude Code Task tool ✅).
-- **session 14차 Phase C step 9**: chain 1 gate Layer 2 통합 (★ chain harness 5 요소 1 변경).
+- **session 12~13차 Phase C**: Layer 2 LLM Claude Code sub-agent invocation paradigm 본격 구현 (Anthropic API ❌ / Claude Code Task tool ✅).
+- **session 14차 Phase C step 9**: chain 1 gate Layer 2 통합 (chain harness 5 요소 1 변경).
 
 ### 다음으로 남긴 숙제
 
@@ -241,16 +242,16 @@
 
 ---
 
-## v2.5.0 (2026-05-14) — Layer 2 LLM paradigm 본격 + ≥ 2 PoC corroboration 본격 입증 (★ ★ MINOR FINAL)
+## v2.5.0 (2026-05-14) — Layer 2 LLM paradigm 본격 + ≥ 2 PoC corroboration 본격 입증 (MINOR FINAL)
 
 ### 어떤 문제 인식이 있었나
 
-"v2.4 까지 dual representation paradigm 은 도입했지만, Layer 2 의 LLM 의미 일관성 평가가 placeholder 상태. ★ ★ ★ Adzic SBE 함정 회피 자격 본격 도달하려면 Layer 2 본격 동작 + ≥ 2 PoC 양쪽 입증 필수."
+"v2.4 까지 dual representation paradigm 은 도입했지만, Layer 2 의 LLM 의미 일관성 평가가 placeholder 상태. Adzic SBE 함정 회피 자격 본격 도달하려면 Layer 2 본격 동작 + ≥ 2 PoC 양쪽 입증 필수."
 
-### 무엇을 추가했나 (★ ★ ★ ★ ★ paradigm 본격 굳힘)
+### 무엇을 추가했나 (paradigm 본격 굳힘)
 
 - **Layer 2 LLM paradigm 본격 도입** — Claude Code sub-agent invocation:
-  - ★ ★ ★ Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정정 (★ 본 plugin 본질 정합).
+  - Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정정 (본 plugin 본질 정합).
   - Sonnet 4.6 sub-agent batch 호출 (1회 호출 전체 BR / paradigm 굳힘).
   - DETERMINISTIC_THRESHOLD = 0.85 / confidence cap = 0.85 / semantic_drift_detected (medium) + confidence_cap_exceeded (low) finding 신설.
   - `docs/layer-2-prompt-spec.md` 본격 자산화.
@@ -258,14 +259,14 @@
   - PoC #01 overall=0.901 / pass
   - PoC #03 overall=0.941 / pass
   - PoC #05 overall=0.985 / pass (sample)
-- **drift BR 2건 DRIFT 격상 자산화** — BR-AUTH-JWT-002 + BR-USER-DELETE-AUTH-001 (★ rules.json 변경 ❌ / 사용자 결단 (2) / Senior REVISE-3).
-- **release-readiness 8/8 → 9/9 격상** — ★ `layer_2_consistency` criterion 신설 (per-PoC mean ≥ 0.7 + critical/high drift 0 / additive change paradigm).
+- **drift BR 2건 DRIFT 격상 자산화** — BR-AUTH-JWT-002 + BR-USER-DELETE-AUTH-001 (rules.json 변경 ❌ / 사용자 결단 (2) / Senior REVISE-3).
+- **release-readiness 8/8 → 9/9 격상** — `layer_2_consistency` criterion 신설 (per-PoC mean ≥ 0.7 + critical/high drift 0 / additive change paradigm).
 - **chain 1 gate gate-eval.js Layer 2 통합** — llm_consistency_score+llm_threshold+llm_status 3 필드 / evaluateGate layer2_threshold block reason / severityRank rank 2.
 
-### 어떻게 입증했나 (★ ★ ★ ★ ★ ★ ★ 본 방법론 사상 최강 입증)
+### 어떻게 입증했나 (본 방법론 사상 최강 입증)
 
-- **★ ★ industry-first paradigm 본격 입증** — Spec Kit 90K star / AWS Q / DMN / Spectral 모두 cross-consistency rule 부재 / 본 방법론 원조 자격.
-- **★ ★ ★ Adzic SBE 10년 폐기 함정 회피 자격 본격 도달** — Layer 2 본격 동작 + ≥ 2 PoC corroboration 양쪽 입증.
+- **industry-first paradigm 본격 입증** — Spec Kit 90K star / AWS Q / DMN / Spectral 모두 cross-consistency rule 부재 / 본 방법론 원조 자격.
+- **Adzic SBE 10년 폐기 함정 회피 자격 본격 도달** — Layer 2 본격 동작 + ≥ 2 PoC corroboration 양쪽 입증.
 - **312/0 workspace test + 10/10 scripts/test = 322/0 본질 보존**.
 - **multi-model cross-validation 본격 자료** — Sonnet 4.6 + Haiku 4.5 (different model class) 31 BR Layer 2 blind retrospect → self-eval bias 단방향 상향 편향 가설 정면 부정 ✅.
 
@@ -281,38 +282,39 @@
 
 ---
 
-## v2.5.1 (2026-05-14) — Claude Code plugin install 호환성 본격 회복 (★ PATCH)
+## v2.5.1 (2026-05-14) — Claude Code plugin install 호환성 본격 회복 (PATCH)
 
 ### 어떤 문제 인식이 있었나
 
-★ ★ ★ **critical 결함 본질 사실**: v2.0.0~v2.5.0 모든 release 가 사내 GHE plugin install 후 38 skill + 3 agent 본격 인식 ❌. 사용자 검증 시 `/plugin` 상세 출력 = "Agents: README (1 file 잘못 인식) / Skills: 0종 / MCP Servers: _comment".
+**critical 결함 본질 사실**: v2.0.0~v2.5.0 모든 release 가 사내 GHE plugin install 후 38 skill + 3 agent 본격 인식 ❌. 사용자 검증 시 `/plugin` 상세 출력 = "Agents: README (1 file 잘못 인식) / Skills: 0종 / MCP Servers: \_comment".
 
 원인 = 본 plugin 의 `agents/<category>/<name>/<name>.md` + `skills/<category>/<name>/SKILL.md` **2-depth lifecycle organize** 가 Claude Code plugin 표준 1-depth scan 과 충돌.
 
 ### 무엇을 추가했나
 
-★ ★ **사용자 결단 옵션 B (category prefix flatten)** 본격 시행:
+**사용자 결단 옵션 B (category prefix flatten)** 본격 시행:
 
 - **agents 3 mv + skills 38 mv (총 41 mv)** — `agents/_base-<name>.md` + `skills/<category>-<name>/SKILL.md` 1-depth + prefix paradigm.
-- **사상 명세 본격 자산화** — `methodology-spec/skills-axis.md` §7 신설 + `methodology-spec/agents-axis.md` 본격 작성 (★ sub-axis 영역 분리: 사상 axis = methodology-spec / runtime axis = 1-depth + prefix).
-- **외부 참조 43 file 정밀 갱신** — flows/*.json + tools/chain-driver/hooks-bridge.js + README + methodology-spec 안 skill name 인용 (★ negative lookbehind/lookahead + .md path 회피 정규식).
-- **3-way sync 회복** — `package.json` v2.4.1 → v2.5.1 (★ v2.5.0 release commit 갱신 누락 회복) + `plugin.json` v2.5.0 → v2.5.1 + CHANGELOG 헤더 신설.
+- **사상 명세 본격 자산화** — `methodology-spec/skills-axis.md` §7 신설 + `methodology-spec/agents-axis.md` 본격 작성 (sub-axis 영역 분리: 사상 axis = methodology-spec / runtime axis = 1-depth + prefix).
+- **외부 참조 43 file 정밀 갱신** — flows/\*.json + tools/chain-driver/hooks-bridge.js + README + methodology-spec 안 skill name 인용 (negative lookbehind/lookahead + .md path 회피 정규식).
+- **3-way sync 회복** — `package.json` v2.4.1 → v2.5.1 (v2.5.0 release commit 갱신 누락 회복) + `plugin.json` v2.5.0 → v2.5.1 + CHANGELOG 헤더 신설.
 
 ### 어떻게 입증했나
 
-- ★ ★ 사내 GHE 표준 install (`/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git` + `/plugin install ai-native-methodology@ai-native-methodology`) 본격 작동 ✅.
-- ★ chain harness 5 요소 변경 ❌ (★ plugin runtime 호환성 fix 영역 한정).
-- ★ v2.5.0 MINOR FINAL release 본질 보존 ✅.
-- ★ 11 PoC 호환 자격 보존 ✅.
+- 사내 GHE 표준 install (`/plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git` + `/plugin install ai-native-methodology@ai-native-methodology`) 본격 작동 ✅.
+- chain harness 5 요소 변경 ❌ (plugin runtime 호환성 fix 영역 한정).
+- v2.5.0 MINOR FINAL release 본질 보존 ✅.
+- 11 PoC 호환 자격 보존 ✅.
 
 ### post-v2.5.1 meta cleanup (2026-05-14 / no version bump / no release)
 
 본 PATCH 후속 메타 정리 4 commit:
+
 - `plugin.json` description ≈ 3KB session history → 200자 안정 제품 설명.
 - `CLAUDE.md` CHANGELOG 라인 7849자 단일 paragraph → 200자 + link.
 - `CHANGELOG.md` split 165KB → 60KB / v2.4+ 본문 / v2.3.7 이하 CHANGELOG-HISTORY.md 격리.
 - `tools/drift-validator/check-phase-skills.js` 1-depth paradigm 정합 갱신 → workspace test 310/2 → 312/0 회복.
-- briefing/ outdated 본격 update (★ 본 페이지 갱신 자체).
+- briefing/ outdated 본격 update (본 페이지 갱신 자체).
 
 ### 다음으로 남긴 숙제
 
@@ -326,4 +328,4 @@
 >
 > 매 버전은 직전 버전이 남긴 숙제 하나를 풀었고, 풀어낸 방법은 항상 ≥ 2 개 PoC 에서 동형으로 입증되었습니다.
 >
-> ★ ★ ★ v2.5.0 = **Adzic SBE 10년 폐기 함정 회피 자격 본격 도달** + **industry-first paradigm 본격 입증** 결정적 단계. ★ v2.5.1 = 사내 동료 plugin install 호환성 본격 완성.
+> v2.5.0 = **Adzic SBE 10년 폐기 함정 회피 자격 본격 도달** + **industry-first paradigm 본격 입증** 결정적 단계. v2.5.1 = 사내 동료 plugin install 호환성 본격 완성.

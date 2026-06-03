@@ -1,13 +1,13 @@
 {
-  "$comment": "★ ★ ★ phase 4.7 snapshot — UC-RAE-010 Article 목록 author 분기 (★ ★ ★ Spring Data JPA method name derived query paradigm core).",
+  "$comment": " phase 4.7 snapshot — UC-RAE-010 Article 목록 author 분기 ( Spring Data JPA method name derived query paradigm core).",
   "snapshot_id": "SNAP-UC-RAE-010",
   "use_case": "UC-RAE-010",
   "endpoint": "GET /articles?author=jane",
   "controller_method": "ArticleRestController.getArticlesByAuthor",
   "service_method": "ArticleService.getArticlesByAuthor",
-  "sql_id": "ArticleRepository.findAllByAuthorProfileUserName (★ ★ method name derived → Embedded Profile.userName 분석)",
+  "sql_id": "ArticleRepository.findAllByAuthorProfileUserName ( method name derived → Embedded Profile.userName 분석)",
   "scenarios": [
-    {"id": "SCN-RAE-010-001", "name": "happy path — author 기반 article 목록", "given": {"request_query": "?author=jane"}, "when": "ArticleRepository.findAllByAuthorProfileUserName(UserName('jane'), Pageable) → ★ Spring Data JPA method name → SQL: SELECT * FROM article a JOIN user u ON a.author_id = u.id WHERE u.user_name = 'jane' LIMIT/OFFSET", "then": {"expected_response": "Page<Article>", "_note": "★ ★ ★ method name derived paradigm core — Embedded VO Profile.userName 자동 분석 / iBATIS / TypeORM / MyBatis 와는 다른 paradigm (★ ORM 추상화 더 깊음)"}, "intent_classification": [{"rule": "BR-RAE-SEARCH-002", "type": "intent", "note": "method name derived query paradigm"}]}
+    {"id": "SCN-RAE-010-001", "name": "happy path — author 기반 article 목록", "given": {"request_query": "?author=jane"}, "when": "ArticleRepository.findAllByAuthorProfileUserName(UserName('jane'), Pageable) → Spring Data JPA method name → SQL: SELECT * FROM article a JOIN user u ON a.author_id = u.id WHERE u.user_name = 'jane' LIMIT/OFFSET", "then": {"expected_response": "Page<Article>", "_note": " method name derived paradigm core — Embedded VO Profile.userName 자동 분석 / iBATIS / TypeORM / MyBatis 와는 다른 paradigm ( ORM 추상화 더 깊음)"}, "intent_classification": [{"rule": "BR-RAE-SEARCH-002", "type": "intent", "note": "method name derived query paradigm"}]}
   ],
   "intent_vs_bug_summary": {"intent": ["BR-RAE-SEARCH-002"], "bug": [], "ambiguous": [], "self_recognized": []}
 }

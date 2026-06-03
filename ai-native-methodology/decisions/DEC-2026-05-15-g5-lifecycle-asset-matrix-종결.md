@@ -15,39 +15,39 @@ charter §3 G5 (R12 lifecycle stage↔asset 매핑표 부재) 종결.
 
 ## paradigm 결단 (사용자 결단 2026-05-15)
 
-| 의제 | 결단 | 근거 |
-|---|---|---|
-| Column 5 | **agent / skill / hook / tool/validator** ✅ | charter §3 G5 원안 정합 |
-| Row 분리도 | **단일 row + 부 매트릭스** ✅ | row 비대화 회피 (4 row 추가 ❌) + orchestrate 자연 응집 + BCDE detail 분리 = ROI 최적 |
-| version 라벨 | **v3.5.0 MINOR** ✅ | G5 종결 = MINOR (G2/G4 일관) |
+| 의제         | 결단                                         | 근거                                                                                  |
+| ------------ | -------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Column 5     | **agent / skill / hook / tool/validator** ✅ | charter §3 G5 원안 정합                                                               |
+| Row 분리도   | **단일 row + 부 매트릭스** ✅                | row 비대화 회피 (4 row 추가 ❌) + orchestrate 자연 응집 + BCDE detail 분리 = ROI 최적 |
+| version 라벨 | **v3.5.0 MINOR** ✅                          | G5 종결 = MINOR (G2/G4 일관)                                                          |
 
 ## 본 매트릭스 8 row
 
-| Stage / Cross-cut | 본질 |
-|---|---|
-| input (analysis 진입) | BCDE 입력 흡수 + orchestrator dispatch |
+| Stage / Cross-cut      | 본질                                                                    |
+| ---------------------- | ----------------------------------------------------------------------- |
+| input (analysis 진입)  | BCDE 입력 흡수 + orchestrator dispatch                                  |
 | analysis (chain 1 sub) | 22 skill (chain 0 sub) — 7대 + 8 FE + aspect + br-cross + html-template |
-| planning (chain 1) | UC / BR-INTENT 추출 + planning-spec |
-| spec (chain 2) | behavior + AC + 7대 통합 |
-| test (chain 3) | RED test 코드 + 5종 물증 |
-| implement (chain 4) | GREEN impl 코드 + 100% pass |
-| cross-cut traceability | UC→BHV→AC→TC→IMPL forward+backward link |
-| cross-cut aspects | a11y / i18n / static-security / legacy |
+| planning (chain 1)     | UC / BR-INTENT 추출 + planning-spec                                     |
+| spec (chain 2)         | behavior + AC + 7대 통합                                                |
+| test (chain 3)         | RED test 코드 + 5종 물증                                                |
+| implement (chain 4)    | GREEN impl 코드 + 100% pass                                             |
+| cross-cut traceability | UC→BHV→AC→TC→IMPL forward+backward link                                 |
+| cross-cut aspects      | a11y / i18n / static-security / legacy                                  |
 
 ## 부 매트릭스 6 row (R8 입력 axis)
 
-| R8 종류 | skill | 의존 도구 | 산출 schema |
-|---|---|---|---|
-| (a) 코드 | `analysis-input-collection` | git + Glob/Grep + ADR-010 baseline | input.json |
-| (b) Figma | `analysis-from-figma` | mcp__figma-desktop__* 4 도구 | figma-extract |
-| (c) Swagger | `analysis-from-swagger` | @readme/openapi-parser | swagger-extract |
-| (d) plan-doc | `analysis-from-plan-doc` | Read PDF + remark + adm-zip + csv-parse | plan-doc-extract |
-| (e) prompt | `analysis-from-prompt` | (Claude only) | prompt-extract |
-| (★ orchestrator) | `analysis-input-orchestrate` | (BCDE dispatch + merge / Hybrid 2-B + 2-A) | input-summary |
+| R8 종류         | skill                        | 의존 도구                                  | 산출 schema      |
+| --------------- | ---------------------------- | ------------------------------------------ | ---------------- |
+| (a) 코드        | `analysis-input-collection`  | git + Glob/Grep + ADR-010 baseline         | input.json       |
+| (b) Figma       | `analysis-from-figma`        | mcp**figma-desktop**\* 4 도구              | figma-extract    |
+| (c) Swagger     | `analysis-from-swagger`      | @readme/openapi-parser                     | swagger-extract  |
+| (d) plan-doc    | `analysis-from-plan-doc`     | Read PDF + remark + adm-zip + csv-parse    | plan-doc-extract |
+| (e) prompt      | `analysis-from-prompt`       | (Claude only)                              | prompt-extract   |
+| ( orchestrator) | `analysis-input-orchestrate` | (BCDE dispatch + merge / Hybrid 2-B + 2-A) | input-summary    |
 
 ## 신설 자산
 
-- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 (★ 신설 / 본 매트릭스 + 부 매트릭스 + Scenario cross-link + 사용 가이드)
+- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 ( 신설 / 본 매트릭스 + 부 매트릭스 + Scenario cross-link + 사용 가이드)
 
 ## 수정 자산
 
@@ -75,7 +75,7 @@ charter §3 G5 (R12 lifecycle stage↔asset 매핑표 부재) 종결.
 - v2.6.0 paradigm (skills-axis.md §category prefix / 의미 ID 정합)
 - be-fe-separation.md (Scenario × IR 4계층 / axis 분리)
 
-## Lessons Learned (★ paradigm 진화)
+## Lessons Learned ( paradigm 진화)
 
 - **LL-G5-01**: 매핑 매트릭스 신설 시 row 분리도 결단은 **사용자 진입 가이드 ↑** vs **매트릭스 시야 ↓** 사이 trade-off. row 비대화 회피 + 부 매트릭스 분리 = ROI 최적. G2 LL-G2-03 (책임 합산 의무) + G4 LL-G4-02 (분리 vs 본문 분기 = 3축 평가) 의 단순 문서 영역 응용.
 - **LL-G5-02**: charter §3 종결 자산 = 매트릭스 1장 정도라도 **단일 SSOT 확립 가치** 큼. 이전엔 `skills-axis.md` + `be-fe-separation.md` + `flows/*` 흩어진 자산을 사용자가 cross-read 의무. 본 매트릭스 = 1장에서 stage 진입 시 어떤 자산 호출할지 즉답.

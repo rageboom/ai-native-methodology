@@ -1,6 +1,6 @@
 # DEC-2026-05-17-chain-harness-e2e-simulation-audit
 
-> ★ chain harness 4-stage e2e 데스크 워크스루 감사 — 2 PoC cross-validation / F-SIM-001~011 정식 등재 / P0 plan + 4원칙 §2 research 후속 / 시행 ❌ (본 결단 = audit + log + plan 단계까지).
+> chain harness 4-stage e2e 데스크 워크스루 감사 — 2 PoC cross-validation / F-SIM-001~011 정식 등재 / P0 plan + 4원칙 §2 research 후속 / 시행 ❌ (본 결단 = audit + log + plan 단계까지).
 
 ## 1. 배경
 
@@ -12,13 +12,13 @@
 
 ## 2. 감사 방법
 
-| 단계 | 도구 / 산출 |
-|---|---|
-| 산출물 정독 | poc-05 분석 stage 입력 + chain 1~4 산출물 + matrix + run-log + README + legacy source = 11 file 전수 |
-| 산출물 정독 | poc-03 analysis stage + chain 1~3 산출물 + matrix = 6 file (chain 4 부재) |
+| 단계              | 도구 / 산출                                                                                                                                                 |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 산출물 정독       | poc-05 분석 stage 입력 + chain 1~4 산출물 + matrix + run-log + README + legacy source = 11 file 전수                                                        |
+| 산출물 정독       | poc-03 analysis stage + chain 1~3 산출물 + matrix = 6 file (chain 4 부재)                                                                                   |
 | 코드 ground-truth | `tools/traceability-matrix-builder/src/builder.js` (severity 산정 로직) / `tools/chain-coverage-validator/src/validator.js` (cross-ref 검증 로직) 직접 grep |
-| flow 정합성 | `flows/sdlc-4stage-flow.json` + `flows/{planning,spec,test,implement}.phase-flow.json` 정독 |
-| cross-validation | poc-03 동형 패턴 재현 / 악화 여부 코드 출력 기반 결정적 비교 |
+| flow 정합성       | `flows/sdlc-4stage-flow.json` + `flows/{planning,spec,test,implement}.phase-flow.json` 정독                                                                 |
+| cross-validation  | poc-03 동형 패턴 재현 / 악화 여부 코드 출력 기반 결정적 비교                                                                                                |
 
 **시뮬레이션 ❌** — 모든 finding 은 ground-truth(코드 또는 산출물) 인용 + 결정적 grep 출력 기반. AI persona 흉내 / 가상 도구 실행 부재.
 
@@ -26,19 +26,19 @@
 
 **11 finding (F-SIM-001~011)** — `methodology-spec/finding-system.md` § Body Finding Ledger — F-SIM namespace 등재.
 
-| ID | severity | 1줄 요약 | 2 PoC 재현 |
-|---|---|---|---|
-| 001 | high | critical AP 가 무경고로 chain 관통 → matrix "critical/green" | ✅ 악화 (poc-03 = 2건 silent omit) |
-| 002 | high | matrix severity = AC.MoSCoW 만 / BR·AP severity 전파 부재 | ✅ 동형 (builder.js:56,67,77) |
-| 003 | high | chain-coverage-validator 가 cross-ref 경로 resolve 미검증 | ✅ 악화 (poc-03 = 2 경로 + 컨벤션 불일치) |
-| 004 | medium | matrix 에 BR 축 부재 (UC→BHV→AC→TC→IMPL 만) | ✅ 동형 |
-| 005 | high | RED 의 의미적 약함 (import-fail / dry-run placeholder) | ✅ 악화 (poc-03 = 테스트 미실행) |
-| 006 | high | gate #4 no-sim 강제 도구 우회 (--dry-run + 수동 사이드채널) | poc-05 only |
-| 007 | medium | chain 산출물 ceremony tax + meta 4~5중 verbatim | ✅ 동형 |
-| 008 | medium | 산출물 meta 에 방법론 진화 서사 혼입 | ✅ 악화 (poc-03 = version skew) |
-| 009 | medium | gate intervention_log 영속 비일관 | poc-05 only |
-| 010 | medium | 기준 PoC README/run-log 가 자기 산출물과 drift | poc-05 only |
-| 011 | high | §8.1 "≥2 PoC corroboration" 이 최강 claim 에서 사실상 n=1 | ✅ 본질적 |
+| ID  | severity | 1줄 요약                                                     | 2 PoC 재현                                |
+| --- | -------- | ------------------------------------------------------------ | ----------------------------------------- |
+| 001 | high     | critical AP 가 무경고로 chain 관통 → matrix "critical/green" | ✅ 악화 (poc-03 = 2건 silent omit)        |
+| 002 | high     | matrix severity = AC.MoSCoW 만 / BR·AP severity 전파 부재    | ✅ 동형 (builder.js:56,67,77)             |
+| 003 | high     | chain-coverage-validator 가 cross-ref 경로 resolve 미검증    | ✅ 악화 (poc-03 = 2 경로 + 컨벤션 불일치) |
+| 004 | medium   | matrix 에 BR 축 부재 (UC→BHV→AC→TC→IMPL 만)                  | ✅ 동형                                   |
+| 005 | high     | RED 의 의미적 약함 (import-fail / dry-run placeholder)       | ✅ 악화 (poc-03 = 테스트 미실행)          |
+| 006 | high     | gate #4 no-sim 강제 도구 우회 (--dry-run + 수동 사이드채널)  | poc-05 only                               |
+| 007 | medium   | chain 산출물 ceremony tax + meta 4~5중 verbatim              | ✅ 동형                                   |
+| 008 | medium   | 산출물 meta 에 방법론 진화 서사 혼입                         | ✅ 악화 (poc-03 = version skew)           |
+| 009 | medium   | gate intervention_log 영속 비일관                            | poc-05 only                               |
+| 010 | medium   | 기준 PoC README/run-log 가 자기 산출물과 drift               | poc-05 only                               |
+| 011 | high     | §8.1 "≥2 PoC corroboration" 이 최강 claim 에서 사실상 n=1    | ✅ 본질적                                 |
 
 **공통 뿌리 1개**: "본 방법론은 *링크 존재*는 결정적 강제 / *링크가 비즈니스 사실을 보존하는가*는 미강제" — F-SIM-001/002/003/004/005 동일 뿌리.
 
@@ -46,13 +46,13 @@
 
 ## 4. 결단
 
-### 4.1 본 결단 scope (★ 2026-05-18 갱신 — 사용자 승인 후 P0 시행 본격 진입)
+### 4.1 본 결단 scope ( 2026-05-18 갱신 — 사용자 승인 후 P0 시행 본격 진입)
 
 - ✅ F-SIM-001~011 `methodology-spec/finding-system.md` Body Finding Ledger F-SIM namespace 정식 등재
 - ✅ 본 결단 기록 + `decisions/INDEX.md` 등재
 - ✅ P0 plan 작성 `.claude/plans/plan-fsim-p0.md`
 - ✅ 3-에이전트 research 병렬 dispatch 완료 (`.claude/researches/research-fsim-p0.md` / Senior conf 0.82 GO + Official-docs F-015 ×5 + Industry-case 3 Topic × 3 Case)
-- ✅ D9 §8.1 자기정합 ≥3 PoC pre-sweep 시행 — F-SIM-002/004 = 3 PoC 동형 재현 (BE+FE 횡단 ★★★) / F-SIM-003 = BE 2 PoC (BE-track v7.0.0 collateral) / LL-fsim-04 자산화 의무 해소
+- ✅ D9 §8.1 자기정합 ≥3 PoC pre-sweep 시행 — F-SIM-002/004 = 3 PoC 동형 재현 (BE+FE 횡단 ) / F-SIM-003 = BE 2 PoC (BE-track v7.0.0 collateral) / LL-fsim-04 자산화 의무 해소
 - ✅ 사용자 묶음 결단 D1~D9 승인 (2026-05-18 "권고안 그대로 시행")
 - ✅ D8 F-SIM-005 ledger 본문 Beck-canonical 반영 수정 (compile-import-fail = valid RED / per-TC granularity 잔존 본질)
 - ⏳ P0 코드 변경 (F-SIM-002/003/001/004/011) — **본 결단 안 본격 진입**
@@ -60,19 +60,19 @@
 
 ### 4.1.1 결단 합의 D1~D9 요약 (research 권고 → 사용자 승인)
 
-| D | 합의 | 비고 |
-|---|---|---|
-| D1 | 묶음 1-session MINOR | Senior GO 0.82 / 공통 뿌리 1개 |
-| D2 | `--strict-paths` flag warn default + release-readiness #14 baseline ratchet | LL-i-55 함정존 회피 / v+1 default 전환 |
-| D3 | poc-03 critical AP 2건 → `out_of_scope.ap_id_refs` carry | retrofit corroboration #2 본질 정합 |
+| D      | 합의                                                                                                                                    | 비고                                                              |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| D1     | 묶음 1-session MINOR                                                                                                                    | Senior GO 0.82 / 공통 뿌리 1개                                    |
+| D2     | `--strict-paths` flag warn default + release-readiness #14 baseline ratchet                                                             | LL-i-55 함정존 회피 / v+1 default 전환                            |
+| D3     | poc-03 critical AP 2건 → `out_of_scope.ap_id_refs` carry                                                                                | retrofit corroboration #2 본질 정합                               |
 | **D4** | **Senior REVISE B 전환** — poc-03 격하 + 신규 PoC corroboration #2 별도 P1 plan + **P0 commit 본문 P1 deadline commit-block 명시 의무** | plan 권장 C 거부 — "정의 강화 ≠ corroboration 회복" 패러독스 회피 |
-| D5 | F-SIM-005 P0 분리 (P1) | blast 1.5~2× 폭증 회피 |
-| D6 | MINOR + cooling-off 생략 (사용자 명시 위임) | additive 위주 / D2 flag breaking 회피 |
-| D7 | STOP-3 9-gate (#15 matrix visual diff + #16 methodology body self-bootstrap) | renderer 회귀 / self-bootstrap |
-| D8 | F-SIM-005 ledger 표현 수정 (Beck CONTRADICTS) | F-015 Claim C — Kent Beck 원저 "doesn't even compile at first" |
-| D9 | §8.1 자기정합 ≥3 PoC pre-sweep 시행 | LL-fsim-04 자산화 해소 |
+| D5     | F-SIM-005 P0 분리 (P1)                                                                                                                  | blast 1.5~2× 폭증 회피                                            |
+| D6     | MINOR + cooling-off 생략 (사용자 명시 위임)                                                                                             | additive 위주 / D2 flag breaking 회피                             |
+| D7     | STOP-3 9-gate (#15 matrix visual diff + #16 methodology body self-bootstrap)                                                            | renderer 회귀 / self-bootstrap                                    |
+| D8     | F-SIM-005 ledger 표현 수정 (Beck CONTRADICTS)                                                                                           | F-015 Claim C — Kent Beck 원저 "doesn't even compile at first"    |
+| D9     | §8.1 자기정합 ≥3 PoC pre-sweep 시행                                                                                                     | LL-fsim-04 자산화 해소                                            |
 
-### 4.1.2 ★★★ P1 deadline commit-block (D4 strongest concern 흡수)
+### 4.1.2 P1 deadline commit-block (D4 strongest concern 흡수)
 
 **P0 v8.3.0 commit 본문 + 본 결단 §4.1 에 다음 deadline 명시 의무**:
 

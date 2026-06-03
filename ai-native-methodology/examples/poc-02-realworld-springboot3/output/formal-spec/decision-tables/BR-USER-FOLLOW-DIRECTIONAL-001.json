@@ -29,7 +29,7 @@
     ],
     "does_not_block": [
       "(A,B) → (B,A) — mutual 정상",
-      "(A,A) — self-follow ★ F-074 별도 CHECK 필요"
+      "(A,A) — self-follow  F-074 별도 CHECK 필요"
     ]
   },
   "decision_grids": [

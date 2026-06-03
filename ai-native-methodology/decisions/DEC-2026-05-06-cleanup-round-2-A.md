@@ -1,12 +1,12 @@
 # DEC-2026-05-06-cleanup-round-2-A
 
-| 항목 | 값 |
-|---|---|
-| 결정자 | 윤주스 (TF Lead) |
-| 일자 | 2026-05-06 |
-| 상태 | 승인 (★ ★ ★ plugin user UX 정합 / build artifact 327 → 241 / -86 / no release / no tag) |
-| 카테고리 | methodology / plugin artifact 정돈 / UX 정합 / SSOT 명확화 |
-| 관련 | DEC-2026-05-06-cleanup-round-1 (docs/ archive 격리 직후), DEC-2026-05-06-sub-plan-6-종결 (v2.0.0-rc1), DEC-2026-05-02-adoption-폐기-build-step-신설 (build script 도입), DEC-2026-05-02-adoption-carry-OFF (adoption frozen archive) |
+| 항목     | 값                                                                                                                                                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 결정자   | 윤주스 (TF Lead)                                                                                                                                                                                                                     |
+| 일자     | 2026-05-06                                                                                                                                                                                                                           |
+| 상태     | 승인 ( plugin user UX 정합 / build artifact 327 → 241 / -86 / no release / no tag)                                                                                                                                                   |
+| 카테고리 | methodology / plugin artifact 정돈 / UX 정합 / SSOT 명확화                                                                                                                                                                           |
+| 관련     | DEC-2026-05-06-cleanup-round-1 (docs/ archive 격리 직후), DEC-2026-05-06-sub-plan-6-종결 (v2.0.0-rc1), DEC-2026-05-02-adoption-폐기-build-step-신설 (build script 도입), DEC-2026-05-02-adoption-carry-OFF (adoption frozen archive) |
 
 ---
 
@@ -22,18 +22,18 @@ cleanup round 1 직후 사용자가 v2.0.0-rc1 build artifact (327 files) 분석
 
 3 plan agent 병렬 (UX / SSOT 정합 / 사용자 journey) → **정돈 후보 8 카테고리** 발견 (A 버전 불일치 / B CHANGELOG 비대 / C lifecycle placeholder / D tools noise / E methodology-spec 도달 path / F flows 이중 SSOT / G tools README / H 사용자 journey 마찰점).
 
-본 round (2-A) = ★ ★ ★ Critical 영역 (A + B + D + F + 부수 paradigm sync). round 2-B (각 폴더 README 정돈) + 2-C (사용자 journey 자산 신설) 별도 carry.
+본 round (2-A) = Critical 영역 (A + B + D + F + 부수 paradigm sync). round 2-B (각 폴더 README 정돈) + 2-C (사용자 journey 자산 신설) 별도 carry.
 
-## 결정 (★ Round 2-A 만 본 commit)
+## 결정 ( Round 2-A 만 본 commit)
 
 ### 1. plugin artifact paradigm sync (사용자 신뢰도 회복 / A 영역)
 
-| 파일 | 변경 |
-|---|---|
-| `.claude-plugin/marketplace.json` | description = "한 방향 추출기" → "SDLC 4단계 chain harness ... Analysis stage = 한 방향 추출 ... 위 chain 4 gate + revisit loop + 70~80% 한계 명시" (paradigm + analysis 범위 한정) |
-| `templates/adoption/CLAUDE.md` (★ build script 가 dist root CLAUDE.md 로 alias) | v1.3.0 → **v2.0.0-rc1** rewrite — chain harness 4 stage 정합 + 12 도구 + 5 요소 mechanical enforcement + 자연어 prompt → skill 표 |
-| `README.md` | v1.4.2 → **v2.0.0-rc1** rewrite — chain harness 4 stage paradigm + dist 실제 디렉토리 구조 + 시나리오 A/B/C + 12 도구 |
-| `flows/README.md` | analysis SSOT 단독 → ★ ★ ★ **sdlc-4stage-flow 가 master SSOT** 명시 + chain stage 4종 채워짐 명시 + analysis = chain 1 진입 전 단계 |
+| 파일                                                                           | 변경                                                                                                                                                                                |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.claude-plugin/marketplace.json`                                              | description = "한 방향 추출기" → "SDLC 4단계 chain harness ... Analysis stage = 한 방향 추출 ... 위 chain 4 gate + revisit loop + 70~80% 한계 명시" (paradigm + analysis 범위 한정) |
+| `templates/adoption/CLAUDE.md` ( build script 가 dist root CLAUDE.md 로 alias) | v1.3.0 → **v2.0.0-rc1** rewrite — chain harness 4 stage 정합 + 12 도구 + 5 요소 mechanical enforcement + 자연어 prompt → skill 표                                                   |
+| `README.md`                                                                    | v1.4.2 → **v2.0.0-rc1** rewrite — chain harness 4 stage paradigm + dist 실제 디렉토리 구조 + 시나리오 A/B/C + 12 도구                                                               |
+| `flows/README.md`                                                              | analysis SSOT 단독 → **sdlc-4stage-flow 가 master SSOT** 명시 + chain stage 4종 채워짐 명시 + analysis = chain 1 진입 전 단계                                                       |
 
 ### 2. CHANGELOG split (B 영역)
 
@@ -45,19 +45,19 @@ cleanup round 1 직후 사용자가 v2.0.0-rc1 build artifact (327 files) 분석
 
 - `EXCLUDE_BASENAMES` 추가: `test`, `tests`, `__tests__`, `corpus`, `fixtures`, `coverage` (workspace developer only / plugin user runtime 호출 path 0)
 - `INCLUDE` 추가: `CHANGELOG-HISTORY.md`
-- ★ ★ ADOPTION-README.md 별칭 복사 비활성 (사용자 결단 (a) — 단일 entry-point 정합)
+- ADOPTION-README.md 별칭 복사 비활성 (사용자 결단 (a) — 단일 entry-point 정합)
 - `templates/adoption/README.md` source 보존 (build script 만 비활성 / 14차 retract pattern 회피 / 향후 재활성 가능)
 
 ### 4. dist artifact 결과
 
-| 영역 | before | after |
-|---|---|---|
-| dist files | 327 | **241** (-86 / -26%) |
-| EXCLUDE 영역 (test/corpus/fixtures) | 80+ | **0** |
-| ADOPTION-README.md | 1 | 0 (별칭 비활성) |
-| CHANGELOG-HISTORY.md | 0 | 1 (신규) |
-| version 정합 (CLAUDE/README/marketplace) | v1.3.0 / v1.4.2 / v1.x stale | ★ all v2.0.0-rc1 |
-| paradigm 명시 | "한 방향 추출기" 만 | chain harness 4 stage + analysis 범위 한정 |
+| 영역                                     | before                       | after                                      |
+| ---------------------------------------- | ---------------------------- | ------------------------------------------ |
+| dist files                               | 327                          | **241** (-86 / -26%)                       |
+| EXCLUDE 영역 (test/corpus/fixtures)      | 80+                          | **0**                                      |
+| ADOPTION-README.md                       | 1                            | 0 (별칭 비활성)                            |
+| CHANGELOG-HISTORY.md                     | 0                            | 1 (신규)                                   |
+| version 정합 (CLAUDE/README/marketplace) | v1.3.0 / v1.4.2 / v1.x stale | all v2.0.0-rc1                             |
+| paradigm 명시                            | "한 방향 추출기" 만          | chain harness 4 stage + analysis 범위 한정 |
 
 shasum -c CHECKSUMS.txt → 240/240 OK (CHECKSUMS 자체 제외 / 정상).
 
@@ -65,14 +65,14 @@ shasum -c CHECKSUMS.txt → 240/240 OK (CHECKSUMS 자체 제외 / 정상).
 
 본 round 종결 후 별도 round 진입:
 
-### Round 2-B (★ ★ 사용자 진짜 핵심 — 각 폴더 정돈)
+### Round 2-B ( 사용자 진짜 핵심 — 각 폴더 정돈)
 
 - C 영역: lifecycle placeholder 13개 정돈 (chain 4 stage 실 채움 또는 단일 LIFECYCLE-COMPLETION-STATUS.md)
 - E 영역: methodology-spec/README.md 신설 (phase × deliverable × schema index)
-- G 영역: tools/README.md 신설 (12 도구 cadence table) + tools/{_shared,chain-driver,schema-validator}/README.md 신설 + 9 도구 README 표준 schema 통일 (Purpose / When / In / Out / Exit / Siblings)
+- G 영역: tools/README.md 신설 (12 도구 cadence table) + tools/{\_shared,chain-driver,schema-validator}/README.md 신설 + 9 도구 README 표준 schema 통일 (Purpose / When / In / Out / Exit / Siblings)
 - 각 폴더 (agents/skills/hooks/flows/tools/templates/methodology-spec/schemas) README 가 **"이 폴더 자산이 어떻게 정돈 + 어디서 참조 + 언제 호출"** 명시
 
-### Round 2-C (★ 사용자 journey 자산 신설)
+### Round 2-C ( 사용자 journey 자산 신설)
 
 - H 영역: getting-started.md (10분 walkthrough) + chain-harness-guide.md (init/next/blocked loop) + common-errors.md (FAQ) + first-prompt-cookbook.md
 - CHECKSUMS.txt → .claude-plugin/checksums.txt 이동 (plugin meta-data 영역)
@@ -91,7 +91,7 @@ shasum -c CHECKSUMS.txt → 240/240 OK (CHECKSUMS 자체 제외 / 정상).
 
 ## release / tag
 
-- ★ no release / no tag / 본체 commit 만
+- no release / no tag / 본체 commit 만
 - v2.0.0-rc1 → v2.0.0 final 자격 영향 ❌ (release-readiness 7/7 무관 / cleanup = paradigm 외부)
 
 ## 결단 묶음

@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "poc_id": "poc-10-realworld-jpa-querydsl",
   "batch_size": 5,
-  "self_eval_bias_note": "★ Sprint 2 NL→GWT 합성(Sonnet 4.6) ↔ Layer 2 검증(Sonnet 4.6) echo chamber / confidence cap 0.85 / Haiku 4.5 blind retrospect 동반 실행.",
+  "self_eval_bias_note": "Sprint 2 NL→GWT 합성(Sonnet 4.6) ↔ Layer 2 검증(Sonnet 4.6) echo chamber / confidence cap 0.85 / Haiku 4.5 blind retrospect 동반 실행.",
   "results": [
     { "br_id": "BR-RAE-AUTH-001", "semantic_score": 0.92, "rationale": "회원가입과 동시 JWT 발급(로그인 생략) 핵심 의미 NL↔GWT 일치.", "confidence": 0.85 },
     { "br_id": "BR-RAE-SEARCH-002", "semantic_score": 0.78, "rationale": "4종 필터 분기 검색 의도 일치. GWT Then 절 QueryDSL 동적분기 구현 어휘 노출 = 비즈니스 계약 순도 저하 (의미 반전 ❌).", "confidence": 0.80 },

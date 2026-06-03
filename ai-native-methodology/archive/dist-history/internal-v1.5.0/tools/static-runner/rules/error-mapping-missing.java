@@ -3,7 +3,7 @@
 // 본 fixture = AP-API-001 patterns: generic Java exception thrown inside Spring-managed bean.
 // PoC #02 ArticleService.favorite() throw IllegalArgumentException 학습 (F-070+F-079+F-085 묶음).
 
-// ===== positive cases (★ ruleid 매칭 의무 / @Service / @RestController / @Component) =====
+// ===== positive cases (ruleid 매칭 의무 / @Service / @RestController / @Component) =====
 
 @Service
 class ArticleService {
@@ -45,7 +45,7 @@ class HelperBean {
     }
 }
 
-// ===== negative cases (★ ok 매칭 의무) =====
+// ===== negative cases (ok 매칭 의무) =====
 
 // (1) 도메인 specific exception 사용 — Spring bean 안에서도 OK
 @Service

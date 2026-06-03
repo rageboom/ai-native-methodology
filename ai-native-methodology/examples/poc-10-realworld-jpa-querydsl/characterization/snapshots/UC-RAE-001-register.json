@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RAE-001 사용자 등록 + JWT 발급.",
+  "$comment": " phase 4.7 snapshot — UC-RAE-001 사용자 등록 + JWT 발급.",
   "snapshot_id": "SNAP-UC-RAE-001",
   "use_case": "UC-RAE-001",
   "endpoint": "POST /users",

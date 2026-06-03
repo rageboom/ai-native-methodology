@@ -23,14 +23,14 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 4. **inventory.json 작성** — `schemas/inventory.schema.json` (strict / SSOT) 기준:
    ```json
    {
-     "meta": { "...": "..." },
-     "repo": { "...": "..." },
-     "stack": { "...": "..." },
-     "architecture_style_candidates": ["..."],
-     "modules_for_priority_analysis": ["..."]
+   	"meta": { "...": "..." },
+   	"repo": { "...": "..." },
+   	"stack": { "...": "..." },
+   	"architecture_style_candidates": ["..."],
+   	"modules_for_priority_analysis": ["..."]
    }
    ```
-   ★ top-level required = `meta` · `repo` · `stack` (strict `additionalProperties:false`). 정확한 하위 구조는 `schemas/inventory.schema.json` 이 SSOT — 위 키 외 필드 추가 시 schema-validator fail.
+   top-level required = `meta` · `repo` · `stack` (strict `additionalProperties:false`). 정확한 하위 구조는 `schemas/inventory.schema.json` 이 SSOT — 위 키 외 필드 추가 시 schema-validator fail.
 5. **drift-validator 검증** — schema 정합 자동 확인 (PostToolUse hook).
 6. **finding 등재** — gap / unclear module ownership 등 발견 시 `log-finding`.
 

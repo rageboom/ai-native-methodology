@@ -9,8 +9,8 @@
     "confidence": 0.85,
     "raw_confidence": 0.85,
     "warnings": [
-      "★ Scenario C (JSP) — Modern FE 상태관리 라이브러리 0건 / state_sources 5 진실 detected=false (server-side state paradigm)",
-      "★ machines 빈 array — server-side state 본질 / Modern FE migration 시 신설"
+      "Scenario C (JSP) — Modern FE 상태관리 라이브러리 0건 / state_sources 5 진실 detected=false (server-side state paradigm)",
+      "machines 빈 array — server-side state 본질 / Modern FE migration 시 신설"
     ],
     "related_chain_ids": [
       "AC-CAR-MGT-001",

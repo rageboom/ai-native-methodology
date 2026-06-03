@@ -3,7 +3,7 @@
 > **일자**: 2026-05-23
 > **session**: 34차 (현 session) / v8.11.0 MINOR release
 > **카테고리**: methodology / chain-coverage-validator forward lane 신설 — risks_and_constraints string form (legacy carry) warn
-> **상태**: 승인 (★ 사용자 "ㄱㄱ" 2026-05-23 / Senior REVISE-1 사전 합의 / additive only)
+> **상태**: 승인 ( 사용자 "ㄱㄱ" 2026-05-23 / Senior REVISE-1 사전 합의 / additive only)
 > **Resolves**: DEC-2026-05-23-analysis-validator-poc06-11-resolve §8 carry C-risks-string-form-warn-v811 (medium 우선순위)
 > **Cross-link**: v8.10.0 §3 D2 Senior REVISE-1 / v8.10.0 schema 진화 paradigm
 
@@ -19,31 +19,31 @@ v8.10.0 §3 D2 결단: "$comment 'string = legacy carry 한정 / 신규 = object
 
 ### 2.1 9 PoC string vs object 분포
 
-| PoC | string | object | 분류 |
-|---|---|---|---|
-| poc-03-realworld-nestjs | 2 | 0 | legacy carry |
-| poc-04-mini-realworld-react | 2 | 0 | legacy carry |
-| poc-05-sample-user-register | 2 | 0 | legacy carry |
-| poc-06-efiweb-exchange-spring41 | 6 | 0 | legacy carry |
-| poc-07-efiweb-capital-spring41 | 6 | 0 | legacy carry |
-| poc-08-realworld-mybatis | 0 | 8 | object form ✅ |
-| poc-09-realworld-typeorm-rawsql | 0 | 4 | object form ✅ |
-| poc-10-realworld-jpa-querydsl | 0 | 2 | object form ✅ |
-| poc-11-efiweb-billing-spring41 | 0 | 14 | object form ✅ (v8.10.0 정합) |
+| PoC                             | string | object | 분류                          |
+| ------------------------------- | ------ | ------ | ----------------------------- |
+| poc-03-realworld-nestjs         | 2      | 0      | legacy carry                  |
+| poc-04-mini-realworld-react     | 2      | 0      | legacy carry                  |
+| poc-05-sample-user-register     | 2      | 0      | legacy carry                  |
+| poc-06-efiweb-exchange-spring41 | 6      | 0      | legacy carry                  |
+| poc-07-efiweb-capital-spring41  | 6      | 0      | legacy carry                  |
+| poc-08-realworld-mybatis        | 0      | 8      | object form ✅                |
+| poc-09-realworld-typeorm-rawsql | 0      | 4      | object form ✅                |
+| poc-10-realworld-jpa-querydsl   | 0      | 2      | object form ✅                |
+| poc-11-efiweb-billing-spring41  | 0      | 14     | object form ✅ (v8.10.0 정합) |
 
 총 string=18 (5 PoC) / object=28 (4 PoC). 본 lane = legacy carry 5 PoC 영구 warn.
 
 ## 3. 결단
 
-| # | 결단 | 채택 |
-|---|---|---|
-| D1 | `validateRisksForm(planning)` 5번째 export function 신설 (validateChainCoverage + validateCrossRefPaths + validateAntipatternCoverage + validateConfidenceCoverage 다음) | ✅ |
-| D2 | severity = `low` (warning만 / chain coverage gate 종결 차단 ❌ / blocking ❌) | ✅ |
-| D3 | finding kind = `chain.planning.risks_string_form_warn` (paradigm 정합) | ✅ |
-| D4 | CLI wire + `--json` output 안 `risks_form` 키 + 사람-친화 출력 | ✅ |
-| D5 | test 4종 신설 (all-string / all-object / mixed / graceful) | ✅ |
-| D6 | v8.11.0 MINOR (additive — function + CLI flag + test 4 / breaking 0) | ✅ |
-| D7 | 5 PoC legacy 산출물 마이그레이션 = 별도 carry session (정보 손실 risk 평가 의무 / 사용자 결단) | ✅ |
+| #   | 결단                                                                                                                                                                     | 채택 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---- |
+| D1  | `validateRisksForm(planning)` 5번째 export function 신설 (validateChainCoverage + validateCrossRefPaths + validateAntipatternCoverage + validateConfidenceCoverage 다음) | ✅   |
+| D2  | severity = `low` (warning만 / chain coverage gate 종결 차단 ❌ / blocking ❌)                                                                                            | ✅   |
+| D3  | finding kind = `chain.planning.risks_string_form_warn` (paradigm 정합)                                                                                                   | ✅   |
+| D4  | CLI wire + `--json` output 안 `risks_form` 키 + 사람-친화 출력                                                                                                           | ✅   |
+| D5  | test 4종 신설 (all-string / all-object / mixed / graceful)                                                                                                               | ✅   |
+| D6  | v8.11.0 MINOR (additive — function + CLI flag + test 4 / breaking 0)                                                                                                     | ✅   |
+| D7  | 5 PoC legacy 산출물 마이그레이션 = 별도 carry session (정보 손실 risk 평가 의무 / 사용자 결단)                                                                           | ✅   |
 
 ## 4. 시행 (4원칙 4단계)
 
@@ -53,24 +53,35 @@ v8.10.0 §3 D2 결단: "$comment 'string = legacy carry 한정 / 신규 = object
 
 ```js
 export function validateRisksForm(planning) {
-  const findings = [];
-  const risks = Array.isArray(planning?.risks_and_constraints) ? planning.risks_and_constraints : [];
-  let stringCount = 0, objectCount = 0;
-  const stringIndices = [];
-  risks.forEach((item, idx) => {
-    if (typeof item === 'string') { stringCount++; stringIndices.push(idx); }
-    else if (item !== null && typeof item === 'object') { objectCount++; }
-  });
-  if (stringCount > 0) {
-    findings.push({
-      kind: 'chain.planning.risks_string_form_warn',
-      severity: 'low',
-      string_count: stringCount, object_count: objectCount,
-      affected_indices: stringIndices,
-      message: `risks_and_constraints 안 string form ${stringCount} item — legacy carry 한정 (v8.10.0+ object form 권장) ...`
-    });
-  }
-  return { findings, summary: { total_findings, string_count, object_count, total_count } };
+	const findings = [];
+	const risks = Array.isArray(planning?.risks_and_constraints)
+		? planning.risks_and_constraints
+		: [];
+	let stringCount = 0,
+		objectCount = 0;
+	const stringIndices = [];
+	risks.forEach((item, idx) => {
+		if (typeof item === 'string') {
+			stringCount++;
+			stringIndices.push(idx);
+		} else if (item !== null && typeof item === 'object') {
+			objectCount++;
+		}
+	});
+	if (stringCount > 0) {
+		findings.push({
+			kind: 'chain.planning.risks_string_form_warn',
+			severity: 'low',
+			string_count: stringCount,
+			object_count: objectCount,
+			affected_indices: stringIndices,
+			message: `risks_and_constraints 안 string form ${stringCount} item — legacy carry 한정 (v8.10.0+ object form 권장) ...`,
+		});
+	}
+	return {
+		findings,
+		summary: { total_findings, string_count, object_count, total_count },
+	};
 }
 ```
 
@@ -79,7 +90,7 @@ export function validateRisksForm(planning) {
 - `import { ..., validateRisksForm }`
 - `const risksFormResult = validateRisksForm(planning);`
 - `--json` output 안 `risks_form` 키 추가
-- 사람-친화 출력: `[risks-form] string=N / object=M / total=K (★ v8.11.0 / Senior REVISE-1 legacy carry warn lane)`
+- 사람-친화 출력: `[risks-form] string=N / object=M / total=K ( v8.11.0 / Senior REVISE-1 legacy carry warn lane)`
 
 ### 4.3 test 4종 (`test/validator.test.js`)
 
@@ -98,13 +109,13 @@ export function validateRisksForm(planning) {
 
 ## 5. STOP-3 hard gate 실측
 
-| Gate | 결과 |
-|---|---|
-| chain-coverage-validator test | **30/30 pass** ✅ (신규 4 + 기존 26) |
-| breaking | 0 = MINOR (additive — function + CLI + test 4) |
-| version 3-way sync | plugin.json 8.11.0 / package.json 8.11.0 / chain-coverage-validator 0.2.0 / CHANGELOG v8.11.0 ✅ |
-| §8.1 corroboration | 9 PoC isomorphic 실측 = string 5 PoC + object 4 PoC + lane 정합 = single-PoC overfitting 회피 ✓ |
-| Senior REVISE-1 흡수 | v8.10.0 §3 D2 commitment 종결 ✅ |
+| Gate                          | 결과                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| chain-coverage-validator test | **30/30 pass** ✅ (신규 4 + 기존 26)                                                             |
+| breaking                      | 0 = MINOR (additive — function + CLI + test 4)                                                   |
+| version 3-way sync            | plugin.json 8.11.0 / package.json 8.11.0 / chain-coverage-validator 0.2.0 / CHANGELOG v8.11.0 ✅ |
+| §8.1 corroboration            | 9 PoC isomorphic 실측 = string 5 PoC + object 4 PoC + lane 정합 = single-PoC overfitting 회피 ✓  |
+| Senior REVISE-1 흡수          | v8.10.0 §3 D2 commitment 종결 ✅                                                                 |
 
 ## 6. Lessons Learned 신규
 
@@ -114,15 +125,16 @@ export function validateRisksForm(planning) {
 
 ## 7. 차기 session carry
 
-| carry | 우선순위 | 비고 |
-|---|---|---|
-| C-legacy-risks-poc-migration | medium | 5 PoC (poc-03/04-mini/05/06/07) 18 risks string form → object form 마이그레이션 / 정보 손실 risk 평가 의무 / 사용자 결단 (해당 PoC 의 paradigm value 보존 vs object form 정합 trade-off) |
-| C-xmllint-env-absent | medium | v8.9.0+v8.10.0 carry 보존 / Linux/Mac libxml2 환경 의무 |
-| C-operation-md-work-folder | low | v8.9.0 carry 보존 / docs/ 흡수 후보 |
+| carry                        | 우선순위 | 비고                                                                                                                                                                                     |
+| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C-legacy-risks-poc-migration | medium   | 5 PoC (poc-03/04-mini/05/06/07) 18 risks string form → object form 마이그레이션 / 정보 손실 risk 평가 의무 / 사용자 결단 (해당 PoC 의 paradigm value 보존 vs object form 정합 trade-off) |
+| C-xmllint-env-absent         | medium   | v8.9.0+v8.10.0 carry 보존 / Linux/Mac libxml2 환경 의무                                                                                                                                  |
+| C-operation-md-work-folder   | low      | v8.9.0 carry 보존 / docs/ 흡수 후보                                                                                                                                                      |
 
 ---
 
 **참고**:
+
 - 직전 release: v8.10.0 (DEC-2026-05-23-analysis-validator-poc06-11-resolve §8 carry C-risks-string-form-warn-v811)
 - chain-coverage-validator industry-aligned lanes:
   - validateChainCoverage (chain link coverage)

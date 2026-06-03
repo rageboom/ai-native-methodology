@@ -45,7 +45,7 @@ const directionalUnique = (follows: UserFollow[]): boolean =>
 
 // 시뮬레이션된 follow / unfollow operation
 function follow(state: UserFollow[], req: { follower: UserId; following: UserId }): UserFollow[] {
-  // ★ F-074 fix
+  //  F-074 fix
   if (req.follower === req.following) {
     throw new Error('follower and following must be different');
   }
@@ -70,13 +70,13 @@ function unfollow(state: UserFollow[], req: { follower: UserId; following: UserI
 // ============================================================================
 
 describe('UserFollow Invariants — BR-USER-FOLLOW-* (Phase 4.5 Sprint 2)', () => {
-  // ── INV-USER-FOLLOW-NO-SELF (★ F-074) ────────────────────────────────────
-  test.prop('★ F-074: self-follow 시도 → IAE 항상 throw', [userIdGen], (selfId) => {
+  // ── INV-USER-FOLLOW-NO-SELF ( F-074) ────────────────────────────────────
+  test.prop(' F-074: self-follow 시도 → IAE 항상 throw', [userIdGen], (selfId) => {
     expect(() => follow([], { follower: selfId, following: selfId }))
       .toThrow('follower and following must be different');
   });
 
-  test.prop('★ F-074: 모든 persisted UserFollow 가 noSelfFollow invariant 만족', [
+  test.prop(' F-074: 모든 persisted UserFollow 가 noSelfFollow invariant 만족', [
     fc.array(fc.tuple(userIdGen, userIdGen).filter(([a, b]) => a !== b), { maxLength: 100 }),
   ], (pairs) => {
     let state: UserFollow[] = [];
@@ -155,7 +155,7 @@ describe('UserFollow Invariants — BR-USER-FOLLOW-* (Phase 4.5 Sprint 2)', () =
   });
 
   // ── F-074 + Idempotent 조합 ──────────────────────────────────────────────
-  test.prop('★ F-074 + Idempotent: self-follow 후 동일 self-follow 재시도 → 둘 다 IAE (idempotent 정합)', [
+  test.prop(' F-074 + Idempotent: self-follow 후 동일 self-follow 재시도 → 둘 다 IAE (idempotent 정합)', [
     userIdGen,
   ], (selfId) => {
     let threw1 = false;
@@ -166,7 +166,7 @@ describe('UserFollow Invariants — BR-USER-FOLLOW-* (Phase 4.5 Sprint 2)', () =
   });
 
   // ── Equality on transient (Sprint 1.5 #13 isomorphic) ────────────────────
-  test('★ Sprint 1.5 #13 isomorphic: pre-persist UserFollow equality 위험', () => {
+  test(' Sprint 1.5 #13 isomorphic: pre-persist UserFollow equality 위험', () => {
     const a: UserFollow = { id: null, follower: { id: 'u1' }, following: { id: 'u2' }, createdAt: new Date() };
     const b: UserFollow = { id: null, follower: { id: 'u3' }, following: { id: 'u4' }, createdAt: new Date() };
     // UserFollow.equals 가 id 기반 → 둘 다 null → 의도치 않게 equals true 위험
@@ -190,5 +190,5 @@ describe('UserFollow Invariants — BR-USER-FOLLOW-* (Phase 4.5 Sprint 2)', () =
 /*
  * Property test 12건 작성 — 실행 환경 부재로 사용자 위임.
  * 실행 통과 = 형식 명세 ↔ 코드 정합 자동 보장.
- * 실행 실패 = 형식 명세 ↔ 코드 drift 즉시 검출 (★ 형식화 진짜 가치).
+ * 실행 실패 = 형식 명세 ↔ 코드 drift 즉시 검출 ( 형식화 진짜 가치).
  */

@@ -1,10 +1,10 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RW-013 Comment 추가 (★ TypeORM cascade relation).",
+  "$comment": " phase 4.7 snapshot — UC-RW-013 Comment 추가 ( TypeORM cascade relation).",
   "snapshot_id": "SNAP-UC-RW-013",
   "use_case": "UC-RW-013",
   "endpoint": "POST /articles/:slug/comments",
   "controller_method": "ArticleController.createComment",
-  "service_method": "ArticleService.addComment (★ commentRepository.save + article.comments.push + article.save)",
+  "service_method": "ArticleService.addComment ( commentRepository.save + article.comments.push + article.save)",
   "sql_id": "ArticleService.addComment (logical INSERT comment + UPDATE article cascade)",
   "layer": "integration",
   "scenarios": [

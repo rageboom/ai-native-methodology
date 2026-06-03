@@ -14,6 +14,7 @@
 **산출**: `.aimd/output/planning-spec.{json,md}`
 
 **validator**:
+
 ```
 node tools/planning-extraction-validator/src/cli.js \
   --planning examples/poc-05-sample-user-register/.aimd/output/planning-spec.json \
@@ -31,6 +32,7 @@ node tools/planning-extraction-validator/src/cli.js \
 **산출**: `behavior-spec.{json}` + `acceptance-criteria.{json}`
 
 **validator**:
+
 - chain-coverage-validator → 0 findings (UC→BHV 100% / BHV→AC 100%)
 - spec-test-link (behavior provided) → 0 findings
 - schema-validator → ✅ both files
@@ -42,6 +44,7 @@ node tools/planning-extraction-validator/src/cli.js \
 **산출**: `test-spec.json` + 실 vitest test (`target/src/user.service.test.ts`)
 
 **RED evidence** (impl 부재 시):
+
 ```
 cd target && rm -f src/user.service.ts src/email-uniqueness-guard.ts
 npx vitest run --reporter=json --outputFile=../.aimd/output/evidence/vitest-red.json
@@ -49,6 +52,7 @@ npx vitest run --reporter=json --outputFile=../.aimd/output/evidence/vitest-red.
 ```
 
 evidence 파일:
+
 - `.aimd/output/evidence/vitest-red.json` (vitest JSON)
 - `.aimd/output/evidence/test-stdout-red.txt`
 - `.aimd/output/evidence/test-stderr-red.txt`
@@ -62,12 +66,14 @@ evidence 파일:
 **산출**: `impl-spec.json` + 실 impl (`target/src/{user.service,email-uniqueness-guard}.ts`)
 
 **GREEN evidence**:
+
 ```
 cd target && npx vitest run --reporter=json --outputFile=../.aimd/output/evidence/vitest-green.json
 # → exit 0 / numTotalTests=6 / numPassedTests=6 / numFailedTests=0
 ```
 
 evidence 파일:
+
 - `.aimd/output/evidence/vitest-green.json`
 - `.aimd/output/evidence/test-stdout-green.txt`
 - `.aimd/output/evidence/test-stderr-green.txt`
@@ -77,6 +83,7 @@ evidence 파일:
 **commit_hash**: `321eeb3bb15f476b3fd0e55fbd8523901992bd20`
 
 **validator**:
+
 - test-impl-pass-validator (--dry-run) → exit 0 / config 검증 ✅
 - schema-validator (impl-spec) → ✅
 
@@ -102,4 +109,4 @@ node tools/chain-driver/src/cli.js state examples/poc-05-sample-user-register
 # → project_id: poc-05-sample-user-register / current_chain: analysis
 ```
 
-★ ★ ★ chain harness 4 stage e2e — validated.
+chain harness 4 stage e2e — validated.

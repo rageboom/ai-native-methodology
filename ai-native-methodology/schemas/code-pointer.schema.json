@@ -28,7 +28,7 @@
     "anchor_type": {
       "type": "string",
       "enum": ["strict_path", "glob", "ast_symbol", "doc_link"],
-      "description": "★ 좌표 종류 (4종). strict_path = 단일 파일 정확 매칭 / glob = 패턴 매칭 / ast_symbol = 심볼 식별 (언어 AST 의존) / doc_link = 외부 문서 URL (위키·Confluence·OpenAPI 등). 자동 갱신 정책(결정 5)이 anchor_type 별로 다름 — ast_symbol 변경은 manual."
+      "description": "좌표 종류 (4종). strict_path = 단일 파일 정확 매칭 / glob = 패턴 매칭 / ast_symbol = 심볼 식별 (언어 AST 의존) / doc_link = 외부 문서 URL (위키·Confluence·OpenAPI 등). 자동 갱신 정책(결정 5)이 anchor_type 별로 다름 — ast_symbol 변경은 manual."
     },
     "stale": {
       "type": "boolean",

@@ -14,7 +14,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 - chain 4 (test) 종결 + gate #4 go 결단 후
 - inventory.json 안 Vue 3 stack signals (`vue` ≥ 3.0 / `@vue/test-utils` 2.x)
-- test-spec.json 의 TC-* 중 Vue Test Utils pattern 검출
+- test-spec.json 의 TC-\* 중 Vue Test Utils pattern 검출
 
 ## 입력
 
@@ -30,7 +30,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 - `src/**/*.composable.ts` (composable 분리 시)
 - `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "vue-3"` — schema modules.items.framework 필드)
 
-## paradigm (★ Vue 3 only / 2026-05-15 사용자 결단)
+## paradigm (Vue 3 only / 2026-05-15 사용자 결단)
 
 ### 1. Composition API + `<script setup>` 우선 (default)
 
@@ -43,19 +43,21 @@ const emit = defineEmits<{ submit: [email: string, password: string] }>();
 
 const email = ref('');
 const password = ref('');
-const isValid = computed(() => email.value.includes('@') && password.value.length >= 8);
+const isValid = computed(
+	() => email.value.includes('@') && password.value.length >= 8,
+);
 
 async function handleSubmit() {
-  if (isValid.value) emit('submit', email.value, password.value);
+	if (isValid.value) emit('submit', email.value, password.value);
 }
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <input v-model="email" type="email" />
-    <input v-model="password" type="password" />
-    <button type="submit" :disabled="!isValid">Login</button>
-  </form>
+	<form @submit.prevent="handleSubmit">
+		<input v-model="email" type="email" />
+		<input v-model="password" type="password" />
+		<button type="submit" :disabled="!isValid">Login</button>
+	</form>
 </template>
 ```
 
@@ -67,8 +69,14 @@ legacy Vue 3 + Options API 케이스 = 본문 분기 시 명시:
 <script lang="ts">
 import { defineComponent } from 'vue';
 export default defineComponent({
-  data() { return { email: '', password: '' }; },
-  methods: { handleSubmit() { /* ... */ } }
+	data() {
+		return { email: '', password: '' };
+	},
+	methods: {
+		handleSubmit() {
+			/* ... */
+		},
+	},
 });
 </script>
 ```
@@ -94,12 +102,12 @@ Vue 2 Options API + filter + Vue.extend 패턴 = 본 skill ❌ / 별도 carry sk
 ## 절차
 
 1. **vue 버전 확인** — `package.json` 의 `dependencies.vue` ≥ "3.0.0" 의무. 2.x 시 state.blocked + 사용자 안내 (Vue 2 carry).
-2. **test-spec 의 Vue Test Utils TC-* filter** — `source_file` path 분석 → SFC path 매핑 (예: `src/auth/LoginForm.test.ts` → `src/auth/LoginForm.vue`).
+2. **test-spec 의 Vue Test Utils TC-\* filter** — `source_file` path 분석 → SFC path 매핑 (예: `src/auth/LoginForm.test.ts` → `src/auth/LoginForm.vue`).
 3. **SFC generate** — Gherkin → template + script setup + style 매핑.
 4. **composable generate** — reusable logic = `src/composables/use*.ts`.
 5. **commit_hash 채움** — `implement-generate-impl-spec` §4 동일 paradigm.
 6. **vitest 진짜 호출** — `npx vitest run` (사용자 명시 / auto-invoke ❌). 100% pass GREEN 의무.
-7. **impl-spec.json `modules[].framework` 에 `"vue-3"` 명시** (★ schema modules.items.framework 기존 필드 / top-level vue_version ❌ = additionalProperties:false reject).
+7. **impl-spec.json `modules[].framework` 에 `"vue-3"` 명시** (schema modules.items.framework 기존 필드 / top-level vue_version ❌ = additionalProperties:false reject).
 
 ## GREEN 의무
 

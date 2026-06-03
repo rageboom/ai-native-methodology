@@ -22,35 +22,35 @@ allowed-tools: Read, Glob, Grep, Bash, Task
 
 URL/path 패턴 + 한국어/영어 키워드 매칭 + **인라인 마커 우선**.
 
-| 신호 | 패턴 | 분기 |
-|---|---|---|
-| swagger | `openapi.yaml` / `swagger.json` / `swagger` / `openapi` 키워드 + URL/path | → `analysis-from-swagger` |
-| figma | `figma.com` 도메인 / `피그마` / `figma` 키워드 + URL | → `analysis-from-figma` |
-| plan-doc | `.md` / `.pdf` 확장자 / `기획` / `문서` / `spec` 키워드 + path | → `analysis-from-plan-doc` |
-| residual | 위 3종 캡처 후 남은 자연어 전체 | → `analysis-from-prompt` |
-| **인라인 마커 (정식)** | `@swagger: <URL>` / `@figma: <URL>` / `@plan-doc: <path>` | 휴리스틱 override (우선순위 ↑) |
+| 신호                   | 패턴                                                                      | 분기                           |
+| ---------------------- | ------------------------------------------------------------------------- | ------------------------------ |
+| swagger                | `openapi.yaml` / `swagger.json` / `swagger` / `openapi` 키워드 + URL/path | → `analysis-from-swagger`      |
+| figma                  | `figma.com` 도메인 / `피그마` / `figma` 키워드 + URL                      | → `analysis-from-figma`        |
+| plan-doc               | `.md` / `.pdf` 확장자 / `기획` / `문서` / `spec` 키워드 + path            | → `analysis-from-plan-doc`     |
+| residual               | 위 3종 캡처 후 남은 자연어 전체                                           | → `analysis-from-prompt`       |
+| **인라인 마커 (정식)** | `@swagger: <URL>` / `@figma: <URL>` / `@plan-doc: <path>`                 | 휴리스틱 override (우선순위 ↑) |
 
 ### 2단계 — BCDE sub-skill dispatch (Hybrid rule)
 
-| 조건 | 호출 방식 | 근거 |
-|---|---|---|
-| 총 입력 (figma + swagger + plan-doc + prompt 추정 크기 합) ≤ 50K token | **직접 skill chain** (Task tool 미사용) | token 비용 최소 / 한 turn 안 trace / 사용자 BCDE 직접 호출 흐름과 일관 |
-| 총 입력 > 50K token 또는 단일 sub-skill 실패가 다른 3개 오염 risk 큰 케이스 | **Task tool sub-agent** (general-purpose) | main context window 보호 / 격리 / 실패 분리 |
-| ❌ chain-driver CLI dispatch | (절대 ❌ / STRONG-STOP) | chain-driver = 결정론적 gate/sync/scope axis / LLM 판단 inject 시 axis 오염 |
+| 조건                                                                        | 호출 방식                                 | 근거                                                                        |
+| --------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| 총 입력 (figma + swagger + plan-doc + prompt 추정 크기 합) ≤ 50K token      | **직접 skill chain** (Task tool 미사용)   | token 비용 최소 / 한 turn 안 trace / 사용자 BCDE 직접 호출 흐름과 일관      |
+| 총 입력 > 50K token 또는 단일 sub-skill 실패가 다른 3개 오염 risk 큰 케이스 | **Task tool sub-agent** (general-purpose) | main context window 보호 / 격리 / 실패 분리                                 |
+| ❌ chain-driver CLI dispatch                                                | (절대 ❌ / STRONG-STOP)                   | chain-driver = 결정론적 gate/sync/scope axis / LLM 판단 inject 시 axis 오염 |
 
 각 sub-skill 산출 = `.aimd/<scope>/planning/{prompt,swagger,plan-doc,figma}-extract.json` (해당 schema 정합 의무).
 
 ### 3단계 — merge / cross-ref / conflict 검출
 
-4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합 (★ json 단독 / ADR-011 — input-summary.md 미산출).
+4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합 (json 단독 / ADR-011 — input-summary.md 미산출).
 
 #### cross-ref 3-tier severity + 정량 기준
 
-| severity | 의미 | 정량 기준 | 처리 |
-|---|---|---|---|
-| low | 표기 차이 (snake_case vs camelCase) | Levenshtein 거리 ≤ 2 + 대소문자/underscore 정규화 후 ≥ 90% 일치 | log only / 후속 skill 정규화 |
-| medium | 명명 충돌 (figma.email vs swagger.userEmail) | 정규화 후 50~90% 일치 + 같은 도메인 entity 추정 | conflict 등재 / 후속 skill 결단 |
-| high | 의미 충돌 (figma 화면 != swagger endpoint 도메인) | 정규화 후 < 50% 일치 또는 entity 도메인 불일치 | **사용자 결단 의무** / state.blocked |
+| severity | 의미                                              | 정량 기준                                                       | 처리                                 |
+| -------- | ------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------ |
+| low      | 표기 차이 (snake_case vs camelCase)               | Levenshtein 거리 ≤ 2 + 대소문자/underscore 정규화 후 ≥ 90% 일치 | log only / 후속 skill 정규화         |
+| medium   | 명명 충돌 (figma.email vs swagger.userEmail)      | 정규화 후 50~90% 일치 + 같은 도메인 entity 추정                 | conflict 등재 / 후속 skill 결단      |
+| high     | 의미 충돌 (figma 화면 != swagger endpoint 도메인) | 정규화 후 < 50% 일치 또는 entity 도메인 불일치                  | **사용자 결단 의무** / state.blocked |
 
 #### LLM 양심 의존 회피 (no-simulation 정합)
 
@@ -68,9 +68,10 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 - 다중 swagger (백오피스 + 프론트) → 사용자 명시 구분 의무 (인라인 마커 권장)
 - 의도만 있고 입력 부재 → `analysis-from-prompt` 만 발동 + 다른 자료 보강 권장 안내
 
-### 5단계 — ★ greenfield 분기 (scenario=greenfield)
+### 5단계 — greenfield 분기 (scenario=greenfield)
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4) 일 때:
+
 - **no-code 감지** — 분석 대상 코드 디렉토리 부재 / 입력이 PRD·디자인·계약(swagger·figma·plan-doc·prompt)뿐.
 - **입력어댑터만 dispatch** — BCDE 그대로 (code-archaeology 패스 skip / legacy 전용 phase = `source-inventory`/`db-schema`(코드)/`characterization`/`sql-inventory` 미발동).
 - **`analysis-greenfield-bootstrap` 로 위임** — input-summary 산출 후, 5종 산출물(architecture/domain/business-rules/openapi/schema)을 각 analysis skill 의 **greenfield code-optional mode** 로 생성 + legacy-only 산출물(antipatterns/migration-cautions) N/A + (swagger 채널) openapi.yaml 결정적 elevation 을 조율.
@@ -78,7 +79,7 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 ## 산출물
 
-- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / ★ json 단독 SSOT — ADR-011)
+- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / json 단독 SSOT — ADR-011)
 - 4 sub-skill extract 파일 (각 skill 책임)
 
 ## 본체 명세 참조

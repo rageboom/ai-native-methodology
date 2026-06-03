@@ -7,15 +7,15 @@
     "phase": "quality",
     "captured_at": "2026-05-02",
     "captured_by": "real",
-    "★_g4_strict_threshold": "patterns ≥ 3 (★ Senior 권고 / §8.1 strict)"
+    "_g4_strict_threshold": "patterns ≥ 3 (Senior 권고 / §8.1 strict)"
   },
   "antipatterns": [
     {
       "id": "AP-FE-OPTIMISTIC-INCONSISTENT",
       "severity": "medium",
       "category": "ui-state-management",
-      "title": "★ Optimistic update 패턴 3 컴포넌트 isomorphic / 코드 중복",
-      "description": "★ ★ ★ 3 컴포넌트 (HomeFavoriteButton + FavoriteArticleButton + ProfileFavoriteButton) 가 동일 optimistic update 패턴을 코드 중복으로 구현. ★ DRY 위반 / 유지보수 비용 ↑.",
+      "title": "Optimistic update 패턴 3 컴포넌트 isomorphic / 코드 중복",
+      "description": "3 컴포넌트 (HomeFavoriteButton + FavoriteArticleButton + ProfileFavoriteButton) 가 동일 optimistic update 패턴을 코드 중복으로 구현. DRY 위반 / 유지보수 비용 ↑.",
       "evidence": {
         "isomorphic_components_count": 3,
         "file_locations": [
@@ -23,26 +23,26 @@
           "src/pages/article/article.ui.tsx § FavoriteArticleButton (line 158-200)",
           "src/pages/profile/profile.ui.tsx § ProfileFavoriteButton (line 231-271)"
         ],
-        "shared_logic": "★ 동일 패턴: useFetcher({key}) + optimisticOperation = formData?.get('operation') + isFavorited 갱신 + optimisticFavoritesCount 계산 + handleFavoriteToggle"
+        "shared_logic": "동일 패턴: useFetcher({key}) + optimisticOperation = formData?.get('operation') + isFavorited 갱신 + optimisticFavoritesCount 계산 + handleFavoriteToggle"
       },
-      "★_g4_strict_compliance": "★ patterns ≥ 3 strict 임계 도달 (★ G4 결단)",
+      "_g4_strict_compliance": "patterns ≥ 3 strict 임계 도달 (G4 결단)",
       "recommendation": {
-        "refactor": "★ shared/ui/FavoriteButton 추상화 (★ FSD shared/ui slice 추가)",
+        "refactor": "shared/ui/FavoriteButton 추상화 (FSD shared/ui slice 추가)",
         "props_interface": "{ slug: string, favorited: boolean, favoritesCount: number, action_path: string }",
-        "benefit": "★ 3 → 1 컴포넌트 / 80+ line → 30 line / 일관성 보장"
+        "benefit": "3 → 1 컴포넌트 / 80+ line → 30 line / 일관성 보장"
       },
       "migration_advice": {
-        "for_new_system": "★ 신규 시스템 구축 시 즉시 추상 컴포넌트로 시작 / 페이지별 중복 ❌",
-        "framework_neutral": "★ ADR-FE-006 명제 2 정합 — Component 분해는 신규 스택 결정 후 / 단 본 패턴은 framework-neutral abstract"
+        "for_new_system": "신규 시스템 구축 시 즉시 추상 컴포넌트로 시작 / 페이지별 중복 ❌",
+        "framework_neutral": "ADR-FE-006 명제 2 정합 — Component 분해는 신규 스택 결정 후 / 단 본 패턴은 framework-neutral abstract"
       },
-      "stage_5_본체_격상_후보": "★ Stage 5 본격 + adoption 합산 시 본체 antipattern AP-FE-OPTIMISTIC-DRY-001 격상 검토"
+      "stage_5_본체_격상_후보": "Stage 5 본격 + adoption 합산 시 본체 antipattern AP-FE-OPTIMISTIC-DRY-001 격상 검토"
     },
     {
       "id": "AP-FE-FOLLOW-INCONSISTENT",
       "severity": "low",
       "category": "ui-state-management",
-      "title": "★ Follow toggle 패턴 2 컴포넌트 isomorphic (★ G4 임계 미달 / candidate)",
-      "description": "★ FollowAuthorButton (article) + ProfileFollowButton (profile) = 2 컴포넌트 isomorphic.",
+      "title": "Follow toggle 패턴 2 컴포넌트 isomorphic (G4 임계 미달 / candidate)",
+      "description": "FollowAuthorButton (article) + ProfileFollowButton (profile) = 2 컴포넌트 isomorphic.",
       "evidence": {
         "isomorphic_components_count": 2,
         "file_locations": [
@@ -50,62 +50,62 @@
           "src/pages/profile/profile.ui.tsx § ProfileFollowButton"
         ]
       },
-      "★_g4_strict_compliance": "★ 2 < 3 → candidate (★ adoption 트랙 합산 시 격상 후보)",
-      "recommendation": "★ AP-FE-OPTIMISTIC-INCONSISTENT 와 같은 추상화 적용 가능"
+      "_g4_strict_compliance": "2 < 3 → candidate (adoption 트랙 합산 시 격상 후보)",
+      "recommendation": "AP-FE-OPTIMISTIC-INCONSISTENT 와 같은 추상화 적용 가능"
     },
     {
       "id": "AP-FE-EDITOR-MISSING-HTML5-VALIDATION",
       "severity": "medium",
       "category": "form-validation",
-      "title": "★ ★ Editor 4 form input HTML5 native required 부재 (★ Stage 5 신규)",
-      "description": "★ 다른 5 form (Login + Register + Settings + CommentCreate) 모두 required ✅ / Editor 만 ❌ 일관성 위반.",
+      "title": "Editor 4 form input HTML5 native required 부재 (Stage 5 신규)",
+      "description": "다른 5 form (Login + Register + Settings + CommentCreate) 모두 required ✅ / Editor 만 ❌ 일관성 위반.",
       "evidence": {
-        "isomorphic_violation": "★ 1/6 form (Editor 만 위반) / 비교 baseline 5 form 전부 적용",
+        "isomorphic_violation": "1/6 form (Editor 만 위반) / 비교 baseline 5 form 전부 적용",
         "file_locations": ["src/pages/editor/editor.ui.tsx (line 51-85)"]
       },
-      "recommendation": "★ 4 input 모두 required + Zod schema 정합 (★ Zod NewArticleRequest 의 required 명시 일관성)",
+      "recommendation": "4 input 모두 required + Zod schema 정합 (Zod NewArticleRequest 의 required 명시 일관성)",
       "finding_link": "F-FE-005",
-      "★_g4_strict_compliance": "★ 1 PoC 단독 발견 / candidate"
+      "_g4_strict_compliance": "1 PoC 단독 발견 / candidate"
     },
     {
       "id": "AP-FE-SECURITY-JWT-LOCALSTORAGE",
       "severity": "high",
       "category": "security",
-      "title": "★ ★ ★ ★ JWT localStorage XSS 노출 surface (★ ★ ★ 4 PoC isomorphic / 본체 격상 후보 ★ ★ ★)",
-      "description": "★ ★ ★ JWT 토큰을 localStorage 저장 → XSS 공격 시 token 탈취 위험.",
+      "title": "JWT localStorage XSS 노출 surface (4 PoC isomorphic / 본체 격상 후보 )",
+      "description": "JWT 토큰을 localStorage 저장 → XSS 공격 시 token 탈취 위험.",
       "evidence": {
         "file_locations": ["src/shared/api/auth-storage.ts (line 12, 20, 28)"],
         "code_snippet": "window.localStorage.setItem(TOKEN_STORAGE_KEY, token)"
       },
-      "★_4_poc_isomorphic": {
+      "_4_poc_isomorphic": {
         "PoC_01_Java_Spring_Boot_2_5": "AP-SECURITY-001 critical (JWT 21byte secret)",
         "PoC_02_Hexagonal_Spring_Boot_3": "AP-SECURITY-001 critical (RSA private key git commit)",
-        "PoC_03_NestJS": "Bearer JWT (★ F-161 positive 학습 효과)",
-        "PoC_04_full_React_FSD": "★ ★ AP-FE-SECURITY-JWT-LOCALSTORAGE high (본 fork 발견)"
+        "PoC_03_NestJS": "Bearer JWT (F-161 positive 학습 효과)",
+        "PoC_04_full_React_FSD": "AP-FE-SECURITY-JWT-LOCALSTORAGE high (본 fork 발견)"
       },
-      "★_g4_strict_compliance": "★ ★ ★ ★ 4 PoC isomorphic ≥ 3 strict 임계 ★ 도달 → ★ ★ ★ Sprint 5-4 본체 antipattern AP-SECURITY-001-FE 격상 결단 의뢰 의무",
+      "_g4_strict_compliance": "4 PoC isomorphic ≥ 3 strict 임계 도달 → Sprint 5-4 본체 antipattern AP-SECURITY-001-FE 격상 결단 의뢰 의무",
       "recommendation": {
-        "primary": "★ httpOnly cookie + CSRF token (BE 협조)",
-        "secondary": "★ short-lived access token (5min) + refresh token httpOnly",
-        "weak_workaround": "★ 강한 CSP (script-src 제한)"
+        "primary": "httpOnly cookie + CSRF token (BE 협조)",
+        "secondary": "short-lived access token (5min) + refresh token httpOnly",
+        "weak_workaround": "강한 CSP (script-src 제한)"
       },
       "migration_advice": {
-        "for_new_system": "★ ★ ★ 신규 시스템 구축 시 ★ httpOnly cookie 의무 / localStorage JWT 저장 ❌ 절대"
+        "for_new_system": "신규 시스템 구축 시 httpOnly cookie 의무 / localStorage JWT 저장 ❌ 절대"
       },
-      "stage_5_본체_격상": "★ ★ ★ 본체 antipattern 격상 결단 의뢰 시점 (Sprint 5-4)"
+      "stage_5_본체_격상": "본체 antipattern 격상 결단 의뢰 시점 (Sprint 5-4)"
     },
     {
       "id": "AP-FE-A11Y-HTML-LANG-MISSING",
       "severity": "serious",
       "category": "accessibility",
-      "title": "★ <html> lang attribute 부재 — 모든 page (★ 8 page isomorphic)",
-      "description": "★ axe-core 진짜 실행 발견 (Stage 4 1 page → Stage 5 8 page 전부 isomorphic) — WCAG 2 §3.1.1 (Language of Page) 위반.",
+      "title": "<html> lang attribute 부재 — 모든 page (8 page isomorphic)",
+      "description": "axe-core 진짜 실행 발견 (Stage 4 1 page → Stage 5 8 page 전부 isomorphic) — WCAG 2 §3.1.1 (Language of Page) 위반.",
       "evidence": {
         "isomorphic_pages_count": 8,
-        "axe_violations": "★ 16 total (8 page × 2 viewport / 1 unique rule = html-has-lang)"
+        "axe_violations": "16 total (8 page × 2 viewport / 1 unique rule = html-has-lang)"
       },
-      "★_g4_strict_compliance": "★ 단일 fork 8 page isomorphic = ★ root level 위반 (★ 본 fork 한정 / cross-PoC 평가는 다른 fork 와 비교 시점 / candidate)",
-      "recommendation": "★ public/index.html 또는 webpack template `<html lang=\"en\">` 추가",
+      "_g4_strict_compliance": "단일 fork 8 page isomorphic = root level 위반 (본 fork 한정 / cross-PoC 평가는 다른 fork 와 비교 시점 / candidate)",
+      "recommendation": "public/index.html 또는 webpack template `<html lang=\"en\">` 추가",
       "finding_link": "F-FE-002 (Stage 4 mini carry input)"
     },
     {
@@ -113,11 +113,11 @@
       "severity": "medium",
       "category": "ui-flow",
       "title": "Article delete 후 redirect 부재",
-      "description": "★ Stage 4 mini-PoC F-FE-001 carry / Stage 5 본격에서도 confirm — DeleteArticleButton click 시 server delete 성공 후 redirect 명시 부재.",
+      "description": "Stage 4 mini-PoC F-FE-001 carry / Stage 5 본격에서도 confirm — DeleteArticleButton click 시 server delete 성공 후 redirect 명시 부재.",
       "evidence": {
         "file_locations": ["src/pages/article/article.ui.tsx § DeleteArticleButton (line 212-232)"]
       },
-      "recommendation": "★ actions/article-delete.action.ts 에 `return redirect('/')` 추가",
+      "recommendation": "actions/article-delete.action.ts 에 `return redirect('/')` 추가",
       "finding_link": "F-FE-001 (Stage 4 mini carry)"
     }
   ],
@@ -125,11 +125,11 @@
     "antipatterns_count": 6,
     "by_severity": {"high": 1, "serious": 1, "medium": 3, "low": 1},
     "by_category": {"security": 1, "ui-state-management": 2, "form-validation": 1, "accessibility": 1, "ui-flow": 1},
-    "★_g4_strict_threshold_met": [
+    "_g4_strict_threshold_met": [
       "AP-FE-OPTIMISTIC-INCONSISTENT (3 components ≥ 3)",
-      "AP-FE-SECURITY-JWT-LOCALSTORAGE (4 PoC ≥ 3 / ★ ★ ★ 본체 격상 결단 의뢰)"
+      "AP-FE-SECURITY-JWT-LOCALSTORAGE (4 PoC ≥ 3 / 본체 격상 결단 의뢰)"
     ],
-    "★_g4_candidate_carry": [
+    "_g4_candidate_carry": [
       "AP-FE-FOLLOW-INCONSISTENT (2 components < 3)",
       "AP-FE-EDITOR-MISSING-HTML5-VALIDATION (1 PoC)",
       "AP-FE-A11Y-HTML-LANG-MISSING (1 fork)",

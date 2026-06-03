@@ -1,121 +1,121 @@
-# First Prompt Cookbook — 자연어 → skill 매핑 표 (★ chain harness validated / v2.5.1)
+# First Prompt Cookbook — 자연어 → skill 매핑 표 (chain harness validated / v2.5.1)
 
 본 가이드 = plugin install 후 사용자가 자기 의도를 자연어로 어떻게 표현하면 어떤 skill 자동 발동되는지.
 
-★ ★ skill description 매칭 = Claude Code 가 SKILL.md frontmatter 검색 / slash command 불필요.
+skill description 매칭 = Claude Code 가 SKILL.md frontmatter 검색 / slash command 불필요.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (★ 모든 skill path 1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md` / Claude Code plugin 표준 정합 / + analysis-br-cross-consistency-check 신규 v2.5).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (모든 skill path 1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md` / Claude Code plugin 표준 정합 / + analysis-br-cross-consistency-check 신규 v2.5).
 
 ## 1. Analysis stage (chain 1 진입 전 / v1.x 자산)
 
 ### 1.1 입력 정리 + Inventory
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "이 코드베이스 분석 시작" / "분석 시작" / "프로젝트 분석" | [`analysis-input-collection`](../skills/analysis-input-collection/) | `_manifest.yml` |
-| "inventory 추출" / "코드베이스 인벤토리" / "파일 list" | [`analysis-source-inventory`](../skills/analysis-source-inventory/) | `inventory.json` / `tree.md` / `stats.json` |
+| 자연어 prompt                                             | 발동 skill                                                          | 산출                                        |
+| --------------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------- |
+| "이 코드베이스 분석 시작" / "분석 시작" / "프로젝트 분석" | [`analysis-input-collection`](../skills/analysis-input-collection/) | `_manifest.yml`                             |
+| "inventory 추출" / "코드베이스 인벤토리" / "파일 list"    | [`analysis-source-inventory`](../skills/analysis-source-inventory/) | `inventory.json` / `tree.md` / `stats.json` |
 
 ### 1.2 Architecture + DB
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-architecture`](../skills/analysis-architecture/) | `architecture.json` (json 단독 SSOT) / `circular-dependencies.md` |
-| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석" | [`analysis-db-schema-erd`](../skills/analysis-db-schema-erd/) | `schema.{json,sql}` (json 단독 SSOT) |
+| 자연어 prompt                                           | 발동 skill                                                    | 산출                                                              |
+| ------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------- |
+| "아키텍처 분석" / "의존성 그래프" / "circular dep 검출" | [`analysis-architecture`](../skills/analysis-architecture/)   | `architecture.json` (json 단독 SSOT) / `circular-dependencies.md` |
+| "DB schema 추출" / "ERD 만들어줘" / "DB 스키마 분석"    | [`analysis-db-schema-erd`](../skills/analysis-db-schema-erd/) | `schema.{json,sql}` (json 단독 SSOT)                              |
 
-### 1.3 Domain + Rules (★ v2.4 dual representation)
+### 1.3 Domain + Rules (v2.4 dual representation)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "도메인 모델 추출" / "도메인 분석" / "BC 식별" | [`analysis-domain-model`](../skills/analysis-domain-model/) | `domain.json` (json 단독 SSOT) |
-| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석" | [`analysis-business-rules`](../skills/analysis-business-rules/) | `rules.json` (★ json 단독 SSOT / natural_language + given/when/then dual) |
-| "`formal-spec` phase 형식 명세 검증" / "drift 검증" | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/) | drift / DMN / cross-link finding |
-| "characterization 추출" / "의도 vs 버그 분류" | [`analysis-characterization-test`](../skills/analysis-characterization-test/) | `characterization-spec.json` (v2.1) |
-| "SQL inventory 추출" / "매퍼 SQL 정리" | [`analysis-sql-inventory`](../skills/analysis-sql-inventory/) | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority) |
-| **"비즈니스 규칙 의미 일관성 검증" / "BR cross-consistency"** | [`analysis-br-cross-consistency-check`](../skills/analysis-br-cross-consistency-check/) | **★ v2.5 신규 / Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent)** |
+| 자연어 prompt                                                 | 발동 skill                                                                              | 산출                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| "도메인 모델 추출" / "도메인 분석" / "BC 식별"                | [`analysis-domain-model`](../skills/analysis-domain-model/)                             | `domain.json` (json 단독 SSOT)                                          |
+| "비즈니스 규칙 추출" / "BR 추출" / "rules 분석"               | [`analysis-business-rules`](../skills/analysis-business-rules/)                         | `rules.json` (json 단독 SSOT / natural_language + given/when/then dual) |
+| "`formal-spec` phase 형식 명세 검증" / "drift 검증"           | [`analysis-formal-spec-validation`](../skills/analysis-formal-spec-validation/)         | drift / DMN / cross-link finding                                        |
+| "characterization 추출" / "의도 vs 버그 분류"                 | [`analysis-characterization-test`](../skills/analysis-characterization-test/)           | `characterization-spec.json` (v2.1)                                     |
+| "SQL inventory 추출" / "매퍼 SQL 정리"                        | [`analysis-sql-inventory`](../skills/analysis-sql-inventory/)                           | `sql-inventory.json` 12컬럼 (v2.2 / v2.3 migration_priority)            |
+| **"비즈니스 규칙 의미 일관성 검증" / "BR cross-consistency"** | [`analysis-br-cross-consistency-check`](../skills/analysis-br-cross-consistency-check/) | **v2.5 신규 / Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent)**     |
 
 ### 1.4 API + UI/State (FE)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/) | `openapi.yaml` (json/yaml 단독 SSOT) |
-| "UI rules 추출" / "FE rules" | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/) | `business-rules.json` (FE 영역) |
-| "state-map 추출" / "FE state machine" | [`analysis-ui-state-map-fe`](../skills/analysis-ui-state-map-fe/) | `state-map.json` (FE) |
-| "visual-manifest 추출" / "Playwright snapshot" | [`analysis-ui-visual-manifest-fe`](../skills/analysis-ui-visual-manifest-fe/) | `visual-manifest.json` (binary) |
-| "form validation 추출" / "Zod / RHF 분석" | [`analysis-form-validation-fe`](../skills/analysis-form-validation-fe/) | `form-validation-spec.json` |
-| "type-spec 추출" / "TypeScript type 분석" | [`analysis-type-spec-fe`](../skills/analysis-type-spec-fe/) | `type-spec.json` (ts-morph) |
-| "error-mapping 추출" / "BE error code 분석" | [`analysis-error-mapping`](../skills/analysis-error-mapping/) | `error-mapping-spec.json` |
+| 자연어 prompt                                         | 발동 skill                                                                    | 산출                                 |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------ |
+| "OpenAPI 만들어줘" / "API 명세 추출" / "openapi.yaml" | [`analysis-openapi`](../skills/analysis-openapi/)                             | `openapi.yaml` (json/yaml 단독 SSOT) |
+| "UI rules 추출" / "FE rules"                          | [`analysis-api-rule-mapping`](../skills/analysis-api-rule-mapping/)           | `business-rules.json` (FE 영역)      |
+| "state-map 추출" / "FE state machine"                 | [`analysis-ui-state-map-fe`](../skills/analysis-ui-state-map-fe/)             | `state-map.json` (FE)                |
+| "visual-manifest 추출" / "Playwright snapshot"        | [`analysis-ui-visual-manifest-fe`](../skills/analysis-ui-visual-manifest-fe/) | `visual-manifest.json` (binary)      |
+| "form validation 추출" / "Zod / RHF 분석"             | [`analysis-form-validation-fe`](../skills/analysis-form-validation-fe/)       | `form-validation-spec.json`          |
+| "type-spec 추출" / "TypeScript type 분석"             | [`analysis-type-spec-fe`](../skills/analysis-type-spec-fe/)                   | `type-spec.json` (ts-morph)          |
+| "error-mapping 추출" / "BE error code 분석"           | [`analysis-error-mapping`](../skills/analysis-error-mapping/)                 | `error-mapping-spec.json`            |
 
 ### 1.5 Quality (Phase 6)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
+| 자연어 prompt                                    | 발동 skill                                                                | 산출                                                             |
+| ------------------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | "antipattern 정리" / "안티패턴 통합" / "AP 도출" | [`analysis-quality-antipattern`](../skills/analysis-quality-antipattern/) | `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT) |
 
 ### 1.6 Aspect (cross-cutting / phase 무관)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "a11y 검증" / "WCAG 2.2 AA 검증" / "접근성 검증" | [`analysis-aspect-a11y`](../skills/analysis-aspect-a11y/) | `a11y-spec.json` (axe-core) |
-| "i18n 검증" / "다국어 분석" | [`analysis-aspect-i18n`](../skills/analysis-aspect-i18n/) | `i18n-spec.json` |
-| "정적 보안 검증" / "Semgrep 실행" / "OWASP 검증" | [`analysis-aspect-static-security`](../skills/analysis-aspect-static-security/) | `static-security-spec.json` (★ 진짜 도구) |
-| "legacy spectrum 분류" / "Strangler 분류" | [`analysis-aspect-legacy`](../skills/analysis-aspect-legacy/) | `legacy-spectrum.json` |
+| 자연어 prompt                                    | 발동 skill                                                                      | 산출                                    |
+| ------------------------------------------------ | ------------------------------------------------------------------------------- | --------------------------------------- |
+| "a11y 검증" / "WCAG 2.2 AA 검증" / "접근성 검증" | [`analysis-aspect-a11y`](../skills/analysis-aspect-a11y/)                       | `a11y-spec.json` (axe-core)             |
+| "i18n 검증" / "다국어 분석"                      | [`analysis-aspect-i18n`](../skills/analysis-aspect-i18n/)                       | `i18n-spec.json`                        |
+| "정적 보안 검증" / "Semgrep 실행" / "OWASP 검증" | [`analysis-aspect-static-security`](../skills/analysis-aspect-static-security/) | `static-security-spec.json` (진짜 도구) |
+| "legacy spectrum 분류" / "Strangler 분류"        | [`analysis-aspect-legacy`](../skills/analysis-aspect-legacy/)                   | `legacy-spectrum.json`                  |
 
-★ aspect skill = 코드베이스 시그널 (`package.json` react / `pom.xml` spring-boot 등) 자동 매칭.
+aspect skill = 코드베이스 시그널 (`package.json` react / `pom.xml` spring-boot 등) 자동 매칭.
 
-## 2. Chain harness stage (★ v2.0 / v2.5 Layer 2 통합)
+## 2. Chain harness stage (v2.0 / v2.5 Layer 2 통합)
 
-### 2.1 Chain 1 (discovery) ★ v2.5: Layer 2 LLM 의무 통과
+### 2.1 Chain 1 (discovery) v2.5: Layer 2 LLM 의무 통과
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/) | `discovery-spec.json` (json 단독 SSOT) |
-| "Swagger/OpenAPI 에서 추출" | [`discovery-from-swagger`](../skills/discovery-from-swagger/) | UC + intent (API spec 입력 어댑터) |
-| "Figma 에서 추출" | [`discovery-from-figma`](../skills/discovery-from-figma/) | UC + intent (디자인 입력 어댑터) |
-| "기획문서/자연어 md 에서 추출" | [`discovery-from-nl-md`](../skills/discovery-from-nl-md/) | UC + intent (NL 입력 어댑터) |
-| "use case 분해" / "UC decompose" / "story 분해" | [`discovery-decompose-use-cases`](../skills/discovery-decompose-use-cases/) | UC-* 분해 |
-| "비즈니스 의도 식별" / "domain priority" / "intent 추출" | [`discovery-identify-business-intent`](../skills/discovery-identify-business-intent/) | intent-tag + domain priority |
+| 자연어 prompt                                                            | 발동 skill                                                                            | 산출                                   |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | -------------------------------------- |
+| "발견 단계 시작" / "기획 단계 시작" / "discovery 진입" / "use case 추출" | [`discovery-from-analysis-output`](../skills/discovery-from-analysis-output/)         | `discovery-spec.json` (json 단독 SSOT) |
+| "Swagger/OpenAPI 에서 추출"                                              | [`discovery-from-swagger`](../skills/discovery-from-swagger/)                         | UC + intent (API spec 입력 어댑터)     |
+| "Figma 에서 추출"                                                        | [`discovery-from-figma`](../skills/discovery-from-figma/)                             | UC + intent (디자인 입력 어댑터)       |
+| "기획문서/자연어 md 에서 추출"                                           | [`discovery-from-nl-md`](../skills/discovery-from-nl-md/)                             | UC + intent (NL 입력 어댑터)           |
+| "use case 분해" / "UC decompose" / "story 분해"                          | [`discovery-decompose-use-cases`](../skills/discovery-decompose-use-cases/)           | UC-\* 분해                             |
+| "비즈니스 의도 식별" / "domain priority" / "intent 추출"                 | [`discovery-identify-business-intent`](../skills/discovery-identify-business-intent/) | intent-tag + domain priority           |
 
-★ ★ v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
+v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
 
-★ ★ **timing 분리** (v10.0.4 paradigm / v10.1.0 본격): `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용 (★ v10.1.0 모두 본격 구현). 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등 본격 구현). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
+**timing 분리** (v10.0.4 paradigm / v10.1.0 본격): `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용 (v10.1.0 모두 본격 구현). 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등 본격 구현). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
 
 ### 2.2 Chain 2 (spec)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "behavior spec 만들어" / "BHV 도출" / "executable contract" | [`spec-compose-behavior-spec`](../skills/spec-compose-behavior-spec/) | `behavior-spec.json` (json 단독 SSOT / BHV-*) |
-| "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출" | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.json` (json 단독 SSOT / AC-*) |
-| "7대 통합" / "deliverables 통합" / "spec 통합" | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/) | analysis 7대 산출물 통합 |
+| 자연어 prompt                                               | 발동 skill                                                                      | 산출                                                |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------- |
+| "behavior spec 만들어" / "BHV 도출" / "executable contract" | [`spec-compose-behavior-spec`](../skills/spec-compose-behavior-spec/)           | `behavior-spec.json` (json 단독 SSOT / BHV-\*)      |
+| "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출"     | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.json` (json 단독 SSOT / AC-\*) |
+| "7대 통합" / "deliverables 통합" / "spec 통합"              | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/)         | analysis 7대 산출물 통합                            |
 
-### 2.3 Chain 3 (plan / ★ v10.0.0 gate #3 본격)
+### 2.3 Chain 3 (plan / v10.0.0 gate #3 본격)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
+| 자연어 prompt             | 발동 skill                                                              | 산출                                                     |
+| ------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
 | "plan / 계획 / task 분해" | [`plan-decompose-and-sequence`](../skills/plan-decompose-and-sequence/) | `task-plan.json` (json 단독 SSOT / tasks / dependencies) |
-| "ADR / 아키텍처 결정" | [`plan-architect-decisions`](../skills/plan-architect-decisions/) | ADR (alternatives ≥3) + integration points |
-| "risk / NFR allocation" | [`plan-risk-and-nfr`](../skills/plan-risk-and-nfr/) | risks[] + nfr_allocation[] (hard gate) |
+| "ADR / 아키텍처 결정"     | [`plan-architect-decisions`](../skills/plan-architect-decisions/)       | ADR (alternatives ≥3) + integration points               |
+| "risk / NFR allocation"   | [`plan-risk-and-nfr`](../skills/plan-risk-and-nfr/)                     | risks[] + nfr_allocation[] (hard gate)                   |
 
-★ gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR alternatives ≥3 + dependency cycle / chain 3 = gate #3 1:1).
+gate #3 (plan-coverage-validator / NFR allocation hard gate + ADR alternatives ≥3 + dependency cycle / chain 3 = gate #3 1:1).
 
 ### 2.4 Chain 4 (test / RED 의무)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "test spec 생성" / "TC 도출" / "test case 분해" | [`test-generate-test-spec`](../skills/test-generate-test-spec/) | `test-spec.json` (json 단독 SSOT / TC-*) |
-| "test code RED" / "test 실 실행 RED" / "5종 물증 RED" | [`test-run-test-evidence`](../skills/test-run-test-evidence/) | 실 test code + 5종 물증 (★ no-simulation) |
-| "AC→TC coverage 검증" / "test coverage 검증" | [`test-verify-coverage`](../skills/test-verify-coverage/) | coverage finding |
+| 자연어 prompt                                         | 발동 skill                                                      | 산출                                      |
+| ----------------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------- |
+| "test spec 생성" / "TC 도출" / "test case 분해"       | [`test-generate-test-spec`](../skills/test-generate-test-spec/) | `test-spec.json` (json 단독 SSOT / TC-\*) |
+| "test code RED" / "test 실 실행 RED" / "5종 물증 RED" | [`test-run-test-evidence`](../skills/test-run-test-evidence/)   | 실 test code + 5종 물증 (no-simulation)   |
+| "AC→TC coverage 검증" / "test coverage 검증"          | [`test-verify-coverage`](../skills/test-verify-coverage/)       | coverage finding                          |
 
 ### 2.5 Chain 5 (impl / GREEN 의무)
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
-| "impl spec 생성" / "구현 코드 작성" / "impl GREEN" | [`implement-generate-impl-spec`](../skills/implement-generate-impl-spec/) | `impl-spec.json` (json 단독 SSOT / IMPL-*) + 실 impl code |
-| "test pass 검증" / "100% GREEN" / "test runner 실 실행" | [`implement-verify-test-pass`](../skills/implement-verify-test-pass/) | 실 test runner + 5종 물증 (★ --allow-execute) |
+| 자연어 prompt                                           | 발동 skill                                                                | 산출                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| "impl spec 생성" / "구현 코드 작성" / "impl GREEN"      | [`implement-generate-impl-spec`](../skills/implement-generate-impl-spec/) | `impl-spec.json` (json 단독 SSOT / IMPL-\*) + 실 impl code |
+| "test pass 검증" / "100% GREEN" / "test runner 실 실행" | [`implement-verify-test-pass`](../skills/implement-verify-test-pass/)     | 실 test runner + 5종 물증 (--allow-execute)                |
 
 ### 2.6 Release matrix
 
-| 자연어 prompt | 발동 skill | 산출 |
-|---|---|---|
+| 자연어 prompt                                            | 발동 skill                                                                      | 산출                                                           |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------------------------- |
 | "traceability matrix" / "release matrix" / "matrix 산출" | [`_base-build-traceability-matrix`](../skills/_base-build-traceability-matrix/) | `matrix.json` (json 단독 SSOT / UC→BHV→AC→TC→IMPL+commit_hash) |
 
 ## 3. Skill auto-invoke 매커니즘
@@ -125,27 +125,29 @@
   ↓
 Claude Code 가 모든 SKILL.md description 검색
   ↓
-매칭 skill 자동 발동 (★ slash command 불필요)
+매칭 skill 자동 발동 (slash command 불필요)
   ↓
 chain harness gate 통과 의무 검증 (state.json + chain-driver)
-  ↓ (★ v2.5: chain 1 gate 진입 시 Layer 2 LLM sub-agent invocation)
+  ↓ (v2.5: chain 1 gate 진입 시 Layer 2 LLM sub-agent invocation)
 다음 stage 진입
 ```
 
-★ ★ ★ **D21' 정합** — UserPromptSubmit hook 이 chain stage 매칭 prompt 감지 후 chain-driver hooks-bridge 호출 → suggest-skill stderr 권고. LLM "권고를 즉시 따르는 척" 차단 (`suppressOutput=true`).
+**D21' 정합** — UserPromptSubmit hook 이 chain stage 매칭 prompt 감지 후 chain-driver hooks-bridge 호출 → suggest-skill stderr 권고. LLM "권고를 즉시 따르는 척" 차단 (`suppressOutput=true`).
 
 ## 4. 매칭 안 될 때
 
 ### Tip 1. 명시적 키워드 사용
 
 자연어 매칭 폭이 좁은 prompt → 명시적 키워드 추가:
+
 - ❌ "rules 만들어줘" — domain rules / FE rules 가 모호
 - ✅ "비즈니스 규칙 추출" → `analysis-business-rules`
 - ✅ "FE form validation 추출" → `analysis-form-validation-fe`
 
 ### Tip 2. Skill 명시 호출
 
-slash command 부재 환경 = 명시 path (★ v2.5.1 1-depth + prefix paradigm):
+slash command 부재 환경 = 명시 path (v2.5.1 1-depth + prefix paradigm):
+
 ```
 @skills/analysis-architecture/SKILL.md
 @skills/discovery-from-analysis-output/SKILL.md
@@ -163,4 +165,4 @@ slash command 부재 환경 = 명시 path (★ v2.5.1 1-depth + prefix paradigm)
 - [`common-errors.md`](./common-errors.md) — FAQ
 - [`../README.md`](../README.md) §사용법 — skill description trigger 전체 표
 
-> ★ v2.5.1 paradigm: 모든 skill 디렉토리 = `skills/<category>-<name>/SKILL.md` 1-depth + category prefix. Claude Code plugin 표준 정합 (1-depth scan) + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 별도 axis 보존.
+> v2.5.1 paradigm: 모든 skill 디렉토리 = `skills/<category>-<name>/SKILL.md` 1-depth + category prefix. Claude Code plugin 표준 정합 (1-depth scan) + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 별도 axis 보존.

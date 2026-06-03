@@ -30,26 +30,26 @@ node tools/chain-driver/src/cli.js trace-view --graph <path> [--scope <id>] [--s
 
 ## 3. 구현 = thin formatter (새 순회 0)
 
-| 데이터 | 재사용 함수 (cli.js 기존) |
-|---|---|
+| 데이터                                 | 재사용 함수 (cli.js 기존)                                   |
+| -------------------------------------- | ----------------------------------------------------------- |
 | per-UC forward reachable (매트릭스 셀) | `analyzeImpact(graph, ucId, opts).forward` → subkind 버킷팅 |
-| per-node backward/forward (map 인접) | `analyzeImpact` (cmdNavigateRollup 와 동일 호출) |
-| top-3 impact root | `topKImpactRoot(graph, {k:3})` |
-| stats | `graph.stats` (합성 시 precomputed) |
-| freshness | `tools/_shared/graph-freshness.js#checkGraphFreshness` |
-| 노드 title (선택) | `readSpecBody` 또는 node.title |
+| per-node backward/forward (map 인접)   | `analyzeImpact` (cmdNavigateRollup 와 동일 호출)            |
+| top-3 impact root                      | `topKImpactRoot(graph, {k:3})`                              |
+| stats                                  | `graph.stats` (합성 시 precomputed)                         |
+| freshness                              | `tools/_shared/graph-freshness.js#checkGraphFreshness`      |
+| 노드 title (선택)                      | `readSpecBody` 또는 node.title                              |
 
 → 신규 모듈 = `src/trace-view.js` (formatter only / graph 알고리즘 import 만 / write 0). cli.js 에 `case 'trace-view'` 추가.
 
 ## 4. 5대 제약 정합 + 공통 의무
 
-| 제약 | 정합 |
-|---|---|
-| json 단독 SSOT | ✓ read-only / SSOT 무변경 |
-| on-demand only | ✓ **stdout only — 파일 write 0 / git commit 0** (committed mirror = mermaid-부활 = REJECT) |
-| no-engineification | ✓ stateless CLI formatter / 의존성 0 / 서버·auto-render·stateful 엔진 ❌ |
-| reference-lens | ✓ display-only / 어떤 결정적 gate(gate-eval/findings-aggregator/release-readiness)에도 inject ❌ |
-| minimal-additive | ✓ MINOR / breaking 0 |
+| 제약               | 정합                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------ |
+| json 단독 SSOT     | ✓ read-only / SSOT 무변경                                                                        |
+| on-demand only     | ✓ **stdout only — 파일 write 0 / git commit 0** (committed mirror = mermaid-부활 = REJECT)       |
+| no-engineification | ✓ stateless CLI formatter / 의존성 0 / 서버·auto-render·stateful 엔진 ❌                         |
+| reference-lens     | ✓ display-only / 어떤 결정적 gate(gate-eval/findings-aggregator/release-readiness)에도 inject ❌ |
+| minimal-additive   | ✓ MINOR / breaking 0                                                                             |
 
 - **reference-lens 가드** = release-readiness 신규 check (check31 미러) — trace-view 출력이 어떤 gate 에도 소비되지 않음을 구조 검증(trace-view.js 가 gate 모듈에 import 안 됨 + spec/gate 토큰 0).
 - **정직 명명** = 출력 헤더 `[traceability-map]` (not blueprint) + 문서에 "요구사항→구현 추적성 / 시스템 아키텍처 ❌ (아키텍처 슬라이스 = analysis-architecture 노드 1개뿐)" 명시.
@@ -87,7 +87,7 @@ node tools/chain-driver/src/cli.js trace-view --graph <path> [--scope <id>] [--s
 2. 실 dogfood render — RealWorld + ecommerce 실 그래프에 `trace-view` 실행, 출력 eyeball (coverage hole 정확성 + stale 배너 음성대조).
 3. release-readiness 신규 check (reference-lens 가드) + 기존 회귀(chain-driver test + workspace 전체 + release-readiness 전 check green).
 4. version 3-way(plugin.json + package + CHANGELOG + CLAUDE.md) MINOR.
-5. dep-graph 운영 문서(`docs/dependency-graph.md`) §4 에 trace-view 사용법 추가 + §3 도구맵 (★ 부수: §4-1 의 stale `matrix.{json,md,mermaid}` 문구 정정 = v12.0.0 잔여 doc-drift / 별도 확인).
+5. dep-graph 운영 문서(`docs/dependency-graph.md`) §4 에 trace-view 사용법 추가 + §3 도구맵 (부수: §4-1 의 stale `matrix.{json,md,mermaid}` 문구 정정 = v12.0.0 잔여 doc-drift / 별도 확인).
 
 ## 9. 미해결 — 사용자 확인 포인트
 

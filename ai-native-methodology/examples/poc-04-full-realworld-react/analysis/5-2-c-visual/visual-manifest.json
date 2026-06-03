@@ -9,7 +9,7 @@
     "captured_by": "real",
     "tool": "@playwright/test (chromium headless) + ADR-FE-002 4 viewport",
     "target_url": "https://demo.realworld.io",
-    "target_note": "★ demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 8 page 시각 산출 isomorphic 검증)"
+    "target_note": "demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 8 page 시각 산출 isomorphic 검증)"
   },
   "snapshots": [
     {

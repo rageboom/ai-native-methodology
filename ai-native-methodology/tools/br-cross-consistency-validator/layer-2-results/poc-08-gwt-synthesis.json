@@ -5,7 +5,7 @@
   "batch_size": 8,
   "poc_id": "poc-08-realworld-mybatis",
   "direction": "NL→GWT",
-  "$comment": "★ ★ session 23차 Sprint 2 / dual-representation 합성 (session 13차 Agent 3 isomorphic). natural_language → given/when/then 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 20초). 비즈니스 관점 / additive only (기존 NL 보존) / Layer 2 cross-validation (Sprint 3) 입력 자산.",
+  "$comment": "session 23차 Sprint 2 / dual-representation 합성 (session 13차 Agent 3 isomorphic). natural_language → given/when/then 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 20초). 비즈니스 관점 / additive only (기존 NL 보존) / Layer 2 cross-validation (Sprint 3) 입력 자산.",
   "results": [
     { "br_id": "BR-PETSTORE-ACCREG-001", "given": ["신규 회원이 계정 정보, 프로필 정보, 로그인 정보를 모두 입력한 상태이다"], "when": ["회원 가입을 요청한다"], "then": ["계정, 프로필, 로그인 정보가 모두 함께 저장되거나, 하나라도 실패하면 전체가 저장되지 않는다", "세 데이터의 저장은 원자적으로 처리된다"] },
     { "br_id": "BR-PETSTORE-ACCUPD-002", "given": ["기존 회원이 계정 갱신 요청을 한 상태이다"], "when": ["계정 정보를 수정 요청한다"], "then": ["계정 정보와 프로필 정보는 항상 갱신된다", "비밀번호가 입력된 경우에만 로그인 정보(비밀번호)가 갱신된다", "비밀번호가 입력되지 않은 경우 기존 비밀번호는 변경되지 않는다"] },

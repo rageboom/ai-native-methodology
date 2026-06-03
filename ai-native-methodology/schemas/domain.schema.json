@@ -13,11 +13,11 @@
     "stakeholders": {
       "type": "array",
       "items": {"type": "string"},
-      "description": "★ v11.16.0 (C-domain-schema-stakeholders) — 도메인 모델 actor / 이해관계자 목록 (예: 차량관리자, 회계담당자). optional / additive — discovery-spec business_intent.stakeholders 와 동형(string array) / domain 은 도메인 actor 초점 (전체 비즈니스 이해관계자는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+      "description": "v11.16.0 (C-domain-schema-stakeholders) — 도메인 모델 actor / 이해관계자 목록 (예: 차량관리자, 회계담당자). optional / additive — discovery-spec business_intent.stakeholders 와 동형(string array) / domain 은 도메인 actor 초점 (전체 비즈니스 이해관계자는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
     },
     "business_intent_summary": {
       "type": "string",
-      "description": "★ v11.16.0 (C-domain-schema-stakeholders) — 도메인 비즈니스 의도 한 줄 요약. optional / additive — discovery-spec business_intent.domain_purpose 의 도메인 측 요약(summary / full 의도는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+      "description": "v11.16.0 (C-domain-schema-stakeholders) — 도메인 비즈니스 의도 한 줄 요약. optional / additive — discovery-spec business_intent.domain_purpose 의 도메인 측 요약(summary / full 의도는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
     },
     "ubiquitous_language": {
       "type": "array",
@@ -183,12 +183,12 @@
                       "related_use_cases": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "관련 유스케이스 ID (★ v2.0 통일 / 예: UC-ORDER-001)"
+                        "description": "관련 유스케이스 ID (v2.0 통일 / 예: UC-ORDER-001)"
                       },
                       "related_rules": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "관련 비즈니스 규칙 ID (★ 4토막 strict / 예: BR-ORDER-CANCEL-001)"
+                        "description": "관련 비즈니스 규칙 ID (4토막 strict / 예: BR-ORDER-CANCEL-001)"
                       }
                     }
                   }
@@ -306,7 +306,7 @@
                 "id": {
                   "type": "string",
                   "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
-                  "description": "유스케이스 ID (★ v2.0 통일 / id-conventions canonical / 예: UC-ORDER-001 / 기존 이름 형식 (UC-ORDER-CREATE) = sub-plan-6 migration carry)"
+                  "description": "유스케이스 ID (v2.0 통일 / id-conventions canonical / 예: UC-ORDER-001 / 기존 이름 형식 (UC-ORDER-CREATE) = sub-plan-6 migration carry)"
                 },
                 "name": {"type": "string"},
                 "actor": {

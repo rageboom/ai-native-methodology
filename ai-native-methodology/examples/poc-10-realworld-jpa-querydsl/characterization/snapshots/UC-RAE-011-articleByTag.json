@@ -1,11 +1,11 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RAE-011 Article 목록 tag 분기 (★ method name derived M:N).",
+  "$comment": " phase 4.7 snapshot — UC-RAE-011 Article 목록 tag 분기 ( method name derived M:N).",
   "snapshot_id": "SNAP-UC-RAE-011",
   "use_case": "UC-RAE-011",
   "endpoint": "GET /articles?tag=intro",
   "controller_method": "ArticleRestController.getArticlesByTag",
   "service_method": "ArticleService.getArticlesByTag",
-  "sql_id": "ArticleRepository.findAllByContentsTagsContains (★ Embedded Contents.tags M:N)",
+  "sql_id": "ArticleRepository.findAllByContentsTagsContains ( Embedded Contents.tags M:N)",
   "scenarios": [
     {"id": "SCN-RAE-011-001", "name": "happy path — tag 기반 article 목록", "given": {"request_query": "?tag=intro"}, "when": "ArticleRepository.findAllByContentsTagsContains(Tag('intro'), Pageable) → SELECT article JOIN article_tags JOIN tag WHERE tag.name = 'intro'", "then": {"expected_response": "Page<Article>"}, "intent_classification": [{"rule": "BR-RAE-SEARCH-002", "type": "intent", "note": "M:N method name derived"}]}
   ],

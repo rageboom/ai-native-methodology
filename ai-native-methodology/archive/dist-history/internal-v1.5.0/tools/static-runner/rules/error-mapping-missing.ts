@@ -3,12 +3,12 @@
 // 본 fixture = AP-API-001 NestJS decorator drift mechanism — @Delete + @ApiResponse({status: 201}).
 // PoC #03 article.controller.ts:65,68 + 81,85 + 97,99 학습.
 
-// Mock decorator stubs (★ fixture 만 / 실 런타임 ❌)
+// Mock decorator stubs (fixture 만 / 실 런타임 ❌)
 declare function Delete(path: string): MethodDecorator;
 declare function ApiResponse(opts: { status: number; description?: string }): MethodDecorator;
 declare function HttpCode(code: number): MethodDecorator;
 
-// ===== positive cases (★ ruleid 매칭 의무 / @Delete + @ApiResponse 201) =====
+// ===== positive cases (ruleid 매칭 의무 / @Delete + @ApiResponse 201) =====
 
 class ArticleControllerDrift {
     // ruleid: internal.be.api.error-mapping-nestjs-delete-201-decorator-drift
@@ -31,7 +31,7 @@ class CommentControllerDrift {
     deleteComment(): void {}
 }
 
-// ===== negative cases (★ ok 매칭 의무) =====
+// ===== negative cases (ok 매칭 의무) =====
 
 // (1) @Delete + @ApiResponse 204 — 정합
 class ArticleControllerOK {

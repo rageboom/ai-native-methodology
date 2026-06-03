@@ -33,7 +33,7 @@
           "severity": "medium",
           "file": "ai-native-methodology\\examples\\poc-04-full-realworld-react\\INPUT\\src\\shared\\api\\auth-storage.ts",
           "line": 20,
-          "message": "JWT/auth token 을 localStorage 에 저장 — XSS 공격 표면.\n★ ADR-FE-007 / AP-FE-SECURITY-001 / OWASP A02 + A07.\n권고: httpOnly + Secure + SameSite=Lax cookie + CSP 강화.\n",
+          "message": "JWT/auth token 을 localStorage 에 저장 — XSS 공격 표면.\nADR-FE-007 / AP-FE-SECURITY-001 / OWASP A02 + A07.\n권고: httpOnly + Secure + SameSite=Lax cookie + CSP 강화.\n",
           "plugin": "semgrep oss",
           "sarif_run_index": 0,
           "fingerprint": "4144d56a6f9f53dd"

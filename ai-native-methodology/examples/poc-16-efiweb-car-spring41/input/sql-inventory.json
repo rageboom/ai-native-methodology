@@ -1,7 +1,7 @@
 {
   "project_id": "poc-15-efiweb-car-spring41",
   "spectrum": "Legacy (Spring 4.1 + iBATIS 2)",
-  "corroboration_role": "★ 4번째 EFI-WEB corroboration (R1' axis carry) — D-axis (artifact-graph) 주 입증",
+  "corroboration_role": "4번째 EFI-WEB corroboration (R1' axis carry) — D-axis (artifact-graph) 주 입증",
   "meta_confidence": {
     "generated_at": "2026-05-28T08:30:00Z",
     "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
@@ -13,9 +13,9 @@
     "confidence": 0.82,
     "raw_confidence": 0.82,
     "warnings": [
-      "★ 37 statement 중 6개만 본격 추출 / 나머지 31 partial carry — D-axis 우선 / 핵심 anchor (insertCar / selectLeaderUserId / selectCarCostCalculate / saveCarCostAccept / insertCarCostSlip / updateCarTotDist) 만",
-      "★ external 4 DB (FIM / SGERP / e_hr / ekporg) 18 object — dependent_tables 에 external_only 표기",
-      "★ business_meaning = LLM 추론 + 도메인 expert 검증 carry (4 ambiguous BR 정합)"
+      "37 statement 중 6개만 본격 추출 / 나머지 31 partial carry — D-axis 우선 / 핵심 anchor (insertCar / selectLeaderUserId / selectCarCostCalculate / saveCarCostAccept / insertCarCostSlip / updateCarTotDist) 만",
+      "external 4 DB (FIM / SGERP / e_hr / ekporg) 18 object — dependent_tables 에 external_only 표기",
+      "business_meaning = LLM 추론 + 도메인 expert 검증 carry (4 ambiguous BR 정합)"
     ]
   },
   "summary": {
@@ -76,7 +76,7 @@
       "poc_11_auto_ratio": "약 66.7%",
       "poc_15_auto_ratio": "66.7%",
       "delta": "0.0%p (사내 isomorphic 안정점)",
-      "note": "★ 4번째 EFI-WEB PoC corroboration — auto_ratio_external_6 안정 66.7% 사실 robust"
+      "note": "4번째 EFI-WEB PoC corroboration — auto_ratio_external_6 안정 66.7% 사실 robust"
     }
   },
   "inventory": [
@@ -115,7 +115,7 @@
       "mapper_xml_line": 328,
       "statement_type": "CALLABLE",
       "called_from_screen": "carCosting.jsp → POST /ifrs/car/costingCalculateAjax",
-      "business_meaning": "★ 차량비용 → ERP 회계전표 IF SP 호출 — EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery(useComCd, 0, strDate, endDate, userNm, '', '') / BR-CAR-COST-003 anchor / 본 PoC 핵심 anchor",
+      "business_meaning": "차량비용 → ERP 회계전표 IF SP 호출 — EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery(useComCd, 0, strDate, endDate, userNm, '', '') / BR-CAR-COST-003 anchor / 본 PoC 핵심 anchor",
       "dynamic_branch": [],
       "dependent_tables": [
         "sgerp.sg_sacsliprowcarmanagementifquery"
@@ -177,12 +177,12 @@
   ],
   "external_advice_absorption": {
     "notes": [
-      "★ MyBatis 14 표준 속성 정합 — statement_type enum (PREPARED / CALLABLE / STATEMENT) 적용",
-      "★ Agent 1 강 권고 흡수 — CALLABLE 표기 (SGERP SP)"
+      "MyBatis 14 표준 속성 정합 — statement_type enum (PREPARED / CALLABLE / STATEMENT) 적용",
+      "Agent 1 강 권고 흡수 — CALLABLE 표기 (SGERP SP)"
     ]
   },
   "carry_inventory_56_summary": {
-    "note": "★ 37 statement 중 6 본격 / 31 partial carry — D-axis 우선 / impl stage 진입 후 전수 추출 carry"
+    "note": "37 statement 중 6 본격 / 31 partial carry — D-axis 우선 / impl stage 진입 후 전수 추출 carry"
   },
   "code_pointers_na": true
 }

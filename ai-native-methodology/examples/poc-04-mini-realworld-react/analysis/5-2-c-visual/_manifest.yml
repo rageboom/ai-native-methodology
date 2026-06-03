@@ -2,10 +2,10 @@ phase: 5-2-c-visual
 poc_id: poc-04-mini
 captured_at: 2026-05-02
 captured_by: real
-tool: "@playwright/test (chromium headless)"
-tool_version: "1.49+"
-target_url: "https://demo.realworld.io/"
-target_note: "★ demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 시각 산출 isomorphic)"
+tool: '@playwright/test (chromium headless)'
+tool_version: '1.49+'
+target_url: 'https://demo.realworld.io/'
+target_note: ' demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 시각 산출 isomorphic)'
 artifacts:
   - visual-manifest.json
   - snapshot/home-desktop.png
@@ -13,17 +13,17 @@ artifacts:
   - _manifest.yml
 ir_layer_mapping:
   L4_Presentation:
-    - visual-manifest.json (★ binary 진실 — ADR-FE-002)
+    - visual-manifest.json ( binary 진실 — ADR-FE-002)
     - snapshot/*.png (Playwright 진짜 baseline)
 captured_summary:
-  pages_covered: 1                # PAGE-HOME (mini scope)
-  viewports: 2                    # desktop 1280x720 + mobile 375x667
+  pages_covered: 1 # PAGE-HOME (mini scope)
+  viewports: 2 # desktop 1280x720 + mobile 375x667
   snapshots_count: 2
-  total_size_bytes: "약 200KB (★ binary 진실 보존)"
+  total_size_bytes: '약 200KB ( binary 진실 보존)'
 no_simulation_compliance:
   static_tool_simulated: false
   ai_persona_used: false
-  evidence: "★ Playwright + Chromium headless 진짜 실행 / demo.realworld.io 실제 page 캡처"
+  evidence: ' Playwright + Chromium headless 진짜 실행 / demo.realworld.io 실제 page 캡처'
 deliverable_9_compliance:
   playwright_real_run: true
   binary_truth_captured: true

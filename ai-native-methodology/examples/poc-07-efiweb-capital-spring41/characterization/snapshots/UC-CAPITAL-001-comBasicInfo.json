@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-001 법인 기초정보 조회 (sub-domain A. ComBasicInfo). 단순 read 진입점.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-CAPITAL-001 법인 기초정보 조회 (sub-domain A. ComBasicInfo). 단순 read 진입점.",
   "snapshot_id": "SNAP-UC-CAPITAL-001",
   "use_case": "UC-CAPITAL-001",
   "endpoint": "GET /ifrs/capital/comBasicInfoListAjax",
@@ -7,7 +7,7 @@
   "service_method": "CapitalService.selectComBasicInfoListAjax",
   "sql_id": "CapitalDAO.selectComBasicInfoList",
   "layer": "integration",
-  "data_source_status": "★ 실 DB 환경 부재 — TB_COMPANY 정렬 결과는 코드 + iBATIS XML 분석 기반 추정",
+  "data_source_status": "실 DB 환경 부재 — TB_COMPANY 정렬 결과는 코드 + iBATIS XML 분석 기반 추정",
   "scenarios": [
     {
       "id": "SCN-CAPITAL-001-001",
@@ -41,7 +41,7 @@
         "Map<String,Object> 결과 (현재 형식 / 새 시스템 = DTO 매핑 의무)"
       ],
       "behavior_likely_bug": [
-        "★ AP-CAPITAL-002 — Map<String,Object> 강제 캐스팅 / type safety 부재 (새 시스템 DTO 의무)"
+        "AP-CAPITAL-002 — Map<String,Object> 강제 캐스팅 / type safety 부재 (새 시스템 DTO 의무)"
       ]
     }
   ],

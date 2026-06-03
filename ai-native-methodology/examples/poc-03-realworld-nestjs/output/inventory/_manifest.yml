@@ -1,36 +1,36 @@
 # Phase 1 매니페스트 — PoC #03 NestJS init
-# ★ G7 meta-confidence.template.yaml v1.2.2 첫 외부 사용 (정합 검증 대상)
+# G7 meta-confidence.template.yaml v1.2.2 첫 외부 사용 (정합 검증 대상)
 
 manifest:
-  generated_at: "2026-04-30"
-  poc_id: "poc-03-realworld-nestjs"
-  phase: "1"
-  phase_name: "init (인벤토리)"
-  methodology_version: "v1.2.2"
-  actor: "AI (Claude Opus 4.7) — 메인 직접 (sub-agent 생략 — PoC #03 진입 research 흡수)"
+  generated_at: '2026-04-30'
+  poc_id: 'poc-03-realworld-nestjs'
+  phase: '1'
+  phase_name: 'init (인벤토리)'
+  methodology_version: 'v1.2.2'
+  actor: 'AI (Claude Opus 4.7) — 메인 직접 (sub-agent 생략 — PoC #03 진입 research 흡수)'
 
 # 상위 phase 인계
 upstream_handoff:
-  - source: "../../input/_manifest.yml"
-    consistency: "✅ phase 0 입력 정리 정합. lujakob/nestjs-realworld-example-app c1c2cc4 master + license=ISC (정정: phase 0 manifest 의 license=null 은 부정확 — package.json 검증)"
+  - source: '../../input/_manifest.yml'
+    consistency: '✅ phase 0 입력 정리 정합. lujakob/nestjs-realworld-example-app c1c2cc4 master + license=ISC (정정: phase 0 manifest 의 license=null 은 부정확 — package.json 검증)'
 
 # Phase 1 산출물 5종 (이중 렌더링 정합)
 deliverables:
-  - file: "inventory.json"
-    purpose: "AI 눈 — 모듈 인벤토리 + 메타 + 18+ preliminary finding signals"
-    schema: "schemas/inventory.schema.json ✅ (v1.1)"
+  - file: 'inventory.json'
+    purpose: 'AI 눈 — 모듈 인벤토리 + 메타 + 18+ preliminary finding signals'
+    schema: 'schemas/inventory.schema.json ✅ (v1.1)'
     confidence: 0.90
-  - file: "tree.md"
-    purpose: "사람 눈 — 디렉토리 구조 + PoC #02 차이 + 다음 phase 인계"
+  - file: 'tree.md'
+    purpose: '사람 눈 — 디렉토리 구조 + PoC #02 차이 + 다음 phase 인계'
     confidence: 0.95
-  - file: "stack-detection.md"
-    purpose: "사람 눈 — stack 자동 감지 + 아키텍처 후보 + cross-val 시그널"
+  - file: 'stack-detection.md'
+    purpose: '사람 눈 — stack 자동 감지 + 아키텍처 후보 + cross-val 시그널'
     confidence: 0.92
-  - file: "stats.json"
-    purpose: "결정적 통계 (LOC / decorator coverage / auth 적용 routes)"
+  - file: 'stats.json'
+    purpose: '결정적 통계 (LOC / decorator coverage / auth 적용 routes)'
     confidence: 0.98
-  - file: "_manifest.yml"
-    purpose: "본 매니페스트 (★ G7 첫 외부 사용)"
+  - file: '_manifest.yml'
+    purpose: '본 매니페스트 (G7 첫 외부 사용)'
     confidence: 0.95
 
 # ───────────────────────────────────────────────────
@@ -45,56 +45,62 @@ trust_level:
   current: 0.90
   current_step: 1
   validation_history:
-    - {step: "1차 작성", at: "2026-04-30", actor: "AI", tool_type: "ai_subagent", note: "메인 직접 raw fetch + grounded LLM"}
-  next_validation: "Phase 2 db 진입 시 entity → schema.sql 정합 검증 (G6 v1.2.2 sub-section b)"
+    - {
+        step: '1차 작성',
+        at: '2026-04-30',
+        actor: 'AI',
+        tool_type: 'ai_subagent',
+        note: '메인 직접 raw fetch + grounded LLM',
+      }
+  next_validation: 'Phase 2 db 진입 시 entity → schema.sql 정합 검증 (G6 v1.2.2 sub-section b)'
 
 tool_type_enum_reference:
-  ai_subagent: "AI sub-agent (Claude) — +5~15%p"
-  ai_persona_simulation: "★ AI persona Static Analyzer 흉내 — -5%p 패널티 (본 phase 미사용)"
-  automated_tool: "★ 자동 검증 도구 (drift-validator / decision-table-validator) — Phase 4.5 적용"
-  real_static_tool: "★ 진짜 외부 도구 (typescript-eslint / Semgrep / OSV-Scanner) — Sprint 5 carry-over (환경 부재)"
-  property_test: "Property test 실행 — 본 phase 미사용"
-  human_review: "사람 도메인 전문가 — 본 phase 미사용"
-  formal_proof: "TLA+ / Coq — scope 아웃"
+  ai_subagent: 'AI sub-agent (Claude) — +5~15%p'
+  ai_persona_simulation: 'AI persona Static Analyzer 흉내 — -5%p 패널티 (본 phase 미사용)'
+  automated_tool: '자동 검증 도구 (drift-validator / decision-table-validator) — Phase 4.5 적용'
+  real_static_tool: '진짜 외부 도구 (typescript-eslint / Semgrep / OSV-Scanner) — Sprint 5 carry-over (환경 부재)'
+  property_test: 'Property test 실행 — 본 phase 미사용'
+  human_review: '사람 도메인 전문가 — 본 phase 미사용'
+  formal_proof: 'TLA+ / Coq — scope 아웃'
 
 # Cross-validation
 cross_validation:
   performed: false
-  note: "Phase 1 명세 §3.7 — Phase 1 cross-validation 의무 X (Phase 4.5+ 부터). 단 sub-agent 생략 정직 표기."
+  note: 'Phase 1 명세 §3.7 — Phase 1 cross-validation 의무 X (Phase 4.5+ 부터). 단 sub-agent 생략 정직 표기.'
   simulation_only: false
 
 # 입력
 inputs:
-  - source: "source/nestjs-realworld-example-app"
-    type: "source_code"
+  - source: 'source/nestjs-realworld-example-app'
+    type: 'source_code'
     files: 35
-    confidence_contribution: "+70%p"
-  - source: "source/nestjs-realworld-example-app/package.json"
-    type: "dependency_manifest"
-    confidence_contribution: "+10%p"
-  - source: "source/nestjs-realworld-example-app/ormconfig.json.example"
-    type: "orm_config"
-    confidence_contribution: "+5%p (-3%p partial 패널티)"
-  - source: "source/nestjs-realworld-example-app/tsconfig.json + nestconfig.json"
-    type: "build_config"
-    confidence_contribution: "+3%p"
+    confidence_contribution: '+70%p'
+  - source: 'source/nestjs-realworld-example-app/package.json'
+    type: 'dependency_manifest'
+    confidence_contribution: '+10%p'
+  - source: 'source/nestjs-realworld-example-app/ormconfig.json.example'
+    type: 'orm_config'
+    confidence_contribution: '+5%p (-3%p partial 패널티)'
+  - source: 'source/nestjs-realworld-example-app/tsconfig.json + nestconfig.json'
+    type: 'build_config'
+    confidence_contribution: '+3%p'
 
 # 알려진 한계 (ADR-009 §1.1 6 메커니즘)
 known_limitations:
-  - "★ Document agent fetch 일부 실패 (codebase.show / docs.nestjs.com SPA) — 메인 raw fetch 만 ground truth (메커니즘 #1 추출 한계)"
-  - "정체 레포 (코드 commit 2021-01) — NestJS 7 / TypeORM 0.2 / TS 3.8 (메커니즘 #5 drift)"
-  - "운영 DB 접근 부재 — schema.sql ground truth 추출 한계 (메커니즘 #3 SoT 함정 회피)"
-  - "test suite 부재 (1 spec 만) — 동작 검증 불가 (메커니즘 #1 + #5)"
-  - "external static tool 환경 부재 — 진짜 도구 단계 5 미달성 (★★★ no-simulation 정직)"
+  - 'Document agent fetch 일부 실패 (codebase.show / docs.nestjs.com SPA) — 메인 raw fetch 만 ground truth (메커니즘 #1 추출 한계)'
+  - '정체 레포 (코드 commit 2021-01) — NestJS 7 / TypeORM 0.2 / TS 3.8 (메커니즘 #5 drift)'
+  - '운영 DB 접근 부재 — schema.sql ground truth 추출 한계 (메커니즘 #3 SoT 함정 회피)'
+  - 'test suite 부재 (1 spec 만) — 동작 검증 불가 (메커니즘 #1 + #5)'
+  - 'external static tool 환경 부재 — 진짜 도구 단계 5 미달성 (no-simulation 정직)'
 
 # 결정적 처리 결과
 deterministic_results:
   raw_fetch:
-    main_agent: "35 TS 파일 + 5 config 파일 read + git log/branch 검증"
-    sub_agent_document: "(생략 — PoC #03 진입 research 흡수)"
-    sub_agent_case: "(생략)"
-    sub_agent_senior: "(생략 — Phase 3 부터 본격)"
-  module_count: 5  # Application + 4 sub
+    main_agent: '35 TS 파일 + 5 config 파일 read + git log/branch 검증'
+    sub_agent_document: '(생략 — PoC #03 진입 research 흡수)'
+    sub_agent_case: '(생략)'
+    sub_agent_senior: '(생략 — Phase 3 부터 본격)'
+  module_count: 5 # Application + 4 sub
   domain_module_count: 4
   controller_count: 5
   service_count: 4
@@ -106,175 +112,175 @@ deterministic_results:
 
 # 본 phase 핵심 결정 (Auto Mode 자율 적용)
 key_decisions:
-  - id: "DEC-PHASE1-PoC03-001"
-    title: "단일 NestJS module tree 분류 — Modular Monolith"
-    decision: "5 module / 4 domain (User/Article/Profile/Tag) + 1 root (Application). Hexagonal 분류 ❌ — Senior 위험 5 정합."
-    rationale: "별도 디렉토리 convention (core/application/infrastructure) 부재. NestJS Module = DI 경계."
+  - id: 'DEC-PHASE1-PoC03-001'
+    title: '단일 NestJS module tree 분류 — Modular Monolith'
+    decision: '5 module / 4 domain (User/Article/Profile/Tag) + 1 root (Application). Hexagonal 분류 ❌ — Senior 위험 5 정합.'
+    rationale: '별도 디렉토리 convention (core/application/infrastructure) 부재. NestJS Module = DI 경계.'
     auto_mode_applied: true
-  - id: "DEC-PHASE1-PoC03-002"
-    title: "TypeORM naming strategy = default (camelCase 보존)"
+  - id: 'DEC-PHASE1-PoC03-002'
+    title: 'TypeORM naming strategy = default (camelCase 보존)'
     decision: "SnakeNamingStrategy 적용 흔적 부재. entity 데코 명시적 name (@Entity('user'/'article'/'tag'/'follows') + Comment 만 default)."
-    rationale: "G6 v1.2.2 ORM sub-section (b) 정합 — Phase 2 schema 추출 시 적용."
+    rationale: 'G6 v1.2.2 ORM sub-section (b) 정합 — Phase 2 schema 추출 시 적용.'
     auto_mode_applied: true
-  - id: "DEC-PHASE1-PoC03-003"
-    title: "stack-detection 신뢰도 0.92 (정체 레포 / legacy 적합)"
-    decision: "NestJS 7 (현재 10.x) / TypeORM 0.2 (현재 0.3+) / TS 3.8 (현재 5.x). 정체 = legacy 분석 적합."
+  - id: 'DEC-PHASE1-PoC03-003'
+    title: 'stack-detection 신뢰도 0.92 (정체 레포 / legacy 적합)'
+    decision: 'NestJS 7 (현재 10.x) / TypeORM 0.2 (현재 0.3+) / TS 3.8 (현재 5.x). 정체 = legacy 분석 적합.'
     rationale: "본 방법론 = 'legacy → 형식 명세' 추출기. 정체 자체가 적합 시그널."
     auto_mode_applied: true
-  - id: "DEC-PHASE1-PoC03-004"
-    title: "Phase 3 architecture cap 0.85 (단일 module = PoC #02 0.65 대비 ↑)"
-    decision: "PoC #02 multi-module Hexagonal hybrid 0.65 cap 대비 단일 module = 분류 단순 + 모호성 ↓ → cap 0.85 추정."
-    rationale: "Phase 3 검증."
+  - id: 'DEC-PHASE1-PoC03-004'
+    title: 'Phase 3 architecture cap 0.85 (단일 module = PoC #02 0.65 대비 ↑)'
+    decision: 'PoC #02 multi-module Hexagonal hybrid 0.65 cap 대비 단일 module = 분류 단순 + 모호성 ↓ → cap 0.85 추정.'
+    rationale: 'Phase 3 검증.'
     auto_mode_applied: true
-  - id: "DEC-PHASE1-PoC03-005"
-    title: "preliminary finding signals 18+ → Phase 2~6 분배"
-    decision: "본 phase 신규 finding 정식 등록 보류 — Phase 별 검증 후 정식 등록. 단 inventory.json 의 preliminary_findings_signals[] 에 18 시그널 보존."
-    rationale: "PoC #02 의 phase-별 finding 등록 패턴 정합 + 5~15 건강 범위 내 등록."
+  - id: 'DEC-PHASE1-PoC03-005'
+    title: 'preliminary finding signals 18+ → Phase 2~6 분배'
+    decision: '본 phase 신규 finding 정식 등록 보류 — Phase 별 검증 후 정식 등록. 단 inventory.json 의 preliminary_findings_signals[] 에 18 시그널 보존.'
+    rationale: 'PoC #02 의 phase-별 finding 등록 패턴 정합 + 5~15 건강 범위 내 등록.'
     auto_mode_applied: true
 
 # 명세 §5 + plan §6 승인 게이트
 approval_gate:
-  - check: "inventory.json schema 검증 (inventory.schema.json 정합)"
-    status: "✅ deterministic + grounded"
-  - check: "이중 렌더링 정합 (.json + .md 동시 산출)"
-    status: "✅ inventory.json + tree.md + stack-detection.md + stats.json + _manifest.yml"
-  - check: "★ G7 meta-confidence.template.yaml 외부 사용 적합성"
+  - check: 'inventory.json schema 검증 (inventory.schema.json 정합)'
+    status: '✅ deterministic + grounded'
+  - check: '이중 렌더링 정합 (.json + .md 동시 산출)'
+    status: '✅ inventory.json + tree.md + stack-detection.md + stats.json + _manifest.yml'
+  - check: 'G7 meta-confidence.template.yaml 외부 사용 적합성'
     status: "✅ 본 _manifest.yml 적용 — finding 후보: tool_type 에 'main_agent' 항목 부재 (template 자체 finding) / cross_validation.note 필드 추가 필요"
-  - check: "★ G6 v1.2.2 ORM sub-section (b) TypeORM 외부 사용"
-    status: "✅ stack-detection.md + Phase 2 인계 — 적합. 다른 ORM 추가 시 sub-section 신설 가이드 정합."
-  - check: "Auto Mode 적용 결정 5건"
-    status: "✅ DEC-PHASE1-PoC03-001~005"
-  - check: "다음 phase 인계 사항 명시"
-    status: "✅ tree.md §5 + stack-detection.md §5"
+  - check: 'G6 v1.2.2 ORM sub-section (b) TypeORM 외부 사용'
+    status: '✅ stack-detection.md + Phase 2 인계 — 적합. 다른 ORM 추가 시 sub-section 신설 가이드 정합.'
+  - check: 'Auto Mode 적용 결정 5건'
+    status: '✅ DEC-PHASE1-PoC03-001~005'
+  - check: '다음 phase 인계 사항 명시'
+    status: '✅ tree.md §5 + stack-detection.md §5'
 
 # Phase 2 진입 시 인계 사항
 downstream_handoff:
-  - "5 entity → schema.sql 추출 (synchronize:true 자동 / G6 ORM sub-section (b) 적용)"
-  - "naming strategy = TypeORM default (camelCase 보존)"
-  - "DDL 파일 부재 — 운영 DB 접근 부재 → Phase 2 신뢰도 cap 적용 후보"
-  - "★ DB 제약 부재 검증: user (username/email UQ 부재) + article (slug UQ 부재) + follows (followerId/followingId FK 부재)"
-  - "★ tagList simple-array vs TagEntity 두 SoT — Phase 4 의미 검증"
+  - '5 entity → schema.sql 추출 (synchronize:true 자동 / G6 ORM sub-section (b) 적용)'
+  - 'naming strategy = TypeORM default (camelCase 보존)'
+  - 'DDL 파일 부재 — 운영 DB 접근 부재 → Phase 2 신뢰도 cap 적용 후보'
+  - 'DB 제약 부재 검증: user (username/email UQ 부재) + article (slug UQ 부재) + follows (followerId/followingId FK 부재)'
+  - 'tagList simple-array vs TagEntity 두 SoT — Phase 4 의미 검증'
   - "Comment entity @Entity() default — table 명 'comment' 자동 추정 검증"
 
 # Findings — 본 phase 신규 등록 (5~15 건강 범위)
 findings_phase:
   # Phase 1 에서 정식 등록할 수준의 finding 만 (deterministic + 강한 시그널)
-  - id: "F-118"
-    title: "★ JWT verify 3 곳 DRY 위반 + try/catch 부재 (auth.middleware:18 / user.decorator:14 / shared/base.controller:9)"
-    severity: "high"
-    proposed_fix: "@nestjs/passport 또는 Guards 패턴으로 통합 + JwtVerifyException catch → 401 응답"
-    status: "promoted"
-    cross_val_signal: "PoC #02 JWT 패턴과 다른 형태 — 변형 재현 후보 (AP-SECURITY-001)"
-  - id: "F-119"
-    title: "★ JWT 60일 expiry (user.service:103) — 너무 김"
-    severity: "medium"
-    proposed_fix: "15분 access token + refresh token 분리 또는 24시간 max"
-    status: "promoted"
-  - id: "F-120"
-    title: "★ DB UQ 부재 — UserEntity (username/email) 동시 ArticleEntity (slug) 동시 — App pre-check 1중 race-prone"
-    severity: "critical"
-    proposed_fix: "TypeORM @Column 에 unique:true 추가 + race window 처리 (DataIntegrityViolation catch)"
-    status: "promoted"
-    cross_val_signal: "★★ PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (PoC #02 = 2중 / PoC #03 = 1중)"
-  - id: "F-121"
-    title: "★ FollowsEntity FK 제약 부재 (followerId/followingId 단순 number column)"
-    severity: "high"
-    proposed_fix: "@ManyToOne UserEntity 관계 추가 + cascade 정의"
-    status: "promoted"
-    cross_val_signal: "PoC #02 user_follow JPA @ManyToOne 와 본질적 차이"
-  - id: "F-122"
-    title: "★ TagEntity 미사용 — insert 코드 부재 / dead code 가능성"
-    severity: "medium"
-    proposed_fix: "TagService.create / Article 생성 시 tag 연결 로직 추가 또는 TagEntity 제거"
-    status: "candidate"
-  - id: "F-123"
-    title: "★ ArticleEntity.tagList (simple-array) vs TagEntity 두 SoT — 의미 모순"
-    severity: "medium"
-    proposed_fix: "Phase 4 도메인 의미 결정 — tagList 통합 또는 TagEntity 제거"
-    status: "candidate"
-  - id: "F-124"
-    title: "★ Article.comments eager:true — N+1 위험"
-    severity: "medium"
-    proposed_fix: "lazy loading + Pageable / 별도 endpoint"
-    status: "promoted"
-    cross_val_signal: "★ PoC #02 F-051 (Article EAGER + Specification HHH000104) cross-val 재현"
-  - id: "F-125"
-    title: "★ slugify random suffix (article.service.slugify) — slug unique 회피 우회"
-    severity: "low"
-    proposed_fix: "DB UQ + 충돌 시 retry 또는 명시적 slug 입력"
-    status: "promoted"
-    cross_val_signal: "★ PoC #02 F-053 titleToSlug 8 함정 cross-val 재현 (변형 — random suffix)"
-  - id: "F-126"
-    title: "★ Update Article 시 slug 미업데이트 (TODO 주석 명시)"
-    severity: "medium"
-    proposed_fix: "title 변경 시 slug 재생성 + URL redirect 또는 명시적 immutable 정책"
-    status: "promoted"
-  - id: "F-127"
-    title: "★ ValidationPipe 적용 controller 일관성 결여 — UserController 만"
-    severity: "medium"
-    proposed_fix: "main.ts 에 app.useGlobalPipes(new ValidationPipe()) 적용"
-    status: "promoted"
-  - id: "F-128"
-    title: "★ class-validator 데코 coverage 12% (6/50+) — DTO 4종 + entity 6종 데코 0개"
-    severity: "high"
-    proposed_fix: "필수 BR 데코 추가 (UpdateUserDto / CreateArticleDto / CreateCommentDto / 모든 entity)"
-    status: "promoted"
-    cross_val_signal: "★ Senior 위험 3 — class-validator 가 DTO 단독이라는 가정조차 부분적"
-  - id: "F-129"
-    title: "★ swagger 데코 coverage 불균형 — ArticleController 만 풀세트"
-    severity: "medium"
-    proposed_fix: "User/Profile/Tag 도 @ApiOperation/@ApiResponse 추가"
-    status: "promoted"
-    cross_val_signal: "Senior 위험 6 정합 — silent 빈약 위험"
-  - id: "F-130"
-    title: "★ AuthMiddleware 사용 (legacy) — 현재 NestJS 권장 = Guards"
-    severity: "low"
-    proposed_fix: "@UseGuards(JwtAuthGuard) 패턴 — passport-jwt 통합"
-    status: "candidate"
-  - id: "F-131"
-    title: "★ shared/base.controller.ts dead code 가능성 (사용처 grep 부재)"
-    severity: "low"
-    proposed_fix: "삭제 또는 실제 사용 controller 명시"
-    status: "candidate"
-  - id: "F-132"
-    title: "★ G7 meta-confidence template 적용 시 발견 — tool_type enum 에 'main_agent' 항목 부재"
-    severity: "low"
+  - id: 'F-118'
+    title: 'JWT verify 3 곳 DRY 위반 + try/catch 부재 (auth.middleware:18 / user.decorator:14 / shared/base.controller:9)'
+    severity: 'high'
+    proposed_fix: '@nestjs/passport 또는 Guards 패턴으로 통합 + JwtVerifyException catch → 401 응답'
+    status: 'promoted'
+    cross_val_signal: 'PoC #02 JWT 패턴과 다른 형태 — 변형 재현 후보 (AP-SECURITY-001)'
+  - id: 'F-119'
+    title: 'JWT 60일 expiry (user.service:103) — 너무 김'
+    severity: 'medium'
+    proposed_fix: '15분 access token + refresh token 분리 또는 24시간 max'
+    status: 'promoted'
+  - id: 'F-120'
+    title: 'DB UQ 부재 — UserEntity (username/email) 동시 ArticleEntity (slug) 동시 — App pre-check 1중 race-prone'
+    severity: 'critical'
+    proposed_fix: 'TypeORM @Column 에 unique:true 추가 + race window 처리 (DataIntegrityViolation catch)'
+    status: 'promoted'
+    cross_val_signal: 'PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (PoC #02 = 2중 / PoC #03 = 1중)'
+  - id: 'F-121'
+    title: 'FollowsEntity FK 제약 부재 (followerId/followingId 단순 number column)'
+    severity: 'high'
+    proposed_fix: '@ManyToOne UserEntity 관계 추가 + cascade 정의'
+    status: 'promoted'
+    cross_val_signal: 'PoC #02 user_follow JPA @ManyToOne 와 본질적 차이'
+  - id: 'F-122'
+    title: 'TagEntity 미사용 — insert 코드 부재 / dead code 가능성'
+    severity: 'medium'
+    proposed_fix: 'TagService.create / Article 생성 시 tag 연결 로직 추가 또는 TagEntity 제거'
+    status: 'candidate'
+  - id: 'F-123'
+    title: 'ArticleEntity.tagList (simple-array) vs TagEntity 두 SoT — 의미 모순'
+    severity: 'medium'
+    proposed_fix: 'Phase 4 도메인 의미 결정 — tagList 통합 또는 TagEntity 제거'
+    status: 'candidate'
+  - id: 'F-124'
+    title: 'Article.comments eager:true — N+1 위험'
+    severity: 'medium'
+    proposed_fix: 'lazy loading + Pageable / 별도 endpoint'
+    status: 'promoted'
+    cross_val_signal: 'PoC #02 F-051 (Article EAGER + Specification HHH000104) cross-val 재현'
+  - id: 'F-125'
+    title: 'slugify random suffix (article.service.slugify) — slug unique 회피 우회'
+    severity: 'low'
+    proposed_fix: 'DB UQ + 충돌 시 retry 또는 명시적 slug 입력'
+    status: 'promoted'
+    cross_val_signal: 'PoC #02 F-053 titleToSlug 8 함정 cross-val 재현 (변형 — random suffix)'
+  - id: 'F-126'
+    title: 'Update Article 시 slug 미업데이트 (TODO 주석 명시)'
+    severity: 'medium'
+    proposed_fix: 'title 변경 시 slug 재생성 + URL redirect 또는 명시적 immutable 정책'
+    status: 'promoted'
+  - id: 'F-127'
+    title: 'ValidationPipe 적용 controller 일관성 결여 — UserController 만'
+    severity: 'medium'
+    proposed_fix: 'main.ts 에 app.useGlobalPipes(new ValidationPipe()) 적용'
+    status: 'promoted'
+  - id: 'F-128'
+    title: 'class-validator 데코 coverage 12% (6/50+) — DTO 4종 + entity 6종 데코 0개'
+    severity: 'high'
+    proposed_fix: '필수 BR 데코 추가 (UpdateUserDto / CreateArticleDto / CreateCommentDto / 모든 entity)'
+    status: 'promoted'
+    cross_val_signal: 'Senior 위험 3 — class-validator 가 DTO 단독이라는 가정조차 부분적'
+  - id: 'F-129'
+    title: 'swagger 데코 coverage 불균형 — ArticleController 만 풀세트'
+    severity: 'medium'
+    proposed_fix: 'User/Profile/Tag 도 @ApiOperation/@ApiResponse 추가'
+    status: 'promoted'
+    cross_val_signal: 'Senior 위험 6 정합 — silent 빈약 위험'
+  - id: 'F-130'
+    title: 'AuthMiddleware 사용 (legacy) — 현재 NestJS 권장 = Guards'
+    severity: 'low'
+    proposed_fix: '@UseGuards(JwtAuthGuard) 패턴 — passport-jwt 통합'
+    status: 'candidate'
+  - id: 'F-131'
+    title: 'shared/base.controller.ts dead code 가능성 (사용처 grep 부재)'
+    severity: 'low'
+    proposed_fix: '삭제 또는 실제 사용 controller 명시'
+    status: 'candidate'
+  - id: 'F-132'
+    title: "G7 meta-confidence template 적용 시 발견 — tool_type enum 에 'main_agent' 항목 부재"
+    severity: 'low'
     proposed_fix: "templates/meta-confidence.template.yaml 의 tool_type_enum 에 'main_agent' (메인 agent 직접 read) 추가 또는 'ai_subagent' 가 main 도 포괄함을 명시"
-    status: "candidate"
-    note: "★ 본 PoC #03 가 v1.2.2 template 외부 검증 → finding (재귀적 자가 검증)"
+    status: 'candidate'
+    note: '본 PoC #03 가 v1.2.2 template 외부 검증 → finding (재귀적 자가 검증)'
 
 # 누적 통계
 cumulative_statistics:
-  poc_total: 15        # F-118~F-132 (15건 — 5~15 건강 범위 ★ 정합)
-  poc_promoted: 9      # F-118 / F-119 / F-120 / F-121 / F-124 / F-125 / F-126 / F-127 / F-128 / F-129
-  poc_candidate: 5     # F-122 / F-123 / F-130 / F-131 / F-132
+  poc_total: 15 # F-118~F-132 (15건 — 5~15 건강 범위 정합)
+  poc_promoted: 9 # F-118 / F-119 / F-120 / F-121 / F-124 / F-125 / F-126 / F-127 / F-128 / F-129
+  poc_candidate: 5 # F-122 / F-123 / F-130 / F-131 / F-132
   poc_deferred: 0
   poc_closed: 0
   poc_rejected: 0
-  cumulative_total: 132  # PoC #01 33 + PoC #02 43 + Sprint 1.5/2/3/4 (Phase 4.5) 30 + Sprint 4 11 + PoC #03 Phase 1 15
+  cumulative_total: 132 # PoC #01 33 + PoC #02 43 + Sprint 1.5/2/3/4 (Phase 4.5) 30 + Sprint 4 11 + PoC #03 Phase 1 15
   threshold_status: |
     F-021 임계 132건 (20+ "명세 자체 부실 의심" 영역 깊이 진입).
     단 비중 분석:
     - PoC #03 Phase 1 신규 15건 = 5~15 건강 상한
-    - Senior 위험 6건 중 3건 사전 차단 (★ Phase 1 검증 — 위험 3/5/6 수치화)
-    - cross-val 시그널 강함 (F-120 ★★ isomorphic / F-124 / F-125)
-    - ★ F-132 = G7 template 자가 검증 finding (메타 finding 누적 패턴)
+    - Senior 위험 6건 중 3건 사전 차단 (Phase 1 검증 — 위험 3/5/6 수치화)
+    - cross-val 시그널 강함 (F-120 isomorphic / F-124 / F-125)
+    - F-132 = G7 template 자가 검증 finding (메타 finding 누적 패턴)
     → §8.1 강제 통과 — PoC #03 Phase 2 즉시 진입 권고.
 
 # 본 phase KPI 평가
 phase_kpi:
-  - "✅ finding 15건 신규 (5~15 건강 범위 정합 / 상한)"
-  - "✅ inventory.json schema 정합 (deterministic 영역만)"
-  - "✅ DEC-PHASE1-PoC03-001~005 Auto Mode 적용"
-  - "★ ★★ F-120 isomorphic + 더 나쁜 — PoC #02 AP-DOMAIN-002 cross-val 강한 권위"
-  - "★ F-124 / F-125 cross-val 재현 — PoC #02 F-051 / F-053 정합"
-  - "★ F-132 메타 finding — G7 template 자가 검증 (재귀적)"
-  - "✅ G6 / G7 첫 외부 사용 — 적합성 확인 + 미세 보강 후보 (F-132)"
-  - "★★★ no-simulation 정합 — sub-agent 생략 정직 표기 + external static tool 환경 부재 정직 표기"
+  - '✅ finding 15건 신규 (5~15 건강 범위 정합 / 상한)'
+  - '✅ inventory.json schema 정합 (deterministic 영역만)'
+  - '✅ DEC-PHASE1-PoC03-001~005 Auto Mode 적용'
+  - 'F-120 isomorphic + 더 나쁜 — PoC #02 AP-DOMAIN-002 cross-val 강한 권위'
+  - 'F-124 / F-125 cross-val 재현 — PoC #02 F-051 / F-053 정합'
+  - 'F-132 메타 finding — G7 template 자가 검증 (재귀적)'
+  - '✅ G6 / G7 첫 외부 사용 — 적합성 확인 + 미세 보강 후보 (F-132)'
+  - 'no-simulation 정합 — sub-agent 생략 정직 표기 + external static tool 환경 부재 정직 표기'
 
 # 다음 단계
 next_actions:
-  - "Phase 2 (db) 진입 — schema.sql 추출 (synchronize:true 자동) + G6 v1.2.2 ORM sub-section (b) 본격 적용"
-  - "Phase 2 신뢰도 cap 검토 (운영 DB 부재 -10%p 후보)"
-  - "F-120 critical 격상 검증 (Phase 2 schema 확인 시 DB UQ 부재 확정)"
-  - "F-118 high cross-val (PoC #02 JWT 패턴과 변형 재현 분류)"
+  - 'Phase 2 (db) 진입 — schema.sql 추출 (synchronize:true 자동) + G6 v1.2.2 ORM sub-section (b) 본격 적용'
+  - 'Phase 2 신뢰도 cap 검토 (운영 DB 부재 -10%p 후보)'
+  - 'F-120 critical 격상 검증 (Phase 2 schema 확인 시 DB UQ 부재 확정)'
+  - 'F-118 high cross-val (PoC #02 JWT 패턴과 변형 재현 분류)'

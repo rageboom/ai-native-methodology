@@ -43,7 +43,7 @@
     },
     {
       "id": "SCN-CAR-COST-001-likely-bug",
-      "name": "★ likely bug — cross-DB transaction 보장 ❌ (eventual consistency)",
+      "name": "likely bug — cross-DB transaction 보장 ❌ (eventual consistency)",
       "tags": ["@bug", "@cross-db", "@AP-DB-003", "@AP-EXT-001"],
       "given": {
         "session_user": "admin_user_id",

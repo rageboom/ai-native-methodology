@@ -23,6 +23,7 @@ ADR-FE-001 (FE 추출기 가정) 은 spectrum Tier 1~4 cover 를 명시했지만
 ### 1.1 Strangler Fig Pattern 인용
 
 Martin Fowler, "StranglerFigApplication" (2004):
+
 > "Gradually create a new system around the edges of the old, letting it grow slowly over several years until the old system is strangled."
 
 → legacy spectrum (Tier 2/3/4) 의 마이그레이션은 **rewrite 가 아니라 strangle** (점진적 대체).
@@ -35,14 +36,14 @@ Martin Fowler, "StranglerFigApplication" (2004):
 
 **Tier 2/3/4 추출 정책 + Strangler Fig Pattern 채택 + Tier 4 Stage 6 ADR-FE-004 예외.**
 
-### 2.1 Tier 별 추출 정책 (★ 핵심)
+### 2.1 Tier 별 추출 정책 (핵심)
 
-| Tier | 추출 가능 | LLM 의존도 | 본체 산출물 | legacy 산출물 |
-|---|---|---|---|---|
-| **Tier 1 (Modern SPA)** | 7대 7/7 | 낮음 | 모두 | (해당 ❌) |
-| **Tier 2 (jQuery legacy)** | 5/7 (state-map / visual 부분) | 중 | ui-spec (legacy_widget) / antipatterns | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
-| **Tier 3 (Vanilla JS)** | 4/7 | 높음 | ui-spec / antipatterns | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
-| **Tier 4 (server-side template)** | 3/7 | 높음 | ★ ADR-FE-004 BE/FE 통합 산출 (Stage 6) | legacy-spectrum (분리 detection 만) |
+| Tier                              | 추출 가능                     | LLM 의존도 | 본체 산출물                            | legacy 산출물                                                    |
+| --------------------------------- | ----------------------------- | ---------- | -------------------------------------- | ---------------------------------------------------------------- |
+| **Tier 1 (Modern SPA)**           | 7대 7/7                       | 낮음       | 모두                                   | (해당 ❌)                                                        |
+| **Tier 2 (jQuery legacy)**        | 5/7 (state-map / visual 부분) | 중         | ui-spec (legacy_widget) / antipatterns | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
+| **Tier 3 (Vanilla JS)**           | 4/7                           | 높음       | ui-spec / antipatterns                 | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
+| **Tier 4 (server-side template)** | 3/7                           | 높음       | ADR-FE-004 BE/FE 통합 산출 (Stage 6)   | legacy-spectrum (분리 detection 만)                              |
 
 ### 2.2 Tier 2 (jQuery legacy) 추출 절차
 
@@ -59,11 +60,11 @@ detection_signals:
   - components: jQuery widget / plugin 단위 (LLM 추론 — level=legacy_widget)
   - design_tokens: Bootstrap 변수 (CSS / SCSS) — 신뢰도 ↓
   - user_flows: $(form).submit() / location.href / window.open 추적
-  - state_sources: ★ DOM state 비중 ↑ (input value / data-* attribute)
+  - state_sources: DOM state 비중 ↑ (input value / data-* attribute)
   - api_calls: $.ajax / $.get / $.post URL 매핑
 
 추출_미흡:
-  - state-map machine: 명시적 state machine 부재 (LLM 추론 ★ 신뢰도 0.50~0.65)
+  - state-map machine: 명시적 state machine 부재 (LLM 추론 신뢰도 0.50~0.65)
   - visual-manifest: ✅ 동일 (Playwright 동등 적용)
   - scenarios: LLM 추론 의존도 ↑
 
@@ -85,16 +86,16 @@ detection_signals:
 추출_가능:
   - pages: HTML 파일 단위 (라우팅 부재 가능)
   - components: 모듈 단위 (level=legacy_widget 또는 legacy_template)
-  - state_sources: ★ DOM state 압도적 비중
+  - state_sources: DOM state 압도적 비중
 
 추출_미흡:
   - design_tokens: CSS 직접 — 신뢰도 0.30~0.40
   - api_calls: fetch / XMLHttpRequest 흩어짐 — LLM 추론 의무
 ```
 
-### 2.4 Tier 4 (server-side template) — ★ Stage 6 ADR-FE-004 정식 (resolved)
+### 2.4 Tier 4 (server-side template) — Stage 6 ADR-FE-004 정식 (resolved)
 
-> **★ Stage 6 종결 (2026-05-01)** — 본 §2.4 carry 종결. ADR-FE-004 §2.4 (Tier 4 통합 산출 절차 정식) + `methodology-spec/be-fe-separation.md` §5 정식 정의.
+> **Stage 6 종결 (2026-05-01)** — 본 §2.4 carry 종결. ADR-FE-004 §2.4 (Tier 4 통합 산출 절차 정식) + `methodology-spec/be-fe-separation.md` §5 정식 정의.
 
 ```yaml
 detection_signals:
@@ -102,7 +103,7 @@ detection_signals:
   - <%= %> / ${} / <%- %> 등 server-side 표현식
   - JSP request attribute / Thymeleaf model attribute
 
-★ 핵심: BE 와 통합 산출
+핵심: BE 와 통합 산출
   - 라우팅 = BE Spring MVC @RequestMapping (BE 영역)
   - 렌더링 = JSP (FE 영역)
   - 데이터 = BE controller 의 model attribute
@@ -113,7 +114,7 @@ detection_signals:
 
 ---
 
-## 3. Strangler Fig Pattern 적용 (★ migration-plan)
+## 3. Strangler Fig Pattern 적용 (migration-plan)
 
 ### 3.1 4 가지 strangle 접근
 
@@ -135,12 +136,12 @@ flowchart TB
     style M fill:#d4edda
 ```
 
-| 접근 | 적합 | 위험 |
-|---|---|---|
-| **page-by-page** | Tier 2/3 (페이지 단위 분리 명확) | 공통 layout / header drift |
-| **feature-by-feature** | Tier 1+2 혼재 (기능 단위 strangle) | feature 경계 모호 시 ↑ |
-| **side-by-side iframe** | Tier 4 / 사내 legacy | iframe a11y / 검색 SEO 손실 |
-| **edge proxy** | URL prefix 기반 / micro-frontend | 인프라 비용 ↑ |
+| 접근                    | 적합                               | 위험                        |
+| ----------------------- | ---------------------------------- | --------------------------- |
+| **page-by-page**        | Tier 2/3 (페이지 단위 분리 명확)   | 공통 layout / header drift  |
+| **feature-by-feature**  | Tier 1+2 혼재 (기능 단위 strangle) | feature 경계 모호 시 ↑      |
+| **side-by-side iframe** | Tier 4 / 사내 legacy               | iframe a11y / 검색 SEO 손실 |
+| **edge proxy**          | URL prefix 기반 / micro-frontend   | 인프라 비용 ↑               |
 
 ### 3.2 strangler-migration-plan.md (산출물)
 
@@ -162,17 +163,17 @@ strangler_plan:
 
 ---
 
-## 4. bootstrap 데이터 흐름 (★ legacy 산출물 sub)
+## 4. bootstrap 데이터 흐름 (legacy 산출물 sub)
 
 Tier 2/3/4 의 **초기 데이터 진실 source** 추출:
 
-| 방식 | 출처 | 추출 |
-|---|---|---|
+| 방식                       | 출처                                                        | 추출              |
+| -------------------------- | ----------------------------------------------------------- | ----------------- |
 | `window.__INITIAL_STATE__` | server render (Next.js / Nuxt SSR / 직접 inline `<script>`) | inline JSON parse |
-| `data-*` attribute | HTML attribute (jQuery 패턴) | DOM scan |
-| AJAX fetch on load | `$(document).ready` 시 fetch | network 호출 추적 |
-| WebSocket on load | bootstrap WebSocket connect | endpoint 추적 |
-| JSP request attribute | `<%=request.getAttribute()%>` | ★ Tier 4 (BE 통합) |
+| `data-*` attribute         | HTML attribute (jQuery 패턴)                                | DOM scan          |
+| AJAX fetch on load         | `$(document).ready` 시 fetch                                | network 호출 추적 |
+| WebSocket on load          | bootstrap WebSocket connect                                 | endpoint 추적     |
+| JSP request attribute      | `<%=request.getAttribute()%>`                               | Tier 4 (BE 통합)  |
 
 → `bootstrap-data-flow.md` 산출물 (legacy-spectrum 의 sub).
 
@@ -196,7 +197,7 @@ Tier 2/3/4 의 **초기 데이터 진실 source** 추출:
 ### 5.3 무시한 다른 옵션
 
 - **Tier 2/3/4 통합 정책** — 거부. Tier 별 추출 가능성 / detection signal / 함정 모두 다름. 통합 시 산출물 의미 손실.
-- **rewrite-only 권고** (strangler ❌) — 거부. 산업 사례 (Fowler / Sam Newman) 모두 strangle 권고. rewrite 는 비즈니스 위험 ★★★.
+- **rewrite-only 권고** (strangler ❌) — 거부. 산업 사례 (Fowler / Sam Newman) 모두 strangle 권고. rewrite 는 비즈니스 위험 .
 - **Tier 4 v1.4 정식 처리** — 거부. BE/FE 분리 default 깸. Stage 6 ADR-FE-004 정합 깸.
 
 ---
@@ -221,21 +222,25 @@ Tier 2/3/4 의 **초기 데이터 진실 source** 추출:
 ## 7. 참조
 
 ### ADR
+
 - ADR-001 (사상적 기반)
 - ADR-FE-001 (FE 추출기 가정 — 짝)
 - ADR-FE-002 (이중 렌더링 FE 적용)
 - ADR-FE-004 (BE/FE 분리 — Tier 4 예외 / Stage 6)
 
 ### DEC
+
 - DEC-2026-05-01-v1.4-Stage-1-research-종결 (legacy 챕터)
 - DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G2-2 legacy Tier 1~4)
 - DEC-2026-05-01-v1.4-Stage-3-1-종결 (Stage 3-1 carry)
 
 ### Sources
+
 - Martin Fowler, "StranglerFigApplication" (2004): https://martinfowler.com/bliki/StranglerFigApplication.html
 - Sam Newman, "Monolith to Microservices" (O'Reilly, 2019) — Strangler pattern 챕터
 
 ### Memory
+
 - `project_v140_fe_track.md`
 
 **End of ADR-FE-003.**

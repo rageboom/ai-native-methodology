@@ -1,5 +1,5 @@
 {
-  "$comment": "★ invalid fixture — sql_id 누락 record",
+  "$comment": "invalid fixture — sql_id 누락 record",
   "meta_confidence": {
     "generated_at": "2026-05-08T00:00:00Z",
     "confidence": 0.85,
@@ -14,7 +14,7 @@
   "inventory": [
     {
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ sql_id 누락 case",
+      "business_meaning": "sql_id 누락 case",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent",
       "confidence": 0.80

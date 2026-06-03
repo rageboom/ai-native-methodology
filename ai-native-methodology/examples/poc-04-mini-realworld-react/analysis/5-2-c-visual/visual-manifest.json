@@ -1,5 +1,5 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/visual-manifest.schema.json (★ Stage 3-1)",
+  "$schema_origin": "ai-native-methodology/schemas/visual-manifest.schema.json ( Stage 3-1)",
   "meta": {
     "poc_id": "poc-04-mini",
     "phase": "ui",
@@ -8,7 +8,7 @@
     "tool": "@playwright/test (chromium headless)",
     "tool_version": "1.49+",
     "target_url": "https://demo.realworld.io/",
-    "target_note": "★ demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 시각 산출 isomorphic)"
+    "target_note": " demo.realworld.io = RealWorld 운영 데모 사이트 (본 fork 와 동일 backend / 시각 산출 isomorphic)"
   },
   "snapshots": [
     {

@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ ★ v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 + DEC-2026-05-06-harness-호칭-엄밀화 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상. ★ ★ ★ harness_status 필드 = 호칭 엄밀화 (DEC-2026-05-06-harness-호칭-엄밀화 정합) — scaffolding / harness-incomplete / harness-complete enum.",
+  "$comment": "v2.0 SDLC 4단계 chain harness 통합 SSOT (master plan §B 정합). DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-06-round-trip-부분-허용 + DEC-2026-05-06-cooling-off-정책-폐기 + DEC-2026-05-06-harness-호칭-엄밀화 정합. analysis stage = sub_flow (analysis.phase-flow.json 흡수). chain 1~4 stage 별 sub_flow + 4 gate + revisit_edges + cross_cutting validators. drift-validator phase-flow 비교기 자동 검증 대상. harness_status 필드 = 호칭 엄밀화 (DEC-2026-05-06-harness-호칭-엄밀화 정합) — scaffolding / harness-incomplete / harness-complete enum.",
   "id": "sdlc-4stage-flow",
   "version": "2.0.0-rc1",
   "harness_status": "harness-validated",
@@ -9,17 +9,17 @@
     "transitioned_at": "2026-05-06",
     "transitioned_by": "DEC-2026-05-06-sub-plan-6-종결 + §8.1 strict 7/7 + ≥ 2 PoC corroboration (PoC #05 + PoC #03 retrofit)",
     "transitions": {
-      "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증) — ★ ★ ★ ACHIEVED 2026-05-06",
+      "scaffolding -> harness-complete": "sub-plan-5 종결 (5 요소 모두 보유 입증) — ACHIEVED 2026-05-06",
       "harness-complete -> harness-validated": "sub-plan-6 종결 (PoC #05 e2e cycle pass + §8.1 strict 7/7)"
     },
     "five_required_elements": [
       { "id": 1, "name": "Driver / Orchestrator", "status": "complete", "implementation_target": "tools/chain-driver/ (workspace 12번째 / cli + 6 module / 60 unit test)" },
       { "id": 2, "name": "State 영속", "status": "complete", "implementation_target": ".aimd/state.json + schemas/state.schema.json + atomic write CAS (state-store.js)" },
       { "id": 3, "name": "Mechanical gate", "status": "complete", "implementation_target": "trio enforcement: state.blocked + cli exit 2 + PreToolUse permissionDecision=deny (gate-eval.js + hooks-bridge.js)" },
-      { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "complete", "implementation_target": "hooks/hooks.json UserPromptSubmit + PreToolUse (★ D21' suppressOutput=true / additionalContext 차단 문구)" },
+      { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "complete", "implementation_target": "hooks/hooks.json UserPromptSubmit + PreToolUse (D21' suppressOutput=true / additionalContext 차단 문구)" },
       { "id": 5, "name": "Chain-revisit detector", "status": "complete", "implementation_target": "tools/chain-driver/src/revisit-detect.js (git diff --numstat + LOC threshold + ignore-globs)" }
     ],
-    "simulation_risk_until_complete": "★ ★ ★ harness-complete 도달 — mechanical gate trio + D21' suppressOutput 으로 LLM 양심 의존 → 코드 enforcement 전환 완료. (sub-plan-6 의 PoC corroboration 으로 §8.1 strict 입증 잔존.)"
+    "simulation_risk_until_complete": "harness-complete 도달 — mechanical gate trio + D21' suppressOutput 으로 LLM 양심 의존 → 코드 enforcement 전환 완료. (sub-plan-6 의 PoC corroboration 으로 §8.1 strict 입증 잔존.)"
   },
   "stages": [
     {
@@ -40,7 +40,7 @@
       "depends_on": ["analysis"],
       "sub_flow": "discovery.phase-flow.json",
       "outputs_summary": ["discovery-spec.json (deliverable 17 / discovery 산출물)"],
-      "introduced": "v2.0 (★ v9.0 planning→discovery 개칭 + 입력 어댑터 4종 확장 / DEC-2026-05-21)",
+      "introduced": "v2.0 (v9.0 planning→discovery 개칭 + 입력 어댑터 4종 확장 / DEC-2026-05-21)",
       "gate": "#1",
       "user_review_pct": "≤ 20",
       "ai_automation_pct": "≥ 80"
@@ -64,7 +64,7 @@
       "depends_on": ["spec"],
       "sub_flow": "plan.phase-flow.json",
       "outputs_summary": ["task-plan.json (deliverable 22 / task 분해 + 의존성 + ADR + NFR allocation + risk + rollback)"],
-      "introduced": "★ v9.0 신설 (spec ↔ test 사이 HOW 단계 / DEC-2026-05-21) — ★ v10.0.0 MAJOR (Phase 4-4') hard gate #3 본격 진입 (v9.3.0 placeholder → 본격)",
+      "introduced": "v9.0 신설 (spec ↔ test 사이 HOW 단계 / DEC-2026-05-21) — v10.0.0 MAJOR (Phase 4-4') hard gate #3 본격 진입 (v9.3.0 placeholder → 본격)",
       "gate": "#3",
       "user_review_pct": "≤ 20",
       "ai_automation_pct": "≥ 80"
@@ -106,7 +106,7 @@
     { "from": "implement", "to": "plan",      "trigger": "revisit:plan"      },
     { "from": "implement", "to": "spec",      "trigger": "revisit:spec"      },
     { "from": "implement", "to": "discovery", "trigger": "revisit:discovery" },
-    { "from": "implement", "to": "analysis",  "trigger": "revisit:analysis (★ rare / 가장 큰 cycle)" }
+    { "from": "implement", "to": "analysis",  "trigger": "revisit:analysis (rare / 가장 큰 cycle)" }
   ],
   "gates": [
     {
@@ -118,9 +118,9 @@
     {
       "id": "#2",
       "stage": "spec",
-      "validators": ["chain-coverage-validator", "chain-coverage-validator --antipatterns (★ F-SIM-001 ap-coverage lane)", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
+      "validators": ["chain-coverage-validator", "chain-coverage-validator --antipatterns (F-SIM-001 ap-coverage lane)", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
       "conditional_validators": ["spectral-runner (OpenAPI)"],
-      "$comment_conditional": "★ F-S07 (S10/S14) — spectral-runner 는 OpenAPI 존재 시만 조건부 (cross_cutting.validators 에 등재 / gate-eval REQUIRED·gate matrix 비포함 = 정당 차이). check26 conditional allowlist.",
+      "$comment_conditional": "F-S07 (S10/S14) — spectral-runner 는 OpenAPI 존재 시만 조건부 (cross_cutting.validators 에 등재 / gate-eval REQUIRED·gate matrix 비포함 = 정당 차이). check26 conditional allowlist.",
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
@@ -134,7 +134,7 @@
       "stage": "test",
       "validators": ["test-impl-pass-validator (expected: all_fail)", "spec-test-link-validator", "schema-validator", "lint-no-simulation (chain-strict)"],
       "scenario_expected": { "S1": "all_fail", "greenfield": "all_fail", "S2": "per_tc_outcome", "S3": "snapshot_green" },
-      "$comment_scenario": "★ SEED-3 fix (S2 / INSPECTION-2026-05-31-spec) — gate-eval.js SCENARIO_EXPECTED 미러 (use-scenario taxonomy / DEC-2026-05-30 + v11.11.0 characterization GREEN + augmentation RED 분리). gate-eval 이 코드 SSOT, 본 필드는 문서 정합.",
+      "$comment_scenario": "SEED-3 fix (S2 / INSPECTION-2026-05-31-spec) — gate-eval.js SCENARIO_EXPECTED 미러 (use-scenario taxonomy / DEC-2026-05-30 + v11.11.0 characterization GREEN + augmentation RED 분리). gate-eval 이 코드 SSOT, 본 필드는 문서 정합.",
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {
@@ -148,7 +148,7 @@
   "cross_cutting": {
     "no_simulation": {
       "policy": "DEC-2026-04-29-static-tool-실행-의무화",
-      "enforcement": ["lint-no-simulation (chain-strict)", "test-impl-pass-validator --allow-execute", "static-runner real plugin (★ 진짜 도구 7종)"]
+      "enforcement": ["lint-no-simulation (chain-strict)", "test-impl-pass-validator --allow-execute", "static-runner real plugin (진짜 도구 7종)"]
     },
     "double_rendering": {
       "policy": "ADR-008 v2 §10",
@@ -188,7 +188,7 @@
   },
   "release_eligibility": {
     "policy": "§8.1 strict 7/7",
-    "$comment": "★ F-SIM-011 (2026-05-18 v8.4.0): corroboration 강도(depth) 명시 — 권위 SLSA L1~L3 + CNCF graduation + OpenSSF Gold (F-015 Claim D / industry-aligned). ★ ★ ★ v8.14.0 (2026-05-23 / DEC-2026-05-23-fsim-005-corroboration-2-genuine): corroboration **type 3계층화** (Type 1 / Type 1.5 / Type 2) + fail_mode_distribution boolean 강제 — Senior REVISE-1 BLOCKER 흡수 paradigm 진화. dry_run_placeholder 는 corroboration count 제외 (F-SIM-005 fail_mode enum 정합 / Adzic SBE 10년 폐기 함정 직접 회피).",
+    "$comment": "F-SIM-011 (2026-05-18 v8.4.0): corroboration 강도(depth) 명시 — 권위 SLSA L1~L3 + CNCF graduation + OpenSSF Gold (F-015 Claim D / industry-aligned). v8.14.0 (2026-05-23 / DEC-2026-05-23-fsim-005-corroboration-2-genuine): corroboration **type 3계층화** (Type 1 / Type 1.5 / Type 2) + fail_mode_distribution boolean 강제 — Senior REVISE-1 BLOCKER 흡수 paradigm 진화. dry_run_placeholder 는 corroboration count 제외 (F-SIM-005 fail_mode enum 정합 / Adzic SBE 10년 폐기 함정 직접 회피).",
     "corroboration_depth_levels": {
       "L0_analysis_only": "analysis stage 만 — release_eligibility corroboration 자격 ❌",
       "L1_chain_3_complete": "chain 1~3 종결 (test-spec 산출 / 단 RED 강도 = 본 PoC 의 test_run_evidence.fail_mode 명시 의무)",
@@ -196,34 +196,34 @@
       "L3_full_traceability_green": "L2 + traceability-matrix 100% green + critical AP 무누락 (F-SIM-001 ap-coverage lane pass)"
     },
     "corroboration_type_levels": {
-      "$comment": "★ v8.14.0 신설 — Senior REVISE-1 BLOCKER 흡수 (research-fsim-005-corroboration-2.md §1.1) / paradigm 진화 / industry 권위 Waymo CarCraft+실도로 병렬 + Anthropic Bloom auto-eval + NIST/AISI 외부 eval + SWE-bench static/Live (격차 35~50%p)",
+      "$comment": "v8.14.0 신설 — Senior REVISE-1 BLOCKER 흡수 (research-fsim-005-corroboration-2.md §1.1) / paradigm 진화 / industry 권위 Waymo CarCraft+실도로 병렬 + Anthropic Bloom auto-eval + NIST/AISI 외부 eval + SWE-bench static/Live (격차 35~50%p)",
       "Type_1_self_run": "Claude self-run / same session / 외부 사용자 ❌ — Anthropic Bloom auto-eval 동형 / corroboration 자격 부분 (boolean ❌)",
-      "Type_1_5_user_dogfood": "본 user 가 별도 PoC 적용 / same plugin SSOT / 외부 사용자 ❌ — ★ Rust/GCC Stage 3 identity check 동형 / self-bootstrap proof 본격 / corroboration 자격 ✅ (boolean)",
-      "Type_2_external_user": "외부 사용자 / 외부 repo / 별도 Claude Code session — NIST/AISI 외부 pre-deployment eval 동형 / corroboration 자격 ✅ (boolean) / ★ deadline 없는 carry (OSS 채택 트리거 의존)"
+      "Type_1_5_user_dogfood": "본 user 가 별도 PoC 적용 / same plugin SSOT / 외부 사용자 ❌ — Rust/GCC Stage 3 identity check 동형 / self-bootstrap proof 본격 / corroboration 자격 ✅ (boolean)",
+      "Type_2_external_user": "외부 사용자 / 외부 repo / 별도 Claude Code session — NIST/AISI 외부 pre-deployment eval 동형 / corroboration 자격 ✅ (boolean) / deadline 없는 carry (OSS 채택 트리거 의존)"
     },
     "fail_mode_qualification": {
-      "$comment": "★ v8.14.0 신설 — Senior REVISE-3 흡수 / Adzic SBE 함정 직접 회피 / chain-coverage-validator validateFailModeDistribution (7번째 export / warn-only)",
+      "$comment": "v8.14.0 신설 — Senior REVISE-3 흡수 / Adzic SBE 함정 직접 회피 / chain-coverage-validator validateFailModeDistribution (7번째 export / warn-only)",
       "qualified_modes": ["compile_import_fail", "assertion_fail", "pending"],
       "excluded_modes": ["dry_run_placeholder"],
       "$comment_excluded": "dry_run_placeholder 가 1개라도 있으면 corroboration_qualified=false (boolean / 임계 ratio ❌). 30% 임계 ratchet = v+1 (≥ 2 PoC 실측 후 / §8.1 단일 PoC 함정 회피)"
     },
     "items": [
-      { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "PoC #05 (L3 / Type 1.5 / TypeScript+vitest / fail_mode=assertion_fail 2건) + PoC #14 (L3 / Type 1 / Python+pytest / fail_mode=assertion_fail 4건 / v8.4.0 도달)", "corroboration_strength_required": "L2_chain_4_GREEN", "corroboration_type_distribution": { "Type_1": 1, "Type_1_5": 1, "Type_2": 0 }, "current_corroboration_count_at_required_strength": 2, "qualified_count_excluding_type_1": 1, "p1_carry_resolved": "v8.4.0 (2026-05-18) — PoC #14 Type 1 partial / ★ v8.14.0 (DEC-2026-05-23) — PoC #05 Type 1.5 본격 (self-bootstrap proof single arm) + fail_mode_qualification.corroboration_qualified=true 양측 입증", "carry": "★ Type 1.5 second arm (poc-02 Spring Boot 3 = source empty 발견 / poc-03 NestJS chain 4 yellow / poc-04-mini React chain 4 yellow) = deadline 없는 carry / Type 2 (외부 사용자) = deadline 없는 carry. 두 carry 모두 commit-block 회피 꼼수 ❌ paradigm 정합" },
-      { "id": 2, "name": "진짜 도구 5종 물증 보존 (★ 각 PoC chain 4 GREEN 도달 의무)", "data_source": "test-impl-pass-validator (chain 3-4) — PoC #05 vitest + PoC #14 pytest 모두 fail_count=0 + result_hash sha256 정합 + fail_mode=assertion_fail / dry_run_placeholder=0건 / corroboration_qualified=true (양측)", "corroboration_requirement": "≥ 2 PoC 가 모두 chain 4 GREEN 도달 + test_pass_evidence.fail_count == 0 + fail_mode_distribution.corroboration_qualified=true (dry_run_placeholder 0건)", "current_corroboration_count_at_required_strength": 2, "fail_mode_qualification_boolean": true },
-      { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "13 chain validator + drift-check.yml + chain-check.yml (★ v8.14.0 — F-SIM-005 fail_mode_distribution lane 신설로 13종)" },
+      { "id": 1, "name": "≥ 2 PoC corroboration", "data_source": "PoC #05 (L3 / Type 1.5 / TypeScript+vitest / fail_mode=assertion_fail 2건) + PoC #14 (L3 / Type 1 / Python+pytest / fail_mode=assertion_fail 4건 / v8.4.0 도달)", "corroboration_strength_required": "L2_chain_4_GREEN", "corroboration_type_distribution": { "Type_1": 1, "Type_1_5": 1, "Type_2": 0 }, "current_corroboration_count_at_required_strength": 2, "qualified_count_excluding_type_1": 1, "p1_carry_resolved": "v8.4.0 (2026-05-18) — PoC #14 Type 1 partial / v8.14.0 (DEC-2026-05-23) — PoC #05 Type 1.5 본격 (self-bootstrap proof single arm) + fail_mode_qualification.corroboration_qualified=true 양측 입증", "carry": "Type 1.5 second arm (poc-02 Spring Boot 3 = source empty 발견 / poc-03 NestJS chain 4 yellow / poc-04-mini React chain 4 yellow) = deadline 없는 carry / Type 2 (외부 사용자) = deadline 없는 carry. 두 carry 모두 commit-block 회피 꼼수 ❌ paradigm 정합" },
+      { "id": 2, "name": "진짜 도구 5종 물증 보존 (각 PoC chain 4 GREEN 도달 의무)", "data_source": "test-impl-pass-validator (chain 3-4) — PoC #05 vitest + PoC #14 pytest 모두 fail_count=0 + result_hash sha256 정합 + fail_mode=assertion_fail / dry_run_placeholder=0건 / corroboration_qualified=true (양측)", "corroboration_requirement": "≥ 2 PoC 가 모두 chain 4 GREEN 도달 + test_pass_evidence.fail_count == 0 + fail_mode_distribution.corroboration_qualified=true (dry_run_placeholder 0건)", "current_corroboration_count_at_required_strength": 2, "fail_mode_qualification_boolean": true },
+      { "id": 3, "name": "drift / dmn / 신규 validator 0 violation", "data_source": "13 chain validator + drift-check.yml + chain-check.yml (v8.14.0 — F-SIM-005 fail_mode_distribution lane 신설로 13종)" },
       { "id": 4, "name": "모든 chain stage coverage ≥ 0.85", "data_source": "chain-coverage-validator + spec-test-link-validator + test-verify-coverage skill" },
       { "id": 5, "name": "ADR-CHAIN-001~004 + ADR-008/009/010 v2 등재", "data_source": "docs/adr/ (sub-plan-1~3 종결)" },
       { "id": 6, "name": "traceability-matrix 100% greenness", "data_source": "PoC #05 (L3 — sub-plan-6) + PoC #14 (L3 — 2026-05-18 / 4 rows / 4 green / 0 yellow / 0 red)", "corroboration_strength_required": "L3_full_traceability_green", "current_corroboration_count_at_required_strength": 2 },
       { "id": 7, "name": "sample legacy 1 cycle e2e pass (1 BR + 1 UC + 1 TC + 1 IMPL)", "data_source": "PoC #05 (L3 / Type 1.5) + PoC #14 (L3 / Type 1 / 2 entity / 5 UC / 4 AC / 4 TC / 4 IMPL)", "corroboration_strength_required": "L2_chain_4_GREEN", "current_corroboration_count_at_required_strength": 2 }
     ],
-    "self_consistency_note": "★ ★ ★ ★ ★ F-SIM-011 패러독스 진정 해소 (v8.14.0 / DEC-2026-05-23-fsim-005-corroboration-2-genuine): Type 분류 3계층화 paradigm 본격 진화 + fail_mode_qualification boolean 강제. v8.4.0 (2026-05-18) = PoC #14 Type 1 partial 달성 (Claude self-run / Python+pytest / 패러독스 부분 해소). v8.14.0 = PoC #05 Type 1.5 single arm 본격 (TypeScript+vitest / 본 user 별도 PoC 적용 / Rust/GCC Stage 3 identity check 동형 / self-bootstrap proof 부분 달성) + dry_run_placeholder=0 양측 입증 (Adzic SBE 10년 폐기 함정 직접 회피 / fail_mode_qualification.corroboration_qualified=true). ★ ★ paradigm 정합 정직 표기 (Senior REVISE-2 사실 검증 보강 / 2026-05-23 사용자 결단 옵션 α): Type 1.5 second arm = ★ carry (poc-02 source empty 발견 / poc-03+poc-04-mini chain 4 yellow / deadline 없음). Type 2 (외부 사용자 / 외부 repo) = ★ carry (deadline 없음 / OSS 채택 트리거 의존). 두 carry 모두 commit-block 회피 꼼수 ❌ paradigm 정합 = release-readiness 자기 enforcement 본격 입증대 (paradigm maturity signal). DEC-2026-05-17 §4.1.2 P1 commit-block (2026-06-01) 9일 전 이행 + paradigm 진화 동시 자산화. industry-aligned: Rust/GCC Stage 3 identity check + Waymo CarCraft+실도로 + Anthropic Bloom auto-eval + SWE-bench static/Live 격차 35~50%p."
+    "self_consistency_note": "F-SIM-011 패러독스 진정 해소 (v8.14.0 / DEC-2026-05-23-fsim-005-corroboration-2-genuine): Type 분류 3계층화 paradigm 본격 진화 + fail_mode_qualification boolean 강제. v8.4.0 (2026-05-18) = PoC #14 Type 1 partial 달성 (Claude self-run / Python+pytest / 패러독스 부분 해소). v8.14.0 = PoC #05 Type 1.5 single arm 본격 (TypeScript+vitest / 본 user 별도 PoC 적용 / Rust/GCC Stage 3 identity check 동형 / self-bootstrap proof 부분 달성) + dry_run_placeholder=0 양측 입증 (Adzic SBE 10년 폐기 함정 직접 회피 / fail_mode_qualification.corroboration_qualified=true). paradigm 정합 정직 표기 (Senior REVISE-2 사실 검증 보강 / 2026-05-23 사용자 결단 옵션 α): Type 1.5 second arm = carry (poc-02 source empty 발견 / poc-03+poc-04-mini chain 4 yellow / deadline 없음). Type 2 (외부 사용자 / 외부 repo) = carry (deadline 없음 / OSS 채택 트리거 의존). 두 carry 모두 commit-block 회피 꼼수 ❌ paradigm 정합 = release-readiness 자기 enforcement 본격 입증대 (paradigm maturity signal). DEC-2026-05-17 §4.1.2 P1 commit-block (2026-06-01) 9일 전 이행 + paradigm 진화 동시 자산화. industry-aligned: Rust/GCC Stage 3 identity check + Waymo CarCraft+실도로 + Anthropic Bloom auto-eval + SWE-bench static/Live 격차 35~50%p."
   },
   "implemented_in": {
     "sub_plan_1": "scope (DEC + lifecycle-contract + skills-axis chain stage 신설)",
     "sub_plan_2": "schemas (planning/behavior/acceptance/test/impl/traceability) + deliverables 17~22 + ADR-CHAIN-001~003",
     "sub_plan_3a": "11 chain validator + ADR-CHAIN-004 + chain-check.yml + npm workspace + 110 unit test",
     "sub_plan_3b": "test-impl-pass-validator + test-cmd.schema + 5 framework adapter + 135 unit test",
-    "sub_plan_4": "★ 본 sdlc-4stage-flow + 14 신규 skill + agents 정식 채움 + 4 chain stage flow",
+    "sub_plan_4": "본 sdlc-4stage-flow + 14 신규 skill + agents 정식 채움 + 4 chain stage flow",
     "sub_plan_5": "hooks 확장 + chain-revisit-detector + go/stop UX (carry)",
     "sub_plan_6": "PoC #05 + v2.0.0 release (carry)"
   }

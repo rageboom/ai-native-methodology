@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/type-spec.schema.json",
-  "title": "Type Spec (★ v1.4 Stage 7-pre 신설 — TypeScript .d.ts 추출)",
+  "title": "Type Spec ( v1.4 Stage 7-pre 신설 — TypeScript .d.ts 추출)",
   "description": "Deliverable #15. TypeScript 타입 정보 추출 — framework-neutral L1 Domain (ADR-FE-006 정합). ADR-FE-005 매개체 #6 (.d.ts) 채택의 정식 산출 절차. 외부 LLM 검증 빈틈 #2 해소.",
   "x-spec-source": {
     "typescript": "https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html",
@@ -13,17 +13,17 @@
     "meta": { "$ref": "./meta-confidence.schema.json" },
     "scope": {
       "type": "object",
-      "description": "추출 범위 (★ scope 한정 의무 — 모든 TS 타입 추출 시 비대 위험).",
+      "description": "추출 범위 ( scope 한정 의무 — 모든 TS 타입 추출 시 비대 위험).",
       "properties": {
         "exported_only": {
           "type": "boolean",
           "default": true,
-          "description": "★ export 된 타입만 추출 권장 (private internal type 제외)."
+          "description": " export 된 타입만 추출 권장 (private internal type 제외)."
         },
         "domain_linked_only": {
           "type": "boolean",
           "default": false,
-          "description": "domain.json E-XXX 와 연결된 타입만 추출 (★ 더 좁은 scope)."
+          "description": "domain.json E-XXX 와 연결된 타입만 추출 ( 더 좁은 scope)."
         },
         "include_dirs": {
           "type": "array",
@@ -67,7 +67,7 @@
           },
           "declaration": {
             "type": "string",
-            "description": "★ .d.ts 형식 declaration 문자열 (재추출 의무 — JSDoc 보존)."
+            "description": " .d.ts 형식 declaration 문자열 (재추출 의무 — JSDoc 보존)."
           },
           "is_generic": { "type": "boolean" },
           "generic_params": {
@@ -104,13 +104,13 @@
           "domain_entity_id": {
             "type": "string",
             "pattern": "^E-[A-Z0-9_-]+(-\\d+)?$",
-            "description": "★ domain.json E-XXX cross-link (있을 시)."
+            "description": " domain.json E-XXX cross-link (있을 시)."
           },
           "framework_coupling_score": {
             "type": "number",
             "minimum": 0.0,
             "maximum": 1.0,
-            "description": "★ ADR-FE-006 정합 — framework 종속도 (0=완전 중립 / 1=React/Vue/Angular 종속). React.FC / @types/react 직접 참조 시 ↑."
+            "description": " ADR-FE-006 정합 — framework 종속도 (0=완전 중립 / 1=React/Vue/Angular 종속). React.FC / @types/react 직접 참조 시 ↑."
           },
           "framework_coupling_reasons": {
             "type": "array",
@@ -152,17 +152,17 @@
           "type": "number",
           "minimum": 0.0,
           "maximum": 1.0,
-          "description": "★ 핵심 metric — 전체 타입 중 framework_coupling_score=0 인 타입 비율. 1.0 = 모든 타입 framework-neutral."
+          "description": " 핵심 metric — 전체 타입 중 framework_coupling_score=0 인 타입 비율. 1.0 = 모든 타입 framework-neutral."
         },
         "framework_coupled_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ framework_coupling_score > 0 인 타입 개수 → 신규 스택 정해진 후 재추출 권장."
+          "description": " framework_coupling_score > 0 인 타입 개수 → 신규 스택 정해진 후 재추출 권장."
         },
         "captured_by": {
           "type": "string",
           "enum": ["ts_morph_real", "tsc_real", "typedoc_real", "manual_extraction", "simulation"],
-          "description": "★ no-simulation 정책."
+          "description": " no-simulation 정책."
         },
         "captured_by_version": { "type": "string" },
         "stdout_path": { "type": "string" },

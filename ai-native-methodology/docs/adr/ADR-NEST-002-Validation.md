@@ -14,59 +14,61 @@ PoC #03 분석 결과 **class-validator coverage 12% (6/50+ 필드)**. UpdateUse
 
 ## 2. 결정
 
-### 2.1 ★ ValidationPipe 글로벌 의무
+### 2.1 ValidationPipe 글로벌 의무
 
 ```typescript
 // main.ts
-app.useGlobalPipes(new ValidationPipe({
-  whitelist: true,           // ★ DTO 외 필드 차단
-  forbidNonWhitelisted: true, // ★ DTO 외 필드 시 400
-  transform: true            // ★ 타입 자동 변환
-}));
+app.useGlobalPipes(
+	new ValidationPipe({
+		whitelist: true, // DTO 외 필드 차단
+		forbidNonWhitelisted: true, // DTO 외 필드 시 400
+		transform: true, // 타입 자동 변환
+	}),
+);
 ```
 
-### 2.2 ★ 모든 input DTO = class-validator 의무
+### 2.2 모든 input DTO = class-validator 의무
 
 ```typescript
 export class CreateUserDto {
-  @IsNotEmpty() @MinLength(3) @MaxLength(20) username: string;
-  @IsNotEmpty() @IsEmail() email: string;
-  @IsNotEmpty() @MinLength(8) password: string;
+	@IsNotEmpty() @MinLength(3) @MaxLength(20) username: string;
+	@IsNotEmpty() @IsEmail() email: string;
+	@IsNotEmpty() @MinLength(8) password: string;
 }
 
 export class UpdateUserDto {
-  @IsOptional() @IsString() @MinLength(3) @MaxLength(20) username?: string;
-  @IsOptional() @IsEmail() email?: string;  // ★ F-143 fix
-  @IsOptional() @MaxLength(500) bio?: string;
+	@IsOptional() @IsString() @MinLength(3) @MaxLength(20) username?: string;
+	@IsOptional() @IsEmail() email?: string; // F-143 fix
+	@IsOptional() @MaxLength(500) bio?: string;
 }
 ```
 
-### 2.3 ★★ Domain Aggregate constructor invariant 의무
+### 2.3 Domain Aggregate constructor invariant 의무
 
 DTO 검증만으로는 domain invariant 보장 안 됨. Aggregate 생성자 throw 의무:
 
 ```typescript
 @Entity('follows')
 export class FollowsEntity {
-  constructor(followerId: number, followingId: number) {
-    if (followerId === followingId) {
-      throw new Error('follower and following must differ');  // ★ Domain invariant
-    }
-    // ...
-  }
+	constructor(followerId: number, followingId: number) {
+		if (followerId === followingId) {
+			throw new Error('follower and following must differ'); // Domain invariant
+		}
+		// ...
+	}
 }
 ```
 
 → Sairyss DDD-Hexagon 정설 정합.
 
-### 2.4 ★ Service.create + Service.update 둘 다 validate 의무
+### 2.4 Service.create + Service.update 둘 다 validate 의무
 
 ```typescript
 async update(userId: number, dto: UpdateUserDto) {
   const user = await this.findOne(userId);
   Object.assign(user, dto);
 
-  const errors = await validate(user);  // ★ NEW (F-143 fix)
+  const errors = await validate(user);  // NEW (F-143 fix)
   if (errors.length) throw new HttpException({errors}, 400);
 
   await this.userRepository.save(user);
@@ -77,14 +79,14 @@ async update(userId: number, dto: UpdateUserDto) {
 
 ### 3.1 Positive 효과
 
-- ★ OWASP API1 (mass assignment) 회피
-- ★ Domain invariant 보장 (Aggregate 생성자 throw)
-- ★ DTO + Domain + DB 3중 안전망
+- OWASP API1 (mass assignment) 회피
+- Domain invariant 보장 (Aggregate 생성자 throw)
+- DTO + Domain + DB 3중 안전망
 
 ### 3.2 트레이드오프
 
-- ★ DTO 작성 부담 — input/update/patch 별 분리 의무
-- ★ Aggregate 생성자 throw 시 테스트 부담
+- DTO 작성 부담 — input/update/patch 별 분리 의무
+- Aggregate 생성자 throw 시 테스트 부담
 
 ## 4. 검증
 

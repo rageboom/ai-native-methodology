@@ -19,6 +19,7 @@
 ### 2. invariant 본질
 
 **strategy_chosen 본질 — impl 생성 strategy 의 evidence trail**:
+
 - `ai-generate-fresh`: test → 신규 generate (가장 시뮬 위험 / chain 4 본질 path)
 - `git-restore`: 이전 branch / commit 의 코드 복원 (가장 안전 / 단 AC drift 위험)
 - `hybrid-restore-and-modify`: restore + modify (중간)
@@ -31,12 +32,12 @@
 
 ### 3. universal claim 정합
 
-| 축 | plugin v8.7.4 | v8.8.0 (G-007 보강) |
-|---|---|---|
-| impl 생성 strategy 구분 | 명시 없음 (ai-generate-fresh 암묵 가정) | 3 strategy enum + restore_source 객체 |
-| commit_hash 의미 | "본 chain commit" 만 가정 | strategy 별 분리 (본 chain commit + restore 출처 commit_hash 별도) |
-| AC ↔ restored 정합 검증 | 없음 | gate #4 cluster 필수 항목 + intervention-log entry 의무 |
-| hybrid modify 추적 | 없음 | modify_diff 필드 의무 |
+| 축                      | plugin v8.7.4                           | v8.8.0 (G-007 보강)                                                |
+| ----------------------- | --------------------------------------- | ------------------------------------------------------------------ |
+| impl 생성 strategy 구분 | 명시 없음 (ai-generate-fresh 암묵 가정) | 3 strategy enum + restore_source 객체                              |
+| commit_hash 의미        | "본 chain commit" 만 가정               | strategy 별 분리 (본 chain commit + restore 출처 commit_hash 별도) |
+| AC ↔ restored 정합 검증 | 없음                                    | gate #4 cluster 필수 항목 + intervention-log entry 의무            |
+| hybrid modify 추적      | 없음                                    | modify_diff 필드 의무                                              |
 
 ## 변경 항목
 
@@ -48,7 +49,7 @@
 
 - **schema 갱신** — `impl-spec.schema.json` 의 `meta.strategy_chosen` enum + `impl_modules[].restore_source` 객체 schema 정식 추가 = 후속 task.
 - **static-runner lint-no-simulation 본문 갱신** — strategy 별 commit_hash 의미 분리 + restore_source.commit_hash 의 `git cat-file -t` 검증 = 후속 task.
-- **mis-fe-admin DWPD-1774 case study** — 본 보강 후 mis-fe-admin 갭 보고서 update 의무 (★ 본 보강의 impl-spec.json 이 reference 자격).
+- **mis-fe-admin DWPD-1774 case study** — 본 보강 후 mis-fe-admin 갭 보고서 update 의무 ( 본 보강의 impl-spec.json 이 reference 자격).
 
 ## Cross-link
 

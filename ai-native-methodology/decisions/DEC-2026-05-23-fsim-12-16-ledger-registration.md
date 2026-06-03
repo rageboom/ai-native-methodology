@@ -2,7 +2,7 @@
 
 > F-SIM-12~16 정식 ledger 등재 + closed 처분 (F-SIM-13 + F-SIM-15 = v8.14.0 본격 흡수 / F-SIM-12 + 14 + 16 = open carry).
 
-- **결단 일자**: 2026-05-23 (★ session 39차 / v8.14.1 PATCH release / v8.14.0 직후 후속 sync)
+- **결단 일자**: 2026-05-23 ( session 39차 / v8.14.1 PATCH release / v8.14.0 직후 후속 sync)
 - **결단자**: 윤주스 (TF Lead) — 사용자 "α로 진행" (v8.14.0 후 cooling-off cadence 안 additive only 작업 선택)
 - **범주**: methodology / F-SIM-12~16 정식 ledger 등재 + closed 처분 + carry 정직 표기
 - **상태**: 승인 / additive doc only / breaking 0
@@ -14,6 +14,7 @@
 `project_v84_simulation_carry.md` 안 의제 B = "F-SIM-12~16 정식 ledger 등재 + 처분 결단 (P0/P1/P2 분류)". v8.4.0 (2026-05-18) 시뮬레이션 dogfood 안 5 신규 finding 표면화하되 정식 등재 carry. v8.4.0 ~ v8.14.0 안 자산화 대기.
 
 v8.14.0 (2026-05-23) F-SIM-005 P1 본격 해소 시점에:
+
 - **F-SIM-015** (high / test-spec.fail_mode schema 미허용) = **본격 흡수 종결** (schema enum 4종 추가 + chain-coverage-validator 7번째 export)
 - **F-SIM-013** (medium / Type 1 시뮬레이션 한계) = **본격 흡수 종결** (Type 분류 3계층화 paradigm 진화 / Type 1 정식 분류 + Type 2 carry)
 - **F-SIM-012 + 014 + 016** = 잔존 carry (v8.14.0 paradigm 진화 와 직접 무관)
@@ -28,13 +29,13 @@ v8.14.0 직후 cooling-off cadence 안 additive only 작업 진입. paradigm pre
 
 `methodology-spec/finding-system.md` F-SIM namespace 표 안 5 row 추가:
 
-| F-SIM | severity | 처분 |
-|---|---|---|
-| 012 | medium | open (v8.4.0 carry) |
-| 013 | medium | **closed v8.14.0** (Type 분류 3계층화 본격 흡수) |
-| 014 | low | open (v8.4.0 carry) |
-| 015 | **high** | **closed v8.14.0** (fail_mode schema 본격 추가) |
-| 016 | low | open (v8.4.0 carry) |
+| F-SIM | severity | 처분                                             |
+| ----- | -------- | ------------------------------------------------ |
+| 012   | medium   | open (v8.4.0 carry)                              |
+| 013   | medium   | **closed v8.14.0** (Type 분류 3계층화 본격 흡수) |
+| 014   | low      | open (v8.4.0 carry)                              |
+| 015   | **high** | **closed v8.14.0** (fail_mode schema 본격 추가)  |
+| 016   | low      | open (v8.4.0 carry)                              |
 
 ### §2. F-SIM-12 ~ F-SIM-16 body section 5종 신설 (additive doc)
 
@@ -62,15 +63,15 @@ v8.14.0 직후 cooling-off cadence 안 additive only 작업 진입. paradigm pre
 
 ## 자산 변경 (additive doc / breaking 0)
 
-| 영역 | 변경 |
-|---|---|
+| 영역                                 | 변경                                                                        |
+| ------------------------------------ | --------------------------------------------------------------------------- |
 | `methodology-spec/finding-system.md` | F-SIM ledger 표 11 row → 16 row + body 5종 신설 (F-SIM-012/013/014/015/016) |
-| `plugin.json` | 8.14.0 → 8.14.1 |
-| `package.json` | 8.14.0 → 8.14.1 (3-way sync) |
-| `CHANGELOG.md` | v8.14.1 PATCH entry |
-| `decisions/INDEX.md` | 본 DEC 최상단 entry |
-| `decisions/STATUS.md` | session 39차 v8.14.1 sub-entry |
-| `CLAUDE.md` | "plugin.json v8.14.1" sync |
+| `plugin.json`                        | 8.14.0 → 8.14.1                                                             |
+| `package.json`                       | 8.14.0 → 8.14.1 (3-way sync)                                                |
+| `CHANGELOG.md`                       | v8.14.1 PATCH entry                                                         |
+| `decisions/INDEX.md`                 | 본 DEC 최상단 entry                                                         |
+| `decisions/STATUS.md`                | session 39차 v8.14.1 sub-entry                                              |
+| `CLAUDE.md`                          | "plugin.json v8.14.1" sync                                                  |
 
 ## LL 자산화 (1종)
 

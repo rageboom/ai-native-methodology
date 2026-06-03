@@ -1,11 +1,12 @@
 # DEC-2026-06-03-living-graph-with-spec-task-tc-impl
 
-> ★ v12.6.0 MINOR release SSOT. dep-graph 의도③ `navigate --with-spec` 확장 — UC/BHV/AC(v12.3.0) → + TASK/TC/IMPL = chain leaf 6 subkind.
+> v12.6.0 MINOR release SSOT. dep-graph 의도③ `navigate --with-spec` 확장 — UC/BHV/AC(v12.3.0) → + TASK/TC/IMPL = chain leaf 6 subkind.
 > 상태: **승인 + 시행 완료** (2026-06-03). 4원칙 = `plan-dep-graph-with-spec-task-tc-impl.md` → Senior 적대적 리뷰 0.86(must-fix A/B/C) → 사용자 옵션 2(TASK/TC/IMPL 6/6 — Senior B IMPL carry 권고 명시 override).
 
 **작성일**: 2026-06-03
 
 **relates to**:
+
 - `DEC-2026-06-03-living-graph-spec-body.md` (v12.3.0) — 의도③ 첫 슬라이스(UC/BHV/AC 본문). 본 DEC 가 frozen-config 패턴을 plan/test/implement stage leaf 로 대칭 확장.
 - `DEC-2026-06-03-living-graph-what-if.md` (v12.5.0) — 직전 ③ 슬라이스. s69 carry "TASK·TC·IMPL spec 본문"을 본 DEC 가 소진.
 
@@ -18,7 +19,8 @@
 ## 1. 의제 선정 (s69 carry 잔여 3버킷 중)
 
 사용자 "dep-graph 의도③ 잔여 계속" → 3버킷 가치/위험 정직 비교 후 with-spec 확장 채택:
-- **TASK/TC/IMPL 본문** = 이미 출하·검증된 frozen-config 패턴 대칭 / 결정론 fs read / reference-lens / check31 무변경 / withSpec off=회귀0 → ★ 채택.
+
+- **TASK/TC/IMPL 본문** = 이미 출하·검증된 frozen-config 패턴 대칭 / 결정론 fs read / reference-lens / check31 무변경 / withSpec off=회귀0 → 채택.
 - 임베딩 의미검색(NL 라우팅 확장) = 비결정론 임베딩 = navigator "AI 추론 0%" trust 모델 정면 충돌 → DEFER.
 - what-if 확장(deprecate/remove-edge/add-node) = Senior 가 v12.5.0 에서 이미 gold-plating/carry 판정 → DEFER.
 
@@ -32,17 +34,20 @@
 ## 3. 결단
 
 ### D1 — scope = chain leaf 6 subkind (UC/BHV/AC/TASK/TC/IMPL)
+
 - TASK: `tasks` / scalars[description·behavior_ref·layer·module·execution_order] / arrays[ac_refs·tc_refs·dependencies].
 - TC: `test_cases` / scalars[type·framework·framework_status·ac_ref·bhv_ref·expected_outcome·test_intent·source_file] (gherkin 부재).
 - IMPL: `modules` / scalars[framework·layer·stack·commit_hash] / arrays[tc_refs·bhv_refs·source_files].
 
 ### D2 — carry 경계 유지
+
 EPIC/STORY/OP(plan 조직 노드 / id 매칭 불확실) + analysis/aspect kind = 미지원 유지(UC/BHV/AC 식 leaf 본문 아님).
 
 ### D3 — trust 무변경 (check31)
+
 config 추가는 `SPEC_SUBKIND_CONFIG` 내부만 → gate-eval·findings-aggregator spec-token 0 유지 / readSpecBody 호출부 1곳(cmdNavigate) 유지 / reference_lens:true 유지 → check31 그대로 통과(실측).
 
-## 4. ★ IMPL 정직 표기 (사용자 옵션 2 override / overclaim 금지)
+## 4. IMPL 정직 표기 (사용자 옵션 2 override / overclaim 금지)
 
 - IMPL corroboration = **ecommerce 1-도메인만** (RealWorld·react-fsd IMPL=0 / chain5 env-blocked). **2-도메인 주장 ❌**.
 - impl-spec.schema 필드명은 도메인-무관 계약 → 기계적 작동 보장(graceful) / 그러나 **Java/Gradle IMPL 실 데이터 shape 검증 = carry** (RealWorld chain5 JDK11+Gradle unblock 세션 = 자연 close 채널).

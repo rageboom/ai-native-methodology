@@ -30,16 +30,16 @@ finding 등록 조건 (AND):
 `examples/poc-NN-*/findings/poc-findings.md` 에 누적. 각 finding 은 다음 YAML 블록.
 
 ```yaml
-finding_id: F-NNN          # PoC 전역 일련번호
-phase: 0~6                  # 발견 phase
+finding_id: F-NNN # PoC 전역 일련번호
+phase: 0~6 # 발견 phase
 discovered_at: YYYY-MM-DD
-discoverer: <서술>          # PoC 진행 중 / sub-agent / 사용자 등
-description: |              # 무슨 일이 있었나
-context: |                  # 왜 이 케이스가 나왔나
-spec_gap: |                 # 어느 명세의 어느 절이 비었나
-decision_made: |            # 본 PoC 는 어떻게 우회했나
+discoverer: <서술> # PoC 진행 중 / sub-agent / 사용자 등
+description: | # 무슨 일이 있었나
+context: | # 왜 이 케이스가 나왔나
+spec_gap: | # 어느 명세의 어느 절이 비었나
+decision_made: | # 본 PoC 는 어떻게 우회했나
 severity: low | medium | high
-proposed_fix: <서술>        # 어떻게 고치면 좋을까
+proposed_fix: <서술> # 어떻게 고치면 좋을까
 
 # 처리 후 추가
 resolution:
@@ -55,38 +55,41 @@ resolution:
 
 severity = **영향 범위 × 차단 강도**.
 
-| severity | 기준 | 예시 |
-|---|---|---|
-| **critical** | 즉시 수정 의무 / production blocker | Auth scope 결여 / API 보안 취약점 |
-| **high** | 모든 산출물 또는 복수 phase 영향 / 표준화 시급 / 우회 시 불일치 위험 | F-003 / F-007 / F-016 / F-023 |
-| **medium** | 단일 phase 영향 / 우회 가능 / 명세 보강 권장 | F-008 / F-017 / F-022 / F-024 |
-| **low** | 환경 의존 / 케이스별 무시 가능 / 옵셔널 | F-001 / F-018 / F-019 / F-026 |
-| **★ positive** | **학습 효과 입증 / 모범 사례** — cross-PoC 비재현 | F-161 (Bearer 표준 = NestJS 학습 효과 / PoC #02 F-084 비재현) |
+| severity      | 기준                                                                 | 예시                                                          |
+| ------------- | -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **critical**  | 즉시 수정 의무 / production blocker                                  | Auth scope 결여 / API 보안 취약점                             |
+| **high**      | 모든 산출물 또는 복수 phase 영향 / 표준화 시급 / 우회 시 불일치 위험 | F-003 / F-007 / F-016 / F-023                                 |
+| **medium**    | 단일 phase 영향 / 우회 가능 / 명세 보강 권장                         | F-008 / F-017 / F-022 / F-024                                 |
+| **low**       | 환경 의존 / 케이스별 무시 가능 / 옵셔널                              | F-001 / F-018 / F-019 / F-026                                 |
+| ** positive** | **학습 효과 입증 / 모범 사례** — cross-PoC 비재현                    | F-161 (Bearer 표준 = NestJS 학습 효과 / PoC #02 F-084 비재현) |
 
 ### 4.1 Positive finding 패턴
 
 **정의**: 이전 PoC 의 negative finding 이 본 PoC 에서 **자연 회피된** 경우 등재.
 
 **조건**:
+
 - 이전 PoC 에 동형 negative finding 존재 (cross-PoC 검증 필수)
 - 본 PoC 가 framework / 언어 / 팀 학습 효과로 자연 회피
 - 시뮬 ❌ — 코드/main.ts/package.json 명시적 evidence 의무
 
 **4 학습 효과 분류** (`positive_finding_meta.learning_effect_type`):
 
-| 분류 | 의미 | 사례 |
-|---|---|---|
-| **framework_natural_avoidance** | Framework 가 자연 회피 | F-161 — NestJS `addBearerAuth()` 표준 |
-| **language_static_block** | 언어가 정적 차단 | F-048 비재현 — TypeScript generic 정적 차단 |
-| **platform_difference** | platform 자체 차이 | F-087 비재현 — NestJS 가 `ModelAndView` 미사용 |
-| **team_learning** | 동일 팀의 학습 결과 | (PoC #2 → PoC #3 동일 팀 사내 적용 시) |
+| 분류                            | 의미                   | 사례                                           |
+| ------------------------------- | ---------------------- | ---------------------------------------------- |
+| **framework_natural_avoidance** | Framework 가 자연 회피 | F-161 — NestJS `addBearerAuth()` 표준          |
+| **language_static_block**       | 언어가 정적 차단       | F-048 비재현 — TypeScript generic 정적 차단    |
+| **platform_difference**         | platform 자체 차이     | F-087 비재현 — NestJS 가 `ModelAndView` 미사용 |
+| **team_learning**               | 동일 팀의 학습 결과    | (PoC #2 → PoC #3 동일 팀 사내 적용 시)         |
 
 **처리**:
+
 - status: `logged` (promoted/closed 아닌 별도 분류)
 - migration-cautions.md 에 "모범 사례" 섹션 등재 의무
 - 본체 격상 후보 표시 (`v13_promotion_candidate: true`)
 
 **ROI**:
+
 - 단일 PoC 과적합 회피 (§8.1) 의 적극적 입증 = "비재현 = 학습 효과" 정량화
 - 사내 적용 시 framework / language 선택 가이드
 
@@ -96,13 +99,13 @@ severity = **영향 범위 × 차단 강도**.
 
 finding 처리 = **다음 PoC 에서 어떻게 다룰지 결정**.
 
-| 처분 | 의미 | 명세 영향 | 다음 PoC 효과 |
-|---|---|---|---|
-| **closed** | 명세 본체/스키마/템플릿/ADR 에 정식 반영 | YES (즉시 갱신) | 재발 차단 |
-| **promoted** | "지금은 안 고치지만 v1.2/v1.3 후보" | NO (백로그 등재) | 같은 finding 재발 가능 — 등재만 |
-| **rejected** | "이건 명세 책임이 아님" + 사유 명시 | NO (사유 보존) | 다음 PoC 에서 같은 finding 올라와도 무시 근거 |
-| **deferred** | "PoC 데이터 더 필요 — revisit_at 명시" | NO (관찰 모드) | 단일 PoC 과적합 회피 |
-| **★ logged** | **positive finding (학습 효과) 등재** | YES (migration-cautions.md "모범 사례") | 사내 적용 시 framework/language 선택 가이드 |
+| 처분         | 의미                                     | 명세 영향                               | 다음 PoC 효과                                 |
+| ------------ | ---------------------------------------- | --------------------------------------- | --------------------------------------------- |
+| **closed**   | 명세 본체/스키마/템플릿/ADR 에 정식 반영 | YES (즉시 갱신)                         | 재발 차단                                     |
+| **promoted** | "지금은 안 고치지만 v1.2/v1.3 후보"      | NO (백로그 등재)                        | 같은 finding 재발 가능 — 등재만               |
+| **rejected** | "이건 명세 책임이 아님" + 사유 명시      | NO (사유 보존)                          | 다음 PoC 에서 같은 finding 올라와도 무시 근거 |
+| **deferred** | "PoC 데이터 더 필요 — revisit_at 명시"   | NO (관찰 모드)                          | 단일 PoC 과적합 회피                          |
+| ** logged**  | **positive finding (학습 효과) 등재**    | YES (migration-cautions.md "모범 사례") | 사내 적용 시 framework/language 선택 가이드   |
 
 ### 5.1 closed 의 정식 반영 채널
 
@@ -117,16 +120,19 @@ finding 처리 = **다음 PoC 에서 어떻게 다룰지 결정**.
 ## 6. 처리의 효과
 
 ### 6.1 closed 의 효과 (명세 견고화)
+
 - 다음 PoC 에서 동일 케이스 재발 차단
 - 신규 사용자 진입장벽 감소 (명세만 보고 결정 가능)
 - sub-agent 도 명세 참조로 일관 행동
 
 ### 6.2 closed 의 위험 (단일 PoC 과적합)
+
 - 단일 PoC 의 환경 특수성 (예: H2 + ddl-auto=none + Lombok) 이 명세에 박힘
 - 다른 도메인 PoC (예: NestJS + TypeORM + Redis) 에서 부적합 가능
 - **해결**: high 만 즉시 closed, medium/low 는 PoC 2~3 회 누적 후 패턴 확정 시 closed
 
 ### 6.3 promoted/deferred 의 효과
+
 - 명세 진화의 데이터 축적
 - 같은 finding 이 PoC #02/#03 에서 재현 → "진짜 빈틈" 증명
 - 재현 안 됨 → PoC #01 특수성 → reject 근거
@@ -137,10 +143,10 @@ finding 처리 = **다음 PoC 에서 어떻게 다룰지 결정**.
 
 ```yaml
 finding 누적 임계:
-  1~4건  : 양호 (명세 안정)
-  5~15건 : 건강한 검증 (명세 자가진화 활발)
+  1~4건: 양호 (명세 안정)
+  5~15건: 건강한 검증 (명세 자가진화 활발)
   16~19건: 임계 근접 (집중 처리 권장)
-  20건+  : 명세 자체 부실 의심 (PoC 정지 + 격상 검토)
+  20건+: 명세 자체 부실 의심 (PoC 정지 + 격상 검토)
 ```
 
 **의미**: finding 은 많을수록 좋은 게 아니다. 누적 = 명세가 PoC 마다 막힌다는 신호. 20+ 도달 시 **PoC 진행보다 명세 격상이 ROI 높음**.
@@ -171,6 +177,7 @@ Q3. (모든 severity 공통) 명세 책임 범위 안인가?
 ### 8.1 단일 PoC 과적합 회피 휴리스틱
 
 다음 케이스는 **closed 보류** 권장:
+
 - 임계값/공식이 단일 PoC 의 숫자 1개에 의존 (예: LOC 4711, 모듈 11개)
 - 특정 기술 스택/프레임워크 가정 (예: Spring Boot only)
 - 도메인 특이 패턴 (예: RealWorld 의 @Embeddable 3-level)

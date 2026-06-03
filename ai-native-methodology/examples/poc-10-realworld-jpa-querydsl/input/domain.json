@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #10 Day 1 — raeperd 도메인. 4 BC + 23 endpoint UC.",
+  "$comment": " PoC #10 Day 1 — raeperd 도메인. 4 BC + 23 endpoint UC.",
   "project_id": "poc-10-realworld-jpa-querydsl",
   "domain_layer": "L0 — Realworld Conduit (Medium-clone) DDD + Embedded VO Java",
   "bounded_contexts": [
@@ -9,18 +9,18 @@
     {"id": "BC-TAG", "name": "Tag", "service": "TagRestController"}
   ],
   "use_cases": [
-    {"id": "UC-RAE-001", "name": "사용자 등록 + JWT", "endpoint": "POST /users", "bc": "BC-USER", "linked_brs": ["BR-RAE-AUTH-001"], "scope_decision": "covered (★ 핵심)"},
+    {"id": "UC-RAE-001", "name": "사용자 등록 + JWT", "endpoint": "POST /users", "bc": "BC-USER", "linked_brs": ["BR-RAE-AUTH-001"], "scope_decision": "covered ( 핵심)"},
     {"id": "UC-RAE-002", "name": "로그인 + JWT", "endpoint": "POST /users/login", "bc": "BC-USER", "scope_decision": "covered"},
     {"id": "UC-RAE-003", "name": "현재 사용자", "endpoint": "GET /user", "bc": "BC-USER", "scope_decision": "covered"},
     {"id": "UC-RAE-004", "name": "사용자 갱신", "endpoint": "PUT /user", "bc": "BC-USER", "scope_decision": "covered"},
     {"id": "UC-RAE-005", "name": "Profile 조회", "endpoint": "GET /profiles/{username}", "bc": "BC-USER", "scope_decision": "covered"},
     {"id": "UC-RAE-006", "name": "Follow", "endpoint": "POST /profiles/{username}/follow", "bc": "BC-USER", "linked_brs": ["BR-RAE-FOLLOW-005"], "scope_decision": "covered"},
     {"id": "UC-RAE-007", "name": "Unfollow", "endpoint": "DELETE /profiles/{username}/follow", "bc": "BC-USER", "scope_decision": "covered"},
-    {"id": "UC-RAE-008", "name": "Article 작성 (★ DDD Aggregate + slug)", "endpoint": "POST /articles", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SLUG-003", "BR-RAE-CONTENT-004"], "scope_decision": "covered (★ 핵심)"},
-    {"id": "UC-RAE-009", "name": "★ ★ Article 목록 (basic)", "endpoint": "GET /articles", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered"},
-    {"id": "UC-RAE-010", "name": "★ ★ Article 목록 (author 분기 / method name derived)", "endpoint": "GET /articles?author=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered (★ 핵심)"},
-    {"id": "UC-RAE-011", "name": "★ ★ Article 목록 (tag 분기 / method name derived)", "endpoint": "GET /articles?tag=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered (★ 핵심)"},
-    {"id": "UC-RAE-012", "name": "★ ★ Article 목록 (favorited 분기 / method name derived)", "endpoint": "GET /articles?favorited=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered (★ 핵심)"},
+    {"id": "UC-RAE-008", "name": "Article 작성 ( DDD Aggregate + slug)", "endpoint": "POST /articles", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SLUG-003", "BR-RAE-CONTENT-004"], "scope_decision": "covered ( 핵심)"},
+    {"id": "UC-RAE-009", "name": " Article 목록 (basic)", "endpoint": "GET /articles", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered"},
+    {"id": "UC-RAE-010", "name": " Article 목록 (author 분기 / method name derived)", "endpoint": "GET /articles?author=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered ( 핵심)"},
+    {"id": "UC-RAE-011", "name": " Article 목록 (tag 분기 / method name derived)", "endpoint": "GET /articles?tag=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered ( 핵심)"},
+    {"id": "UC-RAE-012", "name": " Article 목록 (favorited 분기 / method name derived)", "endpoint": "GET /articles?favorited=...", "bc": "BC-ARTICLE", "linked_brs": ["BR-RAE-SEARCH-002"], "scope_decision": "covered ( 핵심)"},
     {"id": "UC-RAE-013", "name": "Article feed", "endpoint": "GET /articles/feed", "bc": "BC-ARTICLE", "scope_decision": "covered"},
     {"id": "UC-RAE-014", "name": "단일 Article", "endpoint": "GET /articles/{slug}", "bc": "BC-ARTICLE", "scope_decision": "covered"},
     {"id": "UC-RAE-015", "name": "Article 갱신", "endpoint": "PUT /articles/{slug}", "bc": "BC-ARTICLE", "scope_decision": "covered"},
@@ -31,7 +31,7 @@
     {"id": "UC-RAE-020", "name": "Comment 목록", "endpoint": "GET /articles/{slug}/comments", "bc": "BC-COMMENT", "scope_decision": "covered"},
     {"id": "UC-RAE-021", "name": "Comment 삭제", "endpoint": "DELETE /articles/{slug}/comments/{id}", "bc": "BC-COMMENT", "scope_decision": "covered"},
     {"id": "UC-RAE-022", "name": "Tag 목록", "endpoint": "GET /tags", "bc": "BC-TAG", "scope_decision": "covered"},
-    {"id": "UC-RAE-023", "name": "Tag 생성 (★ admin / Article 작성 시 자동)", "endpoint": "(internal)", "bc": "BC-TAG", "scope_decision": "covered"}
+    {"id": "UC-RAE-023", "name": "Tag 생성 ( admin / Article 작성 시 자동)", "endpoint": "(internal)", "bc": "BC-TAG", "scope_decision": "covered"}
   ],
   "summary": {"total_uc": 23, "covered_uc": 23, "carry_uc": 0}
 }

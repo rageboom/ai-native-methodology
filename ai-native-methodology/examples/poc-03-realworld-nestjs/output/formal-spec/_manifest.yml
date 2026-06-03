@@ -1,120 +1,168 @@
 # PoC #03 Phase 4.5 형식 명세 — _manifest.yml
 
-phase: "4.5 (formal-spec)"
-methodology_version: "v1.2.2"
-generated_at: "2026-04-30"
-source_commit_sha: "c1c2cc4e448b279ff083272df1ac50d20c3304fa"
+phase: '4.5 (formal-spec)'
+methodology_version: 'v1.2.2'
+generated_at: '2026-04-30'
+source_commit_sha: 'c1c2cc4e448b279ff083272df1ac50d20c3304fa'
 
 # ----------------------------------------------------------------------
 # 산출 현황 (36 / 37 파일 — drift-validator 결과 통합 carry-over)
 # ----------------------------------------------------------------------
 artifacts:
   state_machines:
-    User: { json: "./state-machines/User.json" }
-    Follows: { json: "./state-machines/Follows.json" }
-    Article: { json: "./state-machines/Article.json" }
+    User: { json: './state-machines/User.json' }
+    Follows: { json: './state-machines/Follows.json' }
+    Article: { json: './state-machines/Article.json' }
   sequence_diagrams:
-    UC-USER-SIGNUP: { json: "./sequence-diagrams/UC-USER-SIGNUP.json" }
-    UC-USER-LOGIN: { json: "./sequence-diagrams/UC-USER-LOGIN.json" }
-    UC-USER-DELETE: { json: "./sequence-diagrams/UC-USER-DELETE.json" }
-    UC-PROFILE-FOLLOW: { json: "./sequence-diagrams/UC-PROFILE-FOLLOW.json" }
-    UC-ARTICLE-CREATE: { json: "./sequence-diagrams/UC-ARTICLE-CREATE.json" }
-    UC-ARTICLE-FAVORITE: { json: "./sequence-diagrams/UC-ARTICLE-FAVORITE.json" }
+    UC-USER-SIGNUP: { json: './sequence-diagrams/UC-USER-SIGNUP.json' }
+    UC-USER-LOGIN: { json: './sequence-diagrams/UC-USER-LOGIN.json' }
+    UC-USER-DELETE: { json: './sequence-diagrams/UC-USER-DELETE.json' }
+    UC-PROFILE-FOLLOW: { json: './sequence-diagrams/UC-PROFILE-FOLLOW.json' }
+    UC-ARTICLE-CREATE: { json: './sequence-diagrams/UC-ARTICLE-CREATE.json' }
+    UC-ARTICLE-FAVORITE:
+      { json: './sequence-diagrams/UC-ARTICLE-FAVORITE.json' }
   decision_tables:
-    BR-USER-USERNAME-EMAIL-UNIQUE-001: { json: "./decision-tables/BR-USER-USERNAME-EMAIL-UNIQUE-001.json" }
-    BR-USER-DELETE-AUTH-001: { json: "./decision-tables/BR-USER-DELETE-AUTH-001.json" }
-    BR-FOLLOWS-NO-SELF-001: { json: "./decision-tables/BR-FOLLOWS-NO-SELF-001.json" }
-    BR-FOLLOWS-PAIR-UNIQUE-001: { json: "./decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.json" }
-    BR-USER-JWT-EXPIRY-001: { json: "./decision-tables/BR-USER-JWT-EXPIRY-001.json" }
-    BR-USER-LOGIN-VERIFY-001: { json: "./decision-tables/BR-USER-LOGIN-VERIFY-001.json" }
-    # ★ B 추가 6 BR (Phase 4.5 풍부화)
-    BR-USER-EMAIL-FORMAT-001: { json: "./decision-tables/BR-USER-EMAIL-FORMAT-001.json" }
-    BR-USER-PASSWORD-HASH-001: { json: "./decision-tables/BR-USER-PASSWORD-HASH-001.json" }
-    BR-ARTICLE-SLUG-AUTO-001: { json: "./decision-tables/BR-ARTICLE-SLUG-AUTO-001.json" }
-    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.json" }
-    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: { json: "./decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.json" }
-    BR-ARTICLE-COMMENT-EAGER-001: { json: "./decision-tables/BR-ARTICLE-COMMENT-EAGER-001.json" }
+    BR-USER-USERNAME-EMAIL-UNIQUE-001:
+      { json: './decision-tables/BR-USER-USERNAME-EMAIL-UNIQUE-001.json' }
+    BR-USER-DELETE-AUTH-001:
+      { json: './decision-tables/BR-USER-DELETE-AUTH-001.json' }
+    BR-FOLLOWS-NO-SELF-001:
+      { json: './decision-tables/BR-FOLLOWS-NO-SELF-001.json' }
+    BR-FOLLOWS-PAIR-UNIQUE-001:
+      { json: './decision-tables/BR-FOLLOWS-PAIR-UNIQUE-001.json' }
+    BR-USER-JWT-EXPIRY-001:
+      { json: './decision-tables/BR-USER-JWT-EXPIRY-001.json' }
+    BR-USER-LOGIN-VERIFY-001:
+      { json: './decision-tables/BR-USER-LOGIN-VERIFY-001.json' }
+    # B 추가 6 BR (Phase 4.5 풍부화)
+    BR-USER-EMAIL-FORMAT-001:
+      { json: './decision-tables/BR-USER-EMAIL-FORMAT-001.json' }
+    BR-USER-PASSWORD-HASH-001:
+      { json: './decision-tables/BR-USER-PASSWORD-HASH-001.json' }
+    BR-ARTICLE-SLUG-AUTO-001:
+      { json: './decision-tables/BR-ARTICLE-SLUG-AUTO-001.json' }
+    BR-ARTICLE-FAVORITE-IDEMPOTENT-001:
+      { json: './decision-tables/BR-ARTICLE-FAVORITE-IDEMPOTENT-001.json' }
+    BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001:
+      { json: './decision-tables/BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001.json' }
+    BR-ARTICLE-COMMENT-EAGER-001:
+      { json: './decision-tables/BR-ARTICLE-COMMENT-EAGER-001.json' }
   invariants:
-    User: "./invariants/User.ts"
-    Follows: "./invariants/Follows.ts"
-    Article: "./invariants/Article.ts"
+    User: './invariants/User.ts'
+    Follows: './invariants/Follows.ts'
+    Article: './invariants/Article.ts'
   property_tests:
-    User: "./property-tests/User.spec.ts"
-    Follows: "./property-tests/Follows.spec.ts"
-    Article: "./property-tests/Article.spec.ts"
+    User: './property-tests/User.spec.ts'
+    Follows: './property-tests/Follows.spec.ts'
+    Article: './property-tests/Article.spec.ts'
 
 artifact_count:
   state_machines: 6
   sequence_diagrams: 12
-  decision_tables: 36  # ★★ O 보강 — 12 BR (24 file) → 18 BR (36 file) / 100% coverage
+  decision_tables: 36 # O 보강 — 12 BR (24 file) → 18 BR (36 file) / 100% coverage
   invariants: 3
   property_tests: 3
   validation_results: 3
-  baseline_files: 1   # ★ ADR-010 — drift-baseline.json (49 grandfathered findings)
-  total: 64   # ★ +13 (O 추가 6 BR × 2 file + baseline 1)
+  baseline_files: 1 # ADR-010 — drift-baseline.json (49 grandfathered findings)
+  total: 64 # +13 (O 추가 6 BR × 2 file + baseline 1)
   expected: 65
   carry_over_drift_validator_results: false
-  br_formalization_coverage: "★★★ 18/18 = 100% (O 종결)"
+  br_formalization_coverage: '18/18 = 100% (O 종결)'
 
 # ----------------------------------------------------------------------
-# 신뢰도 (★ Senior 의사결정 5 ❌ 권고 반영 — D5 / 본 세션 자동 검증 후 +7p)
+# 신뢰도 (Senior 의사결정 5 ❌ 권고 반영 — D5 / 본 세션 자동 검증 후 +7p)
 # ----------------------------------------------------------------------
 trust_level:
-  raw_confidence: 0.89  # 0.87 + ★ O 종결 (BR coverage 66.7% → 100% / 18 BR 자동 검증 통과 / ADR-010 baseline 등재) +2p
-  current_step: 3.7  # ★★★ ADR-009 단계 3+ — BR 100% / 도구 quality + Phase 4.5 풍부화 + baseline 등재
+  raw_confidence: 0.89 # 0.87 + O 종결 (BR coverage 66.7% → 100% / 18 BR 자동 검증 통과 / ADR-010 baseline 등재) +2p
+  current_step: 3.7 # ADR-009 단계 3+ — BR 100% / 도구 quality + Phase 4.5 풍부화 + baseline 등재
   validation_history:
-    - { step: "1차 작성", at: "2026-04-30", actor: "AI (메인 raw fetch)", tool_type: "ai_main" }
-    - { step: "Sub-agent 3 병렬 (NestJS 7 + OSS 사례 + Senior)", at: "2026-04-30", tool_type: "ai_subagent_lightweight" }
-    - { step: "drift-validator + decision-table-validator 자동 실행 (★ 첫 외부 검증)", at: "2026-04-30", tool_type: "validator_real" }
-    - { step: "Phase 4.5+1 다이어그램 mermaid 보강 (진짜 drift 8건 → 0)", at: "2026-04-30", tool_type: "validator_real_rerun" }
-  next_validation: "Sprint 5 transitionFuzzyMatch 보완 + 진짜 static tool 실행 → +5%p (목표 0.85)"
-  target_after_sprint5: 0.85  # 80 + 5
+    - {
+        step: '1차 작성',
+        at: '2026-04-30',
+        actor: 'AI (메인 raw fetch)',
+        tool_type: 'ai_main',
+      }
+    - {
+        step: 'Sub-agent 3 병렬 (NestJS 7 + OSS 사례 + Senior)',
+        at: '2026-04-30',
+        tool_type: 'ai_subagent_lightweight',
+      }
+    - {
+        step: 'drift-validator + decision-table-validator 자동 실행 (첫 외부 검증)',
+        at: '2026-04-30',
+        tool_type: 'validator_real',
+      }
+    - {
+        step: 'Phase 4.5+1 다이어그램 mermaid 보강 (진짜 drift 8건 → 0)',
+        at: '2026-04-30',
+        tool_type: 'validator_real_rerun',
+      }
+  next_validation: 'Sprint 5 transitionFuzzyMatch 보완 + 진짜 static tool 실행 → +5%p (목표 0.85)'
+  target_after_sprint5: 0.85 # 80 + 5
 
   penalty_breakdown:
-    - { reason: "drift-validator 미실행 (carry-over)", penalty: 0, status: "★ 해소" }
-    - { reason: "decision-table-validator 미실행 (carry-over)", penalty: 0, status: "★ 해소" }
-    - { reason: "drift-validator breaking — 도구 한계 100% (진짜 drift 0 ★ Phase 4.5+1 종결)", penalty: 0, status: "★ 해소 — 패널티 회수" }
-    - { reason: "static tool 시뮬레이션 (Senior sub-agent persona = 학습 코퍼스)", penalty: -5 }
-    - { reason: "진짜 static tool 미실행 (Sprint 5 carry-over)", penalty: -5 }
-    - { reason: "critical finding 1건당 -3%p 추가 (Senior 권고) — F-120 + F-140 = -6", penalty: -6 }
-    - { reason: "사용자 검증 미완", penalty: -3 }
-  base_confidence_before_penalty: 0.99  # 5 산출물 완성 baseline (PoC #02 = 0.96 / PoC #03 = 코드 충실 + Sairyss cross-val 추가)
-  current_after_penalty: 0.80  # 0.99 - 0.19 (반올림 / Sprint 5 + 사용자 검증 후 0.85+)
+    - {
+        reason: 'drift-validator 미실행 (carry-over)',
+        penalty: 0,
+        status: '해소',
+      }
+    - {
+        reason: 'decision-table-validator 미실행 (carry-over)',
+        penalty: 0,
+        status: '해소',
+      }
+    - {
+        reason: 'drift-validator breaking — 도구 한계 100% (진짜 drift 0 Phase 4.5+1 종결)',
+        penalty: 0,
+        status: '해소 — 패널티 회수',
+      }
+    - {
+        reason: 'static tool 시뮬레이션 (Senior sub-agent persona = 학습 코퍼스)',
+        penalty: -5,
+      }
+    - { reason: '진짜 static tool 미실행 (Sprint 5 carry-over)', penalty: -5 }
+    - {
+        reason: 'critical finding 1건당 -3%p 추가 (Senior 권고) — F-120 + F-140 = -6',
+        penalty: -6,
+      }
+    - { reason: '사용자 검증 미완', penalty: -3 }
+  base_confidence_before_penalty: 0.99 # 5 산출물 완성 baseline (PoC #02 = 0.96 / PoC #03 = 코드 충실 + Sairyss cross-val 추가)
+  current_after_penalty: 0.80 # 0.99 - 0.19 (반올림 / Sprint 5 + 사용자 검증 후 0.85+)
 
 # ----------------------------------------------------------------------
-# Cross-validation 정직 표기 (★★★ no-simulation 정합)
+# Cross-validation 정직 표기 (no-simulation 정합)
 # ----------------------------------------------------------------------
 cross_validation:
   validators:
     - id: nestjs-7-official-docs-fetch
       real_tool: false
-      simulation_reason: "Sub-agent 환경에서 WebFetch / WebSearch 도구 미제공 — 학습 코퍼스 기반 답변 (★★★ no-simulation 정합 우선)"
-      delivered: "본문 인라인 — research-poc03-phase4.5.md §1"
+      simulation_reason: 'Sub-agent 환경에서 WebFetch / WebSearch 도구 미제공 — 학습 코퍼스 기반 답변 (no-simulation 정합 우선)'
+      delivered: '본문 인라인 — research-poc03-phase4.5.md §1'
     - id: oss-cross-reference-fetch
       real_tool: true
-      tool_version: "github raw API (다수 URL)"
-      tool_stdout_path: "research-poc03-phase4.5.md §2.1"
-      invocation_timestamp: "2026-04-30"
+      tool_version: 'github raw API (다수 URL)'
+      tool_stdout_path: 'research-poc03-phase4.5.md §2.1'
+      invocation_timestamp: '2026-04-30'
       duration_ms: 123438
-      result_hash: "(N/A — sub-agent 본문 인라인)"
-      reproduction_command: "WebFetch raw.githubusercontent.com/{lujakob,Sairyss,dubzzz}/..."
+      result_hash: '(N/A — sub-agent 본문 인라인)'
+      reproduction_command: 'WebFetch raw.githubusercontent.com/{lujakob,Sairyss,dubzzz}/...'
       verified_sources:
-        - "github.com/nestjs/nest/tree/master/sample (36 samples)"
-        - "raw.githubusercontent.com/lujakob/nestjs-realworld-example-app/master/src/user/*"
-        - "github.com/Sairyss/domain-driven-hexagon (★★★★ 11k+ stars)"
-        - "raw.githubusercontent.com/dubzzz/fast-check/main/examples/004-stateMachine/musicPlayer"
-        - "github.com/search?q=xstate+nestjs (9건)"
+        - 'github.com/nestjs/nest/tree/master/sample (36 samples)'
+        - 'raw.githubusercontent.com/lujakob/nestjs-realworld-example-app/master/src/user/*'
+        - 'github.com/Sairyss/domain-driven-hexagon (11k+ stars)'
+        - 'raw.githubusercontent.com/dubzzz/fast-check/main/examples/004-stateMachine/musicPlayer'
+        - 'github.com/search?q=xstate+nestjs (9건)'
     - id: senior-engineer-sub-agent
       real_tool: false
-      simulation_reason: "AI sub-agent — drift 검출 / 산출물 정합성. Static tool persona 시뮬레이션 ❌ — 학습 코퍼스 + 추론만"
-      delivered: "본문 인라인 — research-poc03-phase4.5.md §3"
+      simulation_reason: 'AI sub-agent — drift 검출 / 산출물 정합성. Static tool persona 시뮬레이션 ❌ — 학습 코퍼스 + 추론만'
+      delivered: '본문 인라인 — research-poc03-phase4.5.md §3'
     - id: drift-validator
       real_tool: true
-      tool_version: "0.1.0"
-      status: "executed"
-      invocation_timestamp: "2026-04-30"
-      tool_stdout_path: "./.validation/drift-result.json"
-      reproduction_command: "node ai-native-methodology/tools/schema-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/ (★ v12 ADR-011: drift-validator .json↔.mermaid dir pair-mode 폐기 — formal-spec json 검증은 schema-validator + formal-spec-link-validator 로 이관)"
+      tool_version: '0.1.0'
+      status: 'executed'
+      invocation_timestamp: '2026-04-30'
+      tool_stdout_path: './.validation/drift-result.json'
+      reproduction_command: 'node ai-native-methodology/tools/schema-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/ (v12 ADR-011: drift-validator .json↔.mermaid dir pair-mode 폐기 — formal-spec json 검증은 schema-validator + formal-spec-link-validator 로 이관)'
       result_summary:
         first_run:
           pairs: 9
@@ -123,35 +171,35 @@ cross_validation:
           info: 44
           errors: 0
           exit_code: 1
-        after_diagram_fix:  # Phase 4.5+1
+        after_diagram_fix: # Phase 4.5+1
           pairs: 9
           breaking: 8
           non_breaking: 2
           info: 47
           errors: 0
           exit_code: 1
-        after_tool_quality_boost:  # ★★ A drift-validator 보강 + Phase 4.5+2 종결
+        after_tool_quality_boost: # A drift-validator 보강 + Phase 4.5+2 종결
           pairs: 9
-          breaking: 0  # ✅
+          breaking: 0 # ✅
           non_breaking: 2
           info: 47
           errors: 0
-          exit_code: 0  # ★ CI 통과
+          exit_code: 0 # CI 통과
         manual_classification_final:
-          true_drift: 0   # ★★ 8 → 0 ✅
-          tool_limitation: 0  # ★★★ 12 → 8 → 0 ✅ (A 보강 — false positive 60% → 0%)
-          a_quality_boost_summary: "★★★ A drift-validator 보강 — transitionFuzzyMatch (compound state inner) + corpus 4 → 14 (10/10 통과) + sequence -x/-)/--) 변종 화살표 인식. F-154 + F-155 closed."
+          true_drift: 0 # 8 → 0 ✅
+          tool_limitation: 0 # 12 → 8 → 0 ✅ (A 보강 — false positive 60% → 0%)
+          a_quality_boost_summary: 'A drift-validator 보강 — transitionFuzzyMatch (compound state inner) + corpus 4 → 14 (10/10 통과) + sequence -x/-)/--) 변종 화살표 인식. F-154 + F-155 closed.'
     - id: decision-table-validator
       real_tool: true
-      tool_version: "0.1.0"
-      status: "executed"
-      invocation_timestamp: "2026-04-30"
-      tool_stdout_path: "./.validation/dmn-check-result.json"
-      reproduction_command: "node ai-native-methodology/tools/decision-table-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/decision-tables/"
+      tool_version: '0.1.0'
+      status: 'executed'
+      invocation_timestamp: '2026-04-30'
+      tool_stdout_path: './.validation/dmn-check-result.json'
+      reproduction_command: 'node ai-native-methodology/tools/decision-table-validator/src/cli.js examples/poc-03-realworld-nestjs/output/formal-spec/decision-tables/'
       result_summary:
         markdown_files: 6
-        breaking_first_run: 6   # 모두 current_state enum 위반 (★ 1줄 fix 가능)
-        breaking_after_fix: 0   # ✅
+        breaking_first_run: 6 # 모두 current_state enum 위반 (1줄 fix 가능)
+        breaking_after_fix: 0 # ✅
         non_breaking: 0
         info: 0
         exit_code_after_fix: 0
@@ -164,33 +212,33 @@ cross_validation:
         all_passed: true
     - id: semgrep-typescript-nestjs
       real_tool: false
-      simulation_reason: "환경 부재 (Sprint 5 carry-over). 시뮬 결과 ❌ — 미실행 정직 표기 (★★★ no-simulation 정합)"
+      simulation_reason: '환경 부재 (Sprint 5 carry-over). 시뮬 결과 ❌ — 미실행 정직 표기 (no-simulation 정합)'
     - id: typescript-eslint-strict
       real_tool: false
-      simulation_reason: "환경 부재 (Sprint 5 carry-over)"
+      simulation_reason: '환경 부재 (Sprint 5 carry-over)'
 
 # ----------------------------------------------------------------------
 # Phase 4.5 자연어 빈약성 정량 (PoC #02 F-074 cross-val)
 # ----------------------------------------------------------------------
 natural_language_gap:
-  poc_02_average: 0.44   # 4 / 9 항목
-  poc_03_average: 0.42   # 33%~44% (BR 6건 평균)
+  poc_02_average: 0.44 # 4 / 9 항목
+  poc_03_average: 0.42 # 33%~44% (BR 6건 평균)
   poc_03_per_br:
     BR-USER-USERNAME-EMAIL-UNIQUE-001: 0.44
-    BR-USER-DELETE-AUTH-001: 0.33   # ★ critical — 자연어 가장 빈약
+    BR-USER-DELETE-AUTH-001: 0.33 # critical — 자연어 가장 빈약
     BR-FOLLOWS-NO-SELF-001: 0.44
     BR-FOLLOWS-PAIR-UNIQUE-001: 0.44
     BR-USER-JWT-EXPIRY-001: 0.44
     BR-USER-LOGIN-VERIFY-001: 0.44
-    # ★ B 보강 6 BR
+    # B 보강 6 BR
     BR-USER-EMAIL-FORMAT-001: 0.44
-    BR-USER-PASSWORD-HASH-001: 0.44   # ★ lifecycle hook BR — F-141 critical 노출
-    BR-ARTICLE-SLUG-AUTO-001: 0.44    # ★ F-053-variant + F-120 + F-126 합산
-    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: 0.44   # ★ F-135 critical 노출
+    BR-USER-PASSWORD-HASH-001: 0.44 # lifecycle hook BR — F-141 critical 노출
+    BR-ARTICLE-SLUG-AUTO-001: 0.44 # F-053-variant + F-120 + F-126 합산
+    BR-ARTICLE-FAVORITE-IDEMPOTENT-001: 0.44 # F-135 critical 노출
     BR-ARTICLE-UNFAVORITE-IDEMPOTENT-001: 0.44
-    BR-ARTICLE-COMMENT-EAGER-001: 0.33   # ★ lifecycle/EAGER BR — 자연어 가장 빈약 (3/9)
-  poc_03_average_after_b: 0.42   # 12 BR 평균 (PoC #02 0.44 와 isomorphic)
-  validation: "★ Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 33-44% / ★★ corpus 6 → 12 BR 확장 후 자연어 빈약성 일관성 입증"
+    BR-ARTICLE-COMMENT-EAGER-001: 0.33 # lifecycle/EAGER BR — 자연어 가장 빈약 (3/9)
+  poc_03_average_after_b: 0.42 # 12 BR 평균 (PoC #02 0.44 와 isomorphic)
+  validation: 'Senior 위험 3 정량 입증 — class-validator coverage 12% / 자연어 33-44% / corpus 6 → 12 BR 확장 후 자연어 빈약성 일관성 입증'
 
 # ----------------------------------------------------------------------
 # 신규 finding (Phase 4.5 도출 — drift-validator 결과 합산 후 최종)
@@ -198,100 +246,118 @@ natural_language_gap:
 findings_added_this_phase:
   - id: F-145
     severity: medium
-    summary: "DB UQ 추가 + 409 status 격상 (industry 정설 — Sairyss + RFC 9110 §15.5.10)"
-    source: "decision-table BR-USER-USERNAME-EMAIL-UNIQUE-001.md §4-A/B"
+    summary: 'DB UQ 추가 + 409 status 격상 (industry 정설 — Sairyss + RFC 9110 §15.5.10)'
+    source: 'decision-table BR-USER-USERNAME-EMAIL-UNIQUE-001.md §4-A/B'
   - id: F-146
     severity: high
-    summary: "UC-USER-DELETE 소유권 검증 부재 (req.user.email !== target email)"
-    source: "decision-table BR-USER-DELETE-AUTH-001.md §4-B"
+    summary: 'UC-USER-DELETE 소유권 검증 부재 (req.user.email !== target email)'
+    source: 'decision-table BR-USER-DELETE-AUTH-001.md §4-B'
   - id: F-147
     severity: high
-    summary: "FollowsEntity Domain invariant (생성자 검증) 부재 — Sairyss DDD-Hexagon 위반 (★★ double_hit 후보 — Senior + drift)"
-    source: "decision-table BR-FOLLOWS-NO-SELF-001.md §4-A"
+    summary: 'FollowsEntity Domain invariant (생성자 검증) 부재 — Sairyss DDD-Hexagon 위반 (double_hit 후보 — Senior + drift)'
+    source: 'decision-table BR-FOLLOWS-NO-SELF-001.md §4-A'
   - id: F-148
     severity: medium
-    summary: "DB UQ pair 추가 + App pre-check 제거 (Follows race-safe)"
-    source: "decision-table BR-FOLLOWS-PAIR-UNIQUE-001.md §2-A"
+    summary: 'DB UQ pair 추가 + App pre-check 제거 (Follows race-safe)'
+    source: 'decision-table BR-FOLLOWS-PAIR-UNIQUE-001.md §2-A'
   - id: F-149
     severity: medium
-    summary: "JWT refresh token + logout/blacklist endpoint 부재"
-    source: "decision-table BR-USER-JWT-EXPIRY-001.md §3"
+    summary: 'JWT refresh token + logout/blacklist endpoint 부재'
+    source: 'decision-table BR-USER-JWT-EXPIRY-001.md §3'
   - id: F-150
     severity: low
     summary: "login 'User not found' 메시지 모호 — 'Invalid credentials' 권고 (OWASP A07)"
-    source: "decision-table BR-USER-LOGIN-VERIFY-001.md §2"
+    source: 'decision-table BR-USER-LOGIN-VERIFY-001.md §2'
   - id: F-151
     severity: medium
-    summary: "favoriteCount == favorites.length 단조성 invariant App level 만 보장 / DB level 부재"
-    source: "sequence UC-ARTICLE-FAVORITE.json + invariants Article.ts"
+    summary: 'favoriteCount == favorites.length 단조성 invariant App level 만 보장 / DB level 부재'
+    source: 'sequence UC-ARTICLE-FAVORITE.json + invariants Article.ts'
   - id: F-152
     severity: low
-    summary: "UC-USER-DELETE slug parameter 가 실제 email — param naming 혼란"
-    source: "sequence UC-USER-DELETE.json"
+    summary: 'UC-USER-DELETE slug parameter 가 실제 email — param naming 혼란'
+    source: 'sequence UC-USER-DELETE.json'
   - id: F-153
     severity: medium
-    summary: "rate limiting 부재 — brute force 방어 ❌ (OWASP A04)"
-    source: "decision-table BR-USER-LOGIN-VERIFY-001.md §4-C"
+    summary: 'rate limiting 부재 — brute force 방어 ❌ (OWASP A04)'
+    source: 'decision-table BR-USER-LOGIN-VERIFY-001.md §4-C'
   - id: F-154
     severity: medium
-    summary: "★ drift-validator transitionFuzzyMatch 한계 재발 — compound state 안 sub-state transition 이 outer 로 elide 못 됨 (12/20 = 60% false positive). F-117 재발 입증 → ★★ A 보강 후 closed ✅"
-    source: "validation .validation/SUMMARY.md §1.5 + drift-result.json"
-    status: "closed (★★ A drift-validator 보강 — 60% → 0%)"
+    summary: 'drift-validator transitionFuzzyMatch 한계 재발 — compound state 안 sub-state transition 이 outer 로 elide 못 됨 (12/20 = 60% false positive). F-117 재발 입증 → A 보강 후 closed ✅'
+    source: 'validation .validation/SUMMARY.md §1.5 + drift-result.json'
+    status: 'closed (A drift-validator 보강 — 60% → 0%)'
   - id: F-155
     severity: low
-    summary: "drift-validator sequence diagram `-x`/`-)` 변종 화살표 미인식 — UC-USER-DELETE Controller-AuthMiddleware false positive → ★ A 보강 후 closed ✅"
-    source: "validation .validation/SUMMARY.md §1.5"
-    status: "closed (★ A drift-validator 보강 — sequence 변종 인식)"
+    summary: 'drift-validator sequence diagram `-x`/`-)` 변종 화살표 미인식 — UC-USER-DELETE Controller-AuthMiddleware false positive → A 보강 후 closed ✅'
+    source: 'validation .validation/SUMMARY.md §1.5'
+    status: 'closed (A drift-validator 보강 — sequence 변종 인식)'
   - id: F-156
     severity: low
-    summary: "decision-table JSON current_state 가 한국어 prefix + 부가 설명 사용 → schema enum 위반 (6 BR 모두 동일 / 본 세션 fix 완료)"
-    source: "validation .validation/SUMMARY.md §2.1 + dmn-check-result.json"
+    summary: 'decision-table JSON current_state 가 한국어 prefix + 부가 설명 사용 → schema enum 위반 (6 BR 모두 동일 / 본 세션 fix 완료)'
+    source: 'validation .validation/SUMMARY.md §2.1 + dmn-check-result.json'
 
-findings_total_this_phase: 12  # F-145 ~ F-156 (검증 단계 도출 F-154/155/156 추가)
-findings_carry_over_after_drift_validator: false  # ★ 본 세션 종결 — Phase 4.5+1 다이어그램 보강 별 carry
+findings_total_this_phase: 12 # F-145 ~ F-156 (검증 단계 도출 F-154/155/156 추가)
+findings_carry_over_after_drift_validator: false # 본 세션 종결 — Phase 4.5+1 다이어그램 보강 별 carry
 
 # ----------------------------------------------------------------------
-# PoC #02 cross-validation 시그널 (★★ double_hit 후보)
+# PoC #02 cross-validation 시그널 (double_hit 후보)
 # ----------------------------------------------------------------------
 poc02_cross_validation:
   isomorphic_findings:
-    - { poc02: "BR-USER-EMAIL-UNIQUE-001 + BR-USER-USERNAME-UNIQUE-001", poc03: "BR-USER-USERNAME-EMAIL-UNIQUE-001", relation: "★ App 1중 vs App+DB 2중 — PoC #03 더 나쁨" }
-    - { poc02: "BR-USER-FOLLOW-NO-SELF-001 (코드 부재)", poc03: "BR-FOLLOWS-NO-SELF-001 (코드 존재 + 차원 불일치 F-144)", relation: "★★ double_hit — Domain invariant 부재 양쪽 발견" }
-    - { poc02: "BR-USER-FOLLOW-IDEMPOTENT-001 + BR-USER-FOLLOW-DIRECTIONAL-001", poc03: "BR-FOLLOWS-PAIR-UNIQUE-001", relation: "★ App+DB 2중 vs App 1중 — F-121 신규" }
+    - {
+        poc02: 'BR-USER-EMAIL-UNIQUE-001 + BR-USER-USERNAME-UNIQUE-001',
+        poc03: 'BR-USER-USERNAME-EMAIL-UNIQUE-001',
+        relation: 'App 1중 vs App+DB 2중 — PoC #03 더 나쁨',
+      }
+    - {
+        poc02: 'BR-USER-FOLLOW-NO-SELF-001 (코드 부재)',
+        poc03: 'BR-FOLLOWS-NO-SELF-001 (코드 존재 + 차원 불일치 F-144)',
+        relation: 'double_hit — Domain invariant 부재 양쪽 발견',
+      }
+    - {
+        poc02: 'BR-USER-FOLLOW-IDEMPOTENT-001 + BR-USER-FOLLOW-DIRECTIONAL-001',
+        poc03: 'BR-FOLLOWS-PAIR-UNIQUE-001',
+        relation: 'App+DB 2중 vs App 1중 — F-121 신규',
+      }
   poc03_unique_findings:
-    - { id: "F-118 + F-140 + F-150", relation: "★ NestJS Passport 미사용 → AP-AUTH-NEST-001 critical 후보 (PoC #02 = Spring Security framework-managed → 재현 ❌)" }
-    - { id: "F-135", relation: "★ Counter aggregate race window — PoC #02 미발견 (NestJS/TypeORM 특이)" }
+    - {
+        id: 'F-118 + F-140 + F-150',
+        relation: 'NestJS Passport 미사용 → AP-AUTH-NEST-001 critical 후보 (PoC #02 = Spring Security framework-managed → 재현 ❌)',
+      }
+    - {
+        id: 'F-135',
+        relation: 'Counter aggregate race window — PoC #02 미발견 (NestJS/TypeORM 특이)',
+      }
   double_hit_candidates_for_phase6:
-    - "Domain invariant 부재 (FollowsEntity 생성자) — Sairyss DDD-Hexagon 위반 (양쪽 발견)"
-    - "App pre-check + DB UQ 2중 안전망 (PoC #02) → industry 정설 = DB UQ 단독 (Sairyss) — 양쪽 비효율"
+    - 'Domain invariant 부재 (FollowsEntity 생성자) — Sairyss DDD-Hexagon 위반 (양쪽 발견)'
+    - 'App pre-check + DB UQ 2중 안전망 (PoC #02) → industry 정설 = DB UQ 단독 (Sairyss) — 양쪽 비효율'
 
 # ----------------------------------------------------------------------
 # 종료 조건 자가 점검 (phase-4-5-formal-spec.md §7 정합)
 # ----------------------------------------------------------------------
 exit_criteria:
-  five_artifacts_complete: true   # 36/37 (manifest 본 파일 포함)
-  drift_validator_executed: true   # ★ 본 세션 실행 완료 (.validation/drift-result.json)
-  decision_table_validator_executed: true   # ★ 본 세션 실행 완료 (.validation/dmn-check-result.json)
-  drift_validator_breaking_zero: false   # 8 도구 한계 (진짜 drift 0 ✅ Phase 4.5+1 종결)
-  drift_validator_true_drift_zero: true   # ★ Phase 4.5+1 다이어그램 보강 종결 ✅
-  decision_table_validator_breaking_zero: true   # ★ 6 enum 위반 fix 완료 → 0 ✅
-  cross_validation_complete: partial  # Senior + OSS 사례 ✅ + 자동 검증 도구 2종 ✅ / 진짜 static ❌ (Sprint 5 carry-over)
-  five_evidences_for_real_tool: not_applicable  # 진짜 static tool 미실행 (Sprint 5)
-  lint_no_simulation_passed: true   # ★★★ no-simulation 정합 — 시뮬 0건 / 진짜 도구 2종 실행
+  five_artifacts_complete: true # 36/37 (manifest 본 파일 포함)
+  drift_validator_executed: true # 본 세션 실행 완료 (.validation/drift-result.json)
+  decision_table_validator_executed: true # 본 세션 실행 완료 (.validation/dmn-check-result.json)
+  drift_validator_breaking_zero: false # 8 도구 한계 (진짜 drift 0 ✅ Phase 4.5+1 종결)
+  drift_validator_true_drift_zero: true # Phase 4.5+1 다이어그램 보강 종결 ✅
+  decision_table_validator_breaking_zero: true # 6 enum 위반 fix 완료 → 0 ✅
+  cross_validation_complete: partial # Senior + OSS 사례 ✅ + 자동 검증 도구 2종 ✅ / 진짜 static ❌ (Sprint 5 carry-over)
+  five_evidences_for_real_tool: not_applicable # 진짜 static tool 미실행 (Sprint 5)
+  lint_no_simulation_passed: true # no-simulation 정합 — 시뮬 0건 / 진짜 도구 2종 실행
   manifest_honesty_disclosure: true
-  progress_log_updated: true  # 동시 작성
+  progress_log_updated: true # 동시 작성
 
 # ----------------------------------------------------------------------
-# 정직 표기 (★★★ no-simulation 정합)
+# 정직 표기 (no-simulation 정합)
 # ----------------------------------------------------------------------
 honesty_disclosure:
-  - "★★★ drift-validator + decision-table-validator 본 세션 실행 완료 (carry-over -10p 해소)"
-  - "★★ drift-validator breaking 20 → 8 — 진짜 drift 8 → 0 ✅ (Phase 4.5+1 다이어그램 보강) + 도구 한계 8건 (F-117 재발 = F-154 신규 finding)"
-  - "★ decision-table-validator breaking 6→0 (current_state enum fix 완료)"
-  - "★★ ADR-009 단계 3 (자동 검증 통과 ✅) 도달 — drift 진짜 drift 0 + dmn 0"
-  - "★ Static tool (Semgrep/typescript-eslint/OSV-Scanner) 미실행 — Sprint 5 환경 부재 carry-over (-5%p)"
-  - "★ NestJS 7 공식 sub-agent fetch 도구 부재 → 학습 코퍼스 답변 (-5%p)"
-  - "★ Senior sub-agent = AI 추론 (Static tool persona 시뮬레이션 ❌)"
-  - "★ critical finding 2건 (F-120 + F-140) — Senior 권고 -6%p 추가 패널티"
-  - "★★★ OSS sub-agent raw fetch 5건 성공 (lujakob + Sairyss + fast-check + NestJS sample + XState) — 본 phase 진짜 외부 검증 영역"
-  - "★★ D6 false positive 정량 = 1차 60% (drift 도구 한계) / 2차 100% (도구 한계만 남음) → Sprint 5 transitionFuzzyMatch 보완 핵심 데이터"
+  - 'drift-validator + decision-table-validator 본 세션 실행 완료 (carry-over -10p 해소)'
+  - 'drift-validator breaking 20 → 8 — 진짜 drift 8 → 0 ✅ (Phase 4.5+1 다이어그램 보강) + 도구 한계 8건 (F-117 재발 = F-154 신규 finding)'
+  - 'decision-table-validator breaking 6→0 (current_state enum fix 완료)'
+  - 'ADR-009 단계 3 (자동 검증 통과 ✅) 도달 — drift 진짜 drift 0 + dmn 0'
+  - 'Static tool (Semgrep/typescript-eslint/OSV-Scanner) 미실행 — Sprint 5 환경 부재 carry-over (-5%p)'
+  - 'NestJS 7 공식 sub-agent fetch 도구 부재 → 학습 코퍼스 답변 (-5%p)'
+  - 'Senior sub-agent = AI 추론 (Static tool persona 시뮬레이션 ❌)'
+  - 'critical finding 2건 (F-120 + F-140) — Senior 권고 -6%p 추가 패널티'
+  - 'OSS sub-agent raw fetch 5건 성공 (lujakob + Sairyss + fast-check + NestJS sample + XState) — 본 phase 진짜 외부 검증 영역'
+  - 'D6 false positive 정량 = 1차 60% (drift 도구 한계) / 2차 100% (도구 한계만 남음) → Sprint 5 transitionFuzzyMatch 보완 핵심 데이터'

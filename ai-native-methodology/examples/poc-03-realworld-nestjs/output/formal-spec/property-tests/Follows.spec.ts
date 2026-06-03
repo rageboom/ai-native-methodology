@@ -8,8 +8,8 @@
  * - decision-table: BR-FOLLOWS-NO-SELF-001 / BR-FOLLOWS-PAIR-UNIQUE-001
  * - invariants: Follows.ts
  *
- * ★ F-144 — self-check 차원 불일치 (follow=email / unFollow=id) 명세
- * ★ F-147 — Domain invariant (FollowsEntity 생성자) 부재 명세
+ *  F-144 — self-check 차원 불일치 (follow=email / unFollow=id) 명세
+ *  F-147 — Domain invariant (FollowsEntity 생성자) 부재 명세
  */
 
 import fc from 'fast-check';
@@ -25,21 +25,21 @@ class HttpException extends Error {
 class MockProfileService {
   private follows: MockFollows[] = [];
   private idSeq = 1;
-  constructor(private users: MockUser[]) {}
+  constructor(private users: MockUser[]) { }
 
-  // ★ follow = email 비교 (현재 코드 실태)
+  //  follow = email 비교 (현재 코드 실태)
   async follow(followerEmail: string, username: string): Promise<void> {
     if (!followerEmail || !username) throw new HttpException('not provided', 400);
     const follower = this.users.find(u => u.email === followerEmail);
     const following = this.users.find(u => u.username === username);
     if (!follower || !following) throw new HttpException('user not found', 400);
 
-    // ★ F-144 — email 비교
+    //  F-144 — email 비교
     if (follower.email === following.email) {
       throw new HttpException('FollowerEmail and FollowingId cannot be equal', 400);
     }
 
-    // ★ App 1중 idempotent (DB UQ pair 부재)
+    //  App 1중 idempotent (DB UQ pair 부재)
     const existing = this.follows.find(
       f => f.followerId === follower.id && f.followingId === following.id
     );
@@ -48,11 +48,11 @@ class MockProfileService {
     }
   }
 
-  // ★ unFollow = id 비교 (★ F-144 차원 불일치)
+  //  unFollow = id 비교 ( F-144 차원 불일치)
   async unFollow(followerId: number, followingId: number): Promise<void> {
     if (followerId == null || followingId == null) throw new HttpException('not provided', 400);
 
-    // ★ F-144 — id 비교 (follow 와 차원 불일치)
+    //  F-144 — id 비교 (follow 와 차원 불일치)
     if (followerId === followingId) {
       throw new HttpException('FollowerId and FollowingId cannot be equal', 400);
     }
@@ -83,9 +83,9 @@ describe('ProfileService Properties — PoC #03 Phase 4.5', () => {
   });
 
   // ----------------------------------------------------------------------
-  // ★★ F-144 차원 불일치 명세 (follow=email / unFollow=id)
+  //  F-144 차원 불일치 명세 (follow=email / unFollow=id)
   // ----------------------------------------------------------------------
-  test('★★ F-144 차원 불일치: follow 검증 = email / unFollow 검증 = id', async () => {
+  test(' F-144 차원 불일치: follow 검증 = email / unFollow 검증 = id', async () => {
     const users: MockUser[] = [
       { id: 1, email: 'a@x.com', username: 'alice' },
       { id: 2, email: 'b@x.com', username: 'bob' },

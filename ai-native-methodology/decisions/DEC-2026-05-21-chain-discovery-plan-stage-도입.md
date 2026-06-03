@@ -21,35 +21,35 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 
 ## 진단 — 기존 chain 의 빈 칸
 
-| 빈 칸 | 본질 | 영향 |
-|---|---|---|
-| 단어 misleading | `planning` = 산업 통용 "구현 계획" vs 본 methodology "UC + intent 추출" | 사용자 혼란 / paradigm 학습 비용 |
-| 입력 다양성 부재 | analysis-output 만 chain 입력 / swagger·figma·자연어 는 analysis stage 안에 묻힘 | 신규 일감 (baseline 외) 진입 채널 모호 |
-| HOW 단계 부재 | spec 이후 test/implement 가 mechanical translation 만 수행 | macro HOW (작업 분해 / 의존성 / 아키텍처 결정 / NFR allocation / risk / rollback) 가 LLM implicit 추론으로 묻힘 |
+| 빈 칸            | 본질                                                                             | 영향                                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| 단어 misleading  | `planning` = 산업 통용 "구현 계획" vs 본 methodology "UC + intent 추출"          | 사용자 혼란 / paradigm 학습 비용                                                                                |
+| 입력 다양성 부재 | analysis-output 만 chain 입력 / swagger·figma·자연어 는 analysis stage 안에 묻힘 | 신규 일감 (baseline 외) 진입 채널 모호                                                                          |
+| HOW 단계 부재    | spec 이후 test/implement 가 mechanical translation 만 수행                       | macro HOW (작업 분해 / 의존성 / 아키텍처 결정 / NFR allocation / risk / rollback) 가 LLM implicit 추론으로 묻힘 |
 
 ## paradigm 결단 (사용자 결단 2026-05-21)
 
-| 의제 | 결단 | 근거 |
-|---|---|---|
-| chain stage 재구성 | 옵션 A "개칭 + 확장" ✅ | 사용자 명시 "A. 개칭 + 확장 (paradigm 일관, 큰 변경)" — 옵션 B (stage 7개 / 중복) + 옵션 C (placeholder 만 / 본질 미해결) 거절 |
-| `discovery` 명명 채택 | 산업 통용 단어 정합 ✅ | Agile/Lean 의 Discovery 단계 (왜·무엇·누구 탐색) 와 본 책임 일치 / `Intent` `Framing` `Requirements` 후보 비교 후 선택 |
-| `plan` 신설 위치 | spec ↔ test 사이 ✅ | UC 분해 정보가 spec 전에 부족 → `discovery` 앞에 둘 수 없음 / impl-spec 은 사후 기록 → `implement` 안에 둘 수 없음 / `plan` 은 spec 이후 사전 결정 |
-| placeholder 패턴 | `plan-agent` 만 placeholder ✅ | `discovery-agent` = 기존 planning-agent 책임 흡수 + skill 추가 → 즉시 본격 (placeholder 아님). `plan-agent` = skill 3종 부재 → design-agent 패턴 (frontmatter skills:[] / dispatch carry) |
-| 입력 어댑터 이관 | `analysis-from-*` 6 skill → `discovery-from-*` 이관 ✅ | analysis stage 의 본 책임 = "기존 코드·시스템 해부 (baseline)" / 외부 입력 어댑터는 discovery stage 책임 / paradigm 정합 |
-| version label | v4.1.0 MINOR ✅ | paradigm 본질 확장 (stage 5→6) 이지만 chain harness 본격 paradigm (v4.0) 유지 / MAJOR ❌ |
+| 의제                  | 결단                                                   | 근거                                                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| chain stage 재구성    | 옵션 A "개칭 + 확장" ✅                                | 사용자 명시 "A. 개칭 + 확장 (paradigm 일관, 큰 변경)" — 옵션 B (stage 7개 / 중복) + 옵션 C (placeholder 만 / 본질 미해결) 거절                                                            |
+| `discovery` 명명 채택 | 산업 통용 단어 정합 ✅                                 | Agile/Lean 의 Discovery 단계 (왜·무엇·누구 탐색) 와 본 책임 일치 / `Intent` `Framing` `Requirements` 후보 비교 후 선택                                                                    |
+| `plan` 신설 위치      | spec ↔ test 사이 ✅                                    | UC 분해 정보가 spec 전에 부족 → `discovery` 앞에 둘 수 없음 / impl-spec 은 사후 기록 → `implement` 안에 둘 수 없음 / `plan` 은 spec 이후 사전 결정                                        |
+| placeholder 패턴      | `plan-agent` 만 placeholder ✅                         | `discovery-agent` = 기존 planning-agent 책임 흡수 + skill 추가 → 즉시 본격 (placeholder 아님). `plan-agent` = skill 3종 부재 → design-agent 패턴 (frontmatter skills:[] / dispatch carry) |
+| 입력 어댑터 이관      | `analysis-from-*` 6 skill → `discovery-from-*` 이관 ✅ | analysis stage 의 본 책임 = "기존 코드·시스템 해부 (baseline)" / 외부 입력 어댑터는 discovery stage 책임 / paradigm 정합                                                                  |
+| version label         | v4.1.0 MINOR ✅                                        | paradigm 본질 확장 (stage 5→6) 이지만 chain harness 본격 paradigm (v4.0) 유지 / MAJOR ❌                                                                                                  |
 
 ## 8 운영 정책 (사용자 명시 결단 2026-05-21)
 
-| # | 정책 | 결단값 | 근거 |
-|---|---|---|---|
-| 1 | Discovery 입력 감지 | 혼합 (자동 추정 + 1회 confirm) | 오감지 cost > confirm cost |
-| 2 | Skill 병렬 dispatch | 허용 | skill 간 독립 / 시간 단축 / methodology 다른 stage 패턴 정합 |
-| 3 | NFR 게이트 위치 | Discovery (soft) + Plan (hard) 비대칭 | NFR 누락 폭발 cost > gate 부담 |
-| 4 | Plan task granularity | 1~3 AC 묶음 (같은 BHV + 같은 layer + 같은 module) | 의미 단위 + 합리적 수 |
-| 5 | ADR 의무 범위 | 되돌리기 어려운 결정만 (5 자동 판정 기준) | 산업 표준 (Michael Nygard) / cost 균형 |
-| 6 | Risk 도출 자동화 | LLM 기본 + industry-case-researcher + 사람 보강 (3중 망) | risk 누락 cost 큼 / generic risk 회피 |
-| 7 | Estimation 필드 | estimation_ai + estimation_human 분리 | AI 값 잘못 신뢰 위험 차단 |
-| 8 | Agent 도입 방식 | discovery-agent 즉시 본격 / plan-agent placeholder | discovery = 기존 책임 흡수 / plan = skill 부재 |
+| #   | 정책                  | 결단값                                                   | 근거                                                         |
+| --- | --------------------- | -------------------------------------------------------- | ------------------------------------------------------------ |
+| 1   | Discovery 입력 감지   | 혼합 (자동 추정 + 1회 confirm)                           | 오감지 cost > confirm cost                                   |
+| 2   | Skill 병렬 dispatch   | 허용                                                     | skill 간 독립 / 시간 단축 / methodology 다른 stage 패턴 정합 |
+| 3   | NFR 게이트 위치       | Discovery (soft) + Plan (hard) 비대칭                    | NFR 누락 폭발 cost > gate 부담                               |
+| 4   | Plan task granularity | 1~3 AC 묶음 (같은 BHV + 같은 layer + 같은 module)        | 의미 단위 + 합리적 수                                        |
+| 5   | ADR 의무 범위         | 되돌리기 어려운 결정만 (5 자동 판정 기준)                | 산업 표준 (Michael Nygard) / cost 균형                       |
+| 6   | Risk 도출 자동화      | LLM 기본 + industry-case-researcher + 사람 보강 (3중 망) | risk 누락 cost 큼 / generic risk 회피                        |
+| 7   | Estimation 필드       | estimation_ai + estimation_human 분리                    | AI 값 잘못 신뢰 위험 차단                                    |
+| 8   | Agent 도입 방식       | discovery-agent 즉시 본격 / plan-agent placeholder       | discovery = 기존 책임 흡수 / plan = skill 부재               |
 
 ## ADR 자동 판정 기준 (정책 5 상세)
 
@@ -64,10 +64,12 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 ## 신설 자산 (v4.1.0 commit scope)
 
 ### agents/
+
 - `agents/discovery-agent.md` ← `agents/planning-agent.md` 의 책임 흡수 + 확장 (rename)
 - `agents/plan-agent.md` 신설 (placeholder / design-agent 패턴 / skills:[] / v4.2+ skill 신설 carry)
 
 ### skills/
+
 - `skills/discovery-from-analysis-output/` ← `skills/planning-extract-from-legacy/` (rename)
 - `skills/discovery-decompose-use-cases/` ← `skills/planning-decompose-use-cases/` (rename / discovery agent 공통 호출 sub-skill)
 - `skills/discovery-identify-business-intent/` ← `skills/planning-identify-business-intent/` (rename / 공통 호출)
@@ -79,11 +81,13 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 - `skills/plan-risk-and-nfr/` placeholder
 
 ### methodology-spec/
+
 - `methodology-spec/lifecycle-contract.md` — §자산 매핑 매트릭스 §Agent column 6 row 재작성 (discovery·plan 추가)
 - `methodology-spec/agents-axis.md` — v4.1.0 정합 갱신 (현 v2.5.1 PATCH 시점 stale)
 - `methodology-spec/skills-axis.md` — discovery·plan stage 추가
 
 ### infra
+
 - `hooks/hooks.json` — TRIGGER_PATTERNS 안 discovery·plan stage 진입 패턴 추가
 - `.claude-plugin/plugin.json` — version 4.0.x → 4.1.0
 - `CLAUDE.md` — chain stage 6-stage 설명 갱신
@@ -93,15 +97,15 @@ chain harness 5-stage paradigm (`analysis → planning → spec → test → imp
 
 ## carry (v4.2+ scope)
 
-| ID | 내용 |
-|---|---|
-| C-v4.1-plan-skill | `plan-{decompose-and-sequence, architect-decisions, risk-and-nfr}` skill 3종 본격 신설 (현 placeholder 상태) |
-| C-v4.1-input-skill-이관 ✅ **(v10.0.4 종결 / option α light)** | `analysis-from-{prompt,swagger,plan-doc,figma}` 6 input skill 의 실제 이관 — 현 ADR scope = discovery-from-* 신설 / analysis-from-* 흡수 여부는 본격 검토 후 결단. **결단 (DEC-2026-05-26-input-skill-roles)**: 양쪽 set 평행 유지 + timing/책임 분리 명문화 (analysis-from-* = 최초 1회 baseline 수립 / discovery-from-* = 신규 건마다 scope 진입). `discovery-from-{figma,swagger,nl-md}` 본격 구현 = 실 use case 트리거 carry (v10.x / 사내 배포 전 ROI 정합). |
-| C-v4.1-session-재시작-검증 ✅ **(v10.0.3 종결 표기)** | LL-v4-04 정합 — 본 paradigm 변경 후 Claude Code session 재시작 후 dispatch 검증 의무. **자산화 완료** = DEC-2026-05-17-v4-multi-agent-paradigm-채택 + DEC-2026-05-21 본 문서 안 LL-v4-04 series 등재. v9.0.0/v9.1.0 paradigm 진입 시 session 재시작 검증 적용됨 (별도 코드/문서 작업 불필요 = protocol 자산 / DEC-2026-05-26-quick-carry-close). |
-| C-v4.1-traceability-확장 | traceability-matrix 안 TASK + ADR + NFR + RISK layer 신설 (UC → BHV → AC → TASK → TC → IMPL + ADR/NFR/RISK cross-cut) |
-| C-v4.1-baseline-delta-운영-문서화 ✅ **(v10.0.1 종결)** | "초기 1회 full analysis + 매 신규 건 delta 갱신" 운영 모델 명시 (baseline carry 규약) → `methodology-spec/baseline-delta-operating-model.md` 신설 / DEC-2026-05-26-baseline-delta-operating-model |
-| C-v4.1-poc-재실행 ✅ **(v10.1.1 부분 종결 / 5 PoC task-plan 생성)** | 기존 PoC chain 산출물에 discovery·plan stage 추가 재실행. **결과**: 5 PoC (poc-03/04-mini/05/11/14) task-plan.{json,md} 생성 완료 (Type 1 self-run / schema VALID 5/5). **잔여 서브-carry**: poc-06/07/08/09/10 = spec stage 미실행 (behavior-spec + AC 부재 / 별도 heavy 작업 / v10.x carry). DEC-2026-05-26-poc-task-plan-5. |
-| ★ C-v4.1-hooks-정합 (★ 깨진 참조 버그 / 시급) | `hooks.json` matcher (`planning` → `discovery`) + `hooks-bridge.js` TRIGGER_PATTERNS agentId 매핑 (`planning-agent` → `discovery-agent`, `planning-extract-from-legacy` → `discovery-from-analysis-output`) 갱신. ★ rename 미반영 = 깨진 참조 (6-stage 가 hooks 레벨 미작동). ★ 주의: artifact-graph 작업 (feat/artifact-graph-p1 / dependency-graph P1~P3) 이 동일 파일 (`hooks.json` + `hooks-bridge.js`) 대폭 수정 중 → 분리 commit 시 충돌. **artifact-graph 작업 안에 함께 수정** 또는 **artifact-graph merge 후** 수정 필요. plan/design 은 placeholder 라 TRIGGER 미등록 유지 (design-agent 패턴 정합 / v4.2+ 본격 시 등록). |
+| ID                                                                  | 내용                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C-v4.1-plan-skill                                                   | `plan-{decompose-and-sequence, architect-decisions, risk-and-nfr}` skill 3종 본격 신설 (현 placeholder 상태)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| C-v4.1-input-skill-이관 ✅ **(v10.0.4 종결 / option α light)**      | `analysis-from-{prompt,swagger,plan-doc,figma}` 6 input skill 의 실제 이관 — 현 ADR scope = discovery-from-_ 신설 / analysis-from-_ 흡수 여부는 본격 검토 후 결단. **결단 (DEC-2026-05-26-input-skill-roles)**: 양쪽 set 평행 유지 + timing/책임 분리 명문화 (analysis-from-_ = 최초 1회 baseline 수립 / discovery-from-_ = 신규 건마다 scope 진입). `discovery-from-{figma,swagger,nl-md}` 본격 구현 = 실 use case 트리거 carry (v10.x / 사내 배포 전 ROI 정합).                                                                                                                                                               |
+| C-v4.1-session-재시작-검증 ✅ **(v10.0.3 종결 표기)**               | LL-v4-04 정합 — 본 paradigm 변경 후 Claude Code session 재시작 후 dispatch 검증 의무. **자산화 완료** = DEC-2026-05-17-v4-multi-agent-paradigm-채택 + DEC-2026-05-21 본 문서 안 LL-v4-04 series 등재. v9.0.0/v9.1.0 paradigm 진입 시 session 재시작 검증 적용됨 (별도 코드/문서 작업 불필요 = protocol 자산 / DEC-2026-05-26-quick-carry-close).                                                                                                                                                                                                                                                                                |
+| C-v4.1-traceability-확장                                            | traceability-matrix 안 TASK + ADR + NFR + RISK layer 신설 (UC → BHV → AC → TASK → TC → IMPL + ADR/NFR/RISK cross-cut)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| C-v4.1-baseline-delta-운영-문서화 ✅ **(v10.0.1 종결)**             | "초기 1회 full analysis + 매 신규 건 delta 갱신" 운영 모델 명시 (baseline carry 규약) → `methodology-spec/baseline-delta-operating-model.md` 신설 / DEC-2026-05-26-baseline-delta-operating-model                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| C-v4.1-poc-재실행 ✅ **(v10.1.1 부분 종결 / 5 PoC task-plan 생성)** | 기존 PoC chain 산출물에 discovery·plan stage 추가 재실행. **결과**: 5 PoC (poc-03/04-mini/05/11/14) task-plan.{json,md} 생성 완료 (Type 1 self-run / schema VALID 5/5). **잔여 서브-carry**: poc-06/07/08/09/10 = spec stage 미실행 (behavior-spec + AC 부재 / 별도 heavy 작업 / v10.x carry). DEC-2026-05-26-poc-task-plan-5.                                                                                                                                                                                                                                                                                                  |
+| C-v4.1-hooks-정합 ( 깨진 참조 버그 / 시급)                          | `hooks.json` matcher (`planning` → `discovery`) + `hooks-bridge.js` TRIGGER_PATTERNS agentId 매핑 (`planning-agent` → `discovery-agent`, `planning-extract-from-legacy` → `discovery-from-analysis-output`) 갱신. rename 미반영 = 깨진 참조 (6-stage 가 hooks 레벨 미작동). 주의: artifact-graph 작업 (feat/artifact-graph-p1 / dependency-graph P1~P3) 이 동일 파일 (`hooks.json` + `hooks-bridge.js`) 대폭 수정 중 → 분리 commit 시 충돌. **artifact-graph 작업 안에 함께 수정** 또는 **artifact-graph merge 후** 수정 필요. plan/design 은 placeholder 라 TRIGGER 미등록 유지 (design-agent 패턴 정합 / v4.2+ 본격 시 등록). |
 
 ## 정합 관계
 

@@ -3,22 +3,22 @@ poc_id: poc-04-mini
 captured_at: 2026-05-02
 captured_by: real
 artifacts:
-  - a11y-spec.json (★ axe-core 진짜 실행 / 2 viewport / 1 unique violation)
-  - i18n-spec.json (★ N/A — Stage 5 carry)
-  - static-security-spec.json (★ grep 1차 / Semgrep carry)
-  - form-validation-spec.json (★ 85 validation / 72 BR 자동 등록)
-  - br-auto-extracted.md (★ deliverable 14 핵심 입증 산출)
-  - type-spec.json (★ ts-morph 진짜 실행 / 46 type / framework_neutrality_score 1.0)
+  - a11y-spec.json ( axe-core 진짜 실행 / 2 viewport / 1 unique violation)
+  - i18n-spec.json ( N/A — Stage 5 carry)
+  - static-security-spec.json ( grep 1차 / Semgrep carry)
+  - form-validation-spec.json ( 85 validation / 72 BR 자동 등록)
+  - br-auto-extracted.md ( deliverable 14 핵심 입증 산출)
+  - type-spec.json ( ts-morph 진짜 실행 / 46 type / framework_neutrality_score 1.0)
   - types.d.ts
   - _manifest.yml
 ir_layer_mapping:
   L1_Domain:
-    - rules.json (★ 본 PoC 부재 / openapi.yaml 가 ground truth)
+    - rules.json ( 본 PoC 부재 / openapi.yaml 가 ground truth)
     - a11y-spec.json
     - i18n-spec.json
     - static-security-spec.json
-    - form-validation-spec.json (★ Stage 7-pre 신설)
-    - type-spec.json (★ Stage 7-pre 신설)
+    - form-validation-spec.json ( Stage 7-pre 신설)
+    - type-spec.json ( Stage 7-pre 신설)
 real_tool_runs:
   ts_morph:
     status: ✅ real
@@ -43,11 +43,11 @@ findings_registered:
 no_simulation_compliance:
   static_tool_simulated: false
   ai_persona_used: false
-  evidence: "★ ts-morph + Playwright + axe-core 3종 진짜 실행 / Semgrep carry + grep fallback / no-simulation 정책 단계 4 도달"
+  evidence: ' ts-morph + Playwright + axe-core 3종 진짜 실행 / Semgrep carry + grep fallback / no-simulation 정책 단계 4 도달'
 deliverable_compliance:
   10_a11y: ✅ axe-core real run
   11_i18n: N/A (Stage 5 carry)
   12_static_security: ⚠ partial (grep + Semgrep carry / -5%p 신뢰도)
-  14_form_validation: ✅ ★ deliverable 14 핵심 입증 (★ Stage 7-pre)
-  15_type_spec: ✅ ts-morph real run (★ Stage 7-pre)
+  14_form_validation: ✅  deliverable 14 핵심 입증 ( Stage 7-pre)
+  15_type_spec: ✅ ts-morph real run ( Stage 7-pre)
 next_phase: V1 (검증) + V2 (IR 4계층 매트릭스)

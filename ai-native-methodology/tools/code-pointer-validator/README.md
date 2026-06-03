@@ -1,6 +1,6 @@
 # code-pointer-validator
 
-★ 12번째 validator (operation.md 결정 3 + P2 완료 기준). release-readiness #12 게이트.
+12번째 validator (operation.md 결정 3 + P2 완료 기준). release-readiness #12 게이트.
 
 `artifact-graph.json` 의 24 Tier-1 노드에 대해 **code_pointers 또는 명시적 N/A** 충족과 **경로 존재성**을 결정적 알고리즘으로 검증.
 
@@ -10,19 +10,19 @@
 code-pointer-validator <artifact-graph.json> [--repo-root <dir>] [--strict] [--format text|json]
 ```
 
-| flag | 의미 |
-|---|---|
-| `--repo-root <dir>` | code_pointer.path 해석 base (default: cwd) |
-| `--strict` | missing/path-not-found 를 high severity 로 격상 (release 게이트) |
-| `--format json` | 기계용 출력 (CI/hook 통합) |
+| flag                | 의미                                                             |
+| ------------------- | ---------------------------------------------------------------- |
+| `--repo-root <dir>` | code_pointer.path 해석 base (default: cwd)                       |
+| `--strict`          | missing/path-not-found 를 high severity 로 격상 (release 게이트) |
+| `--format json`     | 기계용 출력 (CI/hook 통합)                                       |
 
 ### 종료 코드
 
-| code | 의미 |
-|---|---|
-| 0 | pass (severity high 없음, strict 모드에서는 medium 도 없음) |
-| 1 | fail (severity high 또는 strict 모드의 medium) |
-| 2 | usage error / 파일 읽기 실패 |
+| code | 의미                                                        |
+| ---- | ----------------------------------------------------------- |
+| 0    | pass (severity high 없음, strict 모드에서는 medium 도 없음) |
+| 1    | fail (severity high 또는 strict 모드의 medium)              |
+| 2    | usage error / 파일 읽기 실패                                |
 
 ## 검증 항목
 
@@ -31,17 +31,17 @@ code-pointer-validator <artifact-graph.json> [--repo-root <dir>] [--strict] [--f
 - `state ∈ {active, drift}` Tier-1 노드 (chain instance + analysis kind + aspect kind) 는
   - `code_pointers` ≥ 1 개 OR
   - `code_pointers_na: true` (명시적 N/A 마커)
-  중 하나 충족.
+    중 하나 충족.
 - `propose` / `deprecated` 노드는 coverage 대상 제외 (operation.md 결정 1 일시 상태).
 
 ### B. anchor_type 별 pointer 검증
 
-| anchor_type | 검증 | severity (default / strict) |
-|---|---|---|
-| `strict_path` | repo-root 기준 path 존재 | medium / high |
-| `glob` | path 와일드카드 매칭 ≥ 1 (간이 — `*` 1개) | medium / high |
-| `ast_symbol` | `symbol` 필드 필수 (없으면 high). path 존재성은 best-effort | high (symbol 누락) |
-| `doc_link` | URL 형식 OR 로컬 경로 존재 (네트워크 검증 외부) | low (warn) |
+| anchor_type   | 검증                                                        | severity (default / strict) |
+| ------------- | ----------------------------------------------------------- | --------------------------- |
+| `strict_path` | repo-root 기준 path 존재                                    | medium / high               |
+| `glob`        | path 와일드카드 매칭 ≥ 1 (간이 — `*` 1개)                   | medium / high               |
+| `ast_symbol`  | `symbol` 필드 필수 (없으면 high). path 존재성은 best-effort | high (symbol 누락)          |
+| `doc_link`    | URL 형식 OR 로컬 경로 존재 (네트워크 검증 외부)             | low (warn)                  |
 
 ### C. 상태 플래그
 
@@ -69,13 +69,17 @@ code-pointer-validator <artifact-graph.json> [--repo-root <dir>] [--strict] [--f
 
 ```json
 {
-  "id": "IMPL-USER-001",
-  "artifact_kind": "chain",
-  "artifact_subkind": "IMPL",
-  "state": "active",
-  "code_pointers": [
-    { "path": "src/auth/signup.kt", "anchor_type": "strict_path", "commit_hash": "abc1234..." }
-  ]
+	"id": "IMPL-USER-001",
+	"artifact_kind": "chain",
+	"artifact_subkind": "IMPL",
+	"state": "active",
+	"code_pointers": [
+		{
+			"path": "src/auth/signup.kt",
+			"anchor_type": "strict_path",
+			"commit_hash": "abc1234..."
+		}
+	]
 }
 ```
 

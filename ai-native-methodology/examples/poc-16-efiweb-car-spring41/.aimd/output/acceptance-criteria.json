@@ -9,8 +9,8 @@
     "confidence": 0.85,
     "raw_confidence": 0.85,
     "warnings": [
-      "★ chain 2 spec-derive-acceptance-criteria / 10 AC = 10 behavior backward link + 10 UC backward link",
-      "★ Gherkin Given/When/Then BDD 표준 / MoSCoW severity (must/should/nice) 매핑"
+      "chain 2 spec-derive-acceptance-criteria / 10 AC = 10 behavior backward link + 10 UC backward link",
+      "Gherkin Given/When/Then BDD 표준 / MoSCoW severity (must/should/nice) 매핑"
     ]
   },
   "derivation_source": {
@@ -115,7 +115,7 @@
     },
     {
       "id": "AC-CAR-MGT-005",
-      "description": "차량 처분 (★ ambiguous)",
+      "description": "차량 처분 (ambiguous)",
       "behavior_ref": "BHV-CAR-MGT-005",
       "use_case_ref": "UC-CAR-MGT-005",
       "gherkin": {
@@ -125,7 +125,7 @@
         ],
         "when": "POST /ifrs/car/deleteCar",
         "then": [
-          "use_yn='N' (soft delete 추정 / ★ STATE 코드 결단 domain expert carry)"
+          "use_yn='N' (soft delete 추정 / STATE 코드 결단 domain expert carry)"
         ]
       },
       "severity": "should",
@@ -141,7 +141,7 @@
     },
     {
       "id": "AC-CAR-COST-001",
-      "description": "★ ★ 차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
+      "description": "차량비용 → ERP 회계전표 IF 전송 (본 PoC 핵심 anchor)",
       "behavior_ref": "BHV-CAR-COST-001",
       "use_case_ref": "UC-CAR-COST-001",
       "gherkin": {
@@ -155,7 +155,7 @@
           "SGERP SP 호출 성공 (EXEC SG_SACSlipRowCarManagementIFQuery)",
           "slip_id list 반환",
           "tb_car_cost_slip 다중 row INSERT (FN_SPLIT)",
-          "★ cross-DB transaction 보장 ❌ → eventual consistency / saga 또는 outbox 결단 필요"
+          "cross-DB transaction 보장 ❌ → eventual consistency / saga 또는 outbox 결단 필요"
         ]
       },
       "severity": "must",
@@ -184,7 +184,7 @@
         "when": "POST /ifrs/car/cost/saveConfirmList",
         "then": [
           "saveCarCostAccept MERGE 실행",
-          "tb_car_cost.cost_accept_cd = 'Y' 또는 'N' (★ ambiguous)",
+          "tb_car_cost.cost_accept_cd = 'Y' 또는 'N' (ambiguous)",
           "last_upt_dt + last_upt_user_id 갱신"
         ]
       },
@@ -228,7 +228,7 @@
         ],
         "when": "POST /ifrs/car/cost/saveCostSumSystemList",
         "then": [
-          "합산 결과 저장 (★ 구체 location ambiguous carry)"
+          "합산 결과 저장 (구체 location ambiguous carry)"
         ]
       },
       "severity": "nice",

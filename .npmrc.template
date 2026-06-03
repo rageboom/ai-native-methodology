@@ -2,8 +2,8 @@
 # .npmrc.template — 사내 Nexus npm registry (repo.smiledev.net) 용 템플릿
 #
 #  사용법: 필요한 프로필을 복사해 실제 .npmrc(또는 ~/.npmrc)에 붙여넣고 placeholder 치환.
-#  ★ 실제 .npmrc 는 절대 커밋 금지 (자격증명 포함). 이 .template 만 커밋.
-#  ★ 인증 방식 2종 (택1): _authToken=NpmToken.xxx (User Token) | _auth=<base64(user:pass)> (Basic)
+#  실제 .npmrc 는 절대 커밋 금지 (자격증명 포함). 이 .template 만 커밋.
+#  인증 방식 2종 (택1): _authToken=NpmToken.xxx (User Token) | _auth=<base64(user:pass)> (Basic)
 #
 #  실 Nexus repo (2026-06-02 확인):
 #    - consume(group):  https://repo.smiledev.net/repository/npm-public/   ← 익명 read 허용됨(토큰 불요)
@@ -11,7 +11,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ========== [A] CONSUME — 플러그인 사용자 (설치 + 자동갱신) ==========
-#  ★ npm-public group repo 는 익명 read 허용 → 일반 사용자는 이 프로필조차 불필요(무토큰 설치).
+#  npm-public group repo 는 익명 read 허용 → 일반 사용자는 이 프로필조차 불필요(무토큰 설치).
 #    (사내망에서 registry 가 group 으로 향하기만 하면 됨. Claude Code 는 marketplace.json 의
 #     source.registry 로 직접 받으므로 보통 .npmrc 도 불요.)
 #  아래는 npm CLI 로 직접 받을 때만 참고:

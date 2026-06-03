@@ -1,7 +1,7 @@
 -- PoC #02 — schema.sql 보강 (Phase 4.5 Sprint 2 — DB CHECK 제약)
 -- 일자: 2026-04-29
 -- Source of Truth: 자연어 명세 (rules.json BR-USER-FOLLOW-NO-SELF-001) + decision-tables/BR-USER-FOLLOW-NO-SELF-001.md §6-C
--- ★ F-074 fix — 3중 안전망 마지막 layer (DB)
+--  F-074 fix — 3중 안전망 마지막 layer (DB)
 
 -- 변경 전 user_follow 정의 (schema.sql 기존):
 -- create table user_follow (
@@ -13,7 +13,7 @@
 --     constraint uk_user_follow_follower_following unique (follower_id, following_id)
 -- );
 
--- ★★★ NEW (F-074 fix DB layer — race-safe 마지막 안전망)
+--  NEW (F-074 fix DB layer — race-safe 마지막 안전망)
 ALTER TABLE user_follow
     ADD CONSTRAINT chk_user_follow_no_self
     CHECK (follower_id <> following_id);

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/context-cache.schema.json",
   "title": "context-cache.json — dep-graph × codegraph federation 산출물 (reference-lens / NOT gate-injected)",
-  "description": "★ context-federator 산출물. dep-graph(의미/artifact 의존성) 와 codegraph(코드 구조) 를 노드 code_pointers 로 join 한 통합 컨텍스트 캐시. 사용자 P0: prompt→dep-graph→codegraph→재사용. ★ trust 모델 (DEC-2026-06-02 / DEC-2026-05-28 §4.2): codegraph = 휴리스틱 → reference-lens / 어떤 결정론 gate 에도 inject ❌ (meta.trust_note 의무 / computeGateFail 제외 / non-gating). ★ no-simulation: codegraph 부재 = codegraph.available=false 정직 표기.",
+  "description": "context-federator 산출물. dep-graph(의미/artifact 의존성) 와 codegraph(코드 구조) 를 노드 code_pointers 로 join 한 통합 컨텍스트 캐시. 사용자 P0: prompt→dep-graph→codegraph→재사용. trust 모델 (DEC-2026-06-02 / DEC-2026-05-28 §4.2): codegraph = 휴리스틱 → reference-lens / 어떤 결정론 gate 에도 inject ❌ (meta.trust_note 의무 / computeGateFail 제외 / non-gating). no-simulation: codegraph 부재 = codegraph.available=false 정직 표기.",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "target", "codegraph", "packs", "stats"],
@@ -31,8 +31,8 @@
         "trust_note": { "type": "string", "description": "reference-lens / NOT gate-injected 명시 (trust 모델 enforcement)." },
         "derived_from": { "type": "array", "items": { "type": "string" } },
         "synthesized_at": { "type": "string" },
-        "graph_stamp": { "type": ["string", "null"], "description": "★ Phase 2 — artifact-graph 내용 지문 (dep 축 무효화). 변경 시 dep_impact 재계산." },
-        "codegraph_indexed_at": { "type": ["string", "null"], "description": "★ Phase 2 — codegraph 인덱스 시점(.codegraph DB mtime / code 축 무효화). 변경 시 code_refs 재계산." }
+        "graph_stamp": { "type": ["string", "null"], "description": "Phase 2 — artifact-graph 내용 지문 (dep 축 무효화). 변경 시 dep_impact 재계산." },
+        "codegraph_indexed_at": { "type": ["string", "null"], "description": "Phase 2 — codegraph 인덱스 시점(.codegraph DB mtime / code 축 무효화). 변경 시 code_refs 재계산." }
       }
     },
     "target": {
@@ -43,9 +43,9 @@
         "graph_path": { "type": ["string", "null"] },
         "repo_root": { "type": "string" },
         "codegraph_project_dir": { "type": "string" },
-        "sql_inventory_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — legacy 데이터 반쪽 소스 (analysis-sql-inventory source_path 자동발견 또는 --sql-inventory)." },
-        "db_schema_path": { "type": ["string", "null"], "description": "★ Phase 1.5 — db-schema 소스 (dependent_tables 컬럼 보강)." },
-        "business_rules_path": { "type": ["string", "null"], "description": "★ Phase 1.5b — business-rules 소스 (data_refs.business_rules 조인)." }
+        "sql_inventory_path": { "type": ["string", "null"], "description": "Phase 1.5 — legacy 데이터 반쪽 소스 (analysis-sql-inventory source_path 자동발견 또는 --sql-inventory)." },
+        "db_schema_path": { "type": ["string", "null"], "description": "Phase 1.5 — db-schema 소스 (dependent_tables 컬럼 보강)." },
+        "business_rules_path": { "type": ["string", "null"], "description": "Phase 1.5b — business-rules 소스 (data_refs.business_rules 조인)." }
       }
     },
     "codegraph": {
@@ -65,10 +65,10 @@
         "additionalProperties": false,
         "required": ["node_id", "artifact_kind", "artifact_subkind", "state", "dep_impact", "top_impact_roots", "code_anchors", "code_refs", "data_refs", "anchor_stamp"],
         "properties": {
-          "anchor_stamp": { "type": "string", "description": "★ Phase 2 — 노드 코드-side 입력 지문(state+code_pointers). 동일 + codegraph index 무변경 = code_refs verbatim carry." },
+          "anchor_stamp": { "type": "string", "description": "Phase 2 — 노드 코드-side 입력 지문(state+code_pointers). 동일 + codegraph index 무변경 = code_refs verbatim carry." },
           "data_refs": {
             "type": "array",
-            "description": "★ Phase 1.5 — legacy 데이터 반쪽 (sql-inventory/db-schema). codegraph 가 못 보는 SQL/테이블 층 = sql_id·dependent_tables. uc_link/mapper_xml 조인. reference-lens / non-gating.",
+            "description": "Phase 1.5 — legacy 데이터 반쪽 (sql-inventory/db-schema). codegraph 가 못 보는 SQL/테이블 층 = sql_id·dependent_tables. uc_link/mapper_xml 조인. reference-lens / non-gating.",
             "items": {
               "type": "object",
               "additionalProperties": false,
@@ -103,7 +103,7 @@
                 },
                 "business_rules": {
                   "type": "array",
-                  "description": "★ Phase 1.5b — business_meaning 의 BR id(BR-XXX)를 business-rules.json 에서 조회. legacy 데이터 반쪽에 규칙(intent) 부착.",
+                  "description": "Phase 1.5b — business_meaning 의 BR id(BR-XXX)를 business-rules.json 에서 조회. legacy 데이터 반쪽에 규칙(intent) 부착.",
                   "items": {
                     "type": "object",
                     "additionalProperties": false,
@@ -202,12 +202,12 @@
         "symbols_resolved": { "type": "integer" },
         "anchors_unresolved": { "type": "integer" },
         "codegraph_available": { "type": "boolean" },
-        "dep_recomputed": { "type": "integer", "description": "★ Phase 2 — navigate(dep) 재계산 노드 수." },
-        "code_recomputed": { "type": "integer", "description": "★ Phase 2 — codegraph(code) 재계산 노드 수." },
-        "carried_packs": { "type": "integer", "description": "★ Phase 2 — prevCache 에서 통째로 carry 한 노드 수 (재계산 0)." },
-        "data_anchored_nodes": { "type": "integer", "description": "★ Phase 1.5 — sql-inventory uc_link 로만 편입된 노드 수 (code_pointers 0 legacy)." },
-        "data_refs_count": { "type": "integer", "description": "★ Phase 1.5 — 전체 data_refs(SQL 문) 수." },
-        "data_source_available": { "type": "boolean", "description": "★ Phase 1.5 — sql-inventory 로드 여부." }
+        "dep_recomputed": { "type": "integer", "description": "Phase 2 — navigate(dep) 재계산 노드 수." },
+        "code_recomputed": { "type": "integer", "description": "Phase 2 — codegraph(code) 재계산 노드 수." },
+        "carried_packs": { "type": "integer", "description": "Phase 2 — prevCache 에서 통째로 carry 한 노드 수 (재계산 0)." },
+        "data_anchored_nodes": { "type": "integer", "description": "Phase 1.5 — sql-inventory uc_link 로만 편입된 노드 수 (code_pointers 0 legacy)." },
+        "data_refs_count": { "type": "integer", "description": "Phase 1.5 — 전체 data_refs(SQL 문) 수." },
+        "data_source_available": { "type": "boolean", "description": "Phase 1.5 — sql-inventory 로드 여부." }
       }
     }
   }

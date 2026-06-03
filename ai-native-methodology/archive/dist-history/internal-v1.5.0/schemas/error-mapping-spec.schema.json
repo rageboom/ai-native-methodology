@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/error-mapping-spec.schema.json",
-  "title": "Error Mapping Spec — BE error contract 자동 추출 명세 (★ negative-space evidence + AP-API-001 회귀 도구)",
-  "description": "Deliverable #16 (v1.5.0 신설). BE 도메인 예외 ↔ HTTP status 매핑 contract 자동 추출. ★ ADR-BE-001 negative-space corroboration 정식화 정합. ★ ADR-FE-007 의 positive-space variant. Spring (★ @ControllerAdvice/@ExceptionHandler) + NestJS (★ @Catch ExceptionFilter) 양 framework 지원. ★ 진짜 도구 (Semgrep custom rule + ts-morph carry) 실 실행 의무 (no-simulation 정책 / ADR-009 단계 5).",
+  "title": "Error Mapping Spec — BE error contract 자동 추출 명세 ( negative-space evidence + AP-API-001 회귀 도구)",
+  "description": "Deliverable #16 (v1.5.0 신설). BE 도메인 예외 ↔ HTTP status 매핑 contract 자동 추출. ADR-BE-001 negative-space corroboration 정식화 정합. ADR-FE-007 의 positive-space variant. Spring ( @ControllerAdvice/@ExceptionHandler) + NestJS ( @Catch ExceptionFilter) 양 framework 지원. 진짜 도구 (Semgrep custom rule + ts-morph carry) 실 실행 의무 (no-simulation 정책 / ADR-009 단계 5).",
   "x-spec-source": {
     "rfc_7231": "https://datatracker.ietf.org/doc/html/rfc7231#section-4.2.2",
     "rfc_9110": "https://datatracker.ietf.org/doc/html/rfc9110#section-15.3",
@@ -42,7 +42,7 @@
     },
     "exception_handlers": {
       "type": "array",
-      "description": "★ 발견된 ExceptionHandler / ExceptionFilter 등재. ★ 빈 배열 = ★ negative-space evidence (★ AP-API-001 trigger).",
+      "description": " 발견된 ExceptionHandler / ExceptionFilter 등재. 빈 배열 = negative-space evidence ( AP-API-001 trigger).",
       "items": {
         "type": "object",
         "required": ["handler_class", "handler_type", "source_file"],
@@ -97,7 +97,7 @@
           "mapping_mechanism": {
             "type": "string",
             "enum": ["response_status_annotation", "exception_handler_method", "exception_filter", "default_resolver", "response_entity_status", "implicit_default", "throw_unmapped"],
-            "description": "매핑 mechanism. throw_unmapped = ★ ★ AP-API-001 trigger (★ 도메인 예외가 handler 없이 throw)."
+            "description": "매핑 mechanism. throw_unmapped = AP-API-001 trigger ( 도메인 예외가 handler 없이 throw)."
           },
           "evidence_file": {
             "type": "string",
@@ -126,7 +126,7 @@
     },
     "decorator_drift": {
       "type": "array",
-      "description": "★ NestJS-specific. @Post default 201 / @ApiResponse status drift 등 decorator 의 RFC 위반 발견. AP-API-001 mechanism = decorator-drift trigger.",
+      "description": " NestJS-specific. @Post default 201 / @ApiResponse status drift 등 decorator 의 RFC 위반 발견. AP-API-001 mechanism = decorator-drift trigger.",
       "items": {
         "type": "object",
         "required": ["endpoint", "decorator_pattern", "rfc_violation", "evidence_file"],
@@ -159,7 +159,7 @@
     },
     "negative_evidence": {
       "type": "object",
-      "description": "★ ★ ★ ADR-BE-001 negative-space corroboration 정식 evidence 4종.",
+      "description": " ADR-BE-001 negative-space corroboration 정식 evidence 4종.",
       "required": ["contract_absent", "negative_effect", "industry_standard", "automatic_regression_capable"],
       "properties": {
         "contract_absent": {
@@ -175,12 +175,12 @@
         },
         "negative_effect": {
           "type": "string",
-          "description": "부재의 negative effect (★ ★ unmapped error leak / spec drift / 500 leak 등)."
+          "description": "부재의 negative effect ( unmapped error leak / spec drift / 500 leak 등)."
         },
         "industry_standard": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "RFC / OWASP / framework docs 인용 (★ ≥ 1 필수)."
+          "description": "RFC / OWASP / framework docs 인용 ( ≥ 1 필수)."
         },
         "automatic_regression_capable": {
           "type": "object",
@@ -206,7 +206,7 @@
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "description": "★ ADR-FE-006 IR 4계층 정합 / framework 무관 metric. 0 = framework-coupled / 1 = framework-neutral. error-mapping-spec 본문은 ★ exception_class + http_status + mapping_mechanism axis 로 framework 무관 표준 = 1.0 목표. spring/nestjs 분기는 mechanism enum 으로 흡수."
+      "description": " ADR-FE-006 IR 4계층 정합 / framework 무관 metric. 0 = framework-coupled / 1 = framework-neutral. error-mapping-spec 본문은 exception_class + http_status + mapping_mechanism axis 로 framework 무관 표준 = 1.0 목표. spring/nestjs 분기는 mechanism enum 으로 흡수."
     },
     "ap_links": {
       "type": "array",
@@ -225,7 +225,7 @@
           },
           "adr_link": {
             "type": "string",
-            "description": "관련 ADR (★ ADR-BE-001 본 ADR 또는 ADR-FE-007 변형)."
+            "description": "관련 ADR ( ADR-BE-001 본 ADR 또는 ADR-FE-007 변형)."
           }
         }
       }
@@ -234,10 +234,10 @@
       "type": "object",
       "properties": {
         "total_handlers": {"type": "integer"},
-        "total_throw_unmapped": {"type": "integer", "description": "★ ★ AP-API-001 evidence count."},
+        "total_throw_unmapped": {"type": "integer", "description": " AP-API-001 evidence count."},
         "total_decorator_drift": {"type": "integer"},
         "rfc_compliant_ratio": {"type": "number", "minimum": 0, "maximum": 1},
-        "negative_space_triggered": {"type": "boolean", "description": "★ ★ ADR-BE-001 negative-space corroboration trigger 여부."}
+        "negative_space_triggered": {"type": "boolean", "description": " ADR-BE-001 negative-space corroboration trigger 여부."}
       }
     }
   }

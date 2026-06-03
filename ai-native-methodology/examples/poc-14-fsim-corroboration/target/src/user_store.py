@@ -7,7 +7,7 @@ from typing import Optional
 class User:
     id: int
     email: str
-    password: str  # ★ AP-FSIM-SEC-001 carry — bcrypt fix 는 v2.x scope
+    password: str  # AP-FSIM-SEC-001 carry — bcrypt fix 는 v2.x scope
 
 
 class InMemoryUserStore:

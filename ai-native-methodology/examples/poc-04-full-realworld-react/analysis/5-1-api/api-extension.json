@@ -19,7 +19,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-Login-*]",
         "form_validation_spec": "[F-VAL-LoginUserRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#Login",
@@ -34,7 +34,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-CreateUser-*]",
         "form_validation_spec": "[F-VAL-NewUserRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#CreateUser",
@@ -49,7 +49,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetCurrentUser-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetCurrentUser",
@@ -64,7 +64,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-UpdateCurrentUser-*]",
         "form_validation_spec": "[F-VAL-UpdateUserRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#UpdateCurrentUser",
@@ -79,7 +79,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetProfileByUsername-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetProfileByUsername",
@@ -94,7 +94,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-FollowUserByUsername-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#FollowUserByUsername",
@@ -109,7 +109,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-UnfollowUserByUsername-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#UnfollowUserByUsername",
@@ -124,7 +124,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetArticlesFeed-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetArticlesFeed",
@@ -139,7 +139,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetArticles-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetArticles",
@@ -154,7 +154,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-CreateArticle-*]",
         "form_validation_spec": "[F-VAL-NewArticleRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#CreateArticle",
@@ -169,7 +169,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetArticle-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetArticle",
@@ -184,7 +184,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-UpdateArticle-*]",
         "form_validation_spec": "[F-VAL-UpdateArticleRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#UpdateArticle",
@@ -199,7 +199,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-DeleteArticle-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#DeleteArticle",
@@ -214,7 +214,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetArticleComments-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetArticleComments",
@@ -229,7 +229,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-CreateArticleComment-*]",
         "form_validation_spec": "[F-VAL-NewCommentRequest-*]",
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#CreateArticleComment",
@@ -244,7 +244,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-DeleteArticleComment-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#DeleteArticleComment",
@@ -259,7 +259,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-CreateArticleFavorite-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#CreateArticleFavorite",
@@ -274,7 +274,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-DeleteArticleFavorite-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#DeleteArticleFavorite",
@@ -289,7 +289,7 @@
       "cross_link_targets": {
         "rules": "[BR-FE-GetTags-*]",
         "form_validation_spec": null,
-        "ui_spec_pages": "(★ Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
+        "ui_spec_pages": "(Sprint 5-2 5-2-a 산출 시 추론 / api_calls cross-link)"
       },
       "formal_spec_links": {
         "rules_json": "rules.json#GetTags",
@@ -299,6 +299,6 @@
   ],
   "summary": {
     "total_operations": 19,
-    "cross_link_coverage": "★ Sprint 5-2 5-2-a 산출 후 정량 측정 가능"
+    "cross_link_coverage": "Sprint 5-2 5-2-a 산출 후 정량 측정 가능"
   }
 }

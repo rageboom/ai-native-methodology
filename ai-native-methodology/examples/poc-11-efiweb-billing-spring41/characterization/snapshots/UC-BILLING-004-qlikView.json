@@ -1,13 +1,13 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-BILLING-004 Qlik View 임베드 (sub-domain B. QlikView). ★ thin iframe wrapper / 외부 BI 시스템 (datacafe.smilegate.net Qlik Sense) URL hardcoded.",
+  "$comment": " phase 4.7 (characterization) golden snapshot — UC-BILLING-004 Qlik View 임베드 (sub-domain B. QlikView). thin iframe wrapper / 외부 BI 시스템 (datacafe.smilegate.net Qlik Sense) URL hardcoded.",
   "snapshot_id": "SNAP-UC-BILLING-004",
   "use_case": "UC-BILLING-004",
   "endpoint": "GET /ifrs/billing/qlikView",
   "controller_method": "BillingController.qlikView",
   "service_method": "(none — Controller 단순 ModelAndView wrapper)",
   "sql_id": "(none — SQL 호출 ❌ / 외부 시스템 iframe)",
-  "layer": "unit (★ 단순 wrapper)",
-  "data_source_status": "★ 외부 BI 시스템 의존 (datacafe.smilegate.net) — 본 시스템 외부 / Qlik Sense 운영 expert carry",
+  "layer": "unit ( 단순 wrapper)",
+  "data_source_status": " 외부 BI 시스템 의존 (datacafe.smilegate.net) — 본 시스템 외부 / Qlik Sense 운영 expert carry",
   "scenarios": [
     {
       "id": "SCN-BILLING-004-001",
@@ -19,19 +19,19 @@
       "then": {
         "view_name": "/billing/qlikView",
         "model_attrs": { "menuNm": "결제대시보드", "appid": "qlik-app-001", "sheet": "sheet-billing-summary" },
-        "jsp_render": "★ qlikView.jsp = $('#qlik_frame').attr('src', 'https://datacafe.smilegate.net/sense/app/${appid}/sheet/${sheet}/state/analysis') / iframe 임베드",
+        "jsp_render": " qlikView.jsp = $('#qlik_frame').attr('src', 'https://datacafe.smilegate.net/sense/app/${appid}/sheet/${sheet}/state/analysis') / iframe 임베드",
         "iframe_src": "https://datacafe.smilegate.net/sense/app/qlik-app-001/sheet/sheet-billing-summary/state/analysis",
         "_BR_link": "BR-BILLING-EXTBI-008 (외부 BI Qlik Sense 임베드)"
       },
       "intent_classification": [
-        { "rule": "BR-BILLING-EXTBI-008", "type": "intent", "note": "외부 BI 임베드 의도 (★ 단, URL hardcoded 환경 변수 ❌)" }
+        { "rule": "BR-BILLING-EXTBI-008", "type": "intent", "note": "외부 BI 임베드 의도 ( 단, URL hardcoded 환경 변수 ❌)" }
       ],
       "behavior_to_preserve": [
         "외부 BI dashboard 임베드 (intent)",
         "메뉴별 appid + sheet 분기 (intent — 권한별 dashboard 분리)"
       ],
       "behavior_likely_bug": [
-        "★ AP-BILLING-013 (★ medium / 외부 BI URL hardcoded `datacafe.smilegate.net`) — 새 시스템 = application.properties qlik.base.url 또는 Reverse Proxy 의무"
+        " AP-BILLING-013 ( medium / 외부 BI URL hardcoded `datacafe.smilegate.net`) — 새 시스템 = application.properties qlik.base.url 또는 Reverse Proxy 의무"
       ]
     }
   ],

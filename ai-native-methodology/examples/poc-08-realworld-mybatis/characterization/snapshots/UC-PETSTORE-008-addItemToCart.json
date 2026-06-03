@@ -1,10 +1,10 @@
 {
-  "$comment": "★ phase 4.7 golden snapshot — UC-PETSTORE-008 장바구니 상품 추가 (★ session-only Cart / DB persistence ❌).",
+  "$comment": " phase 4.7 golden snapshot — UC-PETSTORE-008 장바구니 상품 추가 ( session-only Cart / DB persistence ❌).",
   "snapshot_id": "SNAP-UC-PETSTORE-008",
   "use_case": "UC-PETSTORE-008",
   "endpoint": "POST /cart/addItemToCart.action",
   "controller_method": "CartActionBean.addItemToCart",
-  "service_method": "(★ ★ direct mapper 호출 / Service 부재 — Cart = session-only)",
+  "service_method": "( direct mapper 호출 / Service 부재 — Cart = session-only)",
   "sql_id": "ItemMapper.getItem + getInventoryQuantity",
   "layer": "controller",
   "data_source_status": "Cart = session bean (CartActionBean @SessionScope) / DB persistence ❌",

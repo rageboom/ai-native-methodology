@@ -9,9 +9,9 @@
     "confidence": 0.72,
     "raw_confidence": 0.72,
     "warnings": [
-      "★ Spring MVC 4.1 + JSP server-rendered paradigm — REST API 아님 / 모든 method = public String 반환 (JSP view name)",
-      "★ ResponseEntity / @ResponseBody / @ExceptionHandler 모두 0건 (grep 결정적) → OpenAPI spec = 추정 / 현 시스템 ≠ OpenAPI 정합",
-      "★ 본 OpenAPI = 마이그레이션 시 REST API 변환 anchor / 현재 상태 추출이 아닌 target spec"
+      "Spring MVC 4.1 + JSP server-rendered paradigm — REST API 아님 / 모든 method = public String 반환 (JSP view name)",
+      "ResponseEntity / @ResponseBody / @ExceptionHandler 모두 0건 (grep 결정적) → OpenAPI spec = 추정 / 현 시스템 ≠ OpenAPI 정합",
+      "본 OpenAPI = 마이그레이션 시 REST API 변환 anchor / 현재 상태 추출이 아닌 target spec"
     ]
   },
   "openapi_file": "input/openapi.yaml",

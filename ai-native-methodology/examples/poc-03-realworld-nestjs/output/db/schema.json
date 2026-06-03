@@ -10,8 +10,8 @@
     "inputs_used": ["source_code", "orm"],
     "applied_modifiers": [],
     "applied_penalties": [
-      {"name": "single_source_only", "value": -0.05, "reason": "★ G6 v1.2.2 sub-section (b) TypeORM 정합 — schema.sql 파일 부재. ormconfig.json.example 의 synchronize:true 시 entity → 런타임 자동 생성. 사실상 출처 1종 (ORM entity)."},
-      {"name": "operational_db_absent", "value": -0.05, "reason": "운영 DB 접근 부재 — 자동 생성 DDL 의 실제 산출 검증 불가. AI 추론으로 추정 시 ★★★ no-simulation 정합 위반 위험. 정직 표기 의무."}
+      {"name": "single_source_only", "value": -0.05, "reason": " G6 v1.2.2 sub-section (b) TypeORM 정합 — schema.sql 파일 부재. ormconfig.json.example 의 synchronize:true 시 entity → 런타임 자동 생성. 사실상 출처 1종 (ORM entity)."},
+      {"name": "operational_db_absent", "value": -0.05, "reason": "운영 DB 접근 부재 — 자동 생성 DDL 의 실제 산출 검증 불가. AI 추론으로 추정 시  no-simulation 정합 위반 위험. 정직 표기 의무."}
     ],
     "raw_confidence": 0.80,
     "cap_applied": false,
@@ -40,19 +40,19 @@
         "confidence": 0.85,
         "element_count": 6,
         "extraction_method": "deterministic+inference",
-        "note": "★ FollowsEntity = followerId/followingId 단순 number column (FK 부재). 다른 관계 (Article.author, Article.comments, User.favorites JoinTable, Comment.article) 는 @ManyToOne/@OneToMany/@ManyToMany 명시"
+        "note": " FollowsEntity = followerId/followingId 단순 number column (FK 부재). 다른 관계 (Article.author, Article.comments, User.favorites JoinTable, Comment.article) 는 @ManyToOne/@OneToMany/@ManyToMany 명시"
       },
       "unique_constraints": {
         "confidence": 0.98,
         "element_count": 0,
         "extraction_method": "deterministic",
-        "note": "★ DB UQ 제약 0건 — 모든 @Column 에 unique:true 부재 확인. F-120 critical 확정."
+        "note": " DB UQ 제약 0건 — 모든 @Column 에 unique:true 부재 확인. F-120 critical 확정."
       },
       "consistency_check": {
         "confidence": 0.65,
         "element_count": 1,
         "extraction_method": "llm_with_grounding",
-        "caveat": "★ G6 v1.2.2 ORM sub-section (b) TypeORM — synchronize:true 의 자동 생성 DDL 추정. 실 DB 접근 부재 → AI 추론 회피 + 알고리즘 적용 ground truth 만"
+        "caveat": " G6 v1.2.2 ORM sub-section (b) TypeORM — synchronize:true 의 자동 생성 DDL 추정. 실 DB 접근 부재 → AI 추론 회피 + 알고리즘 적용 ground truth 만"
       }
     }
   },
@@ -64,8 +64,8 @@
       "entity_decorator": "@Entity('user')",
       "columns": [
         {"name": "id", "type": "int", "auto_increment": true, "primary_key": true, "nullable": false, "decorator": "@PrimaryGeneratedColumn()"},
-        {"name": "username", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "concern": "★ unique 제약 부재 — F-120 critical"},
-        {"name": "email", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "class_validator": "@IsEmail()", "concern": "★ unique 제약 부재 — F-120 critical"},
+        {"name": "username", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "concern": " unique 제약 부재 — F-120 critical"},
+        {"name": "email", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "class_validator": "@IsEmail()", "concern": " unique 제약 부재 — F-120 critical"},
         {"name": "bio", "type": "varchar(255)", "default": "''", "nullable": false, "decorator": "@Column({default: ''})"},
         {"name": "image", "type": "varchar(255)", "default": "''", "nullable": false, "decorator": "@Column({default: ''})"},
         {"name": "password", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "lifecycle": "@BeforeInsert argon2.hash"}
@@ -74,7 +74,7 @@
       "unique_constraints": [],
       "indexes": [],
       "relations": [
-        {"name": "favorites", "type": "ManyToMany", "target": "ArticleEntity", "join_table": "user_favorites_article (★ TypeORM auto-generated junction table)"},
+        {"name": "favorites", "type": "ManyToMany", "target": "ArticleEntity", "join_table": "user_favorites_article ( TypeORM auto-generated junction table)"},
         {"name": "articles", "type": "OneToMany", "target": "ArticleEntity", "mapped_by": "author"}
       ]
     },
@@ -85,14 +85,14 @@
       "entity_decorator": "@Entity('article')",
       "columns": [
         {"name": "id", "type": "int", "auto_increment": true, "primary_key": true, "decorator": "@PrimaryGeneratedColumn()"},
-        {"name": "slug", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "concern": "★ unique 제약 부재 — F-120 critical (slugify random suffix 회피만)"},
+        {"name": "slug", "type": "varchar(255)", "nullable": false, "decorator": "@Column()", "concern": " unique 제약 부재 — F-120 critical (slugify random suffix 회피만)"},
         {"name": "title", "type": "varchar(255)", "nullable": false, "decorator": "@Column()"},
         {"name": "description", "type": "varchar(255)", "default": "''", "nullable": false},
-        {"name": "body", "type": "varchar(255)", "default": "''", "nullable": false, "concern": "★ TypeORM default varchar(255) — body 가 긴 글 저장 의도라면 text 사용 의무 (★ 신규 finding 후보)"},
+        {"name": "body", "type": "varchar(255)", "default": "''", "nullable": false, "concern": " TypeORM default varchar(255) — body 가 긴 글 저장 의도라면 text 사용 의무 ( 신규 finding 후보)"},
         {"name": "created", "type": "timestamp", "default": "CURRENT_TIMESTAMP", "nullable": false},
         {"name": "updated", "type": "timestamp", "default": "CURRENT_TIMESTAMP", "lifecycle": "@BeforeUpdate updateTimestamp()"},
-        {"name": "tagList", "type": "text", "nullable": false, "decorator": "@Column('simple-array')", "concern": "★ TypeORM simple-array = comma-separated text — TagEntity 와 별개 (F-123 두 SoT)"},
-        {"name": "favoriteCount", "type": "int", "default": 0, "concern": "★ 분산 환경 race 위험"},
+        {"name": "tagList", "type": "text", "nullable": false, "decorator": "@Column('simple-array')", "concern": " TypeORM simple-array = comma-separated text — TagEntity 와 별개 (F-123 두 SoT)"},
+        {"name": "favoriteCount", "type": "int", "default": 0, "concern": " 분산 환경 race 위험"},
         {"name": "authorId", "type": "int", "nullable": true, "decorator": "(implicit FK from @ManyToOne author)", "fk": "user.id"}
       ],
       "primary_key": ["id"],
@@ -100,7 +100,7 @@
       "indexes": [],
       "relations": [
         {"name": "author", "type": "ManyToOne", "target": "UserEntity", "fk_column": "authorId", "fk_constraint": "(TypeORM auto-generated FK)"},
-        {"name": "comments", "type": "OneToMany", "target": "Comment", "mapped_by": "article", "eager": true, "concern": "★ F-124 N+1 위험"}
+        {"name": "comments", "type": "OneToMany", "target": "Comment", "mapped_by": "article", "eager": true, "concern": " F-124 N+1 위험"}
       ]
     },
     {
@@ -108,10 +108,10 @@
       "entity_class": "Comment",
       "entity_file": "src/article/comment.entity.ts",
       "entity_decorator": "@Entity() (default — table='comment')",
-      "concern": "★ 다른 entity 는 명시적 @Entity('xxx') — 비일관 (F-? 신규 후보)",
+      "concern": " 다른 entity 는 명시적 @Entity('xxx') — 비일관 (F-? 신규 후보)",
       "columns": [
         {"name": "id", "type": "int", "auto_increment": true, "primary_key": true},
-        {"name": "body", "type": "varchar(255)", "nullable": false, "concern": "★ varchar(255) — comment body 길이 부족 가능"},
+        {"name": "body", "type": "varchar(255)", "nullable": false, "concern": " varchar(255) — comment body 길이 부족 가능"},
         {"name": "articleId", "type": "int", "nullable": true, "decorator": "(implicit FK from @ManyToOne article)", "fk": "article.id"}
       ],
       "primary_key": ["id"],
@@ -126,10 +126,10 @@
       "entity_decorator": "@Entity('tag')",
       "columns": [
         {"name": "id", "type": "int", "auto_increment": true, "primary_key": true},
-        {"name": "tag", "type": "varchar(255)", "nullable": false, "concern": "★ unique 제약 부재 — tag 중복 가능"}
+        {"name": "tag", "type": "varchar(255)", "nullable": false, "concern": " unique 제약 부재 — tag 중복 가능"}
       ],
       "primary_key": ["id"],
-      "concern": "★ F-122 — insert 코드 부재 (TagService.findAll 만). dead code 가능성."
+      "concern": " F-122 — insert 코드 부재 (TagService.findAll 만). dead code 가능성."
     },
     {
       "name": "follows",
@@ -138,12 +138,12 @@
       "entity_decorator": "@Entity('follows')",
       "columns": [
         {"name": "id", "type": "int", "auto_increment": true, "primary_key": true},
-        {"name": "followerId", "type": "int", "nullable": false, "concern": "★★ FK 제약 부재 — F-121 high. PoC #02 user_follow JPA @ManyToOne 와 본질적 차이"},
-        {"name": "followingId", "type": "int", "nullable": false, "concern": "★★ FK 제약 부재"}
+        {"name": "followerId", "type": "int", "nullable": false, "concern": " FK 제약 부재 — F-121 high. PoC #02 user_follow JPA @ManyToOne 와 본질적 차이"},
+        {"name": "followingId", "type": "int", "nullable": false, "concern": " FK 제약 부재"}
       ],
       "primary_key": ["id"],
       "unique_constraints": [],
-      "concern": "★★ (followerId, followingId) composite UQ 부재 → 중복 follow 가능 (App pre-check 만 — ProfileService.follow 의 if (!_follows) 로 회피 시도)"
+      "concern": " (followerId, followingId) composite UQ 부재 → 중복 follow 가능 (App pre-check 만 — ProfileService.follow 의 if (!_follows) 로 회피 시도)"
     },
     {
       "name": "user_favorites_article",
@@ -155,7 +155,7 @@
         {"name": "articleId", "type": "int", "primary_key": true, "fk": "article.id"}
       ],
       "primary_key": ["userId", "articleId"],
-      "note": "★ TypeORM @JoinTable 가 자동 생성 — 명시적 entity 부재. 실 DB 접근 시 검증 의무"
+      "note": " TypeORM @JoinTable 가 자동 생성 — 명시적 entity 부재. 실 DB 접근 시 검증 의무"
     }
   ],
   "summary": {
@@ -171,10 +171,10 @@
     "lifecycle_hooks": ["UserEntity.@BeforeInsert (argon2)", "ArticleEntity.@BeforeUpdate (timestamp)"]
   },
   "ddl_extraction_method": {
-    "method": "★ G6 v1.2.2 ORM sub-section (b) TypeORM default naming algorithm",
+    "method": " G6 v1.2.2 ORM sub-section (b) TypeORM default naming algorithm",
     "naming_strategy": "default — camelCase 보존 + entity 명시적 name 우선",
     "operational_db_check": false,
-    "honesty_disclosure": "synchronize:true 자동 생성 DDL 의 실제 산출 검증 불가 (운영 DB 부재). 본 schema.json 은 entity 데코레이터 + TypeORM 알고리즘 추정. ★★★ no-simulation 정합 — AI 추론 ❌, 알고리즘 적용 ✅."
+    "honesty_disclosure": "synchronize:true 자동 생성 DDL 의 실제 산출 검증 불가 (운영 DB 부재). 본 schema.json 은 entity 데코레이터 + TypeORM 알고리즘 추정.  no-simulation 정합 — AI 추론 ❌, 알고리즘 적용 ✅."
   },
   "carry_over": [
     "Sprint 5 — 사용자 환경 MySQL setup → nest start → SHOW CREATE TABLE 검증 (5종 물증 의무 적용 시)",

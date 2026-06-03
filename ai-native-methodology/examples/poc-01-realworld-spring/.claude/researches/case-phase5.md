@@ -20,9 +20,9 @@
 
 ### 검증 강도 등급
 
-- **★★★** — 1차 자료 + URL 인용 + 본문 직접 확인 (WebFetch raw)
-- **★★** — 1차 URL 있음 + 본문 일부 확인
-- **★** — 코퍼스 기반 추론 / WebSearch summary — URL 미정밀 검증
+- \*\*\*\* — 1차 자료 + URL 인용 + 본문 직접 확인 (WebFetch raw)
+- \*\*\*\* — 1차 URL 있음 + 본문 일부 확인
+- \*\*\*\* — 코퍼스 기반 추론 / WebSearch summary — URL 미정밀 검증
 
 ### 한계
 
@@ -60,7 +60,7 @@
 
 ## 토픽 1. RealWorld 공식 spec — 22 endpoint cross-check
 
-### 1.1 1차 자료 — RealWorld Documentation (★★★)
+### 1.1 1차 자료 — RealWorld Documentation ()
 
 **URL**: https://realworld-docs.netlify.app/specifications/backend/endpoints/
 **Fetch 일시**: 2026-04-29
@@ -118,7 +118,7 @@
 
 ## 토픽 2. GitHub REST API — OpenAPI 공개 + x-extension 패턴
 
-### 2.1 1차 자료 — `github/rest-api-description` (★★★)
+### 2.1 1차 자료 — `github/rest-api-description` ()
 
 **URL**: https://github.com/github/rest-api-description
 **검증 방식**: WebFetch raw
@@ -226,7 +226,7 @@ Rate Limit 헤더 4건:
 
 ## 토픽 3. Stripe API — Bearer/Basic 이중 + 에러 표준 + Cursor pagination
 
-### 3.1 1차 자료 — Stripe API Authentication (★★★)
+### 3.1 1차 자료 — Stripe API Authentication ()
 
 **URL**: https://docs.stripe.com/api/authentication
 **검증 방식**: WebFetch raw
@@ -266,12 +266,12 @@ Rate Limit 헤더 4건:
 
 ```json
 {
-  "error": {
-    "type": "invalid_request_error",
-    "code": "parameter_missing",
-    "message": "...",
-    "param": "amount"
-  }
+	"error": {
+		"type": "invalid_request_error",
+		"code": "parameter_missing",
+		"message": "...",
+		"param": "amount"
+	}
 }
 ```
 
@@ -283,17 +283,17 @@ Rate Limit 헤더 4건:
 
 ```json
 {
-  "object": "list",
-  "url": "/v1/customers",
-  "has_more": false,
-  "data": [
-    {
-      "id": "cus_4QFJOjw2pOmAGJ",
-      "object": "customer",
-      "email": null,
-      "created": 1405641735
-    }
-  ]
+	"object": "list",
+	"url": "/v1/customers",
+	"has_more": false,
+	"data": [
+		{
+			"id": "cus_4QFJOjw2pOmAGJ",
+			"object": "customer",
+			"email": null,
+			"created": 1405641735
+		}
+	]
 }
 ```
 
@@ -339,7 +339,7 @@ components:
       required: [user]
       properties:
         user:
-          $ref: "#/components/schemas/User"
+          $ref: '#/components/schemas/User'
 ```
 
 → **본 PoC 권장 방식**. 22 endpoint 의 wrapper 패턴이 일관 (`UserResponse` / `ArticleResponse` / `ProfileResponse` / `CommentResponse` / `TagsResponse` / `ArticlesResponse`) → 6 wrapper schema 필요.
@@ -348,7 +348,7 @@ components:
 
 ```yaml
 responses:
-  "200":
+  '200':
     content:
       application/json:
         schema:
@@ -395,7 +395,7 @@ responses:
 
 ## 토픽 5. 한국 5사 — 카카오 / 네이버 / 토스 / 배민 / 라인
 
-### 5.1 카카오 — `Authorization: KakaoAK <key>` 비표준 prefix (★★)
+### 5.1 카카오 — `Authorization: KakaoAK <key>` 비표준 prefix ()
 
 **검증 방식**: WebSearch + 1차 URL 부분 확인 (https://developers.kakao.com/docs/latest/en/rest-api/reference)
 
@@ -407,7 +407,7 @@ responses:
 → **본 PoC 의 `Authorization: Token <jwt>` 와 동일 패턴**. 카카오의 `KakaoAK` ≈ RealWorld 의 `Token` (둘 다 비표준 prefix).
 → **OpenAPI 표기 시 `apiKey` 우회 패턴 정당화 사례** (토픽 6 상세).
 
-### 5.2 네이버 — `X-Naver-Client-Id` + `X-Naver-Client-Secret` 커스텀 헤더 (★★)
+### 5.2 네이버 — `X-Naver-Client-Id` + `X-Naver-Client-Secret` 커스텀 헤더 ()
 
 **검증 방식**: WebSearch + 일부 1차 자료
 
@@ -421,7 +421,7 @@ responses:
 → **`Authorization` 헤더 전혀 안 씀**. 완전 커스텀 헤더 채택.
 → OpenAPI 표기는 단순 (`type: apiKey + in: header + name: X-Naver-Client-Id`).
 
-### 5.3 토스페이먼츠 — Basic Auth + 객체 직접 반환 (★★★)
+### 5.3 토스페이먼츠 — Basic Auth + 객체 직접 반환 ()
 
 **URL**: https://docs.tosspayments.com/reference
 **검증 방식**: WebFetch raw
@@ -434,7 +434,7 @@ responses:
 
 → **OpenAPI 표기**: `type: http + scheme: basic`. 표준 형태.
 
-### 5.4 배달의민족 (우아한형제들) — Spring REST Docs + `{code, message, data}` wrapper (★★★)
+### 5.4 배달의민족 (우아한형제들) — Spring REST Docs + `{code, message, data}` wrapper ()
 
 **URL**: https://techblog.woowahan.com/2597/
 **검증 방식**: WebFetch raw
@@ -448,7 +448,7 @@ responses:
 → **본 PoC 의 핵심 motivation 과 동일** (drift 검출). 본 PoC 는 reverse engineering 이지만 동일 원칙.
 → **F-016 (DB drift) 와 동일한 함의** — API 문서도 drift 한다.
 
-### 5.5 라인 (LY Corp) — API 디자인 가이드라인 부재 1차 (★)
+### 5.5 라인 (LY Corp) — API 디자인 가이드라인 부재 1차 ()
 
 **URL 시도**: https://techblog.lycorp.co.jp/en/api-design-guideline-line-bot-platform → **404**
 **검증 한계**: 라인의 사내 API 표준 1차 자료 부재 — public 공개 자료 없음
@@ -535,7 +535,7 @@ security:
 
 → **공식 가이드는 `Authorization` 헤더의 비표준 사용에 대해 명시 금지/허용 없음**. 그러나 `apiKey` 의 `name` 필드에 어떤 헤더 이름이든 허용 (`X-API-KEY`, `Authorization` 등).
 
-### 6.3 OAI/OpenAPI-Specification Issue #583 — 커뮤니티 토론 (★★)
+### 6.3 OAI/OpenAPI-Specification Issue #583 — 커뮤니티 토론 ()
 
 **URL**: https://github.com/OAI/OpenAPI-Specification/issues/583
 **검증 한계**: 본문 일부만 확인 (전체 thread 미확보)
@@ -546,7 +546,7 @@ security:
 
 **현재 상태** (검증 한계 — 학습 코퍼스): Issue 는 OpenAPI 4.0 (Moonwalk) 까지 unresolved. 커뮤니티 합의는 **`apiKey + in: header + name: Authorization` 우회** 가 사실상 표준.
 
-### 6.4 Speakeasy 가이드 — http vs apiKey 분리 권고 (★★)
+### 6.4 Speakeasy 가이드 — http vs apiKey 분리 권고 ()
 
 **검증 방식**: WebSearch summary
 
@@ -557,7 +557,7 @@ security:
 - 표준 (Bearer/Basic) → `http`
 - 비표준 prefix → `apiKey` 채택이 **사실상 표준**
 
-### 6.5 springdoc-openapi 의 한계 (★)
+### 6.5 springdoc-openapi 의 한계 ()
 
 **URL**: https://github.com/springdoc/springdoc-openapi/issues/1843
 **검증 한계**: thread 일부 확인
@@ -588,14 +588,14 @@ components:
 
 ## 토픽 7. API ↔ Use Case 매핑 패턴 — DDD 사례
 
-### 7.1 OperationId 표준 — OpenAPI 명세 (★★★)
+### 7.1 OperationId 표준 — OpenAPI 명세 ()
 
 **일반론**:
 
 - `operationId` 는 OpenAPI 명세에서 **uniqueness 강제** (전체 spec 단일)
 - 권장 형식: `verbResource` (e.g., `getUser`, `createArticle`) 또는 `domain.action` (Stripe 패턴: `customers.list`)
 
-### 7.2 Microservices.io — API Composition 패턴 (★★)
+### 7.2 Microservices.io — API Composition 패턴 ()
 
 **URL**: https://microservices.io/patterns/microservices.html
 **검증 방식**: WebFetch raw
@@ -607,7 +607,7 @@ components:
 
 **한계**: operationId ↔ Use Case 매핑 직접 언급 부재. 일반 패턴.
 
-### 7.3 RealWorld 의 사실상 operationId 표준 (★★★)
+### 7.3 RealWorld 의 사실상 operationId 표준 ()
 
 RealWorld 표준 spec 의 endpoint 이름 (메인 사전 fetch 결과):
 
@@ -633,7 +633,7 @@ RealWorld 표준 spec 의 endpoint 이름 (메인 사전 fetch 결과):
 
 **총 19 unique operationId** (4 GET /articles 통합 시 22 - 3 = 19). 22 와 19 의 차이 = query 변형 단일 operationId 처리.
 
-### 7.4 Eric Evans / Vaughn Vernon — UC 양방향 추적 (★★)
+### 7.4 Eric Evans / Vaughn Vernon — UC 양방향 추적 ()
 
 **일반론** (학습 코퍼스):
 
@@ -682,7 +682,7 @@ x-related-use-cases:
 
 ## 토픽 8. Postman → OpenAPI 변환 도구 + 한계
 
-### 8.1 1차 자료 — joolfe/postman-to-openapi (★★★)
+### 8.1 1차 자료 — joolfe/postman-to-openapi ()
 
 **URL**: https://github.com/joolfe/postman-to-openapi
 **검증 방식**: WebFetch raw
@@ -711,7 +711,7 @@ x-related-use-cases:
 - Wrapper: example body 기반 inline schema → **수동 `$ref` 분리**
 - UC 매핑: 도구는 못 함 → **수동 `x-related-use-cases` 추가**
 
-### 8.3 대안 도구 비교 (★)
+### 8.3 대안 도구 비교 ()
 
 **검증 한계**: 1차 자료 빈약. 학습 코퍼스 기반 일반론.
 
@@ -733,11 +733,11 @@ x-related-use-cases:
 
 ---
 
-## 토픽 9. Netflix — OpenAPI 미공개 + GraphQL Federation (★)
+## 토픽 9. Netflix — OpenAPI 미공개 + GraphQL Federation ()
 
 ### 9.1 검증 한계
 
-**URL 시도**: https://netflixtechblog.com/tagged/api → Medium 인증 redirect (★ 학습 코퍼스 의존)
+**URL 시도**: https://netflixtechblog.com/tagged/api → Medium 인증 redirect (학습 코퍼스 의존)
 
 **일반론**:
 
@@ -745,7 +745,7 @@ x-related-use-cases:
 - 외부 노출 API 는 GraphQL Federation 으로 통합 (DGS framework)
 - 메타 정책: Falcor (deprecated, 2018-2020) → Studio Edge GraphQL (2020-)
 
-### 9.2 Atlas — 시계열 메트릭 API (학습 코퍼스 ★)
+### 9.2 Atlas — 시계열 메트릭 API (학습 코퍼스 )
 
 **일반론**:
 
@@ -781,7 +781,7 @@ x-related-use-cases:
 
 #### 사례 1 — Spring Security 표준 default
 
-**일반론** (학습 코퍼스 ★★):
+**일반론** (학습 코퍼스 ):
 
 - Spring Security 5.x+ 는 `sessionCreationPolicy` 미명시 시 **`IF_REQUIRED` default**
 - JWT + Stateless 패턴은 **STATELESS 명시 권장** (Baeldung / Spring 공식 권장)
@@ -827,7 +827,7 @@ x-related-use-cases:
 
 ### 10.3 잠재 불일치 3: `WebSecurity#ignoring` vs `permitAll`
 
-#### 사례 — Spring Security 공식 (★★★)
+#### 사례 — Spring Security 공식 ()
 
 **일반론** (학습 코퍼스 + Spring Security 공식 가이드):
 
@@ -865,9 +865,9 @@ x-related-use-cases:
 
 **사례 인용**:
 
-- 카카오 `KakaoAK` (★★) — 본 PoC 와 정합 패턴
-- Speakeasy 가이드 (★★) — `apiKey` 가 비표준 prefix 의 사실상 표준
-- OAI Issue #583 (★★) — 표준 부재, `apiKey` 우회 합의
+- 카카오 `KakaoAK` () — 본 PoC 와 정합 패턴
+- Speakeasy 가이드 () — `apiKey` 가 비표준 prefix 의 사실상 표준
+- OAI Issue #583 () — 표준 부재, `apiKey` 우회 합의
 
 **최종**: ✅ `type: apiKey + in: header + name: Authorization`. 5사 사례 정합.
 
@@ -875,9 +875,9 @@ x-related-use-cases:
 
 **사례 인용**:
 
-- 배민 `{code, message, data}` (★★★) — 사내 wrapper 표준 흔함
-- RealWorld 공식 spec (★★★) — wrapper 강제
-- Stripe / 토스 (★★★) — wrapper 없음 (반대 패턴)
+- 배민 `{code, message, data}` () — 사내 wrapper 표준 흔함
+- RealWorld 공식 spec () — wrapper 강제
+- Stripe / 토스 () — wrapper 없음 (반대 패턴)
 
 **최종**: ✅ Wrapper schema 명시 분리 (방식 A). 6 wrapper schema 생성. RealWorld spec 충실.
 
@@ -885,8 +885,8 @@ x-related-use-cases:
 
 **사례 인용**:
 
-- GitHub `previews` extension (★★★) — vendor extension 으로 spec 한계 메모
-- Stripe `doc_url` (★★★) — 외부 link 로 known issue 안내
+- GitHub `previews` extension () — vendor extension 으로 spec 한계 메모
+- Stripe `doc_url` () — 외부 link 로 known issue 안내
 
 **최종**: ✅ `x-known-bug` extension 신설 + `description` 에도 명시 (이중). 운영자 + 외부 클라이언트 모두 인지.
 
@@ -914,7 +914,7 @@ delete:
 
 **사례 인용**:
 
-- GitHub `x-github` extension (★★★) — vendor extension 으로 사내 메타 노출
+- GitHub `x-github` extension () — vendor extension 으로 사내 메타 노출
 - 일부 회사 (Stripe / 토스): vendor ext 미사용 — 표준만 노출
 
 **최종**: ✅ 사내 메타 `x-architectural-debt` 노출 + **public-facing strip pipeline** 권장.
@@ -937,8 +937,8 @@ get:
 
 **사례 인용**:
 
-- Stripe `GET /v1/customers` (★★★) — query 파라미터로 분기, 단일 operation
-- GitHub `GET /repos/{owner}/{repo}/issues` (★★★) — 동일 패턴
+- Stripe `GET /v1/customers` () — query 파라미터로 분기, 단일 operation
+- GitHub `GET /repos/{owner}/{repo}/issues` () — 동일 패턴
 
 **최종**: ✅ 단일 `getArticles` operationId. UC 매핑은 array 로 4건 (UC-ARTICLE-LIST + LIST-BY-{TAG,AUTHOR,FAVORITED}).
 
@@ -979,51 +979,51 @@ get:
 
 ```json
 {
-  "metadata": {
-    "methodology_version": "v1.1.2",
-    "phase": "phase-5-1-api",
-    "source_commit": "56be3ced4f3134424ead5fcaf387b3aa640b9532",
-    "extracted_at": "2026-04-29",
-    "deliverable_id": "ADR-002-#3"
-  },
-  "operations": [
-    {
-      "operation_id": "deleteArticleComment",
-      "method": "DELETE",
-      "path": "/api/articles/{slug}/comments/{id}",
-      "related_use_cases": ["UC-COMMENT-DELETE"],
-      "related_business_rules": ["BR-COMMENT-DELETE-001"],
-      "related_antipatterns": ["AP-DOMAIN-001"],
-      "auth_required": true,
-      "security": ["TokenAuth"],
-      "known_bugs": [
-        {
-          "finding_id": "F-027",
-          "severity": "critical",
-          "summary": "De Morgan bug — intent OR, actual AND",
-          "source_evidence": "Article.java:86"
-        }
-      ],
-      "confidence": 0.95
-    },
-    {
-      "operation_id": "getArticles",
-      "method": "GET",
-      "path": "/api/articles",
-      "related_use_cases": [
-        "UC-ARTICLE-LIST",
-        "UC-ARTICLE-LIST-BY-TAG",
-        "UC-ARTICLE-LIST-BY-AUTHOR",
-        "UC-ARTICLE-LIST-BY-FAVORITED"
-      ],
-      "related_business_rules": [],
-      "auth_required": false,
-      "security": [],
-      "query_variants": ["tag", "author", "favorited"],
-      "pagination": { "type": "offset", "default_limit": 20 },
-      "confidence": 0.95
-    }
-  ]
+	"metadata": {
+		"methodology_version": "v1.1.2",
+		"phase": "phase-5-1-api",
+		"source_commit": "56be3ced4f3134424ead5fcaf387b3aa640b9532",
+		"extracted_at": "2026-04-29",
+		"deliverable_id": "ADR-002-#3"
+	},
+	"operations": [
+		{
+			"operation_id": "deleteArticleComment",
+			"method": "DELETE",
+			"path": "/api/articles/{slug}/comments/{id}",
+			"related_use_cases": ["UC-COMMENT-DELETE"],
+			"related_business_rules": ["BR-COMMENT-DELETE-001"],
+			"related_antipatterns": ["AP-DOMAIN-001"],
+			"auth_required": true,
+			"security": ["TokenAuth"],
+			"known_bugs": [
+				{
+					"finding_id": "F-027",
+					"severity": "critical",
+					"summary": "De Morgan bug — intent OR, actual AND",
+					"source_evidence": "Article.java:86"
+				}
+			],
+			"confidence": 0.95
+		},
+		{
+			"operation_id": "getArticles",
+			"method": "GET",
+			"path": "/api/articles",
+			"related_use_cases": [
+				"UC-ARTICLE-LIST",
+				"UC-ARTICLE-LIST-BY-TAG",
+				"UC-ARTICLE-LIST-BY-AUTHOR",
+				"UC-ARTICLE-LIST-BY-FAVORITED"
+			],
+			"related_business_rules": [],
+			"auth_required": false,
+			"security": [],
+			"query_variants": ["tag", "author", "favorited"],
+			"pagination": { "type": "offset", "default_limit": 20 },
+			"confidence": 0.95
+		}
+	]
 }
 ```
 
@@ -1069,7 +1069,7 @@ components:
       type: object
       required: [user]
       properties:
-        user: { $ref: "#/components/schemas/User" }
+        user: { $ref: '#/components/schemas/User' }
 
     LoginUserRequest:
       type: object
@@ -1107,20 +1107,20 @@ components:
         updatedAt: { type: string, format: date-time }
         favorited: { type: boolean }
         favoritesCount: { type: integer }
-        author: { $ref: "#/components/schemas/Profile" }
+        author: { $ref: '#/components/schemas/Profile' }
 
     ArticleResponse:
       type: object
       required: [article]
       properties:
-        article: { $ref: "#/components/schemas/Article" }
+        article: { $ref: '#/components/schemas/Article' }
 
     ArticlesResponse:
       type: object
       required: [articles, articlesCount]
       properties:
         articles:
-          { type: array, items: { $ref: "#/components/schemas/Article" } }
+          { type: array, items: { $ref: '#/components/schemas/Article' } }
         articlesCount: { type: integer }
 
     GenericErrorModel:
@@ -1167,18 +1167,18 @@ paths:
       security:
         - TokenAuth: []
       responses:
-        "200":
+        '200':
           description: Single comment
-        "401":
+        '401':
           description: Unauthorized
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/GenericErrorModel" }
-        "422":
+              schema: { $ref: '#/components/schemas/GenericErrorModel' }
+        '422':
           description: Unexpected error
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/GenericErrorModel" }
+              schema: { $ref: '#/components/schemas/GenericErrorModel' }
       x-related-use-cases:
         - UC-COMMENT-DELETE
       x-related-rules:
@@ -1188,10 +1188,10 @@ paths:
       x-known-bug:
         finding_id: F-027
         severity: critical
-        title: "De Morgan bug — intent OR, actual AND"
-        source_evidence: "Article.java:86"
-        impact: "Regular comment authors cannot delete their own comments"
-        remediation: "Refactor to OR logic: `commentAuthor.equals(caller) || articleAuthor.equals(caller)`"
+        title: 'De Morgan bug — intent OR, actual AND'
+        source_evidence: 'Article.java:86'
+        impact: 'Regular comment authors cannot delete their own comments'
+        remediation: 'Refactor to OR logic: `commentAuthor.equals(caller) || articleAuthor.equals(caller)`'
 ```
 
 ---
@@ -1249,10 +1249,10 @@ paths:
 
 ### 13.1 본 리서치 한계 5건
 
-1. **Netflix 1차 자료 부재** — Medium 인증 redirect, 학습 코퍼스 의존 ★ (cross-validation 부적합 — 사례 인용 자제)
+1. **Netflix 1차 자료 부재** — Medium 인증 redirect, 학습 코퍼스 의존 (cross-validation 부적합 — 사례 인용 자제)
 2. **한국 5사 중 라인 1차 자료 부재** — techblog.lycorp.co.jp 404 (학습 코퍼스 의존)
 3. **카카오 OpenAPI 운영 1차 회고 부재** — public 자료 없음 (인증 헤더만 확인)
-4. **OAI Issue #583 thread 일부만 확인** — 전체 thread 미확보 (★★ → ★★★ 조정 필요)
+4. **OAI Issue #583 thread 일부만 확인** — 전체 thread 미확보 (→ 조정 필요)
 5. **postman-to-openapi 변환 한계 1차 자료 빈약** — 학습 코퍼스 일반론 + archive 공지로 대체
 
 ### 13.2 후속 작업 권고
@@ -1274,7 +1274,7 @@ paths:
 
 ## §14. 참조 URL 종합
 
-### 1차 자료 (★★★ — WebFetch 본문 확인)
+### 1차 자료 (— WebFetch 본문 확인)
 
 1. https://realworld-docs.netlify.app/specifications/backend/endpoints/ — RealWorld 공식 spec
 2. https://github.com/github/rest-api-description — GitHub OpenAPI 공개 repo
@@ -1291,7 +1291,7 @@ paths:
 13. https://techblog.woowahan.com/2597/ — 배민 Spring REST Docs
 14. https://martinfowler.com/articles/richardsonMaturityModel.html — Richardson Maturity Model
 
-### 2차 자료 (★★ — WebSearch summary + 일부 1차 확인)
+### 2차 자료 (— WebSearch summary + 일부 1차 확인)
 
 15. https://github.com/OAI/OpenAPI-Specification/issues/583 — 비표준 Authorization 토론
 16. https://developers.kakao.com/docs/latest/en/rest-api/reference — 카카오 KakaoAK
@@ -1301,7 +1301,7 @@ paths:
 20. https://github.com/springdoc/springdoc-openapi/issues/1843 — springdoc 한계
 21. https://api.ncloud-docs.com/docs/en/common-naverapi-naverapi — 네이버 X-Naver-Client-\*
 
-### 검증 한계 (★ — 학습 코퍼스 의존)
+### 검증 한계 (— 학습 코퍼스 의존)
 
 22. Netflix Tech Blog (Medium 인증 redirect) — GraphQL Federation
 23. https://techblog.lycorp.co.jp/en/api-design-guideline-line-bot-platform — 라인 (404)

@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #05 sample-user-register — analysis stage (chain 0) 산출 / chain 1 (planning) 입력. minimum scope.",
+  "$comment": "PoC #05 sample-user-register — analysis stage (chain 0) 산출 / chain 1 (planning) 입력. minimum scope.",
   "project_id": "poc-05-sample-user-register",
   "language": "TypeScript",
   "stack_signals": [

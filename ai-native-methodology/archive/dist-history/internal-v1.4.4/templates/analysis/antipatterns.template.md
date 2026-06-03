@@ -9,23 +9,23 @@
 
 ## 메타 정보
 
-| 항목 | 값 |
-|---|---|
-| 생성일시 | {meta.generated_at} |
-| 사용된 입력 | Phase 1~5 모든 결과 |
-| 평균 신뢰도 | {meta.confidence} |
-| 총 항목 수 | {antipatterns.length} |
-| 카테고리 | 8개 (ARCH/DB/DOM/API/FE/CFG/EXT/COMPOSITE) |
+| 항목        | 값                                         |
+| ----------- | ------------------------------------------ |
+| 생성일시    | {meta.generated_at}                        |
+| 사용된 입력 | Phase 1~5 모든 결과                        |
+| 평균 신뢰도 | {meta.confidence}                          |
+| 총 항목 수  | {antipatterns.length}                      |
+| 카테고리    | 8개 (ARCH/DB/DOM/API/FE/CFG/EXT/COMPOSITE) |
 
 ### severity 분포
 
-| severity | 건수 | 의미 |
-|---|---|---|
-| critical | {n_critical} | ★★★ 즉시 수정 의무 (production blocker / OWASP A01-A10) |
-| high | {n_high} | 재구현 시 우선 처리 (보안/데이터 손실 위험) |
-| medium | {n_medium} | 재구현 시 함께 정상화 권장 |
-| low | {n_low} | 시간 여유 시 정상화 |
-| positive | {n_positive} | ★★ 모범 사례 등재 (★ v1.2.3 신설 — cross-PoC 학습 효과 입증) |
+| severity | 건수         | 의미                                                     |
+| -------- | ------------ | -------------------------------------------------------- |
+| critical | {n_critical} | 즉시 수정 의무 (production blocker / OWASP A01-A10)      |
+| high     | {n_high}     | 재구현 시 우선 처리 (보안/데이터 손실 위험)              |
+| medium   | {n_medium}   | 재구현 시 함께 정상화 권장                               |
+| low      | {n_low}      | 시간 여유 시 정상화                                      |
+| positive | {n_positive} | 모범 사례 등재 ( v1.2.3 신설 — cross-PoC 학습 효과 입증) |
 
 ---
 
@@ -52,9 +52,9 @@ evidence:
   - missing_in: [erd, orm]
 
 why_avoid:
-  - "재구현 시 컬럼 누락 → 데이터 손실"
-  - "의도가 불명 (수동 추가? 임시?) → 정책 추적 불가"
-  - "운영자 메모인지, 시스템 메모인지 모호"
+  - '재구현 시 컬럼 누락 → 데이터 손실'
+  - '의도가 불명 (수동 추가? 임시?) → 정책 추적 불가'
+  - '운영자 메모인지, 시스템 메모인지 모호'
 
 recommended_alternative: |
   결정 필요 (도메인 전문가 + DBA):
@@ -95,9 +95,9 @@ evidence:
     be_check: 없음
 
 why_avoid:
-  - "보안 위험: API 직접 호출로 우회 가능"
-  - "FE/BE 검증 일관성 위배"
-  - "API 사용자(외부 통합)에게 정책 부재로 보임"
+  - '보안 위험: API 직접 호출로 우회 가능'
+  - 'FE/BE 검증 일관성 위배'
+  - 'API 사용자(외부 통합)에게 정책 부재로 보임'
 
 recommended_alternative: |
   BE에 동일 validation 추가:
@@ -131,16 +131,16 @@ description: |
 
 evidence:
   - phase: 4 (도메인)
-    finding: "Order 엔티티에 행동 메서드 부재"
+    finding: 'Order 엔티티에 행동 메서드 부재'
     files: [Order.java]
   - phase: 4 (5.A DB)
-    finding: "SQL CASE에 할인 정책"
+    finding: 'SQL CASE에 할인 정책'
     file: OrderMapper.xml#findActiveOrders
 
 why_avoid:
-  - "정책 변경 시 SQL 수정 필요 (배포 위험↑)"
-  - "테스트 작성 어려움 (DB 의존)"
-  - "도메인 모델의 의도 불명"
+  - '정책 변경 시 SQL 수정 필요 (배포 위험↑)'
+  - '테스트 작성 어려움 (DB 의존)'
+  - '도메인 모델의 의도 불명'
 
 recommended_alternative: |
   단계적 접근:
@@ -152,15 +152,15 @@ related:
   business_rules: [BR-ORDER-PRICE-001, BR-ORDER-PRICE-002]
   affected_modules: [MOD-ORDER]
 
-# ★ v1.2.3 신설 — Phase 4.5 cross-link (composite AP 권장)
+# v1.2.3 신설 — Phase 4.5 cross-link (composite AP 권장)
 formal_spec_links:
   decision_tables:
-    - "../formal-spec/decision-tables/BR-ORDER-PRICE-001.md"
-    - "../formal-spec/decision-tables/BR-ORDER-PRICE-002.md"
+    - '../formal-spec/decision-tables/BR-ORDER-PRICE-001.md'
+    - '../formal-spec/decision-tables/BR-ORDER-PRICE-002.md'
   state_machines:
-    - "../formal-spec/state-machines/Order.json"
+    - '../formal-spec/state-machines/Order.json'
   invariants:
-    - "../formal-spec/invariants/Order.ts"
+    - '../formal-spec/invariants/Order.ts'
 ```
 
 - [ ] 결정 완료
@@ -193,7 +193,7 @@ formal_spec_links:
 ```mermaid
 flowchart LR
     AP["전체 안티패턴 {N}건"]
-    
+
     AP --> ARCH["AP-ARCH<br/>{n_arch}건"]
     AP --> DB["AP-DB<br/>{n_db}건"]
     AP --> DOM["AP-DOM<br/>{n_dom}건"]
@@ -202,20 +202,20 @@ flowchart LR
     AP --> CFG["AP-CFG<br/>{n_cfg}건"]
     AP --> EXT["AP-EXT<br/>{n_ext}건"]
     AP --> COMP["AP-COMPOSITE<br/>{n_comp}건"]
-    
+
     style COMP fill:#f8d7da
 ```
 
-| 카테고리 | 건수 | 평균 severity |
-|---|---|---|
-| AP-ARCH (아키텍처) | {n_arch} | medium |
-| AP-DB (DB) | {n_db} | medium |
-| AP-DOM (도메인) | {n_dom} | medium |
-| AP-API (API) | {n_api} | low |
-| AP-FE (FE) | {n_fe} | medium |
-| AP-CFG (설정) | {n_cfg} | medium |
-| AP-EXT (외부) | {n_ext} | medium |
-| AP-COMPOSITE (복합) | {n_comp} | high |
+| 카테고리            | 건수     | 평균 severity |
+| ------------------- | -------- | ------------- |
+| AP-ARCH (아키텍처)  | {n_arch} | medium        |
+| AP-DB (DB)          | {n_db}   | medium        |
+| AP-DOM (도메인)     | {n_dom}  | medium        |
+| AP-API (API)        | {n_api}  | low           |
+| AP-FE (FE)          | {n_fe}   | medium        |
+| AP-CFG (설정)       | {n_cfg}  | medium        |
+| AP-EXT (외부)       | {n_ext}  | medium        |
+| AP-COMPOSITE (복합) | {n_comp} | high          |
 
 ---
 
@@ -228,7 +228,7 @@ flowchart LR
     AP -.|회피 권장.-> API["API 계약"]
     AP -.|회피 권장.-> DB["DB 스키마"]
     AP -.|관련.-> RULES["비즈니스 규칙"]
-    
+
     style AP fill:#f8d7da,stroke:#721c24,stroke-width:3px
 ```
 
@@ -254,6 +254,7 @@ flowchart LR
 ## 톤 점검 자체 보고
 
 자동 톤 점검 결과 (Phase 6에서):
+
 - 비난 표현 검출: 0건
 - "회피 후보" 톤 준수: 100%
 

@@ -1,4 +1,4 @@
-# MIGRATION — v1.x → v2.0 (★ ★ ★ chain harness validated)
+# MIGRATION — v1.x → v2.0 (chain harness validated)
 
 > sub-plan-6 / Senior F7 흡수 — v2.0.0-rc1 청자 (사내 onboarding + 외부 plugin install user) 별 migration guide.
 
@@ -8,23 +8,25 @@
 
 ## 호칭 변경
 
-| 영역 | v1.x | v2.0 |
-|---|---|---|
-| description | "Legacy 코드 → 7대 산출물 한 방향 추출기" | "SDLC 4단계 chain harness" |
-| flow SSOT | analysis.phase-flow.json | flows/sdlc-4stage-flow.json (analysis = sub_flow) |
-| skill 진입 | 사용자가 skill 직접 호출 | `/aimd-next` 또는 `/aimd-stage <name>` (★ chain-driver mediated) |
+| 영역        | v1.x                                      | v2.0                                                           |
+| ----------- | ----------------------------------------- | -------------------------------------------------------------- |
+| description | "Legacy 코드 → 7대 산출물 한 방향 추출기" | "SDLC 4단계 chain harness"                                     |
+| flow SSOT   | analysis.phase-flow.json                  | flows/sdlc-4stage-flow.json (analysis = sub_flow)              |
+| skill 진입  | 사용자가 skill 직접 호출                  | `/aimd-next` 또는 `/aimd-stage <name>` (chain-driver mediated) |
 
 ## 변경 항목 (Breaking)
 
 ### 1. workflow paradigm
 
 v1.x:
+
 ```
 사용자: /init
 → skill 호출 → 7대 산출물 → 끝
 ```
 
 v2.0:
+
 ```
 사용자: chain-driver init <project>      # .aimd/state.json 초기화
 사용자: /aimd-next                          # chain 1 (planning) 진입
@@ -36,6 +38,7 @@ v2.0:
 ```
 
 **v1.x skill 직접 호출 시도** → mechanical gate trio 가 차단할 수 있음:
+
 - (i) state.blocked=true → 후속 chain-driver 명령 모두 exit 2
 - (ii) cli exit 2 + "blocked" 메시지 반복
 - (iii) PreToolUse `permissionDecision: deny` 로 `.aimd/output/**` 대상 Write/Edit 차단
@@ -69,14 +72,14 @@ v1.x 의 7대 산출물 (rules.json / domain.json / openapi.yaml / schema.json /
 
 ```json
 {
-  "derivation_source": {
-    "type": "legacy-extraction",
-    "source_artifacts": [
-      "input/rules.json",
-      "input/domain.json",
-      "input/inventory.json"
-    ]
-  }
+	"derivation_source": {
+		"type": "legacy-extraction",
+		"source_artifacts": [
+			"input/rules.json",
+			"input/domain.json",
+			"input/inventory.json"
+		]
+	}
 }
 ```
 

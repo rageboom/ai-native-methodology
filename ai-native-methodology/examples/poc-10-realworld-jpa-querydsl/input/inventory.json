@@ -1,45 +1,45 @@
 {
-  "$comment": "★ ★ ★ ★ PoC #10 Day 1 — raeperd/realworld-springboot-java analysis. ★ ★ ★ paradigm-cross MEDIUM #3 (★ ★ ★ ★ DSL builder QueryDSL ❌ 솔직 / Spring Data JPA method name derived query paradigm 측정 / reframe — 본 방법론 일반화 자격 입증 / v2.3.0 minor trigger ❌).",
+  "$comment": " PoC #10 Day 1 — raeperd/realworld-springboot-java analysis. paradigm-cross MEDIUM #3 ( DSL builder QueryDSL ❌ 솔직 / Spring Data JPA method name derived query paradigm 측정 / reframe — 본 방법론 일반화 자격 입증 / v2.3.0 minor trigger ❌).",
   "project_id": "poc-10-realworld-jpa-querydsl",
   "language": "Java",
   "language_version": "11+",
   "stack_signals": [
-    "★ Spring Boot (★ Modern Java) + Spring Data JPA (★ ★ method name derived query)",
-    "★ ★ ★ QueryDSL ❌ / BooleanBuilder ❌ / Specification ❌ / @Query ❌ — pure method name derived query paradigm",
-    "JPA + Hibernate (★ JPA Auditing 활용)",
+    " Spring Boot ( Modern Java) + Spring Data JPA ( method name derived query)",
+    " QueryDSL ❌ / BooleanBuilder ❌ / Specification ❌ / @Query ❌ — pure method name derived query paradigm",
+    "JPA + Hibernate ( JPA Auditing 활용)",
     "Lombok",
     "JaCoCo test coverage",
     "DDD + Clean Architecture (application/domain/infrastructure 3-layer)",
-    "★ Embedded entity 활용 (Article.contents / Profile 등 / Value Object pattern)"
+    " Embedded entity 활용 (Article.contents / Profile 등 / Value Object pattern)"
   ],
   "framework": "spring-boot-spring-data-jpa-method-derived",
-  "test_runner_inferred": "JUnit 5 + Spring Boot Test (★ 34 test class)",
+  "test_runner_inferred": "JUnit 5 + Spring Boot Test ( 34 test class)",
   "loc_total": 2387,
-  "loc_breakdown": {"java_main": 2387, "java_test": "★ 34 test files / coverage JaCoCo"},
+  "loc_breakdown": {"java_main": 2387, "java_test": " 34 test files / coverage JaCoCo"},
   "modules": [
     {"name": "application/article (BC-ARTICLE)", "endpoint_count": 11, "files": ["ArticleRestController.java"]},
     {"name": "application/article/comment (BC-COMMENT)", "endpoint_count": 3, "files": ["CommentRestController.java"]},
     {"name": "application/user (BC-USER)", "endpoint_count": 4, "files": ["UserRestController.java"]},
     {"name": "application/user (BC-PROFILE)", "endpoint_count": 3, "files": ["ProfileRestController.java"]},
     {"name": "application/tag (BC-TAG)", "endpoint_count": 2, "files": ["TagRestController.java"]},
-    {"name": "domain/* (★ DDD Aggregate Root / Embedded VO)", "files": ["Article.java", "User.java", "Comment.java", "Tag.java", "Profile.java"]},
-    {"name": "infrastructure/repository (★ Spring Data JPA config)", "files": ["SpringDataJPAConfiguration.java"]}
+    {"name": "domain/* ( DDD Aggregate Root / Embedded VO)", "files": ["Article.java", "User.java", "Comment.java", "Tag.java", "Profile.java"]},
+    {"name": "infrastructure/repository ( Spring Data JPA config)", "files": ["SpringDataJPAConfiguration.java"]}
   ],
   "endpoints_total": 23,
-  "external_dependencies": {"internal_modules": ["application → domain → infrastructure (★ DDD clean)"], "external_systems": ["JPA / Hibernate (★ method name derived query auto-SQL)"]},
+  "external_dependencies": {"internal_modules": ["application → domain → infrastructure ( DDD clean)"], "external_systems": ["JPA / Hibernate ( method name derived query auto-SQL)"]},
   "database": {
     "tables": [{"name": "user"}, {"name": "article"}, {"name": "comment"}, {"name": "tag"}, {"name": "follow"}, {"name": "favorite_article (M:N)"}, {"name": "article_tags (M:N)"}],
     "table_count": 7
   },
   "sql_paradigm_analysis": {
-    "$comment": "★ ★ ★ ★ paradigm-cross 측정 — Spring Data JPA method name derived query paradigm (★ QueryDSL DSL builder ❌ 솔직)",
+    "$comment": " paradigm-cross 측정 — Spring Data JPA method name derived query paradigm ( QueryDSL DSL builder ❌ 솔직)",
     "createQueryBuilder_count": 0,
     "raw_query_count": 0,
     "specification_count": 0,
     "at_query_count": 0,
-    "method_derived_count": "★ ★ ★ 7+ (★ findAllByUserFavoritedContains / findAllByAuthorProfileUserName / findAllByContentsTagsContains / findFirstByContentsTitleSlug / deleteArticleByAuthorAndContentsTitleSlug 등)",
-    "repository_orm_count": "★ ★ pure Spring Data JPA Repository interface (★ method name → SQL 자동 생성)",
-    "paradigm_cross_strength": "★ ★ MEDIUM #3 (★ ★ ★ DSL builder ❌ 솔직 / method name derived query paradigm = 또 다른 ORM 추상화 / 본 방법론 일반화 자격 입증)",
+    "method_derived_count": " 7+ ( findAllByUserFavoritedContains / findAllByAuthorProfileUserName / findAllByContentsTagsContains / findFirstByContentsTitleSlug / deleteArticleByAuthorAndContentsTitleSlug 등)",
+    "repository_orm_count": " pure Spring Data JPA Repository interface ( method name → SQL 자동 생성)",
+    "paradigm_cross_strength": " MEDIUM #3 ( DSL builder ❌ 솔직 / method name derived query paradigm = 또 다른 ORM 추상화 / 본 방법론 일반화 자격 입증)",
     "v2_3_0_trigger_capability": "❌ (DSL builder QueryDSL 부재 → v2.3.0 minor trigger 자격 ❌ / 본 PoC = 본 방법론 일반화 자격 입증 만)"
   },
   "phase_3a_automation_measurement": {
@@ -55,13 +55,13 @@
       "business_meaning": "❌ LLM ~85%",
       "antipatterns_flagged": "❌ 매뉴얼",
       "table_role": "❌ LLM ~85%",
-      "logical_sql_inference": "❌ ★ ★ method name → SQL 추론 (Spring Data JPA 자동 생성)"
+      "logical_sql_inference": "❌ method name → SQL 추론 (Spring Data JPA 자동 생성)"
     },
-    "estimated_ratio": {"auto_count": 6, "manual_count": 4, "ratio": "6/10 = 60%", "comparison": "★ vs PoC #08 66.7% (-6.7%p) / vs PoC #09 63.6% (-3.6%p) — Spring Data JPA method name derived query = direct SQL 부재 / 추론 의존 ↑"}
+    "estimated_ratio": {"auto_count": 6, "manual_count": 4, "ratio": "6/10 = 60%", "comparison": " vs PoC #08 66.7% (-6.7%p) / vs PoC #09 63.6% (-3.6%p) — Spring Data JPA method name derived query = direct SQL 부재 / 추론 의존 ↑"}
   },
   "scope_constraint": {
     "core_modules": ["BC-USER (4)", "BC-PROFILE (3)", "BC-ARTICLE (11)", "BC-COMMENT (3)", "BC-TAG (2)"],
     "total_endpoint_count": 23,
-    "core_sql_count": "★ method name derived query 7+ + repository auto-generated SQL = ★ logical inference 의존"
+    "core_sql_count": " method name derived query 7+ + repository auto-generated SQL = logical inference 의존"
   }
 }

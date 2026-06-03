@@ -9,8 +9,8 @@
     "confidence": 0.85,
     "raw_confidence": 0.85,
     "warnings": [
-      "★ chain 2 spec-compose-behavior-spec / 10 UC backward link / 12 BR backward link",
-      "★ 10 behavior 모두 acceptance_criteria_refs 1:1 매핑 (chain-coverage-validator 정합)"
+      "chain 2 spec-compose-behavior-spec / 10 UC backward link / 12 BR backward link",
+      "10 behavior 모두 acceptance_criteria_refs 1:1 매핑 (chain-coverage-validator 정합)"
     ]
   },
   "derivation_source": {
@@ -120,7 +120,7 @@
     {
       "id": "BHV-CAR-MGT-005",
       "name": "차량 처분 (ambiguous)",
-      "description": "★ ambiguous 처분 방식 — use_yn='N' soft delete vs STATE 변경 vs hard DELETE (domain expert 결단 carry)",
+      "description": "ambiguous 처분 방식 — use_yn='N' soft delete vs STATE 변경 vs hard DELETE (domain expert 결단 carry)",
       "use_case_refs": [
         "UC-CAR-MGT-005"
       ],
@@ -141,7 +141,7 @@
     },
     {
       "id": "BHV-CAR-COST-001",
-      "name": "★ 차량비용 → ERP 회계전표 IF (cross-DB)",
+      "name": "차량비용 → ERP 회계전표 IF (cross-DB)",
       "description": "Admin → SGERP SP 호출 (4 input param) → slip_id list 반환 → IFRS tb_car_cost_slip 다중 INSERT (FN_SPLIT bulk)",
       "use_case_refs": [
         "UC-CAR-COST-001"
@@ -158,7 +158,7 @@
       "postconditions": [
         "SGERP._TACSlip 신규 row (외부)",
         "tb_car_cost_slip 다중 row (FN_SPLIT 결과)",
-        "★ cross-DB transaction 보장 ❌ → eventual consistency"
+        "cross-DB transaction 보장 ❌ → eventual consistency"
       ],
       "acceptance_criteria_refs": [
         "AC-CAR-COST-001"

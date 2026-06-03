@@ -12,11 +12,11 @@
     "methodology_version": "v1.2.2",
     "raw_confidence": 0.78,
     "warnings": [
-      "★ class-validator 데코 6개 (UserEntity.@IsEmail + CreateUserDto/LoginUserDto @IsNotEmpty 5개) — 12% coverage",
-      "★ service.ts manual throw 12+ 가 주요 BR source — Senior 위험 3 정합",
-      "★ DB UQ 부재 (F-120) → DB-level race-safe BR 0건 (PoC #02 의 2중 안전망 부재)"
+      "class-validator 데코 6개 (UserEntity.@IsEmail + CreateUserDto/LoginUserDto @IsNotEmpty 5개) — 12% coverage",
+      "service.ts manual throw 12+ 가 주요 BR source — Senior 위험 3 정합",
+      "DB UQ 부재 (F-120) → DB-level race-safe BR 0건 (PoC #02 의 2중 안전망 부재)"
     ],
-    "phase_d_meta_recovery_note": "★ Sprint 1-J schema cleanup — meta-confidence 비표준 키 회복(의미 변경 ❌): natural_language_poverty_estimate: PoC #02 44% (Senior 위험 3 — DTO 단독 가정 30% 악화 입증). 본 PoC = class-validator coverage 12% → 자연어로 재현 시 28~33% 만 표현 가능 → Phase 4.5 형식화 ROI 더 큼. | br_extraction_method_breakdown: {\"class_validator_decorator\":6,\"entity_decorator\":1,\"service_manual_throw\":12,\"implicit_db_default\":5,\"lifecycle_hook\":2}"
+    "phase_d_meta_recovery_note": "Sprint 1-J schema cleanup — meta-confidence 비표준 키 회복(의미 변경 ❌): natural_language_poverty_estimate: PoC #02 44% (Senior 위험 3 — DTO 단독 가정 30% 악화 입증). 본 PoC = class-validator coverage 12% → 자연어로 재현 시 28~33% 만 표현 가능 → Phase 4.5 형식화 ROI 더 큼. | br_extraction_method_breakdown: {\"class_validator_decorator\":6,\"entity_decorator\":1,\"service_manual_throw\":12,\"implicit_db_default\":5,\"lifecycle_hook\":2}"
   },
   "business_rules": [
     {
@@ -61,7 +61,7 @@
       "rejection_method": "validate(newUser) (UserService.create:62)",
       "verification_location": "src/user/user.entity.ts:13 + UserService.create:62 validate()",
       "current_state": "complete",
-      "concerns": "★ UserService.update 시 validate 미호출 — update 시 검증 우회 가능 (F-143 신규 후보)",
+      "concerns": "UserService.update 시 validate 미호출 — update 시 검증 우회 가능 (F-143 신규 후보)",
       "given": [
         "email 입력"
       ],
@@ -127,8 +127,8 @@
       "expected_result": "중복 시 400 'Username and email must be unique.'",
       "rejection_method": "throw HttpException 400",
       "verification_location": "src/user/user.service.ts:47 createQueryBuilder",
-      "current_state": "★ partial (App 1중 race-prone — DB UQ 부재 / F-120 critical)",
-      "concerns": "★★ PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (PoC #02 = 2중 / PoC #03 = 1중)",
+      "current_state": "partial (App 1중 race-prone — DB UQ 부재 / F-120 critical)",
+      "concerns": "PoC #02 AP-DOMAIN-002 isomorphic + 더 나쁜 (PoC #02 = 2중 / PoC #03 = 1중)",
       "given": [
         "username 또는 email 이 DB 에 이미 존재"
       ],
@@ -151,7 +151,7 @@
       "rejection_method": "—",
       "verification_location": "src/user/user.entity.ts:30-32 @BeforeInsert hashPassword",
       "current_state": "complete",
-      "concerns": "★ UpdateUserDto 에 password 필드 X → password 변경 endpoint 부재 (F-141)",
+      "concerns": "UpdateUserDto 에 password 필드 X → password 변경 endpoint 부재 (F-141)",
       "given": [
         "User insert 시점"
       ],
@@ -193,10 +193,10 @@
       "condition": "JWT 생성 시점",
       "action": "exp = now + 60 days",
       "expected_result": "60일 후 만료",
-      "rejection_method": "jwt.verify exception (★ try/catch 부재 — F-118)",
+      "rejection_method": "jwt.verify exception (try/catch 부재 — F-118)",
       "verification_location": "src/user/user.service.ts:103-110 generateJWT",
-      "current_state": "★ partial (60일 너무 김 — F-119)",
-      "concerns": "★ verify 무방어 + 60일 expiry",
+      "current_state": "partial (60일 너무 김 — F-119)",
+      "concerns": "verify 무방어 + 60일 expiry",
       "given": [
         "JWT 생성 시점"
       ],
@@ -213,21 +213,21 @@
       "title": "회원 탈퇴 본인 인증 필수",
       "domain": "User",
       "trigger": "DELETE /api/users/:slug",
-      "condition": "(★ AuthMiddleware 미적용 — F-140 critical)",
+      "condition": "(AuthMiddleware 미적용 — F-140 critical)",
       "action": "userRepository.delete({email})",
-      "expected_result": "(★★ 권한 검증 부재 — 누구나 삭제 가능)",
+      "expected_result": "(권한 검증 부재 — 누구나 삭제 가능)",
       "rejection_method": "(없음)",
       "verification_location": "src/user/user.controller.ts:39 @Delete + user.module.ts:17 forRoutes (DELETE 누락)",
-      "current_state": "★★ absent (F-140 critical 신규)",
-      "concerns": "★★ 즉시 수정 권고 (사내 적용 시 1줄 fix)",
+      "current_state": "absent (F-140 critical 신규)",
+      "concerns": "즉시 수정 권고 (사내 적용 시 1줄 fix)",
       "given": [
-        "(★ AuthMiddleware 미적용 — F-140 critical)"
+        "(AuthMiddleware 미적용 — F-140 critical)"
       ],
       "when": [
         "DELETE /api/users/:slug"
       ],
       "then": [
-        "(★★ 권한 검증 부재 — 누구나 삭제 가능)"
+        "(권한 검증 부재 — 누구나 삭제 가능)"
       ],
       "natural_language": "사용자 계정 삭제는 인증된 본인만 수행할 수 있어야 하며, 미인증 요청은 거부되어야 한다."
     },
@@ -241,8 +241,8 @@
       "expected_result": "400 BadRequest",
       "rejection_method": "service 단 throw",
       "verification_location": "src/profile/profile.service.ts:53 (follow) / 75 (unFollow)",
-      "current_state": "★ partial (follow = email 비교 / unFollow = id 비교 — 일관성 결여 F-144 신규)",
-      "concerns": "★ App 1중 / DB 차단 부재",
+      "current_state": "partial (follow = email 비교 / unFollow = id 비교 — 일관성 결여 F-144 신규)",
+      "concerns": "App 1중 / DB 차단 부재",
       "given": [
         "follower == following"
       ],
@@ -264,8 +264,8 @@
       "expected_result": "중복 follow X (idempotent)",
       "rejection_method": "service if 분기 (silent skip)",
       "verification_location": "src/profile/profile.service.ts:60 _follows check",
-      "current_state": "★ partial (App 1중 — DB UQ 부재 F-121)",
-      "concerns": "★★ race window — F-121 / F-120 합산",
+      "current_state": "partial (App 1중 — DB UQ 부재 F-121)",
+      "concerns": "race window — F-121 / F-120 합산",
       "given": [
         "(followerId, followingId) pair 가 follows 에 이미 존재"
       ],
@@ -309,8 +309,8 @@
       "expected_result": "slug 자동 생성 (random suffix 로 unique 회피)",
       "rejection_method": "—",
       "verification_location": "src/article/article.service.ts:200 slugify",
-      "current_state": "★ partial (DB UQ 부재 + slug update 미구현 F-126 / F-125 / F-120)",
-      "concerns": "★ PoC #02 F-053 cross-val 변형 재현",
+      "current_state": "partial (DB UQ 부재 + slug update 미구현 F-126 / F-125 / F-120)",
+      "concerns": "PoC #02 F-053 cross-val 변형 재현",
       "given": [
         "create 호출"
       ],
@@ -332,8 +332,8 @@
       "expected_result": "중복 favorite X / count 단조 증가",
       "rejection_method": "service if 분기",
       "verification_location": "src/article/article.service.ts:147 isNewFavorite",
-      "current_state": "★ partial (App 1중 / favoriteCount race F-135)",
-      "concerns": "★ 분산 환경 race window",
+      "current_state": "partial (App 1중 / favoriteCount race F-135)",
+      "concerns": "분산 환경 race window",
       "given": [
         "user.favorites 에 이미 존재"
       ],
@@ -399,8 +399,8 @@
       "expected_result": "comments 항상 로드",
       "rejection_method": "—",
       "verification_location": "src/article/article.entity.ts:38 eager:true",
-      "current_state": "★ partial (N+1 위험 F-124)",
-      "concerns": "★ PoC #02 F-051 cross-val 재현",
+      "current_state": "partial (N+1 위험 F-124)",
+      "concerns": "PoC #02 F-051 cross-val 재현",
       "given": [
         "—"
       ],
@@ -445,12 +445,12 @@
   },
   "concerns": [
     {
-      "race_safe_zero": "★★ DB UQ 부재 (F-120) + FK 부재 (F-121) → race-safe BR 0건. PoC #02 = 5+ race-safe BR (DB UQ 2중 안전망)",
-      "validation_inconsistency": "★ Senior 위험 3 입증 — class-validator coverage 12% / service manual throw 가 주요 source",
-      "auth_scope_missing": "★★ F-140 critical — UC-USER-DELETE AuthMiddleware 미적용",
+      "race_safe_zero": "DB UQ 부재 (F-120) + FK 부재 (F-121) → race-safe BR 0건. PoC #02 = 5+ race-safe BR (DB UQ 2중 안전망)",
+      "validation_inconsistency": "Senior 위험 3 입증 — class-validator coverage 12% / service manual throw 가 주요 source",
+      "auth_scope_missing": "F-140 critical — UC-USER-DELETE AuthMiddleware 미적용",
       "consistency_gaps": [
-        "★ F-144 신규 — follow self-check email vs unFollow self-check id (검증 차원 불일치)",
-        "★ F-143 신규 후보 — UserService.update 에서 validate(newUser) 미호출 (signup 만 호출)"
+        "F-144 신규 — follow self-check email vs unFollow self-check id (검증 차원 불일치)",
+        "F-143 신규 후보 — UserService.update 에서 validate(newUser) 미호출 (signup 만 호출)"
       ]
     }
   ]

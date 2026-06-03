@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 7,
   "poc_id": "poc-06-efiweb-exchange-spring41",
-  "$comment": "★ ★ ★ session 23차 Sprint 1-A 시범 진입 / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (★ implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 13 file rename 동반.",
+  "$comment": "session 23차 Sprint 1-A 시범 진입 / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존 (implementation 디테일 회피 / 비즈니스 본질 우선). cross-ref 13 file rename 동반.",
   "results": [
     { "old_id": "BR-EXCHANGE-001", "new_id": "BR-EXCHANGE-KRW-001", "sub_domain": "KRW", "rationale": "KRW 환율 = 1 고정 — 통화 코드 자체가 규칙의 핵심 식별자" },
     { "old_id": "BR-EXCHANGE-002", "new_id": "BR-EXCHANGE-COMPLETE-002", "sub_domain": "COMPLETE", "rationale": "기말(E)+평균(A) 두 GUBUN 모두 등록해야 완료 — 등록 완료 조건(completeness) 핵심" },

@@ -4,6 +4,6 @@ sequenceDiagram
     participant Auth
 
     Client->>Server: request
-    Server-xAuth: verify (★ fail)
+    Server-xAuth: verify ( fail)
     Auth-->>Server: 401 unauthorized
     Server-->>Client: 401

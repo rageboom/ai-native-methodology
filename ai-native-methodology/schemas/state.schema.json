@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/state.schema.json",
   "title": "Chain Harness Driver State",
-  "description": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver 의 사용자 프로젝트별 영속 state. .aimd/state.json single source of runtime truth. ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration) 정합. sdlc-4stage-flow.json 의 stages enum 과 정합 (drift-validator --check-state-flow-consistency 가 회귀).",
+  "description": "v2.0 sub-plan-5 — chain harness driver 의 사용자 프로젝트별 영속 state. .aimd/state.json single source of runtime truth. ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration) 정합. sdlc-4stage-flow.json 의 stages enum 과 정합 (drift-validator --check-state-flow-consistency 가 회귀).",
   "type": "object",
   "required": ["version", "project_id", "current_chain", "stage_progress", "blocked"],
   "additionalProperties": false,
@@ -14,7 +14,7 @@
     "version": {
       "type": "string",
       "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
-      "description": "★ Senior F5 — schema migration policy 의 versioning. forward-only / 직전 1버전 호환. breaking 시 사용자 명시 confirm."
+      "description": "Senior F5 — schema migration policy 의 versioning. forward-only / 직전 1버전 호환. breaking 시 사용자 명시 confirm."
     },
     "project_id": {
       "type": "string",
@@ -24,7 +24,7 @@
     "current_chain": {
       "type": "string",
       "enum": ["analysis", "discovery", "spec", "plan", "test", "implement", "revisit_pending"],
-      "description": "★ v9.0 6-stage (analysis→discovery→spec→plan→test→implement). sdlc-4stage-flow.json stages 와 정합. drift-validator --check-state-flow-consistency 가 build-time 검증. (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21)"
+      "description": "v9.0 6-stage (analysis→discovery→spec→plan→test→implement). sdlc-4stage-flow.json stages 와 정합. drift-validator --check-state-flow-consistency 가 build-time 검증. (planning→discovery 개칭 + plan 신설 / DEC-2026-05-21)"
     },
     "current_phase": {
       "type": "string",
@@ -36,7 +36,7 @@
         { "type": "null" },
         { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" }
       ],
-      "description": "★ G3 (R5/R7) — 현재 active scope slug. init --scope <s> 또는 cmdNext 의 manifest sync 대상. D10 single work-unit serial 1차."
+      "description": "G3 (R5/R7) — 현재 active scope slug. init --scope <s> 또는 cmdNext 의 manifest sync 대상. D10 single work-unit serial 1차."
     },
     "stage_progress": {
       "type": "object",
@@ -62,12 +62,12 @@
             "id": {
               "type": "string",
               "enum": ["#1", "#2", "#3", "#4", "#5"],
-              "description": "ADR-CHAIN-002 gate ID — ★ v10.0.0 MAJOR (Phase 4-4') gate 번호 재정렬 (chain 번호 = gate 번호 1:1 INTERNAL CONVENTION). discovery=#1 / spec=#2 / plan=#3 / test=#4 / implement=#5."
+              "description": "ADR-CHAIN-002 gate ID — v10.0.0 MAJOR (Phase 4-4') gate 번호 재정렬 (chain 번호 = gate 번호 1:1 INTERNAL CONVENTION). discovery=#1 / spec=#2 / plan=#3 / test=#4 / implement=#5."
             },
             "stage": {
               "type": "string",
               "enum": ["discovery", "spec", "plan", "test", "implement"],
-              "description": "★ v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — gate #1~#5 = discovery/spec/plan/test/implement. plan stage 본격 hard gate 진입 (v9.3.0 placeholder '#plan' 폐기 + v10.0.0 '#3' 본격)."
+              "description": "v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — gate #1~#5 = discovery/spec/plan/test/implement. plan stage 본격 hard gate 진입 (v9.3.0 placeholder '#plan' 폐기 + v10.0.0 '#3' 본격)."
             },
             "decision": {
               "type": "string",
@@ -90,7 +90,7 @@
             },
             "intervention_log_path": {
               "type": "string",
-              "description": "★ ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .aimd/output/intervention-log.jsonl"
+              "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .aimd/output/intervention-log.jsonl"
             }
           }
         }
@@ -115,7 +115,7 @@
             "confidence_loc": {
               "type": "integer",
               "minimum": 0,
-              "description": "★ Senior F4 — non-comment LOC threshold (≥ 5 의무). 미만은 자동 ignore 되어 pending_revisit 에 등록 안 됨."
+              "description": "Senior F4 — non-comment LOC threshold (≥ 5 의무). 미만은 자동 ignore 되어 pending_revisit 에 등록 안 됨."
             },
             "changed_paths": {
               "type": "array",
@@ -131,7 +131,7 @@
     },
     "blocked": {
       "type": "boolean",
-      "description": "★ ADR-CHAIN-005 §3 trio (i) — true 시 모든 후속 chain-driver 명령이 비대화형 exit 2 반환."
+      "description": "ADR-CHAIN-005 §3 trio (i) — true 시 모든 후속 chain-driver 명령이 비대화형 exit 2 반환."
     },
     "block_reason": {
       "anyOf": [
@@ -155,7 +155,7 @@
         { "type": "null" },
         { "type": "integer", "minimum": 1 }
       ],
-      "description": "★ Senior F3 — single-writer 가정. 5분 mtime 초과 시 자동 해제."
+      "description": "Senior F3 — single-writer 가정. 5분 mtime 초과 시 자동 해제."
     },
     "lock_acquired_at": {
       "anyOf": [
@@ -166,7 +166,7 @@
     "revisit_ignore_globs": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "★ Senior F4 — 사용자 학습 누적 ignore globs (`**/*.md`, `**/*.test.*` only-touch 등). chain-revisit-detector confidence score 보정용.",
+      "description": "Senior F4 — 사용자 학습 누적 ignore globs (`**/*.md`, `**/*.test.*` only-touch 등). chain-revisit-detector confidence score 보정용.",
       "default": []
     },
     "intervention_log_path": {
@@ -194,7 +194,7 @@
         "git_baseline_sha": {
           "type": "string",
           "pattern": "^[0-9a-f]{7,40}$",
-          "description": "★ Senior F4 — chain stage 진입 시 git HEAD SHA 기록. revisit-detect 가 baseline..HEAD diff 산출 시 deterministic source."
+          "description": "Senior F4 — chain stage 진입 시 git HEAD SHA 기록. revisit-detect 가 baseline..HEAD diff 산출 시 deterministic source."
         }
       }
     }

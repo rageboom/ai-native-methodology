@@ -11,7 +11,7 @@ charter §1 R16 / R17 (ITSM/Jira 자동 티켓화) 영구 scope-out.
 **사용자 명시 결단 (2026-05-15)**: "G1 안해도 됨 잊어줘"
 
 - charter §1 R16/R17 = strikethrough + scope-out 표기 (번호 보존 / cross-reference drift 회피)
-- charter §2 R16/R17 ❌ → ★ scope-out
+- charter §2 R16/R17 ❌ → scope-out
 - charter §3 G1 = strikethrough + 영구 폐기 표기 (잔여 Gap 없음 / 모두 청산)
 - charter §2 요약 = 활성 요구 **15/15 자산 대칭** + scope-out 2
 - `mcp__wiki-jira-assistant__*` MCP 도구로 사용자 수동 처리 가능 (`reference_confluence_tool` 정합)
@@ -40,7 +40,7 @@ charter §1 R16 / R17 (ITSM/Jira 자동 티켓화) 영구 scope-out.
 ## 정합 관계
 
 - DEC-2026-05-15-plugin-charter-17-requirements-채택 — 원안 charter R16/R17 영구 폐기
-- DEC-2026-05-15-g{2,3,4,5}-* — 활성 Gap 모두 종결 sibling
+- DEC-2026-05-15-g{2,3,4,5}-\* — 활성 Gap 모두 종결 sibling
 - `reference_confluence_tool` memory — `mcp__wiki-jira-assistant` 수동 처리 paradigm
 - [[feedback_chain_driver_deterministic_axis]] — 결정론 axis 오염 회피 (자동 티켓 transition 회피)
 

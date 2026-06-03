@@ -9,8 +9,8 @@
     "confidence": 0.88,
     "raw_confidence": 0.88,
     "warnings": [
-      "★ Java class 기반 type 추출 / TypeScript 마이그레이션 target 시 재생성 의무",
-      "★ HashMap-based DTO paradigm (AP-DOMAIN-001) — typed DTO 미존재 / Map<String, Object> 만"
+      "Java class 기반 type 추출 / TypeScript 마이그레이션 target 시 재생성 의무",
+      "HashMap-based DTO paradigm (AP-DOMAIN-001) — typed DTO 미존재 / Map<String, Object> 만"
     ],
     "related_chain_ids": [
       "AC-CAR-MGT-001",
@@ -86,7 +86,7 @@
       "application": 4,
       "infrastructure": 2
     },
-    "carry_note": "★ DTO / VO class 0건 — HashMap-based paradigm (AP-DOMAIN-001) / Modern 마이그레이션 시 typed DTO 신설 의무",
+    "carry_note": "DTO / VO class 0건 — HashMap-based paradigm (AP-DOMAIN-001) / Modern 마이그레이션 시 typed DTO 신설 의무",
     "captured_by": "manual_extraction",
     "simulation_reason": "본 PoC = Java source / ts-morph 자동 추출 도구 부적용 / Java reflection 또는 javaparser 별도 도구 carry"
   },

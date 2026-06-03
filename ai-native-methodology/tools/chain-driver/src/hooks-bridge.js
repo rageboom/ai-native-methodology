@@ -4,150 +4,194 @@
 // 출력: stdout JSON ({suppressOutput, hookSpecificOutput, ...}).
 // stderr: 사용자에게만 노출되는 메시지 (LLM 컨텍스트 격리).
 //
-// ★ v4.0 multi-agent paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택):
+// v4.0 multi-agent paradigm (DEC-2026-05-17-v4-multi-agent-paradigm-채택):
 // - TRIGGER_PATTERNS 의 각 entry 에 agentId 추가 (stage 별 sub-agent dispatch 권고)
 // - suggestAgentForPrompt 신설 / suggestSkillForPrompt 보존 (옛 호환)
 // - buildSuggestOutput / formatHookBlockContext 에 agentId optional — 자동 매핑
 
-import { formatHookBlockContext, formatSkillSuggestion } from './invoke-skill.js';
+import {
+	formatHookBlockContext,
+	formatSkillSuggestion,
+} from './invoke-skill.js';
 
 // Claude Code hooks output contract (정식 spec 정합).
 export function buildSuggestOutput({ skillId, meta, sessionId, agentId }) {
-  // suppressOutput=true → stdout 의 plain text 가 LLM context 로 흘러가지 않음.
-  // additionalContext 에 차단 문구를 명시 동봉 (LLM 이 보더라도 invoke 금지 명령).
-  // ★ v4.0: agentId 가 있으면 agent dispatch 권고 동봉.
-  return {
-    suppressOutput: true,
-    hookSpecificOutput: {
-      additionalContext: formatHookBlockContext(skillId, meta, agentId),
-    },
-    // continue=true → hook 후 통상 동작.
-    continue: true,
-  };
+	// suppressOutput=true → stdout 의 plain text 가 LLM context 로 흘러가지 않음.
+	// additionalContext 에 차단 문구를 명시 동봉 (LLM 이 보더라도 invoke 금지 명령).
+	// v4.0: agentId 가 있으면 agent dispatch 권고 동봉.
+	return {
+		suppressOutput: true,
+		hookSpecificOutput: {
+			additionalContext: formatHookBlockContext(skillId, meta, agentId),
+		},
+		// continue=true → hook 후 통상 동작.
+		continue: true,
+	};
 }
 
-export function buildBlockOutput({ reason, sessionId, hookEventName = 'PreToolUse' }) {
-  // PreToolUse / PostToolUse 차단용 output. exit 2 로 차단 통지.
-  return {
-    decision: 'block',
-    reason,
-    hookSpecificOutput: {
-      hookEventName,
-      permissionDecision: 'deny',
-      additionalContext: `chain-driver mechanical gate blocked: ${reason}. User must resolve via /aimd-next or /aimd-stage <name>.`,
-    },
-    continue: false,
-  };
+export function buildBlockOutput({
+	reason,
+	sessionId,
+	hookEventName = 'PreToolUse',
+}) {
+	// PreToolUse / PostToolUse 차단용 output. exit 2 로 차단 통지.
+	return {
+		decision: 'block',
+		reason,
+		hookSpecificOutput: {
+			hookEventName,
+			permissionDecision: 'deny',
+			additionalContext: `chain-driver mechanical gate blocked: ${reason}. User must resolve via /aimd-next or /aimd-stage <name>.`,
+		},
+		continue: false,
+	};
 }
 
 export function parseHookInput(jsonString) {
-  if (!jsonString || jsonString.trim() === '') {
-    throw new Error('hook input stdin empty');
-  }
-  let parsed;
-  try { parsed = JSON.parse(jsonString); }
-  catch (e) { throw new Error(`hook input parse failed: ${e.message}`); }
-  if (typeof parsed !== 'object' || parsed === null) {
-    throw new Error('hook input must be JSON object');
-  }
-  return parsed;
+	if (!jsonString || jsonString.trim() === '') {
+		throw new Error('hook input stdin empty');
+	}
+	let parsed;
+	try {
+		parsed = JSON.parse(jsonString);
+	} catch (e) {
+		throw new Error(`hook input parse failed: ${e.message}`);
+	}
+	if (typeof parsed !== 'object' || parsed === null) {
+		throw new Error('hook input must be JSON object');
+	}
+	return parsed;
 }
 
 // Inspect a UserPromptSubmit prompt for chain stage trigger keywords.
-// ★ v4.0: TRIGGER_PATTERNS 의 entry 마다 agentId 추가 (stage 별 sub-agent dispatch / DEC-2026-05-17).
+// v4.0: TRIGGER_PATTERNS 의 entry 마다 agentId 추가 (stage 별 sub-agent dispatch / DEC-2026-05-17).
 // analysis stage entry 추가 (B1 보강 통합 / hooks-bridge TRIGGER_PATTERNS 가 chain 1~4 만 커버 → 5 stage 모두).
 const TRIGGER_PATTERNS = [
-  { regex: /(분석|검토|legacy|레거시|analysis)\s*(시작|진입|해줘|만들어|드라이브)/i,
-    skillId: 'analysis-input-collection', agentId: 'analysis-agent' },
-  { regex: /(discovery|발견|탐색|planning|기획)\s*(시작|진입|만들어|드라이브)/i,
-    skillId: 'discovery-from-analysis-output', agentId: 'discovery-agent' },
-  { regex: /(spec|명세|behavior)\s*(시작|진입|만들어)/i,
-    skillId: 'spec-compose-behavior-spec', agentId: 'spec-agent' },
-  { regex: /(plan|계획)\s*(시작|진입|만들어)/i,
-    skillId: 'plan-decompose-and-sequence', agentId: 'plan-agent' },
-  { regex: /(test|테스트)\s*(시작|진입|만들어)/i,
-    skillId: 'test-generate-test-spec', agentId: 'test-agent' },
-  { regex: /(implement|구현)\s*(시작|진입|만들어)/i,
-    skillId: 'implement-generate-impl-spec', agentId: 'implement-agent' },
+	{
+		regex:
+			/(분석|검토|legacy|레거시|analysis)\s*(시작|진입|해줘|만들어|드라이브)/i,
+		skillId: 'analysis-input-collection',
+		agentId: 'analysis-agent',
+	},
+	{
+		regex: /(discovery|발견|탐색|planning|기획)\s*(시작|진입|만들어|드라이브)/i,
+		skillId: 'discovery-from-analysis-output',
+		agentId: 'discovery-agent',
+	},
+	{
+		regex: /(spec|명세|behavior)\s*(시작|진입|만들어)/i,
+		skillId: 'spec-compose-behavior-spec',
+		agentId: 'spec-agent',
+	},
+	{
+		regex: /(plan|계획)\s*(시작|진입|만들어)/i,
+		skillId: 'plan-decompose-and-sequence',
+		agentId: 'plan-agent',
+	},
+	{
+		regex: /(test|테스트)\s*(시작|진입|만들어)/i,
+		skillId: 'test-generate-test-spec',
+		agentId: 'test-agent',
+	},
+	{
+		regex: /(implement|구현)\s*(시작|진입|만들어)/i,
+		skillId: 'implement-generate-impl-spec',
+		agentId: 'implement-agent',
+	},
 ];
 
 export function suggestSkillForPrompt(prompt) {
-  if (!prompt || typeof prompt !== 'string') return null;
-  for (const { regex, skillId } of TRIGGER_PATTERNS) {
-    if (regex.test(prompt)) return skillId;
-  }
-  return null;
+	if (!prompt || typeof prompt !== 'string') return null;
+	for (const { regex, skillId } of TRIGGER_PATTERNS) {
+		if (regex.test(prompt)) return skillId;
+	}
+	return null;
 }
 
-// ★ v4.0 신설 — agent dispatch 권고 (multi-agent paradigm / DEC-2026-05-17).
+// v4.0 신설 — agent dispatch 권고 (multi-agent paradigm / DEC-2026-05-17).
 // main agent 가 Task tool 로 해당 stage agent 를 dispatch 권고 받음.
 export function suggestAgentForPrompt(prompt) {
-  if (!prompt || typeof prompt !== 'string') return null;
-  for (const { regex, agentId } of TRIGGER_PATTERNS) {
-    if (regex.test(prompt)) return agentId;
-  }
-  return null;
+	if (!prompt || typeof prompt !== 'string') return null;
+	for (const { regex, agentId } of TRIGGER_PATTERNS) {
+		if (regex.test(prompt)) return agentId;
+	}
+	return null;
 }
 
-// ★ dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지.
+// dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지.
 // 파일명 → artifact_subkind 매핑. 한 파일이 여러 노드(예: behavior-spec.json = 다수 BHV)에 대응하므로
 // hook 은 "어떤 종류의 artifact 가 바뀌었나"만 판정하고, per-node 영향 분석은 `chain-driver impact` 로 분리.
 const ARTIFACT_FILENAME_TO_SUBKIND = Object.freeze({
-  'discovery-spec.json': 'UC',   // ★ v11.0.0 planning-spec → discovery-spec rename (DEC-2026-05-26-discovery-spec-rename)
-  'behavior-spec.json': 'BHV',
-  'acceptance-criteria.json': 'AC',
-  'test-spec.json': 'TC',
-  'impl-spec.json': 'IMPL',
+	'discovery-spec.json': 'UC', // v11.0.0 planning-spec → discovery-spec rename (DEC-2026-05-26-discovery-spec-rename)
+	'behavior-spec.json': 'BHV',
+	'acceptance-criteria.json': 'AC',
+	'test-spec.json': 'TC',
+	'impl-spec.json': 'IMPL',
 });
 
 const ANALYSIS_FILENAME_TO_SUBKIND = Object.freeze({
-  'architecture.json': 'architecture',
-  'domain.json': 'domain',
-  'openapi-extension.json': 'api',
-  // ★ v11.24.0 Slice 3 — db-schema 두 파일명 모두 매핑 (schema.json=canonical skill output / db-schema.json=poc-16 compat).
-  'schema.json': 'db-schema',
-  'db-schema.json': 'db-schema',
-  'formal-spec.json': 'formal-spec',
-  'business-rules.json': 'business-rules',
-  'antipatterns.json': 'antipatterns',
-  'ui-spec.json': 'ui-ux',
-  'state-map.json': 'state-map',
-  'visual-manifest.json': 'visual-manifest',
-  'form-validation-spec.json': 'form-validation-spec',
-  'type-spec.json': 'type-spec',
-  'error-mapping-spec.json': 'error-mapping-spec',
-  'characterization-spec.json': 'characterization-spec',
-  'sql-inventory.json': 'sql-inventory',
+	'architecture.json': 'architecture',
+	'domain.json': 'domain',
+	'openapi-extension.json': 'api',
+	// v11.24.0 Slice 3 — db-schema 두 파일명 모두 매핑 (schema.json=canonical skill output / db-schema.json=poc-16 compat).
+	'schema.json': 'db-schema',
+	'db-schema.json': 'db-schema',
+	'formal-spec.json': 'formal-spec',
+	'business-rules.json': 'business-rules',
+	'antipatterns.json': 'antipatterns',
+	'ui-spec.json': 'ui-ux',
+	'state-map.json': 'state-map',
+	'visual-manifest.json': 'visual-manifest',
+	'form-validation-spec.json': 'form-validation-spec',
+	'type-spec.json': 'type-spec',
+	'error-mapping-spec.json': 'error-mapping-spec',
+	'characterization-spec.json': 'characterization-spec',
+	'sql-inventory.json': 'sql-inventory',
 });
 
 const ASPECT_FILENAME_TO_SUBKIND = Object.freeze({
-  'a11y-spec.json': 'a11y',
-  'i18n-spec.json': 'i18n',
-  'static-security-spec.json': 'static-security',
-  'legacy-spectrum.json': 'legacy-spectrum',
+	'a11y-spec.json': 'a11y',
+	'i18n-spec.json': 'i18n',
+	'static-security-spec.json': 'static-security',
+	'legacy-spectrum.json': 'legacy-spectrum',
 });
 
 // PostToolUse payload → 변경된 graph artifact 판정. null = graph artifact 아님.
 export function detectGraphArtifactWrite({ toolName, toolInput }) {
-  if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
-  const path = toolInput?.file_path || toolInput?.path || '';
-  if (!path) return null;
-  // .aimd 경로 하위만 (산출물 영역)
-  if (!path.includes('/.aimd/') && !path.includes('\\.aimd\\')) return null;
-  const filename = path.split(/[/\\]/).pop();
-  if (ARTIFACT_FILENAME_TO_SUBKIND[filename]) {
-    return { path, filename, artifact_kind: 'chain', artifact_subkind: ARTIFACT_FILENAME_TO_SUBKIND[filename] };
-  }
-  if (ANALYSIS_FILENAME_TO_SUBKIND[filename]) {
-    return { path, filename, artifact_kind: 'analysis', artifact_subkind: ANALYSIS_FILENAME_TO_SUBKIND[filename] };
-  }
-  if (ASPECT_FILENAME_TO_SUBKIND[filename]) {
-    return { path, filename, artifact_kind: 'aspect', artifact_subkind: ASPECT_FILENAME_TO_SUBKIND[filename] };
-  }
-  return null;
+	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+	const path = toolInput?.file_path || toolInput?.path || '';
+	if (!path) return null;
+	// .aimd 경로 하위만 (산출물 영역)
+	if (!path.includes('/.aimd/') && !path.includes('\\.aimd\\')) return null;
+	const filename = path.split(/[/\\]/).pop();
+	if (ARTIFACT_FILENAME_TO_SUBKIND[filename]) {
+		return {
+			path,
+			filename,
+			artifact_kind: 'chain',
+			artifact_subkind: ARTIFACT_FILENAME_TO_SUBKIND[filename],
+		};
+	}
+	if (ANALYSIS_FILENAME_TO_SUBKIND[filename]) {
+		return {
+			path,
+			filename,
+			artifact_kind: 'analysis',
+			artifact_subkind: ANALYSIS_FILENAME_TO_SUBKIND[filename],
+		};
+	}
+	if (ASPECT_FILENAME_TO_SUBKIND[filename]) {
+		return {
+			path,
+			filename,
+			artifact_kind: 'aspect',
+			artifact_subkind: ASPECT_FILENAME_TO_SUBKIND[filename],
+		};
+	}
+	return null;
 }
 
-// ★ operation.md "evaluate_policy()" deliverable — 영향 노드 집합에 대해 정책 평가 + propose record 생성.
+// operation.md "evaluate_policy()" deliverable — 영향 노드 집합에 대해 정책 평가 + propose record 생성.
 // impact-analyzer 결과 merged 리스트의 각 노드에 대해, 해당 엣지 단계의 변경 종류 정책을 적용.
 // 순수 함수 — I/O 없음. 호출자(cli.js)가 JSONL append 책임.
 //
@@ -158,49 +202,60 @@ export function detectGraphArtifactWrite({ toolName, toolInput }) {
 // @param {Function} evaluatePolicy  policy-evaluator.evaluatePolicy
 // @param {string} changeKind   'typo'|'item_add'|'item_remove'|'semantic_change'
 // @returns {Object[]}          [{ origin_id, affected_id, grade, decision, source, reasoning, change_kind }]
-export function evaluatePolicyForEdges({ affected, originNode, nodeById, policy, evaluatePolicy, changeKind = 'semantic_change' }) {
-  const records = [];
-  for (const entry of affected ?? []) {
-    const targetNode = nodeById.get(entry.id);
-    const change = {
-      kind: changeKind,
-      origin_subkind: originNode?.artifact_subkind,
-      target_subkind: targetNode?.artifact_subkind,
-    };
-    const evald = evaluatePolicy(policy, change);
-    records.push({
-      origin_id: originNode?.id,
-      affected_id: entry.id,
-      grade: entry.grade,
-      direction: entry.direction,
-      change_kind: changeKind,
-      decision: evald.decision,
-      source: evald.source,
-      reasoning: evald.reasoning,
-    });
-  }
-  return records;
+export function evaluatePolicyForEdges({
+	affected,
+	originNode,
+	nodeById,
+	policy,
+	evaluatePolicy,
+	changeKind = 'semantic_change',
+}) {
+	const records = [];
+	for (const entry of affected ?? []) {
+		const targetNode = nodeById.get(entry.id);
+		const change = {
+			kind: changeKind,
+			origin_subkind: originNode?.artifact_subkind,
+			target_subkind: targetNode?.artifact_subkind,
+		};
+		const evald = evaluatePolicy(policy, change);
+		records.push({
+			origin_id: originNode?.id,
+			affected_id: entry.id,
+			grade: entry.grade,
+			direction: entry.direction,
+			change_kind: changeKind,
+			decision: evald.decision,
+			source: evald.source,
+			reasoning: evald.reasoning,
+		});
+	}
+	return records;
 }
 
 // Determine if a tool call should be blocked based on state.json blocked flag.
 // Used for PreToolUse hook on Write/Edit targeting .aimd/output/** + R20 MCP ticket-sync.
 //
-// ★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
+// v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
 // - mcp__wiki-jira-assistant__* (jira-confluence MCP) 호출도 state.blocked 시 deny.
 // - 결정론 axis 보호 + 사용자 confirmation gate bypass 차단 (chain harness gate 중 ticket-sync auto-fire 차단).
 // - Write/Edit 와 달리 file_path 체크 X — state.blocked=true 만 충분.
 export function shouldBlockToolUse({ toolName, toolInput, state }) {
-  if (!state?.blocked) return null;
+	if (!state?.blocked) return null;
 
-  // R20 path — MCP ticket-sync 차단 (state.blocked 시 file_path 무관 deny)
-  if (typeof toolName === 'string' && toolName.startsWith('mcp__wiki-jira-assistant__')) {
-    return `R20 MCP ticket-sync blocked: ${state.block_reason || 'state.blocked=true'}`;
-  }
+	// R20 path — MCP ticket-sync 차단 (state.blocked 시 file_path 무관 deny)
+	if (
+		typeof toolName === 'string' &&
+		toolName.startsWith('mcp__wiki-jira-assistant__')
+	) {
+		return `R20 MCP ticket-sync blocked: ${state.block_reason || 'state.blocked=true'}`;
+	}
 
-  // 기존 Write/Edit/NotebookEdit path (ADR-CHAIN-005 §3 mechanical trio iii)
-  if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
-  const path = toolInput?.file_path || toolInput?.path || '';
-  if (!path) return null;
-  if (!path.includes('/.aimd/output/') && !path.includes('\\.aimd\\output\\')) return null;
-  return state.block_reason || 'state.blocked=true';
+	// 기존 Write/Edit/NotebookEdit path (ADR-CHAIN-005 §3 mechanical trio iii)
+	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+	const path = toolInput?.file_path || toolInput?.path || '';
+	if (!path) return null;
+	if (!path.includes('/.aimd/output/') && !path.includes('\\.aimd\\output\\'))
+		return null;
+	return state.block_reason || 'state.blocked=true';
 }

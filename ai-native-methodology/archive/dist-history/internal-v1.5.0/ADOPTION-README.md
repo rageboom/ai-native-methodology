@@ -12,7 +12,7 @@ provenance:
     workspace 본체 README.md 와 별도 — 사내 운영 전용 customization.
 -->
 
-# AI-Native 개발 방법론 v1.3.0 — 사내 운영본 ★★★
+# AI-Native 개발 방법론 v1.3.0 — 사내 운영본
 
 > **본 디렉토리 = 사내 표준 운영본 (`internal-v1.3`)** — adoption 워크스페이스의 빌드 산출물.
 > 본 방법론 = "**코드 → 형식 명세 + 위험 기록**" **한 방향 추출기**. 신규 시스템 구축은 사람의 책임.
@@ -42,9 +42,10 @@ provenance:
 루트의 `CLAUDE.md` 는 매 Claude Code 세션 자동 로드되어 정책이 LLM 컨텍스트에 active. 별도 명령 불필요.
 
 수록된 정책 (23):
+
 - 절대 우선순위 (품질 1 > 재작업 최소화 > 속도)
 - 본 방법론 가치 (한 방향 추출기 / round-trip 영구 scope 제외)
-- ★★★ 의무 정책 (7대 산출물 / 신뢰도 메타 / 이중 렌더링 / no-simulation / 다이어그램 신뢰도 / Baseline+Ratchet / migration_advice)
+- 의무 정책 (7대 산출물 / 신뢰도 메타 / 이중 렌더링 / no-simulation / 다이어그램 신뢰도 / Baseline+Ratchet / migration_advice)
 - 사상 (Schema-First + Contract-First + DDD-Lite B + FSD)
 - 운영 (한국어 1차 / 순환의존성 hybrid)
 - NestJS 전용 4 (적용 프로젝트가 NestJS 일 때만)
@@ -64,7 +65,7 @@ provenance:
 
 `tools/` 5종 → 아래 [검증 도구 사용](#검증-도구-사용-5종) 섹션.
 
-### Step 5. ★ legacy 도입 시 ADR-010 Baseline+Ratchet 의무
+### Step 5. legacy 도입 시 ADR-010 Baseline+Ratchet 의무
 
 `CLAUDE.md` 에 인라인 흡수됨 — legacy 결함 폭증 회피, 신규 결함만 차단.
 
@@ -87,23 +88,23 @@ provenance:
 
 ---
 
-## ★★ Platform-Agnostic 입증 (3 PoC 통합)
+##Platform-Agnostic 입증 (3 PoC 통합)
 
-| PoC | platform | 산출 | 신뢰도 |
-|---|---|---|---|
-| **PoC #01** | Java + Spring Boot 2.5 (CRUD) | 7대 산출물 6/7 / 15 AP / 33 finding | 0.96 |
-| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 7대 산출물 6/7 / 21 AP / 43 finding | 0.96 |
-| **PoC #03** | TypeScript + NestJS + TypeORM | 7대 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94 |
+| PoC         | platform                           | 산출                                             | 신뢰도 |
+| ----------- | ---------------------------------- | ------------------------------------------------ | ------ |
+| **PoC #01** | Java + Spring Boot 2.5 (CRUD)      | 7대 산출물 6/7 / 15 AP / 33 finding              | 0.96   |
+| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 7대 산출물 6/7 / 21 AP / 43 finding              | 0.96   |
+| **PoC #03** | TypeScript + NestJS + TypeORM      | 7대 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94   |
 
-→ ★ 3 platform 모두 7대 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
+→ 3 platform 모두 7대 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
 
-### Cross-PoC 학습 효과 (★ §8.1 정합 — 단일 PoC 과적합 회피)
+### Cross-PoC 학습 효과 (§8.1 정합 — 단일 PoC 과적합 회피)
 
-| 분류 | 건수 | 사례 |
-|---|---|---|
-| **★ 재현** (보편 결함) | 6 | EAGER N+1 (★ 3 PoC) / API drift / DB UQ / PUT vs PATCH / versioning / limit cap |
-| **★ 변형 재현** | 3 | RSA git commit → Auth scope / Token apiKey 부분 / De Morgan 학습 효과 |
-| **★★ 비재현 학습 효과 (positive finding)** | 3 | NestJS Bearer 표준 ✅ / 307 redirect / TS generic 정적 차단 |
+| 분류                                    | 건수 | 사례                                                                          |
+| --------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| **재현** (보편 결함)                    | 6    | EAGER N+1 (3 PoC) / API drift / DB UQ / PUT vs PATCH / versioning / limit cap |
+| **변형 재현**                           | 3    | RSA git commit → Auth scope / Token apiKey 부분 / De Morgan 학습 효과         |
+| **비재현 학습 효과 (positive finding)** | 3    | NestJS Bearer 표준 ✅ / 307 redirect / TS generic 정적 차단                   |
 
 **적용 가능 platform** (검증 완료): Java/Spring + Java/Hexagonal + TypeScript/NestJS.
 
@@ -113,7 +114,7 @@ provenance:
 
 ```
 internal-v1.3/
-├── CLAUDE.md                  ★ 자동 로드 — 정책 23 인라인 (위반 = 빌드 실패)
+├── CLAUDE.md                  자동 로드 — 정책 23 인라인 (위반 = 빌드 실패)
 ├── README.md                  ← 본 파일 (사내 적용 진입점)
 ├── methodology-spec/          Single Source of Truth
 │   ├── deliverables/          7대 산출물 명세 (1~7 + 4-5)
@@ -124,12 +125,12 @@ internal-v1.3/
 ├── schemas/                   JSON Schema (AI/도구 계약)
 ├── templates/                 산출물 템플릿 (.md / .mermaid / .yaml)
 ├── tools/                     검증 도구 5종
-│   ├── drift-validator/           ★ Phase 4.5 이중 렌더링 동일성 검증
+│   ├── drift-validator/           Phase 4.5 이중 렌더링 동일성 검증
 │   ├── decision-table-validator/  DMN 5종 (duplicate/conflict/gap/overlap/type)
 │   ├── formal-spec-link-validator/ Phase 4.5 cross-link 검증
 │   ├── spectral-runner/           OpenAPI lint (실 실행 — no-simulation)
 │   └── static-runner/             외부 정적 분석 hook (Semgrep / PMD)
-└── examples/                  ★ 3 PoC (platform-agnostic 입증) — 참고용, 자동 로드 X
+└── examples/                  3 PoC (platform-agnostic 입증) — 참고용, 자동 로드 X
     ├── poc-01-realworld-spring/        Spring 팀 reference
     ├── poc-02-realworld-springboot3/   Hexagonal 팀 reference (Spring 정책 5건 출처)
     └── poc-03-realworld-nestjs/        NestJS 팀 reference (NestJS 정책 4건 출처)
@@ -151,7 +152,7 @@ node tools/decision-table-validator/src/cli.js {산출물 경로}/formal-spec/de
 # 3. formal-spec-link-validator — Phase 4.5 cross-link
 node tools/formal-spec-link-validator/src/cli.js {산출물 경로}/formal-spec/
 
-# 4. spectral-runner — OpenAPI lint (★★★ 실 실행 — no-simulation)
+# 4. spectral-runner — OpenAPI lint (실 실행 — no-simulation)
 cd tools/spectral-runner && npx spectral lint {openapi.yaml} --ruleset ./.spectral.yaml
 
 # 5. static-runner — 진짜 외부 도구 (Semgrep / PMD / SpotBugs)
@@ -180,17 +181,17 @@ CI 통합 권고 — ADR-010 Baseline + Ratchet 의무 (`CLAUDE.md` 인라인).
 
 ## v1.3.0 현재 상태
 
-| 항목 | 상태 |
-|---|---|
-| 7대 산출물 명세 + 형식 명세 | ✅ 완성 (BE 6/7 — UI/UX 만 FE PoC 후속) |
-| JSON Schema | ✅ 11개 (formal-spec / finding-system / openapi-extension 포함) |
-| 정책 (CLAUDE.md 인라인) | ✅ 23 (범용 13 + 가치 1 + NestJS 4 + Spring 5) |
-| Phase 4.5 정식 도입 | ✅ |
-| ADR-010 Baseline+Ratchet | ✅ legacy 도입 시 의무 |
-| 3 PoC 종결 | ✅ Spring + Hexagonal + NestJS (platform-agnostic 입증) |
-| 검증 도구 | ✅ 5종 (drift / dmn / formal-spec-link / spectral / static) |
-| no-simulation 정책 | ✅ spectral 실 실행 (24 warnings / 0 errors) |
-| 신뢰도 | ✅ 85-92% (ADR-009 단계 4 도달) |
+| 항목                        | 상태                                                            |
+| --------------------------- | --------------------------------------------------------------- |
+| 7대 산출물 명세 + 형식 명세 | ✅ 완성 (BE 6/7 — UI/UX 만 FE PoC 후속)                         |
+| JSON Schema                 | ✅ 11개 (formal-spec / finding-system / openapi-extension 포함) |
+| 정책 (CLAUDE.md 인라인)     | ✅ 23 (범용 13 + 가치 1 + NestJS 4 + Spring 5)                  |
+| Phase 4.5 정식 도입         | ✅                                                              |
+| ADR-010 Baseline+Ratchet    | ✅ legacy 도입 시 의무                                          |
+| 3 PoC 종결                  | ✅ Spring + Hexagonal + NestJS (platform-agnostic 입증)         |
+| 검증 도구                   | ✅ 5종 (drift / dmn / formal-spec-link / spectral / static)     |
+| no-simulation 정책          | ✅ spectral 실 실행 (24 warnings / 0 errors)                    |
+| 신뢰도                      | ✅ 85-92% (ADR-009 단계 4 도달)                                 |
 
 ### v1.4 후속 (FE 트랙)
 
@@ -209,14 +210,15 @@ CI 통합 권고 — ADR-010 Baseline + Ratchet 의무 (`CLAUDE.md` 인라인).
 
 ## 사상적 기반
 
-| 사상 | 채택 | 출처 |
-|---|---|---|
-| Schema-First | 주축 | Microsoft TypeSpec, OpenAPI 산업 표준 |
-| Contract-First | API 영역 | Hazelcast, Technijian 등 산업 사례 |
-| DDD-Lite (B 강도) | 도메인 영역 | Eric Evans DDD, 풀 DDD 의도적 제외 |
-| FSD + Atomic Design | FE 영역 | Feature-Sliced Design, Brad Frost Atomic Design |
+| 사상                | 채택        | 출처                                            |
+| ------------------- | ----------- | ----------------------------------------------- |
+| Schema-First        | 주축        | Microsoft TypeSpec, OpenAPI 산업 표준           |
+| Contract-First      | API 영역    | Hazelcast, Technijian 등 산업 사례              |
+| DDD-Lite (B 강도)   | 도메인 영역 | Eric Evans DDD, 풀 DDD 의도적 제외              |
+| FSD + Atomic Design | FE 영역     | Feature-Sliced Design, Brad Frost Atomic Design |
 
 명시적 제외:
+
 - Event Sourcing, CQRS, Saga, Anticorruption Layer
 - 비기능 요구사항(NFR) 측정
 - 테스트 코드 자동 분석

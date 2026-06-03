@@ -5,7 +5,7 @@
  * Source of Truth: 코드 (src/article/article.service.ts + article.entity.ts)
  * Direction: B (코드 → L2)
  *
- * ★ Counter Aggregate 집중 (Senior 권고) — favoriteCount 단조성 + slug 가변성 invariant
+ *  Counter Aggregate 집중 (Senior 권고) — favoriteCount 단조성 + slug 가변성 invariant
  */
 
 type ArticleId = number & { readonly __brand: 'ArticleId' };
@@ -16,7 +16,7 @@ type Slug = string & {
     readonly notBlank: true;
     readonly format: 'kebab-case';
     readonly uniqueScope: 'global';
-    // ★ F-120 — DB UQ 부재 → uniqueScope 미보장
+    //  F-120 — DB UQ 부재 → uniqueScope 미보장
   };
 };
 type FavoriteCount = number & { readonly __brand: 'FavoriteCount'; readonly __refinement: { readonly nonNegative: true } };
@@ -30,7 +30,7 @@ interface ArticleEntity {
   readonly slug: Slug;
   readonly title: string;
   readonly description: string;
-  readonly body: string;        // ★ varchar(255) — text 권장 (F-133)
+  readonly body: string;        //  varchar(255) — text 권장 (F-133)
   readonly created: Date;
   readonly updated: Date;
   readonly tagList: string[];   // simple-array
@@ -44,9 +44,9 @@ interface ArticleEntity {
 
 namespace ArticleInvariants {
   /**
-   * INV-ARTICLE-FAVORITE-COUNT-MONOTONIC (★ F-135 critical)
+   * INV-ARTICLE-FAVORITE-COUNT-MONOTONIC ( F-135 critical)
    * - favoriteCount == favorites.length (단조성)
-   * - ★ App level 만 보장 / DB level FOR UPDATE 부재 → race window 위반
+   * -  App level 만 보장 / DB level FOR UPDATE 부재 → race window 위반
    */
   export const favoriteCountMatchesFavorites = (
     article: ArticleEntity,
@@ -64,9 +64,9 @@ namespace ArticleInvariants {
     article.favoriteCount >= 0;
 
   /**
-   * INV-ARTICLE-SLUG-UNIQUE (★ F-120-slug)
+   * INV-ARTICLE-SLUG-UNIQUE ( F-120-slug)
    * - rules.json BR-ARTICLE-SLUG-AUTO-001
-   * - ★ DB UQ 부재 + random suffix 의존
+   * -  DB UQ 부재 + random suffix 의존
    */
   export const slugUnique = (articles: ArticleEntity[]): boolean =>
     articles.every((a1, i) =>
@@ -81,14 +81,14 @@ namespace ArticleInvariants {
     /^[a-z0-9]+(-[a-z0-9]+)*-[a-z0-9]+$/.test(article.slug);
 
   /**
-   * INV-ARTICLE-AUTHOR-EXISTS (★ FK 권고)
+   * INV-ARTICLE-AUTHOR-EXISTS ( FK 권고)
    * - DB FK author_id → user(id) 권고 (현재 = TypeORM @ManyToOne 만)
    */
   export const authorExists = (article: ArticleEntity, validUserIds: Set<number>): boolean =>
     validUserIds.has(article.authorId);
 
   /**
-   * INV-ARTICLE-SLUG-UPDATE-ON-TITLE-CHANGE (★ F-126)
+   * INV-ARTICLE-SLUG-UPDATE-ON-TITLE-CHANGE ( F-126)
    * - title 변경 시 slug 재생성 (현재 = TODO 주석으로 미구현)
    * - 본 invariant 는 update 전후 비교 (event invariant)
    */
@@ -97,20 +97,20 @@ namespace ArticleInvariants {
     after: ArticleEntity
   ): boolean => {
     if (before.title === after.title) return before.slug === after.slug;
-    // ★ 현재 코드 = title 변경 시 slug 미업데이트 (F-126)
+    //  현재 코드 = title 변경 시 slug 미업데이트 (F-126)
     // 권고: title 변경 시 slug 재생성 또는 명시적 immutable 정책
     return true;  // 현재 코드 동작 = invariant 위반 허용
   };
 }
 
 // ============================================================================
-// Counter Atomicity Invariants (★★ F-135 — Senior 권고 핵심)
+// Counter Atomicity Invariants ( F-135 — Senior 권고 핵심)
 // ============================================================================
 
 namespace CounterAtomicity {
   /**
    * 두 동시 favorite 시 favoriteCount 정확히 +1 (race-safe)
-   * - 현재 = ★★ App 1중 isNewFavorite check / DB FOR UPDATE 부재
+   * - 현재 =  App 1중 isNewFavorite check / DB FOR UPDATE 부재
    * - 권고: SELECT ... FOR UPDATE + transaction 또는 atomic UPDATE
    */
   export const concurrentFavoriteSafe = async (
@@ -154,13 +154,13 @@ namespace UC_ARTICLE_FAVORITE {
   ): boolean => {
     if ('error' in output) return true;
 
-    // ★ 단조성 invariant
+    //  단조성 invariant
     return (
       ArticleInvariants.favoriteCountNonNegative(articleAfter) &&
       ArticleInvariants.favoriteCountMatchesFavorites(articleAfter, favoritesAfter) &&
       // 신규 favorite = +1 / 이미 favorited = 0
       (articleAfter.favoriteCount === articleBefore.favoriteCount ||
-       articleAfter.favoriteCount === articleBefore.favoriteCount + 1)
+        articleAfter.favoriteCount === articleBefore.favoriteCount + 1)
     );
   };
 }
@@ -168,7 +168,7 @@ namespace UC_ARTICLE_FAVORITE {
 /*
  * 발견된 갭:
  *
- * F-135 (재확인) ★★ critical — favoriteCount race window
+ * F-135 (재확인)  critical — favoriteCount race window
  *   현재: App 1중 isNewFavorite check / DB FOR UPDATE 부재
  *   권고: SELECT FOR UPDATE + transaction 또는 atomic UPDATE article SET count = count + 1
  *

@@ -7,6 +7,7 @@
 ## T+0 (2026-04-28) — Phase 5 진입 + 1원칙 plan 작성
 
 ### 진입 컨텍스트
+
 - 윤주스 1번 선택 (Phase 5 진입)
 - Phase 4 완료 ✅ — UC 25 / BR 13 / AP partial 6 / architecture 갱신
 - Phase 5 명세 v1.1.2 (phase-5-1-api.md) 적용
@@ -14,6 +15,7 @@
 ### 1원칙 — 전수 조사 + plan-phase5.md 작성
 
 전수 조사 완료 항목:
+
 - ✅ methodology-spec/workflow/phase-5-1-api.md
 - ✅ methodology-spec/deliverables/03-API-계약.md
 - ✅ schemas/openapi-extension.schema.json
@@ -21,12 +23,14 @@
 - ✅ output/rules/rules.json (BR 13)
 - ✅ output/antipatterns-partial/antipatterns-partial.json (AP 6)
 - ✅ output/architecture/architecture.json (modules + LV-001)
-- ✅ inputs/_manifest.yml
+- ✅ inputs/\_manifest.yml
 
 산출:
+
 - ✅ `.claude/plans/plan-phase5.md` 작성 완료
 
 핵심 결정 (plan §6):
+
 1. RealWorld `Authorization: Token <jwt>` → OpenAPI security scheme apiKey 채택
 2. wrapped DTO 형식 → wrapper schema 분리
 3. F-027 명시 위치 → DELETE /articles/{slug}/comments/{id} description + x-warning
@@ -40,6 +44,7 @@
 ### 메인 사전 raw fetch 결과 (학습 코퍼스 의존 위험 사전 차단)
 
 WebFetch 9회로 ground truth 확보:
+
 - application/ 디렉토리 + 4 subdir listing
 - doc/Conduit.postman_collection.json (22 endpoint)
 - application/security/SecurityConfiguration.java
@@ -48,17 +53,18 @@ WebFetch 9회로 ground truth 확보:
 
 ### 22 endpoint 결정적 확정
 
-| 영역 | 개수 |
-|---|---|
-| User | 4 (POST /users, POST /users/login, GET /user, PUT /user) |
-| Profile | 3 (GET /profiles/{username}, POST + DELETE /follow) |
+| 영역    | 개수                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------- |
+| User    | 4 (POST /users, POST /users/login, GET /user, PUT /user)                                    |
+| Profile | 3 (GET /profiles/{username}, POST + DELETE /follow)                                         |
 | Article | 11 (POST + GET (4 query 변형) + GET /feed + GET/PUT/DELETE /{slug} + POST/DELETE /favorite) |
-| Comment | 3 (POST + GET + DELETE /comments) |
-| Tag | 1 (GET /tags) |
+| Comment | 3 (POST + GET + DELETE /comments)                                                           |
+| Tag     | 1 (GET /tags)                                                                               |
 
 ### Cross-validation 결과 — Phase 4 산출 검증
 
 **✅ 정합 (Phase 4 정확)**:
+
 - LV-001 (UserJWTPayload import) 3 controller 직접 import 확인
 - UC 25 의 18건 operationId pre-매핑 정합
 - BR-AUTH-PUBLIC-001 endpoint 정확
@@ -87,11 +93,11 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 
 ### 2원칙 sub-agent 병렬 spawn (3개)
 
-| 에이전트 | 산출 | 핵심 영역 |
-|---|---|---|
-| Document Researcher | document-phase5.md | OpenAPI 3.1 / Spring REST / ignoring vs permitAll / Pageable / RFC 7519/7515/8725 |
-| Case Researcher | case-phase5.md | Netflix/Stripe/GitHub / RealWorld 공식 spec / 한국 5사 / Authorization Token vs Bearer / Postman→OpenAPI / API↔UC |
-| Senior Engineer | senior-phase5.md | OpenAPI 함정 / Authorization 정책 / Lombok DTO / Pageable DoS / F-027 표기 / JWT 자체 구현 위험 / WebSecurityConfigurerAdapter deprecated / API 버전 |
+| 에이전트            | 산출               | 핵심 영역                                                                                                                                            |
+| ------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Document Researcher | document-phase5.md | OpenAPI 3.1 / Spring REST / ignoring vs permitAll / Pageable / RFC 7519/7515/8725                                                                    |
+| Case Researcher     | case-phase5.md     | Netflix/Stripe/GitHub / RealWorld 공식 spec / 한국 5사 / Authorization Token vs Bearer / Postman→OpenAPI / API↔UC                                    |
+| Senior Engineer     | senior-phase5.md   | OpenAPI 함정 / Authorization 정책 / Lombok DTO / Pageable DoS / F-027 표기 / JWT 자체 구현 위험 / WebSecurityConfigurerAdapter deprecated / API 버전 |
 
 각 sub-agent 에게 메인 raw fetch 결과 명시 전달 (학습 코퍼스 의존 차단).
 
@@ -104,6 +110,7 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ### sub-agent 결과 (모두 실패)
 
 3 sub-agent 모두 사용량 한도 도달로 중단 (reset 17:50 KST):
+
 - document-phase5.md ❌ (85초 / tool_uses 19)
 - case-phase5.md ❌ (49초 / tool_uses 14)
 - senior-phase5.md ❌ (18초 / tool_uses 8)
@@ -127,43 +134,46 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ## T+3 (2026-04-29) — 2원칙 재시도 ✅ 완료 (한도 reset 후 즉시 시도)
 
 ### 사용자 결정 (윤주스)
+
 - 즉시 시도 옵션 채택 (Anthropic 5시간 rolling window 회복 가능성).
 
 ### 3 sub-agent 병렬 spawn (background)
 
-| Agent ID | 산출 | 분량 | 상태 |
-|---|---|---|---|
+| Agent ID        | 산출                                    | 분량       | 상태                           |
+| --------------- | --------------------------------------- | ---------- | ------------------------------ |
 | document-phase5 | `.claude/researches/document-phase5.md` | 1,232 line | ✅ 완료 (469초 / 26 tool_uses) |
-| case-phase5 | `.claude/researches/case-phase5.md` | 1,261 line | ✅ 완료 (461초 / 34 tool_uses) |
-| senior-phase5 | `.claude/researches/senior-phase5.md` | 1,956 line | ✅ 완료 (605초 / 5 tool_uses) |
+| case-phase5     | `.claude/researches/case-phase5.md`     | 1,261 line | ✅ 완료 (461초 / 34 tool_uses) |
+| senior-phase5   | `.claude/researches/senior-phase5.md`   | 1,956 line | ✅ 완료 (605초 / 5 tool_uses)  |
 
 총 4,449 line. 한도 reset 됐음 — 모두 정상 산출.
 
 ### 핵심 합의 (3/3 동의)
 
 **5 핵심 결정 — 모두 표준 적합 + 시니어 승인**:
+
 1. `apiKey + Authorization` (Bearer 아님) — Document RFC 6750 §3 / Case 카카오 KakaoAK / Senior 영역 14
 2. wrapper schema 분리 — Document OpenAPI 3.1 components / Case Stripe·GitHub / Senior 영역 2
-3. F-027 De Morgan → description + x-warning + x-known-bug **3중 표기** — Senior critical 권고 ★
-4. LV-001 → api-extension.json `extracted_from.controller_file` 만 — Case GitHub `x-github` 모방 가능 ★★★
+3. F-027 De Morgan → description + x-warning + x-known-bug **3중 표기** — Senior critical 권고
+4. LV-001 → api-extension.json `extracted_from.controller_file` 만 — Case GitHub `x-github` 모방 가능
 5. 4 GET /articles 변형 단일 operationId `GetArticles` + query parameter — 모두 표준 적합
 
 **잠재 불일치 3건 → 신규 finding 등록 합의**:
+
 - F-034 (medium) `sessionCreationPolicy(STATELESS)` 명시 부재 — Document/Case/Senior 모두 신규 finding 권고
 - F-035 (high/medium) `GET /user` UC 매핑 갱신 — Senior `system_internal=false` + operationId `GetCurrentUser`
 - F-036 (low/medium) `WebSecurity#ignoring` vs `permitAll` — Document/Case 권고 + Senior Phase 6 AP 후보
 
 ### 신규 finding 6~7건 후보 (윤주스 결정 대기)
 
-| ID | severity | 출처 | 설명 |
-|---|---|---|---|
-| F-034 | medium | Document/Case/Senior | STATELESS 명시 부재 |
-| F-035 | high | Senior | GET /user UC 매핑 (system_internal 갱신) |
-| F-036 | low~medium | Document/Case | WebSecurity#ignoring → permitAll 마이그레이션 |
-| F-037 | low | Document | JWT iss/aud/iat/jti 4 claim 부재 (RFC 7519 §4.1) |
-| F-038 | medium | Senior | API 버저닝 부재 (`/api` only) |
-| F-039 | medium | Senior | WebSecurityConfigurerAdapter deprecated (Spring Security 5.7+) |
-| F-040 (선택) | medium | Senior | HTTP status code 일관성 (@ResponseStatus 부재) |
+| ID           | severity   | 출처                 | 설명                                                           |
+| ------------ | ---------- | -------------------- | -------------------------------------------------------------- |
+| F-034        | medium     | Document/Case/Senior | STATELESS 명시 부재                                            |
+| F-035        | high       | Senior               | GET /user UC 매핑 (system_internal 갱신)                       |
+| F-036        | low~medium | Document/Case        | WebSecurity#ignoring → permitAll 마이그레이션                  |
+| F-037        | low        | Document             | JWT iss/aud/iat/jti 4 claim 부재 (RFC 7519 §4.1)               |
+| F-038        | medium     | Senior               | API 버저닝 부재 (`/api` only)                                  |
+| F-039        | medium     | Senior               | WebSecurityConfigurerAdapter deprecated (Spring Security 5.7+) |
+| F-040 (선택) | medium     | Senior               | HTTP status code 일관성 (@ResponseStatus 부재)                 |
 
 → 임계 25 → 31~32 도달 (F-021 임계 20+ 초과). 윤주스 절대 우선순위 (PoC #02 후 v1.2.0 합산 격상) 유지.
 
@@ -193,6 +203,7 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ## T+4 (2026-04-29) — research-phase5.md 통합 ✅
 
 `.claude/researches/research-phase5.md` 작성 완료 (~520 line).
+
 - 3 sub-agent 합의/충돌 정리 (충돌 없음 — 5 핵심 결정 모두 합의)
 - 4단계 작성 인덱스 (T+0~T+12)
 - 신규 finding 7건 후보 등록 (§7)
@@ -203,12 +214,12 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 
 ## T+5 (2026-04-29) — 3원칙 윤주스 승인 ✅ (4/4 항목 일괄)
 
-| 항목 | 결정 |
-|---|---|
-| 5 핵심 결정 + 22 endpoint 작업 범위 | ✅ 일괄 승인 |
+| 항목                                | 결정             |
+| ----------------------------------- | ---------------- |
+| 5 핵심 결정 + 22 endpoint 작업 범위 | ✅ 일괄 승인     |
 | 신규 finding 7건 등록 (F-034~F-040) | ✅ 7건 모두 등록 |
-| v1.2.0 격상 묶음 G (ADR-007) | ✅ 추가 |
-| Phase 6 AP candidate 6건 등록 예고 | ✅ 6건 예고 승인 |
+| v1.2.0 격상 묶음 G (ADR-007)        | ✅ 추가          |
+| Phase 6 AP candidate 6건 등록 예고  | ✅ 6건 예고 승인 |
 
 → 4단계 산출 진입 차단 요인 없음.
 
@@ -217,18 +228,20 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ## T+6 (2026-04-29) — 4단계 산출 시작 + output/api/ 4종 작성 ✅
 
 ### 디렉토리 생성
+
 - `output/api/` 신설
 
 ### 산출물 4종 작성 ✅
 
-| 파일 | 분량 | 핵심 |
-|---|---|---|
-| `output/api/openapi.yaml` | 471 line | OpenAPI 3.1 / 22 endpoint / 19 operationId / wrapper schema 19 / TokenAuth apiKey / F-027 3중 표기 |
+| 파일                            | 분량      | 핵심                                                                                                                      |
+| ------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `output/api/openapi.yaml`       | 471 line  | OpenAPI 3.1 / 22 endpoint / 19 operationId / wrapper schema 19 / TokenAuth apiKey / F-027 3중 표기                        |
 | `output/api/api-extension.json` | ~520 line | operations[19] / schemas_to_entities[18] / x-architectural-debt (LV-001 18 op) / x-known-bug F-027 / x-uc-mapping-summary |
-| `output/api/api.md` | ~290 line | 사람용 요약 / 22 endpoint 운영 시나리오 / 신규 finding 7건 / 사내 권고 41건 / Phase 6 AP candidate 6 / 신뢰도 0.93 |
-| `output/api/_manifest.yml` | ~230 line | formula v1 / 5 핵심 결정 / 신뢰도 산정 / approval gate / Phase 4 갱신 항목 / Phase 6 인계 |
+| `output/api/api.md`             | ~290 line | 사람용 요약 / 22 endpoint 운영 시나리오 / 신규 finding 7건 / 사내 권고 41건 / Phase 6 AP candidate 6 / 신뢰도 0.93        |
+| `output/api/_manifest.yml`      | ~230 line | formula v1 / 5 핵심 결정 / 신뢰도 산정 / approval gate / Phase 4 갱신 항목 / Phase 6 인계                                 |
 
 ### 5 핵심 결정 적용 (3 sub-agent 합의 + 윤주스 승인)
+
 - DEC-API-001 ✅ apiKey + Authorization (Bearer 아님) — components.securitySchemes.TokenAuth
 - DEC-API-002 ✅ Wrapper schema 분리 (3-tier 명명) — UserResponse / ArticleResponse / Comment 등
 - DEC-API-003 ✅ F-027 De Morgan **3중 표기** — description + x-warning + x-known-bug
@@ -240,16 +253,17 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ## T+7 (2026-04-29) — Phase 5-1 cross-link 정정 (UC/BR/Entity ID prefix)
 
 산출물 작성 후 Phase 4 ID 형식 cross-check — `UC-` / `BR-` / `E-` prefix 불일치 발견:
+
 - 내 작성: `UC-USER-SIGNUP` / `BR-AUTHOR-001` / `E-USER-User`
 - Phase 4 실제: `UC-CONTENT-USER-SIGNUP` / `BR-ARTICLE-AUTHOR-001` / `E-CONTENT-User`
 
 ### 일괄 정정 (Edit replace_all)
 
-| 파일 | 정정 항목 | 결과 |
-|---|---|---|
-| openapi.yaml | UC-USER-FIND-BY-ID / UC-ARTICLE-* / BR-AUTHOR-001/002 / BR-FOLLOW-001 | ✅ |
-| api-extension.json | UC-USER-* / UC-PROFILE-* / UC-ARTICLE-* / UC-COMMENT-* / UC-TAG-LIST / BR-USER-PASSWORD-001 / BR-AUTHOR-001/002 / BR-AUDITING-001 / E-USER-User / E-ARTICLE-* | ✅ |
-| api.md | 동일 | ✅ |
+| 파일               | 정정 항목                                                                                                                                                      | 결과 |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| openapi.yaml       | UC-USER-FIND-BY-ID / UC-ARTICLE-\* / BR-AUTHOR-001/002 / BR-FOLLOW-001                                                                                         | ✅   |
+| api-extension.json | UC-USER-_ / UC-PROFILE-_ / UC-ARTICLE-_ / UC-COMMENT-_ / UC-TAG-LIST / BR-USER-PASSWORD-001 / BR-AUTHOR-001/002 / BR-AUDITING-001 / E-USER-User / E-ARTICLE-\* | ✅   |
+| api.md             | 동일                                                                                                                                                           | ✅   |
 
 → Phase 4 ID 형식 100% 일치 달성.
 
@@ -260,6 +274,7 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ### domain.json 갱신 (F-035 — high closed)
 
 `UC-CONTENT-USER-FIND-BY-ID`:
+
 - actor: `System` → `Authenticated User`
 - description: 정정 (Phase 5-1 cross-validation 명시)
 - 신규 필드 추가:
@@ -270,12 +285,14 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 ### rules.json 갱신 (F-034 / F-036 — promoted)
 
 `BR-AUTH-STATELESS-001`:
+
 - source_evidence 정밀화 (sessionCreationPolicy 명시 부재 명시)
 - confidence 0.90 → 0.85
 - `_phase5_correction` 메타 추가 (F-034)
 - tags `["security", "stateless", "jwt", "F-034"]` 갱신
 
 `BR-AUTH-PUBLIC-001`:
+
 - source_evidence 정밀화 (WebSecurity#ignoring filter 우회 명시)
 - confidence 0.95 → 0.92
 - `_phase5_correction` 메타 추가 (F-036)
@@ -297,16 +314,16 @@ OpenAPI 3.1 표준 — 같은 path+method 는 단일 operation. → `getArticles
 
 ## T+10 (2026-04-29) — 승인 게이트 검증 (phase-5-1-api.md §5)
 
-| 체크 | 결과 |
-|---|---|
-| openapi.yaml 표준 lint (manual) | ✅ |
-| 모든 operationId unique | ✅ 19/19 |
-| DTO 스키마 = JSON Schema 호환 | ✅ |
-| 에러 응답 표준화 (4xx/5xx) | ✅ |
-| x-related-use-cases 매핑 | ✅ Phase 4 + F-035 갱신 |
-| x-related-rules 매핑 | ✅ BR 13 → endpoint 모두 매핑 |
-| 5.D inbound webhook | N/A (5.D 0건) |
-| Swagger UI 렌더링 | 🔄 manual (TokenAuth 비표준 — 로컬 테스트 권장) |
+| 체크                            | 결과                                            |
+| ------------------------------- | ----------------------------------------------- |
+| openapi.yaml 표준 lint (manual) | ✅                                              |
+| 모든 operationId unique         | ✅ 19/19                                        |
+| DTO 스키마 = JSON Schema 호환   | ✅                                              |
+| 에러 응답 표준화 (4xx/5xx)      | ✅                                              |
+| x-related-use-cases 매핑        | ✅ Phase 4 + F-035 갱신                         |
+| x-related-rules 매핑            | ✅ BR 13 → endpoint 모두 매핑                   |
+| 5.D inbound webhook             | N/A (5.D 0건)                                   |
+| Swagger UI 렌더링               | 🔄 manual (TokenAuth 비표준 — 로컬 테스트 권장) |
 
 ---
 
@@ -333,15 +350,15 @@ raw confidence: 0.93
 
 ### 7대 산출물 진행률
 
-| # | 산출물 | 단계 | 상태 |
-|---|---|---|---|
-| 1 | 아키텍처 | Phase 3 | ✅ |
-| 2 | 도메인 모델 | Phase 4 | ✅ (F-035 정정 적용) |
-| **3** | **API 계약** | **Phase 5-1** | ✅ **본 산출** |
-| 4 | DB 스키마 | Phase 2 | ✅ |
-| 5 | 비즈니스 규칙 | Phase 4 | ✅ (F-034/F-036 source_evidence 정밀화) |
-| 6 | 안티패턴 | Phase 6 | ⏳ partial 6 + candidate 6 = 12 AP 예상 |
-| 7 | UI/UX | Phase 5-2 | ❌ N/A (BE only) |
+| #     | 산출물        | 단계          | 상태                                    |
+| ----- | ------------- | ------------- | --------------------------------------- |
+| 1     | 아키텍처      | Phase 3       | ✅                                      |
+| 2     | 도메인 모델   | Phase 4       | ✅ (F-035 정정 적용)                    |
+| **3** | **API 계약**  | **Phase 5-1** | ✅ **본 산출**                          |
+| 4     | DB 스키마     | Phase 2       | ✅                                      |
+| 5     | 비즈니스 규칙 | Phase 4       | ✅ (F-034/F-036 source_evidence 정밀화) |
+| 6     | 안티패턴      | Phase 6       | ⏳ partial 6 + candidate 6 = 12 AP 예상 |
+| 7     | UI/UX         | Phase 5-2     | ❌ N/A (BE only)                        |
 
 **6/7 완료 (95%)** — Phase 6 만 남음.
 
@@ -352,7 +369,7 @@ raw confidence: 0.93
 - ✅ 5 핵심 결정 모두 3 sub-agent 합의 (충돌 0건)
 - ✅ Phase 4 산출 cross-validation 정정 3건 (F-034/F-035/F-036)
 - ✅ Phase 6 AP candidate 6건 발굴 (final merge 시 12 AP 예상)
-- ⭐ Case 토픽 8 GitHub `x-github` 패턴 → ADR-007 정당화 (★★★)
+- ⭐ Case 토픽 8 GitHub `x-github` 패턴 → ADR-007 정당화 ()
 
 → Phase 5-1 = **건강한 PoC** (Senior §7 "5건 이상 = 건강" 기준 — 7건 정식 + 6 AP candidate = 사실상 13건 가치).
 

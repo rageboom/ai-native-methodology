@@ -1,242 +1,248 @@
 manifest:
-  generated_at: "2026-04-29"
-  poc_id: "poc-02-realworld-springboot3"
+  generated_at: '2026-04-29'
+  poc_id: 'poc-02-realworld-springboot3'
   phase: 3
-  phase_name: "arch (아키텍처)"
-  methodology_version: "v1.1.2"
+  phase_name: 'arch (아키텍처)'
+  methodology_version: 'v1.1.2'
 
 # 상위 phase 인계
 phase_1_input:
-  source: "../inventory/_manifest.yml"
-  consistency: "multi-module Hexagonal naming hybrid (Phase 1 cap 0.65) → Phase 3 0.85 격상 ✅"
+  source: '../inventory/_manifest.yml'
+  consistency: 'multi-module Hexagonal naming hybrid (Phase 1 cap 0.65) → Phase 3 0.85 격상 ✅'
 phase_2_input:
-  source: "../db/_manifest.yml"
-  consistency: "7 테이블 → BC-CONTENT (5) + BC-USER (2) 매핑 ✅ / F-048 (TagJpaRepository) architecture 영향 합산 / F-051 (EAGER + Specification) Phase 6 합산"
+  source: '../db/_manifest.yml'
+  consistency: '7 테이블 → BC-CONTENT (5) + BC-USER (2) 매핑 ✅ / F-048 (TagJpaRepository) architecture 영향 합산 / F-051 (EAGER + Specification) Phase 6 합산'
 
 # Phase 3 산출물 6종
 deliverables:
-  - file: "architecture.json"
-    purpose: "AI용 통합 아키텍처 (architecture.schema.json 정합)"
-    schema: "schemas/architecture.schema.json ✅"
+  - file: 'architecture.json'
+    purpose: 'AI용 통합 아키텍처 (architecture.schema.json 정합)'
+    schema: 'schemas/architecture.schema.json ✅'
     confidence: 0.92
-  - file: "architecture.md"
-    purpose: "사람용 보고서 + Phase 1 cap 0.65 → Phase 3 0.85 정정 트레이스"
+  - file: 'architecture.md'
+    purpose: '사람용 보고서 + Phase 1 cap 0.65 → Phase 3 0.85 정정 트레이스'
     confidence: 0.92
-  - file: "architecture.mermaid"
-    purpose: "C4 Level 3 component diagram (8 모듈)"
+  - file: 'architecture.mermaid'
+    purpose: 'C4 Level 3 component diagram (8 모듈)'
     confidence: 0.95
-  - file: "dependency-graph.mermaid"
-    purpose: "의존성 그래프 (Build + Source-level)"
+  - file: 'dependency-graph.mermaid'
+    purpose: '의존성 그래프 (Build + Source-level)'
     confidence: 0.95
-  - file: "circular-dependencies.md"
-    purpose: "CIRCULAR 0건 보고 + closed F-023 §3.1.1 0건 케이스 한계 발견 (F-060)"
+  - file: 'circular-dependencies.md'
+    purpose: 'CIRCULAR 0건 보고 + closed F-023 §3.1.1 0건 케이스 한계 발견 (F-060)'
     confidence: 0.92
-  - file: "_manifest.yml"
-    purpose: "Phase 3 매니페스트 (본 파일)"
+  - file: '_manifest.yml'
+    purpose: 'Phase 3 매니페스트 (본 파일)'
     confidence: 0.95
 
 # 결정적 처리 결과 (filesystem 환경)
 deterministic_results:
   raw_fetch:
-    main_agent: "전수 grep + read (build.gradle.kts 4 / 8 module 패키지)"
-    sub_agent_document: "27 파일 read + 12 URL 인용 (★★★ 7 + ★★ 5)"
-    sub_agent_case: "한국 사례 6 + 글로벌 3 + 28 URL 인용"
-    sub_agent_senior: "백그라운드 진행 중 (보강 대기)"
+    main_agent: '전수 grep + read (build.gradle.kts 4 / 8 module 패키지)'
+    sub_agent_document: '27 파일 read + 12 URL 인용 ( 7 +  5)'
+    sub_agent_case: '한국 사례 6 + 글로벌 3 + 28 URL 인용'
+    sub_agent_senior: '백그라운드 진행 중 (보강 대기)'
   module_count: 8
   dependency_count: 10
   circular_dependency_count: 0
   layer_violation_count: 0
   external_dependency_count: 0
-  rate_limit_after_phase_3: "filesystem 환경 — N/A"
+  rate_limit_after_phase_3: 'filesystem 환경 — N/A'
 
 # 아키텍처 스타일 확정 (Phase 1 → Phase 3 정정 트레이스)
 architecture_style_decision:
-  primary: "modular_monolith"
+  primary: 'modular_monolith'
   primary_confidence: 0.85
-  secondary: "hexagonal"
+  secondary: 'hexagonal'
   secondary_confidence: 0.55
-  naming_pattern: "ports_adapters"
+  naming_pattern: 'ports_adapters'
   naming_pattern_confidence: 0.70
   refuted:
-    - {style: "layered", confidence: 0.20, reason: "명시적 layer 분리 부재"}
-    - {style: "clean", confidence: 0.15, reason: "entity = JPA + @Service in core"}
+    - { style: 'layered', confidence: 0.20, reason: '명시적 layer 분리 부재' }
+    - {
+        style: 'clean',
+        confidence: 0.15,
+        reason: 'entity = JPA + @Service in core',
+      }
   phase_1_correction:
     phase_1_cap: 0.65
     phase_3_confidence: 0.85
     delta: 0.20
-    direction: "upgrade"
-    f_024_pattern: "Δ +0.20 (격상) — F-024 (PoC #01 Δ -0.35 임계 promoted) 와 다른 방향. Phase 1 cap 적절 + Phase 3 권위 데이터 후 격상 = 건강한 패턴"
+    direction: 'upgrade'
+    f_024_pattern: 'Δ +0.20 (격상) — F-024 (PoC #01 Δ -0.35 임계 promoted) 와 다른 방향. Phase 1 cap 적절 + Phase 3 권위 데이터 후 격상 = 건강한 패턴'
   evidence_3_cases:
-    - "우아한형제들 ceo-united (techblog.woowahan.com/12720) — multi-module hexagonal hybrid"
-    - "카카오뱅크 메시지허브 (tech.kakaobank.com/posts/2311) — 동일 의존 정책"
-    - "카카오뱅크 Spring Modulith (2025-07) — 거의 동일 3 Gradle module 구조"
+    - '우아한형제들 ceo-united (techblog.woowahan.com/12720) — multi-module hexagonal hybrid'
+    - '카카오뱅크 메시지허브 (tech.kakaobank.com/posts/2311) — 동일 의존 정책'
+    - '카카오뱅크 Spring Modulith (2025-07) — 거의 동일 3 Gradle module 구조'
   hybrid_justification:
     - "권용근 (우형) 인용: '순수성을 위해서 실용성을 포기하는건 어리석은 일이다'"
-    - "카카오페이 home Hexagonal 제거 회고 — Hexagonal 적용 3 전제 중 1/3 만 충족 → Pure Hexagonal NOT 정합"
-    - "Cockburn 4번 원칙 (framework annotation 금지) 위배 — naming hybrid 정확"
+    - '카카오페이 home Hexagonal 제거 회고 — Hexagonal 적용 3 전제 중 1/3 만 충족 → Pure Hexagonal NOT 정합'
+    - 'Cockburn 4번 원칙 (framework annotation 금지) 위배 — naming hybrid 정확'
 
 # Bounded Context 후보 (Phase 4 입력)
 bounded_context_candidates:
   BC-CONTENT:
-    modules: [MOD-CORE-MODEL, MOD-CORE-SERVICE, MOD-PERS-ADAPTER, MOD-API-CONTROLLER]
+    modules:
+      [MOD-CORE-MODEL, MOD-CORE-SERVICE, MOD-PERS-ADAPTER, MOD-API-CONTROLLER]
     tables: [article, article_comment, article_tag, article_favorite, tag]
     aggregate_candidates: [Article, ArticleComment, Tag]
   BC-USER:
-    modules: [MOD-CORE-MODEL, MOD-CORE-SERVICE, MOD-PERS-ADAPTER, MOD-API-CONTROLLER]
+    modules:
+      [MOD-CORE-MODEL, MOD-CORE-SERVICE, MOD-PERS-ADAPTER, MOD-API-CONTROLLER]
     tables: [users, user_follow]
     aggregate_candidates: [User]
   BC-AUTH:
     modules: [MOD-API-CONFIG, MOD-API-MIXIN, MOD-CORE-MODEL]
     tables: []
     aggregate_candidates: []
-    note: "cross-cutting — JWT stateless / PasswordEncoder port (core) + SecurityPasswordEncoderAdapter (api/config)"
+    note: 'cross-cutting — JWT stateless / PasswordEncoder port (core) + SecurityPasswordEncoderAdapter (api/config)'
 
-# 6 핵심 결정 (DEC-PHASE3-POC02-001~006) — Auto Mode 자율 적용 ★
+# 6 핵심 결정 (DEC-PHASE3-POC02-001~006) — Auto Mode 자율 적용
 key_decisions:
-  - id: "DEC-PHASE3-POC02-001"
-    title: "메인 1차 추정 5/5 정합 + F-044/F-048 패턴 비재현"
-    decision: "Phase 3 sub-agent 결과 메인 정정 0건 — Phase 1/2 교훈 흡수 성공"
-    rationale: "Document + Case 둘 다 5/5 정합 보고. §8.1 PoC #03 진입 신호."
+  - id: 'DEC-PHASE3-POC02-001'
+    title: '메인 1차 추정 5/5 정합 + F-044/F-048 패턴 비재현'
+    decision: 'Phase 3 sub-agent 결과 메인 정정 0건 — Phase 1/2 교훈 흡수 성공'
+    rationale: 'Document + Case 둘 다 5/5 정합 보고. §8.1 PoC #03 진입 신호.'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-POC02-002"
-    title: "Phase 1 cap 0.65 → Phase 3 0.85 격상 (Δ +0.20)"
-    decision: "modular_monolith 0.85 / hexagonal 0.55 / ports_adapters_naming 0.70"
-    rationale: "우형 ceo-united + 카뱅 메시지허브 + 카뱅 Spring Modulith 3 사례 정합"
+  - id: 'DEC-PHASE3-POC02-002'
+    title: 'Phase 1 cap 0.65 → Phase 3 0.85 격상 (Δ +0.20)'
+    decision: 'modular_monolith 0.85 / hexagonal 0.55 / ports_adapters_naming 0.70'
+    rationale: '우형 ceo-united + 카뱅 메시지허브 + 카뱅 Spring Modulith 3 사례 정합'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-POC02-003"
-    title: "F-060 (closed F-023 §3.1.1 0건 케이스 한계) medium promoted ★"
-    decision: "closed 명세 한계 2건 누적 (F-049 + F-060) → finding-system closed→reopened 절차 정식화 권고"
-    rationale: "v1.2.0 묶음 I (메타 finding) 신설 강한 근거"
+  - id: 'DEC-PHASE3-POC02-003'
+    title: 'F-060 (closed F-023 §3.1.1 0건 케이스 한계) medium promoted '
+    decision: 'closed 명세 한계 2건 누적 (F-049 + F-060) → finding-system closed→reopened 절차 정식화 권고'
+    rationale: 'v1.2.0 묶음 I (메타 finding) 신설 강한 근거'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-POC02-004"
-    title: "Split Package + compileOnly/runtimeOnly §8.1 deferred"
-    decision: "F-063 (Split Package) + F-064 (compileOnly/runtimeOnly 모범 사례) PoC #03 cross-stack 검증 후 격상"
-    rationale: "본 PoC 특이성 — 일반화 검증 부재"
+  - id: 'DEC-PHASE3-POC02-004'
+    title: 'Split Package + compileOnly/runtimeOnly §8.1 deferred'
+    decision: 'F-063 (Split Package) + F-064 (compileOnly/runtimeOnly 모범 사례) PoC #03 cross-stack 검증 후 격상'
+    rationale: '본 PoC 특이성 — 일반화 검증 부재'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-POC02-005"
-    title: "Phase 3 raw confidence 0.92 (cap 미적용)"
-    decision: "모듈 식별 1.0 / 의존 그래프 1.0 / circular 1.0 / LLM 영역 0.85~0.92 평균"
-    rationale: "명세 §6 표 정합"
+  - id: 'DEC-PHASE3-POC02-005'
+    title: 'Phase 3 raw confidence 0.92 (cap 미적용)'
+    decision: '모듈 식별 1.0 / 의존 그래프 1.0 / circular 1.0 / LLM 영역 0.85~0.92 평균'
+    rationale: '명세 §6 표 정합'
     auto_mode_applied: true
-  - id: "DEC-PHASE3-POC02-006"
-    title: "9 finding 등록 (F-059~F-067)"
-    decision: "Document 3 + Case 6 통합 (메인 추정 3건 중복 제거)"
-    rationale: "Senior 결과 도착 시 보강"
+  - id: 'DEC-PHASE3-POC02-006'
+    title: '9 finding 등록 (F-059~F-067)'
+    decision: 'Document 3 + Case 6 통합 (메인 추정 3건 중복 제거)'
+    rationale: 'Senior 결과 도착 시 보강'
     auto_mode_applied: true
 
 # 명세 §5 + research-phase3 §7 승인 게이트 체크리스트
 approval_gate:
-  - check: "architecture.json schema 검증 (architecture.schema.json 준수)"
-    status: "✅ — formal validation 권장. F-025 hybrid 표현 한계 caveat (architecture_style enum)"
-  - check: "Mermaid Component diagram 렌더링"
-    status: "✅"
-  - check: "모든 모듈에 ID/책임 명시"
-    status: "✅ 8/8"
-  - check: "순환 의존성 = 0 또는 발견 시 안티패턴 등록"
-    status: "✅ 0건 + closed F-023 §3.1.1 한계 발견 (F-060 promoted)"
-  - check: "모듈 ↔ 테이블 매핑 = 사용자 검토 (Phase 2 7 테이블)"
-    status: "✅ Auto Mode — BC-CONTENT 5 / BC-USER 2 / BC-AUTH 0"
-  - check: "아키텍처 스타일 후보 = 사용자 검증"
-    status: "✅ Auto Mode — Phase 1 cap 0.65 → Phase 3 0.85 정정 트레이스"
-  - check: "외부 의존성 위치 = Phase 4 5.D 라우팅 준비"
-    status: "🔄 0건 — Phase 4 5.D 빈약 caveat (RealWorld 한계)"
-  - check: "Phase 3 종료 시 finding 정식 등록"
-    status: "✅ 9건 등록 (F-059~F-067)"
+  - check: 'architecture.json schema 검증 (architecture.schema.json 준수)'
+    status: '✅ — formal validation 권장. F-025 hybrid 표현 한계 caveat (architecture_style enum)'
+  - check: 'Mermaid Component diagram 렌더링'
+    status: '✅'
+  - check: '모든 모듈에 ID/책임 명시'
+    status: '✅ 8/8'
+  - check: '순환 의존성 = 0 또는 발견 시 안티패턴 등록'
+    status: '✅ 0건 + closed F-023 §3.1.1 한계 발견 (F-060 promoted)'
+  - check: '모듈 ↔ 테이블 매핑 = 사용자 검토 (Phase 2 7 테이블)'
+    status: '✅ Auto Mode — BC-CONTENT 5 / BC-USER 2 / BC-AUTH 0'
+  - check: '아키텍처 스타일 후보 = 사용자 검증'
+    status: '✅ Auto Mode — Phase 1 cap 0.65 → Phase 3 0.85 정정 트레이스'
+  - check: '외부 의존성 위치 = Phase 4 5.D 라우팅 준비'
+    status: '🔄 0건 — Phase 4 5.D 빈약 caveat (RealWorld 한계)'
+  - check: 'Phase 3 종료 시 finding 정식 등록'
+    status: '✅ 9건 등록 (F-059~F-067)'
 
 # Phase 4 진입 시 인계 사항
 phase_4_handoff:
-  - "BC 후보 3개 (BC-CONTENT / BC-USER / BC-AUTH cross-cutting)"
-  - "Aggregate 후보: User / Article / Tag / ArticleComment (4)"
-  - "외부 의존성 0건 (5.D 빈약 — RealWorld 한계 caveat)"
-  - "F-048 (TagJpaRepository<Tag, Integer>) Phase 4 도메인 모델 검증 시 합산"
-  - "F-051 (Article EAGER + Specification + Pageable HHH000104) Phase 6 합산"
-  - "F-052 (article.title unique over-constraint) Phase 4 도메인 의미 재검토"
-  - "F-053 (titleToSlug 8 함정) Phase 4 도메인 메서드 분석"
+  - 'BC 후보 3개 (BC-CONTENT / BC-USER / BC-AUTH cross-cutting)'
+  - 'Aggregate 후보: User / Article / Tag / ArticleComment (4)'
+  - '외부 의존성 0건 (5.D 빈약 — RealWorld 한계 caveat)'
+  - 'F-048 (TagJpaRepository<Tag, Integer>) Phase 4 도메인 모델 검증 시 합산'
+  - 'F-051 (Article EAGER + Specification + Pageable HHH000104) Phase 6 합산'
+  - 'F-052 (article.title unique over-constraint) Phase 4 도메인 의미 재검토'
+  - 'F-053 (titleToSlug 8 함정) Phase 4 도메인 메서드 분석'
 
 # Findings (Phase 3 신규 등록)
 findings_phase_3:
-  - id: "F-059"
-    title: "모듈 boundary 도구 도입 권고 가이드 부재 (Spring Modulith / ArchUnit)"
-    severity: "medium"
-    proposed_fix: "phase-3-arch.md §3.1.1 Step 4-pre 추가 (도구 미도입 환경 권고)"
-    status: "promoted"
-  - id: "F-060"
-    title: "closed F-023 §3.1.1 BC 분류 절차 0건 케이스 명시 부재 ★"
-    severity: "medium"
-    proposed_fix: "phase-3-arch.md §3.1.1 Step 0 추가 + finding-system closed→reopened 절차 정식화"
-    status: "promoted (메타 finding — F-049 와 함께 v1.2.0 묶음 I)"
-  - id: "F-061"
-    title: "Hexagonal naming hybrid 라벨 + 어휘 표준화 부재 (F-025 합산)"
-    severity: "low"
-    proposed_fix: "schemas/architecture.schema.json naming_pattern 별도 필드 신설"
-    status: "promoted"
-  - id: "F-062"
-    title: "core Spring `@Service` 의존 — 한국 hybrid 표준 caveat"
-    severity: "low"
-    proposed_fix: "방법론 본체 Hexagonal 가이드에 한국 hybrid 패턴 caveat 추가"
-    status: "promoted"
-  - id: "F-063"
-    title: "Split Package smell — `io.zhc1.realworld.config` 4 location 16 파일"
-    severity: "medium"
-    proposed_fix: "사내 적용 시 모듈별 sub-package 분리 (persistence.config / api.config)"
-    status: "deferred (§8.1 — PoC #03 cross-stack 검증 후 격상)"
-  - id: "F-064"
-    title: "compileOnly + runtimeOnly 모범 사례 ★ (Hexagonal 빌드 시스템 강제)"
-    severity: "(positive — 강점)"
-    proposed_fix: "v1.2.0 모범 사례 가이드 부록"
-    status: "deferred (§8.1 — PoC #03 다른 빌드 시스템 검증 후 격상)"
-  - id: "F-065"
-    title: "AP-ARCH-001 (LV-001) 비재현 — multi-module 회피 입증 (positive)"
-    severity: "(positive)"
-    proposed_fix: "사내 적용 가이드 — single-module → multi-module 전환 ROI"
-    status: "promoted"
-  - id: "F-066"
-    title: "CIRCULAR-001 비재현 — Service 간 직접 의존 0 (positive)"
-    severity: "(positive)"
-    proposed_fix: "Service 간 호출 회피 패턴 가이드 (event-driven / Repository port 만)"
-    status: "promoted"
-  - id: "F-067"
-    title: "Adapter classes package-private — 의도된 캡슐화 vs 가시성 부족"
-    severity: "low"
-    proposed_fix: "방법론 본체 Adapter 가시성 가이드"
-    status: "candidate"
+  - id: 'F-059'
+    title: '모듈 boundary 도구 도입 권고 가이드 부재 (Spring Modulith / ArchUnit)'
+    severity: 'medium'
+    proposed_fix: 'phase-3-arch.md §3.1.1 Step 4-pre 추가 (도구 미도입 환경 권고)'
+    status: 'promoted'
+  - id: 'F-060'
+    title: 'closed F-023 §3.1.1 BC 분류 절차 0건 케이스 명시 부재 '
+    severity: 'medium'
+    proposed_fix: 'phase-3-arch.md §3.1.1 Step 0 추가 + finding-system closed→reopened 절차 정식화'
+    status: 'promoted (메타 finding — F-049 와 함께 v1.2.0 묶음 I)'
+  - id: 'F-061'
+    title: 'Hexagonal naming hybrid 라벨 + 어휘 표준화 부재 (F-025 합산)'
+    severity: 'low'
+    proposed_fix: 'schemas/architecture.schema.json naming_pattern 별도 필드 신설'
+    status: 'promoted'
+  - id: 'F-062'
+    title: 'core Spring `@Service` 의존 — 한국 hybrid 표준 caveat'
+    severity: 'low'
+    proposed_fix: '방법론 본체 Hexagonal 가이드에 한국 hybrid 패턴 caveat 추가'
+    status: 'promoted'
+  - id: 'F-063'
+    title: 'Split Package smell — `io.zhc1.realworld.config` 4 location 16 파일'
+    severity: 'medium'
+    proposed_fix: '사내 적용 시 모듈별 sub-package 분리 (persistence.config / api.config)'
+    status: 'deferred (§8.1 — PoC #03 cross-stack 검증 후 격상)'
+  - id: 'F-064'
+    title: 'compileOnly + runtimeOnly 모범 사례  (Hexagonal 빌드 시스템 강제)'
+    severity: '(positive — 강점)'
+    proposed_fix: 'v1.2.0 모범 사례 가이드 부록'
+    status: 'deferred (§8.1 — PoC #03 다른 빌드 시스템 검증 후 격상)'
+  - id: 'F-065'
+    title: 'AP-ARCH-001 (LV-001) 비재현 — multi-module 회피 입증 (positive)'
+    severity: '(positive)'
+    proposed_fix: '사내 적용 가이드 — single-module → multi-module 전환 ROI'
+    status: 'promoted'
+  - id: 'F-066'
+    title: 'CIRCULAR-001 비재현 — Service 간 직접 의존 0 (positive)'
+    severity: '(positive)'
+    proposed_fix: 'Service 간 호출 회피 패턴 가이드 (event-driven / Repository port 만)'
+    status: 'promoted'
+  - id: 'F-067'
+    title: 'Adapter classes package-private — 의도된 캡슐화 vs 가시성 부족'
+    severity: 'low'
+    proposed_fix: '방법론 본체 Adapter 가시성 가이드'
+    status: 'candidate'
 
 # 누적 통계 (PoC #02 Phase 3 종료)
 cumulative_statistics:
-  poc_02_total: 26    # Phase 1 6 + Phase 2 11 + Phase 3 9
+  poc_02_total: 26 # Phase 1 6 + Phase 2 11 + Phase 3 9
   poc_02_promoted: 17 # Phase 1 3 + Phase 2 7 + Phase 3 7
   poc_02_candidate: 5 # Phase 2 4 + Phase 3 1
-  poc_02_deferred: 5  # Phase 1 3 + Phase 3 2
+  poc_02_deferred: 5 # Phase 1 3 + Phase 3 2
   poc_02_closed: 0
   poc_02_rejected: 0
-  cumulative_total: 59  # PoC #1 33 + PoC #2 26
+  cumulative_total: 59 # PoC #1 33 + PoC #2 26
   cumulative_promoted: 27 # PoC #1 10 + PoC #2 17
   cumulative_deferred: 18
   cumulative_closed: 10
-  v120_bundles: 10  # +1 (I 신규 — closed 명세 한계 메타 finding 묶음 / F-049 + F-060)
+  v120_bundles: 10 # +1 (I 신규 — closed 명세 한계 메타 finding 묶음 / F-049 + F-060)
   threshold_status: |
     F-021 임계 59건 (20+ "명세 자체 부실 의심" 영역 깊이 진입).
     단 비중 분석:
     - PoC #1 외부 검증 가속 (closed 4 / promoted 4 비재현 + 1 재현 강함 / deferred 정정 1)
     - 메타 finding 누적 2건 (F-049 + F-060 — closed 명세 한계 외부 노출)
-    - Senior 직접 발견 ★ (F-048 critical Phase 2)
+    - Senior 직접 발견  (F-048 critical Phase 2)
     - F-044/F-048 패턴 Phase 3 비재현 = **방법론 학습 효과 입증**
     → v1.1.2 자체 부실 아님. §8.1 강제 — PoC #03 (다른 stack/도메인) 즉시 진입 권고.
 
 # Phase 3 KPI 평가
 phase_3_kpi:
-  - "✅ finding 9건 신규 등록 (목표 5~15 건강 범위 정합)"
-  - "✅ schema 검증 통과 (architecture.schema.json)"
-  - "✅ 6 핵심 결정 (DEC-PHASE3-POC02-001~006) — Auto Mode 자율 적용"
-  - "★ F-060 메타 finding — closed F-023 §3.1.1 0건 케이스 한계 (F-049 와 함께 누적 2건)"
-  - "★ Phase 1 cap 0.65 → Phase 3 0.85 격상 (Δ +0.20) — 우형/카뱅 3 사례 정합 권위"
-  - "★ F-044/F-048 패턴 Phase 3 비재현 — 방법론 학습 효과 입증 / §8.1 PoC #03 진입 신호"
-  - "✅ AP-ARCH-001 / CIRCULAR-001 비재현 권위 데이터 (F-065 / F-066)"
+  - '✅ finding 9건 신규 등록 (목표 5~15 건강 범위 정합)'
+  - '✅ schema 검증 통과 (architecture.schema.json)'
+  - '✅ 6 핵심 결정 (DEC-PHASE3-POC02-001~006) — Auto Mode 자율 적용'
+  - ' F-060 메타 finding — closed F-023 §3.1.1 0건 케이스 한계 (F-049 와 함께 누적 2건)'
+  - ' Phase 1 cap 0.65 → Phase 3 0.85 격상 (Δ +0.20) — 우형/카뱅 3 사례 정합 권위'
+  - ' F-044/F-048 패턴 Phase 3 비재현 — 방법론 학습 효과 입증 / §8.1 PoC #03 진입 신호'
+  - '✅ AP-ARCH-001 / CIRCULAR-001 비재현 권위 데이터 (F-065 / F-066)'
 
 # 다음 단계
 next_actions:
-  - "Phase 4 (비즈니스 로직 — 4영역 병렬) 진입"
-  - "BC 후보 3개 + Aggregate 4개 도메인 행동 분석"
-  - "F-048 사내 적용 시 1글자 fix (TagJpaRepository<Tag, String>)"
-  - "v1.1.2 명세 보강 작업 — F-049 (Q3) + F-060 (Step 0) + finding-system closed→reopened 절차"
-  - "PoC #03 (다른 stack/도메인) 진입 검토 (윤주스 결정)"
+  - 'Phase 4 (비즈니스 로직 — 4영역 병렬) 진입'
+  - 'BC 후보 3개 + Aggregate 4개 도메인 행동 분석'
+  - 'F-048 사내 적용 시 1글자 fix (TagJpaRepository<Tag, String>)'
+  - 'v1.1.2 명세 보강 작업 — F-049 (Q3) + F-060 (Step 0) + finding-system closed→reopened 절차'
+  - 'PoC #03 (다른 stack/도메인) 진입 검토 (윤주스 결정)'

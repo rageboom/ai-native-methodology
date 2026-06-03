@@ -1,17 +1,17 @@
 # ui phase: ui (분할 안내 — Deprecated stub)
 
-> ★ **Deprecated stub** — deliverable 7 (UI/UX) 단일 산출 → deliverable 7 / 8 / 9 의 3 산출 분할로 격상됨.
+> **Deprecated stub** — deliverable 7 (UI/UX) 단일 산출 → deliverable 7 / 8 / 9 의 3 산출 분할로 격상됨.
 > 기존 참조 호환을 위해 본 stub 유지.
 
 ---
 
 ## 분할 안내
 
-| 신 phase | deliverable | 영역 | deliverable 명세 |
-|---|---|---|---|
-| **`ui` phase 5-2-a (ui-base)** | #7 ui-spec | pages / components / design-tokens / scenarios / user-flows (정적 구조) | [`../deliverables/7-ui-ux.md`](../deliverables/7-ui-ux.md) |
-| **`ui` phase 5-2-b (state)** | #8 state-map | 분산 상태 5 진실 + state machine (동적 행동) | [`../deliverables/8-state-map.md`](../deliverables/8-state-map.md) |
-| **`ui` phase 5-2-c (visual)** | #9 visual-manifest | snapshot PNG (binary 진실 모델) | [`../deliverables/9-visual-manifest.md`](../deliverables/9-visual-manifest.md) |
+| 신 phase                       | deliverable        | 영역                                                                    | deliverable 명세                                                               |
+| ------------------------------ | ------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| **`ui` phase 5-2-a (ui-base)** | #7 ui-spec         | pages / components / design-tokens / scenarios / user-flows (정적 구조) | [`../deliverables/7-ui-ux.md`](../deliverables/7-ui-ux.md)                     |
+| **`ui` phase 5-2-b (state)**   | #8 state-map       | 분산 상태 5 진실 + state machine (동적 행동)                            | [`../deliverables/8-state-map.md`](../deliverables/8-state-map.md)             |
+| **`ui` phase 5-2-c (visual)**  | #9 visual-manifest | snapshot PNG (binary 진실 모델)                                         | [`../deliverables/9-visual-manifest.md`](../deliverables/9-visual-manifest.md) |
 
 ---
 
@@ -35,5 +35,6 @@
 **병렬 가능**: 5-2-a / 5-2-b / 5-2-c 모두 `api` phase 와 병렬 실행 가능.
 
 **의존 순서** (5-2-a 출력이 5-2-b/c 의 cross-link 입력):
+
 1. 5-2-a 먼저 (ui-spec.json — PAGE-XXX / CMP-XXX ID 부여)
 2. 5-2-b + 5-2-c 병렬 진행 가능

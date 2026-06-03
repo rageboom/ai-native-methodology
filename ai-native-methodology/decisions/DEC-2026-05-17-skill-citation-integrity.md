@@ -1,7 +1,7 @@
 # DEC-2026-05-17-skill-citation-integrity
 
-- **상태**: 승인 (★ ★ 사용자 "내용 로직도 확인 가능한가" → A → "수정 + validator 도구화" / additive enforcement / v8.1.0 MINOR)
-- **일자**: 2026-05-17 (★ session 26차 후속 / v8.1.0 MINOR)
+- **상태**: 승인 ( 사용자 "내용 로직도 확인 가능한가" → A → "수정 + validator 도구화" / additive enforcement / v8.1.0 MINOR)
+- **일자**: 2026-05-17 ( session 26차 후속 / v8.1.0 MINOR)
 - **결정자**: 윤주스 (TF Lead) — "A: 내부 정합 결정적 검사" + "수정 + validator 도구화 (추천)"
 - **관련**: ADR-PLUGIN-001 §7 patch v2 (R18 내부정합 enforcement) / DEC-2026-05-17-plugin-authoring-spec (R18 origin) / DEC-2026-05-17-skill-name-rename (직전 v8.0.0) / formal-spec-link-validator (dead-reference 동형 선례) / ADR-009 (no-simulation)
 
@@ -25,10 +25,10 @@ A = "skill이 인용한 schema/repo-path/ADR/DEC 가 실존하나" 결정적 검
   - v7.0.0 `rules.schema.json`→`business-rules.schema.json`
   - template (`rules.template.json`→`rules.template.md` / `openapi.template.yaml`→`openapi-extension.template.json`)
   - ADR 정확명 (`ADR-CHAIN-001.md`→`ADR-CHAIN-001-chain-4-stage-enforcement.md`)
-- ★ 기존 validator 전 사각 — drift-validator=flows / formal-spec-link-validator=chain 산출물 / SKILL.md 산문 인용 무검증. A 검사가 진짜 사각지대 노출.
+- 기존 validator 전 사각 — drift-validator=flows / formal-spec-link-validator=chain 산출물 / SKILL.md 산문 인용 무검증. A 검사가 진짜 사각지대 노출.
 - false-positive 정확 분리 (LL-i-55) — `implement-react-18`·`-svelte`·`-vue-2`(미존재 carry 정확 기술) / `planning-extraction-validator`(tool) / DEC `.md` 접미 / `ADR-007 부재`(의도적) = 무수정.
 
-### §2. 시행 (★ additive enforcement + 비-breaking dead-link 수정)
+### §2. 시행 ( additive enforcement + 비-breaking dead-link 수정)
 
 - **신설** `tools/skill-citation-validator/` (npm workspace 17번째 / cli + check-citations + test + README) — schema/repo-path/ADR(부재-context 제외)/DEC(.md 정규화) 실존 결정적 검사. AI 추론 0% (정규식+existence / no-simulation). scope = low-FP class만 (skill·tool 이름 backtick = drift-validator·manifest 이미 커버 / FP 높음 → 제외 / Senior F3 신뢰 gate).
 - **수정** 14 SKILL.md / 20 인용 — ground truth 정밀 target (추정 ❌). 비-breaking (내부 doc cross-ref / command-surface·schema 계약 ❌).

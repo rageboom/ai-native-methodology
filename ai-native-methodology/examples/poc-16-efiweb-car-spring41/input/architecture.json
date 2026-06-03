@@ -10,7 +10,7 @@
     "confidence": 0.92,
     "raw_confidence": 0.92,
     "warnings": [
-      "★ external IFRS 모듈 (cmm / common / connect / egov) 본 PoC scope 외 — source 부재 / 호출 시그니처만 확보 (Java import 기반)",
+      "external IFRS 모듈 (cmm / common / connect / egov) 본 PoC scope 외 — source 부재 / 호출 시그니처만 확보 (Java import 기반)",
       "Spring 4.1 + iBATIS 2 paradigm = layered 3-tier 표준 / clean architecture 의 application/domain/infrastructure 분리 ❌ → Clean Architecture layer 매핑 = approximation"
     ],
     "related_chain_ids": [
@@ -56,7 +56,7 @@
       "name": "Car DAO (Repository)",
       "path": "source/java/smilegate/ifrs/car/service/impl",
       "layer": "infrastructure",
-      "responsibility": "iBATIS sqlmap 호출 / DB 접근. CarMgtDAO (17 method) + CarCostDAO (8 method). ★ package anti-pattern: service/impl/ 안에 위치",
+      "responsibility": "iBATIS sqlmap 호출 / DB 접근. CarMgtDAO (17 method) + CarCostDAO (8 method). package anti-pattern: service/impl/ 안에 위치",
       "loc": 312,
       "file_count": 2,
       "related_bounded_context": "car-mgt + car-cost"

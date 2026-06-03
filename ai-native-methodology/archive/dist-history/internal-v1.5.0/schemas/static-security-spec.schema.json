@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/static-security-spec.schema.json",
   "title": "Static Security Spec (정적 분석 가능 보안 — XSS / CSRF / CSP / SRI / cookie)",
-  "description": "Deliverable #12 (v1.4 신설). 정적 분석 가능 보안 검증. Semgrep / ESLint security plugin 진짜 실행 의무 (no-simulation 정책). ★ 운영 NFR ❌ — runtime check 의무 카테고리 별도 표기. ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + OWASP Top 10 정합.",
+  "description": "Deliverable #12 (v1.4 신설). 정적 분석 가능 보안 검증. Semgrep / ESLint security plugin 진짜 실행 의무 (no-simulation 정책). 운영 NFR ❌ — runtime check 의무 카테고리 별도 표기. ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + OWASP Top 10 정합.",
   "x-spec-source": {
     "owasp_top10": "https://owasp.org/Top10/",
     "csp_level3": "https://www.w3.org/TR/CSP3/",
@@ -86,9 +86,9 @@
           "fix_suggestion": {"type": "string"},
           "page_id": {"type": "string"},
           "component_id": {"type": "string"},
-          "★ runtime_check_required": {
+          " runtime_check_required": {
             "type": "boolean",
-            "description": "★ 정적 분석만으로 미흡 — runtime check 의무 표기. true 시 사용자 confirm 의무."
+            "description": " 정적 분석만으로 미흡 — runtime check 의무 표기. true 시 사용자 confirm 의무."
           }
         }
       }
@@ -121,7 +121,7 @@
             "sonarjs_real",
             "simulation"
           ],
-          "description": "★ no-simulation 정책. simulation 시 -5%p 패널티 + simulation_reason 의무."
+          "description": " no-simulation 정책. simulation 시 -5%p 패널티 + simulation_reason 의무."
         },
         "captured_by_version": {"type": "string"},
         "stdout_path": {"type": "string"},
@@ -132,7 +132,7 @@
         "runtime_check_required_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ runtime_check_required=true 인 finding 개수. > 0 시 사용자 confirm 의무 표기 의무."
+          "description": " runtime_check_required=true 인 finding 개수. > 0 시 사용자 confirm 의무 표기 의무."
         }
       },
       "allOf": [

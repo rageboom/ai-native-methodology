@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/swagger-extract.schema.json",
   "title": "Swagger Extract (analysis-from-swagger output)",
-  "description": "★ ★ v3.3 G2 / R8 (c) OpenAPI/Swagger 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.swagger.extract_ref 로 참조.",
+  "description": "v3.3 G2 / R8 (c) OpenAPI/Swagger 흡수 산출. analysis-input-orchestrate 가 input-summary.json 의 inputs.swagger.extract_ref 로 참조.",
   "type": "object",
   "required": ["scope", "spec_source", "spec_version", "endpoints", "schemas"],
   "additionalProperties": false,

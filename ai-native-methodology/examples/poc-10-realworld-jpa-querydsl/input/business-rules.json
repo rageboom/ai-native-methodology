@@ -1,11 +1,11 @@
 {
-  "$comment": "★ PoC #10 Day 1 — raeperd Spring Data JPA BR. ★ DDD + Embedded VO + method name derived query / 5 BR (small Modern).",
+  "$comment": " PoC #10 Day 1 — raeperd Spring Data JPA BR. DDD + Embedded VO + method name derived query / 5 BR (small Modern).",
   "project_id": "poc-10-realworld-jpa-querydsl",
   "business_rules": [
     {
       "id": "BR-RAE-AUTH-001",
       "title": "User 등록 시 JWT 발급",
-      "natural_language": "POST /users → User 신규 + JWT 즉시 발급 (★ Spring Security 정합)",
+      "natural_language": "POST /users → User 신규 + JWT 즉시 발급 ( Spring Security 정합)",
       "given": [
         "신규 사용자가 이메일, 사용자명, 비밀번호를 제공한 상태이다",
         "해당 이메일과 사용자명이 시스템에 아직 등록되지 않은 상태이다"
@@ -25,8 +25,8 @@
     },
     {
       "id": "BR-RAE-SEARCH-002",
-      "title": "★ Article 검색 = Spring Data JPA method name derived (4 분기)",
-      "natural_language": "ArticleRepository.findAll/findAllByUserFavoritedContains/findAllByAuthorProfileUserName/findAllByContentsTagsContains — ★ ★ 4 method = 4 query param 분기 (basic / favorited / author / tag). ★ ★ ★ Spring Data JPA method name → SQL 자동 생성 paradigm.",
+      "title": " Article 검색 = Spring Data JPA method name derived (4 분기)",
+      "natural_language": "ArticleRepository.findAll/findAllByUserFavoritedContains/findAllByAuthorProfileUserName/findAllByContentsTagsContains — 4 method = 4 query param 분기 (basic / favorited / author / tag). Spring Data JPA method name → SQL 자동 생성 paradigm.",
       "given": [
         "Article 목록 조회 요청이 발생한 상태이다",
         "요청 파라미터로 기본 조회, 즐겨찾기 필터, 작성자 필터, 태그 필터 중 하나 이상이 지정될 수 있다"
@@ -48,7 +48,7 @@
     {
       "id": "BR-RAE-SLUG-003",
       "title": "Article slug = URL-safe title 변환",
-      "natural_language": "Article.contents.title.slug — Embedded VO + slug 자동 생성 (★ DDD Value Object)",
+      "natural_language": "Article.contents.title.slug — Embedded VO + slug 자동 생성 ( DDD Value Object)",
       "given": [
         "Article 생성 또는 수정 요청 시 제목(title)이 입력된 상태이다"
       ],
@@ -67,8 +67,8 @@
     },
     {
       "id": "BR-RAE-CONTENT-004",
-      "title": "Comment / Favorite cascade (★ DDD Aggregate)",
-      "natural_language": "Article = Aggregate Root / Comment + Favorite = cascade 관리 (★ JPA cascade + DDD)",
+      "title": "Comment / Favorite cascade ( DDD Aggregate)",
+      "natural_language": "Article = Aggregate Root / Comment + Favorite = cascade 관리 ( JPA cascade + DDD)",
       "given": [
         "Article이 Aggregate Root로 정의된 상태이다",
         "Comment와 Favorite이 해당 Article에 연관된 상태이다"

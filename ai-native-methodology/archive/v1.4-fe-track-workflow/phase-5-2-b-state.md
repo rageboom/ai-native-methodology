@@ -16,45 +16,66 @@ FE 코드에서 **분산 상태 5 진실** (server cache / client state / URL st
 
 ## 2. 입력
 
-| 입력 | 비고 |
-|---|---|
-| FE 소스 코드 | Tier 1~4 |
+| 입력             | 비고                                        |
+| ---------------- | ------------------------------------------- |
+| FE 소스 코드     | Tier 1~4                                    |
 | Phase 5-2-a 결과 | ui-spec.json (페이지 / 컴포넌트 cross-link) |
-| Phase 5-1 결과 | openapi.yaml (operationId cross-link) |
-| Phase 4 결과 | rules.json (BR validates cross-link) |
-| `package.json` | 라이브러리 import 그래프 (5 진실 detection) |
+| Phase 5-1 결과   | openapi.yaml (operationId cross-link)       |
+| Phase 4 결과     | rules.json (BR validates cross-link)        |
+| `package.json`   | 라이브러리 import 그래프 (5 진실 detection) |
 
 ---
 
 ## 3. 처리
 
-### 3.1 5 진실 detection (★ 핵심)
+### 3.1 5 진실 detection (핵심)
 
 `state-map.schema.json` `state_sources[]` minItems=5/maxItems=5 강제. 모든 5 진실의 detected 여부 명시 의무.
 
 ```yaml
 state_sources:
-  - {source_type: server_cache, detected: true, library: tanstack-query, library_version: "5.59.0"}
-  - {source_type: client_state, detected: true, library: zustand, library_version: "5.0.0"}
-  - {source_type: url_state,    detected: true, library: react-router, library_version: "7.0.0"}
-  - {source_type: form_state,   detected: true, library: react-hook-form, library_version: "7.53.0"}
-  - {source_type: dom_state,    detected: false}  # 라이브러리 없으면 useRef 직접
+  - {
+      source_type: server_cache,
+      detected: true,
+      library: tanstack-query,
+      library_version: '5.59.0',
+    }
+  - {
+      source_type: client_state,
+      detected: true,
+      library: zustand,
+      library_version: '5.0.0',
+    }
+  - {
+      source_type: url_state,
+      detected: true,
+      library: react-router,
+      library_version: '7.0.0',
+    }
+  - {
+      source_type: form_state,
+      detected: true,
+      library: react-hook-form,
+      library_version: '7.53.0',
+    }
+  - { source_type: dom_state, detected: false } # 라이브러리 없으면 useRef 직접
 ```
 
-★ **form_state 진실 추출 시 deliverable 14 (form-validation-spec) cross-link 의무** (★ Stage 7-pre 신설):
+**form_state 진실 추출 시 deliverable 14 (form-validation-spec) cross-link 의무** (Stage 7-pre 신설):
+
 - form_state library = react_hook_form / formik / native form 감지 시 form-validation-spec 산출 의무
 - form-validation-spec → rules.json `category=fe_validation` BR 자동 등록
-- state-map.machines.cross_links 의 `link_type=validates` 가 BR-FE-* 참조
+- state-map.machines.cross_links 의 `link_type=validates` 가 BR-FE-\* 참조
 
 ### 3.2 machine 추출
 
-| 추출 단계 | 출처 | 결정적/LLM |
-|---|---|---|
-| state set | useReducer reducer / Zustand store / Redux slice / XState machine | 결정적 + LLM |
-| transition | dispatch / setState / mutate 호출 추적 | 결정적 + LLM |
-| guard | if 조건 / 검증 함수 | LLM 추론 |
-| parallel region | 동시 active region (예: modal + page) | LLM 추론 |
-| history | route restore / modal 복원 | LLM 추론 |
+| 추출 단계       | 출처                                                              | 결정적/LLM   |
+| --------------- | ----------------------------------------------------------------- | ------------ |
+| state set       | useReducer reducer / Zustand store / Redux slice / XState machine | 결정적 + LLM |
+| transition      | dispatch / setState / mutate 호출 추적                            | 결정적 + LLM |
+| guard           | if 조건 / 검증 함수                                               | LLM 추론     |
+| parallel region | 동시 active region (예: modal + page)                             | LLM 추론     |
+| history         | route restore / modal 복원                                        | LLM 추론     |
 
 ### 3.3 SCXML / XState 호환 표기
 
@@ -64,9 +85,24 @@ state_sources:
 
 ```yaml
 cross_links:
-  - {from_machine: FSM-FE-LOGIN-001, to_artifact: api,     to_id: postLogin,     link_type: triggers}
-  - {from_machine: FSM-FE-LOGIN-001, to_artifact: ui-spec, to_id: PAGE-LOGIN-001, link_type: implements}
-  - {from_machine: FSM-FE-LOGIN-001, to_artifact: rules,   to_id: BR-AUTH-001,    link_type: validates}
+  - {
+      from_machine: FSM-FE-LOGIN-001,
+      to_artifact: api,
+      to_id: postLogin,
+      link_type: triggers,
+    }
+  - {
+      from_machine: FSM-FE-LOGIN-001,
+      to_artifact: ui-spec,
+      to_id: PAGE-LOGIN-001,
+      link_type: implements,
+    }
+  - {
+      from_machine: FSM-FE-LOGIN-001,
+      to_artifact: rules,
+      to_id: BR-AUTH-001,
+      link_type: validates,
+    }
 ```
 
 ---
@@ -103,18 +139,19 @@ cross_links:
 
 ## 6. 신뢰도 (ADR-009 §2.4.1 정합)
 
-| 단계 | 조건 | 신뢰도 |
-|---|---|---|
-| 1 | 1차 작성 | 60-70% |
-| 2 | + cross-validation | 75-85% |
-| 3 | + drift-validator FE 통과 | 78-85% |
-| 5 | + XState v5+ SCXML import 검증 | 85-92% |
+| 단계 | 조건                           | 신뢰도 |
+| ---- | ------------------------------ | ------ |
+| 1    | 1차 작성                       | 60-70% |
+| 2    | + cross-validation             | 75-85% |
+| 3    | + drift-validator FE 통과      | 78-85% |
+| 5    | + XState v5+ SCXML import 검증 | 85-92% |
 
 ---
 
 ## 7. 흔한 함정
 
 deliverable 8 §9 정합:
+
 - race condition (server cache ↔ client state)
 - stale cache (refetch 누락)
 - split brain (URL state ↔ form state)
@@ -128,4 +165,4 @@ deliverable 8 §9 정합:
 ## 8. 다음
 
 - Phase 5-2-c (visual) 진입 (deliverable 9 산출)
-- Phase 6 (`/analyze-quality`) AP-FE-STATE-* 등록
+- Phase 6 (`/analyze-quality`) AP-FE-STATE-\* 등록

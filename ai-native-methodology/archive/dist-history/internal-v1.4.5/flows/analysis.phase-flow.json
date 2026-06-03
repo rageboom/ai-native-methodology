@@ -1,5 +1,5 @@
 {
-  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.4.4 PATCH — manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md). 각 phase 에 skills 디렉토리 매핑 명시 (★ skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
+  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.4.4 PATCH — manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md). 각 phase 에 skills 디렉토리 매핑 명시 ( skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
   "id": "phase-flow",
   "version": "1.4.4",
   "rendered_mermaid_path": "./phase-flow.mermaid",
@@ -51,7 +51,7 @@
     },
     {
       "id": "4.5",
-      "name": "formal-spec (★ v1.2.0 신설)",
+      "name": "formal-spec ( v1.2.0 신설)",
       "spec_file": "phase-4-5-formal-spec.md",
       "depends_on": ["4"],
       "inputs": ["domain.json", "rules.json", "code_evidence"],
@@ -105,7 +105,7 @@
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     },
     "aspects": {
-      "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
+      "$comment": " v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
       "skills": ["aspect-a11y", "aspect-i18n", "aspect-static-security", "aspect-legacy"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
     }

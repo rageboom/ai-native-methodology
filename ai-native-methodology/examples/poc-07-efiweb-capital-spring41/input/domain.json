@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #07 prelim — capital 모듈 도메인 추출. ★ ★ 다중책임 → UC ↑ (vs PoC #06 exchange 7 UC). 시간 cap 정합 — 핵심 sub-domain (A + B + D + G) 만 본격 / C/E/F/H/I/J/K = scope_decision: carry.",
+  "$comment": "PoC #07 prelim — capital 모듈 도메인 추출. 다중책임 → UC ↑ (vs PoC #06 exchange 7 UC). 시간 cap 정합 — 핵심 sub-domain (A + B + D + G) 만 본격 / C/E/F/H/I/J/K = scope_decision: carry.",
   "project_id": "poc-07-efiweb-capital-spring41",
   "domain_layer": "L0 (자연어) — Capital 자본 일보 도메인 (다중책임 / IFRS 회계)",
   "use_cases": [
@@ -9,7 +9,7 @@
       "endpoint": "/ifrs/capital/comBasicInfo",
       "sql_ids": ["selectComBasicInfoList"],
       "sub_domain": "A. ComBasicInfo",
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "id": "UC-CAPITAL-002",
@@ -17,7 +17,7 @@
       "endpoint": "/ifrs/capital/IfrsComINSetSave",
       "sql_ids": ["updateComCapitalInfo", "insertComINSetList"],
       "sub_domain": "A. ComBasicInfo",
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "id": "UC-CAPITAL-003",
@@ -26,7 +26,7 @@
       "sql_ids": ["selectCapitalStdAjax"],
       "sub_domain": "B. CapitalStd/Biz/ERP",
       "scope_decision": "covered",
-      "note": "★ external schema (LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD) 의존 / DBA-read carry"
+      "note": "external schema (LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD) 의존 / DBA-read carry"
     },
     {
       "id": "UC-CAPITAL-004",
@@ -51,7 +51,7 @@
       "sql_ids": ["insertERPINList", "IfrsWEEKINListSave"],
       "sub_domain": "B. CapitalStd/Biz/ERP",
       "scope_decision": "covered",
-      "note": "★ Stored Procedure 다중 호출 / proc-body carry"
+      "note": "Stored Procedure 다중 호출 / proc-body carry"
     },
     {
       "id": "UC-CAPITAL-007",
@@ -60,7 +60,7 @@
       "sql_ids": ["selectIfrsERPOUTList"],
       "sub_domain": "B. CapitalStd/Biz/ERP",
       "scope_decision": "covered",
-      "note": "★ SGERP cross-system 호출"
+      "note": "SGERP cross-system 호출"
     },
     {
       "id": "UC-CAPITAL-008",
@@ -68,7 +68,7 @@
       "endpoint": "/ifrs/capital/IfrsLoadSaveData",
       "sql_ids": ["selectLoadSaveData", "IfrsCapitalDeleteAjax"],
       "sub_domain": "D. SaveLoad",
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "id": "UC-CAPITAL-009",
@@ -80,20 +80,20 @@
     },
     {
       "id": "UC-CAPITAL-010",
-      "name": "★ Capital Verify (자본 검증 / 결재 lock)",
+      "name": "Capital Verify (자본 검증 / 결재 lock)",
       "endpoint": "/ifrs/capital/selectCapitalVrify, /ifrs/capital/insertCapitalVrify",
       "sql_ids": ["selectCapitalVrify", "insertCapitalVrify"],
       "sub_domain": "I. Comment+Verify",
-      "scope_decision": "covered (★ 핵심 verify)"
+      "scope_decision": "covered (핵심 verify)"
     },
     {
       "id": "UC-CAPITAL-011",
-      "name": "★ ★ 자금일보 주간보고 1 (IfrsWeekReport1 — 자금조달내역 / cramt)",
+      "name": "자금일보 주간보고 1 (IfrsWeekReport1 — 자금조달내역 / cramt)",
       "endpoint": "/ifrs/capital/IfrsWeekReport1",
       "sql_ids": ["IfrsWeekReport1", "IfrsPreviousWeekEndDate"],
-      "sub_domain": "G. WeeklyReport (★ 핵심)",
+      "sub_domain": "G. WeeklyReport (핵심)",
       "scope_decision": "covered",
-      "note": "★ 전주 마지막 날짜 잔액 가져오기 / sType=3 / Double parsing 으로 String→Double 변환 (★ AP 시그널 - List<Map> 강제 캐스팅)"
+      "note": "전주 마지막 날짜 잔액 가져오기 / sType=3 / Double parsing 으로 String→Double 변환 (AP 시그널 - List<Map> 강제 캐스팅)"
     },
     {
       "id": "UC-CAPITAL-012",
@@ -105,12 +105,12 @@
     },
     {
       "id": "UC-CAPITAL-013",
-      "name": "★ 주간보고 10 (IfrsWeekReport10 — ★ XML 인라인 String / SAC ledger / 보통예금 ERP 조회)",
+      "name": "주간보고 10 (IfrsWeekReport10 — XML 인라인 String / SAC ledger / 보통예금 ERP 조회)",
       "endpoint": "/ifrs/capital/IfrsWeekReport10",
       "sql_ids": ["IfrsWeekReport10"],
       "sub_domain": "G. WeeklyReport",
       "scope_decision": "covered",
-      "note": "★ ★ AP-CAPITAL-005 — xmlDocument String 인라인 (Controller 1769~1785) / 데이터 모델 부재 / DEAD parameter (comNo 파싱 후 미사용)"
+      "note": "AP-CAPITAL-005 — xmlDocument String 인라인 (Controller 1769~1785) / 데이터 모델 부재 / DEAD parameter (comNo 파싱 후 미사용)"
     },
     {
       "id": "UC-CAPITAL-014",
@@ -127,7 +127,7 @@
       "sql_ids": ["IfrsWeekReport13", "IfrsWeekReport14"],
       "sub_domain": "G. WeeklyReport",
       "scope_decision": "covered",
-      "note": "★ AP-CAPITAL-005 동일 / System.out.print(AssetList) line 1852 (★ AP-CAPITAL-010 logger 미사용 / SATD)"
+      "note": "AP-CAPITAL-005 동일 / System.out.print(AssetList) line 1852 (AP-CAPITAL-010 logger 미사용 / SATD)"
     },
     {
       "id": "UC-CAPITAL-016",
@@ -136,12 +136,12 @@
       "sql_ids": ["IfrsWeekRate", "IfrsWeekRateList"],
       "sub_domain": "G. WeeklyReport",
       "scope_decision": "covered",
-      "note": "★ ★ cross-domain 의존 (TB_DAY_EXCHANGE = exchange 모듈 / PoC #06 selectDayExchangeList 와 isomorphic)"
+      "note": "cross-domain 의존 (TB_DAY_EXCHANGE = exchange 모듈 / PoC #06 selectDayExchangeList 와 isomorphic)"
     },
     {
       "id": "UC-CAPITAL-017+",
-      "name": "★ ~14 추가 핵심 endpoint (UC-CAPITAL-017 ~ ~030 / Asset / CapitalReport / CapitalReport1~4 / CapitalAccountAction / CapitalDepositAction / CapitalWithdrawAction / mailList / saveMail / etc)",
-      "scope_decision": "★ 부분 cover (Day 1.5 시간 cap 정합)",
+      "name": "~14 추가 핵심 endpoint (UC-CAPITAL-017 ~ ~030 / Asset / CapitalReport / CapitalReport1~4 / CapitalAccountAction / CapitalDepositAction / CapitalWithdrawAction / mailList / saveMail / etc)",
+      "scope_decision": "부분 cover (Day 1.5 시간 cap 정합)",
       "note": "추가 cover 의무 시 PoC #07 carry 또는 본격 Day 1 +2h"
     }
   ],
@@ -199,7 +199,7 @@
     "ucs_total": 30,
     "ucs_covered_in_this_poc": 16,
     "ucs_carry": 14,
-    "coverage_ratio": "16/30 = 53.3% (★ 시간 cap 정합 / 사용자 D10 3/4 pass 정합)",
-    "$comment": "★ ★ ★ 다중책임 → UC ↑↑ (vs PoC #06 exchange 7 UC) — 시간 cap 정합 위해 핵심 sub-domain (A + B + D + G + I) 16 UC 만 본격."
+    "coverage_ratio": "16/30 = 53.3% (시간 cap 정합 / 사용자 D10 3/4 pass 정합)",
+    "$comment": "다중책임 → UC ↑↑ (vs PoC #06 exchange 7 UC) — 시간 cap 정합 위해 핵심 sub-domain (A + B + D + G + I) 16 UC 만 본격."
   }
 }

@@ -1,8 +1,8 @@
 {
-  "$comment": "★ ★ ★ PoC #07 SQL Inventory (★ ★ corroboration #2 / 다중책임 spectrum / DEC-2026-05-08-poc-06-sql-inventory-retrofit 와 isomorphic). 외부 6 + 본 추가 4 = 10 컬럼. 71 SQL operation 자동 추출 + 핵심 sub-domain (A+B+D+G) 15 SQL 매뉴얼 컬럼 / 나머지 56 SQL = scope_decision: carry.",
+  "$comment": "PoC #07 SQL Inventory (corroboration #2 / 다중책임 spectrum / DEC-2026-05-08-poc-06-sql-inventory-retrofit 와 isomorphic). 외부 6 + 본 추가 4 = 10 컬럼. 71 SQL operation 자동 추출 + 핵심 sub-domain (A+B+D+G) 15 SQL 매뉴얼 컬럼 / 나머지 56 SQL = scope_decision: carry.",
   "project_id": "poc-07-efiweb-capital-spring41",
-  "spectrum": "Spring 4.1.2 + iBATIS 2.x / Legacy 적대성 4중 / ★ ★ 다중책임 모듈 (vs PoC #06 단일책임)",
-  "corroboration_role": "★ ★ corroboration #2 — PoC #06 exchange = #1 (6 SQL / 단일책임) + 본 PoC #07 capital = #2 (71 SQL / 다중책임 / +27 dynamic / +11 SATD) → §8.1 strict ≥ 2 PoC isomorphic 자격 자격 충족",
+  "spectrum": "Spring 4.1.2 + iBATIS 2.x / Legacy 적대성 4중 / 다중책임 모듈 (vs PoC #06 단일책임)",
+  "corroboration_role": "corroboration #2 — PoC #06 exchange = #1 (6 SQL / 단일책임) + 본 PoC #07 capital = #2 (71 SQL / 다중책임 / +27 dynamic / +11 SATD) → §8.1 strict ≥ 2 PoC isomorphic 자격 자격 충족",
   "meta_confidence": {
     "generated_at": "2026-05-08T00:00:00Z",
     "methodology_version": "v2.1.1",
@@ -10,25 +10,25 @@
     "inputs_used": ["source_code", "characterization", "documentation"],
     "applied_modifiers": [],
     "applied_penalties": [
-      { "name": "monorepo_flat_analysis", "value": -0.05, "reason": "★ 71 SQL → 핵심 15 만 본격 / 56 SQL carry / coverage ↓" }
+      { "name": "monorepo_flat_analysis", "value": -0.05, "reason": "71 SQL → 핵심 15 만 본격 / 56 SQL carry / coverage ↓" }
     ],
     "warnings": [
-      "★ ERP cross-system (LIVE_SQL.SGERP.dbo) SP 본문 부재 — DBA-read carry 11건",
-      "★ called_from_screen 컬럼 = 87 endpoint → JSP 추적 / 시간 cap 정합 핵심 ~15 만 cover",
-      "★ business_meaning 컬럼 = LLM ~70% 정확도 + 도메인 expert 검증 carry"
+      "ERP cross-system (LIVE_SQL.SGERP.dbo) SP 본문 부재 — DBA-read carry 11건",
+      "called_from_screen 컬럼 = 87 endpoint → JSP 추적 / 시간 cap 정합 핵심 ~15 만 cover",
+      "business_meaning 컬럼 = LLM ~70% 정확도 + 도메인 expert 검증 carry"
     ]
   },
   "extraction_automation": {
-    "$comment": "★ 외부 조언 6 컬럼 기준 자동/수동 비율 — PoC #06 retrofit (corroboration #1) 과 isomorphic 측정",
+    "$comment": "외부 조언 6 컬럼 기준 자동/수동 비율 — PoC #06 retrofit (corroboration #1) 과 isomorphic 측정",
     "auto_extracted_columns": ["sql_id", "mapper_xml", "dynamic_branch", "dependent_tables"],
     "manual_columns": ["called_from_screen", "business_meaning"],
-    "auto_ratio_external_6": "4/6 = 66.7% (★ ≥ 50% pass / PoC #06 정합 / corroboration #2 사실 확보)",
+    "auto_ratio_external_6": "4/6 = 66.7% (≥ 50% pass / PoC #06 정합 / corroboration #2 사실 확보)",
     "auto_ratio_total_10": "4/10 = 40%",
     "comparison_to_poc06": {
       "poc06_auto_ratio": "66.7% (4/6)",
       "poc07_auto_ratio": "66.7% (4/6)",
       "delta": "0%p",
-      "note": "★ ★ 다중책임 (capital 71 SQL) vs 단일책임 (exchange 6 SQL) 자동화 비율 ★ 동일 — 외부 6 컬럼 자동화 패턴 = scale 무관 isomorphic 입증"
+      "note": "다중책임 (capital 71 SQL) vs 단일책임 (exchange 6 SQL) 자동화 비율 동일 — 외부 6 컬럼 자동화 패턴 = scale 무관 isomorphic 입증"
     }
   },
   "summary": {
@@ -40,10 +40,10 @@
     "self_recognized_count": 11,
     "covered_in_this_poc": 15,
     "carry": 56,
-    "coverage_ratio": "15/71 = 21.1% (★ 시간 cap 정합 / scope_decision: carry)"
+    "coverage_ratio": "15/71 = 21.1% (시간 cap 정합 / scope_decision: carry)"
   },
   "patterns_extension_v2": {
-    "$comment": "★ ★ ★ 외부 조언 v2 (Opus 4.7 / 4-Layer + 4 iBatis 패턴) 흡수 — 사용자 D12 결단 (b) nested patterns object. 양 PoC isomorphic 유지 (PoC #06 corroboration #1 + PoC #07 corroboration #2).",
+    "$comment": "외부 조언 v2 (Opus 4.7 / 4-Layer + 4 iBatis 패턴) 흡수 — 사용자 D12 결단 (b) nested patterns object. 양 PoC isomorphic 유지 (PoC #06 corroboration #1 + PoC #07 corroboration #2).",
     "schema_version": "v2 (Day 1.6 / 2026-05-08)",
     "user_decision": "D12 = (b) nested patterns object (PoC scope 정합 / v2.2.0 본체 격상 시 schema 정식화 carry C-v2.2.0-sql-inventory-extended)",
     "aggregate_metrics": {
@@ -51,7 +51,7 @@
         "description": "iBATIS 2 dynamic tags (<isEqual> / <isNotEmpty> / <isNull> / <isEmpty> / <choose> / <dynamic>)",
         "count": 27,
         "auto_grep": "✅ 80% — tag pattern grep + nested branch depth = LLM",
-        "decision_table_candidate": "★ phase 4.5 formal-spec / decision-table 영역 정합 (★ C-v2.2.0-decision-table-auto carry)",
+        "decision_table_candidate": "phase 4.5 formal-spec / decision-table 영역 정합 (C-v2.2.0-decision-table-auto carry)",
         "core_examples": [
           { "sql_id": "selectLoadSaveData", "tags": ["<isEqual property=\"SaveType\" compareValue=\"R\">", "<isEqual property=\"SaveType\" compareValue=\"B\">", "<isEqual property=\"SaveType\" compareValue=\"A\">"], "branch_count": 3, "line": 391, "br_link": "BR-CAPITAL-SAVTYPE-005 saveType 3 분기" },
           { "sql_id": "selectERPINReport", "tags": ["<isNotEmpty property=\"sType\">"], "branch_count": 7, "line": 746, "br_link": "BR-CAPITAL-STYPE-002 sType 분기" },
@@ -62,13 +62,13 @@
         "description": "SQL 함수 (DECODE/NVL 부재 — MSSQL 정합 / ISNULL/COALESCE/CASE WHEN/FORMAT/CONVERT)",
         "count": 37,
         "auto_grep": "✅ 100% — pure regex",
-        "domain_formula_candidate": "★ 도메인 공식 reference (예: ISNULL(C.RemSeqName1, '') = bank 매핑 default)",
+        "domain_formula_candidate": "도메인 공식 reference (예: ISNULL(C.RemSeqName1, '') = bank 매핑 default)",
         "core_examples": [
           { "function": "ISNULL", "context": "ISNULL(C.RemSeqName1, '') AS DATA1", "line": 117, "sql_id": "selectIfrsERPINList" },
           { "function": "CASE WHEN", "context": "CASE WHEN ISNULL(B.sType,0)=0 THEN 'N' ELSE 'Y' END", "line": 310, "sql_id": "selectERPINSetList" },
-          { "function": "CONVERT (datetime)", "context": "★ 15+ 호출 / IfrsWeekReport 영역 다수", "carry_flag": "DBA-read" }
+          { "function": "CONVERT (datetime)", "context": "15+ 호출 / IfrsWeekReport 영역 다수", "carry_flag": "DBA-read" }
         ],
-        "mssql_specific": "DECODE 부재 (Oracle 함수) → ISNULL/COALESCE/CASE WHEN 대체 (★ stack_signals 정합 / MSSQL 입증)"
+        "mssql_specific": "DECODE 부재 (Oracle 함수) → ISNULL/COALESCE/CASE WHEN 대체 (stack_signals 정합 / MSSQL 입증)"
       },
       "pattern_3_result_mapping": {
         "description": "resultClass + parameterClass + parameterMap 매핑",
@@ -76,24 +76,24 @@
         "parameter_class_count": 55,
         "parameter_map_count": 14,
         "auto_grep": "✅ 100% — XML attribute parsing",
-        "domain_glossary_candidate": "★ glossary-ko 입력 후보 (DB 컬럼 ↔ 도메인 객체 매핑 / 예: cramt = capital remaining amount)",
+        "domain_glossary_candidate": "glossary-ko 입력 후보 (DB 컬럼 ↔ 도메인 객체 매핑 / 예: cramt = capital remaining amount)",
         "unique_result_classes": ["egovMap", "String"],
         "core_examples": [
-          { "type": "resultClass", "value": "egovMap", "count": 41, "note": "★ 표준프레임워크 EgovMap = HashMap 변형 / type safety ❌ (AP-CAPITAL-002 정합)" },
+          { "type": "resultClass", "value": "egovMap", "count": 41, "note": "표준프레임워크 EgovMap = HashMap 변형 / type safety ❌ (AP-CAPITAL-002 정합)" },
           { "type": "resultClass", "value": "String", "count": 1, "sql_id": "selectCapitalVrify" },
-          { "type": "parameterMap", "value": "selectErpAccountListMap (외 13)", "note": "★ Stored Procedure IN/OUT 매핑 의무" }
+          { "type": "parameterMap", "value": "selectErpAccountListMap (외 13)", "note": "Stored Procedure IN/OUT 매핑 의무" }
         ]
       },
       "pattern_4_shared_sql_fragments": {
         "description": "iBATIS 2 <sql id=\"\"> + <include refid=\"\"> 공유 SQL 조각",
         "count": 0,
         "auto_grep": "✅ 100% — 0 결과 자체가 finding",
-        "cross_cutting_candidate": "★ ★ ★ 0건 = ★ ★ 신규 AP-CAPITAL-012 신호 (★ corroboration #1 PoC #06 = 0 동일 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule isomorphic 자격)",
-        "ap_link": "AP-CAPITAL-012 (★ Day 1.6 antipatterns.json 신규 등재 / D13 = (α) 결단)"
+        "cross_cutting_candidate": "0건 = 신규 AP-CAPITAL-012 신호 (corroboration #1 PoC #06 = 0 동일 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule isomorphic 자격)",
+        "ap_link": "AP-CAPITAL-012 (Day 1.6 antipatterns.json 신규 등재 / D13 = (α) 결단)"
       }
     },
     "core_record_extension": {
-      "$comment": "★ 핵심 5 SQL record 에 patterns object 예시 — 나머지 10 covered SQL + 56 carry SQL 은 aggregate_metrics 와 raw-grep.txt 참조 (시간 cap 정합 / v2.2.0 본체 격상 시 schemas/sql-inventory.schema.json 신설하면서 모든 record 정식 patterns object 적용 carry).",
+      "$comment": "핵심 5 SQL record 에 patterns object 예시 — 나머지 10 covered SQL + 56 carry SQL 은 aggregate_metrics 와 raw-grep.txt 참조 (시간 cap 정합 / v2.2.0 본체 격상 시 schemas/sql-inventory.schema.json 신설하면서 모든 record 정식 patterns object 적용 carry).",
       "examples": [
         {
           "sql_id": "CapitalDAO.selectLoadSaveData",
@@ -127,7 +127,7 @@
           "patterns": {
             "dynamic_branch": [],
             "calculation_formula": [],
-            "result_mapping": { "type": "resultClass", "value": "String", "line": 1354, "note": "★ 단일 String 반환 — verify lock 상태" },
+            "result_mapping": { "type": "resultClass", "value": "String", "line": 1354, "note": "단일 String 반환 — verify lock 상태" },
             "shared_sql_fragments": []
           }
         },
@@ -156,7 +156,7 @@
       "intent_vs_bug_classification": "intent (BR-CAPITAL-CORPYN-001 / 회사 마스터 분류)",
       "confidence": 0.90,
       "carry_flags": [],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "sql_id": "CapitalDAO.updateComCapitalInfo",
@@ -167,7 +167,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["TB_COMPANY"],
       "uc_link": "UC-CAPITAL-002",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-CORPYN-001 갱신) + bug 동반 (★ AP-CAPITAL-003 트랜잭션 boundary 모호 / DAO 다중 호출)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-CORPYN-001 갱신) + bug 동반 (AP-CAPITAL-003 트랜잭션 boundary 모호 / DAO 다중 호출)",
       "confidence": 0.80,
       "carry_flags": [],
       "scope_decision": "covered"
@@ -177,7 +177,7 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 30,
       "called_from_screen": "capitalAccountAction.jsp → /ifrs/capital/IfrsCapitalStdAjax",
-      "business_meaning": "★ External schema 의존 — LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD where sType=1 (표준 데이터)",
+      "business_meaning": "External schema 의존 — LIVE_SQL.SGERP.dbo.IFRS_CAPITALSTD where sType=1 (표준 데이터)",
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "UC-CAPITAL-003",
@@ -205,16 +205,16 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 65,
       "called_from_screen": "capitalDepositAction.jsp → /ifrs/capital/IfrsERPINListAjax",
-      "business_meaning": "★ ERP 보통예금 입금 List 조회 (자금일보 자금조달내역 작성) — SGERP.dbo.IFRS_CAPITALSTD INNER JOIN 직접 / WITH(NOLOCK)",
+      "business_meaning": "ERP 보통예금 입금 List 조회 (자금일보 자금조달내역 작성) — SGERP.dbo.IFRS_CAPITALSTD INNER JOIN 직접 / WITH(NOLOCK)",
       "dynamic_branch": [
-        { "tag": "<isNotEmpty> 다수", "branch_count": "~5 분기", "note": "★ Day 1 시간 cap / 정확한 dynamic count = 매뉴얼 carry" }
+        { "tag": "<isNotEmpty> 다수", "branch_count": "~5 분기", "note": "Day 1 시간 cap / 정확한 dynamic count = 매뉴얼 carry" }
       ],
       "dependent_tables": ["TB_CAPITAL_LIST"],
       "uc_link": "UC-CAPITAL-005",
       "intent_vs_bug_classification": "intent (BR-CAPITAL-DATASRC-004 / ERP 입금) + bug 동반 (AP-CAPITAL-004 NOLOCK / AP-CAPITAL-011 cross-domain)",
       "confidence": 0.75,
       "carry_flags": ["DBA-read"],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "sql_id": "CapitalDAO.insertERPINList",
@@ -258,7 +258,7 @@
       "intent_vs_bug_classification": "intent (BR-CAPITAL-SAVTYPE-005 saveType 3 분기)",
       "confidence": 0.85,
       "carry_flags": [],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "sql_id": "CapitalDAO.selectLoadSaveDataForReport",
@@ -285,7 +285,7 @@
       "dynamic_branch": [],
       "dependent_tables": ["TB_CAPITAL_LIST"],
       "uc_link": "UC-CAPITAL-008",
-      "intent_vs_bug_classification": "intent + bug 동반 (★ AP-CAPITAL-001 / soft delete vs hard delete 결단 carry)",
+      "intent_vs_bug_classification": "intent + bug 동반 (AP-CAPITAL-001 / soft delete vs hard delete 결단 carry)",
       "confidence": 0.80,
       "carry_flags": ["domain-expert"],
       "scope_decision": "covered"
@@ -295,81 +295,81 @@
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 1354,
       "called_from_screen": "capitalReport.jsp → /ifrs/capital/selectCapitalVrify",
-      "business_meaning": "★ 자본 검증 lock 조회 (BR-CAPITAL-VRFYLOCK-008 결재 후 lock)",
+      "business_meaning": "자본 검증 lock 조회 (BR-CAPITAL-VRFYLOCK-008 결재 후 lock)",
       "dynamic_branch": [],
       "dependent_tables": ["TB_CAPITAL_VRIFY"],
       "uc_link": "UC-CAPITAL-010",
       "intent_vs_bug_classification": "intent (BR-CAPITAL-VRFYLOCK-008 approval workflow)",
       "confidence": 0.85,
       "carry_flags": ["domain-expert"],
-      "scope_decision": "covered (★ 핵심 verify)"
+      "scope_decision": "covered (핵심 verify)"
     },
     {
       "sql_id": "CapitalDAO.IfrsWeekReport1",
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 686,
       "called_from_screen": "weeklist.jsp → /ifrs/capital/IfrsWeekReport1",
-      "business_meaning": "★ 자금일보 주간보고 1 — 자금조달내역 (cramt 잔액 / 전주 마지막 날짜 자동 fetch BR-CAPITAL-PREVBAL-006)",
+      "business_meaning": "자금일보 주간보고 1 — 자금조달내역 (cramt 잔액 / 전주 마지막 날짜 자동 fetch BR-CAPITAL-PREVBAL-006)",
       "dynamic_branch": [
         { "tag": "<isNotEmpty> + sType 분기", "branch_count": "~6 분기" }
       ],
       "dependent_tables": ["TB_CAPITAL_LIST"],
       "uc_link": "UC-CAPITAL-011",
-      "intent_vs_bug_classification": "intent + bug 동반 (★ AP-CAPITAL-002 Map + Double 강제 캐스팅 / patch 2020.10.30. 김승희 NPE 회피)",
+      "intent_vs_bug_classification": "intent + bug 동반 (AP-CAPITAL-002 Map + Double 강제 캐스팅 / patch 2020.10.30. 김승희 NPE 회피)",
       "confidence": 0.80,
       "carry_flags": [],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered (핵심)"
     },
     {
       "sql_id": "CapitalDAO.IfrsWeekReport10",
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 1206,
       "called_from_screen": "weeklist.jsp → /ifrs/capital/IfrsWeekReport10",
-      "business_meaning": "★ ★ 주간보고 10 — SAC ledger 보통예금 ERP 조회 (xmlDocument String 인라인 / SP 호출)",
+      "business_meaning": "주간보고 10 — SAC ledger 보통예금 ERP 조회 (xmlDocument String 인라인 / SP 호출)",
       "dynamic_branch": [],
       "dependent_tables": [],
       "uc_link": "UC-CAPITAL-013",
-      "intent_vs_bug_classification": "intent + bug 동반 (★ ★ AP-CAPITAL-005 XML 인라인 + AP-CAPITAL-006 DEAD param comNo)",
+      "intent_vs_bug_classification": "intent + bug 동반 (AP-CAPITAL-005 XML 인라인 + AP-CAPITAL-006 DEAD param comNo)",
       "confidence": 0.70,
       "carry_flags": ["DBA-read", "proc-body", "external_call_out_of_scope"],
-      "scope_decision": "covered (★ 핵심 / AP-CAPITAL-005 신규 패턴 입증)"
+      "scope_decision": "covered (핵심 / AP-CAPITAL-005 신규 패턴 입증)"
     },
     {
       "sql_id": "CapitalDAO.IfrsWeekRate / IfrsWeekRateList",
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": "1285 + 1292",
       "called_from_screen": "weeklist.jsp → /ifrs/capital/IfrsWeekRate, /ifrs/capital/IfrsWeekRateList",
-      "business_meaning": "★ ★ 주간 환율 (TB_DAY_EXCHANGE / cross-domain — exchange 모듈 의존 BR-CAPITAL-XRATE-009)",
+      "business_meaning": "주간 환율 (TB_DAY_EXCHANGE / cross-domain — exchange 모듈 의존 BR-CAPITAL-XRATE-009)",
       "dynamic_branch": [
         { "tag": "<isNotEmpty currCd>", "branch_count": 1 }
       ],
       "dependent_tables": ["TB_DAY_EXCHANGE"],
       "uc_link": "UC-CAPITAL-016",
-      "intent_vs_bug_classification": "intent (BR-CAPITAL-XRATE-009 / cross-module dep) + bug 동반 (★ AP-CAPITAL-011 / module boundary 위반)",
+      "intent_vs_bug_classification": "intent (BR-CAPITAL-XRATE-009 / cross-module dep) + bug 동반 (AP-CAPITAL-011 / module boundary 위반)",
       "confidence": 0.85,
       "carry_flags": ["cross-domain"],
-      "scope_decision": "covered (★ 핵심 / cross-module 의존 입증)"
+      "scope_decision": "covered (핵심 / cross-module 의존 입증)"
     },
     {
-      "sql_id": "CapitalDAO.selectDayExchangeList (★ exchange.xml 와 같은 sql_id)",
+      "sql_id": "CapitalDAO.selectDayExchangeList (exchange.xml 와 같은 sql_id)",
       "mapper_xml": "source/sqlmap/capital.xml",
       "mapper_xml_line": 1428,
-      "called_from_screen": "(★ Cross-module call to exchange 모듈)",
-      "business_meaning": "★ ★ ★ exchange 모듈의 selectDayExchangeList SQL 을 capital.xml 에 ★ ★ 중복 정의 — 같은 의도/같은 SQL 두 namespace 에 (★ AP isomorphic to PoC #06 selectDayExchangeList)",
+      "called_from_screen": "(Cross-module call to exchange 모듈)",
+      "business_meaning": "exchange 모듈의 selectDayExchangeList SQL 을 capital.xml 에 중복 정의 — 같은 의도/같은 SQL 두 namespace 에 (AP isomorphic to PoC #06 selectDayExchangeList)",
       "dynamic_branch": [
         { "tag": "SQL CASE WHEN VND vs 그 외", "branch_count": 2 }
       ],
       "dependent_tables": ["TB_DAY_EXCHANGE"],
       "uc_link": "(supplementary / cross-module)",
-      "intent_vs_bug_classification": "★ ambiguous (★ ★ ★ DRY 위반 vs module 독립성 trade-off — 도메인 expert 결단 carry)",
+      "intent_vs_bug_classification": "ambiguous (DRY 위반 vs module 독립성 trade-off — 도메인 expert 결단 carry)",
       "confidence": 0.65,
       "carry_flags": ["cross-domain", "domain-expert", "DRY-violation"],
-      "scope_decision": "covered (★ ★ ambiguous 사례 / Day 2.5 D2 결단 의무)",
-      "note": "★ ★ ★ 신규 ambiguous — capital.xml 이 exchange 모듈의 SQL 을 중복 정의 (DRY 위반?) 또는 module 독립 의도? → D2 결단 의무"
+      "scope_decision": "covered (ambiguous 사례 / Day 2.5 D2 결단 의무)",
+      "note": "신규 ambiguous — capital.xml 이 exchange 모듈의 SQL 을 중복 정의 (DRY 위반?) 또는 module 독립 의도? → D2 결단 의무"
     }
   ],
   "carry_inventory_56_summary": {
-    "$comment": "★ ★ 시간 cap 정합 — 56 SQL 자동 추출 컬럼 (1, 2, 5, 6) 만 raw-grep.txt 에 존재 / 매뉴얼 컬럼 (3, 4, 7, 8) 부재 → carry note",
+    "$comment": "시간 cap 정합 — 56 SQL 자동 추출 컬럼 (1, 2, 5, 6) 만 raw-grep.txt 에 존재 / 매뉴얼 컬럼 (3, 4, 7, 8) 부재 → carry note",
     "by_sub_domain": {
       "C. CapitalAsset (selectAssetListAjax1~7 + insertAssetINSetList)": "8 SQL / external SP 다수 / DBA-read carry",
       "E. Mail (saveMail / insertSendMail / selectMail / selectDeptCd / selectDeptMail / mailsendlogAjax)": "10 SQL / 슈퍼크리에이티브 임시처리 SATD 4회 BR-CAPITAL-MAILSPEC-011 정합",
@@ -382,11 +382,11 @@
     }
   },
   "phase_4_7_corroboration_role": {
-    "purpose": "★ ★ ★ 신규 deliverable #24 (SQL Inventory) v2.2.0 본체 격상 자격 = ≥ 2 PoC isomorphic 충족",
+    "purpose": "신규 deliverable #24 (SQL Inventory) v2.2.0 본체 격상 자격 = ≥ 2 PoC isomorphic 충족",
     "poc_06_role": "corroboration #1 — exchange 단일책임 / 6 SQL 작업 / dynamic_branch 1 + CASE WHEN 14 / self_recognized 1 / ambiguous 1 / 자동화 66.7%",
-    "poc_07_role": "★ ★ corroboration #2 — capital 다중책임 / 71 SQL / dynamic_branch 27 / self_recognized 11 / 핵심 15 cover + 56 carry / 자동화 66.7% (★ ★ scale 무관 isomorphic 입증)",
-    "two_poc_validated": "✅ ★ ★ ★ §8.1 strict ≥ 2 PoC isomorphic 자격 자격 충족",
-    "v2_2_0_trigger": "★ PoC #07 종결 (Day 3.5) 후 v2.2.0 본체 격상 진입 자격 — carry 3 (C-v2.2.0-sql-{inventory, schema, tool}) trigger"
+    "poc_07_role": "corroboration #2 — capital 다중책임 / 71 SQL / dynamic_branch 27 / self_recognized 11 / 핵심 15 cover + 56 carry / 자동화 66.7% (scale 무관 isomorphic 입증)",
+    "two_poc_validated": "✅ §8.1 strict ≥ 2 PoC isomorphic 자격 자격 충족",
+    "v2_2_0_trigger": "PoC #07 종결 (Day 3.5) 후 v2.2.0 본체 격상 진입 자격 — carry 3 (C-v2.2.0-sql-{inventory, schema, tool}) trigger"
   },
   "external_advice_absorption": {
     "$comment": "Opus 4.7 외부 조언 6 항목 본 PoC 한정 흡수 결과.",

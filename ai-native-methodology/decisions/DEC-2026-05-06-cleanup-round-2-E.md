@@ -1,12 +1,12 @@
 # DEC-2026-05-06-cleanup-round-2-E
 
-| 항목 | 값 |
-|---|---|
-| 결정자 | 윤주스 (TF Lead) |
-| 일자 | 2026-05-06 |
-| 상태 | 승인 (★ build artifact path = `internal-v` prefix 제거 / `ai-native-methodology-v` 정합 / no release) |
-| 카테고리 | methodology / build artifact / paradigm sync / plugin user 환경 정합 |
-| 관련 | DEC-2026-05-06-cleanup-round-2-A (paradigm sync), DEC-2026-05-02-adoption-폐기-build-step-신설 (build script 1차 도입 / `internal-v` prefix 시점) |
+| 항목     | 값                                                                                                                                                |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 결정자   | 윤주스 (TF Lead)                                                                                                                                  |
+| 일자     | 2026-05-06                                                                                                                                        |
+| 상태     | 승인 ( build artifact path = `internal-v` prefix 제거 / `ai-native-methodology-v` 정합 / no release)                                              |
+| 카테고리 | methodology / build artifact / paradigm sync / plugin user 환경 정합                                                                              |
+| 관련     | DEC-2026-05-06-cleanup-round-2-A (paradigm sync), DEC-2026-05-02-adoption-폐기-build-step-신설 (build script 1차 도입 / `internal-v` prefix 시점) |
 
 ---
 
@@ -17,6 +17,7 @@ cleanup round 2-C/2-D 직후 사용자 명시 결단:
 > "저 폴더명도 좀 안 맞지 않아? internal-v2.0 이거"
 
 배경:
+
 - v1.4.3 시점 (DEC-2026-05-02-adoption-폐기-build-step-신설) 에 `dist/internal-v<version>/` 패턴 도입
 - "internal-" = 사내 표준 명시 의도 (당시 paradigm = 사내 적용 + adoption workspace 분리)
 - v2.0 chain harness paradigm = plugin user 환경 (사내 + 외부) 모두 가능 → "internal-" stale
@@ -30,16 +31,16 @@ cleanup round 2-C/2-D 직후 사용자 명시 결단:
 
 ### 갱신 자산 (사용자 facing / 7 위치)
 
-| 파일 | 변경 |
-|---|---|
-| `scripts/build-plugin.js` line 2 (주석) | `dist/internal-v<version>/` → `dist/ai-native-methodology-v<version>/` |
-| `scripts/build-plugin.js` line 123 (코드) | `\`internal-v${version}\`` → `\`ai-native-methodology-v${version}\`` |
-| `README.md` line 80 (시나리오 B install 예시) | path 갱신 |
-| `README.md` line 171 (디렉토리 구조 다이어그램) | path 갱신 |
-| `guides/common-errors.md` line 112 (Q12 shasum 검증) | path 갱신 |
-| `templates/adoption/CLAUDE.md` (build script alias source) | provenance + 본문 path 갱신 |
-| `templates/README.md` (alias 표) | path 갱신 |
-| project root `CLAUDE.md` line 91 | path 갱신 + 본 round entry note |
+| 파일                                                       | 변경                                                                   |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `scripts/build-plugin.js` line 2 (주석)                    | `dist/internal-v<version>/` → `dist/ai-native-methodology-v<version>/` |
+| `scripts/build-plugin.js` line 123 (코드)                  | `\`internal-v${version}\`` → `\`ai-native-methodology-v${version}\``   |
+| `README.md` line 80 (시나리오 B install 예시)              | path 갱신                                                              |
+| `README.md` line 171 (디렉토리 구조 다이어그램)            | path 갱신                                                              |
+| `guides/common-errors.md` line 112 (Q12 shasum 검증)       | path 갱신                                                              |
+| `templates/adoption/CLAUDE.md` (build script alias source) | provenance + 본문 path 갱신                                            |
+| `templates/README.md` (alias 표)                           | path 갱신                                                              |
+| project root `CLAUDE.md` line 91                           | path 갱신 + 본 round entry note                                        |
 
 ### Historical 보존 (갱신 ❌)
 
@@ -53,13 +54,13 @@ cleanup round 2-C/2-D 직후 사용자 명시 결단:
 
 ### 본 round 결과
 
-| 영역 | before | after |
-|---|---|---|
-| build artifact path | `dist/internal-v2.0.0-rc1/` | `dist/ai-native-methodology-v2.0.0-rc1/` |
-| plugin user 환경 path 와 정합 | ❌ ("internal-" 어색) | ✅ (README install 예시와 일치) |
-| paradigm 정합 | v1.x adoption-workspace stale | v2.0 plugin marketplace 정합 |
-| dist file count | 256 | **256** (path rename 만 / 변경 0) |
-| sha256 검증 | — | shasum -c **255 OK** |
+| 영역                          | before                        | after                                    |
+| ----------------------------- | ----------------------------- | ---------------------------------------- |
+| build artifact path           | `dist/internal-v2.0.0-rc1/`   | `dist/ai-native-methodology-v2.0.0-rc1/` |
+| plugin user 환경 path 와 정합 | ❌ ("internal-" 어색)         | ✅ (README install 예시와 일치)          |
+| paradigm 정합                 | v1.x adoption-workspace stale | v2.0 plugin marketplace 정합             |
+| dist file count               | 256                           | **256** (path rename 만 / 변경 0)        |
+| sha256 검증                   | —                             | shasum -c **255 OK**                     |
 
 ### 사용자 install 명령 예시 (변경 후)
 
@@ -73,7 +74,7 @@ npm run build
 /plugin install ai-native-methodology@ai-native-methodology
 ```
 
-★ workspace dist path 와 plugin user 환경 path 일치 → 사용자 mental model 단순화.
+workspace dist path 와 plugin user 환경 path 일치 → 사용자 mental model 단순화.
 
 ## Lessons
 
@@ -83,7 +84,7 @@ npm run build
 
 ## release / tag
 
-- ★ no release / no tag / 본체 commit 만
+- no release / no tag / 본체 commit 만
 - v2.0.0-rc1 → v2.0.0 final 자격 영향 ❌
 
 ## Carry

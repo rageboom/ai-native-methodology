@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #06 prelim — Antipatterns. Spring 4.1 + iBATIS 2 + 표준프레임워크(eGov) 빈약 corpus 영역 / false negative ↑ 명시 / 본 PoC 가 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 evidence 후보.",
+  "$comment": "PoC #06 prelim — Antipatterns. Spring 4.1 + iBATIS 2 + 표준프레임워크(eGov) 빈약 corpus 영역 / false negative ↑ 명시 / 본 PoC 가 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 evidence 후보.",
   "project_id": "poc-06-efiweb-exchange-spring41",
   "antipatterns": [
     {
@@ -66,8 +66,8 @@
       "evidence_loc": "source/sqlmap/exchange.xml:11-15, 19-23, 36-72, 79-94",
       "pattern": "월별 환율을 row 단위가 아닌 컬럼 단위 (MON1~MON12) 로 저장. 13번째 월 (윤달/조정월) 추가 시 schema migration 필요 + 모든 SQL 변경 필요. 정규화 (TB_EXCHANGE_MONTHLY: CURR_CD, YEAR, GUBUN, MONTH, RATE) 의 정합.",
       "modern_alternative": "TB_EXCHANGE_MONTHLY (CURR_CD, YEAR, GUBUN, MONTH, RATE) — 1NF 정합",
-      "carry_to": "★ 본 AP 는 의도 가능성 ↑ — IFRS 연간 환율표는 12개월 정합. phase 4.7 intent-vs-bug 분류 carry.",
-      "intent_vs_bug": "★ 분간 어려움 (BR-EXCHANGE-ANNUAL-005 와 동일 영역)"
+      "carry_to": "본 AP 는 의도 가능성 ↑ — IFRS 연간 환율표는 12개월 정합. phase 4.7 intent-vs-bug 분류 carry.",
+      "intent_vs_bug": "분간 어려움 (BR-EXCHANGE-ANNUAL-005 와 동일 영역)"
     },
     {
       "id": "AP-EXCHANGE-007",
@@ -115,14 +115,14 @@
     },
     {
       "id": "AP-EXCHANGE-011",
-      "title": "★ ★ ★ 공유 SQL 조각 부재 / iBATIS2 <sql id> + <include refid> 미사용 / 모듈성 ↓",
+      "title": "공유 SQL 조각 부재 / iBATIS2 <sql id> + <include refid> 미사용 / 모듈성 ↓",
       "applies_to": "exchange.xml (전체 129 LOC)",
       "category": "design",
       "severity": "medium",
       "evidence_loc": "source/sqlmap/exchange.xml grep '<sql\\s+id=' = 0 / grep '<include\\s+refid=' = 0",
-      "pattern": "★ ★ exchange.xml 의 <sql id=\"\"> 정의 0건 + <include refid=\"\"> 호출 0건. 단일책임 모듈 (6 SQL) 라 중복 영향 ↓ 이지만 ★ Spring 4.1 + iBATIS 2 spectrum 공통 패턴 — 양 PoC 모두 0건 (corroboration #1 + #2 isomorphic).",
+      "pattern": "exchange.xml 의 <sql id=\"\"> 정의 0건 + <include refid=\"\"> 호출 0건. 단일책임 모듈 (6 SQL) 라 중복 영향 ↓ 이지만 Spring 4.1 + iBATIS 2 spectrum 공통 패턴 — 양 PoC 모두 0건 (corroboration #1 + #2 isomorphic).",
       "modern_alternative": "MyBatis 3 마이그레이션 시 <sql id=\"\"> 공유 조각 + <include refid=\"\"> 호출",
-      "carry_to": "★ ★ AP-CAPITAL-012 (corroboration #2) → ≥ 2 PoC isomorphic 자격 자격 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule 자격",
+      "carry_to": "AP-CAPITAL-012 (corroboration #2) → ≥ 2 PoC isomorphic 자격 자격 / Spring 4.1 + iBATIS 2 spectrum AP sub-rule 자격",
       "external_advice_origin": "Opus 4.7 (사용자 turn 시 Pattern 4 = 공유 SQL 조각 = 횡단 관심사) — Day 1.6 흡수 / 사용자 D13 = (α) 결단 / corroboration #1 isomorphic 의무"
     }
   ],
@@ -139,12 +139,12 @@
       "AP.modern_alternative (현대 패턴 추천)",
       "AP.severity 평가",
       "AP.category 분류",
-      "AP.intent_vs_bug 판단 (★ phase 4.7 의무 영역)",
+      "AP.intent_vs_bug 판단 (phase 4.7 의무 영역)",
       "AP.carry_to (본체 AP seed 후보 분류)"
     ],
     "manual_required_count": 7,
     "auto_ratio": "22% (2 / 9) — plan §3-A 추정 35% 보다 -13%p / 박한 이유: Spring 4.1 + iBATIS 2 + eGov 한국 상용 corpus 빈약",
-    "note": "★ 본 측정이 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 직접 evidence. ≥2 PoC corroboration 강제 — 사내 다른 legacy Java 1개 더 필요.",
+    "note": "본 측정이 carry 1순위 (Spring 4.x AP seed 본체 격상) 의 직접 evidence. ≥2 PoC corroboration 강제 — 사내 다른 legacy Java 1개 더 필요.",
     "ap_count": 10,
     "ap_count_estimate_per_module": "~10 / 모듈당 (exchange 345 LOC 기준). 51K LOC 전체 = 1500+ AP 추정 (단 단일책임 ↑ 모듈일수록 AP 밀도 ↓).",
     "intent_vs_bug_분간_어려운_AP": ["AP-EXCHANGE-006", "AP-EXCHANGE-008"],

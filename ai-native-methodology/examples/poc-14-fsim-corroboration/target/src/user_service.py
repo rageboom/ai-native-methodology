@@ -1,8 +1,8 @@
 """User service — chain 4 GREEN impl.
 
-★ AP-FSIM-DATA-001 fix: 이메일 중복 검사 추가 (service level).
-★ AP-FSIM-SEC-001: plaintext carry (planning.excluded_antipatterns / v2.x sprint).
-★ AP-FSIM-AUTH-001: JWT exp claim 부재 carry (planning.excluded_antipatterns).
+AP-FSIM-DATA-001 fix: 이메일 중복 검사 추가 (service level).
+AP-FSIM-SEC-001: plaintext carry (planning.excluded_antipatterns / v2.x sprint).
+AP-FSIM-AUTH-001: JWT exp claim 부재 carry (planning.excluded_antipatterns).
 """
 from dataclasses import dataclass
 from typing import Optional
@@ -36,6 +36,6 @@ class UserService:
         user = self.store.find_by_email(email)
         if user is None:
             return None
-        if user.password != password:  # ★ AP-FSIM-SEC-001 carry: plaintext 비교
+        if user.password != password:  # AP-FSIM-SEC-001 carry: plaintext 비교
             return None
         return AuthToken(access_token=secrets.token_urlsafe(32))

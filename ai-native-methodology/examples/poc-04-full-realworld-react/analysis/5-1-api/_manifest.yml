@@ -1,7 +1,7 @@
 phase: 5-1-api
 poc_id: poc-04-full
-stage: "5"
-sprint: "5-2"
+stage: '5'
+sprint: '5-2'
 captured_at: 2026-05-02
 captured_by: real
 tool: yaml parser direct
@@ -13,8 +13,8 @@ artifacts:
   - _manifest.yml
 ir_layer_mapping:
   L3_Contract:
-    - openapi-summary.json (★ ground truth)
-    - api-extension.json (★ Phase 4.5 cross-link)
+    - openapi-summary.json (ground truth)
+    - api-extension.json (Phase 4.5 cross-link)
 api_summary:
   total_operations: 19
   schemas_count: 25
@@ -22,7 +22,7 @@ api_summary:
 no_simulation_compliance:
   static_tool_simulated: false
   ai_persona_used: false
-  evidence: "★ openapi.yaml YAML parser 직접 / 시뮬 0"
+  evidence: 'openapi.yaml YAML parser 직접 / 시뮬 0'
 deliverable_3_compliance:
   full_endpoint_extraction: true
   cross_link_pattern: true

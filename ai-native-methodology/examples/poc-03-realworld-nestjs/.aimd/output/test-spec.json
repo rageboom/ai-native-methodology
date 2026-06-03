@@ -19,7 +19,7 @@
       "type": "unit",
       "framework": "jest",
       "framework_status": "active",
-      "source_file": "source/test/user/user.service.spec.ts (★ retrofit dry-run / 본 파일 미작성 / 진짜 test 미실행)",
+      "source_file": "source/test/user/user.service.spec.ts ( retrofit dry-run / 본 파일 미작성 / 진짜 test 미실행)",
       "source_evidence": "describe('UserService.create — duplicate email/username') { it('should throw on duplicate'); }",
       "expected_outcome": "fail",
       "test_run_evidence": {
@@ -43,7 +43,7 @@
       "type": "unit",
       "framework": "jest",
       "framework_status": "active",
-      "source_file": "source/test/user/user.service.spec.ts (★ retrofit dry-run)",
+      "source_file": "source/test/user/user.service.spec.ts ( retrofit dry-run)",
       "source_evidence": "describe('UserService.findOne — login') { it('should return user + JWT'); }",
       "expected_outcome": "fail",
       "test_run_evidence": {

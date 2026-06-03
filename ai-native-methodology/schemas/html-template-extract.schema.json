@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/html-template-extract.schema.json",
   "title": "HTML Template Extract (analysis-html-template output)",
-  "description": "★ ★ v3.4.0 G4 / Scenario C (JSP / Thymeleaf / EJS / ERB / Razor) server-rendered template 흡수 산출. 외부 정적 분석 도구 실 실행 의무 (no-simulation 정합 / LLM 양심 count ❌).",
+  "description": "v3.4.0 G4 / Scenario C (JSP / Thymeleaf / EJS / ERB / Razor) server-rendered template 흡수 산출. 외부 정적 분석 도구 실 실행 의무 (no-simulation 정합 / LLM 양심 count ❌).",
   "type": "object",
   "required": ["scope", "scenario", "templates", "external_tool_output", "scriptlet_findings"],
   "additionalProperties": false,
@@ -75,7 +75,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["tool", "executed", "tool_version"],
-      "description": "★ no-simulation 의무 — 외부 정적 도구 실 실행 evidence.",
+      "description": "no-simulation 의무 — 외부 정적 도구 실 실행 evidence.",
       "properties": {
         "tool": {
           "type": "string",
@@ -83,7 +83,7 @@
         },
         "executed": {
           "type": "boolean",
-          "description": "★ 진짜 실 실행 여부. false = state.blocked + 사용자 안내 의무 / LLM 양심 count ❌."
+          "description": "진짜 실 실행 여부. false = state.blocked + 사용자 안내 의무 / LLM 양심 count ❌."
         },
         "tool_version": { "type": "string" },
         "command_line": {

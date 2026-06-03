@@ -5,7 +5,7 @@
   "batch_size": 14,
   "poc_id": "poc-02-realworld-springboot3",
   "direction": "GWT→NL",
-  "$comment": "★ ★ session 23차 Sprint 2 / dual-representation 합성 (session 13차 Agent 1 isomorphic). GWT (given/when/then) → natural_language 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 15초). 비즈니스 관점 / implementation 디테일 회피 / additive only (기존 GWT 보존). Layer 2 LLM cross-validation (Sprint 3) 입력 자산.",
+  "$comment": "session 23차 Sprint 2 / dual-representation 합성 (session 13차 Agent 1 isomorphic). GWT (given/when/then) → natural_language 의미 동치 합성 (Sonnet 4.6 sub-agent / batch / 15초). 비즈니스 관점 / implementation 디테일 회피 / additive only (기존 GWT 보존). Layer 2 LLM cross-validation (Sprint 3) 입력 자산.",
   "results": [
     { "br_id": "BR-USER-EMAIL-UNIQUE-001", "natural_language": "이미 사용 중인 이메일로 회원가입을 시도하면 시스템이 중복을 차단하며, 동시 요청에도 한 건만 허용된다." },
     { "br_id": "BR-USER-USERNAME-UNIQUE-001", "natural_language": "이미 사용 중인 사용자명으로는 회원가입을 할 수 없다." },

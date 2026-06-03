@@ -1,6 +1,6 @@
 # templates/plan/ — chain 3 (plan stage) template
 
-★ v10.0.0 chain harness. chain 3 (plan / spec ↔ test 사이 HOW 단계 / hard gate #3) 의 task-plan template placeholder. plan stage 산출물 = `task-plan.json` (task 분해 + 의존성 + ADR + NFR allocation + risk + rollback / json 단독 SSOT — ADR-011).
+v10.0.0 chain harness. chain 3 (plan / spec ↔ test 사이 HOW 단계 / hard gate #3) 의 task-plan template placeholder. plan stage 산출물 = `task-plan.json` (task 분해 + 의존성 + ADR + NFR allocation + risk + rollback / json 단독 SSOT — ADR-011).
 
 ## 본 디렉토리 자산
 
@@ -8,7 +8,7 @@
 
 ## 향후 채움 후보
 
-- `task-plan.template.json` (★ `schemas/task-plan.schema.json` 정합 — tasks[] + adrs[] + risks[] + nfr_allocation[] + rollback_strategy 골조 / json 단독 SSOT (ADR-011))
+- `task-plan.template.json` (`schemas/task-plan.schema.json` 정합 — tasks[] + adrs[] + risks[] + nfr_allocation[] + rollback_strategy 골조 / json 단독 SSOT (ADR-011))
 
 ## 참조
 

@@ -19,13 +19,14 @@ DEC-2026-05-26-input-skill-roles (v10.0.4) 가 `analysis-from-*` ↔ `discovery-
 
 `discovery-from-analysis-output` (v9.0.0 본격 / 137 line) pattern 정합 + 본격 procedure (책임 범위·입력·산출·no-simulation·절차·인용 6 섹션).
 
-| skill | source 채널 | UC 추출 방법 | NFR axis |
-|---|---|---|---|
-| `discovery-from-figma` (~70 line) | figma file URL + selected frame | MCP 4 도구 (get_metadata / get_design_context / get_variable_defs / get_screenshot) → frame nodes → 사용자 flow → UC + interaction | 부 (a11y / responsive / transition) |
-| `discovery-from-swagger` (~65 line) | openapi.yaml / swagger.json (Read 또는 WebFetch) | OpenAPI parse → operation 별 (path + method) → summary/description → UC + I/O contract + schema constraint → BR-INTENT | 부 (security / x-ratelimit / responses SLA) |
-| `discovery-from-nl-md` (~80 line) | markdown 기획 문서 또는 in-conversation NL prompt | structural parse (heading hierarchy / paragraph / sentence index) → "사용자가 X 한다" 패턴 → UC + "X는 Y해야" → BR-INTENT + "응답 200ms" 등 명시 → NFR | ★ **1차 채널** (NL 만이 명시 NFR 표현) |
+| skill                               | source 채널                                       | UC 추출 방법                                                                                                                                           | NFR axis                                    |
+| ----------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
+| `discovery-from-figma` (~70 line)   | figma file URL + selected frame                   | MCP 4 도구 (get_metadata / get_design_context / get_variable_defs / get_screenshot) → frame nodes → 사용자 flow → UC + interaction                     | 부 (a11y / responsive / transition)         |
+| `discovery-from-swagger` (~65 line) | openapi.yaml / swagger.json (Read 또는 WebFetch)  | OpenAPI parse → operation 별 (path + method) → summary/description → UC + I/O contract + schema constraint → BR-INTENT                                 | 부 (security / x-ratelimit / responses SLA) |
+| `discovery-from-nl-md` (~80 line)   | markdown 기획 문서 또는 in-conversation NL prompt | structural parse (heading hierarchy / paragraph / sentence index) → "사용자가 X 한다" 패턴 → UC + "X는 Y해야" → BR-INTENT + "응답 200ms" 등 명시 → NFR | **1차 채널** (NL 만이 명시 NFR 표현)        |
 
 각 skill 의 `source_grounded_evidence` ref 형식:
+
 - figma: `figma:<file_id>:<node_id>` (또는 frame name fallback)
 - swagger: `openapi:<path>:<operationId>` (또는 `<path>:<method>` fallback)
 - nl-md: `doc:<filepath>:<paragraph_index>:<sentence>` (markdown) 또는 `prompt:<message_id>:<line>` (in-conversation)
@@ -38,7 +39,7 @@ DEC-2026-05-26-input-skill-roles (v10.0.4) 가 `analysis-from-*` ↔ `discovery-
 
 ### §3. 동반 doc 갱신
 
-- `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리 표: `discovery-from-{analysis-output, figma, swagger, nl-md}` 4 모두 본격 (★ v10.1.0).
+- `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리 표: `discovery-from-{analysis-output, figma, swagger, nl-md}` 4 모두 본격 ( v10.1.0).
 - `guides/first-prompt-cookbook.md` §2.1 timing note: "v10.1.0 모두 본격" 표기.
 - `decisions/DEC-2026-05-26-input-skill-roles.md` §2: trigger carry 종결 → v10.1.0 본격 구현 완료 명시.
 

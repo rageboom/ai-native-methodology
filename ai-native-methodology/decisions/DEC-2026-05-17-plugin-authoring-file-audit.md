@@ -1,7 +1,7 @@
 # DEC-2026-05-17-plugin-authoring-file-audit
 
-- **상태**: 승인 (★ 사용자 "각 영역 별 파일별 품질 검증" → "진행" → "커밋 릴리즈" / corrective / v8.2.2 PATCH)
-- **일자**: 2026-05-17 (★ session 26차 후속 / v8.2.2 PATCH)
+- **상태**: 승인 ( 사용자 "각 영역 별 파일별 품질 검증" → "진행" → "커밋 릴리즈" / corrective / v8.2.2 PATCH)
+- **일자**: 2026-05-17 ( session 26차 후속 / v8.2.2 PATCH)
 - **결정자**: 윤주스 (TF Lead) — AskUserQuestion ×3 (범위=plugin-authoring 4영역 / 깊이=L1+L2+L3 / 처분=finding 기록+보고서 → 후속 "진행" 수정 cycle / F-PA-005·007 설계분기 2건 = (a)/(a))
 - **관련**: ADR-PLUGIN-001 §7 patch v6 + §8 LL-plugin-04 / DEC-2026-05-17-base-prefix-documented-exception (직전 v8.2.1) / DEC-2026-05-17-plugin-authoring-docs-drift (v8.2.0 / §9 Layer i) / `methodology-spec/finding-system.md` Body Finding Ledger (F-PA-NNN 신설) / `examples/_audits/2026-05-17-plugin-authoring-file-level-audit.md` (disposable working artifact) / ADR-009 (no-simulation / F-015 dogfood) / `feedback_sub_agent_validation` (ground-truth-before-edit)
 
@@ -36,7 +36,7 @@ v8.2.0 의 F-015 ×5 = **영역(area) 단위 digest 대조**. plugin-authoring-s
 ## 회귀 검증 (STOP-3 hard gate — 전부 통과)
 
 - 잔여 grep **0**: standalone `rules.json`(skill+workflow) / §6-no-sim·§3-test-type miscite / react·vue_version 의무 / integrate-7대
-- `skill-citation-validator` **finding 0** (207 active doc) — ★ 자가 회귀 1건(ledger 내 죽은 `*.schema.json` 토큰이 schema-class 트립 / validator 가 ABSENCE_CTX 를 schema-class 에 미적용 확인 → 비리터럴 재기술로 즉시 교정 = 발견 즉시 차단)
+- `skill-citation-validator` **finding 0** (207 active doc) — 자가 회귀 1건(ledger 내 죽은 `*.schema.json` 토큰이 schema-class 트립 / validator 가 ABSENCE_CTX 를 schema-class 에 미적용 확인 → 비리터럴 재기술로 즉시 교정 = 발견 즉시 차단)
 - `release-readiness --target 8.2.2` **13/13 ready:true** (workspace test **395+ pass** / chain-driver hookEventName 변경 무회귀 / validators_violation·analysis_validator·skill_citation green)
 - `version-check` 3-way **8.2.2** (plugin.json SSOT ↔ CHANGELOG.md top ↔ package.json) + CLAUDE.md marker(check #10) sync
 - `drift-validator` 3-way **불변** (skill/agent/flow 무편집 = SKILL.md 본문·workflow doc·schema $id·tool code·decisions·CLAUDE.md 만 / chain harness §1 비범위 safety property)
@@ -46,7 +46,7 @@ v8.2.0 의 F-015 ×5 = **영역(area) 단위 digest 대조**. plugin-authoring-s
 
 ## Lessons Learned
 
-- **LL-plugin-04** (ADR-PLUGIN-001 §8) — 결정적 validator 의 "green" 은 그 validator citation **class 정의 표면**에 한정 (skill-citation check #13 "0 stale" 인데 bare artifact 파일명 `rules.json` 은 schema/repo-path/ADR/DEC 4 class 미해당 → 13 skill+5 workflow doc stale 미탐). L2 의미 감사(LLM 판단 + 실파일 ground-truth)가 보완 axis. ★ ground-truth-before-edit 가 재작업 2건 차단 (FP-1 `_base-apply-template` 오탐 / F-PA-007 1차 오진 = skill 정확·ADR 파일명 stale — 맹신 시 정확한 인용 파괴) = LL-plugin-01·02 "verdict 수렴 ≠ 사실 / 1차 출처 독립 read 의무" 재확인. body finding = `finding-system.md` Body Finding Ledger F-PA(PoC F-NNN 분리) durable / disposable audit artifact 와 SSOT 분리 (LL-audit-04). corrective scope 가 SSOT 근원(workflow doc + schema $id)까지 확대 = "drift 는 표면 아닌 근원 차단".
+- **LL-plugin-04** (ADR-PLUGIN-001 §8) — 결정적 validator 의 "green" 은 그 validator citation **class 정의 표면**에 한정 (skill-citation check #13 "0 stale" 인데 bare artifact 파일명 `rules.json` 은 schema/repo-path/ADR/DEC 4 class 미해당 → 13 skill+5 workflow doc stale 미탐). L2 의미 감사(LLM 판단 + 실파일 ground-truth)가 보완 axis. ground-truth-before-edit 가 재작업 2건 차단 (FP-1 `_base-apply-template` 오탐 / F-PA-007 1차 오진 = skill 정확·ADR 파일명 stale — 맹신 시 정확한 인용 파괴) = LL-plugin-01·02 "verdict 수렴 ≠ 사실 / 1차 출처 독립 read 의무" 재확인. body finding = `finding-system.md` Body Finding Ledger F-PA(PoC F-NNN 분리) durable / disposable audit artifact 와 SSOT 분리 (LL-audit-04). corrective scope 가 SSOT 근원(workflow doc + schema $id)까지 확대 = "drift 는 표면 아닌 근원 차단".
 - **LL-audit (감사 방법론 자산화)** — 영역 digest 대조(F-015 ×5)는 파일-level L2 의미 drift 를 못 본다. 파일별 감사 = 10 sub-agent 배치 + 균일 verdict 스키마 + systemic dedupe(F-021 과대계상 차단) + XV 독립 재검(F-015 dogfood)으로 sound. disposable working artifact + durable ledger 분리.
 
 ---

@@ -18,7 +18,7 @@
     "missing_drift_4": [
       "email null/blank 검증 책임 위치",
       "App pre-check race-prone 정량화",
-      "DataIntegrityViolation 미처리 (★ critical)",
+      "DataIntegrityViolation 미처리 ( critical)",
       "updateUserDetails Hexagonal 위반 (F-071)"
     ]
   },
@@ -109,7 +109,7 @@
             "400/500",
             "App miss + DB catch"
           ],
-          "note": "★ race window — DataIntegrityViolationException 미처리 시 500 노출 (F-058)"
+          "note": " race window — DataIntegrityViolationException 미처리 시 500 노출 (F-058)"
         },
         {
           "when": [
@@ -164,7 +164,7 @@
           ],
           "then": [
             "throw IAE \"email is already exists\"",
-            "Adapter 1중 (★ F-071 Hexagonal 위반)"
+            "Adapter 1중 ( F-071 Hexagonal 위반)"
           ]
         }
       ]

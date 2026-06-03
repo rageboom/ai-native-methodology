@@ -28,12 +28,12 @@
         "REJECT_SELF_FOLLOW": {
           "target": "notFollowing",
           "actions": ["throwIAE_SelfFollow"],
-          "guard": "follower.id == followee.id ★ BR-USER-FOLLOW-NO-SELF-001 (F-074 — 자연어 명시 / 코드 부재)"
+          "guard": "follower.id == followee.id  BR-USER-FOLLOW-NO-SELF-001 (F-074 — 자연어 명시 / 코드 부재)"
         },
         "NO_OP_IDEMPOTENT": {
           "target": "notFollowing",
           "actions": ["silentReturn"],
-          "guard": "isFollowing(A, B) == true ★ BR-USER-FOLLOW-IDEMPOTENT-001"
+          "guard": "isFollowing(A, B) == true  BR-USER-FOLLOW-IDEMPOTENT-001"
         }
       }
     },

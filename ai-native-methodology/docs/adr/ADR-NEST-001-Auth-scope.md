@@ -10,8 +10,9 @@
 ## 1. 컨텍스트
 
 PoC #03 (lujakob/nestjs-realworld-example-app) 분석 결과 **NestJS 의 Auth scope 결여 패턴 critical 5건** 식별:
-- DELETE /api/users/:slug — F-140 (★ AuthMiddleware forRoutes 누락)
-- PUT/DELETE/POST /articles/:slug + comments — F-164 (★ @User decorator 부재)
+
+- DELETE /api/users/:slug — F-140 (AuthMiddleware forRoutes 누락)
+- PUT/DELETE/POST /articles/:slug + comments — F-164 (@User decorator 부재)
 - JWT verify 무방어 — F-118 (try/catch 부재)
 - JWT 60일 expiry — F-119
 - login 'User not found' 모호 — F-150 (OWASP A07)
@@ -22,13 +23,13 @@ PoC #03 (lujakob/nestjs-realworld-example-app) 분석 결과 **NestJS 의 Auth s
 
 ## 2. 결정
 
-### 2.1 ★ JwtAuthGuard 글로벌 적용 의무
+### 2.1 JwtAuthGuard 글로벌 적용 의무
 
 ```typescript
 // app.module.ts
 @Module({
   providers: [
-    {provide: APP_GUARD, useClass: JwtAuthGuard}  // ★ 글로벌
+    {provide: APP_GUARD, useClass: JwtAuthGuard}  // 글로벌
   ]
 })
 ```
@@ -41,7 +42,7 @@ PoC #03 (lujakob/nestjs-realworld-example-app) 분석 결과 **NestJS 의 Auth s
 async login(...) {}
 ```
 
-### 2.2 ★★ Ownership Check Service 단 의무
+### 2.2 Ownership Check Service 단 의무
 
 `@UseGuards(JwtAuthGuard)` 만으로 **resource ownership 보장 안 됨** — Service 단 명시 의무:
 
@@ -49,7 +50,7 @@ async login(...) {}
 async update(slug: string, userId: number, dto: UpdateArticleDto) {
   const article = await this.findOne({slug});
   if (article.author.id !== userId) {
-    throw new ForbiddenException();  // ★ 의무
+    throw new ForbiddenException();  // 의무
   }
   // ...
 }
@@ -57,24 +58,24 @@ async update(slug: string, userId: number, dto: UpdateArticleDto) {
 
 → OWASP API5 (BOLA) 정합.
 
-### 2.3 ★ @nestjs/passport + LocalStrategy + JwtStrategy 의무
+### 2.3 @nestjs/passport + LocalStrategy + JwtStrategy 의무
 
 Manual JWT verify 절대 금지 — verify 분산 시 try/catch 부재 risk (F-118).
 
 ```typescript
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  // verify + try/catch + UnauthorizedException 자동
+	// verify + try/catch + UnauthorizedException 자동
 }
 ```
 
-### 2.4 ★ JWT expiry 7일 + refresh token endpoint 의무
+### 2.4 JWT expiry 7일 + refresh token endpoint 의무
 
 - Access token: **7일 max** (60일+ 금지 — F-119)
 - Refresh token: 30일 + endpoint POST /auth/refresh
 - Logout: Redis blacklist 또는 짧은 expiry 의존
 
-### 2.5 ★ login error 메시지 통일 — "Invalid credentials"
+### 2.5 login error 메시지 통일 — "Invalid credentials"
 
 OWASP A07 (User Enumeration) — user 부재 / password 불일치 구분 금지.
 
@@ -83,7 +84,7 @@ OWASP A07 (User Enumeration) — user 부재 / password 불일치 구분 금지.
 // ✅ 'Invalid credentials'
 ```
 
-### 2.6 ★ rate limiting 의무 — `@nestjs/throttler`
+### 2.6 rate limiting 의무 — `@nestjs/throttler`
 
 ```typescript
 @UseGuards(ThrottlerGuard)
@@ -97,18 +98,19 @@ OWASP A04 (Insecure Design — brute force 방어).
 
 ### 3.1 Positive 효과
 
-- ★ NestJS Auth scope 결여 5건 자연 회피
-- ★ OWASP API5 + A04 + A07 동시 정합
-- ★ @nestjs/passport 표준 = 사내 NestJS 일관성
+- NestJS Auth scope 결여 5건 자연 회피
+- OWASP API5 + A04 + A07 동시 정합
+- @nestjs/passport 표준 = 사내 NestJS 일관성
 
 ### 3.2 트레이드오프
 
-- ★ 학습 곡선 — Passport 패턴 + Strategy 분리
-- ★ 글로벌 Guard 도입 시 기존 endpoint 검토 의무 (★ 큰 codebase 시 마이그레이션 시간)
+- 학습 곡선 — Passport 패턴 + Strategy 분리
+- 글로벌 Guard 도입 시 기존 endpoint 검토 의무 (큰 codebase 시 마이그레이션 시간)
 
 ## 4. 검증
 
 CI 의무:
+
 - supertest E2E — 익명 요청 401 + non-owner 403
 - 모든 controller method = `@UseGuards` 또는 `@Public()` 명시 (ts-morph rule)
 - @nestjs/throttler default config 확인

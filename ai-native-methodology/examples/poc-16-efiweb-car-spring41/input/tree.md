@@ -23,15 +23,15 @@ source/
 │   ├── carInclude.jsp                          # 공통 JS / USERID Header 변수 (carInclude 패턴 anchor)
 │   ├── carList.jsp                             # 차량 목록 페이지
 │   ├── carListAjax.jsp                         # 차량 목록 ajax fragment
-│   ├── carInsertForm.jsp                       # 차량 등록 form (★ 유일 form action: /ifrs/car/insertCar)
+│   ├── carInsertForm.jsp                       # 차량 등록 form (유일 form action: /ifrs/car/insertCar)
 │   ├── carSelectPopup.jsp                      # 차량 선택 popup
 │   ├── carSelectPopupAjax.jsp                  # 차량 선택 popup ajax fragment
-│   ├── carDriveInsertForm.jsp                  # 차량 운행 등록 form (★ year-loop scriptlet)
+│   ├── carDriveInsertForm.jsp                  # 차량 운행 등록 form (year-loop scriptlet)
 │   ├── carDriveListAjax.jsp                    # 차량 운행 목록 ajax
-│   ├── carCosting.jsp                          # 차량 비용 계산 페이지 (★ scriptlet + jsp:include)
+│   ├── carCosting.jsp                          # 차량 비용 계산 페이지 (scriptlet + jsp:include)
 │   ├── carCostingNoDriveLog.jsp                # 운행 로그 없는 비용 계산 분기
-│   ├── carCostConfirm.jsp                      # 차량 비용 확정 페이지 (★ scriptlet)
-│   ├── carCostSumSystem.jsp                    # 차량 비용 합산 시스템 페이지 (★ scriptlet)
+│   ├── carCostConfirm.jsp                      # 차량 비용 확정 페이지 (scriptlet)
+│   ├── carCostSumSystem.jsp                    # 차량 비용 합산 시스템 페이지 (scriptlet)
 │   ├── popCarCostSlip.jsp                      # 차량 비용 회계전표 popup
 │   └── loading.jsp                             # 공통 loading indicator
 │
@@ -54,7 +54,7 @@ source/
 │
 ├── erd/                                         # 2 ERD (시각화 / viewer 부재 / manual_extraction)
 │   ├── car.erd                                 # 60K / car 모듈 부분 ERD
-│   └── ifrs.erd                                # 188K / 전체 IFRS ERD (★ 사용자 지적 정정 사실)
+│   └── ifrs.erd                                # 188K / 전체 IFRS ERD (사용자 지적 정정 사실)
 │
 └── _cross-db-dependencies.md                   # car ↔ 4 외부 DB (FIM/SGERP/e_hr/ekporg) 의존 manifest
 ```
@@ -74,19 +74,19 @@ input/
 
 ## 외부 의존성 (cross-DB / source 외부)
 
-| DB | Object 종류 | 카운트 | 본 PoC source |
-|---|---|---|---|
-| **IFRS (own)** | Table | 6 | ✅ ddl/tables/ |
-| **IFRS (own)** | Function | 3 | ✅ ddl/functions/ |
-| **FIM** (사내 마스터) | Table | 3 | ❌ external_only |
-| **SGERP** (ERP) | Table + View | 10 | ❌ external_only |
-| **SGERP** (ERP) | Stored Procedure | 1 | ❌ signature_only |
-| **e_hr** (인사) | Table | 1 | ❌ external_only |
-| **ekporg** (조직) | Table | 1 | ❌ external_only |
+| DB                    | Object 종류      | 카운트 | 본 PoC source     |
+| --------------------- | ---------------- | ------ | ----------------- |
+| **IFRS (own)**        | Table            | 6      | ✅ ddl/tables/    |
+| **IFRS (own)**        | Function         | 3      | ✅ ddl/functions/ |
+| **FIM** (사내 마스터) | Table            | 3      | ❌ external_only  |
+| **SGERP** (ERP)       | Table + View     | 10     | ❌ external_only  |
+| **SGERP** (ERP)       | Stored Procedure | 1      | ❌ signature_only |
+| **e_hr** (인사)       | Table            | 1      | ❌ external_only  |
+| **ekporg** (조직)     | Table            | 1      | ❌ external_only  |
 
 ## 책임 분기 매트릭스
 
-| 책임 | Controller | Service | ServiceImpl | DAO | sqlmap | 주 도메인 |
-|---|---|---|---|---|---|---|
-| **Mgt** (차량관리) | CarMgtController 374 / 16 ep | CarMgtService 99 / interface | CarMgtServiceImpl 247 / 8 method | CarMgtDAO 202 / 17 method | carMgt.xml | 차량 등록 / 사용자 / 운행 / 비용 |
+| 책임                | Controller                    | Service                       | ServiceImpl                       | DAO                       | sqlmap      | 주 도메인                                |
+| ------------------- | ----------------------------- | ----------------------------- | --------------------------------- | ------------------------- | ----------- | ---------------------------------------- |
+| **Mgt** (차량관리)  | CarMgtController 374 / 16 ep  | CarMgtService 99 / interface  | CarMgtServiceImpl 247 / 8 method  | CarMgtDAO 202 / 17 method | carMgt.xml  | 차량 등록 / 사용자 / 운행 / 비용         |
 | **Cost** (차량비용) | CarCostController 418 / 18 ep | CarCostService 76 / interface | CarCostServiceImpl 224 / 5 method | CarCostDAO 110 / 8 method | carCost.xml | 비용 계산 / 확정 / 회계전표 IF (SP 호출) |

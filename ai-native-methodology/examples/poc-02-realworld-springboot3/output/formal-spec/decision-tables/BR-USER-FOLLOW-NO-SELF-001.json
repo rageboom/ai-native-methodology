@@ -3,10 +3,10 @@
   "br_id": "BR-USER-FOLLOW-NO-SELF-001",
   "trigger": "POST /api/profiles/{username}/follow 시 follower.id == following.id 검사",
   "condition": "self-follow 시도 (follower == following)",
-  "action": "거부 (자연어 명시 / 코드 부재 ★ F-074)",
+  "action": "거부 (자연어 명시 / 코드 부재  F-074)",
   "expected_result": "self-follow 차단 — 400 Bad Request",
-  "rejection_method": "throw IllegalArgumentException (Domain — UserFollow 생성자 ★ Sprint 2 형식화 결단)",
-  "verification_location": "Domain (UserFollow 생성자 ★ NEW — F-074 fix) + DB CHECK (★ Sprint 2 cross-validation 격상 권고 — chk_user_follow_no_self)",
+  "rejection_method": "throw IllegalArgumentException (Domain — UserFollow 생성자  Sprint 2 형식화 결단)",
+  "verification_location": "Domain (UserFollow 생성자  NEW — F-074 fix) + DB CHECK ( Sprint 2 cross-validation 격상 권고 — chk_user_follow_no_self)",
   "http_status": 400,
   "error_message": "follower and following must be different",
   "current_state": "absent",
@@ -150,7 +150,7 @@
           ]
         }
       ],
-      "note": "★ = F-074 신규 추가 행 (현재 코드 부재). 행1·행2 의 follower.id==following.id 및 isFollowing 컬럼은 원문에서 * (wildcard) 로 표기됨."
+      "note": " = F-074 신규 추가 행 (현재 코드 부재). 행1·행2 의 follower.id==following.id 및 isFollowing 컬럼은 원문에서 * (wildcard) 로 표기됨."
     },
     {
       "context": "unfollow 시점 — 일관성 점검",

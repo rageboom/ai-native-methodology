@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #07 prelim — EFI-WEB capital 모듈 analysis stage 산출 / chain 1 (planning) 입력. 다중책임 모듈 (87 Controller endpoint × 71 SQL operation × 17 dependent tables / vs PoC #06 exchange 단일책임). plan §3-A 자동화율 측정 데이터.",
+  "$comment": "PoC #07 prelim — EFI-WEB capital 모듈 analysis stage 산출 / chain 1 (planning) 입력. 다중책임 모듈 (87 Controller endpoint × 71 SQL operation × 17 dependent tables / vs PoC #06 exchange 단일책임). plan §3-A 자동화율 측정 데이터.",
   "project_id": "poc-07-efiweb-capital-spring41",
   "language": "Java",
   "language_version": "1.8",
@@ -11,13 +11,13 @@
     "Maven WAR + web.xml + context-*.xml 10종 (전 프로젝트 범위)",
     "JSP + AUIGrid + 다음에디터 — view 트랙",
     "MSSQL — TB_CAPITAL_LIST + 16 추가 tables",
-    "★ ★ Cross-system 의존: LIVE_SQL.SGERP.dbo (★ ERP 시스템) + IFRS.dbo (★ 외부 IFRS)",
-    "★ Cross-domain 의존: TB_DAY_EXCHANGE (exchange 모듈)",
+    "Cross-system 의존: LIVE_SQL.SGERP.dbo (ERP 시스템) + IFRS.dbo (외부 IFRS)",
+    "Cross-domain 의존: TB_DAY_EXCHANGE (exchange 모듈)",
     "JavaMailSender — 이메일 발송 / MimeMessage / 메일 add-on",
-    "Apache imgscalr (이미지 처리) + Base64 (★ canvasUpload / 이미지 base64 인라인)"
+    "Apache imgscalr (이미지 처리) + Base64 (canvasUpload / 이미지 base64 인라인)"
   ],
   "framework": "spring-mvc-4.1-jsp-ibatis2",
-  "test_runner_inferred": "junit 4.8.1 (★ 환경 부재 / src/test ❌ / @Test 0건 — PoC #06 정합)",
+  "test_runner_inferred": "junit 4.8.1 (환경 부재 / src/test ❌ / @Test 0건 — PoC #06 정합)",
   "source_files": [
     "source/java/web/CapitalController.java",
     "source/java/service/CapitalService.java",
@@ -46,7 +46,7 @@
         "AP-CAPITAL-001 (Controller 비대 / 2536 LOC / 87 endpoint = 단일 책임 위반)",
         "AP-CAPITAL-002 (Map<String,Object> + 강제 캐스팅 / type safety 부재)",
         "AP-CAPITAL-007 (이미지 base64 처리 / canvasUpload / Controller 책임 외)",
-        "AP-CAPITAL-009 (★ ★ 슈퍼크리에이티브 임시처리 / 중복 4회 자조 / SATD)",
+        "AP-CAPITAL-009 (슈퍼크리에이티브 임시처리 / 중복 4회 자조 / SATD)",
         "AP-CAPITAL-010 (e.printStackTrace() 만 / 로깅 부재)"
       ],
       "sub_domains": [
@@ -56,7 +56,7 @@
         "D. SaveLoad (Save/Load Data / 5 endpoint)",
         "E. Mail (메일 발송 / 10+ endpoint)",
         "F. Calendar (Holiday/Week / 4 endpoint)",
-        "★ G. WeeklyReport (주간 보고 / IfrsWeekReport1~14 / 14+ endpoint / ★ 핵심)",
+        "G. WeeklyReport (주간 보고 / IfrsWeekReport1~14 / 14+ endpoint / 핵심)",
         "H. CapitalHistory (4 endpoint)",
         "I. CapitalComment+Verify (4 endpoint)",
         "J. GraphSetting (4 endpoint)",
@@ -76,7 +76,7 @@
       "loc": 748,
       "antipatterns_flagged": [
         "AP-CAPITAL-003 (Anemic Service / 단순 위임 패턴)",
-        "AP-CAPITAL-008 (★ // TODO Auto-generated method stub line 687 / SATD)"
+        "AP-CAPITAL-008 (// TODO Auto-generated method stub line 687 / SATD)"
       ]
     },
     {
@@ -96,21 +96,21 @@
       "smilegate.ifrs.egov.util (EgovFileMngUtil, EgovProperties)"
     ],
     "external_systems": [
-      "★ LIVE_SQL.SGERP.dbo (★ ERP 시스템 cross-system / 다수 SP 호출)",
-      "★ IFRS.dbo (★ 외부 IFRS schema / _IFRSCapitalList / _IFRSCapitalListAsset / _IFRSWeekList SP)",
+      "LIVE_SQL.SGERP.dbo (ERP 시스템 cross-system / 다수 SP 호출)",
+      "IFRS.dbo (외부 IFRS schema / _IFRSCapitalList / _IFRSCapitalListAsset / _IFRSWeekList SP)",
       "JavaMailSender (메일 발송 / SMTP)",
-      "★ TB_DAY_EXCHANGE (★ exchange 모듈 cross-domain 의존)"
+      "TB_DAY_EXCHANGE (exchange 모듈 cross-domain 의존)"
     ],
-    "reverse_dependencies": "확인 보류 (★ capital 이 호출당하는 모듈 / Day 1.5 carry)"
+    "reverse_dependencies": "확인 보류 (capital 이 호출당하는 모듈 / Day 1.5 carry)"
   },
   "database": {
     "tables": [
-      {"name": "TB_CAPITAL_LIST", "role": "★ 핵심 / 자본 보고 raw 데이터"},
-      {"name": "TB_CAPITAL_LIST_COPY", "role": "★ ★ ambiguous / COPY 테이블 = bug? backup?"},
+      {"name": "TB_CAPITAL_LIST", "role": "핵심 / 자본 보고 raw 데이터"},
+      {"name": "TB_CAPITAL_LIST_COPY", "role": "ambiguous / COPY 테이블 = bug? backup?"},
       {"name": "TB_CAPITAL_LIST_IMGSRC", "role": "이미지 base64 src"},
       {"name": "TB_CAPITAL_LIST_USERSET", "role": "사용자 설정"},
       {"name": "TB_CAPITAL_ASSET", "role": "자산"},
-      {"name": "TB_CAPITAL_ASSET_BAK", "role": "★ ambiguous / BAK = backup?"},
+      {"name": "TB_CAPITAL_ASSET_BAK", "role": "ambiguous / BAK = backup?"},
       {"name": "TB_CAPITAL_COMMENT", "role": "코멘트"},
       {"name": "TB_CAPITAL_VRIFY", "role": "검증 (verify)"},
       {"name": "TB_COMPANY", "role": "회사 마스터"},
@@ -120,8 +120,8 @@
       {"name": "TB_WEEK_CALENDAR", "role": "주간 달력"},
       {"name": "TB_WEEK_CALENDAR_ROW", "role": "주간 달력 row"},
       {"name": "TB_FCMMN_LOG", "role": "공통 로그"},
-      {"name": "TB_DAY_EXCHANGE", "role": "★ exchange 모듈 / cross-domain 의존"},
-      {"name": "IFRS.dbo.TB_CAPITAL_LIST", "role": "★ external schema"}
+      {"name": "TB_DAY_EXCHANGE", "role": "exchange 모듈 / cross-domain 의존"},
+      {"name": "IFRS.dbo.TB_CAPITAL_LIST", "role": "external schema"}
     ],
     "table_count": 17,
     "external_sp_function": [
@@ -140,7 +140,7 @@
     "external_sp_count": 11
   },
   "phase_3a_automation_measurement": {
-    "$comment": "★ plan §3-A 자동화율 측정 — 다중책임 capital (vs PoC #06 단일책임 exchange 38.75%)",
+    "$comment": "plan §3-A 자동화율 측정 — 다중책임 capital (vs PoC #06 단일책임 exchange 38.75%)",
     "auto_extracted_fields": {
       "endpoint_count": "✅ grep @RequestMapping (87)",
       "sql_id_count": "✅ grep <select|update|insert|delete|procedure id= (71)",
@@ -162,16 +162,16 @@
       "auto_count": 7,
       "manual_count": 6,
       "ratio": "7/13 = 53.8%",
-      "comparison": "★ ★ ★ vs PoC #06 exchange 38.75% (+15%p) — 다중책임 → 자동 추출 가능 fields 비율 ↑ (★ ★ 가설 R1 입증 — 다중책임 = 분기 ↑ + dynamic ↑ + tables ↑ → 자동 grep ↑)",
-      "plan_3a_estimation": "50% ± 10%p — 실측 53.8% → ★ ★ 추정 정합 (in range / +3.8%p / pass)"
+      "comparison": "vs PoC #06 exchange 38.75% (+15%p) — 다중책임 → 자동 추출 가능 fields 비율 ↑ (가설 R1 입증 — 다중책임 = 분기 ↑ + dynamic ↑ + tables ↑ → 자동 grep ↑)",
+      "plan_3a_estimation": "50% ± 10%p — 실측 53.8% → 추정 정합 (in range / +3.8%p / pass)"
     }
   },
   "scope_constraint": {
-    "$comment": "★ R1 시간 cap 정합 — capital 전체 분석은 Day 1~3 시간 cap (3.5~4일) 정합 위해 핵심 sub-domain 만 본격.",
+    "$comment": "R1 시간 cap 정합 — capital 전체 분석은 Day 1~3 시간 cap (3.5~4일) 정합 위해 핵심 sub-domain 만 본격.",
     "core_sub_domains": ["A. ComBasicInfo", "B. CapitalStd/Biz/ERP", "D. SaveLoad", "G. WeeklyReport"],
     "carry_sub_domains": ["C. CapitalAsset", "E. Mail", "F. Calendar", "H. CapitalHistory", "I. Comment+Verify", "J. GraphSetting", "K. ImageUpload+Excel+ETC"],
     "core_endpoint_count": "~30 (87 - 57 carry)",
     "core_sql_count": "~39 (71 - 32 carry)",
-    "phase_4_7_uc_count": "5~7 핵심 (★ G WeeklyReport + B ERP + D SaveLoad)"
+    "phase_4_7_uc_count": "5~7 핵심 (G WeeklyReport + B ERP + D SaveLoad)"
   }
 }

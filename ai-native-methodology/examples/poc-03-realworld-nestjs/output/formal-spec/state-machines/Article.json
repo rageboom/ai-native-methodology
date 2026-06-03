@@ -21,7 +21,7 @@
   "states": {
     "draft_unrepresented": {
       "type": "transient_pseudo",
-      "comment": "★ RealWorld 스펙 = draft 상태 명시 부재 — 즉시 published 단일 상태",
+      "comment": " RealWorld 스펙 = draft 상태 명시 부재 — 즉시 published 단일 상태",
       "on": {
         "CREATE": "creating"
       }
@@ -37,7 +37,7 @@
       "type": "compound",
       "on": {
         "INSERT_OK": "published_count0",
-        "SLUG_COLLISION": {"target": "published_count0", "actions": ["★ F-053 변형 — random suffix 의존 / DB UQ 부재 / 충돌 시 undefined behavior"], "guard": "★ F-120 — slug UQ 부재"}
+        "SLUG_COLLISION": {"target": "published_count0", "actions": [" F-053 변형 — random suffix 의존 / DB UQ 부재 / 충돌 시 undefined behavior"], "guard": " F-120 — slug UQ 부재"}
       }
     },
     "published_count0": {
@@ -47,7 +47,7 @@
         "UPDATE": "updating",
         "DELETE": "deleted",
         "ADD_COMMENT": "published_count0",
-        "GET": {"target": "published_count0", "actions": ["★ F-124 — comments eager:true → N+1"]}
+        "GET": {"target": "published_count0", "actions": [" F-124 — comments eager:true → N+1"]}
       }
     },
     "favoring": {
@@ -55,7 +55,7 @@
       "on": {
         "NEW_FAVORITE": {"target": "published_countN", "actions": ["push + favoriteCount++"], "guard": "isNewFavorite"},
         "ALREADY_FAVORITED": {"target": "published_countN", "actions": ["silent skip"], "guard": "App 1중 idempotent"},
-        "RACE_DOUBLE_INC": {"target": "published_countN", "actions": ["★★ F-135 critical — 두 동시 favorite 모두 isNewFavorite=true 통과 → favoriteCount 2회 증가 (App 1중 race-prone)"], "guard": "★ favoriteCount race window"}
+        "RACE_DOUBLE_INC": {"target": "published_countN", "actions": [" F-135 critical — 두 동시 favorite 모두 isNewFavorite=true 통과 → favoriteCount 2회 증가 (App 1중 race-prone)"], "guard": " favoriteCount race window"}
       }
     },
     "published_countN": {
@@ -74,7 +74,7 @@
       }
     },
     "published_count0_or_N": {
-      "comment": "★ 단조성 invariant — favoriteCount = favorites.length (App level 만 보장)",
+      "comment": " 단조성 invariant — favoriteCount = favorites.length (App level 만 보장)",
       "on": {
         "FAVORITE": "favoring",
         "UNFAVORITE": "unfavoring",
@@ -85,7 +85,7 @@
     "updating": {
       "type": "compound",
       "on": {
-        "APPLY_OK": {"target": "published_countN", "actions": ["★ F-126 — slug 미업데이트 (TODO 주석)"], "guard": "title 변경 시에도 slug regeneration 부재"}
+        "APPLY_OK": {"target": "published_countN", "actions": [" F-126 — slug 미업데이트 (TODO 주석)"], "guard": "title 변경 시에도 slug regeneration 부재"}
       }
     },
     "deleted": {
@@ -94,10 +94,10 @@
     }
   },
   "findings": [
-    {"id": "F-120", "summary": "★ slug UQ 부재 → random suffix 충돌 시 undefined behavior"},
-    {"id": "F-124", "summary": "★ comments eager:true → N+1 (PoC #02 F-051 cross-val 재현)"},
-    {"id": "F-126", "summary": "★ Update 시 slug 미업데이트 (TODO 주석)"},
-    {"id": "F-135", "summary": "★★ favoriteCount race window — App 1중 isNewFavorite check / 두 동시 favorite 시 count 2회 증가"},
-    {"id": "F-053-variant", "summary": "★ slugify random suffix (slug unique 회피) — PoC #02 F-053 cross-val 변형 재현"}
+    {"id": "F-120", "summary": " slug UQ 부재 → random suffix 충돌 시 undefined behavior"},
+    {"id": "F-124", "summary": " comments eager:true → N+1 (PoC #02 F-051 cross-val 재현)"},
+    {"id": "F-126", "summary": " Update 시 slug 미업데이트 (TODO 주석)"},
+    {"id": "F-135", "summary": " favoriteCount race window — App 1중 isNewFavorite check / 두 동시 favorite 시 count 2회 증가"},
+    {"id": "F-053-variant", "summary": " slugify random suffix (slug unique 회피) — PoC #02 F-053 cross-val 변형 재현"}
   ]
 }

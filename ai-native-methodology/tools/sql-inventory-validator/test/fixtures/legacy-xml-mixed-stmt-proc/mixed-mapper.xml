@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
-<!-- ★ v8.7.1 PATCH fixture — 5 stmt 종류 (select + insert + update + delete + procedure) 혼합 / total = 5 -->
+<!-- v8.7.1 PATCH fixture — 5 stmt 종류 (select + insert + update + delete + procedure) 혼합 / total = 5 -->
 <sqlMap namespace="TestMixedDAO">
     <select id="findById" parameterClass="java.lang.Long" resultClass="HashMap">
         SELECT * FROM users WHERE id = #id#

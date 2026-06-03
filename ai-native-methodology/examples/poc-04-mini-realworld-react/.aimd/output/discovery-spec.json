@@ -16,7 +16,7 @@
     ]
   },
   "business_intent": {
-    "domain_purpose": "RealWorld React FSD — User authentication flow (★ FE retrofit scope = Login page subset / corroboration #3 / Senior F7 BE-only 한계 부분 closure)",
+    "domain_purpose": "RealWorld React FSD — User authentication flow ( FE retrofit scope = Login page subset / corroboration #3 / Senior F7 BE-only 한계 부분 closure)",
     "stakeholders": ["end-user", "FE-team"],
     "success_criteria": [
       "올바른 자격증명으로 login 시 /settings 리다이렉트",
@@ -46,9 +46,9 @@
     }
   ],
   "out_of_scope": [
-    "PAGE-HOME / PAGE-SETTINGS / PAGE-ARTICLE (★ retrofit subset OUT)",
-    "logout / signup / password-reset flow (★ subset OUT)",
-    "진짜 React Testing Library 실행 (★ chain 3 RED dry-run only / sub-plan-6 시간 제약)"
+    "PAGE-HOME / PAGE-SETTINGS / PAGE-ARTICLE ( retrofit subset OUT)",
+    "logout / signup / password-reset flow ( subset OUT)",
+    "진짜 React Testing Library 실행 ( chain 3 RED dry-run only / sub-plan-6 시간 제약)"
   ],
   "risks_and_constraints": [
     {"id": "R-001", "severity": "low", "type": "methodology", "description": "70~80% 자동화 한계 잔존 — gate 별 사용자 검토 의무"},

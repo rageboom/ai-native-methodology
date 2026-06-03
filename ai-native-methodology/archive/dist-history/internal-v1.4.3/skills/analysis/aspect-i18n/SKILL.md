@@ -19,7 +19,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - react-intl (FormatJS)
    - vue-i18n
    - lingui
-   - ICU MessageFormat (★ ADR-FE-005 권위 매개체)
+   - ICU MessageFormat ( ADR-FE-005 권위 매개체)
 2. **Locale catalog 추출** — `locales/<lang>/translation.json` 등
 3. **Message format 분석** — 단순 string vs ICU (plural / select / number / date)
 4. **Untranslated string 검출** — 코드에 hardcoded string 있는지

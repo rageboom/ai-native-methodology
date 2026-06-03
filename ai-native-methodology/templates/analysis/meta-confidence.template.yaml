@@ -9,50 +9,60 @@
 #   {치환} 영역 모두 채울 것. (선택) 표시 영역은 phase 따라 생략 가능.
 
 manifest:
-  generated_at: "{YYYY-MM-DD}"
-  poc_id: "{poc-NN-name}"
-  phase: "{0 | 1 | 2 | 3 | 4 | 4.5 | 5-1 | 5-2 | 6}"
-  phase_name: "{phase 이름}"
-  methodology_version: "v{1.2.2}"
+  generated_at: '{YYYY-MM-DD}'
+  poc_id: '{poc-NN-name}'
+  phase: '{0 | 1 | 2 | 3 | 4 | 4.5 | 5-1 | 5-2 | 6}'
+  phase_name: '{phase 이름}'
+  methodology_version: 'v{1.2.2}'
   actor: "{사람 이름 또는 'AI (Claude vN)'}"
 
 # 상위 phase 인계 (phase 0 만 부재)
 upstream_handoff:
-  - source: "../{prev_phase}/_manifest.yml"
-    consistency: "{인계 정합 여부 한 줄}"
+  - source: '../{prev_phase}/_manifest.yml'
+    consistency: '{인계 정합 여부 한 줄}'
 
 # 본 phase 산출물 인벤토리 (이중 렌더링 정합 — 모든 산출물 AI 눈 + 사람 눈 짝 의무 / ADR-008)
 deliverables:
-  - file: "{filename.json}"     # AI 눈
-    purpose: "{용도}"
-    schema: "schemas/{schema}.schema.json {✅ 통과 | ⚠️ 미검증}"
+  - file: '{filename.json}' # AI 눈
+    purpose: '{용도}'
+    schema: 'schemas/{schema}.schema.json {✅ 통과 | ⚠️ 미검증}'
     confidence: 0.NN
-  - file: "{filename.md}"       # 사람 눈
-    purpose: "{사람 가독 요약 / 보고서}"
+  - file: '{filename.md}' # 사람 눈
+    purpose: '{사람 가독 요약 / 보고서}'
     confidence: 0.NN
-  - file: "{filename.mermaid}"  # 사람 눈 (다이어그램)
-    purpose: "{시각화 의도}"
+  - file: '{filename.mermaid}' # 사람 눈 (다이어그램)
+    purpose: '{시각화 의도}'
     confidence: 0.NN
-  - file: "_manifest.yml"
-    purpose: "{본 phase 매니페스트 (본 파일)}"
+  - file: '_manifest.yml'
+    purpose: '{본 phase 매니페스트 (본 파일)}'
     confidence: 0.95
 
 # ───────────────────────────────────────────────────
-# ★ 신뢰도 메타 (ADR-009 정합 — 단계적 신뢰 모델)
+# 신뢰도 메타 (ADR-009 정합 — 단계적 신뢰 모델)
 # ───────────────────────────────────────────────────
 raw_confidence:
-  current: 0.NN              # 본 phase 산출물 평균 신뢰도
-  cap: 0.NN                  # (선택) phase 진입 시 cap (예: Phase 1 0.65 → Phase 3 0.85 격상)
-  delta: "+0.NN"             # (선택) cap 정정 트레이스
-  delta_direction: "{upgrade | downgrade | none}"
+  current: 0.NN # 본 phase 산출물 평균 신뢰도
+  cap: 0.NN # (선택) phase 진입 시 cap (예: Phase 1 0.65 → Phase 3 0.85 격상)
+  delta: '+0.NN' # (선택) cap 정정 트레이스
+  delta_direction: '{upgrade | downgrade | none}'
 
-# ★ ADR-009 단계 추적 — 어디까지 검증됐나
+# ADR-009 단계 추적 — 어디까지 검증됐나
 trust_level:
-  current: 0.NN              # 0.60~1.00 — ADR-009 §2.1 표 정합
-  current_step: N             # 1~8 (1=1차 작성 / 2=cross-validation / 3=★ 자동 도구 / 4=시뮬 페널티 / 5=★ 진짜 도구 / 6=property test / 7=사람 / 8=형식 증명)
+  current: 0.NN # 0.60~1.00 — ADR-009 §2.1 표 정합
+  current_step: N # 1~8 (1=1차 작성 / 2=cross-validation / 3=자동 도구 / 4=시뮬 페널티 / 5=진짜 도구 / 6=property test / 7=사람 / 8=형식 증명)
   validation_history:
-    - {step: "1차 작성",          at: "{YYYY-MM-DD}", actor: "{AI}",          tool_type: "ai_subagent"}
-    - {step: "cross-validation",  at: "{YYYY-MM-DD}", actor: "Senior sub",    tool_type: "ai_subagent"}
+    - {
+        step: '1차 작성',
+        at: '{YYYY-MM-DD}',
+        actor: '{AI}',
+        tool_type: 'ai_subagent',
+      }
+    - {
+        step: 'cross-validation',
+        at: '{YYYY-MM-DD}',
+        actor: 'Senior sub',
+        tool_type: 'ai_subagent',
+      }
     # v1.2.1 자동 도구 — Phase 4.5 산출물에 적용
     # - {step: "drift-validator",   at: "{YYYY-MM-DD}", actor: "automation",    tool_type: "automated_tool", tool_version: "0.1.0", result_summary: "structural drift 0"}
     # - {step: "decision-table-validator", at: "{YYYY-MM-DD}", actor: "automation", tool_type: "automated_tool", tool_version: "0.1.0", result_summary: "5 BR / breaking 0"}
@@ -64,25 +74,25 @@ trust_level:
     #    tool_stderr_path: "out/semgrep.stderr.log",
     #    result_hash: "{SHA256 of SARIF}",
     #    reproduction_command: "semgrep scan --config p/owasp-top-ten --sarif --sarif-output out/semgrep.sarif ."}
-  next_validation: "{다음 단계 — 예: real static tool execution (Sprint 5 carry-over)}"
+  next_validation: '{다음 단계 — 예: real static tool execution (Sprint 5 carry-over)}'
 
-# ★ ADR-009 도구 종류 enum (절대 동일 신뢰도로 표기 X — DEC-static-tool-실행-의무화)
+# ADR-009 도구 종류 enum (절대 동일 신뢰도로 표기 X — DEC-static-tool-실행-의무화)
 tool_type_enum_reference:
-  ai_subagent: "AI sub-agent (Claude / Gemini 등) — +5~15%p"
-  ai_persona_simulation: "★ AI 가 'Static Analyzer 흉내' — -5%p 패널티 + simulation_reason 의무"
-  automated_tool: "★ 자동 검증 도구 (drift-validator / decision-table-validator) — +3~8%p"
-  real_static_tool: "★ 진짜 외부 도구 (Semgrep / PMD / SpotBugs / Daikon / CodeQL) — +5~10%p (5종 물증 의무)"
-  property_test: "Property test 실행 (jqwik / Vitest) — +5%p"
-  human_review: "사람 도메인 전문가 — +5~10%p"
-  formal_proof: "TLA+ / Coq — +5%p (scope 아웃)"
+  ai_subagent: 'AI sub-agent (Claude / Gemini 등) — +5~15%p'
+  ai_persona_simulation: "AI 가 'Static Analyzer 흉내' — -5%p 패널티 + simulation_reason 의무"
+  automated_tool: '자동 검증 도구 (drift-validator / decision-table-validator) — +3~8%p'
+  real_static_tool: '진짜 외부 도구 (Semgrep / PMD / SpotBugs / Daikon / CodeQL) — +5~10%p (5종 물증 의무)'
+  property_test: 'Property test 실행 (jqwik / Vitest) — +5%p'
+  human_review: '사람 도메인 전문가 — +5~10%p'
+  formal_proof: 'TLA+ / Coq — +5%p (scope 아웃)'
 
-# ★ Cross-validation 메타 (formal-spec.schema cross_validation 호환)
+# Cross-validation 메타 (formal-spec.schema cross_validation 호환)
 cross_validation:
-  performed: true              # 미수행 시 신뢰도 -10%p
+  performed: true # 미수행 시 신뢰도 -10%p
   validators:
-    - type: "senior_engineer_subagent"
+    - type: 'senior_engineer_subagent'
       real_tool: false
-      simulation_reason: "AI 검증 보조용 (Senior 페르소나 — DEC-static-tool 정합)"
+      simulation_reason: 'AI 검증 보조용 (Senior 페르소나 — DEC-static-tool 정합)'
       findings_discovered: 0
     # 진짜 도구 사용 시 — formal-spec.schema if/then 강제 (5종 물증 모두 의무)
     # - type: "external_tool"
@@ -96,28 +106,28 @@ cross_validation:
     #   result_hash: "{SHA256}"
     #   reproduction_command: "..."
     #   findings_discovered: N
-  double_hits: 0               # Senior + Static 양쪽 발견 (★★ 격상 후보)
+  double_hits: 0 # Senior + Static 양쪽 발견 (격상 후보)
   drift_detected: 0
-  simulation_only: false       # ★★★ true 시 lint-no-simulation.sh 자동 fail
+  simulation_only: false # true 시 lint-no-simulation.sh 자동 fail
 
 # 본 phase 입력 (Phase 0 manifest 등)
 inputs:
-  - source: "{경로}"
-    type: "{source_code | schema | erd | orm | design_doc | manifest}"
-    confidence_contribution: "+NN%p"
+  - source: '{경로}'
+    type: '{source_code | schema | erd | orm | design_doc | manifest}'
+    confidence_contribution: '+NN%p'
 
 # 본 phase 알려진 한계 (ADR-009 §1.1 6 메커니즘 정합)
 known_limitations:
-  - "{한계 1 — 메커니즘 #N (추출 오류 / 모델 단순화 / SoT 함정 / 형식 한계 / drift / 사람 편향)}"
-  - "{한계 2}"
+  - '{한계 1 — 메커니즘 #N (추출 오류 / 모델 단순화 / SoT 함정 / 형식 한계 / drift / 사람 편향)}'
+  - '{한계 2}'
 
 # 결정적 처리 결과 (filesystem 환경 — phase 별 다름)
 deterministic_results:
   raw_fetch:
-    main_agent: "{N 파일 read + M URL 인용}"
-    sub_agent_document: "{...}"
-    sub_agent_case: "{...}"
-    sub_agent_senior: "{...}"
+    main_agent: '{N 파일 read + M URL 인용}'
+    sub_agent_document: '{...}'
+    sub_agent_case: '{...}'
+    sub_agent_senior: '{...}'
   # phase 별 결정적 통계 (예시):
   # module_count: N
   # dependency_count: M
@@ -126,35 +136,35 @@ deterministic_results:
 
 # 본 phase 핵심 결정 (Auto Mode 자율 적용 — 사용자 일괄 승인 후)
 key_decisions:
-  - id: "DEC-PHASE-{phase}-{POC-ID}-{NNN}"
-    title: "{한 줄 결정}"
-    decision: "{결정 내용}"
-    rationale: "{근거 — 외부 검증 / 사례 / cross-validation 결과}"
+  - id: 'DEC-PHASE-{phase}-{POC-ID}-{NNN}'
+    title: '{한 줄 결정}'
+    decision: '{결정 내용}'
+    rationale: '{근거 — 외부 검증 / 사례 / cross-validation 결과}'
     auto_mode_applied: true
 
 # 명세 §X 승인 게이트 체크리스트
 approval_gate:
-  - check: "{schema 검증}"
-    status: "{✅ | ⚠️ | ❌}"
-  - check: "{이중 렌더링 정합 (.json + .mermaid + .md)}"
-    status: "{✅ | ⚠️}"
-  - check: "{drift-validator 통과 — Phase 4.5 만}"
-    status: "{✅ | N/A | ⚠️}"
-  - check: "{사용자 검토 또는 Auto Mode 적용}"
-    status: "{✅ Auto Mode | ⚠️ 사용자 대기}"
+  - check: '{schema 검증}'
+    status: '{✅ | ⚠️ | ❌}'
+  - check: '{이중 렌더링 정합 (.json + .mermaid + .md)}'
+    status: '{✅ | ⚠️}'
+  - check: '{drift-validator 통과 — Phase 4.5 만}'
+    status: '{✅ | N/A | ⚠️}'
+  - check: '{사용자 검토 또는 Auto Mode 적용}'
+    status: '{✅ Auto Mode | ⚠️ 사용자 대기}'
 
 # 다음 phase 진입 시 인계 사항
 downstream_handoff:
-  - "{핵심 인계 1}"
-  - "{핵심 인계 2}"
+  - '{핵심 인계 1}'
+  - '{핵심 인계 2}'
 
 # Findings 누적 (본 phase 신규 등록)
 findings_phase:
-  - id: "F-NNN"
-    title: "{한 줄}"
-    severity: "{critical | high | medium | low | (positive)}"
-    proposed_fix: "{1라인}"
-    status: "{candidate | promoted | deferred | closed | rejected | merged}"
+  - id: 'F-NNN'
+    title: '{한 줄}'
+    severity: '{critical | high | medium | low | (positive)}'
+    proposed_fix: '{1라인}'
+    status: '{candidate | promoted | deferred | closed | rejected | merged}'
 
 # 누적 통계 (전체 PoC + 누적)
 cumulative_statistics:
@@ -164,7 +174,7 @@ cumulative_statistics:
   poc_deferred: L
   poc_closed: 0
   poc_rejected: 0
-  cumulative_total: N    # 전체 PoC 합산
+  cumulative_total: N # 전체 PoC 합산
   cumulative_promoted: M
   cumulative_deferred: K
   cumulative_closed: L
@@ -174,14 +184,14 @@ cumulative_statistics:
 
 # 본 phase KPI 평가
 phase_kpi:
-  - "✅ {KPI 1 — 정량}"
-  - "✅ {KPI 2}"
-  - "★ {핵심 발견 — Senior 직접 발견 / 메타 finding 등}"
+  - '✅ {KPI 1 — 정량}'
+  - '✅ {KPI 2}'
+  - '{핵심 발견 — Senior 직접 발견 / 메타 finding 등}'
 
 # 다음 단계
 next_actions:
-  - "{Phase {N+1} 진입 또는 사용자 결정 대기}"
-  - "{Sprint X carry-over 항목}"
+  - '{Phase {N+1} 진입 또는 사용자 결정 대기}'
+  - '{Sprint X carry-over 항목}'
 
 # ───────────────────────────────────────────────────
 # 참조
@@ -191,4 +201,4 @@ next_actions:
 # - docs/adr/ADR-008-이중-렌더링-사상.md (이중 렌더링 의무)
 # - docs/adr/ADR-009-다이어그램-신뢰-모델.md (trust_level + tool_type)
 # - schemas/formal-spec.schema.json (cross_validation 5종 물증 if/then — Phase 4.5)
-# - DEC-2026-04-29-static-tool-실행-의무화 (★★★ 시뮬 거부)
+# - DEC-2026-04-29-static-tool-실행-의무화 (시뮬 거부)

@@ -15,7 +15,7 @@
     {
       "id": "TASK-BILLING-001",
       "title": "데이터 확정처리 화면 진입 — 인증/권한 + currYear + companyList 전달",
-      "description": "★ characterization mode. 회계 운영자 인증 + 권한 보유 검증 → currYear (시스템 현재년도) + companyList (★ COM_NO==2 hardcoded / legacy as-is 보존) model 전달 → JSP render. year select option count = currYear-2015+1 강제.",
+      "description": " characterization mode. 회계 운영자 인증 + 권한 보유 검증 → currYear (시스템 현재년도) + companyList ( COM_NO==2 hardcoded / legacy as-is 보존) model 전달 → JSP render. year select option count = currYear-2015+1 강제.",
       "ac_refs": ["AC-BILLING-001", "AC-BILLING-002", "AC-BILLING-003"],
       "behavior_ref": "BHV-BILLING-001",
       "execution_order": 1,
@@ -25,7 +25,7 @@
     {
       "id": "TASK-BILLING-002",
       "title": "데이터 확정 목록 조회 — 12 row 강제 + cross-DB JOIN + window function",
-      "description": "★ characterization mode. year + comNo 입력 → recursive CTE 로 12 row 강제 응답 + cross-DB FIM.dbo.TB_USER JOIN (USER_NM 확장 / ★ AP-BILLING-XDB-001 보존). 데이터 부재 row 도 null PROC_ID 로 12개 응답 (★ BR-BILLING-PERIOD-001).",
+      "description": " characterization mode. year + comNo 입력 → recursive CTE 로 12 row 강제 응답 + cross-DB FIM.dbo.TB_USER JOIN (USER_NM 확장 / AP-BILLING-XDB-001 보존). 데이터 부재 row 도 null PROC_ID 로 12개 응답 ( BR-BILLING-PERIOD-001).",
       "ac_refs": ["AC-BILLING-004", "AC-BILLING-005", "AC-BILLING-006"],
       "behavior_ref": "BHV-BILLING-002",
       "execution_order": 2,
@@ -35,7 +35,7 @@
     {
       "id": "TASK-BILLING-003",
       "title": "데이터 확정 처리 — happy path (4 SQL 순차 + full overwrite)",
-      "description": "★ characterization mode. count > 0 시 4 SQL 순차 실행 (DELETE 기존 + INSERT history + INSERT detail + UPDATE flag) / ★ BR-BILLING-OVERWRITE-003 full overwrite 패턴 / 정상 commit.",
+      "description": " characterization mode. count > 0 시 4 SQL 순차 실행 (DELETE 기존 + INSERT history + INSERT detail + UPDATE flag) / BR-BILLING-OVERWRITE-003 full overwrite 패턴 / 정상 commit.",
       "ac_refs": ["AC-BILLING-007", "AC-BILLING-009"],
       "behavior_ref": "BHV-BILLING-003",
       "execution_order": 3,
@@ -44,8 +44,8 @@
     },
     {
       "id": "TASK-BILLING-004",
-      "title": "★ critical characterization — 4 SQL 비트랜잭션 atomicity loss 보존 + SCOPE_IDENTITY hisNo",
-      "description": "★ ★ ★ ★ critical characterization mode (TDD intent 정면 위배 정합 / Michael Feathers Working Effectively with Legacy Code §characterization test paradigm). saveDataConfirm 4 SQL 비트랜잭션 = 3번째 SQL fail 시 1+2 commit / 3+4 rollback ❌ = ★ data integrity loss legacy bug 보존 (bug fix ❌ / 새 시스템 = TX rollback invariant). SCOPE_IDENTITY 자동 hisNo PK-FK 관계 검증 동반 (★ BR-BILLING-HIST-* 정합).",
+      "title": " critical characterization — 4 SQL 비트랜잭션 atomicity loss 보존 + SCOPE_IDENTITY hisNo",
+      "description": " critical characterization mode (TDD intent 정면 위배 정합 / Michael Feathers Working Effectively with Legacy Code §characterization test paradigm). saveDataConfirm 4 SQL 비트랜잭션 = 3번째 SQL fail 시 1+2 commit / 3+4 rollback ❌ = data integrity loss legacy bug 보존 (bug fix ❌ / 새 시스템 = TX rollback invariant). SCOPE_IDENTITY 자동 hisNo PK-FK 관계 검증 동반 ( BR-BILLING-HIST-* 정합).",
       "ac_refs": ["AC-BILLING-008", "AC-BILLING-010"],
       "behavior_ref": "BHV-BILLING-003",
       "execution_order": 4,
@@ -55,7 +55,7 @@
     {
       "id": "TASK-BILLING-005",
       "title": "데이터 확정 처리 — ERP 결과 부재 (count=0) skip + JSP alert",
-      "description": "★ characterization. saveDataConfirm pre-check selectConfirmDataCount (SGERPMA.dbo.TB_RG_*) → count == 0 시 skip + JSP alert + no-op (★ BR-BILLING-ERP-* 정합 / 4 SQL 미실행).",
+      "description": " characterization. saveDataConfirm pre-check selectConfirmDataCount (SGERPMA.dbo.TB_RG_*) → count == 0 시 skip + JSP alert + no-op ( BR-BILLING-ERP-* 정합 / 4 SQL 미실행).",
       "ac_refs": ["AC-BILLING-011"],
       "behavior_ref": "BHV-BILLING-004",
       "execution_order": 5,
@@ -65,7 +65,7 @@
     {
       "id": "TASK-BILLING-006",
       "title": "Qlik Sense BI dashboard iframe 임베드 (URL hardcoded as-is)",
-      "description": "★ characterization mode. menuNm + apId 기반 Qlik Sense URL (★ hardcoded as-is 보존 / ★ AP-BILLING-URL-* 보존) iframe 임베드. 새 시스템 = 환경 변수 의무 invariant (별도 paradigm).",
+      "description": " characterization mode. menuNm + apId 기반 Qlik Sense URL ( hardcoded as-is 보존 / AP-BILLING-URL-* 보존) iframe 임베드. 새 시스템 = 환경 변수 의무 invariant (별도 paradigm).",
       "ac_refs": ["AC-BILLING-012"],
       "behavior_ref": "BHV-BILLING-005",
       "execution_order": 6,
@@ -78,9 +78,9 @@
       "id": "ADR-BILLING-001",
       "title": "Characterization mode 채택 — legacy bug 보존 (TDD intent 위배 정합)",
       "status": "accepted",
-      "decision": "Michael Feathers Working Effectively with Legacy Code §characterization test paradigm 정합. 사용자 결단 Q3=(b) — 현 behavior 보존 + bug fix ❌. saveDataConfirm 4 SQL 비트랜잭션 atomicity loss = ★ legacy bug as-is 보존 (test 가 bug 까지 묶음 / 새 시스템 마이그레이션 시 invariant 별도 명문화).",
+      "decision": "Michael Feathers Working Effectively with Legacy Code §characterization test paradigm 정합. 사용자 결단 Q3=(b) — 현 behavior 보존 + bug fix ❌. saveDataConfirm 4 SQL 비트랜잭션 atomicity loss = legacy bug as-is 보존 (test 가 bug 까지 묶음 / 새 시스템 마이그레이션 시 invariant 별도 명문화).",
       "alternatives": [
-        {"option": "Bug fix mode — 4 SQL 을 TX 로 묶고 atomicity 보장", "rejection_reason": "★ legacy behavior 변경 = downstream 산출물 (history table) 의 'partial commit' 상태 의존 시스템 깨짐 / safe 리팩토링 paradigm 위배 / Feathers 의 'characterization first / refactor after' 원칙 위배"},
+        {"option": "Bug fix mode — 4 SQL 을 TX 로 묶고 atomicity 보장", "rejection_reason": " legacy behavior 변경 = downstream 산출물 (history table) 의 'partial commit' 상태 의존 시스템 깨짐 / safe 리팩토링 paradigm 위배 / Feathers 의 'characterization first / refactor after' 원칙 위배"},
         {"option": "Bug coexistence — 두 모드 (legacy + fixed) 병행", "rejection_reason": "복잡도 폭증 / test matrix 2배 / 운영 환경 분기 비용 / characterization 본질 위배"},
         {"option": "Bug document only — 명문화만, code 변경 ❌", "rejection_reason": "test 가 bug 검증 안 함 = 의도와 다른 동작 시 감지 불가 / characterization test paradigm 의 '현 behavior 잠금' 본질 결여"}
       ],
@@ -110,8 +110,8 @@
       "id": "RISK-BILLING-001",
       "severity": "high",
       "type": "design",
-      "description": "★ characterization mode 운영자/신규 개발자 오인 — 'bug 이지만 보존' 의도 미인지 시 후속 작업에서 bug fix 시도 → legacy 시스템 wholesale 깨짐.",
-      "mitigation": "★ TASK-BILLING-004 코드 + test 에 characterization mode 명시 주석 의무 + run-log 등재 + ADR-BILLING-001 cross-link. 새 개발자 onboarding 시 명시 안내.",
+      "description": " characterization mode 운영자/신규 개발자 오인 — 'bug 이지만 보존' 의도 미인지 시 후속 작업에서 bug fix 시도 → legacy 시스템 wholesale 깨짐.",
+      "mitigation": " TASK-BILLING-004 코드 + test 에 characterization mode 명시 주석 의무 + run-log 등재 + ADR-BILLING-001 cross-link. 새 개발자 onboarding 시 명시 안내.",
       "task_refs": ["TASK-BILLING-004"]
     },
     {
@@ -135,7 +135,7 @@
       "severity": "medium",
       "type": "design",
       "description": "Qlik Sense URL hardcoded — environment 변경 (dev/staging/prod) 시 manual 변경 필요 / 환경별 분기 ❌.",
-      "mitigation": "★ characterization mode = legacy as-is 보존 / 새 시스템 마이그레이션 시 환경 변수 invariant 명문화 (별도 paradigm).",
+      "mitigation": " characterization mode = legacy as-is 보존 / 새 시스템 마이그레이션 시 환경 변수 invariant 명문화 (별도 paradigm).",
       "task_refs": ["TASK-BILLING-006"]
     },
     {
@@ -159,7 +159,7 @@
       "id": "NFR-BILLING-002",
       "characteristic": "reliability",
       "severity": "high",
-      "description": "★ characterization mode invariant — legacy behavior 100% 보존 (saveDataConfirm 4 SQL 비트랜잭션 포함). 새 시스템 = 별도 마이그레이션 spec.",
+      "description": " characterization mode invariant — legacy behavior 100% 보존 (saveDataConfirm 4 SQL 비트랜잭션 포함). 새 시스템 = 별도 마이그레이션 spec.",
       "task_refs": ["TASK-BILLING-003", "TASK-BILLING-004", "TASK-BILLING-005"]
     },
     {

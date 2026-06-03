@@ -10,11 +10,12 @@
 ## 컨텍스트
 
 DEC-2026-05-21 carry `C-v4.1-input-skill-이관` 의 결단:
+
 - v9.0.0 신설 `discovery-from-*` 4종 (analysis-output / figma / swagger / nl-md) 중 3종(figma/swagger/nl-md)이 PLACEHOLDER 그대로 (v9.0.0/v10.0.0 동안 본격 구현 안 됨).
 - analysis stage 의 `analysis-from-*` 4종 (figma / swagger / prompt / plan-doc) = 본격 구현 (MCP figma-desktop / openapi-parser 등).
 - figma / swagger 2종 = 양쪽 stage 에 동일 source 입력 어댑터 = **실 중복**.
 
-원 carry 의도: "discovery 신설 / analysis-from-* 흡수 여부는 본격 검토 후 결단" — 흡수 vs 평행 vs 양쪽 유지 vs 폐기 의 4 옵션 결단 의무.
+원 carry 의도: "discovery 신설 / analysis-from-\* 흡수 여부는 본격 검토 후 결단" — 흡수 vs 평행 vs 양쪽 유지 vs 폐기 의 4 옵션 결단 의무.
 
 사용자 결단 paradigm: **"최초 분석 = analysis stage / 이후 = 다양한 input 으로 chain 진입"** = baseline-delta 운영 모델 (v10.0.1 DEC-2026-05-26-baseline-delta-operating-model) 의 입력 측면.
 
@@ -22,12 +23,13 @@ DEC-2026-05-21 carry `C-v4.1-input-skill-이관` 의 결단:
 
 ### §1. 두 set 평행 유지 + timing/책임 분리
 
-| set | timing | 책임 | skill |
-|---|---|---|---|
-| `analysis-from-*` (4) | **최초 1회** (legacy baseline 수립) | analysis 산출물 (visual-manifest / ui-state-map / inventory / domain 등 canonical global `.aimd/output/`) | `analysis-from-{figma, swagger, prompt, plan-doc}` ★ 모두 본격 구현 |
-| `discovery-from-*` (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec (discovery 산출) | `discovery-from-{analysis-output(★본격), figma(light placeholder), swagger(light placeholder), nl-md(light placeholder)}` |
+| set                    | timing                               | 책임                                                                                                      | skill                                                                                                                    |
+| ---------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `analysis-from-*` (4)  | **최초 1회** (legacy baseline 수립)  | analysis 산출물 (visual-manifest / ui-state-map / inventory / domain 등 canonical global `.aimd/output/`) | `analysis-from-{figma, swagger, prompt, plan-doc}` 모두 본격 구현                                                        |
+| `discovery-from-*` (4) | **신규 건마다** (scope 진입 trigger) | UC + intent + flow 추출 → planning-spec (discovery 산출)                                                  | `discovery-from-{analysis-output(본격), figma(light placeholder), swagger(light placeholder), nl-md(light placeholder)}` |
 
 **같은 source(figma/swagger/NL md) 라도 다른 timing/다른 책임**:
+
 - baseline 시 figma → `analysis-from-figma` → visual-manifest / ui-state-map / design tokens 등 **analysis 산출물**.
 - 신규 scope 진입 시 figma → `discovery-from-figma` → **UC + interaction flow + intent** → planning-spec.
 
@@ -36,6 +38,7 @@ DEC-2026-05-21 carry `C-v4.1-input-skill-이관` 의 결단:
 ### §2. ~~light 본격 구현 deferred~~ → **v10.1.0 본격 구현 완료** (DEC-2026-05-26-discovery-input-bodies)
 
 본 결단(v10.0.4)에서 trigger carry 로 보류했던 `discovery-from-{figma, swagger, nl-md}` 본격 구현 = **v10.1.0 MINOR 에서 본격 구현 완료** (사용자 결단 override / "잔여 적용"):
+
 - `skills/discovery-from-figma/SKILL.md` — figma MCP tools (4종) 기반 frame → UC + flow + intent 추출 procedure 본격 명세
 - `skills/discovery-from-swagger/SKILL.md` — OpenAPI parse → operation 별 UC + I/O contract + NFR(부) 추출 procedure 본격 명세
 - `skills/discovery-from-nl-md/SKILL.md` — markdown/NL prompt → UC + BR-INTENT + NFR(1차) + risk 추출 procedure 본격 명세
@@ -44,7 +47,7 @@ DEC-2026-05-21 carry `C-v4.1-input-skill-이관` 의 결단:
 
 ### §3. 시행 (additive doc / breaking 0)
 
-- 3 placeholder description 갱신: `skills/discovery-from-{figma, swagger, nl-md}/SKILL.md` first-line description = paradigm 반영 + analysis-from-* timing 분리 명시 + use case 트리거 carry 표기.
+- 3 placeholder description 갱신: `skills/discovery-from-{figma, swagger, nl-md}/SKILL.md` first-line description = paradigm 반영 + analysis-from-\* timing 분리 명시 + use case 트리거 carry 표기.
 - `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 다음에 **§Input 어댑터 timing 분리** 신설 (두 set 평행 표 + 같은 source 다른 timing 설명).
 - `guides/first-prompt-cookbook.md` §2.1 timing 분리 note.
 - `decisions/DEC-2026-05-21-chain-discovery-plan-stage-도입.md` carry 표 `C-v4.1-input-skill-이관` ✅ 종결 표기.

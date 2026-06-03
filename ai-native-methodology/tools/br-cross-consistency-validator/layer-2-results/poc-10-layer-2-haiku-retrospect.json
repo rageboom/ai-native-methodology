@@ -18,5 +18,5 @@
     "below_0.7_count": 0,
     "below_0.7_brs": []
   },
-  "cross_validation_notes": "blind retrospect / Sonnet 미열람. 5 BR 0.88~0.96 = 높은 정합 / drift 0. 모든 규칙 intent=true 정합 확인. Sonnet(0.868) vs Haiku(0.924) delta = +0.056 → Haiku 더 관대 / Sonnet 상향 self-eval bias ❌. ★ PoC #08 과 대조 — #10 은 is_likely_bug BR 부재로 echo chamber drift 미발생 (#08 PASSWD/ORDQRY 대비 control)."
+  "cross_validation_notes": "blind retrospect / Sonnet 미열람. 5 BR 0.88~0.96 = 높은 정합 / drift 0. 모든 규칙 intent=true 정합 확인. Sonnet(0.868) vs Haiku(0.924) delta = +0.056 → Haiku 더 관대 / Sonnet 상향 self-eval bias ❌. PoC #08 과 대조 — #10 은 is_likely_bug BR 부재로 echo chamber drift 미발생 (#08 PASSWD/ORDQRY 대비 control)."
 }

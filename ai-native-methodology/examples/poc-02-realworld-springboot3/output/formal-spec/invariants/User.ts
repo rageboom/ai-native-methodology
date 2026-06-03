@@ -20,7 +20,7 @@ type Email = string & {
   readonly __refinement: {
     readonly notNull: true;
     readonly notBlank: true;
-    readonly maxLength: 30;       // ★ F-054
+    readonly maxLength: 30;       //  F-054
     readonly uniqueScope: 'global';
   };
 };
@@ -36,7 +36,7 @@ type Username = string & {
   readonly __refinement: {
     readonly notNull: true;
     readonly notBlank: true;
-    readonly maxLength: 30;       // ★ F-055
+    readonly maxLength: 30;       //  F-055
     readonly uniqueScope: 'global';
   };
 };
@@ -52,7 +52,7 @@ type EncryptedPassword = string & {
   readonly __refinement: {
     readonly notNull: true;
     readonly prefix: '$2a$' | '$2b$' | '$2y$';   // BCrypt
-    readonly maxLength: 200;                      // ★ F-056
+    readonly maxLength: 200;                      //  F-056
   };
 };
 

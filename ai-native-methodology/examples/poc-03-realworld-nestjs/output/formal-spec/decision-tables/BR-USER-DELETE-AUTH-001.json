@@ -2,15 +2,15 @@
   "$schema": "https://ai-native-methodology/schemas/formal-spec.schema.json#/properties/decision_tables/items",
   "br_id": "BR-USER-DELETE-AUTH-001",
   "trigger": "DELETE /api/users/:slug",
-  "condition": "(★★ AuthMiddleware 미적용 — F-140 critical) — 누구나 삭제 가능",
+  "condition": "( AuthMiddleware 미적용 — F-140 critical) — 누구나 삭제 가능",
   "action": "userRepository.delete({email})",
-  "expected_result": "(★★ 권한 검증 부재 — 누구나 삭제 가능)",
+  "expected_result": "( 권한 검증 부재 — 누구나 삭제 가능)",
   "rejection_method": "(없음 — F-140 fix 권고: throw 401 if anonymous + throw 403 if not owner)",
-  "verification_location": "(★ AuthMiddleware 미적용 / Service 단 소유권 ❌ / Domain ❌)",
+  "verification_location": "( AuthMiddleware 미적용 / Service 단 소유권 ❌ / Domain ❌)",
   "http_status": 200,
   "error_message": "(없음)",
   "current_state": "absent",
-  "current_state_note": "★★ F-140 critical 신규 (AuthMiddleware 미적용)",
+  "current_state_note": " F-140 critical 신규 (AuthMiddleware 미적용)",
   "round_trip_pattern": "A (자연어 → 형식 → 코드 권장) — 코드 부재",
   "natural_language_gap_quantified": {
     "explicit": 3,
@@ -44,7 +44,7 @@
     {
       "item": "검증 위치",
       "decision": "Guard (JwtAuthGuard) + Service (req.user.email === target email check)",
-      "rationale": "★ NestJS 권장 = Guard / Sairyss 권장 = Service 도 추가 보강"
+      "rationale": " NestJS 권장 = Guard / Sairyss 권장 = Service 도 추가 보강"
     },
     {
       "item": "HTTP status",
@@ -53,7 +53,7 @@
     },
     {
       "item": "cascade 처리",
-      "decision": "★★ 의무 명시 — articles soft delete + favorites/follows/comments orphan 처리 정책",
+      "decision": " 의무 명시 — articles soft delete + favorites/follows/comments orphan 처리 정책",
       "rationale": "현재 = orphan 무처리 (FK 부재 F-121 합산)"
     }
   ],

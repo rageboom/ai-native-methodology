@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 snapshot — UC-RW-018 Follow (★ uniqueness check + AP-RW-004 self-check 늦음).",
+  "$comment": " phase 4.7 snapshot — UC-RW-018 Follow ( uniqueness check + AP-RW-004 self-check 늦음).",
   "snapshot_id": "SNAP-UC-RW-018",
   "use_case": "UC-RW-018",
   "endpoint": "POST /profiles/:username/follow",
@@ -18,10 +18,10 @@
     },
     {
       "id": "SCN-RW-018-002",
-      "name": "edge — self-follow 차단 (★ AP-RW-004 늦은 검증)",
+      "name": "edge — self-follow 차단 ( AP-RW-004 늦은 검증)",
       "given": {"followerEmail": "alice@example.com", "username": "alice"},
-      "when": "userRepository.findOne x2 (★ ★ DB call 후 self-check) → followingUser.email === followerEmail → HttpException(BAD_REQUEST)",
-      "then": {"expected_response": "400 BAD_REQUEST", "_note": "★ ★ AP-RW-004 — self-check 가 DB call 후 → 불필요한 DB 호출 / 모범 = controller 레벨 validation"},
+      "when": "userRepository.findOne x2 ( DB call 후 self-check) → followingUser.email === followerEmail → HttpException(BAD_REQUEST)",
+      "then": {"expected_response": "400 BAD_REQUEST", "_note": " AP-RW-004 — self-check 가 DB call 후 → 불필요한 DB 호출 / 모범 = controller 레벨 validation"},
       "intent_classification": [{"rule": "AP-RW-004", "type": "ambiguous", "note": "self-check 늦은 검증 / 효과 미세 / D2.5 결단 ambiguous 유지"}],
       "behavior_likely_bug": ["DB call 후 self-check = 불필요한 DB 호출 (성능 minor)"],
       "behavior_to_preserve": ["self-follow 차단 자체 (BAD_REQUEST 반환)"]

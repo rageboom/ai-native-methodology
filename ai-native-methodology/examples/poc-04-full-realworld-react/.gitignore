@@ -1,8 +1,8 @@
 INPUT/
 _tools/node_modules/
 
-# ★ v1.4.1 PATCH — Semgrep raw 산출물 (재현 가능 / 1.1MB / .gitignore default).
-# evidence.json + baseline.json + static-security-spec.json 은 commit 의무 (★ 5종 물증 메타 보존).
+# v1.4.1 PATCH — Semgrep raw 산출물 (재현 가능 / 1.1MB / .gitignore default).
+# evidence.json + baseline.json + static-security-spec.json 은 commit 의무 (5종 물증 메타 보존).
 analysis/6-quality/semgrep-output/*.sarif
 analysis/6-quality/semgrep-output/*.log
 analysis/6-quality/semgrep-output-ratchet/

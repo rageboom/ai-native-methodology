@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-002 selectExchangeList (연간 통화별 12개월 환율 조회 Ajax). 실 DB 환경 부재 → 코드 + IFRS 회계 도메인 추정 기반 작성 / 도메인 expert 검증 carry.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-EXCHANGE-002 selectExchangeList (연간 통화별 12개월 환율 조회 Ajax). 실 DB 환경 부재 → 코드 + IFRS 회계 도메인 추정 기반 작성 / 도메인 expert 검증 carry.",
   "snapshot_id": "SNAP-UC-EXCHANGE-002",
   "use_case": "UC-EXCHANGE-002",
   "endpoint": "POST /ifrs/exchange/exchangeViewAjax",
@@ -7,7 +7,7 @@
   "service_method": "ExchangeService.selectExchangeList",
   "sql_id": "ExchangeDAO.selectExchangeList",
   "layer": "integration (Controller → Service → DAO → SQL)",
-  "data_source_status": "★ 실 DB 환경 부재 (MSSQL 미접속 / TB_EXCHANGE 가상 데이터)",
+  "data_source_status": "실 DB 환경 부재 (MSSQL 미접속 / TB_EXCHANGE 가상 데이터)",
   "scenarios": [
     {
       "id": "SCN-002-001",

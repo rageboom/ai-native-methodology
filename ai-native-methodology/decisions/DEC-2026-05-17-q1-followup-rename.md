@@ -1,7 +1,7 @@
 # DEC-2026-05-17-q1-followup-rename
 
-- **상태**: 승인 (★ 사용자 "추천안 묶음 + 지금 시행" / 4원칙 lightweight / v6.1.0 MINOR)
-- **일자**: 2026-05-17 (★ session 26차 연속 / v6.1.0 MINOR / 사용자 "지금 시행" cooling-off 생략)
+- **상태**: 승인 ( 사용자 "추천안 묶음 + 지금 시행" / 4원칙 lightweight / v6.1.0 MINOR)
+- **일자**: 2026-05-17 ( session 26차 연속 / v6.1.0 MINOR / 사용자 "지금 시행" cooling-off 생략)
 - **결정자**: 윤주스 (TF Lead) — 사용자 "1"(묶음 Q 잔여) → "Q-①-followup 먼저"(risk 오름차순) → "추천안 묶음 + 지금 시행"
 - **관련**: DEC-2026-05-17-q1-alias-4중첩-폐기 §1 #4 + LL-i-52 (carry origin / "semantic-rename ≠ alias 폐기") / DEC-2026-05-17-q2-br-표현-4to2 (직전 v6.0.0) / ADR-CHAIN-011 §5 patch v15 + §9 LL-i-56
 
@@ -15,15 +15,15 @@
 
 ### §1. 사용자 결단 (추천안 묶음 + 사실 확정)
 
-| D | 결단 | 근거 (3-에이전트 수렴) |
-|---|---|---|
-| D1 version | ★ **v6.1.0 MINOR** (사실 확정 / choice ❌) | official-docs(semver spec MAJOR 강제 ❌ / public API 경계=프로젝트 재량) + industry(zero-consumer 실용주의 + 연속 MAJOR signal 희석 batch 통설) + Senior(src consumer 0 + poc-04 단일 holder atomic 마이그레이션 = textbook MINOR additive-equivalent / v7.0.0 = semver inflation = 역방향 integrity drift / LL-i-52 'semantic-rename ≠ alias 폐기' → version 논리도 분리) |
-| D2 문서 처분 | 역사 DEC/STATUS/INDEX = 보존 / 활성 SSOT 만 갱신 + ★ schema description forward-pointer 재작성 | Senior CONCUR + 누락 보정 (schema 자체 forward-pointer = active SSOT) |
-| D3 cooling-off | 지금 시행 (생략) | 사용자 명시 / ①② 동형 |
-| D4 guard test | canonical-single-alias.test.js 보존→rename후 보존+구명 재유입 0 전환 + ② guard 비교란 확인 | Senior CONCUR + 추가 |
-| process | ★ lightweight (3-에이전트 가벼운 sub-agent / full Phase-3 생략) | ★ ★ LL-i-54 정당 (breaking 동형 ≠ 비용 동형 / 11 file·src consumer 0·순수 rename) — ① DEC §1 #4 "별도 plan+4원칙" 문자적 일탈을 LL-i-54 로 정당화 (향후 "왜 full research 생략?" drift 회피 위해 본 DEC 명시) |
+| D              | 결단                                                                                         | 근거 (3-에이전트 수렴)                                                                                                                                                                                                                                                                                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1 version     | **v6.1.0 MINOR** (사실 확정 / choice ❌)                                                     | official-docs(semver spec MAJOR 강제 ❌ / public API 경계=프로젝트 재량) + industry(zero-consumer 실용주의 + 연속 MAJOR signal 희석 batch 통설) + Senior(src consumer 0 + poc-04 단일 holder atomic 마이그레이션 = textbook MINOR additive-equivalent / v7.0.0 = semver inflation = 역방향 integrity drift / LL-i-52 'semantic-rename ≠ alias 폐기' → version 논리도 분리) |
+| D2 문서 처분   | 역사 DEC/STATUS/INDEX = 보존 / 활성 SSOT 만 갱신 + schema description forward-pointer 재작성 | Senior CONCUR + 누락 보정 (schema 자체 forward-pointer = active SSOT)                                                                                                                                                                                                                                                                                                      |
+| D3 cooling-off | 지금 시행 (생략)                                                                             | 사용자 명시 / ①② 동형                                                                                                                                                                                                                                                                                                                                                      |
+| D4 guard test  | canonical-single-alias.test.js 보존→rename후 보존+구명 재유입 0 전환 + ② guard 비교란 확인   | Senior CONCUR + 추가                                                                                                                                                                                                                                                                                                                                                       |
+| process        | lightweight (3-에이전트 가벼운 sub-agent / full Phase-3 생략)                                | LL-i-54 정당 (breaking 동형 ≠ 비용 동형 / 11 file·src consumer 0·순수 rename) — ① DEC §1 #4 "별도 plan+4원칙" 문자적 일탈을 LL-i-54 로 정당화 (향후 "왜 full research 생략?" drift 회피 위해 본 DEC 명시)                                                                                                                                                                  |
 
-★ version = **v6.1.0 MINOR 사실 확정** (선택지 아님 / ① "version=사실 확정" 선례 정합). ① "MINOR 호칭=integrity drift" 는 alias 폐기+real consumer 맥락 한정 — 본 건은 반대로 v7.0.0 강제가 semver inflation = integrity drift.
+version = **v6.1.0 MINOR 사실 확정** (선택지 아님 / ① "version=사실 확정" 선례 정합). ① "MINOR 호칭=integrity drift" 는 alias 폐기+real consumer 맥락 한정 — 본 건은 반대로 v7.0.0 강제가 semver inflation = integrity drift.
 
 ### §2. 시행
 
@@ -45,7 +45,7 @@
 
 - ①(v5.0.0) ②(v6.0.0) ④(v4.1.1) **+ Q-①-followup(v6.1.0)** 종결. **잔여 = ⑦ 단독** (rules.json→business-rules.json rename / 642 occ·252 files / breaking 최대 / 별도 session + 4원칙 full + cooling-off).
 
-## Lessons Learned 등재 (★ session 26차 / ADR-CHAIN-011 §9)
+## Lessons Learned 등재 ( session 26차 / ADR-CHAIN-011 §9)
 
 - **LL-i-56** — "동일 cluster(묶음 Q) 내 항목이라도 consumer 분포·breaking 성격 차이 시 version tier 분리 의무 — alias 폐기(real consumer / valid→invalid / MAJOR) vs semantic-rename(zero consumer / atomic 동시 마이그레이션 / MINOR additive-equivalent). scope 분리(LL-i-52)는 version tier 분리를 **동반**해야 정합 — 일괄 MAJOR 강제 = semver inflation = 역방향 integrity drift. + 소작업 process depth = LL-i-54 정합 (breaking 동형 ≠ 비용 동형 → lightweight research 정당 / 단 DEC 에 일탈 근거 명시 = 향후 drift 회피)."
 

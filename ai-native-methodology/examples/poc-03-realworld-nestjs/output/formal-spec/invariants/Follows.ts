@@ -5,15 +5,15 @@
  * Source of Truth: 코드 (src/profile/profile.service.ts + follows.entity.ts)
  * Direction: B (코드 → L2)
  *
- * ★ Senior 권고 — 약한 Aggregate (id 기반 lookup 만) + Sairyss-style 권고
- * ★★ F-144 — Domain invariant 부재로 self-check 차원 불일치 (follow=email / unFollow=id)
+ *  Senior 권고 — 약한 Aggregate (id 기반 lookup 만) + Sairyss-style 권고
+ *  F-144 — Domain invariant 부재로 self-check 차원 불일치 (follow=email / unFollow=id)
  */
 
 type UserId = number & { readonly __brand: 'UserId' };
 type FollowsId = number & { readonly __brand: 'FollowsId' };
 
 // ============================================================================
-// Distinct User Pair (★ NEW — F-144 + F-147 fix)
+// Distinct User Pair ( NEW — F-144 + F-147 fix)
 // ============================================================================
 
 type DistinctUserPair = readonly [follower: UserId, following: UserId] & {
@@ -28,7 +28,7 @@ interface FollowsEntity {
   readonly id: FollowsId;
   readonly followerId: UserId;
   readonly followingId: UserId;
-  // ★ FK 부재 (F-121) — UserEntity 직접 참조 ❌
+  //  FK 부재 (F-121) — UserEntity 직접 참조 ❌
 }
 
 // ============================================================================
@@ -37,17 +37,17 @@ interface FollowsEntity {
 
 namespace FollowsInvariants {
   /**
-   * INV-FOLLOWS-NO-SELF (★ F-144 + F-147)
+   * INV-FOLLOWS-NO-SELF ( F-144 + F-147)
    * - rules.json BR-FOLLOWS-NO-SELF-001
-   * - ★ id 통일 (현재 = follow=email / unFollow=id 차원 불일치)
+   * -  id 통일 (현재 = follow=email / unFollow=id 차원 불일치)
    */
   export const noSelfFollow = (follow: FollowsEntity): boolean =>
     follow.followerId !== follow.followingId;
 
   /**
-   * INV-FOLLOWS-PAIR-UNIQUE (★ F-121)
+   * INV-FOLLOWS-PAIR-UNIQUE ( F-121)
    * - rules.json BR-FOLLOWS-PAIR-UNIQUE-001
-   * - ★ DB UQ pair 부재 → App 1중만 보장
+   * -  DB UQ pair 부재 → App 1중만 보장
    */
   export const pairUnique = (follows: FollowsEntity[]): boolean =>
     follows.every((f1, i) =>
@@ -57,7 +57,7 @@ namespace FollowsInvariants {
     );
 
   /**
-   * INV-FOLLOWS-FK-VALID (★ F-121)
+   * INV-FOLLOWS-FK-VALID ( F-121)
    * - DB FK 부재 → followerId / followingId 가 user.id 참조 보장 ❌
    * - 본 invariant 는 (사용자 환경) DB CHECK 또는 catch 로 보강 의무
    */
@@ -66,7 +66,7 @@ namespace FollowsInvariants {
 }
 
 // ============================================================================
-// ★ D4 권고 — Sairyss-style Smart Constructor (Domain invariant 강제)
+//  D4 권고 — Sairyss-style Smart Constructor (Domain invariant 강제)
 // ============================================================================
 
 /**
@@ -76,7 +76,7 @@ namespace FollowsInvariants {
  *   private constructor(private props: FollowsProps) {}
  *
  *   static create(followerId: UserId, followingId: UserId): FollowsEntity {
- *     // ★ NEW — F-144 + F-147 fix
+ *     //  NEW — F-144 + F-147 fix
  *     if (followerId === followingId) {
  *       throw new InvalidFollowsError('follower and following must be different');
  *     }

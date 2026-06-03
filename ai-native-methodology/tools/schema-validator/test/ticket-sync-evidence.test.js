@@ -19,445 +19,646 @@ const CLI = resolve(__dirname, '../src/cli.js');
 const TMP = resolve(__dirname, '_tmp_ticket_sync_evidence');
 
 function runCli(args) {
-  return spawnSync('node', [CLI, ...args], {
-    encoding: 'utf-8',
-    cwd: resolve(__dirname, '../..'),
-  });
+	return spawnSync('node', [CLI, ...args], {
+		encoding: 'utf-8',
+		cwd: resolve(__dirname, '../..'),
+	});
 }
 
 function ensureTmp() {
-  if (existsSync(TMP)) rmSync(TMP, { recursive: true, force: true });
-  mkdirSync(TMP, { recursive: true });
+	if (existsSync(TMP)) rmSync(TMP, { recursive: true, force: true });
+	mkdirSync(TMP, { recursive: true });
 }
 
 const META_OK = {
-  generated_at: '2026-05-18T14:30:00+09:00',
-  confidence: 0.9,
-  inputs_used: ['source_code', 'documentation'],
-  methodology_version: 'v8.6.1',
+	generated_at: '2026-05-18T14:30:00+09:00',
+	confidence: 0.9,
+	inputs_used: ['source_code', 'documentation'],
+	methodology_version: 'v8.6.1',
 };
 
 const VALID_INVOCATION = {
-  mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
-  tool_stdout_path: '.aimd/output/evidence/mcp-stdout-1.log',
-  tool_stderr_path: '.aimd/output/evidence/mcp-stderr-1.log',
-  tool_version: '1.4.2',
-  invocation_timestamp: '2026-05-18T14:30:00+09:00',
-  duration_ms: 1234,
-  result_hash: 'a'.repeat(64),
-  reproduction_command: 'mcp__wiki-jira-assistant__jira_create with summary=[UC-CAR-007] ...',
+	mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+	tool_stdout_path: '.aimd/output/evidence/mcp-stdout-1.log',
+	tool_stderr_path: '.aimd/output/evidence/mcp-stderr-1.log',
+	tool_version: '1.4.2',
+	invocation_timestamp: '2026-05-18T14:30:00+09:00',
+	duration_ms: 1234,
+	result_hash: 'a'.repeat(64),
+	reproduction_command:
+		'mcp__wiki-jira-assistant__jira_create with summary=[UC-CAR-007] ...',
 };
 
 test('R20 ticket-sync-evidence — valid sample (stage=planning / real MCP invocation)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    scope: 'car',
-    mcp_invocations: [VALID_INVOCATION],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl#entry=2026-05-18T14:29:55',
-    evidence_trust: 'real_tool',
-    preview_md_digest: 'b'.repeat(64),
-    dry_run: false,
-    idempotency_skip_count: 0,
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `valid sample 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			scope: 'car',
+			mcp_invocations: [VALID_INVOCATION],
+			confirmation_log_ref:
+				'.aimd/output/intervention-log.jsonl#entry=2026-05-18T14:29:55',
+			evidence_trust: 'real_tool',
+			preview_md_digest: 'b'.repeat(64),
+			dry_run: false,
+			idempotency_skip_count: 0,
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`valid sample 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 ticket-sync-evidence — valid sample (stage=analysis / dry_run=true)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'analysis',
-    scope: 'car',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      mcp_tool_name: 'mcp__wiki-jira-assistant__wiki_page_create',
-      ticket_id_created: 'WIKI-123',
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-    dry_run: true,
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `dry_run sample 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'analysis',
+			scope: 'car',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__wiki-jira-assistant__wiki_page_create',
+					ticket_id_created: 'WIKI-123',
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+			dry_run: true,
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(r.status, 0, `dry_run sample 의무. stdout:${r.stdout}`);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 ticket-sync-evidence — evidence_trust = "simulated" reject (R15 영구 거부)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    mcp_invocations: [VALID_INVOCATION],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'simulated',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `simulated 영구 거부 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			mcp_invocations: [VALID_INVOCATION],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'simulated',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(r.status, 0, `simulated 영구 거부 의무. stdout:${r.stdout}`);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 ticket-sync-evidence — mcp_tool_name pattern (mcp__wiki-jira-assistant__ prefix only)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      mcp_tool_name: 'mcp__linear__create_issue', // Linear MCP reject (R20 Tier 2.5 = jira-confluence only)
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `Linear MCP reject 의무 (v8.6.1 = jira-confluence only / v8.7.0+ multi-platform carry). stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__linear__create_issue', // Linear MCP reject (R20 Tier 2.5 = jira-confluence only)
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`Linear MCP reject 의무 (v8.6.1 = jira-confluence only / v8.7.0+ multi-platform carry). stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 ticket-sync-evidence — 7-field evidence 누락 reject (reproduction_command 의무)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  const { reproduction_command, ...partial } = VALID_INVOCATION;
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    mcp_invocations: [partial],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `reproduction_command 의무 (R15 정합). stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	const { reproduction_command, ...partial } = VALID_INVOCATION;
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			mcp_invocations: [partial],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`reproduction_command 의무 (R15 정합). stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 ticket-sync-evidence — result_hash sha256 pattern 검증 (64 hex)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      result_hash: 'too_short', // not 64 hex
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `result_hash sha256 pattern 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					result_hash: 'too_short', // not 64 hex
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`result_hash sha256 pattern 의무. stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 traceability-matrix — ticket_ref.status_history valid sample', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        status_history: [
-          { transitioned_at: '2026-05-18T14:30:00+09:00', to_status: 'To Do', mcp_tool: 'mcp__wiki-jira-assistant__jira_create' },
-          { transitioned_at: '2026-05-18T15:00:00+09:00', from_status: 'To Do', to_status: 'In Progress', mcp_tool: 'mcp__wiki-jira-assistant__jira_transition', evidence_ref: '.aimd/output/evidence/ticket-sync-spec-20260518T150000.json' },
-          { transitioned_at: '2026-05-18T16:30:00+09:00', from_status: 'In Progress', to_status: 'Done', mcp_tool: 'mcp__wiki-jira-assistant__jira_transition' },
-        ],
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `status_history valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						status_history: [
+							{
+								transitioned_at: '2026-05-18T14:30:00+09:00',
+								to_status: 'To Do',
+								mcp_tool: 'mcp__wiki-jira-assistant__jira_create',
+							},
+							{
+								transitioned_at: '2026-05-18T15:00:00+09:00',
+								from_status: 'To Do',
+								to_status: 'In Progress',
+								mcp_tool: 'mcp__wiki-jira-assistant__jira_transition',
+								evidence_ref:
+									'.aimd/output/evidence/ticket-sync-spec-20260518T150000.json',
+							},
+							{
+								transitioned_at: '2026-05-18T16:30:00+09:00',
+								from_status: 'In Progress',
+								to_status: 'Done',
+								mcp_tool: 'mcp__wiki-jira-assistant__jira_transition',
+							},
+						],
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`status_history valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
-// ★ v8.6.2+ R20 phase=enter (stage 진입 시 의무 작업 Task) 회귀
+// v8.6.2+ R20 phase=enter (stage 진입 시 의무 작업 Task) 회귀
 test('R20 v8.6.2 — phase=enter + stage=analysis valid (도메인 단위 Task)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'analysis',
-    phase: 'enter',
-    scope: 'car',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
-      ticket_id_created: 'MIG-CAR-ENTER-001',
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `phase=enter analysis valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'analysis',
+			phase: 'enter',
+			scope: 'car',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+					ticket_id_created: 'MIG-CAR-ENTER-001',
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`phase=enter analysis valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.2 — phase=enter + stage=spec + uc_id valid (per UC Task)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'spec',
-    phase: 'enter',
-    scope: 'car',
-    uc_id: 'UC-CAR-007',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
-      ticket_id_created: 'MIG-CAR-007-SPEC-ENTER',
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `phase=enter spec per UC valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'spec',
+			phase: 'enter',
+			scope: 'car',
+			uc_id: 'UC-CAR-007',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+					ticket_id_created: 'MIG-CAR-007-SPEC-ENTER',
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`phase=enter spec per UC valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.2 — uc_id pattern reject (UC- prefix 의무)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'spec',
-    phase: 'enter',
-    scope: 'car',
-    uc_id: 'CAR-007', // UC- prefix 누락
-    mcp_invocations: [VALID_INVOCATION],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `uc_id pattern reject 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'spec',
+			phase: 'enter',
+			scope: 'car',
+			uc_id: 'CAR-007', // UC- prefix 누락
+			mcp_invocations: [VALID_INVOCATION],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(r.status, 0, `uc_id pattern reject 의무. stdout:${r.stdout}`);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.2 — phase enum reject (unknown value)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    phase: 'invalid', // enum reject
-    mcp_invocations: [VALID_INVOCATION],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `phase enum reject 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			phase: 'invalid', // enum reject
+			mcp_invocations: [VALID_INVOCATION],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(r.status, 0, `phase enum reject 의무. stdout:${r.stdout}`);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.2 — traceability-matrix ticket_ref.enter_task_ids valid', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        enter_task_ids: {
-          analysis: 'MIG-ENTER-AN',
-          planning: 'MIG-ENTER-PL',
-          spec: 'MIG-CAR-007-SPEC-ENTER',
-          test: 'MIG-CAR-007-TEST-ENTER',
-          implement: 'MIG-CAR-007-IMPL-ENTER',
-        },
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `enter_task_ids valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						enter_task_ids: {
+							analysis: 'MIG-ENTER-AN',
+							planning: 'MIG-ENTER-PL',
+							spec: 'MIG-CAR-007-SPEC-ENTER',
+							test: 'MIG-CAR-007-TEST-ENTER',
+							implement: 'MIG-CAR-007-IMPL-ENTER',
+						},
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`enter_task_ids valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.2 — enter_task_ids unknown stage key reject', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        enter_task_ids: {
-          chain99_unknown: 'MIG-X', // stage enum 외 reject
-        },
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `unknown stage key reject 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						enter_task_ids: {
+							chain99_unknown: 'MIG-X', // stage enum 외 reject
+						},
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`unknown stage key reject 의무. stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 traceability-matrix — status_history.mcp_tool pattern (mcp__wiki-jira-assistant__ prefix only)', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        status_history: [
-          { transitioned_at: '2026-05-18T14:30:00+09:00', to_status: 'To Do', mcp_tool: 'mcp__github__create_issue' }, // GitHub reject
-        ],
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `GitHub MCP reject 의무 (R20 Tier 2.5 = jira-confluence only). stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						status_history: [
+							{
+								transitioned_at: '2026-05-18T14:30:00+09:00',
+								to_status: 'To Do',
+								mcp_tool: 'mcp__github__create_issue',
+							}, // GitHub reject
+						],
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`GitHub MCP reject 의무 (R20 Tier 2.5 = jira-confluence only). stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
-// ★ v8.6.3+ R20 hierarchy 강제 (DEC-2026-05-18-r20 §v8.6.3 확장)
+// v8.6.3+ R20 hierarchy 강제 (DEC-2026-05-18-r20 §v8.6.3 확장)
 test('R20 v8.6.3 — mcp_invocations[].parent_ticket_id valid (Story 생성 시 Epic id)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    scope: 'car',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
-      ticket_id_created: 'MIG-1234',
-      parent_ticket_id: 'MIG-CAR-100',
-      link_type: 'parent-child',
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `parent_ticket_id Story→Epic valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			scope: 'car',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
+					ticket_id_created: 'MIG-1234',
+					parent_ticket_id: 'MIG-CAR-100',
+					link_type: 'parent-child',
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`parent_ticket_id Story→Epic valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.3 — mcp_invocations[].parent_ticket_id valid (Sub-task 생성 시 Story id)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'spec',
-    scope: 'car',
-    uc_id: 'UC-CAR-007',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      ticket_id_created: 'MIG-1236',
-      parent_ticket_id: 'MIG-1234', // Story
-      link_type: 'parent-child',
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `parent_ticket_id Sub-task→Story valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'spec',
+			scope: 'car',
+			uc_id: 'UC-CAR-007',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					ticket_id_created: 'MIG-1236',
+					parent_ticket_id: 'MIG-1234', // Story
+					link_type: 'parent-child',
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`parent_ticket_id Sub-task→Story valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.3 — link_type enum reject (unknown value)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'planning',
-    scope: 'car',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      parent_ticket_id: 'MIG-1',
-      link_type: 'arbitrary-bogus', // enum 외
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `link_type enum reject 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'planning',
+			scope: 'car',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					parent_ticket_id: 'MIG-1',
+					link_type: 'arbitrary-bogus', // enum 외
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`link_type enum reject 의무. stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.3 — link_type relates-to valid (cross-cutting Tech Debt Story)', () => {
-  ensureTmp();
-  const f = join(TMP, 'ticket-sync-evidence.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    stage: 'analysis',
-    scope: 'car',
-    mcp_invocations: [{
-      ...VALID_INVOCATION,
-      ticket_id_created: 'MIG-AP-001',
-      parent_ticket_id: 'MIG-1', // Initiative
-      link_type: 'relates-to', // Tech Debt Story = cross-cutting
-    }],
-    confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
-    evidence_trust: 'real_tool',
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `link_type=relates-to (Tech Debt) valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'ticket-sync-evidence.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			stage: 'analysis',
+			scope: 'car',
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					ticket_id_created: 'MIG-AP-001',
+					parent_ticket_id: 'MIG-1', // Initiative
+					link_type: 'relates-to', // Tech Debt Story = cross-cutting
+				},
+			],
+			confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+			evidence_trust: 'real_tool',
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`link_type=relates-to (Tech Debt) valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.3 — traceability-matrix ticket_ref.structure_complete=true valid', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        epic_id: 'MIG-CAR-100',
-        initiative_id: 'MIG-1',
-        structure_complete: true,
-        structure_tree_url: 'https://company.atlassian.net/secure/StructureBoard.jspa?s=42',
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.equal(r.status, 0, `structure_complete + structure_tree_url valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						epic_id: 'MIG-CAR-100',
+						initiative_id: 'MIG-1',
+						structure_complete: true,
+						structure_tree_url:
+							'https://company.atlassian.net/secure/StructureBoard.jspa?s=42',
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(
+		r.status,
+		0,
+		`structure_complete + structure_tree_url valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });
 
 test('R20 v8.6.3 — traceability-matrix structure_tree_url uri format reject (invalid URL)', () => {
-  ensureTmp();
-  const f = join(TMP, 'traceability-matrix.json');
-  writeFileSync(f, JSON.stringify({
-    meta: META_OK,
-    matrix: [{
-      use_case_id: 'UC-CAR-007',
-      status: 'green',
-      ticket_ref: {
-        platform: 'jira',
-        id: 'MIG-1234',
-        structure_tree_url: 'not a url at all spaces here',
-      },
-    }],
-    coverage_summary: { forward_coverage: 0.85, backward_coverage: 0.85, threshold: 0.85 },
-  }));
-  const r = runCli([f]);
-  assert.notEqual(r.status, 0, `structure_tree_url uri format reject 의무. stdout:${r.stdout}`);
-  rmSync(TMP, { recursive: true, force: true });
+	ensureTmp();
+	const f = join(TMP, 'traceability-matrix.json');
+	writeFileSync(
+		f,
+		JSON.stringify({
+			meta: META_OK,
+			matrix: [
+				{
+					use_case_id: 'UC-CAR-007',
+					status: 'green',
+					ticket_ref: {
+						platform: 'jira',
+						id: 'MIG-1234',
+						structure_tree_url: 'not a url at all spaces here',
+					},
+				},
+			],
+			coverage_summary: {
+				forward_coverage: 0.85,
+				backward_coverage: 0.85,
+				threshold: 0.85,
+			},
+		}),
+	);
+	const r = runCli([f]);
+	assert.notEqual(
+		r.status,
+		0,
+		`structure_tree_url uri format reject 의무. stdout:${r.stdout}`,
+	);
+	rmSync(TMP, { recursive: true, force: true });
 });

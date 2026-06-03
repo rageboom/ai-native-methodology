@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/code-coverage-hole.schema.json",
   "title": "code-coverage-hole.json — codegraph code→artifact coverage-hole (reference-lens / NOT gate-injected)",
-  "description": "★ codegraph wiring STEP 1 (DEC-2026-06-03-codegraph-deliverable-wiring §5). codegraph .codegraph/codegraph.db 의 코드 엔티티(route/method) 전수 ∖ 산출물 code-ref = '코드有 산출물無' coverage-hole. ★ trust: reference-lens / 비차단(severity low|medium ceiling) / 결정적 gate inject ❌. severity enum 이 구조적으로 high·critical 을 배제 (gate leak 차단).",
+  "description": "codegraph wiring STEP 1 (DEC-2026-06-03-codegraph-deliverable-wiring §5). codegraph .codegraph/codegraph.db 의 코드 엔티티(route/method) 전수 ∖ 산출물 code-ref = '코드有 산출물無' coverage-hole. trust: reference-lens / 비차단(severity low|medium ceiling) / 결정적 gate inject ❌. severity enum 이 구조적으로 high·critical 을 배제 (gate leak 차단).",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "target", "active_axes", "stack", "codegraph", "coverage", "findings"],
@@ -21,7 +21,7 @@
         "severity_ceiling": {
           "type": "array",
           "items": { "enum": ["low", "medium"] },
-          "description": "★ coverage-hole 은 low|medium 만 (high·critical 절대 ❌ / findings-aggregator gate leak 차단)."
+          "description": "coverage-hole 은 low|medium 만 (high·critical 절대 ❌ / findings-aggregator gate leak 차단)."
         }
       }
     },
@@ -132,7 +132,7 @@
           "code_graph_ref": {
             "type": "object",
             "additionalProperties": false,
-            "description": "★ v12.10.0 STEP 2 — coverage-hole 의 codegraph 코드 앵커 (auto-seed). finding-system.schema.json code_graph_ref 와 동형. promote 시 F-XXX ledger 로 그대로 이식.",
+            "description": "v12.10.0 STEP 2 — coverage-hole 의 codegraph 코드 앵커 (auto-seed). finding-system.schema.json code_graph_ref 와 동형. promote 시 F-XXX ledger 로 그대로 이식.",
             "required": ["kind"],
             "properties": {
               "kind": { "type": "string" },
@@ -216,7 +216,7 @@
     "moduleAxis": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ v12.11.0 STEP 3 — module dependency coverage-hole (codegraph cross-file edge rollup ∖ architecture.json dependencies[]). '대치' 아니라 결정론 corroboration lens. holes = codegraph有/arch無(LLM 놓침). informational_notes = arch有/codegraph無(codegraph 사각 / NOT a defect / severity 부재).",
+      "description": "v12.11.0 STEP 3 — module dependency coverage-hole (codegraph cross-file edge rollup ∖ architecture.json dependencies[]). '대치' 아니라 결정론 corroboration lens. holes = codegraph有/arch無(LLM 놓침). informational_notes = arch有/codegraph無(codegraph 사각 / NOT a defect / severity 부재).",
       "required": ["detectable", "total", "covered", "holes"],
       "properties": {
         "detectable": { "type": "boolean" },
@@ -251,7 +251,7 @@
         },
         "informational_notes": {
           "type": "array",
-          "description": "★ onlyArch (arch.json有 / codegraph無 = codegraph 사각: 런타임 DI/decorator/config 와이어링·iBATIS2·동적). NOT a defect / 부재≠거짓. ★ ★ severity 필드 구조적 부재 (additionalProperties:false) — finding/coverage-hole 채널 진입 절대 ❌ (Senior must-fix#3 / check36 가드).",
+          "description": "onlyArch (arch.json有 / codegraph無 = codegraph 사각: 런타임 DI/decorator/config 와이어링·iBATIS2·동적). NOT a defect / 부재≠거짓. severity 필드 구조적 부재 (additionalProperties:false) — finding/coverage-hole 채널 진입 절대 ❌ (Senior must-fix#3 / check36 가드).",
           "items": {
             "type": "object",
             "additionalProperties": false,

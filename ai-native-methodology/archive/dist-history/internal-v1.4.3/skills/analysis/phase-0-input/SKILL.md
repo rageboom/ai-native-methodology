@@ -26,16 +26,20 @@ allowed-tools: Read, Glob, Grep, Bash
 3. **트랙 분기 신호** — 코드베이스가 BE / FE / DB / 풀스택 중 무엇? 신호 기록 (다음 phase 의 skill 자동 발동 trigger)
 4. **분석 가치 명시** — 사용자에게:
    - 본 방법론은 한 방향 추출기 (legacy → 7대 산출물). round-trip 검증 안 함.
-   - 가치 명세 (CLAUDE.md ★★★) 사용자 확인.
+   - 가치 명세 (CLAUDE.md) 사용자 확인.
 5. **메타 정보 기록** — `<user-project>/.aimd/phase-0-input.json`:
    ```json
    {
-     "target": { "repo": "...", "commit": "...", "scope": "module-X" },
-     "stack": { "language": "java", "framework": "spring-boot-3", "db": "postgresql" },
-     "tracks": ["BE", "DB"],
-     "baseline_applied": true,
-     "baseline_ref": ".aimd/baseline-2026-05-02.json",
-     "phase_0_completed_at": "..."
+   	"target": { "repo": "...", "commit": "...", "scope": "module-X" },
+   	"stack": {
+   		"language": "java",
+   		"framework": "spring-boot-3",
+   		"db": "postgresql"
+   	},
+   	"tracks": ["BE", "DB"],
+   	"baseline_applied": true,
+   	"baseline_ref": ".aimd/baseline-2026-05-02.json",
+   	"phase_0_completed_at": "..."
    }
    ```
 6. **다음 단계 안내** — `phase-1-inventory` 호출 권장.

@@ -2,7 +2,7 @@
 
 각 lifecycle stage 의 sub-stage / phase 흐름을 DAG (`.json` + `.mermaid` 이중 렌더링) 으로 정의. drift-validator v0.2.0 가 `.json ↔ .mermaid` 의미 동등성 자동 검증 (drift 0 자가 입증).
 
-## 채워진 흐름 (★ 현재)
+## 채워진 흐름 ( 현재)
 
 - `analysis.phase-flow.json` + `analysis.phase-flow.mermaid` — 분석 stage 의 Phase 0 → 1 → 2 → 3 → 4 → 4.5 → 5 (BE/FE/DB 분기) → 6 흐름
   - 본체 v0.2.0 자산 그대로 재배치 (G6, plan 11차 결단)
@@ -17,11 +17,11 @@
 
 자세한 인터페이스: `methodology-spec/lifecycle-contract.md`
 
-## drift-validator 호출 (★ 2026-05-02 갱신 / iter 0 post-flight)
+## drift-validator 호출 ( 2026-05-02 갱신 / iter 0 post-flight)
 
-**호출 시점** = `phase-4-5-cross-validation` skill 진입 시 (★ Phase 4.5 = 이중 렌더링 정합 검증 단계). skill SKILL.md §1 "이중 렌더링 정합 (ADR-008) — drift-validator 자동 호출" 정합.
+**호출 시점** = `phase-4-5-cross-validation` skill 진입 시 ( Phase 4.5 = 이중 렌더링 정합 검증 단계). skill SKILL.md §1 "이중 렌더링 정합 (ADR-008) — drift-validator 자동 호출" 정합.
 
-**★ 이전 (deprecated)**: PostToolUse hook 매 Write/Edit 마다 자동 호출 — ★ F-PA-009 (매 호출 200-500ms 마찰) + F-PA-010 (`|| true` silent fail / no-simulation 정책 위배) 발견 후 ★ ★ 제거 (★ docs/phase-a-iteration-0-preflight.md §Post-flight 참고).
+** 이전 (deprecated)**: PostToolUse hook 매 Write/Edit 마다 자동 호출 — F-PA-009 (매 호출 200-500ms 마찰) + F-PA-010 (`|| true` silent fail / no-simulation 정책 위배) 발견 후 제거 ( docs/phase-a-iteration-0-preflight.md §Post-flight 참고).
 
 **현재 (v1.4.2 + iter 0 post-flight)**: on-demand 검증. drift 발견 시 stderr 자연 노출 / silent fail 0.
 

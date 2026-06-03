@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) golden snapshot — UC-CAPITAL-006 ERP 입금 List 일괄 저장 (sub-domain B). ★ Stored Procedure (_IFRSCapitalList) 다중 호출 패턴.",
+  "$comment": "phase 4.7 (characterization) golden snapshot — UC-CAPITAL-006 ERP 입금 List 일괄 저장 (sub-domain B). Stored Procedure (_IFRSCapitalList) 다중 호출 패턴.",
   "snapshot_id": "SNAP-UC-CAPITAL-006",
   "use_case": "UC-CAPITAL-006",
   "endpoint": "POST /ifrs/capital/IfrsERPINListSave",
@@ -7,7 +7,7 @@
   "service_method": "CapitalService.insertERPINList",
   "sql_id": "CapitalDAO.insertERPINList (EXEC IFRS.dbo._IFRSCapitalList ?, ?, ?, ?, ?)",
   "layer": "integration",
-  "data_source_status": "★ 실 DB 환경 부재 + Stored Procedure 본문 (★ DBA + proc-body carry)",
+  "data_source_status": "실 DB 환경 부재 + Stored Procedure 본문 (DBA + proc-body carry)",
   "scenarios": [
     {
       "id": "SCN-CAPITAL-006-001",
@@ -24,9 +24,9 @@
       "when": "Map param = IfrsUtil.parameterToHm(request); System.out.print(param); capitalService.insertERPINList(param); → 내부 EXEC IFRS.dbo._IFRSCapitalList ?,?,?,?,?",
       "then": {
         "expected_SP_invocation": "EXEC IFRS.dbo._IFRSCapitalList (CompanySeq, sType, sDate, ?, ?)",
-        "expected_TB_CAPITAL_LIST_after": "★ SP 본문 미확인 — ERP 입금 데이터 → TB_CAPITAL_LIST 의 sType=1 row 다수 INSERT 추정",
-        "transaction_scope": "★ SP 내부 트랜잭션 의존 (SP body 미확인 / DBA carry C-data-PoC07-1)",
-        "side_effect": "★ Controller 의 System.out.print(param) — logger 부재 (AP-CAPITAL-010)"
+        "expected_TB_CAPITAL_LIST_after": "SP 본문 미확인 — ERP 입금 데이터 → TB_CAPITAL_LIST 의 sType=1 row 다수 INSERT 추정",
+        "transaction_scope": "SP 내부 트랜잭션 의존 (SP body 미확인 / DBA carry C-data-PoC07-1)",
+        "side_effect": "Controller 의 System.out.print(param) — logger 부재 (AP-CAPITAL-010)"
       },
       "intent_classification": [
         { "rule": "BR-CAPITAL-DATASRC-004", "type": "intent", "note": "ERP source 분기 = 자금일보 핵심" }
@@ -36,16 +36,16 @@
         "CompanySeq + sType + sDate 3 키 의무 (intent)"
       ],
       "behavior_likely_bug": [
-        "★ AP-CAPITAL-010 — System.out.print(param) (Controller line 395 / line 1852) — slf4j Logger 미사용 / 새 시스템 정식 logger 의무",
-        "★ AP-CAPITAL-002 (Map 캐스팅) + AP-CAPITAL-003 (Anemic Service)",
-        "★ Stored Procedure 본문 비가시성 — 새 시스템 재구현 시 SP 마이그레이션 의무 + 단위 테스트 가능한 코드 위치 결단"
+        "AP-CAPITAL-010 — System.out.print(param) (Controller line 395 / line 1852) — slf4j Logger 미사용 / 새 시스템 정식 logger 의무",
+        "AP-CAPITAL-002 (Map 캐스팅) + AP-CAPITAL-003 (Anemic Service)",
+        "Stored Procedure 본문 비가시성 — 새 시스템 재구현 시 SP 마이그레이션 의무 + 단위 테스트 가능한 코드 위치 결단"
       ]
     }
   ],
   "intent_vs_bug_summary": {
     "intent": ["BR-CAPITAL-DATASRC-004 (ERP source 분기)"],
     "bug": ["AP-CAPITAL-010 (logger 미사용)", "AP-CAPITAL-002", "AP-CAPITAL-003"],
-    "ambiguous": ["★ Stored Procedure (_IFRSCapitalList) 비즈니스 로직 — DBA + proc-body read carry"]
+    "ambiguous": ["Stored Procedure (_IFRSCapitalList) 비즈니스 로직 — DBA + proc-body read carry"]
   },
   "phase_4_7_coverage_contribution": {
     "ucs_covered": ["UC-CAPITAL-006"],

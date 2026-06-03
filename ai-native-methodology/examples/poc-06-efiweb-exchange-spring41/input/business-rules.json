@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #06 prelim — Business Rules. legacy 코드 분석 결과 추출. chain 1 planning-spec.business_rules_intent 의 source. ★ 일부 BR 은 의도 vs 누적 버그 분간 어려움 — phase 4.7 (characterization) intent-vs-bug 분류표에서 결정.",
+  "$comment": "PoC #06 prelim — Business Rules. legacy 코드 분석 결과 추출. chain 1 planning-spec.business_rules_intent 의 source. 일부 BR 은 의도 vs 누적 버그 분간 어려움 — phase 4.7 (characterization) intent-vs-bug 분류표에서 결정.",
   "project_id": "poc-06-efiweb-exchange-spring41",
   "business_rules": [
     {
@@ -95,7 +95,7 @@
         "grep_hit_count": 1
       },
       "severity": "medium",
-      "intent_vs_bug": "★ 분간 어려움 — IFRS 연간 환율표 일괄 등록 정합 (intent) vs DB 정규화 부재 폐해 (bug). phase 4.7 carry."
+      "intent_vs_bug": "분간 어려움 — IFRS 연간 환율표 일괄 등록 정합 (intent) vs DB 정규화 부재 폐해 (bug). phase 4.7 carry."
     },
     {
       "id": "BR-EXCHANGE-GUBUN-006",
@@ -152,7 +152,7 @@
       "BR.severity"
     ],
     "manual_required_count": 5,
-    "auto_ratio": "29% (2 / 7) — plan §3-A 'rules.json (BR) 55%' 추정 보다 -26%p / ★ 큰 갭 발견",
-    "note": "★ rules.json 자동화율이 추정보다 박한 이유: (a) IFRS 회계 도메인 의도 추출이 자연어 무거움 (b) BR 의 intent_vs_bug 판단은 도메인 expert 의무 — phase 4.7 (characterization) 가 필수임을 사실로 입증. 외부 조언 정합."
+    "auto_ratio": "29% (2 / 7) — plan §3-A 'rules.json (BR) 55%' 추정 보다 -26%p / 큰 갭 발견",
+    "note": "rules.json 자동화율이 추정보다 박한 이유: (a) IFRS 회계 도메인 의도 추출이 자연어 무거움 (b) BR 의 intent_vs_bug 판단은 도메인 expert 의무 — phase 4.7 (characterization) 가 필수임을 사실로 입증. 외부 조언 정합."
   }
 }

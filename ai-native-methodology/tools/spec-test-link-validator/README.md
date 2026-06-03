@@ -2,7 +2,7 @@
 
 ## Purpose
 
-★ chain harness 의 **chain 4 (test → implement) gate #4 validator** (System Y / 구 chain 3 — v9.0 plan 신설 재번호). `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-source-inventory stack signal) + coverage threshold (0.85) 강제.
+chain harness 의 **chain 4 (test → implement) gate #4 validator** (System Y / 구 chain 3 — v9.0 plan 신설 재번호). `acceptance-criteria.json` + `test-spec.json` (+ `behavior-spec.json` + `inventory.json`) 사이 AC → TC forward link + framework match (analysis-source-inventory stack signal) + coverage threshold (0.85) 강제.
 
 ## When to call
 
@@ -24,25 +24,26 @@ node src/cli.js \
 ## Outputs
 
 | kind | severity | 의미 |
-|---|---|---|
-> ★ 권위 = `src/validator.js` emit 상수. kind 명은 validator.js 와 일치 의무.
+| ---- | -------- | ---- |
+
+> 권위 = `src/validator.js` emit 상수. kind 명은 validator.js 와 일치 의무.
 
 | `chain.ac_coverage.below_threshold` | critical | AC → TC coverage < threshold |
 | `chain.tc.no_ac_ref` | critical | TC.ac_ref 누락 (validator.js:37) |
 | `chain.tc.unknown_ac` | critical | TC.ac_ref 가 acceptance 에 없음 |
 | `chain.tc.unknown_bhv` | critical | TC.bhv_ref 가 behavior 에 없음 (validator.js emit = critical / 권위 일치) |
 | `chain.ac.no_tc` | high | verifiable=true AC 인데 test_case_refs 빈 배열 |
-| `chain.tc.framework_mismatch` | medium | TC.framework 가 inventory.stack_signals 와 어긋남 (★ ADR-CHAIN-004 정합) |
+| `chain.tc.framework_mismatch` | medium | TC.framework 가 inventory.stack_signals 와 어긋남 (ADR-CHAIN-004 정합) |
 
 ## Exit codes
 
-| code | 의미 |
-|---|---|
-| 0 | pass / no breaking |
-| 1 | critical/high finding ≥ 1 (default strict) |
-| 2 | usage error |
+| code | 의미                                       |
+| ---- | ------------------------------------------ |
+| 0    | pass / no breaking                         |
+| 1    | critical/high finding ≥ 1 (default strict) |
+| 2    | usage error                                |
 
-★ `--dry-run` = (write-baseline 차단) ∧ (prompt 차단) ∧ (exit 0 강제) 3 조합 (sub-plan-3 S3 정합).
+`--dry-run` = (write-baseline 차단) ∧ (prompt 차단) ∧ (exit 0 강제) 3 조합 (sub-plan-3 S3 정합).
 
 ## Sibling tools
 
@@ -62,6 +63,6 @@ node src/cli.js \
 - 진짜 test runner 호출 (5종 물증 7 필드) = [`../test-impl-pass-validator/`](../test-impl-pass-validator/) (sub-plan-3b 신설)
 - ADR-CHAIN-004 framework-mismatch 정밀화 = sub-plan 후속
 
-## ★★★ no-simulation 정합
+## no-simulation 정합
 
 본 도구는 AI 추론 0% — JSON 비교 알고리즘만. 실 test runner 호출은 sibling `test-impl-pass-validator` 의무.

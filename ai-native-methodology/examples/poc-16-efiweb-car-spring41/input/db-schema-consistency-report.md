@@ -4,13 +4,13 @@
 
 ## 출처 비교 매트릭스
 
-| 출처 | 가용 | 본 PoC 사본 위치 |
-|---|---|---|
-| **DDL .sql (IFRS_split)** | ✅ 6 own tables + 3 functions | `source/ddl/` |
-| **iBATIS sqlmap (call signature)** | ✅ 2 sqlmap / 37 statement / 4 외부 DB 18 object | `source/sqlmap/` |
-| **ERD 파일 (car.erd + ifrs.erd)** | ⚠️ 형식 unknown (ER/Studio 또는 DA# 추정) / viewer 부재 | `source/erd/` |
-| **운영 DB 직접 query** | ❌ MSSQL 본 환경 접근 ❌ | — |
-| **JPA / ORM entity** | ❌ Spring 4.1 + iBATIS 2 paradigm = ORM entity 미사용 / DTO 만 | — |
+| 출처                               | 가용                                                           | 본 PoC 사본 위치 |
+| ---------------------------------- | -------------------------------------------------------------- | ---------------- |
+| **DDL .sql (IFRS_split)**          | ✅ 6 own tables + 3 functions                                  | `source/ddl/`    |
+| **iBATIS sqlmap (call signature)** | ✅ 2 sqlmap / 37 statement / 4 외부 DB 18 object               | `source/sqlmap/` |
+| **ERD 파일 (car.erd + ifrs.erd)**  | ⚠️ 형식 unknown (ER/Studio 또는 DA# 추정) / viewer 부재        | `source/erd/`    |
+| **운영 DB 직접 query**             | ❌ MSSQL 본 환경 접근 ❌                                       | —                |
+| **JPA / ORM entity**               | ❌ Spring 4.1 + iBATIS 2 paradigm = ORM entity 미사용 / DTO 만 | —                |
 
 ## drift / 한계 명시
 
@@ -24,18 +24,18 @@
 ### 2. table/column 이름 case 차이
 
 - 실 DDL: `TB_CAR` / `CAR_NO` 대문자
-- 본 schema: `tb_car` / `car_no` 소문자 (snake_case pattern `^[a-z][a-z0-9_]*$` 정합)
+- 본 schema: `tb_car` / `car_no` 소문자 (snake*case pattern `^[a-z]a-z0-9*]\*$` 정합)
 - 모든 컬럼/테이블에 `drift_note` 또는 schema 안 description 명시
 - 영향: schema 정합 위함 / 실 SQL 생성 시 case-insensitive MSSQL 동작 의존
 
-### 3. **외부 4 DB 18 object DDL 부재** (★ 의무 carry)
+### 3. **외부 4 DB 18 object DDL 부재** (의무 carry)
 
 - FIM (3) / SGERP (10 + 1 SP) / e_hr (1) / ekporg (1) = total 16 + 1 SP + 1 view 추정
 - 본 schema scope = own 6 table + 3 function + 1 SP signature 만
 - 외부 object 의 컬럼/타입 = sqlmap 호출 시그니처 (select 컬럼 list) 추론으로만 부분 가능 / 본 PoC 미진행
 - carry 대상: business-rules phase / api phase 에서 외부 의존 BR anchor 추출
 
-### 4. **TB_CAR_COST_SLIP 복합 PK** (★ schema anti-pattern)
+### 4. **TB_CAR_COST_SLIP 복합 PK** (schema anti-pattern)
 
 - composite PK = (cost_idx, slip_id, cost_gubun)
 - schema description = "단일 PK 권장 — 복합 PK는 안티패턴"
@@ -58,9 +58,9 @@
 
 ## 자동 검증 결과
 
-| 도구 | 결과 |
-|---|---|
-| schema-validator (db-schema.schema.json) | (실행 예정) |
+| 도구                                         | 결과        |
+| -------------------------------------------- | ----------- |
+| schema-validator (db-schema.schema.json)     | (실행 예정) |
 | drift-validator (.json ↔ .mermaid 의미 동등) | (실행 예정) |
 
 ## 데이터 구조 summary
@@ -72,7 +72,7 @@
     │   └─ tb_car_cost (1:N / term_idx)
     │       └─ tb_car_cost_slip (1:N / cost_idx) → SGERP._TACSlip (외부 FK)
     └─ tb_car_drive (1:N / car_idx)
-  
+
   + tb_car_cost_nolog (회사별 통합 / 독립 / car 무관)
 
 3 UDFs (IFRS own):

@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # aspect-a11y — Accessibility (FE)
 
-WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-simulation).
+WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 ( no-simulation).
 
 ## 사전 조건
 
@@ -15,7 +15,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-si
 
 ## 절차
 
-1. **도구 진짜 실행 (CLAUDE.md ★★★ no-simulation)**:
+1. **도구 진짜 실행 (CLAUDE.md no-simulation)**:
    ```bash
    # axe-core via Playwright
    npx playwright test --grep @a11y

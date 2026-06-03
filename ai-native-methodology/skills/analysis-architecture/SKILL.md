@@ -31,16 +31,17 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
      "circular_dependencies": []
    }
    ```
-   ★ top-level required = `meta` · `modules` · `dependencies` (strict). 패턴 후보는 `architecture_style` (inventory 의 `architecture_style_candidates` 와 정합). 위 키 외 필드 추가 시 schema-validator fail.
-   ★ 의존 edge 에 사람-눈 설명 라벨이 있으면 `dependencies[].note` (긴 근거 = `detail`) 에 기록 — 구 architecture.mermaid edge 라벨 흡수 (ADR-011 / json 단독 / .mermaid·.md 미산출).
+   top-level required = `meta` · `modules` · `dependencies` (strict). 패턴 후보는 `architecture_style` (inventory 의 `architecture_style_candidates` 와 정합). 위 키 외 필드 추가 시 schema-validator fail.
+   의존 edge 에 사람-눈 설명 라벨이 있으면 `dependencies[].note` (긴 근거 = `detail`) 에 기록 — 구 architecture.mermaid edge 라벨 흡수 (ADR-011 / json 단독 / .mermaid·.md 미산출).
 
 ## 산출물
 
-- `<user-project>/.aimd/output/architecture.json` (★ json 단독 SSOT — .mermaid·.md 미산출 / ADR-011)
+- `<user-project>/.aimd/output/architecture.json` (json 단독 SSOT — .mermaid·.md 미산출 / ADR-011)
 
-## ★ greenfield (code-optional) mode
+## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A) 일 때 — 의존성 방향 코드 분석 대신 **설계 의도** 에서 산출:
+
 - 입력 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점) + 사용자 stack 선택.
 - pattern = PRD 아키텍처 의도 / swagger tag grouping / figma 화면 구조에서 추론, 없으면 **stack 권장 패턴** 제시 + `inferred` 명시 (예: Spring Boot 3 → layered or hexagonal 권고).
 - `circular_dependencies` = `[]` (신규 빌드 / 아직 코드 없음). `source_grounded_evidence` = 입력 출처 인용.

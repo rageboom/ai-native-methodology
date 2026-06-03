@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ phase 4.7 (characterization) coverage matrix — billing 모듈 / 작은 단일책임 spectrum. ★ ★ ★ 4 UC 전수 cover (100%) / ratchet baseline write 의무 (v2.1.1 ratchet trend / 사내 PoC 3번째 적용). ★ ★ Spring 4.1+iBATIS 2 paradigm corroboration #3 사내 PoC.",
+  "$comment": " phase 4.7 (characterization) coverage matrix — billing 모듈 / 작은 단일책임 spectrum. 4 UC 전수 cover (100%) / ratchet baseline write 의무 (v2.1.1 ratchet trend / 사내 PoC 3번째 적용). Spring 4.1+iBATIS 2 paradigm corroboration #3 사내 PoC.",
   "project_id": "poc-11-efiweb-billing-spring41",
   "snapshot_count": 4,
   "scenario_count": 5,
@@ -15,7 +15,7 @@
       "sql_id": "(none / view-only)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-BILLING-001 / 1 scenario (happy path 화면 진입)"],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered ( 핵심)"
     },
     {
       "uc": "UC-BILLING-002",
@@ -24,7 +24,7 @@
       "sql_id": "BillingDAO.selectDataConfirmList (recursive CTE 12 row + cross-DB FIM.dbo.TB_USER + UDF FN_GET_MONTH)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-BILLING-002 / 1 scenario (happy path 12개월 LEFT OUTER JOIN)"],
-      "scope_decision": "covered (★ 핵심 / vendor 종속 4 차원 + cross-DB)"
+      "scope_decision": "covered ( 핵심 / vendor 종속 4 차원 + cross-DB)"
     },
     {
       "uc": "UC-BILLING-003",
@@ -32,8 +32,8 @@
       "service_method": "BillingService.saveDataConfirm",
       "sql_id": "5 SQL (selectConfirmDataCount + delete + insert + insertHistory + insertHistoryData / cross-DB SGERPMA.dbo.TB_RG_RESULTS)",
       "snapshot": "✅",
-      "covered_by": ["SNAP-UC-BILLING-003 / 3 scenario (happy + ★ ★ critical bug 부분 commit + alt skip)"],
-      "scope_decision": "covered (★ ★ ★ critical — atomicity bug / 4 SQL 비트랜잭션)"
+      "covered_by": ["SNAP-UC-BILLING-003 / 3 scenario (happy + critical bug 부분 commit + alt skip)"],
+      "scope_decision": "covered ( critical — atomicity bug / 4 SQL 비트랜잭션)"
     },
     {
       "uc": "UC-BILLING-004",
@@ -42,7 +42,7 @@
       "sql_id": "(none / 외부 BI iframe)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-BILLING-004 / 1 scenario (happy path 외부 BI 임베드)"],
-      "scope_decision": "covered (★ 외부 BI 단순 wrapper)"
+      "scope_decision": "covered ( 외부 BI 단순 wrapper)"
     }
   ],
   "summary": {
@@ -55,28 +55,28 @@
     "intent_count": 6,
     "bug_count": 8,
     "ambiguous_count": 1,
-    "ambiguous_after_d2_5": "★ ★ 1 유지 (BR-BILLING-ENTITY-006 COM_NO==2 hardcoded / ★ ★ 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1 신설)",
-    "named_classified_ratio_d2": "★ Day 2 초안 = 14/15 = 0.933 (★ 1 ambiguous BR-BILLING-ENTITY-006)",
-    "named_classified_ratio_d2_5": "★ ★ ★ 14/15 = 0.933 보존 (★ 사용자 결단 ambiguous 유지 / pass threshold ≥ 80% + plan 2차 expectation ≥ 88% 정합)"
+    "ambiguous_after_d2_5": " 1 유지 (BR-BILLING-ENTITY-006 COM_NO==2 hardcoded / 사용자 결단 D2.5 ambiguous 유지 / Day 3.5 carry C-domain-PoC11-1 신설)",
+    "named_classified_ratio_d2": " Day 2 초안 = 14/15 = 0.933 ( 1 ambiguous BR-BILLING-ENTITY-006)",
+    "named_classified_ratio_d2_5": " 14/15 = 0.933 보존 ( 사용자 결단 ambiguous 유지 / pass threshold ≥ 80% + plan 2차 expectation ≥ 88% 정합)"
   },
   "comparison_to_poc06_07": {
     "poc06_exchange_단일": { "snapshot": 3, "scenario": 10, "uc_coverage": 0.43, "named_classified_d2_5": "17/18 = 94%" },
-    "poc11_billing_작은단일": { "snapshot": 4, "scenario": 5, "uc_coverage": 1.0, "named_classified_d2": "14/15 = 93.3%", "spectrum": "★ ★ ★ scale-cross floor (작은 단일책임)" },
+    "poc11_billing_작은단일": { "snapshot": 4, "scenario": 5, "uc_coverage": 1.0, "named_classified_d2": "14/15 = 93.3%", "spectrum": " scale-cross floor (작은 단일책임)" },
     "poc07_capital_다중": { "snapshot": 7, "scenario": 13, "uc_coverage": 0.4375, "named_classified_d2_5": "27/27 = 100%" },
-    "note": "★ ★ ★ 본 PoC = ★ 작은 scope → 4 UC 전수 cover 자연 (vs PoC #06+#07 부분 cover) / R1' trivially deterministic 효과 정합"
+    "note": " 본 PoC = 작은 scope → 4 UC 전수 cover 자연 (vs PoC #06+#07 부분 cover) / R1' trivially deterministic 효과 정합"
   },
   "ratchet_baseline_write": {
-    "$comment": "★ ★ ★ v2.1.1 ratchet trend baseline 첫 적용 / 사내 PoC 3번째 (PoC #07 capital + PoC #11 billing baseline write)",
+    "$comment": " v2.1.1 ratchet trend baseline 첫 적용 / 사내 PoC 3번째 (PoC #07 capital + PoC #11 billing baseline write)",
     "baseline_file": ".aimd/baseline/characterization-coverage.json",
     "baseline_write_required": true,
     "ratchet_metric": "uc_coverage_ratio",
     "baseline_value": 1.0,
     "current_value": 1.0,
-    "trend": "stable (★ baseline = current / 100% coverage / scale 작아 100% 도달)"
+    "trend": "stable ( baseline = current / 100% coverage / scale 작아 100% 도달)"
   },
   "phase_4_7_corroboration": {
-    "role": "★ ★ ★ corroboration #3 사내 PoC (PoC #06 단일 17/18=94% + PoC #07 다중 27/27=100% + 본 PoC 작은 단일 14/15=93.3% expected)",
+    "role": " corroboration #3 사내 PoC (PoC #06 단일 17/18=94% + PoC #07 다중 27/27=100% + 본 PoC 작은 단일 14/15=93.3% expected)",
     "isomorphic_to": ["UC-CAPITAL-002 atomicity bug (PoC #07 SNAP-UC-CAPITAL-002 SP 실패 패턴 정합)", "UC-CAPITAL-001 thin endpoint (PoC #07 SNAP-UC-CAPITAL-001 정합)"],
-    "novel_to": "★ Qlik 외부 BI 임베드 (UC-BILLING-004) — PoC #06+#07 미보유 spectrum"
+    "novel_to": " Qlik 외부 BI 임베드 (UC-BILLING-004) — PoC #06+#07 미보유 spectrum"
   }
 }

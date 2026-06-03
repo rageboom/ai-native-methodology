@@ -1,5 +1,5 @@
 {
-  "$comment": "★ v9.0 신설 — chain 3 (plan) phase flow — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-21 (spec ↔ test 사이 HOW 단계). ★ v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — placeholder 폐기 / hard gate #3 본격 진입 (chain N = gate #N 1:1 INTERNAL CONVENTION). spec 산출물(behavior/AC) → task-plan(task 분해 / 의존성 / ADR / NFR allocation / risk / rollback).",
+  "$comment": "v9.0 신설 — chain 3 (plan) phase flow — json 단독 SSOT (v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-21 (spec ↔ test 사이 HOW 단계). v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — placeholder 폐기 / hard gate #3 본격 진입 (chain N = gate #N 1:1 INTERNAL CONVENTION). spec 산출물(behavior/AC) → task-plan(task 분해 / 의존성 / ADR / NFR allocation / risk / rollback).",
   "id": "plan-phase-flow",
   "version": "1.0.0",
   "stage": "plan",
@@ -51,7 +51,7 @@
   "cross_cutting": {
     "validators": ["plan-coverage-validator", "schema-validator"],
     "no_simulation": true,
-    "gate": "#3 (★ v10.0.0 MAJOR Phase 4-4' 본격 hard gate 진입 / v9.3.0 deferred '#plan' placeholder 폐기)"
+    "gate": "#3 (v10.0.0 MAJOR Phase 4-4' 본격 hard gate 진입 / v9.3.0 deferred '#plan' placeholder 폐기)"
   },
   "previous_chain": {
     "id": "spec",

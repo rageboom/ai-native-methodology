@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #08 Day 1 — jpetstore-6 AP 추출. 8 AP. Modern stack 정합 → 적대성 ↓↓ vs PoC #06+#07 / 그러나 reference webapp demo limitation (보안 + N+1) 명백. AP-PETSTORE-* prefix.",
+  "$comment": " PoC #08 Day 1 — jpetstore-6 AP 추출. 8 AP. Modern stack 정합 → 적대성 ↓↓ vs PoC #06+#07 / 그러나 reference webapp demo limitation (보안 + N+1) 명백. AP-PETSTORE-* prefix.",
   "project_id": "poc-08-realworld-mybatis",
   "antipatterns": [
     {
@@ -9,9 +9,9 @@
       "evidence_strength": "high",
       "severity": "medium",
       "applies_to": ["domain/*.java (9 file)"],
-      "modern_alternative": "★ Domain Aggregate Root + behavior method (e.g., Cart.addItem(item) / Order.calculateTotal())",
+      "modern_alternative": " Domain Aggregate Root + behavior method (e.g., Cart.addItem(item) / Order.calculateTotal())",
       "is_likely_bug": false,
-      "isomorphic_to_poc06_07": "★ PoC #06 AP-EXCHANGE-002 + PoC #07 AP-CAPITAL-003 (Anemic Service) 와 isomorphic — 단 jpetstore = Domain 까지 anemic"
+      "isomorphic_to_poc06_07": " PoC #06 AP-EXCHANGE-002 + PoC #07 AP-CAPITAL-003 (Anemic Service) 와 isomorphic — 단 jpetstore = Domain 까지 anemic"
     },
     {
       "id": "AP-PETSTORE-002",
@@ -20,64 +20,64 @@
       "evidence_strength": "high",
       "severity": "medium",
       "applies_to": ["service/AccountService.java", "service/CatalogService.java", "service/OrderService.java"],
-      "modern_alternative": "★ Domain Service + Application Service 분리 / 또는 mapper 직접 controller 호출 (CQRS 단순화)",
+      "modern_alternative": " Domain Service + Application Service 분리 / 또는 mapper 직접 controller 호출 (CQRS 단순화)",
       "is_likely_bug": false,
-      "isomorphic_to_poc06_07": "★ PoC #06+#07 (Anemic Service) 동일 패턴 / Modern stack 에서도 발견 → ★ ★ Anti-pattern 일반성 입증"
+      "isomorphic_to_poc06_07": " PoC #06+#07 (Anemic Service) 동일 패턴 / Modern stack 에서도 발견 → Anti-pattern 일반성 입증"
     },
     {
       "id": "AP-PETSTORE-003",
-      "title": "★ Stripes convention default routing — @HandlesEvent + @UrlBinding 부재",
+      "title": " Stripes convention default routing — @HandlesEvent + @UrlBinding 부재",
       "natural_language": "ActionBean 의 public Resolution 메서드 = event handler. @DefaultHandler 1개만 명시 / @UrlBinding ❌ → URL = 클래스명 convention (CatalogActionBean → /Catalog.action). paradigm 학습 cost / explicit ❌ implicit ✅.",
       "evidence_strength": "high",
       "severity": "low",
       "applies_to": ["web/actions/*ActionBean.java (4 concrete)"],
-      "modern_alternative": "★ Spring MVC @RequestMapping + @GetMapping / 명시적 path mapping",
+      "modern_alternative": " Spring MVC @RequestMapping + @GetMapping / 명시적 path mapping",
       "is_likely_bug": false,
-      "isomorphic_to_poc06_07": "★ paradigm 다름 — PoC #06+#07 = Spring MVC @RequestMapping (명시적). PoC #08 = Stripes convention (암묵적). ★ ★ paradigm-cross 입증 가치"
+      "isomorphic_to_poc06_07": " paradigm 다름 — PoC #06+#07 = Spring MVC @RequestMapping (명시적). PoC #08 = Stripes convention (암묵적). paradigm-cross 입증 가치"
     },
     {
       "id": "AP-PETSTORE-004",
-      "title": "★ ★ ★ 평문 password 저장 — signon 테이블 평문 + 평문 비교",
+      "title": " 평문 password 저장 — signon 테이블 평문 + 평문 비교",
       "natural_language": "signon 테이블 schema = (username VARCHAR(25), password VARCHAR(25)) — 해시 ❌. AccountService.getAccount(username, password) → accountMapper.getAccountByUsernameAndPassword(평문 비교). reference webapp demo limitation but production = 보안 취약 critical.",
       "evidence_strength": "high",
       "severity": "critical",
       "applies_to": ["AccountMapper.xml:getAccountByUsernameAndPassword", "schema:signon table"],
-      "modern_alternative": "★ ★ ★ Spring Security + bcrypt/argon2 + PasswordEncoder. salted hash 의무.",
+      "modern_alternative": " Spring Security + bcrypt/argon2 + PasswordEncoder. salted hash 의무.",
       "is_likely_bug": true,
-      "isomorphic_to_poc06_07": "★ ❌ — PoC #06+#07 = 사내 인증 별도 (LIVE_SQL.SGERP) → 본 PoC 신규 AP 분류"
+      "isomorphic_to_poc06_07": " ❌ — PoC #06+#07 = 사내 인증 별도 (LIVE_SQL.SGERP) → 본 PoC 신규 AP 분류"
     },
     {
       "id": "AP-PETSTORE-005",
-      "title": "★ Product 검색 keyword 별 SQL 호출 — N+1 like",
+      "title": " Product 검색 keyword 별 SQL 호출 — N+1 like",
       "natural_language": "CatalogService.searchProductList(keywords) → keywords.split('\\\\s+').forEach(keyword → productMapper.searchProductList('%' + keyword + '%')). 매 keyword 별 별도 SQL execution + client-side aggregation.",
       "evidence_strength": "high",
       "severity": "medium",
       "applies_to": ["CatalogService.java:searchProductList"],
-      "modern_alternative": "★ 단일 SQL = MyBatis <foreach> + OR 또는 FULL TEXT SEARCH / Elasticsearch / PostgreSQL tsvector",
+      "modern_alternative": " 단일 SQL = MyBatis <foreach> + OR 또는 FULL TEXT SEARCH / Elasticsearch / PostgreSQL tsvector",
       "is_likely_bug": true,
-      "isomorphic_to_poc06_07": "★ N+1 패턴 일반 — PoC #06+#07 = LOOP 내 SQL 호출 (다른 형태) 와 isomorphic"
+      "isomorphic_to_poc06_07": " N+1 패턴 일반 — PoC #06+#07 = LOOP 내 SQL 호출 (다른 형태) 와 isomorphic"
     },
     {
       "id": "AP-PETSTORE-006",
-      "title": "★ ★ Order 조회 = lineItem × 2 SQL N+1 fetch",
+      "title": " Order 조회 = lineItem × 2 SQL N+1 fetch",
       "natural_language": "OrderService.getOrder(orderId) — order 1 SQL + lineItems 1 SQL + lineItem.forEach(itemMapper.getItem + getInventoryQuantity) → lineItem 수 N → 1 + 1 + N×2 = 2 + 2N SQL. 명백 N+1.",
       "evidence_strength": "high",
       "severity": "high",
       "applies_to": ["OrderService.java:getOrder"],
-      "modern_alternative": "★ 단일 SQL JOIN (order + lineitem + item + inventory) 또는 MyBatis <association>/<collection> nested ResultMap",
+      "modern_alternative": " 단일 SQL JOIN (order + lineitem + item + inventory) 또는 MyBatis <association>/<collection> nested ResultMap",
       "is_likely_bug": true,
-      "isomorphic_to_poc06_07": "★ ★ ★ N+1 일반 패턴"
+      "isomorphic_to_poc06_07": " N+1 일반 패턴"
     },
     {
       "id": "AP-PETSTORE-007",
-      "title": "★ DB native sequence ❌ — 자체 sequence 테이블 + race condition",
+      "title": " DB native sequence ❌ — 자체 sequence 테이블 + race condition",
       "natural_language": "ordernum sequence = sequence 테이블 (name PK / nextid INT) 자체 관리. SequenceMapper.getSequence(SELECT) + updateSequence(UPDATE nextid+1). multi-RDBMS 호환 의도 but UPDATE 후 SELECT race condition risk (concurrent insert 시 동일 orderId).",
       "evidence_strength": "high",
       "severity": "medium",
       "applies_to": ["OrderService.java:getNextId", "SequenceMapper.xml"],
-      "modern_alternative": "★ DB native sequence (PostgreSQL SEQUENCE / MySQL AUTO_INCREMENT / Oracle SEQUENCE) 또는 UUID v4 / Snowflake ID. multi-RDBMS = DB 별 dialect 분기.",
+      "modern_alternative": " DB native sequence (PostgreSQL SEQUENCE / MySQL AUTO_INCREMENT / Oracle SEQUENCE) 또는 UUID v4 / Snowflake ID. multi-RDBMS = DB 별 dialect 분기.",
       "is_likely_bug": false,
-      "$comment_intent": "★ ambiguous — multi-RDBMS 호환 의도 vs race risk. reference webapp demo 는 단일 사용자 가정 → race ❌."
+      "$comment_intent": " ambiguous — multi-RDBMS 호환 의도 vs race risk. reference webapp demo 는 단일 사용자 가정 → race ❌."
     },
     {
       "id": "AP-PETSTORE-008",
@@ -86,9 +86,9 @@
       "evidence_strength": "high",
       "severity": "low",
       "applies_to": ["OrderService.java:insertOrder line ~62"],
-      "modern_alternative": "★ DTO record (Java 16+) 또는 @Param 명시적 mapper signature",
+      "modern_alternative": " DTO record (Java 16+) 또는 @Param 명시적 mapper signature",
       "is_likely_bug": false,
-      "isomorphic_to_poc06_07": "★ PoC #06+#07 = 전체 endpoint Map<String, Object> + 강제 캐스팅 / PoC #08 = ★ 일부 (insertOrder 내부) 만 → ★ Modern stack = type safety 일반 ↑"
+      "isomorphic_to_poc06_07": " PoC #06+#07 = 전체 endpoint Map<String, Object> + 강제 캐스팅 / PoC #08 = 일부 (insertOrder 내부) 만 → Modern stack = type safety 일반 ↑"
     }
   ],
   "summary": {
@@ -100,6 +100,6 @@
     "likely_bug_count": 4,
     "isomorphic_to_poc06_07_count": 5,
     "novel_ap_count": 3,
-    "$comment_summary": "★ 8 AP / 1 critical (보안 평문 password) + 1 high (N+1 Order fetch) + 4 medium (Anemic 2 + N+1 search + sequence) + 2 low (Stripes convention + HashMap). isomorphic = 5 (PoC #06+#07 패턴 일반성 입증). novel = 3 (보안 + Stripes + sequence) — paradigm-cross MEDIUM corroboration 자격 강화."
+    "$comment_summary": " 8 AP / 1 critical (보안 평문 password) + 1 high (N+1 Order fetch) + 4 medium (Anemic 2 + N+1 search + sequence) + 2 low (Stripes convention + HashMap). isomorphic = 5 (PoC #06+#07 패턴 일반성 입증). novel = 3 (보안 + Stripes + sequence) — paradigm-cross MEDIUM corroboration 자격 강화."
   }
 }

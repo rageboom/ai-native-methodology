@@ -1,5 +1,5 @@
 {
-  "$schema_origin": "ai-native-methodology/schemas/form-validation-spec.schema.json (★ Stage 7-pre)",
+  "$schema_origin": "ai-native-methodology/schemas/form-validation-spec.schema.json (Stage 7-pre)",
   "meta": {
     "poc_id": "poc-04-full",
     "stage": "5",
@@ -10,9 +10,9 @@
     "tool": "ts-morph + yaml + regex",
     "tool_version": "ts-morph 24 / yaml 2.5",
     "sources_analyzed": [
-      "INPUT/openapi.yaml (★ orval+Zod auto-gen via OpenAPI 3.0.1)",
-      "INPUT/src/pages/home/home.state.ts (★ Zod-mini URL params)",
-      "INPUT/src/pages/profile/profile.state.ts (★ Zod-mini URL params — 2 page isomorphic / Stage 5 신규 추가)",
+      "INPUT/openapi.yaml (orval+Zod auto-gen via OpenAPI 3.0.1)",
+      "INPUT/src/pages/home/home.state.ts (Zod-mini URL params)",
+      "INPUT/src/pages/profile/profile.state.ts (Zod-mini URL params — 2 page isomorphic / Stage 5 신규 추가)",
       "INPUT/src/pages/login/login.ui.tsx (HTML5 native)",
       "INPUT/src/pages/register/register.ui.tsx",
       "INPUT/src/pages/settings/settings.ui.tsx",
@@ -1220,7 +1220,7 @@
   "deliverable_14_compliance": {
     "zod_real_extraction": true,
     "simulation_used": false,
-    "url_params_validation_pattern_extension": "★ 신규 패턴 발견 — form 만이 아닌 URL search params 도 BR 자동 추출 시점 (★ Stage 5 deliverable 14 schema 확장 후보)",
-    "adr_fe_005_match": "★ 매개체 #4 (OAS+MSW) + #13 (Zod) 통합 검증 ✅"
+    "url_params_validation_pattern_extension": "신규 패턴 발견 — form 만이 아닌 URL search params 도 BR 자동 추출 시점 (Stage 5 deliverable 14 schema 확장 후보)",
+    "adr_fe_005_match": "매개체 #4 (OAS+MSW) + #13 (Zod) 통합 검증 ✅"
   }
 }

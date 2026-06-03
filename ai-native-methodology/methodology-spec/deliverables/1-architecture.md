@@ -1,7 +1,7 @@
 # 산출물 #1: 아키텍처/의존성 (Architecture & Dependencies)
 
 > **사상**: Schema-First (ADR-001 — 코드 전 스키마 합의)
-> **schema**: `schemas/architecture.schema.json` · **template**: (★ v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
+> **schema**: `schemas/architecture.schema.json` · **template**: (v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
 > **생성 phase**: `architecture` phase (`/analyze-architecture`)
 
 ---
@@ -23,7 +23,8 @@ output/architecture/
 ```
 
 **핵심 결정**:
-- C4 Level 3 컴포넌트 구조 + 모듈 간 의존성 그래프를 `architecture.json` 에 구조화 (★ v12 json 단독 SSOT / 시각화는 view-time 도구)
+
+- C4 Level 3 컴포넌트 구조 + 모듈 간 의존성 그래프를 `architecture.json` 에 구조화 (v12 json 단독 SSOT / 시각화는 view-time 도구)
 - 모듈 = 패키지/디렉토리 단위 (언어별 관례)
 
 ---
@@ -32,14 +33,14 @@ output/architecture/
 
 ### 3.1 추출 대상 (출처 / 방법 / 신뢰도 / 의존)
 
-| 항목 | 추출 출처 | 방법 | 신뢰도 | 선행 의존 |
-|---|---|---|---|---|
-| 모듈 식별 | 디렉토리 구조 + 패키지 선언 | 결정적 | 0.98 | — |
-| 외부 의존성 | 패키지 매니페스트 (pom.xml, package.json 등) | 결정적 | 0.98 | — |
-| 모듈 간 의존성 | AST import/require 그래프 | 결정적 | 0.98 | 모듈 식별 |
-| 순환 의존성 | 의존성 그래프 DFS/BFS | 결정적 | 0.98 | 모듈 간 의존성 |
-| 레이어 분류 | controller/service/repository 패턴 | 결정적 + LLM | 0.85 | 모듈 식별 |
-| 아키텍처 스타일 추론 | 디렉토리 패턴 + 의존 방향 | LLM | 0.70 | 모듈 간 의존성 |
+| 항목                 | 추출 출처                                    | 방법         | 신뢰도 | 선행 의존      |
+| -------------------- | -------------------------------------------- | ------------ | ------ | -------------- |
+| 모듈 식별            | 디렉토리 구조 + 패키지 선언                  | 결정적       | 0.98   | —              |
+| 외부 의존성          | 패키지 매니페스트 (pom.xml, package.json 등) | 결정적       | 0.98   | —              |
+| 모듈 간 의존성       | AST import/require 그래프                    | 결정적       | 0.98   | 모듈 식별      |
+| 순환 의존성          | 의존성 그래프 DFS/BFS                        | 결정적       | 0.98   | 모듈 간 의존성 |
+| 레이어 분류          | controller/service/repository 패턴           | 결정적 + LLM | 0.85   | 모듈 식별      |
+| 아키텍처 스타일 추론 | 디렉토리 패턴 + 의존 방향                    | LLM          | 0.70   | 모듈 간 의존성 |
 
 **입력**: 소스 코드 + `discovery` phase inventory
 **출력**: `architecture.json` (모듈 간 의존성 그래프 포함) + `circular-dependencies.md` (있을 시)
@@ -55,15 +56,15 @@ output/architecture/
 
 ## 4. 아키텍처 스타일 추론 패턴
 
-| 스타일 | 감지 단서 | 신뢰도 |
-|---|---|---|
-| Layered | `controller/`, `service/`, `repository/` 디렉토리 | 0.85 |
-| Hexagonal | `port/`, `adapter/`, `application/`, `domain/` | 0.80 |
-| Clean Architecture | `usecase/`, `entity/`, `interface/`, `infrastructure/` | 0.80 |
-| MVC | `models/`, `views/`, `controllers/` | 0.85 |
-| Monolith | 단일 빌드 + 단일 배포 단위 | 0.90 |
-| Microservices | 다중 서비스 디렉토리 + 독립 빌드 | 0.80 |
-| 혼합/불분명 | 위 패턴에 맞지 않음 | 0.50 (LLM 추론) |
+| 스타일             | 감지 단서                                              | 신뢰도          |
+| ------------------ | ------------------------------------------------------ | --------------- |
+| Layered            | `controller/`, `service/`, `repository/` 디렉토리      | 0.85            |
+| Hexagonal          | `port/`, `adapter/`, `application/`, `domain/`         | 0.80            |
+| Clean Architecture | `usecase/`, `entity/`, `interface/`, `infrastructure/` | 0.80            |
+| MVC                | `models/`, `views/`, `controllers/`                    | 0.85            |
+| Monolith           | 단일 빌드 + 단일 배포 단위                             | 0.90            |
+| Microservices      | 다중 서비스 디렉토리 + 독립 빌드                       | 0.80            |
+| 혼합/불분명        | 위 패턴에 맞지 않음                                    | 0.50 (LLM 추론) |
 
 ---
 
@@ -82,25 +83,28 @@ output/architecture/
 
 ## 6. 산출물 간 참조
 
-| 방향 | 의미 |
-|---|---|
-| ARCH → DOM | 모듈 경계 제공 |
-| ARCH → DB | 모듈 → 테이블 그룹 |
-| ARCH → AP | 순환 의존성 등록 |
-| EXT (5.D) → ARCH | 외부 통합 지점 |
+| 방향             | 의미               |
+| ---------------- | ------------------ |
+| ARCH → DOM       | 모듈 경계 제공     |
+| ARCH → DB        | 모듈 → 테이블 그룹 |
+| ARCH → AP        | 순환 의존성 등록   |
+| EXT (5.D) → ARCH | 외부 통합 지점     |
 
 ---
 
 ## 7. 흔한 함정
 
 ### 7.1 generated 코드 포함
+
 - 증상: `build/`, `dist/` 등의 import 까지 그래프에 포함
 - 대응: `.gitignore` + 추가 제외 패턴 적용
 
 ### 7.2 동적 import 누락
+
 - 증상: `require(variable)`, `import()` 동적 호출 감지 실패
 - 대응: 동적 import 패턴 별도 추적 + 신뢰도↓ 표기
 
 ### 7.3 아키텍처 스타일 과신
+
 - 증상: 디렉토리명만 보고 Hexagonal 판단 → 실제론 Layered
 - 대응: 의존 방향 분석 필수 (domain → infra 의존 시 Hexagonal 아님)

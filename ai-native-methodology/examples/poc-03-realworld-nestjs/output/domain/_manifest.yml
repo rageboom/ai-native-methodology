@@ -1,14 +1,14 @@
 manifest:
-  generated_at: "2026-04-30"
-  poc_id: "poc-03-realworld-nestjs"
-  phase: "4 (5.B domain)"
-  methodology_version: "v1.2.2"
+  generated_at: '2026-04-30'
+  poc_id: 'poc-03-realworld-nestjs'
+  phase: '4 (5.B domain)'
+  methodology_version: 'v1.2.2'
 
 deliverables:
-  - { file: "domain.json", confidence: 0.83 }
-  - { file: "domain.md",   confidence: 0.92 }
-  - { file: "domain.mermaid", confidence: 0.92 }
-  - { file: "_manifest.yml", confidence: 0.95 }
+  - { file: 'domain.json', confidence: 0.83 }
+  - { file: 'domain.md', confidence: 0.92 }
+  - { file: 'domain.mermaid', confidence: 0.92 }
+  - { file: '_manifest.yml', confidence: 0.95 }
 
 raw_confidence:
   current: 0.83
@@ -18,61 +18,66 @@ trust_level:
   current: 0.83
   current_step: 1
   validation_history:
-    - {step: "1차 작성", at: "2026-04-30", actor: "AI", tool_type: "ai_subagent"}
-  next_validation: "Phase 4.5 형식화 (decision-table BR)"
+    - {
+        step: '1차 작성',
+        at: '2026-04-30',
+        actor: 'AI',
+        tool_type: 'ai_subagent',
+      }
+  next_validation: 'Phase 4.5 형식화 (decision-table BR)'
 
 cross_validation:
   performed: false
-  note: "Phase 4 = cross-validation 의무 X (Phase 4.5+)"
+  note: 'Phase 4 = cross-validation 의무 X (Phase 4.5+)'
   simulation_only: false
 
 deterministic_results:
   bc_count: 3
   aggregate_root_candidate_count: 5
   use_case_count: 20
-  missing_endpoints_count: 3  # password / logout / tag-create
+  missing_endpoints_count: 3 # password / logout / tag-create
 
 key_decisions:
-  - id: "DEC-PHASE4-PoC03-001"
-    title: "BC 3개 확정 (BC-USER / BC-CONTENT / BC-PROFILE)"
+  - id: 'DEC-PHASE4-PoC03-001'
+    title: 'BC 3개 확정 (BC-USER / BC-CONTENT / BC-PROFILE)'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-002"
-    title: "Aggregate Root 5 후보 (Tag dead / Follows 모호 — Phase 6 결정 carry)"
+  - id: 'DEC-PHASE4-PoC03-002'
+    title: 'Aggregate Root 5 후보 (Tag dead / Follows 모호 — Phase 6 결정 carry)'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-003"
-    title: "★★ F-140 critical 신규 — UC-USER-DELETE AuthMiddleware 미적용"
-    rationale: "user.module.ts forRoutes 에 DELETE 누락 grep 검증. 사내 적용 시 1줄 fix."
+  - id: 'DEC-PHASE4-PoC03-003'
+    title: ' F-140 critical 신규 — UC-USER-DELETE AuthMiddleware 미적용'
+    rationale: 'user.module.ts forRoutes 에 DELETE 누락 grep 검증. 사내 적용 시 1줄 fix.'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-004"
-    title: "F-139 / F-141 / F-142 신규 (Tag dead / password change 부재 / logout 부재)"
+  - id: 'DEC-PHASE4-PoC03-004'
+    title: 'F-139 / F-141 / F-142 신규 (Tag dead / password change 부재 / logout 부재)'
     auto_mode_applied: true
-  - id: "DEC-PHASE4-PoC03-005"
-    title: "★ Senior 위험 3 정합 — class-validator coverage 12% / service.ts manual throw 가 주요 BR source"
-    rationale: "rules.json L0 자연어 빈약성 PoC #02 44% → 30%+ 더 악화 예상 입증"
+  - id: 'DEC-PHASE4-PoC03-005'
+    title: ' Senior 위험 3 정합 — class-validator coverage 12% / service.ts manual throw 가 주요 BR source'
+    rationale: 'rules.json L0 자연어 빈약성 PoC #02 44% → 30%+ 더 악화 예상 입증'
     auto_mode_applied: true
 
 findings_phase:
-  - id: "F-140"
-    title: "★★ UC-USER-DELETE AuthMiddleware 미적용 — 무차별 삭제 가능"
-    severity: "critical"
+  - id: 'F-140'
+    title: ' UC-USER-DELETE AuthMiddleware 미적용 — 무차별 삭제 가능'
+    severity: 'critical'
     proposed_fix: "user.module.ts forRoutes 에 {path: 'users/:slug', method: RequestMethod.DELETE} 추가 + 본인만 삭제 가능 권한 검증 추가"
-    status: "promoted"
-    cross_val_signal: "★★ AP-SECURITY 변형 — PoC #01 JWT 21byte / PoC #02 RSA git commit 과 다른 형태 (auth scope 누락)"
-  - id: "F-141"
-    title: "★ password change endpoint 부재 (UpdateUserDto password 필드 X)"
-    severity: "medium"
-    proposed_fix: "UpdateUserDto 에 optional password 필드 + UserService.update 에 argon2.hash 처리"
-    status: "promoted"
-  - id: "F-142"
-    title: "★ logout endpoint 부재 (JWT stateless 만)"
-    severity: "low"
-    proposed_fix: "JWT blacklist 또는 short-lived access + refresh token (F-119 합산)"
-    status: "candidate"
-  - id: "F-139"
-    title: "★ Tag Aggregate dead 의문 — F-122/F-123 합산"
-    severity: "medium"
-    proposed_fix: "Phase 6 결정 — TagModule 제거 또는 ArticleService 가 tag insert 추가"
-    status: "promoted"
+    status: 'promoted'
+    cross_val_signal: ' AP-SECURITY 변형 — PoC #01 JWT 21byte / PoC #02 RSA git commit 과 다른 형태 (auth scope 누락)'
+  - id: 'F-141'
+    title: ' password change endpoint 부재 (UpdateUserDto password 필드 X)'
+    severity: 'medium'
+    proposed_fix: 'UpdateUserDto 에 optional password 필드 + UserService.update 에 argon2.hash 처리'
+    status: 'promoted'
+  - id: 'F-142'
+    title: ' logout endpoint 부재 (JWT stateless 만)'
+    severity: 'low'
+    proposed_fix: 'JWT blacklist 또는 short-lived access + refresh token (F-119 합산)'
+    status: 'candidate'
+  - id: 'F-139'
+    title: ' Tag Aggregate dead 의문 — F-122/F-123 합산'
+    severity: 'medium'
+    proposed_fix: 'Phase 6 결정 — TagModule 제거 또는 ArticleService 가 tag insert 추가'
+    status: 'promoted'
 
 cumulative_statistics:
   poc_phase4_5b_new: 4
@@ -80,6 +85,6 @@ cumulative_statistics:
   cumulative_total: 144
 
 next_actions:
-  - "5.A rules 산출 (BR 추출)"
-  - "5.C antipatterns-partial 산출"
-  - "5.D ui-domain 산출 (RealWorld 빈약 caveat)"
+  - '5.A rules 산출 (BR 추출)'
+  - '5.C antipatterns-partial 산출'
+  - '5.D ui-domain 산출 (RealWorld 빈약 caveat)'

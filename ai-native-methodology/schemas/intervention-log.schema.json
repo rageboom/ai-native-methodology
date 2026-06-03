@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/intervention-log.schema.json",
   "title": "Chain Harness Intervention Log Entry (JSONL)",
-  "description": "★ ★ ★ v2.0 sub-plan-5 — chain harness driver 가 사용자 결단 / mechanical gate / revisit detect 를 누적 기록하는 JSONL append-only log 의 1 entry schema. ADR-CHAIN-005 §8 (observability) 정합. .aimd/output/intervention-log.jsonl. 월별 rotation → .aimd/output/archive/yyyy-mm.jsonl.",
+  "description": "v2.0 sub-plan-5 — chain harness driver 가 사용자 결단 / mechanical gate / revisit detect 를 누적 기록하는 JSONL append-only log 의 1 entry schema. ADR-CHAIN-005 §8 (observability) 정합. .aimd/output/intervention-log.jsonl. 월별 rotation → .aimd/output/archive/yyyy-mm.jsonl.",
   "type": "object",
   "required": ["timestamp", "event_type", "actor"],
   "additionalProperties": false,

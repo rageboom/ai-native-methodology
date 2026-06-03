@@ -24,11 +24,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - AP-FETCH-XXX (FE)
    - AP-A11Y-XXX (FE / 접근성)
    - AP-I18N-XXX (FE / 다국어)
-2. **★ Composite View 패턴 거절** — 복합 AP 등록 거절. 단일 패턴별로만 등재. (memory `feedback_composite_view_pattern.md`)
+2. ** Composite View 패턴 거절** — 복합 AP 등록 거절. 단일 패턴별로만 등재. (memory `feedback_composite_view_pattern.md`)
 3. **migration_advice 의무** — 각 anti-pattern 마다 `migration-cautions.md` 의 회피 방법 명시 (DEC-2026-04-29-안티패턴-마이그레이션-가이드)
 4. **antipatterns.json 작성** — `schemas/antipatterns.schema.json`
 5. **migration-cautions.md 작성** — 사람이 읽는 회피 가이드
-6. **§8.1 단일 PoC 과적합 회피** — 격상 / 처분 / 순서 결정 시 ≥2 PoC corroboration 의무 (CLAUDE.md ★★★)
+6. **§8.1 단일 PoC 과적합 회피** — 격상 / 처분 / 순서 결정 시 ≥2 PoC corroboration 의무 (CLAUDE.md)
 
 ## 산출물
 

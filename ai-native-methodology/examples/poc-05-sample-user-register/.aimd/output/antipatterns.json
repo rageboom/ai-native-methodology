@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #05 — antipatterns 도출 (analysis stage). chain 2 (spec) avoid-list 자료.",
+  "$comment": "PoC #05 — antipatterns 도출 (analysis stage). chain 2 (spec) avoid-list 자료.",
   "project_id": "poc-05-sample-user-register",
   "code_pointers_na": true,
   "antipatterns": [

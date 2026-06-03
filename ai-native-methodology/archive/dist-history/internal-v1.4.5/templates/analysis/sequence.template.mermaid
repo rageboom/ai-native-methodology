@@ -14,7 +14,7 @@ sequenceDiagram
     %% participant External as <External Service>
 
     rect rgb(200, 230, 255)
-        Note over Client,DB: ★ UC-<UseCase> (<HTTP method> <path>)
+        Note over Client,DB: UC-<UseCase> (<HTTP method> <path>)
         Client->>Controller: <HTTP method> <path><br/>(Auth: <user>)
         Controller->>Service: <method>(<args>)
 
@@ -45,7 +45,7 @@ sequenceDiagram
                 alt UQ/CHECK 충돌 (race window)
                     DB-->>Repository: DataIntegrityViolation
                     Repository-->>Service: 미처리 propagate
-                    Service-->>Controller: 500 Internal Error<br/>★ AP-* 후보
+                    Service-->>Controller: 500 Internal Error<br/> AP-* 후보
                     Controller-->>Client: 500
                 else 정상
                     DB-->>Repository: OK
@@ -58,7 +58,7 @@ sequenceDiagram
     end
 
     Note right of Service
-        ★ Phase 4.5 형식화 결단:
+        Phase 4.5 형식화 결단:
         - 검증 위치: Domain (생성자)
         - 거부 방식: IllegalArgumentException
         - HTTP: 400 (검증) / 500 (race) / 201 (정상)

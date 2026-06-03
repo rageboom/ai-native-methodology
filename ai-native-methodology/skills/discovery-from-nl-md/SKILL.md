@@ -1,6 +1,6 @@
 ---
 name: discovery-from-nl-md
-description: chain (discovery) 입력 어댑터 skill (자연어 / 마크다운 채널 / scope 진입 timing / ★ v10.1.0 본격). 자연어 prompt 또는 markdown 기획 문서 입력에서 UC + intent + NFR + risk + 출처 ref (doc:para:sentence) 추출 전문. discovery-agent 가 호출. `analysis-from-prompt` + `analysis-from-plan-doc` (baseline 수립 / 최초 1회) 와 timing+책임 분리 — analysis = 1-shot prompt 또는 PDF/Notion docs 흡수 / discovery = NL md (markdown 기획문서 또는 in-conversation NL) scope 진입 trigger. ★ NFR 추출 1차 채널 (다른 채널은 부).
+description: chain (discovery) 입력 어댑터 skill (자연어 / 마크다운 채널 / scope 진입 timing / v10.1.0 본격). 자연어 prompt 또는 markdown 기획 문서 입력에서 UC + intent + NFR + risk + 출처 ref (doc:para:sentence) 추출 전문. discovery-agent 가 호출. `analysis-from-prompt` + `analysis-from-plan-doc` (baseline 수립 / 최초 1회) 와 timing+책임 분리 — analysis = 1-shot prompt 또는 PDF/Notion docs 흡수 / discovery = NL md (markdown 기획문서 또는 in-conversation NL) scope 진입 trigger. NFR 추출 1차 채널 (다른 채널은 부).
 allowed-tools: Read, Glob, Grep, Bash
 ---
 
@@ -25,15 +25,15 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 
 `.aimd/output/discovery-spec.json` 의 다음 entries:
 
-- `use_cases[]` — paragraph / scenario 별 사용자 flow → UC-* (id + name + description + acceptance_criteria_refs[])
-- `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-* id 없음)
-- `nfr[]` (★ 1차 채널) — 응답시간 / 가용성 / 동시접속 / 보안 / a11y / 데이터 보존 등 명시 NFR → NFR-*
-- `risks_and_constraints[]` — 명시 risk / concern 언급 → object {id: R-*, severity, description} (schema 정의 / 명칭 통일 D3)
+- `use_cases[]` — paragraph / scenario 별 사용자 flow → UC-\* (id + name + description + acceptance_criteria_refs[])
+- `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-\* id 없음)
+- `nfr[]` (1차 채널) — 응답시간 / 가용성 / 동시접속 / 보안 / a11y / 데이터 보존 등 명시 NFR → NFR-\*
+- `risks_and_constraints[]` — 명시 risk / concern 언급 → object {id: R-\*, severity, description} (schema 정의 / 명칭 통일 D3)
 - `intent_summary` — section heading 또는 1-line 요약
 
 각 entry `source_grounded_evidence` = `doc:<filepath>:<paragraph_index>:<sentence>` (markdown) 또는 `prompt:<message_id>:<line>` (in-conversation NL).
 
-## ★ ★ ★ no-simulation 의무 (source-grounded)
+## no-simulation 의무 (source-grounded)
 
 - 모든 entry 는 NL source 의 실 문장 / 문단 reference 동반.
 - LLM 의 "그럴듯한" NFR 추가 ❌ — NL 안 명시 언급만 추출 (예: "응답 200ms 이내" 가 있어야 NFR-PERF-001 생성 / LLM 이 임의 200ms fabricate ❌).
@@ -45,10 +45,10 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 1. **source 분기**: 입력이 markdown 파일이면 Read, in-conversation NL 이면 prompt text 직접 사용.
 2. **structural parse** (markdown 시): heading hierarchy (H1/H2/H3) → section 단위 / paragraph index assign / sentence index assign. source_grounded_evidence ref 정확성 보장.
 3. **scope filter 적용** (있으면): 해당 section / scenario 만 추출.
-4. **UC 추출**: paragraph / scenario 별 사용자 flow 식별. "사용자가 X 한다 / 시스템이 Y 응답" 패턴 → UC-* + source ref.
+4. **UC 추출**: paragraph / scenario 별 사용자 flow 식별. "사용자가 X 한다 / 시스템이 Y 응답" 패턴 → UC-\* + source ref.
 5. **business_rules_intent 추출**: "X 는 Y 해야 한다" / "Z 시 W 차단" / "A 만 가능" 등 명시 BR → entry (br_id + reasoning + source_grounded_evidence) + verbatim quote 권장.
-6. **NFR 추출 (★ 1차 책임)**: 응답시간 / 가용성 / 동시 사용자 / 보안 / a11y / 데이터 보존 기간 등 명시 NFR → NFR-*. **명시되지 않은 NFR fabricate ❌** (no-simulation 의무 핵심).
-7. **risks / concerns 추출**: 명시 위험 / 불확실성 / open-question → R-*.
+6. **NFR 추출 (1차 책임)**: 응답시간 / 가용성 / 동시 사용자 / 보안 / a11y / 데이터 보존 기간 등 명시 NFR → NFR-\*. **명시되지 않은 NFR fabricate ❌** (no-simulation 의무 핵심).
+7. **risks / concerns 추출**: 명시 위험 / 불확실성 / open-question → R-\*.
 8. **intent classification**: orchestrator inject `intent` (new/modify/bug-fix) 와 NL 안 키워드 cross-check — 모순 시 finding emit (예: intent=bug-fix 인데 NL 은 신규 기능 묘사).
 9. **discovery-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
 10. **`discovery-extraction-validator` 통과** 자격 = 모든 entry source_grounded / NL 안 실 문장 검증 (grep_hit_count > 0).

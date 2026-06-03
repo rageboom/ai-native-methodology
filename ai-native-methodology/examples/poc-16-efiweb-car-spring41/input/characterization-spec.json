@@ -10,9 +10,9 @@
     "confidence": 0.78,
     "raw_confidence": 0.78,
     "warnings": [
-      "★ data_source_status = code_only — MSSQL 운영 DB 직접 접근 ❌ / 도메인 expert 인터뷰 ❌ / ambiguous 1건 carry",
-      "★ 본 PoC characterization = 2 UC 본격 snapshot (UC-CAR-COST-001 + UC-CAR-MGT-001) — 전체 34 endpoint 중 2건만 / 나머지 partial carry",
-      "★ R1' axis Spring 4.1 + iBATIS 2 paradigm = characterization 추출 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 isomorphic)"
+      "data_source_status = code_only — MSSQL 운영 DB 직접 접근 ❌ / 도메인 expert 인터뷰 ❌ / ambiguous 1건 carry",
+      "본 PoC characterization = 2 UC 본격 snapshot (UC-CAR-COST-001 + UC-CAR-MGT-001) — 전체 34 endpoint 중 2건만 / 나머지 partial carry",
+      "R1' axis Spring 4.1 + iBATIS 2 paradigm = characterization 추출 정확도 50%대 ceiling 정합 (PoC #06/#07/#11 isomorphic)"
     ]
   },
   "snapshots": [
@@ -71,7 +71,7 @@
         },
         {
           "id": "SCN-CAR-COST-001-likely-bug",
-          "name": "★ likely bug — cross-DB transaction 보장 ❌",
+          "name": "likely bug — cross-DB transaction 보장 ❌",
           "tags": [
             "@bug",
             "@cross-db",
@@ -222,7 +222,7 @@
         },
         {
           "id": "SCN-CAR-MGT-001-todo-stub",
-          "name": "★ self_recognized — TODO Auto-generated method stub",
+          "name": "self_recognized — TODO Auto-generated method stub",
           "tags": [
             "@self_recognized",
             "@satd"

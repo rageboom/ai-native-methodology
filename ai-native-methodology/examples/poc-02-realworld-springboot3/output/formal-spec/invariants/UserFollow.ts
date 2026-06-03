@@ -1,7 +1,7 @@
 // PoC #02 — UserFollow Aggregate Refinement Type + Invariant (Phase 4.5 Sprint 2)
 // 일자: 2026-04-29
-// Source of Truth: 자연어 명세 (rules.json BR-USER-FOLLOW-*) — Direction A 단방향 ★
-// ★ F-074 단방향 round-trip 검증 케이스
+// Source of Truth: 자연어 명세 (rules.json BR-USER-FOLLOW-*) — Direction A 단방향 
+//  F-074 단방향 round-trip 검증 케이스
 // 관련 BR: BR-USER-FOLLOW-NO-SELF-001 / BR-USER-FOLLOW-DIRECTIONAL-001 / BR-USER-FOLLOW-IDEMPOTENT-001
 // 표기 도구: TypeScript-like (사람·AI 양쪽 친화)
 
@@ -12,7 +12,7 @@ import type { UserId } from './User';
 // ============================================================================
 
 /**
- * DistinctUserPair — follower ≠ following 보장 (★ F-074)
+ * DistinctUserPair — follower ≠ following 보장 ( F-074)
  * 자연어 BR-USER-FOLLOW-NO-SELF-001 형식화 결과
  */
 type DistinctUserPair = readonly [follower: UserId, following: UserId] & {
@@ -41,7 +41,7 @@ interface UserFollow {
 
 namespace UserFollowInvariants {
   /**
-   * INV-USER-FOLLOW-NO-SELF (★ F-074 — Sprint 2 신규)
+   * INV-USER-FOLLOW-NO-SELF ( F-074 — Sprint 2 신규)
    * - 자연어: BR-USER-FOLLOW-NO-SELF-001
    * - 검증 위치 결단: Domain (UserFollow 생성자) — §decision-table §2
    * - 거부 방식 결단: IllegalArgumentException
@@ -126,7 +126,7 @@ namespace UC_USER_FOLLOW {
         // 성공: 1건 추가 + 모든 invariant 보장
         return (
           followsAfter.length === followsBefore.length + 1 &&
-          UserFollowInvariants.noSelfFollow(output.follow) &&             // ★ F-074
+          UserFollowInvariants.noSelfFollow(output.follow) &&             //  F-074
           UserFollowInvariants.directionalUnique(followsAfter) &&
           output.follow.follower.id === input.follower &&
           output.follow.following.id === input.following
@@ -170,7 +170,7 @@ namespace UC_USER_UNFOLLOW {
 }
 
 // ============================================================================
-// 자연어 → 형식화 결단 trace (★ F-074 단방향 round-trip 핵심)
+// 자연어 → 형식화 결단 trace ( F-074 단방향 round-trip 핵심)
 // ============================================================================
 
 /*

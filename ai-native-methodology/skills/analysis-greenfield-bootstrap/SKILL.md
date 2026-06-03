@@ -25,6 +25,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Task
 ### 2단계 — 결정적 산출 (swagger 채널 / testable)
 
 swagger-extract 가 있으면 `node ${CLAUDE_PLUGIN_ROOT}/tools/greenfield-bootstrap/src/cli.js --output <user-project>/.aimd/output --swagger-extract .aimd/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
+
 - `openapi.yaml` (deliverable 5-a) — swagger-extract(이미 파싱된 OpenAPI)의 **결정적 승격** (AI 추론 0).
 - `antipatterns.json` + `migration-cautions.json` — legacy-only 산출물 **N/A** (빈 배열 + `meta.na_reason` 정당화 / `antipatterns.schema.json` + `migration-cautions.schema.json` 정합 / ADR-011 json 단독).
 
@@ -33,6 +34,7 @@ swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--o
 ### 3단계 — AI code-optional 산출 (5종 / greenfield-mode)
 
 각 analysis skill 의 **greenfield (code-optional) mode** 로 입력어댑터 extract 에서 산출 (코드 grep ❌ / 입력 출처 인용):
+
 - `analysis-architecture` → architecture.json (설계 의도 / stack 권장 패턴 / `inferred`)
 - `analysis-domain-model` → domain.json (swagger domain_seed / figma 화면 / PRD 엔티티)
 - `analysis-business-rules` → business-rules.json (swagger rules_seed / PRD acceptance / form-validation)
@@ -62,4 +64,4 @@ swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--o
 
 - legacy 코드 분석 (S1/S2/S3) → `analysis-input-collection` (코드-고고학 패스 포함).
 - scenario 미선언 → `chain-driver init --scenario greenfield` 먼저.
-- ★ 정직 한계: 본 skill 의 AI code-optional mode 산출은 **≥2 입력 채널 dogfood 미완** (swagger 1채널 입증 / figma·PRD 2nd 채널 = carry `C-use-scenario-greenfield-dogfood-2nd-channel`). DB schema 합성(entity→table) = carry `C-use-scenario-greenfield-schema-synthesis`.
+- 정직 한계: 본 skill 의 AI code-optional mode 산출은 **≥2 입력 채널 dogfood 미완** (swagger 1채널 입증 / figma·PRD 2nd 채널 = carry `C-use-scenario-greenfield-dogfood-2nd-channel`). DB schema 합성(entity→table) = carry `C-use-scenario-greenfield-schema-synthesis`.

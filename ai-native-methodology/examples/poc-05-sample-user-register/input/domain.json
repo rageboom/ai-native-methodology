@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #05 — Use Cases. chain 1 planning-spec.use_cases 의 source.",
+  "$comment": "PoC #05 — Use Cases. chain 1 planning-spec.use_cases 의 source.",
   "project_id": "poc-05-sample-user-register",
   "use_cases": [
     {

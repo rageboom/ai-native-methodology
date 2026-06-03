@@ -15,11 +15,13 @@
 v8.7.3 plugin 으로 mis-fe-admin EAM-AUTH verify-1 iter-6 Stage 1 진입 시:
 
 **B14 evidence (Sub-task customfield_10006 명시 ❌)**:
+
 - Stage 1 (analysis) 의 Sub-task 14건 (DWPD-1668~1681) 생성 시 `extra_fields.customfield_10006 = "DWPD-1442"` (parent Epic) 명시 시도 → 모두 400 reject.
 - 사용자 우회: `jira_create` payload 에서 customfield_10006 제거 후 `parent_key=<Story key>` 만 사용 → 14건 모두 success. parent Story (DWPD-1667) 의 Epic Link (customfield_10006 = DWPD-1442) 가 Sub-task 에 auto-inherit 확인.
-- 후속 `jira_update × 14` backfill 시도 (잘못된 hint 로 customfield_10006 재명시) → 14건 모두 400 reject. → carry_to_v8_7_4: "B14 Sub-task epic_link dual binding 의무" (★ 정정 = dual binding 이 아니라 single binding + auto-inherit / F-VERIFY-015 신규 finding).
+- 후속 `jira_update × 14` backfill 시도 (잘못된 hint 로 customfield_10006 재명시) → 14건 모두 400 reject. → carry_to_v8_7_4: "B14 Sub-task epic_link dual binding 의무" ( 정정 = dual binding 이 아니라 single binding + auto-inherit / F-VERIFY-015 신규 finding).
 
 **B15 evidence (Structure 자동 등록)**:
+
 - Stage 1 종결 후 사용자가 별도 `jira_structure_add_issues` 호출로 Atlassian Structure (DWP-Forge id=676) 에 Story 1 + Sub-task 14 = 15 row 추가 (version 1→2). 본 호출이 plugin 본문에 자동화되어 있지 않아 Stage 마다 사용자 manual 호출 필요. → carry_to_v8_7_4: "B15 jira_structure_add_issues 자동 호출 표준화".
 - 5 stage 종결 후 Structure tree 총 106 row 등록. version 1 → 6 (stage 별 +1).
 
@@ -31,11 +33,11 @@ v8.7.3 plugin 으로 mis-fe-admin EAM-AUTH verify-1 iter-6 Stage 1 진입 시:
 
 ### 3. universal claim 정합
 
-| 축 | v8.7.3 plugin | v8.7.4 |
-|---|---|---|
-| Sub-task Epic Link binding | "Sub-task = parent_key" 약한 명시 | invariant + 위반 reject + auto-inherit 본문 |
-| Structure 등록 | analysis exit 만 1회 자동 | 모든 phase=exit 자동 (env-config 설정 시) |
-| 사용자 manual 부담 | Sub-task customfield 시도 → 매번 reject + 사용자 우회 | 0 (Sub-task payload 본문이 자체로 정합) |
+| 축                         | v8.7.3 plugin                                         | v8.7.4                                      |
+| -------------------------- | ----------------------------------------------------- | ------------------------------------------- |
+| Sub-task Epic Link binding | "Sub-task = parent_key" 약한 명시                     | invariant + 위반 reject + auto-inherit 본문 |
+| Structure 등록             | analysis exit 만 1회 자동                             | 모든 phase=exit 자동 (env-config 설정 시)   |
+| 사용자 manual 부담         | Sub-task customfield 시도 → 매번 reject + 사용자 우회 | 0 (Sub-task payload 본문이 자체로 정합)     |
 
 ## 변경 항목
 

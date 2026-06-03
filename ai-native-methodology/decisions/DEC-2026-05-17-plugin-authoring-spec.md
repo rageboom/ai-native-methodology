@@ -1,7 +1,7 @@
 # DEC-2026-05-17-plugin-authoring-spec
 
-- **상태**: 승인 (★ ★ 사용자 결단 4건 / 4원칙 full plan+research / additive / v7.1.0 MINOR)
-- **일자**: 2026-05-17 (★ session 26차 후속 / v7.1.0 MINOR)
+- **상태**: 승인 ( 사용자 결단 4건 / 4원칙 full plan+research / additive / v7.1.0 MINOR)
+- **일자**: 2026-05-17 ( session 26차 후속 / v7.1.0 MINOR)
 - **결정자**: 윤주스 (TF Lead) — 사용자 질문 "plugin skill/hooks/agent 작성 시 Anthropic 공식·커뮤니티 best practice?" → "1번(감사)+2번(SSOT) 둘 다 + 공식 변경 시 재검증 고려"
 - **관련**: ADR-PLUGIN-001 (결정 원천) / `methodology-spec/plugin-authoring-spec.md` (단일 SSOT) / plugin-charter.md R18 / ADR-010 (baseline+ratchet 차용) / ADR-009 (no-simulation·네트워크=§2) / DEC-2026-05-17-package-version-3way-sync-fix (선행 housekeeping) / plan `skill-hooks-tender-stonebraker`
 
@@ -15,16 +15,16 @@
 
 ### §1. 사용자 결단 4건
 
-| # | 결단 | 채택 |
-|---|---|---|
-| #1 charter 등급 | **R18 정식 요구사항 신설** (§5 backlog 아님 — enforcement 강제력 최상) |
+| #                          | 결단                                                                                                                   | 채택 |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---- |
+| #1 charter 등급            | **R18 정식 요구사항 신설** (§5 backlog 아님 — enforcement 강제력 최상)                                                 |
 | #2 package.json 선행 drift | **별도 housekeeping 선행 청산** (4.0.1→7.0.0 / DEC-2026-05-17-package-version-3way-sync-fix / 별도 commit / 이력 분리) |
-| #3 감사 발견 breaking | **감사+백로그만, 수정 전원 이연** (한글 skill rename=별도 MAJOR / cooling-off+Senior+STOP-gate) |
-| #4 staleness 임계 | **60일** |
+| #3 감사 발견 breaking      | **감사+백로그만, 수정 전원 이연** (한글 skill rename=별도 MAJOR / cooling-off+Senior+STOP-gate)                        |
+| #4 staleness 임계          | **60일**                                                                                                               |
 
-### §2. 시행 (★ additive / 선행 자산 무수정)
+### §2. 시행 ( additive / 선행 자산 무수정)
 
-- **신설** `methodology-spec/plugin-authoring-spec.md` (★ ★ ★ 단일 SSOT / §1~§11). §6 pin = 실 `_base-official-docs-checker` F-015 ×4 VERIFIED (canonical `code.claude.com/docs/en/{skills,hooks,sub-agents,plugins-reference}` / 2026-05-17).
+- **신설** `methodology-spec/plugin-authoring-spec.md` ( 단일 SSOT / §1~§11). §6 pin = 실 `_base-official-docs-checker` F-015 ×4 VERIFIED (canonical `code.claude.com/docs/en/{skills,hooks,sub-agents,plugins-reference}` / 2026-05-17).
 - **신설** `docs/adr/ADR-PLUGIN-001-authoring-spec-and-docs-drift.md` (신규 namespace = ADR-BE/FE/CHAIN/NEST 정합 / §7 patch + §8 LL accretion 영역).
 - **`scripts/release-readiness.js` check #12** (`authoring_spec_staleness`) — §6 `last_verified` 4행 ≤ 60일 결정적 가드 (date-math only / 네트워크 ❌ / `check10` isomorphic / `--skip-authoring-staleness`=skip≠pass). 11/11 → **12/12**. `release-readiness.test.js` 12 case 갱신 (OD-3 — 기존 11 assert 동일 MINOR 내 12 전환).
 - **`plugin-charter.md` R18** §1+§2+§6 + 헤더 "17→18" (활성 16 / R16·R17 scope-out 유지).
@@ -37,10 +37,10 @@
 - Layer ii 결정적 가드 = check #12 (offline date-math / 양심 비의존 = 본 repo 패러다임 / precedent R2→#10·A1→#11).
 - grandfather (ADR-010 §2.1) = 감사 실 위반 = baseline grandfathered / ratchet = 신규·수정 자산만 §2·§4 강제.
 
-### §4. 감사 결과 (★ 실 F-015 cross-check / false-positive 3건 제거)
+### §4. 감사 결과 ( 실 F-015 cross-check / false-positive 3건 제거)
 
 - 실 위반 = **S3 1건 ❌ high** (`spec-integrate-7대-deliverables` 한글 → 공식 charset `[a-z0-9-]` 위반 / MAJOR rename / §8-1 이연) + **S3/A1 1군 ⚠️ low** (`_base-*` skill×5+agent×3 leading `_` / 의도적 grouping / §8-2 이연·수용 후보).
-- ★ false-positive 제거 — S1 retrofit 불요(47/47 ≤500L + out-of-tree ref = progressive disclosure 정합) / marketplace.json 위치 = 공식 정합 / agent `skills:` = 공식 preload 필드(자체확장 ❌). over-claim 교정 = `system_prompt`·`preloaded_skills` 미존재.
+- false-positive 제거 — S1 retrofit 불요(47/47 ≤500L + out-of-tree ref = progressive disclosure 정합) / marketplace.json 위치 = 공식 정합 / agent `skills:` = 공식 preload 필드(자체확장 ❌). over-claim 교정 = `system_prompt`·`preloaded_skills` 미존재.
 
 ### §5. 이연 (별도 user-gated bundle / 본 DEC scope ❌)
 
@@ -54,14 +54,14 @@
 - release-readiness **12/12** (A1 본격 spawn `criteria_total=12 passed=12 ready=true exit 0`)
 - `release-readiness.test.js` **12/12 pass** (check#12 happy + skip≠pass + 12-id 정합 신규 case)
 - version-check **3-way 7.1.0** (선행 housekeeping 청산 후 정상)
-- workspace test green / drift-validator 3-way 불변 (skill/agent/flow 무수정 = ★ §5 이연의 안전 속성)
+- workspace test green / drift-validator 3-way 불변 (skill/agent/flow 무수정 = §5 이연의 안전 속성)
 - breaking ❌ (선행 자산 무수정 / 감사 = 기록만) / chain harness validated 본질 보존
 
 ---
 
 ## Lessons Learned
 
-- **LL-i-58 (후보)** — main-agent 사전 research(claude-code-guide + Explore) 수렴만으로 단정 ❌. 실 `_base-official-docs-checker` F-015 ×4 독립 fetch 가 가설 false-positive 3건(S1 retrofit·marketplace 위치·agent skills 필드) + over-claim 2건(`system_prompt`·`preloaded_skills`) 제거 → 외부 권위 pin 은 반드시 1차 출처 독립 fetch seed (memory `feedback_sub_agent_validation` + ADR-009 no-simulation 정합). (★ ADR-PLUGIN-001 §8 LL-plugin-01 자산화 / 본 DEC = 등재 표기)
+- **LL-i-58 (후보)** — main-agent 사전 research(claude-code-guide + Explore) 수렴만으로 단정 ❌. 실 `_base-official-docs-checker` F-015 ×4 독립 fetch 가 가설 false-positive 3건(S1 retrofit·marketplace 위치·agent skills 필드) + over-claim 2건(`system_prompt`·`preloaded_skills`) 제거 → 외부 권위 pin 은 반드시 1차 출처 독립 fetch seed (memory `feedback_sub_agent_validation` + ADR-009 no-simulation 정합). ( ADR-PLUGIN-001 §8 LL-plugin-01 자산화 / 본 DEC = 등재 표기)
 - **LL-housekeeping 정합** — 선행 결함(package.json 3-way)을 feature 와 분리 별도 commit = 이력 청결 (DEC-2026-05-17-package-version-3way-sync-fix).
 
 ---

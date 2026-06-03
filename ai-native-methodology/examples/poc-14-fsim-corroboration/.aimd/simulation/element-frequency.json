@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ ★ poc-14 simulation 종결 frequency matrix. 47 skill / 9 agent / 17 tool / 3 hook.",
+  "$comment": "poc-14 simulation 종결 frequency matrix. 47 skill / 9 agent / 17 tool / 3 hook.",
   "meta": {
     "plugin_version": "8.3.0",
     "simulation_target": "poc-14-fsim-corroboration",
@@ -14,7 +14,7 @@
     "total_agent_dispatches": 0,
     "total_tool_invocations": 16,
     "total_hook_fires": 0,
-    "simulation_mode_note": "★ ★ ★ 시뮬레이션 = main agent 자체 수행 / Task tool 별도 dispatch ❌ / Claude Code session hook trigger ❌ — 결과 agent/hook count = 0 (★ 시뮬레이션 본질 한계 / F-SIM-13)."
+    "simulation_mode_note": "시뮬레이션 = main agent 자체 수행 / Task tool 별도 dispatch ❌ / Claude Code session hook trigger ❌ — 결과 agent/hook count = 0 (시뮬레이션 본질 한계 / F-SIM-13)."
   },
   "skills": {
     "by_stage": {
@@ -44,16 +44,16 @@
       "analysis-quality-antipattern":      { "fire_count": 1, "first_fire_at": "2026-05-18T16:05:30Z" },
       "analysis-formal-spec-validation":   { "fire_count": 0, "non_fire_category": "phase-simplified" },
       "analysis-characterization-test":    { "fire_count": 0, "non_fire_category": "phase-simplified" },
-      "analysis-sql-inventory":            { "fire_count": 0, "non_fire_category": "phase-simplified (★ stack 자체는 fire 가능 — characterization phase carry)" },
+      "analysis-sql-inventory":            { "fire_count": 0, "non_fire_category": "phase-simplified (stack 자체는 fire 가능 — characterization phase carry)" },
       "analysis-api-rule-mapping":         { "fire_count": 0, "non_fire_category": "phase-simplified" },
       "analysis-error-mapping":            { "fire_count": 1, "first_fire_at": "2026-05-18T16:05:00Z" },
       "analysis-aspect-a11y":              { "fire_count": 0, "non_fire_category": "track-mismatch (FE)" },
       "analysis-aspect-i18n":              { "fire_count": 0, "non_fire_category": "stack-signal-absent" },
       "analysis-aspect-legacy":            { "fire_count": 0, "non_fire_category": "stack-signal-absent" },
-      "analysis-aspect-static-security":   { "fire_count": 1, "first_fire_at": "2026-05-18T16:05:30Z", "result": "blocked_by_environment (★ Semgrep python wrapper deprecated / no-simulation carry)" },
+      "analysis-aspect-static-security":   { "fire_count": 1, "first_fire_at": "2026-05-18T16:05:30Z", "result": "blocked_by_environment (Semgrep python wrapper deprecated / no-simulation carry)" },
       "analysis-br-cross-consistency-check": { "fire_count": 1, "first_fire_at": "2026-05-18T16:05:30Z", "result": "Layer 1 결정적 only / Layer 2 LLM 시뮬레이션 ❌" },
       "analysis-html-template":            { "fire_count": 0, "non_fire_category": "scenario-mismatch (JSP-only)" },
-      "analysis-form-validation-fe":       { "fire_count": 0, "non_fire_category": "track-mismatch (FE-only / Pydantic 비포함 ★ F-SIM-14)" },
+      "analysis-form-validation-fe":       { "fire_count": 0, "non_fire_category": "track-mismatch (FE-only / Pydantic 비포함 F-SIM-14)" },
       "analysis-ui-state-map-fe":          { "fire_count": 0, "non_fire_category": "track-mismatch (FE)" },
       "analysis-ui-visual-manifest-fe":    { "fire_count": 0, "non_fire_category": "track-mismatch (FE)" },
       "analysis-type-spec-fe":             { "fire_count": 0, "non_fire_category": "track-mismatch (FE)" },
@@ -71,7 +71,7 @@
       "implement-react":                   { "fire_count": 0, "non_fire_category": "track-mismatch (FE React)" },
       "implement-vue":                     { "fire_count": 0, "non_fire_category": "track-mismatch (FE Vue)" },
       "implement-verify-test-pass":        { "fire_count": 1, "first_fire_at": "2026-05-18T16:32:30Z" },
-      "_base-apply-baseline-ratchet":      { "fire_count": 0, "non_fire_category": "stack-signal-absent (★ small new / legacy 아님)" },
+      "_base-apply-baseline-ratchet":      { "fire_count": 0, "non_fire_category": "stack-signal-absent (small new / legacy 아님)" },
       "_base-apply-template":              { "fire_count": 7, "first_fire_at": "2026-05-18T16:01:00Z", "trigger_sources": ["산출물 헤더 매번"] },
       "_base-log-finding":                 { "fire_count": 5, "first_fire_at": "2026-05-18T16:05:30Z", "trigger_sources": ["F-SIM-12~16 후보"] },
       "_base-build-traceability-matrix":   { "fire_count": 1, "first_fire_at": "2026-05-18T16:34:30Z" },
@@ -79,7 +79,7 @@
     }
   },
   "agents": {
-    "$comment": "★ ★ ★ 본 시뮬레이션 = main agent 자체 수행 / Task tool 별도 dispatch ❌ → all dispatch_count = 0. F-SIM-13 자산화.",
+    "$comment": "본 시뮬레이션 = main agent 자체 수행 / Task tool 별도 dispatch ❌ → all dispatch_count = 0. F-SIM-13 자산화.",
     "analysis-agent":                  { "dispatch_count": 0, "non_dispatch_reason": "main 자체 수행 (Task tool 미호출)" },
     "planning-agent":                  { "dispatch_count": 0, "non_dispatch_reason": "main 자체 수행" },
     "spec-agent":                      { "dispatch_count": 0, "non_dispatch_reason": "main 자체 수행" },
@@ -91,7 +91,7 @@
     "_base-official-docs-checker":     { "dispatch_count": 0, "non_dispatch_reason": "optional / 외부 docs 검증 불요" }
   },
   "hooks": {
-    "$comment": "★ ★ ★ 시뮬레이션 = Claude Code session 안이 아님 → hook trigger 0. F-SIM-13.",
+    "$comment": "시뮬레이션 = Claude Code session 안이 아님 → hook trigger 0. F-SIM-13.",
     "SessionStart":                    { "fire_count": 0, "non_fire_reason": "시뮬레이션 = no real Claude Code session" },
     "UserPromptSubmit":                { "fire_count": 0, "non_fire_reason": "시뮬레이션 = manual / hook bypass" },
     "PreToolUse":                      { "fire_count": 0, "non_fire_reason": "시뮬레이션 = chain-driver state.blocked=false / no Write/Edit deny trigger" }
@@ -103,7 +103,7 @@
     "chain-coverage-validator":        { "invoke_count": 3, "subcommands": { "default": 3 }, "first_invoke_at": "2026-05-18T16:20:00Z" },
     "spec-test-link-validator":        { "invoke_count": 1, "subcommands": { "default": 1 }, "first_invoke_at": "2026-05-18T16:27:00Z" },
     "traceability-matrix-builder":     { "invoke_count": 1, "subcommands": { "default": 1 }, "first_invoke_at": "2026-05-18T16:34:30Z" },
-    "test-impl-pass-validator":        { "invoke_count": 0, "non_invoke_reason": "★ wrapper 미사용 / 직접 pytest 호출 — wrapper 의 framework adapter 미검증 (F-SIM-005 P1 연계)" },
+    "test-impl-pass-validator":        { "invoke_count": 0, "non_invoke_reason": "wrapper 미사용 / 직접 pytest 호출 — wrapper 의 framework adapter 미검증 (F-SIM-005 P1 연계)" },
     "decision-table-validator":        { "invoke_count": 0, "non_invoke_reason": "본 PoC BR 의 decision table 부재 / simple validation rules" },
     "static-runner":                   { "invoke_count": 0, "non_invoke_reason": "Semgrep 환경 부재 (Windows MSYS2)" },
     "spectral-runner":                 { "invoke_count": 0, "non_invoke_reason": "swagger lint scope-out" },
@@ -132,8 +132,8 @@
   ],
   "coverage_summary": {
     "skills": { "fire_rate": 0.66, "fire_target": 0.64, "result": "✓ (30/47 ≥ 30 의무)" },
-    "agents": { "dispatch_rate": 0.0, "dispatch_target": 0.56, "result": "✗ (0/9 < 5 / ★ 시뮬레이션 본질 한계 / F-SIM-13)" },
-    "tools": { "invoke_rate": 0.41, "invoke_target": 0.71, "result": "✗ (7/17 < 12 / ★ 본 시나리오 한정 — 특정 phase scope-out / drift·citation tool 등 plugin 자체 변경 시 invoke)" },
-    "hooks": { "fire_rate": 0.0, "fire_target": 1.0, "result": "✗ (0/3 / ★ 시뮬레이션 본질 한계)" }
+    "agents": { "dispatch_rate": 0.0, "dispatch_target": 0.56, "result": "✗ (0/9 < 5 / 시뮬레이션 본질 한계 / F-SIM-13)" },
+    "tools": { "invoke_rate": 0.41, "invoke_target": 0.71, "result": "✗ (7/17 < 12 / 본 시나리오 한정 — 특정 phase scope-out / drift·citation tool 등 plugin 자체 변경 시 invoke)" },
+    "hooks": { "fire_rate": 0.0, "fire_target": 1.0, "result": "✗ (0/3 / 시뮬레이션 본질 한계)" }
   }
 }

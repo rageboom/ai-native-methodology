@@ -6,7 +6,7 @@
     "confidence": 0.88,
     "formula_version": "v1",
     "confidence_breakdown": {"use_cases": 0.92, "business_rules_intent": 0.85, "out_of_scope": 0.95, "risks_and_constraints": 0.85},
-    "$comment": "★ confidence 0.88 — Modern Node.js + small codebase + Modern TS / vs PoC #08 0.92 → ★ ↓ (★ TypeORM ORM 추상화 21건 = logical SQL 추론)."
+    "$comment": " confidence 0.88 — Modern Node.js + small codebase + Modern TS / vs PoC #08 0.92 → ↓ ( TypeORM ORM 추상화 21건 = logical SQL 추론)."
   },
   "derivation_source": {
     "type": "legacy-extraction",
@@ -16,78 +16,78 @@
       "characterization/snapshots/{6 snapshot}",
       "characterization/intent-vs-bug.md",
       "characterization/coverage.json",
-      "source/src/{user, article, profile, tag}/* (★ NestJS 5 + TypeORM 0.2 + TypeScript)"
+      "source/src/{user, article, profile, tag}/* ( NestJS 5 + TypeORM 0.2 + TypeScript)"
     ]
   },
   "business_intent": {
     "domain_purpose": "Realworld Conduit (Medium-clone blog) — 4 BC (user/article/profile/tag) Modern Node.js + TypeORM stack. 학습 자료 + production-grade NestJS reference.",
-    "stakeholders": ["reader (article 조회)", "writer (article 작성/comment)", "admin (★ DELETE users / 미세 boundary)", "developer (★ ★ NestJS + TypeORM 학습자)"],
+    "stakeholders": ["reader (article 조회)", "writer (article 작성/comment)", "admin ( DELETE users / 미세 boundary)", "developer ( NestJS + TypeORM 학습자)"],
     "success_criteria": [
       "REST API 정합 (4 BC 표준 CRUD)",
-      "★ ★ argon2 password hash 정상 보안 (vs PoC #08 평문 inverse)",
+      " argon2 password hash 정상 보안 (vs PoC #08 평문 inverse)",
       "TypeORM dynamic SQL paradigm = createQueryBuilder fluent API 입증",
-      "★ phase 4.7 acceptance oracle = 11/11 = 100% (Modern Node.js 정합)",
-      "★ ★ ★ ★ paradigm + platform-cross corroboration #2 MEDIUM 사실 확보 (★ raw query() 입증 ❌ 솔직 / strong corroboration = ★ 별도 carry)",
-      "★ ★ 새 시스템 권고: NestJS @Transaction 의무 (AP-RW-003) + REST URL convention 정합 (AP-RW-001)"
+      " phase 4.7 acceptance oracle = 11/11 = 100% (Modern Node.js 정합)",
+      " paradigm + platform-cross corroboration #2 MEDIUM 사실 확보 ( raw query() 입증 ❌ 솔직 / strong corroboration = 별도 carry)",
+      " 새 시스템 권고: NestJS @Transaction 의무 (AP-RW-003) + REST URL convention 정합 (AP-RW-001)"
     ]
   },
   "use_cases": [
     {"id": "UC-RW-001", "name": "현재 사용자 조회", "description": "GET /user", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["UserRO"], "acceptance_criteria_refs": ["AC-RW-001"], "source_grounded_evidence": ["UserController.findMe", "user.service.ts findOne"]},
     {"id": "UC-RW-002", "name": "사용자 정보 갱신", "description": "PUT /user", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["user UPDATE"], "acceptance_criteria_refs": ["AC-RW-002"], "source_grounded_evidence": ["UserController.update", "user.service.ts update"]},
-    {"id": "UC-RW-003", "name": "★ 사용자 등록 (uniqueness + argon2)", "description": "POST /users — createQueryBuilder uniqueness + argon2 hash + save", "actors": ["shopper"], "preconditions": ["username/email/password 입력"], "postconditions": ["user 신규"], "acceptance_criteria_refs": ["AC-RW-003"], "source_grounded_evidence": ["snapshots/UC-RW-003-register.json", "user.service.ts:42-54"], "linked_brs": ["BR-RW-IDENTITY-001", "BR-RW-AUTHN-002"]},
-    {"id": "UC-RW-004", "name": "사용자 삭제", "description": "DELETE /users/:slug (★ AP-RW-001 :slug = username)", "actors": ["admin"], "preconditions": ["admin"], "postconditions": ["user DELETE"], "acceptance_criteria_refs": ["AC-RW-004"], "source_grounded_evidence": ["UserController.delete"], "modernization_note": "★ /users/:username 명시 권장"},
-    {"id": "UC-RW-005", "name": "★ 로그인 (argon2.verify)", "description": "POST /users/login — argon2.verify password 비교 / vs PoC #08 평문 inverse", "actors": ["registered_user"], "preconditions": ["email/password"], "postconditions": ["JWT 발급"], "acceptance_criteria_refs": ["AC-RW-005"], "source_grounded_evidence": ["snapshots/UC-RW-005-login.json", "user.service.ts:26-36"], "linked_brs": ["BR-RW-AUTHN-002"]},
-    {"id": "UC-RW-006", "name": "★ ★ ★ Article 목록 (4 dynamic where / paradigm core)", "description": "GET /articles — createQueryBuilder + 4 dynamic andWhere + leftJoinAndSelect + orderBy + limit/offset", "actors": ["shopper"], "preconditions": [], "postconditions": ["articles + count"], "acceptance_criteria_refs": ["AC-RW-006"], "source_grounded_evidence": ["snapshots/UC-RW-006-articleFindAll.json", "article.service.ts:26-64"], "linked_brs": ["BR-RW-ARTICLE-003"], "modernization_note": "★ AP-RW-002 — 'where(1=1)' placeholder smell"},
+    {"id": "UC-RW-003", "name": " 사용자 등록 (uniqueness + argon2)", "description": "POST /users — createQueryBuilder uniqueness + argon2 hash + save", "actors": ["shopper"], "preconditions": ["username/email/password 입력"], "postconditions": ["user 신규"], "acceptance_criteria_refs": ["AC-RW-003"], "source_grounded_evidence": ["snapshots/UC-RW-003-register.json", "user.service.ts:42-54"], "linked_brs": ["BR-RW-IDENTITY-001", "BR-RW-AUTHN-002"]},
+    {"id": "UC-RW-004", "name": "사용자 삭제", "description": "DELETE /users/:slug ( AP-RW-001 :slug = username)", "actors": ["admin"], "preconditions": ["admin"], "postconditions": ["user DELETE"], "acceptance_criteria_refs": ["AC-RW-004"], "source_grounded_evidence": ["UserController.delete"], "modernization_note": " /users/:username 명시 권장"},
+    {"id": "UC-RW-005", "name": " 로그인 (argon2.verify)", "description": "POST /users/login — argon2.verify password 비교 / vs PoC #08 평문 inverse", "actors": ["registered_user"], "preconditions": ["email/password"], "postconditions": ["JWT 발급"], "acceptance_criteria_refs": ["AC-RW-005"], "source_grounded_evidence": ["snapshots/UC-RW-005-login.json", "user.service.ts:26-36"], "linked_brs": ["BR-RW-AUTHN-002"]},
+    {"id": "UC-RW-006", "name": " Article 목록 (4 dynamic where / paradigm core)", "description": "GET /articles — createQueryBuilder + 4 dynamic andWhere + leftJoinAndSelect + orderBy + limit/offset", "actors": ["shopper"], "preconditions": [], "postconditions": ["articles + count"], "acceptance_criteria_refs": ["AC-RW-006"], "source_grounded_evidence": ["snapshots/UC-RW-006-articleFindAll.json", "article.service.ts:26-64"], "linked_brs": ["BR-RW-ARTICLE-003"], "modernization_note": " AP-RW-002 — 'where(1=1)' placeholder smell"},
     {"id": "UC-RW-007", "name": "Article feed (follow IN ids)", "description": "GET /articles/feed", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["articles + count"], "acceptance_criteria_refs": ["AC-RW-007"], "source_grounded_evidence": ["article.service.ts:66-94"], "linked_brs": ["BR-RW-FEED-004"]},
     {"id": "UC-RW-008", "name": "단일 Article 조회 (slug)", "description": "GET /articles/:slug", "actors": ["shopper"], "preconditions": ["slug"], "postconditions": ["article"], "acceptance_criteria_refs": ["AC-RW-008"], "source_grounded_evidence": ["article.service.ts findOne"]},
     {"id": "UC-RW-009", "name": "Article comments 조회", "description": "GET /articles/:slug/comments", "actors": ["shopper"], "preconditions": ["slug"], "postconditions": ["comments"], "acceptance_criteria_refs": ["AC-RW-009"], "source_grounded_evidence": ["article.service.ts findComments"]},
-    {"id": "UC-RW-010", "name": "★ Article 작성 (slug 자동)", "description": "POST /articles — slug pkg 자동 생성 + cascade tags", "actors": ["registered_user"], "preconditions": ["JWT + title/body"], "postconditions": ["article INSERT"], "acceptance_criteria_refs": ["AC-RW-010"], "source_grounded_evidence": ["article.service.ts create"], "linked_brs": ["BR-RW-SLUG-005"]},
+    {"id": "UC-RW-010", "name": " Article 작성 (slug 자동)", "description": "POST /articles — slug pkg 자동 생성 + cascade tags", "actors": ["registered_user"], "preconditions": ["JWT + title/body"], "postconditions": ["article INSERT"], "acceptance_criteria_refs": ["AC-RW-010"], "source_grounded_evidence": ["article.service.ts create"], "linked_brs": ["BR-RW-SLUG-005"]},
     {"id": "UC-RW-011", "name": "Article 갱신", "description": "PUT /articles/:slug", "actors": ["registered_user"], "preconditions": ["JWT + 본인"], "postconditions": ["article UPDATE"], "acceptance_criteria_refs": ["AC-RW-011"], "source_grounded_evidence": ["article.service.ts update"]},
     {"id": "UC-RW-012", "name": "Article 삭제", "description": "DELETE /articles/:slug", "actors": ["registered_user"], "preconditions": ["JWT + 본인"], "postconditions": ["article DELETE"], "acceptance_criteria_refs": ["AC-RW-012"], "source_grounded_evidence": ["article.service.ts delete"]},
-    {"id": "UC-RW-013", "name": "★ Comment 추가 (cascade)", "description": "POST /articles/:slug/comments — TypeORM cascade", "actors": ["registered_user"], "preconditions": ["JWT + slug + body"], "postconditions": ["comment INSERT + article cascade"], "acceptance_criteria_refs": ["AC-RW-013"], "source_grounded_evidence": ["snapshots/UC-RW-013-addComment.json", "article.service.ts addComment"], "linked_brs": ["BR-RW-COMMENT-006"]},
+    {"id": "UC-RW-013", "name": " Comment 추가 (cascade)", "description": "POST /articles/:slug/comments — TypeORM cascade", "actors": ["registered_user"], "preconditions": ["JWT + slug + body"], "postconditions": ["comment INSERT + article cascade"], "acceptance_criteria_refs": ["AC-RW-013"], "source_grounded_evidence": ["snapshots/UC-RW-013-addComment.json", "article.service.ts addComment"], "linked_brs": ["BR-RW-COMMENT-006"]},
     {"id": "UC-RW-014", "name": "Comment 삭제", "description": "DELETE /articles/:slug/comments/:id", "actors": ["registered_user"], "preconditions": ["JWT + 본인"], "postconditions": ["comment DELETE"], "acceptance_criteria_refs": ["AC-RW-014"], "source_grounded_evidence": ["article.service.ts deleteComment"]},
-    {"id": "UC-RW-015", "name": "★ Article favorite (★ AP-RW-003 트랜잭션 부재)", "description": "POST /articles/:slug/favorite — user.save + article.save 분리 / @Transactional ❌", "actors": ["registered_user"], "preconditions": ["JWT + slug"], "postconditions": ["favorites M:N + favoriteCount++"], "acceptance_criteria_refs": ["AC-RW-015"], "source_grounded_evidence": ["snapshots/UC-RW-015-favorite.json", "article.service.ts:131-145"], "modernization_note": "★ ★ NestJS @Transaction 의무"},
+    {"id": "UC-RW-015", "name": " Article favorite ( AP-RW-003 트랜잭션 부재)", "description": "POST /articles/:slug/favorite — user.save + article.save 분리 / @Transactional ❌", "actors": ["registered_user"], "preconditions": ["JWT + slug"], "postconditions": ["favorites M:N + favoriteCount++"], "acceptance_criteria_refs": ["AC-RW-015"], "source_grounded_evidence": ["snapshots/UC-RW-015-favorite.json", "article.service.ts:131-145"], "modernization_note": " NestJS @Transaction 의무"},
     {"id": "UC-RW-016", "name": "Article unfavorite", "description": "DELETE /articles/:slug/favorite", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["favorites splice + favoriteCount--"], "acceptance_criteria_refs": ["AC-RW-016"], "source_grounded_evidence": ["article.service.ts unFavorite"]},
     {"id": "UC-RW-017", "name": "Profile 조회", "description": "GET /profiles/:username", "actors": ["shopper"], "preconditions": ["username"], "postconditions": ["profile"], "acceptance_criteria_refs": ["AC-RW-017"], "source_grounded_evidence": ["profile.service.ts findProfile"]},
-    {"id": "UC-RW-018", "name": "★ Follow (uniqueness)", "description": "POST /profiles/:username/follow — uniqueness check + save", "actors": ["registered_user"], "preconditions": ["JWT + username"], "postconditions": ["follows INSERT"], "acceptance_criteria_refs": ["AC-RW-018"], "source_grounded_evidence": ["snapshots/UC-RW-018-follow.json", "profile.service.ts:50-77"], "linked_brs": ["BR-RW-FOLLOW-007"]},
+    {"id": "UC-RW-018", "name": " Follow (uniqueness)", "description": "POST /profiles/:username/follow — uniqueness check + save", "actors": ["registered_user"], "preconditions": ["JWT + username"], "postconditions": ["follows INSERT"], "acceptance_criteria_refs": ["AC-RW-018"], "source_grounded_evidence": ["snapshots/UC-RW-018-follow.json", "profile.service.ts:50-77"], "linked_brs": ["BR-RW-FOLLOW-007"]},
     {"id": "UC-RW-019", "name": "Unfollow", "description": "DELETE /profiles/:username/follow", "actors": ["registered_user"], "preconditions": ["JWT"], "postconditions": ["follows DELETE"], "acceptance_criteria_refs": ["AC-RW-019"], "source_grounded_evidence": ["profile.service.ts unFollow"]},
     {"id": "UC-RW-020", "name": "Tag 목록", "description": "GET /tags", "actors": ["shopper"], "preconditions": [], "postconditions": ["tags"], "acceptance_criteria_refs": ["AC-RW-020"], "source_grounded_evidence": ["tag.service.ts findAll"]}
   ],
   "business_rules": [
     {"id": "BR-RW-IDENTITY-001", "statement": "User 등록 시 username + email uniqueness (createQueryBuilder)", "applies_to": ["UC-RW-003"], "br_type": "uniqueness", "is_intent": true},
-    {"id": "BR-RW-AUTHN-002", "statement": "★ password = argon2 해시 (★ vs PoC #08 평문 inverse)", "applies_to": ["UC-RW-003", "UC-RW-005"], "br_type": "authentication", "is_intent": true},
-    {"id": "BR-RW-ARTICLE-003", "statement": "★ ★ Article findAll = 4 dynamic where (tag/author/favorited/IN ids)", "applies_to": ["UC-RW-006"], "br_type": "dynamic_search", "is_intent": true},
+    {"id": "BR-RW-AUTHN-002", "statement": " password = argon2 해시 ( vs PoC #08 평문 inverse)", "applies_to": ["UC-RW-003", "UC-RW-005"], "br_type": "authentication", "is_intent": true},
+    {"id": "BR-RW-ARTICLE-003", "statement": " Article findAll = 4 dynamic where (tag/author/favorited/IN ids)", "applies_to": ["UC-RW-006"], "br_type": "dynamic_search", "is_intent": true},
     {"id": "BR-RW-FEED-004", "statement": "Article findFeed = follow IN ids", "applies_to": ["UC-RW-007"], "br_type": "feed", "is_intent": true},
     {"id": "BR-RW-SLUG-005", "statement": "Article slug 자동 생성", "applies_to": ["UC-RW-010"], "br_type": "id_generation", "is_intent": true},
     {"id": "BR-RW-COMMENT-006", "statement": "Comment cascade save (TypeORM relation)", "applies_to": ["UC-RW-013"], "br_type": "cascade", "is_intent": true},
     {"id": "BR-RW-FOLLOW-007", "statement": "Profile follow uniqueness check", "applies_to": ["UC-RW-018"], "br_type": "uniqueness", "is_intent": true}
   ],
   "out_of_scope": [
-    "★ Prisma alternate ORM (prisma/ 디렉토리 / 본 PoC = TypeORM only)",
+    " Prisma alternate ORM (prisma/ 디렉토리 / 본 PoC = TypeORM only)",
     "관리 UI (admin dashboard 부재)",
     "결제 / e-commerce 흐름 (blog 도메인)",
-    "★ ★ chain 2~4 본격 진입 (★ §8.1 strict)"
+    " chain 2~4 본격 진입 ( §8.1 strict)"
   ],
   "risks_and_constraints": [
-    {"id": "R-001", "type": "concurrency", "severity": "medium", "description": "★ ★ Article favorite 트랜잭션 boundary 부재 (AP-RW-003 / partial commit risk)"},
+    {"id": "R-001", "type": "concurrency", "severity": "medium", "description": " Article favorite 트랜잭션 boundary 부재 (AP-RW-003 / partial commit risk)"},
     {"id": "R-002", "type": "design", "severity": "low", "description": "AP-RW-001 — DELETE users/:slug URL convention 부정합"},
     {"id": "R-003", "type": "design", "severity": "low", "description": "AP-RW-002 — `where(1=1)` placeholder smell"},
     {"id": "R-004", "type": "performance", "severity": "low", "description": "AP-RW-004 — Profile follow self-check 늦은 검증"}
   ],
   "phase_4_7_acceptance_oracle": {
-    "$comment": "★ paradigm + platform-cross MEDIUM #2 / 5번째 phase 4.7 spectrum 적용",
+    "$comment": " paradigm + platform-cross MEDIUM #2 / 5번째 phase 4.7 spectrum 적용",
     "named_classified_ratio_day2": "11/11 = 100%",
     "intent_count": 8,
     "bug_count": 1,
     "ambiguous_count": 2,
     "self_recognized_count": 0,
-    "spectrum_role": "★ Modern TypeScript + NestJS + TypeORM — DEC-CHAIN-006 §결정 §2 'spectrum 5번째 적용 강화'"
+    "spectrum_role": " Modern TypeScript + NestJS + TypeORM — DEC-CHAIN-006 §결정 §2 'spectrum 5번째 적용 강화'"
   },
   "sql_inventory_summary": {
     "total_sql_operations": 24,
     "auto_ratio_external_6": "4/6 = 66.7%",
     "isomorphic_with": ["PoC #06 (66.7%)", "PoC #07 (66.7%)", "PoC #08 (66.7%)"],
-    "paradigm_cross_role": "★ ★ MEDIUM corroboration #2 / iBATIS 2 / MyBatis 3 / TypeORM createQueryBuilder fluent API isomorphic / ★ raw query() 입증 ❌ 솔직"
+    "paradigm_cross_role": " MEDIUM corroboration #2 / iBATIS 2 / MyBatis 3 / TypeORM createQueryBuilder fluent API isomorphic / raw query() 입증 ❌ 솔직"
   },
   "cross_links": {
     "to_analysis_artifacts": [

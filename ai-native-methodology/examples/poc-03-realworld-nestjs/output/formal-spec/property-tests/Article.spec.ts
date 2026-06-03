@@ -2,9 +2,9 @@
  * Property-Based Test — ArticleService favorite/unFavorite (Phase 4.5)
  *
  * 일자: 2026-04-30
- * ★ Counter Aggregate 집중 — favoriteCount 단조성 + race window
+ *  Counter Aggregate 집중 — favoriteCount 단조성 + race window
  * 검증 대상:
- * - state-machine: Article.mermaid (★ counter aggregate 집중)
+ * - state-machine: Article.mermaid ( counter aggregate 집중)
  * - sequence: UC-ARTICLE-CREATE / UC-ARTICLE-FAVORITE
  * - invariants: Article.ts (ArticleInvariants + CounterAtomicity)
  */
@@ -27,7 +27,7 @@ class MockArticleService {
 
   async create(userId: number, dto: { title: string; body: string }): Promise<MockArticle> {
     const slug = dto.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-                  + '-' + Math.random().toString(36).substring(7);
+      + '-' + Math.random().toString(36).substring(7);
     const article: MockArticle = {
       id: this.idSeq++,
       slug,
@@ -38,12 +38,12 @@ class MockArticleService {
     return article;
   }
 
-  // ★★ F-135 critical — App 1중 isNewFavorite (DB FOR UPDATE 부재)
+  //  F-135 critical — App 1중 isNewFavorite (DB FOR UPDATE 부재)
   async favorite(userId: number, slug: string): Promise<MockArticle> {
     const article = this.articles.find(a => a.slug === slug);
     if (!article) throw new Error('article not found');
 
-    // ★ App 1중
+    //  App 1중
     const isNewFavorite = !this.favorites.find(f => f.userId === userId && f.articleId === article.id);
 
     if (isNewFavorite) {
@@ -129,9 +129,9 @@ describe('ArticleService Properties — Counter Aggregate 집중 (Phase 4.5)', (
   });
 
   // ----------------------------------------------------------------------
-  // INV-ARTICLE-SLUG-UNIQUE (★ F-120-slug — DB UQ 부재 / App level 만)
+  // INV-ARTICLE-SLUG-UNIQUE ( F-120-slug — DB UQ 부재 / App level 만)
   // ----------------------------------------------------------------------
-  test('INV-SLUG-UNIQUE: random suffix 로 슬러그 충돌 회피 (★ DB UQ 부재 / App level 보장 안 됨)', async () => {
+  test('INV-SLUG-UNIQUE: random suffix 로 슬러그 충돌 회피 ( DB UQ 부재 / App level 보장 안 됨)', async () => {
     const svc = new MockArticleService();
     const titles = Array.from({ length: 100 }, () => 'same-title');
     for (const title of titles) {
@@ -139,18 +139,18 @@ describe('ArticleService Properties — Counter Aggregate 집중 (Phase 4.5)', (
     }
     const slugs = svc.getArticles().map(a => a.slug);
     const uniqueSlugs = new Set(slugs);
-    // ★ random suffix 로 충돌 회피 (대부분의 경우)
+    //  random suffix 로 충돌 회피 (대부분의 경우)
     expect(uniqueSlugs.size).toBe(slugs.length);
   });
 
   // ----------------------------------------------------------------------
-  // ★★ F-135 critical — favoriteCount race window
+  //  F-135 critical — favoriteCount race window
   // ----------------------------------------------------------------------
-  test('★★ F-135 critical: 동시 favorite race window 시 favoriteCount 정합성 위반 가능 (현재 코드 실태)', async () => {
+  test(' F-135 critical: 동시 favorite race window 시 favoriteCount 정합성 위반 가능 (현재 코드 실태)', async () => {
     const svc = new MockArticleService();
     const article = await svc.create(1, { title: 'race', body: 'b' });
 
-    // ★ 본 Mock 은 단일 thread — 실제 race window 는 DB 환경 의무 (Sprint 5 carry-over)
+    //  본 Mock 은 단일 thread — 실제 race window 는 DB 환경 의무 (Sprint 5 carry-over)
     // 두 동시 favorite 시 양쪽 isNewFavorite=true 통과 → favoriteCount 2회 증가 / favorites.length 1회 증가
     // (실 환경 시뮬레이션은 진짜 MySQL + concurrent connection 필요)
     await svc.favorite(2, article.slug);

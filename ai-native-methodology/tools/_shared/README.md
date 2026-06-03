@@ -1,4 +1,4 @@
-# _shared/ — 공용 모듈
+# \_shared/ — 공용 모듈
 
 ## Purpose
 
@@ -7,16 +7,17 @@
 ## 파일
 
 - `baseline.js` — ADR-010 baseline + ratchet 로직 (zero-defect 강제 ❌ / 신규 결함만 차단)
-- `evidence-cross-check.js` — ★ v8.7 PATCH Layer 3 evidence cross-check helper (실 외부 도구 invocation log *.jsonl scan → unique `tool` count 산출). R15 silent enabler 차단 공용 logic.
+- `evidence-cross-check.js` — v8.7 PATCH Layer 3 evidence cross-check helper (실 외부 도구 invocation log \*.jsonl scan → unique `tool` count 산출). R15 silent enabler 차단 공용 logic.
 
 ## 사용 위치
 
 import 하는 도구:
+
 - [`../drift-validator/`](../drift-validator/) — drift count baseline + ratchet
 - [`../decision-table-validator/`](../decision-table-validator/) — DMN 5종 baseline + ratchet
 - [`../static-runner/`](../static-runner/) — SARIF finding baseline + ratchet
-- [`../characterization-coverage-validator/`](../characterization-coverage-validator/) — coverage baseline + ratchet trend / ★ evidence cross-check (v8.7 PATCH)
-- [`../sql-inventory-validator/`](../sql-inventory-validator/) — ★ evidence cross-check (v8.7 PATCH / Layer 3) / ★ v8.7 rename from sql-inventory-extractor (bin alias 양쪽 보존)
+- [`../characterization-coverage-validator/`](../characterization-coverage-validator/) — coverage baseline + ratchet trend / evidence cross-check (v8.7 PATCH)
+- [`../sql-inventory-validator/`](../sql-inventory-validator/) — evidence cross-check (v8.7 PATCH / Layer 3) / v8.7 rename from sql-inventory-extractor (bin alias 양쪽 보존)
 
 ## ADR-010 baseline + ratchet 정책
 
@@ -37,9 +38,9 @@ import 하는 도구:
 
 - 단일 file (~250 LOC)
 - runtime 독립 실행 ❌ (script 단독 호출 시점 0 / src/ 와 동급)
-- ★ dist 의무 포함 (3 도구가 import / 부재 시 빌드 회귀)
+- dist 의무 포함 (3 도구가 import / 부재 시 빌드 회귀)
 
-## ★ v8.7 PATCH Layer 3 evidence cross-check 정책
+## v8.7 PATCH Layer 3 evidence cross-check 정책
 
 ```
 1. 도구는 --evidence-dir <dir> 옵션 (cli flag) 신설
@@ -51,7 +52,7 @@ import 하는 도구:
 7. 옵션 미지정 → cross-check skip (backward-compat)
 ```
 
-evidence file schema (JSON Lines / *.jsonl): `{ tool, version, invocation_id, args, target, timestamp, duration_ms, exit_code, stdout_sample, result_sha256 }` — 필수 field: `tool`.
+evidence file schema (JSON Lines / \*.jsonl): `{ tool, version, invocation_id, args, target, timestamp, duration_ms, exit_code, stdout_sample, result_sha256 }` — 필수 field: `tool`.
 
 ## 참조
 

@@ -1,5 +1,5 @@
 {
-  "$comment": "★ phase 4.7 (characterization) coverage matrix — jpetstore-6 / Modern stack 단일책임. 핵심 6 UC snapshot / 13 UC carry (시간 cap 정합). ★ ★ ratchet + trend_required=true / Modern 환경 baseline write.",
+  "$comment": " phase 4.7 (characterization) coverage matrix — jpetstore-6 / Modern stack 단일책임. 핵심 6 UC snapshot / 13 UC carry (시간 cap 정합). ratchet + trend_required=true / Modern 환경 baseline write.",
   "project_id": "poc-08-realworld-mybatis",
   "snapshot_count": 6,
   "scenario_count": 8,
@@ -11,7 +11,7 @@
     {
       "uc": "UC-PETSTORE-001",
       "controller_method": "AccountActionBean.newAccountForm",
-      "service_method": "(★ form view only / no service call)",
+      "service_method": "( form view only / no service call)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -20,11 +20,11 @@
     {
       "uc": "UC-PETSTORE-002",
       "controller_method": "AccountActionBean.newAccount",
-      "service_method": "AccountService.insertAccount (★ @Transactional)",
+      "service_method": "AccountService.insertAccount ( @Transactional)",
       "sql_id": "AccountMapper.insertAccount + insertProfile + insertSignon",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-002 / 1 scenario (happy path 3 테이블 atomic insert + 평문 password bug 동반)"],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered ( 핵심)"
     },
     {
       "uc": "UC-PETSTORE-003",
@@ -38,7 +38,7 @@
     {
       "uc": "UC-PETSTORE-004",
       "controller_method": "AccountActionBean.editAccount",
-      "service_method": "AccountService.updateAccount (★ @Transactional / Optional<password> 분기)",
+      "service_method": "AccountService.updateAccount ( @Transactional / Optional<password> 분기)",
       "sql_id": "AccountMapper.updateAccount + updateProfile + updateSignon (조건부)",
       "snapshot": "❌",
       "covered_by": [],
@@ -47,7 +47,7 @@
     {
       "uc": "UC-PETSTORE-005",
       "controller_method": "AccountActionBean.signonForm",
-      "service_method": "(★ form view only)",
+      "service_method": "( form view only)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -60,12 +60,12 @@
       "sql_id": "AccountMapper.getAccountByUsernameAndPassword",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-006 / 2 scenario (happy + 잘못된 password edge)"],
-      "scope_decision": "covered (★ 핵심 — critical 평문 password bug)"
+      "scope_decision": "covered ( 핵심 — critical 평문 password bug)"
     },
     {
       "uc": "UC-PETSTORE-007",
       "controller_method": "AccountActionBean.signoff",
-      "service_method": "(★ session.invalidate)",
+      "service_method": "( session.invalidate)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -74,16 +74,16 @@
     {
       "uc": "UC-PETSTORE-008",
       "controller_method": "CartActionBean.addItemToCart",
-      "service_method": "(★ direct mapper / Cart = session)",
+      "service_method": "( direct mapper / Cart = session)",
       "sql_id": "ItemMapper.getItem + getInventoryQuantity",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-008 / 2 scenario (happy + 동일 item 수량 증가)"],
-      "scope_decision": "covered (★ 핵심)"
+      "scope_decision": "covered ( 핵심)"
     },
     {
       "uc": "UC-PETSTORE-009",
       "controller_method": "CartActionBean.removeItemFromCart",
-      "service_method": "(★ direct session)",
+      "service_method": "( direct session)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -92,7 +92,7 @@
     {
       "uc": "UC-PETSTORE-010",
       "controller_method": "CartActionBean.updateCartQuantities",
-      "service_method": "(★ direct session bulk)",
+      "service_method": "( direct session bulk)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -101,7 +101,7 @@
     {
       "uc": "UC-PETSTORE-011",
       "controller_method": "CatalogActionBean.viewMain",
-      "service_method": "(★ static view)",
+      "service_method": "( static view)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -137,11 +137,11 @@
     {
       "uc": "UC-PETSTORE-015",
       "controller_method": "CatalogActionBean.searchProducts",
-      "service_method": "CatalogService.searchProductList (★ N+1 keyword split)",
-      "sql_id": "ProductMapper.searchProductList (★ keyword 별 호출)",
+      "service_method": "CatalogService.searchProductList ( N+1 keyword split)",
+      "sql_id": "ProductMapper.searchProductList ( keyword 별 호출)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-015 / 1 scenario (happy + N+1 입증)"],
-      "scope_decision": "covered (★ 핵심 — AP-005 N+1)"
+      "scope_decision": "covered ( 핵심 — AP-005 N+1)"
     },
     {
       "uc": "UC-PETSTORE-016",
@@ -155,7 +155,7 @@
     {
       "uc": "UC-PETSTORE-017",
       "controller_method": "OrderActionBean.newOrderForm",
-      "service_method": "(★ form view + cart pre-fill)",
+      "service_method": "( form view + cart pre-fill)",
       "sql_id": "(없음)",
       "snapshot": "❌",
       "covered_by": [],
@@ -164,20 +164,20 @@
     {
       "uc": "UC-PETSTORE-018",
       "controller_method": "OrderActionBean.newOrder",
-      "service_method": "OrderService.insertOrder (★ @Transactional / 5 단계)",
+      "service_method": "OrderService.insertOrder ( @Transactional / 5 단계)",
       "sql_id": "SequenceMapper + ItemMapper.updateInventoryQuantity (per) + OrderMapper.insertOrder + insertOrderStatus + LineItemMapper.insertLineItem (per)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-018 / 1 scenario (happy 2 lineItem 5 단계 atomic + N+1 update + sequence race)"],
-      "scope_decision": "covered (★ ★ 핵심 — N+1 update + race + atomic)"
+      "scope_decision": "covered ( 핵심 — N+1 update + race + atomic)"
     },
     {
       "uc": "UC-PETSTORE-019",
       "controller_method": "OrderActionBean.viewOrder",
-      "service_method": "OrderService.getOrder (★ @Transactional / N+1 fetch)",
+      "service_method": "OrderService.getOrder ( @Transactional / N+1 fetch)",
       "sql_id": "OrderMapper.getOrder + LineItemMapper.getLineItemsByOrderId + ItemMapper.getItem (per) + getInventoryQuantity (per)",
       "snapshot": "✅",
       "covered_by": ["SNAP-UC-PETSTORE-019 / 1 scenario (happy + N+1 입증 6 SQL)"],
-      "scope_decision": "covered (★ ★ 핵심 — AP-006 N+1)"
+      "scope_decision": "covered ( 핵심 — AP-006 N+1)"
     }
   ],
   "coverage_metrics": {
@@ -187,18 +187,18 @@
     "coverage_ratio": "6/19 = 31.6%",
     "coverage_legacy_minimum": 0.30,
     "passes_legacy_minimum": true,
-    "$comment_coverage": "★ ★ Modern stack + 시간 cap → 핵심 6 UC (registration + signon + cart + search + order create + order view) cover. 13 UC carry = 모두 trivially deterministic CRUD 또는 form view (★ low risk / phase 4.7 의 의도/버그 분리 가치 약함)"
+    "$comment_coverage": " Modern stack + 시간 cap → 핵심 6 UC (registration + signon + cart + search + order create + order view) cover. 13 UC carry = 모두 trivially deterministic CRUD 또는 form view ( low risk / phase 4.7 의 의도/버그 분리 가치 약함)"
   },
   "acceptance_oracle": {
-    "named_classified_ratio_day2": "16/16 = 100% (★ ★ ≥ 80% pass / Modern stack 정합)",
+    "named_classified_ratio_day2": "16/16 = 100% ( ≥ 80% pass / Modern stack 정합)",
     "intent_count": 4,
     "bug_count": 8,
     "ambiguous_count": 4,
     "self_recognized_count": 0,
-    "$comment_oracle": "★ ★ ★ pet store 단순 도메인 → 100% 즉시 도달 / vs PoC #07 다중책임 Day 2 87.5% (+12.5%p) / vs PoC #06 단일책임 Day 2 후 94% (+6%p)"
+    "$comment_oracle": " pet store 단순 도메인 → 100% 즉시 도달 / vs PoC #07 다중책임 Day 2 87.5% (+12.5%p) / vs PoC #06 단일책임 Day 2 후 94% (+6%p)"
   },
   "ratchet_baseline": {
-    "$comment": "★ ★ Modern 환경 baseline write 첫 진입 (vs PoC #07 Legacy 환경 첫 진입). v2.1.1 PATCH ratchet trend production 두 번째 case.",
+    "$comment": " Modern 환경 baseline write 첫 진입 (vs PoC #07 Legacy 환경 첫 진입). v2.1.1 PATCH ratchet trend production 두 번째 case.",
     "coverage_strategy": "ratchet",
     "coverage_ratio": 0.316,
     "trend_required": true,

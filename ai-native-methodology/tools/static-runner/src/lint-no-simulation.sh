@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# lint-no-simulation.sh — ★★★ Sprint 4 묶음 O 차단 룰 enforcement.
+# lint-no-simulation.sh — Sprint 4 묶음 O 차단 룰 enforcement.
 # 입력: 디렉토리 (재귀). 검사: _manifest.yml + cross_validation 메타에 5종 물증 모두 있는지.
 # 5종 누락 또는 simulation_only:true → exit 1.
-# ★ ★ v2.0 sub-plan-3a — chain 4/5 (test-spec.json / impl-spec.json) 의 test_run_evidence(per-TC) /
+# v2.0 sub-plan-3a — chain 4/5 (test-spec.json / impl-spec.json) 의 test_run_evidence(per-TC) /
 #   test_pass_evidence(impl root) 5종 물증 10 필드 검증 추가 + impl-spec source_files commit_hash 의무 검증.
-#   ★ F-T05 — schema 정식 필드명(test_run_evidence/test_pass_evidence) + legacy(test_invocation_evidence) 모두 인식.
+#   F-T05 — schema 정식 필드명(test_run_evidence/test_pass_evidence) + legacy(test_invocation_evidence) 모두 인식.
 
 set -euo pipefail
 
@@ -28,7 +28,7 @@ done
 
 # 1. simulation_only:true grep
 if grep -r --include='*.yml' --include='*.yaml' --include='*.json' -l 'simulation_only.*:.*true' "$TARGET_DIR" 2>/dev/null; then
-  echo "[lint-no-simulation] ❌ FAIL — simulation_only:true detected. ★★★ no-simulation policy violated." >&2
+  echo "[lint-no-simulation] ❌ FAIL — simulation_only:true detected. no-simulation policy violated." >&2
   EXIT=1
 fi
 
@@ -53,10 +53,10 @@ while IFS= read -r f; do
   done
 done < <(grep -r --include='*.yml' --include='*.yaml' --include='*.json' -l 'real_tool.*:.*true' "$TARGET_DIR" 2>/dev/null || true)
 
-# 4. ★ chain 4/5 enforcement — test-spec.json(test_run_evidence per-TC) / impl-spec.json(test_pass_evidence root)
+# 4. chain 4/5 enforcement — test-spec.json(test_run_evidence per-TC) / impl-spec.json(test_pass_evidence root)
 #    5종 물증 10 필드 (test_runner_version / test_runner_stdout_path / invocation_timestamp /
 #    duration_ms / pass_count / fail_count / skip_count / reproduction_command / result_hash / report_format)
-#    ★ F-T05 — schema 정식 필드명 + legacy(test_invocation_evidence) 모두 인식 (naive 단일 grep → schema-valid 산출물 미탐 차단).
+#    F-T05 — schema 정식 필드명 + legacy(test_invocation_evidence) 모두 인식 (naive 단일 grep → schema-valid 산출물 미탐 차단).
 if [ "$CHAIN_MODE" != "off" ]; then
   CHAIN_REQUIRED=(test_runner_version test_runner_stdout_path invocation_timestamp duration_ms pass_count fail_count skip_count reproduction_command result_hash report_format)
   while IFS= read -r f; do

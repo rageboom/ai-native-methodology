@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ v2.0 chain 4 (test) phase flow (★ v9.0 plan 신설로 재번호 / 구 chain 3 / ★ v10.0.0 MAJOR gate #3→#4 재번호 chain N=gate #N) — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합. acceptance-criteria 기반 실 test 코드 자동 generate (RED 의무 / impl 부재 가정 모든 test fail). ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
+  "$comment": "v2.0 chain 4 (test) phase flow (v9.0 plan 신설로 재번호 / 구 chain 3 / v10.0.0 MAJOR gate #3→#4 재번호 chain N=gate #N) — json 단독 SSOT (v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 §3 + ADR-CHAIN-004 정합. acceptance-criteria 기반 실 test 코드 자동 generate (RED 의무 / impl 부재 가정 모든 test fail). v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동).",
   "id": "test-phase-flow",
   "version": "3.1.0",
   "stage": "test",
@@ -24,10 +24,10 @@
     },
     {
       "id": "test-code-generate",
-      "name": "실 test 코드 generate (RED 의무 / ★ v3.4.0 G4: e2e 는 test-playwright 위임)",
+      "name": "실 test 코드 generate (RED 의무 / v3.4.0 G4: e2e 는 test-playwright 위임)",
       "depends_on": ["tc-decompose"],
       "inputs": ["test-spec.test_cases", "behavior-spec.property_tests"],
-      "outputs": ["test source files (jest/vitest/junit5/pytest 등 / ★ v3.4.0 e2e = Playwright POM)"],
+      "outputs": ["test source files (jest/vitest/junit5/pytest 등 / v3.4.0 e2e = Playwright POM)"],
       "skills": ["test-generate-test-spec", "test-playwright"],
       "expected_outcome": "all_fail"
     },

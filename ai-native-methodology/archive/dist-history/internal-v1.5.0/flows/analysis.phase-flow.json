@@ -1,5 +1,5 @@
 {
-  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.5.0 MINOR — phase 5-1 (api) 에 phase-5-error-mapping skill 추가 (★ ★ ADR-BE-001 negative-space corroboration 정식화 / AP-API-001 자동 회귀 도구 본체 격상). 각 phase 에 skills 디렉토리 매핑 명시 (★ skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
+  "$comment": "AI-Native 방법론 phase 흐름 — AI 눈 짝 (phase-flow.mermaid 의 SSOT). v1.5.0 MINOR — phase 5-1 (api) 에 phase-5-error-mapping skill 추가 (ADR-BE-001 negative-space corroboration 정식화 / AP-API-001 자동 회귀 도구 본체 격상). 각 phase 에 skills 디렉토리 매핑 명시 (skills 의 phase 번호는 산출물 번호 prefix axis 로 manifest phase ID 와 다른 axis 사용 — methodology-spec/skills-axis.md 참조). drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제.",
   "id": "phase-flow",
   "version": "1.5.0",
   "rendered_mermaid_path": "./phase-flow.mermaid",
@@ -51,7 +51,7 @@
     },
     {
       "id": "4.5",
-      "name": "formal-spec (★ v1.2.0 신설)",
+      "name": "formal-spec (v1.2.0 신설)",
       "spec_file": "phase-4-5-formal-spec.md",
       "depends_on": ["4"],
       "inputs": ["domain.json", "rules.json", "code_evidence"],
@@ -105,7 +105,7 @@
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     },
     "aspects": {
-      "$comment": "★ v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
+      "$comment": "v1.4.4 신설 — aspect skill 4종은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동.",
       "skills": ["aspect-a11y", "aspect-i18n", "aspect-static-security", "aspect-legacy"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
     }
@@ -115,6 +115,6 @@
     "v1.2.1": ["drift-validator + decision-table-validator + static-runner 도구 산출", "drift-check.yml CI", "Phase 4.5 cross_validation 5종 물증 if/then"],
     "v1.2.2": ["묶음 M-P2-3 5건 — api.template.md / phase-flow / ADR-009 / db-schema.template.md / meta-confidence.template"],
     "v1.4.4": ["manifest 정식 SSOT 승격 (plan-v144-manifest-ssot.md)", "각 phase 에 skills 매핑 명시", "cross_cutting.aspects 신설 (aspect skill 4종)", "skills-axis.md 명세 신설", "drift-validator 3-way 검증 (manifest ↔ workflow ↔ skills) 강제"],
-    "v1.5.0": ["★ ★ ★ ADR-BE-001 negative-space corroboration 정식화 (★ ADR-FE-007 positive-space variant)", "schemas/error-mapping-spec.schema.json 신설 (deliverable 16)", "skills/analysis/phase-5-error-mapping/ 신설 (★ phase 5-1 api 추가 skill)", "★ AP-API-001 자동 회귀 도구 본체 격상 (Spring + NestJS 양 framework)"]
+    "v1.5.0": ["ADR-BE-001 negative-space corroboration 정식화 (ADR-FE-007 positive-space variant)", "schemas/error-mapping-spec.schema.json 신설 (deliverable 16)", "skills/analysis/phase-5-error-mapping/ 신설 (phase 5-1 api 추가 skill)", "AP-API-001 자동 회귀 도구 본체 격상 (Spring + NestJS 양 framework)"]
   }
 }

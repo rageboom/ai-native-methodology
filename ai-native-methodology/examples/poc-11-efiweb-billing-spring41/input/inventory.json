@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #11 — EFI-WEB billing 모듈 analysis stage 산출 / chain 1 (planning) 입력. 작은 단일책임 모듈 (4 endpoint × 6 SQL operation × ~3 tables / scale-cross floor vs PoC #06 345 LOC Java + PoC #07 3752 LOC Java 다중책임). plan §3-A 자동화율 측정 데이터. ★ ★ in-place read 정책 첫 적용 (DEC-2026-05-12-in-place-read-정책-채택 / source 사본 ❌ / source absolute path reference).",
+  "$comment": "PoC #11 — EFI-WEB billing 모듈 analysis stage 산출 / chain 1 (planning) 입력. 작은 단일책임 모듈 (4 endpoint × 6 SQL operation × ~3 tables / scale-cross floor vs PoC #06 345 LOC Java + PoC #07 3752 LOC Java 다중책임). plan §3-A 자동화율 측정 데이터. in-place read 정책 첫 적용 (DEC-2026-05-12-in-place-read-정책-채택 / source 사본 ❌ / source absolute path reference).",
   "project_id": "poc-11-efiweb-billing-spring41",
   "language": "Java",
   "language_version": "1.8",
@@ -10,15 +10,15 @@
     "Maven WAR + web.xml + context-*.xml (전 프로젝트 범위 / PoC #06+#07 동일)",
     "JSP + JSTL + jQuery 1.7.1 + jquery-ui 1.9.2 — view 트랙",
     "MSSQL — TB_SGMA_CONFIRM, TB_SGMA_CONFIRM_HIS, TB_SGMA_CONFIRM_HIS_DATA + cross-DB 의존",
-    "★ ★ ★ Cross-DB 의존 (3 DB minimum): ifrs (이번 모듈) + FIM.dbo.TB_USER (사용자 정보) + SGERPMA.dbo.TB_RG_RESULTS (ERP 결과 데이터)",
-    "★ ★ 외부 BI 시스템: datacafe.smilegate.net Qlik Sense (qlikView.jsp iframe / appid + sheet 동적 파라미터)",
-    "★ Self-implemented utility: IfrsUtil.parameterToHm + DateUtil.getTodayString + StringUtil + jqCommon.js fn_ajax",
-    "★ unused import: ConnectService + DataService (BillingController.java 24-25 / dead code)"
+    "Cross-DB 의존 (3 DB minimum): ifrs (이번 모듈) + FIM.dbo.TB_USER (사용자 정보) + SGERPMA.dbo.TB_RG_RESULTS (ERP 결과 데이터)",
+    "외부 BI 시스템: datacafe.smilegate.net Qlik Sense (qlikView.jsp iframe / appid + sheet 동적 파라미터)",
+    "Self-implemented utility: IfrsUtil.parameterToHm + DateUtil.getTodayString + StringUtil + jqCommon.js fn_ajax",
+    "unused import: ConnectService + DataService (BillingController.java 24-25 / dead code)"
   ],
   "framework": "spring-mvc-4.1-jsp-ibatis2-egov",
-  "test_runner_inferred": "junit 4.x (★ src/test ❌ / @Test 0건 / PoC #06+#07 정합)",
+  "test_runner_inferred": "junit 4.x (src/test ❌ / @Test 0건 / PoC #06+#07 정합)",
   "source_root_absolute": "/Users/sangcl/Documents/Development/Study/EFI-WEB/ifrs",
-  "$source_handling_note": "★ ★ ★ in-place read 정책 (DEC-2026-05-12-in-place-read-정책-채택) — source 사본 ❌ / Read tool 직접 read / 본 inventory 의 source_files 는 source_root_absolute 기준 상대 경로.",
+  "$source_handling_note": "in-place read 정책 (DEC-2026-05-12-in-place-read-정책-채택) — source 사본 ❌ / Read tool 직접 read / 본 inventory 의 source_files 는 source_root_absolute 기준 상대 경로.",
   "source_files": [
     "src/main/java/smilegate/ifrs/billing/web/BillingController.java",
     "src/main/java/smilegate/ifrs/billing/service/BillingService.java",
@@ -57,7 +57,7 @@
       "method_count": 2,
       "loc": 43,
       "antipatterns_flagged": [
-        "AP-BILLING-001 (★ critical / @Transactional ❌ saveDataConfirm 4 SQL 비원자성)",
+        "AP-BILLING-001 (critical / @Transactional ❌ saveDataConfirm 4 SQL 비원자성)",
         "AP-BILLING-004 (param 사후 변경 / input/output mix / insertCount param.put 후 model 전달)"
       ]
     },
@@ -76,8 +76,8 @@
       "sql_statement_count": 6,
       "loc": 77,
       "antipatterns_flagged": [
-        "AP-BILLING-005 (★ critical / SQL Server vendor 종속 — WITH(NOLOCK) + SCOPE_IDENTITY + getDate + dbo.FN_GET_MONTH UDF)",
-        "AP-BILLING-006 (★ critical / cross-DB FQCN — FIM.dbo.TB_USER + SGERPMA.dbo.TB_RG_RESULTS)",
+        "AP-BILLING-005 (critical / SQL Server vendor 종속 — WITH(NOLOCK) + SCOPE_IDENTITY + getDate + dbo.FN_GET_MONTH UDF)",
+        "AP-BILLING-006 (critical / cross-DB FQCN — FIM.dbo.TB_USER + SGERPMA.dbo.TB_RG_RESULTS)",
         "AP-BILLING-007 (recursive CTE — WITH MONTH_INFO 12 row 생성 / SQL Server T-SQL 한정)"
       ]
     },
@@ -86,9 +86,9 @@
       "type": "JSP",
       "loc": 209,
       "antipatterns_flagged": [
-        "AP-BILLING-009 (★ high / XSS risk — makeDataTable HTML string concatenation raw 값 출력)",
-        "AP-BILLING-010 (★ medium / 시작년도 2015 hardcoded — currYear - 2015)",
-        "AP-BILLING-011 (★ critical / 법인 COM_NO == 2 hardcoded — 특정 법인만 노출)",
+        "AP-BILLING-009 (high / XSS risk — makeDataTable HTML string concatenation raw 값 출력)",
+        "AP-BILLING-010 (medium / 시작년도 2015 hardcoded — currYear - 2015)",
+        "AP-BILLING-011 (critical / 법인 COM_NO == 2 hardcoded — 특정 법인만 노출)",
         "AP-BILLING-012 (자체 ajax wrapper fn_ajax / jqCommon.js 의존)"
       ]
     },
@@ -97,15 +97,15 @@
       "type": "JSP (iframe wrapper)",
       "loc": 60,
       "antipatterns_flagged": [
-        "AP-BILLING-013 (★ medium / 외부 BI URL hardcoded — datacafe.smilegate.net / 환경 변수 ❌)"
+        "AP-BILLING-013 (medium / 외부 BI URL hardcoded — datacafe.smilegate.net / 환경 변수 ❌)"
       ]
     }
   ],
   "dependent_tables": {
     "own_db_ifrs": ["TB_SGMA_CONFIRM_HIS", "TB_SGMA_CONFIRM_HIS_DATA", "TB_SGMA_CONFIRM"],
-    "cross_db_FIM": ["TB_USER (★ 사용자 정보 / read only)"],
-    "cross_db_SGERPMA": ["TB_RG_RESULTS (★ ERP 결과 / read only / insert source)"],
-    "udf": ["dbo.FN_GET_MONTH (★ MONTH int → string 변환 UDF)"]
+    "cross_db_FIM": ["TB_USER (사용자 정보 / read only)"],
+    "cross_db_SGERPMA": ["TB_RG_RESULTS (ERP 결과 / read only / insert source)"],
+    "udf": ["dbo.FN_GET_MONTH (MONTH int → string 변환 UDF)"]
   },
   "endpoint_inventory": [
     {
@@ -137,7 +137,7 @@
       ],
       "service_calls": ["billingService.saveDataConfirm"],
       "model_attrs": ["insertCount"],
-      "transaction_concern": "★ ★ ★ critical — saveDataConfirm 4 SQL 비원자성 (@Transactional ❌)"
+      "transaction_concern": "critical — saveDataConfirm 4 SQL 비원자성 (@Transactional ❌)"
     },
     {
       "url": "/ifrs/billing/qlikView",
@@ -160,7 +160,7 @@
     "cross_db_fqcn_count": 2
   },
   "phase_3a_automation_measurement": {
-    "$comment": "★ plan §3-A 자동화율 측정 — 작은 단일책임 billing (vs PoC #06 단일책임 exchange 38.75% / PoC #07 다중책임 capital 53.8%)",
+    "$comment": "plan §3-A 자동화율 측정 — 작은 단일책임 billing (vs PoC #06 단일책임 exchange 38.75% / PoC #07 다중책임 capital 53.8%)",
     "by_artifact": {
       "inventory.json": {
         "auto_ratio": 0.70,
@@ -178,7 +178,7 @@
       },
       "rules.json": {
         "auto_ratio": 0.50,
-        "auto_items": ["source (file:line)", "br_type (enum)", "evidence_strength (file 존재 = high)", "is_intent / is_likely_bug (★ self-comment grep / @Transactional 부재 등)"],
+        "auto_items": ["source (file:line)", "br_type (enum)", "evidence_strength (file 존재 = high)", "is_intent / is_likely_bug (self-comment grep / @Transactional 부재 등)"],
         "manual_items": ["title (LLM)", "natural_language (LLM)", "domain_carry (LLM + expert)"],
         "baseline_poc06": 0.29,
         "baseline_poc07": 0.50
@@ -203,24 +203,24 @@
     "plan_2_expectation_vs_actual": {
       "plan_2_expected_range": "25~40%",
       "actual_measured": "52.5%",
-      "result": "★ ★ ★ expectation 초과 (+12.5%p above upper) — R1 가설 (scale ↓ → 자동화율 ↓) ★ ★ 반증",
-      "interpretation": "★ ★ ★ R1 가설 revisit 의무 — 작은 scope (603 LOC) 도 자동화율 ↑ (52.5%) / PoC #07 다중책임 (53.8%) 와 거의 동일. 결론: **scale 보다 paradigm/책임 ★ 영향 약** / Spring 4.1 + iBATIS 2 standard 패턴 자동화 → 작은 scope 도 trivially deterministic + 자동 grep 효과 충분."
+      "result": "expectation 초과 (+12.5%p above upper) — R1 가설 (scale ↓ → 자동화율 ↓) 반증",
+      "interpretation": "R1 가설 revisit 의무 — 작은 scope (603 LOC) 도 자동화율 ↑ (52.5%) / PoC #07 다중책임 (53.8%) 와 거의 동일. 결론: **scale 보다 paradigm/책임 영향 약** / Spring 4.1 + iBATIS 2 standard 패턴 자동화 → 작은 scope 도 trivially deterministic + 자동 grep 효과 충분."
     },
     "r1_hypothesis_revisit": {
-      "$comment": "★ ★ ★ 3 사내 PoC 측정 후 R1 가설 재정립",
+      "$comment": "3 사내 PoC 측정 후 R1 가설 재정립",
       "original_hypothesis": "scale ↓ → 자동화율 ↓ (분기 양 ↓ → 자동 grep ↓)",
       "evidence_3_poc": {
         "poc06_345LOC_단일": "38.75% (baseline / 단일책임)",
-        "poc11_603LOC_작은단일": "52.5% (★ ★ +13.75%p / scale 작아도 자동화 ↑)",
+        "poc11_603LOC_작은단일": "52.5% (+13.75%p / scale 작아도 자동화 ↑)",
         "poc07_5509LOC_다중": "53.8% (다중책임)"
       },
-      "revised_hypothesis": "★ ★ 자동화율 영향 = (scale × paradigm × responsibility 복합). scale 단독 < 책임 (단일 vs 다중) ≈ paradigm (Spring 4.1 standard) 영향 강. 작은 scope = trivially deterministic 효과 ↑ → 자동화율 ↑ 가능 (PoC #06 < PoC #11 ≈ PoC #07).",
-      "carry": "★ R1 가설 재정립 → 본체 deliverable 갱신 후보 (★ Day 3.5 종결 시 신규 carry C-r1-hypothesis-revisit)"
+      "revised_hypothesis": "자동화율 영향 = (scale × paradigm × responsibility 복합). scale 단독 < 책임 (단일 vs 다중) ≈ paradigm (Spring 4.1 standard) 영향 강. 작은 scope = trivially deterministic 효과 ↑ → 자동화율 ↑ 가능 (PoC #06 < PoC #11 ≈ PoC #07).",
+      "carry": "R1 가설 재정립 → 본체 deliverable 갱신 후보 (Day 3.5 종결 시 신규 carry C-r1-hypothesis-revisit)"
     },
     "self_test_pass": {
-      "expected_pass_criteria": "Day 1.5 §3-A 측정 = ★ measurement 완료 / 결과는 어디든 acceptable (R1 입증 또는 반증 둘 다 finding)",
-      "actual_result": "★ ★ ★ R1 가설 반증 (in range expectation 초과) = ★ ★ critical finding / 사내 ROI axis 강화 ✅",
-      "decision": "pass (★ measurement 완료 + finding 명시)"
+      "expected_pass_criteria": "Day 1.5 §3-A 측정 = measurement 완료 / 결과는 어디든 acceptable (R1 입증 또는 반증 둘 다 finding)",
+      "actual_result": "R1 가설 반증 (in range expectation 초과) = critical finding / 사내 ROI axis 강화 ✅",
+      "decision": "pass (measurement 완료 + finding 명시)"
     }
   }
 }

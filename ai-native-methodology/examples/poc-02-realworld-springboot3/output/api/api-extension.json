@@ -171,7 +171,7 @@
         "controller_method": "follow",
         "annotations_seen": ["@PostMapping(\"/api/profiles/{username}/follow\")"]
       },
-      "x-symmetric-with": "UnfollowUserByUsername (idempotent ✅) — favorite/unfavorite 비대칭 비교 기준 ★",
+      "x-symmetric-with": "UnfollowUserByUsername (idempotent ✅) — favorite/unfavorite 비대칭 비교 기준 ",
       "x-related-findings": ["F-074"]
     },
     {
@@ -416,7 +416,7 @@
         "client_impact": "정상 client 가 spec 따라 200 기대 → 422 GenericError 수신 → DLQ/retry storm"
       },
       "anti_pattern_refs": [
-        {"phase_6_candidate": "AP-API-001", "severity": "critical", "evidence": "F-070 격상 + F-079 evidence ★"}
+        {"phase_6_candidate": "AP-API-001", "severity": "critical", "evidence": "F-070 격상 + F-079 evidence "}
       ],
       "x-known-bug": {
         "id": "F-070",

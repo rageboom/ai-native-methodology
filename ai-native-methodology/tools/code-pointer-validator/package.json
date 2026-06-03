@@ -1,7 +1,7 @@
 {
   "name": "@ai-native-methodology/code-pointer-validator",
   "version": "0.1.0",
-  "description": "★ 12번째 validator (operation.md 결정 3 + P2) — artifact-graph.json 의 24 Tier-1 노드에 대해 code_pointers 또는 명시적 N/A 충족 + 경로 존재성 검증. release-readiness #12 게이트.",
+  "description": "12번째 validator (operation.md 결정 3 + P2) — artifact-graph.json 의 24 Tier-1 노드에 대해 code_pointers 또는 명시적 N/A 충족 + 경로 존재성 검증. release-readiness #12 게이트.",
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": { "code-pointer-validator": "./src/cli.js" },

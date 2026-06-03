@@ -1,5 +1,5 @@
 {
-  "$comment": "★ v2.3.0-rc1 신규 fixture / migration_priority P0~P3 사용 / ADR-CHAIN-009 정합 / mixed (P0/P1/P2/P3 + unspecified)",
+  "$comment": "v2.3.0-rc1 신규 fixture / migration_priority P0~P3 사용 / ADR-CHAIN-009 정합 / mixed (P0/P1/P2/P3 + unspecified)",
   "meta_confidence": {
     "generated_at": "2026-05-12T00:00:00Z",
     "methodology_version": "v2.3.0-rc1",
@@ -20,7 +20,7 @@
       "sql_id": "FooDAO.selectCritical",
       "mapper_xml": "source/sqlmap/foo.xml",
       "statement_type": "PREPARED",
-      "business_meaning": "★ critical bug 동반 / 즉시 modernization",
+      "business_meaning": "critical bug 동반 / 즉시 modernization",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "bug (critical paradigm 위반)",
       "confidence": 0.95,
@@ -29,7 +29,7 @@
     {
       "sql_id": "FooDAO.selectN1",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ N+1 동반 / 短期 priority",
+      "business_meaning": "N+1 동반 / 短期 priority",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent + bug 동반 (N+1)",
       "confidence": 0.90,
@@ -38,7 +38,7 @@
     {
       "sql_id": "FooDAO.selectMedium",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ refactoring 후보 / 中期",
+      "business_meaning": "refactoring 후보 / 中期",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent (medium AP 동반)",
       "confidence": 0.85,
@@ -47,7 +47,7 @@
     {
       "sql_id": "FooDAO.selectSimple",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ 단순 CRUD / maintain",
+      "business_meaning": "단순 CRUD / maintain",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent (단순 CRUD / low AP)",
       "confidence": 0.90,
@@ -56,7 +56,7 @@
     {
       "sql_id": "FooDAO.updateLegacy",
       "mapper_xml": "source/sqlmap/foo.xml",
-      "business_meaning": "★ migration_priority 미명시 (optional 검증)",
+      "business_meaning": "migration_priority 미명시 (optional 검증)",
       "dependent_tables": ["TB_FOO"],
       "intent_vs_bug_classification": "intent (legacy update)",
       "confidence": 0.85

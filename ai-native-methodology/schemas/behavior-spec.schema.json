@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/behavior-spec.schema.json",
   "title": "Behavior Spec (chain 2 / 동작 명세)",
-  "description": "v2.0 chain harness 의 spec stage 핵심 산출물. Phase 4.5 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 spec stage 격상 + discovery-spec.use_cases 흡수. executable behavioral contract. DEC-2026-05-06-v2.0-i-strict-채택 정합. ★ v11.0.0 MAJOR — derivation_source.discovery_spec_path rename (DEC-2026-05-26-discovery-spec-rename / planning_spec_path 폐기).",
+  "description": "v2.0 chain harness 의 spec stage 핵심 산출물. Phase 4.5 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 spec stage 격상 + discovery-spec.use_cases 흡수. executable behavioral contract. DEC-2026-05-06-v2.0-i-strict-채택 정합. v11.0.0 MAJOR — derivation_source.discovery_spec_path rename (DEC-2026-05-26-discovery-spec-rename / planning_spec_path 폐기).",
   "type": "object",
   "required": ["meta", "derivation_source", "behaviors"],
   "additionalProperties": false,
@@ -17,7 +17,7 @@
       "properties": {
         "discovery_spec_path": {
           "type": "string",
-          "description": "★ v11.0.0 rename — 본 behavior-spec 추출의 discovery-spec.json 경로 (chain discovery backward link). 이전 명명 `planning_spec_path` 본격 폐기 (DEC-2026-05-26-discovery-spec-rename)."
+          "description": "v11.0.0 rename — 본 behavior-spec 추출의 discovery-spec.json 경로 (chain discovery backward link). 이전 명명 `planning_spec_path` 본격 폐기 (DEC-2026-05-26-discovery-spec-rename)."
         },
         "analysis_artifacts": {
           "type": "array",
@@ -47,7 +47,7 @@
             "type": "array",
             "items": {"type": "string", "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$"},
             "minItems": 1,
-            "description": "★ discovery-spec backward link 의무 (chain-coverage-validator 강제 / ★ v11.0.0 — planning-spec → discovery-spec rename)"
+            "description": "discovery-spec backward link 의무 (chain-coverage-validator 강제 / v11.0.0 — planning-spec → discovery-spec rename)"
           },
           "br_refs": {
             "type": "array",
@@ -81,7 +81,7 @@
           },
           "property_tests": {
             "type": "array",
-            "description": "★ property-based test stub (fast-check / Hypothesis / jqwik) — Industry research 권고",
+            "description": "property-based test stub (fast-check / Hypothesis / jqwik) — Industry research 권고",
             "items": {
               "type": "object",
               "required": ["property", "framework"],
@@ -92,7 +92,7 @@
                 "framework_status": {
                   "type": "string",
                   "enum": ["active", "maintenance", "deprecated"],
-                  "description": "★ Industry — jqwik 같은 maintenance mode 경고 (B3)"
+                  "description": "Industry — jqwik 같은 maintenance mode 경고 (B3)"
                 },
                 "arbitrary_stub": {"type": "string", "description": "fast-check arbitrary 구조 stub"}
               }
@@ -102,35 +102,35 @@
             "type": "array",
             "items": {"type": "string", "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$"},
             "minItems": 1,
-            "description": "★ forward link 의무 (chain-coverage-validator 강제)"
+            "description": "forward link 의무 (chain-coverage-validator 강제)"
           },
           "source_grounded_evidence": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "★ no-simulation — analysis 산출물 / 코드 경로"
+            "description": "no-simulation — analysis 산출물 / 코드 경로"
           },
           "code_pointers": {
             "type": "array",
-            "description": "★ operation.md 결정 3 + P2 — artifact ↔ code anchor. graph-synthesizer 가 평탄화 / code-pointer-validator 가 검증.",
+            "description": "operation.md 결정 3 + P2 — artifact ↔ code anchor. graph-synthesizer 가 평탄화 / code-pointer-validator 가 검증.",
             "items": {"$ref": "./code-pointer.schema.json"}
           },
           "code_pointers_na": {
             "type": "boolean",
             "default": false,
-            "description": "★ 명시적 N/A 마커 (operation.md 결정 3)."
+            "description": "명시적 N/A 마커 (operation.md 결정 3)."
           }
         }
       }
     },
     "cross_links": {
       "type": "object",
-      "description": "★ DO-178C bidirectional + analysis 7대 산출물 통합 (사용자 답변 3 정합)",
+      "description": "DO-178C bidirectional + analysis 7대 산출물 통합 (사용자 답변 3 정합)",
       "additionalProperties": false,
       "properties": {
         "to_analysis_artifacts": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "★ 7대 산출물 reference 의무 — chain-coverage-validator 가 모두 reference 강제 (사용자 답변 3 \"현 7대 + 신규 추가\" 정합)"
+          "description": "7대 산출물 reference 의무 — chain-coverage-validator 가 모두 reference 강제 (사용자 답변 3 \"현 7대 + 신규 추가\" 정합)"
         }
       }
     }

@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
   title: EFI-WEB car module API (analyzed)
-  version: "1.0.0"
+  version: '1.0.0'
   description: |
-    ★ PoC #15 EFI-WEB car 모듈의 @RequestMapping endpoint 추출 OpenAPI.
-    ★ 본 시스템 = Spring MVC 4.1 + JSP server-rendered / REST API 아님 (모든 method = public String 반환 = JSP view name)
-    ★ Ajax endpoint 도 ModelMap forward → JSP fragment / Content-Type = text/html
-    ★ 본 OpenAPI = 마이그레이션 시 REST API 변환 시 anchor / 현재 상태 ≠ OpenAPI spec 정합
+    PoC #15 EFI-WEB car 모듈의 @RequestMapping endpoint 추출 OpenAPI.
+    본 시스템 = Spring MVC 4.1 + JSP server-rendered / REST API 아님 (모든 method = public String 반환 = JSP view name)
+    Ajax endpoint 도 ModelMap forward → JSP fragment / Content-Type = text/html
+    본 OpenAPI = 마이그레이션 시 REST API 변환 시 anchor / 현재 상태 ≠ OpenAPI spec 정합
 servers:
   - url: https://ifrs.smilegate.net
     description: production
@@ -37,7 +37,7 @@ paths:
     post:
       tags: [car-mgt]
       operationId: insertCar
-      summary: ★ 차량 신규 등록 (BR-CAR-MGT-001 + 005 + 006)
+      summary: 차량 신규 등록 (BR-CAR-MGT-001 + 005 + 006)
       x-controller-method: CarMgtController#insertCar
       x-br-anchor: [BR-CAR-MGT-001, BR-CAR-MGT-005, BR-CAR-MGT-006]
       x-sql-ids: [insertCar, insertCarUserTerm]
@@ -49,13 +49,13 @@ paths:
               type: object
               required: [carNo, carType, comCd, userId, userNm]
               properties:
-                carNo: {type: string, maxLength: 20}
-                carType: {type: string, maxLength: 50}
-                comCd: {type: integer}
-                bizNo: {type: string}
-                userId: {type: string, maxLength: 20}
-                userNm: {type: string, maxLength: 50}
-                carGetDate: {type: string, format: date-time}
+                carNo: { type: string, maxLength: 20 }
+                carType: { type: string, maxLength: 50 }
+                comCd: { type: integer }
+                bizNo: { type: string }
+                userId: { type: string, maxLength: 20 }
+                userNm: { type: string, maxLength: 50 }
+                carGetDate: { type: string, format: date-time }
       responses:
         '200':
           description: 등록 후 carList redirect (server-rendered)
@@ -87,7 +87,7 @@ paths:
     post:
       tags: [car-cost]
       operationId: costingCalculateAjax
-      summary: ★ ★ 차량비용 계산 (SGERP SP IF / BR-CAR-COST-003 anchor)
+      summary: 차량비용 계산 (SGERP SP IF / BR-CAR-COST-003 anchor)
       x-controller-method: CarCostController#costingCalculateAjax
       x-br-anchor: BR-CAR-COST-003
       x-sql-ids: [selectCarCostCalculate]
@@ -102,10 +102,10 @@ paths:
               type: object
               required: [useComCd, strDate, endDate, userNm]
               properties:
-                useComCd: {type: integer}
-                strDate: {type: string, format: date}
-                endDate: {type: string, format: date}
-                userNm: {type: string}
+                useComCd: { type: integer }
+                strDate: { type: string, format: date }
+                endDate: { type: string, format: date }
+                userNm: { type: string }
       responses:
         '200':
           description: slip_id list (Ajax JSP fragment)

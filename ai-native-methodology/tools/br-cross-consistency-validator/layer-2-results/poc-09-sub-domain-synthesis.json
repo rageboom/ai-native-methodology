@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "batch_size": 7,
   "poc_id": "poc-09-realworld-typeorm-rawsql",
-  "$comment": "★ ★ session 23차 Sprint 1-D / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 10 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
+  "$comment": "session 23차 Sprint 1-D / sub-domain 토막 자동 합성 (사용자 결단 (a) paradigm). BR ID 4토막 strict v2.3.7 enforcement 정합 + 의미 보존. cross-ref 10 file rename 동반. Sprint 1-A (poc-06) isomorphic.",
   "results": [
     { "old_id": "BR-RW-001", "new_id": "BR-RW-IDENTITY-001", "sub_domain": "IDENTITY", "rationale": "username·email 중복 방지 = 신원 고유성 보장 도메인" },
     { "old_id": "BR-RW-002", "new_id": "BR-RW-AUTHN-002", "sub_domain": "AUTHN", "rationale": "argon2 해시 저장·로그인 검증 = 인증 보안 핵심" },

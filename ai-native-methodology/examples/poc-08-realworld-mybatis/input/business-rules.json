@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #08 Day 1 — jpetstore-6 BR 추출. 핵심 ~8 BR. Modern stack + 단순 도메인 → BR 적음 (vs PoC #07 capital ~15 BR / PoC #06 exchange 7 BR).",
+  "$comment": " PoC #08 Day 1 — jpetstore-6 BR 추출. 핵심 ~8 BR. Modern stack + 단순 도메인 → BR 적음 (vs PoC #07 capital ~15 BR / PoC #06 exchange 7 BR).",
   "project_id": "poc-08-realworld-mybatis",
   "business_rules": [
     {
@@ -44,7 +44,7 @@
     {
       "id": "BR-PETSTORE-PRODSRCH-003",
       "title": "Product 검색 = keyword split + lowercase + LIKE 양쪽 wildcard",
-      "natural_language": "CatalogService.searchProductList(keywords) → keywords.split('\\\\s+') 후 각 keyword.toLowerCase() → '%keyword%' LIKE 검색. 매 keyword 별 별도 SQL 호출 (★ N+1 risk).",
+      "natural_language": "CatalogService.searchProductList(keywords) → keywords.split('\\\\s+') 후 각 keyword.toLowerCase() → '%keyword%' LIKE 검색. 매 keyword 별 별도 SQL 호출 ( N+1 risk).",
       "given": [
         "사용자가 하나 이상의 키워드를 포함한 검색어를 입력한 상태이다"
       ],
@@ -61,7 +61,7 @@
       "br_type": "search",
       "is_intent": true,
       "is_likely_bug": false,
-      "$comment_bug": "★ N+1 패턴 = 의도된 것 같음 (multi-keyword AND/OR = client side aggregation) but 성능 risk → AP-PETSTORE-005"
+      "$comment_bug": " N+1 패턴 = 의도된 것 같음 (multi-keyword AND/OR = client side aggregation) but 성능 risk → AP-PETSTORE-005"
     },
     {
       "id": "BR-PETSTORE-ORDCRT-004",
@@ -88,7 +88,7 @@
     {
       "id": "BR-PETSTORE-ORDQRY-005",
       "title": "Order 조회 = order + lineItems + item + inventory fetch chaining",
-      "natural_language": "OrderService.getOrder(orderId) — (1) orderMapper.getOrder → order, (2) lineItemMapper.getLineItemsByOrderId → lineItems, (3) lineItems.forEach → itemMapper.getItem + getInventoryQuantity 별도 호출. ★ ★ N+1 패턴 (lineItem 수 × 2 SQL).",
+      "natural_language": "OrderService.getOrder(orderId) — (1) orderMapper.getOrder → order, (2) lineItemMapper.getLineItemsByOrderId → lineItems, (3) lineItems.forEach → itemMapper.getItem + getInventoryQuantity 별도 호출. N+1 패턴 (lineItem 수 × 2 SQL).",
       "given": [
         "사용자가 특정 주문을 조회하려는 상태이다"
       ],
@@ -106,11 +106,11 @@
       "br_type": "fetch_chain",
       "is_intent": false,
       "is_likely_bug": true,
-      "$comment_bug": "★ N+1 fetch = 명백 anti-pattern → AP-PETSTORE-006. 모범 = JOIN 또는 batch fetch."
+      "$comment_bug": " N+1 fetch = 명백 anti-pattern → AP-PETSTORE-006. 모범 = JOIN 또는 batch fetch."
     },
     {
       "id": "BR-PETSTORE-PASSWD-006",
-      "title": "★ ★ ★ 평문 password — signon 테이블 평문 저장 + getAccountByUsernameAndPassword 평문 비교",
+      "title": " 평문 password — signon 테이블 평문 저장 + getAccountByUsernameAndPassword 평문 비교",
       "natural_language": "AccountService.getAccount(username, password) → accountMapper.getAccountByUsernameAndPassword. signon 테이블 schema = (username VARCHAR(25), password VARCHAR(25)) 평문 저장. 해시 ❌.",
       "given": [
         "회원의 비밀번호가 시스템에 저장된 상태이다"
@@ -128,7 +128,7 @@
       "br_type": "authentication",
       "is_intent": false,
       "is_likely_bug": true,
-      "$comment_bug": "★ ★ 보안 취약 — bcrypt/argon2 의무 → AP-PETSTORE-004. reference webapp 의 demo limitation."
+      "$comment_bug": " 보안 취약 — bcrypt/argon2 의무 → AP-PETSTORE-004. reference webapp 의 demo limitation."
     },
     {
       "id": "BR-PETSTORE-BANNER-007",
@@ -169,7 +169,7 @@
       "br_type": "id_generation",
       "is_intent": true,
       "is_likely_bug": false,
-      "$comment_bug": "★ multi-RDBMS 호환 의도 — but UPDATE 후 SELECT race risk → AP-PETSTORE-007"
+      "$comment_bug": " multi-RDBMS 호환 의도 — but UPDATE 후 SELECT race risk → AP-PETSTORE-007"
     }
   ],
   "summary": {
@@ -177,6 +177,6 @@
     "intent_br": 5,
     "likely_bug_br": 2,
     "ambiguous_br": 1,
-    "$comment_summary": "★ Modern stack + 단순 도메인 = BR 추출 trivially clear. 의도/버그 분리 = 5 intent (보호 의무) / 2 likely bug (보안 + N+1) / 1 ambiguous (sequence). 사내 PoC #06+#07 (회계 IFRS) 와 차이 = ★ 도메인 명확 (pet store CRUD)."
+    "$comment_summary": " Modern stack + 단순 도메인 = BR 추출 trivially clear. 의도/버그 분리 = 5 intent (보호 의무) / 2 likely bug (보안 + N+1) / 1 ambiguous (sequence). 사내 PoC #06+#07 (회계 IFRS) 와 차이 = 도메인 명확 (pet store CRUD)."
   }
 }

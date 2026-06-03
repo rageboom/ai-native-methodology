@@ -4,7 +4,7 @@
   "invoked_at": "2026-05-17T00:00:00Z",
   "poc_id": "poc-02-realworld-springboot3",
   "batch_size": 14,
-  "self_eval_bias_note": "★ Sprint 2 GWT→NL 합성 agent (Sonnet 4.6) ↔ 본 Layer 2 검증 agent (Sonnet 4.6) = 동일 모델 echo chamber 위험 / confidence cap 0.85 / Haiku 4.5 blind retrospect 동반 실행 (poc-02-layer-2-haiku-retrospect.json).",
+  "self_eval_bias_note": "Sprint 2 GWT→NL 합성 agent (Sonnet 4.6) ↔ 본 Layer 2 검증 agent (Sonnet 4.6) = 동일 모델 echo chamber 위험 / confidence cap 0.85 / Haiku 4.5 blind retrospect 동반 실행 (poc-02-layer-2-haiku-retrospect.json).",
   "results": [
     { "br_id": "BR-USER-EMAIL-UNIQUE-001", "semantic_score": 0.95, "rationale": "NL '중복 차단 + 동시 요청 race-safe 한 건만' ↔ GWT email 존재 시 차단 + DB unique race-safe. race-safe 조건 양쪽 명시. 의미 완전 정합.", "confidence": 0.85 },
     { "br_id": "BR-USER-USERNAME-UNIQUE-001", "semantic_score": 0.93, "rationale": "NL '사용자명 중복 가입 불가' ↔ GWT username 존재 시 거부. 의미 완전 정합 / 예외 클래스명은 구현 세부.", "confidence": 0.85 },

@@ -27,7 +27,7 @@
     {"from": "Client", "to": "Controller", "label": "POST /api/users {email, username, password}", "sync": "sync"},
     {"from": "Controller", "to": "Service", "label": "signup(UserRegistry)", "sync": "sync"},
 
-    {"from": "Service", "to": "Adapter", "label": "existsBy(email, username)", "sync": "sync", "guard": "★ F-058 App pre-check (1중 race-prone)"},
+    {"from": "Service", "to": "Adapter", "label": "existsBy(email, username)", "sync": "sync", "guard": " F-058 App pre-check (1중 race-prone)"},
     {"from": "Adapter", "to": "JPA", "label": "existsByEmailOrUsername(email, username)", "sync": "sync"},
     {"from": "JPA", "to": "DB", "label": "SELECT 1 FROM users WHERE email=? OR username=?", "sync": "sync"},
     {"from": "DB", "to": "JPA", "label": "result", "sync": "return"},
@@ -44,14 +44,14 @@
     {"from": "Domain", "to": "Encoder", "label": "encode(plainPassword)", "sync": "sync"},
     {"from": "Encoder", "to": "Domain", "label": "$2a$... (BCrypt hash)", "sync": "return"},
 
-    {"from": "Service", "to": "Adapter", "label": "save(user)", "sync": "sync", "guard": "★ DB UQ 제약 (2중 race-safe)"},
+    {"from": "Service", "to": "Adapter", "label": "save(user)", "sync": "sync", "guard": " DB UQ 제약 (2중 race-safe)"},
     {"from": "Adapter", "to": "JPA", "label": "save(user)", "sync": "sync"},
     {"from": "JPA", "to": "DB", "label": "INSERT INTO users (...)", "sync": "sync"},
 
     {"from": "DB", "to": "JPA", "label": "ConstraintViolationException", "sync": "return", "guard": "UQ violation (race window)"},
     {"from": "JPA", "to": "Adapter", "label": "DataIntegrityViolationException", "sync": "return"},
     {"from": "Adapter", "to": "Service", "label": "예외 (현재 코드 미처리)", "sync": "return"},
-    {"from": "Service", "to": "Controller", "label": "500 Internal Error ★ F-058 race window 결함", "sync": "return"},
+    {"from": "Service", "to": "Controller", "label": "500 Internal Error  F-058 race window 결함", "sync": "return"},
 
     {"from": "DB", "to": "JPA", "label": "1 row inserted", "sync": "return", "guard": "INSERT 성공"},
     {"from": "JPA", "to": "Adapter", "label": "User (persisted)", "sync": "return"},

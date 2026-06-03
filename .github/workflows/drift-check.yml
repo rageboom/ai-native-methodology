@@ -18,7 +18,7 @@ on:
 
 permissions:
   contents: read
-  security-events: write   # SARIF upload (Code Scanning)
+  security-events: write # SARIF upload (Code Scanning)
   pull-requests: write
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0   # diff-aware scan 위해 full history 필요
+          fetch-depth: 0 # diff-aware scan 위해 full history 필요
 
       - uses: actions/setup-java@v5
         with:
@@ -104,10 +104,10 @@ jobs:
             --extra-rules tools/static-runner/rules/rsa-private-key-commit.yml \
             --extra-rules tools/static-runner/rules/error-mapping-missing.yml
 
-      # ★ v1.4.2 PATCH — PoC #04 full FE 트랙 (★ custom rule + ratchet 모드 default).
+      # v1.4.2 PATCH — PoC #04 full FE 트랙 (custom rule + ratchet 모드 default).
       # 의의: ADR-010 §2.3 정합 — critical/high severity 신규 결함 = CI fail (production blocker).
       # baseline (semgrep-baseline.json) = v1.4.1 시점 0 findings 첫 작성. novel 1+ = blocked.
-      - name: run Semgrep on PoC #04 full (★ FE 트랙 / custom rule + ratchet)
+      - name: run Semgrep on PoC #04 full (FE 트랙 / custom rule + ratchet)
         working-directory: ai-native-methodology
         run: |
           node tools/static-runner/src/cli.js \
@@ -121,14 +121,14 @@ jobs:
 
       - name: run PMD on Java targets (PoC examples)
         working-directory: ai-native-methodology
-        continue-on-error: true   # PMD 의 false positive 폭발 baseline 미설정 시 일시 허용
+        continue-on-error: true # PMD 의 false positive 폭발 baseline 미설정 시 일시 허용
         run: |
           node tools/static-runner/src/cli.js \
             --plugin pmd \
             --target examples/poc-02-realworld-springboot3 \
             --output tools/static-runner/out
 
-      - name: lint-no-simulation (★★★ no-sim policy enforce)
+      - name: lint-no-simulation (no-sim policy enforce)
         run: |
           bash ai-native-methodology/tools/static-runner/src/lint-no-simulation.sh \
             ai-native-methodology/tools/static-runner/out

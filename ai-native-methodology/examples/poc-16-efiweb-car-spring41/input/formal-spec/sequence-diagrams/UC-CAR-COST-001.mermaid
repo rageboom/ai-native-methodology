@@ -21,7 +21,7 @@ sequenceDiagram
     dao-->>svc: List<Map>
     svc-->>ctrl: List<Map>
 
-    Note over ctrl,admin: ★ Cross-DB transaction 보장 ❌<br/>(eventual consistency)
+    Note over ctrl,admin: Cross-DB transaction 보장 ❌<br/>(eventual consistency)
 
     admin->>ctrl: POST /ifrs/car/saveCostingList
     ctrl->>svc: saveCostingList(list, sessionId)

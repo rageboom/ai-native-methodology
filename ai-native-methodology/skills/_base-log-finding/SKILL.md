@@ -11,11 +11,12 @@ Persist a finding so it isn't lost in conversation context.
 ## When to invoke
 
 Trigger this skill anytime you (or the user) notice:
+
 - A claim with low confidence requiring later verification
 - An anti-pattern in legacy code (per `id-conventions.md` §3 카테고리 9종: AP-API / AP-DB / AP-DOMAIN / AP-ARCH / AP-FE / AP-VALIDATION / AP-CONFIG / AP-SECURITY / AP-PERFORMANCE)
 - A gap (missing source data, undocumented behavior, environment constraint)
 - A migration risk (e.g., breaking change in dependency, deprecated pattern)
-- A simulation occurrence — flag immediately per CLAUDE.md ★★★ no-simulation policy
+- A simulation occurrence — flag immediately per CLAUDE.md no-simulation policy
 - A hypothesis to verify with real tools later
 
 ## ID conventions (per `methodology-spec/id-conventions.md`)

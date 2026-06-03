@@ -5,12 +5,12 @@
   "condition": "follower == following",
   "action": "throw HttpException 'FollowerEmail and FollowingId cannot be equal' (follow) / 'FollowerId and FollowingId cannot be equal' (unFollow)",
   "expected_result": "400 Bad Request (현재) / 권장 = 400 통일",
-  "rejection_method": "Service 단 throw (★ Domain invariant 부재 — F-147 신규)",
-  "verification_location": "★ follow = email 비교 (string) / unFollow = id 비교 (number) — F-144 차원 불일치",
+  "rejection_method": "Service 단 throw ( Domain invariant 부재 — F-147 신규)",
+  "verification_location": " follow = email 비교 (string) / unFollow = id 비교 (number) — F-144 차원 불일치",
   "http_status": 400,
   "error_message": "FollowerEmail and FollowingId cannot be equal / FollowerId and FollowingId cannot be equal",
   "current_state": "partial",
-  "current_state_note": "★ Service 1중 (Domain 부재 + DB CHECK 부재)",
+  "current_state_note": " Service 1중 (Domain 부재 + DB CHECK 부재)",
   "round_trip_pattern": "B+A (코드 + 자연어 빈약 보완)",
   "natural_language_gap_quantified": {
     "explicit": 4,
@@ -25,7 +25,7 @@
     "missing_items": [
       "검증 위치 (Service / Domain / DB CHECK)",
       "HTTP status (400 vs 422)",
-      "에러 메시지 (★ follow vs unFollow 메시지 다름 — 일관성 결여)",
+      "에러 메시지 ( follow vs unFollow 메시지 다름 — 일관성 결여)",
       "self-check 차원 (email vs id — F-144 critical 일관성 결여)",
       "unfollow self 시 silent vs error"
     ]
@@ -34,12 +34,12 @@
     {
       "item": "거부 방식",
       "decision": "Service throw + Domain invariant + DB CHECK (3중 안전망)",
-      "rationale": "PoC #02 BR-USER-FOLLOW-NO-SELF-001 Sprint 2 결단 동일 — 외부 검증 cross-val ★"
+      "rationale": "PoC #02 BR-USER-FOLLOW-NO-SELF-001 Sprint 2 결단 동일 — 외부 검증 cross-val "
     },
     {
       "item": "검증 위치",
       "decision": "**Domain (FollowsEntity 생성자)** + Service 보조 + DB CHECK",
-      "rationale": "★ Sairyss DDD-Hexagon 정설 (PoC #02 isomorphic)"
+      "rationale": " Sairyss DDD-Hexagon 정설 (PoC #02 isomorphic)"
     },
     {
       "item": "HTTP status",
@@ -48,12 +48,12 @@
     },
     {
       "item": "에러 메시지",
-      "decision": "★ follow / unFollow 메시지 통일 — 'follower and following must be different'",
-      "rationale": "★ F-144 일관성 결여 fix — id 통일"
+      "decision": " follow / unFollow 메시지 통일 — 'follower and following must be different'",
+      "rationale": " F-144 일관성 결여 fix — id 통일"
     },
     {
       "item": "self-check 차원",
-      "decision": "★★ id 통일 (number 비교)",
+      "decision": " id 통일 (number 비교)",
       "rationale": "Domain invariant FollowsEntity 생성자에서 id 비교 — string email 비교 ❌"
     },
     {

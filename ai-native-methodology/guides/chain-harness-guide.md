@@ -2,15 +2,16 @@
 
 본 가이드 = chain harness 5 요소 enforcement 의 사용자 mental model. state.json + mechanical gate trio + revisit detector 가 어떻게 함께 동작하는지.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 → **v9.0.1 6-stage 정합 갱신** (★ planning→discovery 개칭 + plan stage 신설 / state.schema `current_chain` 6-stage enum 정합 / DEC-2026-05-21).
+> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 → **v9.0.1 6-stage 정합 갱신** (planning→discovery 개칭 + plan stage 신설 / state.schema `current_chain` 6-stage enum 정합 / DEC-2026-05-21).
 
 ## 1. Chain harness 가 무엇인가?
 
-★ ★ ★ v2.0 paradigm — Aider 패턴 정합. **chain-driver 가 mechanical 하게 stage 순서 + gate 통과 + revisit loop 를 강제**. LLM "통과한 척 / RED 확인한 척" 시뮬레이션 ❌.
+v2.0 paradigm — Aider 패턴 정합. **chain-driver 가 mechanical 하게 stage 순서 + gate 통과 + revisit loop 를 강제**. LLM "통과한 척 / RED 확인한 척" 시뮬레이션 ❌.
 
-★ ★ v2.5 paradigm 확장 — chain 1 gate 가 **Layer 2 LLM (Claude Code sub-agent invocation)** 의무 통합. `br-cross-consistency-validator` 가 chain 1 gate 통과 의무 요소로 격상. semantic_drift_detected 또는 confidence_cap_exceeded finding 발생 시 chain 진입 차단.
+v2.5 paradigm 확장 — chain 1 gate 가 **Layer 2 LLM (Claude Code sub-agent invocation)** 의무 통합. `br-cross-consistency-validator` 가 chain 1 gate 통과 의무 요소로 격상. semantic_drift_detected 또는 confidence_cap_exceeded finding 발생 시 chain 진입 차단.
 
 5 요소:
+
 1. **Driver** — `tools/chain-driver/` cli + 6 module
 2. **State 영속** — `.aimd/state.json` (atomic CAS write)
 3. **Mechanical gate trio** — state.blocked + cli exit 2 + PreToolUse deny
@@ -35,9 +36,9 @@
 }
 ```
 
-★ ★ chain N = gate #N (★ v10.0.0 / INTERNAL CONVENTION). gate #1=discovery / #2=spec / #3=plan / #4=test / #5=implement.
+chain N = gate #N (v10.0.0 / INTERNAL CONVENTION). gate #1=discovery / #2=spec / #3=plan / #4=test / #5=implement.
 
-★ ★ atomic write CAS — chain-driver 가 state 갱신 시 expectedVersion 비교 후 fdatasync + rename. Windows fallback 동작.
+atomic write CAS — chain-driver 가 state 갱신 시 expectedVersion 비교 후 fdatasync + rename. Windows fallback 동작.
 
 ## 3. Init → next → done loop
 
@@ -56,15 +57,17 @@ node tools/chain-driver/src/cli.js next
 ```
 
 작동:
+
 1. 현재 stage 의 종결 자격 검증 (gate validator 호출)
 2. gate finding 발견 시 → state.blocked=true / cli exit 2 / 사용자 fix 후 재시도
 3. gate pass 시 → 다음 stage 로 전이 + state 갱신 / cli exit 0
 
-★ next 호출 시점 = 보통 hook 자동 (UserPromptSubmit hook 이 stage 매칭 prompt 감지 후 chain-driver hooks-bridge 호출).
+next 호출 시점 = 보통 hook 자동 (UserPromptSubmit hook 이 stage 매칭 prompt 감지 후 chain-driver hooks-bridge 호출).
 
 ### 3.3 Blocked 마주칠 때
 
 `state.blocked=true` 가 되면:
+
 - chain-driver `next` cli exit 2 (다음 stage 진입 거부)
 - PreToolUse hook 이 `<project>/.aimd/output/**` Write/Edit 차단 (permissionDecision=deny)
 - 사용자가 finding fix 후 재시도
@@ -85,13 +88,13 @@ node tools/chain-driver/src/cli.js state
 node tools/chain-driver/src/cli.js next
 ```
 
-### 3.5 State transition 시각화 (★ stateDiagram-v2)
+### 3.5 State transition 시각화 (stateDiagram-v2)
 
 ```mermaid
 stateDiagram-v2
     [*] --> analysis: chain-driver init
     analysis --> discovery: 7대 산출물 종결
-    discovery --> spec: gate #1 pass<br/>(discovery-extraction-validator<br/>+ ★ v2.5 br-cross-consistency L1+L2)
+    discovery --> spec: gate #1 pass<br/>(discovery-extraction-validator<br/>+ v2.5 br-cross-consistency L1+L2)
     spec --> plan: gate #2 pass<br/>(chain-coverage-validator)
     plan --> test: gate #3 pass<br/>(plan-coverage-validator / NFR hard gate + ADR ≥3)
     test --> implement: gate #4 pass<br/>(spec-test-link-validator + RED 입증)
@@ -116,9 +119,9 @@ stateDiagram-v2
     end note
 ```
 
-★ current_chain = `state.schema.json` enum 정합 (analysis / discovery / spec / plan / test / implement / revisit_pending). blocked = 별도 boolean field. plan stage (chain 3) 는 hard gate 미보유 (deferred / plan-agent 본격 구현 v9.x+ carry).
+current_chain = `state.schema.json` enum 정합 (analysis / discovery / spec / plan / test / implement / revisit_pending). blocked = 별도 boolean field. plan stage (chain 3) 는 hard gate 미보유 (deferred / plan-agent 본격 구현 v9.x+ carry).
 
-## 4. Mechanical gate trio (★ ★ ★ no-simulation enforcement)
+## 4. Mechanical gate trio (no-simulation enforcement)
 
 ```
 ┌─ (i) state.blocked ──── 영속 / atomic CAS write
@@ -129,7 +132,7 @@ stateDiagram-v2
                             (Auto Mode 도 사용자 'go' 거부 시 차단)
 ```
 
-★ ★ ★ **3 layer 모두** — LLM 양심 의존 회피. 어느 한 layer 만 의존 시 우회 가능.
+**3 layer 모두** — LLM 양심 의존 회피. 어느 한 layer 만 의존 시 우회 가능.
 
 ## 5. Skill auto-invoke (D21')
 
@@ -138,26 +141,26 @@ stateDiagram-v2
 ```
 matcher: (discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)
 action:  chain-driver hooks-bridge → suggest-skill (stderr)
-suppressOutput: true (★ LLM context 미주입)
+suppressOutput: true (LLM context 미주입)
 additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 ```
 
-★ D21' 정합 — 권고만 stderr 로 사용자 콘솔 노출 / LLM 이 즉시 따르는 척 차단.
+D21' 정합 — 권고만 stderr 로 사용자 콘솔 노출 / LLM 이 즉시 따르는 척 차단.
 
-★ ★ **v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-input-collection/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
+**v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-input-collection/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
 
-## 5.1 ★ v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
+## 5.1 v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
 
 chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 validator:
 
 ```
-1. discovery-extraction-validator (★ v11.0.0 rename / 기존 planning-extraction-validator)
-2. ★ br-cross-consistency-validator (v2.4 신규 / v2.5 Layer 2 본격 통합)
+1. discovery-extraction-validator (v11.0.0 rename / 기존 planning-extraction-validator)
+2. br-cross-consistency-validator (v2.4 신규 / v2.5 Layer 2 본격 통합)
    ├─ Layer 1 (결정적):
    │   · 두 표현 ≥ 1 의무 (natural_language + given_when_then)
    │   · structure 검증 (given 안 결과 키워드 ❌ / when 안 전제 키워드 ❌)
    │   · BR id 4토막 strict
-   └─ Layer 2 (★ Claude Code sub-agent invocation / Sonnet 4.6):
+   └─ Layer 2 (Claude Code sub-agent invocation / Sonnet 4.6):
        · 31 BR batch 1회 호출 (PoC #01 13 + PoC #03 18 = corroboration 자료)
        · NL ↔ GWT 의미 등가성 평가 / semantic_score per BR
        · DETERMINISTIC_THRESHOLD = 0.85 / confidence cap = 0.85
@@ -165,12 +168,13 @@ chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 valid
 ```
 
 gate-eval.js 의 evaluateGate:
-- `layer2_threshold` block reason (★ session 14차 신설)
+
+- `layer2_threshold` block reason (session 14차 신설)
 - severityRank rank 2 (coverage_threshold 수준)
 - applyUserDecision user "go" → go-with-warnings 허용
 
-> ★ Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정합 (★ session 11차 정정).
-> ★ Static Tool 시뮬레이션 금지 정합 — sub-agent persona 시뮬레이션 ❌.
+> Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정합 (session 11차 정정).
+> Static Tool 시뮬레이션 금지 정합 — sub-agent persona 시뮬레이션 ❌.
 
 ## 6. Chain-revisit detector
 
@@ -189,17 +193,17 @@ baseline_sha = state.json 의 `last_baseline_sha` 필드. chain stage 종결 시
 
 chain 4 (test) + chain 5 (implement) 종결 시 다음 모두 검증:
 
-| 필드 | 목적 |
-|---|---|
-| `tool_version` | test runner 버전 |
-| `tool_stdout_path` | raw stdout 로그 |
-| `tool_stderr_path` | raw stderr 로그 |
-| `invocation_timestamp` | ISO timestamp |
-| `duration_ms` | 실행 소요 |
-| `result_hash` | sha256 (위조 차단 / SARIF Appendix F 정합) |
-| `reproduction_command` | 사용자 재현 가능 명령 |
+| 필드                   | 목적                                       |
+| ---------------------- | ------------------------------------------ |
+| `tool_version`         | test runner 버전                           |
+| `tool_stdout_path`     | raw stdout 로그                            |
+| `tool_stderr_path`     | raw stderr 로그                            |
+| `invocation_timestamp` | ISO timestamp                              |
+| `duration_ms`          | 실행 소요                                  |
+| `result_hash`          | sha256 (위조 차단 / SARIF Appendix F 정합) |
+| `reproduction_command` | 사용자 재현 가능 명령                      |
 
-★ `real_tool: true` 시 7 필드 모두 의무 / `simulation_only: true` = 자동 fail.
+`real_tool: true` 시 7 필드 모두 의무 / `simulation_only: true` = 자동 fail.
 
 ## 8. Common 시나리오
 
@@ -241,7 +245,7 @@ $ chain-driver revisit-detect
 [chain-driver] 사용자 prompt: revisit / stop ?
 ```
 
-### D. RED → GREEN 전환 시각화 (★ sequenceDiagram)
+### D. RED → GREEN 전환 시각화 (sequenceDiagram)
 
 ```mermaid
 sequenceDiagram
@@ -254,7 +258,7 @@ sequenceDiagram
     U->>C: "test spec 생성 RED"
     C->>V: spec-test-link-validator (gate #4)
     V->>T: 진짜 test runner 호출 (--allow-execute)
-    T-->>V: pass=0 / fail=N (★ ★ RED 입증)
+    T-->>V: pass=0 / fail=N (RED 입증)
     V-->>C: 5종 물증 + result_hash sha256
     C-->>U: gate #4 pass / next stage = implement
 
@@ -262,12 +266,12 @@ sequenceDiagram
     U->>C: "impl spec 생성 GREEN"
     C->>V: test-impl-pass-validator (gate #5)
     V->>T: 진짜 test runner 재실행 (test code 변경 ❌)
-    T-->>V: pass=N / fail=0 (★ ★ GREEN 100%)
+    T-->>V: pass=N / fail=0 (GREEN 100%)
     V-->>C: 5종 물증 + result_hash deterministic
     C-->>U: gate #5 pass / 완료 (release)
 ```
 
-★ ★ ★ chain 4 의 test code = chain 5 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.
+chain 4 의 test code = chain 5 에서 그대로 재호출 (test 변경 ❌). impl 추가만으로 RED → GREEN 전환 입증.
 
 ## 9. 막혔을 때
 

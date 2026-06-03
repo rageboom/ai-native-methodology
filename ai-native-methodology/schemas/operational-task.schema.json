@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/operational-task.schema.json",
   "title": "Operational Task (chain plan / OP-* 운영 작업)",
-  "description": "★ v11.0.0 MAJOR 신설 (DEC-2026-05-26-ticket-plan-단일 §결단 #7 정합). chain harness 안 plan stage 의 보조 산출물 — 사용자 가시 없는 운영/인프라/마이그레이션 작업 anchor. Story sibling (Epic 부재 가능 / Jira `Task` level 매핑). TASK-* (Sub-task / 1~3 AC 묶음) 와 명확 분리 — OP-* 는 AC 부재 운영 작업 (예: argon2 라이브러리 도입 / column migration / cron job 등). DEC-2026-05-26-be-fe-산출물-분리 §1 paradigm 정합. ID 컨벤션: methodology-spec/id-conventions.md (OP-* 신설).",
+  "description": "v11.0.0 MAJOR 신설 (DEC-2026-05-26-ticket-plan-단일 §결단 #7 정합). chain harness 안 plan stage 의 보조 산출물 — 사용자 가시 없는 운영/인프라/마이그레이션 작업 anchor. Story sibling (Epic 부재 가능 / Jira `Task` level 매핑). TASK-* (Sub-task / 1~3 AC 묶음) 와 명확 분리 — OP-* 는 AC 부재 운영 작업 (예: argon2 라이브러리 도입 / column migration / cron job 등). DEC-2026-05-26-be-fe-산출물-분리 §1 paradigm 정합. ID 컨벤션: methodology-spec/id-conventions.md (OP-* 신설).",
   "type": "object",
   "required": ["meta", "derivation_source", "op_tasks"],
   "additionalProperties": false,
-  "$comment": "★ additionalProperties:false strict (cleanup round 9 정합 / drift attractor 차단). meta + derivation_source + op_tasks 의무 / cross_links 권장.",
+  "$comment": "additionalProperties:false strict (cleanup round 9 정합 / drift attractor 차단). meta + derivation_source + op_tasks 의무 / cross_links 권장.",
   "properties": {
     "meta": {
       "$ref": "./meta-confidence.schema.json"
@@ -19,7 +19,7 @@
       "properties": {
         "task_plan_path": {
           "type": "string",
-          "description": "★ chain plan sibling link — task-plan.json path (OP-* 가 TASK-* 와 같은 plan stage 안 sibling)"
+          "description": "chain plan sibling link — task-plan.json path (OP-* 가 TASK-* 와 같은 plan stage 안 sibling)"
         },
         "analysis_artifacts": {
           "type": "array",
@@ -31,7 +31,7 @@
     "op_tasks": {
       "type": "array",
       "minItems": 1,
-      "description": "★ OP-* 목록. Story sibling / BE only 운영 작업 anchor. 각 OP 는 0~N TASK-* sub-task 으로 분해 가능 (subtask_refs).",
+      "description": "OP-* 목록. Story sibling / BE only 운영 작업 anchor. 각 OP 는 0~N TASK-* sub-task 으로 분해 가능 (subtask_refs).",
       "items": {
         "type": "object",
         "required": ["id", "title", "category"],
@@ -40,7 +40,7 @@
           "id": {
             "type": "string",
             "pattern": "^OP-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "Operational Task ID (★ v11.0.0 신설 prefix / 예: OP-AUTH-001)"
+            "description": "Operational Task ID (v11.0.0 신설 prefix / 예: OP-AUTH-001)"
           },
           "title": {
             "type": "string",
@@ -54,12 +54,12 @@
           "category": {
             "type": "string",
             "enum": ["migration", "cron", "health-check", "refactor", "infra", "ops", "monitoring", "security-patch", "dependency-upgrade"],
-            "description": "★ 운영 작업 분류 (DEC-2026-05-26-ticket-plan-단일 §4 예시 6 enum + 사내 3 추가). migration = DB/data migration / cron = 정기 작업 / health-check = 모니터링 / refactor = 사용자 가시 없는 코드 정리 / infra = 인프라 / ops = 운영 일반 / monitoring = 알람/대시보드 / security-patch = CVE 대응 / dependency-upgrade = 의존성 업그레이드"
+            "description": "운영 작업 분류 (DEC-2026-05-26-ticket-plan-단일 §4 예시 6 enum + 사내 3 추가). migration = DB/data migration / cron = 정기 작업 / health-check = 모니터링 / refactor = 사용자 가시 없는 코드 정리 / infra = 인프라 / ops = 운영 일반 / monitoring = 알람/대시보드 / security-patch = CVE 대응 / dependency-upgrade = 의존성 업그레이드"
           },
           "severity": {
             "type": "string",
             "enum": ["critical", "high", "medium", "low"],
-            "description": "★ severity-cross-stage-mapping.md SSOT 정합 (rules 5종↔ratchet 4종↔MoSCoW 3종 / v8.10.0 정합)"
+            "description": "severity-cross-stage-mapping.md SSOT 정합 (rules 5종↔ratchet 4종↔MoSCoW 3종 / v8.10.0 정합)"
           },
           "status": {
             "type": "string",
@@ -71,57 +71,57 @@
             "type": "array",
             "items": {"type": "string", "pattern": "^TASK-[A-Z0-9_-]+-[0-9]{3}$"},
             "uniqueItems": true,
-            "description": "★ OP 가 분해된 TASK-* (Sub-task) 목록. 0~N (단순 OP 안 sub-task 없이 단일 작업 가능)"
+            "description": "OP 가 분해된 TASK-* (Sub-task) 목록. 0~N (단순 OP 안 sub-task 없이 단일 작업 가능)"
           },
           "depends_on": {
             "type": "array",
             "items": {"type": "string", "pattern": "^OP-[A-Z0-9_-]+-[0-9]{3}$"},
             "uniqueItems": true,
-            "description": "★ 다른 OP-* 의존성 (DAG 강제) / 동형 task-plan.tasks[].dependencies 패턴"
+            "description": "다른 OP-* 의존성 (DAG 강제) / 동형 task-plan.tasks[].dependencies 패턴"
           },
           "story_refs": {
             "type": "array",
             "items": {"type": "string"},
-            "description": "★ DEC-2026-05-26-ticket-plan-단일 §결단 #6 — OP 가 Story 안 BE 작업 일부일 경우 cross-cut anchor (자유 string / Jira Story ID 형식 외부 의존)"
+            "description": "DEC-2026-05-26-ticket-plan-단일 §결단 #6 — OP 가 Story 안 BE 작업 일부일 경우 cross-cut anchor (자유 string / Jira Story ID 형식 외부 의존)"
           },
           "jira_id": {
             "type": "string",
-            "description": "★ 외부 매핑 (Jira Task PROJ-NNN 형식 / ticket-sync-evidence 안 자동 채움)"
+            "description": "외부 매핑 (Jira Task PROJ-NNN 형식 / ticket-sync-evidence 안 자동 채움)"
           },
           "estimation_ai": {
             "type": "string",
-            "description": "★ AI 추정 effort (예: 'S' / 'M' / 'L' / 'XL' 또는 hours). estimation_human 과 별 axis 분리 (over-confidence 차단)"
+            "description": "AI 추정 effort (예: 'S' / 'M' / 'L' / 'XL' 또는 hours). estimation_human 과 별 axis 분리 (over-confidence 차단)"
           },
           "estimation_human": {
             "type": "string",
-            "description": "★ 사람 추정 effort"
+            "description": "사람 추정 effort"
           },
           "rollback_strategy": {
             "type": "string",
-            "description": "★ OP 단위 rollback 전략 (예: 'feature flag toggle' / 'DB transaction rollback'). migration/security-patch category 시 권장"
+            "description": "OP 단위 rollback 전략 (예: 'feature flag toggle' / 'DB transaction rollback'). migration/security-patch category 시 권장"
           },
           "code_pointers": {
             "type": "array",
-            "description": "★ operation.md 결정 3 + P2 — OP ↔ code anchor (영향 코드 file path + line range)",
+            "description": "operation.md 결정 3 + P2 — OP ↔ code anchor (영향 코드 file path + line range)",
             "items": {"$ref": "./code-pointer.schema.json"}
           },
           "code_pointers_na": {
             "type": "boolean",
             "default": false,
-            "description": "★ 명시적 N/A 마커 (예: 신규 인프라 OP / 기존 코드 anchor 부재)"
+            "description": "명시적 N/A 마커 (예: 신규 인프라 OP / 기존 코드 anchor 부재)"
           }
         }
       }
     },
     "cross_links": {
       "type": "object",
-      "description": "★ DO-178C bidirectional traceability 차용",
+      "description": "DO-178C bidirectional traceability 차용",
       "additionalProperties": false,
       "properties": {
         "to_task_plan": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "sibling link to task-plan.json (★ plan stage 안 sibling)"
+          "description": "sibling link to task-plan.json (plan stage 안 sibling)"
         },
         "to_analysis_artifacts": {
           "type": "array",

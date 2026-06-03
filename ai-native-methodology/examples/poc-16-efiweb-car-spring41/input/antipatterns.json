@@ -10,7 +10,7 @@
     "raw_confidence": 0.9,
     "warnings": [
       "본 산출 = phase business-logic 의 partial / phase quality 의 antipatterns.json (full) merge 대상 / 잔존 anti-pattern carry",
-      "★ phase quality full — AP-API-001 추가 (negative-space corroboration / API phase 검출)"
+      "phase quality full — AP-API-001 추가 (negative-space corroboration / API phase 검출)"
     ]
   },
   "antipatterns": [

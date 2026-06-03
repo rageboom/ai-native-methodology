@@ -10,27 +10,27 @@
 
 ### 1.1 RFC 7231 §4.2.2 Idempotent Methods
 
-> *"A request method is considered 'idempotent' if the intended effect on the server of multiple identical requests with that method is the same as the effect for a single such request."* — RFC 7231 §4.2.2
+> _"A request method is considered 'idempotent' if the intended effect on the server of multiple identical requests with that method is the same as the effect for a single such request."_ — RFC 7231 §4.2.2
 
 - 명시적 idempotent: **PUT, DELETE**, GET, HEAD, OPTIONS, TRACE
 - POST 는 기본 non-idempotent. **그러나 의미적으로 idempotent 한 POST 는 허용** (e.g. "favorite" toggle-set, 멱등 결과 보장 시).
-- RFC 9110 §9.2.2 (RFC 7231 후속) 도 동일 정의 유지: *"the intended effect on the server is the same."*
+- RFC 9110 §9.2.2 (RFC 7231 후속) 도 동일 정의 유지: _"the intended effect on the server is the same."_
 
 **F-079 평가**: openapi.yaml `/articles/{slug}/favorite` POST/DELETE 의 `responses: 200 OK` 명시는 idempotent 의도의 **spec-level codification**. RFC 7231 §4.2.2 정의에 따라 "이미 favorite/unfavorite 인 자원에 동일 요청 → 동일 결과" 가 강제된다. Profile follow/unfollow 가 service 단 `if (already) return;` 로 idempotent 인 반면 favorite 가 throw → **같은 도메인 내 비대칭** 은 RFC 7231 정의 위반.
 
 ### 1.2 RFC 9110 (HTTP Semantics) §15.3 Status Codes
 
 - **§15.3.1 200 OK**: 일반 success. 응답 body 의미 있음.
-- **§15.3.2 201 Created**: *"the request has been fulfilled and has resulted in one or more new resources being created."* — **신규 자원 URI 생성 시에만**.
-- **§15.3.5 204 No Content**: *"there is no additional content to send in the response payload body"* — DELETE 의 권장 응답 (자원 제거 후 body 없음).
+- **§15.3.2 201 Created**: _"the request has been fulfilled and has resulted in one or more new resources being created."_ — **신규 자원 URI 생성 시에만**.
+- **§15.3.5 204 No Content**: _"there is no additional content to send in the response payload body"_ — DELETE 의 권장 응답 (자원 제거 후 body 없음).
 
-**F-085 평가**: `POST /api/users/login` 은 세션/JWT 발급이 자원 생성으로 해석 가능하나, RFC 9110 §15.3.2 는 *"new resources"* 의 URI 식별 가능성 전제 — **Token 은 자원 URI 미할당** → **200 OK 가 정합적**. 사내 적용 권고: `@ResponseStatus(HttpStatus.OK)` 명시 또는 default 유지.
+**F-085 평가**: `POST /api/users/login` 은 세션/JWT 발급이 자원 생성으로 해석 가능하나, RFC 9110 §15.3.2 는 _"new resources"_ 의 URI 식별 가능성 전제 — **Token 은 자원 URI 미할당** → **200 OK 가 정합적**. 사내 적용 권고: `@ResponseStatus(HttpStatus.OK)` 명시 또는 default 유지.
 
 **F-083 평가**: DELETE 응답 200 은 RFC 9110 §15.3.5 권고 (204) 와 충돌. body 가 의미 있을 때 200, 없으면 204. RealWorld DELETE article/comment/favorite 는 body **공백** → **204 가 정합**. 단, favorite DELETE 는 ArticleResponse body 반환 (idempotent toggle 결과) → 200 유지 정당화 가능.
 
 ### 1.3 RFC 5789 PATCH Method
 
-> *"The PUT method is already defined to overwrite a resource with a complete new body, and cannot be reused to do partial changes. ... A new method is needed to address this issue."* — RFC 5789 §1
+> _"The PUT method is already defined to overwrite a resource with a complete new body, and cannot be reused to do partial changes. ... A new method is needed to address this issue."_ — RFC 5789 §1
 
 - **PUT (RFC 9110 §9.3.4)**: 전체 교체. 누락 필드는 **"unset" 또는 default 적용**.
 - **PATCH (RFC 5789)**: 부분 갱신. JSON Merge Patch (RFC 7396) 또는 JSON Patch (RFC 6902).
@@ -39,7 +39,7 @@
 
 ### 1.4 RFC 7807 / RFC 9457 Problem Details
 
-> *"This document defines a 'problem detail' as a way to carry machine-readable details of errors in a HTTP response."* — RFC 7807 (RFC 9457 가 후속, 2023)
+> _"This document defines a 'problem detail' as a way to carry machine-readable details of errors in a HTTP response."_ — RFC 7807 (RFC 9457 가 후속, 2023)
 
 - 표준 필드: `type` (URI), `title`, `status`, `detail`, `instance`.
 - Content-Type: `application/problem+json`.
@@ -120,35 +120,36 @@
 
 ## §5. 8 Candidate Finding 권위 평가
 
-| finding | 메인 severity | Document 권고 | RFC/표준 권위 | 비고 |
-|---|---|---|---|---|
-| **F-079** | high | **high 확정 ★** | RFC 7231 §4.2.2 / RFC 9110 §9.2.2 | spec 200 OK 명시는 idempotent codification — service throw 는 RFC 위반. Profile 비대칭 evidence ★ |
-| **F-080** | medium | **medium 확정** | OWASP API4:2023 | runtime cap 50 ✅ / spec maximum 부재 → contract drift |
-| **F-081** | medium | **low 조정** | OpenAPI Generator (de facto) | RFC/RFC급 표준 부재. 호환성 영향 없음. legacy artifact cleanup |
-| **F-082** | medium | **medium 확정** | API versioning best practice (Stripe/GitHub) | F-038 재현 → v1.2.0 묶음 데이터 |
-| **F-083** | low | **low 확정** | RFC 9110 §15.3.5 | DELETE article/comment 는 204 권고 / favorite DELETE 는 200 정당화 가능 (idempotent body) |
-| **F-084** | medium | **medium 확정** | RFC 6750 | DEC-API-001 재현 — RealWorld 공식 spec 비표준 외부 검증 ✅ |
-| **F-085** | low | **low 확정** | RFC 9110 §15.3.2 | login 은 신규 자원 URI 생성 아님 → 200 정합 |
-| **F-086** | medium | **medium 확정** | RFC 5789 / RFC 9110 §9.3.4 | UpdateUser DTO 부분 갱신 의도 명시 → PATCH 정합 |
+| finding   | 메인 severity | Document 권고   | RFC/표준 권위                                | 비고                                                                                            |
+| --------- | ------------- | --------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| **F-079** | high          | **high 확정 **  | RFC 7231 §4.2.2 / RFC 9110 §9.2.2            | spec 200 OK 명시는 idempotent codification — service throw 는 RFC 위반. Profile 비대칭 evidence |
+| **F-080** | medium        | **medium 확정** | OWASP API4:2023                              | runtime cap 50 ✅ / spec maximum 부재 → contract drift                                          |
+| **F-081** | medium        | **low 조정**    | OpenAPI Generator (de facto)                 | RFC/RFC급 표준 부재. 호환성 영향 없음. legacy artifact cleanup                                  |
+| **F-082** | medium        | **medium 확정** | API versioning best practice (Stripe/GitHub) | F-038 재현 → v1.2.0 묶음 데이터                                                                 |
+| **F-083** | low           | **low 확정**    | RFC 9110 §15.3.5                             | DELETE article/comment 는 204 권고 / favorite DELETE 는 200 정당화 가능 (idempotent body)       |
+| **F-084** | medium        | **medium 확정** | RFC 6750                                     | DEC-API-001 재현 — RealWorld 공식 spec 비표준 외부 검증 ✅                                      |
+| **F-085** | low           | **low 확정**    | RFC 9110 §15.3.2                             | login 은 신규 자원 URI 생성 아님 → 200 정합                                                     |
+| **F-086** | medium        | **medium 확정** | RFC 5789 / RFC 9110 §9.3.4                   | UpdateUser DTO 부분 갱신 의도 명시 → PATCH 정합                                                 |
 
 **조정 사유**:
+
 - **F-081 medium → low**: RFC 급 권위 부재. legacy artifact 는 호환성 영향 없음 (도구 생태계 인식 유지). cleanup 은 cosmetic.
 
 ---
 
-## §6. 사내 적용 권고 (REC-API-* 9건)
+## §6. 사내 적용 권고 (REC-API-\* 9건)
 
-| ID | 제목 | 우선순위 | 근거 |
-|---|---|---|---|
-| **REC-API-IDEMPOTENCY-001** | favorite/unfavorite service 단 idempotent 정렬 (Profile follow 패턴 적용) | **high** | RFC 7231 §4.2.2 — F-079 |
-| **REC-API-LIMIT-CAP-001** | openapi.yaml `limitParam.maximum: 50` 명시 (runtime cap 와 정합) | medium | OWASP API4 — F-080 |
-| **REC-API-VERSIONING-001** | URI path `/v1/` prefix 도입 (Stripe/GitHub 표준) | medium | F-082 / PoC #01 F-038 |
-| **REC-API-BEARER-MIGRATION-001** | Token (apiKey) → Bearer JWT (RFC 6750) + Spring Security 6 OAuth2 Resource Server | medium | F-084 / DEC-API-001 |
-| **REC-API-PATCH-001** | UpdateCurrentUser PUT → PATCH (RFC 5789, application/merge-patch+json) | medium | F-086 |
-| **REC-API-PROBLEM-DETAILS-001** | GenericErrorModel → RFC 7807/9457 ProblemDetail (Spring 6 자동 매핑) | medium | RFC 7807 / Spring 6 |
-| **REC-API-STATUS-EXPLICIT-001** | controller `@ResponseStatus` 명시 (login OK / register CREATED / delete 204) | low | RFC 9110 §15.3 / F-083 / F-085 |
-| **REC-API-OPENAPI-31-001** | OpenAPI 3.0.1 → 3.1 격상 (JSON Schema 2020-12 정합) | low | OpenAPI 3.1 spec |
-| **REC-API-CODEGEN-CLEANUP-001** | `x-codegen-request-body-name` legacy artifact 제거 | low | OpenAPI Generator — F-081 |
+| ID                               | 제목                                                                              | 우선순위 | 근거                           |
+| -------------------------------- | --------------------------------------------------------------------------------- | -------- | ------------------------------ |
+| **REC-API-IDEMPOTENCY-001**      | favorite/unfavorite service 단 idempotent 정렬 (Profile follow 패턴 적용)         | **high** | RFC 7231 §4.2.2 — F-079        |
+| **REC-API-LIMIT-CAP-001**        | openapi.yaml `limitParam.maximum: 50` 명시 (runtime cap 와 정합)                  | medium   | OWASP API4 — F-080             |
+| **REC-API-VERSIONING-001**       | URI path `/v1/` prefix 도입 (Stripe/GitHub 표준)                                  | medium   | F-082 / PoC #01 F-038          |
+| **REC-API-BEARER-MIGRATION-001** | Token (apiKey) → Bearer JWT (RFC 6750) + Spring Security 6 OAuth2 Resource Server | medium   | F-084 / DEC-API-001            |
+| **REC-API-PATCH-001**            | UpdateCurrentUser PUT → PATCH (RFC 5789, application/merge-patch+json)            | medium   | F-086                          |
+| **REC-API-PROBLEM-DETAILS-001**  | GenericErrorModel → RFC 7807/9457 ProblemDetail (Spring 6 자동 매핑)              | medium   | RFC 7807 / Spring 6            |
+| **REC-API-STATUS-EXPLICIT-001**  | controller `@ResponseStatus` 명시 (login OK / register CREATED / delete 204)      | low      | RFC 9110 §15.3 / F-083 / F-085 |
+| **REC-API-OPENAPI-31-001**       | OpenAPI 3.0.1 → 3.1 격상 (JSON Schema 2020-12 정합)                               | low      | OpenAPI 3.1 spec               |
+| **REC-API-CODEGEN-CLEANUP-001**  | `x-codegen-request-body-name` legacy artifact 제거                                | low      | OpenAPI Generator — F-081      |
 
 ---
 
@@ -161,7 +162,7 @@
 
 ### 7.2 권위 강화
 
-- **RFC 7231 §4.2.2 / RFC 9110 §9.2.2**: idempotent 정의는 *"intended effect"* 기준. spec 의 200 OK 명시는 **intended effect = idempotent** 를 codify.
+- **RFC 7231 §4.2.2 / RFC 9110 §9.2.2**: idempotent 정의는 _"intended effect"_ 기준. spec 의 200 OK 명시는 **intended effect = idempotent** 를 codify.
 - POST 가 일반적으로 non-idempotent 이나, **toggle-set semantics (favorite ON/OFF state)** 는 idempotent 가 정합. RealWorld 공식 spec 의 200 OK 명시도 이를 인정한 결정.
 
 ### 7.3 사내 적용 final 권고
@@ -172,7 +173,7 @@
    ```
 2. **Spec maximum 명시** (REC-API-LIMIT-CAP-001): `limitParam.maximum: 50`.
 3. **AP-API-001 등록** (Phase 6 candidate): "spec idempotent codification ↔ runtime throw 비대칭" 안티패턴.
-4. **F-079 severity high 확정** ★: 같은 도메인 내 비대칭은 일관성 원칙 (Principle of Least Astonishment) 위반 + RFC 7231 §4.2.2 정의 위반.
+4. **F-079 severity high 확정** : 같은 도메인 내 비대칭은 일관성 원칙 (Principle of Least Astonishment) 위반 + RFC 7231 §4.2.2 정의 위반.
 
 ---
 

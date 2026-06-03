@@ -1,5 +1,5 @@
 {
-  "$comment": "★ analysis-domain-model skill 산출 — phase=business-logic.4 (sub: domain-model)",
+  "$comment": "analysis-domain-model skill 산출 — phase=business-logic.4 (sub: domain-model)",
   "project_id": "poc-14-fsim-corroboration",
   "use_cases": [
     {
@@ -9,7 +9,7 @@
       "actor": "anonymous",
       "primary_outcome": "201 Created + user.id 반환",
       "alternatives": [
-        { "id": "UC-USER-FSIM-001-A1", "title": "이메일 중복", "outcome": "409 Conflict (BR-USER-DATA-FSIM-001) — ★ 현 구현 미수행" },
+        { "id": "UC-USER-FSIM-001-A1", "title": "이메일 중복", "outcome": "409 Conflict (BR-USER-DATA-FSIM-001) — 현 구현 미수행" },
         { "id": "UC-USER-FSIM-001-A2", "title": "비밀번호 < 8자", "outcome": "400 Bad Request (BR-USER-VALIDATION-FSIM-001 / Pydantic 자동 검증)" }
       ],
       "related_rules": ["BR-USER-DATA-FSIM-001", "BR-USER-VALIDATION-FSIM-001"],

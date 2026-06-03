@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/visual-manifest.schema.json",
   "title": "Visual Manifest (시각 산출 매니페스트)",
-  "description": "Deliverable #9 (v1.4 신설). FE 영역 시각 산출 (Playwright snapshot + axe-core a11y inline). ★ binary 진실 (snapshot PNG) 모델 — ADR-FE-002 §2.3 visual 예외 정합. ADR-009 §2.4.2 binary trust path 정합. drift-validator 적용 ❌ / Playwright snapshot diff ✅. no-simulation 정책 강제.",
+  "description": "Deliverable #9 (v1.4 신설). FE 영역 시각 산출 (Playwright snapshot + axe-core a11y inline). binary 진실 (snapshot PNG) 모델 — ADR-FE-002 §2.3 visual 예외 정합. ADR-009 §2.4.2 binary trust path 정합. drift-validator 적용 ❌ / Playwright snapshot diff ✅. no-simulation 정책 강제.",
   "x-spec-source": {
     "playwright": "https://playwright.dev/docs/test-snapshots",
     "axe_core": "https://github.com/dequelabs/axe-core/blob/develop/doc/API.md",
@@ -27,7 +27,7 @@
     },
     "viewport_matrix": {
       "type": "array",
-      "description": "캡처 viewport 매트릭스. ★ 매트릭스 정의 의무 (snapshot 일관성 진실 모델).",
+      "description": "캡처 viewport 매트릭스. 매트릭스 정의 의무 (snapshot 일관성 진실 모델).",
       "items": {
         "type": "object",
         "required": ["label", "width", "height"],
@@ -104,12 +104,12 @@
           },
           "snapshot_path": {
             "type": "string",
-            "description": "★ binary 진실 — snapshot PNG 파일 상대 경로."
+            "description": " binary 진실 — snapshot PNG 파일 상대 경로."
           },
           "snapshot_hash": {
             "type": "string",
             "pattern": "^[a-f0-9]{64}$",
-            "description": "★ SHA-256 hash (64 hex chars). binary 진실 fingerprint."
+            "description": " SHA-256 hash (64 hex chars). binary 진실 fingerprint."
           },
           "baseline_hash": {
             "type": "string",
@@ -147,7 +147,7 @@
               "cypress_real",
               "simulation"
             ],
-            "description": "★ 캡처 도구. ADR-FE-002 §2.3 + ADR-009 §2.2.1 정합. simulation=★ -5%p 패널티 (no-simulation 정책)."
+            "description": " 캡처 도구. ADR-FE-002 §2.3 + ADR-009 §2.2.1 정합. simulation= -5%p 패널티 (no-simulation 정책)."
           },
           "captured_by_version": {
             "type": "string",
@@ -155,24 +155,24 @@
           },
           "stdout_path": {
             "type": "string",
-            "description": "★ 5종 물증 1 — 도구 stdout 로그 경로 (real_tool 시 의무)."
+            "description": " 5종 물증 1 — 도구 stdout 로그 경로 (real_tool 시 의무)."
           },
           "stderr_path": {
             "type": "string",
-            "description": "★ 5종 물증 2 — 도구 stderr 로그 경로 (real_tool 시 의무)."
+            "description": " 5종 물증 2 — 도구 stderr 로그 경로 (real_tool 시 의무)."
           },
           "duration_ms": {
             "type": "integer",
             "minimum": 0,
-            "description": "★ 5종 물증 3 — 캡처 소요 ms (real_tool 시 의무)."
+            "description": " 5종 물증 3 — 캡처 소요 ms (real_tool 시 의무)."
           },
           "result_hash": {
             "type": "string",
-            "description": "★ 5종 물증 4 — 캡처 결과 종합 hash (real_tool 시 의무). snapshot_hash 와 다를 수 있음 (메타 포함)."
+            "description": " 5종 물증 4 — 캡처 결과 종합 hash (real_tool 시 의무). snapshot_hash 와 다를 수 있음 (메타 포함)."
           },
           "reproduction_command": {
             "type": "string",
-            "description": "★ 5종 물증 5 — 재현 명령 (real_tool 시 의무). 예: 'npx playwright test --project=chromium login.spec.ts'."
+            "description": " 5종 물증 5 — 재현 명령 (real_tool 시 의무). 예: 'npx playwright test --project=chromium login.spec.ts'."
           },
           "simulation_reason": {
             "type": "string",
@@ -197,7 +197,7 @@
                 "wcag_level": {
                   "type": "string",
                   "enum": ["2.1-A", "2.1-AA", "2.1-AAA", "2.2-A", "2.2-AA", "2.2-AAA"],
-                  "description": "WCAG version + level (★ ADR-FE-005 §2.2.2 baseline 2.1-AA + ratchet 2.2-AA 정합)."
+                  "description": "WCAG version + level ( ADR-FE-005 §2.2.2 baseline 2.1-AA + ratchet 2.2-AA 정합)."
                 },
                 "nodes": {
                   "type": "array",
@@ -268,7 +268,7 @@
         "simulation_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ captured_by=simulation 인 snapshot 개수. > 0 시 -5%p 패널티 표기 의무."
+          "description": " captured_by=simulation 인 snapshot 개수. > 0 시 -5%p 패널티 표기 의무."
         },
         "real_tool_count": {
           "type": "integer",
@@ -292,7 +292,7 @@
             "ratchet_target": {
               "type": "string",
               "enum": ["2.1-AA", "2.2-AA"],
-              "description": "★ ADR-010 baseline+ratchet 정합 — 현재 ratchet 목표 level."
+              "description": " ADR-010 baseline+ratchet 정합 — 현재 ratchet 목표 level."
             }
           }
         }
@@ -300,7 +300,7 @@
     },
     "cross_links": {
       "type": "array",
-      "description": "★ Phase 4.5 cross-link 패턴 정합. visual-manifest ↔ ui-spec / state-map / api 의 관계.",
+      "description": " Phase 4.5 cross-link 패턴 정합. visual-manifest ↔ ui-spec / state-map / api 의 관계.",
       "items": {
         "type": "object",
         "required": ["from_snapshot", "to_artifact", "to_id", "link_type"],
@@ -320,7 +320,7 @@
     },
     "baseline_management": {
       "type": "object",
-      "description": "baseline 관리 정책 (★ ADR-FE-002 §2.3 정합).",
+      "description": "baseline 관리 정책 ( ADR-FE-002 §2.3 정합).",
       "properties": {
         "storage": {
           "type": "string",

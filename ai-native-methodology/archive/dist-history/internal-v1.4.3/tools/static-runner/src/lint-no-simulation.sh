@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lint-no-simulation.sh — ★★★ Sprint 4 묶음 O 차단 룰 enforcement.
+# lint-no-simulation.sh — Sprint 4 묶음 O 차단 룰 enforcement.
 # 입력: 디렉토리 (재귀). 검사: _manifest.yml + cross_validation 메타에 5종 물증 모두 있는지.
 # 5종 누락 또는 simulation_only:true → exit 1.
 
@@ -15,7 +15,7 @@ fi
 
 # 1. simulation_only:true grep
 if grep -r --include='*.yml' --include='*.yaml' --include='*.json' -l 'simulation_only.*:.*true' "$TARGET_DIR" 2>/dev/null; then
-  echo "[lint-no-simulation] ❌ FAIL — simulation_only:true detected. ★★★ no-simulation policy violated." >&2
+  echo "[lint-no-simulation] ❌ FAIL — simulation_only:true detected. no-simulation policy violated." >&2
   EXIT=1
 fi
 

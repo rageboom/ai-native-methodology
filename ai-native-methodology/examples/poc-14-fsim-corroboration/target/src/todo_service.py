@@ -1,6 +1,6 @@
 """Todo service — chain 4 GREEN impl.
 
-★ ownership 검사 정상 (legacy 동일 / BR-TODO-OWNERSHIP-FSIM-001 정합).
+ownership 검사 정상 (legacy 동일 / BR-TODO-OWNERSHIP-FSIM-001 정합).
 """
 from typing import Optional
 

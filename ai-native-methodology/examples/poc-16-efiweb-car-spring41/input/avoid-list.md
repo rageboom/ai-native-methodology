@@ -4,24 +4,24 @@
 
 ## 심각도 분포
 
-| severity | count | % |
-|---|---|---|
-| **critical** | **2** | 20% |
-| **high** | **4** | 40% |
-| medium | 4 | 40% |
-| **합계** | **10** | 100% |
+| severity     | count  | %    |
+| ------------ | ------ | ---- |
+| **critical** | **2**  | 20%  |
+| **high**     | **4**  | 40%  |
+| medium       | 4      | 40%  |
+| **합계**     | **10** | 100% |
 
 | category | count |
-|---|---|
-| DB | 4 |
-| FE | 1 |
-| SECURITY | 1 |
-| ARCH | 1 |
-| EXTERNAL | 1 |
-| DOMAIN | 1 |
-| API | 1 |
+| -------- | ----- |
+| DB       | 4     |
+| FE       | 1     |
+| SECURITY | 1     |
+| ARCH     | 1     |
+| EXTERNAL | 1     |
+| DOMAIN   | 1     |
+| API      | 1     |
 
-## ★★★ Critical (2건) — 마이그레이션 시 즉시 회피 의무
+## Critical (2건) — 마이그레이션 시 즉시 회피 의무
 
 ### AP-FE-001 — JSP scriptlet `<% ... %>` 8건
 
@@ -35,7 +35,7 @@
 - **회피**: ❌ raw expression 금지 / OWASP Top 10 (Injection)
 - **대안**: `${var}` 또는 `<c:out value='${var}'/>` (auto-escape default)
 
-## ★★ High (4건) — 마이그레이션 시 의무 변경
+## High (4건) — 마이그레이션 시 의무 변경
 
 ### AP-API-001 — Exception Handler 부재 (negative-space)
 
@@ -61,16 +61,16 @@
 - **회피**: ❌ 외부 SP 본체 모름 / business logic 분산 / 테스트 격리 ❌
 - **대안**: SP source 확보 → Java service 흡수 또는 ERP REST API 호출
 
-## ★ Medium (4건) — 마이그레이션 시 권고
+## Medium (4건) — 마이그레이션 시 권고
 
-| ID | 패턴 | 대안 |
-|---|---|---|
-| AP-ARCH-001 | DAO package 위치 (service/impl/ 안) | `repository/` 또는 `dao/` 별도 패키지 |
-| AP-DB-001 | Composite PK (TB_CAR_COST_SLIP) | surrogate PK (slip_pk) + composite UNIQUE |
-| AP-DB-004 | Column 의미 중복 (drive_dist ↔ distance) | sqlmap 사용 패턴 분석 → dead column 제거 |
-| AP-DOMAIN-001 | HashMap-based DTO paradigm | typed DTO class + Spring Bean Validation |
+| ID            | 패턴                                     | 대안                                      |
+| ------------- | ---------------------------------------- | ----------------------------------------- |
+| AP-ARCH-001   | DAO package 위치 (service/impl/ 안)      | `repository/` 또는 `dao/` 별도 패키지     |
+| AP-DB-001     | Composite PK (TB_CAR_COST_SLIP)          | surrogate PK (slip_pk) + composite UNIQUE |
+| AP-DB-004     | Column 의미 중복 (drive_dist ↔ distance) | sqlmap 사용 패턴 분석 → dead column 제거  |
+| AP-DOMAIN-001 | HashMap-based DTO paradigm               | typed DTO class + Spring Bean Validation  |
 
-## ★ 체크리스트 (마이그레이션 PR 의무 검사)
+## 체크리스트 (마이그레이션 PR 의무 검사)
 
 - [ ] JSP scriptlet (`<% ... %>` excluding directives) = 0 (grep enforced)
 - [ ] JSP raw expression (`<%= %>`) = 0 (EL `${}` 또는 `<c:out>` 만)

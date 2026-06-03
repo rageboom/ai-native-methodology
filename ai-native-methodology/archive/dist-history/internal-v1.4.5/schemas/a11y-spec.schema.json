@@ -34,13 +34,13 @@
           "type": "string",
           "enum": ["2.1-AA", "2.2-AA"],
           "default": "2.1-AA",
-          "description": "★ ADR-FE-005 §2.2.2 baseline. fail 시 critical (★ ADR-010 baseline 정합)."
+          "description": " ADR-FE-005 §2.2.2 baseline. fail 시 critical ( ADR-010 baseline 정합)."
         },
         "ratchet_wcag": {
           "type": "string",
           "enum": ["2.1-AA", "2.1-AAA", "2.2-AA", "2.2-AAA"],
           "default": "2.2-AA",
-          "description": "★ ADR-010 ratchet 격상 목표. fail 시 권장 (block ❌)."
+          "description": " ADR-010 ratchet 격상 목표. fail 시 권장 (block ❌)."
         }
       }
     },
@@ -99,11 +99,11 @@
           "source_file": {"type": "string"},
           "blocks_baseline": {
             "type": "boolean",
-            "description": "★ baseline_wcag 위반 여부. true 시 critical (build block 권장)."
+            "description": " baseline_wcag 위반 여부. true 시 critical (build block 권장)."
           },
           "blocks_ratchet": {
             "type": "boolean",
-            "description": "ratchet_wcag 위반 여부. true 시 권장 (★ block ❌)."
+            "description": "ratchet_wcag 위반 여부. true 시 권장 ( block ❌)."
           }
         }
       }
@@ -128,7 +128,7 @@
         },
         "baseline_pass": {
           "type": "boolean",
-          "description": "★ baseline_wcag (2.1-AA) 통과 여부. ADR-010 정합 — false 시 build block."
+          "description": " baseline_wcag (2.1-AA) 통과 여부. ADR-010 정합 — false 시 build block."
         },
         "ratchet_pass": {
           "type": "boolean",
@@ -137,7 +137,7 @@
         "captured_by": {
           "type": "string",
           "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real", "simulation"],
-          "description": "★ no-simulation 정책 (ADR-009 §2.2.1). simulation 시 -5%p 패널티 + simulation_reason 의무."
+          "description": " no-simulation 정책 (ADR-009 §2.2.1). simulation 시 -5%p 패널티 + simulation_reason 의무."
         },
         "captured_by_version": {
           "type": "string",

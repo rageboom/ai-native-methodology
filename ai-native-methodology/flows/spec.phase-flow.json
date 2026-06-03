@@ -1,5 +1,5 @@
 {
-  "$comment": "★ ★ v2.0 chain 2 (spec) phase flow — json 단독 SSOT (★ v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. discovery-spec + analysis 7대/Phase 4.5 통합 → behavior-spec + acceptance-criteria 산출. UC → BHV → AC 1:N forward link 의무. ★ ★ ★ v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동). ★ v11.0.0 — planning-spec → discovery-spec rename cascade.",
+  "$comment": "v2.0 chain 2 (spec) phase flow — json 단독 SSOT (v12 ADR-011 / .mermaid 짝 폐기). DEC-2026-05-06-v2.0-i-strict-채택 + ADR-CHAIN-001 정합. discovery-spec + analysis 7대/Phase 4.5 통합 → behavior-spec + acceptance-criteria 산출. UC → BHV → AC 1:N forward link 의무. v3.1.0 — phase ID 의미 ID 자산화 (D-3 paradigm / depends_on 그래프 SSOT / order 필드 폐기 / 위상정렬 자동). v11.0.0 — planning-spec → discovery-spec rename cascade.",
   "id": "spec-phase-flow",
   "version": "3.1.0",
   "stage": "spec",

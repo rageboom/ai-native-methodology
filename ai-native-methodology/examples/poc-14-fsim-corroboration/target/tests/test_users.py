@@ -1,7 +1,7 @@
 """TC-USER-FSIM-001 + TC-USER-FSIM-002 — pytest tests.
 
-★ chain 3 (RED): impl 부재 → ModuleNotFoundError (Beck-canonical RED).
-★ chain 4 (GREEN): target/src/* impl 작성 후 모두 pass 의무.
+chain 3 (RED): impl 부재 → ModuleNotFoundError (Beck-canonical RED).
+chain 4 (GREEN): target/src/* impl 작성 후 모두 pass 의무.
 """
 import pytest
 

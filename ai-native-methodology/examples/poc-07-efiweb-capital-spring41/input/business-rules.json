@@ -1,5 +1,5 @@
 {
-  "$comment": "★ PoC #07 prelim — capital 모듈 BR 추출. 핵심 ~15 BR (vs PoC #06 7 BR / 다중책임 → BR ↑).",
+  "$comment": "PoC #07 prelim — capital 모듈 BR 추출. 핵심 ~15 BR (vs PoC #06 7 BR / 다중책임 → BR ↑).",
   "project_id": "poc-07-efiweb-capital-spring41",
   "business_rules": [
     {
@@ -19,7 +19,7 @@
       "evidence_strength": "medium",
       "br_type": "configuration",
       "is_intent": true,
-      "domain_carry": "★ DBA read — sType enum 의미 결정"
+      "domain_carry": "DBA read — sType enum 의미 결정"
     },
     {
       "id": "BR-CAPITAL-TXBOUND-003",
@@ -42,13 +42,13 @@
     },
     {
       "id": "BR-CAPITAL-SAVTYPE-005",
-      "title": "★ 자금일보 임시저장 / 저장 / 초기화 saveType 3 분기",
+      "title": "자금일보 임시저장 / 저장 / 초기화 saveType 3 분기",
       "natural_language": "자금일보 입력 시 saveType R(저장) / B(임시저장) / A(초기화) 분기. CapitalController.java:763 자조 코멘트 명시",
       "source": "CapitalController.java:763 // saveType = R 는 저장, B는 임시저장 ,A는 초기화",
       "evidence_strength": "high",
       "br_type": "state_machine",
       "is_intent": true,
-      "domain_carry": "★ R/B/A enum 의 정확한 효과 — DBA + planner 결단"
+      "domain_carry": "R/B/A enum 의 정확한 효과 — DBA + planner 결단"
     },
     {
       "id": "BR-CAPITAL-PREVBAL-006",
@@ -59,7 +59,7 @@
       "br_type": "auto_fetch",
       "is_intent": true,
       "is_likely_bug": false,
-      "patch_history": "★ 2020.10.30. 김승희 — Double basicBalance = 0 default → if (!list.isEmpty() && null != list.get(0).get(\"cramt\")) basicBalance = Double.parseDouble(...) 변경 (★ NullPointerException 회피 / String→Double 강제 캐스팅 patch)"
+      "patch_history": "2020.10.30. 김승희 — Double basicBalance = 0 default → if (!list.isEmpty() && null != list.get(0).get(\"cramt\")) basicBalance = Double.parseDouble(...) 변경 (NullPointerException 회피 / String→Double 강제 캐스팅 patch)"
     },
     {
       "id": "BR-CAPITAL-AUDIT-007",
@@ -72,13 +72,13 @@
     },
     {
       "id": "BR-CAPITAL-VRFYLOCK-008",
-      "title": "★ ★ ★ Capital Verify (검증 lock) — 결재 후 임시저장 차단",
+      "title": "Capital Verify (검증 lock) — 결재 후 임시저장 차단",
       "natural_language": "selectCapitalVrify / insertCapitalVrify — 자본 보고 검증 / 결재 후 lock 처리. 임시저장 → 정식 저장 → verify 흐름",
       "source": "capital.xml:1354 + 1371 + CapitalController.java:858/875",
       "evidence_strength": "medium",
       "br_type": "approval_workflow",
       "is_intent": true,
-      "domain_carry": "★ verify 후 수정 가능 여부 — planner 결단"
+      "domain_carry": "verify 후 수정 가능 여부 — planner 결단"
     },
     {
       "id": "BR-CAPITAL-XRATE-009",
@@ -89,7 +89,7 @@
       "br_type": "cross_module_dependency",
       "is_intent": true,
       "is_likely_bug_partial": true,
-      "note": "★ ★ exchange 모듈 BR-EXCHANGE-007 (외화→원화 환산 환율) 의존 / module boundary 흐림 → 새 시스템 = micro-service 분리 검토"
+      "note": "exchange 모듈 BR-EXCHANGE-007 (외화→원화 환산 환율) 의존 / module boundary 흐림 → 새 시스템 = micro-service 분리 검토"
     },
     {
       "id": "BR-CAPITAL-HISTORY-010",
@@ -102,15 +102,15 @@
     },
     {
       "id": "BR-CAPITAL-MAILSPEC-011",
-      "title": "★ 슈퍼크리에이티브 메일수신 유저 임시처리 (★ self_recognized SATD 4회 중복)",
-      "natural_language": "★ ★ insertSendMail / mailList 등에서 슈퍼크리에이티브 사용자 메일 수신 처리 = 임시처리 (★ SATD 4회 중복 / CapitalController.java:1289/1299/1329/1456)",
+      "title": "슈퍼크리에이티브 메일수신 유저 임시처리 (self_recognized SATD 4회 중복)",
+      "natural_language": "insertSendMail / mailList 등에서 슈퍼크리에이티브 사용자 메일 수신 처리 = 임시처리 (SATD 4회 중복 / CapitalController.java:1289/1299/1329/1456)",
       "source": "CapitalController.java:1289+1299+1329+1456 // 슈퍼크리에이티브 메일수신 유저 임시처리",
       "evidence_strength": "high",
       "br_type": "data_source_special_case",
       "is_intent": false,
       "is_likely_bug": true,
       "is_self_recognized": true,
-      "note": "★ ★ ★ SATD per Maldonado & Shihab — 4회 중복 자조 / 새 시스템 = 정식 메일 수신 user enum + audit 의무"
+      "note": "SATD per Maldonado & Shihab — 4회 중복 자조 / 새 시스템 = 정식 메일 수신 user enum + audit 의무"
     },
     {
       "id": "BR-CAPITAL-IMGB64-012",
@@ -121,7 +121,7 @@
       "br_type": "data_storage",
       "is_intent": false,
       "is_likely_bug": true,
-      "note": "★ AP-CAPITAL-007 동반 / DB 비대 + 성능 + IO 비용 ↑ / 새 시스템 = S3/object storage 분리"
+      "note": "AP-CAPITAL-007 동반 / DB 비대 + 성능 + IO 비용 ↑ / 새 시스템 = S3/object storage 분리"
     },
     {
       "id": "BR-CAPITAL-CALEND-013",
@@ -144,13 +144,13 @@
     {
       "id": "BR-CAPITAL-ASSETSP-015",
       "title": "Asset List 다단계 조회 (selectAssetListAjax1~7 / SP 다단)",
-      "natural_language": "★ Asset list 1~7 단계 별도 SP 호출 (SAC ledger / capital asset / company asset / 등). xmlDocument String 인라인 (★ AP)",
+      "natural_language": "Asset list 1~7 단계 별도 SP 호출 (SAC ledger / capital asset / company asset / 등). xmlDocument String 인라인 (AP)",
       "source": "capital.xml:458-501 + 1649-1715 + CapitalController.java:599-784",
       "evidence_strength": "high",
       "br_type": "data_aggregation_pipeline",
       "is_intent": false,
       "is_likely_bug_partial": true,
-      "note": "★ XML 인라인 String 패턴 (★ AP-CAPITAL-005 / DEAD parameter) + Asset list 7단계 = 도메인 fragmentation"
+      "note": "XML 인라인 String 패턴 (AP-CAPITAL-005 / DEAD parameter) + Asset list 7단계 = 도메인 fragmentation"
     }
   ],
   "rules_meta_confidence": {
@@ -159,6 +159,6 @@
     "br_likely_bug": 4,
     "br_self_recognized": 1,
     "br_carry_partial": 2,
-    "$comment": "★ 시간 cap 정합 — 핵심 sub-domain 만 cover. capital 전체 BR ~30+ 추정 (carry)."
+    "$comment": "시간 cap 정합 — 핵심 sub-domain 만 cover. capital 전체 BR ~30+ 추정 (carry)."
   }
 }

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/work-unit-manifest.schema.json",
   "title": "Work-Unit Manifest (scope + stage)",
-  "description": "★ ★ ★ v3.2 G3 (R5/R7 산출물 폴더 자동 + 지속 운영 인프라). .aimd/<scope>/manifest.json (scope manifest = stage 필드 없음) + .aimd/<scope>/<stage>/manifest.json (stage manifest = stage 필드 있음) 두 mode. 이중 렌더링 ADR-008 정합 — manifest.json + manifest.md 쌍.",
+  "description": "v3.2 G3 (R5/R7 산출물 폴더 자동 + 지속 운영 인프라). .aimd/<scope>/manifest.json (scope manifest = stage 필드 없음) + .aimd/<scope>/<stage>/manifest.json (stage manifest = stage 필드 있음) 두 mode. 이중 렌더링 ADR-008 정합 — manifest.json + manifest.md 쌍.",
   "type": "object",
   "required": ["scope", "status"],
   "additionalProperties": false,
@@ -32,7 +32,7 @@
     "scenario": {
       "type": "string",
       "enum": ["S1", "S2", "S3", "greenfield"],
-      "description": "★ v11.9.0 use-scenario taxonomy (S1=재생성 / S2=AX전환 / S3=특성화 / greenfield=신규). scope manifest only / optional / chain-driver init --scenario 로 선언 → 전 stage 일관 참조 + gate-eval RED/GREEN 매트릭스 분기. 미지정 → gate-eval default 'S1'. DEC-2026-05-30-use-scenario-taxonomy."
+      "description": "v11.9.0 use-scenario taxonomy (S1=재생성 / S2=AX전환 / S3=특성화 / greenfield=신규). scope manifest only / optional / chain-driver init --scenario 로 선언 → 전 stage 일관 참조 + gate-eval RED/GREEN 매트릭스 분기. 미지정 → gate-eval default 'S1'. DEC-2026-05-30-use-scenario-taxonomy."
     },
     "created_at": {
       "type": "string",
@@ -55,7 +55,7 @@
     "traceability_refs": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ stage manifest 의 forward link — UC→BHV→AC→TC→IMPL chain.",
+      "description": "stage manifest 의 forward link — UC→BHV→AC→TC→IMPL chain.",
       "properties": {
         "uc":   { "type": "array", "items": { "type": "string" } },
         "bhv":  { "type": "array", "items": { "type": "string" } },
@@ -71,7 +71,7 @@
     "analysis_refs": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ scope manifest 의 canonical global 9 이식성 산출물 역인덱스 (5 + DB 자산 4 / ★ v11.3.0 신설 — DEC-2026-05-28-db-assets-always-on / ADR-CHAIN-014) — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern + DB tables / SP / functions / views.",
+      "description": "scope manifest 의 canonical global 9 이식성 산출물 역인덱스 (5 + DB 자산 4 / v11.3.0 신설 — DEC-2026-05-28-db-assets-always-on / ADR-CHAIN-014) — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern + DB tables / SP / functions / views.",
       "properties": {
         "rules":        { "type": "array", "items": { "type": "string" } },
         "endpoints":    { "type": "array", "items": { "type": "string" } },
@@ -81,11 +81,11 @@
         "db_tables": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Table 식별자 (CREATE TABLE 명 또는 schema.json 안 entry ID)."
+          "description": "v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Table 식별자 (CREATE TABLE 명 또는 schema.json 안 entry ID)."
         },
         "db_procedures": {
           "type": "array",
-          "description": "★ v11.3.0 신설 (db-assets-always-on §5 + sp-conversion-policy §8) — scope 관련 Stored Procedure list. sp_conversion_class 는 chain 3 plan stage 진입 시 채워짐 (discovery 까지 nullable).",
+          "description": "v11.3.0 신설 (db-assets-always-on §5 + sp-conversion-policy §8) — scope 관련 Stored Procedure list. sp_conversion_class 는 chain 3 plan stage 진입 시 채워짐 (discovery 까지 nullable).",
           "items": {
             "type": "object",
             "required": ["id"],
@@ -107,12 +107,12 @@
         "db_functions": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Function 식별자."
+          "description": "v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB Function 식별자."
         },
         "db_views": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "★ v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB View 식별자."
+          "description": "v11.3.0 신설 (db-assets-always-on §5) — scope 관련 DB View 식별자."
         }
       }
     },
@@ -120,7 +120,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["drift_detected"],
-      "description": "★ M4 동기화 메커니즘 자산. canonical global 변경 시 hook 이 drift_detected=true 자동 set / cascade 시 last_synced_at + sync_sources version 갱신.",
+      "description": "M4 동기화 메커니즘 자산. canonical global 변경 시 hook 이 drift_detected=true 자동 set / cascade 시 last_synced_at + sync_sources version 갱신.",
       "properties": {
         "last_synced_at": {
           "anyOf": [
@@ -165,14 +165,14 @@
         "impact_pending": {
           "type": "boolean",
           "default": false,
-          "description": "★ dep-graph operation.md P3 결정 5 — PostToolUse hook 이 chain/analysis artifact write 감지 시 true. 실제 영향 분석(BFS)+정책 평가는 `chain-driver impact` 또는 SessionStart preview 에서 수행. 사용자 confirm 후 false 로 clear."
+          "description": "dep-graph operation.md P3 결정 5 — PostToolUse hook 이 chain/analysis artifact write 감지 시 true. 실제 영향 분석(BFS)+정책 평가는 `chain-driver impact` 또는 SessionStart preview 에서 수행. 사용자 confirm 후 false 로 clear."
         }
       }
     },
     "token_usage": {
       "type": "object",
       "additionalProperties": false,
-      "description": "★ charter §5 P2 backlog — chain stage 별 token 사용량.",
+      "description": "charter §5 P2 backlog — chain stage 별 token 사용량.",
       "properties": {
         "input":  { "type": "integer", "minimum": 0 },
         "output": { "type": "integer", "minimum": 0 },

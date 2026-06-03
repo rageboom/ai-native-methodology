@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # aspect-a11y — Accessibility (FE)
 
-WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-simulation).
+WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (no-simulation).
 
 ## 사전 조건
 
@@ -15,7 +15,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-si
 
 ## 절차
 
-1. **도구 진짜 실행 (CLAUDE.md ★★★ no-simulation)**:
+1. **도구 진짜 실행 (CLAUDE.md no-simulation)**:
    ```bash
    # axe-core via Playwright
    npx playwright test --grep @a11y
@@ -24,7 +24,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (★ no-si
    ```
    환경 부재 시 사용자 위임 (CI) 명시 + 신뢰도 -5%p 기록
 2. **WCAG 2.2 기준** — Level A / AA / AAA 위반 분류
-3. **AP-FE-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합). ★ `id-conventions.md` §3 카테고리 정합 (AP-FE prefix / sub `A11Y` / 실 PoC #04 `AP-FE-{SUB}-NNN` 패턴 정합).
+3. **AP-FE-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합). `id-conventions.md` §3 카테고리 정합 (AP-FE prefix / sub `A11Y` / 실 PoC #04 `AP-FE-{SUB}-NNN` 패턴 정합).
 4. **a11y-spec.json 작성** — `schemas/a11y-spec.schema.json` (v1.4 신규)
 
 ## 산출물

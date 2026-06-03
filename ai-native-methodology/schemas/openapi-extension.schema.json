@@ -41,7 +41,7 @@
           },
           "related_use_case_id": {
             "type": "string",
-            "description": "유스케이스 ID 매칭 (★ v2.0 통일 / 예: UC-ORDER-001). 1:1 매핑 권장",
+            "description": "유스케이스 ID 매칭 (v2.0 통일 / 예: UC-ORDER-001). 1:1 매핑 권장",
             "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$"
           },
           "related_rules": {
@@ -100,7 +100,7 @@
           },
           "formal_spec_links": {
             "type": "object",
-            "description": "★ v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치 정식 입증). PoC #03 자발적 입증 9/21 op (43%) → schema 의무화 (optional but recommended).",
+            "description": "v1.2.3 신설 — Phase 4.5 형식 명세 cross-link (ADR-008 이중 렌더링 + Phase 4.5 본질 가치 정식 입증). PoC #03 자발적 입증 9/21 op (43%) → schema 의무화 (optional but recommended).",
             "properties": {
               "decision_tables": {
                 "type": "array",
@@ -115,7 +115,7 @@
               "sequence_diagrams": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": "관련 sequence-diagram 파일 경로 (★ v2.0 통일 / 예: ../formal-spec/sequence-diagrams/UC-USER-001.json)"
+                "description": "관련 sequence-diagram 파일 경로 (v2.0 통일 / 예: ../formal-spec/sequence-diagrams/UC-USER-001.json)"
               }
             }
           }

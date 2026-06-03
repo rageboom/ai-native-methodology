@@ -35,6 +35,7 @@
 ### T+3 — 핵심 사실 (Phase 4 5.A 입력)
 
 **Aggregate 경계 (cascade 분석)**:
+
 - **Article aggregate**: Article (root) + ArticleContents (Embedded) + ArticleTitle (nested) + Comment (OneToMany cascade={PERSIST, REMOVE} mappedBy=article) → Comment 는 Article aggregate 멤버
 - **User aggregate**: User (root) + Email/Password/Profile (Embedded) + UserName/Image (nested under Profile)
 - **Tag aggregate**: Tag standalone @Entity. ArticleContents.tags 는 cascade=PERSIST ManyToMany → 별도 aggregate (ID-by-reference)
@@ -42,49 +43,58 @@
 - followingUsers (User self-ref OneToMany): cascade=REMOVE → 같은 User aggregate 안 자기참조
 
 **Rich Domain Model 명백 (Anemic ❌)**:
+
 - User: 13+ behaviors (writeArticle, updateArticle with auth, writeCommentToArticle, favoriteArticle, followUser, deleteArticleComment, viewArticleComments, viewProfile, matchesPassword 등)
 - Article: addComment, removeCommentByUser (auth), updateArticle, afterUserFavoritesArticle, updateFavoriteByUser
 - → AP-DOMAIN-ANEMIC 미발생 ✅
 
 **CIRCULAR-001 도메인 의도 (실측)**:
+
 - User.writeArticle/writeCommentToArticle/favoriteArticle 등 cross-aggregate behavior 다수 → 도메인 협력 강함
 - 알고리즘 상 순환이지만 도메인 의도는 같은 통합 BC (BC-CONTENT 또는 BC-ARTICLE 흡수)
 - → ADR-006 default 적용 후 `bc_status=same_bc` 권장 — Phase 4 결정 본진
 
 **DRIFT-002 (단방향 follow)**: ✅ 단방향 명백
+
 - User.followingUsers OneToMany cascade=REMOVE join_table user_followings
 - User.followUser(followee) — 단순 add. 역방향 갱신 없음
 - Profile.following @Transient — viewer 관점 계산
 
 **DRIFT-010 (email unique application 검증)**: ❌ **검증 부재 발견**
+
 - UserService.signUp() 직접 save. existsByEmail / try-catch 없음
 - Email VO @Column unique 없음 (nullable=false 만)
 - → AP-VALIDATION-MISSING-001 (spec 요구사항 미충족)
 - 동일하게 username unique 도 부재 (확장 finding)
 
 **Comment.removeCommentByUser 의심 로직 (잠재 버그)**:
+
 - `if (!user.equals(author) || !user.equals(commentsToDelete.getAuthor())) throw IllegalAccessError`
 - `!A || !B` = `NOT (A AND B)` → 즉 user 가 article 작성자 AND comment 작성자 모두여야 삭제 가능
 - RealWorld spec: "comment author can delete" — **불일치**. AP-DOMAIN-LOGIC-BUG 후보
 
 **5.C 매직 넘버** (3건):
+
 - JWT_DURATION_SECONDS = 2*60*60 (2시간) — JWTConfiguration:13
 - SECRET = "SOME_SIGNATURE_SECRET" 하드코딩 — JWTConfiguration:12
 - allowedOrigins = http://localhost:3000/3001 — application.properties:7
 - → BR-AUTH-JWT-EXPIRE-001 + AP-SECURITY-HARDCODED-SECRET-001
 
 **5.D 외부 의존성**: 0건 ✅
+
 - build.gradle: spring-boot-starter-{web,security,validation,data-jpa} + h2 (runtime). 외부 SDK / Mailer / Kafka / Stripe / OAuth IdP 부재
 - → F-026 deferred finding 발현 사례
 
 **보안/인증 BR**:
+
 - BCryptPasswordEncoder — SecurityConfiguration:59 → BR-AUTH-PASSWORD-BCRYPT-001
 - STATELESS API: csrf disable + formLogin disable + JWT filter only → BR-AUTH-STATELESS-001
-- Public: GET /profiles/* /articles/** /tags/**, POST /users /users/login → BR-AUTH-PUBLIC-ENDPOINTS-001
+- Public: GET /profiles/\* /articles/** /tags/**, POST /users /users/login → BR-AUTH-PUBLIC-ENDPOINTS-001
 
 **Auditing**: @CreatedDate + @LastModifiedDate on Article + Comment → BR-DOMAIN-AUDITING-001
 
 **EAGER 과다** (Phase 6 후보):
+
 - Article.author EAGER, Article.userFavorited EAGER, Comment.article EAGER, Comment.author EAGER → AP-PERFORMANCE-EAGER-N1-001
 
 ### T+4 — 3 에이전트 병렬 리서치 spawn
@@ -94,11 +104,13 @@
 ### T+5 — 3 에이전트 완료 (순서: document → senior → case)
 
 **document-phase4.md (409 lines)** ✅
+
 - F-015 cross-check 8/8 일치
 - 추가 발견: schema.sql users.email/users.name UNIQUE 부재 (이중 부재 격상 정당)
 - 6 토픽 + 7 통합 권고 (A1 cascade 매트릭스 / A2 DRIFT-010 격상 / A3 De Morgan 버그 BR+AP / A4 strategic implicit / A5 JWT SECRET / A6 UC 1:1 + CQRS / A7 F-017 발현)
 
 **senior-phase4.md (242 lines)** ✅
+
 - 5 영역 + 11 결정 매트릭스
 - CIRCULAR-001 → same_bc 단일 BC-CONTENT, severity low 격하
 - DRIFT-010 → BR + AP 이중 등록 (high)
@@ -107,9 +119,10 @@
 - 신규 finding 3건: F-027 (잠재 버그 가이드 부재) / F-028 (equals mutability deferred) / F-029 (N영역 부재 신뢰도 가이드)
 
 **case-phase4.md (456 lines)** ✅
+
 - 7 토픽 + 9 결정 매트릭스 + 33 URL
-- 한국 1차 자료 ★★★: 카카오페이 여신코어 DDD / 우형 WMS 분리
-- 글로벌 ★★★: Vernon Aggregate Design / Twitter asymmetric / OWASP / GitHub leak 통계
+- 한국 1차 자료 : 카카오페이 여신코어 DDD / 우형 WMS 분리
+- 글로벌 : Vernon Aggregate Design / Twitter asymmetric / OWASP / GitHub leak 통계
 - 메인 사전 검증 8건 정합성: 강하게 지지 5 / 지지 2 / 재검증 필요 1 (Comment 권한 — 메인 raw fetch 로 확정 처리)
 - (검증 필요) 표기 4건: 토스/라인 follow / KISA 인시던트 / BCrypt 채택률 / 멜론·당근 follow
 
@@ -138,7 +151,7 @@
 - domain.mermaid (classDiagram — User/Article/Comment/Tag + 7 VO @Embedded composition + cross-aggregate refs + BC-AUTH cross-cutting)
 - use-cases.md (UC 25 카탈로그: Command 11 / Query 14 + Service ↔ UC 매핑 통계 + F-027 De Morgan 버그 명시)
 - ubiquitous-language.md (22 terms — 핵심 도메인 / 관계 / 인증 / 패턴 메타 + 누락 어휘 strategic implicit F-031)
-- _manifest.yml (Phase 4 매니페스트 + Phase 5/6 인계)
+- \_manifest.yml (Phase 4 매니페스트 + Phase 5/6 인계)
 
 ### T+10 — output/rules/ 3종 작성 ✅
 
@@ -147,7 +160,7 @@
   - human_review_required 6건
   - rule_conflicts[] 1건 — BR-COMMENT-DELETE-001 (rule vs actual_behavior, F-027)
 - rules.md (research 풀네임 → schema-compliant 짧은 ID 매핑표 + DRIFT-010 격상 권고 + F-027 격리 원칙)
-- _manifest.yml (BR ↔ AP 이중 등록 정합 + Phase 5/6 인계)
+- \_manifest.yml (BR ↔ AP 이중 등록 정합 + Phase 5/6 인계)
 
 ### T+11 — output/antipatterns-partial/ 2종 작성 ✅
 
@@ -155,7 +168,7 @@
   - AP-DOMAIN-001 / AP-SECURITY-001 / AP-DOMAIN-002 / AP-ARCH-001 / AP-ARCH-002 / AP-DB-001
   - phase_4_partial=true / next_phase_action=Phase 6 merge
   - id_mapping (research 풀네임 → schema 짧은 ID)
-- _manifest.yml (Phase 6 추가 후보 3 메모: AP-PERFORMANCE-001 / F-017 / F-028)
+- \_manifest.yml (Phase 6 추가 후보 3 메모: AP-PERFORMANCE-001 / F-017 / F-028)
 
 ### T+12 — output/architecture/ 갱신 (CIRCULAR-001 same_bc) ✅
 

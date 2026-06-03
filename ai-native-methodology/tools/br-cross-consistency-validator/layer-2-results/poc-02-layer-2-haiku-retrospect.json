@@ -27,7 +27,7 @@
     "score_distribution": { "0.95~1.0": 4, "0.85~0.95": 7, "0.75~0.85": 3, "below_0.75": 0 },
     "below_0.7_count": 0,
     "below_0.7_brs": [],
-    "$comment": "★ Haiku 원 출력은 BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001(0.75) 을 below_0.7_brs 에 잘못 포함 (0.75 ≥ 0.7 산술 비정합) — semantic_score/rationale 원문 보존, 파생 필드만 산술 정정. Haiku 자체 rationale = 'NL↔GWT 의도 mismatch 아님'."
+    "$comment": "Haiku 원 출력은 BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001(0.75) 을 below_0.7_brs 에 잘못 포함 (0.75 ≥ 0.7 산술 비정합) — semantic_score/rationale 원문 보존, 파생 필드만 산술 정정. Haiku 자체 rationale = 'NL↔GWT 의도 mismatch 아님'."
   },
   "cross_validation_notes": "blind retrospect / Sonnet 결과 미열람 / self-eval bias 측정용. 14 BR 독립 채점. 평균 0.906 = 높은 정합. 최저 0.75 (BR-ARTICLE-FAVORITE-NON-IDEMPOTENT-001) = 도메인 설계 우려이지 의미 반전 아님. 모든 BR ≥ 0.7 (genuine semantic drift 0). Sonnet vs Haiku delta = +0.027 (same-model 상향 bias 경미 / 허용 범위)."
 }

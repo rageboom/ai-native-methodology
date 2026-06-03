@@ -1,5 +1,5 @@
 {
-  "$comment": "★ analysis-source-inventory skill 산출 — phase=discovery.1",
+  "$comment": "analysis-source-inventory skill 산출 — phase=discovery.1",
   "project_id": "poc-14-fsim-corroboration",
   "language": "Python",
   "framework": "FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic v2",
@@ -18,7 +18,7 @@
     "source/models.py",
     "source/schemas.py",
     "source/auth.py",
-    "source/users.py (★ 명시 부재 / register/login 모두 auth.py 흡수)",
+    "source/users.py (명시 부재 / register/login 모두 auth.py 흡수)",
     "source/todos.py",
     "source/database.py"
   ],

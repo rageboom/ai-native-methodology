@@ -1,14 +1,14 @@
 name: chain-check
 
-# ★ ★ v2.0 sub-plan-3a 신설 — chain harness 4 gate 정합 검증 (별도 워크플로우 / S2 정합).
-# ★ drift-check.yml 오염 ❌ — 본 워크플로우는 if: false gate + workflow_dispatch only 로 시작.
-# ★ PoC #05 신설 (sub-plan-6) 시점에 본격 활성. 그 전까지는 수동 trigger / template 보존.
+# v2.0 sub-plan-3a 신설 — chain harness 4 gate 정합 검증 (별도 워크플로우 / S2 정합).
+# drift-check.yml 오염 ❌ — 본 워크플로우는 if: false gate + workflow_dispatch only 로 시작.
+# PoC #05 신설 (sub-plan-6) 시점에 본격 활성. 그 전까지는 수동 trigger / template 보존.
 #
 # Gate #1 (discovery → spec): discovery-extraction-validator
 # Gate #2 (spec → test): chain-coverage-validator + drift-validator (chain-mode) +
 #                        formal-spec-link-validator (--chain-mode)
-# Gate #3 (test → impl): spec-test-link-validator + 진짜 test runner (★ chain 3 RED 의무 / sub-plan-3b)
-# Gate #4 (impl → done): test-impl-pass-validator (★ ★ ★ 진짜 runner 100% pass / sub-plan-3b) +
+# Gate #3 (test → impl): spec-test-link-validator + 진짜 test runner (chain 3 RED 의무 / sub-plan-3b)
+# Gate #4 (impl → done): test-impl-pass-validator (진짜 runner 100% pass / sub-plan-3b) +
 #                        chain-coverage-validator (final) + static-runner --chain-strict
 # Cross gate: traceability-matrix-builder + chain-revisit-detector (sub-plan-5 carry)
 
@@ -26,7 +26,7 @@ on:
 
 jobs:
   chain-check:
-    # ★ S2 정합 — PoC #05 데이터 전까지 if: false gate. workflow_dispatch 만 허용.
+    # S2 정합 — PoC #05 데이터 전까지 if: false gate. workflow_dispatch 만 허용.
     if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +41,7 @@ jobs:
       - name: install workspace deps
         run: npm install --no-audit --no-fund
 
-      # ★ Gate #1 — discovery → spec (v11.0.0 rename)
+      # Gate #1 — discovery → spec (v11.0.0 rename)
       - name: gate#1 — discovery-extraction-validator
         working-directory: tools/discovery-extraction-validator
         run: |
@@ -51,7 +51,7 @@ jobs:
             echo "[chain-check] discovery-spec.json not found — skipped"
           fi
 
-      # ★ Gate #2 — spec → test
+      # Gate #2 — spec → test
       - name: gate#2 — chain-coverage-validator
         working-directory: tools/chain-coverage-validator
         run: |
@@ -74,7 +74,7 @@ jobs:
         working-directory: tools/drift-validator
         run: npm test
 
-      # ★ Gate #3 — test → impl
+      # Gate #3 — test → impl
       - name: gate#3 — spec-test-link-validator
         working-directory: tools/spec-test-link-validator
         run: |
@@ -84,14 +84,14 @@ jobs:
             echo "[chain-check] test-spec.json not found — skipped"
           fi
 
-      # ★ ★ ★ Gate #3+#4 — test-impl-pass-validator (★ sub-plan-3b 활성)
+      # Gate #3+#4 — test-impl-pass-validator (sub-plan-3b 활성)
       # ADR-CHAIN-004 정합 — `.aimd/config/test-cmd.json` 우선 / inventory 추론 / --test-cmd override.
       # CI 자동화 시 --allow-execute 의무 (사용자 명시 동의).
       - name: gate#3-4 — test-impl-pass-validator (dry-run only / CI 안전)
         working-directory: tools/test-impl-pass-validator
         run: |
           if [ -d "${{ github.workspace }}/${{ inputs.target_dir }}" ]; then
-            # ★ CI 단계 = dry-run only (config 검증 / 실제 실행 ❌).
+            # CI 단계 = dry-run only (config 검증 / 실제 실행 ❌).
             # 진짜 실행 = 사용자 환경 (PoC #05 sub-plan-6 시점) + workflow_dispatch input 확장.
             node src/cli.js \
               --project "${{ github.workspace }}" \
@@ -114,7 +114,7 @@ jobs:
             exit 1
           fi
 
-      # ★ Gate #4 — impl → done
+      # Gate #4 — impl → done
       - name: gate#4 — static-runner --chain-strict
         run: |
           if [ -d "${{ github.workspace }}/${{ inputs.target_dir }}" ]; then
@@ -123,7 +123,7 @@ jobs:
             echo "[chain-check] target_dir not found — skipped"
           fi
 
-      # ★ Cross gate — traceability matrix
+      # Cross gate — traceability matrix
       - name: cross — traceability-matrix-builder
         working-directory: tools/traceability-matrix-builder
         run: |
@@ -133,7 +133,7 @@ jobs:
             echo "[chain-check] target_dir not found — skipped"
           fi
 
-      # ★ Cross — schema-validator (6 chain schema)
+      # Cross — schema-validator (6 chain schema)
       - name: cross — schema-validator (6 chain schema)
         working-directory: tools/schema-validator
         run: |

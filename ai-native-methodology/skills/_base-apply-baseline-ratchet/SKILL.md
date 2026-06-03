@@ -21,7 +21,7 @@ ADR-010 fixes this: capture the baseline once, then **ratchet** — new findings
 ## Steps
 
 1. **Identify the analysis target** — confirm with user: which legacy codebase / branch / commit ref?
-2. **Run baseline tools** — real external tools, not simulation (★ R19 Tier 명시):
+2. **Run baseline tools** — real external tools, not simulation (R19 Tier 명시):
    - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint
    - **Tier 2 (user-environment SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+) / CodeQL / Daikon / Bandit (Python) → `tools/static-runner --import-sarif <path> --import-driver <name>`
    - Whichever applies to the target language stack
@@ -48,6 +48,7 @@ ADR-010 fixes this: capture the baseline once, then **ratchet** — new findings
 ## Output
 
 After this skill completes, the user has:
+
 - `.aimd/baseline-<date>.json` committed
 - Ratchet policy declared
 - CI configured (or template provided)

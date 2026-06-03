@@ -1,74 +1,74 @@
 ---
 name: ticket-sync
-description: ★ v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / BE only 운영·인프라·마이그레이션) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
+description: v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / BE only 운영·인프라·마이그레이션) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
 allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
 ---
 
 # ticket-sync (R20-prime / v11.0.0 paradigm)
 
-★ ★ ★ ★ ★ **R20-prime** = v11.0.0 본격 paradigm (DEC-2026-05-26-ticket-plan-단일). **ticket 생성 = plan stage 한 곳**. 이전 v8.6.x 5 stage matrix paradigm 영구 폐기.
+**R20-prime** = v11.0.0 본격 paradigm (DEC-2026-05-26-ticket-plan-단일). **ticket 생성 = plan stage 한 곳**. 이전 v8.6.x 5 stage matrix paradigm 영구 폐기.
 
 ## paradigm 개요
 
-| 항목 | v11.0.0 R20-prime (★ 본격) |
-|---|---|
-| ticket 생성 시점 | **plan stage 단일** (chain 3 plan gate 통과 직후) |
-| ticket hierarchy | **4-level cascade 일괄** — Epic + Story + Task(OP-*) + Sub-task(TASK-*) |
-| Epic 정의 | **FE 화면 단위** (UI screen / route) — 또는 BE only 영역의 도메인 묶음 (BE-domain Epic) |
-| Story 정의 | **BHV/AC cross-cut anchor** (BE+FE/DB/E2E 가로지름 / behavior-spec.BHV-* + acceptance-criteria.AC-* 묶음) |
-| Task 정의 (Story sibling) | **OP-* (operational-task)** — BE only 운영·인프라·마이그레이션 (Story 의 사용자 시나리오 axis 와 분리 / Story 와 sibling) |
-| Sub-task 정의 | **TASK-* (task-plan.tasks[])** — 1~3 AC 묶음 + layer 분기 (be/fe/db/e2e/infra) |
-| analysis/discovery/spec stage | **ticket 호출 ❌** — 산출물만 (DEC §3) |
-| test stage | **Sub-task status 갱신만** (RED evidence comment / status=Testing 전이) — 신규 생성 ❌ |
-| implement stage | **Sub-task status 갱신만** (GREEN evidence + commit_hash comment / status=Done / Story=Done) — 신규 생성 ❌ |
+| 항목                          | v11.0.0 R20-prime (본격)                                                                                                   |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| ticket 생성 시점              | **plan stage 단일** (chain 3 plan gate 통과 직후)                                                                          |
+| ticket hierarchy              | **4-level cascade 일괄** — Epic + Story + Task(OP-_) + Sub-task(TASK-_)                                                    |
+| Epic 정의                     | **FE 화면 단위** (UI screen / route) — 또는 BE only 영역의 도메인 묶음 (BE-domain Epic)                                    |
+| Story 정의                    | **BHV/AC cross-cut anchor** (BE+FE/DB/E2E 가로지름 / behavior-spec.BHV-_ + acceptance-criteria.AC-_ 묶음)                  |
+| Task 정의 (Story sibling)     | **OP-\* (operational-task)** — BE only 운영·인프라·마이그레이션 (Story 의 사용자 시나리오 axis 와 분리 / Story 와 sibling) |
+| Sub-task 정의                 | **TASK-\* (task-plan.tasks[])** — 1~3 AC 묶음 + layer 분기 (be/fe/db/e2e/infra)                                            |
+| analysis/discovery/spec stage | **ticket 호출 ❌** — 산출물만 (DEC §3)                                                                                     |
+| test stage                    | **Sub-task status 갱신만** (RED evidence comment / status=Testing 전이) — 신규 생성 ❌                                     |
+| implement stage               | **Sub-task status 갱신만** (GREEN evidence + commit_hash comment / status=Done / Story=Done) — 신규 생성 ❌                |
 
-★ ★ ★ **R16/R17 부활 ❌** — 본 skill = R20-prime 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path). Tier 2.5 = MCP delegation only / Tier 3 (자체 adapter) = v12.0+ carry.
+**R16/R17 부활 ❌** — 본 skill = R20-prime 채널 (DEC-2026-05-15-g1-itsm-permanent-scope-out §31 path). Tier 2.5 = MCP delegation only / Tier 3 (자체 adapter) = v12.0+ carry.
 
 ## 언제 사용
 
-| 호출 시점 | stage 파라미터 | phase | 동작 |
-|---|---|---|---|
-| **chain 3 (plan) gate 통과 직후** (`plan-coverage-validator` green) | `plan` | `exit` | **4-level cascade 일괄 생성** — Epic(FE 화면 또는 BE-domain) + Story(BHV/AC 묶음) + Task(OP-*) + Sub-task(TASK-*) |
-| chain 4 (test, RED) gate 통과 후 | `plan` | `update-test-red` | Sub-task(TASK-*) status=Testing 전이 + RED evidence comment (신규 생성 ❌) |
-| chain 5 (impl, GREEN) gate 통과 후 | `plan` | `update-impl-green` | Sub-task(TASK-*) status=Done + GREEN evidence + commit_hash + Story=Done 전이 (신규 생성 ❌) |
-| (선택) plan stage 진입 시 | `plan` | `enter` | "[Chain 3] {scope} plan 작성 시작" 의무 작업 Task 1건 (Story 부재 시 생성 skip / scope Epic 하위) |
+| 호출 시점                                                           | stage 파라미터 | phase               | 동작                                                                                                              |
+| ------------------------------------------------------------------- | -------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **chain 3 (plan) gate 통과 직후** (`plan-coverage-validator` green) | `plan`         | `exit`              | **4-level cascade 일괄 생성** — Epic(FE 화면 또는 BE-domain) + Story(BHV/AC 묶음) + Task(OP-_) + Sub-task(TASK-_) |
+| chain 4 (test, RED) gate 통과 후                                    | `plan`         | `update-test-red`   | Sub-task(TASK-\*) status=Testing 전이 + RED evidence comment (신규 생성 ❌)                                       |
+| chain 5 (impl, GREEN) gate 통과 후                                  | `plan`         | `update-impl-green` | Sub-task(TASK-\*) status=Done + GREEN evidence + commit_hash + Story=Done 전이 (신규 생성 ❌)                     |
+| (선택) plan stage 진입 시                                           | `plan`         | `enter`             | "[Chain 3] {scope} plan 작성 시작" 의무 작업 Task 1건 (Story 부재 시 생성 skip / scope Epic 하위)                 |
 
-★ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합).
+analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합).
 
-★ ★ ★ **MCP 미연결 환경 무영향** — `ListMcpResourcesTool` probe 결과 mcp__wiki-jira-assistant__ 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt ❌).
+**MCP 미연결 환경 무영향** — `ListMcpResourcesTool` probe 결과 mcp**wiki-jira-assistant** 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt ❌).
 
 ## 파라미터
 
-| 파라미터 | 타입 | 기본 | 비고 |
-|---|---|---|---|
-| `stage` | const | **`plan`** | ★ v11.0.0 — `plan` 단일 const (analysis/discovery/spec/test/implement enum 본격 폐기) |
-| `phase` | enum | **`exit`** | `enter` (plan stage 진입 작업 Task) \| `exit` (4-level cascade 일괄 / 본 skill 본 흐름) \| `update-test-red` (chain 4 RED) \| `update-impl-green` (chain 5 GREEN) |
-| `scope` | string | state.scope | G3 scope slug (예: `car` / `payroll`) — `.aimd/<scope>/` 경로 추출 |
-| `dry_run` | boolean | **`true`** | ★ default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출. |
-| `confluence_emit` | boolean | `false` | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false) |
-| `parent_epic` | string | (없음) | ★ 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`. |
-| `mode` | enum | **`standard`** | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무 / DEC-2026-05-20-r20-verification-mode 정합). |
-| `issuetype_map` | object | env default | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
-| `parent_strategy` | enum | **`auto`** | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`. DEC-2026-05-20-r20-environment-bridge §parent-bridge 정합. |
-| `epic_link_customfield_id` | string | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`. |
-| `structure_id` | string | env-config 또는 (없음) | Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). DWPD 환경 reference: `676`. |
-| `structure_auto_add_on_exit` | boolean | `true` (단 `structure_id` set 일 때) | true 시 phase=exit 마다 자동 호출 표준 (drift attractor 회피). |
+| 파라미터                     | 타입    | 기본                                      | 비고                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------- | ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `stage`                      | const   | **`plan`**                                | v11.0.0 — `plan` 단일 const (analysis/discovery/spec/test/implement enum 본격 폐기)                                                                                                                                                                                                                                                  |
+| `phase`                      | enum    | **`exit`**                                | `enter` (plan stage 진입 작업 Task) \| `exit` (4-level cascade 일괄 / 본 skill 본 흐름) \| `update-test-red` (chain 4 RED) \| `update-impl-green` (chain 5 GREEN)                                                                                                                                                                    |
+| `scope`                      | string  | state.scope                               | G3 scope slug (예: `car` / `payroll`) — `.aimd/<scope>/` 경로 추출                                                                                                                                                                                                                                                                   |
+| `dry_run`                    | boolean | **`true`**                                | default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출.                                                                                                                                                                                                                                  |
+| `confluence_emit`            | boolean | `false`                                   | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false)                                                                                                                                                                                                                                                    |
+| `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
+| `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무 / DEC-2026-05-20-r20-verification-mode 정합).                                                                                                                                     |
+| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
+| `parent_strategy`            | enum    | **`auto`**                                | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`. DEC-2026-05-20-r20-environment-bridge §parent-bridge 정합.                                                                                       |
+| `epic_link_customfield_id`   | string  | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`.                                                                                                                                                                                                             |
+| `structure_id`               | string  | env-config 또는 (없음)                    | Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). DWPD 환경 reference: `676`.                                                                                                                                                         |
+| `structure_auto_add_on_exit` | boolean | `true` (단 `structure_id` set 일 때)      | true 시 phase=exit 마다 자동 호출 표준 (drift attractor 회피).                                                                                                                                                                                                                                                                       |
 
 ## 절차
 
 ### 단계 1 — Pre-flight
 
-1. **MCP 가용성 확인** (★ tools-probe 본격 / F-VERIFY-005 → B8 해결)
+1. **MCP 가용성 확인** (tools-probe 본격 / F-VERIFY-005 → B8 해결)
    - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인 (tool-name presence probe / mis-fe-admin iter-6 verification cycle 입증).
    - 2차 (fallback) — `mcp__wiki-jira-assistant__jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
    - 3차 (skip 결단) — `ListMcpResourcesTool` 은 **resource-only probe** 라 tools 가용성 추론에 부적합 (F-VERIFY-005). resource probe 결과 단독으로 silent skip 분기 ❌.
    - 모두 불가 시 → `_base-log-finding` skill 호출 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip.
 
-2. **stage paradigm 강제력 점검** (★ v11.0.0 R20-prime 본격 / F-TICKETSYNC-012)
+2. **stage paradigm 강제력 점검** (v11.0.0 R20-prime 본격 / F-TICKETSYNC-012)
    - args.stage ∈ {`analysis`, `discovery`, `spec`, `test`, `implement`} 시 → `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합 / plan 단일 const).
    - args.stage = `plan` 만 유효.
 
-3. **state.json read** (★ F-VERIFY-006 + F-VERIFY-008 → B9 + B11 해결)
+3. **state.json read** (F-VERIFY-006 + F-VERIFY-008 → B9 + B11 해결)
    - 정식 path = `<project>/.aimd/state.json` (단일 file / scope 는 `state.current_scope` 필드).
    - 매칭 의무 — `state.current_scope === <scope>` 일치 확인. 불일치 시 `F-TICKETSYNC-006 scope_mismatch` finding + reject.
    - **gate-pass 확인 분기**:
@@ -77,11 +77,11 @@ allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, m
 
 4. `traceability-matrix.json` read — plan stage 의 ticket_ref 기 등록 lookup. 부재 시 = first-entry path → 신규 생성 path 로 분기.
 
-5. **본 stage 산출물 read** (★ v11.0.0 plan stage 단일 — F-VERIFY-007 → B10 해결)
+5. **본 stage 산출물 read** (v11.0.0 plan stage 단일 — F-VERIFY-007 → B10 해결)
    - `task-plan.json` (의무) — 본 skill 본 입력. Epic/Story/Task/Sub-task 4-level cascade payload 본격 source.
-   - `behavior-spec.json` (의무) — Story body source (BHV-* 묶음 / cross-cut anchor).
-   - `acceptance-criteria.json` (의무) — Sub-task body source (AC-* 묶음 / Sub-task 의 1~3 AC).
-   - `operational-task.json` (선택) — Task (OP-* / Story sibling) source. 부재 시 Task 0건.
+   - `behavior-spec.json` (의무) — Story body source (BHV-\* 묶음 / cross-cut anchor).
+   - `acceptance-criteria.json` (의무) — Sub-task body source (AC-\* 묶음 / Sub-task 의 1~3 AC).
+   - `operational-task.json` (선택) — Task (OP-\* / Story sibling) source. 부재 시 Task 0건.
    - `discovery-spec.json` (선택) — Epic 의 의도 source (FE 화면 의도 / BE-domain 의도).
 
 ### 단계 2 — Idempotency check (search-first)
@@ -104,59 +104,66 @@ JQL (OP-* Task):            project = <PROJECT_KEY> AND "OP ID" ~ "OP-CAR-001"
 plan stage exit 의 4-level cascade preview. 예 (scope=car):
 
 ```markdown
-## ★ Preview — ticket-sync stage=plan phase=exit scope=car
+## Preview — ticket-sync stage=plan phase=exit scope=car
 
 ### 4-level cascade (신규 생성 예정 / idempotency check 후)
 
 #### Level 1: Epic (FE 화면 또는 BE-domain 단위)
-| Epic ID | Type | summary |
-|---|---|---|
-| EPIC-CAR-DASH | FE screen | 차량 대시보드 화면 |
+
+| Epic ID       | Type      | summary                    |
+| ------------- | --------- | -------------------------- |
+| EPIC-CAR-DASH | FE screen | 차량 대시보드 화면         |
 | EPIC-CAR-BILL | FE screen | 비용 회계연도 prorate 화면 |
-| EPIC-CAR-BACK | BE-domain | 차량 backend 도메인 |
+| EPIC-CAR-BACK | BE-domain | 차량 backend 도메인        |
 
 #### Level 2: Story (BHV/AC cross-cut anchor / per BHV cluster)
-| Story summary | 부모 Epic | BHV/AC 묶음 |
-|---|---|---|
-| 차량 등록 사용자 시나리오 | EPIC-CAR-DASH | BHV-CAR-001 + AC-CAR-{001~005} |
-| 차량 등록 backend API | EPIC-CAR-BACK | BHV-CAR-002 + AC-CAR-{006~010} |
-| 비용 prorate 시나리오 | EPIC-CAR-BILL | BHV-CAR-003 + AC-CAR-{011~018} |
 
-#### Level 3: Task (OP-* / Story sibling — BE only 운영·인프라·마이그레이션)
-| OP ID | Type | summary | 부모 Epic |
-|---|---|---|---|
-| OP-CAR-001 | infra | DB 인덱스 추가 | EPIC-CAR-BACK |
+| Story summary             | 부모 Epic     | BHV/AC 묶음                    |
+| ------------------------- | ------------- | ------------------------------ |
+| 차량 등록 사용자 시나리오 | EPIC-CAR-DASH | BHV-CAR-001 + AC-CAR-{001~005} |
+| 차량 등록 backend API     | EPIC-CAR-BACK | BHV-CAR-002 + AC-CAR-{006~010} |
+| 비용 prorate 시나리오     | EPIC-CAR-BILL | BHV-CAR-003 + AC-CAR-{011~018} |
+
+#### Level 3: Task (OP-\* / Story sibling — BE only 운영·인프라·마이그레이션)
+
+| OP ID      | Type      | summary          | 부모 Epic     |
+| ---------- | --------- | ---------------- | ------------- |
+| OP-CAR-001 | infra     | DB 인덱스 추가   | EPIC-CAR-BACK |
 | OP-CAR-002 | migration | 기존 데이터 백필 | EPIC-CAR-BACK |
 
-#### Level 4: Sub-task (TASK-* / 1~3 AC 묶음 / layer 분기)
-| TASK ID | layer | 부모 Story | AC 묶음 |
-|---|---|---|---|
-| TASK-CAR-001 | be | 차량 등록 backend API | AC-CAR-006, AC-CAR-007 |
-| TASK-CAR-002 | fe | 차량 등록 사용자 시나리오 | AC-CAR-001, AC-CAR-002 |
-| TASK-CAR-003 | e2e | 차량 등록 사용자 시나리오 | AC-CAR-003 |
-| ... (총 N TASK) | | | |
+#### Level 4: Sub-task (TASK-\* / 1~3 AC 묶음 / layer 분기)
+
+| TASK ID         | layer | 부모 Story                | AC 묶음                |
+| --------------- | ----- | ------------------------- | ---------------------- |
+| TASK-CAR-001    | be    | 차량 등록 backend API     | AC-CAR-006, AC-CAR-007 |
+| TASK-CAR-002    | fe    | 차량 등록 사용자 시나리오 | AC-CAR-001, AC-CAR-002 |
+| TASK-CAR-003    | e2e   | 차량 등록 사용자 시나리오 | AC-CAR-003             |
+| ... (총 N TASK) |       |                           |                        |
 
 ### Skip 예정 (기존 ticket 발견 / status_history 만 갱신)
+
 | ticket | 기존 | 사유 |
-|---|---|---|
-| (없음) | | |
+| ------ | ---- | ---- |
+| (없음) |      |      |
 
 ### MCP 호출 sequence
-1. mcp__wiki-jira-assistant__jira_create (Initiative MIG-1) [redacted body]
-2. mcp__wiki-jira-assistant__jira_create (Epic EPIC-CAR-DASH, parent=MIG-1)
-3. mcp__wiki-jira-assistant__jira_create (Story #1, parent=EPIC-CAR-DASH)
-4. mcp__wiki-jira-assistant__jira_create (Sub-task TASK-CAR-001, parent=Story #1)
-... (총 N 호출)
+
+1. mcp**wiki-jira-assistant**jira_create (Initiative MIG-1) [redacted body]
+2. mcp**wiki-jira-assistant**jira_create (Epic EPIC-CAR-DASH, parent=MIG-1)
+3. mcp**wiki-jira-assistant**jira_create (Story #1, parent=EPIC-CAR-DASH)
+4. mcp**wiki-jira-assistant**jira_create (Sub-task TASK-CAR-001, parent=Story #1)
+   ... (총 N 호출)
 
 ### 추정 비용
+
 - MCP 호출 수: ~38 (3 Epic + 3 Story + 2 OP + 8 TASK + Sub-task transitions)
 - 추정 시간: ~4 분
 ```
 
-### 단계 4 — ★ Confirmation gate
+### 단계 4 — Confirmation gate
 
 ```
-★ Confirm ticket-sync stage=plan phase=exit scope=car?
+Confirm ticket-sync stage=plan phase=exit scope=car?
    [yes] = real MCP 호출 batch (dry_run=false)
    [no]  = cancel + state 무변경
    [dry-run] = reproduction_command 만 print / MCP 호출 ❌
@@ -176,33 +183,32 @@ plan stage exit 의 4-level cascade preview. 예 (scope=car):
 1. **issuetype resolve**:
    - args.`issuetype_map[role]` 우선 → 없으면 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) → 없으면 default table 적용:
 
-   | role | default name | DWPD 환경 reference |
-   |------|--------------|---------------------|
-   | epic | Epic | epic |
-   | initiative | Initiative | epic |
-   | story | Story | 작업 (또는 새 기능) |
-   | subtask | Sub-task | 하위 작업 |
-   | tech_debt | Tech Debt Story | 개선 |
-   | task | Task | 작업 |
-   | bug | Bug | 버그 |
-
+   | role       | default name    | DWPD 환경 reference |
+   | ---------- | --------------- | ------------------- |
+   | epic       | Epic            | epic                |
+   | initiative | Initiative      | epic                |
+   | story      | Story           | 작업 (또는 새 기능) |
+   | subtask    | Sub-task        | 하위 작업           |
+   | tech_debt  | Tech Debt Story | 개선                |
+   | task       | Task            | 작업                |
+   | bug        | Bug             | 버그                |
    - resolve 결과 `string` 시 jira_create `issue_type` 또는 `extra_fields.issuetype.name`
    - resolve 결과 `{id: "..."}` 시 `extra_fields.issuetype.id` (명명 모호 환경 권고)
    - resolve 실패 (role 미정의) 시 `F-TICKETSYNC-007 issuetype_unresolved` finding + reject
 
 2. **parent linking resolve** (`parent_strategy` 별):
    - `parent_strategy=auto` (default):
-     - role=`subtask` → `parent_key` 필드 **만** 사용 (★ B14 invariant — `extra_fields[epic_link_customfield_id]` 명시 ❌. Sub-task 의 Epic Link 은 parent Story 로부터 auto-inherit)
+     - role=`subtask` → `parent_key` 필드 **만** 사용 (B14 invariant — `extra_fields[epic_link_customfield_id]` 명시 ❌. Sub-task 의 Epic Link 은 parent Story 로부터 auto-inherit)
      - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback.
      - role ∈ {`epic`, `initiative`} → parent 없음 (top-level) 또는 Initiative 하위 Epic 의 경우 `parent_key=<initiative_key>`.
    - `parent_strategy=parent_key`: 모든 role 이 `parent_key` 시도 (DWPD 환경에서는 일반 issue 가 400 reject — `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding).
-   - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` 만 / 그 외 = `extra_fields[epic_link_customfield_id]`. ★ B14 — Sub-task 에 `extra_fields[epic_link_customfield_id]` 추가 시도 시 backend 400 reject. `epic_link_customfield_id` 미명시 + 일반 issue 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
+   - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` 만 / 그 외 = `extra_fields[epic_link_customfield_id]`. B14 — Sub-task 에 `extra_fields[epic_link_customfield_id]` 추가 시도 시 backend 400 reject. `epic_link_customfield_id` 미명시 + 일반 issue 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
 
 3. **호출 sequence 의무**:
-   - jira_create payload 의 `issue_type` + parent linking 필드는 위 resolve 결과 직접 인용 (★ no-simulation / SKILL.md 본문 hardcode 표기 인용 ❌).
+   - jira_create payload 의 `issue_type` + parent linking 필드는 위 resolve 결과 직접 인용 (no-simulation / SKILL.md 본문 hardcode 표기 인용 ❌).
    - jira_create 실패 (400/403) 시 — error message parse 후 `F-TICKETSYNC-008 environment_drift` finding emit + 환경별 resolve table 보강 권고 evidence 누적.
 
-★ 본 prelude 는 §단계 6 standard mode + §단계 6b verification mode 모두 적용.
+본 prelude 는 §단계 6 standard mode + §단계 6b verification mode 모두 적용.
 
 **DWPD 환경 reference config** (DEC-2026-05-20-r20-environment-bridge / mis-fe-admin iter-6 verification 입증):
 
@@ -210,7 +216,7 @@ plan stage exit 의 4-level cascade preview. 예 (scope=car):
 # .aimd/ticket-sync-config.yaml (DWPD 환경)
 issuetype_map:
   epic: epic
-  story: 작업          # 또는 새 기능
+  story: 작업 # 또는 새 기능
   subtask: 하위 작업
   initiative: epic
   tech_debt: 개선
@@ -218,16 +224,16 @@ issuetype_map:
   bug: 버그
 parent_strategy: epic_link_customfield
 epic_link_customfield_id: customfield_10006
-# ★ B14 — Sub-task 는 epic_link_customfield_id 명시 ❌
+# B14 — Sub-task 는 epic_link_customfield_id 명시 ❌
 # (parent Story/Task 로부터 auto-inherit / 명시 시 400 reject)
-# ★ B15 — Structure 보드 자동 등록 (옵션)
-structure_id: 676                # ALM Works DWP-Forge id (DWPD 환경)
+# B15 — Structure 보드 자동 등록 (옵션)
+structure_id: 676 # ALM Works DWP-Forge id (DWPD 환경)
 structure_auto_add_on_exit: true
 ```
 
 ### 단계 6 — MCP 호출 (sequential / 결정론 보호 / mode=standard)
 
-★ v11.0.0 R20-prime 본격 — **plan stage phase=exit 4-level cascade 일괄**.
+v11.0.0 R20-prime 본격 — **plan stage phase=exit 4-level cascade 일괄**.
 
 #### phase=enter (선택 / plan stage 진입 작업 Task)
 
@@ -240,9 +246,9 @@ plan enter:
   → enter_task_id 저장 (traceability-matrix.ticket_ref.enter_task_ids.plan)
 ```
 
-★ enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
+enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
 
-#### phase=exit — 4-level cascade 일괄 생성 (★ v11.0.0 R20-prime 본격)
+#### phase=exit — 4-level cascade 일괄 생성 (v11.0.0 R20-prime 본격)
 
 ```
 Step 1 — Initiative (선택 / parent_epic 미명시 시):
@@ -287,7 +293,7 @@ Step 5 — Sub-task (per TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infr
                  parent_ticket_id=parent_ref, link_type=parent-child,
                  labels=[layer-* + task.layer], status=To Do,
                  body=task.ac_refs + task.layer + task.openapi_endpoint_ref|component_ref)
-    ★ B14 — Sub-task payload 안 extra_fields[epic_link_customfield_id] 명시 ❌
+    B14 — Sub-task payload 안 extra_fields[epic_link_customfield_id] 명시 ❌
     → subtask_id[task.task_id] 저장
 
 Step 6 — traceability-matrix.ticket_ref 갱신:
@@ -296,7 +302,7 @@ Step 6 — traceability-matrix.ticket_ref 갱신:
     cascade_complete=true, cascade_timestamp=<ISO8601>
   }
 
-Step 7 — ★ B15 Structure 보드 자동 등록 (옵션):
+Step 7 — B15 Structure 보드 자동 등록 (옵션):
   if (structure_id set + structure_auto_add_on_exit=true):
     jira_structure_add_issues (structure_id=$structure_id,
                                 issue_keys=[Initiative? + Epics + Stories + OP-* + TASK-*])
@@ -332,19 +338,19 @@ for each Story:
 # Epic 의 Done 전이 = 사용자 manual (FE 화면 단위 = 본 cycle 외 화면 추가 가능)
 ```
 
-★ 각 호출 = Bash 로 stdout/stderr 캡쳐 → 7-field evidence record (`mcp_invocations[]` append).
+각 호출 = Bash 로 stdout/stderr 캡쳐 → 7-field evidence record (`mcp_invocations[]` append).
 
-### 단계 6b — MCP 호출 (★ mode=verification 분기 / plugin dogfood meta-cycle 전용)
+### 단계 6b — MCP 호출 (mode=verification 분기 / plugin dogfood meta-cycle 전용)
 
 verification mode 는 plugin 본 작동 검증 / plugin 자체 dogfood meta-cycle 전용. `parent_epic` 의무 — 미명시 시 reject + Block error.
 
-★ standard mode 와의 본질 차이:
+standard mode 와의 본질 차이:
 | 축 | standard | verification |
 |---|---|---|
 | Initiative 생성 | parent_epic 미명시 시 자동 (1건) | ❌ skip (parent_epic 재사용 의무) |
 | Epic 생성 | task-plan.epics[] 기반 N건 | ❌ skip (parent_epic 직접 매핑) |
 | Story 단위 | per BHV cluster (task-plan.stories[] N건) | per chain stage (analysis/discovery/spec/plan/test/implement 5+1=6건) |
-| Sub-task 단위 | TASK-* (task-plan.tasks[]) / OP-* (operational-task.json) | per Story 의 산출물 / UC / AC / TC |
+| Sub-task 단위 | TASK-_ (task-plan.tasks[]) / OP-_ (operational-task.json) | per Story 의 산출물 / UC / AC / TC |
 | 사용 시점 | 실 도메인 feature 개발 cycle | plugin 검증 / migration meta-cycle |
 
 verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement Story 5+1=6건):
@@ -363,19 +369,19 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
                   parent_ticket_id=verification_story_ids[stage],
                   summary="[Verify artifact] {artifact_name}",
                   status=Done)
-     ★ B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
+     B14 — Sub-task payload extra_fields[epic_link_customfield_id] 명시 ❌
    jira_comment (verification_story_ids[stage], "<stage> gate result + 5종 물증 link")
    jira_transition (verification_story_ids[stage] → "Done")
-3. ★ B15 — if (structure_id set + structure_auto_add_on_exit=true):
+3. B15 — if (structure_id set + structure_auto_add_on_exit=true):
    jira_structure_add_issues (structure_id=$structure_id,
                               issue_keys=[6 Story + all Sub-task])
    → cycle 종료 마무리 evidence
 4. jira_comment ($parent_epic,
-                 "★ verification cycle 종결 — 6 Story keys + Q1~Q6 pass/fail summary
+                 "verification cycle 종결 — 6 Story keys + Q1~Q6 pass/fail summary
                   + traceability-matrix 100% green + commit hash + findings 링크")
 ```
 
-★ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + `verification_story_ids` map 추가.
+verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + `verification_story_ids` map 추가.
 
 ### 단계 7 — Evidence 기록
 
@@ -433,12 +439,24 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
 ### 단계 9 — intervention-log append
 
 ```jsonl
-{"timestamp":"2026-05-26T14:30:00Z","skill":"ticket-sync","stage":"plan","phase":"exit","scope":"car","decision":"ticket_sync_confirmed","mcp_invocation_count":38,"idempotency_skip_count":0,"cascade_complete":true,"evidence_ref":".aimd/output/evidence/ticket-sync-plan-exit-20260526T143000.json","user":"reviewer@example.com"}
+{
+	"timestamp": "2026-05-26T14:30:00Z",
+	"skill": "ticket-sync",
+	"stage": "plan",
+	"phase": "exit",
+	"scope": "car",
+	"decision": "ticket_sync_confirmed",
+	"mcp_invocation_count": 38,
+	"idempotency_skip_count": 0,
+	"cascade_complete": true,
+	"evidence_ref": ".aimd/output/evidence/ticket-sync-plan-exit-20260526T143000.json",
+	"user": "reviewer@example.com"
+}
 ```
 
 ## 금지 / 강제력
 
-- **★ ★ ★ stage paradigm 위반 ❌ (R20-prime 본격)** — args.stage ∈ {analysis, discovery, spec, test, implement} 시 reject. `F-TICKETSYNC-012 stage_paradigm_violation` finding emit. ticket 생성 = plan stage 한 곳.
+- **stage paradigm 위반 ❌ (R20-prime 본격)** — args.stage ∈ {analysis, discovery, spec, test, implement} 시 reject. `F-TICKETSYNC-012 stage_paradigm_violation` finding emit. ticket 생성 = plan stage 한 곳.
 - **simulated evidence_trust ❌** — schema-level 영구 거부 (R15 / R19 simulated 영구 reject sibling)
 - **fire-and-forget ❌** — 모든 MCP 호출 직전 confirmation gate 의무
 - **parallel MCP 호출 ❌** — sequential only (결정론 axis 보호)
@@ -449,7 +467,7 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
 - **mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error. 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.
 - **environment hardcode ❌** — SKILL.md 본문의 `Story` / `Sub-task` / `Initiative` / `Epic` 표기는 **role label**. 실 MCP payload 의 `issue_type` 값은 §단계 5 prelude 의 resolve 결과 직접 인용 의무. 위반 시 `F-TICKETSYNC-009 issuetype_hardcode_drift` finding emit + 호출 reject.
 - **parent_strategy 우회 ❌** — `parent_strategy ∈ {epic_link_customfield, auto + epic_link_customfield_id set}` 환경에서 일반 issue (`story` / `task` / `tech_debt` / `bug`) 의 `parent` 필드 직접 채움 ❌. 반드시 `extra_fields[epic_link_customfield_id]` 사용. 위반 시 `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding emit.
-- **★ B14 Sub-task Epic Link customfield 명시 ❌** — role=`subtask` 의 `jira_create` payload 에 `extra_fields[epic_link_customfield_id]` (예: DWPD `customfield_10006`) 명시 ❌. Sub-task 의 Epic Link 은 parent Story / Task 로부터 auto-inherit. 명시 시 backend 400 reject. 위반 시 `F-TICKETSYNC-011 subtask_epic_link_violation` finding emit + 호출 reject.
+- **B14 Sub-task Epic Link customfield 명시 ❌** — role=`subtask` 의 `jira_create` payload 에 `extra_fields[epic_link_customfield_id]` (예: DWPD `customfield_10006`) 명시 ❌. Sub-task 의 Epic Link 은 parent Story / Task 로부터 auto-inherit. 명시 시 backend 400 reject. 위반 시 `F-TICKETSYNC-011 subtask_epic_link_violation` finding emit + 호출 reject.
 
 ## 사용자 결단 9건
 
@@ -465,8 +483,8 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
 
 ## Cross-link
 
-- ★ ★ ★ R20-prime 결단: `decisions/DEC-2026-05-26-ticket-plan-단일.md` (v11.0.0 본격)
-- ★ ★ ★ v11.0.0 paradigm SSOT: `decisions/DEC-2026-05-26-v11-paradigm-결단.md` §3 (ticket = plan 한 곳)
+- R20-prime 결단: `decisions/DEC-2026-05-26-ticket-plan-단일.md` (v11.0.0 본격)
+- v11.0.0 paradigm SSOT: `decisions/DEC-2026-05-26-v11-paradigm-결단.md` §3 (ticket = plan 한 곳)
 - 결단 record (v8.6.x carry — legacy): `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
 - v8.7.2 amendment: `decisions/DEC-2026-05-20-r20-verification-mode.md` (verification mode + parent_epic override)
 - v8.7.3 amendment: `decisions/DEC-2026-05-20-r20-environment-bridge.md` (issuetype_map + parent_strategy + epic_link_customfield_id)
@@ -475,7 +493,7 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
 - ID 명명: `methodology-spec/id-conventions.md` §Ticket Binding
 - Evidence schema: `schemas/ticket-sync-evidence.schema.json` (stage const=plan)
 - task-plan schema: `schemas/task-plan.schema.json` (epics + stories + tasks + layer 분기)
-- operational-task schema: `schemas/operational-task.schema.json` (OP-* Story sibling)
+- operational-task schema: `schemas/operational-task.schema.json` (OP-\* Story sibling)
 - Traceability matrix: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref.status_history
 - Hook config: `hooks/hooks.json` PreToolUse matcher (state.blocked deny path)
 - R20-prime charter entry: `methodology-spec/plugin-charter.md` §1+§2 (v11.0.0 본격)

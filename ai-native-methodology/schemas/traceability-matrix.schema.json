@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/traceability-matrix.schema.json",
   "title": "Traceability Matrix (cross-cutting)",
-  "description": "v2.0 SDLC 4단계 chain harness 의 cross-cutting 산출물. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link 매트릭스. ★ DO-178C bidirectional traceability + IEC 62304 차용 (Official research 권고). 매 chain stage gate 종결 시 갱신 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
+  "description": "v2.0 SDLC 4단계 chain harness 의 cross-cutting 산출물. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link 매트릭스. DO-178C bidirectional traceability + IEC 62304 차용 (Official research 권고). 매 chain stage gate 종결 시 갱신 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
   "type": "object",
   "required": ["meta", "matrix", "coverage_summary"],
   "additionalProperties": false,
@@ -38,7 +38,7 @@
           "task_id": {
             "type": "string",
             "pattern": "^TASK-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "★ v9.2.0 (DEC-2026-05-25-axis-a-phase-4-3) — chain 3 (plan) TASK layer cell-level link / Cluster 3 결단 AC → TASK → TC paradigm 본격 정합 / ★ ★ DO-178C 6 layer 격상 (System Req → HLR → LLR → Source → Test 5 tier + TASK layer 추가). ★ Senior risk #4 흡수 — additive only / 기존 PoC ratchet 분모 미영향 (task_id 부재 cell = task-plan 부재 PoC 정상)"
+            "description": "v9.2.0 (DEC-2026-05-25-axis-a-phase-4-3) — chain 3 (plan) TASK layer cell-level link / Cluster 3 결단 AC → TASK → TC paradigm 본격 정합 / DO-178C 6 layer 격상 (System Req → HLR → LLR → Source → Test 5 tier + TASK layer 추가). Senior risk #4 흡수 — additive only / 기존 PoC ratchet 분모 미영향 (task_id 부재 cell = task-plan 부재 PoC 정상)"
           },
           "impl_id": {
             "type": "string",
@@ -47,7 +47,7 @@
           "impl_commit_hash": {
             "type": "string",
             "pattern": "^[a-f0-9]{40}$",
-            "description": "★ git commit hash 결정적 trace"
+            "description": "git commit hash 결정적 trace"
           },
           "status": {
             "type": "string",
@@ -57,7 +57,7 @@
           "severity": {
             "type": "string",
             "enum": ["critical", "high", "medium", "low"],
-            "description": "★ F-SIM-002 (2026-05-18): source-grounded max-propagation — max(BR.severity, AP.severity ∈ AC.related_aps, AC.MoSCoW→severity). SSOT: methodology-spec/severity-cross-stage-mapping.md §2. 권위: ISO 26262 Part 9 ASIL inheritance + IEC 62304 Class A/B/C propagation (F-015 Claim B). 단일 MoSCoW 축 회귀 ❌."
+            "description": "F-SIM-002 (2026-05-18): source-grounded max-propagation — max(BR.severity, AP.severity ∈ AC.related_aps, AC.MoSCoW→severity). SSOT: methodology-spec/severity-cross-stage-mapping.md §2. 권위: ISO 26262 Part 9 ASIL inheritance + IEC 62304 Class A/B/C propagation (F-015 Claim B). 단일 MoSCoW 축 회귀 ❌."
           },
           "business_rule_ids": {
             "type": "array",
@@ -66,7 +66,7 @@
               "pattern": "^BR-[A-Z0-9_-]+-[0-9]{3}$"
             },
             "uniqueItems": true,
-            "description": "★ F-SIM-004 (2026-05-18): BR 1급 축 — BHV.br_refs ∪ AC.related_brs. DO-178C requirements axis 1급 의무 (F-015 Claim A ★★★)."
+            "description": "F-SIM-004 (2026-05-18): BR 1급 축 — BHV.br_refs ∪ AC.related_brs. DO-178C requirements axis 1급 의무 (F-015 Claim A)."
           },
           "antipattern_ids": {
             "type": "array",
@@ -75,7 +75,7 @@
               "pattern": "^AP-[A-Z0-9_-]+-[0-9]{3}$"
             },
             "uniqueItems": true,
-            "description": "★ F-SIM-002 (2026-05-18): AC.related_aps — severity max-propagation source 추적용."
+            "description": "F-SIM-002 (2026-05-18): AC.related_aps — severity max-propagation source 추적용."
           },
           "gaps": {
             "type": "array",
@@ -84,7 +84,7 @@
           },
           "ticket_ref": {
             "type": "object",
-            "description": "★ v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md. ★ v8.6.3+ hierarchy 강제 — Story id 채움 시 epic_id + initiative_id 의무 (ticket-policy.md §Tier 2.5 hierarchy subsection / 위반 시 F-TICKETSYNC-002 missing_parent finding emit).",
+            "description": "v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md. v8.6.3+ hierarchy 강제 — Story id 채움 시 epic_id + initiative_id 의무 (ticket-policy.md §Tier 2.5 hierarchy subsection / 위반 시 F-TICKETSYNC-002 missing_parent finding emit).",
             "required": ["platform", "id"],
             "additionalProperties": false,
             "properties": {
@@ -106,21 +106,21 @@
               "epic_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "상위 Epic ticket id (도메인 단위). ★ v8.6.3+ — Story 단위 row 시 의무 (ticket-policy.md §Tier 2.5 hierarchy / 미채움 시 F-TICKETSYNC-002)."
+                "description": "상위 Epic ticket id (도메인 단위). v8.6.3+ — Story 단위 row 시 의무 (ticket-policy.md §Tier 2.5 hierarchy / 미채움 시 F-TICKETSYNC-002)."
               },
               "initiative_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps). ★ v8.6.3+ — Story 단위 row 시 의무 (epic_id 의 parent / ticket-policy.md §Tier 2.5 hierarchy)."
+                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps). v8.6.3+ — Story 단위 row 시 의무 (epic_id 의 parent / ticket-policy.md §Tier 2.5 hierarchy)."
               },
               "structure_complete": {
                 "type": "boolean",
-                "description": "★ v8.6.3+ — hierarchy chain 완비 여부 (Initiative → Epic → Story → Sub-task 모든 부모 ID 채움 + jira_structure_add_issues tree 등록 완료). skill / 사용자 확인 후 set. false 또는 미설정 시 F-TICKETSYNC-002 missing_parent 위험 시그널."
+                "description": "v8.6.3+ — hierarchy chain 완비 여부 (Initiative → Epic → Story → Sub-task 모든 부모 ID 채움 + jira_structure_add_issues tree 등록 완료). skill / 사용자 확인 후 set. false 또는 미설정 시 F-TICKETSYNC-002 missing_parent 위험 시그널."
               },
               "structure_tree_url": {
                 "type": "string",
                 "format": "uri",
-                "description": "★ v8.6.3+ — Atlassian Structure (또는 동등 tree view) URL — Jira dashboard 가시화 link. jira_structure_add_issues 호출 후 채움 (선택)."
+                "description": "v8.6.3+ — Atlassian Structure (또는 동등 tree view) URL — Jira dashboard 가시화 link. jira_structure_add_issues 호출 후 채움 (선택)."
               },
               "subtask_ids": {
                 "type": "object",
@@ -135,19 +135,19 @@
               },
               "enter_task_ids": {
                 "type": "object",
-                "description": "★ v8.6.2+ R20 phase=enter — stage 진입 시점 의무 작업 Task ticket id 매핑 (선택). analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 (본 ticket_ref 가 속한 UC 의 enter Task). chain 종료 시 phase=exit 가 enter Task 자동 종결.",
+                "description": "v8.6.2+ R20 phase=enter — stage 진입 시점 의무 작업 Task ticket id 매핑 (선택). analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 (본 ticket_ref 가 속한 UC 의 enter Task). chain 종료 시 phase=exit 가 enter Task 자동 종결.",
                 "additionalProperties": false,
                 "properties": {
                   "analysis": {"type": "string", "description": "analysis 진입 시 Task id (도메인 단위 / per UC 동일)"},
                   "planning": {"type": "string", "description": "planning 진입 시 Task id (도메인 단위 / per UC 동일)"},
-                  "spec": {"type": "string", "description": "spec 진입 시 Task id (★ per UC)"},
-                  "test": {"type": "string", "description": "test 진입 시 Task id (★ per UC)"},
-                  "implement": {"type": "string", "description": "implement 진입 시 Task id (★ per UC)"}
+                  "spec": {"type": "string", "description": "spec 진입 시 Task id (per UC)"},
+                  "test": {"type": "string", "description": "test 진입 시 Task id (per UC)"},
+                  "implement": {"type": "string", "description": "implement 진입 시 Task id (per UC)"}
                 }
               },
               "status_history": {
                 "type": "array",
-                "description": "★ v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — ticket 상태 전이 timeline. MCP 호출 시 append (monotonic by transitioned_at). 사용자 Jira workflow 의 from→to status 기록 + 호출한 MCP tool + evidence cross-link.",
+                "description": "v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — ticket 상태 전이 timeline. MCP 호출 시 append (monotonic by transitioned_at). 사용자 Jira workflow 의 from→to status 기록 + 호출한 MCP tool + evidence cross-link.",
                 "items": {
                   "type": "object",
                   "required": ["transitioned_at", "to_status"],
@@ -204,11 +204,11 @@
           "type": "number",
           "minimum": 0.85,
           "maximum": 0.95,
-          "description": "★ ADR-010 v2 ratchet 0.85 → 0.90 → 0.95"
+          "description": "ADR-010 v2 ratchet 0.85 → 0.90 → 0.95"
         },
         "severity_floor": {
           "type": "object",
-          "description": "★ DO-178C DAL A 차용 — critical=1.0 강제",
+          "description": "DO-178C DAL A 차용 — critical=1.0 강제",
           "additionalProperties": false,
           "properties": {
             "critical": {"type": "number", "const": 1.0},
@@ -223,11 +223,11 @@
         "severity_distinct_count": {
           "type": "integer",
           "minimum": 0,
-          "description": "★ F-SIM-002 (2026-05-18) audit signal — matrix cell severity 분포 수. == 1 시 MoSCoW 단축 회귀 의심 (audit signal / F-SIM-012 v8.14.4: 하드 release-gate sentinel 은 scope-out — distinct==1 은 작은 all-must PoC 정상값이라 §8.1 false-positive)."
+          "description": "F-SIM-002 (2026-05-18) audit signal — matrix cell severity 분포 수. == 1 시 MoSCoW 단축 회귀 의심 (audit signal / F-SIM-012 v8.14.4: 하드 release-gate sentinel 은 scope-out — distinct==1 은 작은 all-must PoC 정상값이라 §8.1 false-positive)."
         },
         "severity_propagation_active": {
           "type": "boolean",
-          "description": "★ F-SIM-002 (2026-05-18) — businessRules / antipatterns 입력 통과 여부 (false 시 propagation 미적용 → 회귀 위험)."
+          "description": "F-SIM-002 (2026-05-18) — businessRules / antipatterns 입력 통과 여부 (false 시 propagation 미적용 → 회귀 위험)."
         }
       }
     }

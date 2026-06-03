@@ -23,26 +23,26 @@ charter §3 G2 (R8 입력 5종 중 BCDE 미지원) 종결.
 
 ## paradigm 4 결단
 
-| paradigm | 결단 | 근거 |
-|---|---|---|
-| orchestrate 분리도 | **1-A 단일 skill (4 책임 응집)** | Senior critique = pipeline 데이터 의존 / 1인 dogfooding 과적합 회피 / 재사용 신호 ≥ 2 누적 시 1-B 격상 carry |
-| sub-skill 호출 방식 | **Hybrid 2-B 기본 + 2-A escalate** | ≤ 50K token = 직접 skill chain / > 50K = Task tool / ❌ chain-driver dispatch (STRONG-STOP: 결정론 axis 오염) |
-| conflict 검출 산식 | **정량 (Levenshtein + stem set intersection)** | LLM 양심 의존 정성 판정 ❌ / no-simulation 정합 |
-| spectral 검증 시점 | **사용자/orchestrate 명시 호출** | spectral-runner = pure CLI passthrough / auto-invoke 금지 / no-simulation 정합 |
+| paradigm            | 결단                                           | 근거                                                                                                          |
+| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| orchestrate 분리도  | **1-A 단일 skill (4 책임 응집)**               | Senior critique = pipeline 데이터 의존 / 1인 dogfooding 과적합 회피 / 재사용 신호 ≥ 2 누적 시 1-B 격상 carry  |
+| sub-skill 호출 방식 | **Hybrid 2-B 기본 + 2-A escalate**             | ≤ 50K token = 직접 skill chain / > 50K = Task tool / ❌ chain-driver dispatch (STRONG-STOP: 결정론 axis 오염) |
+| conflict 검출 산식  | **정량 (Levenshtein + stem set intersection)** | LLM 양심 의존 정성 판정 ❌ / no-simulation 정합                                                               |
+| spectral 검증 시점  | **사용자/orchestrate 명시 호출**               | spectral-runner = pure CLI passthrough / auto-invoke 금지 / no-simulation 정합                                |
 
 ## 신설 자산 (실측)
 
-- `skills/analysis-input-orchestrate/SKILL.md` (★ 신설 / 휴리스틱 + Hybrid rule + 3-tier severity + 정량 산식)
-- `skills/analysis-from-prompt/SKILL.md` (★ 신설)
-- `skills/analysis-from-swagger/SKILL.md` (★ 신설 / `@readme/openapi-parser` 의존)
-- `skills/analysis-from-plan-doc/SKILL.md` (★ 신설 / md + pdf + Notion export)
-- `skills/analysis-from-figma/SKILL.md` (★ 신설 / Figma desktop selection 사전조건)
-- `schemas/input-summary.schema.json` (★ 신설 / strict / cross_refs + conflicts + score_components)
-- `schemas/prompt-extract.schema.json` (★ 신설)
-- `schemas/swagger-extract.schema.json` (★ 신설)
-- `schemas/plan-doc-extract.schema.json` (★ 신설)
-- `schemas/figma-extract.schema.json` (★ 신설)
-- `tools/schema-validator/test/input-summary.test.js` + 4 sibling test (★ 신설 / 25 case)
+- `skills/analysis-input-orchestrate/SKILL.md` ( 신설 / 휴리스틱 + Hybrid rule + 3-tier severity + 정량 산식)
+- `skills/analysis-from-prompt/SKILL.md` ( 신설)
+- `skills/analysis-from-swagger/SKILL.md` ( 신설 / `@readme/openapi-parser` 의존)
+- `skills/analysis-from-plan-doc/SKILL.md` ( 신설 / md + pdf + Notion export)
+- `skills/analysis-from-figma/SKILL.md` ( 신설 / Figma desktop selection 사전조건)
+- `schemas/input-summary.schema.json` ( 신설 / strict / cross_refs + conflicts + score_components)
+- `schemas/prompt-extract.schema.json` ( 신설)
+- `schemas/swagger-extract.schema.json` ( 신설)
+- `schemas/plan-doc-extract.schema.json` ( 신설)
+- `schemas/figma-extract.schema.json` ( 신설)
+- `tools/schema-validator/test/input-summary.test.js` + 4 sibling test ( 신설 / 25 case)
 
 ## 수정 자산
 
@@ -76,7 +76,7 @@ charter §3 G2 (R8 입력 5종 중 BCDE 미지원) 종결.
 - ADR-008 v2 (이중 렌더링) — `input-summary.md` 동시 생성 의무 (orchestrate merge 단계)
 - ADR-009 (no-simulation) — spectral auto-invoke 금지 + LLM 정성 판정 금지 정합
 
-## Lessons Learned (★ paradigm 진화 자산화)
+## Lessons Learned ( paradigm 진화 자산화)
 
 - **LL-G2-01**: charter ✅ 판정 시 "형식 명시" vs "자산 차원" 구분 의무 — ✅ 부여 전 자산 검증.
 - **LL-G2-02**: mermaid "선택" 점선이 흐름 명세 누락 신호 — 복합 입력 케이스 = orchestrator 의무.

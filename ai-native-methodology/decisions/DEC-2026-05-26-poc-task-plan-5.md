@@ -20,16 +20,17 @@ DEC-2026-05-21 carry `C-v4.1-poc-재실행` (기존 PoC 에 discovery·plan stag
 
 ### §1. 5 PoC task-plan.{json,md} 생성 (Type 1 self-run)
 
-| PoC | tasks | ADRs | risks | NFR | layer/module 특성 |
-|---|---|---|---|---|---|
-| poc-04-mini-realworld-react | 1 | 1 | 2 | 3 | presentation/auth (FE Login + JWT) |
-| poc-05-sample-user-register | 2 | 1 | 4 | 4 | application/user (signup + login / argon2) |
-| poc-03-realworld-nestjs | 2 | 2 | 4 | 4 | application/user (RealWorld 규약 JWT) |
-| poc-14-fsim-corroboration | 4 | 2 | 4 | 4 | application/user+todo (IDOR 차단) |
-| poc-11-efiweb-billing-spring41 | 6 | 2 | 5 | 4 | 사내 EFI-WEB billing / ★ characterization mode |
-| **합계 (5 PoC)** | **15** | **7** | **18** | **19** | — |
+| PoC                            | tasks  | ADRs  | risks  | NFR    | layer/module 특성                            |
+| ------------------------------ | ------ | ----- | ------ | ------ | -------------------------------------------- |
+| poc-04-mini-realworld-react    | 1      | 1     | 2      | 3      | presentation/auth (FE Login + JWT)           |
+| poc-05-sample-user-register    | 2      | 1     | 4      | 4      | application/user (signup + login / argon2)   |
+| poc-03-realworld-nestjs        | 2      | 2     | 4      | 4      | application/user (RealWorld 규약 JWT)        |
+| poc-14-fsim-corroboration      | 4      | 2     | 4      | 4      | application/user+todo (IDOR 차단)            |
+| poc-11-efiweb-billing-spring41 | 6      | 2     | 5      | 4      | 사내 EFI-WEB billing / characterization mode |
+| **합계 (5 PoC)**               | **15** | **7** | **18** | **19** | —                                            |
 
 **각 task 의무 정합** (DEC-2026-05-21 §정책 + schema):
+
 - task granularity = 1~3 AC 묶음 (같은 BHV + 같은 layer + 같은 module / schema maxItems:3 enforce) — 5 PoC 모두 충족
 - ADR alternatives ≥3 강제 + status enum (proposed/accepted/deprecated/superseded) — 7 ADR 모두 충족
 - risks severity enum (critical/high/medium/low) — 18 risks 모두 충족
@@ -44,6 +45,7 @@ DEC-2026-05-21 carry `C-v4.1-poc-재실행` (기존 PoC 에 discovery·plan stag
 ### §3. 잔여 서브-carry (5 PoC / spec stage 부재)
 
 `C-v4.1-poc-재실행` 부분 종결 (5/9). 잔여 서브-carry:
+
 - **poc-06-efiweb-exchange-spring41** — spec stage 미실행
 - **poc-07-efiweb-capital-spring41** — spec stage 미실행
 - **poc-08-realworld-mybatis** — spec stage 미실행
@@ -69,5 +71,5 @@ DEC-2026-05-21 carry `C-v4.1-poc-재실행` (기존 PoC 에 discovery·plan stag
 - DEC-2026-05-25-axis-a-phase-4-1 + DEC-2026-05-25-axis-a-phase-4-4-prime (plan-agent v10.0.0 본격 / 본 DEC dispatch 기반)
 - `agents/plan-agent.md` v10.0.0 본격 (chain 3 = gate #3 / 본 산출 dispatch)
 - `schemas/task-plan.schema.json` (산출 schema)
-- Michael Feathers, *Working Effectively with Legacy Code* (poc-11 characterization mode ADR source)
+- Michael Feathers, _Working Effectively with Legacy Code_ (poc-11 characterization mode ADR source)
 - OWASP Password Storage Cheat Sheet (poc-03/05/14 argon2id ADR source)
