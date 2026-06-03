@@ -2630,6 +2630,139 @@ function check37_codegraphAnchorVerifyReferenceLensTrust() {
 	}
 }
 
+// check38 (v12.13.0 / context-cache callees 증분 STEP 5 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 5) —
+//   context-federator 가 codegraph callees(직접 1-hop outgoing call)를 context-cache 에 부착. ★ context-cache 는 finding-severity 채널 자체가 부재
+//   (유일 severity = packs[].data_refs[].business_rules[].severity = BR passthrough) → check34~37 의 severity-ceiling/informational 가드는 부적용 (복붙 시 거짓 isomorphic).
+//   context-cache 구조 정합 격리 가드 (trust 목표는 check34~37 와 동일 = codegraph 신호가 결정적 gate 에 inject 불가 / 메커니즘만 상이). federator 첫 trust 가드.
+//   ① 음성 — gate-decision 모듈(gate-eval + findings-aggregator)에 context-federator/context-cache/federate/callees 토큰 0 + REQUIRED_VALIDATORS_PER_STAGE 미등록
+//   ② 음성 — federator.js gate 모듈(gate-eval/findings-aggregator) import 0 (출력 gate 역류 차단)
+//   ③ 구조 증명 — context-cache.schema.json code_refs.symbols.items.properties.callees 존재 + $ref symbolRef + symbols/symbolRef 어디에도 severity 필드 부재 (callees 가 finding 채널 진입 구조 불가)
+//   ④ 양성 — schema meta.trust_note required + federator.js 'reference-lens' + 'NOT gate-injected' non-gating 라벨
+function check38_contextCacheReferenceLensTrust() {
+	try {
+		const STEP5_TOKENS = [
+			'context-federator',
+			'context-cache',
+			'federate',
+			'callees',
+		];
+		const gateModules = [
+			'tools/chain-driver/src/gate-eval.js',
+			'tools/findings-aggregator/src/aggregator.js',
+			'tools/findings-aggregator/src/cli.js',
+		];
+		const problems = [];
+		for (const rel of gateModules) {
+			const fp = join(ROOT, rel);
+			if (!existsSync(fp)) {
+				problems.push(`${rel} 부재`);
+				continue;
+			}
+			const txt = readFileSync(fp, 'utf-8');
+			const hit = STEP5_TOKENS.filter((t) => txt.includes(t));
+			if (hit.length)
+				problems.push(
+					`${rel} 가 STEP 5 context-cache 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 codegraph callees/federation 소비 = trust 위반`,
+				);
+		}
+		// ① 추가 — gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 context-federator/context-cache 미등록 (federator 가 stage 필수 validator 격상 ❌).
+		const gePath = join(ROOT, 'tools/chain-driver/src/gate-eval.js');
+		if (existsSync(gePath)) {
+			const geSrc = readFileSync(gePath, 'utf-8');
+			const m = geSrc.match(
+				/const\s+REQUIRED_VALIDATORS_PER_STAGE\s*=\s*\{([^}]+)\}/,
+			);
+			if (m && /context[-_]?federator|context[-_]?cache/i.test(m[1])) {
+				problems.push(
+					'gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 context-federator 등록됨 — context-cache 가 stage 필수 validator 격상 = reference-lens trust 위반',
+				);
+			}
+		}
+		// ② federator.js gate 모듈 import 0 + ④ non-gating 라벨.
+		const fedPath = join(ROOT, 'tools/context-federator/src/federator.js');
+		if (!existsSync(fedPath)) {
+			problems.push('tools/context-federator/src/federator.js 부재');
+		} else {
+			const fed = readFileSync(fedPath, 'utf-8');
+			const importGateRe =
+				/^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m;
+			if (importGateRe.test(fed))
+				problems.push(
+					'federator.js 가 gate 모듈(gate-eval/findings-aggregator) import — context-cache 가 gate 결정에 결합 = trust 위반',
+				);
+			if (!/reference-lens/i.test(fed))
+				problems.push(
+					'federator.js 에 reference-lens 라벨 부재 (non-gating trust 라벨 의무)',
+				);
+			if (!/NOT gate-injected/i.test(fed))
+				problems.push(
+					"federator.js trust_note 에 'NOT gate-injected' non-gating 라벨 부재",
+				);
+		}
+		// ③ 구조 증명 — schema: callees 존재(=$ref symbolRef) + symbols/symbolRef severity 필드 부재 (callees 가 finding 채널 진입 구조 불가).
+		const schemaPath = join(ROOT, 'schemas/context-cache.schema.json');
+		if (!existsSync(schemaPath)) {
+			problems.push('schemas/context-cache.schema.json 부재');
+		} else {
+			try {
+				const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+				const symItems =
+					schema?.properties?.packs?.items?.properties?.code_refs?.items
+						?.properties?.symbols?.items ?? null;
+				if (!symItems) {
+					problems.push(
+						'context-cache.schema.json packs.code_refs.symbols.items 부재',
+					);
+				} else {
+					const callees = symItems.properties?.callees ?? null;
+					if (!callees)
+						problems.push(
+							'context-cache.schema.json symbols.items.properties.callees 부재 (STEP 5 신규 의무 / 누락 시 additionalProperties:false 미검증 통과=trust 약화)',
+						);
+					else if (callees.items?.$ref !== '#/$defs/symbolRef')
+						problems.push(
+							'callees.items 가 $ref #/$defs/symbolRef 아님 (callers 동형 의무 / array items = symbolRef)',
+						);
+					if (symItems.properties && 'severity' in symItems.properties)
+						problems.push(
+							'symbols.items 에 severity 필드 존재 — codegraph 코드 ref 가 finding severity 획득 = gate 채널 누출 위험',
+						);
+				}
+				const symRefProps = schema?.$defs?.symbolRef?.properties ?? {};
+				if ('severity' in symRefProps)
+					problems.push(
+						'$defs.symbolRef 에 severity 필드 존재 — callees/callers/affected 가 finding severity 획득 = trust 위반',
+					);
+				const metaReq = schema?.properties?.meta?.required ?? [];
+				if (!metaReq.includes('trust_note'))
+					problems.push(
+						'context-cache.schema.json meta.required 에 trust_note 부재 (non-gating 라벨 강제 의무)',
+					);
+			} catch (e) {
+				problems.push(`context-cache schema parse 실패: ${e.message}`);
+			}
+		}
+		return {
+			id: 'context_cache_reference_lens_trust',
+			pass: problems.length === 0,
+			detail:
+				problems.length === 0
+					? `context-cache(context-federator) callees 증분 (STEP 5) = reference-lens 강제 (federator 첫 trust 가드) — gate-eval/findings-aggregator STEP 5 토큰 0 + REQUIRED_VALIDATORS 미등록 + federator.js gate 모듈 import 0 + schema callees=$ref symbolRef 존재 & symbols/symbolRef severity 필드 부재(callees 가 finding 채널 진입 구조 불가) + meta.trust_note required + federator.js reference-lens/NOT gate-injected 라벨 (결정적 gate inject ❌ / ★ context-cache = finding-severity 채널 부재 산출물 — check34~37 severity-ceiling 가드와 메커니즘 상이/trust 목표 동일 / DEC-2026-06-03 §5 STEP 5)`
+					: `context-cache trust 위반: ${problems.join(' | ')}`,
+			delegated_to:
+				'gate modules (음성 0 + REQUIRED_VALIDATORS 미등록) + context-federator/src/federator.js(gate-import 0 + non-gating 라벨) + schemas/context-cache.schema.json(callees=symbolRef + severity 필드 부재 구조 증명)',
+		};
+	} catch (e) {
+		return {
+			id: 'context_cache_reference_lens_trust',
+			pass: false,
+			detail: `error: ${e.message}`,
+			delegated_to:
+				'gate modules + context-federator/src/federator.js + schemas/context-cache.schema.json',
+		};
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -2672,6 +2805,7 @@ function main() {
 		check35_codegraphFindingReferenceLensTrust(),
 		check36_codegraphModuleReferenceLensTrust(),
 		check37_codegraphAnchorVerifyReferenceLensTrust(),
+		check38_contextCacheReferenceLensTrust(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;

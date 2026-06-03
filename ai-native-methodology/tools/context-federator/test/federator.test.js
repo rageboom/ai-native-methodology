@@ -44,6 +44,7 @@ function fakeNavigate(byGrade = { MUST: [], SHOULD: [], FYI: [] }, roots = []) {
 function fakeCodegraph({
 	queryHits = {},
 	callers = {},
+	callees = {},
 	impact = {},
 	symbolsByFile = null,
 } = {}) {
@@ -53,6 +54,8 @@ function fakeCodegraph({
 		reason: null,
 		query: (s) => queryHits[s] ?? [],
 		callers: (s) => ({ symbol: s, callers: callers[s] ?? [] }),
+		// v12.13.0 STEP 5 — callees(직접 1-hop outgoing call) 스텁 (callers 대칭).
+		callees: (s) => ({ symbol: s, callees: callees[s] ?? [] }),
 		impact: (s) => impact[s] ?? { symbol: s, nodeCount: 0, affected: [] },
 	};
 	if (symbolsByFile) a.symbolsInFile = (rel) => symbolsByFile[rel] ?? [];
@@ -72,7 +75,7 @@ function countingNavigate(byGrade = { MUST: [], SHOULD: [], FYI: [] }) {
 }
 function countingCodegraph(opts = {}) {
 	const base = fakeCodegraph(opts);
-	const state = { query: 0, callers: 0, impact: 0 };
+	const state = { query: 0, callers: 0, callees: 0, impact: 0 };
 	return {
 		state,
 		adapter: {
@@ -84,6 +87,10 @@ function countingCodegraph(opts = {}) {
 			callers: (s) => {
 				state.callers++;
 				return base.callers(s);
+			},
+			callees: (s) => {
+				state.callees++;
+				return base.callees(s);
 			},
 			impact: (s) => {
 				state.impact++;
@@ -232,6 +239,103 @@ test('federate — ast_symbol 앵커 → callers + impact 부착', () => {
 	assert.equal(sym.callers[0].name, 'register');
 	assert.equal(sym.impact.node_count, 8);
 	assert.equal(p.code_refs[0].unresolved, false);
+});
+
+// ── v12.13.0 STEP 5: callees (직접 1-hop outgoing call) 부착 + withCallers 게이트 ──
+test('federate — callees: ast_symbol 앵커에 직접 1-hop outgoing call 부착 + stats.callees_resolved', () => {
+	const graph = {
+		nodes: [
+			node('IMPL-1', 'chain', 'IMPL', 'active', [
+				{ path: 'src/repo.ts', anchor_type: 'ast_symbol', symbol: 'createNew' },
+			]),
+		],
+	};
+	const cache = federate(graph, {
+		repoRoot: '/repo',
+		navigate: fakeNavigate({ MUST: [], SHOULD: [], FYI: [] }),
+		codegraph: fakeCodegraph({
+			callers: {
+				createNew: [
+					{ name: 'handle', kind: 'method', filePath: 'src/c.ts', startLine: 5 },
+				],
+			},
+			callees: {
+				createNew: [
+					{
+						name: 'insertTag',
+						kind: 'method',
+						filePath: 'src/mapper.ts',
+						startLine: 16,
+					},
+					{
+						name: 'Article',
+						kind: 'class',
+						filePath: 'src/article.ts',
+						startLine: 14,
+					}, // lifecycle ctor 포함 (실측 동형)
+				],
+			},
+		}),
+		now: () => FIXED_NOW,
+	});
+	const sym = cache.packs[0].code_refs[0].symbols[0];
+	assert.deepEqual(
+		sym.callees.map((c) => c.name),
+		['insertTag', 'Article'],
+		'callees = 직접 outgoing (생성자 포함)',
+	);
+	assert.equal(sym.callees[0].file_path, 'src/mapper.ts', 'mapSymbolNode 동형');
+	assert.equal(sym.callers[0].name, 'handle', 'callers 무회귀');
+	assert.equal(cache.stats.callees_resolved, 2, 'callees 노출 정량');
+});
+
+test('federate — withCallers=false → callers + callees 동반 생략 (1-hop neighbor 한 쌍)', () => {
+	const graph = {
+		nodes: [
+			node('IMPL-1', 'chain', 'IMPL', 'active', [
+				{ path: 'src/repo.ts', anchor_type: 'ast_symbol', symbol: 'createNew' },
+			]),
+		],
+	};
+	const cache = federate(graph, {
+		repoRoot: '/repo',
+		navigate: fakeNavigate(),
+		codegraph: fakeCodegraph({
+			callees: {
+				createNew: [
+					{ name: 'x', kind: 'method', filePath: 'src/x.ts', startLine: 1 },
+				],
+			},
+		}),
+		withCallers: false,
+		now: () => FIXED_NOW,
+	});
+	const sym = cache.packs[0].code_refs[0].symbols[0];
+	assert.equal(sym.callers, undefined, 'callers 생략');
+	assert.equal(sym.callees, undefined, 'callees 동반 생략');
+	assert.equal(cache.stats.callees_resolved, 0);
+	assert.ok(sym.impact, 'impact 는 withCallers 무관 부착');
+});
+
+test('federate — callees() 미보유 어댑터(구버전) = graceful 생략 (no throw)', () => {
+	const adapter = fakeCodegraph({});
+	delete adapter.callees; // codegraph CLI 'callees' 부재 시뮬
+	const graph = {
+		nodes: [
+			node('IMPL-1', 'chain', 'IMPL', 'active', [
+				{ path: 'src/repo.ts', anchor_type: 'ast_symbol', symbol: 'createNew' },
+			]),
+		],
+	};
+	const cache = federate(graph, {
+		repoRoot: '/repo',
+		navigate: fakeNavigate(),
+		codegraph: adapter,
+		now: () => FIXED_NOW,
+	});
+	const sym = cache.packs[0].code_refs[0].symbols[0];
+	assert.equal(sym.callees, undefined, 'callees 메서드 부재 = 생략');
+	assert.equal(cache.stats.callees_resolved, 0);
 });
 
 // ── federate: strict_path 앵커 = sameFile 필터링 ─────────────────────────────
@@ -439,6 +543,7 @@ test('delta — graph·codegraph 둘 다 무변경 → 전부 carry (navigate·c
 	assert.equal(out.stats.code_recomputed, 0);
 	assert.equal(nav.state.calls, 0, 'navigate 미호출 (dep carry)');
 	assert.equal(cg.state.callers, 0, 'codegraph 미호출 (code carry)');
+	assert.equal(cg.state.callees, 0, 'codegraph.callees 미호출 (callees opaque carry)');
 });
 
 test('delta — codegraph index 만 변경 → dep carry / code 재계산', () => {
@@ -458,6 +563,7 @@ test('delta — codegraph index 만 변경 → dep carry / code 재계산', () =
 	assert.equal(out.stats.code_recomputed, 2, 'code 는 재계산');
 	assert.equal(nav.state.calls, 0, 'navigate 미호출');
 	assert.ok(cg.state.callers > 0, 'codegraph 호출됨');
+	assert.ok(cg.state.callees > 0, 'codegraph.callees 재계산 시 호출됨');
 });
 
 test('delta — graph 만 변경 → code carry / dep 재계산 (codegraph 미호출 = 비싼 부분 절감)', () => {

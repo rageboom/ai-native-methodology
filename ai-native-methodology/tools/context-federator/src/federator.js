@@ -256,7 +256,11 @@ function mapSymbolNode(n) {
 	};
 }
 
-// 심볼 1개에 codegraph callers/impact 를 부착 (read 실패 = 생략 / no-sim: 날조 ❌).
+// 심볼 1개에 codegraph callers/callees/impact 를 부착 (read 실패 = 생략 / no-sim: 날조 ❌).
+//   v12.13.0 STEP 5 (DEC §5 STEP 5 / context-cache 증분) — callees(직접 1-hop outgoing call / 이 심볼이 호출하는 협력자)
+//     를 callers(상류 1-hop) 와 byte-동형(mapSymbolNode 동일 매핑)으로 부착. impact(역방향 transitive blast)와 방향·depth 다른 직교 축.
+//     callers 와 같은 withCallers 게이트 (1-hop neighbor 한 쌍 / --no-callers 시 동반 off / 일관). codegraph CLI 'callees' 부재 어댑터(구버전·fake)=typeof 가드로 graceful 생략.
+//     ⚠ callees 는 heuristic call-edge 의존 + maxDepth=1 self-call/생성자(lifecycle ctor) 포함 가능 = reference-lens/non-gating reading-aid (gate inject ❌).
 function attachCallersImpact(sym, symbolName, { codegraph, withCallers }) {
 	if (withCallers) {
 		try {
@@ -264,6 +268,14 @@ function attachCallersImpact(sym, symbolName, { codegraph, withCallers }) {
 			sym.callers = (c?.callers ?? []).map(mapSymbolNode);
 		} catch {
 			/* codegraph read 실패 → callers 생략 */
+		}
+		if (typeof codegraph.callees === 'function') {
+			try {
+				const ce = codegraph.callees(symbolName);
+				sym.callees = (ce?.callees ?? []).map(mapSymbolNode);
+			} catch {
+				/* codegraph read 실패 → callees 생략 */
+			}
 		}
 	}
 	try {
@@ -509,7 +521,8 @@ export function federate(graph, opts = {}) {
 
 	const packs = [];
 	let symbolsResolved = 0,
-		anchorsUnresolved = 0;
+		anchorsUnresolved = 0,
+		calleesResolved = 0; // v12.13.0 STEP 5 — callees 노출 정량 (해소율 component).
 	let depRecomputed = 0,
 		codeRecomputed = 0,
 		carriedPacks = 0,
@@ -548,6 +561,8 @@ export function federate(graph, opts = {}) {
 		if (carryDep && carryCode) carriedPacks++;
 		for (const r of codePart.code_refs) {
 			symbolsResolved += r.symbols.length;
+			for (const s of r.symbols)
+				calleesResolved += Array.isArray(s.callees) ? s.callees.length : 0;
 			if (r.unresolved) anchorsUnresolved++;
 		}
 
@@ -593,6 +608,7 @@ export function federate(graph, opts = {}) {
 			pack_count: packs.length,
 			anchored_nodes: origins.length,
 			symbols_resolved: symbolsResolved,
+			callees_resolved: calleesResolved,
 			anchors_unresolved: anchorsUnresolved,
 			codegraph_available: !!codegraph.available,
 			dep_recomputed: depRecomputed,
@@ -685,6 +701,8 @@ export function makeCodegraphAdapter({
 		sqliteReader: loadSqlite() !== null,
 		query: (s) => cgReadJson(exec, `query ${cgQuote(s)} -p ${P} --json`),
 		callers: (s) => cgReadJson(exec, `callers ${cgQuote(s)} -p ${P} --json`),
+		// v12.13.0 STEP 5 — callees(직접 1-hop outgoing call). codegraph 0.9.7+ CLI 'callees' (callers 대칭 / {symbol, callees:[{name,kind,filePath,startLine}]}).
+		callees: (s) => cgReadJson(exec, `callees ${cgQuote(s)} -p ${P} --json`),
 		impact: (s) => cgReadJson(exec, `impact ${cgQuote(s)} -p ${P} --json`),
 		// 파일→심볼 = codegraph 인덱스 DB(.codegraph/codegraph.db) 직접 read (CLI 미지원 / reference-lens).
 		//   node:sqlite 부재·DB 부재·스키마 불일치 = null (graceful → 호출부 stem-query fallback).

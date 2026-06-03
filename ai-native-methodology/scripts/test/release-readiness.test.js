@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 36/37 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 36/37 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 37/38 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 37/38 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 37);
-		assert.equal(out.criteria_passed, 36);
+		assert.equal(out.criteria_total, 38);
+		assert.equal(out.criteria_passed, 37);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 37 criterion ids are present in output (no skipped)', () => {
+	it('all 38 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -80,6 +80,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'codegraph_coverage_reference_lens_trust',
 			'codegraph_finding_reference_lens_trust',
 			'codegraph_module_reference_lens_trust',
+			'context_cache_reference_lens_trust',
 			'db_assets_validator',
 			'e2e_cycle_pass',
 			'gate_enum_consistency',
@@ -300,11 +301,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 37 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 38 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 37);
+		assert.equal(out.criteria_total, 38);
 	});
 
 	// v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -526,6 +527,50 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
+	// v12.13.0 check38 discrimination — context-cache callees 증분 reference-lens trust (STEP 5 / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 5).
+	//   ★ context-cache 는 finding-severity 채널 부재 → check34~37 severity-ceiling 가드와 메커니즘 상이 (복붙 시 거짓 isomorphic). 구조 증명 = symbols/symbolRef severity 필드 부재.
+	it('context_cache_reference_lens_trust — gate 모듈 STEP 5 토큰 0 + federator gate-import 0 + schema callees=symbolRef & symbols/symbolRef severity 필드 부재', () => {
+		const r = runScript(['--target', 'v12.13.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find(
+			(x) => x.id === 'context_cache_reference_lens_trust',
+		);
+		assert.ok(
+			c.pass,
+			`check38 must pass (context-cache reference-lens) — detail: ${c.detail}`,
+		);
+		assert.match(c.detail, /reference-lens/);
+		assert.ok(
+			c.delegated_to.includes('federator.js'),
+			'content-aware (federator.js gate-import 0 + non-gating 라벨 / file-presence ❌)',
+		);
+		// discrimination — callees 가 finding 채널 진입 구조 불가 미러 (release-readiness.js check38 ③ 동형 / symbols·symbolRef 가 severity 를 절대 못 가짐).
+		const ccSchema = JSON.parse(
+			readFileSync(
+				resolve(ROOT, 'schemas/context-cache.schema.json'),
+				'utf-8',
+			),
+		);
+		const symItems =
+			ccSchema.properties.packs.items.properties.code_refs.items.properties
+				.symbols.items;
+		assert.equal(
+			symItems.properties.callees.items.$ref,
+			'#/$defs/symbolRef',
+			'callees.items = $ref symbolRef (callers 동형 / array items)',
+		);
+		assert.equal(
+			'severity' in (symItems.properties || {}),
+			false,
+			'symbols.items 는 severity 필드 구조적 부재 → callees 가 finding 채널 진입 불가',
+		);
+		assert.equal(
+			'severity' in (ccSchema.$defs.symbolRef.properties || {}),
+			false,
+			'$defs.symbolRef 는 severity 필드 구조적 부재 (callees/callers/affected 공통)',
+		);
+	});
+
 	it('missing --target → exit 2 (usage error)', () => {
 		const r = runScript([]);
 		assert.equal(r.status, 2);
@@ -542,8 +587,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 37);
-		assert.equal(out.criteria_passed, 37);
+		assert.equal(out.criteria_total, 38);
+		assert.equal(out.criteria_passed, 38);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});

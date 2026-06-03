@@ -41,7 +41,7 @@ function usage(code = 2) {
 			'  --delta                      Phase 2 — 기존 --out 캐시 재사용: 바뀐 노드만 재계산 (2축: graph→dep / codegraph→code)',
 			'  --sql-inventory <file>       Phase 1.5 — legacy 데이터 반쪽 소스 override (기본: analysis-sql-inventory 노드 source_path 자동발견)',
 			'  --db-schema <file>           Phase 1.5 — db-schema override (dependent_tables 컬럼 보강 / 기본: 자동발견)',
-			'  --no-callers                 codegraph callers 조회 생략 (빠름)',
+			'  --no-callers                 codegraph callers + callees 조회 생략 (1-hop neighbor 한 쌍 동반 off / 빠름)',
 			'  --max-symbols <n>            strict_path 앵커당 최대 심볼 수 (default: 12)',
 			'  --format text|json           stdout 출력 형식 (default: json / --out 지정 시 항상 json 파일)',
 			'  --help / -h                  도움말',
@@ -185,7 +185,7 @@ function main() {
 		const s = cache.stats;
 		console.error(
 			`[context-federator] ${outPath}\n` +
-				`  packs=${s.pack_count} anchored_nodes=${s.anchored_nodes} symbols_resolved=${s.symbols_resolved} ` +
+				`  packs=${s.pack_count} anchored_nodes=${s.anchored_nodes} symbols_resolved=${s.symbols_resolved} callees_resolved=${s.callees_resolved} ` +
 				`anchors_unresolved=${s.anchors_unresolved} codegraph=${s.codegraph_available ? cache.codegraph.version : 'unavailable'}\n` +
 				`  delta: dep_recomputed=${s.dep_recomputed} code_recomputed=${s.code_recomputed} carried=${s.carried_packs}\n` +
 				`  data(legacy): sql_inventory=${s.data_source_available ? 'loaded' : 'none'} data_anchored_nodes=${s.data_anchored_nodes} data_refs=${s.data_refs_count}`,
@@ -197,6 +197,11 @@ function main() {
 		);
 		for (const p of cache.packs) {
 			const code = p.code_refs.reduce((a, r) => a + r.symbols.length, 0);
+			const callees = p.code_refs.reduce(
+				(a, r) =>
+					a + r.symbols.reduce((b, s) => b + (s.callees?.length ?? 0), 0),
+				0,
+			);
 			console.log(
 				`  ${p.node_id} (${p.artifact_kind}/${p.artifact_subkind}) state=${p.state}`,
 			);
@@ -204,7 +209,7 @@ function main() {
 				`    dep_impact MUST=${p.dep_impact.must.length} SHOULD=${p.dep_impact.should.length} FYI=${p.dep_impact.fyi.length}`,
 			);
 			console.log(
-				`    code_anchors=${p.code_anchors.length} code_symbols=${code}${p.code_refs.some((r) => r.unresolved) ? ' (일부 unresolved)' : ''}`,
+				`    code_anchors=${p.code_anchors.length} code_symbols=${code} callees=${callees}${p.code_refs.some((r) => r.unresolved) ? ' (일부 unresolved)' : ''}`,
 			);
 			if (p.data_refs.length) {
 				const tables = [

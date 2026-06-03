@@ -174,6 +174,7 @@
                       "file_path": { "type": ["string", "null"] },
                       "start_line": { "type": ["integer", "null"] },
                       "callers": { "type": "array", "items": { "$ref": "#/$defs/symbolRef" } },
+                      "callees": { "type": "array", "description": "v12.13.0 STEP 5 — 이 심볼이 직접(1-hop) 호출하는 협력자(outgoing call). callers(상류 1-hop)와 byte-동형 / impact(역방향 transitive)와 직교. heuristic call-edge 의존 + maxDepth=1 self-call·생성자(lifecycle ctor) 포함 가능 = reference-lens / NOT gate-injected / reading-aid.", "items": { "$ref": "#/$defs/symbolRef" } },
                       "impact": {
                         "type": "object",
                         "additionalProperties": false,
@@ -195,11 +196,12 @@
     "stats": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pack_count", "anchored_nodes", "symbols_resolved", "anchors_unresolved", "codegraph_available", "dep_recomputed", "code_recomputed", "carried_packs", "data_anchored_nodes", "data_refs_count", "data_source_available"],
+      "required": ["pack_count", "anchored_nodes", "symbols_resolved", "callees_resolved", "anchors_unresolved", "codegraph_available", "dep_recomputed", "code_recomputed", "carried_packs", "data_anchored_nodes", "data_refs_count", "data_source_available"],
       "properties": {
         "pack_count": { "type": "integer" },
         "anchored_nodes": { "type": "integer" },
         "symbols_resolved": { "type": "integer" },
+        "callees_resolved": { "type": "integer", "description": "v12.13.0 STEP 5 — 전체 callees(직접 1-hop outgoing call) 부착 수. callees 노출 정량 (해소율 component / reference-lens)." },
         "anchors_unresolved": { "type": "integer" },
         "codegraph_available": { "type": "boolean" },
         "dep_recomputed": { "type": "integer", "description": "Phase 2 — navigate(dep) 재계산 노드 수." },
