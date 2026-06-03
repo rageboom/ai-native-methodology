@@ -22,6 +22,8 @@
 
 import { existsSync, readFileSync, appendFileSync, mkdirSync } from 'node:fs';
 import { basename, dirname, join, resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   initState, readState, writeStateCAS, recoverTmpFiles, ensureAimdDir,
   StateCorruptError, MigrationRequiredError, CURRENT_STATE_VERSION,
@@ -66,6 +68,7 @@ function usage(code = 3) {
     '  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
     '  navigate --graph <artifact-graph.json> --origin <node-id> [--json]   (dep-graph-navigator backend)',
     '  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (★ F3 stage/scope 일괄 의존성 rollup)',
+    '  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (★ Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
     '  suggest-skill --prompt <text>',
     '  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
     '  migrate <project>',
@@ -94,6 +97,7 @@ function parseArgs(argv) {
     else if (a === '--base') out.baseSha = rest[++i];
     else if (a === '--repo-root') out.repoRoot = rest[++i];
     else if (a === '--scope') out.scope = rest[++i];
+    else if (a === '--out-dir') out.outDir = rest[++i];
     else if (a === '--scenario') out.scenario = rest[++i];
     else if (a === '--stage') out.stage = rest[++i];
     else if (a === '--direction') out.direction = rest[++i];
@@ -928,6 +932,95 @@ function cmdImpact(args) {
   process.exit(0);
 }
 
+// ★ chain-driver resync-graph — Loop A / A-lazy-cmd (DEC-2026-06-03-living-graph-a1-surface 후속 / 의도② lazy 재계산).
+//   B-minimal STALE 배너의 nudge → 한 명령 재합성 action (8-flag traceability-matrix-builder → resync-graph).
+//   convention 입력-탐색(.aimd/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
+//   traceability-matrix-builder --graph 위임 (전체 재합성 / --previous-graph propose·deprecated carry-over). caller cwd 만 write.
+//   verdict-free / 비-gating / per-write 자동 ❌ (Senior REJECT — quadratic·fixture) : 사람이 STALE 보고 1 명령 실행.
+const RESYNC_CHAIN_FILES = Object.freeze([
+  ['--discovery', 'discovery-spec.json'],
+  ['--behavior', 'behavior-spec.json'],
+  ['--acceptance', 'acceptance-criteria.json'],
+  ['--task-plan', 'task-plan.json'],
+  ['--test-spec', 'test-spec.json'],
+  ['--impl-spec', 'impl-spec.json'],
+]);
+
+function cmdResyncGraph(args) {
+  const projectRoot = args.project ? resolve(args.project) : process.cwd();
+
+  // 1) outputDir 결정 — 기존 artifact-graph.json 위치 우선 (없으면 convention 기본). --out-dir 명시 시 강제.
+  let outputDir;
+  if (args.outDir) {
+    outputDir = resolve(args.outDir);
+  } else {
+    const candidates = [];
+    if (args.scope) candidates.push(join(projectRoot, '.aimd', args.scope));
+    candidates.push(join(projectRoot, '.aimd', 'output'));
+    candidates.push(join(projectRoot, '.aimd'));
+    outputDir = candidates.find((d) => existsSync(join(d, 'artifact-graph.json')))
+      || (args.scope ? join(projectRoot, '.aimd', args.scope) : join(projectRoot, '.aimd', 'output'));
+  }
+
+  // 2) chain 입력 convention 스캔 (존재하는 것만 builder flag 로).
+  const builderArgs = [];
+  const found = [];
+  for (const [flag, fname] of RESYNC_CHAIN_FILES) {
+    if (existsSync(join(outputDir, fname))) { builderArgs.push(flag, join(outputDir, fname)); found.push(flag.slice(2)); }
+  }
+  // matrix-builder hard-require: behavior + acceptance (없으면 그래프 없음 = 정직 거부 / DEC-2026-06-03 §1.1).
+  const missing = ['behavior-spec.json', 'acceptance-criteria.json'].filter((f) => !existsSync(join(outputDir, f)));
+  if (missing.length > 0) {
+    console.error(`[chain-driver resync-graph] 재합성 불가 — ${outputDir} 에 ${missing.join(', ')} 부재.`);
+    console.error('  chain spec stage(behavior+acceptance) 미도달 / analysis-only scope 는 의존성 그래프 없음 (DEC-2026-06-03 §1.1: migration-start = 엣지 0).');
+    process.exit(3);
+  }
+
+  const prevGraph = join(outputDir, 'artifact-graph.json');
+  const hasPrev = existsSync(prevGraph);
+  builderArgs.push('--analysis-dir', outputDir, '--aspect-dir', outputDir, '--out-dir', outputDir, '--graph');
+  if (hasPrev) builderArgs.push('--previous-graph', prevGraph);
+  if (args.scope) builderArgs.push('--scope-id', args.scope);
+  builderArgs.push('--repo-root', args.repoRoot ? resolve(args.repoRoot) : projectRoot);
+
+  // watch-item #1 — 입력 coverage 명시 (silent under-synth 방지 / 날조 ❌).
+  const coverageLine = `${found.length}/6 stage 입력 (${found.join(', ') || '없음'}) + analysis/aspect scan @ ${outputDir}`
+    + (hasPrev ? ' / --previous-graph carry-over' : ' / 신규(carry-over 없음)');
+
+  if (args.dryRun) {
+    process.stdout.write(`[chain-driver resync-graph] (dry-run) 재합성 예정: ${coverageLine}\n`);
+    process.stdout.write(`  → node <traceability-matrix-builder/src/cli.js> ${builderArgs.join(' ')}\n`);
+    process.exit(0);
+  }
+
+  // 3) traceability-matrix-builder --graph 위임 (cross-package import 회피 — plugin tools 상대경로 / methodology 컨벤션).
+  const here = dirname(fileURLToPath(import.meta.url));
+  const matrixCli = join(here, '..', '..', 'traceability-matrix-builder', 'src', 'cli.js');
+  if (!existsSync(matrixCli)) {
+    console.error(`[chain-driver resync-graph] traceability-matrix-builder CLI 미발견: ${matrixCli}`);
+    process.exit(3);
+  }
+  process.stderr.write(`[chain-driver resync-graph] 재합성: ${coverageLine}\n`);
+  try {
+    const out = execFileSync('node', [matrixCli, ...builderArgs], {
+      cwd: projectRoot, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'pipe'], timeout: 60000, windowsHide: true,
+    });
+    process.stdout.write(out);
+    process.exit(0);
+  } catch (e) {
+    // matrix-builder exit 1 = coverage red/forward<threshold. 그래프는 write 완료(cli.js:173 write → :180 exit).
+    //   resync 자체는 성공 → 비-fatal. exit 2(usage)·기타 = 실패 전달.
+    if (e.stdout) process.stdout.write(e.stdout);
+    if (e.stderr) process.stderr.write(e.stderr);
+    if (e.status === 1) {
+      process.stderr.write('[chain-driver resync-graph] 그래프 재합성 완료 (matrix coverage red/threshold = 별도 사안 / 그래프는 갱신됨).\n');
+      process.exit(0);
+    }
+    console.error(`[chain-driver resync-graph] matrix-builder 실패 (exit ${e.status ?? '?'}).`);
+    process.exit(e.status ?? 1);
+  }
+}
+
 function main() {
   const args = parseArgs(process.argv);
   switch (args.command) {
@@ -938,6 +1031,7 @@ function main() {
     case 'sync':           return cmdSync(args);
     case 'impact':         return cmdImpact(args);
     case 'navigate':       return cmdNavigate(args);
+    case 'resync-graph':   return cmdResyncGraph(args);
     case 'suggest-skill':  return cmdSuggestSkill(args);
     case 'hooks-bridge':   return cmdHooksBridge(args);
     case 'migrate':        return cmdMigrate(args);
