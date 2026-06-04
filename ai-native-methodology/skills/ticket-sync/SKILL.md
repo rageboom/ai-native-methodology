@@ -1,7 +1,7 @@
 ---
 name: ticket-sync
 description: v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / BE only 운영·인프라·마이그레이션) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
-allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
+allowed-tools: Read, Write, Edit, Bash, mcp__mcp-server-wiki-jira__jira_create, mcp__mcp-server-wiki-jira__jira_link, mcp__mcp-server-wiki-jira__jira_transition, mcp__mcp-server-wiki-jira__jira_comment, mcp__mcp-server-wiki-jira__jira_search, mcp__mcp-server-wiki-jira__jira_update, mcp__mcp-server-wiki-jira__jira_assign, mcp__mcp-server-wiki-jira__jira_transitions, mcp__mcp-server-wiki-jira__jira_label_add, mcp__mcp-server-wiki-jira__jira_issue, mcp__mcp-server-wiki-jira__jira_structure_add_issues, mcp__mcp-server-wiki-jira__jira_structure_get, mcp__mcp-server-wiki-jira__wiki_page_create, mcp__mcp-server-wiki-jira__wiki_page_update, mcp__mcp-server-wiki-jira__wiki_search_cql, mcp__mcp-server-wiki-jira__wiki_spaces, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
 ---
 
 # ticket-sync (R20-prime / v11.0.0 paradigm)
@@ -59,10 +59,11 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 ### 단계 1 — Pre-flight
 
 1. **MCP 가용성 확인** (tools-probe 본격 / F-VERIFY-005 → B8 해결)
-   - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인 (tool-name presence probe / mis-fe-admin iter-6 verification cycle 입증).
-   - 2차 (fallback) — `mcp__wiki-jira-assistant__jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
+   - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__mcp-server-wiki-jira__*` **또는** `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인. 신버전(`mcp__mcp-server-wiki-jira__`) 우선 탐지 → 없으면 구버전(`mcp__wiki-jira-assistant__`) fallback (tool-name presence probe).
+   - **MCP 버전 resolve**: 신버전 감지 시 이후 모든 MCP 호출에 `mcp__mcp-server-wiki-jira__` prefix 사용. 구버전만 감지 시 `mcp__wiki-jira-assistant__` prefix 사용. 세션 내 `_mcp_prefix` 변수로 고정.
+   - 2차 (fallback) — `{_mcp_prefix}jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
    - 3차 (skip 결단) — `ListMcpResourcesTool` 은 **resource-only probe** 라 tools 가용성 추론에 부적합 (F-VERIFY-005). resource probe 결과 단독으로 silent skip 분기 ❌.
-   - 모두 불가 시 → `_base-log-finding` skill 호출 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip.
+   - 모두 불가 시 → `_base-log-finding` skill 호출 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip. 메시지에 "신버전(mcp__mcp-server-wiki-jira__) 및 구버전(mcp__wiki-jira-assistant__) 모두 미감지" 포함.
 
 2. **stage paradigm 강제력 점검** (v11.0.0 R20-prime 본격 / F-TICKETSYNC-012)
    - args.stage ∈ {`analysis`, `discovery`, `spec`, `test`, `implement`} 시 → `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합 / plan 단일 const).
