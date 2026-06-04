@@ -10,6 +10,38 @@
 
 ---
 
+## [12.13.0] — 2026-06-04 MINOR — codegraph wiring STEP 5 (context-cache callees 증분)
+
+**§5 STEP 5 (context-cache 증분 / `callees` enrichment) 시행.** 4원칙 = `.claude/plans/plan-codegraph-step5.md` (#1 깊은 숙지 → 사용자 일괄 위임 "스탭5 수행→커밋만" = gate #3 standing go). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §13.
+
+### 공백 — context-cache neighborhood 가 2-방향만 (callees 부재)
+
+context-federator 의 `attachCallersImpact` 는 심볼에 `callers`(상류 1-hop) + `impact`(하류 transitive blast)만 부착하고 **`callees`(하류 1-hop = 내가 직접 호출하는 협력자) 부재.** codegraph 0.9.6 CLI 에 `callees <symbol>` 실재(`callers` 와 byte-동형 출력) → SQLite edge 유도 불필요한 **CLI-native 최소증분**.
+
+### 시행 범위 — 단일 축 callees enrichment (STEP1 11→2·STEP2 5→2·STEP3 4→1·STEP4 6→1 칼날 동형)
+
+- `federator.js`: adapter `callees` + `attachCallersImpact` 부착(`withCallees` 게이트 / callers 대칭) + symbolsInFile(strict_path) 심볼 동형 + `stats.callees_resolved` 해소율.
+- `context-cache.schema.json`: `code_refs.symbols.items.callees`(symbolRef 배열 / callers 와 byte-동형) + `stats.callees_resolved` **additive**.
+- `cli.js`: `--no-callers` 가 callers+callees 1-hop 쌍 동반 off.
+- 2번째 산출물 `code-graph.json`(self-coverage / `edges_by_type`) = **carry**(secondary 산출물 cut 선례 동형).
+
+### trust 가드 — check38 (release-readiness 37→38 / federator 첫 trust 가드 / check34~37 4-part isomorphic)
+
+`context_cache_reference_lens_trust`: ① gate 모듈(gate-eval/findings-aggregator)에 federator/federate/callees 토큰 0 + REQUIRED_VALIDATORS 미등록 ② schema `meta.trust_note` required + symbol/code_refs 어디에도 severity 필드 부재(finding 채널 아님 구조 차단) ③ federator reference-lens 라벨 + gate 모듈 import 0 ④ non-gating 불변. (context-cache = 기존부터 reference-lens / non-gating — callees 도 같은 채널.)
+
+### §8.1 정직 — 2 distinct 도메인 실 dogfood (no-simulation / 실 codegraph 0.9.6)
+
+- **poc-05 (modern TS) full federate e2e**: index 4 files·33 nodes → `packs=4 symbols_resolved=41 callees_resolved=29 anchors_unresolved=0`. **Ajv schema VALID**(callees 포함) + 무회귀(`--no-callers`→callees_resolved=0 / symbols·callers·impact 보존). method callees 정확(`register`→assertAvailable/add/User · `login`→findByEmail/User).
+- **poc-08 (Java Spring+MyBatis3 jpetstore) 메커니즘 corroboration**: index 62 files·996 nodes → `callees insertOrder` → `OrderMapper.xml`(MyBatis SQL 매퍼) + Order/setOrderId/getNextId/getLineItems 실 협력자 체인.
+- **정직 경계**: full pack e2e = poc-05 단일 도메인 / 2nd 도메인(poc-08) = `callees` CLI **mechanism corroboration only**(poc-08 = artifact-graph 미보유 → full pack 불가). STEP 4 §12.6 "mechanism corroboration only" 선례 동형. 2nd 도메인 full e2e pack = carry(committed artifact-graph = poc-05 modern / poc-16 legacy·code_pointers=0 한정).
+
+### 검증 / carry
+
+- federator test 32/32(실 codegraph smoke 포함) + release-readiness 37→38(self-test 22/22) + version 3-way 12.13.0.
+- carry(STEP 5+): code-graph.json self-coverage/`edges_by_type` · 2nd 도메인 full e2e pack(poc-08/poc-03 artifact-graph 생성 후) · (α)함수앵커 제안(federator 소관) · STEP 6(Modern-scoped reading-aid + openapi HIGH 잔여).
+
+---
+
 ## [12.12.0] — 2026-06-04 MINOR — codegraph wiring STEP 4 (ast_symbol stale-anchor verify / 함수단위 추적성)
 
 **§5 STEP 4 (impl/test ast_symbol 앵커 / 함수단위 추적성) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step4.md` (3-agent: 공식문서 F-015 / 업계사례 / Senior 적대 0.84 REVISE + 실 `.codegraph` DB probe → 사용자 gate #3 "4-A 지금 시행" 결단). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §12.

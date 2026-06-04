@@ -275,3 +275,37 @@ arch.json有/codegraph無 의존 = codegraph 정직 사각(런타임 DI/decorato
 - official-docs(F-015): codegraph `NODE_KINDS` 에 class/interface/function/method/enum/type_alias 실재(실 DB probe: RealWorld class141/interface16/method415, ecommerce class66/method189/function7) / symbol-existence·dead-code 내장 CLI 부재(직접 SQLite set-diff 정답) / Figma Code Connect non-existent node-id 검증 = 미구현 오픈이슈(#337) → STEP 4 가 먼저 해결 / SCIP·LSIF = re-index 후 set-diff 패턴 정합.
 - 업계: 함수단위 추적성 = safety-critical(ISO26262/DO-178C)에서 "Traceable 자동생성 + 앵커참조 수동 + stale-on-compile" 패턴 / (α)자동제안 = production ROI 선례 無(gold-plating 신호) / Knip = 코드↔코드 dead-symbol(≠요구사항 앵커) → β 정직 방향.
 - carry(STEP 5+): (α)함수앵커 제안(federator 소관) · (γ)skill ast_symbol emit · traceability dead-cell green · artifact-graph code blast-radius · **in-the-wild stale**(ast_symbol 앵커가 실제 산출물에 도입된 후 재측정) · STEP1~3 carry 유지 · STEP 5(context-cache 증분) · STEP 6(Modern-scoped reading-aid + openapi HIGH).
+
+---
+
+## 13. STEP 5 시행 완료 (v12.13.0 MINOR / 2026-06-04 / 로드맵 5번째 슬라이스)
+
+**§5 STEP 5 (context-cache 증분 / `callees` enrichment) 시행.** 4원칙 = `.claude/plans/plan-codegraph-step5.md` (#1 깊은 숙지 → 사용자 일괄 위임 "스탭5 수행→커밋만" = gate #3 standing go). 본 DEC = SSOT. (코드는 2026-06-04 WIP 커밋 `19051ac7` 로 cross-PC 핸드오프 후, dogfood 레포 보유 환경에서 본 절(§13) + version-bump 로 정식 승격.)
+
+### 13.1 공백 — context-cache neighborhood 가 2-방향만 (callees 부재)
+
+context-federator 의 `attachCallersImpact` 는 심볼에 `callers`(상류 1-hop) + `impact`(하류 transitive blast)만 부착하고 **`callees`(하류 1-hop = 내가 직접 호출하는 협력자)는 부재.** "이 메서드 수정 시 알아야 할 직접 협력자" = P0(재사용) reading-aid 가치 직결인데 빠져 있었음. codegraph 0.9.6 CLI 에 `callees <symbol>` 실재(`callers` 와 byte-동형 `{symbol, callees:[{name,kind,filePath,startLine}]}`) → 기존 `mapSymbolNode` 그대로 매핑 = SQLite edge 유도 불필요한 **CLI-native 최소증분**.
+
+### 13.2 시행 범위 — 단일 축 callees enrichment (STEP1 11→2·STEP2 5→2·STEP3 4→1·STEP4 6→1 칼날 동형)
+
+- `federator.js`: `makeCodegraphAdapter` 에 `callees`(callers 정확 analog) + `attachCallersImpact` 부착(`withCallees` 게이트 / callers 대칭) + symbolsInFile(strict_path) 심볼 동형 부착 + `federate` opts `withCallees` + `stats.callees_resolved`(해소율 component).
+- `context-cache.schema.json`: `code_refs.symbols.items.callees`(`$defs/symbolRef` 배열 / callers 와 byte-동형) + `stats.callees_resolved`(integer) **additive**.
+- `cli.js`: `--no-callers` 가 callers+callees 1-hop neighbor 쌍 동반 off (별도 `--no-callees` 미신설 — 쌍 토글로 수렴).
+- **2번째 산출물 `code-graph.json`**(self-coverage / `top_impact_roots` / `edges_by_type`) = **carry** (DEC §5 STEP 5 의 2번째 산출물 / secondary 산출물 cut 선례 동형 / 1 메커니즘 수렴).
+
+### 13.3 trust 가드 — check38 (release-readiness 37→38 / federator 첫 trust 가드)
+
+실측: 기존 check34~37 은 `codegraph-coverage` 만 가드 / **federator 는 release-readiness 가드 부재**(grep 0). STEP 5 = federator 의 첫 trust 가드(`context_cache_reference_lens_trust`) 신설 = 실재 gap 폐색. check34~37 4-part isomorphic: ① gate 모듈(gate-eval/findings-aggregator)에 federator/federate/callees 토큰 0 + `REQUIRED_VALIDATORS_PER_STAGE` 미등록 ② schema `meta.trust_note` required + symbol/code_refs 어디에도 severity 필드 부재(finding 채널 아님 구조 차단 / 실 Ajv: severity 주입 INVALID) ③ federator reference-lens 라벨 + gate 모듈 import 0 ④ federator 가 gating 목록·REQUIRED_VALIDATORS 밖(non-gating 불변). context-cache 는 기존부터 reference-lens / non-gating — callees 도 같은 채널.
+
+### 13.4 §8.1 정직 — 2 distinct 도메인 실 dogfood (no-simulation / 실 codegraph 0.9.6)
+
+본 환경에 외부 `_dogfood-*` 레포는 부재했으나, `examples/` 내 committed PoC 로 실 dogfood 수행 (no-simulation / persona ❌ / 실 `codegraph index` + `callees`):
+
+- **poc-05-sample-user-register (modern TS) — full federate e2e**: `codegraph index target/`(4 files·33 nodes) → `context-federator artifact-graph.json --codegraph-project target` → `packs=4 symbols_resolved=41 callees_resolved=29 anchors_unresolved=0`. **Ajv schema VALID**(callees 필드 포함) + 무회귀(`--no-callers` → callees_resolved=0 / symbols 41·callers·impact 보존). method-level callees 정확: `register` → assertAvailable/add/User · `login` → findByEmail/User (실 협력자).
+- **poc-08-realworld-mybatis (Java Spring+MyBatis3 / jpetstore) — 메커니즘 corroboration**: `codegraph index source/`(62 files·996 nodes) → `codegraph callees insertOrder --json` → `OrderMapper.xml`(MyBatis SQL 매퍼) + Order/setOrderId/getNextId/getLineItems 실 협력자 체인. federator 가 호출하는 `callees` CLI 가 2nd distinct stack(Java)에서도 동작 입증.
+- **정직 경계 (STEP 4 §12.6 동형)**: full pack e2e = **poc-05 단일 도메인** / 2nd 도메인(poc-08) = `callees` CLI **mechanism corroboration only**(poc-08 = artifact-graph 미보유 → full pack 불가). data-corroboration "2 도메인 모두 non-empty pack" 주장 ❌. 2nd 도메인 full e2e pack = **carry**(committed artifact-graph = poc-05 modern / poc-16 legacy·code_pointers=0 한정 → poc-08/poc-03 artifact-graph 생성 선행 필요). `.codegraph` 인덱스는 gitignore(DEC-2026-06-02) — 레포 무오염.
+
+### 13.5 검증 / carry
+
+- 검증(no-sim/실 CLI): context-federator test **32/32**(실 codegraph smoke 포함) + release-readiness **37→38**(self-test **22/22** / check38 discrimination) + version 3-way 12.13.0. 실 Ajv: context-cache callees valid + severity 주입 INVALID(가드 회귀).
+- carry(STEP 5+): `code-graph.json` self-coverage/`edges_by_type`(2번째 산출물) · **2nd 도메인 full e2e pack**(poc-08/poc-03 artifact-graph 생성 후 non-empty pack 실측) · (α)함수앵커 제안(federator `symbolsInFile` 소관) · STEP 6(Modern-scoped reading-aid + openapi HIGH 잔여 / 다음 슬라이스).
