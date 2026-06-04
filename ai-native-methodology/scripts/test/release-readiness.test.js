@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 37/38 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 37/38 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 38/39 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 38/39 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 38);
-		assert.equal(out.criteria_passed, 37);
+		assert.equal(out.criteria_total, 39);
+		assert.equal(out.criteria_passed, 38);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 38 criterion ids are present in output (no skipped)', () => {
+	it('all 39 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -80,6 +80,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'codegraph_coverage_reference_lens_trust',
 			'codegraph_finding_reference_lens_trust',
 			'codegraph_module_reference_lens_trust',
+			'codegraph_openapi_reference_lens_trust',
 			'context_cache_reference_lens_trust',
 			'db_assets_validator',
 			'e2e_cycle_pass',
@@ -301,11 +302,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 38 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 39 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 38);
+		assert.equal(out.criteria_total, 39);
 	});
 
 	// v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -571,6 +572,54 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
+	// v12.14.0 check39 discrimination — openapi 정적 검증 reference-lens trust (STEP 6 / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 6).
+	//   verb-diff + controller-anchor(STEP4 역방향 재사용) + auth-grounding. 구조 증명 = verb_diff/controller_anchor informational_notes severity 필드 부재.
+	it('codegraph_openapi_reference_lens_trust — gate 모듈 STEP 6 토큰 0 + REQUIRED_VALIDATORS 미등록 + verb_diff/controller_anchor informational_notes severity 부재 + openapi-coverage ceiling/gate·federator-import 0', () => {
+		const r = runScript(['--target', 'v12.14.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find(
+			(x) => x.id === 'codegraph_openapi_reference_lens_trust',
+		);
+		assert.ok(
+			c.pass,
+			`check39 must pass (openapi-coverage reference-lens) — detail: ${c.detail}`,
+		);
+		assert.match(c.detail, /reference-lens/);
+		assert.ok(
+			c.delegated_to.includes('openapi-coverage.js'),
+			'content-aware (openapi-coverage.js ceiling + gate/federator-import 0 / file-presence ❌)',
+		);
+		// discrimination — codegraph 사각(informational_notes) 구조적 절단 미러 (release-readiness.js check39 ② 동형 / informational_notes 가 severity 를 절대 못 가짐).
+		const oaSchema = JSON.parse(
+			readFileSync(
+				resolve(ROOT, 'schemas/code-openapi-coverage.schema.json'),
+				'utf-8',
+			),
+		);
+		for (const ax of ['verb_diff', 'controller_anchor']) {
+			const info =
+				oaSchema.properties.openapi_coverage.properties[ax].properties
+					.informational_notes.items;
+			assert.equal(
+				info.additionalProperties,
+				false,
+				`${ax}.informational_notes.items additionalProperties:false (codegraph 사각 임의필드 차단)`,
+			);
+			assert.equal(
+				'severity' in (info.properties || {}),
+				false,
+				`${ax}.informational_notes.items severity 구조적 부재 → finding 채널 진입 불가`,
+			);
+		}
+		const sevEnum =
+			oaSchema.properties.findings.items.properties.severity.enum;
+		assert.deepEqual(
+			[...sevEnum].sort(),
+			['low', 'medium'],
+			'findings.severity enum ⊆ {low,medium} (gate leak 차단)',
+		);
+	});
+
 	it('missing --target → exit 2 (usage error)', () => {
 		const r = runScript([]);
 		assert.equal(r.status, 2);
@@ -587,8 +636,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 38);
-		assert.equal(out.criteria_passed, 38);
+		assert.equal(out.criteria_total, 39);
+		assert.equal(out.criteria_passed, 39);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});

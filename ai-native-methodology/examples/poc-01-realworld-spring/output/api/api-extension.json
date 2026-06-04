@@ -218,7 +218,7 @@
       "method": "POST",
       "path": "/articles",
       "related_use_case_id": "UC-CONTENT-ARTICLE-CREATE",
-      "related_rules": ["BR-ARTICLE-AUTHOR-001", ""BR-DOMAIN-AUDITING-001""],
+      "related_rules": ["BR-ARTICLE-AUTHOR-001", "BR-DOMAIN-AUDITING-001"],
       "affects_aggregates": ["Article"],
       "auth_required": true,
       "extracted_from": {
@@ -285,7 +285,7 @@
       "method": "PUT",
       "path": "/articles/{slug}",
       "related_use_case_id": "UC-CONTENT-ARTICLE-UPDATE",
-      "related_rules": ["BR-ARTICLE-AUTHOR-001", ""BR-DOMAIN-AUDITING-001""],
+      "related_rules": ["BR-ARTICLE-AUTHOR-001", "BR-DOMAIN-AUDITING-001"],
       "affects_aggregates": ["Article"],
       "auth_required": true,
       "extracted_from": {
@@ -393,7 +393,7 @@
       "method": "POST",
       "path": "/articles/{slug}/comments",
       "related_use_case_id": "UC-CONTENT-COMMENT-CREATE",
-      "related_rules": [""BR-DOMAIN-AUDITING-001""],
+      "related_rules": ["BR-DOMAIN-AUDITING-001"],
       "affects_aggregates": ["Article"],
       "auth_required": true,
       "extracted_from": {

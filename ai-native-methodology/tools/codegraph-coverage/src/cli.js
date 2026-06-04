@@ -38,6 +38,12 @@ import {
 	renderAnchorVerifyMarkdown,
 	SYMBOL_KINDS,
 } from './anchor-verify.js';
+import {
+	extractOpenapiOps,
+	buildOpenapiCoverage,
+	toOpenapiFindings,
+	renderOpenapiCoverageMarkdown,
+} from './openapi-coverage.js';
 
 const DELIVERABLE_FILES = {
 	'acceptance-criteria': 'acceptance-criteria.json',
@@ -54,6 +60,7 @@ function usage(code = 3) {
 			'       codegraph-coverage --db <codegraph.db> --deliverables <dir> [--inventory <path>] [--out <file>] [--json]',
 			'       codegraph-coverage --target <projectDir> --emit-findings [--out-findings <file>] [--json]    # STEP 2 finding 채널',
 			'       codegraph-coverage --target <projectDir> --verify-anchors [--out-verify <file>] [--json]    # STEP 4 ast_symbol 역방향 검증',
+			'       codegraph-coverage --target <projectDir> --openapi-coverage [--openapi <yaml>] [--api-extension <json>] [--out-openapi <file>] [--json]    # STEP 6 openapi 정적 검증',
 			'',
 			'exit: 0=ok / 2=invariant / 3=codegraph DB 부재·usage',
 		].join('\n'),
@@ -76,6 +83,10 @@ function parseArgs(argv) {
 		else if (a === '--out-findings') out.outFindings = rest[++i];
 		else if (a === '--verify-anchors') out.verifyAnchors = true;
 		else if (a === '--out-verify') out.outVerify = rest[++i];
+		else if (a === '--openapi-coverage') out.openapiCoverage = true;
+		else if (a === '--openapi') out.openapi = rest[++i];
+		else if (a === '--api-extension') out.apiExtension = rest[++i];
+		else if (a === '--out-openapi') out.outOpenapi = rest[++i];
 		else if (a === '--axes')
 			out.axes = String(rest[++i] || '')
 				.split(',')
@@ -203,6 +214,98 @@ function main() {
 			process.stdout.write(JSON.stringify(verifyReport, null, 2) + '\n');
 		else process.stdout.write(renderAnchorVerifyMarkdown(verifyReport) + '\n');
 		process.exit(0); // 비차단 — stale-anchor 있어도 gate block ❌.
+	}
+
+	// v12.14.0 STEP 6 — openapi 정적 검증 (--openapi-coverage): codegraph route ∖ openapi.yaml(verb-diff) +
+	//   openapi-extension controller_method ∖ codegraph 심볼(controller-anchor / STEP4 역방향 set-diff 재사용) + auth-grounding reading-aid.
+	//   coverage(STEP1/3)와 분리된 self-contained 모드 (early-exit / 비차단 exit 0). route 0 = verb-diff unverified note.
+	if (args.openapiCoverage) {
+		// api-extension.json 해소 (--api-extension > delivDir 관용 위치).
+		const apiExtCandidates = [
+			args.apiExtension ? resolve(args.apiExtension) : null,
+			join(delivDir, 'api-extension.json'),
+			join(delivDir, 'api', 'api-extension.json'),
+			join(delivDir, 'openapi-extension.json'),
+		].filter(Boolean);
+		const apiExtPath = apiExtCandidates.find((p) => existsSync(p)) || null;
+		const apiExt = apiExtPath ? readJson(apiExtPath) : null;
+		const extOperations = Array.isArray(apiExt?.operations)
+			? apiExt.operations
+			: [];
+
+		// openapi.yaml 해소 (--openapi > api-extension.openapi_file > delivDir 관용 위치).
+		const openapiCandidates = [
+			args.openapi ? resolve(args.openapi) : null,
+			apiExt?.openapi_file && apiExtPath
+				? resolve(dirname(apiExtPath), apiExt.openapi_file)
+				: null,
+			join(delivDir, 'api', 'openapi.yaml'),
+			join(delivDir, 'api', 'openapi.yml'),
+			join(delivDir, 'openapi.yaml'),
+			join(delivDir, 'openapi.yml'),
+		].filter(Boolean);
+		const openapiPath = openapiCandidates.find((p) => existsSync(p)) || null;
+		const yamlText = openapiPath ? readFileSync(openapiPath, 'utf-8') : '';
+		const { basePath, ops: openapiOps } = extractOpenapiOps(yamlText);
+
+		// codegraph 심볼 (controller-anchor 검증).
+		const symEnum = enumerateNodes(dbPath, SYMBOL_KINDS);
+		const symbolNodesByKind = symEnum.available ? symEnum.byKind : {};
+
+		const oacov = buildOpenapiCoverage({
+			routeNodes: enumResult.byKind.route || [],
+			openapiOps,
+			basePath,
+			extOperations,
+			symbolNodesByKind,
+			indexedFiles: distinctFiles(dbPath),
+			freshness: fresh,
+		});
+		const dbPathFwd = dbPath.replace(/\\/g, '/');
+		const oaFindings = toOpenapiFindings(oacov, dbPathFwd);
+		const refSources = [];
+		if (openapiPath) refSources.push('openapi.yaml');
+		if (apiExtPath) refSources.push('api-extension.json');
+		const oaReport = {
+			meta: {
+				schema: 'code-openapi-coverage.schema.json',
+				generated_by: 'codegraph-coverage --openapi-coverage',
+				do_not_edit_manually: true,
+				reference_lens: true,
+				trust_note:
+					'reference-lens / NOT gate-injected. verb-diff hole / stale controller-anchor = 비차단(severity low|medium). 결정적 gate inject ❌. informational(codegraph 사각=동적라우팅·미인덱스 controller)=결함 아님/severity 부재. auth-grounding=reading-aid(@PreAuthorize 내용 검증 ❌). 최종 evidence = 실코드·실 openapi.yaml.',
+				generated_at: new Date().toISOString(),
+				severity_ceiling: [...SEVERITY_CEILING],
+			},
+			target: resolve(args.target || dirname(dirname(dbPath))).replace(
+				/\\/g,
+				'/',
+			),
+			ref_sources: refSources,
+			stack: {
+				language: detect.language,
+				backend_known: detect.backend_known,
+				orm: detect.orm,
+				signals: detect.signals,
+			},
+			codegraph: { available: true, db_path: dbPathFwd, freshness: fresh },
+			openapi_coverage: {
+				openapi_file: openapiPath ? openapiPath.replace(/\\/g, '/') : null,
+				...oacov,
+			},
+			findings: oaFindings,
+		};
+		if (args.outOpenapi)
+			writeFileSync(
+				resolve(args.outOpenapi),
+				JSON.stringify(oaReport, null, 2) + '\n',
+			);
+		if (args.out)
+			writeFileSync(resolve(args.out), JSON.stringify(oaReport, null, 2) + '\n');
+		if (args.json)
+			process.stdout.write(JSON.stringify(oaReport, null, 2) + '\n');
+		else process.stdout.write(renderOpenapiCoverageMarkdown(oaReport) + '\n');
+		process.exit(0); // 비차단 — verb-diff hole / stale anchor 있어도 gate block ❌.
 	}
 
 	// v12.11.0 STEP 3 — module axis 입력: architecture.json(modules[]+dependencies[]) + cross-file edge 전수 열거.

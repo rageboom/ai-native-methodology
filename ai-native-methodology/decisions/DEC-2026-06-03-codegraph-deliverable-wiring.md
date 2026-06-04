@@ -116,11 +116,12 @@
 ## 7. 이번 세션 처분 / 다음 세션 진입점
 
 - **이번 세션 = 문서화만** (release ❌ / 구현 ❌ / 코드·스키마 무변경). 본 DEC + INDEX entry + memory 박제.
-- **다음 세션 진입점**(2026-06-04 갱신): **STEP 6 (Modern-scoped reading-aid: sql-inventory·formal-spec›sequence·migration-cautions·task-plan·plan-org·input-adapters + openapi HIGH 잔여 / §5 로드맵)** 부터 4원칙(plan-codegraph-step6 신규 작성 → 3-agent research → 사용자 승인 → 착수). **STEP 1~5 = v12.9.0~v12.13.0 시행 완료(§9~§13)**. dogfood = examples committed PoC 활용(외부 `_dogfood-*` 불요 / `.codegraph` gitignore / memory `feedback_codegraph_step_dogfood_examples`). 단, 다음 의제 = 사용자 결단(하드코딩 ❌ / STATUS.md frontier).
+- **로드맵 완주**(2026-06-04 갱신): **STEP 1~6 = v12.9.0~v12.14.0 전수 시행 완료(§9~§14)**. §5 로드맵 6 STEP 모두 release — codegraph "필수 인덱싱이나 산출물 미배선" gap 폐색. STEP 6(openapi 정적 검증)에서 gate #3 = "6-B openapi 단일축 + full(verb-diff + controller-anchor + auth-grounding)" 결단. dogfood = examples committed PoC 활용(외부 `_dogfood-*` 불요 / `.codegraph` gitignore / memory `feedback_codegraph_step_dogfood_examples`).
+- **본 DEC 잔여 = 무행동/carry 항목만**(§5 표 + §14.6 carry): call-chain/fan-in **skill-가이드**(federator callees/callers/impact 를 산출물 작성 시 reading-aid 참조 / 도구 신설 ❌) · openapi controller-anchor interface-vs-impl resolve 개선 · iBATIS2/NestJS/FE openapi(코퍼스 확보 후). 다음 의제 = 사용자 결단(하드코딩 ❌ / STATUS.md frontier).
 
 ## 8. carry
 
-- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 (§9)** / ~~C-codegraph-wiring-step2~~ **STEP 2 = v12.10.0 (§10)** / ~~C-codegraph-wiring-step3~~ **STEP 3 = v12.11.0 시행 완료 (§11 / "대치"→corroboration lens 개명 / (a) module dependency coverage-hole 1축 / SCC·layer·inventory = carry STEP4)** / C-codegraph-wiring-step4 ~ step6 (위 로드맵 잔여)
+- ~~C-codegraph-wiring-step1~~ **STEP 1 = v12.9.0 (§9)** / ~~step2~~ **STEP 2 = v12.10.0 (§10)** / ~~step3~~ **STEP 3 = v12.11.0 (§11)** / ~~step4~~ **STEP 4 = v12.12.0 (§12)** / ~~step5~~ **STEP 5 = v12.13.0 (§13)** / ~~step6~~ **STEP 6 = v12.14.0 (§14 / openapi 정적 검증 1축 / 로드맵 완주)** → **6 STEP 전수 완료**. 잔여 = 무행동/carry 항목만(call-chain skill-가이드 / interface-vs-impl resolve / iBATIS2·NestJS·FE 코퍼스).
 - iBATIS2·FE/TS·NestJS BE codegraph 실측 공백 (Modern 한정 정직 표기)
 - coverage-hole false-positive 회피(런타임 와이어링·동적 라우팅 = "검출불가" 스택-게이트)
 - Strangler caller 맵 = STEP 6 migration api_surface 흡수(독립 신규 아님 / 초안 하향)
@@ -309,3 +310,45 @@ context-federator 의 `attachCallersImpact` 는 심볼에 `callers`(상류 1-hop
 
 - 검증(no-sim/실 CLI): context-federator test **32/32**(실 codegraph smoke 포함) + release-readiness **37→38**(self-test **22/22** / check38 discrimination) + version 3-way 12.13.0. 실 Ajv: context-cache callees valid + severity 주입 INVALID(가드 회귀).
 - carry(STEP 5+): `code-graph.json` self-coverage/`edges_by_type`(2번째 산출물) · **2nd 도메인 full e2e pack**(poc-08/poc-03 artifact-graph 생성 후 non-empty pack 실측) · (α)함수앵커 제안(federator `symbolsInFile` 소관) · STEP 6(Modern-scoped reading-aid + openapi HIGH 잔여 / 다음 슬라이스).
+
+---
+
+## 14. STEP 6 시행 완료 (v12.14.0 MINOR / 2026-06-04 / 로드맵 6번째·마지막 슬라이스 — **로드맵 완주**)
+
+**§5 STEP 6 (Modern-scoped reading-aid) 시행.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step6.md` (#1 깊은 숙지 + #2 8-agent workflow `wf_4f1e38ad-a6d`(investigation 4 + 3-agent research(공식문서 F-015/업계/Senior 적대) + synthesis) + plan 단계 main-loop 실 DB probe → 사용자 gate #3 "6-B openapi 단일축 + full 범위" 결단). 본 DEC = SSOT.
+
+### 14.1 칼날 — 9 injection-point → openapi 1축 (STEP1 11→2·2 5→2·3 4→1·4 6→1·5 2→1 동형)
+
+초안 6 산출물 + openapi 중 본체 격상 = **openapi 정적 검증 1축**. cut 사유:
+- **call-chain/fan-in 4축**(sql-inventory caller-chain·formal-spec sequence·task-plan integration·migration api_surface fan-in) = **STEP 5 federator callees/callers/impact 와 byte-동형 jurisdiction 중복**(STEP4 §12.6 (α) federator-소관 cut 직접 선례 동형) → 신규 도구 ❌, skill-가이드 carry.
+- **sql-inventory** = 주 corroboration(PoC#06/#07 iBATIS2)=codegraph sqlMap 0 + 유일 Modern dogfood(poc-05 TS calls=4)=near-vacuous = 2-도메인 불가.
+- **formal-spec sequence** = federator callees 중복 + AppMap 선례(정적 call-graph=정확 ordered sequence 불충분) + 1/5 하위.
+- **plan-org EPIC/STORY** = 순수 semantic(FE screen/cross-cut) codegraph 0 / **input-adapters** = R✗ 비코드 + greenfield N/A + name-match false-positive / **migration DB본체** = codegraph 0(edge .java interface 종료 = XML/SQL/table 미도달 실증).
+
+### 14.2 ★ synthesis "openapi unverified" 정정 (main-loop self-기록 사실 검증 / feedback_self_recorded_fact_validation)
+
+8-agent workflow synthesis 가 "data-2domain corroborated 축 없음 / openapi unverified(코퍼스 route 0)" 로 결론지었으나 = **인덱싱된 코퍼스(poc-05 TS·poc-08 jpetstore=Stripes ActionBean / 둘 다 route 0)만 본 corpus artifact**. plan 단계 main-loop 가 committed examples 의 Spring MVC PoC 직접 인덱싱(no-sim 실 codegraph 0.9.6)으로 정정 — **poc-01(raeperd SB2.x / route 22 / openapi.yaml) + poc-02(zhc1 Java21·SB3 / route 19 / openapi.yaml) = openapi 축 외부 자산 없이 2-distinct-domain data-corroborated**. self-기록 narrative(synthesis 결론)도 사실 검증 의무 — "현재 인덱싱된 코퍼스"가 아니라 "committed examples 전수"로 판정. (STEP 1 §9.2·STEP 2 §10.1 핸드오프 사실 반증 선례 동형.)
+
+### 14.3 시행 범위 — `--openapi-coverage` 3 sub-mechanism
+
+신규 `tools/codegraph-coverage/src/openapi-coverage.js`(순수 / 무의존성 openapi.yaml path 라인 추출) + `code-openapi-coverage.schema.json` + cli `--openapi-coverage` 모드:
+- **(a) verb-diff** — codegraph route {verb,path} 전수 ∖ openapi.yaml operations (양방향). route-path coverage 는 STEP 1 소관 → **verb-단위 직접 diff**(STEP1 §9.6 carry "openapi.yaml verb-단위 직접 diff" 충족). **basePath 정규화**(servers url path / poc-02 `/api/` prefix 흡수). 코드有계약無=medium / 계약有코드無=low(codegraph 동적라우팅 사각 caveat). **degenerate path**(codegraph 가 class @RequestMapping + method path 합성 실패 = root/빈 path) = informational 격리(false-positive 회피 / poc-02 login `POST /` 실관찰).
+- **(b) controller-anchor** — openapi-extension `operations[].extracted_from.controller_method` ∖ codegraph 심볼 = stale. **STEP 4 `buildAnchorVerify` 역방향 set-diff 그대로 재사용**(anchor=controller_method / artifact=`openapi:opId` / live·stale·informational 3-state).
+- **(c) auth-grounding** — auth 보유 op(permission_expression/auth_required/required_roles)의 controller-anchor live 여부 reading-aid. **정직 경계**: codegraph 는 @PreAuthorize *내용* 검증 ❌(심볼 인덱스만) → finding 미산출.
+
+### 14.4 trust 가드 check39 (RR 38→39 / check34~38 4-part isomorphic + Senior 보강)
+
+`codegraph_openapi_reference_lens_trust` — ① gate 모듈 STEP 6 토큰 0 + REQUIRED_VALIDATORS_PER_STAGE 미등록 ② schema verb_diff/controller_anchor `informational_notes` severity 필드 부재 + additionalProperties:false(codegraph 사각 finding 채널 구조 차단) + findings.severity ⊆ {low,medium} ③ openapi-coverage.js 상위 차단등급 리터럴 0 + 'not a defect/부재' 마커 + reference-lens 라벨 ④ gate 모듈 import 0 + **context-federator 간접 import 0**(Senior 보강 — federator 경유 간접 gate-leak 미탐 방지 / research §4 should-fix). severity ceiling low|medium(SEVERITY_CEILING/pinSeverity 재사용 / verb code有계약無·controller stale=medium / verb 계약有코드無=low).
+
+### 14.5 §8.1 정직 경계 — 2 distinct 도메인 no-sim dogfood (committed examples / 외부 자산 불요)
+
+- **verb-diff = data-2domain corroborated** — poc-01 **19/19 perfect-match**(true-negative / clean coverage) + poc-02 honest(degenerate `POST /`→informational + login→spec_not_in_code low / basePath `/api` 정규화). committed examples 활용(memory `feedback_codegraph_step_dogfood_examples`).
+- **controller-anchor = data-2domain 3-state** — poc-02 **live arm 19/19** + poc-01 **informational arm 19/19**(api-extension 가 interface `XxxApi`/`UserApi` 기록 / codegraph 는 impl `XxxRestController` 인덱싱 + interface file 미인덱스 → 검증 불가 정직 격리 = 부재≠stale = informational 정확 동작) + **stale arm = unit-test real-symbol probe**(in-the-wild stale 미관찰 = STEP4 §12.6 mechanism-corroboration 동형 정직 / fake-corroboration ❌). auth-grounding = poc-02 12 auth ops live.
+- 정직 carry: iBATIS2 x-sql-ids(poc-16 x-controller-method anchor 보유하나 source 미인덱스·iBATIS2=0)·NestJS(poc-03)·FE = codegraph 사각.
+- (부수) poc-01 api-extension.json malformation 3곳(`""BR-DOMAIN-AUDITING-001""` 더블따옴표) 정정 = 실 JSON defect 수정 + 2nd 도메인 확보(feedback_strict_exposes_drift).
+
+### 14.6 검증 / carry — 로드맵 완주
+
+- 검증(no-sim/실 CLI): codegraph-coverage test 79→**110**(+31 openapi-coverage) + workspace **1229/1229** + release-readiness **38→39**(self-test 22→**23** / check39 discrimination) + version 3-way 12.14.0 + build dist v12.14.0(4701 files). 실 Ajv: poc-01/02 리포트 VALID + finding severity:high 주입 INVALID + informational_notes severity 주입 INVALID.
+- **§5 로드맵 6 STEP 전수 완료**(STEP 1~6 = v12.9.0~v12.14.0 / 36 산출물 4-렌즈 배정 → ROI·저위험 순 순차 적용 완주). codegraph = "필수 인덱싱 도구이나 산출물 미배선" gap 폐색.
+- carry(STEP 6 이후): call-chain/fan-in skill-가이드(federator callees/callers/impact 를 sql-inventory·sequence·task-plan 작성 시 reading-aid 참조 / 도구 신설 ❌) · openapi controller-anchor 의 interface-vs-impl 매칭 개선(api-extension 가 interface 기록 시 impl 심볼로 resolve) · iBATIS2 x-controller-method(poc-16 source 인덱싱 후) · NestJS/FE openapi · in-the-wild controller stale(실 drift 관찰 시). STEP1~5 carry 유지.

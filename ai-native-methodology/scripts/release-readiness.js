@@ -2763,6 +2763,159 @@ function check38_contextCacheReferenceLensTrust() {
 	}
 }
 
+// check39 (v12.14.0 / openapi 정적 검증 STEP 6 reference-lens trust / DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 6) —
+//   openapi-coverage: codegraph route ∖ openapi.yaml(verb-diff) + openapi-extension controller_method ∖ codegraph 심볼(controller-anchor / STEP4 역방향 재사용) + auth-grounding reading-aid.
+//   결정적 gate(schema/drift/decision-table/spectral/gate-eval/coverage) 절대 소비 ❌ (check34/35/36/37 4-part isomorphic).
+//   ④ Senior 보강 — gate 모듈 직접 import 0 뿐 아니라 context-federator 간접 경로 import 0 (federator 경유 간접 gate-leak 미탐 방지).
+function check39_codegraphOpenapiReferenceLensTrust() {
+	try {
+		const STEP6_TOKENS = [
+			'buildOpenapiCoverage',
+			'openapi-coverage',
+			'buildVerbDiff',
+			'buildControllerAnchor',
+			'code-openapi-coverage',
+			'F-CGAPI',
+			'toOpenapiFindings',
+			'extractOpenapiOps',
+			'openapiCoverage',
+		];
+		const gateModules = [
+			'tools/chain-driver/src/gate-eval.js',
+			'tools/findings-aggregator/src/aggregator.js',
+			'tools/findings-aggregator/src/cli.js',
+		];
+		const problems = [];
+		for (const rel of gateModules) {
+			const fp = join(ROOT, rel);
+			if (!existsSync(fp)) {
+				problems.push(`${rel} 부재`);
+				continue;
+			}
+			const txt = readFileSync(fp, 'utf-8');
+			const hit = STEP6_TOKENS.filter((t) => txt.includes(t));
+			if (hit.length)
+				problems.push(
+					`${rel} 가 STEP 6 openapi-coverage 토큰 [${hit.join(',')}] 참조 — 결정적 gate 가 codegraph openapi 검증 소비 = trust 위반`,
+				);
+		}
+		// ① 추가 — gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 openapi-coverage 미등록 (verb-diff/anchor 리포트가 stage 필수 validator 격상 ❌).
+		const gePath = join(ROOT, 'tools/chain-driver/src/gate-eval.js');
+		if (existsSync(gePath)) {
+			const geSrc = readFileSync(gePath, 'utf-8');
+			const m = geSrc.match(
+				/const\s+REQUIRED_VALIDATORS_PER_STAGE\s*=\s*\{([^}]+)\}/,
+			);
+			if (m && /openapi[-_]?coverage/i.test(m[1])) {
+				problems.push(
+					'gate-eval REQUIRED_VALIDATORS_PER_STAGE 에 openapi-coverage 등록됨 — openapi 검증 리포트가 stage 필수 validator 격상 = reference-lens trust 위반',
+				);
+			}
+		}
+		// ② 구조 증명 — schema verb_diff/controller_anchor informational_notes severity 부재 + additionalProperties:false + findings.severity ⊆ {low,medium}.
+		const schemaPath = join(
+			ROOT,
+			'schemas/code-openapi-coverage.schema.json',
+		);
+		if (!existsSync(schemaPath)) {
+			problems.push(
+				'schemas/code-openapi-coverage.schema.json 부재 (STEP 6 신규 의무)',
+			);
+		} else {
+			try {
+				const schema = JSON.parse(readFileSync(schemaPath, 'utf-8'));
+				const oc = schema?.properties?.openapi_coverage?.properties ?? {};
+				for (const [ax, node] of [
+					['verb_diff', oc.verb_diff],
+					['controller_anchor', oc.controller_anchor],
+				]) {
+					const info = node?.properties?.informational_notes?.items ?? null;
+					if (!info) {
+						problems.push(
+							`code-openapi-coverage.schema.json openapi_coverage.${ax}.informational_notes.items 부재 (STEP 6 의무)`,
+						);
+						continue;
+					}
+					if (info.additionalProperties !== false)
+						problems.push(
+							`${ax}.informational_notes.items additionalProperties:false 아님 (codegraph 사각 임의필드 차단 의무)`,
+						);
+					if (info.properties && 'severity' in info.properties)
+						problems.push(
+							`${ax}.informational_notes.items 에 severity 필드 존재 — codegraph 사각이 severity 획득 = finding 채널 누출 위험 (Senior 위반)`,
+						);
+				}
+				const sevEnum =
+					schema?.properties?.findings?.items?.properties?.severity?.enum ??
+					null;
+				if (
+					!Array.isArray(sevEnum) ||
+					sevEnum.some((s) => s !== 'low' && s !== 'medium')
+				) {
+					problems.push(
+						'code-openapi-coverage.schema.json findings.severity enum ⊄ {low,medium} (상위 차단등급 구조 차단 의무)',
+					);
+				}
+			} catch (e) {
+				problems.push(`code-openapi-coverage schema parse 실패: ${e.message}`);
+			}
+		}
+		// ③ 양성 — openapi-coverage.js ceiling(상위 차단등급 리터럴 0) + 'not a defect/부재' 마커 + reference-lens 라벨.
+		const ocPath = join(
+			ROOT,
+			'tools/codegraph-coverage/src/openapi-coverage.js',
+		);
+		if (!existsSync(ocPath)) {
+			problems.push('codegraph-coverage/src/openapi-coverage.js 부재');
+		} else {
+			const oc = readFileSync(ocPath, 'utf-8');
+			if (/\b(high|critical)\b/.test(oc))
+				problems.push(
+					'openapi-coverage.js 에 상위 차단등급 리터럴 존재 — verb-diff/stale-anchor 은 low|medium 만 (gate leak 차단 불변식 위반)',
+				);
+			if (!/not a defect/i.test(oc) || !/부재/.test(oc))
+				problems.push(
+					"openapi-coverage.js informational 섹션에 'not a defect / 부재' 정직 마커 부재 (codegraph 사각=결함 아님 명시 의무)",
+				);
+			if (!/reference-lens/i.test(oc))
+				problems.push(
+					'openapi-coverage.js 에 reference-lens 라벨 부재 (양성 trust 라벨 의무)',
+				);
+			// ④ — openapi-coverage.js gate 모듈 직접 import 0 + Senior 보강: context-federator 간접 경로 import 0.
+			const importGateRe =
+				/^\s*import\b[^\n]*from\s*['"][^'"]*(?:gate-eval|findings-aggregator)/m;
+			if (importGateRe.test(oc))
+				problems.push(
+					'openapi-coverage.js 가 gate 모듈(gate-eval/findings-aggregator) import — openapi 검증이 gate 결정에 결합 = trust 위반',
+				);
+			const importFederatorRe =
+				/^\s*import\b[^\n]*from\s*['"][^'"]*context-federator/m;
+			if (importFederatorRe.test(oc))
+				problems.push(
+					'openapi-coverage.js 가 context-federator import — federator 경유 간접 gate-leak 경로 (Senior 보강 가드)',
+				);
+		}
+		return {
+			id: 'codegraph_openapi_reference_lens_trust',
+			pass: problems.length === 0,
+			detail:
+				problems.length === 0
+					? `codegraph openapi 정적 검증 (STEP 6) = reference-lens 강제 — gate-eval/findings-aggregator openapi-coverage 토큰 0 + REQUIRED_VALIDATORS_PER_STAGE 미등록 + schema verb_diff/controller_anchor informational_notes severity 필드 부재(codegraph 사각 finding 채널 구조 차단) + findings.severity ⊆ {low,medium} + openapi-coverage.js 상위등급 리터럴 0 + 'not a defect/부재' 마커 + gate 모듈 import 0 + context-federator 간접 import 0(Senior 보강) (결정적 gate inject ❌ / verb-diff·controller-anchor·auth-grounding / DEC-2026-06-03 §5 STEP 6 / check34·35·36·37 동형)`
+					: `codegraph openapi-coverage trust 위반: ${problems.join(' | ')}`,
+			delegated_to:
+				'gate modules (음성 0 + REQUIRED_VALIDATORS 미등록) + code-openapi-coverage.schema.json(verb_diff/controller_anchor informational_notes severity 부재) + codegraph-coverage/src/openapi-coverage.js(ceiling + gate/federator import 0 + not-a-defect 마커)',
+		};
+	} catch (e) {
+		return {
+			id: 'codegraph_openapi_reference_lens_trust',
+			pass: false,
+			detail: `error: ${e.message}`,
+			delegated_to:
+				'gate modules + code-openapi-coverage.schema.json + openapi-coverage.js',
+		};
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -2806,6 +2959,7 @@ function main() {
 		check36_codegraphModuleReferenceLensTrust(),
 		check37_codegraphAnchorVerifyReferenceLensTrust(),
 		check38_contextCacheReferenceLensTrust(),
+		check39_codegraphOpenapiReferenceLensTrust(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;

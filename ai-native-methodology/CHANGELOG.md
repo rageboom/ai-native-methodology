@@ -10,6 +10,38 @@
 
 ---
 
+## [12.14.0] — 2026-06-04 MINOR — codegraph wiring STEP 6 (openapi 정적 검증)
+
+**§5 STEP 6 (Modern-scoped reading-aid) 시행 — 로드맵 6번째(마지막) 슬라이스.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step6.md` (#1 깊은 숙지 + #2 3-agent research(공식문서/업계/Senior 적대) + 실 DB probe → 사용자 gate #3 "6-B openapi 단일축 + full 범위" 결단). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §14.
+
+### 칼날 — 6 산출물 + openapi → openapi 1축 수렴
+
+초안 9 injection-point(sql-inventory·formal-spec sequence·migration·task-plan·plan-org·input-adapters + openapi) 중 **call-chain/fan-in 4축 = STEP 5 federator callees/callers/impact 와 jurisdiction 중복**(STEP4 §12.6 (α) cut 동형) + Modern vacuous(poc-05 calls=4) / plan-org·input-adapters = semantic·greenfield N/A → cut. 유일 비중복 신규 niche = **openapi 정적 검증**(Specmatic/optic/schemathesis 전부 runtime Actuator·spec-only → 정적 "코드有 계약無"·controller-anchor·auth-grounding 을 running app 없이 못 봄). 칼날 궤적(STEP1 11→2·2 5→2·3 4→1·4 6→1·5 2→1) 정합.
+
+### 신규 메커니즘 — `tools/codegraph-coverage` `--openapi-coverage` (3 sub)
+
+- **(a) verb-diff** — codegraph route {verb,path} ∖ openapi.yaml operations (양방향 / basePath 정규화 / route-path coverage 는 STEP 1 소관 → verb-단위 직접 diff). 코드有계약無=medium / 계약有코드無=low. degenerate path(codegraph class+method 합성 실패) = informational 격리(false-positive 회피).
+- **(b) controller-anchor** — openapi-extension `extracted_from.controller_method` ∖ codegraph 심볼 = stale (STEP 4 `buildAnchorVerify` 역방향 set-diff 재사용 / live·stale·informational 3-state).
+- **(c) auth-grounding** — auth 보유 op 의 controller-anchor live 여부 reading-aid. 정직 경계: codegraph 는 @PreAuthorize *내용* 검증 ❌(심볼 인덱스만) → finding 미산출.
+- 신규 `openapi-coverage.js`(순수 / 무의존성 openapi.yaml path 추출) + `code-openapi-coverage.schema.json`(informational_notes severity-less 격리) + cli `--openapi-coverage` 모드.
+
+### trust 가드 check39 (RR 38→39 / check34~38 4-part isomorphic)
+
+`codegraph_openapi_reference_lens_trust` — ① gate 모듈 STEP 6 토큰 0 + REQUIRED_VALIDATORS 미등록 ② schema verb_diff/controller_anchor informational_notes severity 필드 부재(codegraph 사각 finding 채널 구조 차단) + findings.severity ⊆ {low,medium} ③ openapi-coverage.js 상위 차단등급 리터럴 0 + 'not a defect/부재' 마커 + reference-lens 라벨 ④ gate 모듈 import 0 + **context-federator 간접 import 0(Senior 보강 — federator 경유 간접 gate-leak 미탐 방지)**.
+
+### §8.1 정직 — 2 distinct 도메인 no-sim dogfood
+
+- **verb-diff = data-2domain corroborated** — poc-01(raeperd SB2.x / route 22 / openapi.yaml) 19/19 perfect-match(true-negative) + poc-02(zhc1 Java21·SB3 / route 19) honest(degenerate `POST /`→informational + login→spec_not_in_code / basePath `/api` 정규화). committed examples 활용(외부 자산 불요 / `feedback_codegraph_step_dogfood_examples`).
+- **controller-anchor = data-2domain 3-state** — poc-02 live arm 19/19 + poc-01 informational arm 19/19(api-extension 가 interface `XxxApi` 기록 / codegraph 는 impl `XxxRestController` 인덱싱 → 검증 불가 정직 격리 = 부재≠stale) + **stale arm = unit-test real-symbol probe**(in-the-wild stale 미관찰 = STEP4 §12.6 동형 정직). auth-grounding = poc-02 12 auth ops live.
+- **정직 carry**: iBATIS2 x-sql-ids·NestJS·FE = codegraph 사각. call-chain/fan-in·sql-inventory·formal-spec sequence·migration·plan-org·input-adapters = carry(jurisdiction 중복/semantic/vacuous).
+- (부수) poc-01 api-extension.json malformation 3곳(`""BR-DOMAIN-AUDITING-001""`) 정정 — 2nd 도메인 확보 + 실 JSON defect 수정.
+
+### 검증
+
+codegraph-coverage test 79→**110**(+31 openapi-coverage) + workspace **1229/1229** + release-readiness **38→39**(self-test 22→**23** / check39 discrimination) + version 3-way 12.14.0. 실 Ajv: poc-01/02 리포트 VALID + finding severity:high 주입 INVALID + informational_notes severity 주입 INVALID(gate-leak 구조 차단).
+
+---
+
 ## [12.13.1] — 2026-06-04 PATCH — Windows 설치 결함 수정 (scripts/ 누락 + SessionStart 훅 크로스플랫폼화)
 
 **증상**: Windows 신규 설치 시 `scripts/` 폴더 부재 → SessionStart 훅 실패. 사용자 보고.

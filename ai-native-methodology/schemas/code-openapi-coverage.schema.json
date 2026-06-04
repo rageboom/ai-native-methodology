@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/code-openapi-coverage.schema.json",
+  "title": "code-openapi-coverage.json — codegraph openapi 정적 검증 (code↔contract / reference-lens / NOT gate-injected)",
+  "description": "codegraph wiring STEP 6 (DEC-2026-06-03-codegraph-deliverable-wiring §5 STEP 6). codegraph 의 유일 비중복 신규 niche = 정적 openapi 검증 (Specmatic/optic/schemathesis 는 runtime Actuator /mappings 또는 spec-only → 정적 '코드有 계약無'·controller-anchor·auth-grounding 을 running app 없이 못 봄). 3 sub: (a) verb-diff = codegraph route ∖ openapi.yaml operations (route-path coverage 자체는 STEP 1 소관 / 여기선 verb-단위 직접 diff) (b) controller-anchor = openapi-extension extracted_from.controller_method ∖ codegraph 심볼 = stale (STEP 4 역방향 set-diff 재사용) (c) auth-grounding = auth 보유 op 의 controller-anchor live 여부 reading-aid(codegraph 는 @PreAuthorize 내용 검증 ❌). trust: reference-lens / 비차단(severity low|medium ceiling) / 결정적 gate inject ❌. informational_notes(codegraph 사각=동적라우팅·미인덱스 controller)는 severity 필드 구조적 부재 → finding 채널 진입 불가.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "target", "stack", "codegraph", "openapi_coverage", "findings"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "do_not_edit_manually", "reference_lens", "trust_note", "severity_ceiling"],
+      "properties": {
+        "schema": { "const": "code-openapi-coverage.schema.json" },
+        "generated_by": { "const": "codegraph-coverage --openapi-coverage" },
+        "do_not_edit_manually": { "const": true },
+        "reference_lens": { "const": true },
+        "trust_note": { "type": "string" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "severity_ceiling": {
+          "type": "array",
+          "items": { "enum": ["low", "medium"] },
+          "description": "verb-diff hole / stale controller-anchor 은 low|medium 만 (상위 차단등급 절대 ❌ / findings-aggregator gate leak 차단)."
+        }
+      }
+    },
+    "target": { "type": "string" },
+    "ref_sources": { "type": "array", "items": { "type": "string" } },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "backend_known"],
+      "properties": {
+        "language": { "type": "string" },
+        "backend_known": { "type": "boolean" },
+        "orm": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ibatis2": { "type": "boolean" },
+            "mybatis3": { "type": "boolean" },
+            "jpa": { "type": "boolean" },
+            "prisma": { "type": "boolean" }
+          }
+        },
+        "signals": { "type": "string" }
+      }
+    },
+    "codegraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["available", "db_path", "freshness"],
+      "properties": {
+        "available": { "type": "boolean" },
+        "db_path": { "type": "string" },
+        "reason": { "type": ["string", "null"] },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["available", "stale"],
+          "properties": {
+            "available": { "type": "boolean" },
+            "stale": { "type": "boolean" },
+            "reason": { "type": "string" },
+            "indexed_at": { "type": "string" },
+            "newest_source_mtime": { "type": ["string", "null"] },
+            "stale_count": { "type": "integer", "minimum": 0 },
+            "stale_sample": { "type": "array", "items": { "type": "string" } },
+            "capped": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "openapi_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_path", "verb_diff", "controller_anchor", "auth_grounding"],
+      "properties": {
+        "openapi_file": { "type": ["string", "null"] },
+        "base_path": { "type": "string" },
+        "verb_diff": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "codegraph route ∖ openapi.yaml operations (양방향). state=unverified = codegraph route 노드 0(Stripes/non-MVC / @*Mapping 미발화 / false-health 회피).",
+          "required": ["state", "total_code_routes", "total_spec_ops", "matched"],
+          "properties": {
+            "state": { "enum": ["verified", "unverified"] },
+            "reason": { "type": "string" },
+            "base_path": { "type": "string" },
+            "total_code_routes": { "type": "integer", "minimum": 0 },
+            "total_spec_ops": { "type": "integer", "minimum": 0 },
+            "matched": { "type": "integer", "minimum": 0 },
+            "code_not_in_spec": {
+              "type": "array",
+              "description": "codegraph 에 route 존재 + openapi.yaml 명세 부재 = 코드有 계약無 (clean / medium finding).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path"],
+                "properties": {
+                  "verb": { "type": ["string", "null"] },
+                  "path": { "type": "string" },
+                  "normalized_path": { "type": "string" },
+                  "file": { "type": "string" }
+                }
+              }
+            },
+            "spec_not_in_code": {
+              "type": "array",
+              "description": "openapi.yaml 에 operation 존재 + codegraph route 부재 = 계약有 코드無 (codegraph 동적라우팅 사각 가능 / low finding).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path"],
+                "properties": {
+                  "verb": { "type": ["string", "null"] },
+                  "path": { "type": "string" },
+                  "normalized_path": { "type": "string" },
+                  "operation_id": { "type": ["string", "null"] }
+                }
+              }
+            },
+            "informational_notes": {
+              "type": "array",
+              "description": "codegraph 사각(동적 라우팅·verb 미파싱). NOT a defect / 부재≠누락. severity 필드 구조적 부재(additionalProperties:false) — finding 채널 진입 절대 ❌ (check39 가드 / STEP 3·4 informational_notes 동형).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["path", "reason"],
+                "properties": {
+                  "verb": { "type": ["string", "null"] },
+                  "path": { "type": "string" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "controller_anchor": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "openapi-extension extracted_from.controller_method ∖ codegraph 심볼 = stale (STEP 4 buildAnchorVerify 역방향 set-diff 재사용 / anchor_verify 동형 shape). state=unverified = controller_method 부재(api-extension 미보유).",
+          "required": ["state", "total", "live", "stale", "informational"],
+          "properties": {
+            "state": { "enum": ["verified", "unverified"] },
+            "reason": { "type": "string" },
+            "indexed_kinds": { "type": "array", "items": { "type": "string" } },
+            "symbol_index_size": { "type": "integer", "minimum": 0 },
+            "total": { "type": "integer", "minimum": 0 },
+            "live": { "type": "integer", "minimum": 0 },
+            "stale": { "type": "integer", "minimum": 0 },
+            "informational": { "type": "integer", "minimum": 0 },
+            "freshness_caveat": { "type": "string" },
+            "live_anchors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["symbol", "artifact"],
+                "properties": {
+                  "symbol": { "type": "string" },
+                  "artifact": { "type": "string" },
+                  "file": { "type": ["string", "null"] }
+                }
+              }
+            },
+            "stale_anchors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["symbol", "artifact"],
+                "properties": {
+                  "symbol": { "type": "string" },
+                  "normalized": { "type": "string" },
+                  "artifact": { "type": "string" },
+                  "file": { "type": ["string", "null"] }
+                }
+              }
+            },
+            "informational_notes": {
+              "type": "array",
+              "description": "controller file 이 codegraph 미인덱스 = codegraph 사각(iBATIS2·동적 dispatch·미지원 언어·freshness stale·file 부재). NOT a defect / 부재≠stale. severity 필드 구조적 부재(additionalProperties:false) — finding 채널 진입 절대 ❌ (check39 가드).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["symbol", "artifact", "reason"],
+                "properties": {
+                  "symbol": { "type": "string" },
+                  "artifact": { "type": "string" },
+                  "file": { "type": ["string", "null"] },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "auth_grounding": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "reading-aid — auth 보유 op 의 controller-anchor live 여부만 corroborate (codegraph 는 @PreAuthorize 내용 검증 ❌). finding 미산출.",
+          "required": ["auth_bearing_ops", "note"],
+          "properties": {
+            "note": { "type": "string" },
+            "auth_bearing_ops": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["anchor_state"],
+                "properties": {
+                  "operation_id": { "type": ["string", "null"] },
+                  "controller_method": { "type": ["string", "null"] },
+                  "anchor_state": { "enum": ["live", "stale", "informational", "unknown"] },
+                  "auth": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "auth_required": { "type": "boolean" },
+                      "permission_expression": { "type": "string" },
+                      "required_roles": { "type": "array", "items": { "type": "string" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "axis", "severity", "message"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^F-CGAPI-[0-9]{3}$" },
+          "axis": { "enum": ["verb_diff", "controller_anchor"] },
+          "severity": { "enum": ["low", "medium"] },
+          "message": { "type": "string" },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "code_graph_ref": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "codegraph 코드 좌표 (route / controller_method). promote 시 finding-system code_graph_ref 로 이식.",
+            "required": ["kind"],
+            "properties": {
+              "kind": { "type": "string" },
+              "symbol": { "type": "string" },
+              "file": { "type": "string" },
+              "line": { "type": "integer", "minimum": 0 },
+              "node_id": { "type": "string" },
+              "db_path": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
