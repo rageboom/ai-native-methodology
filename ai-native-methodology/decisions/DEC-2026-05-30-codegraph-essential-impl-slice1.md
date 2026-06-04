@@ -38,6 +38,21 @@ code-graph.json = **reference-lens / finding 으로만 수용 / 어떤 결정적
 - MCP `serve` 통합
 - → Senior REVISE @ 40% (UX wrapper) 영역 / §8.1 corroboration 후 별도 진입.
 
+### 3.1 Slice 2 최종 처분 (2026-06-04 / 사용자 gate #3 = Option D / wf_2900f3fd + wf_b72d729d 실측 추적)
+
+Slice 2 4 컴포넌트 전수 추적 결과 — **①② = DONE(별도 이름으로 흡수) / ③ = subsumed(재구현 불필요) / ④ = scope-near-defer.** "Slice 2 통째 미시행"은 사실 아님(절반 실현). 사용자 directive "slice2 실행"의 정직한 귀결 = ③ close + ④ defer(코드 변경 0 / 박제만).
+
+| # | 컴포넌트 | 처분 | 근거 (코드+DEC 실측) |
+| --- | --- | --- | --- |
+| ① | navigate 증강 (callers/impact/callees → 영향 트리) | **DONE** | context-federator `federator.js:264 attachCallersImpact` (DEC-2026-06-02 / 커밋 cc7d4921) + callees = wiring **STEP 5** (v12.13.0 / DEC-2026-06-03 §13). context-cache.json 결합. |
+| ② | code-pointer staleness 검증 (ast_symbol 앵커 실재) | **DONE** | wiring **STEP 4** (v12.12.0 / 커밋 1261b9ea / `tools/codegraph-coverage/src/anchor-verify.js` 역방향 set-diff). ⚠ 전 dogfood 도메인 ast_symbol 앵커=0 → mechanism 검증 / in-the-wild stale 미관찰(unverified). (≠ DEC-2026-06-01-slice2-codepointer-enrich = 이름만 충돌하는 dep-graph Living-graph 별개 라인.) |
+| ③ | cross-domain undeclared 호출 finding 자동 등재 | **CUT — subsumed** | wiring **STEP 3** (v12.11.0 / DEC §11) 의 module dependency coverage-hole 와 **구조적 동일** set-diff: `module-graph.js diffModuleDeps()` = codegraph cross-file edge rollup ∖ arch.json `dependencies[]` = 미선언 cross-boundary 호출. "domain"(DDD semantic)은 codegraph 능력 밖(노드/엣지 스키마에 semantic 컬럼 0) → arch.json `modules[]` 가 유일 경계 proxy = STEP 3 가 이미 사용. "finding 자동 등재"는 §2 trust 불변식 + STEP 2 decision (c)(자동 ledger emit ❌)로 **promote-ready seed**(discoverer:codegraph / finding_id 미부여 / module axis = `finding-export.js` AXIS_PHASE.module='architecture')로 이미 실현. DEC §3 line 34 가 N='cross-domain coupling' 을 '중복→✗' 이미 cut. 별도 do = STEP 3/2 순중복 + cycle/orphan false-positive 함정(§10.1 / call-provenance 519/590 null) 회귀 = 재작업최소화 위배. **정직 caveat: ③ close 는 iBATIS2(주 타깃 S2)/FE 공백을 메우지 않음** — STEP 3 corroboration 은 둘 다 Modern(Spring+MyBatis3 / NestJS+Prisma), iBATIS2 codegraph sqlMap=0, FE unverified. ③ do() 해도 못 메움(codegraph blind). |
+| ④ | MCP `serve` 통합 | **DEFER (scope-near / 사용자 "MCP 없어도 됨")** | `codegraph serve --mcp` = 실 능력 O (stdio / search·context·trace·callers·callees·impact·node·explore·files·status). **단 신규 능력 아님 = 전달 경로 차이뿐**: 함수(method 445 노드)·호출관계(callers/callees/impact 엣지)는 MCP 없이도 (a) CLI (b) `context-cache.json`(심볼별 callers/callees/impact 사전계산)로 이미 조회됨 = 같은 SQLite 인덱스의 두 표현. 순수 신규분 = "분석 산출물에 미리 안 구운 심볼을 LLM 이 세션 중 즉석 질의" 1건뿐인데, 본 방법론 패러다임(산출물=운영 컨텍스트 / 사전계산 중심 / P0)이 그 가치를 대부분 흡수. **사용자 결단(2026-06-04): "함수 다 찾을 수 있고 그래프 연결됨 → MCP 없어도 됨."** 영구 scope-out 은 아님(R19 runtime 툴/G1 ITSM 과 달리 read-only 정적 인덱스 쿼리라 scope 위반 아님) = corroboration·정책 미정으로 인한 defer. |
+
+**carry (④ 재개 시 선결 / Option D 박제)**: ⓐ **R19 Tier 분류 미정** — 상주 stdio MCP 서버(long-lived 프로세스 + live query)는 R19(DEC-2026-05-18) 3-Tier 어디에도 없음(현 codegraph index+status --json one-shot = Tier 1). "정적 인덱스 live query = 비-runtime" 을 Tier 4(또는 carve-out)로 분류하는 정책 결정이 ④ do() 선결. ⓑ §8.1 infra-corroboration = PoC #15 1건뿐(2nd distinct 도메인 필요). ⓒ trust 가드 check40(check34~39 4-part isomorphic) 신설 = MCP 출력이 결정적 gate 진입 구조적 차단(현재는 grep 부재의 incidental 보장 / [추정]). ⓓ 배선 위치 = codegraph 공식 권장 global `~/.claude.json` vs 프로젝트 `.mcp.json`(현 빈 placeholder) 택1.
+
+**`C-codegraph-federation` carry 종결 표기**: ①②③ 해소(③=subsumed) / ④ defer = scope-near. Slice 2 = **실질 완료(④ 사용자 보류)**. memory `project_context_federation` "미릴리스" 노트는 stale(federator v12.0.1 + STEP5 로 릴리스됨).
+
 ## 4. STOP-3
 - workspace test 795 → **804 (+9)** ✅ (codegraph-runner 9 신규 / drift-validator check-phase-skills 정합)
 - release-readiness **22/22 ready** ✅
