@@ -116,7 +116,7 @@
 ## 7. 이번 세션 처분 / 다음 세션 진입점
 
 - **이번 세션 = 문서화만** (release ❌ / 구현 ❌ / 코드·스키마 무변경). 본 DEC + INDEX entry + memory 박제.
-- **다음 세션 진입점**: **STEP 1 (coverage-hole 공통 메커니즘 / Modern 스택-게이트)** 부터 4원칙(plan→3-agent research→사용자 승인→착수). RealWorld + ecommerce dogfood 로 ≥2 distinct 도메인 corroboration 후 본체 격상.
+- **다음 세션 진입점**(2026-06-04 갱신): **STEP 6 (Modern-scoped reading-aid: sql-inventory·formal-spec›sequence·migration-cautions·task-plan·plan-org·input-adapters + openapi HIGH 잔여 / §5 로드맵)** 부터 4원칙(plan-codegraph-step6 신규 작성 → 3-agent research → 사용자 승인 → 착수). **STEP 1~5 = v12.9.0~v12.13.0 시행 완료(§9~§13)**. dogfood = examples committed PoC 활용(외부 `_dogfood-*` 불요 / `.codegraph` gitignore / memory `feedback_codegraph_step_dogfood_examples`). 단, 다음 의제 = 사용자 결단(하드코딩 ❌ / STATUS.md frontier).
 
 ## 8. carry
 
