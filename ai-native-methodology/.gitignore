@@ -21,3 +21,6 @@ examples/**/.aimd/output/intervention-log.jsonl
 
 # codegraph 인덱스 (.codegraph/ SQLite) — context-federator / codegraph-runner 가 target 트리에 생성 (재빌드 가능 / 커밋 ❌ / DEC-2026-06-02-context-federation)
 .codegraph/
+
+# dep-graph-viz on-demand 산출물 — view-time only / committed mirror ❌ (ADR-011 sanctioned / SSOT=artifact-graph.json)
+**/dep-graph.html

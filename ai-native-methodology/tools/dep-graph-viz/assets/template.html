@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dep-graph viz — __GRAPH_NAME__</title>
+<!--
+  AI-Native 방법론 dep-graph 시각화 (on-demand / view-time).
+  reference-lens / display-only — 어떤 결정론 gate 에도 inject ❌. committed mirror 아님.
+  SSOT = artifact-graph.json. 합성 leaf 노드(synthetic)는 표시 전용. 생성: dep-graph-viz CLI.
+-->
+<style>__STYLE__</style>
+</head>
+<body>
+<div id="banner"></div>
+<div id="toolbar">
+  <input id="search" type="search" placeholder="id / title 검색 (Enter=영향도)…">
+  <button id="btn-clear">초기화</button>
+  <span class="sep"></span>
+  <button id="btn-force">force 토글</button>
+  <button id="btn-fit">화면 맞춤</button>
+  <span class="sep"></span>
+  <span id="state-filters" class="hint">
+    state:
+    <label><input type="checkbox" value="active" checked>active</label>
+    <label><input type="checkbox" value="drift" checked>drift</label>
+    <label><input type="checkbox" value="propose" checked>propose</label>
+    <label><input type="checkbox" value="deprecated" checked>deprecated</label>
+  </span>
+  <span class="sep"></span>
+  <span id="summary" class="hint"></span>
+</div>
+<div id="main">
+  <div id="graph"></div>
+  <div id="side"></div>
+</div>
+<div id="legend"></div>
+
+<script>__D3__</script>
+<script type="module">
+const GRAPH = __GRAPH_JSON__;
+const FRESHNESS = __FRESHNESS__;
+// --- 재사용 결정론 알고리즘 (impact-analyzer + centrality + layout 소스 인라인) ---
+__ALGO__
+// --- 시각화 앱 ---
+__APP_JS__
+</script>
+</body>
+</html>

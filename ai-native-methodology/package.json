@@ -68,7 +68,8 @@
     "tools/db-assets-validator",
     "tools/adopter-evidence-packager",
     "tools/context-federator",
-    "tools/codegraph-coverage"
+    "tools/codegraph-coverage",
+    "tools/dep-graph-viz"
   ],
   "scripts": {
     "build": "node scripts/build-plugin.js",
