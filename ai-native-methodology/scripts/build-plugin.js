@@ -38,6 +38,10 @@ const INCLUDE = [
 	'methodology-spec',
 	'schemas',
 	'guides', // cleanup round 2-C — 사용자 journey 자산
+	// SessionStart hook runtime deps — only these two scripts ship; dev tooling
+	// (release-readiness/build/publish/version-check/test) stays workspace-only.
+	'scripts/install-static-tools.js', // hooks.json SessionStart (cross-platform)
+	'scripts/install-static-tools.sh', // retained for direct POSIX use
 	'CHANGELOG.md',
 	'CHANGELOG-HISTORY.md',
 	'README.md',

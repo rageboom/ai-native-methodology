@@ -6,7 +6,7 @@
 
 | Tier                                       | 도구                                                                                                                 | 실행 환경                                                                        | evidence_trust                   |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------- |
-| **Tier 1** (in-plugin native)              | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0)                                                              | plugin 환경 (SessionStart hook 자동 install — `scripts/install-static-tools.sh`) | `real_tool`                      |
+| **Tier 1** (in-plugin native)              | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0)                                                              | plugin 환경 (SessionStart hook 자동 install — `node scripts/install-static-tools.js`, 크로스플랫폼) | `real_tool`                      |
 | **Tier 2** (user-environment SARIF import) | **PMD** (Java 8 or above) / **SpotBugs** (JRE 11+) / **CodeQL** (JDK + DB build) / **Daikon** (Java + runtime trace) | 사용자 CI / 로컬                                                                 | `imported_sarif`                 |
 | **Tier 3** (simulated)                     | ❌ AI persona / 손작성 / `manual` driver SARIF                                                                       | —                                                                                | `simulated` → 영구 reject (-5%p) |
 
@@ -29,7 +29,7 @@ v8.6.0 격하 근거: plugin 배포 환경 (Claude Code / Node.js 기반) 에서
 
 ```bash
 # 자동 install (SessionStart hook 가 첫 세션에 실행 / 이후 idempotent skip)
-#   수동 강제 실행:  bash ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.sh
+#   수동 강제 실행:  node ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.js   (POSIX: bash …/install-static-tools.sh)
 #   fallback chain:  pipx → brew → pip3 --user → 사용자 안내
 # 또는 사용자 수동:
 #   pipx install semgrep

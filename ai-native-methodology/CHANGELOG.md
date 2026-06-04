@@ -10,6 +10,27 @@
 
 ---
 
+## [12.13.1] — 2026-06-04 PATCH — Windows 설치 결함 수정 (scripts/ 누락 + SessionStart 훅 크로스플랫폼화)
+
+**증상**: Windows 신규 설치 시 `scripts/` 폴더 부재 → SessionStart 훅 실패. 사용자 보고.
+
+### 근본 원인 — 패키징 화이트리스트 양쪽에서 `scripts/` 누락
+
+SessionStart 훅(`hooks/hooks.json`)이 `${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.sh` 를 실행하나, **두 패키징 경로 모두** `scripts` 미포함 — `package.json` `files`(source:npm) + `scripts/build-plugin.js` `INCLUDE`(dist). Mac dev 는 git 체크아웃이라 미노출. 추가로 훅이 Windows 부재 `bash` 로 POSIX 셸 스크립트 호출 = 2차 비호환.
+
+### 수정 — 크로스플랫폼 Node 포팅 + 런타임 스크립트 패키징
+
+- `scripts/install-static-tools.js` **신규** — `.sh` 의 멱등 semgrep Tier 1 설치 계약(always exit 0 / stderr 로깅 / `.aimd-install` 마커)을 Node 로 포팅. `where`/`command -v` 탐지, Windows 는 brew 건너뜀(pipx→pip), shell 부재 무관.
+- `hooks/hooks.json` — SessionStart 훅 `bash …sh` → `node …js` (타 훅과 동형 node 채널). `.sh` 는 직접 POSIX 실행용으로 보존.
+- `package.json` `files` + `scripts/build-plugin.js` `INCLUDE` — `scripts/install-static-tools.{js,sh}` 만 추가(dev 전용 release-readiness/build/publish/version-check/test 는 계속 workspace-only).
+- `tools/static-runner/README.md` — 참조 node 버전 갱신.
+
+### carry — 패키징 게이트 갭
+
+`files`(package.json) ↔ `INCLUDE`(build-plugin.js) 이중 정의 + "hooks.json 의 `${CLAUDE_PLUGIN_ROOT}/…` 경로 ⊆ 패키지 페이로드" 검증 부재로 drift 누적. release-readiness 체크 추가 = 별도 커밋(현재 codegraph step6 WIP 와 분리).
+
+---
+
 ## [12.13.0] — 2026-06-04 MINOR — codegraph wiring STEP 5 (context-cache callees 증분)
 
 **§5 STEP 5 (context-cache 증분 / `callees` enrichment) 시행.** 4원칙 = `.claude/plans/plan-codegraph-step5.md` (#1 깊은 숙지 → 사용자 일괄 위임 "스탭5 수행→커밋만" = gate #3 standing go). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §13.

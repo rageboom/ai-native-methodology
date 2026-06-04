@@ -12,9 +12,9 @@
           },
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.sh",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/install-static-tools.js",
             "statusMessage": "Checking Tier 1 static-analysis tools (semgrep)...",
-            "$comment": "Tier 1 auto-install (semgrep). Idempotent — no-op when semgrep already on PATH. Always exits 0. Tier 2 (PMD/SpotBugs/CodeQL/Bandit/Snyk/OSV) stays user-environment per DEC-2026-05-18-runtime-tool-exclusion."
+            "$comment": "Tier 1 auto-install (semgrep). Idempotent — no-op when semgrep already on PATH. Always exits 0. Tier 2 (PMD/SpotBugs/CodeQL/Bandit/Snyk/OSV) stays user-environment per DEC-2026-05-18-runtime-tool-exclusion. Node (not bash) — cross-platform incl. Windows where bash is absent (packaging fix 2026-06-04); install-static-tools.sh retained for direct POSIX use."
           }
         ]
       }
