@@ -14,7 +14,7 @@
 **AI 재구현 시 활용**:
 
 - chain 1 discovery-spec 입력 보강 (UC ↔ sql_id ↔ intent_classification cross-link)
-- chain 4 GREEN 검증 시 sql_id 별 dependent_tables / external_calls 자동 식별
+- chain 5 GREEN 검증 시 sql_id 별 dependent_tables / external_calls 자동 식별
 - carry_flags 명시 = DBA-read / external_call_out_of_scope / domain-expert-review 차단 의무
 
 ### 1.1 외부 조언 (사상적 근거)
@@ -73,10 +73,10 @@ output/sql-inventory/
 
 ### 3.1 미추출 (의도적)
 
-- 자동 코드 generation — chain 4 (impl-spec) 영역
-- DAO + DB 통합 테스트 — chain 3 (test-spec) 영역 (scope ❌ / carry)
-- MockMvc Replay 테스트 — chain 3 영역 / carry
-- DBUnit / @Sql 픽스처 — chain 3/4 영역 / carry
+- 자동 코드 generation — chain 5 (impl-spec) 영역
+- DAO + DB 통합 테스트 — chain 4 (test-spec) 영역 (scope ❌ / carry)
+- MockMvc Replay 테스트 — chain 4 영역 / carry
+- DBUnit / @Sql 픽스처 — chain 4/5 영역 / carry
 - Modern ORM (JPA / TypeORM / Prisma) raw SQL 측정 — paradigm-cross corroboration carry
 
 ---

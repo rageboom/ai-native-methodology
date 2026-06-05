@@ -1,16 +1,16 @@
-# 산출물 #20: Test Spec (chain 3 / RED 의무)
+# 산출물 #20: Test Spec (chain 4 / RED 의무)
 
 > **schema**: `schemas/test-spec.schema.json`
-> **생성 phase**: chain 3 (test) — `/test-generate-test-spec` + `/test-run-test-evidence` (skills / sub-plan-4)
-> **gate**: go/stop gate #3
+> **생성 phase**: chain 4 (test) — `/test-generate-test-spec` + `/test-run-test-evidence` (skills / sub-plan-4)
+> **gate**: go/stop gate #4
 
 ## 1. 목적
 
 **답하는 질문**: "각 acceptance-criteria 를 검증할 test 코드는 무엇이고, 실 runner 실행 결과는?"
 
-**활용**: chain 4 impl 단계의 RED → GREEN 정합 prerequisite.
+**활용**: chain 5 implement 단계의 RED → GREEN 정합 prerequisite.
 
-**chain 3 = RED 의무** — 모든 test fail 의무 (impl 부재 / chain 4 GREEN 시점에 100% pass 격상).
+**chain 4 = RED 의무** — 모든 test fail 의무 (impl 부재 / chain 5 GREEN 시점에 100% pass 격상).
 
 ## 2. 형식
 
@@ -83,7 +83,7 @@ coverage:
       high: 0.95
       medium: 0.90
       low: 0.85
-  test_pass_rate: 0.0 # chain 3 = RED / chain 4 = 1.0
+  test_pass_rate: 0.0 # chain 4 = RED / chain 5 = 1.0
   line_coverage: 0.0 # impl 부재
   branch_coverage: 0.0
 ```

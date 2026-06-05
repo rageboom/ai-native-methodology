@@ -1,9 +1,9 @@
-# 산출물 #21: Impl Spec (chain 4 / GREEN 의무 / i-strict 정통)
+# 산출물 #21: Impl Spec (chain 5 / GREEN 의무 / i-strict 정통)
 
-> **사상**: 진짜 runner 100% pass 의무 / impl trust 0.95 / gate #4 사용자 명시 결단 의무
+> **사상**: 진짜 runner 100% pass 의무 / impl trust 0.95 / gate #5 사용자 명시 결단 의무
 > **schema**: `schemas/impl-spec.schema.json`
-> **생성 phase**: chain 4 (implement) — `/implement-generate-impl-spec` + `/implement-verify-test-pass` (skills / sub-plan-4)
-> **gate**: go/stop gate #4 (Auto Mode 위임 ❌)
+> **생성 phase**: chain 5 (implement) — `/implement-generate-impl-spec` + `/implement-verify-test-pass` (skills / sub-plan-4)
+> **gate**: go/stop gate #5 (Auto Mode 위임 ❌)
 
 ## 1. 목적
 
@@ -11,7 +11,7 @@
 
 **활용**: chain 종결 / production 시스템 + traceability-matrix 동봉 결과.
 
-**chain 4 = GREEN 의무** — `test_pass_evidence.fail_count = 0` (schema const 강제).
+**chain 5 = GREEN 의무** — `test_pass_evidence.fail_count = 0` (schema const 강제).
 
 **single source-of-truth = impl-spec.json**. 실 코드 = 산출물 ❌ / `commit_hash` 만 본 산출물에 보존 / git 으로 결정적 trace.
 
@@ -67,13 +67,13 @@ test_pass_evidence:
   invocation_timestamp: '2026-05-06T13:00:00Z'
   duration_ms: 7892
   pass_count: 24
-  fail_count: 0 # schema const 0 (chain 4 GREEN 의무)
+  fail_count: 0 # schema const 0 (chain 5 GREEN 의무)
   skip_count: 0
   reproduction_command: ['./gradlew test --tests UserSignupTest']
   result_hash: 'sha256:def456...' # 정규화
   report_format: sarif_2_1_0
-  coverage_report_path: '.aimd/output/chain-4-impl/runs/2026-05-06T13-00-00/coverage.lcov'
-  linter_output_path: '.aimd/output/chain-4-impl/runs/2026-05-06T13-00-00/linter.sarif'
+  coverage_report_path: '.aimd/output/chain-5-impl/runs/2026-05-06T13-00-00/coverage.lcov'
+  linter_output_path: '.aimd/output/chain-5-impl/runs/2026-05-06T13-00-00/linter.sarif'
 ```
 
 ## 6. human_review (70~80% 한계 schema 수용)
@@ -82,8 +82,8 @@ test_pass_evidence:
 human_review:
   gate_4_intervention_pct: 0.12 # ≤ 0.30 (master plan §J.2 옵션 A 정합)
   intervention_log:
-    - 'gate #4: 사용자 검토 — IMPL-USER-001 의 password hash bcrypt round 12 확인'
-    - 'gate #4: 사용자 결단 — go (test 100% pass + 보안 검증)'
+    - 'gate #5: 사용자 검토 — IMPL-USER-001 의 password hash bcrypt round 12 확인'
+    - 'gate #5: 사용자 결단 — go (test 100% pass + 보안 검증)'
 ```
 
 ## 7. 예시 (chain 4 sample)

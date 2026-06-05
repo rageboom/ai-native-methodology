@@ -46,7 +46,7 @@
       "inputs": ["impl 코드", ".aimd/config/test-cmd.json"],
       "outputs": ["impl-spec.test_pass_evidence (fail_count: 0 의무)"],
       "skills": ["implement-verify-test-pass", "test-run-test-evidence"],
-      "expected_outcome": "all_pass (chain 4 GREEN 의무)"
+      "expected_outcome": "all_pass (chain 5 GREEN 의무)"
     },
     {
       "id": "static-analysis",

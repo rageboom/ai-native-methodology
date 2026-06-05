@@ -8,7 +8,7 @@
 
 **답하는 질문**: "사용자가 검수할 수 있는 합격 기준은 무엇인가?" — Gherkin BDD 형식.
 
-**활용**: chain 3 test-spec 자동 생성의 1차 input.
+**활용**: chain 4 test-spec 자동 생성의 1차 input.
 
 ## 2. 형식
 
@@ -55,7 +55,7 @@ criteria:
     verifiable: true
     automated_runnable: true
     test_case_refs: [TC-USER-001, TC-USER-002]
-    gate_required: true # Industry — chain 4 impl 진입 허용 게이트
+    gate_required: true # Industry — chain 5 implement 진입 허용 게이트
   - id: AC-USER-003
     description: '이메일 형식 오류 시 400'
     behavior_ref: BHV-USER-001

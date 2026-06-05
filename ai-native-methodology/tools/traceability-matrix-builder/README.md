@@ -8,7 +8,7 @@ DO-178C / ISO 26262 bidirectional traceability 차용 (S5 정합 — header `der
 
 ## When to call
 
-- **trigger**: chain 4 (impl) gate #4 통과 후 / release 진입 시
+- **trigger**: chain 5 (impl) gate #5 통과 후 / release 진입 시
 - **호출자**: 사용자 (수동) / skill `_base-build-traceability-matrix`
 - **수동**: `node src/cli.js ...`
 
@@ -38,7 +38,7 @@ node src/cli.js \
 | status | 조건                                              |
 | ------ | ------------------------------------------------- |
 | green  | UC + BHV + AC + TC + IMPL 5 단계 모두 채워짐      |
-| yellow | TC 까지 OK / IMPL 부재 (chain 4 진입 전)          |
+| yellow | TC 까지 OK / IMPL 부재 (chain 5 진입 전)          |
 | red    | AC 또는 그 위 단계 missing (chain 1~2 incomplete) |
 
 ## Exit codes

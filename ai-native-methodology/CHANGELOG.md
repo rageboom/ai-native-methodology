@@ -10,6 +10,15 @@
 
 ---
 
+## [12.15.2] — 2026-06-05 PATCH — chain/gate 번호 System Y 정합 (test=4 / implement=5)
+
+shipped 운영 컨텍스트 파일에 잔존하던 **System X (구 4-chain / test=3·impl=4) 번호**를 canonical **System Y (discovery1/spec2/plan3/test4/implement5 / chain N = gate #N)** 로 일괄 정정. v9.0 plan stage 신설로 test·implement 가 한 칸씩 밀렸으나 일부 산출물 spec·skill·tool README·schema 가 구 번호를 보존하고 있던 documentary drift 해소 (INSPECTION-2026-05-31-test/implement 에서 식별된 prose-only stale / 동작 영향 0).
+
+- **정리 파일**: methodology-spec/deliverables(18·19·20·21·23·24)·workflow/characterization·plugin-charter R14 / skills(spec-compose·spec-derive·spec-integrate·analysis-characterization-test) / templates(test·implement README) / tools README(chain-coverage·schema-validator·spec-test-link·static-runner·traceability-matrix-builder) + traceability-matrix-builder/src/builder.js gap 메시지 / schemas(business-rules.schema description ×3·README — task-plan(chain 3) 행 신설 + test→4·impl→5) / flows/implement.phase-flow expected_outcome gloss.
+- **frozen 보존 (의도)**: `flows/sdlc-4stage-flow.json` corroboration-evidence ledger(`L1_chain_3_complete`/`L2_chain_4_GREEN` 토큰 = 코드 미참조 / 버전-dated 도달 기록) / non-shipped 이력(docs/adr·decisions·examples·CHANGELOG·tools/*/test·fixtures = era-accurate). 이미 System Y 인 다수 자산(test-impl-pass-validator·test-* skills·lifecycle-contract·use-scenario-taxonomy 등) 무변경.
+- **별도 carry (구조 staleness / 본 PATCH scope 외)**: `methodology-spec/ticket-policy.md`(R20-prime 미반영 — stage=planning/test/implement 구 호출 규약 + per-chain sub-task) + `tools/README.md`(도구 인벤토리 16→34 stale + cadence matrix 4-chain / plan 컬럼·신규 도구 다수 누락) = 번호만 패치하면 내부 모순 → 전용 구조 refresh 필요. 한 칸 밀림이 아닌 모델 자체 stale 이라 본 번호 정정에서 제외.
+- **동작 변화 ❌** (주석·description·문서 prose 만 / validator 로직은 stage 문자열로 동작). 검증: citation 0 · release-readiness **40/40** · traceability-matrix-builder 단위테스트 152/152 · business-rules.schema·implement.phase-flow JSON valid.
+
 ## [12.15.1] — 2026-06-05 PATCH — 잔여 출하 prose provenance 정리 + check40 scope 확장
 
 v12.15.0 의 provenance 정리를 **출하 prose 나머지 디렉토리**(guides/templates/flows/hooks)로 마저 적용. 본문에 박혀 있던 버전 변천사·DEC/ADR 산문·인라인 PoC 증거·session·LL·backlog carry 를 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — 출하 본문 = 현재형 사용자 관심사만. v12.15.0 과 동일 convention/KEEP·RELOCATE 룰.

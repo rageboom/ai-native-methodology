@@ -334,19 +334,19 @@
         "given": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "전제 조건 (GWT 표현 / chain 3 test 자동 생성 시 Arrange 단계 / v1.x 공식 표준)",
+          "description": "전제 조건 (GWT 표현 / chain 4 test 자동 생성 시 Arrange 단계 / v1.x 공식 표준)",
           "minItems": 1
         },
         "when": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "발동 조건 (GWT 표현 / chain 3 test 자동 생성 시 Act 단계)",
+          "description": "발동 조건 (GWT 표현 / chain 4 test 자동 생성 시 Act 단계)",
           "minItems": 1
         },
         "then": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "결과 (GWT 표현 / chain 3 test 자동 생성 시 Assert 단계)",
+          "description": "결과 (GWT 표현 / chain 4 test 자동 생성 시 Assert 단계)",
           "minItems": 1
         },
         "rationale": {

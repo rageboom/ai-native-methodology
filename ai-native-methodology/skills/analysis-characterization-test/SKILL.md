@@ -112,7 +112,7 @@ ambiguous > 0 시:
 
 1. `ambiguous_carry` 배열에 `rule_id` + `carry_owner` (domain_expert / dba / planner / qa) + `carry_reason` 명시 의무
 2. snapshot 의 해당 scenario `behavior_likely_bug` 또는 `behavior_to_preserve` 둘 중 최소 하나 명시
-3. chain 4 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
+3. chain 5 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
 
 ### 8. characterization-spec.json 작성
 

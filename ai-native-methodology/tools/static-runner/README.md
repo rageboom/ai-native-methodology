@@ -19,7 +19,7 @@ v8.6.0 격하 근거: plugin 배포 환경 (Claude Code / Node.js 기반) 에서
 
 ## When to call
 
-- **trigger**: Phase 4.5+ / Phase 6 quality / chain 4 impl 후
+- **trigger**: Phase 4.5+ / Phase 6 quality / chain 5 impl 후
 - **호출자**: skill `analysis-aspect-static-security` / `analysis-quality-antipattern` 자동 호출
 - **수동**: `npx static-runner --plugin <name> ...` (Tier 1) / `npx static-runner --import-sarif <path> ...` (Tier 2)
 

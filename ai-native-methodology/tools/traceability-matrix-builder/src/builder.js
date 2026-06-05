@@ -160,7 +160,7 @@ export function buildMatrix(chain) {
 							antipattern_ids: propagated.antipattern_ids,
 							status: 'yellow',
 							severity: propagated.severity,
-							gaps: ['No IMPL linked (chain 4 not done)'],
+							gaps: ['No IMPL linked (chain 5 not done)'],
 						};
 						if (taskId) cell.task_id = taskId;
 						matrix.push(cell);

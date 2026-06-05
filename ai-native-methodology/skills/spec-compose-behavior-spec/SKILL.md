@@ -92,7 +92,7 @@ Epic = FE 화면 단위 / 본 skill 안에서 Epic 추출 ❌ (plan-decompose-an
 
 - pure function BR (e.g., 비밀번호 해시 검증) → property test 강 권고.
 - I/O bound BHV (e.g., DB lifecycle) → unit/integration 우선 (property optional).
-- chain 3 test stage 에서 property_tests 가 진짜 test 코드로 generate 됨 (skills/test-generate-test-spec).
+- chain 4 test stage 에서 property_tests 가 진짜 test 코드로 generate 됨 (skills/test-generate-test-spec).
 
 ## 70~80% 한계 명시
 
