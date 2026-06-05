@@ -10,6 +10,15 @@
 
 ---
 
+## [12.15.1] — 2026-06-05 PATCH — 잔여 출하 prose provenance 정리 + check40 scope 확장
+
+v12.15.0 의 provenance 정리를 **출하 prose 나머지 디렉토리**(guides/templates/flows/hooks)로 마저 적용. 본문에 박혀 있던 버전 변천사·DEC/ADR 산문·인라인 PoC 증거·session·LL·backlog carry 를 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — 출하 본문 = 현재형 사용자 관심사만. v12.15.0 과 동일 convention/KEEP·RELOCATE 룰.
+
+- **정리 파일 14종**: `guides/{getting-started,chain-harness-guide,common-errors,first-prompt-cookbook,README}.md` · `templates/{README,analysis/finding.template,discovery/{README,planning-doc-format},spec/README,test/README,implement/README}.md` · `flows/README.md` · `hooks/README.md`. (`templates/adoption/` = non-shipped / build alias source → 제외.) common-errors 의 stale v2.5.1→v2.6.0 cutover FAQ 등 구식 마이그레이션 noise 도 정리.
+- **check40 scope 확장**: `release-readiness.js` check40 `shipped_provenance_leak` 의 `SHIPPED_DIRS` 에 `guides`·`templates`·`flows`·`hooks` 추가 + `NON_SHIPPED_SUBPATHS`(`templates/adoption/`) skip. 가드가 이제 전 출하 prose 디렉토리에 fail-closed 적용. detail/delegated_to/주석 갱신.
+- **ticket-sync identity leak 정리**: merge(`9861a085`)로 유입된 ticket-sync SKILL.md 의 SG-MIS 환경 config 참조(`jira.smilegate.net`·`structure_id: 684`·`customfield_11902`) 3줄에 `allow-identity:` 주석 추가 — 사내 공통 env-config reference(개인 신원 아님) 정당 예외. check `shipped_identity_leak` 40/40 복구.
+- **동작 변화 ❌** — provenance noise 제거 + 정당 예외 주석일 뿐 skill·agent·guide 지시 기능 동형 / frontmatter `name`·`description` byte-불변. 검증: citation-validator 0 · check40 0 · release-readiness **40/40** · check40 discrimination 단위테스트 pass.
+
 ## [12.15.0] — 2026-06-05 MINOR — shipped 산출물 provenance 정리 (관심사 분리 + check40 가드)
 
 shipped 파일(skills 53 · methodology-spec 54 · agents 11)에 박혀 있던 **프로젝트 거버넌스 내용**(버전 변천사 · DEC rationale · PoC corroboration 증거 · LL 교훈 · backlog carry · ADR 변천사 산문)을 본문에서 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — shipped 본문 = 현재형 사용자 관심사만. outer `CLAUDE.md` 의 "버전 narrative 누적 금지 / 4중 중복 회피" precedent 를 전 shipped 파일로 확장. SSOT = `decisions/DEC-2026-06-05-shipped-provenance-cleanup.md`.

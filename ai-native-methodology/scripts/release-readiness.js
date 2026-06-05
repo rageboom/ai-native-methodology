@@ -2916,15 +2916,18 @@ function check39_codegraphOpenapiReferenceLensTrust() {
 	}
 }
 
-// check40 (2026-06-05 / shipped-provenance-cleanup 회귀 가드) — 출하 prose(skills/agents/methodology-spec) 본문에
+// check40 (2026-06-05 / shipped-provenance-cleanup 회귀 가드) — 출하 prose(skills/agents/methodology-spec/guides/templates/flows/hooks) 본문에
 //   프로젝트 거버넌스 마커(DEC / ADR / 버전 변천사 / session N차 / inline PoC 증거 / LL)가 재유입되는지 content-aware scan.
 //   출처(provenance)는 '## 인용' footer 포인터로만 허용 — 본문은 present-tense 사용자 관심사.
 //   면제: (a) '## 인용'/'## Cross-link'/'## Provenance' footer heading 이후 줄, (b) 'allow-provenance:' 줄/파일
-//   (의도적 placeholder=design-agent / corroboration-evidence doc=sub-rules·finding-system), (c) YAML frontmatter.
+//   (의도적 placeholder=design-agent / corroboration-evidence doc=sub-rules·finding-system), (c) YAML frontmatter,
+//   (d) NON_SHIPPED_SUBPATHS (templates/adoption/ = build alias source / 사내 정책 inline).
 //   check27(shippedIdentityLeak) 동형 패턴.
 function check40_shippedProvenanceLeak() {
 	try {
-		const SHIPPED_DIRS = ['skills', 'agents', 'methodology-spec'];
+		const SHIPPED_DIRS = ['skills', 'agents', 'methodology-spec', 'guides', 'templates', 'flows', 'hooks'];
+		// templates/adoption/ = non-shipped (build alias source / 사내 정책 inline) → scope 제외.
+		const NON_SHIPPED_SUBPATHS = ['templates/adoption/'];
 		// NOTE: '\b' after Korean '인용' never matches (한글=비-\w) → (\s|$) 경계 사용.
 		const FOOTER_RE = /^#{1,4}\s+(인용|Cross-link|Provenance)(\s|$)/;
 		const MARKERS = [
@@ -2946,6 +2949,8 @@ function check40_shippedProvenanceLeak() {
 			for (const ent of entries) {
 				if (!ent.isFile() || !ent.name.endsWith('.md')) continue;
 				const full = join(ent.parentPath ?? ent.path, ent.name);
+				const rel = full.slice(ROOT.length + 1).replace(/\\/g, '/');
+				if (NON_SHIPPED_SUBPATHS.some((p) => rel.startsWith(p))) continue; // non-shipped skip
 				let content;
 				try {
 					content = readFileSync(full, 'utf-8');
@@ -2988,10 +2993,10 @@ function check40_shippedProvenanceLeak() {
 			pass: hits.length === 0,
 			detail:
 				hits.length === 0
-					? `출하 prose(skills/agents/methodology-spec) 본문 거버넌스 마커(DEC/ADR/버전변천사/session/inline-PoC/LL) 0건 — 출처는 ## 인용 footer 포인터로만 (allow-provenance: 파일/줄 예외 / shipped-provenance-cleanup 회귀 가드)`
+					? `출하 prose(skills/agents/methodology-spec/guides/templates/flows/hooks) 본문 거버넌스 마커(DEC/ADR/버전변천사/session/inline-PoC/LL) 0건 — 출처는 ## 인용 footer 포인터로만 (allow-provenance: 파일/줄 예외 / templates/adoption non-shipped skip / shipped-provenance-cleanup 회귀 가드)`
 					: `본문 거버넌스 마커 ${hits.length}건: ${hits.slice(0, 8).join(', ')}${hits.length > 8 ? ' …' : ''} — ## 인용 footer 로 이동 또는 allow-provenance: 예외`,
 			delegated_to:
-				'skills/ agents/ methodology-spec/ (출하 prose) / 본문 DEC·ADR·버전변천사·session·PoC증거·LL → ## 인용 footer',
+				'skills/ agents/ methodology-spec/ guides/ templates/ flows/ hooks/ (출하 prose) / 본문 DEC·ADR·버전변천사·session·PoC증거·LL → ## 인용 footer',
 		};
 	} catch (e) {
 		return {

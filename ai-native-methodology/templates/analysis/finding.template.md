@@ -32,7 +32,7 @@ severity: { low | medium | high | critical | positive }
 # medium: 단일 phase 영향 / 우회 가능
 # high: 모든 산출물 또는 복수 phase 영향 / 표준화 시급
 # critical: 즉시 수정 의무
-# positive: 학습 효과 입증 / 모범 사례 (v1.2.3 신설 — cross-PoC 비재현)
+# positive: 학습 효과 입증 / 모범 사례 (cross-PoC 비재현)
 
 proposed_fix: |
   {어떻게 고치면 좋을까. 명세 변경 후보.}
@@ -54,7 +54,7 @@ status:
 # deferred: PoC 데이터 추가 필요
 # rejected: 명세 책임 밖
 # merged: 다른 finding 으로 통합
-# logged: positive finding 등재 (v1.2.3 신설)
+# logged: positive finding 등재
 
 resolution:
   resolved_at: { YYYY-MM-DD }
@@ -62,7 +62,7 @@ resolution:
     {closed: 명세 변경 위치 / rejected: 사유 / merged: 통합 대상 finding_id}
   followup: [] # 후속 작업 finding 또는 task ID
 
-# ─── severity:positive 시 추가 (v1.2.3 신설) ───
+# ─── severity:positive 시 추가 ───
 positive_finding_meta:
   previous_poc_finding: F-{NNN} # 이전 PoC 의 negative finding ID
   current_poc_evidence: |
@@ -92,7 +92,7 @@ cross_validation:
 2. **phase**: 발견 시점 phase. Phase 4.5 형식 명세는 `4.5` (string).
 3. **spec_gap**: 어느 명세 파일의 어느 §절인지 명시. 추후 명세 격상 시 정확히 가리킴.
 4. **decision_made**: PoC 는 막혀도 진행해야 함. 어떻게 우회했는지 + 왜.
-5. **severity**: 영향 범위 × 차단 강도. positive 는 v1.2.3 신설 — 학습 효과 입증 시.
+5. **severity**: 영향 범위 × 차단 강도. positive = 학습 효과 입증 시.
 6. **status 전이**: `open → candidate → promoted → closed` 가 표준 경로. positive 는 `logged` 로.
 
 상세 운영: `methodology-spec/finding-system.md`.

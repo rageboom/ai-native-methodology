@@ -1,8 +1,6 @@
-# Common Errors — FAQ (chain harness 운영 / v3.6.9)
+# Common Errors — FAQ (chain harness 운영)
 
 본 가이드 = plugin user 가 install 후 자주 마주칠 마찰점 + 해결 방법.
-
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (A3 / session 20차 / paradigm 진화 안정점 + enforcement 11종).
 
 ## 1. Install / Hook
 
@@ -25,7 +23,7 @@
 
 - v2.0.0~v2.5.0 까지 본 plugin 의 agents/skills 자산이 **Claude Code plugin 표준 (1-depth) 과 충돌하는 2-depth lifecycle organize** 구조였음.
 
-**해결**: **v2.5.1 PATCH 재install 의무**.
+**해결**: **최신 버전 재install 의무** (1-depth flatten paradigm 적용 build).
 
 ```bash
 /plugin uninstall ai-native-methodology
@@ -35,10 +33,10 @@
 /reload-plugins
 ```
 
-v2.5.1 재install 후 정상 출력:
+재install 후 정상 출력:
 
 - **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
-- **Skills: 38** (1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md`)
+- **Skills: N** (1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md`)
 
 ### Q2. UserPromptSubmit hook 발동 안 함 (chain-driver 권고 stderr 안 뜸)
 
@@ -54,11 +52,11 @@ v2.5.1 재install 후 정상 출력:
 
 ### Q3. README / CLAUDE / plugin.json 의 version 출력이 다를 때
 
-**증상**: 받은 build 의 3 source 의 version 표시가 다름 (v2.0.0 이전 또는 v2.5.0 release commit 갱신 누락 build 한정).
+**증상**: 받은 build 의 3 source 의 version 표시가 다름 (release commit 의 version sync 누락 build 한정).
 
 **원인**: 본 plugin = 3-way sync paradigm (plugin.json / package.json / CHANGELOG.md). build 시점 sync 깨진 dist artifact 사용 시 발생.
 
-**해결**: 최신 dist artifact 재다운로드 + reinstall. **현재 정합 = v2.5.1** (2026-05-14 release).
+**해결**: 최신 dist artifact 재다운로드 + reinstall (3 source version 일치 확인 / `npm run version:check`).
 
 ### Q4. plugin.json 과 CHANGELOG / package.json 의 version mismatch
 
@@ -137,12 +135,12 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 ### Q11. dist artifact size — file count 너무 많지 않나?
 
-v2.5.1 = **295 files**. workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE / guides/ 5 자산 + 각 폴더 README 정합 / paradigm v2.5.1 정식.
+dist artifact = workspace developer only 자료 (test/corpus/fixtures) 모두 EXCLUDE / guides/ 자산 + 각 폴더 README 정합. file count 는 build 마다 CHECKSUMS.txt 로 검증.
 
 ### Q12. CHECKSUMS.txt 무결성 검증 fail
 
 ```bash
-cd dist/ai-native-methodology-v2.5.1
+cd dist/ai-native-methodology-v<version>
 shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 # → 어느 파일 hash mismatch 인지 확인
 ```
@@ -159,41 +157,9 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 **원인**: skill description 매칭이 다른 skill 과 겹침.
 
-**해결**: 명시 호출 — `@skills/<category>-<slug>/SKILL.md` (v2.6.0 의미 ID paradigm / 예: `@skills/analysis-business-rules/SKILL.md` / `@skills/analysis-characterization-test/SKILL.md`).
+**해결**: 명시 호출 — `@skills/<category>-<slug>/SKILL.md` (의미 ID paradigm / 예: `@skills/analysis-business-rules/SKILL.md` / `@skills/analysis-characterization-test/SKILL.md`).
 
-### Q14.5 v2.5.1 → v2.6.0 명시 호출 이름 변경 (본격 cutover)
-
-**원인**: v2.5.1 까지 skill 디렉토리 = `analysis-phase-N-NAME` 형식 (phase-N 숫자 prefix). v2.6.0 = 의미 ID 본격 자산화 (analysis-{slug}).
-
-**영향 범위**: 17 skill rename — aspect 4 + br-cross 1 = 변경 ❌ / chain stage (\_base / planning / spec / test / implement) = 변경 ❌.
-
-**해결**: v2.5.1 명시 호출 (예 `/analysis-input`) → v2.6.0 새 이름 (예 `/analysis-input-collection`) 본격 매핑. 자연어 trigger 영역 (description 기반 auto-invocation) = 영향 ❌ — 본격 description 영역 정합 보존.
-
-**전환 매핑** (본격 17 rename):
-
-| v2.5.1 명시 호출                       | v2.6.0 명시 호출                   |
-| -------------------------------------- | ---------------------------------- |
-| `/analysis-input`                      | `/analysis-input-collection`       |
-| `/analysis-phase-1-inventory`          | `/analysis-source-inventory`       |
-| `/analysis-phase-2-architecture`       | `/analysis-architecture`           |
-| `/analysis-phase-3-domain`             | `/analysis-domain-model`           |
-| `/analysis-phase-4-rules`              | `/analysis-business-rules`         |
-| `/analysis-phase-4-5-cross-validation` | `/analysis-formal-spec-validation` |
-| `/analysis-characterization`           | `/analysis-characterization-test`  |
-| `/analysis-sql-inventory`              | `/analysis-sql-inventory`          |
-| `/analysis-phase-5-error-mapping`      | `/analysis-error-mapping`          |
-| `/analysis-phase-5-form-validation`    | `/analysis-form-validation-fe`     |
-| `/analysis-phase-5-openapi`            | `/analysis-openapi`                |
-| `/analysis-phase-5-rules`              | `/analysis-api-rule-mapping`       |
-| `/analysis-phase-5-schema-erd`         | `/analysis-db-schema-erd`          |
-| `/analysis-phase-5-state-map`          | `/analysis-ui-state-map-fe`        |
-| `/analysis-phase-5-type-spec`          | `/analysis-type-spec-fe`           |
-| `/analysis-phase-5-visual-manifest`    | `/analysis-ui-visual-manifest-fe`  |
-| `/analysis-quality`                    | `/analysis-quality-antipattern`    |
-
-**alias map**: ❌ 의무 부재. v2.6.0 install 시 v2.5.1 명시 호출 ❌ — `methodology-spec/skills-axis.md` §6 paradigm 본격 진화 자산화.
-
-## 6.1 v2.5 Layer 2 LLM 마찰
+## 6.1 Layer 2 LLM 마찰
 
 ### Q15. chain 1 gate 진입 시 `br-cross-consistency-validator` 가 너무 오래 걸림
 
@@ -225,3 +191,8 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 ## 8. Finding 등재 (사용자 피드백 자산화)
 
 본 가이드에 없는 마찰점 발견 시 — 사용자 자체 프로젝트의 `findings/` 디렉토리에 등재 + 본 plugin 의 사내 GHE Issue 또는 사내 wiki 에 보고. 후속 patch / round cleanup 시 본 가이드 보강.
+
+## 인용
+
+- `ADR-010` — version 3-way sync (plugin.json source-of-truth) + baseline + ratchet
+- skill 명시 호출 이름 / 버전 변천사: `CHANGELOG.md` · `decisions/INDEX.md`

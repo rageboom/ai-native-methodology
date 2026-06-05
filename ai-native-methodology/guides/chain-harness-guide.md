@@ -2,8 +2,6 @@
 
 본 가이드 = chain harness 5 요소 enforcement 의 사용자 mental model. state.json + mechanical gate trio + revisit detector 가 어떻게 함께 동작하는지.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 → **v9.0.1 6-stage 정합 갱신** (planning→discovery 개칭 + plan stage 신설 / state.schema `current_chain` 6-stage enum 정합 / DEC-2026-05-21).
-
 ## 1. Chain harness 가 무엇인가?
 
 v2.0 paradigm — Aider 패턴 정합. **chain-driver 가 mechanical 하게 stage 순서 + gate 통과 + revisit loop 를 강제**. LLM "통과한 척 / RED 확인한 척" 시뮬레이션 ❌.
@@ -147,21 +145,21 @@ additionalContext: "LLM SHALL NOT auto-invoke" 차단 문구
 
 D21' 정합 — 권고만 stderr 로 사용자 콘솔 노출 / LLM 이 즉시 따르는 척 차단.
 
-**v2.5.1 1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-input-collection/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
+**1-depth + category prefix paradigm**: skill 디렉토리 = `skills/<category>-<name>/SKILL.md` (예: `skills/analysis-input-collection/SKILL.md`). hooks-bridge 가 flat path 자동 lookup. Claude Code plugin 표준 정합.
 
-## 5.1 v2.5 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
+## 5.1 chain 1 gate — Layer 2 LLM 통합 (사상 본질)
 
 chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 validator:
 
 ```
-1. discovery-extraction-validator (v11.0.0 rename / 기존 planning-extraction-validator)
-2. br-cross-consistency-validator (v2.4 신규 / v2.5 Layer 2 본격 통합)
+1. discovery-extraction-validator (기존 planning-extraction-validator)
+2. br-cross-consistency-validator (Layer 2 통합)
    ├─ Layer 1 (결정적):
    │   · 두 표현 ≥ 1 의무 (natural_language + given_when_then)
    │   · structure 검증 (given 안 결과 키워드 ❌ / when 안 전제 키워드 ❌)
    │   · BR id 4토막 strict
    └─ Layer 2 (Claude Code sub-agent invocation / Sonnet 4.6):
-       · 31 BR batch 1회 호출 (PoC #01 13 + PoC #03 18 = corroboration 자료)
+       · BR batch 1회 호출 (전체 BR 묶음)
        · NL ↔ GWT 의미 등가성 평가 / semantic_score per BR
        · DETERMINISTIC_THRESHOLD = 0.85 / confidence cap = 0.85
        · finding 신설: semantic_drift_detected (medium) + confidence_cap_exceeded (low)
@@ -169,11 +167,11 @@ chain 1 gate (discovery → spec 진입) 시 chain-driver 가 호출하는 valid
 
 gate-eval.js 의 evaluateGate:
 
-- `layer2_threshold` block reason (session 14차 신설)
+- `layer2_threshold` block reason
 - severityRank rank 2 (coverage_threshold 수준)
 - applyUserDecision user "go" → go-with-warnings 허용
 
-> Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정합 (session 11차 정정).
+> Anthropic API / OpenAI API 영역 ❌ → **Claude Code sub-agent (Task tool) invocation paradigm** 정합.
 > Static Tool 시뮬레이션 금지 정합 — sub-agent persona 시뮬레이션 ❌.
 
 ## 6. Chain-revisit detector
@@ -286,5 +284,10 @@ chain 4 의 test code = chain 5 에서 그대로 재호출 (test 변경 ❌). im
 - [`../schemas/intervention-log.schema.json`](../schemas/intervention-log.schema.json) — 사용자 결단 로그
 - [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT
 - [`../hooks/README.md`](../hooks/README.md) — hooks lifecycle + D21' 정합
-- ADR-CHAIN-005 — chain harness driver state machine + 5 요소 enforcement
-- DEC-2026-05-06-sub-plan-5-종결 + DEC-2026-05-06-sub-plan-6-종결
+
+## 인용
+
+- `ADR-CHAIN-005` — chain harness driver state machine + 5 요소 enforcement
+- `DEC-2026-05-06-sub-plan-5-종결` · `DEC-2026-05-06-sub-plan-6-종결` — chain-driver / hooks 작성
+- `DEC-2026-05-21` — v9.0 6-stage(planning→discovery 개칭 + plan 신설) 정합
+- 버전 변천사: `CHANGELOG.md` · `decisions/INDEX.md`

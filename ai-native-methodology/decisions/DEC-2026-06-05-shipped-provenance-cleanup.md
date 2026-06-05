@@ -38,7 +38,9 @@ shipped 플러그인 파일(`skills/*/SKILL.md` 57 · `agents/*.md` · `methodol
 
 ### 2.4 재누적 방지 가드
 
-`scripts/release-readiness.js` **check40 `shipped_provenance_leak`** 신설 (check27 동형). `SHIPPED_PROSE_DIRS = [skills, agents, methodology-spec]` `.md` 본문(frontmatter·`## 인용` footer 이후·`allow-provenance:` 줄/파일 면제)에 DEC/ADR/버전변천사/session/inline-PoC/LL 마커 재유입 시 fail-closed. 게이트 39→40.
+`scripts/release-readiness.js` **check40 `shipped_provenance_leak`** 신설 (check27 동형). `SHIPPED_DIRS` `.md` 본문(frontmatter·`## 인용` footer 이후·`allow-provenance:` 줄/파일 면제)에 DEC/ADR/버전변천사/session/inline-PoC/LL 마커 재유입 시 fail-closed. 게이트 39→40.
+
+> **v12.15.1 (2026-06-05) 2차 — scope 확장 + 잔여 prose 정리**: v12.15.0 은 `[skills, agents, methodology-spec]` 만 정리·가드. v12.15.1 에서 동일 룰을 출하 prose 나머지 디렉토리로 확장 — `SHIPPED_DIRS` 에 `guides`·`templates`·`flows`·`hooks` 추가 + `NON_SHIPPED_SUBPATHS=[templates/adoption/]` skip(build alias source / 사내 정책 inline = non-shipped). 정리 파일 14종(guides 5 + templates 7 + flows 1 + hooks 1). 부수: merge 로 유입된 `skills/ticket-sync/SKILL.md` 의 SG-MIS env-config 참조(`jira.smilegate.net` 등) 3줄 `allow-identity:` 정당 예외 → `shipped_identity_leak` 40/40 복구.
 
 ## 3. 근거
 

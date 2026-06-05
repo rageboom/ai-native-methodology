@@ -1,6 +1,6 @@
 # templates/test/ — chain 3 (test stage) template
 
-v2.0.0-rc1 chain harness validated. chain 3 (test / RED 의무) 의 test-spec template placeholder. sub-plan-4 일부 채움 / 미채움 부분 = v2.x carry.
+chain 3 (test / RED 의무) 의 test-spec template placeholder.
 
 ## 본 디렉토리 자산
 
@@ -17,5 +17,5 @@ v2.0.0-rc1 chain harness validated. chain 3 (test / RED 의무) 의 test-spec te
 
 ## 참조
 
-- [`../../skills/`](../../skills/) — chain 3 skill 3종 (1-depth / test-generate-test-spec · test-run-test-evidence · test-verify-coverage / v2.5.1 PATCH 평탄화)
+- [`../../skills/`](../../skills/) — chain 3 skill 3종 (1-depth / test-generate-test-spec · test-run-test-evidence · test-verify-coverage)
 - [`../../methodology-spec/deliverables/20-test-spec.md`](../../methodology-spec/deliverables/20-test-spec.md)
