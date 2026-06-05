@@ -13,6 +13,7 @@ const STAGE_COLUMN = Object.freeze({
 	IMPL: 5,
 });
 const LEAF_COLUMN = 6; // code / contract leaf (체인 끝 오른쪽)
+const SYMBOL_COLUMN = 7; // 함수·메서드 심볼 (코드 더 오른쪽 / codegraph)
 
 // plan subkind → 자신이 묶는 대상 근처 column (조직 노드)
 const PLAN_COLUMN = Object.freeze({
@@ -30,6 +31,7 @@ export const COLUMN_LABELS = Object.freeze([
 	'TC',
 	'IMPL',
 	'code/contract',
+	'symbol',
 ]);
 
 // lane(세로 밴드) 순서 — 위→아래. main = chain+code, plan 위, analysis/aspect 아래.
@@ -39,6 +41,7 @@ export function columnOf(node) {
 	const sk = node?.artifact_subkind;
 	if (sk && sk in STAGE_COLUMN) return STAGE_COLUMN[sk];
 	const kind = node?.artifact_kind;
+	if (kind === 'symbol') return SYMBOL_COLUMN;
 	if (kind === 'code' || kind === 'contract') return LEAF_COLUMN;
 	if (kind === 'plan') return PLAN_COLUMN[sk] ?? 0;
 	return 0; // analysis / aspect / 미지 → 좌측 정렬

@@ -7,6 +7,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, basename, resolve } from 'node:path';
 import { augmentGraph } from './augment.js';
 import { buildHtml } from './emit.js';
+import { readCodegraph, findCodegraphDb, attachSymbols } from './codegraph.js';
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
 
 function parseArgs(argv) {
@@ -17,6 +18,8 @@ function parseArgs(argv) {
 		else if (k === '--scope') a.scope = argv[++i];
 		else if (k === '--out') a.out = argv[++i];
 		else if (k === '--repo-root') a.repoRoot = argv[++i];
+		else if (k === '--codegraph') a.codegraph = argv[++i];
+		else if (k === '--no-codegraph') a.noCodegraph = true;
 		else if (k === '-h' || k === '--help') a.help = true;
 	}
 	return a;
@@ -28,6 +31,8 @@ const HELP = `dep-graph-viz — dep-graph 인터랙티브 시각화 (영향도 �
   --scope <id>        특정 scope_id 만 (기본: 전체)
   --out <path>        출력 HTML (기본: <graph 디렉토리>/dep-graph.html)
   --repo-root <dir>   freshness source 경로 기준 (기본: cwd)
+  --codegraph <db>    codegraph.db 경로 (코드 leaf 아래 함수·메서드+호출 표시 / 기본: 자동 탐색)
+  --no-codegraph      codegraph 자동 탐색·부착 끔
 
   생성물은 reference-lens / display-only / on-demand — gate inject ❌, SSOT 무변경.`;
 
@@ -68,6 +73,22 @@ function main() {
 	const scoped = scopeFilter(raw, args.scope);
 	const augmented = augmentGraph(scoped);
 
+	// codegraph 심볼(함수·메서드+호출) 부착 — 표시 전용 / 결정론 axis 무오염.
+	let cgNote = '';
+	if (!args.noCodegraph) {
+		const dbPath = args.codegraph || findCodegraphDb(graphPath);
+		if (dbPath) {
+			try {
+				attachSymbols(augmented, readCodegraph(dbPath));
+				cgNote = ` · ${augmented.symbol_count || 0} symbol (codegraph)`;
+			} catch (err) {
+				cgNote = ` · codegraph skip (${err.message})`;
+			}
+		} else if (args.codegraph) {
+			cgNote = ' · codegraph 경로 없음';
+		}
+	}
+
 	const graphName = args.scope || basename(graphPath);
 	const html = buildHtml(augmented, freshness, { graphName });
 
@@ -78,6 +99,7 @@ function main() {
 	console.log(`✓ dep-graph viz 생성: ${outPath}`);
 	console.log(
 		`  ${augmented.nodes.length} nodes (${synth} synthetic 표시) · ${augmented.edges.length} edges` +
+			cgNote +
 			(args.scope ? ` · scope=${args.scope}` : '') +
 			(freshness.stale ? ` · ⚠ STALE (${freshness.stale_sources.length} source)` : ' · fresh'),
 	);
