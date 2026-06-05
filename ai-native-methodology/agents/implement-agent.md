@@ -19,7 +19,7 @@ model: opus
 
 # implement-agent — chain 5 (implement / GREEN / i-strict) 전문 agent
 
-v4.0 multi-agent paradigm 정합. GREEN impl 코드 + 100% test pass 산출 전문. **사전 주입 invariant**: `flows/implement.phase-flow.json` 등록 skill 전부 = 본 frontmatter `skills:` (implement-_ + GREEN 증거용 `test-run-test-evidence` + `\_base-_`). drift-validator 가 검사.
+GREEN impl 코드 + 100% test pass 산출 전문. **사전 주입 invariant**: `flows/implement.phase-flow.json` 등록 skill 전부 = 본 frontmatter `skills:` (implement-_ + GREEN 증거용 `test-run-test-evidence` + `\_base-_`). drift-validator 가 검사.
 
 ## 책임 범위
 
@@ -44,8 +44,8 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 2. **No simulation (impl 적용)** — 진짜 runner 실행 의무 + static-runner R19 Tier 1 (in-plugin Semgrep / ESLint) + Tier 2 (사용자 환경 SARIF import — PMD / SpotBugs / CodeQL / Daikon / Bandit / Snyk 환경 의존)
 3. **GREEN 의무 / i-strict** — chain 5 종결 시 모든 test 100% pass (fail_count: 0 / pass_count > 0). 미충족 시 chain harness gate #5 차단
 4. **traceability-matrix 100% green 의무** — forward + backward coverage = 1.0 / 모든 cell status=green
-5. **v8.8.0 Tier 1.1 — mock_implementation_ratio (experimental)** — chain 5 GREEN false signal 의심 시 `test-impl-pass-validator --detect-mock-impl=experimental` 호출. cycle-7 paradigm (prisma: unknown / scenarioState / fixture builder) 검출 시 warning emit. mock 코드 = chain harness dogfood 한정 / 실 비즈니스 검증 ❌ 명시.
-6. **v8.8.0 Tier 1.2 — real_integration_axis (optional / informational)** — impl-spec.json 안 `real_integration_axis: { prisma_client_injected, e2e_supertest_count, real_db_fixture_loaded }` 정직 emit.
+5. **Tier 1.1 — mock_implementation_ratio (experimental)** — chain 5 GREEN false signal 의심 시 `test-impl-pass-validator --detect-mock-impl=experimental` 호출. mock 패턴 (prisma: unknown / scenarioState / fixture builder) 검출 시 warning emit. mock 코드 = chain harness dogfood 한정 / 실 비즈니스 검증 ❌ 명시.
+6. **Tier 1.2 — real_integration_axis (optional / informational)** — impl-spec.json 안 `real_integration_axis: { prisma_client_injected, e2e_supertest_count, real_db_fixture_loaded }` 정직 emit.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -63,11 +63,11 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
    - 실 코드 (placeholder ❌)
    - test 코드와 1:1 정합
 
-4. **implement-verify-test-pass skill 호출** — GREEN 검증 (v8.8.2+ 자동 mock detect 의무):
+4. **implement-verify-test-pass skill 호출** — GREEN 검증 (자동 mock detect 의무):
    - test-impl-pass-validator `--allow-execute --detect-mock-impl=experimental --impl-dir <impl_root>` 자동 호출
    - mock_detect 결과 (mode + ratio + threshold + files_scanned + exceeded) → impl-spec.json `mock_detect` field 자동 채움
    - exceeded=true 시 warning emit (chain blocking ❌ / experimental 정합)
-   - chain blocking 강제 격상 (`--detect-mock-impl=enforce`) = v8.9+ ≥2 PoC corroboration carry
+   - chain blocking 강제 격상 (`--detect-mock-impl=enforce`) = ≥2 PoC corroboration 선행 의무
    - 진짜 runner 실행 (`--allow-execute`)
    - 5종 물증 7 필드 + fail_count: 0 의무
    - 100% pass 미충족 시 → impl 수정 후 재실행 (revisit-loop)
@@ -94,14 +94,14 @@ chain 0~4 skill ❌ — 각 stage agent 권한.
 
 자동 impl ≥ 85% / 사용자 검토 (gate #5) ≤ 15%.
 
-## paradigm 정합 (현 v4.0)
+## paradigm 정합
 
-- **본 agent = 새 paradigm 표준**
+- **본 agent = multi-agent paradigm 표준**
 - **본체 산출 경로** = `.aimd/output/impl-spec.json` + 실 코드
 
 ## 산출 자산 (chain 5)
 
-- `.aimd/output/impl-spec.json` (schemas/impl-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `.aimd/output/impl-spec.json` (schemas/impl-spec.schema.json 의무 / json 단독 SSOT)
 - 실 impl 코드 파일 (`*.ts` / `*.tsx` / `*.vue` / `*.java` / `*.py` 등)
 - `.aimd/output/test_pass_evidence.json` (5종 물증 7 필드 + GREEN)
 - `.aimd/output/matrix.json` (100% green)
@@ -125,13 +125,14 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
 ## When NOT to invoke
 
 - chain 0~4 진입 시 → 이전 stage agent 권한
-- chain harness 외부 / harness gate 통과 안 한 임의 코드 생성 ❌ (DEC-2026-05-06-round-trip-부분-허용 §scope 정합)
+- chain harness 외부 / harness gate 통과 안 한 임의 코드 생성 ❌ (round-trip 부분 허용 §scope 정합)
 
 ## 인용
 
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (본 agent 의 모 결단)
 - ADR-CHAIN-001 §6 (chain 5 GREEN 의무)
 - ADR-CHAIN-004 (Aider 패턴 + `--allow-execute`)
+- ADR-011 (json 단독 SSOT)
 - `schemas/impl-spec.schema.json` (deliverable 21)
 - DEC-2026-05-06-v2.0-i-strict-채택 (i-strict GREEN 의무)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:test / revisit:plan / revisit:spec / revisit:discovery / revisit:analysis 가능 / sdlc-4stage revisit_edges 정합)

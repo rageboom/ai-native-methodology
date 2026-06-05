@@ -18,14 +18,14 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 1. **rules ↔ openapi 매핑** — 각 endpoint 가 어떤 rule 적용 받는지 (e.g., POST /users → DT-USER-VERIFY)
 2. **rules ↔ schema 매핑** — DB constraint 가 rules 의 어느 항목과 정합 / 불일치
 3. **rules ↔ state-map 매핑** (FE) — UI state transition rules
-4. **fe_validation 분리** — `auto_extracted=true` (Zod / Yup / RHF / class-validator 자동 추출) + `auto_extraction_source_id` 명시 (ADR-FE-005)
+4. **fe_validation 분리** — `auto_extracted=true` (Zod / Yup / RHF / class-validator 자동 추출) + `auto_extraction_source_id` 명시
 5. **decision-table-validator 재실행** — link 추가 후 정합 확인
 
 ## 산출물
 
 `<user-project>/.aimd/output/business-rules.json` (cross-link 강화 + meta_confidence 갱신)
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/5-business-rules.md`
-- ADR-FE-005 (권위 매개체 13)
+- 정책: methodology-spec/deliverables/5-business-rules.md
+- ADR: ADR-FE-005 (fe_validation 자동 추출 분리)

@@ -1,6 +1,5 @@
-# 산출물 #19: Acceptance Criteria (v2.0 chain 2)
+# 산출물 #19: Acceptance Criteria (chain 2)
 
-> **사상**: ADR-CHAIN-001 §1 / ADR-008 v2 §10 (Gherkin tag 자동 매핑) / ADR-CHAIN-002 §gate #2
 > **schema**: `schemas/acceptance-criteria.schema.json`
 > **생성 phase**: chain 2 (spec) — `/spec-derive-acceptance-criteria` (skill / sub-plan-4)
 > **gate**: go/stop gate #2
@@ -15,7 +14,7 @@
 
 ```
 .aimd/output/chain-2-spec/
-└── acceptance-criteria.json   # json 단독 SSOT (Gherkin scenario + tag = criteria[] 안 / v12 ADR-011)
+└── acceptance-criteria.json   # json 단독 SSOT (Gherkin scenario + tag = criteria[] 안)
 ```
 
 ## 3. 추출 범위
@@ -72,7 +71,7 @@ criteria:
     test_case_refs: [TC-USER-003]
 ```
 
-## Gherkin 표현 (criteria[] 안 / 예시 — v12 ADR-011 json 단독)
+## Gherkin 표현 (criteria[] 안 / 예시 — json 단독)
 
 ```gherkin
 Feature: User Signup
@@ -91,4 +90,10 @@ Feature: User Signup
 
 - Gherkin 본문 = Cucumber 사실상 표준 (Official research) / W3C 표준 ❌
 - Cucumber tag (`@must` 등) = MoSCoW severity 자동 매핑 (criteria[].severity)
-- AC-\* ID 산업 표준 부재 → 본 방법론 자체 정의 (ADR-CHAIN-001 명시)
+- AC-\* ID 산업 표준 부재 → 본 방법론 자체 정의
+
+## 인용
+
+- ADR: ADR-CHAIN-001 (chain harness AC 정의 + §1) / ADR-CHAIN-002 (gate #2) / ADR-008 §10 (Gherkin tag 자동 매핑) / ADR-011 (json 단독 SSOT)
+- AC-\* ID 자체 정의 근거: ADR-CHAIN-001
+- schema: schemas/acceptance-criteria.schema.json

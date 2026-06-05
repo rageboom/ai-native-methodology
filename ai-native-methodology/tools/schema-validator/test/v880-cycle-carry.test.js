@@ -1,4 +1,4 @@
-// schema-validator 회귀 — v8.8.0 Tier 4.1 cycle-carry.schema.json (DEC-2026-05-21).
+// schema-validator 회귀 — Tier 4.1 cycle-carry.schema.json (governance / decisions/governance/ 반출 / --schema 명시).
 // CarryRecord 의 resolution_kind 의무 검증 (status=completed 시):
 //   1) status=pending 의 carry — resolution_kind 없어도 valid
 //   2) status=completed + resolution_kind=intended — valid
@@ -17,9 +17,12 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = resolve(__dirname, '../src/cli.js');
 const TMP = resolve(__dirname, '_tmp_v880_cycle_carry');
+// cycle-carry.schema.json = governance schema → shipped payload 밖(decisions/governance/)으로 반출 (2026-06-05 shipped-provenance-cleanup).
+// schema-validator DEFAULT_SCHEMA_DIR(schemas/) 밖이므로 --schema 로 명시 지정.
+const SCHEMA = resolve(__dirname, '../../../decisions/governance/cycle-carry.schema.json');
 
 function runCli(args) {
-  return spawnSync('node', [CLI, ...args], {
+  return spawnSync('node', [CLI, ...args, '--schema', SCHEMA], {
     encoding: 'utf-8',
     cwd: resolve(__dirname, '../..'),
   });
@@ -35,7 +38,7 @@ function writeFixture(name, obj) {
   writeFileSync(
     p,
     JSON.stringify(
-      { $schema_origin: '../../../schemas/cycle-carry.schema.json', ...obj },
+      { $schema_origin: '../../../decisions/governance/cycle-carry.schema.json', ...obj },
       null,
       2,
     ),

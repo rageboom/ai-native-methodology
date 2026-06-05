@@ -22,15 +22,15 @@ FE 의 client state + server state cache shape 추출.
 3. **Mutation / action 추출** — store 의 setter / action / dispatch 후보
 4. **Server state cache key 매핑** — `useQuery(['users', id])` 같은 cache key + 응답 shape
 5. **Server state ↔ openapi 매핑** — server-state cache 가 어느 endpoint 와 정합
-6. **state-map.json 작성** — `schemas/state-map.schema.json` (v1.4 신규)
+6. **state-map.json 작성** — `schemas/state-map.schema.json`
 
 ## 산출물
 
 `<user-project>/.aimd/output/state-map.json`
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/8-state-map.md` (v1.4)
-- `methodology-spec/workflow/ui.md`
-- `schemas/state-map.schema.json`
-- ADR-FE-006 (framework-neutral IR + IR 4계층)
+- 정책: `methodology-spec/deliverables/8-state-map.md`
+- 정책: `methodology-spec/workflow/ui.md`
+- schema: `schemas/state-map.schema.json`
+- ADR: ADR-FE-006 (framework-neutral IR 4계층)

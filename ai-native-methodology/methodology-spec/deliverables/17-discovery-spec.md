@@ -1,9 +1,8 @@
-# 산출물 #17: Planning Spec (v2.0 chain 1)
+# 산출물 #17: Planning Spec (chain 1)
 
-> **사상**: ADR-CHAIN-001 (chain 정합 강제) §1 / ADR-011 (json 단독 SSOT / ADR-008 이중 렌더링 supersede) / ADR-009 v2 §2.5 (planning trust 0.85)
 > **schema**: `schemas/discovery-spec.schema.json`
-> **생성 phase**: chain 1 (discovery) — `/discovery-from-analysis-output` (skill / v9.0 planning→discovery 개칭 / 산출물 파일명 `discovery-spec.json` 은 reuse 유지)
-> **gate**: go/stop gate #1 (ADR-CHAIN-002)
+> **생성 phase**: chain 1 (discovery) — `/discovery-from-analysis-output` (skill / 산출물 파일명 `discovery-spec.json`)
+> **gate**: go/stop gate #1
 
 ## 1. 목적
 
@@ -14,19 +13,19 @@
 ### 1차 구현 = legacy single-case
 
 - `derivation_source.type = legacy-extraction` 만 (사용자 답변 1번 정합)
-- use case 4종 분기 (legacy/신규 PRD/수정/버그) = v2.1+ carry K-1
+- use case 4종 분기 (legacy/신규 PRD/수정/버그)
 
 ## 2. 형식
 
 ```
 .aimd/output/chain-1-discovery/
-├── discovery-spec.json   # json 단독 SSOT (v12 ADR-011)
+├── discovery-spec.json   # json 단독 SSOT
 └── _manifest.yml
 ```
 
 ## 3. 추출 범위 (출처 / 도구 / 신뢰도)
 
-| 항목                  | 출처                                  | 도구                | 신뢰도 (ADR-009 v2 §2.5)   |
+| 항목                  | 출처                                  | 도구                | 신뢰도                     |
 | --------------------- | ------------------------------------- | ------------------- | -------------------------- |
 | business_intent       | analysis 산출물 + LLM 추론            | LLM with grounding  | 70% (base) → 85% (gate #1) |
 | use_cases             | domain.json UC-\* + 정합              | 결정적              | 90%                        |
@@ -40,9 +39,9 @@
 
 | 도구                                                                  | 검증                                                                                      |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **discovery-extraction-validator** (sub-plan-3 신설 / v11.0.0 rename) | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
+| **discovery-extraction-validator**                                    | source-grounded coverage / no-hallucination / coverage ≥ 0.80 (analysis BR-/UC- ref 비율) |
 | schema-validator (Ajv 8)                                              | discovery-spec.schema.json 구조 정합                                                      |
-| traceability-matrix-builder                                           | UC-\* row 채움 (matrix.json — json 단독 SSOT / v12 ADR-011)                               |
+| traceability-matrix-builder                                           | UC-\* row 채움 (matrix.json — json 단독 SSOT)                                             |
 
 ## 5. 예시 (chain 1 sample)
 
@@ -74,9 +73,10 @@ business_rules_intent:
     source_grounded_evidence: 'src/user/UserValidator.java:23'
 ```
 
-## 6. carry / 후속
+## 인용
 
-| #      | 항목                            | 시점       |
-| ------ | ------------------------------- | ---------- |
-| K-1    | use case 4종 entry flow 분기    | v2.1+      |
-| sp2-c1 | framework_neutrality_score 정량 | sub-plan-3 |
+- 사상: ADR-CHAIN-001 (chain 정합 강제) §1
+- 사상: ADR-011 (json 단독 SSOT)
+- 사상: ADR-009 (planning trust 0.85)
+- gate: ADR-CHAIN-002 (go/stop gate)
+- schema: schemas/discovery-spec.schema.json

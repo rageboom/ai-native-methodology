@@ -1,7 +1,7 @@
 # Migration Cautions — FE 영역 가이드
 
-> **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + 위험 기록 한 방향 추출기) FE 적용 + ADR-FE-001 (Tier 1~4 spectrum) + ADR-FE-003 (Strangler Pattern)
-> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.json` (BE) + `migration-cautions-fe.json` (FE / v12 ADR-011)
+> **사상**: 본 방법론 가치 명세 (코드 → 형식 명세 + 위험 기록 한 방향 추출기) FE 적용 (Tier 1~4 spectrum + Strangler Pattern)
+> **위치**: 본 doc = 본체 spec. 실 산출물은 PoC 별 `output/antipatterns/migration-cautions.json` (BE) + `migration-cautions-fe.json` (FE / json-only)
 > **생성 phase**: `quality` phase (`/analyze-quality`) — FE 산출물 (deliverable 7~13) 통합 후
 
 ---
@@ -18,7 +18,7 @@
 | -------------------------------------------------------------------------- | ---------------------------- | ------------------------------- |
 | API / DB / Security / Architecture / Domain                                | ✅                           | (cross-link 만)                 |
 | FE state 5 진실 / visual baseline / a11y / i18n / 정적보안 / legacy 4 Tier | (cross-link 만)              | ✅                              |
-| 사내 도입 quality gate (Baseline + Ratchet)                                | ✅ ADR-010 정합              | ✅ ADR-010 + WCAG ratchet 정합  |
+| 사내 도입 quality gate (Baseline + Ratchet)                                | ✅                           | ✅ WCAG ratchet 정합            |
 
 → BE / FE migration-cautions 양쪽 의무 산출물 (Phase 6).
 
@@ -34,7 +34,7 @@
 | D   | i18n MF2 runtime preview    | #11 i18n-spec                   |
 | E   | 정적보안 (XSS / CSRF / CSP) | #12 static-security-spec        |
 | F   | legacy 4 Tier strangle      | #13 legacy-spectrum             |
-| G   | 사내 도입 quality gate FE   | (횡단 — ADR-010 + WCAG ratchet) |
+| G   | 사내 도입 quality gate FE   | (횡단 — WCAG ratchet)           |
 
 ---
 
@@ -107,7 +107,7 @@
 
 ---
 
-## 5. C — a11y baseline / ratchet (ADR-010 정합)
+## 5. C — a11y baseline / ratchet
 
 ### C-1. WCAG 2.1-AA baseline 의무 (build block)
 
@@ -120,7 +120,7 @@
 
 **CI 의무**:
 
-- a11y-spec.summary.baseline_pass=false → build fail (ADR-010 baseline 정합)
+- a11y-spec.summary.baseline_pass=false → build fail (baseline 정합)
 
 ### C-2. WCAG 2.2-AA ratchet 격상 path
 
@@ -146,7 +146,7 @@
 
 ### D-1. MF1 폴백 의무
 
-**근거**: #11 i18n-spec §4 + ADR-FE-005 §2.2.3
+**근거**: #11 i18n-spec §4
 
 **design 단계**:
 
@@ -217,7 +217,7 @@
 
 ### F-1. big_bang rewrite 절대 금지
 
-**근거**: #13 legacy-spectrum §11.4 + ADR-FE-003 §3
+**근거**: #13 legacy-spectrum §11.4
 
 **design 단계**:
 
@@ -231,7 +231,7 @@
 - ✅ Tier 1 + 2 혼재 시 mixed_breakdown 의무 (LOC / file_count 비율)
 - ✅ 진실 source 1개 일원화 (window.**INITIAL_STATE** + data-\* 동시 사용 금지)
 
-### F-3. Tier 4 (JSP) BE/FE 통합 (ADR-FE-004 carry)
+### F-3. Tier 4 (JSP) BE/FE 통합
 
 **design 단계**:
 
@@ -240,7 +240,7 @@
 
 ---
 
-## 9. G — 사내 도입 quality gate FE (ADR-010 정합)
+## 9. G — 사내 도입 quality gate FE
 
 ### G-1. Baseline 도입 의무
 
@@ -300,14 +300,22 @@
 | Security     | E                       | OWASP API Security ↔ FE 정적보안                                              |
 | Architecture | F                       | strangle = micro-frontend / edge proxy                                        |
 | Domain       | A / D                   | rules.schema fe_validation / fe_authorization / fe_a11y / fe_i18n cross-link  |
-| Performance  | (운영 NFR — v1.5 carry) | LCP / CLS = ADR-001 §명시적 제외 정합                                         |
+| Performance  | (운영 NFR — carry)      | LCP / CLS = §명시적 제외 정합                                                 |
 
 → `quality` phase 산출 시 BE migration-cautions + FE migration-cautions 양쪽 의무.
 
 ---
 
-## 11. PoC #04 (Stage 5+) 적용 의무
+## 11. 적용 의무
 
-본 doc = 본체 spec. 실제 platform-specific 변형은 PoC #04 RealWorld React 의 `output/antipatterns/migration-cautions-fe.md` 에서 BE PoC #03 NestJS 패턴 정합 (ADR-NEST-001~004) 으로 구체화.
+본 doc = 본체 spec. 실제 platform-specific 변형은 PoC 별 `output/antipatterns/migration-cautions-fe.md` 에서 BE 패턴 정합으로 구체화.
 
-→ Stage 5 본격 PoC #04 종결 시 platform-specific 변형 섹션 (React / Vue / Angular 별) 의무.
+→ platform-specific 변형 섹션 (React / Vue / Angular 별) 의무.
+
+---
+
+## 인용
+
+- ADR: ADR-FE-001 (Tier 1~4 spectrum) / ADR-FE-003 (Strangler Pattern) / ADR-FE-004 (Tier 4 JSP BE/FE split) / ADR-FE-005 (i18n MF2 fallback)
+- ADR: ADR-010 (Baseline + Ratchet quality gate) / ADR-011 (json-only migration-cautions-fe) / ADR-001 (운영 NFR 명시적 제외) / ADR-NEST-001~004 (NestJS BE 패턴 정합)
+- schema: schemas (state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / legacy-spectrum)

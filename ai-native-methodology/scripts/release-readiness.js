@@ -2916,6 +2916,93 @@ function check39_codegraphOpenapiReferenceLensTrust() {
 	}
 }
 
+// check40 (2026-06-05 / shipped-provenance-cleanup 회귀 가드) — 출하 prose(skills/agents/methodology-spec) 본문에
+//   프로젝트 거버넌스 마커(DEC / ADR / 버전 변천사 / session N차 / inline PoC 증거 / LL)가 재유입되는지 content-aware scan.
+//   출처(provenance)는 '## 인용' footer 포인터로만 허용 — 본문은 present-tense 사용자 관심사.
+//   면제: (a) '## 인용'/'## Cross-link'/'## Provenance' footer heading 이후 줄, (b) 'allow-provenance:' 줄/파일
+//   (의도적 placeholder=design-agent / corroboration-evidence doc=sub-rules·finding-system), (c) YAML frontmatter.
+//   check27(shippedIdentityLeak) 동형 패턴.
+function check40_shippedProvenanceLeak() {
+	try {
+		const SHIPPED_DIRS = ['skills', 'agents', 'methodology-spec'];
+		// NOTE: '\b' after Korean '인용' never matches (한글=비-\w) → (\s|$) 경계 사용.
+		const FOOTER_RE = /^#{1,4}\s+(인용|Cross-link|Provenance)(\s|$)/;
+		const MARKERS = [
+			{ kind: 'DEC', re: /DEC-\d{4}-\d{2}-\d{2}-/ },
+			{ kind: 'ADR', re: /\bADR-[A-Za-z]+-?\d+/ },
+			{
+				kind: 'version-history',
+				re: /v\d+\.\d+(\.\d+)?[^|]{0,30}(신설|종결|누적|갱신|MINOR|PATCH|폐기|추가|rename|개칭|carry)/,
+			},
+			{ kind: 'session', re: /session\s*\d+\s*차/ },
+			{ kind: 'poc-evidence', re: /[Pp]oC\s*#?\d|poc-\d+/ },
+			{ kind: 'LL', re: /\bLL-[A-Za-z0-9]/ },
+		];
+		const hits = [];
+		for (const dir of SHIPPED_DIRS) {
+			const base = join(ROOT, dir);
+			if (!existsSync(base)) continue;
+			const entries = readdirSync(base, { recursive: true, withFileTypes: true });
+			for (const ent of entries) {
+				if (!ent.isFile() || !ent.name.endsWith('.md')) continue;
+				const full = join(ent.parentPath ?? ent.path, ent.name);
+				let content;
+				try {
+					content = readFileSync(full, 'utf-8');
+				} catch {
+					continue;
+				}
+				if (content.includes('allow-provenance:')) continue; // 파일 단위 면제
+				const lines = content.split('\n');
+				let inFrontmatter = false;
+				let pastFooter = false;
+				for (let i = 0; i < lines.length; i++) {
+					const ln = lines[i];
+					if (i === 0 && ln.trim() === '---') {
+						inFrontmatter = true;
+						continue;
+					}
+					if (inFrontmatter) {
+						if (ln.trim() === '---') inFrontmatter = false;
+						continue;
+					}
+					if (FOOTER_RE.test(ln)) {
+						pastFooter = true;
+						continue;
+					}
+					if (pastFooter) continue;
+					if (/allow-provenance:/.test(ln)) continue; // 줄 단위 면제
+					for (const m of MARKERS) {
+						if (m.re.test(ln)) {
+							hits.push(
+								`${full.slice(ROOT.length + 1).replace(/\\/g, '/')}:${i + 1} [${m.kind}]`,
+							);
+							break;
+						}
+					}
+				}
+			}
+		}
+		return {
+			id: 'shipped_provenance_leak',
+			pass: hits.length === 0,
+			detail:
+				hits.length === 0
+					? `출하 prose(skills/agents/methodology-spec) 본문 거버넌스 마커(DEC/ADR/버전변천사/session/inline-PoC/LL) 0건 — 출처는 ## 인용 footer 포인터로만 (allow-provenance: 파일/줄 예외 / shipped-provenance-cleanup 회귀 가드)`
+					: `본문 거버넌스 마커 ${hits.length}건: ${hits.slice(0, 8).join(', ')}${hits.length > 8 ? ' …' : ''} — ## 인용 footer 로 이동 또는 allow-provenance: 예외`,
+			delegated_to:
+				'skills/ agents/ methodology-spec/ (출하 prose) / 본문 DEC·ADR·버전변천사·session·PoC증거·LL → ## 인용 footer',
+		};
+	} catch (e) {
+		return {
+			id: 'shipped_provenance_leak',
+			pass: false,
+			detail: `error: ${e.message}`,
+			delegated_to: 'skills/ agents/ methodology-spec/',
+		};
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -2960,6 +3047,7 @@ function main() {
 		check37_codegraphAnchorVerifyReferenceLensTrust(),
 		check38_contextCacheReferenceLensTrust(),
 		check39_codegraphOpenapiReferenceLensTrust(),
+		check40_shippedProvenanceLeak(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;

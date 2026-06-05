@@ -1,6 +1,5 @@
-# 산출물 #20: Test Spec (v2.0 chain 3 / RED 의무)
+# 산출물 #20: Test Spec (chain 3 / RED 의무)
 
-> **사상**: ADR-CHAIN-001 §3 (no-simulation 강화) / ADR-008 v2 §10 / ADR-009 v2 §2.5 (test trust 0.88) / ADR-010 v2 §2.6 (coverage ratchet)
 > **schema**: `schemas/test-spec.schema.json`
 > **생성 phase**: chain 3 (test) — `/test-generate-test-spec` + `/test-run-test-evidence` (skills / sub-plan-4)
 > **gate**: go/stop gate #3
@@ -78,7 +77,7 @@ coverage:
     by_acceptance_criteria: 0.92 # chain 정합 의무
     by_business_rule: 0.88
     by_use_case: 0.95
-    threshold: 0.85 # ADR-010 v2 §2.6 ratchet
+    threshold: 0.85 # coverage ratchet
     severity_floor:
       critical: 1.0 # DO-178C DAL A
       high: 0.95
@@ -97,3 +96,11 @@ chain_attempt:
   retry_cap: 3 # default / 사용자 갱신 = §8.1 strict ≥ 2 PoC 의무
   revisit_count: 0
 ```
+
+## 인용
+
+- ADR: ADR-CHAIN-001 §3 (no-simulation 강화)
+- ADR: ADR-008 §10 (test spec 형식 근거)
+- ADR: ADR-009 §2.5 (test trust 0.88)
+- ADR: ADR-010 §2.6 (coverage ratchet)
+- schema: `schemas/test-spec.schema.json`

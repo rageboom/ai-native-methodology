@@ -1,6 +1,6 @@
 # input phase: 입력 정리 (Input Preparation)
 
-> **v3.3.0 G2 종결 이후 (2026-05-15)**: 본 단계는 **3중 양립** — (1) 사용자 수동 (자료를 inputs/ 폴더에 배치) / (2) skill 명시 호출 (`analysis-from-{prompt,swagger,plan-doc,figma}` / `analysis-input-collection`) / (3) `analysis-input-orchestrate` 자동 dispatch (자연어 발화 1회 → BCDE 4 skill 자동 + merge + cross-ref + conflict). 셋 모두 정합.
+> 본 단계는 **3중 양립** — (1) 사용자 수동 (자료를 inputs/ 폴더에 배치) / (2) skill 명시 호출 (`analysis-from-{prompt,swagger,plan-doc,figma}` / `analysis-input-collection`) / (3) `analysis-input-orchestrate` 자동 dispatch (자연어 발화 1회 → BCDE 4 skill 자동 + merge + cross-ref + conflict). 셋 모두 정합.
 
 ---
 
@@ -18,7 +18,7 @@
 
 ## 2. 입력
 
-**R8 입력 5종 (charter §1) — v3.3.0 G2 종결 시 자산 대칭 도달**:
+**R8 입력 5종 (charter §1)**:
 
 | R8 종류               | 입력                            | 흡수 skill                                                                                     | 출처                  |
 | --------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------- |
@@ -68,12 +68,12 @@
 
 - 입력 종류별 skill 직접 호출 — `/analysis-from-swagger` / `/analysis-from-figma` / `/analysis-from-plan-doc` / `/analysis-from-prompt` / `/analysis-input-collection`
 
-**경로 C — orchestrate 자동 dispatch (v3.3.0 G2)**:
+**경로 C — orchestrate 자동 dispatch**:
 
 - 자연어 발화 1회 (메타데이터 + 의도 섞임) → `analysis-input-orchestrate` 자동 호출
 - 휴리스틱 (URL/path 패턴 + 키워드) + 인라인 마커 (`@swagger:`, `@figma:`, `@plan-doc:`) 으로 1단계 파싱
 - BCDE 4 skill 자동 dispatch + merge + cross-ref + conflict 검출 (정량 산식)
-- 산출 = `.aimd/<scope>/planning/input-summary.json` (json 단독 SSOT / ADR-011)
+- 산출 = `.aimd/<scope>/planning/input-summary.json` (json 단독 SSOT)
 - Hybrid rule: 총 입력 ≤ 50K token = 직접 chain / > 50K = Task tool sub-agent
 
 ### 3.3 환경 제약 케이스
@@ -84,7 +84,7 @@ git clone 이 불가능한 환경 (예: web-only):
 - GitHub API 로 디렉토리 구조 조회
 - **우선순위**: build 설정 → 소스 코드 (핵심 도메인) → 설정 파일
 
-### 3.4 Scenario detection (BE/FE 분리 운영 — ADR-FE-004 정합)
+### 3.4 Scenario detection (BE/FE 분리 운영)
 
 | signal                                                                      | A 분리 | B JS 풀스택 | C JSP    |
 | --------------------------------------------------------------------------- | ------ | ----------- | -------- |
@@ -131,13 +131,13 @@ inputs:
   domain_context_md: true
   postman_or_api_test: false
 
-expected_confidence_average: 0.78 # ADR-003 공식 v1 로 산정
+expected_confidence_average: 0.78 # 공식 v1 로 산정
 formula_version: 'v1'
 applied_modifiers:
   - { input: domain_context_md, bonus: 0.03 }
 applied_penalties: []
 
-# v1.4 Stage 6 신설 — BE/FE 분리 운영 Scenario (ADR-FE-004)
+# BE/FE 분리 운영 Scenario
 scenario: A # A 분리 default / B JS 풀스택 / C JSP
 scenario_signals:
   - { signal: package_json_present, detected: true }
@@ -176,10 +176,19 @@ scenario_signals:
 ## 6. 신뢰도
 
 이 phase 는 사용자 수동 작업이므로 신뢰도 산정 대상이 아님.
-다만 **입력의 양과 질이 후속 phase 의 신뢰도를 결정** (ADR-003 §6).
+다만 **입력의 양과 질이 후속 phase 의 신뢰도를 결정**.
 
 ---
 
 ## 7. 다음 단계
 
 `discovery` phase (`/analyze-init`) 진입.
+
+---
+
+## 인용
+
+- ADR: ADR-003 (입력 양·질 → 신뢰도 산정 공식)
+- ADR: ADR-011 (input-summary json 단독 SSOT)
+- ADR: ADR-FE-004 (BE/FE 분리 운영 Scenario detection)
+- 결단: DEC-2026-05-15-g2 (G2 종결 — 3중 양립 자산 대칭)

@@ -1,8 +1,7 @@
 # sql-inventory phase: sql-inventory (SQL 단위 11 컬럼 인벤토리 + extraction_automation)
 
-> **명령어**: `/analyze-sql-inventory` · **사상**: ADR-CHAIN-007 (phase 4.8 정식 도입) + Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP) + Opus 4.7 외부 조언 6 컬럼
+> **명령어**: `/analyze-sql-inventory` · **사상**: Michael Feathers Characterization Testing (2004) + Gartner TIME framework + AWS Migration Acceleration Program (MAP)
 > **핵심 책임**: rules + antipatterns + characterization 만으로는 SQL 단위 추적 ❌ → SQL 단위 11 컬럼 인벤토리 (외부 6 + 본 추가 5) + extraction_automation metric → chain 1 discovery-spec UC↔sql_id mapping 입력 보강
-> **introduced**: v2.2.0-rc1
 > **RDB only**: ✅ (NoSQL/Prisma 단독 환경 시 skip)
 
 ---
@@ -41,9 +40,9 @@
 
 | #   | 컬럼                         | 출처                              | 자동?                                                         |
 | --- | ---------------------------- | --------------------------------- | ------------------------------------------------------------- |
-| 1   | sql_id                       | 외부 (Opus 4.7)                   | ✅ grep                                                       |
+| 1   | sql_id                       | 외부                              | ✅ grep                                                       |
 | 2   | mapper_xml                   | 외부                              | ✅                                                            |
-| 3   | statement_type               | Agent 1 강 권고 (MyBatis 14 표준) | ✅ grep — XML `statementType` 속성 + Java `CallableStatement` |
+| 3   | statement_type               | MyBatis 14 표준                   | ✅ grep — XML `statementType` 속성 + Java `CallableStatement` |
 | 4   | called_from_screen           | 외부                              | ❌ 매뉴얼                                                     |
 | 5   | business_meaning             | 외부                              | ❌ 매뉴얼 (LLM ~70%)                                          |
 | 6   | dynamic_branch               | 외부                              | ✅ grep                                                       |
@@ -61,7 +60,7 @@
 | 11 컬럼 표          | (없음 / json 별도)                        | `output/sql-inventory/sql-inventory.md` |
 | 1차 grep 산출       | `output/sql-inventory/raw-grep.txt`       | (디버그 용)                             |
 
-### 3.3 statement_type enum (Agent 1 강 권고 흡수)
+### 3.3 statement_type enum
 
 | 값          | 정의                                   | 식별                                                                                                            |
 | ----------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------- |
@@ -92,8 +91,8 @@ extraction_automation:
       'dependent_tables',
     ]
   manual_columns: ['called_from_screen', 'business_meaning']
-  auto_ratio_external_6: '4/6 = 66.7% (≥ 50% pass / PoC #06+#07 baseline)'
-  auto_ratio_external_7: '5/7 = 71.4% (statement_type 추가 후)'
+  auto_ratio_external_6: '4/6 = 66.7% (≥ 50% pass)'
+  auto_ratio_external_7: '5/7 = 71.4%'
   auto_ratio_total_11: '5/11 = 45.5%'
 ```
 
@@ -103,11 +102,11 @@ extraction_automation:
 
 ## 5. patterns_extension_v2 (optional / Legacy iBATIS 한정)
 
-PoC #07 D12 결단 (b) nested patterns object 패턴. 4 패턴:
+nested patterns object 패턴. 4 패턴:
 
 - pattern_1_dynamic_branch / pattern_2_calculation_formula / pattern_3_result_mapping / pattern_4_shared_sql_fragments
 
-patterns_extension_v3 (cache / discriminator / typeHandler) = C-v2.2.0-3 carry / 본 phase scope ❌.
+patterns_extension_v3 (cache / discriminator / typeHandler) = 본 phase scope ❌.
 
 ---
 
@@ -121,7 +120,7 @@ node tools/schema-validator/src/cli.js .aimd/output/sql-inventory/
 node tools/sql-inventory-validator/src/cli.js \
   --target .aimd/output/sql-inventory/ \
   --threshold-auto-ratio 0.50
-# v8.7 rename — 옛 명칭 'sql-inventory-extractor' bin alias 양쪽 보존 (옛 호출자 break ❌)
+# 옛 명칭 'sql-inventory-extractor' bin alias 양쪽 보존 (옛 호출자 break ❌)
 ```
 
 Exit codes:
@@ -147,7 +146,7 @@ phase 4.8 산출물 = chain 1 (discovery-spec) 입력 핵심:
 ## 8. 흔한 함정
 
 1. RDB 부재 환경 (NoSQL/Prisma 단독) → phase 4.8 skip 의무
-2. Modern ORM raw SQL 측정 표준 부재 → C-v2.2.0-6 carry (Modern ORM PoC #08)
+2. Modern ORM raw SQL 측정 표준 부재 → Modern ORM 정합 검증 carry
 3. called_from_screen 자동화 0% → 매뉴얼 매핑 + 시간 cap carry
 4. business_meaning LLM ~70% → 도메인 expert 검증 carry
 5. external*call_out_of_scope 누락 → FN*_ / S\__ / SP\_\* prefix grep 의무
@@ -159,37 +158,22 @@ phase 4.8 산출물 = chain 1 (discovery-spec) 입력 핵심:
 
 ## 9. ≥ 2 PoC scale-cross corroboration
 
-| PoC                  | spectrum                                  | scale  | 외부 6 컬럼 자동화       | statement_type  |
-| -------------------- | ----------------------------------------- | ------ | ------------------------ | --------------- |
-| **PoC #06 retrofit** | Spring 4.1 + iBATIS 2 단일책임 (exchange) | 6 SQL  | 4/6 = 66.7%              | ✅ 1 SP         |
-| **PoC #07**          | Spring 4.1 + iBATIS 2 다중책임 (capital)  | 71 SQL | 4/6 = 66.7% (scale 무관) | ✅ 14 procedure |
-
-→ scale-cross isomorphic 입증 / **paradigm-cross = Modern ORM PoC #08 carry C-v2.2.0-6** (Senior STOP signal 흡수 / v2.2.0 final trigger / 7d minimum prerelease).
+격상 gate: 외부 6 컬럼 자동화 비율 + statement_type 식별 = Legacy iBATIS 2 환경 ≥ 2 PoC scale-cross corroboration 의무 (단일책임 + 다중책임 / scale 무관 isomorphic). paradigm-cross (Modern ORM) = 별도 corroboration carry.
 
 ---
 
-## 10. carry (v2.2.x patch / v2.x)
+## 인용
 
-| ID         | 항목                                                                        | trigger                |
-| ---------- | --------------------------------------------------------------------------- | ---------------------- |
-| C-v2.2.0-1 | Modern 환경 NoSQL/Prisma 정합 검증                                          | ≥ 1 Modern PoC 후      |
-| C-v2.2.0-2 | sql-inventory baseline ratchet (characterization-coverage-validator mirror) | v2.2.x patch / 사용 시 |
-| C-v2.2.0-3 | patterns_extension_v3 (cache / discriminator / typeHandler)                 | ≥ 2 Legacy PoC 후      |
-| C-v2.2.0-6 | Modern ORM PoC #08 (paradigm-cross)                                         | v2.2.0 final trigger   |
-| C-v2.2.0-7 | iBATIS 2 전용 dynamic 태그 sub-classification                               | v2.2.x patch           |
-| C-v2.2.0-8 | Gartner TIME 2축 매핑 (`time_classification` 12번째 컬럼)                   | v2.3+                  |
+- 본체 명세: `methodology-spec/deliverables/24-sql-inventory.md`
+- schema: `schemas/sql-inventory.schema.json`
+- validator: `tools/sql-inventory-validator/`
+- skill: `skills/analysis-sql-inventory/SKILL.md`
+- ADR: ADR-CHAIN-007 (phase 4.8 sql-inventory 도입)
+- corroboration #1: DEC-2026-05-08-poc-06-sql-inventory-retrofit
+- corroboration #2: DEC-2026-05-08-poc-07-종결
 
----
+### 외부 권위 출처
 
-## 11. 본체 명세 + 외부 권위
-
-- `methodology-spec/deliverables/24-sql-inventory.md`
-- `schemas/sql-inventory.schema.json` (31번째)
-- `tools/sql-inventory-validator/` (workspace 14번째)
-- `skills/analysis-sql-inventory/SKILL.md`
-- ADR-CHAIN-007 phase 4.8 정식 도입
-- DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
-- DEC-2026-05-08-poc-07-종결 (corroboration #2)
 - Michael Feathers, _Working Effectively with Legacy Code_ (2004)
 - Gartner _TIME framework_ / AWS _Migration Acceleration Program_ (MAP)
-- MyBatis 3 / iBATIS 2 / sonar-mybatis / SchemaSpy / ibatis2mybatis 공식 docs (research §7 12종 footnote)
+- MyBatis 3 / iBATIS 2 / sonar-mybatis / SchemaSpy / ibatis2mybatis 공식 docs

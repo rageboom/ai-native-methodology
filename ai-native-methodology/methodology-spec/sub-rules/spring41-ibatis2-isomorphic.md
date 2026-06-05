@@ -1,14 +1,11 @@
 # Sub-Rule: Spring 4.1 + iBATIS 2 Spectrum AP Isomorphic 5종
 
-> v2.3.0 Phase 2 신설 (v1.0) → v1.1 갱신 (2026-05-12 / DEC-2026-05-12-sub-rule-v1.1-갱신) — PoC #11 (billing / 작은 단일책임) corroboration #3 추가 + KL-SATD 인용 정정 + §X automation ceiling R1' 신설.
-> **v1.1.1 PATCH** (2026-05-13 / DEC-2026-05-13-r1-prime-본체-명문화) — Agent 1 F-015 cross-validation 인용 정정 3건 (Zhang → **Wang et al.** / LongCodeBench **2025** (2026 ❌) / "Not All Code Is Equal" 검증 carry 분리) + Agent 2 외부 권위 보강 (AWS SCT + Amazon Q + ThoughtWorks isomorphic corroboration 3건) + §X-C-2 신설.
-> **v1.1.2 PATCH** (2026-05-13 session 2차 / DEC-2026-05-13-not-all-code-인용-복원) — Agent 1 finding "arxiv 2601.21894 검증 실패 가능성" **정정** (메인 WebFetch + WebSearch 직접 검증 결과 = arxiv ID 정확 / Twist et al. 2026 / 2026-01-29 submission). "Not All Code Is Equal" 인용 **복원** + 저자명 정확 명시. C-not-all-code-검증 carry ✅ resolved. critical lesson F-015 sub-agent 한계 (WebFetch 직접 못 한 가능성 / fallback 메인 cross-check 의무).
-> **v1.2.0 MINOR** (2026-05-29 / DEC-2026-05-29-sub-rule-v1.2.0-poc-17-corroboration) — poc-17 Phase 1 analysis baseline 12 phase 전수 종결 시점 본격 입증 사실 누적. **§X-H sub-axis (R1'-c DB axis) 첫 corroboration 본격** (poc-17 = 4번째 사내 PoC 사실 — PoC #06+#07+#11+#17 / scale-cross 4 spectrum). **§X-H-11 신축 AP 본격 등재** (AP-LEGACY-IBATIS2-DB-001~011 / N+1 / cross-DB / SP-EXEC / raw-JSP / PII-하드코딩 / dead-SQL / magic / insert-as-update / debug-stdout / parallel-array / N1-cross-DB). **sub-axis 자동화율 81.25% 본격 측정** (AP detection sub-axis만 한정 / R1' axis ceiling 53~55% 와 별 metric). additive only / breaking 0 / sub-rule §2 core 5 AP 변경 ❌.
+<!-- allow-provenance: corroboration-evidence 문서 — R1' isomorphic 입증(사내 PoC scale-cross + 외부 권위 cross-validation)이 본문의 존재 근거. PoC·DEC·외부 인용이 곧 증거이므로 check40 가드 면제. -->
+
 > **trigger**: Spring 4.x + iBATIS 2.x stack 분석 시 본 5종 우선 후보 AP.
-> **자격 (v1.1)**: ≥ 3 사내 PoC isomorphic (PoC #06 단일책임 + PoC #07 다중책임 + PoC #11 작은 단일책임 spectrum) — scale-cross 3 spectrum 충족 (v1.0 ≥ 2 PoC → v1.1 ≥ 3 사내 PoC 강화).
+> **자격**: ≥ 3 사내 PoC isomorphic (단일책임 + 다중책임 + 작은 단일책임 spectrum) — scale-cross 충족.
 > **schema 참조**: `schemas/antipatterns.schema.json` AP-\* 정합.
-> **ADR**: ADR-CHAIN-010 (Spring 4.1 + iBATIS 2 spectrum sub-rule 정식 자산화 / v1.0 origin).
-> **version**: v1.2.0 (MINOR / 2026-05-29 / poc-17 §X-H sub-axis 첫 corroboration + §X-H-11 신축 AP 본격 등재 / additive only / breaking 0 / §2 core 5 AP 변경 ❌ / ADR-CHAIN-010 자체 변경 ❌ / schema 변경 ❌).
+> **ADR**: ADR-CHAIN-010 (Spring 4.1 + iBATIS 2 spectrum sub-rule 정식 자산화).
 
 ---
 

@@ -64,7 +64,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 ## 인용
 
 - DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 skill 의 모 결단)
-- DEC-2026-05-26-input-skill-roles (`analysis-from-prompt` / `analysis-from-plan-doc` 와 timing 분리 / v10.0.4 paradigm / v10.1.0 본격 구현)
+- DEC-2026-05-26-input-skill-roles (`analysis-from-prompt` / `analysis-from-plan-doc` 와 timing 분리)
 - `agents/discovery-agent.md` (본 skill 의 caller)
 - `skills/analysis-from-prompt/SKILL.md` + `skills/analysis-from-plan-doc/SKILL.md` (baseline 채널)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference)

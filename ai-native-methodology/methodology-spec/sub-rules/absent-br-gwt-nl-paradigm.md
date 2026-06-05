@@ -1,8 +1,10 @@
-# absent BR GWT-NL 합성 paradigm (v2.5.0 industry-first 본격)
+# absent BR GWT-NL 합성 paradigm (industry-first)
 
-> **status**: 승인됨 (session 15차 / 2026-05-14)
+<!-- allow-provenance: industry-first corroboration 문서 — cross-validation 부재 입증(Spec Kit/AWS Q/DMN 등) + ADR/DEC 근거가 본문의 존재 근거. check40 가드 면제. -->
+
+> **status**: 승인됨
 > **scope**: BR (Business Rule) chain 1 stage 안 NL ↔ GWT dual representation paradigm 안 **absent/결함 BR** 영역 특수 사실 영역
-> **본격 사실**: 본 paradigm = 본 방법론 v2.5.0 안 industry-first 자격 핵심 영역 / Spec Kit (90K) / AWS Q / DMN / Spectral / Drools / AutoUAT 모두 부재
+> **industry-first 근거**: 본 paradigm 의 NL ↔ GWT dual representation (absent/결함 BR) = Spec Kit (90K) / AWS Q / DMN / Spectral / Drools / AutoUAT 모두 부재 — industry-first 자격 핵심 영역
 
 ---
 
@@ -192,8 +194,6 @@ then: [현 결함 결과 / 권한 검증 부재 / 누구나 가능]
 
 ---
 
-## §8. version handling
+## §8. 자산 자격
 
-- session 15차 = v2.5.0 MINOR FINAL release 직후 본 자산 신설 (본 release 안 본격 포함 ❌ / v2.5.1 PATCH 자격 영역)
-- 본 자산 = methodology-spec/ 안 sub-rule 자격 (industry-first paradigm 본격 명세)
-- 다음 PATCH release 시 본 자산 본격 포함 의무 (본 자산 자체 = 본 방법론 v2.5.0 industry-first 자격 핵심 영역)
+- 본 자산 = `methodology-spec/` 안 sub-rule (industry-first paradigm 명세).

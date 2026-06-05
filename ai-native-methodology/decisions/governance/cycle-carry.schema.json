@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ai-native-methodology/schemas/cycle-carry.schema.json",
+  "$id": "https://ai-native-methodology/decisions/governance/cycle-carry.schema.json",
   "title": "Cycle Carry Record (v8.8.0 / Tier 4.1)",
   "description": "cycle 산출물의 carry 추적 schema. 본 schema 는 v8.8.0 Tier 4.1 (DEC-2026-05-21-v8.8.0-cycle7-evolution) — cycle 간 carry 항목의 'original_intent' (원 의도) vs 'resolution_kind' (실 resolution 방식) 정직 표기 강제. cycle-3 의 A2~A6 carry (= 'v8.7 PATCH 적용 후 정합 redo' 의도) 가 cycle-7 의 '신규 분석' 으로 resolution 되는 drift 추적 필요성에서 도출. cycle 의 state.json 안 'carries' 필드 또는 CLOSURE.md 안 carry table 의 자료를 본 schema 형식으로 표준화.",
   "type": "object",

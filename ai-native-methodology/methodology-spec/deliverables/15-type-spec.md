@@ -1,6 +1,6 @@
-# 산출물 #15: Type Spec (v1.4 Stage 7-pre 신설 — TypeScript .d.ts 추출)
+# 산출물 #15: Type Spec — TypeScript .d.ts 추출
 
-> **사상**: ADR-FE-005 매개체 #6 (TypeScript .d.ts) 산출 절차 정식 + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #2 해소
+> **사상**: 매개체 #6 (TypeScript .d.ts) 산출 절차 정식 + L1 Domain framework-neutral IR + 외부 LLM 검증 빈틈 #2 해소
 > **schema**: `schemas/type-spec.schema.json`
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic` 의 sub) 또는 `ui` phase 5-2-a 의 sub
 
@@ -14,12 +14,12 @@
 
 ### 1.1 framework-neutrality_score (핵심 metric)
 
-ADR-FE-006 정합 — TS 타입 자체가 framework-neutral 인지 정량:
+TS 타입 자체가 framework-neutral 인지 정량:
 
 - **1.0** = React import / Vue setup / Angular decorator 직접 참조 ❌ → 신규 스택 즉시 활용
 - **0.0** = `React.FC<Props>` / `@types/react` 직접 참조 → 신규 스택 정해진 후 재추출 의무
 
-→ Stage 4 mini-PoC + Stage 5 본격 PoC 에서 정량 검증 의무.
+→ Stage 4 mini-PoC + Stage 5 PoC 에서 정량 검증 의무.
 
 ---
 
@@ -111,7 +111,7 @@ cross_links:
 
 ---
 
-## 6. 신뢰도 (ADR-009 §2.4 정합)
+## 6. 신뢰도
 
 | 단계 | 조건                                      | 신뢰도 |
 | ---- | ----------------------------------------- | ------ |
@@ -183,3 +183,12 @@ cross_links:
 
 - 증상: `React.FC<Props>` 추출 시 framework_coupling_score=0 표기
 - 대응: schema if/then 강제 (Stage 5+ drift-validator 검증 검토)
+
+---
+
+## 인용
+
+- ADR: ADR-FE-005 (매개체 #6 TypeScript .d.ts 산출)
+- ADR: ADR-FE-006 (L1 Domain framework-neutral IR)
+- 신뢰도 근거: ADR-009 §2.4
+- schema: `schemas/type-spec.schema.json`

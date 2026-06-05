@@ -1,13 +1,13 @@
-# 산출물 #22: Traceability Matrix (v2.0 cross-cutting)
+# 산출물 #22: Traceability Matrix (cross-cutting)
 
-> **사상**: ADR-CHAIN-001 §4 (매 gate 갱신 의무) / DO-178C bidirectional traceability + IEC 62304 (산업 권위 — Official research) / matrix.json 단독 SSOT (ADR-011 / ADR-008 v2 §10 이중 렌더링 supersede)
+> **사상**: 매 gate 갱신 의무 / DO-178C bidirectional traceability + IEC 62304 (산업 권위 — Official research) / matrix.json 단독 SSOT
 > **schema**: `schemas/traceability-matrix.schema.json`
 > **생성 phase**: cross-cutting — `/_base-build-traceability-matrix` (skill / sub-plan-4 / `skills/_base/`)
 > **gate**: 매 gate #1~#5 prerequisite
 
 ## 1. 목적
 
-**답하는 질문**: "UC → BHV → AC → TASK → TC → IMPL + commit_hash chain end-to-end 추적성은?" (v10.0.0 TASK layer)
+**답하는 질문**: "UC → BHV → AC → TASK → TC → IMPL + commit_hash chain end-to-end 추적성은?"
 
 **활용**: 사용자 검토 / 감사 / 산업 표준 (DO-178C / IEC 62304) 정합 입증.
 
@@ -17,7 +17,7 @@
 
 ```
 .aimd/output/_traceability/
-└── matrix.json       # json 단독 SSOT (ADR-011 / 시각화·표는 view-time 도구)
+└── matrix.json       # json 단독 SSOT (시각화·표는 view-time 도구)
 ```
 
 ## 3. 추출 범위
@@ -37,8 +37,8 @@
 
 | 도구                                              | 검증                                                         |
 | ------------------------------------------------- | ------------------------------------------------------------ |
-| **traceability-matrix-builder** (sub-plan-3 신설) | matrix.json 단독 산출 (ADR-011 / 표·graph 는 view-time 도구) |
-| chain-coverage-validator                          | forward+backward coverage ≥ 0.85 (ADR-010 v2 §2.6 ratchet)   |
+| **traceability-matrix-builder**                   | matrix.json 단독 산출 (표·graph 는 view-time 도구)           |
+| chain-coverage-validator                          | forward+backward coverage ≥ 0.85 (ratchet)                   |
 | schema-validator                                  | severity_floor (critical=1.0 const)                          |
 
 ## 5. 예시 (matrix cells)
@@ -85,7 +85,7 @@ coverage_summary:
 | UC-USER-002 | BHV-USER-002 | AC-USER-005 | —           | —             | —        | 🔴 red   | must     |
 ```
 
-## 7. graph view (figure 예시 / 산출물 아님 / v12 ADR-011)
+## 7. graph view (figure 예시 / 산출물 아님)
 
 ```mermaid
 graph LR
@@ -107,8 +107,8 @@ graph LR
 
 | #      | 항목                                                                              | 시점                 |
 | ------ | --------------------------------------------------------------------------------- | -------------------- |
-| sp2-c4 | matrix ≥ 100 cell 시 view-time graph 분할 정책 (mermaid twin emit 폐기 — ADR-011) | sub-plan-3           |
-| sp2-c3 | impl-spec binary artifact 보존 정책                                               | sub-plan-5 (PoC #05) |
+| sp2-c4 | matrix ≥ 100 cell 시 view-time graph 분할 정책                                     | sub-plan-3           |
+| sp2-c3 | impl-spec binary artifact 보존 정책                                               | sub-plan-5           |
 
 ## 9. 산업 권위 (Official research)
 
@@ -116,4 +116,13 @@ graph LR
 - **IEC 62304** (의료기기 SW) — class C (life-threatening) 100% coverage
 - **ISO/IEC 25010:2023** — Functional Correctness sub-characteristic 매핑
 
-본 산출물 = 산업 권위 표준 차용 / 본 방법론 첫 정식 도입 (ADR-CHAIN-001 §4).
+본 산출물 = 산업 권위 표준 차용.
+
+## 인용
+
+- ADR: ADR-CHAIN-001 §4 (매 gate 갱신 의무)
+- ADR: ADR-011 (matrix.json 단독 SSOT / json-only)
+- ADR: ADR-010 §2.6 (coverage ratchet)
+- ADR: ADR-008 §10 (이중 렌더링 supersede)
+- schema: schemas/traceability-matrix.schema.json
+- 외부 권위 출처: DO-178C (avionics) / IEC 62304 (의료기기 SW) / ISO/IEC 25010:2023

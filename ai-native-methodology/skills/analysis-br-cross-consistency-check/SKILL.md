@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Agent
 
 # br-cross-consistency-check
 
-v2.5.0 Phase C 의 Layer 2 LLM mandatory paradigm skill. Q-C-trigger (d) skill trigger paradigm 정합.
+Phase C 의 Layer 2 LLM mandatory paradigm skill.
 
 ## 언제 사용
 
@@ -19,7 +19,7 @@ v2.5.0 Phase C 의 Layer 2 LLM mandatory paradigm skill. Q-C-trigger (d) skill t
   - "br-cross-consistency-validator 시행"
   - "NL ↔ GWT 정합 검증"
 
-## paradigm 본질 (session 11차 patch v5 + session 12차 paradigm 회복)
+## paradigm 본질
 
 Layer 2 LLM 호출 paradigm = Claude Code sub-agent (Task tool / Agent tool) invocation paradigm:
 
@@ -94,7 +94,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/br-cross-consistency-validator/src/cli.js \
 - Layer 1 deterministic_score (structural sanity)
 - Layer 2 llm_consistency_score (semantic 정합)
 - overall_score = (L1 + L2) / 2
-- gate_status = (L1 ≥ 0.85 AND L2 ≥ 0.7) — Q-C4 (a) 결단 정합
+- gate_status = (L1 ≥ 0.85 AND L2 ≥ 0.7)
 
 ## 산출물
 
@@ -106,16 +106,15 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/br-cross-consistency-validator/src/cli.js \
 
 - same-model self-evaluation bias 위험 — NL/GWT 합성 sub-agent + Layer 2 검증 sub-agent 모두 Sonnet 4.6 시 self-consistency bias / Phase D retrospect 의무 (Opus / Haiku 교차 검증 carry)
 - confidence cap 0.85 의무 (Static Tool 시뮬레이션 금지 정책 정합)
-- LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 의무 보존 (LL-i-31 정합)
+- LLM advisory = 사람 검토 대체 ❌ / Phase D 도메인 전문가 검토 의무 보존
 
 ## Adzic SBE 함정 회피 자격
 
 - Layer 1 단독 = "형식 통과 = 의미 정합 착각" 함정 재현 위험
-- Layer 1 + Layer 2 양쪽 = Adzic 함정 회피 자격 도달 (LL-i-26 정합)
-- 본 skill = industry-first 자격 (Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT / TestFlow / IBM ODM 모두 부재 / LL-i-35 정합)
+- Layer 1 + Layer 2 양쪽 = Adzic 함정 회피 자격 도달
+- 본 skill = industry-first 자격 (Spec Kit / AWS Q / DMN / Drools / Spectral / AutoUAT / TestFlow / IBM ODM 모두 부재)
 
-## 참조
+## 인용
 
-- `tools/br-cross-consistency-validator/docs/layer-2-prompt-spec.md` — Layer 2 prompt spec
-- `tools/br-cross-consistency-validator/PHASE-C-2026-05-14-re-measurement.md` — session 13차 재실측 보고
-- `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` — paradigm 본질 + LL-i-26~38
+- 정책: `tools/br-cross-consistency-validator/docs/layer-2-prompt-spec.md` — Layer 2 prompt spec
+- ADR: `docs/adr/ADR-CHAIN-011-BR-dual-representation-paradigm.md` (BR dual representation paradigm)

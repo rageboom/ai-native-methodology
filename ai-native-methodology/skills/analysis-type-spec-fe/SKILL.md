@@ -34,7 +34,7 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
    - css-in-js
    - state-lib-specific
    - other
-5. **type-spec.json 작성** — `schemas/type-spec.schema.json` (v1.4 Stage 7-pre 신규):
+5. **type-spec.json 작성** — `schemas/type-spec.schema.json`:
    ```json
    {
      "types": [...],
@@ -49,8 +49,8 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
 
 `<user-project>/.aimd/output/type-spec.json`
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/15-type-spec.md` (v1.4 Stage 7-pre)
-- `schemas/type-spec.schema.json`
-- ADR-FE-006 (framework-neutral IR + IR 4계층)
+- 정책: methodology-spec/deliverables/15-type-spec.md
+- schema: schemas/type-spec.schema.json
+- ADR: ADR-FE-006 (framework-neutral IR 4계층)

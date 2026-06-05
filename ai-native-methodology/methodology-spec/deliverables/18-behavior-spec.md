@@ -1,6 +1,5 @@
-# 산출물 #18: Behavior Spec (v2.0 chain 2)
+# 산출물 #18: Behavior Spec (chain 2)
 
-> **사상**: ADR-CHAIN-001 §1 / ADR-011 (json 단독 SSOT / ADR-008 이중 렌더링 supersede) / ADR-009 v2 §2.5 (spec trust 0.88)
 > **schema**: `schemas/behavior-spec.schema.json`
 > **생성 phase**: chain 2 (spec) — `/spec-compose-behavior-spec` (skill / sub-plan-4)
 > **gate**: go/stop gate #2
@@ -17,7 +16,7 @@
 
 ```
 .aimd/output/chain-2-spec/
-├── behavior-spec.json   # json 단독 SSOT (ADR-011)
+├── behavior-spec.json   # json 단독 SSOT
 └── _manifest.yml
 ```
 
@@ -77,8 +76,9 @@ cross_links:
     - .aimd/output/schema.json
 ```
 
-## 6. carry
+## 인용
 
-| #      | 항목                                  | 시점 |
-| ------ | ------------------------------------- | ---- |
-| sp2-c2 | acceptance-criteria ICU MF2 i18n 통합 | v2.x |
+- ADR: ADR-CHAIN-001 §1 (chain harness paradigm)
+- ADR: ADR-011 (json 단독 SSOT)
+- ADR: ADR-009 §2.5 (spec trust 0.88)
+- schema: `schemas/behavior-spec.schema.json`

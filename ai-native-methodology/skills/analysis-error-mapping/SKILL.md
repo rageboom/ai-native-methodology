@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # analysis-error-mapping — BE Error Mapping Contract 분석
 
-ADR-BE-001 negative-space corroboration 정식화 정합. AP-API-001 의 자동 회귀 도구 + 신규 시스템 설계 시 contract 의무 명시.
+negative-space corroboration 정식화 정합. AP-API-001 의 자동 회귀 도구 + 신규 시스템 설계 시 contract 의무 명시.
 
 ## no-simulation 절대 금지
 
@@ -17,7 +17,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 ## 사전 조건
 
 - BE framework 식별 완료 (inventory.json / stack-detection.md → spring / spring-hexagonal / nestjs / express / fastapi 등)
-- 진짜 Semgrep 환경 (pip 채널 / Python 3.10+ / v1.4.1 입증)
+- 진짜 Semgrep 환경 (pip 채널 / Python 3.10+)
 
 ## 절차
 
@@ -52,7 +52,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - Spring rule = `error-mapping-generic-exception-in-service` (throw_unmapped mechanism)
    - NestJS rule = `error-mapping-nestjs-delete-201-decorator-drift` (decorator-drift mechanism)
 
-4. **ADR-010 baseline + ratchet 통합 의무** — legacy 진입 시 첫 분석 = baseline 등재 / 신규 결함만 차단:
+4. **baseline + ratchet 통합 의무** — legacy 진입 시 첫 분석 = baseline 등재 / 신규 결함만 차단:
 
    ```bash
    # 첫 run — baseline 작성
@@ -61,7 +61,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js ... --baseline <output>/error-mapping-baseline.json --ratchet
    ```
 
-   - critical/high severity = baseline 등재 ❌ (ADR-010 §2.3 = production blocker)
+   - critical/high severity = baseline 등재 ❌ (production blocker)
 
 5. **HTTP status mapping 표 작성** — `error-mapping-spec.json` 의 `http_status_mapping` 배열:
    - 각 exception class × HTTP status × mapping mechanism (enum: response_status_annotation / exception_handler_method / exception_filter / default_resolver / response_entity_status / implicit_default / **throw_unmapped**)
@@ -73,9 +73,9 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - `@Delete + @ApiResponse({status: 201})` → `apiresponse_201_for_delete` (Semgrep 자동 detect)
    - `@Put + @ApiResponse({status: 201})` → `apiresponse_201_for_update`
    - `@HttpCode` 명시 0 → `missing_httpcode_explicit`
-   - ts-morph semantic 분석 = v1.5.1+ carry (Semgrep pattern-not-inside 한계)
+   - ts-morph semantic 분석 미제공 (Semgrep pattern-not-inside 한계)
 
-7. **negative_evidence 4종 작성** (ADR-BE-001 정식 evidence):
+7. **negative_evidence 4종 작성** (정식 evidence):
 
    ```yaml
    negative_evidence:
@@ -96,7 +96,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 8. **AP 등재** — anti-pattern 통합 (Phase 6):
    - `throw_unmapped` ≥ 1 + `exception_handlers` 빈 배열 → AP-API-001 critical 등재 의무
    - `decorator_drift` ≥ 1 → AP-API-001 high 등재 의무
-   - cross_poc_isomorphic_count ≥ 2 BE PoC = ADR-BE-001 정합 (본체 antipattern 카탈로그 격상 자격 자연 충족)
+   - cross_poc_isomorphic_count ≥ 2 BE PoC = 본체 antipattern 카탈로그 격상 자격 자연 충족
 
 9. **error-mapping-spec.json 작성** — `schemas/error-mapping-spec.schema.json` 정합. framework_neutrality_score = exception_class / http_status / mapping_mechanism axis 로 framework 무관 표준 → 1.0 목표.
 
@@ -104,22 +104,22 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 - `<user-project>/.aimd/output/error-mapping-spec.json` (산출물 16)
 - raw Semgrep 출력 (`<user-project>/.aimd/output/tool-runs/error-mapping-*.sarif`)
-- baseline 파일 (`<user-project>/.aimd/baseline/error-mapping-baseline.json`) — ADR-010
+- baseline 파일 (`<user-project>/.aimd/baseline/error-mapping-baseline.json`)
 
 ## CI 통합 (drift-check.yml 정합)
 
-`.github/workflows/drift-check.yml` 의 body scan step + custom rule extra-rules 자동 통합. jwt-rsa-custom-rule 패턴 정합 (a144b5a + b87cec5 + 4dcace9 commit cadence 입증).
+`.github/workflows/drift-check.yml` 의 body scan step + custom rule extra-rules 자동 통합. jwt-rsa-custom-rule 패턴 정합.
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/16-error-mapping-spec.md` (v1.5.1+ carry — full deliverable)
-- `schemas/error-mapping-spec.schema.json` (v1.5.0 신설)
-- `tools/static-runner/rules/error-mapping-missing.yml` (Spring + NestJS sub-rule 2종)
-- `tools/static-runner/rules/error-mapping-missing.java` (Spring fixture)
-- `tools/static-runner/rules/error-mapping-missing.ts` (NestJS fixture)
-- ADR-BE-001 (negative-space corroboration 정식화 / 본 skill 의 사상 origin)
-- ADR-FE-007 (positive-space sister ADR)
-- ADR-009 (5단계 신뢰도 모델)
-- ADR-010 (baseline + ratchet)
-- DEC-2026-04-29-static-tool-실행-의무화
-- DEC-2026-05-02-jwt-rsa-custom-rule (negative-space rule 패턴 origin)
+- 정책: methodology-spec/deliverables/16-error-mapping-spec.md
+- schema: schemas/error-mapping-spec.schema.json
+- rule: tools/static-runner/rules/error-mapping-missing.yml (Spring + NestJS sub-rule 2종)
+- fixture: tools/static-runner/rules/error-mapping-missing.java (Spring)
+- fixture: tools/static-runner/rules/error-mapping-missing.ts (NestJS)
+- ADR: ADR-BE-001 (negative-space corroboration 정식화)
+- ADR: ADR-FE-007 (positive-space sister ADR)
+- ADR: ADR-009 (5단계 신뢰도 모델)
+- ADR: ADR-010 (baseline + ratchet)
+- 결단: DEC-2026-04-29-static-tool-실행-의무화
+- 결단: DEC-2026-05-02-jwt-rsa-custom-rule (negative-space rule 패턴)

@@ -1,7 +1,7 @@
 # 산출물 #1: 아키텍처/의존성 (Architecture & Dependencies)
 
-> **사상**: Schema-First (ADR-001 — 코드 전 스키마 합의)
-> **schema**: `schemas/architecture.schema.json` · **template**: (v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
+> **사상**: Schema-First (코드 전 스키마 합의)
+> **schema**: `schemas/architecture.schema.json` · **template**: json 단독 / 별도 template 파일 ❌, schema-driven
 > **생성 phase**: `architecture` phase (`/analyze-architecture`)
 
 ---
@@ -108,3 +108,11 @@ output/architecture/
 
 - 증상: 디렉토리명만 보고 Hexagonal 판단 → 실제론 Layered
 - 대응: 의존 방향 분석 필수 (domain → infra 의존 시 Hexagonal 아님)
+
+---
+
+## 인용
+
+- ADR: ADR-001 (Schema-First — 코드 전 스키마 합의)
+- ADR: ADR-011 (json 단독 SSOT — template 파일 폐기)
+- schema: `schemas/architecture.schema.json`

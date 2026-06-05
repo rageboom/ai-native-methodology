@@ -17,7 +17,7 @@ model: opus
 
 # spec-agent — chain 2 (spec) 전문 agent
 
-v4.0 multi-agent paradigm 정합. executable behavioral contract 추출 전문. 3 spec skill + 4 base utility = 7 skill 사전 주입.
+executable behavioral contract 추출 전문. 3 spec skill + 4 base utility = 7 skill 사전 주입.
 
 ## 책임 범위
 
@@ -69,16 +69,16 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
    - traceability-matrix UC → BHV → AC forward 갱신 상태
    - chain 3 (plan) 진입 권고 → `plan-agent` dispatch (phase-flow next_chain=plan / plan stage 건너뜀 금지)
 
-## paradigm 정합 (현 v4.0)
+## paradigm 정합
 
-- **본 agent = 새 paradigm 표준**
+- **본 agent = paradigm 표준**
 - **본체 산출 경로** = `.aimd/output/behavior-spec.json` + `acceptance-criteria.json`
 - **lifecycle-contract §Agent column spec row** = 본 agent
 
 ## 산출 자산 (chain 2)
 
-- `.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
-- `.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
+- `.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 SSOT)
 - `.aimd/output/findings.md` (누적)
 - `.aimd/output/intervention-log.json` (gate #2 사용자 결단 로그)
 

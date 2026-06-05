@@ -25,10 +25,10 @@
 | `business-logic` phase | 4영역 부분 안티패턴                                 |
 | `api` phase            | API 안티패턴 후보                                   |
 | `ui` phase             | UI 안티패턴 후보 (5-2-a / 5-2-b / 5-2-c)            |
-| deliverable 10         | a11y-spec.json (v1.4 — WCAG 2.1+2.2 ratchet)        |
-| deliverable 11         | i18n-spec.json (v1.4 — ICU MF1+MF2 / MF1 폴백)      |
-| deliverable 12         | static-security-spec.json (v1.4 — XSS / CSRF / CSP) |
-| deliverable 13         | legacy-spectrum.json (v1.4 — Tier 1~4 + Strangler)  |
+| deliverable 10         | a11y-spec.json (WCAG 2.1+2.2 ratchet)               |
+| deliverable 11         | i18n-spec.json (ICU MF1+MF2 / MF1 폴백)             |
+| deliverable 12         | static-security-spec.json (XSS / CSRF / CSP)        |
+| deliverable 13         | legacy-spectrum.json (Tier 1~4 + Strangler)         |
 
 ---
 
@@ -40,7 +40,7 @@
 | 패턴 매칭 | SQL 정책 박힘 / 매직 넘버 분산 / FE-BE 검증 누락           | 준결정적 |
 | LLM 추론  | Anemic Domain Model 판정 / 복합 안티패턴 (여러 phase 결합) | LLM      |
 
-후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` (v12 ADR-011 — json 단독)
+후속 단계: 통합 → drift 격상 → severity 재산정 → 톤 점검 → `antipatterns.json` (json 단독)
 
 ### 3.1 단순 통합 (`business-logic` phase 가 만든 부분 안티패턴)
 
@@ -95,7 +95,7 @@ DRIFT-001: column_only_in_db (severity: high)
 
 ## 4. 톤 점검 (자동)
 
-ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 자동 변환:
+책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 자동 변환:
 
 | Bad           | Good                    |
 | ------------- | ----------------------- |
@@ -122,7 +122,7 @@ ADR-002 §책임 분담 + 6-antipatterns §2 톤 정책에 따라 비난 표현 
 
 ```
 .ai-analysis/output/antipatterns/
-├── antipatterns.json           # json 단독 SSOT (통합 + migration_advice / v12 ADR-011 — 구 avoid-list.md twin 폐기)
+├── antipatterns.json           # json 단독 SSOT (통합 + migration_advice)
 ├── migration-cautions.json     # 신규 시스템 회피 가이드 (BE 영역 의무 / migration-cautions.schema.json)
 ├── migration-cautions-fe.json  # FE 영역 회피 가이드 (의무, FE 분석 시)
 └── composite-patterns.md       # 복합 패턴 별도 (가독성 / functional report)
@@ -141,9 +141,9 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
 - severity 기반 적용 우선순위
 - antipatterns.json `migration_advice` 필드의 사람 친화적 통합
 - **Platform-specific 변형 섹션** — 분석 대상 stack 별 함정 + 학습 효과 입증 표
-- **사내 도입 quality gate 정책 (ADR-010 정합)** — Baseline + Ratchet 패턴
+- **사내 도입 quality gate 정책** — Baseline + Ratchet 패턴
 
-**antipatterns.json 과의 차이** (v12 ADR-011 — 구 avoid-list.md twin 폐기):
+**antipatterns.json 과의 차이**:
 
 - antipatterns.json = "기존 시스템에서 발견된 패턴 + 즉시 fix"
 - migration-cautions.json = "신규 시스템 구축 시 design/review/CI 단계에서 차단 가이드"
@@ -153,7 +153,7 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
 **의무**: stack 별 함정과 학습 효과 등재. 신규 platform 분석 시 동일 패턴으로 변형 섹션 등재 의무 (Spring Boot / FastAPI / Ktor / NestJS 등).
 
 ```markdown
-## NestJS 특이 패턴 (PoC #03 정합 — ADR-NEST-001~004)
+## NestJS 특이 패턴
 
 ### NestJS 학습 효과 (자연 회피 — 비재현)
 
@@ -166,14 +166,14 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
 ### NestJS 함정 (신규 — design 단계 의무 적용)
 
 - @Controller() 빈 prefix → @Controller('users') 의무
-- @Post default 201 → @HttpCode 명시 의무 (ADR-NEST-003)
-- @Delete default 200 → @HttpCode(204) 의무 (ADR-NEST-003)
-- AuthMiddleware forRoutes 분산 → JwtAuthGuard 글로벌 (ADR-NEST-001)
-- TypeORM eager:true → eager:false default + 명시적 fetch (ADR-NEST-004)
-- Math.random() suffix slug → DB UQ + nanoid (ADR-NEST-004)
+- @Post default 201 → @HttpCode 명시 의무
+- @Delete default 200 → @HttpCode(204) 의무
+- AuthMiddleware forRoutes 분산 → JwtAuthGuard 글로벌
+- TypeORM eager:true → eager:false default + 명시적 fetch
+- Math.random() suffix slug → DB UQ + nanoid
 ```
 
-#### 6.1.2 사내 도입 quality gate 정책 (ADR-010 정합)
+#### 6.1.2 사내 도입 quality gate 정책
 
 **의무**: Baseline + Ratchet 패턴 등재. 사내 legacy 도입 시 결함 폭증으로 차단되지 않도록.
 
@@ -206,7 +206,7 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
 
 → Slack/GitLab/Dropbox/Figma/Shopify 산업 표준.
 
-### 6.2 antipatterns 사람-읽기 표현 예시 (구 avoid-list.md / 현 antipatterns.json view-time 렌더)
+### 6.2 antipatterns 사람-읽기 표현 예시 (antipatterns.json view-time 렌더)
 
 ```markdown
 # 재구현 시 회피 후보 체크리스트
@@ -280,7 +280,18 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
 `quality` phase 완료 → 전체 산출물 검증 → 최종 발행:
 
 - TF 멤버 검토
-- 재구현 단계 입력 (v3)
+- 재구현 단계 입력
 - 사내 자산화
 
-다음 라이프사이클 (② 자산화, ③ 재구현) 은 별도 도구·방법론 (v2/v3 plan).
+다음 라이프사이클 (② 자산화, ③ 재구현) 은 별도 도구·방법론.
+
+---
+
+## 인용
+
+- ADR: ADR-002 (톤 점검 책임 분담)
+- ADR: ADR-010 (quality gate baseline+ratchet)
+- ADR: ADR-011 (antipatterns json 단독 / avoid-list twin 폐기)
+- ADR: ADR-NEST-001 (JwtAuthGuard 글로벌)
+- ADR: ADR-NEST-003 (@HttpCode 명시)
+- ADR: ADR-NEST-004 (eager:false + nanoid slug)

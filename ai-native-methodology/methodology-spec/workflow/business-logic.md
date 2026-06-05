@@ -1,6 +1,6 @@
 # business-logic phase: 비즈니스 로직 추출 (4영역 병렬)
 
-> **명령어**: `/analyze-business-logic` · **사상**: 4영역 병렬 추출 (DB / FE / 설정 / 외부) · ADR-004 (DDD-Lite B)
+> **명령어**: `/analyze-business-logic` · **사상**: 4영역 병렬 추출 (DB / FE / 설정 / 외부)
 
 ---
 
@@ -103,7 +103,7 @@
 
 ```
 .ai-analysis/output/domain/           # 도메인 모델 (#2)
-└── domain.json                       # json 단독 SSOT (엔티티·UC·보편 언어 / v12 ADR-011)
+└── domain.json                       # json 단독 SSOT (엔티티·UC·보편 언어 / v12 json-only)
 
 .ai-analysis/output/rules/            # 비즈니스 규칙 (#5) — 부분
 ├── business-rules.json
@@ -174,3 +174,10 @@
 ## 8. 다음 단계
 
 `formal-spec` phase (`/analyze-formal-spec`) → `api` phase (`/analyze-api`) + `ui` phase (`/analyze-ui-base` + `/analyze-state` + `/analyze-visual`) 병렬 진입.
+
+---
+
+## 인용
+
+- ADR: ADR-004 (DDD-Lite B 사상)
+- ADR: ADR-011 (domain.json json-only SSOT)

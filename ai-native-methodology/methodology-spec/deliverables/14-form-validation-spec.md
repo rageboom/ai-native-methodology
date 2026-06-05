@@ -1,6 +1,6 @@
-# 산출물 #14: Form Validation Spec (v1.4 Stage 7-pre 신설)
+# 산출물 #14: Form Validation Spec
 
-> **사상**: ADR-FE-005 §2.1.1 (Zod 매개체 13 채택) + ADR-FE-006 (L1 Domain framework-neutral IR) + 외부 LLM 검증 빈틈 #1 해소
+> **사상**: Zod 를 검증 매개체로 채택 + L1 Domain framework-neutral IR + 외부 LLM 검증 빈틈 #1 해소
 > **schema**: `schemas/form-validation-spec.schema.json`
 > **생성 phase**: `ui` phase 5-2-b (`/analyze-state` 의 sub) 또는 별도 `/analyze-form-validation`
 
@@ -70,9 +70,9 @@ F-VAL-LOGIN-EMAIL-001:
 
 # Step 2: business-rules.json 자동 등록 (BR-* ID 부여)
 BR-FE-LOGIN-EMAIL-001:
-  category: fe_validation # Stage 3-2 enum
-  source_format: zod # Stage 7-pre 신규
-  auto_extracted: true # Stage 7-pre 신규
+  category: fe_validation # enum 값
+  source_format: zod
+  auto_extracted: true
   auto_extraction_source_id: F-VAL-LOGIN-EMAIL-001
   given:
     - '사용자가 로그인 form 의 email field 에 값 입력'
@@ -109,7 +109,7 @@ cross_links:
 
 ---
 
-## 6. 신뢰도 (ADR-009 §2.4 정합)
+## 6. 신뢰도
 
 | 단계 | 조건                                                              | 신뢰도                 |
 | ---- | ----------------------------------------------------------------- | ---------------------- |
@@ -124,7 +124,7 @@ cross_links:
 ```
 □ schema 검증 통과
 □ source_libraries 명시 (≥ 1 항목)
-□ Zod 사용 시 zod = primary 표기 (ADR-FE-005 매개체 13)
+□ Zod 사용 시 zod = primary 표기
 □ 모든 validation 에 id / field_name / validation_type / source_format 명시
 □ framework_coupled=true 시 신규 스택 정해진 후 재추출 의무 표기
 □ cross_link_to_br 명시 (business-rules.json fe_validation BR 자동 등록)
@@ -173,3 +173,12 @@ cross_links:
 
 - 증상: 자동 등록 BR ID 가 사람 작성 BR ID 와 충돌
 - 대응: 자동 등록 prefix `BR-FE-*` 사용 + auto_extracted=true 분리 운영
+
+---
+
+## 인용
+
+- 사상 근거: ADR-FE-005 §2.1.1 (Zod 검증 매개체 채택) / ADR-FE-006 (L1 Domain framework-neutral IR)
+- zod=primary 체크리스트 근거: ADR-FE-005
+- §6 신뢰도 단계 근거: ADR-009 §2.4 (신뢰도 단계별 정량)
+- schema: `schemas/form-validation-spec.schema.json`

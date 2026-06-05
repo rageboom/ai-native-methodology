@@ -20,9 +20,9 @@ model: opus
 
 # discovery-agent — chain (discovery) 전문 agent
 
-v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figma / nl-md) 에서 UC + intent + spec-필요 정보 추출. 4 어댑터 + 2 공통 sub-skill + 4 base utility = 10 skill 사전 주입.
+입력 4종 (analysis-output / swagger / figma / nl-md) 에서 UC + intent + spec-필요 정보 추출. 4 어댑터 + 2 공통 sub-skill + 4 base utility = 10 skill 사전 주입.
 
-본 agent 는 v4.0 `planning-agent` 의 책임을 흡수하고 입력 어댑터 paradigm 으로 확장 (DEC-2026-05-21 정합).
+본 agent 는 `planning-agent` 의 책임을 흡수하고 입력 어댑터 paradigm 으로 확장.
 
 ## 책임 범위
 
@@ -43,7 +43,7 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 다른 chain stage (analysis / spec / plan / test / implement) skill ❌ — 각 stage agent 권한.
 
-## 운영 정책 (DEC-2026-05-21 §8 정합)
+## 운영 정책
 
 | #   | 정책                     | 본 agent 적용                                                                   |
 | --- | ------------------------ | ------------------------------------------------------------------------------- |
@@ -63,13 +63,13 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 2. **어댑터 병렬 dispatch** — 입력 유형별 skill 호출 (analysis-output / swagger / figma / nl-md)
 3. **공통 sub-skill 호출** — `discovery-decompose-use-cases` + `discovery-identify-business-intent` 로 어댑터 결과 정규화
 4. **Merge + 충돌 해소** — 어댑터 간 동일 UC / Intent 충돌 / 중복 detection 결과 사용자 결단 묶음 gate
-5. **discovery-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무 (carry — schema 신설)
+5. **discovery-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무
 6. **gate 진입** — `_base-invoke-go-stop-gate` 호출 / 사용자 결단 cluster + intervention-log 등재
 7. **종결 보고** — discovery-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
 
 ## 산출 자산
 
-- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-v4.1-discovery-schema / json 단독 SSOT / ADR-011)
+- `.aimd/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-discovery-schema / json 단독 SSOT)
 - `.aimd/output/findings.md` (discovery stage 의 발견 사항 누적)
 - `.aimd/output/intervention-log.json` (discovery gate 사용자 결단 로그)
 
@@ -79,10 +79,10 @@ v4.1 chain stage 재구성 정합. 입력 4종 (analysis-output / swagger / figm
 
 자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 UC / BR-INTENT / I/O contract / UI spec / NFR 는 사용자 검토 의무.
 
-## paradigm 정합 (v4.1)
+## paradigm 정합
 
-- 본 agent = v4.0 `planning-agent` 의 책임 흡수 + 입력 어댑터 paradigm 확장 (DEC-2026-05-21 옵션 A)
-- 현 commit 안 frontmatter `skills:` 사전 등록된 `discovery-from-*` 4 어댑터 + `discovery-decompose-use-cases` / `discovery-identify-business-intent` skill 파일은 후속 commit 안 신설/rename — Claude Code SessionStart 시점에 frontmatter 사전 주입 paradigm 정합 (Sub-agents.md spec line 407~429)
+- 본 agent = `planning-agent` 의 책임 흡수 + 입력 어댑터 paradigm 확장
+- frontmatter `skills:` 사전 등록된 `discovery-from-*` 4 어댑터 + `discovery-decompose-use-cases` / `discovery-identify-business-intent` skill 파일은 Claude Code SessionStart 시점에 frontmatter 사전 주입 paradigm 정합 (Sub-agents.md spec line 407~429)
 - lifecycle-contract §자산 매핑 매트릭스 §Agent column discovery row = 본 agent path
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
@@ -102,15 +102,14 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
 
 - chain (analysis) 진입 시 → `analysis-agent` 권한 (baseline 산출)
 - chain (spec) 진입 후 → `spec-agent` 권한
-- chain (plan) 진입 후 → `plan-agent` 권한 (v4.2+ 본격)
+- chain (plan) 진입 후 → `plan-agent` 권한
 - 입력 어댑터 4종 외 입력 채널 → 본 agent scope 외 (carry)
 
 ## 인용
 
-- DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 agent 의 모 결단)
-- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리 paradigm)
-- v4.0 planning-agent (git history 보존 / 본 작업 안 discovery-agent 로 rename — `agents/discovery-agent.md`)
-- ADR-CHAIN-001 (json 단독 / ADR-011)
-- ADR-CHAIN-002 (gate UX)
-- `schemas/discovery-spec.schema.json` (carry — v4.1 신설)
-- DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)
+- 결단: DEC-2026-05-21-chain-discovery-plan-stage-도입
+- 결단: DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리)
+- 결단: DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)
+- ADR: ADR-CHAIN-001 (json 단독 SSOT)
+- ADR: ADR-CHAIN-002 (gate UX)
+- schema: schemas/discovery-spec.schema.json

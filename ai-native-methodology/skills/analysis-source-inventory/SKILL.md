@@ -38,11 +38,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 `<user-project>/.aimd/output/inventory.json` (validate against `schemas/inventory.schema.json`)
 
-## 본체 명세
-
-- `methodology-spec/workflow/discovery.md`
-- `schemas/inventory.schema.json` (inventory 산출물 = `discovery` phase output / 별도 deliverables 문서 ❌ — v3.0.0 phase 의미 ID rename 정합)
-
 ## 다음
 
 - `analysis-architecture` 호출 권장
+
+## 인용
+
+- 정책: methodology-spec/workflow/discovery.md
+- schema: schemas/inventory.schema.json (inventory 산출물 = `discovery` phase output / 별도 deliverables 문서 ❌)

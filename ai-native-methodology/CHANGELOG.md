@@ -10,6 +10,17 @@
 
 ---
 
+## [12.15.0] — 2026-06-05 MINOR — shipped 산출물 provenance 정리 (관심사 분리 + check40 가드)
+
+shipped 파일(skills 53 · methodology-spec 54 · agents 11)에 박혀 있던 **프로젝트 거버넌스 내용**(버전 변천사 · DEC rationale · PoC corroboration 증거 · LL 교훈 · backlog carry · ADR 변천사 산문)을 본문에서 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — shipped 본문 = 현재형 사용자 관심사만. outer `CLAUDE.md` 의 "버전 narrative 누적 금지 / 4중 중복 회피" precedent 를 전 shipped 파일로 확장. SSOT = `decisions/DEC-2026-06-05-shipped-provenance-cleanup.md`.
+
+- **convention**: 본문 present-tense + `## 인용` footer(id·경로 포인터 + ≤6어 gloss). KEEP = 현재 아키텍처 명칭(`v9.0 6-stage`/`chain N`)·게이트 문구(`≥2 PoC corroboration 의무`)·런타임 carry(R19 environment carry-over / baseline+ratchet / named `C-*` / schema field). RELOCATE = 버전 변천사·DEC/ADR 산문·인라인 PoC 증거·LL·backlog carry.
+- **반출 (non-shipped)**: `methodology-spec/finding-system.md` Body Finding Ledger(`F-PA`/`F-MB`/`F-SIM`/`F-SKILL`/`F-CHA` = 방법론 자체 dev 로그) → `decisions/finding-ledger.md` (995→212줄). `schemas/cycle-carry.schema.json`(거버넌스/dormant — shipped 생산자 0) → `decisions/governance/cycle-carry.schema.json` (payload 제외 / `--schema` 명시 test).
+- **증거 doc 보존**: `sub-rules/spring41-ibatis2-isomorphic.md`·`sub-rules/absent-br-gwt-nl-paradigm.md`·`finding-system.md` §9 = PoC corroboration 증거 보존 + 파일 단위 `allow-provenance:` 가드 면제. `agents/design-agent.md` = NOT-SHIPPED placeholder 강조 + 가드 면제.
+- **schema 라벨**: `adopter-corroboration.schema.json` `x-aimd-tier: governance` (경로 유지 / release check30 하드코딩 보호).
+- **재누적 방지 가드**: release-readiness **check40 `shipped_provenance_leak`** 신설 (39→40) — shipped prose(skills/agents/methodology-spec) 본문에 거버넌스 마커 재유입 시 fail-closed(`## 인용` footer·`allow-provenance:` 면제 / frontmatter skip / check27 동형). `skill-citation-validator` HISTORY_FILE 에 `decisions/finding-ledger*` 추가(history-class).
+- **동작 변화 ❌** — provenance noise 제거일 뿐 skill·agent 지시 기능 동형 / frontmatter `name`·`description` byte-불변. 검증: citation-validator 0 · check40 0 · release-readiness **40/40** · schema-validator 40/40 · release 테스트 24/24 (A1 workspace 29/29 포함).
+
 ## [12.14.0] — 2026-06-04 MINOR — codegraph wiring STEP 6 (openapi 정적 검증)
 
 **§5 STEP 6 (Modern-scoped reading-aid) 시행 — 로드맵 6번째(마지막) 슬라이스.** 4원칙 = `.claude/plans/{plan,research}-codegraph-step6.md` (#1 깊은 숙지 + #2 3-agent research(공식문서/업계/Senior 적대) + 실 DB probe → 사용자 gate #3 "6-B openapi 단일축 + full 범위" 결단). SSOT = DEC-2026-06-03-codegraph-deliverable-wiring.md §14.

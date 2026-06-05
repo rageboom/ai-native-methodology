@@ -42,7 +42,7 @@ URL/path 패턴 + 한국어/영어 키워드 매칭 + **인라인 마커 우선*
 
 ### 3단계 — merge / cross-ref / conflict 검출
 
-4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합 (json 단독 / ADR-011 — input-summary.md 미산출).
+4 sub-skill 산출을 `input-summary.json` (schema = `schemas/input-summary.schema.json`) 으로 통합 (json 단독 — input-summary.md 미산출).
 
 #### cross-ref 3-tier severity + 정량 기준
 
@@ -70,7 +70,7 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 ### 5단계 — greenfield 분기 (scenario=greenfield)
 
-`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / DEC-2026-05-30-use-scenario-taxonomy §2.4) 일 때:
+`work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음) 일 때:
 
 - **no-code 감지** — 분석 대상 코드 디렉토리 부재 / 입력이 PRD·디자인·계약(swagger·figma·plan-doc·prompt)뿐.
 - **입력어댑터만 dispatch** — BCDE 그대로 (code-archaeology 패스 skip / legacy 전용 phase = `source-inventory`/`db-schema`(코드)/`characterization`/`sql-inventory` 미발동).
@@ -79,17 +79,20 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 ## 산출물
 
-- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / json 단독 SSOT — ADR-011)
+- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / json 단독 SSOT)
 - 4 sub-skill extract 파일 (각 skill 책임)
-
-## 본체 명세 참조
-
-- `methodology-spec/workflow/input.md` (수동 + skill 호출 옵션 + orchestrator 자동 dispatch 3중)
-- `methodology-spec/plugin-charter.md` §1 R8 + §3 G2
-  (G2 orchestrate skill 분리 결단 = DEC-2026-05-15 / 상세는 decisions/ 워크스페이스 로그 — dist 미포함이라 경로 직접 인용 제거: case-by-case dist-dangling 정책)
 
 ## When NOT to invoke
 
 - 사용자가 legacy 코드만 분석 → `analysis-input-collection` 호출 (본 skill 우회)
 - 단일 입력만 (예: openapi.yaml 한 건만) → 해당 BCDE skill 직접 호출 가능 (orchestrate 우회)
 - chain 1+ 진입 후 (discovery-spec 작성 중 추가 자료 흡수) → revisit-loop 으로 input 재진입 의무
+
+## 인용
+
+- 결단: DEC-2026-05-30-use-scenario-taxonomy (greenfield 분기)
+- 결단: DEC-2026-05-15 (G2 orchestrate skill 분리)
+- ADR: ADR-011 (json 단독 SSOT — md 미산출)
+- 정책: methodology-spec/workflow/input.md (수동 + skill 호출 + 자동 dispatch 3중)
+- 정책: methodology-spec/plugin-charter.md §1 R8 + §3 G2
+- schema: schemas/input-summary.schema.json

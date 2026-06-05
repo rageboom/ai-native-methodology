@@ -1,7 +1,7 @@
 # 산출물 #5: 비즈니스 규칙 (Business Rules)
 
-> **사상**: DDD-Lite (ADR-004) + 4영역 추출 (DB / FE / 설정 / 외부)
-> **schema**: `schemas/business-rules.schema.json` · **template**: schema-driven inline placeholder (v12 ADR-011 — .template.md twin 폐지)
+> **사상**: DDD-Lite + 4영역 추출 (DB / FE / 설정 / 외부)
+> **schema**: `schemas/business-rules.schema.json` · **template**: schema-driven inline placeholder (.template.md twin 없음)
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
@@ -20,7 +20,7 @@
 
 ```
 output/rules/
-├── business-rules.json            # json 단독 SSOT (구조화, Given/When/Then) — v7.0.0 묶음 Q ⑦ rename (구 rules.json) / v12 ADR-011
+├── business-rules.json            # json 단독 SSOT (구조화, Given/When/Then)
 └── conflicts.md                   # 규칙 간 충돌 보고서 (있을 경우 / functional report)
 ```
 
@@ -83,49 +83,48 @@ output/rules/
 □ 추출 영역 (5.A/5.B/5.C/5.D) 명시
 □ human_review_required 항목 사용자 검토 완료
 □ FE-BE 검증 중복/누락 → 안티패턴(#6) 에 등록
-□ 상태 다이어그램 = formal-spec.json state_machines (v12 ADR-011 — 시각화는 view-time)
+□ 상태 다이어그램 = formal-spec.json state_machines (시각화는 view-time)
 □ 규칙 간 충돌 검토
-□ v4.0.1 — auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
-□ v4.0.1 — intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)
-□ v4.1.0 — is_intent + intent_vs_bug_classification 둘 다 보유 시 is_intent=true ⇔ classification='intent' 정합 (if/then schema enforcement)
-□ v6.0.0 묶음 Q ② — BR 은 given/when/then 또는 natural_language 중 **≥ 1 표현 의무** (description·trigger/condition/action 표현 자격 박탈 / description-only·TCA-only = schema INVALID hard reject / description·trigger·condition·action property 자체는 optional metadata 로 보존)
-□ v4.1.0 — cross_consistency_check 기록 시 generated_by provenance + heavy 데이터는 layer-2-results/ 분리 (slim marker only)
+□ auto_extracted=true BR 은 source_grounded_evidence 또는 source_evidence 의무 (if/then schema enforcement)
+□ intent_vs_bug_classification 채움 시 characterization-spec.intent_classification.type 와 정합 (cross-stage)
+□ is_intent + intent_vs_bug_classification 둘 다 보유 시 is_intent=true ⇔ classification='intent' 정합 (if/then schema enforcement)
+□ BR 은 given/when/then 또는 natural_language 중 **≥ 1 표현 의무** (description·trigger/condition/action 표현 자격 박탈 / description-only·TCA-only = schema INVALID hard reject / description·trigger·condition·action property 자체는 optional metadata 로 보존)
+□ cross_consistency_check 기록 시 generated_by provenance + heavy 데이터는 layer-2-results/ 분리 (slim marker only)
 ```
 
-### 4.1 v4.0.1 schema enforcement 강화 (DEC-2026-05-17 / ADR-CHAIN-011 §5 patch v8)
+### 4.1 schema enforcement
 
 **③ source-grounded enforcement** — AI 자동 추출 BR (auto_extracted=true) 은 schema 안 if/then 으로 source 인용 의무. 사람 작성 BR optional 보존. Industry case 정합 (Semgrep + CodeQL + SonarQube + Daikon 4/4 모두 source location required 또는 degraded-without).
 
 **⑥ intent_vs_bug_classification (cross-stage SSOT)** — schemas/intent-classification.schema.json 의 enum 4종 (intent / bug / ambiguous / self_recognized) 을 본 BR + characterization-spec scenario 양쪽이 $ref 의무. drift-validator cross-schema enum 정합 check 통과 의무.
 
 ```yaml
-# v4.0.1 예시
 - id: BR-USER-DATA-001
   name: '이메일 중복 ❌'
   natural_language: '사용자 등록 시 이메일은 시스템 내 유일해야 한다.'
   given: ['기존 사용자 존재']
   when: ['동일 이메일 신규 등록 시도']
   then: ['409 Conflict']
-  auto_extracted: true # v4.0.1
-  source_grounded_evidence: # v4.0.1 if/then required (auto_extracted=true)
+  auto_extracted: true
+  source_grounded_evidence: # if/then required (auto_extracted=true)
     file: 'source/src/user.legacy.ts'
     line_range: '10-15'
     grep_hit_count: 0
     grep_query: "users.find\\(.*email"
-  intent_vs_bug_classification: 'bug' # v4.0.1 신설 / characterization-spec 정합
+  intent_vs_bug_classification: 'bug' # characterization-spec 정합
   is_intent: false # legacy alias / classification 와 cross-consistency
   current_state_note: 'legacy source 결함 — register() 중복 검사 미수행'
 ```
 
-### 4.2 v4.1.0 Phase 2 ⑤ — cross_consistency_check + 동치 enforcement (DEC-2026-05-17-phase-2-5 / ADR-CHAIN-011 §5 patch v12)
+### 4.2 cross_consistency_check + 동치 enforcement
 
 **⑤ cross_consistency_check (slim provenance-tagged marker)** — Layer 1+2 cross-validation 결과의 BR 단위 추적성 marker. heavy 실행 데이터(per-BR rationale·score dump)는 `tools/br-cross-consistency-validator/layer-2-results/poc-NN-layer-2-results.json` 분리 보존 (SARIF·Semgrep·OPA·Spectral 산업 표준) / BR 안 inline = rule 의 '서술적 속성' 영역 한정 (Semgrep `metadata:` 패턴). optional / additionalProperties:false.
 
-**is_intent ⇔ intent_vs_bug_classification 양방향 동치 enforcement** — 둘 다 보유 시 schema if/then 으로 `is_intent=true ⇔ classification='intent'` 강제 (PoC #08 echo-chamber drift 차단 / LL-i-47·51). 단방향·미보유 BR = vacuous (실측 both=0 → 전 PoC 회귀 풀이 0 수학 보장).
+**is_intent ⇔ intent_vs_bug_classification 양방향 동치 enforcement** — 둘 다 보유 시 schema if/then 으로 `is_intent=true ⇔ classification='intent'` 강제 (echo-chamber drift 차단). 단방향·미보유 BR = vacuous.
 
 ```yaml
-# v4.1.0 추가 예시 (위 BR-USER-DATA-001 확장 — is_intent=false ⇔ classification≠'intent' 정합)
-cross_consistency_check: # v4.1.0 신설 / optional / additionalProperties:false
+# 추가 예시 (위 BR-USER-DATA-001 확장 — is_intent=false ⇔ classification≠'intent' 정합)
+cross_consistency_check: # optional / additionalProperties:false
   generated_by: 'br-cross-consistency-validator@0.2.0' # provenance discriminator (Senior 조건 1)
   layer: 2
   layer2_model: 'claude-sonnet-4-6'
@@ -134,7 +133,7 @@ cross_consistency_check: # v4.1.0 신설 / optional / additionalProperties:false
   intent_classification_preserved: false # 분류 보존 강제 핵심
   classification_drift_detected: true
   classification_drift_reason: 'GWT synthesis dropped is_likely_bug=true → normalized as business rule'
-  external_result_ref: 'tools/br-cross-consistency-validator/layer-2-results/poc-08-layer-2-results.json'
+  external_result_ref: 'tools/br-cross-consistency-validator/layer-2-results/poc-NN-layer-2-results.json'
   checked_at: '2026-05-17T00:00:00Z'
 ```
 
@@ -167,3 +166,15 @@ cross_consistency_check: # v4.1.0 신설 / optional / additionalProperties:false
 
 - 증상: `if (age >= 19)` — 왜 19 인지 코드만으로 알 수 없음
 - 대응: BR 에 등록 + human_review_required=true + rationale 비워둠
+
+---
+
+## 인용
+
+- ADR: ADR-004 (DDD-Lite 사상)
+- ADR: ADR-011 (json-only / .template.md twin 폐지)
+- ADR: ADR-CHAIN-011 (BR schema enforcement)
+- §4.1 ③⑥ source-grounded + intent_vs_bug 근거: DEC-2026-05-17
+- §4.2 ⑤ cross_consistency_check + 동치 enforcement 근거: DEC-2026-05-17-phase-2-5
+- schema: schemas/business-rules.schema.json
+- schema: schemas/intent-classification.schema.json

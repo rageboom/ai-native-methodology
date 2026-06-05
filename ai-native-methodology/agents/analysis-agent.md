@@ -43,7 +43,7 @@ model: opus
 
 # analysis-agent — chain 1 sub (analysis stage) 전문 agent
 
-v4.0 multi-agent paradigm 정합. legacy 코드베이스 분석 stage 전문. **사전 주입 invariant**: 디스크 `analysis-*` 전 skill = `flows/analysis.phase-flow.json` 등록 = 본 frontmatter `skills:` (+ `_base-*` 3 utility). 개별 카운트 대신 invariant 로 drift 자기방지 (drift-validator 가 검사).
+legacy 코드베이스 분석 stage 전문. **사전 주입 invariant**: 디스크 `analysis-*` 전 skill = `flows/analysis.phase-flow.json` 등록 = 본 frontmatter `skills:` (+ `_base-*` 3 utility). 개별 카운트 대신 invariant 로 drift 자기방지 (drift-validator 가 검사).
 
 ## 책임 범위
 
@@ -90,30 +90,30 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 
 6. **chain 1 (discovery) gate#1 진입 prep** — analysis 산출물 schema valid 확인 후 main agent 에 보고 + `discovery-agent` dispatch 권고
 
-## paradigm 정합 (현 v4.0 본격 진입 정합)
+## paradigm 정합
 
-- **본 agent = 새 paradigm 표준** (DEC-2026-05-17-v4-multi-agent-paradigm-채택 정합)
-- **본체 산출 경로** = `.aimd/output/` (spike 의 `.aimd/output/_spike/` 와 axis 분리 — spike 는 역사 기록)
-- **agents/README.md 정책** = stage 별 분리 ✅ (DEC-2026-05-15-g5 retract / 본 agent 는 그 retract 의 5종 중 1번)
+- **본 agent = 새 paradigm 표준** (multi-agent paradigm 정합)
+- **본체 산출 경로** = `.aimd/output/`
+- **agents/README.md 정책** = stage 별 분리 ✅ (본 agent 는 analysis stage 전담)
 - **lifecycle-contract §Agent column** = 본 agent 가 analysis row 의 실 agent path
 
 ## 산출 자산 (chain 1 sub / analysis stage)
 
-- `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (json 단독 SSOT / ADR-011) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT / ADR-011)
+- `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (json 단독 SSOT) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT)
 - `.aimd/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
-- `.aimd/output/state-machines.json` (json 단독 SSOT / ADR-011 / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
+- `.aimd/output/state-machines.json` (json 단독 SSOT / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
 - `.aimd/output/findings.md`
 
 ## When NOT to invoke
 
 - chain 1 (discovery) 진입 후 → `discovery-agent` 권한
 - chain 2~5 진입 → 각 stage agent 권한
-- v3.x release 검증 → 본 paradigm 자격 부재
+- release 검증 → 본 agent scope 외
 
 ## 인용
 
-- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (본 agent 의 모 결단)
-- DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (retract 대상 — "stage 별 분리 ❌" 폐기)
-- v4-spike paradigm 가능 입증 (workspace archive 역사 기록 / dist 미포함 — 경로 인용 제거: case-by-case dist-dangling 정책)
-- `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스
-- `flows/analysis.phase-flow.json` (phase 의존 그래프 SSOT)
+- 결단: DEC-2026-05-17-v4-multi-agent-paradigm-채택 (본 agent 의 모 결단)
+- 결단: DEC-2026-05-15-g5-lifecycle-asset-matrix-종결 (stage 별 분리 retract)
+- ADR: ADR-011 (json 단독 SSOT)
+- 정책: methodology-spec/lifecycle-contract.md §자산 매핑 매트릭스
+- 정책: flows/analysis.phase-flow.json (phase 의존 그래프 SSOT)

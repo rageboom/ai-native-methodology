@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 38/39 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 38/39 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 39/40 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 39/40 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 39);
-		assert.equal(out.criteria_passed, 38);
+		assert.equal(out.criteria_total, 40);
+		assert.equal(out.criteria_passed, 39);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 39 criterion ids are present in output (no skipped)', () => {
+	it('all 40 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -97,6 +97,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'readme_version_sync',
 			'real_tool_evidence',
 			'shipped_identity_leak',
+			'shipped_provenance_leak',
 			'shipped_repo_relative_tool_path',
 			'skill_citation_integrity',
 			'spec_body_reference_lens_trust',
@@ -302,11 +303,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 39 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 40 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 39);
+		assert.equal(out.criteria_total, 40);
 	});
 
 	// v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -636,9 +637,45 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 39);
-		assert.equal(out.criteria_passed, 39);
+		assert.equal(out.criteria_total, 40);
+		assert.equal(out.criteria_passed, 40);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
+	});
+
+	// check40 discrimination — shipped prose provenance 회귀 가드 (shipped-provenance-cleanup / DEC-2026-06-05).
+	it('shipped_provenance_leak — skills/agents/methodology-spec 본문 거버넌스 마커 0 + 검출/면제 discrimination (## 인용 footer + allow-provenance + 한글 footer regression)', () => {
+		const r = runScript(['--target', 'v12.14.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find((x) => x.id === 'shipped_provenance_leak');
+		assert.ok(c.pass, `check40 must pass (0 body provenance markers) — detail: ${c.detail}`);
+		assert.ok(c.delegated_to.includes('## 인용'), 'delegated_to references the ## 인용 footer convention');
+		// discrimination — release-readiness.js check40 미러 (MARKERS + FOOTER_RE / digest_sha test 패턴 동형).
+		const FOOTER_RE = /^#{1,4}\s+(인용|Cross-link|Provenance)(\s|$)/;
+		const MARKERS = [
+			/DEC-\d{4}-\d{2}-\d{2}-/,
+			/\bADR-[A-Za-z]+-?\d+/,
+			/v\d+\.\d+(\.\d+)?[^|]{0,30}(신설|종결|누적|갱신|MINOR|PATCH|폐기|추가|rename|개칭|carry)/,
+			/session\s*\d+\s*차/,
+			/[Pp]oC\s*#?\d|poc-\d+/,
+			/\bLL-[A-Za-z0-9]/,
+		];
+		const isMarker = (line) => MARKERS.some((re) => re.test(line));
+		// poisoned 본문 = 위반
+		assert.ok(isMarker('본 skill 은 DEC-2026-05-26-ticket-plan-단일 정합.'), 'body DEC = marker');
+		assert.ok(isMarker('ADR-CHAIN-001 §2 정합'), 'body ADR = marker');
+		assert.ok(isMarker('v8.0.0 신설 — 이전 paradigm 폐기'), 'version change-history = marker');
+		assert.ok(isMarker('session 54차 결단 흡수'), 'session N차 = marker');
+		assert.ok(isMarker('PoC #06 Spring 4.1 입증'), 'inline PoC #N = marker');
+		assert.ok(isMarker('LL-i-26 정합'), 'LL tag = marker');
+		// clean = 비위반 (present-tense 아키텍처 명칭 / 게이트 문구 / 현재형 규칙)
+		assert.ok(!isMarker('chain harness v9.0 6-stage (discovery → spec → plan → test → implement)'), 'architecture version naming = OK');
+		assert.ok(!isMarker('≥ 2 PoC corroboration 의무 (Legacy + Modern)'), 'gate phrasing (no digit after PoC) = OK');
+		assert.ok(!isMarker('NFR allocation 누락 시 gate #3 block'), 'present-tense rule = OK');
+		// FOOTER_RE — 한글 '인용' 매칭 (regression: JS '\b' 는 한글 뒤 미성립 → (\s|$) 경계)
+		assert.ok(FOOTER_RE.test('## 인용'), '## 인용 footer heading detected');
+		assert.ok(FOOTER_RE.test('## 인용 (Provenance)'), '## 인용 (suffix) detected');
+		assert.ok(FOOTER_RE.test('## Cross-link'), '## Cross-link detected');
+		assert.ok(!FOOTER_RE.test('## 인용문 작성 가이드'), 'non-footer 인용문 heading not matched');
 	});
 });

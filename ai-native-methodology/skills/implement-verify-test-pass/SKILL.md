@@ -6,7 +6,7 @@ allowed-tools: Read, Bash, Edit
 
 # verify-test-pass
 
-v2.0 chain 5 의 **종결 skill**. impl 코드 generate 후 진짜 runner 호출 → 100% pass 검증 / 5종 물증 7 필드 채움 / traceability-matrix 최종 갱신.
+chain 5 의 **종결 skill**. impl 코드 generate 후 진짜 runner 호출 → 100% pass 검증 / 5종 물증 7 필드 채움 / traceability-matrix 최종 갱신.
 
 ## 언제 사용
 
@@ -48,7 +48,7 @@ validator 결과 분석:
 사용자 결단 의무 (Auto Mode 도 차단 / no-simulation). `_base-invoke-go-stop-gate` skill 호출 / cluster:
 
 1. revisit target 결정 (4 분류 중 하나)
-2. 영향 범위 (chain-revisit-detector — sub-plan-5 carry / 현재는 사용자 명시)
+2. 영향 범위 (chain-revisit-detector 자동 추출 미제공 — 현재는 사용자 명시)
 3. 재시도 사이클 한도 (권고: 동일 fail 3회+ → escalation)
 
 ### 4. 5종 물증 7 필드 + flaky_retries_count 채움
@@ -100,7 +100,7 @@ chain 5 strict 의무:
 
 `_base-invoke-go-stop-gate` skill — chain 5 종결 결단:
 
-- go → release 자격 평가 (sub-plan-6).
+- go → release 자격 평가.
 - stop → carry 등재.
 - revisit:<stage> → §3 분류 결과 적용.
 
@@ -118,7 +118,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/adopter-evidence-packager/src/cli.js \
 ```
 
 - 익명화 (PII best-effort redaction + post-redaction leak guard) 후 `.aimd/output/adopter-corroboration.json` 생성 (schema = `schemas/adopter-corroboration.schema.json`).
-- 자동 전송 ❌ — adopter 가 명시 공유할 때만 maintainer 에 전달 (§8.1 ≥2 distinct domain corroboration 채널 / EXT-CAPTURE-05).
+- 자동 전송 ❌ — adopter 가 명시 공유할 때만 maintainer 에 전달 (§8.1 ≥2 distinct domain corroboration 채널).
 - 정직: 본 단계 = 캡처 '배선' / Type 2 '측정'은 실 외부 adopter 실행 시 발생 (no-simulation).
 
 ## no-simulation 강화 (chain 5 핵심)
@@ -139,7 +139,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/adopter-evidence-packager/src/cli.js \
 - §3 drift / dmn / 6 신규 validator 0 violation ✅
 - §4 모든 chain stage coverage ≥ 0.85 ✅
 
-추가 §1 (≥ 2 PoC corroboration) + §5~§7 (ADR / matrix / e2e cycle) = sub-plan-6 PoC #05 시점.
+추가 §1 (≥ 2 PoC corroboration) + §5~§7 (ADR / matrix / e2e cycle) 은 본 skill 범위 밖에서 충족.
 
 ## 인용
 
@@ -149,9 +149,3 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/adopter-evidence-packager/src/cli.js \
 - ADR-CHAIN-003 (revisit loop)
 - impl-spec.schema.json `test_pass_evidence` `fail_count const 0`
 - master plan §C release 자격 §1~§7
-
-## Carry
-
-- chain-revisit-detector 자동 영향 범위 추출 (sub-plan-5 hooks 통합).
-- design-stage skill (1차 = analysis 자산 reuse / 후속) = v2.x.
-- 재시도 sandbox 격리 (Docker / firecracker) = v2.x.

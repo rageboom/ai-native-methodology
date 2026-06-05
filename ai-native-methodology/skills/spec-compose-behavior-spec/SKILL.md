@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # compose-behavior-spec
 
-v2.0 chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec` phase 통합 → executable behavior contract.
+chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec` phase 통합 → executable behavior contract.
 
 ## 언제 사용
 
@@ -21,9 +21,9 @@ v2.0 chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec
 
 ## 산출물
 
-- `<project>/.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `<project>/.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
 
-> **code_pointers_na 기본** (F-DOGFOOD-009) — BHV 는 의도 노드(executable contract) → 코드 anchor 는 하위 IMPL/TC 가 보유. 각 BHV `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
+> **code_pointers_na 기본** — BHV 는 의도 노드(executable contract) → 코드 anchor 는 하위 IMPL/TC 가 보유. 각 BHV `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 
 ## UC → BHV 1:N forward link 의무
 
@@ -34,9 +34,9 @@ v2.0 chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec
 - 1 UC = 1+ BHV. 단순 CRUD UC = 1 BHV / 복합 lifecycle UC = state 마다 1 BHV.
 - 예: UC-USER-001 (login) → BHV-USER-001 (validate-credentials) + BHV-USER-002 (issue-jwt) + BHV-USER-003 (set-session).
 
-## v11.0.0 Story cross-cut anchor 정합 (DEC-2026-05-26-be-fe-산출물-분리 §결단 #6)
+## Story cross-cut anchor 정합
 
-본 skill 안 BHV 산출 시 Story cross-cut anchor 본격 인식:
+본 skill 안 BHV 산출 시 Story cross-cut anchor 인식:
 
 - BHV-\* = Story anchor (BE+FE/DB/E2E 가로지름) — discovery-spec.UC 의 자연 evolution.
 - 본 skill 안 BHV 자체 = cross-cut 단일 (BE-only BHV / FE-only BHV 분리 ❌ — Story paradigm 정합).
@@ -100,13 +100,6 @@ Epic = FE 화면 단위 / 본 skill 안에서 Epic 추출 ❌ (plan-decompose-an
 
 자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. 특히 reasoning + invariants 는 사용자 검토 의무. property_tests stub 은 fast-check arbitrary 자동 생성 권고.
 
-## 인용
-
-- ADR-CHAIN-001 (chain 4단계 정합)
-- behavior-spec.schema.json (deliverable 18)
-- master plan §B chain 2
-- DEC-2026-04-29-phase-4-5-형식화-후보 (`formal-spec` phase chain 2 격상)
-
 ## 기술 스택 분기
 
 - Spring/JPA: invariants/_.ts 가 아닌 invariants/_.java (Bean Validation / Hibernate Validator) 가능.
@@ -115,3 +108,11 @@ Epic = FE 화면 단위 / 본 skill 안에서 Epic 추출 ❌ (plan-decompose-an
 - Go: invariants/\*.go (struct tag + validator package).
 
 각 framework 에 맞는 invariants 산출물 path 변환은 본 skill 본문에서 분기 (analysis stage `discovery` phase 차용).
+
+## 인용
+
+- ADR: ADR-CHAIN-001 (chain 4단계 정합)
+- schema: schemas/behavior-spec.schema.json (deliverable 18)
+- 결단: DEC-2026-04-29-phase-4-5-형식화-후보 (`formal-spec` phase chain 2 격상)
+- 결단: DEC-2026-05-26-be-fe-산출물-분리 §결단 #6 (Story cross-cut anchor)
+- master plan §B chain 2

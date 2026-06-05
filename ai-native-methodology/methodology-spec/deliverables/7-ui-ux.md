@@ -1,6 +1,6 @@
 # 산출물 #7: UI/UX 명세 (UI/UX Specification)
 
-> **사상**: FSD + Atomic Design (ADR-001 §FE) + legacy Tier 1~4 spectrum (ADR-FE-001) + DTCG 2025.10 토큰 (ADR-FE-005)
+> **사상**: FSD + Atomic Design + legacy Tier 1~4 spectrum + DTCG 2025.10 토큰
 > **schema**: `schemas/ui-spec.schema.json`
 > **생성 phase**: `ui` phase (`/analyze-ui`)
 
@@ -20,7 +20,7 @@
 | **#8 state-map**         | 분산 상태 5 진실 + state machine (동적 행동)                            |
 | **#9 visual-manifest**   | snapshot PNG (시각 진실 — binary 진실 모델)                             |
 
-→ 3 산출물이 짝. ADR-FE-002 §2.2 매트릭스 정합 + ADR-002 (책임 분담 원칙). 본 산출물은 정적 구조만 담당.
+→ 3 산출물이 짝. 책임 분담 매트릭스 정합. 본 산출물은 정적 구조만 담당.
 
 ---
 
@@ -54,7 +54,7 @@ output/ui/
 | 사용자 시나리오           | 페이지 흐름 + 인증 + API 호출 패턴                     | LLM 추론     | 0.60                 |
 
 **입력**: FE 소스 + 라우팅 설정 + Tailwind config / theme + (선택) Storybook
-**평균 신뢰도** (drift-validator 적용 후 / ADR-009 §2.4.1 정합): ~80% (FE 코드 품질에 진폭)
+**평균 신뢰도** (drift-validator 적용 후): ~80% (FE 코드 품질에 진폭)
 
 ### 3.2 framework 감지 enum (Tier 1~4)
 
@@ -65,9 +65,9 @@ output/ui/
 | Tier 1 (Modern SPA)           | `react`, `vue`, `angular`, `svelte`, `solid`, `qwik`, `astro`, `next`, `nuxt`, `remix` | 7대 산출물 7/7 추출 가능               |
 | Tier 2 (jQuery legacy)        | `jquery_legacy`                                                                        | 5/7 (state-map / visual-manifest 부분) |
 | Tier 3 (Vanilla JS)           | `vanilla_js`                                                                           | 4/7 (LLM 추론 의존도 ↑)                |
-| Tier 4 (server-side template) | `jsp_template`                                                                         | 3/7 + ADR-FE-004 BE/FE 분리 예외       |
+| Tier 4 (server-side template) | `jsp_template`                                                                         | 3/7 + BE/FE 분리 예외                  |
 
-→ Native (React Native / Flutter) = v1.5 이연.
+→ Native (React Native / Flutter) 미지원.
 
 ### 3.3 미추출 (의도적)
 
@@ -156,9 +156,9 @@ shared/     공유 (UI Kit, Lib, API)
 | Tier 3 (Vanilla JS)      | 모듈 패턴 + IIFE 단위              | `legacy_widget` 또는 `legacy_template` | 0.50~0.60 |
 | Tier 4 (JSP / Thymeleaf) | template fragment + include 그래프 | `legacy_template`                      | 0.50~0.55 |
 
-### 6.5 Screen+Journey 우선 / Component 분해 후순위 (ADR-FE-006 정합)
+### 6.5 Screen+Journey 우선 / Component 분해 후순위
 
-본 component-tree 산출물은 **L4 Presentation 보조 산출물** (ADR-FE-006 명제 2 / IR 4계층 매트릭스):
+본 component-tree 산출물은 **L4 Presentation 보조 산출물** (IR 4계층 매트릭스):
 
 | 우선 단위                      | 비고                                                   |
 | ------------------------------ | ------------------------------------------------------ |
@@ -179,7 +179,7 @@ shared/     공유 (UI Kit, Lib, API)
 - ⚠️ Component-tree = **참고용** / 신규 스택 정해진 후 그 스택의 관용구로 재분해 의무
 - ✅ design-tokens (DTCG) = framework-neutral / 즉시 활용
 
-→ ADR-FE-006 §2.2 IR 4계층 매트릭스 정합.
+→ IR 4계층 매트릭스 정합.
 
 ---
 
@@ -188,7 +188,7 @@ shared/     공유 (UI Kit, Lib, API)
 ### 7.1 DTCG Design Tokens Format Module 2025.10
 
 - **spec URL** (고정): https://www.designtokens.org/TR/2025.10/format/
-- **status**: Final Community Group Report (W3C Standard ❌ — ADR-FE-005 §2.2.1 명시 의무)
+- **status**: Final Community Group Report (W3C Standard ❌ — 명시 의무)
 - **publication**: 2025-10-28
 - **필드**: `$value` (required) / `$type` (optional) / `$description` (optional)
 
@@ -314,3 +314,18 @@ design_tokens:
 
 - 증상: SCN 과 UC 를 같은 것으로 다룸
 - 대응: §8 명확화 (시스템 행동 vs 사용자 경험)
+
+---
+
+## 인용
+
+- ADR: ADR-001 §FE (FSD + Atomic Design 사상)
+- ADR: ADR-002 (산출물 책임 분담 원칙)
+- ADR: ADR-FE-001 (legacy Tier 1~4 spectrum)
+- ADR: ADR-FE-002 §2.2 (#7/#8/#9 책임 분담 매트릭스)
+- ADR: ADR-FE-004 (Tier 4 BE/FE 분리 예외)
+- ADR: ADR-FE-005 §2.2.1 (DTCG 2025.10 토큰 / W3C status 명시)
+- ADR: ADR-FE-006 §2.2 (Screen+Journey 우선 / IR 4계층 매트릭스)
+- ADR: ADR-009 §2.4.1 (drift-validator 신뢰도 보정)
+- schema: schemas/ui-spec.schema.json
+- 외부 권위: DTCG Design Tokens Format Module 2025.10 — https://www.designtokens.org/TR/2025.10/format/

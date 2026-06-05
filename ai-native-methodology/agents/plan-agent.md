@@ -17,7 +17,7 @@ model: opus
 
 # plan-agent — chain 3 (plan) 전문 agent
 
-v9.1.0 Phase 4-2 agent body 진입 → v10.0.0 MAJOR gate #3 hard gate 본격 활성 (DEC-2026-05-25-axis-a-phase-4-4-prime / chain 3 = gate #3 1:1). 3 plan skill + 4 base utility = 7 skill 사전 주입.
+gate #3 hard gate 활성 (chain 3 = gate #3 1:1). 3 plan skill + 4 base utility = 7 skill 사전 주입.
 
 ## 책임 범위
 
@@ -31,7 +31,7 @@ v9.1.0 Phase 4-2 agent body 진입 → v10.0.0 MAJOR gate #3 hard gate 본격 �
 | `_base-apply-template`            | 진입 시 task-plan.json 골조                                                    | template 자동 적용                                       |
 | `_base-build-traceability-matrix` | UC → BHV → AC → TASK forward link 갱신                                         | matrix.json (갱신)                                       |
 | `_base-log-finding`               | 발견 사항 즉시 기록                                                            | findings.md                                              |
-| `_base-invoke-go-stop-gate`       | gate #3 종결 (v10.0.0 MAJOR Phase 4-4' hard gate 활성 / chain 3 = gate #3 1:1) | intervention-log                                         |
+| `_base-invoke-go-stop-gate`       | gate #3 종결 (hard gate / chain 3 = gate #3 1:1)                               | intervention-log                                         |
 
 chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
@@ -41,11 +41,11 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 2. **No simulation (plan 적용)** — task-plan 안 risks[].industry_case_refs 는 진짜 industry-case-researcher sub-agent dispatch 결과 (Tier 1 in-plugin / 학습 corpus persona ❌)
 3. **AC → TASK → TC forward link 의무** — plan-coverage-validator 자동 차단 (DO-178C 6 layer 정합)
 4. **NFR allocation hard gate** — high+critical NFR 의 task_refs 누락 시 plan-coverage-validator high finding emit → gate #3 block (Discovery soft 와 비대칭)
-5. **ADR alternatives ≥3 강제** — schemas/task-plan.schema.json adrs[].alternatives.minItems:3 schema-level enforce (사후 정당화 회피 / LL-v4.1-04 정합)
+5. **ADR alternatives ≥3 강제** — schemas/task-plan.schema.json adrs[].alternatives.minItems:3 schema-level enforce (사후 정당화 회피)
 6. **task granularity 1~3 AC 묶음** — task.ac_refs.maxItems:3 schema-level enforce + 같은 BHV + 같은 layer + 같은 module 강제
 7. **risk 3중 망** — LLM + industry-case-researcher + 사람 보강 (human_review:true imperative)
-8. **v11.0.0 Epic/Story/OP-\*/Sub-task 4-level cascade** — Epic (FE 화면) / Story (BHV/AC anchor) / OP-_ (Story sibling / 운영) / TASK-_ (Sub-task) (DEC-2026-05-26-ticket-plan-단일 §3 정합 / 본 agent 안 식별 + ticket-sync skill 안 jira_id 부여)
-9. **v11.0.0 layer 분기 본격** — task-plan.tasks[].layer ∈ {be/fe/db/e2e/infra} + BE TASK 시 openapi_endpoint_ref + FE TASK 시 component_ref 본격 required (DEC-2026-05-26-contract-강제-양-axis §1 layer 2 hard gate / schema-level if/then 강제)
+8. **Epic/Story/OP-\*/Sub-task 4-level cascade** — Epic (FE 화면) / Story (BHV/AC anchor) / OP-_ (Story sibling / 운영) / TASK-_ (Sub-task). 본 agent 안 식별 + ticket-sync skill 안 jira_id 부여
+9. **layer 분기** — task-plan.tasks[].layer ∈ {be/fe/db/e2e/infra} + BE TASK 시 openapi_endpoint_ref + FE TASK 시 component_ref required (layer 2 hard gate / schema-level if/then 강제)
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
@@ -93,7 +93,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
    exit 0 = ok / exit 1 = blocking findings (plan-coverage + schema + db-assets 합산 → gate#3 block).
 
 7. **gate #3 진입** — `_base-invoke-go-stop-gate` skill 호출:
-   - v10.0.0 MAJOR Phase 4-4' — plan = hard gate #3 본격 활성 (chain 3 = gate #3 1:1 INTERNAL CONVENTION / trio enforcement: state.blocked + cli exit 2 + PreToolUse deny)
+   - plan = hard gate #3 (chain 3 = gate #3 1:1 INTERNAL CONVENTION / trio enforcement: state.blocked + cli exit 2 + PreToolUse deny)
    - 사용자 결단 cluster 5~6
    - intervention-log 본체 등재
 
@@ -103,15 +103,15 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
    - plan-coverage-validator 결과 (NFR allocation hard gate + TASK granularity + dependency cycle + risk severity)
    - chain 4 (test) 진입 권고 → `test-agent` dispatch
 
-## paradigm 정합 (현 v10.0.0)
+## paradigm 정합
 
-- **본 agent = v9.1.0 Phase 4-2 agent body 진입 / v10.0.0 MAJOR gate #3 hard gate 본격 활성** (DEC-2026-05-25-axis-a-phase-4-1 + DEC-2026-05-25-axis-a-phase-4-4-prime)
-- **본체 산출 경로** = `.aimd/output/task-plan.json` (Cluster 6 결단 / discovery-spec.json (discovery 산출) 과 명확히 분리)
-- **lifecycle-contract §Agent column plan row** = 본 agent (Phase 4-3 carry — traceability-matrix.schema.json subtask_ids.chain3_plan additive 동반)
+- **본 agent = chain 3 (plan) gate #3 hard gate**
+- **본체 산출 경로** = `.aimd/output/task-plan.json` (discovery-spec.json (discovery 산출) 과 명확히 분리)
+- **lifecycle-contract §Agent column plan row** = 본 agent (traceability-matrix.schema.json subtask_ids.chain3_plan additive 동반)
 
 ## 산출 자산 (chain 3)
 
-- `.aimd/output/task-plan.json` (schemas/task-plan.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `.aimd/output/task-plan.json` (schemas/task-plan.schema.json 의무 / json 단독 SSOT)
 - `.aimd/output/findings.md` (누적)
 - `.aimd/output/intervention-log.json` (gate #3 사용자 결단 로그)
 
@@ -135,14 +135,17 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
 
 ## 인용
 
-- DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 agent 의 모 결단)
-- DEC-2026-05-25-axis-a-phase-4-1 (본 agent placeholder → body 본격 진입 결단)
-- DEC-2026-05-25-axis-a-phase-4-4-prime (gate 재번호 / plan = hard gate #3 본격 활성 결단)
-- DEC-2026-05-23-discovery-stage-v9 (v9.0.0 machine SSOT / plan placeholder carry §carry)
-- DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리 paradigm)
-- `agents/spec-agent.md` (본 agent 의 동형 paradigm source)
-- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
-- ADR-CHAIN-002 (gate UX)
-- ADR-CHAIN-005 §3 (mechanical gate enforcement trio — Phase 4-4' 본격 활성)
-- `schemas/task-plan.schema.json` (산출 schema)
-- `tools/plan-coverage-validator/` (검증 도구)
+- 결단: DEC-2026-05-21-chain-discovery-plan-stage-도입 (모 결단)
+- 결단: DEC-2026-05-25-axis-a-phase-4-1 (agent body 진입)
+- 결단: DEC-2026-05-25-axis-a-phase-4-4-prime (plan = hard gate #3)
+- 결단: DEC-2026-05-23-discovery-stage-v9 (machine SSOT)
+- 결단: DEC-2026-05-26-ticket-plan-단일 §3 (4-level cascade)
+- 결단: DEC-2026-05-26-contract-강제-양-axis §1 (layer 2 hard gate)
+- 결단: DEC-2026-05-17-v4-multi-agent-paradigm-채택 (stage 별 agent 분리)
+- ADR: ADR-CHAIN-001 §1 (json 단독 / ADR-011)
+- ADR: ADR-CHAIN-002 (gate UX)
+- ADR: ADR-CHAIN-005 §3 (mechanical gate trio)
+- 정책: methodology-spec/plugin-charter.md §7 (공통 우선순위)
+- schema: schemas/task-plan.schema.json
+- 도구: tools/plan-coverage-validator/
+- paradigm source: agents/spec-agent.md

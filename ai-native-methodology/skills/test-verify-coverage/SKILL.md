@@ -6,7 +6,7 @@ allowed-tools: Read, Bash
 
 # verify-coverage
 
-v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
+chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측정 + ratchet 강제.
 
 ## 언제 사용
 
@@ -21,7 +21,7 @@ v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리
 - `<project>/.aimd/output/impl-spec.json` — 있으면 (line/branch coverage path)
 - `<project>/<coverage>/lcov.info` 또는 `coverage.xml` 등 (framework 별)
 
-## 3 metric 분리 (ADR-CHAIN-001 §2)
+## 3 metric 분리
 
 본 skill 핵심 정책 — 한 metric 으로 합치지 않고 3 분리 측정:
 
@@ -33,7 +33,7 @@ v2.0 chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리
 
 정책: `test_pass_rate` 는 chain 5 GREEN 의무 (강제) / `link_coverage` 는 chain 2-4 의무 (강제) / `line+branch_coverage` 는 정보 (사용자 검토 권고 / 본 방법론 강제 ❌).
 
-## ratchet 정책 (ADR-010 v2 §2.6)
+## ratchet 정책
 
 - 1차 baseline: 0.85
 - 1+ PoC 누적 후: 0.90
@@ -79,7 +79,7 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 - junit5: `target/site/jacoco/jacoco.xml`.
 - pytest: `coverage.xml` (Cobertura format).
 
-본 skill 은 path 만 검출 → impl-spec.test_pass_evidence.coverage_report_path 필드 채움. 진짜 metric 측정 = 도구 본격 통합 v2.x carry.
+본 skill 은 path 만 검출 → impl-spec.test_pass_evidence.coverage_report_path 필드 채움. 진짜 metric 측정은 외부 도구 책임 (본 skill 미수행 / 사용자 환경 도구).
 
 ### 4. severity_floor 검증
 
@@ -117,8 +117,3 @@ framework 별 LCOV / JaCoCo / Cobertura 파싱:
 - ADR-010 v2 §2.6 (baseline+ratchet 0.85→0.90→0.95)
 - DO-178C DAL A (severity_floor)
 - master plan §B chain 4 / §J §coverage 책임 분리
-
-## Carry
-
-- LCOV/JaCoCo/Cobertura 진짜 metric 파싱 → 본 skill 본격 통합 = v2.x carry.
-- coverage badge SVG 자동 생성 (README/PR) = sub-plan-6.

@@ -1,6 +1,6 @@
 # 산출물 #9: Visual Manifest (시각 산출 매니페스트)
 
-> **사상**: binary 진실 모델 (ADR-FE-002 §2.3 — JSON / mermaid 모두 진실 아님, snapshot PNG 가 진실) + Playwright + axe-core 진짜 실행 (ADR-FE-005)
+> **사상**: binary 진실 모델 (JSON / mermaid 모두 진실 아님, snapshot PNG 가 진실) + Playwright + axe-core 진짜 실행
 > **schema**: `schemas/visual-manifest.schema.json`
 > **생성 phase**: `ui` phase 5-2-c (`/analyze-visual`)
 
@@ -14,7 +14,7 @@
 
 ### 1.1 binary 진실 모델 (다른 산출물과 구분)
 
-ADR-008 의 이중 렌더링 사상 (AI 눈 + 사람 눈) 은 visual 영역에서 **불완전 적용**:
+이중 렌더링 사상 (AI 눈 + 사람 눈) 은 visual 영역에서 **불완전 적용**:
 
 - AI 눈 = `visual-manifest.json` (메타 + path + hash)
 - 사람 눈 = ❌ mermaid 표현 불가 / ✅ Storybook static + GitHub PNG 직접 렌더
@@ -65,7 +65,7 @@ locale_matrix:
 
 ## 3. 추출 범위
 
-### 3.1 추출 대상 (출처 / 도구 / 신뢰도 — ADR-009 §2.4.2 binary trust path 정합)
+### 3.1 추출 대상 (출처 / 도구 / 신뢰도 — binary trust path 정합)
 
 | 항목                   | 출처                    | 도구                                                   | 신뢰도 (단계 5 / 6 / 7) |
 | ---------------------- | ----------------------- | ------------------------------------------------------ | ----------------------- |
@@ -82,7 +82,7 @@ locale_matrix:
 
 - 화면 동영상 / 인터랙션 녹화 — Stage 5+ 검토
 - 픽셀 단위 디자인 명세 (Figma 영역) — round-trip scope 제외
-- 운영 perf 메트릭 (LCP / CLS) — ADR-001 명시적 제외
+- 운영 perf 메트릭 (LCP / CLS) — 명시적 제외
 
 ---
 
@@ -231,3 +231,14 @@ cross_links:
 
 - 증상: 진짜 Playwright 환경 부재 시 시뮬 캡처
 - 대응: simulation_reason 명시 + carry-over / -5%p 패널티 표기
+
+---
+
+## 인용
+
+- ADR: ADR-FE-002 (binary 진실 모델 §2.3)
+- ADR: ADR-FE-005 (Playwright + axe-core 진짜 실행)
+- ADR: ADR-008 (이중 렌더링 사상 — AI 눈 + 사람 눈)
+- ADR: ADR-009 (binary trust path §2.4.2)
+- ADR: ADR-001 (운영 perf 메트릭 제외)
+- schema: schemas/visual-manifest.schema.json

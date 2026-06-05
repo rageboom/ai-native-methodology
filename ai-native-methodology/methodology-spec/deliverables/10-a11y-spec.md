@@ -1,6 +1,6 @@
 # 산출물 #10: A11y Spec (접근성 명세 — axe-core + WCAG 2.1+2.2 ratchet)
 
-> **사상**: ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + ADR-FE-005 §2.2.2 (WCAG 2.1-AA baseline + 2.2-AA ratchet) + ADR-010 (baseline+ratchet) + ADR-009 §2.2.1 (axe_core_real)
+> **사상**: WCAG 2.1-AA baseline + 2.2-AA ratchet (baseline+ratchet) / 정적 NFR 포함 / axe_core_real
 > **schema**: `schemas/a11y-spec.schema.json`
 > **생성 phase**: `ui` phase 5-2-c (`/analyze-visual` 의 sub) 또는 별도 `/analyze-a11y`
 
@@ -56,7 +56,7 @@ output/a11y/
 
 ---
 
-## 4. WCAG ratchet 정책 (ADR-010 정합)
+## 4. WCAG ratchet 정책
 
 | level                 | 정책                                          |
 | --------------------- | --------------------------------------------- |
@@ -94,7 +94,7 @@ cross_links:
 
 ---
 
-## 6. 신뢰도 (ADR-009 §2.4 정합)
+## 6. 신뢰도
 
 | 단계  | 조건                           | 신뢰도                         |
 | ----- | ------------------------------ | ------------------------------ |
@@ -111,7 +111,7 @@ simulation 시 -5%p 패널티.
 
 ```
 □ schema 검증 통과
-□ scope.baseline_wcag = "2.1-AA" 명시 (ADR-010)
+□ scope.baseline_wcag = "2.1-AA" 명시
 □ scope.ratchet_wcag = "2.2-AA" 명시
 □ summary.captured_by ∈ [axe_core_real, pa11y_real, lighthouse_a11y_real]
 □ captured_by=simulation 시 simulation_reason 의무 + -5%p 패널티
@@ -160,3 +160,13 @@ simulation 시 -5%p 패널티.
 
 - 증상: 진짜 axe-core 환경 부재 시 시뮬 결과
 - 대응: simulation_reason 명시 + Stage 4+ carry / -5%p 패널티
+
+---
+
+## 인용
+
+- ADR: ADR-001 (정적 NFR 명시적 제외 갱신)
+- ADR: ADR-FE-005 §2.2.2 (WCAG 2.1-AA baseline + 2.2-AA ratchet)
+- ADR: ADR-010 (baseline+ratchet) — §4 WCAG ratchet 정책 근거 / §7 baseline_wcag 체크 근거
+- ADR: ADR-009 §2.2.1 (axe_core_real) — §6 신뢰도 단계 근거
+- schema: `schemas/a11y-spec.schema.json`

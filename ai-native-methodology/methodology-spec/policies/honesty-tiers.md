@@ -16,4 +16,4 @@
 
 ## 인용
 
-- `tools/inflation-lint/src/cli.js` (v8.8.0 Tier 3.1 / v8.8.2 확장)
+- `tools/inflation-lint/src/cli.js` (Tier 3.1 검출 도구)

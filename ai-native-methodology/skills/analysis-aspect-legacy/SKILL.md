@@ -26,7 +26,7 @@ Strangler Pattern 적용 가능성 / migration debt 식별.
    - feature flag default 가 production 과 불일치
    - migration 미완료 상태에서 다른 작업 진행 시 부채
 4. **AP-LEGACY-XXX 등재** — anti-pattern (`quality` phase 통합)
-5. **legacy.json 작성** — `schemas/legacy-spectrum.schema.json` (v1.4 신규):
+5. **legacy.json 작성** — `schemas/legacy-spectrum.schema.json`:
    ```json
    {
      "strangler_zones": [...],
@@ -42,8 +42,8 @@ Strangler Pattern 적용 가능성 / migration debt 식별.
 
 `<user-project>/.aimd/output/legacy-spectrum.json`
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/13-legacy-spectrum.md` (v1.4)
-- `schemas/legacy-spectrum.schema.json`
-- ADR-FE-003 (legacy + Strangler Pattern)
+- 정책: methodology-spec/deliverables/13-legacy-spectrum.md
+- schema: schemas/legacy-spectrum.schema.json
+- ADR: ADR-FE-003 (legacy + Strangler Pattern)

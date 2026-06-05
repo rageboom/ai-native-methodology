@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Edit, Bash
 
 # build-traceability-matrix
 
-v2.0 chain harness 의 **cross-gate matrix builder skill**. ADR-CHAIN-001 §4 (forward+backward bidirectional / DO-178C 차용) 정합. master plan §B deliverable 22 + §C cross-gate.
+chain harness 의 **cross-gate matrix builder skill** (forward+backward bidirectional / DO-178C 차용).
 
 ## 언제 사용
 
@@ -16,9 +16,9 @@ v2.0 chain harness 의 **cross-gate matrix builder skill**. ADR-CHAIN-001 §4 (f
 
 ## 산출물
 
-1종 (json 단독 / ADR-011):
+1종 (json 단독):
 
-- `traceability-matrix.json` — single source of truth (json 단독 SSOT / ADR-011 / DO-178C / `derived_from` + `do_not_edit_manually: true` header 의무).
+- `traceability-matrix.json` — single source of truth (json 단독 SSOT / DO-178C / `derived_from` + `do_not_edit_manually: true` header 의무).
 
 ## 절차
 
@@ -39,7 +39,7 @@ v2.0 chain harness 의 **cross-gate matrix builder skill**. ADR-CHAIN-001 §4 (f
 3. **matrix.json 검토** — 사용자에게 `coverage_summary` / `status` 요약 (green/yellow/red 카운트) 제공.
 
 4. **coverage_summary 임계 검사**:
-   - `red_count > 0` → ADR-CHAIN-001 §2 violation (chain coupling) → 사용자 결단 prompt (go/stop-gate skill 호출).
+   - `red_count > 0` → chain coupling violation → 사용자 결단 prompt (go/stop-gate skill 호출).
    - `forward_coverage < 0.85` → ratchet violation → 위와 동일.
 
 5. **finding 등록** (필요 시) — `_base-log-finding` skill 호출. severity = critical (red_count > 0) / high (forward_coverage < 0.85).
@@ -61,11 +61,7 @@ v2.0 chain harness 의 **cross-gate matrix builder skill**. ADR-CHAIN-001 §4 (f
 
 ## 인용
 
-- ADR-CHAIN-001 §2 (cross-link coverage ≥ 0.85 ratchet)
-- ADR-011 (json 단독 / chain 산출물 .md·.mermaid twin 폐지)
-- DO-178C / IEC 62304 bidirectional traceability
-- master plan §B deliverable 22
-
-## Carry
-
-- chain-revisit-detector 통합 자동 trigger (sub-plan-5).
+- ADR: ADR-CHAIN-001 §2 (cross-link ≥ 0.85 ratchet) / §4 (bidirectional)
+- ADR: ADR-011 (json 단독 / .md·.mermaid twin 폐지)
+- 정책: DO-178C / IEC 62304 bidirectional traceability
+- master plan §B deliverable 22 + §C cross-gate

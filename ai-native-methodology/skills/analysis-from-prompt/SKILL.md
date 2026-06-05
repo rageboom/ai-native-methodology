@@ -27,16 +27,17 @@ allowed-tools: Read
 
 ## 산출물
 
-- `.aimd/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false / json 단독 — ADR-011)
+- `.aimd/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false / json 단독)
 - 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
-
-## 본체 명세 참조
-
-- `methodology-spec/workflow/input.md` §5종 입력 (e)
-- `methodology-spec/plugin-charter.md` §1 R8
 
 ## When NOT to invoke
 
 - 사용자가 코드 / Figma / Swagger / 기획 문서 같은 구조 자료만 제공 (자연어 의도 부재) → 본 skill skip
 - 사용자가 chain 1 discovery-spec 작성 중 추가 의도 보강 → revisit-loop 으로 input 재진입 후 본 skill 재호출
 - LLM 양심 의존 정성 추출 ❌ — 명시되지 않은 의도를 "추측" 으로 채우면 후속 chain stage 가 hallucinate-driven 산출 위험. 추정은 `assumptions` 필드 + `confidence` 명시 의무 (no-simulation 정합)
+
+## 인용
+
+- ADR: ADR-011 (json 단독 산출 / erd.mermaid 폐기)
+- 정책: methodology-spec/workflow/input.md §5종 입력 (e)
+- 정책: methodology-spec/plugin-charter.md §1 R8

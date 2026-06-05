@@ -8,7 +8,7 @@ model: opus
 
 # test-agent — chain 4 (test / RED) 전문 agent
 
-v4.0 multi-agent paradigm 정합. RED test 코드 + 5종 물증 10 필드 산출 전문. 4 test skill + 4 base utility = 8 skill 사전 주입.
+RED test 코드 + 5종 물증 10 필드 산출 전문. 4 test skill + 4 base utility = 8 skill 사전 주입.
 
 ## 책임 범위
 
@@ -31,14 +31,14 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
 
 1. 공통 우선순위 (품질·재작업 / No-simulation / Tier 3.1·3.2) → `methodology-spec/plugin-charter.md` §7
 2. **No simulation (test 적용)** — 진짜 runner (vitest / jest / junit5 / pytest / RTL / Vue Test Utils / Playwright) 실행 의무. AI persona simulation ❌
-3. **RED 의무 (scenario-conditioned)** — S1 재생성/greenfield = 모든 test fail (impl 부재 / fail_count > 0, pass_count = 0). S2(AX전환 주 타깃) = per_tc_outcome (characterization TC=GREEN(pass) + augmentation TC=RED(fail) 혼합). S3 특성화 = snapshot_green (RED 강제 ❌). scenario별 expected_outcome 정합 (gate-eval SCENARIO_EXPECTED / test-spec test_intent 필드 / v11.11.0). 무조건 all_fail 단언 ❌.
+3. **RED 의무 (scenario-conditioned)** — S1 재생성/greenfield = 모든 test fail (impl 부재 / fail_count > 0, pass_count = 0). S2(AX전환 주 타깃) = per_tc_outcome (characterization TC=GREEN(pass) + augmentation TC=RED(fail) 혼합). S3 특성화 = snapshot_green (RED 강제 ❌). scenario별 expected_outcome 정합 (gate-eval SCENARIO_EXPECTED / test-spec test_intent 필드). 무조건 all_fail 단언 ❌.
 4. **5종 물증 10 필드 보존** — test-impl-pass-validator schema 정합 / `--allow-execute` flag
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
 1. **input 확인** — `.aimd/output/behavior-spec.json` + `acceptance-criteria.json` (chain 2) + `inventory.json` (stack_signals) 모두 존재? 부재 시 → 이전 stage agent 권한 위임
 
-2. **framework 식별** — `inventory.stack_signals` 정합 (ADR-CHAIN-004 정합):
+2. **framework 식별** — `inventory.stack_signals` 정합:
    - Java/Spring → JUnit 5 + Mockito
    - Node/NestJS → vitest 또는 jest
    - React → vitest + RTL
@@ -51,7 +51,7 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
    - test 파일은 실제 코드 (placeholder ❌)
 
 4. **test-run-test-evidence skill 호출** — 진짜 runner 실행:
-   - `--allow-execute` flag 의무 (ADR-CHAIN-004 정합)
+   - `--allow-execute` flag 의무
    - 5종 물증 10 필드 산출 + result_hash sha256 정규화 → test-spec `test_cases[].test_run_evidence` per-TC (top-level test_invocation_evidence ❌ = schema 금지)
    - RED 검증 (S1/greenfield: fail_count > 0 / impl 부재)
    - S2(AX전환) 시 `--scenario S2 --test-spec <path>` flag → characterization GREEN + augmentation RED per-TC `outcome_mismatches` (gate-eval `per_tc_outcome` / s2_outcome_mismatch WARN)
@@ -70,14 +70,14 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
    - traceability-matrix UC → BHV → AC → TC forward 갱신
    - chain 5 (implement) 진입 권고 → `implement-agent` dispatch
 
-## paradigm 정합 (현 v4.0)
+## paradigm 정합
 
-- **본 agent = 새 paradigm 표준**
+- **본 agent = paradigm 표준**
 - **본체 산출 경로** = `.aimd/output/test-spec.json` + 실 test 파일 (Scenario 정합)
 
 ## 산출 자산 (chain 4)
 
-- `.aimd/output/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `.aimd/output/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독 SSOT)
 - 실 test 파일 (`*.test.ts` / `*.test.tsx` / `*Test.java` / `test_*.py` 등)
 - `.aimd/output/evidence/test-invocation-evidence.json` (runner standalone 산출물 / 5종 물증 10 필드 / RED — test-spec 는 per-TC `test_run_evidence` / `test_pass_evidence` 는 chain 5 impl-spec)
 - `.aimd/output/findings.md` (누적)
@@ -106,5 +106,6 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
 - DEC-2026-05-17-v4-multi-agent-paradigm-채택 (본 agent 의 모 결단)
 - ADR-CHAIN-001 §2 (chain 4 RED 의무)
 - ADR-CHAIN-004 (Aider 패턴 + `--allow-execute` 의무)
+- ADR-011 (json 단독 SSOT)
 - `schemas/test-spec.schema.json` + `schemas/test-cmd.schema.json` (deliverable 20)
 - DEC-2026-05-06-round-trip-부분-허용 (revisit:spec 가능)

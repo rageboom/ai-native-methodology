@@ -1,7 +1,7 @@
 # 산출물 #6: 안티패턴 (Antipatterns)
 
 > **사상**: 회피 후보 (단정적 표현 지양 — 시니어 채택 저항 완화)
-> **schema**: `schemas/antipatterns.schema.json` · **template**: schema-driven inline placeholder (v12 ADR-011 — .template.md twin 폐지)
+> **schema**: `schemas/antipatterns.schema.json` · **template**: schema-driven inline placeholder (v12 json-only)
 > **생성 phase**: 각 phase 에서 부분 발견 → `quality` phase (`/analyze-quality`) 에서 통합
 
 ---
@@ -18,7 +18,7 @@
 
 ```
 output/antipatterns/
-├── antipatterns.json               # json 단독 SSOT (v12 ADR-011)
+├── antipatterns.json               # json 단독 SSOT (v12 json-only)
 └── (선택) details/                 # 개별 안티패턴 상세
     └── AP-DB-N-PLUS-ONE-001.md
 ```
@@ -71,7 +71,7 @@ output/antipatterns/
 
 - 성능 안티패턴 (측정 필요) → NFR 영역
 - 보안 취약점 → SAST 도구 영역
-- 테스트 코드 안티패턴 → v1.2 이후
+- 테스트 코드 안티패턴 → 미추출
 
 ---
 
@@ -93,7 +93,7 @@ PoC cross-validation 권위에 따라 severity 자동 격상.
 
 ## 5. `formal-spec` phase cross-link (formal_spec_links)
 
-json 단독 SSOT (ADR-011 / ADR-008 supersede) 정합 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p.
+json 단독 SSOT 정합 — AP 가 BR / state-machine / sequence-diagram / invariant 직접 참조 시 신뢰도 +5%p.
 
 ### 5.1 의무 vs 선택 (category 별)
 
@@ -107,7 +107,7 @@ json 단독 SSOT (ADR-011 / ADR-008 supersede) 정합 — AP 가 BR / state-mach
 | PERFORMANCE                                                  | 선택              | 성능 패턴, BR 무관 (N+1 / EAGER)                       |
 | SECURITY / CONFIG / EXTERNAL / TESTABILITY / MAINTAINABILITY | 선택              | 카테고리별 판단                                        |
 
-**적용 시점**: v1.4 신규 PoC 부터. v1.3.x 시점 기존 PoC 산출물은 release 보존.
+**적용 시점**: 신규 PoC 부터. 기존 PoC 산출물은 release 보존.
 
 ### 5.2 schema 구조
 
@@ -131,7 +131,7 @@ formal_spec_links:
 □ 감지 방법 명시 (detection_method)
 □ recommendation 필수 기재
 □ confidence < 0.70 이면 human_review_required 표기
-□ DOMAIN / API / FE 카테고리 AP 는 formal_spec_links 기재 (의무 / v1.4+)
+□ DOMAIN / API / FE 카테고리 AP 는 formal_spec_links 기재 (의무)
 □ 그 외 카테고리 AP 는 formal_spec_links 선택
 □ 다른 산출물에서 발견된 AP 가 모두 통합됨 (`quality` phase)
 ```
@@ -172,3 +172,11 @@ formal_spec_links:
 
 - 증상: 1 PoC 발견을 high 로 격상
 - 대응: §4.1 격상 규칙 — 3 PoC 재현 입증 후 격상
+
+---
+
+## 인용
+
+- ADR: ADR-011 (json 단독 SSOT / .template.md twin 폐지)
+- ADR: ADR-008 (formal-spec cross-link / ADR-011 supersede)
+- schema: `schemas/antipatterns.schema.json`

@@ -1,6 +1,6 @@
 # 산출물 #11: I18n Spec (다국어 명세 — ICU MF1 stable + MF2 preview)
 
-> **사상**: ADR-001 §명시적 제외 갱신 (정적 NFR 포함) + ADR-FE-005 §2.2.3 (ICU MF1 stable + MF2 spec stable / runtime Technical Preview / MF1 폴백 의무)
+> **사상**: 정적 NFR 포함 / ICU MF1 stable + MF2 spec stable / runtime Technical Preview / MF1 폴백 의무
 > **schema**: `schemas/i18n-spec.schema.json`
 > **생성 phase**: `ui` phase 5-2-a (`/analyze-ui-base` 의 sub) 또는 별도 `/analyze-i18n`
 
@@ -13,8 +13,6 @@
 **AI 재구현 시 활용**: 미번역 key 자동 검출 / locale 별 plural rule / gender select 함정 회피 / MF2 마이그레이션 plan
 
 ### 1.1 MF2 채택 단계 명시 (cross-check 권고 #3 정합)
-
-ADR-FE-005 §2.2.3 정합:
 
 - **MF1** = stable (ICU 안정 — production 권장)
 - **MF2 spec** = stable (Unicode LDML 47+)
@@ -63,7 +61,7 @@ i18n-spec.summary:
 
 mf2_used=true & mf1_fallback_present=false → schema validation fail (production 위험 carry / Stage 4 mini-PoC 검증 의무).
 
-→ ADR-FE-005 §2.2.3 정합 + ICU 공식 docs 의 MF2 status 인용.
+→ ICU 공식 docs 의 MF2 status 정합.
 
 ---
 
@@ -86,7 +84,7 @@ cross_links:
 
 ---
 
-## 6. 신뢰도 (ADR-009 §2.4 정합)
+## 6. 신뢰도
 
 | 단계 | 조건                                            | 신뢰도 |
 | ---- | ----------------------------------------------- | ------ |
@@ -153,3 +151,13 @@ cross_links:
 
 - 증상: MF2 단독 사용 / runtime preview 위험
 - 대응: schema if/then 자동 강제 (mf2_used=true → mf1_fallback_present 의무)
+
+---
+
+## 인용
+
+- ADR: ADR-001 (정적 NFR 명시적 제외 범위)
+- ADR: ADR-FE-005 §2.2.3 (ICU MF1 stable / MF2 preview / MF1 폴백)
+- ADR: ADR-009 §2.4 (신뢰도 단계 모델)
+- schema: `schemas/i18n-spec.schema.json`
+- 외부 권위: ICU 공식 docs (MF2 status / Unicode LDML 47+)

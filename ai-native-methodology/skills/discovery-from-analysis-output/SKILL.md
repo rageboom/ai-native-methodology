@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # discovery-from-analysis-output
 
-chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 사용자 답변 1번 정합 — 1차 use case = legacy 추출 single-case (use case 4종 분기 = v2.1+ carry K-1).
+chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 1차 use case = legacy 추출 single-case.
 
 ## 언제 사용
 
@@ -25,7 +25,7 @@ chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 사용자 답
 
 ## 산출물
 
-- `<project>/.aimd/output/discovery-spec.json` (schemas/discovery-spec.schema.json 의무 / json 단독 SSOT / ADR-011)
+- `<project>/.aimd/output/discovery-spec.json` (schemas/discovery-spec.schema.json 의무 / json 단독 SSOT)
 
 ## no-simulation 의무 (source-grounded)
 
@@ -74,14 +74,14 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
    2. 누락 use case 추가?
    3. 의문 BR-INTENT?
    4. cross_links 추가?
-   5. v8.7.5+ pending_decisions[] (사용자 결단 필요) — Auto Mode 미활성 시 본 cluster 에서 user-explicit 결단 받음.
+   5. pending_decisions[] (사용자 결단 필요) — Auto Mode 미활성 시 본 cluster 에서 user-explicit 결단 받음.
    6. chain 2 (spec) 진입?
 
-## v8.7.5+ 결단 처리 (G-005 보강 / Auto Mode 정합)
+## 결단 처리 (Auto Mode 정합)
 
 ### 배경
 
-chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT / use case 가 발생 가능 (예: BR 의 default 값 / state 의 source / pagination 정책 / system-level 첫 옵션 자동 선택 여부 등). Auto Mode 호환 + 후속 chain 2~4 stage 의 traceability 보장을 위해 결단 처리를 정식화. mis-fe-admin DWPD-1774 5 stage 실증 테스트 §결단 보류 3건 (D-1/D-2/D-3) 입증 — 명세 부재로 plugin 본문이 아닌 사용자 ad-hoc record 로 처리됨 (F-VERIFY-G005 결정적 evidence).
+chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT / use case 가 발생 가능 (예: BR 의 default 값 / state 의 source / pagination 정책 / system-level 첫 옵션 자동 선택 여부 등). Auto Mode 호환 + 후속 chain 2~4 stage 의 traceability 보장을 위해 결단 처리를 정식화한다.
 
 ### discovery-spec.json 신설 필드
 
@@ -117,7 +117,7 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 `pending_decisions[]` 가 있으면 chain 1 gate #1 의 cluster 5번 (사용자 검토 cluster) 에서 사용자 결단 받음 → `user-explicit` 으로 record. `AI-default` 0 의무. 사용자가 결단을 보류하면 → `pending_decisions[]` 유지 + chain 1 종결 reject (gate stop).
 
-### `discovery-extraction-validator` 검증 (v8.7.5+)
+### `discovery-extraction-validator` 검증
 
 - `decisions[].source = AI-default + revisit_required != true` 시 → `discovery.ai-default-revisit-flag-missing` finding emit + critical.
 - `pending_decisions[]` non-empty + Auto Mode 미활성 + gate=go 진입 시 → `discovery.pending-decisions-not-resolved` finding emit + critical (gate stop).
@@ -129,14 +129,16 @@ Auto Mode 활성 시 (사용자 명시 위임 — `auto_mode: true` flag 또는 
 
 자동 추출 ≥ 80% / 사용자 검토 ≤ 20%. AI 가 추출한 use_case / BR-INTENT 는 **사용자 검토 의무**.
 
-## 인용
-
-- ADR-CHAIN-001 §1 (json 단독 / ADR-011)
-- ADR-CHAIN-002 (gate UX)
-- discovery-spec.schema.json (deliverable 17)
-- master plan §B chain 1
-- DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)
-
 ## 기술 스택 분기
 
 `inventory.stack_signals` 정합 — Spring / NestJS / Django / Rails / Hexagonal 분기는 analysis stage `discovery` phase 차용 / 본 skill 에서는 도메인 추출만 (framework neutral).
+
+## 인용
+
+- ADR: ADR-CHAIN-001 §1 (json 단독 SSOT)
+- ADR: ADR-CHAIN-002 (gate UX)
+- ADR: ADR-011 (json 단독 deliverable)
+- schema: schemas/discovery-spec.schema.json (deliverable 17)
+- 결단: DEC-2026-05-06-round-trip-부분-허용 (revisit:analysis 가능)
+- 결단: DEC-2026-05-21 (planning→discovery rename)
+- 정책: master plan §B chain 1

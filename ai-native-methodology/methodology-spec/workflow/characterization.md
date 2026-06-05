@@ -1,8 +1,7 @@
 # characterization phase: characterization (의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle)
 
-> **명령어**: `/analyze-characterization` · **사상**: ADR-CHAIN-006 (phase 4.7 정식 도입) + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + SATD/KL-SATD (Maldonado & Shihab 2015)
+> **명령어**: `/analyze-characterization` · **사상**: Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + SATD/KL-SATD (Maldonado & Shihab 2015)
 > **핵심 책임**: business-rules.json + antipatterns.json 만으로는 결정되지 않는 "의도 vs 버그" 분류 + Given/When/Then snapshot acceptance oracle 작성 → chain 1 discovery-spec 입력 보강
-> **introduced**: v2.1.0
 
 ---
 
@@ -38,9 +37,9 @@
 | 산출물                      | AI 눈                                                               | 사람 눈                                |
 | --------------------------- | ------------------------------------------------------------------- | -------------------------------------- |
 | Characterization Spec entry | `output/characterization/characterization-spec.json`                | (없음 / md 별도)                       |
-| Intent vs Bug 분류표        | `characterization-spec.json` (intent_vs_bug)                        | v12 ADR-011 — 구 intent-vs-bug.md 폐기 |
+| Intent vs Bug 분류표        | `characterization-spec.json` (intent_vs_bug)                        | json 단독 (md 없음)                    |
 | Coverage matrix             | `output/characterization/coverage.json`                             | (없음)                                 |
-| Snapshots                   | `output/characterization/snapshots/UC-*.json` (Given/When/Then BDD) | (옵션 .md 변환 / v2.1.x carry)         |
+| Snapshots                   | `output/characterization/snapshots/UC-*.json` (Given/When/Then BDD) | (옵션 .md 변환)                        |
 
 ### 3.1 4 분류 매핑 (schema enum)
 
@@ -57,7 +56,7 @@
 grep -rn -E "TODO|FIXME|HACK|XXX|폐해|임시|나중에|폐기|deprecate|workaround" <src>/
 ```
 
-0건 = Modern 스택 자연 부재 (PoC #03 NestJS retrofit 입증) — `intentVsBug.self_recognized_grep_count: 0` 명시.
+0건 = Modern 스택 자연 부재 — `intentVsBug.self_recognized_grep_count: 0` 명시.
 
 ### 3.3 Snapshot Given/When/Then (Cucumber Gherkin 정합)
 
@@ -89,8 +88,6 @@ ambiguous > 0 시:
 2. snapshot scenario `behavior_likely_bug` 또는 `behavior_to_preserve` 중 최소 하나 명시
 3. chain 4 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
 
-PoC #06 D2 패턴 정합 — ambiguous 3 → 1 (DBA carry 만) → 명확 비율 82% → 94%.
-
 ### 3.5 Coverage threshold + ratchet
 
 ```yaml
@@ -106,7 +103,7 @@ trend_required: false # ratchet 시 true 의무
 
 ```
 output/characterization/
-├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / v12 ADR-011 / D-6)
+├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / D-6)
 ├── coverage.json
 └── snapshots/
     └── UC-*.json                  # Given/When/Then BDD
@@ -161,7 +158,7 @@ phase 4.7 출력 ↔ 다른 산출물:
 
 ---
 
-## 7. 신뢰도 (ADR-009 §2.4 정합)
+## 7. 신뢰도
 
 | 단계 | 조건                                                                | 신뢰도 |
 | ---- | ------------------------------------------------------------------- | ------ |
@@ -173,10 +170,7 @@ phase 4.7 출력 ↔ 다른 산출물:
 
 ## 8. ≥ 2 PoC corroboration (§8.1 strict)
 
-| PoC                               | spectrum          | 명확 분류 비율      | self_recognized | ambiguous     |
-| --------------------------------- | ----------------- | ------------------- | --------------- | ------------- |
-| **PoC #06** (Spring 4.1 + iBATIS) | Legacy 적대성 4중 | 17/18 = 94% (D2 후) | 1 (AP-007 자조) | 1 (DBA carry) |
-| **PoC #03 retrofit** (NestJS)     | Modern            | 30/30 = 100%        | 0 (자연 부재)   | 0             |
+본 phase 격상/처분은 단일 PoC 과적합 회피를 위해 Legacy + Modern 양 spectrum ≥ 2 PoC corroboration 의무.
 
 ---
 
@@ -194,10 +188,17 @@ phase 4.7 출력 ↔ 다른 산출물:
 ## 10. 본체 자산 매핑
 
 - `methodology-spec/deliverables/23-characterization-spec.md`
-- `schemas/characterization-spec.schema.json` (30번째)
-- `skills/analysis-characterization-test/SKILL.md` (skills 19 → 20)
-- `tools/characterization-coverage-validator/` (workspace 13번째)
-- `flows/analysis.phase-flow.json` v2.1.0
-- ADR-CHAIN-006 phase 4.7 정식 도입
-- DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
-- DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)
+- `schemas/characterization-spec.schema.json`
+- `skills/analysis-characterization-test/SKILL.md`
+- `tools/characterization-coverage-validator/`
+- `flows/analysis.phase-flow.json`
+
+---
+
+## 인용
+
+- ADR: ADR-CHAIN-006 (phase 4.7 도입) · ADR-009 §2.4 (신뢰도 단계) · ADR-011 (json 단독 산출물)
+- 결단: DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
+- 결단: DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)
+- schema: `schemas/characterization-spec.schema.json`
+- 외부 권위: Michael Feathers, Working Effectively with Legacy Code — Characterization Testing (2004) · Gojko Adzic, Specification by Example (2011) · Maldonado & Shihab, SATD/KL-SATD (2015) · Cucumber Gherkin · PIT/Stryker/BullseyeCoverage (coverage 산업 표준)

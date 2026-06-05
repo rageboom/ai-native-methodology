@@ -1,12 +1,14 @@
 ---
 name: design-agent
-description: PLACEHOLDER 2026-05-17 (v4.0 paradigm 가시화만 / skill 부재). design stage 전문 agent placeholder. design stage = chain harness 4 stage (planning/spec/test/implement) 외부 / v2.x carry K-3 영역 / 1차 (v2.0~v4.0) analysis stage 의 deliverable 7~9 (ui-ux/state-map/visual-manifest) 안 cross-cutting 흡수. 향후 본격 trigger 시 design-* skill 5~6종 (wireframe/component-spec/DTCG token 등) 신설 후 본 agent frontmatter skills 사전 주입 paradigm 정합. 현 상태 = dispatch 무의미 (skill 부재).
+description: NOT-SHIPPED PLACEHOLDER — dispatch ❌ (skill 부재 / v4.0 paradigm 가시화만). design stage 전문 agent placeholder. design stage = chain harness 4 stage (planning/spec/test/implement) 외부 / v2.x carry K-3 영역 / 1차 (v2.0~v4.0) analysis stage 의 deliverable 7~9 (ui-ux/state-map/visual-manifest) 안 cross-cutting 흡수. 향후 본격 trigger 시 design-* skill 5~6종 (wireframe/component-spec/DTCG token 등) 신설 후 본 agent frontmatter skills 사전 주입 paradigm 정합. 현 상태 = dispatch 무의미 (skill 부재).
 tools: Read, Glob, Grep, Bash, Write
 skills: []
 model: opus
 ---
 
-# design-agent (PLACEHOLDER 2026-05-17 — v4.0 paradigm 가시화만)
+<!-- allow-provenance: 의도적 design-stage placeholder (skill 부재 / dispatch ❌ / v4.1+ carry). 본문 전체가 향후 로드맵 = 의도된 예외. NOT a shipped runtime agent → check40 가드 면제. -->
+
+# design-agent (PLACEHOLDER — NOT-SHIPPED RUNTIME / v4.0 paradigm 가시화만)
 
 > **PLACEHOLDER**: 본 agent 는 v4.0 multi-agent paradigm 정합 **가시화 자산**. skill 부재 = dispatch 무의미. 향후 v4.1+ design stage 본격 trigger 시 design-\* skill 5~6종 신설 후 frontmatter `skills: [...]` 사전 주입 의무.
 >

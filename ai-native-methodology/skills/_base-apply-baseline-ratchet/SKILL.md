@@ -6,7 +6,7 @@ allowed-tools: Read, Glob, Bash, Edit, Write
 
 # apply-baseline-ratchet
 
-ADR-010 의무 진입 단계. `input` phase 이전 적용.
+의무 진입 단계. `input` phase 이전 적용.
 
 ## Why this matters
 
@@ -16,7 +16,7 @@ When the methodology starts surfacing findings on a legacy codebase, the user se
 2. Methodology gets blamed ("this tool is generating noise")
 3. Adoption fails
 
-ADR-010 fixes this: capture the baseline once, then **ratchet** — new findings only count if they're additions over baseline. Existing issues are tracked separately as "legacy debt" with their own paydown schedule.
+Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new findings only count if they're additions over baseline. Existing issues are tracked separately as "legacy debt" with their own paydown schedule.
 
 ## Steps
 
@@ -56,8 +56,12 @@ After this skill completes, the user has:
 
 ## Refuse to skip
 
-If user wants to skip baseline+ratchet on a legacy project, refuse and reference ADR-010. Surface the "defect explosion" risk concretely. If user still insists, log a finding with `Type: methodology-violation, Confidence: high` and proceed under protest.
+If user wants to skip baseline+ratchet on a legacy project, refuse and reference the baseline+ratchet policy. Surface the "defect explosion" risk concretely. If user still insists, log a finding with `Type: methodology-violation, Confidence: high` and proceed under protest.
 
 ## Greenfield projects
 
-For greenfield (no legacy code), ADR-010 is N/A — proceed directly to `input` phase. State this explicitly in the finding ledger so future readers know baseline was intentionally absent.
+For greenfield (no legacy code), baseline+ratchet is N/A — proceed directly to `input` phase. State this explicitly in the finding ledger so future readers know baseline was intentionally absent.
+
+## 인용
+
+- ADR: ADR-010 (baseline+ratchet legacy gate)

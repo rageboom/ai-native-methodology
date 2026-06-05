@@ -24,15 +24,15 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (no-simula
    ```
    환경 부재 시 사용자 위임 (CI) 명시 + 신뢰도 -5%p 기록
 2. **WCAG 2.2 기준** — Level A / AA / AAA 위반 분류
-3. **AP-FE-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합). `id-conventions.md` §3 카테고리 정합 (AP-FE prefix / sub `A11Y` / 실 PoC #04 `AP-FE-{SUB}-NNN` 패턴 정합).
-4. **a11y-spec.json 작성** — `schemas/a11y-spec.schema.json` (v1.4 신규)
+3. **AP-FE-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합). `id-conventions.md` §3 카테고리 정합 (AP-FE prefix / sub `A11Y` / `AP-FE-{SUB}-NNN` 패턴 정합).
+4. **a11y-spec.json 작성** — `schemas/a11y-spec.schema.json`
 
 ## 산출물
 
 `<user-project>/.aimd/output/a11y-spec.json`
 
-## 본체 명세
+## 인용
 
-- `methodology-spec/deliverables/10-a11y-spec.md` (v1.4)
-- `schemas/a11y-spec.schema.json`
+- 정책: methodology-spec/deliverables/10-a11y-spec.md
+- schema: schemas/a11y-spec.schema.json
 - WCAG 2.2 (cross-check 권고)

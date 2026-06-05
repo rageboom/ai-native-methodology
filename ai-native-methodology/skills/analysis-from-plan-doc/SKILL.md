@@ -39,21 +39,22 @@ Markdown / PDF / Notion export 문서를 입력 받아 비즈니스 의도 + UC 
 - **inferred 명시 의무** — 문서에 직접 명시 안 됐으나 내용 기반 종합한 entry 는 `provenance: "inferred"` 명시 (verbatim 으로 위장 ❌). intent_summary 는 본질상 요약이라 예외 (전체 의도 1~3문장).
 - **inferred 비율 노출** — uc_candidates / glossary 중 `provenance: "inferred"` 비율 > 0 이면 후속 GO-STOP gate 에 노출 (사용자 확인 의무). 추론 UC 가 "문서 근거" 로 silent 통과 차단.
 
-> 자동 검증: `tools/analysis-extraction-validator --extract <plan-doc-extract.json>` — provenance 누락(high) + inferred 비율 임계(medium) hard gate (v11.0.3 / discovery-extraction-validator 대칭).
+> 자동 검증: `tools/analysis-extraction-validator --extract <plan-doc-extract.json>` — provenance 누락(high) + inferred 비율 임계(medium) hard gate.
 
 ## 산출물
 
-- `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false / json 단독 — ADR-011)
+- `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false / json 단독)
 - 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
-
-## 본체 명세 참조
-
-- `methodology-spec/workflow/input.md` §5종 입력 (d)
-- `methodology-spec/plugin-charter.md` §1 R8
-- `methodology-spec/finding-system.md` F-163 (input-adapter source-grounded 비대칭 전수 점검 — 본 보강의 모 finding) + F-162 (analysis-from-figma 동형 fix)
 
 ## When NOT to invoke
 
 - 기획 문서 부재 (사용자 자연어 의도만) → `analysis-from-prompt`
 - 큰 PDF (≫ 20 page) — 사용자 분할 안내 후 chunk 별 재호출 (한 번에 흡수 ❌)
 - 이미지·다이어그램만 있는 문서 (텍스트 미존재) → 본 skill scope 외 / Figma 자료라면 `analysis-from-figma`
+
+## 인용
+
+- ADR: ADR-011 (json 단독 산출)
+- 정책: methodology-spec/workflow/input.md §5종 입력 (d)
+- 정책: methodology-spec/plugin-charter.md §1 R8
+- 정책: methodology-spec/finding-system.md F-163 + F-162

@@ -1,14 +1,13 @@
 # Stored Procedure → 신규 stack 코드 로직 전환 정책 (4 분류 매트릭스)
 
 > **사상**: legacy DB 의 Stored Procedure 안에 핵심 비즈니스 로직이 분포한 경우, 신규 stack 마이그레이션 시 **default = SP → app layer 코드 전환** / 예외 3 case 한정 SP 보존 (+ thin wrapper).
-> **trigger**: poc-17 ifrs/car dogfooding 작업 (2026-05-28) — 사용자 명시 "프로시저는 코드 로직으로 전환 하기 위한 정책도 필요해".
-> **관련**: `db-assets-always-on.md` · `lifecycle-contract.md` · `sub-rules/spring41-ibatis2-isomorphic.md` · ADR-CHAIN-015 · DEC-2026-05-28-sp-conversion-policy.
+> **관련**: `db-assets-always-on.md` · `lifecycle-contract.md` · `sub-rules/spring41-ibatis2-isomorphic.md`.
 
 ## 1. 왜 필요한가
 
-사내 legacy paradigm (특히 mainframe 기원 / Oracle PL/SQL / MSSQL T-SQL 중심 시스템) 에서 SP 는 종종 **핵심 정산 / 배치 / 마이그레이션 로직** 보유. 신규 stack (Spring Boot 3.x / NestJS 등) 으로 마이그레이션 시 SP 처리 framework 부재 = plan 부실. poc-17 ifrs/car 작업 plan 결단 시 사용자 명시 → 본 정책 신설.
+사내 legacy paradigm (특히 mainframe 기원 / Oracle PL/SQL / MSSQL T-SQL 중심 시스템) 에서 SP 는 종종 **핵심 정산 / 배치 / 마이그레이션 로직** 보유. 신규 stack (Spring Boot 3.x / NestJS 등) 으로 마이그레이션 시 SP 처리 framework 부재 = plan 부실.
 
-**default = (α) 코드 전환** 이 본격 paradigm:
+**default = (α) 코드 전환** paradigm:
 
 - test 용이 (단위 test / mock 가능)
 - 마이그레이션 유연 (DB engine 종속 ↓)
@@ -68,7 +67,7 @@ scope chain 5 implement
 
 - 100만+ row 처리하는가?
 - cursor 또는 temporary table 사용하는가?
-- set 기반 처리 (single SQL) 가 app layer 의 n+1 보다 본격적인가?
+- set 기반 처리 (single SQL) 가 app layer 의 n+1 보다 효율적인가?
 - 야간 batch / 정산 batch 인가?
 
 → **YES 2+ → (β) 보존**
@@ -178,52 +177,22 @@ public class CarCostExternalSpRepository {
 
 ## 9. R1' axis sub-axis 정합
 
-SP 정적 분석 = **R1' sub-axis 본격 입증** (`sub-rules/spring41-ibatis2-isomorphic.md` §X 갱신):
+SP 정적 분석 = **R1' sub-axis** (`sub-rules/spring41-ibatis2-isomorphic.md` §X):
 
 | Sub-layer                         | 자동 추출                 | 비고                     |
 | --------------------------------- | ------------------------- | ------------------------ |
-| Java (Controller / Service / DAO) | △ 부분 (codegraph ⭐⭐⭐) | LOC 기반                 |
+| Java (Controller / Service / DAO) | △ 부분 (codegraph)        | LOC 기반                 |
 | iBATIS sqlMap XML                 | ❌ (codegraph 미지원)     | 수동 SQL Inventory       |
 | **DB SP / Function SQL**          | **✅ 정적 분석 ✅**       | AST parse / body extract |
 
 → analysis Phase 4 business-logic 의 자동화 가능성 ↑ (SP body 추출). §3-A axis 의 ceiling 을 살짝 높일 수 있다 (carry 측정 자산).
 
-## 10. 사례 (poc-17 ifrs/car / 첫 적용 + Phase 1 본격 입증)
+## 인용
 
-### 10.1 SP 분류 사실 (2026-05-28 plan + 2026-05-29 Phase 1 종결 본격 실측)
-
-| SP source                                               | 갯수                                                 | 분류 결단                                                                                                                                                               |
-| ------------------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IFRS_split/04_StoredProcedures/ 자체 SP (car 관련 grep) | **0**                                                | 적용 ❌ — car 비종속                                                                                                                                                    |
-| 외부 SP 호출 (`carCost.xml` `<procedure>` tag)          | **1**: `SGERP.dbo.SG_SACSlipRowCarManagementIFQuery` | **(γ) 외부 시스템 SP — 보존 + thin wrapper** / 화면 4 차량비용산출                                                                                                      |
-| 사내 utility function (Phase 1 추가 발견)               | **2**                                                | `ifrs.dbo.FN_SPLIT` (comma 분할 / insertCarCostSlip) + `dbo.fn_lpad` (zero-pad / updateCarNo CTE) F-MISSING-FN-001 (IFRS_split/03_Functions/ export 부재 = K 정책 위반) |
-
-### 10.2 L 정책 본격 적용 사실 (첫 live)
-
-- **γ (외부 시스템 SP)** 1건 본격 입증 = `<procedure>` tag iBATIS 2 + parameterMap (4 IN parameter) + magic 위치 2,6,7 하드 (F-SP-PARAM-MAGIC-001)
-- **EXEC paradigm 본격 발견**: `EXEC SGERP.dbo.SG_SACSlipRowCarManagementIFQuery ?, 0, ?, ?, ?, '', ''`
-- 마이그레이션 결단 (chain 3 plan stage / sp-conversion-policy.md §6 정합):
-  - 옵션 A: DB link / linked server (SQL 직접 EXEC)
-  - 옵션 B: API wrapping (SGERP API 신설)
-  - 옵션 C: SP 호출 service layer wrapper (DAO 단)
-
-### 10.3 sub-rule §X-H R1'-c (DB axis) 정합 사실
-
-- (c) sub-layer 측정 본격: SP 1건 + Function 2건 + 사내 utility 2건 = **AST parse 가능 layer 5종 본격 발견**
-- (a) Java + (b) sqlMap 만으로는 노출 ❌ (사내 utility function 2건 = sqlMap 안 EXEC string literal만 / 의미 추론 불가)
-- **K + L 정책 통합 적용 시점 = sub-axis (R1'-c) 본격 측정 cycle**
-
-→ poc-17 가 **첫 live 적용 사례**. 다른 도메인 (capital / payroll / bspl) 확대 시 (α/β/δ) 본격 적용 측정 가치 예상.
-
-→ **car 도메인 SP 전환 부담 사실상 0 (γ 1건 자명) BUT 사내 utility function 2건 추가 발견 = K 정책 본격 가치 본격 입증**.
-
-## 11. 인용
-
-- 사용자 명시 — 2026-05-28 / poc-17 ifrs/car plan 결단
+- 결단: DEC-2026-05-28-sp-conversion-policy
+- ADR: ADR-CHAIN-015-sp-conversion-policy (SP→코드 전환 정책)
+- schema: schemas/task-plan.schema.json (sp_conversions 필드 carry)
 - `methodology-spec/db-assets-always-on.md` (DB 자산 always-on 정책)
 - `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X (R1' sub-axis)
 - `methodology-spec/lifecycle-contract.md` (chain 3 plan stage)
-- `schemas/task-plan.schema.json` (sp_conversions 필드 carry)
-- `tools/plan-coverage-validator/` (gate #3 신규 검증 항목)
-- DEC-2026-05-28-sp-conversion-policy
-- ADR-CHAIN-015-sp-conversion-policy
+- `tools/plan-coverage-validator/` (gate #3 검증 항목)

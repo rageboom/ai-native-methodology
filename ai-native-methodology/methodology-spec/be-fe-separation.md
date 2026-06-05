@@ -1,6 +1,6 @@
 # BE/FE 분리 운영 정책 — Scenario A/B/C × IR 4계층
 
-> **사상**: ADR-FE-004 (BE/FE 분리 default + JS풀스택+JSP 예외) + ADR-FE-006 (framework-neutral IR + Screen+Journey 우선)
+> **사상**: BE/FE 분리 default + JS풀스택+JSP 예외 / framework-neutral IR + Screen+Journey 우선
 > **위치**: 본체 spec. 사용자 사내 적용 시 직접 참조.
 > **trigger**: `input` phase 입력 시 Scenario detection 자동 분류
 
@@ -66,7 +66,7 @@
 
 ### 4.1 산출 명령
 
-**v2.x carry — `/analyze-fullstack` 명령어 실 등록 부재** (D25 / 2026-05-15). 현재 = scenario B 도 deliverable 별 분리 실행 (각 `analyze-*` skill 호출). 통합 명령어 = methodology 진화 carry / 본 plugin 등록 시 추가 예정.
+`/analyze-fullstack` 통합 명령어는 미등록 carry. 현재 = scenario B 도 deliverable 별 분리 실행 (각 `analyze-*` skill 호출).
 
 ```
 ☐ /analyze-fullstack --scenario=B  ← 미구현 carry
@@ -136,7 +136,7 @@ Scenario C 는 BE/FE 코드 분리 ❌ → 한 팀 운영 / 분석도 통합.
 
 ---
 
-## 6. Scenario × IR 4계층 매트릭스 (ADR-FE-006 정합)
+## 6. Scenario × IR 4계층 매트릭스
 
 | 계층                | Scenario A                               | Scenario B                     | Scenario C                                                  |
 | ------------------- | ---------------------------------------- | ------------------------------ | ----------------------------------------------------------- |
@@ -149,7 +149,7 @@ Scenario C 는 BE/FE 코드 분리 ❌ → 한 팀 운영 / 분석도 통합.
 
 ---
 
-## 7. 사내 도입 가이드 (3 Scenario 별 quality gate 차이)
+## 7. 사내 도입 가이드 — 3 Scenario 별 quality gate 차이
 
 | Scenario | quality gate                                                                          |
 | -------- | ------------------------------------------------------------------------------------- |
@@ -157,12 +157,12 @@ Scenario C 는 BE/FE 코드 분리 ❌ → 한 팀 운영 / 분석도 통합.
 | **B**    | 통합 baseline.yml / API route handler 의 양쪽 인식 검증                               |
 | **C**    | BE baseline.yml + FE baseline-fe.yml (state-map ❌ — JSP-specific 함정 강조)          |
 
-→ ADR-010 baseline+ratchet 정합 + WCAG 2.1-AA → 2.2-AA ratchet (a11y) + Strangler 마이그레이션 plan (legacy-spectrum) 모두 적용.
+→ baseline+ratchet 정합 + WCAG 2.1-AA → 2.2-AA ratchet (a11y) + Strangler 마이그레이션 plan (legacy-spectrum) 모두 적용.
 
 ---
 
-## 8. 다음
+## 인용
 
-- Stage 4 mini-PoC = Scenario A (RealWorld React fork) 첫 검증
-- Scenario B (Next.js) 본격 PoC = Stage 5+ 또는 사내 적용 시
-- Scenario C (JSP) 본격 PoC = release 후 adoption (사내 legacy 도입 시)
+- ADR: ADR-FE-004 (BE/FE 분리 default)
+- ADR: ADR-FE-006 (framework-neutral IR)
+- ADR: ADR-010 (baseline+ratchet quality gate)

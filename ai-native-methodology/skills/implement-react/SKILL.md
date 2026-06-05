@@ -91,16 +91,16 @@ export function LoginForm({ ref, onSubmit }: LoginFormProps) {
 
 자동 generate ≥ 80% (boilerplate / Gherkin 매칭 코드) / 사용자 검토 ≤ 20% (component composition / hook abstraction / performance).
 
-## 본체 명세 참조
-
-- `methodology-spec/plugin-charter.md` §1 R14 + §3 G4
-- `skills/implement-generate-impl-spec/SKILL.md` (본 skill 의 BE sibling)
-- `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` §1 (json 단독 / ADR-011) §3 (no-simulation)
-- React 19 공식: https://react.dev/blog/2024/12/05/react-19
-
 ## When NOT to invoke
 
 - React 18 이하 — `implement-react-18` 별도 carry 또는 사용자 명시 (forwardRef 패턴 차이)
 - BE impl (Spring / NestJS / FastAPI 등) — `implement-generate-impl-spec` 본문 분기
 - Vue / Svelte / Solid — 각각 `implement-vue` / `implement-svelte` (carry) 등
 - LLM auto-invoke `npx jest` ❌ (사용자 명시 의무)
+
+## 인용
+
+- ADR: ADR-CHAIN-001 (chain stage enforcement / no-simulation)
+- 정책: methodology-spec/plugin-charter.md §1 R14 + §3 G4
+- sibling: skills/implement-generate-impl-spec/SKILL.md (BE 트랙)
+- React 19 공식: https://react.dev/blog/2024/12/05/react-19

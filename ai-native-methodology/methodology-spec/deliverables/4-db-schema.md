@@ -1,7 +1,7 @@
 # 산출물 #4: DB 스키마 (Database Schema)
 
-> **사상**: Schema-First (ADR-001 — 다중 출처 통합 시 운영 DB > ORM > ERD 우선순위)
-> **schema**: `schemas/db-schema.schema.json` (json 단독 SSOT / ADR-011 — `.template.mermaid` 폐지)
+> **사상**: Schema-First (다중 출처 통합 시 운영 DB > ORM > ERD 우선순위)
+> **schema**: `schemas/db-schema.schema.json` (json 단독 SSOT)
 > **생성 phase**: `db-schema` phase (`/analyze-db`)
 
 ---
@@ -18,7 +18,7 @@
 
 ```
 output/db/
-├── schema.json                    # json 단독 SSOT / ADR-011 (구조화 / ERD relationships 포함)
+├── schema.json                    # json 단독 SSOT (구조화 / ERD relationships 포함)
 ├── schema.sql                     # 통합 SQL (CREATE TABLE)
 ├── 정합성-검증-보고서.md           # 다중 출처 시 (보조)
 └── tables/                        # 테이블별 상세 (선택)
@@ -47,7 +47,7 @@ output/db/
 ### 3.2 미추출 (의도적)
 
 - 쿼리 성능, 실행 계획 → NFR 영역
-- 데이터 마이그레이션 전략 → v2 (재구현 단계)
+- 데이터 마이그레이션 전략 → 재구현 단계
 
 ---
 
@@ -90,3 +90,11 @@ output/db/
 
 - 증상: JPA + Native Query 혼재인데 ORM 만 봄
 - 대응: Native Query 위치 함께 기록 → `business-logic` phase 5.A 로 전달
+
+---
+
+## 인용
+
+- ADR: ADR-001 (Schema-First 출처 우선순위)
+- ADR: ADR-011 (json 단독 SSOT / mermaid 폐지)
+- schema: `schemas/db-schema.schema.json`

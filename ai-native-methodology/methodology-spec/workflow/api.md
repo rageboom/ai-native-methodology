@@ -60,7 +60,7 @@ paths:
 ```
 .ai-analysis/output/api/
 ├── openapi.yaml             # 표준 (외부 공유 가능)
-├── api-extension.json       # json 단독 SSOT (AI 분석 메타 / v12 ADR-011)
+├── api-extension.json       # json 단독 SSOT (AI 분석 메타 / v12 json-only)
 └── (선택) swagger-ui-build/
 ```
 
@@ -115,10 +115,17 @@ paths:
 ### 7.4 GraphQL/gRPC 혼재
 
 - 증상: REST API + GraphQL 함께 사용
-- 대응: REST 우선. GraphQL 은 별도 산출물 (v1.2+)
+- 대응: REST 우선. GraphQL 은 별도 산출물
 
 ---
 
 ## 8. 다음
 
 `quality` phase (`/analyze-quality`) 진입 (`ui` phase 와 합쳐서).
+
+---
+
+## 인용
+
+- api-extension.json (json 단독 SSOT): ADR-011 (json-only artifacts, erd.mermaid 폐기)
+- schema: schemas/openapi-extension.schema.json

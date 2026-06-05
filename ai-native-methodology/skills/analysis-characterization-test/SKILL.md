@@ -6,11 +6,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # analysis-characterization-test — 의도 vs 버그 분리 + Given/When/Then snapshot acceptance oracle
 
-ADR-CHAIN-006 phase 4.7 정식 도입 정합 + DEC-2026-05-07-poc-06-종결 + DEC-2026-05-07-poc-06-domain-결단 + DEC-2026-05-07-poc-07-poc03-phase7-retrofit. ≥ 2 PoC corroboration 입증 (PoC #06 Spring 4.1 Legacy + PoC #03 NestJS Modern).
+phase 4.7 산출물. ≥ 2 PoC corroboration 의무 (Legacy + Modern 두 spectrum).
 
 ## no-simulation 절대 금지
 
-baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = ADR-009 단계 4 / -5%p.)
+baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = 신뢰도 -5%p.)
 
 - ✅ 실 코드 grep + 코드 자조 코멘트 search 의무
 - ✅ ambiguous 영역 → 도메인 expert (사용자 본인 또는 IFRS 회계 / DBA / 기획자) 결단 강제 (carry 명시)
@@ -50,7 +50,7 @@ grep -rn -E "TODO|FIXME|HACK|XXX|폐해|임시|나중에|폐기|deprecate|workar
   --include="*.xml" --include="*.jsp"
 ```
 
-0건 = Modern 스택 자연 부재 (PoC #03 NestJS retrofit 입증) — §8.1 strict overfitting ❌. `intentVsBug.self_recognized_grep_count: 0` 명시 + carry note "Modern 스택 자연 부재 정합".
+0건 = Modern 스택 자연 부재 — §8.1 strict overfitting ❌. `intentVsBug.self_recognized_grep_count: 0` 명시 + carry note "Modern 스택 자연 부재 정합".
 
 ### 4. snapshot Given/When/Then 작성 (1 UC 당 1 snapshot 권장)
 
@@ -78,7 +78,7 @@ scenarios:
     behavior_likely_bug: ['DB UQ 부재 race window']
 ```
 
-권장 scenario 수: happy + edge 1~2 + likely_bug 1~2 (PoC #06 = 3~4 / PoC #03 = 3 정합).
+권장 scenario 수: happy + edge 1~2 + likely_bug 1~2.
 
 ### 5. coverage matrix + ratchet 정책
 
@@ -99,7 +99,7 @@ coverage:
 
 ### 6. Modern vs Legacy hint (자연어 한 줄 / 분기 ❌)
 
-skill prompt 분기 ❌ (Cursor/Cline/Aider 표준 / DEC §6 정합 / YAGNI). 단, 자연어 hint 한 줄로 환경 차이 인식:
+skill prompt 분기 ❌ (Cursor/Cline/Aider 표준 / YAGNI). 단, 자연어 hint 한 줄로 환경 차이 인식:
 
 - **Legacy 의심 신호** (자조 코멘트 ↑ / 적대성 4중 / 표준프레임워크 / iBATIS / JSP) → ambiguous ↑ 가능성 → 도메인 expert carry 의무 강조
 - **Modern 의심 신호** (TODO/FIXME 0~소수 / class-validator / TypeORM / clean architecture) → 명확 분류 비율 ↑ 가능성 → ambiguous = 0 정합
@@ -114,8 +114,6 @@ ambiguous > 0 시:
 2. snapshot 의 해당 scenario `behavior_likely_bug` 또는 `behavior_to_preserve` 둘 중 최소 하나 명시
 3. chain 4 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
 
-PoC #06 D2 패턴 정합 — ambiguous 3건 → 도메인 결단 후 1건 (DBA carry only) → 명확 분류 비율 82% → 94% (+12%p).
-
 ### 8. characterization-spec.json 작성
 
 `schemas/characterization-spec.schema.json` 정합. 4 sub-section (meta_confidence + snapshots + intent_vs_bug + coverage).
@@ -125,7 +123,7 @@ node ../../tools/schema-validator/src/cli.js .aimd/output/characterization/
 # Expect: characterization-spec.json valid + ratchet if/then + ambiguous if/then 모두 통과
 ```
 
-### 9. characterization-coverage-validator 실행 (v2.1.0 신설 / v2.1.1 ratchet trend 보강)
+### 9. characterization-coverage-validator 실행
 
 ```bash
 # 기본 (absolute 또는 ratchet 첫 측정)
@@ -133,7 +131,7 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
   --target .aimd/output/characterization/ \
   --threshold 0.80
 
-# v2.1.1 ratchet trend 자동 검증 (coverage_strategy=ratchet + trend_required=true 인 경우)
+# ratchet trend 자동 검증 (coverage_strategy=ratchet + trend_required=true 인 경우)
 node ../../tools/characterization-coverage-validator/src/cli.js \
   --target .aimd/output/characterization/ \
   --coverage-baseline .aimd/baseline/characterization-coverage.json \
@@ -143,7 +141,7 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.aimd/output/characterization/characterization-spec.json` (산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지 ADR-011)
+- `<user-project>/.aimd/output/characterization/characterization-spec.json` (산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지)
 - `<user-project>/.aimd/output/characterization/coverage.json`
 - `<user-project>/.aimd/output/characterization/snapshots/UC-*.json`
 
@@ -155,18 +153,6 @@ phase 4.7 산출물 = chain 1 (discovery-spec) 입력 핵심:
 - bug 분류 AP → modern_alternative 적용
 - ambiguous → discovery-spec carry / 결단 전 chain 2 진입 ❌
 - self_recognized → SATD 처분 (자조 위치 새 시스템에서 자동 fix)
-
-## 본체 명세
-
-- `methodology-spec/deliverables/23-characterization-spec.md`
-- `schemas/characterization-spec.schema.json` (30번째 schema)
-- `tools/characterization-coverage-validator/` (workspace 13번째)
-- `flows/analysis.phase-flow.json` v2.1.0 phase 4.7 entry
-- ADR-CHAIN-006 phase 4.7 정식 도입
-- ADR-011 (json 단독 — characterization-spec.json 에 intent_vs_bug 통합 / 구 intent-vs-bug.md twin 폐지)
-- ADR-009 (5단계 신뢰도 모델 — 단계 5 = 도메인 expert 결단 후)
-- DEC-2026-05-07-poc-06-종결 (corroboration #1 / Legacy)
-- DEC-2026-05-07-poc-07-poc03-phase7-retrofit (corroboration #2 / Modern)
 
 ## 외부 권위 출처
 
@@ -187,11 +173,15 @@ phase 4.7 산출물 = chain 1 (discovery-spec) 입력 핵심:
 5. coverage threshold 단일값 강제 → ratchet 옵션 부재 시 legacy 0.43 fail
 6. Gherkin tag 미사용 → traceability 단일축 (intent_classification.type 만)
 
-## ≥ 2 PoC corroboration
+## 인용
 
-| PoC                               | spectrum          | 명확 분류 비율 | self_recognized | ambiguous     |
-| --------------------------------- | ----------------- | -------------- | --------------- | ------------- |
-| **PoC #06** (Spring 4.1 + iBATIS) | Legacy 적대성 4중 | 17/18 = 94%    | 1 (AP-007 자조) | 1 (DBA carry) |
-| **PoC #03 retrofit** (NestJS)     | Modern            | 30/30 = 100%   | 0 (자연 부재)   | 0             |
-
-→ phase 4.7 가 두 spectrum 모두에서 동작 입증 — v2.1.0 본체 격상 자격.
+- 정책: methodology-spec/deliverables/23-characterization-spec.md
+- schema: schemas/characterization-spec.schema.json
+- 도구: tools/characterization-coverage-validator/
+- flow: flows/analysis.phase-flow.json (phase 4.7 entry)
+- ADR: ADR-CHAIN-006 (phase 4.7 도입)
+- ADR: ADR-011 (json 단독 / twin 폐지)
+- ADR: ADR-009 (5단계 신뢰도 모델)
+- 결단: DEC-2026-05-07-poc-06-종결
+- 결단: DEC-2026-05-07-poc-06-domain-결단
+- 결단: DEC-2026-05-07-poc-07-poc03-phase7-retrofit

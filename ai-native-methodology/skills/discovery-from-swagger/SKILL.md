@@ -8,7 +8,7 @@ allowed-tools: Read, Glob, Grep, Bash, WebFetch
 
 ## 언제 사용
 
-scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger spec 이 source 채널일 때. discovery-agent 가 dispatch. 본 skill = **endpoint 별 UC behavior intent 추출 axis** (`analysis-from-swagger` 의 inventory 추출과 분리 / DEC-2026-05-26-input-skill-roles 정합).
+scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger spec 이 source 채널일 때. discovery-agent 가 dispatch. 본 skill = **endpoint 별 UC behavior intent 추출 axis** (`analysis-from-swagger` 의 inventory 추출과 분리).
 
 ## 사전 조건
 
@@ -60,7 +60,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 ## 인용
 
 - DEC-2026-05-21-chain-discovery-plan-stage-도입 (본 skill 의 모 결단)
-- DEC-2026-05-26-input-skill-roles (`analysis-from-swagger` 와 timing 분리 / v10.0.4 paradigm / v10.1.0 본격 구현)
+- DEC-2026-05-26-input-skill-roles (`analysis-from-swagger` 와 timing 분리)
 - `agents/discovery-agent.md` (본 skill 의 caller)
 - `skills/analysis-from-swagger/SKILL.md` (baseline 채널 / source 동일 / 출력 axis 다름)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference)

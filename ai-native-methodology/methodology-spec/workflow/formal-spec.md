@@ -1,6 +1,6 @@
 # formal-spec phase: formal-spec (형식 명세)
 
-> **명령어**: `/analyze-formal-spec` · **사상**: json 단독 SSOT (ADR-011 / ADR-008 이중 렌더링 supersede) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무 (ADR-009)
+> **명령어**: `/analyze-formal-spec` · **사상**: json 단독 SSOT (이중 렌더링 supersede) + 자연어 빈약성 보완 (60% → 90%) + 진짜 도구 의무
 > **핵심 책임**: business-rules.json 자연어 한계를 형식 명세로 보완 / AI 코드 생성 정확도 향상
 
 ---
@@ -34,7 +34,7 @@
 
 ## 3. 처리 — 5 산출물 동시 생성
 
-| 산출물         | json 단독 SSOT (ADR-011)                                                 |
+| 산출물         | json 단독 SSOT                                                           |
 | -------------- | ------------------------------------------------------------------------ |
 | State Machine  | `state-machines/<AggregateRoot>.json` (XState / 시각화는 view-time 도구) |
 | Sequence       | `sequence-diagrams/UC-<UseCase>.json` (시각화는 view-time 도구)          |
@@ -142,7 +142,7 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 
 수동 ad-hoc 검증 **금지** — "drift 0" 보고가 7+3 자동 검출로 한계 노출 사례 있음. 자동 도구 미실행 시 신뢰도 -5%p 패널티.
 
-### 4.2 Static Analyzer 정합 — DEC-static-tool-실행-의무화 ()
+### 4.2 Static Analyzer 정합
 
 - ❌ AI persona 시뮬레이션 절대 금지
 - ✅ 진짜 외부 도구 실행 의무 — R19 Tier 1 (in-plugin: Semgrep) 또는 Tier 2 (사용자 환경 SARIF import: PMD / SpotBugs / Daikon / CodeQL)
@@ -164,7 +164,7 @@ node ai-native-methodology/tools/decision-table-validator/src/cli.js \
 
 **양쪽 발견 (double_hit)** 시:
 
-- 정식 finding 등급 ()
+- 정식 finding 등급
 - finding-system.schema.json `cross_validation.double_hit: true`
 
 **단독 발견 시**:
@@ -191,11 +191,11 @@ output/formal-spec/
 └── _manifest.yml                # meta-confidence
 ```
 
-ADR-011 정합: 모든 영역 json 단독 SSOT 산출 (ADR-008 이중 렌더링 supersede / 시각화는 view-time 도구).
+모든 영역 json 단독 SSOT 산출 (이중 렌더링 supersede / 시각화는 view-time 도구).
 
 ---
 
-## 6. 신뢰도 (ADR-009 정합)
+## 6. 신뢰도
 
 | 단계                                                   | raw confidence          |
 | ------------------------------------------------------ | ----------------------- |
@@ -215,7 +215,7 @@ ADR-011 정합: 모든 영역 json 단독 SSOT 산출 (ADR-008 이중 렌더링 
 
 ## 7. 종료 조건
 
-- 5 산출물 모두 작성 (json 단독 SSOT / ADR-011)
+- 5 산출물 모두 작성 (json 단독 SSOT)
 - **drift-validator + decision-table-validator 자동 실행 완료** (breaking 0 또는 finding 등록 / non-breaking + interpretive drift 모두 finding 등록)
 - Cross-validation 완료 — Senior + 진짜 static tool (또는 환경 부재 명시 보고). **시뮬 결과 사용 금지**
 - `cross_validation.real_tool: true` 시 5종 물증 schema 검증 통과 / `false` 시 `simulation_reason` 명시
@@ -233,3 +233,14 @@ ADR-011 정합: 모든 영역 json 단독 SSOT 산출 (ADR-008 이중 렌더링 
 - **자연어 누락 (형식화 필수)**: 거부 방식 / 검증 위치 / HTTP status / 에러 메시지 / unfollow 일관성
 
 → `formal-spec` phase 형식화 시 100% 표현.
+
+---
+
+## 인용
+
+- ADR: ADR-011 (json 단독 SSOT)
+- ADR: ADR-008 (이중 렌더링 — ADR-011 supersede)
+- ADR: ADR-009 (진짜 도구 의무 / 신뢰도 단계)
+- 결단(§4.2 static tool 실행 의무): DEC-static-tool-실행-의무화
+- schema: schemas/formal-spec.schema.json
+- schema: schemas/finding-system.schema.json

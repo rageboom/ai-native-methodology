@@ -6,7 +6,7 @@ allowed-tools: Read, Grep, Bash, Write
 
 # derive-acceptance-criteria
 
-v2.0 chain 2 의 sub-skill (compose-behavior-spec 가 호출). **bdd-author persona** 책임. Gherkin BDD AC-\* 산출.
+chain 2 의 sub-skill (compose-behavior-spec 가 호출). **bdd-author persona** 책임. Gherkin BDD AC-\* 산출.
 
 ## 언제 사용
 
@@ -21,7 +21,7 @@ v2.0 chain 2 의 sub-skill (compose-behavior-spec 가 호출). **bdd-author pers
 
 ## 산출
 
-- `<project>/.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 / ADR-011 — Gherkin 은 json gherkin 필드)
+- `<project>/.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 / Gherkin 은 json gherkin 필드)
 
 > **code_pointers_na 기본** (F-DOGFOOD-009) — AC 는 의도 노드(Gherkin) → 코드 anchor 는 하위 TC/IMPL 가 보유. 각 AC `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 
@@ -49,21 +49,21 @@ v2.0 chain 2 의 sub-skill (compose-behavior-spec 가 호출). **bdd-author pers
 }
 ```
 
-## v11.0.0 layer + contract ref 산출 의무 (DEC-2026-05-26-contract-강제-양-axis §1 layer 1 hard gate)
+## layer + contract ref 산출 의무
 
-AC 안 `layer` 필드 본격 부여 + contract ref 본격 명시 (schema-level if/then 강제):
+AC 안 `layer` 필드 부여 + contract ref 명시 (schema-level if/then 강제):
 
-| layer        | 본격 required 필드                                                                                       |
+| layer        | required 필드                                                                                            |
 | ------------ | -------------------------------------------------------------------------------------------------------- |
 | `be`         | `openapi_path` + `operationId` (BE swagger contract anchor)                                              |
 | `fe`         | `state_map_ref` + `dtcg_token_ref` + `visual_manifest_ref` (FE state-map + DTCG token + visual contract) |
-| `db`         | 본격 required ❌ (carry — v11.x 안 schema migration ref 후보)                                            |
-| `e2e`        | 본격 required ❌ (FE+BE cross / e2e test framework anchor)                                               |
-| `infra`      | 본격 required ❌                                                                                         |
+| `db`         | required ❌                                                                                              |
+| `e2e`        | required ❌ (FE+BE cross / e2e test framework anchor)                                                    |
+| `infra`      | required ❌                                                                                              |
 | `cross-cut`  | Story anchor (BE+FE 모두 포함) / contract ref optional                                                   |
-| (layer 부재) | legacy carry / 기존 PoC backward-compat / if/then trigger ❌                                             |
+| (layer 부재) | legacy backward-compat / if/then trigger ❌                                                              |
 
-### FE AC 예제 (v11.0.0)
+### FE AC 예제
 
 ```json
 {
@@ -87,9 +87,9 @@ AC 안 `layer` 필드 본격 부여 + contract ref 본격 명시 (schema-level i
 }
 ```
 
-## v11.0.0 Story anchor 본격 명시
+## Story anchor 명시
 
-AC 안 `story_ref` 본격 부여 (Jira Story ID 또는 자유 string). Story = BHV/AC cross-cut anchor:
+AC 안 `story_ref` 부여 (Jira Story ID 또는 자유 string). Story = BHV/AC cross-cut anchor:
 
 - BHV 1개 안에서 BE AC + FE AC 모두 같은 `story_ref` 부여 가능 (cross-cut paradigm 정합).
 - chain plan 진입 시 task-plan.tasks[].story_ref 안 정합 의무.
@@ -118,7 +118,7 @@ verifiable=false AC 비율 ≤ 10% 권고. 초과 시 `chain-coverage-validator`
 
 1. **각 BHV 마다 1+ AC 분해** — happy path + ≥ 1 edge case + ≥ 1 negative path 권고.
 2. **Gherkin 작성** — Given/When/Then 단순 사용자어. step 본문에 specific value (random 변수 ❌ / property test 는 별도 chain 2 property_tests).
-3. **severity + related_aps 채움** — 관련 analysis BR (br_id) 의 `severity` 매핑 (business-rules.json / critical / high / medium / low). v11.0.0 — business_rules_intent 에 criticality 필드 폐기 (Senior B1) → severity 는 analysis BR 가 SSOT (br_id backward link 로 조회). severe AP coverage (S13): antipatterns.json 의 critical/high AP 를 cover 하는 AC 는 `related_aps[]` 에 해당 AP-\* 등재 — gate#2 chain-coverage `--antipatterns` lane(`chain.ap.uncovered_severe` critical/blocking / F-SIM-001) 정합 (related_brs 와 병렬).
+3. **severity + related_aps 채움** — 관련 analysis BR (br_id) 의 `severity` 매핑 (business-rules.json / critical / high / medium / low). severity 는 analysis BR 가 SSOT (br_id backward link 로 조회 / business_rules_intent 에 criticality 필드 없음). severe AP coverage: antipatterns.json 의 critical/high AP 를 cover 하는 AC 는 `related_aps[]` 에 해당 AP-\* 등재 — gate#2 chain-coverage `--antipatterns` lane(`chain.ap.uncovered_severe` critical/blocking) 정합 (related_brs 와 병렬).
 4. **moscow 채움** — release 우선순위 / 사용자 검토 필수 (default = MUST 단, exploratory = SHOULD).
 5. **test_case_refs 채움 (forward link)** — chain 3 (test) 진입 후 `generate-test-spec` skill 이 backward 채움. 본 skill 단계에서는 placeholder `["TC-{BHV}-001"]` 사전 등록 + chain 3 step 1 에서 검증.
 6. **자동 검증 (chain 2 시점)** — chain-coverage-validator 의 `chain.ac.verifiable_no_tc` (verifiable=true ⇔ test_case_refs ≥ 1) check 로 위임 (compose-behavior-spec step 7 합산). `spec-test-link-validator` 는 chain **test(4)** 의 generate-test-spec 가 `test-spec.json` 을 산출한 _후_ 호출 — chain 2 시점엔 test-spec.json 부재라 `--test-spec` 호출 시 usage error(exit 2). 따라서 chain 2 에서 spec-test-link-validator 호출 ❌ (S12 / test 단계로 이관).
@@ -133,12 +133,9 @@ verifiable=false AC 비율 ≤ 10% 권고. 초과 시 `chain-coverage-validator`
 
 ## 인용
 
-- acceptance-criteria.schema.json (deliverable 19)
-- behavior-spec.schema.json `acceptance_criteria_refs[]` 정합
+- 결단: DEC-2026-05-26-contract-강제-양-axis (§1 layer 1 hard gate)
+- ADR: ADR-011 (json 단독 산출)
+- schema: schemas/acceptance-criteria.schema.json (deliverable 19)
+- schema: schemas/behavior-spec.schema.json `acceptance_criteria_refs[]` 정합
 - master plan §B chain 2
 - BDD ([Cucumber Gherkin spec](https://cucumber.io/docs/gherkin/) — official)
-
-## Carry
-
-- AC 자동 generate 정확도 측정 = sub-plan-6 PoC #05.
-- moscow 분포 dashboard (release 자격 / chain 4 통과 cycle) = sub-plan-6.

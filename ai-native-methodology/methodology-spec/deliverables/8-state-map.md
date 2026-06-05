@@ -1,6 +1,6 @@
 # 산출물 #8: State Map (분산 상태 5 진실)
 
-> **사상**: json 단독 SSOT (ADR-011, ADR-008 supersede) + W3C SCXML 1.0 + XState v5+ 호환 (ADR-FE-005)
+> **사상**: json 단독 SSOT + W3C SCXML 1.0 + XState v5+ 호환
 > **schema**: `schemas/state-map.schema.json`
 > **생성 phase**: `ui` phase 5-2-b (`/analyze-state`)
 
@@ -60,14 +60,14 @@ output/state-map/
 | cross_links            | `api` phase + `business-logic` phase (rules) + `ui` phase 5-2-a (ui-spec) | 결정적 + LLM | 0.75 / 0.85 / 0.90                             | machines      |
 
 **입력**: FE 소스
-**평균 신뢰도** (단계 3 / ADR-009 §2.4.1 정합): ~78% (drift-validator FE 적용 시)
+**평균 신뢰도** (단계 3): ~78% (drift-validator FE 적용 시)
 **단계**: 1=raw / 3=drift-validator / 5=XState SCXML 진짜 import
 
 ### 3.2 미추출 (의도적)
 
 - 실시간 데이터 흐름 (WebSocket / SSE) — Stage 5+ 검토
 - service worker / push notification — Stage 5+ 검토
-- 운영 NFR (state transition latency) — ADR-001 명시적 제외
+- 운영 NFR (state transition latency) — 명시적 제외
 
 ---
 
@@ -94,7 +94,7 @@ state_machines:
 
 ## 5. 다이어그램 형식 (json 단독 SSOT / 시각화는 view-time 도구)
 
-> 아래 ```mermaid 블록은 문서 설명용 figure (view-time 렌더 예시). 산출물은 state-map.json 단독 — 별도 .mermaid 파일 emit ❌ (ADR-011).
+> 아래 ```mermaid 블록은 문서 설명용 figure (view-time 렌더 예시). 산출물은 state-map.json 단독 — 별도 .mermaid 파일 emit ❌.
 
 ### 5.1 overview (state-map.json 의 machines 를 view-time 렌더)
 
@@ -168,7 +168,7 @@ cross_links:
 | SM → RULES | validates BR           |
 | SM → AP    | 회피 (5 진실 안티패턴) |
 
-→ json 단독 SSOT (ADR-011 / ADR-008·ADR-FE-002 이중 렌더링 사상 supersede).
+→ json 단독 SSOT.
 
 ---
 
@@ -198,3 +198,16 @@ cross_links:
 
 - 증상: focus / scroll 위치 손실
 - 대응: useRef 로 DOM 진실 보존
+
+---
+
+## 인용
+
+- ADR: ADR-011 (json 단독 SSOT)
+- ADR: ADR-008 (이중 렌더링 사상, supersede)
+- ADR: ADR-FE-002 (FE 이중 렌더링, supersede)
+- ADR: ADR-FE-005 (SCXML/XState 호환)
+- ADR: ADR-009 §2.4.1 (신뢰도 단계 정합)
+- ADR: ADR-001 (운영 NFR 제외)
+- schema: schemas/state-map.schema.json
+- 외부 권위: W3C SCXML 1.0 (REC 2015-09-01) https://www.w3.org/TR/scxml/

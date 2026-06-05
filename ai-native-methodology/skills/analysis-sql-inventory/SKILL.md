@@ -6,11 +6,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 # analysis-sql-inventory — SQL 단위 11 컬럼 인벤토리 + extraction_automation
 
-ADR-CHAIN-007 phase 4.8 정식 도입 정합 + DEC-2026-05-08-poc-06-sql-inventory-retrofit + DEC-2026-05-08-poc-07-종결 §4. ≥ 2 PoC scale-cross 입증 (PoC #06 단일책임 6 SQL + PoC #07 다중책임 71 SQL / 양쪽 외부 6 컬럼 자동화 4/6 = 66.7%).
+phase 4.8 SQL 단위 인벤토리 추출. ≥ 2 PoC scale-cross corroboration 의무.
 
 ## no-simulation 절대 금지
 
-baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = ADR-009 단계 4 / -5%p.)
+baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = 신뢰도 -5%p.)
 
 - ✅ 실 코드 grep + mapper XML grep + Java DAO grep 의무 (외부 analyzer 아님)
 - ✅ DB function (FN*\*) / Stored Procedure (S*\_ / SP\_\_) 호출 시 → DBA-read carry 명시 의무 (proc-body 부재)
@@ -131,14 +131,14 @@ extraction_automation:
 
 ### 9. patterns_extension_v2 (optional / Legacy iBATIS 한정)
 
-PoC #07 D12 (b) nested patterns object 패턴. 4 패턴:
+nested patterns object 패턴. 4 패턴:
 
 - pattern_1_dynamic_branch / pattern_2_calculation_formula / pattern_3_result_mapping / pattern_4_shared_sql_fragments
 
-patterns_extension_v3 (cache / discriminator / typeHandler) = C-v2.2.0-3 carry / 본 v2.2.0-rc1 scope ❌.
-iBATIS 2 전용 `<dynamic>` / `<iterate>` / `<isPropertyAvailable>` sub-classification = C-v2.2.0-7 carry.
+patterns_extension_v3 (cache / discriminator / typeHandler) = scope 외 (미지원).
+iBATIS 2 전용 `<dynamic>` / `<iterate>` / `<isPropertyAvailable>` sub-classification = scope 외 (미지원).
 
-### 10. sql-inventory.json 작성 (json 단독 SSOT / ADR-011 — sql-inventory.md 미산출)
+### 10. sql-inventory.json 작성 (json 단독 SSOT — sql-inventory.md 미산출)
 
 `schemas/sql-inventory.schema.json` 정합. 4 sub-section (meta_confidence + summary + extraction_automation + inventory + (optional) patterns_extension_v2).
 
@@ -147,7 +147,7 @@ node ../../tools/schema-validator/src/cli.js .aimd/output/sql-inventory/
 # Expect: sql-inventory.json valid + carry_flags enum 통과 + external_call_out_of_scope confidence if/then 통과
 ```
 
-### 11. sql-inventory-validator 실행 (v2.2.0-rc1 신설 / workspace 14번째 / v8.7 rename from sql-inventory-extractor)
+### 11. sql-inventory-validator 실행
 
 ```bash
 node ../../tools/sql-inventory-validator/src/cli.js \
@@ -158,7 +158,7 @@ node ../../tools/sql-inventory-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.aimd/output/sql-inventory/sql-inventory.json` (산출물 24 / 통합 entry / json 단독 SSOT — ADR-011)
+- `<user-project>/.aimd/output/sql-inventory/sql-inventory.json` (산출물 24 / 통합 entry / json 단독 SSOT)
 - `<user-project>/.aimd/output/sql-inventory/raw-grep.txt` (1차 산출)
 
 ## chain 1 입력 보강
@@ -169,18 +169,6 @@ phase 4.8 산출물 = chain 1 (discovery-spec) 입력 핵심:
 - intent_vs_bug_classification → discovery-spec carry 의무
 - carry_flags external_call_out_of_scope → 새 시스템 외부 의존 명시
 - DBA-read + proc-body → 새 시스템 SP body 재구현 차단
-
-## 본체 명세
-
-- `methodology-spec/deliverables/24-sql-inventory.md`
-- `schemas/sql-inventory.schema.json` (31번째 schema)
-- `tools/sql-inventory-validator/` (workspace 14번째 / v8.7 rename from sql-inventory-extractor — bin alias 양쪽 보존)
-- `flows/analysis.phase-flow.json` v2.2.0-rc1 phase 4.8 entry
-- ADR-CHAIN-007 phase 4.8 정식 도입
-- ADR-011 (json 단독 / .md 미산출)
-- ADR-009 (5단계 신뢰도 모델)
-- DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
-- DEC-2026-05-08-poc-07-종결 (corroboration #2)
 
 ## 외부 권위 출처
 
@@ -200,18 +188,22 @@ phase 4.8 산출물 = chain 1 (discovery-spec) 입력 핵심:
 ## 흔한 함정 (deliverable §11 정합)
 
 1. RDB 부재 환경 (NoSQL/Prisma 단독) → phase 4.8 skip 의무
-2. Modern ORM raw SQL 측정 표준 부재 → C-v2.2.0-6 carry (Modern ORM PoC #08)
+2. Modern ORM raw SQL 측정 표준 부재 → Modern ORM 측정 carry (corroboration 미충족)
 3. called_from_screen 자동화 0% → 매뉴얼 매핑 + 시간 cap carry
 4. business_meaning LLM ~70% → 도메인 expert 검증 carry
 5. external*call_out_of_scope 누락 → FN*\_ / S\_\_ / SP\_\* prefix grep 의무
 6. 시간 cap (대규모 모듈) → coverage_ratio 자연어 (예: "15/71 = 21.1%") + scope_decision: carry
 7. patterns_extension_v2 의무화 ❌ → optional 명시 / Legacy 한정
 
-## ≥ 2 PoC scale-cross corroboration
+## 인용
 
-| PoC                                                   | spectrum                     | scale  | 외부 6 컬럼 자동화       | statement_type              |
-| ----------------------------------------------------- | ---------------------------- | ------ | ------------------------ | --------------------------- |
-| **PoC #06 retrofit** (Spring 4.1 + iBATIS 2 단일책임) | Legacy 적대성 4중            | 6 SQL  | 4/6 = 66.7%              | ✅ 1 SP (S_ExRateMigration) |
-| **PoC #07** (Spring 4.1 + iBATIS 2 다중책임)          | Legacy 적대성 4중 / 다중책임 | 71 SQL | 4/6 = 66.7% (scale 무관) | ✅ 14 procedure             |
+- 정책: `methodology-spec/deliverables/24-sql-inventory.md`
+- schema: `schemas/sql-inventory.schema.json`
+- 도구: `tools/sql-inventory-validator/`
+- flow: `flows/analysis.phase-flow.json` (phase 4.8 entry)
+- ADR: ADR-CHAIN-007 (phase 4.8 도입)
+- ADR: ADR-011 (json 단독 / .md 미산출)
+- ADR: ADR-009 (5단계 신뢰도 모델)
+- 결단: DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
+- 결단: DEC-2026-05-08-poc-07-종결 (corroboration #2)
 
-→ scale-cross isomorphic 입증 / **paradigm-cross = Modern ORM PoC #08 carry** (C-v2.2.0-6 / v2.2.0 final trigger / Senior STOP signal 흡수).

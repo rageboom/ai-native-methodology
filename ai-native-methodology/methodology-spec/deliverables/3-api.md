@@ -1,6 +1,6 @@
 # 산출물 #3: API 계약 (API Contract)
 
-> **사상**: Contract-First (ADR-001 — OpenAPI 3.1 산업 표준 그대로, 분석 메타는 별도 파일로 분리)
+> **사상**: Contract-First (OpenAPI 3.1 산업 표준 그대로, 분석 메타는 별도 파일로 분리)
 > **schema**: `schemas/openapi-extension.schema.json` · **표준**: OpenAPI 3.1
 > **생성 phase**: `api` phase (`/analyze-api`)
 
@@ -53,7 +53,7 @@ OpenAPI 자체는 변형 없이 표준대로. 분석 메타는 `api-extension.js
 
 ## 4. 책임 분담 — API 에 안 담기는 것
 
-ADR-002 §책임 분담 원칙. API 에는 **인터페이스 형식만**, 정책은 비즈니스 규칙으로:
+책임 분담 원칙. API 에는 **인터페이스 형식만**, 정책은 비즈니스 규칙으로:
 
 ```yaml
 # ❌ 안 좋은 예 (API 에 정책 박힘)
@@ -119,3 +119,12 @@ post:
 ### 7.3 Swagger annotation 부재
 - 증상: Spring `@Operation` 등 없어서 추출 어려움
 - 대응: LLM 이 메서드명/파라미터로 추론, 신뢰도↓ 표기
+
+---
+
+## 인용
+
+- ADR: ADR-001 (Contract-First OpenAPI 3.1 표준 유지)
+- ADR: ADR-002 (책임 분담 — API 형식 / 정책 분리)
+- schema: `schemas/openapi-extension.schema.json`
+- 표준: OpenAPI 3.1

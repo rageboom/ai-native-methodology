@@ -20,7 +20,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 절차
 
-1. **cross-link 검토 (LLM/사람 — analysis 무-gate / 결정론 강제 ❌)** — 아래 3 정합은 LLM·사람 검토 영역. formal-spec-link-validator 는 analysis-stage 이 3종을 결정론 강제하지 **않음** (FE/chain cross-link id-pattern 만 자동 검사 / v12.0.0 — 구 `.json ↔ .mermaid` 이중렌더링 drift 검사는 json 단독 전환으로 폐지 / ADR-011). 따라서 본 3종은 정직하게 "검토 권고"로 표기:
+1. **cross-link 검토 (LLM/사람 — analysis 무-gate / 결정론 강제 ❌)** — 아래 3 정합은 LLM·사람 검토 영역. formal-spec-link-validator 는 analysis-stage 이 3종을 결정론 강제하지 **않음** (FE/chain cross-link id-pattern 만 자동 검사 / json 단독 — `.mermaid·.md` 이중렌더링 drift 검사 없음). 따라서 본 3종은 정직하게 "검토 권고"로 표기:
    - business-rules.json 의 domain reference ∈ domain.json
    - architecture.json 의 module ∈ inventory.json
    - openapi.yaml endpoint ↔ business-rules.json rule 매칭
@@ -28,7 +28,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx)
    - **Tier 2 (사용자 환경 SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+ + bytecode) / Daikon (Java + runtime trace) / CodeQL (JDK + DB build) / SonarQube
    - 환경 부재 시 사용자 위임 명시 (정직 표기 / 시뮬 ❌)
-3. **5단계 신뢰도 (ADR-009)** — 각 산출물별 신뢰도 평가:
+3. **5단계 신뢰도** — 각 산출물별 신뢰도 평가:
    - 1단계: 사람 작성 / source 없음
    - 2단계: AI 추론
    - 3단계: AI 추론 + sub-agent cross-check
@@ -41,12 +41,14 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - `<user-project>/.aimd/output/cross-validation-report.json`
 - 각 도구의 raw 출력 보존 (`<user-project>/.aimd/output/tool-runs/`)
 
-## 본체 명세
-
-- `methodology-spec/workflow/formal-spec.md`
-- ADR-011 (json 단독 / .mermaid·.md 미산출), ADR-009 (5단계 신뢰도)
-- `tools/formal-spec-link-validator/`, `tools/drift-validator/`, `tools/static-runner/`
-
 ## 다음
 
 - `analysis-api-rule-mapping` 또는 `analysis-openapi` / `analysis-db-schema-erd` (BE/FE/DB 트랙별 자동 분기)
+
+## 인용
+
+- ADR: ADR-011 (json 단독, mermaid 미산출)
+- ADR: ADR-009 (5단계 신뢰도)
+- 정책: methodology-spec/workflow/formal-spec.md
+- 정책: methodology-spec/policies/no-simulation.md
+- 도구: tools/formal-spec-link-validator/, tools/drift-validator/, tools/static-runner/

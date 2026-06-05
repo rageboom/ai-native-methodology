@@ -11,7 +11,7 @@ allowed-tools: Read, Glob, Grep, Bash
 ## 사전 조건
 
 - 사용자가 분석 대상 legacy 코드베이스 (또는 신규 시스템 구축 input) 을 가리킴
-- ADR-010 baseline+ratchet 적용 확인 — 미적용 legacy 프로젝트면 `_base-apply-baseline-ratchet` skill 우선 호출
+- baseline+ratchet 적용 확인 — 미적용 legacy 프로젝트면 `_base-apply-baseline-ratchet` skill 우선 호출
 
 ## 절차
 
@@ -48,12 +48,14 @@ allowed-tools: Read, Glob, Grep, Bash
 
 `<user-project>/.aimd/input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
 
-## 본체 명세 참조
-
-- `methodology-spec/workflow/input.md`
-- `methodology-spec/lifecycle-contract.md` (단계 간 산출물 인터페이스)
-
 ## When NOT to invoke
 
-- 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (DEC-2026-05-30-use-scenario-taxonomy §2.4 옵션 A — analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
-- ADR-010 baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.
+- 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
+- baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.
+
+## 인용
+
+- 정책: `methodology-spec/workflow/input.md`
+- 정책: `methodology-spec/lifecycle-contract.md` (단계 간 산출물 인터페이스)
+- ADR: ADR-010 (baseline+ratchet)
+- 결단: DEC-2026-05-30-use-scenario-taxonomy §2.4

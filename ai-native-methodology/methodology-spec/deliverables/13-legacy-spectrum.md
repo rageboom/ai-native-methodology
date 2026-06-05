@@ -1,6 +1,5 @@
 # 산출물 #13: Legacy Spectrum (Tier 1~4 detection + bootstrap data flow + strangler plan)
 
-> **사상**: ADR-FE-001 (FE 추출기 가정 — Tier 1~4) + ADR-FE-003 (legacy spectrum 정책 + Strangler Fig Pattern) + ADR-FE-004 (BE/FE 분리 — Tier 4 예외 / Stage 6)
 > **schema**: `schemas/legacy-spectrum.schema.json`
 > **생성 phase**: `discovery` phase (`/analyze-init` 의 sub) 또는 별도 `/analyze-legacy`
 
@@ -48,16 +47,16 @@ output/legacy-spectrum/
 
 ---
 
-## 4. Tier 1~4 정책 매트릭스 (ADR-FE-001 §3.1 정합)
+## 4. Tier 1~4 정책 매트릭스
 
 | Tier                       | 추출 산출물           | LLM 의존 | bootstrap 패턴                                    |
 | -------------------------- | --------------------- | -------- | ------------------------------------------------- |
 | **1 Modern SPA**           | 7대 7/7               | 낮음     | window.**INITIAL_STATE** / SSR hydration          |
 | **2 jQuery legacy**        | 5/7                   | 중       | data-\* attribute / AJAX on $(document).ready     |
 | **3 Vanilla JS**           | 4/7                   | 높음     | DOM 직접 / fetch on load                          |
-| **4 server-side template** | 3/7 + ADR-FE-004 예외 | 높음     | JSP request attribute / Thymeleaf model attribute |
+| **4 server-side template** | 3/7 + BE/FE 분리 예외 | 높음     | JSP request attribute / Thymeleaf model attribute |
 
-→ Tier 4 = Stage 6 ADR-FE-004 BE/FE 분리 예외 (`tier_4_be_fe_split_carry=true` 의무).
+→ Tier 4 = Stage 6 BE/FE 분리 예외 (`tier_4_be_fe_split_carry=true` 의무).
 
 ---
 
@@ -72,7 +71,7 @@ output/legacy-spectrum/
 | data_attribute_dom                    | 2 (jQuery)         | state 진실 분산  |
 | ajax_fetch_on_load                    | 2, 3               | race condition   |
 | websocket_on_load                     | 1, 2, 3            | reconnect 정책   |
-| jsp_request_attribute                 | 4                  | ADR-FE-004 예외  |
+| jsp_request_attribute                 | 4                  | BE/FE 분리 예외  |
 | thymeleaf_model_attribute             | 4                  | 동일             |
 | erb_instance_variable                 | 4                  | 동일             |
 | cookie_initial / localstorage_initial | 1~3                | tampering 위험   |
@@ -108,7 +107,7 @@ cross_links:
 
 ---
 
-## 8. 신뢰도 (ADR-009 §2.4 정합)
+## 8. 신뢰도
 
 | 단계 | 조건                                                      | 신뢰도 |
 | ---- | --------------------------------------------------------- | ------ |
@@ -130,7 +129,7 @@ cross_links:
 □ bootstrap method 별 ssr_safe 표기 (XSS 위험 평가)
 □ strangler_plan.migration_target_tier 명시
 □ strangler_plan.approach ≠ big_bang_rewrite_not_recommended (권고 ❌)
-□ summary.tier_4_be_fe_split_carry=true if Tier 4 detected (ADR-FE-004 Stage 6 carry)
+□ summary.tier_4_be_fe_split_carry=true if Tier 4 detected (Stage 6 BE/FE 분리 carry)
 □ summary.captured_by=code_static_analysis (simulation 시 -5%p 패널티 + simulation_reason)
 ```
 
@@ -172,4 +171,15 @@ cross_links:
 ### 11.5 Tier 4 (JSP) BE/FE 통합 누락
 
 - 증상: JSP 코드를 FE 단독 분석 / BE controller model attribute 무시
-- 대응: tier_4_be_fe_split_carry=true 의무 + Stage 6 ADR-FE-004 carry-over 명시
+- 대응: tier_4_be_fe_split_carry=true 의무 + Stage 6 BE/FE 분리 carry-over 명시
+
+---
+
+## 인용
+
+- ADR: ADR-FE-001 (FE 추출기 가정 / Tier 1~4)
+- ADR: ADR-FE-003 (legacy spectrum 정책 / Strangler Fig)
+- ADR: ADR-FE-004 (BE/FE 분리 / Tier 4 예외 / Stage 6)
+- §4 정합 근거: ADR-FE-001 §3.1
+- §8 신뢰도 근거: ADR-009 §2.4
+- schema: schemas/legacy-spectrum.schema.json

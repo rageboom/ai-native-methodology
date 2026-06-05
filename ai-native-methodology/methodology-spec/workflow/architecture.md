@@ -40,7 +40,7 @@
 | S5   | LLM: 모듈 책임 추론 + 아키텍처 스타일 식별 | LLM                         |
 | S6   | 모듈 ↔ 테이블 그룹 매핑                    | `db-schema` phase 결과 활용 |
 
-### 3.2 순환 의존성 처리 — 탐지 + 분류 hybrid (ADR-006 정합)
+### 3.2 순환 의존성 처리 — 탐지 + 분류 hybrid
 
 탐지는 결정적 (Tarjan SCC), 분류는 도메인 의도 기반 hybrid.
 
@@ -118,7 +118,7 @@ ORM 엔티티 → 모듈 (소속 패키지) → 테이블 (`db-schema` phase 결
 
 ```
 .ai-analysis/output/architecture/
-├── architecture.json                 # json 단독 SSOT (v12 ADR-011)
+├── architecture.json                 # json 단독 SSOT
 ├── dependency-graph.json             # 의존성 그래프 raw
 └── module-table-mapping.json         # 모듈 ↔ 테이블 그룹
 ```
@@ -181,7 +181,7 @@ layer_violations:
     routed_to_antipattern: AP-ARCH-002
 ```
 
-### 4.3 architecture 다이어그램 예시 (figure / 산출물 아님 / v12 ADR-011)
+### 4.3 architecture 다이어그램 예시 (figure / 산출물 아님)
 
 ```mermaid
 flowchart TB
@@ -217,7 +217,7 @@ flowchart TB
 
 ```
 □ architecture.json schema 검증 통과
-□ architecture.json 의존성 그래프 정합 (시각화는 view-time / v12 ADR-011)
+□ architecture.json 의존성 그래프 정합 (시각화는 view-time)
 □ 모든 모듈에 ID/책임 명시
 □ 순환 의존성 = 0 또는 발견 시 안티패턴 등록
 □ 모듈 ↔ 테이블 매핑 = 사용자 검토 (시니어 BE)
@@ -283,3 +283,10 @@ flowchart TB
 `business-logic` phase (`/analyze-business-logic`) 진입.
 
 > ⚠️ `business-logic` phase 는 **4영역 병렬 처리**되는 가장 큰 단계. 입력으로 `discovery` / `db-schema` / `architecture` phase 모두 사용.
+
+---
+
+## 인용
+
+- ADR: ADR-006 (순환 의존성 탐지+분류 hybrid)
+- ADR: ADR-011 (architecture.json json 단독 SSOT / 시각화 view-time)

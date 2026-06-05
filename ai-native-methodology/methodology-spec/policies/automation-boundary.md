@@ -4,14 +4,14 @@
 
 ## 1. 원칙
 
-- 100% 자동화는 하지 않는다. AI 자동 생성 + 사용자 검토 의무. round-trip = chain harness gate 안에서만 정식 허용 (DEC-2026-05-06-round-trip-부분-허용).
+- 100% 자동화는 하지 않는다. AI 자동 생성 + 사용자 검토 의무. round-trip = chain harness gate 안에서만 정식 허용.
 
 ## 2. 두 axis 구분 (분모가 다르므로 동일 숫자로 비교/인용 금지)
 
 | axis | 정의 | 분모 | 기준 |
 |---|---|---|---|
 | chain-harness 전체 자동화 | AI 자동화 ≥ 85% / 사람 검토(gate #1~#5) ≤ 15% | gate #1~#5 통합 통과율 (process metric) | 100% 자동화 ❌ |
-| analysis §3-A extraction | paradigm 별 ceiling (Legacy ~53~55% / Modern ~60~67%) | analysis 단방향 추출률 | R1' / 6 PoC 사실 |
+| analysis §3-A extraction | paradigm 별 ceiling (Legacy ~53~55% / Modern ~60~67%) | analysis 단방향 추출률 | R1' / ≥2 PoC corroboration 의무 |
 
 → 두 metric 은 분모가 다르므로 외부 인용 시 동일 숫자로 비교하지 않는다.
 
@@ -21,6 +21,6 @@
 
 ## 인용
 
-- `docs/adr/ADR-009-다이어그램-신뢰-모델.md` §2.5 (70~80% 한계 정량 모델)
-- DEC-2026-05-06-v2.0-i-strict-채택
-- DEC-2026-05-06-round-trip-부분-허용
+- ADR: ADR-009 (70~80% 한계 정량 모델) — `docs/adr/ADR-009-다이어그램-신뢰-모델.md` §2.5
+- 결단: DEC-2026-05-06-v2.0-i-strict-채택
+- round-trip gate 안 허용 근거: DEC-2026-05-06-round-trip-부분-허용

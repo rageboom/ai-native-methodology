@@ -1,9 +1,9 @@
-# 산출물 #23: Characterization Spec (v2.1.0 신설 — 의도 vs 버그 분리 + snapshot acceptance oracle)
+# 산출물 #23: Characterization Spec
 
-> **사상**: ADR-CHAIN-006 phase 4.7 정식 도입 + Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context 합성
+> **사상**: 의도 vs 버그 분리 + snapshot acceptance oracle. Michael Feathers Characterization Testing (2004) + Specification by Example (Gojko Adzic 2011) + DDD bounded context 합성.
 > **schema**: `schemas/characterization-spec.schema.json`
 > **생성 phase**: `characterization` phase (`formal-spec` phase 후 / `api` phase + `ui` phase 전 / analysis stage chain 1 입력 보강)
-> **≥ 2 PoC corroboration**: PoC #06 (Spring 4.1 + iBATIS Legacy 적대성) + PoC #03 retrofit (NestJS Modern)
+> **≥ 2 PoC corroboration 의무**
 
 ---
 
@@ -30,7 +30,7 @@
 
 ```
 output/characterization/
-├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / v12 ADR-011 / D-6)
+├── characterization-spec.json     # json 단독 SSOT (intent_vs_bug 분류 포함 / D-6)
 ├── coverage.json                  # UC ↔ snapshot 매핑 + threshold
 └── snapshots/
     └── UC-*.json                  # Given/When/Then BDD 형식 / 1 UC 당 1 snapshot
@@ -69,11 +69,11 @@ output/characterization/
 
 ### 4.1 Modern 환경에서 self_recognized = 0 도 정합
 
-PoC #03 NestJS retrofit = self_recognized 0건. Modern 스택 자연 부재 — "TODO 0건 = §8.1 strict overfitting" 의심 ❌. self_recognized 발생 빈도 metric 첨부 의무 (예: "TODO/FIXME grep result: N건 / N=0").
+Modern 스택은 self_recognized 자연 부재 — "TODO 0건 = §8.1 strict overfitting" 의심 ❌. self_recognized 발생 빈도 metric 첨부 의무 (예: "TODO/FIXME grep result: N건 / N=0").
 
 ### 4.2 Legacy 환경에서 ambiguous ↑
 
-PoC #06 Spring 4.1 = ambiguous 1~3건 (D2 결단 후 1건). 도메인 expert (IFRS 회계 담당자 등) 결단 강제. 이게 phase 4.7 의 핵심 가치 — rules + antipatterns 만으로는 결정되지 않음.
+Legacy 환경은 ambiguous 가 증가한다. 도메인 expert (IFRS 회계 담당자 등) 결단 강제. 이게 characterization phase 의 핵심 가치 — rules + antipatterns 만으로는 결정되지 않음.
 
 ---
 
@@ -146,7 +146,7 @@ coverage:
 - **absolute** = `actual ≥ coverage_target` (default 0.80) 검증 / 신규 코드 + Modern 스택 권장
 - **ratchet** = `actual ≥ coverage_minimum_legacy` (default 0.40) + `trend_required: true` 검증 / Legacy 진입 시 권장
 
-PoC #06 단일 모듈 = 0.43 → ratchet 정합. `trend_required` 충족 시 통과.
+Legacy 단일 모듈이 absolute target 미달 시 ratchet 으로 진입 — `trend_required` 충족 시 통과.
 
 ### 6.2 외부 권위
 
@@ -172,7 +172,7 @@ cross_links:
 
 ---
 
-## 8. 신뢰도 (ADR-009 §2.4 정합)
+## 8. 신뢰도
 
 | 단계 | 조건                                                                | 신뢰도 |
 | ---- | ------------------------------------------------------------------- | ------ |
@@ -184,7 +184,7 @@ cross_links:
 
 - ambiguous > 0 시 → 도메인 expert carry 명시 의무 (snapshot 또는 characterization-spec.json 의 intent_vs_bug)
 - 결단 전까지 chain 4 (impl-spec GREEN) 진입 ❌
-- 결단 후 갱신 의무 (PoC #06 D2 패턴)
+- 결단 후 갱신 의무
 
 ---
 
@@ -233,7 +233,7 @@ cross_links:
 ### 11.3 scenario 수 과다
 
 - 증상: 1 UC 당 10+ scenario → 유지보수 비용 ↑ + acceptance oracle 모호
-- 대응: 1 UC 당 happy + edge 1~2 + likely_bug 1~2 권장 (PoC #06 = 3~4 scenario / PoC #03 = 3 scenario 정합)
+- 대응: 1 UC 당 happy + edge 1~2 + likely_bug 1~2 권장 (1 UC 당 약 3~4 scenario)
 
 ### 11.4 self_recognized 누락 (Legacy 만)
 
@@ -252,22 +252,21 @@ cross_links:
 
 ---
 
-## 12. ≥ 2 PoC corroboration 사실 (v2.1.0 본체 격상 자격)
+## 12. ≥ 2 PoC corroboration 사실
 
-| PoC                                      | spectrum   | 명확 분류 비율      | self_recognized      | ambiguous     |
-| ---------------------------------------- | ---------- | ------------------- | -------------------- | ------------- |
-| **PoC #06** (Spring 4.1 + iBATIS Legacy) | 적대성 4중 | 17/18 = 94% (D2 후) | 1 (AP-007 자조)      | 1 (DBA carry) |
-| **PoC #03 retrofit** (NestJS Modern)     | Modern     | 30/30 = 100%        | 0 (Modern 자연 부재) | 0             |
-
-→ phase 4.7 가 두 spectrum 모두에서 동작 입증.
+characterization phase 는 Legacy 적대성 spectrum 과 Modern spectrum 양쪽에서 동작이 입증되어야 한다 (≥ 2 PoC corroboration 의무 / §8.1 strict overfitting 회피).
 
 ---
 
-## 13. carry (v2.1.x patch / v2.x)
+## 인용
 
-| ID         | 항목                                                        | trigger                       |
-| ---------- | ----------------------------------------------------------- | ----------------------------- |
-| C-v2.1.0-1 | sub-rule 추가 (snapshot 형식 다양화 / 예: e2e Cypress 정합) | v2.1.x patch / 사용자 finding |
-| C-v2.1.0-2 | Modern 환경 명확 비율 ≥ 95% 자동 detect                     | v2.2+                         |
-| C-v2.1.0-3 | acceptance oracle threshold dashboard                       | v2.x                          |
-| C-v2.1.0-4 | F-PHASE7-001~004 (PoC #06 첫 적용 finding) 일반화 검토      | ≥ 3 PoC corroboration 후      |
+- 사상 근거: ADR-CHAIN-006 (characterization phase 정식 도입)
+- 신뢰도 모델: ADR-009 §2.4 (신뢰도 단계 정합)
+- json-only SSOT: ADR-011 (erd.mermaid 폐기 / json 단독)
+- schema: `schemas/characterization-spec.schema.json`
+- 외부 권위:
+  - Michael Feathers, _Working Effectively with Legacy Code_ (2004) §13 — Characterization Test
+  - Gojko Adzic, _Specification by Example_ (2011) — Given/When/Then BDD / Living Documentation
+  - Eric Evans, _Domain-Driven Design_ (2003) — bounded context
+  - Maldonado & Shihab (2015) — SATD / KL-SATD 분류
+  - PIT (PITest) `mutationThreshold` 80% default / Stryker Mutator / BullseyeCoverage / jest-coverage-ratchet

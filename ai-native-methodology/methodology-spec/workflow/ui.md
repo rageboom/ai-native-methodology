@@ -17,9 +17,9 @@
 
 ## 분할 사상 근거
 
-- **ADR-FE-001** — FE 추출기 가정 (spectrum Tier 1~4 cover)
-- **ADR-FE-002** — 이중 렌더링 사상 FE 적용 + visual 예외 (binary 진실 모델)
-- **ADR-FE-005** — 권위 매개체 12 채택 (W3C SCXML 1.0 / DTCG 2025.10 / Playwright / axe-core / Storybook CSF v3 / WCAG 2.1+2.2 ratchet)
+- FE 추출기 가정 (spectrum Tier 1~4 cover)
+- 이중 렌더링 사상 FE 적용 + visual 예외 (binary 진실 모델)
+- 권위 매개체 12 (W3C SCXML 1.0 / DTCG 2025.10 / Playwright / axe-core / Storybook CSF v3 / WCAG 2.1+2.2 ratchet)
 
 ---
 
@@ -38,3 +38,15 @@
 
 1. 5-2-a 먼저 (ui-spec.json — PAGE-XXX / CMP-XXX ID 부여)
 2. 5-2-b + 5-2-c 병렬 진행 가능
+
+---
+
+## 인용
+
+- 분할 사상 근거 1 (FE 추출기 가정): ADR-FE-001 (FE 추출기 spectrum 가정)
+- 분할 사상 근거 2 (이중 렌더링 + visual 예외): ADR-FE-002 (이중 렌더링 FE 적용)
+- 분할 사상 근거 3 (권위 매개체 12): ADR-FE-005 (권위 매개체 12 채택)
+- deliverable #7: [`../deliverables/7-ui-ux.md`](../deliverables/7-ui-ux.md)
+- deliverable #8: [`../deliverables/8-state-map.md`](../deliverables/8-state-map.md)
+- deliverable #9: [`../deliverables/9-visual-manifest.md`](../deliverables/9-visual-manifest.md)
+- 외부 권위: W3C SCXML 1.0 / DTCG 2025.10 / WCAG 2.1+2.2 / Playwright / axe-core / Storybook CSF v3

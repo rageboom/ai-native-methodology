@@ -1,7 +1,7 @@
 # 산출물 #2: 도메인 모델 (Domain Model — DDD-Lite B)
 
-> **사상**: DDD-Lite B 강도 (ADR-004 — Entity/VO/Aggregate/Repository/UbiquitousLanguage 까지 추출, Context Map / Subdomain / Domain Event / Saga 미추출)
-> **schema**: `schemas/domain.schema.json` · **template**: (v12 ADR-011 — json 단독 / 별도 template 파일 ❌, schema-driven)
+> **사상**: DDD-Lite B 강도 (Entity/VO/Aggregate/Repository/UbiquitousLanguage 까지 추출, Context Map / Subdomain / Domain Event / Saga 미추출)
+> **schema**: `schemas/domain.schema.json` · **template**: json 단독 / 별도 template 파일 ❌, schema-driven
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
@@ -21,9 +21,9 @@ output/domain/
 └── domain.json                    # json 단독 SSOT (엔티티·UC·보편 언어 / 시각화는 view-time 도구)
 ```
 
-**DDD-Lite B 적용 범위** (ADR-004):
+**DDD-Lite B 적용 범위**:
 
-| ✅ 추출                                                                                                                                 | ❌ 미추출 (v1.2 이후)                           |
+| ✅ 추출                                                                                                                                 | ❌ 미추출                                       |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | Bounded Context, Entity, Value Object, Aggregate, Aggregate Root, Invariants, Repository, Domain Service, Use Case, Ubiquitous Language | Context Map, Subdomain 분류, Domain Event, Saga |
 
@@ -51,7 +51,7 @@ output/domain/
 
 ### 3.2 미추출 (의도적)
 
-- 도메인 이벤트 → v1.2 이후 (ADR-004)
+- 도메인 이벤트 → 미추출 (의도적)
 - 비즈니스 정책 상세 → 비즈니스 규칙 산출물(#5) 로 분리
 - 영속화 상세 → DB 스키마 산출물(#4) 로 분리
 
@@ -153,3 +153,11 @@ output/domain/
 
 - 증상: MyBatis 만 사용 → @Entity 없음 → Entity 자동 감지 실패
 - 대응: SQL Mapper + DTO 클래스에서 LLM 추론, 신뢰도↓ 표기
+
+---
+
+## 인용
+
+- ADR: ADR-004 (DDD-Lite B 강도 / 도메인 이벤트 미추출)
+- ADR: ADR-011 (json 단독 / template 파일 없음)
+- schema: schemas/domain.schema.json
