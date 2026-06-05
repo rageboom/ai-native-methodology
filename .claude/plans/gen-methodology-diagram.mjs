@@ -52,8 +52,15 @@ function makeRect(id, x, y, w, h, bg, stroke, textId, strokeStyle = 'solid', str
 }
 
 function makeText(id, containerId, x, y, w, h, text, color = '#000000', fontSize = 14, align = 'center') {
+  // bound text(컨테이너 내부)는 실제 텍스트 높이 + 세로중앙 y 로 저장.
+  // (일부 뷰어가 verticalAlign:'middle' 을 무시하고 저장된 y 부터 그려서 상단정렬되는 것 방지)
+  let ty = y, th = h;
+  if (containerId) {
+    th = Math.ceil(String(text).split('\n').length * fontSize * 1.25);
+    ty = Math.round(y + (h - th) / 2);
+  }
   return {
-    id, type: 'text', x, y, width: w, height: h,
+    id, type: 'text', x, y: ty, width: w, height: th,
     strokeColor: color, backgroundColor: 'transparent', seed: s(), version: 1, versionNonce: s(),
     text, originalText: text, fontSize, fontFamily: 2,
     textAlign: align, verticalAlign: 'middle',
@@ -67,7 +74,7 @@ function freeText(id, x, y, w, h, text, color = '#475569', fontSize = 14, align 
   return makeText(id, null, x, y, w, h, text, color, fontSize, align);
 }
 
-function makeArrow(id, ax, ay, pts, startId, endId, stroke = '#0f172a', strokeStyle = 'solid', endArrow = 'arrow') {
+function makeArrow(id, ax, ay, pts, startId, endId, stroke = '#0f172a', strokeStyle = 'solid', endArrow = 'arrow', strokeWidth = 2) {
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
   const a = {
     id, type: 'arrow', x: ax, y: ay,
@@ -80,6 +87,7 @@ function makeArrow(id, ax, ay, pts, startId, endId, stroke = '#0f172a', strokeSt
     startArrowhead: null, endArrowhead: endArrow, elbowed: false, ...COMMON,
   };
   if (strokeStyle !== 'solid') a.strokeStyle = strokeStyle;
+  if (strokeWidth !== 2) a.strokeWidth = strokeWidth;
   return a;
 }
 
@@ -198,15 +206,22 @@ function build() {
     elements.push(freeText(`${z.id}-title`, b.x, b.y + 8, b.w, 28, z.title, stroke, 16));
   }
 
-  // 박스: rect + 가운데 텍스트(label\nsub)
+  // 박스: rect + 가운데 자유 텍스트. binding 미사용(뷰어가 bound text 를 상단 강제재배치하는 문제 회피)
+  // → 텍스트를 박스 정중앙 좌표에 직접 배치 + groupId 로 묶어 함께 이동.
   for (const bx of boxes) {
     const b = boxBox[bx.id];
     if (!b) continue;
     const [bg, stroke] = col(bx.color || zones.find((z) => z.id === bx.zone)?.color);
-    const tid = `${bx.id}-t`;
     const txt = bx.sub ? `${bx.label}\n${bx.sub}` : bx.label;
-    elements.push(makeRect(bx.id, b.x, b.y, b.w, b.h, bg, stroke, tid, bx.strokeStyle || 'solid', bx.emphasis ? 4 : 2));
-    elements.push(makeText(tid, bx.id, b.x, b.y, b.w, b.h, txt, bx.textColor || '#1e293b', bx.fontSize || 13));
+    const gid = `${bx.id}-g`;
+    const rect = makeRect(bx.id, b.x, b.y, b.w, b.h, bg, stroke, null, bx.strokeStyle || 'solid', bx.emphasis ? 4 : 2);
+    rect.groupIds = [gid];
+    elements.push(rect);
+    const fs = bx.fontSize || 13;
+    const th = Math.ceil(txt.split('\n').length * fs * 1.25);
+    const t = freeText(`${bx.id}-t`, b.x, b.y + (b.h - th) / 2, b.w, th, txt, bx.textColor || '#1e293b', fs);
+    t.groupIds = [gid];
+    elements.push(t);
   }
 
   // 화살표: from→to. 좌표/바인딩/points 자동.
@@ -216,7 +231,7 @@ function build() {
     let ax, ay, pts, mid;
     if (ar.route === 'under') {
       // U자: source 아래로 → 가로질러 → target 아래로 (revisit loopback)
-      const baseline = Math.max(sB.y + sB.h, eB.y + eB.h) + 24;
+      const baseline = Math.max(sB.y + sB.h, eB.y + eB.h) + (ar.drop || 24);
       ax = sB.x + sB.w / 2; ay = sB.y + sB.h;
       const tx = eB.x + eB.w / 2, ty = eB.y + eB.h;
       pts = [[0, 0], [0, baseline - ay], [tx - ax, baseline - ay], [tx - ax, ty - ay]];
@@ -225,32 +240,56 @@ function build() {
       ({ ax, ay, pts, mid } = routeArrow(sB, eB));
     }
     const aid = `a-${ar.from}-${ar.to}`;
-    elements.push(makeArrow(aid, ax, ay, pts, ar.from, ar.to, ar.color || '#0f172a', ar.style || 'solid'));
-    if (ar.label) elements.push(freeText(`${aid}-lbl`, mid.x - 70, mid.y - 9, 140, 18, ar.label, ar.color || '#475569', 12));
+    elements.push(makeArrow(aid, ax, ay, pts, ar.from, ar.to, ar.color || '#0f172a', ar.style || 'solid', 'arrow', ar.emphasis ? 3 : 2));
+    // 라벨은 항상 선 아래에 (선 위에 얹혀 겹치는 것 방지)
+    if (ar.label) elements.push(freeText(`${aid}-lbl`, mid.x - 90, mid.y + 6, 180, 18, ar.label, ar.color || '#475569', 12));
   }
 
-  // gate ◇ 배지: 해당 박스 상단 모서리에 작은 다이아 (개별 라벨 ❌ — 간략)
+  // gate ◇ : 각 chain 단계 위에 번호(#1~#5) 단 다이아 + go/stop 결정 박스
   const gates = spec.gates || [];
   if (gates.length) {
     const [gbg, gstroke] = col('gate');
-    for (const gid of gates) {
+    gates.forEach((gid, i) => {
       const b = boxBox[gid];
-      if (!b) continue;
-      const ds = 22, cx = b.x + b.w / 2, cy = b.y;
-      elements.push(makeDiamond(`gate-${gid}`, cx - ds / 2, cy - ds / 2, ds, ds, gbg, gstroke));
-    }
-    if (spec.gateCaption) {
-      const zid = boxes.find((b) => b.id === gates[0])?.zone;
-      const z = zid && zoneBox[zid];
-      if (z) elements.push(freeText('gate-caption', z.x, z.y + z.h + 30, z.w, 20, spec.gateCaption, '#b45309', 13));
+      if (!b) return;
+      const ds = 32, cx = b.x + b.w / 2, cy = b.y - 2; // 단계 박스 위로 올려 또렷이
+      const did = `gate-${gid}`, ggid = `${did}-g`;
+      const dm = makeDiamond(did, cx - ds / 2, cy - ds / 2, ds, ds, gbg, gstroke);
+      dm.groupIds = [ggid];
+      elements.push(dm);
+      const nfs = 13, nth = Math.ceil(nfs * 1.25);
+      const nt = freeText(`${did}-t`, cx - ds / 2, cy - nth / 2, ds, nth, String(i + 1), gstroke, nfs);
+      nt.groupIds = [ggid];
+      elements.push(nt);
+    });
+    // go/stop 결정 박스 — 흐름 zone 바로 아래, 초록 go / 빨강 stop 색 구분
+    const zid = boxes.find((b) => b.id === gates[0])?.zone;
+    const z = zid && zoneBox[zid];
+    if (z) {
+      const cx = z.x + z.w / 2, ty = z.y + z.h + 10;
+      if (spec.gateCaption) elements.push(freeText('gate-key-title', cx - 240, ty, 480, 20, spec.gateCaption, '#b45309', 14));
+      const kbY = ty + 26, kbW = 520, kbH = 38, kbX = cx - kbW / 2;
+      elements.push(makeRect('gate-key-box', kbX, kbY, kbW, kbH, '#fffbeb', gstroke, null, 'solid'));
+      if (spec.gateGo)   elements.push(freeText('gate-go',   kbX + 6,        kbY, kbW / 2 - 6, kbH, spec.gateGo,   '#047857', 14));
+      if (spec.gateStop) elements.push(freeText('gate-stop', kbX + kbW / 2,  kbY, kbW / 2 - 6, kbH, spec.gateStop, '#b91c1c', 14));
     }
   }
 
   // 도식 제목 / 범례
   if (title) elements.push(freeText('diagram-title', MARGIN_X, 20, totalW, 40, title, '#0f172a', 26));
-  if (legend) {
-    const maxY = Math.max(...elements.map((e) => (e.y || 0) + (e.height || 0)));
-    elements.push(freeText('diagram-legend', MARGIN_X, maxY + 24, totalW, 22, legend, '#475569', 13));
+  if (Array.isArray(legend) && legend.length) {
+    // 실제 최하단 (화살표는 points 로 계산 — 위로 향하는 화살표의 bbox height 오인 방지)
+    const bottomOf = (e) => (e.type === 'arrow'
+      ? e.y + Math.max(0, ...e.points.map((p) => p[1]))
+      : (e.y || 0) + (e.height || 0));
+    const maxY = Math.max(...elements.map(bottomOf));
+    const lx = MARGIN_X, ly = maxY + 30, lw = 1200, lineH = 22, pad = 16, titleH = 26;
+    const lines = legend.map((l) => `•  ${l.term}  —  ${l.meaning}`);
+    const bodyH = lines.length * lineH;
+    const boxH = pad * 2 + titleH + bodyH;
+    elements.push(makeRect('legend-box', lx, ly, lw, boxH, '#f8fafc', '#94a3b8', null, 'solid'));
+    elements.push(freeText('legend-title', lx + pad, ly + pad, lw - 2 * pad, titleH, '범례 — 용어 풀이', '#0f172a', 15, 'left'));
+    elements.push(freeText('legend-body', lx + pad, ly + pad + titleH, lw - 2 * pad, bodyH, lines.join('\n'), '#334155', 13, 'left'));
   }
 
   // freeze merge: freeze 의 id 는 생성분에서 제외 + 기존 파일에서 보존

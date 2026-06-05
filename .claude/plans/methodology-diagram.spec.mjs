@@ -36,38 +36,39 @@ export default {
     { id: 'Z_ASSET', title: '플러그인이 떠받친다 — 결정론 검증으로',   row: 2, col: 0, color: 'asset', cols: 4, span: 3 },
   ],
 
+  // 라벨은 평이한 한국어로 (플러그인 내부용어는 풀어쓰고, 남길 고유명은 legend 참조)
   boxes: [
     // ── Z_FLOW : 6단계 (좌→우) ── analysis=회색(진입 전) / test=빨강 / implement=초록
-    { id: 'analysis',  zone: 'Z_FLOW', label: 'analysis',  sub: '코드 고고학·입력 어댑터', color: 'pre' },
-    { id: 'discovery', zone: 'Z_FLOW', label: 'discovery', sub: 'UC 발견 · ch1' },
-    { id: 'spec',      zone: 'Z_FLOW', label: 'spec',      sub: '행위명세+AC · ch2' },
-    { id: 'plan',      zone: 'Z_FLOW', label: 'plan',      sub: 'task·ADR·NFR · ch3' },
-    { id: 'test',      zone: 'Z_FLOW', label: 'test',      sub: '실 test·RED · ch4', color: 'red' },
-    { id: 'implement', zone: 'Z_FLOW', label: 'implement', sub: '실 impl·GREEN · ch5', color: 'green' },
+    { id: 'analysis',  zone: 'Z_FLOW', label: 'analysis (분석)',   sub: '기존 코드에서 동작·규칙\n캐내기 / 입력 변환', color: 'pre' },
+    { id: 'discovery', zone: 'Z_FLOW', label: 'discovery (발견)',  sub: '기능·의도 단위로\n찾아 정리 · 1단계' },
+    { id: 'spec',      zone: 'Z_FLOW', label: 'spec (명세)',       sub: '행동 명세 + 합격 기준\n작성 · 2단계' },
+    { id: 'plan',      zone: 'Z_FLOW', label: 'plan (계획)',       sub: '작업 분해·순서·설계\n결정·위험 · 3단계' },
+    { id: 'test',      zone: 'Z_FLOW', label: 'test (테스트)',     sub: '합격 기준을 테스트로,\n먼저 다 실패 · 4단계', color: 'red' },
+    { id: 'implement', zone: 'Z_FLOW', label: 'implement (구현)',  sub: '테스트 통과까지 실제\n코드 작성 · 5단계', color: 'green' },
 
-    // ── Z_INPUT : 입력 4종 (위→아래) ── S2 = 주 타깃(강조)
-    { id: 'in_s2', zone: 'Z_INPUT', label: 'S2 · AX 전환',  sub: 'legacy 코드+의도 (주 타깃)', emphasis: true },
-    { id: 'in_s1', zone: 'Z_INPUT', label: 'S1 · 재생성',   sub: 'legacy → 신규 스택' },
-    { id: 'in_s3', zone: 'Z_INPUT', label: 'S3 · 특성화',   sub: '문서·스냅샷만' },
-    { id: 'in_gf', zone: 'Z_INPUT', label: 'greenfield',   sub: 'PRD·디자인·계약 (코드 X)' },
+    // ── Z_INPUT : 시작 시나리오 4종 (위→아래) ── S2 = 주 대상(강조)
+    { id: 'in_s2', zone: 'Z_INPUT', label: 'S2 · AI 전환',          sub: '기존 코드 그대로 두고\n기능 확장 (주 대상)', emphasis: true },
+    { id: 'in_s1', zone: 'Z_INPUT', label: 'S1 · 재작성',           sub: '기존 코드를 새 기술로\n다시 작성' },
+    { id: 'in_s3', zone: 'Z_INPUT', label: 'S3 · 동작 기록',        sub: '지금 동작을 문서·\n스냅샷으로만 남김' },
+    { id: 'in_gf', zone: 'Z_INPUT', label: '신규 빌드 (greenfield)', sub: '기획·디자인·계약만\n(기존 코드 없음)' },
 
-    // ── Z_OUT : 산출물 4종 (위→아래) ── traceability = 강조
-    { id: 'out_ctx',   zone: 'Z_OUT', label: '시스템 컨텍스트',   sub: 'rules·domain·openapi·schema' },
-    { id: 'out_avoid', zone: 'Z_OUT', label: '주의 자산',        sub: 'antipatterns·migration' },
-    { id: 'out_chain', zone: 'Z_OUT', label: 'chain별 spec+실코드', sub: 'discovery~impl + test·impl 코드' },
-    { id: 'out_trace', zone: 'Z_OUT', label: 'traceability-matrix', sub: 'UC→BHV→AC→TASK→TC→IMPL 양방향', emphasis: true },
+    // ── Z_OUT : 산출물 4종 (위→아래) ── 추적표 = 강조
+    { id: 'out_ctx',   zone: 'Z_OUT', label: '시스템 핵심 정보',      sub: '규칙·도메인·API·DB\n구조 파일' },
+    { id: 'out_avoid', zone: 'Z_OUT', label: '조심할 점 모음',        sub: '피할 코드 패턴·\n전환 시 주의사항' },
+    { id: 'out_chain', zone: 'Z_OUT', label: '단계별 명세+실제 코드',  sub: '발견~구현 명세 +\n테스트·구현 코드' },
+    { id: 'out_trace', zone: 'Z_OUT', label: '추적표 (traceability)',  sub: '기능부터 구현까지\n앞뒤로 따라가기', emphasis: true },
 
     // ── Z_WHY : 핵심 사상 4 (좌→우 띠) ──
-    { id: 'why_ctx',  zone: 'Z_WHY', label: '산출물 = "설명서"가 아니다', sub: 'LLM 이 그대로 쓰는 운영 컨텍스트' },
-    { id: 'why_ax',   zone: 'Z_WHY', label: '정상상태 = AX 운영',        sub: 'LLM 이 develop·run·modify·evolve' },
-    { id: 'why_eyes', zone: 'Z_WHY', label: '두 눈 렌더링',              sub: 'AI: .json·yaml + 사람: .mermaid·md' },
-    { id: 'why_auto', zone: 'Z_WHY', label: '자동화 70~80% 선',         sub: 'AI ≥85% · 사람 gate ≤15% · 100% X' },
+    { id: 'why_ctx',  zone: 'Z_WHY', label: '산출물은 "설명서"가 아니다', sub: 'AI 가 그대로 읽고\n쓰는 작업 자료' },
+    { id: 'why_ax',   zone: 'Z_WHY', label: '정상 상태 = AI 운영(AX)',   sub: 'AI 가 개발·실행·수정·\n발전까지 맡음' },
+    { id: 'why_ssot', zone: 'Z_WHY', label: '기준 원본은 json 한 벌',    sub: 'AI·도구가 바로 읽음\n(사람용 사본 안 만듦)' },
+    { id: 'why_auto', zone: 'Z_WHY', label: '완전 자동화는 안 함',       sub: 'AI 자동 ~70~80% +\n사람이 단계마다 검토' },
 
-    // ── Z_ASSET : 플러그인 자산 4 (좌→우 띠) ──
-    { id: 'as_agent', zone: 'Z_ASSET', label: 'agents 6',  sub: 'stage별 orchestrator' },
-    { id: 'as_skill', zone: 'Z_ASSET', label: 'skills 60', sub: '사용자 호출 (stage·aspect별)' },
-    { id: 'as_hook',  zone: 'Z_ASSET', label: 'hooks 4',   sub: 'drift·stage권고·gate차단·영향마킹' },
-    { id: 'as_tool',  zone: 'Z_ASSET', label: 'tools 35',  sub: 'chain-driver + gate validator + 추적' },
+    // ── Z_ASSET : 플러그인 구성 자산 4종 (좌→우 띠) ──
+    { id: 'as_agent', zone: 'Z_ASSET', label: 'agents 6종',  sub: '단계마다 일 묶어주는\nAI 담당자' },
+    { id: 'as_skill', zone: 'Z_ASSET', label: 'skills 57개', sub: '산출물 단위로\n추출·생성하는 작업' },
+    { id: 'as_hook',  zone: 'Z_ASSET', label: 'hooks 4개',   sub: '불일치 감지·단계 안내·\n검문·영향 표시 자동' },
+    { id: 'as_tool',  zone: 'Z_ASSET', label: 'tools 29개',  sub: '흐름 진행 + 검사기\n+ 추적 도구' },
   ],
 
   arrows: [
@@ -86,19 +87,33 @@ export default {
 
     // ── implement → 산출물 ── + traceability 가 전 단계 추적
     { from: 'implement', to: 'out_ctx' },
-    { from: 'out_trace', to: 'implement', label: '전 단계 양방향 추적', style: 'dashed', color: '#6a1b9a' },
+    { from: 'out_trace', to: 'implement', style: 'dashed', color: '#6a1b9a' }, // 라벨은 out_trace 박스가 대신 설명(겹침 방지)
 
     // ── 자산이 흐름을 떠받침 (대표 점선 2개) ──
-    { from: 'as_agent', to: 'analysis', label: 'agents 가 stage 구동', style: 'dashed', color: '#475569' },
-    { from: 'as_tool',  to: 'test',     label: 'hooks·tools 가 gate 강제', style: 'dashed', color: '#475569' },
+    { from: 'as_agent', to: 'analysis', label: 'AI 담당자가 단계 구동', style: 'dashed', color: '#475569' },
+    { from: 'as_tool',  to: 'test',     label: '도구가 검문 자동 실행', style: 'dashed', color: '#475569' },
 
-    // ── revisit loop (사람 결단 시 이전 stage로) ──
-    { from: 'implement', to: 'analysis', label: 'revisit (사람 결단 시 되돌아감)', style: 'dashed', color: '#1e40af', route: 'under' },
+    // ── 되돌리기 loop = 이전 단계로 (빨강·굵게·깊은 U자로 또렷이) ──
+    { from: 'implement', to: 'analysis', label: '↺ 되돌리기 = 이전 단계로 다시', style: 'dashed', color: '#dc2626', route: 'under', drop: 125, emphasis: true },
   ],
 
-  // gate ◇ 배지: 각 chain 단계(ch1~ch5) 끝의 사람 결단 지점
+  // 인라인으로 못 푼 고유명/약어 풀이 (도식 하단 범례 박스)
+  legend: [
+    { term: '흐름 단계 영문', meaning: 'analysis(분석)는 선행, 이후 discovery·spec·plan·test·implement = 핵심 5단계' },
+    { term: 'S1 / S2 / S3', meaning: '시작 시나리오 종류(S=Scenario): S1 재작성 · S2 AI전환 · S3 동작기록' },
+    { term: 'AX (AI 운영)', meaning: 'AI 가 산출물을 컨텍스트로 프로젝트를 계속 굴리는 상태 = 이 방법론의 목표' },
+    { term: '시스템 핵심 정보', meaning: '분석 산출 파일 — 비즈니스 규칙·도메인·API 명세·DB 구조' },
+    { term: '추적표(traceability)', meaning: '기능→행동→합격기준→작업→테스트→구현을 앞뒤로 잇는 표' },
+    { term: '테스트 먼저(RED→GREEN)', meaning: '구현 전 테스트를 다 실패시켜 두고 → 통과할 때까지 구현' },
+    { term: '단일 진실 원본(SSOT)', meaning: '믿을 수 있는 단 하나의 기준 자료 (여기선 json)' },
+    { term: '검문(gate)/되돌리기', meaning: '각 단계 끝의 사람 결정 지점, 되돌리기 = 이전 단계로 다시(revisit)' },
+  ],
+
+  // gate ◇ : 각 chain 단계(ch1~ch5) 위 번호 다이아 + go/stop 결정 박스
   gates: ['discovery', 'spec', 'plan', 'test', 'implement'],
-  gateCaption: '◇ = 각 stage(ch1~ch5) 끝의 gate · AI 생성 → 사람이 go/stop 결단',
+  gateCaption: '◇ 각 단계 끝마다 AI 결과를 사람이 보고 통과/되돌리기 결정 (1~5단계)',
+  gateGo:   '✓ 통과 → 다음 단계로',
+  gateStop: '✗ 되돌리기 → 앞 단계 고쳐 다시',
 
   freeze: [], // 손편집으로 넘긴 요소 id (재생성에서 제외 + 기존 파일에서 보존)
 };
