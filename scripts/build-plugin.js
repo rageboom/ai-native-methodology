@@ -20,10 +20,10 @@ import { join, resolve, relative, sep } from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { resolveTargets, pluginDir, REPO_ROOT } from './_plugins.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const SCRIPT_DIR = resolve(__filename, '..');
-const WORKSPACE = resolve(SCRIPT_DIR, '..');
 const DRY_RUN = process.argv.includes('--check');
 
 // Industry 보강 1 — explicit allow-list (VSCode vsce node_modules 사고 회피)
@@ -73,8 +73,8 @@ const EXCLUDE_REL_PATHS = new Set([
 // Official 보강 — Windows long-path (>260) 검증
 const WINDOWS_PATH_LIMIT = 260;
 
-function readPluginVersion() {
-	const pluginJsonPath = join(WORKSPACE, '.claude-plugin', 'plugin.json');
+function readPluginVersion(workspace) {
+	const pluginJsonPath = join(workspace, '.claude-plugin', 'plugin.json');
 	const data = JSON.parse(readFileSync(pluginJsonPath, 'utf-8'));
 	// semver pre-release tag (e.g. 2.0.0-rc1) 허용 — sub-plan-6 v2.0.0-rc1 정합
 	if (
@@ -86,13 +86,16 @@ function readPluginVersion() {
 	return data.version;
 }
 
-function runVersionCheck() {
-	// scripts/version-check.js 호출 — plugin.json + CHANGELOG 정합
+function runVersionCheck(name) {
+	// scripts/version-check.js 호출 — 해당 플러그인 plugin.json + CHANGELOG + package.json 정합
 	try {
-		execSync(`node "${join(SCRIPT_DIR, 'version-check.js')}"`, {
-			stdio: 'inherit',
-			cwd: WORKSPACE,
-		});
+		execSync(
+			`node "${join(SCRIPT_DIR, 'version-check.js')}" --plugin ${name}`,
+			{
+				stdio: 'inherit',
+				cwd: REPO_ROOT,
+			},
+		);
 	} catch (err) {
 		console.error('[build-plugin] version-check failed — abort.');
 		process.exit(1);
@@ -139,11 +142,13 @@ function sha256(filePath) {
 	});
 }
 
-async function build() {
-	const version = readPluginVersion();
-	const distRoot = join(WORKSPACE, 'dist');
-	const target = join(distRoot, `ai-native-methodology-v${version}`);
+async function buildOne(pluginName) {
+	const WORKSPACE = pluginDir(pluginName);
+	const version = readPluginVersion(WORKSPACE);
+	const distRoot = join(REPO_ROOT, 'dist');
+	const target = join(distRoot, `${pluginName}-v${version}`);
 
+	console.log(`\n[build-plugin] plugin:    ${pluginName}`);
 	console.log(`[build-plugin] workspace: ${WORKSPACE}`);
 	console.log(`[build-plugin] target:    ${target}`);
 	console.log(
@@ -151,14 +156,12 @@ async function build() {
 	);
 
 	// Senior gate — version-check 강제 (build 첫 step)
-	runVersionCheck();
+	runVersionCheck(pluginName);
 
-	// build self-contained 보장 (Official 보강) — target 이 workspace 안인지 검증 / ../ 금지
-	const rel = relative(WORKSPACE, target);
+	// build self-contained 보장 (Official 보강) — target 이 repo dist 안인지 검증 / ../ 금지
+	const rel = relative(REPO_ROOT, target);
 	if (rel.startsWith('..') || rel.includes(`..${sep}`)) {
-		throw new Error(
-			`[build-plugin] target outside workspace — abort: ${target}`,
-		);
+		throw new Error(`[build-plugin] target outside repo — abort: ${target}`);
 	}
 
 	// 기존 target 정리 (stale 방지)
@@ -270,7 +273,17 @@ async function build() {
 	}
 }
 
-build().catch((err) => {
+async function main() {
+	const targets = resolveTargets(process.argv.slice(2));
+	for (const name of targets) {
+		await buildOne(name);
+	}
+	console.log(
+		`\n[build-plugin] ✅ ${DRY_RUN ? 'would build' : 'built'} ${targets.length} plugin(s): ${targets.join(', ')}`,
+	);
+}
+
+main().catch((err) => {
 	console.error('[build-plugin] failed:', err);
 	process.exit(1);
 });

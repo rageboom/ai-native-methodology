@@ -20,13 +20,12 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
-const SCRIPT_DIR = resolve(__filename, '..');
-const WORKSPACE = resolve(SCRIPT_DIR, '..');
-const REPO_ROOT = resolve(WORKSPACE, '..');
+const SCRIPT_DIR = resolve(__filename, '..'); // repo-root/scripts
+const REPO_ROOT = resolve(SCRIPT_DIR, '..'); // repo-root
 
 const DEFAULT_URL =
 	'https://repo.smiledev.net/repository/serving-static/mis-plugins/marketplace.json';
-const CATALOG = join(REPO_ROOT, '.claude-plugin', 'marketplace.json'); // repo-root 카탈로그 = SSOT
+const CATALOG = join(REPO_ROOT, '.claude-plugin', 'marketplace.json'); // 생성물(build-catalog.js) — 손편집 ❌
 
 const argv = process.argv.slice(2);
 const DRY = argv.includes('--dry-run');
@@ -41,6 +40,16 @@ const fail = (m) => {
 	console.error(`[publish-catalog] ${m}`);
 	process.exit(1);
 };
+
+// drift gate — 카탈로그는 생성물이므로 업로드 전 build-catalog --check 로 최신 여부 강제.
+try {
+	execSync(`node "${join(SCRIPT_DIR, 'build-catalog.js')}" --check`, {
+		stdio: 'inherit',
+		cwd: REPO_ROOT,
+	});
+} catch {
+	fail('카탈로그 drift — `npm run catalog:build` 후 커밋하고 다시 업로드할 것.');
+}
 
 if (!existsSync(CATALOG)) fail(`카탈로그 없음: ${CATALOG}`);
 let cat;

@@ -3,11 +3,14 @@ node_modules/
 *.log
 npm-debug.log*
 
+# Build artifacts (build-plugin.js → repo-root dist/<plugin>-v<ver>/)
+dist/
+
 # Cloned source (PoC analysis only — re-clone via git)
-ai-native-methodology/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp/
+plugins/ai-native-methodology/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp/
 
 # Tool output
-tools/static-runner/out/
+**/tools/static-runner/out/
 *.sarif
 *.stdout.log
 *.stderr.log

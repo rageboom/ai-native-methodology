@@ -1,0 +1,41 @@
+{
+  "name": "@mis-plugins/monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "MIS 사내 Claude Code 플러그인 모노레포 (mis-plugins 마켓플레이스). plugins/* 각 플러그인이 독립 semver + Nexus(npm-hosted) 배포 / 카탈로그(marketplace.json)는 plugins/* 에서 자동 생성. 빌드·퍼블리시·검증 도구는 scripts/ 공유.",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git"
+  },
+  "workspaces": [
+    "plugins/*",
+    "plugins/*/tools/*"
+  ],
+  "scripts": {
+    "build": "node scripts/build-plugin.js",
+    "build:check": "node scripts/build-plugin.js --check",
+    "build:all": "node scripts/build-plugin.js --all",
+    "version:check": "node scripts/version-check.js --all",
+    "build:diff-check": "node scripts/build-plugin.js --all && node scripts/build-catalog.js && git diff --exit-code -- plugins .claude-plugin",
+    "catalog:build": "node scripts/build-catalog.js",
+    "catalog:build:check": "node scripts/build-catalog.js --check",
+    "test": "npm run test --workspaces --if-present",
+    "test:tools": "npm run test --workspaces --if-present",
+    "test:release": "node --test plugins/ai-native-methodology/scripts/test/release-readiness.test.js",
+    "release:check": "node scripts/release-check.js",
+    "publish:plugin": "node scripts/publish.js",
+    "publish:plugin:dry": "node scripts/publish.js --dry-run",
+    "publish:catalog": "node scripts/publish-catalog.js",
+    "publish:catalog:dry": "node scripts/publish-catalog.js --dry-run"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

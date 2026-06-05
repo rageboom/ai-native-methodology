@@ -10,7 +10,7 @@
       "name": "ai-native-methodology",
       "source": {
         "source": "npm",
-        "package": "@ai-native-methodology/plugin",
+        "package": "@mis-plugins/ai-native-methodology",
         "version": "^12.0.0",
         "registry": "https://repo.smiledev.net/repository/npm-public/"
       },

@@ -40,14 +40,16 @@
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { dirname, join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 // v11.29.0 REVISE-2 — PII / 사내 신원 패턴 SSOT (regex 복사 ❌ / drift attractor 회피). check27 + adopter-evidence-packager 공용.
 import { INTERNAL_IDENTITY_RE } from '../tools/_shared/pii-patterns.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const ROOT = resolve(__dirname, '..');
+const ROOT = resolve(__dirname, '..'); // 플러그인 dir (plugins/<name>)
+// 모노레포 전환 — 플러그인은 plugins/<name>/ 아래. repo-root 자산(CLAUDE.md / 생성 카탈로그)은 2레벨 위.
+const REPO_ROOT = resolve(ROOT, '..', '..');
 
 function usage(code = 2) {
 	console.error(
@@ -543,7 +545,7 @@ function check10_claudeMdVersionSync() {
 	// 검증 대상: CLAUDE.md 안 "plugin.json vX.Y.Z" 표기 (핵심 컨텍스트 자산 안 plugin 진화 정합 표기).
 	// drift 발생 시 다음 session 의 plan + research 부정확 risk → release 차단 의무.
 	const pluginJsonPath = join(ROOT, '.claude-plugin/plugin.json');
-	const claudeMdPath = resolve(ROOT, '..', 'CLAUDE.md');
+	const claudeMdPath = resolve(REPO_ROOT, 'CLAUDE.md');
 	if (!existsSync(pluginJsonPath)) {
 		return {
 			id: 'claude_md_version_sync',
@@ -604,8 +606,9 @@ function check11_workspaceTestPass(args) {
 	//    (본 env 잔존 시 workspace 안 모든 test 자동 skip → 0/0 pass false positive).
 	const childEnv = { ...process.env };
 	delete childEnv.NODE_TEST_CONTEXT;
+	// 모노레포 전환 — workspaces 는 repo-root 가 소유 (plugin package.json 엔 없음) → REPO_ROOT 에서 실행.
 	const result = spawnSync('npm', ['test', '--workspaces', '--if-present'], {
-		cwd: ROOT,
+		cwd: REPO_ROOT,
 		env: childEnv,
 		encoding: 'utf-8',
 		timeout: 600_000,
@@ -983,12 +986,14 @@ function check16_codePointerCoverage(args) {
 // SSOT: 현재 6-stage = analysis + chain 5 (discovery / spec / plan / test / implement).
 // 검사 axes (3): ① "6단계 chain harness" 또는 "6-stage chain harness" 표기 ② 5 stage name 모두 포함 ③ legacy "planning →" 미포함.
 function check17_marketplaceStageSync() {
-	const marketplacePath = join(ROOT, '.claude-plugin/marketplace.json');
+	// 모노레포 전환 — 카탈로그(marketplace.json)는 repo-root 에 build-catalog.js 로 생성됨.
+	// 이 플러그인 엔트리를 name(=디렉토리명)으로 찾아 description 검증 (구 plugins[0] 하드코딩 제거).
+	const marketplacePath = join(REPO_ROOT, '.claude-plugin', 'marketplace.json');
 	if (!existsSync(marketplacePath)) {
 		return {
 			id: 'marketplace_stage_sync',
 			pass: false,
-			detail: 'marketplace.json missing',
+			detail: 'marketplace.json missing (catalog:build 필요)',
 		};
 	}
 	let marketplace;
@@ -1001,15 +1006,16 @@ function check17_marketplaceStageSync() {
 			detail: `marketplace.json parse fail: ${e.message}`,
 		};
 	}
-	const plugins = marketplace.plugins || [];
-	if (plugins.length === 0) {
+	const PLUGIN_NAME = basename(ROOT);
+	const entry = (marketplace.plugins || []).find((p) => p.name === PLUGIN_NAME);
+	if (!entry) {
 		return {
 			id: 'marketplace_stage_sync',
 			pass: false,
-			detail: 'marketplace.json plugins[] empty',
+			detail: `marketplace.json 에 '${PLUGIN_NAME}' 엔트리 없음 (catalog:build 필요)`,
 		};
 	}
-	const desc = plugins[0].description || '';
+	const desc = entry.description || '';
 	const EXPECTED_STAGES = ['discovery', 'spec', 'plan', 'test', 'implement'];
 	const EXPECTED_COUNT_PATTERNS = [
 		/6\s*단계\s*chain\s*harness/,
@@ -1039,7 +1045,7 @@ function check17_marketplaceStageSync() {
 				? `marketplace.json description 안 "6단계 chain harness" + 5 stage (${EXPECTED_STAGES.join('/')}) 모두 포함 + legacy "planning →" 미포함 ✅`
 				: `drift: ${issues.join(' / ')}`,
 		delegated_to:
-			'.claude-plugin/marketplace.json plugins[0].description ↔ current 6-stage chain harness sync (LL-v903-03 / sweeping MAJOR stage change cascade enforcement)',
+			'repo-root .claude-plugin/marketplace.json 엔트리(name 매칭).description ↔ current 6-stage chain harness sync (LL-v903-03 / sweeping MAJOR stage change cascade enforcement)',
 	};
 }
 
@@ -1098,7 +1104,7 @@ function check18_gateEnumConsistency() {
 function check19_legacy4StageExpressionAbsent() {
 	// user-facing 4 file (CLAUDE.md / README.md / methodology-spec/agents-axis / chain-driver/README) 안 "chain 4단계" / "4 gate" prose 잔존 ❌
 	const FILES = [
-		join(ROOT, '..', 'CLAUDE.md'), // project root CLAUDE.md
+		join(REPO_ROOT, 'CLAUDE.md'), // monorepo root CLAUDE.md
 		join(ROOT, 'README.md'),
 		join(ROOT, 'methodology-spec/agents-axis.md'),
 		join(ROOT, 'tools/chain-driver/README.md'),
