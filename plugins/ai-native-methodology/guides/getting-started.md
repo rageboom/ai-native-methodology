@@ -1,12 +1,10 @@
-# Getting Started — 10분 walkthrough (v3.6.9 paradigm 진화 안정점 + enforcement cadence 정착)
+# Getting Started — 10분 walkthrough
 
 본 가이드 = plugin install 직후 첫 100 line. 사용자가 자기 legacy 코드 분석 + chain harness 진입까지 10분.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 → v3.6.9 정합 갱신 (A3 / session 20차 / Gap 모두 청산 + 47 skills / 16 tools / 39 schemas / 14 PoC / **11/11 strict criterion** / 분석 입력 5종 orchestrate / FE skill 4종 / scope/stage 자동 폴더) → **v9.0.1 6-stage 정합 갱신** (planning→discovery 개칭 + plan stage 신설).
-
 ## 1. Install (2분)
 
-### (Recommended) 사내 GHE 표준 — v2.4.1+ Recommended
+### (Recommended) 사내 GHE 표준
 
 ```bash
 # Claude Code 세션에서:
@@ -18,13 +16,13 @@
 
 ```bash
 # Claude Code 세션에서:
-/plugin marketplace add /absolute/path/to/ai-native-methodology-v2.5.1
+/plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
 /plugin install ai-native-methodology@mis-plugins
 ```
 
-install 직후 SessionStart hook 메시지 표시 — `[ai-native-methodology] Plugin loaded. v2.5 chain harness ready / Layer 2 LLM paradigm ✅`.
+install 직후 SessionStart hook 메시지 표시 — `[ai-native-methodology] Plugin loaded. chain harness ready / Layer 2 LLM paradigm ✅`.
 
-## 1.5 외부 도구 사전 install — chain harness 동작 의무 (v8.5.0+ F-V2-05 신설)
+## 1.5 외부 도구 사전 install — chain harness 동작 의무
 
 본 plugin 의 **R15 (no-simulation 정책)** + chain 4/5 (test/implement) 의 **real test runner** 의무로 다음 외부 도구가 사용자 환경에 필요. 부재 시 chain 단계 산출물이 차단되거나 F-SIM finding 자동 등재.
 
@@ -75,13 +73,13 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 /plugin                  # 대화형 manager — Installed 탭 / v2.5.1 확인
 ```
 
-**v2.5.1 install 후 확인 의무**:
+**install 후 확인 의무**:
 
 - **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
 - **Skills: 55** (`_base 5 + analysis 28 + discovery 6 + spec 3 + plan 3 + test 4 + implement 4 + dep-graph-navigator 1 + ticket-sync 1`)
 - **MCP Servers: (없음)**
 
-만약 `Skills: 0` 또는 `Agents: README` 식 출력 = v2.5.0 이전 버전 / 재install 의무 (v2.5.1 PATCH 가 1-depth flatten paradigm 으로 fix).
+만약 `Skills: 0` 또는 `Agents: README` 식 출력 = 구 버전 / 재install 의무 (1-depth flatten paradigm 미적용 build).
 
 본 plugin install 후 dist root 에 다음 자산 만남:
 
@@ -138,10 +136,10 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-2. analysis stage 종결 (시나리오 A 와 동일)
 "이 코드베이스 분석 시작해줘"  → 7대 산출물 산출
 
-# 5-3. chain 1 (discovery) 진입 (1분 / v2.5: Layer 2 LLM 의무 통과)
+# 5-3. chain 1 (discovery) 진입 (1분 / Layer 2 LLM 의무 통과)
 "발견 단계 시작" (또는 "기획 단계 시작")
 → discovery-from-analysis-output / discovery-decompose-use-cases / discovery-identify-business-intent skill 자동 발동
-→ discovery-spec.json 산출 (v11.0.0 rename / v12 json 단독 ADR-011)
+→ discovery-spec.json 산출 (json 단독 SSOT)
 → gate #1 자동 호출:
   · discovery-extraction-validator (입출력 무결성)
   · br-cross-consistency-validator Layer 1 (결정적) + Layer 2 (Claude Code sub-agent / Sonnet 4.6) 양쪽 통과
@@ -193,7 +191,7 @@ cd tools/spectral-runner && npx spectral lint <openapi.yaml>
 # Static security (Semgrep)
 node tools/static-runner/src/cli.js --plugin semgrep --target ./src --output ./out --ruleset p/owasp-top-ten
 
-# v2.4+ BR cross-consistency 검증
+# BR cross-consistency 검증
 node tools/br-cross-consistency-validator/src/cli.js <output>/business-rules.json
 # (Layer 1 결정적 + Layer 2 LLM strict mode 옵션)
 
@@ -208,7 +206,7 @@ node tools/findings-aggregator/src/cli.js --target <project-dir> --stage <discov
 - **Hook 안 뜸** / **버전 불일치** / **state.blocked 마주침** → [common-errors.md](./common-errors.md)
 - **chain-driver init 호출 시점 / state.json 의 의미** → [chain-harness-guide.md](./chain-harness-guide.md)
 - **자연어 prompt 매칭 안 됨** → [first-prompt-cookbook.md](./first-prompt-cookbook.md)
-- **Skills: 0 출력 (Claude Code install 후)** → v2.5.0 이전 버전 / v2.5.1 재install 필요
+- **Skills: 0 출력 (Claude Code install 후)** → 구 버전 / 최신 버전 재install 필요
 
 ## 다음 단계
 
@@ -219,3 +217,8 @@ node tools/findings-aggregator/src/cli.js --target <project-dir> --stage <discov
 5. [`../methodology-spec/README.md`](../methodology-spec/README.md) — phase × deliverable × schema 매트릭스
 
 install 후 첫 30분 안 막히는 점 발견 → [common-errors.md](./common-errors.md) 에 finding 등재 (사용자 피드백 자산화).
+
+## 인용
+
+- `ADR-011` — discovery-spec json 단독 SSOT
+- 6-stage(planning→discovery 개칭 + plan 신설) / 외부 도구 의무 변천사: `CHANGELOG.md` · `decisions/INDEX.md`

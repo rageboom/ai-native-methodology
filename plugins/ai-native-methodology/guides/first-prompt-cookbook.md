@@ -1,12 +1,10 @@
-# First Prompt Cookbook — 자연어 → skill 매핑 표 (chain harness validated / v2.5.1)
+# First Prompt Cookbook — 자연어 → skill 매핑 표
 
 본 가이드 = plugin install 후 사용자가 자기 의도를 자연어로 어떻게 표현하면 어떤 skill 자동 발동되는지.
 
 skill description 매칭 = Claude Code 가 SKILL.md frontmatter 검색 / slash command 불필요.
 
-> **갱신 이력**: v2.0.0 작성 → v2.5.1 정합 갱신 (모든 skill path 1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md` / Claude Code plugin 표준 정합 / + analysis-br-cross-consistency-check 신규 v2.5).
-
-## 1. Analysis stage (chain 1 진입 전 / v1.x 자산)
+## 1. Analysis stage (chain 1 진입 전)
 
 ### 1.1 입력 정리 + Inventory
 
@@ -62,9 +60,9 @@ skill description 매칭 = Claude Code 가 SKILL.md frontmatter 검색 / slash c
 
 aspect skill = 코드베이스 시그널 (`package.json` react / `pom.xml` spring-boot 등) 자동 매칭.
 
-## 2. Chain harness stage (v2.0 / v2.5 Layer 2 통합)
+## 2. Chain harness stage (Layer 2 통합)
 
-### 2.1 Chain 1 (discovery) v2.5: Layer 2 LLM 의무 통과
+### 2.1 Chain 1 (discovery) — Layer 2 LLM 의무 통과
 
 | 자연어 prompt                                                            | 발동 skill                                                                            | 산출                                   |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- | -------------------------------------- |
@@ -75,9 +73,9 @@ aspect skill = 코드베이스 시그널 (`package.json` react / `pom.xml` sprin
 | "use case 분해" / "UC decompose" / "story 분해"                          | [`discovery-decompose-use-cases`](../skills/discovery-decompose-use-cases/)           | UC-\* 분해                             |
 | "비즈니스 의도 식별" / "domain priority" / "intent 추출"                 | [`discovery-identify-business-intent`](../skills/discovery-identify-business-intent/) | intent-tag + domain priority           |
 
-v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
+chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 1 결정적 + Layer 2 LLM (Sonnet 4.6 sub-agent invocation) 양쪽 통과 강제. `semantic_drift_detected` 또는 `confidence_cap_exceeded` finding 발생 시 chain 진입 차단.
 
-**timing 분리** (v10.0.4 paradigm / v10.1.0 본격): `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용 (v10.1.0 모두 본격 구현). 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등 본격 구현). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
+**timing 분리**: `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용. 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
 
 ### 2.2 Chain 2 (spec)
 
@@ -87,7 +85,7 @@ v2.5: chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` 
 | "acceptance criteria 도출" / "Gherkin 작성" / "AC 추출"     | [`spec-derive-acceptance-criteria`](../skills/spec-derive-acceptance-criteria/) | `acceptance-criteria.json` (json 단독 SSOT / AC-\*) |
 | "7대 통합" / "deliverables 통합" / "spec 통합"              | [`spec-integrate-deliverables`](../skills/spec-integrate-deliverables/)         | analysis 7대 산출물 통합                            |
 
-### 2.3 Chain 3 (plan / v10.0.0 gate #3 본격)
+### 2.3 Chain 3 (plan / gate #3)
 
 | 자연어 prompt             | 발동 skill                                                              | 산출                                                     |
 | ------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------------- |
@@ -128,7 +126,7 @@ Claude Code 가 모든 SKILL.md description 검색
 매칭 skill 자동 발동 (slash command 불필요)
   ↓
 chain harness gate 통과 의무 검증 (state.json + chain-driver)
-  ↓ (v2.5: chain 1 gate 진입 시 Layer 2 LLM sub-agent invocation)
+  ↓ (chain 1 gate 진입 시 Layer 2 LLM sub-agent invocation)
 다음 stage 진입
 ```
 
@@ -146,7 +144,7 @@ chain harness gate 통과 의무 검증 (state.json + chain-driver)
 
 ### Tip 2. Skill 명시 호출
 
-slash command 부재 환경 = 명시 path (v2.5.1 1-depth + prefix paradigm):
+slash command 부재 환경 = 명시 path (1-depth + category prefix paradigm):
 
 ```
 @skills/analysis-architecture/SKILL.md
@@ -165,4 +163,8 @@ slash command 부재 환경 = 명시 path (v2.5.1 1-depth + prefix paradigm):
 - [`common-errors.md`](./common-errors.md) — FAQ
 - [`../README.md`](../README.md) §사용법 — skill description trigger 전체 표
 
-> v2.5.1 paradigm: 모든 skill 디렉토리 = `skills/<category>-<name>/SKILL.md` 1-depth + category prefix. Claude Code plugin 표준 정합 (1-depth scan) + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 별도 axis 보존.
+> skill 디렉토리 paradigm: 모든 skill = `skills/<category>-<name>/SKILL.md` 1-depth + category prefix. Claude Code plugin 표준 정합 (1-depth scan) + lifecycle organize 사상은 `methodology-spec/skills-axis.md` 별도 axis 보존.
+
+## 인용
+
+- 버전 변천사 / skill rename: `CHANGELOG.md` · `decisions/INDEX.md`

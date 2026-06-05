@@ -86,7 +86,7 @@ ambiguous > 0 시:
 
 1. `intent_vs_bug.ambiguous_carry[]` 의무 (rule_id + carry_owner + carry_reason)
 2. snapshot scenario `behavior_likely_bug` 또는 `behavior_to_preserve` 중 최소 하나 명시
-3. chain 4 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
+3. chain 5 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
 
 ### 3.5 Coverage threshold + ratchet
 

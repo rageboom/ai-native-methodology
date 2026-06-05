@@ -10,6 +10,34 @@
 
 ---
 
+## [12.16.0] — 2026-06-05 MINOR — ticket subsystem R20-prime 마이그레이션 완결 (deferred breaking 완료)
+
+DEC-2026-05-26-ticket-plan-단일 §5 의 **deferred breaking 마이그레이션** 완결 — 그간 skill·신규 schema(operational-task / task-plan refs / ticket-sync-evidence)만 R20-prime 였고 `traceability-matrix.ticket_ref` + 정책 doc + id-conventions + 테스트가 구 System-X(5-stage × phase / `subtask_ids.{chain1_planning..chain4_impl}`) 로 남아 있던 partial-migration 청산. ticket = **plan stage(chain 3) 단일 4-level cascade** (Epic=FE 화면/BE-domain + Story=BHV/AC + Task=OP-\* + Sub-task=TASK-\*) / test·implement = Sub-task status 갱신만.
+
+- **schema (breaking)**: `traceability-matrix.schema.json` `ticket_ref` 재편 — 구 `subtask_ids.{chain1_planning..chain4_impl}` (chain-stage object) + `enter_task_ids` (5-stage) **폐기** → `level`(enum epic/story/op_task/subtask) + `subtask_refs`(TASK-\* 배열) + `op_task_refs`(OP-\* 배열). `additionalProperties:false` 라 구 field = reject (breaking). 실 consumer 0 (PoC fixture 미사용 — 영향 면적 0).
+- **policy/spec prose**: `methodology-spec/ticket-policy.md` 전면 R20-prime 재작성 (§1 결단·§2 4-level layer·§3 plan-단일 시점·§5 OP-\*/TASK-\* summary·§10 phase×stage matrix → plan-단일 + skill SSOT 포인터·hierarchy parent matrix) + `id-conventions.md` §Ticket Binding 재작성 + `plugin-charter.md` R20→R20-prime (§1 정의 + §2 status) + `agents/plan-agent.md` + `skills/ticket-sync/SKILL.md` (enter_task_ids/subtask_ids → transient/subtask_refs).
+- **test (breaking guard)**: `ticket-binding.test.js` + `ticket-sync-evidence.test.js` R20-prime 재작성 — valid(level/subtask_refs/op_task_refs/cascade) + 구 subtask_ids·enter_task_ids 폐기 reject 회귀 가드. (ticket-binding 7/7 · ticket-sync-evidence 19/19 · schema-validator npm test 40/40.)
+- **tools/README refresh (동반)**: cadence matrix 4-chain(System-X) → 5-chain(discovery/spec/plan/test/impl + gate #1~#5 / plan-coverage-validator 행 신설) + "16 도구" → 29 패키지 정정 + cadence 외 12 도구(codegraph/context/graph/meta family) 인벤토리 + validator 4종→5종. (chain-numbering 정정 turn 의 structural carry 완료.)
+- **동작 변화 (breaking schema shape)** — 단, ticket_ref 는 optional + consumer 0 이라 실 산출물 영향 0. 검증: citation 0 · check40 0 · release-readiness 40/40 · version 3-source sync 12.16.0.
+
+## [12.15.2] — 2026-06-05 PATCH — chain/gate 번호 System Y 정합 (test=4 / implement=5)
+
+shipped 운영 컨텍스트 파일에 잔존하던 **System X (구 4-chain / test=3·impl=4) 번호**를 canonical **System Y (discovery1/spec2/plan3/test4/implement5 / chain N = gate #N)** 로 일괄 정정. v9.0 plan stage 신설로 test·implement 가 한 칸씩 밀렸으나 일부 산출물 spec·skill·tool README·schema 가 구 번호를 보존하고 있던 documentary drift 해소 (INSPECTION-2026-05-31-test/implement 에서 식별된 prose-only stale / 동작 영향 0).
+
+- **정리 파일**: methodology-spec/deliverables(18·19·20·21·23·24)·workflow/characterization·plugin-charter R14 / skills(spec-compose·spec-derive·spec-integrate·analysis-characterization-test) / templates(test·implement README) / tools README(chain-coverage·schema-validator·spec-test-link·static-runner·traceability-matrix-builder) + traceability-matrix-builder/src/builder.js gap 메시지 / schemas(business-rules.schema description ×3·README — task-plan(chain 3) 행 신설 + test→4·impl→5) / flows/implement.phase-flow expected_outcome gloss.
+- **frozen 보존 (의도)**: `flows/sdlc-4stage-flow.json` corroboration-evidence ledger(`L1_chain_3_complete`/`L2_chain_4_GREEN` 토큰 = 코드 미참조 / 버전-dated 도달 기록) / non-shipped 이력(docs/adr·decisions·examples·CHANGELOG·tools/*/test·fixtures = era-accurate). 이미 System Y 인 다수 자산(test-impl-pass-validator·test-* skills·lifecycle-contract·use-scenario-taxonomy 등) 무변경.
+- **별도 carry (구조 staleness / 본 PATCH scope 외)**: `methodology-spec/ticket-policy.md`(R20-prime 미반영 — stage=planning/test/implement 구 호출 규약 + per-chain sub-task) + `tools/README.md`(도구 인벤토리 16→34 stale + cadence matrix 4-chain / plan 컬럼·신규 도구 다수 누락) = 번호만 패치하면 내부 모순 → 전용 구조 refresh 필요. 한 칸 밀림이 아닌 모델 자체 stale 이라 본 번호 정정에서 제외.
+- **동작 변화 ❌** (주석·description·문서 prose 만 / validator 로직은 stage 문자열로 동작). 검증: citation 0 · release-readiness **40/40** · traceability-matrix-builder 단위테스트 152/152 · business-rules.schema·implement.phase-flow JSON valid.
+
+## [12.15.1] — 2026-06-05 PATCH — 잔여 출하 prose provenance 정리 + check40 scope 확장
+
+v12.15.0 의 provenance 정리를 **출하 prose 나머지 디렉토리**(guides/templates/flows/hooks)로 마저 적용. 본문에 박혀 있던 버전 변천사·DEC/ADR 산문·인라인 PoC 증거·session·LL·backlog carry 를 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — 출하 본문 = 현재형 사용자 관심사만. v12.15.0 과 동일 convention/KEEP·RELOCATE 룰.
+
+- **정리 파일 14종**: `guides/{getting-started,chain-harness-guide,common-errors,first-prompt-cookbook,README}.md` · `templates/{README,analysis/finding.template,discovery/{README,planning-doc-format},spec/README,test/README,implement/README}.md` · `flows/README.md` · `hooks/README.md`. (`templates/adoption/` = non-shipped / build alias source → 제외.) common-errors 의 stale v2.5.1→v2.6.0 cutover FAQ 등 구식 마이그레이션 noise 도 정리.
+- **check40 scope 확장**: `release-readiness.js` check40 `shipped_provenance_leak` 의 `SHIPPED_DIRS` 에 `guides`·`templates`·`flows`·`hooks` 추가 + `NON_SHIPPED_SUBPATHS`(`templates/adoption/`) skip. 가드가 이제 전 출하 prose 디렉토리에 fail-closed 적용. detail/delegated_to/주석 갱신.
+- **ticket-sync identity leak 정리**: merge(`9861a085`)로 유입된 ticket-sync SKILL.md 의 SG-MIS 환경 config 참조(`jira.smilegate.net`·`structure_id: 684`·`customfield_11902`) 3줄에 `allow-identity:` 주석 추가 — 사내 공통 env-config reference(개인 신원 아님) 정당 예외. check `shipped_identity_leak` 40/40 복구.
+- **동작 변화 ❌** — provenance noise 제거 + 정당 예외 주석일 뿐 skill·agent·guide 지시 기능 동형 / frontmatter `name`·`description` byte-불변. 검증: citation-validator 0 · check40 0 · release-readiness **40/40** · check40 discrimination 단위테스트 pass.
+
 ## [12.15.0] — 2026-06-05 MINOR — shipped 산출물 provenance 정리 (관심사 분리 + check40 가드)
 
 shipped 파일(skills 53 · methodology-spec 54 · agents 11)에 박혀 있던 **프로젝트 거버넌스 내용**(버전 변천사 · DEC rationale · PoC corroboration 증거 · LL 교훈 · backlog carry · ADR 변천사 산문)을 본문에서 제거하고 출처를 파일 끝 단일 `## 인용` footer 포인터로 일원화 — shipped 본문 = 현재형 사용자 관심사만. outer `CLAUDE.md` 의 "버전 narrative 누적 금지 / 4중 중복 회피" precedent 를 전 shipped 파일로 확장. SSOT = `decisions/DEC-2026-06-05-shipped-provenance-cleanup.md`.

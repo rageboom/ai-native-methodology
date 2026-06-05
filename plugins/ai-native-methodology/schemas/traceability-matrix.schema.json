@@ -84,7 +84,7 @@
           },
           "ticket_ref": {
             "type": "object",
-            "description": "v8.6.0+ ticket-binding policy (DEC-2026-05-18) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md. v8.6.3+ hierarchy 강제 — Story id 채움 시 epic_id + initiative_id 의무 (ticket-policy.md §Tier 2.5 hierarchy subsection / 위반 시 F-TICKETSYNC-002 missing_parent finding emit).",
+            "description": "ticket-binding policy (R20-prime / DEC-2026-05-26-ticket-plan-단일) — UC ↔ 외부 ticket system Story 1:1 매핑. Tier 1 권고 / validator 강제 X / optional field. 자세한 정책 = methodology-spec/ticket-policy.md. hierarchy 강제 — Story id 채움 시 epic_id 권장 (ticket-policy.md hierarchy / 미채움 시 F-TICKETSYNC-002 missing_parent finding emit).",
             "required": ["platform", "id"],
             "additionalProperties": false,
             "properties": {
@@ -106,12 +106,12 @@
               "epic_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "상위 Epic ticket id (도메인 단위). v8.6.3+ — Story 단위 row 시 의무 (ticket-policy.md §Tier 2.5 hierarchy / 미채움 시 F-TICKETSYNC-002)."
+                "description": "상위 Epic ticket id (FE 화면 단위 또는 BE-domain). Story 단위 row 시 권장 (ticket-policy.md hierarchy / 미채움 시 F-TICKETSYNC-002)."
               },
               "initiative_id": {
                 "type": "string",
                 "minLength": 1,
-                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps). v8.6.3+ — Story 단위 row 시 의무 (epic_id 의 parent / ticket-policy.md §Tier 2.5 hierarchy)."
+                "description": "상위 Initiative ticket id (Jira Premium / Advanced Roadmaps / 선택 — 대형 분석 결과 묶음). epic_id 의 parent (ticket-policy.md hierarchy)."
               },
               "structure_complete": {
                 "type": "boolean",
@@ -122,28 +122,20 @@
                 "format": "uri",
                 "description": "v8.6.3+ — Atlassian Structure (또는 동등 tree view) URL — Jira dashboard 가시화 link. jira_structure_add_issues 호출 후 채움 (선택)."
               },
-              "subtask_ids": {
-                "type": "object",
-                "description": "chain stage 별 sub-task ticket id 매핑 (선택)",
-                "additionalProperties": false,
-                "properties": {
-                  "chain1_planning": {"type": "string"},
-                  "chain2_spec": {"type": "string"},
-                  "chain3_test": {"type": "string"},
-                  "chain4_impl": {"type": "string"}
-                }
+              "level": {
+                "type": "string",
+                "enum": ["epic", "story", "op_task", "subtask"],
+                "description": "R20-prime (DEC-2026-05-26-ticket-plan-단일 §5) — 본 ticket 의 cascade level. UC row = 'story' (BHV/AC cross-cut anchor) default. 4-level: Epic(FE 화면) / Story(BHV·AC) / OP-*(Story sibling 운영) / TASK-*(Sub-task). 구 stage-별 phase enum 폐기 — ticket 은 plan stage 단일에서 cascade 생성."
               },
-              "enter_task_ids": {
-                "type": "object",
-                "description": "v8.6.2+ R20 phase=enter — stage 진입 시점 의무 작업 Task ticket id 매핑 (선택). analysis/planning = 도메인 단위 / spec/test/implement = per UC 단위 (본 ticket_ref 가 속한 UC 의 enter Task). chain 종료 시 phase=exit 가 enter Task 자동 종결.",
-                "additionalProperties": false,
-                "properties": {
-                  "analysis": {"type": "string", "description": "analysis 진입 시 Task id (도메인 단위 / per UC 동일)"},
-                  "planning": {"type": "string", "description": "planning 진입 시 Task id (도메인 단위 / per UC 동일)"},
-                  "spec": {"type": "string", "description": "spec 진입 시 Task id (per UC)"},
-                  "test": {"type": "string", "description": "test 진입 시 Task id (per UC)"},
-                  "implement": {"type": "string", "description": "implement 진입 시 Task id (per UC)"}
-                }
+              "subtask_refs": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "description": "본 Story 의 Sub-task(TASK-*) ticket id 목록 (1~3 AC 묶음 / layer 분기 / plan stage cascade 생성). 구 subtask_ids{chain1_planning..chain4_impl}(chain-stage 별) 폐기 — R20-prime 은 plan stage 단일에서 cascade (DEC-2026-05-26-ticket-plan-단일 §5 / breaking)."
+              },
+              "op_task_refs": {
+                "type": "array",
+                "items": {"type": "string", "minLength": 1},
+                "description": "화면 없는 운영·인프라·마이그레이션 작업(OP-* / Story sibling / Jira Task level) ticket id 목록 (선택)."
               },
               "status_history": {
                 "type": "array",
@@ -192,13 +184,13 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "planning → impl 쪽 chain 정합 % (UC → ... → IMPL link 채움 비율)"
+          "description": "UC → impl 쪽 chain 정합 % (UC → ... → IMPL link 채움 비율)"
         },
         "backward_coverage": {
           "type": "number",
           "minimum": 0,
           "maximum": 1,
-          "description": "impl → planning 쪽 chain 정합 %"
+          "description": "impl → UC 쪽 chain 정합 %"
         },
         "threshold": {
           "type": "number",

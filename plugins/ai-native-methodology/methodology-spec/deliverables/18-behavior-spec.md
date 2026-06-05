@@ -8,7 +8,7 @@
 
 **답하는 질문**: "각 use case 의 동작은 어떻게 정의되나? executable behavioral contract?"
 
-**활용**: chain 3 test stage 의 핵심 input. acceptance-criteria 추출 source.
+**활용**: chain 4 test stage 의 핵심 input. acceptance-criteria 추출 source.
 
 `formal-spec` phase 산출물 (state-machine / sequence / decision-table / invariant / property-test) 의 chain 2 격상 + discovery-spec.use_cases 흡수.
 

@@ -182,22 +182,26 @@ BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 
 
 자세한 정책 = `methodology-spec/ticket-policy.md` / **권고만 / validator 강제 X**.
 
-### 매핑 단위
+### 매핑 단위 (R20-prime / ticket = plan stage 단일 cascade)
 
-| Plugin 산출물                                                             | Ticket 단위                                             | 시점                                         |
-| ------------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------------------- |
-| Analysis 산출물 (inventory + architecture + sql-inventory + antipatterns) | Initiative (or 상위 Epic / label)                       | 분석 stage 종료 직후                         |
-| Domain                                                                    | Epic                                                    | Initiative 분해 시점                         |
-| **UC-{도메인}-{번호}**                                                    | **Story**                                               | **Chain 1 (discovery-spec.json) green 시점** |
-| Chain 1~4 stage                                                           | Sub-task (선택)                                         | Story 생성 시 batch 4개                      |
-| BHV / AC / TC / IMPL                                                      | (별도 ticket X — Story 본문 link / sub-task acceptance) | —                                            |
+ticket 생성 = **plan stage(chain 3) 단일** 4-level cascade. analysis/discovery/spec stage = 생성 ❌ (산출물 = "이해"). test(chain 4)/implement(chain 5) stage = Sub-task status 갱신만 (신규 생성 ❌).
 
-### UC ↔ Story 매핑 권장 형식
+| Plugin entity                                       | Ticket 단위 (Jira)            | 시점                             |
+| --------------------------------------------------- | ----------------------------- | -------------------------------- |
+| 대형 분석 결과 묶음                                 | Initiative (선택 / 외부 매핑) | plan stage (선택)                |
+| FE 화면 (route) 또는 BE-domain                      | **Epic**                      | plan stage                       |
+| **UC = BHV/AC cross-cut 시나리오**                  | **Story**                     | **plan stage (chain 3 gate 후)** |
+| **OP-{도메인}-{번호}** (운영·인프라·마이그레이션)   | **Task** (Story sibling)      | plan stage                       |
+| **TASK-{도메인}-{번호}** (1~3 AC 묶음 / layer 분기) | **Sub-task**                  | plan stage                       |
+| BHV / AC / TC / IMPL                                | (별도 ticket X — 본문 link)   | —                                |
+
+### 매핑 권장 형식
 
 - **Story summary**: `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}` (예: `[UC-CAR-007] 차량 비용 회계연도 prorate + cross-company billing`)
 - **Story 본문**: `discovery-spec.json` 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs
-- **Sub-task summary**: `chain{N}/{stage_name} — {UC ID}` (예: `chain3/test — UC-CAR-007`)
-- **Traceability matrix**: `schemas/traceability-matrix.schema.json` matrix item 의 `ticket_ref` optional field 에 platform / id / url / epic_id / initiative_id / subtask_ids 기록
+- **Sub-task summary (TASK-\*)**: `[TASK-{도메인}-{번호}] {1~3 AC 요약}` (layer=be/fe/db/e2e/infra / 예: `[TASK-CAR-001] POST /api/car-billing endpoint (layer=be)`)
+- **Task summary (OP-\*)**: `[OP-{도메인}-{번호}] {운영 작업}` (category=migration/cron/health-check/refactor/infra/ops / 예: `[OP-CAR-001] cost column migration`)
+- **Traceability matrix**: `schemas/traceability-matrix.schema.json` matrix item 의 `ticket_ref` optional field 에 platform / id / url / level / epic_id / subtask_refs / op_task_refs 기록
 
 ### BHV / AC / TC / IMPL 별 별도 ticket 금지 사유
 
@@ -214,13 +218,11 @@ Tier 2.5 활성 시 ticket 상태 전이 timeline 자동 기록:
   ticket_ref:
     platform: jira
     id: MIG-1234
+    level: story
     epic_id: MIG-CAR-100
     initiative_id: MIG-1
-    subtask_ids:
-      chain1_planning: MIG-1235
-      chain2_spec: MIG-1236
-      chain3_test: MIG-1237
-      chain4_impl: MIG-1238
+    subtask_refs: [MIG-1235, MIG-1236] # TASK-* (1~3 AC / layer 분기)
+    op_task_refs: [MIG-1240] # OP-* (Story sibling / 선택)
     status_history: # R20 — ticket 상태 전이 timeline
       - transitioned_at: '2026-05-18T14:30:00+09:00'
         to_status: 'To Do'
@@ -247,6 +249,7 @@ MCP tool = `mcp__wiki-jira-assistant__*` only (Tier 2.5).
 - 규칙 4 (BR 4토막 enforcement) 근거: DEC-2026-05-13-BR-id-4-segment-enforcement
 - Ticket Binding (Tier 1 정책) 근거: DEC-2026-05-18-ticket-binding-policy
 - R20 (Tier 2.5 MCP ticket sync) 근거: DEC-2026-05-18-r20-mcp-ticket-sync-channel
+- R20-prime (ticket = plan stage 단일 cascade / subtask_ids{chain*} → subtask_refs·op_task_refs 폐기·재편 / breaking) 근거: DEC-2026-05-26-ticket-plan-단일
 
 ### Cross-link
 

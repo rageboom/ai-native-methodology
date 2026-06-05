@@ -56,8 +56,8 @@ chain harness gate validator 4종이 본 도구를 sub-invoke:
 
 - [`../discovery-extraction-validator/`](../discovery-extraction-validator/) — chain 1 / discovery-spec schema 의존
 - [`../chain-coverage-validator/`](../chain-coverage-validator/) — chain 2 / behavior + acceptance schema 의존
-- [`../spec-test-link-validator/`](../spec-test-link-validator/) — chain 3 / test-spec schema 의존
-- [`../test-impl-pass-validator/`](../test-impl-pass-validator/) — chain 4 / impl-spec schema 의존
+- [`../spec-test-link-validator/`](../spec-test-link-validator/) — chain 4 / test-spec schema 의존
+- [`../test-impl-pass-validator/`](../test-impl-pass-validator/) — chain 5 / impl-spec schema 의존
 
 ## Test
 

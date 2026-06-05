@@ -11,8 +11,9 @@
 | `discovery-spec.schema.json`      | chain 1 / discovery-spec                                         | `tools/discovery-extraction-validator/` (gate #1)     |
 | `behavior-spec.schema.json`       | chain 2 / behavior-spec (BHV-\* executable contract)             | `tools/chain-coverage-validator/` (gate #2)           |
 | `acceptance-criteria.schema.json` | chain 2 / Gherkin BDD AC-\*                                      | `tools/chain-coverage-validator/`                     |
-| `test-spec.schema.json`           | chain 3 / TC-\* (RED 의무)                                       | `tools/spec-test-link-validator/` (gate #3)           |
-| `impl-spec.schema.json`           | chain 4 / IMPL-\* (GREEN / 100% pass)                            | `tools/test-impl-pass-validator/` (gate #4)           |
+| `task-plan.schema.json`           | chain 3 / task 분해 + ADR + NFR + risk                          | `tools/plan-coverage-validator/` (gate #3)            |
+| `test-spec.schema.json`           | chain 4 / TC-\* (RED 의무)                                       | `tools/spec-test-link-validator/` (gate #4)           |
+| `impl-spec.schema.json`           | chain 5 / IMPL-\* (GREEN / 100% pass)                            | `tools/test-impl-pass-validator/` (gate #5)           |
 | `traceability-matrix.schema.json` | release / UC→BHV→AC→TC→IMPL+commit_hash                          | `tools/traceability-matrix-builder/`                  |
 | `state.schema.json`               | chain-driver state 영속                                          | `tools/chain-driver/src/state-store.js`               |
 | `intervention-log.schema.json`    | 사용자 결단 로그 (single-writer JSONL)                           | `tools/chain-driver/src/state-store.js`               |

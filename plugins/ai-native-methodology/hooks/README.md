@@ -1,4 +1,4 @@
-# hooks/ — chain harness mechanical enforcement (ADR-CHAIN-005)
+# hooks/ — chain harness mechanical enforcement
 
 본 디렉토리 = Claude Code hooks 정의. plugin install 후 `hooks.json` 의 hook 이 자동 발동하여 chain harness mechanical gate trio (iii) + skill auto-invoke 차단을 enforcement.
 
@@ -24,7 +24,7 @@ action:  node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge
 purpose: D21' 정합 — suppressOutput=true / stderr only / additionalContext 차단 문구
 ```
 
-**D21' (ADR-CHAIN-005 §4)** — LLM 양심 의존 회피:
+**D21'** — LLM 양심 의존 회피:
 
 - chain-driver hooks-bridge 가 stderr 로 사용자에게 권고 표시 (예: "현재 chain 1 / planning skill 진입 권고")
 - `suppressOutput: true` 설정 → LLM context 에 hook 출력 미주입 ("권고를 LLM 이 즉시 따르는 척" 차단)
@@ -38,7 +38,7 @@ action:  node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge
 purpose: state.blocked=true + .aimd/output/** 대상 시 permissionDecision=deny / exit 2
 ```
 
-**Mechanical gate trio** (ADR-CHAIN-005 §3):
+**Mechanical gate trio**:
 
 1. (i) **state.blocked 영속** (`.aimd/state.json`) — chain-driver 가 finding 발견 시 자동 set
 2. (ii) **cli exit 2** — `chain-driver next` 가 blocked 상태 시 exit 2 반환
@@ -75,9 +75,12 @@ hooks/hooks.json
 
 ## 참조
 
-- ADR-CHAIN-005 — chain harness 5 요소 enforcement / D21' suppressOutput 정책 / mechanical gate trio
 - [`../tools/chain-driver/`](../tools/chain-driver/) — hooks-bridge 구현체
 - [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT
-- DEC-2026-05-06-sub-plan-5-종결 — hooks.json 본격 작성 record + Senior F1 BLOCKER 흡수 (D21' 정합)
 - [`../schemas/state.schema.json`](../schemas/state.schema.json) — state 영속 schema
 - [`../schemas/intervention-log.schema.json`](../schemas/intervention-log.schema.json) — 사용자 결단 로그 schema
+
+## 인용
+
+- `ADR-CHAIN-005` — chain harness 5 요소 enforcement / D21' suppressOutput / mechanical gate trio
+- `DEC-2026-05-06-sub-plan-5-종결` — hooks.json 작성 (Senior F1 BLOCKER 흡수 / D21' 정합)

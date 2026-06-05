@@ -6,7 +6,7 @@ chain harness 의 **chain 4 (test → implement) gate #4 validator** (System Y /
 
 ## When to call
 
-- **trigger**: chain 3 (test) stage 종결 시 / chain-driver `next` 진입
+- **trigger**: chain 4 (test) stage 종결 시 / chain-driver `next` 진입
 - **호출자**: gate auto (chain-driver) / skill `_base-invoke-go-stop-gate`
 - **수동**: `node src/cli.js ...`
 
@@ -48,7 +48,7 @@ node src/cli.js \
 ## Sibling tools
 
 - [`../chain-coverage-validator/`](../chain-coverage-validator/) — gate #2 / chain 2 (spec)
-- [`../test-impl-pass-validator/`](../test-impl-pass-validator/) — gate #4 / chain 4 (impl) — 본 도구 후속 (실 test runner 호출)
+- [`../test-impl-pass-validator/`](../test-impl-pass-validator/) — gate #5 / chain 5 (impl) — 본 도구 후속 (실 test runner 호출)
 - [`../schema-validator/`](../schema-validator/) — test-spec.schema 검증 (sub-validate)
 
 ## 참조

@@ -14,7 +14,7 @@
 **AI 재구현 시 활용**:
 
 - chain 1 discovery-spec 입력 보강 (use_cases 추출 시 acceptance oracle 직접 적용)
-- chain 4 GREEN 검증 시 snapshot 이 acceptance test 로 작동 (AI 자동 생성 코드의 의도 보존 검증)
+- chain 5 GREEN 검증 시 snapshot 이 acceptance test 로 작동 (AI 자동 생성 코드의 의도 보존 검증)
 - ambiguous 영역 = 도메인 expert 결단 강제 (carry 명시 의무)
 
 ### 1.1 외부 조언 (사상적 근거)
@@ -52,8 +52,8 @@ output/characterization/
 
 ### 3.1 미추출 (의도적)
 
-- 자동 코드 generation — chain 4 (impl-spec) 영역
-- 실행 가능 test 코드 — chain 3 (test-spec) 영역. characterization snapshot = test 의 acceptance oracle / 실 test 코드 ❌
+- 자동 코드 generation — chain 5 (impl-spec) 영역
+- 실행 가능 test 코드 — chain 4 (test-spec) 영역. characterization snapshot = test 의 acceptance oracle / 실 test 코드 ❌
 - ambiguous 자동 결단 — 도메인 expert 의무 (carry)
 
 ---
@@ -183,7 +183,7 @@ cross_links:
 ### 8.1 ambiguous 정책 (핵심)
 
 - ambiguous > 0 시 → 도메인 expert carry 명시 의무 (snapshot 또는 characterization-spec.json 의 intent_vs_bug)
-- 결단 전까지 chain 4 (impl-spec GREEN) 진입 ❌
+- 결단 전까지 chain 5 (impl-spec GREEN) 진입 ❌
 - 결단 후 갱신 의무
 
 ---
