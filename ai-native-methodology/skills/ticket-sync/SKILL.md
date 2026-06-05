@@ -1,7 +1,7 @@
 ---
 name: ticket-sync
 description: v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / BE only 운영·인프라·마이그레이션) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
-allowed-tools: Read, Write, Edit, Bash, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
+allowed-tools: Read, Write, Edit, Bash, mcp__mcp-server-wiki-jira__jira_create, mcp__mcp-server-wiki-jira__jira_link, mcp__mcp-server-wiki-jira__jira_transition, mcp__mcp-server-wiki-jira__jira_comment, mcp__mcp-server-wiki-jira__jira_search, mcp__mcp-server-wiki-jira__jira_update, mcp__mcp-server-wiki-jira__jira_assign, mcp__mcp-server-wiki-jira__jira_transitions, mcp__mcp-server-wiki-jira__jira_label_add, mcp__mcp-server-wiki-jira__jira_issue, mcp__mcp-server-wiki-jira__jira_structure_add_issues, mcp__mcp-server-wiki-jira__jira_structure_get, mcp__mcp-server-wiki-jira__wiki_page_create, mcp__mcp-server-wiki-jira__wiki_page_update, mcp__mcp-server-wiki-jira__wiki_search_cql, mcp__mcp-server-wiki-jira__wiki_spaces, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
 ---
 
 # ticket-sync (R20-prime / v11.0.0 paradigm)
@@ -47,11 +47,13 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | `dry_run`                    | boolean | **`true`**                                | default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출.                                                                                                                                                                                                                                  |
 | `confluence_emit`            | boolean | `false`                                   | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false)                                                                                                                                                                                                                                                    |
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
+| `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.aimd/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
 | `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무).                                                                                                                                     |
 | `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
 | `parent_strategy`            | enum    | **`auto`**                                | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`.                                                                                       |
 | `epic_link_customfield_id`   | string  | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`.                                                                                                                                                                                                             |
-| `structure_id`               | string  | env-config 또는 (없음)                    | Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). DWPD 환경 reference: `676`.                                                                                                                                                         |
+| `parent_link_customfield_id` | string  | env-config 또는 (없음)                    | role=`epic` 의 Initiative 부모 링크 customfield ID. set 시 Epic 생성 시 `extra_fields[parent_link_customfield_id] = <initiative_key>` 사용 — `parent_key` 보다 우선. 미set 시 `parent_key` 시도 → 400 reject 시 `jira_link (Relates)` fallback. **SG-MIS 환경(jira.smilegate.net) reference: `customfield_11902`** (Parent Link 필드). 타 Jira 인스턴스는 Jira 필드 설정에서 "Parent Link" customfield ID 확인 후 기재. |
+| `structure_id`               | string  | env-config 또는 (없음)                    | Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). **SG-MIS 환경 reference: `684`** (SG-MIS board). Jira Structure board URL 의 `s=<숫자>` 파라미터 값으로 확인.                                                                                                                                                         |
 | `structure_auto_add_on_exit` | boolean | `true` (단 `structure_id` set 일 때)      | true 시 phase=exit 마다 자동 호출 표준 (drift attractor 회피).                                                                                                                                                                                                                                                                       |
 
 ## 절차
@@ -59,10 +61,11 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 ### 단계 1 — Pre-flight
 
 1. **MCP 가용성 확인** (tools-probe 본격 / F-VERIFY-005 → B8 해결)
-   - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인 (tool-name presence probe).
-   - 2차 (fallback) — `mcp__wiki-jira-assistant__jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
+   - 1차 — Skill 의 `allowed-tools` frontmatter 안 `mcp__mcp-server-wiki-jira__*` **또는** `mcp__wiki-jira-assistant__*` entry 가 system deferred tools list 에 등록되어 있는지 확인. 신버전(`mcp__mcp-server-wiki-jira__`) 우선 탐지 → 없으면 구버전(`mcp__wiki-jira-assistant__`) fallback (tool-name presence probe).
+   - **MCP 버전 resolve**: 신버전 감지 시 이후 모든 MCP 호출에 `mcp__mcp-server-wiki-jira__` prefix 사용. 구버전만 감지 시 `mcp__wiki-jira-assistant__` prefix 사용. 세션 내 `_mcp_prefix` 변수로 고정.
+   - 2차 (fallback) — `{_mcp_prefix}jira_search` 무해 JQL (예: `project = <PROJECT_KEY> AND created >= -1d`) 1회 시도 → 응답 200 OK 시 가용 / 401·403·404·timeout 시 미연결.
    - 3차 (skip 결단) — `ListMcpResourcesTool` 은 **resource-only probe** 라 tools 가용성 추론에 부적합 (F-VERIFY-005). resource probe 결과 단독으로 silent skip 분기 ❌.
-   - 모두 불가 시 → `_base-log-finding` skill 호출 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip.
+   - 모두 불가 시 → `_base-log-finding` skill 호출 로 `F-TICKETSYNC-001 mcp_unavailable` emit + silent skip. 메시지에 "신버전(mcp__mcp-server-wiki-jira__) 및 구버전(mcp__wiki-jira-assistant__) 모두 미감지" 포함.
 
 2. **stage paradigm 강제력 점검** (F-TICKETSYNC-012)
    - args.stage ∈ {`analysis`, `discovery`, `spec`, `test`, `implement`} 시 → `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합 / plan 단일 const).
@@ -193,11 +196,23 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
    - resolve 결과 `{id: "..."}` 시 `extra_fields.issuetype.id` (명명 모호 환경 권고)
    - resolve 실패 (role 미정의) 시 `F-TICKETSYNC-007 issuetype_unresolved` finding + reject
 
-2. **parent linking resolve** (`parent_strategy` 별):
+2. **Initiative 생성 전 search-first** (신규):
+   - `parent_initiative` 명시 시 → 해당 키 재사용, Initiative 신규 생성 스킵.
+   - `parent_initiative` 미명시 + env-config `parent_initiative` 존재 시 → env-config 값 재사용.
+   - 둘 다 없을 시 → `jira_search` JQL: `project = <PROJECT_KEY> AND issuetype = <initiative_type> AND summary ~ "<scope_or_app_name>"` 탐색.
+     - 발견 시 → 첫 번째 결과 재사용 (사용자 확인 후).
+     - 미발견 시 → 신규 Initiative 생성.
+   - **Initiative = 앱/제품 단위** (SmileApp, 근태, 총무 등). 기능(feature) 단위는 Epic. Initiative 생성 시 summary 는 앱/제품명만 사용 (기능명 포함 ❌).
+
+3. **parent linking resolve** (`parent_strategy` 별):
    - `parent_strategy=auto` (default):
      - role=`subtask` → `parent_key` 필드 **만** 사용 (B14 invariant — `extra_fields[epic_link_customfield_id]` 명시 ❌. Sub-task 의 Epic Link 은 parent Story 로부터 auto-inherit)
-     - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback.
-     - role ∈ {`epic`, `initiative`} → parent 없음 (top-level) 또는 Initiative 하위 Epic 의 경우 `parent_key=<initiative_key>`.
+     - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback. 둘 다 400 reject 시 → `jira_link (Relates)` fallback.
+     - role=`epic` (Initiative 하위 Epic 생성 시):
+       - `parent_link_customfield_id` set 이면 → `extra_fields[parent_link_customfield_id] = <initiative_key>` **우선** (SG-MIS 사내 표준: `customfield_11902` / 타 Jira 인스턴스는 env-config 에서 확인).
+       - 미set 이면 → `parent_key=<initiative_key>` 시도. 400 reject 시 → `jira_link (Relates)` fallback.
+       - `F-TICKETSYNC-013 epic_initiative_link_fallback` finding emit (fallback 발생 시 env-config `parent_link_customfield_id` 설정 권고).
+     - role=`initiative` → top-level (parent 없음).
    - `parent_strategy=parent_key`: 모든 role 이 `parent_key` 시도 (DWPD 환경에서는 일반 issue 가 400 reject — `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding).
    - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` 만 / 그 외 = `extra_fields[epic_link_customfield_id]`. B14 — Sub-task 에 `extra_fields[epic_link_customfield_id]` 추가 시도 시 backend 400 reject. `epic_link_customfield_id` 미명시 + 일반 issue 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
 
@@ -226,6 +241,28 @@ epic_link_customfield_id: customfield_10006
 # B15 — Structure 보드 자동 등록 (옵션)
 structure_id: 676 # ALM Works DWP-Forge id (DWPD 환경)
 structure_auto_add_on_exit: true
+```
+
+**SG-MIS 환경 표준 config** (jira.smilegate.net / 사내 공통 — SmileApp Intune 실측 확정):
+
+```yaml
+# .aimd/ticket-sync-config.yaml (SG-MIS 환경 — 사내 표준)
+issuetype_map:
+  epic:       epic
+  story:      이야기
+  subtask:    하위 작업
+  initiative: Initiative
+  tech_debt:  이야기
+  task:       작업
+  bug:        버그
+parent_strategy: epic_link_customfield
+epic_link_customfield_id: customfield_10006    # Story → Epic 링크 (사내 공통)
+parent_link_customfield_id: customfield_11902  # Epic → Initiative "Parent Link" (사내 공통)
+# B14 — Sub-task 는 epic_link_customfield_id 명시 ❌
+# B15 — Structure 보드 자동 등록 (SG-MIS board)
+structure_id: 684              # SG-MIS Structure board (jira.smilegate.net)
+structure_auto_add_on_exit: true
+# parent_initiative: <앱/제품 Initiative 키>  # 프로젝트별 기재 (예: MIS-108)
 ```
 
 ### 단계 6 — MCP 호출 (sequential / 결정론 보호 / mode=standard)
@@ -301,8 +338,18 @@ Step 6 — traceability-matrix.ticket_ref 갱신:
 
 Step 7 — B15 Structure 보드 자동 등록 (옵션):
   if (structure_id set + structure_auto_add_on_exit=true):
-    jira_structure_add_issues (structure_id=$structure_id,
-                                issue_keys=[Initiative? + Epics + Stories + OP-* + TASK-*])
+    # items 계층 순서 의무: Initiative(0) → Epic(1) → Story/OP-*(2) → Sub-task(3)
+    # depth = 직전 row 대비 상대값. Epic 루프마다 해당 Epic 하위 항목 묶어 배치 후 다음 Epic 은 depth=1 로 reset.
+    items = [
+      {"key": initiative_key,  "depth": 0},        # Initiative (parent_initiative 재사용 포함)
+      # per-epic 루프 (epic_id_map 순서):
+      {"key": epic_key,        "depth": 1},         # Epic
+        {"key": story_key,     "depth": 2},         # Epic 하위 Story
+          {"key": subtask_key, "depth": 3},         # Story 하위 Sub-task
+        {"key": op_task_key,   "depth": 2},         # Epic 하위 OP-* Task (Story sibling)
+      # 다음 Epic → depth=1 reset
+    ]
+    jira_structure_add_issues (structure_id=$structure_id, items=items, under_key=None)
     → matrix.ticket_ref.structure_tree_url 채움 / version_after 캡쳐
     → 모든 ticket 의 structure_complete=true
 
@@ -370,8 +417,12 @@ verification mode 6 stage 본문 (analysis/discovery/spec/plan/test/implement St
    jira_comment (verification_story_ids[stage], "<stage> gate result + 5종 물증 link")
    jira_transition (verification_story_ids[stage] → "Done")
 3. B15 — if (structure_id set + structure_auto_add_on_exit=true):
-   jira_structure_add_issues (structure_id=$structure_id,
-                              issue_keys=[6 Story + all Sub-task])
+   # items = per-story 루프. depth=0 = under_key($parent_epic) 의 직접 자식.
+   items = [
+     {"key": story_key,     "depth": 0},   # Stage Story (per-stage 루프)
+       {"key": subtask_key, "depth": 1},   # Story 하위 artifact Sub-task
+   ]
+   jira_structure_add_issues (structure_id=$structure_id, items=items, under_key=$parent_epic)
    → cycle 종료 마무리 evidence
 4. jira_comment ($parent_epic,
                  "verification cycle 종결 — 6 Story keys + Q1~Q6 pass/fail summary
