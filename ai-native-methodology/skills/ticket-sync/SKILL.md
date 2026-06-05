@@ -277,7 +277,7 @@ plan enter:
                summary="[Chain 3] {scope} plan 작성 시작",
                parent=Epic(scope) if exists else parent=Initiative,
                status=To Do)
-  → enter_task_id 저장 (traceability-matrix.ticket_ref.enter_task_ids.plan)
+  → enter_task_id = 전이용 transient id (evidence 에만 기록 / traceability-matrix.ticket_ref 영속 ❌ — cascade 4-level 만 영속)
 ```
 
 enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
@@ -354,8 +354,8 @@ Step 7 — B15 Structure 보드 자동 등록 (옵션):
     → 모든 ticket 의 structure_complete=true
 
 Step 8 — enter Task 종결:
-  if exists enter_task_ids.plan:
-    jira_transition (enter_task_ids.plan → Done)
+  if exists plan enter_task_id (transient / evidence 기록분):
+    jira_transition (plan enter_task_id → Done)
 ```
 
 #### phase=update-test-red (chain 4 RED gate 통과 후 / 신규 생성 ❌)
@@ -482,7 +482,7 @@ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + 
 
 ### 단계 8 — traceability-matrix 갱신
 
-각 Story / Sub-task entry 의 `ticket_ref.status_history[]` append + `ticket_ref.id` / `epic_id` / `story_id` / `subtask_ids` 채움. 본 갱신 후 `_base-build-traceability-matrix` skill 재호출 (forward_coverage 갱신).
+각 Story entry 의 `ticket_ref.status_history[]` append + `ticket_ref.id` / `level` / `epic_id` / `subtask_refs` (TASK-\*) / `op_task_refs` (OP-\*) 채움. 본 갱신 후 `_base-build-traceability-matrix` skill 재호출 (forward_coverage 갱신).
 
 ### 단계 9 — intervention-log append
 

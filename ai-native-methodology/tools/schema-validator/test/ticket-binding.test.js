@@ -1,9 +1,10 @@
-// schema-validator 회귀 — v8.6.0+ ticket-binding policy (DEC-2026-05-18).
+// schema-validator 회귀 — ticket-binding policy R20-prime (DEC-2026-05-26-ticket-plan-단일).
 // traceability-matrix.schema.json matrix.items.ticket_ref optional field 검증:
 //   1) ticket_ref 없는 matrix valid (기존 회귀 / breaking 0)
-//   2) ticket_ref 있는 matrix valid (신규)
+//   2) ticket_ref 있는 matrix valid (R20-prime: level + subtask_refs + op_task_refs)
 //   3) platform enum 외 값 reject
-//   4) subtask_ids unknown chain key reject
+//   4) level enum 외 값 reject
+//   5) 구 subtask_ids field 폐기 — unknown field → reject (breaking 회귀 가드)
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
@@ -62,7 +63,7 @@ test('ticket-binding — ticket_ref 없는 traceability matrix valid (regression
   rmSync(TMP, { recursive: true, force: true });
 });
 
-test('ticket-binding — ticket_ref 있는 traceability matrix valid (Tier 1 신규)', () => {
+test('ticket-binding — ticket_ref 있는 traceability matrix valid (R20-prime: level + subtask_refs + op_task_refs)', () => {
   ensureTmp();
   const f = join(TMP, 'traceability-matrix.json');
   writeFileSync(f, JSON.stringify(baseMatrix({
@@ -70,18 +71,15 @@ test('ticket-binding — ticket_ref 있는 traceability matrix valid (Tier 1 신
       platform: 'jira',
       id: 'MIG-1234',
       url: 'https://company.atlassian.net/browse/MIG-1234',
+      level: 'story',
       epic_id: 'MIG-1000',
       initiative_id: 'MIG-1',
-      subtask_ids: {
-        chain1_planning: 'MIG-1235',
-        chain2_spec: 'MIG-1236',
-        chain3_test: 'MIG-1237',
-        chain4_impl: 'MIG-1238',
-      },
+      subtask_refs: ['MIG-1235', 'MIG-1236'],
+      op_task_refs: ['MIG-1240'],
     },
   })));
   const r = runCli([f]);
-  assert.equal(r.status, 0, `Tier 1 ticket_ref valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
+  assert.equal(r.status, 0, `R20-prime ticket_ref valid 의무. stdout:${r.stdout}\nstderr:${r.stderr}`);
   rmSync(TMP, { recursive: true, force: true });
 });
 
@@ -96,18 +94,29 @@ test('ticket-binding — platform enum 외 값 reject', () => {
   rmSync(TMP, { recursive: true, force: true });
 });
 
-test('ticket-binding — subtask_ids unknown chain key reject', () => {
+test('ticket-binding — level enum 외 값 reject (R20-prime)', () => {
+  ensureTmp();
+  const f = join(TMP, 'traceability-matrix.json');
+  writeFileSync(f, JSON.stringify(baseMatrix({
+    ticket_ref: { platform: 'jira', id: 'MIG-1234', level: 'chain3_test' },
+  })));
+  const r = runCli([f]);
+  assert.notEqual(r.status, 0, `level enum(epic/story/op_task/subtask) 외 값 reject 의무. stdout:${r.stdout}`);
+  rmSync(TMP, { recursive: true, force: true });
+});
+
+test('ticket-binding — 구 subtask_ids field 폐기 → unknown field reject (breaking 회귀 가드)', () => {
   ensureTmp();
   const f = join(TMP, 'traceability-matrix.json');
   writeFileSync(f, JSON.stringify(baseMatrix({
     ticket_ref: {
       platform: 'jira',
       id: 'MIG-1234',
-      subtask_ids: { chain99_unknown: 'MIG-9999' },
+      subtask_ids: { chain1_planning: 'MIG-1235' },
     },
   })));
   const r = runCli([f]);
-  assert.notEqual(r.status, 0, `subtask_ids 의 unknown key reject 의무. stdout:${r.stdout}`);
+  assert.notEqual(r.status, 0, `구 subtask_ids 는 R20-prime 에서 폐기 → additionalProperties:false 가 reject 의무. stdout:${r.stdout}`);
   rmSync(TMP, { recursive: true, force: true });
 });
 

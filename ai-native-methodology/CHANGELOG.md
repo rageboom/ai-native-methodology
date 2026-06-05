@@ -10,6 +10,16 @@
 
 ---
 
+## [12.16.0] — 2026-06-05 MINOR — ticket subsystem R20-prime 마이그레이션 완결 (deferred breaking 완료)
+
+DEC-2026-05-26-ticket-plan-단일 §5 의 **deferred breaking 마이그레이션** 완결 — 그간 skill·신규 schema(operational-task / task-plan refs / ticket-sync-evidence)만 R20-prime 였고 `traceability-matrix.ticket_ref` + 정책 doc + id-conventions + 테스트가 구 System-X(5-stage × phase / `subtask_ids.{chain1_planning..chain4_impl}`) 로 남아 있던 partial-migration 청산. ticket = **plan stage(chain 3) 단일 4-level cascade** (Epic=FE 화면/BE-domain + Story=BHV/AC + Task=OP-\* + Sub-task=TASK-\*) / test·implement = Sub-task status 갱신만.
+
+- **schema (breaking)**: `traceability-matrix.schema.json` `ticket_ref` 재편 — 구 `subtask_ids.{chain1_planning..chain4_impl}` (chain-stage object) + `enter_task_ids` (5-stage) **폐기** → `level`(enum epic/story/op_task/subtask) + `subtask_refs`(TASK-\* 배열) + `op_task_refs`(OP-\* 배열). `additionalProperties:false` 라 구 field = reject (breaking). 실 consumer 0 (PoC fixture 미사용 — 영향 면적 0).
+- **policy/spec prose**: `methodology-spec/ticket-policy.md` 전면 R20-prime 재작성 (§1 결단·§2 4-level layer·§3 plan-단일 시점·§5 OP-\*/TASK-\* summary·§10 phase×stage matrix → plan-단일 + skill SSOT 포인터·hierarchy parent matrix) + `id-conventions.md` §Ticket Binding 재작성 + `plugin-charter.md` R20→R20-prime (§1 정의 + §2 status) + `agents/plan-agent.md` + `skills/ticket-sync/SKILL.md` (enter_task_ids/subtask_ids → transient/subtask_refs).
+- **test (breaking guard)**: `ticket-binding.test.js` + `ticket-sync-evidence.test.js` R20-prime 재작성 — valid(level/subtask_refs/op_task_refs/cascade) + 구 subtask_ids·enter_task_ids 폐기 reject 회귀 가드. (ticket-binding 7/7 · ticket-sync-evidence 19/19 · schema-validator npm test 40/40.)
+- **tools/README refresh (동반)**: cadence matrix 4-chain(System-X) → 5-chain(discovery/spec/plan/test/impl + gate #1~#5 / plan-coverage-validator 행 신설) + "16 도구" → 29 패키지 정정 + cadence 외 12 도구(codegraph/context/graph/meta family) 인벤토리 + validator 4종→5종. (chain-numbering 정정 turn 의 structural carry 완료.)
+- **동작 변화 (breaking schema shape)** — 단, ticket_ref 는 optional + consumer 0 이라 실 산출물 영향 0. 검증: citation 0 · check40 0 · release-readiness 40/40 · version 3-source sync 12.16.0.
+
 ## [12.15.2] — 2026-06-05 PATCH — chain/gate 번호 System Y 정합 (test=4 / implement=5)
 
 shipped 운영 컨텍스트 파일에 잔존하던 **System X (구 4-chain / test=3·impl=4) 번호**를 canonical **System Y (discovery1/spec2/plan3/test4/implement5 / chain N = gate #N)** 로 일괄 정정. v9.0 plan stage 신설로 test·implement 가 한 칸씩 밀렸으나 일부 산출물 spec·skill·tool README·schema 가 구 번호를 보존하고 있던 documentary drift 해소 (INSPECTION-2026-05-31-test/implement 에서 식별된 prose-only stale / 동작 영향 0).

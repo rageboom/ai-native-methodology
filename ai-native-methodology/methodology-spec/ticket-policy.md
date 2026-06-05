@@ -7,40 +7,48 @@
 
 ## 1. 결단 요약
 
-| 항목                 | 결정                                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------------- |
-| Ticket 단위          | **UC = Story** (Plugin 의 UC ID 가 grep-hit 검증된 유일 단위 = Jira Story 의 사용자 가치 단위 정합) |
-| Ticket 생성 시점     | **Chain 1 종료 시점** (discovery-spec.json schema-valid + grep-hit 증거 확보 직후)                  |
-| 상위 단위            | Domain = Epic / 분석 stage 결과 = Initiative                                                        |
-| 하위 단위 (선택)     | Chain stage 4개 = Sub-task                                                                          |
-| BHV / AC / TC / IMPL | **별도 ticket X** — Story 본문에 link / 또는 sub-task acceptance criteria                           |
-| 강제력               | 권고만 / validator 강제 X / `ticket_ref` field optional                                             |
+| 항목                 | 결정                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Ticket 단위          | **UC = Story** (BHV/AC cross-cut 시나리오 anchor)                                                                          |
+| Ticket 생성 시점     | **plan stage(chain 3) gate 통과 직후 단일** — Epic+Story+Task+Sub-task 4-level cascade 일괄 (analysis/discovery/spec = 생성 ❌) |
+| 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** / (선택) Initiative = 대형 분석 결과 묶음                                          |
+| 하위 단위            | **Task = OP-\*** (Story sibling / BE only 운영·인프라·마이그레이션) / **Sub-task = TASK-\*** (1~3 AC 묶음 / layer 분기)     |
+| test / implement     | Sub-task **status 갱신만** (RED / GREEN evidence / 신규 생성 ❌)                                                            |
+| BHV / AC / TC / IMPL | **별도 ticket X** — Story / Sub-task 본문에 link                                                                           |
+| 강제력               | 권고만 / validator 강제 X / `ticket_ref` field optional                                                                    |
 
 ---
 
-## 2. Layer 매핑
+## 2. Layer 매핑 (R20-prime 4-level)
 
 ```
-Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-inventory + antipatterns)
-  └── Epic          ← Domain (car/, payroll/, mainpay/ …)
-        └── Story   ← UC-{도메인}-{번호}
-              └── Sub-task    ← chain1_planning / chain2_spec / chain3_test / chain4_impl
+화면 있는 시나리오:
+  (선택) Initiative   ← 대형 분석 결과 묶음
+    └── Epic          ← FE 화면 단위 (UI screen / route) 또는 BE-domain
+          └── Story   ← UC = BHV/AC cross-cut 시나리오
+                └── Sub-task × N   ← TASK-* (1~3 AC / layer 분기 be/fe/db/e2e/infra)
+
+화면 없는 운영 작업:
+  Task (Story sibling / Epic 부재 가능)   ← OP-* (운영·인프라·마이그레이션/cron/헬스체크/리팩터링)
+    └── Sub-task × N   ← TASK-* (운영 작업 분해)
 ```
+
+모든 level = **plan stage(chain 3) 단일에서 cascade 생성**.
 
 ---
 
-## 3. 시점별 활동 (Plugin chain 진행 동기)
+## 3. 시점별 활동 (R20-prime — ticket = plan stage 단일)
 
-| Stage             | Ticket 활동                                                                                                    |
-| ----------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Analysis 종료** | Initiative 생성 / Domain 별 Epic batch 생성 / Antipattern P0 = Tech Debt Story 별도 생성 (횡단)                |
-| Chain 1 시작      | (Epic 1개 in-progress / 도메인 결정)                                                                           |
-| **Chain 1 종료**  | **discovery-spec.json 의 use_cases[] 각각 = Story 생성** + 각 Story 에 sub-task 4개 batch 생성 (chain1 = done) |
-| Chain 2 종료      | Story 의 chain2 sub-task done / BHV/AC 본문 link 갱신                                                          |
-| Chain 3 종료      | chain3 sub-task done / RED test evidence 첨부                                                                  |
-| Chain 4 종료      | chain4 sub-task done / GREEN evidence 첨부 / **Story close**                                                   |
-| 도메인 전체 종료  | Epic close                                                                                                     |
-| Initiative 종료   | 마이그레이션 완료                                                                                              |
+| Stage              | Ticket 활동                                                                                                       |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| analysis           | 생성 ❌ (산출물 = 이해 / 작업 항목 아님)                                                                          |
+| discovery (chain 1) | 생성 ❌ (UC = 사용자 의도 / cross-cut)                                                                            |
+| spec (chain 2)     | 생성 ❌ (BHV/AC = cross-cut anchor)                                                                               |
+| **plan (chain 3)** | **gate #3 통과 직후 4-level cascade 일괄 생성** — Epic + Story + Task(OP-\*) + Sub-task(TASK-\*) (`task-plan.json` 기반) |
+| test (chain 4)     | Sub-task status=Testing 전이 + RED evidence comment (신규 생성 ❌)                                                |
+| implement (chain 5) | Sub-task status=Done + GREEN evidence + commit_hash / Story=Done 전이 (신규 생성 ❌)                              |
+| 도메인 전체 종료   | Epic close                                                                                                        |
+| (선택) Initiative 종료 | 마이그레이션 완료                                                                                            |
 
 ---
 
@@ -56,17 +64,16 @@ Initiative          ← 분석 stage 산출물 (inventory + architecture + sql-i
 		"platform": "jira",
 		"id": "MIG-1234",
 		"url": "https://company.atlassian.net/browse/MIG-1234",
+		"level": "story",
 		"epic_id": "MIG-1000",
 		"initiative_id": "MIG-1",
-		"subtask_ids": {
-			"chain1_planning": "MIG-1235",
-			"chain2_spec": "MIG-1236",
-			"chain3_test": "MIG-1237",
-			"chain4_impl": "MIG-1238"
-		}
+		"subtask_refs": ["MIG-1235", "MIG-1236"],
+		"op_task_refs": ["MIG-1240"]
 	}
 }
 ```
+
+`level` enum = epic/story/op_task/subtask. `subtask_refs` = TASK-\* / `op_task_refs` = OP-\* (구 `subtask_ids.{chain1_planning..chain4_impl}` 폐기 — R20-prime breaking).
 
 field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 omit (회귀 영향 0).
 
@@ -74,14 +81,15 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 
 ## 5. 권장 ticket summary 형식
 
-| Ticket 유형             | Summary 형식                                                | Description 본문                                                                           |
-| ----------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Initiative              | `[MIG] {프로젝트} legacy → {target stack} 전환`             | analysis 산출물 4종 요약 + R# carry                                                        |
-| Epic                    | `[MIG/{domain}] {도메인} 마이그레이션`                      | inventory / architecture / sql-inventory 의 해당 domain 부분                               |
-| **Story**               | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}` | discovery-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
-| Sub-task                | `chain{N}/{stage_name} — {UC ID}`                           | (e.g., `chain1/planning — UC-CAR-007`)                                                     |
-| Tech Debt Story (AP P0) | `[AP-{cat}] {antipattern.name}`                             | antipatterns.json 의 AP 본문                                                               |
-| Spike (BR)              | `[BR-{도메인}-{이름}] 정책 결단`                            | rules.json BR 본문 + 도메인 전문가 위임                                                    |
+| Ticket 유형 (Jira)      | Summary 형식                                                        | Description 본문                                                                           |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| (선택) Initiative       | `[MIG] {프로젝트} legacy → {target stack} 전환`                     | analysis 산출물 요약 + R# carry                                                            |
+| Epic                    | `[{화면/route 또는 domain}] {Epic 명}`                              | FE 화면(route) 또는 BE-domain 범위                                                         |
+| **Story**               | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}`         | discovery-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
+| Task (OP-\*)            | `[OP-{도메인}-{번호}] {운영 작업}` (category=migration/cron/…)       | 운영·인프라·마이그레이션 작업 (Story sibling / Epic 부재 가능)                             |
+| Sub-task (TASK-\*)      | `[TASK-{도메인}-{번호}] {1~3 AC 요약}` (layer=be/fe/db/e2e/infra)    | 개발 작업 단위 (Story 또는 OP-\* 하위 nested)                                              |
+| Tech Debt Story (AP P0) | `[AP-{cat}] {antipattern.name}`                                     | antipatterns.json 의 AP 본문                                                               |
+| Spike (BR)              | `[BR-{도메인}-{이름}] 정책 결단`                                    | rules.json BR 본문 + 도메인 전문가 위임                                                    |
 
 ---
 
@@ -131,59 +139,38 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 
 ## 10. Tier 2.5 — MCP delegation
 
-R20 — 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임으로 chain stage 동기 ticket lifecycle 자동화. **R16/R17 부활 ❌** — 신규 채널 (별도 charter 요구 신설 R18+ path 정합).
+R20-prime — 사용자 보유 jira-confluence MCP (`mcp__wiki-jira-assistant__*`) 위임으로 **plan stage 단일** ticket lifecycle 자동화. **R16/R17 부활 ❌** — 신규 채널 (charter R20-prime).
 
-### 자동화 행동 — phase × stage matrix
+### 자동화 행동 — plan stage 단일 cascade
 
-chain stage **진입 시점 (`phase=enter`)** + **종료 시점 (`phase=exit`)** 분리. 사용자 의도 "각 단계에서 일감을 따는 부분도 필요" 정합. backward compat = `phase=exit` default.
+ticket 생성 = **plan stage(chain 3) gate 통과 직후 단일 4-level cascade** (구 5-stage × phase=enter/exit matrix 폐기). 운영 sequence SSOT = [`skills/ticket-sync/SKILL.md`](../skills/ticket-sync/SKILL.md) (본 정책 = "무엇/왜" / skill = "언제/어떻게").
 
-#### phase=enter — Stage 진입 시점 의무 작업 Task
+| phase                | stage  | 행동                                                                                                  |
+| -------------------- | ------ | ----------------------------------------------------------------------------------------------------- |
+| `exit` (본 흐름)     | `plan` | gate #3 통과 후 4-level cascade 일괄 — Epic + Story + Task(OP-\*) + Sub-task(TASK-\*) / `task-plan.json` 기반 |
+| `enter` (선택)       | `plan` | plan stage 진입 작업 Task                                                                             |
+| `update-test-red`    | (test) | Sub-task status=Testing + RED evidence comment (신규 생성 ❌)                                         |
+| `update-impl-green`  | (impl) | Sub-task status=Done + GREEN evidence + commit_hash / Story=Done 전이 (신규 생성 ❌)                  |
 
-의미 = "오늘 무엇을 할 지 Jira 에서 가시화" / 작업자가 dashboard 만 봐도 진행 중 작업 알 수 있음.
+analysis/discovery/spec stage = ticket 호출 ❌ (산출물 = "이해" / 작업 항목 아님). 구 stage 별 enter/exit Task 폭증 paradigm 폐기 (ticket 폭발 / "분석 산출물 ≠ 작업 항목" 회피).
 
-| Stage                      | Skill 호출                                                 | MCP 호출                                             | issuetype      | parent        | scope           |
-| -------------------------- | ---------------------------------------------------------- | ---------------------------------------------------- | -------------- | ------------- | --------------- |
-| analysis 진입 시           | `ticket-sync stage=analysis phase=enter`                   | 1 Task ("[Analysis] {scope} 분석 시작")              | Task (default) | Initiative    | 도메인 단위     |
-| Chain 1 (planning) 진입 시 | `ticket-sync stage=planning phase=enter`                   | 1 Task ("[Chain 1] {scope} UC 분해 작업")            | Task (default) | Epic (도메인) | 도메인 단위     |
-| Chain 2 (spec) 진입 시     | `ticket-sync stage=spec phase=enter uc_id=UC-CAR-007`      | 1 Task ("[Chain 2] {scope}/{uc_id} BHV/AC 작성")     | Task (default) | Story (UC)    | **per UC 단위** |
-| Chain 3 (test) 진입 시     | `ticket-sync stage=test phase=enter uc_id=UC-CAR-007`      | 1 Task ("[Chain 3] {scope}/{uc_id} RED test 작성")   | Task (default) | Story (UC)    | **per UC 단위** |
-| Chain 4 (impl) 진입 시     | `ticket-sync stage=implement phase=enter uc_id=UC-CAR-007` | 1 Task ("[Chain 4] {scope}/{uc_id} GREEN impl 작성") | Task (default) | Story (UC)    | **per UC 단위** |
+#### car 도메인 7 UC ticket 수 예시 (R20-prime / plan stage 1회)
 
-issuetype default = `Task` (Jira 기본 / universal). 사용자 환경 결단 시 env override 가능 (Spike / Story 등 선택).
+| 항목                            | 수                                       |
+| ------------------------------- | ---------------------------------------- |
+| Epic (FE 화면 또는 BE-domain)   | 화면 수 의존 (예: ~3~7)                  |
+| Story (UC)                      | 7 (car)                                  |
+| Sub-task (TASK-\* / per Story)  | UC 당 AC 묶음(1~3) × layer 수 의존       |
+| Task (OP-\* / 운영)             | 운영·인프라·마이그레이션 작업 수 의존    |
 
-Stage 진입 시 Task 상태 = `To Do` (생성 직후). 사용자가 작업 시작하면 manual 또는 hook 자동 `In Progress` 전이.
-
-#### phase=exit — Stage 종료 시점 결과 batch
-
-| Stage                      | Skill 호출                                        | MCP 호출                                                                                   |
-| -------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| analysis 종료 후           | `ticket-sync stage=analysis` (default phase=exit) | 1 Initiative + N Epics (per BC) + Tech Debt Story (AP P0) + (enter Task → Done 전이)       |
-| Chain 1 (planning) 종료 후 | `ticket-sync stage=planning`                      | Story per UC-\* + Sub-task 4 batch (chain1 done, chain2/3/4 pending) + (enter Task → Done) |
-| Chain 2 (spec) 종료 후     | `ticket-sync stage=spec`                          | Sub-task chain2 done / BHV/AC link comment / Story → In Progress + (enter Task → Done)     |
-| Chain 3 (test) 종료 후     | `ticket-sync stage=test`                          | RED evidence comment / AC sub-task → Testing + (enter Task → Done)                         |
-| Chain 4 (impl) 종료 후     | `ticket-sync stage=implement`                     | GREEN evidence + commit hash / AC sub-task → Done / Story → Done + (enter Task → Done)     |
-
-phase=exit 시 enter Task 자동 종결 — 즉 진입 Task 가 "오늘 의무 작업" / 종료 시점에 자동 close.
-
-#### car 도메인 7 UC 완주 시 ticket 수 예시
-
-| 항목                                 | 수                                      |
-| ------------------------------------ | --------------------------------------- |
-| Initiative                           | 1                                       |
-| Epic (도메인)                        | 23 (car 포함 / 전체)                    |
-| Story (UC)                           | 7 (car 만)                              |
-| Sub-task (per Story chain 1~4)       | 28 (7 × 4)                              |
-| **Enter Task — analysis**            | 1 (도메인)                              |
-| **Enter Task — planning**            | 1 (도메인)                              |
-| **Enter Task — spec/test/implement** | 21 (per UC × chain 2~4 = 7 × 3)         |
-| **합계 (car 도메인)**                | **82 ticket**                           |
+→ plan stage cascade **1회 생성** (구 5-stage × enter/exit 폭증 → 회피 / agile 정합 = 작업 단위 = Sub-task).
 
 ### Confirmation gate (의무)
 
 모든 MCP 호출 직전 사용자 confirmation:
 
 ```
-Confirm ticket-sync stage=planning scope=car?
+Confirm ticket-sync stage=plan phase=exit scope=car?
    [yes] = real MCP 호출 batch (dry_run=false)
    [no]  = cancel + state 무변경
    [dry-run] = reproduction_command 만 print / MCP 호출 X
@@ -246,24 +233,24 @@ Confirm ticket-sync stage=planning scope=car?
 | -------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | **1. Policy**  | 본 subsection                                                                      | "Sub-task / Story / Epic 의무 parent" 명시                                                                                |
 | **2. Schema**  | `ticket-sync-evidence.schema.json`                                                 | `mcp_invocations[].parent_ticket_id` + `link_type` enum + `ticket_ref.structure_complete` boolean                         |
-| **3. Skill**   | `skills/ticket-sync/SKILL.md`                                                      | phase=exit 각 stage 호출 sequence 에 `parent_ticket_id=` 명시 + analysis phase=exit 끝에 `jira_structure_add_issues` step |
+| **3. Skill**   | `skills/ticket-sync/SKILL.md`                                                      | plan stage phase=exit cascade sequence 에 `parent_ticket_id=` 명시 + cascade 끝에 `jira_structure_add_issues` step |
 | **4. Finding** | `_base-log-finding` skill 또는 ticket-sync skill 인라인 (별 finding-log 도구 부재) | `F-TICKETSYNC-002 missing_parent` emit                                                                                    |
 
 #### Parent 의무 매트릭스
 
 | 생성 ticket 유형                            | parent_ticket_id 의무?                | link_type      | 위반 시                                      |
 | ------------------------------------------- | ------------------------------------- | -------------- | -------------------------------------------- |
-| **Initiative**                              | ❌ omit (최상위)                      | —              | —                                            |
-| **Epic** (도메인)                           | ✅ Initiative id                      | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Epic)     |
+| (선택) **Initiative**                       | ❌ omit (최상위)                      | —              | —                                            |
+| **Epic** (FE 화면 / BE-domain)              | ⚪ Initiative id (선택)               | `parent-child` | — (Initiative 부재 가능)                     |
 | **Story** (UC)                              | ✅ Epic id                            | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Story)    |
-| **Sub-task** (chain N)                      | ✅ Story id                           | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
-| **Enter Task** (phase=enter)                | ✅ 단계별 (Initiative / Epic / Story) | `parent-child` | `F-TICKETSYNC-002 missing_parent` (enter)    |
+| **Sub-task** (TASK-\*)                      | ✅ Story id 또는 OP-\* id             | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
+| **Task** (OP-\* / Story sibling)            | ⚪ Epic id (선택 / Epic 부재 가능)    | `parent-child` | — (운영 작업 / Epic 무관 가능)               |
 | **Tech Debt Story** (AP P0 / cross-cutting) | ⚪ Initiative id (선택)               | `relates-to`   | — (omit 가능)                                |
 | **Spike** (도메인 횡단 BR)                  | ⚪ Story prerequisite (선택)          | `relates-to`   | — (omit 가능)                                |
 
 #### Atlassian Structure 통합
 
-analysis stage phase=exit 끝에 `mcp__wiki-jira-assistant__jira_structure_add_issues` 1회 호출 (Initiative + all Epics + Tech Debt Stories) → Jira dashboard 의 tree view 가시화 → `ticket_ref.structure_tree_url` 채움 + `ticket_ref.structure_complete=true`.
+plan stage cascade(phase=exit) 끝에 `mcp__wiki-jira-assistant__jira_structure_add_issues` 1회 호출 (Epic + Story + Task(OP-\*) + Sub-task(TASK-\*) + (선택) Initiative) → Jira dashboard 의 tree view 가시화 → `ticket_ref.structure_tree_url` 채움 + `ticket_ref.structure_complete=true`.
 
 Atlassian Standard plan = `jira_link` (Epic Link) + tree view plugin (Structure / Advanced Roadmaps) 의 가용성 결단 → 미가용 시 `F-TICKETSYNC-003 structure_unavailable` finding emit + skip (오류 halt X / link 만으로도 hierarchy 의미 보존).
 
@@ -309,6 +296,7 @@ Atlassian Standard plan = `jira_link` (Epic Link) + tree view plugin (Structure 
 
 - 결단: DEC-2026-05-18-ticket-binding-policy (`decisions/DEC-2026-05-18-ticket-binding-policy.md`)
 - R20 / Tier 2.5 MCP delegation 근거: DEC-2026-05-18-r20-mcp-ticket-sync-channel
+- R20-prime (plan stage 단일 4-level cascade / 구 5-stage matrix·subtask_ids{chain*} 폐기 / breaking): DEC-2026-05-26-ticket-plan-단일
 - R16/R17 scope-out 정합: DEC-2026-05-15-g1-itsm-permanent-scope-out
 - ID 명명 규약: `methodology-spec/id-conventions.md` §"Ticket Binding"
 - schema: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref

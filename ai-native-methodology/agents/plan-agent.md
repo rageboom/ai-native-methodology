@@ -107,7 +107,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
 - **본 agent = chain 3 (plan) gate #3 hard gate**
 - **본체 산출 경로** = `.aimd/output/task-plan.json` (discovery-spec.json (discovery 산출) 과 명확히 분리)
-- **lifecycle-contract §Agent column plan row** = 본 agent (traceability-matrix.schema.json subtask_ids.chain3_plan additive 동반)
+- **lifecycle-contract §Agent column plan row** = 본 agent (plan stage = ticket cascade 단일 생성 지점 / `ticket-sync` skill R20-prime 연동)
 
 ## 산출 자산 (chain 3)
 
