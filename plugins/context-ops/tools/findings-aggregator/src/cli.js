@@ -69,12 +69,12 @@ function printUsage() {
 }
 
 // validator runner — workspace tools/<name>/src/cli.js 실행
-function runValidator(validatorName, projectDir) {
+function runValidator(validatorName, projectDir, stage) {
 	const validatorBin = join(WORKSPACE, 'tools', validatorName, 'src', 'cli.js');
 	if (!existsSync(validatorBin)) {
 		return null; // validator 부재 = skipped (aggregator level 기록)
 	}
-	const args = buildValidatorArgs(validatorName, projectDir);
+	const args = buildValidatorArgs(validatorName, projectDir, stage);
 	try {
 		const stdout = execFileSync('node', [validatorBin, ...args], {
 			encoding: 'utf-8',
@@ -90,41 +90,58 @@ function runValidator(validatorName, projectDir) {
 }
 
 // validator 별 인자 매핑 (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)
-export function buildValidatorArgs(validatorName, projectDir) {
+export function buildValidatorArgs(validatorName, projectDir, stage) {
+	const O = (f) => join(projectDir, '.aimd/output', f);
 	switch (validatorName) {
 		case 'discovery-extraction-validator':
 			return [
 				'--discovery',
-				join(projectDir, '.aimd/output/discovery-spec.json'),
+				O('discovery-spec.json'),
 				'--rules',
 				join(projectDir, 'input/business-rules.json'),
 				'--domain',
 				join(projectDir, 'input/domain.json'),
 				'--json',
 			];
+		case 'br-cross-consistency-validator':
+			// F2-followup wiring: br-cross 는 --target <rules.json> 파일을 요구 (이전엔 default '--target <dir>' → errored skip).
+			//   discovery gate 의 BR 원본 = input/business-rules.json (discovery-extraction --rules 와 동일 경로).
+			return ['--target', join(projectDir, 'input/business-rules.json'), '--json'];
 		case 'chain-coverage-validator':
 			return [
 				'--discovery',
-				join(projectDir, '.aimd/output/discovery-spec.json'),
+				O('discovery-spec.json'),
 				'--behavior',
-				join(projectDir, '.aimd/output/behavior-spec.json'),
+				O('behavior-spec.json'),
 				'--acceptance',
-				join(projectDir, '.aimd/output/acceptance-criteria.json'),
+				O('acceptance-criteria.json'),
 				'--json',
 			];
 		case 'schema-validator':
-			// chain 2 자산 정합 검증 (behavior-spec + acceptance-criteria + traceability-matrix)
-			return [
-				join(projectDir, '.aimd/output/behavior-spec.json'),
-				join(projectDir, '.aimd/output/acceptance-criteria.json'),
-				join(projectDir, '.aimd/output/traceability-matrix.json'),
-			];
+			// stage-aware 산출물 검증 (이전엔 stage 무관 chain-2 자산만 → plan/test/implement 에서 잘못된 파일 검증).
+			switch (stage) {
+				case 'discovery':
+					return [O('discovery-spec.json')];
+				case 'plan':
+					return [O('task-plan.json')];
+				case 'test':
+					return [O('test-spec.json')];
+				case 'implement':
+					return [O('impl-spec.json'), O('traceability-matrix.json')];
+				case 'spec':
+				default:
+					// chain 2 자산 정합 (behavior-spec + acceptance-criteria + traceability-matrix)
+					return [O('behavior-spec.json'), O('acceptance-criteria.json'), O('traceability-matrix.json')];
+			}
 		case 'spec-test-link-validator':
+			// --behavior 누락 시 bhv_ref 미해석 → TC 당 false critical (hard block). behavior-spec 동반 필수.
 			return [
 				'--acceptance',
-				join(projectDir, '.aimd/output/acceptance-criteria.json'),
+				O('acceptance-criteria.json'),
 				'--test-spec',
-				join(projectDir, '.aimd/output/test-spec.json'),
+				O('test-spec.json'),
+				'--behavior',
+				O('behavior-spec.json'),
 				'--json',
 			];
 		// F2 fix (dogfood): plan-coverage-validator case 부재 → default '--target' 인자로 호출되어
@@ -278,7 +295,16 @@ function main() {
 		);
 		findings.scenario = scenario ?? 'S1';
 	} else {
-		findings = aggregateForStage(args.stage, args.target, runValidator);
+		// DEC-2026-06-06 후속 — 비-analysis 단계도 fail-closed (failClosedOnNull): required validator 가
+		//   args 미해석/미실행으로 null → silent skip(fail-OPEN) 대신 evidence_missing(soft / --user-decision go 로 ack).
+		//   drift-validator(plugin 자기구조 검사 / 사용자 프로젝트 N/A) · test-impl-pass(CHANNEL B 직접실행) ·
+		//   static-runner(환경 의존 semgrep) 는 정직한 evidence_missing 으로 surface.
+		findings = aggregateForStage(
+			args.stage,
+			args.target,
+			(name, dir) => runValidator(name, dir, args.stage),
+			{ failClosedOnNull: true },
+		);
 	}
 
 	if (args.json) {
