@@ -21,7 +21,8 @@
 
 - codegraph 출력 = **reference-lens**. 결정적 validator(schema / drift / decision-table / spectral / gate-eval / coverage / negative-space) **판정 입력 inject 금지**.
 - 허용 채널 3종: **reading-aid**(최종 evidence=실코드 grep) / **finding**(cycle·leak·orphan, gate blocker 아님) / **coverage-hole**(코드엔 route/method 있는데 산출물 누락).
-- codegraph = **결정적이지만 불완전**(비결정 아님). 강점: Java/Spring route·DI·interface, MyBatis3 mapper, JPA derived query. **사각: iBATIS2 sqlMap=0( 주 타깃 S2!), Java↔SQL 경계, DB table 경계, 런타임 와이어링(Spring XML bean·AOP·reflection DI), 동적 라우팅, FE/TS 미검증.**
+- codegraph = **결정적이지만 불완전**(비결정 아님). **언어 지원=광범위**(tree-sitter 36 파싱 + 18 언어 전용 extractor incl. Python·TS·Go·Rust·C#·Kotlin… + mybatis/vue/svelte extractor / **DEC-2026-06-06-codegraph-probe-4-python-ts 실측**). 강점: 정적 호출 가능한 전 언어의 route·DI·interface·call-graph·import (Java/Spring·MyBatis3·JPA·**Python·TS** 측정 ⭐⭐⭐).
+- **"사각" 재분류 (probe-4 정정 / 약점 아님 = 관심사 분리)**: (a) **스코프 밖** — iBATIS2 sqlMap(마이그레이션 대상 legacy XML) · query→DB-table(DB/ORM 영역=db-schema 담당) = code-graph 도구 책임 아님 (결함 ❌). (b) **언어무관 원리 한계** — 런타임 와이어링(Spring XML bean·AOP·reflection DI·동적 라우팅·Express 미들웨어 dispatch) = 정적 AST 도달 불가 → reference-lens(gate inject ❌)의 근거. (c) ~~FE/TS 미검증~~ → **TS·Python 측정 완료**(probe-4 / "미지원" 아니라 "Java만 probe했던 공백"이었음).
 
 ## 3. 전 산출물 36 × 4-렌즈 (Part A / 그룹 dismiss 없음 / 개별 verdict)
 
