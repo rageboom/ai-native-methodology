@@ -12,7 +12,7 @@ no-simulation 정책 핵심 적용 영역. 진짜 도구 실행 의무.
 
 baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정의 / 7 evidence 필드 / 신뢰도 단계 4·5).
 
-- 본 skill 도구 매핑: Semgrep·ESLint = Tier 1 (in-plugin) / 그 외(PMD·SpotBugs·CodeQL·Daikon·Bandit·Snyk·OSV-Scanner·SonarQube)는 **사용자 환경 실행 가능한 보안 도구 landscape** = Tier 2. 단 **static-runner SARIF import allowlist 현재 = PMD only**(실 import 입증 driver) — 그 외 도구를 import 하려면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 필요(실 import 이력 0 / 실행 못 하는 도구 인용 금지). 아래 stack별 목록 = 도구 존재 안내이지 "방법론이 자동 import" 보장 ❌.
+- 본 skill 도구 매핑: Semgrep·ESLint·**PMD** = Tier 1 (in-plugin 자동실행 / PMD 는 JDK+PMD 설치 시 plugin 직접 실행 / DEC-2026-06-07) / 그 외(SpotBugs·CodeQL·Daikon·Bandit·Snyk·OSV-Scanner·SonarQube)는 **사용자 환경 실행 가능한 보안 도구 landscape** = Tier 2. **static-runner SARIF import allowlist = PMD only**(PMD 는 in-plugin 자동 + import 양쪽 유효 / orthogonal) — 그 외 도구를 import 하려면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 필요(실 import 이력 0 / 실행 못 하는 도구 인용 금지). 아래 stack별 목록 = 도구 존재 안내이지 "방법론이 자동 import" 보장 ❌.
 
 ## 사전 조건
 
@@ -22,8 +22,9 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
 
 1. **stack 별 도구 매핑** (R19 Tier 명시):
    - **Tier 1 — 다중 언어 (in-plugin)**: Semgrep (Python pipx / Java 소스 source-pattern 분석 가능)
+   - **Tier 1 — Java (in-plugin 자동실행)**: PMD 7.x (JDK 8+ / `--plugin pmd` / DEC-2026-06-07 / 부재 시 exit 3)
    - **Tier 2 — 다중 언어 (사용자 환경 SARIF import)**: SonarQube / CodeQL
-   - **Tier 2 — Java (사용자 환경)**: PMD (Java 8 or above) / SpotBugs (JRE 11+) / Checkstyle
+   - **Tier 2 — Java (사용자 환경)**: SpotBugs (JRE 11+) / Checkstyle / PMD(import 경로 / orthogonal)
    - **Tier 1 — JS/TS (in-plugin)**: ESLint security plugin
    - **Tier 2 — JS/TS (사용자 환경)**: Snyk
    - **Tier 2 — Python (사용자 환경)**: Bandit

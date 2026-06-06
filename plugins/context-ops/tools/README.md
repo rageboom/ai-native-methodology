@@ -51,11 +51,12 @@ charter R19 (Tool Ecosystem Dependency Classification) 의 3-tier paradigm:
 | Tier                                  | 도구                                 | wrapper                         | 환경 의무                                                                             |
 | ------------------------------------- | ------------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------- |
 | **1** (in-plugin native)              | Spectral (OpenAPI lint)              | `spectral-runner/`              | npm install 의존 (Node.js)                                                            |
-| **1** (in-plugin native)              | Semgrep (정적 분석 / multi-language) | `static-runner/`                | `pipx install semgrep` / Python 3.10+ / `PYTHONUTF8=1` (Windows 한국어)               |
-| **2** (user-environment SARIF import) | allowlist=PMD (확장은 명시 등재)     | `static-runner/ --import-sarif` | 사용자 CI / 로컬 환경 (Java 8+) — plugin 환경 실행 ❌ / 실 import 이력 0 도구 미등재 |
+| **1** (in-plugin native)              | Semgrep (정적 분석 / multi-language) | `static-runner/ --plugin semgrep` | `pipx install semgrep` / Python 3.10+ / `PYTHONUTF8=1` (Windows 한국어)               |
+| **1** (in-plugin / DEC-2026-06-07)    | PMD (Java 정적 분석)                 | `static-runner/ --plugin pmd`     | PMD 7.x + JDK 8+ (PATH 등재) — 부재 시 exit 3 정직 신호 (자동실행 / poc-06+poc-10 corroboration) |
+| **2** (user-environment SARIF import) | allowlist=PMD (orthogonal / 확장은 명시 등재) | `static-runner/ --import-sarif` | 사용자 CI / 로컬 환경 (Java 8+) — in-plugin 불가 환경의 import 경로 / 실 import 이력 0 도구 미등재 |
 | **3** (simulated)                     | ❌ AI persona / 손작성 SARIF         | —                               | 영구 reject (chain gate -5%p + block)                                                 |
 
-v8.6.0 격하 사유: plugin 배포 환경 (Claude Code / Node.js 기반) 에서 JVM/JDK/Maven/Gradle/bytecode 컴파일 환경 보장 비현실. Tier 2 = SARIF 2.1.0 (OASIS Standard) 결과 import 패턴으로 위임.
+분류 축 = **실행 locus** (DEC-2026-06-07-pmd-tier1-promotion): Tier 1 = plugin 직접 실행(런타임 JVM 의존 무관 — PMD·Gradle·JUnit 포함) / Tier 2 = 사용자 CI SARIF import. PMD 는 양쪽 유효(orthogonal). (구 v8.6.0 = PMD in-plugin 일시 격하 → SARIF import 위임이었으나, poc-06 legacy + poc-10 modern in-plugin auto-run 물증 확보로 Tier 1 재편입. import 경로는 보존.)
 
 ## chain harness gate validator 5종 (chain N = gate #N)
 

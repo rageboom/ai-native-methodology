@@ -10,6 +10,17 @@
 
 ---
 
+## [0.2.0] — 2026-06-07 MINOR — PMD Tier 2(import) → Tier 1(in-plugin 자동실행) 정식 격상 + R19 Tier 축 = "실행 locus" 명문화
+
+PMD 를 R19 Tier 1(plugin in-plugin 자동 실행)으로 편입. 사용자 질문("java 가 있으면 자동으로 되나?")을 계기로 in-plugin PMD 자동 실행을 실측 입증하고, charter R19 의 "JVM 의존 0" 문구가 SSOT(`no-simulation.md` 가 Gradle·JUnit 을 Tier 1 로 둠)와 모순되는 drift 임을 확인 → Tier 분류 축을 **"실행 locus"**(plugin 직접 실행 vs 사용자 CI import)로 명문화. import 경로(allowlist=`['pmd']`)는 **orthogonal 로 보존** — PMD 는 in-plugin 자동 + import 양쪽 유효.
+
+- **코드 (`tools/static-runner/`)**: `runner.js` — `Plugin` 에 `shell` 옵션(Windows `pmd.bat` 대응 / Node 22+ CVE-2024-27980 EINVAL 회피 / default false = Semgrep 무영향) + `versionParse` 콜백(default 첫 줄 / PMD 는 ASCII 배너 회피 semver 추출). `PmdPlugin`(`check -d <dir> -R <ruleset> -f sarif -r <file> --no-progress`) + `PLUGINS.pmd` 등록. `cli.js` — usage/error plugin-aware(`--plugin <semgrep|pmd>` / PMD 환경부재 설치 안내).
+- **물증 (§8.1 2-paradigm corroboration / OpenJDK 25 + PMD 7.25.0)**: poc-06(legacy Spring4.1) Tier1 auto-run **17 findings real_tool** (hash `09ec18ad…` = Tier2 import 와 **동일** = 결정성 입증) + poc-10(modern JPA/QueryDSL) **42 findings real_tool**. legacy+modern distinct paradigm = 단일 PoC 과적합 회피 충족.
+- **doc (Tier 축 명문화 + PMD Tier1)**: `policies/no-simulation.md`(SSOT) · `plugin-charter.md`(R19 L29·R15 L51 "JVM 의존 0" 정정 + L55 allowlist `['pmd']`·`PLUGINS={semgrep,pmd}`) · 루트 `CLAUDE.md` · `lifecycle-contract.md` · `deliverables/{12,21}` · `workflow/formal-spec.md` · 4 skill(`analysis-aspect-static-security`·`analysis-formal-spec-validation`·`implement-generate-impl-spec`·`_base-apply-baseline-ratchet`) · `templates/adoption/CLAUDE.md` · `tools/README.md`.
+- **DEC-2026-06-06-tool-allowlist-pmd-only 관계 = orthogonal (supersede 아님)**: import allowlist `['pmd']` 무변경. 그 결정의 근거("실 import/실행 이력 0 도구 나열 ❌" = no-unrunnable-tool-citation)를 본 격상은 in-plugin 실행 물증(real_tool/duration/hash)으로 **충족**. v8.6.0 에서 import 패턴으로 일시 격하됐던 PmdPlugin 을 물증과 함께 재도입.
+- **R-1 정직성 (과대광고 회피)**: "PMD 항상 자동실행" 아님 — JDK/PMD 부재 시 preflight `PluginEnvironmentMissing` → cli **exit 3**(정직 "환경 부재" 신호 / LLM 추론 대체 ❌ / Semgrep 동형).
+- **검증**: static-runner `npm test` **35/35** green(29→35 / PmdPlugin +6) · live PMD `tool_version='PMD 7.25.0'`(직전 ASCII 배너 ████ 버그 fix) · release-readiness **40/40** · version 3-source sync(plugin.json·package.json·CHANGELOG) 0.2.0. SSOT=`decisions/DEC-2026-06-07-pmd-tier1-promotion.md`.
+
 ## [0.1.0] — 2026-06-06 — 플러그인 rename `ai-native-methodology` → `context-ops` + tool 스코프 `@mis-plugins` 통일 + 버전 스킴 0.x 리셋 (pre-1.0 / 사내 미배포)
 
 플러그인의 **기계 식별자**를 `ai-native-methodology` → `context-ops` 로 변경. 설치 시 `@mis-plugins/context-ops` 로 잡히고 skill 호출이 `context-ops:<skill>` 네임스페이스가 된다(= breaking). 방법론 **개념명 "AI-Native 개발 방법론"** 과 GitHub repo(`SGH-ISD/ai-native-methodology`)는 불변 — 식별자 축만 교체. 동시에 **버전 스킴을 0.x 로 리셋** (pre-1.0 + 사내 미배포 반영 / 이전 12.x 는 maturity 과대 표기). 실 사용자 0(사내 배포 전) → 외부 영향 0.

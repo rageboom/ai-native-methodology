@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 baseline → `methodology-spec/policies/no-simulation.md`.
 
-- 본 skill 도구: Semgrep (Tier 1) / PMD (Tier 2 SARIF import allowlist / 실 import 입증 driver). 환경 부재 시 사용자 환경 준비 또는 CI 위임. (SpotBugs·CodeQL·Daikon·SonarQube 등 실 import 이력 0 도구는 미등재 — 사용자 명시 확장.)
+- 본 skill 도구: Semgrep (Tier 1) / PMD (Tier 1 in-plugin 자동실행 / DEC-2026-06-07 + Tier 2 SARIF import allowlist / orthogonal). 환경(JDK+PMD) 부재 시 exit 3 정직신호 → 사용자 환경 준비 또는 CI 위임. (SpotBugs·CodeQL·Daikon·SonarQube 등 실 import 이력 0 도구는 미등재 — 사용자 명시 확장.)
 
 ## 절차
 
@@ -25,8 +25,8 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - architecture.json 의 module ∈ inventory.json
    - openapi.yaml endpoint ↔ business-rules.json rule 매칭
 2. **진짜 도구 실행** (해당 stack 에 한해 / R19 Tier 명시):
-   - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx)
-   - **Tier 2 (사용자 환경 SARIF import)** — allowlist=PMD (Java 8 or above / 실 import 입증). 그 외 도구는 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장
+   - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx) / PMD (Java / `--plugin pmd` / JDK 8+ / DEC-2026-06-07)
+   - **Tier 2 (사용자 환경 SARIF import)** — allowlist=PMD (orthogonal / in-plugin 불가 환경의 import 경로). 그 외 도구는 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장
    - 환경 부재 시 사용자 위임 명시 (정직 표기 / 시뮬 ❌)
 3. **5단계 신뢰도** — 각 산출물별 신뢰도 평가:
    - 1단계: 사람 작성 / source 없음

@@ -9,8 +9,10 @@
 
 ## 2. R19 Tier 분류
 
-- **Tier 1 (in-plugin 실제 실행)**: Semgrep / ESLint / Spectral / axe-core·Playwright / 테스트 단계 stack runner (Gradle·JUnit / vitest 등). 실 실행 + 5종 물증 의무 → 신뢰 모델 단계 5.
-- **Tier 2 (사용자 환경 SARIF import / plugin 자동 실행 ❌)**: import allowlist = **PMD** (본 환경 실 import 입증 driver). plugin 이 직접 돌리지 않고, 사용자가 자기 CI/환경에서 실행해 SARIF 를 import 할 때만 `evidence_trust=imported_sarif` (`tool_stdout_path=null` 정직 표기). 부재 = environment-dependent carry (날조 ❌). **SpotBugs/CodeQL/Daikon/SonarQube 등 실행·import 이력 0 도구는 "사용 toolset" 으로 나열 ❌** (실행 못 하는 도구 인용 금지 / 사용자가 자기 환경서 쓰면 allowlist 명시 확장 = `static-runner` `IMPORTED_DRIVER_ALLOWLIST`).
+> **분류 축 = 실행 locus**. Tier 1 = **plugin 이 직접 실행**(런타임 JVM 의존 여부 무관 — Gradle·JUnit·PMD 같은 JVM 도구도 plugin 이 직접 돌리면 Tier 1). Tier 2 = **사용자 CI/환경에서 실행한 SARIF 를 import**. 두 축은 orthogonal — 한 도구가 양쪽에 동시에 존재할 수 있다(PMD). (축 명문화 근거 = ## 인용.)
+
+- **Tier 1 (in-plugin 실제 실행)**: Semgrep / ESLint / Spectral / axe-core·Playwright / **PMD** (JDK+PMD 설치 시 plugin 직접 실행 / 2-paradigm 실측 corroboration) / 테스트 단계 stack runner (Gradle·JUnit / vitest 등). 실 실행 + 5종 물증(`evidence_trust=real_tool`) 의무 → 신뢰 모델 단계 5. **환경(도구 바이너리) 부재 시 = preflight `PluginEnvironmentMissing` → cli exit 3 (정직 "환경 부재" 신호 / "항상 자동실행" 아님 / LLM 추론 대체 ❌)**.
+- **Tier 2 (사용자 환경 SARIF import / plugin 자동 실행 ❌)**: import allowlist = **PMD** (본 환경 실 import 입증 driver). 사용자가 자기 CI/환경에서 실행해 SARIF 를 import 할 때 `evidence_trust=imported_sarif` (`tool_stdout_path=null` 정직 표기). PMD 는 **Tier 1(in-plugin 자동) + Tier 2(import) 양쪽 유효** — in-plugin 실행이 불가한 환경에선 import 경로로 흡수. 부재 = environment-dependent carry (날조 ❌). **SpotBugs/CodeQL/Daikon/SonarQube 등 실행·import 이력 0 도구는 "사용 toolset" 으로 나열 ❌** (실행 못 하는 도구 인용 금지 / 사용자가 자기 환경서 쓰면 allowlist 명시 확장 = `static-runner` `IMPORTED_DRIVER_ALLOWLIST`).
 - **Tier 3 (simulated)**: `evidence_trust=simulated` = -5%p + chain gate block + 영구 reject.
 
 ## 3. 7 evidence 필드 contract
@@ -27,3 +29,4 @@
 - R19 근거: `methodology-spec/plugin-charter.md`
 - 결단: DEC-2026-05-18-runtime-tool-exclusion
 - 결단: DEC-2026-06-06-tool-allowlist-pmd-only (Tier 2 import allowlist=PMD 축소 / 실행 이력 0 도구 제거)
+- 결단: DEC-2026-06-07-pmd-tier1-promotion (Tier 분류 축 = 실행 locus 명문화 / PMD Tier 1 in-plugin 자동실행 편입 / import 경로 orthogonal 보존)

@@ -3,10 +3,11 @@
 //
 // v8.6.0 — R19 Tier 1 (Semgrep in-plugin) + Tier 2 (사용자 환경 SARIF import).
 //
-//   Tier 1 사용 (in-plugin Semgrep):
+//   Tier 1 사용 (in-plugin 자동 실행 — Semgrep / PMD):
 //     npx static-runner --plugin semgrep --target <dir> --output <dir>
+//     npx static-runner --plugin pmd --target <dir> --output <dir>   (DEC-2026-06-07-pmd-tier1)
 //
-//   Tier 2 사용 (사용자 환경 PMD 실행 후 SARIF import / allowlist=pmd):
+//   Tier 2 사용 (사용자 환경 PMD 실행 후 SARIF import / allowlist=pmd / orthogonal 보존):
 //     npx static-runner --import-sarif <path> --import-driver pmd --output <dir> \
 //       [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]
 //
@@ -88,7 +89,7 @@ function parseArgs(argv) {
 function usage() {
 	console.error('usage:');
 	console.error(
-		'  static-runner --plugin semgrep --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]',
+		'  static-runner --plugin <semgrep|pmd> --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]',
 	);
 	console.error(
 		'  static-runner --import-sarif <path> --import-driver pmd --output <dir> [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]',
@@ -174,7 +175,7 @@ function main() {
 		const plugin = PLUGINS[pname];
 		if (!plugin) {
 			console.error(
-				`[static-runner] unknown plugin: ${pname} (Tier 1 = semgrep / Tier 2 = --import-sarif)`,
+				`[static-runner] unknown plugin: ${pname} (Tier 1 in-plugin = semgrep,pmd / Tier 2 = --import-sarif)`,
 			);
 			process.exit(2);
 		}
@@ -183,8 +184,14 @@ function main() {
 		} catch (err) {
 			if (err instanceof PluginEnvironmentMissing) {
 				console.error(`[static-runner] ${err.message}`);
+				const installHint =
+					pname === 'pmd'
+						? 'install PMD 7.x + JDK 8+ (https://pmd.github.io) and add to PATH'
+						: pname === 'semgrep'
+							? 'pipx install semgrep'
+							: `install ${pname}`;
 				console.error(
-					`[static-runner] NO SIMULATION — install ${pname} (e.g. pipx install semgrep) or delegate to CI environment.`,
+					`[static-runner] NO SIMULATION — ${installHint} or delegate to CI environment.`,
 				);
 				summary.environment_missing.push({
 					plugin: pname,

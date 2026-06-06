@@ -1,6 +1,8 @@
-// static-runner unit test — Tier 1 (Semgrep preflight) + Tier 2 (importSarif 4 조건 강제).
-// v8.6.0 — R19 Tier 2 import 패턴 추가 / PMDPlugin 제거 (사용자 환경 import 패턴 위임).
-// 본 환경 (Sandbox) Java/Semgrep 부재 가정. preflight 시 PluginEnvironmentMissing throw 정합 확인.
+// static-runner unit test — Tier 1 in-plugin (Semgrep + PMD preflight/args) + Tier 2 (importSarif 4 조건 강제).
+// v0.2.0 — PMDPlugin Tier 1 재도입 (DEC-2026-06-07-pmd-tier1-promotion / 실행 locus 축 / poc-06+poc-10 corroboration).
+//   v8.6.0 에서 import 패턴으로 일시 제거됐던 PMDPlugin 을 in-plugin 자동실행 물증과 함께 재도입.
+//   import 경로(allowlist=['pmd'])는 orthogonal 로 보존.
+// 환경에 도구 부재 시 preflight 가 PluginEnvironmentMissing throw 정합 확인 (도구 설치 환경에서는 성공 경로도 유효).
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
@@ -9,6 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
 	SemgrepPlugin,
+	PmdPlugin,
+	Plugin,
 	PluginEnvironmentMissing,
 	REQUIRED_EVIDENCE,
 	importSarif,
@@ -65,6 +69,67 @@ test('SemgrepPlugin extraRules empty default — no extra --config', () => {
 	});
 	const configCount = args.filter((a) => a === '--config').length;
 	assert.equal(configCount, 1);
+});
+
+// R19 Tier 1 — PmdPlugin in-plugin 자동실행 (DEC-2026-06-07-pmd-tier1)
+
+test('PmdPlugin registered as Tier 1 in-plugin (shell=true / executable=pmd)', () => {
+	assert.equal(PmdPlugin.name, 'pmd');
+	assert.equal(PmdPlugin.executable, 'pmd');
+	// Windows pmd.bat 런처 → shell:true 필수 (CVE-2024-27980 EINVAL 회피)
+	assert.equal(PmdPlugin.shell, true);
+});
+
+test('PmdPlugin args = check -d <dir> -R <ruleset> -f sarif -r <file> --no-progress', () => {
+	const args = PmdPlugin.mandatoryArgs({
+		targetDir: '/src',
+		sarifPath: '/out/pmd.sarif',
+		ruleset: 'rulesets/java/quickstart.xml',
+	});
+	assert.deepEqual(args, [
+		'check',
+		'-d',
+		'/src',
+		'-R',
+		'rulesets/java/quickstart.xml',
+		'-f',
+		'sarif',
+		'-r',
+		'/out/pmd.sarif',
+		'--no-progress',
+	]);
+});
+
+test('PmdPlugin default ruleset = quickstart when omitted', () => {
+	const args = PmdPlugin.mandatoryArgs({
+		targetDir: '/src',
+		sarifPath: '/out/pmd.sarif',
+	});
+	assert.ok(args.includes('rulesets/java/quickstart.xml'));
+});
+
+test('PmdPlugin extraRules emits -R per rule', () => {
+	const args = PmdPlugin.mandatoryArgs({
+		targetDir: '/src',
+		sarifPath: '/out/pmd.sarif',
+		ruleset: 'rulesets/java/quickstart.xml',
+		extraRules: ['custom/a.xml', 'custom/b.xml'],
+	});
+	const rCount = args.filter((a) => a === '-R').length;
+	assert.equal(rCount, 3); // ruleset + 2 extra
+});
+
+test('PmdPlugin versionParse extracts semver from ASCII banner (배너 첫 줄 회피)', () => {
+	// PMD --version 은 ASCII 아트 배너를 먼저 출력 → 첫 줄은 배너. semver 추출 검증.
+	const banner = '  ████   ████\n PMD logo art\nPMD 7.25.0 (418f8b7, 2026-05-29T06:28:38Z)\n';
+	assert.equal(PmdPlugin.versionParse(banner), 'PMD 7.25.0');
+});
+
+test('Plugin default versionParse = first line (Semgrep 동형 / backward-compatible)', () => {
+	const p = new Plugin({ name: 'x', executable: 'x', mandatoryArgs: () => [] });
+	assert.equal(p.versionParse('1.2.3\nextra line'), '1.2.3');
+	// SemgrepPlugin 은 override 없음 → 첫 줄 유지
+	assert.equal(SemgrepPlugin.versionParse('1.99.0\n...'), '1.99.0');
 });
 
 // R19 Tier 2 — importSarif 4 조건 강제 test

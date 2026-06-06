@@ -65,11 +65,26 @@ export class ImportSarifRejected extends Error {
 }
 
 export class Plugin {
-	constructor({ name, executable, mandatoryArgs, versionArgs }) {
+	constructor({
+		name,
+		executable,
+		mandatoryArgs,
+		versionArgs,
+		shell = false,
+		versionParse,
+	}) {
 		this.name = name;
 		this.executable = executable;
 		this.mandatoryArgs = mandatoryArgs;
 		this.versionArgs = versionArgs;
+		// shell=true: Windows .bat/.cmd 런처(PMD pmd.bat 등) 호출 시 필수.
+		//   Node 18.20+/20.12+/22+ 에서 execFileSync('.bat') = EINVAL (CVE-2024-27980) → shell 경유 필요.
+		//   default false → Semgrep(네이티브 실행파일) 등 기존 plugin 무영향 (backward-compatible).
+		this.shell = shell;
+		// versionParse: --version stdout → 버전 문자열 추출 콜백.
+		//   default = 첫 줄(Semgrep 등 첫 줄에 버전 출력하는 도구). PMD 처럼 ASCII 배너를
+		//   먼저 출력하는 도구는 semver 정규식 override 로 정확 추출 (no-simulation 물증 정합).
+		this.versionParse = versionParse ?? ((out) => out.trim().split('\n')[0]);
 	}
 
 	preflight() {
@@ -77,9 +92,9 @@ export class Plugin {
 			const v = execFileSync(
 				this.executable,
 				this.versionArgs ?? ['--version'],
-				{ encoding: 'utf-8', timeout: 10_000 },
+				{ encoding: 'utf-8', timeout: 10_000, shell: this.shell },
 			);
-			return { ok: true, version: v.trim().split('\n')[0] };
+			return { ok: true, version: this.versionParse(v) };
 		} catch (err) {
 			throw new PluginEnvironmentMissing(
 				this.name,
@@ -110,6 +125,7 @@ export class Plugin {
 			stdout = execFileSync(this.executable, args, {
 				encoding: 'utf-8',
 				maxBuffer: 64 * 1024 * 1024,
+				shell: this.shell,
 			});
 		} catch (err) {
 			exitCode = err.status ?? 1;
@@ -166,8 +182,49 @@ export const SemgrepPlugin = new Plugin({
 	],
 });
 
+// PMD in-plugin 자동 실행 (R19 Tier 1 / DEC-2026-06-07-pmd-tier1-promotion).
+//   Tier 1 축 = "실행 locus"(plugin 직접 실행) — JVM 의존 도구(Gradle/JUnit 테스트 러너 동형)도 Tier 1.
+//   전제: PMD 설치 + PATH 등록 + JAVA_HOME(또는 java on PATH). 부재 시 preflight → PluginEnvironmentMissing
+//     → cli exit 3 (정직 "환경 부재" 신호 / no-simulation / Semgrep 동형 — "항상 자동실행" 아님).
+//   Windows pmd.bat 런처 → shell:true 필수. PMD 7.x: check -d <dir> -R <ruleset> -f sarif -r <file>.
+//   exit 4 = 위반 발견(정상) / 5 = recoverable error — runner.run() catch 가 흡수 후 SARIF 해시 진행 (Semgrep 동형).
+//   §8.1 corroboration: poc-06(legacy Spring4.1) + poc-10(modern JPA) in-plugin auto-run 입증 (OpenJDK 25 / PMD 7.25.0).
+//   import 경로(Tier 2 SARIF import allowlist=['pmd'])는 orthogonal 로 보존 — PMD = in-plugin 자동 + 사용자 CI import 양쪽 유효.
+export const PmdPlugin = new Plugin({
+	name: 'pmd',
+	executable: 'pmd',
+	shell: true,
+	versionArgs: ['--version'],
+	// PMD --version 은 ASCII 배너를 먼저 출력 → 첫 줄 = 배너. semver 패턴으로 정확 추출.
+	versionParse: (out) => {
+		const m = out.match(/PMD\s+(\d+\.\d+\.\d+\S*)/) ?? out.match(/\b(\d+\.\d+\.\d+\S*)/);
+		return m ? `PMD ${m[1]}` : out.trim().split('\n').pop();
+	},
+	mandatoryArgs: ({
+		targetDir,
+		sarifPath,
+		ruleset,
+		extraRules = [],
+		extraArgs = [],
+	}) => [
+		'check',
+		'-d',
+		targetDir,
+		'-R',
+		ruleset ?? 'rulesets/java/quickstart.xml',
+		...extraRules.flatMap((r) => ['-R', r]),
+		'-f',
+		'sarif',
+		'-r',
+		sarifPath,
+		'--no-progress',
+		...extraArgs,
+	],
+});
+
 export const PLUGINS = {
 	semgrep: SemgrepPlugin,
+	pmd: PmdPlugin,
 };
 
 // R19 Tier 2 — imported SARIF 결과 흡수 (사용자 CI/환경 위임).

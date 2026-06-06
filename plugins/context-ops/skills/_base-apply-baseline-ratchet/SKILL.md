@@ -22,8 +22,8 @@ Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new
 
 1. **Identify the analysis target** — confirm with user: which legacy codebase / branch / commit ref?
 2. **Run baseline tools** — real external tools, not simulation (R19 Tier 명시):
-   - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint
-   - **Tier 2 (user-environment SARIF import)** — `import-driver` allowlist = **PMD** (Java 8+ / 실 import 입증). 그 외 도구는 실 import 이력 0 → 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 후 → `tools/static-runner --import-sarif <path> --import-driver pmd`
+   - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint / **PMD** (`tools/static-runner --plugin pmd` / JDK 8+ / DEC-2026-06-07 / 부재 시 exit 3)
+   - **Tier 2 (user-environment SARIF import)** — `import-driver` allowlist = **PMD** (orthogonal / in-plugin 불가 환경의 import 경로). 그 외 도구는 실 import 이력 0 → 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 후 → `tools/static-runner --import-sarif <path> --import-driver pmd`
    - Whichever applies to the target language stack
 3. **Capture baseline counts and findings** — write to `<user-project>/.aimd/baseline-<YYYY-MM-DD>.json`:
    ```json

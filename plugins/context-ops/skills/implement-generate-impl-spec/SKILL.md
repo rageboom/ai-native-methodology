@@ -152,7 +152,7 @@ ok=true + fail_count=0 의무. fail 발생 시:
 ### 6. coverage_report_path / linter_output_path 채움
 
 ```bash
-# static-runner R19 Tier 1 (Semgrep in-plugin) + Tier 2 (SARIF import / allowlist=PMD)
+# static-runner R19 Tier 1 in-plugin (Semgrep + PMD / DEC-2026-06-07) + Tier 2 (SARIF import / allowlist=PMD / orthogonal)
 bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
 ```
 
