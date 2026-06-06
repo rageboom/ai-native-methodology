@@ -88,7 +88,11 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 
 5. **finding 즉시 등재** — `_base-log-finding` 으로 5~15 healthy / 20+ suspect 임계 (memory `feedback_finding_threshold.md` 정합)
 
-6. **chain 1 (discovery) gate#1 진입 prep** — analysis 산출물 schema valid 확인 후 main agent 에 보고 + `discovery-agent` dispatch 권고
+6. **analysis exit gate #0 통과** — analysis 산출물 생성 시 각 경로를 `work-unit-manifest.analysis_refs.artifacts` 에 기록. 산출 완료 후 **반드시**:
+   1. `node ${CLAUDE_PLUGIN_ROOT}/tools/findings-aggregator/src/cli.js --target <project> --stage analysis --output <project>/.aimd/output/findings-analysis.json` (필요 validator 결정론 실행 → findings 집계)
+   2. `node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js next <project> --findings <그 findings.json>` (게이트 #0 평가·기록·차단)
+   - findings 없이 next 호출 = fail-closed(`findings_unverified`) 차단. critical/high = hard-block(go 거부). evidence_missing/soft = `--user-decision go` 로 ack 후 전진.
+   - 게이트 통과(discovery 전진) 후 main agent 에 보고 + `discovery-agent` dispatch 권고.
 
 ## paradigm 정합
 

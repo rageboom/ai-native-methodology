@@ -30,7 +30,7 @@ OUTPUT chain (v9.0 6-stage / planning→discovery 개칭 + plan 신설 / DEC-202
 USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 ```
 
-**SDLC 5단계 chain harness** (v10.0.0 / discovery → spec → plan → test → impl / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-21-chain-discovery-plan-stage-도입 + DEC-2026-05-25-axis-a-phase-4-4-prime + ADR-CHAIN-001~012). round-trip = chain harness gate 안에서 정식 허용. harness 외부 자동 코드 생성 ❌. chain N = gate #N 1:1 INTERNAL CONVENTION.
+**SDLC 5단계 chain harness** (v10.0.0 / discovery → spec → plan → test → impl / DEC-2026-05-06-v2.0-i-strict-채택 + DEC-2026-05-21-chain-discovery-plan-stage-도입 + DEC-2026-05-25-axis-a-phase-4-4-prime + ADR-CHAIN-001~012). round-trip = chain harness gate 안에서 정식 허용. harness 외부 자동 코드 생성 ❌. chain N = gate #N 1:1 INTERNAL CONVENTION. analysis = **soft exit gate #0** (DEC-2026-06-06-analysis-exit-gate / opt-in fail-closed / chain-harness 70~80% axis 별개 — findings-aggregator 러너 → chain-driver next).
 
 **70~80% 한계 = 명시 잔존** (**chain harness 전체 자동화 axis** / process 통과율 metric). AI 자동화 ≥ 85% / 사람 검토 (gate #1~#5) ≤ 15% / 100% 자동화 ❌.
 

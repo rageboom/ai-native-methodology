@@ -13,6 +13,8 @@ import {
 	transformTestImplPass,
 	transformGeneric,
 	transformBrCrossConsistency,
+	transformDecisionTable,
+	transformFormalSpecLink,
 	dispatchValidator,
 	aggregateForStage,
 	REQUIRED_VALIDATORS_PER_STAGE,
@@ -453,6 +455,114 @@ describe('aggregateForStage', () => {
 		assert.equal(
 			findings.sources['discovery-extraction-validator'].status,
 			'error',
+		);
+	});
+});
+
+// DEC-2026-06-06-analysis-exit-gate — analysis gate #0 러너 (validator 실행 + transform + fail-closed)
+describe('DEC-2026-06-06-analysis-exit-gate', () => {
+	it('REQUIRED_VALIDATORS_PER_STAGE.analysis = base 4 (gate-eval sync)', () => {
+		assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.analysis, [
+			'schema-validator',
+			'br-cross-consistency-validator',
+			'formal-spec-link-validator',
+			'decision-table-validator',
+		]);
+	});
+
+	it('transformDecisionTable: totals.breaking → critical / non-breaking → medium (RR2 어휘버그 가드)', () => {
+		const f = transformDecisionTable({
+			totals: { breaking: 2, 'non-breaking': 1, info: 3 },
+		});
+		assert.equal(f.critical, 2);
+		assert.equal(f.medium, 1);
+		assert.equal(f.info, 3);
+	});
+
+	it('transformFormalSpecLink: totals.breaking + errors → critical / non-breaking → medium', () => {
+		const f = transformFormalSpecLink({
+			totals: { breaking: 1, errors: 1, 'non-breaking': 2, info: 0 },
+		});
+		assert.equal(f.critical, 2); // breaking 1 + errors 1
+		assert.equal(f.medium, 2);
+	});
+
+	it('dispatchValidator: decision-table/formal-spec-link 전용 transform (generic fallback ❌ / silent pass 차단)', () => {
+		const dt = dispatchValidator(
+			'decision-table-validator',
+			JSON.stringify({ totals: { breaking: 1, 'non-breaking': 0, info: 0 } }),
+		);
+		assert.equal(dt.critical, 1); // generic 이면 0 (summary.critical 부재) — 전용 transform 으로 1
+		const fsl = dispatchValidator(
+			'formal-spec-link-validator',
+			JSON.stringify({ totals: { breaking: 2, 'non-breaking': 0, info: 0 } }),
+		);
+		assert.equal(fsl.critical, 2);
+	});
+
+	it('aggregateForStage(analysis) — base 4 + extraValidators(조건부) 실행', () => {
+		const mockRun = (name) => {
+			if (name === 'schema-validator')
+				return '  valid: 4  invalid: 0  skipped: 0';
+			if (name === 'br-cross-consistency-validator')
+				return JSON.stringify({
+					findings: [],
+					summary: { gate_status: 'pass' },
+				});
+			if (name === 'formal-spec-link-validator')
+				return JSON.stringify({
+					totals: { breaking: 0, 'non-breaking': 0, info: 0 },
+				});
+			if (name === 'decision-table-validator')
+				return JSON.stringify({
+					totals: { breaking: 0, 'non-breaking': 0, info: 0 },
+				});
+			if (name === 'characterization-coverage-validator')
+				return JSON.stringify({ summary: { critical: 0, high: 1, medium: 0 } });
+			if (name === 'sql-inventory-validator')
+				return JSON.stringify({ summary: { critical: 0, high: 0, medium: 0 } });
+			return null;
+		};
+		const findings = aggregateForStage('analysis', '/tmp/poc', mockRun, {
+			extraValidators: [
+				'characterization-coverage-validator',
+				'sql-inventory-validator',
+			],
+		});
+		assert.equal(findings.high, 1); // characterization 1 high
+		assert.equal(Object.keys(findings.sources).length, 6); // base 4 + 조건부 2
+		assert.equal(
+			findings.sources['characterization-coverage-validator'].status,
+			'ok',
+		);
+	});
+
+	it('aggregateForStage(analysis) failClosedOnNull — target 미해석 validator → evidence_missing (fail-closed)', () => {
+		const mockRun = (name) =>
+			name === 'schema-validator' ? '  valid: 2  invalid: 0  skipped: 0' : null;
+		const findings = aggregateForStage('analysis', '/tmp/poc', mockRun, {
+			failClosedOnNull: true,
+		});
+		assert.equal(findings.critical, 0);
+		assert.ok(
+			findings.evidence_missing.includes('br-cross-consistency-validator'),
+			'미해석 validator = evidence_missing',
+		);
+		assert.equal(findings.evidence_missing.length, 3); // br-cross + formal-spec-link + decision-table
+		assert.equal(
+			findings.sources['decision-table-validator'].status,
+			'evidence_missing',
+		);
+	});
+
+	it('aggregateForStage(analysis) failClosedOnNull=false (default) → null = skipped (backward-compat)', () => {
+		const mockRun = (name) =>
+			name === 'schema-validator' ? '  valid: 1  invalid: 0' : null;
+		const findings = aggregateForStage('analysis', '/tmp/poc', mockRun);
+		assert.equal(findings.evidence_missing.length, 0);
+		assert.equal(
+			findings.sources['br-cross-consistency-validator'].status,
+			'skipped',
 		);
 	});
 });

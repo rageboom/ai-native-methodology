@@ -51,6 +51,7 @@ export function getGateForStage(stage) {
 	//   TO-BE (v10.0.0): chain 번호 = gate 번호 1:1 (INTERNAL CONVENTION / DO-178C SOI isomorphic) — plan=#3 / test=#4 / implement=#5
 	//   Senior BLOCKER-2 잔여 본격 해소 + F-CHA-001 trio enforcement plan stage 본격 통합 / widespread breaking.
 	const map = {
+		analysis: '#0',
 		discovery: '#1',
 		spec: '#2',
 		plan: '#3',

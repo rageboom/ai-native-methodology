@@ -106,6 +106,54 @@ describe('gate-eval', () => {
 		assert.equal(r.length, 2);
 	});
 
+	// DEC-2026-06-06-analysis-exit-gate — analysis exit gate #0 (옵션 A fail-closed + soft)
+	it('analysis: requiredValidators(analysis) = base 4 (drift-validator 제외 / 플러그인 구조 검사 아님)', () => {
+		assert.deepEqual(requiredValidators('analysis'), [
+			'schema-validator',
+			'br-cross-consistency-validator',
+			'formal-spec-link-validator',
+			'decision-table-validator',
+		]);
+	});
+
+	it('analysis: critical → hard-block (validator_critical / go 거부)', () => {
+		const r = evaluateGate('analysis', { critical: 1, high: 0 });
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'validator_critical');
+		const final = applyUserDecision(r, 'go');
+		assert.equal(final.blocked, true); // hard-block — go 무시
+		assert.equal(final.user_override_rejected, true);
+	});
+
+	it('analysis: evidence_missing → soft block (rank-3) / go → go-with-warnings (전진)', () => {
+		const r = evaluateGate('analysis', {
+			critical: 0,
+			high: 0,
+			evidence_missing: ['br-cross-consistency-validator'],
+		});
+		assert.equal(r.blocked, true);
+		assert.equal(r.primary_reason, 'evidence_missing');
+		const final = applyUserDecision(r, 'go');
+		assert.equal(final.blocked, false); // soft — go-with-warnings 허용
+		assert.equal(final.decision, 'go-with-warnings');
+	});
+
+	it('analysis: __findings_absent → findings_unverified (fail-closed / 양심 의존 차단)', () => {
+		const r = evaluateGate('analysis', { __findings_absent: true });
+		assert.equal(r.blocked, true);
+		assert.ok(r.reasons.some((x) => x.code === 'findings_unverified'));
+	});
+
+	it('analysis: clean (0 critical/high, no evidence_missing) → go-eligible (discovery 전진 자격)', () => {
+		const r = evaluateGate('analysis', {
+			critical: 0,
+			high: 0,
+			medium: 2,
+			evidence_missing: [],
+		});
+		assert.equal(r.blocked, false);
+	});
+
 	// v2.5.0 Phase C session 14차 — Layer 2 LLM 통합 paradigm test (Q-S1+S2+S3 결단 정합)
 
 	it('v2.5.0 Phase C: llm_status=skipped → block 없음 (backward-compat)', () => {

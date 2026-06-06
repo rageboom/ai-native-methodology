@@ -6,7 +6,7 @@
 //   findings-aggregator --target <project-dir> --stage <discovery|spec|plan|test|implement> [--output <findings.json>] [--dry-run] [--json]
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
@@ -23,6 +23,7 @@ function parseArgs(argv) {
 		target: null,
 		stage: null,
 		output: null,
+		manifest: null,
 		dryRun: false,
 		json: false,
 	};
@@ -32,6 +33,7 @@ function parseArgs(argv) {
 		if (a === '--target') out.target = rest[++i];
 		else if (a === '--stage') out.stage = rest[++i];
 		else if (a === '--output') out.output = rest[++i];
+		else if (a === '--manifest') out.manifest = rest[++i];
 		else if (a === '--dry-run') out.dryRun = true;
 		else if (a === '--json') out.json = true;
 		else if (a === '--help' || a === '-h') {
@@ -49,13 +51,14 @@ function parseArgs(argv) {
 function printUsage() {
 	console.error(
 		[
-			'usage: findings-aggregator --target <project-dir> --stage <discovery|spec|plan|test|implement> [--output <findings.json>] [--dry-run] [--json]',
+			'usage: findings-aggregator --target <project-dir> --stage <analysis|discovery|spec|plan|test|implement> [--manifest <path>] [--output <findings.json>] [--dry-run] [--json]',
 			'',
 			'stage 별 REQUIRED_VALIDATORS_PER_STAGE 실행 → findings JSON 통합 → chain-driver next --findings 입력 정합.',
 			'',
 			'options:',
 			'  --target   PoC 디렉토리 (예: examples/poc-11-efiweb-billing-spring41)',
-			'  --stage    discovery / spec / plan / test / implement (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)',
+			'  --stage    analysis / discovery / spec / plan / test / implement (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)',
+			'  --manifest analysis 전용 — work-unit-manifest.json 경로 (미지정 시 <target>/.aimd/state.json.current_scope 자동 해석). analysis_refs.artifacts 경로 맵 + scenario 사용.',
 			'  --output   findings JSON 저장 경로 (default: <target>/.aimd/output/findings-<stage>.json)',
 			'  --dry-run  파일 저장 ❌ / stdout 만',
 			'  --json     JSON 출력 (default: text)',
@@ -139,6 +142,98 @@ function buildValidatorArgs(validatorName, projectDir) {
 	}
 }
 
+// ── DEC-2026-06-06-analysis-exit-gate — analysis 전용 (manifest 주도 경로 해석 / 결정론 / probe ❌) ──
+
+// manifest.analysis_refs.artifacts + scenario 로드.
+function loadAnalysisRefs(projectDir, explicitManifest) {
+	let manifestPath = explicitManifest ? resolve(explicitManifest) : null;
+	if (!manifestPath) {
+		// <target>/.aimd/state.json.current_scope → <target>/.aimd/<scope>/manifest.json
+		try {
+			const statePath = join(projectDir, '.aimd', 'state.json');
+			if (existsSync(statePath)) {
+				const state = JSON.parse(readFileSync(statePath, 'utf-8'));
+				if (state.current_scope) {
+					const p = join(
+						projectDir,
+						'.aimd',
+						state.current_scope,
+						'manifest.json',
+					);
+					if (existsSync(p)) manifestPath = p;
+				}
+			}
+		} catch {
+			/* fall through → 빈 artifacts → fail-closed */
+		}
+	}
+	if (!manifestPath || !existsSync(manifestPath))
+		return { artifacts: {}, scenario: null };
+	try {
+		const m = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+		return {
+			artifacts: m.analysis_refs?.artifacts ?? {},
+			scenario: m.scenario ?? null,
+		};
+	} catch {
+		return { artifacts: {}, scenario: null };
+	}
+}
+
+// analysis validator 별 인자 = manifest artifacts 경로 resolve. 미해석/파일부재 → null (aggregator failClosedOnNull → evidence_missing).
+function buildAnalysisArgs(validatorName, projectDir, artifacts) {
+	const abs = (rel) => (rel ? resolve(projectDir, rel) : null);
+	const ok = (p) => p && existsSync(p);
+	switch (validatorName) {
+		case 'schema-validator': {
+			const dir = abs(artifacts['analysis-output-dir']);
+			return ok(dir) ? [dir] : null; // stdout text (no --json / transformSchemaValidator)
+		}
+		case 'br-cross-consistency-validator': {
+			const f = abs(artifacts['business-rules'] ?? artifacts['rules']);
+			return ok(f) ? ['--target', f, '--json'] : null;
+		}
+		case 'formal-spec-link-validator': {
+			const dir = abs(artifacts['analysis-output-dir']);
+			return ok(dir) ? [dir, '--mode=both', '--json'] : null;
+		}
+		case 'decision-table-validator': {
+			const t = abs(artifacts['decision-tables']);
+			return ok(t) ? [t, '--json'] : null;
+		}
+		case 'characterization-coverage-validator': {
+			const f = abs(artifacts['characterization-spec']);
+			const dir = ok(f) ? dirname(f) : abs(artifacts['characterization-dir']);
+			return ok(dir) ? ['--target', dir, '--json'] : null;
+		}
+		case 'sql-inventory-validator': {
+			const f = abs(artifacts['sql-inventory']);
+			const dir = ok(f) ? dirname(f) : abs(artifacts['sql-inventory-dir']);
+			return ok(dir) ? ['--target', dir, '--json'] : null;
+		}
+		default:
+			return null;
+	}
+}
+
+// analysis runValidator — buildAnalysisArgs 로 args 해석 (null=미해석 → evidence_missing).
+function runValidatorAnalysis(validatorName, projectDir, artifacts) {
+	const validatorBin = join(WORKSPACE, 'tools', validatorName, 'src', 'cli.js');
+	if (!existsSync(validatorBin)) return null;
+	const args = buildAnalysisArgs(validatorName, projectDir, artifacts);
+	if (args == null) return null; // 경로 미해석/파일부재 → fail-closed evidence_missing
+	try {
+		return execFileSync('node', [validatorBin, ...args], {
+			encoding: 'utf-8',
+			stdio: ['ignore', 'pipe', 'pipe'],
+			maxBuffer: 32 * 1024 * 1024,
+		});
+	} catch (err) {
+		if (err.stdout) return err.stdout.toString();
+		return null;
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target || !args.stage) {
@@ -148,11 +243,33 @@ function main() {
 	}
 	if (!REQUIRED_VALIDATORS_PER_STAGE[args.stage]) {
 		console.error(`error: unknown stage ${args.stage}`);
-		console.error(`  expected: discovery / spec / plan / test / implement`);
+		console.error(
+			`  expected: analysis / discovery / spec / plan / test / implement`,
+		);
 		process.exit(2);
 	}
 
-	const findings = aggregateForStage(args.stage, args.target, runValidator);
+	// DEC-2026-06-06-analysis-exit-gate — analysis 는 manifest.analysis_refs.artifacts 로 경로 결정론 해석 + 조건부 validator(scenario/RDB) + fail-closed(null=evidence_missing).
+	let findings;
+	if (args.stage === 'analysis') {
+		const { artifacts, scenario } = loadAnalysisRefs(args.target, args.manifest);
+		const extraValidators = [];
+		if (scenario === 'S2' || scenario === 'S3')
+			extraValidators.push('characterization-coverage-validator');
+		if (artifacts['sql-inventory'])
+			extraValidators.push('sql-inventory-validator');
+		const runAnalysisValidator = (name, projectDir) =>
+			runValidatorAnalysis(name, projectDir, artifacts);
+		findings = aggregateForStage(
+			'analysis',
+			args.target,
+			runAnalysisValidator,
+			{ extraValidators, failClosedOnNull: true },
+		);
+		findings.scenario = scenario ?? 'S1';
+	} else {
+		findings = aggregateForStage(args.stage, args.target, runValidator);
+	}
 
 	if (args.json) {
 		process.stdout.write(JSON.stringify(findings, null, 2) + '\n');

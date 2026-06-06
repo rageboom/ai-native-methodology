@@ -45,13 +45,13 @@ describe('stage-graph', () => {
 		assert.equal(previousStage('analysis'), null);
 	});
 
-	it('v10.0.0 MAJOR: getGateForStage maps discovery..implement to #1..#5 (chain 번호 = gate 번호 1:1 / Phase 4-4 prime)', () => {
+	it('v10.0.0 MAJOR: getGateForStage maps analysis..implement to #0..#5 (chain 번호 = gate 번호 1:1 / Phase 4-4 prime / analysis=#0 DEC-2026-06-06-analysis-exit-gate)', () => {
+		assert.equal(getGateForStage('analysis'), '#0');
 		assert.equal(getGateForStage('discovery'), '#1');
 		assert.equal(getGateForStage('spec'), '#2');
 		assert.equal(getGateForStage('plan'), '#3');
 		assert.equal(getGateForStage('test'), '#4');
 		assert.equal(getGateForStage('implement'), '#5');
-		assert.equal(getGateForStage('analysis'), null);
 	});
 
 	// v10.0.0 MAJOR — plan gate 본격 번호 부여 (v9.3.0 '#plan' string placeholder 폐기)

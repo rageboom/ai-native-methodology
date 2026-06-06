@@ -15,6 +15,15 @@
 // }
 
 const REQUIRED_VALIDATORS_PER_STAGE = {
+	// analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) — analysis 산출물(사용자 프로젝트) 결정론 validator base set.
+	//   drift-validator 제외: 그건 플러그인 자체 구조(flows↔skills↔manifest) 검사지 사용자 analysis 산출물 검사가 아님 (CI drift-check + spec gate chain-mode 가 owner).
+	//   조건부(characterization-coverage[S2/S3] · sql-inventory[RDB])는 caller(findings-aggregator)가 배열 밖에서 추가 (sdlc gates[#0].conditional_validators allowlist 정합).
+	analysis: [
+		'schema-validator',
+		'br-cross-consistency-validator',
+		'formal-spec-link-validator',
+		'decision-table-validator',
+	],
 	// v9.0 — planning→discovery 개칭 (gate #1). v11.0.0 — tool rename planning-extraction-validator → discovery-extraction-validator (DEC-2026-05-26-discovery-spec-rename). v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2).
 	discovery: [
 		'discovery-extraction-validator',

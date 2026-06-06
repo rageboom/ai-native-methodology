@@ -286,8 +286,9 @@ function cmdNext(args) {
 	}
 	if (state.blocked) blockedExit(state, root);
 
-	const stage =
-		state.current_chain === 'analysis' ? 'discovery' : state.current_chain;
+	// DEC-2026-06-06-analysis-exit-gate — analysis 자체 gate(#0) 평가. 구: analysis→'discovery' 매핑이
+	//   gate 를 discovery(#1)로 평가 + nextStage('discovery')='spec' 로 discovery 를 스킵하던 latent 버그 → analysis→discovery 정상 전이로 교정.
+	const stage = state.current_chain;
 	const findings = loadFindings(args.findingsPath);
 	// v11.9.0 — use-scenario taxonomy: scope manifest.scenario → gate matrix (미지정 → 'S1' default / backward-compat).
 	let scenario;
@@ -298,11 +299,7 @@ function cmdNext(args) {
 	} catch {
 		scenario = undefined;
 	}
-	const gateResult = evaluateGate(
-		stage === 'analysis' ? 'discovery' : stage,
-		findings,
-		scenario,
-	);
+	const gateResult = evaluateGate(stage, findings, scenario);
 	const finalDecision = applyUserDecision(gateResult, args.userDecision);
 
 	if (args.dryRun) {

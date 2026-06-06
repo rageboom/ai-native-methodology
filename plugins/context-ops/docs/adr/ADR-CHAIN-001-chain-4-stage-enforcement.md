@@ -58,6 +58,7 @@ ADR-008 v2 §10 (chain 단계 확장) 으로 동반 격상.
 - ADR-CHAIN-002 (go/stop gate UX) 정합
 - Auto Mode 위임 가능 — 단 결단 trace logged 의무 (intervention_log)
 - gate_5_intervention_pct ≤ 0.30 ( 70~80% 한계 명시 잔존 / master plan §J.2 옵션 A / v10.0.0 gate_4 → gate_5 재번호)
+- **analysis exit gate #0** (DEC-2026-06-06-analysis-exit-gate / 본 §5 의 chain hard gate #1~#5 와 별개) — analysis→discovery 경계 soft·opt-in fail-closed gate. ADR-CHAIN-005 §3 mechanical gate trio 재사용 + 옵션 A (caller 가 validator 실행 → findings 공급). chain-harness 자동화 axis 미포함 (§3-A 별개).
 
 ### 6. revisit loop 자동 감지 → 사용자 결단 의무
 

@@ -76,10 +76,11 @@ agent 자산이 \_base 3종만 인 사실 = chain stage 영역의 sub-agent invo
 - [`skills-axis.md`](./skills-axis.md) — skills 영역 axis 사상 명세 (category prefix paradigm 정합)
 - [`lifecycle-contract.md`](./lifecycle-contract.md) — SDLC stage 간 data contract
 - [`../README.md`](../README.md) — plugin user 진입점 (시나리오 A/B/C)
-- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (6 stage / stages + revisit_edges + 5 gate / chain N = gate #N 1:1 INTERNAL CONVENTION)
+- [`../flows/sdlc-4stage-flow.json`](../flows/sdlc-4stage-flow.json) — chain harness master SSOT (6 stage / stages + revisit_edges + 6 gate [#0 analysis soft exit + #1~#5 chain hard] / chain N = gate #N 1:1 INTERNAL CONVENTION)
 
 ## 인용
 
 - 결단: DEC-2026-05-14-agents-skills-1-depth-flatten (agents/skills 1-depth flatten paradigm)
+- 결단: DEC-2026-06-06-analysis-exit-gate (analysis soft exit gate #0 / sdlc 6 gate)
 - ADR: ADR-CHAIN-001~005 (chain harness 5 요소 enforcement)
 - ADR: ADR-CHAIN-011 §9 (1-depth vs lifecycle organize 충돌 해소)

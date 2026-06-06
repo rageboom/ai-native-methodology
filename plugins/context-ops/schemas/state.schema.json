@@ -61,13 +61,13 @@
           "properties": {
             "id": {
               "type": "string",
-              "enum": ["#1", "#2", "#3", "#4", "#5"],
-              "description": "ADR-CHAIN-002 gate ID — v10.0.0 MAJOR (Phase 4-4') gate 번호 재정렬 (chain 번호 = gate 번호 1:1 INTERNAL CONVENTION). discovery=#1 / spec=#2 / plan=#3 / test=#4 / implement=#5."
+              "enum": ["#0", "#1", "#2", "#3", "#4", "#5"],
+              "description": "ADR-CHAIN-002 gate ID — v10.0.0 MAJOR (Phase 4-4') gate 번호 재정렬 (chain 번호 = gate 번호 1:1 INTERNAL CONVENTION). analysis=#0 (DEC-2026-06-06-analysis-exit-gate / pre-chain exit gate) / discovery=#1 / spec=#2 / plan=#3 / test=#4 / implement=#5."
             },
             "stage": {
               "type": "string",
-              "enum": ["discovery", "spec", "plan", "test", "implement"],
-              "description": "v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — gate #1~#5 = discovery/spec/plan/test/implement. plan stage 본격 hard gate 진입 (v9.3.0 placeholder '#plan' 폐기 + v10.0.0 '#3' 본격)."
+              "enum": ["analysis", "discovery", "spec", "plan", "test", "implement"],
+              "description": "v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — gate #1~#5 = discovery/spec/plan/test/implement. analysis=#0 (DEC-2026-06-06-analysis-exit-gate / pre-chain exit gate). plan stage 본격 hard gate 진입 (v9.3.0 placeholder '#plan' 폐기 + v10.0.0 '#3' 본격)."
             },
             "decision": {
               "type": "string",
@@ -141,7 +141,10 @@
           "enum": [
             "validator_critical",
             "validator_high",
+            "s2_outcome_mismatch",
             "coverage_threshold",
+            "layer2_threshold",
+            "findings_unverified",
             "evidence_missing",
             "schema_migration_required",
             "state_corrupt",

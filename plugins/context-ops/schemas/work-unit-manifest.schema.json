@@ -73,6 +73,11 @@
       "additionalProperties": false,
       "description": "scope manifest 의 canonical global 9 이식성 산출물 역인덱스 (5 + DB 자산 4 / v11.3.0 신설 — DEC-2026-05-28-db-assets-always-on / ADR-CHAIN-014) — 이 scope 와 관련된 BR / endpoint / table / domain entity / antipattern + DB tables / SP / functions / views.",
       "properties": {
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "v12.17.0 (DEC-2026-06-06-analysis-exit-gate) — analysis 산출물명 → repo-relative 경로 맵 (결정론 경로 해석 / probe ❌). 키 예: analysis-output-dir / business-rules / decision-tables / characterization-spec / sql-inventory / api-extension / antipatterns / domain. findings-aggregator --stage analysis 가 이 맵으로 validator 대상 경로 resolve (gate #0). 'sql-inventory' 키 존재 = RDB 트랙 (조건부 validator 발동)."
+        },
         "rules":        { "type": "array", "items": { "type": "string" } },
         "endpoints":    { "type": "array", "items": { "type": "string" } },
         "schemas":      { "type": "array", "items": { "type": "string" } },

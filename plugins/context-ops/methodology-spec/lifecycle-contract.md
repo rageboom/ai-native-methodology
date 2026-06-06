@@ -28,8 +28,8 @@ USE: AI 자동 생성 + 사용자 검토 (i-strict) / prod 시스템 + traceabil
 
 ```
 분석 (analysis)  →  발견 (discovery)  →  스펙 (spec)  →  계획 (plan)  →  테스트 (test)  →  구현 (implement)
-   chain 진입 전     chain 1            chain 2         chain 3         chain 4         chain 5
-   (단방향 추출)     gate #1            gate #2         gate #3         gate #4         gate #5
+   chain 0 (단방향추출)  chain 1          chain 2         chain 3         chain 4         chain 5
+   gate #0 (soft)       gate #1          gate #2         gate #3         gate #4         gate #5
 ```
 
 design stage = carry (1차 = analysis 자산 deliverable 7~9 reuse / sub-plan 분할 정책 정합).
@@ -194,7 +194,7 @@ input (plan stage 가 받음):
 - 운영 정책: task granularity 1~3 AC 묶음 / ADR 5 자동 판정 기준 / NFR hard gate / risk 3중 망 / estimation_ai+estimation_human 분리
 - **contract 강제 양 axis**: BE task (`layer=='be'`) = `openapi_endpoint_ref` (swagger operationId 연결) 의무 / FE task (`layer=='fe'`) = `component_ref` + state-map + visual-manifest + DTCG token 연결 의무. task-plan.schema.json if/then 강제 / plan-coverage-validator BE↔FE 1:1 matching 검증.
 
-plan hard gate = **gate #3 활성** (gate #1~#5 = discovery/spec/plan/test/implement / chain N = gate #N 1:1 / `plan-coverage-validator` NFR allocation hard gate).
+plan hard gate = **gate #3 활성** (gate #1~#5 = discovery/spec/plan/test/implement / chain N = gate #N 1:1 / analysis = soft exit gate #0 [opt-in fail-closed / §3-A axis 별개] / `plan-coverage-validator` NFR allocation hard gate).
 
 ### chain 4 (테스트) — test stage
 
@@ -416,6 +416,7 @@ master plan `~/.claude/plans/a-stateful-gadget.md` §H sequencing 정합:
 ## 인용
 
 - 결단: DEC-2026-05-06-v2.0-i-strict-채택 (round-trip 부분 허용 / §가치 경계 충돌 deferral resolve)
+- 결단: DEC-2026-06-06-analysis-exit-gate (analysis soft exit gate #0 / SEED-1 partially-reversed)
 - 결단: DEC-2026-05-06-round-trip-부분-허용 (DEC-2026-04-29-round-trip-스코프-아웃 partial retract / 4 항목 중 2 retract)
 - 결단: DEC-2026-05-21-chain-discovery-plan-stage-도입 (discovery 개칭 + plan stage 도입)
 - 결단: DEC-2026-05-23-discovery-stage-v9

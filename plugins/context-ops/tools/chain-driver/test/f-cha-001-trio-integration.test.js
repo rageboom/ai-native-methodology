@@ -202,7 +202,7 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 	// ──────────────────────────────────────────────────────────────
 	it('시나리오 5 gate id enum 정합: stage-graph.getGateForStage = state.schema.json gate.id enum', () => {
 		// stage-graph 의 모든 chain stage 의 gate id collect
-		const stages = getStageOrder().filter((s) => s !== 'analysis'); // analysis = gate null
+		const stages = getStageOrder(); // analysis = gate #0 (DEC-2026-06-06-analysis-exit-gate) — 전 stage 가 gate id 보유 (필터 제외 ❌)
 		const fromStageGraph = new Set(
 			stages.map((s) => getGateForStage(s)).filter(Boolean),
 		);
@@ -234,8 +234,8 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 		// v10.0.0 기대값 명시 — chain N = gate #N 1:1 INTERNAL CONVENTION
 		assert.deepEqual(
 			[...fromStageGraph].sort(),
-			['#1', '#2', '#3', '#4', '#5'],
-			'v10.0.0 gate enum = #1~#5',
+			['#0', '#1', '#2', '#3', '#4', '#5'],
+			'analysis=#0 (DEC-2026-06-06-analysis-exit-gate) + chain N=gate #N (#1~#5)',
 		);
 	});
 

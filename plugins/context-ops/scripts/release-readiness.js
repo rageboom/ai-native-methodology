@@ -1584,7 +1584,7 @@ function check26_gateValidatorListConsistency() {
 				.replace(/\s*\([^)]*\)\s*/g, ' ')
 				.replace(/\s*--\S+.*$/, '')
 				.trim();
-		const STAGES = ['discovery', 'spec', 'plan', 'test', 'implement'];
+		const STAGES = ['analysis', 'discovery', 'spec', 'plan', 'test', 'implement'];
 
 		// gate-eval REQUIRED_VALIDATORS_PER_STAGE (코드 SSOT / regex-extract — check18 패턴)
 		const geSrc = readFileSync(

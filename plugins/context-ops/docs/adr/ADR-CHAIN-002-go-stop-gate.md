@@ -22,6 +22,8 @@ UX 결정 영역:
 
 **5 gate UX 정책** 명문화 ( v10.0.0):
 
+> analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) 도 동일 go/stop 결단 메커니즘(applyUserDecision / trio) 재사용 — 단 **soft** (critical/high 만 hard-block / 나머지 evidence_missing·findings_unverified 는 `--user-decision go` 로 ack). 본 §의 #1~#5 = chain hard gate.
+
 ### 1. gate #1~#5 prompt 형식
 
 각 gate 종결 시 사용자에게 다음 정보 제시:

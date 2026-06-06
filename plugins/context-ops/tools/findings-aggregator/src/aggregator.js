@@ -9,6 +9,14 @@ import { resolve } from 'node:path';
 
 // chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합 (v2.4.0 br-cross-consistency-validator 추가 / v11.0.0 discovery rename)
 export const REQUIRED_VALIDATORS_PER_STAGE = {
+	// analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) — base 4 (gate-eval REQUIRED.analysis 와 sync 의무).
+	//   조건부(characterization-coverage[S2/S3] · sql-inventory[RDB])는 cli 가 opts.extraValidators 로 추가 (sdlc gates[#0].conditional_validators allowlist 정합).
+	analysis: [
+		'schema-validator',
+		'br-cross-consistency-validator',
+		'formal-spec-link-validator',
+		'decision-table-validator',
+	],
 	discovery: [
 		'discovery-extraction-validator',
 		'schema-validator',
@@ -149,6 +157,31 @@ export function transformGeneric(json) {
 	};
 }
 
+// decision-table-validator / formal-spec-link-validator JSON → findings 변환 (DEC-2026-06-06-analysis-exit-gate / RR2 어휘버그 해소)
+//   이 두 validator 는 summary.{critical,high} 가 없고 totals.{breaking,non-breaking,info} 를 emit → generic transform 이 항상 0 critical (silent pass) 였음.
+//   breaking → critical, non-breaking → medium 매핑 (analysis gate #0 가 실효 차단). summary fallback 도 관용.
+export function transformDecisionTable(json) {
+	const t = json.totals ?? json.summary ?? {};
+	return {
+		critical: t.breaking ?? t.critical ?? 0,
+		high: t.high ?? 0,
+		medium: t['non-breaking'] ?? t.non_breaking ?? t.medium ?? 0,
+		low: t.low ?? 0,
+		info: t.info ?? 0,
+	};
+}
+
+export function transformFormalSpecLink(json) {
+	const t = json.totals ?? json.summary ?? {};
+	return {
+		critical: (t.breaking ?? 0) + (t.errors ?? 0) + (t.critical ?? 0),
+		high: t.high ?? 0,
+		medium: t['non-breaking'] ?? t.non_breaking ?? t.medium ?? 0,
+		low: t.low ?? 0,
+		info: t.info ?? 0,
+	};
+}
+
 // v2.4.0 — br-cross-consistency-validator JSON → findings 변환 (ADR-CHAIN-011 §5.6)
 // 출력 shape:
 // { stats: { total, with_natural_language, with_gwt, with_both, with_finding },
@@ -222,6 +255,10 @@ export function dispatchValidator(validatorName, output) {
 			return transformTestImplPass(JSON.parse(output));
 		case 'br-cross-consistency-validator':
 			return transformBrCrossConsistency(JSON.parse(output));
+		case 'decision-table-validator':
+			return transformDecisionTable(JSON.parse(output));
+		case 'formal-spec-link-validator':
+			return transformFormalSpecLink(JSON.parse(output));
 		default:
 			// generic JSON fallback (drift / formal-spec-link / spec-test-link / static-runner / traceability-matrix-builder)
 			try {
@@ -234,13 +271,19 @@ export function dispatchValidator(validatorName, output) {
 
 // aggregate — stage 별 validator 실행 + findings 통합 / external runner 의존 (DI 의무 / unit test 정합)
 // runValidator: (validatorName, projectDir) => stdout|null
-export function aggregateForStage(stage, projectDir, runValidator) {
-	const validators = REQUIRED_VALIDATORS_PER_STAGE[stage];
-	if (!validators) {
+export function aggregateForStage(stage, projectDir, runValidator, opts = {}) {
+	const base = REQUIRED_VALIDATORS_PER_STAGE[stage];
+	if (!base) {
 		throw new Error(
-			`unknown stage: ${stage} (expected: discovery / spec / plan / test / implement)`,
+			`unknown stage: ${stage} (expected: analysis / discovery / spec / plan / test / implement)`,
 		);
 	}
+	// DEC-2026-06-06-analysis-exit-gate — opts.extraValidators(조건부) 추가 + opts.failClosedOnNull(analysis fail-closed: null=evidence_missing).
+	const extraValidators = Array.isArray(opts.extraValidators)
+		? opts.extraValidators
+		: [];
+	const failClosedOnNull = opts.failClosedOnNull === true;
+	const validators = [...base, ...extraValidators];
 
 	let findings = emptyFindings();
 	const sources = {};
@@ -248,10 +291,20 @@ export function aggregateForStage(stage, projectDir, runValidator) {
 	for (const validatorName of validators) {
 		const output = runValidator(validatorName, projectDir);
 		if (output == null) {
-			sources[validatorName] = {
-				status: 'skipped',
-				reason: 'validator unavailable or N/A',
-			};
+			if (failClosedOnNull) {
+				// analysis gate #0 fail-closed — required validator 가 target(산출물) 미해석(manifest 미등재/파일부재) 또는 미실행 = 증거 부재 → evidence_missing (gate-eval rank-3 block / soft / --user-decision go 로 ack 가능).
+				if (!findings.evidence_missing.includes(validatorName))
+					findings.evidence_missing.push(validatorName);
+				sources[validatorName] = {
+					status: 'evidence_missing',
+					reason: 'target 미해석(manifest.analysis_refs.artifacts 미등재/파일부재) 또는 validator 미실행',
+				};
+			} else {
+				sources[validatorName] = {
+					status: 'skipped',
+					reason: 'validator unavailable or N/A',
+				};
+			}
 			continue;
 		}
 		try {
