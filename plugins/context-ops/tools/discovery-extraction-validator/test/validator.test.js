@@ -292,4 +292,32 @@ describe('discovery-extraction-validator', () => {
       assert.ok(r.summary.medium >= 1, 'cross_links.empty (medium) counted in summary');
     });
   });
+
+  // F1 fix (poc-18 dogfood): domain.schema 는 use_cases/entities 를 bounded_contexts[] 아래 중첩.
+  //   이전엔 top-level analysis.domain.use_cases 만 읽어 schema-conformant domain.json 에서 coverage 가 silent skip(vacuous pass) 됐음.
+  describe('F1 — nested bounded_contexts use_cases coverage (dogfood)', () => {
+    const mkDiscoveryUC = (ids) => ids.map((id) => ({ id, source_grounded_evidence: [`src/${id}.ts:1`] }));
+    const nestedDomain = { domain: { bounded_contexts: [{ id: 'BC-CONTENT', use_cases: [{ id: 'UC-POST-001' }, { id: 'UC-POST-002' }] }] } };
+    it('computes UC coverage from bounded_contexts[].use_cases (was silently skipped)', () => {
+      const discovery = { use_cases: mkDiscoveryUC(['UC-POST-001']), business_rules_intent: [], cross_links: { to_analysis_artifacts: ['x'] } };
+      const r = validateDiscoveryExtraction(discovery, nestedDomain);
+      assert.equal(r.coverage.use_case, 0.5, 'nested UC set (2) vs discovery (1) = 0.5 — no longer vacuous 1.0');
+      assert.ok(
+        r.findings.some((x) => x.kind === 'discovery.uc_coverage.below_threshold'),
+        'below-0.80 nested coverage now blocks (was fail-OPEN)'
+      );
+    });
+    it('full nested coverage passes (no uc_coverage finding)', () => {
+      const discovery = { use_cases: mkDiscoveryUC(['UC-POST-001', 'UC-POST-002']), business_rules_intent: [], cross_links: { to_analysis_artifacts: ['x'] } };
+      const r = validateDiscoveryExtraction(discovery, nestedDomain);
+      assert.equal(r.coverage.use_case, 1.0);
+      assert.ok(!r.findings.some((x) => x.kind === 'discovery.uc_coverage.below_threshold'));
+    });
+    it('under_decomposition fires for nested entities (UC/entity < 1.5)', () => {
+      const discovery = { use_cases: mkDiscoveryUC(['UC-POST-001']), cross_links: { to_analysis_artifacts: ['x'] } };
+      const domain = { domain: { bounded_contexts: [{ id: 'BC-CONTENT', entities: [{ name: 'Post' }, { name: 'Comment' }] }] } };
+      const r = validateDiscoveryExtraction(discovery, domain);
+      assert.ok(r.findings.some((x) => x.kind === 'discovery.uc.under_decomposition'), 'nested entities now counted');
+    });
+  });
 });

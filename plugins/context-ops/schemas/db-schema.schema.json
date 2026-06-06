@@ -7,6 +7,15 @@
   "additionalProperties": false,
   "required": ["meta", "tables"],
   "properties": {
+    "$schema_ref": {
+      "type": "string",
+      "description": "본 instance 의 schema 경로 reference (schema-validator 라우팅 키 / business-rules.schema 와 동형 / F4 dogfood fix)"
+    },
+    "$schema_origin": {
+      "type": "string",
+      "description": "schema 경로 reference (alias of $schema_ref)"
+    },
+    "$comment": { "type": "string" },
     "meta": {
       "$ref": "./meta-confidence.schema.json"
     },

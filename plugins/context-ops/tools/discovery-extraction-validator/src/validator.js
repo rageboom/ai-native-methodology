@@ -67,12 +67,17 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   }
 
   // 3. UC coverage
+  // F1 fix (dogfood): domain.schema 는 use_cases 를 bounded_contexts[] 아래 중첩한다.
+  //   이전엔 top-level analysis.domain.use_cases 만 읽어, schema-conformant domain.json 에서는 UC set 이 항상 비어
+  //   coverage 체크가 silent skip(vacuous pass) 됐음. top-level(backward-compat) + 중첩 양쪽에서 수집.
   let ucCoverageRatio = 1.0;
   let analysisUCs = new Set();
-  if (analysis?.domain?.use_cases) {
-    for (const uc of analysis.domain.use_cases) {
-      if (uc.id) analysisUCs.add(uc.id);
-    }
+  const collectIds = (arr, set) => {
+    if (Array.isArray(arr)) for (const x of arr) if (x && x.id) set.add(x.id);
+  };
+  collectIds(analysis?.domain?.use_cases, analysisUCs);
+  if (Array.isArray(analysis?.domain?.bounded_contexts)) {
+    for (const bc of analysis.domain.bounded_contexts) collectIds(bc?.use_cases, analysisUCs);
   }
   if (analysisUCs.size > 0) {
     const discoveryUCIds = new Set(useCases.map(u => u.id));
@@ -103,7 +108,13 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
       message: `use_cases ${useCases.length}개 ≥ 30 — over-decomposition cluster 검토 권장 (gate#1 cluster 항목 / discovery-decompose-use-cases SKILL §임계)`
     });
   }
-  const domainEntities = Array.isArray(analysis?.domain?.entities) ? analysis.domain.entities.length : 0;
+  // F1 fix (dogfood): entities 도 bounded_contexts[] 아래 중첩 → top-level + 중첩 합산.
+  let domainEntities = Array.isArray(analysis?.domain?.entities) ? analysis.domain.entities.length : 0;
+  if (Array.isArray(analysis?.domain?.bounded_contexts)) {
+    for (const bc of analysis.domain.bounded_contexts) {
+      if (Array.isArray(bc?.entities)) domainEntities += bc.entities.length;
+    }
+  }
   if (domainEntities > 0 && useCases.length > 0 && (useCases.length / domainEntities) < 1.5) {
     findings.push({
       kind: 'discovery.uc.under_decomposition',

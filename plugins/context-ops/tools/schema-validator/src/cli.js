@@ -69,7 +69,13 @@ function findJsonFiles(dir) {
 }
 
 function inferSchemaName(jsonFile, jsonContent) {
-	// 1) $schema_origin 키 (본 방법론 패턴)
+	// 1) $schema_ref / $schema_origin 키 (본 방법론 패턴 / F4 fix — 두 sanctioned 키 모두 인식.
+	//    business-rules.schema 등이 $schema_ref 를 허용하므로 instance 가 이를 라우팅 키로 쓸 수 있어야 함.
+	//    이전엔 $schema_origin/$schema 만 읽어 $schema_ref instance(예: db-schema 명명 schema.json)가 silent skip 됐음.)
+	if (jsonContent.$schema_ref) {
+		const m = jsonContent.$schema_ref.match(/([a-z0-9-]+\.schema\.json)/i);
+		if (m) return m[1];
+	}
 	if (jsonContent.$schema_origin) {
 		const m = jsonContent.$schema_origin.match(/([a-z0-9-]+\.schema\.json)/i);
 		if (m) return m[1];

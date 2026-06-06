@@ -90,7 +90,7 @@ function runValidator(validatorName, projectDir) {
 }
 
 // validator 별 인자 매핑 (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)
-function buildValidatorArgs(validatorName, projectDir) {
+export function buildValidatorArgs(validatorName, projectDir) {
 	switch (validatorName) {
 		case 'discovery-extraction-validator':
 			return [
@@ -125,6 +125,16 @@ function buildValidatorArgs(validatorName, projectDir) {
 				join(projectDir, '.aimd/output/acceptance-criteria.json'),
 				'--test-spec',
 				join(projectDir, '.aimd/output/test-spec.json'),
+				'--json',
+			];
+		// F2 fix (dogfood): plan-coverage-validator case 부재 → default '--target' 인자로 호출되어
+		//   (validator 가 --task-plan/--acceptance 를 요구) errored → silent skip = plan gate primary validator 미실행(fail-OPEN).
+		case 'plan-coverage-validator':
+			return [
+				'--task-plan',
+				join(projectDir, '.aimd/output/task-plan.json'),
+				'--acceptance',
+				join(projectDir, '.aimd/output/acceptance-criteria.json'),
 				'--json',
 			];
 		case 'test-impl-pass-validator':
@@ -325,4 +335,5 @@ function main() {
 	process.exit(0);
 }
 
-main();
+// main() 는 CLI 직접 실행 시에만 (import 시 buildValidatorArgs 등 단위 테스트 가능 / F2 fix 회귀 테스트 enablement).
+if (process.argv[1] === __filename) main();
