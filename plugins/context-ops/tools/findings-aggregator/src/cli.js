@@ -159,7 +159,17 @@ export function buildValidatorArgs(validatorName, projectDir, stage) {
 		case 'static-runner':
 			return ['--target', projectDir, '--json'];
 		case 'traceability-matrix-builder':
-			return ['--target', projectDir, '--json'];
+			// implement gate — full chain 으로 traceability matrix coverage 산출 (--json findings-only / --out-dir 미지정 = side-effect write 없음).
+			//   이전 default '--target <dir>' → --behavior/--acceptance 부재로 errored → silent skip. transformTraceabilityMatrix 가 red→critical 매핑.
+			return [
+				'--behavior', O('behavior-spec.json'),
+				'--acceptance', O('acceptance-criteria.json'),
+				'--discovery', O('discovery-spec.json'),
+				'--task-plan', O('task-plan.json'),
+				'--test-spec', O('test-spec.json'),
+				'--impl-spec', O('impl-spec.json'),
+				'--json',
+			];
 		case 'drift-validator':
 			return ['--target', projectDir, '--json'];
 		case 'formal-spec-link-validator':

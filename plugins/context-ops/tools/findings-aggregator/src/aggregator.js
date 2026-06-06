@@ -243,6 +243,30 @@ export function mergeFindings(a, b) {
 }
 
 // validator dispatch — validator_name + stage → transform 호출
+// traceability-matrix-builder --json (coverage_summary) → findings (poc-18 dogfood gate wiring / DEC-2026-06-06-non-analysis-gate-fail-closed).
+//   builder 가 summary.{critical,high} 가 아니라 coverage_summary 를 emit → generic transform 이 0(blind) 였음.
+//   red_count(broken trace)→critical / forward_coverage<threshold(coverage gap)→medium(advisory — 부분 slice 정당 / hard-block ❌) / yellow→low.
+export function transformTraceabilityMatrix(json) {
+	const cs = json.coverage_summary ?? json ?? {};
+	const red = cs.red_count ?? 0;
+	const forwardGap =
+		cs.forward_coverage != null &&
+		cs.threshold != null &&
+		cs.forward_coverage < cs.threshold
+			? 1
+			: 0;
+	const yellow = cs.yellow_count ?? 0;
+	return {
+		critical: red,
+		high: 0,
+		medium: forwardGap,
+		low: yellow,
+		info: 0,
+		traceability_forward_coverage: cs.forward_coverage ?? null,
+		traceability_threshold: cs.threshold ?? null,
+	};
+}
+
 export function dispatchValidator(validatorName, output) {
 	switch (validatorName) {
 		case 'discovery-extraction-validator':
@@ -259,8 +283,10 @@ export function dispatchValidator(validatorName, output) {
 			return transformDecisionTable(JSON.parse(output));
 		case 'formal-spec-link-validator':
 			return transformFormalSpecLink(JSON.parse(output));
+		case 'traceability-matrix-builder':
+			return transformTraceabilityMatrix(JSON.parse(output));
 		default:
-			// generic JSON fallback (drift / formal-spec-link / spec-test-link / static-runner / traceability-matrix-builder)
+			// generic JSON fallback (drift / spec-test-link / static-runner)
 			try {
 				return transformGeneric(JSON.parse(output));
 			} catch {

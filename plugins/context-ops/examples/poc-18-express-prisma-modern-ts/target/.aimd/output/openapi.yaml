@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: poc-18 post slice (extracted)
+  version: 0.1.0
+  description: >-
+    analysis 추출 openapi (5 이식성 산출물 중 1 / post.service slice).
+    src/modules/post/{post.route,post.controller,post.validation}.ts 에서 추출.
+    응답 코드는 BR-POST-OWNERSHIP(403) / BR-POST-EXISTENCE(404) 근거.
+servers:
+  - url: /v1
+paths:
+  /posts:
+    post:
+      operationId: createPost
+      summary: 게시글 생성 (작성자 = 인증 사용자 / BR-POST-AUTHORSHIP-001)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePostInput'
+      responses:
+        '201':
+          description: 생성됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '401':
+          description: 미인증
+    get:
+      operationId: getPosts
+      summary: 게시글 목록 (published 필터 / BR-POST-PUBLISHFILTER-001)
+      parameters:
+        - { name: title, in: query, required: false, schema: { type: string } }
+        - { name: published, in: query, required: false, schema: { type: string, enum: ['true', 'false'] } }
+        - { name: sortBy, in: query, required: false, schema: { type: string } }
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1 } }
+        - { name: page, in: query, required: false, schema: { type: integer, minimum: 1 } }
+      responses:
+        '200':
+          description: 페이지네이션 목록
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPosts'
+  /posts/{postId}:
+    parameters:
+      - { name: postId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      operationId: getPost
+      summary: 게시글 단건 조회
+      responses:
+        '200':
+          description: 조회됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '404':
+          description: 부재 (BR-POST-EXISTENCE-001)
+    patch:
+      operationId: updatePost
+      summary: 게시글 수정 (작성자 전용 / BR-POST-OWNERSHIP-001)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePostInput'
+      responses:
+        '200':
+          description: 수정됨
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        '403':
+          description: 비작성자 (BR-POST-OWNERSHIP-001)
+        '404':
+          description: 부재 (BR-POST-EXISTENCE-001)
+    delete:
+      operationId: deletePost
+      summary: 게시글 삭제 (작성자 전용 / BR-POST-OWNERSHIP-002)
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: 삭제됨
+        '403':
+          description: 비작성자 (BR-POST-OWNERSHIP-002)
+        '404':
+          description: 부재 (BR-POST-EXISTENCE-001)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    CreatePostInput:
+      type: object
+      required: [title, content]
+      properties:
+        title: { type: string, minLength: 1 }
+        content: { type: string, minLength: 1 }
+        published: { type: boolean }
+    UpdatePostInput:
+      type: object
+      minProperties: 1
+      properties:
+        title: { type: string }
+        content: { type: string }
+        published: { type: boolean }
+    Post:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        content: { type: string }
+        published: { type: boolean }
+        authorId: { type: string, format: uuid }
+        author:
+          type: object
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string, nullable: true }
+            email: { type: string, format: email }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    PaginatedPosts:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        page: { type: integer }
+        limit: { type: integer }
+        totalPages: { type: integer }
+        totalResults: { type: integer }

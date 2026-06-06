@@ -55,7 +55,7 @@ const ASPECT_FILENAMES = {
 };
 
 function parseArgs(argv) {
-	const out = { dryRun: false, graph: false };
+	const out = { dryRun: false, graph: false, json: false };
 	for (let i = 2; i < argv.length; i++) {
 		const a = argv[i];
 		if (a === '--discovery')
@@ -72,6 +72,8 @@ function parseArgs(argv) {
 		else if (a === '--impl-spec') out.implSpec = argv[++i];
 		else if (a === '--out-dir') out.outDir = argv[++i];
 		else if (a === '--dry-run') out.dryRun = true;
+		else if (a === '--json')
+			out.json = true; // findings-only 모드 (findings-aggregator gate 배선 / coverage_summary stdout JSON / 텍스트·write·graph skip)
 		// 신설 (P1 graph) ─────────────────────────────────────────────
 		else if (a === '--graph') out.graph = true;
 		else if (a === '--analysis-dir') out.analysisDir = argv[++i];
@@ -120,6 +122,14 @@ const operationalTaskData = args.operationalTask
 const matrix = buildMatrix(chain);
 
 const cs = matrix.coverage_summary;
+// --json: findings-only 모드 (findings-aggregator gate 배선용 / 텍스트·파일쓰기·graph skip / coverage_summary 만 stdout JSON).
+//   transformTraceabilityMatrix 가 red_count→critical / forward<threshold→medium / yellow→low 로 매핑.
+if (args.json) {
+	process.stdout.write(
+		JSON.stringify({ coverage_summary: cs, cells: matrix.matrix.length }) + '\n',
+	);
+	process.exit(cs.red_count > 0 || cs.forward_coverage < cs.threshold ? 1 : 0);
+}
 console.log(
 	`[traceability-matrix-builder] ${matrix.matrix.length} cells / forward=${(cs.forward_coverage * 100).toFixed(1)}% / backward=${(cs.backward_coverage * 100).toFixed(1)}%`,
 );

@@ -64,9 +64,23 @@ pnpm test   # baseline: 128 pass / 14 fail(upstream route/auth) → 슬라이스
 
 전 runner 호출 = Tier 1 실 vitest 3.2.4 (`pnpm exec vitest run test/modules/post/post.service.test.ts --reporter=json`). simulated_evidence_count=0.
 
-### AXIS 2 — §3-A 추출률 (Modern)
+### AXIS 2 — §3-A 추출 (Modern / provenance self-assessment)
 
-본 run 에서는 **엄밀 측정 안 함**. analysis 산출물 6종(business-rules·domain·db-schema·antipatterns·architecture + discovery 이후 체인)을 LLM(나)이 코드 실측 기반 수작업 생성, 전부 strict schema VALID. openapi.yaml 미생성(5 이식성 산출물 중 4). analysis-extraction-validator 기대-set 미설정으로 추출률 백분율 비측정. (본 dogfood 주 타깃은 AXIS 1.)
+**5 이식성 산출물 = 5/5 완비** (후속): rules(business-rules) · domain · schema(db-schema) · **openapi.yaml(신규 생성)** · antipatterns. openapi.yaml(post slice 5 endpoint / `src/modules/post/{post.route,post.controller,post.validation}.ts` 추출) = **spectral `spectral:oas` lint error 0**(warning만: info-contact·operation-description·operation-tags = cosmetic / Tier 1 실 검증 exit 0). 전 산출물 strict schema VALID.
+
+**provenance breakdown (산출물 실측 카운트 / `detected_by`·`source_evidence`·`intent_certainty` 필드 기반)**:
+
+| 산출물 | code-grounded (직접 코드 증거) | inferred / 관찰·판단 |
+| --- | --- | --- |
+| business-rules | **6/6** (5 code_condition + 1 orm_constraint / intent_certainty 전부 `observed`) | 0 |
+| db-schema | **5/5 table** (전부 `sources:[orm]` = Prisma 추출) | 0 |
+| domain | **3 entity + 6 use_case** (Prisma 모델 + service 함수) | ubiquitous_language 2 (curated) · business_intent (qualitative) |
+| openapi | **5/5 endpoint** (route/validation 추출) | 0 |
+| antipatterns | 2 (`static_analysis`) | 2 (`human_review` = live-probe 경험 관찰: migration drift / phantom dep) |
+
+**§3-A 해석 (정직 경계)**: Modern 스택(typed + ORM + 명시 route)에서 **구조 산출물(schema·BR 조건·endpoint)은 거의 전부 직접 코드-grounded** — Modern ceiling **60~67%(R1')가 본 clean 코드베이스엔 보수적**임을 시사하는 정성 신호. 그러나:
+- **이 수치 = 정직한 §3-A "자동화율" 아님**. (a) 추출한 항목만 셈(survivorship — 사람이 추가했을 **누락분 미반영**) / (b) 독립 expected-set·human-vs-auto 귀속 없음(`analysis-extraction-validator` 는 figma/plan-doc source-grounded gate 이지 §3-A rate 측정기 아님 — 도구 부재) / (c) **추출한 LLM 본인의 self-assessment**(독립성 ❌).
+- 따라서 **백분율 ceiling claim ❌**. provenance breakdown = 사실, §3-A rate = **미측정**(엄밀 측정엔 독립 ground-truth + 누락 귀속 필요).
 
 > **§8.1 단일 PoC 과적합 회피**: 본 run = chain-harness 상태머신 메커니즘 **1건 corroboration** (단일 Modern Node/TS data point). paradigm-wide ceiling claim ❌. 본체 격상은 ≥2 distinct problem-domain 필요.
 

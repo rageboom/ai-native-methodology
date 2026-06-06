@@ -58,4 +58,12 @@ describe('buildValidatorArgs — non-analysis wiring completeness', () => {
 		assert.ok(args.includes('--behavior'), '--behavior 동반');
 		assert.ok(args.some((a) => a.endsWith('behavior-spec.json')));
 	});
+	it('traceability-matrix-builder → full chain + --json (이전 default --target = errored skip)', () => {
+		const args = buildValidatorArgs('traceability-matrix-builder', '/p', 'implement');
+		assert.ok(args.includes('--behavior') && args.includes('--acceptance'), 'full chain args');
+		assert.ok(args.includes('--json'), 'findings-only --json 모드');
+		assert.ok(!args.includes('--target'), 'errored skip 유발 default --target 아님');
+		assert.ok(!args.includes('--out-dir'), 'gate eval 시 side-effect write 없음');
+		assert.ok(args.some((a) => a.endsWith('impl-spec.json')));
+	});
 });
