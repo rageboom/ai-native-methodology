@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:00:00Z",
+    "confidence": 0.85,
+    "inputs_used": ["source_code"]
+  },
+  "stakeholders": ["금융 계산 호출자", "라이브러리 사용자"],
+  "business_intent_summary": "대출 원리금을 고정 주기 상환금으로 분할하고 각 기간을 이자분/원금분으로 분해하는 화폐의 시간가치 계산. (work-unit 슬라이스 = 상환 amortization / numpy-financial 의 valuation 함수 npv·irr·fv·pv 는 architecture 전수 분석에는 포함되나 본 work-unit 스코프 밖.)",
+  "bounded_contexts": [
+    {
+      "id": "BC-AMORTIZATION",
+      "name": "대출 상환",
+      "description": "대출 원리금을 고정 주기 상환금으로 분할하고, 각 기간의 이자분/원금분으로 분해하는 책임. 화폐의 시간가치 방정식을 강제한다.",
+      "entities": [
+        {
+          "id": "E-AMORT-Loan",
+          "name": "Loan",
+          "is_aggregate_root": true,
+          "attributes": [
+            { "name": "pv", "type": "Number" },
+            { "name": "rate", "type": "Number" },
+            { "name": "nper", "type": "Number" },
+            { "name": "fv", "type": "Number" },
+            { "name": "when", "type": "Enum" }
+          ],
+          "persisted_to": "(none / 계산 입력 / DB 없음)",
+          "related_rules": ["BR-PMT-EQUATION-001", "BR-PMT-ZERORATE-001", "BR-WHEN-CONVENTION-001"]
+        },
+        {
+          "id": "E-AMORT-Payment",
+          "name": "Payment",
+          "is_aggregate_root": false,
+          "attributes": [
+            { "name": "per", "type": "Number" },
+            { "name": "pmt", "type": "Number" },
+            { "name": "ipmt", "type": "Number" },
+            { "name": "ppmt", "type": "Number" }
+          ],
+          "persisted_to": "(none / 계산 산출)",
+          "related_rules": ["BR-AMORT-DECOMPOSE-001", "BR-IPMT-BALANCE-001", "BR-IPMT-BEGINFIRST-001"]
+        }
+      ],
+      "use_cases": [
+        { "id": "UC-PMT-001", "name": "고정 주기 상환금 계산", "actor": "금융 계산 호출자", "related_rules": ["BR-PMT-EQUATION-001", "BR-PMT-ZERORATE-001"] },
+        { "id": "UC-IPMT-001", "name": "기간별 이자 상환분 계산", "actor": "금융 계산 호출자", "related_rules": ["BR-IPMT-BALANCE-001", "BR-IPMT-BEGINFIRST-001"] },
+        { "id": "UC-PPMT-001", "name": "기간별 원금 상환분 계산", "actor": "금융 계산 호출자", "related_rules": ["BR-AMORT-DECOMPOSE-001"] }
+      ],
+      "ubiquitous_language": [
+        { "term": "현재가치(pv)", "definition": "현재 시점의 대출 원금 또는 투자 금액. 음수는 현금 유출을 의미한다." },
+        { "term": "납입 시점(when)", "definition": "각 주기의 납입이 기말(end=0) 또는 기초(begin=1)에 발생하는지를 나타내는 규약." }
+      ]
+    }
+  ]
+}

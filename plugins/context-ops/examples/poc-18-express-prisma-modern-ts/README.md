@@ -83,6 +83,8 @@ pnpm test   # baseline: 128 pass / 14 fail(upstream route/auth) → 슬라이스
 - 따라서 **백분율 ceiling claim ❌**. provenance breakdown = 사실, §3-A rate = **미측정**(엄밀 측정엔 독립 ground-truth + 누락 귀속 필요).
 
 > **§8.1 단일 PoC 과적합 회피**: 본 run = chain-harness 상태머신 메커니즘 **1건 corroboration** (단일 Modern Node/TS data point). paradigm-wide ceiling claim ❌. 본체 격상은 ≥2 distinct problem-domain 필요.
+>
+> **✅ corroboration #2 충족 (2026-06-06)**: [PoC #19](../poc-19-numpy-financial-python/README.md) = `numpy-financial`(금융 amortization / **Python 3.14+pytest**) full-chain 상태머신 E2E 완주. poc-18(blog/Node·TS) + poc-19(금융/Python) = **≥2 distinct problem-domain + distinct stack** 충족 → 상태머신 메커니즘이 다른 도메인·스택·산출물 프로파일(poc-19 는 db-schema·openapi N/A = 3/5 산출물)에서 재현됨을 corroborate. (단 2 data point ≠ paradigm ceiling 자동확정 / §3-A rate 여전히 미측정.)
 
 ## 4. 방법론이 노출한 finding (dogfood 가치)
 

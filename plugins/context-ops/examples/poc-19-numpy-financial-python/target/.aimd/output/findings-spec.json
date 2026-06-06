@@ -1,0 +1,50 @@
+{
+  "critical": 0,
+  "high": 0,
+  "medium": 0,
+  "low": 0,
+  "info": 0,
+  "evidence_missing": [
+    "drift-validator"
+  ],
+  "sources": {
+    "chain-coverage-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0,
+        "coverage_pct": 1,
+        "coverage_threshold": 0.85
+      }
+    },
+    "drift-validator": {
+      "status": "evidence_missing",
+      "reason": "target 미해석(manifest.analysis_refs.artifacts 미등재/파일부재) 또는 validator 미실행"
+    },
+    "formal-spec-link-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "schema-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    }
+  },
+  "coverage_pct": 1,
+  "coverage_threshold": 0.85
+}

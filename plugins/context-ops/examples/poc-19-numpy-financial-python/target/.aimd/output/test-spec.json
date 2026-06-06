@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:30:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code", "test_code"],
+    "confidence": 0.9,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "behavior_spec_path": ".aimd/output/behavior-spec.json"
+  },
+  "test_cases": [
+    {"id": "TC-PMT-001", "ac_ref": "AC-PMT-001", "bhv_ref": "BHV-PMT-001", "type": "unit", "framework": "pytest", "source_file": "numpy_financial/tests/test_amortization_slice.py", "expected_outcome": "pass", "test_intent": "characterization", "fail_mode": "assertion_fail", "source_evidence": "test_pmt_tvm_equation"},
+    {"id": "TC-PMT-002", "ac_ref": "AC-PMT-002", "bhv_ref": "BHV-PMT-002", "type": "unit", "framework": "pytest", "source_file": "numpy_financial/tests/test_amortization_slice.py", "expected_outcome": "pass", "test_intent": "characterization", "fail_mode": "assertion_fail", "source_evidence": "test_pmt_zero_rate_linear_split"},
+    {"id": "TC-IPMT-001", "ac_ref": "AC-IPMT-001", "bhv_ref": "BHV-IPMT-001", "type": "unit", "framework": "pytest", "source_file": "numpy_financial/tests/test_amortization_slice.py", "expected_outcome": "pass", "test_intent": "characterization", "fail_mode": "assertion_fail", "source_evidence": "test_ipmt_first_period_interest"},
+    {"id": "TC-IPMT-002", "ac_ref": "AC-IPMT-002", "bhv_ref": "BHV-IPMT-002", "type": "unit", "framework": "pytest", "source_file": "numpy_financial/tests/test_amortization_slice.py", "expected_outcome": "pass", "test_intent": "characterization", "fail_mode": "assertion_fail", "source_evidence": "test_ipmt_begin_first_period_zero"},
+    {"id": "TC-PPMT-001", "ac_ref": "AC-PPMT-001", "bhv_ref": "BHV-PPMT-001", "type": "unit", "framework": "pytest", "source_file": "numpy_financial/tests/test_amortization_slice.py", "expected_outcome": "pass", "test_intent": "characterization", "fail_mode": "assertion_fail", "source_evidence": "test_ppmt_decomposition_invariant"}
+  ],
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1,
+      "threshold": 0.85
+    },
+    "test_pass_rate": 0
+  }
+}

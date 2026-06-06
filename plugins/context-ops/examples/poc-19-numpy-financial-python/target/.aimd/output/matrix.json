@@ -1,0 +1,104 @@
+{
+  "derived_from": [
+    "planning-spec.json",
+    "behavior-spec.json",
+    "acceptance-criteria.json",
+    "test-spec.json",
+    "impl-spec.json",
+    "task-plan.json"
+  ],
+  "do_not_edit_manually": true,
+  "matrix": [
+    {
+      "use_case_id": "UC-PMT-001",
+      "behavior_id": "BHV-PMT-001",
+      "acceptance_id": "AC-PMT-001",
+      "test_id": "TC-PMT-001",
+      "impl_id": "IMPL-AMORT-001",
+      "business_rule_ids": [
+        "BR-PMT-EQUATION-001"
+      ],
+      "antipattern_ids": [],
+      "status": "green",
+      "severity": "critical",
+      "task_id": "TASK-PMT-001",
+      "impl_commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7"
+    },
+    {
+      "use_case_id": "UC-PMT-001",
+      "behavior_id": "BHV-PMT-002",
+      "acceptance_id": "AC-PMT-002",
+      "test_id": "TC-PMT-002",
+      "impl_id": "IMPL-AMORT-001",
+      "business_rule_ids": [
+        "BR-PMT-ZERORATE-001"
+      ],
+      "antipattern_ids": [],
+      "status": "green",
+      "severity": "critical",
+      "task_id": "TASK-PMT-001",
+      "impl_commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7"
+    },
+    {
+      "use_case_id": "UC-IPMT-001",
+      "behavior_id": "BHV-IPMT-001",
+      "acceptance_id": "AC-IPMT-001",
+      "test_id": "TC-IPMT-001",
+      "impl_id": "IMPL-AMORT-001",
+      "business_rule_ids": [
+        "BR-IPMT-BALANCE-001"
+      ],
+      "antipattern_ids": [],
+      "status": "green",
+      "severity": "critical",
+      "task_id": "TASK-IPMT-001",
+      "impl_commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7"
+    },
+    {
+      "use_case_id": "UC-IPMT-001",
+      "behavior_id": "BHV-IPMT-002",
+      "acceptance_id": "AC-IPMT-002",
+      "test_id": "TC-IPMT-002",
+      "impl_id": "IMPL-AMORT-001",
+      "business_rule_ids": [
+        "BR-IPMT-BEGINFIRST-001"
+      ],
+      "antipattern_ids": [],
+      "status": "green",
+      "severity": "critical",
+      "task_id": "TASK-IPMT-001",
+      "impl_commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7"
+    },
+    {
+      "use_case_id": "UC-PPMT-001",
+      "behavior_id": "BHV-PPMT-001",
+      "acceptance_id": "AC-PPMT-001",
+      "test_id": "TC-PPMT-001",
+      "impl_id": "IMPL-AMORT-001",
+      "business_rule_ids": [
+        "BR-AMORT-DECOMPOSE-001"
+      ],
+      "antipattern_ids": [],
+      "status": "green",
+      "severity": "critical",
+      "task_id": "TASK-PPMT-001",
+      "impl_commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7"
+    }
+  ],
+  "coverage_summary": {
+    "forward_coverage": 1,
+    "backward_coverage": 1,
+    "threshold": 0.85,
+    "severity_floor": {
+      "critical": 1,
+      "high": 0.95,
+      "medium": 0.9,
+      "low": 0.85
+    },
+    "green_count": 5,
+    "yellow_count": 0,
+    "red_count": 0,
+    "severity_distinct_count": 1,
+    "severity_propagation_active": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:00:00Z",
+    "confidence": 0.9,
+    "inputs_used": ["source_code"]
+  },
+  "system_name": "numpy-financial",
+  "architecture_style": "monolith",
+  "modules": [
+    { "id": "MOD-FINANCIAL", "name": "금융 함수 코어", "path": "numpy_financial/_financial.py", "layer": "domain" },
+    { "id": "MOD-PKG", "name": "공개 API 패키지", "path": "numpy_financial/__init__.py", "layer": "presentation" },
+    { "id": "MOD-TESTS", "name": "테스트", "path": "numpy_financial/tests", "layer": "cross-cutting" }
+  ],
+  "dependencies": [
+    { "from": "MOD-PKG", "to": "MOD-FINANCIAL", "type": "import" },
+    { "from": "MOD-TESTS", "to": "MOD-PKG", "type": "import" }
+  ]
+}

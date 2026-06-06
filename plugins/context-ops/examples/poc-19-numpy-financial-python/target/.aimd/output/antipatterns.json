@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:00:00Z",
+    "confidence": 0.8,
+    "inputs_used": ["source_code"]
+  },
+  "antipatterns": [
+    {
+      "id": "AP-MAINTAINABILITY-001",
+      "category": "MAINTAINABILITY",
+      "name": "키워드 충돌 회피용 함수 별칭(_rbl)",
+      "severity": "low",
+      "why_avoid": "_rbl 은 fv 함수의 단순 별칭으로, ipmt 내부의 'fv' 키워드 인자와의 이름 충돌을 피하려고 도입됐다(코드 주석이 직접 인정). 의미상 'remaining balance on loan'을 별도 개념으로 노출하지 않고 우회 별칭으로 숨겨, 재구현 시 잔액 계산 의도가 드러나지 않는다.",
+      "evidence": [{ "file": "numpy_financial/_financial.py", "line": 400 }],
+      "detected_by": "human_review",
+      "confidence": 0.85,
+      "recommended_alternative": "remaining_balance(rate, per, pmt, pv, when) 같은 의미 명시 함수로 노출하고 ipmt 가 이를 호출"
+    },
+    {
+      "id": "AP-MAINTAINABILITY-002",
+      "category": "MAINTAINABILITY",
+      "name": "API 전반의 Decimal 지원 불일치",
+      "severity": "medium",
+      "why_avoid": "대부분의 시간가치 함수는 decimal.Decimal 입력을 지원하나 nper 는 docstring 에 'Decimal type is not supported' 로 명시적으로 제외된다. 동일 도메인 API 안에서 타입 지원 계약이 함수마다 달라, 호출자가 Decimal 정밀도를 일관되게 쓸 수 없다.",
+      "evidence": [{ "file": "numpy_financial/_financial.py", "line": 233 }],
+      "detected_by": "human_review",
+      "confidence": 0.8,
+      "recommended_alternative": "전 함수 Decimal 지원 통일 또는 지원 경계를 타입 시그니처/런타임 검증으로 일관 표기"
+    },
+    {
+      "id": "AP-TESTABILITY-001",
+      "category": "TESTABILITY",
+      "name": "산출물 부호 규약의 암묵성",
+      "severity": "low",
+      "why_avoid": "현금 유출을 음수로 표현하는 부호 규약(pmt/ipmt/ppmt 가 음수 반환)이 시그니처에 드러나지 않고 docstring 예시로만 전달된다. 재구현 시 부호 규약을 놓치면 테스트가 부호 반전으로 실패하나 그 의도가 코드 계약에 명시돼 있지 않다.",
+      "evidence": [{ "file": "numpy_financial/_financial.py", "line": 114 }],
+      "detected_by": "human_review",
+      "confidence": 0.75,
+      "recommended_alternative": "부호 규약을 도메인 타입(CashOut/CashIn) 또는 명시 문서 계약으로 승격"
+    }
+  ]
+}

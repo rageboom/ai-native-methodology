@@ -1,0 +1,14 @@
+{
+  "test_runner_version": "pytest 9.0.3",
+  "test_runner_stdout_path": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\plugins\\context-ops\\examples\\poc-19-numpy-financial-python\\target\\.aimd\\output\\evidence\\test-stdout.txt",
+  "test_runner_stderr_path": "C:\\Users\\RAGEBOOM\\Documents\\Developments\\AI\\ai-native-methodology\\plugins\\context-ops\\examples\\poc-19-numpy-financial-python\\target\\.aimd\\output\\evidence\\test-stderr.txt",
+  "invocation_timestamp": "2026-06-06T13:07:41.548Z",
+  "duration_ms": 595,
+  "pass_count": 0,
+  "fail_count": 5,
+  "skip_count": 0,
+  "reproduction_command": "C:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/plugins/context-ops/examples/poc-19-numpy-financial-python/.venv/Scripts/python.exe -m pytest numpy_financial/tests/test_amortization_slice.py --json-report --json-report-file=.aimd/output/evidence/pytest-report.json -q",
+  "result_hash": "sha256:acf0cd2c19fb4fbeb9747d60b5a0ca50215efeba77fe3a6fda929a41b3704767",
+  "report_format": "pytest_json",
+  "flaky_retries_count": 2
+}

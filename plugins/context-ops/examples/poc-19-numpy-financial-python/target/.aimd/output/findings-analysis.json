@@ -1,0 +1,50 @@
+{
+  "critical": 0,
+  "high": 0,
+  "medium": 0,
+  "low": 1,
+  "info": 0,
+  "evidence_missing": [
+    "decision-table-validator"
+  ],
+  "sources": {
+    "schema-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "br-cross-consistency-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 1,
+        "info": 0,
+        "br_overall_score": 0.975,
+        "br_overall_threshold": 0.85,
+        "br_gate_status": "pass"
+      }
+    },
+    "formal-spec-link-validator": {
+      "status": "ok",
+      "findings": {
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "decision-table-validator": {
+      "status": "evidence_missing",
+      "reason": "target 미해석(manifest.analysis_refs.artifacts 미등재/파일부재) 또는 validator 미실행"
+    }
+  },
+  "scenario": "S1"
+}

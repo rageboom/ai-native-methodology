@@ -1,0 +1,13 @@
+{
+  "$schema_origin": "test-cmd.schema.json",
+  "framework": "pytest",
+  "framework_version": "pytest 9.0.3",
+  "test_cmd": "C:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/plugins/context-ops/examples/poc-19-numpy-financial-python/.venv/Scripts/python.exe",
+  "test_cmd_args": ["-m", "pytest", "numpy_financial/tests/test_amortization_slice.py", "--json-report", "--json-report-file=.aimd/output/evidence/pytest-report.json", "-q"],
+  "report_format": "json",
+  "report_path": ".aimd/output/evidence/pytest-report.json",
+  "stdout_path": ".aimd/output/evidence/test-stdout.txt",
+  "stderr_path": ".aimd/output/evidence/test-stderr.txt",
+  "allow_execute": true,
+  "timeout_ms": 180000
+}

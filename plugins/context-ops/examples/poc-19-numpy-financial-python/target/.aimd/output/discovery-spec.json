@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:10:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code", "documentation"],
+    "confidence": 0.9,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "numpy_financial/_financial.py"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "대출 상환(amortization) 슬라이스 — 고정 주기 상환금(pmt)과 각 기간의 이자분(ipmt)·원금분(ppmt) 계산. 화폐의 시간가치 방정식과 pmt=ppmt+ipmt 분해 규칙을 강제한다. (Python + numpy)",
+    "stakeholders": ["금융 계산 호출자", "라이브러리 사용자"],
+    "success_criteria": ["pmt 는 시간가치 방정식을 만족", "각 기간 pmt = ppmt + ipmt", "이자분은 직전 잔액 × 이율", "기초납입 첫 기간 이자분 = 0"]
+  },
+  "use_cases": [
+    {"id": "UC-PMT-001", "name": "고정 주기 상환금 계산", "description": "pmt — 현재가치·이율·기간수로 고정 주기 상환금을 계산", "actors": ["금융 계산 호출자"], "preconditions": ["rate, nper, pv 가 주어진다"], "postconditions": ["시간가치 방정식을 만족하는 pmt 반환", "rate=0 시 선형 분할"], "acceptance_criteria_refs": ["AC-PMT-001", "AC-PMT-002"], "source_grounded_evidence": ["numpy_financial/_financial.py:pmt (line 134)"]},
+    {"id": "UC-IPMT-001", "name": "기간별 이자 상환분 계산", "description": "ipmt — 특정 기간의 이자 상환분을 직전 잔액×이율로 계산", "actors": ["금융 계산 호출자"], "preconditions": ["rate, per, nper, pv 가 주어진다"], "postconditions": ["이자분 = 직전 잔액 × 이율", "기초납입 첫 기간 = 0"], "acceptance_criteria_refs": ["AC-IPMT-001", "AC-IPMT-002"], "source_grounded_evidence": ["numpy_financial/_financial.py:ipmt (line 301)"]},
+    {"id": "UC-PPMT-001", "name": "기간별 원금 상환분 계산", "description": "ppmt — 총 상환금에서 이자분을 뺀 원금 상환분", "actors": ["금융 계산 호출자"], "preconditions": ["rate, per, nper, pv 가 주어진다"], "postconditions": ["ppmt = pmt - ipmt", "ppmt + ipmt = pmt"], "acceptance_criteria_refs": ["AC-PPMT-001"], "source_grounded_evidence": ["numpy_financial/_financial.py:ppmt (line 410)"]}
+  ],
+  "business_rules_intent": [
+    {"br_id": "BR-PMT-EQUATION-001", "reasoning": "pmt 가 시간가치 방정식을 pmt 에 대해 풀어 -(fv + pv*temp)/fact 를 반환한다.", "source_grounded_evidence": "numpy_financial/_financial.py:221", "intent_certainty": "observed"},
+    {"br_id": "BR-PMT-ZERORATE-001", "reasoning": "rate==0 마스크 분기로 0 나눗셈을 회피하고 선형 분할로 퇴화한다.", "source_grounded_evidence": "numpy_financial/_financial.py:222", "intent_certainty": "observed"},
+    {"br_id": "BR-AMORT-DECOMPOSE-001", "reasoning": "ppmt 가 total = pmt(...) 에서 ipmt(...) 를 뺀 값으로 정의된다.", "source_grounded_evidence": "numpy_financial/_financial.py:435", "intent_certainty": "observed"},
+    {"br_id": "BR-IPMT-BALANCE-001", "reasoning": "ipmt 가 _rbl(직전 잔액)에 rate 를 곱한다.", "source_grounded_evidence": "numpy_financial/_financial.py:391", "intent_certainty": "observed"},
+    {"br_id": "BR-IPMT-BEGINFIRST-001", "reasoning": "when==1 & per==1 일 때 ipmt 를 0 으로 설정한다.", "source_grounded_evidence": "numpy_financial/_financial.py:394", "intent_certainty": "observed"},
+    {"br_id": "BR-WHEN-CONVENTION-001", "reasoning": "_convert_when 이 end/begin 을 0/1 로 정규화한다 (기본 end).", "source_grounded_evidence": "numpy_financial/_financial.py:126", "intent_certainty": "observed"}
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": ["input/business-rules.json", "input/domain.json"]
+  }
+}
