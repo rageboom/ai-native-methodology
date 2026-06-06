@@ -18,6 +18,17 @@
 
 ---
 
+## 인계 carry — 다른 PC 진행 가능 (2026-06-06 / repo-committed ≠ memory)
+
+> ⚠️ 메모리(`~/.claude/...`)는 **머신-로컬 → 다른 PC 미전파**. 본 carry = **repo committed(origin/main)** 이므로 다른 PC `git pull` 후 본 섹션 기준 재개. 각 항목 = 무엇 / 왜 / 시작점.
+
+- **[ops] GHE(origin-smilegate) push 미실행** — 이 환경에서 `github.smilegate.net` 네트워크 불가(`Connection reset by peer`). origin(rageboom) main = `7c4a0502` 까지 동기화됨(코드·문서 전부 origin 에 있음). → **VPN 세션에서 `git push origin-smilegate main`** (GHE main 분기 시 `git fetch origin-smilegate` 후 확인 / force ❌).
+- **[D1] 사내 Modern S2 재측정** — poc-18 = 공개 OSS **S1 재생성**. CLAUDE.md "사내 Modern 재측정 의무" 미충족(현 Modern PoC 전부 OSS). 사내 Modern 모듈(Spring Boot 3+JPA / NestJS 등)로 **S2 AX전환** 측정 = 진짜 prod-value frontier. 사내 source 규약 = examples/ 밖 / 외부 절대경로 / commit ❌ / 마스킹 DEC 만 공개([[feedback_internal_source_poc_external_location]] — 단 이 memory 는 머신-로컬이니 규약은 `decisions/INDEX.md` 의 관련 DEC 도 참조).
+- **[D2] §8.1 2번째 Modern 도메인** — poc-18 = 단일 Modern Node/TS data point(blog/post 도메인). chain-harness 상태머신 E2E + §3-A 의 어떤 ceiling/qualification claim 도 **≥2 distinct problem-domain** 필요 → 다른 Modern stack(또는 다른 도메인 ecommerce 등)으로 2번째 full-chain dogfood. (poc-18 절차 = `examples/poc-18-express-prisma-modern-ts/README.md` §2 재현.)
+- **[D3] gate #0 prose #0-정합 검증** — mechanical SSOT(gate-eval / state.schema / sdlc-4stage-flow)는 #0 정합이나, **prose 가 #0 반영했는지 vs 구 5-gate(#1~#5) lag 잔존인지 미검증**: `methodology-spec/lifecycle-contract.md` · `docs/adr/ADR-CHAIN-001-chain-4-stage-enforcement.md` · `docs/adr/ADR-CHAIN-002-go-stop-gate.md` · `methodology-spec/policies/automation-boundary.md` · `methodology-spec/agents-axis.md`. (5429d9e0 가 prose 갱신 주장 / 첫 state-machine 분석은 lag 의심 → grep 후 lag 시 corrective. SSOT = `decisions/DEC-2026-06-06-analysis-exit-gate.md` carry.)
+
+---
+
 ## Archive
 
 > 세션 narrative 는 STATUS 에 누적하지 않음 (s73 정책) — **release 상세 SSOT = [CHANGELOG.md](../CHANGELOG.md)** / 결정 = [INDEX.md](INDEX.md) / 세션 = memory. 최신 = v12.9.0 (codegraph STEP 1).
