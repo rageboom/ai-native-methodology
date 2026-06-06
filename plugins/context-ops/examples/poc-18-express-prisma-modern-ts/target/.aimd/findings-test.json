@@ -1,0 +1,40 @@
+{
+  "critical": 0,
+  "high": 0,
+  "medium": 0,
+  "low": 0,
+  "info": 0,
+  "tests_total": 18,
+  "tests_passed": 0,
+  "tests_failed": 18,
+  "scenario": "S1",
+  "test_invocation_evidence": {
+    "test_runner_version": "3.2.4",
+    "test_runner_stdout_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.aimd/evidence/test-stdout.txt",
+    "test_runner_stderr_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.aimd/evidence/test-stderr.txt",
+    "invocation_timestamp": "2026-06-06T09:45:20.187Z",
+    "duration_ms": 1421,
+    "pass_count": 0,
+    "fail_count": 18,
+    "skip_count": 0,
+    "reproduction_command": "pnpm exec vitest run test/modules/post/post.service.test.ts --reporter=json --outputFile=.aimd/evidence/vitest-report.json",
+    "result_hash": "sha256:b8532413a99bf162d6c34b476f2ed66c44bf41271027e570ad1c70aaf4597855",
+    "report_format": "vitest_json",
+    "flaky_retries_count": 2
+  },
+  "sources": {
+    "test-impl-pass-validator": {
+      "status": "ok",
+      "evidence_trust": "real_tool",
+      "pass": 0,
+      "fail": 18,
+      "result_hash": "sha256:b8532413a99bf162d6c34b476f2ed66c44bf41271027e570ad1c70aaf4597855"
+    },
+    "spec-test-link-validator": {
+      "status": "ok"
+    },
+    "schema-validator": {
+      "status": "ok"
+    }
+  }
+}

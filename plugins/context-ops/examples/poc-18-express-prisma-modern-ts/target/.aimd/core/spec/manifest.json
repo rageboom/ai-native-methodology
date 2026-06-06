@@ -1,0 +1,16 @@
+{
+  "scope": "core",
+  "stage": "spec",
+  "status": "complete",
+  "linked_artifacts": [],
+  "traceability_refs": {
+    "uc": [],
+    "bhv": [],
+    "ac": [],
+    "tc": [],
+    "impl": []
+  },
+  "evidence_paths": [],
+  "created_at": "2026-06-06T09:12:30.976Z",
+  "updated_at": "2026-06-06T09:39:39.050Z"
+}

@@ -1,0 +1,14 @@
+{
+  "test_runner_version": "3.2.4",
+  "test_runner_stdout_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.aimd/evidence/test-stdout.txt",
+  "test_runner_stderr_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.aimd/evidence/test-stderr.txt",
+  "invocation_timestamp": "2026-06-06T09:46:37.740Z",
+  "duration_ms": 1616,
+  "pass_count": 18,
+  "fail_count": 0,
+  "skip_count": 0,
+  "reproduction_command": "pnpm exec vitest run test/modules/post/post.service.test.ts --reporter=json --outputFile=.aimd/evidence/vitest-report.json",
+  "result_hash": "sha256:d376463248402809c81dbc3865f55b4f1d7dcb2f6f7ccc2231728748da7eeca3",
+  "report_format": "vitest_json",
+  "flaky_retries_count": 0
+}

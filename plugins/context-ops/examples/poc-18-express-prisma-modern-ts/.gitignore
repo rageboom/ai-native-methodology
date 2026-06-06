@@ -1,0 +1,11 @@
+# PoC #18 — vendored OSS target. Exclude build/runtime artifacts (재현은 README §2 참조).
+target/node_modules/
+target/build/
+target/dist/
+target/.env
+target/.env.test
+target/.codegraph/
+**/*.orig
+# vitest raw stdout/stderr 은 evidence 로 보존하되, 대용량 캐시류는 제외
+target/coverage/
+target/.vitest/

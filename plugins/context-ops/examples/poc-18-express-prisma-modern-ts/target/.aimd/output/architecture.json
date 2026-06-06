@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:30:00Z",
+    "confidence": 0.85,
+    "inputs_used": ["source_code", "config_files"]
+  },
+  "system_name": "express-prisma-typescript-boilerplate",
+  "architecture_style": "layered",
+  "modules": [
+    { "id": "MOD-POST", "name": "게시글 모듈", "path": "src/modules/post", "layer": "application" },
+    { "id": "MOD-USER", "name": "사용자 모듈", "path": "src/modules/user", "layer": "application" },
+    { "id": "MOD-AUTH", "name": "인증 모듈", "path": "src/modules/auth", "layer": "application" },
+    { "id": "MOD-SHARED", "name": "공유 (repository/service/util/middleware)", "path": "src/shared", "layer": "shared" },
+    { "id": "MOD-CONFIG", "name": "설정", "path": "src/config", "layer": "cross-cutting" },
+    { "id": "MOD-ROUTES", "name": "라우팅", "path": "src/routes", "layer": "presentation" }
+  ],
+  "dependencies": [
+    { "from": "MOD-POST", "to": "MOD-SHARED", "type": "import" },
+    { "from": "MOD-POST", "to": "MOD-CONFIG", "type": "import" },
+    { "from": "MOD-USER", "to": "MOD-SHARED", "type": "import" },
+    { "from": "MOD-AUTH", "to": "MOD-SHARED", "type": "import" },
+    { "from": "MOD-ROUTES", "to": "MOD-POST", "type": "import" },
+    { "from": "MOD-ROUTES", "to": "MOD-USER", "type": "import" }
+  ]
+}

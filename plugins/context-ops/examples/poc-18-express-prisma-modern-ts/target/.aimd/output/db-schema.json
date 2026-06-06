@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:30:00Z",
+    "confidence": 0.9,
+    "inputs_used": ["source_code", "orm"]
+  },
+  "database_type": "postgresql",
+  "schema_name": "public",
+  "tables": [
+    {
+      "name": "User",
+      "sources": ["orm"],
+      "columns": [
+        { "name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm"] },
+        { "name": "email", "type": "TEXT", "nullable": false, "is_unique": true, "sources": ["orm"] },
+        { "name": "name", "type": "TEXT", "nullable": true, "sources": ["orm"] },
+        { "name": "password", "type": "TEXT", "nullable": true, "sources": ["orm"] },
+        { "name": "isEmailVerified", "type": "BOOLEAN", "nullable": false, "sources": ["orm"] },
+        { "name": "createdAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] },
+        { "name": "updatedAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] }
+      ],
+      "primary_key": ["id"]
+    },
+    {
+      "name": "Token",
+      "sources": ["orm"],
+      "columns": [
+        { "name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm"] },
+        { "name": "token", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "type", "type": "TokenType", "nullable": false, "sources": ["orm"] },
+        { "name": "expires", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] },
+        { "name": "blacklisted", "type": "BOOLEAN", "nullable": false, "sources": ["orm"] },
+        { "name": "userId", "type": "UUID", "nullable": false, "sources": ["orm"] }
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        { "columns": ["userId"], "references_table": "User", "references_columns": ["id"], "relationship_label": "발급 대상 사용자", "on_delete": "CASCADE" }
+      ]
+    },
+    {
+      "name": "Notification",
+      "sources": ["orm"],
+      "columns": [
+        { "name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm"] },
+        { "name": "title", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "message", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "isRead", "type": "BOOLEAN", "nullable": false, "sources": ["orm"] },
+        { "name": "userId", "type": "UUID", "nullable": false, "sources": ["orm"] }
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        { "columns": ["userId"], "references_table": "User", "references_columns": ["id"], "relationship_label": "알림 수신 사용자", "on_delete": "CASCADE" }
+      ]
+    },
+    {
+      "name": "Post",
+      "sources": ["orm"],
+      "columns": [
+        { "name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm"] },
+        { "name": "title", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "content", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "published", "type": "BOOLEAN", "nullable": false, "sources": ["orm"] },
+        { "name": "authorId", "type": "UUID", "nullable": false, "sources": ["orm"] },
+        { "name": "createdAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] },
+        { "name": "updatedAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] }
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        { "columns": ["authorId"], "references_table": "User", "references_columns": ["id"], "relationship_label": "게시글 작성자", "on_delete": "CASCADE" }
+      ]
+    },
+    {
+      "name": "Comment",
+      "sources": ["orm"],
+      "columns": [
+        { "name": "id", "type": "UUID", "nullable": false, "is_primary_key": true, "sources": ["orm"] },
+        { "name": "content", "type": "TEXT", "nullable": false, "sources": ["orm"] },
+        { "name": "authorId", "type": "UUID", "nullable": false, "sources": ["orm"] },
+        { "name": "postId", "type": "UUID", "nullable": false, "sources": ["orm"] },
+        { "name": "createdAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] },
+        { "name": "updatedAt", "type": "TIMESTAMP", "nullable": false, "sources": ["orm"] }
+      ],
+      "primary_key": ["id"],
+      "foreign_keys": [
+        { "columns": ["authorId"], "references_table": "User", "references_columns": ["id"], "relationship_label": "댓글 작성자", "on_delete": "CASCADE" },
+        { "columns": ["postId"], "references_table": "Post", "references_columns": ["id"], "relationship_label": "대상 게시글", "on_delete": "CASCADE" }
+      ]
+    }
+  ]
+}

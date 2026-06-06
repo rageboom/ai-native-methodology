@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:30:00Z",
+    "confidence": 0.85,
+    "inputs_used": ["source_code", "orm"]
+  },
+  "bounded_contexts": [
+    {
+      "id": "BC-CONTENT",
+      "name": "콘텐츠",
+      "description": "게시글(Post)과 댓글(Comment)의 작성·조회·수정·삭제 책임. 작성자 소유권 규칙을 강제한다.",
+      "entities": [
+        {
+          "id": "E-CONTENT-Post",
+          "name": "Post",
+          "is_aggregate_root": true,
+          "attributes": [
+            { "name": "id", "type": "UUID", "is_id": true },
+            { "name": "title", "type": "String" },
+            { "name": "content", "type": "String" },
+            { "name": "published", "type": "Boolean" },
+            { "name": "authorId", "type": "UUID" }
+          ],
+          "persisted_to": "Post",
+          "related_rules": ["BR-POST-AUTHORSHIP-001", "BR-POST-OWNERSHIP-001", "BR-POST-OWNERSHIP-002", "BR-POST-EXISTENCE-001"]
+        },
+        {
+          "id": "E-CONTENT-Comment",
+          "name": "Comment",
+          "is_aggregate_root": false,
+          "attributes": [
+            { "name": "id", "type": "UUID", "is_id": true },
+            { "name": "content", "type": "String" },
+            { "name": "authorId", "type": "UUID" },
+            { "name": "postId", "type": "UUID" }
+          ],
+          "persisted_to": "Comment"
+        }
+      ],
+      "use_cases": [
+        { "id": "UC-POST-001", "name": "게시글 생성", "actor": "인증 사용자", "related_rules": ["BR-POST-AUTHORSHIP-001"] },
+        { "id": "UC-POST-002", "name": "게시글 목록 조회", "actor": "사용자", "related_rules": ["BR-POST-PUBLISHFILTER-001"] },
+        { "id": "UC-POST-003", "name": "게시글 단건 조회", "actor": "사용자" },
+        { "id": "UC-POST-004", "name": "게시글 수정", "actor": "작성자", "related_rules": ["BR-POST-OWNERSHIP-001", "BR-POST-EXISTENCE-001"] },
+        { "id": "UC-POST-005", "name": "게시글 삭제", "actor": "작성자", "related_rules": ["BR-POST-OWNERSHIP-002", "BR-POST-EXISTENCE-001"] }
+      ]
+    },
+    {
+      "id": "BC-USER",
+      "name": "사용자",
+      "description": "계정/인증/토큰 책임. 이메일 유일성을 보장한다.",
+      "entities": [
+        {
+          "id": "E-USER-User",
+          "name": "User",
+          "is_aggregate_root": true,
+          "attributes": [
+            { "name": "id", "type": "UUID", "is_id": true },
+            { "name": "email", "type": "String" },
+            { "name": "name", "type": "String" },
+            { "name": "role", "type": "Role[]" }
+          ],
+          "persisted_to": "User",
+          "related_rules": ["BR-USER-EMAILUNIQUE-001"]
+        }
+      ],
+      "use_cases": [
+        { "id": "UC-USER-001", "name": "사용자 생성", "actor": "관리자", "related_rules": ["BR-USER-EMAILUNIQUE-001"] }
+      ],
+      "ubiquitous_language": [
+        { "term": "작성자(author)", "definition": "게시글 또는 댓글을 생성한 사용자. Post.authorId 로 식별된다." },
+        { "term": "발행(published)", "definition": "게시글이 공개 목록에 노출되는지 여부를 나타내는 불리언 플래그." }
+      ]
+    }
+  ]
+}

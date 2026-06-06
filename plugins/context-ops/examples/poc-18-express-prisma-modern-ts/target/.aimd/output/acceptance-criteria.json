@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:50:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.9,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
+  },
+  "criteria": [
+    {"id": "AC-POST-001", "description": "createPost 가 인증 사용자 id 로 authorId 를 설정", "behavior_ref": "BHV-POST-001", "use_case_ref": "UC-POST-001",
+     "gherkin": {"given": ["사용자 alice 가 인증되어 있다"], "when": "alice 가 {title, content} 로 createPost 를 호출한다", "then": ["게시글이 생성된다", "post.authorId == alice.id"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-POST-001"], "related_brs": ["BR-POST-AUTHORSHIP-001"]},
+    {"id": "AC-POST-002", "description": "queryPosts 가 published 'true' 필터를 적용", "behavior_ref": "BHV-POST-002", "use_case_ref": "UC-POST-002",
+     "gherkin": {"given": ["발행된 게시글과 미발행 게시글이 존재한다"], "when": "published='true' 필터로 queryPosts 를 호출한다", "then": ["발행된 게시글만 결과에 포함된다"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-POST-002"], "related_brs": ["BR-POST-PUBLISHFILTER-001"]},
+    {"id": "AC-POST-003", "description": "getPostById 가 부재 시 null/404", "behavior_ref": "BHV-POST-003", "use_case_ref": "UC-POST-003",
+     "gherkin": {"given": ["id 999 게시글이 존재하지 않는다"], "when": "getPostById(999) 를 호출한다", "then": ["null 이 반환되거나 404 가 발생한다"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-POST-003"], "related_brs": ["BR-POST-EXISTENCE-001"]},
+    {"id": "AC-POST-004", "description": "updatePostById 가 비작성자를 거부(403)", "behavior_ref": "BHV-POST-004", "use_case_ref": "UC-POST-004",
+     "gherkin": {"given": ["alice 소유 게시글이 존재한다"], "when": "bob 이 그 게시글에 updatePostById 를 호출한다", "then": ["403 Forbidden 이 발생한다", "게시글은 변경되지 않는다"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-POST-004"], "related_brs": ["BR-POST-OWNERSHIP-001"]},
+    {"id": "AC-POST-005", "description": "deletePostById 가 비작성자를 거부(403)", "behavior_ref": "BHV-POST-005", "use_case_ref": "UC-POST-005",
+     "gherkin": {"given": ["alice 소유 게시글이 존재한다"], "when": "bob 이 그 게시글에 deletePostById 를 호출한다", "then": ["403 Forbidden 이 발생한다", "게시글은 그대로 존재한다"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-POST-005"], "related_brs": ["BR-POST-OWNERSHIP-002"]},
+    {"id": "AC-USER-001", "description": "사용자 생성 시 중복 이메일 거부", "behavior_ref": "BHV-USER-001", "use_case_ref": "UC-USER-001",
+     "gherkin": {"given": ["이메일 x@y.com 사용자가 존재한다"], "when": "x@y.com 으로 사용자 생성을 시도한다", "then": ["중복 이메일 오류가 발생한다"], "tags": ["@must"]},
+     "severity": "must", "verifiable": true, "automated_runnable": true, "test_case_refs": ["TC-USER-001"], "related_brs": ["BR-USER-EMAILUNIQUE-001"]}
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "cross_validation": {
+    "real_tool": false,
+    "imported_sarif": false,
+    "simulation_only": true,
+    "runs": [],
+    "environment_missing": [
+      {
+        "plugin": "semgrep",
+        "detail": "spawnSync semgrep ETIMEDOUT",
+        "ts": "2026-06-06T09:49:46.475Z"
+      }
+    ],
+    "findings_count": 0,
+    "baseline_report": null
+  }
+}

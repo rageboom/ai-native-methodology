@@ -1,0 +1,53 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:30:00Z",
+    "confidence": 0.82,
+    "inputs_used": ["source_code", "orm", "config_files"]
+  },
+  "antipatterns": [
+    {
+      "id": "AP-MAINTAINABILITY-001",
+      "category": "MAINTAINABILITY",
+      "name": "서비스 시그니처의 any 타입 누수",
+      "severity": "medium",
+      "why_avoid": "queryPosts(filter: any, options: any) 가 any 로 선언되어 타입 안전성이 사라진다. 재구현 시 필터/페이지네이션 계약이 코드에서 드러나지 않아 회귀 위험이 크다.",
+      "evidence": [{ "file": "src/modules/post/post.service.ts", "line": 19 }],
+      "detected_by": "static_analysis",
+      "confidence": 0.9,
+      "recommended_alternative": "filter/options 에 명시적 타입(PostFilter, PaginationOptions) 부여"
+    },
+    {
+      "id": "AP-DB-001",
+      "category": "DB",
+      "name": "마이그레이션 드리프트 (스키마-마이그레이션 불일치)",
+      "severity": "high",
+      "why_avoid": "init 마이그레이션(20250703095717_init)에 Post/Comment 테이블이 없어 prisma migrate deploy 만으로는 현재 schema.prisma(5모델)와 DB가 어긋난다. 실측: migrate deploy 후 테이블이 User/Token/Notification 3개뿐이었고 db push 로만 5개가 동기화됨.",
+      "evidence": [{ "file": "prisma/migrations/20250703095717_init/migration.sql", "line": 1 }],
+      "detected_by": "human_review",
+      "confidence": 0.95,
+      "migration_advice": "Post/Comment 추가분에 대한 후속 마이그레이션을 생성하거나 baseline 재설정"
+    },
+    {
+      "id": "AP-CONFIG-001",
+      "category": "CONFIG",
+      "name": "팬텀 의존성 (jsonwebtoken 미선언)",
+      "severity": "high",
+      "why_avoid": "src/shared/services/token.service.ts 가 jsonwebtoken 을 직접 import 하지만 package.json 에 선언되지 않았다(transitive 로만 존재). pnpm strict 환경에서 모듈 해소 실패로 테스트 7개 파일이 깨졌다(실측).",
+      "evidence": [{ "file": "src/shared/services/token.service.ts", "line": 4 }],
+      "detected_by": "human_review",
+      "confidence": 0.95,
+      "recommended_alternative": "jsonwebtoken 과 @types/jsonwebtoken 을 package.json 에 명시적으로 선언"
+    },
+    {
+      "id": "AP-MAINTAINABILITY-002",
+      "category": "MAINTAINABILITY",
+      "name": "문자열 비교로 위장한 불리언 필터",
+      "severity": "low",
+      "why_avoid": "published === 'true' 문자열 비교는 쿼리 계층에서 타입 강제를 우회한다. 입력 파서/검증 계층과 저장소 계층 사이의 타입 계약이 모호해진다.",
+      "evidence": [{ "file": "src/modules/post/post.repository.ts", "line": 126 }],
+      "detected_by": "static_analysis",
+      "confidence": 0.8,
+      "recommended_alternative": "validation 계층에서 boolean 으로 강제 후 저장소에는 boolean 으로 전달"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:40:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code", "documentation"],
+    "confidence": 0.9,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "src/modules/post/post.service.ts"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "Post 모듈 — 블로그 게시글 CRUD. 작성자 소유권(ownership)·존재 검사(existence)·발행 필터(publish filter) 규칙을 강제한다. (Express + Prisma + TypeScript)",
+    "stakeholders": ["reader", "author", "admin"],
+    "success_criteria": ["수정/삭제는 작성자만 가능", "존재하지 않는 게시글은 404", "생성 시 작성자=현재 사용자"]
+  },
+  "use_cases": [
+    {"id": "UC-POST-001", "name": "게시글 생성", "description": "createPost — 인증된 작성자가 게시글을 생성", "actors": ["author"], "preconditions": ["JWT 유효"], "postconditions": ["authorId = 현재 사용자 id 로 게시글 생성"], "acceptance_criteria_refs": ["AC-POST-001"], "source_grounded_evidence": ["src/modules/post/post.service.ts:createPost (line 12)"]},
+    {"id": "UC-POST-002", "name": "게시글 목록 조회", "description": "queryPosts — published 필터 목록", "actors": ["reader"], "preconditions": [], "postconditions": ["published 필터 적용"], "acceptance_criteria_refs": ["AC-POST-002"], "source_grounded_evidence": ["src/modules/post/post.repository.ts:findPosts (line 126)"]},
+    {"id": "UC-POST-003", "name": "게시글 단건 조회", "description": "getPostById", "actors": ["reader"], "preconditions": [], "postconditions": ["존재하지 않으면 null/404"], "acceptance_criteria_refs": ["AC-POST-003"], "source_grounded_evidence": ["src/modules/post/post.service.ts:getPostById (line 23)"]},
+    {"id": "UC-POST-004", "name": "게시글 수정", "description": "updatePostById — 작성자 전용", "actors": ["author"], "preconditions": ["JWT 유효", "작성자 본인"], "postconditions": ["게시글 수정"], "acceptance_criteria_refs": ["AC-POST-004"], "source_grounded_evidence": ["src/modules/post/post.service.ts:updatePostById (line 27)"]},
+    {"id": "UC-POST-005", "name": "게시글 삭제", "description": "deletePostById — 작성자 전용", "actors": ["author"], "preconditions": ["JWT 유효", "작성자 본인"], "postconditions": ["게시글 삭제"], "acceptance_criteria_refs": ["AC-POST-005"], "source_grounded_evidence": ["src/modules/post/post.service.ts:deletePostById (line 43)"]},
+    {"id": "UC-USER-001", "name": "사용자 생성", "description": "이메일 유일성", "actors": ["admin"], "preconditions": [], "postconditions": ["사용자 생성"], "acceptance_criteria_refs": ["AC-USER-001"], "source_grounded_evidence": ["prisma/schema.prisma:User.email @unique (line 15)"]}
+  ],
+  "business_rules_intent": [
+    {"br_id": "BR-POST-AUTHORSHIP-001", "reasoning": "createPost 가 요청 본문이 아니라 인증 사용자 id 로 authorId 를 설정한다.", "source_grounded_evidence": "src/modules/post/post.service.ts:13", "intent_certainty": "observed"},
+    {"br_id": "BR-POST-OWNERSHIP-001", "reasoning": "updatePostById 가 변경 전 post.authorId === userId 를 검증한다.", "source_grounded_evidence": "src/modules/post/post.service.ts:36", "intent_certainty": "observed"},
+    {"br_id": "BR-POST-OWNERSHIP-002", "reasoning": "deletePostById 가 삭제 전 소유권을 검증한다.", "source_grounded_evidence": "src/modules/post/post.service.ts:48", "intent_certainty": "observed"},
+    {"br_id": "BR-POST-EXISTENCE-001", "reasoning": "수정/삭제 시 게시글 부재면 404 를 던진다.", "source_grounded_evidence": "src/modules/post/post.service.ts:33", "intent_certainty": "observed"},
+    {"br_id": "BR-POST-PUBLISHFILTER-001", "reasoning": "findPosts 가 published === 'true' 문자열 비교로 필터를 적용한다.", "source_grounded_evidence": "src/modules/post/post.repository.ts:126", "intent_certainty": "observed"},
+    {"br_id": "BR-USER-EMAILUNIQUE-001", "reasoning": "User.email 에 unique 제약이 걸려 중복 이메일을 거부한다.", "source_grounded_evidence": "prisma/schema.prisma:15", "intent_certainty": "observed"}
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": ["input/business-rules.json", "input/domain.json"]
+  }
+}
