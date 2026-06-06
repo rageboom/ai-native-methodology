@@ -1,0 +1,12 @@
+{
+  "name": "@mis-plugins/inflation-lint",
+  "version": "0.1.0",
+  "description": "v8.8.0 Tier 3.1 — markdown 산출물의 inflation tone lint (warning only / chain blocking ❌). user memory `communication-style-no-star-inflation` 정합.",
+  "type": "module",
+  "engines": {"node": ">=18"},
+  "bin": {"inflation-lint": "./src/cli.js"},
+  "scripts": {
+    "test": "node --test test/lint.test.js"
+  },
+  "license": "UNLICENSED"
+}

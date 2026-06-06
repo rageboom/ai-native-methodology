@@ -7,7 +7,7 @@ npm-debug.log*
 dist/
 
 # Cloned source (PoC analysis only — re-clone via git)
-plugins/ai-native-methodology/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp/
+plugins/context-ops/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp/
 
 # Tool output
 **/tools/static-runner/out/

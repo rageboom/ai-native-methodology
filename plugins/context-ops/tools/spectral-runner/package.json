@@ -1,0 +1,15 @@
+{
+  "name": "@mis-plugins/spectral-runner",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo '[spectral-runner] CLI passthrough wrapper — no unit tests (S1 workspace test 호환 / spectral CLI 자체 검증)' && exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "description": "Spectral CLI passthrough — OpenAPI lint runner (no-simulation 정책 진짜 도구 1호 / v1.3.0 정식 도입). 본 wrapper 는 unit test 미보유 — Spectral 자체 ruleset 검증.",
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.15.1"
+  }
+}

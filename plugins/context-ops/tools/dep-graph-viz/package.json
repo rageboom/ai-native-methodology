@@ -1,0 +1,14 @@
+{
+  "name": "@mis-plugins/dep-graph-viz",
+  "version": "0.1.0",
+  "description": "dep-graph(artifact-graph.json) on-demand 인터랙티브 시각화 — 영향도 추적 중심. CLI가 self-contained 단독 HTML(D3 v7 인라인) 생성. reference-lens / display-only / committed mirror 아님 (ADR-011 sanctioned view-time). analyzeImpact·topKImpactRoot·checkGraphFreshness 재사용.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "dep-graph-viz": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED"
+}

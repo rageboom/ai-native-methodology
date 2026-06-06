@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// build-plugin.js — workspace source → dist/ai-native-methodology-v<version>/ plugin artifact 추출
+// build-plugin.js — workspace source → dist/context-ops-v<version>/ plugin artifact 추출
 // 본 plan (warm-brewing-moth.md) Phase 3 — Official Docs / Industry Case / Senior Engineer 토론 보강 7건 반영
 // usage:
 //   node scripts/build-plugin.js              # build (dist 생성)

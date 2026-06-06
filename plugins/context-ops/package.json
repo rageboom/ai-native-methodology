@@ -1,0 +1,63 @@
+{
+  "name": "@mis-plugins/context-ops",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "AI-Native 개발 방법론 — SDLC 6단계 chain harness Claude Code plugin (사내 표준). npm 배포 페이로드(source:npm) + chain/analysis 검증 도구 workspace. 산출물 json 단독 SSOT (v12).",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "plugins/context-ops"
+  },
+  "files": [
+    ".claude-plugin",
+    "agents",
+    "skills",
+    "hooks",
+    "flows",
+    "tools",
+    "templates",
+    "methodology-spec",
+    "schemas",
+    "guides",
+    "scripts/install-static-tools.js",
+    "scripts/install-static-tools.sh",
+    "CHANGELOG.md",
+    "CHANGELOG-HISTORY.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/fixtures",
+    "!**/corpus",
+    "!**/coverage",
+    "!**/*.test.js",
+    "!templates/adoption"
+  ],
+  "scripts": {
+    "release:check": "node scripts/release-readiness.js",
+    "test:release": "node --test scripts/test/release-readiness.test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "bundledDependencies": [
+    "ajv",
+    "ajv-formats",
+    "fast-xml-parser"
+  ],
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
+  }
+}

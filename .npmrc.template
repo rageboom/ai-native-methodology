@@ -15,7 +15,7 @@
 #    (사내망에서 registry 가 group 으로 향하기만 하면 됨. Claude Code 는 marketplace.json 의
 #     source.registry 로 직접 받으므로 보통 .npmrc 도 불요.)
 #  아래는 npm CLI 로 직접 받을 때만 참고:
-@ai-native-methodology:registry=https://repo.smiledev.net/repository/npm-public/
+@mis-plugins:registry=https://repo.smiledev.net/repository/npm-public/
 # (익명 read 이므로 토큰 라인 불요. 만약 환경상 인증 요구되면 아래 주석 해제)
 # //repo.smiledev.net/repository/npm-public/:_authToken=${NEXUS_NPM_TOKEN}
 

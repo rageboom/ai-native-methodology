@@ -1,0 +1,14 @@
+{
+  "name": "@mis-plugins/br-cross-consistency-validator",
+  "version": "0.2.1",
+  "description": "v2.5.0 MINOR FINAL — rules.json BR 안 두 표현 (natural_language + given/when/then) 의 의미적 정합 cross-validation 검증 도구. Layer 1 결정적 (structural sanity / overlap > 0 only / threshold 자체 제거 / session 11차 phase B) + Layer 2 LLM mandatory paradigm 본격 도입 (Claude Code sub-agent invocation / Sonnet 4.6 / batch paradigm / DETERMINISTIC_THRESHOLD 0.85 / confidence cap 0.85 / semantic_drift_detected + confidence_cap_exceeded finding / session 12~13차 본격 구현). 31 BR ≥ 2 PoC corroboration 본격 입증 (PoC #01 13 + PoC #03 18 / Adzic SBE 함정 회피 자격 본격 도달). industry-first paradigm (GitHub Spec Kit / AWS Q / DMN / Drools / Spectral 모두 cross-consistency rule 부재). ADR-CHAIN-011 §11 patch v9 정합.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "br-cross-consistency-validator": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/validator.test.js"
+  },
+  "license": "UNLICENSED"
+}

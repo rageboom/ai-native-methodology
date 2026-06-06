@@ -1,0 +1,14 @@
+{
+  "name": "@mis-plugins/adopter-evidence-packager",
+  "version": "0.1.0",
+  "description": "26번째 도구 — Type 2 외부 adopter corroboration 캡처 (plan-type2-external-adoption.md EXT-CAPTURE 해소). .aimd/state.json + scope manifest + findings + traceability-matrix → 익명화 corroboration 합성 → adopter-corroboration.schema 검증 → .aimd/output/adopter-corroboration.json. PII best-effort redaction + post-redaction leak guard. AI 추론 0% (결정론). release-readiness #30 게이트.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "adopter-evidence-packager": "./src/cli.js" },
+  "scripts": { "test": "node --test test/packager.test.js" },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1"
+  },
+  "license": "UNLICENSED"
+}

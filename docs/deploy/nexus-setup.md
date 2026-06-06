@@ -51,7 +51,7 @@ npm run publish:plugin           # publishConfig.registry(npm-hosted)로 publish
 
 ```bash
 # group repo 에서 받아지는지 (익명)
-npm view @ai-native-methodology/plugin --registry https://repo.smiledev.net/repository/npm-public/
+npm view @mis-plugins/context-ops --registry https://repo.smiledev.net/repository/npm-public/
 # 클린 머신(git 계정 無, 토큰 無)에서 설치
 claude plugin marketplace add https://<카탈로그-host>/marketplace.json   # 또는 GHE git
 claude plugin install ai-native-methodology@mis-plugins

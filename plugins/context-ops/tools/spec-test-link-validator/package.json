@@ -1,0 +1,10 @@
+{
+  "name": "@mis-plugins/spec-test-link-validator",
+  "version": "0.1.0",
+  "description": "v2.0 chain 3 validator — AC→TC link coverage / framework match (analysis-source-inventory) / coverage ≥ 0.85.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "spec-test-link-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

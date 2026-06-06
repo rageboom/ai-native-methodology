@@ -1,0 +1,14 @@
+{
+  "name": "@mis-plugins/test-impl-pass-validator",
+  "version": "0.1.0",
+  "description": "v2.0 sub-plan-3b — shared test-runner gate validator (test=chain 4/gate#4 RED · implement=chain 5/gate#5 GREEN). 진짜 test runner shell 호출 (jest/vitest/junit5/pytest) + scenario별 RED/GREEN 의무 + 5종 물증 schema 강제 + result_hash 정규화 (SARIF Appendix F). ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) 정합. no-simulation 정책 핵심 enforcement.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "test-impl-pass-validator": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/result-hash.test.js test/adapter.test.js test/cli.test.js test/mock-detect.test.js test/s2-outcome-check.test.js test/report-format.test.js test/load-test-cmd.test.js"
+  },
+  "license": "UNLICENSED"
+}

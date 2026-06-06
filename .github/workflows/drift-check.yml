@@ -38,18 +38,18 @@ jobs:
 
       - name: drift-validator self-test (corpus 4쌍 + dmn-check)
         run: |
-          npm test --workspace=plugins/plugins/ai-native-methodology/tools/drift-validator
-          npm test --workspace=plugins/plugins/ai-native-methodology/tools/decision-table-validator
+          npm test --workspace=plugins/plugins/context-ops/tools/drift-validator
+          npm test --workspace=plugins/plugins/context-ops/tools/decision-table-validator
 
       - name: drift-validator on PoC #02 formal-spec
         run: |
-          node plugins/ai-native-methodology/tools/drift-validator/src/cli.js \
-            plugins/ai-native-methodology/examples/poc-02-realworld-springboot3/output/formal-spec/
+          node plugins/context-ops/tools/drift-validator/src/cli.js \
+            plugins/context-ops/examples/poc-02-realworld-springboot3/output/formal-spec/
 
       - name: decision-table-validator on PoC #02
         run: |
-          node plugins/ai-native-methodology/tools/decision-table-validator/src/cli.js \
-            plugins/ai-native-methodology/examples/poc-02-realworld-springboot3/output/formal-spec/decision-tables/
+          node plugins/context-ops/tools/decision-table-validator/src/cli.js \
+            plugins/context-ops/examples/poc-02-realworld-springboot3/output/formal-spec/decision-tables/
 
   static-runner:
     name: static-runner (Semgrep + PMD — real tool only, no simulation)
@@ -86,7 +86,7 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: run Semgrep on body (diff-aware on PR / full on schedule)
-        working-directory: plugins/ai-native-methodology
+        working-directory: plugins/context-ops
         run: |
           mkdir -p tools/static-runner/out
           node tools/static-runner/src/cli.js \
@@ -102,7 +102,7 @@ jobs:
       # 의의: ADR-010 §2.3 정합 — critical/high severity 신규 결함 = CI fail (production blocker).
       # baseline (semgrep-baseline.json) = v1.4.1 시점 0 findings 첫 작성. novel 1+ = blocked.
       - name: run Semgrep on PoC #04 full (FE 트랙 / custom rule + ratchet)
-        working-directory: plugins/ai-native-methodology
+        working-directory: plugins/context-ops
         run: |
           node tools/static-runner/src/cli.js \
             --plugin semgrep \
@@ -114,7 +114,7 @@ jobs:
             --ratchet
 
       - name: run PMD on Java targets (PoC examples)
-        working-directory: plugins/ai-native-methodology
+        working-directory: plugins/context-ops
         continue-on-error: true # PMD 의 false positive 폭발 baseline 미설정 시 일시 허용
         run: |
           node tools/static-runner/src/cli.js \
@@ -124,21 +124,21 @@ jobs:
 
       - name: lint-no-simulation (no-sim policy enforce)
         run: |
-          bash plugins/ai-native-methodology/tools/static-runner/src/lint-no-simulation.sh \
-            plugins/ai-native-methodology/tools/static-runner/out
+          bash plugins/context-ops/tools/static-runner/src/lint-no-simulation.sh \
+            plugins/context-ops/tools/static-runner/out
 
       - name: upload SARIF to Code Scanning
         if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: plugins/ai-native-methodology/tools/static-runner/out/
+          sarif_file: plugins/context-ops/tools/static-runner/out/
 
       - name: upload evidence artifact (5종 물증 보존)
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: static-runner-evidence
-          path: plugins/ai-native-methodology/tools/static-runner/out/
+          path: plugins/context-ops/tools/static-runner/out/
           retention-days: 30
 
   monorepo-gates:

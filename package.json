@@ -28,7 +28,7 @@
     "catalog:build:check": "node scripts/build-catalog.js --check",
     "test": "npm run test --workspaces --if-present",
     "test:tools": "npm run test --workspaces --if-present",
-    "test:release": "node --test plugins/ai-native-methodology/scripts/test/release-readiness.test.js",
+    "test:release": "node --test plugins/context-ops/scripts/test/release-readiness.test.js",
     "release:check": "node scripts/release-check.js",
     "publish:plugin": "node scripts/publish.js",
     "publish:plugin:dry": "node scripts/publish.js --dry-run",

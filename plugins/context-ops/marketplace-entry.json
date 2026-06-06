@@ -1,0 +1,4 @@
+{
+  "description": "SDLC 6단계 chain harness (legacy 분석 → discovery → spec → plan → test → implement / v9.0 6-stage). Analysis stage = 한 방향 추출 (7대 산출물 + finding + antipatterns + migration-cautions / Phase 0~6 + BE/FE/DB 분기 + 횡단 a11y/i18n/security/legacy). 위 chain 1~5 gate (#1~#5 / chain N = gate #N / plan = #3 본격) + revisit loop + 70~80% 한계 명시.",
+  "versionRange": "^0.1.0"
+}
