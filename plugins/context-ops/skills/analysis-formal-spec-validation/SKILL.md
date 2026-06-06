@@ -16,7 +16,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 baseline → `methodology-spec/policies/no-simulation.md`.
 
-- 본 skill 도구: Semgrep (Tier 1) / PMD·SpotBugs·CodeQL·Daikon·SonarQube (Tier 2 SARIF import). 환경 부재 시 사용자 환경 준비 또는 CI 위임.
+- 본 skill 도구: Semgrep (Tier 1) / PMD (Tier 2 SARIF import allowlist / 실 import 입증 driver). 환경 부재 시 사용자 환경 준비 또는 CI 위임. (SpotBugs·CodeQL·Daikon·SonarQube 등 실 import 이력 0 도구는 미등재 — 사용자 명시 확장.)
 
 ## 절차
 
@@ -26,7 +26,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - openapi.yaml endpoint ↔ business-rules.json rule 매칭
 2. **진짜 도구 실행** (해당 stack 에 한해 / R19 Tier 명시):
    - **Tier 1 (in-plugin)** — Semgrep (다중 언어 / 보안 + 패턴 / Python pipx)
-   - **Tier 2 (사용자 환경 SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+ + bytecode) / Daikon (Java + runtime trace) / CodeQL (JDK + DB build) / SonarQube
+   - **Tier 2 (사용자 환경 SARIF import)** — allowlist=PMD (Java 8 or above / 실 import 입증). 그 외 도구는 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장
    - 환경 부재 시 사용자 위임 명시 (정직 표기 / 시뮬 ❌)
 3. **5단계 신뢰도** — 각 산출물별 신뢰도 평가:
    - 1단계: 사람 작성 / source 없음

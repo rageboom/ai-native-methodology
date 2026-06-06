@@ -7,7 +7,7 @@
 | Tier                                       | 도구                                                                                                                 | 실행 환경                                                                        | evidence_trust                   |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------- |
 | **Tier 1** (in-plugin native)              | **Semgrep** (Python pipx / brew / uv tool — JVM 의존 0)                                                              | plugin 환경 (SessionStart hook 자동 install — `node scripts/install-static-tools.js`, 크로스플랫폼) | `real_tool`                      |
-| **Tier 2** (user-environment SARIF import) | **PMD** (Java 8 or above) / **SpotBugs** (JRE 11+) / **CodeQL** (JDK + DB build) / **Daikon** (Java + runtime trace) | 사용자 CI / 로컬                                                                 | `imported_sarif`                 |
+| **Tier 2** (user-environment SARIF import) | **PMD** (Java 8 or above / 본 환경 실 import 입증 driver). 그 외 도구(SpotBugs·CodeQL·Daikon 등)는 실 import 이력 0 → allowlist 미등재(사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장) | 사용자 CI / 로컬                                                                 | `imported_sarif`                 |
 | **Tier 3** (simulated)                     | ❌ AI persona / 손작성 / `manual` driver SARIF                                                                       | —                                                                                | `simulated` → 영구 reject (-5%p) |
 
 v8.6.0 격하 근거: plugin 배포 환경 (Claude Code / Node.js 기반) 에서 JVM/JDK/Maven/Gradle/bytecode 컴파일 환경 보장 비현실 → in-plugin 실행 ❌. 사용자 환경 SARIF import 패턴 = Adzic SBE 10년 폐기 함정 정공법 (시뮬 ❌ + 실 사용자 환경 의무).
@@ -82,16 +82,16 @@ npx static-runner --import-sarif ./out/pmd.sarif --import-driver pmd --output ./
   --reproduction-command "pmd check -d ./src -R rulesets/java/quickstart.xml -f sarif"
 
 # 빈 SARIF (results=[]) 인 경우 = non_use_rationale 의무 (Adzic SBE 함정 회피)
-npx static-runner --import-sarif ./out/spotbugs.sarif --import-driver spotbugs --output ./out \
-  --reproduction-command "spotbugs -sarif=./out/spotbugs.sarif ..." \
-  --non-use-rationale "legacy module — SpotBugs 결함 0 사실 기록"
+npx static-runner --import-sarif ./out/pmd.sarif --import-driver pmd --output ./out \
+  --reproduction-command "pmd check -d ./src -R rulesets/java/quickstart.xml -f sarif" \
+  --non-use-rationale "legacy module — PMD 결함 0 사실 기록"
 ```
 
 ### Tier 2 4 조건 schema-level 강제 (Senior STRONG-STOP 흡수)
 
 | #   | 조건                                                                    | 미만족 시                                                   |
 | --- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
-| 1   | driver.name allowlist `[pmd, spotbugs, codeql, daikon]` (대소문자 무관) | `ImportSarifRejected: driver_name_not_allowlisted` (exit 4) |
+| 1   | driver.name allowlist `[pmd]` (대소문자 무관 / 실 import 입증 driver 만 / 확장은 명시 등재) | `ImportSarifRejected: driver_name_not_allowlisted` (exit 4) |
 | 2   | `runs[].results > 0` 또는 `--non-use-rationale` 명시                    | `ImportSarifRejected: empty_sarif_without_rationale`        |
 | 3   | SARIF `invocations[].commandLine` 또는 `--reproduction-command` 명시    | `ImportSarifRejected: reproduction_command_missing`         |
 | 4   | `evidence_trust = imported_sarif` (real_tool 과 결정적 구분)            | manifest 에 명시 / chain gate 가 별도 등급 평가             |

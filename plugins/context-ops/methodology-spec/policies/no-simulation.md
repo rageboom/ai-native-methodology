@@ -10,7 +10,7 @@
 ## 2. R19 Tier 분류
 
 - **Tier 1 (in-plugin 실제 실행)**: Semgrep / ESLint / Spectral / axe-core·Playwright / 테스트 단계 stack runner (Gradle·JUnit / vitest 등). 실 실행 + 5종 물증 의무 → 신뢰 모델 단계 5.
-- **Tier 2 (사용자 환경 SARIF import / plugin 자동 실행 ❌)**: PMD / SpotBugs / CodeQL / Daikon / SonarQube. plugin 이 직접 돌리지 않고, 사용자가 자기 CI/환경에서 실행해 SARIF 를 import 할 때만 `evidence_trust=imported_sarif` (`tool_stdout_path=null` 정직 표기). 부재 = environment-dependent carry (날조 ❌).
+- **Tier 2 (사용자 환경 SARIF import / plugin 자동 실행 ❌)**: import allowlist = **PMD** (본 환경 실 import 입증 driver). plugin 이 직접 돌리지 않고, 사용자가 자기 CI/환경에서 실행해 SARIF 를 import 할 때만 `evidence_trust=imported_sarif` (`tool_stdout_path=null` 정직 표기). 부재 = environment-dependent carry (날조 ❌). **SpotBugs/CodeQL/Daikon/SonarQube 등 실행·import 이력 0 도구는 "사용 toolset" 으로 나열 ❌** (실행 못 하는 도구 인용 금지 / 사용자가 자기 환경서 쓰면 allowlist 명시 확장 = `static-runner` `IMPORTED_DRIVER_ALLOWLIST`).
 - **Tier 3 (simulated)**: `evidence_trust=simulated` = -5%p + chain gate block + 영구 reject.
 
 ## 3. 7 evidence 필드 contract
@@ -26,3 +26,4 @@
 - ADR: `docs/adr/ADR-009-다이어그램-신뢰-모델.md` §2.2 / §2.5 (신뢰 모델 단계 4·5)
 - R19 근거: `methodology-spec/plugin-charter.md`
 - 결단: DEC-2026-05-18-runtime-tool-exclusion
+- 결단: DEC-2026-06-06-tool-allowlist-pmd-only (Tier 2 import allowlist=PMD 축소 / 실행 이력 0 도구 제거)

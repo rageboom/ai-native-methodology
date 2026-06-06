@@ -52,7 +52,7 @@ charter R19 (Tool Ecosystem Dependency Classification) 의 3-tier paradigm:
 | ------------------------------------- | ------------------------------------ | ------------------------------- | ------------------------------------------------------------------------------------- |
 | **1** (in-plugin native)              | Spectral (OpenAPI lint)              | `spectral-runner/`              | npm install 의존 (Node.js)                                                            |
 | **1** (in-plugin native)              | Semgrep (정적 분석 / multi-language) | `static-runner/`                | `pipx install semgrep` / Python 3.10+ / `PYTHONUTF8=1` (Windows 한국어)               |
-| **2** (user-environment SARIF import) | PMD / SpotBugs / CodeQL / Daikon     | `static-runner/ --import-sarif` | 사용자 CI / 로컬 환경 (Java 8+ / JRE 11+ / JDK / runtime trace) — plugin 환경 실행 ❌ |
+| **2** (user-environment SARIF import) | allowlist=PMD (확장은 명시 등재)     | `static-runner/ --import-sarif` | 사용자 CI / 로컬 환경 (Java 8+) — plugin 환경 실행 ❌ / 실 import 이력 0 도구 미등재 |
 | **3** (simulated)                     | ❌ AI persona / 손작성 SARIF         | —                               | 영구 reject (chain gate -5%p + block)                                                 |
 
 v8.6.0 격하 사유: plugin 배포 환경 (Claude Code / Node.js 기반) 에서 JVM/JDK/Maven/Gradle/bytecode 컴파일 환경 보장 비현실. Tier 2 = SARIF 2.1.0 (OASIS Standard) 결과 import 패턴으로 위임.

@@ -392,7 +392,7 @@ retract 영역 (chain harness 안에서 정식 허용):
 - drift-validator: handoff/layout 정합 (JSON-only handoff + artifact-registry detector)
 - decision-table-validator: DMN 5-check
 - spectral-runner: OpenAPI 정합
-- static-runner: 외부 정적 분석 hook — R19 Tier 1 (in-plugin Semgrep) + Tier 2 (사용자 환경 SARIF import / PMD / SpotBugs / CodeQL / Daikon)
+- static-runner: 외부 정적 분석 hook — R19 Tier 1 (in-plugin Semgrep) + Tier 2 (사용자 환경 SARIF import / allowlist=PMD)
 - schema-validator: Ajv 8 (FE 트랙)
 
 ### chain harness (6-stage)

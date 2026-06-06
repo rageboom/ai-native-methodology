@@ -69,13 +69,8 @@ test('SemgrepPlugin extraRules empty default — no extra --config', () => {
 
 // R19 Tier 2 — importSarif 4 조건 강제 test
 
-test('IMPORTED_DRIVER_ALLOWLIST = pmd/spotbugs/codeql/daikon (R19 Tier 2)', () => {
-	assert.deepEqual(IMPORTED_DRIVER_ALLOWLIST, [
-		'pmd',
-		'spotbugs',
-		'codeql',
-		'daikon',
-	]);
+test('IMPORTED_DRIVER_ALLOWLIST = pmd only (R19 Tier 2 / 실 import 입증 driver 만)', () => {
+	assert.deepEqual(IMPORTED_DRIVER_ALLOWLIST, ['pmd']);
 });
 
 test('EVIDENCE_TRUST 3-tier enum (real_tool / imported_sarif / simulated)', () => {
@@ -190,9 +185,9 @@ test('importSarif accepts empty results WITH non_use_rationale', () => {
 			version: '2.1.0',
 			runs: [
 				{
-					tool: { driver: { name: 'SpotBugs', version: '4.7.3' } },
+					tool: { driver: { name: 'PMD', version: '7.0.0' } },
 					results: [],
-					invocations: [{ commandLine: 'spotbugs -sarif ...' }],
+					invocations: [{ commandLine: 'pmd check -f sarif ...' }],
 				},
 			],
 		}),
@@ -204,7 +199,7 @@ test('importSarif accepts empty results WITH non_use_rationale', () => {
 			nonUseRationale: 'legacy module — coverage 보고된 결함 0 사실 기록',
 		});
 		assert.equal(run.evidence.evidence_trust, 'imported_sarif');
-		assert.equal(run.evidence.imported_driver_name, 'spotbugs');
+		assert.equal(run.evidence.imported_driver_name, 'pmd');
 		assert.equal(run.evidence.imported_results_count, 0);
 		assert.ok(run.evidence.non_use_rationale);
 	} finally {
@@ -249,9 +244,9 @@ test('importSarif accepts user-provided reproduction_command (SARIF invocations 
 			version: '2.1.0',
 			runs: [
 				{
-					tool: { driver: { name: 'CodeQL', version: '2.15.0' } },
+					tool: { driver: { name: 'PMD', version: '7.0.0' } },
 					results: [
-						{ ruleId: 'cq1', message: { text: 'x' }, level: 'warning' },
+						{ ruleId: 'r1', message: { text: 'x' }, level: 'warning' },
 					],
 				},
 			],
@@ -261,11 +256,11 @@ test('importSarif accepts user-provided reproduction_command (SARIF invocations 
 		const run = importSarif({
 			sarifPath: path,
 			outputDir: dir,
-			reproductionCommand: 'codeql database analyze db --format=sarif-latest',
+			reproductionCommand: 'pmd check -d src -R ruleset.xml -f sarif',
 		});
 		assert.equal(run.evidence.evidence_trust, 'imported_sarif');
-		assert.equal(run.evidence.imported_driver_name, 'codeql');
-		assert.match(run.evidence.reproduction_command, /codeql database analyze/);
+		assert.equal(run.evidence.imported_driver_name, 'pmd');
+		assert.match(run.evidence.reproduction_command, /pmd check/);
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
 	}

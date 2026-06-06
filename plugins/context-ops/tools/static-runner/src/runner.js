@@ -1,7 +1,7 @@
 // static-runner core
 //
 // v8.6.0 — Tier 1 (in-plugin native) = Semgrep 단일.
-//   Tier 2 (imported SARIF) = 사용자 CI/환경 실행 후 SARIF 결과 import (PMD / SpotBugs / CodeQL / Daikon).
+//   Tier 2 (imported SARIF) = 사용자 CI/환경 실행 후 SARIF 결과 import (PMD = 실 import 입증 driver / poc-17).
 //   Tier 3 (simulated) = 영구 reject (no-simulation 정책 enforcement).
 //
 //   no-simulation 정책 (feedback_no_static_tool_simulation.md):
@@ -34,12 +34,10 @@ export const REQUIRED_EVIDENCE = [
 
 // R19 Tier 2 — imported SARIF driver.name allowlist (대소문자 무관).
 // allowlist 외 driver = 'manual' / 'ai-generated' / 미명시 → reject.
-export const IMPORTED_DRIVER_ALLOWLIST = [
-	'pmd',
-	'spotbugs',
-	'codeql',
-	'daikon',
-];
+// PMD only — 본 환경에서 실 import 입증된 driver 만 등재 (poc-17 user-env).
+//   SpotBugs/CodeQL/Daikon/SonarQube 는 실행·import 이력 0 → "진짜 도구" 나열 = no-simulation
+//   위반(feedback_no_unrunnable_tool_citation) → 제거. 필요 시 사용자가 명시 확장 (DEC-2026-06-06-tool-allowlist-pmd-only).
+export const IMPORTED_DRIVER_ALLOWLIST = ['pmd'];
 
 // evidence_trust 등급 (Senior STRONG-STOP 흡수 / chain-strict mode 격상).
 export const EVIDENCE_TRUST = Object.freeze({

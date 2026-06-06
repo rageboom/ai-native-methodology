@@ -23,7 +23,7 @@ Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new
 1. **Identify the analysis target** — confirm with user: which legacy codebase / branch / commit ref?
 2. **Run baseline tools** — real external tools, not simulation (R19 Tier 명시):
    - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint
-   - **Tier 2 (user-environment SARIF import)** — PMD (Java 8 or above) / SpotBugs (JRE 11+) / CodeQL / Daikon / Bandit (Python) → `tools/static-runner --import-sarif <path> --import-driver <name>`
+   - **Tier 2 (user-environment SARIF import)** — `import-driver` allowlist = **PMD** (Java 8+ / 실 import 입증). 그 외 도구는 실 import 이력 0 → 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 후 → `tools/static-runner --import-sarif <path> --import-driver pmd`
    - Whichever applies to the target language stack
 3. **Capture baseline counts and findings** — write to `<user-project>/.aimd/baseline-<YYYY-MM-DD>.json`:
    ```json
@@ -32,7 +32,7 @@ Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new
      "baseline_commit": "<sha>",
      "tools": {
        "semgrep": { "findings_count": 247, "by_severity": { "high": 12, "medium": 89, "low": 146 }, "report_path": ".aimd/baseline-semgrep-2026-05-02.json" },
-       "spotbugs": { ... }
+       "pmd": { ... }
      },
      "ratchet_policy": "no-new-high | no-new-any | percent-decrease",
      "review_cadence": "monthly"

@@ -6,7 +6,7 @@
 //   Tier 1 사용 (in-plugin Semgrep):
 //     npx static-runner --plugin semgrep --target <dir> --output <dir>
 //
-//   Tier 2 사용 (사용자 환경 PMD/SpotBugs/CodeQL/Daikon 실행 후 SARIF import):
+//   Tier 2 사용 (사용자 환경 PMD 실행 후 SARIF import / allowlist=pmd):
 //     npx static-runner --import-sarif <path> --import-driver pmd --output <dir> \
 //       [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]
 //
@@ -91,7 +91,7 @@ function usage() {
 		'  static-runner --plugin semgrep --target <dir> --output <dir> [--ruleset <id>] [--extra-rules <path>]... [--baseline <path>] [--ratchet] [--write-baseline <path>] [-- <extra args>]',
 	);
 	console.error(
-		'  static-runner --import-sarif <path> --import-driver <pmd|spotbugs|codeql|daikon> --output <dir> [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]',
+		'  static-runner --import-sarif <path> --import-driver pmd --output <dir> [--reproduction-command "<cmd>"] [--non-use-rationale "<reason>"]',
 	);
 }
 

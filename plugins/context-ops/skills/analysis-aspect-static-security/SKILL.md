@@ -12,7 +12,7 @@ no-simulation 정책 핵심 적용 영역. 진짜 도구 실행 의무.
 
 baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정의 / 7 evidence 필드 / 신뢰도 단계 4·5).
 
-- 본 skill 도구 매핑: Semgrep·ESLint = Tier 1 (in-plugin) / PMD·SpotBugs·CodeQL·Daikon·Bandit·Snyk·OSV-Scanner·SonarQube = Tier 2 (사용자 환경 SARIF import).
+- 본 skill 도구 매핑: Semgrep·ESLint = Tier 1 (in-plugin) / 그 외(PMD·SpotBugs·CodeQL·Daikon·Bandit·Snyk·OSV-Scanner·SonarQube)는 **사용자 환경 실행 가능한 보안 도구 landscape** = Tier 2. 단 **static-runner SARIF import allowlist 현재 = PMD only**(실 import 입증 driver) — 그 외 도구를 import 하려면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 필요(실 import 이력 0 / 실행 못 하는 도구 인용 금지). 아래 stack별 목록 = 도구 존재 안내이지 "방법론이 자동 import" 보장 ❌.
 
 ## 사전 조건
 
