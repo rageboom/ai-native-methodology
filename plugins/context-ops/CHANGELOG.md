@@ -10,6 +10,20 @@
 
 ---
 
+## [0.19.0] — 2026-06-08 MINOR — living-sync carry 2: fixpoint 자동 재진입 (수렴 원장 `sync-converge`)
+
+`sync-next` 큐 소비 완료 후 남던 honest-debt("fixpoint 미보증 — 수동 sync-loop 재실행")를 **결정론 수렴 원장**으로 종결. 도구는 **수렴-제어 half 만 결정론 소유** — 재생성(LLM)·그래프 재합성(외부 flow)은 반복 사이(no-simulation §3.4 경계 보존). §23 DEFER 가 말한 "LLM-orchestration 배선 시 재검토"의 그 배선. 4원칙(plan `plan-living-sync-carry2-converge.md` + **Senior 적대 step-0[REVISE@0.80]** + 사용자 BUILD 결단 / DEC §23 carry2 / §33 fixpoint / §63 R1).
+
+- **핵심 가치 = cumulative_done dedup**: naive 수동 `sync-loop --git C0` 반복은 고정 baseline 대비 재생성된 하류를 **전부 재시드** → ping-pong(무한 재생성). 빠진 결정론 조각 = 세션 누적 done 노드를 재시드에서 제외 → §33 단조 → **종료 보장**.
+- **순수 코어(sync-loop.js)**: `recordCompleted`(세션 done 누적) + `convergenceDecision`(detectedIds \ cumulative_done = newWork / ∅→fixpoint·>0&iter<cap→continue·iter>=cap→non_converging) + `nonConvergingFinding`(promote-ready). gate·I/O·시간 0(trust 가드).
+- **`sync-converge <project> --graph <g> --git <baseline> [--cap n] [--reset] [--json]`**: 큐 complete 전제 → 고정 baseline 재검출(carry 1b `--git` 재사용) → 수렴 판정. continue=잔여 newWork 만 iter++ 재시드 / fixpoint=큐 clear+세션 종결 / non_converging=finding+exit1.
+- **★ Senior BLOCKER-1(REVISE@0.80) 반영 = fixpoint 선언 하드 전제 가드**: 재합성 부재 상태의 fixpoint 선언 = 거짓 건강(P0 역행). fixpoint 는 **(newWork=∅) AND (graph fresh: `checkGraphFreshness.stale=false`) AND (unresolved_paths=∅)** 3조건 동시일 때만. 미충족 = **강등**(exit≠0 정직 신호): stale·unresolved→`needs_resynth`(traceability-matrix-builder --graph 재합성 후 재판정 안내) / derived_from 부재(freshness no-op)→`unverified_fixpoint`(현 honest-debt 동급 / 거짓 확정 금지).
+- **★ Senior MAJOR 반영**: M1 session 생명주기(baseline 최초 1회·불일치 exit3·--reset / sync-loop·route·lift fresh 큐 write 시 `sync_session` 무효화=새 배치) · M2 단조 trade 명시(동일 세션 done 노드 재편집은 별도 세션 / fixpoint 출력 표기) · M3 non_converging finding(`{kind:'sync.non_converging', severity:'high', residual_new_work}`).
+- **검증(no-sim 실 / §8.1 ≥2 도메인 mechanism)**: chain-driver **482**(+23: 순수 코어 11 + e2e 12). e2e=★ **BLOCKER-1 두 경로**(재합성됨→fixpoint / 재합성 안 됨[stale]→needs_resynth) + 새 구조 파일→unresolved + continue→fixpoint **2-iter 수렴** + cap non_converging + 세션 가드(baseline 불일치·--reset·fresh-큐 무효화). 재생성·재합성=synthetic tmp-git(LLM 미실행 / 데이터 ceiling 아님 = mechanism corroboration). RR 무회귀·3-way 0.19.0.
+- **정직 경계**: 도구는 재생성·재합성 안 함(외부). 실 운영 다중-iteration in-the-wild 관찰 0(synthetic). untracked 신규 파일=git diff 제외(미감지 / carry 1b note 계승).
+
+---
+
 ## [0.18.0] — 2026-06-07 MINOR — living-sync carry 1b: BR 외 범용 git-auto-origin (`sync-loop --git`)
 
 carry 1(--br-diff / business-rules.json per-rule)을 **전 산출물**로 일반화 — `sync-loop --git <ref>` = ref↔워크트리 git diff → 변경 파일 자동 수집 → origins → regen_queue. 변경 자동 감지 완성(수동 `--changed <path>...` 트리거 갭 해소 / P0). 4원칙(plan `plan-living-sync-c1b-git-auto-origin.md` + **Senior 적대 step-0[REVISE@0.82]** + 사용자 ① BUILD 결단).

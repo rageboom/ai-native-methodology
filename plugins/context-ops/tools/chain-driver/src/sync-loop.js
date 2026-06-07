@@ -245,3 +245,85 @@ export function queueStatus(regenQueue) {
 		complete: items.length > 0 && done === items.length,
 	};
 }
+
+// ── carry 2 — fixpoint 자동 재진입 / 수렴 원장 (DEC §23 carry2 / §33 fixpoint / §63 R1) ──────
+// 정책: 도구는 **수렴-제어 half 만 결정론**으로 소유한다 — 재생성(LLM)·그래프 재합성(외부 flow)은 반복 사이.
+//   가치 = cumulative_done dedup(§33 단조 → ping-pong 불가 → 종료) + iteration cap + non-converging finding.
+//   ★ BLOCKER-1(Senior@0.80): 재합성 부재 상태의 fixpoint 선언 = 거짓 건강(P0 역행).
+//     fixpoint 는 (newWork=∅) AND (graph fresh) AND (unresolved=∅) 3조건 동시일 때만. 미충족 = 강등(needs_resynth / unverified_fixpoint).
+
+/**
+ * 세션 done 노드 누적 (순수 transform — durable write 는 호출자 CAS).
+ *   cumulative_done = 한 수렴 세션(고정 baseline)에서 이미 처리한 노드. 재시드 dedup 의 기준.
+ * @returns {object} 갱신된 session (cumulative_done 정렬·dedup)
+ */
+export function recordCompleted(session, completedNodeIds = []) {
+	const set = new Set(session?.cumulative_done ?? []);
+	for (const id of completedNodeIds) if (id) set.add(id);
+	return { ...(session || {}), cumulative_done: [...set].sort() };
+}
+
+/**
+ * 수렴 결정 (순수 / BLOCKER-1 가드 인코딩).
+ *   우선순위: newWork>0 → (cap 초과 non_converging / 아니면 continue) / newWork=∅ → fixpoint 가드.
+ * @param {object} p
+ * @param {string[]} p.detectedIds 재검출 영향 노드 (origins∪closure)
+ * @param {string[]} p.unresolvedPaths --git 재검출 미해소 경로 (새 구조 파일 = 노드 미매핑)
+ * @param {string[]} p.cumulativeDone 세션 누적 done
+ * @param {number} p.iteration 현 iteration (1-base)
+ * @param {number} p.cap iteration 상한
+ * @param {boolean} p.graphStale checkGraphFreshness().stale
+ * @param {boolean} p.freshnessVerifiable graph.derived_from 비어있지 않음 (freshness 가 no-op 아님)
+ * @returns {{ status, newWork:string[], iteration, cap, reason?, unresolved? }}
+ *   status ∈ fixpoint | continue | non_converging | needs_resynth | unverified_fixpoint
+ */
+export function convergenceDecision({
+	detectedIds = [],
+	unresolvedPaths = [],
+	cumulativeDone = [],
+	iteration = 1,
+	cap = 10,
+	graphStale = false,
+	freshnessVerifiable = true,
+} = {}) {
+	const doneSet = new Set(cumulativeDone);
+	const newWork = [...new Set(detectedIds)].filter((id) => !doneSet.has(id)).sort();
+
+	if (newWork.length > 0) {
+		if (iteration >= cap)
+			return { status: 'non_converging', newWork, iteration, cap };
+		return { status: 'continue', newWork, iteration, cap };
+	}
+
+	// newWork=∅ → fixpoint 후보. ★ BLOCKER-1 하드 전제 가드.
+	const unresolved = [...new Set(unresolvedPaths)].sort();
+	if (graphStale || unresolved.length > 0)
+		return {
+			status: 'needs_resynth',
+			newWork: [],
+			iteration,
+			cap,
+			reason: graphStale ? 'graph_stale' : 'unresolved_paths',
+			unresolved,
+		};
+	if (!freshnessVerifiable)
+		return { status: 'unverified_fixpoint', newWork: [], iteration, cap };
+	return { status: 'fixpoint', newWork: [], iteration, cap };
+}
+
+/**
+ * non-converging finding (promote-ready / 자동 promote ❌ = 사람 / graph.stale finding 형식 동형).
+ */
+export function nonConvergingFinding(decision) {
+	return {
+		kind: 'sync.non_converging',
+		severity: 'high',
+		message:
+			`living-sync 수렴 실패 — iteration ${decision.iteration} 가 cap(${decision.cap}) 도달했으나 ` +
+			`잔여 newWork ${decision.newWork.length}건: ${decision.newWork.slice(0, 5).join(', ')}` +
+			`${decision.newWork.length > 5 ? ' …' : ''} (단조 위반 의심 / 그래프 cycle / 재생성 비수렴)`,
+		iteration: decision.iteration,
+		cap: decision.cap,
+		residual_new_work: decision.newWork,
+	};
+}

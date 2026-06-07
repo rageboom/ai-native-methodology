@@ -87,6 +87,9 @@ import {
 	selectNextStage,
 	markStageDone,
 	queueStatus,
+	recordCompleted,
+	convergenceDecision,
+	nonConvergingFinding,
 } from './sync-loop.js';
 import { resolveDiscoveryOrigins } from './route-discovery.js';
 import {
@@ -133,6 +136,7 @@ function usage(code = 3) {
 			'  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
 		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--force] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
 			'  sync-next <project> [--findings <path>] [--user-decision <go|stop>] [--dry-run] [--json]   (living-sync Phase 1c — regen_queue 를 stage 단위로 소비 / findings 없으면 재생성 지시 surface)',
+			'  sync-converge <project> --graph <artifact-graph.json> --git <baseline-ref> [--cap <n>] [--reset] [--json]   (living-sync carry 2 — 큐 소비 완료 후 고정 baseline 재검출 → cumulative_done dedup → 수렴 판정[fixpoint/continue/non_converging/needs_resynth])',
 			'  route [<project>] --discovery-spec <path> --graph <artifact-graph.json> [--analysis <business-rules.json>] [--force] [--dry-run] [--json]   (living-sync Phase 1b — discovery-spec 명시 매핑 → 진입 origins → regen_queue / net-new propose 보고)',
 			'  lift [<project>] --changed <codefile>... --graph <artifact-graph.json> [--ceiling <node-id>] [--reconcile [--base <sha>] [--repo-root <dir>]] [--force] [--dry-run] [--json]   (living-sync Phase 2 — 손수정 코드 anchor → backward 천장 후보 surface / --ceiling 명시 시 forward 재전파 → regen_queue / --reconcile = anchor 관측사실 git 신선도 propose / reverse 유일 예외)',
 			'  suggest-skill --prompt <text>',
@@ -196,6 +200,8 @@ function parseArgs(argv) {
 		else if (a === '--br-diff') out.brDiffRef = rest[++i];
 		else if (a === '--git') out.gitRef = rest[++i];
 		else if (a === '--br-path') out.brPath = rest[++i];
+		else if (a === '--reset') out.reset = true; // sync-converge: 세션 초기화
+		else if (a === '--cap') out.cap = Number(rest[++i]); // sync-converge: iteration 상한 (기본 10)
 		else if (a === '--help' || a === '-h') usage(0);
 		else if (a.startsWith('--')) usage(3);
 	}
@@ -1968,6 +1974,7 @@ function cmdSyncLoop(args) {
 			try {
 				writeStateCAS(root, (s) => {
 					s.regen_queue = regenQueue;
+					delete s.sync_session; // M1 — fresh origin 배치 = 새 수렴 세션 (이전 cumulative_done 무효).
 					return s;
 				});
 				written = true;
@@ -2068,7 +2075,7 @@ function cmdSyncNext(args) {
 		else
 			process.stdout.write(
 				`[chain-driver sync-next] 큐 완료 (${status.done}/${status.total} done). ` +
-					`fixpoint 미보증 — 재생성이 계약을 바꿨으면 sync-loop 재실행.\n`,
+					`fixpoint 판정 → sync-converge --git <baseline> 실행 (수렴 원장 / carry 2).\n`,
 			);
 		process.exit(0);
 	}
@@ -2160,6 +2167,7 @@ function cmdSyncNext(args) {
 	}
 
 	// pass → 그 stage 미완 item 전부 done. state.blocked·current_chain·last_gate 미접촉.
+	//   carry 2 — 처리한 노드를 sync_session.cumulative_done 에 누적 (수렴 dedup 기준 / §33 단조).
 	let after;
 	const newState = writeStateCAS(root, (s) => {
 		if (s.regen_queue) {
@@ -2172,6 +2180,8 @@ function cmdSyncNext(args) {
 			} else {
 				s.regen_queue.status = 'in_progress';
 			}
+			// 세션 누적 (세션은 sync-converge 가 baseline 확정 / 여기선 done 노드만 적재).
+			s.sync_session = recordCompleted(s.sync_session, sel.item_ids);
 		}
 		return s;
 	});
@@ -2200,9 +2210,272 @@ function cmdSyncNext(args) {
 		);
 		if (after.complete)
 			process.stdout.write(
-				`  큐 완료. fixpoint 미보증 — 재생성이 계약을 바꿨으면 sync-loop 재실행.\n`,
+				`  큐 완료. fixpoint 판정 → sync-converge --git <baseline> 실행 (수렴 원장 / carry 2).\n`,
 			);
 	}
+	process.exit(0);
+}
+
+// chain-driver sync-converge — living-sync carry 2 (fixpoint 자동 재진입 / 수렴 원장 / DEC §23 carry2).
+//   sync-next 가 큐를 소비 완료한 뒤, 고정 baseline 대비 재검출(--git = carry 1b 재사용) → cumulative_done dedup →
+//     수렴 결정(convergenceDecision 순수 코어). newWork=∅ AND graph fresh AND unresolved=∅ → fixpoint.
+//   ★ 도구는 수렴-제어 half 만 결정론 소유 — 재생성(LLM)·그래프 재합성(외부 flow)은 반복 사이 (no-simulation §3.4).
+//   ★ BLOCKER-1(Senior@0.80): 재합성 부재 상태의 fixpoint 선언 = 거짓 건강 → needs_resynth / unverified_fixpoint 강등.
+function cmdSyncConverge(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	recoverTmpFiles(root);
+	let state;
+	try {
+		state = readState(root);
+	} catch (e) {
+		if (e instanceof StateCorruptError) {
+			console.error(`[chain-driver] ${e.message}`);
+			process.exit(4);
+		}
+		throw e;
+	}
+	if (!state) {
+		console.error('[chain-driver] sync-converge: no state.json — run init first');
+		process.exit(3);
+	}
+
+	// --reset: 세션 초기화 (다른 baseline 진입 시 안내대로).
+	if (args.reset) {
+		writeStateCAS(root, (s) => {
+			delete s.sync_session;
+			return s;
+		});
+		process.stdout.write('[chain-driver sync-converge] sync_session reset.\n');
+		process.exit(0);
+	}
+
+	if (!args.graphPath) {
+		console.error('[chain-driver] sync-converge: --graph <path> required');
+		process.exit(3);
+	}
+	if (!existsSync(args.graphPath)) {
+		console.error(`[chain-driver] sync-converge: graph not found: ${args.graphPath}`);
+		process.exit(3);
+	}
+	if (!args.gitRef) {
+		console.error('[chain-driver] sync-converge: --git <baseline-ref> required (재검출 baseline)');
+		process.exit(3);
+	}
+
+	// 전제: 큐가 소비 완료(complete) 상태여야 판정. 미완 = sync-next 먼저 / 부재 = sync-loop 먼저.
+	const queue = state.regen_queue;
+	const qstat = queueStatus(queue);
+	if (!queue || !(queue.items?.length)) {
+		console.error('[chain-driver] sync-converge: regen_queue 부재 — sync-loop 먼저 실행');
+		process.exit(3);
+	}
+	if (!qstat.complete) {
+		console.error(
+			`[chain-driver] sync-converge: regen_queue 미완 (${qstat.done}/${qstat.total}) — sync-next 로 소비 완료 후 재판정`,
+		);
+		process.exit(3);
+	}
+
+	// 세션 baseline 확정/검증 (M1: baseline 최초 1회 / 불일치 = exit3 --reset).
+	const session = state.sync_session || { cumulative_done: [], iteration: 1 };
+	if (session.baseline_ref && session.baseline_ref !== args.gitRef) {
+		console.error(
+			`[chain-driver] sync-converge: 세션 baseline(${session.baseline_ref}) ≠ --git(${args.gitRef}). ` +
+				`다른 변경 배치면 --reset 후 재시작.`,
+		);
+		process.exit(3);
+	}
+	const cap = Number.isFinite(args.cap) && args.cap > 0 ? args.cap : (session.cap ?? 10);
+	const iteration = session.iteration ?? 1;
+	const cumulativeDone = session.cumulative_done ?? [];
+
+	let graph;
+	try {
+		graph = JSON.parse(readFileSync(args.graphPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] sync-converge: graph parse error: ${e.message}`);
+		process.exit(3);
+	}
+
+	// 재검출 = carry 1b --git 메커니즘 재사용 (ref↔worktree diff → BR per-rule + 비-BR coarse origins).
+	const git = makeGitRunner(root);
+	try {
+		git(['rev-parse', '--verify', `${args.gitRef}^{commit}`]);
+	} catch {
+		console.error(`[chain-driver] sync-converge --git: invalid git ref / not a repo: ${args.gitRef} (미실행 — 날조 ❌)`);
+		process.exit(3);
+	}
+	const diff = gitDiffNumstat(root, args.gitRef, null);
+	if (!diff.ok) {
+		console.error(`[chain-driver] sync-converge --git: git diff 실패: ${diff.error}`);
+		process.exit(3);
+	}
+	const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+	const brRelPosix = brRel.split('\\').join('/');
+	const changed = diff.files.map((f) => f.path.split('\\').join('/'));
+	const brChanged = changed.includes(brRelPosix);
+	const nonBr = changed.filter((q) => q !== brRelPosix);
+	let brOrigins = [];
+	if (brChanged) {
+		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
+		const res = brDiffOrigins({ git, ref: args.gitRef, brAbs, brRelPosix, graph });
+		if (!res.ok) {
+			console.error(`[chain-driver] sync-converge --git: ${res.msg}`);
+			process.exit(res.exitCode);
+		}
+		brOrigins = res.origins;
+	}
+	const pathOrigins = resolveOriginNodeIds(graph, nonBr);
+	const origins = [...new Set([...brOrigins, ...pathOrigins.ids])].sort();
+
+	// 재검출 영향 노드 (origins ∪ forward closure). origin 0 이어도 변경 자체가 없으면 detectedIds=[].
+	let detectedIds = [];
+	let computeUnresolved = [];
+	if (origins.length > 0) {
+		const result = computeSyncLoop(graph, { origins });
+		detectedIds = result.items.map((it) => it.id);
+		computeUnresolved = result.unresolved;
+	}
+	// ★ BLOCKER-1 신호: 새 구조 파일(노드 미매핑) = unresolved → fixpoint 거부 근거.
+	const unresolvedPaths = [...new Set([...pathOrigins.unresolved, ...computeUnresolved])].sort();
+
+	// ★ BLOCKER-1 freshness 가드. derived_from 부재 = freshness no-op → 보증 불가(unverified).
+	const fresh = checkGraphFreshness(graph, { repoRoot: root });
+	const freshnessVerifiable =
+		Array.isArray(graph?.derived_from) && graph.derived_from.length > 0;
+
+	const decision = convergenceDecision({
+		detectedIds,
+		unresolvedPaths,
+		cumulativeDone,
+		iteration,
+		cap,
+		graphStale: fresh.stale,
+		freshnessVerifiable,
+	});
+
+	const nowIso = new Date().toISOString();
+	const baseSession = {
+		baseline_ref: args.gitRef,
+		cap,
+		iteration,
+		cumulative_done: cumulativeDone,
+		started_at: session.started_at || nowIso,
+	};
+
+	// ── 결정별 처리 ────────────────────────────────────────────────
+	if (decision.status === 'continue') {
+		// 잔여 newWork 만 새 regen_queue 로 시드 (iteration++). cumulative_done = 보존 (소비 시 sync-next 가 누적).
+		const result = computeSyncLoop(graph, { origins });
+		const items = result.items
+			.filter((it) => decision.newWork.includes(it.id))
+			.map((it) => ({ ...it, done: false }));
+		const regenQueue = {
+			generated_at: nowIso,
+			converge_iteration: iteration + 1,
+			origins,
+			graph_path: args.graphPath,
+			has_cycle: result.has_cycle,
+			items,
+		};
+		writeStateCAS(root, (s) => {
+			if (!result.has_cycle) s.regen_queue = regenQueue;
+			s.sync_session = { ...baseSession, iteration: iteration + 1, status: 'converging' };
+			return s;
+		});
+		const out = {
+			status: 'continue',
+			iteration: iteration + 1,
+			cap,
+			new_work: decision.newWork,
+			has_cycle: result.has_cycle,
+		};
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else
+			process.stdout.write(
+				`[chain-driver sync-converge] 잔여 drift ${decision.newWork.length}건 → iteration ${iteration + 1} 재시드: ` +
+					`${decision.newWork.join(', ')}\n  → sync-next 로 소비 후 sync-converge --git ${args.gitRef} 재판정.\n`,
+			);
+		process.exit(0);
+	}
+
+	if (decision.status === 'non_converging') {
+		const finding = nonConvergingFinding(decision);
+		writeStateCAS(root, (s) => {
+			s.sync_session = { ...baseSession, status: 'non_converging' };
+			return s;
+		});
+		const out = { status: 'non_converging', iteration, cap, finding, new_work: decision.newWork };
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else {
+			process.stdout.write(
+				`[chain-driver sync-converge] ⚠️ 수렴 실패 — iteration ${iteration} 가 cap(${cap}) 도달, 잔여 ${decision.newWork.length}건.\n`,
+			);
+			process.stdout.write(`  finding(promote-ready): ${finding.kind} [${finding.severity}] — ${finding.message}\n`);
+		}
+		process.exit(1);
+	}
+
+	if (decision.status === 'needs_resynth') {
+		writeStateCAS(root, (s) => {
+			s.sync_session = { ...baseSession, status: 'needs_resynth' };
+			return s;
+		});
+		const out = {
+			status: 'needs_resynth',
+			iteration,
+			cap,
+			reason: decision.reason,
+			stale_sources: fresh.stale_sources,
+			unresolved_paths: decision.unresolved,
+		};
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else {
+			process.stdout.write(
+				`[chain-driver sync-converge] fixpoint 미확정 — ${decision.reason}. (★ 거짓 수렴 차단 / BLOCKER-1)\n`,
+			);
+			if (decision.reason === 'graph_stale')
+				process.stdout.write(
+					`  그래프 stale (${fresh.stale_sources.length} source): 재합성 필요 → traceability-matrix-builder --graph 후 sync-converge --git ${args.gitRef} 재판정.\n`,
+				);
+			else
+				process.stdout.write(
+					`  unresolved_paths ${decision.unresolved.length}건 (노드 미매핑 = 새 구조 산출물): 그래프 재합성 후 재판정.\n`,
+				);
+		}
+		process.exit(2);
+	}
+
+	if (decision.status === 'unverified_fixpoint') {
+		writeStateCAS(root, (s) => {
+			s.sync_session = { ...baseSession, status: 'unverified_fixpoint' };
+			return s;
+		});
+		const out = { status: 'unverified_fixpoint', iteration, cap, note: 'graph.derived_from 부재 → freshness 검증 불가' };
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else
+			process.stdout.write(
+				`[chain-driver sync-converge] newWork=∅ 이나 graph.derived_from 부재 → freshness 검증 불가 = unverified_fixpoint ` +
+					`(거짓 fixpoint 확정 금지 / 현 honest-debt 동급). 그래프에 derived_from 배선 시 진짜 fixpoint 판정.\n`,
+			);
+		process.exit(2);
+	}
+
+	// fixpoint — 3조건 동시 충족 (newWork=∅ AND fresh AND unresolved=∅). 큐 clear + 세션 종결.
+	writeStateCAS(root, (s) => {
+		delete s.regen_queue;
+		s.sync_session = { ...baseSession, status: 'fixpoint', completed_at: nowIso };
+		return s;
+	});
+	const out = { status: 'fixpoint', iteration, cap, cumulative_done: cumulativeDone.length };
+	if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+	else
+		process.stdout.write(
+			`[chain-driver sync-converge] ✅ fixpoint 도달 (iteration ${iteration} / 누적 처리 ${cumulativeDone.length} 노드). ` +
+				`잔여 drift 0 · 그래프 fresh · unresolved 0.\n` +
+				`  (단조 trade: 본 세션 baseline 이후 done 노드 재편집은 별도 세션[--reset] / M2.)\n`,
+		);
 	process.exit(0);
 }
 
@@ -2301,6 +2574,7 @@ function cmdRoute(args) {
 				try {
 					writeStateCAS(root, (s) => {
 						s.regen_queue = regenQueue;
+						delete s.sync_session; // M1 — fresh origin 배치 = 새 수렴 세션 (이전 cumulative_done 무효).
 						return s;
 					});
 					written = true;
@@ -2493,6 +2767,7 @@ function cmdLift(args) {
 				try {
 					writeStateCAS(root, (s) => {
 						s.regen_queue = regenQueue;
+						delete s.sync_session; // M1 — fresh origin 배치 = 새 수렴 세션 (이전 cumulative_done 무효).
 						return s;
 					});
 					written = true;
@@ -2756,6 +3031,8 @@ function main() {
 			return cmdSyncLoop(args);
 		case 'sync-next':
 			return cmdSyncNext(args);
+		case 'sync-converge':
+			return cmdSyncConverge(args);
 		case 'route':
 			return cmdRoute(args);
 		case 'lift':
