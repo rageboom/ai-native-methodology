@@ -193,3 +193,40 @@
 **검증(no-sim 실 합성 / §8.1)**: graph-synthesizer 161(+9) / chain-driver 432(+1) / poc-18 2-BC 실 재합성 e2e `impact(analysis-business-rules-BC-POST)`=BC-POST chain만(BC-USER 무관) / RR 39/40(workspace_test_pass=env artifact) / 3-way 0.12.0.
 
 **선택적 후속(S1~S6 / 하나씩 승인)**: S1 route per-BC dispatch · S2 drift subset-hash(=§14 측정 FP 제거) · S3 federator per-BC · S4 trace-view per-BC · **S5 종단=부모 coarse 엣지 은퇴(진짜 분할 / 소비자 전 재배선 후)** · S6 per-BR granularity. 부모 coarse 엣지는 S5 까지 잔존(부모 read 소비자 over-propagate=의도).
+
+## 16. S1 시행 로그 (v0.13.0 / 2026-06-07 — route-discovery per-BC dispatch / Phase 4 선택적 #1)
+
+**S1 = Phase 4 펀더멘털(§15) 위 첫 선택적 항목** — discovery-spec business_rules_intent 매칭 `br_id` 를 coarse 부모 `analysis-business-rules` 대신 per-BC 자식 `analysis-business-rules-<BC>` origin 으로 직접 라우팅(정밀 forward 전파 / sync-loop·route). 4원칙(plan `plan-living-sync-s1-route-per-bc.md` 1원칙 + **Senior 적대 step-0[REVISE@0.88] 전건 코드 사실검증** + 사용자 "s1").
+
+**구현(`route-discovery.js` 3-tier)**: (1) `br_id`→BC(`analysisBrList` 재사용 / 재-normalize ❌ / 빈 BC skip)→자식이 graph 에 존재 → **정밀 origin** / (2) 자식 부재(BC 없음·미재합성 graph) → 부모 coarse fallback(무회귀) / (3) 둘 다 부재 → net-new(기존 보존). origins Set dedup(같은 BC 다수 BR=자식 1) + `.sort()` 결정성.
+
+**Senior REVISE@0.88 반영(전건 코드 사실검증)**: #1 3-tier fallback 순서 유지(net-new tier 보존) · #2 `analysisBrList` 재사용+빈 BC skip(junk id 회피) · #3 positive 테스트 신설(today 전부 fallback-only=feature 무검증) · #4 stale "S1 deferred" 주석 정정. 핵심 사실: `normalizeAnalysisBusinessRules` 가 full rule 객체 push(`bounded_context` 보존 / load-business-rules.js:69) · 자식 = valid sync-loop origin(v0.12.0 자식 outgoing cross_reference 엣지 = impact precise) · poc-05(committed graph 자식 0 + BR `bounded_context`=BC-USER) → childId 부재 → 부모 fallback(e2e :143 유지).
+
+**검증(no-sim 실 / §8.1)**: route-discovery.test.js +5(자식 dispatch·같은 BC dedup·다른 BC 2자식 정렬·혼합 BC-less fallback·자식부재 부모 fallback) → chain-driver **437**(432+5) · RR 39/40(workspace_test_pass=env) · 3-way 0.13.0.
+
+**다음 선택적(하나씩)**: S2 drift subset-hash(=§14 측정 FP 제거) · S3 federator per-BC · S4 trace-view per-BC · **S5 종단=부모 coarse 엣지 은퇴(진짜 분할)** · S6 per-BR granularity.
+
+## 17. S2 시행 로그 (v0.14.0 / 2026-06-07 — drift subset-hash / Phase 4 선택적 #2 / 구 Phase 3b)
+
+**S2 = 공유 canonical `business-rules.json` 의 cross-scope drift false-positive 제거** — §14 multi-scope dogfood 가 측정한 trigger(BC-POST rule 변경 → 무관 scope-user 도 whole-file hash drift). scope 가 `--bc` 로 선언한 bounded_context subset 만 재hash. 4원칙(plan `plan-living-sync-s2-subset-hash.md` 1원칙 + **Senior 적대 step-0[REVISE@0.83] 전건 코드 사실검증** + 사용자 "s2").
+
+**구현(`sync.js`)**: `hashBusinessRulesSubset(abs, bcs)`(register/detect/cascade 공유 SSOT) = `bounded_context ∈ bcs` 필터 → 재귀 canonical 직렬화(전 depth 키 정렬 / array 순서 보존) → 직렬문자열 정렬 → sha256. `registerCanonicalSources(root, scope, {bcs})`: bcs non-empty + `business-rules.json` → subset version + entry `bounded_contexts`(non-empty 만) + return `subsets[].subset_count` / 그 외 canonical·미지정 = file-hash(3a 보존). `detectDrift`: entry `bounded_contexts` 있으면 subset 재hash / 없으면 file-hash. schema sync_sources item `bounded_contexts?` optional 추가.
+
+**Senior REVISE@0.83 반영(전건 코드 사실검증 / 권위≠사실정합)**: **BLOCKER-1** = `cascade`(sync.js:118-123) 가 entry 를 `{path, version:hashFile}` 로 매핑 → `bounded_contexts` **drop + file-hash 퇴화**(첫 `sync --scope X`→cross-scope FP 부활 / 테스트 미커버) → cascade 가 `bounded_contexts` 보존 + 동일 subset 헬퍼 재계산 fix + 회귀 가드 테스트. **BLOCKER-2** = sort-by-id 모호(`normalizeBusinessRules`:37 = id 무보장)+Senior 제안 replacer-array `JSON.stringify(r, keys.sort())` 는 **nested key drop 결함** → 재귀 canonicalStringify 채택(전 depth 키정렬·총순서). honesty: schema 비-CI-gated(writeManifest 미검증·manifest.schema 매핑 부재) → 명시 Ajv 테스트 · non-empty 만 `bounded_contexts` 부착(idempotency `sync.test.js:233` 보호).
+
+**정직 경계**: BR-한정 subset(그 외 canonical=file-hash / BC-partition 불명확 / 후속 확장) · `--bc` 엄격 opt-in(자동 BC 도출 ❌ default-on·un-honest 회피) · **synthetic 1-domain only**(in-the-wild multi-scope 0 = 전 PoC single core scope / §14 = tmp 2-scope 1-domain 측정 / mechanism 입증·in-the-wild 주장 ❌) · 어떤 scope 도 선언 안 한 BC = 미감시(scope 자기 선언 BC 만 / `subset_count` 노출로 typo ghost-monitor 감지).
+
+**검증(no-sim 실 fs / §8.1)**: sync.test.js +8(subset 결정성[key 재정렬 무력화]·register/detect 분기·backward-compat·**cascade 보존[BLOCKER-1 가드]**·§14 e2e 2-scope FP 제거·Ajv guard) → chain-driver **445**(437+8) · RR 39/40(workspace_test_pass=env) · 3-way 0.14.0.
+
+**다음 선택적(하나씩)**: S3 federator per-BC · S4 trace-view per-BC · **S5 종단=부모 coarse 엣지 은퇴(진짜 분할)** · S6 per-BR granularity.
+
+## 18. S3 검토 결과 = DROP (federator per-BC 불필요/유해 / 2026-06-07 / 사용자 승인)
+
+**S3(federator per-BC) = 드롭** (코드·버전 변경 0). Senior 적대 검증@0.88 + 전건 코드 사실확인:
+- federator 의 `analysis-business-rules` 사용처 = `loadLegacyDataSource`(federator.js:141-143) **단 1곳** — 파일경로 resolve → `loadBusinessRules` → `brById` **전체 id-keyed 조회맵**(federator.js:170).
+- `brById` 소비 = `buildDataRefs`(federator.js:222-230): sql-inventory `business_meaning` 자유텍스트의 BR-id 를 **id 로** 조회. sql 항목은 BC 무관하게 임의 BR-id 참조 가능 → **whole-file 이 correct-by-construction**. BC 슬라이스 = 경계 밖 id 누락 = silent false-health 회귀.
+- 부모 노드 intact(additive Phase 4) → `sourcePathOf` 이미 작동 / per-BC 자식은 code_pointers 있으면 이미 federation origin 자동 편입(v0.12.0 deriveAnalysisCodePointers) / 자식 source_path = 부모와 동일 → enumerate/merge no-op.
+- ★ **재제안 방지 노트**: federator 는 per-BC 불필요 — `brById` 는 sql-inventory 자유텍스트 BR-id 조회라 whole-file 정답. 쪼개지 말 것.
+- ★ **파일 분할(BR-split STEP 3)과 무관**: business-rules.json 을 BC별 파일로 쪼개는 건 가능(`loadBusinessRules` 가 dir 감지·병합 single-point = load-business-rules.js:89 / 현 STEP2=단일파일). federator 는 loader 경유라 파일 레이아웃 무관. "whole" = 메모리 조회표(전체 규칙 집합)이지 물리 파일 아님 — 노드 분할(Phase 4 ①)·파일 분할(STEP 3 ②) = 별개 축.
+
+**남은 선택적 재평가**: S4(trace-view per-BC) = trace-view 가 UC-rooted hard-chain coverage 뷰라 analysis(business-rules) 노드를 애초에 표시 안 함(trace-view.js:19) → S3 동형 no-op 의심(가치검증 보류). 실 grounded 잔여 = **S5(부모 coarse 엣지 은퇴 = 진짜 분할)** — route(S1)·drift(S2) 핵심 소비자 재배선 완료 / graph 축.

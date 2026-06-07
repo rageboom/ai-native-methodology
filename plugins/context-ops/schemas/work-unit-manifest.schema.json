@@ -144,6 +144,11 @@
               "version": {
                 "type": "string",
                 "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "bounded_contexts": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "S2 — BR-한정 BC-subset hash 대상 bounded_context 목록. 존재(non-empty) 시 detectDrift/cascade 가 file-hash 대신 그 subset 재hash (cross-scope drift FP 제거)."
               }
             }
           }

@@ -175,6 +175,7 @@ function parseArgs(argv) {
 		else if (a === '--ceiling') out.ceiling = rest[++i];
 		else if (a === '--reconcile') out.reconcile = true;
 		else if (a === '--register') out.register = true;
+		else if (a === '--bc') (out.bc ||= []).push(rest[++i]);
 		else if (a === '--origin') {
 			out.origin = rest[++i]; // scalar (impact/navigate back-compat)
 			(out.origins ||= []).push(out.origin); // sync-loop multi-origin 누적
@@ -1230,7 +1231,7 @@ function cmdSync(args) {
 	// --scope <slug> --register — 명시 (재)등록 (living-sync Phase 3a / baseline 체크포인트).
 	if (args.scope && args.register) {
 		try {
-			const result = registerCanonicalSources(root, args.scope);
+			const result = registerCanonicalSources(root, args.scope, { bcs: args.bc || [] });
 			process.stdout.write(
 				JSON.stringify({ scope: args.scope, ...result }, null, 2) + '\n',
 			);

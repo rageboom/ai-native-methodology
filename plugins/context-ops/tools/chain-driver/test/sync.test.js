@@ -19,6 +19,7 @@ import {
   cascade,
   registerCanonicalSources,
   CANONICAL_ANALYSIS_FILES,
+  hashBusinessRulesSubset,
 } from '../src/sync.js';
 
 let tmp;
@@ -266,5 +267,126 @@ describe('cross-scope drift e2e (Phase 3a / 2-scope 기계 메커니즘 / 1-도�
     // cascade scope-a → scope-a clear, scope-b 잔존
     cascade(root, 'scope-a');
     assert.deepEqual(markDrift(root).marked, ['scope-b']);
+  });
+});
+
+// living-sync S2 (DEC §17) — BR BC-subset hash (cross-scope drift FP 제거).
+describe('S2 — hashBusinessRulesSubset (결정성)', () => {
+  it('같은 입력 → 같은 hash / key 순서 무관 (canonical)', () => {
+    const root = join(tmp, 's2h1');
+    const p1 = seedCanonical(root, 'business-rules.json', JSON.stringify({ business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST', note: 'x' }] }));
+    const h1 = hashBusinessRulesSubset(p1, ['BC-POST']);
+    // 동일 semantic, key 순서만 변경
+    seedCanonical(root, 'business-rules.json', JSON.stringify({ business_rules: [{ bounded_context: 'BC-POST', note: 'x', id: 'BR-1' }] }));
+    const h2 = hashBusinessRulesSubset(p1, ['BC-POST']);
+    assert.equal(h1, h2, 'intra-object key 재정렬 무력화');
+    assert.match(h1, /^sha256:[a-f0-9]{64}$/);
+  });
+
+  it('BC 필터 — 선언 BC subset 만 반영', () => {
+    const root = join(tmp, 's2h2');
+    const p1 = seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    const hUser = hashBusinessRulesSubset(p1, ['BC-USER']);
+    // BC-POST rule 변경 → BC-USER subset hash 불변
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    assert.equal(hashBusinessRulesSubset(p1, ['BC-USER']), hUser, 'BC-POST 변경 → BC-USER subset 불변');
+  });
+});
+
+describe('S2 — registerCanonicalSources / detectDrift subset 분기', () => {
+  it('--bc → BR entry 에 bounded_contexts + subset version / 그 외 canonical = file-hash', () => {
+    const root = join(tmp, 's2r1');
+    ensureScopeDir(root, 'scope-user');
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    seedCanonical(root, 'domain.json', '{"d":1}');
+    const r = registerCanonicalSources(root, 'scope-user', { bcs: ['BC-USER'] });
+    const m = readManifest(root, 'scope-user');
+    const br = m.sync_state.sync_sources.find((x) => x.path.endsWith('business-rules.json'));
+    const dom = m.sync_state.sync_sources.find((x) => x.path.endsWith('domain.json'));
+    assert.deepEqual(br.bounded_contexts, ['BC-USER']);
+    assert.equal(br.version, hashBusinessRulesSubset(join(root, '.aimd', 'output', 'business-rules.json'), ['BC-USER']));
+    assert.equal(dom.bounded_contexts, undefined, '그 외 canonical = bounded_contexts 부재(file-hash)');
+    assert.equal(r.subsets[0].subset_count, 1, 'subset_count 노출 (ghost-monitor 감지)');
+  });
+
+  it('★ FP 제거 — BC-POST rule 변경은 BC-USER scope 무드리프트 / BC-USER 변경은 drift', () => {
+    const root = join(tmp, 's2r2');
+    ensureScopeDir(root, 'scope-user');
+    const abs = seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    registerCanonicalSources(root, 'scope-user', { bcs: ['BC-USER'] });
+    assert.equal(detectDrift(root, 'scope-user').drift_detected, false);
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}"); // BC-POST 만 변경
+    assert.equal(detectDrift(root, 'scope-user').drift_detected, false, 'BC-POST 변경 = BC-USER scope FP 제거');
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\",\"changed\":true}]}"); // BC-USER 변경
+    assert.equal(detectDrift(root, 'scope-user').drift_detected, true, 'BC-USER 변경 = drift');
+    assert.ok(abs);
+  });
+
+  it('backward-compat — --bc 미지정 = file-hash (bounded_contexts 키 부재 / idempotent)', () => {
+    const root = join(tmp, 's2r3');
+    ensureScopeDir(root, 'scope-a');
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    registerCanonicalSources(root, 'scope-a');
+    const br = readManifest(root, 'scope-a').sync_state.sync_sources.find((x) => x.path.endsWith('business-rules.json'));
+    assert.equal(br.bounded_contexts, undefined, '미지정 = bounded_contexts 키 부재');
+    const before = JSON.stringify(readManifest(root, 'scope-a').sync_state.sync_sources);
+    registerCanonicalSources(root, 'scope-a');
+    assert.equal(JSON.stringify(readManifest(root, 'scope-a').sync_state.sync_sources), before, 'idempotent');
+  });
+});
+
+describe('S2 — cascade subset 보존 (BLOCKER-1 회귀 가드)', () => {
+  it('cascade 후 bounded_contexts 보존 + subset 정밀 유지 (file-hash 퇴화 ❌)', () => {
+    const root = join(tmp, 's2c1');
+    ensureScopeDir(root, 'scope-user');
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    registerCanonicalSources(root, 'scope-user', { bcs: ['BC-USER'] });
+    // BC-USER 변경 → drift → cascade
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\",\"changed\":true}]}");
+    markDrift(root);
+    cascade(root, 'scope-user');
+    const br = readManifest(root, 'scope-user').sync_state.sync_sources.find((x) => x.path.endsWith('business-rules.json'));
+    assert.deepEqual(br.bounded_contexts, ['BC-USER'], 'cascade 가 bounded_contexts 보존');
+    // cascade 후 BC-POST 만 변경 → 여전히 무드리프트 (subset 정밀 유지)
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\",\"changed\":true}]}");
+    assert.equal(detectDrift(root, 'scope-user').drift_detected, false, 'cascade 후에도 BC-POST 변경 무드리프트');
+  });
+});
+
+describe('S2 — cross-scope FP 제거 e2e (§14 재현 / 2-scope / 1-도메인 합성)', () => {
+  it('BC-POST rule 변경 → scope-post 만 drift (scope-user FP 제거) / 공유 domain 변경 → 양 scope', () => {
+    const root = join(tmp, 's2e1');
+    ensureScopeDir(root, 'scope-post');
+    ensureScopeDir(root, 'scope-user');
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\"},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    seedCanonical(root, 'domain.json', '{"d":1}');
+    registerCanonicalSources(root, 'scope-post', { bcs: ['BC-POST'] });
+    registerCanonicalSources(root, 'scope-user', { bcs: ['BC-USER'] });
+    assert.deepEqual(markDrift(root).marked, [], 'baseline in-sync');
+    // BC-POST 전용 변경
+    seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
+    assert.deepEqual(markDrift(root).marked, ['scope-post'], 'BC-POST 변경 → scope-post 만 (3a 대비 scope-user FP 제거)');
+    // 공유 domain.json 변경 → 양 scope (file-hash)
+    seedCanonical(root, 'domain.json', '{"d":2}');
+    assert.deepEqual(markDrift(root).marked.sort(), ['scope-post', 'scope-user'], '공유 domain 변경 → 양 scope (file-hash 유지)');
+  });
+});
+
+describe('S2 — schema bounded_contexts Ajv guard', () => {
+  it('sync_sources entry(bounded_contexts) = schema valid / 잉여키 invalid', async () => {
+    const { default: Ajv2020 } = await import('ajv/dist/2020.js');
+    const { default: addFormats } = await import('ajv-formats');
+    const { readFileSync } = await import('node:fs');
+    const { fileURLToPath } = await import('node:url');
+    const pathMod = await import('node:path');
+    const here = pathMod.dirname(fileURLToPath(import.meta.url));
+    const schema = JSON.parse(readFileSync(pathMod.resolve(here, '../../../schemas/work-unit-manifest.schema.json'), 'utf8'));
+    const ajv = new Ajv2020({ allErrors: true, strict: false });
+    addFormats(ajv);
+    const validate = ajv.compile(schema.properties.sync_state.properties.sync_sources.items);
+    const sha = 'sha256:' + 'a'.repeat(64);
+    assert.ok(validate({ path: '.aimd/output/business-rules.json', version: sha, bounded_contexts: ['BC-USER'] }), JSON.stringify(validate.errors));
+    assert.ok(validate({ path: '.aimd/output/domain.json', version: sha }), '기존 shape 유지');
+    assert.ok(!validate({ path: 'x', version: sha, bogus: 1 }), '잉여키(additionalProperties:false) 차단');
   });
 });

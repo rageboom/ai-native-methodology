@@ -112,6 +112,81 @@ describe('route-discovery core (resolveDiscoveryOrigins)', () => {
 		assert.deepEqual(r.origins, ['analysis-business-rules'], '자식 아닌 부모 coarse 노드');
 	});
 
+	// --- S1 per-BC dispatch (Phase 4 선택적 #1) ---
+	const dnode = (id, extra = {}) => ({
+		id,
+		artifact_kind: 'analysis',
+		artifact_subkind: 'business-rules',
+		state: 'active',
+		...extra,
+	});
+	const s1Graph = {
+		nodes: [
+			dnode('analysis-business-rules'),
+			dnode('analysis-business-rules-BC-POST', { bounded_context: 'BC-POST' }),
+			dnode('analysis-business-rules-BC-USER', { bounded_context: 'BC-USER' }),
+		],
+		edges: [],
+	};
+
+	it('S1 — br_id → BC 자식 노드 직접 dispatch (정밀 origin, 부모 아님)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
+		const analysis = { business_rules: [{ id: 'BR-1', bounded_context: 'BC-USER' }] };
+		const r = resolveDiscoveryOrigins(spec, s1Graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BC-USER']);
+	});
+
+	it('S1 — 같은 BC 의 BR 2개 → 자식 1개 dedup', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }, { br_id: 'BR-2' }] };
+		const analysis = {
+			business_rules: [
+				{ id: 'BR-1', bounded_context: 'BC-POST' },
+				{ id: 'BR-2', bounded_context: 'BC-POST' },
+			],
+		};
+		const r = resolveDiscoveryOrigins(spec, s1Graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BC-POST']);
+	});
+
+	it('S1 — 서로 다른 BC → 자식 2개 (정렬)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }, { br_id: 'BR-2' }] };
+		const analysis = {
+			business_rules: [
+				{ id: 'BR-1', bounded_context: 'BC-USER' },
+				{ id: 'BR-2', bounded_context: 'BC-POST' },
+			],
+		};
+		const r = resolveDiscoveryOrigins(spec, s1Graph, analysis);
+		assert.deepEqual(r.origins, [
+			'analysis-business-rules-BC-POST',
+			'analysis-business-rules-BC-USER',
+		]);
+	});
+
+	it('S1 — 혼합: BC 있는 BR(자식) + BC-less BR(부모 fallback)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }, { br_id: 'BR-2' }] };
+		const analysis = {
+			business_rules: [
+				{ id: 'BR-1', bounded_context: 'BC-USER' },
+				{ id: 'BR-2' }, // BC-less → 부모 fallback
+			],
+		};
+		const r = resolveDiscoveryOrigins(spec, s1Graph, analysis);
+		assert.deepEqual(r.origins, [
+			'analysis-business-rules',
+			'analysis-business-rules-BC-USER',
+		]);
+	});
+
+	it('S1 — BR 에 BC 는 있으나 자식 노드 부재(미재합성 graph) → 부모 coarse fallback (무회귀)', () => {
+		// poc-05 동형: graph 에 자식 없음 + BR bounded_context 존재.
+		const graphNoChild = { nodes: [dnode('analysis-business-rules')], edges: [] };
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
+		const analysis = { business_rules: [{ id: 'BR-1', bounded_context: 'BC-USER' }] };
+		const r = resolveDiscoveryOrigins(spec, graphNoChild, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules']);
+	});
+
 	it('analysis 미인식 shape(container present + 0 rules) → shape_unrecognized 진단 + 억제', () => {
 		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
 		const analysis = { rules: [{ noId: true }] }; // container present, 0 id-rules

@@ -8,7 +8,7 @@
 //
 // 정정(Senior REVISE@0.86):
 //   #1 br_id 매칭 = normalizeAnalysisBusinessRules (validator 동형 / 4-shape) — loadBusinessRules(strict canonical-only) ❌.
-//   #3 BR origin = analysis-business-rules(coarse) = soft edge → closure SHOULD/notify-only (full 하향=fixpoint 재진입 / deferred).
+//   #3 BR origin = br_id→BC 자식 analysis-business-rules-<BC>(정밀 / S1) / 자식 부재 시 부모 coarse fallback = soft edge → closure SHOULD/notify-only (full 하향=fixpoint 재진입 / deferred).
 //   #4 discovery UC 가 노드보다 fine → net_new (counts 로 loud 보고 / cli 가 0-origin=propose-only exit 0).
 
 import { normalizeAnalysisBusinessRules } from '../../_shared/load-business-rules.js';
@@ -25,8 +25,8 @@ export function resolveDiscoveryOrigins(discoverySpec, graph, analysis) {
 	const nodeIds = new Set(nodes.map((n) => n.id));
 	// business-rules = 부모 file-level coarse 노드. 정확 id 로 핀 (F-M1 / Senior REVISE@0.88).
 	//   Phase 4 additive 가 자식 analysis-business-rules-<BC> 를 추가하므로 .find(subkind=business-rules) 는
-	//   push 순서에 따라 자식을 바인딩할 fragility 가 있음 → coarse origin 의도(주석 #3)대로 부모 id 직접.
-	//   br_id→BC 자식 직접 dispatch 정밀화 = S1 deferred.
+	//   push 순서에 따라 자식을 바인딩할 fragility 가 있음 → 부모 id 직접.
+	//   brNode = S1 dispatch 의 fallback(자식 부재/BC 없음 시 / 아래 매칭 분기 3-tier).
 	const brNode = nodes.find((n) => n.id === 'analysis-business-rules');
 
 	const useCases = discoverySpec?.use_cases ?? [];
@@ -53,6 +53,14 @@ export function resolveDiscoveryOrigins(discoverySpec, graph, analysis) {
 	const { rules: analysisBrList, unrecognizedShape } =
 		normalizeAnalysisBusinessRules(analysis);
 	const analysisBrIds = new Set(analysisBrList.map((br) => br.id));
+	// S1: br_id → bounded_context 인덱스(analysisBrList 재사용 / 재-normalize ❌ / 빈 BC skip).
+	//   per-BC 자식 노드(analysis-business-rules-<BC>) 직접 라우팅용 (Phase 4 v0.12.0 additive 노드).
+	const brIdToBC = new Map();
+	for (const br of analysisBrList) {
+		if (br?.id && typeof br.bounded_context === 'string' && br.bounded_context.length > 0) {
+			brIdToBC.set(br.id, br.bounded_context);
+		}
+	}
 	if (unrecognizedShape && brIntent.length > 0) {
 		diagnostics.push({
 			kind: 'br_source.shape_unrecognized',
@@ -64,8 +72,11 @@ export function resolveDiscoveryOrigins(discoverySpec, graph, analysis) {
 	for (const intent of brIntent) {
 		if (!intent?.br_id) continue;
 		if (!unrecognizedShape && analysisBrIds.has(intent.br_id)) {
-			// existing → coarse origin = business-rules 노드. (closure = soft/SHOULD notify-only / #3)
-			if (brNode) origins.add(brNode.id);
+			// S1 3-tier: (1) br_id→BC 자식 노드 = 정밀 origin / (2) 자식 부재(BC 없음·미재합성 graph) → 부모 coarse fallback(무회귀 / closure soft/SHOULD #3) / (3) 둘 다 부재 → net-new.
+			const bc = brIdToBC.get(intent.br_id);
+			const childId = bc ? `analysis-business-rules-${bc}` : null;
+			if (childId && nodeIds.has(childId)) origins.add(childId);
+			else if (brNode) origins.add(brNode.id);
 			else
 				net_new.push({
 					ref: intent.br_id,
