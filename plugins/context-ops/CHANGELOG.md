@@ -10,6 +10,21 @@
 
 ---
 
+## [0.11.0] — 2026-06-07 MINOR — living-sync Phase 3a: cross-scope drift 기계 활성화 (sync_sources 충전 / dead-fed → live)
+
+Phase 3(merge-back + cross-scope)의 **선행 grounded 슬라이스**. 1원칙 실측 = multi-scope 서브시스템이 vestigial — cross-scope drift 기계(detectDrift/markDrift/cascade)는 있으나 `sync_sources` 가 실 플로우에서 **한 번도 채워지지 않아 dead-fed**(markDrift 절대 발화 ❌). merge-back 빌드 전, 이 **기존 기계를 live 로** 만든다. 4원칙(plan `plan-living-sync-phase3a.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.82] 전건 코드 사실검증** + 사용자 승인[기계 활성화 / 자동 충전]).
+
+- **신규 `tools/chain-driver/src/sync.js` `registerCanonicalSources(root, scope)`** + `CANONICAL_ANALYSIS_FILES`: canonical 분석 deliverable 중 `.aimd/output/` 에 존재하는 것을 scope `sync_state.sync_sources`(path+hash baseline) 로 등록. 부재 = skip(날조 ❌).
+- **`chain-driver sync` 활성화**: `sync <project>`(no-scope) = **빈 sync_sources scope first-touch 자동 baseline**(사용자 "자동 충전" 의도) → markDrift. `sync --scope <slug> --register` = 명시 re-baseline. `sync --scope <slug>` = cascade(기존). **markDrift 코어 순수 유지**(SessionStart hook 무영향 / 등록은 cmdSync glue 한정 = zero-regression).
+- **★ Senior 적대검토(REVISE@0.82) 전건 사실검증 후 반영** (권위≠사실정합):
+  - **#1 BLOCKER 확정**: plan allowlist(`rules.json`/`schema.json`/`migration-cautions.json`)가 CLAUDE.md **개념 라벨을 파일명으로 오인** — 실 emit 명은 `business-rules.json`(rules.json=0)·`db-schema.json`(schema.json≠) 실측(lifecycle-contract §289-302 + poc-18). 미수정 시 **테스트 green·production 은 BR 미등록 = false-health**(반복 데인 패턴). **수정: allowlist = business-rules.json·domain.json·openapi.yaml·db-schema.json·antipatterns.json·migration-cautions.json·architecture.json**(존재분만 / business-rules 등록 보장). e2e fixture 도 실 파일명.
+  - **#2 MAJOR 확정**: manual-only --register = 기계 여전히 dead(아무도 안 누름) + **DEC-2026-06-02 §81**(sync_sources 자동등재) 배치. **수정: cmdSync first-touch 자동 baseline**(자동 충전).
+  - **#3 MAJOR**: --register 가 "현재"를 baseline 스냅샷 → 늦게 등록 시 기존 drift 마스킹. **수정: first-touch only + baseline 의미 명시**(scope 현 canonical in-sync 체크포인트 / 올바른 사용=canonical 소비 시점).
+  - **#4 정직**: drift 입도 = 파일 hash(coarse / subset 외 변경도 표지) — **false-positive > false-negative**(over-mark→사람 cascade[저렴·M4 수동] vs silence→stale 출하=P0 위반) 의도적 trade. subset 정밀화(subsetAnalysisRefs 활성화)=후속.
+  - **#5 정직**: 2-scope fixture = **1-도메인 합성 mechanism 입증**(multi-scope PoC 0 = 전 PoC single `core` scope / in-the-wild dogfood 아님).
+- **검증(no-sim 실 fs / §8.1)**: `test/sync.test.js` +5(registerCanonicalSources 4[실 파일명 BLOCKER 가드·hash·idempotent·detectDrift 연동·throws] + cross-scope e2e 1[2-scope 동일 canonical → 변경 시 양 scope drift → cascade 1개 → 나머지만]). chain-driver **431/431**(426+5) · 3-way 0.11.0.
+- **carry**: subset-hash 정밀화(subsetAnalysisRefs 활성화 / prefix 도출) · 자동등록 lifecycle 배선(chain 단계 canonical 소비 시점 / DEC §81 context-cache 연동) · merge-back(scope→canonical / Phase 3 본체) · 실 multi-scope dogfood. SSOT = DEC §13 + plan.
+
 ## [0.10.0] — 2026-06-07 MINOR — living-sync Phase 2c: reconcile 결단 보조(carry-A) + relocation source-locator(carry-B′) + findRelocation 실 git 버그 fix
 
 Phase 2b reconcile 가 **propose-only 로 surface 한 것을 사람이 결단·실행**할 수 있게 마감(같은 라인). 전부 **순수 reporting 강화**(mutation 0 / propose-only 패러다임 불변). 4원칙(plan `plan-living-sync-phase2c.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.83] 전건 코드 사실검증** + 사용자 승인[low-risk carry]).

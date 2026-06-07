@@ -41,7 +41,7 @@ import {
 	listScopes,
 } from './state-store.js';
 import { executeQuery } from './query.js';
-import { markDrift, cascade } from './sync.js';
+import { markDrift, cascade, registerCanonicalSources } from './sync.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -121,7 +121,7 @@ function usage(code = 3) {
 			'  next <project> [--findings <path>] [--user-decision <go|stop|revisit:STAGE>] [--dry-run]',
 			'  query <project> [--scope <slug>] [--stage <s>] [--ref <id>] [--stale]',
 			'  query --graph <artifact-graph.json> [--ref <node-id>]   (graph JSON 출력 / 툴링용)',
-			'  sync <project> [--scope <slug>]',
+			'  sync <project> [--scope <slug>] [--register]   (no scope=빈 scope auto-baseline+markDrift / --scope=cascade / --scope --register=canonical sync_sources 등록[living-sync Phase 3a])',
 			'  impact --graph <artifact-graph.json> --origin <node-id> [--change-kind <kind>] [--policy <path>] [--out-jsonl <path>] [--code-pointer-only] [--json]',
 			'  navigate --graph <artifact-graph.json> --origin <node-id> [--with-spec] [--json]   (dep-graph-navigator backend)',
 			'  navigate --graph <artifact-graph.json> --prompt "<자연어>" [--with-spec] [--json]   (의도③ NL 라우팅 — id/title 결정론 해소)',
@@ -174,6 +174,7 @@ function parseArgs(argv) {
 		else if (a === '--analysis') out.analysisPath = rest[++i];
 		else if (a === '--ceiling') out.ceiling = rest[++i];
 		else if (a === '--reconcile') out.reconcile = true;
+		else if (a === '--register') out.register = true;
 		else if (a === '--origin') {
 			out.origin = rest[++i]; // scalar (impact/navigate back-compat)
 			(out.origins ||= []).push(out.origin); // sync-loop multi-origin 누적
@@ -1225,10 +1226,39 @@ function cmdTraceView(args) {
 function cmdSync(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
+
+	// --scope <slug> --register — 명시 (재)등록 (living-sync Phase 3a / baseline 체크포인트).
+	if (args.scope && args.register) {
+		try {
+			const result = registerCanonicalSources(root, args.scope);
+			process.stdout.write(
+				JSON.stringify({ scope: args.scope, ...result }, null, 2) + '\n',
+			);
+			process.exit(0);
+		} catch (e) {
+			console.error(`[chain-driver] sync --register failed: ${e.message}`);
+			process.exit(3);
+		}
+	}
+
 	if (!args.scope) {
-		// no scope → markDrift summary
+		// no scope → ① 빈 sync_sources scope first-touch 자동 baseline (Phase 3a / DEC §13) → ② markDrift summary.
+		//   기계 활성화: 등록 없으면 markDrift 가 영원히 dead-fed. cmdSync(명시 실행)가 등재 트리거.
+		//   markDrift 코어는 순수 유지 (SessionStart hook 무영향 — 본 auto-register 는 cmdSync glue 한정).
+		const auto_registered = [];
+		for (const scope of listScopes(root)) {
+			const m = readManifest(root, scope);
+			const sources = m?.sync_state?.sync_sources;
+			if (Array.isArray(sources) && sources.length === 0) {
+				const r = registerCanonicalSources(root, scope);
+				if (r.registered.length > 0)
+					auto_registered.push({ scope, registered: r.registered.length });
+			}
+		}
 		const summary = markDrift(root);
-		process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
+		process.stdout.write(
+			JSON.stringify({ auto_registered, ...summary }, null, 2) + '\n',
+		);
 		process.exit(0);
 	}
 	try {

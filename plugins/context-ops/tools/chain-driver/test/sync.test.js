@@ -17,6 +17,8 @@ import {
   detectDrift,
   markDrift,
   cascade,
+  registerCanonicalSources,
+  CANONICAL_ANALYSIS_FILES,
 } from '../src/sync.js';
 
 let tmp;
@@ -195,5 +197,74 @@ describe('cascade (M4 manual)', () => {
   it('throws when scope does not exist', () => {
     const root = join(tmp, 'c3');
     assert.throws(() => cascade(root, 'nonexistent'), /scope not found/i);
+  });
+});
+
+// living-sync Phase 3a (DEC §13) — cross-scope drift 기계 활성화 (sync_sources 충전).
+describe('registerCanonicalSources (Phase 3a / 기계 활성화)', () => {
+  it('실제 canonical 파일명 등록 (business-rules.json — rules.json ❌ / Senior #1 BLOCKER 가드)', () => {
+    const root = join(tmp, 'reg1');
+    ensureScopeDir(root, 'scope-a');
+    seedCanonical(root, 'business-rules.json', '{"business_rules":[{"id":"BR-1"}]}');
+    seedCanonical(root, 'domain.json', '{"d":1}');
+    const r = registerCanonicalSources(root, 'scope-a');
+    const paths = r.registered.map((s) => s.path);
+    assert.ok(paths.includes('.aimd/output/business-rules.json'), 'business-rules.json 등록');
+    assert.ok(paths.includes('.aimd/output/domain.json'));
+    // 부재 canonical = skip (날조 ❌)
+    assert.ok(r.skipped.includes('openapi.yaml'));
+    // allowlist 에 잘못된 라벨명 없음
+    assert.ok(!CANONICAL_ANALYSIS_FILES.includes('rules.json'));
+    assert.ok(!CANONICAL_ANALYSIS_FILES.includes('schema.json'));
+    assert.ok(CANONICAL_ANALYSIS_FILES.includes('business-rules.json'));
+    assert.ok(CANONICAL_ANALYSIS_FILES.includes('db-schema.json'));
+  });
+
+  it('manifest 에 sync_sources 기록 + hash 정확 + idempotent', () => {
+    const root = join(tmp, 'reg2');
+    ensureScopeDir(root, 'scope-a');
+    const p = seedCanonical(root, 'business-rules.json', '{"x":1}');
+    registerCanonicalSources(root, 'scope-a');
+    const m = readManifest(root, 'scope-a');
+    const src = m.sync_state.sync_sources.find((s) => s.path.endsWith('business-rules.json'));
+    assert.equal(src.version, hashFile(p));
+    assert.equal(m.sync_state.drift_detected, false);
+    // idempotent (재등록 동일)
+    const before = JSON.stringify(readManifest(root, 'scope-a').sync_state.sync_sources);
+    registerCanonicalSources(root, 'scope-a');
+    assert.equal(JSON.stringify(readManifest(root, 'scope-a').sync_state.sync_sources), before);
+  });
+
+  it('등록 후 detectDrift = 무드리프트 / canonical 변경 시 drift', () => {
+    const root = join(tmp, 'reg3');
+    ensureScopeDir(root, 'scope-a');
+    seedCanonical(root, 'business-rules.json', '{"v":1}');
+    registerCanonicalSources(root, 'scope-a');
+    assert.equal(detectDrift(root, 'scope-a').drift_detected, false);
+    seedCanonical(root, 'business-rules.json', '{"v":2}'); // canonical 변경
+    assert.equal(detectDrift(root, 'scope-a').drift_detected, true);
+  });
+
+  it('throws when scope does not exist', () => {
+    assert.throws(() => registerCanonicalSources(join(tmp, 'nope'), 'nonexistent'), /scope not found/i);
+  });
+});
+
+describe('cross-scope drift e2e (Phase 3a / 2-scope 기계 메커니즘 / 1-도메인 합성)', () => {
+  it('2 scope 동일 canonical 의존 → 변경 시 양 scope drift → cascade 1개 → 나머지만', () => {
+    const root = join(tmp, 'xscope');
+    ensureScopeDir(root, 'scope-a');
+    ensureScopeDir(root, 'scope-b');
+    seedCanonical(root, 'business-rules.json', '{"rules":["a"]}');
+    // 양 scope 등록 (baseline in-sync)
+    registerCanonicalSources(root, 'scope-a');
+    registerCanonicalSources(root, 'scope-b');
+    assert.deepEqual(markDrift(root).marked, []); // 무변경
+    // canonical 변경 → 양 scope drift
+    seedCanonical(root, 'business-rules.json', '{"rules":["a","b"]}');
+    assert.deepEqual(markDrift(root).marked.sort(), ['scope-a', 'scope-b']);
+    // cascade scope-a → scope-a clear, scope-b 잔존
+    cascade(root, 'scope-a');
+    assert.deepEqual(markDrift(root).marked, ['scope-b']);
   });
 });

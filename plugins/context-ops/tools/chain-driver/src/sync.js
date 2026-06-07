@@ -19,6 +19,51 @@ export function hashFile(absPath) {
   return `sha256:${h}`;
 }
 
+// living-sync Phase 3a (DEC §13) — cross-scope drift 기계 활성화.
+//   canonical 분석 deliverable(5 이식성 + architecture) 중 .aimd/output/ 에 존재하는 것을 scope 의
+//   sync_state.sync_sources 로 등록(path + 현 hash = baseline 체크포인트). 이후 detectDrift/markDrift 가
+//   canonical 변경 시 실제 발화. 부재 파일 = skip(날조 ❌). 등록 시점 hash = "현 canonical 과 in-sync" 기준.
+//   ★ 파일명 = 실제 emit 명(business-rules.json/db-schema.json — rules.json/schema.json 아님 / Senior #1 BLOCKER fix).
+export const CANONICAL_ANALYSIS_FILES = Object.freeze([
+  'business-rules.json',
+  'domain.json',
+  'openapi.yaml',
+  'db-schema.json',
+  'antipatterns.json',
+  'migration-cautions.json',
+  'architecture.json',
+]);
+
+// scope 의 sync_sources 를 현 canonical 파일 hash 로 (재)등록. 존재분만. writeManifest 로 durable.
+//   @returns { registered:[{path,version}], skipped:string[] }
+export function registerCanonicalSources(projectRoot, scope, opts = {}) {
+  const m = readManifest(projectRoot, scope);
+  if (!m) throw new Error(`registerCanonicalSources: scope not found: ${scope}`);
+  const files = opts.canonicalFiles || CANONICAL_ANALYSIS_FILES;
+  const registered = [];
+  const skipped = [];
+  for (const name of files) {
+    const rel = join('.aimd', 'output', name);
+    const abs = join(projectRoot, rel);
+    if (!existsSync(abs)) {
+      skipped.push(name);
+      continue;
+    }
+    // path 는 posix-style repo-rel 로 정규화 (detectDrift 가 join(projectRoot, s.path) 로 해소).
+    registered.push({ path: rel.split('\\').join('/'), version: hashFile(abs) });
+  }
+  writeManifest(projectRoot, scope, null, {
+    ...m,
+    sync_state: {
+      ...(m.sync_state || {}),
+      sync_sources: registered,
+      last_synced_at: new Date().toISOString(),
+      drift_detected: false,
+    },
+  });
+  return { registered, skipped };
+}
+
 export function detectDrift(projectRoot, scope) {
   const m = readManifest(projectRoot, scope);
   if (!m) throw new Error(`detectDrift: scope not found: ${scope}`);

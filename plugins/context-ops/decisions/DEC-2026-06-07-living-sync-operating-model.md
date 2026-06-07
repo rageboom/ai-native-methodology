@@ -147,3 +147,19 @@
 - **신규 순수 helper(`lift-anchor.js`)**: `relocationSourceHint(subkind, id, candidate)`(subkind→source 산출물+필드 역매핑) · `ceilingOptionsForAnchor(id, ceilingByAnchor)`(anchor-self 제외+정렬). cmdLift 가 reconcile 출력에 동봉(이미 보유 데이터 / 신규 IO·mutation 0).
 - **검증(no-sim 실 git / §8.1)**: `test/lift-anchor.test.js` +7(순수 5 + carry e2e 2[poc-05 carry-A ceiling_options·self-제외 + tmp-git git mv carry-B′ source_edit·그래프 byte-identical]) = 39. chain-driver **426/426**(419+7) · code-pointer-validator **45/45**(fake 갱신·fix back-compat) · 3-way 0.10.0.
 - **carry**: durable source-write(--apply / multi-source+commit_hash+path-base+atomic = 별도 MINOR) · Phase 3 merge-back · Phase 4 per-item granularity. 다음 = 사용자 결단.
+
+## 13. Phase 3a 시행 로그 (v0.11.0 / 2026-06-07 — cross-scope drift 기계 활성화)
+
+**Phase 3a = Phase 3(merge-back+cross-scope)의 선행 grounded 슬라이스.** 1원칙 실측 = multi-scope 서브시스템 vestigial: cross-scope drift 기계(detectDrift/markDrift/cascade + cmdSync + query --stale)는 존재하나 `sync_sources` 가 실 플로우에서 **한 번도 채워지지 않아 dead-fed**(work-unit.js:38 `[]` 초기화·읽기만 / detectDrift 항상 빈 sources → markDrift 절대 발화 ❌). subsetAnalysisRefs 미호출. 다중 scope PoC 0. **v0.3.0 이 scope-local 사본(subset.json) 폐기** → merge-back "출처" 모호. → merge-back 본체 빌드 전, **기존 dead 기계를 live 로** 만드는 것이 grounded(선제 빌드 ❌ / `feedback_paradigm_stable_point_cadence`). 4원칙 — Senior 적대 step-0[REVISE@0.82] 전건 사실검증.
+
+**★ Senior 적대검토(REVISE@0.82) 전건 사실검증 후 반영**:
+- **#1 BLOCKER 확정**: plan allowlist(`rules.json`/`schema.json`/`migration-cautions.json`)가 **CLAUDE.md 5-이식성 개념 라벨을 파일명으로 오인**. 실 emit 명 = `business-rules.json`(rules.json=0 실측)·`db-schema.json`(schema.json≠) — lifecycle-contract §289-302 디렉토리 레이아웃 + poc-18 output 실측. 미수정 시 §6 fixture(`rules.json`)는 green 인데 production 은 BR canonical 미등록 = **false-health**(register 가 "skip absent" 라 조용히 부분 baseline). **수정: allowlist = 실 파일명 7종(business-rules/domain/openapi/db-schema/antipatterns/migration-cautions/architecture) / 존재분만 / fixture 도 실명**.
+- **#2 MAJOR 확정**: manual-only --register = 아무도 안 누르면 기계 여전히 dead + **DEC-2026-06-02 §81**("context-cache.json sync_sources 자동등재 / markDrift 연동")이 자동등록을 이미 결정. **수정: cmdSync(no-scope) first-touch 자동 baseline**(빈 sync_sources scope / 사용자 "자동 충전" 의도 정합). markDrift 코어는 순수 유지(등록=cmdSync glue / SessionStart hook 무영향 = zero-regression).
+- **#3 MAJOR**: --register 가 "현재" canonical hash 를 baseline 스냅샷 → scope 산출물이 현 canonical 보다 앞선 채 늦게 등록 시 그 drift 마스킹. **수정: first-touch only(빈 sources) + baseline 의미 명시**(scope 현 canonical in-sync 체크포인트 / 올바른 사용=canonical 소비 시점 / 재등록=--register).
+- **#4 정직(coarse)**: drift 입도 = 파일 hash(subset 외 변경도 표지=over-eager). **false-positive > false-negative**(over-mark→사람 cascade[저렴·M4 수동] vs silence→stale 컨텍스트 출하=P0 위반) = 의도적 trade. subset-hash 정밀화(subsetAnalysisRefs 활성화 / prefix 도출)=후속 carry.
+- **#5 정직(검증)**: 2-scope fixture = **1-도메인 합성 mechanism 입증**(multi-scope PoC 0 = 전 PoC single `core` scope / in-the-wild cross-scope dogfood 아님). #6 zero-regression 확인: sync_state(scope manifest) ↔ state.json(regen_queue/state.blocked) 별 파일 = living-sync forward 전파 무접촉.
+
+- **신규 `sync.js registerCanonicalSources(root, scope)` + `CANONICAL_ANALYSIS_FILES`**: 존재 canonical → sync_sources(path posix-rel + hashFile) baseline 기록(writeManifest / drift_detected=false / last_synced_at).
+- **`chain-driver sync` 활성화**(cli.js cmdSync): no-scope = 빈 sources scope first-touch 자동 baseline → markDrift summary(`auto_registered` 포함) / `--scope --register` = 명시 re-baseline / `--scope` = cascade(기존).
+- **검증(no-sim 실 fs / §8.1)**: `test/sync.test.js` +5(registerCanonicalSources 4[실명 BLOCKER 가드·hash·idempotent·detectDrift 연동·throws] + cross-scope e2e 1[2-scope 동일 canonical→변경 시 양 scope drift→cascade 1개→나머지만]). chain-driver **431/431**(426+5) · 3-way 0.11.0 · RR 39/40(env artifact).
+- **carry**: subset-hash 정밀화 · 자동등록 lifecycle 배선(canonical 소비 시점 / DEC §81) · **merge-back(scope→canonical = Phase 3 본체)** · 실 multi-scope dogfood. 다음 = 사용자 결단.
