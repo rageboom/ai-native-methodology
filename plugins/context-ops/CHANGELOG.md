@@ -18,7 +18,7 @@
 - **★ Senior REVISE@0.83 전건 사실검증 반영**: **BLOCKER-1** `cascade`(sync.js:118) 가 entry 를 `{path,version:hashFile}` 로 매핑→`bounded_contexts` drop+file-hash 퇴화(첫 `sync --scope`→cross-scope FP 부활) → cascade 가 보존+subset 헬퍼 재계산 fix · **BLOCKER-2** sort-by-id 모호(normalizeBusinessRules id 무보장)+replacer-array nested-key drop → 재귀 canonicalStringify · schema Ajv 단위테스트(writeManifest 미검증·manifest.schema 매핑 부재=비-CI-gated) · non-empty 만 `bounded_contexts` 부착(idempotency).
 - **정직 경계**: BR-한정(그 외 canonical=file-hash / BC-partition 불명확) · `--bc` 엄격 opt-in(자동 BC 도출 ❌ default-on 회피) · **synthetic 1-domain only**(in-the-wild multi-scope 0 / §14 tmp 측정 / mechanism 입증) · 미선언 BC = 미감시(scope 자기 선언 BC 만 / subset_count 노출로 typo 감지).
 - **검증(no-sim 실 fs / §8.1)**: sync.test.js +8(subset 결정성·register/detect 분기·backward-compat·cascade 보존[BLOCKER-1 가드]·§14 e2e 2-scope FP 제거·Ajv guard) → chain-driver **445**(437+8) · RR 무회귀 · 3-way 0.14.0.
-- **다음 선택적**: S3 federator per-BC · S4 trace-view per-BC · **S5 종단=부모 coarse 엣지 은퇴** · S6 per-BR. SSOT = DEC §17.
+- **다음 선택적**: ~~S3 federator per-BC~~ = **DROP**(불필요/유해 — `brById` 는 sql-inventory 자유텍스트 BR-id 조회라 whole-file 정답 / BC 슬라이스 = 경계밖 id silent false-health / DEC §18 사용자 승인) · S4 trace-view per-BC(no-op 의심 — trace-view 가 business-rules 노드 미표시 / 가치검증 보류) · **S5 종단=부모 coarse 엣지 은퇴(진짜 분할 / 실 grounded 잔여)** · S6 per-BR. SSOT = DEC §18.
 
 ## [0.13.0] — 2026-06-07 MINOR — living-sync S1: route-discovery per-BC dispatch (Phase 4 선택적 #1)
 
