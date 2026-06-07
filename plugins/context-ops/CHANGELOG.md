@@ -10,6 +10,16 @@
 
 ---
 
+## [0.7.0] — 2026-06-07 MINOR — living-sync Phase 1b: `route` 의미 라우터 (discovery-spec 명시 매핑 → 진입 origins → regen_queue)
+
+자연어 변경요청을 그래프에 ground 해 **진입 노드**를 찾는 라우터. **의미 판정은 기존 LLM skill(`discovery-from-nl-md`)이 discovery-spec 으로 산출**하고, 신규 **결정론 도구 `chain-driver route`** 가 discovery-spec 의 명시 매핑(use_cases.id / business_rules_intent.br_id)을 entry origins 로 변환 → sync-loop forward closure → regen_queue. §3.4 경계: LLM 제안 / 도구·validator 결정론 / 사람 gate#1. 4원칙(plan `plan-living-sync-phase1b.md` + 2 Explore + **2 Senior 적대 pass**). **★ v1(token 매칭) Senior REVISE@0.78 = 의미 라우팅 불가 → v2(discovery-spec 명시 매핑) 전환** → v2 Senior REVISE@0.86 BLOCKER/MAJOR 6건 코드확인 후 정정.
+
+- **신규 순수 코어 `tools/chain-driver/src/route-discovery.js`** (gate·I/O·시간 0 / trust 가드): `resolveDiscoveryOrigins(discoverySpec, graph, analysis)` → `{origins, net_new, diagnostics, counts}`. UC-id→그래프 노드 직접 매칭 / br_id→analysis business-rules **content** 매칭(`normalizeAnalysisBusinessRules` 재사용 = validator 동형 / Senior #1 정정: loadBusinessRules[strict canonical-only] ❌) → coarse `analysis-business-rules` 노드(per-BR=Phase 4). miss=net-new.
+- **신규 `chain-driver route` 명령**: `route [<project>] --discovery-spec <p> --graph <g> [--analysis <br.json>] [--force] [--dry-run] [--json]`. existing origins → computeSyncLoop → regen_queue seed(sync-loop durable 경로 재사용 / clobber·has_cycle 가드). net-new = propose-only report.
+- **Senior 정정 (코드확인)**: #2 `--analysis` 부재 + br_intent 존재 → **fail-closed exit 3**(전건 net-new 무진단 silent mis-route 차단) · #3 BR origin=analysis-business-rules=soft edge → closure SHOULD/**notify-only**(full 하향 cascade=fixpoint 재진입 / 1c deferred) · #4 discovery UC 가 노드보다 fine → net-new + **counts loud 보고** / **0-origin=유효 propose-only exit 0**(sync-loop exit 3 와 구분 / S2 graph 부재 대응) · #5 net-new carrier=stdout report-only(그래프 mutation ❌) · #6 net-new BR 차단은 별도 gate#1(역할 분리 / route=비-gating).
+- **검증(no-sim 실 CLI / §8.1 ≥2 distinct 도메인)**: 신규 `test/route-discovery.test.js` 13(코어 6 + poc-05 e2e 5 + trust 2). **2 도메인 = poc-05(register / UC+BR→13 item) + poc-16(Spring 4.1 legacy car / 10 UC+12 BR→31 item / net_new 0)** 실 discovery-spec fixture. chain-driver **387/387**(374+13) · release-readiness **40/40** · version 3-way 0.7.0.
+- **carry(후속)**: per-BR granularity(Phase 4 = br_id↔per-BR 노드 / 현 coarse) · UC parent-prefix 매칭(fine UC 화해) · fixpoint 자동 재진입(BR notify→full cascade). Phase 2(손수정 코드 lift+reconcile) = 다음 추천. SSOT = DEC §9 + plan.
+
 ## [0.6.0] — 2026-06-07 MINOR — living-sync Phase 1c: `sync-next` regen_queue stage-단위 소비 (루프 닫기)
 
 living-sync Phase 1(`sync-loop`)이 worklist 를 **계산·durable 기록만** 하고 멈추던 지점을 닫는다 — 신규 `sync-next` 가 `regen_queue` 를 **stage 단위**로 소비하여 재생성 지시 surface → stage gate 재실행 → drift 해소까지 end-to-end. 죽은 `pending_revisit`(stage-단위 / jump 미실행)의 **산 대체**(노드-단위 worklist). 재생성(LLM 내용 생성)·fixpoint 자동 재진입은 명시적 deferred. 4원칙(plan `plan-living-sync-phase1c.md` + 2 research-agent[Senior 적대 + soundness/reuse] 코드 사실확인). **Senior REVISE@0.82 — naive 설계의 BLOCKER 1·MAJOR 3 코드확인 후 정정**(node-gate→stage-gate).

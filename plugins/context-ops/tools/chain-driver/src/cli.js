@@ -86,6 +86,7 @@ import {
 	markStageDone,
 	queueStatus,
 } from './sync-loop.js';
+import { resolveDiscoveryOrigins } from './route-discovery.js';
 // Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
@@ -118,6 +119,7 @@ function usage(code = 3) {
 			'  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
 		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--force] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
 			'  sync-next <project> [--findings <path>] [--user-decision <go|stop>] [--dry-run] [--json]   (living-sync Phase 1c — regen_queue 를 stage 단위로 소비 / findings 없으면 재생성 지시 surface)',
+			'  route [<project>] --discovery-spec <path> --graph <artifact-graph.json> [--analysis <business-rules.json>] [--force] [--dry-run] [--json]   (living-sync Phase 1b — discovery-spec 명시 매핑 → 진입 origins → regen_queue / net-new propose 보고)',
 			'  suggest-skill --prompt <text>',
 			'  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
 			'  migrate <project>',
@@ -155,6 +157,8 @@ function parseArgs(argv) {
 		else if (a === '--stale') out.stale = true;
 		// dep-graph P3 impact 명령
 		else if (a === '--graph') out.graphPath = rest[++i];
+		else if (a === '--discovery-spec') out.discoverySpecPath = rest[++i];
+		else if (a === '--analysis') out.analysisPath = rest[++i];
 		else if (a === '--origin') {
 			out.origin = rest[++i]; // scalar (impact/navigate back-compat)
 			(out.origins ||= []).push(out.origin); // sync-loop multi-origin 누적
@@ -2015,6 +2019,144 @@ function cmdSyncNext(args) {
 	process.exit(0);
 }
 
+// chain-driver route — living-sync Phase 1b 의미 라우터 (DEC §5 Phase 1b).
+//   discovery-spec(LLM 산출)의 명시 매핑(use_cases.id / business_rules_intent.br_id)을 결정론 라우팅 →
+//   existing 진입 origins → computeSyncLoop forward closure → regen_queue seed (sync-loop 와 동일 durable 경로).
+//   net-new(unknown_br / 신규·fine UC) = propose-only report(seed ❌ / 차단은 별도 gate#1 evaluateGate('discovery')+validator).
+//   의미 판정(NL→discovery-spec) = LLM skill(밖). 본 명령 = 명시 매핑 결정론 라우팅 + seed.
+function cmdRoute(args) {
+	if (!args.discoverySpecPath) {
+		console.error('[chain-driver] route: --discovery-spec <path> required');
+		process.exit(3);
+	}
+	if (!args.graphPath) {
+		console.error('[chain-driver] route: --graph <path> required');
+		process.exit(3);
+	}
+	if (!existsSync(args.discoverySpecPath)) {
+		console.error(
+			`[chain-driver] route: discovery-spec not found: ${args.discoverySpecPath}`,
+		);
+		process.exit(3);
+	}
+	if (!existsSync(args.graphPath)) {
+		console.error(`[chain-driver] route: graph not found: ${args.graphPath}`);
+		process.exit(3);
+	}
+	let discoverySpec, graph;
+	try {
+		discoverySpec = JSON.parse(readFileSync(args.discoverySpecPath, 'utf-8'));
+		graph = JSON.parse(readFileSync(args.graphPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] route: parse error: ${e.message}`);
+		process.exit(3);
+	}
+
+	// --analysis (br_id content 매칭). br_intent 존재인데 미제공/미로드 = fail-closed (Senior #2).
+	let analysis = null;
+	if (args.analysisPath) {
+		if (!existsSync(args.analysisPath)) {
+			console.error(
+				`[chain-driver] route: analysis not found: ${args.analysisPath}`,
+			);
+			process.exit(3);
+		}
+		try {
+			analysis = JSON.parse(readFileSync(args.analysisPath, 'utf-8'));
+		} catch (e) {
+			console.error(`[chain-driver] route: analysis parse error: ${e.message}`);
+			process.exit(3);
+		}
+	}
+	const brIntentCount = (discoverySpec?.business_rules_intent ?? []).length;
+	if (brIntentCount > 0 && !analysis) {
+		console.error(
+			`[chain-driver] route: business_rules_intent ${brIntentCount}건 존재하나 --analysis <business-rules.json> 미제공 — ` +
+				`전건 net-new 오분류 방지 fail-closed (Senior #2). --analysis 로 analysis business-rules 공급.`,
+		);
+		process.exit(3);
+	}
+
+	const resolved = resolveDiscoveryOrigins(discoverySpec, graph, analysis);
+
+	// existing origins → forward closure → regen_queue. 0건 = propose-only (S2 graph 부재 대응 / exit 0 / Senior #4).
+	let regenQueue = null;
+	let written = false;
+	let loopResult = null;
+	if (resolved.origins.length > 0) {
+		try {
+			loopResult = computeSyncLoop(graph, { origins: resolved.origins });
+		} catch (e) {
+			console.error(`[chain-driver] route: ${e.message}`);
+			process.exit(3);
+		}
+		regenQueue = {
+			generated_at: new Date().toISOString(),
+			origins: loopResult.origins,
+			graph_path: args.graphPath,
+			has_cycle: loopResult.has_cycle,
+			items: loopResult.items,
+			source: 'discovery-route',
+		};
+		const root = args.project ? resolve(args.project) : null;
+		if (root && !args.dryRun && !loopResult.has_cycle) {
+			const existing = readState(root);
+			if (!existing) {
+				console.error(
+					`[chain-driver] route: state.json 부재 (${root}) — init 먼저 / regen_queue 미기록`,
+				);
+			} else if (isQueueInProgress(existing.regen_queue) && !args.force) {
+				console.error(
+					`[chain-driver] route: regen_queue 진행 중 — 덮어쓰기 거부. 소비 완료 후 또는 --force.`,
+				);
+				process.exit(2);
+			} else {
+				try {
+					writeStateCAS(root, (s) => {
+						s.regen_queue = regenQueue;
+						return s;
+					});
+					written = true;
+				} catch (e) {
+					console.error(`[chain-driver] route: state write 실패: ${e.message}`);
+				}
+			}
+		}
+	}
+
+	const out = {
+		origins: resolved.origins,
+		net_new: resolved.net_new,
+		diagnostics: resolved.diagnostics,
+		counts: resolved.counts,
+		regen_queue: regenQueue,
+		written,
+		propose_only: resolved.origins.length === 0,
+	};
+	if (args.json) {
+		process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+	} else {
+		process.stdout.write(
+			`[chain-driver route] origins(existing)=${resolved.origins.join(', ') || '-'} / net-new=${resolved.counts.net_new} (UC ${resolved.counts.uc_total} + BR ${resolved.counts.br_total} intent)\n`,
+		);
+		if (regenQueue)
+			process.stdout.write(
+				`  regen_queue: ${regenQueue.items.length} item(s) [${regenQueue.items.map((it) => it.id).join(' → ')}] ${written ? '→ written' : '(미기록 — --dry-run / state 부재 / project 미지정)'}\n`,
+			);
+		else
+			process.stdout.write(
+				`  propose-only (existing origin 0 / seed ❌) — net-new 는 gate#1(discovery) 사람 확인.\n`,
+			);
+		for (const nn of resolved.net_new)
+			process.stdout.write(`  net-new ${nn.kind}: ${nn.ref} — ${nn.reason}\n`);
+		for (const d of resolved.diagnostics)
+			process.stdout.write(`  ⚠️ ${d.kind} (${d.severity}): ${d.message}\n`);
+		if (loopResult?.has_cycle)
+			process.stdout.write(`  ⚠️ cycle detected — durable write 거부\n`);
+	}
+	process.exit(0);
+}
+
 // chain-driver resync-graph — Loop A / A-lazy-cmd (DEC-2026-06-03-living-graph-a1-surface 후속 / 의도② lazy 재계산).
 //   B-minimal STALE 배너의 nudge → 한 명령 재합성 action (8-flag traceability-matrix-builder → resync-graph).
 //   convention 입력-탐색(.aimd/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
@@ -2174,6 +2316,8 @@ function main() {
 			return cmdSyncLoop(args);
 		case 'sync-next':
 			return cmdSyncNext(args);
+		case 'route':
+			return cmdRoute(args);
 		case 'suggest-skill':
 			return cmdSuggestSkill(args);
 		case 'hooks-bridge':

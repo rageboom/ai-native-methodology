@@ -86,3 +86,16 @@
 - **가드**: clobber(sync-loop 가 in-progress 큐 덮어쓰기 거부 / `--force`) · fixpoint 미보증 정직 표기(자동 재진입 deferred) · has_cycle 큐 방어 · cmdState done-aware 표시.
 - **검증(no-sim 실 CLI / §8.1 ≥2 distinct 도메인)**: `test/sync-next.test.js` 16(코어 6 + poc-05 e2e 6 + trust 4) — drain spec→plan→test→implement→complete / block 격리(state.blocked 불변)·복구 / clobber. **2번째 도메인 = poc-16 efiweb-car-spring41(Spring 4.1 legacy) 실 dogfood**(BHV-CAR-MGT-001 → surface → spec gate drain → complete). chain-driver **374/374**(358+16) · release-readiness **40/40** · 3-way 0.6.0.
 - **carry(후속)**: fixpoint 자동 재진입(sync-next 종료 시 sync-loop 재호출) · Phase 1b NL 라우터 · Phase 2 lift+reconcile · Phase 3 merge-back · Phase 4 per-item · hook auto-fire. (선택) state.schema.json `regen_queue` 선언(honest-debt / reuse-agent 지적). 다음 = Phase 1b 또는 2(사용자 결단).
+
+## 9. Phase 1b 시행 로그 (v0.7.0 / 2026-06-07 — 의미 라우터)
+
+**Phase 1b = `chain-driver route`** — 자연어 변경요청을 그래프에 ground 해 진입 노드 산출. **의미 판정 = 기존 LLM skill(`discovery-from-nl-md` → discovery-spec) / 라우팅 = 신규 결정론 도구**. §5 로드맵 Phase 1b 이행. 4원칙 — 2 Explore + **2 Senior 적대 pass**.
+
+**★ v1(token) → v2(명시 매핑) 전환 (Senior REVISE@0.78)**: 초안은 `sync-loop --prompt` 로 matchPromptToNodes(substring) 의미 라우팅. Senior 코드검증 — **의미 라우팅 불가**(substring 은 "이건 룰 변경" 판정 불가 / analysis→chain soft edge ~2hop 감쇠 / orphan analysis kind 빈 closure). → **v2**: 의미를 LLM(discovery-spec)에 위임, 도구는 discovery-spec 의 **명시 br_id/UC 매핑**만 결정론 라우팅.
+
+**v2 Senior REVISE@0.86 — 6건 코드확인 후 정정**: #1 br_id 매칭=`normalizeAnalysisBusinessRules`(validator 동형 / `loadBusinessRules` strict-canonical-only ❌) · #2 `--analysis` 부재+br_intent → **fail-closed exit 3** · #3 BR origin=soft edge → **notify-only/SHOULD**(full 하향=fixpoint deferred) · #4 fine UC → net-new + **counts loud** / **0-origin=propose-only exit 0**(S2 graph 부재) · #5 net-new=stdout report-only · #6 net-new BR 차단=별도 gate#1(route=비-gating).
+
+- **신규 코어 `tools/chain-driver/src/route-discovery.js`**(gate·I/O·시간 0): `resolveDiscoveryOrigins(discoverySpec, graph, analysis)` → `{origins, net_new, diagnostics, counts}`. UC-id→노드 직접 / br_id→content 매칭→coarse `analysis-business-rules` 노드 / miss=net-new.
+- **신규 `chain-driver route` 명령**(cli.js): existing origins → computeSyncLoop → regen_queue seed(durable 경로 재사용). cmdNext·sync-loop·sync-next 무변경.
+- **검증(§8.1 ≥2 도메인)**: `test/route-discovery.test.js` 13(코어6+poc-05 e2e5+trust2). **poc-05(UC+BR→13 item) + poc-16(Spring 4.1 legacy / 10 UC+12 BR→31 item / net_new 0)**. chain-driver **387/387** · RR **40/40** · 3-way 0.7.0.
+- **carry**: per-BR granularity(Phase 4) · UC parent-prefix 매칭 · fixpoint 자동 재진입. 다음 = Phase 2(손수정 코드 lift+reconcile / 사용자 결단).
