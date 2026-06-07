@@ -81,6 +81,7 @@ import { topKImpactRoot } from './centrality.js';
 // living-sync 전파 루프 (Phase 1 MVP / DEC-2026-06-07-living-sync-operating-model) — 순수 코어.
 import {
 	computeSyncLoop,
+	resolveOriginNodeIds,
 	resolveChangedRuleOrigins,
 	markTransientDrift,
 	selectNextStage,
@@ -193,6 +194,7 @@ function parseArgs(argv) {
 		else if (a === '--no-matrix')
 			out.noMatrix = true; // trace-view: coverage 매트릭스 억제 (기본 ON).
 		else if (a === '--br-diff') out.brDiffRef = rest[++i];
+		else if (a === '--git') out.gitRef = rest[++i];
 		else if (a === '--br-path') out.brPath = rest[++i];
 		else if (a === '--help' || a === '-h') usage(0);
 		else if (a.startsWith('--')) usage(3);
@@ -1750,6 +1752,49 @@ function cmdImpact(args) {
 //   변경된 origin(--origin id... 또는 --changed path...) → forward 단방향 영향 closure → 순서화된 재생성
 //   worklist 를 state.json `regen_queue` 에 durable 기록(결정론 / 비-gating). 재생성(LLM)·NL 라우터·역동기화 = 후속 phase.
 //   drift 는 파생값 → 그래프 영속 ❌ (--mark = in-memory display-only escape hatch). has_cycle 시 durable write 거부.
+// living-sync carry 1/1b — business-rules.json per-rule diff → per-BR origin (공유 / --br-diff·--git).
+//   new = working-tree fs (MAJOR-2 불변식 / git blob ❌). deleted brAbs = newParsed={} (all removed / minor-3).
+//   discriminated result (process.exit ❌ = 테스트가능 / cmdSyncLoop 가 exit·in-sync 담당 / minor-5).
+function brDiffOrigins({ git, ref, brAbs, brRelPosix, graph }) {
+	let oldParsed = {};
+	try {
+		oldParsed = JSON.parse(git(['show', `${ref}:${brRelPosix}`]));
+	} catch {
+		oldParsed = {}; // valid ref 에 path 부재 = 신규 파일 → 전 rule added
+	}
+	let newParsed = {};
+	if (existsSync(brAbs)) {
+		try {
+			newParsed = JSON.parse(readFileSync(brAbs, 'utf-8'));
+		} catch (e) {
+			return { ok: false, exitCode: 3, msg: `business-rules.json parse error: ${e.message}` };
+		}
+	} // 부재 = deleted → newParsed={} = all removed (minor-3)
+	const { changed_rule_ids, removed_rule_ids } = diffBusinessRulesByRule(oldParsed, newParsed);
+	const ruleOrigins = resolveChangedRuleOrigins(graph, changed_rule_ids);
+	return {
+		ok: true,
+		origins: ruleOrigins.origins,
+		report: {
+			ref,
+			changed_rule_ids,
+			removed_rule_ids,
+			seeded_origins: ruleOrigins.origins,
+			coarse_fallback: ruleOrigins.coarse_fallback,
+			unresolved: ruleOrigins.unresolved,
+		},
+	};
+}
+function reportBrDiff(r) {
+	process.stdout.write(
+		`[br-diff] ref=${r.ref} changed=${r.changed_rule_ids.length} removed=${r.removed_rule_ids.length} → seeded=${r.seeded_origins.length}` +
+			(r.coarse_fallback.length ? ` ⚠️ coarse_fallback(BC-less)=${r.coarse_fallback.join(',')}` : '') +
+			(r.removed_rule_ids.length ? ` ⚠️ removed(소비자 stale 가능)=${r.removed_rule_ids.join(',')}` : '') +
+			(r.unresolved.length ? ` ⚠️ unresolved(BR 그래프 부재)=${r.unresolved.join(',')}` : '') +
+			'\n',
+	);
+}
+
 function cmdSyncLoop(args) {
 	if (!args.graphPath) {
 		console.error('[chain-driver] sync-loop: --graph <path> required');
@@ -1761,7 +1806,7 @@ function cmdSyncLoop(args) {
 	}
 	let origins = args.origins ?? (args.origin ? [args.origin] : []);
 	const changedPaths = args.changedPaths ?? [];
-	if (origins.length === 0 && changedPaths.length === 0 && !args.brDiffRef) {
+	if (origins.length === 0 && changedPaths.length === 0 && !args.brDiffRef && !args.gitRef) {
 		console.error(
 			'[chain-driver] sync-loop: --origin <id>... / --changed <path>... / --br-diff <ref> 중 하나 필수',
 		);
@@ -1775,9 +1820,14 @@ function cmdSyncLoop(args) {
 		process.exit(3);
 	}
 
-	// living-sync carry 1 — --br-diff <ref>: business-rules.json per-rule git diff → 변경 rule → per-BR origin seed (Senior@0.84).
+	// living-sync carry 1 — --br-diff <ref>: business-rules.json per-rule git diff → per-BR origin seed.
 	let brDiffReport = null;
+	let gitDiffReport = null;
 	if (args.brDiffRef) {
+		if (args.gitRef) {
+			console.error('[chain-driver] sync-loop: --br-diff 와 --git 동시 사용 불가 (대체 진입 모드 / 하나만 / MAJOR-1).');
+			process.exit(3);
+		}
 		const root = args.project ? resolve(args.project) : process.cwd();
 		const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
 		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
@@ -1786,7 +1836,6 @@ function cmdSyncLoop(args) {
 			process.exit(3);
 		}
 		const git = makeGitRunner(root);
-		// MAJOR-2: ref 선검증 (bad-ref/no-repo 와 new-file 구분 — 날조 drift 회피).
 		try {
 			git(['rev-parse', '--verify', `${args.brDiffRef}^{commit}`]);
 		} catch {
@@ -1794,40 +1843,70 @@ function cmdSyncLoop(args) {
 			process.exit(3);
 		}
 		const brRelPosix = brRel.split('\\').join('/');
-		let oldParsed = {};
-		try {
-			oldParsed = JSON.parse(git(['show', `${args.brDiffRef}:${brRelPosix}`]));
-		} catch {
-			oldParsed = {}; // valid ref 에 path 부재 = 신규 파일 → 전 rule added
+		const res = brDiffOrigins({ git, ref: args.brDiffRef, brAbs, brRelPosix, graph });
+		if (!res.ok) {
+			console.error(`[chain-driver] sync-loop --br-diff: ${res.msg}`);
+			process.exit(res.exitCode);
 		}
-		let newParsed;
-		try {
-			newParsed = JSON.parse(readFileSync(brAbs, 'utf-8'));
-		} catch (e) {
-			console.error(`[chain-driver] sync-loop --br-diff: business-rules.json parse error: ${e.message}`);
-			process.exit(3);
-		}
-		const { changed_rule_ids, removed_rule_ids } = diffBusinessRulesByRule(oldParsed, newParsed);
-		const ruleOrigins = resolveChangedRuleOrigins(graph, changed_rule_ids);
-		origins = [...new Set([...origins, ...ruleOrigins.origins])].sort();
-		brDiffReport = {
-			ref: args.brDiffRef,
-			changed_rule_ids,
-			removed_rule_ids,
-			seeded_origins: ruleOrigins.origins,
-			coarse_fallback: ruleOrigins.coarse_fallback,
-			unresolved: ruleOrigins.unresolved,
-		};
-		process.stdout.write(
-			`[br-diff] ref=${args.brDiffRef} changed=${changed_rule_ids.length} removed=${removed_rule_ids.length} → seeded=${ruleOrigins.origins.length}` +
-				(ruleOrigins.coarse_fallback.length ? ` ⚠️ coarse_fallback(BC-less)=${ruleOrigins.coarse_fallback.join(',')}` : '') +
-				(removed_rule_ids.length ? ` ⚠️ removed(소비자 stale 가능)=${removed_rule_ids.join(',')}` : '') +
-				(ruleOrigins.unresolved.length ? ` ⚠️ unresolved(BR 그래프 부재)=${ruleOrigins.unresolved.join(',')}` : '') +
-				'\n',
-		);
+		brDiffReport = res.report;
+		origins = [...new Set([...origins, ...res.origins])].sort();
+		reportBrDiff(res.report);
 		if (origins.length === 0 && changedPaths.length === 0) {
 			process.stdout.write('[br-diff] 변경 rule 0 — in-sync (regen_queue 미기록)\n');
 			if (args.json) process.stdout.write(JSON.stringify({ br_diff: brDiffReport, in_sync: true }, null, 2) + '\n');
+			process.exit(0);
+		}
+	}
+
+	// living-sync carry 1b — --git <ref>: ref↔worktree 전 산출물 변경 자동 감지 → origins (BR=per-rule 위임 / 기타=coarse).
+	if (args.gitRef) {
+		const root = args.project ? resolve(args.project) : process.cwd();
+		const git = makeGitRunner(root);
+		try {
+			git(['rev-parse', '--verify', `${args.gitRef}^{commit}`]);
+		} catch {
+			console.error(`[chain-driver] sync-loop --git: invalid git ref / not a repo: ${args.gitRef} (미실행 — 날조 ❌)`);
+			process.exit(3);
+		}
+		const diff = gitDiffNumstat(root, args.gitRef, null); // ref↔worktree (carry 1b)
+		if (!diff.ok) {
+			console.error(`[chain-driver] sync-loop --git: git diff 실패: ${diff.error}`);
+			process.exit(3);
+		}
+		const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+		const brRelPosix = brRel.split('\\').join('/');
+		const changed = diff.files.map((f) => f.path.split('\\').join('/'));
+		const brChanged = changed.includes(brRelPosix); // BLOCKER-1: 정규화 키로 partition
+		const nonBr = changed.filter((q) => q !== brRelPosix);
+		let brOrigins = [];
+		if (brChanged) {
+			const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
+			const res = brDiffOrigins({ git, ref: args.gitRef, brAbs, brRelPosix, graph });
+			if (!res.ok) {
+				console.error(`[chain-driver] sync-loop --git: ${res.msg}`);
+				process.exit(res.exitCode);
+			}
+			brOrigins = res.origins;
+			reportBrDiff(res.report);
+			gitDiffReport = { br_diff: res.report };
+		}
+		const pathOrigins = resolveOriginNodeIds(graph, nonBr);
+		origins = [...new Set([...origins, ...brOrigins, ...pathOrigins.ids])].sort();
+		gitDiffReport = {
+			...(gitDiffReport || {}),
+			ref: args.gitRef,
+			changed_files: changed.length,
+			non_br_origins: pathOrigins.ids,
+			unresolved_paths: pathOrigins.unresolved,
+		};
+		process.stdout.write(
+			`[git] ref=${args.gitRef} (ref↔worktree) changed_files=${changed.length} → origins(non-BR)=${pathOrigins.ids.length}` +
+				(pathOrigins.unresolved.length ? ` ⚠️ unresolved_paths=${pathOrigins.unresolved.length}` : '') +
+				' (untracked 파일은 git diff 제외 — 신규 미-add 산출물 미감지 / minor-2)\n',
+		);
+		if (origins.length === 0 && changedPaths.length === 0) {
+			process.stdout.write('[git] 영향 origin 0 — in-sync (regen_queue 미기록)\n');
+			if (args.json) process.stdout.write(JSON.stringify({ git_diff: gitDiffReport, in_sync: true }, null, 2) + '\n');
 			process.exit(0);
 		}
 	}
@@ -1862,6 +1941,7 @@ function cmdSyncLoop(args) {
 	const regenQueue = {
 		generated_at: new Date().toISOString(),
 		...(brDiffReport ? { br_diff: brDiffReport } : {}),
+		...(gitDiffReport ? { git_diff: gitDiffReport } : {}),
 		origins: result.origins,
 		graph_path: args.graphPath,
 		has_cycle: result.has_cycle,

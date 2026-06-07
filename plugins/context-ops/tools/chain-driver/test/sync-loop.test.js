@@ -19,6 +19,7 @@ import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { computeSyncLoop, resolveChangedRuleOrigins } from '../src/sync-loop.js';
+import { gitDiffNumstat } from '../src/revisit-detect.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'src', 'cli.js');
@@ -309,6 +310,70 @@ describe('carry 1 — sync-loop --br-diff e2e (tmp git / per-BR auto-origin / no
 		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.aimd/output/business-rules.json', state: 'active' }], edges: [] }));
 		const r = run(['sync-loop', root, '--graph', graphPath, '--br-diff', 'NOPE', '--dry-run']);
 		assert.equal(r.status, 3, "bad ref/no repo = exit 3");
+		rmSync(root, { recursive: true, force: true });
+	});
+});
+
+describe('carry 1b — gitDiffNumstat 워크트리 모드 (head=null → ref↔worktree)', () => {
+	it('head=null → 미커밋 working-tree 변경 감지 / head=HEAD → 커밋범위 무회귀', () => {
+		const root = mkdtempSync(join(tmpdir(), 'gdn-'));
+		const g = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
+		g(['init', '-q']); g(['config', 'user.email', 't@t']); g(['config', 'user.name', 't']);
+		writeFileSync(join(root, 'f.txt'), 'v1\n');
+		g(['add', '-A']); g(['commit', '-q', '-m', 'c1']);
+		writeFileSync(join(root, 'f.txt'), 'v1\nv2\n'); // 미커밋 변경
+		const wt = gitDiffNumstat(root, 'HEAD', null);
+		assert.ok(wt.ok && wt.files.some((x) => x.path === 'f.txt'), 'worktree 모드 미커밋 변경 감지');
+		const committed = gitDiffNumstat(root, 'HEAD', 'HEAD');
+		assert.equal(committed.files.length, 0, 'HEAD..HEAD = 변경 0 (무회귀)');
+		rmSync(root, { recursive: true, force: true });
+	});
+});
+
+describe('carry 1b — sync-loop --git e2e (전 산출물 / BR=per-rule·기타=coarse / no-sim)', () => {
+	const node = (id, kind, sub, x = {}) => ({ id, artifact_kind: kind, artifact_subkind: sub, state: "active", ...x });
+	it('BR.json 1 rule + domain.json 수정 → BR per-rule origin + domain coarse origin', () => {
+		const root = mkdtempSync(join(tmpdir(), 'git-ao-'));
+		const g = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
+		g(['init', '-q']); g(['config', 'user.email', 't@t']); g(['config', 'user.name', 't']);
+		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const br = (d) => JSON.stringify({ business_rules: [
+			{ id: 'BR-POST-1', bounded_context: 'BC-POST', desc: d },
+			{ id: 'BR-POST-2', bounded_context: 'BC-POST', desc: 'stable' },
+		] });
+		writeFileSync(join(outDir, 'business-rules.json'), br('orig'));
+		writeFileSync(join(outDir, 'domain.json'), JSON.stringify({ v: 1 }));
+		const graph = { nodes: [
+			node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-1', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-1', source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-2', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-2', source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-domain', 'analysis', 'domain', { source_path: '.aimd/output/domain.json' }),
+			node('BHV-POST-001', 'chain', 'BHV'), node('BHV-POST-002', 'chain', 'BHV'),
+		], edges: [
+			{ source: 'analysis-business-rules-BR-POST-1', target: 'BHV-POST-001', edge_type: 'cross_reference', confidence: 'soft' },
+			{ source: 'analysis-business-rules-BR-POST-2', target: 'BHV-POST-002', edge_type: 'cross_reference', confidence: 'soft' },
+		] };
+		const graphPath = join(root, 'graph.json'); writeFileSync(graphPath, JSON.stringify(graph));
+		g(['add', '-A']); g(['commit', '-q', '-m', 'init']);
+		writeFileSync(join(outDir, 'business-rules.json'), br('MODIFIED')); // BR-POST-1 만 변경
+		writeFileSync(join(outDir, 'domain.json'), JSON.stringify({ v: 2 })); // 비-BR 변경
+		const r = run(['sync-loop', root, '--graph', graphPath, '--git', 'HEAD', '--dry-run', '--json']);
+		assert.equal(r.status, 0, r.stderr);
+		const out = JSON.parse(r.stdout.slice(r.stdout.indexOf("{")));
+		assert.ok(out.origins.includes('analysis-business-rules-BR-POST-1'), 'BR per-rule 정밀 origin');
+		assert.ok(!out.origins.includes('analysis-business-rules-BR-POST-2'), '무관 BR 제외');
+		assert.ok(!out.origins.includes('analysis-business-rules'), 'BR parent coarse 제외(BLOCKER-1 partition)');
+		assert.ok(out.origins.includes('analysis-domain'), '비-BR=coarse origin');
+		assert.ok(out.closure.SHOULD.includes('BHV-POST-001') && !out.closure.SHOULD.includes('BHV-POST-002'), 'BR 정밀 closure');
+		rmSync(root, { recursive: true, force: true });
+	});
+	it('--git + --br-diff 동시 → exit 3 (MAJOR-1)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'git-both-'));
+		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		writeFileSync(join(outDir, 'business-rules.json'), JSON.stringify({ business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST' }] }));
+		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.aimd/output/business-rules.json' })], edges: [] }));
+		const r = run(['sync-loop', root, '--graph', graphPath, '--git', 'HEAD', '--br-diff', 'HEAD', '--dry-run']);
+		assert.equal(r.status, 3, '동시 사용 거부');
 		rmSync(root, { recursive: true, force: true });
 	});
 });

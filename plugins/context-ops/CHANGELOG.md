@@ -10,6 +10,18 @@
 
 ---
 
+## [0.18.0] — 2026-06-07 MINOR — living-sync carry 1b: BR 외 범용 git-auto-origin (`sync-loop --git`)
+
+carry 1(--br-diff / business-rules.json per-rule)을 **전 산출물**로 일반화 — `sync-loop --git <ref>` = ref↔워크트리 git diff → 변경 파일 자동 수집 → origins → regen_queue. 변경 자동 감지 완성(수동 `--changed <path>...` 트리거 갭 해소 / P0). 4원칙(plan `plan-living-sync-c1b-git-auto-origin.md` + **Senior 적대 step-0[REVISE@0.82]** + 사용자 ① BUILD 결단).
+
+- **`gitDiffNumstat` 워크트리 모드(additive)**: `headSha` falsy → `git diff --numstat <ref>`(단일=ref↔worktree / 미커밋 변경 감지). 기존 caller(HEAD~1..HEAD) 무영향.
+- **`brDiffOrigins` helper 추출(DRY/테스트가능)**: --br-diff 인라인 블록 → discriminated result `{ok,origins,report}|{ok,exitCode,msg}`(process.exit ❌ / new=worktree fs 불변식 / deleted brAbs=newParsed={} all-removed). --br-diff·--git 공유.
+- **`sync-loop --git <ref>`**: rev-parse 선검증 → gitDiffNumstat(ref,null) → partition: business-rules.json=per-rule 위임(정밀) / 기타=resolveOriginNodeIds(coarse whole-artifact) → origins 합류 → computeSyncLoop durable. 변경 0=in-sync exit0.
+- **★ Senior REVISE@0.82 fix 전건 코드확인**: **BLOCKER-1** BR partition 제외는 정규화 `--br-path`(brRelPosix) 키 — 안 빼면 resolveOriginNodeIds 가 parent+전 per-BC+전 per-BR 재매칭=over-propagation 부활(per-rule 무력화). **MAJOR-1** --git+--br-diff 동시=exit3(서로 다른 baseline 비정합). MAJOR-2 추출 helper new=worktree fs 유지(git blob ❌=두 모드 동일 기반). minor: untracked 제외 정직 note(false-in-sync 회피)·deleted-BR=newParsed={}·`--git` arg parser·sorted merge.
+- **검증(no-sim 실 / §8.1)**: sync-loop.test.js +3(gitDiffNumstat 워크트리[미커밋 감지]+커밋범위 무회귀 · **--git e2e**: BR.json 1 rule+domain.json 수정→BR per-rule 정밀 origin[parent/per-BC/무관 BR 제외=BLOCKER-1]+domain coarse origin+정밀 closure · --git+--br-diff exit3) → chain-driver **459**(+3). --br-diff 기존 e2e 통과(helper 추출 무회귀). RR 무회귀·3-way 0.18.0.
+- **정직 경계**: untracked(미-add) 신규 산출물 = git diff 제외(stdout note) / BR=per-rule 정밀·기타=coarse(§5 whole-artifact 정당) / 실 demand 0(P0 gap BUILD).
+- **② 자동등록 lifecycle 배선 = DEFER**: registration=cmdSync glue 한정(cli.js:1251 "hook 무영향" 의도 경계) / analysis-stage-completion 트리거 = 별도 설계+grounding. 현 cmdSync first-touch(Phase 3a)로 기계 live. SSOT = DEC §24.
+
 ## [0.17.0] — 2026-06-07 MINOR — living-sync carry 1: 변경 자동 감지 → per-BR auto-origin
 
 business-rules.json 변경을 **per-rule 단위로 자동 감지**(git old↔new diff) → 변경 rule 의 **per-BR 노드를 sync-loop origin 으로 자동 seed**. S6 per-BR 정밀화를 파일변경 경로에도 실현(기존 `resolveOriginNodeIds` 는 finest-origin 미선택 → BR.json 변경 시 parent+전 per-BC+전 per-BR = 최대 coarse). 메서드론 P0(평생 자동 동기화 / 수동 트리거 갭) 정합. 4원칙(plan `plan-living-sync-c1-rule-auto-origin.md` + **Senior 적대 step-0[REVISE@0.84]** + 사용자 (b) 결단).

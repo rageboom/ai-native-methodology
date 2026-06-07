@@ -65,7 +65,7 @@ function matchGlob(path, glob) {
 export function gitDiffNumstat(repoRoot, baseSha = 'HEAD~1', headSha = 'HEAD') {
 	const result = spawnSync(
 		'git',
-		['diff', '--numstat', `${baseSha}..${headSha}`],
+		['diff', '--numstat', headSha ? `${baseSha}..${headSha}` : baseSha], // headSha=null → ref↔worktree (carry 1b)
 		{
 			cwd: repoRoot,
 			encoding: 'utf-8',
