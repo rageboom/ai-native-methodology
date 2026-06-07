@@ -1,6 +1,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateDiscoveryExtraction } from '../src/validator.js';
+import {
+  normalizeBusinessRules,
+  normalizeAnalysisBusinessRules,
+  loadBusinessRules,
+} from '../../_shared/load-business-rules.js';
 
 describe('discovery-extraction-validator', () => {
   it('passes for valid discovery-spec', () => {
@@ -129,6 +134,82 @@ describe('discovery-extraction-validator', () => {
       };
       const r = validateDiscoveryExtraction(discovery, analysis);
       assert.ok(r.findings.some(f => f.kind === 'discovery.br_intent.unknown_br' && f.severity === 'critical'));
+    });
+  });
+
+  // v0.4.0 (BR-split STEP 2): silent mis-fire fix (blocker #1)
+  describe('br_source shape mis-fire (v0.4.0 / BR-split STEP 2)', () => {
+    const intent = [{ br_id: 'BR-X-001', reasoning: 'r', source_grounded_evidence: 'x' }];
+    const baseDiscovery = {
+      use_cases: [{ id: 'UC-USER-001', source_grounded_evidence: ['x.java:1'] }],
+      business_rules_intent: intent,
+      cross_links: { to_analysis_artifacts: ['business-rules.json'] }
+    };
+
+    it('container key present but 0 id-BRs → single shape_unrecognized (high), NOT N unknown_br', () => {
+      // rules:{} = container present, malformed/empty → 미인식 shape
+      const r = validateDiscoveryExtraction(baseDiscovery, { rules: {} });
+      assert.ok(r.findings.some(f => f.kind === 'discovery.br_source.shape_unrecognized' && f.severity === 'high'));
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.br_intent.unknown_br'),
+        'unknown_br 오탐 억제');
+    });
+
+    it('container array present but entries lack id → shape_unrecognized', () => {
+      const r = validateDiscoveryExtraction(baseDiscovery, { business_rules: [{ noId: true }] });
+      assert.ok(r.findings.some(f => f.kind === 'discovery.br_source.shape_unrecognized'));
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.br_intent.unknown_br'));
+    });
+
+    it('NO container key (legit 0-rules) + BR-INTENT → unknown_br (NOT shape_unrecognized)', () => {
+      // analysis 에 BR container 키 자체 부재(예: 순수 계산 lib) → dangling BR-INTENT 는 정당히 unknown_br
+      const r = validateDiscoveryExtraction(baseDiscovery, { domain: {}, architecture: {} });
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.br_source.shape_unrecognized'),
+        'shape 은 미인식 아님 — 단지 BR 부재');
+      assert.ok(r.findings.some(f => f.kind === 'discovery.br_intent.unknown_br'));
+    });
+
+    it('shape_unrecognized only fires when there are BR-INTENT refs to protect', () => {
+      const noIntent = { ...baseDiscovery, business_rules_intent: [] };
+      const r = validateDiscoveryExtraction(noIntent, { rules: {} });
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.br_source.shape_unrecognized'));
+    });
+  });
+
+  // v0.4.0: _shared loader unit (BR-split STEP 2 single-point)
+  describe('_shared/load-business-rules', () => {
+    it('normalizeBusinessRules: strict canonical only (alias hard-kill 정합)', () => {
+      assert.deepEqual(normalizeBusinessRules({ business_rules: [{ id: 'A' }] }), [{ id: 'A' }]);
+      assert.deepEqual(normalizeBusinessRules({ rules: [{ id: 'A' }] }), []); // alias 미수용
+      assert.deepEqual(normalizeBusinessRules({ rules: { business_rules: [{ id: 'A' }] } }), []);
+      assert.deepEqual(normalizeBusinessRules(null), []);
+    });
+
+    it('normalizeAnalysisBusinessRules: absorbs 4 legacy shapes + unrecognizedShape', () => {
+      assert.equal(normalizeAnalysisBusinessRules({ business_rules: [{ id: 'A' }] }).rules.length, 1);
+      assert.equal(normalizeAnalysisBusinessRules({ rules: { business_rules: [{ id: 'A' }] } }).rules.length, 1);
+      assert.equal(normalizeAnalysisBusinessRules({ rules: [{ id: 'A' }] }).rules.length, 1);
+      assert.equal(normalizeAnalysisBusinessRules({ rules_step_4c_carcost: [{ id: 'A' }] }).rules.length, 1);
+      // unrecognizedShape: container present, 0 id
+      assert.equal(normalizeAnalysisBusinessRules({ rules: {} }).unrecognizedShape, true);
+      // 정당한 0-rules: container 키 부재
+      assert.equal(normalizeAnalysisBusinessRules({ domain: {} }).unrecognizedShape, false);
+      assert.equal(normalizeAnalysisBusinessRules(null).unrecognizedShape, false);
+    });
+
+    it('loadBusinessRules: bcFilter 슬라이스 + 주입 readJson + fail-closed', () => {
+      const doc = { business_rules: [
+        { id: 'A', bounded_context: 'BC-X' },
+        { id: 'B', bounded_context: 'BC-Y' },
+      ] };
+      const readJson = () => doc;
+      assert.equal(loadBusinessRules('any.json', { readJson }).length, 2);
+      assert.equal(
+        loadBusinessRules('any.json', { readJson, bcFilter: (br) => br.bounded_context === 'BC-X' }).length,
+        1
+      );
+      // fail-closed: readJson null → []
+      assert.deepEqual(loadBusinessRules('any.json', { readJson: () => null }), []);
+      assert.deepEqual(loadBusinessRules(null), []);
     });
   });
 

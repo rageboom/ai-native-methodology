@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildMatrix, loadJson } from './builder.js';
 import { synthesizeGraph, TIER1_CATALOG } from './graph-synthesizer.js';
+// v0.4.0 (BR-split STEP 2) — business-rules 로딩 중앙화 (graph 합성 입력 / STEP 3 single-point).
+import { loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 // A2 baseline (DEC-2026-06-01 dogfood F-DF-A2-001) — --commit-hash 미지정 시 현 git HEAD auto-derive.
 //   synth-time HEAD = strict_path code_pointer 의 content-drift baseline (graph-synthesizer 가 스탬프 / SLSA 동형).
@@ -159,7 +161,13 @@ if (args.graph) {
 			for (const fname of candidates) {
 				const p = join(args.analysisDir, fname);
 				if (existsSync(p)) {
-					analysis[kind] = loadJson(p);
+					// v0.4.0 (BR-split STEP 2): business-rules 는 _shared loader 경유로 정규화 →
+					//   graph-synthesizer 의 `.business_rules` accessor 무변경 + STEP 3(index+per-BC)
+					//   분할 시 본 cli 무수정(loader 내부만 확장) single-point.
+					analysis[kind] =
+						kind === 'business-rules'
+							? { business_rules: loadBusinessRules(p) }
+							: loadJson(p);
 					analysisPaths[kind] = p;
 					break; // 첫 존재 후보 채택 (canonical 우선 순서)
 				}

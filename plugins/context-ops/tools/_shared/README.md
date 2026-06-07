@@ -8,6 +8,7 @@
 
 - `baseline.js` — ADR-010 baseline + ratchet 로직 (zero-defect 강제 ❌ / 신규 결함만 차단)
 - `evidence-cross-check.js` — v8.7 PATCH Layer 3 evidence cross-check helper (실 외부 도구 invocation log \*.jsonl scan → unique `tool` count 산출). R15 silent enabler 차단 공용 logic.
+- `load-business-rules.js` — v0.4.0 (BR-split STEP 2 / DEC-2026-06-07-br-split-step2) business-rules 로딩 중앙화. `normalizeBusinessRules`(strict canonical / STEP 3 분할 단일 변경 지점) + `normalizeAnalysisBusinessRules`(analysis-stage 4 legacy shape + mis-fire 신호 / discovery-extraction 전용) + `loadBusinessRules`(파일/dir resolve + bcFilter + 주입 readJson seam). import: br-cross-consistency-validator / context-federator / traceability-matrix-builder / discovery-extraction-validator.
 
 ## 사용 위치
 

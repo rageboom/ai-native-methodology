@@ -33,6 +33,8 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 // v12.4.0 — prompt→노드 결정론 매칭 코어 (_shared / navigate --prompt 와 DRY 공유 / graph-freshness 선례).
 import { matchPromptToNodes } from '../../_shared/prompt-node-match.js';
+// v0.4.0 (BR-split STEP 2) — business-rules 로딩 중앙화 (주입 readJson seam 보존 / STEP 3 single-point).
+import { loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 const require = createRequire(import.meta.url);
 // node:sqlite = Node 22.5+ (실험). 부재(구 Node) = null → 호출부 graceful fallback.
@@ -160,10 +162,12 @@ export function loadLegacyDataSource(
 		dbLoaded = true;
 		for (const t of db.tables) if (t?.name) tableByName.set(t.name, t);
 	}
-	const br = brPath ? readJson(brPath) : null;
-	if (br && Array.isArray(br.business_rules)) {
+	// v0.4.0 (BR-split STEP 2): loadBusinessRules 경유 — 주입 readJson 그대로 전달(testability seam
+	//   보존) + STEP 3(index+per-BC) 분할 시 본 호출부 무수정(loader 내부만 확장) single-point.
+	const brRules = brPath ? loadBusinessRules(brPath, { readJson }) : [];
+	if (brRules.length > 0) {
 		brLoaded = true;
-		for (const r of br.business_rules) if (r?.id) brById.set(r.id, r);
+		for (const r of brRules) if (r?.id) brById.set(r.id, r);
 	}
 	return {
 		available: sqlLoaded,

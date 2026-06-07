@@ -10,6 +10,19 @@
 
 ---
 
+## [0.4.0] — 2026-06-07 MINOR — business-rules 로딩 `_shared` 중앙화 + discovery-extraction silent mis-fire fix (BR-split 순차안 STEP 2)
+
+BR-split 순차안 STEP 2 — business-rules 로딩(파일위치 resolve + shape 추출)을 신규 `tools/_shared/load-business-rules.js` 로 중앙화. 목적: ① discovery-extraction-validator silent mis-fire(blocker #1) 즉시 수정, ② STEP 3(포맷 분할 = index + per-BC)을 **single-point 변경**으로 de-risk. **포맷·schema·산출물 무변경.** 3-Explore 실측 + Senior 적대검토(REVISE@0.82 / 결함 5건 코드확인 후 수정)로 naive 설계 정정.
+
+- **신규 `tools/_shared/load-business-rules.js`** (ESM / `_shared` 컨벤션 선례 답습 / 3 export):
+  - `normalizeBusinessRules(parsed)` = **strict canonical**(오직 `{business_rules:[]}`). canonical output reader 3종 전용 — v5.0.0 alias hard-kill(`rules`/`rules_manual_authored`) 정합(4-shape 로 안 넓힘 / Senior 정정 1: 넓히면 죽인 alias 부활). **STEP 3 분할 단일 변경 지점.**
+  - `normalizeAnalysisBusinessRules(analysis)` = analysis-stage raw 4 legacy shape(rules.business_rules / business_rules / rules / rules_step_4c_carcost) 흡수 + **mis-fire 신호**. discovery-extraction-validator 전용(STEP 3 분할 무영향).
+  - `loadBusinessRules(target, {readJson, bcFilter})` = 파일/디렉토리 resolve + 추출 + bcFilter 슬라이스. 주입 readJson 지원(context-federator testability seam 보존 / Senior 정정 3). fail-closed([]).
+- **discovery-extraction-validator silent mis-fire fix (blocker #1)**: BR-container 키가 present 인데 id 보유 BR 0건(미인식/malformed shape) → N 개 false `discovery.br_intent.unknown_br` **critical**(gate #1 오차단) 대신 단일 `discovery.br_source.shape_unrecognized`(**high**) emit. 판별 경계(Senior 정정 2) = "container 키 present + 0 id" 일 때만(BR 키 자체 부재 = 정당한 0-rules → 무알람 / typo'd id 는 union-then-check 라 여전히 critical = 보존).
+- **reader 재배선 4종**: br-cross-consistency-validator(`extractRules`→`normalizeBusinessRules` 위임 + cli `loadBusinessRules`) / context-federator(`loadBusinessRules(brPath,{readJson})` seam 보존) / traceability-matrix-builder(graph cli 루프 business-rules kind 정규화 / graph-synthesizer accessor 무변경) / discovery-extraction-validator(상기). 필명→subkind 매핑 상수(hooks-bridge 등)는 로더 아님 + STEP 3 index 가 파일명 유지 → 무영향(scope-out / Senior 점검 안전).
+- **버전 = MINOR(0.4.0)** (Senior 정정 5): 신규 finding kind + gate #1 verdict 변화(N critical-block → 1 high non-block) = 호환 기능추가(PATCH ❌ / v0.2.0 PmdPlugin MINOR 선례).
+- **검증**: 재배선 4 reader test green(br-cross 32 / federator 32 / traceability 152 / discovery 39 / mis-fire+loader 신규 7) · workspace 1277/1279(0 fail / 직전 1270/1272 + 신규) · 예제 전수 schema-valid 유지(포맷 무변경). **carry**: STEP 3(index+per-BC 분할 + schema 2종 + 노드모델 + examples 재생성 / BC 채움률 실측 재판단) · traceability `chain.businessRules` cli unset latent gap(buildMatrix BR 미주입 / 본 STEP 무행동 명시 / Senior 정정 6). SSOT = `decisions/DEC-2026-06-07-br-split-step2.md` + plan `plan-br-split.md` §8.
+
 ## [0.3.0] — 2026-06-07 (breaking / pre-1.0) — business-rules `bounded_context` required 승격 + scope-local `*.subset.json` 폐기 (BR-split 순차안 STEP 0+1)
 
 business-rules 산출물을 BC별 파일로 분할하려는 요구에서 출발 — Senior 적대 검토가 **bounded_context 채움률 8 PoC 중 7개 = 0%** 를 실측, "무조건 분할 now" 전제를 반증(분할 시 전부 `_uncategorized` 로 몰려 무의미 + reader silent mis-fire + 경로 3종 불일치). → **순차 4스텝**(STEP 0 subset 폐기 / STEP 1 BC 의무화 / STEP 2 경로통일+loader / STEP 3 분할)으로 전환, **본 릴리스 = STEP 0+1**(토대). 분할(STEP 3)은 STEP 2 후 BC 채움률 실측 재판단.

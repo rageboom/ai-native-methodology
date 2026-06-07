@@ -30,6 +30,7 @@ import {
 	validateRulesDocStrict,
 	OVERALL_THRESHOLD,
 } from './validator.js';
+import { loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 function parseArgs(argv) {
 	const out = { target: null, json: false, strict: false, llmResults: null };
@@ -92,6 +93,9 @@ async function main() {
 		);
 		process.exit(3);
 	}
+	// v0.4.0 (BR-split STEP 2): BR 배열을 _shared loader 경유로 확보 = STEP 3(index+per-BC)
+	//   분할 시 cli 무수정(loadBusinessRules 내부만 확장) single-point. STEP 2 동작 동치.
+	doc.business_rules = loadBusinessRules(targetPath);
 
 	// v2.5.0 Phase C — Layer 2 LLM results 입력 paradigm (B-4 paradigm 정합)
 	let llmResults = null;

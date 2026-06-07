@@ -7,6 +7,7 @@
 //   4. cross_links.to_analysis_artifacts 의무
 
 import { readFileSync, existsSync } from 'node:fs';
+import { normalizeAnalysisBusinessRules } from '../../_shared/load-business-rules.js';
 
 export function validateDiscoveryExtraction(discoverySpec, analysis) {
   const findings = [];
@@ -26,26 +27,26 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   }
 
   // 2. BR-INTENT match
-  // v11.5.1: multi-path BR lookup (LL-validator-dual-key-02 / additive backward-compat)
-  // 분석 산출물 paradigm 다양화 (v11.0.0 rename + chain 1 normalize + dual key 등) 대응
+  // v0.4.0 (BR-split STEP 2): multi-path BR lookup 을 _shared 로 중앙화
+  //   (구 v11.5.1 LL-validator-dual-key-02 / 4 shape) + mis-fire 신호 추가.
   const brsIntent = discoverySpec?.business_rules_intent ?? [];
-  const analysisBrs = new Set();
-  const brCandidates = [
-    analysis?.rules?.business_rules,    // 기존 가정 (backward-compat / v11.0.0~v11.5.0)
-    analysis?.business_rules,            // top-level array (poc-17 chain 1 normalize)
-    analysis?.rules,                     // top-level rules array (analysis baseline)
-    analysis?.rules_step_4c_carcost,    // dual key 두번째 (poc-17 Phase 4c)
-  ];
-  for (const arr of brCandidates) {
-    if (Array.isArray(arr)) {
-      for (const br of arr) {
-        if (br?.id) analysisBrs.add(br.id);
-      }
-    }
+  const { rules: analysisBrList, unrecognizedShape } =
+    normalizeAnalysisBusinessRules(analysis);
+  const analysisBrs = new Set(analysisBrList.map((br) => br.id));
+  // mis-fire fix (blocker #1): BR-container 키가 present 인데 id 보유 BR 0건 =
+  //   미인식/malformed shape → N 개 false unknown_br critical 대신 단일 진단 1건.
+  //   (BR 키 자체 부재 = 정당한 0-rules → 무알람 / plan §8.5 정정 2.)
+  if (unrecognizedShape && brsIntent.length > 0) {
+    findings.push({
+      kind: 'discovery.br_source.shape_unrecognized',
+      severity: 'high',
+      message: `analysis business-rules 가 알려진 shape 로 0건 추출 (container 키는 present) — ${brsIntent.length} BR-INTENT 를 unknown_br 로 오탐하지 않도록 단일 진단으로 보고. business-rules 산출물 shape/경로 확인 필요.`,
+    });
   }
   const INTENT_CERTAINTY_ENUM = ['observed', 'inferred-consequence', 'unverified-intent', 'source-refuted'];
   for (const intent of brsIntent) {
-    if (!analysisBrs.has(intent.br_id)) {
+    // unrecognizedShape 시 BR set 이 비어 전건 false 가 되므로 unknown_br 억제(단일 진단으로 대체).
+    if (!unrecognizedShape && !analysisBrs.has(intent.br_id)) {
       findings.push({
         kind: 'discovery.br_intent.unknown_br',
         severity: 'critical',
