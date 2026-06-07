@@ -242,3 +242,17 @@
 **검증(no-sim 실 / §8.1)**: graph-synthesizer.test.js — Phase 4 블록 전수 감사 후 2285 flip(부모 coarse `[]`) + 신규 fallback(BC-less) + 신규 mixed(부분 은퇴) → **163**. chain-driver 445·graph-integrity 13·federator 32·code-pointer 45 무회귀 · RR 무회귀 · 3-way 0.15.0. 정직 경계: poc-18 실 2-BC + BC-less PoC backward-compat(in-the-wild multi-BC 1건 / S1·S2 동형).
 
 **다음 선택적(하나씩)**: S6 per-BR granularity(잔여). S4 = no-op 의심 보류(§18). S3 = DROP(§18).
+
+## 20. S6 시행 로그 (v0.16.0 / 2026-06-07 — business-rules per-BR granularity / additive)
+
+**S6 = per-BC 노드(Phase 4)를 per-BR 로 한 단계 더** — distinct business rule 당 `analysis-business-rules-<BR-id>` 노드 + route(S1) br_id→per-BR 최우선. sync-loop 영향 = 그 rule 개별 참조 item 만. 4원칙(plan `plan-living-sync-s6-per-br.md` 1원칙 + Senior 적대 step-0[DEFER@0.86] + 사용자 BUILD-NOW).
+
+**★ 결단 = BUILD-NOW (Senior=DEFER 반대 / 결정권자 우선)**: Senior 측정 = poc-18 BC-POST 5 rule, item 이 각 개별 rule 참조 → 1 rule drift 가 per-BC 노드 origin 시 10 item 신호(실 2) = **5:1 over-propagation real**(S3 correct-by-construction·S4 no-op 와 다름). 그러나 Senior DEFER@0.86: ① coupling ② 실 수요 신호 0(유일 기록 over-prop FP=cross-scope=S2 v0.14.0 로 해소) ③ 스펙 §5 "정밀도 필요해질 때 도입" + soundness 불변(per-BC=over-include 만/누락 0=defer 안전). BLOCKER 정정: plan 의 "BC fill 7/8=0%"는 v0.3.0 backfill 前 stale → 실 100%(직접 실측). **사용자 BUILD-NOW** → 시행. 정직 경계 유지.
+
+**★ 재설계 = ADDITIVE (Senior coupling 전제 무효화 / 코드 재검증)**: drift(sync.js detectDrift:120/markDrift:145)는 **scope/manifest 레벨 플래그**(`sync_state.drift_detected`)이고 **graph-node 를 mark 안 함**. over-propagation 은 sync-loop origin(route 산출)→forward closure 에서 발생. ∴ Senior coupling claim("drift 가 per-BC 노드 mark→groups soft 1-hop→per-BR cross_reference soft 2-hop DROP[impact-analyzer:153]")은 **Layer-1 을 per-BR 로 옮길(retire) 때만** 성립 — **ADDITIVE(per-BC 엣지 유지 + per-BR 추가)면 무관**. ⟹ 4-서브시스템(노드+route+drift+retire) → **2-서브시스템(graph additive + route)**, Phase 4 동형 무회귀. per-BC Layer-1 은퇴 = 미래 선택적(S5→Phase4 처럼 후속).
+
+**구현**: (1) graph-synthesizer: per-BR 노드(`business_rule_id` 필드 / artifact-graph-node.schema additive) + per-BC→per-BR groups + Layer-1 per-BR 엣지 추가(`emittedBr` dedup / per-BC 엣지 유지) + per-BR code_pointers=그 rule source_evidence(per-BC 패스 per-BR skip / na backstop 커버). (2) route-discovery.js: 4-tier(per-BR tier1 / per-BC tier2 / parent tier3 / net-new tier4). 결정성(BR id sort).
+
+**검증(no-sim 실 / §8.1 2-도메인)**: graph-synthesizer.test.js **170**(+7) / route-discovery.test.js → chain-driver **448**(+3) / graph-integrity 13·federator 32·code-pointer 45 무회귀. e2e: **poc-18**(Express/TS 2-BC) BR-POST-AUTHORSHIP-001 영향 **10(per-BC)→2(per-BR) = 5:1 제거** + **poc-19**(Python numpy-financial 4-BC / 6 per-BR / valid). RR 무회귀 · 3-way 0.16.0. (S1/S2/S5=1 도메인보다 강한 2-distinct-paradigm 입증 / 단 실 운영 수요 신호는 여전히 0=BUILD 결단.)
+
+**다음 선택적**: per-BC Layer-1 엣지 은퇴(진짜 per-BR 분할 / S5→Phase4 동형) · drift per-BR(scope subset 내 per-rule hash).

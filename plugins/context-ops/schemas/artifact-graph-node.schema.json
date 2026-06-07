@@ -47,6 +47,10 @@
       "type": "string",
       "description": "v0.12.0 Phase 4 (additive per-BC) — analysis-business-rules-<BC> 자식 노드의 bounded_context (예: BC-POST). 부모 file-level 노드(analysis-business-rules)는 본 필드 부재. business-rules 산출물의 business_rules[].bounded_context 와 동일 도메인 파티션 라벨. per-BC 의존 그래프 정밀화 / scope_id(work-unit scope)와 별개 축."
     },
+    "business_rule_id": {
+      "type": "string",
+      "description": "v0.16.0 S6 (additive per-BR) — analysis-business-rules-<BR-id> 자식 노드의 business rule id (예: BR-POST-AUTHORSHIP-001). per-BC 노드(bounded_context 만)·부모(둘 다 부재)와 구분. business-rules 산출물 business_rules[].id 와 동일. per-rule 의존 정밀화 (route·impact precise origin / per-BC 보다 한 단계 fine)."
+    },
     "commit_hash": {
       "type": "string",
       "pattern": "^[0-9a-f]{7,40}$",

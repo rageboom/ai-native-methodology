@@ -10,6 +10,18 @@
 
 ---
 
+## [0.16.0] — 2026-06-07 MINOR — living-sync S6: business-rules per-BR granularity (additive)
+
+per-BC 노드(Phase 4)를 한 단계 더 — distinct business rule 당 **per-BR 노드** `analysis-business-rules-<BR-id>` 추가 + route(S1) br_id→per-BR 최우선 dispatch. 한 rule 변경의 sync-loop 영향 = 그 rule 을 개별 참조한 item 만(per-BC over-propagation 제거). 4원칙(plan `plan-living-sync-s6-per-br.md` 1원칙 + **Senior 적대 step-0[DEFER@0.86]** + 사용자 BUILD-NOW 결단).
+
+- **★ 결단 = BUILD-NOW (Senior=DEFER 권고 반대)**: Senior step-0 = "정밀도 이득 5:1 real 이나 ① coupling 4-서브시스템 ② 실 수요 신호 0 ③ 스펙 §5 YAGNI → DEFER@0.86" + BLOCKER(plan 의 'BC fill 0%' stale 오류 정정 = 실 100%). 사용자 BUILD-NOW 선택 → 결정권자 우선. **정직 경계 유지**(grounding=합성 2 PoC / 실 수요 0 / soundness 불변).
+- **★ 재설계 = ADDITIVE (Senior coupling 우려 무효화)**: drift(sync.js detectDrift/markDrift)는 **scope/manifest 레벨**(`sync_state.drift_detected`)이고 graph-node 를 mark 안 함 — over-propagation 은 sync-loop origin(route 산출) closure 에서 발생. ∴ Senior coupling claim("drift 가 per-BC 노드 mark→2-hop soft drop")은 additive 엔 무관. Layer-1 엣지를 per-BR 로 **옮기지(retire) 않고 추가** → per-BC 엣지/drift/route fallback 전부 무회귀(Phase 4 동형) / per-BC Layer-1 은퇴 = 미래 선택적. **4-서브시스템 → 2-서브시스템**으로 축소.
+- **graph-synthesizer (additive)**: BC 보유 BR 당 per-BR 노드(`business_rule_id` 필드 / schema additive = Phase 4 `bounded_context` 동형) + per-BC→per-BR `groups` + Layer-1 cross_reference per-BR 엣지 **추가**(`emittedBr` per-(item,field) dedup / per-BC 엣지 유지) + per-BR code_pointers = 그 rule source_evidence 만(per-BC subset 보다 정밀 / per-BC 패스는 per-BR skip). 결정성(BR id sort). BC-less BR → per-BR 없음(무회귀).
+- **route(S1) 4-tier**: br_id→per-BR 노드(tier1 신설 최우선) / per-BC 자식(tier2) / 부모 coarse(tier3) / net-new(tier4). per-BR 노드 부재 graph(미재합성)는 tier2 fallback = 무회귀.
+- **검증(no-sim 실 / §8.1 2-도메인)**: graph-synthesizer.test.js +7(per-BR 노드·정밀 cross_reference·per-BC additive·groups·code_pointers·BC-less·결정성) → **170** / route-discovery.test.js +3(per-BR dispatch·혼합 fallback·정렬) → chain-driver **448**. graph-integrity 13·federator 32·code-pointer 45 무회귀. **e2e**: poc-18(Express/TS 2-BC) BR-POST-AUTHORSHIP-001 영향 **10→2 item(5:1 제거)** + poc-19(Python numpy-financial 4-BC / 6 per-BR / valid graph). RR 무회귀.
+- **정직 경계**: 5:1 정밀 = route→per-BR origin 시 실현(per-BC 엣지 잔존=fallback) / soundness 불변(over-include 제거만·누락 0 / additive=기존동작 불변) / 실 운영 수요 신호 0(BUILD=사용자 결단). 노드 증가 = per-graph 수십.
+- **다음 선택적**: per-BC Layer-1 엣지 은퇴(S5→Phase4 동형 후속 / 진짜 per-BR 분할) · drift per-BR(scope subset 내 per-rule). SSOT = DEC §20.
+
 ## [0.15.0] — 2026-06-07 MINOR — living-sync S5: 부모 coarse 엣지 은퇴 (진짜 분할 / Phase 4 선택적 종단)
 
 Phase 4(v0.12.0 per-BC 노드분할 additive) 의 종단 — per-rule 부모 `analysis-business-rules` coarse cross_reference 를 per-BC 자식이 인수했을 때 **은퇴**. S1(route→자식)·S2(drift→자식 subset) 가 소비자를 자식으로 재배선 완료 → 부모 Layer-1 coarse 엣지 = latent per-rule over-propagation 잔존 surface(한 BC rule 변경이 전 BC behavior 누수). 4원칙(plan `plan-living-sync-s5-parent-edge-retire.md` 1원칙 + **Senior 적대 step-0[REVISE@0.80] 전건 코드 사실검증** + 사용자 "설계대로 착수").

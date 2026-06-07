@@ -414,6 +414,7 @@ export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
     for (const node of nodes) {
       if (node.artifact_kind !== 'analysis' || node.artifact_subkind !== 'business-rules') continue;
       if (typeof node.bounded_context !== 'string') continue; // parent (no bc field) skipped
+      if (typeof node.business_rule_id === 'string') continue; // S6: per-BR = 별도 패스
       if (node.state !== 'active') continue;
       if (Array.isArray(node.code_pointers) && node.code_pointers.length > 0) continue;
       const _rules = (_brData.business_rules ?? []).filter((r) => r?.bounded_context === node.bounded_context);
@@ -421,6 +422,28 @@ export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
       const _pointers = [];
       for (const raw of _cfg.accessor({ business_rules: _rules })) {
         const ptr = resolveAnchor(raw, _cfg, existsFn);
+        if (!ptr) continue;
+        if (_seen.has(ptr.path)) continue;
+        _seen.add(ptr.path);
+        _pointers.push(ptr);
+        if (_pointers.length >= ANALYSIS_DERIVE_CAP) break;
+      }
+      if (_pointers.length > 0) node.code_pointers = _pointers;
+    }
+  }
+  // S6 (v0.16.0) additive: per-BR 노드 code_pointers = 그 rule 의 source_evidence 만 (per-BC subset 보다 정밀).
+  if (_brData) {
+    const _cfgBr = ANALYSIS_TO_CODE_POINTERS['business-rules'];
+    for (const node of nodes) {
+      if (node.artifact_kind !== 'analysis' || node.artifact_subkind !== 'business-rules') continue;
+      if (typeof node.business_rule_id !== 'string') continue; // per-BR 만
+      if (node.state !== 'active') continue;
+      if (Array.isArray(node.code_pointers) && node.code_pointers.length > 0) continue;
+      const _rules = (_brData.business_rules ?? []).filter((r) => r?.id === node.business_rule_id);
+      const _seen = new Set();
+      const _pointers = [];
+      for (const raw of _cfgBr.accessor({ business_rules: _rules })) {
+        const ptr = resolveAnchor(raw, _cfgBr, existsFn);
         if (!ptr) continue;
         if (_seen.has(ptr.path)) continue;
         _seen.add(ptr.path);
@@ -686,6 +709,23 @@ export function synthesizeGraph(input) {
       // parent -> child (organizational / soft). No closure impact (2-hop soft dropped => parent stays coarse by design).
       edges.push(makeEdge('analysis-business-rules', `analysis-business-rules-${bc}`, 'groups'));
     }
+    // S6 (v0.16.0) additive per-BR 노드: BC 보유 BR 당 1 노드 (per-BC 하위 / route·impact precise origin).
+    // per-BC 엣지/노드 유지(무회귀) + per-BR 추가 = additive (Phase 4 동형). BC-less BR = per-BR 없음(parent fallback).
+    const brIds = [...brById.keys()].sort(); // 결정성
+    for (const brId of brIds) {
+      const _bc = brById.get(brId);
+      pushNode({
+        id: `analysis-business-rules-${brId}`,
+        artifact_kind: 'analysis',
+        artifact_subkind: 'business-rules',
+        bounded_context: _bc,
+        business_rule_id: brId,
+        source_path: brSourcePath,
+        state: 'active',
+        title: `${brTitle} (${brId})`,
+      });
+      edges.push(makeEdge(`analysis-business-rules-${_bc}`, `analysis-business-rules-${brId}`, 'groups'));
+    }
   }
 
   // --- aspect kind 노드 (4) ---
@@ -711,6 +751,7 @@ export function synthesizeGraph(input) {
       for (const [field, analysisKind] of Object.entries(refMap)) {
         if (!analysisLoaded.has(analysisKind)) continue;
         const emittedChild = new Set(); // per (item,field) per-BC child dedup
+        const emittedBr = new Set(); // S6: per (item,field) per-BR dedup
         for (const _ref of item[field] ?? []) {
           // S5 (v0.15.0) 진짜 분할: per-rule 참조는 per-BC 자식으로만 라우팅 (부모 coarse 은퇴).
           // 3-tier fail-open: (1) BR-ref→BC + 자식 실재 → 자식 precise 엣지만(coarse 은퇴) /
@@ -720,6 +761,12 @@ export function synthesizeGraph(input) {
           if (analysisKind === 'business-rules') {
             const bc = brById.get(_ref);
             if (bc) {
+              // S6 (v0.16.0) additive per-BR: _ref = BR id → per-BR 노드 (정밀 origin / per-BC 와 공존 / route 가 per-BR 우선).
+              const brNodeId = `analysis-business-rules-${_ref}`;
+              if (nodeIds.has(brNodeId) && !emittedBr.has(_ref)) {
+                emittedBr.add(_ref);
+                edges.push(makeEdge(brNodeId, item.id, 'cross_reference'));
+              }
               const childId = `analysis-business-rules-${bc}`;
               if (nodeIds.has(childId)) {
                 precise = true;

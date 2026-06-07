@@ -2373,6 +2373,69 @@ describe('Phase 4 — business-rules per-BC 자식 노드 (additive / 무회귀)
 	});
 });
 
+describe('S6 — business-rules per-BR 노드 (additive / 정밀 origin)', () => {
+	it('per-BR 노드 = distinct BR 당 1 (business_rule_id + bounded_context)', () => {
+		const g = synthesizeGraph(brInput);
+		const perBr = g.nodes.filter((n) => typeof n.business_rule_id === 'string').map((n) => n.id).sort();
+		assert.deepEqual(perBr, [
+			'analysis-business-rules-BR-POST-A-001',
+			'analysis-business-rules-BR-POST-A-002',
+			'analysis-business-rules-BR-USER-X-001',
+		]);
+		const a1 = g.nodes.find((n) => n.business_rule_id === 'BR-POST-A-001');
+		assert.equal(a1.bounded_context, 'BC-POST');
+		assert.equal(a1.artifact_subkind, 'business-rules');
+		assert.equal(a1.state, 'active');
+	});
+
+	it('per-BR cross_reference 정밀 — 그 rule 을 참조한 item 만', () => {
+		const g = synthesizeGraph(brInput);
+		const tgt = (src) => g.edges.filter((e) => e.edge_type === 'cross_reference' && e.source === src).map((e) => e.target).sort();
+		assert.deepEqual(tgt('analysis-business-rules-BR-POST-A-001'), ['AC-POST-001', 'BHV-POST-001']);
+		assert.deepEqual(tgt('analysis-business-rules-BR-POST-A-002'), ['BHV-POST-001']);
+		assert.deepEqual(tgt('analysis-business-rules-BR-USER-X-001'), ['BHV-USER-001']);
+	});
+
+	it('per-BC cross_reference 엣지 additive 유지 (무회귀 / per-BR 와 공존)', () => {
+		const g = synthesizeGraph(brInput);
+		const fromBC = g.edges.filter((e) => e.edge_type === 'cross_reference' && e.source === 'analysis-business-rules-BC-POST').map((e) => e.target);
+		assert.deepEqual([...new Set(fromBC)].sort(), ['AC-POST-001', 'BHV-POST-001'], 'per-BC 엣지 그대로');
+	});
+
+	it('per-BC → per-BR groups 엣지', () => {
+		const g = synthesizeGraph(brInput);
+		const grp = (bc) => g.edges.filter((e) => e.edge_type === 'groups' && e.source === `analysis-business-rules-${bc}` && /-BR-/.test(e.target)).map((e) => e.target).sort();
+		assert.deepEqual(grp('BC-POST'), ['analysis-business-rules-BR-POST-A-001', 'analysis-business-rules-BR-POST-A-002']);
+		assert.deepEqual(grp('BC-USER'), ['analysis-business-rules-BR-USER-X-001']);
+	});
+
+	it('per-BR code_pointers = 그 rule source_evidence 만 (per-BC subset 보다 정밀)', () => {
+		const g = synthesizeGraph({ ...brInput, existsFn: () => true });
+		const cp = (br) => g.nodes.find((n) => n.business_rule_id === br).code_pointers.map((c) => c.path).sort();
+		assert.deepEqual(cp('BR-POST-A-001'), ['src/post/a.ts']);
+		assert.deepEqual(cp('BR-POST-A-002'), ['src/post/b.ts']);
+		assert.deepEqual(cp('BR-USER-X-001'), ['src/user/x.ts']);
+	});
+
+	it('BC-less BR → per-BR 노드 0 (backward-compat)', () => {
+		const noBC = {
+			behavior: { behaviors: [{ id: 'BHV-1', br_refs: ['BR-LEGACY-001'] }] },
+			analysis: { 'business-rules': { meta: { title: 'BR' }, business_rules: [{ id: 'BR-LEGACY-001', source_evidence: [] }] } },
+			sourcePaths: { analysis: { 'business-rules': 'business-rules.json' } },
+		};
+		const g = synthesizeGraph(noBC);
+		assert.equal(g.nodes.filter((n) => typeof n.business_rule_id === 'string').length, 0);
+	});
+
+	it('결정성 — per-BR 포함 synthesize 2회 deepEqual', () => {
+		const g1 = synthesizeGraph({ ...brInput, existsFn: () => true });
+		const g2 = synthesizeGraph({ ...brInput, existsFn: () => true });
+		assert.deepEqual(g1.nodes, g2.nodes);
+		assert.deepEqual(g1.edges, g2.edges);
+	});
+});
+
+
 describe('Phase 4 — artifact-graph node schema Ajv guard (자식 포함 / CI 공백 메움 / F-B1)', () => {
 	it('자식 노드(bounded_context 포함) 전부 artifact-graph-node.schema 통과', async () => {
 		const { default: Ajv2020 } = await import('ajv/dist/2020.js');

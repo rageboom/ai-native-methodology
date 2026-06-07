@@ -73,9 +73,12 @@ export function resolveDiscoveryOrigins(discoverySpec, graph, analysis) {
 		if (!intent?.br_id) continue;
 		if (!unrecognizedShape && analysisBrIds.has(intent.br_id)) {
 			// S1 3-tier: (1) br_id→BC 자식 노드 = 정밀 origin / (2) 자식 부재(BC 없음·미재합성 graph) → 부모 coarse fallback(무회귀 / closure soft/SHOULD #3) / (3) 둘 다 부재 → net-new.
+			// S6 (v0.16.0) 4-tier: br_id→per-BR 노드 최우선(최정밀 origin) → per-BC 자식 → 부모 coarse → net-new.
+			const brNodeId = `analysis-business-rules-${intent.br_id}`;
 			const bc = brIdToBC.get(intent.br_id);
 			const childId = bc ? `analysis-business-rules-${bc}` : null;
-			if (childId && nodeIds.has(childId)) origins.add(childId);
+			if (nodeIds.has(brNodeId)) origins.add(brNodeId);
+			else if (childId && nodeIds.has(childId)) origins.add(childId);
 			else if (brNode) origins.add(brNode.id);
 			else
 				net_new.push({

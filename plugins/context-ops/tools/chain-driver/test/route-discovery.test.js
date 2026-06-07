@@ -187,6 +187,46 @@ describe('route-discovery core (resolveDiscoveryOrigins)', () => {
 		assert.deepEqual(r.origins, ['analysis-business-rules']);
 	});
 
+
+	// --- S6 per-BR dispatch (per-BR granularity / 4-tier 최우선) ---
+	const s6Graph = {
+		nodes: [
+			dnode('analysis-business-rules'),
+			dnode('analysis-business-rules-BC-POST', { bounded_context: 'BC-POST' }),
+			dnode('analysis-business-rules-BC-USER', { bounded_context: 'BC-USER' }),
+			dnode('analysis-business-rules-BR-1', { bounded_context: 'BC-POST', business_rule_id: 'BR-1' }),
+			dnode('analysis-business-rules-BR-2', { bounded_context: 'BC-USER', business_rule_id: 'BR-2' }),
+		],
+		edges: [],
+	};
+
+	it('S6 — br_id → per-BR 노드 직접 dispatch (per-BC 아닌 최정밀 origin)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
+		const analysis = { business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST' }] };
+		const r = resolveDiscoveryOrigins(spec, s6Graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BR-1']);
+	});
+
+	it('S6 — per-BR 노드 부재 BR 은 per-BC fallback (혼합 / 4-tier)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }, { br_id: 'BR-3' }] };
+		const analysis = { business_rules: [
+			{ id: 'BR-1', bounded_context: 'BC-POST' },
+			{ id: 'BR-3', bounded_context: 'BC-USER' },
+		] };
+		const r = resolveDiscoveryOrigins(spec, s6Graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BC-USER', 'analysis-business-rules-BR-1']);
+	});
+
+	it('S6 — 서로 다른 BR 2개 → per-BR 2개 (정렬)', () => {
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }, { br_id: 'BR-2' }] };
+		const analysis = { business_rules: [
+			{ id: 'BR-1', bounded_context: 'BC-POST' },
+			{ id: 'BR-2', bounded_context: 'BC-USER' },
+		] };
+		const r = resolveDiscoveryOrigins(spec, s6Graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BR-1', 'analysis-business-rules-BR-2']);
+	});
+
 	it('analysis 미인식 shape(container present + 0 rules) → shape_unrecognized 진단 + 억제', () => {
 		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
 		const analysis = { rules: [{ noId: true }] }; // container present, 0 id-rules
