@@ -84,6 +84,27 @@ export function resolveOriginNodeIds(graph, changedPaths = []) {
 	return { ids: [...ids].sort(), unresolved };
 }
 
+// living-sync carry 1 — 변경 rule id → per-BR origin (없으면 부모 coarse fallback / BLOCKER-1 fail-open / Senior@0.84).
+//   변경 rule 절대 silent drop ❌: per-BR 노드 있으면 그것(정밀) / 없으면(BC-less rule) 부모 analysis-business-rules(coarse·sound) / BR 그래프 자체 부재만 unresolved.
+export function resolveChangedRuleOrigins(graph, changedRuleIds = []) {
+	const nodeIds = new Set((graph?.nodes ?? []).map((n) => n.id));
+	const hasParent = nodeIds.has('analysis-business-rules');
+	const origins = new Set();
+	const coarse_fallback = [];
+	const unresolved = [];
+	for (const id of changedRuleIds) {
+		const perBr = `analysis-business-rules-${id}`;
+		if (nodeIds.has(perBr)) origins.add(perBr);
+		else if (hasParent) { origins.add('analysis-business-rules'); coarse_fallback.push(id); }
+		else unresolved.push(id);
+	}
+	return {
+		origins: [...origins].sort(),
+		coarse_fallback: coarse_fallback.sort(),
+		unresolved: unresolved.sort(),
+	};
+}
+
 /**
  * forward 영향 closure + 순서화된 재생성 worklist 계산 (순수).
  * @param {object} graph artifact-graph

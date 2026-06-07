@@ -41,7 +41,7 @@ import {
 	listScopes,
 } from './state-store.js';
 import { executeQuery } from './query.js';
-import { markDrift, cascade, registerCanonicalSources } from './sync.js';
+import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule } from './sync.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -81,6 +81,7 @@ import { topKImpactRoot } from './centrality.js';
 // living-sync 전파 루프 (Phase 1 MVP / DEC-2026-06-07-living-sync-operating-model) — 순수 코어.
 import {
 	computeSyncLoop,
+	resolveChangedRuleOrigins,
 	markTransientDrift,
 	selectNextStage,
 	markStageDone,
@@ -191,6 +192,8 @@ function parseArgs(argv) {
 		else if (a === '--what-if') out.whatIf = rest[++i];
 		else if (a === '--no-matrix')
 			out.noMatrix = true; // trace-view: coverage 매트릭스 억제 (기본 ON).
+		else if (a === '--br-diff') out.brDiffRef = rest[++i];
+		else if (a === '--br-path') out.brPath = rest[++i];
 		else if (a === '--help' || a === '-h') usage(0);
 		else if (a.startsWith('--')) usage(3);
 	}
@@ -1756,11 +1759,11 @@ function cmdSyncLoop(args) {
 		console.error(`[chain-driver] sync-loop: graph not found: ${args.graphPath}`);
 		process.exit(3);
 	}
-	const origins = args.origins ?? (args.origin ? [args.origin] : []);
+	let origins = args.origins ?? (args.origin ? [args.origin] : []);
 	const changedPaths = args.changedPaths ?? [];
-	if (origins.length === 0 && changedPaths.length === 0) {
+	if (origins.length === 0 && changedPaths.length === 0 && !args.brDiffRef) {
 		console.error(
-			'[chain-driver] sync-loop: --origin <id>... 또는 --changed <path>... 중 하나 필수',
+			'[chain-driver] sync-loop: --origin <id>... / --changed <path>... / --br-diff <ref> 중 하나 필수',
 		);
 		process.exit(3);
 	}
@@ -1770,6 +1773,63 @@ function cmdSyncLoop(args) {
 	} catch (e) {
 		console.error(`[chain-driver] sync-loop: graph parse error: ${e.message}`);
 		process.exit(3);
+	}
+
+	// living-sync carry 1 — --br-diff <ref>: business-rules.json per-rule git diff → 변경 rule → per-BR origin seed (Senior@0.84).
+	let brDiffReport = null;
+	if (args.brDiffRef) {
+		const root = args.project ? resolve(args.project) : process.cwd();
+		const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
+		if (!existsSync(brAbs)) {
+			console.error(`[chain-driver] sync-loop --br-diff: business-rules.json 부재: ${brAbs}`);
+			process.exit(3);
+		}
+		const git = makeGitRunner(root);
+		// MAJOR-2: ref 선검증 (bad-ref/no-repo 와 new-file 구분 — 날조 drift 회피).
+		try {
+			git(['rev-parse', '--verify', `${args.brDiffRef}^{commit}`]);
+		} catch {
+			console.error(`[chain-driver] sync-loop --br-diff: invalid git ref / not a repo: ${args.brDiffRef} (미실행 — 날조 ❌)`);
+			process.exit(3);
+		}
+		const brRelPosix = brRel.split('\\').join('/');
+		let oldParsed = {};
+		try {
+			oldParsed = JSON.parse(git(['show', `${args.brDiffRef}:${brRelPosix}`]));
+		} catch {
+			oldParsed = {}; // valid ref 에 path 부재 = 신규 파일 → 전 rule added
+		}
+		let newParsed;
+		try {
+			newParsed = JSON.parse(readFileSync(brAbs, 'utf-8'));
+		} catch (e) {
+			console.error(`[chain-driver] sync-loop --br-diff: business-rules.json parse error: ${e.message}`);
+			process.exit(3);
+		}
+		const { changed_rule_ids, removed_rule_ids } = diffBusinessRulesByRule(oldParsed, newParsed);
+		const ruleOrigins = resolveChangedRuleOrigins(graph, changed_rule_ids);
+		origins = [...new Set([...origins, ...ruleOrigins.origins])].sort();
+		brDiffReport = {
+			ref: args.brDiffRef,
+			changed_rule_ids,
+			removed_rule_ids,
+			seeded_origins: ruleOrigins.origins,
+			coarse_fallback: ruleOrigins.coarse_fallback,
+			unresolved: ruleOrigins.unresolved,
+		};
+		process.stdout.write(
+			`[br-diff] ref=${args.brDiffRef} changed=${changed_rule_ids.length} removed=${removed_rule_ids.length} → seeded=${ruleOrigins.origins.length}` +
+				(ruleOrigins.coarse_fallback.length ? ` ⚠️ coarse_fallback(BC-less)=${ruleOrigins.coarse_fallback.join(',')}` : '') +
+				(removed_rule_ids.length ? ` ⚠️ removed(소비자 stale 가능)=${removed_rule_ids.join(',')}` : '') +
+				(ruleOrigins.unresolved.length ? ` ⚠️ unresolved(BR 그래프 부재)=${ruleOrigins.unresolved.join(',')}` : '') +
+				'\n',
+		);
+		if (origins.length === 0 && changedPaths.length === 0) {
+			process.stdout.write('[br-diff] 변경 rule 0 — in-sync (regen_queue 미기록)\n');
+			if (args.json) process.stdout.write(JSON.stringify({ br_diff: brDiffReport, in_sync: true }, null, 2) + '\n');
+			process.exit(0);
+		}
 	}
 
 	let result;
@@ -1801,6 +1861,7 @@ function cmdSyncLoop(args) {
 
 	const regenQueue = {
 		generated_at: new Date().toISOString(),
+		...(brDiffReport ? { br_diff: brDiffReport } : {}),
 		origins: result.origins,
 		graph_path: args.graphPath,
 		has_cycle: result.has_cycle,

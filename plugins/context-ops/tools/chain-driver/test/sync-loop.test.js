@@ -10,6 +10,7 @@ import { spawnSync } from 'node:child_process';
 import {
 	mkdtempSync,
 	mkdirSync,
+	writeFileSync,
 	copyFileSync,
 	readFileSync,
 	rmSync,
@@ -17,7 +18,7 @@ import {
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { computeSyncLoop } from '../src/sync-loop.js';
+import { computeSyncLoop, resolveChangedRuleOrigins } from '../src/sync-loop.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'src', 'cli.js');
@@ -241,5 +242,73 @@ describe('sync-loop reference-lens trust 가드 (check36/37 동형)', () => {
 
 	it('코어가 gate-eval import 0', () => {
 		assert.ok(!/from '\.\/gate-eval/.test(coreSrc));
+	});
+});
+
+describe('carry 1 — resolveChangedRuleOrigins (per-BR origin / coarse fallback / BLOCKER-1)', () => {
+	const graph = { nodes: [
+		{ id: 'analysis-business-rules' },
+		{ id: 'analysis-business-rules-BR-1', business_rule_id: 'BR-1' },
+		{ id: 'analysis-business-rules-BR-3', business_rule_id: 'BR-3' },
+	] };
+	it('per-BR 노드 있으면 정밀 origin', () => {
+		const r = resolveChangedRuleOrigins(graph, ['BR-3', 'BR-1']);
+		assert.deepEqual(r.origins, ['analysis-business-rules-BR-1', 'analysis-business-rules-BR-3']);
+		assert.deepEqual(r.coarse_fallback, []);
+	});
+	it('per-BR 부재(BC-less) → 부모 coarse fallback (silent drop ❌)', () => {
+		const r = resolveChangedRuleOrigins(graph, ['BR-NOBC']);
+		assert.deepEqual(r.origins, ['analysis-business-rules']);
+		assert.deepEqual(r.coarse_fallback, ['BR-NOBC']);
+	});
+	it('BR 그래프 자체 부재 → unresolved (origin 0)', () => {
+		const r = resolveChangedRuleOrigins({ nodes: [] }, ['BR-1']);
+		assert.deepEqual(r.origins, []);
+		assert.deepEqual(r.unresolved, ['BR-1']);
+	});
+});
+
+describe('carry 1 — sync-loop --br-diff e2e (tmp git / per-BR auto-origin / no-sim)', () => {
+	it('BR.json 1 rule 수정 → 그 per-BR origin seed (정밀 / 무관 rule·item 제외)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'br-diff-'));
+		const git = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
+		git(['init', '-q']); git(['config', 'user.email', 't@t']); git(['config', 'user.name', 't']);
+		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const br = (desc) => JSON.stringify({ business_rules: [
+			{ id: 'BR-POST-1', bounded_context: 'BC-POST', desc },
+			{ id: 'BR-POST-2', bounded_context: 'BC-POST', desc: 'stable' },
+		] });
+		writeFileSync(join(outDir, 'business-rules.json'), br('orig'));
+		const node = (id, x = {}) => ({ id, artifact_kind: id.startsWith("BHV") ? "chain" : "analysis", artifact_subkind: id.startsWith("BHV") ? "BHV" : "business-rules", state: "active", ...x });
+		const graph = { nodes: [
+			node('analysis-business-rules', { source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-1', { business_rule_id: 'BR-POST-1', source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-2', { business_rule_id: 'BR-POST-2', source_path: '.aimd/output/business-rules.json' }),
+			node('BHV-POST-001'), node('BHV-POST-002'),
+		], edges: [
+			{ source: 'analysis-business-rules-BR-POST-1', target: 'BHV-POST-001', edge_type: 'cross_reference', confidence: 'soft' },
+			{ source: 'analysis-business-rules-BR-POST-2', target: 'BHV-POST-002', edge_type: 'cross_reference', confidence: 'soft' },
+		] };
+		const graphPath = join(root, 'graph.json'); writeFileSync(graphPath, JSON.stringify(graph));
+		git(['add', '-A']); git(['commit', '-q', '-m', 'init']);
+		writeFileSync(join(outDir, 'business-rules.json'), br('MODIFIED'));
+		const r = run(['sync-loop', root, '--graph', graphPath, '--br-diff', 'HEAD', '--dry-run', '--json']);
+		assert.equal(r.status, 0, r.stderr);
+		const out = JSON.parse(r.stdout.slice(r.stdout.indexOf("{")));
+		assert.deepEqual(out.regen_queue.br_diff.changed_rule_ids, ['BR-POST-1'], '수정 rule 만 감지');
+		assert.ok(out.origins.includes('analysis-business-rules-BR-POST-1'), '수정 rule per-BR origin seed');
+		assert.ok(!out.origins.includes('analysis-business-rules-BR-POST-2'), '무관 rule 제외');
+		assert.ok(out.closure.SHOULD.includes('BHV-POST-001'), '그 rule 소비 item');
+		assert.ok(!out.closure.SHOULD.includes('BHV-POST-002'), '무관 item 제외 (정밀)');
+		rmSync(root, { recursive: true, force: true });
+	});
+	it('invalid git ref → exit 3 (날조 drift ❌ / MAJOR-2)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'br-diff-bad-'));
+		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		writeFileSync(join(outDir, 'business-rules.json'), JSON.stringify({ business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST' }] }));
+		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.aimd/output/business-rules.json', state: 'active' }], edges: [] }));
+		const r = run(['sync-loop', root, '--graph', graphPath, '--br-diff', 'NOPE', '--dry-run']);
+		assert.equal(r.status, 3, "bad ref/no repo = exit 3");
+		rmSync(root, { recursive: true, force: true });
 	});
 });

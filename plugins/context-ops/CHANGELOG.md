@@ -10,6 +10,18 @@
 
 ---
 
+## [0.17.0] — 2026-06-07 MINOR — living-sync carry 1: 변경 자동 감지 → per-BR auto-origin
+
+business-rules.json 변경을 **per-rule 단위로 자동 감지**(git old↔new diff) → 변경 rule 의 **per-BR 노드를 sync-loop origin 으로 자동 seed**. S6 per-BR 정밀화를 파일변경 경로에도 실현(기존 `resolveOriginNodeIds` 는 finest-origin 미선택 → BR.json 변경 시 parent+전 per-BC+전 per-BR = 최대 coarse). 메서드론 P0(평생 자동 동기화 / 수동 트리거 갭) 정합. 4원칙(plan `plan-living-sync-c1-rule-auto-origin.md` + **Senior 적대 step-0[REVISE@0.84]** + 사용자 (b) 결단).
+
+- **`sync.js diffBusinessRulesByRule(oldParsed, newParsed)`**: 각 rule canonicalStringify(키-정렬 / S2 결정성 동형) → sha256 → new added·modified=changed / removed 별도. id 없는 rule=skip(per-BR 매핑 불가). `canonicalStringify` export.
+- **`sync-loop.js resolveChangedRuleOrigins(graph, ids)`**: 변경 rule id → per-BR 노드(`analysis-business-rules-<id>`) 정밀 origin / 부재(BC-less)=부모 `analysis-business-rules` **coarse fallback** / BR 그래프 부재=unresolved.
+- **`cli.js sync-loop --br-diff <ref> [--br-path <p>]`**: git rev-parse 선검증 → `git show ref:path`(old)+fs(new) → diff → resolveChangedRuleOrigins → origins 합류 → 기존 computeSyncLoop→regen_queue durable(has_cycle·clobber 가드 재사용). 변경 0=in-sync exit 0. `--br-diff` 없으면 무변경.
+- **★ Senior REVISE@0.84 4-fix 전건 코드확인**: **BLOCKER-1**(false-health) BC-less rule=per-BR·per-BC 둘 다 부재 → silent drop 시 실 변경이 regen 0건=false in-sync → **부모 coarse fallback(절대 drop ❌ / `coarse_fallback` diagnostic)**. **MAJOR-2**(no-sim 정직) makeGitRunner stderr swallow → `git rev-parse --verify <ref>^{commit}` 선검증으로 bad-ref/no-repo(exit 3·날조 ❌) vs valid-ref-path-부재(new file=all added) 구분. MAJOR-3 changed/origins `.sort()`(byte-stable). MAJOR-4 `--br-diff`·`--br-path` arg parser 등록(미등록 시 unknown-flag exit 3).
+- **검증(no-sim 실 / §8.1)**: sync.test.js +3(diff modified/added/removed·canonical key-reorder·신규 all-added) · sync-loop.test.js +5(resolve per-BR/coarse-fallback/unresolved + **tmp-git e2e**: BR.json 1 rule 수정→그 per-BR origin+소비 item BHV-POST-001 만[무관 rule·item 제외=정밀] + invalid-ref exit 3) → chain-driver **456**(+8). RR 무회귀 · 3-way 0.17.0.
+- **정직 경계**: mechanism = synthetic tmp-git e2e + per-BR 노드 real(poc-18/19 / S6) / 실 운영 demand 신호 0(P0 roadmap gap=BUILD 결단) / removed rule=diagnostic(소비자 stale 가능 loud / forward origin ❌) / coarse fallback=BC-less(현 backfill 100%나 방어).
+- **carry 2(fixpoint 자동 재진입)=DEFER** (재생성=LLM 외부 in-loop / 결정론 도구 단독 완결 불가) · **carry 3(`--apply` durable source-write)=DROP** (의도 보존 R2 = propose-only 패러다임 / Phase 2c "B reject→B′" 결정). SSOT = DEC §22~§23.
+
 ## [0.16.0] — 2026-06-07 MINOR — living-sync S6: business-rules per-BR granularity (additive)
 
 per-BC 노드(Phase 4)를 한 단계 더 — distinct business rule 당 **per-BR 노드** `analysis-business-rules-<BR-id>` 추가 + route(S1) br_id→per-BR 최우선 dispatch. 한 rule 변경의 sync-loop 영향 = 그 rule 을 개별 참조한 item 만(per-BC over-propagation 제거). 4원칙(plan `plan-living-sync-s6-per-br.md` 1원칙 + **Senior 적대 step-0[DEFER@0.86]** + 사용자 BUILD-NOW 결단).

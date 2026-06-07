@@ -24,7 +24,7 @@ export function hashFile(absPath) {
 //   register/detect/cascade 공유 SSOT. 결정성: rule 별 재귀 키-정렬 canonical 직렬화 → 직렬문자열 정렬 → sha256
 //   (intra-object key 재정렬 무력화 + id 누락/중복 모호 회피 / Senior REVISE@0.83 BLOCKER-2 — replacer-array 는 nested key drop 결함이라 재귀 canonicalize 채택).
 export const BR_CANONICAL = 'business-rules.json';
-function canonicalStringify(v) {
+export function canonicalStringify(v) {
   if (Array.isArray(v)) return '[' + v.map(canonicalStringify).join(',') + ']';
   if (v && typeof v === 'object') {
     return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + canonicalStringify(v[k])).join(',') + '}';
@@ -42,6 +42,29 @@ export function hashBusinessRulesSubset(absPath, bcs) {
   const serialized = subsetRules(absPath, bcs).map(canonicalStringify).sort();
   const h = createHash('sha256').update(serialized.join('\n')).digest('hex');
   return `sha256:${h}`;
+}
+
+// living-sync carry 1 — business-rules.json per-rule diff → 변경 rule id (per-BR auto-origin seed / DEC 예정).
+//   각 rule 을 canonicalStringify(키-정렬 / S2 결정성 동형) → sha256. new 의 added·modified = changed.
+//   id 없는 rule = skip(per-BR 노드 매핑 불가 / graph-synthesizer per-BR 도 id 必). removed = 별도(forward origin 안 함 / 소비자 stale 가능성 loud).
+export function diffBusinessRulesByRule(oldParsed, newParsed) {
+  const hashOf = (parsed) => {
+    const m = new Map();
+    for (const r of normalizeBusinessRules(parsed)) {
+      if (!r || typeof r.id !== 'string') continue;
+      m.set(r.id, createHash('sha256').update(canonicalStringify(r)).digest('hex'));
+    }
+    return m;
+  };
+  const oldH = hashOf(oldParsed);
+  const newH = hashOf(newParsed);
+  const changed = [];
+  for (const [id, h] of newH) {
+    if (!oldH.has(id) || oldH.get(id) !== h) changed.push(id);
+  }
+  const removed = [];
+  for (const id of oldH.keys()) if (!newH.has(id)) removed.push(id);
+  return { changed_rule_ids: changed.sort(), removed_rule_ids: removed.sort() };
 }
 
 // living-sync Phase 3a (DEC §13) — cross-scope drift 기계 활성화.

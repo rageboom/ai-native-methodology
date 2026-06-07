@@ -20,6 +20,7 @@ import {
   registerCanonicalSources,
   CANONICAL_ANALYSIS_FILES,
   hashBusinessRulesSubset,
+  diffBusinessRulesByRule,
 } from '../src/sync.js';
 
 let tmp;
@@ -388,5 +389,35 @@ describe('S2 — schema bounded_contexts Ajv guard', () => {
     assert.ok(validate({ path: '.aimd/output/business-rules.json', version: sha, bounded_contexts: ['BC-USER'] }), JSON.stringify(validate.errors));
     assert.ok(validate({ path: '.aimd/output/domain.json', version: sha }), '기존 shape 유지');
     assert.ok(!validate({ path: 'x', version: sha, bogus: 1 }), '잉여키(additionalProperties:false) 차단');
+  });
+});
+
+describe('carry 1 — diffBusinessRulesByRule (per-rule diff)', () => {
+  it('modified(hash 상이) + added 분류 / removed 별도 / id-less skip', () => {
+    const oldP = { business_rules: [
+      { id: 'BR-1', bounded_context: 'BC-POST', desc: 'old' },
+      { id: 'BR-2', bounded_context: 'BC-POST', desc: 'same' },
+      { id: 'BR-GONE', desc: 'x' },
+    ] };
+    const newP = { business_rules: [
+      { id: 'BR-1', bounded_context: 'BC-POST', desc: 'NEW' },
+      { id: 'BR-2', bounded_context: 'BC-POST', desc: 'same' },
+      { id: 'BR-3', bounded_context: 'BC-USER', desc: 'added' },
+      { desc: 'id-less added' },
+    ] };
+    const d = diffBusinessRulesByRule(oldP, newP);
+    assert.deepEqual(d.changed_rule_ids, ['BR-1', 'BR-3']);
+    assert.deepEqual(d.removed_rule_ids, ['BR-GONE']);
+  });
+
+  it('key 재정렬 = no-change (canonical 결정성)', () => {
+    const a = { business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST', desc: 'x' }] };
+    const b = { business_rules: [{ desc: 'x', id: 'BR-1', bounded_context: 'BC-POST' }] };
+    assert.equal(diffBusinessRulesByRule(a, b).changed_rule_ids.length, 0);
+  });
+
+  it('빈/신규 old → 전 rule added (정렬)', () => {
+    const newP = { business_rules: [{ id: 'BR-2', bounded_context: 'BC-USER' }, { id: 'BR-1', bounded_context: 'BC-POST' }] };
+    assert.deepEqual(diffBusinessRulesByRule({}, newP).changed_rule_ids, ['BR-1', 'BR-2']);
   });
 });

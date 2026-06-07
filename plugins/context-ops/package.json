@@ -1,6 +1,6 @@
 {
   "name": "@mis-plugins/context-ops",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": false,
   "type": "module",
   "description": "AI-Native 개발 방법론 — SDLC 6단계 chain harness Claude Code plugin (사내 표준). npm 배포 페이로드(source:npm) + chain/analysis 검증 도구 workspace. 산출물 json 단독 SSOT (v12).",
