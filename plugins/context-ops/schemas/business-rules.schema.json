@@ -89,7 +89,7 @@
   "$defs": {
     "businessRule": {
       "type": "object",
-      "required": ["id"],
+      "required": ["id", "bounded_context"],
       "anyOf": [
         {
           "title": "name 또는 title 표현 (v1.x = name / v2.x = title — 둘 다 호환)",
@@ -329,7 +329,8 @@
         },
         "bounded_context": {
           "type": "string",
-          "description": "관련 도메인 경계 ID (예: BC-ORDER)"
+          "minLength": 1,
+          "description": "관련 도메인 경계(BC) ID — domain.json 의 bounded_contexts 에서 매핑 (예: BC-ORDER). v0.3.0 required (DEC-2026-06-07-bounded-context-mandatory) — BR↔모듈 경계 추적성 + 향후 BC별 산출물 분할(STEP 3)의 분할 키. 단일 도메인이면 그 1개 BC."
         },
         "given": {
           "type": "array",

@@ -9,7 +9,8 @@
       "source": "user.service.ts:42-54",
       "evidence_strength": "high",
       "br_type": "uniqueness",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-AUTHN-002",
@@ -19,7 +20,8 @@
       "evidence_strength": "high",
       "br_type": "authentication",
       "is_intent": true,
-      "isomorphic_to_poc08": " inverse — PoC #08 = 평문 (bug) / PoC #09 = argon2 (intent / 정상) / paradigm-cross AP 일반화 입증 ↑"
+      "isomorphic_to_poc08": " inverse — PoC #08 = 평문 (bug) / PoC #09 = argon2 (intent / 정상) / paradigm-cross AP 일반화 입증 ↑",
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-ARTICLE-003",
@@ -28,7 +30,8 @@
       "source": "article.service.ts:26-64",
       "evidence_strength": "high",
       "br_type": "dynamic_search",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-FEED-004",
@@ -37,7 +40,8 @@
       "source": "article.service.ts:66-94",
       "evidence_strength": "high",
       "br_type": "feed",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-SLUG-005",
@@ -46,7 +50,8 @@
       "source": "article.service.ts:170-188 + import slug",
       "evidence_strength": "medium",
       "br_type": "id_generation",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-COMMENT-006",
@@ -55,7 +60,8 @@
       "source": "article.service.ts:101-112",
       "evidence_strength": "high",
       "br_type": "cascade",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     },
     {
       "id": "BR-RW-FOLLOW-007",
@@ -64,7 +70,8 @@
       "source": "profile.service.ts:50-77",
       "evidence_strength": "high",
       "br_type": "uniqueness + relation",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RW"
     }
   ],
   "summary": {

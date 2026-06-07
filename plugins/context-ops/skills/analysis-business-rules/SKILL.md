@@ -39,7 +39,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    }
    ```
 
-   - BR item = `required:["id"]` + (`name`|`title`) + (GWT `given`/`when`/`then` | `natural_language`) 2종 표현 ($defs.businessRule).
+   - BR item = `required:["id","bounded_context"]` + (`name`|`title`) + (GWT `given`/`when`/`then` | `natural_language`) 2종 표현 ($defs.businessRule).
+   - **`bounded_context` 의무 채움** (v0.3.0 required): 각 BR 을 `domain.json` 의 `bounded_contexts[]` 중 하나에 매핑 (BR id 의 `<DOMAIN>` 부분 + rule 의 도메인/엔티티 참조로 결정). domain.json 에 BC 가 1개뿐(단일 도메인)이면 모든 BR 이 그 BC. 어떤 BC 에도 안 들어가면 = domain 모델 재점검 신호(임의 누락 ❌). → BR↔모듈 추적성 + BC별 산출물 분할(STEP 3) 분할 키.
    - FE form validation 은 `business_rules[]` 안 `auto_extracted=true` BR + top-level `auto_extracted_br_refs` cross-link (별도 top-level 키 아님).
    - **BR id 형식 의무** (자유 paradigm ❌): `^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$` 정합 의무 = **`BR-<DOMAIN>-<SUBJECT>-<NNN>`** form (예: `BR-USER-VERIFY-001` / `BR-RBAC-PRIORITY-001` / `BR-CARLIST-PAGINATION-001`).
      - prefix `BR-<DOMAIN>-<SUBJECT>` = 의미 (LLM 컨텍스트 read 시 의미 직관)

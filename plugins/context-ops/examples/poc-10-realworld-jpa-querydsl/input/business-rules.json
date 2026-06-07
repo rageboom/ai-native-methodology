@@ -21,7 +21,8 @@
       ],
       "evidence_strength": "high",
       "br_type": "authentication",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RAE"
     },
     {
       "id": "BR-RAE-SEARCH-002",
@@ -43,7 +44,8 @@
       ],
       "evidence_strength": "high",
       "br_type": "dynamic_search",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RAE"
     },
     {
       "id": "BR-RAE-SLUG-003",
@@ -63,7 +65,8 @@
       ],
       "evidence_strength": "high",
       "br_type": "id_generation",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RAE"
     },
     {
       "id": "BR-RAE-CONTENT-004",
@@ -84,7 +87,8 @@
       ],
       "evidence_strength": "high",
       "br_type": "aggregate",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RAE"
     },
     {
       "id": "BR-RAE-FOLLOW-005",
@@ -104,7 +108,8 @@
       ],
       "evidence_strength": "high",
       "br_type": "uniqueness",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-RAE"
     }
   ],
   "summary": {

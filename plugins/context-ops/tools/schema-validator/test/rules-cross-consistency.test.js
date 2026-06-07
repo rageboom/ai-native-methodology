@@ -43,7 +43,7 @@ function validateRules(businessRule) {
 	}
 }
 
-const BASE = { id: 'BR-TEST-CASE-001', name: 't', natural_language: 't' };
+const BASE = { id: 'BR-TEST-CASE-001', bounded_context: 'BC-TEST', name: 't', natural_language: 't' };
 
 // ── regression-safety (실측 both=0 / 단방향 보유 = vacuous) ─────────────
 test('regression-safe — is_intent 단독 (intent_vs_bug_classification 부재) → VALID', () => {

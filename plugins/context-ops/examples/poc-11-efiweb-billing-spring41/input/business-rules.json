@@ -9,7 +9,8 @@
       "source": "billing.xml:8-29 (selectDataConfirmList / WITH MONTH_INFO recursive CTE)",
       "evidence_strength": "high",
       "br_type": "query",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-CONFIRM-002",
@@ -20,7 +21,8 @@
       "br_type": "transaction",
       "is_intent": false,
       "is_likely_bug": true,
-      "domain_carry": "결제 도메인 expert — 부분 commit 시 정합성 영향 정탐 의무"
+      "domain_carry": "결제 도메인 expert — 부분 commit 시 정합성 영향 정탐 의무",
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-OVERWRITE-003",
@@ -30,7 +32,8 @@
       "evidence_strength": "high",
       "br_type": "data_overwrite",
       "is_intent": true,
-      "domain_carry": "결제 도메인 expert — full overwrite 정책 의도 확인"
+      "domain_carry": "결제 도메인 expert — full overwrite 정책 의도 확인",
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-ERPDATA-004",
@@ -39,7 +42,8 @@
       "source": "BillingServiceImpl.saveDataConfirm:34 + dataConfirm.jsp:109-111",
       "evidence_strength": "high",
       "br_type": "validation",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-BASEYEAR-005",
@@ -50,7 +54,8 @@
       "br_type": "configuration",
       "is_intent": true,
       "is_likely_bug": false,
-      "domain_carry": "결제 도메인 expert — 2015 의미 확인 (시스템 가동 시점?)"
+      "domain_carry": "결제 도메인 expert — 2015 의미 확인 (시스템 가동 시점?)",
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-ENTITY-006",
@@ -61,7 +66,8 @@
       "br_type": "filtering",
       "is_intent": false,
       "is_likely_bug": true,
-      "domain_carry": "결제 도메인 expert — 법인 2 = 어떤 법인? 다른 법인 확정 처리 부재 의도?"
+      "domain_carry": "결제 도메인 expert — 법인 2 = 어떤 법인? 다른 법인 확정 처리 부재 의도?",
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-HISTPK-007",
@@ -70,7 +76,8 @@
       "source": "billing.xml:31-38 (insertConfirmHistory + <selectKey resultClass='int' keyProperty='hisNo'>)",
       "evidence_strength": "high",
       "br_type": "audit",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-BILLING"
     },
     {
       "id": "BR-BILLING-EXTBI-008",
@@ -80,13 +87,22 @@
       "evidence_strength": "high",
       "br_type": "external_integration",
       "is_intent": true,
-      "domain_carry": "Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)"
+      "domain_carry": "Qlik Sense 운영 expert — appid/sheet 관리 체계 (별도 시스템?)",
+      "bounded_context": "BC-BILLING"
     }
   ],
   "summary": {
     "total": 8,
-    "by_intent": {"intent": 6, "likely_bug": 2, "ambiguous": 0},
-    "by_evidence": {"high": 8, "medium": 0, "low": 0},
+    "by_intent": {
+      "intent": 6,
+      "likely_bug": 2,
+      "ambiguous": 0
+    },
+    "by_evidence": {
+      "high": 8,
+      "medium": 0,
+      "low": 0
+    },
     "by_type": {
       "query": 1,
       "transaction": 1,

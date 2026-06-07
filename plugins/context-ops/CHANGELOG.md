@@ -10,6 +10,17 @@
 
 ---
 
+## [0.3.0] — 2026-06-07 (breaking / pre-1.0) — business-rules `bounded_context` required 승격 + scope-local `*.subset.json` 폐기 (BR-split 순차안 STEP 0+1)
+
+business-rules 산출물을 BC별 파일로 분할하려는 요구에서 출발 — Senior 적대 검토가 **bounded_context 채움률 8 PoC 중 7개 = 0%** 를 실측, "무조건 분할 now" 전제를 반증(분할 시 전부 `_uncategorized` 로 몰려 무의미 + reader silent mis-fire + 경로 3종 불일치). → **순차 4스텝**(STEP 0 subset 폐기 / STEP 1 BC 의무화 / STEP 2 경로통일+loader / STEP 3 분할)으로 전환, **본 릴리스 = STEP 0+1**(토대). 분할(STEP 3)은 STEP 2 후 BC 채움률 실측 재판단.
+
+- **STEP 0 — subset 폐기 (DEC-2026-06-07-subset-retire)**: baseline-delta 의 `*.subset.json`(scope-local 파생 사본) 개념 폐기. 사용자 지적("subset 바뀌어도 원본 반영 안 되면 SSOT 아니다" = 사본↔원본 역동기화 부채) 수용 → scope 슬라이스 = `chain-driver` `subsetAnalysisRefs(canonical, prefixes)` **in-memory 참조 필터**(BR-id/analysis_refs / 사본 파일 ❌)로 canonical 단일 SSOT 유지. 실 `*.subset.json` 0건(미실현)→코드 제거 0 / `subsetAnalysisRefs` 함수 무변경(chain-driver 343/343). doc=`baseline-delta-operating-model.md`(§2·§3·§4)+`lifecycle-contract.md`(scope 디렉토리 다이어그램). greenfield "7대-subset"(산출물 종류 subset / 다른 의미) 무관·보존.
+- **STEP 1 — bounded_context required (DEC-2026-06-07-bounded-context-mandatory / breaking)**: `business-rules.schema.json` `$defs.businessRule.required` = `["id"]` → `["id","bounded_context"]` + `minLength:1` + description(분할 키 / domain.json 매핑). writer `analysis-business-rules/SKILL.md` = 각 BR 을 domain.json bounded_contexts 에 매핑 의무 채움 지시(단일 도메인이면 그 1개 BC).
+- **예제 백필 (113 rule / 14 파일)**: release-readiness `analysis_validator_violation` 이 예제 business-rules.json 전수 schema 검증 → 0% 14 PoC 백필. BR id `<DOMAIN>` 토큰 → `BC-<DOMAIN>` 결정적 derive(poc-01[BC-AUTH/CONTENT]·poc-16 기존 domain-informed BC 보존 / poc-05 = BC-USER 수동).
+- **test 정합**: schema-validator `chain-schemas`+`rules-cross-consistency` 픽스처에 bounded_context 추가 — VALID 기대 픽스처(BC 추가) + INVALID 기대 픽스처(BC 추가해 의도한 anyOf 이유로 실패 / 테스트 무결성). schema-validator **108/108**.
+- **검증**: schema-validator 108/108 · chain-coverage 41 · traceability-matrix-builder 152 · decision-table-validator 11 · chain-driver 343 green / 예제 14 전수 schema-valid / version 3-source 0.3.0. **정직 표기**: release-readiness `workspace_test_pass`(NODE_TEST_CONTEXT env artifact / clean 트리 동일) + findings-aggregator 7 fail(buildValidatorArgs 단위 / **clean 트리 stash 동일 = pre-existing env / 본 변경 무관**). SSOT=`decisions/DEC-2026-06-07-{subset-retire,bounded-context-mandatory}.md` + plan `plan-br-split.md`.
+- **carry**: BR-split STEP 2(경로 3종 통일 + reader 공용 loader / blocker #1 silent mis-fire·#3) → STEP 3(index+per-BC 분할 / BC 채움률 실측 재판단). 예제 BC = id-prefix derive(시점 기록물 / 정밀 domain 매핑 = STEP 3 재생성 시). domain/antipatterns 등 타 산출물 BC = scope-out.
+
 ## [0.2.0] — 2026-06-07 MINOR — PMD Tier 2(import) → Tier 1(in-plugin 자동실행) 정식 격상 + R19 Tier 축 = "실행 locus" 명문화
 
 PMD 를 R19 Tier 1(plugin in-plugin 자동 실행)으로 편입. 사용자 질문("java 가 있으면 자동으로 되나?")을 계기로 in-plugin PMD 자동 실행을 실측 입증하고, charter R19 의 "JVM 의존 0" 문구가 SSOT(`no-simulation.md` 가 Gradle·JUnit 을 Tier 1 로 둠)와 모순되는 drift 임을 확인 → Tier 분류 축을 **"실행 locus"**(plugin 직접 실행 vs 사용자 CI import)로 명문화. import 경로(allowlist=`['pmd']`)는 **orthogonal 로 보존** — PMD 는 in-plugin 자동 + import 양쪽 유효.

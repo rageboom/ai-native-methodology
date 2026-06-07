@@ -19,6 +19,7 @@
   "business_rules": [
     {
       "id": "BR-USER-DATA-001",
+      "bounded_context": "BC-USER",
       "title": "이메일 중복 ❌",
       "type": "uniqueness_constraint",
       "description": "사용자 등록 시 이메일은 시스템 내 유일해야 한다. 동일 이메일로 신규 등록 시도 시 409 Conflict 응답.",
@@ -45,6 +46,7 @@
     },
     {
       "id": "BR-USER-VALIDATION-001",
+      "bounded_context": "BC-USER",
       "title": "비밀번호 최소 8자",
       "type": "validation",
       "description": "신규 등록 시 비밀번호는 최소 8자 이상. 미달 시 400 Bad Request.",

@@ -19,7 +19,8 @@
       "source": "AccountService.java:insertAccount + AccountMapper.xml (insertAccount/insertProfile/insertSignon)",
       "evidence_strength": "high",
       "br_type": "transaction",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-ACCUPD-002",
@@ -39,7 +40,8 @@
       "source": "AccountService.java:updateAccount",
       "evidence_strength": "high",
       "br_type": "conditional_update",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-PRODSRCH-003",
@@ -61,7 +63,8 @@
       "br_type": "search",
       "is_intent": true,
       "is_likely_bug": false,
-      "$comment_bug": " N+1 패턴 = 의도된 것 같음 (multi-keyword AND/OR = client side aggregation) but 성능 risk → AP-PETSTORE-005"
+      "$comment_bug": " N+1 패턴 = 의도된 것 같음 (multi-keyword AND/OR = client side aggregation) but 성능 risk → AP-PETSTORE-005",
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-ORDCRT-004",
@@ -83,7 +86,8 @@
       "source": "OrderService.java:insertOrder",
       "evidence_strength": "high",
       "br_type": "transaction",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-ORDQRY-005",
@@ -106,7 +110,8 @@
       "br_type": "fetch_chain",
       "is_intent": false,
       "is_likely_bug": true,
-      "$comment_bug": " N+1 fetch = 명백 anti-pattern → AP-PETSTORE-006. 모범 = JOIN 또는 batch fetch."
+      "$comment_bug": " N+1 fetch = 명백 anti-pattern → AP-PETSTORE-006. 모범 = JOIN 또는 batch fetch.",
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-PASSWD-006",
@@ -128,7 +133,8 @@
       "br_type": "authentication",
       "is_intent": false,
       "is_likely_bug": true,
-      "$comment_bug": " 보안 취약 — bcrypt/argon2 의무 → AP-PETSTORE-004. reference webapp 의 demo limitation."
+      "$comment_bug": " 보안 취약 — bcrypt/argon2 의무 → AP-PETSTORE-004. reference webapp 의 demo limitation.",
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-BANNER-007",
@@ -147,7 +153,8 @@
       "source": "AccountMapper.xml + bannerdata schema (favcategory PK / bannername)",
       "evidence_strength": "medium",
       "br_type": "personalization",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-PETSTORE"
     },
     {
       "id": "BR-PETSTORE-SEQMGR-008",
@@ -169,7 +176,8 @@
       "br_type": "id_generation",
       "is_intent": true,
       "is_likely_bug": false,
-      "$comment_bug": " multi-RDBMS 호환 의도 — but UPDATE 후 SELECT race risk → AP-PETSTORE-007"
+      "$comment_bug": " multi-RDBMS 호환 의도 — but UPDATE 후 SELECT race risk → AP-PETSTORE-007",
+      "bounded_context": "BC-PETSTORE"
     }
   ],
   "summary": {

@@ -9,7 +9,8 @@
       "source": "selectComBasicInfoList (capital.xml:7-19) — order by CAPITAL_YN DESC, CMS_USE_YN DESC, COM_NO",
       "evidence_strength": "high",
       "br_type": "validation",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-STYPE-002",
@@ -19,7 +20,8 @@
       "evidence_strength": "medium",
       "br_type": "configuration",
       "is_intent": true,
-      "domain_carry": "DBA read — sType enum 의미 결정"
+      "domain_carry": "DBA read — sType enum 의미 결정",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-TXBOUND-003",
@@ -29,7 +31,8 @@
       "evidence_strength": "high",
       "br_type": "transaction",
       "is_intent": false,
-      "is_likely_bug": true
+      "is_likely_bug": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-DATASRC-004",
@@ -38,7 +41,8 @@
       "source": "selectIfrsERPINList + selectCMSINSetList + selectLoadNonErpSaveData",
       "evidence_strength": "high",
       "br_type": "data_source_switching",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-SAVTYPE-005",
@@ -48,7 +52,8 @@
       "evidence_strength": "high",
       "br_type": "state_machine",
       "is_intent": true,
-      "domain_carry": "R/B/A enum 의 정확한 효과 — DBA + planner 결단"
+      "domain_carry": "R/B/A enum 의 정확한 효과 — DBA + planner 결단",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-PREVBAL-006",
@@ -59,7 +64,8 @@
       "br_type": "auto_fetch",
       "is_intent": true,
       "is_likely_bug": false,
-      "patch_history": "2020.10.30. 김승희 — Double basicBalance = 0 default → if (!list.isEmpty() && null != list.get(0).get(\"cramt\")) basicBalance = Double.parseDouble(...) 변경 (NullPointerException 회피 / String→Double 강제 캐스팅 patch)"
+      "patch_history": "2020.10.30. 김승희 — Double basicBalance = 0 default → if (!list.isEmpty() && null != list.get(0).get(\"cramt\")) basicBalance = Double.parseDouble(...) 변경 (NullPointerException 회피 / String→Double 강제 캐스팅 patch)",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-AUDIT-007",
@@ -68,7 +74,8 @@
       "source": "CapitalController.java:1798",
       "evidence_strength": "high",
       "br_type": "audit",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-VRFYLOCK-008",
@@ -78,7 +85,8 @@
       "evidence_strength": "medium",
       "br_type": "approval_workflow",
       "is_intent": true,
-      "domain_carry": "verify 후 수정 가능 여부 — planner 결단"
+      "domain_carry": "verify 후 수정 가능 여부 — planner 결단",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-XRATE-009",
@@ -89,7 +97,8 @@
       "br_type": "cross_module_dependency",
       "is_intent": true,
       "is_likely_bug_partial": true,
-      "note": "exchange 모듈 BR-EXCHANGE-007 (외화→원화 환산 환율) 의존 / module boundary 흐림 → 새 시스템 = micro-service 분리 검토"
+      "note": "exchange 모듈 BR-EXCHANGE-007 (외화→원화 환산 환율) 의존 / module boundary 흐림 → 새 시스템 = micro-service 분리 검토",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-HISTORY-010",
@@ -98,7 +107,8 @@
       "source": "capital.xml:1438-1499",
       "evidence_strength": "medium",
       "br_type": "audit",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-MAILSPEC-011",
@@ -110,7 +120,8 @@
       "is_intent": false,
       "is_likely_bug": true,
       "is_self_recognized": true,
-      "note": "SATD per Maldonado & Shihab — 4회 중복 자조 / 새 시스템 = 정식 메일 수신 user enum + audit 의무"
+      "note": "SATD per Maldonado & Shihab — 4회 중복 자조 / 새 시스템 = 정식 메일 수신 user enum + audit 의무",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-IMGB64-012",
@@ -121,7 +132,8 @@
       "br_type": "data_storage",
       "is_intent": false,
       "is_likely_bug": true,
-      "note": "AP-CAPITAL-007 동반 / DB 비대 + 성능 + IO 비용 ↑ / 새 시스템 = S3/object storage 분리"
+      "note": "AP-CAPITAL-007 동반 / DB 비대 + 성능 + IO 비용 ↑ / 새 시스템 = S3/object storage 분리",
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-CALEND-013",
@@ -130,7 +142,8 @@
       "source": "capital.xml:601+624+672+752",
       "evidence_strength": "medium",
       "br_type": "calendar",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-GRAPHSET-014",
@@ -139,7 +152,8 @@
       "source": "capital.xml:1501-1557",
       "evidence_strength": "low",
       "br_type": "ui_personalization",
-      "is_intent": true
+      "is_intent": true,
+      "bounded_context": "BC-CAPITAL"
     },
     {
       "id": "BR-CAPITAL-ASSETSP-015",
@@ -150,7 +164,8 @@
       "br_type": "data_aggregation_pipeline",
       "is_intent": false,
       "is_likely_bug_partial": true,
-      "note": "XML 인라인 String 패턴 (AP-CAPITAL-005 / DEAD parameter) + Asset list 7단계 = 도메인 fragmentation"
+      "note": "XML 인라인 String 패턴 (AP-CAPITAL-005 / DEAD parameter) + Asset list 7단계 = 도메인 fragmentation",
+      "bounded_context": "BC-CAPITAL"
     }
   ],
   "rules_meta_confidence": {

@@ -5,7 +5,11 @@
   "meta": {
     "generated_at": "2026-05-18T16:03:00Z",
     "confidence": 0.88,
-    "inputs_used": ["source_code", "design_specs", "planning_docs"],
+    "inputs_used": [
+      "source_code",
+      "design_specs",
+      "planning_docs"
+    ],
     "methodology_version": "v8.3.0",
     "formula_version": "v1",
     "extraction_env": "poc14_simulation",
@@ -36,7 +40,8 @@
       "then": [
         "시스템은 409 Conflict 응답을 반환한다",
         "사용자 저장소에 중복 이메일 항목이 추가되지 않는다"
-      ]
+      ],
+      "bounded_context": "BC-USER"
     },
     {
       "id": "BR-USER-VALIDATION-FSIM-001",
@@ -61,7 +66,8 @@
       "then": [
         "시스템은 422 Unprocessable Entity (FastAPI 기본 Pydantic 응답) 또는 400 응답을 반환한다",
         "사용자 저장소에 해당 사용자가 추가되지 않는다"
-      ]
+      ],
+      "bounded_context": "BC-USER"
     },
     {
       "id": "BR-TODO-VALIDATION-FSIM-001",
@@ -86,7 +92,8 @@
       "then": [
         "시스템은 422 응답을 반환한다",
         "Todo 가 생성되지 않는다"
-      ]
+      ],
+      "bounded_context": "BC-TODO"
     },
     {
       "id": "BR-TODO-OWNERSHIP-FSIM-001",
@@ -112,7 +119,8 @@
       "then": [
         "시스템은 404 Not Found (또는 403 Forbidden) 응답을 반환한다",
         "User A 의 todo 는 변경되지 않는다"
-      ]
+      ],
+      "bounded_context": "BC-TODO"
     }
   ]
 }
