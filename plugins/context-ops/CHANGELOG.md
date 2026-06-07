@@ -10,6 +10,19 @@
 
 ---
 
+## [0.19.1] — 2026-06-08 PATCH — living-sync ② honest surface: SessionStart 미-baseline scope 표면화 (false-health 수정)
+
+② lifecycle auto-register 는 **DEFER 유지**(SessionStart 자동등록=이미 drift 난 상태를 clean baseline 으로 흡수=false-health 유해 / analysis-completion hook=신규 설계+실 수요 0). 대신 깊은 숙지에서 발견한 **실재 false-health 버그**만 정직하게 수정 — SessionStart hook(hooks-bridge)이 first-touch 없이 markDrift 만 돌아, 빈/absent `sync_sources` scope 를 조용히 "chain harness ready"(건강)로 보고하던 것(detectDrift 가 빈 sources → drift_detected:false). carry 2 BLOCKER-1 과 같은 P0 "거짓 건강 신호" 가족. 4원칙(plan `plan-living-sync-c2-unbaselined-surface.md` + Senior 적대 step-0[REVISE@0.80] + 사용자 option 1 승인).
+
+- **신규 순수 read-only 헬퍼 `listUnbaselinedScopes`(sync.js)**: `.aimd/output/` canonical ≥1 존재(anyCanonical 가드 = 빈 프로젝트 false-positive 차단) AND scope `sync_sources` 빈/absent → 미-baseline scope 목록. **write 0**(markDrift 코어 순수성·SessionStart 무-write 불변식 보존 / auto-register 는 여전히 cmdSync glue 한정 = DEFER).
+- **SessionStart 표면화(cli.js hooks-bridge)**: markDrift 후 헬퍼 호출 → additionalContext + stderr 에 `⚠️ N scope(s) unbaselined … Run: chain-driver sync`. **unbaselined>0 면 "ready" 주장 금지**(거짓 건강 제거).
+- **★ Senior BLOCKER-1(REVISE@0.80) 반영 = 표면화 집합 ⊆ 수리가능 집합 정렬 (B)**: 표면화가 empty-or-absent 인데 기존 cmdSync first-touch 는 `Array.isArray && length===0`(empty-only)만 등록 → absent scope 는 `sync` 후에도 미등록=안내 오도였음. **cmdSync first-touch 조건을 `!Array.isArray(sources) || sources.length===0` 으로 확장**(absent 도 first-touch / behavior note: 명시 `chain-driver sync` 시 더 많은 scope 가 baseline — 엄밀히 더 정직·무회귀). schema 상 absent 도달 가능 확인(work-unit-manifest sync_state.required=[drift_detected]만·sync_state 자체 미필수).
+- **MAJOR 반영**: M1 absent `sync_state` 통째 부재 테스트(schema-valid 도달) / M2 별도 헬퍼 second-scan 수용 명시(SessionStart 비-perf-critical·scope 소수·동기 무-concurrent-write=TOCTOU 무의미 / 순수 헬퍼=테스트 단위 가치) / minor-2 stderr 조건 `|| unbaselined>0` 정합(부분 false-health 재발 차단). disjoint 불변식(빈 sync_sources=drift 발화 불가 → marked∩unbaselined=∅).
+- **검증(no-sim 실)**: chain-driver **492**(+10: listUnbaselinedScopes 6[canonical 부재·empty·absent sources·absent state·baselined 제외·read-only byte-identical] + SessionStart e2e 4[표면화+ready 억제·sync 후 소멸·absent first-touch (B) 회귀·canonical 부재 false-positive 차단]). RR 무회귀·3-way 0.19.1.
+- **정직 경계**: 자동등록(write) 안 함=표면화(read)만 / canonical 부재 프로젝트는 미표면화(analysis-stage 미성숙은 sync 소관 아님). ② full auto-register = DEFER 지속.
+
+---
+
 ## [0.19.0] — 2026-06-08 MINOR — living-sync carry 2: fixpoint 자동 재진입 (수렴 원장 `sync-converge`)
 
 `sync-next` 큐 소비 완료 후 남던 honest-debt("fixpoint 미보증 — 수동 sync-loop 재실행")를 **결정론 수렴 원장**으로 종결. 도구는 **수렴-제어 half 만 결정론 소유** — 재생성(LLM)·그래프 재합성(외부 flow)은 반복 사이(no-simulation §3.4 경계 보존). §23 DEFER 가 말한 "LLM-orchestration 배선 시 재검토"의 그 배선. 4원칙(plan `plan-living-sync-carry2-converge.md` + **Senior 적대 step-0[REVISE@0.80]** + 사용자 BUILD 결단 / DEC §23 carry2 / §33 fixpoint / §63 R1).

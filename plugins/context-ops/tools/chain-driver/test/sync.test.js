@@ -21,6 +21,7 @@ import {
   CANONICAL_ANALYSIS_FILES,
   hashBusinessRulesSubset,
   diffBusinessRulesByRule,
+  listUnbaselinedScopes,
 } from '../src/sync.js';
 
 let tmp;
@@ -419,5 +420,58 @@ describe('carry 1 — diffBusinessRulesByRule (per-rule diff)', () => {
   it('빈/신규 old → 전 rule added (정렬)', () => {
     const newP = { business_rules: [{ id: 'BR-2', bounded_context: 'BC-USER' }, { id: 'BR-1', bounded_context: 'BC-POST' }] };
     assert.deepEqual(diffBusinessRulesByRule({}, newP).changed_rule_ids, ['BR-1', 'BR-2']);
+  });
+});
+
+// living-sync ② honest surface (read-only) — 미-baseline scope 표면화 (DEC §24 / Senior REVISE@0.80 BLOCKER-1 (B) 반영).
+describe('listUnbaselinedScopes', () => {
+  const mkScope = (root, scope, syncState) => {
+    ensureScopeDir(root, scope);
+    writeManifest(root, scope, null, { scope, status: 'active', ...(syncState !== undefined ? { sync_state: syncState } : {}) });
+  };
+
+  it('canonical 부재 → [] (빈/미초기화 프로젝트 false-positive 차단 / anyCanonical 가드)', () => {
+    const root = join(tmp, 'ub-nocanon');
+    mkScope(root, 'scope-a', { sync_sources: [], drift_detected: false });
+    assert.deepEqual(listUnbaselinedScopes(root), []);
+  });
+
+  it('canonical 존재 + 빈 sync_sources → 표면화', () => {
+    const root = join(tmp, 'ub-empty');
+    seedCanonical(root, 'business-rules.json', '{"business_rules":[]}');
+    mkScope(root, 'scope-a', { sync_sources: [], drift_detected: false });
+    assert.deepEqual(listUnbaselinedScopes(root), ['scope-a']);
+  });
+
+  it('canonical 존재 + absent sync_sources(sync_state 있음) → 표면화', () => {
+    const root = join(tmp, 'ub-absentsrc');
+    seedCanonical(root, 'domain.json', '{}');
+    mkScope(root, 'scope-a', { drift_detected: false }); // sync_sources 키 자체 부재
+    assert.deepEqual(listUnbaselinedScopes(root), ['scope-a']);
+  });
+
+  it('canonical 존재 + absent sync_state(통째 부재) → 표면화 (MAJOR-1 / schema-valid 도달)', () => {
+    const root = join(tmp, 'ub-absentstate');
+    seedCanonical(root, 'domain.json', '{}');
+    mkScope(root, 'scope-a', undefined); // sync_state 키 자체 부재
+    assert.deepEqual(listUnbaselinedScopes(root), ['scope-a']);
+  });
+
+  it('baseline 된 scope(sync_sources 채워짐)는 제외 + 정렬', () => {
+    const root = join(tmp, 'ub-mixed');
+    const p = seedCanonical(root, 'business-rules.json', '{"business_rules":[]}');
+    mkScope(root, 'scope-z', { sync_sources: [{ path: '.aimd/output/business-rules.json', version: hashFile(p) }], drift_detected: false });
+    mkScope(root, 'scope-a', { sync_sources: [], drift_detected: false });
+    assert.deepEqual(listUnbaselinedScopes(root), ['scope-a'], 'baseline 된 scope-z 제외');
+  });
+
+  it('read-only — manifest 미변경 (markDrift 코어 순수성 / 호출 전후 byte-identical)', () => {
+    const root = join(tmp, 'ub-readonly');
+    seedCanonical(root, 'domain.json', '{}');
+    mkScope(root, 'scope-a', { sync_sources: [], drift_detected: false });
+    const before = JSON.stringify(readManifest(root, 'scope-a'));
+    listUnbaselinedScopes(root);
+    listUnbaselinedScopes(root);
+    assert.equal(JSON.stringify(readManifest(root, 'scope-a')), before, 'write 0');
   });
 });

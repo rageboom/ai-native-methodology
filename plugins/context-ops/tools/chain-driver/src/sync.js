@@ -172,6 +172,28 @@ export function markDrift(projectRoot) {
   return { marked };
 }
 
+// living-sync ② honest surface (DEC §24 / read-only) — 미-baseline 이면서 baseline-able 한 scope 목록.
+//   배경: SessionStart hook 이 first-touch 없이 markDrift 만 돈다(cli hooks-bridge). 빈/absent sync_sources scope 는
+//     detectDrift 가 조용히 drift_detected:false → "건강"으로 오인(dead-fed false-health). 그걸 표면화만 한다.
+//   ★ write 0 (markDrift 코어 순수성·SessionStart 무-write 불변식 보존 / auto-register 는 여전히 cmdSync glue 한정 = DEFER).
+//   집합 = cmdSync first-touch 가 고칠 수 있는 집합과 정렬(empty-or-absent / Senior BLOCKER-1) → 안내 실효.
+//   anyCanonical 가드: .aimd/output canonical 0개면 [] (빈/미초기화 프로젝트 false-positive 차단 / 부재=skip 철학 동형).
+export function listUnbaselinedScopes(projectRoot, opts = {}) {
+  const files = opts.canonicalFiles || CANONICAL_ANALYSIS_FILES;
+  const anyCanonical = files.some((name) =>
+    existsSync(join(projectRoot, '.aimd', 'output', name)),
+  );
+  if (!anyCanonical) return [];
+  const out = [];
+  for (const scope of listScopes(projectRoot)) {
+    const m = readManifest(projectRoot, scope);
+    if (!m) continue;
+    const sources = m.sync_state && m.sync_state.sync_sources;
+    if (!Array.isArray(sources) || sources.length === 0) out.push(scope);
+  }
+  return out.sort();
+}
+
 export function cascade(projectRoot, scope) {
   const m = readManifest(projectRoot, scope);
   if (!m) throw new Error(`cascade: scope not found: ${scope}`);

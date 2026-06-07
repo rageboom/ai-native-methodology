@@ -41,7 +41,7 @@ import {
 	listScopes,
 } from './state-store.js';
 import { executeQuery } from './query.js';
-import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule } from './sync.js';
+import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -1261,7 +1261,8 @@ function cmdSync(args) {
 		for (const scope of listScopes(root)) {
 			const m = readManifest(root, scope);
 			const sources = m?.sync_state?.sync_sources;
-			if (Array.isArray(sources) && sources.length === 0) {
+			// empty-or-absent 둘 다 first-touch (Senior BLOCKER-1 (B) — absent 도 dead-fed 동일 병 / SessionStart 표면화 집합과 정렬).
+			if (m && (!Array.isArray(sources) || sources.length === 0)) {
 				const r = registerCanonicalSources(root, scope);
 				if (r.registered.length > 0)
 					auto_registered.push({ scope, registered: r.registered.length });
@@ -1404,10 +1405,27 @@ function cmdHooksBridge(args) {
 		} catch {
 			/* non-fatal */
 		}
-		let additionalContext =
-			driftSummary.marked.length > 0
-				? `[ai-native-methodology] ⚠️ drift detected in ${driftSummary.marked.length} scope(s): ${driftSummary.marked.join(', ')}. Run: chain-driver sync --scope <slug> to cascade.`
-				: '[ai-native-methodology] chain harness ready. M4 sync = drift auto-detect + manual cascade.';
+		// living-sync ② honest surface (read-only) — 미-baseline scope 는 markDrift 가 조용히 "건강"으로 오인.
+		//   별도 pure helper(second scan / SessionStart 비-perf-critical·scope 소수·동기 무-concurrent-write = TOCTOU 무의미 = 수용).
+		let unbaselined = [];
+		try {
+			unbaselined = listUnbaselinedScopes(root);
+		} catch {
+			/* non-fatal */
+		}
+		// 메시지 조립: drift + unbaselined 별도 line. ★ unbaselined>0 면 "ready" 주장 금지(거짓 건강 제거).
+		const parts = [];
+		if (driftSummary.marked.length > 0)
+			parts.push(
+				`⚠️ drift detected in ${driftSummary.marked.length} scope(s): ${driftSummary.marked.join(', ')}. Run: chain-driver sync --scope <slug> to cascade.`,
+			);
+		if (unbaselined.length > 0)
+			parts.push(
+				`⚠️ ${unbaselined.length} scope(s) unbaselined (sync_sources 비어 markDrift 가 건강으로 오인 — drift 미감지 사각): ${unbaselined.slice(0, 5).join(', ')}${unbaselined.length > 5 ? ' …' : ''}. Run: chain-driver sync to establish baseline.`,
+			);
+		let additionalContext = parts.length
+			? `[ai-native-methodology] ${parts.join(' ')}`
+			: '[ai-native-methodology] chain harness ready. M4 sync = drift auto-detect + manual cascade.';
 		// dep-graph P4 (operation.md 결정 7) — artifact-graph.json 있으면 dirty 노드 수 + top-3 impact root 주입.
 		try {
 			const graphInjection = buildGraphSessionContext(root);
@@ -1426,6 +1444,13 @@ function cmdHooksBridge(args) {
 				`[ai-native-methodology] ⚠️ drift detected: ${driftSummary.marked.join(', ')}\n`,
 			);
 			process.stderr.write(`  → chain-driver sync --scope <slug>\n`);
+		}
+		// minor-2 — additionalContext 와 stderr 조건 정합 (부분 false-health 재발 차단).
+		if (unbaselined.length > 0) {
+			process.stderr.write(
+				`[ai-native-methodology] ⚠️ ${unbaselined.length} scope(s) unbaselined (drift 미감지 사각): ${unbaselined.slice(0, 5).join(', ')}${unbaselined.length > 5 ? ' …' : ''}\n`,
+			);
+			process.stderr.write(`  → chain-driver sync (baseline 등록)\n`);
 		}
 		process.exit(0);
 	}
