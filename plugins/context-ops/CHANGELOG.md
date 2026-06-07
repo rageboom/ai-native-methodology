@@ -10,6 +10,36 @@
 
 ---
 
+## [0.9.0] — 2026-06-07 MINOR — living-sync Phase 2b: `lift --reconcile` 손수정 코드 ↔ anchor 관측사실 git 신선도 (propose-only)
+
+Phase 2(`lift`)의 **전파 절반**(코드→천장→forward)에 이어 **reconcile 절반**: 손수정된 코드가 anchor 노드의 **관측사실**(code_pointer path/commit_hash)과 아직 맞는지 git 으로 재탐지 → 어긋나면 **propose**(자동 덮어쓰기 절대 ❌). `lift --reconcile [--base <sha>] [--repo-root <dir>]` 플래그. 4원칙(plan `plan-living-sync-phase2b.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.82] 전건 코드 사실검증** + 사용자 승인[코드 착수 / lift 스토리 완성]).
+
+- **신규 공용 프리미티브 `tools/_shared/code-pointer-git.js`**: `makeGitRunner`·`detectContentDrift`·`findRelocation` 를 code-pointer-validator 에서 추출(DRY 단일 출처 / chain-driver lift 와 cross-tool 공유). **code-pointer-validator 는 re-export**(import 처 cli.js/test API 표면 무변경 / 내부 호출 validateOnePointer 도 로컬 import / **45 test green**). 선례 = `_shared/checkGraphFreshness`(validator.js:408)·`load-business-rules`.
+- **신규 순수 분류 `tools/chain-driver/src/lift-anchor.js` `reconcileObserved(codePointers, gitFacts)`** (gate·I/O·git 0): relocation→관측사실 후보(auto-update) / content_drift+intent→flag. git 탐지(IO)는 cli glue 주입.
+- **`chain-driver lift --reconcile`**: anchor 노드의 strict_path pointer 만 `detectContentDrift(worktree:true)`+`findRelocation` → `reconcileObserved` → `reconcile` 보고 블록(propose-only / **그래프 mutation ❌** / exit 0). `--reconcile` 없으면 lift 동작 무변경.
+- **★ Senior 적대검토(REVISE@0.82) 전건 사실검증 후 반영** (권위≠사실정합 / `feedback_senior_fact_check_supplement`):
+  - **#2 MAJOR 확정**: `applyContentDrift`(validator.js:386)는 state flip 만·commit_hash 재기록 ❌. content_drift 재앵커="새 코드가 정답"=`lift --ceiling` 의미 판정 = 후보면 게이트 backdoor. **수정: content_drift = flag-only / relocation 만 관측사실 후보**(프리미티브보다 공격적 ❌).
+  - **#1 MAJOR 확정 + 정정**: poc-05 commit_hash(321eeb3b)가 anchor 파일(후행 커밋 추가)보다 앞서 → detectContentDrift new-file diff 로 **무조건 true**. **poc-18 도 동일**(stamp ca06a2e6 = post.service.ts 추가 cfb790ff 보다 앞선 무관 커밋 / Senior 의 "poc-18 clean" 주장은 fact-check 로 반증). **수정: committed poc 2개 = "drift→flag" 메커니즘 2-도메인 corroboration / "false-positive 0(clean)" = tmp-git fixture**(commit_hash==현재 / self-contained 실 git / 환경독립).
+  - **#3 MINOR**: `validateCodePointers --git --worktree` 가 이미 같은 git 사실 산출 → 부가가치 = **새 git 사실 ❌**, anchor-scoping(손수정 파일 주인 노드만) + 관측/의도 분류 + lift 워크플로 통합. 정직 명시.
+  - **#4 MINOR**: `reconcileObserved` 는 노드 전체 ❌ → code_pointers + gitFacts.
+- **검증(no-sim 실 git / §8.1)**: `test/lift-anchor.test.js` 32(기존 22 + reconcile 10: 순수 분류 6 + committed poc e2e 2[poc-05+poc-18 drift→flag·propose_only·그래프 byte-identical] + tmp-git clean 1[false-positive 0] + git 부재 graceful 1). chain-driver **419/419**(409+10) · code-pointer-validator **45/45**(추출 back-compat) · 3-way 0.9.0.
+- **carry(후속)**: content_drift flag → 사람 결단 UX(재앵커 vs --ceiling 분기 명령) · relocation auto-apply(--apply / 현 propose-only) · Phase 3 merge-back · Phase 4 per-item granularity. SSOT = DEC §11 + plan.
+
+## [0.8.0] — 2026-06-07 MINOR — living-sync Phase 2: `lift` 손수정 코드 anchor → 의미 천장 surface → forward 재전파 (유일 reverse 예외)
+
+forward-only 전파 정책의 **유일한 reverse 예외** — 누군가 **코드를 직접 손수정**한 경우. 신규 `chain-driver lift` 가 변경 코드파일을 주인(owner) 노드로 anchor(결정론 / code_pointers path) → 그 노드의 backward 조상을 **의미 천장 후보 메뉴**로 surface → **사람이 `--ceiling` 으로 어느 높이까지 의미가 바뀌었는지 명시**하면 그 천장부터 forward 재전파(computeSyncLoop → regen_queue). 의미 천장 판정 = **사람 only**(auto-climb ❌ = 없는 상위 의도 날조 회피 / DEC §2 예외 정책). 4원칙(plan `plan-living-sync-phase2.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.83] 전건 코드 사실검증** + D1~D6 사용자 승인).
+
+- **신규 순수 코어 `tools/chain-driver/src/lift-anchor.js`** (fs/state/LLM/시간/git 0 / trust 가드): `liftCandidates(graph, changedPaths)` → `{anchors, unresolved, ceilingCandidates[hop정렬], ceilingByAnchor}` (resolveOriginNodeIds + analyzeImpact backward 재사용) · `validateCeiling(ceilingId, anchors, ceilingByAnchor)` (ancestry guard).
+- **신규 `chain-driver lift` 명령**: `lift [<project>] --changed <codefile>... --graph <g> [--ceiling <id>] [--force] [--dry-run] [--json]`. **--ceiling 명시 시** computeSyncLoop(ceiling) → regen_queue(`source:'lift'` / route·sync-loop durable 경로·clobber·has_cycle 가드 재사용).
+- **★ Senior 적대검토(REVISE@0.83) 전건 사실검증 후 반영** (권위≠사실정합 / `feedback_senior_fact_check_supplement`):
+  - **#1 BLOCKER 확정**: IMPL=forward-leaf 실측(`forward(IMPL)=0`) → "기본 천장=IMPL"은 빈 큐 = 무의미. **수정: 명시 `--ceiling` 없으면 천장 후보 surface-only / forward seed ❌ / propose-only exit 0**.
+  - **#3 MAJOR 확정**: `forward(BHV)` closure 에 손수정 IMPL 이 재생성 대상으로 포함(자기 코드 재생성 지시). **수정: forward closure 에서 손수정 anchor 노드 제외 + `hand_edited_excluded` 별도 보고**(computeSyncLoop 순수 유지·cli 사후 필터).
+  - **#4 MAJOR 확정**: computeSyncLoop ancestry 체크 0 → 엉뚱한 천장도 통째 오-seed. **수정: `--ceiling` ∈ anchor backward 조상 allowlist 검증 / 아니면 exit 3 + 유효 후보 나열**(auto-climb ❌).
+  - **#5 MAJOR 확정**: reconcile 프리미티브(detectContentDrift/findRelocation)는 code-pointer-validator 패키지 / chain-driver cross-import 0. **수정: reconcile(observed-fact 재추출 + intent 충돌 propose) = Phase 2b 분리**(git/fs IO + cross-package 결정 필요 / no-op stub 회피 / 0.8.0 = 전파 슬라이스만).
+  - **#8 MINOR 확정**: poc-16 IMPL **0건** → lift 검증 불가. **수정: 2nd 도메인 = poc-18(Modern Express/TS / IMPL-POST-001) artifact-graph 합성**(traceability-matrix-builder).
+- **검증(no-sim 실 CLI / §8.1 ≥2 distinct 도메인)**: 신규 `test/lift-anchor.test.js` 22(코어 9 + poc-05 e2e 11[surface-only/명시천장 forward+IMPL제외/오-천장 거부/비존재 거부/refactor 빈큐/unresolved/usage/durable/clobber/결정론] + poc-18 2nd 도메인 1 + trust 2). **2 도메인 = poc-05(register / BHV→4 item·IMPL 제외) + poc-18(Express/TS / IMPL-POST-001→TC/AC/BHV/UC 천장 surface)** 실 graph. chain-driver **409/409**(387+22) · version 3-way 0.8.0.
+- **carry(후속 / DEC §5)**: Phase 2b(reconcile = observed-fact 재추출 + intent 충돌 propose / `_shared` or shell-out 결정) · Phase 3 merge-back · Phase 4 per-item granularity(BR-split STEP 3) · fixpoint 자동 재진입. SSOT = `DEC-2026-06-07-living-sync-operating-model.md` §10(Phase 2 append) + plan.
+
 ## [0.7.0] — 2026-06-07 MINOR — living-sync Phase 1b: `route` 의미 라우터 (discovery-spec 명시 매핑 → 진입 origins → regen_queue)
 
 자연어 변경요청을 그래프에 ground 해 **진입 노드**를 찾는 라우터. **의미 판정은 기존 LLM skill(`discovery-from-nl-md`)이 discovery-spec 으로 산출**하고, 신규 **결정론 도구 `chain-driver route`** 가 discovery-spec 의 명시 매핑(use_cases.id / business_rules_intent.br_id)을 entry origins 로 변환 → sync-loop forward closure → regen_queue. §3.4 경계: LLM 제안 / 도구·validator 결정론 / 사람 gate#1. 4원칙(plan `plan-living-sync-phase1b.md` + 2 Explore + **2 Senior 적대 pass**). **★ v1(token 매칭) Senior REVISE@0.78 = 의미 라우팅 불가 → v2(discovery-spec 명시 매핑) 전환** → v2 Senior REVISE@0.86 BLOCKER/MAJOR 6건 코드확인 후 정정.

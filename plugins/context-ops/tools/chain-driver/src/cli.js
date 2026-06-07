@@ -87,6 +87,16 @@ import {
 	queueStatus,
 } from './sync-loop.js';
 import { resolveDiscoveryOrigins } from './route-discovery.js';
+import {
+	liftCandidates,
+	validateCeiling,
+	reconcileObserved,
+} from './lift-anchor.js';
+import {
+	makeGitRunner,
+	detectContentDrift,
+	findRelocation,
+} from '../../_shared/code-pointer-git.js';
 // Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
@@ -120,6 +130,7 @@ function usage(code = 3) {
 		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--force] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
 			'  sync-next <project> [--findings <path>] [--user-decision <go|stop>] [--dry-run] [--json]   (living-sync Phase 1c — regen_queue 를 stage 단위로 소비 / findings 없으면 재생성 지시 surface)',
 			'  route [<project>] --discovery-spec <path> --graph <artifact-graph.json> [--analysis <business-rules.json>] [--force] [--dry-run] [--json]   (living-sync Phase 1b — discovery-spec 명시 매핑 → 진입 origins → regen_queue / net-new propose 보고)',
+			'  lift [<project>] --changed <codefile>... --graph <artifact-graph.json> [--ceiling <node-id>] [--reconcile [--base <sha>] [--repo-root <dir>]] [--force] [--dry-run] [--json]   (living-sync Phase 2 — 손수정 코드 anchor → backward 천장 후보 surface / --ceiling 명시 시 forward 재전파 → regen_queue / --reconcile = anchor 관측사실 git 신선도 propose / reverse 유일 예외)',
 			'  suggest-skill --prompt <text>',
 			'  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
 			'  migrate <project>',
@@ -159,6 +170,8 @@ function parseArgs(argv) {
 		else if (a === '--graph') out.graphPath = rest[++i];
 		else if (a === '--discovery-spec') out.discoverySpecPath = rest[++i];
 		else if (a === '--analysis') out.analysisPath = rest[++i];
+		else if (a === '--ceiling') out.ceiling = rest[++i];
+		else if (a === '--reconcile') out.reconcile = true;
 		else if (a === '--origin') {
 			out.origin = rest[++i]; // scalar (impact/navigate back-compat)
 			(out.origins ||= []).push(out.origin); // sync-loop multi-origin 누적
@@ -2157,6 +2170,230 @@ function cmdRoute(args) {
 	process.exit(0);
 }
 
+// chain-driver lift — living-sync Phase 2 (DEC §5 Phase 2 / forward-only 의 유일 reverse 예외).
+//   손수정 코드 → anchor(주인 노드) → backward 천장 후보 surface. --ceiling 명시(사람) 시 그 천장부터
+//   forward 재전파 → regen_queue (route/sync-loop 동일 durable 경로). 의미 천장 판정 = 사람(auto-climb ❌).
+//   Senior 적대검토(REVISE@0.83) 반영: ① 명시 --ceiling 없으면 forward seed ❌(propose-only / IMPL=forward-leaf 실측)
+//   ④ --ceiling 은 anchor backward 조상 allowlist ∈ 검증 ③ forward closure 에서 손수정 anchor 노드 제외(자기 코드 재생성 지시 회피).
+//   reconcile(observed-fact 재추출 + intent 충돌 propose) = Phase 2b 분리 (git/fs IO + cross-package 결정 / no-op stub 회피).
+function cmdLift(args) {
+	if (!args.graphPath) {
+		console.error('[chain-driver] lift: --graph <path> required');
+		process.exit(3);
+	}
+	if (!existsSync(args.graphPath)) {
+		console.error(`[chain-driver] lift: graph not found: ${args.graphPath}`);
+		process.exit(3);
+	}
+	const changedPaths = args.changedPaths ?? [];
+	if (changedPaths.length === 0) {
+		console.error('[chain-driver] lift: --changed <codefile>... 필수 (손수정 코드 경로)');
+		process.exit(3);
+	}
+	let graph;
+	try {
+		graph = JSON.parse(readFileSync(args.graphPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] lift: graph parse error: ${e.message}`);
+		process.exit(3);
+	}
+
+	const lift = liftCandidates(graph, changedPaths);
+	const ceiling = args.ceiling ?? null;
+
+	// --reconcile (Phase 2b / DEC §11): 손수정 코드 ↔ anchor 관측사실 신선도 git 재탐지 → propose-only 분류.
+	//   anchor 노드의 strict_path pointer 만 detectContentDrift(worktree)/findRelocation → reconcileObserved(순수 분류).
+	//   relocation=관측사실 후보 / content_drift+intent=flag (자동 덮어쓰기 ❌). 그래프 mutation ❌ (exit 0).
+	let reconcile = null;
+	if (args.reconcile) {
+		const repoRoot = args.repoRoot ? resolve(args.repoRoot) : process.cwd();
+		const gitRunner = makeGitRunner(repoRoot);
+		const nodeById = new Map((graph.nodes ?? []).map((n) => [n.id, n]));
+		const perAnchor = [];
+		for (const anchorId of lift.anchors) {
+			const node = nodeById.get(anchorId);
+			const pointers = (node?.code_pointers ?? []).filter(
+				(cp) => cp?.anchor_type === 'strict_path' && cp.path,
+			);
+			const gitFacts = pointers.map((cp) => {
+				const baseSha = cp.commit_hash ?? args.baseSha ?? null;
+				return {
+					path: cp.path,
+					content_drift: detectContentDrift(cp.path, baseSha, {
+						gitRunner,
+						includeWorktree: true, // D4 손수정=미커밋 작업트리 포함
+					}),
+					relocation: findRelocation(cp.path, { gitRunner, repoRoot }),
+				};
+			});
+			const classified = reconcileObserved(pointers, gitFacts);
+			perAnchor.push({
+				anchor: anchorId,
+				observed_candidates: classified.observed_candidates,
+				flags: classified.flags,
+			});
+		}
+		reconcile = {
+			repo_root: repoRoot,
+			propose_only: true, // 그래프 mutation ❌ / durable write = 사람
+			anchors: perAnchor,
+		};
+	}
+
+	// --ceiling 명시 시: ancestry guard(R-D3) → forward 재전파(R-D4 hand-edited 제외) → regen_queue durable.
+	let regenQueue = null;
+	let written = false;
+	let loopResult = null;
+	let excludedAnchors = [];
+	if (ceiling) {
+		if (lift.anchors.length === 0) {
+			console.error(
+				`[chain-driver] lift: --ceiling 지정됐으나 해소된 anchor 0건 (전부 unresolved: ${lift.unresolved.join(', ') || '-'}) — 코드 파일이 어느 노드 code_pointers 와도 매칭 안 됨 (coverage 상한 / 추적 밖)`,
+			);
+			process.exit(3);
+		}
+		const v = validateCeiling(ceiling, lift.anchors, lift.ceilingByAnchor);
+		if (!v.valid) {
+			console.error(
+				`[chain-driver] lift: --ceiling '${ceiling}' 는 어느 anchor 의 backward 조상도 아님 (auto-climb ❌ / 사람이 잘못 선택 차단). ` +
+					`유효 천장 후보: ${lift.ceilingCandidates.map((c) => c.id).join(', ') || '(없음 — anchor 가 forward-leaf 면 자기 자신만 가능)'}`,
+			);
+			process.exit(3);
+		}
+		try {
+			loopResult = computeSyncLoop(graph, { origins: [ceiling] });
+		} catch (e) {
+			console.error(`[chain-driver] lift: ${e.message}`);
+			process.exit(3);
+		}
+		// R-D4 / Senior #3 — 손수정 anchor 노드는 regen_queue 에서 제외 (사람이 방금 쓴 코드 재생성 지시 회피).
+		const anchorSet = new Set(lift.anchors);
+		const keptItems = loopResult.items.filter((it) => !anchorSet.has(it.id));
+		excludedAnchors = loopResult.items
+			.filter((it) => anchorSet.has(it.id))
+			.map((it) => it.id)
+			.sort();
+		regenQueue = {
+			generated_at: new Date().toISOString(),
+			origins: loopResult.origins,
+			graph_path: args.graphPath,
+			has_cycle: loopResult.has_cycle,
+			items: keptItems,
+			source: 'lift',
+			ceiling,
+			hand_edited_excluded: excludedAnchors,
+		};
+
+		// durable write = state.json regen_queue (route/sync-loop 동형 clobber 가드 / has_cycle·빈 큐 거부).
+		const root = args.project ? resolve(args.project) : null;
+		if (
+			root &&
+			!args.dryRun &&
+			!loopResult.has_cycle &&
+			keptItems.length > 0
+		) {
+			const existing = readState(root);
+			if (!existing) {
+				console.error(
+					`[chain-driver] lift: state.json 부재 (${root}) — init 먼저 / regen_queue 미기록`,
+				);
+			} else if (isQueueInProgress(existing.regen_queue) && !args.force) {
+				console.error(
+					`[chain-driver] lift: regen_queue 진행 중 — 덮어쓰기 거부. 소비 완료 후 또는 --force.`,
+				);
+				process.exit(2);
+			} else {
+				try {
+					writeStateCAS(root, (s) => {
+						s.regen_queue = regenQueue;
+						return s;
+					});
+					written = true;
+				} catch (e) {
+					console.error(`[chain-driver] lift: state write 실패: ${e.message}`);
+				}
+			}
+		}
+	}
+
+	const out = {
+		anchors: lift.anchors,
+		unresolved: lift.unresolved,
+		ceiling_candidates: lift.ceilingCandidates,
+		ceiling,
+		regen_queue: regenQueue,
+		hand_edited_excluded: excludedAnchors,
+		written,
+		...(reconcile ? { reconcile } : {}),
+		// propose-only = 천장 미지정(후보 surface 만) 또는 forward 빈 closure(refactor / reconcile-only Phase 2b).
+		propose_only: !ceiling || (regenQueue?.items?.length ?? 0) === 0,
+	};
+	if (args.json) {
+		process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+	} else {
+		process.stdout.write(
+			`[chain-driver lift] anchors=${lift.anchors.join(', ') || '-'}\n`,
+		);
+		if (lift.anchors.length === 0)
+			process.stdout.write(
+				`  (해소된 anchor 0 — code_pointers 매칭 없음 / coverage 상한 / 추적 밖)\n`,
+			);
+		process.stdout.write(
+			`  천장 후보: ${lift.ceilingCandidates.map((c) => `${c.id}[${c.grade}/+${c.additional_hard_hops}]`).join(', ') || '(없음 — anchor 가 forward-leaf)'}\n`,
+		);
+		if (!ceiling) {
+			process.stdout.write(
+				`  propose-only — 의미 천장(어느 높이까지 바뀌었나)은 사람 판정. --ceiling <후보-id> 로 명시하면 그 천장부터 forward 재전파 (auto-climb ❌).\n`,
+			);
+		} else {
+			process.stdout.write(`  ceiling=${ceiling} (사람 명시)\n`);
+			if ((regenQueue?.items?.length ?? 0) === 0)
+				process.stdout.write(
+					`  forward closure 빈 큐 — 천장=anchor(refactor) 또는 하류 노드 없음 = reconcile-only (observed-fact 재추출은 Phase 2b).\n`,
+				);
+			else
+				process.stdout.write(
+					`  regen_queue: ${regenQueue.items.length} item(s) [${regenQueue.items.map((it) => it.id).join(' → ')}] ${written ? '→ written' : '(미기록 — --dry-run / state 부재 / project 미지정)'}\n`,
+				);
+			if (excludedAnchors.length)
+				process.stdout.write(
+					`  hand-edited 제외(재생성 ❌): ${excludedAnchors.join(', ')}\n`,
+				);
+			if (loopResult?.has_cycle)
+				process.stdout.write(`  ⚠️ cycle detected — durable write 거부\n`);
+		}
+		if (lift.unresolved.length)
+			process.stdout.write(
+				`  unresolved(추적 밖): ${lift.unresolved.join(', ')}\n`,
+			);
+		if (reconcile) {
+			process.stdout.write(`  reconcile (propose-only / 그래프 mutation ❌):\n`);
+			let any = false;
+			for (const a of reconcile.anchors) {
+				for (const oc of a.observed_candidates) {
+					any = true;
+					process.stdout.write(
+						`    [관측사실 후보] ${a.anchor} ${oc.path} → ${oc.kind}: '${oc.suggested}' (suggested_path)\n`,
+					);
+				}
+				for (const fl of a.flags) {
+					any = true;
+					const detail =
+						fl.kind === 'content_drift'
+							? 'content_drift — 사람 결단(재앵커 vs --ceiling)'
+							: `intent_review — 사람의도 필드 ${(fl.fields ?? []).join('/')} (자동 ❌)`;
+					process.stdout.write(`    [flag] ${a.anchor} ${fl.path}: ${detail}\n`);
+				}
+			}
+			if (!any)
+				process.stdout.write(
+					`    (후보·flag 0 — anchor 관측사실 신선 / 또는 git 부재·commit_hash 부재로 판정불가 carry)\n`,
+				);
+		}
+	}
+	process.exit(0);
+}
+
 // chain-driver resync-graph — Loop A / A-lazy-cmd (DEC-2026-06-03-living-graph-a1-surface 후속 / 의도② lazy 재계산).
 //   B-minimal STALE 배너의 nudge → 한 명령 재합성 action (8-flag traceability-matrix-builder → resync-graph).
 //   convention 입력-탐색(.aimd/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
@@ -2318,6 +2555,8 @@ function main() {
 			return cmdSyncNext(args);
 		case 'route':
 			return cmdRoute(args);
+		case 'lift':
+			return cmdLift(args);
 		case 'suggest-skill':
 			return cmdSuggestSkill(args);
 		case 'hooks-bridge':

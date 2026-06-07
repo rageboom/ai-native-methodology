@@ -99,3 +99,35 @@
 - **신규 `chain-driver route` 명령**(cli.js): existing origins → computeSyncLoop → regen_queue seed(durable 경로 재사용). cmdNext·sync-loop·sync-next 무변경.
 - **검증(§8.1 ≥2 도메인)**: `test/route-discovery.test.js` 13(코어6+poc-05 e2e5+trust2). **poc-05(UC+BR→13 item) + poc-16(Spring 4.1 legacy / 10 UC+12 BR→31 item / net_new 0)**. chain-driver **387/387** · RR **40/40** · 3-way 0.7.0.
 - **carry**: per-BR granularity(Phase 4) · UC parent-prefix 매칭 · fixpoint 자동 재진입. 다음 = Phase 2(손수정 코드 lift+reconcile / 사용자 결단).
+
+## 10. Phase 2 시행 로그 (v0.8.0 / 2026-06-07 — 손수정 코드 lift / 유일 reverse 예외)
+
+**Phase 2 = `chain-driver lift`** — forward-only 정책의 **유일한 reverse 예외**: 누군가 코드를 직접 손수정한 경우. 변경 코드파일 → 주인(owner) 노드 anchor(결정론 / code_pointers path) → backward 조상 = **의미 천장 후보 메뉴** surface → 사람이 `--ceiling` 으로 어느 높이까지 의미가 바뀌었는지 명시 → 그 천장부터 forward 재전파(computeSyncLoop → regen_queue). **의미 천장 판정 = 사람 only**(auto-climb ❌ = 없는 상위 의도 날조 회피 / §2 예외 정책). §5 로드맵 Phase 2 이행. 4원칙 — plan(`plan-living-sync-phase2.md`) 1원칙 + **Senior 적대 step-0 pass[REVISE@0.83] 전건 코드 사실검증** + D1~D6 사용자 승인(reconcile 분리 + poc-18 2nd 도메인).
+
+**★ Senior 적대검토(REVISE@0.83) 전건 사실검증 후 반영** (권위≠사실정합 — 5건 모두 코드 재현 확인):
+- **#1 BLOCKER 확정**: IMPL=forward-leaf 실측(`forward(IMPL)=0` / computeSyncLoop origins=[IMPL] = 자기 자신만) → plan 초안 "기본 천장=IMPL(보수적 refactor)"은 빈 큐 = 무의미. **수정(R-D2): 명시 `--ceiling` 없으면 천장 후보 surface-only / forward seed ❌ / propose-only exit 0**. 천장 메뉴가 정직한 기본 동작.
+- **#3 MAJOR 확정**: `forward(BHV)` closure = `[BHV*, AC, TASK, TC, IMPL]` — 손수정 IMPL 이 재생성 대상으로 포함(사람이 방금 쓴 코드 재생성 지시 = clobber 위험). **수정(R-D4): forward closure 에서 손수정 anchor 노드 제외 + `hand_edited_excluded` 별도 보고**(computeSyncLoop 순수 유지 / cli 사후 필터 — computeSyncLoop 은 origin=천장만 제외하지 손수정 leaf 개념 없음).
+- **#4 MAJOR 확정**: computeSyncLoop ancestry 체크 0 → `origins=[엉뚱한 형제 UC]` 도 통째 오-seed. **수정(R-D3): `validateCeiling` — `--ceiling` ∈ anchor backward 조상 allowlist / 아니면 exit 3 + 유효 후보 나열**(auto-climb 금지의 실효적 가드).
+- **#5 MAJOR 확정**: reconcile 프리미티브(detectContentDrift/findRelocation/transition)는 code-pointer-validator·traceability-matrix-builder 패키지 / chain-driver deps=ajv만·cross-import 0(컨벤션 = shell-out 위임). **수정(R-D5): reconcile(observed-fact 재추출 + intent 충돌 propose) = Phase 2b 분리** — git/fs IO + cross-package 결정(`_shared` vs 위임) 필요 / no-op report stub(Senior #2) 회피. 0.8.0 = lift 전파 슬라이스만(헤드라인 reverse-exception 가치 완전 전달).
+- **#8 MINOR 확정**: poc-16 IMPL **0건**(legacy Spring4.1 = analysis-heavy / IMPL 미생성) → lift 검증 불가. **수정(R-D8): 2nd 도메인 = poc-18(Modern Express/TS) artifact-graph 합성**(traceability-matrix-builder / IMPL-POST-001 = source_files+commit_hash).
+
+- **신규 순수 코어 `tools/chain-driver/src/lift-anchor.js`**(fs/state/LLM/시간/git 0 / trust 가드): `liftCandidates(graph, changedPaths)` → `{anchors, unresolved, ceilingCandidates[hop정렬], ceilingByAnchor}`(resolveOriginNodeIds + analyzeImpact backward 재사용) · `validateCeiling(ceilingId, anchors, ceilingByAnchor)`.
+- **신규 `chain-driver lift` 명령**(cli.js): `lift [<project>] --changed <codefile>... --graph <g> [--ceiling <id>] [--force] [--dry-run] [--json]`. --ceiling 명시 시 computeSyncLoop → regen_queue(`source:'lift'`,`ceiling`,`hand_edited_excluded` / route·sync-loop durable·clobber·has_cycle 가드 재사용). cmdNext·sync-loop·sync-next·route 무변경.
+- **검증(§8.1 ≥2 도메인 / no-sim 실 CLI)**: `test/lift-anchor.test.js` 22(코어9 + poc-05 e2e11 + poc-18 2nd 도메인1 + trust2). **poc-05(register / BHV→4 item·IMPL 제외) + poc-18(Express/TS / IMPL-POST-001→TC/AC/BHV/UC 천장 surface)** 실 graph. chain-driver **409/409**(387+22) · RR **39/40**(workspace_test_pass = 문서화 env artifact / 사내 CI 40/40 · 직접 실행 chain-driver 409+tmb 152+cpv 45 전부 green) · 3-way 0.8.0.
+- **carry**: Phase 2b(reconcile = observed-fact 재추출 + intent 충돌 propose / `_shared` or shell-out 결정) · Phase 3 merge-back · Phase 4 per-item granularity(BR-split STEP 3) · fixpoint 자동 재진입. 다음 = 사용자 결단.
+
+## 11. Phase 2b 시행 로그 (v0.9.0 / 2026-06-07 — reconcile = anchor 관측사실 신선도)
+
+**Phase 2b = `chain-driver lift --reconcile`** — Phase 2 lift 의 **reconcile 절반**(전파 절반=anchor→천장→forward 는 §10). 손수정된 코드가 anchor 노드의 **관측사실**(code_pointer path/commit_hash)과 아직 맞는지 git 으로 재탐지 → 어긋나면 **propose**(자동 덮어쓰기 절대 ❌ / 그래프 mutation ❌). §10 Senior #5 가 분리해 둔 슬라이스(cross-package = git IO + `_shared` 결정). 4원칙 — plan(`plan-living-sync-phase2b.md`) 1원칙 + **Senior 적대 step-0 pass[REVISE@0.82] 전건 코드 사실검증** + 사용자 승인(코드 착수 / lift 스토리 완성).
+
+**★ Senior 적대검토(REVISE@0.82) 전건 사실검증 후 반영** (권위≠사실정합):
+- **#2 MAJOR 확정 (핵심)**: `applyContentDrift`(validator.js:386)는 state active→drift flip 만·**commit_hash 재기록 절대 ❌**. content_drift 재앵커="새 코드가 정답" = `lift --ceiling` 이 사람에게 명시 요구하는 의미 판정 → 후보로 두면 게이트 backdoor. **수정: content_drift = flag-only / relocation(경로 이동·내용 동일)만 관측사실 후보**(프리미티브보다 공격적이면 안 됨).
+- **#1 MAJOR 확정 + Senior corollary 반증**: poc-05 commit_hash(321eeb3b)가 user.service.ts(후행 커밋 2fc39e9f 추가)보다 앞서 → detectContentDrift new-file diff 로 **무조건 true**. **poc-18 도 동일**(stamp ca06a2e6 = post.service.ts 추가 cfb790ff 보다 앞선 무관 docs 커밋 / **Senior 의 "poc-18 base ca06a2e6 clean" 주장을 fact-check 로 반증** — git diff --stat 66 insertions). **수정: committed poc 2개 = "drift→flag" 메커니즘 2-도메인 corroboration / "false-positive 0(clean)" = tmp-git fixture**(commit_hash==현재 / self-contained 실 git / 환경독립).
+- **#3 MINOR**: `validateCodePointers --git --worktree` 가 이미 content_drift/relocation git 사실 산출 → 부가가치 = **새 git 사실 ❌**, anchor-scoping(손수정 `--changed` 파일 주인 노드만 / 전체 graph ❌) + 관측/의도 분류 + lift 워크플로 통합. 정직 명시.
+- **#4 MINOR**: `reconcileObserved` = 노드 전체 ❌ → code_pointers + gitFacts. **#6 GO**: D1 `_shared` 추출 = checkGraphFreshness 선례로 저위험(45 test 안전 확정).
+
+- **신규 공용 `tools/_shared/code-pointer-git.js`**: makeGitRunner·detectContentDrift·findRelocation 추출(DRY / cross-tool). code-pointer-validator = re-export(내부 validateOnePointer 도 로컬 import / **45 test green**).
+- **신규 순수 `lift-anchor.js reconcileObserved(codePointers, gitFacts)`**(gate·I/O·git 0): relocation→`observed_candidates` / content_drift+intent→`flags`.
+- **`lift --reconcile [--base <sha>] [--repo-root <dir>]`**(cli.js): anchor strict_path pointer → detectContentDrift(worktree:true)+findRelocation → reconcileObserved → `reconcile` 보고(propose-only / exit 0). `--reconcile` 없으면 lift 무변경.
+- **검증(no-sim 실 git / §8.1)**: `test/lift-anchor.test.js` 32(기존 22 + reconcile 10: 순수 분류 6 + committed poc e2e 2[poc-05+poc-18 drift→flag·propose_only·그래프 byte-identical = 2-도메인 메커니즘] + tmp-git clean 1[false-positive 0 / commit_hash==현재] + git 부재 graceful 1). chain-driver **419/419**(409+10) · code-pointer-validator **45/45**(추출 back-compat) · RR 39/40(workspace_test_pass=env artifact) · 3-way 0.9.0.
+- **carry**: content_drift flag → 사람 결단 UX(재앵커 vs --ceiling 분기 명령) · relocation auto-apply(--apply / 현 propose-only) · Phase 3 merge-back · Phase 4 per-item granularity. 다음 = 사용자 결단.

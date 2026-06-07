@@ -17,7 +17,12 @@
 
 import { existsSync, readdirSync } from 'node:fs';
 import { join, dirname, basename, isAbsolute, resolve } from 'node:path';
-import { execFileSync } from 'node:child_process';
+// v0.9.0 — git 프리미티브 _shared 추출 (DRY / chain-driver lift --reconcile 공유). 내부 호출(validateOnePointer)용 로컬 import + 하단 re-export.
+import {
+	makeGitRunner,
+	findRelocation,
+	detectContentDrift,
+} from '../../_shared/code-pointer-git.js';
 
 const TRAVERSABLE_STATES = new Set(['active', 'drift']);
 const VALID_ANCHOR_TYPES = new Set([
@@ -55,77 +60,14 @@ function simpleGlobMatch(repoRoot, p) {
 //   A3 relocation → suggested_path / A2 content-drift → drift 생산자.
 //   전부 opt-in (opts.gitRunner 주입 시에만 동작) → 기존 호출부 behavior 무변경 (release-readiness #16 포함).
 //   git 부재·repo 아님·추적 불가 = graceful null (no-simulation: 날조 ❌ / 환경 부재 정직 skip).
+//
+//   v0.9.0 (living-sync Phase 2b) — makeGitRunner/findRelocation/detectContentDrift 를 `_shared/code-pointer-git.js`
+//     로 추출(DRY 단일 출처 / chain-driver lift --reconcile 와 cross-tool 공유 / 선례 checkGraphFreshness L408).
+//     export 표면 무변경 — 본 모듈 import 처(cli.js / test)는 re-export 로 그대로 동작. 내부 호출부(validateOnePointer)도 동일.
 // ============================================================================
 
-// 실 git 호출 래퍼 (cross-platform — git 은 native exe). 실패 시 throw → 호출부가 catch.
-export function makeGitRunner(repoRoot = process.cwd()) {
-	return (args) =>
-		execFileSync('git', args, {
-			cwd: repoRoot,
-			encoding: 'utf-8',
-			stdio: ['ignore', 'pipe', 'ignore'],
-			timeout: 5000,
-			windowsHide: true,
-		});
-}
-
-// A3 — path 가 사라졌을 때 git rename 이력에서 새 경로 추정 (blob-hash + 유사도).
-//   gitRunner(args)->stdout. 추적 불가/실패/새 경로 부재 = null (제안 없음).
-export function findRelocation(
-	path,
-	{ gitRunner, repoRoot = process.cwd() } = {},
-) {
-	if (typeof gitRunner !== 'function') return null;
-	let out;
-	try {
-		out = gitRunner([
-			'log',
-			'-M',
-			'--diff-filter=R',
-			'--name-status',
-			'--format=',
-			'--',
-			path,
-		]);
-	} catch {
-		return null; // git 부재 / repo 아님 / 추적 불가
-	}
-	if (!out) return null;
-	for (const line of out.split('\n')) {
-		const m = line.match(/^R\d*\t(.+?)\t(.+)$/); // R<score>\told\tnew (log 최신순 → 첫 매치 = 최근 이동)
-		if (m && m[1] === path) {
-			const candidate = m[2].trim();
-			const full = isAbsolute(candidate)
-				? candidate
-				: join(repoRoot, candidate);
-			return existsSync(full) ? candidate : null; // 현재 실제 존재할 때만 제안
-		}
-	}
-	return null;
-}
-
-// A2 — commit_hash 시점 대비 내용 변경 여부. 변경=true / 무변경=false / 판정불가=null.
-//   includeWorktree=false (기본) → base→HEAD (커밋된 변경만 / 기존 behavior byte-identical).
-//   includeWorktree=true  → base→작업트리 ('HEAD' 인자 제거) = 커밋된 변경 + 미커밋(staged/unstaged) 포함 superset.
-//     근거: git-diff(1) Form 4 "changes you have in your working tree relative to the named <commit>" (VERIFIED / 공식문서).
-//     untracked(신규·미add) 파일은 git diff 가 미포함 → 본 기능은 "이미 앵커된(추적되는) 파일"만 보므로 무관.
-export function detectContentDrift(
-	path,
-	commitHash,
-	{ gitRunner, includeWorktree = false } = {},
-) {
-	if (typeof gitRunner !== 'function' || !commitHash) return null;
-	let out;
-	try {
-		const args = includeWorktree
-			? ['diff', '--name-only', commitHash, '--', path] // base→작업트리 (미커밋 포함)
-			: ['diff', '--name-only', commitHash, 'HEAD', '--', path]; // base→HEAD (커밋된 것만)
-		out = gitRunner(args);
-	} catch {
-		return null; // commit 무효 / git 부재
-	}
-	return out.trim().length > 0;
-}
+// re-export — 기존 import 처(cli.js / test) API 표면 무변경.
+export { makeGitRunner, findRelocation, detectContentDrift };
 
 function validateOnePointer(pointer, { repoRoot, opts = {} }) {
 	const findings = [];
