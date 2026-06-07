@@ -63,3 +63,14 @@
 - **R1 fixpoint 종료(lateral cycle)**: revalidated 후에만 재발화 + iteration cap + non-converging finding. Phase 5 전 소형 증명.
 - **R2 의도 보존(역동기화)**: 관측사실/사람의도 분리 = S2 정확성 핵심. reconcile 보수적(의도 propose-only) / ≥2 도메인 전까지 finding·propose only.
 - **R3 §8.1 과적합**: 모든 phase 격상 = ≥2 distinct 도메인(RealWorld + ecommerce) 실 dogfood.
+
+## 7. Phase 1 시행 로그 (v0.5.0 / 2026-06-07)
+
+**Phase 1 MVP = `sync-loop` forward 전파 → regen_queue worklist** (결정론 only / 재생성·NL라우터·역동기화·merge-back·per-item = deferred). 본 §은 §5 로드맵 Phase 1 의 구현 로그(별도 release DEC 미생성 — 로드맵 owner 에 append / codegraph-wiring §9 패턴 동형).
+
+- **신규 `tools/chain-driver/src/sync-loop.js`**(순수 코어): `computeSyncLoop`/`resolveOriginNodeIds`/`SUBKIND_TO_STAGE`/`markTransientDrift`. **forward-only**: `analyzeImpact(..., {includeForward:true, includeBackward:false})` (impact-analyzer.js:198-199 기본 양방향 override — 코드 사실확인). drift=파생 → durable=state.json `regen_queue` 단일 필드(§D1 정합) / 그래프 영속 ❌(--mark display-only).
+- **`chain-driver sync-loop` 명령**(cli.js): cmdSyncLoop + dispatch + parseArgs(`--origin` 누적/`--changed`/`--mark`) + usage + cmdState 표시. cmdImpact 의 analyzeImpact+topo+cascade 재사용. has_cycle 시 durable write 거부.
+- **origin 해소**: source_path 매치(산출물) / code_pointers 매치(코드파일). coarse per-file = SOUND(over-include만 / per-item=Phase 4).
+- **검증**: `test/sync-loop.test.js` 15(단위+poc-05 e2e+trust 가드). **forward-only 입증**: poc-05 BHV-USER-001 → closure=[AC,IMPL,TASK,TC]-USER-001 / UC·USER-002 부재. chain-driver 358/358 · release-readiness 40/40 · version 3-way 0.5.0. **trust**: 코어 gate토큰·I/O·비결정 0 + gate-eval/cmdNext 가 regen_queue·sync-loop 미참조(reference-lens).
+- **정정**: 청사진 §6/§8 D2 "policy-evaluator.js 미확인" → **실재 확인**(cli.js:74 import / 과대인용 아니었음).
+- **carry(deferred)**: Phase 1b NL discovery 라우터 · Phase 2 lift+reconcile · Phase 3 merge-back · Phase 4 per-item · `next`-consumes-worklist+pending_revisit 활성화 · hook auto-fire. 다음 = Phase 2 또는 1b(사용자 결단).

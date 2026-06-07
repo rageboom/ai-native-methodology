@@ -71,7 +71,9 @@
 
 ## 7. 현 구현 상태 (정직 표기)
 
-본 운영 모델은 **목표 패러다임 + 단계화 구현** 이다. 전파 커널(impact 분석 BFS · 위상 정렬 · 4-state transition · code↔artifact drift 감지)은 이미 존재한다. 그 위의 last-mile 배선(변경 진입 orchestrator / 중간 stage 재진입 실행 / 재생성 루프 / merge-back)은 단계적으로 채운다 — 단계·진입점·검증 기준은 ## 인용의 결단 문서가 SSOT 다. 각 단계는 ≥2 distinct 도메인 실 dogfood 후에만 격상한다(단일 PoC 과적합 회피). 미구현 단계를 "동작한다"로 표기하지 않는다.
+본 운영 모델은 **목표 패러다임 + 단계화 구현** 이다. 전파 커널(impact 분석 BFS · 위상 정렬 · 4-state transition · code↔artifact drift 감지)은 이미 존재한다. 그 위의 last-mile 배선은 단계적으로 채운다 — 단계·진입점·검증 기준은 ## 인용의 결단 문서가 SSOT 다. 각 단계는 ≥2 distinct 도메인 실 dogfood 후에만 격상한다(단일 PoC 과적합 회피). 미구현 단계를 "동작한다"로 표기하지 않는다.
+
+**현재 시행분**: 변경 origin → **forward 단방향** 영향 closure → 순서화된 재생성 worklist 산출 + 결과를 운영 상태에 durable 기록하는 결정론 루프(`sync-loop`)가 동작한다(forward-only 실 입증). **미배선(후속)**: 자연어 변경 요청의 discovery 라우터 · 손수정 코드 lift + reconcile · scope merge-back · per-item granularity · worklist 소비 자동 재진입 · 변경 자동 감지(현재 수동 트리거). 자세한 단계·시행 로그는 ## 인용의 결단 문서.
 
 ## 인용
 

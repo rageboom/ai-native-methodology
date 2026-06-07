@@ -10,6 +10,16 @@
 
 ---
 
+## [0.5.0] — 2026-06-07 MINOR — living-sync Phase 1 MVP: `sync-loop` forward 전파 → regen_queue worklist
+
+living-sync 운영 모델(v0.4.0 후 청사진 정착)의 **Phase 1 MVP** — 변경된 산출물에서 그래프를 따라 **forward 단방향** 영향 closure 를 계산해 순서화된 재생성 worklist 를 산출하는 첫 결정론 루프. 재생성(LLM)·NL discovery 라우터·역동기화·merge-back·per-item granularity 는 명시적 deferred(후속 phase). 4원칙(plan `fancy-nibbling-wolf.md` §11 + 2 Explore 코드 사실확인 + 1 Plan-agent 설계).
+
+- **신규 `tools/chain-driver/src/sync-loop.js`** (순수 코어 / fs·state·LLM·시간 의존 0): `computeSyncLoop(graph,{origins,changedPaths})` → `{origins, unresolved, closure:{MUST,SHOULD,FYI}, has_cycle, items}` · `resolveOriginNodeIds`(파일→노드: source_path 매치 / 코드파일=code_pointers 매치) · `SUBKIND_TO_STAGE` · `markTransientDrift`(--mark 전용 in-memory). **forward-only 강제**: `analyzeImpact(... includeBackward:false ...)` (기본 양방향 override — 정책 §2.0).
+- **신규 `chain-driver sync-loop` 명령**: `sync-loop <project> --graph <g> (--origin <id>... | --changed <path>...) [--mark] [--dry-run] [--json]` → forward closure + **regen_queue worklist 를 state.json 에 durable 기록**(결정론 / 비-gating). cmdImpact 의 analyzeImpact+topologicalOrder+cascadeOrder 재사용. `has_cycle` 시 durable write 거부(graph-integrity #15 동형). **drift 는 파생값 → 그래프 영속 ❌**(--mark = display-only / 기본 off). cmdState 에 `regen_queue` 표시줄.
+- **결정론 경계(no-simulation)**: "어느 노드 영향받나" = 그래프 reachability(LLM ❌) / 재생성(내용)은 코어 밖. regen_queue 는 어떤 gate 도 읽지 않음(reference-lens / trust 가드).
+- **검증(no-sim 실 CLI)**: 신규 `test/sync-loop.test.js` 15(단위 + poc-05 실 fixture e2e + trust 가드). poc-05 `--origin BHV-USER-001` → closure MUST=`[AC,IMPL,TASK,TC]-USER-001` / **UC(상류)·USER-002(분리체인) 부재 = forward-only 입증** / items cascade 순 / durable==stdout / 그래프 byte-identical / 결정론 / coarse `--changed`=BHV-001+002 union. chain-driver **358/358**(343+15) · release-readiness **40/40 무회귀** · version 3-way 0.5.0.
+- **carry(후속 phase / DEC §5)**: Phase 1b NL discovery 라우터 · Phase 2 손수정 코드 lift+reconcile · Phase 3 merge-back · Phase 4 per-item granularity(BR-split STEP 3) · `next`-consumes-worklist + pending_revisit 활성화 · hook auto-fire. SSOT = `DEC-2026-06-07-living-sync-operating-model.md` §7(Phase 1 시행 로그) + plan §11.
+
 ## [0.4.0] — 2026-06-07 MINOR — business-rules 로딩 `_shared` 중앙화 + discovery-extraction silent mis-fire fix (BR-split 순차안 STEP 2)
 
 BR-split 순차안 STEP 2 — business-rules 로딩(파일위치 resolve + shape 추출)을 신규 `tools/_shared/load-business-rules.js` 로 중앙화. 목적: ① discovery-extraction-validator silent mis-fire(blocker #1) 즉시 수정, ② STEP 3(포맷 분할 = index + per-BC)을 **single-point 변경**으로 de-risk. **포맷·schema·산출물 무변경.** 3-Explore 실측 + Senior 적대검토(REVISE@0.82 / 결함 5건 코드확인 후 수정)로 naive 설계 정정.

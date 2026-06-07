@@ -78,6 +78,8 @@ import {
 } from './policy-evaluator.js';
 import { topologicalOrder, cascadeOrder } from './propagation-orderer.js';
 import { topKImpactRoot } from './centrality.js';
+// living-sync 전파 루프 (Phase 1 MVP / DEC-2026-06-07-living-sync-operating-model) — 순수 코어.
+import { computeSyncLoop, markTransientDrift } from './sync-loop.js';
 // Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
@@ -108,6 +110,7 @@ function usage(code = 3) {
 			'  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (F3 stage/scope 일괄 의존성 rollup)',
 			'  trace-view --graph <artifact-graph.json> [--scope <id>] [--no-matrix] [--json]   (사람 gate-검토용 추적성 맵 + coverage 매트릭스 / stdout)',
 			'  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
+		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
 			'  suggest-skill --prompt <text>',
 			'  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
 			'  migrate <project>',
@@ -145,7 +148,12 @@ function parseArgs(argv) {
 		else if (a === '--stale') out.stale = true;
 		// dep-graph P3 impact 명령
 		else if (a === '--graph') out.graphPath = rest[++i];
-		else if (a === '--origin') out.origin = rest[++i];
+		else if (a === '--origin') {
+			out.origin = rest[++i]; // scalar (impact/navigate back-compat)
+			(out.origins ||= []).push(out.origin); // sync-loop multi-origin 누적
+		} else if (a === '--changed') (out.changedPaths ||= []).push(rest[++i]);
+		else if (a === '--mark') out.mark = true;
+		else if (a === '--no-mark') out.mark = false;
 		else if (a === '--change-kind') out.changeKind = rest[++i];
 		else if (a === '--policy') out.policyPath = rest[++i];
 		else if (a === '--out-jsonl') out.outJsonl = rest[++i];
@@ -240,6 +248,7 @@ function cmdState(args) {
 			`blocked        : ${state.blocked} (${state.block_reason || '-'})`,
 			`last_gate      : ${state.last_gate ? `${state.last_gate.id} ${state.last_gate.decision}` : '-'}`,
 			`pending_revisit: ${state.pending_revisit ? state.pending_revisit.target_stage : '-'}`,
+			`regen_queue    : ${state.regen_queue ? `${state.regen_queue.items?.length ?? 0} item(s) pending` : '-'}`,
 		];
 		process.stdout.write(lines.join('\n') + '\n');
 	}
@@ -1658,6 +1667,131 @@ function cmdImpact(args) {
 	process.exit(0);
 }
 
+// chain-driver sync-loop — living-sync Phase 1 MVP (DEC-2026-06-07-living-sync-operating-model §5 Phase 1).
+//   변경된 origin(--origin id... 또는 --changed path...) → forward 단방향 영향 closure → 순서화된 재생성
+//   worklist 를 state.json `regen_queue` 에 durable 기록(결정론 / 비-gating). 재생성(LLM)·NL 라우터·역동기화 = 후속 phase.
+//   drift 는 파생값 → 그래프 영속 ❌ (--mark = in-memory display-only escape hatch). has_cycle 시 durable write 거부.
+function cmdSyncLoop(args) {
+	if (!args.graphPath) {
+		console.error('[chain-driver] sync-loop: --graph <path> required');
+		process.exit(3);
+	}
+	if (!existsSync(args.graphPath)) {
+		console.error(`[chain-driver] sync-loop: graph not found: ${args.graphPath}`);
+		process.exit(3);
+	}
+	const origins = args.origins ?? (args.origin ? [args.origin] : []);
+	const changedPaths = args.changedPaths ?? [];
+	if (origins.length === 0 && changedPaths.length === 0) {
+		console.error(
+			'[chain-driver] sync-loop: --origin <id>... 또는 --changed <path>... 중 하나 필수',
+		);
+		process.exit(3);
+	}
+	let graph;
+	try {
+		graph = JSON.parse(readFileSync(args.graphPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] sync-loop: graph parse error: ${e.message}`);
+		process.exit(3);
+	}
+
+	let result;
+	try {
+		result = computeSyncLoop(graph, { origins, changedPaths });
+	} catch (e) {
+		console.error(`[chain-driver] sync-loop: ${e.message}`);
+		process.exit(3);
+	}
+
+	if (result.origins.length === 0) {
+		console.error(
+			`[chain-driver] sync-loop: 해소된 origin 0건 (unresolved: ${result.unresolved.join(', ') || '-'})`,
+		);
+		process.exit(3);
+	}
+
+	// --mark (기본 off): in-memory display-only — origin+closure 노드를 drift 로 표시(영속 ❌).
+	let marked = null;
+	if (args.mark) {
+		const ids = [
+			...result.origins,
+			...result.closure.MUST,
+			...result.closure.SHOULD,
+			...result.closure.FYI,
+		];
+		marked = markTransientDrift(graph, ids).applied;
+	}
+
+	const regenQueue = {
+		generated_at: new Date().toISOString(),
+		origins: result.origins,
+		graph_path: args.graphPath,
+		has_cycle: result.has_cycle,
+		items: result.items,
+	};
+
+	// durable write = state.json regen_queue (drift 자체는 비영속 / §2.3). has_cycle 시 거부.
+	let written = false;
+	const root = args.project ? resolve(args.project) : null;
+	if (root && !args.dryRun && !result.has_cycle) {
+		if (!readState(root)) {
+			console.error(
+				`[chain-driver] sync-loop: state.json 부재 (${root}) — init 먼저 / regen_queue 미기록`,
+			);
+		} else {
+			try {
+				writeStateCAS(root, (s) => {
+					s.regen_queue = regenQueue;
+					return s;
+				});
+				written = true;
+			} catch (e) {
+				console.error(`[chain-driver] sync-loop: state write 실패: ${e.message}`);
+			}
+		}
+	}
+
+	const out = {
+		origins: result.origins,
+		unresolved: result.unresolved,
+		closure: result.closure,
+		has_cycle: result.has_cycle,
+		regen_queue: regenQueue,
+		written,
+		...(marked !== null ? { marked_drift: marked } : {}),
+	};
+
+	if (args.json) {
+		process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+	} else {
+		process.stdout.write(
+			`[chain-driver sync-loop] origins=${result.origins.join(', ')}\n`,
+		);
+		process.stdout.write(`  MUST: ${result.closure.MUST.join(', ') || '-'}\n`);
+		process.stdout.write(
+			`  SHOULD: ${result.closure.SHOULD.join(', ') || '-'}\n`,
+		);
+		process.stdout.write(`  FYI: ${result.closure.FYI.join(', ') || '-'}\n`);
+		process.stdout.write(
+			`  regen_queue: ${result.items.length} item(s) [${result.items.map((it) => it.id).join(' → ')}]\n`,
+		);
+		if (result.has_cycle)
+			process.stdout.write(
+				`  ⚠️ cycle detected — regen_queue durable write 거부 (graph-integrity #15 동형)\n`,
+			);
+		else
+			process.stdout.write(
+				`  ${written ? 'written → .aimd/state.json regen_queue' : '(미기록 — --dry-run / state 부재 / project 미지정)'}\n`,
+			);
+		if (result.unresolved.length)
+			process.stdout.write(
+				`  unresolved: ${result.unresolved.join(', ')}\n`,
+			);
+	}
+	process.exit(0);
+}
+
 // chain-driver resync-graph — Loop A / A-lazy-cmd (DEC-2026-06-03-living-graph-a1-surface 후속 / 의도② lazy 재계산).
 //   B-minimal STALE 배너의 nudge → 한 명령 재합성 action (8-flag traceability-matrix-builder → resync-graph).
 //   convention 입력-탐색(.aimd/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
@@ -1813,6 +1947,8 @@ function main() {
 			return cmdTraceView(args);
 		case 'resync-graph':
 			return cmdResyncGraph(args);
+		case 'sync-loop':
+			return cmdSyncLoop(args);
 		case 'suggest-skill':
 			return cmdSuggestSkill(args);
 		case 'hooks-bridge':
