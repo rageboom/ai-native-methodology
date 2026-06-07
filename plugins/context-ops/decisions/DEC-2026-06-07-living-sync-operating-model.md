@@ -52,7 +52,7 @@
 | **0** | 청사진 정착 (본 DEC + living-sync-operating-model.md) | — (본 결단) |
 | **1** | MVP 루프 (S2 / 1 scope / forward) — INTAKE(파일변경 + discovery 라우터) → pending_revisit jump 활성화 → sync-loop orchestrator(analyzeImpact+topo+cascade) → drift 마킹 → resync → gate | 실 fixture BHV 편집 영향분만 갱신 + NL "BR 변경" discovery 상향 라우팅 입증 |
 | **2** | 예외(손수정 코드) lift + reconcile (anchor → 의미천장 → forward) | 실 코드 편집 → 천장 lift → 의도충돌 propose 입증 |
-| **3** | Merge-back + cross-scope (subsetAnalysisRefs 활성화 + item 병합 + markDrift) | scope delta → canonical 병합 + 타 scope drift 표지 |
+| **3** | ~~Merge-back~~ + cross-scope (✅ 3a markDrift 활성화 v0.11.0 / **merge-back = v0.3.0+3a 로 obviated** — §14 dogfood / subset-precision = §14 측정 trigger) | scope delta → canonical 병합 + 타 scope drift 표지 ⟨**reframe §14**: merge-back 병합단계 부재[scope-local 사본 없음→canonical 직접 편집+markDrift] / 잔여 = subset-precision⟩ |
 | **4** | 정밀도 granularity (per-item 노드 / business-rules per-BC/BR = STEP 3) | SHOULD-noise 실측 trigger |
 | **5** | lateral 엣지 + fixpoint 하드닝 + (≥2 도메인 후) drift/conflict gate 격상 | 수렴 증명 + ≥2 distinct 도메인 corroboration |
 
@@ -163,3 +163,19 @@
 - **`chain-driver sync` 활성화**(cli.js cmdSync): no-scope = 빈 sources scope first-touch 자동 baseline → markDrift summary(`auto_registered` 포함) / `--scope --register` = 명시 re-baseline / `--scope` = cascade(기존).
 - **검증(no-sim 실 fs / §8.1)**: `test/sync.test.js` +5(registerCanonicalSources 4[실명 BLOCKER 가드·hash·idempotent·detectDrift 연동·throws] + cross-scope e2e 1[2-scope 동일 canonical→변경 시 양 scope drift→cascade 1개→나머지만]). chain-driver **431/431**(426+5) · 3-way 0.11.0 · RR 39/40(env artifact).
 - **carry**: subset-hash 정밀화 · 자동등록 lifecycle 배선(canonical 소비 시점 / DEC §81) · **merge-back(scope→canonical = Phase 3 본체)** · 실 multi-scope dogfood. 다음 = 사용자 결단.
+
+## 14. 실 multi-scope dogfood + Phase 3 reframe (2026-06-07 — grounding / 본체 코드 무변경)
+
+**목적**: Phase 3 라인(merge-back/cross-scope)의 누락된 grounding — multi-scope 가 현실에서 한 번도 검증된 적 없음(전 PoC single `core` scope / 3a 도 합성 fixture). merge-back 본체/subset-precision 을 검증 안 된 전제 위에 빌드하기 전, 실 데이터로 전제 검증(`feedback_paradigm_stable_point_cadence` "실 trigger 우선" + two-loops "만들어도 못 쓰면").
+
+**setup (no-sim 실 CLI)**: poc-18(2 BC=BC-POST+BC-USER) canonical 6파일을 tmp project 로 복사 → 2 scope(scope-post/scope-user) 생성 → 3a `sync`(no-scope) first-touch 자동 baseline(양 scope 6 sources 등록 / markDrift=[]).
+
+**시나리오 실측**:
+- **A** 공유 canonical(domain.json) 변경 → `markDrift=[scope-post, scope-user]` = ✅ 정당(둘 다 domain 의존).
+- **B** BC-POST 전용 rule 변경(business-rules.json) → `markDrift=[scope-post, scope-user]` = ⚠️ **false-positive 실측** — scope-user 는 BC-POST 무관인데 business-rules.json 파일 공유로 coarse file-hash drift.
+
+**핵심 발견 2**:
+1. **subset-precision 이 grounded** — 시나리오 B 가 coarse file-hash 의 FP 를 실 2-BC 데이터로 **측정**(추측 ❌). 3a §4 D3 "후속 carry" 가 이제 측정된 trigger 보유 → subsetAnalysisRefs 활성화(per-BC/prefix subset-hash)가 정당. = Phase 3 잔여의 실 핵심.
+2. **★ merge-back obviated (v0.3.0 + 3a)** — "delta 출처" 실측 답: post-v0.3.0 에 **scope-local 분석 사본 없음**(subsetAnalysisRefs=in-memory 필터·사본 ❌·divergence 금지=SSOT 단일). scope 가 canonical 항목 변경 = **canonical 직접 편집**(병합할 divergent 사본 부재) → markDrift(3a live)가 타 scope 자동 표지 = cross-scope 전파 이미 처리. ⟹ "scope-local delta → canonical 병합" **단계 자체가 존재하지 않음**. Phase 3 merge-back = 별도 도구 ❌, "canonical 직접 편집 + markDrift" 로 충족. (DEC §5 로드맵 Phase 3 = Phase 0 작성분 / v0.3.0 subset 폐기 前 framing → reframe.)
+
+**결론(Phase 3 reframe)**: ✅ cross-scope drift 전파 = 3a 로 DONE(실 2-BC 검증). ⚠️ subset-precision = NEEDED(FP 측정 / grounded next). ❌ merge-back 병합단계 = OBVIATED. **grounding 가치 = merge-back 헛빌드 회피(재작업 최소화) + subset-precision 실 trigger 확보.** 본체 코드 무변경(dogfood=tmp / 결함 미발견 → 본체 fix 없음 / poc-18 canonical 무변경). 다음 = 사용자 결단(subset-precision 추천).
