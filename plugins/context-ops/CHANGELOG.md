@@ -10,6 +10,17 @@
 
 ---
 
+## [0.10.0] — 2026-06-07 MINOR — living-sync Phase 2c: reconcile 결단 보조(carry-A) + relocation source-locator(carry-B′) + findRelocation 실 git 버그 fix
+
+Phase 2b reconcile 가 **propose-only 로 surface 한 것을 사람이 결단·실행**할 수 있게 마감(같은 라인). 전부 **순수 reporting 강화**(mutation 0 / propose-only 패러다임 불변). 4원칙(plan `plan-living-sync-phase2c.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.83] 전건 코드 사실검증** + 사용자 승인[low-risk carry]).
+
+- **carry-A — content_drift flag 결단 보조** (`lift-anchor.js` `ceilingOptionsForAnchor`): content_drift flag 에 **재전파 천장 후보**(그 anchor 의 backward 조상) 동봉. **★ Senior #1 수정 + 실측 반영**: anchor 자신 제외(IMPL=forward-leaf=`lift --ceiling IMPL`=빈 큐 no-op 실측) + 정직 prose — `--ceiling <상위>` = 하류 TASK/TC **재생성**(손수정 코드는 closure 제외 / 실측 `forward(AC-USER-001)=[AC,TASK,TC,IMPL]`·IMPL 제외) vs 재앵커 = 코드 canonical 결단 시 source 재합성. naive 명령 동봉은 clarity 회귀라 필터·라벨 필수.
+- **carry-B′ — relocation source-locator** (`lift-anchor.js` `relocationSourceHint`): relocation 관측사실 후보에 **durable 수정 위치** 동봉 — graph 는 **파생물**(IMPL code_pointers ← impl-spec `modules[].source_files` / graph-synthesizer.js:231-242)이라 graph 직접 수정 = 다음 resync clobber → source 산출물 위치 제시(IMPL→`impl-spec.json modules[id].source_files` / TC→`test-spec.json test_cases[id].source_file` / multi-source = Senior #2 실측). **write ❌(B′ / propose-only 유지)**.
+- **★ findRelocation 실 git 버그 fix** (`_shared/code-pointer-git.js`): pathspec `-- <oldpath>` 제거 — HEAD 에 부재한 old path 로 pathspec 제한 시 실 git 이 committed rename 을 못 짚음(`git log -M --diff-filter=R -- old.ts` = 빈 결과 실측 / variant A 무-pathspec = `R100 old→new`). 파싱이 이미 `m[1]===path` 로 source 필터 → pathspec 제거가 정합. **구버전은 fake gitRunner 로만 검증돼 잠복**(cpv A3 relocation 도 실 git 미작동이었음) → **Phase 2c 가 실 git mv fixture 로 노출·수정**(no-simulation 가치). cpv fake 갱신(`renameFrom` 키잉) + chain-driver 실 git mv 테스트.
+- **★ Senior 적대검토(REVISE@0.83) 전건 사실검증 후 반영**: #1 IMPL=forward-leaf → anchor-self 제외+재생성 대상=하류 TC(실측 forward) · #2 TC 도 test-spec source_file derive(multi-source / graph-synthesizer.js:524-531) · **#4 (B) durable source-write reject** = multi-source·commit_hash staleness·path-coordinate·propose-only 패러다임 이탈 = 사용자 "low-risk" 의도 배치 → **(B′) propose 정밀화 채택**(no-op 아님 = 정확 source 위치) · #5 신규 관찰가능 동작 = MINOR(PATCH 과소표기).
+- **검증(no-sim 실 git / §8.1)**: `test/lift-anchor.test.js` +7(순수 helper 5: relocationSourceHint IMPL/TC/generic + ceilingOptionsForAnchor self-제외·미존재 / carry e2e 2: poc-05 carry-A ceiling_options·self-제외 + tmp-git git mv carry-B′ source_edit·그래프 byte-identical) = **39**. chain-driver **426/426**(419+7) · code-pointer-validator **45/45**(fake 갱신·findRelocation fix back-compat) · 3-way 0.10.0.
+- **carry**: durable source-write(--apply / multi-source+commit_hash+path-base+atomic = 별도 MINOR) · Phase 3 merge-back · Phase 4 per-item granularity. SSOT = DEC §12 + plan.
+
 ## [0.9.0] — 2026-06-07 MINOR — living-sync Phase 2b: `lift --reconcile` 손수정 코드 ↔ anchor 관측사실 git 신선도 (propose-only)
 
 Phase 2(`lift`)의 **전파 절반**(코드→천장→forward)에 이어 **reconcile 절반**: 손수정된 코드가 anchor 노드의 **관측사실**(code_pointer path/commit_hash)과 아직 맞는지 git 으로 재탐지 → 어긋나면 **propose**(자동 덮어쓰기 절대 ❌). `lift --reconcile [--base <sha>] [--repo-root <dir>]` 플래그. 4원칙(plan `plan-living-sync-phase2b.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.82] 전건 코드 사실검증** + 사용자 승인[코드 착수 / lift 스토리 완성]).

@@ -138,3 +138,49 @@ export function reconcileObserved(codePointers = [], gitFacts = []) {
 	}
 	return { observed_candidates, flags };
 }
+
+// ── Phase 2c — reconcile 후속 결단 보조 (carry 마감 / DEC §12 / Senior REVISE@0.83) ──────────
+// 전부 순수 reporting 강화 (mutation 0 / propose-only 불변). graph 는 파생물(impl-spec source_files 에서 derive)
+//   이므로 relocation 의 durable 수정 타깃 = source 산출물(graph 직접 ❌ = 다음 resync clobber). 본 helper 는
+//   그 정확 위치만 제시(B' / write ❌). 자동 source-write 는 multi-source·commit_hash·path-base 정합이 별도 MINOR.
+
+// anchor subkind → relocation 의 source 산출물 + 필드 locator (graph-synthesizer derive 역매핑).
+//   IMPL ← impl-spec.json modules[].source_files / TC ← test-spec.json test_cases[].source_file.
+const RELOCATION_SOURCE_BY_SUBKIND = Object.freeze({
+	IMPL: { source_artifact: 'impl-spec.json', field: 'source_files', collection: 'modules' },
+	TC: { source_artifact: 'test-spec.json', field: 'source_file', collection: 'test_cases' },
+});
+
+/**
+ * relocation 관측사실 후보 → durable 수정할 source 위치 hint (순수 / write ❌ / B').
+ * @returns {{ source_artifact, locator, old, new } | null} 매핑 미지원 subkind = null(generic carry)
+ */
+export function relocationSourceHint(anchorSubkind, anchorId, candidate) {
+	const map = RELOCATION_SOURCE_BY_SUBKIND[anchorSubkind];
+	if (!map) {
+		return {
+			source_artifact: '(source 산출물)',
+			locator: `${anchorId}.code_pointers[].path`,
+			old: candidate.current,
+			new: candidate.suggested,
+		};
+	}
+	return {
+		source_artifact: map.source_artifact,
+		locator: `${map.collection}[id=${anchorId}].${map.field}`,
+		old: candidate.current,
+		new: candidate.suggested,
+	};
+}
+
+/**
+ * content_drift flag 결단 보조: 그 anchor 의 유효 천장 후보 중 **anchor 자신 제외** (Senior #1 — IMPL=forward-leaf=no-op).
+ *   재전파(--ceiling)는 하류 TASK/TC 재생성(손수정 코드는 closure 제외) — 코드 자체 재생성 아님.
+ * @returns {string[]} 그 anchor 로부터 forward 재전파 가능한 상위 천장 id (정렬)
+ */
+export function ceilingOptionsForAnchor(anchorId, ceilingByAnchor) {
+	return (ceilingByAnchor?.[anchorId] ?? [])
+		.filter((id) => id !== anchorId)
+		.slice()
+		.sort();
+}

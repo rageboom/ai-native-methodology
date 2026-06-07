@@ -91,6 +91,8 @@ import {
 	liftCandidates,
 	validateCeiling,
 	reconcileObserved,
+	relocationSourceHint,
+	ceilingOptionsForAnchor,
 } from './lift-anchor.js';
 import {
 	makeGitRunner,
@@ -2227,10 +2229,23 @@ function cmdLift(args) {
 				};
 			});
 			const classified = reconcileObserved(pointers, gitFacts);
+			// Phase 2c carry-B' — relocation 후보에 durable source 수정 위치 동봉 (graph 직접 ❌ = 파생물 clobber / write ❌).
+			const subkind = node?.artifact_subkind ?? null;
+			const observed_candidates = classified.observed_candidates.map((oc) =>
+				oc.kind === 'path_relocated'
+					? { ...oc, source_edit: relocationSourceHint(subkind, anchorId, oc) }
+					: oc,
+			);
+			// Phase 2c carry-A — content_drift flag 에 결단 보조(재전파 천장 후보 = anchor 자신 제외 / Senior #1).
+			const hasContentDrift = classified.flags.some((f) => f.kind === 'content_drift');
+			const ceiling_options = hasContentDrift
+				? ceilingOptionsForAnchor(anchorId, lift.ceilingByAnchor)
+				: [];
 			perAnchor.push({
 				anchor: anchorId,
-				observed_candidates: classified.observed_candidates,
+				observed_candidates,
 				flags: classified.flags,
+				...(hasContentDrift ? { ceiling_options } : {}),
 			});
 		}
 		reconcile = {
@@ -2375,14 +2390,30 @@ function cmdLift(args) {
 					process.stdout.write(
 						`    [관측사실 후보] ${a.anchor} ${oc.path} → ${oc.kind}: '${oc.suggested}' (suggested_path)\n`,
 					);
+					// carry-B' — durable 수정 위치(source 산출물 / graph 직접 ❌ = clobber). write ❌ = propose.
+					if (oc.source_edit)
+						process.stdout.write(
+							`        ↳ durable: ${oc.source_edit.source_artifact} ${oc.source_edit.locator}: '${oc.source_edit.old}' → '${oc.source_edit.new}' (수정 후 resync-graph / graph 직접 ❌)\n`,
+						);
 				}
 				for (const fl of a.flags) {
 					any = true;
 					const detail =
 						fl.kind === 'content_drift'
-							? 'content_drift — 사람 결단(재앵커 vs --ceiling)'
+							? 'content_drift — 사람 결단 필요'
 							: `intent_review — 사람의도 필드 ${(fl.fields ?? []).join('/')} (자동 ❌)`;
 					process.stdout.write(`    [flag] ${a.anchor} ${fl.path}: ${detail}\n`);
+				}
+				// carry-A — content_drift 결단 보조 (재전파 천장 후보 / anchor 자신 제외 / 재전파=하류 재생성·코드 ❌).
+				if (a.ceiling_options) {
+					if (a.ceiling_options.length)
+						process.stdout.write(
+							`        ↳ 결단 ①재전파: lift --ceiling <${a.ceiling_options.join('|')}> = 하류 TASK/TC 재생성(손수정 코드는 closure 제외) / ②재앵커: 코드를 canonical 결단 시 source 재합성(resync)\n`,
+						);
+					else
+						process.stdout.write(
+							`        ↳ 결단: 상위 천장 없음(forward-leaf orphan) → 재앵커(코드=canonical / source 재합성)만 가능\n`,
+						);
 				}
 			}
 			if (!any)

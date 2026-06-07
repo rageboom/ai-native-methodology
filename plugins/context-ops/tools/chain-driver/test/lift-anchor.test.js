@@ -24,6 +24,8 @@ import {
 	liftCandidates,
 	validateCeiling,
 	reconcileObserved,
+	relocationSourceHint,
+	ceilingOptionsForAnchor,
 } from '../src/lift-anchor.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -591,6 +593,128 @@ describe('lift --reconcile clean (tmp-git / false-positive 0 / no-simulation)', 
 			assert.equal(status, 0, 'git 부재여도 crash ❌');
 			const flags = out.reconcile.anchors.flatMap((a) => a.flags);
 			assert.equal(flags.length, 0, 'null carry → flag 0 (날조 ❌)');
+		} finally {
+			rmSync(tmp, { recursive: true, force: true });
+		}
+	});
+});
+
+describe('Phase 2c carry helpers (순수 / reporting 강화)', () => {
+	it('relocationSourceHint IMPL → impl-spec modules locator', () => {
+		const h = relocationSourceHint('IMPL', 'IMPL-X', {
+			current: 'src/a.ts',
+			suggested: 'src/b.ts',
+		});
+		assert.equal(h.source_artifact, 'impl-spec.json');
+		assert.equal(h.locator, 'modules[id=IMPL-X].source_files');
+		assert.equal(h.old, 'src/a.ts');
+		assert.equal(h.new, 'src/b.ts');
+	});
+	it('relocationSourceHint TC → test-spec test_cases locator (multi-source / Senior #2)', () => {
+		const h = relocationSourceHint('TC', 'TC-X', { current: 'a', suggested: 'b' });
+		assert.equal(h.source_artifact, 'test-spec.json');
+		assert.equal(h.locator, 'test_cases[id=TC-X].source_file');
+	});
+	it('relocationSourceHint 미지원 subkind → generic (graph 직접 ❌ 안내)', () => {
+		const h = relocationSourceHint('EPIC', 'EPIC-X', { current: 'a', suggested: 'b' });
+		assert.equal(h.source_artifact, '(source 산출물)');
+		assert.match(h.locator, /code_pointers/);
+	});
+	it('ceilingOptionsForAnchor — anchor 자신 제외 + 정렬 (Senior #1 / IMPL=forward-leaf=no-op)', () => {
+		const byAnchor = { 'IMPL-1': ['TC-1', 'IMPL-1', 'BHV-1', 'AC-1'] };
+		const opts = ceilingOptionsForAnchor('IMPL-1', byAnchor);
+		assert.ok(!opts.includes('IMPL-1'), 'anchor 자신 제외');
+		assert.deepEqual(opts, ['AC-1', 'BHV-1', 'TC-1']);
+	});
+	it('ceilingOptionsForAnchor — 미존재 anchor → []', () => {
+		assert.deepEqual(ceilingOptionsForAnchor('NOPE', {}), []);
+	});
+});
+
+describe('Phase 2c carry e2e (carry-A 결단보조 / carry-B\' source-locator / propose-only)', () => {
+	const POC05_DIR = join(EXAMPLES, 'poc-05-sample-user-register');
+	it('carry-A: content_drift flag anchor 에 ceiling_options(자신 제외) 동봉', { skip: !GIT ? 'git 부재' : false }, () => {
+		const { status, out } = runJson([
+			'lift',
+			'--changed',
+			'target/src/user.service.ts',
+			'--graph',
+			POC05_GRAPH,
+			'--reconcile',
+			'--repo-root',
+			POC05_DIR,
+			'--dry-run',
+			'--json',
+		]);
+		assert.equal(status, 0);
+		const withDrift = out.reconcile.anchors.filter((a) =>
+			a.flags.some((f) => f.kind === 'content_drift'),
+		);
+		assert.ok(withDrift.length > 0);
+		for (const a of withDrift) {
+			assert.ok(Array.isArray(a.ceiling_options));
+			assert.ok(!a.ceiling_options.includes(a.anchor), 'anchor 자신 제외');
+		}
+	});
+
+	it("carry-B': relocation(git mv) → observed_candidate.source_edit (impl-spec locator / write ❌ / 그래프 byte-identical)", { skip: !GIT ? 'git 부재' : false }, () => {
+		const tmp = mkdtempSync(join(tmpdir(), 'lift-reloc-'));
+		try {
+			const git = (a) =>
+				execFileSync('git', a, { cwd: tmp, stdio: ['ignore', 'pipe', 'ignore'] });
+			git(['init', '-q']);
+			git(['config', 'user.email', 't@t.t']);
+			git(['config', 'user.name', 't']);
+			mkdirSync(join(tmp, 'src'), { recursive: true });
+			writeFileSync(join(tmp, 'src', 'old.ts'), 'export const x = 1;\n', 'utf-8');
+			git(['add', '.']);
+			git(['commit', '-q', '-m', 'init']);
+			const sha = execFileSync('git', ['rev-parse', 'HEAD'], {
+				cwd: tmp,
+				encoding: 'utf-8',
+			}).trim();
+			// git mv → rename (content 동일) = relocation
+			git(['mv', 'src/old.ts', 'src/new.ts']);
+			git(['commit', '-q', '-m', 'move']);
+			const graph = {
+				nodes: [
+					{
+						id: 'IMPL-X',
+						artifact_kind: 'chain',
+						artifact_subkind: 'IMPL',
+						state: 'active',
+						code_pointers: [
+							{ anchor_type: 'strict_path', path: 'src/old.ts', commit_hash: sha },
+						],
+					},
+				],
+				edges: [],
+			};
+			const g = join(tmp, 'graph.json');
+			const graphBefore = JSON.stringify(graph);
+			writeFileSync(g, graphBefore, 'utf-8');
+			const { status, out } = runJson([
+				'lift',
+				'--changed',
+				'src/old.ts',
+				'--graph',
+				g,
+				'--reconcile',
+				'--repo-root',
+				tmp,
+				'--dry-run',
+				'--json',
+			]);
+			assert.equal(status, 0);
+			const cands = out.reconcile.anchors.flatMap((a) => a.observed_candidates);
+			const reloc = cands.find((c) => c.kind === 'path_relocated');
+			assert.ok(reloc, 'git mv → relocation 후보');
+			assert.equal(reloc.suggested, 'src/new.ts');
+			assert.ok(reloc.source_edit, 'durable source 위치 동봉 (carry-B\')');
+			assert.equal(reloc.source_edit.source_artifact, 'impl-spec.json');
+			assert.equal(reloc.source_edit.locator, 'modules[id=IMPL-X].source_files');
+			// propose-only — 그래프 byte-identical (write ❌)
+			assert.equal(readFileSync(g, 'utf-8'), graphBefore);
 		} finally {
 			rmSync(tmp, { recursive: true, force: true });
 		}

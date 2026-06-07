@@ -26,6 +26,10 @@ export function makeGitRunner(repoRoot = process.cwd()) {
 
 // A3 — path 가 사라졌을 때 git rename 이력에서 새 경로 추정 (blob-hash + 유사도).
 //   gitRunner(args)->stdout. 추적 불가/실패/새 경로 부재 = null (제안 없음).
+//   ★ v0.10.0 (Phase 2c) — pathspec(`-- <oldpath>`) 제거: HEAD 에 부재한 old path 로 pathspec 제한하면
+//     실 git 이 rename 을 못 짚는다(committed rename 미탐 / `--follow` 는 존재 path 必). 전체 rename 이력을
+//     스캔하고 파싱이 source==path 로 필터(아래 `m[1] === path`) = 실 git 정합. (구버전은 fake gitRunner 로만
+//     검증돼 잠복했던 버그 / living-sync Phase 2b reconcile 가 실 git mv fixture 로 노출.)
 export function findRelocation(
 	path,
 	{ gitRunner, repoRoot = process.cwd() } = {},
@@ -39,8 +43,6 @@ export function findRelocation(
 			'--diff-filter=R',
 			'--name-status',
 			'--format=',
-			'--',
-			path,
 		]);
 	} catch {
 		return null; // git 부재 / repo 아님 / 추적 불가

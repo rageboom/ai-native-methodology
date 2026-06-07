@@ -424,12 +424,19 @@ describe('mixed coverage — 통합 시나리오', () => {
 // ============================================================================
 
 // 설정 가능한 fake gitRunner — 실 git 없이 결정적 단위테스트.
-function fakeGit({ renameTo = null, changed = false, throwCmd = null } = {}) {
+//   v0.10.0 — findRelocation 가 pathspec 을 제거(실 git rename 미탐 버그 fix) → log 분기는 last arg(구 pathspec)
+//   대신 renameFrom(검색 대상 path / 테스트 pointer='ghost.kt' 기본)으로 R 라인 source 를 키잉. diff 분기는 무변경.
+function fakeGit({
+	renameTo = null,
+	renameFrom = 'ghost.kt',
+	changed = false,
+	throwCmd = null,
+} = {}) {
 	return (args) => {
 		if (throwCmd && args[0] === throwCmd) throw new Error('git unavailable');
 		const last = args[args.length - 1];
 		if (args[0] === 'log')
-			return renameTo ? `R100\t${last}\t${renameTo}\n` : '';
+			return renameTo ? `R100\t${renameFrom}\t${renameTo}\n` : '';
 		if (args[0] === 'diff') return changed ? `${last}\n` : '';
 		return '';
 	};
