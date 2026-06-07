@@ -23,12 +23,11 @@ import { normalizeAnalysisBusinessRules } from '../../_shared/load-business-rule
 export function resolveDiscoveryOrigins(discoverySpec, graph, analysis) {
 	const nodes = graph?.nodes ?? [];
 	const nodeIds = new Set(nodes.map((n) => n.id));
-	// business-rules = 단일 coarse 노드 (kind=analysis / subkind=business-rules / per-BR=Phase 4).
-	const brNode = nodes.find(
-		(n) =>
-			n.artifact_kind === 'analysis' &&
-			n.artifact_subkind === 'business-rules',
-	);
+	// business-rules = 부모 file-level coarse 노드. 정확 id 로 핀 (F-M1 / Senior REVISE@0.88).
+	//   Phase 4 additive 가 자식 analysis-business-rules-<BC> 를 추가하므로 .find(subkind=business-rules) 는
+	//   push 순서에 따라 자식을 바인딩할 fragility 가 있음 → coarse origin 의도(주석 #3)대로 부모 id 직접.
+	//   br_id→BC 자식 직접 dispatch 정밀화 = S1 deferred.
+	const brNode = nodes.find((n) => n.id === 'analysis-business-rules');
 
 	const useCases = discoverySpec?.use_cases ?? [];
 	const brIntent = discoverySpec?.business_rules_intent ?? [];

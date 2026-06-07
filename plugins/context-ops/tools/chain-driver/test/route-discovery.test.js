@@ -89,6 +89,29 @@ describe('route-discovery core (resolveDiscoveryOrigins)', () => {
 		assert.match(r.net_new[0].reason, /unknown_br/);
 	});
 
+	it('F-M1 — Phase 4 per-BC 자식이 부모보다 먼저 와도 coarse origin = 부모 (정확 id 핀)', () => {
+		// 자식을 일부러 부모 앞에 배치 → .find(subkind) 였다면 자식 바인딩될 fragility 재현.
+		const node = (id, kind, subkind, extra = {}) => ({
+			id,
+			artifact_kind: kind,
+			artifact_subkind: subkind,
+			state: 'active',
+			...extra,
+		});
+		const graph = {
+			nodes: [
+				node('analysis-business-rules-BC-POST', 'analysis', 'business-rules', { bounded_context: 'BC-POST' }),
+				node('analysis-business-rules-BC-USER', 'analysis', 'business-rules', { bounded_context: 'BC-USER' }),
+				node('analysis-business-rules', 'analysis', 'business-rules'),
+			],
+			edges: [],
+		};
+		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
+		const analysis = { business_rules: [{ id: 'BR-1' }] };
+		const r = resolveDiscoveryOrigins(spec, graph, analysis);
+		assert.deepEqual(r.origins, ['analysis-business-rules'], '자식 아닌 부모 coarse 노드');
+	});
+
 	it('analysis 미인식 shape(container present + 0 rules) → shape_unrecognized 진단 + 억제', () => {
 		const spec = { business_rules_intent: [{ br_id: 'BR-1' }] };
 		const analysis = { rules: [{ noId: true }] }; // container present, 0 id-rules

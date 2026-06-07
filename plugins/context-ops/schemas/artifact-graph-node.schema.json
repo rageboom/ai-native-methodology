@@ -43,6 +43,10 @@
       "type": "string",
       "description": "work-unit-manifest 의 scope ID 와 결합. 멀티 scope 그래프 분리·필터에 사용."
     },
+    "bounded_context": {
+      "type": "string",
+      "description": "v0.12.0 Phase 4 (additive per-BC) — analysis-business-rules-<BC> 자식 노드의 bounded_context (예: BC-POST). 부모 file-level 노드(analysis-business-rules)는 본 필드 부재. business-rules 산출물의 business_rules[].bounded_context 와 동일 도메인 파티션 라벨. per-BC 의존 그래프 정밀화 / scope_id(work-unit scope)와 별개 축."
+    },
     "commit_hash": {
       "type": "string",
       "pattern": "^[0-9a-f]{7,40}$",

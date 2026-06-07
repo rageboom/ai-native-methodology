@@ -405,6 +405,31 @@ export function deriveAnalysisCodePointers(nodes, analysis, { existsFn } = {}) {
     }
     if (pointers.length > 0) node.code_pointers = pointers;
   }
+  // Phase 4 additive: business-rules per-BC child nodes get code_pointers from ONLY that BC's rules'
+  // source_evidence. Parent keeps whole-file pointers (coarse); children = BC subset (precise A2 drift).
+  // Same gating (resolveAnchor / extension whitelist / prefixes / cap) as the parent pass.
+  const _brData = analysis?.['business-rules'];
+  if (_brData) {
+    const _cfg = ANALYSIS_TO_CODE_POINTERS['business-rules'];
+    for (const node of nodes) {
+      if (node.artifact_kind !== 'analysis' || node.artifact_subkind !== 'business-rules') continue;
+      if (typeof node.bounded_context !== 'string') continue; // parent (no bc field) skipped
+      if (node.state !== 'active') continue;
+      if (Array.isArray(node.code_pointers) && node.code_pointers.length > 0) continue;
+      const _rules = (_brData.business_rules ?? []).filter((r) => r?.bounded_context === node.bounded_context);
+      const _seen = new Set();
+      const _pointers = [];
+      for (const raw of _cfg.accessor({ business_rules: _rules })) {
+        const ptr = resolveAnchor(raw, _cfg, existsFn);
+        if (!ptr) continue;
+        if (_seen.has(ptr.path)) continue;
+        _seen.add(ptr.path);
+        _pointers.push(ptr);
+        if (_pointers.length >= ANALYSIS_DERIVE_CAP) break;
+      }
+      if (_pointers.length > 0) node.code_pointers = _pointers;
+    }
+  }
 }
 
 // ============================================================================
@@ -629,6 +654,40 @@ export function synthesizeGraph(input) {
     analysisLoaded.add(subkind);
   }
 
+  // Phase 4 (v0.12.0) additive per-BC business-rules child nodes.
+  // Keep parent analysis-business-rules (file-level / unchanged). Add one child
+  // analysis-business-rules-<BC> per distinct bounded_context. Children carry per-BC
+  // cross_reference (emitAnalysisCrossRefs) + per-BC code_pointers (deriveAnalysisCodePointers)
+  // = precise dependency surface. No BC => no children (full backward-compat).
+  // Consumer rewiring (route per-BC dispatch) + parent coarse-edge retirement = S1..S5 (deferred).
+  const brById = new Map();   // BR id -> bounded_context
+  const brBCs = [];           // distinct BC, sorted (determinism / F-m2)
+  if (analysisLoaded.has('business-rules')) {
+    const seenBC = new Set();
+    for (const r of analysis['business-rules']?.business_rules ?? []) {
+      if (!r || typeof r.id !== 'string') continue;
+      if (typeof r.bounded_context !== 'string' || r.bounded_context.length === 0) continue;
+      brById.set(r.id, r.bounded_context);
+      if (!seenBC.has(r.bounded_context)) { seenBC.add(r.bounded_context); brBCs.push(r.bounded_context); }
+    }
+    brBCs.sort(); // deterministic synthesize-twice (F-m2)
+    const brSourcePath = sourcePaths.analysis?.['business-rules'] ?? '(analysis-business-rules)';
+    const brTitle = analysis['business-rules']?.meta?.title ?? 'business-rules';
+    for (const bc of brBCs) {
+      pushNode({
+        id: `analysis-business-rules-${bc}`,
+        artifact_kind: 'analysis',
+        artifact_subkind: 'business-rules',
+        bounded_context: bc,
+        source_path: brSourcePath,
+        state: 'active',
+        title: `${brTitle} (${bc})`,
+      });
+      // parent -> child (organizational / soft). No closure impact (2-hop soft dropped => parent stays coarse by design).
+      edges.push(makeEdge('analysis-business-rules', `analysis-business-rules-${bc}`, 'groups'));
+    }
+  }
+
   // --- aspect kind 노드 (4) ---
   for (const subkind of ASPECT_SUBKINDS) {
     const data = aspect[subkind];
@@ -651,9 +710,18 @@ export function synthesizeGraph(input) {
     for (const item of items ?? []) {
       for (const [field, analysisKind] of Object.entries(refMap)) {
         if (!analysisLoaded.has(analysisKind)) continue;
+        const emittedChild = new Set(); // per (item,field) per-BC child dedup
         for (const _ref of item[field] ?? []) {
           // analysis kind 노드 → 개별 chain instance: 본문 변경 시 chain 으로 SHOULD 전파
           edges.push(makeEdge(`analysis-${analysisKind}`, item.id, 'cross_reference'));
+          // Phase 4 additive: business-rules only  route ignored _ref(BR id) -> BC -> child node (precise).
+          if (analysisKind === 'business-rules') {
+            const bc = brById.get(_ref);
+            if (bc && !emittedChild.has(bc)) {
+              emittedChild.add(bc);
+              edges.push(makeEdge(`analysis-business-rules-${bc}`, item.id, 'cross_reference'));
+            }
+          }
         }
       }
     }

@@ -2209,3 +2209,156 @@ describe('synthesizeGraph — F-FE-ANCHOR-001 FE kinds code-pointer enrich', () 
 		);
 	});
 });
+
+// ============================================================================
+// Phase 4 (v0.12.0) — additive per-BC business-rules 노드 분할
+//   부모 analysis-business-rules(file-level / 무변경) 유지 + distinct bounded_context 당
+//   자식 analysis-business-rules-<BC> 추가. precision(자식발 cross_reference·code_pointers)
+//   = additive / 무회귀. 소비자 재배선·부모 coarse 엣지 은퇴 = S1~S5(deferred).
+// ============================================================================
+const brInput = {
+	behavior: {
+		behaviors: [
+			{ id: 'BHV-POST-001', use_case_refs: [], br_refs: ['BR-POST-A-001', 'BR-POST-A-002'] },
+			{ id: 'BHV-USER-001', use_case_refs: [], br_refs: ['BR-USER-X-001'] },
+		],
+	},
+	acceptance: {
+		criteria: [
+			{ id: 'AC-POST-001', behavior_ref: 'BHV-POST-001', related_brs: ['BR-POST-A-001'] },
+		],
+	},
+	analysis: {
+		'business-rules': {
+			meta: { title: 'BR' },
+			business_rules: [
+				{ id: 'BR-POST-A-001', bounded_context: 'BC-POST', source_evidence: [{ file: 'src/post/a.ts' }] },
+				{ id: 'BR-POST-A-002', bounded_context: 'BC-POST', source_evidence: [{ file: 'src/post/b.ts' }] },
+				{ id: 'BR-USER-X-001', bounded_context: 'BC-USER', source_evidence: [{ file: 'src/user/x.ts' }] },
+			],
+		},
+	},
+	sourcePaths: { analysis: { 'business-rules': 'business-rules.json' } },
+};
+
+describe('Phase 4 — business-rules per-BC 자식 노드 (additive / 무회귀)', () => {
+	it('distinct BC 당 자식 노드 + 부모 유지 (id/subkind/bounded_context)', () => {
+		const g = synthesizeGraph(brInput);
+		const parent = g.nodes.find((n) => n.id === 'analysis-business-rules');
+		assert.ok(parent, '부모 analysis-business-rules 유지');
+		assert.equal(parent.bounded_context, undefined, '부모는 bounded_context 필드 부재');
+		const post = g.nodes.find((n) => n.id === 'analysis-business-rules-BC-POST');
+		const user = g.nodes.find((n) => n.id === 'analysis-business-rules-BC-USER');
+		assert.equal(post.artifact_subkind, 'business-rules');
+		assert.equal(post.bounded_context, 'BC-POST');
+		assert.equal(user.bounded_context, 'BC-USER');
+		assert.equal(post.state, 'active');
+	});
+
+	it('부모 → 자식 groups 엣지 (조직 포함 / soft)', () => {
+		const g = synthesizeGraph(brInput);
+		const grp = g.edges.filter(
+			(e) =>
+				e.edge_type === 'groups' &&
+				e.source === 'analysis-business-rules' &&
+				e.target.startsWith('analysis-business-rules-BC-'),
+		);
+		assert.equal(grp.length, 2);
+		assert.ok(grp.every((e) => e.confidence === 'soft'));
+	});
+
+	it('per-BC cross_reference 라우팅 — POST item 은 BC-POST 자식만, USER 는 BC-USER 자식만', () => {
+		const g = synthesizeGraph(brInput);
+		const xref = g.edges.filter((e) => e.edge_type === 'cross_reference');
+		const fromPost = xref
+			.filter((e) => e.source === 'analysis-business-rules-BC-POST')
+			.map((e) => e.target)
+			.sort();
+		const fromUser = xref
+			.filter((e) => e.source === 'analysis-business-rules-BC-USER')
+			.map((e) => e.target)
+			.sort();
+		assert.deepEqual(fromPost, ['AC-POST-001', 'BHV-POST-001']);
+		assert.deepEqual(fromUser, ['BHV-USER-001']);
+	});
+
+	it('부모 coarse cross_reference 엣지 유지 (zero-regression safety net)', () => {
+		const g = synthesizeGraph(brInput);
+		const fromParent = g.edges
+			.filter((e) => e.edge_type === 'cross_reference' && e.source === 'analysis-business-rules')
+			.map((e) => e.target);
+		assert.deepEqual([...new Set(fromParent)].sort(), [
+			'AC-POST-001',
+			'BHV-POST-001',
+			'BHV-USER-001',
+		]);
+	});
+
+	it('한 item 이 같은 BC 의 BR 2개 참조 → 자식 엣지는 1개로 dedup', () => {
+		const g = synthesizeGraph(brInput);
+		const dup = g.edges.filter(
+			(e) =>
+				e.source === 'analysis-business-rules-BC-POST' &&
+				e.target === 'BHV-POST-001' &&
+				e.edge_type === 'cross_reference',
+		);
+		assert.equal(dup.length, 1, 'per (item,field) BC dedup');
+	});
+
+	it('bounded_context 부재 rule → 자식 0 (부모만 / backward-compat)', () => {
+		const noBC = {
+			...brInput,
+			analysis: {
+				'business-rules': { meta: { title: 'BR' }, business_rules: [{ id: 'BR-LEGACY-001', source_evidence: [] }] },
+			},
+		};
+		const g = synthesizeGraph(noBC);
+		const children = g.nodes.filter((n) => n.id.startsWith('analysis-business-rules-'));
+		assert.equal(children.length, 0);
+		assert.ok(g.nodes.find((n) => n.id === 'analysis-business-rules'));
+	});
+
+	it('per-BC code_pointers 분리 — 자식 = 그 BC source_evidence 만 / 부모 = 전체 (existsFn stub)', () => {
+		const g = synthesizeGraph({ ...brInput, existsFn: () => true });
+		const post = g.nodes.find((n) => n.id === 'analysis-business-rules-BC-POST');
+		const user = g.nodes.find((n) => n.id === 'analysis-business-rules-BC-USER');
+		assert.deepEqual(post.code_pointers.map((c) => c.path).sort(), ['src/post/a.ts', 'src/post/b.ts']);
+		assert.deepEqual(user.code_pointers.map((c) => c.path), ['src/user/x.ts']);
+		const parent = g.nodes.find((n) => n.id === 'analysis-business-rules');
+		assert.deepEqual(parent.code_pointers.map((c) => c.path).sort(), [
+			'src/post/a.ts',
+			'src/post/b.ts',
+			'src/user/x.ts',
+		]);
+	});
+
+	it('결정성 — synthesize 2회 nodes+edges deepEqual (F-m2)', () => {
+		const g1 = synthesizeGraph({ ...brInput, existsFn: () => true });
+		const g2 = synthesizeGraph({ ...brInput, existsFn: () => true });
+		assert.deepEqual(g1.nodes, g2.nodes);
+		assert.deepEqual(g1.edges, g2.edges);
+	});
+});
+
+describe('Phase 4 — artifact-graph node schema Ajv guard (자식 포함 / CI 공백 메움 / F-B1)', () => {
+	it('자식 노드(bounded_context 포함) 전부 artifact-graph-node.schema 통과', async () => {
+		const { default: Ajv2020 } = await import('ajv/dist/2020.js');
+		const { default: addFormats } = await import('ajv-formats');
+		const { readFileSync } = await import('node:fs');
+		const { fileURLToPath } = await import('node:url');
+		const pathMod = await import('node:path');
+		const here = pathMod.dirname(fileURLToPath(import.meta.url));
+		const schemaDir = pathMod.resolve(here, '../../../schemas');
+		const load = (f) => JSON.parse(readFileSync(pathMod.join(schemaDir, f), 'utf8'));
+		const ajv = new Ajv2020({ allErrors: true, strict: false });
+		addFormats(ajv);
+		ajv.addSchema(load('code-pointer.schema.json'));
+		const validate = ajv.compile(load('artifact-graph-node.schema.json'));
+		const g = synthesizeGraph({ ...brInput, existsFn: () => true });
+		const children = g.nodes.filter((n) => n.bounded_context);
+		assert.ok(children.length >= 2, '자식 노드 ≥2 (테스트 의미 보장)');
+		for (const n of g.nodes) {
+			assert.ok(validate(n), 'node ' + n.id + ' invalid: ' + JSON.stringify(validate.errors));
+		}
+	});
+});

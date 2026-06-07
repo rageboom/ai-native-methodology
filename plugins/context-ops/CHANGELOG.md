@@ -10,6 +10,20 @@
 
 ---
 
+## [0.12.0] — 2026-06-07 MINOR — living-sync Phase 4 (펀더멘털): business-rules 노드 BC별 분할 (additive / 그래프 의존성 정밀화)
+
+artifact-graph 의 단일 `analysis-business-rules` 노드가 BC-POST·BC-USER 양쪽 행위에 cross_reference 로 걸려 **BC 간 coarse 의존**(BC-POST 규칙 변경이 BC-USER 행위에 SHOULD 전파). 사용자 통찰: ".json 통째 의존이 아니라 쪼갠 것끼리만 의존이 걸려야 그래프 의존성이 정밀". B(전체 분할) 채택 / **펀더멘털 먼저 → 나머지(소비자 재배선)는 하나씩 선택적**. 4원칙(plan 1원칙 + **Senior 적대 step-0[REVISE@0.88] 전건 코드 사실검증** + 사용자 승인[additive / 단계적 은퇴]).
+
+- **★ 설계 전환 = additive(부모 유지 + 자식 추가)**: 직전 Senior 가 replace(단일 노드 삭제) 전제로 찾은 3 BLOCKER(F1 dangling 엣지·F2 A2 content-drift 사망·F3 federator BR federation 유실)는 **부모 file-level 노드를 유지**하면 전부 소멸 — exact-id 참조 ~30곳이 전부 부모를 계속 가리켜 **무회귀**. 제약 실측(`impact-analyzer.js:153` = 1-hop 이후 hard 엣지만 추종 → soft 2-hop 폐기)상 부모는 자기 cross_reference 를 유지해야 file-drift→행위 안전망 보존.
+- **`graph-synthesizer.js` (BE 도구 / +68 additive)**: (1) BR-id→BC 인덱스(`business_rules[].{id,bounded_context}` / distinct BC `[...].sort()`=결정성) (2) distinct BC 당 자식 노드 `analysis-business-rules-<BC>`(subkind 유지 + `bounded_context` 필드 / BC 부재=자식 0 부모만=backward-compat) (3) 부모→자식 `groups` 엣지(조직 포함 / closure 영향 0) (4) `emitAnalysisCrossRefs` — 부모 coarse 엣지 유지 + 무시되던 `_ref`(BR id)→BC→자식 cross_reference 추가(per (item,field) dedup) (5) `deriveAnalysisCodePointers` — 부모=전체 source(coarse) + 자식=그 BC source_evidence 만(정밀 A2 drift / 동일 gating).
+- **★ Senior 적대검토(REVISE@0.88) 전건 사실검증 후 반영** (권위≠사실정합):
+  - **F-B1 (BLOCKER 확정)**: `artifact-graph-node.schema.json` = `additionalProperties:false` + `bounded_context` 부재 → 자식 신규 필드 schema-invalid. CI 가 artifact-graph 를 Ajv 검증 **안 함**(release-readiness #15 = graph-integrity[cycle/orphan/unknown]만) = silent false-health. **수정: 스키마에 `bounded_context` 추가 + 자식 포함 그래프 Ajv guard 테스트 신설(CI 공백 메움)**.
+  - **F-M1 (MAJOR 확정)**: `route-discovery.js:27` `.find(subkind=business-rules)` 가 push 순서 의존(부모 먼저=현 무회귀나 fragile). **수정: 정확 id `n.id==='analysis-business-rules'` 핀(거동 동일·하드닝) + 자식이 부모보다 먼저 와도 부모 resolve 회귀 테스트**. per-BC dispatch 격상 = S1 deferred.
+  - **F-m2 (MINOR)**: 최종 sort 부재 → distinct BC `.sort()` 명시 + synthesize-twice nodes+edges deepEqual 결정성 테스트.
+  - **정직 경계**: 부모 coarse cross_reference 엣지는 소비자 재배선(S1~S5)까지 잔존(부모 read 소비자는 그때까지 over-propagate=의도) / per-BC code_pointers 로 A2 drift baseline = BC 당 노드 +1 flag(회귀 아님).
+- **검증(no-sim 실 합성 / §8.1)**: graph-synthesizer.test.js +9(자식 노드·groups·per-BC 라우팅·부모 coarse 유지·BC dedup·BC 부재 fallback·per-BC code_pointers 분리·결정성·Ajv guard) = **161** · route-discovery.test.js +1(F-M1) → chain-driver **432** · **poc-18 2-BC 실 재합성 e2e**: `impact(analysis-business-rules-BC-POST)` = BC-POST 행위/AC/TASK/TC 만(BC-USER 무관) = 사용자 목표 live 입증. 3-way 0.12.0.
+- **선택적 후속(하나씩 승인)**: S1 route per-BC dispatch · S2 drift subset-hash(cross-scope FP 제거) · S3 federator per-BC · S4 trace-view per-BC · **S5(종단) 부모 coarse 엣지 은퇴=진짜 분할**(소비자 전 재배선 후) · S6 per-BR granularity. SSOT = DEC + plan.
+
 ## [0.11.0] — 2026-06-07 MINOR — living-sync Phase 3a: cross-scope drift 기계 활성화 (sync_sources 충전 / dead-fed → live)
 
 Phase 3(merge-back + cross-scope)의 **선행 grounded 슬라이스**. 1원칙 실측 = multi-scope 서브시스템이 vestigial — cross-scope drift 기계(detectDrift/markDrift/cascade)는 있으나 `sync_sources` 가 실 플로우에서 **한 번도 채워지지 않아 dead-fed**(markDrift 절대 발화 ❌). merge-back 빌드 전, 이 **기존 기계를 live 로** 만든다. 4원칙(plan `plan-living-sync-phase3a.md` 1원칙 + **Senior 적대 step-0 pass[REVISE@0.82] 전건 코드 사실검증** + 사용자 승인[기계 활성화 / 자동 충전]).

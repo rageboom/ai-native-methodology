@@ -179,3 +179,17 @@
 2. **★ merge-back obviated (v0.3.0 + 3a)** — "delta 출처" 실측 답: post-v0.3.0 에 **scope-local 분석 사본 없음**(subsetAnalysisRefs=in-memory 필터·사본 ❌·divergence 금지=SSOT 단일). scope 가 canonical 항목 변경 = **canonical 직접 편집**(병합할 divergent 사본 부재) → markDrift(3a live)가 타 scope 자동 표지 = cross-scope 전파 이미 처리. ⟹ "scope-local delta → canonical 병합" **단계 자체가 존재하지 않음**. Phase 3 merge-back = 별도 도구 ❌, "canonical 직접 편집 + markDrift" 로 충족. (DEC §5 로드맵 Phase 3 = Phase 0 작성분 / v0.3.0 subset 폐기 前 framing → reframe.)
 
 **결론(Phase 3 reframe)**: ✅ cross-scope drift 전파 = 3a 로 DONE(실 2-BC 검증). ⚠️ subset-precision = NEEDED(FP 측정 / grounded next). ❌ merge-back 병합단계 = OBVIATED. **grounding 가치 = merge-back 헛빌드 회피(재작업 최소화) + subset-precision 실 trigger 확보.** 본체 코드 무변경(dogfood=tmp / 결함 미발견 → 본체 fix 없음 / poc-18 canonical 무변경). 다음 = 사용자 결단(subset-precision 추천).
+
+## 15. Phase 4 시행 로그 (v0.12.0 / 2026-06-07 — business-rules 노드 BC별 분할 펀더멘털 / additive)
+
+**Phase 4 = artifact-graph 의 단일 `analysis-business-rules` 노드를 bounded_context 별로 분할** — 사용자 통찰 "쪼개면 쪼갠 것끼리만 의존이 걸려야 그래프 의존성이 정밀"(통째 .json 의존 ❌). 결단 = B(전체 분할) / **펀더멘털 먼저 → 소비자 재배선은 하나씩 선택적**. 4원칙(plan `splendid-churning-curry.md`[plan-living-sync-phase4-br-per-bc 발전형] 1원칙 + **Senior 적대 step-0[REVISE@0.88] 전건 코드 사실검증** + 사용자 승인[additive / 1번=단계적 은퇴]).
+
+**★ 설계 = additive(부모 유지 + 자식 추가)** — 직전 Senior 가 replace(단일 노드 삭제) 전제로 찾은 3 BLOCKER(F1 dangling·F2 A2 content-drift 사망·F3 federator BR federation 유실)는 부모 file-level 노드 유지로 전부 소멸(exact-id ~30곳 부모 계속 참조=무회귀). 제약 실측: `impact-analyzer.js:153` 1-hop 이후 hard-only → soft 2-hop 폐기 ⟹ 부모는 자기 cross_reference 유지(file-drift→행위 안전망), 자식은 per-BC 정밀 엣지 추가.
+
+**구현(`graph-synthesizer.js` +68)**: BR-id→BC 인덱스(sort=결정성) / distinct BC 당 자식 `analysis-business-rules-<BC>`(subkind 유지+`bounded_context` 필드 / BC 부재=부모만) / 부모→자식 `groups` 엣지 / emitAnalysisCrossRefs 부모 유지+`_ref`→BC 자식 cross_reference(dedup) / deriveAnalysisCodePointers 부모=전체·자식=BC subset.
+
+**Senior REVISE@0.88 반영(전건 코드 사실검증 / 권위≠사실정합)**: F-B1(BLOCKER) `artifact-graph-node.schema.json` `additionalProperties:false`+`bounded_context` 부재 → 스키마 필드 추가 + Ajv guard 테스트(CI 가 artifact-graph Ajv 미검증=silent false-health 메움) / F-M1(MAJOR) route-discovery `.find(subkind)` push순서 fragility → 정확 id 핀+회귀테스트(per-BC dispatch=S1 deferred) / F-m2 BC `.sort()`+synthesize-twice 결정성 테스트.
+
+**검증(no-sim 실 합성 / §8.1)**: graph-synthesizer 161(+9) / chain-driver 432(+1) / poc-18 2-BC 실 재합성 e2e `impact(analysis-business-rules-BC-POST)`=BC-POST chain만(BC-USER 무관) / RR 39/40(workspace_test_pass=env artifact) / 3-way 0.12.0.
+
+**선택적 후속(S1~S6 / 하나씩 승인)**: S1 route per-BC dispatch · S2 drift subset-hash(=§14 측정 FP 제거) · S3 federator per-BC · S4 trace-view per-BC · **S5 종단=부모 coarse 엣지 은퇴(진짜 분할 / 소비자 전 재배선 후)** · S6 per-BR granularity. 부모 coarse 엣지는 S5 까지 잔존(부모 read 소비자 over-propagate=의도).
