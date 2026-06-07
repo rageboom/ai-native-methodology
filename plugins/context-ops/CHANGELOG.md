@@ -10,6 +10,18 @@
 
 ---
 
+## [0.6.0] — 2026-06-07 MINOR — living-sync Phase 1c: `sync-next` regen_queue stage-단위 소비 (루프 닫기)
+
+living-sync Phase 1(`sync-loop`)이 worklist 를 **계산·durable 기록만** 하고 멈추던 지점을 닫는다 — 신규 `sync-next` 가 `regen_queue` 를 **stage 단위**로 소비하여 재생성 지시 surface → stage gate 재실행 → drift 해소까지 end-to-end. 죽은 `pending_revisit`(stage-단위 / jump 미실행)의 **산 대체**(노드-단위 worklist). 재생성(LLM 내용 생성)·fixpoint 자동 재진입은 명시적 deferred. 4원칙(plan `plan-living-sync-phase1c.md` + 2 research-agent[Senior 적대 + soundness/reuse] 코드 사실확인). **Senior REVISE@0.82 — naive 설계의 BLOCKER 1·MAJOR 3 코드확인 후 정정**(node-gate→stage-gate).
+
+- **신규 소비 코어 (`tools/chain-driver/src/sync-loop.js` 에 추가 / 순수 / gate 토큰·I/O·시간 0)**: `selectNextStage(regenQueue)`(cascade 보존 = 첫 미완 item 의 stage + 같은 stage 노드 묶음 / origins) · `markStageDone(regenQueue, stage)`(in-place / CAS 는 호출자) · `queueStatus(regenQueue)`. 기존 sync-loop trust 가드가 커버.
+- **신규 `chain-driver sync-next` 명령**: `sync-next <project> [--findings <path>] [--user-decision <go|stop>] [--dry-run] [--json]`. **findings 미제출 = 재생성 지시 surface**(다음 미완 stage + 노드 + `requiredValidators(stage)` / gate ❌ / write ❌ / exit 0). **findings 제출 = 그 stage gate 재실행**(`evaluateGate(item.stage, findings, scenario)`) → pass=그 stage 미완 item 전부 `done:true` CAS·`status:in_progress|complete` / stop=`regen_queue.blocked={stage,reason}` 전용 표기·exit 1. **리듬 = invocation 1회 = distinct stage 1개**(기존 `next` 동형).
+- **정정 (Senior BLOCKER #1·MAJOR #2 / gate 입도 = stage)**: `evaluateGate` 는 노드 차원이 없는 **stage 단위 aggregate** 함수 → "노드별 gate" 는 불가(findings 부재→livelock / per-item done 허구). 라이프사이클 [4] "그 노드의 owning gate" = 그 노드의 **stage gate** 로 정합. findings = 그 stage validator 산출을 `--findings` 로 공급(bootstrap 동형).
+- **회귀 차단 (Senior MAJOR #3 / D5)**: 큐 block 은 `regen_queue.blocked` 전용 — **`state.blocked`·`current_chain`·`last_gate` 미접촉**(bootstrap `cmdNext` 무변경 / `blockedExit` 교차오염 회피). 별도 `sync-next` 명령(cmdNext 무변경 / zero-regression).
+- **clobber 가드 (Senior MINOR #5 / D7)**: `sync-loop` 가 in-progress 큐(in-flight done 존재 또는 `blocked`) 덮어쓰기 거부(exit 2) / `--force` 강제 교체. **fixpoint 정직 표기 (#6)**: 큐 소진 = `status:complete` + "fixpoint 미보증 — 계약 변경 시 sync-loop 재실행" / 자동 재진입 deferred. **has_cycle 큐 방어 (#7)**: 소비 전 assert. cmdState `regen_queue` 표시 done-aware(완료 큐를 "pending" 으로 오표기하던 것 교정).
+- **검증(no-sim 실 CLI / §8.1 ≥2 distinct 도메인)**: 신규 `test/sync-next.test.js` 16(코어 단위 6 + poc-05 e2e 6[surface/drain spec→plan→test→implement/block 격리·복구/빈큐/clobber/cmdState] + trust 4). **2번째 도메인 = poc-16 efiweb-car-spring41(Spring 4.1 legacy) 실 dogfood**(BHV-CAR-MGT-001 seed → surface → spec gate drain → complete). chain-driver **374/374**(358+16) · release-readiness **40/40 무회귀** · version 3-way 0.6.0.
+- **carry(후속 / DEC §5)**: fixpoint 자동 재진입(sync-next 종료 시 sync-loop 재호출) · Phase 1b NL discovery 라우터 · Phase 2 손수정 코드 lift+reconcile · Phase 3 merge-back · Phase 4 per-item granularity · hook auto-fire. (선택) state.schema.json `regen_queue` 선언(honest-debt). SSOT = `DEC-2026-06-07-living-sync-operating-model.md` §7(Phase 1c append) + plan.
+
 ## [0.5.0] — 2026-06-07 MINOR — living-sync Phase 1 MVP: `sync-loop` forward 전파 → regen_queue worklist
 
 living-sync 운영 모델(v0.4.0 후 청사진 정착)의 **Phase 1 MVP** — 변경된 산출물에서 그래프를 따라 **forward 단방향** 영향 closure 를 계산해 순서화된 재생성 worklist 를 산출하는 첫 결정론 루프. 재생성(LLM)·NL discovery 라우터·역동기화·merge-back·per-item granularity 는 명시적 deferred(후속 phase). 4원칙(plan `fancy-nibbling-wolf.md` §11 + 2 Explore 코드 사실확인 + 1 Plan-agent 설계).

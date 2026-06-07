@@ -79,7 +79,13 @@ import {
 import { topologicalOrder, cascadeOrder } from './propagation-orderer.js';
 import { topKImpactRoot } from './centrality.js';
 // living-sync 전파 루프 (Phase 1 MVP / DEC-2026-06-07-living-sync-operating-model) — 순수 코어.
-import { computeSyncLoop, markTransientDrift } from './sync-loop.js';
+import {
+	computeSyncLoop,
+	markTransientDrift,
+	selectNextStage,
+	markStageDone,
+	queueStatus,
+} from './sync-loop.js';
 // Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
@@ -110,7 +116,8 @@ function usage(code = 3) {
 			'  navigate --graph <artifact-graph.json> --stage <discovery|spec|plan|test|implement> [--scope <id>] [--json]   (F3 stage/scope 일괄 의존성 rollup)',
 			'  trace-view --graph <artifact-graph.json> [--scope <id>] [--no-matrix] [--json]   (사람 gate-검토용 추적성 맵 + coverage 매트릭스 / stdout)',
 			'  resync-graph [<project>] [--scope <slug>] [--out-dir <dir>] [--repo-root <dir>] [--dry-run]   (Loop A lazy 재합성 — STALE 배너 nudge → 1 명령)',
-		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
+		'  sync-loop <project> --graph <artifact-graph.json> (--origin <id>... | --changed <path>...) [--mark] [--force] [--dry-run] [--json]   (living-sync Phase 1 — forward 영향 closure → regen_queue worklist)',
+			'  sync-next <project> [--findings <path>] [--user-decision <go|stop>] [--dry-run] [--json]   (living-sync Phase 1c — regen_queue 를 stage 단위로 소비 / findings 없으면 재생성 지시 surface)',
 			'  suggest-skill --prompt <text>',
 			'  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
 			'  migrate <project>',
@@ -154,6 +161,7 @@ function parseArgs(argv) {
 		} else if (a === '--changed') (out.changedPaths ||= []).push(rest[++i]);
 		else if (a === '--mark') out.mark = true;
 		else if (a === '--no-mark') out.mark = false;
+		else if (a === '--force') out.force = true;
 		else if (a === '--change-kind') out.changeKind = rest[++i];
 		else if (a === '--policy') out.policyPath = rest[++i];
 		else if (a === '--out-jsonl') out.outJsonl = rest[++i];
@@ -229,6 +237,24 @@ function cmdInit(args) {
 	}
 }
 
+// regen_queue 표시 — done-aware (Phase 1c). 완료 큐를 "pending" 으로 잘못 표기하던 것 교정.
+function regenQueueSummary(q) {
+	if (!q || !(q.items?.length)) return '-';
+	const st = queueStatus(q);
+	if (q.blocked) return `BLOCKED @${q.blocked.stage} (${st.done}/${st.total} done)`;
+	if (st.complete) return `complete (${st.done}/${st.total} done)`;
+	return `${st.pending}/${st.total} pending`;
+}
+
+// D7 clobber 가드 — sync-loop 재실행이 in-flight done 을 덮어쓰는 것 방지.
+//   in-progress = blocked 표기 있거나, 일부 done 인데 아직 미완료 (완전 미시작/완료 큐는 교체 OK).
+function isQueueInProgress(q) {
+	if (!q || !(q.items?.length)) return false;
+	if (q.blocked) return true;
+	const st = queueStatus(q);
+	return st.done > 0 && !st.complete;
+}
+
 function cmdState(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -248,7 +274,7 @@ function cmdState(args) {
 			`blocked        : ${state.blocked} (${state.block_reason || '-'})`,
 			`last_gate      : ${state.last_gate ? `${state.last_gate.id} ${state.last_gate.decision}` : '-'}`,
 			`pending_revisit: ${state.pending_revisit ? state.pending_revisit.target_stage : '-'}`,
-			`regen_queue    : ${state.regen_queue ? `${state.regen_queue.items?.length ?? 0} item(s) pending` : '-'}`,
+			`regen_queue    : ${regenQueueSummary(state.regen_queue)}`,
 		];
 		process.stdout.write(lines.join('\n') + '\n');
 	}
@@ -1735,10 +1761,18 @@ function cmdSyncLoop(args) {
 	let written = false;
 	const root = args.project ? resolve(args.project) : null;
 	if (root && !args.dryRun && !result.has_cycle) {
-		if (!readState(root)) {
+		const existing = readState(root);
+		if (!existing) {
 			console.error(
 				`[chain-driver] sync-loop: state.json 부재 (${root}) — init 먼저 / regen_queue 미기록`,
 			);
+		} else if (isQueueInProgress(existing.regen_queue) && !args.force) {
+			// D7 clobber 가드 — in-flight done 보호 (sync-next 진행 중 덮어쓰기 거부).
+			console.error(
+				`[chain-driver] sync-loop: regen_queue 진행 중 (in-flight done 존재) — 덮어쓰기 거부. ` +
+					`소비 완료 후 재실행하거나 --force 로 강제 교체.`,
+			);
+			process.exit(2);
 		} else {
 			try {
 				writeStateCAS(root, (s) => {
@@ -1787,6 +1821,195 @@ function cmdSyncLoop(args) {
 		if (result.unresolved.length)
 			process.stdout.write(
 				`  unresolved: ${result.unresolved.join(', ')}\n`,
+			);
+	}
+	process.exit(0);
+}
+
+// chain-driver sync-next — living-sync Phase 1c (루프 닫기 / DEC §5 Phase 1c).
+//   regen_queue(sync-loop 산출)를 **stage 단위**로 소비: 다음 미완 stage 의 노드를 surface(재생성 지시) →
+//   사람/LLM 이 그 stage skill 로 재생성 + validator 실행 → --findings 로 재호출 = 그 stage gate 재실행.
+//   gate pass = 그 stage 미완 item 전부 done / stop = regen_queue.blocked 전용 표기·state.blocked 미접촉(cmdNext 회귀 차단).
+//   gate 입도 = stage (Senior BLOCKER #1·MAJOR #2 정정 / evaluateGate=stage 단위). 내용 재생성 = 본 명령 밖(no-simulation §3.4).
+function cmdSyncNext(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	recoverTmpFiles(root);
+	let state;
+	try {
+		state = readState(root);
+	} catch (e) {
+		if (e instanceof StateCorruptError) {
+			console.error(`[chain-driver] ${e.message}`);
+			process.exit(4);
+		}
+		throw e;
+	}
+	if (!state) {
+		console.error('[chain-driver] no state.json — run init first');
+		process.exit(3);
+	}
+
+	const queue = state.regen_queue;
+	if (!queue || !(queue.items?.length)) {
+		console.error(
+			'[chain-driver] sync-next: regen_queue 비어있음 — sync-loop 먼저 실행',
+		);
+		process.exit(3);
+	}
+	// #7 has_cycle 방어 (산출 시 이미 write 거부되나 hand-edit 방어).
+	if (queue.has_cycle) {
+		console.error(
+			'[chain-driver] sync-next: regen_queue.has_cycle=true — 소비 거부 (cycle 해소 후 재합성)',
+		);
+		process.exit(2);
+	}
+
+	const status = queueStatus(queue);
+	if (status.complete) {
+		const out = {
+			status: 'complete',
+			done: status.done,
+			total: status.total,
+			fixpoint_guaranteed: false,
+		};
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else
+			process.stdout.write(
+				`[chain-driver sync-next] 큐 완료 (${status.done}/${status.total} done). ` +
+					`fixpoint 미보증 — 재생성이 계약을 바꿨으면 sync-loop 재실행.\n`,
+			);
+		process.exit(0);
+	}
+
+	const sel = selectNextStage(queue); // status.complete=false → 미완 존재 → non-null
+	let scenario;
+	try {
+		scenario = state.current_scope
+			? readManifest(root, state.current_scope)?.scenario
+			: undefined;
+	} catch {
+		scenario = undefined;
+	}
+
+	// findings 미제출 = 재생성 지시 surface (gate 평가 ❌ / exit 0). 재생성 후 --findings 로 재호출.
+	if (!args.findingsPath) {
+		const reqv = requiredValidators(sel.stage) || [];
+		const out = {
+			action: 'regenerate',
+			stage: sel.stage,
+			nodes: sel.item_ids,
+			grades: sel.grades,
+			required_validators: reqv,
+			progress: { done: status.done, total: status.total },
+		};
+		if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+		else {
+			process.stdout.write(
+				`[chain-driver sync-next] 재생성 대상 stage: ${sel.stage} (${status.done}/${status.total} done)\n`,
+			);
+			process.stdout.write(`  노드: ${sel.item_ids.join(', ')}\n`);
+			process.stdout.write(
+				`  필요 validator: ${(reqv.length ? reqv : ['(없음)']).join(', ')}\n`,
+			);
+			process.stdout.write(
+				`  → 재생성 후 그 결과 validator 산출을 --findings <path> 로 재호출하면 gate 재실행·done 표시.\n`,
+			);
+		}
+		process.exit(0);
+	}
+
+	// findings 제출 = stage gate 재실행.
+	const findings = loadFindings(args.findingsPath);
+	const gateResult = evaluateGate(sel.stage, findings, scenario);
+	const finalDecision = applyUserDecision(gateResult, args.userDecision);
+
+	if (args.dryRun) {
+		process.stdout.write(
+			JSON.stringify(
+				{
+					stage: sel.stage,
+					nodes: sel.item_ids,
+					gate: finalDecision,
+					dry_run: true,
+				},
+				null,
+				2,
+			) + '\n',
+		);
+		process.exit(finalDecision.blocked ? 1 : 0);
+	}
+
+	const nowIso = new Date().toISOString();
+
+	if (finalDecision.blocked) {
+		// #3·#5 큐-전용 block — state.blocked 미접촉 (cmdNext 회귀 차단).
+		writeStateCAS(root, (s) => {
+			if (s.regen_queue)
+				s.regen_queue.blocked = {
+					stage: sel.stage,
+					reason: finalDecision.primary_reason || 'validator',
+					blocked_at: nowIso,
+				};
+			return s;
+		});
+		logIntervention(state, root, {
+			event_type: 'sync_next_gate',
+			actor: args.userDecision ? 'user' : 'driver',
+			stage: sel.stage,
+			decision: 'block',
+			exit_code: 1,
+			message: finalDecision.reasons.map((r) => r.detail).join('; '),
+		});
+		console.error(
+			`[chain-driver] sync-next: stage ${sel.stage} gate blocked: ${finalDecision.primary_reason}. ` +
+				`(regen_queue.blocked 표기 / state.blocked 미접촉)`,
+		);
+		process.exit(1);
+	}
+
+	// pass → 그 stage 미완 item 전부 done. state.blocked·current_chain·last_gate 미접촉.
+	let after;
+	const newState = writeStateCAS(root, (s) => {
+		if (s.regen_queue) {
+			markStageDone(s.regen_queue, sel.stage);
+			delete s.regen_queue.blocked;
+			after = queueStatus(s.regen_queue);
+			if (after.complete) {
+				s.regen_queue.status = 'complete';
+				s.regen_queue.completed_at = nowIso;
+			} else {
+				s.regen_queue.status = 'in_progress';
+			}
+		}
+		return s;
+	});
+	after = after || queueStatus(newState.regen_queue);
+
+	logIntervention(state, root, {
+		event_type: 'sync_next_gate',
+		actor: args.userDecision ? 'user' : 'driver',
+		stage: sel.stage,
+		decision: finalDecision.decision,
+		exit_code: 0,
+		message: `stage ${sel.stage} done (${sel.item_ids.join(',')}) — ${after.done}/${after.total}`,
+	});
+
+	const out = {
+		stage: sel.stage,
+		marked_done: sel.item_ids,
+		decision: finalDecision.decision,
+		progress: { done: after.done, total: after.total, complete: after.complete },
+		...(after.complete ? { fixpoint_guaranteed: false } : {}),
+	};
+	if (args.json) process.stdout.write(JSON.stringify(out, null, 2) + '\n');
+	else {
+		process.stdout.write(
+			`[chain-driver sync-next] stage ${sel.stage} gate ${finalDecision.decision} → done: ${sel.item_ids.join(', ')} (${after.done}/${after.total})\n`,
+		);
+		if (after.complete)
+			process.stdout.write(
+				`  큐 완료. fixpoint 미보증 — 재생성이 계약을 바꿨으면 sync-loop 재실행.\n`,
 			);
 	}
 	process.exit(0);
@@ -1949,6 +2172,8 @@ function main() {
 			return cmdResyncGraph(args);
 		case 'sync-loop':
 			return cmdSyncLoop(args);
+		case 'sync-next':
+			return cmdSyncNext(args);
 		case 'suggest-skill':
 			return cmdSuggestSkill(args);
 		case 'hooks-bridge':

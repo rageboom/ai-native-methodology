@@ -74,3 +74,15 @@
 - **검증**: `test/sync-loop.test.js` 15(단위+poc-05 e2e+trust 가드). **forward-only 입증**: poc-05 BHV-USER-001 → closure=[AC,IMPL,TASK,TC]-USER-001 / UC·USER-002 부재. chain-driver 358/358 · release-readiness 40/40 · version 3-way 0.5.0. **trust**: 코어 gate토큰·I/O·비결정 0 + gate-eval/cmdNext 가 regen_queue·sync-loop 미참조(reference-lens).
 - **정정**: 청사진 §6/§8 D2 "policy-evaluator.js 미확인" → **실재 확인**(cli.js:74 import / 과대인용 아니었음).
 - **carry(deferred)**: Phase 1b NL discovery 라우터 · Phase 2 lift+reconcile · Phase 3 merge-back · Phase 4 per-item · `next`-consumes-worklist+pending_revisit 활성화 · hook auto-fire. 다음 = Phase 2 또는 1b(사용자 결단).
+
+## 8. Phase 1c 시행 로그 (v0.6.0 / 2026-06-07 — 루프 닫기)
+
+**Phase 1c = `sync-next` regen_queue **stage-단위** 소비** — Phase 1(`sync-loop`)이 worklist 를 계산·durable 기록만 하고 멈추던 지점을 닫는다. 죽은 `pending_revisit`(stage-단위 / jump 미실행 / cli.js:1519 write·:250 display)의 **노드-단위 산 대체**. §5 로드맵의 carry `next`-consumes-worklist 항목 이행(추천 순서 1순위). 4원칙 — 2 research-agent(Senior 적대 + soundness/reuse) 코드 사실확인.
+
+**★ Senior REVISE@0.82 — naive 설계 정정 (node-gate → stage-gate)**: 초안은 "regen_queue item(노드)별 gate 재실행". 코드 검증 결과 **BLOCKER**: `evaluateGate(stage, findings, scenario)`(gate-eval.js:80)는 **노드 차원이 없는 stage 단위 aggregate** 함수 + findings 는 stage 단위 외부 산출 → "노드별 gate"는 (a) findings 부재 시 `__findings_absent` 센티넬로 **전 item livelock** (b) BHV·AC 둘 다 spec → per-item done **허구**. **정정**: 라이프사이클 [4] "그 노드의 owning gate" = 그 노드의 **stage gate**. 소비도 distinct stage 단위. 추가 MAJOR — `state.blocked` 공유 시 bootstrap `cmdNext`가 `blockedExit`(exit 2) 교차오염 → **`regen_queue.blocked` 전용**.
+
+- **신규 소비 코어 (`tools/chain-driver/src/sync-loop.js` 추가 / 순수 / gate 토큰·I/O·시간 0)**: `selectNextStage`(cascade 보존 = 첫 미완 item 의 stage + 같은 stage 노드 묶음 + origins) · `markStageDone`(in-place / CAS 는 호출자) · `queueStatus`. 기존 sync-loop trust 가드 커버.
+- **신규 `chain-driver sync-next` 명령**(cli.js / **cmdNext 무변경 = zero-regression**): findings 미제출 = 재생성 지시 surface(다음 stage + 노드 + `requiredValidators(stage)` / gate·write ❌ / exit 0) / 제출 = `evaluateGate(item.stage, findings, scenario)` → pass=그 stage 미완 item 전부 `done:true` CAS·`status` / stop=`regen_queue.blocked={stage,reason}` 전용·exit 1. cmdNext 의 post-gate tail(current_chain·last_gate·s.blocked) **재사용 ❌**(reuse-agent 경고). 리듬 = invocation 1회 = distinct stage 1개.
+- **가드**: clobber(sync-loop 가 in-progress 큐 덮어쓰기 거부 / `--force`) · fixpoint 미보증 정직 표기(자동 재진입 deferred) · has_cycle 큐 방어 · cmdState done-aware 표시.
+- **검증(no-sim 실 CLI / §8.1 ≥2 distinct 도메인)**: `test/sync-next.test.js` 16(코어 6 + poc-05 e2e 6 + trust 4) — drain spec→plan→test→implement→complete / block 격리(state.blocked 불변)·복구 / clobber. **2번째 도메인 = poc-16 efiweb-car-spring41(Spring 4.1 legacy) 실 dogfood**(BHV-CAR-MGT-001 → surface → spec gate drain → complete). chain-driver **374/374**(358+16) · release-readiness **40/40** · 3-way 0.6.0.
+- **carry(후속)**: fixpoint 자동 재진입(sync-next 종료 시 sync-loop 재호출) · Phase 1b NL 라우터 · Phase 2 lift+reconcile · Phase 3 merge-back · Phase 4 per-item · hook auto-fire. (선택) state.schema.json `regen_queue` 선언(honest-debt / reuse-agent 지적). 다음 = Phase 1b 또는 2(사용자 결단).

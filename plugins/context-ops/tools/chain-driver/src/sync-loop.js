@@ -165,3 +165,62 @@ export function markTransientDrift(graph, ids) {
 	}
 	return { applied };
 }
+
+// ── Phase 1c — regen_queue 소비 (루프 닫기 / DEC §5 Phase 1c) ──────────────
+// 정정(Senior BLOCKER #1·MAJOR #2): gate 는 노드가 아니라 **stage 단위**다. 따라서 소비도 노드가 아니라
+//   distinct stage 단위로 한다 — 워크리스트는 어느 stage 가 교란됐나·어느 노드가 바뀌었나·순서를 스케줄링하고,
+//   검증은 기존 stage gate 를 그대로 재실행(cli glue). 본 코어 = gate 토큰·I/O·시간 0 (trust 가드 / §3.4 경계).
+
+/**
+ * 워크리스트에서 다음 소비할 stage 선택 (cascade 보존 = 첫 미완 item 의 stage / 위상 최선두 미완).
+ *   같은 stage 의 미완 item 을 한 묶음으로 모은다 (gate 가 stage 단위이므로 함께 검증·done).
+ * @returns {{ stage, item_ids:string[], grades:object, origins:string[] } | null} 미완 없으면 null
+ */
+export function selectNextStage(regenQueue) {
+	const items = regenQueue?.items ?? [];
+	const firstPending = items.find((it) => !it.done);
+	if (!firstPending) return null;
+	const stage = firstPending.stage;
+	const group = items.filter((it) => !it.done && it.stage === stage);
+	const grades = {};
+	for (const it of group) grades[it.id] = it.grade;
+	return {
+		stage,
+		item_ids: group.map((it) => it.id).sort(),
+		grades,
+		origins: group
+			.filter((it) => it.origin)
+			.map((it) => it.id)
+			.sort(),
+	};
+}
+
+/**
+ * 한 stage 의 모든 미완 item 을 done 표시 (in-place 순수 transform — durable write 는 호출자 CAS).
+ * @returns {{ marked: number }}
+ */
+export function markStageDone(regenQueue, stage) {
+	let marked = 0;
+	for (const it of regenQueue?.items ?? []) {
+		if (!it.done && it.stage === stage) {
+			it.done = true;
+			marked++;
+		}
+	}
+	return { marked };
+}
+
+/**
+ * 워크리스트 진행 요약 (순수).
+ * @returns {{ total, done, pending, complete:boolean }}
+ */
+export function queueStatus(regenQueue) {
+	const items = regenQueue?.items ?? [];
+	const done = items.filter((it) => it.done).length;
+	return {
+		total: items.length,
+		done,
+		pending: items.length - done,
+		complete: items.length > 0 && done === items.length,
+	};
+}
