@@ -20,7 +20,7 @@ per-BC 노드(Phase 4)를 한 단계 더 — distinct business rule 당 **per-BR
 - **route(S1) 4-tier**: br_id→per-BR 노드(tier1 신설 최우선) / per-BC 자식(tier2) / 부모 coarse(tier3) / net-new(tier4). per-BR 노드 부재 graph(미재합성)는 tier2 fallback = 무회귀.
 - **검증(no-sim 실 / §8.1 2-도메인)**: graph-synthesizer.test.js +7(per-BR 노드·정밀 cross_reference·per-BC additive·groups·code_pointers·BC-less·결정성) → **170** / route-discovery.test.js +3(per-BR dispatch·혼합 fallback·정렬) → chain-driver **448**. graph-integrity 13·federator 32·code-pointer 45 무회귀. **e2e**: poc-18(Express/TS 2-BC) BR-POST-AUTHORSHIP-001 영향 **10→2 item(5:1 제거)** + poc-19(Python numpy-financial 4-BC / 6 per-BR / valid graph). RR 무회귀.
 - **정직 경계**: 5:1 정밀 = route→per-BR origin 시 실현(per-BC 엣지 잔존=fallback) / soundness 불변(over-include 제거만·누락 0 / additive=기존동작 불변) / 실 운영 수요 신호 0(BUILD=사용자 결단). 노드 증가 = per-graph 수십.
-- **다음 선택적**: per-BC Layer-1 엣지 은퇴(S5→Phase4 동형 후속 / 진짜 per-BR 분할) · drift per-BR(scope subset 내 per-rule). SSOT = DEC §20.
+- **다음 선택적**: ~~per-BC Layer-1 은퇴~~·~~drift per-BR~~·~~S4 trace-view per-BC~~ = **전부 DROP**(per-BC 엣지=유효한 whole-BC 정밀도 다이얼·drift=scope-level boolean 소비자 0·trace-view=UC-rooted no-op / DEC §21 / per-BR 로드맵 S6 완료) · 별개 carry: 변경 자동 감지→per-BR auto-origin · fixpoint 자동 재진입 · durable source-write(--apply). SSOT = DEC §21.
 
 ## [0.15.0] — 2026-06-07 MINOR — living-sync S5: 부모 coarse 엣지 은퇴 (진짜 분할 / Phase 4 선택적 종단)
 

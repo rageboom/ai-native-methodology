@@ -256,3 +256,13 @@
 **검증(no-sim 실 / §8.1 2-도메인)**: graph-synthesizer.test.js **170**(+7) / route-discovery.test.js → chain-driver **448**(+3) / graph-integrity 13·federator 32·code-pointer 45 무회귀. e2e: **poc-18**(Express/TS 2-BC) BR-POST-AUTHORSHIP-001 영향 **10(per-BC)→2(per-BR) = 5:1 제거** + **poc-19**(Python numpy-financial 4-BC / 6 per-BR / valid). RR 무회귀 · 3-way 0.16.0. (S1/S2/S5=1 도메인보다 강한 2-distinct-paradigm 입증 / 단 실 운영 수요 신호는 여전히 0=BUILD 결단.)
 
 **다음 선택적**: per-BC Layer-1 엣지 은퇴(진짜 per-BR 분할 / S5→Phase4 동형) · drift per-BR(scope subset 내 per-rule hash).
+
+## 21. 잔여 per-BR 로드맵 = DROP + 로드맵 종료 (2026-06-07 / 사용자 승인 / 코드·버전 변경 0)
+
+S6(v0.16.0) 후 남은 per-BR 선택적 3종을 코드 실증으로 재평가 → **전부 DROP**. per-BR/per-BC graph 정밀화 로드맵 = **S6 으로 완료 선언**. (S3 DROP·merge-back OBVIATED 선례 동형 / cadence 원칙: 안정점 후 새 feature ≠ default.)
+
+- **① per-BC Layer-1 엣지 은퇴(구 "진짜 per-BR 분할") = DROP**: 정밀화는 S6 route→per-BR(tier1)로 **이미 달성**. per-BC→item cross_reference 엣지 = **whole-BC 변경 granularity**(§5 정밀도 다이얼 / 유효한 coarser 입도 — "BC-POST 전 rule 개편" 류 변경 표현). 은퇴 = 그 dial 제거 = 기능 상실. additive(S6)가 per-BC(whole-BC)·per-BR(single-rule) 두 입도 모두 보존 = §5 정합 end-state. 직전 S5/S6 narrative 의 "진짜 분할" 은 재검증상 over-engineering(없애면 capability 감소). ★ 재제안 방지: per-BC 엣지는 유지가 정답 — over-include 는 §5 상 누락 0 의 정밀도 다이얼.
+- **② drift per-BR = DROP**: drift(sync.js detectDrift/markDrift)는 **scope-level boolean**(`sync_state.drift_detected`). 유일 소비자 = `query.js --stale`(drift 된 scope manifest 목록). per-rule 해싱 = **소비자 0**(origin·rule 선택 안 함). per-rule 식별 가치는 별개 feature "변경 자동 감지→per-BR auto-origin" 소관(현 수동 트리거 / 후속 carry).
+- **③ S4 trace-view per-BC/BR = DROP(no-op 확정)**: trace-view = **UC-rooted** 매트릭스(행=UC / 열=BHV·AC·TASK·TC·IMPL / trace-view.js:19 "analysis=비-체인→열 아님" / :30 BR 노드 = (misc) 그룹). business-rules 노드 first-class 미표시 → per-BC/per-BR 인지 추가 = 산출 무변화.
+
+**로드맵 상태**: living-sync per-BR/per-BC graph 정밀화 = **종료**(Phase 4 노드 → S1 route → S2 drift FP → S5 부모 은퇴 → S6 per-BR additive). 남은 **별개 feature carry**(각자 4원칙): 변경 자동 감지→per-BR auto-origin(진짜 다음 / drift 가 변경 rule 식별→sync-loop origin 자동 seed) · 재생성-후 fixpoint 자동 재진입 · 자동등록 lifecycle 배선·durable source-write(--apply).
