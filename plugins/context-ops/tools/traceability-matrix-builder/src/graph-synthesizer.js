@@ -712,16 +712,26 @@ export function synthesizeGraph(input) {
         if (!analysisLoaded.has(analysisKind)) continue;
         const emittedChild = new Set(); // per (item,field) per-BC child dedup
         for (const _ref of item[field] ?? []) {
-          // analysis kind 노드 → 개별 chain instance: 본문 변경 시 chain 으로 SHOULD 전파
-          edges.push(makeEdge(`analysis-${analysisKind}`, item.id, 'cross_reference'));
-          // Phase 4 additive: business-rules only  route ignored _ref(BR id) -> BC -> child node (precise).
+          // S5 (v0.15.0) 진짜 분할: per-rule 참조는 per-BC 자식으로만 라우팅 (부모 coarse 은퇴).
+          // 3-tier fail-open: (1) BR-ref→BC + 자식 실재 → 자식 precise 엣지만(coarse 은퇴) /
+          // (2) BC-less BR·자식 부재 / (3) non-business-rules kind → 부모 coarse fallback(무회귀 / silent false-health 차단).
+          // whole-artifact 참조(Layer 3/4 meta.related_chain_ids·to_analysis_artifacts)는 per-rule id 부재라 부모 coarse 유지가 정답.
+          let precise = false;
           if (analysisKind === 'business-rules') {
             const bc = brById.get(_ref);
-            if (bc && !emittedChild.has(bc)) {
-              emittedChild.add(bc);
-              edges.push(makeEdge(`analysis-business-rules-${bc}`, item.id, 'cross_reference'));
+            if (bc) {
+              const childId = `analysis-business-rules-${bc}`;
+              if (nodeIds.has(childId)) {
+                precise = true;
+                if (!emittedChild.has(bc)) {
+                  emittedChild.add(bc);
+                  edges.push(makeEdge(childId, item.id, 'cross_reference'));
+                }
+              }
             }
           }
+          // analysis kind 노드 → 개별 chain instance: SHOULD 전파 (precise 자식이 대체하면 은퇴)
+          if (!precise) edges.push(makeEdge(`analysis-${analysisKind}`, item.id, 'cross_reference'));
         }
       }
     }

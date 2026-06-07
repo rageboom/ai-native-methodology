@@ -10,6 +10,16 @@
 
 ---
 
+## [0.15.0] — 2026-06-07 MINOR — living-sync S5: 부모 coarse 엣지 은퇴 (진짜 분할 / Phase 4 선택적 종단)
+
+Phase 4(v0.12.0 per-BC 노드분할 additive) 의 종단 — per-rule 부모 `analysis-business-rules` coarse cross_reference 를 per-BC 자식이 인수했을 때 **은퇴**. S1(route→자식)·S2(drift→자식 subset) 가 소비자를 자식으로 재배선 완료 → 부모 Layer-1 coarse 엣지 = latent per-rule over-propagation 잔존 surface(한 BC rule 변경이 전 BC behavior 누수). 4원칙(plan `plan-living-sync-s5-parent-edge-retire.md` 1원칙 + **Senior 적대 step-0[REVISE@0.80] 전건 코드 사실검증** + 사용자 "설계대로 착수").
+
+- **`graph-synthesizer.js` emitAnalysisCrossRefs 3-tier fail-open**: per-ref `_ref`(BR id)→`brById`(BC) + 자식 `analysis-business-rules-<BC>` `nodeIds.has` → **자식 precise 엣지만 emit(부모 coarse 은퇴)**. (2) BC-less BR(`brById` 부재)·자식 부재 / (3) non-business-rules kind → **부모 coarse fallback 유지**(무회귀 / silent false-health 차단). `emittedChild` per-(item,field) BC dedup·결정성(synthesize-twice deepEqual) 유지.
+- **★ Senior REVISE@0.80 전건 사실검증 — emit 4-Layer 범위 정밀화**: 부모 BR coarse 4 경로 중 **Layer 1(per-rule)만** S5 대상. Layer 2(ANALYSIS_TO_CHAIN_REFS)=business-rules 엔트리 부재(N/A) / **Layer 3(meta.related_chain_ids)·Layer 4(to_analysis_artifacts)=whole-artifact 참조(per-rule id 없음)→BC 매핑 불가→coarse 유지가 정답**(whole-file 의존). ∴ 부모 = whole-artifact anchor + 조직(groups) 노드 잔존(순수 조직 노드 ❌). **false-health hole 부재**(route tier-1=자식 / 부모 fallback=BC-less coarse-유지 경우만→closure 비공집합) · orphan 무영향(부모 outgoing groups 유지) · stat 변동 RR#13(cycle/orphan/unknown=0) 무영향 · **committed golden 재생성❌**(byte 회귀 0).
+- **정직 경계**: per-rule 정밀화/방어(신규 기능 ❌) · BC-less BR(7/8 PoC fill 0%)·whole-artifact 참조 무영향 · fail-open=정확성 불변(over-include 제거만 / granularity=정밀도 다이얼) · §8.1 = poc-18 실 2-BC + BC-less PoC backward-compat(in-the-wild multi-BC 1건 / S1·S2 동형 honest boundary).
+- **검증(no-sim 실 / §8.1)**: graph-synthesizer.test.js — Phase 4 블록 전수 감사 후 2285 "zero-regression safety net" flip(부모 coarse `[]`) + 신규 fallback(BC-less→부모 coarse 1) + 신규 mixed(BC-ful+BC-less→자식 precise + 부모 coarse 부분 은퇴) → **163**(flip 1+신규 2). chain-driver 445·graph-integrity 13·federator 32·code-pointer 45 무회귀 · RR 무회귀 · 3-way 0.15.0.
+- **다음 선택적**: S6 per-BR granularity(잔여 / 사용자 결단). S4 trace-view per-BC = no-op 의심 보류(§18). S3 = DROP(§18). SSOT = DEC §19.
+
 ## [0.14.0] — 2026-06-07 MINOR — living-sync S2: drift subset-hash (cross-scope FP 제거 / Phase 4 선택적 #2 / 구 Phase 3b)
 
 공유 canonical `business-rules.json` 의 cross-scope drift false-positive 제거 — §14 multi-scope dogfood 가 측정한 trigger(BC-POST rule 변경 → 무관 scope-user 도 file-hash drift). scope 가 `--bc` 로 선언한 bounded_context subset 만 재hash. 4원칙(plan `plan-living-sync-s2-subset-hash.md` 1원칙 + **Senior 적대 step-0[REVISE@0.83] 전건 코드 사실검증** + 사용자 "s2").

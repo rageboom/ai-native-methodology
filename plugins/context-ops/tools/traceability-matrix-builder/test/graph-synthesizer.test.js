@@ -2282,16 +2282,49 @@ describe('Phase 4 — business-rules per-BC 자식 노드 (additive / 무회귀)
 		assert.deepEqual(fromUser, ['BHV-USER-001']);
 	});
 
-	it('부모 coarse cross_reference 엣지 유지 (zero-regression safety net)', () => {
+	it('S5 — BC-ful 참조는 부모 coarse cross_reference 은퇴 (자식만 / 진짜 분할)', () => {
 		const g = synthesizeGraph(brInput);
 		const fromParent = g.edges
 			.filter((e) => e.edge_type === 'cross_reference' && e.source === 'analysis-business-rules')
 			.map((e) => e.target);
-		assert.deepEqual([...new Set(fromParent)].sort(), [
-			'AC-POST-001',
-			'BHV-POST-001',
-			'BHV-USER-001',
-		]);
+		assert.deepEqual([...new Set(fromParent)].sort(), [], 'BC-ful refs → 자식 인수 / 부모 coarse 0');
+	});
+
+	it('S5 fallback — BC-less BR 참조 item 은 부모 coarse 유지 (silent false-health 차단)', () => {
+		const noBC = {
+			behavior: { behaviors: [{ id: 'BHV-1', use_case_refs: [], br_refs: ['BR-LEGACY-001'] }] },
+			analysis: {
+				'business-rules': { meta: { title: 'BR' }, business_rules: [{ id: 'BR-LEGACY-001', source_evidence: [] }] },
+			},
+			sourcePaths: { analysis: { 'business-rules': 'business-rules.json' } },
+		};
+		const g = synthesizeGraph(noBC);
+		assert.equal(g.nodes.filter((n) => n.id.startsWith('analysis-business-rules-')).length, 0, '자식 0');
+		const coarse = g.edges.filter(
+			(e) => e.edge_type === 'cross_reference' && e.source === 'analysis-business-rules' && e.target === 'BHV-1',
+		);
+		assert.equal(coarse.length, 1, 'BC-less → 부모 coarse fallback 유지');
+	});
+
+	it('S5 mixed — item 이 BC-ful + BC-less BR 동시 참조 → 자식 precise + 부모 coarse 부분 은퇴', () => {
+		const mixed = {
+			behavior: { behaviors: [{ id: 'BHV-MIX', use_case_refs: [], br_refs: ['BR-POST-A-001', 'BR-LEGACY-001'] }] },
+			analysis: {
+				'business-rules': {
+					meta: { title: 'BR' },
+					business_rules: [
+						{ id: 'BR-POST-A-001', bounded_context: 'BC-POST', source_evidence: [] },
+						{ id: 'BR-LEGACY-001', source_evidence: [] },
+					],
+				},
+			},
+			sourcePaths: { analysis: { 'business-rules': 'business-rules.json' } },
+		};
+		const g = synthesizeGraph(mixed);
+		const xref = g.edges.filter((e) => e.edge_type === 'cross_reference' && e.target === 'BHV-MIX');
+		const sources = xref.map((e) => e.source).sort();
+		assert.ok(sources.includes('analysis-business-rules-BC-POST'), 'BC-ful → 자식 precise');
+		assert.ok(sources.includes('analysis-business-rules'), 'BC-less → 부모 coarse fallback');
 	});
 
 	it('한 item 이 같은 BC 의 BR 2개 참조 → 자식 엣지는 1개로 dedup', () => {

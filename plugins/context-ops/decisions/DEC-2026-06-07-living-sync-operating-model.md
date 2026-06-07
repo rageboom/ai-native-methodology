@@ -230,3 +230,15 @@
 - ★ **파일 분할(BR-split STEP 3)과 무관**: business-rules.json 을 BC별 파일로 쪼개는 건 가능(`loadBusinessRules` 가 dir 감지·병합 single-point = load-business-rules.js:89 / 현 STEP2=단일파일). federator 는 loader 경유라 파일 레이아웃 무관. "whole" = 메모리 조회표(전체 규칙 집합)이지 물리 파일 아님 — 노드 분할(Phase 4 ①)·파일 분할(STEP 3 ②) = 별개 축.
 
 **남은 선택적 재평가**: S4(trace-view per-BC) = trace-view 가 UC-rooted hard-chain coverage 뷰라 analysis(business-rules) 노드를 애초에 표시 안 함(trace-view.js:19) → S3 동형 no-op 의심(가치검증 보류). 실 grounded 잔여 = **S5(부모 coarse 엣지 은퇴 = 진짜 분할)** — route(S1)·drift(S2) 핵심 소비자 재배선 완료 / graph 축.
+
+## 19. S5 시행 로그 (v0.15.0 / 2026-06-07 — 부모 coarse 엣지 은퇴 = 진짜 분할 / Phase 4 선택적 종단)
+
+**S5 = Phase 4 additive(§15)의 종단** — per-rule 부모 `analysis-business-rules` coarse cross_reference 를 per-BC 자식이 인수했을 때 은퇴. S1(route)·S2(drift) 소비자 재배선 완료가 전제. 4원칙(plan `plan-living-sync-s5-parent-edge-retire.md` 1원칙 + **Senior 적대 step-0[REVISE@0.80] 전건 코드 사실검증** + 사용자 "설계대로 착수").
+
+**구현(`graph-synthesizer.js` emitAnalysisCrossRefs / Layer 1)**: per-ref 3-tier fail-open — (1) BR-ref→BC + `nodeIds.has(analysis-business-rules-<BC>)` → 자식 precise 엣지만(부모 coarse 은퇴 / `emittedChild` per-(item,field) dedup) / (2) BC-less BR(`brById` skip @669)·자식 부재 / (3) non-business-rules kind → 부모 coarse fallback. 결정성 유지(global edge sort 부재 / 삽입순서 결정론).
+
+**★ Senior REVISE@0.80 전건 사실검증 — emit 4-Layer 범위 정밀화(놓친 경로)**: Layer 1(emitAnalysisCrossRefs = BHV.br_refs·AC.related_brs)=per-ref BR-id 보유→S5 대상. Layer 2(ANALYSIS_TO_CHAIN_REFS @137-159)=business-rules 엔트리 부재→부모 BR 엣지 0(N/A). Layer 3(meta.related_chain_ids @752-758)·Layer 4(to_analysis_artifacts @788-796)=whole-artifact 참조(per-rule id 없음)→BC 매핑 불가→**coarse 유지가 정답**. ∴ 부모 = whole-artifact anchor + 조직(groups) 노드 잔존. false-health hole 부재(route tier-1=자식 / 부모 fallback=BC-less coarse-유지 경우만→closure 비공집합)·orphan 무영향(부모 outgoing groups 유지)·stat 변동 RR#13 무영향·committed golden 재생성❌·shape-divergence(synthesizer=.business_rules 만 인덱싱 / 비-canonical=자식 0→fail-open coarse / pre-existing).
+
+**검증(no-sim 실 / §8.1)**: graph-synthesizer.test.js — Phase 4 블록 전수 감사 후 2285 flip(부모 coarse `[]`) + 신규 fallback(BC-less) + 신규 mixed(부분 은퇴) → **163**. chain-driver 445·graph-integrity 13·federator 32·code-pointer 45 무회귀 · RR 무회귀 · 3-way 0.15.0. 정직 경계: poc-18 실 2-BC + BC-less PoC backward-compat(in-the-wild multi-BC 1건 / S1·S2 동형).
+
+**다음 선택적(하나씩)**: S6 per-BR granularity(잔여). S4 = no-op 의심 보류(§18). S3 = DROP(§18).
