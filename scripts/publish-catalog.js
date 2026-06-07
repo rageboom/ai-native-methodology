@@ -9,15 +9,18 @@
 //
 // usage:
 //   node scripts/publish-catalog.js --dry-run            # 검증 + 미리보기 (업로드 없음)
+//   node scripts/publish-catalog.js                      # --user 생략 시 ID 를 대화형 prompt(기본 admin) → curl 이 비번 prompt
 //   node scripts/publish-catalog.js --user <nexus-id>    # 업로드 (curl 이 비밀번호를 prompt — 채팅/스크립트에 비번 넣지 말 것)
 //   node scripts/publish-catalog.js --user <id> --url <override>
 //
 // 인증: Nexus raw(serving-static) write 권한 계정 (HTTP Basic). npm 토큰과 별개.
+//   ⚠ ID/비번 대화형 prompt 는 실제 터미널(TTY)에서만 동작 — 비대화식(CI/캡처 셸)이면 --user 명시 필요.
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
+import { createInterface } from 'node:readline/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const SCRIPT_DIR = resolve(__filename, '..'); // repo-root/scripts
@@ -85,15 +88,28 @@ if (DRY) {
 	console.log('\n[publish-catalog] ✅ 검증 통과 (업로드 없음)');
 	process.exit(0);
 }
-if (!user)
-	fail(
-		'--user <nexus-id> 필요 (curl 이 비밀번호를 prompt / 채팅·스크립트에 비번 넣지 말 것).',
-	);
+// --user 생략 시 — TTY 면 ID 를 대화형 prompt(기본 admin), 비대화식이면 fail(CI 안전).
+// 비번은 어느 경로든 curl 이 prompt(-u <user>) — 명령줄/히스토리에 비번 미노출.
+let resolvedUser = user;
+if (!resolvedUser) {
+	if (!process.stdin.isTTY)
+		fail(
+			'--user <nexus-id> 필요 (비대화식 환경 — TTY 없음 / 채팅·스크립트에 비번 넣지 말 것).',
+		);
+	const rl = createInterface({ input: process.stdin, output: process.stdout });
+	const answer = (
+		await rl.question('[publish-catalog] Nexus user ID [admin]: ')
+	).trim();
+	rl.close();
+	resolvedUser = answer || 'admin';
+}
 
-console.log('\n[publish-catalog] curl PUT (비밀번호 prompt)…');
+console.log(
+	`\n[publish-catalog] curl PUT as '${resolvedUser}' (비밀번호 prompt)…`,
+);
 try {
 	execSync(
-		`curl -fSs -u ${user} --upload-file "${CATALOG}" "${url}" -w "\\n[publish-catalog] HTTP %{http_code}\\n"`,
+		`curl -fSs -u ${resolvedUser} --upload-file "${CATALOG}" "${url}" -w "\\n[publish-catalog] HTTP %{http_code}\\n"`,
 		{ stdio: 'inherit' },
 	);
 } catch {
