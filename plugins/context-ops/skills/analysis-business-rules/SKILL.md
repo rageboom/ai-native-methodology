@@ -24,18 +24,32 @@ allowed-tools: Read, Glob, Grep, Bash, Write
      "hit_policy": "first | unique | rule-order"
    }
    ```
-3. **business-rules.json 작성** — `schemas/business-rules.schema.json` (`required:["business_rules"]` / `additionalProperties:false` — 폐기 alias hard-reject):
+3. **business-rules 산출 (분할 / BR-split STEP 3 / v0.24.0)** — BC 그룹핑 후 **per-BC leaf 파일 + index** 로 산출(단일 파일 ❌):
+   - **per-BC leaf**: `<user-project>/.ai-context/output/business-rules/<BC-slug>.json` — 해당 BC 의 `business_rules[]` 만. schema = `schemas/business-rules-bc.schema.json` (`required:["bounded_context","business_rules"]`). 인스턴스에 `"$schema_ref": "schemas/business-rules-bc.schema.json"` 명시(파일명 fallback 부정합 → 라우팅 명시 필수).
+   - **index**: `<user-project>/.ai-context/output/business-rules.json` — `bc_files[]`(per-BC 파일 명단/통계) + `total_rules`. schema = `schemas/business-rules-index.schema.json`. 인스턴스에 `"$schema_ref": "schemas/business-rules-index.schema.json"` 명시 **필수**(basename 이 business-rules.json 이라 명시 없으면 옛 단일파일 schema 로 오라우팅).
+   - BC 미정 rule = `business-rules/_uncategorized.json` 버킷(단 `bounded_context` required 라 실무상 미발생 / 안전망).
+   - loader(`loadBusinessRules`)가 index 를 감지해 per-BC sibling 을 재조립 → 소비자(br-cross / federator / traceability / graph)는 전체 rule 전수 로드(분할 투명).
    ```json
+   // .ai-context/output/business-rules.json  (index)
    {
+   	"$schema_ref": "schemas/business-rules-index.schema.json",
+   	"bc_files": [
+   		{ "bounded_context": "BC-USER", "file": "business-rules/BC-USER.json", "rule_count": 1, "rule_ids": ["BR-USER-VERIFY-001"] }
+   	],
+   	"total_rules": 1
+   }
+   // .ai-context/output/business-rules/BC-USER.json  (per-BC leaf)
+   {
+   	"$schema_ref": "schemas/business-rules-bc.schema.json",
+   	"bounded_context": "BC-USER",
    	"business_rules": [
    		{
    			"id": "BR-USER-VERIFY-001",
+   			"bounded_context": "BC-USER",
    			"title": "이메일 미인증 사용자 로그인 차단",
    			"natural_language": "사용자가 이메일 미인증 상태면 로그인을 거부한다."
    		}
-   	],
-   	"summary": "...",
-   	"meta": { "$ref": "meta-confidence.schema.json" }
+   	]
    }
    ```
 
@@ -52,7 +66,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.ai-context/output/business-rules.json`
+`<user-project>/.ai-context/output/business-rules.json` (분할 **index**) + `<user-project>/.ai-context/output/business-rules/<BC-slug>.json` (per-BC leaf 1개 이상).
 
 ## greenfield (code-optional) mode
 
@@ -75,5 +89,5 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - 결단: DEC-2026-05-30-use-scenario-taxonomy §2.4 (greenfield 옵션 A)
 - 정책: `methodology-spec/workflow/business-logic.md` §5 (4영역 병렬 추출 / rules 매핑 = §5.A SQL CASE/WHERE + §5.B FE validation + §5.C 매직 넘버)
 - 정책: `methodology-spec/deliverables/5-business-rules.md`
-- schema: `schemas/business-rules.schema.json`
+- schema: `schemas/business-rules-index.schema.json` (index) + `schemas/business-rules-bc.schema.json` (per-BC leaf / `$defs.businessRule` 는 `schemas/business-rules.schema.json` 재사용)
 - ADR: ADR-FE-005 (fe_validation 자동 등록)

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/business-rules-bc.schema.json",
+  "title": "비즈니스 규칙 — per-BC leaf (BR-split STEP 3 / v0.24.0)",
+  "description": "BR-split STEP 3 (산출물 분할 / DEC-2026-06-09-br-split-step3). 분할된 산출물의 per-bounded-context leaf 파일 schema. 한 파일 = 한 BC 의 business_rules[]. `bounded_context` 는 파일 단위로 required (파일명과 이중化 = self-describing / file↔rule drift 검출). rule item 형식은 business-rules.schema.json 의 `$defs.businessRule` 를 그대로 재사용(rule 형식 불변). 라우팅: 파일 basename(`<bc>.json`)이 파일명 fallback 과 부정합하므로 인스턴스는 `$schema_ref` 로 본 schema 를 명시. index 파일(business-rules.json)은 business-rules-index.schema.json 으로 검증.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bounded_context", "business_rules"],
+  "properties": {
+    "$schema_ref": { "type": "string" },
+    "$schema_origin": { "type": "string" },
+    "$comment": { "type": "string" },
+    "bounded_context": {
+      "type": "string",
+      "minLength": 1,
+      "description": "이 leaf 파일이 담는 도메인 경계(BC) ID — domain.json 의 bounded_contexts 에서 매핑 (예: BC-AUTH). 본 파일의 모든 business_rules[].bounded_context 와 동일해야 함(self-describing)."
+    },
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "business_rules": {
+      "type": "array",
+      "description": "이 BC 에 속하는 BR 목록. item = business-rules.schema.json 의 $defs.businessRule 재사용(형식 불변).",
+      "items": { "$ref": "./business-rules.schema.json#/$defs/businessRule" }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema_ref": "schemas/business-rules-bc.schema.json",
+  "bounded_context": "BC-AMORT",
+  "business_rules": [
+    {
+      "id": "BR-AMORT-DECOMPOSE-001",
+      "title": "주기 상환금은 이자분과 원금분의 합",
+      "natural_language": "각 주기 상환금은 이자 상환분 ipmt 와 원금 상환분 ppmt 의 합으로 분해된다. 즉 모든 기간 per 에 대해 pmt = ppmt + ipmt 가 성립하며, ppmt 는 총 상환금에서 이자분을 뺀 나머지로 정의된다.",
+      "given": [
+        "기간 per, 주기 이율 rate, 총 기간수 nper, 현재가치 pv 가 주어진다"
+      ],
+      "when": [
+        "ppmt(rate, per, nper, pv, fv, when) 가 호출된다"
+      ],
+      "then": [
+        "ppmt = pmt(...) - ipmt(...) 를 반환한다",
+        "ppmt + ipmt 의 합은 해당 기간의 pmt 와 같다"
+      ],
+      "category": "calculation",
+      "severity": "high",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 435,
+          "snippet": "total = pmt(rate, nper, pv, fv, when); return total - ipmt(rate, per, nper, pv, fv, when)"
+        }
+      ],
+      "bounded_context": "BC-AMORT"
+    }
+  ]
+}

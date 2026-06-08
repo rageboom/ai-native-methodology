@@ -293,6 +293,39 @@ describe('S2 — hashBusinessRulesSubset (결정성)', () => {
     seedCanonical(root, 'business-rules.json', "{\"business_rules\":[{\"id\":\"BR-POST-1\",\"bounded_context\":\"BC-POST\",\"changed\":true},{\"id\":\"BR-USER-1\",\"bounded_context\":\"BC-USER\"}]}");
     assert.equal(hashBusinessRulesSubset(p1, ['BC-USER']), hUser, 'BC-POST 변경 → BC-USER subset 불변');
   });
+
+  // BR-split STEP 3 (v0.24.0) — subset-hash 는 rule 내용 기반(정렬)이라 단일파일↔index 분할에 불변(BLOCKER-3 non-issue 가드).
+  it('★ 분할 불변 — 단일파일 subset-hash == index+per-BC 재조립 subset-hash', () => {
+    const rules = [
+      { id: 'BR-POST-1', bounded_context: 'BC-POST', note: 'x' },
+      { id: 'BR-USER-1', bounded_context: 'BC-USER', note: 'y' },
+    ];
+    // (a) 단일파일
+    const single = join(tmp, 's2split-single');
+    const pSingle = seedCanonical(single, 'business-rules.json', JSON.stringify({ business_rules: rules }));
+    // (b) index + per-BC (rule 내용 동일)
+    const split = join(tmp, 's2split-idx');
+    const outDir = join(split, '.ai-context', 'output');
+    mkdirSync(join(outDir, 'business-rules'), { recursive: true });
+    writeFileSync(join(outDir, 'business-rules.json'), JSON.stringify({
+      bc_files: [
+        { bounded_context: 'BC-POST', file: 'business-rules/BC-POST.json', rule_count: 1, rule_ids: ['BR-POST-1'] },
+        { bounded_context: 'BC-USER', file: 'business-rules/BC-USER.json', rule_count: 1, rule_ids: ['BR-USER-1'] },
+      ],
+      total_rules: 2,
+    }));
+    writeFileSync(join(outDir, 'business-rules', 'BC-POST.json'), JSON.stringify({ bounded_context: 'BC-POST', business_rules: [rules[0]] }));
+    writeFileSync(join(outDir, 'business-rules', 'BC-USER.json'), JSON.stringify({ bounded_context: 'BC-USER', business_rules: [rules[1]] }));
+    const pIndex = join(outDir, 'business-rules.json');
+    // 전 BC 합산 subset-hash 동일 → 기존 baseline 무효화 ❌ (재등록 불요)
+    assert.equal(
+      hashBusinessRulesSubset(pIndex, ['BC-POST', 'BC-USER']),
+      hashBusinessRulesSubset(pSingle, ['BC-POST', 'BC-USER']),
+      '분할 전후 subset-hash 동일',
+    );
+    // per-BC 슬라이스도 동일
+    assert.equal(hashBusinessRulesSubset(pIndex, ['BC-USER']), hashBusinessRulesSubset(pSingle, ['BC-USER']));
+  });
 });
 
 describe('S2 — registerCanonicalSources / detectDrift subset 분기', () => {

@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { listScopes, readManifest, writeManifest } from './state-store.js';
-import { normalizeBusinessRules } from '../../_shared/load-business-rules.js';
+import { normalizeBusinessRules, loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 export function hashFile(absPath) {
   const buf = readFileSync(absPath);
@@ -33,9 +33,9 @@ export function canonicalStringify(v) {
 }
 function subsetRules(absPath, bcs) {
   const set = new Set(bcs);
-  let parsed;
-  try { parsed = JSON.parse(readFileSync(absPath, 'utf8')); } catch { parsed = null; }
-  return normalizeBusinessRules(parsed).filter((r) => r && set.has(r.bounded_context));
+  // STEP 3: loadBusinessRules 가 index(`{bc_files}`)→per-BC 재조립 + 옛 단일파일 backward-compat
+  //   둘 다 처리 → register/detect/cascade 의 subset-hash 가 분할 후에도 전수 rule 기준 유지.
+  return loadBusinessRules(absPath, { bcFilter: (r) => r && set.has(r.bounded_context) });
 }
 // BC-subset 결정적 hash (register/detect/cascade 공유).
 export function hashBusinessRulesSubset(absPath, bcs) {

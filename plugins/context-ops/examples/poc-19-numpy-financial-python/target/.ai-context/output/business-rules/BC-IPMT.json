@@ -1,0 +1,58 @@
+{
+  "$schema_ref": "schemas/business-rules-bc.schema.json",
+  "bounded_context": "BC-IPMT",
+  "business_rules": [
+    {
+      "id": "BR-IPMT-BALANCE-001",
+      "title": "이자 상환분은 직전 잔액에 이율을 곱한 값",
+      "natural_language": "기간 per 의 이자 상환분 ipmt 는 직전 기간(per-1)까지의 잔여 대출 잔액에 주기 이율 rate 를 곱한 값이다. 잔여 잔액은 fv 함수를 per-1 기간에 대해 평가하여 구한다.",
+      "given": [
+        "기간 per, 주기 이율 rate, 총 기간수 nper, 현재가치 pv 가 주어진다"
+      ],
+      "when": [
+        "ipmt(rate, per, nper, pv, fv, when) 가 호출된다"
+      ],
+      "then": [
+        "잔여 잔액 _rbl = fv(rate, per-1, total_pmt, pv, when) 를 계산한다",
+        "ipmt = 잔여 잔액 * rate 를 반환한다"
+      ],
+      "category": "calculation",
+      "severity": "high",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 391,
+          "snippet": "total_pmt = pmt(rate, nper, pv, fv, when); ipmt = _rbl(rate, per, total_pmt, pv, when)*rate"
+        }
+      ],
+      "bounded_context": "BC-IPMT"
+    },
+    {
+      "id": "BR-IPMT-BEGINFIRST-001",
+      "title": "기초 납입의 첫 기간 이자분은 0",
+      "natural_language": "납입 시점이 기초(when=begin=1)인 경우, 첫 기간(per=1)의 이자 상환분은 0 이다. 그 외 기초 납입 기간의 이자분은 (1+rate) 로 나누어 보정한다.",
+      "given": [
+        "납입 시점이 기초(when=1)이다",
+        "기간 per 가 1 이다"
+      ],
+      "when": [
+        "ipmt(rate, per, nper, pv, fv, when=1) 가 호출된다"
+      ],
+      "then": [
+        "해당 기간의 이자 상환분은 0 으로 설정된다"
+      ],
+      "category": "calculation",
+      "severity": "medium",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 394,
+          "snippet": "ipmt = np.where(np.logical_and(when == 1, per == 1), 0, ipmt)"
+        }
+      ],
+      "bounded_context": "BC-IPMT"
+    }
+  ]
+}

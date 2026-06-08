@@ -287,7 +287,8 @@ test-impl-pass-validator = 진짜 runner 호출 / 100% pass / 5종 물증 7 필�
 │       ├── inventory.json
 │       ├── architecture.json
 │       ├── domain.json
-│       ├── business-rules.json
+│       ├── business-rules.json      # 분할 index (bc_files[] / well-known 진입점)
+│       ├── business-rules/          # per-BC leaf (BR-split STEP 3) — <BC-slug>.json
 │       ├── openapi.yaml             # BE
 │       ├── schema.json              # DB
 │       ├── state-map.json           # FE

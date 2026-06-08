@@ -389,7 +389,11 @@ function discoverPocSchemaArtifacts() {
 				// 그 외 dotfile (`.git`, `.idea`, `.vscode` 등) 은 그대로 skip.
 				if (e.name.startsWith('.') && e.name !== '.ai-context') continue;
 				stack.push(full);
-			} else if (ANALYSIS_VALIDATOR_TARGETS.has(e.name)) {
+			} else if (
+				ANALYSIS_VALIDATOR_TARGETS.has(e.name) ||
+				// BR-split STEP 3 — per-BC leaf (business-rules/<bc>.json). 부모 dir 이 정확히 business-rules.
+				(basename(cur) === 'business-rules' && e.name.endsWith('.json'))
+			) {
 				found.push(full);
 			}
 		}
@@ -411,8 +415,9 @@ function check8_analysisValidatorViolation() {
 	let chainArtifactCount = 0;
 	for (const target of targets) {
 		const rel = target.slice(ROOT.length + 1).replace(/\\/g, '/');
-		const isBusinessRules = target.endsWith('business-rules.json');
-		if (isBusinessRules) businessRulesCount++;
+		const isBusinessRules = target.endsWith('business-rules.json'); // index OR 옛 단일파일(br-cross 대상)
+		const isBrLeaf = basename(dirname(target)) === 'business-rules'; // STEP 3 per-BC leaf(schema-only)
+		if (isBusinessRules || isBrLeaf) businessRulesCount++;
 		else chainArtifactCount++;
 
 		// schema-validator 전수 (모든 PoC 산출물 = VALID 의무 / chain 1~4 산출물 포함)

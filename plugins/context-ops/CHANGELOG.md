@@ -10,6 +10,20 @@
 
 ---
 
+## [0.24.0] — 2026-06-09 MINOR — business-rules 산출물 분할 (BR-split STEP 3 / index + per-BC)
+
+**산출물 `business-rules.json` 단일파일 → 분할**: `business-rules.json`(index, well-known 파일명 보존) + `business-rules/<BC-slug>.json`(per-BC leaf). BR-split 순차안의 마지막 STEP 3 (STEP 0 subset 폐기 / STEP 1 bounded_context required / STEP 2 loader 중앙화 토대 위). 보류 근거(STEP 1 전 BC 채움률 7/8 PoC=0%)는 STEP 1 백필로 **채움률 100% 실측** → 해소. **검증파일(business-rules.schema.json)은 무변경** — 산출물만 분할(사용자 결단). DEC-2026-06-09-br-split-step3.
+
+- **loader (단일 변경점)**: `tools/_shared/load-business-rules.js` `loadBusinessRules` 가 index(`{bc_files}`)를 감지해 per-BC sibling 을 재조립 → 전체 rule 전수 반환. 소비자(br-cross / context-federator / traceability-graph / graph-synthesizer)는 **무변경**(분할 투명). 옛 단일파일 `{business_rules:[...]}` 은 backward-compat 으로 그대로 수용(input fixture·legacy 시점기록 보존). `isBusinessRulesIndex` export.
+- **schema (additive / 기존 무변경)**: 신규 `business-rules-index.schema.json`(`bc_files[]`+`total_rules`) + `business-rules-bc.schema.json`(`bounded_context`+`business_rules[]` / `$defs.businessRule` 재사용). 인스턴스는 `$schema_ref` 로 라우팅(basename fallback 오라우팅 회피). 기존 `business-rules.schema.json` = 옛 단일파일·input fixture 검증용으로 **그대로 유지**.
+- **living-sync 재배선**: `sync.js` `subsetRules`→`loadBusinessRules` 경유(register/detect/cascade subset-hash 가 분할 후에도 전수 rule 기준 / 3 호출점 자동 수복). `cli.js` `brDiffOrigins` = `reconstructBrFromGit`(index blob + per-BC blob N+1 git show 재구성) + `loadBusinessRules`(working) → `diffBusinessRulesByRule` wrapper 주입(시그니처 보존). **`--git`/`sync-converge --git` brChanged path-partition** = index 정확매치 OR `business-rules/` prefix(per-BC 편집 감지 / Senior BLOCKER-1).
+- **route 커맨드**: `--analysis` 가 index 면 재조립 후 `{business_rules:[...]}` 정규화(route-discovery BR 라우팅 복원 / e2e 회귀 가드).
+- **release-readiness check8**: `discoverPocSchemaArtifacts` 가 `business-rules/<bc>.json` per-BC leaf 도 발견·schema-validate(Senior BLOCKER-2). br-cross 는 index 1회만(전수 일관성 = 재조립 1회 충분 / 의도).
+- **writer/flows/docs**: `analysis-business-rules/SKILL.md`(BC 그룹핑 → index+per-BC 산출 지시) · `analysis.phase-flow.json` outputs `business-rules/*.json` glob(state-machines/*.json 선례 / 토큰 추출 0 = drift 무영향) · deliverables/5 + lifecycle-contract 경로 트리.
+- **examples**: canonical output 3개(poc-05/18/19) index+per-BC 마이그레이션(결정적 / loader 재조립 = 원본 rule id 집합 MATCH 검증). legacy `output/rules/`·`analysis/6-quality/` + input fixture 16개 = 시점기록·다른 역할 → 단일파일 그대로 보존(oneOf 회피 / additive schema).
+- **Senior BLOCKER-3 (baseline hash 무효화) = non-issue 실증**: BR baseline 은 content-based subset-hash(정렬)라 파일 분할에 **불변**(단일↔index 동일 hash 실측 / test 가드). examples 에 BR 등록 manifest 0 → 재등록 대상 자체 없음.
+- **검증**: workspace 1469 GREEN(fail 0 / 신규 loader 7 + sync 1 test 포함) + 마이그레이션 3개 index+per-BC schema-valid + 재조립 MATCH + release-readiness. Senior REVISE@0.83 BLOCKER 3건 반영.
+
 ## [0.23.1] — 2026-06-08 PATCH — `.aimd-install/` → `.static-tools/` (v0.23.0 잔존 aimd 토큰 후속 정리)
 
 v0.23.0 에서 **보존**했던 `.aimd-install/`(정적분석 도구 설치 마커 dir / `.aimd/` 와 무관·별 컨벤션)을 후속 리네임. 이유: ① `.aimd/`→`.ai-context/` 후 `.aimd-install` 만 `aimd` 토큰 잔존 = 반쪽 정합 ② 사용자 기준(내용 서술성)상 "aimd-install"은 무엇을 install 하는지 안 보임 → `.static-tools/`(semgrep/PMD 등 정적도구 설치 마커). **내부 마커 dir**(`${CLAUDE_PLUGIN_ROOT}/.static-tools/` / gitignore / 커밋 ❌ / 세션 재생성) = 산출물·동작 무변경 = PATCH.

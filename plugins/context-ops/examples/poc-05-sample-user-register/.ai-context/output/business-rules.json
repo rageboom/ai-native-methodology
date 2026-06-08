@@ -1,4 +1,5 @@
 {
+  "$schema_ref": "schemas/business-rules-index.schema.json",
   "$comment": "PoC #05 — Business Rules. legacy 결함 분석 결과 자동 도출. chain 1 planning-spec.business_rules_intent 의 source.",
   "project_id": "poc-05-sample-user-register",
   "meta": {
@@ -16,59 +17,16 @@
     "phase_b_migration_note": "description → natural_language 자동 추출 ✅ (Phase A script 재활용) / given/when/then 부재 보존 (Phase C LLM 본격 합성 의무) / sample mode 특수성 명시. rules.json 위치 = input/ → output/rules/ 이전 ✅ (Agent 1 phase-flow SSOT 정합 / flows/analysis.phase-flow.json 안 rules.json = phase 4 output).",
     "phase_d_meta_recovery_note": "session 15차 — schema-validator 필수 필드 (generated_at + confidence + inputs_used) 회복 추가 (session 11차 Phase B 시 누락 / release-readiness 회귀 회복)."
   },
-  "business_rules": [
+  "bc_files": [
     {
-      "id": "BR-USER-DATA-001",
       "bounded_context": "BC-USER",
-      "title": "이메일 중복 ❌",
-      "type": "uniqueness_constraint",
-      "description": "사용자 등록 시 이메일은 시스템 내 유일해야 한다. 동일 이메일로 신규 등록 시도 시 409 Conflict 응답.",
-      "current_state_note": "legacy source 결함 — register() 가 중복 검사 미수행 / users[] 에 email 중복 허용",
-      "source_grounded_evidence": {
-        "file": "source/src/user.legacy.ts",
-        "line_range": "10-15",
-        "grep_hit_count": 0,
-        "grep_query": "users.find\\(.*email"
-      },
-      "severity": "high",
-      "natural_language": "사용자 등록 시 이메일은 시스템 내 유일해야 한다.",
-      "given": [
-        "시스템에 이미 'user@example.com' 으로 등록된 사용자가 존재한다",
-        "사용자 저장소(users[])에 해당 이메일이 등록된 상태이다"
-      ],
-      "when": [
-        "동일 이메일 'user@example.com' 으로 신규 사용자 등록을 시도한다"
-      ],
-      "then": [
-        "시스템은 409 Conflict 응답을 반환한다",
-        "사용자 저장소에 중복 이메일 항목이 추가되지 않는다"
-      ]
-    },
-    {
-      "id": "BR-USER-VALIDATION-001",
-      "bounded_context": "BC-USER",
-      "title": "비밀번호 최소 8자",
-      "type": "validation",
-      "description": "신규 등록 시 비밀번호는 최소 8자 이상. 미달 시 400 Bad Request.",
-      "current_state_note": "legacy source 결함 — register() 가 password 길이 검증 미수행",
-      "source_grounded_evidence": {
-        "file": "source/src/user.legacy.ts",
-        "line_range": "10-15",
-        "grep_hit_count": 0,
-        "grep_query": "password\\.length"
-      },
-      "severity": "medium",
-      "natural_language": "신규 등록 시 비밀번호는 최소 8자 이상.",
-      "given": [
-        "신규 사용자 등록 요청이 준비된 상태이다"
-      ],
-      "when": [
-        "7자 이하 비밀번호('pass123')로 사용자 등록을 시도한다"
-      ],
-      "then": [
-        "시스템은 400 Bad Request 응답을 반환한다",
-        "사용자 저장소에 해당 사용자가 추가되지 않는다"
+      "file": "business-rules/BC-USER.json",
+      "rule_count": 2,
+      "rule_ids": [
+        "BR-USER-DATA-001",
+        "BR-USER-VALIDATION-001"
       ]
     }
-  ]
+  ],
+  "total_rules": 2
 }

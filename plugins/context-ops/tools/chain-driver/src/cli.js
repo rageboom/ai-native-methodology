@@ -42,6 +42,7 @@ import {
 } from './state-store.js';
 import { executeQuery } from './query.js';
 import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
+import { isBusinessRulesIndex, normalizeBusinessRules, loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -1810,22 +1811,51 @@ function cmdImpact(args) {
 // living-sync carry 1/1b — business-rules.json per-rule diff → per-BR origin (공유 / --br-diff·--git).
 //   new = working-tree fs (MAJOR-2 불변식 / git blob ❌). deleted brAbs = newParsed={} (all removed / minor-3).
 //   discriminated result (process.exit ❌ = 테스트가능 / cmdSyncLoop 가 exit·in-sync 담당 / minor-5).
-function brDiffOrigins({ git, ref, brAbs, brRelPosix, graph }) {
-	let oldParsed = {};
+// STEP 3 (BR-split) — git ref 의 business-rules 를 전체 rule 배열로 재구성.
+//   index(`{bc_files}`) 면 per-BC blob N 개를 git show 로 재조립(N+1 호출). 옛 단일파일이면 그대로.
+//   ref 에 index 부재 = 신규 파일(전 rule added → []). per-BC blob 부재 = 그 BC skip(부분 / 날조 ❌).
+function reconstructBrFromGit(git, ref, brRelPosix) {
+	let indexParsed;
 	try {
-		oldParsed = JSON.parse(git(['show', `${ref}:${brRelPosix}`]));
+		indexParsed = JSON.parse(git(['show', `${ref}:${brRelPosix}`]));
 	} catch {
-		oldParsed = {}; // valid ref 에 path 부재 = 신규 파일 → 전 rule added
+		return []; // valid ref 에 path 부재 = 신규 파일
 	}
-	let newParsed = {};
+	if (!isBusinessRulesIndex(indexParsed)) {
+		return normalizeBusinessRules(indexParsed); // 분할 도입 경계 이전 = 옛 단일파일
+	}
+	const slash = brRelPosix.lastIndexOf('/');
+	const dirPosix = slash >= 0 ? brRelPosix.slice(0, slash) : '';
+	const rules = [];
+	for (const entry of indexParsed.bc_files) {
+		if (!entry || typeof entry.file !== 'string') continue;
+		const filePosix = entry.file.split('\\').join('/');
+		const blobPath = dirPosix ? `${dirPosix}/${filePosix}` : filePosix;
+		try {
+			const perBc = JSON.parse(git(['show', `${ref}:${blobPath}`]));
+			for (const r of normalizeBusinessRules(perBc)) rules.push(r);
+		} catch {
+			/* per-BC blob 부재 = 그 BC skip (부분 로드) */
+		}
+	}
+	return rules;
+}
+function brDiffOrigins({ git, ref, brAbs, brRelPosix, graph }) {
+	const oldRules = reconstructBrFromGit(git, ref, brRelPosix);
+	let newRules = []; // 부재 = deleted → all removed (minor-3)
 	if (existsSync(brAbs)) {
 		try {
-			newParsed = JSON.parse(readFileSync(brAbs, 'utf-8'));
+			JSON.parse(readFileSync(brAbs, 'utf-8')); // index/단일 자체 parse 무결성 (corrupt = loud exit 3)
 		} catch (e) {
 			return { ok: false, exitCode: 3, msg: `business-rules.json parse error: ${e.message}` };
 		}
-	} // 부재 = deleted → newParsed={} = all removed (minor-3)
-	const { changed_rule_ids, removed_rule_ids } = diffBusinessRulesByRule(oldParsed, newParsed);
+		newRules = loadBusinessRules(brAbs); // index → per-BC fs 재조립 (working tree)
+	}
+	// diffBusinessRulesByRule 시그니처 보존(parsed-object) → 재구성 배열을 wrapper 로 주입(무회귀).
+	const { changed_rule_ids, removed_rule_ids } = diffBusinessRulesByRule(
+		{ business_rules: oldRules },
+		{ business_rules: newRules },
+	);
 	const ruleOrigins = resolveChangedRuleOrigins(graph, changed_rule_ids);
 	return {
 		ok: true,
@@ -1931,8 +1961,12 @@ function cmdSyncLoop(args) {
 		const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
 		const brRelPosix = brRel.split('\\').join('/');
 		const changed = diff.files.map((f) => f.path.split('\\').join('/'));
-		const brChanged = changed.includes(brRelPosix); // BLOCKER-1: 정규화 키로 partition
-		const nonBr = changed.filter((q) => q !== brRelPosix);
+		// BLOCKER-1 (STEP 3): 분할 후 실 rule 편집은 business-rules/<bc>.json 에서 발생 → index 정확매치만으론
+		//   per-BC 변경을 못 잡아 per-BR origin 死. index 파일 OR per-BC 디렉토리 prefix 둘 다 BR 변경으로 partition.
+		const brDirPrefix = brRelPosix.replace(/\.json$/, '/'); // .ai-context/output/business-rules/
+		const isBrPath = (q) => q === brRelPosix || q.startsWith(brDirPrefix);
+		const brChanged = changed.some(isBrPath);
+		const nonBr = changed.filter((q) => !isBrPath(q));
 		let brOrigins = [];
 		if (brChanged) {
 			const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
@@ -2365,8 +2399,11 @@ function cmdSyncConverge(args) {
 	const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
 	const brRelPosix = brRel.split('\\').join('/');
 	const changed = diff.files.map((f) => f.path.split('\\').join('/'));
-	const brChanged = changed.includes(brRelPosix);
-	const nonBr = changed.filter((q) => q !== brRelPosix);
+	// STEP 3 partition (BR-split BLOCKER-1): index 파일 OR per-BC 디렉토리 prefix = BR 변경.
+	const brDirPrefix = brRelPosix.replace(/\.json$/, '/');
+	const isBrPath = (q) => q === brRelPosix || q.startsWith(brDirPrefix);
+	const brChanged = changed.some(isBrPath);
+	const nonBr = changed.filter((q) => !isBrPath(q));
 	let brOrigins = [];
 	if (brChanged) {
 		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
@@ -2573,7 +2610,12 @@ function cmdRoute(args) {
 			process.exit(3);
 		}
 		try {
-			analysis = JSON.parse(readFileSync(args.analysisPath, 'utf-8'));
+			const parsedAnalysis = JSON.parse(readFileSync(args.analysisPath, 'utf-8'));
+			// BR-split STEP 3: index(`{bc_files}`) 면 per-BC 재조립 후 canonical shape 로 정규화
+			//   (route-discovery 의 normalizeAnalysisBusinessRules 는 business_rules 키를 인식 → BR 라우팅 복원).
+			analysis = isBusinessRulesIndex(parsedAnalysis)
+				? { business_rules: loadBusinessRules(args.analysisPath) }
+				: parsedAnalysis;
 		} catch (e) {
 			console.error(`[chain-driver] route: analysis parse error: ${e.message}`);
 			process.exit(3);

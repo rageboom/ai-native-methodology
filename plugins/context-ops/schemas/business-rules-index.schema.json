@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/business-rules-index.schema.json",
+  "title": "비즈니스 규칙 — 분할 index (BR-split STEP 3 / v0.24.0)",
+  "description": "BR-split STEP 3 (산출물 분할 / DEC-2026-06-09-br-split-step3). 분할된 business-rules 산출물의 index 파일 schema. well-known 파일명 `business-rules.json` 을 유지하되 내용을 index 로 의미 전환(하드코딩 churn 최소화) — `bc_files[]` 가 per-BC leaf 파일(business-rules/<bc>.json)을 열거. loader(loadBusinessRules)가 본 index 를 감지해 per-BC sibling 을 재조립 = 전체 rule 전수 로드. 라우팅: index 파일은 basename 이 business-rules.json 이라 파일명 fallback 이 business-rules.schema.json(옛 단일파일 schema) 로 오라우팅되므로 인스턴스는 `$schema_ref` 로 본 schema 를 명시 필수.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["bc_files", "total_rules"],
+  "properties": {
+    "$schema_ref": { "type": "string" },
+    "$schema_origin": { "type": "string" },
+    "$comment": { "type": "string" },
+    "project_id": {
+      "type": "string",
+      "description": "optional — 분석 대상 프로젝트 식별자 (business-rules.schema.json 동형)."
+    },
+    "paradigm": {
+      "type": "string",
+      "enum": ["BE", "FE"],
+      "default": "BE",
+      "description": "optional — 분석 paradigm discriminator (business-rules.schema.json 동형 / 분할 전 단일파일의 paradigm 승계)."
+    },
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "summary": {
+      "type": ["string", "object"],
+      "description": "optional — BR 분석 요약(분할 전 단일파일의 summary 승계)."
+    },
+    "bc_files": {
+      "type": "array",
+      "description": "per-BC leaf 파일 명단. file = index 파일 dir 기준 상대경로(예: business-rules/BC-AUTH.json). rule_count/rule_ids = 무결성 계약(loader 재조립 결과와 대조 가능).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["bounded_context", "file", "rule_count", "rule_ids"],
+        "properties": {
+          "bounded_context": {
+            "type": "string",
+            "minLength": 1,
+            "description": "이 leaf 의 도메인 경계(BC) ID (예: BC-AUTH). BC 미정 rule 버킷은 _uncategorized."
+          },
+          "file": {
+            "type": "string",
+            "minLength": 1,
+            "description": "index 파일 dir 기준 상대경로 (예: business-rules/BC-AUTH.json)."
+          },
+          "rule_count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "이 leaf 의 business_rules 개수 (재조립 무결성 대조용)."
+          },
+          "rule_ids": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "이 leaf 의 BR id 목록 (재조립 무결성 + 빠른 멤버십 조회)."
+          }
+        }
+      }
+    },
+    "total_rules": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "전 BC 합산 rule 총수 (Σ bc_files[].rule_count 와 일치해야 함)."
+    }
+  }
+}

@@ -57,7 +57,7 @@
       "spec_file": "business-logic.md",
       "depends_on": ["discovery", "db-schema", "architecture"],
       "parallel_areas": ["5.A rules", "5.B domain", "5.C antipatterns-partial", "5.D ui-domain"],
-      "outputs": ["domain.json", "business-rules.json", "antipatterns-partial.json"],
+      "outputs": ["domain.json", "business-rules.json", "business-rules/*.json", "antipatterns-partial.json"],
       "skills": ["analysis-domain-model", "analysis-business-rules", "analysis-form-validation-fe"]
     },
     {

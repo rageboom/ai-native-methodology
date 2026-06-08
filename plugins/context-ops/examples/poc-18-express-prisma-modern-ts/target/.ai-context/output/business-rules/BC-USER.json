@@ -1,0 +1,31 @@
+{
+  "$schema_ref": "schemas/business-rules-bc.schema.json",
+  "bounded_context": "BC-USER",
+  "business_rules": [
+    {
+      "id": "BR-USER-EMAILUNIQUE-001",
+      "title": "사용자 이메일 유일성",
+      "natural_language": "사용자 이메일은 시스템 내에서 유일해야 한다. 데이터베이스 수준에서 User.email 에 unique 제약이 걸려 있어 중복 이메일 사용자는 생성될 수 없다.",
+      "given": [
+        "동일 이메일을 가진 사용자가 이미 존재한다"
+      ],
+      "when": [
+        "같은 이메일로 신규 사용자 생성을 시도한다"
+      ],
+      "then": [
+        "데이터베이스 unique 제약에 의해 생성이 거부된다"
+      ],
+      "category": "validation",
+      "severity": "high",
+      "source_evidence": [
+        {
+          "type": "orm_constraint",
+          "file": "prisma/schema.prisma",
+          "line": 15,
+          "snippet": "email String @unique"
+        }
+      ],
+      "bounded_context": "BC-USER"
+    }
+  ]
+}

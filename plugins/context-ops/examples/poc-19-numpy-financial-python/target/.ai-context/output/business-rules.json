@@ -1,5 +1,5 @@
 {
-  "$schema_origin": "business-rules.schema.json",
+  "$schema_ref": "schemas/business-rules-index.schema.json",
   "project_id": "poc-19-numpy-financial-python",
   "paradigm": "BE",
   "meta": {
@@ -9,166 +9,45 @@
       "source_code"
     ]
   },
-  "business_rules": [
-    {
-      "id": "BR-PMT-EQUATION-001",
-      "title": "고정 주기 상환금은 화폐의 시간가치 방정식을 만족",
-      "natural_language": "고정 주기 상환금 pmt 는 현재가치 pv, 미래가치 fv, 주기 이율 rate, 총 기간수 nper 에 대해 시간가치 방정식 fv + pv*(1+rate)^nper + pmt*(1+rate*when)/rate*((1+rate)^nper - 1) = 0 을 pmt 에 대해 푼 값이다.",
-      "given": [
-        "현재가치 pv, 주기 이율 rate, 총 기간수 nper, (선택) 미래가치 fv 가 주어진다"
-      ],
-      "when": [
-        "pmt(rate, nper, pv, fv, when) 가 호출된다"
-      ],
-      "then": [
-        "시간가치 방정식을 pmt 에 대해 푼 값 -(fv + pv*(1+rate)^nper) / fact 를 반환한다",
-        "fact = (1 + rate*when)*((1+rate)^nper - 1)/rate"
-      ],
-      "category": "calculation",
-      "severity": "high",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 221,
-          "snippet": "temp = (1 + rate)**nper; ... fact = ...(1 + masked_rate*when)*(temp - 1)/masked_rate; return -(fv + pv*temp) / fact"
-        }
-      ],
-      "bounded_context": "BC-PMT"
-    },
-    {
-      "id": "BR-PMT-ZERORATE-001",
-      "title": "이율 0 일 때 상환금은 선형 분할",
-      "natural_language": "주기 이율 rate 가 0 이면 시간가치 방정식이 fv + pv + pmt*nper = 0 으로 퇴화하여, 상환금은 원리금을 기간수로 균등 분할한 값이 된다 (0 나눗셈 회피를 위해 masked_rate 로 분기).",
-      "given": [
-        "주기 이율 rate 가 0 이다"
-      ],
-      "when": [
-        "pmt(rate, nper, pv, fv, when) 가 호출된다"
-      ],
-      "then": [
-        "fact 는 rate 분기 대신 nper 로 대체된다",
-        "결과는 -(fv + pv)/nper 과 동치다"
-      ],
-      "category": "calculation",
-      "severity": "medium",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 222,
-          "snippet": "mask = (rate == 0); masked_rate = np.where(mask, 1, rate); fact = np.where(mask != 0, nper, ...)"
-        }
-      ],
-      "bounded_context": "BC-PMT"
-    },
-    {
-      "id": "BR-AMORT-DECOMPOSE-001",
-      "title": "주기 상환금은 이자분과 원금분의 합",
-      "natural_language": "각 주기 상환금은 이자 상환분 ipmt 와 원금 상환분 ppmt 의 합으로 분해된다. 즉 모든 기간 per 에 대해 pmt = ppmt + ipmt 가 성립하며, ppmt 는 총 상환금에서 이자분을 뺀 나머지로 정의된다.",
-      "given": [
-        "기간 per, 주기 이율 rate, 총 기간수 nper, 현재가치 pv 가 주어진다"
-      ],
-      "when": [
-        "ppmt(rate, per, nper, pv, fv, when) 가 호출된다"
-      ],
-      "then": [
-        "ppmt = pmt(...) - ipmt(...) 를 반환한다",
-        "ppmt + ipmt 의 합은 해당 기간의 pmt 와 같다"
-      ],
-      "category": "calculation",
-      "severity": "high",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 435,
-          "snippet": "total = pmt(rate, nper, pv, fv, when); return total - ipmt(rate, per, nper, pv, fv, when)"
-        }
-      ],
-      "bounded_context": "BC-AMORT"
-    },
-    {
-      "id": "BR-IPMT-BALANCE-001",
-      "title": "이자 상환분은 직전 잔액에 이율을 곱한 값",
-      "natural_language": "기간 per 의 이자 상환분 ipmt 는 직전 기간(per-1)까지의 잔여 대출 잔액에 주기 이율 rate 를 곱한 값이다. 잔여 잔액은 fv 함수를 per-1 기간에 대해 평가하여 구한다.",
-      "given": [
-        "기간 per, 주기 이율 rate, 총 기간수 nper, 현재가치 pv 가 주어진다"
-      ],
-      "when": [
-        "ipmt(rate, per, nper, pv, fv, when) 가 호출된다"
-      ],
-      "then": [
-        "잔여 잔액 _rbl = fv(rate, per-1, total_pmt, pv, when) 를 계산한다",
-        "ipmt = 잔여 잔액 * rate 를 반환한다"
-      ],
-      "category": "calculation",
-      "severity": "high",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 391,
-          "snippet": "total_pmt = pmt(rate, nper, pv, fv, when); ipmt = _rbl(rate, per, total_pmt, pv, when)*rate"
-        }
-      ],
-      "bounded_context": "BC-IPMT"
-    },
-    {
-      "id": "BR-IPMT-BEGINFIRST-001",
-      "title": "기초 납입의 첫 기간 이자분은 0",
-      "natural_language": "납입 시점이 기초(when=begin=1)인 경우, 첫 기간(per=1)의 이자 상환분은 0 이다. 그 외 기초 납입 기간의 이자분은 (1+rate) 로 나누어 보정한다.",
-      "given": [
-        "납입 시점이 기초(when=1)이다",
-        "기간 per 가 1 이다"
-      ],
-      "when": [
-        "ipmt(rate, per, nper, pv, fv, when=1) 가 호출된다"
-      ],
-      "then": [
-        "해당 기간의 이자 상환분은 0 으로 설정된다"
-      ],
-      "category": "calculation",
-      "severity": "medium",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 394,
-          "snippet": "ipmt = np.where(np.logical_and(when == 1, per == 1), 0, ipmt)"
-        }
-      ],
-      "bounded_context": "BC-IPMT"
-    },
-    {
-      "id": "BR-WHEN-CONVENTION-001",
-      "title": "납입 시점 규약은 기말 또는 기초",
-      "natural_language": "모든 시간가치 함수의 납입 시점 인자 when 은 기말('end' 또는 0) 또는 기초('begin' 또는 1) 두 값만 허용하며 기본값은 기말이다. 문자열 별칭은 정수 0/1 로 정규화된다.",
-      "given": [
-        "시간가치 함수가 when 인자와 함께 호출된다"
-      ],
-      "when": [
-        "when 이 'end'/'begin' 문자열 또는 0/1 정수로 전달된다"
-      ],
-      "then": [
-        "_convert_when 이 end→0, begin→1 로 정규화한다",
-        "when 미지정 시 기말(0)이 적용된다"
-      ],
-      "category": "policy",
-      "severity": "medium",
-      "source_evidence": [
-        {
-          "type": "code_condition",
-          "file": "numpy_financial/_financial.py",
-          "line": 126,
-          "snippet": "when = _convert_when(when)  # 'end'->0, 'begin'->1 정규화 (기본 'end')"
-        }
-      ],
-      "bounded_context": "BC-WHEN"
-    }
-  ],
   "summary": {
     "total_br": 6,
     "slice": "loan amortization (pmt / ipmt / ppmt) + when convention"
-  }
+  },
+  "bc_files": [
+    {
+      "bounded_context": "BC-AMORT",
+      "file": "business-rules/BC-AMORT.json",
+      "rule_count": 1,
+      "rule_ids": [
+        "BR-AMORT-DECOMPOSE-001"
+      ]
+    },
+    {
+      "bounded_context": "BC-IPMT",
+      "file": "business-rules/BC-IPMT.json",
+      "rule_count": 2,
+      "rule_ids": [
+        "BR-IPMT-BALANCE-001",
+        "BR-IPMT-BEGINFIRST-001"
+      ]
+    },
+    {
+      "bounded_context": "BC-PMT",
+      "file": "business-rules/BC-PMT.json",
+      "rule_count": 2,
+      "rule_ids": [
+        "BR-PMT-EQUATION-001",
+        "BR-PMT-ZERORATE-001"
+      ]
+    },
+    {
+      "bounded_context": "BC-WHEN",
+      "file": "business-rules/BC-WHEN.json",
+      "rule_count": 1,
+      "rule_ids": [
+        "BR-WHEN-CONVENTION-001"
+      ]
+    }
+  ],
+  "total_rules": 6
 }

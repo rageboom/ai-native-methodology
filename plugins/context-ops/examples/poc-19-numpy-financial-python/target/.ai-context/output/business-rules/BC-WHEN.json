@@ -1,0 +1,32 @@
+{
+  "$schema_ref": "schemas/business-rules-bc.schema.json",
+  "bounded_context": "BC-WHEN",
+  "business_rules": [
+    {
+      "id": "BR-WHEN-CONVENTION-001",
+      "title": "납입 시점 규약은 기말 또는 기초",
+      "natural_language": "모든 시간가치 함수의 납입 시점 인자 when 은 기말('end' 또는 0) 또는 기초('begin' 또는 1) 두 값만 허용하며 기본값은 기말이다. 문자열 별칭은 정수 0/1 로 정규화된다.",
+      "given": [
+        "시간가치 함수가 when 인자와 함께 호출된다"
+      ],
+      "when": [
+        "when 이 'end'/'begin' 문자열 또는 0/1 정수로 전달된다"
+      ],
+      "then": [
+        "_convert_when 이 end→0, begin→1 로 정규화한다",
+        "when 미지정 시 기말(0)이 적용된다"
+      ],
+      "category": "policy",
+      "severity": "medium",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 126,
+          "snippet": "when = _convert_when(when)  # 'end'->0, 'begin'->1 정규화 (기본 'end')"
+        }
+      ],
+      "bounded_context": "BC-WHEN"
+    }
+  ]
+}

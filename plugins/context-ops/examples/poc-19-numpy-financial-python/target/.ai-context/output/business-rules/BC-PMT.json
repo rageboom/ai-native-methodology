@@ -1,0 +1,58 @@
+{
+  "$schema_ref": "schemas/business-rules-bc.schema.json",
+  "bounded_context": "BC-PMT",
+  "business_rules": [
+    {
+      "id": "BR-PMT-EQUATION-001",
+      "title": "고정 주기 상환금은 화폐의 시간가치 방정식을 만족",
+      "natural_language": "고정 주기 상환금 pmt 는 현재가치 pv, 미래가치 fv, 주기 이율 rate, 총 기간수 nper 에 대해 시간가치 방정식 fv + pv*(1+rate)^nper + pmt*(1+rate*when)/rate*((1+rate)^nper - 1) = 0 을 pmt 에 대해 푼 값이다.",
+      "given": [
+        "현재가치 pv, 주기 이율 rate, 총 기간수 nper, (선택) 미래가치 fv 가 주어진다"
+      ],
+      "when": [
+        "pmt(rate, nper, pv, fv, when) 가 호출된다"
+      ],
+      "then": [
+        "시간가치 방정식을 pmt 에 대해 푼 값 -(fv + pv*(1+rate)^nper) / fact 를 반환한다",
+        "fact = (1 + rate*when)*((1+rate)^nper - 1)/rate"
+      ],
+      "category": "calculation",
+      "severity": "high",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 221,
+          "snippet": "temp = (1 + rate)**nper; ... fact = ...(1 + masked_rate*when)*(temp - 1)/masked_rate; return -(fv + pv*temp) / fact"
+        }
+      ],
+      "bounded_context": "BC-PMT"
+    },
+    {
+      "id": "BR-PMT-ZERORATE-001",
+      "title": "이율 0 일 때 상환금은 선형 분할",
+      "natural_language": "주기 이율 rate 가 0 이면 시간가치 방정식이 fv + pv + pmt*nper = 0 으로 퇴화하여, 상환금은 원리금을 기간수로 균등 분할한 값이 된다 (0 나눗셈 회피를 위해 masked_rate 로 분기).",
+      "given": [
+        "주기 이율 rate 가 0 이다"
+      ],
+      "when": [
+        "pmt(rate, nper, pv, fv, when) 가 호출된다"
+      ],
+      "then": [
+        "fact 는 rate 분기 대신 nper 로 대체된다",
+        "결과는 -(fv + pv)/nper 과 동치다"
+      ],
+      "category": "calculation",
+      "severity": "medium",
+      "source_evidence": [
+        {
+          "type": "code_condition",
+          "file": "numpy_financial/_financial.py",
+          "line": 222,
+          "snippet": "mask = (rate == 0); masked_rate = np.where(mask, 1, rate); fact = np.where(mask != 0, nper, ...)"
+        }
+      ],
+      "bounded_context": "BC-PMT"
+    }
+  ]
+}

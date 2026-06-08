@@ -6,14 +6,27 @@
 //     normalizeBusinessRules (오직 `{ business_rules: [...] }` / v5.0.0 alias hard-kill 정합).
 //   - discovery-extraction-validator = analysis-stage raw 객체(다양 provenance) →
 //     normalizeAnalysisBusinessRules (4 legacy shape + mis-fire 신호).
-//   - STEP 3(포맷 분할 = index + per-BC) 시 loadBusinessRules 내부(파일위치 분기)만
-//     수정 = single-point. index 는 파일명 business-rules.json 유지(plan §2.1)이므로
-//     기존 existsSync/basename 매핑은 무영향.
+//   - STEP 3(포맷 분할 = index + per-BC / v0.24.0) 시행: loadBusinessRules 가 index
+//     (`{bc_files:[...]}`)를 감지해 per-BC sibling 을 재조립 = single-point. index 는
+//     파일명 business-rules.json 유지(plan §2.1)이므로 기존 existsSync/basename 매핑 무영향.
+//     옛 단일파일 `{business_rules:[...]}` 은 backward-compat 으로 계속 수용(시점기록 예제).
 
 import { readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 
 export const BUSINESS_RULES_FILENAME = 'business-rules.json';
+// STEP 3 (BR-split) — index 의 per-BC leaf 가 사는 서브디렉토리(index 파일 dir 기준 상대).
+export const BUSINESS_RULES_DIR = 'business-rules';
+
+/**
+ * parsed 가 분할 index 인지 판별 (STEP 3). index = `{ bc_files: [...] }`.
+ * 옛 단일파일 `{ business_rules: [...] }` 과 disjoint(required 키 상이).
+ * @param {object|null} parsed
+ * @returns {boolean}
+ */
+export function isBusinessRulesIndex(parsed) {
+	return !!parsed && Array.isArray(parsed.bc_files);
+}
 
 // fail-closed JSON reader (defaultReadJson 컨벤션 동형 / read·parse 실패 = null).
 function defaultReadJson(path) {
@@ -79,6 +92,25 @@ export function normalizeAnalysisBusinessRules(analysis) {
 }
 
 /**
+ * 분할 index 의 per-BC leaf 들을 재조립해 전체 rule 배열 반환 (STEP 3).
+ * index 의 bc_files[].file = index 파일 dir 기준 상대경로(예: `business-rules/BC-AUTH.json`).
+ * per-BC blob 부재/파싱실패 = 그 BC skip(부분 로드 / 날조 ❌).
+ * @param {object} indexParsed — `{ bc_files: [...] }`
+ * @param {string} indexDir — index 파일이 있는 디렉토리
+ * @param {(p:string)=>object|null} readJson — 주입 reader(seam 보존)
+ * @returns {Array} 전체 business_rules
+ */
+function reassembleFromIndex(indexParsed, indexDir, readJson) {
+	const rules = [];
+	for (const entry of indexParsed.bc_files) {
+		if (!entry || typeof entry.file !== 'string') continue;
+		const perBc = readJson(join(indexDir, entry.file));
+		for (const r of normalizeBusinessRules(perBc)) rules.push(r);
+	}
+	return rules;
+}
+
+/**
  * canonical business-rules 를 파일/디렉토리에서 로드.
  * @param {string} target — business-rules.json 파일 경로 OR 디렉토리(canonical 파일명 resolve).
  * @param {object} [opts]
@@ -86,19 +118,27 @@ export function normalizeAnalysisBusinessRules(analysis) {
  * @param {(br:object)=>boolean} [opts.bcFilter] — bounded_context scope 슬라이스 술어(선택).
  * @returns {Array} business_rules (없거나 실패 시 [])
  *
- * STEP 3: target 이 dir 이면 business-rules/ index+per-BC 를 감지·병합하는 분기를 본
- * 함수 내부에 추가 = single-point. (현 STEP 2 = 단일 파일만.)
+ * STEP 3: parsed 가 index(`{bc_files:[...]}`) 면 dir 의 per-BC sibling 을 재조립 = single-point.
+ * 옛 단일파일 `{business_rules:[...]}` 은 backward-compat 으로 그대로 수용(시점기록 예제 보존).
  */
 export function loadBusinessRules(target, opts = {}) {
 	const { readJson = defaultReadJson, bcFilter = null } = opts;
 	if (!target) return [];
 	// 1차: target 을 파일 경로로 read (federator 처럼 .json 경로 / 주입 readJson seam).
 	let parsed = readJson(target);
+	let resolvedPath = target;
 	// 파일이 아니면(dir 등) canonical 파일명 결합 재시도.
 	if (parsed === null && !target.endsWith('.json')) {
-		parsed = readJson(join(target, BUSINESS_RULES_FILENAME));
+		resolvedPath = join(target, BUSINESS_RULES_FILENAME);
+		parsed = readJson(resolvedPath);
 	}
-	let rules = normalizeBusinessRules(parsed);
+	let rules;
+	if (isBusinessRulesIndex(parsed)) {
+		// index → per-BC 재조립 (resolvedPath 는 이 시점에 항상 index 파일 경로).
+		rules = reassembleFromIndex(parsed, dirname(resolvedPath), readJson);
+	} else {
+		rules = normalizeBusinessRules(parsed); // 옛 단일파일 backward-compat
+	}
 	if (typeof bcFilter === 'function') rules = rules.filter(bcFilter);
 	return rules;
 }

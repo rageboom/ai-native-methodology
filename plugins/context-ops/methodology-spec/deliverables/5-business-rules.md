@@ -1,7 +1,7 @@
 # 산출물 #5: 비즈니스 규칙 (Business Rules)
 
 > **사상**: DDD-Lite + 4영역 추출 (DB / FE / 설정 / 외부)
-> **schema**: `schemas/business-rules.schema.json` · **template**: schema-driven inline placeholder (.template.md twin 없음)
+> **schema**: 분할 index = `schemas/business-rules-index.schema.json` · per-BC leaf = `schemas/business-rules-bc.schema.json` (`$defs.businessRule` 는 `schemas/business-rules.schema.json` 재사용 / 옛 단일파일·input fixture 검증) · **template**: schema-driven inline placeholder (.template.md twin 없음)
 > **생성 phase**: `business-logic` phase (`/analyze-business-logic`)
 
 ---
@@ -19,10 +19,15 @@
 ## 2. 형식
 
 ```
-output/rules/
-├── business-rules.json            # json 단독 SSOT (구조화, Given/When/Then)
+.ai-context/output/
+├── business-rules.json            # 분할 index — bc_files[] + total_rules (well-known 진입점 / business-rules-index.schema.json)
+├── business-rules/                # per-BC leaf 디렉토리 (BR-split STEP 3 / v0.24.0)
+│   ├── <BC-slug>.json             # 해당 BC 의 business_rules[] (business-rules-bc.schema.json)
+│   └── _uncategorized.json        # bounded_context 미정 rule 버킷 (required 라 실무상 미발생 / 안전망)
 └── conflicts.md                   # 규칙 간 충돌 보고서 (있을 경우 / functional report)
 ```
+
+> **분할 (STEP 3)**: 산출물은 BC별 leaf 로 분할되고 `business-rules.json` 은 **index 로 의미 전환**(파일명 보존). loader(`loadBusinessRules`)가 index 를 감지해 per-BC sibling 을 재조립 → 소비자는 전체 rule 전수 로드(분할 투명). 옛 단일파일(input fixture·legacy 시점기록)은 backward-compat 으로 그대로 유효(`business-rules.schema.json`).
 
 ### 2.1 Given/When/Then 형식 (핵심)
 
@@ -77,7 +82,7 @@ output/rules/
 ## 4. 검증 체크리스트
 
 ```
-□ business-rules.json schema 검증 통과 (business-rules.schema.json)
+□ index schema 검증 통과 (business-rules-index.schema.json) + per-BC leaf 검증 통과 (business-rules-bc.schema.json) — 각 인스턴스 $schema_ref 명시
 □ 모든 BR 에 ID 표준 (BR-{도메인}-{이름}-{번호}) 적용
 □ Given/When/Then 형식 준수
 □ 추출 영역 (5.A/5.B/5.C/5.D) 명시
