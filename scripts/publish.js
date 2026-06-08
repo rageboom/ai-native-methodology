@@ -3,17 +3,17 @@
 // (source:npm 배포 채널 / build-plugin.js = git-subdir Claude 아티팩트 채널과 별개)
 //
 // usage:
-//   node scripts/publish.js --plugin <name> --dry-run    # version-check + npm publish --dry-run (업로드 없음 / tarball·bundled deps 확인)
+//   node scripts/publish.js --plugin <name> --dry-run    # version-check + pnpm publish --dry-run (업로드 없음 / tarball·bundled deps 확인)
 //   node scripts/publish.js --plugin <name>              # publishConfig.registry 로 publish
 //   node scripts/publish.js --all                        # 전 플러그인 publish (CI 일괄)
 //   node scripts/publish.js --plugin <name> --registry <url>   # 레지스트리 override (verdaccio 검증)
 //   (플러그인 인자 생략 시 — plugins/ 에 1개면 그것)
 //
 // 인증: .npmrc 의 //<host>/...:_authToken=... (또는 base64 _auth) 에 의존. 이 스크립트는 자격증명을 다루지 않음.
-//   source:npm 은 설치 시 deps 를 npm install 하지 않으므로 외부 의존(ajv/ajv-formats/fast-xml-parser)은
-//     package.json bundledDependencies 로 tarball 에 동봉됨 (Phase 0 verdaccio 실측).
-//   ⚠ 모노레포 호이스팅 회피 — bundled deps 는 루트 node_modules 로 호이스트되므로 publish 직전
-//     `npm install --no-workspaces` 로 plugins/<name>/node_modules 에 격리 설치해야 tarball 에 동봉됨.
+//   source:npm 은 설치 시 deps 를 install 하지 않으므로 외부 의존(ajv/ajv-formats/fast-xml-parser)은
+//     package.json bundledDependencies 로 tarball 에 동봉됨 (실측: node_modules 594 엔트리).
+//   ⚠ pnpm + .npmrc node-linker=hoisted 의존 — hoisted 라야 plugins/<name>/node_modules 에 bundledDeps 가
+//     flat materialize 되어 pnpm pack/publish 가 tarball 에 동봉함 (isolated 기본값이면 동봉 누락 위험).
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -68,21 +68,22 @@ function publishOne(name) {
 		fail(`'${name}' version-check 실패 — abort.`);
 	}
 
-	// gate 1.5 — bundledDependencies 격리 설치 (모노레포 호이스팅 회피)
-	// 루트 워크스페이스 install 은 ajv 등을 repo-root/node_modules 로 호이스트하므로
-	// plugins/<name>/node_modules 가 비어 tarball 에 동봉 불가 → --no-workspaces 로 로컬 materialize.
+	// gate 1.5 — bundledDependencies materialize (pnpm + node-linker=hoisted)
+	// pnpm 워크스페이스 install(hoisted)은 plugins/<name>/node_modules 에 bundledDeps 를 flat 으로 채운다
+	//   (실측: ajv/ajv-formats/fast-xml-parser → node_modules 594 엔트리 동봉 / .npmrc node-linker=hoisted 의존).
+	//   → 별도 격리 install 불필요. 단 standalone 호출 대비 워크스페이스 install 을 한 번 보장.
 	const bundled = pkg.bundledDependencies || pkg.bundleDependencies || [];
 	if (bundled.length) {
 		console.log(
-			'[publish] bundledDependencies 격리 설치 (npm install --no-workspaces)…',
+			'[publish] bundledDependencies materialize (pnpm install --filter, node-linker=hoisted)…',
 		);
 		try {
-			execSync(
-				'npm install --no-workspaces --no-package-lock --no-audit --no-fund',
-				{ stdio: 'inherit', cwd: WORKSPACE },
-			);
+			execSync(`pnpm install --filter ${pkg.name}`, {
+				stdio: 'inherit',
+				cwd: REPO_ROOT,
+			});
 		} catch {
-			fail(`'${name}' bundled deps 격리 설치 실패 — abort.`);
+			fail(`'${name}' bundled deps materialize 실패 — abort.`);
 		}
 	}
 
@@ -99,10 +100,11 @@ function publishOne(name) {
 			`[publish] bundledDependencies 확인: ${bundled.join(', ')} (로컬 node_modules 존재)`,
 		);
 
-	// publish (npm 자체 --dry-run 사용 — tarball 내용 + bundled deps 출력)
+	// publish (pnpm publish --dry-run — tarball 내용 + bundled deps 출력)
+	//   --no-git-checks: pnpm 은 기본적으로 clean tree/branch/up-to-date 를 검사 → 릴리스 워크플로상 생략.
 	const regFlag = `--registry "${registry}"`;
 	const dryFlag = DRY_RUN ? '--dry-run' : '';
-	const cmd = `npm publish ${dryFlag} ${regFlag} --no-workspaces`
+	const cmd = `pnpm publish ${dryFlag} ${regFlag} --no-git-checks`
 		.replace(/\s+/g, ' ')
 		.trim();
 	console.log(`[publish] ${cmd}`);

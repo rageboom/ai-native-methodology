@@ -1,0 +1,5 @@
+# pnpm 워크스페이스 정의 (구 package.json "workspaces" 필드 이전 / pnpm 은 그 필드를 무시).
+# 멤버 = plugins/<plugin> + 각 플러그인의 tools/* (검증 도구 32종). examples/poc-* 는 비멤버(불변).
+packages:
+  - 'plugins/*'
+  - 'plugins/*/tools/*'

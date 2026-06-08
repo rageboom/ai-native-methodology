@@ -598,22 +598,35 @@ function check11_workspaceTestPass(args) {
 			pass: false,
 			detail:
 				'skipped via --skip-workspace-test (test cadence 안 사용 / release 본격 시행 시 본 flag ❌ 의무)',
-			delegated_to: 'npm test --workspaces --if-present (skipped)',
+			delegated_to: 'pnpm -r --if-present run test (skipped)',
 		};
 	}
-	// Windows Node.js v22+ EINVAL fix — npm.cmd spawn 시 shell: true 의무 (CVE-2024-27980 정합).
+	// Windows Node.js v22+ EINVAL fix — pnpm.cmd spawn 시 shell: true 의무 (CVE-2024-27980 정합).
 	// NODE_TEST_CONTEXT 제거 — test runner 안 release-readiness 호출 시 child env inherit 회피
 	//    (본 env 잔존 시 workspace 안 모든 test 자동 skip → 0/0 pass false positive).
 	const childEnv = { ...process.env };
 	delete childEnv.NODE_TEST_CONTEXT;
-	// 모노레포 전환 — workspaces 는 repo-root 가 소유 (plugin package.json 엔 없음) → REPO_ROOT 에서 실행.
-	const result = spawnSync('npm', ['test', '--workspaces', '--if-present'], {
-		cwd: REPO_ROOT,
-		env: childEnv,
-		encoding: 'utf-8',
-		timeout: 600_000,
-		shell: true,
-	});
+	// node 22+ 는 test 파일별 process-isolation 이 기본 → pnpm recursive 러너의 child spawn 과 충돌해
+	//   "node:test run() recursively … skipping running files" 로 파일이 통째로 skip(undercount) 됨.
+	//   isolation=none 으로 단일 프로세스 실행 시 해소. 플래그는 node 22+ 에만 존재(18~21 은 격리 자체가 없어 불필요).
+	const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
+	if (nodeMajor >= 22) {
+		childEnv.NODE_OPTIONS =
+			`${childEnv.NODE_OPTIONS || ''} --test-isolation=none`.trim();
+	}
+	// pnpm 워크스페이스 — 멤버 정의는 pnpm-workspace.yaml (repo-root). -r = 모든 멤버, test script 있는 패키지만 실행.
+	//   --workspace-concurrency=1 = 순차(npm 동형) — 병렬 시 cross-package temp-file race(skill-citation ↔ inflation-lint) 회피.
+	const result = spawnSync(
+		'pnpm',
+		['-r', '--workspace-concurrency=1', '--if-present', 'run', 'test'],
+		{
+			cwd: REPO_ROOT,
+			env: childEnv,
+			encoding: 'utf-8',
+			timeout: 600_000,
+			shell: true,
+		},
+	);
 	const stdout = result.stdout || '';
 	const sumMatches = (pattern) =>
 		(stdout.match(pattern) || []).reduce((acc, line) => {
@@ -621,10 +634,10 @@ function check11_workspaceTestPass(args) {
 			return acc + (m ? parseInt(m[0], 10) : 0);
 		}, 0);
 	// v8.6.0 fix — node:test 출력 prefix 변동 양쪽 지원 (`# tests N` 또는 `ℹ tests N` / U+2139).
-	//   본 환경 sandbox 에서 spawnSync child output 이 ℹ prefix 만 emit → 0 collect false positive 회피.
-	const totalTests = sumMatches(/^(?:# |ℹ )tests \d+/gm);
-	const totalPass = sumMatches(/^(?:# |ℹ )pass \d+/gm);
-	const totalFail = sumMatches(/^(?:# |ℹ )fail \d+/gm);
+	//   pnpm -r run 은 라인마다 `<pkg> test: ` prefix 를 붙이므로 라인-시작(^) 앵커 제거 — summary 토큰을 라인 내 어디서나 매칭.
+	const totalTests = sumMatches(/(?:# |ℹ )tests \d+/g);
+	const totalPass = sumMatches(/(?:# |ℹ )pass \d+/g);
+	const totalFail = sumMatches(/(?:# |ℹ )fail \d+/g);
 	const passed = result.status === 0 && totalFail === 0 && totalTests > 0;
 	// F-V1-01 fix — 0 tests collected 별도 inconclusive 분기 (환경 진단 안내).
 	// 이전: 0/0 → pass=false / detail="regress: 0 fail / 0/0 pass / exit=0" (정확하지만 환경 vs 회귀 구분 불가)
@@ -638,10 +651,10 @@ function check11_workspaceTestPass(args) {
 		detail: passed
 			? `workspace test ${totalPass}/${totalTests} pass / 0 fail / exit=0 ✅`
 			: inconclusive
-				? `inconclusive — 0 tests collected / exit=${result.status} (npm workspaces 인식 실패 또는 test script 부재. 사내 환경: package.json workspaces 필드 + 각 workspace 의 test script + node ≥18 + NODE_TEST_CONTEXT env 제거 확인 의무 / release 차단 효과 동일)`
+				? `inconclusive — 0 tests collected / exit=${result.status} (pnpm 워크스페이스 인식 실패 또는 test script 부재. 사내 환경: pnpm-workspace.yaml + 각 workspace 의 test script + node ≥18 + pnpm 설치 + NODE_TEST_CONTEXT env 제거 확인 의무 / release 차단 효과 동일)`
 				: `regress: ${totalFail} fail / ${totalPass}/${totalTests} pass / exit=${result.status}`,
 		delegated_to:
-			'npm test --workspaces --if-present (A1 / chain-driver Windows path 회귀 사례 정합 / LL-session-20-A1)',
+			'pnpm -r --if-present run test (A1 / chain-driver Windows path 회귀 사례 정합 / LL-session-20-A1)',
 	};
 }
 
