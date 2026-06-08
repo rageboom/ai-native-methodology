@@ -56,6 +56,101 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | `structure_id`               | string  | env-config 또는 (없음)                    | Atlassian Structure (ALM Works DWP-Forge) tree ID. set 시 phase=exit 종료 후 `jira_structure_add_issues` 자동 호출 표준 (모든 신규 ticket 등록). **SG-MIS 환경 reference: `684`** (SG-MIS board). Jira Structure board URL 의 `s=<숫자>` 파라미터 값으로 확인.                                                                                                                                                         |
 | `structure_auto_add_on_exit` | boolean | `true` (단 `structure_id` set 일 때)      | true 시 phase=exit 마다 자동 호출 표준 (drift attractor 회피).                                                                                                                                                                                                                                                                       |
 
+## 이슈 유형 네이밍 규칙 & 설명 템플릿
+
+사내 표준 (`jira_이슈유형_표준템플릿`) 준수. MCP `jira_create` 호출 시 아래 규칙을 그대로 반영한다.
+
+### Summary 네이밍
+
+| role       | 규칙                                | 형식 예시                              |
+| ---------- | ----------------------------------- | -------------------------------------- |
+| epic       | **메뉴명 그대로** (화면명)          | `내근무현황` / `휴가신청`              |
+| story      | **명사형** — 사용자가 할 수 있는 것 | `연차 잔여일수 조회` / `근무시간 엑셀 다운로드` |
+| task (OP)  | **무엇을 어떻게 한다**              | `[OP-{id}] 근태 계산 배치 리팩토링`    |
+| subtask    | **레이어 + 작업 내용**              | `[TASK-{id}] {layer} {title}`          |
+| bug        | **발생위치 + 무엇이 + 어떻게 됨**  | `내근무현황 1주차 근태 집계 누락`      |
+
+> Epic·Story 는 내부 ID 브래킷(`[Epic-fe]`, `[Story]`) **없이** 실제 메뉴명·기능명만 사용한다.
+> OP-Task·Sub-task 는 traceability를 위해 `[OP-xxx]` / `[TASK-xxx]` 브래킷 유지.
+
+---
+
+### Description 본문 템플릿
+
+#### Epic
+```
+■ 화면 개요
+- 신규 — {신규 제공 목적 한 줄}
+- 기존 — {기존 화면에 추가되는 내용} (해당 없을 시 생략)
+
+■ 화면 경로
+{route or URL path (예: /hr/my-attendance)}
+
+■ 비고
+- 본 Epic은 화면이 서비스되는 동안 닫지 않으며(open 유지), 이후 일감은 성격에 따라 하위에 이야기/작업/버그로 계속 추가한다.
+```
+
+#### Story
+```
+■ 기능 목적
+나는 {사용자 유형}으로서 {기능 목적}을 원한다. 왜냐하면 {이유}이기 때문이다.
+
+■ 상세 내용
+{behavior-spec.BHV-* 기반 기능 상세}
+
+■ 완료 조건
+- {acceptance-criteria.AC-* 항목 나열}
+```
+
+#### Task (OP-\*)
+```
+■ 작업 내용
+{작업 상세 설명}
+
+■ 작업 사유 (왜 Task인가)
+화면 동작이나 결과는 그대로이고 내부 구조만 개선/변경하는 작업으로, 사용자 가치 변화가 없으므로 Task로 등록한다.
+
+■ 완료 조건
+- {완료 판단 조건 나열}
+```
+
+#### Sub-task (TASK-\*)
+```
+■ AC 범위
+{task.ac_refs 나열 (예: AC-XXX-001, AC-XXX-002)}
+
+■ 레이어
+{task.layer (be / fe / db / e2e / infra)}
+
+■ API / 컴포넌트 참조
+{task.openapi_endpoint_ref 또는 component_ref (없으면 생략)}
+```
+
+#### Bug
+```
+■ 전제조건
+{버그 재현을 위한 사전 상태}
+
+■ 재현절차
+1. {단계 1}
+2. {단계 2}
+3. {단계 3}
+
+■ 재현결과
+{실제로 발생한 현상}
+
+■ 기대결과
+{원래 되어야 하는 정상 동작}
+
+■ 문제
+{해당 버그로 인한 영향 또는 문제}
+
+■ 해결 방향
+{수정 방향 또는 원인 추정}
+```
+
+---
+
 ## 절차
 
 ### 단계 1 — Pre-flight
@@ -296,37 +391,90 @@ Step 1 — Initiative (선택 / parent_epic 미명시 시):
 
 Step 2 — Epic (per FE 화면 또는 BE-domain 묶음):
   for each epic in task-plan.epics[]:
+    # 네이밍: 메뉴명 그대로 (브래킷 없이) — §이슈 유형 네이밍 규칙 Epic 규칙
+    summary = epic.title  # 예: "내근무현황", "휴가신청"
+    # body: §Description 본문 템플릿 > Epic 적용
+    body = """
+■ 화면 개요
+- {신규 or 기존} — {epic.description}
+
+■ 화면 경로
+{epic.route or discovery-spec 경로}
+
+■ 비고
+- 본 Epic은 화면이 서비스되는 동안 닫지 않으며(open 유지), 이후 일감은 성격에 따라 하위에 이야기/작업/버그로 계속 추가한다.
+"""
     jira_create (role=epic,
-                 summary="[Epic-{epic.type}] {epic.title}",
+                 summary=summary,
                  parent_ticket_id=initiative_id, link_type=parent-child,
-                 labels=[epic.type], body=discovery-spec/visual-manifest link)
+                 labels=[epic.type], body=body)
     → epic_id[epic.epic_id] 저장 (epic_id map)
     jira_link (epic, parent=initiative_id)
 
 Step 3 — Story (per BHV cluster / cross-cut anchor):
   for each story in task-plan.stories[]:
+    # 네이밍: 명사형 기능명 (브래킷 없이) — §이슈 유형 네이밍 규칙 Story 규칙
+    summary = story.title  # 예: "연차 잔여일수 조회", "근무시간 엑셀 다운로드"
+    # body: §Description 본문 템플릿 > Story 적용
+    body = """
+■ 기능 목적
+나는 {story.user_role}으로서 {story.user_action}을 원한다. 왜냐하면 {story.because}이기 때문이다.
+
+■ 상세 내용
+{behavior-spec.BHV-* 상세 내용}
+
+■ 완료 조건
+- {acceptance-criteria.AC-* 항목 나열}
+"""
     jira_create (role=story,
-                 summary="[Story] {story.title}",
+                 summary=summary,
                  parent=epic_id[story.epic_ref] via parent_strategy,
-                 body=behavior-spec.BHV-* + acceptance-criteria.AC-* link)
+                 body=body)
     → story_id[story.story_id] 저장
 
 Step 4 — Task (per OP-* / Story sibling / BE only 운영·인프라·마이그레이션):
   for each op_task in operational-task.json[] (if exists):
+    # 네이밍: [OP-id] 무엇을 어떻게 한다 — §이슈 유형 네이밍 규칙 Task 규칙
+    summary = "[OP-{op_task.op_id}] {op_task.title}"
+    # body: §Description 본문 템플릿 > Task 적용
+    body = """
+■ 작업 내용
+{op_task.description}
+
+■ 작업 사유 (왜 Task인가)
+화면 동작이나 결과는 그대로이고 내부 구조만 개선/변경하는 작업으로, 사용자 가치 변화가 없으므로 Task로 등록한다.
+
+■ 완료 조건
+- {op_task.acceptance_criteria 나열}
+"""
     jira_create (role=task,
-                 summary="[OP-{op_task.op_id}] {op_task.title}",
+                 summary=summary,
                  parent=epic_id[op_task.epic_ref] via parent_strategy,
-                 labels=[op-* + op_task.op_type], status=To Do)
+                 labels=[op-* + op_task.op_type], status=To Do,
+                 body=body)
     → op_task_id[op_task.op_id] 저장
 
 Step 5 — Sub-task (per TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra):
   for each task in task-plan.tasks[]:
     parent_ref = task.story_ref ? story_id[task.story_ref] : op_task_id[task.op_task_ref]
+    # 네이밍: [TASK-id] layer 작업 내용 — §이슈 유형 네이밍 규칙 Sub-task 규칙
+    summary = "[TASK-{task.task_id}] {task.title}"
+    # body: §Description 본문 템플릿 > Sub-task 적용
+    body = """
+■ AC 범위
+{task.ac_refs 나열}
+
+■ 레이어
+{task.layer}
+
+■ API / 컴포넌트 참조
+{task.openapi_endpoint_ref 또는 component_ref (없으면 생략)}
+"""
     jira_create (role=subtask,
-                 summary="[TASK-{task.task_id}] {task.title}",
+                 summary=summary,
                  parent_ticket_id=parent_ref, link_type=parent-child,
                  labels=[layer-* + task.layer], status=To Do,
-                 body=task.ac_refs + task.layer + task.openapi_endpoint_ref|component_ref)
+                 body=body)
     B14 — Sub-task payload 안 extra_fields[epic_link_customfield_id] 명시 ❌
     → subtask_id[task.task_id] 저장
 
