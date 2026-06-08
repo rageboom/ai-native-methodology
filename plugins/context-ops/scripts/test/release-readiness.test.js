@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 39/40 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 39/40 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 40/41 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 40/41 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 40);
-		assert.equal(out.criteria_passed, 39);
+		assert.equal(out.criteria_total, 41);
+		assert.equal(out.criteria_passed, 40);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 40 criterion ids are present in output (no skipped)', () => {
+	it('all 41 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -73,6 +73,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'analysis_validator_violation',
 			'authoring_spec_staleness',
 			'be_task_openapi_ref_ratchet',
+			'catalog_range_covers_version',
 			'chain_coverage',
 			'claude_md_version_sync',
 			'code_pointer_coverage',
@@ -303,11 +304,53 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 40 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 41 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 40);
+		assert.equal(out.criteria_total, 41);
+	});
+
+	// check41 discrimination — 카탈로그 범위 ⊇ plugin.json 버전 (install ETARGET 회귀 가드).
+	//   실 결함: 0.x 에서 ^0.1.0 = <0.2.0 라 0.19.x/0.20.x 미커버 → /plugin install "No matching version (ETARGET)".
+	it('catalog_range_covers_version — 범위 ⊇ 버전 + 0.x caret 함정/major 경계 discrimination', () => {
+		const r = runScript(['--target', 'v0.20.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find((x) => x.id === 'catalog_range_covers_version');
+		assert.ok(c.pass, `check41 must pass (범위가 현재 버전 커버) — detail: ${c.detail}`);
+		assert.ok(c.delegated_to.includes('ETARGET'), 'ETARGET 회귀 차단 의도 명시');
+		// discrimination — release-readiness.js semverSatisfies 미러 (compact / caret + comparator-set).
+		const parseV = (s) => {
+			const m = /^[v=]?(\d+)\.(\d+)\.(\d+)/.exec(String(s).trim());
+			return m ? [+m[1], +m[2], +m[3]] : null;
+		};
+		const cmp = (a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+		const sat = (version, range) => {
+			const v = parseV(version);
+			const r2 = String(range).trim();
+			if (r2.startsWith('^')) {
+				const lo = parseV(r2.slice(1));
+				const hi =
+					lo[0] > 0 ? [lo[0] + 1, 0, 0]
+					: lo[1] > 0 ? [0, lo[1] + 1, 0]
+					: [0, 0, lo[2] + 1];
+				return cmp(v, lo) >= 0 && cmp(v, hi) < 0;
+			}
+			return r2.split(/\s+/).every((cstr) => {
+				const m = /^(>=|<=|>|<|=)?(.+)$/.exec(cstr);
+				const op = m[1] || '=';
+				const d = cmp(v, parseV(m[2]));
+				return op === '>=' ? d >= 0
+					: op === '<=' ? d <= 0
+					: op === '>' ? d > 0
+					: op === '<' ? d < 0
+					: d === 0;
+			});
+		};
+		assert.equal(sat('0.20.0', '^0.1.0'), false, '0.x caret 함정: ^0.1.0 은 0.20.0 미커버 (원 결함)');
+		assert.equal(sat('0.20.0', '>=0.1.0 <1.0.0'), true, '수정 범위 >=0.1.0 <1.0.0 은 0.20.0 커버');
+		assert.equal(sat('1.0.0', '>=0.1.0 <1.0.0'), false, 'major 경계: 1.0.0 은 0.x 범위 밖 → 게이트가 차단(범위 갱신 강제)');
+		assert.equal(sat('1.5.0', '^1.0.0'), true, '1.x 는 caret 정상(^1.0.0 ⊇ 1.5.0)');
 	});
 
 	// v11.29.0 check30 discrimination — Type 2 캡처 배선 content-aware (file-presence ❌).
@@ -637,8 +680,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 40);
-		assert.equal(out.criteria_passed, 40);
+		assert.equal(out.criteria_total, 41);
+		assert.equal(out.criteria_passed, 41);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});

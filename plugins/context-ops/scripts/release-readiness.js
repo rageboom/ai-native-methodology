@@ -3027,6 +3027,117 @@ function check40_shippedProvenanceLeak() {
 	}
 }
 
+// check41 — 카탈로그(marketplace.json) source.version 범위가 현재 plugin.json.version 을 실제로 커버하는지.
+//   ⚠ 실 결함 회귀 가드 (install ETARGET): 0.x 에서 caret 은 patch-only (`^0.1.0` = `>=0.1.0 <0.2.0`) 라
+//     plugin 0.19.x 가 범위 밖 → `/plugin install` 시 "No matching version (ETARGET)". 0.x→1.0 major 경계서도 동일.
+//   런타임 설치 실패를 release 게이트(pre-publish)로 앞당겨 차단 — major 경계마다 versionRange 갱신 강제.
+//   카탈로그 = 생성물(build-catalog.js) 이므로 marketplace-entry.json versionRange 수정 후 catalog:build + publish:catalog 필요.
+function semverSatisfies(version, range) {
+	// 최소 satisfies — 본 레포가 생성하는 범위 형식만 지원: comparator-set(`>=a.b.c <d.e.f`) / caret(`^a.b.c`) / `*`.
+	//   미인식 형식 → null (호출부에서 "수동 확인" fail 처리 / 조용한 통과 ❌).
+	const parseV = (s) => {
+		const m = /^[v=]?(\d+)\.(\d+)\.(\d+)/.exec(String(s).trim());
+		return m ? [+m[1], +m[2], +m[3]] : null;
+	};
+	const cmp = (a, b) =>
+		a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+	const v = parseV(version);
+	if (!v) return null;
+	const r = String(range).trim();
+	if (r === '*' || r === 'latest' || r === '') return true;
+	// caret
+	if (r.startsWith('^')) {
+		const lo = parseV(r.slice(1));
+		if (!lo) return null;
+		let hi;
+		if (lo[0] > 0) hi = [lo[0] + 1, 0, 0];
+		else if (lo[1] > 0) hi = [0, lo[1] + 1, 0];
+		else hi = [0, 0, lo[2] + 1];
+		return cmp(v, lo) >= 0 && cmp(v, hi) < 0;
+	}
+	// comparator set (AND, 공백 구분) — 예: ">=0.1.0 <1.0.0"
+	const comps = r.split(/\s+/).filter(Boolean);
+	for (const c of comps) {
+		const m = /^(>=|<=|>|<|=)?(.+)$/.exec(c);
+		if (!m) return null;
+		const op = m[1] || '=';
+		const cv = parseV(m[2]);
+		if (!cv) return null;
+		const d = cmp(v, cv);
+		const ok =
+			op === '>=' ? d >= 0
+			: op === '<=' ? d <= 0
+			: op === '>' ? d > 0
+			: op === '<' ? d < 0
+			: d === 0;
+		if (!ok) return false;
+	}
+	return true;
+}
+
+function check41_catalogRangeCoversVersion() {
+	const marketplacePath = join(REPO_ROOT, '.claude-plugin', 'marketplace.json');
+	const pluginJsonPath = join(ROOT, '.claude-plugin', 'plugin.json');
+	if (!existsSync(marketplacePath))
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: 'marketplace.json missing (catalog:build 필요)',
+		};
+	let marketplace, pluginVersion;
+	try {
+		marketplace = JSON.parse(readFileSync(marketplacePath, 'utf-8'));
+	} catch (e) {
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: `marketplace.json parse fail: ${e.message}`,
+		};
+	}
+	try {
+		pluginVersion = JSON.parse(readFileSync(pluginJsonPath, 'utf-8')).version;
+	} catch (e) {
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: `plugin.json parse fail: ${e.message}`,
+		};
+	}
+	const PLUGIN_NAME = basename(ROOT);
+	const entry = (marketplace.plugins || []).find((p) => p.name === PLUGIN_NAME);
+	if (!entry)
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: `marketplace.json 에 '${PLUGIN_NAME}' 엔트리 없음 (catalog:build 필요)`,
+		};
+	const range = entry.source && entry.source.version;
+	if (!range)
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: `'${PLUGIN_NAME}' source.version (범위) 없음`,
+		};
+	const sat = semverSatisfies(pluginVersion, range);
+	const delegated_to =
+		'marketplace.json source.version ⊇ plugin.json.version (semver satisfies / 0.x caret 함정·major 경계서 install ETARGET 회귀 차단)';
+	if (sat === null)
+		return {
+			id: 'catalog_range_covers_version',
+			pass: false,
+			detail: `범위 형식 미인식 — 수동 확인 필요: version=${pluginVersion} range="${range}"`,
+			delegated_to,
+		};
+	return {
+		id: 'catalog_range_covers_version',
+		pass: sat,
+		detail: sat
+			? `카탈로그 범위 "${range}" ⊇ plugin.json v${pluginVersion} ✅ (install ETARGET 방지)`
+			: `❌ 카탈로그 범위 "${range}" 가 plugin.json v${pluginVersion} 미커버 → /plugin install ETARGET 위험. marketplace-entry.json versionRange 갱신 + catalog:build + publish:catalog 필요.`,
+		delegated_to,
+	};
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -3072,6 +3183,7 @@ function main() {
 		check38_contextCacheReferenceLensTrust(),
 		check39_codegraphOpenapiReferenceLensTrust(),
 		check40_shippedProvenanceLeak(),
+		check41_catalogRangeCoversVersion(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;
