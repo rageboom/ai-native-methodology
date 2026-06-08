@@ -75,9 +75,18 @@
 
 **현재 시행분**: ① 변경 origin → **forward 단방향** 영향 closure → 순서화된 재생성 worklist 를 운영 상태에 durable 기록(`sync-loop` / forward-only 실 입증). ② 그 worklist 를 **stage 단위로 소비**해 재생성 지시를 surface 하고 그 stage gate 를 재실행하여 통과분을 done 처리(`sync-next` / gate 입도 = stage / 큐-block 은 운영 cursor 와 격리). ③ 자연어 변경요청 → (LLM skill 이 산출한) discovery-spec 의 **명시 매핑**(use_cases.id / business_rules_intent.br_id)을 결정론 변환해 진입 origins 를 산출, existing 은 ①로 seed·net-new 는 propose 보고(`route` / 의미 판정=LLM·라우팅=결정론·차단=gate#1). **미배선(후속)**: 손수정 코드 lift + reconcile · scope merge-back · per-item granularity · 재생성-후 fixpoint 자동 재진입 · 변경 자동 감지(현재 수동 트리거). 자세한 단계·시행 로그는 ## 인용의 결단 문서.
 
+## 8. 운영 전제 — git 위생 (`--git` 변경 자동 감지)
+
+`sync-loop --git` / `sync-converge --git` 은 baseline↔워크트리 git diff 로 변경 산출물을 자동 감지한다. 이 루프가 noise 없이 돌려면 채택자 프로젝트의 git 추적 경계가 다음과 같아야 한다 (결단 출처 = ## 인용):
+
+- **런타임 상태 = 커밋 ❌**: `.aimd/state.json` · `state.json.tmp` · `**/intervention-log.jsonl` 은 도구 실행 상태이지 AX 산출물이 아니다 → git 추적 제외. `chain-driver init` 이 `<project>/.aimd/.gitignore` 를 **자동 스캐폴드**(idempotent / 기존 파일 무클로버 / 재-init upgrade 경로). 추적되면 `--git` diff 에 잡혀 `unresolved_paths` → `needs_resynth` false 신호를 낸다.
+- **파생물 = 커밋 ✓ (그러나 재검출에서 도구가 skip)**: `artifact-graph.json` · `matrix.json` · `findings-*.json` 은 LLM 운영 컨텍스트/증거라 **커밋 대상**이다(gitignore ❌ — SSOT 손실). 대신 `--git` 재검출이 **노드 미매핑 + `.aimd/` 도구 파생물**인 경로를 자동 skip 한다(C-lite / `resolveOriginNodeIds {skipDerivedNoise}`) → resync 로 변경된 그래프가 false-`unresolved` 를 만들지 않는다.
+- **BLOCKER-1 보존**: 노드 미매핑이면서 도구 파생물도 **아닌** 경로(=진짜 새 구조 산출물)는 `unresolved` 로 유지 → 거짓 fixpoint 차단(carry2 철학). skip 은 `do_not_edit_manually` 파생물에만 적용된다.
+
 ## 인용
 
 - 결단: DEC-2026-06-07-living-sync-operating-model (정책·전파 모델·discovery 라우터·granularity 원칙·단계 로드맵 SSOT)
+- 결단: DEC-2026-06-08-living-sync-adopter-git-hygiene (§8 git 위생 — init .gitignore 스캐폴드 + --git 도구 파생물 skip)
 - spec: `methodology-spec/baseline-delta-operating-model.md` (재분석 cadence — 자매 문서)
 - spec: `methodology-spec/use-scenario-taxonomy.md` (4 시나리오 → AX 운영 수렴)
 - spec: `methodology-spec/lifecycle-contract.md` (stage × asset / gate)

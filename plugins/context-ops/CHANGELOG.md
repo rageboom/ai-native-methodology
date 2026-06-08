@@ -10,6 +10,19 @@
 
 ---
 
+## [0.22.0] — 2026-06-08 MINOR — living-sync 채택자 git 위생 (--git 루프 noise 제거 / init .gitignore 스캐폴드 + 도구 파생물 skip)
+
+**poc-20 전체 루프 테스트(진입→소비→sync-converge 수렴) 중 `--git` 재검출이 `.aimd/state.json`·`artifact-graph.json` 을 `unresolved_paths` → `needs_resynth` 로 false-flag. zero-base 전수조사 → 채택자 온보딩 갭 + 도구 자기 파생물 false-unresolved 라는 구조적 사실로 정정.**
+
+근거 정합: 레포 git posture 실측 = 런타임 상태(`state.json`·`tmp`·`intervention-log`)만 gitignore / **artifact-graph·matrix·findings 는 커밋**(AX 운영 컨텍스트·증거). 따라서 후자를 gitignore 로 빼면 SSOT 손실 → 도구가 재검출에서 skip 하는 것이 정답.
+
+- **feat — B (`tools/chain-driver/src/cli.js` `cmdInit`)**: `ensureAimdGitignore(root)` 신설 — 채택자 프로젝트에 `<project>/.aimd/.gitignore` 자동 스캐폴드(`state.json`·`state.json.tmp`·`**/intervention-log.jsonl` 만 / 레포 plugin-root .gitignore 동형). idempotent(기존 파일 무클로버) + early-exit **前** 호출 → state.json 존재 프로젝트 재-init 도 받음(upgrade 경로). **artifact-graph·matrix·findings 는 제외 ❌**(커밋 대상).
+- **feat — C-lite (`tools/chain-driver/src/sync-loop.js` `resolveOriginNodeIds`)**: opt-in `{ skipDerivedNoise: true }` + `isAimdDerivedOutput()` — 노드 **미매핑 AND** `.aimd/` 도구 파생물(basename ∈ {state.json·tmp, artifact-graph.json, matrix.json, context-cache.json, intervention-log.jsonl, findings-*.json})인 경로를 unresolved 에서 제외(→ `skipped_derived`). 두 `--git` caller(`sync-loop --git` cli.js:1928 + `sync-converge` cli.js:2358)만 전달 → **lift(lift-anchor.js)·`--changed` 모드 무변경**. 미매핑+파생물 **아님** = unresolved 유지(진짜 새 구조 파일 = carry2 BLOCKER-1 보존). `.aimd/` prefix 한정(레포 밖 동명 파일 오skip ❌).
+- **docs**: `methodology-spec/living-sync-operating-model.md` §8(운영 전제 — git 위생) 신설 + `guides/common-errors.md` §7 Q18(unresolved=state.json)·Q19(resync 후 fixpoint) 트러블슈팅. 후행 섹션 번호 +1.
+- **test**: 신규 `test/adopter-git-hygiene.test.js` +8 (C-lite opt-in/무회귀/prefix-pin/AND-guard · B 신규생성/idempotent/upgrade · --git e2e skip) → chain-driver 494→502 GREEN.
+- **§8.1 2-도메인 dogfood**: poc-20 전체 루프 = artifact-graph **커밋 상태**로 fixpoint noise 0 도달(이전엔 needs_resynth). poc-18(2nd domain) 실 그래프 --git skip corroboration(discovery-spec 변경 6 origin / 파생물 2 skip / unresolved 0).
+- **Senior 적대검토 REVISE@0.78 → 4건 반영**: MAJOR(범위)=필터를 resolveOriginNodeIds 내부로 / Senior "무조건 내부" → **opt-in 정정**(lift·--changed 도 caller / fact-check supplement) / MINOR=basename→`.aimd/` pin · B ensure 를 exit 前.
+
 ## [0.21.0] — 2026-06-08 MINOR — PMD Java-조건부 자동설치 (Tier1 install 갭 해소 / 사용자 zero-base 재검토 결론)
 
 **"플러그인 최초 설치 시 OSS 툴이 안 깔린다"는 사용자 지적 → zero-base 재검토 → 진짜 갭 = PMD가 Tier1(in-plugin 자동실행)로 격상됐는데도(DEC-2026-06-07) install 스크립트는 설치 0 + 주석이 stale 'Tier2' 였던 점.**

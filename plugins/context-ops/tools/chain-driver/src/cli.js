@@ -20,7 +20,7 @@
 //   3 = usage-error
 //   4 = state-corrupt
 
-import { existsSync, readFileSync, appendFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve, isAbsolute } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -236,11 +236,31 @@ function blockedExit(state, projectRoot) {
 	process.exit(2);
 }
 
+// B (DEC-2026-06-08-living-sync-adopter-git-hygiene) — 채택자 프로젝트에 .aimd/.gitignore 스캐폴드.
+//   순수 런타임 상태(state.json·tmp·intervention-log)만 제외 = 레포 관행(plugin-root .gitignore) 동형.
+//   ★ artifact-graph/matrix/findings 는 제외 ❌ (커밋 대상 = AX 운영 컨텍스트/증거). 그 noise 는 C-lite(--git skip)가 처리.
+//   idempotent: 파일 부재 시만 생성(클로버 ❌). early-exit 前 호출 → 기존 채택자 재-init 도 받음(upgrade).
+const AIMD_GITIGNORE_BODY = `# chain-driver runtime state — regenerable, AX 산출물 아님 (커밋 ❌)
+# (DEC-2026-06-08-living-sync-adopter-git-hygiene / artifact-graph·matrix·findings 는 커밋 대상 = 제외 안 함)
+state.json
+state.json.tmp
+**/intervention-log.jsonl
+`;
+function ensureAimdGitignore(root) {
+	const dir = join(root, '.aimd');
+	const gi = join(dir, '.gitignore');
+	if (existsSync(gi)) return false; // idempotent — 기존 보존
+	mkdirSync(dir, { recursive: true });
+	writeFileSync(gi, AIMD_GITIGNORE_BODY, 'utf-8');
+	return true;
+}
+
 function cmdInit(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
 	const projectId = basename(root);
 	recoverTmpFiles(root);
+	ensureAimdGitignore(root); // early-exit 보다 앞 — 기존 채택자 upgrade 경로 (Senior MINOR-Q3)
 	try {
 		let state;
 		if (existsSync(statePath(root))) {
@@ -1925,7 +1945,7 @@ function cmdSyncLoop(args) {
 			reportBrDiff(res.report);
 			gitDiffReport = { br_diff: res.report };
 		}
-		const pathOrigins = resolveOriginNodeIds(graph, nonBr);
+		const pathOrigins = resolveOriginNodeIds(graph, nonBr, { skipDerivedNoise: true });
 		origins = [...new Set([...origins, ...brOrigins, ...pathOrigins.ids])].sort();
 		gitDiffReport = {
 			...(gitDiffReport || {}),
@@ -1933,10 +1953,12 @@ function cmdSyncLoop(args) {
 			changed_files: changed.length,
 			non_br_origins: pathOrigins.ids,
 			unresolved_paths: pathOrigins.unresolved,
+			skipped_derived: pathOrigins.skipped_derived,
 		};
 		process.stdout.write(
 			`[git] ref=${args.gitRef} (ref↔worktree) changed_files=${changed.length} → origins(non-BR)=${pathOrigins.ids.length}` +
 				(pathOrigins.unresolved.length ? ` ⚠️ unresolved_paths=${pathOrigins.unresolved.length}` : '') +
+				(pathOrigins.skipped_derived.length ? ` (도구 파생물 ${pathOrigins.skipped_derived.length}건 skip)` : '') +
 				' (untracked 파일은 git diff 제외 — 신규 미-add 산출물 미감지 / minor-2)\n',
 		);
 		if (origins.length === 0 && changedPaths.length === 0) {
@@ -2355,7 +2377,7 @@ function cmdSyncConverge(args) {
 		}
 		brOrigins = res.origins;
 	}
-	const pathOrigins = resolveOriginNodeIds(graph, nonBr);
+	const pathOrigins = resolveOriginNodeIds(graph, nonBr, { skipDerivedNoise: true });
 	const origins = [...new Set([...brOrigins, ...pathOrigins.ids])].sort();
 
 	// 재검출 영향 노드 (origins ∪ forward closure). origin 0 이어도 변경 자체가 없으면 detectedIds=[].

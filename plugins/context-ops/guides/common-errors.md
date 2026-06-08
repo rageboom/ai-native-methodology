@@ -194,13 +194,27 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 **해결**: 정상 동작 (low finding / chain 1 gate block 없음 / 사용자 결단 carry).
 
-## 7. 참조
+## 7. Living-sync (`--git` 변경 자동 감지)
+
+### Q18. `sync-loop --git` / `sync-converge` 가 `unresolved_paths` 에 `.aimd/state.json` 등 도구 파일을 띄움
+
+**원인**: `--git` 재검출은 baseline↔워크트리의 **변경 tracked 파일 전체**를 스캔한다. `state.json`(도구 실행 상태)이 git 에 커밋돼 있으면 노드 미매핑 → `unresolved` → `needs_resynth` false 신호.
+
+**해결**: 런타임 상태는 커밋 대상이 아니다. `chain-driver init` 이 `<project>/.aimd/.gitignore` 를 자동 생성하므로(`state.json`·`state.json.tmp`·`intervention-log.jsonl` 제외) **신규 프로젝트는 자동 처리**. 기존 프로젝트면 `git rm --cached .aimd/state.json` 후 그대로 두면 된다(재-init 도 .gitignore 를 보강). 상세 = `methodology-spec/living-sync-operating-model.md` §8.
+
+### Q19. resync 후 `sync-converge` 가 `artifact-graph.json` 때문에 fixpoint 안 됨?
+
+**원인 아님 (정상)**: `artifact-graph.json`·`matrix.json`·`findings-*.json` 은 커밋 대상(AX 컨텍스트/증거)이지만, `--git` 재검출이 이 **도구 파생물**(`.aimd/` 한정·`do_not_edit_manually`)을 자동 skip 한다(C-lite). 따라서 resync 로 그래프가 바뀌어도 false-`unresolved` 가 안 생기고 fixpoint 에 도달한다. stdout 에 `(도구 파생물 N건 skip)` 으로 정직 표기.
+
+**진짜 막히면**: 노드에 매핑 안 되면서 도구 파생물도 **아닌** 새 산출물이 변경셋에 있다는 신호(=BLOCKER-1 보존). 그 파일을 그래프 노드로 편입(resync)하거나 origin 으로 명시.
+
+## 8. 참조
 
 - [`getting-started.md`](./getting-started.md) — 10분 walkthrough
 - [`chain-harness-guide.md`](./chain-harness-guide.md) — chain harness mental model + state.json
 - [`first-prompt-cookbook.md`](./first-prompt-cookbook.md) — 자연어 → skill 매핑
 
-## 8. Finding 등재 (사용자 피드백 자산화)
+## 9. Finding 등재 (사용자 피드백 자산화)
 
 본 가이드에 없는 마찰점 발견 시 — 사용자 자체 프로젝트의 `findings/` 디렉토리에 등재 + 본 plugin 의 사내 GHE Issue 또는 사내 wiki 에 보고. 후속 patch / round cleanup 시 본 가이드 보강.
 
