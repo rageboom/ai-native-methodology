@@ -109,8 +109,13 @@
   - 두 fix 결합 = npm 과 동일 1444/1446/0. release-readiness #11 에 node-version 조건부로 박음.
 - **node 버전 주의**: `--test-isolation` 은 node 22+ 만 존재 → .npmrc 전역 node-options 금지(node 18/20 CI 깨짐). 게이트 내 조건부가 정답.
 
-## 10. 잔여 (Phase 3 / 별도 착수)
+## 10. Phase 3 완료 (2026-06-08)
 
-- CI `drift-check.yml` pnpm 화(+`plugins/plugins/…` 경로 버그 수정) / `pre-push` pnpm / 문서 3종 pnpm 명령 + INSTALL-npm.md 플러그인명 stale 정정.
-- corepack 핸드오프(`packageManager` 동작) 사내 환경 실측.
-- (선택) 병렬 안전화 — skill-citation/inflation-lint temp-file 격리해 향후 병렬 복원 여지.
+- ✅ CI `drift-check.yml` pnpm 화 — 3 job 모두 `pnpm/action-setup@v4`(setup-node 먼저) + `cache:pnpm`/`pnpm-lock.yaml` + `pnpm install --frozen-lockfile` + `pnpm --filter <pkg> test`/`pnpm run …`/`pnpm test`. `plugins/plugins/…` 중복경로 버그 → `--filter @mis-plugins/<tool>` 로 수정.
+- ✅ `pre-push` hook pnpm 화 (test:release + node_modules 안내).
+- ✅ 메시지 문자열 pnpm 화 — build-catalog/publish-catalog/publish/setup-git-hooks.
+- ✅ 문서 — nexus-setup.md(pnpm 명령 + node-linker 주의) / INSTALL·INSTALL-npm pnpm 무관(유저 install 채널 불변) + **stale 플러그인명 전수 정정** `ai-native-methodology@mis-plugins`→`context-ops@mis-plugins` (README·guides·extensions 9파일 / rename 누락분).
+- ✅ release:check 40/40 유지 (skill_citation·readme_version 포함).
+- 잔여(별도): corepack 핸드오프 사내 환경 실측 / (선택) skill-citation↔inflation-lint temp-file 격리로 병렬 복원.
+
+> ⚠ 용어 보존: "npm 패키지 / npm-hosted / source:npm / npm 토큰 / npm-public" = Nexus npm-레지스트리 포맷 정확 용어 → pnpm 전환에도 불변(미수정).

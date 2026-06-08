@@ -9,7 +9,7 @@
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 ```
 
 ### 오프라인 / 압축본
@@ -17,7 +17,7 @@
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 ```
 
 install 직후 SessionStart hook 메시지 표시 — `[ai-native-methodology] Plugin loaded. chain harness ready / Layer 2 LLM paradigm ✅`.

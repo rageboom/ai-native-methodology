@@ -29,7 +29,7 @@
 /plugin uninstall ai-native-methodology
 /plugin marketplace remove mis-plugins
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 /reload-plugins
 ```
 

@@ -17,7 +17,7 @@ extensions/
 
 ```bash
 # extensions는 플러그인 본체에 포함되어 별도 설치 불필요.
-# /plugin install ai-native-methodology@mis-plugins 설치 시 함께 포함됨.
+# /plugin install context-ops@mis-plugins 설치 시 함께 포함됨.
 ```
 
 ## 공통 skills와의 차이

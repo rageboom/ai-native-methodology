@@ -86,7 +86,7 @@ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + 
 ```bash
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology/ai-native-methodology
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 /reload-plugins
 /plugin                  # 대화형 manager — Installed 탭에서 최신 버전 확인
 ```
@@ -103,7 +103,7 @@ gh auth login --hostname github.smilegate.net
 
 # Claude Code 세션에서:
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 /reload-plugins
 ```
 
@@ -111,7 +111,7 @@ gh auth login --hostname github.smilegate.net
 
 ```bash
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git#v<version>
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 ```
 
 plugin update — `/plugin` 대화형 manager → Installed 탭 → "Update" → 최신 tag 자동 fetch.
@@ -130,7 +130,7 @@ plugin update — `/plugin` 대화형 manager → Installed 탭 → "Update" →
 
 # Claude Code 세션에서:
 /plugin marketplace add /absolute/path/to/ai-native-methodology-v<version>
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 /reload-plugins
 ```
 

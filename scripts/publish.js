@@ -112,7 +112,7 @@ function publishOne(name) {
 		execSync(cmd, { stdio: 'inherit', cwd: WORKSPACE });
 	} catch {
 		fail(
-			`'${name}' npm publish 실패 — .npmrc 인증(_authToken) / 레지스트리 권한 / 네트워크 확인.`,
+			`'${name}' pnpm publish 실패 — .npmrc 인증(_authToken) / 레지스트리 권한 / 네트워크 확인.`,
 		);
 	}
 
@@ -130,7 +130,7 @@ function main() {
 			'\n[publish] ℹ 카탈로그(marketplace.json)는 version RANGE(^x) 라 patch/minor 에는 불변 — 사용자 autoUpdate 가 자동 재해석.',
 		);
 		console.log(
-			'[publish] ℹ MAJOR range/description/새 플러그인 변경 시에만: npm run catalog:build && npm run publish:catalog -- --user <nexus-id>',
+			'[publish] ℹ MAJOR range/description/새 플러그인 변경 시에만: pnpm run catalog:build && pnpm run publish:catalog -- --user <nexus-id>',
 		);
 	}
 	console.log(

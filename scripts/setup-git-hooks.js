@@ -43,5 +43,5 @@ try {
 }
 
 console.log(`[setup-git-hooks] OK: core.hooksPath = ${relPath}`);
-console.log('[setup-git-hooks] 이제 git push 시 release gate(npm run test:release)가 자동 실행됩니다.');
+console.log('[setup-git-hooks] 이제 git push 시 release gate(pnpm run test:release)가 자동 실행됩니다.');
 console.log('[setup-git-hooks] 우회: git push --no-verify   /   해제: git config --unset core.hooksPath');

@@ -67,7 +67,7 @@ Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을
 
 ```text
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install ai-native-methodology@mis-plugins
+/plugin install context-ops@mis-plugins
 /reload-plugins
 ```
 
@@ -80,7 +80,7 @@ Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을
 ```text
 /plugin
 ```
-대화형 매니저의 **Installed** 탭에서 `ai-native-methodology`가 보이면 완료입니다.
+대화형 매니저의 **Installed** 탭에서 `context-ops`가 보이면 완료입니다.
 
 ---
 

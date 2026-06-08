@@ -25,13 +25,14 @@
 # 1) .npmrc 에 PUBLISH 프로필(hosted 토큰) 설정 — .npmrc.template [B] 참고
 #    //repo.smiledev.net/repository/npm-hosted/:_authToken=<당신의 hosted-write User Token>
 # 2) 플러그인 workspace 에서
-cd ai-native-methodology
-npm install                      # bundledDependencies(ajv 등) node_modules 채움 (필수)
-npm run publish:plugin:dry       # version-check + tarball 내용 + bundled deps 8 확인 (업로드 없음)
-npm run publish:plugin           # publishConfig.registry(npm-hosted)로 publish
+# (레포 루트에서)
+pnpm install                     # bundledDependencies(ajv 등) node_modules 채움 (.npmrc node-linker=hoisted 필수)
+pnpm run publish:plugin:dry      # version-check + tarball 내용 + bundled deps 8 확인 (업로드 없음)
+pnpm run publish:plugin          # publishConfig.registry(npm-hosted)로 publish
 ```
 
 > ⚠️ npm 레지스트리는 보통 **같은 버전 재publish 불가**. release 마다 plugin.json+package.json+CHANGELOG 3-way 버전 bump 후 publish (version-check 강제).
+> ⚠️ 패키지 매니저 = **pnpm 10.x** (`packageManager` 필드 / corepack). bundledDeps 동봉은 `.npmrc node-linker=hoisted` 의존.
 
 ## 4b. 카탈로그(marketplace.json) URL 호스팅 — 통일 설치 경로
 
@@ -40,9 +41,9 @@ npm run publish:plugin           # publishConfig.registry(npm-hosted)로 publish
 - **canonical URL**: `https://repo.smiledev.net/repository/serving-static/mis-plugins/marketplace.json` (익명 read)
 - 업로드 (raw write 권한 계정 / 비밀번호는 prompt):
   ```bash
-  cd ai-native-methodology
-  npm run publish:catalog:dry            # 검증 + 미리보기
-  npm run publish:catalog -- --user <nexus-id>   # 업로드 (curl 이 비번 prompt)
+  # (레포 루트에서)
+  pnpm run publish:catalog:dry           # 검증 + 미리보기
+  pnpm run publish:catalog -- --user <nexus-id>   # 업로드 (--user 생략 시 ID 도 prompt / curl 이 비번 prompt)
   ```
 - **cadence**: 카탈로그 version 은 RANGE(`^12.0.0`) → 일반 release(patch/minor)에는 **불변, 재업로드 불요**. 사용자 autoUpdate 가 범위를 Nexus 에 재해석해 새 버전 수신. **MAJOR range 이동(^12→^13) / description / 새 플러그인 추가 시에만** `publish:catalog` 재실행.
 - npm 패키지 publish(`publish:plugin`, npm-hosted, npm 토큰)와 **별개 채널·별개 인증**(raw, HTTP Basic).
@@ -51,16 +52,16 @@ npm run publish:plugin           # publishConfig.registry(npm-hosted)로 publish
 
 ```bash
 # group repo 에서 받아지는지 (익명)
-npm view @mis-plugins/context-ops --registry https://repo.smiledev.net/repository/npm-public/
+pnpm view @mis-plugins/context-ops --registry https://repo.smiledev.net/repository/npm-public/
 # 클린 머신(git 계정 無, 토큰 無)에서 설치
 claude plugin marketplace add https://<카탈로그-host>/marketplace.json   # 또는 GHE git
-claude plugin install ai-native-methodology@mis-plugins
+claude plugin install context-ops@mis-plugins
 ```
 
 ## 핵심 주의 (Phase 0 실측)
 
-- `source:npm` 설치는 **deps 를 `npm install` 하지 않음** → 외부 의존(ajv/ajv-formats/fast-xml-parser)은
+- `source:npm` 설치는 **deps 를 install 하지 않음** → 외부 의존(ajv/ajv-formats/fast-xml-parser)은
   `package.json` `bundledDependencies` 로 tarball 에 동봉됨 (top-level 3개 선언 → transitive 5개 자동 포함 = 8 packages).
-  publish 전 `npm install` 로 node_modules 가 채워져 있어야 동봉됨.
+  publish 전 `pnpm install`(node-linker=hoisted)로 plugins/<name>/node_modules 가 flat 으로 채워져 있어야 동봉됨.
 - 자동갱신 감지는 `.claude-plugin/plugin.json.version` 기준 → release 마다 3-way lockstep bump.
 - 카탈로그(marketplace.json)는 모든 엔트리가 `source:npm` 이라 URL 호스팅 시에도 상대경로 파손 없음.

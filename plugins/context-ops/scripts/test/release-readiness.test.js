@@ -626,8 +626,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.equal(r.status, 2);
 	});
 
-	it('A1 본격 spawn — workspace test + 29/29 pass (npm test --workspaces 실시간 실행 / timeout 600s)', () => {
-		// A1 본격 검증 — check11 spawn → npm test --workspaces 실시간 실행 → fail=0 의무 입증.
+	it('A1 본격 spawn — workspace test + 40/40 pass (pnpm -r run test 실시간 실행 / timeout 600s)', () => {
+		// A1 본격 검증 — check11 spawn → pnpm -r --workspace-concurrency=1 run test 실시간 실행 → fail=0 의무 입증.
 		// 본 case = release 본격 시행 cadence 정합 (다른 case 는 SKIP_WS 사용 / 본 case 만 본격 spawn).
 		const r = runScript(['--target', 'v8.1.0', '--json'], {}, 600_000);
 		const out = JSON.parse(r.stdout);

@@ -2,8 +2,9 @@ name: drift-check
 
 # Sprint 4 묶음 N+O CI workflow.
 # 이중 모드: PR (diff-aware) / nightly (full). action 핀 (research 반영).
-#   - actions/setup-java@v5  (Temurin 21)
-#   - actions/setup-node@v6  (npm cache)
+#   - actions/setup-java@v5     (Temurin 21)
+#   - pnpm/action-setup@v4      (packageManager:pnpm@10.x 자동 감지 / setup-node 보다 먼저)
+#   - actions/setup-node@v6     (cache: pnpm / pnpm-lock.yaml)
 # 본 workflow 는 GitHub Actions 미사용 환경에서 local 실행도 가능 (각 step 의 cmd 참고).
 
 on:
@@ -27,19 +28,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: install workspace (monorepo root)
-        run: npm install --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       - name: drift-validator self-test (corpus 4쌍 + dmn-check)
         run: |
-          npm test --workspace=plugins/plugins/context-ops/tools/drift-validator
-          npm test --workspace=plugins/plugins/context-ops/tools/decision-table-validator
+          pnpm --filter @mis-plugins/drift-validator test
+          pnpm --filter @mis-plugins/decision-table-validator test
 
       - name: drift-validator on PoC #02 formal-spec
         run: |
@@ -67,9 +69,12 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: install Semgrep
         run: |
@@ -83,7 +88,7 @@ jobs:
           echo "$HOME/pmd/pmd-bin-7.9.0/bin" >> "$GITHUB_PATH"
 
       - name: install workspace (monorepo root)
-        run: npm install --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       - name: run Semgrep on body (diff-aware on PR / full on schedule)
         working-directory: plugins/context-ops
@@ -146,22 +151,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: install workspace (monorepo root)
-        run: npm install --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       # 전 플러그인 plugin.json ↔ package.json ↔ CHANGELOG 3-way sync
       - name: version 3-way sync (all plugins)
-        run: npm run version:check
+        run: pnpm run version:check
 
       # build-plugin --all (source 무변경) + build-catalog (생성 카탈로그 == 커밋본) drift gate
       - name: build + catalog drift gate
-        run: npm run build:diff-check
+        run: pnpm run build:diff-check
 
       - name: workspace tests
-        run: npm test
+        run: pnpm test

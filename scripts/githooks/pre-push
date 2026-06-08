@@ -1,7 +1,7 @@
 #!/bin/sh
 # pre-push — AI-Native methodology release gate (F-AUDIT-SOFTGATE-001 후속 / 사내 CI(GitHub Actions) 부재 대응).
 #
-# git push 직전 release-readiness self-test (npm run test:release) 실행 → 실패 시 push 중단.
+# git push 직전 release-readiness self-test (pnpm run test:release) 실행 → 실패 시 push 중단.
 #   - 검증 범위: self-test 정합(17→22 류 rot 차단) + A1 case 가 full release-readiness(22/22) + workspace test(879) 전수 실행.
 #   - 사내(GitHub Actions 없음)에서도 작동 — git 만 있으면 됨. 서버 CI 불필요.
 #   - bypass: git push --no-verify   (escape hatch — 책임은 사용자 / intervention)
@@ -13,17 +13,17 @@
 HOOK_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 METH_ROOT=$(CDPATH= cd -- "$HOOK_DIR/../.." && pwd)
 
-echo "[pre-push] release gate: npm run test:release (self-test + full release-readiness + workspace 879) — ~1-2min"
+echo "[pre-push] release gate: pnpm run test:release (self-test + full release-readiness + workspace 879) — ~1-2min"
 echo "[pre-push] 우회가 필요하면: git push --no-verify"
 
 cd "$METH_ROOT" || { echo "[pre-push] methodology root 진입 실패: $METH_ROOT" >&2; exit 1; }
 
 if [ ! -d node_modules ]; then
-  echo "[pre-push] node_modules 부재 — 먼저 'npm ci'(또는 npm install) 후 재시도. (push 차단)" >&2
+  echo "[pre-push] node_modules 부재 — 먼저 'pnpm install --frozen-lockfile' 후 재시도. (push 차단)" >&2
   exit 1
 fi
 
-npm run test:release
+pnpm run test:release
 rc=$?
 if [ "$rc" -ne 0 ]; then
   echo "[pre-push] FAIL: release gate (test:release exit $rc) — push 중단. 수정 후 재시도하거나 'git push --no-verify' 로 우회." >&2

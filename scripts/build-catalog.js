@@ -86,7 +86,7 @@ function main() {
 			: '';
 		if (current !== rendered) {
 			fail(
-				'카탈로그 drift — marketplace.json 이 생성 결과와 다름. `npm run catalog:build` 후 커밋 필요.',
+				'카탈로그 drift — marketplace.json 이 생성 결과와 다름. `pnpm run catalog:build` 후 커밋 필요.',
 			);
 		}
 		console.log(

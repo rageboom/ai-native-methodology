@@ -51,7 +51,7 @@ try {
 		cwd: REPO_ROOT,
 	});
 } catch {
-	fail('카탈로그 drift — `npm run catalog:build` 후 커밋하고 다시 업로드할 것.');
+	fail('카탈로그 drift — `pnpm run catalog:build` 후 커밋하고 다시 업로드할 것.');
 }
 
 if (!existsSync(CATALOG)) fail(`카탈로그 없음: ${CATALOG}`);
