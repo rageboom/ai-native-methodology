@@ -10,6 +10,14 @@
 
 ---
 
+## [0.20.0] — 2026-06-08 MINOR — dep-graph 의존 갭 5종 조사 + G2-1 federation FK 읽기-aid
+
+**dep-graph(artifact-graph.json / 운영 SSOT)가 표현하는 의존 차원 진단 → AX 운영(P0) 관점 누락/보강 컨텍스트 5종 등재 + 전 5갭 "기존 자산 실측 → 정직 reframe" 조사 (DEC-2026-06-08-dep-graph-dependency-axis-gaps).** 5종 모두 원래 진단보다 작게 판명 — 갭1(코드 call-graph)=대부분 이미 해소(context-federator + SKILL 코드흐름 lens + living-sync anchor-lift) / SSOT 승격은 trust 모델·업계 정합(Sourcegraph·CodeQL·Nx / ISSTA2024 정적 call-graph 61% 누락 / 0.85)으로 **명시 거부**(IMPL gate-층 leaf = 의도된 trust 경계) · 갭3=scope-out · 갭4=격상 보류(inter-scope 실발현 0 / `sync_state.dependents[]` 死필드) · 갭5=BR-split STEP3 흡수(BR↔BR 필드·엣지 전무 but 실수요 0 + BC 채움 7/8=0%).
+
+**G2-1 (유일 코드 변경 / additive)**: context-federator `data_refs[].dependent_tables[]` 에 `foreign_keys`(references_table·local_columns·references_columns·relationship_label) reading-aid 부착 — db-schema `foreign_keys` 직읽기(결정론) → "어느 테이블이 어느 테이블 참조하나(table↔table 위상)" 운영 컨텍스트 회수. **optional 필드**(callees 동형 / required 미합류 — Senior BLOCKER-1) / reference-lens·non-gating(release-readiness context_cache_reference_lens_trust 무손상). 검증: federator 34/34(+2 FK 노출·graceful) + 생성 cache schema-valid + poc-16 실 dogfood(tb_car_cost_slip→tb_car_cost · tb_car_cost→tb_car_user_term FK 2건) + release-readiness 40/40.
+
+**G2-2 reframe**: 원 carry(DEC-2026-06-02 #1 "modern ORM data_refs")는 ① substrate 부재(modern sql-inventory PoC[08/09/10]=analysis-only / chain spec 없음 → 그래프 합성 불가) + ② **category mismatch**(`data_refs`=`loadLegacyDataSource`=설계상 legacy 데이터 반쪽 / modern 데이터 반쪽=codegraph[poc-05 실증]) → 신규작업 아님. **귀결: G2-1 FK reading-aid = legacy-스택 한정 scope**(poc-16=대표·우연 아님). 잔존 carry: G2-3(per-table SSOT 노드/FK 엣지 승격 / 폭증·등급규칙 선결) · 갭1 G1-A1·A2(living-sync 흡수).
+
 ## [0.19.1] — 2026-06-08 PATCH — living-sync ② honest surface: SessionStart 미-baseline scope 표면화 (false-health 수정)
 
 ② lifecycle auto-register 는 **DEFER 유지**(SessionStart 자동등록=이미 drift 난 상태를 clean baseline 으로 흡수=false-health 유해 / analysis-completion hook=신규 설계+실 수요 0). 대신 깊은 숙지에서 발견한 **실재 false-health 버그**만 정직하게 수정 — SessionStart hook(hooks-bridge)이 first-touch 없이 markDrift 만 돌아, 빈/absent `sync_sources` scope 를 조용히 "chain harness ready"(건강)로 보고하던 것(detectDrift 가 빈 sources → drift_detected:false). carry 2 BLOCKER-1 과 같은 P0 "거짓 건강 신호" 가족. 4원칙(plan `plan-living-sync-c2-unbaselined-surface.md` + Senior 적대 step-0[REVISE@0.80] + 사용자 option 1 승인).
