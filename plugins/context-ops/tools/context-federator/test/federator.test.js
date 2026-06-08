@@ -767,6 +767,14 @@ const DS_JSON = {
 					{ name: 'car_idx', type: 'int' },
 					{ name: 'car_name', type: 'varchar' },
 				],
+				foreign_keys: [
+					{
+						columns: ['owner_id'],
+						references_table: 'tb_user',
+						references_columns: ['user_idx'],
+						relationship_label: 'owns',
+					},
+				],
 			},
 		],
 	},
@@ -847,6 +855,78 @@ test('federate — data-anchored: code_pointers 0 인 UC 노드도 sql-inventory
 		p.data_refs[0].dependent_tables[0].columns.map((c) => c.name),
 		['car_idx', 'car_name'],
 		'db-schema 컬럼 보강',
+	);
+});
+
+test('federate — G2-1: data_refs.dependent_tables[].foreign_keys = db-schema FK 위상 노출 (reference-lens)', () => {
+	const graph = { nodes: [node('UC-CAR-001', 'chain', 'UC', 'active', [])] };
+	const cache = federate(graph, {
+		repoRoot: '/repo',
+		navigate: fakeNavigate({ MUST: [], SHOULD: [], FYI: [] }),
+		codegraph: { available: false, version: null, reason: 'legacy iBATIS2' },
+		dataSource: loadDS(),
+		now: () => FIXED_NOW,
+	});
+	const tbl = cache.packs[0].data_refs[0].dependent_tables[0];
+	assert.equal(tbl.name, 'tb_car');
+	assert.equal(tbl.foreign_keys.length, 1, 'tb_car FK 1건 노출');
+	const fk = tbl.foreign_keys[0];
+	assert.equal(fk.references_table, 'tb_user', '위상 1차 = references_table');
+	assert.deepEqual(fk.local_columns, ['owner_id'], 'FK 출발 컬럼 = local_columns (rename)');
+	assert.deepEqual(fk.references_columns, ['user_idx']);
+	assert.equal(fk.relationship_label, 'owns', '2차 ERD 동사');
+});
+
+test('federate — G2-1: foreign_keys graceful — FK 없는 테이블·db-schema 부재 테이블 = [] (no-sim 날조 ❌)', () => {
+	const G = {
+		nodes: [
+			{ id: 'analysis-sql-inventory', artifact_kind: 'analysis', source_path: 'i/s.json' },
+			{ id: 'analysis-db-schema', artifact_kind: 'analysis', source_path: 'i/d.json' },
+		],
+	};
+	const J = {
+		[resolve(DS_REPO, 'i/s.json')]: {
+			inventory: [
+				{
+					sql_id: 'q',
+					mapper_xml: 'm.xml',
+					statement_type: 'SELECT',
+					dependent_tables: ['tb_plain', 'tb_absent'],
+					uc_link: 'UC-X-001',
+					business_meaning: '',
+				},
+			],
+		},
+		// tb_plain = FK 필드 없음 / tb_absent = db-schema 에 부재
+		[resolve(DS_REPO, 'i/d.json')]: {
+			tables: [{ name: 'tb_plain', columns: [{ name: 'id', type: 'int' }] }],
+		},
+	};
+	const ds = loadLegacyDataSource(G, {
+		repoRoot: DS_REPO,
+		readJson: (p) => J[p] ?? null,
+		existsFn: (p) => p in J,
+	});
+	const cache = federate(
+		{ nodes: [node('UC-X-001', 'chain', 'UC', 'active', [])] },
+		{
+			repoRoot: '/repo',
+			navigate: fakeNavigate({ MUST: [], SHOULD: [], FYI: [] }),
+			codegraph: { available: false, version: null, reason: 'x' },
+			dataSource: ds,
+			now: () => FIXED_NOW,
+		},
+	);
+	const dts = cache.packs[0].data_refs[0].dependent_tables;
+	assert.deepEqual(
+		dts.find((d) => d.name === 'tb_plain').foreign_keys,
+		[],
+		'FK 없는 테이블 = []',
+	);
+	assert.deepEqual(
+		dts.find((d) => d.name === 'tb_absent').foreign_keys,
+		[],
+		'db-schema 부재 테이블 = [] (graceful)',
 	);
 });
 

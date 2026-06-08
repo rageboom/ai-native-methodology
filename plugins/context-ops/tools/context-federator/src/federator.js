@@ -198,7 +198,7 @@ function extractBrIds(text) {
 	return out;
 }
 
-// 노드 → data_refs (sql-inventory entries / uc_link + mapper_xml 조인 / dependent_tables db-schema 컬럼 보강).
+// 노드 → data_refs (sql-inventory entries / uc_link + mapper_xml 조인 / dependent_tables db-schema 컬럼 + FK(G2-1) 보강).
 function buildDataRefs(node, dataSource) {
 	if (!dataSource || !dataSource.available) return [];
 	const refs = [];
@@ -212,13 +212,26 @@ function buildDataRefs(node, dataSource) {
 			statement_type: e?.statement_type ?? null,
 			mapper_xml: e?.mapper_xml ?? null,
 			business_meaning: e?.business_meaning ?? null,
-			dependent_tables: (e?.dependent_tables ?? []).map((t) => ({
-				name: t,
-				columns: (dataSource.tableByName.get(t)?.columns ?? []).map((c) => ({
-					name: c?.name ?? null,
-					type: c?.type ?? null,
-				})),
-			})),
+			dependent_tables: (e?.dependent_tables ?? []).map((t) => {
+				const tbl = dataSource.tableByName.get(t);
+				return {
+					name: t,
+					columns: (tbl?.columns ?? []).map((c) => ({
+						name: c?.name ?? null,
+						type: c?.type ?? null,
+					})),
+					// G2-1 — table↔table 위상(FK) reading-aid. db-schema foreign_keys 직읽기(결정론).
+					//   references_table=위상 1차 / relationship_label=2차 ERD 동사(OPTIONAL=null 잦음).
+					//   local_columns = FK 출발 컬럼(dependent_table.columns 객체배열과 혼동 회피 rename).
+					//   reference-lens / non-gating (callees 동형 optional). FK·table 부재 = [] graceful.
+					foreign_keys: (tbl?.foreign_keys ?? []).map((fk) => ({
+						references_table: fk?.references_table ?? null,
+						local_columns: fk?.columns ?? [],
+						references_columns: fk?.references_columns ?? [],
+						relationship_label: fk?.relationship_label ?? null,
+					})),
+				};
+			}),
 			business_rules: extractBrIds(e?.business_meaning)
 				.map((id) => (dataSource.brById ?? new Map()).get(id))
 				.filter(Boolean)

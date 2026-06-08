@@ -6,7 +6,9 @@
 
 ## 미해결 결정 (open-question / 검토중 / 보류)
 
-(없음 — v2.0 정체성 결단 carry resolved 2026-05-06 by DEC-2026-05-06-v2.0-i-strict-채택. carry K-1 ~ K-9 = 명시 후속 / master plan §K 정합 / 본 INDEX 의 미해결 항목 ❌)
+- **[DEC-2026-06-08-dep-graph-dependency-axis-gaps](DEC-2026-06-08-dep-graph-dependency-axis-gaps.md)** — **dep-graph 의존 차원 갭 5종 진단 + 전 5갭 조사완료** (코드·schema·release 변경 0 / 진단·조사 원장). dep-graph(artifact-graph.json / 운영 SSOT)의 본질 = **"요구사항→구현 추적성"** 단일 축(노드 4 kind + 엣지 8종 실측). 각 갭에 "기존 자산 실측 → 정직 reframe"(갭1 패턴 / memory `feedback_diagnose_before_design_check_existing`) 적용 → 5종 모두 원래 진단보다 **작게** 판명: ① **코드 call-graph** = 대부분 이미 해소(context-federator impact.affected + SKILL 코드흐름 lens + living-sync anchor-lift) / SSOT 승격은 trust 모델·업계(0.85: Sourcegraph·CodeQL·Nx / ISSTA2024 정적 61% 누락) 위배로 **명시 거부**(IMPL gate-층 leaf = 의도된 trust 경계) / 옵션2 코드0 / 잔존 G1-A1·A2=living-sync 흡수. ② **데이터 FK·BHV↔table** = BHV↔table 읽기-aid 는 federation data_refs 로 해소 / 잔존 = FK 위상 federation 미소비(`foreign_keys` grep 0)·SSOT per-table 0·modern 그래프 합성 carry → **즉시후보 G2-1(federation FK 읽기-aid ~20줄)만 / 사용자 결단 대기**. ③ **외부 dep·런타임** = **scope-out 권고 유지**(별 도구 위임). ④ **cross-scope** = inter-scope 의존 **실발현 0**(전 PoC 단일-scope) + scope_id=분리·필터 설계 + living-sync 격리 강화와 충돌 → **격상 보류**(부수발견: `sync_state.dependents[]` = 死 필드 / 격상 시 재활용). ⑤ **BR↔BR** = 필드·엣지 전무(validator 도 per-rule / pairwise 부재 실측) = 진짜 잔존이나 실수요0+BC채움 7/8=0% → **BR-split STEP3 흡수**. 즉시 신규작업 = G2-1 1건뿐. Relates DEC-2026-06-07-living-sync-operating-model + DEC-2026-06-02-context-federation + DEC-2026-06-03-dep-graph-trace-view + DEC-2026-06-07-br-split-step2.
+
+(이하 — v2.0 정체성 결단 carry resolved 2026-05-06 by DEC-2026-05-06-v2.0-i-strict-채택. carry K-1 ~ K-9 = 명시 후속 / master plan §K 정합 / 본 INDEX 의 미해결 항목 ❌)
 
 ## 진행중 결정
 

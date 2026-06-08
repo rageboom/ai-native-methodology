@@ -97,6 +97,21 @@
                             "type": { "type": ["string", "null"] }
                           }
                         }
+                      },
+                      "foreign_keys": {
+                        "type": "array",
+                        "description": "G2-1 — 이 테이블의 FK 관계(table↔table 위상). db-schema foreign_keys 직읽기 / references_table(1차)·relationship_label(2차 ERD 동사). reference-lens / non-gating / reading-aid (callees 동형 optional — required 미합류).",
+                        "items": {
+                          "type": "object",
+                          "additionalProperties": false,
+                          "required": ["references_table", "local_columns", "references_columns", "relationship_label"],
+                          "properties": {
+                            "references_table": { "type": ["string", "null"] },
+                            "local_columns": { "type": "array", "items": { "type": "string" } },
+                            "references_columns": { "type": "array", "items": { "type": "string" } },
+                            "relationship_label": { "type": ["string", "null"] }
+                          }
+                        }
                       }
                     }
                   }

@@ -99,6 +99,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/context-federator/src/cli.js \
 ```
 
 - **사전**: codegraph 가 소스를 인덱싱(`codegraph index <src>`)했어야 코드 반쪽이 채워짐. 부재 시 dep 반쪽만 (`codegraph.available=false` 정직 표기 / no-simulation).
+- **데이터 반쪽**(legacy / `--sql-inventory`·`--db-schema`): `data_refs[].dependent_tables[]` 에 컬럼 + **FK 위상**(`foreign_keys` = references_table·relationship_label / "이 테이블이 어느 테이블을 참조하나" table↔table) 동반. db-schema 직읽기 / reference-lens. FK·table 부재 = `[]`.
 - **`--delta`**: 안 바뀐 노드는 재계산 0 (graph→dep / codegraph index→code 2축 무효화) = "다시 작업 안 하기".
 - **trust**: codegraph = 휴리스틱 → context-cache = **reference-lens / gate 주입 ❌**. 영향 등급(dep)은 결정론 navigate verbatim, 코드 구조는 codegraph verbatim. LLM 이 재유추하면 ❌.
 - 한글 산문만 있고 식별자 0 → 매칭 0 (`--origin` 지정 / 임베딩 의미검색 미지원).
