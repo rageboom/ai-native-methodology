@@ -35,6 +35,9 @@ function readJson(p) {
 function majorRange(version) {
 	const m = /^(\d+)\./.exec(version);
 	if (!m) fail(`잘못된 version: ${version}`);
+	// ⚠ 0.x 는 caret 의미가 patch-only (`^0.1.0` = `>=0.1.0 <0.2.0`) 라 minor bump(0.2~0.x)을 못 받음 → ETARGET.
+	//   0.x 전체(<1.0.0)로 범위를 넓혀 minor 자동 수신 (재배포는 major=1.0 진입 시에만 — 설계 의도 동일).
+	if (m[1] === '0') return '>=0.1.0 <1.0.0';
 	return `^${m[1]}.0.0`;
 }
 
