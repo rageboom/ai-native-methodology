@@ -30,7 +30,7 @@ install 직후 SessionStart hook 메시지 표시 — `[ai-native-methodology] P
 
 | 도구        | 의무                                   | 검증             |
 | ----------- | -------------------------------------- | ---------------- |
-| `node` ≥ 18 | chain-driver / 모든 17 cli tool 동작   | `node --version` |
+| `node` ≥ 22 | chain-driver / 모든 17 cli tool 동작   | `node --version` |
 | `npm`       | workspace test (release-readiness #11) | `npm --version`  |
 
 ### Stack-specific (해당 스택일 때 의무)

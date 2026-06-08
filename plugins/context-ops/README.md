@@ -75,7 +75,7 @@ Platform-Agnostic 입증 — Java/Spring + Java/Hexagonal + TypeScript/NestJS + 
 - 분석 대상 프로젝트 git clone (analysis stage 입력 자산)
 - (선택) ERD 파일, 운영 DB 메타데이터, 기획 문서
 - (Windows 한국어 환경 / Semgrep 사용 시) `PYTHONUTF8=1` 환경변수
-- Node ≥ 18 (chain-driver / workspace tool 실행)
+- Node ≥ 22 (chain-driver / workspace tool 실행)
 
 ### 사용법 — Plugin install
 
