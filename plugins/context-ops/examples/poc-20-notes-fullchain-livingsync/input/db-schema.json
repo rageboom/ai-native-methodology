@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "source_commit_sha": "0000000000000000000000000000000000000000",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.95,
+    "raw_confidence": 0.95,
+    "warnings": []
+  },
+  "database_type": "sqlite",
+  "schema_name": "main",
+  "tables": [
+    {
+      "name": "users",
+      "columns": [
+        { "name": "id", "type": "INTEGER", "nullable": false, "is_primary_key": true, "description": "사용자 PK", "sources": ["operational_db"] },
+        { "name": "username", "type": "TEXT", "nullable": false, "description": "고유 사용자명", "sources": ["operational_db"] },
+        { "name": "created_at", "type": "TEXT", "nullable": false, "description": "생성 시각", "sources": ["operational_db"] }
+      ]
+    },
+    {
+      "name": "categories",
+      "columns": [
+        { "name": "id", "type": "INTEGER", "nullable": false, "is_primary_key": true, "description": "카테고리 PK", "sources": ["operational_db"] },
+        { "name": "name", "type": "TEXT", "nullable": false, "description": "카테고리명 (고유)", "sources": ["operational_db"] }
+      ]
+    },
+    {
+      "name": "notes",
+      "columns": [
+        { "name": "id", "type": "INTEGER", "nullable": false, "is_primary_key": true, "description": "메모 PK", "sources": ["operational_db"] },
+        { "name": "user_id", "type": "INTEGER", "nullable": false, "description": "작성자 FK", "sources": ["operational_db"] },
+        { "name": "category_id", "type": "INTEGER", "nullable": false, "description": "카테고리 FK (요구사항2)", "sources": ["operational_db"] },
+        { "name": "body", "type": "TEXT", "nullable": false, "description": "메모 본문", "sources": ["operational_db"] },
+        { "name": "created_at", "type": "TEXT", "nullable": false, "description": "생성 시각", "sources": ["operational_db"] }
+      ],
+      "foreign_keys": [
+        {
+          "name": "fk_notes_user",
+          "columns": ["user_id"],
+          "references_table": "users",
+          "references_columns": ["id"],
+          "relationship_label": "author"
+        },
+        {
+          "name": "fk_notes_category",
+          "columns": ["category_id"],
+          "references_table": "categories",
+          "references_columns": ["id"],
+          "relationship_label": "categorized_as"
+        }
+      ]
+    }
+  ]
+}

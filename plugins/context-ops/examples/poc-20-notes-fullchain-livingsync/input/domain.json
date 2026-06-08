@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "source_commit_sha": "0000000000000000000000000000000000000000",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.92,
+    "raw_confidence": 0.92,
+    "warnings": []
+  },
+  "bounded_contexts": [
+    {
+      "id": "BC-NOTES",
+      "name": "메모",
+      "description": "사용자가 메모를 작성·조회하는 단일 컨텍스트",
+      "related_modules": ["MOD-NOTES-DB", "MOD-NOTES-USERS", "MOD-NOTES-NOTES"],
+      "aggregates": [
+        {
+          "root_entity_id": "E-NOTES-User",
+          "members": ["E-NOTES-Note"],
+          "invariants": [
+            {
+              "description": "Note 는 존재하는 User 에만 속할 수 있다 (작성자 FK)",
+              "enforced_by": "db_constraint"
+            }
+          ]
+        }
+      ],
+      "entities": [
+        { "id": "E-NOTES-User", "name": "User", "description": "사용자 (username 고유)" },
+        { "id": "E-NOTES-Note", "name": "Note", "description": "메모 (작성자 user_id FK)" }
+      ]
+    }
+  ]
+}

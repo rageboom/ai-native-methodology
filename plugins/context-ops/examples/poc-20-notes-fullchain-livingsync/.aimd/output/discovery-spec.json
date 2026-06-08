@@ -1,0 +1,60 @@
+{
+  "meta": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code", "sql_inventory"],
+    "confidence": 0.93,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "type": "legacy-extraction",
+    "source_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "input/db-schema.json",
+      "input/sql-inventory.json",
+      "input/inventory.json",
+      "src/notes.js",
+      "src/users.js",
+      "src/schema.sql"
+    ]
+  },
+  "business_intent": {
+    "domain_purpose": "사용자가 메모를 작성·조회하는 최소 메모 서비스 (Node + raw SQL). 단일 BC(BC-NOTES) / 작성자 FK 무결성.",
+    "stakeholders": ["user (메모 작성자)"],
+    "success_criteria": ["존재하는 사용자가 비어있지 않은 메모를 작성할 수 있다", "잘못된 입력(빈 본문/미존재 사용자)은 거부된다"]
+  },
+  "use_cases": [
+    {
+      "id": "UC-NOTES-001",
+      "name": "메모 작성",
+      "description": "사용자가 본문을 입력해 메모를 작성한다. 존재하는 사용자만, 빈 본문은 거부.",
+      "actors": ["user"],
+      "preconditions": ["작성자 user 가 users 에 존재한다"],
+      "postconditions": ["notes 에 1행 추가 (user_id FK = 작성자)"],
+      "acceptance_criteria_refs": ["AC-NOTES-001", "AC-NOTES-002"],
+      "source_grounded_evidence": ["src/notes.js:createNote", "input/sql-inventory.json:notes.createNote"]
+    }
+  ],
+  "business_rules_intent": [
+    {
+      "br_id": "BR-NOTES-CREATE-001",
+      "reasoning": "createNote 가 body 공백 검사 후 throw — 빈 본문 금지가 의도된 검증.",
+      "source_grounded_evidence": "src/notes.js:createNote (body required)",
+      "intent_certainty": "observed"
+    },
+    {
+      "br_id": "BR-NOTES-CREATE-002",
+      "reasoning": "createNote 가 findUserById 로 존재 확인 후 throw — 미존재 사용자 작성 금지(작성자 FK 무결성).",
+      "source_grounded_evidence": "src/notes.js:createNote (user not found) / db-schema fk_notes_user",
+      "intent_certainty": "observed"
+    },
+    {
+      "br_id": "BR-NOTES-CREATE-003",
+      "reasoning": "요구사항2 — 메모는 존재하는 카테고리를 지정해야 함 (category_id FK 무결성).",
+      "source_grounded_evidence": "input/db-schema.json:fk_notes_category / BR-NOTES-CREATE-003",
+      "intent_certainty": "unverified-intent"
+    }
+  ],
+  "out_of_scope": ["메모 수정/삭제", "인증/인가", "페이지네이션"]
+}

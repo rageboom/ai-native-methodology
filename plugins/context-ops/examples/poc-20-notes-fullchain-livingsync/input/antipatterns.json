@@ -1,0 +1,12 @@
+{
+  "meta": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "source_commit_sha": "0000000000000000000000000000000000000000",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.9,
+    "raw_confidence": 0.9,
+    "warnings": ["tiny 출발점 앱 — 안티패턴 미검출 (clean)"]
+  },
+  "antipatterns": []
+}

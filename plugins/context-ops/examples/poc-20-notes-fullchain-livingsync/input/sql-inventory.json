@@ -1,0 +1,73 @@
+{
+  "meta_confidence": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "source_commit_sha": "0000000000000000000000000000000000000000",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code", "sql_inventory"],
+    "confidence": 0.95,
+    "raw_confidence": 0.95,
+    "warnings": []
+  },
+  "summary": {
+    "total_sql_operations": 4,
+    "by_type": { "select": 2, "insert": 2, "update": 0, "delete": 0, "procedure": 0 },
+    "dependent_tables_unique": ["users", "notes"]
+  },
+  "extraction_automation": {
+    "auto_extracted_columns": ["sql_id", "statement_type", "dependent_tables"],
+    "manual_columns": ["business_meaning", "uc_link"],
+    "auto_ratio_external_6": "6/6 = 100% (tiny app — 전 statement 추출)"
+  },
+  "inventory": [
+    {
+      "sql_id": "users.createUser",
+      "mapper_xml": "src/users.js",
+      "statement_type": "PREPARED",
+      "business_meaning": "사용자 신규 등록 (username UNIQUE)",
+      "dependent_tables": ["users"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "uc_link": "UC-NOTES-001"
+    },
+    {
+      "sql_id": "users.findUserById",
+      "mapper_xml": "src/users.js",
+      "statement_type": "PREPARED",
+      "business_meaning": "사용자 단건 조회 (메모 작성 전 존재 확인)",
+      "dependent_tables": ["users"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "uc_link": "UC-NOTES-001"
+    },
+    {
+      "sql_id": "notes.createNote",
+      "mapper_xml": "src/notes.js",
+      "statement_type": "PREPARED",
+      "business_meaning": "메모 작성 — 존재 사용자 + 빈 본문 금지 + 존재 카테고리 필수 / BR-NOTES-CREATE-001 + BR-NOTES-CREATE-002 + BR-NOTES-CREATE-003 anchor",
+      "dependent_tables": ["notes"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "uc_link": "UC-NOTES-001"
+    },
+    {
+      "sql_id": "categories.findCategoryById",
+      "mapper_xml": "src/categories.js",
+      "statement_type": "PREPARED",
+      "business_meaning": "카테고리 단건 조회 (메모 작성 전 존재 확인 / BR-NOTES-CREATE-003)",
+      "dependent_tables": ["categories"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "uc_link": "UC-NOTES-001"
+    },
+    {
+      "sql_id": "notes.listNotesByUser",
+      "mapper_xml": "src/notes.js",
+      "statement_type": "PREPARED",
+      "business_meaning": "사용자의 메모 목록 (작성자 FK 조인)",
+      "dependent_tables": ["notes", "users"],
+      "intent_vs_bug_classification": "intent",
+      "confidence": 0.95,
+      "uc_link": "UC-NOTES-001"
+    }
+  ]
+}

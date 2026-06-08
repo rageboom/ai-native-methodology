@@ -1,0 +1,46 @@
+{
+  "business_rules": [
+    {
+      "id": "BR-NOTES-CREATE-001",
+      "name": "메모 본문 필수",
+      "title": "Note body required",
+      "natural_language": "메모 작성 시 본문(body)은 비어 있을 수 없다 (공백만도 불가).",
+      "category": "validation",
+      "type": "constraint",
+      "severity": "high",
+      "bounded_context": "BC-NOTES",
+      "source": "source_code",
+      "given": ["사용자가 메모를 작성하려 한다"],
+      "when": ["본문이 비어 있거나 공백뿐이면"],
+      "then": ["작성을 거부한다 (body required)"]
+    },
+    {
+      "id": "BR-NOTES-CREATE-002",
+      "name": "존재하는 사용자만 작성",
+      "title": "Author must exist",
+      "natural_language": "메모는 존재하는 사용자(users)만 작성할 수 있다 — 작성자 FK 무결성.",
+      "category": "validation",
+      "type": "constraint",
+      "severity": "high",
+      "bounded_context": "BC-NOTES",
+      "source": "source_code",
+      "given": ["메모 작성 요청의 user_id 가 주어진다"],
+      "when": ["해당 user_id 의 사용자가 존재하지 않으면"],
+      "then": ["작성을 거부한다 (user not found)"]
+    },
+    {
+      "id": "BR-NOTES-CREATE-003",
+      "name": "메모 카테고리 필수",
+      "title": "Note category required",
+      "natural_language": "메모 작성 시 존재하는 카테고리(category_id)를 반드시 지정해야 한다 (요구사항2).",
+      "category": "validation",
+      "type": "constraint",
+      "severity": "high",
+      "bounded_context": "BC-NOTES",
+      "source": "requirement",
+      "given": ["메모 작성 요청에 category_id 가 주어진다"],
+      "when": ["category_id 가 없거나 categories 에 존재하지 않으면"],
+      "then": ["작성을 거부한다 (category required / category not found)"]
+    }
+  ]
+}

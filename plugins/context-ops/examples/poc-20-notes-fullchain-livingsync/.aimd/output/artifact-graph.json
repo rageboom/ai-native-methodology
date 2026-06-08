@@ -1,0 +1,466 @@
+{
+  "derived_from": [
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/discovery-spec.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/behavior-spec.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/acceptance-criteria.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/task-plan.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/test-spec.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/domain.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/db-schema.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/antipatterns.json",
+    "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/sql-inventory.json"
+  ],
+  "do_not_edit_manually": true,
+  "schema": {
+    "node": "artifact-graph-node.schema.json",
+    "edge": "artifact-graph-edge.schema.json"
+  },
+  "synthesized_at": "2026-06-08T06:17:29.045Z",
+  "nodes": [
+    {
+      "id": "UC-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/discovery-spec.json",
+      "state": "active",
+      "title": "메모 작성",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "BHV-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/behavior-spec.json",
+      "state": "active",
+      "title": "메모 작성 동작",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "AC-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "정상 메모 작성",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "AC-NOTES-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "잘못된 입력 거부",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "AC-NOTES-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "카테고리 필수 (요구사항2)",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "TASK-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/task-plan.json",
+      "state": "active",
+      "title": "메모 작성 구현 (createNote)",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "TC-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "TC-NOTES-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "TC-NOTES-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.aimd/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-domain",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "domain",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/domain.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-db-schema",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "db-schema",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/db-schema.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-business-rules",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-antipatterns",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "antipatterns",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/antipatterns.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-sql-inventory",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "sql-inventory",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/sql-inventory.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-business-rules-BC-NOTES",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "bounded_context": "BC-NOTES",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+      "state": "active",
+      "title": "business-rules (BC-NOTES)",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-business-rules-BR-NOTES-CREATE-001",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "bounded_context": "BC-NOTES",
+      "business_rule_id": "BR-NOTES-CREATE-001",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+      "state": "active",
+      "title": "business-rules (BR-NOTES-CREATE-001)",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-business-rules-BR-NOTES-CREATE-002",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "bounded_context": "BC-NOTES",
+      "business_rule_id": "BR-NOTES-CREATE-002",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+      "state": "active",
+      "title": "business-rules (BR-NOTES-CREATE-002)",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "id": "analysis-business-rules-BR-NOTES-CREATE-003",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "bounded_context": "BC-NOTES",
+      "business_rule_id": "BR-NOTES-CREATE-003",
+      "source_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json",
+      "state": "active",
+      "title": "business-rules (BR-NOTES-CREATE-003)",
+      "code_pointers_na": true,
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    }
+  ],
+  "edges": [
+    {
+      "source": "UC-NOTES-001",
+      "target": "BHV-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "BHV-NOTES-001",
+      "target": "AC-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "BHV-NOTES-001",
+      "target": "AC-NOTES-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "BHV-NOTES-001",
+      "target": "AC-NOTES-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "AC-NOTES-001",
+      "target": "TASK-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "AC-NOTES-002",
+      "target": "TASK-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "AC-NOTES-003",
+      "target": "TASK-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "TASK-NOTES-001",
+      "target": "TC-NOTES-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "TASK-NOTES-001",
+      "target": "TC-NOTES-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "TASK-NOTES-001",
+      "target": "TC-NOTES-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "analysis-business-rules-BC-NOTES",
+      "edge_type": "groups",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "analysis-business-rules-BR-NOTES-CREATE-001",
+      "edge_type": "groups",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "analysis-business-rules-BR-NOTES-CREATE-002",
+      "edge_type": "groups",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "analysis-business-rules-BR-NOTES-CREATE-003",
+      "edge_type": "groups",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-001",
+      "target": "BHV-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "BHV-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-002",
+      "target": "BHV-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-003",
+      "target": "BHV-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-001",
+      "target": "AC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "AC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-002",
+      "target": "AC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-001",
+      "target": "AC-NOTES-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "AC-NOTES-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-002",
+      "target": "AC-NOTES-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BR-NOTES-CREATE-003",
+      "target": "AC-NOTES-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-business-rules-BC-NOTES",
+      "target": "AC-NOTES-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    },
+    {
+      "source": "analysis-sql-inventory",
+      "target": "UC-NOTES-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+    }
+  ],
+  "stats": {
+    "node_count": 18,
+    "edge_count": 31,
+    "by_kind": {
+      "chain": 9,
+      "plan": 0,
+      "analysis": 9,
+      "aspect": 0
+    },
+    "by_state": {
+      "active": 18,
+      "drift": 0,
+      "propose": 0,
+      "deprecated": 0
+    },
+    "by_edge_type": {
+      "derived_from": 10,
+      "implements": 0,
+      "tests": 0,
+      "depends_on": 0,
+      "conforms_to": 0,
+      "cross_reference": 17,
+      "informs": 0,
+      "groups": 4
+    }
+  },
+  "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+}

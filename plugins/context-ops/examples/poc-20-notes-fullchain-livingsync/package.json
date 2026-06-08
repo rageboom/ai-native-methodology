@@ -1,0 +1,16 @@
+{
+  "name": "chain-fkflow-test",
+  "version": "0.1.0",
+  "description": "AI-Native 방법론 full-chain + living-sync 관찰 테스트용 tiny 앱 (Node + raw SQL / better-sqlite3). 메모 서비스.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.0.0"
+  }
+}

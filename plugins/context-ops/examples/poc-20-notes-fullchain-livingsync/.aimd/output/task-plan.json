@@ -1,0 +1,40 @@
+{
+  "meta": {
+    "generated_at": "2026-06-08T00:00:00Z",
+    "source_commit_sha": "0000000000000000000000000000000000000000",
+    "methodology_version": "v0.20.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.9,
+    "raw_confidence": 0.9,
+    "warnings": []
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".aimd/output/behavior-spec.json",
+    "acceptance_criteria_path": ".aimd/output/acceptance-criteria.json",
+    "discovery_spec_path": ".aimd/output/discovery-spec.json"
+  },
+  "tasks": [
+    {
+      "id": "TASK-NOTES-001",
+      "title": "메모 작성 구현 (createNote)",
+      "description": "존재 사용자 + 빈 본문 검증 후 notes INSERT (작성자 FK). AC-NOTES-001(정상)·002(거부) 충족.",
+      "ac_refs": ["AC-NOTES-001", "AC-NOTES-002", "AC-NOTES-003"],
+      "behavior_ref": "BHV-NOTES-001",
+      "layer": "application",
+      "tc_refs": ["TC-NOTES-001", "TC-NOTES-002", "TC-NOTES-003"],
+      "dependencies": [],
+      "execution_order": 1
+    }
+  ],
+  "adrs": [],
+  "risks": [],
+  "nfr_allocation": [
+    {
+      "id": "NFR-NOTES-001",
+      "characteristic": "security",
+      "severity": "medium",
+      "description": "입력 검증(빈 본문·미존재 사용자) + 작성자 FK 무결성 — 잘못된 데이터 유입 차단.",
+      "task_refs": ["TASK-NOTES-001"]
+    }
+  ]
+}
