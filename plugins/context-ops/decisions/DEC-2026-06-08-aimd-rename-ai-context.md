@@ -25,6 +25,9 @@
 ## 검증
 - chain-driver 502 GREEN + 전 워크스페이스(RR check#11) + release-readiness **41/41**(check#16 poc-05 graph 경로 lockstep) + 잔존 `.aimd`(INCLUDE)=0 + `.aimd-install` 보존 + 3-way.
 
+## 후속 (v0.23.1 PATCH) — `.aimd-install/` → `.static-tools/`
+v0.23.0 에서 scope 밖으로 **보존**했던 `.aimd-install/`(정적분석 도구 설치 마커 dir / `${CLAUDE_PLUGIN_ROOT}/` 내부 / gitignore·커밋❌)을 후속 리네임. 사용자 후속 질문("`.aimd-install` 이건 뭔가") 계기. 이유 = ① `.aimd/`→`.ai-context/` 후 잔존 `aimd` 토큰 반쪽 정합 ② 내용 서술성("aimd-install"→무엇 install 인지 불명 → `.static-tools`=semgrep/PMD 설치 마커). 11곳/6 live 파일(runner.js localPmdBinDir·install-static-tools.js/.sh·preflight·static-runner README·.gitignore). 내부 마커=산출물·동작 무변경=PATCH / static-runner 40/40 무회귀. User-Agent `aimd-installer`(dot 없는 별 토큰)=scope 밖. v0.23.0 의 "`.aimd-install` 보존" 기술 = 당시 사실(무모순).
+
 ## 교훈
 - "폴더명 = 내용 서술" 사용자 개념 = discoverability(식별자 정합 아님) → 첫 옵션 셋(.ax/.context-ops/유지)이 빗나간 것을 사용자 메타 발화로 교정.
 - 역사 기록은 시점 사실 → 컨벤션 리네임 시에도 보존(역사 왜곡 회피).

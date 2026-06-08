@@ -17,7 +17,7 @@ examples/**/.ai-context/state.json.tmp
 examples/**/.ai-context/output/intervention-log.jsonl
 
 # install-static-tools.sh marker (사용자 환경별 idempotent flag)
-.aimd-install/
+.static-tools/
 
 # codegraph 인덱스 (.codegraph/ SQLite) — context-federator / codegraph-runner 가 target 트리에 생성 (재빌드 가능 / 커밋 ❌ / DEC-2026-06-02-context-federation)
 .codegraph/

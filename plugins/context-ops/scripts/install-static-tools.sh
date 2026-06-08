@@ -14,7 +14,7 @@
 set -u
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-MARKER_DIR="${PLUGIN_ROOT}/.aimd-install"
+MARKER_DIR="${PLUGIN_ROOT}/.static-tools"
 SEMGREP_MARKER="${MARKER_DIR}/.semgrep-installed"
 LOG_PREFIX="[ai-native-methodology/install]"
 

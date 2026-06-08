@@ -81,7 +81,7 @@ const TOOLS = {
 		cmd: 'pmd',
 		versionFlag: '--version',
 		fallback:
-			'Java 존재 시 SessionStart hook(install-static-tools.js)이 PMD dist zip 자동설치(.aimd-install/) — Java 부재 시 정직 carry(JVM 부트스트랩 ❌). 수동: PMD 7.x (https://pmd.github.io) 또는 sdkman install pmd / 대체: ast-grep + Checkstyle (CyclomaticComplexity = lizard)',
+			'Java 존재 시 SessionStart hook(install-static-tools.js)이 PMD dist zip 자동설치(.static-tools/) — Java 부재 시 정직 carry(JVM 부트스트랩 ❌). 수동: PMD 7.x (https://pmd.github.io) 또는 sdkman install pmd / 대체: ast-grep + Checkstyle (CyclomaticComplexity = lizard)',
 	},
 	spectral: {
 		kind: 'analysis',

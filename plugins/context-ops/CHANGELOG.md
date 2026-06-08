@@ -10,6 +10,14 @@
 
 ---
 
+## [0.23.1] — 2026-06-08 PATCH — `.aimd-install/` → `.static-tools/` (v0.23.0 잔존 aimd 토큰 후속 정리)
+
+v0.23.0 에서 **보존**했던 `.aimd-install/`(정적분석 도구 설치 마커 dir / `.aimd/` 와 무관·별 컨벤션)을 후속 리네임. 이유: ① `.aimd/`→`.ai-context/` 후 `.aimd-install` 만 `aimd` 토큰 잔존 = 반쪽 정합 ② 사용자 기준(내용 서술성)상 "aimd-install"은 무엇을 install 하는지 안 보임 → `.static-tools/`(semgrep/PMD 등 정적도구 설치 마커). **내부 마커 dir**(`${CLAUDE_PLUGIN_ROOT}/.static-tools/` / gitignore / 커밋 ❌ / 세션 재생성) = 산출물·동작 무변경 = PATCH.
+
+- **rename**: `.aimd-install` → `.static-tools` (11곳 / 6 live 파일): `tools/static-runner/src/runner.js`(localPmdBinDir 마커 경로 / 4) · `scripts/install-static-tools.js`(MARKER_DIR / 3) · `install-static-tools.sh`(1) · `scripts/preflight-check.js`(1) · `static-runner/README.md`(1) · `.gitignore`(1).
+- **미변경(시점 기록)**: v0.23.0 CHANGELOG/DEC/INDEX 의 "`.aimd-install` 보존" 기술 = 당시 사실(이번 후속과 무모순). User-Agent 문자열 `aimd-installer`(dot 없는 별 토큰 / `.aimd-install` dir 아님) = scope 밖.
+- **검증**: static-runner 40/40 GREEN(localPmdBinDir 경로 변경 무회귀) + release-readiness + 3-way. DEC-2026-06-08-aimd-rename-ai-context §후속.
+
 ## [0.23.0] — 2026-06-08 MINOR — `.aimd/` → `.ai-context/` 디렉토리 컨벤션 리네임 (내용 서술성)
 
 **사용자 지적: 출력 디렉토리 `.aimd`(≈ ai-native methodology dir)는 폴더를 본 사람이 안에 뭐가 있는지 모른다. 기준 = 내용 서술성 → `.ai-context/`** (= AI 운영 컨텍스트 = 방법론 P0 "산출물 = LLM 운영 컨텍스트 그 자체" / 패키지 `context-ops` 와 자연 짝). v0.x 사내 미배포 = 채택자 0 → 마이그레이션 부담 없는 적기. 기능 변경 0 (순수 컨벤션 정합).

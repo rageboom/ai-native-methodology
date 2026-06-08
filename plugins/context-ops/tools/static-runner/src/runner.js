@@ -24,13 +24,13 @@ import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 
 // plugin-local 자동설치 도구 발견 (install-static-tools.js 와 동일 root 규약).
-//   install-static-tools.js 가 Java 존재 시 PMD zip 을 .aimd-install/ 에 풀고
+//   install-static-tools.js 가 Java 존재 시 PMD zip 을 .static-tools/ 에 풀고
 //   bin dir 절대경로를 .pmd-bin-dir marker 에 기록 → runner 가 child PATH 에 prepend.
 //   사용자 shell PATH 영구수정 불가 → runner 자동실행 경로만 해결 (DEC-2026-06-07 후속).
 const PLUGIN_ROOT =
 	process.env.CLAUDE_PLUGIN_ROOT ||
 	resolve(dirname(fileURLToPath(import.meta.url)), '../../../');
-const MARKER_DIR = join(PLUGIN_ROOT, '.aimd-install');
+const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools');
 
 // .pmd-bin-dir marker → 유효한 PMD bin 디렉터리 또는 null (결정적).
 export function localPmdBinDir() {
@@ -228,7 +228,7 @@ export const SemgrepPlugin = new Plugin({
 // PMD in-plugin 자동 실행 (R19 Tier 1 / DEC-2026-06-07-pmd-tier1-promotion).
 //   Tier 1 축 = "실행 locus"(plugin 직접 실행) — JVM 의존 도구(Gradle/JUnit 테스트 러너 동형)도 Tier 1.
 //   전제: PMD on PATH + JAVA_HOME(또는 java on PATH). PMD 부재 시 → install-static-tools.js 가
-//     Java 존재 시 PMD zip 을 .aimd-install/ 에 자동설치 → extraPathDirs 가 child PATH 로 노출.
+//     Java 존재 시 PMD zip 을 .static-tools/ 에 자동설치 → extraPathDirs 가 child PATH 로 노출.
 //     Java 부재 시 = 설치 안 함(JVM user-owned / 부트스트랩 ❌) → preflight PluginEnvironmentMissing
 //     → cli exit 3 (정직 "환경 부재" 신호 / no-simulation / "항상 자동실행" 아님).
 //   Windows pmd.bat 런처 → shell:true 필수. PMD 7.x: check -d <dir> -R <ruleset> -f sarif -r <file>.
@@ -241,7 +241,7 @@ export const PmdPlugin = new Plugin({
 	executable: 'pmd',
 	shell: true,
 	versionArgs: ['--version'],
-	// plugin-local 자동설치 PMD(.aimd-install/pmd/.../bin) 발견 → child PATH prepend.
+	// plugin-local 자동설치 PMD(.static-tools/pmd/.../bin) 발견 → child PATH prepend.
 	extraPathDirs: () => {
 		const d = localPmdBinDir();
 		return d ? [d] : [];

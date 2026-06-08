@@ -8,13 +8,13 @@
 // Contract (unchanged from the .sh):
 //   - Always exits 0 — never blocks Claude Code session start.
 //   - Writes status to stderr so Claude surfaces it; stdout stays clean.
-//   - Idempotent — no-op when semgrep already on PATH (marker file under .aimd-install/).
+//   - Idempotent — no-op when semgrep already on PATH (marker file under .static-tools/).
 //
 // Scope (matches static-runner tier policy / DEC-2026-06-07-pmd-tier1-promotion):
 //   Tier 1 (auto-install attempted):
 //     - Semgrep — pip/pipx/brew channel.
 //     - PMD     — Java-conditional: when `java` is on PATH, fetch the PMD dist zip
-//                 into .aimd-install/ and record its bin dir so the runner discovers it.
+//                 into .static-tools/ and record its bin dir so the runner discovers it.
 //                 JVM itself is NEVER bootstrapped (user-owned) — Java absent ⇒ honest skip.
 //   Tier 2 (informational only):     SpotBugs / CodeQL / Bandit / Snyk / OSV-Scanner
 //   Tier 2 require JVM/JDK or per-language envs a plugin cannot bootstrap;
@@ -31,7 +31,7 @@ const LOG_PREFIX = '[ai-native-methodology/install]';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || resolve(SCRIPT_DIR, '..');
-const MARKER_DIR = join(PLUGIN_ROOT, '.aimd-install');
+const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools');
 const SEMGREP_MARKER = join(MARKER_DIR, '.semgrep-installed');
 const PMD_BIN_MARKER = join(MARKER_DIR, '.pmd-bin-dir'); // runner.js localPmdBinDir() 와 동일 규약
 const PMD_DIR = join(MARKER_DIR, 'pmd'); // dist zip 추출 위치
