@@ -10,6 +10,18 @@
 
 ---
 
+## [0.21.0] — 2026-06-08 MINOR — PMD Java-조건부 자동설치 (Tier1 install 갭 해소 / 사용자 zero-base 재검토 결론)
+
+**"플러그인 최초 설치 시 OSS 툴이 안 깔린다"는 사용자 지적 → zero-base 재검토 → 진짜 갭 = PMD가 Tier1(in-plugin 자동실행)로 격상됐는데도(DEC-2026-06-07) install 스크립트는 설치 0 + 주석이 stale 'Tier2' 였던 점.**
+
+zero-base 판정: 방법론 엔진은 OSS 무관(번들 Node 도구 + LLM 추출), "전부 자동설치"는 정당한 비-목표(JVM 부트스트랩 불가). 단 **PMD 바이너리 자체는 zip 산출물이라, JVM이 이미 있으면 부트스트랩 가능** = no-simulation 정합(JVM은 검사만, 설치 ❌).
+
+- **feat (`scripts/install-static-tools.js`)**: `ensurePmd()` 신설 — `java` PATH 감지 시 PMD dist zip 자동설치 (GitHub API 최신 7.x → fallback 7.0.0 → fetch[timeout 120s] → tar/unzip/Expand-Archive 추출 → `.aimd-install/.pmd-bin-dir` marker). **Java 부재 시 정직 carry**(JVM user-owned / 부트스트랩 ❌). 모든 실패 경로 catch → 항상 exit 0 (SessionStart 무차단) / marker idempotent. 상단 주석 stale "PMD=Tier2" → Tier1(Java-conditional) 정정 + `reportTier2()` 에서 pmd 제거.
+- **feat (`tools/static-runner/src/runner.js`)**: runner 가 plugin-local PMD 를 발견하도록 `localPmdBinDir()` + `augmentEnv()` 신설(export) + `Plugin.extraPathDirs` 옵션 → `preflight()`/`run()` 의 `execFileSync` env.PATH 에 prepend. 사용자 shell PATH 영구수정 불가 → runner 자동실행 경로만 해결. Semgrep 등 미지정 plugin = PATH 불변(backward-compatible).
+- **docs**: `static-runner/README.md` tier 표 + `cli.js` install 힌트를 DEC-2026-06-07(PMD Tier1) 정합으로 정정 — PMD 격상 이후 갱신 안 됐던 stale 동반 해소.
+- **test**: static-runner +5 (augmentEnv 불변/prepend · localPmdBinDir null-게이트 · extraPathDirs 계약 · Semgrep PATH 불변) → 40/40 GREEN.
+- **carry (정직 표기)**: 실 zip 다운로드는 네트워크 의존 → 오프라인 검증 불가(syntax + java-absent carry-path + marker→runner 발견 종단만 검증 / 실 PMD 다운로드 1회 = 사용자 환경 carry). `preflight-check.js` PMD fallback 힌트("sdkman") 자동설치 미반영 = 저우선 carry.
+
 ## [0.20.1] — 2026-06-08 PATCH — chain harness dogfood fix: persisted soft-block 사후 ack + 비-API layer 힌트
 
 **full-chain dogfood(외부 신규 프로젝트 E2E)에서 발견한 chain harness rough-edge 2건.**

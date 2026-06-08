@@ -186,7 +186,7 @@ function main() {
 				console.error(`[static-runner] ${err.message}`);
 				const installHint =
 					pname === 'pmd'
-						? 'install PMD 7.x + JDK 8+ (https://pmd.github.io) and add to PATH'
+						? 'install JDK 8+ then re-open session (plugin auto-installs PMD when Java present), or install PMD 7.x manually (https://pmd.github.io)'
 						: pname === 'semgrep'
 							? 'pipx install semgrep'
 							: `install ${pname}`;

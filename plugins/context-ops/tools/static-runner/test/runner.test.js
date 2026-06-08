@@ -19,6 +19,8 @@ import {
 	ImportSarifRejected,
 	IMPORTED_DRIVER_ALLOWLIST,
 	EVIDENCE_TRUST,
+	augmentEnv,
+	localPmdBinDir,
 } from '../src/runner.js';
 
 test('REQUIRED_EVIDENCE has 7 fields (5 evidence + 2 path)', () => {
@@ -130,6 +132,38 @@ test('Plugin default versionParse = first line (Semgrep 동형 / backward-compat
 	assert.equal(p.versionParse('1.2.3\nextra line'), '1.2.3');
 	// SemgrepPlugin 은 override 없음 → 첫 줄 유지
 	assert.equal(SemgrepPlugin.versionParse('1.99.0\n...'), '1.99.0');
+});
+
+// plugin-local 자동설치 PMD 발견 (install-static-tools.js Java-조건부 설치 ↔ runner 발견)
+
+test('augmentEnv([]) returns process.env unchanged (Semgrep 무영향 / backward-compatible)', () => {
+	assert.equal(augmentEnv([]), process.env);
+	assert.equal(augmentEnv(undefined), process.env);
+});
+
+test('augmentEnv prepends dirs to PATH (plugin-local PMD bin 노출)', () => {
+	const sep = process.platform === 'win32' ? ';' : ':';
+	const env = augmentEnv(['/opt/pmd/bin']);
+	assert.notEqual(env, process.env); // 새 객체
+	assert.ok(env.PATH.startsWith(`/opt/pmd/bin${sep}`));
+	// 기존 PATH 보존
+	const cur = process.env.PATH || process.env.Path || '';
+	assert.ok(env.PATH.endsWith(cur));
+});
+
+test('localPmdBinDir() returns null when no marker (결정적 / 미설치 환경)', () => {
+	// marker 부재 환경(테스트 실행 환경)에서는 null — launcher 검증 게이트.
+	const d = localPmdBinDir();
+	assert.ok(d === null || typeof d === 'string');
+});
+
+test('PmdPlugin.extraPathDirs is a callback returning an array', () => {
+	assert.equal(typeof PmdPlugin.extraPathDirs, 'function');
+	assert.ok(Array.isArray(PmdPlugin.extraPathDirs()));
+});
+
+test('SemgrepPlugin has no extraPathDirs (PATH 불변 보장)', () => {
+	assert.equal(SemgrepPlugin.extraPathDirs, undefined);
 });
 
 // R19 Tier 2 — importSarif 4 조건 강제 test

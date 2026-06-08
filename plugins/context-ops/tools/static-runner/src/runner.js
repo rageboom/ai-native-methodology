@@ -19,8 +19,41 @@ import {
 	readFileSync,
 	existsSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+
+// plugin-local 자동설치 도구 발견 (install-static-tools.js 와 동일 root 규약).
+//   install-static-tools.js 가 Java 존재 시 PMD zip 을 .aimd-install/ 에 풀고
+//   bin dir 절대경로를 .pmd-bin-dir marker 에 기록 → runner 가 child PATH 에 prepend.
+//   사용자 shell PATH 영구수정 불가 → runner 자동실행 경로만 해결 (DEC-2026-06-07 후속).
+const PLUGIN_ROOT =
+	process.env.CLAUDE_PLUGIN_ROOT ||
+	resolve(dirname(fileURLToPath(import.meta.url)), '../../../');
+const MARKER_DIR = join(PLUGIN_ROOT, '.aimd-install');
+
+// .pmd-bin-dir marker → 유효한 PMD bin 디렉터리 또는 null (결정적).
+export function localPmdBinDir() {
+	try {
+		const marker = join(MARKER_DIR, '.pmd-bin-dir');
+		if (!existsSync(marker)) return null;
+		const dir = readFileSync(marker, 'utf-8').trim();
+		if (!dir) return null;
+		const launcher = join(dir, process.platform === 'win32' ? 'pmd.bat' : 'pmd');
+		return existsSync(launcher) ? dir : null;
+	} catch {
+		return null;
+	}
+}
+
+// extraDirs 를 PATH 앞에 prepend 한 env 반환. 빈 배열/undefined → process.env 그대로
+// (Semgrep 등 기존 plugin 무영향 / backward-compatible).
+export function augmentEnv(extraDirs) {
+	if (!extraDirs || extraDirs.length === 0) return process.env;
+	const sep = process.platform === 'win32' ? ';' : ':';
+	const cur = process.env.PATH || process.env.Path || '';
+	return { ...process.env, PATH: extraDirs.join(sep) + sep + cur };
+}
 
 export const REQUIRED_EVIDENCE = [
 	'tool_stdout_path',
@@ -72,6 +105,7 @@ export class Plugin {
 		versionArgs,
 		shell = false,
 		versionParse,
+		extraPathDirs,
 	}) {
 		this.name = name;
 		this.executable = executable;
@@ -81,6 +115,9 @@ export class Plugin {
 		//   Node 18.20+/20.12+/22+ 에서 execFileSync('.bat') = EINVAL (CVE-2024-27980) → shell 경유 필요.
 		//   default false → Semgrep(네이티브 실행파일) 등 기존 plugin 무영향 (backward-compatible).
 		this.shell = shell;
+		// extraPathDirs: () => string[] — plugin-local 자동설치 bin 디렉터리.
+		//   child process PATH 앞에 prepend (preflight/run 양쪽). 미지정 → PATH 불변.
+		this.extraPathDirs = extraPathDirs;
 		// versionParse: --version stdout → 버전 문자열 추출 콜백.
 		//   default = 첫 줄(Semgrep 등 첫 줄에 버전 출력하는 도구). PMD 처럼 ASCII 배너를
 		//   먼저 출력하는 도구는 semver 정규식 override 로 정확 추출 (no-simulation 물증 정합).
@@ -92,7 +129,12 @@ export class Plugin {
 			const v = execFileSync(
 				this.executable,
 				this.versionArgs ?? ['--version'],
-				{ encoding: 'utf-8', timeout: 10_000, shell: this.shell },
+				{
+					encoding: 'utf-8',
+					timeout: 10_000,
+					shell: this.shell,
+					env: augmentEnv(this.extraPathDirs?.()),
+				},
 			);
 			return { ok: true, version: this.versionParse(v) };
 		} catch (err) {
@@ -126,6 +168,7 @@ export class Plugin {
 				encoding: 'utf-8',
 				maxBuffer: 64 * 1024 * 1024,
 				shell: this.shell,
+				env: augmentEnv(this.extraPathDirs?.()),
 			});
 		} catch (err) {
 			exitCode = err.status ?? 1;
@@ -184,17 +227,24 @@ export const SemgrepPlugin = new Plugin({
 
 // PMD in-plugin 자동 실행 (R19 Tier 1 / DEC-2026-06-07-pmd-tier1-promotion).
 //   Tier 1 축 = "실행 locus"(plugin 직접 실행) — JVM 의존 도구(Gradle/JUnit 테스트 러너 동형)도 Tier 1.
-//   전제: PMD 설치 + PATH 등록 + JAVA_HOME(또는 java on PATH). 부재 시 preflight → PluginEnvironmentMissing
-//     → cli exit 3 (정직 "환경 부재" 신호 / no-simulation / Semgrep 동형 — "항상 자동실행" 아님).
+//   전제: PMD on PATH + JAVA_HOME(또는 java on PATH). PMD 부재 시 → install-static-tools.js 가
+//     Java 존재 시 PMD zip 을 .aimd-install/ 에 자동설치 → extraPathDirs 가 child PATH 로 노출.
+//     Java 부재 시 = 설치 안 함(JVM user-owned / 부트스트랩 ❌) → preflight PluginEnvironmentMissing
+//     → cli exit 3 (정직 "환경 부재" 신호 / no-simulation / "항상 자동실행" 아님).
 //   Windows pmd.bat 런처 → shell:true 필수. PMD 7.x: check -d <dir> -R <ruleset> -f sarif -r <file>.
 //   exit 4 = 위반 발견(정상) / 5 = recoverable error — runner.run() catch 가 흡수 후 SARIF 해시 진행 (Semgrep 동형).
-//   §8.1 corroboration: poc-06(legacy Spring4.1) + poc-10(modern JPA) in-plugin auto-run 입증 (OpenJDK 25 / PMD 7.25.0).
+//   §8.1 corroboration: poc-06(legacy Spring4.1) + poc-10(modern JPA) in-plugin auto-run 입증.
 //   import 경로(Tier 2 SARIF import allowlist=['pmd'])는 orthogonal 로 보존 — PMD = in-plugin 자동 + 사용자 CI import 양쪽 유효.
 export const PmdPlugin = new Plugin({
 	name: 'pmd',
 	executable: 'pmd',
 	shell: true,
 	versionArgs: ['--version'],
+	// plugin-local 자동설치 PMD(.aimd-install/pmd/.../bin) 발견 → child PATH prepend.
+	extraPathDirs: () => {
+		const d = localPmdBinDir();
+		return d ? [d] : [];
+	},
 	// PMD --version 은 ASCII 배너를 먼저 출력 → 첫 줄 = 배너. semver 패턴으로 정확 추출.
 	versionParse: (out) => {
 		const m = out.match(/PMD\s+(\d+\.\d+\.\d+\S*)/) ?? out.match(/\b(\d+\.\d+\.\d+\S*)/);
