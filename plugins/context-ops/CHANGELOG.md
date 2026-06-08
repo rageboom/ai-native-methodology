@@ -10,6 +10,14 @@
 
 ---
 
+## [0.20.1] — 2026-06-08 PATCH — chain harness dogfood fix: persisted soft-block 사후 ack + 비-API layer 힌트
+
+**full-chain dogfood(외부 신규 프로젝트 E2E)에서 발견한 chain harness rough-edge 2건.**
+
+- **fix (rough-edge 1 / gate UX 결함)**: `chain-driver next` 의 persisted block 가드(`cli.js`)가 `--user-decision` 보다 먼저 발화해, 일단 `blocked:true` 가 박히면 soft block(`evidence_missing` 등 의도된 N/A)을 `--user-decision go` 로 풀 수 없던 결함 수정. 가드를 `state.blocked && !args.userDecision` 로 좁혀 **명시적 결단(go/stop/revisit)은 재평가로 통과** → `applyUserDecision` 이 soft=go-with-warnings 해소 / hard(critical·high)=user_override_rejected 재차단. **anti-bypass(plain re-run = exit 2) + hard-block 무결성 무손상**. 신규 e2e 2(persisted soft 해소 / hard 우회불가) / chain-driver 492→494.
+- **hint (rough-edge 2 / by-design discoverability)**: `layer:"be"` TASK 의 `openapi_endpoint_ref` 강제(contract 양 axis / DEC-2026-05-26)는 의도된 paradigm — 단 비-API 백엔드(라이브러리·배치·컨슈머·도메인 서비스)는 `application`/`domain` layer 사용이 탈출구임을 task-plan.schema `layer` description + common-errors Q5.1 에 명시(계약 강제 약화 ❌ / 안내만).
+- common-errors Q5 보강: persisted block 은 plain `next` 로 안 풀림(anti-bypass) / soft=`--user-decision go` / hard=fix+findings 재집계 후 ack.
+
 ## [0.20.0] — 2026-06-08 MINOR — dep-graph 의존 갭 5종 조사 + G2-1 federation FK 읽기-aid
 
 **dep-graph(artifact-graph.json / 운영 SSOT)가 표현하는 의존 차원 진단 → AX 운영(P0) 관점 누락/보강 컨텍스트 5종 등재 + 전 5갭 "기존 자산 실측 → 정직 reframe" 조사 (DEC-2026-06-08-dep-graph-dependency-axis-gaps).** 5종 모두 원래 진단보다 작게 판명 — 갭1(코드 call-graph)=대부분 이미 해소(context-federator + SKILL 코드흐름 lens + living-sync anchor-lift) / SSOT 승격은 trust 모델·업계 정합(Sourcegraph·CodeQL·Nx / ISSTA2024 정적 call-graph 61% 누락 / 0.85)으로 **명시 거부**(IMPL gate-층 leaf = 의도된 trust 경계) · 갭3=scope-out · 갭4=격상 보류(inter-scope 실발현 0 / `sync_state.dependents[]` 死필드) · 갭5=BR-split STEP3 흡수(BR↔BR 필드·엣지 전무 but 실수요 0 + BC 채움 7/8=0%).

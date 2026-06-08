@@ -351,7 +351,11 @@ function cmdNext(args) {
 		console.error('[chain-driver] no state.json — run init first');
 		process.exit(3);
 	}
-	if (state.blocked) blockedExit(state, root);
+	// mechanical trio (ii) — persisted block 은 plain re-run(`next` no-decision)으로 우회 불가(anti-bypass).
+	//   단 명시적 결단(`--user-decision go|stop|revisit`)은 해결 행동이므로 재평가로 통과시킨다:
+	//   재평가 시 applyUserDecision 이 soft(evidence_missing 등)→go-with-warnings 로 해소 / hard(critical/high)→user_override_rejected 로 재차단.
+	//   → soft block 사후 ack 경로 복원 (dogfood: 블록 후 --user-decision 이 가드에 막혀 미도달). anti-bypass 무손상.
+	if (state.blocked && !args.userDecision) blockedExit(state, root);
 
 	// DEC-2026-06-06-analysis-exit-gate — analysis 자체 gate(#0) 평가. 구: analysis→'discovery' 매핑이
 	//   gate 를 discovery(#1)로 평가 + nextStage('discovery')='spec' 로 discovery 를 스킵하던 latent 버그 → analysis→discovery 정상 전이로 교정.

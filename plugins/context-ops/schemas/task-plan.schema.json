@@ -79,7 +79,7 @@
               "e2e",
               "infra"
             ],
-            "description": "같은 layer 묶음 강제. v11.0.0 — enum 확장 (DEC-2026-05-26-be-fe-산출물-분리 §1 paradigm 정합). hexagonal 5종 (domain/application/infrastructure/presentation/cross-cutting) = legacy carry / 신규 PoC = tech-track 5종 (be/fe/db/e2e/infra) 권장. tech-track layer 시 contract ref 본격 강제 (if/then)."
+            "description": "같은 layer 묶음 강제. v11.0.0 — enum 확장 (DEC-2026-05-26-be-fe-산출물-분리 §1 paradigm 정합). hexagonal 5종 (domain/application/infrastructure/presentation/cross-cutting) = legacy carry / 신규 PoC = tech-track 5종 (be/fe/db/e2e/infra) 권장. tech-track layer 시 contract ref 본격 강제 (if/then). ★ `be` = HTTP API 백엔드(openapi_endpoint_ref 의무) — 비-API 백엔드 로직(라이브러리·배치·메시지 컨슈머·도메인 서비스)은 `application`/`domain` 사용(contract 강제 trigger ❌ / common-errors Q5.1)."
           },
           "module": {
             "type": "string",

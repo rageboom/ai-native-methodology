@@ -71,7 +71,8 @@
 node tools/chain-driver/src/cli.js state
 
 # 2. block_reason 식별:
-#    "validator_critical" / "validator_high"  → finding fix 필요
+#    "validator_critical" / "validator_high"  → finding fix 필요 (hard / go 우회 ❌)
+#    "evidence_missing"                       → soft / 의도된 N/A(예: drift @spec)면 아래 명시 ack
 #    "user_intervention"                      → 사용자 명시 결단 입력
 #    "tmp_files_pending"                      → recoverTmpFiles 호출
 #    "schema_migration"                       → chain-driver migrate
@@ -80,6 +81,17 @@ node tools/chain-driver/src/cli.js state
 #    각 finding 의 file/line + kind 확인
 #    source 수정 후 chain-driver next 재시도
 ```
+
+> ⚠️ **persisted block 은 plain `next` 재실행으로 안 풀린다** (mechanical trio (ii) anti-bypass = exit 2 영속). 해결은 **명시적 결단**으로만:
+> - **soft block**(`evidence_missing` 등 / 의도된 N/A) → `chain-driver next --findings <path> --user-decision go` (재평가 후 go-with-warnings 전진).
+> - **hard block**(`validator_critical/high`) → `--user-decision go` 로도 우회 불가(재평가서 거부). source 수정 → findings 재집계 → `next --findings <new> --user-decision go`.
+> - 중단/되돌리기 → `--user-decision stop` 또는 `revisit:<stage>`.
+
+### Q5.1 task-plan 검증이 `openapi_endpoint_ref` required (BE task) 로 막힘 — HTTP API 가 아닌데?
+
+**원인**: `layer: "be"` 인 TASK 는 contract 강제(양 axis / DEC-2026-05-26)로 `openapi_endpoint_ref` 가 의무. 이건 **API 백엔드** 전제.
+
+**해결**: 비-API 백엔드 로직(라이브러리·배치 job·메시지 컨슈머·도메인 서비스)은 `be` 가 아니라 **`application` 또는 `domain`**(hexagonal layer)으로 둔다 → contract 강제 trigger 안 됨(openapi 불요). `be`/`fe` 는 HTTP/UI 계약이 실제로 있는 TASK 에만.
 
 ### Q6. validator finding 이 너무 많아 fix 끝이 안 보임
 

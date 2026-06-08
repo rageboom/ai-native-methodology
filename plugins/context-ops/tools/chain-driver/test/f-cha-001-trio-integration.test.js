@@ -299,4 +299,60 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 			'명시 ack 후 state.blocked=false (go-with-warnings 전진)',
 		);
 	});
+
+	// persisted soft-block 사후 해소 (dogfood: 블록 후 --user-decision 이 가드에 막혀 미도달 / cli.js:354 fix)
+	it('persisted soft-block: 첫 차단(exit1) → plain next(exit2 anti-bypass) → --user-decision go(exit0 해소)', () => {
+		const root = join(tmp, 'persisted-softblock');
+		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+		initState(root, 'persisted-softblock'); // analysis / blocked=false
+		const findingsPath = join(root, '.aimd', 'output', 'findings.json');
+		writeFileSync(
+			findingsPath,
+			JSON.stringify({
+				critical: 0, high: 0, medium: 0, low: 0, info: 0,
+				evidence_missing: ['drift-validator'],
+			}),
+		);
+		const run = (extra) =>
+			spawnSync('node', [CLI_PATH, 'next', root, '--findings', findingsPath, ...extra], {
+				encoding: 'utf-8', timeout: 20000,
+			});
+
+		// ① 첫 호출(결단 없음) → soft block 차단 + 영속
+		const r1 = run([]);
+		assert.equal(r1.status, 1, `첫 차단 exit 1 (got ${r1.status}) / ${r1.stderr}`);
+		assert.equal(readState(root).blocked, true, '①후 blocked=true 영속');
+		assert.equal(readState(root).block_reason, 'evidence_missing', 'block_reason=evidence_missing');
+
+		// ② plain re-run(결단 없음) → blockedExit exit 2 (anti-bypass 무손상)
+		const r2 = run([]);
+		assert.equal(r2.status, 2, `anti-bypass: plain next 재호출 exit 2 (got ${r2.status})`);
+		assert.equal(readState(root).blocked, true, '②후에도 blocked 유지');
+
+		// ③ 명시 --user-decision go → 재평가 → soft go-with-warnings 해소 + 전진
+		const r3 = run(['--user-decision', 'go']);
+		assert.equal(r3.status, 0, `명시 go ack 해소 exit 0 (got ${r3.status}) / ${r3.stderr}`);
+		assert.equal(readState(root).blocked, false, '③후 blocked=false (해소)');
+		assert.equal(readState(root).current_chain, 'discovery', '전진 = discovery');
+	});
+
+	// hard-block 은 --user-decision go 로도 우회 불가 (재평가서 user_override_rejected → 재차단)
+	it('persisted hard-block: --user-decision go 로도 우회 불가 (exit 1 재차단 / anti-bypass)', () => {
+		const root = join(tmp, 'persisted-hardblock');
+		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+		initState(root, 'persisted-hardblock');
+		const findingsPath = join(root, '.aimd', 'output', 'findings.json');
+		writeFileSync(
+			findingsPath,
+			JSON.stringify({ critical: 1, high: 0, medium: 0, low: 0, info: 0 }),
+		);
+		const run = (extra) =>
+			spawnSync('node', [CLI_PATH, 'next', root, '--findings', findingsPath, ...extra], {
+				encoding: 'utf-8', timeout: 20000,
+			});
+		assert.equal(run([]).status, 1, '첫 hard 차단 exit 1');
+		assert.equal(readState(root).blocked, true, 'hard blocked 영속');
+		assert.equal(run(['--user-decision', 'go']).status, 1, 'hard: go 우회 불가 exit 1');
+		assert.equal(readState(root).blocked, true, 'hard: go 후에도 blocked 유지');
+	});
 });
