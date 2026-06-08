@@ -40,7 +40,7 @@ grep -n "getPackages\|ReactPackage\|PackageList" client/android/app/src/main/jav
 
 ## 산출물
 
-`.aimd/output/rn-native-bridge-inventory.json`:
+`.ai-context/output/rn-native-bridge-inventory.json`:
 
 ```json
 {

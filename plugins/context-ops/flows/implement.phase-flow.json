@@ -43,7 +43,7 @@
       "id": "green-evidence",
       "name": "GREEN 검증 (진짜 runner / 100% pass)",
       "depends_on": ["commit-hash-fill"],
-      "inputs": ["impl 코드", ".aimd/config/test-cmd.json"],
+      "inputs": ["impl 코드", ".ai-context/config/test-cmd.json"],
       "outputs": ["impl-spec.test_pass_evidence (fail_count: 0 의무)"],
       "skills": ["implement-verify-test-pass", "test-run-test-evidence"],
       "expected_outcome": "all_pass (chain 5 GREEN 의무)"

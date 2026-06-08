@@ -14,7 +14,7 @@ v2.1.0 phase 4.7 (characterization) 의 산출물 (`characterization-spec.json` 
 
 ```bash
 node src/cli.js \
-  --target .aimd/output/characterization/ \
+  --target .ai-context/output/characterization/ \
   [--threshold 0.80] \
   [--coverage-baseline <path>] [--write-coverage-baseline] \
   [--evidence-dir <dir>] \

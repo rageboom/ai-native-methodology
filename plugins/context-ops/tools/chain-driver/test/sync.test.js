@@ -29,7 +29,7 @@ before(() => { tmp = mkdtempSync(join(tmpdir(), 'chain-driver-sync-')); });
 after(() => { rmSync(tmp, { recursive: true, force: true }); });
 
 function seedCanonical(root, filename, content) {
-  const dir = join(root, '.aimd', 'output');
+  const dir = join(root, '.ai-context', 'output');
   mkdirSync(dir, { recursive: true });
   const p = join(dir, filename);
   writeFileSync(p, content);
@@ -65,7 +65,7 @@ describe('detectDrift', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: currentHash }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: currentHash }],
         drift_detected: false,
       },
     });
@@ -82,7 +82,7 @@ describe('detectDrift', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: oldHash }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: oldHash }],
         drift_detected: false,
       },
     });
@@ -90,7 +90,7 @@ describe('detectDrift', () => {
     const result = detectDrift(root, 'user-registration');
     assert.equal(result.drift_detected, true);
     assert.equal(result.changed_sources.length, 1);
-    assert.equal(result.changed_sources[0].path, '.aimd/output/rules.json');
+    assert.equal(result.changed_sources[0].path, '.ai-context/output/rules.json');
   });
 
   it('handles missing canonical file as drift', () => {
@@ -99,7 +99,7 @@ describe('detectDrift', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: 'sha256:deadbeef' }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: 'sha256:deadbeef' }],
         drift_detected: false,
       },
     });
@@ -117,7 +117,7 @@ describe('markDrift', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: oldHash }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: oldHash }],
         drift_detected: false,
       },
     });
@@ -137,7 +137,7 @@ describe('markDrift', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: currentHash }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: currentHash }],
         drift_detected: false,
       },
     });
@@ -154,7 +154,7 @@ describe('markDrift', () => {
       writeManifest(root, scope, null, {
         scope,
         sync_state: {
-          sync_sources: [{ path: '.aimd/output/rules.json', version: oldHash }],
+          sync_sources: [{ path: '.ai-context/output/rules.json', version: oldHash }],
           drift_detected: false,
         },
       });
@@ -185,7 +185,7 @@ describe('cascade (M4 manual)', () => {
     writeManifest(root, 'user-registration', null, {
       scope: 'user-registration',
       sync_state: {
-        sync_sources: [{ path: '.aimd/output/rules.json', version: 'sha256:stale' }],
+        sync_sources: [{ path: '.ai-context/output/rules.json', version: 'sha256:stale' }],
         drift_detected: true,
       },
     });
@@ -212,8 +212,8 @@ describe('registerCanonicalSources (Phase 3a / 기계 활성화)', () => {
     seedCanonical(root, 'domain.json', '{"d":1}');
     const r = registerCanonicalSources(root, 'scope-a');
     const paths = r.registered.map((s) => s.path);
-    assert.ok(paths.includes('.aimd/output/business-rules.json'), 'business-rules.json 등록');
-    assert.ok(paths.includes('.aimd/output/domain.json'));
+    assert.ok(paths.includes('.ai-context/output/business-rules.json'), 'business-rules.json 등록');
+    assert.ok(paths.includes('.ai-context/output/domain.json'));
     // 부재 canonical = skip (날조 ❌)
     assert.ok(r.skipped.includes('openapi.yaml'));
     // allowlist 에 잘못된 라벨명 없음
@@ -306,7 +306,7 @@ describe('S2 — registerCanonicalSources / detectDrift subset 분기', () => {
     const br = m.sync_state.sync_sources.find((x) => x.path.endsWith('business-rules.json'));
     const dom = m.sync_state.sync_sources.find((x) => x.path.endsWith('domain.json'));
     assert.deepEqual(br.bounded_contexts, ['BC-USER']);
-    assert.equal(br.version, hashBusinessRulesSubset(join(root, '.aimd', 'output', 'business-rules.json'), ['BC-USER']));
+    assert.equal(br.version, hashBusinessRulesSubset(join(root, '.ai-context', 'output', 'business-rules.json'), ['BC-USER']));
     assert.equal(dom.bounded_contexts, undefined, '그 외 canonical = bounded_contexts 부재(file-hash)');
     assert.equal(r.subsets[0].subset_count, 1, 'subset_count 노출 (ghost-monitor 감지)');
   });
@@ -387,8 +387,8 @@ describe('S2 — schema bounded_contexts Ajv guard', () => {
     addFormats(ajv);
     const validate = ajv.compile(schema.properties.sync_state.properties.sync_sources.items);
     const sha = 'sha256:' + 'a'.repeat(64);
-    assert.ok(validate({ path: '.aimd/output/business-rules.json', version: sha, bounded_contexts: ['BC-USER'] }), JSON.stringify(validate.errors));
-    assert.ok(validate({ path: '.aimd/output/domain.json', version: sha }), '기존 shape 유지');
+    assert.ok(validate({ path: '.ai-context/output/business-rules.json', version: sha, bounded_contexts: ['BC-USER'] }), JSON.stringify(validate.errors));
+    assert.ok(validate({ path: '.ai-context/output/domain.json', version: sha }), '기존 shape 유지');
     assert.ok(!validate({ path: 'x', version: sha, bogus: 1 }), '잉여키(additionalProperties:false) 차단');
   });
 });
@@ -460,7 +460,7 @@ describe('listUnbaselinedScopes', () => {
   it('baseline 된 scope(sync_sources 채워짐)는 제외 + 정렬', () => {
     const root = join(tmp, 'ub-mixed');
     const p = seedCanonical(root, 'business-rules.json', '{"business_rules":[]}');
-    mkScope(root, 'scope-z', { sync_sources: [{ path: '.aimd/output/business-rules.json', version: hashFile(p) }], drift_detected: false });
+    mkScope(root, 'scope-z', { sync_sources: [{ path: '.ai-context/output/business-rules.json', version: hashFile(p) }], drift_detected: false });
     mkScope(root, 'scope-a', { sync_sources: [], drift_detected: false });
     assert.deepEqual(listUnbaselinedScopes(root), ['scope-a'], 'baseline 된 scope-z 제외');
   });

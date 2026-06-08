@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "generated_at": "2026-05-06T19:15:00Z",
+    "methodology_version": "v2.0.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.75,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "acceptance_criteria_path": ".ai-context/output/acceptance-criteria.json",
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-FE-LOGIN-001",
+      "ac_ref": "AC-FE-LOGIN-001",
+      "bhv_ref": "BHV-FE-LOGIN-001",
+      "type": "integration",
+      "framework": "vitest",
+      "framework_status": "active",
+      "source_file": "src/pages/login/login-page.test.tsx ( retrofit dry-run / 본 파일 미작성 / 진짜 React Testing Library 미실행)",
+      "source_evidence": "describe('LoginPage — happy path') { it('redirects to /settings on valid login'); it('shows error on invalid credentials'); }",
+      "expected_outcome": "fail",
+      "test_run_evidence": {
+        "test_runner_version": "(not run / FE retrofit dry-run)",
+        "test_runner_stdout_path": "(not generated)",
+        "invocation_timestamp": "2026-05-06T19:15:00Z",
+        "duration_ms": 0,
+        "pass_count": 0,
+        "fail_count": 1,
+        "skip_count": 0,
+        "reproduction_command": "(retrofit dry-run — see retrofit-note.md / chain 4 미실행 / corroboration #3 자격)",
+        "result_hash": "sha256:247d51d5f775b263648040242dd578058c14fe9391fcc1997af8c989f871a343",
+        "report_format": "vitest_json",
+        "flaky_retries_count": 0
+      }
+    }
+  ],
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1.0,
+      "by_business_rule": 1.0,
+      "by_use_case": 1.0,
+      "threshold": 0.85,
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 1.0,
+        "medium": 1.0,
+        "low": 1.0
+      }
+    },
+    "test_pass_rate": 0.0
+  },
+  "chain_attempt": {
+    "attempt_n": 1,
+    "retry_cap": 3,
+    "revisit_count": 0
+  }
+}

@@ -23,7 +23,7 @@
 
 ```
 $ node tools/planning-extraction-validator/src/cli.js \
-    --planning .aimd/output/planning-spec.json \
+    --planning .ai-context/output/planning-spec.json \
     --rules input/rules.json --domain input/domain.json --json
 {
   "findings": [],
@@ -179,4 +179,4 @@ plan 추정 3~4일 보다 빠름. 단일책임 모듈 + 시간 cap + ambiguous �
 - 외부 조언 정합: plan §6.5 (Michael Feathers Characterization Testing + DDD + SbE)
 - input/: rules + domain + antipatterns + inventory
 - characterization/: snapshots/ 3 + coverage.json + intent-vs-bug.md
-- .aimd/output/: planning-spec.{json,md} + state.json
+- .ai-context/output/: planning-spec.{json,md} + state.json

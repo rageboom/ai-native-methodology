@@ -97,7 +97,7 @@ node tools/schema-validator/src/cli.js <output-dir>
 ```bash
 npx ajv validate \
   -s schemas/discovery-spec.schema.json \
-  -d output/.aimd/discovery-spec.json \
+  -d output/.ai-context/discovery-spec.json \
   -r schemas/meta-confidence.schema.json
 ```
 

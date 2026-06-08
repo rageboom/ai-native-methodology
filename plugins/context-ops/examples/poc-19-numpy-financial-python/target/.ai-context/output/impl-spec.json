@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:35:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code", "test_code"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "test_spec_path": ".ai-context/output/test-spec.json",
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
+  },
+  "modules": [
+    {
+      "id": "IMPL-AMORT-001",
+      "tc_refs": ["TC-PMT-001", "TC-PMT-002", "TC-IPMT-001", "TC-IPMT-002", "TC-PPMT-001"],
+      "bhv_refs": ["BHV-PMT-001", "BHV-PMT-002", "BHV-IPMT-001", "BHV-IPMT-002", "BHV-PPMT-001"],
+      "framework": "pytest",
+      "layer": "be",
+      "source_files": ["numpy_financial/_financial.py"],
+      "commit_hash": "247aa4e2ee4fa7db44915790d5a730b9776d10a7",
+      "source_evidence": "S1 regeneration of amortization slice — pmt/ipmt/ppmt (numpy-financial v1.0.0 tag 247aa4e2). RED→GREEN: slice impl stub→regen / test 파일 무변경(i-strict)."
+    }
+  ],
+  "test_pass_evidence": {
+    "test_runner_version": "pytest 9.0.3",
+    "test_runner_stdout_path": ".ai-context/output/evidence/test-stdout.txt",
+    "test_runner_stderr_path": ".ai-context/output/evidence/test-stderr.txt",
+    "invocation_timestamp": "2026-06-06T13:09:16.642Z",
+    "duration_ms": 626,
+    "pass_count": 5,
+    "fail_count": 0,
+    "skip_count": 0,
+    "reproduction_command": "C:/Users/RAGEBOOM/Documents/Developments/AI/ai-native-methodology/plugins/context-ops/examples/poc-19-numpy-financial-python/.venv/Scripts/python.exe -m pytest numpy_financial/tests/test_amortization_slice.py --json-report --json-report-file=.ai-context/output/evidence/pytest-report.json -q",
+    "result_hash": "sha256:dab39caee4437f3d427565f038e85626c5d43e4894553078d5255f06b55313a8",
+    "report_format": "pytest_json",
+    "flaky_retries_count": 0
+  },
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1,
+      "by_business_rule": 1,
+      "threshold": 0.85
+    },
+    "test_pass_rate": 1
+  },
+  "human_review": {
+    "gate_4_intervention_pct": 0
+  }
+}

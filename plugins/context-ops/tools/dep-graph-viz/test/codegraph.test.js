@@ -8,7 +8,7 @@ import { attachSymbols, readCodegraph, findCodegraphDb } from '../src/codegraph.
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const POC05_DB = join(REPO, 'examples/poc-05-sample-user-register/target/.codegraph/codegraph.db');
-const POC05_GRAPH = join(REPO, 'examples/poc-05-sample-user-register/.aimd/output/artifact-graph.json');
+const POC05_GRAPH = join(REPO, 'examples/poc-05-sample-user-register/.ai-context/output/artifact-graph.json');
 
 function augmentedFixture() {
 	return augmentGraph({

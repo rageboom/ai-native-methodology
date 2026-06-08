@@ -1,5 +1,5 @@
 // context-federator core
-// dep-graph(의미) × codegraph(코드 구조) federation → .aimd/output/context-cache.json (reference-lens).
+// dep-graph(의미) × codegraph(코드 구조) federation → .ai-context/output/context-cache.json (reference-lens).
 //   사용자 P0: prompt → dep-graph 검색 → codegraph 연동 → 통합 컨텍스트 회수·재사용 ("다시 작업 안 하기").
 //   DEC-2026-06-02-context-federation (Phase 1 = read-only federate 코어 / gate 무개입).
 //

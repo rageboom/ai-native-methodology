@@ -1,1 +1,0 @@
-JSON report written to /Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.aimd/evidence/vitest-report.json

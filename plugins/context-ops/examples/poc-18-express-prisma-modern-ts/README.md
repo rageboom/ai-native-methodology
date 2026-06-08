@@ -106,8 +106,8 @@ pnpm test   # baseline: 128 pass / 14 fail(upstream route/auth) → 슬라이스
 
 ## 6. 산출물 위치
 
-- `target/.aimd/state.json` — 상태머신 최종 상태(current_chain=implement, last_gate=#5)
-- `target/.aimd/output/` — 11 체인 산출물 (analysis 6 + discovery/spec/ac/plan/test/impl-spec + matrix), 전부 strict schema VALID
-- `target/.aimd/findings-*.json` — gate 별 findings (실 validator/runner 유래)
-- `target/.aimd/evidence/` — vitest report + stdout/stderr (5종 물증 원본)
+- `target/.ai-context/state.json` — 상태머신 최종 상태(current_chain=implement, last_gate=#5)
+- `target/.ai-context/output/` — 11 체인 산출물 (analysis 6 + discovery/spec/ac/plan/test/impl-spec + matrix), 전부 strict schema VALID
+- `target/.ai-context/findings-*.json` — gate 별 findings (실 validator/runner 유래)
+- `target/.ai-context/evidence/` — vitest report + stdout/stderr (5종 물증 원본)
 - `target/src/modules/post/post.service.ts` — GREEN 재생성 impl

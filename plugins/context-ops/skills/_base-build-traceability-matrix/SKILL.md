@@ -22,18 +22,18 @@ chain harness 의 **cross-gate matrix builder skill** (forward+backward bidirect
 
 ## 절차
 
-1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.aimd/output/` 안의 `discovery-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
+1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.ai-context/output/` 안의 `discovery-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
 
 2. **traceability-matrix-builder 도구 호출**:
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
-     --discovery  <project>/.aimd/output/discovery-spec.json \
-     --behavior   <project>/.aimd/output/behavior-spec.json \
-     --acceptance <project>/.aimd/output/acceptance-criteria.json \
-     --test-spec  <project>/.aimd/output/test-spec.json \
-     --impl-spec  <project>/.aimd/output/impl-spec.json \
-     --out-dir    <project>/.aimd/output/traceability/
+     --discovery  <project>/.ai-context/output/discovery-spec.json \
+     --behavior   <project>/.ai-context/output/behavior-spec.json \
+     --acceptance <project>/.ai-context/output/acceptance-criteria.json \
+     --test-spec  <project>/.ai-context/output/test-spec.json \
+     --impl-spec  <project>/.ai-context/output/impl-spec.json \
+     --out-dir    <project>/.ai-context/output/traceability/
    ```
 
 3. **matrix.json 검토** — 사용자에게 `coverage_summary` / `status` 요약 (green/yellow/red 카운트) 제공.

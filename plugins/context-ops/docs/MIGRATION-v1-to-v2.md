@@ -28,7 +28,7 @@ v1.x:
 v2.0:
 
 ```
-사용자: chain-driver init <project>      # .aimd/state.json 초기화
+사용자: chain-driver init <project>      # .ai-context/state.json 초기화
 사용자: /aimd-next                          # chain 1 (planning) 진입
 → planning-spec 생성 → planning-extraction-validator pass → gate #1 결단
 사용자: /aimd-next                          # chain 2 (spec)
@@ -41,13 +41,13 @@ v2.0:
 
 - (i) state.blocked=true → 후속 chain-driver 명령 모두 exit 2
 - (ii) cli exit 2 + "blocked" 메시지 반복
-- (iii) PreToolUse `permissionDecision: deny` 로 `.aimd/output/**` 대상 Write/Edit 차단
+- (iii) PreToolUse `permissionDecision: deny` 로 `.ai-context/output/**` 대상 Write/Edit 차단
 
 → skill 진입은 **사용자 명시 결단** (`/aimd-next` slash command) 만 (D21' 정합 / hooks suppressOutput=true / LLM 양심 우회 차단).
 
 ### 2. state.json 영속 의무
 
-v2.0 사용자 프로젝트 디렉토리에 `.aimd/state.json` 자동 생성 (`chain-driver init`).
+v2.0 사용자 프로젝트 디렉토리에 `.ai-context/state.json` 자동 생성 (`chain-driver init`).
 
 ```json
 {
@@ -64,7 +64,7 @@ v2.0 사용자 프로젝트 디렉토리에 `.aimd/state.json` 자동 생성 (`c
 }
 ```
 
-v1.x 사용자: `.aimd/` 디렉토리 부재 / state 영속 없음. v2.0 진입 시 driver init 의무.
+v1.x 사용자: `.ai-context/` 디렉토리 부재 / state 영속 없음. v2.0 진입 시 driver init 의무.
 
 ### 3. 기존 7대 산출물 재활용
 
@@ -102,7 +102,7 @@ claude plugin install ai-native-methodology@2.0.0-rc1
 ```bash
 cd <existing-poc-dir>
 node /path/to/ai-native-methodology/tools/chain-driver/src/cli.js init .
-ls .aimd/
+ls .ai-context/
 # state.json + output/
 ```
 
@@ -114,7 +114,7 @@ ls .aimd/
 # planning-spec.json 작성 (사용자 manual or skill)
 # validator 회귀
 node /path/to/.../tools/discovery-extraction-validator/src/cli.js \
-  --discovery .aimd/output/discovery-spec.json \
+  --discovery .ai-context/output/discovery-spec.json \
   --rules output/business-rules.json \
   --domain output/domain.json
 ```

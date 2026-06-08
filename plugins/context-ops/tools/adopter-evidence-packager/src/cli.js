@@ -66,14 +66,14 @@ function resolvePluginVersion(args) {
 
 function printHelp() {
   console.error([
-    'Usage: adopter-evidence-packager --state <.aimd/state.json> [opts]',
+    'Usage: adopter-evidence-packager --state <.ai-context/state.json> [opts]',
     '',
     'Type 2 외부 adopter corroboration 캡처 (익명화 / opt-in / consent).',
-    '입력: .aimd/state.json (필수) + scope manifest + findings + traceability-matrix.',
-    '출력: .aimd/output/adopter-corroboration.json (익명화 / schema 검증 / PII leak guard).',
+    '입력: .ai-context/state.json (필수) + scope manifest + findings + traceability-matrix.',
+    '출력: .ai-context/output/adopter-corroboration.json (익명화 / schema 검증 / PII leak guard).',
     '',
     '옵션:',
-    '  --state <path>        .aimd/state.json (positional 로도 가능 / 필수)',
+    '  --state <path>        .ai-context/state.json (positional 로도 가능 / 필수)',
     '  --manifest <path>     scope manifest.json (scenario / stack_signals)',
     '  --findings <path>     findings 카운트 json ({critical,high,medium,low,info})',
     '  --matrix <path>       traceability matrix.json (coverage)',

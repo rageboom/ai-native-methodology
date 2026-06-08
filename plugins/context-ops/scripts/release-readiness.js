@@ -93,7 +93,7 @@ function check1_pocCorroboration() {
 		.filter((d) => d.startsWith('poc-'))
 		.filter((d) => {
 			// v11.0.0 — discovery-spec.json (planning-spec.json legacy 별칭 제거 / refactor: tooling-audit-cleanup)
-			const base = join(ROOT, 'examples', d, '.aimd/output');
+			const base = join(ROOT, 'examples', d, '.ai-context/output');
 			return existsSync(join(base, 'discovery-spec.json'));
 		});
 	return {
@@ -101,7 +101,7 @@ function check1_pocCorroboration() {
 		pass: candidates.length >= 2,
 		detail: `found ${candidates.length} PoC with chain harness output: ${candidates.join(', ')}`,
 		delegated_to:
-			'examples/*/.aimd/output/discovery-spec.json (v11.0.0) existence + valid schema',
+			'examples/*/.ai-context/output/discovery-spec.json (v11.0.0) existence + valid schema',
 	};
 }
 
@@ -121,7 +121,7 @@ function check2_realToolEvidence() {
 	];
 	const path = join(
 		ROOT,
-		'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+		'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 	);
 	if (!existsSync(path)) {
 		return {
@@ -164,7 +164,7 @@ function check3_validatorsViolation() {
 			cmd: [
 				'tools/discovery-extraction-validator/src/cli.js',
 				'--discovery',
-				'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/discovery-spec.json',
 				'--rules',
 				'examples/poc-05-sample-user-register/output/rules/business-rules.json',
 				'--domain',
@@ -177,15 +177,15 @@ function check3_validatorsViolation() {
 			cmd: [
 				'tools/chain-coverage-validator/src/cli.js',
 				'--discovery',
-				'examples/poc-05-sample-user-register/.aimd/output/discovery-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/discovery-spec.json',
 				'--behavior',
-				'examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/behavior-spec.json',
 				'--acceptance',
-				'examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/acceptance-criteria.json',
 				'--test-spec',
-				'examples/poc-05-sample-user-register/.aimd/output/test-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/test-spec.json',
 				'--impl-spec',
-				'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 				'--json',
 			],
 		},
@@ -194,11 +194,11 @@ function check3_validatorsViolation() {
 			cmd: [
 				'tools/spec-test-link-validator/src/cli.js',
 				'--behavior',
-				'examples/poc-05-sample-user-register/.aimd/output/behavior-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/behavior-spec.json',
 				'--acceptance',
-				'examples/poc-05-sample-user-register/.aimd/output/acceptance-criteria.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/acceptance-criteria.json',
 				'--test-spec',
-				'examples/poc-05-sample-user-register/.aimd/output/test-spec.json',
+				'examples/poc-05-sample-user-register/.ai-context/output/test-spec.json',
 				'--json',
 			],
 		},
@@ -240,7 +240,7 @@ function check3_validatorsViolation() {
 function check4_chainCoverage() {
 	const path = join(
 		ROOT,
-		'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+		'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 	);
 	if (!existsSync(path))
 		return { id: 'chain_coverage', pass: false, detail: 'impl-spec missing' };
@@ -302,7 +302,7 @@ function check5_adrRegistry() {
 function check6_matrixGreenness() {
 	const path = join(
 		ROOT,
-		'examples/poc-05-sample-user-register/.aimd/output/matrix.json',
+		'examples/poc-05-sample-user-register/.ai-context/output/matrix.json',
 	);
 	if (!existsSync(path))
 		return {
@@ -331,7 +331,7 @@ function check6_matrixGreenness() {
 function check7_e2eCyclePass() {
 	const path = join(
 		ROOT,
-		'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+		'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 	);
 	if (!existsSync(path))
 		return { id: 'e2e_cycle_pass', pass: false, detail: 'impl-spec missing' };
@@ -385,9 +385,9 @@ function discoverPocSchemaArtifacts() {
 			const full = join(cur, e.name);
 			if (e.isDirectory()) {
 				if (e.name === 'node_modules') continue;
-				// v8.6.0+ F-V2C2-1-01 fix — `.aimd/` 는 chain artifact 표준 위치 (lifecycle-contract.md §파일 위치 컨벤션 정합) — skip 금지.
+				// v8.6.0+ F-V2C2-1-01 fix — `.ai-context/` 는 chain artifact 표준 위치 (lifecycle-contract.md §파일 위치 컨벤션 정합) — skip 금지.
 				// 그 외 dotfile (`.git`, `.idea`, `.vscode` 등) 은 그대로 skip.
-				if (e.name.startsWith('.') && e.name !== '.aimd') continue;
+				if (e.name.startsWith('.') && e.name !== '.ai-context') continue;
 				stack.push(full);
 			} else if (ANALYSIS_VALIDATOR_TARGETS.has(e.name)) {
 				found.push(full);
@@ -888,9 +888,9 @@ function check14_preflightTools(args) {
 //   #15 graph-integrity (artifact-graph.json 합성 성공 + cycle/orphan/unknown 0) — code-pointer 의 prerequisite
 //   #16 code-pointer (24 Tier-1 노드 code_pointers 또는 명시적 N/A coverage)
 //
-// 입력 그래프 위치: PoC #05 .aimd/output/artifact-graph.json (release-readiness 표준 corpus).
+// 입력 그래프 위치: PoC #05 .ai-context/output/artifact-graph.json (release-readiness 표준 corpus).
 const POC05_GRAPH_PATH =
-	'examples/poc-05-sample-user-register/.aimd/output/artifact-graph.json';
+	'examples/poc-05-sample-user-register/.ai-context/output/artifact-graph.json';
 
 function check15_graphIntegrity() {
 	const graphPath = join(ROOT, POC05_GRAPH_PATH);
@@ -1252,7 +1252,7 @@ function check22_beTaskOpenapiRefRatchet() {
 			const p = join(examplesDir, d);
 			try {
 				return (
-					existsSync(join(p, '.aimd', 'output')) || existsSync(join(p, '.aimd'))
+					existsSync(join(p, '.ai-context', 'output')) || existsSync(join(p, '.ai-context'))
 				);
 			} catch {
 				return false;
@@ -1264,8 +1264,8 @@ function check22_beTaskOpenapiRefRatchet() {
 		for (const poc of pocDirs) {
 			// task-plan.json 후보 path
 			const taskPlanCandidates = [
-				join(examplesDir, poc, '.aimd', 'output', 'task-plan.json'),
-				join(examplesDir, poc, '.aimd', 'plan', 'task-plan.json'),
+				join(examplesDir, poc, '.ai-context', 'output', 'task-plan.json'),
+				join(examplesDir, poc, '.ai-context', 'plan', 'task-plan.json'),
 			];
 			let taskPlan = null;
 			for (const candidate of taskPlanCandidates) {

@@ -4,7 +4,7 @@
 // markDrift   = 모든 scope 순회 → drift 발견 시 manifest.sync_state.drift_detected=true 자동 set.
 // cascade     = 사용자 명시 호출 시만 산출물 재생성 + sync_sources version 갱신 + drift_detected=false.
 //
-// canonical global = .aimd/output/<5 이식성>.* — scope 횡단 공통 분석 자산.
+// canonical global = .ai-context/output/<5 이식성>.* — scope 횡단 공통 분석 자산.
 // M4 paradigm = 자동 cascade ❌ (안전 · 통제 · false positive 회피).
 
 import { createHash } from 'node:crypto';
@@ -68,7 +68,7 @@ export function diffBusinessRulesByRule(oldParsed, newParsed) {
 }
 
 // living-sync Phase 3a (DEC §13) — cross-scope drift 기계 활성화.
-//   canonical 분석 deliverable(5 이식성 + architecture) 중 .aimd/output/ 에 존재하는 것을 scope 의
+//   canonical 분석 deliverable(5 이식성 + architecture) 중 .ai-context/output/ 에 존재하는 것을 scope 의
 //   sync_state.sync_sources 로 등록(path + 현 hash = baseline 체크포인트). 이후 detectDrift/markDrift 가
 //   canonical 변경 시 실제 발화. 부재 파일 = skip(날조 ❌). 등록 시점 hash = "현 canonical 과 in-sync" 기준.
 //   ★ 파일명 = 실제 emit 명(business-rules.json/db-schema.json — rules.json/schema.json 아님 / Senior #1 BLOCKER fix).
@@ -95,7 +95,7 @@ export function registerCanonicalSources(projectRoot, scope, opts = {}) {
   const subsets = [];
   const skipped = [];
   for (const name of files) {
-    const rel = join('.aimd', 'output', name);
+    const rel = join('.ai-context', 'output', name);
     const abs = join(projectRoot, rel);
     if (!existsSync(abs)) {
       skipped.push(name);
@@ -177,11 +177,11 @@ export function markDrift(projectRoot) {
 //     detectDrift 가 조용히 drift_detected:false → "건강"으로 오인(dead-fed false-health). 그걸 표면화만 한다.
 //   ★ write 0 (markDrift 코어 순수성·SessionStart 무-write 불변식 보존 / auto-register 는 여전히 cmdSync glue 한정 = DEFER).
 //   집합 = cmdSync first-touch 가 고칠 수 있는 집합과 정렬(empty-or-absent / Senior BLOCKER-1) → 안내 실효.
-//   anyCanonical 가드: .aimd/output canonical 0개면 [] (빈/미초기화 프로젝트 false-positive 차단 / 부재=skip 철학 동형).
+//   anyCanonical 가드: .ai-context/output canonical 0개면 [] (빈/미초기화 프로젝트 false-positive 차단 / 부재=skip 철학 동형).
 export function listUnbaselinedScopes(projectRoot, opts = {}) {
   const files = opts.canonicalFiles || CANONICAL_ANALYSIS_FILES;
   const anyCanonical = files.some((name) =>
-    existsSync(join(projectRoot, '.aimd', 'output', name)),
+    existsSync(join(projectRoot, '.ai-context', 'output', name)),
   );
   if (!anyCanonical) return [];
   const out = [];

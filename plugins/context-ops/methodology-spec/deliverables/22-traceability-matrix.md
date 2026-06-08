@@ -16,7 +16,7 @@
 ## 2. 형식
 
 ```
-.aimd/output/_traceability/
+.ai-context/output/_traceability/
 └── matrix.json       # json 단독 SSOT (시각화·표는 view-time 도구)
 ```
 

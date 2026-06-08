@@ -18,7 +18,7 @@
 ## 2. 형식
 
 ```
-.aimd/output/chain-4-impl/
+.ai-context/output/chain-4-impl/
 ├── impl-spec.json
 ├── impl-report.md
 ├── test-pass-evidence.md
@@ -63,7 +63,7 @@
 ```yaml
 test_pass_evidence:
   test_runner_version: 'junit-jupiter-5.10.0'
-  test_runner_stdout_path: '.aimd/output/chain-4-impl/runs/2026-05-06T13-00-00/stdout.log'
+  test_runner_stdout_path: '.ai-context/output/chain-4-impl/runs/2026-05-06T13-00-00/stdout.log'
   invocation_timestamp: '2026-05-06T13:00:00Z'
   duration_ms: 7892
   pass_count: 24
@@ -72,8 +72,8 @@ test_pass_evidence:
   reproduction_command: ['./gradlew test --tests UserSignupTest']
   result_hash: 'sha256:def456...' # 정규화
   report_format: sarif_2_1_0
-  coverage_report_path: '.aimd/output/chain-5-impl/runs/2026-05-06T13-00-00/coverage.lcov'
-  linter_output_path: '.aimd/output/chain-5-impl/runs/2026-05-06T13-00-00/linter.sarif'
+  coverage_report_path: '.ai-context/output/chain-5-impl/runs/2026-05-06T13-00-00/coverage.lcov'
+  linter_output_path: '.ai-context/output/chain-5-impl/runs/2026-05-06T13-00-00/linter.sarif'
 ```
 
 ## 6. human_review (70~80% 한계 schema 수용)

@@ -32,13 +32,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const CLI = join(__dirname, '..', 'src', 'cli.js');
 const SRC = join(__dirname, '..', 'src');
 const EXAMPLES = join(__dirname, '..', '..', '..', 'examples');
-const POC05 = join(EXAMPLES, 'poc-05-sample-user-register', '.aimd', 'output');
+const POC05 = join(EXAMPLES, 'poc-05-sample-user-register', '.ai-context', 'output');
 const POC05_GRAPH = join(POC05, 'artifact-graph.json');
 const POC18_GRAPH = join(
 	EXAMPLES,
 	'poc-18-express-prisma-modern-ts',
 	'target',
-	'.aimd',
+	'.ai-context',
 	'output',
 	'artifact-graph.json',
 );
@@ -258,8 +258,8 @@ describe('lift e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('durable write: lift <project> --ceiling → state.json regen_queue', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'lift-w-'));
 		try {
-			mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-			const g = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+			mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+			const g = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 			copyFileSync(POC05_GRAPH, g);
 			assert.equal(run(['init', tmp]).status, 0);
 			const { status, out } = runJson([
@@ -276,7 +276,7 @@ describe('lift e2e (no-simulation / poc-05 실 fixture)', () => {
 			assert.equal(status, 0);
 			assert.equal(out.written, true);
 			const state = JSON.parse(
-				readFileSync(join(tmp, '.aimd', 'state.json'), 'utf-8'),
+				readFileSync(join(tmp, '.ai-context', 'state.json'), 'utf-8'),
 			);
 			assert.equal(state.regen_queue.source, 'lift');
 			assert.equal(state.regen_queue.ceiling, 'BHV-USER-001');
@@ -289,8 +289,8 @@ describe('lift e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('clobber 가드: in-progress 큐에 lift → exit 2 / --force 교체', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'lift-c-'));
 		try {
-			mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-			const g = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+			mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+			const g = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 			copyFileSync(POC05_GRAPH, g);
 			run(['init', tmp]);
 			run([

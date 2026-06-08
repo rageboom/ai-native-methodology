@@ -31,7 +31,7 @@ const POC05_GRAPH = join(
 	'..',
 	'examples',
 	'poc-05-sample-user-register',
-	'.aimd',
+	'.ai-context',
 	'output',
 	'artifact-graph.json',
 );
@@ -187,8 +187,8 @@ describe('sync-loop e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('durable write: regen_queue → state.json (== stdout) + 그래프 파일 비영속', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'syncloop-'));
 		try {
-			mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-			const tmpGraph = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+			mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+			const tmpGraph = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 			copyFileSync(POC05_GRAPH, tmpGraph);
 			const graphBefore = readFileSync(tmpGraph, 'utf-8');
 
@@ -207,7 +207,7 @@ describe('sync-loop e2e (no-simulation / poc-05 실 fixture)', () => {
 			assert.equal(status, 0);
 			assert.equal(out.written, true);
 
-			const state = JSON.parse(readFileSync(join(tmp, '.aimd', 'state.json'), 'utf-8'));
+			const state = JSON.parse(readFileSync(join(tmp, '.ai-context', 'state.json'), 'utf-8'));
 			assert.deepEqual(state.regen_queue.items, out.regen_queue.items);
 			assert.deepEqual(state.regen_queue.origins, ['BHV-USER-001']);
 
@@ -274,7 +274,7 @@ describe('carry 1 — sync-loop --br-diff e2e (tmp git / per-BR auto-origin / no
 		const root = mkdtempSync(join(tmpdir(), 'br-diff-'));
 		const git = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
 		git(['init', '-q']); git(['config', 'user.email', 't@t']); git(['config', 'user.name', 't']);
-		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const outDir = join(root, '.ai-context', 'output'); mkdirSync(outDir, { recursive: true });
 		const br = (desc) => JSON.stringify({ business_rules: [
 			{ id: 'BR-POST-1', bounded_context: 'BC-POST', desc },
 			{ id: 'BR-POST-2', bounded_context: 'BC-POST', desc: 'stable' },
@@ -282,9 +282,9 @@ describe('carry 1 — sync-loop --br-diff e2e (tmp git / per-BR auto-origin / no
 		writeFileSync(join(outDir, 'business-rules.json'), br('orig'));
 		const node = (id, x = {}) => ({ id, artifact_kind: id.startsWith("BHV") ? "chain" : "analysis", artifact_subkind: id.startsWith("BHV") ? "BHV" : "business-rules", state: "active", ...x });
 		const graph = { nodes: [
-			node('analysis-business-rules', { source_path: '.aimd/output/business-rules.json' }),
-			node('analysis-business-rules-BR-POST-1', { business_rule_id: 'BR-POST-1', source_path: '.aimd/output/business-rules.json' }),
-			node('analysis-business-rules-BR-POST-2', { business_rule_id: 'BR-POST-2', source_path: '.aimd/output/business-rules.json' }),
+			node('analysis-business-rules', { source_path: '.ai-context/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-1', { business_rule_id: 'BR-POST-1', source_path: '.ai-context/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-2', { business_rule_id: 'BR-POST-2', source_path: '.ai-context/output/business-rules.json' }),
 			node('BHV-POST-001'), node('BHV-POST-002'),
 		], edges: [
 			{ source: 'analysis-business-rules-BR-POST-1', target: 'BHV-POST-001', edge_type: 'cross_reference', confidence: 'soft' },
@@ -305,9 +305,9 @@ describe('carry 1 — sync-loop --br-diff e2e (tmp git / per-BR auto-origin / no
 	});
 	it('invalid git ref → exit 3 (날조 drift ❌ / MAJOR-2)', () => {
 		const root = mkdtempSync(join(tmpdir(), 'br-diff-bad-'));
-		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const outDir = join(root, '.ai-context', 'output'); mkdirSync(outDir, { recursive: true });
 		writeFileSync(join(outDir, 'business-rules.json'), JSON.stringify({ business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST' }] }));
-		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.aimd/output/business-rules.json', state: 'active' }], edges: [] }));
+		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.ai-context/output/business-rules.json', state: 'active' }], edges: [] }));
 		const r = run(['sync-loop', root, '--graph', graphPath, '--br-diff', 'NOPE', '--dry-run']);
 		assert.equal(r.status, 3, "bad ref/no repo = exit 3");
 		rmSync(root, { recursive: true, force: true });
@@ -336,7 +336,7 @@ describe('carry 1b — sync-loop --git e2e (전 산출물 / BR=per-rule·기타=
 		const root = mkdtempSync(join(tmpdir(), 'git-ao-'));
 		const g = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
 		g(['init', '-q']); g(['config', 'user.email', 't@t']); g(['config', 'user.name', 't']);
-		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const outDir = join(root, '.ai-context', 'output'); mkdirSync(outDir, { recursive: true });
 		const br = (d) => JSON.stringify({ business_rules: [
 			{ id: 'BR-POST-1', bounded_context: 'BC-POST', desc: d },
 			{ id: 'BR-POST-2', bounded_context: 'BC-POST', desc: 'stable' },
@@ -344,10 +344,10 @@ describe('carry 1b — sync-loop --git e2e (전 산출물 / BR=per-rule·기타=
 		writeFileSync(join(outDir, 'business-rules.json'), br('orig'));
 		writeFileSync(join(outDir, 'domain.json'), JSON.stringify({ v: 1 }));
 		const graph = { nodes: [
-			node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.aimd/output/business-rules.json' }),
-			node('analysis-business-rules-BR-POST-1', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-1', source_path: '.aimd/output/business-rules.json' }),
-			node('analysis-business-rules-BR-POST-2', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-2', source_path: '.aimd/output/business-rules.json' }),
-			node('analysis-domain', 'analysis', 'domain', { source_path: '.aimd/output/domain.json' }),
+			node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.ai-context/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-1', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-1', source_path: '.ai-context/output/business-rules.json' }),
+			node('analysis-business-rules-BR-POST-2', 'analysis', 'business-rules', { business_rule_id: 'BR-POST-2', source_path: '.ai-context/output/business-rules.json' }),
+			node('analysis-domain', 'analysis', 'domain', { source_path: '.ai-context/output/domain.json' }),
 			node('BHV-POST-001', 'chain', 'BHV'), node('BHV-POST-002', 'chain', 'BHV'),
 		], edges: [
 			{ source: 'analysis-business-rules-BR-POST-1', target: 'BHV-POST-001', edge_type: 'cross_reference', confidence: 'soft' },
@@ -369,9 +369,9 @@ describe('carry 1b — sync-loop --git e2e (전 산출물 / BR=per-rule·기타=
 	});
 	it('--git + --br-diff 동시 → exit 3 (MAJOR-1)', () => {
 		const root = mkdtempSync(join(tmpdir(), 'git-both-'));
-		const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+		const outDir = join(root, '.ai-context', 'output'); mkdirSync(outDir, { recursive: true });
 		writeFileSync(join(outDir, 'business-rules.json'), JSON.stringify({ business_rules: [{ id: 'BR-1', bounded_context: 'BC-POST' }] }));
-		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.aimd/output/business-rules.json' })], edges: [] }));
+		const graphPath = join(root, 'g.json'); writeFileSync(graphPath, JSON.stringify({ nodes: [node('analysis-business-rules', 'analysis', 'business-rules', { source_path: '.ai-context/output/business-rules.json' })], edges: [] }));
 		const r = run(['sync-loop', root, '--graph', graphPath, '--git', 'HEAD', '--br-diff', 'HEAD', '--dry-run']);
 		assert.equal(r.status, 3, '동시 사용 거부');
 		rmSync(root, { recursive: true, force: true });

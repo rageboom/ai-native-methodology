@@ -15,7 +15,7 @@
  *
  * axis 분리 (chain-driver 결정론 / feedback_chain_driver_deterministic_axis):
  *   본 validator = 결정론 (LLM 판단 inject ❌). manifest 완성도 검사 only —
- *   canonical global (.aimd/output/schema.json) 와의 cross-resolution 은 drift-validator 영역.
+ *   canonical global (.ai-context/output/schema.json) 와의 cross-resolution 은 drift-validator 영역.
  *
  * 입력: work-unit-manifest.json (object)
  * 출력: { passed, summary, findings }

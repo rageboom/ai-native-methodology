@@ -65,7 +65,7 @@ poc-16-efiweb-car-spring41/
 ├── input/                                   # analysis 산출물 (well-known scan)
 ├── aspect/                                  # cross-cutting 4 (a11y/i18n/static-security/legacy)
 ├── findings/poc-findings.md
-└── .aimd/
+└── .ai-context/
     ├── state.json
     └── output/                              # chain artifact (discovery-spec / behavior-spec / acceptance-criteria / artifact-graph 등)
 ```

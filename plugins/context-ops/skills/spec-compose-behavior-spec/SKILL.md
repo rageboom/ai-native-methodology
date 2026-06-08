@@ -15,13 +15,13 @@ chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec` pha
 
 ## 입력
 
-- `<project>/.aimd/output/discovery-spec.json` (chain 1 산출)
-- `<project>/.aimd/output/business-rules.json` + `domain.json` + 7대 산출물
-- `<project>/.aimd/output/formal-spec/state-machines/*.json` + `formal-spec/sequences/*.json` + `formal-spec/decision-tables/*.json` + `formal-spec/invariants/*.ts` (`formal-spec` phase 산출 / formal-spec/ prefix = schema·template convention 정합 S8)
+- `<project>/.ai-context/output/discovery-spec.json` (chain 1 산출)
+- `<project>/.ai-context/output/business-rules.json` + `domain.json` + 7대 산출물
+- `<project>/.ai-context/output/formal-spec/state-machines/*.json` + `formal-spec/sequences/*.json` + `formal-spec/decision-tables/*.json` + `formal-spec/invariants/*.ts` (`formal-spec` phase 산출 / formal-spec/ prefix = schema·template convention 정합 S8)
 
 ## 산출물
 
-- `<project>/.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
+- `<project>/.ai-context/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
 
 > **code_pointers_na 기본** — BHV 는 의도 노드(executable contract) → 코드 anchor 는 하위 IMPL/TC 가 보유. 각 BHV `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 
@@ -69,19 +69,19 @@ Epic = FE 화면 단위 / 본 skill 안에서 Epic 추출 ❌ (plan-decompose-an
    ```bash
    # chain coverage (UC → BHV / BHV → AC) + severe-AP coverage (gate#2 blocking lane / S13)
    node ${CLAUDE_PLUGIN_ROOT}/tools/chain-coverage-validator/src/cli.js \
-     --discovery  .aimd/output/discovery-spec.json \
-     --behavior   .aimd/output/behavior-spec.json \
-     --acceptance .aimd/output/acceptance-criteria.json \
-     --antipatterns .aimd/output/antipatterns.json
+     --discovery  .ai-context/output/discovery-spec.json \
+     --behavior   .ai-context/output/behavior-spec.json \
+     --acceptance .ai-context/output/acceptance-criteria.json \
+     --antipatterns .ai-context/output/antipatterns.json
 
    # behavior chain 2 drift (state-machine + sequence 짝)
-   node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .aimd/output/behavior-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/drift-validator/src/cli.js .ai-context/output/behavior-spec.json
 
    # formal-spec link chain mode
-   node ${CLAUDE_PLUGIN_ROOT}/tools/formal-spec-link-validator/src/cli.js .aimd/output/ --chain-mode
+   node ${CLAUDE_PLUGIN_ROOT}/tools/formal-spec-link-validator/src/cli.js .ai-context/output/ --chain-mode
 
    # decision-table 5-check
-   node ${CLAUDE_PLUGIN_ROOT}/tools/decision-table-validator/src/cli.js .aimd/output/formal-spec/decision-tables/
+   node ${CLAUDE_PLUGIN_ROOT}/tools/decision-table-validator/src/cli.js .ai-context/output/formal-spec/decision-tables/
    ```
 
 7. **gate #2 호출** — `_base-invoke-go-stop-gate` skill (cluster 5~6).

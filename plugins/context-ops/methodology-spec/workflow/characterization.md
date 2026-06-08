@@ -117,7 +117,7 @@ output/characterization/
 
 ```bash
 node tools/characterization-coverage-validator/src/cli.js \
-  --target .aimd/output/characterization/ \
+  --target .ai-context/output/characterization/ \
   --threshold 0.80
 ```
 
@@ -135,7 +135,7 @@ node tools/characterization-coverage-validator/src/cli.js \
 ### 5.2 schema 검증 — schema-validator (Ajv 8 strict)
 
 ```bash
-node tools/schema-validator/src/cli.js .aimd/output/characterization/
+node tools/schema-validator/src/cli.js .ai-context/output/characterization/
 ```
 
 `schemas/characterization-spec.schema.json` (30번째 schema) — 4 sub-schema (snapshot + scenario + intentVsBug + coverage) + if/then 강제.

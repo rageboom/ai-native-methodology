@@ -51,7 +51,7 @@ const CHAIN = {
 
 function makeFixture(files) {
 	const root = mkdtempSync(join(tmpdir(), 'aimd-resync-'));
-	const out = join(root, '.aimd', 'output');
+	const out = join(root, '.ai-context', 'output');
 	mkdirSync(out, { recursive: true });
 	for (const [fname, data] of Object.entries(files)) {
 		writeFileSync(join(out, fname), JSON.stringify(data, null, 2) + '\n');
@@ -87,7 +87,7 @@ describe('resync-graph (A-lazy-cmd — Loop A lazy 재합성)', () => {
 		assert.equal(r.status, 0, `stderr: ${r.stderr}`);
 		assert.match(r.stderr, /재합성: 5\/6 stage/); // watch-item #1 coverage 노출
 		assert.match(r.stderr, /신규\(carry-over 없음\)/); // 최초 = previous-graph 없음
-		const graphPath = join(root, '.aimd', 'output', 'artifact-graph.json');
+		const graphPath = join(root, '.ai-context', 'output', 'artifact-graph.json');
 		assert.ok(existsSync(graphPath), 'artifact-graph.json 생성됨');
 		const g = JSON.parse(readFileSync(graphPath, 'utf-8'));
 		const ids = g.nodes.map((n) => n.id);
@@ -116,7 +116,7 @@ describe('resync-graph (A-lazy-cmd — Loop A lazy 재합성)', () => {
 		assert.match(r.stderr, /behavior-spec\.json/);
 		assert.match(r.stderr, /migration-start = 엣지 0/); // DEC-2026-06-03 §1.1 정직 안내
 		assert.ok(
-			!existsSync(join(root, '.aimd', 'output', 'artifact-graph.json')),
+			!existsSync(join(root, '.ai-context', 'output', 'artifact-graph.json')),
 			'write 안 함',
 		);
 	});
@@ -128,7 +128,7 @@ describe('resync-graph (A-lazy-cmd — Loop A lazy 재합성)', () => {
 		assert.equal(r.status, 0);
 		assert.match(r.stdout, /\(dry-run\) 재합성 예정: 5\/6 stage/);
 		assert.ok(
-			!existsSync(join(root, '.aimd', 'output', 'artifact-graph.json')),
+			!existsSync(join(root, '.ai-context', 'output', 'artifact-graph.json')),
 			'dry-run = write 안 함',
 		);
 	});

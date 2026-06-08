@@ -1,0 +1,13 @@
+{
+  "$schema_origin": "test-cmd.schema.json",
+  "framework": "vitest",
+  "framework_version": "3.2.4",
+  "test_cmd": "pnpm",
+  "test_cmd_args": ["exec", "vitest", "run", "test/modules/post/post.service.test.ts", "--reporter=json", "--outputFile=.ai-context/evidence/vitest-report.json"],
+  "report_format": "json",
+  "report_path": ".ai-context/evidence/vitest-report.json",
+  "stdout_path": ".ai-context/evidence/test-stdout.txt",
+  "stderr_path": ".ai-context/evidence/test-stderr.txt",
+  "allow_execute": true,
+  "timeout_ms": 180000
+}

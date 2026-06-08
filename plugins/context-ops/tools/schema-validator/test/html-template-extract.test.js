@@ -52,7 +52,7 @@ function validInstance() {
 			tool_version: '10.4.1',
 			command_line:
 				'sonar-scanner -Dsonar.projectKey=legacy-jsp-app -Dsonar.sources=src/main/webapp',
-			output_path: '.aimd/legacy-jsp-app/planning/sonar-output.json',
+			output_path: '.ai-context/legacy-jsp-app/planning/sonar-output.json',
 			exit_code: 0,
 		},
 		scriptlet_findings: [

@@ -16,9 +16,9 @@ v11.0.0 chain harness 의 **chain 1 (discovery → spec) gate #1 validator**. `d
 
 ```bash
 node src/cli.js \
-  --discovery .aimd/output/discovery-spec.json \
-  --rules .aimd/output/business-rules.json \
-  --domain .aimd/output/domain.json \
+  --discovery .ai-context/output/discovery-spec.json \
+  --rules .ai-context/output/business-rules.json \
+  --domain .ai-context/output/domain.json \
   [--dry-run] [--json]
 ```
 

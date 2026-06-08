@@ -1,0 +1,40 @@
+{
+  "scope": "core",
+  "status": "pending",
+  "current_stage": "impl",
+  "analysis_refs": {
+    "rules": [
+      "BR-PMT-EQUATION-001",
+      "BR-PMT-ZERORATE-001",
+      "BR-AMORT-DECOMPOSE-001",
+      "BR-IPMT-BALANCE-001",
+      "BR-IPMT-BEGINFIRST-001",
+      "BR-WHEN-CONVENTION-001"
+    ],
+    "endpoints": [],
+    "schemas": [],
+    "domain": [
+      "BC-AMORTIZATION"
+    ],
+    "antipatterns": [
+      "AP-MAINTAINABILITY-001",
+      "AP-MAINTAINABILITY-002",
+      "AP-TESTABILITY-001"
+    ],
+    "artifacts": {
+      "analysis-output-dir": ".ai-context/output",
+      "business-rules": ".ai-context/output/business-rules.json",
+      "domain": ".ai-context/output/domain.json",
+      "antipatterns": ".ai-context/output/antipatterns.json"
+    }
+  },
+  "sync_state": {
+    "last_synced_at": null,
+    "sync_sources": [],
+    "dependents": [],
+    "drift_detected": false
+  },
+  "scenario": "S1",
+  "created_at": "2026-06-06T12:51:18.102Z",
+  "updated_at": "2026-06-06T13:09:02.279Z"
+}

@@ -28,7 +28,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.aimd/output/i18n-spec.json`
+`<user-project>/.ai-context/output/i18n-spec.json`
 
 ## 인용
 

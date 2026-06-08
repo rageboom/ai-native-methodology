@@ -463,7 +463,7 @@ describe('synthesizeGraph — node/edge 구성', () => {
 			use_cases: [{ id: 'UC-B' }, { id: 'UC-A' }], // anchor = UC-A (정렬 첫)
 			cross_links: {
 				to_analysis_artifacts: [
-					'.aimd/output/domain.json',
+					'.ai-context/output/domain.json',
 					'schema.json',
 					'state-map.json',
 				],

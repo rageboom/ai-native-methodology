@@ -34,7 +34,7 @@ grep -rn "downloadAttachment\|saveAttachment\|openAttachment" client/src/
 
 ## 산출물
 
-`.aimd/output/rn-screen-scan.json`:
+`.ai-context/output/rn-screen-scan.json`:
 
 ```json
 {

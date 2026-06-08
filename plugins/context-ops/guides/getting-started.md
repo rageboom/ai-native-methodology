@@ -118,7 +118,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 - "비즈니스 규칙 의미 일관성 검증" → `analysis-br-cross-consistency-check` (v2.5 신규 / Layer 2 LLM)
 - "antipattern 정리" → `analysis-quality-antipattern`
 
-각 phase 종결 시 산출물 `<project>/.aimd/output/` 에 .json 단독 SSOT (v12 ADR-011 / 시각화는 view-time 도구).
+각 phase 종결 시 산출물 `<project>/.ai-context/output/` 에 .json 단독 SSOT (v12 ADR-011 / 시각화는 view-time 도구).
 
 자세한 prompt → skill 매핑 = [first-prompt-cookbook.md](./first-prompt-cookbook.md).
 
@@ -129,7 +129,7 @@ v2.0 paradigm 핵심 / v2.5 chain 1 gate Layer 2 LLM 통합.
 ```bash
 # 5-1. chain-driver init (1분)
 node tools/chain-driver/src/cli.js init <project>
-# → .aimd/state.json 생성 / 첫 stage = analysis (chain 1 진입 전)
+# → .ai-context/state.json 생성 / 첫 stage = analysis (chain 1 진입 전)
 ```
 
 ```

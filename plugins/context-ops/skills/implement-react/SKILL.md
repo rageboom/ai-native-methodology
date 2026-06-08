@@ -18,10 +18,10 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 입력
 
-- `<project>/.aimd/output/test-spec.json` (TC-\* + source_file path)
-- `<project>/.aimd/output/behavior-spec.json` (BHV-\* contract)
-- `<project>/.aimd/output/acceptance-criteria.json` (AC-\* Gherkin)
-- `<project>/.aimd/output/inventory.json` (stack signals)
+- `<project>/.ai-context/output/test-spec.json` (TC-\* + source_file path)
+- `<project>/.ai-context/output/behavior-spec.json` (BHV-\* contract)
+- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* Gherkin)
+- `<project>/.ai-context/output/inventory.json` (stack signals)
 - `<project>/package.json` (react 버전 확인 / 19.x 의무)
 
 ## 산출물
@@ -29,7 +29,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 - `src/**/*.{tsx,jsx}` (component)
 - `src/**/*.hook.ts` (custom hook)
 - `src/**/*.context.tsx` (Context Provider)
-- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "react-19"` — schema modules.items.framework 필드)
+- `<project>/.ai-context/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "react-19"` — schema modules.items.framework 필드)
 
 ## paradigm (React 19 / research 흡수)
 

@@ -24,8 +24,8 @@
   ],
   "cross_ref_files_updated": [
     "input/rules.json",
-    ".aimd/output/planning-spec.json",
-    ".aimd/output/planning-spec.md",
+    ".ai-context/output/planning-spec.json",
+    ".ai-context/output/planning-spec.md",
     "characterization/coverage.json",
     "characterization/intent-vs-bug.md",
     "characterization/snapshots/UC-CAPITAL-001-comBasicInfo.json",

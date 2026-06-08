@@ -46,17 +46,17 @@ function makeGraph(synthesizedAt) {
 	};
 }
 
-// fixture 프로젝트 생성: .aimd/state.json + .aimd/output/artifact-graph.json + src/a.json(mtime=now).
+// fixture 프로젝트 생성: .ai-context/state.json + .ai-context/output/artifact-graph.json + src/a.json(mtime=now).
 function makeFixture(synthesizedAt) {
 	const root = mkdtempSync(join(tmpdir(), 'aimd-fresh-'));
-	mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+	mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
 	mkdirSync(join(root, 'src'), { recursive: true });
 	writeFileSync(
-		join(root, '.aimd', 'state.json'),
+		join(root, '.ai-context', 'state.json'),
 		JSON.stringify({ version: 1 }) + '\n',
 	);
 	writeFileSync(
-		join(root, '.aimd', 'output', 'artifact-graph.json'),
+		join(root, '.ai-context', 'output', 'artifact-graph.json'),
 		JSON.stringify(makeGraph(synthesizedAt), null, 2) + '\n',
 	);
 	writeFileSync(join(root, 'src', 'a.json'), '{}\n'); // mtime = now → synthesized_at 과거면 stale

@@ -94,9 +94,9 @@ describe('hooks-contract', () => {
 describe('hooks-contract — SessionStart unbaselined surface (② honest)', () => {
 	function setup() {
 		const root = mkdtempSync(join(tmpdir(), 'unbaselined-'));
-		runCli(['init', root]); // .aimd/state.json
-		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
-		writeFileSync(join(root, '.aimd', 'output', 'domain.json'), '{}'); // canonical 존재
+		runCli(['init', root]); // .ai-context/state.json
+		mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
+		writeFileSync(join(root, '.ai-context', 'output', 'domain.json'), '{}'); // canonical 존재
 		ensureScopeDir(root, 'scope-a');
 		writeManifest(root, 'scope-a', null, {
 			scope: 'scope-a',
@@ -131,8 +131,8 @@ describe('hooks-contract — SessionStart unbaselined surface (② honest)', () 
 	it('cmdSync first-touch 가 absent sync_sources 도 baseline (Senior BLOCKER-1 (B) 회귀)', () => {
 		const root = mkdtempSync(join(tmpdir(), 'unbaselined-absent-'));
 		runCli(['init', root]);
-		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
-		writeFileSync(join(root, '.aimd', 'output', 'domain.json'), '{}');
+		mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
+		writeFileSync(join(root, '.ai-context', 'output', 'domain.json'), '{}');
 		ensureScopeDir(root, 'scope-a');
 		writeManifest(root, 'scope-a', null, { scope: 'scope-a', status: 'active', sync_state: { drift_detected: false } }); // sync_sources absent
 		const before = sessionStart(root);

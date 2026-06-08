@@ -38,7 +38,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .aimd/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — mcp__wiki-jira-assistant__.* (jira-confluence MCP) 호출도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
+            "$comment": "ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .ai-context/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — mcp__wiki-jira-assistant__.* (jira-confluence MCP) 호출도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
           }
         ]
       }
@@ -50,7 +50,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.aimd/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
+            "$comment": "dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.ai-context/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
           }
         ]
       }

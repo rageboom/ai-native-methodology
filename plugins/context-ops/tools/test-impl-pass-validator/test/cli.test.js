@@ -29,7 +29,7 @@ function runCli(args, env = {}) {
 
 function setupProject() {
 	const dir = mkdtempSync(join(tmpdir(), 'tipv-'));
-	mkdirSync(join(dir, '.aimd', 'config'), { recursive: true });
+	mkdirSync(join(dir, '.ai-context', 'config'), { recursive: true });
 	return dir;
 }
 
@@ -51,7 +51,7 @@ test('load-test-cmd — config 우선 (config:path source)', () => {
 			allow_execute: false,
 		};
 		writeFileSync(
-			join(dir, '.aimd', 'config', 'test-cmd.json'),
+			join(dir, '.ai-context', 'config', 'test-cmd.json'),
 			JSON.stringify(cfg),
 		);
 		const r = loadTestCmd({ sourceProjectDir: dir });
@@ -83,7 +83,7 @@ test('CLI — --allow-execute 부재 + --dry-run 부재 → exit 2', () => {
 			test_cmd_args: ['ok'],
 		};
 		writeFileSync(
-			join(dir, '.aimd', 'config', 'test-cmd.json'),
+			join(dir, '.ai-context', 'config', 'test-cmd.json'),
 			JSON.stringify(cfg),
 		);
 		const r = runCli(['--project', dir]);
@@ -107,7 +107,7 @@ test('CLI — --dry-run → exit 0 (allow-execute 부재 OK)', () => {
 			test_cmd_args: ['ok'],
 		};
 		writeFileSync(
-			join(dir, '.aimd', 'config', 'test-cmd.json'),
+			join(dir, '.ai-context', 'config', 'test-cmd.json'),
 			JSON.stringify(cfg),
 		);
 		const r = runCli(['--project', dir, '--dry-run', '--json']);
@@ -170,7 +170,7 @@ function setupS2(dir, jestOut) {
 		test_cmd_args: ['-e', jestRunnerScript(jestOut)],
 	};
 	writeFileSync(
-		join(dir, '.aimd', 'config', 'test-cmd.json'),
+		join(dir, '.ai-context', 'config', 'test-cmd.json'),
 		JSON.stringify(cfg),
 	);
 	const specPath = join(dir, 'test-spec.json');
@@ -297,7 +297,7 @@ test('F-I05 — --scenario 부재 → outcome_mismatches 필드 omit (S1 backwar
 			test_cmd_args: ['-e', jestRunnerScript(jestOut)],
 		};
 		writeFileSync(
-			join(dir, '.aimd', 'config', 'test-cmd.json'),
+			join(dir, '.ai-context', 'config', 'test-cmd.json'),
 			JSON.stringify(cfg),
 		);
 		const r = runCli(['--project', dir, '--allow-execute', '--json']);

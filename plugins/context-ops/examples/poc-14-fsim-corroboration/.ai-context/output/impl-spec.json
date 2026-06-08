@@ -1,0 +1,105 @@
+{
+  "meta": {
+    "generated_at": "2026-05-18T16:35:00Z",
+    "methodology_version": "v8.3.0",
+    "inputs_used": ["source_code", "design_specs", "test_code"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "test_spec_path": ".ai-context/output/test-spec.json",
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
+  },
+  "modules": [
+    {
+      "id": "IMPL-USER-FSIM-001",
+      "tc_refs": ["TC-USER-FSIM-001"],
+      "bhv_refs": ["BHV-USER-FSIM-001"],
+      "framework": "pure-python-3.14",
+      "source_files": [
+        "target/src/user_service.py",
+        "target/src/user_store.py"
+      ],
+      "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
+      "source_evidence": "UserService.register — store.find_by_email check + raises EmailDuplicateError. AP-FSIM-DATA-001 fix."
+    },
+    {
+      "id": "IMPL-USER-FSIM-002",
+      "tc_refs": ["TC-USER-FSIM-002"],
+      "bhv_refs": ["BHV-USER-FSIM-002"],
+      "framework": "pure-python-3.14",
+      "source_files": [
+        "target/src/user_service.py",
+        "target/src/user_store.py"
+      ],
+      "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
+      "source_evidence": "UserService.login — find_by_email + plaintext compare (AP-FSIM-SEC-001 carry) + secrets.token_urlsafe."
+    },
+    {
+      "id": "IMPL-TODO-FSIM-001",
+      "tc_refs": ["TC-TODO-FSIM-001"],
+      "bhv_refs": ["BHV-TODO-FSIM-001"],
+      "framework": "pure-python-3.14",
+      "source_files": [
+        "target/src/todo_service.py",
+        "target/src/todo_store.py"
+      ],
+      "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
+      "source_evidence": "TodoService.create — title 1~200 검증 + store.add(user_id=user.id)."
+    },
+    {
+      "id": "IMPL-TODO-FSIM-002",
+      "tc_refs": ["TC-TODO-FSIM-002"],
+      "bhv_refs": ["BHV-TODO-FSIM-002"],
+      "framework": "pure-python-3.14",
+      "source_files": [
+        "target/src/todo_service.py",
+        "target/src/todo_store.py"
+      ],
+      "commit_hash": "8e83c6fd69198c20b5d8d8df34dfb4cedf3feb4a",
+      "source_evidence": "TodoService._get_for_user — todo.user_id != user.id 시 None / update 에서 TodoNotFoundError raise."
+    }
+  ],
+  "test_pass_evidence": {
+    "test_runner_version": "pytest 9.0.3",
+    "test_runner_stdout_path": ".ai-context/output/evidence/pytest-green.json",
+    "test_runner_stderr_path": ".ai-context/output/evidence/pytest-green.json",
+    "invocation_timestamp": "2026-05-18T16:33:00Z",
+    "duration_ms": 30,
+    "pass_count": 7,
+    "fail_count": 0,
+    "skip_count": 0,
+    "reproduction_command": "cd target && python -m pytest tests/ --json-report",
+    "result_hash": "sha256:47dbad627265e8c026d6712779bb59a92d7b80e050eed1706e40d45964d5878c",
+    "report_format": "pytest_json",
+    "flaky_retries_count": 0
+  },
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1.0,
+      "by_business_rule": 1.0,
+      "by_use_case": 1.0,
+      "threshold": 0.85,
+      "severity_floor": {
+        "critical": 1.0,
+        "high": 1.0,
+        "medium": 1.0,
+        "low": 1.0
+      }
+    },
+    "test_pass_rate": 1.0,
+    "line_coverage": 0.92,
+    "branch_coverage": 0.88
+  },
+  "human_review": {
+    "gate_4_intervention_pct": 0.10,
+    "intervention_log": [
+      "gate-4 user-decision: go (5종 물증 7 필드 정합 / commit 8e83c6f / 7/7 pytest pass / F-SIM-001 lane self-bootstrap pass)"
+    ]
+  },
+  "chain_attempt": {
+    "attempt_n": 1,
+    "retry_cap": 3,
+    "revisit_count": 0
+  }
+}

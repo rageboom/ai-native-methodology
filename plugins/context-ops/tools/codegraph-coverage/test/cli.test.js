@@ -33,12 +33,12 @@ function run(args) {
 	return spawnSync(process.execPath, [CLI, ...args], { encoding: 'utf-8' });
 }
 
-// 완전한 fixture 프로젝트: .codegraph/codegraph.db + .aimd/output/{inventory,impl-spec,acceptance-criteria}.json
+// 완전한 fixture 프로젝트: .codegraph/codegraph.db + .ai-context/output/{inventory,impl-spec,acceptance-criteria}.json
 function makeProject(base) {
 	const sqlite = sqliteOrSkip();
 	const root = mkdtempSync(join(base, 'proj-'));
 	mkdirSync(join(root, '.codegraph'), { recursive: true });
-	mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+	mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
 	const dbPath = join(root, '.codegraph', 'codegraph.db');
 	const db = new sqlite.DatabaseSync(dbPath);
 	db.exec(
@@ -90,7 +90,7 @@ function makeProject(base) {
 		'()',
 	); // hole
 	db.close();
-	const out = join(root, '.aimd', 'output');
+	const out = join(root, '.ai-context', 'output');
 	writeFileSync(
 		join(out, 'inventory.json'),
 		JSON.stringify({
@@ -126,8 +126,8 @@ describe('cli — real spawn (no-simulation)', () => {
 
 	it('codegraph DB 부재 = exit 3 (정직 신호 / 날조 ❌)', () => {
 		const empty = mkdtempSync(join(base, 'nodb-'));
-		mkdirSync(join(empty, '.aimd', 'output'), { recursive: true });
-		writeFileSync(join(empty, '.aimd', 'output', 'inventory.json'), '{}');
+		mkdirSync(join(empty, '.ai-context', 'output'), { recursive: true });
+		writeFileSync(join(empty, '.ai-context', 'output', 'inventory.json'), '{}');
 		const r = run(['--target', empty]);
 		assert.equal(r.status, 3);
 		assert.match(r.stderr, /codegraph DB unavailable|no-simulation/);

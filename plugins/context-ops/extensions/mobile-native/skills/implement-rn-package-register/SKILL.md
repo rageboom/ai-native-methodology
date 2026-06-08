@@ -20,7 +20,7 @@ Android `MainApplication.java` / `MainApplication.kt`에 ReactPackage 등록 자
 
 ## 입력
 
-- `.aimd/output/rn-native-bridge-inventory.json`의 `missing_registrations[]`
+- `.ai-context/output/rn-native-bridge-inventory.json`의 `missing_registrations[]`
 - `MainApplication.java` / `MainApplication.kt` 현재 내용
 
 ## 처리 절차

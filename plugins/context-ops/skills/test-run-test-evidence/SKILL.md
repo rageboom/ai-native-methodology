@@ -16,16 +16,16 @@ chain 4 + chain 5 의 **횡단 evidence skill**. test-impl-pass-validator 진짜
 
 ## 입력
 
-- `<project>/.aimd/output/test-spec.json` (chain 4 산출)
-- `<project>/.aimd/output/impl-spec.json` (chain 5 진행 중) — 있으면
-- `<project>/.aimd/config/test-cmd.json` — 있으면 우선
-- `<project>/.aimd/output/inventory.json` (stack_signals 추론 fallback)
+- `<project>/.ai-context/output/test-spec.json` (chain 4 산출)
+- `<project>/.ai-context/output/impl-spec.json` (chain 5 진행 중) — 있으면
+- `<project>/.ai-context/config/test-cmd.json` — 있으면 우선
+- `<project>/.ai-context/output/inventory.json` (stack_signals 추론 fallback)
 
 ## 산출
 
-- `<project>/.aimd/output/evidence/test-invocation-evidence.json` (runner standalone 산출물 — test-spec 필드 아님)
-- `<project>/.aimd/output/evidence/test-stdout.txt` + `test-stderr.txt`
-- `<project>/.aimd/output/evidence/test-report.{sarif,xml,json}` (framework 별)
+- `<project>/.ai-context/output/evidence/test-invocation-evidence.json` (runner standalone 산출물 — test-spec 필드 아님)
+- `<project>/.ai-context/output/evidence/test-stdout.txt` + `test-stderr.txt`
+- `<project>/.ai-context/output/evidence/test-report.{sarif,xml,json}` (framework 별)
 - `test-spec.json` 의 `test_cases[].test_run_evidence` per-TC 채움 / chain 5 시 `impl-spec.json` root `test_pass_evidence` (schema 정식 필드 / top-level `test_invocation_evidence` ❌ = test-spec.schema `additionalProperties:false` 금지)
 
 ## 절차
@@ -45,8 +45,8 @@ chain 4 + chain 5 의 **횡단 evidence skill**. test-impl-pass-validator 진짜
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory <project>/.aimd/output/inventory.json \
-  --out <project>/.aimd/output/evidence/test-invocation-evidence.json \
+  --inventory <project>/.ai-context/output/inventory.json \
+  --out <project>/.ai-context/output/evidence/test-invocation-evidence.json \
   --allow-execute \
   --json
 ```
@@ -58,7 +58,7 @@ S2(AX전환 / use-scenario taxonomy) per-TC outcome 검사 시 추가 flag (char
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> --allow-execute \
-  --scenario S2 --test-spec <project>/.aimd/output/test-spec.json \
+  --scenario S2 --test-spec <project>/.ai-context/output/test-spec.json \
   --json
 ```
 
@@ -78,8 +78,8 @@ test-impl-pass-validator 산출 evidence 를 test-spec.json 의 `test_cases[].te
 			"id": "TC-USER-001",
 			"test_run_evidence": {
 				"test_runner_version": "jest 29.7.0",
-				"test_runner_stdout_path": ".aimd/output/evidence/test-stdout.txt",
-				"test_runner_stderr_path": ".aimd/output/evidence/test-stderr.txt",
+				"test_runner_stdout_path": ".ai-context/output/evidence/test-stdout.txt",
+				"test_runner_stderr_path": ".ai-context/output/evidence/test-stderr.txt",
 				"invocation_timestamp": "2026-05-06T11:30:00Z",
 				"duration_ms": 3210,
 				"pass_count": 47,
@@ -98,14 +98,14 @@ test-impl-pass-validator 산출 evidence 를 test-spec.json 의 `test_cases[].te
 ### 5. schema-validator 회귀
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/test-spec.json
-node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/impl-spec.json  # chain 5
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/test-spec.json
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/impl-spec.json  # chain 5
 ```
 
 ### 6. lint-no-simulation chain-strict
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.ai-context/output/ --chain-strict
 ```
 
 chain 5 시 strict 모드 의무 (evidence 10 필드 — `test_run_evidence`/`test_pass_evidence`/legacy `test_invocation_evidence` 모두 인식 + impl-spec source_files commit_hash 자동 검증 / sub-plan-3a §static-runner chain mode).

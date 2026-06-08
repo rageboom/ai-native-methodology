@@ -19,7 +19,7 @@ chain harness 의 **gate UX skill**. 매 chain stage (1=planning / 2=spec / 3=te
 ## 절차
 
 1. **gate 입력 수집**:
-   - 본 stage 산출물 path (예: `.aimd/output/discovery-spec.json`)
+   - 본 stage 산출물 path (예: `.ai-context/output/discovery-spec.json`)
    - validator 결과 (finding 목록 / coverage / 임계 위반)
    - traceability-matrix 현 상태 (forward_coverage / red_count)
 
@@ -53,7 +53,7 @@ chain harness 의 **gate UX skill**. 매 chain stage (1=planning / 2=spec / 3=te
    - `stop` → sprint 중단 / 사용자 carry 등재.
    - `revisit:<stage>` → 임의 stage jump (chain harness gate 안 round-trip 정식 허용).
 
-4. **intervention_log 기록** (`<project>/.aimd/output/chain-intervention-log.jsonl`):
+4. **intervention_log 기록** (`<project>/.ai-context/output/chain-intervention-log.jsonl`):
 
    ```jsonl
    {

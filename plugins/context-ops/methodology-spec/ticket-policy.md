@@ -202,7 +202,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 				"from_status": "To Do",
 				"to_status": "In Progress",
 				"mcp_tool": "mcp__wiki-jira-assistant__jira_transition",
-				"evidence_ref": ".aimd/output/evidence/ticket-sync-spec-20260518T150000.json"
+				"evidence_ref": ".ai-context/output/evidence/ticket-sync-spec-20260518T150000.json"
 			},
 			{
 				"transitioned_at": "2026-05-18T16:30:00+09:00",

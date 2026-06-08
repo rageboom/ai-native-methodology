@@ -30,7 +30,7 @@ const POC05 = join(
 	'..',
 	'examples',
 	'poc-05-sample-user-register',
-	'.aimd',
+	'.ai-context',
 	'output',
 );
 
@@ -339,8 +339,8 @@ describe('route-discovery e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('durable write: route <project> → state.json regen_queue', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'route-w-'));
 		try {
-			mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-			const g = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+			mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+			const g = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 			copyFileSync(join(POC05, 'artifact-graph.json'), g);
 			assert.equal(run(['init', tmp]).status, 0);
 			const { status, out } = runJson([
@@ -357,7 +357,7 @@ describe('route-discovery e2e (no-simulation / poc-05 실 fixture)', () => {
 			assert.equal(status, 0);
 			assert.equal(out.written, true);
 			const state = JSON.parse(
-				readFileSync(join(tmp, '.aimd', 'state.json'), 'utf-8'),
+				readFileSync(join(tmp, '.ai-context', 'state.json'), 'utf-8'),
 			);
 			assert.deepEqual(state.regen_queue.items, out.regen_queue.items);
 			assert.equal(state.regen_queue.source, 'discovery-route');
@@ -369,8 +369,8 @@ describe('route-discovery e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('clobber 가드: in-progress 큐에 route → exit 2 / --force 교체', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'route-c-'));
 		try {
-			mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-			const g = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+			mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+			const g = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 			copyFileSync(join(POC05, 'artifact-graph.json'), g);
 			run(['init', tmp]);
 			// seed + 부분 소비 → in-progress

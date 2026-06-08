@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "generated_at": "2026-05-18T16:15:00Z",
+    "methodology_version": "v8.3.0",
+    "inputs_used": ["source_code", "domain_context_md", "design_specs"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json",
+    "analysis_artifacts": [
+      "output/rules/business-rules.json",
+      "output/domain/domain.json",
+      "output/antipatterns/antipatterns.json"
+    ]
+  },
+  "behaviors": [
+    {
+      "id": "BHV-USER-FSIM-001",
+      "name": "신규 사용자 등록 동작",
+      "description": "email + password 입력 시 신규 user 생성. 이메일 중복 시 409 / pwd<8자 시 422.",
+      "use_case_refs": ["UC-USER-FSIM-001"],
+      "br_refs": ["BR-USER-DATA-FSIM-001", "BR-USER-VALIDATION-FSIM-001"],
+      "preconditions": ["request.email is valid email", "request.password is non-empty string"],
+      "postconditions": [
+        "userStore.size == userStore.size@pre + 1 (success)",
+        "returns User with assigned id (success)"
+      ],
+      "invariants": ["no two users share the same email"],
+      "acceptance_criteria_refs": ["AC-USER-FSIM-001"],
+      "source_grounded_evidence": ["source/main.py:21-24"]
+    },
+    {
+      "id": "BHV-USER-FSIM-002",
+      "name": "로그인 동작",
+      "description": "email + password 일치 시 JWT 발급 / 불일치 시 401.",
+      "use_case_refs": ["UC-USER-FSIM-002"],
+      "br_refs": [],
+      "preconditions": ["request.email + password non-empty"],
+      "postconditions": ["returns AuthToken (match) / 401 (mismatch)"],
+      "invariants": [],
+      "acceptance_criteria_refs": ["AC-USER-FSIM-002"],
+      "source_grounded_evidence": ["source/main.py:27-35"]
+    },
+    {
+      "id": "BHV-TODO-FSIM-001",
+      "name": "Todo 생성 동작",
+      "description": "인증 사용자가 title (+body+due_date) 제공 시 본인 todo 1건 생성.",
+      "use_case_refs": ["UC-TODO-FSIM-001"],
+      "br_refs": ["BR-TODO-VALIDATION-FSIM-001"],
+      "preconditions": ["JWT bearer 유효", "title 1~200자"],
+      "postconditions": ["todos.count(user_id=user.id) += 1"],
+      "invariants": [],
+      "acceptance_criteria_refs": ["AC-TODO-FSIM-001"],
+      "source_grounded_evidence": ["source/main.py:46-52"]
+    },
+    {
+      "id": "BHV-TODO-FSIM-002",
+      "name": "Todo 수정 (소유자만) 동작",
+      "description": "본인 todo 만 update. 타인 todo 시 변경 ❌.",
+      "use_case_refs": ["UC-TODO-FSIM-002"],
+      "br_refs": ["BR-TODO-OWNERSHIP-FSIM-001"],
+      "preconditions": ["JWT bearer + todo_id 존재"],
+      "postconditions": [
+        "본인 소유 시 변경 + 200",
+        "타인 소유 시 변경 ❌ + 404"
+      ],
+      "invariants": ["todo.user_id 만 update 가능"],
+      "acceptance_criteria_refs": ["AC-TODO-FSIM-002"],
+      "source_grounded_evidence": ["source/todos.py:30-45"]
+    }
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      "output/rules/business-rules.json",
+      "output/domain/domain.json",
+      "output/antipatterns/antipatterns.json",
+      "output/inventory/inventory.json",
+      "output/architecture/architecture.json"
+    ]
+  }
+}

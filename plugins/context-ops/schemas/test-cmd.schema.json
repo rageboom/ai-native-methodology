@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/test-cmd.schema.json",
   "title": "Test Command Contract (ADR-CHAIN-004 §1)",
-  "description": "v2.0 sub-plan-3b — `.aimd/config/test-cmd.json` 사용자 명시 contract. ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) §1 정합. test-impl-pass-validator 가 본 contract 를 single source 로 참조하여 진짜 runner shell 호출.",
+  "description": "v2.0 sub-plan-3b — `.ai-context/config/test-cmd.json` 사용자 명시 contract. ADR-CHAIN-004 (Test Runner Invocation Contract / Aider 패턴) §1 정합. test-impl-pass-validator 가 본 contract 를 single source 로 참조하여 진짜 runner shell 호출.",
   "type": "object",
   "required": ["framework", "test_cmd"],
   "additionalProperties": false,
@@ -71,12 +71,12 @@
     },
     "stdout_path": {
       "type": "string",
-      "default": ".aimd/output/evidence/test-stdout.txt",
+      "default": ".ai-context/output/evidence/test-stdout.txt",
       "description": "stdout 캡처 경로. test_invocation_evidence.test_runner_stdout_path 에 매핑 (5종 물증 의무 필드)"
     },
     "stderr_path": {
       "type": "string",
-      "default": ".aimd/output/evidence/test-stderr.txt",
+      "default": ".ai-context/output/evidence/test-stderr.txt",
       "description": "stderr 캡처 경로. test_invocation_evidence.test_runner_stderr_path 에 매핑 (B5 optional)"
     },
     "coverage_report_path": {
@@ -112,7 +112,7 @@
     },
     "working_directory": {
       "type": "string",
-      "description": "test 실행 cwd. 부재 시 .aimd/config/test-cmd.json 위치의 부모 디렉토리"
+      "description": "test 실행 cwd. 부재 시 .ai-context/config/test-cmd.json 위치의 부모 디렉토리"
     }
   },
   "allOf": [

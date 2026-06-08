@@ -14,9 +14,9 @@ v2.0 chain harness 의 **chain 2 (spec → test) gate #2 validator**. `behavior-
 
 ```bash
 node src/cli.js \
-  --discovery .aimd/output/discovery-spec.json \
-  --behavior .aimd/output/behavior-spec.json \
-  --acceptance .aimd/output/acceptance-criteria.json \
+  --discovery .ai-context/output/discovery-spec.json \
+  --behavior .ai-context/output/behavior-spec.json \
+  --acceptance .ai-context/output/acceptance-criteria.json \
   [--threshold 0.85] [--dry-run] [--json]
 ```
 

@@ -50,7 +50,7 @@ paradigm modernization 시 ceiling 돌파: PoC #08 MyBatis 3 = 66.7% / PoC #09 N
 
 ```
 $ node tools/planning-extraction-validator/src/cli.js \
-    --planning examples/poc-11-efiweb-billing-spring41/.aimd/output/planning-spec.json \
+    --planning examples/poc-11-efiweb-billing-spring41/.ai-context/output/planning-spec.json \
     --rules examples/poc-11-efiweb-billing-spring41/input/rules.json \
     --domain examples/poc-11-efiweb-billing-spring41/input/domain.json
 [planning-extraction-validator] 0 findings (critical: 0, high: 0)
@@ -167,7 +167,7 @@ carry_flags total: 8
 
 ## 8. ratchet baseline write (v2.1.1 + v2.3.1 mirror)
 
-- `examples/poc-11-efiweb-billing-spring41/.aimd/baseline/characterization-coverage.json` ✅ write (ratchet 100% / 사내 PoC 3번째)
+- `examples/poc-11-efiweb-billing-spring41/.ai-context/baseline/characterization-coverage.json` ✅ write (ratchet 100% / 사내 PoC 3번째)
 - SQL Inventory baseline = `extraction_automation.auto_ratio_baseline: 0.667` / trend: stable (3 사내 PoC robust)
 
 ---
@@ -222,7 +222,7 @@ carry_flags total: 8
 | ------------------------------------- | ----------------------------------------------------------------- | -------------------------------------- |
 | ≥ 3 사내 PoC isomorphic SQL Inventory | PoC #06 + PoC #07 + PoC #11 / 66.7% × 3                           | ✅ 충족                                |
 | patterns_extension_v3 적용            | sub-rule v1.1 §X 등재                                             | ✅                                     |
-| ratchet baseline write                | `.aimd/baseline/characterization-coverage.json`                   | ✅                                     |
+| ratchet baseline write                | `.ai-context/baseline/characterization-coverage.json`                   | ✅                                     |
 | AP isomorphic                         | 5종 (Map + NOLOCK + Anemic + 공유 SQL 부재 + SATD)                | ✅ 2종 3 PoC + 3종 2 PoC corroboration |
 | 본체 격상 자격                        | ✅ v2.3.2 PATCH release (sub-rule v1.1 minor 본문 보강 + DEC 3건) | ✅                                     |
 
@@ -252,6 +252,6 @@ carry_flags total: 8
 - DEC r1: DEC-2026-05-12-r1-가설-revisit.md
 - DEC sub-rule v1.1: DEC-2026-05-12-sub-rule-v1.1-갱신.md
 - v2.3.2 PATCH release commit `ba3ed82` (origin push ✅ / git tag v2.3.2)
-- 본 PoC: examples/poc-11-efiweb-billing-spring41/ (input + sql-inventory + characterization + .aimd/output + .aimd/baseline)
+- 본 PoC: examples/poc-11-efiweb-billing-spring41/ (input + sql-inventory + characterization + .ai-context/output + .ai-context/baseline)
 - 4원칙: CLAUDE.md §"Work Principles (4원칙)"
 - sub-rule v1.1: `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md`

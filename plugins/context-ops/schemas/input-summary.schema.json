@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/input-summary.schema.json",
   "title": "Input Summary (analysis-input-orchestrate output)",
-  "description": "v3.3 G2 (R8 입력 5종 BCDE 자산 대칭 + orchestrator paradigm). .aimd/<scope>/planning/input-summary.json — analysis-input-orchestrate 가 BCDE 4 sub-skill 산출을 통합한 결과. 이중 렌더링 = input-summary.md 동시 생성 (ADR-008 v2).",
+  "description": "v3.3 G2 (R8 입력 5종 BCDE 자산 대칭 + orchestrator paradigm). .ai-context/<scope>/planning/input-summary.json — analysis-input-orchestrate 가 BCDE 4 sub-skill 산출을 통합한 결과. 이중 렌더링 = input-summary.md 동시 생성 (ADR-008 v2).",
   "type": "object",
   "required": ["scope", "raw_prompt", "parsed", "inputs", "cross_refs", "conflicts"],
   "additionalProperties": false,

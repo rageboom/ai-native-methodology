@@ -18,8 +18,8 @@ import {
 const validTaskPlan = {
 	meta: { confidence: 0.85 },
 	derivation_source: {
-		behavior_spec_path: '.aimd/output/behavior-spec.json',
-		acceptance_criteria_path: '.aimd/output/acceptance-criteria.json',
+		behavior_spec_path: '.ai-context/output/behavior-spec.json',
+		acceptance_criteria_path: '.ai-context/output/acceptance-criteria.json',
 	},
 	tasks: [
 		{

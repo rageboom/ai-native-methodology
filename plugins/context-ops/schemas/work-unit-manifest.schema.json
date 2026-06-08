@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/work-unit-manifest.schema.json",
   "title": "Work-Unit Manifest (scope + stage)",
-  "description": "v3.2 G3 (R5/R7 산출물 폴더 자동 + 지속 운영 인프라). .aimd/<scope>/manifest.json (scope manifest = stage 필드 없음) + .aimd/<scope>/<stage>/manifest.json (stage manifest = stage 필드 있음) 두 mode. 이중 렌더링 ADR-008 정합 — manifest.json + manifest.md 쌍.",
+  "description": "v3.2 G3 (R5/R7 산출물 폴더 자동 + 지속 운영 인프라). .ai-context/<scope>/manifest.json (scope manifest = stage 필드 없음) + .ai-context/<scope>/<stage>/manifest.json (stage manifest = stage 필드 있음) 두 mode. 이중 렌더링 ADR-008 정합 — manifest.json + manifest.md 쌍.",
   "type": "object",
   "required": ["scope", "status"],
   "additionalProperties": false,

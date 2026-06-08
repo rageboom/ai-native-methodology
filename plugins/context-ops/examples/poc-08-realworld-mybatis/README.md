@@ -90,7 +90,7 @@ phase 4.8 (sql-inventory) v2.2.0-rc1 prerelease 본체 격상의 paradigm-cross 
 | 3.5  | §3-A 측정 + sql-inventory 자동/수동 비율                                                                       | inventory.json + sql-inventory.json `extraction_automation` |
 | 4~6  | phase 4.7 (snapshot + intent-vs-bug + coverage)                                                                | characterization/{snapshots, intent-vs-bug, coverage}       |
 | 6.5  | D2 ambiguous 도메인 결단 (사용자 묶음)                                                                         | DEC-domain-결단 + intent-vs-bug §3                          |
-| 7    | chain 1 + validators + ratchet baseline write                                                                  | .aimd/output/planning-spec + state.json + baseline          |
+| 7    | chain 1 + validators + ratchet baseline write                                                                  | .ai-context/output/planning-spec + state.json + baseline          |
 | 7.5  | REPORT + DEC 종결 + STATUS + INDEX                                                                             | REPORT + DEC-종결                                           |
 | 8~14 | (cap 여유 / paradigm-cross corroboration 자격 측정 결과 따라 carry resolve 의무)                               | C-v2.2.0-6a resolve                                         |
 

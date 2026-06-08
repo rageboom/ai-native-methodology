@@ -1,0 +1,267 @@
+{
+  "meta": {
+    "generated_at": "2026-05-28T10:30:00Z",
+    "source_commit_sha": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "methodology_version": "v11.1.0",
+    "inputs_used": [
+      "source_code"
+    ],
+    "confidence": 0.85,
+    "raw_confidence": 0.85,
+    "warnings": [
+      "chain 2 spec-compose-behavior-spec / 10 UC backward link / 12 BR backward link",
+      "10 behavior 모두 acceptance_criteria_refs 1:1 매핑 (chain-coverage-validator 정합)"
+    ]
+  },
+  "derivation_source": {
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json",
+    "analysis_artifacts": [
+      "input/business-rules.json",
+      "input/domain.json",
+      "input/sql-inventory.json",
+      "input/characterization-spec.json"
+    ]
+  },
+  "behaviors": [
+    {
+      "id": "BHV-CAR-MGT-001",
+      "name": "차량 신규 등록 동작",
+      "description": "Leader 인증 후 차량 정보 INSERT + 사용자 기간 동시 INSERT (cross-aggregate / single transaction)",
+      "use_case_refs": [
+        "UC-CAR-MGT-001"
+      ],
+      "br_refs": [
+        "BR-CAR-MGT-001",
+        "BR-CAR-MGT-005",
+        "BR-CAR-MGT-006"
+      ],
+      "preconditions": [
+        "sessionId가 FIM.TB_USER.USER_ID 매칭 + PFLE_STATUS_CD='PS10' + USER_FG_HR='E10'",
+        "carNo + carType + comCd + userId 입력 유효"
+      ],
+      "postconditions": [
+        "tb_car.idx 신규 (IDENTITY auto-generated)",
+        "tb_car_user_term.car_idx FK 연결",
+        "use_yn='Y'",
+        "ins_dt = current timestamp"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-001"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-MGT-002",
+      "name": "차량 운행 등록 + 누적거리 자동 갱신",
+      "description": "운전자가 운행 1회 단위 입력 → tb_car_drive INSERT + tb_car.TOT_DIST 자동 update (BR-CAR-MGT-004 side effect)",
+      "use_case_refs": [
+        "UC-CAR-MGT-002"
+      ],
+      "br_refs": [
+        "BR-CAR-MGT-004"
+      ],
+      "preconditions": [
+        "대상 차량 use_yn='Y'",
+        "CarUserTerm 범위 내 drive_date"
+      ],
+      "postconditions": [
+        "tb_car_drive 신규 row",
+        "tb_car.tot_dist = (기존 tot_dist + drive_dist)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-002"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-MGT-003",
+      "name": "차량 목록 조회",
+      "description": "Leader 권한 검증 후 페이지네이션 list 반환 (선택적 검색 조건)",
+      "use_case_refs": [
+        "UC-CAR-MGT-003"
+      ],
+      "br_refs": [
+        "BR-CAR-MGT-006"
+      ],
+      "preconditions": [
+        "Leader 인증 통과"
+      ],
+      "postconditions": [
+        "paginated car list 반환 (List<Map>)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-003"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-MGT-004",
+      "name": "차량 정보 수정",
+      "description": "Leader 가 기존 차량 정보 update (CAR_NO / TYPE / USER 등)",
+      "use_case_refs": [
+        "UC-CAR-MGT-004"
+      ],
+      "br_refs": [
+        "BR-CAR-MGT-002",
+        "BR-CAR-MGT-005"
+      ],
+      "preconditions": [
+        "대상 차량 idx 존재",
+        "Leader 권한"
+      ],
+      "postconditions": [
+        "tb_car update + upt_dt 갱신 + upt_id=sessionId"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-004"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-MGT-005",
+      "name": "차량 처분 (ambiguous)",
+      "description": "ambiguous 처분 방식 — use_yn='N' soft delete vs STATE 변경 vs hard DELETE (domain expert 결단 carry)",
+      "use_case_refs": [
+        "UC-CAR-MGT-005"
+      ],
+      "br_refs": [
+        "BR-CAR-MGT-002",
+        "BR-CAR-MGT-003"
+      ],
+      "preconditions": [
+        "대상 차량 active"
+      ],
+      "postconditions": [
+        "use_yn='N' (soft delete 추정 / BR-CAR-MGT-003 STATE 코드 결단 의무)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-MGT-005"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-COST-001",
+      "name": "차량비용 → ERP 회계전표 IF (cross-DB)",
+      "description": "Admin → SGERP SP 호출 (4 input param) → slip_id list 반환 → IFRS tb_car_cost_slip 다중 INSERT (FN_SPLIT bulk)",
+      "use_case_refs": [
+        "UC-CAR-COST-001"
+      ],
+      "br_refs": [
+        "BR-CAR-COST-003",
+        "BR-CAR-COST-006"
+      ],
+      "preconditions": [
+        "Admin 인증",
+        "useComCd / strDate / endDate / userNm 유효",
+        "SGERP DB 접근 가능"
+      ],
+      "postconditions": [
+        "SGERP._TACSlip 신규 row (외부)",
+        "tb_car_cost_slip 다중 row (FN_SPLIT 결과)",
+        "cross-DB transaction 보장 ❌ → eventual consistency"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-001"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-COST-002",
+      "name": "비용 승인 (MERGE)",
+      "description": "Admin 이 cost row 별로 cost_accept_cd 갱신 — MERGE pattern (upsert)",
+      "use_case_refs": [
+        "UC-CAR-COST-002"
+      ],
+      "br_refs": [
+        "BR-CAR-COST-002"
+      ],
+      "preconditions": [
+        "Admin 인증",
+        "tb_car_cost.cost_idx 존재"
+      ],
+      "postconditions": [
+        "tb_car_cost.cost_accept_cd = input value ('Y'/'N' ambiguous)",
+        "last_upt_dt + last_upt_user_id 갱신"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-002"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-COST-003",
+      "name": "NoLog 비용 계산 / 저장",
+      "description": "Admin 이 회사 단위 비용 집계 INSERT (차량 무관 / 별도 aggregate)",
+      "use_case_refs": [
+        "UC-CAR-COST-003"
+      ],
+      "br_refs": [
+        "BR-CAR-COST-004"
+      ],
+      "preconditions": [
+        "Admin 인증",
+        "회사 + 기간 + 비용 항목 입력"
+      ],
+      "postconditions": [
+        "tb_car_cost_nolog 신규 row"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-003"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-COST-004",
+      "name": "비용 합산 시스템 (CostSumSystem)",
+      "description": "Admin 이 회사 단위 비용 합산 + 저장",
+      "use_case_refs": [
+        "UC-CAR-COST-004"
+      ],
+      "br_refs": [
+        "BR-CAR-COST-005"
+      ],
+      "preconditions": [
+        "Admin 인증"
+      ],
+      "postconditions": [
+        "합산 결과 저장 (구체 location ambiguous carry)"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-004"
+      ],
+      "code_pointers_na": true
+    },
+    {
+      "id": "BHV-CAR-COST-005",
+      "name": "비용 항목별 조회",
+      "description": "Admin 이 5 항목 (gas/insurance/repair/tax/etc) + 조정 + 임차/감가 조회",
+      "use_case_refs": [
+        "UC-CAR-COST-005"
+      ],
+      "br_refs": [
+        "BR-CAR-COST-001"
+      ],
+      "preconditions": [
+        "Admin 인증"
+      ],
+      "postconditions": [
+        "비용 항목별 list 반환"
+      ],
+      "acceptance_criteria_refs": [
+        "AC-CAR-COST-005"
+      ],
+      "code_pointers_na": true
+    }
+  ],
+  "cross_links": {
+    "to_analysis_artifacts": [
+      ".ai-context/output/discovery-spec.json",
+      "input/business-rules.json",
+      "input/domain.json",
+      "input/architecture.json",
+      "input/sql-inventory.json",
+      "input/characterization-spec.json",
+      "input/antipatterns.json"
+    ]
+  }
+}

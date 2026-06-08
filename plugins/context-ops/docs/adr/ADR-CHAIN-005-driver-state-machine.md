@@ -10,7 +10,7 @@
 sub-plan-1~4 종결 후 자산 = harness scaffolding (사양 + validator + skills + flows + agents + schemas / **부품**). DEC-2026-05-06-harness-호칭-엄밀화 audit 결과 harness 5 요소 모두 ❌:
 
 1. Driver / Orchestrator
-2. State 영속 (`.aimd/state.json`)
+2. State 영속 (`.ai-context/state.json`)
 3. Mechanical gate (validator → block / unblock 자동화)
 4. Skill auto-invocation (사용자 명시 결단 enforced)
 5. Chain-revisit detector (자동 감지 + 사용자 prompt)
@@ -38,7 +38,7 @@ sub-plan-1~4 종결 후 자산 = harness scaffolding (사양 + validator + skill
 - module ≤ 250 LOC 가이드라인 ( Senior F9)
 - 7 module: cli / state-store / stage-graph / invoke-skill / gate-eval / revisit-detect / hooks-bridge
 
-### 2. State 영속 = `.aimd/state.json` + atomic write + CAS
+### 2. State 영속 = `.ai-context/state.json` + atomic write + CAS
 
 `schemas/state.schema.json` SSOT. atomic write 패턴:
 
@@ -66,7 +66,7 @@ exit code 1 만으론 LLM 무시 가능 → **3 layer 차단** 의무:
 | ----------- | ------------------------------------------------------------------------------ | --------------------------------- |
 | (i) state   | `state.blocked = true` 영속                                                    | 다음 invocation 시 자동 차단 유지 |
 | (ii) cli    | blocked 상태에선 모든 `chain-driver *` 명령 비대화형 exit 2 + 동일 메시지 반복 | LLM 우회 호출 차단                |
-| (iii) hooks | `PreToolUse` `permissionDecision: "deny"` + `.aimd/output/**` Write/Edit 차단  | 직접 산출물 우회 작성 차단        |
+| (iii) hooks | `PreToolUse` `permissionDecision: "deny"` + `.ai-context/output/**` Write/Edit 차단  | 직접 산출물 우회 작성 차단        |
 
 trio 모두 동작해야 enforcement 진짜 — 1개라도 누락 시 양심 의존 회귀.
 
@@ -90,7 +90,7 @@ trio 모두 동작해야 enforcement 진짜 — 1개라도 누락 시 양심 의
 - `git diff --name-only --numstat <baseline>..HEAD` 사용
 - path-to-chain whitelist (예: `src/**` → implement / `**/*.test.*` → test)
 - **confidence score = non-comment LOC** ≥ 5 미만은 자동 ignore + log only
-- `revisit-ignore-globs` (`**/*.md`, `**/*.test.*` only-touch) 학습 누적 (`.aimd/state.json` 내)
+- `revisit-ignore-globs` (`**/*.md`, `**/*.test.*` only-touch) 학습 누적 (`.ai-context/state.json` 내)
 - false positive > 30% 묵인 ❌ — 사용자 결단 의무 + Auto Mode 차단 (trio §3 적용)
 
 ### 6. State schema evolution = forward-only migration ( Senior F5)
@@ -118,11 +118,11 @@ state-store.migrate(fromVersion, toVersion, json) → json
 - `state --json` = raw state.json
 - `next --dry-run` = mutate ❌ / gate 평가만
 
-### 8. Observability = `.aimd/output/intervention-log.jsonl`
+### 8. Observability = `.ai-context/output/intervention-log.jsonl`
 
 - `schemas/intervention-log.schema.json` 신설
 - 필수 필드: `event_type` / `stage` / `decision` (go|stop|revisit:<stage>) / `actor` (user|driver|llm) / `timestamp` / `validator_findings_ref` (옵션)
-- JSONL append-only / 월별 rotation `.aimd/output/archive/yyyy-mm.jsonl`
+- JSONL append-only / 월별 rotation `.ai-context/output/archive/yyyy-mm.jsonl`
 - driver startup 시 `*.tmp` 잔존 detect → "이전 실행 중단 — recovery" prompt + auto-cleanup ( Senior F6)
 
 ## 인용 체인
@@ -182,7 +182,7 @@ ADR-CHAIN-005 ( 본 ADR / driver state machine + mechanical gate)
 
 ### 대안 B: state.json 대신 SQLite
 
-기각: zero-dep 원칙 위배 / `.aimd/` git 추적 가능성 ↓ / human-readable diff 손실. 다중 사용자 시점 (v2.x) 재검토.
+기각: zero-dep 원칙 위배 / `.ai-context/` git 추적 가능성 ↓ / human-readable diff 손실. 다중 사용자 시점 (v2.x) 재검토.
 
 ### 대안 C: 7 module → 2~3 file 통합
 
@@ -199,7 +199,7 @@ ADR-CHAIN-005 ( 본 ADR / driver state machine + mechanical gate)
 cd tools/chain-driver && npm test
 
 # state schema 회귀
-node tools/schema-validator/src/cli.js .aimd/state.json --schemas schemas/
+node tools/schema-validator/src/cli.js .ai-context/state.json --schemas schemas/
 
 # drift state-flow consistency ( F8)
 node tools/drift-validator/src/cli.js --check-state-flow-consistency

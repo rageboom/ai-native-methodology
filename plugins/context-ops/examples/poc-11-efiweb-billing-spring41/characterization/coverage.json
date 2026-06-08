@@ -67,7 +67,7 @@
   },
   "ratchet_baseline_write": {
     "$comment": " v2.1.1 ratchet trend baseline 첫 적용 / 사내 PoC 3번째 (PoC #07 capital + PoC #11 billing baseline write)",
-    "baseline_file": ".aimd/baseline/characterization-coverage.json",
+    "baseline_file": ".ai-context/baseline/characterization-coverage.json",
     "baseline_write_required": true,
     "ratchet_metric": "uc_coverage_ratio",
     "baseline_value": 1.0,

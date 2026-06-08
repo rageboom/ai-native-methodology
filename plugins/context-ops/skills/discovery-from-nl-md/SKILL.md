@@ -13,7 +13,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 ## 사전 조건
 
 - markdown 기획 문서 파일 경로 (`.md`) 또는 in-conversation NL prompt text.
-- (선택) `.aimd/output/business-rules.json` baseline (BR cross-check 용).
+- (선택) `.ai-context/output/business-rules.json` baseline (BR cross-check 용).
 
 ## 입력
 
@@ -23,7 +23,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 
 ## 산출
 
-`.aimd/output/discovery-spec.json` 의 다음 entries:
+`.ai-context/output/discovery-spec.json` 의 다음 entries:
 
 - `use_cases[]` — paragraph / scenario 별 사용자 flow → UC-\* (id + name + description + acceptance_criteria_refs[])
 - `business_rules_intent[]` — NL 안 명시 BR ("X 는 Y 만 가능" / "Z 시 W 차단") → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-\* id 없음)

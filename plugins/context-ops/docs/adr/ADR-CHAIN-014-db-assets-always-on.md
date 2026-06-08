@@ -52,11 +52,11 @@ poc-17 (사내 legacy ifrs/car 도메인 신규 stack 전환 dogfooding) 작업 
 
 ### 3. canonical global 산출물 디렉토리 (신설)
 
-`.aimd/output/` 에 다음 디렉토리 신설:
+`.ai-context/output/` 에 다음 디렉토리 신설:
 
-- `.aimd/output/stored-procedures/` — SP 정적 분석 결과
-- `.aimd/output/functions/` — Function 정리
-- (`.aimd/output/erd/`, `.aimd/output/schema/`, `.aimd/output/business-rules/` 는 기존 활용)
+- `.ai-context/output/stored-procedures/` — SP 정적 분석 결과
+- `.ai-context/output/functions/` — Function 정리
+- (`.ai-context/output/erd/`, `.ai-context/output/schema/`, `.ai-context/output/business-rules/` 는 기존 활용)
 
 ### 4. work-unit-manifest 스키마 갱신 (carry)
 

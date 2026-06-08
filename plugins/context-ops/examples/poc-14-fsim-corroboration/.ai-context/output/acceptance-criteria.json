@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "generated_at": "2026-05-18T16:18:00Z",
+    "methodology_version": "v8.3.0",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json",
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json"
+  },
+  "criteria": [
+    {
+      "id": "AC-USER-FSIM-001",
+      "description": "이메일 중복 등록 시 EmailDuplicateError (BR-USER-DATA-FSIM-001 / AP-FSIM-DATA-001 fix).",
+      "behavior_ref": "BHV-USER-FSIM-001",
+      "use_case_ref": "UC-USER-FSIM-001",
+      "gherkin": {
+        "given": ["email='alice@example.com' 으로 등록된 사용자가 존재한다"],
+        "when": "동일 email + password='secret123' 으로 register 호출",
+        "then": [
+          "EmailDuplicateError 가 발생한다 (또는 409 Conflict)",
+          "users 저장소 크기는 변하지 않는다"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-FSIM-001"],
+      "gate_required": true,
+      "related_brs": ["BR-USER-DATA-FSIM-001", "BR-USER-VALIDATION-FSIM-001"],
+      "related_aps": ["AP-FSIM-DATA-001"]
+    },
+    {
+      "id": "AC-USER-FSIM-002",
+      "description": "올바른 자격으로 login 시 AuthToken 반환 / 불일치 시 InvalidCredentialsError.",
+      "behavior_ref": "BHV-USER-FSIM-002",
+      "use_case_ref": "UC-USER-FSIM-002",
+      "gherkin": {
+        "given": ["email='alice@example.com' / password='secret123' 으로 등록된 사용자가 존재한다"],
+        "when": "동일 email + 동일 password 로 login 호출",
+        "then": [
+          "AuthToken 이 반환된다 (access_token non-empty)",
+          "token_type == 'bearer'"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-USER-FSIM-002"],
+      "gate_required": true,
+      "related_brs": [],
+      "related_aps": []
+    },
+    {
+      "id": "AC-TODO-FSIM-001",
+      "description": "인증 사용자가 title 유효 시 todo 생성 + 본인 user_id 매핑.",
+      "behavior_ref": "BHV-TODO-FSIM-001",
+      "use_case_ref": "UC-TODO-FSIM-001",
+      "gherkin": {
+        "given": ["alice 가 로그인 상태이다", "유효한 title='Buy milk' 으로 todo 생성 요청"],
+        "when": "POST /todos 호출",
+        "then": [
+          "신규 todo 1건 생성된다",
+          "todo.user_id == alice.id",
+          "todo.status == 'pending'"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-TODO-FSIM-001"],
+      "gate_required": true,
+      "related_brs": ["BR-TODO-VALIDATION-FSIM-001"],
+      "related_aps": []
+    },
+    {
+      "id": "AC-TODO-FSIM-002",
+      "description": "본인 소유 todo 만 update 가능 / 타인 todo 시 NotFound (또는 Forbidden).",
+      "behavior_ref": "BHV-TODO-FSIM-002",
+      "use_case_ref": "UC-TODO-FSIM-002",
+      "gherkin": {
+        "given": ["alice 가 todo_id=1 소유", "bob 이 로그인 상태이다"],
+        "when": "bob 이 PUT /todos/1 호출",
+        "then": [
+          "TodoNotFoundError (또는 NotOwnedError) 가 발생한다",
+          "alice 의 todo_id=1 은 변경되지 않는다"
+        ],
+        "tags": ["@must"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-TODO-FSIM-002"],
+      "gate_required": true,
+      "related_brs": ["BR-TODO-OWNERSHIP-FSIM-001"],
+      "related_aps": []
+    }
+  ]
+}

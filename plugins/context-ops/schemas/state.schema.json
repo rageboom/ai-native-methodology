@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/state.schema.json",
   "title": "Chain Harness Driver State",
-  "description": "v2.0 sub-plan-5 — chain harness driver 의 사용자 프로젝트별 영속 state. .aimd/state.json single source of runtime truth. ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration) 정합. sdlc-4stage-flow.json 의 stages enum 과 정합 (drift-validator --check-state-flow-consistency 가 회귀).",
+  "description": "v2.0 sub-plan-5 — chain harness driver 의 사용자 프로젝트별 영속 state. .ai-context/state.json single source of runtime truth. ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration) 정합. sdlc-4stage-flow.json 의 stages enum 과 정합 (drift-validator --check-state-flow-consistency 가 회귀).",
   "type": "object",
   "required": ["version", "project_id", "current_chain", "stage_progress", "blocked"],
   "additionalProperties": false,
@@ -90,7 +90,7 @@
             },
             "intervention_log_path": {
               "type": "string",
-              "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .aimd/output/intervention-log.jsonl"
+              "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .ai-context/output/intervention-log.jsonl"
             }
           }
         }
@@ -174,8 +174,8 @@
     },
     "intervention_log_path": {
       "type": "string",
-      "description": "프로젝트별 intervention log 경로. 기본 = .aimd/output/intervention-log.jsonl",
-      "default": ".aimd/output/intervention-log.jsonl"
+      "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/output/intervention-log.jsonl",
+      "default": ".ai-context/output/intervention-log.jsonl"
     }
   },
   "$defs": {

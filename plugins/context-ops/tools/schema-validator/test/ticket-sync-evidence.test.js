@@ -40,8 +40,8 @@ const META_OK = {
 
 const VALID_INVOCATION = {
 	mcp_tool_name: 'mcp__wiki-jira-assistant__jira_create',
-	tool_stdout_path: '.aimd/output/evidence/mcp-stdout-1.log',
-	tool_stderr_path: '.aimd/output/evidence/mcp-stderr-1.log',
+	tool_stdout_path: '.ai-context/output/evidence/mcp-stdout-1.log',
+	tool_stderr_path: '.ai-context/output/evidence/mcp-stderr-1.log',
 	tool_version: '1.4.2',
 	invocation_timestamp: '2026-05-18T14:30:00+09:00',
 	duration_ms: 1234,
@@ -66,7 +66,7 @@ function baseEvidence(extra = {}) {
 		scope: 'car',
 		ticket_cascade: VALID_CASCADE,
 		mcp_invocations: [VALID_INVOCATION],
-		confirmation_log_ref: '.aimd/output/intervention-log.jsonl',
+		confirmation_log_ref: '.ai-context/output/intervention-log.jsonl',
 		evidence_trust: 'real_tool',
 		...extra,
 	};
@@ -318,7 +318,7 @@ test('traceability-matrix — ticket_ref.status_history valid sample', () => {
 					from_status: 'To Do',
 					to_status: 'In Progress',
 					mcp_tool: 'mcp__wiki-jira-assistant__jira_transition',
-					evidence_ref: '.aimd/output/evidence/ticket-sync-plan-20260518T150000.json',
+					evidence_ref: '.ai-context/output/evidence/ticket-sync-plan-20260518T150000.json',
 				},
 				{
 					transitioned_at: '2026-05-18T16:30:00+09:00',

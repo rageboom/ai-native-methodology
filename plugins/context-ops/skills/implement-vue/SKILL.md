@@ -18,17 +18,17 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 
 ## 입력
 
-- `<project>/.aimd/output/test-spec.json`
-- `<project>/.aimd/output/behavior-spec.json`
-- `<project>/.aimd/output/acceptance-criteria.json`
-- `<project>/.aimd/output/inventory.json`
+- `<project>/.ai-context/output/test-spec.json`
+- `<project>/.ai-context/output/behavior-spec.json`
+- `<project>/.ai-context/output/acceptance-criteria.json`
+- `<project>/.ai-context/output/inventory.json`
 - `<project>/package.json` (vue 버전 확인 / 3.x 의무)
 
 ## 산출물
 
 - `src/**/*.vue` (SFC)
 - `src/**/*.composable.ts` (composable 분리 시)
-- `<project>/.aimd/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "vue-3"` — schema modules.items.framework 필드)
+- `<project>/.ai-context/output/impl-spec.json` (FE 트랙 entry / framework 버전은 `modules[].framework: "vue-3"` — schema modules.items.framework 필드)
 
 ## paradigm (Vue 3 only / 2026-05-15 사용자 결단)
 

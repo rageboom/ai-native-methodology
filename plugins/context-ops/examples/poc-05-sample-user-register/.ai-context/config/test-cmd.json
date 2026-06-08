@@ -1,0 +1,14 @@
+{
+  "framework": "vitest",
+  "framework_version": "1.6.1",
+  "test_cmd": "npx",
+  "test_cmd_args": ["vitest", "run", "--reporter=json", "--outputFile=../.ai-context/output/evidence/vitest-output.json"],
+  "cwd": "target",
+  "timeout_ms": 120000,
+  "flaky_retry_per_test": 2,
+  "report_format": "vitest_json",
+  "report_path": ".ai-context/output/evidence/vitest-output.json",
+  "stdout_path": ".ai-context/output/evidence/test-stdout.txt",
+  "stderr_path": ".ai-context/output/evidence/test-stderr.txt",
+  "allow_execute": true
+}

@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:45:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.9,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json",
+    "analysis_artifacts": ["input/business-rules.json", "input/domain.json"]
+  },
+  "behaviors": [
+    {"id": "BHV-POST-001", "name": "게시글 생성 시 작성자 자동 설정", "use_case_refs": ["UC-POST-001"], "br_refs": ["BR-POST-AUTHORSHIP-001"], "preconditions": ["요청 사용자가 인증됨"], "postconditions": ["post.authorId == 현재 사용자 id"], "acceptance_criteria_refs": ["AC-POST-001"], "source_grounded_evidence": ["src/modules/post/post.service.ts:createPost"]},
+    {"id": "BHV-POST-002", "name": "발행 필터 목록 조회", "use_case_refs": ["UC-POST-002"], "br_refs": ["BR-POST-PUBLISHFILTER-001"], "preconditions": [], "postconditions": ["published 필터가 문자열 'true' 비교로 적용됨"], "acceptance_criteria_refs": ["AC-POST-002"], "source_grounded_evidence": ["src/modules/post/post.repository.ts:findPosts"]},
+    {"id": "BHV-POST-003", "name": "존재하지 않는 게시글 조회 404", "use_case_refs": ["UC-POST-003"], "br_refs": ["BR-POST-EXISTENCE-001"], "preconditions": [], "postconditions": ["부재 시 404"], "acceptance_criteria_refs": ["AC-POST-003"], "source_grounded_evidence": ["src/modules/post/post.service.ts:getPostById"]},
+    {"id": "BHV-POST-004", "name": "게시글 수정 작성자 전용", "use_case_refs": ["UC-POST-004"], "br_refs": ["BR-POST-OWNERSHIP-001", "BR-POST-EXISTENCE-001"], "preconditions": ["게시글 존재", "요청자=작성자"], "postconditions": ["수정 반영, 비작성자는 403"], "acceptance_criteria_refs": ["AC-POST-004"], "source_grounded_evidence": ["src/modules/post/post.service.ts:updatePostById"]},
+    {"id": "BHV-POST-005", "name": "게시글 삭제 작성자 전용", "use_case_refs": ["UC-POST-005"], "br_refs": ["BR-POST-OWNERSHIP-002", "BR-POST-EXISTENCE-001"], "preconditions": ["게시글 존재", "요청자=작성자"], "postconditions": ["삭제, 비작성자는 403"], "acceptance_criteria_refs": ["AC-POST-005"], "source_grounded_evidence": ["src/modules/post/post.service.ts:deletePostById"]},
+    {"id": "BHV-USER-001", "name": "사용자 이메일 유일성", "use_case_refs": ["UC-USER-001"], "br_refs": ["BR-USER-EMAILUNIQUE-001"], "preconditions": [], "postconditions": ["중복 이메일 생성 거부"], "acceptance_criteria_refs": ["AC-USER-001"], "source_grounded_evidence": ["prisma/schema.prisma:User.email"]}
+  ],
+  "cross_links": {"to_analysis_artifacts": ["input/business-rules.json", "input/domain.json"]}
+}

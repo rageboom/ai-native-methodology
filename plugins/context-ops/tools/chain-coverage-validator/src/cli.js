@@ -51,7 +51,7 @@ F-SIM-003 (v11.16.0 default = strict):
   (default)      : cross-ref broken-path = high (blocking). cooling-off 영구 폐기 + autoDetect fix + 5 PoC 0 broken sweep.
   --warn-paths   : broken-path = medium (warn / non-blocking). 옛 default / 비상 escape hatch (release 시 ❌ 의무).
   --strict-paths : (이제 default = no-op / backward-compat 보존).
-  --project-root : project base for relative path resolution (default = v9.0.4 autoDetectProjectRoot — .aimd/output/ 패턴 시 PoC root 자동 감지 / 그 외 dirname(behavior) fallback / F-MB-VAL-001).
+  --project-root : project base for relative path resolution (default = v9.0.4 autoDetectProjectRoot — .ai-context/output/ 패턴 시 PoC root 자동 감지 / 그 외 dirname(behavior) fallback / F-MB-VAL-001).
   --repo-root    : repo base for repo-absolute (examples/...) paths (default = process.cwd()).`);
 			process.exit(0);
 		}

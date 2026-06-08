@@ -27,7 +27,7 @@ DEC-2026-05-06-sub-plan-5-종결 / sub-plan-6 chaos test (CAS race fix / 68 test
 ```bash
 cd ~/Documents/Development/Study/
 chain-driver init poc-17-ifrs-car-migration
-# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/.aimd/state.json 생성
+# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/.ai-context/state.json 생성
 ```
 
 ### (b) 작업 디렉토리 안에서 호출
@@ -35,7 +35,7 @@ chain-driver init poc-17-ifrs-car-migration
 ```bash
 cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
 chain-driver init .
-# → 현 디렉토리 .aimd/state.json 생성
+# → 현 디렉토리 .ai-context/state.json 생성
 ```
 
 ### ❌ 안티패턴 (회피)
@@ -43,18 +43,18 @@ chain-driver init .
 ```bash
 cd ~/Documents/Development/Study/poc-17-ifrs-car-migration/
 chain-driver init poc-17-ifrs-car-migration   # 자기 이름 인수 → 중첩 hit
-# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/poc-17-ifrs-car-migration/.aimd/state.json ❌
+# → ~/Documents/Development/Study/poc-17-ifrs-car-migration/poc-17-ifrs-car-migration/.ai-context/state.json ❌
 ```
 
-**자기 디렉토리 안에서 자기 이름 인수로 호출 시 `{cwd}/{project_name}/.aimd/` 중첩 생성**. 사용자 신규 진입 시 자연스러운 패턴이라 hit 가능성 ↑ — `init .` 또는 부모 디렉토리 호출 paradigm 정공.
+**자기 디렉토리 안에서 자기 이름 인수로 호출 시 `{cwd}/{project_name}/.ai-context/` 중첩 생성**. 사용자 신규 진입 시 자연스러운 패턴이라 hit 가능성 ↑ — `init .` 또는 부모 디렉토리 호출 paradigm 정공.
 
 (carry: `cli.js cmdInit` 안 자기참조 감지 + warning enforcement = v11.x backlog. 본 README paradigm 절 = 사용자 양심 의존 우회 표지 / `methodology-spec/finding-system.md` F-CHA-poc17-001 정합.)
 
 ## Inputs
 
-- `<project-dir>/.aimd/state.json` — chain harness state (schema/state.schema.json 정합)
-- `<project-dir>/.aimd/output/**` — chain stage 산출물
-- `<project-dir>/.aimd/intervention-log.jsonl` — 사용자 결단 로그
+- `<project-dir>/.ai-context/state.json` — chain harness state (schema/state.schema.json 정합)
+- `<project-dir>/.ai-context/output/**` — chain stage 산출물
+- `<project-dir>/.ai-context/intervention-log.jsonl` — 사용자 결단 로그
 - `flows/sdlc-4stage-flow.json` — stage 순서 + 5 gate SSOT (v10.0.0 / chain N = gate #N 1:1)
 
 ## Outputs

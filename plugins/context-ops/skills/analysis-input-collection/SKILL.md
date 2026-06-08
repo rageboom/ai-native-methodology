@@ -27,7 +27,7 @@ allowed-tools: Read, Glob, Grep, Bash
 4. **분석 가치 명시** — 사용자에게:
    - 본 방법론은 한 방향 추출기 (legacy → 7대 산출물). round-trip 검증 안 함.
    - 가치 명세 (CLAUDE.md) 사용자 확인.
-5. **메타 정보 기록** — `<user-project>/.aimd/input.json`:
+5. **메타 정보 기록** — `<user-project>/.ai-context/input.json`:
    ```json
    {
    	"target": { "repo": "...", "commit": "...", "scope": "module-X" },
@@ -38,7 +38,7 @@ allowed-tools: Read, Glob, Grep, Bash
    	},
    	"tracks": ["BE", "DB"],
    	"baseline_applied": true,
-   	"baseline_ref": ".aimd/baseline-2026-05-02.json",
+   	"baseline_ref": ".ai-context/baseline-2026-05-02.json",
    	"phase_0_completed_at": "..."
    }
    ```
@@ -46,7 +46,7 @@ allowed-tools: Read, Glob, Grep, Bash
 
 ## 산출물
 
-`<user-project>/.aimd/input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
+`<user-project>/.ai-context/input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
 
 ## When NOT to invoke
 

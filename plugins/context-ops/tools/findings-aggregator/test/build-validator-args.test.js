@@ -12,7 +12,7 @@ describe('buildValidatorArgs (F2 fix — plan-coverage wiring)', () => {
 		assert.ok(args.includes('--acceptance'), 'has --acceptance');
 		assert.ok(!args.includes('--target'), 'no generic --target (이전 default = errored skip)');
 		assert.ok(
-			args.some((a) => a.endsWith('.aimd/output/task-plan.json')),
+			args.some((a) => a.endsWith('.ai-context/output/task-plan.json')),
 			'task-plan.json 경로 포함',
 		);
 	});

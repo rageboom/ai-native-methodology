@@ -51,7 +51,7 @@ MEDIUM 정합 / **non-isomorphic in the hard direction**:
 | **Day 1.5 ( 본 session)** | **sql-inventory.{json,md} (25 SQL × 11 컬럼 / 0 findings / 66.7%)**                                                        | ~480 line        |
 | **Day 2 ( 본 session)**   | **characterization/{snapshots/6 + intent-vs-bug.md + coverage.json} (acceptance oracle 100%)**                             | ~520 line        |
 | **Day 2.5 ( 본 session)** | **D2 결단 (intent-vs-bug.md §5 갱신 / 4 ambiguous → 분류 명시)**                                                           | inline           |
-| **Day 3 ( 본 session)**   | **.aimd/output/planning-spec.json (UC 100% / 0 findings) + .aimd/baseline/characterization-coverage.json (ratchet write)** | ~310 line        |
+| **Day 3 ( 본 session)**   | **.ai-context/output/planning-spec.json (UC 100% / 0 findings) + .ai-context/baseline/characterization-coverage.json (ratchet write)** | ~310 line        |
 | **Day 3.5 ( 본 session)** | **본 REPORT + DEC 종결 + STATUS + INDEX + carry resolve + commit**                                                         | ~150 line        |
 
 ---

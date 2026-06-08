@@ -15,7 +15,7 @@
   "cross_ref_files_updated": [
     "input/rules.json",
     "input/domain.json",
-    ".aimd/output/planning-spec.json",
+    ".ai-context/output/planning-spec.json",
     "characterization/intent-vs-bug.md",
     "characterization/snapshots/UC-RAE-001-register.json",
     "characterization/snapshots/UC-RAE-006-follow.json",

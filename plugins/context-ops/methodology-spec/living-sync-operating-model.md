@@ -79,8 +79,8 @@
 
 `sync-loop --git` / `sync-converge --git` 은 baseline↔워크트리 git diff 로 변경 산출물을 자동 감지한다. 이 루프가 noise 없이 돌려면 채택자 프로젝트의 git 추적 경계가 다음과 같아야 한다 (결단 출처 = ## 인용):
 
-- **런타임 상태 = 커밋 ❌**: `.aimd/state.json` · `state.json.tmp` · `**/intervention-log.jsonl` 은 도구 실행 상태이지 AX 산출물이 아니다 → git 추적 제외. `chain-driver init` 이 `<project>/.aimd/.gitignore` 를 **자동 스캐폴드**(idempotent / 기존 파일 무클로버 / 재-init upgrade 경로). 추적되면 `--git` diff 에 잡혀 `unresolved_paths` → `needs_resynth` false 신호를 낸다.
-- **파생물 = 커밋 ✓ (그러나 재검출에서 도구가 skip)**: `artifact-graph.json` · `matrix.json` · `findings-*.json` 은 LLM 운영 컨텍스트/증거라 **커밋 대상**이다(gitignore ❌ — SSOT 손실). 대신 `--git` 재검출이 **노드 미매핑 + `.aimd/` 도구 파생물**인 경로를 자동 skip 한다(C-lite / `resolveOriginNodeIds {skipDerivedNoise}`) → resync 로 변경된 그래프가 false-`unresolved` 를 만들지 않는다.
+- **런타임 상태 = 커밋 ❌**: `.ai-context/state.json` · `state.json.tmp` · `**/intervention-log.jsonl` 은 도구 실행 상태이지 AX 산출물이 아니다 → git 추적 제외. `chain-driver init` 이 `<project>/.ai-context/.gitignore` 를 **자동 스캐폴드**(idempotent / 기존 파일 무클로버 / 재-init upgrade 경로). 추적되면 `--git` diff 에 잡혀 `unresolved_paths` → `needs_resynth` false 신호를 낸다.
+- **파생물 = 커밋 ✓ (그러나 재검출에서 도구가 skip)**: `artifact-graph.json` · `matrix.json` · `findings-*.json` 은 LLM 운영 컨텍스트/증거라 **커밋 대상**이다(gitignore ❌ — SSOT 손실). 대신 `--git` 재검출이 **노드 미매핑 + `.ai-context/` 도구 파생물**인 경로를 자동 skip 한다(C-lite / `resolveOriginNodeIds {skipDerivedNoise}`) → resync 로 변경된 그래프가 false-`unresolved` 를 만들지 않는다.
 - **BLOCKER-1 보존**: 노드 미매핑이면서 도구 파생물도 **아닌** 경로(=진짜 새 구조 산출물)는 `unresolved` 로 유지 → 거짓 fixpoint 차단(carry2 철학). skip 은 `do_not_edit_manually` 파생물에만 적용된다.
 
 ## 인용

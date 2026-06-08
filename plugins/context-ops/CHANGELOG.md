@@ -10,6 +10,17 @@
 
 ---
 
+## [0.23.0] — 2026-06-08 MINOR — `.aimd/` → `.ai-context/` 디렉토리 컨벤션 리네임 (내용 서술성)
+
+**사용자 지적: 출력 디렉토리 `.aimd`(≈ ai-native methodology dir)는 폴더를 본 사람이 안에 뭐가 있는지 모른다. 기준 = 내용 서술성 → `.ai-context/`** (= AI 운영 컨텍스트 = 방법론 P0 "산출물 = LLM 운영 컨텍스트 그 자체" / 패키지 `context-ops` 와 자연 짝). v0.x 사내 미배포 = 채택자 0 → 마이그레이션 부담 없는 적기. 기능 변경 0 (순수 컨벤션 정합).
+
+- **rename**: 정규식 `/\.aimd(?!-install)/g` → `.ai-context` 스코프 sweep(281 파일 / 2-pass: 1차 docs·extensions 누락 → 보강: tools 코어+test·skills·agents·schemas·templates·flows·methodology-spec·guides·hooks·scripts·.github·docs·extensions·README·CLAUDE.md·.gitignore·examples) + **git mv 14 example `.aimd/` 디렉토리**(history 보존). 내부 식별자 `AIMD_GITIGNORE_BODY`→`AICONTEXT_GITIGNORE_BODY`·`AIMD_DERIVED_BASENAMES`→`AICONTEXT_DERIVED_BASENAMES`·`isAimdDerivedOutput`→`isAiContextDerivedOutput`.
+- **보존 (Senior BLOCKER-1)**: `.aimd-install`(무관 static-tool install marker dir)는 `(?!-install)` 음성 lookahead 로 보존 — install-static-tools.js/.sh + .gitignore. (별 컨벤션 / 이번 스코프 밖.)
+- **역사 기록 미변경 (honesty)**: `archive/` · `CHANGELOG-HISTORY.md` · 과거 CHANGELOG/DEC 항목은 시점 사실(당시 실제 `.aimd`)이라 재작성 ❌ (runtime read 0 확인). 현재 spec(`.ai-context`)과 dated record(`.aimd`) 공존 = 표준.
+- **클린 컷**: 미배포 → `.aimd` 하위호환 fallback 불요.
+- **Senior REVISE@0.86 2 BLOCKER 반영**: ① `.aimd-install` substring 충돌 → 정규식 anchor ② `.github/workflows/chain-check.yml`(live default target_dir + strict gate) INCLUDE 추가.
+- **검증**: chain-driver 502 GREEN + release-readiness 41/41(check#16 poc-05 graph lockstep) + 잔존 `.aimd`(INCLUDE)=0 + `.aimd-install` 보존 + 3-way. DEC-2026-06-08-aimd-rename-ai-context.
+
 ## [0.22.0] — 2026-06-08 MINOR — living-sync 채택자 git 위생 (--git 루프 noise 제거 / init .gitignore 스캐폴드 + 도구 파생물 skip)
 
 **poc-20 전체 루프 테스트(진입→소비→sync-converge 수렴) 중 `--git` 재검출이 `.aimd/state.json`·`artifact-graph.json` 을 `unresolved_paths` → `needs_resynth` 로 false-flag. zero-base 전수조사 → 채택자 온보딩 갭 + 도구 자기 파생물 false-unresolved 라는 구조적 사실로 정정.**

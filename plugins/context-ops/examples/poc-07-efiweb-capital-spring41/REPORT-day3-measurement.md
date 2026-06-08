@@ -40,7 +40,7 @@
 
 ```
 $ node tools/planning-extraction-validator/src/cli.js \
-    --planning examples/poc-07-efiweb-capital-spring41/.aimd/output/planning-spec.json \
+    --planning examples/poc-07-efiweb-capital-spring41/.ai-context/output/planning-spec.json \
     --rules examples/poc-07-efiweb-capital-spring41/input/rules.json \
     --domain examples/poc-07-efiweb-capital-spring41/input/domain.json
 [planning-extraction-validator] 0 findings (critical: 0, high: 0)

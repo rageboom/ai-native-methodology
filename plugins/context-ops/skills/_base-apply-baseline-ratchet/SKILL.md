@@ -25,13 +25,13 @@ Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new
    - **Tier 1 (in-plugin)** — Semgrep (`tools/static-runner --plugin semgrep`) / ESLint / **PMD** (`tools/static-runner --plugin pmd` / JDK 8+ / DEC-2026-06-07 / 부재 시 exit 3)
    - **Tier 2 (user-environment SARIF import)** — `import-driver` allowlist = **PMD** (orthogonal / in-plugin 불가 환경의 import 경로). 그 외 도구는 실 import 이력 0 → 사용자가 자기 환경서 쓰면 `IMPORTED_DRIVER_ALLOWLIST` 명시 확장 후 → `tools/static-runner --import-sarif <path> --import-driver pmd`
    - Whichever applies to the target language stack
-3. **Capture baseline counts and findings** — write to `<user-project>/.aimd/baseline-<YYYY-MM-DD>.json`:
+3. **Capture baseline counts and findings** — write to `<user-project>/.ai-context/baseline-<YYYY-MM-DD>.json`:
    ```json
    {
      "baseline_date": "2026-05-02",
      "baseline_commit": "<sha>",
      "tools": {
-       "semgrep": { "findings_count": 247, "by_severity": { "high": 12, "medium": 89, "low": 146 }, "report_path": ".aimd/baseline-semgrep-2026-05-02.json" },
+       "semgrep": { "findings_count": 247, "by_severity": { "high": 12, "medium": 89, "low": 146 }, "report_path": ".ai-context/baseline-semgrep-2026-05-02.json" },
        "pmd": { ... }
      },
      "ratchet_policy": "no-new-high | no-new-any | percent-decrease",
@@ -49,7 +49,7 @@ Baseline+ratchet fixes this: capture the baseline once, then **ratchet** — new
 
 After this skill completes, the user has:
 
-- `.aimd/baseline-<date>.json` committed
+- `.ai-context/baseline-<date>.json` committed
 - Ratchet policy declared
 - CI configured (or template provided)
 - Next-step prompt: "`input` phase 진입 가능. `/methodology:input` 호출."

@@ -16,9 +16,9 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve as pathResolve, isAbsolute, dirname } from 'node:path';
 
 // F-MB-VAL-001 (v9.0.4 / 2026-05-24): default projectRoot 자동 감지
-// 산출물이 `.aimd/output/<file>.json` 패턴이면 PoC root = `dirname(p)/../..` 로 자동 감지.
+// 산출물이 `.ai-context/output/<file>.json` 패턴이면 PoC root = `dirname(p)/../..` 로 자동 감지.
 // 5 PoC self-corroboration (poc-03/04-mini/05/14/06/07) 모두 PoC root 기준 cross-ref convention 일관 — 도구 default mismatch 해소.
-// fallback (비-`.aimd/output/` 위치): dirname(p) 그대로 (backward-compat).
+// fallback (비-`.ai-context/output/` 위치): dirname(p) 그대로 (backward-compat).
 // LL-v903-04 자산화: validator default 와 산출물 convention mismatch silent sink — 5 PoC corroboration ≥ 2 fix.
 export function autoDetectProjectRoot(specPath) {
 	if (!specPath || typeof specPath !== 'string') return null;
@@ -26,8 +26,8 @@ export function autoDetectProjectRoot(specPath) {
 	// POSIX dirname() 은 \ 를 path separator 로 안 봐서 Windows path 입력 시 '.' 반환 → 사전 정규화 의무
 	const d = dirname(specPath.replace(/\\/g, '/'));
 	const normalized = d.replace(/\\/g, '/');
-	// `.aimd/output` 끝나는 패턴 → PoC root = ../..
-	if (/(^|\/)\.aimd\/output$/.test(normalized)) {
+	// `.ai-context/output` 끝나는 패턴 → PoC root = ../..
+	if (/(^|\/)\.ai-context\/output$/.test(normalized)) {
 		return pathResolve(d, '..', '..');
 	}
 	// fallback (backward-compat): dirname 그대로

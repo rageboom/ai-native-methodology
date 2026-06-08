@@ -1,0 +1,487 @@
+{
+  "meta": {
+    "schema": "context-cache.schema.json",
+    "generated_by": "context-federator",
+    "do_not_edit_manually": true,
+    "trust_note": "reference-lens / NOT gate-injected — codegraph 휴리스틱 신호 = finding-only / 어떤 결정론 gate 에도 inject ❌ (DEC-2026-06-02 / DEC-2026-05-28 §4.2)",
+    "derived_from": [
+      "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.ai-context/output/artifact-graph.json"
+    ],
+    "synthesized_at": "2026-06-08T06:17:48.521Z",
+    "graph_stamp": "4eafa0df622707c66de79de9e4e634670af796ca83d8dbf5b89bbca9111e34df",
+    "codegraph_indexed_at": null
+  },
+  "target": {
+    "graph_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/.ai-context/output/artifact-graph.json",
+    "repo_root": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test",
+    "codegraph_project_dir": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test",
+    "sql_inventory_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/sql-inventory.json",
+    "db_schema_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/db-schema.json",
+    "business_rules_path": "/Users/sangcl/Documents/Development/Study/chain-fkflow-test/input/business-rules.json"
+  },
+  "codegraph": {
+    "available": true,
+    "version": "0.9.6",
+    "reason": null
+  },
+  "packs": [
+    {
+      "node_id": "TC-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "state": "active",
+      "dep_impact": {
+        "must": [
+          "AC-NOTES-001",
+          "AC-NOTES-002",
+          "AC-NOTES-003",
+          "BHV-NOTES-001",
+          "TASK-NOTES-001",
+          "UC-NOTES-001"
+        ],
+        "should": [],
+        "fyi": []
+      },
+      "top_impact_roots": [
+        {
+          "id": "analysis-business-rules-BC-NOTES",
+          "score": 3.5,
+          "raw": 3.5
+        },
+        {
+          "id": "BHV-NOTES-001",
+          "score": 3,
+          "raw": 3
+        },
+        {
+          "id": "TASK-NOTES-001",
+          "score": 3,
+          "raw": 3
+        }
+      ],
+      "code_anchors": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbol": null,
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "code_refs": [
+        {
+          "anchor_path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbols": [],
+          "unresolved": true,
+          "note": "codegraph 인덱스에 이 path 의 심볼 row 없음 (path 매핑 불일치 / 인덱스 범위 밖 / 미인덱싱 언어 / legacy SQL 층) — 코드 반쪽 비어있음 (no-simulation 정직 표기)"
+        }
+      ],
+      "data_refs": [],
+      "anchor_stamp": "08aebc18caaf38ca1fc2d3b7d36d80820341b4b9de704715edbff1fb00a7f7bd"
+    },
+    {
+      "node_id": "TC-NOTES-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "state": "active",
+      "dep_impact": {
+        "must": [
+          "AC-NOTES-001",
+          "AC-NOTES-002",
+          "AC-NOTES-003",
+          "BHV-NOTES-001",
+          "TASK-NOTES-001",
+          "UC-NOTES-001"
+        ],
+        "should": [],
+        "fyi": []
+      },
+      "top_impact_roots": [
+        {
+          "id": "analysis-business-rules-BC-NOTES",
+          "score": 3.5,
+          "raw": 3.5
+        },
+        {
+          "id": "BHV-NOTES-001",
+          "score": 3,
+          "raw": 3
+        },
+        {
+          "id": "TASK-NOTES-001",
+          "score": 3,
+          "raw": 3
+        }
+      ],
+      "code_anchors": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbol": null,
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "code_refs": [
+        {
+          "anchor_path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbols": [],
+          "unresolved": true,
+          "note": "codegraph 인덱스에 이 path 의 심볼 row 없음 (path 매핑 불일치 / 인덱스 범위 밖 / 미인덱싱 언어 / legacy SQL 층) — 코드 반쪽 비어있음 (no-simulation 정직 표기)"
+        }
+      ],
+      "data_refs": [],
+      "anchor_stamp": "08aebc18caaf38ca1fc2d3b7d36d80820341b4b9de704715edbff1fb00a7f7bd"
+    },
+    {
+      "node_id": "TC-NOTES-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "state": "active",
+      "dep_impact": {
+        "must": [
+          "AC-NOTES-001",
+          "AC-NOTES-002",
+          "AC-NOTES-003",
+          "BHV-NOTES-001",
+          "TASK-NOTES-001",
+          "UC-NOTES-001"
+        ],
+        "should": [],
+        "fyi": []
+      },
+      "top_impact_roots": [
+        {
+          "id": "analysis-business-rules-BC-NOTES",
+          "score": 3.5,
+          "raw": 3.5
+        },
+        {
+          "id": "BHV-NOTES-001",
+          "score": 3,
+          "raw": 3
+        },
+        {
+          "id": "TASK-NOTES-001",
+          "score": 3,
+          "raw": 3
+        }
+      ],
+      "code_anchors": [
+        {
+          "path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbol": null,
+          "commit_hash": "6fd0da29e96045f1c7eb6b36613e13d427013b21"
+        }
+      ],
+      "code_refs": [
+        {
+          "anchor_path": "test/notes.test.js",
+          "anchor_type": "strict_path",
+          "symbols": [],
+          "unresolved": true,
+          "note": "codegraph 인덱스에 이 path 의 심볼 row 없음 (path 매핑 불일치 / 인덱스 범위 밖 / 미인덱싱 언어 / legacy SQL 층) — 코드 반쪽 비어있음 (no-simulation 정직 표기)"
+        }
+      ],
+      "data_refs": [],
+      "anchor_stamp": "08aebc18caaf38ca1fc2d3b7d36d80820341b4b9de704715edbff1fb00a7f7bd"
+    },
+    {
+      "node_id": "UC-NOTES-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "state": "active",
+      "dep_impact": {
+        "must": [
+          "AC-NOTES-001",
+          "AC-NOTES-002",
+          "AC-NOTES-003",
+          "BHV-NOTES-001",
+          "TASK-NOTES-001",
+          "TC-NOTES-001",
+          "TC-NOTES-002",
+          "TC-NOTES-003"
+        ],
+        "should": [
+          "analysis-sql-inventory"
+        ],
+        "fyi": []
+      },
+      "top_impact_roots": [
+        {
+          "id": "analysis-business-rules-BC-NOTES",
+          "score": 3.5,
+          "raw": 3.5
+        },
+        {
+          "id": "BHV-NOTES-001",
+          "score": 3,
+          "raw": 3
+        },
+        {
+          "id": "TASK-NOTES-001",
+          "score": 3,
+          "raw": 3
+        }
+      ],
+      "code_anchors": [],
+      "code_refs": [],
+      "data_refs": [
+        {
+          "sql_id": "users.createUser",
+          "statement_type": "PREPARED",
+          "mapper_xml": "src/users.js",
+          "business_meaning": "사용자 신규 등록 (username UNIQUE)",
+          "dependent_tables": [
+            {
+              "name": "users",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "username",
+                  "type": "TEXT"
+                },
+                {
+                  "name": "created_at",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": []
+            }
+          ],
+          "business_rules": [],
+          "source": "sql-inventory"
+        },
+        {
+          "sql_id": "users.findUserById",
+          "statement_type": "PREPARED",
+          "mapper_xml": "src/users.js",
+          "business_meaning": "사용자 단건 조회 (메모 작성 전 존재 확인)",
+          "dependent_tables": [
+            {
+              "name": "users",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "username",
+                  "type": "TEXT"
+                },
+                {
+                  "name": "created_at",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": []
+            }
+          ],
+          "business_rules": [],
+          "source": "sql-inventory"
+        },
+        {
+          "sql_id": "notes.createNote",
+          "statement_type": "PREPARED",
+          "mapper_xml": "src/notes.js",
+          "business_meaning": "메모 작성 — 존재 사용자 + 빈 본문 금지 + 존재 카테고리 필수 / BR-NOTES-CREATE-001 + BR-NOTES-CREATE-002 + BR-NOTES-CREATE-003 anchor",
+          "dependent_tables": [
+            {
+              "name": "notes",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "user_id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "category_id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "body",
+                  "type": "TEXT"
+                },
+                {
+                  "name": "created_at",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": [
+                {
+                  "references_table": "users",
+                  "local_columns": [
+                    "user_id"
+                  ],
+                  "references_columns": [
+                    "id"
+                  ],
+                  "relationship_label": "author"
+                },
+                {
+                  "references_table": "categories",
+                  "local_columns": [
+                    "category_id"
+                  ],
+                  "references_columns": [
+                    "id"
+                  ],
+                  "relationship_label": "categorized_as"
+                }
+              ]
+            }
+          ],
+          "business_rules": [
+            {
+              "id": "BR-NOTES-CREATE-001",
+              "name": "메모 본문 필수",
+              "natural_language": "메모 작성 시 본문(body)은 비어 있을 수 없다 (공백만도 불가).",
+              "severity": "high"
+            },
+            {
+              "id": "BR-NOTES-CREATE-002",
+              "name": "존재하는 사용자만 작성",
+              "natural_language": "메모는 존재하는 사용자(users)만 작성할 수 있다 — 작성자 FK 무결성.",
+              "severity": "high"
+            },
+            {
+              "id": "BR-NOTES-CREATE-003",
+              "name": "메모 카테고리 필수",
+              "natural_language": "메모 작성 시 존재하는 카테고리(category_id)를 반드시 지정해야 한다 (요구사항2).",
+              "severity": "high"
+            }
+          ],
+          "source": "sql-inventory"
+        },
+        {
+          "sql_id": "categories.findCategoryById",
+          "statement_type": "PREPARED",
+          "mapper_xml": "src/categories.js",
+          "business_meaning": "카테고리 단건 조회 (메모 작성 전 존재 확인 / BR-NOTES-CREATE-003)",
+          "dependent_tables": [
+            {
+              "name": "categories",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "name",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": []
+            }
+          ],
+          "business_rules": [
+            {
+              "id": "BR-NOTES-CREATE-003",
+              "name": "메모 카테고리 필수",
+              "natural_language": "메모 작성 시 존재하는 카테고리(category_id)를 반드시 지정해야 한다 (요구사항2).",
+              "severity": "high"
+            }
+          ],
+          "source": "sql-inventory"
+        },
+        {
+          "sql_id": "notes.listNotesByUser",
+          "statement_type": "PREPARED",
+          "mapper_xml": "src/notes.js",
+          "business_meaning": "사용자의 메모 목록 (작성자 FK 조인)",
+          "dependent_tables": [
+            {
+              "name": "notes",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "user_id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "category_id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "body",
+                  "type": "TEXT"
+                },
+                {
+                  "name": "created_at",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": [
+                {
+                  "references_table": "users",
+                  "local_columns": [
+                    "user_id"
+                  ],
+                  "references_columns": [
+                    "id"
+                  ],
+                  "relationship_label": "author"
+                },
+                {
+                  "references_table": "categories",
+                  "local_columns": [
+                    "category_id"
+                  ],
+                  "references_columns": [
+                    "id"
+                  ],
+                  "relationship_label": "categorized_as"
+                }
+              ]
+            },
+            {
+              "name": "users",
+              "columns": [
+                {
+                  "name": "id",
+                  "type": "INTEGER"
+                },
+                {
+                  "name": "username",
+                  "type": "TEXT"
+                },
+                {
+                  "name": "created_at",
+                  "type": "TEXT"
+                }
+              ],
+              "foreign_keys": []
+            }
+          ],
+          "business_rules": [],
+          "source": "sql-inventory"
+        }
+      ],
+      "anchor_stamp": "8bf0353682113615c28757a613fcb75102f2a2449898a7d06f24450ab13166ca"
+    }
+  ],
+  "stats": {
+    "pack_count": 4,
+    "anchored_nodes": 4,
+    "symbols_resolved": 0,
+    "callees_resolved": 0,
+    "anchors_unresolved": 3,
+    "codegraph_available": true,
+    "dep_recomputed": 4,
+    "code_recomputed": 4,
+    "carried_packs": 0,
+    "data_anchored_nodes": 1,
+    "data_refs_count": 5,
+    "data_source_available": true
+  }
+}

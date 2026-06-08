@@ -15,7 +15,7 @@ before(() => { tmp = mkdtempSync(join(tmpdir(), 'chain-driver-state-')); });
 after(() => { rmSync(tmp, { recursive: true, force: true }); });
 
 describe('state-store', () => {
-  it('initState creates .aimd/state.json with defaults', () => {
+  it('initState creates .ai-context/state.json with defaults', () => {
     const root = join(tmp, 'p1');
     const state = initState(root, 'p1');
     assert.equal(state.project_id, 'p1');
@@ -60,10 +60,10 @@ describe('state-store', () => {
   it('recoverTmpFiles cleans up dangling .tmp', () => {
     const root = join(tmp, 'p6');
     initState(root, 'p6');
-    writeFileSync(join(root, '.aimd', 'leftover.tmp'), 'oops');
+    writeFileSync(join(root, '.ai-context', 'leftover.tmp'), 'oops');
     const recovered = recoverTmpFiles(root);
     assert.ok(recovered.includes('leftover.tmp'));
-    assert.equal(existsSync(join(root, '.aimd', 'leftover.tmp')), false);
+    assert.equal(existsSync(join(root, '.ai-context', 'leftover.tmp')), false);
   });
 
   it('migrate same major version is a no-op', () => {

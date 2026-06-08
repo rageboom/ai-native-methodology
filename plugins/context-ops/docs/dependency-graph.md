@@ -51,40 +51,40 @@
 
 ```bash
 node tools/traceability-matrix-builder/src/cli.js \
-  --discovery .aimd/output/discovery-spec.json \
-  --behavior .aimd/output/behavior-spec.json \
-  --acceptance .aimd/output/acceptance-criteria.json \
-  --task-plan .aimd/output/task-plan.json \
-  --test-spec .aimd/output/test-spec.json \
-  --impl-spec .aimd/output/impl-spec.json \
-  --analysis-dir .aimd/output/ --aspect-dir .aimd/output/ \
-  --out-dir .aimd/output/ --graph
+  --discovery .ai-context/output/discovery-spec.json \
+  --behavior .ai-context/output/behavior-spec.json \
+  --acceptance .ai-context/output/acceptance-criteria.json \
+  --task-plan .ai-context/output/task-plan.json \
+  --test-spec .ai-context/output/test-spec.json \
+  --impl-spec .ai-context/output/impl-spec.json \
+  --analysis-dir .ai-context/output/ --aspect-dir .ai-context/output/ \
+  --out-dir .ai-context/output/ --graph
 ```
 
 > v11.0.0 — `--discovery` (구 `--planning` alias 보존) + `--task-plan` (plan stage TASK/Epic/Story/OP) + `--operational-task` (OP 보강 optional).
 
-→ `.aimd/output/artifact-graph.json` 산출 (matrix.json 와 함께 / v12 ADR-011 — .md/.mermaid twin 폐기 / json 단독).
+→ `.ai-context/output/artifact-graph.json` 산출 (matrix.json 와 함께 / v12 ADR-011 — .md/.mermaid twin 폐기 / json 단독).
 
 ### 4-2. 변경 영향 분석 (변경 전)
 
 ```bash
 # 영향 트리 + code_pointers + top-3 impact root
 node tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --origin BHV-USER-001
+  --graph .ai-context/output/artifact-graph.json --origin BHV-USER-001
 
 # 의도③ — 스펙 본문까지 함께 (UC/BHV/AC 의 title·description·precondition·gherkin lazy-read)
 node tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --origin BHV-USER-001 --with-spec
+  --graph .ai-context/output/artifact-graph.json --origin BHV-USER-001 --with-spec
 
 # 의도③ (a) NL 라우팅 — 정확 id 몰라도 자연어로 (id/title/symbol/file 결정론 매칭)
 node tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --prompt "회원가입 BHV 바꾸려는데" [--with-spec]
+  --graph .ai-context/output/artifact-graph.json --prompt "회원가입 BHV 바꾸려는데" [--with-spec]
 
 # 의도③ (b) what-if — 그래프에 아직 없는 변경의 영향 (in-memory 비파괴 / 파일 write ❌)
 node tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --origin AC-USER-001 --what-if "remove-node:BHV-USER-001"
+  --graph .ai-context/output/artifact-graph.json --origin AC-USER-001 --what-if "remove-node:BHV-USER-001"
 node tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --origin BHV-USER-001 --what-if "add-edge:BHV-USER-001>UC-ARTICLE-001"
+  --graph .ai-context/output/artifact-graph.json --origin BHV-USER-001 --what-if "add-edge:BHV-USER-001>UC-ARTICLE-001"
 ```
 
 또는 skill: `/dep-graph-navigator BHV-USER-001`
@@ -99,8 +99,8 @@ node tools/chain-driver/src/cli.js navigate \
 
 ```bash
 node tools/chain-driver/src/cli.js impact \
-  --graph .aimd/output/artifact-graph.json --origin BHV-USER-001 \
-  --change-kind item_add --out-jsonl .aimd/output/propose.jsonl
+  --graph .ai-context/output/artifact-graph.json --origin BHV-USER-001 \
+  --change-kind item_add --out-jsonl .ai-context/output/propose.jsonl
 ```
 
 → 각 영향 노드에 대해 auto/propose/manual 결정 + propose.jsonl 기록.
@@ -108,8 +108,8 @@ node tools/chain-driver/src/cli.js impact \
 ### 4-4. 무결성 검증 (release 전)
 
 ```bash
-node tools/graph-integrity-validator/src/cli.js .aimd/output/artifact-graph.json
-node tools/code-pointer-validator/src/cli.js .aimd/output/artifact-graph.json --repo-root .
+node tools/graph-integrity-validator/src/cli.js .ai-context/output/artifact-graph.json
+node tools/code-pointer-validator/src/cli.js .ai-context/output/artifact-graph.json --repo-root .
 ```
 
 또는 통합: `node scripts/release-readiness.js --target vX.Y.Z` (#15 graph-integrity / #16 code-pointer).
@@ -118,12 +118,12 @@ node tools/code-pointer-validator/src/cli.js .aimd/output/artifact-graph.json --
 
 ```bash
 # 추적 맵(feature별 UC→하류) + UC→단계 coverage 매트릭스 → stdout Markdown
-node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json
+node tools/chain-driver/src/cli.js trace-view --graph .ai-context/output/artifact-graph.json
 
 # 매트릭스 억제(긴 그래프) / scope 필터 / 구조화 JSON
-node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --no-matrix
-node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --scope <scope_id>
-node tools/chain-driver/src/cli.js trace-view --graph .aimd/output/artifact-graph.json --json
+node tools/chain-driver/src/cli.js trace-view --graph .ai-context/output/artifact-graph.json --no-matrix
+node tools/chain-driver/src/cli.js trace-view --graph .ai-context/output/artifact-graph.json --scope <scope_id>
+node tools/chain-driver/src/cli.js trace-view --graph .ai-context/output/artifact-graph.json --json
 ```
 
 > `navigate`(쿼리 단위 = 노드 하나의 영향 트리) 와 분리: `trace-view` = **stage/feature 조망 + UC→단계 coverage hole** (사람 gate #1~#5 검토용). 순수 formatter — `analyzeImpact`/`topKImpactRoot`/`graph.stats` 재사용 (새 그래프 순회 0).

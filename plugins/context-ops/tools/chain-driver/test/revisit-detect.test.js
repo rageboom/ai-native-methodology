@@ -8,8 +8,8 @@ import {
 } from '../src/revisit-detect.js';
 
 describe('revisit-detect', () => {
-	it('classifyPath maps .aimd discovery-spec.json to discovery', () => {
-		assert.equal(classifyPath('.aimd/output/discovery-spec.json'), 'discovery'); // v11.0.0 planning-spec → discovery-spec rename / chain=discovery
+	it('classifyPath maps .ai-context discovery-spec.json to discovery', () => {
+		assert.equal(classifyPath('.ai-context/output/discovery-spec.json'), 'discovery'); // v11.0.0 planning-spec → discovery-spec rename / chain=discovery
 	});
 
 	it('classifyPath maps src/foo.ts to implement', () => {
@@ -40,7 +40,7 @@ describe('revisit-detect', () => {
 	it('detectRevisit returns spec when spec source changed during implement', () => {
 		const result = detectRevisit({
 			changedFiles: [
-				{ path: '.aimd/output/behavior-spec.json', added: 50, deleted: 10 },
+				{ path: '.ai-context/output/behavior-spec.json', added: 50, deleted: 10 },
 				{ path: 'src/feat.ts', added: 5, deleted: 0 },
 			],
 			currentChain: 'implement',
@@ -52,7 +52,7 @@ describe('revisit-detect', () => {
 	it('detectRevisit auto-ignores below LOC threshold', () => {
 		const result = detectRevisit({
 			changedFiles: [
-				{ path: '.aimd/output/behavior-spec.json', added: 1, deleted: 1 },
+				{ path: '.ai-context/output/behavior-spec.json', added: 1, deleted: 1 },
 			],
 			currentChain: 'implement',
 		});
@@ -64,12 +64,12 @@ describe('revisit-detect', () => {
 	it('detectRevisit respects ignoreGlobs', () => {
 		const result = detectRevisit({
 			changedFiles: [
-				{ path: '.aimd/output/test-spec.md', added: 100, deleted: 0 },
+				{ path: '.ai-context/output/test-spec.md', added: 100, deleted: 0 },
 			],
 			currentChain: 'implement',
 			ignoreGlobs: ['**/*.md'],
 		});
-		assert.ok(result.ignored_paths.includes('.aimd/output/test-spec.md'));
+		assert.ok(result.ignored_paths.includes('.ai-context/output/test-spec.md'));
 	});
 
 	it('detectRevisit downstream chain change does not trigger revisit', () => {

@@ -68,7 +68,7 @@ EFI-WEB 사내 IFRS 회계 시스템의 **billing (결제 / 청구) 모듈** (~2
 | 1.5 | §3-A 측정 + sql-inventory 자동/수동 비율                            | inventory.json + sql-inventory.json `extraction_automation` |
 | 2   | phase 4.7 (snapshot + intent-vs-bug + coverage)                     | characterization/{snapshots, intent-vs-bug, coverage}       |
 | 2.5 | D2 ambiguous 도메인 결단 (결제 도메인 expert)                       | DEC-domain-결단 + intent-vs-bug §3                          |
-| 3   | chain 1 + validators + ratchet baseline write                       | .aimd/output/planning-spec + state.json + baseline          |
+| 3   | chain 1 + validators + ratchet baseline write                       | .ai-context/output/planning-spec + state.json + baseline          |
 | 3.5 | REPORT + DEC 종결 + STATUS + INDEX + sub-rule carry resolve         | REPORT + DEC-종결                                           |
 
 누적 ~14~18h (~2~3일 실측 / 14d cap 충분 여유 / billing 257 LOC = quick win).

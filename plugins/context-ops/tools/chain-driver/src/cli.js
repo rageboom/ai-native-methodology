@@ -2,7 +2,7 @@
 // chain-driver — chain harness driver CLI (sub-plan-5).
 //
 // commands:
-//   chain-driver init <project>            — .aimd/state.json 초기화
+//   chain-driver init <project>            — .ai-context/state.json 초기화
 //   chain-driver state <project> [--json]  — 현재 state read
 //   chain-driver next <project> [--findings <path>] [--user-decision go|stop|revisit:<stage>] [--dry-run]
 //                                          — gate 평가 + (옵션) stage 전이
@@ -211,7 +211,7 @@ function parseArgs(argv) {
 function logIntervention(state, projectRoot, entry) {
 	const path = join(
 		projectRoot,
-		state?.intervention_log_path || '.aimd/output/intervention-log.jsonl',
+		state?.intervention_log_path || '.ai-context/output/intervention-log.jsonl',
 	);
 	mkdirSync(dirname(path), { recursive: true });
 	const line =
@@ -236,22 +236,22 @@ function blockedExit(state, projectRoot) {
 	process.exit(2);
 }
 
-// B (DEC-2026-06-08-living-sync-adopter-git-hygiene) — 채택자 프로젝트에 .aimd/.gitignore 스캐폴드.
+// B (DEC-2026-06-08-living-sync-adopter-git-hygiene) — 채택자 프로젝트에 .ai-context/.gitignore 스캐폴드.
 //   순수 런타임 상태(state.json·tmp·intervention-log)만 제외 = 레포 관행(plugin-root .gitignore) 동형.
 //   ★ artifact-graph/matrix/findings 는 제외 ❌ (커밋 대상 = AX 운영 컨텍스트/증거). 그 noise 는 C-lite(--git skip)가 처리.
 //   idempotent: 파일 부재 시만 생성(클로버 ❌). early-exit 前 호출 → 기존 채택자 재-init 도 받음(upgrade).
-const AIMD_GITIGNORE_BODY = `# chain-driver runtime state — regenerable, AX 산출물 아님 (커밋 ❌)
+const AICONTEXT_GITIGNORE_BODY = `# chain-driver runtime state — regenerable, AX 산출물 아님 (커밋 ❌)
 # (DEC-2026-06-08-living-sync-adopter-git-hygiene / artifact-graph·matrix·findings 는 커밋 대상 = 제외 안 함)
 state.json
 state.json.tmp
 **/intervention-log.jsonl
 `;
 function ensureAimdGitignore(root) {
-	const dir = join(root, '.aimd');
+	const dir = join(root, '.ai-context');
 	const gi = join(dir, '.gitignore');
 	if (existsSync(gi)) return false; // idempotent — 기존 보존
 	mkdirSync(dir, { recursive: true });
-	writeFileSync(gi, AIMD_GITIGNORE_BODY, 'utf-8');
+	writeFileSync(gi, AICONTEXT_GITIGNORE_BODY, 'utf-8');
 	return true;
 }
 
@@ -442,7 +442,7 @@ function cmdNext(args) {
 				info: findings.info || 0,
 			},
 			intervention_log_path:
-				s.intervention_log_path || '.aimd/output/intervention-log.jsonl',
+				s.intervention_log_path || '.ai-context/output/intervention-log.jsonl',
 		};
 		s.stage_progress[stage] = {
 			...(s.stage_progress[stage] || {}),
@@ -523,10 +523,10 @@ function cmdNext(args) {
 		process.stderr.write(
 			`[chain-driver] adopter-corroboration capture suggest (chain 1 cycle 완주 / terminal): ` +
 				`외부 채택(Type 2) corroboration 을 남기려면 adopter-evidence-packager 실행 권장 (opt-in) — ` +
-				`node tools/adopter-evidence-packager/src/cli.js --state .aimd/state.json ` +
-				`[--manifest .aimd/<scope>/manifest.json --findings <f> --matrix .aimd/output/matrix.json ` +
+				`node tools/adopter-evidence-packager/src/cli.js --state .ai-context/state.json ` +
+				`[--manifest .ai-context/<scope>/manifest.json --findings <f> --matrix .ai-context/output/matrix.json ` +
 				`--stack <csv> --org-type <enum> --salt <s>]. ` +
-				`익명화(PII redaction + leak guard) 후 .aimd/output/adopter-corroboration.json 생성. ` +
+				`익명화(PII redaction + leak guard) 후 .ai-context/output/adopter-corroboration.json 생성. ` +
 				`자동 전송 ❌ (데이터 주권 / 명시 공유 시 maintainer 에 전달). EXT-CAPTURE-05.\n`,
 		);
 	}
@@ -1332,15 +1332,15 @@ function cmdSuggestSkill(args) {
 // 그래프 없으면 null (non-fatal).
 function buildGraphSessionContext(root) {
 	const candidates = [
-		join(root, '.aimd', 'output', 'artifact-graph.json'),
-		join(root, '.aimd', 'artifact-graph.json'),
+		join(root, '.ai-context', 'output', 'artifact-graph.json'),
+		join(root, '.ai-context', 'artifact-graph.json'),
 	];
 	let graphPath = candidates.find((p) => existsSync(p));
 	if (!graphPath) {
-		// scope 별 위치도 탐색 (.aimd/<scope>/artifact-graph.json)
+		// scope 별 위치도 탐색 (.ai-context/<scope>/artifact-graph.json)
 		try {
 			for (const scope of listScopes(root)) {
-				const p = join(root, '.aimd', scope, 'artifact-graph.json');
+				const p = join(root, '.ai-context', scope, 'artifact-graph.json');
 				if (existsSync(p)) {
 					graphPath = p;
 					break;
@@ -1411,7 +1411,7 @@ function cmdHooksBridge(args) {
 	if (event === 'SessionStart') {
 		// G3 R5/R7 — recover .tmp + drift 자동 감지 + 사용자 안내 (M4).
 		const root = payload.cwd || process.cwd();
-		if (!existsSync(join(root, '.aimd', 'state.json'))) {
+		if (!existsSync(join(root, '.ai-context', 'state.json'))) {
 			// user project not yet initialized — pass-through.
 			process.stdout.write(
 				JSON.stringify({ suppressOutput: true, continue: true }) + '\n',
@@ -1884,7 +1884,7 @@ function cmdSyncLoop(args) {
 			process.exit(3);
 		}
 		const root = args.project ? resolve(args.project) : process.cwd();
-		const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+		const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
 		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
 		if (!existsSync(brAbs)) {
 			console.error(`[chain-driver] sync-loop --br-diff: business-rules.json 부재: ${brAbs}`);
@@ -1928,7 +1928,7 @@ function cmdSyncLoop(args) {
 			console.error(`[chain-driver] sync-loop --git: git diff 실패: ${diff.error}`);
 			process.exit(3);
 		}
-		const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+		const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
 		const brRelPosix = brRel.split('\\').join('/');
 		const changed = diff.files.map((f) => f.path.split('\\').join('/'));
 		const brChanged = changed.includes(brRelPosix); // BLOCKER-1: 정규화 키로 partition
@@ -2065,7 +2065,7 @@ function cmdSyncLoop(args) {
 			);
 		else
 			process.stdout.write(
-				`  ${written ? 'written → .aimd/state.json regen_queue' : '(미기록 — --dry-run / state 부재 / project 미지정)'}\n`,
+				`  ${written ? 'written → .ai-context/state.json regen_queue' : '(미기록 — --dry-run / state 부재 / project 미지정)'}\n`,
 			);
 		if (result.unresolved.length)
 			process.stdout.write(
@@ -2362,7 +2362,7 @@ function cmdSyncConverge(args) {
 		console.error(`[chain-driver] sync-converge --git: git diff 실패: ${diff.error}`);
 		process.exit(3);
 	}
-	const brRel = args.brPath || join('.aimd', 'output', 'business-rules.json');
+	const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
 	const brRelPosix = brRel.split('\\').join('/');
 	const changed = diff.files.map((f) => f.path.split('\\').join('/'));
 	const brChanged = changed.includes(brRelPosix);
@@ -2925,7 +2925,7 @@ function cmdLift(args) {
 
 // chain-driver resync-graph — Loop A / A-lazy-cmd (DEC-2026-06-03-living-graph-a1-surface 후속 / 의도② lazy 재계산).
 //   B-minimal STALE 배너의 nudge → 한 명령 재합성 action (8-flag traceability-matrix-builder → resync-graph).
-//   convention 입력-탐색(.aimd/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
+//   convention 입력-탐색(.ai-context/output 또는 그래프 위치 dir 의 well-known chain 6 + analysis/aspect scan) →
 //   traceability-matrix-builder --graph 위임 (전체 재합성 / --previous-graph propose·deprecated carry-over). caller cwd 만 write.
 //   verdict-free / 비-gating / per-write 자동 ❌ (Senior REJECT — quadratic·fixture) : 사람이 STALE 보고 1 명령 실행.
 const RESYNC_CHAIN_FILES = Object.freeze([
@@ -2946,14 +2946,14 @@ function cmdResyncGraph(args) {
 		outputDir = resolve(args.outDir);
 	} else {
 		const candidates = [];
-		if (args.scope) candidates.push(join(projectRoot, '.aimd', args.scope));
-		candidates.push(join(projectRoot, '.aimd', 'output'));
-		candidates.push(join(projectRoot, '.aimd'));
+		if (args.scope) candidates.push(join(projectRoot, '.ai-context', args.scope));
+		candidates.push(join(projectRoot, '.ai-context', 'output'));
+		candidates.push(join(projectRoot, '.ai-context'));
 		outputDir =
 			candidates.find((d) => existsSync(join(d, 'artifact-graph.json'))) ||
 			(args.scope
-				? join(projectRoot, '.aimd', args.scope)
-				: join(projectRoot, '.aimd', 'output'));
+				? join(projectRoot, '.ai-context', args.scope)
+				: join(projectRoot, '.ai-context', 'output'));
 	}
 
 	// 2) chain 입력 convention 스캔 (존재하는 것만 builder flag 로).

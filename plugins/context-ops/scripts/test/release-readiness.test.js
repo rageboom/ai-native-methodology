@@ -262,7 +262,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		// schema 정합 직접 검증 — release-readiness 의 sha256 regex 와 일치.
 		const path = join(
 			ROOT,
-			'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+			'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 		);
 		const spec = JSON.parse(readFileSync(path, 'utf-8'));
 		const ev = spec.test_pass_evidence;
@@ -285,7 +285,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 	it('matrix_greenness checks per-cell status (cells > 0 + all green required)', () => {
 		const path = join(
 			ROOT,
-			'examples/poc-05-sample-user-register/.aimd/output/matrix.json',
+			'examples/poc-05-sample-user-register/.ai-context/output/matrix.json',
 		);
 		const m = JSON.parse(readFileSync(path, 'utf-8'));
 		assert.ok(Array.isArray(m.matrix) && m.matrix.length > 0);
@@ -296,7 +296,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 	it('e2e_cycle_pass verifies fail_count==0 AND pass_count>0 (not just file existence)', () => {
 		const path = join(
 			ROOT,
-			'examples/poc-05-sample-user-register/.aimd/output/impl-spec.json',
+			'examples/poc-05-sample-user-register/.ai-context/output/impl-spec.json',
 		);
 		const spec = JSON.parse(readFileSync(path, 'utf-8'));
 		const ev = spec.test_pass_evidence;

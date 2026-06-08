@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T09:55:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.88,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json",
+    "acceptance_criteria_path": ".ai-context/output/acceptance-criteria.json",
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json"
+  },
+  "tasks": [
+    {"id": "TASK-POST-001", "title": "createPost — 인증 컨텍스트에서 authorId 설정", "ac_refs": ["AC-POST-001"], "behavior_ref": "BHV-POST-001", "execution_order": 1, "layer": "application", "module": "post"},
+    {"id": "TASK-POST-002", "title": "queryPosts — 비작성자 대상 발행 필터", "ac_refs": ["AC-POST-002"], "behavior_ref": "BHV-POST-002", "execution_order": 2, "layer": "application", "module": "post"},
+    {"id": "TASK-POST-003", "title": "getPostById — 부재 시 404", "ac_refs": ["AC-POST-003"], "behavior_ref": "BHV-POST-003", "execution_order": 3, "layer": "application", "module": "post"},
+    {"id": "TASK-POST-004", "title": "updatePostById — 소유권 검사", "ac_refs": ["AC-POST-004"], "behavior_ref": "BHV-POST-004", "execution_order": 4, "layer": "application", "module": "post", "dependencies": ["TASK-POST-003"]},
+    {"id": "TASK-POST-005", "title": "deletePostById — 소유권 검사", "ac_refs": ["AC-POST-005"], "behavior_ref": "BHV-POST-005", "execution_order": 5, "layer": "application", "module": "post", "dependencies": ["TASK-POST-003"]},
+    {"id": "TASK-USER-001", "title": "register — 이메일 유일성", "ac_refs": ["AC-USER-001"], "behavior_ref": "BHV-USER-001", "execution_order": 6, "layer": "application", "module": "user"}
+  ],
+  "risks": [
+    {"id": "RISK-POST-001", "severity": "high", "type": "security", "description": "IDOR — 비작성자가 직접 id 로 게시글 수정/삭제 시도.", "mitigation": "서비스 계층 소유권 검사 + 적절한 오류 응답.", "task_refs": ["TASK-POST-004", "TASK-POST-005"], "human_review": true}
+  ],
+  "nfr_allocation": [
+    {"id": "NFR-POST-001", "characteristic": "security", "severity": "high", "description": "수정/삭제 시 소유권 강제, 미발행 게시글은 비작성자에게 비노출.", "measurement": "모든 변경 경로가 authorId == userId 를 검증", "acceptance_criteria_ref": "AC-POST-004", "task_refs": ["TASK-POST-004", "TASK-POST-005"]}
+  ]
+}

@@ -28,7 +28,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 1. **codegraph-runner 실 실행** — `tools/codegraph-runner/` 가 codegraph CLI 통합 (init -i / index → status --json):
 
    ```bash
-   node ${CLAUDE_PLUGIN_ROOT}/tools/codegraph-runner/src/cli.js --target <project-dir> --output <user-project>/.aimd/output
+   node ${CLAUDE_PLUGIN_ROOT}/tools/codegraph-runner/src/cli.js --target <project-dir> --output <user-project>/.ai-context/output
    ```
 
    - 최초 = `codegraph init -i <target>` (인덱싱) / 재실행 = `codegraph index <target>` (증분).
@@ -41,9 +41,9 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.aimd/output/code-graph.json` (`schemas/code-graph.schema.json` / reference-lens / NOT gate-injected)
+- `<user-project>/.ai-context/output/code-graph.json` (`schemas/code-graph.schema.json` / reference-lens / NOT gate-injected)
 - codegraph raw 출력 (`codegraph.stdout.log` / `codegraph.stderr.log`)
-- codegraph index store (`<project-dir>/.codegraph/` — `.aimd/` 와 동급 도구 인덱스 / `.gitignore` 권고)
+- codegraph index store (`<project-dir>/.codegraph/` — `.ai-context/` 와 동급 도구 인덱스 / `.gitignore` 권고)
 
 ## 인용
 

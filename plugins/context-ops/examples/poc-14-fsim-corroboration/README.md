@@ -74,7 +74,7 @@ poc-14-fsim-corroboration/
 │   │   └── plan.md                   # 기획 문서 (analysis-from-plan-doc 입력)
 │   └── swagger.yaml                  # OpenAPI 명세 (analysis-from-swagger 입력)
 ├── .semgrep.yml                       # Semgrep 룰 (no-simulation 의무)
-├── .aimd/
+├── .ai-context/
 │   ├── state.json                    # chain-driver state
 │   ├── output/                       # chain 1~4 산출물 (planning/behavior/AC/test/impl/matrix)
 │   └── simulation/                   # 본 PoC 핵심 산출 (사용자 시점 기록)

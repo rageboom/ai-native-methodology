@@ -1,0 +1,778 @@
+{
+  "derived_from": [
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+    "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/impl-spec.json",
+    "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\architecture.json",
+    "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\domain.json",
+    "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\db-schema.json",
+    "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\business-rules.json",
+    "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\antipatterns.json"
+  ],
+  "do_not_edit_manually": true,
+  "schema": {
+    "node": "artifact-graph-node.schema.json",
+    "edge": "artifact-graph-edge.schema.json"
+  },
+  "synthesized_at": "2026-06-07T07:47:20.320Z",
+  "nodes": [
+    {
+      "id": "UC-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "게시글 생성",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "UC-POST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "게시글 목록 조회",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "UC-POST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "게시글 단건 조회",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "UC-POST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "게시글 수정",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "UC-POST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "게시글 삭제",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "UC-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "UC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/discovery-spec.json",
+      "state": "active",
+      "title": "사용자 생성",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "게시글 생성 시 작성자 자동 설정",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-POST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "발행 필터 목록 조회",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-POST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "존재하지 않는 게시글 조회 404",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-POST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "게시글 수정 작성자 전용",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-POST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "게시글 삭제 작성자 전용",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "BHV-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "BHV",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/behavior-spec.json",
+      "state": "active",
+      "title": "사용자 이메일 유일성",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "createPost 가 인증 사용자 id 로 authorId 를 설정",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-POST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "queryPosts 가 published 'true' 필터를 적용",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-POST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "getPostById 가 부재 시 null/404",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-POST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "updatePostById 가 비작성자를 거부(403)",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-POST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "deletePostById 가 비작성자를 거부(403)",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "AC-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "AC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/acceptance-criteria.json",
+      "state": "active",
+      "title": "사용자 생성 시 중복 이메일 거부",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "createPost — 인증 컨텍스트에서 authorId 설정",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-POST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "queryPosts — 비작성자 대상 발행 필터",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-POST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "getPostById — 부재 시 404",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-POST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "updatePostById — 소유권 검사",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-POST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "deletePostById — 소유권 검사",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TASK-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TASK",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/task-plan.json",
+      "state": "active",
+      "title": "register — 이메일 유일성",
+      "layer": "application",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/post/post.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-POST-002",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/post/post.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-POST-003",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/post/post.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-POST-004",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/post/post.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-POST-005",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/post/post.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "TC-USER-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "TC",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/test-spec.json",
+      "state": "active",
+      "code_pointers": [
+        {
+          "path": "test/modules/user/user.service.test.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "IMPL-POST-001",
+      "artifact_kind": "chain",
+      "artifact_subkind": "IMPL",
+      "source_path": "../../examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/impl-spec.json",
+      "state": "active",
+      "layer": "be",
+      "code_pointers": [
+        {
+          "path": "src/modules/post/post.service.ts",
+          "anchor_type": "strict_path",
+          "commit_hash": "ca06a2e6faed688b464b31316c4d7c50e8c587d2"
+        }
+      ],
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "analysis-architecture",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "architecture",
+      "source_path": "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\architecture.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "analysis-domain",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "domain",
+      "source_path": "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\domain.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "analysis-db-schema",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "db-schema",
+      "source_path": "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\db-schema.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "analysis-business-rules",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "business-rules",
+      "source_path": "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\business-rules.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "id": "analysis-antipatterns",
+      "artifact_kind": "analysis",
+      "artifact_subkind": "antipatterns",
+      "source_path": "..\\..\\examples\\poc-18-express-prisma-modern-ts\\target\\.ai-context\\output\\antipatterns.json",
+      "state": "active",
+      "code_pointers_na": true,
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    }
+  ],
+  "edges": [
+    {
+      "source": "UC-POST-001",
+      "target": "BHV-POST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "UC-POST-002",
+      "target": "BHV-POST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "UC-POST-003",
+      "target": "BHV-POST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "UC-POST-004",
+      "target": "BHV-POST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "UC-POST-005",
+      "target": "BHV-POST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "UC-USER-001",
+      "target": "BHV-USER-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-POST-001",
+      "target": "AC-POST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-POST-002",
+      "target": "AC-POST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-POST-003",
+      "target": "AC-POST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-POST-004",
+      "target": "AC-POST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-POST-005",
+      "target": "AC-POST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "BHV-USER-001",
+      "target": "AC-USER-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-001",
+      "target": "TASK-POST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-002",
+      "target": "TASK-POST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-003",
+      "target": "TASK-POST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-004",
+      "target": "TASK-POST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-005",
+      "target": "TASK-POST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-USER-001",
+      "target": "TASK-USER-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-001",
+      "target": "TC-POST-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-002",
+      "target": "TC-POST-002",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-003",
+      "target": "TC-POST-003",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-004",
+      "target": "TC-POST-004",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-POST-005",
+      "target": "TC-POST-005",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "AC-USER-001",
+      "target": "TC-USER-001",
+      "edge_type": "derived_from",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "TC-POST-001",
+      "target": "IMPL-POST-001",
+      "edge_type": "tests",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "TC-POST-002",
+      "target": "IMPL-POST-001",
+      "edge_type": "tests",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "TC-POST-003",
+      "target": "IMPL-POST-001",
+      "edge_type": "tests",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "TC-POST-004",
+      "target": "IMPL-POST-001",
+      "edge_type": "tests",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "TC-POST-005",
+      "target": "IMPL-POST-001",
+      "edge_type": "tests",
+      "confidence": "hard",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "IMPL-POST-001",
+      "target": "src/modules/post/post.service.ts",
+      "edge_type": "implements",
+      "confidence": "hard",
+      "commit_hash": "ca06a2e6faed688b464b31316c4d7c50e8c587d2"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-POST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "BHV-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-POST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-POST-002",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-POST-003",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-POST-004",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-POST-005",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "AC-USER-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-business-rules",
+      "target": "UC-POST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "UC-POST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    },
+    {
+      "source": "analysis-domain",
+      "target": "BHV-POST-001",
+      "edge_type": "cross_reference",
+      "confidence": "soft",
+      "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+    }
+  ],
+  "stats": {
+    "node_count": 36,
+    "edge_count": 47,
+    "by_kind": {
+      "chain": 31,
+      "plan": 0,
+      "analysis": 5,
+      "aspect": 0
+    },
+    "by_state": {
+      "active": 36,
+      "drift": 0,
+      "propose": 0,
+      "deprecated": 0
+    },
+    "by_edge_type": {
+      "derived_from": 24,
+      "implements": 1,
+      "tests": 5,
+      "depends_on": 0,
+      "conforms_to": 0,
+      "cross_reference": 17,
+      "informs": 0,
+      "groups": 0
+    }
+  },
+  "commit_hash": "a83ed986f4828f6d58aaad282c64599740824186"
+}

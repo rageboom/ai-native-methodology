@@ -5,7 +5,7 @@
   "description": "PoC #05 chain 4 (impl) target — chain harness 의 GREEN 산출물.",
   "type": "module",
   "scripts": {
-    "test": "vitest run --reporter=json --outputFile=../.aimd/output/evidence/vitest-output.json",
+    "test": "vitest run --reporter=json --outputFile=../.ai-context/output/evidence/vitest-output.json",
     "test:human": "vitest run"
   },
   "devDependencies": {

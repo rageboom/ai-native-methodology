@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "generated_at": "2026-05-13T22:45:00Z",
+    "methodology_version": "v2.3.5",
+    "inputs_used": ["source_code", "design_specs"],
+    "confidence": 0.83,
+    "formula_version": "v1",
+    "$comment": " PoC #11 chain 2 4 UC 모두 종결 / 12 AC / Gherkin BDD / MoSCoW priority must×8 + should×4. AC-BILLING-008 ( critical / saveDataConfirm 4 SQL 비트랜잭션 부분 fail 시 부분 commit assertion) = TDD intent 정면 위배 characterization mode 명시. test_case_refs TC-* = chain 3 placeholder ( chain 3 진입 시 실 test 코드 RED 작성)."
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json",
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json"
+  },
+  "criteria": [
+    {
+      "id": "AC-BILLING-001",
+      "description": " 인증 + 권한 보유 회계 운영자가 데이터 확정처리 화면에 진입 시, 시스템은 currYear + companyList 모델을 전달 + HTTP 200 + JSP 렌더.",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          " 회계 운영자 (ifrs_admin) 가 인증 완료 + authMap 권한 7 속성 보유 상태이다",
+          "currYear = 시스템 현재 연도 accessor 정상 동작 상태이다"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          "currYear 모델 attribute 가 응답에 포함된다",
+          "companyList 모델 attribute 가 응답에 포함된다",
+          "HTTP 200 응답을 받는다",
+          "JSP dataConfirm 화면이 렌더링된다"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-001"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-002",
+      "description": " year select option count = (currYear - 2015) + 1 ( BR-BILLING-BASEYEAR-005 / characterization mode 시작년도 2015 hardcoded as-is 보존).",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          " 회계 운영자가 인증 + 권한 보유 상태이다",
+          " 시스템 현재 연도 currYear = 2026 이다"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          " year select option count == 12 (= 2026 - 2015 + 1) 가 표시된다",
+          "year select option 의 첫 옵션 값 = 2015 이다",
+          "year select option 의 마지막 옵션 값 = 2026 이다",
+          "year select option 순서 = 시간순 (ASC) 이다"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-BASEYEAR-005"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-002"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-003",
+      "description": " characterization mode — 법인 select option count = 1 ( COM_NO==2 hardcoded filter / BR-BILLING-ENTITY-006 ambiguous → as-is 보존 / TDD intent 정면 위배 정합 / 결제 도메인 expert carry C-domain-PoC11-1).",
+      "behavior_ref": "BHV-BILLING-001",
+      "use_case_ref": "UC-BILLING-001",
+      "gherkin": {
+        "given": [
+          " 회계 운영자가 인증 + 권한 보유 상태이다",
+          " 시스템에 다수 법인 (COM_NO ∈ {1, 2, 3, ...}) 이 등록되어 있다 — 본 검증 시 characterization mode (현 behavior 보존)"
+        ],
+        "when": "회계 운영자가 데이터 확정처리 화면에 진입한다",
+        "then": [
+          " 법인 select option count == 1 ( COM_NO==2 hardcoded filter 보존)",
+          " 표시된 법인의 COM_NO == 2 이다",
+          " 다른 COM_NO (COM_NO != 2) 의 법인은 노출되지 않는다"
+        ],
+        "tags": ["@should", "@chain2", "@characterization-mode", "@BR-BILLING-ENTITY-006-ambiguous", "@domain-expert-carry"]
+      },
+      "severity": "should",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-003"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-004",
+      "description": " 데이터 확정 목록 조회 = 12 row 강제 응답 ( BR-BILLING-PERIOD-001 / recursive CTE / 데이터 0 row 도 12 row 출력).",
+      "behavior_ref": "BHV-BILLING-002",
+      "use_case_ref": "UC-BILLING-002",
+      "gherkin": {
+        "given": [
+          " year = 2025, comNo = 2, comNm = '회사명' 파라미터 제공",
+          " TB_SGMA_CONFIRM_HIS 안 해당 year + comNo row count == 0 ( ERP 결과 부재)",
+          " FIM.dbo.TB_USER cross-DB 접근 가능"
+        ],
+        "when": "회계 운영자가 데이터 확정 목록 조회를 요청한다",
+        "then": [
+          " JSON array 응답 row count == 12 ( recursive CTE / BR-BILLING-PERIOD-001)",
+          " row 의 YEAR == 2025 / COM_NO == 2 모두 일치",
+          " row 의 MONTH 1~12 ASC ( window function 결과)",
+          " row 의 PROC_ID + USER_NM + PROC_DT == null ( LEFT OUTER JOIN 결과 / 데이터 부재)",
+          " row 의 ROW_NUM 1~12 + ROW_COUNT == 12 ( window function)"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-PERIOD-001", "@T-SQL"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-004"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-005",
+      "description": " 데이터 확정 목록 조회 = 데이터 존재 시 PROC_ID + USER_NM + PROC_DT 정상 응답 ( cross-DB FIM.dbo.TB_USER JOIN).",
+      "behavior_ref": "BHV-BILLING-002",
+      "use_case_ref": "UC-BILLING-002",
+      "gherkin": {
+        "given": [
+          " year = 2025, comNo = 2 파라미터 제공",
+          " TB_SGMA_CONFIRM_HIS 에 (YEAR=2025, MONTH=3, COM_NO=2) row 존재 (PROC_ID='user1', PROC_DT='2025-03-31')",
+          " FIM.dbo.TB_USER 에 (USER_ID='user1', USER_NM='홍길동') row 존재"
+        ],
+        "when": "회계 운영자가 데이터 확정 목록 조회를 요청한다",
+        "then": [
+          " 12 row 응답 ( recursive CTE 보존)",
+          " MONTH == 3 인 row 의 PROC_ID == 'user1', USER_NM == '홍길동', PROC_DT == '2025-03-31'",
+          " 다른 month (1, 2, 4~12) 의 PROC_ID + USER_NM + PROC_DT == null"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@AP-BILLING-006"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-005"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-006",
+      "description": " characterization mode — cross-DB FIM.dbo.TB_USER 접근 부재 시 cross-DB 의존 에러 ( AP-BILLING-006 / 새 시스템 = dataSource 분리 invariant 정합).",
+      "behavior_ref": "BHV-BILLING-002",
+      "use_case_ref": "UC-BILLING-002",
+      "gherkin": {
+        "given": [
+          " year = 2025, comNo = 2 파라미터 제공",
+          " FIM cross-DB 접근 차단 ( permission denied 또는 DB 분리 상황 simulation)"
+        ],
+        "when": "회계 운영자가 데이터 확정 목록 조회를 요청한다",
+        "then": [
+          " characterization mode 보존: cross-DB 의존 에러 발생 (예: SQLException / DB access denied)",
+          " 새 시스템 invariant: dataSource 분리 시 SQL 자체 재작성 의무 (carry C-stack-결단-chain-3-4-plan)"
+        ],
+        "tags": ["@should", "@chain2", "@characterization-mode", "@AP-BILLING-006", "@cross-DB"]
+      },
+      "severity": "should",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-006"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-007",
+      "description": " 데이터 확정 처리 = 정상 4 SQL 순차 commit ( count > 0 시 happy path / full overwrite).",
+      "behavior_ref": "BHV-BILLING-003",
+      "use_case_ref": "UC-BILLING-003",
+      "gherkin": {
+        "given": [
+          " distYear = 2025, distMonth = '03', companySeq = 1 파라미터 제공",
+          " session EKP_USER_ID = 'user1' 존재",
+          " SGERPMA.dbo.TB_RG_RESULTS 에 해당 (DIST_YEAR=2025, DIST_MONTH='03', COMPANYSEQ=1) row 5건 존재 ( count > 0)",
+          " TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA 빈 상태"
+        ],
+        "when": "회계 운영자가 데이터 확정 처리를 요청한다",
+        "then": [
+          " pre-check selectConfirmDataCount 결과 == 5 ( count > 0)",
+          " 4 SQL 순차 실행: deleteConfirmData + insertConfirmData + insertConfirmHistory + insertConfirmHistoryData",
+          " TB_SGMA_CONFIRM 에 5 row 추가 ( full overwrite / BR-BILLING-OVERWRITE-003)",
+          " TB_SGMA_CONFIRM_HIS 에 1 row 추가 ( history header / SCOPE_IDENTITY hisNo 자동 채움)",
+          " TB_SGMA_CONFIRM_HIS_DATA 에 5 row 추가 ( hisNo FK 관계 / history detail)",
+          " HTTP 200 + success 응답"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-OVERWRITE-003", "@BR-BILLING-HISTPK-007", "@happy-path"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-007"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-008",
+      "description": " critical characterization mode — 데이터 확정 처리 = 4 SQL 중 3 번째 fail 시 부분 commit ( AP-BILLING-001 / BR-BILLING-CONFIRM-002 likely_bug / @Transactional ❌ / TDD intent 정면 위배 정합 / 새 시스템 invariant = @Transactional(rollbackFor=Exception.class) 의무).",
+      "behavior_ref": "BHV-BILLING-003",
+      "use_case_ref": "UC-BILLING-003",
+      "gherkin": {
+        "given": [
+          " distYear = 2025, distMonth = '03', companySeq = 1 파라미터 제공",
+          " SGERPMA.dbo.TB_RG_RESULTS row 5건 존재",
+          " insertConfirmHistory (3 번째 SQL) 호출 시 DB exception 발생 ( 예: PK violation / constraint fail simulation)"
+        ],
+        "when": "회계 운영자가 데이터 확정 처리를 요청한다",
+        "then": [
+          " characterization mode: deleteConfirmData (1 번째) commit 완료 (TB_SGMA_CONFIRM 기존 row 삭제됨)",
+          " characterization mode: insertConfirmData (2 번째) commit 완료 (TB_SGMA_CONFIRM 5 row 추가됨)",
+          " characterization mode: insertConfirmHistory (3 번째) fail (exception)",
+          " characterization mode: 부분 commit ( TB_SGMA_CONFIRM = full overwrite 완료 / TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA = 변경 없음)",
+          " characterization mode: rollback ❌ ( @Transactional ❌ / Legacy bug 보존)",
+          " 새 시스템 invariant assertion: 동일 시나리오 시 4 SQL 모두 rollback 의무 ( @Transactional(rollbackFor=Exception.class) / carry C-stack-결단-chain-3-4-plan)"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@critical", "@AP-BILLING-001", "@TDD-violation", "@migration-priority-P0"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-008"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-009",
+      "description": " 데이터 확정 처리 = full overwrite 패턴 ( BR-BILLING-OVERWRITE-003 / 기존 row 모두 삭제 후 신규 row 일괄 insert).",
+      "behavior_ref": "BHV-BILLING-003",
+      "use_case_ref": "UC-BILLING-003",
+      "gherkin": {
+        "given": [
+          " distYear = 2025, distMonth = '03', companySeq = 1 파라미터 제공",
+          " TB_SGMA_CONFIRM 에 기존 (DIST_YEAR=2025, DIST_MONTH='03', COMPANYSEQ=1) row 3건 존재 ( 이전 확정 데이터)",
+          " SGERPMA.dbo.TB_RG_RESULTS 에 신규 row 5건 존재"
+        ],
+        "when": "회계 운영자가 데이터 확정 처리를 요청한다",
+        "then": [
+          " deleteConfirmData 실행 → TB_SGMA_CONFIRM 기존 3 row 삭제",
+          " insertConfirmData 실행 → TB_SGMA_CONFIRM 신규 5 row 추가",
+          " 최종 TB_SGMA_CONFIRM row count == 5 ( full overwrite / 기존 3 row 흔적 ❌)",
+          " TB_SGMA_CONFIRM_HIS 1 row 추가 ( history)"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-OVERWRITE-003"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-009"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-010",
+      "description": " characterization mode — SCOPE_IDENTITY 자동 hisNo PK-FK 관계 검증 ( BR-BILLING-HISTPK-007 / AP-BILLING-005 SQL Server vendor 종속 invariant).",
+      "behavior_ref": "BHV-BILLING-003",
+      "use_case_ref": "UC-BILLING-003",
+      "gherkin": {
+        "given": [
+          " distYear = 2025, distMonth = '03', companySeq = 1 + ERP 결과 5건 존재",
+          " SCOPE_IDENTITY 함수 사용 가능 ( SQL Server T-SQL)"
+        ],
+        "when": "회계 운영자가 데이터 확정 처리를 요청한다",
+        "then": [
+          " insertConfirmHistory 실행 → TB_SGMA_CONFIRM_HIS 1 row 추가 ( HIS_NO PK 자동 채움 / SCOPE_IDENTITY)",
+          " insertConfirmHistoryData 실행 → TB_SGMA_CONFIRM_HIS_DATA 5 row 추가 ( HIS_NO FK = 직전 SCOPE_IDENTITY 값 일치)",
+          " characterization mode: SCOPE_IDENTITY 종속 보존 / 새 시스템 invariant = PostgreSQL RETURNING / Oracle SEQUENCE 재작성 의무 (carry C-stack-결단-chain-3-4-plan)"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-HISTPK-007", "@AP-BILLING-005"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-010"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-011",
+      "description": " 데이터 확정 처리 = ERP 결과 부재 (count == 0) 시 skip + JSP alert + no-op ( BR-BILLING-ERPDATA-004 / pre-check skip).",
+      "behavior_ref": "BHV-BILLING-004",
+      "use_case_ref": "UC-BILLING-003",
+      "gherkin": {
+        "given": [
+          " distYear = 2025, distMonth = '03', companySeq = 1 파라미터 제공",
+          " SGERPMA.dbo.TB_RG_RESULTS 에 해당 row count == 0 ( ERP 결과 부재)",
+          " TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS 기존 상태 (변경 ❌ 검증용)"
+        ],
+        "when": "회계 운영자가 데이터 확정 처리를 요청한다",
+        "then": [
+          " pre-check selectConfirmDataCount 결과 == 0",
+          " 4 SQL (delete + insert + insertHistory + insertHistoryData) 호출 ❌ (skip)",
+          " TB_SGMA_CONFIRM + TB_SGMA_CONFIRM_HIS + TB_SGMA_CONFIRM_HIS_DATA = 변경 ❌ ( no-op)",
+          " JSP alert 메시지 응답 ( '해당 월 ERP 결과가 없습니다' 류 / BR-BILLING-ERPDATA-004)",
+          " no-op idempotency = 동일 파라미터 N회 호출 시 동일 결과"
+        ],
+        "tags": ["@must", "@chain2", "@characterization-mode", "@BR-BILLING-ERPDATA-004"]
+      },
+      "severity": "must",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-011"],
+      "gate_required": true
+    },
+    {
+      "id": "AC-BILLING-012",
+      "description": " characterization mode — Qlik Sense iframe 임베드 + URL hardcoded as-is 보존 ( AP-BILLING-013 / BR-BILLING-EXTBI-008).",
+      "behavior_ref": "BHV-BILLING-005",
+      "use_case_ref": "UC-BILLING-004",
+      "gherkin": {
+        "given": [
+          " menuNm = 'sales', appid = 'app-uuid-123', sheet = 'sheet-uuid-456' 파라미터 제공",
+          " session 인증 완료"
+        ],
+        "when": "회계 운영자가 Qlik View 화면에 진입한다",
+        "then": [
+          " menuNm + appid + sheet 모델 attribute 전달 ( ModelAndView)",
+          " JSP qlikView 화면 렌더 (HTTP 200)",
+          " iframe src 의 값이 'https://datacafe.smilegate.net/sense/app/app-uuid-123/sheet/sheet-uuid-456/state/analysis' 와 일치 ( URL hardcoded characterization mode)",
+          " 새 시스템 invariant assertion: URL = 환경 변수 ${qlik.base.url} 의무 ( AP-BILLING-013 carry / carry C-stack-결단-chain-3-4-plan)"
+        ],
+        "tags": ["@should", "@chain2", "@characterization-mode", "@BR-BILLING-EXTBI-008", "@AP-BILLING-013", "@URL-hardcoded"]
+      },
+      "severity": "should",
+      "verifiable": true,
+      "automated_runnable": true,
+      "test_case_refs": ["TC-BILLING-012"],
+      "gate_required": true
+    }
+  ]
+}

@@ -35,7 +35,7 @@ const POC05_GRAPH = join(
 	'..',
 	'examples',
 	'poc-05-sample-user-register',
-	'.aimd',
+	'.ai-context',
 	'output',
 	'artifact-graph.json',
 );
@@ -48,7 +48,7 @@ function runJson(args) {
 	return { ...r, out: r.stdout ? JSON.parse(r.stdout) : null };
 }
 function readState(tmp) {
-	return JSON.parse(readFileSync(join(tmp, '.aimd', 'state.json'), 'utf-8'));
+	return JSON.parse(readFileSync(join(tmp, '.ai-context', 'state.json'), 'utf-8'));
 }
 
 // 합성 hard 체인 BHV-1 origin → spec(BHV-1,AC-1) → plan(TASK-1) → test(TC-1) → implement(IMPL-1).
@@ -149,8 +149,8 @@ describe('sync-next core (selectNextStage / markStageDone / queueStatus)', () =>
 // e2e 하네스 — tmp 복사 + init + sync-loop 로 큐 seed.
 function seedQueue() {
 	const tmp = mkdtempSync(join(tmpdir(), 'syncnext-'));
-	mkdirSync(join(tmp, '.aimd', 'output'), { recursive: true });
-	const tmpGraph = join(tmp, '.aimd', 'output', 'artifact-graph.json');
+	mkdirSync(join(tmp, '.ai-context', 'output'), { recursive: true });
+	const tmpGraph = join(tmp, '.ai-context', 'output', 'artifact-graph.json');
 	copyFileSync(POC05_GRAPH, tmpGraph);
 	const init = run(['init', tmp]);
 	assert.equal(init.status, 0, 'init 성공');
@@ -171,7 +171,7 @@ describe('sync-next e2e (no-simulation / poc-05 실 fixture)', () => {
 		const { tmp } = seedQueue();
 		try {
 			const graphBefore = readFileSync(
-				join(tmp, '.aimd', 'output', 'artifact-graph.json'),
+				join(tmp, '.ai-context', 'output', 'artifact-graph.json'),
 				'utf-8',
 			);
 			const { status, out } = runJson(['sync-next', tmp, '--json']);
@@ -183,7 +183,7 @@ describe('sync-next e2e (no-simulation / poc-05 실 fixture)', () => {
 			assert.deepEqual(out.progress, { done: 0, total: 5 });
 			// 그래프 비영속
 			assert.equal(
-				readFileSync(join(tmp, '.aimd', 'output', 'artifact-graph.json'), 'utf-8'),
+				readFileSync(join(tmp, '.ai-context', 'output', 'artifact-graph.json'), 'utf-8'),
 				graphBefore,
 			);
 			// 큐 done 미변경
@@ -265,7 +265,7 @@ describe('sync-next e2e (no-simulation / poc-05 실 fixture)', () => {
 	it('빈 큐 → exit 3', () => {
 		const tmp = mkdtempSync(join(tmpdir(), 'syncnext-empty-'));
 		try {
-			mkdirSync(join(tmp, '.aimd'), { recursive: true });
+			mkdirSync(join(tmp, '.ai-context'), { recursive: true });
 			run(['init', tmp]);
 			const r = run(['sync-next', tmp]);
 			assert.equal(r.status, 3);

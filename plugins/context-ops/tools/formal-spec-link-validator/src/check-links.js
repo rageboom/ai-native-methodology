@@ -267,11 +267,11 @@ function pushDeadIfMissing(
 const isRealEvidencePath = (p) =>
 	typeof p === 'string' && p.length > 0 && !p.startsWith('(');
 
-// evidence dump 존재 — baseDir(artifact dir) 와 project-root(.aimd/ 관례 / project-root-relative) 양 base 허용.
-//   (poc-05 evidence path = '.aimd/output/evidence/…' = project-root-relative / test-spec.json 은 .aimd/output/ 위치.)
+// evidence dump 존재 — baseDir(artifact dir) 와 project-root(.ai-context/ 관례 / project-root-relative) 양 base 허용.
+//   (poc-05 evidence path = '.ai-context/output/evidence/…' = project-root-relative / test-spec.json 은 .ai-context/output/ 위치.)
 function evidenceDumpExists(baseDir, p) {
 	const candidates = [resolve(baseDir, p)];
-	const idx = baseDir.replace(/\\/g, '/').indexOf('/.aimd/');
+	const idx = baseDir.replace(/\\/g, '/').indexOf('/.ai-context/');
 	if (idx >= 0) candidates.push(resolve(baseDir.slice(0, idx), p));
 	return candidates.some((c) => {
 		try {

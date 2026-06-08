@@ -14,10 +14,10 @@ chain harness 의 **chain 4 (test → implement) gate #4 validator** (System Y /
 
 ```bash
 node src/cli.js \
-  --behavior .aimd/output/behavior-spec.json \
-  --acceptance .aimd/output/acceptance-criteria.json \
-  --test-spec .aimd/output/test-spec.json \
-  --inventory .aimd/output/inventory.json \
+  --behavior .ai-context/output/behavior-spec.json \
+  --acceptance .ai-context/output/acceptance-criteria.json \
+  --test-spec .ai-context/output/test-spec.json \
+  --inventory .ai-context/output/inventory.json \
   [--threshold 0.85] [--dry-run] [--json]
 ```
 

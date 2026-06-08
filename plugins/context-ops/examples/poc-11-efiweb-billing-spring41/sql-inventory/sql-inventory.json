@@ -37,7 +37,7 @@
       "auto_ratio_baseline": 0.667,
       "auto_ratio_current": 0.667,
       "trend": "stable (3 사내 PoC robust)",
-      "baseline_file": ".aimd/baseline/sql-inventory-coverage.json"
+      "baseline_file": ".ai-context/baseline/sql-inventory-coverage.json"
     }
   },
   "summary": {

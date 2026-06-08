@@ -15,7 +15,7 @@
 ## 2. 형식
 
 ```
-.aimd/output/chain-2-spec/
+.ai-context/output/chain-2-spec/
 ├── behavior-spec.json   # json 단독 SSOT
 └── _manifest.yml
 ```
@@ -58,8 +58,8 @@ behaviors:
       - 'user.status = ACTIVE'
     invariants:
       - 'user.email is unique'
-    state_transition_ref: '.aimd/output/formal-spec/state-machines/user-signup.json'
-    decision_table_ref: '.aimd/output/formal-spec/decision-tables/user-signup.json'
+    state_transition_ref: '.ai-context/output/formal-spec/state-machines/user-signup.json'
+    decision_table_ref: '.ai-context/output/formal-spec/decision-tables/user-signup.json'
     property_tests:
       - property: 'email always unique after signup'
         framework: fast-check
@@ -70,10 +70,10 @@ behaviors:
       - 'src/user/UserService.java:30-60'
 cross_links:
   to_analysis_artifacts:
-    - .aimd/output/business-rules.json
-    - .aimd/output/domain.json
-    - .aimd/output/openapi.yaml
-    - .aimd/output/schema.json
+    - .ai-context/output/business-rules.json
+    - .ai-context/output/domain.json
+    - .ai-context/output/openapi.yaml
+    - .ai-context/output/schema.json
 ```
 
 ## 인용

@@ -16,9 +16,9 @@ on:
   workflow_dispatch:
     inputs:
       target_dir:
-        description: 'chain artifact target directory (e.g., examples/poc-05-*/.aimd/output/)'
+        description: 'chain artifact target directory (e.g., examples/poc-05-*/.ai-context/output/)'
         required: false
-        default: 'examples/poc-05-realworld-chain/.aimd/output/'
+        default: 'examples/poc-05-realworld-chain/.ai-context/output/'
       strict:
         description: 'fail on non-breaking findings (default: false / breaking only)'
         required: false
@@ -85,7 +85,7 @@ jobs:
           fi
 
       # Gate #3+#4 — test-impl-pass-validator (sub-plan-3b 활성)
-      # ADR-CHAIN-004 정합 — `.aimd/config/test-cmd.json` 우선 / inventory 추론 / --test-cmd override.
+      # ADR-CHAIN-004 정합 — `.ai-context/config/test-cmd.json` 우선 / inventory 추론 / --test-cmd override.
       # CI 자동화 시 --allow-execute 의무 (사용자 명시 동의).
       - name: gate#3-4 — test-impl-pass-validator (dry-run only / CI 안전)
         working-directory: tools/test-impl-pass-validator
@@ -105,12 +105,12 @@ jobs:
         if: ${{ inputs.strict == 'true' }}
         working-directory: tools/test-impl-pass-validator
         run: |
-          if [ -f "${{ github.workspace }}/.aimd/config/test-cmd.json" ]; then
+          if [ -f "${{ github.workspace }}/.ai-context/config/test-cmd.json" ]; then
             node src/cli.js \
               --project "${{ github.workspace }}" \
               --allow-execute --json
           else
-            echo "[chain-check] .aimd/config/test-cmd.json 부재 — strict mode 진입 ❌"
+            echo "[chain-check] .ai-context/config/test-cmd.json 부재 — strict mode 진입 ❌"
             exit 1
           fi
 

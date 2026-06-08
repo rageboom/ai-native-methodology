@@ -101,7 +101,7 @@ function redactInto(value, acc) {
 /**
  * corroboration 합성.
  * @param {object} o
- * @param {object} o.state — .aimd/state.json (필수)
+ * @param {object} o.state — .ai-context/state.json (필수)
  * @param {object} [o.manifest] — scope manifest (scenario / stack)
  * @param {object} [o.findings] — findings 카운트
  * @param {object} [o.matrix] — traceability-matrix

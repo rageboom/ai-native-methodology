@@ -243,7 +243,7 @@ describe('chain-driver navigate stage emphasis / --direction (F4)', () => {
 describe('SessionStart 그래프 주입 (dep-graph P4 결정 7)', () => {
 	it('artifact-graph.json 있으면 dirty count + top-3 impact root 주입', () => {
 		const dir = mkdtempSync(join(tmpdir(), 'dg-session-'));
-		const aimdOut = join(dir, '.aimd', 'output');
+		const aimdOut = join(dir, '.ai-context', 'output');
 		mkdirSync(aimdOut, { recursive: true });
 		const graph = {
 			nodes: [
@@ -273,7 +273,7 @@ describe('SessionStart 그래프 주입 (dep-graph P4 결정 7)', () => {
 		};
 		writeFileSync(join(aimdOut, 'artifact-graph.json'), JSON.stringify(graph));
 		writeFileSync(
-			join(dir, '.aimd', 'state.json'),
+			join(dir, '.ai-context', 'state.json'),
 			JSON.stringify({
 				version: '3.0.0',
 				project_id: 't',
@@ -297,9 +297,9 @@ describe('SessionStart 그래프 주입 (dep-graph P4 결정 7)', () => {
 
 	it('artifact-graph.json 없으면 dep-graph 컨텍스트 주입 안 함 (non-fatal)', () => {
 		const dir = mkdtempSync(join(tmpdir(), 'dg-session-'));
-		mkdirSync(join(dir, '.aimd'), { recursive: true });
+		mkdirSync(join(dir, '.ai-context'), { recursive: true });
 		writeFileSync(
-			join(dir, '.aimd', 'state.json'),
+			join(dir, '.ai-context', 'state.json'),
 			JSON.stringify({
 				version: '3.0.0',
 				project_id: 't',

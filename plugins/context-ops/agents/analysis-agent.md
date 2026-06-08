@@ -89,7 +89,7 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 5. **finding 즉시 등재** — `_base-log-finding` 으로 5~15 healthy / 20+ suspect 임계 (memory `feedback_finding_threshold.md` 정합)
 
 6. **analysis exit gate #0 통과** — analysis 산출물 생성 시 각 경로를 `work-unit-manifest.analysis_refs.artifacts` 에 기록. 산출 완료 후 **반드시**:
-   1. `node ${CLAUDE_PLUGIN_ROOT}/tools/findings-aggregator/src/cli.js --target <project> --stage analysis --output <project>/.aimd/output/findings-analysis.json` (필요 validator 결정론 실행 → findings 집계)
+   1. `node ${CLAUDE_PLUGIN_ROOT}/tools/findings-aggregator/src/cli.js --target <project> --stage analysis --output <project>/.ai-context/output/findings-analysis.json` (필요 validator 결정론 실행 → findings 집계)
    2. `node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js next <project> --findings <그 findings.json>` (게이트 #0 평가·기록·차단)
    - findings 없이 next 호출 = fail-closed(`findings_unverified`) 차단. critical/high = hard-block(go 거부). evidence_missing/soft = `--user-decision go` 로 ack 후 전진.
    - 게이트 통과(discovery 전진) 후 main agent 에 보고 + `discovery-agent` dispatch 권고.
@@ -97,16 +97,16 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 ## paradigm 정합
 
 - **본 agent = 새 paradigm 표준** (multi-agent paradigm 정합)
-- **본체 산출 경로** = `.aimd/output/`
+- **본체 산출 경로** = `.ai-context/output/`
 - **agents/README.md 정책** = stage 별 분리 ✅ (본 agent 는 analysis stage 전담)
 - **lifecycle-contract §Agent column** = 본 agent 가 analysis row 의 실 agent path
 
 ## 산출 자산 (chain 1 sub / analysis stage)
 
-- `.aimd/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (json 단독 SSOT) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT)
-- `.aimd/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
-- `.aimd/output/state-machines.json` (json 단독 SSOT / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
-- `.aimd/output/findings.md`
+- `.ai-context/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (json 단독 SSOT) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT)
+- `.ai-context/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
+- `.ai-context/output/state-machines.json` (json 단독 SSOT / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
+- `.ai-context/output/findings.md`
 
 ## When NOT to invoke
 

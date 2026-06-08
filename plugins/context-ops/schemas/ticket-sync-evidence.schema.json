@@ -18,7 +18,7 @@
     },
     "scope": {
       "type": "string",
-      "description": "G3 scope slug (예: car / payroll / mainpay) — `.aimd/<scope>/` 단위 격리"
+      "description": "G3 scope slug (예: car / payroll / mainpay) — `.ai-context/<scope>/` 단위 격리"
     },
     "ticket_cascade": {
       "type": "object",
@@ -120,7 +120,7 @@
           },
           "tool_stdout_path": {
             "type": "string",
-            "description": "MCP 응답 stdout 캡쳐 file path (예: .aimd/output/evidence/mcp-stdout-<timestamp>.log)"
+            "description": "MCP 응답 stdout 캡쳐 file path (예: .ai-context/output/evidence/mcp-stdout-<timestamp>.log)"
           },
           "tool_stderr_path": {
             "type": "string",
@@ -179,7 +179,7 @@
     "confirmation_log_ref": {
       "type": "string",
       "minLength": 1,
-      "description": "모든 MCP 호출 직전 사용자 confirmation gate 기록 경로. 보통 `.aimd/output/intervention-log.jsonl` (intervention-log.schema.json 정합) 또는 별도 ticket-sync-confirmation-<timestamp>.jsonl. 사용자 yes/no/dry-run 응답 + preview MD digest."
+      "description": "모든 MCP 호출 직전 사용자 confirmation gate 기록 경로. 보통 `.ai-context/output/intervention-log.jsonl` (intervention-log.schema.json 정합) 또는 별도 ticket-sync-confirmation-<timestamp>.jsonl. 사용자 yes/no/dry-run 응답 + preview MD digest."
     },
     "confirmation_gate": {
       "type": "object",

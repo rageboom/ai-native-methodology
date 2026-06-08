@@ -1,0 +1,112 @@
+{
+  "$schema_origin": "skills/analysis-input-collection/SKILL.md (산출물 정의)",
+  "target": {
+    "repo": "EFI-WEB",
+    "origin_path": "/Users/sangcl/Documents/Development/Study/EFI-WEB",
+    "branch": "main",
+    "commit": "d651baa616ebddf78cbd6170920056e93960bc7f",
+    "commit_short": "d651baa6",
+    "last_commit_at": "2026-04-02",
+    "scope": "smilegate.ifrs.car (CarMgt + CarCost — 이중 책임 분기 / 1750 LOC)",
+    "source_path": "examples/poc-16-efiweb-car-spring41/source/",
+    "immutable_snapshot": true
+  },
+  "stack": {
+    "language": "java",
+    "java_version": "1.8",
+    "framework": "spring-mvc-4.1.2",
+    "egov_framework": "3.6.0",
+    "orm": "ibatis-2.3.4",
+    "db": "mssql",
+    "view": "jsp",
+    "servlet_container": "resin",
+    "packaging": "war",
+    "build": "maven-2"
+  },
+  "tracks": ["BE", "DB", "FE"],
+  "input_assets": {
+    "java_files": 8,
+    "java_loc": 1750,
+    "jsp_files": 14,
+    "sqlmap_files": 2,
+    "sqlmap_statements": 37,
+    "sqlmap_statement_breakdown": {
+      "select": 17,
+      "insert": 5,
+      "update": 9,
+      "delete": 5,
+      "procedure": 1
+    },
+    "ddl_tables": 6,
+    "ddl_functions": 3,
+    "ddl_loc": 337,
+    "erd_files": 2,
+    "erd_total_size_kb": 248,
+    "external_db_count": 4,
+    "external_db_objects": 18,
+    "total_files": 36
+  },
+  "cross_db_dependencies": {
+    "manifest_ref": "source/_cross-db-dependencies.md",
+    "external_dbs": [
+      {"name": "FIM", "purpose": "사내 사용자/회사 마스터", "object_count": 3},
+      {"name": "SGERP", "purpose": "ERP 회계/조직 시스템", "object_count": 11, "sp_count": 1},
+      {"name": "e_hr", "purpose": "인사 / 휴일", "object_count": 1},
+      {"name": "ekporg", "purpose": "조직 group / company list", "object_count": 1}
+    ],
+    "stored_procedure_calls": [
+      {
+        "object": "SGERP.dbo.SG_SACSlipRowCarManagementIFQuery",
+        "purpose": "차량비용 → ERP 회계전표 IF 전송",
+        "source_available": false,
+        "signature_only": true,
+        "parameter_count": 6,
+        "called_from": "carCost.xml selectCarCostCalculate (line 328-329)"
+      }
+    ],
+    "own_db": "IFRS",
+    "own_tables": [
+      "TB_CAR",
+      "TB_CAR_COST",
+      "TB_CAR_COST_NOLOG",
+      "TB_CAR_COST_SLIP",
+      "TB_CAR_DRIVE",
+      "TB_CAR_USER_TERM"
+    ],
+    "own_functions": [
+      "fn_Get_CarUserListView",
+      "fn_Get_CarUserListView_2",
+      "FN_split (공통 utility)"
+    ]
+  },
+  "axis_label": "D-axis (artifact-graph e2e 입증)",
+  "r1_prime_corroboration": {
+    "applies": true,
+    "axis": "Spring 4.1 + iBATIS 2 (Legacy)",
+    "ceiling_baseline": "~53~55%",
+    "prior_corroboration_count": 3,
+    "prior_pocs": ["poc-06-efiweb-exchange-spring41", "poc-07-efiweb-capital-spring41", "poc-11-efiweb-billing-spring41"],
+    "this_poc_role": "4th corroboration (carry / blocking ❌ — main axis = D-axis)"
+  },
+  "baseline_applied": false,
+  "baseline_note": "PoC 단독 / chain-driver init 만 적용 / ADR-010 baseline+ratchet 본 PoC scope 외 (PoC #06/#11 동형)",
+  "chain_driver_state": {
+    "version": "1.0",
+    "project_id": "poc-16-efiweb-car-spring41",
+    "current_chain": "analysis",
+    "current_phase": "input.0",
+    "blocked": false,
+    "intervention_log_path": ".ai-context/output/intervention-log.jsonl"
+  },
+  "known_limitations": [
+    "external 4 DB (FIM/SGERP/e_hr/ekporg) 18 object source 부재 — sqlmap 추론 + external_only:true 마커",
+    "SP `SG_SACSlipRowCarManagementIFQuery` 본체 부재 — 외부 SGERP / 호출 시그니처만",
+    "ERD 형식 viewer 부재 — manual_extraction 의무 / meta-confidence 정합",
+    "MSSQL 운영 DB 직접 접근 부재 — DDL 사본 + sqlmap 추론",
+    "Spring 4.1 + iBATIS 2 R1' axis 53~55% ceiling — analysis 자동화율 50%대 예상 / blocking 아님",
+    "JSP scenario C 한계 — ui phase state-map 추출률 부분"
+  ],
+  "phase_input_completed_at": "2026-05-28T05:00:00Z",
+  "next_phase": "template-analyze (analysis-html-template / scenario C / JSP 14)",
+  "next_skill_recommendation": "analysis-html-template"
+}

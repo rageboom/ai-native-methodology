@@ -59,7 +59,7 @@ EFI-WEB (사내 IFRS 회계 시스템 / Spring 4.1.2 + iBATIS 2 + JSP 248) 의 *
 | 1.5 | §3-A 측정 + sql-inventory 자동/수동 비율                    | inventory.json `phase_3a_automation_measurement` + sql-inventory.json `extraction_automation` |
 | 2   | phase 4.7 (snapshot + intent-vs-bug + coverage)             | characterization/snapshots/UC-CAPITAL-\*.json + intent-vs-bug.md + coverage.json              |
 | 2.5 | D2 ambiguous 도메인 결단 (사용자 묶음 의뢰)                 | DEC-domain-결단 + intent-vs-bug §3 갱신                                                       |
-| 3   | chain 1 + validators (ratchet trend baseline write 첫 진입) | .aimd/output/planning-spec.{json,md} + validator output                                       |
+| 3   | chain 1 + validators (ratchet trend baseline write 첫 진입) | .ai-context/output/planning-spec.{json,md} + validator output                                       |
 | 3.5 | REPORT + 종결 + carry 3 신규 등재                           | REPORT + DEC-종결 + STATUS + INDEX + C-v2.2.0-{sql-inventory, sql-schema, sql-tool}           |
 
 ## 측정 자격 (4축 / Day 3.5 종결)
@@ -97,7 +97,7 @@ poc-07-efiweb-capital-spring41/
 │   ├── snapshots/UC-CAPITAL-*.json # Given/When/Then BDD
 │   ├── coverage.json               # ratchet 권장 / trend_required: true
 │   └── intent-vs-bug.md            # 4분류 (intent/bug/ambiguous/self_recognized)
-└── .aimd/                          # chain-driver state (Day 3)
+└── .ai-context/                          # chain-driver state (Day 3)
     ├── state.json
     ├── baseline/
     │   └── characterization-coverage.json    # legacy 첫 진입 baseline write

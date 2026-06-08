@@ -17,7 +17,7 @@
 - **Node ESM + better-sqlite3 (raw SQL / ORM 아님)** — raw SQL 이라 sql-inventory + db-schema(FK) 가 생기는 스택(=data_refs/FK reading-aid 가 legacy 반쪽 메커니즘으로 적용). vitest 러너.
 - `src/` — db.js(스키마 부트스트랩) · users.js · categories.js · notes.js(UC1 createNote) · schema.sql(users·notes·categories / FK 2)
 - `input/` — analysis 6종(코드-고고학 추출): sql-inventory · db-schema(FK) · business-rules(BC-NOTES / BR-001·002·003) · domain · inventory · antipatterns
-- `.aimd/output/` — chain 산출물(discovery·behavior·acceptance·task-plan·test-spec) + **artifact-graph.json** + context-cache.json(FK federation) + findings + intervention-log + state.json
+- `.ai-context/output/` — chain 산출물(discovery·behavior·acceptance·task-plan·test-spec) + **artifact-graph.json** + context-cache.json(FK federation) + findings + intervention-log + state.json
 - `test/` — vitest (5 tests / GREEN)
 
 ## 여정 (S2 AX전환 경로 / 3 commit)
@@ -35,12 +35,12 @@
 ```bash
 # 그래프 합성
 node tools/traceability-matrix-builder/src/cli.js \
-  --discovery $P/.aimd/output/discovery-spec.json --behavior $P/.aimd/output/behavior-spec.json \
-  --acceptance $P/.aimd/output/acceptance-criteria.json --task-plan $P/.aimd/output/task-plan.json \
-  --test-spec $P/.aimd/output/test-spec.json --analysis-dir $P/input --out-dir $P/.aimd/output --graph
+  --discovery $P/.ai-context/output/discovery-spec.json --behavior $P/.ai-context/output/behavior-spec.json \
+  --acceptance $P/.ai-context/output/acceptance-criteria.json --task-plan $P/.ai-context/output/task-plan.json \
+  --test-spec $P/.ai-context/output/test-spec.json --analysis-dir $P/input --out-dir $P/.ai-context/output --graph
 
 # FK federation (data_refs + foreign_keys)
-node tools/context-federator/src/cli.js $P/.aimd/output/artifact-graph.json \
+node tools/context-federator/src/cli.js $P/.ai-context/output/artifact-graph.json \
   --repo-root $P --sql-inventory $P/input/sql-inventory.json --db-schema $P/input/db-schema.json --no-callers --out /tmp/cc.json
 
 # 앱 테스트 (PoC 디렉토리에서 / better-sqlite3+vitest 설치 후)

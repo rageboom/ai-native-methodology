@@ -7,7 +7,7 @@
 //                   [--timeout <ms>] [--flaky-retry <n>]
 //
 // ADR-CHAIN-004 정합:
-//   1. .aimd/config/test-cmd.json 우선 / inventory 추론 / --test-cmd override
+//   1. .ai-context/config/test-cmd.json 우선 / inventory 추론 / --test-cmd override
 //   2. --allow-execute 의무 (없으면 dry-run only)
 //   3. timeout 600000ms default / maxBuffer 50MB
 //   4. flaky retry per-test cap 2 (Playwright 정합)
@@ -36,10 +36,10 @@ function usage(code = 2) {
 	console.error(
 		[
 			'usage: test-impl-pass-validator --project <dir> [options]',
-			'  --project <dir>          required — 사용자 프로젝트 root (.aimd/ 위치 기준)',
+			'  --project <dir>          required — 사용자 프로젝트 root (.ai-context/ 위치 기준)',
 			'  --inventory <path>       inventory.json (stack_signals 자동 추론용)',
 			'  --test-cmd <json>        inline test-cmd JSON override',
-			'  --out <path>             test_invocation_evidence 산출 path (default: <project>/.aimd/output/evidence/test-invocation-evidence.json)',
+			'  --out <path>             test_invocation_evidence 산출 path (default: <project>/.ai-context/output/evidence/test-invocation-evidence.json)',
 			'  --allow-execute          ADR-CHAIN-004 §4 — 진짜 실행 동의 (없으면 dry-run only)',
 			'  --dry-run                config 검증만 / 실행 ❌ / exit 0 강제',
 			'  --json                   JSON output',
@@ -221,11 +221,11 @@ function buildEvidence(
 	const reproduction =
 		`${testCmd.test_cmd} ${(testCmd.test_cmd_args ?? []).join(' ')}`.trim();
 	const stdout_path = resolvePath(
-		testCmd.stdout_path ?? '.aimd/output/evidence/test-stdout.txt',
+		testCmd.stdout_path ?? '.ai-context/output/evidence/test-stdout.txt',
 		projectDir,
 	);
 	const stderr_path = resolvePath(
-		testCmd.stderr_path ?? '.aimd/output/evidence/test-stderr.txt',
+		testCmd.stderr_path ?? '.ai-context/output/evidence/test-stderr.txt',
 		projectDir,
 	);
 
@@ -273,7 +273,7 @@ function writeEvidenceFiles(evidence, runResult, outPath, projectDir) {
 	const out =
 		outPath ??
 		resolvePath(
-			'.aimd/output/evidence/test-invocation-evidence.json',
+			'.ai-context/output/evidence/test-invocation-evidence.json',
 			projectDir,
 		);
 	mkdirSync(dirname(out), { recursive: true });

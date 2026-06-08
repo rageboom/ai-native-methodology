@@ -58,8 +58,8 @@ function printUsage() {
 			'options:',
 			'  --target   PoC 디렉토리 (예: examples/poc-11-efiweb-billing-spring41)',
 			'  --stage    analysis / discovery / spec / plan / test / implement (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)',
-			'  --manifest analysis 전용 — work-unit-manifest.json 경로 (미지정 시 <target>/.aimd/state.json.current_scope 자동 해석). analysis_refs.artifacts 경로 맵 + scenario 사용.',
-			'  --output   findings JSON 저장 경로 (default: <target>/.aimd/output/findings-<stage>.json)',
+			'  --manifest analysis 전용 — work-unit-manifest.json 경로 (미지정 시 <target>/.ai-context/state.json.current_scope 자동 해석). analysis_refs.artifacts 경로 맵 + scenario 사용.',
+			'  --output   findings JSON 저장 경로 (default: <target>/.ai-context/output/findings-<stage>.json)',
 			'  --dry-run  파일 저장 ❌ / stdout 만',
 			'  --json     JSON 출력 (default: text)',
 			'',
@@ -91,7 +91,7 @@ function runValidator(validatorName, projectDir, stage) {
 
 // validator 별 인자 매핑 (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)
 export function buildValidatorArgs(validatorName, projectDir, stage) {
-	const O = (f) => join(projectDir, '.aimd/output', f);
+	const O = (f) => join(projectDir, '.ai-context/output', f);
 	switch (validatorName) {
 		case 'discovery-extraction-validator':
 			return [
@@ -149,9 +149,9 @@ export function buildValidatorArgs(validatorName, projectDir, stage) {
 		case 'plan-coverage-validator':
 			return [
 				'--task-plan',
-				join(projectDir, '.aimd/output/task-plan.json'),
+				join(projectDir, '.ai-context/output/task-plan.json'),
 				'--acceptance',
-				join(projectDir, '.aimd/output/acceptance-criteria.json'),
+				join(projectDir, '.ai-context/output/acceptance-criteria.json'),
 				'--json',
 			];
 		case 'test-impl-pass-validator':
@@ -185,15 +185,15 @@ export function buildValidatorArgs(validatorName, projectDir, stage) {
 function loadAnalysisRefs(projectDir, explicitManifest) {
 	let manifestPath = explicitManifest ? resolve(explicitManifest) : null;
 	if (!manifestPath) {
-		// <target>/.aimd/state.json.current_scope → <target>/.aimd/<scope>/manifest.json
+		// <target>/.ai-context/state.json.current_scope → <target>/.ai-context/<scope>/manifest.json
 		try {
-			const statePath = join(projectDir, '.aimd', 'state.json');
+			const statePath = join(projectDir, '.ai-context', 'state.json');
 			if (existsSync(statePath)) {
 				const state = JSON.parse(readFileSync(statePath, 'utf-8'));
 				if (state.current_scope) {
 					const p = join(
 						projectDir,
-						'.aimd',
+						'.ai-context',
 						state.current_scope,
 						'manifest.json',
 					);
@@ -349,7 +349,7 @@ function main() {
 	if (!args.dryRun) {
 		const outputPath =
 			args.output ??
-			join(args.target, '.aimd/output', `findings-${args.stage}.json`);
+			join(args.target, '.ai-context/output', `findings-${args.stage}.json`);
 		mkdirSync(dirname(outputPath), { recursive: true });
 		writeFileSync(
 			outputPath,

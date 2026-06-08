@@ -15,7 +15,7 @@ DEC-2026-05-02-v1.4-Stage-5-Sprint-5-3-종결 (Ajv 8 신설) + DEC-2026-05-06-su
 
 ## Inputs
 
-- `<project-dir>/.aimd/output/**/*.json` — 검증 대상 산출물
+- `<project-dir>/.ai-context/output/**/*.json` — 검증 대상 산출물
 - chain 6 schema (자동 등록 / v11.0.0 — planning-spec → discovery-spec rename):
   - `discovery-spec.schema.json`
   - `behavior-spec.schema.json`

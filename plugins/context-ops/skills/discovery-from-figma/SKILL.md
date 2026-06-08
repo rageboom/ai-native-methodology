@@ -18,12 +18,12 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 ## 입력
 
 - Figma file URL + selected frame
-- (선택) `.aimd/output/visual-manifest.json` (`analysis-from-figma` baseline 산출 — design tokens / layouts 참조 cross-check)
+- (선택) `.ai-context/output/visual-manifest.json` (`analysis-from-figma` baseline 산출 — design tokens / layouts 참조 cross-check)
 - discovery context: `intent` (new feature / modify / bug-fix) — orchestrator inject
 
 ## 산출
 
-`.aimd/output/discovery-spec.json` 의 다음 entries (source_grounded_evidence 의무):
+`.ai-context/output/discovery-spec.json` 의 다음 entries (source_grounded_evidence 의무):
 
 - `use_cases[]` — frame 별 사용자 flow → UC-\* (id + name + description + acceptance_criteria_refs[])
 - `business_rules_intent[]` — interaction 에 함축된 BR (예: 카드 만료 가림 / 폼 validation 시각화 / 조건부 button enable) → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-\* id 없음)

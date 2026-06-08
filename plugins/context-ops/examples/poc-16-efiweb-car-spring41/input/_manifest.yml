@@ -158,7 +158,7 @@ input_validation_checklist:
   - check: 'cross-DB dependency manifest 작성'
     status: '✅ source/_cross-db-dependencies.md / 4 외부 DB / 18 object / SP 1'
   - check: 'chain-driver init 완료'
-    status: '✅ .aimd/state.json (stage=analysis / blocked=false)'
+    status: '✅ .ai-context/state.json (stage=analysis / blocked=false)'
   - check: 'stack-detection 1차'
     status: '✅ Spring 4.1.2 + iBATIS 2.3.4 + Java 1.8 + MSSQL + Resin + Maven war'
 

@@ -19,11 +19,11 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Task
 
 ### 1단계 — 입력어댑터 패스 (코드-고고학 skip)
 
-`analysis-input-orchestrate` 의 **greenfield 분기**(5단계)를 호출 → BCDE 어댑터(`analysis-from-{prompt,swagger,plan-doc,figma}`)만 dispatch. 산출 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` + `input-summary.json`. legacy 전용 phase(`source-inventory` / DDL `db-schema` / `characterization` / `sql-inventory`)는 미발동.
+`analysis-input-orchestrate` 의 **greenfield 분기**(5단계)를 호출 → BCDE 어댑터(`analysis-from-{prompt,swagger,plan-doc,figma}`)만 dispatch. 산출 = `.ai-context/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` + `input-summary.json`. legacy 전용 phase(`source-inventory` / DDL `db-schema` / `characterization` / `sql-inventory`)는 미발동.
 
 ### 2단계 — 결정적 산출 (swagger 채널 / testable)
 
-swagger-extract 가 있으면 `node ${CLAUDE_PLUGIN_ROOT}/tools/greenfield-bootstrap/src/cli.js --output <user-project>/.aimd/output --swagger-extract .aimd/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
+swagger-extract 가 있으면 `node ${CLAUDE_PLUGIN_ROOT}/tools/greenfield-bootstrap/src/cli.js --output <user-project>/.ai-context/output --swagger-extract .ai-context/<scope>/planning/swagger-extract.json --scope <scope> --channel swagger`:
 
 - `openapi.yaml` (deliverable 5-a) — swagger-extract(이미 파싱된 OpenAPI)의 **결정적 승격** (AI 추론 0).
 - `antipatterns.json` + `migration-cautions.json` — legacy-only 산출물 **N/A** (빈 배열 + `meta.na_reason` 정당화 / `antipatterns.schema.json` + `migration-cautions.schema.json` 정합 / json 단독).
@@ -49,8 +49,8 @@ swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--o
 
 ## 산출물
 
-- `<user-project>/.aimd/output/{architecture,domain,business-rules,schema}.json` + `openapi.yaml` (7대 subset)
-- `<user-project>/.aimd/output/antipatterns.json` (N/A 빈) + `migration-cautions.json` (N/A stub / json 단독)
+- `<user-project>/.ai-context/output/{architecture,domain,business-rules,schema}.json` + `openapi.yaml` (7대 subset)
+- `<user-project>/.ai-context/output/antipatterns.json` (N/A 빈) + `migration-cautions.json` (N/A stub / json 단독)
 
 ## When NOT to invoke
 

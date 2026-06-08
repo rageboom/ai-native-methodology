@@ -10,7 +10,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 ## 사전 조건
 
-- `<user-project>/.aimd/output/architecture.json` 존재
+- `<user-project>/.ai-context/output/architecture.json` 존재
 - 가급적 `business-logic` phase (§8.1 단일 PoC 과적합 회피) — 같은 도메인이 여러 PoC / module 에서 일관 식별되는지 cross-check 권장
 
 ## 절차
@@ -34,13 +34,13 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 ## 산출물
 
-`<user-project>/.aimd/output/domain.json`
+`<user-project>/.ai-context/output/domain.json`
 
 ## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / use-scenario-taxonomy §2.4 옵션 A) 일 때 — `@Entity`/ORM 스캔 대신 **입력어댑터 extract** 에서 산출:
 
-- 입력 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점 / `analysis-input-orchestrate` greenfield 분기).
+- 입력 = `.ai-context/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점 / `analysis-input-orchestrate` greenfield 분기).
 - entity 후보 = swagger `domain_seed[]` + schema 이름/required 필드 / figma 화면 entity / PRD 도메인 용어. aggregate/VO/bounded-context = 설계 의도(inferred) 기반.
 - `source_grounded_evidence` = **입력 출처 인용** (코드 grep ❌): `swagger:SchemaName` / `figma:node_id` / `doc:§N`.
 - `code_pointers` = N/A (`meta.code_pointers_na` 동형 사유 / 가리킬 코드 부재). domain.schema.json 은 code_pointers hard-require ❌ → 산출물 schema-valid.

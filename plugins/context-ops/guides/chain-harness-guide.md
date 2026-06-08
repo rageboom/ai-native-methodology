@@ -11,14 +11,14 @@ v2.5 paradigm 확장 — chain 1 gate 가 **Layer 2 LLM (Claude Code sub-agent i
 5 요소:
 
 1. **Driver** — `tools/chain-driver/` cli + 6 module
-2. **State 영속** — `.aimd/state.json` (atomic CAS write)
+2. **State 영속** — `.ai-context/state.json` (atomic CAS write)
 3. **Mechanical gate trio** — state.blocked + cli exit 2 + PreToolUse deny
 4. **Skill auto-invoke (D21')** — hooks/hooks.json suppressOutput=true
 5. **Chain-revisit detector** — git diff --numstat + LOC threshold
 
 ## 2. state.json 의 의미
 
-`<project>/.aimd/state.json` 의 핵심 필드 (전체 = `schemas/state.schema.json`):
+`<project>/.ai-context/state.json` 의 핵심 필드 (전체 = `schemas/state.schema.json`):
 
 ```json
 {
@@ -46,7 +46,7 @@ atomic write CAS — chain-driver 가 state 갱신 시 expectedVersion 비교 �
 node tools/chain-driver/src/cli.js init <project-dir>
 ```
 
-→ `.aimd/state.json` 신규 생성 (current_chain: "analysis" / blocked: false). 이후 사용자 prompt 로 chain stage 진입.
+→ `.ai-context/state.json` 신규 생성 (current_chain: "analysis" / blocked: false). 이후 사용자 prompt 로 chain stage 진입.
 
 ### 3.2 Next (다음 stage 진입)
 
@@ -67,7 +67,7 @@ next 호출 시점 = 보통 hook 자동 (UserPromptSubmit hook 이 stage 매칭 
 `state.blocked=true` 가 되면:
 
 - chain-driver `next` cli exit 2 (다음 stage 진입 거부)
-- PreToolUse hook 이 `<project>/.aimd/output/**` Write/Edit 차단 (permissionDecision=deny)
+- PreToolUse hook 이 `<project>/.ai-context/output/**` Write/Edit 차단 (permissionDecision=deny)
 - 사용자가 finding fix 후 재시도
 
 ### 3.4 Unblock 절차

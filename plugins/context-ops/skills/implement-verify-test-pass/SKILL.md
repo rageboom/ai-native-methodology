@@ -16,11 +16,11 @@ chain 5 의 **종결 skill**. impl 코드 generate 후 진짜 runner 호출 → 
 
 ## 입력
 
-- `<project>/.aimd/output/impl-spec.json`
-- `<project>/.aimd/output/test-spec.json`
-- `<project>/.aimd/output/behavior-spec.json` + `acceptance-criteria.json`
-- `<project>/.aimd/output/discovery-spec.json`
-- `<project>/.aimd/config/test-cmd.json`
+- `<project>/.ai-context/output/impl-spec.json`
+- `<project>/.ai-context/output/test-spec.json`
+- `<project>/.ai-context/output/behavior-spec.json` + `acceptance-criteria.json`
+- `<project>/.ai-context/output/discovery-spec.json`
+- `<project>/.ai-context/config/test-cmd.json`
 
 ## 절차
 
@@ -74,12 +74,12 @@ severity_floor (DO-178C DAL A) 검증:
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
-  --discovery  .aimd/output/discovery-spec.json \
-  --behavior   .aimd/output/behavior-spec.json \
-  --acceptance .aimd/output/acceptance-criteria.json \
-  --test-spec  .aimd/output/test-spec.json \
-  --impl-spec  .aimd/output/impl-spec.json \
-  --out-dir    .aimd/output/traceability/
+  --discovery  .ai-context/output/discovery-spec.json \
+  --behavior   .ai-context/output/behavior-spec.json \
+  --acceptance .ai-context/output/acceptance-criteria.json \
+  --test-spec  .ai-context/output/test-spec.json \
+  --impl-spec  .ai-context/output/impl-spec.json \
+  --out-dir    .ai-context/output/traceability/
 ```
 
 matrix.coverage_summary.red_count == 0 의무 / status 모두 green.
@@ -87,7 +87,7 @@ matrix.coverage_summary.red_count == 0 의무 / status 모두 green.
 ### 7. lint-no-simulation chain-strict (static-runner)
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.ai-context/output/ --chain-strict
 ```
 
 chain 5 strict 의무:
@@ -110,14 +110,14 @@ gate #5 go = chain 1 cycle (discovery→implement) 완주 = terminal. 외부 ado
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/adopter-evidence-packager/src/cli.js \
-  --state .aimd/state.json \
-  --manifest .aimd/<scope>/manifest.json \
+  --state .ai-context/state.json \
+  --manifest .ai-context/<scope>/manifest.json \
   --findings <findings.json> \
-  --matrix .aimd/output/matrix.json \
+  --matrix .ai-context/output/matrix.json \
   --stack <csv> --org-type <internal-team|external-oss|individual|undisclosed> --salt <s>
 ```
 
-- 익명화 (PII best-effort redaction + post-redaction leak guard) 후 `.aimd/output/adopter-corroboration.json` 생성 (schema = `schemas/adopter-corroboration.schema.json`).
+- 익명화 (PII best-effort redaction + post-redaction leak guard) 후 `.ai-context/output/adopter-corroboration.json` 생성 (schema = `schemas/adopter-corroboration.schema.json`).
 - 자동 전송 ❌ — adopter 가 명시 공유할 때만 maintainer 에 전달 (§8.1 ≥2 distinct domain corroboration 채널).
 - 정직: 본 단계 = 캡처 '배선' / Type 2 '측정'은 실 외부 adopter 실행 시 발생 (no-simulation).
 

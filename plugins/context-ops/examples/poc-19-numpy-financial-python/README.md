@@ -84,11 +84,11 @@ python -m venv .venv
 
 ## 5. 산출물 위치
 
-- `target/.aimd/state.json` — 상태머신 최종 상태 (current_chain=implement, last_gate=#5)
-- `target/.aimd/output/` — 11 체인 산출물 (analysis 4[business-rules/domain/architecture/antipatterns] + discovery/behavior/ac/task-plan/test/impl-spec + matrix), 전부 strict schema VALID
-- `target/.aimd/output/findings-*.json` — gate 별 findings (실 validator/runner 유래)
-- `target/.aimd/output/evidence/pytest-report-{red,green}.json` — RED/GREEN pytest 원본 (5종 물증)
-- `target/.aimd/findings/test-impl-{red,green}.json` — RED/GREEN invocation evidence
+- `target/.ai-context/state.json` — 상태머신 최종 상태 (current_chain=implement, last_gate=#5)
+- `target/.ai-context/output/` — 11 체인 산출물 (analysis 4[business-rules/domain/architecture/antipatterns] + discovery/behavior/ac/task-plan/test/impl-spec + matrix), 전부 strict schema VALID
+- `target/.ai-context/output/findings-*.json` — gate 별 findings (실 validator/runner 유래)
+- `target/.ai-context/output/evidence/pytest-report-{red,green}.json` — RED/GREEN pytest 원본 (5종 물증)
+- `target/.ai-context/findings/test-impl-{red,green}.json` — RED/GREEN invocation evidence
 - `target/numpy_financial/tests/test_amortization_slice.py` — 슬라이스 테스트 (RED↔GREEN 무변경 / i-strict)
 - `target/numpy_financial/_financial.py` — GREEN 복원 impl (= v1.0.0 원본)
 

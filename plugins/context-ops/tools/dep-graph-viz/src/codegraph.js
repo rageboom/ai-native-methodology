@@ -32,9 +32,9 @@ export function readCodegraph(dbPath) {
 
 // graph 의 code_pointers / code leaf 근처에서 codegraph.db 자동 탐색. 없으면 null.
 export function findCodegraphDb(graphPath) {
-	// graphPath = <poc>/.aimd/output/artifact-graph.json → pocRoot 추정 후 후보 검사.
+	// graphPath = <poc>/.ai-context/output/artifact-graph.json → pocRoot 추정 후 후보 검사.
 	const outputDir = dirname(resolve(graphPath));
-	const pocRoot = dirname(dirname(outputDir)); // .aimd/output → .aimd → pocRoot
+	const pocRoot = dirname(dirname(outputDir)); // .ai-context/output → .ai-context → pocRoot
 	const candidates = [
 		join(pocRoot, 'target', '.codegraph', 'codegraph.db'),
 		join(pocRoot, '.codegraph', 'codegraph.db'),

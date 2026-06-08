@@ -139,7 +139,7 @@ function setupRepo({ synthesizedAt, derivedFrom, withOrphan = false }) {
 	const root = mkdtempSync(join(tmpdir(), 'converge-'));
 	const g = (a) => spawnSync('git', a, { cwd: root, encoding: 'utf-8' });
 	g(['init', '-q']); g(['config', 'user.email', 't@t']); g(['config', 'user.name', 't']);
-	const outDir = join(root, '.aimd', 'output'); mkdirSync(outDir, { recursive: true });
+	const outDir = join(root, '.ai-context', 'output'); mkdirSync(outDir, { recursive: true });
 	const br = (d) => JSON.stringify({ business_rules: [{ id: 'BR-POST-1', bounded_context: 'BC-POST', desc: d }] });
 	writeFileSync(join(outDir, 'business-rules.json'), br('orig'));
 	writeFileSync(join(outDir, 'behavior-spec.json'), JSON.stringify({ v: 1 }));
@@ -148,9 +148,9 @@ function setupRepo({ synthesizedAt, derivedFrom, withOrphan = false }) {
 		synthesized_at: synthesizedAt,
 		...(derivedFrom ? { derived_from: derivedFrom } : {}),
 		nodes: [
-			{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.aimd/output/business-rules.json', state: 'active' },
-			{ id: 'analysis-business-rules-BR-POST-1', artifact_kind: 'analysis', artifact_subkind: 'business-rules', business_rule_id: 'BR-POST-1', source_path: '.aimd/output/business-rules.json', state: 'active' },
-			{ id: 'BHV-POST-001', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: '.aimd/output/behavior-spec.json', state: 'active' },
+			{ id: 'analysis-business-rules', artifact_kind: 'analysis', artifact_subkind: 'business-rules', source_path: '.ai-context/output/business-rules.json', state: 'active' },
+			{ id: 'analysis-business-rules-BR-POST-1', artifact_kind: 'analysis', artifact_subkind: 'business-rules', business_rule_id: 'BR-POST-1', source_path: '.ai-context/output/business-rules.json', state: 'active' },
+			{ id: 'BHV-POST-001', artifact_kind: 'chain', artifact_subkind: 'BHV', source_path: '.ai-context/output/behavior-spec.json', state: 'active' },
 		],
 		edges: [
 			{ source: 'analysis-business-rules-BR-POST-1', target: 'BHV-POST-001', edge_type: 'cross_reference', confidence: 'soft' },
@@ -166,7 +166,7 @@ function setupRepo({ synthesizedAt, derivedFrom, withOrphan = false }) {
 	return { root, graphPath };
 }
 function setState(root, { cumulativeDone, iteration = 1, cap, baselineRef, queueComplete = true }) {
-	const sp = join(root, '.aimd', 'state.json');
+	const sp = join(root, '.ai-context', 'state.json');
 	const s = JSON.parse(readFileSync(sp, 'utf-8'));
 	s.regen_queue = {
 		generated_at: '2026-01-01T00:00:00.000Z',
@@ -182,10 +182,10 @@ function setState(root, { cumulativeDone, iteration = 1, cap, baselineRef, queue
 	if (baselineRef) s.sync_session.baseline_ref = baselineRef;
 	writeFileSync(sp, JSON.stringify(s));
 }
-const readState = (root) => JSON.parse(readFileSync(join(root, '.aimd', 'state.json'), 'utf-8'));
+const readState = (root) => JSON.parse(readFileSync(join(root, '.ai-context', 'state.json'), 'utf-8'));
 
 describe('carry 2 — sync-converge e2e (BLOCKER-1 두 경로 / no-sim tmp-git)', () => {
-	const DERIVED = ['.aimd/output/business-rules.json', '.aimd/output/behavior-spec.json'];
+	const DERIVED = ['.ai-context/output/business-rules.json', '.ai-context/output/behavior-spec.json'];
 
 	it('★ 도메인1 fixpoint: 재합성됨(fresh) + newWork=∅ + unresolved=∅ → fixpoint (큐 clear)', () => {
 		const { root, graphPath } = setupRepo({ synthesizedAt: FUTURE, derivedFrom: DERIVED });
@@ -235,7 +235,7 @@ describe('carry 2 — sync-converge e2e (BLOCKER-1 두 경로 / no-sim tmp-git)'
 });
 
 describe('carry 2 — sync-converge continue→fixpoint 2-iter + cap (도메인2 mechanism)', () => {
-	const DERIVED = ['.aimd/output/business-rules.json', '.aimd/output/behavior-spec.json'];
+	const DERIVED = ['.ai-context/output/business-rules.json', '.ai-context/output/behavior-spec.json'];
 
 	it('★ continue→fixpoint 2-iter: 잔여 노드 재시드(iter2) → (synthetic 소비) → 진짜 fixpoint', () => {
 		const { root, graphPath } = setupRepo({ synthesizedAt: FUTURE, derivedFrom: DERIVED });
@@ -251,7 +251,7 @@ describe('carry 2 — sync-converge continue→fixpoint 2-iter + cap (도메인2
 		assert.equal(st1.sync_session.iteration, 2, 'iteration++');
 		assert.ok(st1.regen_queue.items.some((it) => it.id === 'BHV-POST-001' && !it.done), '잔여만 재시드');
 		// synthetic 소비(외부 = 재생성+재합성): cumulative_done 에 BHV-POST-001 누적 + 큐 done.
-		const sp = join(root, '.aimd', 'state.json');
+		const sp = join(root, '.ai-context', 'state.json');
 		const s = JSON.parse(readFileSync(sp, 'utf-8'));
 		s.sync_session.cumulative_done = ['analysis-business-rules-BR-POST-1', 'BHV-POST-001'];
 		s.regen_queue.items.forEach((it) => (it.done = true));
@@ -280,7 +280,7 @@ describe('carry 2 — sync-converge continue→fixpoint 2-iter + cap (도메인2
 });
 
 describe('carry 2 — sync-converge 가드 (전제·세션 생명주기 M1)', () => {
-	const DERIVED = ['.aimd/output/business-rules.json', '.aimd/output/behavior-spec.json'];
+	const DERIVED = ['.ai-context/output/business-rules.json', '.ai-context/output/behavior-spec.json'];
 
 	it('큐 미완 → exit 3 (sync-next 먼저)', () => {
 		const { root, graphPath } = setupRepo({ synthesizedAt: FUTURE, derivedFrom: DERIVED });

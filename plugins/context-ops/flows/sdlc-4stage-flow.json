@@ -14,7 +14,7 @@
     },
     "five_required_elements": [
       { "id": 1, "name": "Driver / Orchestrator", "status": "complete", "implementation_target": "tools/chain-driver/ (workspace 12번째 / cli + 6 module / 60 unit test)" },
-      { "id": 2, "name": "State 영속", "status": "complete", "implementation_target": ".aimd/state.json + schemas/state.schema.json + atomic write CAS (state-store.js)" },
+      { "id": 2, "name": "State 영속", "status": "complete", "implementation_target": ".ai-context/state.json + schemas/state.schema.json + atomic write CAS (state-store.js)" },
       { "id": 3, "name": "Mechanical gate", "status": "complete", "implementation_target": "trio enforcement: state.blocked + cli exit 2 + PreToolUse permissionDecision=deny (gate-eval.js + hooks-bridge.js)" },
       { "id": 4, "name": "자동 전이 (skill auto-invoke)", "status": "complete", "implementation_target": "hooks/hooks.json UserPromptSubmit + PreToolUse (D21' suppressOutput=true / additionalContext 차단 문구)" },
       { "id": 5, "name": "Chain-revisit detector", "status": "complete", "implementation_target": "tools/chain-driver/src/revisit-detect.js (git diff --numstat + LOC threshold + ignore-globs)" }

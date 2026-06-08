@@ -38,7 +38,7 @@ URL/path 패턴 + 한국어/영어 키워드 매칭 + **인라인 마커 우선*
 | 총 입력 > 50K token 또는 단일 sub-skill 실패가 다른 3개 오염 risk 큰 케이스 | **Task tool sub-agent** (general-purpose) | main context window 보호 / 격리 / 실패 분리                                 |
 | ❌ chain-driver CLI dispatch                                                | (절대 ❌ / STRONG-STOP)                   | chain-driver = 결정론적 gate/sync/scope axis / LLM 판단 inject 시 axis 오염 |
 
-각 sub-skill 산출 = `.aimd/<scope>/planning/{prompt,swagger,plan-doc,figma}-extract.json` (해당 schema 정합 의무).
+각 sub-skill 산출 = `.ai-context/<scope>/planning/{prompt,swagger,plan-doc,figma}-extract.json` (해당 schema 정합 의무).
 
 ### 3단계 — merge / cross-ref / conflict 검출
 
@@ -79,7 +79,7 @@ orchestrate 가 산식 결과 + 입력 양쪽 인용을 같이 등재. LLM 이 "
 
 ## 산출물
 
-- `.aimd/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / json 단독 SSOT)
+- `.ai-context/<scope>/planning/input-summary.json` (schema = `schemas/input-summary.schema.json` / json 단독 SSOT)
 - 4 sub-skill extract 파일 (각 skill 책임)
 
 ## When NOT to invoke

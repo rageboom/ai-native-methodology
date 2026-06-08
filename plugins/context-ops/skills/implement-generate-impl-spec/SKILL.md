@@ -15,18 +15,18 @@ chain 5 (impl) 의 **진입 skill / i-strict 정통**. test-spec → impl 코드
 
 ## 입력
 
-- `<project>/.aimd/output/test-spec.json` (TC-\* 목록 / source_file path)
-- `<project>/.aimd/output/behavior-spec.json` (BHV-\* contract / preconditions / postconditions / invariants)
-- `<project>/.aimd/output/acceptance-criteria.json` (AC-\* / Gherkin reasoning)
-- `<project>/.aimd/output/architecture.json` (7대 / layered architecture)
-- `<project>/.aimd/output/schema.json` (7대 / DB schema)
-- `<project>/.aimd/output/api-extension.json` (7대 / endpoint 정합)
-- `<project>/.aimd/output/inventory.json` (stack_signals / framework match)
-- `<project>/.aimd/config/test-cmd.json` (test 실행 커맨드 설정)
+- `<project>/.ai-context/output/test-spec.json` (TC-\* 목록 / source_file path)
+- `<project>/.ai-context/output/behavior-spec.json` (BHV-\* contract / preconditions / postconditions / invariants)
+- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* / Gherkin reasoning)
+- `<project>/.ai-context/output/architecture.json` (7대 / layered architecture)
+- `<project>/.ai-context/output/schema.json` (7대 / DB schema)
+- `<project>/.ai-context/output/api-extension.json` (7대 / endpoint 정합)
+- `<project>/.ai-context/output/inventory.json` (stack_signals / framework match)
+- `<project>/.ai-context/config/test-cmd.json` (test 실행 커맨드 설정)
 
 ## 산출물
 
-- `<project>/.aimd/output/impl-spec.json` (schemas/impl-spec.schema.json 의무 / json 단독 SSOT)
+- `<project>/.ai-context/output/impl-spec.json` (schemas/impl-spec.schema.json 의무 / json 단독 SSOT)
 - 실 impl 코드 (framework 별):
   - nestjs: `<project>/<src>/{module,controller,service,repository}.ts`
   - spring: `<project>/src/main/java/**/{Controller,Service,Repository}.java`
@@ -140,7 +140,7 @@ commit_hash 부재 = static-runner lint-no-simulation chain-strict 자동 차단
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory <project>/.aimd/output/inventory.json \
+  --inventory <project>/.ai-context/output/inventory.json \
   --allow-execute --json
 ```
 
@@ -153,7 +153,7 @@ ok=true + fail_count=0 의무. fail 발생 시:
 
 ```bash
 # static-runner R19 Tier 1 in-plugin (Semgrep + PMD / DEC-2026-06-07) + Tier 2 (SARIF import / allowlist=PMD / orthogonal)
-bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.aimd/output/ --chain-strict
+bash ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/lint-no-simulation.sh <project>/.ai-context/output/ --chain-strict
 ```
 
 linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
@@ -161,14 +161,14 @@ linter_output_path → impl-spec.test_pass_evidence.linter_output_path 채움.
 ### 7. schema-validator + traceability-matrix-builder 회귀
 
 ```bash
-node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .aimd/output/impl-spec.json
+node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/impl-spec.json
 node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
-  --discovery  .aimd/output/discovery-spec.json \
-  --behavior   .aimd/output/behavior-spec.json \
-  --acceptance .aimd/output/acceptance-criteria.json \
-  --test-spec  .aimd/output/test-spec.json \
-  --impl-spec  .aimd/output/impl-spec.json \
-  --out-dir    .aimd/output/traceability/
+  --discovery  .ai-context/output/discovery-spec.json \
+  --behavior   .ai-context/output/behavior-spec.json \
+  --acceptance .ai-context/output/acceptance-criteria.json \
+  --test-spec  .ai-context/output/test-spec.json \
+  --impl-spec  .ai-context/output/impl-spec.json \
+  --out-dir    .ai-context/output/traceability/
 ```
 
 matrix.coverage_summary.green_count 가 IMPL 까지 채워짐 의무 (red_count == 0).

@@ -1,6 +1,6 @@
 // state-store.js — ADR-CHAIN-005 §2 (atomic write + CAS) + §6 (forward-only migration).
 //
-// .aimd/state.json read/write. tmp + fdatasync + rename.
+// .ai-context/state.json read/write. tmp + fdatasync + rename.
 // CAS: read-time version 기록 → mutate → write 시 version 일치 확인 → +1.
 // Windows fallback: copyFile + unlink (rename EEXIST 회피).
 
@@ -44,11 +44,11 @@ const DEFAULT_STATE = (projectId) => ({
 	lock_holder_pid: null,
 	lock_acquired_at: null,
 	revisit_ignore_globs: [],
-	intervention_log_path: '.aimd/output/intervention-log.jsonl',
+	intervention_log_path: '.ai-context/output/intervention-log.jsonl',
 });
 
 export function statePath(projectRoot) {
-	return join(projectRoot, '.aimd', 'state.json');
+	return join(projectRoot, '.ai-context', 'state.json');
 }
 
 function tmpPath(finalPath) {
@@ -56,14 +56,14 @@ function tmpPath(finalPath) {
 }
 
 export function ensureAimdDir(projectRoot) {
-	const dir = join(projectRoot, '.aimd');
+	const dir = join(projectRoot, '.ai-context');
 	if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 	const out = join(dir, 'output');
 	if (!existsSync(out)) mkdirSync(out, { recursive: true });
 }
 
 export function recoverTmpFiles(projectRoot) {
-	const dir = join(projectRoot, '.aimd');
+	const dir = join(projectRoot, '.ai-context');
 	if (!existsSync(dir)) return [];
 	const recovered = [];
 	for (const name of readdirSync(dir)) {
@@ -264,8 +264,8 @@ export class MigrationRequiredError extends Error {
 // ── G3 R5/R7 산출물 폴더 자동 + manifest 이중 렌더링 ─────────────────────
 //
 // scope = feature/도메인 작업 단위 (사용자 자유 명명 / kebab-case).
-// layout = .aimd/<scope>/{discovery,spec,plan,test,impl}/manifest.{json,md} + scope root manifest.
-// canonical global .aimd/output/ 5 이식성 산출물 은 scope 횡단 공통 (분리).
+// layout = .ai-context/<scope>/{discovery,spec,plan,test,impl}/manifest.{json,md} + scope root manifest.
+// canonical global .ai-context/output/ 5 이식성 산출물 은 scope 횡단 공통 (분리).
 // M4 sync = drift 자동 감지 / cascade 는 사용자 명시 호출 (sync.js).
 //
 // import 방향 = state-store → work-unit (단방향). 순환 회피.
@@ -305,15 +305,15 @@ export function scopeDirPath(projectRoot, scope, stage) {
 	validateScopeSlug(scope);
 	if (stage !== undefined && stage !== null) validateStage(stage);
 	return stage
-		? join(projectRoot, '.aimd', scope, stage)
-		: join(projectRoot, '.aimd', scope);
+		? join(projectRoot, '.ai-context', scope, stage)
+		: join(projectRoot, '.ai-context', scope);
 }
 
 export function ensureScopeDir(projectRoot, scope, scenario) {
 	validateScopeSlug(scope);
 	ensureAimdDir(projectRoot);
 
-	const scopeDir = join(projectRoot, '.aimd', scope);
+	const scopeDir = join(projectRoot, '.ai-context', scope);
 	if (!existsSync(scopeDir)) mkdirSync(scopeDir, { recursive: true });
 
 	// Seed scope manifest (idempotent — only when absent). v11.9.0 scenario passthrough (use-scenario taxonomy).
@@ -376,7 +376,7 @@ export function readManifest(projectRoot, scope, stage) {
 }
 
 export function listScopes(projectRoot) {
-	const aimdDir = join(projectRoot, '.aimd');
+	const aimdDir = join(projectRoot, '.ai-context');
 	if (!existsSync(aimdDir)) return [];
 	const scopes = [];
 	for (const name of readdirSync(aimdDir)) {

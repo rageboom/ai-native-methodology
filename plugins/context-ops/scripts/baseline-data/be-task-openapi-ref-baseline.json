@@ -3,5 +3,5 @@
   "_note": "BE TASK 중 openapi_endpoint_ref 부재 baseline (ADR-010 baseline+ratchet / DEC-2026-05-26-contract-강제-양-axis §3). 신규 BE TASK 는 openapi_endpoint_ref 의무 — 본 baseline 초과 시 release-readiness check22 (be_task_openapi_ref_ratchet) block. refactor: tooling-audit-cleanup Phase C 에서 broken-ref 해소 + 명시 baseline 기록 (이전엔 파일 부재로 baseline=0 묵시 fallback).",
   "established": "2026-05-31",
   "established_by": "refactor/tooling-audit-cleanup",
-  "scope": "examples/*/.aimd/{output,plan}/task-plan.json tasks[] (layer=be)"
+  "scope": "examples/*/.ai-context/{output,plan}/task-plan.json tasks[] (layer=be)"
 }

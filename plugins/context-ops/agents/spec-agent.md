@@ -44,7 +44,7 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
-1. **input 확인** — `.aimd/output/discovery-spec.json` (chain 1) + analysis formal-spec phase (state-machines / sequences / decision-tables / invariants) 모두 존재? 부재 시 → 이전 stage agent 권한 위임 + blocker 등재
+1. **input 확인** — `.ai-context/output/discovery-spec.json` (chain 1) + analysis formal-spec phase (state-machines / sequences / decision-tables / invariants) 모두 존재? 부재 시 → 이전 stage agent 권한 위임 + blocker 등재
 
 2. **spec-compose-behavior-spec skill 호출** — BHV-\* (executable behavioral contract) 채움:
    - discovery-spec.use_cases[].behavior_spec_refs 정합
@@ -72,23 +72,23 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합
 
 - **본 agent = paradigm 표준**
-- **본체 산출 경로** = `.aimd/output/behavior-spec.json` + `acceptance-criteria.json`
+- **본체 산출 경로** = `.ai-context/output/behavior-spec.json` + `acceptance-criteria.json`
 - **lifecycle-contract §Agent column spec row** = 본 agent
 
 ## 산출 자산 (chain 2)
 
-- `.aimd/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
-- `.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 SSOT)
-- `.aimd/output/findings.md` (누적)
-- `.aimd/output/intervention-log.json` (gate #2 사용자 결단 로그)
+- `.ai-context/output/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
+- `.ai-context/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 SSOT)
+- `.ai-context/output/findings.md` (누적)
+- `.ai-context/output/intervention-log.json` (gate #2 사용자 결단 로그)
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.aimd/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
-  --graph .aimd/output/artifact-graph.json --origin <node-id>
+  --graph .ai-context/output/artifact-graph.json --origin <node-id>
 ```
 
 - 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).

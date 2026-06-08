@@ -44,7 +44,7 @@ analysis (chain 0)
 node ../../tools/chain-driver/src/cli.js init .
 
 # 2. chain 1 → 2 → 3 → 4 (각 단계 validator + driver next)
-#    상세 절차는 .aimd/output/run-log.md 참조
+#    상세 절차는 .ai-context/output/run-log.md 참조
 
 # 3. 진짜 test runner (chain 4 GREEN)
 cd target && npm test
@@ -72,7 +72,7 @@ poc-05-sample-user-register/
 │   ├── rules.json
 │   ├── domain.json
 │   └── antipatterns.json
-├── .aimd/
+├── .ai-context/
 │   ├── state.json        # chain-driver 영속 state
 │   ├── config/test-cmd.json
 │   └── output/

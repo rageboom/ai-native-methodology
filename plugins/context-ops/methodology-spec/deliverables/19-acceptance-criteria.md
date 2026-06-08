@@ -13,7 +13,7 @@
 ## 2. 형식
 
 ```
-.aimd/output/chain-2-spec/
+.ai-context/output/chain-2-spec/
 └── acceptance-criteria.json   # json 단독 SSOT (Gherkin scenario + tag = criteria[] 안)
 ```
 

@@ -24,7 +24,7 @@ describe('detectGraphArtifactWrite', () => {
 	it('chain artifact (behavior-spec.json) → chain/BHV', () => {
 		const r = detectGraphArtifactWrite({
 			toolName: 'Write',
-			toolInput: { file_path: '/proj/.aimd/output/behavior-spec.json' },
+			toolInput: { file_path: '/proj/.ai-context/output/behavior-spec.json' },
 		});
 		assert.equal(r.artifact_kind, 'chain');
 		assert.equal(r.artifact_subkind, 'BHV');
@@ -42,7 +42,7 @@ describe('detectGraphArtifactWrite', () => {
 		for (const [fname, subkind] of Object.entries(map)) {
 			const r = detectGraphArtifactWrite({
 				toolName: 'Edit',
-				toolInput: { file_path: `/p/.aimd/output/${fname}` },
+				toolInput: { file_path: `/p/.ai-context/output/${fname}` },
 			});
 			assert.equal(r.artifact_subkind, subkind, fname);
 			assert.equal(r.artifact_kind, 'chain');
@@ -52,7 +52,7 @@ describe('detectGraphArtifactWrite', () => {
 	it('analysis artifact (business-rules.json) → analysis/business-rules', () => {
 		const r = detectGraphArtifactWrite({
 			toolName: 'Write',
-			toolInput: { file_path: '/p/.aimd/business-rules.json' },
+			toolInput: { file_path: '/p/.ai-context/business-rules.json' },
 		});
 		assert.equal(r.artifact_kind, 'analysis');
 		assert.equal(r.artifact_subkind, 'business-rules');
@@ -63,7 +63,7 @@ describe('detectGraphArtifactWrite', () => {
 		for (const fname of ['schema.json', 'db-schema.json']) {
 			const r = detectGraphArtifactWrite({
 				toolName: 'Write',
-				toolInput: { file_path: `/p/.aimd/output/${fname}` },
+				toolInput: { file_path: `/p/.ai-context/output/${fname}` },
 			});
 			assert.ok(r, `${fname} 매핑 존재`);
 			assert.equal(r.artifact_kind, 'analysis', fname);
@@ -74,13 +74,13 @@ describe('detectGraphArtifactWrite', () => {
 	it('aspect artifact (a11y-spec.json) → aspect/a11y', () => {
 		const r = detectGraphArtifactWrite({
 			toolName: 'Write',
-			toolInput: { file_path: '/p/.aimd/a11y-spec.json' },
+			toolInput: { file_path: '/p/.ai-context/a11y-spec.json' },
 		});
 		assert.equal(r.artifact_kind, 'aspect');
 		assert.equal(r.artifact_subkind, 'a11y');
 	});
 
-	it('.aimd 밖 파일 → null', () => {
+	it('.ai-context 밖 파일 → null', () => {
 		assert.equal(
 			detectGraphArtifactWrite({
 				toolName: 'Write',
@@ -94,7 +94,7 @@ describe('detectGraphArtifactWrite', () => {
 		assert.equal(
 			detectGraphArtifactWrite({
 				toolName: 'Write',
-				toolInput: { file_path: '/p/.aimd/output/random.json' },
+				toolInput: { file_path: '/p/.ai-context/output/random.json' },
 			}),
 			null,
 		);
@@ -104,7 +104,7 @@ describe('detectGraphArtifactWrite', () => {
 		assert.equal(
 			detectGraphArtifactWrite({
 				toolName: 'Read',
-				toolInput: { file_path: '/p/.aimd/output/behavior-spec.json' },
+				toolInput: { file_path: '/p/.ai-context/output/behavior-spec.json' },
 			}),
 			null,
 		);
@@ -117,7 +117,7 @@ describe('detectGraphArtifactWrite', () => {
 	it('Windows path 도 인식', () => {
 		const r = detectGraphArtifactWrite({
 			toolName: 'Write',
-			toolInput: { file_path: 'C:\\proj\\.aimd\\output\\test-spec.json' },
+			toolInput: { file_path: 'C:\\proj\\.ai-context\\output\\test-spec.json' },
 		});
 		assert.equal(r.artifact_subkind, 'TC');
 	});

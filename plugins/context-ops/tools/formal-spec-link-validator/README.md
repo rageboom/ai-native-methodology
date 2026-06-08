@@ -37,7 +37,7 @@ node src/cli.js examples/poc-04/output/ --mode=both
 node src/cli.js examples/poc-04/output/ --mode=fe --json
 
 # Chain mode (sub-plan-3a 신설)
-node src/cli.js .aimd/output/ --chain-mode
+node src/cli.js .ai-context/output/ --chain-mode
 ```
 
 ## Outputs

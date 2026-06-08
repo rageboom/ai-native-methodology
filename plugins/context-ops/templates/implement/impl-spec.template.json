@@ -8,8 +8,8 @@
     "$comment": "impl-spec template placeholder (chain 5 / implement). confidence=bare number (schema:number). test-spec → 실 impl 코드 (GREEN 의무 / 100% test pass / fail_count=0). 실 코드=산출물 ❌ / commit_hash 보존 (i-strict). stack 분기(be/fe/db/e2e/infra). 근거: 실 runner GREEN 100% pass + 5종 물증 10 필드. _base-apply-template instantiate."
   },
   "derivation_source": {
-    "test_spec_path": ".aimd/output/test-spec.json",
-    "behavior_spec_path": ".aimd/output/behavior-spec.json"
+    "test_spec_path": ".ai-context/output/test-spec.json",
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
   },
   "modules": [
     {
@@ -42,7 +42,7 @@
   ],
   "test_pass_evidence": {
     "test_runner_version": "junit-jupiter 5.10.0 + vitest 1.4.0",
-    "test_runner_stdout_path": ".aimd/output/test-evidence/impl-green.stdout.log",
+    "test_runner_stdout_path": ".ai-context/output/test-evidence/impl-green.stdout.log",
     "invocation_timestamp": "2026-01-01T00:00:00+09:00",
     "duration_ms": 12345,
     "pass_count": 3,
@@ -51,8 +51,8 @@
     "reproduction_command": ["./gradlew test", "npm test"],
     "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "report_format": "junit_xml",
-    "coverage_report_path": ".aimd/output/test-evidence/lcov.info",
-    "linter_output_path": ".aimd/output/test-evidence/static-runner.sarif"
+    "coverage_report_path": ".ai-context/output/test-evidence/lcov.info",
+    "linter_output_path": ".ai-context/output/test-evidence/static-runner.sarif"
   },
   "coverage": {
     "link_coverage": {

@@ -3,12 +3,12 @@
 // trio enforcement (ADR-CHAIN-005 §3) plan stage 본격 통합 검증:
 //   (i)   state.blocked=true 영속 + intervention_log entry
 //   (ii)  cli exit code = 1 (blocked-by-gate)
-//   (iii) hooks-bridge PreToolUse → permissionDecision='deny' on .aimd/output/** Write/Edit
+//   (iii) hooks-bridge PreToolUse → permissionDecision='deny' on .ai-context/output/** Write/Edit
 //
 // 5 시나리오:
 //   1. plan stage critical finding → evaluateGate blocked=true (validator_critical)
 //   2. cli `chain-driver next` 실 spawn → state.blocked + exit code 1 영속
-//   3. shouldBlockToolUse(Write .aimd/output/plan-spec.json + state.blocked) → block reason
+//   3. shouldBlockToolUse(Write .ai-context/output/plan-spec.json + state.blocked) → block reason
 //   4. trio 통합 — 단일 critical finding 1개로 3 mechanism 동시 작동 입증
 //   5. gate id enum 정합 (stage-graph.getGateForStage 결과 set = state.schema enum set)
 
@@ -117,7 +117,7 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 			'block_reason=validator_critical 영속 의무',
 		);
 		// intervention log 기록 검증
-		const logPath = join(root, '.aimd', 'output', 'intervention-log.jsonl');
+		const logPath = join(root, '.ai-context', 'output', 'intervention-log.jsonl');
 		assert.ok(existsSync(logPath), 'intervention-log.jsonl 기록 의무');
 		const logContent = readFileSync(logPath, 'utf-8');
 		assert.match(logContent, /gate_decision/, 'gate_decision event 기록 의무');
@@ -127,17 +127,17 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 	// ──────────────────────────────────────────────────────────────
 	// 시나리오 3: hooks-bridge → permissionDecision='deny'
 	// ──────────────────────────────────────────────────────────────
-	it('시나리오 3: hooks-bridge Write .aimd/output/plan-spec.json + state.blocked → deny (mechanism iii)', () => {
+	it('시나리오 3: hooks-bridge Write .ai-context/output/plan-spec.json + state.blocked → deny (mechanism iii)', () => {
 		const state = { blocked: true, block_reason: 'validator_critical' };
 		const reason = shouldBlockToolUse({
 			toolName: 'Write',
-			toolInput: { file_path: '/tmp/proj/.aimd/output/plan-spec.json' },
+			toolInput: { file_path: '/tmp/proj/.ai-context/output/plan-spec.json' },
 			state,
 		});
 		assert.equal(
 			reason,
 			'validator_critical',
-			'.aimd/output/ Write 차단 의무 (block_reason 반환)',
+			'.ai-context/output/ Write 차단 의무 (block_reason 반환)',
 		);
 	});
 
@@ -186,7 +186,7 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 		// mechanism (iii): hooks-bridge → deny (영속된 state 사용)
 		const hookReason = shouldBlockToolUse({
 			toolName: 'Write',
-			toolInput: { file_path: join(root, '.aimd', 'output', 'task-plan.json') },
+			toolInput: { file_path: join(root, '.ai-context', 'output', 'task-plan.json') },
 			state: persistedState,
 		});
 		assert.ok(hookReason, 'trio mechanism (iii): hooks-bridge deny');
@@ -303,9 +303,9 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 	// persisted soft-block 사후 해소 (dogfood: 블록 후 --user-decision 이 가드에 막혀 미도달 / cli.js:354 fix)
 	it('persisted soft-block: 첫 차단(exit1) → plain next(exit2 anti-bypass) → --user-decision go(exit0 해소)', () => {
 		const root = join(tmp, 'persisted-softblock');
-		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+		mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
 		initState(root, 'persisted-softblock'); // analysis / blocked=false
-		const findingsPath = join(root, '.aimd', 'output', 'findings.json');
+		const findingsPath = join(root, '.ai-context', 'output', 'findings.json');
 		writeFileSync(
 			findingsPath,
 			JSON.stringify({
@@ -339,9 +339,9 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 	// hard-block 은 --user-decision go 로도 우회 불가 (재평가서 user_override_rejected → 재차단)
 	it('persisted hard-block: --user-decision go 로도 우회 불가 (exit 1 재차단 / anti-bypass)', () => {
 		const root = join(tmp, 'persisted-hardblock');
-		mkdirSync(join(root, '.aimd', 'output'), { recursive: true });
+		mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
 		initState(root, 'persisted-hardblock');
-		const findingsPath = join(root, '.aimd', 'output', 'findings.json');
+		const findingsPath = join(root, '.ai-context', 'output', 'findings.json');
 		writeFileSync(
 			findingsPath,
 			JSON.stringify({ critical: 1, high: 0, medium: 0, low: 0, info: 0 }),

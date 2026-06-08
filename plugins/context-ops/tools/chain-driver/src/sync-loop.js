@@ -52,10 +52,10 @@ function stageOf(node) {
 }
 
 // C-lite (DEC-2026-06-08-living-sync-adopter-git-hygiene) — chain-driver 자기 파생/상태 산출물인가.
-//   --git 재검출은 변경 tracked 파일 전체를 스캔 → 도구가 .aimd/ 에 쓰는 파생물(artifact-graph 등 = do_not_edit_manually)이
+//   --git 재검출은 변경 tracked 파일 전체를 스캔 → 도구가 .ai-context/ 에 쓰는 파생물(artifact-graph 등 = do_not_edit_manually)이
 //   커밋돼 있으면 노드 미매핑 → false-unresolved noise. 노드 미매핑 + 본 패턴이면 skip (진짜 새 구조 파일은 unresolved 유지).
-//   ★ .aimd/ prefix 한정 (bare basename ❌ — 레포 밖 동명 산출물 오skip 방지 / Senior MINOR-Q1).
-const AIMD_DERIVED_BASENAMES = new Set([
+//   ★ .ai-context/ prefix 한정 (bare basename ❌ — 레포 밖 동명 산출물 오skip 방지 / Senior MINOR-Q1).
+const AICONTEXT_DERIVED_BASENAMES = new Set([
 	'state.json',
 	'state.json.tmp',
 	'artifact-graph.json',
@@ -63,12 +63,12 @@ const AIMD_DERIVED_BASENAMES = new Set([
 	'context-cache.json',
 	'intervention-log.jsonl',
 ]);
-function isAimdDerivedOutput(rawPath) {
+function isAiContextDerivedOutput(rawPath) {
 	const np = normPath(rawPath);
-	const underAimd = np === '.aimd' || np.startsWith('.aimd/') || np.includes('/.aimd/');
+	const underAimd = np === '.ai-context' || np.startsWith('.ai-context/') || np.includes('/.ai-context/');
 	if (!underAimd) return false;
 	const base = np.split('/').pop() || '';
-	if (AIMD_DERIVED_BASENAMES.has(base)) return true;
+	if (AICONTEXT_DERIVED_BASENAMES.has(base)) return true;
 	return /^findings-[^/]*\.json$/.test(base); // findings-discovery.json / findings-spec.json …
 }
 
@@ -76,7 +76,7 @@ function isAimdDerivedOutput(rawPath) {
  * 변경 파일 경로 → origin 노드 id 집합 (결정론).
  *   - 산출물 파일: node.source_path 매치.
  *   - 코드 파일: node.code_pointers[].path 매치 (= 코드의 직접 주인 노드 / origin 탐색만 / 전파는 forward).
- *   - opts.skipDerivedNoise (opt-in / --git caller 전용): 노드 미매핑 + 도구 파생물(.aimd/)이면 unresolved 에서 제외.
+ *   - opts.skipDerivedNoise (opt-in / --git caller 전용): 노드 미매핑 + 도구 파생물(.ai-context/)이면 unresolved 에서 제외.
  *     lift(lift-anchor.js)·--changed(computeSyncLoop) 는 옵션 미전달 = 기존 동작 보존.
  * @returns {{ ids: string[], unresolved: string[], skipped_derived?: string[] }}
  */
@@ -104,7 +104,7 @@ export function resolveOriginNodeIds(graph, changedPaths = [], opts = {}) {
 			}
 		}
 		if (!hit) {
-			if (opts.skipDerivedNoise && isAimdDerivedOutput(raw)) skipped_derived.push(raw);
+			if (opts.skipDerivedNoise && isAiContextDerivedOutput(raw)) skipped_derived.push(raw);
 			else unresolved.push(raw);
 		}
 	}

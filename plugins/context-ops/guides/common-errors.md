@@ -116,7 +116,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 만약 정말 우회 필요 시 (예: hook 자체 디버그):
 
 - chain-driver hooks-bridge 명령에 `--dry-run` 추가 (현재 미지원 / sub-plan 후속 carry)
-- 또는 `<project>/.aimd/state.json` 의 `blocked` 필드 직접 false (위험 / no-simulation 정책 위배 의도가 있을 시 finding 으로 등재)
+- 또는 `<project>/.ai-context/state.json` 의 `blocked` 필드 직접 false (위험 / no-simulation 정책 위배 의도가 있을 시 finding 으로 등재)
 
 ## 4. RED / GREEN 의무
 
@@ -124,7 +124,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 **검증**:
 
-- `<project>/.aimd/output/test/result_hash.json` 의 `pass_count: 0` + `fail_count: N` 확인
+- `<project>/.ai-context/output/test/result_hash.json` 의 `pass_count: 0` + `fail_count: N` 확인
 - `tool_stdout_path` 의 raw log 직접 확인 (test runner 출력)
 - `result_hash` 가 sha256 valid (SARIF Appendix F 정합 / framework_neutral)
 
@@ -137,7 +137,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 - `pass_count` = `total_count` / `fail_count: 0`
 - `--allow-execute` flag 사용됨 (test-impl-pass-validator 의무)
-- chain 4 의 test code 가 변경 안 됨 (git diff `<project>/.aimd/output/test/` 확인)
+- chain 4 의 test code 가 변경 안 됨 (git diff `<project>/.ai-context/output/test/` 확인)
 
 ## 5. Build / dist artifact
 
@@ -196,15 +196,15 @@ shasum -a 256 -c CHECKSUMS.txt | grep -v "OK$"
 
 ## 7. Living-sync (`--git` 변경 자동 감지)
 
-### Q18. `sync-loop --git` / `sync-converge` 가 `unresolved_paths` 에 `.aimd/state.json` 등 도구 파일을 띄움
+### Q18. `sync-loop --git` / `sync-converge` 가 `unresolved_paths` 에 `.ai-context/state.json` 등 도구 파일을 띄움
 
 **원인**: `--git` 재검출은 baseline↔워크트리의 **변경 tracked 파일 전체**를 스캔한다. `state.json`(도구 실행 상태)이 git 에 커밋돼 있으면 노드 미매핑 → `unresolved` → `needs_resynth` false 신호.
 
-**해결**: 런타임 상태는 커밋 대상이 아니다. `chain-driver init` 이 `<project>/.aimd/.gitignore` 를 자동 생성하므로(`state.json`·`state.json.tmp`·`intervention-log.jsonl` 제외) **신규 프로젝트는 자동 처리**. 기존 프로젝트면 `git rm --cached .aimd/state.json` 후 그대로 두면 된다(재-init 도 .gitignore 를 보강). 상세 = `methodology-spec/living-sync-operating-model.md` §8.
+**해결**: 런타임 상태는 커밋 대상이 아니다. `chain-driver init` 이 `<project>/.ai-context/.gitignore` 를 자동 생성하므로(`state.json`·`state.json.tmp`·`intervention-log.jsonl` 제외) **신규 프로젝트는 자동 처리**. 기존 프로젝트면 `git rm --cached .ai-context/state.json` 후 그대로 두면 된다(재-init 도 .gitignore 를 보강). 상세 = `methodology-spec/living-sync-operating-model.md` §8.
 
 ### Q19. resync 후 `sync-converge` 가 `artifact-graph.json` 때문에 fixpoint 안 됨?
 
-**원인 아님 (정상)**: `artifact-graph.json`·`matrix.json`·`findings-*.json` 은 커밋 대상(AX 컨텍스트/증거)이지만, `--git` 재검출이 이 **도구 파생물**(`.aimd/` 한정·`do_not_edit_manually`)을 자동 skip 한다(C-lite). 따라서 resync 로 그래프가 바뀌어도 false-`unresolved` 가 안 생기고 fixpoint 에 도달한다. stdout 에 `(도구 파생물 N건 skip)` 으로 정직 표기.
+**원인 아님 (정상)**: `artifact-graph.json`·`matrix.json`·`findings-*.json` 은 커밋 대상(AX 컨텍스트/증거)이지만, `--git` 재검출이 이 **도구 파생물**(`.ai-context/` 한정·`do_not_edit_manually`)을 자동 skip 한다(C-lite). 따라서 resync 로 그래프가 바뀌어도 false-`unresolved` 가 안 생기고 fixpoint 에 도달한다. stdout 에 `(도구 파생물 N건 skip)` 으로 정직 표기.
 
 **진짜 막히면**: 노드에 매핑 안 되면서 도구 파생물도 **아닌** 새 산출물이 변경셋에 있다는 신호(=BLOCKER-1 보존). 그 파일을 그래프 노드로 편입(resync)하거나 origin 으로 명시.
 

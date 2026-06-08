@@ -23,11 +23,11 @@ allowed-tools: Read
 3. **제약 (constraints)** — 명시된 비기능 요구 (성능 / 보안 / 호환성 / 외부 시스템 연동 등) + 명시 시점에 있는 의존성 ("기존 auth 시스템과 연동" 등).
 4. **가정 (assumptions)** — prompt 안에 명시 안 됐지만 흡수에 필요한 가정 (예: "현재 사용자 DB 가 PostgreSQL 이라고 가정" / 후속 단계에서 사용자 확인 의무).
 5. **UC 후보 (uc_candidates)** — 의도 + 범위에서 도출 가능한 use case 후보 (UC-\* 정식 ID 부여는 chain 1 discovery-spec). 본 skill = 후보 명사만.
-6. **산출 작성** — `.aimd/<scope>/planning/prompt-extract.json` (schema = `schemas/prompt-extract.schema.json`).
+6. **산출 작성** — `.ai-context/<scope>/planning/prompt-extract.json` (schema = `schemas/prompt-extract.schema.json`).
 
 ## 산출물
 
-- `.aimd/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false / json 단독)
+- `.ai-context/<scope>/planning/prompt-extract.json` (strict / additionalProperties:false / json 단독)
 - 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
 
 ## When NOT to invoke

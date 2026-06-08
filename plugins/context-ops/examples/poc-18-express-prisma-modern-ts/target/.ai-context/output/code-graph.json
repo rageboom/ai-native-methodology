@@ -1,0 +1,51 @@
+{
+  "meta": {
+    "schema": "code-graph.schema.json",
+    "generated_by": "codegraph-runner",
+    "do_not_edit_manually": true,
+    "derived_from": [
+      {
+        "tool": "@colbymchenry/codegraph",
+        "version": "0.9.6",
+        "method": "codegraph index + status --json"
+      }
+    ],
+    "trust_note": "reference-lens / NOT gate-injected (DEC-2026-05-28 §4.2 trust model / DEC-2026-05-30-codegraph-essential). codegraph 출력(code↔code 구조)은 LLM 운영 컨텍스트의 참고 lens 이며 결정적 gate 에 inject 되지 않는다."
+  },
+  "target_path": "examples/poc-18-express-prisma-modern-ts/target",
+  "index_stats": {
+    "file_count": 78,
+    "node_count": 634,
+    "edge_count": 1152,
+    "db_size_bytes": 1409024,
+    "backend": "node-sqlite",
+    "languages": [
+      "javascript",
+      "typescript",
+      "yaml"
+    ],
+    "nodes_by_kind": {
+      "class": 1,
+      "constant": 122,
+      "file": 75,
+      "function": 112,
+      "import": 271,
+      "interface": 20,
+      "method": 4,
+      "property": 3,
+      "route": 16,
+      "type_alias": 8,
+      "variable": 2
+    }
+  },
+  "evidence": {
+    "tool_stdout_path": "examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/codegraph.stdout.log",
+    "tool_stderr_path": "examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/codegraph.stderr.log",
+    "tool_version": "0.9.6",
+    "invocation_timestamp": "2026-06-08T05:04:57.363Z",
+    "duration_ms": 490,
+    "result_hash": "4cd0a63c84b04dfdb96dc47a386c479a9ef998fc08901fb6171bbfbe93cc96c2",
+    "reproduction_command": "codegraph init -i \"examples/poc-18-express-prisma-modern-ts/target\" && codegraph status \"examples/poc-18-express-prisma-modern-ts/target\" --json",
+    "evidence_trust": "real_tool"
+  }
+}

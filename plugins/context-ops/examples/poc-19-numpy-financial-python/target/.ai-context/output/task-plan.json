@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T13:25:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": ["source_code"],
+    "confidence": 0.88,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json",
+    "acceptance_criteria_path": ".ai-context/output/acceptance-criteria.json",
+    "discovery_spec_path": ".ai-context/output/discovery-spec.json"
+  },
+  "tasks": [
+    {"id": "TASK-PMT-001", "title": "pmt — 시간가치 방정식 + rate=0 분기로 고정 주기 상환금 계산", "ac_refs": ["AC-PMT-001", "AC-PMT-002"], "behavior_ref": "BHV-PMT-001", "execution_order": 1, "layer": "domain", "module": "financial"},
+    {"id": "TASK-IPMT-001", "title": "ipmt — 직전 잔액×이율 이자 상환분 + 기초납입 첫 기간 0", "ac_refs": ["AC-IPMT-001", "AC-IPMT-002"], "behavior_ref": "BHV-IPMT-001", "execution_order": 2, "layer": "domain", "module": "financial", "dependencies": ["TASK-PMT-001"]},
+    {"id": "TASK-PPMT-001", "title": "ppmt — pmt - ipmt 원금 상환분 (분해 불변식)", "ac_refs": ["AC-PPMT-001"], "behavior_ref": "BHV-PPMT-001", "execution_order": 3, "layer": "domain", "module": "financial", "dependencies": ["TASK-PMT-001", "TASK-IPMT-001"]}
+  ],
+  "risks": [
+    {"id": "RISK-SIGN-001", "severity": "high", "type": "correctness", "description": "현금 유출을 음수로 표현하는 부호 규약이 시그니처에 드러나지 않아, 재구현 시 부호를 반전하면 결과가 틀린다(AP-TESTABILITY-001).", "mitigation": "AC 의 기대값을 음수로 명시(예: pmt ≈ -1854.02) 하여 부호 규약을 테스트 계약으로 고정.", "task_refs": ["TASK-PMT-001", "TASK-IPMT-001", "TASK-PPMT-001"], "human_review": true}
+  ],
+  "nfr_allocation": [
+    {"id": "NFR-ACCURACY-001", "characteristic": "reliability", "severity": "high", "description": "금융 계산은 참조 구현 대비 수치 정확도를 보장해야 한다(부동소수 허용오차 rtol 1e-7 / atol 0.01).", "measurement": "모든 슬라이스 함수가 알려진 참조 수치에 np.allclose 로 일치", "acceptance_criteria_ref": "AC-PMT-001", "task_refs": ["TASK-PMT-001", "TASK-IPMT-001", "TASK-PPMT-001"]}
+  ]
+}

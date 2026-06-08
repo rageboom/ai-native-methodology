@@ -45,7 +45,7 @@ release-readiness check3 가 `--check-state-flow-consistency` + `--check-handoff
 
 ## 향후
 
-- 사용자 프로젝트의 stage 진척도 (`<user-project>/.aimd/state.json`) 와 cross-link
+- 사용자 프로젝트의 stage 진척도 (`<user-project>/.ai-context/state.json`) 와 cross-link
 - skill 호출 시 prerequisite phase 자동 체크 (예: phase-3 미완료 시 phase-5 호출 거절)
 
 ## 인용

@@ -43,13 +43,13 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | ---------------------------- | ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `stage`                      | const   | **`plan`**                                | `plan` 단일 const (analysis/discovery/spec/test/implement enum 미지원)                                                                                                                                                                                                                                                  |
 | `phase`                      | enum    | **`exit`**                                | `enter` (plan stage 진입 작업 Task) \| `exit` (4-level cascade 일괄 / 본 skill 본 흐름) \| `update-test-red` (chain 4 RED) \| `update-impl-green` (chain 5 GREEN)                                                                                                                                                                    |
-| `scope`                      | string  | state.scope                               | G3 scope slug (예: `car` / `payroll`) — `.aimd/<scope>/` 경로 추출                                                                                                                                                                                                                                                                   |
+| `scope`                      | string  | state.scope                               | G3 scope slug (예: `car` / `payroll`) — `.ai-context/<scope>/` 경로 추출                                                                                                                                                                                                                                                                   |
 | `dry_run`                    | boolean | **`true`**                                | default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출.                                                                                                                                                                                                                                  |
 | `confluence_emit`            | boolean | `false`                                   | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false)                                                                                                                                                                                                                                                    |
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
-| `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.aimd/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
+| `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.ai-context/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
 | `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무).                                                                                                                                     |
-| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
+| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
 | `parent_strategy`            | enum    | **`auto`**                                | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`.                                                                                       |
 | `epic_link_customfield_id`   | string  | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`.                                                                                                                                                                                                             |
 | `parent_link_customfield_id` | string  | env-config 또는 (없음)                    | role=`epic` 의 Initiative 부모 링크 customfield ID. set 시 Epic 생성 시 `extra_fields[parent_link_customfield_id] = <initiative_key>` 사용 — `parent_key` 보다 우선. 미set 시 `parent_key` 시도 → 400 reject 시 `jira_link (Relates)` fallback. **SG-MIS 환경(jira.smilegate.net) reference: `customfield_11902`** (Parent Link 필드). 타 Jira 인스턴스는 Jira 필드 설정에서 "Parent Link" customfield ID 확인 후 기재. <!-- allow-identity: SG-MIS 환경 config reference (사내 공통 / 개인 신원 아님) --> |
@@ -72,7 +72,7 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
    - args.stage = `plan` 만 유효.
 
 3. **state.json read** (F-VERIFY-006 + F-VERIFY-008 → B9 + B11 해결)
-   - 정식 path = `<project>/.aimd/state.json` (단일 file / scope 는 `state.current_scope` 필드).
+   - 정식 path = `<project>/.ai-context/state.json` (단일 file / scope 는 `state.current_scope` 필드).
    - 매칭 의무 — `state.current_scope === <scope>` 일치 확인. 불일치 시 `F-TICKETSYNC-006 scope_mismatch` finding + reject.
    - **gate-pass 확인 분기**:
      - `mode=standard` 시 — `state.last_gate` 가 plan stage gate (#3) 통과 evidence 와 일치해야 함 (미통과 시 reject + Block error).
@@ -181,7 +181,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 **resolve 알고리즘 (의무)**:
 
 1. **issuetype resolve**:
-   - args.`issuetype_map[role]` 우선 → 없으면 env-config (`.aimd/ticket-sync-config.yaml` 안 `issuetype_map`) → 없으면 default table 적용:
+   - args.`issuetype_map[role]` 우선 → 없으면 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) → 없으면 default table 적용:
 
    | role       | default name    | DWPD 환경 reference |
    | ---------- | --------------- | ------------------- |
@@ -225,7 +225,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 **DWPD 환경 reference config**:
 
 ```yaml
-# .aimd/ticket-sync-config.yaml (DWPD 환경)
+# .ai-context/ticket-sync-config.yaml (DWPD 환경)
 issuetype_map:
   epic: epic
   story: 작업 # 또는 새 기능
@@ -246,7 +246,7 @@ structure_auto_add_on_exit: true
 **SG-MIS 환경 표준 config** (jira.smilegate.net / 사내 공통 — SmileApp Intune 실측 확정): <!-- allow-identity: SG-MIS 환경 config reference (사내 공통 / 개인 신원 아님) -->
 
 ```yaml
-# .aimd/ticket-sync-config.yaml (SG-MIS 환경 — 사내 표준)
+# .ai-context/ticket-sync-config.yaml (SG-MIS 환경 — 사내 표준)
 issuetype_map:
   epic:       epic
   story:      이야기
@@ -433,7 +433,7 @@ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + 
 
 ### 단계 7 — Evidence 기록
 
-`<project>/.aimd/output/evidence/ticket-sync-plan-<phase>-<timestamp>.json` 작성 (schema: `ticket-sync-evidence.schema.json` / stage const=plan):
+`<project>/.ai-context/output/evidence/ticket-sync-plan-<phase>-<timestamp>.json` 작성 (schema: `ticket-sync-evidence.schema.json` / stage const=plan):
 
 ```json
 {
@@ -452,8 +452,8 @@ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + 
   "mcp_invocations": [
     {
       "mcp_tool_name": "mcp__wiki-jira-assistant__jira_create",
-      "tool_stdout_path": ".aimd/output/evidence/mcp-stdout-1.log",
-      "tool_stderr_path": ".aimd/output/evidence/mcp-stderr-1.log",
+      "tool_stdout_path": ".ai-context/output/evidence/mcp-stdout-1.log",
+      "tool_stderr_path": ".ai-context/output/evidence/mcp-stderr-1.log",
       "tool_version": "1.4.2",
       "invocation_timestamp": "2026-05-26T14:30:00+09:00",
       "duration_ms": 1234,
@@ -465,7 +465,7 @@ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + 
   "confirmation_gate": {
     "preview_md_digest": "def...",
     "user_response": "yes",
-    "intervention_log_ref": ".aimd/output/intervention-log.jsonl#entry=2026-05-26T14:29:55"
+    "intervention_log_ref": ".ai-context/output/intervention-log.jsonl#entry=2026-05-26T14:29:55"
   },
   "search_first_idempotency": {
     "lookup_count": 13,
@@ -497,7 +497,7 @@ verification mode 는 `traceability-matrix.ticket_ref.verification_mode=true` + 
 	"mcp_invocation_count": 38,
 	"idempotency_skip_count": 0,
 	"cascade_complete": true,
-	"evidence_ref": ".aimd/output/evidence/ticket-sync-plan-exit-20260526T143000.json",
+	"evidence_ref": ".ai-context/output/evidence/ticket-sync-plan-exit-20260526T143000.json",
 	"user": "reviewer@example.com"
 }
 ```

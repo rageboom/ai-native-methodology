@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "generated_at": "2026-06-06T10:20:00Z",
+    "methodology_version": "v0.1.0",
+    "inputs_used": [
+      "source_code",
+      "test_code"
+    ],
+    "confidence": 0.92,
+    "formula_version": "v1"
+  },
+  "derivation_source": {
+    "test_spec_path": ".ai-context/output/test-spec.json",
+    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
+  },
+  "modules": [
+    {
+      "id": "IMPL-POST-001",
+      "tc_refs": [
+        "TC-POST-001",
+        "TC-POST-002",
+        "TC-POST-003",
+        "TC-POST-004",
+        "TC-POST-005"
+      ],
+      "bhv_refs": [
+        "BHV-POST-001",
+        "BHV-POST-002",
+        "BHV-POST-003",
+        "BHV-POST-004",
+        "BHV-POST-005"
+      ],
+      "framework": "vitest",
+      "layer": "be",
+      "source_files": [
+        "src/modules/post/post.service.ts"
+      ],
+      "commit_hash": "ca06a2e6faed688b464b31316c4d7c50e8c587d2",
+      "source_evidence": "S1 regeneration of PostService — createPost/queryPosts/getPostById/updatePostById/deletePostById"
+    }
+  ],
+  "test_pass_evidence": {
+    "test_runner_version": "3.2.4",
+    "test_runner_stdout_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.ai-context/evidence/test-stdout.txt",
+    "test_runner_stderr_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/.ai-context/evidence/test-stderr.txt",
+    "invocation_timestamp": "2026-06-06T09:46:37.740Z",
+    "duration_ms": 1616,
+    "pass_count": 18,
+    "fail_count": 0,
+    "skip_count": 0,
+    "reproduction_command": "pnpm exec vitest run test/modules/post/post.service.test.ts --reporter=json --outputFile=.ai-context/evidence/vitest-report.json",
+    "result_hash": "sha256:d376463248402809c81dbc3865f55b4f1d7dcb2f6f7ccc2231728748da7eeca3",
+    "report_format": "vitest_json",
+    "flaky_retries_count": 0
+  },
+  "coverage": {
+    "link_coverage": {
+      "by_acceptance_criteria": 1,
+      "by_business_rule": 1,
+      "threshold": 0.85
+    },
+    "test_pass_rate": 1
+  },
+  "human_review": {
+    "gate_4_intervention_pct": 0
+  }
+}

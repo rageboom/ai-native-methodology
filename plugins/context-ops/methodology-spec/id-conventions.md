@@ -71,7 +71,7 @@ flowchart LR
 
 scope 는 사용자가 작업 시작 시 자유 명명 (chain-driver init --scope <slug>). 자동 추출 ❌ (사용자 의도 분명).
 한국어 / 공백 / path traversal (`../`, `/`) 비허용 — 파일시스템 호환 + state-store `validateScopeSlug` 강제.
-한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 사이클 1회 또는 revisit 시 N회. `.aimd/<scope>/` 단위 격리.
+한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 사이클 1회 또는 revisit 시 N회. `.ai-context/<scope>/` 단위 격리.
 
 discovery-spec 의 use_cases 는 기존 UC-_ 차용 (analysis stage UC-_ 와 동일 namespace / backward link).
 BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).
@@ -158,7 +158,7 @@ BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 
   source_files: [src/main/java/order/OrderCancelService.java]
   test_pass_evidence: # no-simulation 5종 물증 7 필드
     test_runner_version: 'junit-jupiter-5.10.0'
-    test_runner_stdout_path: '.aimd/output/runs/2026-05-06T12-00/stdout.log'
+    test_runner_stdout_path: '.ai-context/output/runs/2026-05-06T12-00/stdout.log'
     invocation_timestamp: '2026-05-06T12:00:00Z'
     duration_ms: 4523
     pass_count: 12
@@ -231,7 +231,7 @@ Tier 2.5 활성 시 ticket 상태 전이 timeline 자동 기록:
         from_status: 'To Do'
         to_status: 'In Progress'
         mcp_tool: 'mcp__wiki-jira-assistant__jira_transition'
-        evidence_ref: '.aimd/output/evidence/ticket-sync-spec-20260518T150000.json'
+        evidence_ref: '.ai-context/output/evidence/ticket-sync-spec-20260518T150000.json'
       - transitioned_at: '2026-05-18T16:30:00+09:00'
         from_status: 'In Progress'
         to_status: 'Done'

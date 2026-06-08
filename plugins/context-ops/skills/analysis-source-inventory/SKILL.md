@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- `<user-project>/.aimd/input.json` 존재 (analysis-input-collection 완료)
+- `<user-project>/.ai-context/input.json` 존재 (analysis-input-collection 완료)
 
 ## 절차
 
@@ -36,7 +36,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.aimd/output/inventory.json` (validate against `schemas/inventory.schema.json`)
+`<user-project>/.ai-context/output/inventory.json` (validate against `schemas/inventory.schema.json`)
 
 ## 다음
 

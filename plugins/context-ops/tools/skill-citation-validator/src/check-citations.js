@@ -2,7 +2,7 @@
 //
 // scope = repo-wide **active shipped 표면** (v8.1.1 — SKILL.md 한정 → 전 활성 doc 확장).
 //   대상 확장자: .md (v12 ADR-011 — .mermaid 산출물 폐기 / scan 제외)
-//   EXCLUDE (역사 보존 LL-i-52 / 생성물 / 외부): node_modules·.git·.aimd·.claude·.github·briefing·dist·examples·archive
+//   EXCLUDE (역사 보존 LL-i-52 / 생성물 / 외부): node_modules·.git·.ai-context·.claude·.github·briefing·dist·examples·archive
 //             + CHANGELOG*·*HISTORY*·decisions/DEC-*·decisions/STATUS*·decisions/INDEX*(과거 DEC 서술 = history-summary)
 //
 // 검사 class (low-FP / 실결함 입증):
@@ -23,7 +23,7 @@ const SCAN_EXT = new Set(['.md']);
 const SKIP_DIR = new Set([
 	'node_modules',
 	'.git',
-	'.aimd',
+	'.ai-context',
 	'.claude',
 	'.github',
 	'briefing',

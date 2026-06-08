@@ -161,8 +161,8 @@ export function detectGraphArtifactWrite({ toolName, toolInput }) {
 	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
 	const path = toolInput?.file_path || toolInput?.path || '';
 	if (!path) return null;
-	// .aimd 경로 하위만 (산출물 영역)
-	if (!path.includes('/.aimd/') && !path.includes('\\.aimd\\')) return null;
+	// .ai-context 경로 하위만 (산출물 영역)
+	if (!path.includes('/.ai-context/') && !path.includes('\\.ai-context\\')) return null;
 	const filename = path.split(/[/\\]/).pop();
 	if (ARTIFACT_FILENAME_TO_SUBKIND[filename]) {
 		return {
@@ -234,7 +234,7 @@ export function evaluatePolicyForEdges({
 }
 
 // Determine if a tool call should be blocked based on state.json blocked flag.
-// Used for PreToolUse hook on Write/Edit targeting .aimd/output/** + R20 MCP ticket-sync.
+// Used for PreToolUse hook on Write/Edit targeting .ai-context/output/** + R20 MCP ticket-sync.
 //
 // v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel):
 // - mcp__wiki-jira-assistant__* (jira-confluence MCP) 호출도 state.blocked 시 deny.
@@ -255,7 +255,7 @@ export function shouldBlockToolUse({ toolName, toolInput, state }) {
 	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
 	const path = toolInput?.file_path || toolInput?.path || '';
 	if (!path) return null;
-	if (!path.includes('/.aimd/output/') && !path.includes('\\.aimd\\output\\'))
+	if (!path.includes('/.ai-context/output/') && !path.includes('\\.ai-context\\output\\'))
 		return null;
 	return state.block_reason || 'state.blocked=true';
 }

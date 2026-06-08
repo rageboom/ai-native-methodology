@@ -7,9 +7,9 @@
   "phases": [
     {
       "id": "framework-detect",
-      "name": "framework 추론 (inventory + .aimd/config/test-cmd)",
+      "name": "framework 추론 (inventory + .ai-context/config/test-cmd)",
       "depends_on": [],
-      "inputs": ["acceptance-criteria.json", "behavior-spec.json", "inventory.json", ".aimd/config/test-cmd.json"],
+      "inputs": ["acceptance-criteria.json", "behavior-spec.json", "inventory.json", ".ai-context/config/test-cmd.json"],
       "outputs": ["framework_resolved", "test_cmd_resolved"],
       "skills": ["test-generate-test-spec"],
       "adr_ref": "ADR-CHAIN-004"
@@ -43,7 +43,7 @@
       "id": "red-evidence",
       "name": "RED 검증 + evidence (5종 물증 10 필드)",
       "depends_on": ["test-code-generate", "ac-tc-backlink"],
-      "inputs": ["test source files", ".aimd/config/test-cmd.json"],
+      "inputs": ["test source files", ".ai-context/config/test-cmd.json"],
       "outputs": ["test-spec.test_cases[].test_run_evidence (RED / S1·greenfield fail_count > 0 / S2 per_tc_outcome)"],
       "skills": ["test-run-test-evidence"],
       "automated_validation": ["test-impl-pass-validator (--allow-execute / expected: all_fail)", "schema-validator", "spec-test-link-validator", "lint-no-simulation (chain-strict)"]

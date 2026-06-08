@@ -116,10 +116,10 @@ function main() {
 		dbPath = join(resolve(args.target), '.codegraph', 'codegraph.db');
 	if (!dbPath) usage(3);
 
-	// 산출물 디렉토리 해소 (default = <target>/.aimd/output).
+	// 산출물 디렉토리 해소 (default = <target>/.ai-context/output).
 	let delivDir = args.deliverables ? resolve(args.deliverables) : null;
 	if (!delivDir && args.target)
-		delivDir = join(resolve(args.target), '.aimd', 'output');
+		delivDir = join(resolve(args.target), '.ai-context', 'output');
 	if (!delivDir || !existsSync(delivDir)) usage(3);
 
 	// inventory (stack 감지).

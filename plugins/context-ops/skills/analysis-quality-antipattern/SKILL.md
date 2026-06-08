@@ -32,8 +32,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-- `<user-project>/.aimd/output/antipatterns.json`
-- `<user-project>/.aimd/output/migration-cautions.json` (json 단독)
+- `<user-project>/.ai-context/output/antipatterns.json`
+- `<user-project>/.ai-context/output/migration-cautions.json` (json 단독)
 
 ## 인용
 

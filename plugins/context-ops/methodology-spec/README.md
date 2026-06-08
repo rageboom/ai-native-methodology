@@ -55,8 +55,8 @@
 
 | 자산                                              | schema                         |
 | ------------------------------------------------- | ------------------------------ |
-| `.aimd/state.json` (chain harness state)          | `state.schema.json`            |
-| `.aimd/intervention-log.jsonl` (사용자 결단 로그) | `intervention-log.schema.json` |
+| `.ai-context/state.json` (chain harness state)          | `state.schema.json`            |
+| `.ai-context/intervention-log.jsonl` (사용자 결단 로그) | `intervention-log.schema.json` |
 | 도구 호출 명세                                    | `test-cmd.schema.json`         |
 
 ### 공통 메타+유틸 (모든 산출물 횡단)

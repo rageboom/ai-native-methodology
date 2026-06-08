@@ -15,13 +15,13 @@ chain 2 의 sub-skill (compose-behavior-spec 가 호출). **bdd-author persona**
 
 ## 입력
 
-- `<project>/.aimd/output/behavior-spec.json` (chain 2 진행 중)
-- `<project>/.aimd/output/discovery-spec.json` (use case backward link)
-- `<project>/.aimd/output/business-rules.json` + `domain.json` (BR / domain reference)
+- `<project>/.ai-context/output/behavior-spec.json` (chain 2 진행 중)
+- `<project>/.ai-context/output/discovery-spec.json` (use case backward link)
+- `<project>/.ai-context/output/business-rules.json` + `domain.json` (BR / domain reference)
 
 ## 산출
 
-- `<project>/.aimd/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 / Gherkin 은 json gherkin 필드)
+- `<project>/.ai-context/output/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 / Gherkin 은 json gherkin 필드)
 
 > **code_pointers_na 기본** (F-DOGFOOD-009) — AC 는 의도 노드(Gherkin) → 코드 anchor 는 하위 TC/IMPL 가 보유. 각 AC `code_pointers_na: true` 기본 (dep-graph code-pointer coverage 정직). builder backstop 자동 보강 + 산출 시점 명시 권장.
 

@@ -55,7 +55,7 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
      - test-spec: requires acceptance-criteria + behavior-spec (framework 분기 — BE contract → openapi_contract_ref / FE visual → visual_regression_ref / RED 의무 / fail_count > 0)
      - impl-spec: requires test-spec + behavior-spec (GREEN 의무 / fail_count=0 enforce / commit_hash 보존)
 4. **Fill placeholders** (`<placeholder>` / `<...>`) with project-specific data extracted from the codebase / analysis 산출물 / chain backward link.
-5. **Write to user's output directory.** Default: `<user-project>/.aimd/output/<artifact>.json` (json 단독 SSOT) or as user specifies.
+5. **Write to user's output directory.** Default: `<user-project>/.ai-context/output/<artifact>.json` (json 단독 SSOT) or as user specifies.
 6. **Log finding** if any placeholder cannot be filled with confidence — invoke `_base-log-finding` skill.
 
 ## Per-artifact prerequisites

@@ -686,10 +686,10 @@ describe('validateConfidenceCoverage — hard/soft 인지', () => {
 
 // F-MB-VAL-001 (v9.0.4 / 2026-05-24): autoDetectProjectRoot default 결함 fix 검증
 describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
-	it('.aimd/output/<file>.json 패턴 → PoC root 자동 감지 (../..)', () => {
-		const specPath = '/repo/examples/poc-05/.aimd/output/behavior-spec.json';
+	it('.ai-context/output/<file>.json 패턴 → PoC root 자동 감지 (../..)', () => {
+		const specPath = '/repo/examples/poc-05/.ai-context/output/behavior-spec.json';
 		const result = autoDetectProjectRoot(specPath);
-		// dirname = /repo/examples/poc-05/.aimd/output, ../.. = /repo/examples/poc-05
+		// dirname = /repo/examples/poc-05/.ai-context/output, ../.. = /repo/examples/poc-05
 		assert.ok(
 			result.endsWith('poc-05') ||
 				result.endsWith('poc-05/') ||
@@ -698,9 +698,9 @@ describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
 		);
 	});
 
-	it('Windows backslash path 도 .aimd/output 패턴 자동 감지', () => {
+	it('Windows backslash path 도 .ai-context/output 패턴 자동 감지', () => {
 		const specPath =
-			'C:\\repo\\examples\\poc-14\\.aimd\\output\\discovery-spec.json';
+			'C:\\repo\\examples\\poc-14\\.ai-context\\output\\discovery-spec.json';
 		const result = autoDetectProjectRoot(specPath);
 		assert.ok(
 			result.endsWith('poc-14') ||
@@ -710,7 +710,7 @@ describe('autoDetectProjectRoot (F-MB-VAL-001 / v9.0.4)', () => {
 		);
 	});
 
-	it('non-.aimd/output 위치 → fallback dirname 그대로 (backward-compat)', () => {
+	it('non-.ai-context/output 위치 → fallback dirname 그대로 (backward-compat)', () => {
 		const specPath = '/repo/some/other/dir/behavior-spec.json';
 		const result = autoDetectProjectRoot(specPath);
 		// dirname = /repo/some/other/dir (변경 없음)

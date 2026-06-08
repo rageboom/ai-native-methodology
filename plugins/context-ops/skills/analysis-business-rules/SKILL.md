@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- `<user-project>/.aimd/output/domain.json` 존재 (analysis-domain-model 완료)
+- `<user-project>/.ai-context/output/domain.json` 존재 (analysis-domain-model 완료)
 
 ## 절차
 
@@ -52,13 +52,13 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.aimd/output/business-rules.json`
+`<user-project>/.ai-context/output/business-rules.json`
 
 ## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / §2.4 옵션 A) 일 때 — if/switch/policy 코드 스캔 대신 **입력어댑터 extract** 에서 산출:
 
-- 입력 = `.aimd/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점).
+- 입력 = `.ai-context/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점).
 - BR 후보 = swagger `rules_seed[]` (enum/pattern/min/max/required/format 제약) + PRD acceptance rule (NL md 기획문서) + form-validation-spec (FE 검증).
 - `source_grounded_evidence` = **입력 출처 인용** (코드 grep ❌): `swagger:User.email` / `doc:§3.2` (verbatim quote 권장 / LLM fabrication 회피).
 - `code_pointers` = N/A (`meta.code_pointers_na` 동형 / 가리킬 코드 부재). business-rules.schema.json 은 code_pointers hard-require ❌.

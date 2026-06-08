@@ -29,7 +29,7 @@ Markdown / PDF / Notion export 문서를 입력 받아 비즈니스 의도 + UC 
 5. **의도 추출** — H1/H2 제목 + 첫 문단 + bullet 리스트의 "목적/배경/범위" 섹션 우선 read.
 6. **UC 후보 추출 (원문 인용 의무 / F-163)** — "사용자 시나리오" / "기능 목록" / "use case" / "유즈케이스" 키워드 섹션 + 동사 + 대상 entity. 각 UC 후보는 `source_section` (heading) 뿐 아니라 도출 근거 문서 원문을 `source_excerpt` (verbatim) 에 발췌. 문서에 명시된 UC = `provenance: "verbatim"`. 문서 내용 기반 LLM 종합·추론 UC = `provenance: "inferred"` (후속 stage 사용자 확인 의무).
 7. **용어집 추출 (원문 인용 / F-163)** — "용어" / "glossary" / "약어" 섹션 + 본문 안 backtick 또는 정의 패턴 (`A: B` 또는 "A 란 B 를 의미한다"). 문서 명시 정의 = `provenance: "verbatim"` / LLM 종합 정의 = `provenance: "inferred"`.
-8. **산출 작성** — `.aimd/<scope>/planning/plan-doc-extract.json` (schema = `schemas/plan-doc-extract.schema.json`).
+8. **산출 작성** — `.ai-context/<scope>/planning/plan-doc-extract.json` (schema = `schemas/plan-doc-extract.schema.json`).
 
 ## no-simulation 의무 / 산출 자격 조건 (F-163)
 
@@ -43,7 +43,7 @@ Markdown / PDF / Notion export 문서를 입력 받아 비즈니스 의도 + UC 
 
 ## 산출물
 
-- `.aimd/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false / json 단독)
+- `.ai-context/<scope>/planning/plan-doc-extract.json` (strict / additionalProperties:false / json 단독)
 - 추출 결과는 orchestrate merge 단계에서 `input-summary.json` 안 통합
 
 ## When NOT to invoke

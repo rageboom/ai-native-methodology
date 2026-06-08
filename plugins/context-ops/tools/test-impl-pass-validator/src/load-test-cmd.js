@@ -1,4 +1,4 @@
-// load-test-cmd — `.aimd/config/test-cmd.json` 우선 + inventory.stack_signals 자동 추론.
+// load-test-cmd — `.ai-context/config/test-cmd.json` 우선 + inventory.stack_signals 자동 추론.
 // ADR-CHAIN-004 §1 + §2 정합.
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -111,7 +111,7 @@ export function inferFromStackSignals(signals = []) {
  * Load test-cmd contract.
  * Priority:
  *   1. CLI override (cliCmd) — caller should already build a partial config.
- *   2. .aimd/config/test-cmd.json (sourceProjectDir).
+ *   2. .ai-context/config/test-cmd.json (sourceProjectDir).
  *   3. inventory.stack_signals 자동 추론.
  *   4. null (사용자 명시 의무 / 추론 불가).
  */
@@ -123,7 +123,7 @@ export function loadTestCmd({ sourceProjectDir, inventory, cliOverride }) {
 		resolved = { ...cliOverride };
 		source = 'cli-override';
 	} else {
-		const cfgPath = join(sourceProjectDir, '.aimd', 'config', 'test-cmd.json');
+		const cfgPath = join(sourceProjectDir, '.ai-context', 'config', 'test-cmd.json');
 		if (existsSync(cfgPath)) {
 			try {
 				resolved = JSON.parse(readFileSync(cfgPath, 'utf-8'));
@@ -148,7 +148,7 @@ export function loadTestCmd({ sourceProjectDir, inventory, cliOverride }) {
 			resolved: null,
 			source,
 			error:
-				'no test-cmd contract — `.aimd/config/test-cmd.json` 신설 또는 --test-cmd 명시 의무 (ADR-CHAIN-004 §1)',
+				'no test-cmd contract — `.ai-context/config/test-cmd.json` 신설 또는 --test-cmd 명시 의무 (ADR-CHAIN-004 §1)',
 		};
 	}
 

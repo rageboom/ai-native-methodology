@@ -109,16 +109,16 @@ describe('hooks-bridge', () => {
 		}
 	});
 
-	it('shouldBlockToolUse blocks Write under .aimd/output/ when state.blocked', () => {
+	it('shouldBlockToolUse blocks Write under .ai-context/output/ when state.blocked', () => {
 		const reason = shouldBlockToolUse({
 			toolName: 'Write',
-			toolInput: { file_path: '/tmp/proj/.aimd/output/spec.json' },
+			toolInput: { file_path: '/tmp/proj/.ai-context/output/spec.json' },
 			state: { blocked: true, block_reason: 'validator_critical' },
 		});
 		assert.equal(reason, 'validator_critical');
 	});
 
-	it('shouldBlockToolUse allows Write outside .aimd/output/', () => {
+	it('shouldBlockToolUse allows Write outside .ai-context/output/', () => {
 		const reason = shouldBlockToolUse({
 			toolName: 'Write',
 			toolInput: { file_path: '/tmp/proj/src/foo.ts' },
@@ -130,7 +130,7 @@ describe('hooks-bridge', () => {
 	it('shouldBlockToolUse allows when state.blocked=false', () => {
 		const reason = shouldBlockToolUse({
 			toolName: 'Write',
-			toolInput: { file_path: '/tmp/proj/.aimd/output/spec.json' },
+			toolInput: { file_path: '/tmp/proj/.ai-context/output/spec.json' },
 			state: { blocked: false },
 		});
 		assert.equal(reason, null);

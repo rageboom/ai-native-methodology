@@ -76,12 +76,12 @@ describe('validateScopeSlug', () => {
 describe('scopeDirPath', () => {
 	it('returns scope root when stage omitted', () => {
 		const p = scopeDirPath('/root', 'user-registration');
-		assert.equal(p, join('/root', '.aimd', 'user-registration'));
+		assert.equal(p, join('/root', '.ai-context', 'user-registration'));
 	});
 
 	it('returns stage subdir when stage supplied', () => {
 		const p = scopeDirPath('/root', 'user-registration', 'discovery');
-		assert.equal(p, join('/root', '.aimd', 'user-registration', 'discovery'));
+		assert.equal(p, join('/root', '.ai-context', 'user-registration', 'discovery'));
 	});
 
 	it('rejects invalid stage', () => {
@@ -96,10 +96,10 @@ describe('ensureScopeDir', () => {
 	it('creates 5 stage dirs + scope root', () => {
 		const root = join(tmp, 'p1');
 		ensureScopeDir(root, 'user-registration');
-		assert.ok(existsSync(join(root, '.aimd', 'user-registration')));
+		assert.ok(existsSync(join(root, '.ai-context', 'user-registration')));
 		for (const stage of STAGES) {
 			assert.ok(
-				existsSync(join(root, '.aimd', 'user-registration', stage)),
+				existsSync(join(root, '.ai-context', 'user-registration', stage)),
 				`${stage} dir missing`,
 			);
 		}
@@ -110,7 +110,7 @@ describe('ensureScopeDir', () => {
 		ensureScopeDir(root, 'user-registration');
 		const scopeManifestPath = join(
 			root,
-			'.aimd',
+			'.ai-context',
 			'user-registration',
 			'manifest.json',
 		);
@@ -129,7 +129,7 @@ describe('ensureScopeDir', () => {
 		for (const stage of STAGES) {
 			const p = join(
 				root,
-				'.aimd',
+				'.ai-context',
 				'user-registration',
 				stage,
 				'manifest.json',
@@ -147,7 +147,7 @@ describe('ensureScopeDir', () => {
 		ensureScopeDir(root, 'user-registration');
 		const scopeManifestPath = join(
 			root,
-			'.aimd',
+			'.ai-context',
 			'user-registration',
 			'manifest.json',
 		);
@@ -168,7 +168,7 @@ describe('ensureScopeDir', () => {
 	it('leaves no .tmp files', () => {
 		const root = join(tmp, 'p7');
 		ensureScopeDir(root, 'user-registration');
-		const scopeDir = join(root, '.aimd', 'user-registration');
+		const scopeDir = join(root, '.ai-context', 'user-registration');
 		for (const f of readdirSync(scopeDir)) {
 			assert.ok(!f.endsWith('.tmp'), `dangling tmp: ${f}`);
 		}
@@ -233,7 +233,7 @@ describe('writeManifest / readManifest', () => {
 			scope: 'user-registration',
 			status: 'in_progress',
 		});
-		const dir = join(root, '.aimd', 'user-registration');
+		const dir = join(root, '.ai-context', 'user-registration');
 		for (const f of readdirSync(dir)) {
 			assert.ok(!f.endsWith('.tmp'), `dangling tmp: ${f}`);
 		}
