@@ -234,6 +234,7 @@ export const SemgrepPlugin = new Plugin({
 //   Windows pmd.bat 런처 → shell:true 필수. PMD 7.x: check -d <dir> -R <ruleset> -f sarif -r <file>.
 //   exit 4 = 위반 발견(정상) / 5 = recoverable error — runner.run() catch 가 흡수 후 SARIF 해시 진행 (Semgrep 동형).
 //   §8.1 corroboration: poc-06(legacy Spring4.1) + poc-10(modern JPA) in-plugin auto-run 입증.
+//     auto-install(v0.21.0) dogfood: poc-08(modern MyBatis3 jpetstore) — ensurePmd→PMD 7.25.0 다운로드→runner 발견→실 scan 6 findings(real_tool / 2nd modern 스택).
 //   import 경로(Tier 2 SARIF import allowlist=['pmd'])는 orthogonal 로 보존 — PMD = in-plugin 자동 + 사용자 CI import 양쪽 유효.
 export const PmdPlugin = new Plugin({
 	name: 'pmd',
