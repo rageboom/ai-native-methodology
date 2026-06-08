@@ -116,6 +116,20 @@
 - ✅ 메시지 문자열 pnpm 화 — build-catalog/publish-catalog/publish/setup-git-hooks.
 - ✅ 문서 — nexus-setup.md(pnpm 명령 + node-linker 주의) / INSTALL·INSTALL-npm pnpm 무관(유저 install 채널 불변) + **stale 플러그인명 전수 정정** `ai-native-methodology@mis-plugins`→`context-ops@mis-plugins` (README·guides·extensions 9파일 / rename 누락분).
 - ✅ release:check 40/40 유지 (skill_citation·readme_version 포함).
-- 잔여(별도): corepack 핸드오프 사내 환경 실측 / (선택) skill-citation↔inflation-lint temp-file 격리로 병렬 복원.
+- **패키지 매니저 설치 = 전역 설치 방식 확정** (2026-06-08 / corepack 미사용). 각자 `npm i -g pnpm@10` 또는 `brew install pnpm`(현 dev 머신 = homebrew pnpm 10.33.0). `packageManager` 필드는 버전 명시 + CI action-setup 용 / `manage-package-manager-versions` off 라 자동 전환 강제 안 함 → 필드 유지(무해).
+- 잔여(별도 / 선택): skill-citation↔inflation-lint temp-file 격리로 병렬 테스트 복원. (corepack 잔여 = DROP)
 
 > ⚠ 용어 보존: "npm 패키지 / npm-hosted / source:npm / npm 토큰 / npm-public" = Nexus npm-레지스트리 포맷 정확 용어 → pnpm 전환에도 불변(미수정).
+
+## 11. 개정 — pnpm 11 + Node 22 상향 (2026-06-08, 윤주스 결정)
+
+당초 pnpm 10.x(Node ≥18) 채택했으나, **Node 22 표준화** 결정으로 **pnpm 11.x(11.5.2) 상향**. engines = dev/CI + 플러그인 **전부 `>=22.0.0`**.
+
+변경:
+- `packageManager: pnpm@11.5.2` / 양 package.json engines `>=22.0.0` / CI node-version `22`.
+- **`.npmrc` 삭제 → `pnpm-workspace.yaml` 에 `nodeLinker: hoisted`** (pnpm 11 은 설정을 .npmrc 가 아닌 workspace.yaml 에서 읽음 / npm 도 .npmrc node-linker 경고).
+- 설치 = pnpm 아무 최신 버전만 있으면 됨(`brew install pnpm` / `npm i -g pnpm`) / corepack 미사용. **실측**: 전역 pnpm 10.33 이어도 pnpm 기본 `manage-package-manager-versions`(기본 on)가 `packageManager: pnpm@11.5.2` 를 읽어 repo 안에선 11.5.2 자동 위임(repo 밖=10.33 / repo 안=11.5.2 확인).
+
+**★ P0 재발견 + 해결 (pnpm 11 고유)**: pnpm 11 워크스페이스 hoisted 는 deps 를 **repo-root node_modules 에만** 두고 plugin-local 은 빈 상태 → `pnpm pack` 이 `package/../../node_modules/ajv` 깨진 경로 생성(동봉 누락 = v0.19.1 결함 회귀). `pnpm install --filter` 도 plugin-local 미생성. **해법 = publish gate 1.5 가 plugin dir 에서 `pnpm install --ignore-workspace --node-linker=hoisted`**(npm `--no-workspaces` 대응) → plugin-local flat node_modules 확보 → pack `package/node_modules/ajv` 정상(실측 594). pnpm 10 은 워크스페이스 hoisted 가 plugin-local 도 채워 문제없었음(11 에서 동작 변경).
+
+검증 (pnpm 11.5.2 + node 25 로컬): pnpm pack 594 엔트리 정상 동봉 / publish:plugin:dry GREEN / release:check **40/40** / workspace test 1444/1446 pass 0 fail.

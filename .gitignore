@@ -3,6 +3,10 @@ node_modules/
 *.log
 npm-debug.log*
 
+# pnpm — plugin-local lock = publish 시 `pnpm install --ignore-workspace` 가 생성하는 transient 부산물
+#   (워크스페이스 lock = repo-root pnpm-lock.yaml 만 SSOT / plugin-local 은 커밋 안 함)
+plugins/*/pnpm-lock.yaml
+
 # Build artifacts (build-plugin.js → repo-root dist/<plugin>-v<ver>/)
 dist/
 

@@ -12,8 +12,8 @@
 // 인증: .npmrc 의 //<host>/...:_authToken=... (또는 base64 _auth) 에 의존. 이 스크립트는 자격증명을 다루지 않음.
 //   source:npm 은 설치 시 deps 를 install 하지 않으므로 외부 의존(ajv/ajv-formats/fast-xml-parser)은
 //     package.json bundledDependencies 로 tarball 에 동봉됨 (실측: node_modules 594 엔트리).
-//   ⚠ pnpm + .npmrc node-linker=hoisted 의존 — hoisted 라야 plugins/<name>/node_modules 에 bundledDeps 가
-//     flat materialize 되어 pnpm pack/publish 가 tarball 에 동봉함 (isolated 기본값이면 동봉 누락 위험).
+//   ⚠ pnpm 11 주의 — 워크스페이스 hoisted 는 deps 를 repo-root 에만 둬 plugin-local 이 비어 pack 이 ../../ 깨진 경로 생성.
+//     gate 1.5 가 plugin dir 에서 `pnpm install --ignore-workspace --node-linker=hoisted` 로 격리 설치해 flat 동봉 보장.
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
@@ -68,19 +68,22 @@ function publishOne(name) {
 		fail(`'${name}' version-check 실패 — abort.`);
 	}
 
-	// gate 1.5 — bundledDependencies materialize (pnpm + node-linker=hoisted)
-	// pnpm 워크스페이스 install(hoisted)은 plugins/<name>/node_modules 에 bundledDeps 를 flat 으로 채운다
-	//   (실측: ajv/ajv-formats/fast-xml-parser → node_modules 594 엔트리 동봉 / .npmrc node-linker=hoisted 의존).
-	//   → 별도 격리 install 불필요. 단 standalone 호출 대비 워크스페이스 install 을 한 번 보장.
+	// gate 1.5 — bundledDependencies materialize (pnpm 11 / --ignore-workspace + --node-linker=hoisted)
+	// ⚠ pnpm 11 워크스페이스 hoisted 는 deps 를 repo-root node_modules 에만 두고 plugins/<name>/node_modules 는 비움
+	//    → pnpm pack 이 `package/../../node_modules/ajv` 같은 깨진 경로(패키지 밖)를 생성 → 동봉 누락(v0.19.1 결함 회귀).
+	//   해법 = plugin dir 에서 --ignore-workspace 로 독립 패키지처럼 격리 설치(npm --no-workspaces 대응)
+	//          → plugin-local flat node_modules 확보 → pack 이 `package/node_modules/ajv` 로 정상 동봉(실측 594 엔트리).
+	//   --node-linker=hoisted 명시 필수(--ignore-workspace 는 pnpm-workspace.yaml 설정을 무시) / CI=true = 비대화식 modules-purge 허용.
 	const bundled = pkg.bundledDependencies || pkg.bundleDependencies || [];
 	if (bundled.length) {
 		console.log(
-			'[publish] bundledDependencies materialize (pnpm install --filter, node-linker=hoisted)…',
+			'[publish] bundledDependencies materialize (pnpm install --ignore-workspace --node-linker=hoisted)…',
 		);
 		try {
-			execSync(`pnpm install --filter ${pkg.name}`, {
+			execSync('pnpm install --ignore-workspace --node-linker=hoisted', {
 				stdio: 'inherit',
-				cwd: REPO_ROOT,
+				cwd: WORKSPACE,
+				env: { ...process.env, CI: 'true' },
 			});
 		} catch {
 			fail(`'${name}' bundled deps materialize 실패 — abort.`);

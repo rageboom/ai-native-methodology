@@ -1,5 +1,10 @@
-# pnpm 워크스페이스 정의 (구 package.json "workspaces" 필드 이전 / pnpm 은 그 필드를 무시).
-# 멤버 = plugins/<plugin> + 각 플러그인의 tools/* (검증 도구 32종). examples/poc-* 는 비멤버(불변).
+# pnpm 11.x 워크스페이스 정의 + 설정 (pnpm 11 은 nodeLinker 등 설정을 .npmrc 가 아닌 여기서 읽음 / .npmrc = auth·registry 전용).
+# 멤버 = plugins/<plugin> + 각 플러그인의 tools/* (검증 도구). examples/poc-* 는 비멤버(불변).
 packages:
   - 'plugins/*'
   - 'plugins/*/tools/*'
+
+# nodeLinker: hoisted — 심링크(.pnpm) 대신 flat node_modules 생성(npm 동형).
+#   ★ bundledDependencies(ajv/ajv-formats/fast-xml-parser)가 publish tarball 에 정상 동봉되려면 필수
+#     (source:npm 설치는 deps 를 install 하지 않으므로 동봉 누락 시 검증 도구 깨짐 — v0.19.1 결함 회귀 방지).
+nodeLinker: hoisted

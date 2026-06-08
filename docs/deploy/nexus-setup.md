@@ -32,7 +32,8 @@ pnpm run publish:plugin          # publishConfig.registry(npm-hosted)로 publish
 ```
 
 > ⚠️ npm 레지스트리는 보통 **같은 버전 재publish 불가**. release 마다 plugin.json+package.json+CHANGELOG 3-way 버전 bump 후 publish (version-check 강제).
-> ⚠️ 패키지 매니저 = **pnpm 10.x** (`packageManager` 필드 / corepack). bundledDeps 동봉은 `.npmrc node-linker=hoisted` 의존.
+> ⚠️ 패키지 매니저 = **pnpm 11.x** (Node ≥22). corepack 미사용 — pnpm 본인의 기본 동작(`manage-package-manager-versions`, 기본 on)이 `packageManager: pnpm@11.5.2` 필드를 읽어 **repo 안에선 자동으로 11.5.2 위임**(전역 pnpm 버전 무관). 따라서 각자 pnpm 만 있으면 됨(`brew install pnpm` / `npm i -g pnpm`). CI 는 `pnpm/action-setup` 이 필드를 읽어 설치.
+> - **bundledDeps 동봉 (pnpm 11 주의)**: 워크스페이스 hoisted 는 deps 를 repo-root 에만 둬서 `pnpm pack` 이 `../../` 깨진 경로를 만듦 → `publish:plugin` 이 내부적으로 plugin dir 에서 `pnpm install --ignore-workspace --node-linker=hoisted` 로 plugin-local 격리 설치한 뒤 pack(실측 594 엔트리 정상 동봉). `nodeLinker: hoisted` 는 `pnpm-workspace.yaml` 에 선언(pnpm 11 은 .npmrc 가 아닌 여기서 설정을 읽음).
 
 ## 4b. 카탈로그(marketplace.json) URL 호스팅 — 통일 설치 경로
 

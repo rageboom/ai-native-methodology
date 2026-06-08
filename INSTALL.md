@@ -8,7 +8,7 @@ Windows / macOS 둘 다 다룹니다. 순서대로 따라오면 됩니다.
 
 ---
 
-## 1. Node.js 설치 (≥ 18)
+## 1. Node.js 설치 (≥ 22)
 
 Claude Code와 플러그인 도구가 Node 위에서 돕니다.
 
@@ -90,7 +90,7 @@ Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을
 |---|---|
 | `marketplace add` 가 인증 오류 | 2단계 GHE 인증 미완 → `gh auth login --hostname github.smilegate.net` 다시 실행 |
 | `node` / `claude` 명령 없음 | 1·3단계 설치 후 **터미널을 새로 열기** (PATH 갱신) |
-| 도구 실행 오류 | Node 버전 확인(`node -v` ≥ 18) |
+| 도구 실행 오류 | Node 버전 확인(`node -v` ≥ 22) |
 | (Windows·한국어 + Semgrep 사용 시) 인코딩 깨짐 | 환경변수 `PYTHONUTF8=1` 설정 |
 
 자세한 사용법은 플러그인 본체의 [`ai-native-methodology/README.md`](ai-native-methodology/README.md)를 참고하세요.
