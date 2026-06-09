@@ -1,0 +1,366 @@
+{
+  "meta": {
+    "schema": "scope-carve.schema.json",
+    "generated_by": "scope-carve",
+    "do_not_edit_manually": true,
+    "reference_lens": true,
+    "derived_from": [
+      {
+        "tool": "scope-carve",
+        "version": "0.1.0",
+        "method": "Tarjan SCC + Martin Ca/Ce/I over architecture.json dependencies"
+      },
+      {
+        "tool": "git",
+        "version": null,
+        "method": "git log --no-merges --name-only (logical-coupling co-change mining)"
+      }
+    ],
+    "trust_note": "reference-lens / NOT gate-injected (DEC-2026-05-28 §4.2). 어떤 결정적 gate 에도 inject ❌ — 사용자가 soft gate #0 에서 scope 확정. carve reference finding 은 _base-log-finding 으로 low|medium 만(gate blocker ❌).",
+    "generated_at": "2026-06-09T09:22:56.306Z"
+  },
+  "target": {
+    "architecture_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/.claude/worktrees/wizardly-antonelli-b8319d/plugins/context-ops/examples/poc-01-realworld-spring/output/architecture/architecture.json",
+    "repo_path": null,
+    "module_count": 10,
+    "dependency_edge_count": 13
+  },
+  "params": {
+    "co_change": {
+      "min_support": 2,
+      "min_confidence": 0.5,
+      "window": null,
+      "max_transaction_size": 30,
+      "since": null
+    },
+    "martin_thresholds": {
+      "unstable_instability": 0.7,
+      "hub_afferent": 3
+    }
+  },
+  "scc": {
+    "has_cycle": true,
+    "components": [
+      {
+        "index": 0,
+        "members": [
+          "MOD-APP-ARTICLE"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 5
+      },
+      {
+        "index": 1,
+        "members": [
+          "MOD-APP-CROSS"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 4
+      },
+      {
+        "index": 2,
+        "members": [
+          "MOD-APP-SECURITY"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 3
+      },
+      {
+        "index": 3,
+        "members": [
+          "MOD-APP-TAG"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 2
+      },
+      {
+        "index": 4,
+        "members": [
+          "MOD-APP-USER"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 1
+      },
+      {
+        "index": 5,
+        "members": [
+          "MOD-DOMAIN-ARTICLE",
+          "MOD-DOMAIN-USER"
+        ],
+        "size": 2,
+        "is_atomic": true,
+        "kind": "multi_node_cycle",
+        "topo_rank": 7
+      },
+      {
+        "index": 6,
+        "members": [
+          "MOD-DOMAIN-JWT"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 8
+      },
+      {
+        "index": 7,
+        "members": [
+          "MOD-INFRA-JWT"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 6
+      },
+      {
+        "index": 8,
+        "members": [
+          "MOD-INFRA-REPO"
+        ],
+        "size": 1,
+        "is_atomic": false,
+        "kind": "singleton",
+        "topo_rank": 0
+      }
+    ],
+    "condensation_order": [
+      8,
+      4,
+      3,
+      2,
+      1,
+      0,
+      7,
+      5,
+      6
+    ],
+    "note": "multi-node SCC = 분할 불가 atomic (is_atomic=true). condensation_order = 의존 그래프 위상순서(A→B 면 A 먼저). 안전 증분 추출은 통상 leaf(가장 많이 의존되는 = 큰 topo_rank)부터 — 의미 경계는 soft gate #0 human."
+  },
+  "martin": [
+    {
+      "module_id": "MOD-APP-ARTICLE",
+      "afferent": 0,
+      "efferent": 3,
+      "instability": 1,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "sink"
+    },
+    {
+      "module_id": "MOD-APP-CROSS",
+      "afferent": 0,
+      "efferent": 0,
+      "instability": null,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "isolated"
+    },
+    {
+      "module_id": "MOD-APP-SECURITY",
+      "afferent": 0,
+      "efferent": 1,
+      "instability": 1,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "sink"
+    },
+    {
+      "module_id": "MOD-APP-TAG",
+      "afferent": 0,
+      "efferent": 1,
+      "instability": 1,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "sink"
+    },
+    {
+      "module_id": "MOD-APP-USER",
+      "afferent": 0,
+      "efferent": 2,
+      "instability": 1,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "sink"
+    },
+    {
+      "module_id": "MOD-DOMAIN-ARTICLE",
+      "afferent": 3,
+      "efferent": 2,
+      "instability": 0.4,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "hub"
+    },
+    {
+      "module_id": "MOD-DOMAIN-JWT",
+      "afferent": 3,
+      "efferent": 0,
+      "instability": 0,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "hub"
+    },
+    {
+      "module_id": "MOD-DOMAIN-USER",
+      "afferent": 4,
+      "efferent": 1,
+      "instability": 0.2,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "hub"
+    },
+    {
+      "module_id": "MOD-INFRA-JWT",
+      "afferent": 2,
+      "efferent": 2,
+      "instability": 0.5,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "balanced"
+    },
+    {
+      "module_id": "MOD-INFRA-REPO",
+      "afferent": 0,
+      "efferent": 0,
+      "instability": null,
+      "abstractness": null,
+      "distance": null,
+      "abstractness_status": "not_computable",
+      "role": "isolated"
+    }
+  ],
+  "co_change": {
+    "status": "not_run",
+    "transactions_analyzed": 0,
+    "pairs": [],
+    "note": "repo_path 미지정 — co-change 미실행(SCC+Martin 만)."
+  },
+  "carve_candidates": [
+    {
+      "index": 0,
+      "kind": "atomic_unit",
+      "members": [
+        "MOD-DOMAIN-ARTICLE",
+        "MOD-DOMAIN-USER"
+      ],
+      "signals": [
+        "scc"
+      ],
+      "rationale": "multi-node circular dependency (2 모듈) — acyclic cut 으로 cycle 미분리 = 분할 불가. 함께 carve 하거나 cycle 먼저 해소.",
+      "confidence_note": "구조 hard 제약(증명 가능). 의미·도메인 경계 확정은 soft gate #0 의 human."
+    },
+    {
+      "index": 1,
+      "kind": "clean_seam",
+      "members": [
+        "MOD-APP-ARTICLE"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "sink (Ca=0, Ce=3, I=1) — 아무도 의존하지 않음 → 깨끗 추출 가능.",
+      "confidence_note": "구조 신호 한정(cohesion·도메인 의미 미포함). soft gate #0 human 확정."
+    },
+    {
+      "index": 2,
+      "kind": "clean_seam",
+      "members": [
+        "MOD-APP-SECURITY"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "sink (Ca=0, Ce=1, I=1) — 아무도 의존하지 않음 → 깨끗 추출 가능.",
+      "confidence_note": "구조 신호 한정(cohesion·도메인 의미 미포함). soft gate #0 human 확정."
+    },
+    {
+      "index": 3,
+      "kind": "clean_seam",
+      "members": [
+        "MOD-APP-TAG"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "sink (Ca=0, Ce=1, I=1) — 아무도 의존하지 않음 → 깨끗 추출 가능.",
+      "confidence_note": "구조 신호 한정(cohesion·도메인 의미 미포함). soft gate #0 human 확정."
+    },
+    {
+      "index": 4,
+      "kind": "clean_seam",
+      "members": [
+        "MOD-APP-USER"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "sink (Ca=0, Ce=2, I=1) — 아무도 의존하지 않음 → 깨끗 추출 가능.",
+      "confidence_note": "구조 신호 한정(cohesion·도메인 의미 미포함). soft gate #0 human 확정."
+    },
+    {
+      "index": 5,
+      "kind": "hub_warning",
+      "members": [
+        "MOD-DOMAIN-ARTICLE"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "hub (Ca=3, Ce=2) — 다수 모듈이 의존하는 shared kernel 근처. 쪼개면 다수 slice 파편화 → 경계 신중.",
+      "confidence_note": "경고 신호(추출 회피 후보). soft gate #0 human 확정."
+    },
+    {
+      "index": 6,
+      "kind": "hub_warning",
+      "members": [
+        "MOD-DOMAIN-JWT"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "hub (Ca=3, Ce=0) — 다수 모듈이 의존하는 shared kernel 근처. 쪼개면 다수 slice 파편화 → 경계 신중.",
+      "confidence_note": "경고 신호(추출 회피 후보). soft gate #0 human 확정."
+    },
+    {
+      "index": 7,
+      "kind": "hub_warning",
+      "members": [
+        "MOD-DOMAIN-USER"
+      ],
+      "signals": [
+        "martin"
+      ],
+      "rationale": "hub (Ca=4, Ce=1) — 다수 모듈이 의존하는 shared kernel 근처. 쪼개면 다수 slice 파편화 → 경계 신중.",
+      "confidence_note": "경고 신호(추출 회피 후보). soft gate #0 human 확정."
+    }
+  ],
+  "evidence": {
+    "tool_version": "0.1.0",
+    "invocation_timestamp": "2026-06-09T09:22:56.306Z",
+    "duration_ms": 6,
+    "inputs_hash": "3d6670ed1db1e374bcee441e6ec025f70b642e949f69474b1a0f63a7670d40b7",
+    "result_hash": "3a8a3b6f3130e67b7b21471d88d768660ee18dd9ae45d6bae2b1cfe95fce315b",
+    "reproduction_command": "scope-carve --architecture examples/poc-01-realworld-spring/output/architecture/architecture.json --min-support 2 --min-confidence 0.5 --max-transaction-size 30 --unstable-instability 0.7 --hub-afferent 3",
+    "git_available": false,
+    "evidence_trust": "real_tool"
+  }
+}

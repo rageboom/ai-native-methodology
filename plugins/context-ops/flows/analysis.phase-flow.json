@@ -141,8 +141,8 @@
       "cross_validation_introduced": "v1.2.1 (5종 물증 if/then 강제 — formal-spec.schema)"
     },
     "aspects": {
-      "$comment": "v1.4.4 신설 — aspect skill 은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. v2.5.0 Phase C session 13차 추가 — analysis-br-cross-consistency-check (Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger). v11.8.0 추가 — analysis-code-graph (CodeGraph OSS 필수 도구 / code↔code reference-lens / DEC-2026-05-30-codegraph-essential / NOT gate-injected).",
-      "skills": ["analysis-aspect-a11y", "analysis-aspect-i18n", "analysis-aspect-static-security", "analysis-aspect-legacy", "analysis-br-cross-consistency-check", "analysis-code-graph"],
+      "$comment": "v1.4.4 신설 — aspect skill 은 phase 무관 cross-cutting 으로 분류. 각 aspect 는 코드베이스 시그널 자동 매칭으로 발동. v2.5.0 Phase C session 13차 추가 — analysis-br-cross-consistency-check (Layer 2 LLM mandatory paradigm / Q-C-trigger (d) skill trigger). v11.8.0 추가 — analysis-code-graph (CodeGraph OSS 필수 도구 / code↔code reference-lens / DEC-2026-05-30-codegraph-essential / NOT gate-injected). 추가 — analysis-scope-carve (역공학 scope-carve 3 결정론 신호 reference-lens / DEC-2026-06-09-scope-carve-3signal-reference-lens / soft gate #0 evidence / NOT gate-injected / 1차 draft opt-in).",
+      "skills": ["analysis-aspect-a11y", "analysis-aspect-i18n", "analysis-aspect-static-security", "analysis-aspect-legacy", "analysis-br-cross-consistency-check", "analysis-code-graph", "analysis-scope-carve"],
       "applies_to": ["all phases — FE+BE+DB cross-cutting"]
     },
     "base": {

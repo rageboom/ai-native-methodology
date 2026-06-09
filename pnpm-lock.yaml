@@ -85,6 +85,8 @@ importers:
         specifier: ^3.0.1
         version: 3.0.1(ajv@8.20.0)
 
+  plugins/context-ops/tools/scope-carve: {}
+
   plugins/context-ops/tools/skill-citation-validator: {}
 
   plugins/context-ops/tools/spec-test-link-validator: {}

@@ -65,6 +65,8 @@
 
 **🥇1 scope-carve**: 신호 5종 = EventStorming pivotal-event(LLM heuristic — 신중) / Martin Ca-Ce-Instability / SCC(기존 Tarjan 재사용) / VCS change-coupling(git 저렴) / Bunch MQ. carve 출력은 code-graph 선례(DEC-2026-05-28)대로 **reference-lens 고정** — 사용자가 soft gate #0 에서 확정. trust 위반(gate inject) 절대 회피.
 
+> **Phase 0 진행 (2026-06-09)**: per-delta DEC 작성 = [`DEC-2026-06-09-scope-carve-3signal-reference-lens.md`](../../plugins/context-ops/decisions/DEC-2026-06-09-scope-carve-3signal-reference-lens.md) (INDEX 미해결 등재). 1원칙 자산 실측(workflow 7-reader) 완료 — **정정 2건**: ⒜ "기존 Tarjan 재사용" 가정 = **틀림**(repo Tarjan·Martin 구현 전무 / `architecture.schema.json` tarjan_scc = aspirational label) → carve tool 이 자체 구현. ⒝ "VCS change-coupling = git 저렴" → 기존 `gitDiffNumstat` 은 **point-to-point**(역사 co-change 아님) → `git log` 이력 logical-coupling mining 신규(makeGitRunner plumbing 만 재사용). 추가 결단: Martin **A·D abstain**(architecture.json 에 abstractness 부재 = no-simulation) → 1차 = Ca/Ce/I. 형태 = standalone tool+skill(chain-driver 무수정). DEC §6 **일괄 승인 묶음 4결단 대기 → 승인 후 Phase 1 코드 착수**.
+
 **🥈2 build/run/env + secret-scan**: (a) "어떻게 build/run/configure" positive manifest(migration-cautions 는 negative 경고만). (b) 방출 산출물 secret-scan — 실증 리스크(br-cross-consistency 가 산출물에 `SECRET="..."` verbatim 복사한 finding 기록 존재). no-simulation 준수(실 gitleaks/regex, LLM 판단 ❌) + R19 Tier 분류 명시.
 
 **🥉3 recovered-ADR**: legacy 과거 결정 발굴 + 복구불가 WHY 정직 abstain. `task-plan.adrs[]`=forward 전용(unknown 없음). no-simulation honesty("없는 상위 의도 날조 회피") 정합.
