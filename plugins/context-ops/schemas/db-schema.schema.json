@@ -86,6 +86,11 @@
                 "drift_note": {
                   "type": "string",
                   "description": "출처 간 불일치 발견 시 노트 (예: 'ERD는 (10,2), 운영DB는 (12,2)')"
+                },
+                "sensitivity": {
+                  "type": "string",
+                  "enum": ["public", "internal", "pii", "credential", "regulated", "unknown"],
+                  "description": "컬럼 데이터 민감도 분류 (OPTIONAL / active data dictionary provenance). pii(개인식별정보) / credential(비밀번호·토큰·키) / regulated(금융·의료 등 규제) = 산출물 secret-scan + redaction 트리거 후보. 미지정 = unknown 취급. LLM 운영 컨텍스트가 민감 데이터를 verbatim 노출하지 않도록 하는 1차 신호."
                 }
               }
             }
