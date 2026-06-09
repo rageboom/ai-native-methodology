@@ -8,7 +8,7 @@
 
 ```
 INPUT (4 use-scenario):  S2 AX전환(주 타깃)/S1 재생성/S3 특성화 = legacy 코드 / greenfield = PRD·디자인·계약
-  ↓ analysis stage = 코드-고고학(legacy) + 입력어댑터(공통 / greenfield 는 이것만 / 현 v1.5.x 자산 / 단방향 추출)
+  ↓ analysis stage = 코드-고고학(legacy) + 입력어댑터(공통 / greenfield 는 이것만 / 현 입력어댑터 자산 / 단방향 추출)
   ↓
 OUTPUT chain:
   [CHAIN 1] discovery-spec (discovery stage)      ── go/stop gate #1

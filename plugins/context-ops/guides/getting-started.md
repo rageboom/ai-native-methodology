@@ -70,7 +70,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 
 ```bash
 # version-check
-/plugin                  # 대화형 manager — Installed 탭 / v2.5.1 확인
+/plugin                  # 대화형 manager — Installed 탭 / 설치 버전 확인
 ```
 
 **install 후 확인 의무**:

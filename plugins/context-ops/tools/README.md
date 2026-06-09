@@ -2,7 +2,7 @@
 
 본 디렉토리 = npm workspace 29 도구 패키지 (`_shared` lib + `semgrep-rules` data 제외). plugin user 가 자기 산출물 검증 시 CLI 호출하는 자산. (정확한 인벤토리는 하위 폴더 + `package.json` workspaces 참조 — 본 README 는 카운트 하드코딩 최소화.)
 
-## 자산 매핑 매트릭스 cross-link (v3.6.1)
+## 자산 매핑 매트릭스 cross-link
 
 본 도구 자산 = `methodology-spec/lifecycle-contract.md` §자산 매핑 매트릭스 의 **Tool / Validator column** detail. 아래 cadence table = 본 매트릭스 8 row 중 stage × tool 의 확장 매핑.
 

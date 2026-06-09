@@ -18,7 +18,7 @@
 
 ```
 INPUT (4 use-scenario / DEC-2026-05-30):  S2 AX전환(주 타깃) / S1 재생성 / S3 특성화 = legacy 코드 / greenfield = PRD·디자인·계약
-  ↓ analysis stage = 코드-고고학 패스(legacy) + 입력어댑터 패스(공통 / greenfield 는 이것만 / 현 v1.5.x 자산)
+  ↓ analysis stage = 코드-고고학 패스(legacy) + 입력어댑터 패스(공통 / greenfield 는 이것만 / 현 입력어댑터 자산)
   ↓
 OUTPUT chain (v9.0 6-stage / planning→discovery 개칭 + plan 신설 / DEC-2026-05-21+DEC-2026-05-23-discovery-stage-v9):
   [CHAIN 1] discovery: discovery-spec (입력 어댑터 4종 analysis-output/swagger/figma/nl-md)  ── go/stop gate #1
