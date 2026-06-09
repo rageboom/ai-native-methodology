@@ -664,6 +664,53 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
+	it('artifact_secret_leak (check42) — 방출 산출물 secret/credential 누출 0건 (delta #2-b / output-hygiene release-gate)', () => {
+		const r = runScript(['--target', 'v0.24.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find((x) => x.id === 'artifact_secret_leak');
+		assert.ok(c, 'check42 artifact_secret_leak criterion must exist');
+		assert.ok(
+			c.pass,
+			`check42 must pass (방출 산출물 secret 누출 0) — detail: ${c.detail}`,
+		);
+		assert.match(c.detail, /no-simulation/);
+		assert.ok(
+			c.delegated_to.includes('scanSecrets'),
+			'content-aware (scanSecrets 결정론 regex / release-block / chain gate 미주입)',
+		);
+	});
+
+	it('scanSecrets — TP(실 secret) hit / FP(test-data·타입설명·placeholder) clean (release-block low-FP 의무)', async () => {
+		const { scanSecrets } = await import('../../tools/_shared/pii-patterns.js');
+		// TP — 진짜 secret 은 hit
+		assert.ok(scanSecrets('ghp_1234567890abcdefghijklmnopqrstuvwx').length, 'github token');
+		assert.ok(scanSecrets('AKIA1234567890ABCDEF').length, 'aws access key (AKIA+16)');
+		assert.ok(
+			scanSecrets('private static final String SECRET = "kP9mX2vL8qR4nT6w"').length,
+			'verbatim 복사된 SECRET 할당 (실증 risk)',
+		);
+		assert.ok(
+			scanSecrets('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTYifQ.abc123def456ghi').length,
+			'jwt',
+		);
+		assert.ok(scanSecrets('-----BEGIN RSA PRIVATE KEY-----').length, 'private key');
+		// FP — 구조화 산출물 흔한 test-data/타입설명/placeholder 는 clean
+		assert.equal(scanSecrets("password='secret123'").length, 0, 'short test password');
+		assert.equal(scanSecrets('"password": "@IsNotEmpty()"').length, 0, '검증 데코레이터 설명');
+		assert.equal(
+			scanSecrets('"password": "string (argon2 hash via @BeforeInsert)"').length,
+			0,
+			'타입 설명 (공백 포함)',
+		);
+		assert.equal(scanSecrets('apiKey: "your-api-key-here"').length, 0, 'placeholder');
+		assert.equal(scanSecrets('"description": "validates the password field"').length, 0, 'prose');
+		// 결정론
+		assert.deepEqual(
+			scanSecrets('ghp_1234567890abcdefghijklmnopqrstuvwx'),
+			scanSecrets('ghp_1234567890abcdefghijklmnopqrstuvwx'),
+		);
+	});
+
 	it('missing --target → exit 2 (usage error)', () => {
 		const r = runScript([]);
 		assert.equal(r.status, 2);

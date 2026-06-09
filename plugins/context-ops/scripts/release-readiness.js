@@ -43,7 +43,8 @@ import { createHash } from 'node:crypto';
 import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 // v11.29.0 REVISE-2 — PII / 사내 신원 패턴 SSOT (regex 복사 ❌ / drift attractor 회피). check27 + adopter-evidence-packager 공용.
-import { INTERNAL_IDENTITY_RE } from '../tools/_shared/pii-patterns.js';
+// delta #2-b — scanSecrets (방출 산출물 secret 누출 / check42 / DEC-2026-06-09-artifact-secret-scan).
+import { INTERNAL_IDENTITY_RE, scanSecrets } from '../tools/_shared/pii-patterns.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -3143,6 +3144,59 @@ function check41_catalogRangeCoversVersion() {
 	};
 }
 
+// check42 (delta #2-b / DEC-2026-06-09-artifact-secret-scan) — 방출 분석/체인 산출물(.ai-context/output·output·analysis)
+//   의 secret/credential 누출 차단. 실증 risk: br-cross-consistency 가 산출물에 source secret(`SECRET="..."`)을
+//   verbatim 복사 = output-hygiene 결함. built-in regex scanSecrets (no-simulation / 결정론 / LLM 판단 ❌).
+//   check27(shippedIdentityLeak) 동형 release-block. chain gate 미주입(forward 진행 무관 / 결정론 axis 보호).
+//   content-aware. input fixture(legacy source config)는 제외 — 방출 산출물 dir(output/.ai-context/analysis)만.
+function check42_artifactSecretLeak() {
+	try {
+		const EXAMPLES = join(ROOT, 'examples');
+		const ARTIFACT_SEG = /\/(?:output|\.ai-context|analysis)\//;
+		const hits = [];
+		let scanned = 0;
+		if (existsSync(EXAMPLES)) {
+			const entries = readdirSync(EXAMPLES, {
+				recursive: true,
+				withFileTypes: true,
+			});
+			for (const ent of entries) {
+				if (!ent.isFile() || !ent.name.endsWith('.json')) continue;
+				const full = join(ent.parentPath ?? ent.path, ent.name);
+				const rel = full.slice(ROOT.length + 1).replace(/\\/g, '/');
+				if (rel.includes('/node_modules/')) continue;
+				if (!ARTIFACT_SEG.test('/' + rel)) continue; // 방출 산출물 dir 만 (input fixture 제외)
+				let content;
+				try {
+					content = readFileSync(full, 'utf-8');
+				} catch {
+					continue;
+				}
+				scanned++;
+				const labels = scanSecrets(content);
+				if (labels.length) hits.push(`${rel} (${labels.join(',')})`);
+			}
+		}
+		return {
+			id: 'artifact_secret_leak',
+			pass: hits.length === 0,
+			detail:
+				hits.length === 0
+					? `방출 산출물(examples/**/{output,.ai-context,analysis}/*.json ${scanned}건) secret/credential 누출 0건 — built-in regex(AWS/GitHub/Slack/Google/Stripe/JWT/private-key/hardcoded-credential) / no-simulation 결정론 / output-hygiene release-gate (delta #2-b / check27 동형)`
+					: `산출물 secret 누출 ${hits.length}건: ${hits.slice(0, 8).join(', ')}${hits.length > 8 ? ' …' : ''} — 산출물에서 제거 + 재생성(source secret verbatim 복사 = output-hygiene 결함 / R15·R19 no-simulation)`,
+			delegated_to:
+				'examples/**/{output,.ai-context,analysis}/**.json / tools/_shared/pii-patterns.js scanSecrets (결정론 regex / release-block / chain gate 미주입)',
+		};
+	} catch (e) {
+		return {
+			id: 'artifact_secret_leak',
+			pass: false,
+			detail: `error: ${e.message}`,
+			delegated_to: 'examples/ secret-scan',
+		};
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -3189,6 +3243,7 @@ function main() {
 		check39_codegraphOpenapiReferenceLensTrust(),
 		check40_shippedProvenanceLeak(),
 		check41_catalogRangeCoversVersion(),
+		check42_artifactSecretLeak(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;

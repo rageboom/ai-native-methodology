@@ -81,3 +81,71 @@ export function scanLeak(text) {
 	}
 	return hits;
 }
+
+// ── Secret / credential 패턴 (delta #2-b / DEC-2026-06-09-artifact-secret-scan) ──
+//    방출 .ai-context/output 산출물 secret 누출 검출용 (release-block / check27 동형). low-FP 의무:
+//    release 차단이므로 false-positive 최소화 — 고유 prefix 토큰 + private key + 비-placeholder 할당만.
+//    실증 risk: br-cross-consistency 가 산출물에 `SECRET = "..."` verbatim 복사 (output-hygiene 결함).
+
+// 고유 prefix / 형식 기반 토큰 (very-low-FP / verbatim 누출 = 거의 확실 진짜 secret).
+export const SECRET_TOKEN_RULES = [
+	{ label: 'aws-access-key', source: '\\bAKIA[0-9A-Z]{16}\\b', flags: '' },
+	{
+		label: 'github-token',
+		source: '\\b(?:gh[pos ur]|github_pat)_[A-Za-z0-9_]{20,}\\b',
+		flags: '',
+	},
+	{ label: 'slack-token', source: '\\bxox[baprs]-[0-9A-Za-z-]{10,}\\b', flags: '' },
+	{ label: 'google-api-key', source: '\\bAIza[0-9A-Za-z_\\-]{35}\\b', flags: '' },
+	{ label: 'stripe-secret-key', source: '\\bsk_live_[0-9A-Za-z]{16,}\\b', flags: '' },
+	{ label: 'slack-webhook', source: 'hooks\\.slack\\.com/services/[A-Za-z0-9/]{20,}', flags: '' },
+	{
+		label: 'jwt',
+		source: '\\beyJ[A-Za-z0-9_-]{8,}\\.eyJ[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\b',
+		flags: '',
+	},
+	// private-key 는 PII PRIVATE_KEY_RE 와 동일 패턴 (secret 으로도 등재).
+	{ label: 'private-key', source: PRIVATE_KEY_RE.source, flags: '' },
+];
+
+// 하드코딩 credential 할당 (`SECRET = "..."` 류). 값이 "진짜 secret 모양"일 때만 hit.
+//   FP 회피(release-block): 구조화 산출물엔 password 가 field-name 으로 흔하고 값은 test-data/타입설명
+//   ("secret123" / "@IsNotEmpty()" / "string (argon2 hash)") → 아래 looksLikeRealSecret 로 강하게 거른다.
+const SECRET_ASSIGNMENT_RE =
+	/(?:password|passwd|pwd|secret|api[_-]?key|apikey|access[_-]?key|auth[_-]?token|client[_-]?secret|private[_-]?key|encryption[_-]?key)["'\s]*[:=]\s*["']([^"'\n]+)["']/gi;
+
+// placeholder / 예시 값 (contains-match) — credential 할당에서 제외 (release-block FP 회피).
+const SECRET_PLACEHOLDER_RE =
+	/example|changeme|change[_-]?me|placeholder|your[-_]|redacted|dummy|sample|fake|<|>|\$\{|\{\{|x{4,}/i;
+
+// 진짜 secret 모양: 16+ token charset(공백·괄호·단어설명 배제) + letter·digit 혼재(entropy proxy) + 비-placeholder.
+//   "secret123"(9) / "Test1234!"(9·`!`) / "@IsNotEmpty()"(`@()`) / "string (argon2 hash)"(공백) 모두 탈락.
+function looksLikeRealSecret(val) {
+	if (typeof val !== 'string' || val.length < 16) return false;
+	if (!/^[A-Za-z0-9+/_=.\-]{16,}$/.test(val)) return false;
+	if (!/[A-Za-z]/.test(val) || !/[0-9]/.test(val)) return false;
+	if (SECRET_PLACEHOLDER_RE.test(val)) return false;
+	return true;
+}
+
+/**
+ * secret / credential 누출 검사 (delta #2-b). 결정론 regex (no-simulation / LLM 판단 ❌).
+ * @param {string} text
+ * @returns {string[]} 매치된 secret label 목록 (빈 배열 = clean). low-FP (release-block 용).
+ */
+export function scanSecrets(text) {
+	if (typeof text !== 'string' || text.length === 0) return [];
+	const hits = new Set();
+	for (const { label, source, flags } of SECRET_TOKEN_RULES) {
+		if (new RegExp(source, flags).test(text)) hits.add(label);
+	}
+	const re = new RegExp(SECRET_ASSIGNMENT_RE.source, 'gi');
+	let m;
+	while ((m = re.exec(text)) !== null) {
+		if (looksLikeRealSecret(m[1].trim())) {
+			hits.add('hardcoded-credential');
+			break;
+		}
+	}
+	return [...hits];
+}
