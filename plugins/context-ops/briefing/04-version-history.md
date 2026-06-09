@@ -2,7 +2,9 @@
 
 > 왜 이 방법론이 지금의 모양이 되었는가. 각 버전마다 어떤 깨달음이 있었고 무엇이 추가됐는지를 한 페이지씩 풀었습니다.
 >
-> **갱신 이력**: 2026-05-08 작성 (v1.0 ~ v2.2 / 2026-05-14 갱신: v2.3 + v2.4 + v2.5.0 + v2.5.1 entry 추가).
+> **갱신 이력**: 2026-05-08 작성 (v1.0 ~ v2.2) → 2026-05-14 갱신 (v2.3 ~ v2.5.1) → **2026-06-09 v0.24.0 까지 확장** (v2.6 이후 6-stage chain / json 단독 / 0.x 리셋 / BR-split·living-sync entry 추가. v1.0~v2.5.1 entry 는 사실 history 라 보존).
+>
+> ⚠ v2.5.x 이하 entry 의 "본격" 같은 표현과 "최신 = v2.5.1" 프레이밍은 당시 시점 기록입니다. **현재 최신은 v0.24.0** 이며, 아래 "v2.6 이후" 절부터가 그 사이의 진화입니다.
 
 ---
 
@@ -322,10 +324,63 @@
 
 ---
 
+# ── 여기서부터 v2.6 이후 (2026-06-09 확장) ──
+
+## v2.6 ~ v8.x — 스킬 네임스페이스 정비
+
+v2.5.1 직후, 스킬을 자연어뿐 아니라 명시 호출(`/skill-name`)로도 안정적으로 부를 수 있도록 네임스페이스를 정비했습니다. 숫자 prefix(phase-N) 대신 의미 ID(`analysis-source-inventory` 식)로 굳혔고, 사상 axis 는 `methodology-spec/skills-axis.md` 에 별도로 보존했습니다.
+
+## v9.0.0 — 6-stage chain harness 도입 (MAJOR / 2026-05-25)
+
+가장 큰 구조 변경. 그 전까지 "분석(Stage 1) + 4-체인(Stage 2)" 으로 나뉘던 것을, **analysis + 5개 체인의 6-stage** 로 재편했습니다.
+
+```
+analysis → discovery → spec → plan → test → implement
+(추출)     게이트#1    #2     #3     #4(RED) #5(GREEN)
+```
+
+- 예전 "planning" 단계는 **discovery** 로 개칭됐고, 별도로 **plan** 단계(task 분해 / ADR / NFR / risk)가 신설됐습니다.
+- analysis 는 체인의 게이트가 아니라 **soft exit gate #0** (증거 누락 시 fail-closed)로 정리됐습니다.
+
+## v10 / v11 — 게이트 1:1 컨벤션 + BE/FE 분리 + 티켓 cascade
+
+- **체인 N = 게이트 #N** 을 1:1 내부 컨벤션으로 못박음.
+- 산출물을 **BE / FE 로 분리**하고, 계약을 양 axis 로 강제(BE = swagger / FE = state-map + DTCG).
+- 티켓 시스템을 plan 단계 한 곳의 **Epic / Story / OP-* / TASK-* 4-level cascade** 로 정리.
+- discovery 입력 어댑터 4종 정비 (analysis-output / swagger / figma / nl-md).
+
+## v12.0.0 — json 단독 SSOT (MAJOR / 2026-05-31)
+
+산출물에서 **`.mermaid` + `.md` 짝(이중 렌더링)을 전면 폐기**하고, `.json` 한 벌만 진실(SSOT)로 삼았습니다. 다이어그램은 필요할 때 view-time 에 렌더합니다. 완전 AX-native (ADR-008 Superseded / ADR-011).
+
+이어진 v12.9~v12.16 에서는 **codegraph wiring**(코드↔산출물 coverage-hole / openapi 정적 검증)을 단계적으로 붙이고, chain/gate 번호를 canonical(test=4·implement=5)로 정합시켰습니다.
+
+## v0.1.0 — `context-ops` 리네임 + 0.x 버전 리셋 (2026-06-06)
+
+- 플러그인 **기계 식별자**를 `ai-native-methodology` → `context-ops` (npm `@mis-plugins/context-ops`)로 변경. **방법론 개념명 "AI-Native 개발 방법론" 은 불변.**
+- **버전을 12.16.0 → 0.1.0 으로 리셋.** 누적 12.x 가 성숙도를 과대 표기한다고 봤고, 아직 사내 미배포(실 사용자 0)인 pre-1.0 상태를 정직하게 반영했습니다. 누적 이력은 CHANGELOG 에 연속 보존, 외부 영향 0.
+
+## v0.2 ~ v0.24 — Tier 정합 · BR-split · living-sync (2026-06-07~09)
+
+- **v0.2.0** — PMD 를 Tier 1(in-plugin 자동 실행)으로 격상. R19 Tier 축을 "실행 locus" 로 명문화.
+- **v0.3 ~ v0.4 / v0.24 (BR-split)** — `business-rules.json` 을 index + per-BC(`business-rules/<BC>.json`)로 분할. 검증 스키마는 무변경, loader 단일 변경점으로 소비자에게 투명.
+- **v0.5 ~ v0.19 (living-sync)** — 산출물을 한 번 만들고 끝이 아니라 **평생 동기화**되게. 변경 origin → forward 영향 closure → 재생성 큐(Phase 1), 손수정 코드 → anchor 역추적 → 의미 천장 surface(Phase 2), cross-scope drift 활성화(Phase 3), BC별·BR별 노드 분할(Phase 4), fixpoint 자동 재진입(carry 2)까지.
+- **v0.23** — 출력 디렉토리 컨벤션 `.aimd/` → `.ai-context/` (내용 서술성 / 패키지 `context-ops` 와 짝).
+- **v0.24.0 (현재)** — BR-split 마지막 STEP 완성.
+
+> 그리고 v0.x 동안, 6-stage 상태머신을 **외부 Modern 스택**에서도 완주시켰습니다 — PoC #18(Express+Prisma / TS) + PoC #19(numpy / Python)이 genuine RED → GREEN 6-stage e2e 를 통과했습니다.
+
+---
+
 ## 진화의 한 줄 요약
 
-> **"분석만" 에서 → "분석 + 새 시스템 짓기" 로 → "레거시의 의도/버그 판별까지" 로 → "SQL 한 줄까지 추적" 으로 → "비즈니스 규칙의 자연어 ↔ 실행 가능 표현 의미 일관성 검증" 으로 → "Claude Code plugin 본격 사내 동료 install 작동" 까지.**
+> **"분석만" 에서 → "분석 + 새 시스템 짓기" 로 → "레거시의 의도/버그 판별" 로 → "SQL 한 줄까지 추적" 으로 → "비즈니스 규칙의 자연어 ↔ 실행 가능 표현 의미 일관성 검증" 으로 → "사내 동료 plugin install 작동" 으로 → "analysis + 5-gate 6-stage chain harness" 로 → "산출물 json 단독 SSOT + 평생 동기화되는 LLM 운영 컨텍스트(AX 운영)" 까지.**
 >
 > 매 버전은 직전 버전이 남긴 숙제 하나를 풀었고, 풀어낸 방법은 항상 ≥ 2 개 PoC 에서 동형으로 입증되었습니다.
 >
-> v2.5.0 = **Adzic SBE 10년 폐기 함정 회피 자격 본격 도달** + **industry-first paradigm 본격 입증** 결정적 단계. v2.5.1 = 사내 동료 plugin install 호환성 본격 완성.
+> - **v2.5.0** = 자연어 ↔ 실행 가능 명세의 의미 일관성 검증(Adzic SBE 함정 회피) — industry-first.
+> - **v9.0.0** = analysis + 5-체인의 6-stage chain harness.
+> - **v12.0.0** = json 단독 SSOT (이중 렌더링 폐기 / 완전 AX-native).
+> - **v0.x** = `context-ops` 리네임 + 정직한 버전 리셋 + BR-split + 평생 동기화(living-sync).
+>
+> **현재 = v0.24.0.** 산출물은 시스템 설명서가 아니라 LLM 의 운영 컨텍스트 그 자체이고, 그 목표는 프로젝트를 AX 로 운영하는 것입니다.
