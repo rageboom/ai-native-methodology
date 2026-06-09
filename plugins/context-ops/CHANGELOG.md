@@ -10,6 +10,30 @@
 
 ---
 
+## [0.25.1] — 2026-06-09 PATCH — 멀티모듈 repo 산출물 배치 컨벤션 명문화
+
+멀티모듈(Gradle/Maven·모노레포) repo 에서 `.ai-context/` 를 **repo 루트 단일**로 두는 규칙을 `lifecycle-contract.md` "파일 위치 컨벤션" 에 명문화 (기존 단일 `<user-project>/.ai-context/` 만 있고 멀티모듈 케이스 누락 = 갭 보완). 개별 모듈 내부 분산 ❌.
+
+- **근거 3**: ① scope(feature 응집 단위)가 모듈(배포 단위)을 관통 → 모듈 안에 두면 한 feature 산출물 분할 ② 글로벌 산출물(inventory/code-graph/schema/공유-kernel)은 모듈 무소속 ③ living-sync·dep-graph federation 이 단일 `.ai-context/` 트리 가정(모듈 분산 시 cross-scope 연결 단절).
+- **예외**: 모듈이 독립 배포 + 독립 도메인(마이크로서비스 모노레포 / 모듈마다 자기 DB)이면 모듈별 `.ai-context/` 허용. 판별 축 = "모듈=배포축(shared-core+entrypoints) → repo 루트 / 모듈=도메인축(독립 서비스) → 모듈별".
+- v0.25.0 측정 기반 scope 도출의 후속 — "scope ≠ 모듈" 원칙을 산출물 배치로 확장. 코드·schema 무변경(doc 컨벤션). DEC-2026-06-09-measured-coupling-scope-derivation §후속.
+
+---
+
+## [0.25.0] — 2026-06-09 MINOR — 측정 기반 scope 도출 (대형/decayed 코드베이스 / advisory)
+
+대형·복잡 코드베이스의 최초 analysis 시 **scope 절취선을 codegraph 실측 coupling 으로 도출**하는 전략을 본체 자산화. 트리거 = ep-be-gea 점검(Spring Boot / 6307 Java / 클린아키텍처 *지향*하나 decay). **원칙: 패키지 경로 ≠ 경계, 측정된 coupling = 경계.** ADR-CHAIN-016 / DEC-2026-06-09-measured-coupling-scope-derivation.
+
+- **배경 (실측 grounded)**: 기존 `modules_for_priority_analysis` 는 "LOC/파일 수 큰 모듈 추정" = 명목 패키지 트리 절취선 가정. ep-be-gea 실측이 반증 — domain→infrastructure 역참조 45건, frontoffice↔backoffice 교차 import 514건(123 고유). 누수가 **feature 축 정렬**(biztrip↔biztrip 등) → 진짜 응집 단위 = **feature-across-BC**. LOC 추정으로 scope 끊으면 decayed-architecture 에서 오답. 기존 자산 대조(diagnose-before-design): codegraph 존재하나 "측정→scope 도출" 배선 ❌ = 갭.
+- **schema (additive / 기존 무변경)**: `inventory.schema.json` 에 신규 top-level `scope_candidates[]`(id·members·internal/external_coupling·crosses_nominal_boundary·boundary_violations·decay_grade·source) + `modules_for_priority_analysis` 항목에 `efferent_coupling`/`afferent_coupling` 보강. **advisory(reference-lens) — 어떤 gate 에도 inject ❌ / 최종 scope 절단은 사용자 결단** (codegraph trust 모델 DEC-2026-05-28 §4.2 정합). antipatterns/migration-cautions schema 무변경(ARCH/other enum 재사용).
+- **skill**: `analysis-source-inventory`(scope 후보 도출 단계 4 신설 — codegraph coupling 집계→클러스터→scope_candidates / "패키지 경로 ≠ 경계" 원칙 / 환경부재 loc_estimate fallback) + `analysis-code-graph`(단계 4-b coupling 결정론 집계 + 경계위반→antipatterns(ARCH)+migration-cautions+finding 라우팅).
+- **workflow/ADR**: `methodology-spec/workflow/discovery.md`(scope_candidates 샘플 + 승인 게이트 line) + 신규 `ADR-CHAIN-016-measured-coupling-scope-derivation`.
+- **사용자 결단 D1~D5 (전부 Recommended)**: D1 결정론 coupling 집계+advisory(full Louvain 도구 ❌ — research SW적용 연구단계 경고) / D3 위반→antipatterns+migration-cautions+finding 전부 / D4 skill+schema+ADR/DEC 정식 자산화 / D5 즉시격상(advisory·gate inject ❌·paradigm-grounded 저위험 / "자동화 천장 수치"는 ep-be-gea 실측前 미주장).
+- **research grounding (4원칙 2 / 5선례 지지·반대 0)**: CodeScene temporal-coupling(명목≠실측) · Vertical Slice Bogard(couple along axis of change) · dependency-cruiser severity(warn=advisory 동형) · advisory-vs-authoritative 주류(학술 Koschke·상용 vFunction) · ⚠️Louvain/Leiden SW적용=연구단계(일반원칙으로만 인용 / research-fact-validation).
+- **carry**: §8.1 단일 PoC 과적합 — 트리거 ep-be-gea 1 PoC / advisory 격상은 정당하나 천장 수치는 poc-17+ep-be-gea ≥2 corroboration 후 확정. 후속 = ep-be-gea `[0]inventory→[1]codegraph 실측 클러스터링→[2]DB backbone→[3]feature-across-BC scope` 실착수(dogfooding / examples 밖 외부격리).
+
+---
+
 ## [0.24.0] — 2026-06-09 MINOR — business-rules 산출물 분할 (BR-split STEP 3 / index + per-BC)
 
 **산출물 `business-rules.json` 단일파일 → 분할**: `business-rules.json`(index, well-known 파일명 보존) + `business-rules/<BC-slug>.json`(per-BC leaf). BR-split 순차안의 마지막 STEP 3 (STEP 0 subset 폐기 / STEP 1 bounded_context required / STEP 2 loader 중앙화 토대 위). 보류 근거(STEP 1 전 BC 채움률 7/8 PoC=0%)는 STEP 1 백필로 **채움률 100% 실측** → 해소. **검증파일(business-rules.schema.json)은 무변경** — 산출물만 분할(사용자 결단). DEC-2026-06-09-br-split-step3.

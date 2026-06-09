@@ -37,7 +37,8 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 2. **환경 부재 시 (exit 3)** — 사용자에게 설치 요청 또는 CI 위임 명시. finding 등재 (`Type: gap, Action: codegraph 설치 또는 CI step 추가`).
 3. **code-graph.json 검토 (reference-lens)** — `index_stats` (files/nodes/edges/languages/nodes_by_kind) 로 코드 구조 규모 파악. 도구의 언어별 적용 범위·한계는 `## 인용` 의 probe DEC 참조. DB table 경계는 본 도구가 다루지 않음 — schema.json + sql-inventory 로 보완.
 4. **질의 (선택 / 참고)** — `codegraph callers/callees/impact <symbol>` 로 code↔code 영향 추적 (cross-domain caller 자동 추출). 결과는 finding (reference) 으로만 (gate inject ❌).
-5. **finding 등재 (필요 시)** — codegraph 가 발견한 code-level risk (예: undeclared cross-domain 호출 cycle) = `_base-log-finding` 으로 reference finding 등재 (severity 부여 / status=open / **gate blocker 아님**).
+4-b. **coupling 집계 → scope 후보 입력 (대형/decayed 코드베이스)** — code-graph.json 의 edge 를 **모듈간 coupling 행렬로 결정론 집계**(LLM 추정 ❌ / 단순 정적 의존성 집계 — community-detection 알고리즘 미주장, "coupling 측정 기반 경계 도출" 일반 원칙). 고결합 쌍 = 응집 클러스터 후보 → `analysis-source-inventory` 가 `inventory.json#scope_candidates[]` 로 산출(advisory / source=codegraph_measured). 명목 패키지 경계를 관통하는 클러스터(crosses_nominal_boundary=true)는 decay 신호.
+5. **finding 등재 (필요 시)** — codegraph 가 발견한 code-level risk = `_base-log-finding` 으로 reference finding 등재 (severity 부여 / status=open / **gate blocker 아님**). **경계 위반(의존성 규칙 위반)** — domain→infrastructure/application 역참조, feature 응집축을 벗어난 교차참조 등은 버그가 아니라 **1급 분석 산출물**: `analysis-quality-antipattern`(antipatterns.json category=ARCH) + `migration-cautions`(이관 위험) + finding 으로 라우팅 (decay = 가치 / dependency-cruiser severity=warn 동형 advisory).
 
 ## 산출물
 
@@ -50,6 +51,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - `schemas/code-graph.schema.json`
 - `tools/codegraph-runner/` (codegraph index + status --json → code-graph.json / 7-field evidence / no-simulation exit 3)
 - DEC-2026-05-30-codegraph-essential (codegraph 필수 도구 격상)
+- ADR-CHAIN-016 (coupling 측정 기반 scope 도출 + 경계위반 라우팅 / advisory) / DEC-2026-06-09-measured-coupling-scope-derivation
 - DEC-2026-05-28-codegraph-probe-결과 (probe #1 / trust 모델 §4.2)
 - DEC-2026-05-30-codegraph-probe-2-mybatis3 (probe #2)
 - DEC-2026-05-30-codegraph-probe-3-jpa (probe #3)

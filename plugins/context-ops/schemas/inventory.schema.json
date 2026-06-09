@@ -108,7 +108,7 @@
     },
     "modules_for_priority_analysis": {
       "type": "array",
-      "description": "후속 phase 우선 분석 권장 모듈. LOC/파일 수 기준 큰 모듈 또는 핵심 도메인 추정.",
+      "description": "후속 phase 우선 분석 권장 모듈. ⚠️ LOC/파일 수 추정은 '큰 모듈 = 분석 단위'를 가정하나, decayed-architecture(클린아키텍처 지향하나 미준수 등)에서는 명목 패키지 경계 ≠ 실제 응집이라 오답이 된다. 실측 coupling 기반 scope 후보는 `scope_candidates` 가 권위. 본 필드는 LOC 추정 신호 + (가능 시) coupling 보강. ADR-CHAIN-016.",
       "items": {
         "type": "object",
         "required": ["path", "reason"],
@@ -128,6 +128,67 @@
           "file_count": {
             "type": "integer",
             "minimum": 0
+          },
+          "efferent_coupling": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "(선택) 이 모듈이 *나가는* 의존 수 (codegraph edge 집계). 높으면 self-contained 아님."
+          },
+          "afferent_coupling": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "(선택) 이 모듈로 *들어오는* 의존 수 (codegraph edge 집계). 높으면 다수 scope 가 의존하는 공유 커널 후보."
+          }
+        }
+      }
+    },
+    "scope_candidates": {
+      "type": "array",
+      "description": "ADR-CHAIN-016 — 대형/decayed 코드베이스의 analysis scope 후보. 패키지 경로 추정이 아니라 codegraph 실측 coupling(응집 클러스터)에서 결정론 집계로 도출. **advisory(reference-lens) — 어떤 gate 에도 inject ❌ / 최종 scope 절단은 사용자 결단** (codegraph trust 모델 DEC-2026-05-28 §4.2 + dependency-cruiser severity=warn 선례 정합). 미측정(codegraph 부재) 시 빈 배열 + meta.warnings 에 정직 표기. CodeScene temporal-coupling + Vertical Slice(Bogard) 원칙.",
+      "items": {
+        "type": "object",
+        "required": ["id", "members", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+            "description": "scope slug 후보 (work-unit-manifest.scope 와 동일 규약 / kebab-case). 예: biztrip / wlfr / event."
+          },
+          "members": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string" },
+            "description": "이 클러스터에 응집하는 소스 경로/모듈. 명목 BC 경계를 *관통할 수 있음* (예: frontoffice/biztrip + backoffice/biztrip = 한 업무의 두 얼굴 / Vertical Slice 'couple along the axis of change')."
+          },
+          "internal_coupling": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "(선택) 클러스터 *내부* edge 수. 'maximize coupling in a slice'."
+          },
+          "external_coupling": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "(선택) 클러스터 *밖으로* 나가는 edge 수. 'minimize coupling between slices' — 낮을수록 깨끗한 scope."
+          },
+          "crosses_nominal_boundary": {
+            "type": "boolean",
+            "description": "true = 이 응집 클러스터가 명목 패키지/BC 경계를 가로지름 (decay 신호 / 패키지 트리로는 안 보이던 단위)."
+          },
+          "boundary_violations": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "(선택) 이 scope 와 결부된 의존성 규칙 위반 식별자 (예: domain→infrastructure 역참조). antipatterns.json(category=ARCH) + migration-cautions.json + finding 으로 라우팅됨 — decay = 1급 분석 가치 출력 (ADR-CHAIN-016 §위반 라우팅)."
+          },
+          "decay_grade": {
+            "type": "string",
+            "enum": ["clean", "moderate", "entangled"],
+            "description": "(선택) legacy-spectrum 정합 decay 등급. §3-A 자동화 천장 보정 입력 — clean=Modern 천장 기대 / entangled=하향 정직 표기 (over-claim ❌)."
+          },
+          "source": {
+            "type": "string",
+            "enum": ["codegraph_measured", "loc_estimate", "manual"],
+            "description": "trust provenance. codegraph_measured = 실측(권장) / loc_estimate = 환경부재 fallback 추정 / manual = 사용자 지정. no-simulation 정합 — 측정 안 했으면 codegraph_measured 표기 ❌."
           }
         }
       }
