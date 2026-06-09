@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 40/41 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 40/41 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 41/42 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 41/42 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 41);
-		assert.equal(out.criteria_passed, 40);
+		assert.equal(out.criteria_total, 42);
+		assert.equal(out.criteria_passed, 41);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 41 criterion ids are present in output (no skipped)', () => {
+	it('all 42 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -71,6 +71,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'adr_registry',
 			'agent_skills_phaseflow_sync',
 			'analysis_validator_violation',
+			'artifact_secret_leak',
 			'authoring_spec_staleness',
 			'be_task_openapi_ref_ratchet',
 			'catalog_range_covers_version',
@@ -304,11 +305,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 41 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 42 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 41);
+		assert.equal(out.criteria_total, 42);
 	});
 
 	// check41 discrimination — 카탈로그 범위 ⊇ plugin.json 버전 (install ETARGET 회귀 가드).
@@ -716,7 +717,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.equal(r.status, 2);
 	});
 
-	it('A1 본격 spawn — workspace test + 40/40 pass (pnpm -r run test 실시간 실행 / timeout 600s)', () => {
+	it('A1 본격 spawn — workspace test + 42/42 pass (pnpm -r run test 실시간 실행 / timeout 600s)', () => {
 		// A1 본격 검증 — check11 spawn → pnpm -r --workspace-concurrency=1 run test 실시간 실행 → fail=0 의무 입증.
 		// 본 case = release 본격 시행 cadence 정합 (다른 case 는 SKIP_WS 사용 / 본 case 만 본격 spawn).
 		const r = runScript(['--target', 'v8.1.0', '--json'], {}, 600_000);
@@ -727,8 +728,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 41);
-		assert.equal(out.criteria_passed, 41);
+		assert.equal(out.criteria_total, 42);
+		assert.equal(out.criteria_passed, 42);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});
