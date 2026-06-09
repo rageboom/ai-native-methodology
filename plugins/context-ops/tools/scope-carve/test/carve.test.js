@@ -30,6 +30,7 @@ function build(opts = {}) {
 		architecturePath: '/tmp/architecture.json',
 		repoPath: opts.repoPath ?? null,
 		gitRunner: opts.gitRunner ?? null,
+		readFileFn: opts.readFileFn ?? null,
 		params: opts.params ?? DEFAULT_PARAMS,
 		nowIso: opts.nowIso ?? '2026-06-09T00:00:00.000Z',
 		durationMs: 0,
@@ -93,6 +94,36 @@ test('co_change not_run without repo; mined with gitRunner', () => {
 			.length,
 		1,
 	);
+});
+
+test('hotspot computed (churn×complexity) when git + readFileFn present; mirrors co_change otherwise', () => {
+	const noGit = build();
+	assert.equal(noGit.hotspot.status, 'not_run'); // mirrors co_change not_run
+
+	const withHot = build({
+		repoPath: '/tmp/fake',
+		gitRunner: () =>
+			fakeLog([
+				{ sha: 'c1', files: ['deep.js', 'b.js'] },
+				{ sha: 'c2', files: ['deep.js', 'b.js'] },
+				{ sha: 'c3', files: ['deep.js'] },
+			]),
+		readFileFn: (p) =>
+			p.endsWith('deep.js') ? 'a\n    b\n        c\n' : 'x\n',
+		params: {
+			...DEFAULT_PARAMS,
+			hotspot: { top_n: 5, min_churn: 2, tab_width: 4 },
+		},
+	});
+	assert.equal(withHot.hotspot.status, 'mined');
+	// deep.js churn 3 × complexity 3 = 9; b.js churn 2 × 0 = 0
+	assert.equal(withHot.hotspot.items[0].file, 'deep.js');
+	assert.equal(withHot.hotspot.items[0].score, 9);
+	assert.ok(
+		withHot.carve_candidates.some((c) => c.kind === 'hotspot_priority'),
+	);
+	// file_churn must NOT leak into serialized co_change block (schema 정합)
+	assert.equal(withHot.co_change.file_churn, undefined);
 });
 
 test('result_hash deterministic + independent of timestamp', () => {

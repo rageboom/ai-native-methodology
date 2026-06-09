@@ -40,6 +40,22 @@ test('mines co-change pairs with support + confidence', () => {
 	assert.equal(p.confidence_b_given_a, 0.6667); // 2 / count(a)=3
 });
 
+test('file_churn = raw revision count over windowed commits (pre-filter / hotspot input)', () => {
+	const r = mineCoChange({
+		gitRunner: runnerOf([
+			{ sha: 'c1', files: ['a.js', 'b.js'] },
+			{ sha: 'c2', files: ['a.js', 'b.js'] },
+			{ sha: 'c3', files: ['a.js', 'c.js'] },
+			{ sha: 'c4', files: ['a.js'] }, // single-file commit: excluded from pairs, counted in churn
+		]),
+		params: PARAMS,
+	});
+	// churn counts ALL windowed commits (incl. single-file c4) → a=4, b=2, c=1
+	assert.equal(r.file_churn['a.js'], 4);
+	assert.equal(r.file_churn['b.js'], 2);
+	assert.equal(r.file_churn['c.js'], 1);
+});
+
 test('max_transaction_size excludes tangled commits', () => {
 	const r = mineCoChange({
 		gitRunner: runnerOf([

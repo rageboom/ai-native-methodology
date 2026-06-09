@@ -31,6 +31,7 @@ function parseArgs(argv) {
 		stdout: false,
 		co: { ...DEFAULT_PARAMS.co_change },
 		martin: { ...DEFAULT_PARAMS.martin_thresholds },
+		hotspot: { ...DEFAULT_PARAMS.hotspot },
 	};
 	for (let i = 0; i < argv.length; i++) {
 		const a = argv[i];
@@ -47,6 +48,9 @@ function parseArgs(argv) {
 		else if (a === '--unstable-instability')
 			opts.martin.unstable_instability = Number(argv[++i]);
 		else if (a === '--hub-afferent') opts.martin.hub_afferent = Number(argv[++i]);
+		else if (a === '--hotspot-top-n') opts.hotspot.top_n = Number(argv[++i]);
+		else if (a === '--min-churn') opts.hotspot.min_churn = Number(argv[++i]);
+		else if (a === '--tab-width') opts.hotspot.tab_width = Number(argv[++i]);
 	}
 	return opts;
 }
@@ -60,7 +64,10 @@ function usage() {
 		'    [--since <date>] [--min-support N] [--min-confidence F] [--window N]',
 	);
 	console.error(
-		'    [--max-transaction-size N] [--unstable-instability F] [--hub-afferent N] [--stdout]',
+		'    [--max-transaction-size N] [--unstable-instability F] [--hub-afferent N]',
+	);
+	console.error(
+		'    [--hotspot-top-n N] [--min-churn N] [--tab-width N] [--stdout]',
 	);
 	console.error(
 		'  (architecture.json 부재 시 exit 3 / no-simulation — reference-lens / NOT gate-injected)',
@@ -77,6 +84,9 @@ function buildReproCommand(opts) {
 	parts.push(`--max-transaction-size ${opts.co.max_transaction_size}`);
 	parts.push(`--unstable-instability ${opts.martin.unstable_instability}`);
 	parts.push(`--hub-afferent ${opts.martin.hub_afferent}`);
+	parts.push(`--hotspot-top-n ${opts.hotspot.top_n}`);
+	parts.push(`--min-churn ${opts.hotspot.min_churn}`);
+	parts.push(`--tab-width ${opts.hotspot.tab_width}`);
 	return parts.join(' ');
 }
 
@@ -113,6 +123,7 @@ function main() {
 	const params = {
 		co_change: opts.co,
 		martin_thresholds: opts.martin,
+		hotspot: opts.hotspot,
 	};
 
 	const t0 = Date.now();
@@ -122,6 +133,7 @@ function main() {
 		architecturePath: archPath,
 		repoPath,
 		gitRunner,
+		readFileFn: (p) => readFileSync(p, 'utf-8'),
 		params,
 		nowIso: new Date().toISOString(),
 		durationMs: 0,
@@ -146,13 +158,14 @@ function main() {
 			`[scope-carve] v${TOOL_VERSION} reference-lens (NOT gate-injected) → ${outPath}`,
 		);
 		console.log(
-			`[scope-carve] SCC: ${result.scc.components.length} comp (${atoms} atomic / has_cycle=${result.scc.has_cycle}) | Martin: ${sinks} sink, ${hubs} hub (A/D abstain) | co-change: ${result.co_change.status} (${result.co_change.pairs.length} pair) | candidates: ${result.carve_candidates.length}`,
+			`[scope-carve] SCC: ${result.scc.components.length} comp (${atoms} atomic / has_cycle=${result.scc.has_cycle}) | Martin: ${sinks} sink, ${hubs} hub (A/D abstain) | co-change: ${result.co_change.status} (${result.co_change.pairs.length} pair) | hotspot: ${result.hotspot.status} (${result.hotspot.items.length}) | candidates: ${result.carve_candidates.length}`,
 		);
 		console.log(
 			'[scope-carve] soft gate #0 evidence — 사용자가 scope 확정 (carve 는 구조 신호일 뿐).',
 		);
 	}
-	process.exit(0);
+	// process.exit(0) 안 함 — 대용량 --stdout 파이프가 drain 전 truncate 되는 Node footgun 회피.
+	// 성공 = exitCode 기본 0 / 이벤트루프 비면 자연 종료(stdout flush 보장).
 }
 
 // 직접 실행 시에만 main (테스트 import 안전)

@@ -8,16 +8,16 @@
       {
         "tool": "scope-carve",
         "version": "0.1.0",
-        "method": "Tarjan SCC + Martin Ca/Ce/I over architecture.json dependencies"
+        "method": "Tarjan SCC + Martin Ca/Ce/I over architecture.json dependencies + hotspot churn×indentation-complexity"
       },
       {
         "tool": "git",
         "version": null,
-        "method": "git log --no-merges --name-only (logical-coupling co-change mining)"
+        "method": "git log --no-merges --name-only (logical-coupling co-change mining + Tornhill churn)"
       }
     ],
     "trust_note": "reference-lens / NOT gate-injected (DEC-2026-05-28 §4.2). 어떤 결정적 gate 에도 inject ❌ — 사용자가 soft gate #0 에서 scope 확정. carve reference finding 은 _base-log-finding 으로 low|medium 만(gate blocker ❌).",
-    "generated_at": "2026-06-09T09:22:56.306Z"
+    "generated_at": "2026-06-09T10:10:51.481Z"
   },
   "target": {
     "architecture_path": "/Users/sangcl/Documents/Development/Study/ai-native-methodology/.claude/worktrees/wizardly-antonelli-b8319d/plugins/context-ops/examples/poc-01-realworld-spring/output/architecture/architecture.json",
@@ -36,6 +36,11 @@
     "martin_thresholds": {
       "unstable_instability": 0.7,
       "hub_afferent": 3
+    },
+    "hotspot": {
+      "top_n": 15,
+      "min_churn": 3,
+      "tab_width": 4
     }
   },
   "scc": {
@@ -254,6 +259,11 @@
     "pairs": [],
     "note": "repo_path 미지정 — co-change 미실행(SCC+Martin 만)."
   },
+  "hotspot": {
+    "status": "not_run",
+    "items": [],
+    "note": "churn(co-change git 이력) 부재 — hotspot 미산출 (co_change.status=not_run)."
+  },
   "carve_candidates": [
     {
       "index": 0,
@@ -355,11 +365,11 @@
   ],
   "evidence": {
     "tool_version": "0.1.0",
-    "invocation_timestamp": "2026-06-09T09:22:56.306Z",
-    "duration_ms": 6,
+    "invocation_timestamp": "2026-06-09T10:10:51.481Z",
+    "duration_ms": 2,
     "inputs_hash": "3d6670ed1db1e374bcee441e6ec025f70b642e949f69474b1a0f63a7670d40b7",
-    "result_hash": "3a8a3b6f3130e67b7b21471d88d768660ee18dd9ae45d6bae2b1cfe95fce315b",
-    "reproduction_command": "scope-carve --architecture examples/poc-01-realworld-spring/output/architecture/architecture.json --min-support 2 --min-confidence 0.5 --max-transaction-size 30 --unstable-instability 0.7 --hub-afferent 3",
+    "result_hash": "9b2074851f6123f365bc75bd424f428e55215a836582a11e3c1e99cc0d6ba3a1",
+    "reproduction_command": "scope-carve --architecture examples/poc-01-realworld-spring/output/architecture/architecture.json --min-support 2 --min-confidence 0.5 --max-transaction-size 30 --unstable-instability 0.7 --hub-afferent 3 --hotspot-top-n 15 --min-churn 3 --tab-width 4",
     "git_available": false,
     "evidence_trust": "real_tool"
   }

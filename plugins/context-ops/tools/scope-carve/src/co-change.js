@@ -43,6 +43,7 @@ export function mineCoChange({ gitRunner, params }) {
 			status: 'not_run',
 			transactions_analyzed: 0,
 			pairs: [],
+			file_churn: {},
 			note: 'gitRunner 미주입 — co-change 미실행.',
 		};
 	}
@@ -56,6 +57,7 @@ export function mineCoChange({ gitRunner, params }) {
 			status: 'no_git_history',
 			transactions_analyzed: 0,
 			pairs: [],
+			file_churn: {},
 			note: `git log 실패 (repo 아님 / 이력 없음 / timeout): ${String(err && err.message ? err.message : err).slice(0, 160)} — 정직 skip(날조 ❌).`,
 		};
 	}
@@ -64,6 +66,7 @@ export function mineCoChange({ gitRunner, params }) {
 			status: 'no_git_history',
 			transactions_analyzed: 0,
 			pairs: [],
+			file_churn: {},
 			note: 'git log 출력 없음 — 이력 부재 정직 skip.',
 		};
 	}
@@ -82,10 +85,18 @@ export function mineCoChange({ gitRunner, params }) {
 	}
 
 	// window = 최근 N commit (git log 가 newest-first)
-	let txns = commits;
-	if (params.window && params.window > 0) txns = txns.slice(0, params.window);
-	// max_transaction_size 필터: tangled commit 결합 inflate 회피 + 단일파일 commit(쌍 없음) 제외
-	txns = txns.filter(
+	let windowed = commits;
+	if (params.window && params.window > 0) windowed = windowed.slice(0, params.window);
+
+	// raw churn = windowed 전체(필터 전) 파일별 revision 수 (Tornhill churn / hotspot 신호 입력).
+	//   max_transaction_size 필터 전이므로 단일파일·대형 commit 포함 = 진짜 변경 빈도.
+	const fileChurn = new Map();
+	for (const t of windowed) {
+		for (const f of new Set(t.files)) fileChurn.set(f, (fileChurn.get(f) || 0) + 1);
+	}
+
+	// max_transaction_size 필터: tangled commit 결합 inflate 회피 + 단일파일 commit(쌍 없음) 제외 (pair mining 전용)
+	const txns = windowed.filter(
 		(t) => t.files.length >= 2 && t.files.length <= params.max_transaction_size,
 	);
 
@@ -125,10 +136,14 @@ export function mineCoChange({ gitRunner, params }) {
 			(x.b < y.b ? -1 : x.b > y.b ? 1 : 0),
 	);
 
+	const fileChurnObj = {};
+	for (const k of [...fileChurn.keys()].sort()) fileChurnObj[k] = fileChurn.get(k);
+
 	return {
 		status: 'mined',
 		transactions_analyzed: txns.length,
 		pairs,
+		file_churn: fileChurnObj,
 		note: `git log 이력 mining (commit ${commits.length}건 중 max_tx_size<=${params.max_transaction_size} 통과 ${txns.length}건 / min_support>=${params.min_support} / min_confidence>=${params.min_confidence}${params.window ? ` / window=${params.window}` : ''}${params.since ? ` / since=${params.since}` : ''}).`,
 	};
 }

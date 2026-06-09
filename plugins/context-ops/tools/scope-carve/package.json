@@ -5,6 +5,6 @@
   "type": "module",
   "engines": { "node": ">=18" },
   "bin": { "scope-carve": "./src/cli.js" },
-  "scripts": { "test": "node --test test/scc.test.js test/martin.test.js test/co-change.test.js test/carve.test.js" },
+  "scripts": { "test": "node --test test/scc.test.js test/martin.test.js test/co-change.test.js test/hotspot.test.js test/carve.test.js" },
   "license": "UNLICENSED"
 }

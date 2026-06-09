@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { tarjanScc } from './scc.js';
 import { martinMetrics } from './martin.js';
 import { mineCoChange } from './co-change.js';
+import { computeHotspot } from './hotspot.js';
 
 export const TOOL_VERSION = '0.1.0';
 
@@ -25,9 +26,15 @@ export const DEFAULT_PARAMS = {
 		unstable_instability: 0.7,
 		hub_afferent: 3,
 	},
+	hotspot: {
+		top_n: 15,
+		min_churn: 3,
+		tab_width: 4,
+	},
 };
 
 const BEHAVIORAL_CLUSTER_CAP = 15;
+const HOTSPOT_CANDIDATE_CAP = 5;
 
 function sha256(s) {
 	return createHash('sha256').update(s).digest('hex');
@@ -41,7 +48,7 @@ function stableStringify(value) {
 	return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(',')}}`;
 }
 
-function synthesizeCandidates({ scc, martin, co }) {
+function synthesizeCandidates({ scc, martin, co, hotspot }) {
 	const candidates = [];
 	let idx = 0;
 
@@ -101,6 +108,20 @@ function synthesizeCandidates({ scc, martin, co }) {
 		});
 	}
 
+	// 5) hotspot_priority — churn × complexity 상위 (우선순위 axis / 3 구조신호에 직교)
+	const topHot = hotspot.items.slice(0, HOTSPOT_CANDIDATE_CAP);
+	for (const h of topHot) {
+		candidates.push({
+			index: idx++,
+			kind: 'hotspot_priority',
+			members: [h.file],
+			signals: ['hotspot'],
+			rationale: `churn ${h.churn} × complexity ${h.complexity_total}(mean ${h.complexity_mean}) = score ${h.score} — 자주 변경 + 복잡 → 먼저 carve/격리/hardening 후보.`,
+			confidence_note:
+				'우선순위 신호(WHERE 아닌 WHICH-first). indentation-complexity proxy / soft gate #0 human 확정.',
+		});
+	}
+
 	return {
 		candidates,
 		behavioral_truncated:
@@ -118,6 +139,7 @@ export function buildCarve({
 	architecturePath,
 	repoPath = null,
 	gitRunner = null,
+	readFileFn = null,
 	params = DEFAULT_PARAMS,
 	nowIso,
 	durationMs = 0,
@@ -146,13 +168,28 @@ export function buildCarve({
 					status: 'not_run',
 					transactions_analyzed: 0,
 					pairs: [],
+					file_churn: {},
 					note: 'repo_path 미지정 — co-change 미실행(SCC+Martin 만).',
 				};
+
+	// churn = co-change file_churn 재사용(단일 git 패스). co_change 블록 직렬화 전 분리(schema 정합).
+	const fileChurn = co.file_churn || {};
+	delete co.file_churn;
+
+	// hotspot = churn × indentation-complexity (delta #4 / 우선순위 axis / 3 구조신호에 직교)
+	const hotspot = computeHotspot({
+		fileChurn,
+		repoPath,
+		readFileFn,
+		params: params.hotspot,
+		coChangeStatus: co.status,
+	});
 
 	const { candidates, behavioral_truncated } = synthesizeCandidates({
 		scc,
 		martin,
 		co,
+		hotspot,
 	});
 	if (behavioral_truncated > 0) {
 		co.note += ` (carve_candidates behavioral_cluster 는 top ${BEHAVIORAL_CLUSTER_CAP} highlight — 전체 ${co.pairs.length} pair 는 co_change.pairs 참조 / ${behavioral_truncated} 추가 미표시.)`;
@@ -163,6 +200,7 @@ export function buildCarve({
 		scc,
 		martin,
 		co_change: co,
+		hotspot,
 		carve_candidates: candidates,
 	};
 	const resultHash = sha256(stableStringify(payload));
@@ -179,12 +217,13 @@ export function buildCarve({
 					tool: 'scope-carve',
 					version: TOOL_VERSION,
 					method:
-						'Tarjan SCC + Martin Ca/Ce/I over architecture.json dependencies',
+						'Tarjan SCC + Martin Ca/Ce/I over architecture.json dependencies + hotspot churn×indentation-complexity',
 				},
 				{
 					tool: 'git',
 					version: null,
-					method: 'git log --no-merges --name-only (logical-coupling co-change mining)',
+					method:
+						'git log --no-merges --name-only (logical-coupling co-change mining + Tornhill churn)',
 				},
 			],
 			trust_note:
@@ -201,6 +240,7 @@ export function buildCarve({
 		scc,
 		martin,
 		co_change: co,
+		hotspot,
 		carve_candidates: candidates,
 		evidence: {
 			tool_version: TOOL_VERSION,
