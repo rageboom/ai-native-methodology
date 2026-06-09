@@ -18,6 +18,7 @@ skills:
     analysis-db-schema-erd,
     analysis-code-graph,
     analysis-scope-carve,
+    analysis-run-manifest,
     analysis-openapi,
     analysis-api-rule-mapping,
     analysis-error-mapping,
