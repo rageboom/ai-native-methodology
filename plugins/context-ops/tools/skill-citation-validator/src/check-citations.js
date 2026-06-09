@@ -139,7 +139,17 @@ export function checkCitations(root) {
 			const add = (kind, ref, why) =>
 				findings.push({ file: rel, line: lineNo, kind, ref, why });
 
+			// URL span 수집 — URL 내부 경로/토큰(예: github.com/.../templates/x.md)은 repo 인용 아님 →
+			//   외부 URL 꼬리를 repo-path 로 오추출하는 false-positive 회피 (URL 내부 매치만 skip = 결과 strictly ⊆).
+			const urlSpans = [];
+			for (const um of ln.matchAll(/https?:\/\/[^\s)"'`\]]+/g)) {
+				urlSpans.push([um.index, um.index + um[0].length]);
+			}
+			const inUrl = (idx) =>
+				urlSpans.some(([s, e]) => idx >= s && idx < e);
+
 			for (const m of ln.matchAll(/([a-z0-9][a-z0-9-]*\.schema\.json)/g)) {
+				if (inUrl(m.index)) continue;
 				if (!gt.schemas.has(m[1]))
 					add('schema', m[1], 'schemas/ 부재 (rename drift)');
 			}
@@ -147,11 +157,13 @@ export function checkCitations(root) {
 				/\b(methodology-spec|flows|templates|schemas|docs|tools|skills|agents|scripts|guides)\/[A-Za-z0-9._/가-힣-]+\.(?:md|json|yaml|yml|mermaid|js|ts)\b/g,
 			)) {
 				if (m[0].includes('*')) continue;
+				if (inUrl(m.index)) continue; // 외부 URL 내부 경로 (예: github.com/.../templates/x.md) = repo 인용 아님
 				if (ABSENCE_CTX.test(ln)) continue; // 의도적 부재 / future-carry 후보 경로
 				if (!resolvable(m[0]))
 					add('repo-path', m[0], '실파일 부재 (재구조화 drift)');
 			}
 			for (const m of ln.matchAll(/\bADR-(?:[A-Z]+-)?\d{1,3}\b/g)) {
+				if (inUrl(m.index)) continue;
 				if (ABSENCE_CTX.test(ln)) continue;
 				if (!adrResolves(gt, m[0]))
 					add('adr', m[0], 'docs/adr/ prefix 매칭 부재');
@@ -159,6 +171,7 @@ export function checkCitations(root) {
 			for (const m of ln.matchAll(
 				/\bDEC-\d{4}-\d{2}-\d{2}-[A-Za-z0-9가-힣-]+/g,
 			)) {
+				if (inUrl(m.index)) continue;
 				const id = m[0].replace(/\.md$/, '');
 				if (ABSENCE_CTX.test(ln)) continue;
 				if (!decResolves(gt, id)) add('dec', id, 'decisions/ prefix 매칭 부재');

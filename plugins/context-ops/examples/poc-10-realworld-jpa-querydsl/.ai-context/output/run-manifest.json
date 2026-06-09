@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "schema": "run-manifest.schema.json",
+    "generated_by": "analysis-run-manifest",
+    "generated_at": "2026-06-09T10:05:00.000Z",
+    "source_commit": null,
+    "source_grounded": true,
+    "extraction_note": "build.gradle / settings.gradle / application.properties = deterministic_parse. run 명령은 Spring Boot plugin 관례 추론(llm_read / confidence 0.7). gradlew wrapper·Dockerfile·.env 부재 = configs_missing 정직 표기. env 외부화 0 (application.properties 에 ${ENV} placeholder 없음) → environment_variables 빈 배열. 1차 draft dogfood."
+  },
+  "system_context": {
+    "primary_stack": "Spring Boot 4.0.6 / Java / Spring Data JPA(Hibernate) / QueryDSL / H2",
+    "build_tool": "gradle",
+    "runtime": "jvm",
+    "inventory_ref": null
+  },
+  "build": {
+    "tool": "gradle",
+    "command": "./gradlew",
+    "args": ["build"],
+    "output_dir": "build/libs",
+    "candidates": ["gradle build (gradlew wrapper 미커밋 → 로컬 gradle 설치 또는 wrapper 생성 필요)", "./gradlew bootJar"],
+    "source": { "file": "build.gradle", "anchor": "plugins.org.springframework.boot 4.0.6", "method": "deterministic_parse" },
+    "confidence": 0.9
+  },
+  "run": {
+    "command": "gradle",
+    "args": ["bootRun"],
+    "entrypoint": null,
+    "ports": [],
+    "working_directory": null,
+    "source": { "file": "build.gradle", "anchor": "spring-boot plugin (bootRun 관례)", "method": "llm_read" },
+    "confidence": 0.7
+  },
+  "environment_variables": [],
+  "service_dependencies": [
+    { "name": "h2", "type": "database", "version_constraint": null, "port": null, "env_var": null, "source": { "file": "build.gradle", "anchor": "runtimeOnly com.h2database:h2", "method": "deterministic_parse" } }
+  ],
+  "operational_guidance": [
+    { "category": "db_init", "note": "H2 in-memory (jdbc:h2:mem:test;MODE=PostgreSQL) — 영속 DB 없음 / spring.jpa.hibernate.ddl-auto=none (스키마 외부 제공 의무). 데모·테스트 구성.", "source": { "file": "src/main/resources/application.properties", "anchor": "spring.datasource.url", "method": "deterministic_parse" } },
+    { "category": "env_config", "note": "server.port 미선언 (application.properties 에 명시 없음 → Spring 기본 8080 이나 산출물엔 미추론 / ports=[] 표기).", "source": { "file": "src/main/resources/application.properties", "anchor": "(server.port 부재)", "method": "deterministic_parse" } },
+    { "category": "build_setup", "note": "gradlew wrapper 미커밋 → build.candidates 의 gradle 직접 실행. 또는 build 후 java -jar build/libs/<artifact>-2.1.1.jar.", "source": { "file": "build.gradle", "anchor": "version = 2.1.1", "method": "deterministic_parse" } }
+  ],
+  "extraction": {
+    "configs_found": ["build.gradle", "settings.gradle", "src/main/resources/application.properties"],
+    "configs_missing": ["gradlew (gradle wrapper)", "Dockerfile", "docker-compose.yml", ".env / .env.example"],
+    "evidence_trust": "real_extraction"
+  }
+}

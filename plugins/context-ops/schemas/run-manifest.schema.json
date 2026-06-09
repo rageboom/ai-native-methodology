@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/run-manifest.schema.json",
+  "title": "run-manifest.json — build/run/env 운영 컨텍스트 (analysis 산출물 #16 / positive operational manifest)",
+  "description": "역공학으로 추출한 '이 시스템을 어떻게 build·run·configure 하는가'의 positive manifest (DEC-2026-06-09-build-run-env-manifest / 역공학 델타 #2-a). migration-cautions 는 negative 경고만 제공 — 본 산출물은 P0 use-scenario 'LLM 이 develop·run·modify·evolve'의 RUN 축 운영 컨텍스트. source-grounded: 모든 추출 항목은 실 config 파일 출처(source) 명시 / 누락은 정직 null+configs_missing (추론 ❌ / no-simulation). env value 는 절대 미저장 — name + is_secret + sensitivity + (비-secret) default 만. confidence: 결정론 parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "system_context", "build", "run", "environment_variables", "service_dependencies", "extraction"],
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "method"],
+      "description": "추출 출처 (source-grounded / no-fabrication).",
+      "properties": {
+        "file": { "type": "string", "description": "config 파일 repo-relative 경로 (예: package.json / Dockerfile / src/main/resources/application.yml)." },
+        "anchor": { "type": ["string", "null"], "description": "key 경로 또는 line (예: scripts.build / Dockerfile:12)." },
+        "method": { "enum": ["deterministic_parse", "llm_read"], "description": "deterministic_parse=JSON/YAML/properties 파싱(confidence 1.0) / llm_read=Dockerfile·Makefile 등 비정형(≤0.75)." }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "deterministic_parse=1.0 / llm_read ≤0.75 (automation-boundary ceiling) / heuristic 후보 0.5~0.95."
+    }
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "generated_at", "source_grounded", "extraction_note"],
+      "properties": {
+        "schema": { "const": "run-manifest.schema.json" },
+        "generated_by": { "const": "analysis-run-manifest" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "source_commit": { "type": ["string", "null"], "description": "분석 대상 target repo 의 commit sha (재현성)." },
+        "source_grounded": {
+          "const": true,
+          "description": "모든 추출 항목 source 명시 의무 / 누락 = configs_missing 정직 표기 (추론 ❌)."
+        },
+        "extraction_note": {
+          "type": "string",
+          "description": "추출 방법·한계 1줄 (예: 'package.json 결정론 parse + Dockerfile llm_read / env value 미저장 / 누락 config 정직')."
+        }
+      }
+    },
+    "system_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primary_stack"],
+      "description": "inventory.json stack 요약 (중복 추출 ❌ / 참조).",
+      "properties": {
+        "primary_stack": { "type": "string", "description": "예: 'Node 22 / Express / Prisma' / 'Spring 4.1 / iBATIS 2 / JSP'." },
+        "build_tool": { "type": ["string", "null"], "description": "예: npm / gradle / maven / make." },
+        "runtime": { "type": ["string", "null"], "description": "예: node / jvm / python." },
+        "inventory_ref": { "type": ["string", "null"], "description": "inventory.json 경로 (stack SSOT 참조)." }
+      }
+    },
+    "build": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "빌드 recipe. 탐지 불가 = null + extraction.configs_missing 표기 (추론 ❌).",
+      "required": ["tool", "command", "args", "source", "confidence"],
+      "properties": {
+        "tool": { "type": "string", "description": "npm / gradle / maven / make / cargo / dotnet / custom." },
+        "command": { "type": "string", "description": "binary (예: npm / ./gradlew / mvn). shell:true ❌ — args 분리." },
+        "args": { "type": "array", "items": { "type": "string" }, "description": "예: ['run','build'] / ['clean','package']." },
+        "output_dir": { "type": ["string", "null"], "description": "산출 dir (dist / target / build)." },
+        "candidates": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "확신 부족 시 후보 명령 (예: pom.xml 있으나 mvnw 부재 → ['mvn','mvnw','docker']). 사람 확정."
+        },
+        "source": { "$ref": "#/$defs/source_ref" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+    "run": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "description": "실행 recipe. 탐지 불가 = null.",
+      "required": ["command", "args", "source", "confidence"],
+      "properties": {
+        "command": { "type": "string", "description": "binary (예: node / java / npm / python)." },
+        "args": { "type": "array", "items": { "type": "string" }, "description": "예: ['dist/main.js'] / ['-jar','app.jar']." },
+        "entrypoint": { "type": ["string", "null"], "description": "code-level 진입점 (예: src/main.ts / com.example.App#main)." },
+        "ports": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 0, "maximum": 65535 },
+          "description": "리스닝 포트 (config/코드서 추출 / 예: [3000] / [8080])."
+        },
+        "working_directory": { "type": ["string", "null"] },
+        "source": { "$ref": "#/$defs/source_ref" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+    "environment_variables": {
+      "type": "array",
+      "description": "환경변수 선언 (name 만 / **value 절대 미저장** — secret 누출 차단 / check42 정합). is_secret 판정 모호 시 null + human review.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "required", "is_secret", "sensitivity", "source"],
+        "properties": {
+          "name": { "type": "string", "description": "변수명만 (예: DATABASE_URL / JWT_SECRET). value ❌." },
+          "required": { "type": "boolean" },
+          "is_secret": { "type": ["boolean", "null"], "description": "true/false / null=keyword heuristic 모호 → human review." },
+          "sensitivity": { "enum": ["public", "internal", "pii", "credential", "regulated", "unknown"], "description": "db-schema.sensitivity enum 정합." },
+          "default": { "type": ["string", "null"], "description": "**비-secret 만** 기본값 허용 (is_secret=true 면 null 의무)." },
+          "description": { "type": ["string", "null"] },
+          "source": { "$ref": "#/$defs/source_ref" }
+        }
+      }
+    },
+    "service_dependencies": {
+      "type": "array",
+      "description": "외부 서비스 의존 (DB/cache/queue 등). config/compose 에서 추출.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "type", "source"],
+        "properties": {
+          "name": { "type": "string", "description": "예: postgres / redis / kafka." },
+          "type": { "enum": ["database", "cache", "message_queue", "search", "api", "infrastructure", "other"] },
+          "version_constraint": { "type": ["string", "null"], "description": "선언된 제약 (예: 'postgres:13' / '^5.1.0'). 실 동작 버전과 다를 수 있음(declared)." },
+          "port": { "type": ["integer", "null"], "minimum": 0, "maximum": 65535 },
+          "env_var": { "type": ["string", "null"], "description": "연결 정보 env 변수명 (예: DATABASE_URL). value ❌." },
+          "source": { "$ref": "#/$defs/source_ref" }
+        }
+      }
+    },
+    "operational_guidance": {
+      "type": "array",
+      "description": "positive 운영 지침 (lean prose / migration-cautions 의 반대편 = 성공 경로). 1차 = note 수준.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "note", "source"],
+        "properties": {
+          "category": { "enum": ["build_setup", "env_config", "service_startup", "db_init", "health_check", "feature_flag", "other"] },
+          "note": { "type": "string", "description": "지침 1~3줄 (예: 'postgres 먼저 기동 후 prisma migrate deploy')." },
+          "source": { "$ref": "#/$defs/source_ref" }
+        }
+      }
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["configs_found", "configs_missing", "evidence_trust"],
+      "description": "추출 정직 표기 — 발견/누락 config + trust.",
+      "properties": {
+        "configs_found": { "type": "array", "items": { "type": "string" }, "description": "실제 발견·파싱한 config 파일 목록." },
+        "configs_missing": { "type": "array", "items": { "type": "string" }, "description": "기대했으나 부재한 config (해당 필드 null 사유 / 추론 ❌)." },
+        "evidence_trust": { "enum": ["real_extraction", "simulated"], "description": "no-simulation. 실 config 파싱·읽기 = real_extraction (simulated 영구 reject)." }
+      }
+    }
+  }
+}

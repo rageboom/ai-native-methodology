@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "schema": "run-manifest.schema.json",
+    "generated_by": "analysis-run-manifest",
+    "generated_at": "2026-06-09T10:00:00.000Z",
+    "source_commit": null,
+    "source_grounded": true,
+    "extraction_note": "package.json / docker-compose.yml / .env.example = deterministic_parse / Dockerfile = llm_read. env value 미저장(name+is_secret만). package.json scripts 는 npm/tsc 인데 Dockerfile 은 pnpm 사용 → build.candidates 표기. 1차 draft dogfood."
+  },
+  "system_context": {
+    "primary_stack": "Node 20 / Express / Prisma / TypeScript",
+    "build_tool": "npm",
+    "runtime": "node",
+    "inventory_ref": ".ai-context/output/inventory.json"
+  },
+  "build": {
+    "tool": "npm",
+    "command": "npm",
+    "args": ["run", "build"],
+    "output_dir": "build",
+    "candidates": ["pnpm build (Dockerfile 빌드는 pnpm install --frozen-lockfile → pnpm build / host scripts 는 npm·tsc)"],
+    "source": { "file": "package.json", "anchor": "scripts.build", "method": "deterministic_parse" },
+    "confidence": 1.0
+  },
+  "run": {
+    "command": "node",
+    "args": ["build/src/index.js"],
+    "entrypoint": "src/index.ts",
+    "ports": [8080],
+    "working_directory": null,
+    "source": { "file": "package.json", "anchor": "scripts.start", "method": "deterministic_parse" },
+    "confidence": 1.0
+  },
+  "environment_variables": [
+    { "name": "PORT", "required": false, "is_secret": false, "sensitivity": "public", "default": null, "description": "앱 리스닝 포트 (compose 8080 매핑)", "source": { "file": ".env.example", "anchor": "PORT", "method": "deterministic_parse" } },
+    { "name": "DATABASE_URL", "required": true, "is_secret": true, "sensitivity": "credential", "default": null, "description": "postgres 연결 문자열 (자격 포함)", "source": { "file": ".env.example", "anchor": "DATABASE_URL", "method": "deterministic_parse" } },
+    { "name": "JWT_SECRET", "required": true, "is_secret": true, "sensitivity": "credential", "default": null, "description": "JWT 서명 비밀키", "source": { "file": ".env.example", "anchor": "JWT_SECRET", "method": "deterministic_parse" } },
+    { "name": "JWT_ACCESS_EXPIRATION_MINUTES", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "access 토큰 만료(분)", "source": { "file": ".env.example", "anchor": "JWT_ACCESS_EXPIRATION_MINUTES", "method": "deterministic_parse" } },
+    { "name": "JWT_REFRESH_EXPIRATION_DAYS", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "refresh 토큰 만료(일)", "source": { "file": ".env.example", "anchor": "JWT_REFRESH_EXPIRATION_DAYS", "method": "deterministic_parse" } },
+    { "name": "JWT_RESET_PASSWORD_EXPIRATION_MINUTES", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "비밀번호 재설정 토큰 만료(분)", "source": { "file": ".env.example", "anchor": "JWT_RESET_PASSWORD_EXPIRATION_MINUTES", "method": "deterministic_parse" } },
+    { "name": "JWT_VERIFY_EMAIL_EXPIRATION_MINUTES", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "이메일 인증 토큰 만료(분)", "source": { "file": ".env.example", "anchor": "JWT_VERIFY_EMAIL_EXPIRATION_MINUTES", "method": "deterministic_parse" } },
+    { "name": "SMTP_HOST", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "SMTP 호스트", "source": { "file": ".env.example", "anchor": "SMTP_HOST", "method": "deterministic_parse" } },
+    { "name": "SMTP_PORT", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "SMTP 포트", "source": { "file": ".env.example", "anchor": "SMTP_PORT", "method": "deterministic_parse" } },
+    { "name": "SMTP_USERNAME", "required": false, "is_secret": null, "sensitivity": "unknown", "default": null, "description": "SMTP 사용자명 (자격 인접 — is_secret 모호 / human review)", "source": { "file": ".env.example", "anchor": "SMTP_USERNAME", "method": "deterministic_parse" } },
+    { "name": "SMTP_PASSWORD", "required": false, "is_secret": true, "sensitivity": "credential", "default": null, "description": "SMTP 비밀번호", "source": { "file": ".env.example", "anchor": "SMTP_PASSWORD", "method": "deterministic_parse" } },
+    { "name": "EMAIL_FROM", "required": false, "is_secret": false, "sensitivity": "internal", "default": null, "description": "발신 이메일 주소", "source": { "file": ".env.example", "anchor": "EMAIL_FROM", "method": "deterministic_parse" } }
+  ],
+  "service_dependencies": [
+    { "name": "postgres", "type": "database", "version_constraint": "postgres:15", "port": 5432, "env_var": "DATABASE_URL", "source": { "file": "docker-compose.yml", "anchor": "services.postgres", "method": "deterministic_parse" } },
+    { "name": "redis", "type": "cache", "version_constraint": "redis:7-alpine", "port": 6379, "env_var": null, "source": { "file": "docker-compose.yml", "anchor": "services.redis", "method": "deterministic_parse" } }
+  ],
+  "operational_guidance": [
+    { "category": "service_startup", "note": "pm2-start = 'prisma migrate deploy && pm2-runtime start ecosystem.config.json' — DB migration 적용 후 기동. compose 의 app 은 postgres·redis 에 depends_on.", "source": { "file": "package.json", "anchor": "scripts.pm2-start", "method": "deterministic_parse" } },
+    { "category": "build_setup", "note": "Dockerfile(prod): pnpm install --frozen-lockfile → pnpm prisma generate → pnpm build → CMD sh ./entrypoint.sh. host 개발 scripts(npm/tsc)와 빌드 도구 상이.", "source": { "file": "Dockerfile", "anchor": "Dockerfile:13-30", "method": "llm_read" } },
+    { "category": "db_init", "note": "prisma migrate deploy 로 스키마 적용 (db:migrate:prod). 개발은 prisma migrate dev.", "source": { "file": "package.json", "anchor": "scripts.db:migrate:prod", "method": "deterministic_parse" } }
+  ],
+  "extraction": {
+    "configs_found": ["package.json", "docker-compose.yml", ".env.example", "Dockerfile"],
+    "configs_missing": [],
+    "evidence_trust": "real_extraction"
+  }
+}
