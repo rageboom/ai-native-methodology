@@ -136,16 +136,18 @@ export function buildCascadePlan(inputs) {
 		}
 	};
 
-	// Step 1 — Initiative (config.parent_initiative reuse / 아니면 create 1건).
+	// Step 1 — Initiative = 참조 전용 (DEC-2026-06-10-initiative-reference-only).
+	//   Initiative = 실 프로젝트명 → ticket-sync 는 **참조만 / 생성 ❌**.
+	//   parent_initiative 제공 시 = Epic 부모로 참조(skip_prebound) / 미제공 시 = initiative_required 신호 (도구는 생성 ❌ → 스킬이 사용자에게 키 질문).
 	let initiativeKey = config.parent_initiative || null;
+	let initiativeRequired = false;
 	if (initiativeKey) {
 		evidence_skeleton.initiative_id = initiativeKey;
-		push({ role: 'initiative', issue_type: resolveIssueType('initiative', config), summary: `(reuse) ${initiativeKey}`,
+		push({ role: 'initiative', issue_type: resolveIssueType('initiative', config), summary: `(reference) ${initiativeKey}`,
 			body: '', parent_spec: resolveParentSpec('initiative', config, null), labels: [],
 			delta_action: 'skip_prebound', prebound_jira_id: initiativeKey, source_ref: initiativeKey });
 	} else {
-		push({ role: 'initiative', issue_type: resolveIssueType('initiative', config), summary: `[Migration] ${scope} initiative`,
-			body: '', parent_spec: resolveParentSpec('initiative', config, null), labels: [], delta_action: 'create', source_ref: `INIT-${scope}` });
+		initiativeRequired = true; // 생성 ❌ — Epic 부모 미상 → 스킬이 사용자에게 Initiative 키 질문 후 재실행
 	}
 
 	// Step 2 — Epic (per epic_ref / 델타).
@@ -201,6 +203,7 @@ export function buildCascadePlan(inputs) {
 		meta: meta || defaultMeta(),
 		scope,
 		config_env: config._env || 'default',
+		initiative_required: initiativeRequired,
 		calls,
 		preview_md: '',
 		skip_list,
@@ -231,7 +234,8 @@ export function renderPreview(plan) {
 	return [
 		`## Preview — ticket cascade (scope=${plan.scope})`,
 		`생성 ${plan.counts.create || 0} / 기존재사용 ${plan.counts.skip_prebound || 0} (총 ${plan.calls.length} call)`,
-		sec('Initiative', 'initiative'),
+		plan.initiative_required ? `\n⚠️ **Initiative 참조 미상** — Initiative=실 프로젝트명(생성 ❌). 사용자에게 기존 Initiative 키를 물어 \`parent_initiative\` 로 재실행 필요 (Epic 부모 미확정).` : '',
+		sec('Initiative (참조)', 'initiative'),
 		sec('Epic', 'epic'),
 		sec('Story', 'story'),
 		sec('Task (OP-*)', 'task'),

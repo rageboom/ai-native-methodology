@@ -14,6 +14,11 @@
       "type": "string",
       "description": "resolve 에 사용된 환경 식별 (예: DWPD / SG-MIS / default) — debug 용"
     },
+    "initiative_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "v12 (DEC-2026-06-10-initiative-reference-only). true = parent_initiative 미제공 → Initiative(=실 프로젝트명) 참조 미상. ticket-sync 는 Initiative 를 **생성하지 않음** → 스킬이 사용자에게 기존 Initiative 키를 질문해 parent_initiative 로 재실행 의무 (Epic 부모 미확정 상태)."
+    },
     "calls": {
       "type": "array",
       "description": "순서 있는 MCP jira_create 호출 spec. order 오름차순 = Initiative→Epic→{Story,OP}→Sub-task 의존성 순서. skill 이 순차 발사.",

@@ -73,12 +73,22 @@ test('deltaAction — jira_id 보유 → skip_prebound / pre_existing → skip /
 	assert.equal(deltaAction({}), 'create');
 });
 
-test('buildCascadePlan — cascade 순서 = initiative→epic→story→task→subtask', () => {
+test('buildCascadePlan — parent_initiative 없으면 Initiative 생성 ❌ + initiative_required (DEC-2026-06-10-initiative-reference-only)', () => {
 	const plan = buildCascadePlan({ scope: 'car', taskPlan: baseTaskPlan(), config: SG_MIS });
 	const roles = plan.calls.map((c) => c.role);
-	assert.deepEqual(roles, ['initiative', 'epic', 'story', 'task', 'subtask']);
-	// order 오름차순
-	assert.deepEqual(plan.calls.map((c) => c.order), [1, 2, 3, 4, 5]);
+	// Initiative 미상 → cascade 는 Epic 부터 (Initiative call ❌)
+	assert.deepEqual(roles, ['epic', 'story', 'task', 'subtask']);
+	assert.equal(plan.initiative_required, true);
+	assert.equal(plan.calls.some((c) => c.role === 'initiative'), false);
+});
+
+test('buildCascadePlan — parent_initiative 제공 시 Initiative = 참조(skip_prebound) / 생성 ❌ + 순서', () => {
+	const plan = buildCascadePlan({ scope: 'car', taskPlan: baseTaskPlan(), config: { ...SG_MIS, parent_initiative: 'MIS-58' } });
+	assert.deepEqual(plan.calls.map((c) => c.role), ['initiative', 'epic', 'story', 'task', 'subtask']);
+	const init = plan.calls.find((c) => c.role === 'initiative');
+	assert.equal(init.delta_action, 'skip_prebound'); // 참조 = 생성 ❌
+	assert.equal(plan.initiative_required, false);
+	assert.equal(plan.calls.filter((c) => c.delta_action === 'create' && c.role === 'initiative').length, 0); // Initiative create 0
 });
 
 test('buildCascadePlan — 델타: 기존 Story(jira_id) → skip_prebound + skip_list 기록', () => {

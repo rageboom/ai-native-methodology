@@ -11,7 +11,7 @@
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Ticket 단위          | **UC = Story** (BHV/AC cross-cut 시나리오 anchor)                                                                          |
 | Ticket 생성 시점     | **plan stage(chain 3) gate 통과 직후 단일** — Epic+Story+Task+Sub-task 4-level cascade 일괄 (analysis/discovery/spec = 생성 ❌) |
-| 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** / (선택) Initiative = 대형 분석 결과 묶음                                          |
+| 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** (cascade 생성 시작점) / Initiative = 실 프로젝트명 **참조만** (ticket-sync 생성 ❌ / DEC-2026-06-10-initiative-reference-only) |
 | 하위 단위            | **Task = OP-\*** (Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관) / **Sub-task = TASK-\*** (1~3 AC 묶음 / layer 분기)     |
 | test / implement     | Sub-task **status 갱신만** (RED / GREEN evidence / 신규 생성 ❌)                                                            |
 | BHV / AC / TC / IMPL | **별도 ticket X** — Story / Sub-task 본문에 link                                                                           |
@@ -23,8 +23,8 @@
 
 ```
 화면 있는 시나리오:
-  (선택) Initiative   ← 대형 분석 결과 묶음
-    └── Epic          ← FE 화면 단위 (UI screen / route) 또는 BE-domain
+  Initiative   ← 실 프로젝트명 (참조만 / ticket-sync 생성 ❌ / DEC-2026-06-10-initiative-reference-only)
+    └── Epic          ← FE 화면 단위 (UI screen / route) 또는 BE-domain ← cascade 실 생성 시작점
           └── Story   ← UC = BHV/AC cross-cut 시나리오
                 └── Sub-task × N   ← TASK-* (1~3 AC / layer 분기 be/fe/db/e2e/infra)
 
@@ -83,7 +83,7 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 
 | Ticket 유형 (Jira)      | Summary 형식                                                        | Description 본문                                                                           |
 | ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| (선택) Initiative       | `[MIG] {프로젝트} legacy → {target stack} 전환`                     | analysis 산출물 요약 + R# carry                                                            |
+| Initiative (참조만)     | **생성 ❌** — 실 프로젝트명 (기존 키를 `parent_initiative` 로 참조 / 미상 시 사용자 질문)         | —                                                                                          |
 | Epic                    | `[{화면/route 또는 domain}] {Epic 명}`                              | FE 화면(route) 또는 BE-domain 범위                                                         |
 | **Story**               | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}`         | discovery-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
 | Task (OP-\*)            | `[OP-{도메인}-{번호}] {운영 작업}` (category=migration/cron/refactor/security-patch/…) | 운영·인프라·마이그레이션·리팩터링 작업 (Story sibling / Epic 부재 가능) — **AP P0 횡단 회피 작업도 여기**(구 "Tech Debt Story" 흡수) |
@@ -241,8 +241,8 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 
 | 생성 ticket 유형                            | parent_ticket_id 의무?                | link_type      | 위반 시                                      |
 | ------------------------------------------- | ------------------------------------- | -------------- | -------------------------------------------- |
-| (선택) **Initiative**                       | ❌ omit (최상위)                      | —              | —                                            |
-| **Epic** (FE 화면 / BE-domain)              | ⚪ Initiative id (선택)               | `parent-child` | — (Initiative 부재 가능)                     |
+| **Initiative** (참조만 / 생성 ❌)            | — (실 프로젝트명 / `parent_initiative` 참조) | —          | ticket-sync 생성 ❌ (DEC-2026-06-10-initiative-reference-only) |
+| **Epic** (FE 화면 / BE-domain / 생성 시작점) | ⚪ Initiative id 참조 (미상 시 사용자 질문) | `parent-child` | — (Initiative top-level 가능)                |
 | **Story** (UC)                              | ✅ Epic id                            | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Story)    |
 | **Sub-task** (TASK-\*)                      | ✅ Story id 또는 OP-\* id             | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
 | **Task** (OP-\* / Story sibling)            | ⚪ Epic id (선택 / Epic 부재 가능)    | `parent-child` | — (운영 작업 / Epic 무관 가능)               |

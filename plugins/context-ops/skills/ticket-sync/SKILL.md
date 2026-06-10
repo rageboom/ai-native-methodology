@@ -42,7 +42,7 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | `dry_run`                    | boolean | **`true`**                                | default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출.                                                                                                                                                                                                                                  |
 | `confluence_emit`            | boolean | `false`                                   | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false)                                                                                                                                                                                                                                                    |
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
-| `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.ai-context/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
+| `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 **참조** (= 실 프로젝트명 / **ticket-sync 생성 ❌** / DEC-2026-06-10-initiative-reference-only). 명시 시 Epic 의 최상위 부모로 재사용. 미명시 시 → cascade-plan `initiative_required=true` → **사용자에게 기존 Initiative 키 질문 (신규 생성 ❌)**. env-config (`.ai-context/ticket-sync-config.yaml` `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
 | `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무).                                                                                                                                     |
 
 > **환경 config**(`issuetype_map` / `parent_strategy` / `epic_link_customfield_id` / `parent_link_customfield_id` / `structure_id` / `structure_auto_add_on_exit`)는 스킬 파라미터 ❌ — `.ai-context/ticket-sync-config.yaml` 에 두고 §단계 5 의 `ticket-cascade-builder` 가 `--config` 로 읽어 resolve. 구체값·default = [`env-config-reference.md`](./env-config-reference.md).
@@ -146,7 +146,9 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js \
 
 **환경 config** — 도구가 `--config`(ticket-sync-config.yaml)를 읽어 `issuetype_map` / `parent_strategy` / customfield 를 resolve. 환경별 구체값(DWPD/SG-MIS) = [`env-config-reference.md`](./env-config-reference.md). issuetype 미정의 시 도구가 `F-TICKETSYNC-007 issuetype_unresolved` throw (exit 1).
 
-**스킬 책임 (도구 밖 / runtime live 의존)** — cascade-plan 은 **happy-path 의도**. 실 MCP 호출의 **400/403 fallback**(parent_link → parent_key → `jira_link (Relates)` / `F-TICKETSYNC-013`·`010`·`008`) + Initiative search-first(parent_initiative 미명시 시) 는 본 스킬이 live 응답 보고 적응.
+**스킬 책임 (도구 밖 / runtime live 의존)** — cascade-plan 은 **happy-path 의도**. 실 MCP 호출의 **400/403 fallback**(parent_link → parent_key → `jira_link (Relates)` / `F-TICKETSYNC-013`·`010`·`008`) 은 본 스킬이 live 응답 보고 적응.
+
+**Initiative = 참조 전용 (생성 ❌ / DEC-2026-06-10-initiative-reference-only)** — Initiative = 실 프로젝트명. cascade-plan `initiative_required=true` (parent_initiative 미상) 시 → **신규 생성 ❌**, 사용자에게 질문: ① 기존 Initiative 키 지정 / ② jira_search 후보 중 선택. 키 확보 후 `--config parent_initiative=<키>` 로 cascade-builder **재실행**. cascade 실 생성 시작점 = **Epic** (참조 Initiative 하위).
 
 ### 단계 6 — MCP 호출 (sequential / 결정론 보호 / mode=standard)
 
@@ -157,6 +159,8 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js \
 `jira_create(role=task, summary="[Chain 3] {scope} plan 작성 시작", parent=Epic(scope)\|\|Initiative, status=To Do)` → `enter_task_id` = transient(evidence 만 / traceability-matrix.ticket_ref 영속 ❌). 작업 시작 시 manual/hook `jira_transition`(To Do→In Progress).
 
 #### phase=exit — cascade-plan.calls 발사 (델타 + evidence)
+
+> **선결: Initiative 참조 확인** — `cascade-plan.initiative_required=true` 면 발사 ❌ → **사용자에게 Initiative 키 질문**(생성 금지 / DEC-2026-06-10-initiative-reference-only) → `parent_initiative` 채워 cascade-builder 재실행 → `initiative_required=false` 된 plan 으로 진행.
 
 §단계 5 의 `cascade-plan.json` 을 읽어 `calls[]` 를 **order 오름차순 순차** 발사 (parallel ❌ / 결정론 보호). 부모 키는 발사하며 채워지는 `keymap`(source_ref → 실 Jira 키)으로 resolve. **payload 의 issue_type / summary / body / parent_spec 은 cascade-plan 그대로 인용** (LLM 재조립 ❌ / hardcode ❌).
 
