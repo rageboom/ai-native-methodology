@@ -90,19 +90,7 @@ export function extractTraceabilityRefs(artifactJson, kind) {
 	}
 }
 
-// analysis_refs subset filter — canonical global 의 부분 추출.
-// 1차 = ID prefix 매칭 (예: scope user-registration → BR-USER-* / BR-AUTH-*).
-// v2.1+ 에서 의미 기반 매칭 강화.
-export function subsetAnalysisRefs(canonical, prefixes) {
-	if (!Array.isArray(prefixes) || prefixes.length === 0) return {};
-	const matches = (id) => prefixes.some((p) => id.startsWith(p));
-	return {
-		rules: (canonical.rules || []).filter((r) => matches(r.id || r)),
-		endpoints: (canonical.endpoints || []).filter((e) => matches(e.path || e)),
-		schemas: (canonical.schemas || []).filter((s) => matches(s.name || s)),
-		domain: (canonical.domain || []).filter((d) => matches(d.name || d)),
-		antipatterns: (canonical.antipatterns || []).filter((a) =>
-			matches(a.id || a),
-		),
-	};
-}
+// NOTE — `subsetAnalysisRefs` (canonical prefix 슬라이스 필터) retired (v0.33.1 / DEC-2026-06-10-subset-slicing-corollary-supersede).
+// v0.3.0 이 scope 슬라이싱 메커니즘으로 선언했으나 호출처 0(미배선). 실 슬라이싱은
+//   drift = sync.js hashBusinessRulesSubset(bounded_context 필터 / v0.14.0) · validation 분모 = discovery-extraction-validator scope-token(v0.30.0)
+// 이 담당 — prefix(id.startsWith) 필터는 둘보다 부정확 + 미실현. `analysis_refs` 필드는 유지(query --ref 역인덱스 / db-assets-validator / findings-aggregator artifacts map 소비).

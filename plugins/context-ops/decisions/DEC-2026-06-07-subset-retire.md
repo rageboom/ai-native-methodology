@@ -1,6 +1,8 @@
 # DEC-2026-06-07-subset-retire
 
-**결단**: baseline-delta 운영 모델에서 **`*.subset.json`(scope-local analysis 파생 사본) 개념을 폐기**. scope 슬라이스는 사본 파일을 만들지 않고 **`chain-driver` `subsetAnalysisRefs(canonical, prefixes)` in-memory 참조 필터**(BR-id 등 `analysis_refs`)로 수행 → canonical global 단일 SSOT 유지.
+> ⚠️ **PARTIALLY SUPERSEDED (corollary 한정 / 2026-06-10)** — 본 결단의 **본체**(`*.subset.json` 파생사본 폐기 → canonical global 단일 SSOT)는 **유효·불변**. 단 corollary("scope 슬라이스 = `subsetAnalysisRefs(canonical, prefixes)` in-memory 필터 / §2 L21·§3 L26·§4 L31 '제거 금지'")는 **`DEC-2026-06-10-subset-slicing-corollary-supersede`** 로 정정됨: 해당 함수는 호출처 0(미배선) + 실 슬라이싱은 BC-subset-hash(drift / v0.14.0)·scope-token 분모(validation / v0.30.0)가 담당 → 함수 retire(v0.33.1). scope 는 canonical 을 full 참조(context-reduction prefix 슬라이싱 미실현).
+
+**결단**: baseline-delta 운영 모델에서 **`*.subset.json`(scope-local analysis 파생 사본) 개념을 폐기**. scope 슬라이스는 사본 파일을 만들지 않고 canonical global 단일 SSOT 를 유지(~~`subsetAnalysisRefs` in-memory 참조 필터~~ → corollary supersede 참조).
 
 **작성일**: 2026-06-07 (사용자 채널: "subset 이 바뀌어도 원본 반영 안 되면 SSOT 가 아니잖아" — 사본↔원본 역동기화 부채 지적).
 

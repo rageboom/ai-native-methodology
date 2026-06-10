@@ -36,7 +36,7 @@ ADR-CHAIN-016 에 **규칙 4 (scope 후보 coarseness → 재귀 carve)** 추가
 
 ## canonical global 누적 모델 정합
 
-이번 dogfood 에서 reservation→golf 재분해 후 BC-RESV-GOLF 를 canonical global 에 누적 — `baseline-delta-operating-model.md`(분석 1회 누적 / scope=`subsetAnalysisRefs` 필터 / 사본 ❌ / DEC-2026-06-07-subset-retire) 와 정합. 실측: 단일 canonical(42 BR/24 domain) → subset(event)/subset(golf) 교차오염 0·합집합=전체.
+이번 dogfood 에서 reservation→golf 재분해 후 BC-RESV-GOLF 를 canonical global 에 누적 — `baseline-delta-operating-model.md`(분석 1회 누적 / scope=canonical full 참조·사본 ❌ / 슬라이싱=drift BC-hash·validation scope-token / DEC-2026-06-07-subset-retire + DEC-2026-06-10-subset-slicing-corollary-supersede) 와 정합. 실측: 단일 canonical(42 BR/24 domain) → 교차오염 0·합집합=전체.
 
 ## 변경 범위
 

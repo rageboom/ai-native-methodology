@@ -78,7 +78,7 @@ codegraph 출력은 **어떤 gate 에도 inject ❌ / 최종 scope 절단은 사
 - (+) advisory 설계 → trust 모델 위배 0 / gate 무영향 (저위험 격상).
 - (−) codegraph 환경 의존 — 부재 시 loc_estimate fallback (정직 degrade).
 - carry: **§8.1 단일 PoC 과적합** — 트리거 = ep-be-gea 1 PoC. 설계 자체는 paradigm-grounded(5 외부 선례)라 advisory 격상은 정당하나, **"자동화 천장 수치"는 ep-be-gea 실측 전 미주장**. poc-17 + ep-be-gea ≥2 corroboration 후 천장 보정 수치 확정.
-- (v0.29.0 규칙 4 추가) **coarse-to-fine 재귀 carve** — scope candidate 가 복수 응집 sub-unit 클러스터일 때 재분해. 규칙은 paradigm-grounded codify / "거침" 정량 임계는 ep-be-gea reservation(6 sub-domain) 1-PoC carry. 적용 = ep-be-gea reservation→golf 분해 실착(dogfood) — canonical global 누적 모델과 정합(scope 별 BC 가 글로벌에 누적, scope=subsetAnalysisRefs 필터).
+- (v0.29.0 규칙 4 추가) **coarse-to-fine 재귀 carve** — scope candidate 가 복수 응집 sub-unit 클러스터일 때 재분해. 규칙은 paradigm-grounded codify / "거침" 정량 임계는 ep-be-gea reservation(6 sub-domain) 1-PoC carry. 적용 = ep-be-gea reservation→golf 분해 실착(dogfood) — canonical global 누적 모델과 정합(scope 별 BC 가 글로벌에 누적, scope 는 canonical full 참조 / 슬라이싱 = drift BC-hash·validation scope-token / DEC-2026-06-10-subset-slicing-corollary-supersede).
 
 ## 인용
 - 결단: DEC-2026-06-09-measured-coupling-scope-derivation (D1~D5) / DEC-2026-06-10-scope-candidate-recursive-carve (규칙 4)

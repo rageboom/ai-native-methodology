@@ -174,8 +174,10 @@
 - **A** 공유 canonical(domain.json) 변경 → `markDrift=[scope-post, scope-user]` = ✅ 정당(둘 다 domain 의존).
 - **B** BC-POST 전용 rule 변경(business-rules.json) → `markDrift=[scope-post, scope-user]` = ⚠️ **false-positive 실측** — scope-user 는 BC-POST 무관인데 business-rules.json 파일 공유로 coarse file-hash drift.
 
+> ⚠️ **발견 1 OBVIATED (2026-06-10 / DEC-2026-06-10-subset-slicing-corollary-supersede)**: "subset-precision = Phase 3 잔여 핵심" 은 본 §14 직후 **v0.14.0 `hashBusinessRulesSubset`(bounded_context 필터)**가 시나리오 B FP 를 해소(sync.test.js:288-294 회귀가드)하며 충족됨. `subsetAnalysisRefs`(prefix 필터)는 미배선·BC-hash 보다 부정확 → retire. 즉 발견 2(merge-back obviated)와 **동형으로 발견 1 도 obviated** — 추가 빌드 잔여 0.
+
 **핵심 발견 2**:
-1. **subset-precision 이 grounded** — 시나리오 B 가 coarse file-hash 의 FP 를 실 2-BC 데이터로 **측정**(추측 ❌). 3a §4 D3 "후속 carry" 가 이제 측정된 trigger 보유 → subsetAnalysisRefs 활성화(per-BC/prefix subset-hash)가 정당. = Phase 3 잔여의 실 핵심.
+1. **subset-precision 이 grounded** — 시나리오 B 가 coarse file-hash 의 FP 를 실 2-BC 데이터로 **측정**(추측 ❌). 3a §4 D3 "후속 carry" 가 이제 측정된 trigger 보유 → subsetAnalysisRefs 활성화(per-BC/prefix subset-hash)가 정당. = Phase 3 잔여의 실 핵심. ⟨↑ 후속 obviated 주석 참조 — v0.14.0 BC-hash 로 충족⟩
 2. **★ merge-back obviated (v0.3.0 + 3a)** — "delta 출처" 실측 답: post-v0.3.0 에 **scope-local 분석 사본 없음**(subsetAnalysisRefs=in-memory 필터·사본 ❌·divergence 금지=SSOT 단일). scope 가 canonical 항목 변경 = **canonical 직접 편집**(병합할 divergent 사본 부재) → markDrift(3a live)가 타 scope 자동 표지 = cross-scope 전파 이미 처리. ⟹ "scope-local delta → canonical 병합" **단계 자체가 존재하지 않음**. Phase 3 merge-back = 별도 도구 ❌, "canonical 직접 편집 + markDrift" 로 충족. (DEC §5 로드맵 Phase 3 = Phase 0 작성분 / v0.3.0 subset 폐기 前 framing → reframe.)
 
 **결론(Phase 3 reframe)**: ✅ cross-scope drift 전파 = 3a 로 DONE(실 2-BC 검증). ⚠️ subset-precision = NEEDED(FP 측정 / grounded next). ❌ merge-back 병합단계 = OBVIATED. **grounding 가치 = merge-back 헛빌드 회피(재작업 최소화) + subset-precision 실 trigger 확보.** 본체 코드 무변경(dogfood=tmp / 결함 미발견 → 본체 fix 없음 / poc-18 canonical 무변경). 다음 = 사용자 결단(subset-precision 추천).

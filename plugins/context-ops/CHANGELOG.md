@@ -10,6 +10,17 @@
 
 ---
 
+## [0.33.1] — 2026-06-10 PATCH — living-sync subset-precision = OBVIATED → dead `subsetAnalysisRefs` retire (diagnose-before-design)
+
+"living-sync subset-precision 진행" 1원칙 조사가 **obviation 을 포착** — merge-back 과 동형. STATUS 추천("`subsetAnalysisRefs` 활성화")은 **v0.14.0 이전 작성 stale** 이었음.
+
+- **조사 결론**: §14 multi-scope dogfood 가 측정한 유일 FP(BC-POST rule 변경 → 무관 scope-user 도 `business-rules.json` file-hash drift)는 **v0.14.0 `hashBusinessRulesSubset`**(bounded_context 필터)가 이미 해소 + `sync.test.js:288-294` 회귀가드 박제. `subsetAnalysisRefs`(work-unit.js prefix 필터)는 호출처 0·미배선 / 실 슬라이싱은 **drift = BC-subset-hash(v0.14.0) + validation 분모 = scope-token(v0.30.0)** 가 더 정밀하게 담당 → prefix(`id.startsWith`) 일반화 = 능력 재발명(§8.1 과적합).
+- **변경**: `chain-driver/src/work-unit.js` dead 함수 `subsetAnalysisRefs` 제거(retire NOTE 주석 대체 / 13줄). **`analysis_refs` 필드는 KEEP**(load-bearing: query `--ref` 역인덱스 / db-assets-validator RR#23 게이트 / findings-aggregator gate#0 artifacts map).
+- **DEC**: `DEC-2026-06-10-subset-slicing-corollary-supersede` 신설 — `DEC-2026-06-07-subset-retire` 의 corollary(subsetAnalysisRefs=슬라이싱 메커니즘·제거 금지) 한정 supersede. **본 결단(`*.subset.json` 폐기→SSOT 단일)은 유효·불변**.
+- **doc 정합 정정**(삭제 ❌·정정 ✅ "슬라이싱 = BC-hash[drift]·scope-token[validation] / scope 는 canonical full 참조"): baseline-delta-operating-model · lifecycle-contract · living-sync-operating-model · ADR-CHAIN-016 · INDEX · STATUS(stale 추천 제거) + DEC narrative(living-sync §14·scope-candidate-recursive-carve).
+- **검증**: Senior 적대검증 GO@0.93(STOP 신호 0 / context-reduction 슬라이싱 코드 부재 확정 / 누락 surface 2건 INDEX·STATUS 포착). chain-driver test **516 무회귀** / breaking 0.
+- 상세 = DEC-2026-06-10-subset-slicing-corollary-supersede.
+
 ## [0.33.0] — 2026-06-10 MINOR — ticket cascade-conformance 강제 (정책 11 trust→enforcement) — release 마감
 
 `ticket-cascade-builder`(v0.32.0) 추출 후 정책 7·8·9·12 가 "스킬이 cascade-plan 을 충실히 발사했을 때만" 보장(정책 11 의존) 판명 → **정책 11(스킬이 cascade-plan 충실 발사)을 결정론 강제**로 승격(trust→enforcement / SKILL 재서술 불요). ⟨코드는 선행 커밋 `74e6ec3b`+`f99a041f` 에 출하됐으나 버전·CHANGELOG·잔여 문서 미마감 → 본 entry 가 release 마감.⟩
