@@ -22,9 +22,12 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 3. **의존성 그래프** — package manager 출력 (npm ls / mvn dependency:tree / pip freeze) 또는 manifest 파싱.
 4. **scope 후보 도출 — 대형/decayed 코드베이스 (측정 기반 절취선)**:
    - **원칙: 패키지 경로 ≠ 경계, 실측 coupling = 경계.** 명목 패키지 트리(BC/레이어)를 scope 절취선으로 액면 수용하면 decayed-architecture(클린아키텍처 *지향*하나 미준수)에서 깨진다 — `modules_for_priority_analysis` 의 LOC 추정만으로 scope 를 끊지 말 것. (CodeScene temporal-coupling: "layered architecture will lead you to exactly those expensive change patterns" / Vertical Slice(Bogard): "couple along the axis of change")
-   - **codegraph 실측 → 결정론 coupling 집계**: `analysis-code-graph` 가 산출한 `code-graph.json` 의 edge 를 모듈간 coupling 행렬로 **결정론 집계**(LLM 추정 ❌). 고결합 쌍(예: `frontoffice/biztrip` ↔ `backoffice/biztrip`)은 같은 응집 단위 후보 → `scope_candidates[]` 로 묶는다. members 는 **명목 BC 경계를 관통할 수 있다**(한 업무의 두 얼굴).
-   - **`scope_candidates[]` 산출** (schema `scope_candidates`): id(slug) / members / internal·external_coupling / crosses_nominal_boundary / decay_grade / `source` (codegraph_measured | loc_estimate | manual). **advisory — reference-lens / gate inject ❌ / 최종 절단은 사용자 결단.**
-   - **codegraph 환경 부재 시**: scope_candidates 는 `source=loc_estimate` 로 best-effort + `meta.warnings` 에 "coupling 미측정 — 추정" 정직 표기 (no-simulation / codegraph_measured 표기 ❌). exit 3 신호면 사용자에게 codegraph 설치/CI 위임 안내.
+   - **신호원 우선순위 (역할 분담)**: scope_candidates 는 **확정 출력 컨테이너**일 뿐, 신호 자체는 아래 순서로 받는다.
+     1. **scope-carve.json (권장 / 가장 풍부)** — `analysis-scope-carve` 가 있으면 그 `carve_candidates[]`(Tarjan SCC atomic / Martin seam·hub·sink / co-change behavioral cluster / hotspot 우선순위)를 1차 신호로 받아 `scope_candidates[]` 로 일원화. `source=scope_carve` + `carve_signals[]` 에 근거 신호(scc/martin/co_change/hotspot) 인용. (scope-carve 와 scope_candidates 를 **별도 평행 산출물로 두지 말 것** — scope-carve=신호, scope_candidates=확정.)
+     2. **codegraph coupling 집계 (scope-carve 부재 시 / corroborating)** — `code-graph.json` edge 를 모듈간 coupling 행렬로 **결정론 집계**(LLM 추정 ❌). 고결합 쌍(예: `frontoffice/biztrip` ↔ `backoffice/biztrip`)=같은 응집 단위 후보. `source=codegraph_measured`. scope-carve 와 함께면 co-change 와 교차검증.
+     3. **LOC 추정 (둘 다 부재 / fallback)** — `source=loc_estimate` + `meta.warnings` "coupling 미측정 — 추정" 정직 표기.
+   - **`scope_candidates[]` 산출** (schema `scope_candidates`): id(slug) / members(명목 BC 경계 관통 가능 — 한 업무의 두 얼굴) / internal·external_coupling / crosses_nominal_boundary / decay_grade / `source` / `carve_signals`. **advisory — reference-lens / gate inject ❌ / 최종 절단은 사용자 soft gate #0 결단.**
+   - **환경 부재 시**: codegraph exit 3 신호면 사용자에게 codegraph/scope-carve 실행·CI 위임 안내 (no-simulation / 안 돌린 신호로 표기 ❌).
    - **경계 위반 라우팅**: codegraph 가 드러낸 의존성 규칙 위반(domain→infrastructure 역참조, feature 축 벗어난 교차참조)은 버그가 아니라 **1급 산출물** → `analysis-quality-antipattern`(category=ARCH) + `migration-cautions` + finding 으로 흘린다. decay = 분석 가치.
 5. **inventory.json 작성** — `schemas/inventory.schema.json` (strict / SSOT) 기준:
    ```json

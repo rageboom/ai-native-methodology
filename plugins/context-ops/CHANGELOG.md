@@ -10,6 +10,30 @@
 
 ---
 
+## [0.27.0] — 2026-06-10 MINOR — scope-carve draft→official 격상 (≥2 도메인 corroboration)
+
+역공학 델타 #1 scope-carve 를 1차 draft → **official(corroborated)** 격상. §8.1 ≥2 distinct 도메인 corroboration 충족 + Phase-1 명시 carry(co-change target-with-history live) 해소. 격상 수준 = **official / 대형 코드베이스 conditional 권장**(전면 MANDATORY ❌ / sql-inventory rdb_only 선례 동형). trust 모델 불변(reference-lens / gate inject ❌ / chain-driver 무수정). DEC-2026-06-10-scope-carve-promotion.
+
+- **corroboration (2 도메인)**: poc-01(소형 legacy Spring / SCC+Martin) + **ep-be-gea(대형 modern / 6307 Java / 4신호 전부 live)**. SCC 137/262 모듈 cycle / Martin hub=cache·base·utils(shared) / **co-change mined 49 pair · 13,137 commit · real_tool = 첫 external target-with-history → carry 해소** / hotspot=resve 최상위.
+- **caveat 해소(B)**: SCC/Martin 입력을 analysis-architecture skill 절차로 정식 재생성 — 실 layer detect(domain 62·application 77·infrastructure 62·presentation 11·shared 28·cross-cutting 22) + `violates_layer` 100건(clean-arch inward 위반 1급 기록) + circular SCC. 합성 architecture(layer=대표값) caveat 해소.
+- **교차검증(격상 핵심 근거)**: 정식 architecture `violates_layer` 최악 = **wlfr 449·req 306**·biztrip 266 → ADR-CHAIN-016 scope_candidates 가 codegraph coupling 으로 독립 표시한 **decay_grade=entangled(wlfr·req)** 와 **수렴**. 서로 다른 방법이 같은 feature 를 최악 decay 로 지목 = 신호 ROI 실증. Martin hub ↔ scope_candidates#shared-kernel 독립 일치.
+- **변경**: de-draft(SKILL.md·phase-flow aspect note → corroborated) + DEC + 인용 footer. tool 코드·schema·38 test·artifact-graph 노드 모델 **무변경**(scope-carve = code-graph 동형 reference-lens → 그래프 노드 아님 유지 / scope_candidates 경유 연결 / lifecycle-contract 미등재도 code-graph 와 일관).
+- **정직 carry**: co-change·hotspot 의 2nd *external* target-with-history(현재 ep-be-gea + self-repo) / architecture.json = codegraph-grounded 결정론 생성(granularity=feature×layer 선택) / ep-be-gea = 사내 소스 외부격리 commit ❌(DEC 마스킹 수치 기록).
+
+---
+
+## [0.26.0] — 2026-06-10 MINOR — scope-carve ↔ scope_candidates dedup (역할 분담 일원화)
+
+같은 개념("측정 신호 → scope 후보")의 두 평행 표현을 일원화. **scope-carve.json**(역공학 델타 #1 / 신호 엔진)과 **inventory.json#scope_candidates**(v0.25.0 / 출력 컨테이너)이 상호 미참조로 평행 존재하던 것을 역할 분담으로 배선. DEC-2026-06-10-scope-carve-candidates-dedup.
+
+- **역할 분담**: scope-carve = **신호 엔진**(Tarjan SCC·Martin·co-change·hotspot = WHERE/WHICH 결정론 신호) / scope_candidates = **soft gate #0 사람 확정 출력 컨테이너**. carve_candidates → (사람 확정) → scope_candidates 일원화. 두 산출물 별도 평행 유지 종료.
+- **신호원 우선순위** (analysis-source-inventory): ① scope-carve.json(권장 / 가장 풍부) → `source=scope_carve` ② codegraph coupling(scope-carve 부재 / corroborating — co-change 교차검증) → `source=codegraph_measured` ③ LOC 추정(fallback) → `source=loc_estimate`.
+- **schema (additive / 무파괴)**: `inventory.schema.json#scope_candidates` `source` enum `+scope_carve` + 신규 optional `carve_signals[]`(scc·martin·co_change·hotspot provenance) + 역할분담 description. 기존 값·필드 무변경 = backward-compat. scope-carve.schema·tool 코드 무변경.
+- **자동 주입 ❌**: carve 가 scope_candidates 를 직접 write 하지 않음 — soft gate #0 사람 확정 후 inventory 단계가 일원화 (reference-lens + 사람 확정 보존 / feedback_chain_driver_deterministic_axis).
+- **§8.1**: 본 dedup = 배선/스키마 통합(stable contract) 격상. scope-carve **도구 자체 MANDATORY 격상은 별개**(여전히 draft·opt-in / ≥2 PoC 후 / DEC-2026-06-09-scope-carve §8). 후속 = ep-be-gea 에서 scope-carve 4신호 ↔ scope_candidates(codegraph_measured 8건) 교차검증.
+
+---
+
 ## [0.25.1] — 2026-06-09 PATCH — 멀티모듈 repo 산출물 배치 컨벤션 명문화
 
 멀티모듈(Gradle/Maven·모노레포) repo 에서 `.ai-context/` 를 **repo 루트 단일**로 두는 규칙을 `lifecycle-contract.md` "파일 위치 컨벤션" 에 명문화 (기존 단일 `<user-project>/.ai-context/` 만 있고 멀티모듈 케이스 누락 = 갭 보완). 개별 모듈 내부 분산 ❌.

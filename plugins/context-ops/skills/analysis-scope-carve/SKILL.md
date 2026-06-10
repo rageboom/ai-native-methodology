@@ -55,7 +55,8 @@ baseline → `methodology-spec/policies/no-simulation.md`.
    - **co-change** — `pairs[]` 정적 그래프 비가시 결합(config↔code / mapper↔DAO 동시편집). 가르는 cut 은 leaky 후보.
    - **hotspot** (우선순위 axis / WHICH-first) — `hotspot.items[]` = churn × indentation-complexity score 내림차순. 자주 변경+복잡 = **먼저** carve/격리/hardening. flat 파일(고churn but 들여쓰기~0)은 저score(Tornhill 의도). WHERE(3 구조신호)에 직교.
 
-4. **carve_candidates → soft gate #0** — `carve_candidates[]`(atomic_unit / clean_seam / hub_warning / behavioral_cluster)를 사용자에게 제시. 사용자가 scope 경계를 확정(또는 override)한 뒤 `chain-driver init --scope <확정-slug>` 로 scope 를 생성한다. **carve 가 slug 를 자동 생성하거나 manifest 를 만들지 않는다** — carve 는 구조 신호일 뿐, scope 확정은 사람.
+4. **carve_candidates → soft gate #0 → scope_candidates** — `carve_candidates[]`(atomic_unit / clean_seam / hub_warning / behavioral_cluster / hotspot_priority)를 사용자에게 제시. 사용자가 scope 경계를 확정(또는 override)한 뒤 `chain-driver init --scope <확정-slug>` 로 scope 를 생성한다. **carve 가 slug 를 자동 생성하거나 manifest 를 만들지 않는다** — carve 는 구조 신호일 뿐, scope 확정은 사람.
+   - **scope_candidates 로 일원화 (dedup 배선)**: 확정된 carve_candidates 는 `analysis-source-inventory` 가 `inventory.json#scope_candidates[]` 의 **확정 출력**으로 흡수한다 (`source=scope_carve` + `carve_signals[]` 에 근거 신호 인용). scope-carve = **신호 엔진** / scope_candidates = **확정 결과** — 같은 개념을 두 산출물로 평행 유지 ❌. (carve 가 직접 scope_candidates 를 write 하지 않음 — soft gate #0 사람 확정 후 inventory 단계가 일원화 / reference-lens 보존.)
 
 5. **finding 등재 (필요 시)** — 구조 risk = `_base-log-finding` 으로 low|medium reference finding (status=open / gate blocker 아님).
 
@@ -69,13 +70,14 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - **co-change = git 이력 필수** — 신규/sparse 이력 = cold-start(구조 중심이어도 신호 0). tangled commit = `max_transaction_size` 로 inflate 제어(soft gate).
 - 구조 3신호 모두 **cohesion·도메인 의미 미포함** — 구조 신호 한정, 의미 경계 확정은 soft gate #0 의 사람.
 - **hotspot complexity = indentation proxy**(cyclomatic 아님 / research "약한 proxy"). 우선순위 랭킹엔 충분(결정론)하나 절대 복잡도 아님. `tab_width` 의존(2-space 코드 = `--tab-width 2`). churn 은 co-change 와 동일 `.git` 의존.
-- 1차 draft (≥2 PoC corroboration 전 / 본체 MANDATORY 격상 아님 / opt-in).
+- **official / 대형 코드베이스 conditional 권장** (소형은 carving 불요 / 전면 MANDATORY ❌). reference-lens·soft gate #0 evidence·chain-driver 무수정 불변. ≥2 distinct 도메인(소형 legacy + 대형 modern) corroborated. 잔존 carry — co-change·hotspot 의 2nd external target-with-history.
 
 ## 인용
 
 - `schemas/scope-carve.schema.json`
 - `tools/scope-carve/` (Tarjan SCC + Martin Ca/Ce/I + git co-change mining + Tornhill hotspot / real_tool evidence / no-simulation exit 3)
 - DEC-2026-06-09-scope-carve-3signal-reference-lens + DEC-2026-06-09-hotspot-prioritization-reference-lens (본 skill 의 결정 / 모DEC = DEC-2026-06-09-reverse-eng-methodology-gap)
+- DEC-2026-06-10-scope-carve-promotion (draft→official 격상 / ≥2 도메인 corroboration / 대형 conditional)
 - DEC-2026-05-28-codegraph-probe-결과 §4.2 (reference-lens trust 모델 SSOT)
 - DEC-2026-06-06-analysis-exit-gate (soft gate #0)
 - `.claude/plans/research-reverse-engineering-carve.md` (3신호 적격 / 2신호 부적격 근거)
