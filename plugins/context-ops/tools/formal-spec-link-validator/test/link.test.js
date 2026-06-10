@@ -10,6 +10,7 @@ import {
 	detectChainArtifact,
 	summarize,
 } from '../src/check-links.js';
+import { resolveProjectRoot } from '../../_shared/project-root.js';
 
 function setupFixture() {
 	const dir = mkdtempSync(join(tmpdir(), 'fsl-test-'));
@@ -684,4 +685,32 @@ test('F-T05 — impl-spec root test_pass_evidence dump 부재 → non-breaking',
 	} finally {
 		rmSync(dir, { recursive: true, force: true });
 	}
+});
+
+// ── F15 (DEC-2026-06-10-validator-path-convention-unify) — resolveProjectRoot ──
+// chain-coverage 와 formal-spec-link 가 공유하는 project-root 자동 감지. `.ai-context/` 부모 = root.
+test('resolveProjectRoot: .ai-context/output/ 패턴 → PoC root (구 autoDetect 동형)', () => {
+	const r = resolveProjectRoot('/repo/examples/poc-05/.ai-context/output/behavior-spec.json');
+	assert.equal(r, '/repo/examples/poc-05');
+});
+
+test('resolveProjectRoot: scope-dir(.ai-context/<scope>/<stage>/) → project root (F15 신규 커버)', () => {
+	const r = resolveProjectRoot('/abs/ep-be-gea/.ai-context/reservation-golf/spec/acceptance-criteria.json');
+	assert.equal(r, '/abs/ep-be-gea');
+});
+
+test('resolveProjectRoot: Windows backslash 정규화', () => {
+	const r = resolveProjectRoot('C:\\repo\\proj\\.ai-context\\plan\\task-plan.json');
+	assert.equal(r, 'C:/repo/proj');
+});
+
+test('resolveProjectRoot: .ai-context 무함유 → fallback dirname (backward-compat)', () => {
+	const r = resolveProjectRoot('/repo/some/other/dir/behavior-spec.json');
+	assert.equal(r, '/repo/some/other/dir');
+});
+
+test('resolveProjectRoot: null/empty 방어', () => {
+	assert.equal(resolveProjectRoot(null), null);
+	assert.equal(resolveProjectRoot(''), null);
+	assert.equal(resolveProjectRoot(undefined), null);
 });

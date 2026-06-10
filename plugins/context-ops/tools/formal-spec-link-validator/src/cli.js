@@ -14,6 +14,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, basename, dirname, relative } from 'node:path';
+import { resolveProjectRoot } from '../../_shared/project-root.js';
 import {
 	checkLinks,
 	checkFeCrossLinks,
@@ -182,7 +183,7 @@ function processFe(path) {
 	};
 }
 
-function processChain(path) {
+function processChain(path, projectRoot) {
 	const text = readFileSync(path, 'utf-8');
 	let json;
 	try {
@@ -195,7 +196,10 @@ function processChain(path) {
 		};
 	}
 
-	const baseDir = dirname(path);
+	// F15 (DEC-2026-06-10-validator-path-convention-unify): chain 산출물 cross-ref 경로는
+	// project-root-relative(`.ai-context/...`) — chain-coverage 와 동일하게 project root 기준 해석.
+	// 명시 --project-root 우선 / 없으면 resolveProjectRoot 자동 감지(`.ai-context` 부모) / 그 외 dirname fallback.
+	const baseDir = projectRoot ?? resolveProjectRoot(path) ?? dirname(path);
 	const artifact = detectChainArtifact(basename(path));
 	if (!artifact) {
 		return {
@@ -218,9 +222,9 @@ function processChain(path) {
 	};
 }
 
-function processOne(path, mode) {
+function processOne(path, mode, projectRoot) {
 	const name = basename(path);
-	if (mode === 'chain' || CHAIN_TARGETS.has(name)) return processChain(path);
+	if (mode === 'chain' || CHAIN_TARGETS.has(name)) return processChain(path, projectRoot);
 	if (BE_TARGETS.has(name)) return processBe(path);
 	if (FE_TARGETS.has(name)) return processFe(path);
 	// 사용자가 명시적으로 path 를 지정한 경우 → mode 따라 처리
@@ -242,11 +246,15 @@ function main() {
 	const args = process.argv.slice(2);
 	if (args.length === 0) {
 		console.error(
-			'usage: formal-spec-link-validator <file-or-dir> [--json] [--mode=be|fe|both|chain] [--chain-mode] [--dry-run]',
+			'usage: formal-spec-link-validator <file-or-dir> [--json] [--mode=be|fe|both|chain] [--chain-mode] [--project-root <dir>] [--dry-run]',
 		);
 		process.exit(2);
 	}
-	const target = args.find((a) => !a.startsWith('--')) ?? args[0];
+	// F15: --project-root <dir> 파싱 (chain mode cross-ref 해석 base / value 는 positional target 감지서 제외).
+	const prIdx = args.indexOf('--project-root');
+	const projectRoot = prIdx >= 0 ? args[prIdx + 1] : undefined;
+	const target =
+		args.find((a, i) => !a.startsWith('--') && i !== prIdx + 1) ?? args[0];
 	const jsonOut = args.includes('--json');
 	const dryRun = args.includes('--dry-run');
 	const mode = parseMode(args);
@@ -266,7 +274,7 @@ function main() {
 		files = [target];
 	}
 
-	const results = files.map((p) => processOne(p, mode));
+	const results = files.map((p) => processOne(p, mode, projectRoot));
 	const totals = {
 		files: results.length,
 		breaking: 0,

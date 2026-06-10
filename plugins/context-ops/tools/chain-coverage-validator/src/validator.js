@@ -14,25 +14,13 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve as pathResolve, isAbsolute, dirname } from 'node:path';
+import { resolveProjectRoot } from '../../_shared/project-root.js';
 
-// F-MB-VAL-001 (v9.0.4 / 2026-05-24): default projectRoot 자동 감지
-// 산출물이 `.ai-context/output/<file>.json` 패턴이면 PoC root = `dirname(p)/../..` 로 자동 감지.
-// 5 PoC self-corroboration (poc-03/04-mini/05/14/06/07) 모두 PoC root 기준 cross-ref convention 일관 — 도구 default mismatch 해소.
-// fallback (비-`.ai-context/output/` 위치): dirname(p) 그대로 (backward-compat).
-// LL-v903-04 자산화: validator default 와 산출물 convention mismatch silent sink — 5 PoC corroboration ≥ 2 fix.
-export function autoDetectProjectRoot(specPath) {
-	if (!specPath || typeof specPath !== 'string') return null;
-	// cross-platform: Windows backslash path 도 macOS/Linux 에서 처리 (DEC-2026-05-26-gate-renumber-coherence carry §macOS env-dependent test fix)
-	// POSIX dirname() 은 \ 를 path separator 로 안 봐서 Windows path 입력 시 '.' 반환 → 사전 정규화 의무
-	const d = dirname(specPath.replace(/\\/g, '/'));
-	const normalized = d.replace(/\\/g, '/');
-	// `.ai-context/output` 끝나는 패턴 → PoC root = ../..
-	if (/(^|\/)\.ai-context\/output$/.test(normalized)) {
-		return pathResolve(d, '..', '..');
-	}
-	// fallback (backward-compat): dirname 그대로
-	return d;
-}
+// F-MB-VAL-001 (v9.0.4) + F15 (v0.31.0 / DEC-2026-06-10-validator-path-convention-unify):
+// project root 자동 감지를 `_shared/project-root.js` 로 중앙화(formal-spec-link 와 단일 로직 공유).
+// 일반화: `.ai-context/` 의 부모 = root → output/(`.ai-context/output/…`) + scope-dir(`.ai-context/<scope>/<stage>/…`)
+//   양쪽 일관(구 `.ai-context/output$`→../.. 결과 동형 / 5-PoC 테스트 lock 보존). 그 외 = fallback dirname.
+export const autoDetectProjectRoot = resolveProjectRoot;
 
 export function validateChainCoverage(
 	planning,

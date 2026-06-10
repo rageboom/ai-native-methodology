@@ -10,6 +10,15 @@
 
 ---
 
+## [0.31.0] — 2026-06-10 MINOR — validator project-root 경로 해석 단일화 (F15) + F14/F16 diagnose 처분
+
+`formal-spec-link-validator`(gate#2 REQUIRED)가 chain mode cross-ref 경로를 spec-dir 기준 해석 → project-root-relative(`.ai-context/...`) 산출물 경로를 dead-reference(breaking)로 오탐 → gate#2 거짓 block 하던 결함(ep-be-gea dogfooding **F15**) 수정.
+
+- **수정**: `_shared/project-root.js` 신설 — `resolveProjectRoot()`(경로의 `.ai-context/` 부모 = root). chain-coverage 의 autoDetectProjectRoot(v9.0.4)를 일반화·중앙화(output/ + scope-dir 양쪽 커버 / 구 결과 동형 / 5-PoC lock 보존). formal-spec-link 에 `--project-root` + 자동감지 배선.
+- **검증**: golf·event formal-spec-link breaking **2→0** / formal-spec-link test 21→26 / chain-coverage 41 무회귀.
+- **F13 sibling family 처분(diagnose-before-design / 코드 ❌)**: F14(chain-coverage AP-coverage scope)=REFRAME·DEFER(cross-cutting AP 인지는 correct-by-design / AP scope 귀속 schema 변경은 §8.1 1-PoC 과적합 / honest carry 가 처리). F16(graph-synth orphan)=DISSOLVE(Layer-4 `to_analysis_artifacts` orphan-해소 이미 존재 / 미누적 산출물 미참조가 정답 / graph-integrity 비-gate).
+- schema·gate semantics 무변경 / backward-compat. 상세 = DEC-2026-06-10-validator-path-convention-unify.
+
 ## [0.30.0] — 2026-06-10 MINOR — discovery-extraction-validator scope(BC)-aware coverage (F13)
 
 `discovery-extraction-validator` 의 UC-coverage·UC/entity 분모를 **scope(BC)-aware** 로 정정. canonical-global accumulation(DEC-2026-06-07-subset-retire)에서 `output/domain.json` 이 여러 BC 누적 시, 단일 scope discovery 가 타 BC 의 UC/entity 로 분모가 부풀려져 coverage 가 구조적으로 희석되던 결함(ep-be-gea dogfooding **F13**) 수정.
