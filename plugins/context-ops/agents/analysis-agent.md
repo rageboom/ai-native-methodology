@@ -19,6 +19,7 @@ skills:
     analysis-code-graph,
     analysis-scope-carve,
     analysis-run-manifest,
+    analysis-recovered-adr,
     analysis-openapi,
     analysis-api-rule-mapping,
     analysis-error-mapping,

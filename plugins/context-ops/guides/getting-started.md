@@ -76,7 +76,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/preflight-check.js --stack all --json
 **install 후 확인 의무**:
 
 - **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
-- **Skills: 57** (`_base 5 + analysis 30 + discovery 6 + spec 3 + plan 3 + test 4 + implement 4 + dep-graph-navigator 1 + ticket-sync 1`)
+- **Skills: 60** (`_base 5 + analysis 33 + discovery 6 + spec 3 + plan 3 + test 4 + implement 4 + dep-graph-navigator 1 + ticket-sync 1`)
 - **MCP Servers: (없음)**
 
 만약 `Skills: 0` 또는 `Agents: README` 식 출력 = 구 버전 / 재install 의무 (1-depth flatten paradigm 미적용 build).

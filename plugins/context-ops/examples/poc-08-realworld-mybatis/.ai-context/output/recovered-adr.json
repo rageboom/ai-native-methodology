@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "schema": "recovered-adr.schema.json",
+    "generated_by": "analysis-recovered-adr",
+    "generated_at": "2026-06-10T00:00:00Z",
+    "source_commit": null,
+    "source_grounded": true,
+    "extraction_note": "jpetstore-6 pom.xml(결정론 parse) + 매퍼 xml + 디렉토리 구조 역추적 / rationale 미복구는 unverified-intent abstain(날조 ❌) / 1차 draft dogfood"
+  },
+  "recovered_adrs": [
+    {
+      "id": "RADR-JPETSTORE-001",
+      "title": "spring-web 5.3.39 버전 핀 (jakarta 마이그레이션 지연)",
+      "category": "dependencies",
+      "status": "accepted",
+      "decision": "spring-web 을 5.3.39 에 고정 — 나머지 Spring 모듈은 6.2.18 사용 (혼용)",
+      "evidence": [
+        { "file": "pom.xml", "anchor": "pom.xml:107-109", "kind": "config_dependency" }
+      ],
+      "rationale": {
+        "certainty": "observed",
+        "text": "jakarta EE 네임스페이스 마이그레이션 완료 전까지 spring-web 을 5.x 에 의도적으로 고정. pom.xml 주석에 근거 명시.",
+        "basis_evidence": { "file": "pom.xml", "anchor": "pom.xml:108", "kind": "doc_comment" }
+      },
+      "alternatives": [],
+      "consequences": {
+        "positive": ["jakarta 마이그레이션을 점진적으로 분리 진행 가능"],
+        "negative": ["Spring 6 + spring-web 5 혼용 = javax/jakarta 경계 호환 위험 (의도된 임시 기술부채)"]
+      }
+    },
+    {
+      "id": "RADR-JPETSTORE-002",
+      "title": "WAR 패키징 + 외부 서블릿 컨테이너 배포",
+      "category": "construction",
+      "status": "accepted",
+      "decision": "war 패키징 + WEB-INF/applicationContext.xml — embedded jar(Spring Boot) 대신 외부 서블릿 컨테이너 배포",
+      "evidence": [
+        { "file": "pom.xml", "anchor": "pom.xml:33", "kind": "config_setting" },
+        { "file": "src/main/webapp/WEB-INF/applicationContext.xml", "anchor": null, "kind": "dir_structure" }
+      ],
+      "rationale": {
+        "certainty": "unverified-intent",
+        "text": null,
+        "basis_evidence": null
+      },
+      "alternatives": [],
+      "consequences": {
+        "positive": [],
+        "negative": ["embedded server 미사용 — 외부 컨테이너 운영 의존 (관찰된 구조적 결과 / WHY 는 미복구)"]
+      }
+    },
+    {
+      "id": "RADR-JPETSTORE-003",
+      "title": "MyBatis XML 매퍼 영속 계층",
+      "category": "dependencies",
+      "status": "accepted",
+      "decision": "MyBatis + mybatis-spring 를 영속 계층으로 채택, SQL 을 도메인별 XML 매퍼로 외부화",
+      "evidence": [
+        { "file": "pom.xml", "anchor": "pom.xml:87", "kind": "config_dependency" },
+        { "file": "pom.xml", "anchor": "pom.xml:92", "kind": "config_dependency" },
+        { "file": "src/main/resources/org/mybatis/jpetstore/mapper/OrderMapper.xml", "anchor": null, "kind": "code_symbol" }
+      ],
+      "rationale": {
+        "certainty": "inferred-consequence",
+        "text": "프로젝트가 MyBatis 공식 레퍼런스 앱(pom url mybatis.org/jpetstore-6)이라는 정체성에서 'SQL 완전 제어 시연' 의도를 추론. 명시적 결정 문서는 부재 — 사실적 결과(MyBatis 사용)는 관찰, 의도 귀속은 추론 수준.",
+        "basis_evidence": { "file": "pom.xml", "anchor": "url", "kind": "config_setting" }
+      },
+      "alternatives": [
+        { "option": "JPA/Hibernate (ORM)", "status": "speculative", "rejection_reason": null, "evidence": null }
+      ],
+      "consequences": {
+        "positive": ["SQL 완전 제어·튜닝 용이"],
+        "negative": ["매퍼 보일러플레이트 / 컴파일타임 쿼리 검증 부재"]
+      }
+    }
+  ],
+  "extraction": {
+    "sources_examined": [
+      "pom.xml",
+      "src/main/java/org/mybatis/jpetstore",
+      "src/main/resources/org/mybatis/jpetstore/mapper",
+      "src/main/webapp/WEB-INF/applicationContext.xml"
+    ],
+    "evidence_trust": "real_extraction",
+    "rationale_unknown_count": 1
+  }
+}

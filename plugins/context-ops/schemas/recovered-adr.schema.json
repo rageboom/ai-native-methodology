@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/recovered-adr.schema.json",
+  "title": "recovered-adr.json — 역추적된 과거 architecture 결정 + rationale abstention (analysis 산출물 #25)",
+  "description": "legacy/기존 코드베이스에서 역추적한 architecture 결정(예: ORM 선택 / 배포 패키징 / 모듈 분리)의 산출물 (DEC-2026-06-09-recovered-adr-rationale-abstention / 역공학 델타 #3). forward-authored task-plan.adrs[] (plan stage / 앞으로 내릴 결정 / alternatives≥3 강제)의 backward 보완 — 이미 내려진 결정을 코드 증거에서 복구. 차별점 = WHY(rationale)를 복구 못 하면 정직하게 abstain (날조 ❌ / no-simulation). 모든 결정은 code/config/structure evidence 로 grounding (fail-closed) / rationale 복구도는 discovery-spec intent_certainty enum 재사용 (신규 enum ❌). 학술 grounding = Jansen&Bosch 2008 'Documenting after the fact' + Archie(FSE2014 traceability). source = https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions (Nygard ADR).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "recovered_adrs", "extraction"],
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "kind"],
+      "description": "결정/rationale 의 grounding 증거 (Archie traceability 차용 / no-fabrication).",
+      "properties": {
+        "file": { "type": "string", "description": "증거 파일 repo-relative 경로 (예: pom.xml / src/main/webapp/WEB-INF/applicationContext.xml)." },
+        "anchor": { "type": ["string", "null"], "description": "line 또는 key 경로 (예: pom.xml:108 / packaging / scripts.build)." },
+        "kind": {
+          "enum": ["config_dependency", "config_setting", "doc_comment", "code_symbol", "dir_structure", "vcs_history"],
+          "description": "증거 종류. config_dependency=의존성 선언 / config_setting=설정값(packaging 등) / doc_comment=코드·설정 주석(rationale 명시 가능) / code_symbol=클래스·메서드 / dir_structure=디렉토리 레이아웃(구조 추론) / vcs_history=git log·blame."
+        }
+      }
+    }
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "generated_at", "source_grounded", "extraction_note"],
+      "properties": {
+        "schema": { "const": "recovered-adr.schema.json" },
+        "generated_by": { "const": "analysis-recovered-adr" },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "source_commit": { "type": ["string", "null"], "description": "분석 대상 target repo 의 commit sha (재현성)." },
+        "source_grounded": {
+          "const": true,
+          "description": "모든 결정 evidence[] 명시 의무 / rationale 복구불가 = unverified-intent abstention (날조 ❌)."
+        },
+        "extraction_note": {
+          "type": "string",
+          "description": "추출 방법·한계 1줄 (예: 'pom.xml/매퍼 xml/디렉토리 구조 역추적 / rationale 미복구는 unverified-intent abstain')."
+        }
+      }
+    },
+    "recovered_adrs": {
+      "type": "array",
+      "description": "역추적된 결정 목록. 빈 배열 허용(결정 식별 0 = 정직).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "status", "decision", "evidence", "rationale"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^RADR-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "역추적 ADR ID (예: RADR-JPETSTORE-001). forward ADR-* 와 구분 — recovered = 이미 내려진 결정의 역추적물."
+          },
+          "title": { "type": "string", "minLength": 3 },
+          "category": {
+            "enum": ["structure", "nfr", "dependencies", "interfaces", "construction", "security_regulatory"],
+            "description": "선택 — Nygard 5 category (Structure/NFR/Dependencies/Interfaces/Construction) + 보안·규제 axis (task-plan.adrs 정합)."
+          },
+          "status": {
+            "enum": ["accepted", "deprecated", "superseded"],
+            "description": "결정 lifecycle 상태. recovered = 이미 구현된 시스템이므로 'proposed' 부적용 (Nygard enum 의 subset). rationale 복구도(rationale.certainty)와 직교 — status overload ❌."
+          },
+          "decision": {
+            "type": "string",
+            "minLength": 5,
+            "description": "역추적한 결정 내용 (관찰된 사실 / 예: 'spring-web 을 5.3.39 에 핀(나머지 Spring 6.2.18)')."
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "$ref": "#/$defs/source_ref" },
+            "description": "결정 자체의 grounding 증거 (≥1 / fail-closed — 증거 없는 결정 등재 ❌)."
+          },
+          "rationale": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["certainty"],
+            "description": "WHY(결정 근거)의 복구. certainty = discovery-spec intent_certainty enum 재사용 (신규 enum ❌). unverified-intent = 정직한 'rationale unknown' abstention.",
+            "properties": {
+              "certainty": {
+                "enum": ["observed", "inferred-consequence", "unverified-intent", "source-refuted"],
+                "description": "rationale 귀속 확실성 (discovery-spec.intent_certainty 동일 어휘). observed=근거가 소스에 직접 명시(주석/ADR/commit) / inferred-consequence=결정의 사실적 결과는 관찰되나 의도는 추론 / unverified-intent=의도 귀속이나 소스 근거 부재 = 정직 unknown(abstention) / source-refuted=귀속하려던 의도를 소스가 반증."
+              },
+              "text": {
+                "type": ["string", "null"],
+                "description": "복구한 WHY 자연어. unverified-intent 면 null 또는 '복구 불가 — 사람 확인' (날조 ❌)."
+              },
+              "basis_evidence": {
+                "oneOf": [{ "$ref": "#/$defs/source_ref" }, { "type": "null" }],
+                "description": "rationale text 의 근거 증거 (observed 면 필수). unverified-intent 면 null 허용."
+              }
+            },
+            "allOf": [
+              {
+                "$comment": "fail-closed 핵심 — observed rationale 는 반드시 non-null text + basis_evidence 보유 (증거 없이 'observed' 주장 차단 / 날조 회피).",
+                "if": { "properties": { "certainty": { "const": "observed" } } },
+                "then": {
+                  "required": ["text", "basis_evidence"],
+                  "properties": {
+                    "text": { "type": "string", "minLength": 1 },
+                    "basis_evidence": { "$ref": "#/$defs/source_ref" }
+                  }
+                }
+              }
+            ]
+          },
+          "alternatives": {
+            "type": "array",
+            "description": "대안 — **evidence 가 대안 검토를 보일 때만** (MADR Considered Options 정합). forward task-plan.adrs 의 ≥3 강제 ❌ — 역추적은 검토된 대안을 알 수 없음(빈 배열 정상).",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["option", "status"],
+              "properties": {
+                "option": { "type": "string" },
+                "status": { "enum": ["rejected-with-evidence", "speculative"], "description": "rejected-with-evidence=소스가 이 대안을 거부했음을 보임(evidence 필수) / speculative=일반적 대안 언급(거부 근거 미상)." },
+                "rejection_reason": { "type": ["string", "null"] },
+                "evidence": { "oneOf": [{ "$ref": "#/$defs/source_ref" }, { "type": "null" }] }
+              }
+            }
+          },
+          "consequences": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "관찰된 결과만 (추론은 rationale.certainty 로 표기).",
+            "properties": {
+              "positive": { "type": "array", "items": { "type": "string" } },
+              "negative": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        }
+      }
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources_examined", "evidence_trust", "rationale_unknown_count"],
+      "description": "추출 정직 표기.",
+      "properties": {
+        "sources_examined": { "type": "array", "items": { "type": "string" }, "description": "역추적에 실제 검토한 소스 (예: pom.xml / src/main/java / mapper xml)." },
+        "evidence_trust": { "enum": ["real_extraction", "simulated"], "description": "no-simulation. 실 코드·config 읽기 = real_extraction (simulated 영구 reject)." },
+        "rationale_unknown_count": { "type": "integer", "minimum": 0, "description": "rationale.certainty=unverified-intent 인 결정 수 (정직 abstention 노출 — 0 이라고 모두 복구됐다는 뜻 아님 / 정직 신호)." }
+      }
+    }
+  }
+}
