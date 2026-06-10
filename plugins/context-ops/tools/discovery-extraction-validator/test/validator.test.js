@@ -73,6 +73,79 @@ describe('discovery-extraction-validator', () => {
     assert.ok(r.findings.some(f => f.kind === 'discovery.cross_links.empty'));
   });
 
+  // F13 (dogfood ep-be-gea): canonical-global accumulation 의 다중 BC 가 단일 scope coverage 를 희석하지 않음.
+  describe('scope-aware UC coverage (F13 / DEC-2026-06-10-discovery-validator-scope-aware)', () => {
+    const multiBcAnalysis = {
+      domain: {
+        bounded_contexts: [
+          {
+            id: 'BC-EVENT',
+            use_cases: [{ id: 'UC-EVENT-001' }, { id: 'UC-EVENT-002' }, { id: 'UC-EVENT-003' }],
+            entities: [{ id: 'E-EVENT-A' }, { id: 'E-EVENT-B' }, { id: 'E-EVENT-C' }]
+          },
+          {
+            id: 'BC-RESV-GOLF',
+            use_cases: [{ id: 'UC-RESVGOLF-001' }, { id: 'UC-RESVGOLF-002' }],
+            entities: [{ id: 'E-RESVGOLF-A' }]
+          }
+        ]
+      }
+    };
+
+    it('single-scope discovery on multi-BC global is NOT diluted by other BCs', () => {
+      const discovery = {
+        use_cases: [
+          { id: 'UC-RESVGOLF-001', source_grounded_evidence: ['x.java:1'] },
+          { id: 'UC-RESVGOLF-002', source_grounded_evidence: ['x.java:2'] }
+        ],
+        cross_links: { to_analysis_artifacts: ['domain.json'] }
+      };
+      const r = validateDiscoveryExtraction(discovery, multiBcAnalysis);
+      // golf 2/2 = 100% (전역 2/5=40% 희석 ❌)
+      assert.equal(r.coverage.use_case, 1.0);
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.uc_coverage.below_threshold'));
+    });
+
+    it('still flags genuinely incomplete coverage within the in-scope BC', () => {
+      const discovery = {
+        use_cases: [{ id: 'UC-EVENT-001', source_grounded_evidence: ['x.java:1'] }], // BC-EVENT 1/3
+        cross_links: { to_analysis_artifacts: ['domain.json'] }
+      };
+      const r = validateDiscoveryExtraction(discovery, multiBcAnalysis);
+      const f = r.findings.find(x => x.kind === 'discovery.uc_coverage.below_threshold');
+      assert.ok(f, '1/3 < 0.8 → flag');
+      assert.equal(f.scope_filtered, true);
+      assert.deepEqual(f.scoped_bounded_contexts, ['BC-EVENT']);
+    });
+
+    it('single-BC global keeps backward-compat (no scope filtering)', () => {
+      const singleBc = {
+        domain: { bounded_contexts: [{ id: 'BC-X', use_cases: [{ id: 'UC-X-001' }, { id: 'UC-X-002' }] }] }
+      };
+      const discovery = {
+        use_cases: [{ id: 'UC-X-001', source_grounded_evidence: ['x.java:1'] }], // 1/2 = 0.5 < 0.8
+        cross_links: { to_analysis_artifacts: ['domain.json'] }
+      };
+      const r = validateDiscoveryExtraction(discovery, singleBc);
+      const f = r.findings.find(x => x.kind === 'discovery.uc_coverage.below_threshold');
+      assert.ok(f);
+      assert.equal(f.scope_filtered, false); // 단일 BC → 미필터
+    });
+
+    it('entity count is scope-limited to in-scope BC (UC/entity ratio not diluted)', () => {
+      const discovery = {
+        use_cases: [
+          { id: 'UC-RESVGOLF-001', source_grounded_evidence: ['x.java:1'] },
+          { id: 'UC-RESVGOLF-002', source_grounded_evidence: ['x.java:2'] }
+        ],
+        cross_links: { to_analysis_artifacts: ['domain.json'] }
+      };
+      const r = validateDiscoveryExtraction(discovery, multiBcAnalysis);
+      // golf 2 UC / golf 1 entity = 2.0 ≥ 1.5 → under_decomposition 없음 (전역 2/4=0.5 희석 ❌)
+      assert.ok(!r.findings.some(f => f.kind === 'discovery.uc.under_decomposition'));
+    });
+  });
+
   // v11.5.1: multi-path BR lookup (LL-validator-dual-key-02 / additive backward-compat)
   describe('multi-path BR lookup (v11.5.1)', () => {
     it('matches BR from analysis.business_rules top-level array (poc-17 normalize)', () => {

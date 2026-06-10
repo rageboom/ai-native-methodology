@@ -10,6 +10,16 @@
 
 ---
 
+## [0.30.0] — 2026-06-10 MINOR — discovery-extraction-validator scope(BC)-aware coverage (F13)
+
+`discovery-extraction-validator` 의 UC-coverage·UC/entity 분모를 **scope(BC)-aware** 로 정정. canonical-global accumulation(DEC-2026-06-07-subset-retire)에서 `output/domain.json` 이 여러 BC 누적 시, 단일 scope discovery 가 타 BC 의 UC/entity 로 분모가 부풀려져 coverage 가 구조적으로 희석되던 결함(ep-be-gea dogfooding **F13**) 수정.
+
+- **수정**: discovery UC 의 scope-token(`UC-<TOKEN>-NNN`)을 가진 BC 만 in-scope 분모로 한정. UC·entity 동일 분모 정합. finding 에 `scope_filtered`·`scoped_bounded_contexts` additive.
+- **backward-compat fallback**: 단일 BC / token 무매치 / 전 BC 매치 / top-level use_cases → 전체 분모 유지(기존 동작 보존). schema·gate·trust 무변경.
+- **실증**: golf discovery 가 BC-RESV-GOLF 5 UC 전부 커버(5/5)인데 전역 16 분모로 31.3% 오탐 → 수정 후 100%. event 재검증 100% 유지(regression-safe). 검증기 test 39→43(scope-aware 4종).
+- **§8.1**: scope-aware 분모 = paradigm-grounded(subset 모델 채택 + sync.js BC-subset 선례 정합화 / 2 BC 누적 즉시 일반 발현 = 1-PoC 특화 아님). 임계(0.80/1.5) 무변경 — 분모 정의만 정정.
+- 상세 = DEC-2026-06-10-discovery-validator-scope-aware.
+
 ## [0.29.0] — 2026-06-10 MINOR — scope candidate coarse-to-fine 재귀 carve (ADR-CHAIN-016 규칙 4)
 
 측정으로 도출한 scope candidate 도 **거칠 수 있다**(한 candidate members 가 복수 독립 응집 sub-unit 클러스터) → **coarse-to-fine 재귀 carve** 규칙을 본체 명문화. ep-be-gea dogfooding F12 트리거 (advisory / gate·trust·schema·code·test 무변경). DEC-2026-06-10-scope-candidate-recursive-carve.

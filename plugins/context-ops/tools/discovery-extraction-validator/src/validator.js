@@ -67,19 +67,41 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
     }
   }
 
-  // 3. UC coverage
+  // 3. UC coverage (scope-aware / F13 — DEC-2026-06-10-discovery-validator-scope-aware)
   // F1 fix (dogfood): domain.schema 는 use_cases 를 bounded_contexts[] 아래 중첩한다.
   //   이전엔 top-level analysis.domain.use_cases 만 읽어, schema-conformant domain.json 에서는 UC set 이 항상 비어
   //   coverage 체크가 silent skip(vacuous pass) 됐음. top-level(backward-compat) + 중첩 양쪽에서 수집.
+  // F13 fix (dogfood ep-be-gea): canonical-global accumulation 모델(DEC-2026-06-07-subset-retire)에서
+  //   output/domain.json 은 여러 BC 가 누적된다. 단일 scope discovery 를 전역 전체 BC 분모로 평가하면
+  //   타 BC 의 UC/entity 가 coverage·UC/entity 비율을 구조적으로 희석(event 누적 후 golf=31% 등). sync.js BC-subset
+  //   머신과 정합 — discovery UC 의 scope-token(UC-<TOKEN>-NNN)을 보유한 BC 만 in-scope 분모로 한정.
+  //   안전 fallback: 단일 BC / token 무매치 / 전 BC 매치(=실 단일scope) / top-level use_cases → 전체(기존 동작 보존).
+  const ucScopeToken = (id) => {
+    const m = /^UC-(.+)-\d+$/.exec(typeof id === 'string' ? id : '');
+    return m ? m[1] : null;
+  };
+  const allBCs = Array.isArray(analysis?.domain?.bounded_contexts) ? analysis.domain.bounded_contexts : [];
+  const discoveryTokens = new Set(useCases.map((u) => ucScopeToken(u?.id)).filter(Boolean));
+  let scopedBCs = allBCs;
+  let scopeFiltered = false;
+  if (allBCs.length > 1 && discoveryTokens.size > 0) {
+    const inScope = allBCs.filter(
+      (bc) => Array.isArray(bc?.use_cases) && bc.use_cases.some((u) => discoveryTokens.has(ucScopeToken(u?.id)))
+    );
+    if (inScope.length > 0 && inScope.length < allBCs.length) {
+      scopedBCs = inScope;
+      scopeFiltered = true;
+    }
+  }
+  const scopedBcIds = scopedBCs.map((bc) => bc?.id).filter(Boolean);
+
   let ucCoverageRatio = 1.0;
   let analysisUCs = new Set();
   const collectIds = (arr, set) => {
     if (Array.isArray(arr)) for (const x of arr) if (x && x.id) set.add(x.id);
   };
   collectIds(analysis?.domain?.use_cases, analysisUCs);
-  if (Array.isArray(analysis?.domain?.bounded_contexts)) {
-    for (const bc of analysis.domain.bounded_contexts) collectIds(bc?.use_cases, analysisUCs);
-  }
+  for (const bc of scopedBCs) collectIds(bc?.use_cases, analysisUCs);
   if (analysisUCs.size > 0) {
     const discoveryUCIds = new Set(useCases.map(u => u.id));
     let coveredCount = 0;
@@ -93,7 +115,9 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
         severity: 'high',
         coverage: ucCoverageRatio,
         threshold: 0.80,
-        message: `UC coverage ${ucCoverageRatio.toFixed(2)} < 0.80 (analysis ${analysisUCs.size} UCs / discovery covers ${[...analysisUCs].filter(id => discoveryUCIds.has(id)).length})`
+        scope_filtered: scopeFiltered,
+        scoped_bounded_contexts: scopedBcIds,
+        message: `UC coverage ${ucCoverageRatio.toFixed(2)} < 0.80 (analysis ${analysisUCs.size} UCs / discovery covers ${[...analysisUCs].filter(id => discoveryUCIds.has(id)).length})${scopeFiltered ? ` [scope-filtered → BC: ${scopedBcIds.join(', ')}]` : ''}`
       });
     }
   }
@@ -110,11 +134,10 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
     });
   }
   // F1 fix (dogfood): entities 도 bounded_contexts[] 아래 중첩 → top-level + 중첩 합산.
+  // F13 fix: coverage 분모와 동일하게 in-scope BC entity 만 합산 (희석 회피 / scopedBCs 재사용).
   let domainEntities = Array.isArray(analysis?.domain?.entities) ? analysis.domain.entities.length : 0;
-  if (Array.isArray(analysis?.domain?.bounded_contexts)) {
-    for (const bc of analysis.domain.bounded_contexts) {
-      if (Array.isArray(bc?.entities)) domainEntities += bc.entities.length;
-    }
+  for (const bc of scopedBCs) {
+    if (Array.isArray(bc?.entities)) domainEntities += bc.entities.length;
   }
   if (domainEntities > 0 && useCases.length > 0 && (useCases.length / domainEntities) < 1.5) {
     findings.push({
