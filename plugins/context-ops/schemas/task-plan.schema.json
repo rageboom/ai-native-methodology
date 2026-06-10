@@ -214,15 +214,21 @@
     },
     "epic_refs": {
       "type": "array",
-      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4). plan stage 안 본격 생성되는 Jira Epic 매핑 array. Epic = FE 화면 단위 (UI screen / route).",
+      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4). plan stage 안 Jira Epic 매핑 array. Epic = FE 화면 단위 (UI screen / route). v12 델타 생성 (DEC-2026-06-10-ticket-delta-creation): jira_id 사전 보유 시 = 기존 Epic (생성 skip / 부모로만) / 미보유 시 = 신규 생성.",
       "items": {
         "type": "object",
-        "required": ["jira_id"],
+        "required": [],
         "additionalProperties": false,
+        "$comment": "델타 생성 — required 비움 (jira_id 미보유 = 신규 생성 케이스 허용 / DEC-2026-06-10). 신규 생성 시 title 권장.",
         "properties": {
           "jira_id": {
             "type": "string",
-            "description": "외부 Jira Epic ID (예: PROJ-10)"
+            "description": "외부 Jira Epic ID (예: PROJ-10). **있으면 = 기존 티켓 (생성 skip / 부모로만 사용) / 없으면 = 신규 생성 후 ticket-sync 가 채움** (DEC-2026-06-10-ticket-delta-creation)."
+          },
+          "pre_existing": {
+            "type": "boolean",
+            "default": false,
+            "description": "true = discovery/입력에서 전달받은 기존 Epic (생성 skip 의무). jira_id 사전 보유 시 true 권장 (델타 생성 정직 마커)."
           },
           "screen_id": {
             "type": "string",
@@ -241,15 +247,21 @@
     },
     "story_refs": {
       "type": "array",
-      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4 + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6). plan stage 안 본격 생성되는 Jira Story 매핑 array. Story = cross-cut anchor (BE+FE/DB/E2E 가로지름).",
+      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4 + DEC-2026-05-26-be-fe-산출물-분리 §결단 #6). plan stage 안 Jira Story 매핑 array. Story = cross-cut anchor (BE+FE/DB/E2E 가로지름). v12 델타 생성 (DEC-2026-06-10): jira_id 사전 보유 시 = 기존 Story (생성 skip / 부모로만) / 미보유 시 = 신규 생성.",
       "items": {
         "type": "object",
-        "required": ["jira_id", "behavior_ref"],
+        "required": ["behavior_ref"],
         "additionalProperties": false,
+        "$comment": "델타 생성 — jira_id 를 required 에서 제외 (미보유 = 신규 생성 / DEC-2026-06-10). behavior_ref 는 anchor 로 항상 의무.",
         "properties": {
           "jira_id": {
             "type": "string",
-            "description": "외부 Jira Story ID (예: PROJ-101)"
+            "description": "외부 Jira Story ID (예: PROJ-101). **있으면 = 기존 티켓 (생성 skip / 부모로만 사용) / 없으면 = 신규 생성 후 ticket-sync 가 채움** (DEC-2026-06-10-ticket-delta-creation)."
+          },
+          "pre_existing": {
+            "type": "boolean",
+            "default": false,
+            "description": "true = discovery/입력에서 전달받은 기존 Story (생성 skip 의무). jira_id 사전 보유 시 true 권장."
           },
           "behavior_ref": {
             "type": "string",
@@ -274,15 +286,21 @@
     },
     "op_task_refs": {
       "type": "array",
-      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4 + §결단 #7). plan stage 안 본격 생성되는 Jira Task (Story sibling) 매핑 array. OP-* = 운영/인프라/마이그레이션 작업.",
+      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §4 + §결단 #7). plan stage 안 Jira Task (Story sibling) 매핑 array. OP-* = 사용자 가시 없는 운영/인프라/마이그레이션/리팩터링 작업 (layer 무관). v12 델타 생성 (DEC-2026-06-10): jira_id 사전 보유 시 = 기존 Task (생성 skip) / 미보유 시 = 신규 생성.",
       "items": {
         "type": "object",
-        "required": ["jira_id", "op_task_id"],
+        "required": ["op_task_id"],
         "additionalProperties": false,
+        "$comment": "델타 생성 — jira_id 를 required 에서 제외 (미보유 = 신규 생성 / DEC-2026-06-10). op_task_id 는 anchor 로 항상 의무.",
         "properties": {
           "jira_id": {
             "type": "string",
-            "description": "외부 Jira Task ID (Story sibling / 예: PROJ-42)"
+            "description": "외부 Jira Task ID (Story sibling / 예: PROJ-42). **있으면 = 기존 티켓 (생성 skip) / 없으면 = 신규 생성 후 ticket-sync 가 채움** (DEC-2026-06-10-ticket-delta-creation)."
+          },
+          "pre_existing": {
+            "type": "boolean",
+            "default": false,
+            "description": "true = 입력에서 전달받은 기존 Task (생성 skip 의무). jira_id 사전 보유 시 true 권장."
           },
           "op_task_id": {
             "type": "string",

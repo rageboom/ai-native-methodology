@@ -109,6 +109,20 @@
             "type": "boolean",
             "default": false,
             "description": "명시적 N/A 마커 (operation.md 결정 3). UC 가 코드 anchor 를 직접 가리키지 않는 경우 true (보통 analysis/aspect 에 사용)."
+          },
+          "existing_ticket_refs": {
+            "type": "array",
+            "description": "v12 델타 생성 (DEC-2026-06-10-ticket-delta-creation). discovery 입력(swagger/figma/nl-md)에서 본 UC 가 **이미 존재하는 Jira Epic/Story 에 매핑**됨을 전달받은 경우 기록. plan-decompose 가 task-plan epic_refs/story_refs 의 jira_id(+pre_existing=true)로 전파 → ticket-sync 가 생성 skip + 부모로만 사용 (델타만 생성). 미보유 시 신규 생성 경로.",
+            "items": {
+              "type": "object",
+              "required": ["jira_id", "level"],
+              "additionalProperties": false,
+              "properties": {
+                "jira_id": {"type": "string", "description": "기존 Jira 티켓 키 (예: MIS-201)"},
+                "level": {"type": "string", "enum": ["epic", "story"], "description": "기존 티켓의 level (Epic = 화면 / Story = 기능)"},
+                "title": {"type": "string", "description": "참조 title (선택 / 사람 확인용)"}
+              }
+            }
           }
         }
       },

@@ -179,6 +179,8 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 
 ### 단계 2 — Idempotency check (search-first)
 
+> **델타 생성 우선 (DEC-2026-06-10)**: ref 에 `jira_id` 가 이미 있거나 `pre_existing=true` 면 = 기존 티켓 확정 → **search 생략 + 생성 skip** (본 §단계 2 는 jira_id 미보유 ref 에만 적용). `prebound_reused_count` 로 기록.
+
 `{_mcp_prefix}jira_search` (§단계 1 resolve 결과) JQL 로 기존 ticket lookup.
 
 **1차 — 커스텀 필드 JQL** (해당 Jira 환경에 아래 커스텀 필드가 구성된 경우만):
@@ -303,56 +305,57 @@ plan enter:
 
 enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
 
-#### phase=exit — 4-level cascade 일괄 생성
+#### phase=exit — 4-level cascade (델타 생성 / DEC-2026-06-10-ticket-delta-creation)
+
+**델타 생성 원칙** — ref(epic_refs/story_refs/op_task_refs)에 **`jira_id` 가 이미 있으면 (또는 `pre_existing=true`) = 기존 티켓 → 생성 skip, 부모로만 사용**. 없으면 신규 생성. 즉 **없는 티켓(델타)만 딴다**. discovery 가 `existing_ticket_refs` 로 전달한 Epic/Story 가 plan-decompose 를 거쳐 jira_id 로 들어옴.
+
+**기존/신규 판정 우선순위** (per ref): ① `jira_id` 사전 보유 → 기존 (skip / 부모로만, search 생략) → ② §단계 2 search-first idempotency 발견 → 기존 → ③ 둘 다 부재 → 신규 생성.
 
 ```
 Step 1 — Initiative (선택 / parent_epic 미명시 시):
   if !parent_epic:
-    jira_create (role=initiative,
-                 summary="[Migration] {scope} initiative",
-                 status=To Do)
+    jira_create (role=initiative, summary="[Migration] {scope} initiative", status=To Do)
     → initiative_id 저장
   else:
     initiative_id = parent_epic (재사용)
 
-Step 2 — Epic (per FE 화면 또는 BE-domain 묶음):
-  for each epic in task-plan.epics[]:
-    # 네이밍: 메뉴명 그대로 (브래킷 없이) — §이슈 유형 네이밍 규칙 Epic 규칙
+Step 2 — Epic (per FE 화면 또는 BE-domain 묶음 / 델타):
+  for each epic in task-plan.epic_refs[]:
+    if epic.jira_id set OR epic.pre_existing:           # 기존 Epic
+      epic_id_map[epic.screen_id||epic.jira_id] = epic.jira_id   # 생성 skip, 부모로만
+      reused_count++; continue
+    # 신규 — 네이밍: 메뉴명 그대로 (브래킷 없이) — §이슈 유형 네이밍 규칙 Epic 규칙
     summary = epic.title  # 예: "내근무현황", "휴가신청"
     body = §"이슈 유형 네이밍 규칙 & 설명 템플릿" > Epic 템플릿 채움 (epic.description + epic.route|discovery-spec 경로)
-    jira_create (role=epic,
-                 summary=summary,
-                 parent_ticket_id=initiative_id, link_type=parent-child,
-                 labels=[epic.type], body=body)
-    → epic_id[epic.epic_id] 저장 (epic_id map)
-    jira_link (epic, parent=initiative_id)
+    jira_create (role=epic, summary=summary, parent_ticket_id=initiative_id, link_type=parent-child, labels=[epic.type], body=body)
+    → epic_id_map[epic.screen_id||새 키] = 신규 키 (+ epic.jira_id 채움)
 
-Step 3 — Story (per BHV cluster / cross-cut anchor):
-  for each story in task-plan.stories[]:
-    # 네이밍: 명사형 기능명 (브래킷 없이) — §이슈 유형 네이밍 규칙 Story 규칙
+Step 3 — Story (per BHV cluster / cross-cut anchor / 델타):
+  for each story in task-plan.story_refs[]:
+    if story.jira_id set OR story.pre_existing:         # 기존 Story
+      story_id_map[story.behavior_ref||story.jira_id] = story.jira_id   # 생성 skip, 부모로만
+      reused_count++; continue
+    # 신규 — 네이밍: 명사형 기능명 (브래킷 없이) — §이슈 유형 네이밍 규칙 Story 규칙
     summary = story.title  # 예: "연차 잔여일수 조회", "근무시간 엑셀 다운로드"
     body = §"이슈 유형 네이밍 규칙 & 설명 템플릿" > Story 템플릿 채움 (story.user_role/user_action/because + BHV-* 상세 + AC-* 완료조건)
-    jira_create (role=story,
-                 summary=summary,
-                 parent=epic_id[story.epic_ref] via parent_strategy,
-                 body=body)
-    → story_id[story.story_id] 저장
+    # 부모 Epic = epic_ref 가 (a) 이번에 만든 키 또는 (b) 기존 키 — 둘 다 epic_id_map 로 resolve
+    jira_create (role=story, summary=summary, parent=epic_id_map[story.epic_ref] via parent_strategy, body=body)
+    → story_id_map[story.behavior_ref||새 키] = 신규 키 (+ story.jira_id 채움)
 
-Step 4 — Task (per OP-* / Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관):
+Step 4 — Task (per OP-* / Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관 / 델타):
   for each op_task in operational-task.json[] (if exists):
-    # 네이밍: [OP-id] 무엇을 어떻게 한다 — §이슈 유형 네이밍 규칙 Task 규칙
+    # op_task_refs[] 안 jira_id 사전 보유 시 = 기존 Task → 생성 skip, op_task_id_map 에 기존 키
+    if op_task_ref.jira_id set OR op_task_ref.pre_existing:
+      op_task_id_map[op_task.op_id] = op_task_ref.jira_id; reused_count++; continue
+    # 신규 — 네이밍: [OP-id] 무엇을 어떻게 한다 — §이슈 유형 네이밍 규칙 Task 규칙
     summary = "[OP-{op_task.op_id}] {op_task.title}"
     body = §"이슈 유형 네이밍 규칙 & 설명 템플릿" > Task(OP-*) 템플릿 채움 (op_task.description + 완료조건 op_task.acceptance_criteria)
-    jira_create (role=task,
-                 summary=summary,
-                 parent=epic_id[op_task.epic_ref] via parent_strategy,
-                 labels=[op-* + op_task.op_type], status=To Do,
-                 body=body)
-    → op_task_id[op_task.op_id] 저장
+    jira_create (role=task, summary=summary, parent=epic_id_map[op_task.epic_ref] via parent_strategy, labels=[op-* + op_task.op_type], status=To Do, body=body)
+    → op_task_id_map[op_task.op_id] = 신규 키
 
 Step 5 — Sub-task (per TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra):
   for each task in task-plan.tasks[]:
-    parent_ref = task.story_ref ? story_id[task.story_ref] : op_task_id[task.op_task_ref]
+    parent_ref = task.story_ref ? story_id_map[task.story_ref] : op_task_id_map[task.op_task_ref]   # 기존/신규 무관 — map 이 resolve
     # 네이밍: [TASK-id] layer 작업 내용 — §이슈 유형 네이밍 규칙 Sub-task 규칙
     summary = "[TASK-{task.task_id}] {task.title}"
     body = §"이슈 유형 네이밍 규칙 & 설명 템플릿" > Sub-task 템플릿 채움 (task.ac_refs + task.layer + openapi_endpoint_ref|component_ref)
@@ -362,7 +365,8 @@ Step 5 — Sub-task (per TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infr
                  labels=[layer-* + task.layer], status=To Do,
                  body=body)
     B14 — Sub-task payload 안 extra_fields[epic_link_customfield_id] 명시 ❌
-    → subtask_id[task.task_id] 저장
+    → subtask_id_map[task.task_id] = 신규 키
+    # (Sub-task 는 통상 신규 / task.jira_id 사전 보유 시 동일 델타 규칙 적용 — skip + 기존 키)
 
 Step 6 — traceability-matrix.ticket_ref 갱신:
   matrix.ticket_ref = {
@@ -470,6 +474,7 @@ for each Story:
 - **parallel MCP 호출 ❌** — sequential only (결정론 axis 보호)
 - **state.blocked 시 MCP 호출 ❌** — `hooks/hooks.json` PreToolUse matcher 가 `mcp__wiki-jira-assistant__.*` deny
 - **R16/R17 부활 ❌** — 본 skill = R20-prime 채널 (drift attractor 회피)
+- **pre-bound 티켓 재생성 ❌ (델타 생성 / DEC-2026-06-10)** — ref 의 `jira_id` 가 set 이거나 `pre_existing=true` 면 절대 `jira_create` 호출 ❌ (기존 Epic/Story/Task = 부모로만 사용). 위반(기존 키 있는데 신규 생성) 시 `F-TICKETSYNC-014 prebound_ticket_recreated` finding emit + reject. discovery `existing_ticket_refs` → task-plan jira_id 로 전달된 티켓 보호.
 - **orphan ticket ❌ (environment-aware)** — role ∈ {`subtask`, `story`, `task`, `tech_debt`, `bug`} 생성 시 parent linking 의무 — `parent_strategy=parent_key` 시 `parent_ticket_id` / `parent_strategy=epic_link_customfield` (또는 auto + epic_link set) 시 `extra_fields[epic_link_customfield_id]` 중 1개 채움. Initiative / Epic top-level 만 omit 가능. 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit.
 - **link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (Tech Debt / Spike / 도메인 횡단 BR) 만 허용.
 - **mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error. 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.

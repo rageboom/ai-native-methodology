@@ -39,12 +39,19 @@ task 안 ac_refs.length 1~3 imperative:
 
 | Jira                     | 본 방법론 entity                                             | 정의                                            | 본 skill 책임                                     |
 | ------------------------ | ------------------------------------------------------------ | ----------------------------------------------- | ------------------------------------------------- |
-| **Epic**                 | task-plan.epic_refs[]                                        | FE 화면 단위 (UI screen / route)                | screen_id / route 추출 + jira_id placeholder      |
-| **Story**                | task-plan.story_refs[]                                       | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id placeholder |
-| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | OP-\* (사용자 가시 없는 운영/인프라/마이그레이션 / layer 무관) | OP-\* 검출 + jira_id placeholder                  |
+| **Epic**                 | task-plan.epic_refs[]                                        | FE 화면 단위 (UI screen / route)                | screen_id / route 추출 + jira_id (델타 규칙 ↓)    |
+| **Story**                | task-plan.story_refs[]                                       | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id (델타 규칙 ↓) |
+| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | OP-\* (사용자 가시 없는 운영/인프라/마이그레이션 / layer 무관) | OP-\* 검출 + jira_id (델타 규칙 ↓)                |
 | **Sub-task**             | task-plan.tasks[]                                            | TASK-\* (1~3 AC 묶음 / layer 분기)              | 본 skill 의 주 산출                               |
 
-본 skill = Sub-task (TASK-\*) 책임 + Epic/Story 식별 (jira_id 부여 ❌ — ticket-sync skill 책임).
+본 skill = Sub-task (TASK-\*) 책임 + Epic/Story 식별. ticket 생성/매핑은 ticket-sync skill 책임.
+
+### jira_id 델타 규칙 (DEC-2026-06-10-ticket-delta-creation)
+
+`epic_refs/story_refs/op_task_refs` 의 `jira_id` 는 **기존 Jira 티켓 키이면 기입**, 아니면 **빈 값 (ticket-sync 가 신규 생성 후 채움)**.
+
+- **discovery 가 기존 티켓 전달 시** — `discovery-spec.json` use_cases[].`existing_ticket_refs` (level=epic/story + jira_id) 를 본 ref 의 `jira_id` 로 **전파 + `pre_existing=true` set**. → ticket-sync 가 생성 skip, 부모로만 사용 (**없는 티켓만 딴다**).
+- **신규 시** — jira_id 미기입 (placeholder ❌ / 빈 채로). ticket-sync 가 cascade 에서 생성.
 
 OP-\* = 운영 작업 anchor (예: argon2 라이브러리 도입 / column migration / cron job) — 본 skill 안 별도 검출 (AC 부재 + 사용자 가시 없음 — analysis 산출물 안 migration-cautions / static-security-spec 검출).
 

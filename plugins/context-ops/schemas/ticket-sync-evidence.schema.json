@@ -226,9 +226,10 @@
       "additionalProperties": false,
       "properties": {
         "enabled": {"type": "boolean", "default": true},
-        "skip_count": {"type": "integer", "minimum": 0, "description": "본 cascade 안 기존 ticket lookup → skip 한 횟수"},
+        "skip_count": {"type": "integer", "minimum": 0, "description": "본 cascade 안 기존 ticket lookup(search-first) → skip 한 횟수"},
         "search_jql_used": {"type": "array", "items": {"type": "string"}, "description": "사용된 JQL queries (debugging 용)"},
-        "search_path": {"type": "string", "enum": ["custom_field", "fallback_summary"], "description": "SKILL.md §단계 2 정합 — idempotency 검색이 1차 커스텀 필드(custom_field)로 됐는지, 커스텀 필드 부재로 2차 표준 summary/label fallback(fallback_summary)으로 됐는지 기록. 커스텀 필드 부재 환경에서 1차가 조용히 0건 → 중복 생성되는 무력화를 추적."}
+        "search_path": {"type": "string", "enum": ["custom_field", "fallback_summary"], "description": "SKILL.md §단계 2 정합 — idempotency 검색이 1차 커스텀 필드(custom_field)로 됐는지, 커스텀 필드 부재로 2차 표준 summary/label fallback(fallback_summary)으로 됐는지 기록. 커스텀 필드 부재 환경에서 1차가 조용히 0건 → 중복 생성되는 무력화를 추적."},
+        "prebound_reused_count": {"type": "integer", "minimum": 0, "description": "v12 델타 생성 (DEC-2026-06-10-ticket-delta-creation) — ref 의 jira_id 사전 보유(또는 pre_existing=true)로 **search 없이** 생성 skip + 부모로만 사용한 횟수 (search-first skip_count 와 별 축 / 델타 생성 정직 기록)."}
       }
     },
     "graceful_mcp_missing": {

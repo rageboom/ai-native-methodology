@@ -79,6 +79,73 @@ test('chain — discovery-spec.json 정합 instance → valid (v11.0.0 — plann
 	}
 });
 
+test('델타 생성 (DEC-2026-06-10) — task-plan epic_refs jira_id 없음(신규) + story_refs pre_existing(기존) → valid', () => {
+	const dir = tmp();
+	try {
+		// task-plan = top-level additionalProperties:false → $schema_origin 금지 (파일명으로 schema 매칭)
+		const inst = {
+			meta: { ...FULL_META },
+			derivation_source: {
+				behavior_spec_path: './behavior-spec.json',
+				acceptance_criteria_path: './acceptance-criteria.json',
+			},
+			tasks: [
+				{
+					id: 'TASK-USER-001',
+					ac_refs: ['AC-USER-001'],
+					behavior_ref: 'BHV-USER-001',
+					execution_order: 1,
+				},
+			],
+			// epic_ref: jira_id 없음 → 신규 생성 케이스 (D2 required 완화 검증)
+			epic_refs: [{ screen_id: 'SCR-USER', title: '로그인 화면' }],
+			// story_ref: 기존 티켓 (discovery 전달) → 생성 skip
+			story_refs: [
+				{ behavior_ref: 'BHV-USER-001', jira_id: 'MIS-201', pre_existing: true },
+			],
+		};
+		writeFileSync(join(dir, 'task-plan.json'), JSON.stringify(inst));
+		const r = runCli(join(dir, 'task-plan.json'));
+		const result = r.parsed.results[0];
+		assert.notEqual(result.schema_status, 'not-found', `task-plan schema 미발견: ${JSON.stringify(result)}`);
+		assert.equal(result.valid, true, `델타 refs valid 의무. errors: ${JSON.stringify(result.errors)}`);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test('델타 생성 (DEC-2026-06-10) — discovery-spec use_cases existing_ticket_refs → valid', () => {
+	const dir = tmp();
+	try {
+		const inst = {
+			$schema_origin: '../../schemas/discovery-spec.schema.json',
+			meta: { ...FULL_META },
+			derivation_source: {
+				type: 'legacy-extraction',
+				source_artifacts: ['./business-rules.json'],
+			},
+			business_intent: { domain_purpose: '사용자 인증' },
+			use_cases: [
+				{
+					id: 'UC-USER-001',
+					description: '사용자 로그인',
+					acceptance_criteria_refs: ['AC-USER-001'],
+					existing_ticket_refs: [
+						{ jira_id: 'MIS-201', level: 'story', title: '연차 잔여일수 조회' },
+					],
+				},
+			],
+		};
+		writeFileSync(join(dir, 'discovery-spec.json'), JSON.stringify(inst));
+		const r = runCli(join(dir, 'discovery-spec.json'));
+		const result = r.parsed.results[0];
+		assert.notEqual(result.schema_status, 'not-found');
+		assert.equal(result.valid, true, `existing_ticket_refs valid 의무. errors: ${JSON.stringify(result.errors)}`);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
 test('chain — 6 schema 모두 로드 (no parse error / v11.0.0 — planning-spec → discovery-spec)', () => {
 	// 빈 instance 라도 schema 로드 자체는 성공해야 함.
 	const dir = tmp();
