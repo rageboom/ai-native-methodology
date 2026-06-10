@@ -77,5 +77,19 @@ ep-be-gea 4-산출물(poc-06 동일 방식 / analyst 판정): inventory ~60 · d
 
 ## 7. carry
 
-- ep-be-gea operability 측정 = Path B(reservation-golf test gate#4 god-method / impl real DB) 와 합류 = 진짜 "사내 Modern 재측정"의 본체.
+- ~~ep-be-gea operability 측정 = Path B~~ → ✅ **1차 시행 완료 (§8 시행 로그)**.
 - §3-A metric 의 analyst-noise(2-C) 자체를 finding 으로 둘지(측정 프로토콜 폐기 vs 정성화) = 본 강등에 흡수.
+
+## 8. 시행 로그 — Path B 1차 operability 측정 (2026-06-10 / 재정의 검증)
+
+§3-A 강등 후 재정의된 **"사내 Modern 재측정 = chain-harness operability"의 첫 실측**. 사내 ep-be-gea reservation-golf scope(Spring Boot 3 / S2 AX전환 / 외부격리·commit❌ / 마스킹) test stage 를 실제 구동.
+
+**측정 결과(실 JUnit / no-simulation)**: characterization AC **3 → 6** (001 적격성 / 002 과거시각 / 003 120분상한 / 004 2주 / 008 요금-마스터참조 / 010 취소) — backward link **23.1% → 46.2%**. 실 JUnit **8 test 0 fail**(JDK17+Gradle8.14.4 / result_hash 2ea705ff / XML 물증). 본체 release-readiness 무관(외부 dogfood / 본체 코드 무변경).
+
+**operability 가 auto_ratio 보다 풍부한 신호임을 입증 (재정의 정당화)**:
+- **정적 결합 friction**: F19(예외 메시지 포맷이 static ApplicationContextProvider→bean 결합)·**F20 신규**(예약 검증이 LoginUserInfo→Spring Security SecurityContextHolder 결합) = unit test 에 context/principal 주입 필수. → "산출물로 LLM 이 이 코드를 특성화·운영하려면 정적 결합을 먼저 풀어야 한다"는 실제 운영 신호.
+- **순차 god-method operability 천장**: 검증이 ~108줄 god-method 의 위임 helper 안 **순차 guard 시퀀스** → 후행 guard(최종 중복체크 / full 요금계산 / 불가시간)는 **선행 BR 전부 충족해야 도달** → 격리 특성화 불가. (AC-005 시도가 fee 블록 charge.invalidReference 로 조기 발화하며 천장 실증 → AC-008 로 retarget.)
+- **모듈 경계**: 012(admin CUD)=별도 클래스 BoGolfRestService / 013(급여공제 집계)=별도 모듈.
+- gate#4 46.2%<85% = **결함 아니라 god-method operability 천장 측정 결과**. impl(gate#5)=real DB integration carry.
+
+**결론**: auto_ratio(입력측 숫자 / 노이즈)와 달리 operability 는 **"어디까지 되고 어디서 깨지나"**(정적 결합·순차 guard 천장·모듈 경계)를 드러냄 = §3-A→operability 재정의가 옳았음을 1 도메인 실측으로 검증. **§8.1**: 단일 god-method / 사내 1 scope = corroboration 데이터점(operability 천장 일반 임계 미주장 / ≥2 사내 도메인 후). 산출물 = `examples/` 밖 ep-be-gea `.ai-context/reservation-golf/test/` (test-spec 6 TC + manifest + 실 JUnit XML / commit❌). 마스킹 = 수치·finding type·결합 패턴만(business rule 전사·사내식별자 ❌).

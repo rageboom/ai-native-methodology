@@ -23,8 +23,9 @@
   - Path A(§3-A auto_ratio 측정)→측정방법 결함(필드명 휴리스틱·축불일치)으로 격상 5파일 **1차 REVERTED**→사용자 "이 측정 무슨 의미·인사이트?" 환기→**(나) 채택**(§3-A 강등 + 재측정 의무 재정의).
   - **확증**: ⓐ 측정 비대칭(Legacy 4-산출물 / Modern inventory-only / 구조 확정) ⓑ analyst noise(rules 29↔50% / 데이터 확정) ⓒ ep-be-gea 4-artifact ≈37.5%≈Legacy → **paradigm ceiling gap 근거 약함**.
   - **반영(본체 정정 / docs / 버전 bump 없음)**: CLAUDE.md §3-A 문단·표(정량→정성 강등+재정의) + sub-rule §X(배너·X-E·X-F·carry144) + 신규 DEC + INDEX. §3-A = 보조 정성 신호 / chain-harness axis = 사내 Modern 측정 1차.
-  - **재측정 의무 재정의**: auto_ratio ❌ → **chain-harness operability**(산출물로 LLM 이 실제 작업하나) = **Path B 와 합류**(ep-be-gea reservation-golf god-method 천장 gate#4 = 신호 실례).
-- **D1 잔여 = operability 측정(Path B)**: reservation-golf test gate#4 god-method 천장(23.1%) 돌파 시도 or impl real DB · event scope · ≥2 사내 distinct Modern 도메인.
+  - **재측정 의무 재정의**: auto_ratio ❌ → **chain-harness operability**(산출물로 LLM 이 실제 작업하나).
+- **Path B 1차 operability 측정 = 시행 완료** (DEC §8 / 2026-06-10): reservation-golf test 실구동 → characterization AC **3→6**(001/002/003/004/008/010 / backward 23.1%→**46.2%**) / 실 JUnit **8 test 0 fail**(result_hash 2ea705ff / no-simulation). **operability 천장 실측**: 정적결합 F19·**F20 신규**(LoginUserInfo SecurityContextHolder) + 순차 god-method(후행 guard=선행 BR 전부 충족 필요→격리 불가) + 모듈경계(012/013 별도). gate#4 46.2%<85%=**천장 측정 결과**(결함 아님). impl=real DB carry. **operability ≫ auto_ratio 입증 = 재정의 검증**. 본체 무변경(외부 dogfood / DEC 시행로그 append).
+- **D1 잔여(operability 후속)**: AC 005/006/007/009 god-method 천장 돌파 or 011 query + impl real DB integration · event scope · ≥2 사내 distinct Modern 도메인.
 
 **다음 세션 frontier (독립 축 / 사용자 결단 — 역공학 라인처럼 자명한 다음 단계 ❌)**:
 1. **사내 Modern S2 재측정 [D1]** — §3-A axis 강등·재정의 완료(위 ★★). 재측정 의무 = **chain-harness operability**(Path B: reservation-golf test/impl god-method 천장) · event scope · ≥2 사내 도메인. ep-be-gea = `/Users/sangcl/Documents/Development/Products/ep-be-gea`(외부격리·commit❌).
