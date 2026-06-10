@@ -57,9 +57,11 @@
 | 🥈2 | **build/run/env-config manifest + 산출물 secret-scan** | MISSING | 신규 analysis 산출물 schema + PostToolUse 스캐너 over `.ai-context/output/**`. D3 sensitivity 조율 | M | ✅ |
 | 🥉3 | **Recovered-ADR rationale + `rationale_status:unknown`** | MISSING | 신규 analysis 산출물. abstention 어휘 = `discovery-spec` intent_certainty + human_review_required **재사용**(신규 enum ❌) | M | ✅ |
 | 4 | **Hotspot prioritization** (churn × complexity) | MISSING | discovery reference-lens 출력(git log + complexity proxy). S0 carve 와 묶음 | S | (S0 흡수) |
-| 5 | **기존 테스트 = 증거 채널**(test-recovery) | MISSING | ~~산출물 23 `data_source_status` 에 `existing_test_file` enum~~ → **격상: R15 정책 결정 필요** (아래 §1차착수) | M | **DEC** |
-| 6 | ~~inquiry/hypothesis `finding_type` enum~~ | **범주 정정** | finding-system = 방법론 spec-gap 기록(dogfooding) ≠ 분석가 per-project inquiry log. **별개 산출물** (아래 §1차착수) | — | 결단 |
-| 7 | **decision-gated 3종** (intent round-trip / dynamic-trace / app-code fitness) | MISSING | trust·R19 정책 충돌 — 아래 §4 결단 6 | — | 결단 |
+| 5 | **기존 테스트 = 증거 채널**(test-recovery) | ✅ **official v0.35.0** | `data_source_status` `existing_test_file` enum + REAL_SOURCE_STATUSES 편입(R15 RUN 의무 가드) / DEC-2026-06-10-test-recovery-existing-test-evidence / Senior GO@0.88 | M | ✅ |
+| 6 | ~~inquiry/hypothesis `finding_type` enum~~ | ✅ **REFRAME/DROP** | finding-system=governance 확정(범주 오염) + 가설캡처 deliverable-attached 분산 커버 + AX-native redundant → 신규 deliverable·enum ❌ / DEC-2026-06-10-inquiry-log-reframe-dissolve(코드 0 / F14·F16 DISSOLVE 동형) | — | ✅(DROP) |
+| 7 | **decision-gated 3종** (intent round-trip / dynamic-trace / app-code fitness) | DEFER | trust·R19 정책 충돌 — 별도 정책 결단 (본 라인 외 / 미해소) | — | 결단(보류) |
+
+> **역공학 델타 라인 완전 종결 (2026-06-10)**: #1 scope-carve(official v0.27.0) · #2a run-manifest + #3 recovered-ADR(official v0.34.0) · #2b secret-scan(live check42) · #4 hotspot(scope-carve 흡수) · #5 test-recovery(official v0.35.0) · #6 inquiry-log(REFRAME/DROP) · #7 decision-gated(DEFER / 별도 정책). diagnose-before-design 이 #1·#4·#2b 기격상·#6 redundant 를 모두 실측으로 차단 — 액면수용 시 재발명/scope-creep 회피.
 
 ### 델타 상세 (착수 시 참조)
 
