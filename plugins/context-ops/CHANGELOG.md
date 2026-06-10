@@ -10,6 +10,17 @@
 
 ---
 
+## [0.33.0] — 2026-06-10 MINOR — ticket cascade-conformance 강제 (정책 11 trust→enforcement) — release 마감
+
+`ticket-cascade-builder`(v0.32.0) 추출 후 정책 7·8·9·12 가 "스킬이 cascade-plan 을 충실히 발사했을 때만" 보장(정책 11 의존) 판명 → **정책 11(스킬이 cascade-plan 충실 발사)을 결정론 강제**로 승격(trust→enforcement / SKILL 재서술 불요). ⟨코드는 선행 커밋 `74e6ec3b`+`f99a041f` 에 출하됐으나 버전·CHANGELOG·잔여 문서 미마감 → 본 entry 가 release 마감.⟩
+
+- **M1 post-hoc `ticket-cascade-builder verify`**(`src/verify.js` + cli): cascade-plan(의도) ↔ ticket-sync-evidence(실 발사) aggregate 대조 → 7(델타 skip)·8(orphan)·9(link_type)·12(B14)·coverage 검출 / gate exit 1.
+- **M2 pre-fire hooks-bridge `checkCascadeConformance`**: `jira_create` summary ∉ cascade-plan → PreToolUse **deny**(exempt `[Chain `·`[Plugin Verify]`). 동반 fix: `shouldBlockToolUse` 신 prefix 에서 `state.blocked` 미차단 버그.
+- **schema**: ticket-sync-evidence `mcp_invocations[].issue_type` optional 추가(verify 입력).
+- **SKILL**: 금지 12 bullet → **강제 메커니즘 포인터 표**(2·5·7·8·9·11·12=메커니즘 / 1·3·4·6·10=SKILL 잔존) + verify subcommand 문서(README).
+- **검증**: verify 8 test + hooks-bridge +6 test. provenance(본문 거버넌스 마커) → `## 인용` footer 일원화(선행 커밋 leak 수습).
+- 상세 = DEC-2026-06-10-cascade-conformance.
+
 ## [0.32.0] — 2026-06-10 MINOR — ticket-sync 결정론 핵심 → `ticket-cascade-builder` 도구 추출 (breaking 0 / 행위 보존)
 
 `ticket-sync` 스킬이 "도구=결정론 / skill=LLM 의미"(STRONG-STOP / `feedback_chain_driver_deterministic_axis`)를 위반하는 유일 outlier 였음 — resolve·payload·델타 판정·순서가 LLM 해석 pseudo-code 로 스킬에 존재(drift-prone)했던 것을 신규 결정론 builder 로 추출.

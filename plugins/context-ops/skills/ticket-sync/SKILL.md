@@ -223,7 +223,7 @@ for call in cascade-plan.calls (order asc):
 }
 ```
 
-> **conformance verify 의무 (DEC-2026-06-10-cascade-conformance)** — evidence 작성 후 gate-green 전에:
+> **conformance verify 의무** — evidence 작성 후 gate-green 전에:
 > ```bash
 > node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js verify \
 >   --plan .ai-context/output/cascade-plan.json --evidence <위 evidence.json>
@@ -240,7 +240,7 @@ for call in cascade-plan.calls (order asc):
 
 ## 금지 / 강제력
 
-대부분 정책은 **메커니즘이 강제** (SKILL 재서술 불요 / DEC-2026-06-10-cascade-conformance). 강제 위치:
+대부분 정책은 **메커니즘이 강제** (SKILL 재서술 불요 / 근거 ## 인용). 강제 위치:
 
 | 정책 | 강제 메커니즘 |
 | --- | --- |

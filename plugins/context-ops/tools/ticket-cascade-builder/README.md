@@ -24,6 +24,14 @@ node src/cli.js \
 
 exit 0 = 산출 성공 / 1 = 입력 부재·오류 (issue_type 미정의 = F-TICKETSYNC-007 throw).
 
+### verify subcommand (post-hoc conformance / DEC-2026-06-10-cascade-conformance)
+
+```bash
+node src/cli.js verify --plan cascade-plan.json --evidence ticket-sync-evidence.json
+```
+
+cascade-plan(의도) ↔ evidence(실 발사) aggregate 대조 — 정책 11(스킬이 계획 충실 발사) 강제 → 7(델타)·8(orphan)·9(link_type)·12(B14)·coverage 검출. exit 0 = 정합 / 1 = 위반(finding 출력). gate 에서 실행.
+
 ## 경계 (도구 밖 = skill 책임)
 
 cascade-plan 은 **happy-path 의도**. 실 MCP 발사 / confirmation gate / 7-field evidence 캡쳐 / **runtime 400 fallback**(parent_link→parent_key→Relates) / search-first idempotency / graceful MCP-missing 은 `ticket-sync` skill 이 담당.
