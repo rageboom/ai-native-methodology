@@ -22,7 +22,7 @@
     },
     "ticket_cascade": {
       "type": "object",
-      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §3 본격). plan stage 안 본격 생성되는 4-level ticket cascade: Epic (FE 화면) + Story (BHV/AC cross-cut anchor) + OP-* (Story sibling / BE only 운영) + TASK-* (Sub-task / 1~3 AC).",
+      "description": "v11.0.0 신설 (DEC-2026-05-26-ticket-plan-단일 §3 본격). plan stage 안 본격 생성되는 4-level ticket cascade: Epic (FE 화면) + Story (BHV/AC cross-cut anchor) + OP-* (Story sibling / 사용자 가시 없는 운영 작업 / layer 무관) + TASK-* (Sub-task / 1~3 AC).",
       "required": ["epics", "stories", "op_tasks", "subtasks"],
       "additionalProperties": false,
       "properties": {
@@ -61,7 +61,7 @@
         },
         "op_tasks": {
           "type": "array",
-          "description": "OP-* = Story sibling / BE only 운영·인프라·마이그레이션 / Jira Task level (Story sibling) 매핑. DEC-2026-05-26-ticket-plan-단일 §결단 #7.",
+          "description": "OP-* = Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 (layer 무관) / Jira Task level (Story sibling) 매핑. DEC-2026-05-26-ticket-plan-단일 §결단 #7 + DEC-2026-06-10-op-task-layer-agnostic (BE only 정정).",
           "items": {
             "type": "object",
             "required": ["jira_id", "op_task_id"],

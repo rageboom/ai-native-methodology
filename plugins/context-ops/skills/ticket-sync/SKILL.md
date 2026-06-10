@@ -1,6 +1,6 @@
 ---
 name: ticket-sync
-description: v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / BE only 운영·인프라·마이그레이션) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
+description: v11.0.0 R20-prime (DEC-2026-05-26-ticket-plan-단일). **plan stage 단일** 진입 — Epic(FE 화면) + Story(BHV/AC cross-cut) + Task(OP-* Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관) + Sub-task(TASK-* / 1~3 AC 묶음 / layer 분기 be/fe/db/e2e/infra) **4-level cascade 일괄 생성**. analysis/discovery/spec stage 는 ticket 호출 ❌. test/implement stage 는 Sub-task status 갱신만 (신규 생성 ❌). 모든 MCP 호출 직전 사용자 confirmation gate 의무 (preview MD → yes/no/dry-run). 7-field evidence 캡쳐 + search-first idempotency + graceful MCP-missing.
 allowed-tools: Read, Write, Edit, Bash, mcp__mcp-server-wiki-jira__jira_create, mcp__mcp-server-wiki-jira__jira_link, mcp__mcp-server-wiki-jira__jira_transition, mcp__mcp-server-wiki-jira__jira_comment, mcp__mcp-server-wiki-jira__jira_search, mcp__mcp-server-wiki-jira__jira_update, mcp__mcp-server-wiki-jira__jira_assign, mcp__mcp-server-wiki-jira__jira_transitions, mcp__mcp-server-wiki-jira__jira_label_add, mcp__mcp-server-wiki-jira__jira_issue, mcp__mcp-server-wiki-jira__jira_structure_add_issues, mcp__mcp-server-wiki-jira__jira_structure_get, mcp__mcp-server-wiki-jira__wiki_page_create, mcp__mcp-server-wiki-jira__wiki_page_update, mcp__mcp-server-wiki-jira__wiki_search_cql, mcp__mcp-server-wiki-jira__wiki_spaces, mcp__wiki-jira-assistant__jira_create, mcp__wiki-jira-assistant__jira_link, mcp__wiki-jira-assistant__jira_transition, mcp__wiki-jira-assistant__jira_comment, mcp__wiki-jira-assistant__jira_search, mcp__wiki-jira-assistant__jira_update, mcp__wiki-jira-assistant__jira_assign, mcp__wiki-jira-assistant__jira_transitions, mcp__wiki-jira-assistant__jira_label_add, mcp__wiki-jira-assistant__jira_issue, mcp__wiki-jira-assistant__jira_structure_add_issues, mcp__wiki-jira-assistant__jira_structure_get, mcp__wiki-jira-assistant__wiki_page_create, mcp__wiki-jira-assistant__wiki_page_update, mcp__wiki-jira-assistant__wiki_search_cql, mcp__wiki-jira-assistant__wiki_spaces, ListMcpResourcesTool
 ---
 
@@ -16,7 +16,7 @@ allowed-tools: Read, Write, Edit, Bash, mcp__mcp-server-wiki-jira__jira_create, 
 | ticket hierarchy              | **4-level cascade 일괄** — Epic + Story + Task(OP-_) + Sub-task(TASK-_)                                                    |
 | Epic 정의                     | **FE 화면 단위** (UI screen / route) — 또는 BE only 영역의 도메인 묶음 (BE-domain Epic)                                    |
 | Story 정의                    | **BHV/AC cross-cut anchor** (BE+FE/DB/E2E 가로지름 / behavior-spec.BHV-_ + acceptance-criteria.AC-_ 묶음)                  |
-| Task 정의 (Story sibling)     | **OP-\* (operational-task)** — BE only 운영·인프라·마이그레이션 (Story 의 사용자 시나리오 axis 와 분리 / Story 와 sibling) |
+| Task 정의 (Story sibling)     | **OP-\* (operational-task)** — 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 (layer 무관 / 가르는 축 = 사용자 가시 가치 변화 부재, BE/FE ❌ / Story 의 사용자 시나리오 axis 와 분리 / Story 와 sibling) |
 | Sub-task 정의                 | **TASK-\* (task-plan.tasks[])** — 1~3 AC 묶음 + layer 분기 (be/fe/db/e2e/infra)                                            |
 | analysis/discovery/spec stage | **ticket 호출 ❌** — 산출물만 (plan stage 단일 정책)                                                                        |
 | test stage                    | **Sub-task status 갱신만** (RED evidence comment / status=Testing 전이) — 신규 생성 ❌                                     |
@@ -222,7 +222,7 @@ plan stage exit 의 4-level cascade preview. 예 (scope=car):
 | 차량 등록 backend API     | EPIC-CAR-BACK | BHV-CAR-002 + AC-CAR-{006~010} |
 | 비용 prorate 시나리오     | EPIC-CAR-BILL | BHV-CAR-003 + AC-CAR-{011~018} |
 
-#### Level 3: Task (OP-\* / Story sibling — BE only 운영·인프라·마이그레이션)
+#### Level 3: Task (OP-\* / Story sibling — 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관)
 
 | OP ID      | Type      | summary          | 부모 Epic     |
 | ---------- | --------- | ---------------- | ------------- |
@@ -432,7 +432,7 @@ Step 3 — Story (per BHV cluster / cross-cut anchor):
                  body=body)
     → story_id[story.story_id] 저장
 
-Step 4 — Task (per OP-* / Story sibling / BE only 운영·인프라·마이그레이션):
+Step 4 — Task (per OP-* / Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관):
   for each op_task in operational-task.json[] (if exists):
     # 네이밍: [OP-id] 무엇을 어떻게 한다 — §이슈 유형 네이밍 규칙 Task 규칙
     summary = "[OP-{op_task.op_id}] {op_task.title}"

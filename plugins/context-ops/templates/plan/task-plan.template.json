@@ -94,7 +94,7 @@
       "jira_id": "OP-DOMAIN-001-JIRA",
       "op_task_id": "OP-DOMAIN-001",
       "category": "infra",
-      "title": "DB 인덱스 추가 (Story sibling — BE only 운영)"
+      "title": "DB 인덱스 추가 (Story sibling — 사용자 가시 없는 운영 작업 / layer 무관)"
     }
   ],
   "adrs": [

@@ -41,7 +41,7 @@ task 안 ac_refs.length 1~3 imperative:
 | ------------------------ | ------------------------------------------------------------ | ----------------------------------------------- | ------------------------------------------------- |
 | **Epic**                 | task-plan.epic_refs[]                                        | FE 화면 단위 (UI screen / route)                | screen_id / route 추출 + jira_id placeholder      |
 | **Story**                | task-plan.story_refs[]                                       | BHV/AC cross-cut anchor (BE+FE/DB/E2E 가로지름) | behavior_ref + ac_refs 묶음 + jira_id placeholder |
-| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | OP-\* (운영/인프라/마이그레이션 / BE only)      | OP-\* 검출 + jira_id placeholder                  |
+| **Task** (Story sibling) | task-plan.op_task_refs[] + operational-task.json (별도 산출) | OP-\* (사용자 가시 없는 운영/인프라/마이그레이션 / layer 무관) | OP-\* 검출 + jira_id placeholder                  |
 | **Sub-task**             | task-plan.tasks[]                                            | TASK-\* (1~3 AC 묶음 / layer 분기)              | 본 skill 의 주 산출                               |
 
 본 skill = Sub-task (TASK-\*) 책임 + Epic/Story 식별 (jira_id 부여 ❌ — ticket-sync skill 책임).

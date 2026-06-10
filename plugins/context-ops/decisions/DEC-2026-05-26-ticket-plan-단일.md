@@ -1,5 +1,7 @@
 # DEC-2026-05-26-ticket-plan-단일
 
+> ⚠️ **부분 정정 (2026-06-10)**: 본 결단 본문의 OP-* = "**BE only 운영**" 프레이밍은 **과소 스코핑 오류**로 정정됨. OP-* 를 가르는 축 = **사용자 가시 가치 변화 부재 (layer 무관)** — BE/FE/DB/infra 공통 (category enum `refactor`·`dependency-upgrade` 등 FE 포함). 본 파일 inline "BE only" 표기는 역사 기록으로 보존 / 정식 정의 = [DEC-2026-06-10-op-task-layer-agnostic](DEC-2026-06-10-op-task-layer-agnostic.md) + `methodology-spec/id-conventions.md` ("사용자 가시 없는 작업").
+
 > v11.0.0 #3 + #5 + #7 결단 — ticket 생성 = plan stage 한 곳 + Epic = FE 화면 단위 + Task = Story sibling (BE only 운영) entity 매핑. SSOT: [DEC-2026-05-26-v11-paradigm-결단](DEC-2026-05-26-v11-paradigm-결단.md).
 
 **일자**: 2026-05-26 (session 48차)

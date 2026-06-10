@@ -1,5 +1,7 @@
 # DEC-2026-05-26-v11-paradigm-결단
 
+> ⚠️ **부분 정정 (2026-06-10)**: 본 문서 §결단 #7 의 "Task = Story sibling (**BE only** 운영/인프라/마이그레이션 / OP-*)" 프레이밍은 **과소 스코핑 오류**로 정정됨. OP-* 를 가르는 축 = **사용자 가시 가치 변화 부재 (layer 무관)**, BE/FE 레이어 아님. inline "BE only" 표기는 역사 기록으로 보존 / 정식 정의 = [DEC-2026-06-10-op-task-layer-agnostic](DEC-2026-06-10-op-task-layer-agnostic.md).
+
 >      **v11.0.0 MAJOR paradigm SSOT** — 본 세션 (2026-05-26) 사용자 8 결단 SSOT. 4 동반 결단 file 의 진입점. Phase 0 = 본 결단 문서화만 / 본격 시행 = 차기 세션 cascade.
 
 **일자**: 2026-05-26 (session 48차)

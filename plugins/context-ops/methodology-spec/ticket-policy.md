@@ -12,7 +12,7 @@
 | Ticket 단위          | **UC = Story** (BHV/AC cross-cut 시나리오 anchor)                                                                          |
 | Ticket 생성 시점     | **plan stage(chain 3) gate 통과 직후 단일** — Epic+Story+Task+Sub-task 4-level cascade 일괄 (analysis/discovery/spec = 생성 ❌) |
 | 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** / (선택) Initiative = 대형 분석 결과 묶음                                          |
-| 하위 단위            | **Task = OP-\*** (Story sibling / BE only 운영·인프라·마이그레이션) / **Sub-task = TASK-\*** (1~3 AC 묶음 / layer 분기)     |
+| 하위 단위            | **Task = OP-\*** (Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관) / **Sub-task = TASK-\*** (1~3 AC 묶음 / layer 분기)     |
 | test / implement     | Sub-task **status 갱신만** (RED / GREEN evidence / 신규 생성 ❌)                                                            |
 | BHV / AC / TC / IMPL | **별도 ticket X** — Story / Sub-task 본문에 link                                                                           |
 | 강제력               | 권고만 / validator 강제 X / `ticket_ref` field optional                                                                    |

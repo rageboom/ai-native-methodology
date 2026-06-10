@@ -31,7 +31,7 @@
     "op_tasks": {
       "type": "array",
       "minItems": 1,
-      "description": "OP-* 목록. Story sibling / BE only 운영 작업 anchor. 각 OP 는 0~N TASK-* sub-task 으로 분해 가능 (subtask_refs).",
+      "description": "OP-* 목록. Story sibling / 사용자 가시 없는 운영 작업 anchor (layer 무관 — 가르는 축 = 사용자 가시 가치 변화 부재, BE/FE 레이어 ❌ / category enum 안 refactor·dependency-upgrade 등 FE 포함). 각 OP 는 0~N TASK-* sub-task 으로 분해 가능 (subtask_refs).",
       "items": {
         "type": "object",
         "required": ["id", "title", "category"],
