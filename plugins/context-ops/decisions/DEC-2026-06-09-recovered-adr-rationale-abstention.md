@@ -1,6 +1,6 @@
 # DEC-2026-06-09-recovered-adr-rationale-abstention
 
-> **상태**: 채택 (1차 draft) — 역공학 델타 #3. 본체 MANDATORY 격상 = ≥2 distinct 도메인 PoC corroboration 후 (§8.1).
+> **상태**: 채택 → **official(opt-in) 격상 완료** (2026-06-10 / `DEC-2026-06-10-reverse-eng-delta-2a-3-promotion`) — ≥2 distinct 도메인 corroborated (poc-08 MyBatis legacy + 대형 Spring Boot 3 사내 dogfood). 역공학 델타 #3 / legacy·brownfield 한정 opt-in (MANDATORY ❌).
 > **모DEC**: `DEC-2026-06-09-reverse-eng-methodology-gap` §2.5 델타 #3 (ROI 3위 / 채택 4개 중 마지막).
 > **plan**: `plan-delta3-recovered-adr.md` / **research**: `research-delta3-recovered-adr.md`.
 

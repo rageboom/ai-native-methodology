@@ -4,7 +4,7 @@
 
 **작성일**: 2026-06-09.
 
-**version**: 없음 (1차 draft / plugin.json·CHANGELOG·lifecycle MANDATORY 무변경 = §8.1 격상 보류 / 본체 격상 = ≥2 PoC corroboration 후).
+**version**: **official(opt-in) 격상 완료** (2026-06-10 / `DEC-2026-06-10-reverse-eng-delta-2a-3-promotion` — ≥2 paradigm corroborated poc-18 Node + poc-10 JVM/Gradle / runnable 산출물 한정 opt-in / MANDATORY ❌). 초기 1차 draft → 본 격상.
 
 **relates to**:
 

@@ -10,6 +10,17 @@
 
 ---
 
+## [0.34.0] — 2026-06-10 MINOR — 역공학 델타 #2a(run-manifest) + #3(recovered-ADR) draft → official(opt-in) 격상
+
+"역공학 델타 #1~#4 격상" 지시에 1원칙 병렬 조사 → **#1·#4·#2b 는 이미 격상/출하**(diagnose-before-design): #1 scope-carve=official(v0.27.0) / #4 hotspot=scope-carve 흡수 / #2b secret-scan=live 게이트 check42. **실 잔여 = #2a + #3 격상**.
+
+- **#2a run-manifest** = draft → **official(opt-in / runnable 한정)**. §8.1 ≥2 paradigm corroboration **이미 충족**(poc-18 Node/Express + poc-10 Spring/Gradle JVM / committed) → de-draft.
+- **#3 recovered-ADR** = draft → **official(opt-in / legacy·brownfield 한정)**. 2nd distinct 도메인 dogfood 신규: poc-08(jpetstore MyBatis legacy / committed) + **ep-be-gea**(대형 multi-module Spring Boot 3 사내 / **외부격리·commit ❌** / [[feedback_internal_source_poc_external_location]]). **마스킹 수치만**: recovered_adr 12건 / certainty observed 3·inferred-consequence 6·unverified-intent 3 / schema-valid / real_extraction.
+- **Senior 적대검증 GO@0.88**(STOP 0): self-생성 ep-be-gea 증거 anchor 전수 실파일 재현 = genuine real_extraction / observed 3건 주석 exact-match(over-attribution 0) / unverified-intent 3건 WHY 부재 실측(abstention 정당) / distinctness 충분. 마스킹·carry·caveat 지시 DEC 반영.
+- **격상 레벨 = official/opt-in**(scope-carve promotion 선례 동형 / MANDATORY ❌ — cross-cutting aspect). de-draft = skills·deliverables·lifecycle-contract "1차 draft" → official + 모 DEC 상태 전이.
+- **carry**: recovered-adr/run-manifest validator 부재(manual cross-check) / #3 vcs-rationale 미본격 / #3 3rd non-Java paradigm(완전 corroboration) / #2a detailed 필드.
+- schema·skill 절차·tool 무변경(격상=trust/기능 무파괴). 상세 = DEC-2026-06-10-reverse-eng-delta-2a-3-promotion.
+
 ## [0.33.1] — 2026-06-10 PATCH — living-sync subset-precision = OBVIATED → dead `subsetAnalysisRefs` retire (diagnose-before-design)
 
 "living-sync subset-precision 진행" 1원칙 조사가 **obviation 을 포착** — merge-back 과 동형. STATUS 추천("`subsetAnalysisRefs` 활성화")은 **v0.14.0 이전 작성 stale** 이었음.

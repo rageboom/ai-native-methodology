@@ -1,6 +1,6 @@
 ---
 name: analysis-recovered-adr
-description: Use during analysis stage to reverse-engineer the PAST architecture decisions of a legacy/existing codebase ("recovered ADR" / "왜 이렇게 설계됐나" / "과거 결정 복구" / "architecture decision archaeology" / "역추적 ADR" / "decision rationale recovery"). Reconstructs decisions (ORM/persistence choice, deployment packaging, module split, framework version pins) from code/config/structure evidence into recovered-adr.json (analysis 산출물 #25 / backward complement to forward task-plan.adrs[]). Distinguishing feature = HONEST ABSTENTION — when the WHY (rationale) cannot be recovered from evidence, mark rationale.certainty=unverified-intent (no fabrication / no-simulation). Every decision is evidence-grounded (fail-closed); rationale recoverability reuses discovery-spec intent_certainty enum (no new enum). Academic grounding = Jansen&Bosch 2008 "Documenting after the fact" + Archie (FSE2014 traceability). 1차 draft (DEC-2026-06-09-recovered-adr-rationale-abstention / 본체 격상 = ≥2 PoC). Stage = analysis, aspect = cross-cutting.
+description: Use during analysis stage to reverse-engineer the PAST architecture decisions of a legacy/existing codebase ("recovered ADR" / "왜 이렇게 설계됐나" / "과거 결정 복구" / "architecture decision archaeology" / "역추적 ADR" / "decision rationale recovery"). Reconstructs decisions (ORM/persistence choice, deployment packaging, module split, framework version pins) from code/config/structure evidence into recovered-adr.json (analysis 산출물 #25 / backward complement to forward task-plan.adrs[]). Distinguishing feature = HONEST ABSTENTION — when the WHY (rationale) cannot be recovered from evidence, mark rationale.certainty=unverified-intent (no fabrication / no-simulation). Every decision is evidence-grounded (fail-closed); rationale recoverability reuses discovery-spec intent_certainty enum (no new enum). Academic grounding = Jansen&Bosch 2008 "Documenting after the fact" + Archie (FSE2014 traceability). official (opt-in / legacy·brownfield 한정 / DEC-2026-06-10-reverse-eng-delta-2a-3-promotion — ≥2 도메인 corroborated). Stage = analysis, aspect = cross-cutting.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -65,12 +65,13 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - **rationale 복구율은 코드베이스 의존** — 주석·ADR·commit 위생이 나쁜 legacy 일수록 `unverified-intent` 비율↑(정직). `rationale_unknown_count` 높음 = 결함 아니라 정직 신호.
 - **alternatives 는 보통 빈 배열** — 역추적은 "검토했으나 거부된 대안"을 거의 알 수 없음(소스에 흔적 있을 때만).
 - **`source-refuted` 는 드묾** — 소스가 명시적으로 통념을 반증하는 경우만(예: 주석이 "성능 아님, 호환성 때문" 명시).
-- 1차 draft (≥2 distinct 도메인 PoC corroboration 전 / 본체 MANDATORY 격상 아님 / opt-in). 1차 dogfood = legacy Java Spring + MyBatis 코드베이스.
+- **official (opt-in)** — ≥2 distinct 도메인 corroborated (근거 ## 인용). MANDATORY ❌ — legacy/brownfield 한정 cross-cutting aspect (greenfield 비적용). carry = recovered-adr-validator 부재(manual cross-check) / vcs-rationale 미본격 / 3rd non-Java paradigm.
 
 ## 인용
 
 - `schemas/recovered-adr.schema.json`
 - DEC-2026-06-09-recovered-adr-rationale-abstention (본 skill 의 결정 / 모DEC = DEC-2026-06-09-reverse-eng-methodology-gap §2.5 델타 #3)
+- DEC-2026-06-10-reverse-eng-delta-2a-3-promotion (draft→official 격상 / ≥2 도메인 corroborated)
 - `schemas/discovery-spec.schema.json` (intent_certainty enum 재사용 SSOT / 신규 enum ❌)
 - `schemas/task-plan.schema.json` (forward adrs[] — 본 산출물의 backward 보완 / Nygard status enum)
 - `methodology-spec/policies/no-simulation.md` (evidence-grounded / rationale 날조 금지 / abstention)

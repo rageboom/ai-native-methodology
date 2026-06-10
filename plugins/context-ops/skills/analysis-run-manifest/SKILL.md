@@ -1,6 +1,6 @@
 ---
 name: analysis-run-manifest
-description: Use during analysis stage to extract the positive build/run/env operational context of a system ("어떻게 build/run/configure 하나" / "run recipe" / "운영 컨텍스트" / "build command" / "환경변수" / "service dependency" / "how to run"). Reverse-engineers from real config files (package.json / Dockerfile / docker-compose / Makefile / pom.xml / build.gradle / application.yml|properties / .env.example / CI configs) into run-manifest.json (analysis 산출물 #26 / positive counterpart to migration-cautions negative warnings). Feeds P0 use-scenario "LLM 이 develop·run·modify·evolve"의 RUN 축. Source-grounded — every item cites its source config (no fabrication / 누락 = honest null + configs_missing); env value 절대 미저장 (name + is_secret + sensitivity only / secret 누출 차단). confidence: deterministic parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75. no-simulation. 1차 draft (DEC-2026-06-09-build-run-env-manifest / 본체 격상 = ≥2 PoC). Stage = analysis, aspect = cross-cutting.
+description: Use during analysis stage to extract the positive build/run/env operational context of a system ("어떻게 build/run/configure 하나" / "run recipe" / "운영 컨텍스트" / "build command" / "환경변수" / "service dependency" / "how to run"). Reverse-engineers from real config files (package.json / Dockerfile / docker-compose / Makefile / pom.xml / build.gradle / application.yml|properties / .env.example / CI configs) into run-manifest.json (analysis 산출물 #26 / positive counterpart to migration-cautions negative warnings). Feeds P0 use-scenario "LLM 이 develop·run·modify·evolve"의 RUN 축. Source-grounded — every item cites its source config (no fabrication / 누락 = honest null + configs_missing); env value 절대 미저장 (name + is_secret + sensitivity only / secret 누출 차단). confidence: deterministic parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75. no-simulation. official (opt-in / runnable 산출물 한정 / DEC-2026-06-10-reverse-eng-delta-2a-3-promotion — ≥2 paradigm corroborated). Stage = analysis, aspect = cross-cutting.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -66,12 +66,13 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - **is_secret heuristic** — keyword 기반 = 확률적. 모호는 null + human review(단정 ❌).
 - **version_constraint = declared** — compose/manifest 의 선언 버전이지 실 동작 버전 아님.
 - **LLM-read ceiling 0.75** — Dockerfile/Makefile 추출은 결정론 아님(자동화 경계).
-- 1차 draft (≥2 PoC corroboration 전 / 본체 MANDATORY 격상 아님 / opt-in). lean scope — health-check poll/cache/startup-order 등 elaborate 필드 defer.
+- **official (opt-in)** — ≥2 distinct paradigm corroborated (근거 ## 인용). MANDATORY ❌ — runnable 산출물 한정 cross-cutting aspect. lean scope — health-check poll/cache/startup-order 등 elaborate 필드 defer(carry) / run-manifest-validator 부재(manual / carry).
 
 ## 인용
 
 - `schemas/run-manifest.schema.json`
 - DEC-2026-06-09-build-run-env-manifest (본 skill 의 결정 / 모DEC = DEC-2026-06-09-reverse-eng-methodology-gap §2.5 델타 #2-a)
+- DEC-2026-06-10-reverse-eng-delta-2a-3-promotion (draft→official 격상 / ≥2 paradigm corroborated)
 - `methodology-spec/use-scenario-taxonomy.md` (P0 RUN 축 운영 컨텍스트)
 - `methodology-spec/policies/no-simulation.md` (source-grounded / 누락 정직 / value 미저장)
 - `schemas/migration-cautions.schema.json` (negative 경고 — 본 산출물의 positive 반대편)

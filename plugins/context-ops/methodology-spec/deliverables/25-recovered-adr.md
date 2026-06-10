@@ -3,7 +3,7 @@
 > **사상**: Nygard ADR (2011) backward 적용 + Jansen & Bosch _"Documenting after the fact: Recovering architectural design decisions"_ (JSS 2008) + Archie (Mirakhorli, FSE 2014 — tactics↔rationale↔code traceability)
 > **schema**: `schemas/recovered-adr.schema.json`
 > **생성**: analysis stage / cross-cutting aspect (`analysis-recovered-adr` skill)
-> **자격**: 1차 draft (역공학 델타 #3). 본체 MANDATORY 격상 = ≥2 distinct 도메인 PoC corroboration 후 (결정 = 인용 footer).
+> **자격**: **official (opt-in)** — 역공학 델타 #3 / ≥2 distinct 도메인 corroborated (결정·증거 = 인용 footer). MANDATORY ❌ — legacy/brownfield 한정 (greenfield 비적용).
 
 ---
 
@@ -107,6 +107,7 @@ cross_links:
 
 - schema: `schemas/recovered-adr.schema.json`
 - DEC: DEC-2026-06-09-recovered-adr-rationale-abstention (모DEC = DEC-2026-06-09-reverse-eng-methodology-gap §2.5 델타 #3)
+- DEC: DEC-2026-06-10-reverse-eng-delta-2a-3-promotion (draft→official 격상 / ≥2 도메인 corroborated)
 - skill: `skills/analysis-recovered-adr/SKILL.md`
 - 어휘 SSOT: `schemas/discovery-spec.schema.json` (intent_certainty)
 - forward 짝: `schemas/task-plan.schema.json` (adrs[])

@@ -3,7 +3,7 @@
 > **사상**: "이 시스템을 어떻게 **build·run·configure** 하는가" = LLM 운영 컨텍스트(P0 use-scenario RUN 축) / migration-cautions 의 **positive 반대편**(negative 경고 ↔ positive 성공 경로)
 > **schema**: `schemas/run-manifest.schema.json`
 > **생성**: `analysis-run-manifest` skill (analysis stage / cross-cutting aspect — phase 무관 / code-graph·scope-carve 동급)
-> **자격**: 1차 draft (opt-in) / 본체 MANDATORY 격상 = ≥2 distinct paradigm PoC corroboration 후 (Node + JVM/Gradle 2 paradigm dogfood 입증)
+> **자격**: **official (opt-in)** — ≥2 distinct paradigm corroborated (결정·증거 = 인용 footer). MANDATORY ❌ — runnable 산출물 한정 (library/non-runnable 비적용).
 
 ---
 
@@ -121,7 +121,7 @@ cross_links:
 - **version_constraint = declared** — compose/manifest 선언 버전이지 실 동작 버전 아님.
 - **llm_read ceiling 0.75** — Dockerfile/Makefile 추출은 결정론 아님(automation-boundary).
 - **재현성** — skill-based 추출은 LLM-주도라 결정론 도구만큼 강하지 않음(source-grounded·deterministic parse 부분으로 완화).
-- 1차 draft(opt-in) — 본체 MANDATORY 격상 전 / lean scope(elaborate 필드 defer).
+- official(opt-in / runnable 한정) — lean scope(elaborate 필드 defer = carry) / run-manifest-validator 부재(manual = carry).
 
 ---
 
@@ -136,6 +136,7 @@ cross_links:
 - schema: `schemas/run-manifest.schema.json`
 - skill: `skills/analysis-run-manifest/SKILL.md`
 - 결정: DEC-2026-06-09-build-run-env-manifest (본 산출물 신설 / 번호 정정 §2.2) · 모DEC DEC-2026-06-09-reverse-eng-methodology-gap §2.5 델타 #2-a
+- 결정: DEC-2026-06-10-reverse-eng-delta-2a-3-promotion (draft→official 격상 / ≥2 paradigm corroborated)
 - 정책: `methodology-spec/policies/no-simulation.md` (source-grounded / 누락 정직 / value 미저장) · `methodology-spec/use-scenario-taxonomy.md` (P0 RUN 축)
 - 선례 schema: `schemas/migration-cautions.schema.json` (negative 반대편) · `schemas/db-schema.schema.json` (sensitivity enum) · `schemas/inventory.schema.json` (stack) · `schemas/test-cmd.schema.json` (cmd+args shell-safe 필드)
 - dogfood: `examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/run-manifest.json` · `examples/poc-10-realworld-jpa-querydsl/.ai-context/output/run-manifest.json`
