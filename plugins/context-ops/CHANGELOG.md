@@ -10,6 +10,17 @@
 
 ---
 
+## [0.32.0] — 2026-06-10 MINOR — ticket-sync 결정론 핵심 → `ticket-cascade-builder` 도구 추출 (breaking 0 / 행위 보존)
+
+`ticket-sync` 스킬이 "도구=결정론 / skill=LLM 의미"(STRONG-STOP / `feedback_chain_driver_deterministic_axis`)를 위반하는 유일 outlier 였음 — resolve·payload·델타 판정·순서가 LLM 해석 pseudo-code 로 스킬에 존재(drift-prone)했던 것을 신규 결정론 builder 로 추출.
+
+- **신규 도구 `tools/ticket-cascade-builder/`** (`@mis-plugins/ticket-cascade-builder` / NO MCP·NO network·NO LLM): task-plan + config 에서 4-level ticket cascade 실행 계획 `cascade-plan.json` 산출. role→issuetype resolve(환경별 SG-MIS/DWPD) · parent_spec(initiative/epic/story/subtask + B14 subtask epic-link 금지) · 델타 판정(jira_id 보유→skip_prebound / 미보유→create) · body·summary 템플릿 채움 · cascade 순서(Initiative→Epic→{Story,OP}→Sub-task topological) · preview_md. config = js-yaml(lazy require / core `buildCascadePlan` 무의존 = 단위테스트 install 불요).
+- **신규 schema `cascade-plan.schema.json`** (top-level `additionalProperties:false` strict / meta-confidence $ref / schema-validator 동적 canonical 자동 등록).
+- **SKILL.md 위임 + lean**: §3 preview·§5 resolve 표·§6 cascade pseudo-code·이슈유형 body 템플릿 → 도구 호출 + `cascade-plan.json` 실행으로 대체. 유지(비가역 / live 의존) = MCP probe·gate·search-first JQL·jira_create **실발사 + 7-field evidence 캡쳐**·**runtime 400 fallback 체인**(parent_link→parent_key→Relates). 709→279줄.
+- **정당화**: 결정론 axis 복원 + 단위 테스트 가능성(prefix·idempotency 버그 사전 차단) + 정직 dry-run(`cascade-plan.json` diff). length 감소는 부수효과(MCP 발사+evidence+fallback+gate 비가역 잔존). 선례 = `traceability-matrix-builder`.
+- **검증**: 도구 단위 테스트 **15/15** green · cascade-plan schema ajv valid · skill-citation 0 stale(220 doc) · workspace 회귀 0 · breaking 0(현 pseudo-code 와 동일 MCP 호출 생성 / 기존 ticket-sync-evidence schema 무변경).
+- 상세 = DEC-2026-06-10-ticket-cascade-builder.
+
 ## [0.31.0] — 2026-06-10 MINOR — validator project-root 경로 해석 단일화 (F15) + F14/F16 diagnose 처분
 
 `formal-spec-link-validator`(gate#2 REQUIRED)가 chain mode cross-ref 경로를 spec-dir 기준 해석 → project-root-relative(`.ai-context/...`) 산출물 경로를 dead-reference(breaking)로 오탐 → gate#2 거짓 block 하던 결함(ep-be-gea dogfooding **F15**) 수정.

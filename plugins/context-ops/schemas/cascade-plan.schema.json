@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/cascade-plan.schema.json",
+  "title": "Ticket Cascade Plan (결정론 — ticket-cascade-builder 산출)",
+  "description": "v12 신설 (DEC-2026-06-10-ticket-cascade-builder). ticket-cascade-builder 도구가 task-plan + config 등에서 결정론으로 산출하는 4-level cascade 실행 계획. ticket-sync skill 이 본 plan 을 읽어 MCP 호출을 발사(실행). 도구 = NO MCP / NO LLM / NO network (결정론 axis / feedback_chain_driver_deterministic_axis). calls[] = happy-path 의도된 호출 spec — runtime fallback(live 400 적응)은 skill 책임.",
+  "type": "object",
+  "required": ["meta", "scope", "calls", "preview_md", "skip_list", "evidence_skeleton"],
+  "additionalProperties": false,
+  "$comment": "top-level additionalProperties:false strict (drift attractor 차단).",
+  "properties": {
+    "meta": { "$ref": "./meta-confidence.schema.json" },
+    "scope": { "type": "string", "description": "G3 scope slug (예: car)" },
+    "config_env": {
+      "type": "string",
+      "description": "resolve 에 사용된 환경 식별 (예: DWPD / SG-MIS / default) — debug 용"
+    },
+    "calls": {
+      "type": "array",
+      "description": "순서 있는 MCP jira_create 호출 spec. order 오름차순 = Initiative→Epic→{Story,OP}→Sub-task 의존성 순서. skill 이 순차 발사.",
+      "items": {
+        "type": "object",
+        "required": ["order", "role", "issue_type", "summary", "parent_spec", "delta_action", "source_ref"],
+        "additionalProperties": false,
+        "properties": {
+          "order": { "type": "integer", "minimum": 0, "description": "발사 순서 (1-indexed 권장 / 부모 먼저)" },
+          "role": {
+            "type": "string",
+            "enum": ["initiative", "epic", "story", "task", "subtask"],
+            "description": "canonical role (DEC-2026-06-10-ticket-canonical-types / bug 은 cascade 비대상)"
+          },
+          "issue_type": {
+            "type": "string",
+            "description": "config.issuetype_map[role] resolve 결과 (실 Jira issue type 이름 / 예: 이야기·하위 작업·epic)"
+          },
+          "summary": { "type": "string", "description": "네이밍 규칙 적용 summary" },
+          "body": { "type": "string", "description": "Description 템플릿 채움 (role 별)" },
+          "parent_spec": {
+            "type": "object",
+            "required": ["strategy"],
+            "additionalProperties": false,
+            "description": "부모 연결 의도 (happy-path). strategy 별 필드. runtime 400 fallback 은 skill.",
+            "properties": {
+              "strategy": {
+                "type": "string",
+                "enum": ["top_level", "parent_key", "epic_link_customfield", "parent_link_customfield"],
+                "description": "top_level=Initiative / parent_key=Sub-task(B14) / epic_link_customfield=Story·Task·Bug / parent_link_customfield=Epic→Initiative"
+              },
+              "parent_ref_key": {
+                "type": ["string", "null"],
+                "description": "부모 anchor key (epic_id_map/story_id_map 등에서 resolve 될 키 / top_level 은 null)"
+              },
+              "customfield_id": {
+                "type": ["string", "null"],
+                "description": "epic_link_customfield / parent_link_customfield strategy 시 customfield ID (예: customfield_10006)"
+              },
+              "link_type": {
+                "type": "string",
+                "enum": ["parent-child", "relates-to", "blocks", "is-blocked-by"],
+                "default": "parent-child"
+              }
+            }
+          },
+          "labels": { "type": "array", "items": { "type": "string" } },
+          "delta_action": {
+            "type": "string",
+            "enum": ["create", "skip_prebound"],
+            "description": "create=신규 생성 / skip_prebound=ref jira_id 사전 보유 → 생성 skip, 부모로만 (DEC-2026-06-10-ticket-delta-creation)"
+          },
+          "prebound_jira_id": {
+            "type": "string",
+            "description": "delta_action=skip_prebound 시 기존 Jira 키"
+          },
+          "source_ref": {
+            "type": "string",
+            "description": "본 call 의 본 방법론 anchor (screen_id / behavior_ref / OP-* / TASK-* / initiative slug) — evidence_skeleton 키 매핑용"
+          }
+        }
+      }
+    },
+    "preview_md": { "type": "string", "description": "사람 검토용 4-level cascade preview (markdown / confirmation gate 표시)" },
+    "skip_list": {
+      "type": "array",
+      "description": "delta skip 또는 idempotency hint 로 생성 안 하는 항목",
+      "items": {
+        "type": "object",
+        "required": ["key", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "key": { "type": "string" },
+          "prebound_jira_id": { "type": "string" },
+          "reason": { "type": "string", "enum": ["prebound_jira_id", "pre_existing_flag"] }
+        }
+      }
+    },
+    "evidence_skeleton": {
+      "type": "object",
+      "description": "ticket-sync-evidence.ticket_cascade 의 placeholder 골격 (skill 이 실 jira_id 로 채움)",
+      "additionalProperties": false,
+      "properties": {
+        "initiative_id": { "type": ["string", "null"] },
+        "epic_id_map": { "type": "object", "additionalProperties": { "type": ["string", "null"] } },
+        "story_id_map": { "type": "object", "additionalProperties": { "type": ["string", "null"] } },
+        "op_task_id_map": { "type": "object", "additionalProperties": { "type": ["string", "null"] } },
+        "subtask_id_map": { "type": "object", "additionalProperties": { "type": ["string", "null"] } }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "description": "요약 카운트 (create vs skip / role 별)",
+      "additionalProperties": { "type": "integer" }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "@mis-plugins/ticket-cascade-builder",
+  "version": "0.1.0",
+  "description": "v12 결정론 builder (DEC-2026-06-10-ticket-cascade-builder) — task-plan + config 에서 4-level ticket cascade 실행 계획(cascade-plan.json) 산출. role→issuetype resolve / parent linking / B14 / 델타 skip / body 템플릿 / 순서. NO MCP / NO LLM / NO network (결정론 axis). ticket-sync skill 이 본 plan 을 발사.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "ticket-cascade-builder": "./src/cli.js" },
+  "scripts": { "test": "node --test test/*.test.js" },
+  "dependencies": { "js-yaml": "^4.1.0" },
+  "license": "UNLICENSED"
+}
