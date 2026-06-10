@@ -88,7 +88,7 @@ snapshots[]:
   controller_method: 'UserController.create'
   service_method: 'UserService.create'
   layer: 'integration | unit | e2e'
-  data_source_status: 'real_db | code_only | domain_expert_interview'
+  data_source_status: 'real_db | real_environment | existing_test_file | code_only | domain_expert_interview | carry'
   scenarios:
     - id: 'SCN-SIGNUP-001'
       name: 'happy path — 신규 user 등록'
@@ -224,6 +224,7 @@ cross_links:
 
 - 증상: 실 DB 접속 ❌ → snapshot.then.state_after 추정만
 - 대응: `data_source_status: "code_only"` 명시 + 도메인 expert 검증 carry 의무
+- **역공학 test-recovery** (R15 / 근거 ## 인용): 기존 테스트가 행위를 증명하면 `data_source_status: "existing_test_file"` — **단 그 테스트를 실제 실행(real_tool invocation 5종 물증)했을 때만**. REAL_SOURCE_STATUS → Layer 3 evidence cross-check 대상(claim ≤ evidence_tool_count). 테스트 파일을 읽기만 하고 안 돌렸으면 `code_only`(stale/skip 테스트의 증거 주장 차단).
 
 ### 11.2 ambiguous 분류 회피
 
@@ -261,6 +262,7 @@ characterization phase 는 Legacy 적대성 spectrum 과 Modern spectrum 양쪽�
 ## 인용
 
 - 사상 근거: ADR-CHAIN-006 (characterization phase 정식 도입)
+- test-recovery(existing_test_file): DEC-2026-06-10-test-recovery-existing-test-evidence (R15 RUN 의무 / 역공학 델타 #5)
 - 신뢰도 모델: ADR-009 §2.4 (신뢰도 단계 정합)
 - json-only SSOT: ADR-011 (erd.mermaid 폐기 / json 단독)
 - schema: `schemas/characterization-spec.schema.json`

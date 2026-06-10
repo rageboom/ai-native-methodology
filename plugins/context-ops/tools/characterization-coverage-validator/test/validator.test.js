@@ -7,6 +7,7 @@ import {
 	readFileSync,
 	existsSync,
 	mkdtempSync,
+	mkdirSync,
 	rmSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -319,4 +320,101 @@ test('v8.7 Layer 3 — evidence-dir-mismatch → N_evidence=1 < N_claim=3 → in
 	assert.equal(mismatch[0].severity, 'critical');
 	assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 1);
 	assert.equal(r.summary.evidence_cross_check.claimed_count, 3);
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// test-recovery (DEC-2026-06-10-test-recovery-existing-test-evidence / R15 / 역공학 델타 #5):
+// data_source_status='existing_test_file' = REAL_SOURCE_STATUS → Layer 3 evidence cross-check 대상.
+// 기존 테스트를 실제 실행(real_tool invocation)했을 때만 사용 — claim ≤ evidence_tool_count 강제.
+// 안 돌린 테스트의 증거 주장(silent simulation) 차단 + code_only 우회 차단.
+// ─────────────────────────────────────────────────────────────────────
+
+// existing_test_file 스냅샷 1개 + evidence jsonl(테스트 러너 invocation) 0~N 으로 tmp 픽스처 구성.
+function buildExistingTestFixture(tmpDir, invocations) {
+	mkdirSync(join(tmpDir, 'snapshots'), { recursive: true });
+	mkdirSync(join(tmpDir, 'evidence'), { recursive: true });
+	writeFileSync(
+		join(tmpDir, 'snapshots', 'UC-X-001.json'),
+		JSON.stringify({
+			snapshot_id: 'SNAP-UC-X-001',
+			use_case: 'UC-X-001',
+			endpoint: 'GET /api/x',
+			data_source_status: 'existing_test_file',
+			scenarios: [
+				{
+					id: 'SCN-X-001',
+					name: 'happy',
+					given: { request_body: {} },
+					when: 'GET /api/x',
+					then: { expected_response: { status: 200 } },
+					intent_classification: [{ rule: 'BR-X-001', type: 'intent' }],
+				},
+			],
+		}),
+	);
+	writeFileSync(
+		join(tmpDir, 'coverage.json'),
+		JSON.stringify({
+			matrix: [
+				{ uc: 'UC-X-001', snapshot: '✅', covered_by: ['SNAP-UC-X-001'], scope_decision: 'covered' },
+			],
+			coverage_summary: { ucs_total: 1, ucs_covered: 1, uc_coverage_ratio: 1.0 },
+			coverage_target: 0.8,
+			coverage_strategy: 'absolute',
+			coverage_minimum_legacy: 0.4,
+			trend_required: false,
+		}),
+	);
+	writeFileSync(join(tmpDir, 'intent-vs-bug.md'), '# intent-vs-bug\nBR-X-001 = intent\n');
+	writeFileSync(
+		join(tmpDir, 'evidence', 'characterization-tool-invocations.jsonl'),
+		invocations.map((i) => JSON.stringify(i)).join('\n'),
+	);
+}
+
+test('test-recovery R15 — existing_test_file claim + 테스트 실행 증거 부재(0 invocation) → invocation_count_mismatch CRITICAL (silent simulation 차단)', () => {
+	const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-existtest-'));
+	try {
+		buildExistingTestFixture(tmpDir, []); // 0 invocation — 테스트 안 돌리고 existing_test_file 주장
+		const r = validateCharacterization(tmpDir, 0.8, {
+			evidenceDir: join(tmpDir, 'evidence'),
+		});
+		const mismatch = r.findings.filter(
+			(f) => f.kind === 'evidence_cross_check.invocation_count_mismatch',
+		);
+		assert.equal(
+			mismatch.length,
+			1,
+			`existing_test_file 도 real-source claim 으로 계수 → 증거 부재 시 critical 의무: ${JSON.stringify(r.summary.evidence_cross_check, null, 2)}`,
+		);
+		assert.equal(mismatch[0].severity, 'critical');
+		assert.equal(r.summary.evidence_cross_check.claimed_count, 1, 'existing_test_file = REAL_SOURCE_STATUS 계수');
+		assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 0);
+	} finally {
+		rmSync(tmpDir, { recursive: true, force: true });
+	}
+});
+
+test('test-recovery R15 — existing_test_file + 실 테스트 러너 invocation → cross-check ok + code_only finding 미발생', () => {
+	const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-existtest-'));
+	try {
+		buildExistingTestFixture(tmpDir, [
+			{ tool: 'junit', version: '5.10.0', invocation_id: 'inv-1', args: ['--tests', '*Characterization*'], target: 'core', timestamp: '2026-06-10T00:00:00Z', duration_ms: 1200, exit_code: 0, stdout_sample: '' },
+		]);
+		const r = validateCharacterization(tmpDir, 0.8, {
+			evidenceDir: join(tmpDir, 'evidence'),
+		});
+		const mismatch = r.findings.filter(
+			(f) => f.kind === 'evidence_cross_check.invocation_count_mismatch',
+		);
+		assert.equal(mismatch.length, 0, `claim=1 ≤ evidence=1 → mismatch 미발생: ${JSON.stringify(r.summary.evidence_cross_check, null, 2)}`);
+		assert.equal(r.summary.evidence_cross_check.status, 'ok');
+		assert.equal(r.summary.evidence_cross_check.evidence_tool_count, 1);
+		assert.equal(r.summary.evidence_cross_check.claimed_count, 1);
+		// existing_test_file 는 code_only 가 아니므로 code_only carry finding 미발생 (우회 ❌ / 정확 분류)
+		const codeOnly = r.findings.filter((f) => f.kind === 'snapshot.code_only_carry_required');
+		assert.equal(codeOnly.length, 0, 'existing_test_file ≠ code_only → carry finding 미발생');
+	} finally {
+		rmSync(tmpDir, { recursive: true, force: true });
+	}
 });

@@ -473,6 +473,7 @@ export function validateCharacterization(
 const REAL_SOURCE_STATUSES = new Set([
 	'real_db',
 	'real_environment',
+	'existing_test_file', // test-recovery (DEC-2026-06-10-test-recovery-existing-test-evidence / R15): 기존 테스트 실행 증거 = real source → evidence cross-check 대상 (claim ≤ evidence_tool_count / 안 돌린 테스트 읽기는 code_only)
 	'domain_expert_interview',
 ]);
 function countRealSourceSnapshots(snapshots) {

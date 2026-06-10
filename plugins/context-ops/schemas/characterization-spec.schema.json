@@ -68,8 +68,8 @@
         },
         "data_source_status": {
           "type": "string",
-          "enum": ["real_db", "real_environment", "code_only", "domain_expert_interview", "carry"],
-          "description": "no-simulation 정책 — code_only 시 도메인 expert carry 의무."
+          "enum": ["real_db", "real_environment", "existing_test_file", "code_only", "domain_expert_interview", "carry"],
+          "description": "no-simulation 정책 — code_only 시 도메인 expert carry 의무. existing_test_file = 역공학 test-recovery (기존 테스트가 행위 증거) — **그 테스트를 실제 실행(real_tool invocation 5종 물증)했을 때만** 사용 (DEC-2026-06-10-test-recovery-existing-test-evidence / R15). REAL_SOURCE_STATUS → Layer 3 evidence cross-check 대상(claim ≤ evidence_tool_count). 테스트 파일을 읽기만 하고 안 돌렸으면 code_only (stale/skip 테스트의 증거 주장 차단)."
         },
         "scenarios": {
           "type": "array",

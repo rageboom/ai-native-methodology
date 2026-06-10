@@ -10,6 +10,17 @@
 
 ---
 
+## [0.35.0] — 2026-06-10 MINOR — 역공학 델타 #5 test-recovery — `existing_test_file` data_source_status (R15 RUN 의무)
+
+기존 테스트를 characterization 행위 증거로 인정하는 `existing_test_file` data_source_status 신설 — **단 그 테스트를 실제 실행했을 때만**(R15). 역공학 델타 #5 (DEC-2026-06-09-reverse-eng-methodology-gap §3 / plan §4-b 가 "R15 결단 격상"으로 보류했던 마지막 델타).
+
+- **갭(plan §4-b 보류 사유)**: enum 만 추가 시 `characterization-coverage-validator` 의 `REAL_SOURCE_STATUSES` 하드코딩을 우회 → code_only 검증(domain expert carry HIGH)·Layer 3 evidence cross-check **둘 다 통과 = R15 silent-simulation 구멍**.
+- **diagnose-before-design**: 증거 메커니즘은 이미 존재 — no-simulation.md §2 Tier 1 이 "test stack runner(Gradle·JUnit/vitest) = in-plugin 실행 / `evidence_trust=real_tool` 5종 물증" 인정. #5 = 새 증거 채널 빌드 ❌ / **의미 tier 추가 + 가드 구멍 차단**.
+- **R15 정책(사용자 채택 = RUN 의무)**: `existing_test_file` = 그 테스트 실제 실행(real_tool invocation)했을 때만 → `REAL_SOURCE_STATUSES` 편입 → Layer 3 cross-check(claim ≤ evidence_tool_count). 테스트 읽기만 = `code_only`(stale/skip 테스트의 검증 안 된 증거 주장 차단).
+- **변경**: characterization-spec.schema.json enum + description / validator.js REAL_SOURCE_STATUSES / deliverables/23-characterization-spec.md. test +2(0 invocation→critical / real invocation→ok + code_only 미발생). 검증기 20→22.
+- **Senior 적대검증 GO@0.88**: 가드 구멍 차단 실측(REAL_SOURCE_STATUSES 편입→cross-check 발화) / 22/22 무회귀 / 잔여 우회(evidence_dir 미지정 skip)=기존 backward-compat 설계·신규 결함 아님 / §14→§2 Tier 1 인용 정정.
+- **carry**: existing_test_file usage ≥2 distinct 도메인(ep-be-gea JUnit=1 live / 2nd vitest 등). 가드 자체는 도메인 무관 결정론. 상세 = DEC-2026-06-10-test-recovery-existing-test-evidence.
+
 ## [0.34.0] — 2026-06-10 MINOR — 역공학 델타 #2a(run-manifest) + #3(recovered-ADR) draft → official(opt-in) 격상
 
 "역공학 델타 #1~#4 격상" 지시에 1원칙 병렬 조사 → **#1·#4·#2b 는 이미 격상/출하**(diagnose-before-design): #1 scope-carve=official(v0.27.0) / #4 hotspot=scope-carve 흡수 / #2b secret-scan=live 게이트 check42. **실 잔여 = #2a + #3 격상**.
