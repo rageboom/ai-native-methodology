@@ -10,6 +10,18 @@
 
 ---
 
+## [0.28.0] — 2026-06-10 MINOR — backbone-first 절차 + shared-kernel factoring codify
+
+대형 코드베이스 analysis 의 **backbone-first 절차 + shared-kernel factoring 규칙**을 본체 명문화 (ad-hoc → codified 전환). ADR-CHAIN-016 에 [0]→[3] 시퀀스는 있었으나 ⓐ shared-kernel(비-DB 공통코드) factoring 누락(DB backbone 만) ⓑ skill 미operationalize ⓒ scope/backbone 구분 표식 없음 = 갭(grep ③ 0건). DEC-2026-06-10-backbone-first-shared-kernel-factoring.
+
+- **규칙**: scope 를 끊기 전 ⓐ DB(always-on / ADR-CHAIN-014) + ⓑ shared-kernel(Martin afferent-hub = 만물이 의존하는 공통 유틸/코드: cache·base·utils 등)을 `role=backbone` 으로 먼저 분리 → 1회 분석 / 모든 scope 가 참조. **hub 제거 시 feature 의 external coupling 급감(주로 kernel 행) → feature 가 깨끗한 role=scope 로 분리** (Martin "hub 쪼개면 파편화" + DDD shared-kernel + Vertical Slice "slice 간 결합 최소").
+- **schema (additive)**: `inventory.schema.json#scope_candidates` 에 `role` enum [scope, backbone] 신설 (default scope / 무파괴).
+- **operationalize**: `analysis-source-inventory`(backbone-first 단계 = DB+shared-kernel 먼저 분리) + `analysis-scope-carve`(hub_warning→role=backbone) + `methodology-spec/workflow/discovery.md`(backbone-first 샘플 + 의미 명칭) + ADR-CHAIN-016 §적용절차 확장.
+- **scope 명명**: scope id = **알아듣기 쉬운 의미 명칭**(예: resve→reservation / wlfr→welfare / 패키지 약칭 그대로 ❌). 사용자 자유 명명(id-conventions §scope) 정합.
+- **§8.1 정직**: 규칙(hub→backbone) = paradigm-grounded(Martin Ca + DDD shared-kernel + db-assets-always-on 동형) → 즉시 codify / **"external coupling 의 kernel 비중 %"(ep-be-gea 1-PoC 81~88%) = 일반 임계 수치 미주장 / ≥2 도메인 corroboration carry**.
+
+---
+
 ## [0.27.0] — 2026-06-10 MINOR — scope-carve draft→official 격상 (≥2 도메인 corroboration)
 
 역공학 델타 #1 scope-carve 를 1차 draft → **official(corroborated)** 격상. §8.1 ≥2 distinct 도메인 corroboration 충족 + Phase-1 명시 carry(co-change target-with-history live) 해소. 격상 수준 = **official / 대형 코드베이스 conditional 권장**(전면 MANDATORY ❌ / sql-inventory rdb_only 선례 동형). trust 모델 불변(reference-lens / gate inject ❌ / chain-driver 무수정). DEC-2026-06-10-scope-carve-promotion.

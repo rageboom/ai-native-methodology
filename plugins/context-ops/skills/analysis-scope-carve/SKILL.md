@@ -57,6 +57,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 4. **carve_candidates → soft gate #0 → scope_candidates** — `carve_candidates[]`(atomic_unit / clean_seam / hub_warning / behavioral_cluster / hotspot_priority)를 사용자에게 제시. 사용자가 scope 경계를 확정(또는 override)한 뒤 `chain-driver init --scope <확정-slug>` 로 scope 를 생성한다. **carve 가 slug 를 자동 생성하거나 manifest 를 만들지 않는다** — carve 는 구조 신호일 뿐, scope 확정은 사람.
    - **scope_candidates 로 일원화 (dedup 배선)**: 확정된 carve_candidates 는 `analysis-source-inventory` 가 `inventory.json#scope_candidates[]` 의 **확정 출력**으로 흡수한다 (`source=scope_carve` + `carve_signals[]` 에 근거 신호 인용). scope-carve = **신호 엔진** / scope_candidates = **확정 결과** — 같은 개념을 두 산출물로 평행 유지 ❌. (carve 가 직접 scope_candidates 를 write 하지 않음 — soft gate #0 사람 확정 후 inventory 단계가 일원화 / reference-lens 보존.)
+   - **hub_warning → backbone (backbone-first)**: `hub_warning`(Martin afferent-hub = 공통 커널 cache·base·utils 등)은 **개별 scope 로 쪼개면 파편화** → `scope_candidates[].role=backbone` 으로 빼서 1회 분석(모든 scope 참조). DB 도 동일(db-assets-always-on). backbone 을 먼저 빼면 feature 간 결합 급감 → 남은 feature = `role=scope`. (carve 는 hub 를 신호로 표시할 뿐 backbone 확정은 soft gate #0 사람.)
 
 5. **finding 등재 (필요 시)** — 구조 risk = `_base-log-finding` 으로 low|medium reference finding (status=open / gate blocker 아님).
 

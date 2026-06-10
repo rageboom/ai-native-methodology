@@ -185,6 +185,12 @@
             "enum": ["clean", "moderate", "entangled"],
             "description": "(선택) legacy-spectrum 정합 decay 등급. §3-A 자동화 천장 보정 입력 — clean=Modern 천장 기대 / entangled=하향 정직 표기 (over-claim ❌)."
           },
+          "role": {
+            "type": "string",
+            "enum": ["scope", "backbone"],
+            "default": "scope",
+            "description": "ADR-CHAIN-016 backbone-first — scope = feature 단위 분석 대상 / backbone = afferent-hub(Martin Ca 최상위 공통 커널: cache·base·utils 등) 또는 DB-adjacent 공통코드 → **개별 scope 아님 / 1회 분석 / 모든 scope 가 참조**. backbone 을 빼면 feature 간 결합 급감(shared-kernel factoring). 미지정=scope."
+          },
           "source": {
             "type": "string",
             "enum": ["scope_carve", "codegraph_measured", "loc_estimate", "manual"],

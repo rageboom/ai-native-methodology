@@ -42,14 +42,22 @@ codegraph 출력은 **어떤 gate 에도 inject ❌ / 최종 scope 절단은 사
 ### 3. 경계 위반 = 1급 산출물
 의존성 규칙 위반(domain→infra 역참조, feature 축 벗어난 교차참조)은 버그가 아니라 분석 가치 출력 → **antipatterns.json(category=ARCH) + migration-cautions.json + finding** 3곳 라우팅. decay 정도는 `decay_grade`(clean/moderate/entangled / legacy-spectrum 정합)로 §3-A 자동화 천장 보정(정직 하향 / over-claim ❌).
 
-## 적용 절차 (대형 코드베이스)
+## 적용 절차 (대형 코드베이스 — backbone-first)
 
 ```
 [0] 글로벌 inventory       : 전 repo 파일/모듈 지도
 [1] 글로벌 codegraph 실측   : coupling 행렬 → scope_candidates 도출 + 경계위반 hotspot  ← 본 ADR 핵심
-[2] 글로벌 DB backbone      : schema.json (db-assets-always-on / ADR-CHAIN-014)
-[3] scope = 측정 feature 클러스터 단위 full 11-phase (advisory → 사용자 절단 후)
+[2] 글로벌 backbone 분리    : ⓐ DB(schema.json / db-assets-always-on / ADR-CHAIN-014)
+                              ⓑ shared-kernel = Martin afferent-hub(공통 유틸/코드: cache·base·utils 등)
+                              → backbone = scope 아님 / 1회 분석 / 모든 scope 가 참조 (role=backbone)
+[3] scope = 측정 feature 클러스터 단위 full 11-phase (advisory → 사용자 soft gate #0 절단)
 ```
+
+### shared-kernel factoring 규칙 (backbone-first 핵심)
+
+- **규칙**: afferent-hub(Martin Ca 높음 = 만물이 의존) + DB-adjacent 공통 코드는 **개별 scope 가 아니라 global backbone** 으로 빼고 1회 분석. `inventory.json#scope_candidates[].role=backbone` 로 표식.
+- **근거 (paradigm-grounded)**: Martin "hub 를 쪼개면 파편화" + DDD shared-kernel + 기존 db-assets-always-on(DB 이미 backbone) 동형 확장. backbone 을 빼면 **feature 간 결합이 급감**(feature 의 external coupling 상당분이 kernel 행) → feature 가 깨끗한 scope 로 분리됨 (Vertical Slice "slice 간 결합 최소").
+- **정직 carry (§8.1)**: "external coupling 의 kernel 비중 %"는 ep-be-gea 1-PoC 실측(81~88%) — **일반 임계 수치 미주장** / ≥2 distinct 도메인 corroboration 후 확정. 규칙(hub→backbone) 자체는 paradigm-grounded 로 codify.
 
 ## Consequences
 

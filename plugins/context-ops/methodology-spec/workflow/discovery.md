@@ -123,14 +123,23 @@ modules_for_priority_analysis:
 
 # 대형/decayed 코드베이스 — 패키지 경로가 아니라 codegraph 실측 coupling 으로 도출 (advisory / 측정 기반)
 scope_candidates:
-  - id: biztrip
-    members: ["core/frontoffice/biztrip", "core/backoffice/biztrip"]  # 명목 BC 경계 관통 가능
+  # backbone 먼저 분리 (대형 / backbone-first)
+  - id: shared-kernel
+    members: ["core/geacommon", "core/common"]   # Martin afferent-hub (만물이 의존)
+    role: backbone                                 # scope 아님 / 1회 분석 / 모든 scope 참조
+    source: scope_carve
+  - id: reservation                                # 알아듣기 쉬운 의미 명칭 (패키지 약칭 resve ❌)
+    members: ["core/frontoffice/resve", "core/backoffice/resve"]  # 명목 BC 관통 = 한 업무 두 얼굴
+    role: scope
     crosses_nominal_boundary: true
-    decay_grade: moderate
-    source: codegraph_measured
+    decay_grade: entangled
+    source: scope_carve
+    carve_signals: [scc, martin, hotspot]
 ```
 
 > ⚠️ **패키지 경로 ≠ 경계.** 클린아키텍처를 *지향*했으나 미준수된 코드베이스에서는 명목 BC/레이어 트리와 실제 응집이 어긋난다. `modules_for_priority_analysis` 의 LOC 추정만으로 scope 를 끊지 말고, `analysis-code-graph` 실측 coupling 으로 `scope_candidates` 도출(advisory / 최종 절단 = 사용자 결단). 경계 위반은 antipatterns(ARCH)+migration-cautions+finding 으로 라우팅.
+>
+> **backbone-first (대형)**: scope 를 끊기 전에 ⓐ DB(always-on) + ⓑ shared-kernel(Martin afferent-hub 공통 커널)을 `role=backbone` 으로 먼저 분리 → 1회 분석. hub 를 빼면 feature 간 결합 급감 → feature 가 깨끗한 `role=scope` 로 분리(Martin "hub 쪼개면 파편화" + DDD shared-kernel). scope id = **알아듣기 쉬운 의미 명칭**(패키지 약칭 그대로 ❌).
 
 ---
 
