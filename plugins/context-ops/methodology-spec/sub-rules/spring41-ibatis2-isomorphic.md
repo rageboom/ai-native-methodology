@@ -141,11 +141,13 @@
 | **R1' automation ceiling 외부 권위 정량 비교 (v1.1 신규)**    | Spring 4.1+iBATIS 2 specific academic 권위 출현 시 (현재 ❌ / paradigm class 추상화 인용만 가능) | ⏳ open (Wang ICSE 2025 + LongCodeBench 2025 + AWS SCT + Amazon Q + ThoughtWorks 외부 권위 = paradigm 방향성 + scope 효과 + 자릿수 sanity 정합 / 정량 ceiling 53~55% = original empirical finding (industry first) 유지)    |
 | **PoC #11 0 SATD 해석 정정 (v1.1 신규 carry)**                | PoC #11 Day 3.5 종결 시                                                                          | ⏳ open ("Modern OSS reference 정합" 단순 결론 ❌ / single-case + 작은 모듈 + 잠복 기간 미경과 해석 명시 / `examples/poc-11-efiweb-billing-spring41/input/` + `sql-inventory.json` 갱신)                                    |
 | ~~**C-not-all-code-검증 (v1.1.1 신규 carry)**~~               | arxiv 2601.21894 "Not All Code Is Equal" 별도 검증 후 sub-rule §X-C 재인용 vs 영구 제거          | ✅ **resolved 2026-05-13** (session 2차 / DEC-2026-05-13-not-all-code-인용-복원 / 메인 WebFetch + WebSearch 직접 검증 = arxiv ID 정확 / Twist et al. 2026 / 인용 복원 / sub-rule v1.1.1 → v1.1.2 PATCH / 본체 v2.3.4 PATCH) |
-| **Modern stack 사내 측정 carry (v1.1.1 신규 critical)**       | 사내 Modern stack (MyBatis 3 / TypeORM / Spring Data JPA / Prisma) PoC 진입 시                   | ⏳ open (Modern ceiling ~60~67% = 3 OSS PoC 한정 / 사내 Modern 측정 ❌ — Agent 3 Senior critique REVISE #1 / 외부 인용자 "OSS-only" 한정 인지 의무 / 본체 가치 명세 명시 의무 cross-link CLAUDE.md + README + memory)       |
+| ~~**Modern stack 사내 측정 carry (v1.1.1 신규 critical)**~~       | 사내 Modern stack PoC 진입 시                   | ✅ **재정의/종결 2026-06-10** (DEC-2026-06-10-3a-deflate): 사내 Modern(ep-be-gea) 진입 시 발견 — §3-A paradigm ceiling 정량 주장이 측정 비대칭 산물(미입증) → §3-A 강등 + "재측정 의무"를 auto_ratio → **chain-harness operability** 측정으로 재정의. auto_ratio 재측정 carry = 폐기(저가치).       |
 
 ---
 
 ## X. analysis 단계 §3-A automation ceiling (R1' 새 가설 / v1.1 신규)
+
+> **⚠️ 강등 (DEC-2026-06-10-3a-automation-ceiling-deflate-operability-reframe / 2026-06-10)**: 본 §X 의 **paradigm-cross 정량 ceiling 주장(Legacy 53~55% < Modern 60~67% / ~10%p gap)은 근거 약함으로 강등** — 정량 paradigm 주장 ❌, **정성 신호로만 유효**. 근거: ⓐ **측정 비대칭** — Legacy(#06/07/11) = 4-산출물 평균(분해표 명시) / Modern(#08/09/10) = **inventory 산출물 1개만**(분해표 없음 / "평균" 오라벨). inventory 끼리는 Legacy 60~75% ≈ Modern 60~67% = **paradigm gap 없음**. ⓑ **metric analyst-noise** — 같은 Legacy·같은 rules.json auto_ratio 가 poc-06 29% ↔ poc-07/11 50% (+21%p 출렁) = paradigm ceiling 떠받칠 정밀도 미달. ⓒ ep-be-gea(사내 Modern) 4-산출물 ≈37.5% ≈ Legacy poc-06 38.75%(analyst 판정). **남는 진실은 정성적**: 의미 계층(의도·도메인 의미·bug-vs-intent)은 결정론 환원 불가 → 진짜 ceiling이고 **paradigm 아닌 산출물 종류**가 가름(사람 gate + characterization 의 존재 이유). 아래 정량 수치는 **역사적 측정 기록**으로 보존(액면 paradigm 주장 ❌). "사내 Modern 재측정 의무" = auto_ratio 재측정 ❌ → **chain-harness operability/correctness 측정**(산출물이 LLM 을 실제 운영하게 하느냐)으로 재정의.
 
 ### X-A. 3 사내 PoC 측정 사실
 
@@ -236,14 +238,14 @@ paradigm-cross axis 정량 측정 = academic + industry 모두 부재 / **자릿
 | PoC #09 lujakob                             | NestJS + TypeORM Modern     | **63.6%**                            | DEC-2026-05-08-poc-09-종결 | OSS 한정     |
 | PoC #10 raeperd                             | Spring Data JPA Modern      | **60%**                              | DEC-2026-05-08-poc-10-종결 | OSS 한정     |
 
-→ Legacy ceiling **~53~55%** vs Modern ceiling **~60~67%** (~10%p gap / 6 PoC 사실 robust).
+→ ~~Legacy ceiling **~53~55%** vs Modern ceiling **~60~67%** (~10%p gap / 6 PoC 사실 robust).~~ **(강등 — §X 배너)**: 이 gap 은 **측정 비대칭의 산물**(Legacy=4-산출물 평균 vs Modern=inventory-only). 비교 가능한 inventory 끼리는 Legacy 60~75% ≈ Modern 60~67% = paradigm gap 없음. 정량 ceiling 주장 ❌.
 
-**Modern ceiling = OSS PoC 3건 한정** (v1.1.1 신규 명시 / Agent 3 REVISE #1 흡수). 사내 Modern stack 측정 ❌ — 사내 적용 시 재측정 의무 (carry C-모던-stack-사내-측정 / 외부 인용자 "OSS-only" 한정 인지 의무).
+~~**Modern ceiling = OSS PoC 3건 한정**~~ — **재정의(DEC-2026-06-10-3a-deflate)**: Modern "60~67%" = inventory 산출물 1개만 측정(분해표 없음). 사내 Modern "재측정 의무" = auto_ratio 재측정 ❌ → **chain-harness operability/correctness 측정**으로 재정의(산출물 컨텍스트로 LLM 이 실제 작업 수행하나 / chain-harness axis 가 이미 측정). ep-be-gea reservation-golf god-method 천장(gate#4) = 그 신호 실례.
 
 ### X-F. 실용 함의
 
 1. Spring 4.1+iBATIS 2 stack analysis = §3-A 자동화율 35~55% expectation (scale 무관 / responsibility 무관 / paradigm 종속)
-2. migration target stack 결정 시 = Modern stack 이전 = §3-A 자동화율 +10%p expectation (Modern = OSS 한정 / 사내 재측정 의무)
+2. ~~migration target stack 결정 시 = Modern stack 이전 = §3-A 자동화율 +10%p expectation~~ **(강등)**: "+10%p paradigm 효과"는 측정 비대칭 산물 = 미입증(§X 배너). §3-A 는 산출물 종류(inventory 결정론 ~60% / 의미-heavy ~22~50%)가 가르지 paradigm 아님 — migration 공수 추정은 "의미 계층(BR 의도·도메인)은 사람/LLM 판단 필요"라는 정성 사실로만.
 3. 70~80% 한계 (**chain harness 전체 자동화 axis** / process 통과율 metric / gate 의무 ≤ 15% 사용자 검토 / CLAUDE.md / project_methodology_scope memory) 와 **별도 axis** (본 §X = **analysis 단계 §3-A automation axis** / artifact 추출률 metric / paradigm 종속 ceiling). **metric 분모 자체 다름** — chain harness axis 분모 = chain 1~4 통합 gate 통과량 / §3-A axis 분모 = analysis 단계 LLM ↔ rule.json 단방향 추출 row count (v1.1.1 신규 metric semantics 차이 명시 / Agent 3 강화 흡수).
 4. ADR-CHAIN-008 "MEDIUM × ≥ 5 PoC = strong" 정책 = 본 R1' 가설에도 정합 적용 가능 (6 PoC isomorphic 6 차원 corroboration 보강 / industry first paradigm-cross axis quantification)
 

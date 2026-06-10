@@ -16,9 +16,19 @@
 - **★ 역공학 분석 방법론 갭 backlog 완전 종결(0 잔여)** — 7항목 전부 처분(#1~#5 official/live · #6 DROP · #7 DEFER-verified). SSOT = `plan-reverse-engineering-methodology.md` §3 표 + DEC-2026-06-10-{reverse-eng-delta-2a-3-promotion / test-recovery-existing-test-evidence / inquiry-log-reframe-dissolve / decision-gated-defer-verified}.
 - diagnose-before-design 이 세션 내 6회 적중(기격상/obviated/redundant/정책충돌 실측 차단) → [[feedback_diagnose_before_design_check_existing]] 선례 누적.
 
+### ★★ 2026-06-10 후속 세션 (frontier #2 stale 정정 + D1 → §3-A axis 강등·재정의)
+
+- **frontier #2(Phase 4 living-sync) = stale 적발·종결 표기 정정**(아래 #2 줄 strikethrough): per-item=종료 / `--apply`=DROP / 자동등록=DEFER 유해확인. diagnose-before-design 7번째.
+- **frontier #1(D1) = §3-A auto_ratio 측정 시도 → 결함 발견 → axis 강등·재정의로 귀결** (DEC-2026-06-10-3a-automation-ceiling-deflate-operability-reframe / 승인·반영 완료):
+  - Path A(§3-A auto_ratio 측정)→측정방법 결함(필드명 휴리스틱·축불일치)으로 격상 5파일 **1차 REVERTED**→사용자 "이 측정 무슨 의미·인사이트?" 환기→**(나) 채택**(§3-A 강등 + 재측정 의무 재정의).
+  - **확증**: ⓐ 측정 비대칭(Legacy 4-산출물 / Modern inventory-only / 구조 확정) ⓑ analyst noise(rules 29↔50% / 데이터 확정) ⓒ ep-be-gea 4-artifact ≈37.5%≈Legacy → **paradigm ceiling gap 근거 약함**.
+  - **반영(본체 정정 / docs / 버전 bump 없음)**: CLAUDE.md §3-A 문단·표(정량→정성 강등+재정의) + sub-rule §X(배너·X-E·X-F·carry144) + 신규 DEC + INDEX. §3-A = 보조 정성 신호 / chain-harness axis = 사내 Modern 측정 1차.
+  - **재측정 의무 재정의**: auto_ratio ❌ → **chain-harness operability**(산출물로 LLM 이 실제 작업하나) = **Path B 와 합류**(ep-be-gea reservation-golf god-method 천장 gate#4 = 신호 실례).
+- **D1 잔여 = operability 측정(Path B)**: reservation-golf test gate#4 god-method 천장(23.1%) 돌파 시도 or impl real DB · event scope · ≥2 사내 distinct Modern 도메인.
+
 **다음 세션 frontier (독립 축 / 사용자 결단 — 역공학 라인처럼 자명한 다음 단계 ❌)**:
-1. **사내 Modern S2 재측정 [D1]** — 최고 prod-value. ep-be-gea(`/Users/sangcl/Documents/Development/Products/ep-be-gea` / Spring Boot 3 multi-module / 외부격리·commit❌)는 analysis~plan 까지 진행됨(`project_epbegea_dogfooding` 메모리) → full chain(test/impl) + S2 AX전환 측정. CLAUDE.md "사내 Modern 재측정 의무" 미충족분.
-2. **Phase 4 living-sync** (per-item granularity) — 일부 기출하(per-BC/per-BR v0.12~0.16). 잔여 = (carry) 자동등록 lifecycle 배선 · durable source-write(--apply). DEC-2026-06-07-living-sync §5 로드맵.
+1. **사내 Modern S2 재측정 [D1]** — §3-A axis 강등·재정의 완료(위 ★★). 재측정 의무 = **chain-harness operability**(Path B: reservation-golf test/impl god-method 천장) · event scope · ≥2 사내 도메인. ep-be-gea = `/Users/sangcl/Documents/Development/Products/ep-be-gea`(외부격리·commit❌).
+2. ~~**Phase 4 living-sync** (per-item granularity)~~ — **종결 (frontier 아님 / 2026-06-10 diagnose-before-design 정정)**: per-item granularity = v0.16.0 S6 로 **종료**(잔여 선택 3종 DROP / DEC §21) · `--apply` durable source-write = **DROP**("★재제안 방지" / propose-only=R2 의도보존 패러다임 / DEC §23) · 자동등록 lifecycle 배선 = **DEFER 정답 재확인**(SessionStart auto-register=영구 false-health 적극 유해 / read-only 표면화만 v0.19.1 / DEC §24·§26). 핵심 동기화 루프 = **종단**(DEC line 317). ⟹ 본 줄 stale 였음(직전 narrative 가 pre-v0.16 era). 빌드할 잔여 0. [[feedback_diagnose_before_design_check_existing]].
 3. **Type 2 사내 plugin-install 배포 측정 [③]** — 사내 팀 self-serve 1 cycle(측정=0 / 사용자 의존) + F-EXT-PATH-DOCS-001(human 문서 path).
 4. (보류) #7 decision-gated 재검토 = trigger(실 driver / 측정 demand) 발생 시만.
 

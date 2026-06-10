@@ -34,14 +34,11 @@ USE: AI 자동 생성 + 사용자 검토 / prod 시스템 + traceability-matrix
 
 **70~80% 한계 = 명시 잔존** (**chain harness 전체 자동화 axis** / process 통과율 metric). AI 자동화 ≥ 85% / 사람 검토 (gate #1~#5) ≤ 15% / 100% 자동화 ❌.
 
-**analysis 단계 §3-A automation = 별도 axis** (R1' / DEC-2026-05-13-r1-prime-본체-명문화 / 6 PoC 사실 / sub-rule `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X 정합):
+**analysis 단계 §3-A automation = 보조 정성 신호** (R1' / sub-rule `methodology-spec/sub-rules/spring41-ibatis2-isomorphic.md` §X / **2026-06-10 강등 = DEC-2026-06-10-3a-automation-ceiling-deflate-operability-reframe**):
 
-| paradigm                                       | analysis §3-A ceiling | corroboration                             | 측정 환경                              |
-| ---------------------------------------------- | --------------------- | ----------------------------------------- | -------------------------------------- |
-| Spring 4.1 + iBATIS 2 (Legacy)                 | **~53~55%**           | 3 사내 PoC isomorphic (PoC #06+#07+#11)   | 사내 EFI-WEB                           |
-| Modern (MyBatis 3 / TypeORM / Spring Data JPA) | **~60~67%**           | 3 OSS PoC corroboration (PoC #08+#09+#10) | **OSS 한정 / 사내 Modern 재측정 의무** |
+> **paradigm-cross 정량 ceiling 주장(Legacy 53~55% < Modern 60~67% / ~10%p gap)은 근거 약함으로 강등** — 측정 비대칭 산물(Legacy=4-산출물 평균 / Modern=inventory-only) + analyst noise(rules.json 29↔50%). inventory 끼리는 Legacy 60~75% ≈ Modern 60~67% = **paradigm gap 없음**. 사내 ep-be-gea 4-산출물 ≈37.5% ≈ Legacy. **남는 정성 신호**: 의미 계층(의도·도메인 의미·bug-vs-intent)은 결정론 환원 불가 = 진짜 ceiling이고 **paradigm 아닌 산출물 종류**가 가름(사람 gate + characterization 의 존재 이유). **"사내 Modern 재측정 의무" = auto_ratio 재측정 ❌ → chain-harness operability/correctness 측정으로 재정의**(산출물 컨텍스트로 LLM 이 실제 운영·작업하나 / 아래 chain harness axis 가 1차 측정 / ep-be-gea god-method 천장 gate#4 = 신호 실례). 역사적 정량 측정 = sub-rule §X 보존(액면 paradigm 주장 ❌).
 
-chain harness 70~80% axis 와 analysis §3-A automation axis = **별도 metric** (metric 분모 자체 다름 / chain harness = chain 1~5 통합 gate 통과율 / §3-A = analysis 단방향 추출률 / 외부 인용 시 axis 혼동 회피 의무).
+chain harness 70~80% axis = analysis §3-A axis 보다 **운영가능성에 직결된 1차 metric** (chain 1~5 통합 gate 통과율 / 사내 Modern 측정의 본체). §3-A = 보조 정성(분모 = analysis 단방향 추출률 / 외부 인용 시 강등·axis 혼동 회피 의무).
 
 revisit loop (자동 감지 + 사용자 결단): chain-revisit-detector → 사용자 prompt → go/stop. stop 시 임의 stage jump.
 
