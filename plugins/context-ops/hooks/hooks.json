@@ -33,12 +33,12 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Write|Edit|NotebookEdit|mcp__wiki-jira-assistant__.*",
+        "matcher": "Write|Edit|NotebookEdit|mcp__wiki-jira-assistant__.*|mcp__mcp-server-wiki-jira__.*",
         "hooks": [
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .ai-context/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — mcp__wiki-jira-assistant__.* (jira-confluence MCP) 호출도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
+            "$comment": "ADR-CHAIN-005 §3 mechanical trio (iii) — state.blocked=true + .ai-context/output/** 대상 Write/Edit 시 permissionDecision=deny 차단. exit 2 반환 시 Claude Code 가 도구 실행 차단. v8.6.1+ R20 (DEC-2026-05-18-r20-mcp-ticket-sync-channel) — jira-confluence MCP 호출(신버전 mcp__mcp-server-wiki-jira__.* + 구버전 mcp__wiki-jira-assistant__.* 양쪽)도 state.blocked 시 deny / 결정론 axis 보호 + 사용자 confirmation gate bypass 차단."
           }
         ]
       }

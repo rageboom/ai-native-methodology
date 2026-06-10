@@ -115,8 +115,8 @@
         "properties": {
           "mcp_tool_name": {
             "type": "string",
-            "pattern": "^mcp__wiki-jira-assistant__[a-z0-9_]+$",
-            "description": "R20 = `mcp__wiki-jira-assistant__*` 만 허용 (jira_create / jira_link / jira_transition / jira_comment / jira_search / jira_structure_add_issues / wiki_page_create / wiki_page_update / 등). 다른 MCP 호출 = ❌ schema-validator reject (Tier 2.5 = jira-confluence MCP only / Linear/GitHub Issues 등 = v8.7.0+ multi-platform carry)."
+            "pattern": "^mcp__(mcp-server-wiki-jira|wiki-jira-assistant)__[a-z0-9_]+$",
+            "description": "R20 = jira-confluence MCP 만 허용 — 신버전 `mcp__mcp-server-wiki-jira__*` 또는 구버전 `mcp__wiki-jira-assistant__*` (jira_create / jira_link / jira_transition / jira_comment / jira_search / jira_structure_add_issues / wiki_page_create / wiki_page_update / 등 / SKILL.md §단계 1 _mcp_prefix resolve 정합). 다른 MCP 호출 = ❌ schema-validator reject (Tier 2.5 = jira-confluence MCP only / Linear/GitHub Issues 등 = v8.7.0+ multi-platform carry)."
           },
           "tool_stdout_path": {
             "type": "string",
@@ -227,7 +227,8 @@
       "properties": {
         "enabled": {"type": "boolean", "default": true},
         "skip_count": {"type": "integer", "minimum": 0, "description": "본 cascade 안 기존 ticket lookup → skip 한 횟수"},
-        "search_jql_used": {"type": "array", "items": {"type": "string"}, "description": "사용된 JQL queries (debugging 용)"}
+        "search_jql_used": {"type": "array", "items": {"type": "string"}, "description": "사용된 JQL queries (debugging 용)"},
+        "search_path": {"type": "string", "enum": ["custom_field", "fallback_summary"], "description": "SKILL.md §단계 2 정합 — idempotency 검색이 1차 커스텀 필드(custom_field)로 됐는지, 커스텀 필드 부재로 2차 표준 summary/label fallback(fallback_summary)으로 됐는지 기록. 커스텀 필드 부재 환경에서 1차가 조용히 0건 → 중복 생성되는 무력화를 추적."}
       }
     },
     "graceful_mcp_missing": {

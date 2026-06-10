@@ -35,7 +35,7 @@ allowed-tools: Read, Write, Edit, Bash, mcp__mcp-server-wiki-jira__jira_create, 
 
 analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stage_paradigm_violation` finding emit + reject (R20-prime 정합).
 
-**MCP 미연결 환경 무영향** — `ListMcpResourcesTool` probe 결과 mcp**wiki-jira-assistant** 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt ❌).
+**MCP 미연결 환경 무영향** — jira-confluence MCP(신버전 `mcp__mcp-server-wiki-jira__*` 또는 구버전 `mcp__wiki-jira-assistant__*`) 부재 시 silent skip + `F-TICKETSYNC-001 mcp_unavailable` finding emit (opt-in 설계 / error halt ❌).
 
 ## 파라미터
 
@@ -184,7 +184,9 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 
 ### 단계 2 — Idempotency check (search-first)
 
-`mcp__wiki-jira-assistant__jira_search` JQL 로 기존 ticket lookup:
+`{_mcp_prefix}jira_search` (§단계 1 resolve 결과) JQL 로 기존 ticket lookup.
+
+**1차 — 커스텀 필드 JQL** (해당 Jira 환경에 아래 커스텀 필드가 구성된 경우만):
 
 ```
 JQL (Story per BHV cluster): project = <PROJECT_KEY> AND "BHV cluster" ~ "{bhv_cluster_id}"
@@ -193,9 +195,19 @@ JQL (Epic per screen):      project = <PROJECT_KEY> AND "Screen ID" ~ "SCR-CAR-D
 JQL (OP-* Task):            project = <PROJECT_KEY> AND "OP ID" ~ "OP-CAR-001"
 ```
 
+**2차 — fallback (커스텀 필드 부재 / 1차 결과 0건 또는 400 reject 시 의무)**: 표준 필드 `summary` + `labels` 로 재조회. 트레이스 ID 는 summary 브래킷(`[TASK-CAR-001]` / `[OP-CAR-001]`) 또는 label 에 박혀 있으므로 환경 무관 검색 가능:
+
+```
+JQL (Sub-task per TASK-*): project = <PROJECT_KEY> AND summary ~ "[TASK-CAR-001]"
+JQL (OP-* Task):           project = <PROJECT_KEY> AND summary ~ "[OP-CAR-001]"
+JQL (Story / Epic):        project = <PROJECT_KEY> AND summary ~ "{title}"   # Epic·Story 는 브래킷 없음 → 정확 일치 확인 후 사용자 confirm
+```
+
+> ⚠️ **idempotency 무력화 방지**: 1차 커스텀 필드 JQL 이 그 환경에 없는 필드명을 쓰면 **조용히 0건** 반환 → 중복 생성 위험. 따라서 커스텀 필드 미구성 환경에서는 **2차 fallback 의무**. 1차/2차 모두 0건일 때만 "신규 생성" 으로 분기.
+
 - 발견 시 → `ticket_ref.id` 채움 + `status_history` 갱신 path 만 진행 (신규 생성 ❌)
-- 부재 시 → 신규 생성 path 진행
-- `idempotency_skip_count` 증가 기록
+- 부재 시 (1차+2차 모두 0건) → 신규 생성 path 진행
+- `idempotency_skip_count` 증가 기록 (+ `search_first_idempotency.search_path` = `custom_field` \| `fallback_summary` 기록)
 
 ### 단계 3 — Preview MD 생성
 
@@ -246,10 +258,10 @@ plan stage exit 의 4-level cascade preview. 예 (scope=car):
 
 ### MCP 호출 sequence
 
-1. mcp**wiki-jira-assistant**jira_create (Initiative MIG-1) [redacted body]
-2. mcp**wiki-jira-assistant**jira_create (Epic EPIC-CAR-DASH, parent=MIG-1)
-3. mcp**wiki-jira-assistant**jira_create (Story #1, parent=EPIC-CAR-DASH)
-4. mcp**wiki-jira-assistant**jira_create (Sub-task TASK-CAR-001, parent=Story #1)
+1. {_mcp_prefix}jira_create (Initiative MIG-1) [redacted body]
+2. {_mcp_prefix}jira_create (Epic EPIC-CAR-DASH, parent=MIG-1)
+3. {_mcp_prefix}jira_create (Story #1, parent=EPIC-CAR-DASH)
+4. {_mcp_prefix}jira_create (Sub-task TASK-CAR-001, parent=Story #1)
    ... (총 N 호출)
 
 ### 추정 비용 — MCP 호출 ~38회 (3 Epic + 3 Story + 2 OP + 8 TASK + transitions) / ~4분
@@ -311,7 +323,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
    - `parent_strategy=parent_key`: 모든 role 이 `parent_key` 시도 (DWPD 환경에서는 일반 issue 가 400 reject — `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding).
    - `parent_strategy=epic_link_customfield`: Sub-task = `parent_key` 만 / 그 외 = `extra_fields[epic_link_customfield_id]`. B14 — Sub-task 에 `extra_fields[epic_link_customfield_id]` 추가 시도 시 backend 400 reject. `epic_link_customfield_id` 미명시 + 일반 issue 시 `F-TICKETSYNC-005 missing_epic_link_customfield` finding + reject.
 
-3. **호출 sequence 의무**:
+4. **호출 sequence 의무**:
    - jira_create payload 의 `issue_type` + parent linking 필드는 위 resolve 결과 직접 인용 (no-simulation / SKILL.md 본문 hardcode 표기 인용 ❌).
    - jira_create 실패 (400/403) 시 — error message parse 후 `F-TICKETSYNC-008 environment_drift` finding emit + 환경별 resolve table 보강 권고 evidence 누적.
 

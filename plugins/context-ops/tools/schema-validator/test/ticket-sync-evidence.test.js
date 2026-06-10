@@ -163,6 +163,24 @@ test('ticket-sync-evidence — mcp_tool_name pattern (mcp__wiki-jira-assistant__
 	rmSync(TMP, { recursive: true, force: true });
 });
 
+test('ticket-sync-evidence — mcp_tool_name 신버전 prefix(mcp__mcp-server-wiki-jira__) accept', () => {
+	ensureTmp();
+	const f = writeEvidence(
+		baseEvidence({
+			mcp_invocations: [
+				{
+					...VALID_INVOCATION,
+					mcp_tool_name: 'mcp__mcp-server-wiki-jira__jira_create',
+					reproduction_command: 'mcp__mcp-server-wiki-jira__jira_create with summary=...',
+				},
+			],
+		}),
+	);
+	const r = runCli([f]);
+	assert.equal(r.status, 0, `신버전 prefix accept 의무 (DEC-2026-05-18 _mcp_prefix resolve). stdout:${r.stdout}`);
+	rmSync(TMP, { recursive: true, force: true });
+});
+
 test('ticket-sync-evidence — 7-field evidence 누락 reject (reproduction_command 의무)', () => {
 	ensureTmp();
 	const { reproduction_command, ...partial } = VALID_INVOCATION;

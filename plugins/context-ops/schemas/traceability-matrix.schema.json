@@ -160,8 +160,8 @@
                     },
                     "mcp_tool": {
                       "type": "string",
-                      "pattern": "^mcp__wiki-jira-assistant__[a-z0-9_]+$",
-                      "description": "전이 수행 MCP tool 이름 (예: mcp__wiki-jira-assistant__jira_transition)"
+                      "pattern": "^mcp__(mcp-server-wiki-jira|wiki-jira-assistant)__[a-z0-9_]+$",
+                      "description": "전이 수행 MCP tool 이름 — 신버전 mcp__mcp-server-wiki-jira__* 또는 구버전 mcp__wiki-jira-assistant__* (예: mcp__mcp-server-wiki-jira__jira_transition)"
                     },
                     "evidence_ref": {
                       "type": "string",
