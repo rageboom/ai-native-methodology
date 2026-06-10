@@ -10,6 +10,18 @@
 
 ---
 
+## [0.29.0] — 2026-06-10 MINOR — scope candidate coarse-to-fine 재귀 carve (ADR-CHAIN-016 규칙 4)
+
+측정으로 도출한 scope candidate 도 **거칠 수 있다**(한 candidate members 가 복수 독립 응집 sub-unit 클러스터) → **coarse-to-fine 재귀 carve** 규칙을 본체 명문화. ep-be-gea dogfooding F12 트리거 (advisory / gate·trust·schema·code·test 무변경). DEC-2026-06-10-scope-candidate-recursive-carve.
+
+- **갭 (diagnose-before-design)**: 측정 scope 도출(ADR-CHAIN-016)은 codified 됐으나 "도출된 candidate 가 여전히 거칠다 → 재귀 재-carve" 미명시. `under_decomposition` 신호는 **discovery 단계 UC/entity<1.5 축**(scope 내 UC 분해)이지 **inventory/carve 단계 scope-자체-거칠음 축이 아님** = 별개·미커버 → 진짜 델타(중복 아님).
+- **규칙 (ADR-CHAIN-016 규칙 4)**: candidate members 가 복수 독립 응집 sub-unit 이면 측정 단계([1]~[3]) 재적용해 재-carve 후 절단(한 번의 coupling 집계가 최종 단위를 항상 주지 않음 / coarse-to-fine 반복). 거칠음 신호(advisory) ⓐ members 다수 독립 하위 트리 ⓑ 내부 coupling 약하게 분절(SCC 재분할) ⓒ 후행 — scope 진입 후 `discovery.uc.under_decomposition` 발화. 재분해 절단 = 사용자 soft gate #0 (자동 재분해·slug 생성 ❌ / 규칙 2 동형).
+- **operationalize**: ADR-CHAIN-016 §결정 규칙 4 + §적용절차 [3] 하위 + `analysis-source-inventory` §4 coarseness 재점검 단계.
+- **실증 (1-PoC)**: scope-carve 'reservation' candidate(member `resve`) = 실제 494 java / 6 하위 예약도메인(golf·healing·helium·mtrm·athrt·base) 클러스터 / golf 만 떼니 응집 BC(90 파일). canonical global 누적 모델 정합(reservation→golf 재분해→BC-RESV-GOLF 누적→subset 필터 교차오염 0 / DEC-2026-06-07-subset-retire).
+- **§8.1 정직**: 규칙(coarse-to-fine 재귀) = paradigm-grounded(measured-coupling 재귀 + under_decomposition scope-level 확장 / 계층적 클러스터링 표준) 즉시 codify / **"몇 파일=거침" 정량 임계 = ep-be-gea 1-PoC carry / ≥2 distinct 도메인 corroboration 후 확정**.
+
+---
+
 ## [0.28.0] — 2026-06-10 MINOR — backbone-first 절차 + shared-kernel factoring codify
 
 대형 코드베이스 analysis 의 **backbone-first 절차 + shared-kernel factoring 규칙**을 본체 명문화 (ad-hoc → codified 전환). ADR-CHAIN-016 에 [0]→[3] 시퀀스는 있었으나 ⓐ shared-kernel(비-DB 공통코드) factoring 누락(DB backbone 만) ⓑ skill 미operationalize ⓒ scope/backbone 구분 표식 없음 = 갭(grep ③ 0건). DEC-2026-06-10-backbone-first-shared-kernel-factoring.

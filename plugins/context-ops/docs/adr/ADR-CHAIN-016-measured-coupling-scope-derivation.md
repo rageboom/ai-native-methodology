@@ -42,6 +42,17 @@ codegraph 출력은 **어떤 gate 에도 inject ❌ / 최종 scope 절단은 사
 ### 3. 경계 위반 = 1급 산출물
 의존성 규칙 위반(domain→infra 역참조, feature 축 벗어난 교차참조)은 버그가 아니라 분석 가치 출력 → **antipatterns.json(category=ARCH) + migration-cautions.json + finding** 3곳 라우팅. decay 정도는 `decay_grade`(clean/moderate/entangled / legacy-spectrum 정합)로 §3-A 자동화 천장 보정(정직 하향 / over-claim ❌).
 
+### 4. scope 후보도 거칠 수 있다 — 재귀 carve (coarseness 재점검)
+측정으로 도출한 `scope_candidate` 라도 그 members 가 **복수의 독립 응집 sub-unit 을 한 묶음**으로 담을 수 있다 (명목 패키지 1개가 실제로는 N개 도메인). 이때 그 candidate 를 더 잘게 **재-carve**(본 절차 [1]~[3] 재적용)한 뒤 scope 를 절단한다 — 한 번의 coupling 집계가 항상 최종 응집 단위를 주지 않는다(coarse-to-fine 반복). 거칠음 신호(advisory):
+
+- ⓐ candidate members 가 **다수의 독립 하위 트리**(각자 자기 domain/service/infra 세트)로 갈라짐.
+- ⓑ candidate **내부 coupling 이 약하게 분절**(internal sub-cluster 다수 / SCC 가 candidate 안에서 다시 쪼개짐).
+- ⓒ **후행 신호**: scope 진입(discovery) 후 `discovery.uc.under_decomposition`(UC/entity < 1.5)이 발화 = scope 가 거칠어 한 scope 에 여러 도메인이 뭉쳤다는 사후 증거.
+
+→ 모두 **advisory / reference-lens** — 재분해 절단은 사용자 soft gate #0 결단. carve 가 자동 재분해·slug 생성 ❌ (규칙 2 동형).
+
+**§8.1 carry**: ep-be-gea 'reservation' candidate(codegraph member `resve`)가 실제로는 **6 하위 예약도메인**(golf/healing/helium/mtrm/athrt/base) 클러스터였던 **1-PoC 실증** — golf 만 떼니 응집 BC(90 파일)로 깨끗이 분석됨. 규칙(coarse-to-fine 재귀 carve)은 **paradigm-grounded** codify(measured-coupling 재귀 + 기존 under_decomposition 신호의 scope-level 확장 / coarse-to-fine 은 계층적 클러스터링 표준 형태). **"몇 파일/몇 sub-tree = 거침" 정량 임계는 미주장** (≥2 distinct 도메인 corroboration 후 확정).
+
 ## 적용 절차 (대형 코드베이스 — backbone-first)
 
 ```
@@ -51,6 +62,7 @@ codegraph 출력은 **어떤 gate 에도 inject ❌ / 최종 scope 절단은 사
                               ⓑ shared-kernel = Martin afferent-hub(공통 유틸/코드: cache·base·utils 등)
                               → backbone = scope 아님 / 1회 분석 / 모든 scope 가 참조 (role=backbone)
 [3] scope = 측정 feature 클러스터 단위 full 11-phase (advisory → 사용자 soft gate #0 절단)
+      └ coarseness 재점검(규칙 4): candidate 가 복수 응집 sub-unit 클러스터면 [1]~[3] 재귀 재-carve
 ```
 
 ### shared-kernel factoring 규칙 (backbone-first 핵심)
@@ -66,8 +78,9 @@ codegraph 출력은 **어떤 gate 에도 inject ❌ / 최종 scope 절단은 사
 - (+) advisory 설계 → trust 모델 위배 0 / gate 무영향 (저위험 격상).
 - (−) codegraph 환경 의존 — 부재 시 loc_estimate fallback (정직 degrade).
 - carry: **§8.1 단일 PoC 과적합** — 트리거 = ep-be-gea 1 PoC. 설계 자체는 paradigm-grounded(5 외부 선례)라 advisory 격상은 정당하나, **"자동화 천장 수치"는 ep-be-gea 실측 전 미주장**. poc-17 + ep-be-gea ≥2 corroboration 후 천장 보정 수치 확정.
+- (v0.29.0 규칙 4 추가) **coarse-to-fine 재귀 carve** — scope candidate 가 복수 응집 sub-unit 클러스터일 때 재분해. 규칙은 paradigm-grounded codify / "거침" 정량 임계는 ep-be-gea reservation(6 sub-domain) 1-PoC carry. 적용 = ep-be-gea reservation→golf 분해 실착(dogfood) — canonical global 누적 모델과 정합(scope 별 BC 가 글로벌에 누적, scope=subsetAnalysisRefs 필터).
 
 ## 인용
-- 결단: DEC-2026-06-09-measured-coupling-scope-derivation (D1~D5)
-- 관련: ADR-CHAIN-014(db-assets-always-on) / ADR-FE-003(legacy-spectrum) / DEC-2026-05-28-codegraph-probe-결과(trust §4.2) / DEC-2026-05-30-codegraph-essential
+- 결단: DEC-2026-06-09-measured-coupling-scope-derivation (D1~D5) / DEC-2026-06-10-scope-candidate-recursive-carve (규칙 4)
+- 관련: ADR-CHAIN-014(db-assets-always-on) / ADR-FE-003(legacy-spectrum) / DEC-2026-05-28-codegraph-probe-결과(trust §4.2) / DEC-2026-05-30-codegraph-essential / baseline-delta-operating-model.md(canonical global 누적·subset 필터)
 - memory: feedback_diagnose_before_design_check_existing / feedback_chain_driver_deterministic_axis / feedback_research_fact_validation / feedback_quality_priority(§8.1)

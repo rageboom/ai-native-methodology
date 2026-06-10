@@ -107,7 +107,7 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 
 ## 7. 예외 케이스 — 별도 ticket 권장
 
-> canonical 6종(Initiative/Epic/Story/Task/Sub-task/Bug) 외 별도 ticket 유형 신설 ❌ (DEC-2026-06-10-ticket-canonical-types). 아래는 canonical 유형으로의 매핑.
+> canonical 6종(Initiative/Epic/Story/Task/Sub-task/Bug) 외 별도 ticket 유형 신설 ❌. 아래는 canonical 유형으로의 매핑.
 
 | Case                         | Ticket 유형                   | 이유                                                                          |
 | ---------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
@@ -298,6 +298,7 @@ Atlassian Standard plan = `jira_link` (Epic Link) + tree view plugin (Structure 
 - R20-prime (plan stage 단일 4-level cascade / 구 5-stage matrix·subtask_ids{chain*} 폐기 / breaking): DEC-2026-05-26-ticket-plan-단일
 - R16/R17 scope-out 정합: DEC-2026-05-15-g1-itsm-permanent-scope-out
 - ID 명명 규약: `methodology-spec/id-conventions.md` §"Ticket Binding"
+- canonical 6종 고정: DEC-2026-06-10-ticket-canonical-types
 - schema: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref
 - schema: `schemas/ticket-sync-evidence.schema.json`
 - 검증 sample: `tools/schema-validator/test/ticket-binding.test.js`

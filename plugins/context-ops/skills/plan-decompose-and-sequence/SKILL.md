@@ -46,7 +46,7 @@ task 안 ac_refs.length 1~3 imperative:
 
 본 skill = Sub-task (TASK-\*) 책임 + Epic/Story 식별. ticket 생성/매핑은 ticket-sync skill 책임.
 
-### jira_id 델타 규칙 (DEC-2026-06-10-ticket-delta-creation)
+### jira_id 델타 규칙
 
 `epic_refs/story_refs/op_task_refs` 의 `jira_id` 는 **기존 Jira 티켓 키이면 기입**, 아니면 **빈 값 (ticket-sync 가 신규 생성 후 채움)**.
 
@@ -133,6 +133,7 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 - 결단: DEC-2026-05-26-ticket-plan-단일 §3 (4-level cascade)
 - 결단: DEC-2026-05-26-be-fe-산출물-분리 (layer 분기)
 - 결단: DEC-2026-05-26-contract-강제-양-axis §1 (be openapi_endpoint_ref)
+- 결단: DEC-2026-06-10-ticket-delta-creation (jira_id 델타 규칙 / 기존 티켓 skip)
 - ADR: ADR-CHAIN-001 §1 (json 단독 / ADR-011)
 - ADR: ADR-CHAIN-002 (gate UX)
 - `agents/plan-agent.md` (caller)

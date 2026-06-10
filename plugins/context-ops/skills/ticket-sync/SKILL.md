@@ -44,7 +44,7 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
 | `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.ai-context/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
 | `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무).                                                                                                                                     |
-| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `initiative` \| `epic` \| `story` \| `task` \| `subtask` \| `bug` (canonical 6종 / DEC-2026-06-10-ticket-canonical-types). 미명시 시 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", task:"작업"}`. |
+| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `initiative` \| `epic` \| `story` \| `task` \| `subtask` \| `bug` (canonical 6종). 미명시 시 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", task:"작업"}`. |
 | `parent_strategy`            | enum    | **`auto`**                                | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`.                                                                                       |
 | `epic_link_customfield_id`   | string  | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`.                                                                                                                                                                                                             |
 | `parent_link_customfield_id` | string  | env-config 또는 (없음)                    | role=`epic` 의 Initiative 부모 링크 customfield ID. set 시 Epic 생성 시 `extra_fields[parent_link_customfield_id] = <initiative_key>` 사용 — `parent_key` 보다 우선. 미set 시 `parent_key` 시도 → 400 reject 시 `jira_link (Relates)` fallback. **SG-MIS 환경(jira.smilegate.net) reference: `customfield_11902`** (Parent Link 필드). 타 Jira 인스턴스는 Jira 필드 설정에서 "Parent Link" customfield ID 확인 후 기재. <!-- allow-identity: SG-MIS 환경 config reference (사내 공통 / 개인 신원 아님) --> |
@@ -304,7 +304,7 @@ plan enter:
 
 enter phase 후 작업 시작 시점 → 사용자 manual 또는 hook 자동 `jira_transition` (To Do → In Progress).
 
-#### phase=exit — 4-level cascade (델타 생성 / DEC-2026-06-10-ticket-delta-creation)
+#### phase=exit — 4-level cascade (델타 생성)
 
 **델타 생성 원칙** — ref(epic_refs/story_refs/op_task_refs)에 **`jira_id` 가 이미 있으면 (또는 `pre_existing=true`) = 기존 티켓 → 생성 skip, 부모로만 사용**. 없으면 신규 생성. 즉 **없는 티켓(델타)만 딴다**. discovery 가 `existing_ticket_refs` 로 전달한 Epic/Story 가 plan-decompose 를 거쳐 jira_id 로 들어옴.
 
@@ -501,6 +501,7 @@ for each Story:
 - paradigm SSOT: `decisions/DEC-2026-05-26-v11-paradigm-결단.md` §3 (ticket = plan 한 곳)
 - 결단 record: `decisions/DEC-2026-05-18-r20-mcp-ticket-sync-channel.md`
 - verification mode: `decisions/DEC-2026-05-20-r20-verification-mode.md` (parent_epic override)
+- canonical 6종 + 델타 생성: `decisions/DEC-2026-06-10-ticket-canonical-types.md` + `decisions/DEC-2026-06-10-ticket-delta-creation.md`
 - environment bridge: `decisions/DEC-2026-05-20-r20-environment-bridge.md` (issuetype_map + parent_strategy + epic_link_customfield_id)
 - B14 + B15: `decisions/DEC-2026-05-21-r20-subtask-autoinherit-structure-auto.md` (subtask auto-inherit + structure auto)
 - 정책 본문: `methodology-spec/ticket-policy.md` §Tier 2.5
