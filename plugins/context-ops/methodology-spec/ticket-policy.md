@@ -86,10 +86,9 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 | (선택) Initiative       | `[MIG] {프로젝트} legacy → {target stack} 전환`                     | analysis 산출물 요약 + R# carry                                                            |
 | Epic                    | `[{화면/route 또는 domain}] {Epic 명}`                              | FE 화면(route) 또는 BE-domain 범위                                                         |
 | **Story**               | `[UC-{도메인}-{번호}] {use_case.name 또는 description 1줄}`         | discovery-spec.json 의 use_case 본체 + source_grounded_evidence + acceptance_criteria_refs |
-| Task (OP-\*)            | `[OP-{도메인}-{번호}] {운영 작업}` (category=migration/cron/…)       | 운영·인프라·마이그레이션 작업 (Story sibling / Epic 부재 가능)                             |
+| Task (OP-\*)            | `[OP-{도메인}-{번호}] {운영 작업}` (category=migration/cron/refactor/security-patch/…) | 운영·인프라·마이그레이션·리팩터링 작업 (Story sibling / Epic 부재 가능) — **AP P0 횡단 회피 작업도 여기**(구 "Tech Debt Story" 흡수) |
 | Sub-task (TASK-\*)      | `[TASK-{도메인}-{번호}] {1~3 AC 요약}` (layer=be/fe/db/e2e/infra)    | 개발 작업 단위 (Story 또는 OP-\* 하위 nested)                                              |
-| Tech Debt Story (AP P0) | `[AP-{cat}] {antipattern.name}`                                     | antipatterns.json 의 AP 본문                                                               |
-| Spike (BR)              | `[BR-{도메인}-{이름}] 정책 결단`                                    | rules.json BR 본문 + 도메인 전문가 위임                                                    |
+| Bug                     | `{발생위치} {무엇이} {어떻게 됨}`                                    | 전제/재현절차/재현결과/기대결과/문제/해결방향 (id-conventions Bug 템플릿)                  |
 
 ---
 
@@ -108,10 +107,12 @@ field 모두 optional — ticket 시스템 사용 안 하는 PoC 는 그대로 o
 
 ## 7. 예외 케이스 — 별도 ticket 권장
 
+> canonical 6종(Initiative/Epic/Story/Task/Sub-task/Bug) 외 별도 ticket 유형 신설 ❌ (DEC-2026-06-10-ticket-canonical-types). 아래는 canonical 유형으로의 매핑.
+
 | Case                         | Ticket 유형                   | 이유                                                                          |
 | ---------------------------- | ----------------------------- | ----------------------------------------------------------------------------- |
-| Antipattern P0 회피 작업     | Tech Debt Story (Epic 외)     | 횡단적 / 모든 Domain Epic 영향 (예: Java 1.8 EOL / zero-test / scriptlet XSS) |
-| 도메인 횡단 비즈니스 룰 (BR) | Spike (Story 의 prerequisite) | 단일 UC 에 속하지 않는 정책 결단                                              |
+| Antipattern P0 회피 작업     | **Task (OP-\*)** (category=refactor/security-patch) | 횡단적 / 사용자 가시 없는 작업 (예: Java 1.8 EOL / zero-test / scriptlet XSS) — 구 "Tech Debt Story" 흡수 |
+| 도메인 횡단 비즈니스 룰 (BR) | 결단 = ADR + business-rules.json / 작업 필요 시 **Task (OP-\*)** | 단일 UC 에 속하지 않는 정책 결단 — 구 "Spike" 폐기 (티켓 유형 ❌ / 결단은 ADR, 작업은 Task) |
 | Plugin 자체 fix (carry list) | Bug (별도 plugin 프로젝트)    | 마이그레이션 외부                                                             |
 
 ---
@@ -245,8 +246,6 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 | **Story** (UC)                              | ✅ Epic id                            | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Story)    |
 | **Sub-task** (TASK-\*)                      | ✅ Story id 또는 OP-\* id             | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
 | **Task** (OP-\* / Story sibling)            | ⚪ Epic id (선택 / Epic 부재 가능)    | `parent-child` | — (운영 작업 / Epic 무관 가능)               |
-| **Tech Debt Story** (AP P0 / cross-cutting) | ⚪ Initiative id (선택)               | `relates-to`   | — (omit 가능)                                |
-| **Spike** (도메인 횡단 BR)                  | ⚪ Story prerequisite (선택)          | `relates-to`   | — (omit 가능)                                |
 
 #### Atlassian Structure 통합
 

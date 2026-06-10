@@ -44,7 +44,7 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
 | `parent_initiative`          | string  | (없음)                                    | 앱/제품 단위 Initiative 키 명시. 명시 시 Initiative 신규 생성 스킵 + 해당 키를 최상위로 재사용. 미명시 시 jira_search 로 기존 Initiative 탐색 후 발견 시 재사용, 미발견 시 신규 생성. env-config (`.ai-context/ticket-sync-config.yaml` 안 `parent_initiative`) 에서도 읽음. 예: `MIS-58` (SmileApp Initiative).                        |
 | `mode`                       | enum    | **`standard`**                            | `standard` (default / R20-prime 본격 — task-plan.json 기반 4-level cascade) \| `verification` (plugin dogfood meta-cycle 전용 / `parent_epic` 의무).                                                                                                                                     |
-| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `story` \| `subtask` \| `initiative` \| `tech_debt` \| `task` \| `bug` \| `epic`. 미명시 시 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", tech_debt:"개선", task:"작업"}`. |
+| `issuetype_map`              | object  | env default                               | role → name/id resolve. role enum = `initiative` \| `epic` \| `story` \| `task` \| `subtask` \| `bug` (canonical 6종 / DEC-2026-06-10-ticket-canonical-types). 미명시 시 env-config (`.ai-context/ticket-sync-config.yaml` 안 `issuetype_map`) 또는 기본값 (Atlassian 표준). DWPD 환경 예: `{story:"작업", subtask:"하위 작업", initiative:"epic", task:"작업"}`. |
 | `parent_strategy`            | enum    | **`auto`**                                | `auto` (default — role=subtask 는 `parent_key`, 그 외 role 은 `epic_link_customfield_id` set 이면 customfield, 미set 이면 `parent_key`) \| `parent_key` \| `epic_link_customfield`.                                                                                       |
 | `epic_link_customfield_id`   | string  | env (`EPIC_LINK_CUSTOMFIELD`) 또는 (없음) | `parent_strategy ∈ {epic_link_customfield, auto}` 시 Epic Link customfield ID. DWPD 환경 reference: `customfield_10006`.                                                                                                                                                                                                             |
 | `parent_link_customfield_id` | string  | env-config 또는 (없음)                    | role=`epic` 의 Initiative 부모 링크 customfield ID. set 시 Epic 생성 시 `extra_fields[parent_link_customfield_id] = <initiative_key>` 사용 — `parent_key` 보다 우선. 미set 시 `parent_key` 시도 → 400 reject 시 `jira_link (Relates)` fallback. **SG-MIS 환경(jira.smilegate.net) reference: `customfield_11902`** (Parent Link 필드). 타 Jira 인스턴스는 Jira 필드 설정에서 "Parent Link" customfield ID 확인 후 기재. <!-- allow-identity: SG-MIS 환경 config reference (사내 공통 / 개인 신원 아님) --> |
@@ -240,7 +240,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 
 ### 단계 5 — 환경 resolve prelude (호출 전 의무 / F-VERIFY-009 + F-VERIFY-010 → B12+B13 해결)
 
-본 §단계 6 본문이 사용하는 `Story` / `Sub-task` / `Initiative` / `Epic` / `Tech Debt Story` / `Task` 등의 명명은 **role label**. 실 MCP 호출 시점에 다음 resolve table 적용 의무.
+본 §단계 6 본문이 사용하는 `Initiative` / `Epic` / `Story` / `Task` / `Sub-task` / `Bug` (canonical 6종) 의 명명은 **role label**. 실 MCP 호출 시점에 다음 resolve table 적용 의무.
 
 **resolve 알고리즘 (의무)**:
 
@@ -253,7 +253,6 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
    | initiative | Initiative      | epic                |
    | story      | Story           | 작업 (또는 새 기능) |
    | subtask    | Sub-task        | 하위 작업           |
-   | tech_debt  | Tech Debt Story | 개선                |
    | task       | Task            | 작업                |
    | bug        | Bug             | 버그                |
    - resolve 결과 `string` 시 jira_create `issue_type` 또는 `extra_fields.issuetype.name`
@@ -271,7 +270,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 3. **parent linking resolve** (`parent_strategy` 별):
    - `parent_strategy=auto` (default):
      - role=`subtask` → `parent_key` 필드 **만** 사용 (B14 invariant — `extra_fields[epic_link_customfield_id]` 명시 ❌. Sub-task 의 Epic Link 은 parent Story 로부터 auto-inherit)
-     - role ∈ {`story`, `task`, `tech_debt`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback. 둘 다 400 reject 시 → `jira_link (Relates)` fallback.
+     - role ∈ {`story`, `task`, `bug`} 시 `epic_link_customfield_id` 가 set 이면 → `extra_fields[epic_link_customfield_id] = <parent_epic>`. 미set 시 → `parent_key` fallback. 둘 다 400 reject 시 → `jira_link (Relates)` fallback.
      - role=`epic` (Initiative 하위 Epic 생성 시):
        - `parent_link_customfield_id` set 이면 → `extra_fields[parent_link_customfield_id] = <initiative_key>` **우선** (SG-MIS 사내 표준: `customfield_11902` / 타 Jira 인스턴스는 env-config 에서 확인).
        - 미set 이면 → `parent_key=<initiative_key>` 시도. 400 reject 시 → `jira_link (Relates)` fallback.
@@ -475,11 +474,11 @@ for each Story:
 - **state.blocked 시 MCP 호출 ❌** — `hooks/hooks.json` PreToolUse matcher 가 `mcp__wiki-jira-assistant__.*` deny
 - **R16/R17 부활 ❌** — 본 skill = R20-prime 채널 (drift attractor 회피)
 - **pre-bound 티켓 재생성 ❌ (델타 생성 / DEC-2026-06-10)** — ref 의 `jira_id` 가 set 이거나 `pre_existing=true` 면 절대 `jira_create` 호출 ❌ (기존 Epic/Story/Task = 부모로만 사용). 위반(기존 키 있는데 신규 생성) 시 `F-TICKETSYNC-014 prebound_ticket_recreated` finding emit + reject. discovery `existing_ticket_refs` → task-plan jira_id 로 전달된 티켓 보호.
-- **orphan ticket ❌ (environment-aware)** — role ∈ {`subtask`, `story`, `task`, `tech_debt`, `bug`} 생성 시 parent linking 의무 — `parent_strategy=parent_key` 시 `parent_ticket_id` / `parent_strategy=epic_link_customfield` (또는 auto + epic_link set) 시 `extra_fields[epic_link_customfield_id]` 중 1개 채움. Initiative / Epic top-level 만 omit 가능. 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit.
-- **link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (Tech Debt / Spike / 도메인 횡단 BR) 만 허용.
+- **orphan ticket ❌ (environment-aware)** — role ∈ {`subtask`, `story`, `task`, `bug`} 생성 시 parent linking 의무 — `parent_strategy=parent_key` 시 `parent_ticket_id` / `parent_strategy=epic_link_customfield` (또는 auto + epic_link set) 시 `extra_fields[epic_link_customfield_id]` 중 1개 채움. Initiative / Epic top-level 만 omit 가능. 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit.
+- **link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (횡단 OP-* / 도메인 횡단 BR) 만 허용.
 - **mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error. 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.
 - **environment hardcode ❌** — SKILL.md 본문의 `Story` / `Sub-task` / `Initiative` / `Epic` 표기는 **role label**. 실 MCP payload 의 `issue_type` 값은 §단계 5 prelude 의 resolve 결과 직접 인용 의무. 위반 시 `F-TICKETSYNC-009 issuetype_hardcode_drift` finding emit + 호출 reject.
-- **parent_strategy 우회 ❌** — `parent_strategy ∈ {epic_link_customfield, auto + epic_link_customfield_id set}` 환경에서 일반 issue (`story` / `task` / `tech_debt` / `bug`) 의 `parent` 필드 직접 채움 ❌. 반드시 `extra_fields[epic_link_customfield_id]` 사용. 위반 시 `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding emit.
+- **parent_strategy 우회 ❌** — `parent_strategy ∈ {epic_link_customfield, auto + epic_link_customfield_id set}` 환경에서 일반 issue (`story` / `task` / `bug`) 의 `parent` 필드 직접 채움 ❌. 반드시 `extra_fields[epic_link_customfield_id]` 사용. 위반 시 `F-TICKETSYNC-010 parent_strategy_environment_mismatch` finding emit.
 - **B14 Sub-task Epic Link customfield 명시 ❌** — role=`subtask` 의 `jira_create` payload 에 `extra_fields[epic_link_customfield_id]` (예: DWPD `customfield_10006`) 명시 ❌. Sub-task 의 Epic Link 은 parent Story / Task 로부터 auto-inherit. 명시 시 backend 400 reject. 위반 시 `F-TICKETSYNC-011 subtask_epic_link_violation` finding emit + 호출 reject.
 
 ## 사용자 결단 9건

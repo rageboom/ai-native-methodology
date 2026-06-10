@@ -166,7 +166,7 @@
             "type": "string",
             "enum": ["parent-child", "relates-to", "blocks", "is-blocked-by"],
             "default": "parent-child",
-            "description": "v8.6.3+ — ticket 관계 종류. `parent-child` (default / R20 hierarchy 의무 매핑 / Atlassian Structure tree 정합) / `relates-to` (도메인 횡단 BR Spike 등) / `blocks` / `is-blocked-by`. Sub-task / Story / Epic = `parent-child` 의무 (다른 값 시 finding emit)."
+            "description": "v8.6.3+ — ticket 관계 종류. `parent-child` (default / R20 hierarchy 의무 매핑 / Atlassian Structure tree 정합) / `relates-to` (도메인 횡단 BR / 횡단 OP-* 등) / `blocks` / `is-blocked-by`. Sub-task / Story / Epic = `parent-child` 의무 (다른 값 시 finding emit)."
           },
           "ticket_level": {
             "type": "string",

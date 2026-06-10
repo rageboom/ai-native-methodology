@@ -11,7 +11,6 @@ issuetype_map:
   story: ...
   subtask: ...
   initiative: ...
-  tech_debt: ...
   task: ...
   bug: ...
 parent_strategy: epic_link_customfield
@@ -30,7 +29,6 @@ issuetype_map:
   story: 작업 # 또는 새 기능
   subtask: 하위 작업
   initiative: epic
-  tech_debt: 개선
   task: 작업
   bug: 버그
 parent_strategy: epic_link_customfield
@@ -53,7 +51,6 @@ issuetype_map:
   story:      이야기
   subtask:    하위 작업
   initiative: Initiative
-  tech_debt:  이야기
   task:       작업
   bug:        버그
 parent_strategy: epic_link_customfield
