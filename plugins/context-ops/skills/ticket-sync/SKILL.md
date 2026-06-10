@@ -215,13 +215,20 @@ for call in cascade-plan.calls (order asc):
 {
   "meta": {...}, "stage": "plan", "phase": "exit", "scope": "car",
   "ticket_cascade": { "initiative_id", "epic_id_map", "story_id_map", "op_task_id_map", "subtask_id_map", "cascade_complete" },
-  "mcp_invocations": [ { /* 7-field 의무: mcp_tool_name(신/구 prefix) · tool_stdout_path · tool_stderr_path · tool_version · invocation_timestamp · duration_ms · result_hash(64hex) · reproduction_command · ticket_id_created */ } ],
+  "mcp_invocations": [ { /* 7-field 의무 + ticket_level + issue_type + parent_ticket_id + link_type (verify 대조용 / mcp_tool_name 신·구 prefix · tool_stdout/stderr_path · tool_version · invocation_timestamp · duration_ms · result_hash(64hex) · reproduction_command · ticket_id_created) */ } ],
   "confirmation_gate": { "preview_md_digest", "user_response", "intervention_log_ref" },
-  "search_first_idempotency": { "lookup_count", "skip_count", "search_path": "custom_field|fallback_summary" },
+  "search_first_idempotency": { "lookup_count", "skip_count", "prebound_reused_count", "search_path": "custom_field|fallback_summary" },
   "graceful_mcp_missing": { "probe_result", "fallback_path" },
   "evidence_trust": "real_tool", "dry_run": false
 }
 ```
+
+> **conformance verify 의무 (DEC-2026-06-10-cascade-conformance)** — evidence 작성 후 gate-green 전에:
+> ```bash
+> node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js verify \
+>   --plan .ai-context/output/cascade-plan.json --evidence <위 evidence.json>
+> ```
+> exit 1 (위반) 시 gate green ❌ — 스킬이 cascade-plan 을 어겼다는 결정론 신호. `mcp_invocations[]` 에 `issue_type`·`ticket_level`·`parent_ticket_id`·`link_type` 캡쳐 의무 (verify 입력).
 
 ### 단계 8 — traceability-matrix 갱신
 
@@ -233,18 +240,24 @@ for call in cascade-plan.calls (order asc):
 
 ## 금지 / 강제력
 
-- **stage paradigm 위반 ❌ (R20-prime 본격)** — args.stage ∈ {analysis, discovery, spec, test, implement} 시 reject. `F-TICKETSYNC-012 stage_paradigm_violation` finding emit. ticket 생성 = plan stage 한 곳.
-- **simulated evidence_trust ❌** — schema-level 영구 거부 (R15 / R19 simulated 영구 reject sibling)
-- **fire-and-forget ❌** — 모든 MCP 호출 직전 confirmation gate 의무
-- **parallel MCP 호출 ❌** — sequential only (결정론 axis 보호)
-- **state.blocked 시 MCP 호출 ❌** — `hooks/hooks.json` PreToolUse matcher 가 jira-confluence MCP(신/구 prefix) deny
-- **R16/R17 부활 ❌** — 본 skill = R20-prime 채널 (drift attractor 회피)
-- **pre-bound 티켓 재생성 ❌ (델타 생성 / DEC-2026-06-10)** — ref 의 `jira_id` 가 set 이거나 `pre_existing=true` 면 절대 `jira_create` 호출 ❌ (기존 Epic/Story/Task = 부모로만 사용). 위반(기존 키 있는데 신규 생성) 시 `F-TICKETSYNC-014 prebound_ticket_recreated` finding emit + reject. discovery `existing_ticket_refs` → task-plan jira_id 로 전달된 티켓 보호.
-- **orphan ticket ❌ (environment-aware)** — role ∈ {`subtask`, `story`, `task`, `bug`} 생성 시 parent linking 의무 — `parent_strategy=parent_key` 시 `parent_ticket_id` / `parent_strategy=epic_link_customfield` (또는 auto + epic_link set) 시 `extra_fields[epic_link_customfield_id]` 중 1개 채움. Initiative / Epic top-level 만 omit 가능. 위반 시 `F-TICKETSYNC-002 missing_parent` finding emit.
-- **link_type drift ❌** — Sub-task / Story / Epic 의 link_type = `parent-child` 의무. `relates-to` / `blocks` 등 = cross-cutting (횡단 OP-* / 도메인 횡단 BR) 만 허용.
-- **mode=verification + parent_epic 미명시 ❌** — `mode=verification` 시 `parent_epic` 의무. 미명시 시 reject + Block error. 위반 시 `F-TICKETSYNC-003 verification_missing_parent_epic` finding emit.
-- **payload hardcode / 우회 ❌** — `issue_type` + parent linking 은 §단계 5 `cascade-plan.calls` (도구 resolve) **그대로 인용** 의무. LLM 이 본문 표기/임의 값으로 조립 ❌ (`F-TICKETSYNC-009 issuetype_hardcode_drift` / `F-TICKETSYNC-010 parent_strategy_environment_mismatch`).
-- **B14 Sub-task Epic Link customfield 명시 ❌** — role=`subtask` payload 에 `extra_fields[epic_link_customfield_id]` 명시 ❌ (parent Story/Task 로부터 auto-inherit / 명시 시 400). 위반 시 `F-TICKETSYNC-011 subtask_epic_link_violation` reject. (도구 parent_spec 이 subtask=parent_key 만 emit 으로 보장)
+대부분 정책은 **메커니즘이 강제** (SKILL 재서술 불요 / DEC-2026-06-10-cascade-conformance). 강제 위치:
+
+| 정책 | 강제 메커니즘 |
+| --- | --- |
+| simulated evidence ❌ | `ticket-sync-evidence.schema` evidence_trust enum (simulated 영구 거부) |
+| state.blocked 시 MCP ❌ | `hooks/hooks.json` PreToolUse deny (신·구 prefix) |
+| **계획 밖 ticket 발사 ❌** (정책 11) | **PreToolUse 훅** `checkCascadeConformance` — jira_create summary ∉ cascade-plan → **발사 직전 deny** (`F-TICKETSYNC-009`) |
+| pre-bound 재생성(7)·orphan(8)·link_type(9)·B14(12)·issue_type(11)·coverage | **`ticket-cascade-builder verify`** post-hoc (cascade-plan ↔ evidence / gate 실행 / `F-TICKETSYNC-014·002·016·011·009·015`) + cascade-builder 가 parent_spec·delta·issue_type resolve 로 **구조상 보장** |
+| canonical 6종 / 4-level 계층 | cascade-builder role enum + parent_spec (구조상 위반 불가) |
+
+**SKILL 잔존 규칙 (메커니즘 없음 — LLM/런타임/거버넌스)**:
+
+- **stage = plan 한 곳** — args.stage ∈ {analysis,discovery,spec,test,implement} 시 reject (`F-TICKETSYNC-012`).
+- **fire-and-forget ❌** — 모든 MCP 호출 직전 confirmation gate 의무 (사람 확인).
+- **parallel MCP ❌** — cascade-plan `order` 순 **sequential** 발사 (런타임 동시성).
+- **R16/R17 부활 ❌** — R20-prime 채널만 (거버넌스).
+- **mode=verification + parent_epic 의무** (`F-TICKETSYNC-003`).
+- **payload = cascade-plan 그대로 + evidence 에 issue_type 캡쳐** (verify 가 대조 / 어기면 위 훅·verify 차단).
 
 ## 사용자 결단 (열린 항목)
 
@@ -258,6 +271,7 @@ for call in cascade-plan.calls (order asc):
 
 - cascade-plan 생성 도구 (결정론): `tools/ticket-cascade-builder/` + schema `schemas/cascade-plan.schema.json`
 - 도구 추출 결단: `decisions/DEC-2026-06-10-ticket-cascade-builder.md`
+- conformance 강제 (verify + PreToolUse 훅): `decisions/DEC-2026-06-10-cascade-conformance.md`
 - verification mode 상세 (분리): `skills/ticket-sync/verification-mode.md`
 - 환경별 config 상세 (분리): `skills/ticket-sync/env-config-reference.md`
 - R20-prime 결단: `decisions/DEC-2026-05-26-ticket-plan-단일.md`

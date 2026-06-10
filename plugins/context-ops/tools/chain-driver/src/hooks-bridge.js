@@ -9,10 +9,36 @@
 // - suggestAgentForPrompt 신설 / suggestSkillForPrompt 보존 (옛 호환)
 // - buildSuggestOutput / formatHookBlockContext 에 agentId optional — 자동 매핑
 
+import { readFileSync, existsSync } from 'node:fs';
+import { join } from 'node:path';
 import {
 	formatHookBlockContext,
 	formatSkillSuggestion,
 } from './invoke-skill.js';
+
+// M2 (DEC-2026-06-10-cascade-conformance) — PreToolUse pre-fire 차단.
+// jira_create 의 summary 가 cascade-plan.calls 에 없으면 = 스킬이 계획 밖 ticket 발사 (정책 11) → deny.
+// exempt: enter-task([Chain ) / verification([Plugin Verify]) = cascade-plan 무관.
+// 정직 한계: summary verbatim 복사 가정(정책 11 요구) / cascade-plan 부재 시 미적용(=비-cascade 흐름).
+const CONFORMANCE_EXEMPT_PREFIXES = ['[Chain ', '[Plugin Verify]'];
+
+export function checkCascadeConformance({ toolName, toolInput, root, cascadePlanPath }) {
+	if (typeof toolName !== 'string' || !toolName.endsWith('jira_create')) return null;
+	const planPath = cascadePlanPath || join(root || '.', '.ai-context', 'output', 'cascade-plan.json');
+	if (!existsSync(planPath)) return null; // cascade-plan 없음 = 비-cascade 흐름 (미적용)
+	let plan;
+	try {
+		plan = JSON.parse(readFileSync(planPath, 'utf-8'));
+	} catch {
+		return null; // 읽기 실패 = 강제 안 함 (graceful)
+	}
+	const summary = toolInput?.summary;
+	if (!summary) return null; // payload 에 summary 없음 = 판단 불가
+	if (CONFORMANCE_EXEMPT_PREFIXES.some((p) => summary.startsWith(p))) return null;
+	const planned = new Set((plan?.calls || []).map((c) => c.summary).filter(Boolean));
+	if (planned.has(summary)) return null; // 계획에 있음 = 정합
+	return `cascade nonconformance (F-TICKETSYNC-009): jira_create summary "${summary}" 가 cascade-plan.calls 에 없음 — 스킬이 계획 밖 ticket 발사 (정책 11 / cascade-plan 그대로 발사 의무).`;
+}
 
 // Claude Code hooks output contract (정식 spec 정합).
 export function buildSuggestOutput({ skillId, meta, sessionId, agentId }) {
@@ -244,9 +270,11 @@ export function shouldBlockToolUse({ toolName, toolInput, state }) {
 	if (!state?.blocked) return null;
 
 	// R20 path — MCP ticket-sync 차단 (state.blocked 시 file_path 무관 deny)
+	// 신·구 prefix 양쪽 (DEC-2026-06-10 prefix 양립 / hooks.json matcher 정합).
 	if (
 		typeof toolName === 'string' &&
-		toolName.startsWith('mcp__wiki-jira-assistant__')
+		(toolName.startsWith('mcp__wiki-jira-assistant__') ||
+			toolName.startsWith('mcp__mcp-server-wiki-jira__'))
 	) {
 		return `R20 MCP ticket-sync blocked: ${state.block_reason || 'state.blocked=true'}`;
 	}

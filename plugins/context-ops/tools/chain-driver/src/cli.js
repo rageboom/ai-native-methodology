@@ -67,6 +67,7 @@ import {
 	suggestSkillForPrompt,
 	suggestAgentForPrompt,
 	shouldBlockToolUse,
+	checkCascadeConformance,
 	detectGraphArtifactWrite,
 	evaluatePolicyForEdges,
 } from './hooks-bridge.js';
@@ -1531,6 +1532,22 @@ function cmdHooksBridge(args) {
 				process.stderr.write(`[chain-driver] PreToolUse blocked: ${reason}\n`);
 				process.exit(2);
 			}
+		}
+		// M2 (DEC-2026-06-10-cascade-conformance) — jira_create pre-fire 준수 차단 (state 무관 / cascade-plan 존재 시).
+		const conformanceReason = checkCascadeConformance({
+			toolName: payload.tool_name,
+			toolInput: payload.tool_input,
+			root,
+		});
+		if (conformanceReason) {
+			const out = buildBlockOutput({
+				reason: conformanceReason,
+				sessionId: payload.session_id,
+				hookEventName: event,
+			});
+			process.stdout.write(JSON.stringify(out) + '\n');
+			process.stderr.write(`[chain-driver] PreToolUse blocked: ${conformanceReason}\n`);
+			process.exit(2);
 		}
 	}
 	// dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지 → impact_pending 마킹.

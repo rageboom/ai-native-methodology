@@ -172,6 +172,10 @@
             "type": "string",
             "enum": ["epic", "story", "op_task", "subtask"],
             "description": "v11.0.0 신설 — 본 MCP 호출이 생성한 ticket level. ticket_cascade 안 4 array 와 cross-ref."
+          },
+          "issue_type": {
+            "type": "string",
+            "description": "v12 신설 (DEC-2026-06-10-cascade-conformance). 본 호출에 실제 보낸 Jira issue_type (cascade-plan.calls[].issue_type resolve 결과). post-hoc conformance verify(정책 11)가 cascade-plan 과 대조."
           }
         }
       }

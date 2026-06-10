@@ -9,7 +9,11 @@ import {
 	suggestSkillForPrompt,
 	suggestAgentForPrompt,
 	shouldBlockToolUse,
+	checkCascadeConformance,
 } from '../src/hooks-bridge.js';
+import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 describe('hooks-bridge', () => {
 	it('parseHookInput parses well-formed JSON object', () => {
@@ -116,6 +120,58 @@ describe('hooks-bridge', () => {
 			state: { blocked: true, block_reason: 'validator_critical' },
 		});
 		assert.equal(reason, 'validator_critical');
+	});
+
+	it('shouldBlockToolUse blocks 신 prefix jira MCP when state.blocked (DEC-2026-06-10 fix)', () => {
+		const reason = shouldBlockToolUse({
+			toolName: 'mcp__mcp-server-wiki-jira__jira_create',
+			toolInput: { summary: 'x' },
+			state: { blocked: true, block_reason: 'gate_block' },
+		});
+		assert.match(reason || '', /R20 MCP ticket-sync blocked/);
+	});
+
+	describe('checkCascadeConformance (M2 PreToolUse)', () => {
+		function setup(planCalls) {
+			const dir = mkdtempSync(join(tmpdir(), 'cc-'));
+			mkdirSync(join(dir, '.ai-context', 'output'), { recursive: true });
+			if (planCalls) {
+				writeFileSync(join(dir, '.ai-context', 'output', 'cascade-plan.json'), JSON.stringify({ calls: planCalls }));
+			}
+			return dir;
+		}
+		const PLAN = [{ summary: '차량 등록', issue_type: '이야기' }, { summary: '[TASK-CAR-001] be API', issue_type: '하위 작업' }];
+
+		it('계획에 있는 summary → 통과(null)', () => {
+			const dir = setup(PLAN);
+			const r = checkCascadeConformance({ toolName: 'mcp__mcp-server-wiki-jira__jira_create', toolInput: { summary: '차량 등록' }, root: dir });
+			rmSync(dir, { recursive: true, force: true });
+			assert.equal(r, null);
+		});
+		it('계획 밖 summary → deny (F-TICKETSYNC-009)', () => {
+			const dir = setup(PLAN);
+			const r = checkCascadeConformance({ toolName: 'mcp__mcp-server-wiki-jira__jira_create', toolInput: { summary: '내가 지어낸 티켓' }, root: dir });
+			rmSync(dir, { recursive: true, force: true });
+			assert.match(r || '', /cascade nonconformance/);
+		});
+		it('exempt prefix([Chain ) → 통과', () => {
+			const dir = setup(PLAN);
+			const r = checkCascadeConformance({ toolName: 'mcp__mcp-server-wiki-jira__jira_create', toolInput: { summary: '[Chain 3] car plan 작성 시작' }, root: dir });
+			rmSync(dir, { recursive: true, force: true });
+			assert.equal(r, null);
+		});
+		it('cascade-plan 부재 → 미적용(null / 비-cascade 흐름)', () => {
+			const dir = setup(null);
+			const r = checkCascadeConformance({ toolName: 'mcp__mcp-server-wiki-jira__jira_create', toolInput: { summary: 'x' }, root: dir });
+			rmSync(dir, { recursive: true, force: true });
+			assert.equal(r, null);
+		});
+		it('jira_create 아닌 tool → 미적용(null)', () => {
+			const dir = setup(PLAN);
+			const r = checkCascadeConformance({ toolName: 'Write', toolInput: { summary: 'x' }, root: dir });
+			rmSync(dir, { recursive: true, force: true });
+			assert.equal(r, null);
+		});
 	});
 
 	it('shouldBlockToolUse allows Write outside .ai-context/output/', () => {

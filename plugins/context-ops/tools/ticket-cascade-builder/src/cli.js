@@ -5,6 +5,7 @@
 import { writeFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { buildCascadePlan, loadJson, loadConfig } from './builder.js';
+import { verifyConformance } from './verify.js';
 
 function parseArgs(argv) {
 	const args = {};
@@ -19,8 +20,35 @@ function parseArgs(argv) {
 	return args;
 }
 
+// verify subcommand — post-hoc conformance (cascade-plan ↔ evidence / 정책 11).
+function runVerify(args) {
+	if (!args.plan || !args.evidence) {
+		process.stderr.write('usage: ticket-cascade-builder verify --plan <cascade-plan.json> --evidence <ticket-sync-evidence.json>\n');
+		process.exit(1);
+	}
+	try {
+		const plan = loadJson(resolve(args.plan));
+		const evidence = loadJson(resolve(args.evidence));
+		const { ok, findings } = verifyConformance(plan, evidence);
+		if (ok) {
+			process.stdout.write('✅ cascade conformance — 위반 0 (스킬이 cascade-plan 충실 발사)\n');
+			process.exit(0);
+		}
+		process.stderr.write(`❌ cascade conformance 위반 ${findings.length}건:\n`);
+		for (const f of findings) process.stderr.write(`  - [${f.id}] ${f.msg}\n`);
+		process.exit(1);
+	} catch (e) {
+		process.stderr.write(`verify 오류: ${e.message}\n`);
+		process.exit(1);
+	}
+}
+
 function main() {
-	const args = parseArgs(process.argv);
+	const argv = process.argv;
+	if (argv[2] === 'verify') {
+		return runVerify(parseArgs(['', '', ...argv.slice(3)]));
+	}
+	const args = parseArgs(argv);
 	if (args.help || !args['task-plan']) {
 		process.stderr.write(
 			'usage: ticket-cascade-builder --task-plan <path> [--operational-task <p>] [--behavior-spec <p>] ' +
