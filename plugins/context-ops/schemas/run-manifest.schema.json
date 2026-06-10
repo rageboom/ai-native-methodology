@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/run-manifest.schema.json",
-  "title": "run-manifest.json — build/run/env 운영 컨텍스트 (analysis 산출물 #16 / positive operational manifest)",
+  "title": "run-manifest.json — build/run/env 운영 컨텍스트 (analysis 산출물 #26 / positive operational manifest)",
   "description": "역공학으로 추출한 '이 시스템을 어떻게 build·run·configure 하는가'의 positive manifest (DEC-2026-06-09-build-run-env-manifest / 역공학 델타 #2-a). migration-cautions 는 negative 경고만 제공 — 본 산출물은 P0 use-scenario 'LLM 이 develop·run·modify·evolve'의 RUN 축 운영 컨텍스트. source-grounded: 모든 추출 항목은 실 config 파일 출처(source) 명시 / 누락은 정직 null+configs_missing (추론 ❌ / no-simulation). env value 는 절대 미저장 — name + is_secret + sensitivity + (비-secret) default 만. confidence: 결정론 parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75.",
   "type": "object",
   "additionalProperties": false,

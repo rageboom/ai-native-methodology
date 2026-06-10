@@ -1,6 +1,6 @@
 ---
 name: analysis-run-manifest
-description: Use during analysis stage to extract the positive build/run/env operational context of a system ("어떻게 build/run/configure 하나" / "run recipe" / "운영 컨텍스트" / "build command" / "환경변수" / "service dependency" / "how to run"). Reverse-engineers from real config files (package.json / Dockerfile / docker-compose / Makefile / pom.xml / build.gradle / application.yml|properties / .env.example / CI configs) into run-manifest.json (analysis 산출물 #16 / positive counterpart to migration-cautions negative warnings). Feeds P0 use-scenario "LLM 이 develop·run·modify·evolve"의 RUN 축. Source-grounded — every item cites its source config (no fabrication / 누락 = honest null + configs_missing); env value 절대 미저장 (name + is_secret + sensitivity only / secret 누출 차단). confidence: deterministic parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75. no-simulation. 1차 draft (DEC-2026-06-09-build-run-env-manifest / 본체 격상 = ≥2 PoC). Stage = analysis, aspect = cross-cutting.
+description: Use during analysis stage to extract the positive build/run/env operational context of a system ("어떻게 build/run/configure 하나" / "run recipe" / "운영 컨텍스트" / "build command" / "환경변수" / "service dependency" / "how to run"). Reverse-engineers from real config files (package.json / Dockerfile / docker-compose / Makefile / pom.xml / build.gradle / application.yml|properties / .env.example / CI configs) into run-manifest.json (analysis 산출물 #26 / positive counterpart to migration-cautions negative warnings). Feeds P0 use-scenario "LLM 이 develop·run·modify·evolve"의 RUN 축. Source-grounded — every item cites its source config (no fabrication / 누락 = honest null + configs_missing); env value 절대 미저장 (name + is_secret + sensitivity only / secret 누출 차단). confidence: deterministic parse(package.json/yml)=1.0 / LLM-read(Dockerfile/Makefile)≤0.75. no-simulation. 1차 draft (DEC-2026-06-09-build-run-env-manifest / 본체 격상 = ≥2 PoC). Stage = analysis, aspect = cross-cutting.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -58,7 +58,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/run-manifest.json` (`schemas/run-manifest.schema.json` / analysis 산출물 #16 / source-grounded / env value 미저장)
+- `<user-project>/.ai-context/output/run-manifest.json` (`schemas/run-manifest.schema.json` / analysis 산출물 #26 / source-grounded / env value 미저장)
 
 ## 한계 (정직)
 
