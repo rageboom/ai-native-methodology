@@ -18,7 +18,7 @@
 - **PoC #1 (ep-be-gea / 외부격리·commit❌)**: DrawNumberGeneratorTest 52 + MaskingUtilsTest 6 = 실 JUnit 58 GREEN / event unit-spec.json(4 UNIT) schema-valid / matrix unit_coverage{ratio:1,total:4,tested:2} / mock-soundness 0=sound.
 - **carry**: flows phase-flow 편집(drift handoff 위험 / skill 운영 본체 격상) · ~~mock-soundness·unit-coverage 하드게이트(≥2 PoC)~~ → **§8.1 2nd-도메인 corroboration ✅ poc-18**(2026-06-11 / DEC-2026-06-11-unit-layer-corroboration-poc18 / 아래 ★ 참조) · code-graph method-axis unit anchor flip.
 
-### ★ unit 층 §8.1 2nd-도메인 corroboration ✅ (2026-06-11 / poc-18 / 버전 bump 없음 / 미커밋)
+### ★ unit 층 §8.1 2nd-도메인 corroboration ✅ (2026-06-11 / poc-18 / 버전 bump 없음 / **커밋·push 완료 `12a9c9b4` 양원격**)
 
 **성과 (DEC-2026-06-11-unit-layer-corroboration-poc18 / 본체 schema·gate·tool 무변경 / examples + docs additive)**:
 - v0.36.0 unit 층(SOFT)의 하드게이트 격상 전제(§8.1 ≥2 distinct 도메인) = **poc-18 = 2번째 distinct 도메인 corroboration**(PoC #1=ep-be-gea 외부·commit❌ / poc-18 = unit 층 **최초의 in-repo 재현가능 증거**). 워크플로우 7 agents(5 readers→synthesis→Senior REVISE@0.82) 조사 후 사용자 결단(2nd domain=poc-18 / mock-soundness=RED→GREEN).
@@ -27,7 +27,7 @@
 - **STOP**: 실 vitest **18/18 GREEN**(no Docker/no-sim) + schema-valid 14/14 + matrix 기존 셀 무회귀(POST 5/5 green·backward 1.0) + plan-coverage 0 findings + 도구 11/47/172/111 + **release-readiness 42/42** + 본체 무변경.
 - **정직 GAP(flip 판단 입력)**: ①provenance 편중(둘 다 characterized_from_code / designed_from_spec RED→GREEN 미실증→향후 greenfield) ②재현성 비대칭(ep-be-gea 외부) ③breadth 보통(2 UNIT) ④matrix forward 0.833→0.714(additive yellow / 날조 IMPL 미생성).
 - **carry**: 하드게이트 promotion(LEVER A/B/C SOFT→HARD flip = mock-soundness aggregator `--unit-spec` 배선 + plan-coverage severity medium→high + aggregator unit_coverage 매핑) = §8.1 precondition 충족됐으나 GAP 고려한 **별도 promotion DEC**(본 세션 코드 미작성). designed_from_spec greenfield 실증.
-- **미커밋** — plan `.claude/plans/plan-unit-layer-corroboration-poc18.md` / 다음: 커밋 + origin/GHE push.
+- **커밋·push 완료** (`12a9c9b4` / origin[rageboom] + origin-smilegate[GHE] / 14 files / finding-ledger.md + 병렬 tool 작업 제외) — plan `.claude/plans/plan-unit-layer-corroboration-poc18.md`.
 - **STOP**: release-readiness **42/42**(pre-existing check40 ticket 부채 6건도 정리) + 도구 테스트 spec-test-link 11/11·plan-coverage 47/47·matrix 172/172·schema 111/111 + version 3-way 0.36.0. **✅ 커밋·push 완료** (`3e4624b3` / origin[rageboom] + origin-smilegate[GHE] 양원격 동기 / 트리 clean). 다음 의제 = 아래 frontier 중 **사용자 결단**.
 
 ---
