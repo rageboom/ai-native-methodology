@@ -808,7 +808,7 @@
 >
 > | F-DOGFOOD | severity     | 처분                    | 비고                                                                                                   |
 > | --------- | ------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
-> | 013       | medium       | open                    | codegraph-coverage 모노레포 거짓엣지 + 채택자 플로우 미배선 (수정 cycle 별도)                           |
+> | 013       | medium       | **resolved (2차 cycle)** | import_verified 결정론 분류(앱간 49/49 의심 분리·finding 90% 절단) + SKILL 4-b 교체·한계 명문화 (DEC-2026-06-11-fdogfood-013-import-verify) |
 > | 014       | **critical** | **resolved (본 cycle)** | evidence-scan 신설 + gate #0 REQUIRED 배선 — 날조 증거 = validator_critical hard-block (go 거부 실증)  |
 > | 015       | **high**     | **resolved (본 cycle)** | static-runner exit 의미론 (semgrep [0,1] / pmd [0,4,5]) + scan FAILED = exit 5 / real_tool=false       |
 > | 016       | **high**     | **resolved (본 cycle)** | probe ETIMEDOUT ≠ ENOENT 분리 (PROBE_TIMEOUT / exit 6) + semgrep 오프라인 env default                  |
@@ -830,7 +830,7 @@
 - **Decision made:** dogfood 본 cycle 은 grep import 집계로 우회 (inventory.scope_candidates 작성) + codegraph-coverage 는 사후 실행으로 검증. 거짓 엣지 1건 실코드 반증 후 triage 중단 (전수는 carry).
 - **Severity:** **medium** — reference-lens 비차단(trust 모델이 한계를 예견 / "최종 evidence = 실코드 grep" 헤더 명시)이라 gate 오염 없음. 단 scope 절단 보조 신호로 쓰일 때 중복 많은 모노레포에서 오도 위험 + 가치 있는 도구가 채택자에게 미노출.
 - **Proposed fix:** (a) SKILL 4-b 를 codegraph-coverage 호출로 교체 + 인용 추가 (PATCH/doc) (b) rollup 에 "source 파일 → target 파일 import 경로 실재" 결정론 필터 또는 신뢰 주석 (codegraph.db `unresolved_refs.candidates` 활용 후보) (c) scope/앱 단위 인덱싱 옵션 (codegraph-runner `--target` 다중 호출 패턴 문서화) (d) SKILL 한계 절에 모노레포 name-collision failure mode + triage 절차 명문화. §8.1 정합 — 멀티앱 모노레포를 probe 매트릭스에 추가 (본 건 = 1st arm / 2nd corroboration carry).
-- **Status:** open
+- **Status:** **resolved** (2차 cycle / DEC-2026-06-11-fdogfood-013-import-verify — 근본원인 4연쇄 확정[클로저 미인덱스→이름 fallback→단일 인덱스 앱밖 후보→provenance 무구분, 앱간 불가능 엣지 5,050 정량화] 후 시행: (b) codegraph-coverage import_verified 결정론 분류[상대/tsconfig alias/workspace 패키지 3경로 / unverified=finding 미진입·report 분리표기 / ep-fe-mis 실증 hole 112→verified 11+의심 101·앱간 49/49 의심·verified 누출 0] + (a) SKILL 4-b 를 codegraph-coverage 호출로 교체+인용 추가 + (d) 한계 절 name-collision failure mode·triage 명문화 + (c) scope 단위 인덱싱 옵션 문서화. 잔존 carry = §8.1 2nd 도메인 corroboration[멀티앱 모노레포 1st arm=ep-fe-mis] + unresolved_refs/provenance 활용은 codegraph OSS 업스트림 소관)
 
 ### F-DOGFOOD-014: 날조 source_evidence 가 analysis 단계 전 검증 통과 (실재성 게이트 부재)
 

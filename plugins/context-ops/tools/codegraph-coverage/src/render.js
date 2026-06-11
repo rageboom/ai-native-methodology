@@ -62,6 +62,9 @@ export function toFindings(coverage) {
 	//   holes 만 순회 — informational_notes(onlyArch=codegraph 사각)는 finding 채널 진입 절대 ❌ (구조적 절단 / Senior must-fix#3 / check36 가드).
 	if (coverage.axes.module?.holes?.length) {
 		for (const h of coverage.axes.module.holes) {
+			// F-DOGFOOD-013 — 이름-해석 의심(import 도달 미확인) hole = finding 채널 미진입.
+			//   codegraph 이름-기반 fallback 오연결(모노레포 동명 심볼) 노이즈 차단 — report 에는 정직 잔존.
+			if (h.import_verified === false) continue;
 			const sym = `${h.from} → ${h.to}`;
 			const ek = Array.isArray(h.edge_kinds) ? h.edge_kinds.join(',') : '';
 			findings.push({
@@ -139,8 +142,13 @@ export function renderMarkdown(report) {
 	}
 	const mod = report.coverage.axes.module;
 	if (mod) {
+		const iv = mod.import_verification;
+		const ivStat =
+			iv?.status === 'done'
+				? ` / import-verified=${iv.verified} 의심=${iv.unverified}`
+				: '';
 		L.push(
-			`## module dependency coverage (detectable / codegraph 결정론 의존=${mod.total} corroborated=${mod.covered} hole=${mod.holes.length} / modules=${mod.module_count})`,
+			`## module dependency coverage (detectable / codegraph 결정론 의존=${mod.total} corroborated=${mod.covered} hole=${mod.holes.length}${ivStat} / modules=${mod.module_count})`,
 		);
 		L.push(
 			'> "대치" 아니라 결정론 corroboration lens — arch.json dependencies[] 를 codegraph cross-file edge 로 corroborate + LLM 놓친 의존 노출. arch.json 무수정.',
@@ -149,12 +157,32 @@ export function renderMarkdown(report) {
 			L.push(
 				'_module dependency hole 없음 — codegraph 결정론 의존이 모두 architecture.json 에 문서화됨._',
 			);
-		for (const h of mod.holes.slice(0, 80))
+		// F-DOGFOOD-013 — verified(import 도달 확인) 와 unverified(이름-해석 의심) 분리 표기.
+		//   verified === false 만 의심 — undefined(검증 skip)는 기존 표기 유지 (backward-compat).
+		const verifiedHoles = mod.holes.filter((h) => h.import_verified !== false);
+		const suspectHoles = mod.holes.filter((h) => h.import_verified === false);
+		for (const h of verifiedHoles.slice(0, 80))
 			L.push(
 				`- ⚠ \`${h.from} → ${h.to}\`  weight=${h.weight}${Array.isArray(h.edge_kinds) && h.edge_kinds.length ? ' [' + h.edge_kinds.join(',') + ']' : ''}  (${h.sample_file})`,
 			);
-		if (mod.holes.length > 80) L.push(`- … (+${mod.holes.length - 80} more)`);
+		if (verifiedHoles.length > 80)
+			L.push(`- … (+${verifiedHoles.length - 80} more)`);
 		L.push('');
+		if (suspectHoles.length) {
+			L.push(
+				'### 이름-해석 의심 (import 도달 미확인 — finding 미진입 / F-DOGFOOD-013)',
+			);
+			L.push(
+				'> source 파일에 target 으로 도달하는 import(상대/tsconfig alias/workspace 패키지)가 없음 — codegraph 이름-기반 fallback 오연결(모노레포 동명 심볼 / 클로저·외부패키지 정의 미인덱스 흡인) 가능성. 결함 주장 ❌ / 최종 판단 = 사람 (실코드 grep).',
+			);
+			for (const h of suspectHoles.slice(0, 40))
+				L.push(
+					`- ⓘ \`${h.from} → ${h.to}\`  weight=${h.weight}  (${h.sample_file})`,
+				);
+			if (suspectHoles.length > 40)
+				L.push(`- … (+${suspectHoles.length - 40} more)`);
+			L.push('');
+		}
 		// informational_notes (onlyArch = codegraph 사각) — 결함 보고 ❌ / severity 부재 / finding 채널 진입 ❌.
 		if (mod.informational_notes?.length) {
 			L.push(

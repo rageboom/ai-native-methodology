@@ -65,9 +65,14 @@ function sortModules(modules) {
  * @param {Array<{id,path,layer?}>} modules    architecture.json modules[]
  * @returns {{pairs:Map<string,{from,to,weight,sample_file,edge_kinds:Set}>, stats:{cross_file,test_skipped,unmapped,intra_module}}}
  */
+// F-DOGFOOD-013 — module-pair 당 보존하는 distinct 기여 file-pair 상한.
+//   import-verify(이름-해석 의심 분류)의 검사 표본 — 거대 pair(weight 수천)의 메모리 폭증 방지.
+//   상한 도달 = file_pairs_truncated 정직 표기 (검증은 "≥1 도달" 판정이라 표본으로 충분).
+export const FILE_PAIRS_CAP = 100;
+
 export function rollupModuleEdges(edgesByKind = {}, modules = []) {
 	const sorted = sortModules(modules);
-	const pairs = new Map(); // "from|to" -> {from,to,weight,sample_file,edge_kinds:Set}
+	const pairs = new Map(); // "from|to" -> {from,to,weight,sample_file,edge_kinds:Set,file_pairs:Map,file_pairs_truncated}
 	let crossFile = 0,
 		testSkipped = 0,
 		unmapped = 0,
@@ -105,11 +110,22 @@ export function rollupModuleEdges(edgesByKind = {}, modules = []) {
 					weight: 0,
 					sample_file: nsf,
 					edge_kinds: new Set(),
+					// F-DOGFOOD-013 — import-verify 입력 (distinct source→target file pair / 순수 수집).
+					file_pairs: new Map(),
+					file_pairs_truncated: false,
 				};
 				pairs.set(key, rec);
 			}
 			rec.weight++;
 			rec.edge_kinds.add(kind);
+			const fpKey = nsf + '|' + ntf;
+			if (!rec.file_pairs.has(fpKey)) {
+				if (rec.file_pairs.size < FILE_PAIRS_CAP) {
+					rec.file_pairs.set(fpKey, { source_file: nsf, target_file: ntf });
+				} else {
+					rec.file_pairs_truncated = true;
+				}
+			}
 		}
 	}
 	return {
@@ -156,6 +172,9 @@ export function diffModuleDeps(pairs, dependencies = []) {
 			weight: rec.weight,
 			edge_kinds: [...rec.edge_kinds].sort(),
 			sample_file: rec.sample_file,
+			// F-DOGFOOD-013 — import-verify 내부 입력 (report 직전 annotate 단계가 소비 후 제거 / 출력 비포함).
+			file_pairs: [...rec.file_pairs.values()],
+			file_pairs_truncated: rec.file_pairs_truncated,
 		});
 	}
 	// arch.json 이 선언했으나 codegraph 가 못 본 의존 = 정직 사각 (informational only).

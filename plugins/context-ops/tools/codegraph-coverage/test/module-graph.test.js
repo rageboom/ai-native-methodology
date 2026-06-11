@@ -279,3 +279,70 @@ describe('toFindings — module holes → finding (informational 구조적 절�
 		assert.equal(refLeak.length, 0);
 	});
 });
+
+// ── F-DOGFOOD-013 — file_pairs 수집(순수) + finding 채널 절단 ──
+import { FILE_PAIRS_CAP } from '../src/module-graph.js';
+
+describe('F-DOGFOOD-013 — rollup file_pairs 수집 (import-verify 입력 / 순수)', () => {
+	const MODS = [
+		{ id: 'MOD-A', path: 'src/a' },
+		{ id: 'MOD-B', path: 'src/b' },
+	];
+	it('module-pair 에 distinct source→target file pair 보존', () => {
+		const edges = {
+			calls: [
+				{ source: { file: 'src/a/x.ts' }, target: { file: 'src/b/y.ts' } },
+				{ source: { file: 'src/a/x.ts' }, target: { file: 'src/b/y.ts' } }, // 중복 = dedupe
+				{ source: { file: 'src/a/z.ts' }, target: { file: 'src/b/y.ts' } },
+			],
+		};
+		const { pairs } = rollupModuleEdges(edges, MODS);
+		const rec = pairs.get('MOD-A|MOD-B');
+		assert.equal(rec.weight, 3);
+		assert.equal(rec.file_pairs.size, 2); // distinct 2
+		assert.equal(rec.file_pairs_truncated, false);
+	});
+	it('file_pairs 상한(FILE_PAIRS_CAP) 초과 = truncated 정직 표기', () => {
+		const calls = [];
+		for (let i = 0; i < FILE_PAIRS_CAP + 5; i++)
+			calls.push({ source: { file: `src/a/f${i}.ts` }, target: { file: 'src/b/y.ts' } });
+		const { pairs } = rollupModuleEdges({ calls }, MODS);
+		const rec = pairs.get('MOD-A|MOD-B');
+		assert.equal(rec.file_pairs.size, FILE_PAIRS_CAP);
+		assert.equal(rec.file_pairs_truncated, true);
+	});
+	it('diffModuleDeps holes 에 file_pairs 동봉 (내부 입력 — annotate 가 소비 후 제거)', () => {
+		const edges = {
+			calls: [{ source: { file: 'src/a/x.ts' }, target: { file: 'src/b/y.ts' } }],
+		};
+		const { pairs } = rollupModuleEdges(edges, MODS);
+		const diff = diffModuleDeps(pairs, []);
+		assert.equal(diff.holes[0].file_pairs.length, 1);
+		assert.deepEqual(diff.holes[0].file_pairs[0], {
+			source_file: 'src/a/x.ts',
+			target_file: 'src/b/y.ts',
+		});
+	});
+});
+
+describe('F-DOGFOOD-013 — toFindings: 이름-해석 의심 hole 미진입', () => {
+	function covWith(holes) {
+		return {
+			axes: { module: { detectable: true, total: holes.length, covered: 0, holes } },
+			undetectable: [],
+		};
+	}
+	it('import_verified=false → finding 제외 / true·부재 → 포함', () => {
+		const f = toFindings(
+			covWith([
+				{ from: 'MOD-A', to: 'MOD-B', weight: 3, import_verified: true },
+				{ from: 'MOD-A', to: 'MOD-C', weight: 667, import_verified: false }, // 의심 = 미진입
+				{ from: 'MOD-A', to: 'MOD-D', weight: 1 }, // 검증 skip = 기존 동작 (backward-compat)
+			]),
+		);
+		const syms = f.map((x) => x.code_graph_ref.symbol);
+		assert.ok(syms.includes('MOD-A → MOD-B'));
+		assert.ok(!syms.includes('MOD-A → MOD-C'), '이름-해석 의심 미진입');
+		assert.ok(syms.includes('MOD-A → MOD-D'));
+	});
+});

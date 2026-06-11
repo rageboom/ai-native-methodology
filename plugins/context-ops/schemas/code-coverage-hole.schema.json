@@ -5,70 +5,172 @@
   "description": "codegraph wiring STEP 1 (DEC-2026-06-03-codegraph-deliverable-wiring §5). codegraph .codegraph/codegraph.db 의 코드 엔티티(route/method) 전수 ∖ 산출물 code-ref = '코드有 산출물無' coverage-hole. trust: reference-lens / 비차단(severity low|medium ceiling) / 결정적 gate inject ❌. severity enum 이 구조적으로 high·critical 을 배제 (gate leak 차단).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["meta", "target", "active_axes", "stack", "codegraph", "coverage", "findings"],
+  "required": [
+    "meta",
+    "target",
+    "active_axes",
+    "stack",
+    "codegraph",
+    "coverage",
+    "findings"
+  ],
   "properties": {
     "meta": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["schema", "generated_by", "do_not_edit_manually", "reference_lens", "trust_note", "severity_ceiling"],
+      "required": [
+        "schema",
+        "generated_by",
+        "do_not_edit_manually",
+        "reference_lens",
+        "trust_note",
+        "severity_ceiling"
+      ],
       "properties": {
-        "schema": { "const": "code-coverage-hole.schema.json" },
-        "generated_by": { "const": "codegraph-coverage" },
-        "do_not_edit_manually": { "const": true },
-        "reference_lens": { "const": true },
-        "trust_note": { "type": "string" },
-        "generated_at": { "type": "string", "format": "date-time" },
+        "schema": {
+          "const": "code-coverage-hole.schema.json"
+        },
+        "generated_by": {
+          "const": "codegraph-coverage"
+        },
+        "do_not_edit_manually": {
+          "const": true
+        },
+        "reference_lens": {
+          "const": true
+        },
+        "trust_note": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "severity_ceiling": {
           "type": "array",
-          "items": { "enum": ["low", "medium"] },
+          "items": {
+            "enum": [
+              "low",
+              "medium"
+            ]
+          },
           "description": "coverage-hole 은 low|medium 만 (high·critical 절대 ❌ / findings-aggregator gate leak 차단)."
         }
       }
     },
-    "target": { "type": "string" },
-    "active_axes": { "type": "array", "items": { "type": "string" } },
-    "ref_sources": { "type": "array", "items": { "type": "string" } },
+    "target": {
+      "type": "string"
+    },
+    "active_axes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ref_sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
     "stack": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["language", "backend_known"],
+      "required": [
+        "language",
+        "backend_known"
+      ],
       "properties": {
-        "language": { "type": "string" },
-        "backend_known": { "type": "boolean" },
+        "language": {
+          "type": "string"
+        },
+        "backend_known": {
+          "type": "boolean"
+        },
         "orm": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "ibatis2": { "type": "boolean" },
-            "mybatis3": { "type": "boolean" },
-            "jpa": { "type": "boolean" },
-            "prisma": { "type": "boolean" }
+            "ibatis2": {
+              "type": "boolean"
+            },
+            "mybatis3": {
+              "type": "boolean"
+            },
+            "jpa": {
+              "type": "boolean"
+            },
+            "prisma": {
+              "type": "boolean"
+            }
           }
         },
-        "signals": { "type": "string" }
+        "signals": {
+          "type": "string"
+        }
       }
     },
     "codegraph": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["available", "db_path", "freshness"],
+      "required": [
+        "available",
+        "db_path",
+        "freshness"
+      ],
       "properties": {
-        "available": { "type": "boolean" },
-        "db_path": { "type": "string" },
-        "reason": { "type": ["string", "null"] },
+        "available": {
+          "type": "boolean"
+        },
+        "db_path": {
+          "type": "string"
+        },
+        "reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
         "freshness": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["available", "stale"],
+          "required": [
+            "available",
+            "stale"
+          ],
           "properties": {
-            "available": { "type": "boolean" },
-            "stale": { "type": "boolean" },
-            "reason": { "type": "string" },
-            "indexed_at": { "type": "string" },
-            "newest_source_mtime": { "type": ["string", "null"] },
-            "stale_count": { "type": "integer", "minimum": 0 },
-            "stale_sample": { "type": "array", "items": { "type": "string" } },
-            "capped": { "type": "integer", "minimum": 0 }
+            "available": {
+              "type": "boolean"
+            },
+            "stale": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "indexed_at": {
+              "type": "string"
+            },
+            "newest_source_mtime": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stale_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "stale_sample": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "capped": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         }
       }
@@ -76,15 +178,25 @@
     "coverage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["axes", "undetectable", "stats"],
+      "required": [
+        "axes",
+        "undetectable",
+        "stats"
+      ],
       "properties": {
         "axes": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "route": { "$ref": "#/$defs/routeAxis" },
-            "method": { "$ref": "#/$defs/methodAxis" },
-            "module": { "$ref": "#/$defs/moduleAxis" }
+            "route": {
+              "$ref": "#/$defs/routeAxis"
+            },
+            "method": {
+              "$ref": "#/$defs/methodAxis"
+            },
+            "module": {
+              "$ref": "#/$defs/moduleAxis"
+            }
           }
         },
         "undetectable": {
@@ -92,27 +204,70 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["axis", "state", "reason"],
+            "required": [
+              "axis",
+              "state",
+              "reason"
+            ],
             "properties": {
-              "axis": { "type": "string" },
-              "state": { "enum": ["undetectable", "unverified"] },
-              "reason": { "type": "string" }
+              "axis": {
+                "type": "string"
+              },
+              "state": {
+                "enum": [
+                  "undetectable",
+                  "unverified"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              }
             }
           }
         },
         "stats": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["route_total", "route_holes", "method_total", "method_holes", "undetectable_axes"],
+          "required": [
+            "route_total",
+            "route_holes",
+            "method_total",
+            "method_holes",
+            "undetectable_axes"
+          ],
           "properties": {
-            "route_total": { "type": "integer", "minimum": 0 },
-            "route_holes": { "type": "integer", "minimum": 0 },
-            "method_total": { "type": "integer", "minimum": 0 },
-            "method_holes": { "type": "integer", "minimum": 0 },
-            "module_total": { "type": "integer", "minimum": 0 },
-            "module_holes": { "type": "integer", "minimum": 0 },
-            "module_informational": { "type": "integer", "minimum": 0 },
-            "undetectable_axes": { "type": "integer", "minimum": 0 }
+            "route_total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "route_holes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "method_total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "method_holes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "module_total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "module_holes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "module_informational": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "undetectable_axes": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         }
       }
@@ -122,26 +277,75 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "axis", "severity", "message"],
+        "required": [
+          "id",
+          "axis",
+          "severity",
+          "message"
+        ],
         "properties": {
-          "id": { "type": "string", "pattern": "^F-CGCOV-[0-9]{3}$" },
-          "axis": { "type": "string" },
-          "severity": { "enum": ["low", "medium"] },
-          "message": { "type": "string" },
-          "evidence": { "type": "array", "items": { "type": "string" } },
+          "id": {
+            "type": "string",
+            "pattern": "^F-CGCOV-[0-9]{3}$"
+          },
+          "axis": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "low",
+              "medium"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "code_graph_ref": {
             "type": "object",
             "additionalProperties": false,
             "description": "v12.10.0 STEP 2 — coverage-hole 의 codegraph 코드 앵커 (auto-seed). finding-system.schema.json code_graph_ref 와 동형. promote 시 F-XXX ledger 로 그대로 이식.",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
-              "kind": { "type": "string" },
-              "symbol": { "type": "string" },
-              "file": { "type": "string" },
-              "line": { "type": "integer", "minimum": 0 },
-              "edge_kind": { "type": "string", "enum": ["contains", "imports", "calls", "references", "instantiates", "extends", "implements", "decorates"] },
-              "node_id": { "type": "string" },
-              "db_path": { "type": "string" }
+              "kind": {
+                "type": "string"
+              },
+              "symbol": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "edge_kind": {
+                "type": "string",
+                "enum": [
+                  "contains",
+                  "imports",
+                  "calls",
+                  "references",
+                  "instantiates",
+                  "extends",
+                  "implements",
+                  "decorates"
+                ]
+              },
+              "node_id": {
+                "type": "string"
+              },
+              "db_path": {
+                "type": "string"
+              }
             }
           }
         }
@@ -152,29 +356,67 @@
     "routeAxis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["detectable", "total", "covered", "holes"],
+      "required": [
+        "detectable",
+        "total",
+        "covered",
+        "holes"
+      ],
       "properties": {
-        "detectable": { "type": "boolean" },
-        "total": { "type": "integer", "minimum": 0 },
-        "covered": { "type": "integer", "minimum": 0 },
-        "excluded_count": { "type": "integer", "minimum": 0 },
-        "dynamic_count": { "type": "integer", "minimum": 0 },
+        "detectable": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "covered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dynamic_count": {
+          "type": "integer",
+          "minimum": 0
+        },
         "holes": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["path", "normalized_path", "file"],
+            "required": [
+              "path",
+              "normalized_path",
+              "file"
+            ],
             "properties": {
-              "verb": { "type": ["string", "null"] },
-              "path": { "type": "string" },
-              "normalized_path": { "type": "string" },
-              "file": { "type": "string" }
+              "verb": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "path": {
+                "type": "string"
+              },
+              "normalized_path": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
             }
           }
         },
-        "excluded_routes": { "$ref": "#/$defs/routeRefList" },
-        "dynamic_routes": { "$ref": "#/$defs/routeRefList" }
+        "excluded_routes": {
+          "$ref": "#/$defs/routeRefList"
+        },
+        "dynamic_routes": {
+          "$ref": "#/$defs/routeRefList"
+        }
       }
     },
     "routeRefList": {
@@ -182,32 +424,63 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["route"],
+        "required": [
+          "route"
+        ],
         "properties": {
-          "route": { "type": "string" },
-          "file": { "type": "string" }
+          "route": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          }
         }
       }
     },
     "methodAxis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["detectable", "total", "covered", "holes"],
+      "required": [
+        "detectable",
+        "total",
+        "covered",
+        "holes"
+      ],
       "properties": {
-        "detectable": { "type": "boolean" },
-        "total": { "type": "integer", "minimum": 0 },
-        "covered": { "type": "integer", "minimum": 0 },
-        "filtered": { "type": "integer", "minimum": 0 },
+        "detectable": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "covered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "filtered": {
+          "type": "integer",
+          "minimum": 0
+        },
         "holes": {
           "type": "array",
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["symbol", "file"],
+            "required": [
+              "symbol",
+              "file"
+            ],
             "properties": {
-              "symbol": { "type": "string" },
-              "name": { "type": "string" },
-              "file": { "type": "string" }
+              "symbol": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "file": {
+                "type": "string"
+              }
             }
           }
         }
@@ -217,20 +490,50 @@
       "type": "object",
       "additionalProperties": false,
       "description": "v12.11.0 STEP 3 — module dependency coverage-hole (codegraph cross-file edge rollup ∖ architecture.json dependencies[]). '대치' 아니라 결정론 corroboration lens. holes = codegraph有/arch無(LLM 놓침). informational_notes = arch有/codegraph無(codegraph 사각 / NOT a defect / severity 부재).",
-      "required": ["detectable", "total", "covered", "holes"],
+      "required": [
+        "detectable",
+        "total",
+        "covered",
+        "holes"
+      ],
       "properties": {
-        "detectable": { "type": "boolean" },
-        "total": { "type": "integer", "minimum": 0, "description": "codegraph 결정론 module→module 의존 수 (coverage 분모)." },
-        "covered": { "type": "integer", "minimum": 0, "description": "arch.json dependencies[] 가 이미 문서화 (corroborated)." },
-        "module_count": { "type": "integer", "minimum": 0 },
+        "detectable": {
+          "type": "boolean"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "codegraph 결정론 module→module 의존 수 (coverage 분모)."
+        },
+        "covered": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "arch.json dependencies[] 가 이미 문서화 (corroborated)."
+        },
+        "module_count": {
+          "type": "integer",
+          "minimum": 0
+        },
         "rollup_stats": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "cross_file": { "type": "integer", "minimum": 0 },
-            "test_skipped": { "type": "integer", "minimum": 0 },
-            "unmapped": { "type": "integer", "minimum": 0 },
-            "intra_module": { "type": "integer", "minimum": 0 }
+            "cross_file": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "test_skipped": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unmapped": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "intra_module": {
+              "type": "integer",
+              "minimum": 0
+            }
           }
         },
         "holes": {
@@ -239,13 +542,35 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["from", "to", "weight"],
+            "required": [
+              "from",
+              "to",
+              "weight"
+            ],
             "properties": {
-              "from": { "type": "string" },
-              "to": { "type": "string" },
-              "weight": { "type": "integer", "minimum": 1 },
-              "edge_kinds": { "type": "array", "items": { "type": "string" } },
-              "sample_file": { "type": "string" }
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "edge_kinds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sample_file": {
+                "type": "string"
+              },
+              "import_verified": {
+                "type": "boolean",
+                "description": "F-DOGFOOD-013 — source 파일에 target 으로 도달하는 import(상대/tsconfig alias/workspace 패키지) 실재 결정론 검증 결과. false = 이름-해석 의심(codegraph 이름-기반 fallback 오연결 가능 / 모노레포 동명 심볼) — finding 채널 미진입 / report 잔존. 부재 = 검증 skip(--db 단독 모드 등 / backward-compat)."
+              }
             }
           }
         },
@@ -255,11 +580,48 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["from", "to"],
+            "required": [
+              "from",
+              "to"
+            ],
             "properties": {
-              "from": { "type": "string" },
-              "to": { "type": "string" },
-              "type": { "type": "string" }
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "import_verification": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "F-DOGFOOD-013 — holes import 도달 검증 요약. status done = verified/unverified 카운트 / skipped = repo root 부재(정직 표기).",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "done",
+                "skipped"
+              ]
+            },
+            "verified": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unverified": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "note": {
+              "type": "string"
             }
           }
         }

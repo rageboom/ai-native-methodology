@@ -26,6 +26,7 @@ import { classifyStack } from './detect.js';
 import { collectRefs, collectSymbolAnchors } from './collect.js';
 import { buildCoverage } from './coverage.js';
 import { MODULE_EDGE_KINDS } from './module-graph.js';
+import { annotateImportVerification } from './import-verify.js';
 import { renderMarkdown, toFindings, SEVERITY_CEILING } from './render.js';
 import {
 	toPromoteReadyFindings,
@@ -330,6 +331,15 @@ function main() {
 		moduleEdgesByKind,
 		arch,
 	});
+	// F-DOGFOOD-013 — module hole 이름-해석 의심 분류 (cli 레이어 I/O / buildCoverage 순수성 보존).
+	//   codegraph 이름-기반 fallback 오연결(모노레포 동명 심볼)을 "source→target import 실재"
+	//   결정론 검증으로 분리 — unverified = finding 미진입 / report 잔존. --db 단독(target 부재) = skipped.
+	if (coverage.axes.module) {
+		annotateImportVerification(
+			coverage.axes.module,
+			args.target ? resolve(args.target) : null,
+		);
+	}
 	const findings = toFindings(coverage);
 
 	const report = {
