@@ -9,15 +9,26 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-11 / TDD/unit 층 1급화 v0.36.0 / **미커밋** — 커밋·push 대기)
+### ★ 다음 세션 인계 (2026-06-11 / TDD/unit 층 1급화 v0.36.0 / **✅ 커밋·push 완료** — `3e4624b3` 양원격 동기)
 
-**이번 세션 성과 (plugin.json v0.35.0 → v0.36.0 MINOR / 미커밋 / 트리 dirty)**:
+**이번 세션 성과 (plugin.json v0.35.0 → v0.36.0 MINOR / ✅ 커밋·push 완료 / 트리 clean)**:
 - **TDD/unit 층 1급화 — UNIT-* 전체 스레드** (DEC-2026-06-11-tdd-unit-layer-thread): behavior(BDD) 단일 스레드에 나란히 도는 TDD/unit 층(`UNIT-*`=DO-178C LLR rung) 1급화. ep-be-gea event dogfood 가 노출한 갭(composition 이 mock 한 빌딩블록의 격리 유닛테스트 부재="GREEN 인데 거짓 안심")이 본체 변경으로 귀결.
 - **신규**: unit-spec.schema.json(UNIT-* SSOT) + 정책 test-layering.md(2층 모델·mocking-soundness 계약·시나리오 분기·canon) + deliverable 27 + id-conventions UNIT-*. **additive 필드**(behavior-spec.unit_refs·task-plan.unit_refs+obligation·test-spec.test_layer+class_ref+mocks·matrix unit_id+coverage_summary.unit_coverage / 전부 optional·default behavior-only / **기존 PoC 25/25 무회귀**). **검증기 soft**(validateMockSoundness=spec-test-link opt-in·비주입 / validateUnitTestObligation=plan-coverage medium·비차단 / matrix-builder --unit-spec). skill UNIT 앵커 bottom-up 격상.
 - **결정**: ①신뢰분리(spec 파생 UNIT=게이트 후보 / code-graph method-axis=reference-lens·propose-only 영구 비-게이트 / DEC-2026-05-28 불변·check34/36/37/39 가드) ②§8.1 ratchet(스캐폴딩 now / 하드게이트 ≥2 PoC) ③additive default behavior-only ④재사용(code-pointer ast_symbol) ⑤시나리오(S2=code-graph∩domain 발견 / greenfield=formal-spec 설계).
 - **PoC #1 (ep-be-gea / 외부격리·commit❌)**: DrawNumberGeneratorTest 52 + MaskingUtilsTest 6 = 실 JUnit 58 GREEN / event unit-spec.json(4 UNIT) schema-valid / matrix unit_coverage{ratio:1,total:4,tested:2} / mock-soundness 0=sound.
-- **carry**: flows phase-flow 편집(drift handoff 위험 / skill 운영 본체 격상) · mock-soundness·unit-coverage 하드게이트(≥2 PoC = greenfield 예제 or 사내 2nd 도메인) · code-graph method-axis unit anchor flip.
-- **STOP**: release-readiness **42/42**(pre-existing check40 ticket 부채 6건도 정리) + 도구 테스트 spec-test-link 11/11·plan-coverage 47/47·matrix 172/172·schema 111/111 + version 3-way 0.36.0. **미커밋 — 다음: 커밋 + origin/GHE push**.
+- **carry**: flows phase-flow 편집(drift handoff 위험 / skill 운영 본체 격상) · ~~mock-soundness·unit-coverage 하드게이트(≥2 PoC)~~ → **§8.1 2nd-도메인 corroboration ✅ poc-18**(2026-06-11 / DEC-2026-06-11-unit-layer-corroboration-poc18 / 아래 ★ 참조) · code-graph method-axis unit anchor flip.
+
+### ★ unit 층 §8.1 2nd-도메인 corroboration ✅ (2026-06-11 / poc-18 / 버전 bump 없음 / 미커밋)
+
+**성과 (DEC-2026-06-11-unit-layer-corroboration-poc18 / 본체 schema·gate·tool 무변경 / examples + docs additive)**:
+- v0.36.0 unit 층(SOFT)의 하드게이트 격상 전제(§8.1 ≥2 distinct 도메인) = **poc-18 = 2번째 distinct 도메인 corroboration**(PoC #1=ep-be-gea 외부·commit❌ / poc-18 = unit 층 **최초의 in-repo 재현가능 증거**). 워크플로우 7 agents(5 readers→synthesis→Senior REVISE@0.82) 조사 후 사용자 결단(2nd domain=poc-18 / mock-soundness=RED→GREEN).
+- **시행**: poc-18 신규 `unit-spec.json`(2 UNIT encryption·pick / characterized_from_code / ast_symbol) + 신규 실 mockist 테스트 `user.service.unit.test.ts` + test-spec 3 TC(unit 2 + composition 1+mocks) + behavior/task `unit_refs`+obligation + matrix `--unit-spec` unit_coverage{ratio:1,total:2,tested:2}.
+- **mock-soundness RED→GREEN**: encryption unit TC 부재→`unit.mock.unsound` 1 finding(RED)→TC-ENC-001 핀→0(GREEN) = 검증기 비-공허 입증(evidence/mock-soundness-{RED,GREEN}.json).
+- **STOP**: 실 vitest **18/18 GREEN**(no Docker/no-sim) + schema-valid 14/14 + matrix 기존 셀 무회귀(POST 5/5 green·backward 1.0) + plan-coverage 0 findings + 도구 11/47/172/111 + **release-readiness 42/42** + 본체 무변경.
+- **정직 GAP(flip 판단 입력)**: ①provenance 편중(둘 다 characterized_from_code / designed_from_spec RED→GREEN 미실증→향후 greenfield) ②재현성 비대칭(ep-be-gea 외부) ③breadth 보통(2 UNIT) ④matrix forward 0.833→0.714(additive yellow / 날조 IMPL 미생성).
+- **carry**: 하드게이트 promotion(LEVER A/B/C SOFT→HARD flip = mock-soundness aggregator `--unit-spec` 배선 + plan-coverage severity medium→high + aggregator unit_coverage 매핑) = §8.1 precondition 충족됐으나 GAP 고려한 **별도 promotion DEC**(본 세션 코드 미작성). designed_from_spec greenfield 실증.
+- **미커밋** — plan `.claude/plans/plan-unit-layer-corroboration-poc18.md` / 다음: 커밋 + origin/GHE push.
+- **STOP**: release-readiness **42/42**(pre-existing check40 ticket 부채 6건도 정리) + 도구 테스트 spec-test-link 11/11·plan-coverage 47/47·matrix 172/172·schema 111/111 + version 3-way 0.36.0. **✅ 커밋·push 완료** (`3e4624b3` / origin[rageboom] + origin-smilegate[GHE] 양원격 동기 / 트리 clean). 다음 의제 = 아래 frontier 중 **사용자 결단**.
 
 ---
 
@@ -65,7 +76,7 @@
 
 > ⚠️ 메모리(`~/.claude/...`)는 **머신-로컬 → 다른 PC 미전파**. 본 carry = **repo committed(origin/main)** 이므로 다른 PC `git pull` 후 본 섹션 기준 재개. 각 항목 = 무엇 / 왜 / 시작점.
 
-- **[ops] GHE(origin-smilegate) push 미실행** — 이 환경에서 `github.smilegate.net` 네트워크 불가(`Connection reset by peer`). origin(rageboom) main = `7c4a0502` 까지 동기화됨(코드·문서 전부 origin 에 있음). → **VPN 세션에서 `git push origin-smilegate main`** (GHE main 분기 시 `git fetch origin-smilegate` 후 확인 / force ❌).
+- ~~**[ops] GHE(origin-smilegate) push 미실행**~~ — **✅ 해소 (2026-06-11)**: origin(rageboom) + origin-smilegate(GHE) main 둘 다 `3e4624b3`(v0.36.0) 동기 확인. 과거 GHE `Connection reset by peer` 부채 청산. (재분기 시 `git fetch origin-smilegate` 후 확인 / force ❌ 규율 유지.)
 - **[D1] 사내 Modern S2 재측정** — poc-18 = 공개 OSS **S1 재생성**. CLAUDE.md "사내 Modern 재측정 의무" 미충족(현 Modern PoC 전부 OSS). 사내 Modern 모듈(Spring Boot 3+JPA / NestJS 등)로 **S2 AX전환** 측정 = 진짜 prod-value frontier. 사내 source 규약 = examples/ 밖 / 외부 절대경로 / commit ❌ / 마스킹 DEC 만 공개([[feedback_internal_source_poc_external_location]] — 단 이 memory 는 머신-로컬이니 규약은 `decisions/INDEX.md` 의 관련 DEC 도 참조).
 - **[D2] §8.1 2번째 Modern 도메인 — ✅ RESOLVED (2026-06-06 / PoC #19)**: **`numpy-financial v1.0.0`(금융 amortization / Python 3.14+pytest)** 로 chain-driver 상태머신 6 stage E2E 완주(analysis #0~implement #5 / terminal last_gate=#5). poc-18(blog·post / Node·TS)과 **2 distinct problem-domain + 2 distinct stack** = §8.1 ≥2 충족(메커니즘 corroboration #2). genuine RED→GREEN 실 pytest(0/5→5/5 / result_hash acf0cd2c≠dab39cae / test 파일 무변경 i-strict / simulated_evidence_count=0). 산출물 10/10 strict schema VALID. **dogfood finding**: gate #1 UC coverage 0.43<0.80 hard-block→work-unit scope 정렬로 해소(게이트 실작동 입증) / db-schema·openapi=N/A(순수 계산 lib = 5 이식성 중 3 적용 / 다른 산출물 프로파일) / static-runner env-carry / chain4·5 CHANNEL B(poc-18 F3 동형 기지 갭). **정직 경계**: §3-A rate=미측정(provenance만) / 2 data point=메커니즘 corroboration이지 paradigm ceiling 자동확정 ❌. 본체 release-readiness **40/40 무회귀**(examples 추가만 / 본체 무변경). SSOT=`examples/poc-19-numpy-financial-python/README.md` + plan `plan-d2-numpy-financial-dogfood.md`. **잔여**: 사내 Modern S2([D1] 별개) / 3rd 도메인=선택적.
 - **[D3] gate #0 prose #0-정합 검증 — ✅ RESOLVED (verified / 2026-06-06)**: 전수 grep 검증 결과 **lag 없음 / corrective 불필요**. carry가 의심한 5-gate lag는 **같은 커밋 `5429d9e0`(게이트 #0 도입)이 5파일 전부에 동시 반영**해 이미 해소돼 있었음 (carry 문구가 STALE). 근거: `lifecycle-contract.md` L32 다이어그램 `gate #0 (soft)`·L197 "analysis = soft exit gate #0 [§3-A axis 별개]" / `ADR-CHAIN-001` L61 "#0 ... 본 §5 chain hard gate #1~#5 와 별개" / `ADR-CHAIN-002` L25 "#0 도 동일 go/stop 재사용 — 단 soft" / `automation-boundary.md` L18 "#0 는 두 axis 와 별개 soft·opt-in" / `agents-axis.md` L79 "6 gate [#0 soft + #1~#5 hard]". 모순 진술(self-attested / hard gate 없음) = 살아있는 spec 산문 0건 (잔존은 DEC/LEDGER 과거형 참조 + `INSPECTION-2026-05-31` 날짜 스냅샷뿐 / SEED-1=partially-reversed 기등록). 산문 5파일 무수정(이미 정합 / cosmetic 추가 = manufactured drift 회피). 상세 = DEC §5 prose-coherence carry(resolved-verified) + plan `gleaming-pondering-kernighan.md`.

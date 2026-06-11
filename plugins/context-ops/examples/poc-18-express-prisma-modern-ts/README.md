@@ -111,3 +111,44 @@ pnpm test   # baseline: 128 pass / 14 fail(upstream route/auth) → 슬라이스
 - `target/.ai-context/findings-*.json` — gate 별 findings (실 validator/runner 유래)
 - `target/.ai-context/evidence/` — vitest report + stdout/stderr (5종 물증 원본)
 - `target/src/modules/post/post.service.ts` — GREEN 재생성 impl
+
+## 7. TDD/unit 층 §8.1 2nd-도메인 corroboration (2026-06-11 / DEC-2026-06-11-unit-layer-corroboration-poc18)
+
+v0.36.0 가 TDD/unit 층(`UNIT-*`/mock-soundness/unit-coverage)을 **SOFT/opt-in** 으로 출하. 하드게이트 격상 전제 = **≥2 distinct 도메인 PoC**(§8.1). PoC #1 = ep-be-gea(Java/Spring/event/S2 / 외부·commit❌). poc-18 = **2번째 distinct 도메인**(Node/TS/blog / in-repo 재현가능 = unit 층 최초의 재현 증거). **본체 schema/gate/tool 무변경 — examples + docs additive only**.
+
+### unit 슬라이스 재현 (Docker 불요 / B2 — 기존 §2 test-cmd 는 post.service Docker 슬라이스라 별개)
+
+```bash
+# §2 의 pnpm install 선행 (node_modules·.env.test gitignored)
+cd target && pnpm exec vitest run \
+  test/shared/utils/encryption.test.ts \
+  test/shared/utils/pick.test.ts \
+  test/modules/user/user.service.unit.test.ts \
+  --reporter=json --outputFile=.ai-context/evidence/unit-layer-vitest-report.json
+# → 18 passed (encryption 9 + pick 7 + user.service.unit 2) / no Postgres / success:true
+```
+
+### mock-soundness RED→GREEN (검증기 비-공허 입증)
+
+신규 mockist 테스트 `test/modules/user/user.service.unit.test.ts` 가 `createUser` 의 협력자 `encryptPassword` 를 mock → "평문이 절대 저장 안 되고 해시만 저장됨" 단언. 이 GREEN 은 **encryptPassword 가 실제로 해시한다는 가정**에 의존 = `UNIT-ENCRYPTION-001` 이 자기 `test_layer=unit` TC 로 핀될 때만 SOUND.
+
+| 상태 | test-spec | `spec-test-link-validator --unit-spec` | evidence |
+| --- | --- | --- | --- |
+| **RED** | TC-USER-002 mocks UNIT-ENCRYPTION-001 / encryption unit TC 부재 | `unit.mock.unsound` **1 finding(high)** | `evidence/mock-soundness-RED.json` |
+| **GREEN** | TC-ENC-001(test_layer=unit, class_ref=UNIT-ENCRYPTION-001) 추가 → 핀 | **0 findings**(sound) | `evidence/mock-soundness-GREEN.json` |
+
+검증기가 불건전을 **실제로 잡고**(RED) 고치면 **풀린다**(GREEN) = no-op 검증기와 구분 = ep-be-gea(sound 방향 단독)가 못 본 **발화 방향** 보완.
+
+### 산출물 (additive)
+
+- `output/unit-spec.json` — 2 UNIT(`UNIT-ENCRYPTION-001`·`UNIT-PICK-001` / provenance=`characterized_from_code` / code_pointer ast_symbol / obligation=required). schema-valid.
+- `output/test-spec.json` — +3 TC(TC-ENC-001·TC-PICK-001=unit / TC-USER-002=composition+mocks).
+- `output/behavior-spec.json`·`output/task-plan.json` — `unit_refs`(+task `unit_test_obligation`) = BHV→UNIT·TASK→UNIT join.
+- `output/matrix.json` — `coverage_summary.unit_coverage{obligation_satisfied_ratio:1, unit_total:2, unit_tested:2}` (기존 behavior 셀 status 무회귀).
+
+### 정직 경계 (flip 판단 입력 / 본 corroboration 이 입증 못 하는 것)
+
+- **provenance 편중**: encryption·pick 는 vendored OSS 의 기존 코드+기존 테스트 핀 = `characterized_from_code`. **designed_from_spec(RED→GREEN test-first) 브랜치는 미실증** → 향후 greenfield PoC.
+- **재현성 비대칭**: 2 distinct 도메인 중 ep-be-gea 는 외부·commit❌. poc-18 만 in-repo 재현. (s2 격상 선례 DEC-2026-06-01 은 양쪽 in-corpus.)
+- **forward_coverage 0.833→0.714**: composition TC(TC-USER-002)가 **이미 미구현인 USER 슬라이스**(chain5 = POST scoped / impl-spec=IMPL-POST-001 only)에 yellow 셀 1개 추가 = additive. 기존 green 셀 무회귀·날조 IMPL 미생성(no-simulation).
+- **하드게이트 flip ≠ 본 작업**: §8.1 precondition(≥2 distinct 도메인) 충족됐으나 flip(mock-soundness·unit-coverage SOFT→HARD)은 위 GAP 고려한 **별도 promotion DEC**.

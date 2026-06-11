@@ -84,6 +84,45 @@
       "expected_outcome": "pass",
       "test_intent": "characterization",
       "source_evidence": "user.service email uniqueness (linkage-only; RED→GREEN runner scoped to post slice)"
+    },
+    {
+      "id": "TC-USER-002",
+      "ac_ref": "AC-USER-001",
+      "bhv_ref": "BHV-USER-001",
+      "type": "unit",
+      "framework": "vitest",
+      "test_layer": "composition",
+      "source_file": "test/modules/user/user.service.unit.test.ts",
+      "expected_outcome": "pass",
+      "test_intent": "characterization",
+      "mocks": [
+        { "collaborator_unit_ref": "UNIT-ENCRYPTION-001", "mock_kind": "mock" }
+      ],
+      "source_evidence": "describe('createUser (composition / mocked collaborators)') — mocks encryptPassword; asserts only the hash is persisted (never plaintext)"
+    },
+    {
+      "id": "TC-PICK-001",
+      "bhv_ref": "BHV-POST-002",
+      "type": "unit",
+      "framework": "vitest",
+      "test_layer": "unit",
+      "class_ref": "UNIT-PICK-001",
+      "source_file": "test/shared/utils/pick.test.ts",
+      "expected_outcome": "pass",
+      "test_intent": "characterization",
+      "source_evidence": "describe('pick') — selects only listed keys from object"
+    },
+    {
+      "id": "TC-ENC-001",
+      "bhv_ref": "BHV-USER-001",
+      "type": "unit",
+      "framework": "vitest",
+      "test_layer": "unit",
+      "class_ref": "UNIT-ENCRYPTION-001",
+      "source_file": "test/shared/utils/encryption.test.ts",
+      "expected_outcome": "pass",
+      "test_intent": "characterization",
+      "source_evidence": "describe('Encryption Utils') — encryptPassword returns bcrypt hash (≠ plaintext); isPasswordMatch verifies. Pins UNIT-ENCRYPTION-001 → makes TC-USER-002's mock SOUND."
     }
   ],
   "coverage": {

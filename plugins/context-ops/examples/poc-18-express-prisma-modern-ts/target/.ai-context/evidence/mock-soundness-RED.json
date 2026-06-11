@@ -1,0 +1,19 @@
+{
+  "state": "RED",
+  "note": "encryption unit TC ABSENT — validateMockSoundness fires unsound (검증기 발화 입증)",
+  "mock_soundness_advisory": {
+    "findings": [
+      {
+        "kind": "unit.mock.unsound",
+        "severity": "high",
+        "tc_id": "TC-USER-002",
+        "collaborator_unit_ref": "UNIT-ENCRYPTION-001",
+        "message": "TC TC-USER-002 mocks UNIT-ENCRYPTION-001 but UNIT-ENCRYPTION-001 has no test_layer=unit TC — mock = unverified assumption (propose-only / soft / DEC-2026-06-11)"
+      }
+    ],
+    "summary": {
+      "total_findings": 1,
+      "high": 1
+    }
+  }
+}

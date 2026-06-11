@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "generated_at": "2026-06-11T06:51:00Z",
+    "methodology_version": "v0.36.0",
+    "inputs_used": ["source_code", "test_code"],
+    "confidence": 0.9,
+    "formula_version": "v1",
+    "$comment": "PoC #18 unit 층 §8.1 2nd-도메인 corroboration (DEC-2026-06-11-tdd-unit-layer-thread / 2nd domain = poc-18). provenance=characterized_from_code — encryption/pick 는 vendored OSS 의 기존 코드+기존 unit test 를 핀(관찰 동작 / Feathers characterization). designed_from_spec 브랜치는 schema 구조 지원 / 향후 greenfield PoC 에서 실증."
+  },
+  "derivation_source": {
+    "domain_path": ".ai-context/output/domain.json"
+  },
+  "units": [
+    {
+      "id": "UNIT-ENCRYPTION-001",
+      "name": "encryptPassword / isPasswordMatch (bcrypt 비밀번호 해싱 빌딩블록)",
+      "provenance": "characterized_from_code",
+      "kind": "function",
+      "code_pointer": {
+        "path": "src/shared/utils/encryption.ts",
+        "anchor_type": "ast_symbol",
+        "symbol": "encryptPassword"
+      },
+      "bc_ref": "BC-USER",
+      "unit_test_obligation": "required"
+    },
+    {
+      "id": "UNIT-PICK-001",
+      "name": "pick (객체에서 키 선택 — query 필터/옵션 분해 빌딩블록)",
+      "provenance": "characterized_from_code",
+      "kind": "function",
+      "code_pointer": {
+        "path": "src/shared/utils/pick.ts",
+        "anchor_type": "ast_symbol",
+        "symbol": "pick"
+      },
+      "bc_ref": "BC-POST",
+      "unit_test_obligation": "required"
+    }
+  ],
+  "coverage": {
+    "obligation_satisfied_ratio": 1.0,
+    "threshold": 0.85,
+    "coverage_strategy": "absolute"
+  }
+}

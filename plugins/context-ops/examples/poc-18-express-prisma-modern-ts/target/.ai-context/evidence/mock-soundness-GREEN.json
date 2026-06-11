@@ -1,0 +1,11 @@
+{
+  "state": "GREEN",
+  "note": "encryption unit TC PRESENT (TC-ENC-001 pins UNIT-ENCRYPTION-001) → mock SOUND → 0 findings",
+  "mock_soundness_advisory": {
+    "findings": [],
+    "summary": {
+      "total_findings": 0,
+      "high": 0
+    }
+  }
+}
