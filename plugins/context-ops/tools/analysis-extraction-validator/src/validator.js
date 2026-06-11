@@ -8,7 +8,8 @@
 //   3. (figma TEXT / plan-doc uc_candidates·glossary) provenance 필드 누락 → high (silent 통과 차단)
 //   4. (공통) provenance 보유 entry 중 inferred 비율 > threshold → medium (사용자 확인 권고)
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 const DEFAULT_INFERRED_RATIO_THRESHOLD = 0.5;
 
@@ -190,4 +191,143 @@ export function loadJson(path) {
   } catch (e) {
     throw new Error(`JSON parse error at ${path}: ${e.message}`);
   }
+}
+
+// ── evidence-scan 모드 (F-DOGFOOD-014 / ep-fe-mis dogfood P0) ──
+// analysis 산출물(LLM 생성)의 {file, line} 증거 인용 실재성 결정론 검사.
+// 배경: 날조 source_evidence(존재하지 않는 파일:라인)가 schema/br-cross/gate#0 전 검증을 통과 —
+//   analysis-only scope 는 artifact-graph 부재로 code-pointer-validator 불가 → 분석 단계 전용 실재성 게이트.
+// 대상 shape: 객체 안 `file`(string) [+ `line`(integer)] 페어 한정 (deep-walk) —
+//   business-rules source_evidence / domain invariants·value_objects evidence 등.
+//   shape 한정 = false-positive 억제 (tool_stdout_path 류 다른 키는 비대상).
+// 판정: 상대경로 file 부재 → critical (fabrication-grade) / line 범위 밖 → high /
+//   절대경로 → info (머신 종속 비이식 — 존재검사 skip / 정직 표기).
+
+function isAbsolutePathLike(p) {
+  return p.startsWith('/') || /^[A-Za-z]:[\\/]/.test(p);
+}
+
+function collectFileLineRefs(node, jsonPath, out) {
+  if (Array.isArray(node)) {
+    node.forEach((v, i) => collectFileLineRefs(v, `${jsonPath}[${i}]`, out));
+    return;
+  }
+  if (!node || typeof node !== 'object') return;
+  if (typeof node.file === 'string' && node.file.length > 0) {
+    out.push({
+      jsonPath,
+      file: node.file,
+      line: Number.isInteger(node.line) ? node.line : null,
+    });
+  }
+  for (const [k, v] of Object.entries(node)) {
+    if (v && typeof v === 'object') collectFileLineRefs(v, `${jsonPath}.${k}`, out);
+  }
+}
+
+function listJsonFilesRecursive(dir) {
+  const out = [];
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    const p = join(dir, e.name);
+    if (e.isDirectory()) out.push(...listJsonFilesRecursive(p));
+    // findings-*.json = aggregator 자기 출력 (증거 인용 산출물 아님) — scan 제외
+    else if (e.name.endsWith('.json') && !e.name.startsWith('findings-')) out.push(p);
+  }
+  return out;
+}
+
+export function validateEvidenceExistence(outputDir, repoRoot) {
+  const findings = [];
+  const lineCountCache = new Map();
+  const coverage = {
+    artifacts_scanned: 0,
+    refs_total: 0,
+    refs_ok: 0,
+    refs_absolute: 0,
+    refs_missing: 0,
+    refs_line_out_of_range: 0,
+  };
+
+  if (!existsSync(outputDir)) {
+    findings.push({
+      kind: 'evidence.output_dir_missing',
+      severity: 'medium',
+      message: `analysis output dir 부재: ${outputDir}`,
+    });
+    return { adapter: 'evidence-scan', findings, coverage, summary: summarize(findings) };
+  }
+
+  for (const artifactPath of listJsonFilesRecursive(outputDir)) {
+    let json;
+    try {
+      json = JSON.parse(readFileSync(artifactPath, 'utf-8'));
+    } catch {
+      continue; // parse 불가 = schema-validator 소관 (이중 보고 회피)
+    }
+    coverage.artifacts_scanned += 1;
+    const refs = [];
+    collectFileLineRefs(json, '$', refs);
+    for (const ref of refs) {
+      coverage.refs_total += 1;
+      if (isAbsolutePathLike(ref.file)) {
+        coverage.refs_absolute += 1;
+        findings.push({
+          kind: 'evidence.absolute_path',
+          severity: 'info',
+          message: `절대경로 증거 인용 (머신 종속 — 비이식 / 존재검사 skip): ${ref.file}`,
+          artifact: artifactPath,
+          json_path: ref.jsonPath,
+        });
+        continue;
+      }
+      // 상대경로 해석: repo-root 기준 우선, 산출물 자신의 디렉토리 기준 fallback —
+      //   증거 인용은 repo-relative / index 류(bc_files[].file)는 artifact-relative (둘 다 정당).
+      const candidates = [
+        resolve(repoRoot, ref.file),
+        resolve(artifactPath, '..', ref.file),
+      ];
+      let abs = null;
+      for (const c of candidates) {
+        try {
+          if (statSync(c).isFile()) {
+            abs = c;
+            break;
+          }
+        } catch {
+          /* 다음 후보 */
+        }
+      }
+      if (!abs) {
+        coverage.refs_missing += 1;
+        findings.push({
+          kind: 'evidence.file_missing',
+          severity: 'critical',
+          message: `증거 인용 파일 부재 (fabrication-grade): ${ref.file}${ref.line != null ? ':' + ref.line : ''}`,
+          artifact: artifactPath,
+          json_path: ref.jsonPath,
+        });
+        continue;
+      }
+      if (ref.line != null) {
+        let count = lineCountCache.get(abs);
+        if (count == null) {
+          count = readFileSync(abs, 'utf-8').split('\n').length;
+          lineCountCache.set(abs, count);
+        }
+        if (ref.line < 1 || ref.line > count) {
+          coverage.refs_line_out_of_range += 1;
+          findings.push({
+            kind: 'evidence.line_out_of_range',
+            severity: 'high',
+            message: `증거 인용 라인 범위 밖: ${ref.file}:${ref.line} (파일 ${count} 라인)`,
+            artifact: artifactPath,
+            json_path: ref.jsonPath,
+          });
+          continue;
+        }
+      }
+      coverage.refs_ok += 1;
+    }
+  }
+  return { adapter: 'evidence-scan', findings, coverage, summary: summarize(findings) };
 }

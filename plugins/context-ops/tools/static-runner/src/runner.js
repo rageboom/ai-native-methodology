@@ -46,13 +46,21 @@ export function localPmdBinDir() {
 	}
 }
 
-// extraDirs 를 PATH 앞에 prepend 한 env 반환. 빈 배열/undefined → process.env 그대로
-// (Semgrep 등 기존 plugin 무영향 / backward-compatible).
-export function augmentEnv(extraDirs) {
-	if (!extraDirs || extraDirs.length === 0) return process.env;
-	const sep = process.platform === 'win32' ? ';' : ':';
-	const cur = process.env.PATH || process.env.Path || '';
-	return { ...process.env, PATH: extraDirs.join(sep) + sep + cur };
+// extraDirs 를 PATH 앞에 prepend + extraEnv 를 default 로 깐 env 반환.
+// extraEnv 는 process.env 아래에 깔림 = 사용자가 명시한 env 가 항상 우선 (F-DOGFOOD-016 —
+//   semgrep 버전체크 네트워크 대기 ~96s(egress 차단 사내망)를 SEMGREP_ENABLE_VERSION_CHECK=0
+//   default 로 차단하되 사용자 의도 override 보존). 둘 다 비면 process.env 그대로 (backward-compatible).
+export function augmentEnv(extraDirs, extraEnv) {
+	const hasDirs = extraDirs && extraDirs.length > 0;
+	const hasEnv = extraEnv && Object.keys(extraEnv).length > 0;
+	if (!hasDirs && !hasEnv) return process.env;
+	const base = hasEnv ? { ...extraEnv, ...process.env } : { ...process.env };
+	if (hasDirs) {
+		const sep = process.platform === 'win32' ? ';' : ':';
+		const cur = process.env.PATH || process.env.Path || '';
+		base.PATH = extraDirs.join(sep) + sep + cur;
+	}
+	return base;
 }
 
 export const REQUIRED_EVIDENCE = [
@@ -88,6 +96,18 @@ export class PluginEnvironmentMissing extends Error {
 	}
 }
 
+// F-DOGFOOD-016 — probe timeout ≠ 환경 부재. 도구가 설치되어 있어도 느린 기동(네트워크
+// 버전체크 등 / 사내 egress 차단 실측 ~96s)으로 probe 가 timeout 될 수 있다. 이를
+// ENV_MISSING 으로 오분류하면 "정직한 환경 신호"(exit 3)가 거짓 양성이 됨 → 별도 분류.
+export class PluginProbeTimeout extends Error {
+	constructor(plugin, detail) {
+		super(`[${plugin}] probe timeout (환경 부재 단정 ❌ — 도구가 느리게 기동 중일 수 있음): ${detail}`);
+		this.plugin = plugin;
+		this.detail = detail;
+		this.code = 'PROBE_TIMEOUT';
+	}
+}
+
 export class ImportSarifRejected extends Error {
 	constructor(reason, detail) {
 		super(`[import-sarif rejected] ${reason}: ${detail}`);
@@ -106,6 +126,9 @@ export class Plugin {
 		shell = false,
 		versionParse,
 		extraPathDirs,
+		acceptableExitCodes,
+		extraEnv,
+		probeTimeoutMs,
 	}) {
 		this.name = name;
 		this.executable = executable;
@@ -122,6 +145,12 @@ export class Plugin {
 		//   default = 첫 줄(Semgrep 등 첫 줄에 버전 출력하는 도구). PMD 처럼 ASCII 배너를
 		//   먼저 출력하는 도구는 semver 정규식 override 로 정확 추출 (no-simulation 물증 정합).
 		this.versionParse = versionParse ?? ((out) => out.trim().split('\n')[0]);
+		// F-DOGFOOD-015 — 도구별 정상 exit code 의미론. 범위 밖 exit = scan FAILED (fatal) —
+		//   "실행됐으나 스캔 무효"를 findings 0 성공으로 둔갑시키던 false-health 차단.
+		this.acceptableExitCodes = acceptableExitCodes ?? [0];
+		// F-DOGFOOD-016 — 도구별 오프라인 default env (사용자 env 우선 / augmentEnv 참조).
+		this.extraEnv = extraEnv ?? null;
+		this.probeTimeoutMs = probeTimeoutMs ?? 10_000;
 	}
 
 	preflight() {
@@ -131,13 +160,17 @@ export class Plugin {
 				this.versionArgs ?? ['--version'],
 				{
 					encoding: 'utf-8',
-					timeout: 10_000,
+					timeout: this.probeTimeoutMs,
 					shell: this.shell,
-					env: augmentEnv(this.extraPathDirs?.()),
+					env: augmentEnv(this.extraPathDirs?.(), this.extraEnv),
 				},
 			);
 			return { ok: true, version: this.versionParse(v) };
 		} catch (err) {
+			// F-DOGFOOD-016 — timeout = "느림" 신호지 "부재" 신호가 아님 (ENOENT 와 결정적 구분).
+			if (err?.code === 'ETIMEDOUT') {
+				throw new PluginProbeTimeout(this.name, err?.message ?? String(err));
+			}
 			throw new PluginEnvironmentMissing(
 				this.name,
 				err?.message ?? String(err),
@@ -168,7 +201,7 @@ export class Plugin {
 				encoding: 'utf-8',
 				maxBuffer: 64 * 1024 * 1024,
 				shell: this.shell,
-				env: augmentEnv(this.extraPathDirs?.()),
+				env: augmentEnv(this.extraPathDirs?.(), this.extraEnv),
 			});
 		} catch (err) {
 			exitCode = err.status ?? 1;
@@ -188,6 +221,10 @@ export class Plugin {
 			/* SARIF not produced — handled by caller */
 		}
 
+		// F-DOGFOOD-015 — exit 의미론 판정: acceptable 밖 exit = scan FAILED.
+		//   (예: semgrep 2 = fatal[룰 fetch 실패·config 오류] / 이전엔 흡수되어 findings 0 "성공" 둔갑)
+		const scanFailed = !this.acceptableExitCodes.includes(exitCode);
+
 		const evidence = {
 			tool_stdout_path: stdoutPath,
 			tool_stderr_path: stderrPath,
@@ -198,7 +235,7 @@ export class Plugin {
 			reproduction_command: reproductionCommand,
 			evidence_trust: EVIDENCE_TRUST.REAL_TOOL,
 		};
-		return { plugin: this.name, exitCode, evidence, sarifPath };
+		return { plugin: this.name, exitCode, evidence, sarifPath, scanFailed };
 	}
 }
 
@@ -206,6 +243,16 @@ export const SemgrepPlugin = new Plugin({
 	name: 'semgrep',
 	executable: 'semgrep',
 	versionArgs: ['--version'],
+	// F-DOGFOOD-015 — semgrep exit 의미론: 0=clean / 1=findings(blocking 모드) = 정상 스캔.
+	//   2+=fatal(레지스트리 fetch 실패·config 오류 등 / 스캔 무효) → scan FAILED.
+	acceptableExitCodes: [0, 1],
+	// F-DOGFOOD-016 — egress 차단 사내망에서 버전체크 네트워크 대기 ~96s 실측 → probe/scan
+	//   양쪽 timeout 오분류·지연의 근원. default 차단 (사용자 env 명시 시 그쪽 우선).
+	extraEnv: {
+		SEMGREP_ENABLE_VERSION_CHECK: '0',
+		SEMGREP_SEND_METRICS: 'off',
+	},
+	probeTimeoutMs: 20_000,
 	mandatoryArgs: ({
 		targetDir,
 		sarifPath,
@@ -241,6 +288,9 @@ export const PmdPlugin = new Plugin({
 	executable: 'pmd',
 	shell: true,
 	versionArgs: ['--version'],
+	// PMD exit 의미론 (기존 주석 명문화 / F-DOGFOOD-015): 0=clean / 4=위반 발견(정상) /
+	//   5=recoverable error(스캔 완료) — 그 외(1=launch fail 등) = scan FAILED.
+	acceptableExitCodes: [0, 4, 5],
 	// plugin-local 자동설치 PMD(.static-tools/pmd/.../bin) 발견 → child PATH prepend.
 	extraPathDirs: () => {
 		const d = localPmdBinDir();

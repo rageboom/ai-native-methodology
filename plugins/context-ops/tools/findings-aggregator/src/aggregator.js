@@ -16,6 +16,8 @@ export const REQUIRED_VALIDATORS_PER_STAGE = {
 		'br-cross-consistency-validator',
 		'formal-spec-link-validator',
 		'decision-table-validator',
+		// F-DOGFOOD-014 — evidence-scan: LLM 산출물 {file,line} 증거 실재성 (날조 source_evidence 차단 / analysis-only 는 code-pointer-validator 불가)
+		'analysis-extraction-validator',
 	],
 	discovery: [
 		'discovery-extraction-validator',
@@ -283,6 +285,9 @@ export function dispatchValidator(validatorName, output) {
 			return transformDecisionTable(JSON.parse(output));
 		case 'formal-spec-link-validator':
 			return transformFormalSpecLink(JSON.parse(output));
+		case 'analysis-extraction-validator':
+			// evidence-scan JSON = { findings, coverage, summary:{critical,high,medium} } — generic summary 정합 (F-DOGFOOD-014)
+			return transformGeneric(JSON.parse(output));
 		case 'traceability-matrix-builder':
 			return transformTraceabilityMatrix(JSON.parse(output));
 		default:

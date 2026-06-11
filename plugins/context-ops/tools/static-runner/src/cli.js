@@ -13,6 +13,8 @@
 //
 //   환경 부재 시 PluginEnvironmentMissing throw → exit 3 ("환경 부재 — 사용자 위임" 정직 신호).
 //   import 시 4 조건 미만족 → ImportSarifRejected throw → exit 4 ("import 우회 표면 차단" 결정적 reject).
+//   scan 실패(도구 fatal exit — semgrep 2 등) → exit 5 (F-DOGFOOD-015 — findings 0 "성공" 둔갑 차단).
+//   probe timeout → exit 6 (F-DOGFOOD-016 — "환경 부재"(exit 3) 와 결정적 구분 / 도구 존재 가능).
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
@@ -20,6 +22,7 @@ import { join } from 'node:path';
 import {
 	PLUGINS,
 	PluginEnvironmentMissing,
+	PluginProbeTimeout,
 	REQUIRED_EVIDENCE,
 	importSarif,
 	ImportSarifRejected,
@@ -170,7 +173,12 @@ function main() {
 
 	mkdirSync(opts.output, { recursive: true });
 
-	const summary = { plugins: [], environment_missing: [], runs: [] };
+	const summary = {
+		plugins: [],
+		environment_missing: [],
+		probe_timeout: [],
+		runs: [],
+	};
 	for (const pname of opts.plugins) {
 		const plugin = PLUGINS[pname];
 		if (!plugin) {
@@ -182,6 +190,19 @@ function main() {
 		try {
 			plugin.preflight();
 		} catch (err) {
+			if (err instanceof PluginProbeTimeout) {
+				// F-DOGFOOD-016 — timeout ≠ 부재. "설치하라" 오안내 ❌ / 별도 신호.
+				console.error(`[static-runner] ${err.message}`);
+				console.error(
+					`[static-runner] probe timeout — 도구가 존재하나 기동이 느릴 수 있음 (네트워크 버전체크 등). 재시도 또는 오프라인 env (semgrep: SEMGREP_ENABLE_VERSION_CHECK=0) 확인. "환경 부재" 아님.`,
+				);
+				summary.probe_timeout.push({
+					plugin: pname,
+					detail: err.detail,
+					ts: new Date().toISOString(),
+				});
+				continue;
+			}
 			if (err instanceof PluginEnvironmentMissing) {
 				console.error(`[static-runner] ${err.message}`);
 				const installHint =
@@ -213,9 +234,19 @@ function main() {
 		summary.runs.push(run);
 	}
 
-	// Sprint 5+ Phase D — SARIF → finding 어댑터 + ADR-010 baseline + ratchet 처리.
+	// F-DOGFOOD-015 — scan 실패(fatal exit) 분리: 실패 run 의 SARIF/findings 는 신뢰 불가 →
+	//   findings 집계에서 제외 + 별도 보고 (실패가 "findings 0 성공" 으로 둔갑하던 false-health 차단).
+	const okRuns = summary.runs.filter((r) => !r.scanFailed);
+	const failedRuns = summary.runs.filter((r) => r.scanFailed);
+	for (const r of failedRuns) {
+		console.error(
+			`[static-runner] ${r.plugin} scan FAILED (exit ${r.exitCode} — acceptable 밖 / fatal). stderr: ${r.evidence.tool_stderr_path}`,
+		);
+	}
+
+	// Sprint 5+ Phase D — SARIF → finding 어댑터 + ADR-010 baseline + ratchet 처리 (성공 run 만).
 	const allFindings = [];
-	for (const r of summary.runs) {
+	for (const r of okRuns) {
 		try {
 			const fs = readSarifFindings(r.sarifPath, r.plugin);
 			allFindings.push(...fs);
@@ -272,16 +303,20 @@ function main() {
 		JSON.stringify(
 			{
 				cross_validation: {
-					real_tool: summary.runs.length > 0,
+					// F-DOGFOOD-015 — real_tool = "유효한 스캔이 1건 이상" (실패 run 은 실행됐어도 스캔 무효).
+					real_tool: okRuns.length > 0,
 					imported_sarif: false,
 					simulation_only: summary.runs.length === 0,
 					runs: summary.runs.map((r) => ({
 						plugin: r.plugin,
 						exit_code: r.exitCode,
+						scan_status: r.scanFailed ? 'failed' : 'ok',
 						sarif_path: r.sarifPath,
 						evidence: r.evidence,
 					})),
 					environment_missing: summary.environment_missing,
+					probe_timeout: summary.probe_timeout,
+					scan_failed_count: failedRuns.length,
 					findings_count: allFindings.length,
 					baseline_report: baselineReport,
 				},
@@ -292,9 +327,24 @@ function main() {
 	);
 
 	console.log(
-		`[static-runner] runs: ${summary.runs.length}, env-missing: ${summary.environment_missing.length}, findings: ${allFindings.length}`,
+		`[static-runner] runs: ${summary.runs.length} (ok: ${okRuns.length}, failed: ${failedRuns.length}), env-missing: ${summary.environment_missing.length}, probe-timeout: ${summary.probe_timeout.length}, findings: ${allFindings.length}`,
 	);
 	console.log(`[static-runner] manifest: ${manifestPath}`);
+
+	// F-DOGFOOD-015 — 실패 run 존재 = 결과 신뢰 불가. baseline/ratchet 입력으로 쓰면 안 됨 → exit 5.
+	if (failedRuns.length > 0) {
+		console.error(
+			`[static-runner] scan FAILED (${failedRuns.map((r) => `${r.plugin}:exit${r.exitCode}`).join(', ')}) — findings_count 는 성공 run 한정. 본 결과를 baseline 으로 사용 금지.`,
+		);
+		process.exit(5);
+	}
+
+	if (summary.runs.length === 0 && summary.probe_timeout.length > 0) {
+		console.error(
+			'[static-runner] probe timeout — 환경 부재 단정 ❌ (exit 3 아님). 재시도/오프라인 env 확인 후 재실행.',
+		);
+		process.exit(6);
+	}
 
 	if (summary.runs.length === 0 && summary.environment_missing.length > 0) {
 		console.log(

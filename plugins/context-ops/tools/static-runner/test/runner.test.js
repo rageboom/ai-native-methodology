@@ -397,3 +397,101 @@ test('importSarif rejects driver mismatch when expectedDriver supplied', () => {
 		rmSync(dir, { recursive: true, force: true });
 	}
 });
+
+// ── F-DOGFOOD-015/016 — exit 의미론 + probe timeout 분류 + 오프라인 env (ep-fe-mis dogfood P0) ──
+import { PluginProbeTimeout } from '../src/runner.js';
+
+test('augmentEnv: extraEnv 는 default 로 깔리고 사용자 process.env 가 우선 (F-DOGFOOD-016)', () => {
+	const env = augmentEnv(undefined, { __AIMD_TEST_DEFAULT__: 'from-extra' });
+	assert.equal(env.__AIMD_TEST_DEFAULT__, 'from-extra');
+	process.env.__AIMD_TEST_USER__ = 'from-user';
+	try {
+		const env2 = augmentEnv(undefined, { __AIMD_TEST_USER__: 'from-extra' });
+		assert.equal(env2.__AIMD_TEST_USER__, 'from-user', '사용자 env 우선');
+	} finally {
+		delete process.env.__AIMD_TEST_USER__;
+	}
+});
+
+test('augmentEnv: extraDirs + extraEnv 둘 다 없으면 process.env 그대로 (backward-compat)', () => {
+	assert.equal(augmentEnv(), process.env);
+	assert.equal(augmentEnv([], null), process.env);
+});
+
+test('SemgrepPlugin: acceptable exit = [0,1] (2+ = fatal) + 오프라인 env default', () => {
+	assert.deepEqual(SemgrepPlugin.acceptableExitCodes, [0, 1]);
+	assert.equal(SemgrepPlugin.extraEnv.SEMGREP_ENABLE_VERSION_CHECK, '0');
+	assert.equal(SemgrepPlugin.extraEnv.SEMGREP_SEND_METRICS, 'off');
+});
+
+test('PmdPlugin: acceptable exit = [0,4,5] (기존 주석 의미론 명문화)', () => {
+	assert.deepEqual(PmdPlugin.acceptableExitCodes, [0, 4, 5]);
+});
+
+test('Plugin.run: acceptable 밖 exit → scanFailed=true (F-DOGFOOD-015 — findings 0 성공 둔갑 차단)', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'sr-fatal-'));
+	try {
+		const fatal = new Plugin({
+			name: 'fake-fatal',
+			executable: process.execPath,
+			versionArgs: ['--version'],
+			acceptableExitCodes: [0],
+			mandatoryArgs: () => ['-e', 'process.exit(2)'],
+		});
+		const r = fatal.run({ targetDir: dir, outputDir: dir });
+		assert.equal(r.exitCode, 2);
+		assert.equal(r.scanFailed, true);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test('Plugin.run: acceptable 안 exit → scanFailed=false (semgrep exit 1 = findings = 정상 스캔 동형)', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'sr-ok-'));
+	try {
+		const okish = new Plugin({
+			name: 'fake-findings',
+			executable: process.execPath,
+			versionArgs: ['--version'],
+			acceptableExitCodes: [0, 1],
+			mandatoryArgs: () => ['-e', 'process.exit(1)'],
+		});
+		const r = okish.run({ targetDir: dir, outputDir: dir });
+		assert.equal(r.exitCode, 1);
+		assert.equal(r.scanFailed, false);
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});
+
+test('preflight: probe timeout → PluginProbeTimeout (ENV_MISSING 오분류 차단 / F-DOGFOOD-016)', () => {
+	const slow = new Plugin({
+		name: 'fake-slow',
+		executable: process.execPath,
+		versionArgs: ['-e', 'setTimeout(() => {}, 60000)'],
+		probeTimeoutMs: 300,
+		mandatoryArgs: () => [],
+	});
+	try {
+		slow.preflight();
+		assert.fail('expected throw');
+	} catch (err) {
+		assert.ok(err instanceof PluginProbeTimeout, `got ${err.constructor.name}: ${err.message}`);
+		assert.equal(err.code, 'PROBE_TIMEOUT');
+	}
+});
+
+test('preflight: 바이너리 부재 → PluginEnvironmentMissing 유지 (ENOENT 경로 무회귀)', () => {
+	const absent = new Plugin({
+		name: 'fake-absent',
+		executable: 'definitely-not-a-binary-xyz-aimd',
+		mandatoryArgs: () => [],
+	});
+	try {
+		absent.preflight();
+		assert.fail('expected throw');
+	} catch (err) {
+		assert.ok(err instanceof PluginEnvironmentMissing);
+		assert.equal(err.code, 'ENV_MISSING');
+	}
+});

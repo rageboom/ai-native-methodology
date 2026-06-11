@@ -797,3 +797,76 @@
 - **Severity:** **medium** — plan-doc 1건 실 위험 / 나머지는 LOW 또는 이미 적절. 구조적 validator 부재는 carry.
 - **Proposed fix:** (본 cycle ✅) plan-doc schema+SKILL fix. (✅ v11.0.3 carry 청산) `analysis-extraction-validator` 신설 (figma + plan-doc adapter 자동 감지 / 13 test pass). (잔여 carry) swagger-extract evidence 필드 (LOW / parser verbatim 후순위).
 - **Status:** **resolved** (plan-doc fix v11.0.2 / validator 신설 v11.0.3 / swagger evidence 잔여 carry)
+
+---
+
+## Body Finding Ledger — F-DOGFOOD namespace 연속 (외부 사내 프로젝트 ep-fe-mis dogfood / 2026-06-11)
+
+> 출처: 사내 FE 모노레포 `ep-fe-mis` (React/TS / 5 앱 + 7 패키지 / TS 815k LOC / 7,792 파일) analysis stage 전체 dogfood — 사용자 의뢰 "방법론의 헛점·개선점·불필요점 발굴". 측정·산출물 = ep-fe-mis repo `.ai-context/` + 비평 전문 = ep-fe-mis `.claude/methodology-critique-report-2026-06-11.md` (A1~A10) + 원본 노트 `.claude/dogfood-critique-notes.md` (F-DOG-001~023 / 외부격리·본 repo 커밋 ❌).
+> namespace: 기존 F-DOGFOOD-001~012 (RealWorld 등 외부 dogfood 계보 / DEC·STATUS-HISTORY 산재) 연속. 본 섹션 = finding-ledger 내 첫 F-DOGFOOD 상주 섹션.
+> 환류 이력: ① F-DOGFOOD-013 = F-DOG-023 선행 환류 (open). ② P0 3건 = F-DOGFOOD-014/015/016 환류 + **같은 날 수정 cycle 시행 → resolved** (DEC-2026-06-11-epfemis-dogfood-p0-fixes / 코드+테스트+ep-fe-mis 재현 검증). 나머지 (F-DOG-001~022 中 미환류분) = 비평 보고서 참조 / 환류 후보 carry.
+>
+> | F-DOGFOOD | severity     | 처분                    | 비고                                                                                                   |
+> | --------- | ------------ | ----------------------- | ------------------------------------------------------------------------------------------------------ |
+> | 013       | medium       | open                    | codegraph-coverage 모노레포 거짓엣지 + 채택자 플로우 미배선 (수정 cycle 별도)                           |
+> | 014       | **critical** | **resolved (본 cycle)** | evidence-scan 신설 + gate #0 REQUIRED 배선 — 날조 증거 = validator_critical hard-block (go 거부 실증)  |
+> | 015       | **high**     | **resolved (본 cycle)** | static-runner exit 의미론 (semgrep [0,1] / pmd [0,4,5]) + scan FAILED = exit 5 / real_tool=false       |
+> | 016       | **high**     | **resolved (본 cycle)** | probe ETIMEDOUT ≠ ENOENT 분리 (PROBE_TIMEOUT / exit 6) + semgrep 오프라인 env default                  |
+
+### F-DOGFOOD-013: codegraph-coverage 모듈 rollup — 모노레포 동명 심볼 오연결 거짓 엣지 + provenance 무구분 + 채택자 분석 플로우 미배선
+
+- **Phase:** analysis (외부 사내 dogfood / FE 모노레포 — ep-fe-mis 노트 F-DOG-023 + F-DOG-007 정밀화)
+- **Confidence:** verified (codegraph.db sqlite 직접 질의 + 실코드 grep 재현)
+- **Type:** validation-result + gap
+- **Description:**
+  codegraph-coverage STEP 3(모듈 의존 rollup ↔ architecture.json 대조)을 ep-fe-mis 에 실행 — 분석자 작성 의존 40개 중 30 corroborated + 누락 112 노출로 **lens 가치는 실증**. 그러나 노출분에 **구조상 불가능한 앱 간 엣지** 포함 (예: `MOD-ADMIN-GEA → MOD-APP-TLM weight=667`). 근본 원인 4연쇄를 sqlite 질의로 확정: ① 호출부가 hook 반환 구조분해(`const { openCommonToastbar } = useCommonToastbar()`)라 정의가 hook 내부 클로저 → 바인딩 해석 실패 ② codegraph(OSS)가 이름 기반 fallback 으로 전역 인덱스에서 동명 모듈-최상위 심볼에 오연결 (`apps/ep-fe-tlm/src/utils/error.ts:29`) ③ 모노레포 전체 단일 인덱스라 앱 경계 밖 후보 존재 (동명 유틸이 3개 앱에 중복 — backoffice/frontoffice 쌍둥이 구조) ④ `edges.provenance=null` — import-해석 vs 이름-추측 무구분 → rollup 동등 가중 집계. 별건으로 **채택자 플로우 미배선**: analysis-code-graph SKILL 4-b 는 edge 가 없는 code-graph.json 집계라는 불가능 지침을 지시하고 codegraph-coverage 를 인용하지 않음 — wiring STEP 1~6 은 release-readiness check(34/36/37/39)에만 연결.
+- **Evidence:**
+  - ep-fe-mis `.codegraph/codegraph.db` edges 질의: admin/gea/components/Dialog/FileDialog.tsx → ep-fe-tlm 엣지 8건 전부 `openCommonToastbar` calls / provenance=null
+  - 실코드 반증: 해당 파일 import 에 ep-fe-tlm 전무 (react / @sgh/ui-bo / @/common / @/gea 만)
+  - 동명 심볼 분포: `openCommonToastbar` 정의 3개 앱 (admin=hook 클로저 useCommonToastbar.ts:32 / ep-fe-tlm=모듈 최상위 error.ts:29 / ep-fe-gea)
+  - rollup 출력: corroborated=30 / hole=112 (+10 informational) — 거짓 엣지 비율 미산정 (전수 triage 필요)
+  - `skills/analysis-code-graph/SKILL.md` 절차 4-b + 인용 목록 (codegraph-coverage 부재) / `schemas/code-graph.schema.json` (edge 표현 불가 strict)
+- **Spec gap:** ① analysis-code-graph SKILL 4-b 가 산출물로 실행 불가능한 지침 ② codegraph-coverage 가 채택자 analysis 플로우(스킬 인용·gate #0 validator 목록) 미배선 ③ 모노레포 멀티앱 name-collision failure mode 미문서화 (기존 probe 3종 = Spring4.1/MyBatis3/JPA 전부 단일 앱 레포 — probe 매트릭스에 멀티앱 모노레포 부재) ④ rollup 의 해석-신뢰도(provenance) 무구분.
+- **Decision made:** dogfood 본 cycle 은 grep import 집계로 우회 (inventory.scope_candidates 작성) + codegraph-coverage 는 사후 실행으로 검증. 거짓 엣지 1건 실코드 반증 후 triage 중단 (전수는 carry).
+- **Severity:** **medium** — reference-lens 비차단(trust 모델이 한계를 예견 / "최종 evidence = 실코드 grep" 헤더 명시)이라 gate 오염 없음. 단 scope 절단 보조 신호로 쓰일 때 중복 많은 모노레포에서 오도 위험 + 가치 있는 도구가 채택자에게 미노출.
+- **Proposed fix:** (a) SKILL 4-b 를 codegraph-coverage 호출로 교체 + 인용 추가 (PATCH/doc) (b) rollup 에 "source 파일 → target 파일 import 경로 실재" 결정론 필터 또는 신뢰 주석 (codegraph.db `unresolved_refs.candidates` 활용 후보) (c) scope/앱 단위 인덱싱 옵션 (codegraph-runner `--target` 다중 호출 패턴 문서화) (d) SKILL 한계 절에 모노레포 name-collision failure mode + triage 절차 명문화. §8.1 정합 — 멀티앱 모노레포를 probe 매트릭스에 추가 (본 건 = 1st arm / 2nd corroboration carry).
+- **Status:** open
+
+### F-DOGFOOD-014: 날조 source_evidence 가 analysis 단계 전 검증 통과 (실재성 게이트 부재)
+
+- **Phase:** analysis (외부 사내 dogfood ep-fe-mis — 노트 F-DOG-016 / 비평 보고서 A1)
+- **Confidence:** verified (날조 BR 삽입 실험 — 통과 실증 + fix 후 차단 실증)
+- **Type:** gap (no-simulation 보증 범위 구멍)
+- **Description:** 존재하지 않는 파일(`DOES_NOT_EXIST/fabricated.ts:9999`)을 source_evidence 로 갖는 BR 을 삽입해도 schema-validator(shape) / br-cross(NL↔GWT) / findings-aggregator(0건) / gate #0 전부 통과. analysis-only scope 는 artifact-graph 부재(resync-graph 거부)로 code-pointer-validator 도 불가 — "source-grounded" 의 실보증 범위 = JSON shape 뿐. 도구 증거(R19 5종 물증)에는 엄격하면서 LLM 산출물의 file:line 인용 실재성은 분석 단계에서 무검증.
+- **Evidence:** ep-fe-mis 재현 로그 (삽입 → 전 검증 pass / 비평 보고서 A1) + fix 후 동일 시나리오 차단 실증 (아래).
+- **Spec gap:** analysis stage 에 LLM 산출물 증거 실재성 결정론 validator 부재 (F-163 이 만든 analysis-extraction-validator 는 figma/plan-doc extract 전용 — README "analysis stage source-grounded hard gate" 표기와 실범위 괴리 = F-DOG-014).
+- **Decision made:** **본 cycle corrective fix 시행** — analysis-extraction-validator 에 `--evidence-scan <output-dir> --repo-root <dir>` 모드 신설: 산출물 deep-walk 로 `{file, line}` 페어 수집 → 상대경로 부재=critical(fabrication-grade) / line 범위 밖=high / 절대경로=info(비이식 정직 표기) / 상대경로 해석 = repo-root 우선 + artifact-dir fallback(index 류 bc_files[].file 정당 흡수). gate #0 배선 = findings-aggregator REQUIRED.analysis + buildAnalysisArgs + chain-driver gate-eval REQUIRED.analysis (3곳 sync).
+- **Severity:** **critical** — 방법론 핵심 약속(source-grounded)의 자기 위반 / 운영 컨텍스트(AX)에 날조 증거 영속 위험.
+- **Proposed fix:** (✅ 본 cycle) 위 시행. ep-fe-mis 재현 검증: 날조 BR 재삽입 → evidence-scan critical 1 (실제 증거 32건은 전부 ok) → gate-eval `validator_critical` hard-block → **`--user-decision go` 거부**(override_rejected / soft-ack 불가) → 제거 후 clean. 테스트: validator 19 / aggregator 38+15 / chain-driver 516 GREEN.
+- **Status:** **resolved** (본 cycle / DEC-2026-06-11-epfemis-dogfood-p0-fixes)
+
+### F-DOGFOOD-015: static-runner false-health — 실패 스캔이 "성공 + findings 0" 으로 보고
+
+- **Phase:** analysis baseline (외부 사내 dogfood ep-fe-mis — 노트 F-DOG-006 / 비평 보고서 A2)
+- **Confidence:** verified (사내망 SSL 실패 재현 + fix 후 동일 시나리오 exit 5 실증)
+- **Type:** anti-pattern (false assurance / false-health)
+- **Description:** 사내망(egress 제한)에서 semgrep 기본 ruleset(`p/owasp-top-ten` 레지스트리 fetch)이 SSL 실패 → semgrep **exit 2 (fatal / 0개 파일 스캔)** → static-runner 가 process exit 0 / `runs: 1, findings: 0` / `evidence_trust: real_tool` 로 보고. 이 값이 baseline-ratchet 입력이 되면 ratchet 전체 무의미. 원인 = run() 이 모든 exit 를 흡수 (PMD exit 4/5 흡수 의미론을 semgrep fatal 에도 적용).
+- **Evidence:** ep-fe-mis `.ai-context/output/static-runner.evidence.json` (fix 전 — exit_code 2 인데 findings_count 0 / real_tool true) + fix 후 동일 재현 = **exit 5** + "scan FAILED — baseline 사용 금지" + manifest `real_tool: false / scan_status: failed / scan_failed_count: 1`.
+- **Spec gap:** Plugin 에 도구별 정상 exit 의미론 부재 → "실행됨"과 "스캔 유효"의 미구분.
+- **Decision made:** **본 cycle corrective fix 시행** — Plugin.acceptableExitCodes (semgrep [0,1] / pmd [0,4,5] 기존 주석 명문화) + run() `scanFailed` 판정 + cli 실패 run 분리(findings 집계 제외 / `scan_status` per-run / exit 5 신설). 정상 스캔 경로 무회귀 (ep-fe-mis packages/utils 로컬룰 scan exit 0 재확인).
+- **Severity:** **high** — baseline/ratchet 신뢰 기반 직격 / 방법론이 타 영역서 P0 로 다루는 false-health 동형.
+- **Proposed fix:** (✅ 본 cycle) 위 시행. carry — findings-aggregator implement 단계의 static-runner stdout(JSON 아님) generic transform = 항상 0 집계 잠복 (별건 / 본 cycle scope 외 정직 기록).
+- **Status:** **resolved** (본 cycle / DEC-2026-06-11-epfemis-dogfood-p0-fixes)
+
+### F-DOGFOOD-016: probe timeout = "환경 부재" 오분류 + semgrep 네트워크 대기 (정직 신호의 거짓 양성)
+
+- **Phase:** analysis baseline (외부 사내 dogfood ep-fe-mis — 노트 F-DOG-004 / 비평 보고서 A3)
+- **Confidence:** verified (실측: `semgrep --version` 97.9s → env 주입 시 1.5s / fix 후 probe 즉시 통과)
+- **Type:** gap (환경 신호 분류 결함)
+- **Description:** semgrep 이 매 호출마다 버전체크 네트워크 대기(~96s / egress 차단 사내망 실측) → preflight timeout(10s) ETIMEDOUT → PluginEnvironmentMissing 으로 분류 → "pipx install semgrep" 오안내 (설치되어 있었음). no-simulation 의 핵심 장치(exit 3 = 정직한 환경 부재 신호)가 느린 환경에서 체계적 거짓 양성 — LLM 이 이를 신뢰해 "설치 위임" finding 등재 시 거짓 finding 연쇄. 주 타깃 = 사내(egress 제한) 환경인데 runner 가 오프라인 env 미설정.
+- **Evidence:** ep-fe-mis dogfood 실측 (97.9s / 0% CPU = 네트워크 대기 / `SEMGREP_ENABLE_VERSION_CHECK=0` 주입 시 1.465s) + fix 후 동일 사내망에서 probe 즉시 통과 (전체 재현 run 이 SSL 단계까지 직행).
+- **Spec gap:** ETIMEDOUT(느림)과 ENOENT(부재)의 미구분 + 도구별 오프라인 default env 메커니즘 부재.
+- **Decision made:** **본 cycle corrective fix 시행** — ① preflight ETIMEDOUT → 신규 `PluginProbeTimeout`(code PROBE_TIMEOUT / cli exit 6 / "환경 부재 아님" 명시 메시지) 분리, ENOENT 류만 ENV_MISSING 유지 ② Plugin.extraEnv (default — 사용자 process.env 가 항상 우선) + SemgrepPlugin `SEMGREP_ENABLE_VERSION_CHECK=0`·`SEMGREP_SEND_METRICS=off` + probeTimeoutMs 20s ③ augmentEnv(extraDirs, extraEnv) backward-compatible 확장.
+- **Severity:** **high** — 사내 표준 배포 타깃에서 Tier 1 도구 체계적 오작동 + 정직 신호 신뢰 훼손.
+- **Proposed fix:** (✅ 본 cycle) 위 시행. carry — 기본 ruleset 이 여전히 레지스트리(`p/owasp-top-ten`): 벤더링된 `tools/semgrep-rules/` 로컬 기본화는 룰 커버리지 정책 결정 필요 (별도 DEC 후보 / scan 실패는 이제 exit 5 로 정직).
+- **Status:** **resolved** (본 cycle / DEC-2026-06-11-epfemis-dogfood-p0-fixes)

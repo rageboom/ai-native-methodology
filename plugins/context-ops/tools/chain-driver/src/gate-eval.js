@@ -23,6 +23,8 @@ const REQUIRED_VALIDATORS_PER_STAGE = {
 		'br-cross-consistency-validator',
 		'formal-spec-link-validator',
 		'decision-table-validator',
+		// F-DOGFOOD-014 — evidence-scan: LLM 산출물 {file,line} 증거 실재성 (findings-aggregator REQUIRED.analysis 와 sync 의무)
+		'analysis-extraction-validator',
 	],
 	// v9.0 — planning→discovery 개칭 (gate #1). v11.0.0 — tool rename planning-extraction-validator → discovery-extraction-validator (DEC-2026-05-26-discovery-spec-rename). v9.1.x — plan stage validator 본격 등록 (DEC-2026-05-25-axis-a-phase-4-1 Phase 4-2).
 	discovery: [

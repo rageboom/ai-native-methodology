@@ -67,3 +67,16 @@ describe('buildValidatorArgs — non-analysis wiring completeness', () => {
 		assert.ok(args.some((a) => a.endsWith('impl-spec.json')));
 	});
 });
+
+// F-DOGFOOD-014 — analysis-extraction-validator evidence-scan 배선 (analysis stage)
+describe('buildAnalysisArgs — analysis-extraction-validator evidence-scan', () => {
+	it('REQUIRED.analysis 에 analysis-extraction-validator 포함 + evidence-scan args 형태', async () => {
+		// buildAnalysisArgs 는 cli.js 내부 비공개 — manifest 경로 실재가 전제라 여기서는
+		// REQUIRED 목록 배선만 단언 (args 형태는 aggregator.test.js mockRun + e2e 가 커버).
+		const { REQUIRED_VALIDATORS_PER_STAGE } = await import('../src/aggregator.js');
+		assert.ok(
+			REQUIRED_VALIDATORS_PER_STAGE.analysis.includes('analysis-extraction-validator'),
+			'analysis gate #0 에 evidence-scan validator 배선',
+		);
+	});
+});

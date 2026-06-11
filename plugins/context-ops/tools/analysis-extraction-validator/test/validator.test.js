@@ -110,3 +110,88 @@ describe('analysis-extraction-validator — unknown adapter', () => {
     assert.equal(r.coverage.verbatim_ratio, null);
   });
 });
+
+// ── evidence-scan 모드 (F-DOGFOOD-014 — 날조 source_evidence 차단) ──
+import { validateEvidenceExistence } from '../src/validator.js';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+describe('analysis-extraction-validator — evidence-scan (F-DOGFOOD-014)', () => {
+  function fixture() {
+    const root = mkdtempSync(join(tmpdir(), 'evscan-'));
+    const repo = join(root, 'repo');
+    const out = join(repo, '.ai-context', 'output');
+    mkdirSync(join(repo, 'src'), { recursive: true });
+    mkdirSync(out, { recursive: true });
+    writeFileSync(join(repo, 'src', 'a.ts'), 'line1\nline2\nline3\n'); // 4 lines (trailing)
+    return { root, repo, out };
+  }
+
+  it('실재 file+line 인용 = ok / findings 0', () => {
+    const { root, repo, out } = fixture();
+    writeFileSync(join(out, 'business-rules-x.json'), JSON.stringify({
+      business_rules: [{ id: 'BR-X-Y-001', source_evidence: [{ type: 'code_condition', file: 'src/a.ts', line: 2 }] }],
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.summary.critical, 0);
+    assert.equal(r.coverage.refs_ok, 1);
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('날조 파일 인용 → critical (fabrication-grade)', () => {
+    const { root, repo, out } = fixture();
+    writeFileSync(join(out, 'rules.json'), JSON.stringify({
+      rules: [{ evidence: [{ file: 'src/DOES_NOT_EXIST/fabricated.ts', line: 9999 }] }],
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.summary.critical, 1);
+    assert.ok(r.findings.some(f => f.kind === 'evidence.file_missing'));
+    assert.equal(r.coverage.refs_missing, 1);
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('라인 범위 밖 인용 → high', () => {
+    const { root, repo, out } = fixture();
+    writeFileSync(join(out, 'd.json'), JSON.stringify({
+      evidence: [{ file: 'src/a.ts', line: 9999 }],
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.summary.high, 1);
+    assert.ok(r.findings.some(f => f.kind === 'evidence.line_out_of_range'));
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('절대경로 인용 → info (존재검사 skip / 비이식 정직 표기)', () => {
+    const { root, repo, out } = fixture();
+    writeFileSync(join(out, 'e.json'), JSON.stringify({
+      evidence: [{ file: '/abs/machine/path.log', line: 1 }],
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.summary.critical, 0);
+    assert.equal(r.coverage.refs_absolute, 1);
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('findings-*.json (aggregator 자기 출력) 은 scan 제외', () => {
+    const { root, repo, out } = fixture();
+    writeFileSync(join(out, 'findings-analysis.json'), JSON.stringify({
+      sources: { x: { file: 'src/NOPE.ts', line: 1 } },
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.coverage.refs_total, 0);
+    rmSync(root, { recursive: true, force: true });
+  });
+
+  it('하위 디렉토리(business-rules/) 재귀 scan + line 없는 file 인용 = 존재만 검사', () => {
+    const { root, repo, out } = fixture();
+    mkdirSync(join(out, 'business-rules'), { recursive: true });
+    writeFileSync(join(out, 'business-rules', 'BC-X.json'), JSON.stringify({
+      business_rules: [{ source_evidence: [{ file: 'src/a.ts' }] }],
+    }));
+    const r = validateEvidenceExistence(out, repo);
+    assert.equal(r.coverage.refs_ok, 1);
+    assert.equal(r.summary.critical, 0);
+    rmSync(root, { recursive: true, force: true });
+  });
+});

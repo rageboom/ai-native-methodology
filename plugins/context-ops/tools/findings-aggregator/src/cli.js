@@ -230,6 +230,13 @@ function buildAnalysisArgs(validatorName, projectDir, artifacts) {
 			const f = abs(artifacts['business-rules'] ?? artifacts['rules']);
 			return ok(f) ? ['--target', f, '--json'] : null;
 		}
+		case 'analysis-extraction-validator': {
+			// F-DOGFOOD-014 evidence-scan — 산출물 {file,line} 증거 실재성 (repo-root = projectDir)
+			const dir = abs(artifacts['analysis-output-dir']);
+			return ok(dir)
+				? ['--evidence-scan', dir, '--repo-root', resolve(projectDir), '--json']
+				: null;
+		}
 		case 'formal-spec-link-validator': {
 			const dir = abs(artifacts['analysis-output-dir']);
 			return ok(dir) ? [dir, '--mode=both', '--json'] : null;

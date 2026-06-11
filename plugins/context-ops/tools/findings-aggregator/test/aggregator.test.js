@@ -461,12 +461,13 @@ describe('aggregateForStage', () => {
 
 // DEC-2026-06-06-analysis-exit-gate — analysis gate #0 러너 (validator 실행 + transform + fail-closed)
 describe('DEC-2026-06-06-analysis-exit-gate', () => {
-	it('REQUIRED_VALIDATORS_PER_STAGE.analysis = base 4 (gate-eval sync)', () => {
+	it('REQUIRED_VALIDATORS_PER_STAGE.analysis = base 5 (gate-eval sync / F-DOGFOOD-014 evidence-scan)', () => {
 		assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.analysis, [
 			'schema-validator',
 			'br-cross-consistency-validator',
 			'formal-spec-link-validator',
 			'decision-table-validator',
+			'analysis-extraction-validator',
 		]);
 	});
 
@@ -517,6 +518,12 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 				return JSON.stringify({
 					totals: { breaking: 0, 'non-breaking': 0, info: 0 },
 				});
+			if (name === 'analysis-extraction-validator')
+				return JSON.stringify({
+					adapter: 'evidence-scan',
+					findings: [],
+					summary: { total_findings: 0, critical: 0, high: 0, medium: 0 },
+				});
 			if (name === 'characterization-coverage-validator')
 				return JSON.stringify({ summary: { critical: 0, high: 1, medium: 0 } });
 			if (name === 'sql-inventory-validator')
@@ -530,7 +537,7 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 			],
 		});
 		assert.equal(findings.high, 1); // characterization 1 high
-		assert.equal(Object.keys(findings.sources).length, 6); // base 4 + 조건부 2
+		assert.equal(Object.keys(findings.sources).length, 7); // base 5 + 조건부 2
 		assert.equal(
 			findings.sources['characterization-coverage-validator'].status,
 			'ok',
@@ -548,7 +555,7 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 			findings.evidence_missing.includes('br-cross-consistency-validator'),
 			'미해석 validator = evidence_missing',
 		);
-		assert.equal(findings.evidence_missing.length, 3); // br-cross + formal-spec-link + decision-table
+		assert.equal(findings.evidence_missing.length, 4); // br-cross + formal-spec-link + decision-table + analysis-extraction(evidence-scan)
 		assert.equal(
 			findings.sources['decision-table-validator'].status,
 			'evidence_missing',
