@@ -175,3 +175,53 @@ describe('spec-test-link-validator', () => {
 		);
 	});
 });
+
+// ──────────────────────────────────────────────────────────────────────
+// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — mocking-soundness + test_layer=unit
+// ──────────────────────────────────────────────────────────────────────
+import { validateMockSoundness } from '../src/validator.js';
+
+describe('v0.36.0 TDD/unit layer', () => {
+	it('test_layer=unit TC 는 ac_ref 없어도 no_ac_ref 미발생 (AC 축 제외)', () => {
+		const ts = {
+			test_cases: [
+				{ id: 'TC-U-001', test_layer: 'unit', class_ref: 'UNIT-U-001', bhv_ref: 'BHV-USER-001' },
+				{ id: 'TC-U-002', ac_ref: 'AC-USER-001', bhv_ref: 'BHV-USER-001' },
+			],
+		};
+		const r = validateSpecTestLink(validBehavior, validAcceptance, ts, null, 0.85);
+		assert.equal(r.findings.filter((f) => f.kind === 'chain.tc.no_ac_ref').length, 0);
+	});
+
+	it('mock-soundness — 협력자 UNIT 의 unit TC 부재 시 unsound finding', () => {
+		const ts = {
+			test_cases: [
+				{ id: 'TC-C-001', ac_ref: 'AC-USER-001', test_layer: 'composition', mocks: [{ collaborator_unit_ref: 'UNIT-DEP-001' }] },
+			],
+		};
+		const r = validateMockSoundness(ts, { units: [] });
+		assert.equal(r.findings.length, 1);
+		assert.equal(r.findings[0].kind, 'unit.mock.unsound');
+	});
+
+	it('mock-soundness — 협력자가 unit TC 보유 시 sound (finding 0)', () => {
+		const ts = {
+			test_cases: [
+				{ id: 'TC-U-001', test_layer: 'unit', class_ref: 'UNIT-DEP-001' },
+				{ id: 'TC-C-001', ac_ref: 'AC-USER-001', test_layer: 'composition', mocks: [{ collaborator_unit_ref: 'UNIT-DEP-001' }] },
+			],
+		};
+		const r = validateMockSoundness(ts, { units: [] });
+		assert.equal(r.findings.length, 0);
+	});
+
+	it('mock-soundness — waived 협력자는 면제', () => {
+		const ts = {
+			test_cases: [
+				{ id: 'TC-C-001', ac_ref: 'AC-USER-001', mocks: [{ collaborator_unit_ref: 'UNIT-DATA-001' }] },
+			],
+		};
+		const r = validateMockSoundness(ts, { units: [{ id: 'UNIT-DATA-001', unit_test_obligation: 'waived' }] });
+		assert.equal(r.findings.length, 0);
+	});
+});

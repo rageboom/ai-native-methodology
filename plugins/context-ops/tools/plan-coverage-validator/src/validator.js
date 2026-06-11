@@ -466,6 +466,33 @@ export function validateSpConversions(taskPlan) {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// 8. v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — TDD/unit 층 obligation.
+//   task 가 unit_refs(빌딩블록 바인딩) 보유인데 unit_test_obligation 미선언 시 medium finding.
+//   ★ SOFT — medium = cli exit-code 비차단(blocking = critical|high only). §8.1 ratchet —
+//     ≥2 distinct 도메인 PoC 후 layer-keyed 하드게이트 격상(별도 DEC).
+// ──────────────────────────────────────────────────────────────────────
+export function validateUnitTestObligation(taskPlan) {
+	const findings = [];
+	const tasks = taskPlan?.tasks ?? [];
+	for (const t of tasks) {
+		const unitRefs = t.unit_refs ?? [];
+		if (unitRefs.length > 0 && !t.unit_test_obligation) {
+			findings.push({
+				kind: 'plan.task.unit_obligation_missing',
+				severity: 'medium',
+				task_id: t.id,
+				unit_count: unitRefs.length,
+				message: `TASK ${t.id} binds ${unitRefs.length} UNIT-* (unit_refs) but unit_test_obligation 미선언 (TDD/unit 층 propose-only / soft / DEC-2026-06-11 §8.1)`,
+			});
+		}
+	}
+	return {
+		findings,
+		summary: aggregateSummary(findings),
+	};
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // helpers
 // ──────────────────────────────────────────────────────────────────────
 

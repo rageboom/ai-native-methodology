@@ -10,6 +10,45 @@
 
 ---
 
+## [0.36.0] — 2026-06-11 MINOR — TDD/unit 층 1급화 — UNIT-* 전체 스레드
+
+방법론 SDLC chain 이 운반하던 **behavior(BDD) 단일 스레드**(UC→BHV→AC→TASK→TC→IMPL)에 나란히 도는 **TDD/unit 층**을 1급 노드(`UNIT-*`)로 추가. ep-be-gea event dogfood 에서 노출된 갭 — composition(BDD) 시나리오가 mock 으로 빼버린 빌딩블록(DrawNumberGenerator·MaskingUtils)의 격리 유닛테스트가 없어 "GREEN 인데 거짓 안심" — 을 닫는다. 사용자(TF Lead) 결단: 전체 UNIT-* 스레드를 본체에 + ep-be-gea 실증(PoC #1).
+
+### 2층 모델 (정책 SSOT `methodology-spec/policies/test-layering.md` 신설)
+
+- **TDD/unit 층** = 클래스·순수함수·컴포넌트 빌딩블록 격리 검증 / **BDD/composition 층** = 그것들을 조합·mock 해 AC 검증. 두 축 — `type`(technique: unit/integration/property/...) ⟂ `test_layer`(position: unit/composition).
+- **mocking-soundness 계약**(본 방법론 합성 — Fowler "Mocks Aren't Stubs"의 위험 'green but mask inherent errors' + CDC 정신 / 과잉 귀속 ❌): composition TC 가 mock 한 협력자는 자기 `test_layer=unit` TC 로 핀될 때만 건전. `validateMockSoundness`(spec-test-link / **SOFT·opt-in `--unit-spec`·gate 비주입**).
+- **시나리오 분기**: S2(레거시)=`code-graph ∩ domain.behaviors` 발견(characterized_from_code / characterization) / greenfield=`formal-spec.invariants` 설계(designed_from_spec / RED→GREEN). 근거 = Beck TDD(2002)·Cohn pyramid(2009)·Feathers WELC(2004)·Fowler mocks(2007)·Claessen-Hughes QuickCheck(2000).
+
+### 신뢰 분리 (결정 1 / DEC-2026-05-28 불변 reconcile)
+
+- **spec 파생 UNIT**(domain/formal-spec = 결정론·spec-side) = AC 와 동형 게이트 후보(단 §8.1 ratchet — 현 soft).
+- **code-graph method-axis**(codegraph OSS `buildMethodAxis`) = **reference-lens·propose-only / 게이트 주입 영구 ❌**. `render.js` severity `low` 고정·`code-coverage-hole.schema` high/critical 배제 무수정 / release-readiness check34/36/37/39 가드 보존.
+
+### §8.1 ratchet (스캐폴딩 now / 강제 ≥2 PoC 후)
+
+- ep-be-gea = PoC #1(단일). 스키마·필드·노드(스캐폴딩) 전부 구축 + 검증기 soft(`validateMockSoundness` opt-in / `validateUnitTestObligation` medium = `REQUIRED_VALIDATORS_PER_STAGE` 미편입 = 비차단). mock-soundness·unit-coverage 하드게이트 격상 = ≥2 distinct 도메인 PoC corroboration 후 별도 DEC.
+
+### 변경 (전부 additive·optional·default behavior-only / 기존 PoC 25/25 무회귀)
+
+- **신규** `schemas/unit-spec.schema.json` (UNIT-* SSOT / provenance·kind·code_pointer[ast_symbol 재사용]·collaborators·unit_test_obligation / waived→waiver_reason if/then).
+- **schema 필드**: `behavior-spec.behaviors[].unit_refs` / `task-plan.tasks[].unit_refs`+`unit_test_obligation` / `test-spec.test_cases[].test_layer`+`class_ref`+`mocks[]` (ac_ref 조건부 allOf: test_layer=unit→class_ref 의무·ac_ref optional / else→ac_ref 의무=무회귀) / `traceability-matrix` cell `unit_id`+`unit_test_id` + `coverage_summary.unit_coverage`.
+- **검증기/도구**: spec-test-link `validateMockSoundness` + `test_layer=unit` no_ac_ref skip / plan-coverage `validateUnitTestObligation`(medium soft) / traceability-matrix-builder `--unit-spec` → `coverage_summary.unit_coverage`(별 axis).
+- **skill**: `test-generate-test-spec` step 3 = 피라미드 권고 → UNIT 앵커 bottom-up 규칙(required UNIT + mock 협력자마다 test_layer=unit TC).
+- **문서**: 정책 `test-layering.md` / deliverable `27-unit-spec.md` / `id-conventions` UNIT-* 등재(DO-178C LLR rung) / `lifecycle-contract` 매핑.
+- **carry**: flows/{test,spec,plan}.phase-flow.json 편집(drift-validator handoff 위험 — skill 이 운영 본체로 이미 격상 / 별도 focused 작업) / mock-soundness·unit-coverage 하드게이트(≥2 PoC).
+
+### 검증
+
+- schema-validator: 신규 unit-spec.schema 컴파일·instance·waiver guard / **기존 PoC 25/25 무회귀 valid**(drift guard).
+- 신규 도구 테스트: spec-test-link 11/11(+4) · plan-coverage 47/47(+3) · traceability-matrix-builder 172/172(+2) GREEN.
+- drift-validator chain-layout 0 orphans / reference-lens 가드 무수정.
+- **PoC #1 (ep-be-gea / 외부격리·commit❌)**: `DrawNumberGeneratorTest` 52 + `MaskingUtilsTest` 6 = 실 JUnit 58 GREEN(직전 dogfood 가 mock 으로 빼버린 빌딩블록 / hash f75f3918·dc4f8f9b). event `unit-spec.json`(4 UNIT) schema-valid + matrix `unit_coverage{obligation_satisfied_ratio:1, unit_total:4, unit_tested:2}` + behavior 체인 92.3% 무회귀 + **mock-soundness 0 findings(sound — TC-009 가 mock 한 DrawNumberGenerator 가 TC-014 로 핀)**.
+
+DEC-2026-06-11-tdd-unit-layer-thread.
+
+---
+
 ## [0.35.0] — 2026-06-10 MINOR — 역공학 델타 #5 test-recovery — `existing_test_file` data_source_status (R15 RUN 의무)
 
 기존 테스트를 characterization 행위 증거로 인정하는 `existing_test_file` data_source_status 신설 — **단 그 테스트를 실제 실행했을 때만**(R15). 역공학 델타 #5 (DEC-2026-06-09-reverse-eng-methodology-gap §3 / plan §4-b 가 "R15 결단 격상"으로 보류했던 마지막 델타).

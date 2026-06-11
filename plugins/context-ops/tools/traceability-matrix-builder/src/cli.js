@@ -72,6 +72,8 @@ function parseArgs(argv) {
 			out.operationalTask = argv[++i]; // v11.0.0 OP 보강 (optional)
 		else if (a === '--test-spec') out.testSpec = argv[++i];
 		else if (a === '--impl-spec') out.implSpec = argv[++i];
+		else if (a === '--unit-spec')
+			out.unitSpec = argv[++i]; // v0.36.0 TDD/unit 층 (DEC-2026-06-11 / optional / additive)
 		else if (a === '--out-dir') out.outDir = argv[++i];
 		else if (a === '--dry-run') out.dryRun = true;
 		else if (a === '--json')
@@ -116,6 +118,7 @@ const chain = {
 	taskPlan: args.taskPlan ? loadJson(args.taskPlan) : null,
 	testSpec: args.testSpec ? loadJson(args.testSpec) : null,
 	implSpec: args.implSpec ? loadJson(args.implSpec) : null,
+	unitSpec: args.unitSpec ? loadJson(args.unitSpec) : null,
 };
 const operationalTaskData = args.operationalTask
 	? loadJson(args.operationalTask)

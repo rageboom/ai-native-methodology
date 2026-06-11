@@ -11,7 +11,7 @@
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | Ticket 단위          | **UC = Story** (BHV/AC cross-cut 시나리오 anchor)                                                                          |
 | Ticket 생성 시점     | **plan stage(chain 3) gate 통과 직후 단일** — Epic+Story+Task+Sub-task 4-level cascade 일괄 (analysis/discovery/spec = 생성 ❌) |
-| 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** (cascade 생성 시작점) / Initiative = 실 프로젝트명 **참조만** (ticket-sync 생성 ❌ / DEC-2026-06-10-initiative-reference-only) |
+| 상위 단위            | **Epic = FE 화면(route) 또는 BE-domain** (cascade 생성 시작점) / Initiative = 실 프로젝트명 **참조만** (ticket-sync 생성 ❌) |
 | 하위 단위            | **Task = OP-\*** (Story sibling / 사용자 가시 없는 운영·인프라·마이그레이션·리팩터링 / layer 무관) / **Sub-task = TASK-\*** (1~3 AC 묶음 / layer 분기)     |
 | test / implement     | Sub-task **status 갱신만** (RED / GREEN evidence / 신규 생성 ❌)                                                            |
 | BHV / AC / TC / IMPL | **별도 ticket X** — Story / Sub-task 본문에 link                                                                           |
@@ -23,7 +23,7 @@
 
 ```
 화면 있는 시나리오:
-  Initiative   ← 실 프로젝트명 (참조만 / ticket-sync 생성 ❌ / DEC-2026-06-10-initiative-reference-only)
+  Initiative   ← 실 프로젝트명 (참조만 / ticket-sync 생성 ❌)
     └── Epic          ← FE 화면 단위 (UI screen / route) 또는 BE-domain ← cascade 실 생성 시작점
           └── Story   ← UC = BHV/AC cross-cut 시나리오
                 └── Sub-task × N   ← TASK-* (1~3 AC / layer 분기 be/fe/db/e2e/infra)
@@ -241,7 +241,7 @@ Confirm ticket-sync stage=plan phase=exit scope=car?
 
 | 생성 ticket 유형                            | parent_ticket_id 의무?                | link_type      | 위반 시                                      |
 | ------------------------------------------- | ------------------------------------- | -------------- | -------------------------------------------- |
-| **Initiative** (참조만 / 생성 ❌)            | — (실 프로젝트명 / `parent_initiative` 참조) | —          | ticket-sync 생성 ❌ (DEC-2026-06-10-initiative-reference-only) |
+| **Initiative** (참조만 / 생성 ❌)            | — (실 프로젝트명 / `parent_initiative` 참조) | —          | ticket-sync 생성 ❌ |
 | **Epic** (FE 화면 / BE-domain / 생성 시작점) | ⚪ Initiative id 참조 (미상 시 사용자 질문) | `parent-child` | — (Initiative top-level 가능)                |
 | **Story** (UC)                              | ✅ Epic id                            | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Story)    |
 | **Sub-task** (TASK-\*)                      | ✅ Story id 또는 OP-\* id             | `parent-child` | `F-TICKETSYNC-002 missing_parent` (Sub-task) |
@@ -299,6 +299,7 @@ Atlassian Standard plan = `jira_link` (Epic Link) + tree view plugin (Structure 
 - R16/R17 scope-out 정합: DEC-2026-05-15-g1-itsm-permanent-scope-out
 - ID 명명 규약: `methodology-spec/id-conventions.md` §"Ticket Binding"
 - canonical 6종 고정: DEC-2026-06-10-ticket-canonical-types
+- Initiative 참조 전용(생성 ❌) 근거: DEC-2026-06-10-initiative-reference-only
 - schema: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref
 - schema: `schemas/ticket-sync-evidence.schema.json`
 - 검증 sample: `tools/schema-validator/test/ticket-binding.test.js`

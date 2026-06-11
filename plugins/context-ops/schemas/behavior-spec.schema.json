@@ -54,6 +54,12 @@
             "items": {"type": "string", "pattern": "^BR-[A-Z0-9_-]+-[A-Z0-9_-]+-[0-9]+$"},
             "description": "analysis stage business-rules.json BR-* backward link"
           },
+          "unit_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$"},
+            "uniqueItems": true,
+            "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). 본 BHV 가 조합(compose)하는 빌딩블록 UNIT-* (unit-spec.json). TDD/unit 층과 behavior 층의 join — composition TC 가 어떤 UNIT 을 mock 하는지 추적. optional/additive — 부재 = behavior-only mode 정상."
+          },
           "preconditions": {
             "type": "array",
             "items": {"type": "string"},

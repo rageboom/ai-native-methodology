@@ -9,7 +9,19 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-10 / 세션 종료 / repo committed = 다른 PC `git pull` 후 재개)
+### ★ 다음 세션 인계 (2026-06-11 / TDD/unit 층 1급화 v0.36.0 / **미커밋** — 커밋·push 대기)
+
+**이번 세션 성과 (plugin.json v0.35.0 → v0.36.0 MINOR / 미커밋 / 트리 dirty)**:
+- **TDD/unit 층 1급화 — UNIT-* 전체 스레드** (DEC-2026-06-11-tdd-unit-layer-thread): behavior(BDD) 단일 스레드에 나란히 도는 TDD/unit 층(`UNIT-*`=DO-178C LLR rung) 1급화. ep-be-gea event dogfood 가 노출한 갭(composition 이 mock 한 빌딩블록의 격리 유닛테스트 부재="GREEN 인데 거짓 안심")이 본체 변경으로 귀결.
+- **신규**: unit-spec.schema.json(UNIT-* SSOT) + 정책 test-layering.md(2층 모델·mocking-soundness 계약·시나리오 분기·canon) + deliverable 27 + id-conventions UNIT-*. **additive 필드**(behavior-spec.unit_refs·task-plan.unit_refs+obligation·test-spec.test_layer+class_ref+mocks·matrix unit_id+coverage_summary.unit_coverage / 전부 optional·default behavior-only / **기존 PoC 25/25 무회귀**). **검증기 soft**(validateMockSoundness=spec-test-link opt-in·비주입 / validateUnitTestObligation=plan-coverage medium·비차단 / matrix-builder --unit-spec). skill UNIT 앵커 bottom-up 격상.
+- **결정**: ①신뢰분리(spec 파생 UNIT=게이트 후보 / code-graph method-axis=reference-lens·propose-only 영구 비-게이트 / DEC-2026-05-28 불변·check34/36/37/39 가드) ②§8.1 ratchet(스캐폴딩 now / 하드게이트 ≥2 PoC) ③additive default behavior-only ④재사용(code-pointer ast_symbol) ⑤시나리오(S2=code-graph∩domain 발견 / greenfield=formal-spec 설계).
+- **PoC #1 (ep-be-gea / 외부격리·commit❌)**: DrawNumberGeneratorTest 52 + MaskingUtilsTest 6 = 실 JUnit 58 GREEN / event unit-spec.json(4 UNIT) schema-valid / matrix unit_coverage{ratio:1,total:4,tested:2} / mock-soundness 0=sound.
+- **carry**: flows phase-flow 편집(drift handoff 위험 / skill 운영 본체 격상) · mock-soundness·unit-coverage 하드게이트(≥2 PoC = greenfield 예제 or 사내 2nd 도메인) · code-graph method-axis unit anchor flip.
+- **STOP**: release-readiness **42/42**(pre-existing check40 ticket 부채 6건도 정리) + 도구 테스트 spec-test-link 11/11·plan-coverage 47/47·matrix 172/172·schema 111/111 + version 3-way 0.36.0. **미커밋 — 다음: 커밋 + origin/GHE push**.
+
+---
+
+### ★ 이전 세션 인계 (2026-06-10 / 세션 종료 / repo committed = 다른 PC `git pull` 후 재개)
 
 **이번 세션 성과 (plugin.json v0.31.0 → v0.35.0 / 5 릴리스 + docs 4건 / origin+GHE push 완료 / 트리 clean)**:
 - v0.32.0 ticket-cascade-builder 도구 추출 · v0.33.0 ticket cascade-conformance 강제 · v0.33.1 subset-precision OBVIATED(subsetAnalysisRefs retire) · v0.34.0 역공학 델타 #2a·#3 official 격상(#3=ep-be-gea dogfood) · v0.35.0 #5 test-recovery(existing_test_file R15) · docs #6 REFRAME/DROP · #7 DEFER-verified.

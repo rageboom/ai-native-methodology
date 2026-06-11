@@ -103,6 +103,10 @@ export function validateSpecTestLink(
 	const allBHVs = new Set((behavior?.behaviors ?? []).map((b) => b.id));
 
 	for (const tc of testSpec?.test_cases ?? []) {
+		// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — test_layer=unit TC 는 AC 없이 정당
+		//   (빌딩블록을 class_ref 로 검증 / 유닛테스트는 acceptance 시나리오가 아님).
+		//   AC coverage 축에서 제외 (no_ac_ref 오탐 차단 / AC 분모 미진입 = behavior-only 무회귀).
+		if (tc.test_layer === 'unit') continue;
 		if (!tc.ac_ref) {
 			findings.push({
 				kind: 'chain.tc.no_ac_ref',
@@ -196,6 +200,53 @@ export function validateSpecTestLink(
 			critical: findings.filter((f) => f.severity === 'critical').length,
 			high: findings.filter((f) => f.severity === 'high').length,
 			medium: findings.filter((f) => f.severity === 'medium').length,
+		},
+	};
+}
+
+// ──────────────────────────────────────────────────────────────────────
+// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — mocking-soundness 계약.
+//   composition TC 가 mock 한 협력자 UNIT 은 자기 test_layer=unit TC 로 핀될 때만 건전.
+//   = Fowler "Mocks Aren't Stubs"의 위험('green but mask inherent errors') 형식화 + CDC 합성.
+//   ★ SOFT / propose-only — 별도 함수 + cli --unit-spec opt-in 경로로만 호출.
+//     gate #4 의 validateSpecTestLink 결과(exit-code 결정)에는 미포함 → 비차단(§8.1 ratchet).
+//     ≥2 distinct 도메인 PoC corroboration 후 하드게이트 격상(별도 DEC).
+// ──────────────────────────────────────────────────────────────────────
+export function validateMockSoundness(testSpec, unitSpec) {
+	const findings = [];
+	const tcs = testSpec?.test_cases ?? [];
+	// UNIT 이 자기 유닛테스트(test_layer=unit + class_ref)를 가지는가?
+	const unitTested = new Set(
+		tcs
+			.filter((t) => t.test_layer === 'unit' && t.class_ref)
+			.map((t) => t.class_ref),
+	);
+	// waived 단위는 mock 건전성 면제 (동작 주장 ❌ — data class 등)
+	const waived = new Set(
+		(unitSpec?.units ?? [])
+			.filter((u) => u.unit_test_obligation === 'waived')
+			.map((u) => u.id),
+	);
+	for (const tc of tcs) {
+		for (const m of tc.mocks ?? []) {
+			const U = m.collaborator_unit_ref;
+			if (!U || waived.has(U)) continue;
+			if (!unitTested.has(U)) {
+				findings.push({
+					kind: 'unit.mock.unsound',
+					severity: 'high',
+					tc_id: tc.id,
+					collaborator_unit_ref: U,
+					message: `TC ${tc.id} mocks ${U} but ${U} has no test_layer=unit TC — mock = unverified assumption (propose-only / soft / DEC-2026-06-11)`,
+				});
+			}
+		}
+	}
+	return {
+		findings,
+		summary: {
+			total_findings: findings.length,
+			high: findings.filter((f) => f.severity === 'high').length,
 		},
 	};
 }

@@ -60,8 +60,11 @@ flowchart LR
 | ----------------------- | ---------------------------- | ---------------- | -------------------------- |
 | **Behavior**            | `BHV-{도메인}-{3자리 번호}`  | `BHV-ORDER-001`  | behavior-spec.schema       |
 | **Acceptance Criteria** | `AC-{도메인}-{3자리 번호}`   | `AC-ORDER-001`   | acceptance-criteria.schema |
+| **Unit** (TDD/unit 층)  | `UNIT-{도메인}-{3자리 번호}` | `UNIT-ORDER-001` | unit-spec.schema           |
 | **Test Case**           | `TC-{도메인}-{3자리 번호}`   | `TC-ORDER-001`   | test-spec.schema           |
 | **Impl Module**         | `IMPL-{도메인}-{3자리 번호}` | `IMPL-ORDER-001` | impl-spec.schema           |
+
+> **UNIT-\*** = behavior(BDD) 스레드(UC→BHV→AC→TC→IMPL)와 **나란히 도는 TDD/unit 층**의 1급 노드 = 격리 테스트 단위(클래스/순수함수/컴포넌트) = composition TC 가 조합·mock 하는 빌딩블록. DO-178C 사다리의 **LLR(Low-Level Requirement) rung**. behavior 스레드와의 join = `behavior-spec.behaviors[].unit_refs` / `task-plan.tasks[].unit_refs` / `test-spec.test_cases[].class_ref`(test_layer=unit) / matrix `unit_id`. 상세 = `methodology-spec/policies/test-layering.md`.
 
 ### G3 운영 자산 ID
 

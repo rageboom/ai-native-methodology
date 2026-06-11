@@ -63,6 +63,8 @@ export function buildMatrix(chain) {
 	const antipatterns = chain.antipatterns ?? null;
 	// v9.2.0 (DEC-2026-05-25-axis-a-phase-4-3) — chain 3 (plan) TASK layer input (optional / backwards compat / Senior risk #4 흡수)
 	const taskPlan = chain.taskPlan ?? null;
+	// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — TDD/unit 층 input (optional / additive / 부재 = behavior-only 정상)
+	const unitSpec = chain.unitSpec ?? null;
 
 	const brById = new Map();
 	for (const br of businessRules?.business_rules ?? []) brById.set(br.id, br);
@@ -197,6 +199,34 @@ export function buildMatrix(chain) {
 	// F-SIM-002 self-audit: severity 분포 (단일 상수 경고 신호)
 	const severityDistinct = [...new Set(matrix.map((c) => c.severity))];
 
+	// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — TDD/unit 층 별 axis (behavioral chain 분리).
+	//   spec 파생 UNIT obligation_satisfied_ratio = 결정론(게이트 후보 / 현 soft). additive — unitSpec 부재 = unit_coverage 미부착(behavior-only 정상).
+	let unitCoverage = null;
+	if (unitSpec) {
+		const units = unitSpec.units ?? [];
+		// test_layer=unit + class_ref TC 가 검증한 UNIT 집합
+		const unitTested = new Set(
+			(testSpec?.test_cases ?? [])
+				.filter((t) => t.test_layer === 'unit' && t.class_ref)
+				.map((t) => t.class_ref),
+		);
+		const requiredUnits = units.filter(
+			(u) => u.unit_test_obligation === 'required',
+		);
+		const requiredTested = requiredUnits.filter((u) => unitTested.has(u.id));
+		const unitTotal = units.length;
+		const unitTestedCount = units.filter((u) => unitTested.has(u.id)).length;
+		unitCoverage = {
+			obligation_satisfied_ratio:
+				requiredUnits.length === 0
+					? 1.0
+					: requiredTested.length / requiredUnits.length,
+			unit_total: unitTotal,
+			unit_tested: unitTestedCount,
+			threshold: 0.85,
+		};
+	}
+
 	return {
 		derived_from: [
 			'planning-spec.json',
@@ -209,6 +239,8 @@ export function buildMatrix(chain) {
 			...(antipatterns ? ['antipatterns.json'] : []),
 			// v9.2.0 TASK layer optional input (DEC-2026-05-25-axis-a-phase-4-3)
 			...(taskPlan ? ['task-plan.json'] : []),
+			// v0.36.0 TDD/unit 층 optional input (DEC-2026-06-11-tdd-unit-layer-thread)
+			...(unitSpec ? ['unit-spec.json'] : []),
 		],
 		do_not_edit_manually: true,
 		matrix,
@@ -224,6 +256,8 @@ export function buildMatrix(chain) {
 			severity_distinct_count: severityDistinct.length,
 			severity_propagation_active:
 				businessRules !== null || antipatterns !== null,
+			// v0.36.0 TDD/unit 층 별 axis (additive / unitSpec 부재 시 미부착 = behavior-only 정상)
+			...(unitCoverage ? { unit_coverage: unitCoverage } : {}),
 		},
 	};
 }

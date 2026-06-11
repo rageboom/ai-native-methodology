@@ -1,6 +1,6 @@
 {
   "name": "context-ops",
-  "version": "0.35.0",
+  "version": "0.36.0",
   "description": "AI-Native 개발 방법론 — SDLC 6단계 chain harness Claude Code plugin (사내 표준). v12.0.0 — 산출물 json 단독 SSOT (.mermaid + .md dual-rendering twin 폐기 / ADR-008 Superseded / ADR-011 / 완전 AX-native). v11.0.0 paradigm — planning-spec → discovery-spec rename + BE/FE 산출물 분리 + Epic/Story/OP-*/TASK-* 4-level ticket cascade (plan stage 한 곳) + contract 강제 양 axis (BE swagger / FE state-map+DTCG). v9.1 multi-agent — stage 별 sub-agent (discovery 본격 + plan 본격 / v10.0.0 hard gate 본격) + 3 base + spike (main agent = orchestrator + Task tool dispatch). Analysis stage (legacy 분석 / 7대 산출물 + finding + antipatterns + migration-cautions) + chain gate (discovery → spec → plan → test RED → impl GREEN / gate #1~#5 / chain N = gate #N 1:1 INTERNAL CONVENTION) + traceability matrix + 70~80% 한계 명시. 변경 이력은 CHANGELOG.md 참조.",
   "author": {
     "name": "MIS",

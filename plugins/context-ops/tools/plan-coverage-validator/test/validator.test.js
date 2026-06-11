@@ -952,3 +952,26 @@ describe('validateSpConversions (v11.3.0)', () => {
 		assert.equal(r.findings.length, 0);
 	});
 });
+
+// ──────────────────────────────────────────────────────────────────────
+// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — unit-test obligation (soft/medium)
+// ──────────────────────────────────────────────────────────────────────
+import { validateUnitTestObligation } from '../src/validator.js';
+
+describe('v0.36.0 validateUnitTestObligation', () => {
+	it('unit_refs 보유 + obligation 미선언 → medium finding (soft)', () => {
+		const tp = { tasks: [{ id: 'TASK-X-001', unit_refs: ['UNIT-X-001'] }] };
+		const r = validateUnitTestObligation(tp);
+		assert.equal(r.findings.length, 1);
+		assert.equal(r.findings[0].kind, 'plan.task.unit_obligation_missing');
+		assert.equal(r.findings[0].severity, 'medium');
+	});
+	it('obligation 선언 시 finding 0', () => {
+		const tp = { tasks: [{ id: 'TASK-X-001', unit_refs: ['UNIT-X-001'], unit_test_obligation: 'required' }] };
+		assert.equal(validateUnitTestObligation(tp).findings.length, 0);
+	});
+	it('unit_refs 부재(behavior-only) 시 finding 0 (무회귀)', () => {
+		const tp = { tasks: [{ id: 'TASK-X-001', ac_refs: ['AC-X-001'] }] };
+		assert.equal(validateUnitTestObligation(tp).findings.length, 0);
+	});
+});

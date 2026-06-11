@@ -19,6 +19,7 @@ import {
 	validateBETaskOpenapiRef,
 	validateFETaskComponentRef,
 	validateSpConversions,
+	validateUnitTestObligation,
 	loadJson,
 } from './validator.js';
 
@@ -82,6 +83,7 @@ const riskResult = validateRiskSeverity(taskPlan);
 const beOpenapiResult = validateBETaskOpenapiRef(taskPlan);
 const feComponentResult = validateFETaskComponentRef(taskPlan);
 const spConversionResult = validateSpConversions(taskPlan);
+const unitObligationResult = validateUnitTestObligation(taskPlan);
 
 const allFindings = [
 	...taskCoverageResult.findings,
@@ -92,6 +94,7 @@ const allFindings = [
 	...beOpenapiResult.findings,
 	...feComponentResult.findings,
 	...spConversionResult.findings,
+	...unitObligationResult.findings,
 ];
 
 const summary = {
@@ -114,6 +117,7 @@ if (args.json) {
 				be_openapi_ref: beOpenapiResult,
 				fe_component_ref: feComponentResult,
 				sp_conversions: spConversionResult,
+				unit_test_obligation: unitObligationResult,
 				summary,
 			},
 			null,

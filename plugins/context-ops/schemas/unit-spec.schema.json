@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/unit-spec.schema.json",
+  "title": "Unit Spec (TDD/unit 층 / UNIT-* SSOT)",
+  "description": "v0.36.0 MINOR 신설 (DEC-2026-06-11-tdd-unit-layer-thread). SDLC chain 의 behavior(BDD) 스레드(UC→BHV→AC→TASK→TC→IMPL) 와 나란히 도는 TDD/unit 층의 1급 인벤토리. UNIT-* = 격리 테스트 단위(클래스 / 순수함수 / 컴포넌트) = behavior 시나리오(composition TC)가 조합·mock 하는 빌딩블록. 본 산출물은 신규 도구 ❌ — 기존 자산을 인덱싱한다: code-graph(ClassDef/MethodDef) + domain.entities[].behaviors[] + formal-spec.invariants[] + code-pointer(ast_symbol). 두 provenance — S2(레거시)=code-graph∩domain 에서 발견(characterized_from_code) / greenfield·S1=formal-spec.invariants 에서 설계(designed_from_spec). 신뢰 분리(결정 1 / DEC-2026-06-11 §): 본 spec 파생 UNIT 층 = 결정론(spec-side) = 게이트 후보(단 §8.1 ratchet — 현 soft) / code-graph method-axis 보강은 영구 reference-lens·propose-only(DEC-2026-05-28 불변). additive — 본 산출물 부재 = behavior-only mode 정상(불완전 ❌).",
+  "type": "object",
+  "required": ["meta", "derivation_source", "units"],
+  "additionalProperties": false,
+  "$comment": "additionalProperties:false strict (drift attractor 차단). meta + derivation_source + units 의무 / coverage 권장.",
+  "properties": {
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "derivation_source": {
+      "type": "object",
+      "description": "본 unit-spec 의 출처. provenance 별로 다른 입력 — S2=code_graph_path+domain_path / greenfield=formal_spec_path+domain_path. domain_path 는 항상 권고(의미 계층 anchor).",
+      "required": ["domain_path"],
+      "additionalProperties": false,
+      "properties": {
+        "code_graph_path": {
+          "type": "string",
+          "description": "S2 — analysis code-graph.json 경로 (ClassDef/MethodDef 구조 인벤토리 source). reference-lens — 본 path 인용은 인벤토리 발견용이고 게이트 주입 ❌ (DEC-2026-05-28 불변)."
+        },
+        "domain_path": {
+          "type": "string",
+          "description": "analysis domain.json 경로 — entities[].behaviors[].method_name / domain_services[].operations[] 가 UNIT 의 의미 계층(domain_ref / behavior_method_ref) anchor."
+        },
+        "formal_spec_path": {
+          "type": "string",
+          "description": "greenfield·S1 / 양쪽 — formal-spec.json 경로. invariants[].aggregate_root 가 designed_from_spec UNIT 의 source + invariant_refs/property_test_refs anchor."
+        },
+        "characterization_spec_path": {
+          "type": "string",
+          "description": "S2 — characterization-spec.json 경로. snapshots[] 가 characterized_from_code UNIT 의 AS-IS oracle (layer=unit 정합)."
+        }
+      }
+    },
+    "units": {
+      "type": "array",
+      "minItems": 1,
+      "description": "UNIT-* 목록. 각 UNIT = 1 격리 테스트 단위. id-conventions UNIT-* 규약 정합.",
+      "items": {
+        "type": "object",
+        "required": ["id", "provenance", "kind", "code_pointer", "unit_test_obligation"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "Unit ID (id-conventions canonical / 예: UNIT-EVENT-001). UC/BHV/AC/TASK/TC/IMPL 과 동급 1급 노드."
+          },
+          "name": {
+            "type": "string",
+            "description": "한 줄 단위 식별 (예: 'DrawNumberGenerator.generateUniqueNumber')"
+          },
+          "provenance": {
+            "type": "string",
+            "enum": ["characterized_from_code", "designed_from_spec"],
+            "description": "시나리오 분기(결정 5). characterized_from_code = S2 레거시(코드 이미 존재 → code-graph∩domain 발견 / 유닛테스트=characterization) / designed_from_spec = greenfield·S1(코드 미존재 → formal-spec.invariants 설계 / 유닛테스트=RED→GREEN TDD). 혼합 허용(per-unit)."
+          },
+          "kind": {
+            "type": "string",
+            "enum": ["class", "function", "module", "component"],
+            "description": "단위 종류. class/function = BE 빌딩블록 / component = FE / module = 응집 묶음."
+          },
+          "code_pointer": {
+            "$ref": "./code-pointer.schema.json",
+            "description": "단위의 코드 좌표. anchor_type=ast_symbol(symbol='Class.method') 권고 — 신규 class_ref/method_ref 원시필드 ❌, 기존 code-pointer 재사용(결정 4 / SSOT). designed_from_spec 시 미존재 코드 → code-pointer.stale 또는 doc_link 허용."
+          },
+          "domain_ref": {
+            "type": "string",
+            "description": "domain.json 의 entity/aggregate/value-object/domain-service id (의미 계층 backward link / 예: E-EVENT-Event)."
+          },
+          "behavior_method_ref": {
+            "type": "string",
+            "description": "domain.entities[].behaviors[].method_name 또는 domain_services[].operations[] match (메서드 의미 anchor)."
+          },
+          "bc_ref": {
+            "type": "string",
+            "description": "bounded context id (예: BC-EVENT). scope-aware 인벤토리 분할용."
+          },
+          "invariant_refs": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "formal-spec.invariants[] 참조 (aggregate_root + index 등). type=property·test_layer=unit TC 의 실행 대상 = 본 invariant. formal-spec-link-validator 도달성 검증."
+          },
+          "property_test_refs": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "formal-spec.property_tests[] 또는 behavior-spec.behaviors[].property_tests[] 참조."
+          },
+          "collaborators": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$"},
+            "uniqueItems": true,
+            "description": "본 단위가 의존하는 다른 UNIT-* (mocking-soundness 계약 backbone). composition TC 가 collaborator 를 mock 할 때, 그 collaborator 가 자기 유닛테스트(test_layer=unit)를 가질 때만 mock 이 건전 — spec-test-link validateMockSoundness 가 검증(현 soft)."
+          },
+          "unit_test_obligation": {
+            "type": "string",
+            "enum": ["required", "characterization_only", "waived"],
+            "description": "유닛테스트 의무 수준. required = 격리 유닛테스트 의무(순수로직·분기 보유) / characterization_only = S2 AS-IS 핀만(설계 변경 ❌) / waived = 면제(data class·생성코드·trivial getter / waiver_reason 의무). mocking-soundness 에서 waived 단위는 mock 건전성 면제."
+          },
+          "waiver_reason": {
+            "type": "string",
+            "description": "unit_test_obligation=waived 시 사유 의무 (예: 'pure data holder / no branch logic')."
+          }
+        },
+        "allOf": [
+          {
+            "$comment": "waived 시 waiver_reason 의무 (정직 마커 / 빈 waive 차단).",
+            "if": {
+              "properties": {"unit_test_obligation": {"const": "waived"}},
+              "required": ["unit_test_obligation"]
+            },
+            "then": {
+              "required": ["waiver_reason"]
+            }
+          }
+        ]
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "description": "유닛 층 커버리지 (별 axis / behavioral chain 분리). obligation_satisfied_ratio = 결정론(spec-side / 게이트 후보) / method_axis_corroboration = code-graph 보강(reference-lens·propose-only / 게이트 주입 ❌ / DEC-2026-05-28 불변).",
+      "additionalProperties": false,
+      "properties": {
+        "obligation_satisfied_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "unit_test_obligation=required UNIT 중 ≥1 test_layer=unit TC 로 cover 된 비율. spec-side 결정론 = chain-internal 게이트 후보(현 soft / ≥2 PoC 후 하드게이트 격상 별도 DEC)."
+        },
+        "method_axis_corroboration": {
+          "type": "object",
+          "description": "code-graph buildMethodAxis 보강 신호 (reference-lens / propose-only / 게이트 주입 영구 ❌). impl-spec anchor 있을 때만 detectable.",
+          "additionalProperties": false,
+          "properties": {
+            "method_total": {"type": "integer", "minimum": 0},
+            "method_covered": {"type": "integer", "minimum": 0},
+            "reference_lens": {
+              "type": "boolean",
+              "const": true,
+              "description": "DEC-2026-05-28 불변 — 본 신호는 reference-lens(NOT gate-injected). const true 로 게이트 주입 구조적 차단."
+            }
+          }
+        },
+        "mutation_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "PIT/Stryker mutation score (선택 / 품질 신호). characterization 핀이 버그를 정답으로 박제 안 했는지 = 유닛테스트가 실제 동작을 단언하는지. characterization-spec ratchet 정합."
+        },
+        "threshold": {
+          "type": "number",
+          "minimum": 0.85,
+          "maximum": 0.95,
+          "description": "ADR-010 v2 ratchet 정합 (0.85 → 0.90 → 0.95)."
+        },
+        "coverage_strategy": {
+          "type": "string",
+          "enum": ["absolute", "ratchet"],
+          "description": "characterization-spec 재사용 — ratchet 시 legacy 는 coverage_minimum_legacy(0.40) 부터 상향."
+        }
+      }
+    }
+  }
+}

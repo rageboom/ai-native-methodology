@@ -24,8 +24,9 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "ac_ref", "bhv_ref", "type", "framework", "source_file", "expected_outcome"],
+        "required": ["id", "bhv_ref", "type", "framework", "source_file", "expected_outcome"],
         "additionalProperties": false,
+        "$comment": "v0.36.0 — ac_ref 가 top-required 에서 빠짐 (DEC-2026-06-11-tdd-unit-layer-thread). 대신 allOf if/then 으로 조건부: test_layer=unit TC 는 class_ref 의무·ac_ref optional (유닛테스트는 AC 없이 정당) / 그 외(composition / test_layer 부재=기본) 는 ac_ref 의무 = 기존 PoC 무회귀.",
         "properties": {
           "id": {
             "type": "string",
@@ -34,7 +35,7 @@
           "ac_ref": {
             "type": "string",
             "pattern": "^AC-[A-Z0-9_-]+-[0-9]{3}$",
-            "description": "chain spec backward link"
+            "description": "chain spec backward link (composition TC 의무 / test_layer=unit TC 는 optional — allOf if/then)"
           },
           "bhv_ref": {
             "type": "string",
@@ -92,6 +93,37 @@
             "type": "boolean",
             "default": false,
             "description": "명시적 N/A 마커 (operation.md 결정 3)."
+          },
+          "test_layer": {
+            "type": "string",
+            "enum": ["unit", "composition"],
+            "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). 피라미드 *위치* axis — `type`(technique: unit/integration/property/...)과 **별 axis**. unit = 단일 UNIT-* 격리 검증(빌딩블록 / TDD 층) / composition = 협력자 조합·mock(BDD 시나리오 / AC 검증). 미지정 = composition(기본 / 기존 PoC 무회귀 — test_layer 부재 시 ac_ref 의무 유지). unit 시 class_ref 의무(allOf if/then)."
+          },
+          "class_ref": {
+            "type": "string",
+            "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "v0.36.0 신설 — test_layer=unit TC 가 검증하는 UNIT-* (unit-spec.json). 기존 class_ref/method_ref 원시필드 대신 UNIT-* 노드 참조 + 실 코드 좌표는 code_pointers(ast_symbol)가 보유(결정 4 / SSOT). test_layer=unit 시 required(allOf if/then)."
+          },
+          "mocks": {
+            "type": "array",
+            "description": "v0.36.0 신설 — 본 TC(주로 composition)가 mock 하는 협력자 UNIT-* 목록. mocking-soundness 계약: mock 한 collaborator 는 자기 test_layer=unit TC 로 핀될 때만 건전(spec-test-link validateMockSoundness / 현 soft). 그 협력자가 unit_test_obligation=waived 면 면제. Fowler 'Mocks Aren't Stubs'의 위험('green but mask inherent errors') + Consumer-Driven Contracts 정신의 본 방법론 합성.",
+            "items": {
+              "type": "object",
+              "required": ["collaborator_unit_ref"],
+              "additionalProperties": false,
+              "properties": {
+                "collaborator_unit_ref": {
+                  "type": "string",
+                  "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$",
+                  "description": "mock 된 협력자 UNIT-* (unit-spec.units[].collaborators 와 정합)."
+                },
+                "mock_kind": {
+                  "type": "string",
+                  "enum": ["stub", "mock", "spy", "fake"],
+                  "description": "Fowler test double 분류 (stub=상태 / mock=행위 검증 / spy=기록 / fake=경량 구현)."
+                }
+              }
+            }
           },
           "openapi_contract_ref": {
             "type": "object",
@@ -213,6 +245,19 @@
             },
             "then": {
               "required": ["visual_regression_ref"]
+            }
+          },
+          {
+            "$comment": "v0.36.0 if/then (DEC-2026-06-11-tdd-unit-layer-thread) — test_layer=unit TC 는 class_ref 의무(ac_ref optional / 유닛테스트는 AC 없이 정당). else(composition / test_layer 부재=기본)는 ac_ref 의무 = 기존 PoC 무회귀(test_layer 미지정 시 if 의 required:[test_layer] 실패 → else 진입 → ac_ref 강제).",
+            "if": {
+              "properties": {"test_layer": {"const": "unit"}},
+              "required": ["test_layer"]
+            },
+            "then": {
+              "required": ["class_ref"]
+            },
+            "else": {
+              "required": ["ac_ref"]
             }
           }
         ]

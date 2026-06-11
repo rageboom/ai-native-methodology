@@ -44,6 +44,16 @@
             "type": "string",
             "pattern": "^IMPL-[A-Z0-9_-]+-[0-9]{3}$"
           },
+          "unit_id": {
+            "type": "string",
+            "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). TDD/unit 층 = DO-178C LLR(Low-Level Requirement) rung — 매트릭스가 표방한 'System Req→HLR→LLR→Source→Test' 사다리의 누락 단을 완성. additive (unit_id 부재 cell = unit 스레드 미참조 PoC 정상 / task_id 와 동형). cell 이 unit_id 보유·unit_test_id 부재 시 yellow."
+          },
+          "unit_test_id": {
+            "type": "string",
+            "pattern": "^TC-[A-Z0-9_-]+-[0-9]{3}$",
+            "description": "v0.36.0 신설 — 본 unit_id 를 검증하는 test_layer=unit TC. unit_id 보유·unit_test_id 부재 = 미검증 빌딩블록(yellow)."
+          },
           "impl_commit_hash": {
             "type": "string",
             "pattern": "^[a-f0-9]{40}$",
@@ -220,6 +230,29 @@
         "severity_propagation_active": {
           "type": "boolean",
           "description": "F-SIM-002 (2026-05-18) — businessRules / antipatterns 입력 통과 여부 (false 시 propagation 미적용 → 회귀 위험)."
+        },
+        "unit_coverage": {
+          "type": "object",
+          "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). TDD/unit 층 커버리지 = behavioral chain(forward/backward_coverage)과 **별 axis**. obligation_satisfied_ratio = spec-side 결정론(게이트 후보 / 현 soft) / method_axis_corroboration = code-graph 보강(reference-lens·propose-only / 게이트 주입 영구 ❌ / DEC-2026-05-28 불변). additive — unit 스레드 미참조 PoC 는 본 객체 부재 = behavior-only 정상.",
+          "additionalProperties": false,
+          "properties": {
+            "obligation_satisfied_ratio": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "unit_test_obligation=required UNIT 중 ≥1 test_layer=unit TC cover 비율 (결정론 / 게이트 후보)."
+            },
+            "method_axis_corroboration": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "code-graph buildMethodAxis 보강 신호 (reference-lens / propose-only / 게이트 주입 ❌)."
+            },
+            "mutation_score": {"type": "number", "minimum": 0, "maximum": 1, "description": "PIT/Stryker (선택 / 품질 신호 / characterization 핀 의미성)."},
+            "unit_total": {"type": "integer", "minimum": 0},
+            "unit_tested": {"type": "integer", "minimum": 0},
+            "threshold": {"type": "number", "minimum": 0.85, "maximum": 0.95, "description": "ADR-010 v2 ratchet 정합."}
+          }
         }
       }
     }

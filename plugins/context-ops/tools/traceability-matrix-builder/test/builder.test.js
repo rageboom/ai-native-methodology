@@ -287,3 +287,36 @@ describe('traceability-matrix-builder', () => {
 		});
 	});
 });
+
+// ──────────────────────────────────────────────────────────────────────
+// v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — unit_coverage axis (additive)
+// ──────────────────────────────────────────────────────────────────────
+describe('v0.36.0 unit_coverage axis', () => {
+	it('unitSpec 부재 시 coverage_summary.unit_coverage 미부착 (behavior-only 무회귀)', () => {
+		const m = buildMatrix(fullChain);
+		assert.equal(m.coverage_summary.unit_coverage, undefined);
+	});
+	it('unitSpec 존재 시 obligation_satisfied_ratio 계산', () => {
+		const chain = {
+			...fullChain,
+			unitSpec: {
+				units: [
+					{ id: 'UNIT-USER-001', unit_test_obligation: 'required' },
+					{ id: 'UNIT-USER-002', unit_test_obligation: 'required' },
+				],
+			},
+			testSpec: {
+				test_cases: [
+					{ id: 'TC-USER-001', ac_ref: 'AC-USER-001' },
+					{ id: 'TC-USER-010', test_layer: 'unit', class_ref: 'UNIT-USER-001' },
+				],
+			},
+		};
+		const m = buildMatrix(chain);
+		assert.ok(m.coverage_summary.unit_coverage);
+		assert.equal(m.coverage_summary.unit_coverage.unit_total, 2);
+		assert.equal(m.coverage_summary.unit_coverage.unit_tested, 1);
+		assert.equal(m.coverage_summary.unit_coverage.obligation_satisfied_ratio, 0.5);
+		assert.ok(m.derived_from.includes('unit-spec.json'));
+	});
+});

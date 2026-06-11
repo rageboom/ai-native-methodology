@@ -212,11 +212,13 @@ input (test stage 가 받음):
 
 산출물 (test stage 가 만듦):
 
-- **test-spec.json** (deliverable 20 / `schemas/test-spec.schema.json`) — TC-\* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / framework (jest/vitest/junit/pytest/playwright)
+- **test-spec.json** (deliverable 20 / `schemas/test-spec.schema.json`) — TC-\* (테스트 케이스 메타) / type (unit/integration/contract/e2e/property) / **test_layer (unit/composition / v0.36.0)** / framework (jest/vitest/junit/pytest/playwright)
 - **실 test 코드** (사용자 프로젝트 `<project>/test/` 또는 `__tests__/`) — RED 의무 (CHAIN 4 종결 시 모든 test fail / impl 부재)
 - **5종 물증 7 필드** (no-simulation — runner_version + stdout + stderr + timestamp + pass/fail count + duration + reproduction + result_hash)
 
 spec-test-link-validator = AC→TC 1:N 정합 + framework match (analysis-source-inventory) + coverage ≥ 0.85.
+
+> **TDD/unit 층**: behavior 스레드와 나란히 **unit-spec.json** (deliverable 27 / `schemas/unit-spec.schema.json` / `UNIT-*`) 운반. **emit 단계 = provenance 별**: S2(레거시)=**analysis** 단계에서 `code-graph ∩ domain.behaviors` 발견(characterized_from_code) / greenfield·S1=**spec** 단계에서 `formal-spec.invariants` 설계(designed_from_spec). test 단계는 `test_layer=unit` TC 로 UNIT 을 검증(class_ref) + composition TC 의 `mocks[]` 로 mocking-soundness. 검증기 = `validateMockSoundness`(spec-test-link) + `validateUnitTestObligation`(plan-coverage) = **현 soft/비차단** (≥2 PoC 후 하드게이트). 신뢰 분리: spec 파생 UNIT=게이트 후보 / code-graph method-axis=reference-lens·propose-only(영구 비-게이트). SSOT = `methodology-spec/policies/test-layering.md`.
 
 ### chain 5 (구현) — implement stage (i-strict / chain harness 안에서 round-trip 정식 허용)
 

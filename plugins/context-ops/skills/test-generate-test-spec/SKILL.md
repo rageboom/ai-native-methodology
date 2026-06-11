@@ -80,10 +80,16 @@ TC.framework ∈ {playwright-visual, axe-core, percy, chromatic} 시 `visual_reg
 
 no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 3 simulated 영구 거부).
 
-3. **각 AC 마다 1 TC 분해** — TC-{AC}-001:
-   - test type 분포: unit (60%) / integration (25%) / contract (10%) / e2e (5%) (test pyramid 관행 권고).
-   - source_file path 결정 (framework convention).
-   - expected_outcome = "fail" (RED 의무 / impl 부재 가정).
+3. **2층 분해 — composition TC (AC 단위) + unit TC (UNIT 단위)**:
+
+   > **2층 모델** (SSOT `methodology-spec/policies/test-layering.md`): chain 은 BDD/composition 층(AC 시나리오)과 TDD/unit 층(빌딩블록)을 **둘 다** 운반. `test_layer` 필드로 구분 — `composition`(기본 / AC 검증 / 협력자 mock) / `unit`(단일 UNIT-* 격리 / class_ref 의무).
+
+   - **(top) composition TC** — 각 AC 마다 1 TC: `test_layer=composition`(기본) + `ac_ref` + 협력자 mock 시 `mocks[].collaborator_unit_ref`. BDD 시나리오.
+   - **(bottom) unit TC** — **bottom-up 앵커 규칙**: ① `unit-spec.units[]` 중 `unit_test_obligation=required` 인 모든 UNIT-* / ② composition TC 의 모든 `mocks[].collaborator_unit_ref` (mock 한 협력자) — 에 대해 `test_layer=unit` + `class_ref=UNIT-*` + `code_pointers`(ast_symbol) TC 생성. 이게 "AC 시나리오가 mock 하는 A·B·C 빌딩블록을 각각 핀"하는 mocking-soundness 의 충족. (피라미드 unit≈60% 는 이 bottom-up 의 *결과*이지 top-down 할당이 아님.)
+   - **시나리오 분기**: S2(provenance=characterized_from_code) = 기존 클래스 characterization(test_intent=characterization / 코드 존재 → GREEN) / greenfield(designed_from_spec) = test-first RED→GREEN.
+   - **unit-spec 부재 = behavior-only mode** (composition TC 만 / 무회귀). unit 층은 unit-spec.json 이 있을 때만 opt-in.
+   - source_file path 결정 (framework convention). expected_outcome = "fail" (RED 의무 / impl 부재 가정 / S2 characterization 은 'pass').
+   - **신뢰**: spec 파생 UNIT obligation = 게이트 후보(현 soft / ≥2 PoC 후 강제) / code-graph method-axis = reference-lens·propose-only(영구 비-게이트).
 
    > **S2 augmentation 재동기화** (P4 양방향 역동기화): `test_intent=augmentation` TC 는 생성 시 `expected_outcome="fail"`(RED / 증강분 미구현). impl 완료 후엔 spec 의 `expected_outcome` 을 **fail→pass 로 재동기화**(증강분이 시스템 동작 = characterization-grade 승격). 재동기화 누락 시 S2 per_tc_outcome gate 가 actual(pass) ↔ expected(fail) 불일치를 `s2_outcome_mismatch` WARN 으로 신호(impl 이 spec 보다 앞섬 = drift) — 이 신호가 운영자에게 역동기화를 요구한다.
 
@@ -109,7 +115,8 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
      --behavior   .ai-context/output/behavior-spec.json \
      --acceptance .ai-context/output/acceptance-criteria.json \
      --test-spec  .ai-context/output/test-spec.json \
-     --inventory  .ai-context/output/inventory.json
+     --inventory  .ai-context/output/inventory.json \
+     --unit-spec  .ai-context/output/unit-spec.json   # v0.36.0 — mock-soundness advisory (SOFT/propose-only/비차단 / unit-spec 있을 때만)
    ```
 
 9. **test-impl-pass-validator dry-run 호출** — 진짜 실행 ❌ / config 검증만:
