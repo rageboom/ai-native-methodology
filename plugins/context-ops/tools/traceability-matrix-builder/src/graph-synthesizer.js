@@ -934,6 +934,35 @@ export function synthesizeGraph(input) {
     if (!nodeIds.has(e.source) || !nodeIds.has(e.target)) edges.splice(i, 1);
   }
 
+  // --- ★ F-DOGFOOD-PENDING-TC — claim 안 된 pending TC → 'propose' (acknowledged-incomplete) ---
+  //   fail_mode:'pending'(Cucumber yellow / 미작성 carry-forward RED) TC 가 어떤 task/AC/impl 도 claim 안 해
+  //   고립(edge 0)된 경우 = '제안됨/미커밋'. active 로 두면 graph-integrity 가 의도적 carry 를 silent-orphan 으로
+  //   오인해 hard-block → propose 로 정직 강등(가시 / orphan 검사 제외 / no-silent-false-health).
+  //   claim 된 pending TC(task.tc_refs / ac_ref = committed)는 edge 보유 → active 유지.
+  //   acknowledged 안 된 진짜 orphan(fail_mode≠pending)은 active 유지 → 정상 block (STORY 류 버그 미은폐).
+  const _pendingTcIds = new Set(
+    (testSpec?.test_cases ?? [])
+      .filter((tc) => tc?.fail_mode === 'pending' && typeof tc.id === 'string')
+      .map((tc) => tc.id),
+  );
+  if (_pendingTcIds.size > 0) {
+    const _incident = new Set();
+    for (const e of edges) {
+      _incident.add(e.source);
+      _incident.add(e.target);
+    }
+    for (const n of nodes) {
+      if (
+        n.artifact_subkind === 'TC' &&
+        n.state === 'active' &&
+        _pendingTcIds.has(n.id) &&
+        !_incident.has(n.id)
+      ) {
+        n.state = 'propose';
+      }
+    }
+  }
+
   // --- ★ v11.x (F-DF-ANCHOR-002) analysis evidence → code_pointers derive (backstop 直前) ---
   // 실 src 앵커 surface → A2 content-drift 가 production 코드 변경 탐지. 추출0/미검증 경로 → 아래 backstop na.
   deriveAnalysisCodePointers(nodes, analysis, { existsFn: effectiveExistsFn });

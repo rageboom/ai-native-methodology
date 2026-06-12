@@ -1020,6 +1020,90 @@ describe('synthesizeGraph — v11.0.0 6-layer chain + plan 조직 + contract', (
 });
 
 // ============================================================================
+// F-DOGFOOD-PENDING-TC — pending TC (fail_mode:'pending' / 미작성 carry-forward RED) → state='propose'.
+//   작성 완료 active TC 와 구분. graph-integrity orphan 검사가 propose 제외 → silent orphan 아님(가시).
+// ============================================================================
+describe('synthesizeGraph — pending TC → propose state (F-DOGFOOD-PENDING-TC)', () => {
+	const pendingInput = {
+		discovery: { use_cases: [{ id: 'UC-USER-001', name: '회원가입' }] },
+		behavior: { behaviors: [{ id: 'BHV-USER-001', use_case_refs: ['UC-USER-001'] }] },
+		acceptance: { criteria: [{ id: 'AC-USER-001', behavior_ref: 'BHV-USER-001' }] },
+		taskPlan: {
+			tasks: [
+				{
+					id: 'TASK-USER-001',
+					layer: 'be',
+					ac_refs: ['AC-USER-001'],
+					tc_refs: ['TC-USER-001', 'TC-USER-051'], // TC-051(pending)을 claim
+				},
+			],
+		},
+		testSpec: {
+			test_cases: [
+				// 작성 완료(active) — task 가 claim
+				{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', expected_outcome: 'pass' },
+				// 미작성 carry-forward (pending RED) — task 가 claim (committed) → active 유지
+				{
+					id: 'TC-USER-051',
+					bhv_ref: 'BHV-USER-001',
+					expected_outcome: 'fail',
+					fail_mode: 'pending',
+					source_file: 'TC-USER-051.pending.java',
+				},
+				// 미작성 carry-forward (pending RED) — 아무도 claim 안 함 (orphan) → propose
+				{
+					id: 'TC-USER-050',
+					bhv_ref: 'BHV-USER-001',
+					expected_outcome: 'fail',
+					fail_mode: 'pending',
+					source_file: 'TC-USER-050.pending.java',
+				},
+			],
+		},
+		sourcePaths: { discovery: 'd.json', behavior: 'b.json', acceptance: 'a.json', taskPlan: 'p.json', testSpec: 't.json' },
+	};
+
+	it('claim 안 된 pending TC = propose / claim 된 pending TC = active 유지 / 작성 TC = active', () => {
+		const g = synthesizeGraph(pendingInput);
+		const orphanPending = g.nodes.find((n) => n.id === 'TC-USER-050');
+		const claimedPending = g.nodes.find((n) => n.id === 'TC-USER-051');
+		const written = g.nodes.find((n) => n.id === 'TC-USER-001');
+		assert.equal(orphanPending.state, 'propose', 'claim 안 된 pending → propose');
+		assert.equal(claimedPending.state, 'active', 'task 가 claim 한 pending → active (committed)');
+		assert.equal(written.state, 'active', '작성/연결 TC → active');
+	});
+
+	it('claim 안 된 propose pending TC 는 엣지 0 이지만 orphan 검사 제외 대상 (acknowledged-incomplete)', () => {
+		const g = synthesizeGraph(pendingInput);
+		const orphanPending = g.nodes.find((n) => n.id === 'TC-USER-050');
+		const hasEdge = g.edges.some((e) => e.source === 'TC-USER-050' || e.target === 'TC-USER-050');
+		assert.equal(hasEdge, false, 'claim 안 된 pending TC = 엣지 없음');
+		assert.equal(orphanPending.state, 'propose', 'propose → detectOrphans state guard 가 제외 (active/drift 만 후보)');
+	});
+
+	it('acknowledged 안 된 orphan(fail_mode≠pending)은 active 유지 → graph-integrity 가 정상 block', () => {
+		const buggy = {
+			...pendingInput,
+			taskPlan: {
+				tasks: [
+					{ id: 'TASK-USER-001', layer: 'be', ac_refs: ['AC-USER-001'], tc_refs: ['TC-USER-001'] },
+				],
+			},
+			testSpec: {
+				test_cases: [
+					{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', expected_outcome: 'pass' },
+					// pending 마커 없는 진짜 고립 TC (STORY 류 버그) → active 유지 → orphan block 대상
+					{ id: 'TC-USER-099', bhv_ref: 'BHV-USER-001', expected_outcome: 'pass' },
+				],
+			},
+		};
+		const g = synthesizeGraph(buggy);
+		const realOrphan = g.nodes.find((n) => n.id === 'TC-USER-099');
+		assert.equal(realOrphan.state, 'active', 'pending 아닌 orphan 은 active → block 유지 (silent 은폐 ❌)');
+	});
+});
+
+// ============================================================================
 // v11.2.0 — analysis schema chain-link 일관성 (ADR-CHAIN-013)
 //   3 layer 매핑 검증:
 //     Layer 1 — chain-side ref (BHV.br_refs / AC.related_brs+aps) — 기존 검증
