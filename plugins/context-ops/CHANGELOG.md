@@ -10,6 +10,34 @@
 
 ---
 
+## [0.37.0] — 2026-06-11 MINOR — findings-aggregator 비-analysis scope-aware + test-impl-pass 인자 정정 + code_only severity 재배치
+
+**ep-be-gea event 모듈 full chain 재실행(run #2 / S2 / 외부격리·commit❌)** dogfood 가 노출한 chain harness 자동화 axis 직결 본체 결함 3건 수정. behavior fix only — schema·gate 의미 무변경 / backward-compat. DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate.
+
+### F-R2-35 (high) — findings-aggregator 비-analysis stage 경로 scope-aware
+
+- **갭**: `buildValidatorArgs` 가 discovery~implement 5 stage 에서 평면 경로(`​.ai-context/output/<f>` + `input/business-rules.json`) 하드코딩. analysis 만 DEC-2026-06-06 으로 manifest+scope-aware 화됐고 나머지는 per-scope(`​.ai-context/<scope>/<stage>/<f>` + canonical `output/business-rules/BC-<TOKEN>.json`) 미해석 → canonical-global+per-scope 레이아웃에서 5 stage validator **전부 evidence_missing** (event 실측 discovery 3/3).
+- **수정**: optional 4th param `scopeCtx` overlay — `null`(unit-test/평면 PoC)=현 평면 경로 byte-identical 무회귀 / 주입=`resolveChainArtifact`+`resolveBusinessRules`+`resolveDomain`(per-scope→canonical→legacy existsSync). `loadScopeCtx`(state.current_scope) + runValidator/main 배선. 실증: discovery 3/3·plan 2/2 ok 복구(spec drift-validator evidence_missing=plugin 자기-layout orthogonal). F13·F15 family 의 aggregator 층.
+
+### F-R2-40 (medium) — test-impl-pass-validator 인자 규약 정정
+
+- **갭**: buildValidatorArgs 에 test-impl-pass case 부재 → default `--target` → validator `--project` 요구 → exit 2 usage → silent skip.
+- **수정**: case 추가 → `--project` + `--allow-execute`(test/implement gate 실 GREEN reconciliation / no-simulation·i-strict / ADR-CHAIN-004 §4) + `package.json` test script `test/*.test.js`(build-validator-args/transform-traceability CI 누락 교정).
+
+### F-R2-32 (high / senior GO@0.82) — code_only severity 재배치
+
+- **갭**: characterization-coverage-validator code_only=`high`(v8.7 PATCH F-CYCLE3-005 R15 격상)이나 이 validator 는 **analysis exit gate(gate#0)에서만** 실행 → analysis 시점 snapshot 은 본질상 code_only=정상 상태인데 high(rank1 hard-block)가 모든 S2/S3 gate#0 구조 차단(event 11/11 snapshot high). validator 헤더 §10("medium 권장")↔code drift.
+- **senior 교정(self-recorded-fact 함정 회피)**: R15 silent-enabler 진짜 방어 = chain-4 아님 → characterization-coverage-validator **자체의 Layer 3 evidence cross-check**(real-source 허위 CLAIM=critical block / validator.js:450~456). 정직한 code_only(미검증 명시)=medium carry / 허위 real-source claim=critical = 올바른 분리.
+- **수정(안 A)**: code_only `high`→`medium`(kind `snapshot.code_only_carry_required` 유지 / header §10 정합 복원 / message 갱신). Layer 3 critical·test-recovery R15 가드 22/22 무회귀. 안 B(gate-eval finding-kind ack-path)=결정론 severity-rank 계약 오염 → 기각.
+
+### §8.1 + 검증
+
+- 3건 모두 behavioral threshold promotion 아닌 **구조적 결함**(경로 해석 locus / 인자명 / severity-stage locus) → 코드 증명 + 1 PoC(+ analysis 선례·event·golf) 본체 격상 정당.
+- findings-aggregator 57/57 · characterization-coverage-validator 22/22 · release-readiness 자체테스트 27/27 · event dogfood 실증(F-R2-35 per-scope 해석 복구 / F-R2-40 73 green reconciliation / F-R2-32 code_only medium + gate#0 high-block 해소).
+- 변경 = findings-aggregator(cli.js+test+package.json) + characterization-coverage-validator(validator.js+test) + DEC + INDEX + CHANGELOG + STATUS + CLAUDE.md.
+
+---
+
 ## [0.36.0] — 2026-06-11 MINOR — TDD/unit 층 1급화 — UNIT-* 전체 스레드
 
 방법론 SDLC chain 이 운반하던 **behavior(BDD) 단일 스레드**(UC→BHV→AC→TASK→TC→IMPL)에 나란히 도는 **TDD/unit 층**을 1급 노드(`UNIT-*`)로 추가. ep-be-gea event dogfood 에서 노출된 갭 — composition(BDD) 시나리오가 mock 으로 빼버린 빌딩블록(DrawNumberGenerator·MaskingUtils)의 격리 유닛테스트가 없어 "GREEN 인데 거짓 안심" — 을 닫는다. 사용자(TF Lead) 결단: 전체 UNIT-* 스레드를 본체에 + ep-be-gea 실증(PoC #1).

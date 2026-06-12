@@ -218,10 +218,13 @@ test('ratchet baseline write — --write-coverage-baseline 옵션 시 baseline f
 	}
 });
 
-// v8.7 PATCH — Fix #3 characterization-coverage-validator R15 silent enabler partial defense 격상
-// F-CYCLE3-005: data_source_status='code_only' snapshot 은 AI hypothesis 가능성 — medium → high 격상
+// DEC-2026-06-11-code-only-severity-relocate (F-R2-32): code_only severity high → medium 환원.
+//   진단: 본 validator 는 analysis exit gate(gate#0)에서만 실행 → analysis 시점 snapshot 은 본질상 code_only
+//   (코드에서 특성화 추출 / 실 RUN 검증은 chain 4) = 정상 상태인데 high(rank1 hard-block)는 모든 S2/S3 gate#0 구조적 차단.
+//   v8.7(F-CYCLE3-005)의 medium→high 격상이 analysis-only validator 에 자리를 잘못 잡음. R15 silent-enabler 진짜 방어 =
+//   Layer 3 evidence cross-check(real-source CLAIM 인데 evidence 부족 = critical / 아래 테스트). code_only(미검증 명시)=medium carry.
 
-test('v8.7 — data_source_status=code_only → snapshot.code_only_carry_required HIGH finding (R15 partial defense 격상)', () => {
+test('DEC-2026-06-11 — data_source_status=code_only → snapshot.code_only_carry_required MEDIUM finding (analysis-baseline carry / R15 = Layer 3 critical)', () => {
 	const r = validateCharacterization(fx('valid-code-only'), 0.8);
 	const codeOnly = r.findings.filter(
 		(f) => f.kind === 'snapshot.code_only_carry_required',
@@ -233,8 +236,8 @@ test('v8.7 — data_source_status=code_only → snapshot.code_only_carry_require
 	);
 	assert.equal(
 		codeOnly[0].severity,
-		'high',
-		'v8.7 PATCH: severity medium → high 격상 의무 (F-CYCLE3-005 R15 silent enabler partial defense)',
+		'medium',
+		'F-R2-32: code_only 는 analysis 시점 정상 상태 = medium carry (high hard-block 환원 / R15 허위 real-source claim 방어는 Layer 3 cross-check=critical 가 담당)',
 	);
 });
 

@@ -7,7 +7,10 @@
 //   5. coverage_strategy ratchet 시 trend_required = true 의무
 //   6. coverage_target / coverage_minimum_legacy 적용
 //   7. UC 유일성 (snapshot 의 use_case 가 matrix 에 존재)
-//   8. data_source_status: code_only 시 carry note 권장 (medium finding)
+//   8. data_source_status: code_only 시 carry note (medium / analysis 시점 정상 상태 — chain 4 RUN 검증 carry).
+//      R15 silent-enabler 진짜 방어 = Layer 3 evidence cross-check(real-source CLAIM 인데 evidence 부족 = critical).
+//      DEC-2026-06-11-code-only-severity-relocate (F-R2-32): v8.7 의 code_only high 격상이 analysis-only validator 에
+//      자리를 잘못 잡아 모든 S2/S3 gate#0 구조적 차단 → medium 환원 (header 와 code 정합 복원).
 
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -100,13 +103,19 @@ export function validateCharacterization(
 		}
 
 		if (d.data_source_status === 'code_only') {
-			// v8.7 PATCH — severity 격상 (medium → high) / R15 silent enabler partial defense 강화
-			// F-CYCLE3-005: snapshot 이 AI 가 코드만 보고 작성된 hypothesis 시 도메인 expert 검증 의무 / silent pass 차단
+			// severity = medium (carry note / 헤더 §10 정합). DEC-2026-06-11-code-only-severity-relocate (F-R2-32).
+			//   진단: 본 validator 는 analysis exit gate(gate#0)에서만 실행(S2/S3 conditional extraValidator) →
+			//   analysis 시점 characterization snapshot 은 **본질상 code_only**(코드에서 특성화 추출 / 실 RUN 검증은 chain 4).
+			//   따라서 code_only=high(rank1 hard-block)는 모든 S2/S3 analysis gate 를 구조적 차단 = category error.
+			//   v8.7 의 medium→high 격상은 analysis-only validator 에 자리를 잘못 잡음 → medium 환원(정직 carry 신호).
+			//   R15 silent-enabler 진짜 방어 = 아래 Layer 3 evidence cross-check (real_*/existing_test_file CLAIM 인데
+			//   tool invocation evidence 부족 시 'critical' block / line 450~456). 즉 정직한 code_only(=미검증 명시)=medium carry /
+			//   허위 real-source claim=critical = 올바른 분리. code_only 는 "chain 4 RUN 으로 검증 필요" carry 일 뿐.
 			findings.push({
 				kind: 'snapshot.code_only_carry_required',
-				severity: 'high',
+				severity: 'medium',
 				file: s.file,
-				message: `${s.file}: data_source_status='code_only' — 도메인 expert 검증 의무 (R15 silent enabler 차단 / AI hypothesis 가능성 시 코드만 기반 snapshot 은 도메인 정합 보장 불가)`,
+				message: `${s.file}: data_source_status='code_only' — chain 4 test stage 실 RUN(existing_test_file/real_db) 검증 carry (analysis 시점 정상 상태 / R15 허위 real-source claim 방어는 Layer 3 evidence cross-check=critical).`,
 			});
 		}
 

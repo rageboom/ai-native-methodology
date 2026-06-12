@@ -8,7 +8,7 @@
     "findings-aggregator": "./src/cli.js"
   },
   "scripts": {
-    "test": "node --test test/aggregator.test.js"
+    "test": "node --test test/*.test.js"
   },
   "license": "UNLICENSED"
 }

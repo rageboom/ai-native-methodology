@@ -68,13 +68,13 @@ function printUsage() {
 	);
 }
 
-// validator runner — workspace tools/<name>/src/cli.js 실행
-function runValidator(validatorName, projectDir, stage) {
+// validator runner — workspace tools/<name>/src/cli.js 실행. scopeCtx = 비-analysis per-scope 경로 해석 (F-R2-35).
+function runValidator(validatorName, projectDir, stage, scopeCtx = null) {
 	const validatorBin = join(WORKSPACE, 'tools', validatorName, 'src', 'cli.js');
 	if (!existsSync(validatorBin)) {
 		return null; // validator 부재 = skipped (aggregator level 기록)
 	}
-	const args = buildValidatorArgs(validatorName, projectDir, stage);
+	const args = buildValidatorArgs(validatorName, projectDir, stage, scopeCtx);
 	try {
 		const stdout = execFileSync('node', [validatorBin, ...args], {
 			encoding: 'utf-8',
@@ -89,24 +89,93 @@ function runValidator(validatorName, projectDir, stage) {
 	}
 }
 
-// validator 별 인자 매핑 (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합)
-export function buildValidatorArgs(validatorName, projectDir, stage) {
-	const O = (f) => join(projectDir, '.ai-context/output', f);
+// ── F-R2-35 — 비-analysis stage 경로 scope-aware overlay (DEC-2026-06-11-aggregator-nonanalysis-scope-aware) ──
+//   analysis 는 loadAnalysisRefs(manifest+state.current_scope) 로 scope-aware(DEC-2026-06-06)인데 discovery~implement 5 stage 는
+//   평면 .ai-context/output/<f> + input/ 하드코딩이라 per-scope 레이아웃(.ai-context/<scope>/<stage>/<f> + canonical output/)에서 전부 미해석.
+//   설계: scopeCtx 주입 시 per-scope→canonical→legacy existsSync 해석 / scopeCtx=null 시 현 평면 경로 byte-identical(무회귀).
+
+// 파일명 → per-scope stage 서브디렉토리.
+const STAGE_SUBDIR = {
+	'discovery-spec.json': 'discovery',
+	'behavior-spec.json': 'spec',
+	'acceptance-criteria.json': 'spec',
+	'unit-spec.json': 'spec',
+	'task-plan.json': 'plan',
+	'test-spec.json': 'test',
+	'impl-spec.json': 'impl',
+	'traceability-matrix.json': 'impl',
+	'matrix.json': 'impl',
+};
+
+// state.json.current_scope → scopeCtx (analysis loadAnalysisRefs 대칭 / 비-analysis runtime 용).
+export function loadScopeCtx(projectDir) {
+	try {
+		const statePath = join(projectDir, '.ai-context', 'state.json');
+		if (!existsSync(statePath)) return null;
+		const state = JSON.parse(readFileSync(statePath, 'utf-8'));
+		return state.current_scope ? { scope: state.current_scope } : null;
+	} catch {
+		return null;
+	}
+}
+
+// chain 산출물: scopeCtx 주입 시 per-scope(.ai-context/<scope>/<stageSubdir>/<f>) existsSync 우선 → flat .ai-context/output/<f> fallback.
+//   scopeCtx=null → flat .ai-context/output/<f> (평면 PoC / unit-test 무회귀).
+function resolveChainArtifact(projectDir, f, scopeCtx) {
+	if (scopeCtx?.scope) {
+		const sub = STAGE_SUBDIR[f];
+		if (sub) {
+			const cand = join(projectDir, '.ai-context', scopeCtx.scope, sub, f);
+			if (existsSync(cand)) return cand;
+		}
+	}
+	return join(projectDir, '.ai-context/output', f);
+}
+
+// business-rules: scopeCtx 주입 시 BR-split leaf(output/business-rules/BC-<SCOPE>.json) → canonical output/business-rules.json existsSync 우선.
+//   scopeCtx=null → legacy input/business-rules.json (현 동작 무회귀).
+function resolveBusinessRules(projectDir, scopeCtx) {
+	if (scopeCtx?.scope) {
+		const leaf = join(
+			projectDir,
+			'.ai-context/output/business-rules',
+			`BC-${scopeCtx.scope.toUpperCase()}.json`,
+		);
+		if (existsSync(leaf)) return leaf;
+		const canonical = join(projectDir, '.ai-context/output/business-rules.json');
+		if (existsSync(canonical)) return canonical;
+	}
+	return join(projectDir, 'input/business-rules.json');
+}
+
+// domain: scopeCtx 주입 시 canonical output/domain.json existsSync 우선 → scopeCtx=null → legacy input/domain.json (현 동작 무회귀).
+function resolveDomain(projectDir, scopeCtx) {
+	if (scopeCtx?.scope) {
+		const canonical = join(projectDir, '.ai-context/output/domain.json');
+		if (existsSync(canonical)) return canonical;
+	}
+	return join(projectDir, 'input/domain.json');
+}
+
+// validator 별 인자 매핑 (chain-driver/gate-eval REQUIRED_VALIDATORS_PER_STAGE 정합).
+//   scopeCtx (4th param / optional) = 비-analysis per-scope 경로 해석 (F-R2-35). null = 평면 경로(무회귀).
+export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = null) {
+	const O = (f) => resolveChainArtifact(projectDir, f, scopeCtx);
 	switch (validatorName) {
 		case 'discovery-extraction-validator':
 			return [
 				'--discovery',
 				O('discovery-spec.json'),
 				'--rules',
-				join(projectDir, 'input/business-rules.json'),
+				resolveBusinessRules(projectDir, scopeCtx),
 				'--domain',
-				join(projectDir, 'input/domain.json'),
+				resolveDomain(projectDir, scopeCtx),
 				'--json',
 			];
 		case 'br-cross-consistency-validator':
 			// F2-followup wiring: br-cross 는 --target <rules.json> 파일을 요구 (이전엔 default '--target <dir>' → errored skip).
-			//   discovery gate 의 BR 원본 = input/business-rules.json (discovery-extraction --rules 와 동일 경로).
-			return ['--target', join(projectDir, 'input/business-rules.json'), '--json'];
+			//   scope-aware(F-R2-35): per-scope BR-split leaf → canonical → legacy input/business-rules.json.
+			return ['--target', resolveBusinessRules(projectDir, scopeCtx), '--json'];
 		case 'chain-coverage-validator':
 			return [
 				'--discovery',
@@ -149,13 +218,16 @@ export function buildValidatorArgs(validatorName, projectDir, stage) {
 		case 'plan-coverage-validator':
 			return [
 				'--task-plan',
-				join(projectDir, '.ai-context/output/task-plan.json'),
+				O('task-plan.json'),
 				'--acceptance',
-				join(projectDir, '.ai-context/output/acceptance-criteria.json'),
+				O('acceptance-criteria.json'),
 				'--json',
 			];
 		case 'test-impl-pass-validator':
-			return ['--target', projectDir, '--json'];
+			// F-R2-40: validator 인자 규약 = --project (이전 default '--target' → exit 2 usage → silent skip).
+			//   --allow-execute = test/implement gate 가 진짜 GREEN reconciliation(실 RUN) 확보 (no-simulation / i-strict / ADR-CHAIN-004 §4).
+			//   test-cmd contract 부재 시 validator 가 정직 fail(evidence_missing) = 프로젝트 책임.
+			return ['--project', projectDir, '--allow-execute', '--json'];
 		case 'static-runner':
 			return ['--target', projectDir, '--json'];
 		case 'traceability-matrix-builder':
@@ -316,10 +388,12 @@ function main() {
 		//   args 미해석/미실행으로 null → silent skip(fail-OPEN) 대신 evidence_missing(soft / --user-decision go 로 ack).
 		//   drift-validator(plugin 자기구조 검사 / 사용자 프로젝트 N/A) · test-impl-pass(CHANNEL B 직접실행) ·
 		//   static-runner(환경 의존 semgrep) 는 정직한 evidence_missing 으로 surface.
+		// F-R2-35 — 비-analysis stage 도 state.current_scope 로 per-scope 경로 해석 (analysis loadAnalysisRefs 대칭).
+		const scopeCtx = loadScopeCtx(args.target);
 		findings = aggregateForStage(
 			args.stage,
 			args.target,
-			(name, dir) => runValidator(name, dir, args.stage),
+			(name, dir) => runValidator(name, dir, args.stage, scopeCtx),
 			{ failClosedOnNull: true },
 		);
 	}

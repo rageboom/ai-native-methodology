@@ -9,7 +9,19 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-11 / TDD/unit 층 1급화 v0.36.0 / **✅ 커밋·push 완료** — `3e4624b3` 양원격 동기)
+### ★ 다음 세션 인계 (2026-06-11 / aggregator scope-aware + code_only 재배치 v0.37.0 / **미커밋** — 사용자 push 결단 대기)
+
+**이번 세션 성과 (plugin.json v0.36.0 → v0.37.0 MINOR / behavior fix 3건 / DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate / 미커밋)**:
+- **ep-be-gea event 모듈 full chain 재실행(run #2 / S2 / 외부격리·commit❌)**: 개선 플러그인 v0.36.0 으로 analysis→implement 6 stage + gate #0~#5 fresh 완주(terminal). DB 입력 = `docs/databases/*.sql` 5종(516 table·FK 11 / 직전 155·FK0 대비 입력 갱신·FK relationship_label 첫 산출). UNIT 층 1급화 검증(DrawNumberGenerator·MaskingUtils 핀 / mock-soundness sound) + test-recovery 가드 2회차 corroboration(stale EventRestServiceTest 3-fail 증거 부적격). artifact-graph 152 node/258 edge·cycle 0. forward 0.417(23 AC 중 13 GREEN / real-DB 4+human-review 2+augmentation carry = 정직 천장). finding 45건(F-R2-01~44) 한 파일 누적 + 6분류 일괄 처리.
+- **본체 결함 3건 수정 (사용자 "지금 수정" 승인 / F-R2-35+40+32)**:
+  - **F-R2-35(high)**: findings-aggregator 비-analysis 5 stage(discovery~implement) 경로 per-scope/canonical-global 미인지(analysis 만 DEC-2026-06-06 scope-aware) → optional `scopeCtx` overlay(null=평면 byte-identical 무회귀 / 주입=per-scope→canonical→legacy existsSync) + loadScopeCtx + runValidator/main 배선. 실증 discovery 3/3·plan 2/2 ok 복구. F13·F15 family.
+  - **F-R2-40(medium)**: test-impl-pass `--target`→`--project`+`--allow-execute` + package.json test glob 교정(build-validator-args CI 누락).
+  - **F-R2-32(high / senior GO@0.82)**: characterization code_only=high(v8.7)가 analysis-only validator 에서 S2/S3 gate#0 구조 차단 → medium 환원. senior 교정 = R15 진짜 방어는 chain-4 아닌 같은 validator Layer 3 evidence cross-check critical(self-recorded-fact 함정 회피).
+- **검증**: findings-aggregator 57/57 · characterization-coverage-validator 22/22 · release-readiness 자체테스트 27/27 · release-readiness gate v0.37.0(README sync fix 후 재확인 중).
+- **carry / 다음**: ① **양 remote push 사용자 결단**(트리 미커밋 / methodology repo). ② 나머지 본체 결함 6건(F-R2-01 state.schema·07 semgrep 룰·28 manifest enum·29 char validator drift·41 junit-xml 멀티모듈·44 graph-synth STORY/UNIT edge) backlog. ③ ep-be-gea real-DB 천장(AC-007/016/017/022 = SQL Server testcontainer) + human-review 2(AC-005 /test 무가드·AC-019 확정취소 가드). ④ event 외 scope(biztrip/welfare/reservation 나머지).
+- ⚠️ 직전 인계(아래) = v0.36.0 TDD/unit 층(`3e4624b3` push 완료). 본 v0.37.0 은 그 위 미커밋 델타.
+
+### ★ (직전) 다음 세션 인계 (2026-06-11 / TDD/unit 층 1급화 v0.36.0 / **✅ 커밋·push 완료** — `3e4624b3` 양원격 동기)
 
 **이번 세션 성과 (plugin.json v0.35.0 → v0.36.0 MINOR / ✅ 커밋·push 완료 / 트리 clean)**:
 - **TDD/unit 층 1급화 — UNIT-* 전체 스레드** (DEC-2026-06-11-tdd-unit-layer-thread): behavior(BDD) 단일 스레드에 나란히 도는 TDD/unit 층(`UNIT-*`=DO-178C LLR rung) 1급화. ep-be-gea event dogfood 가 노출한 갭(composition 이 mock 한 빌딩블록의 격리 유닛테스트 부재="GREEN 인데 거짓 안심")이 본체 변경으로 귀결.

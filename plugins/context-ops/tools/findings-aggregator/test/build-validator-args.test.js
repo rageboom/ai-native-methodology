@@ -68,6 +68,39 @@ describe('buildValidatorArgs — non-analysis wiring completeness', () => {
 	});
 });
 
+// F-R2-40 — test-impl-pass-validator 인자 규약 (--project / --allow-execute, NOT --target)
+describe('buildValidatorArgs — test-impl-pass-validator (F-R2-40)', () => {
+	it('test-impl-pass-validator → --project + --allow-execute (NOT --target = 이전 exit 2 usage → silent skip)', () => {
+		const args = buildValidatorArgs('test-impl-pass-validator', '/p', 'implement');
+		assert.ok(args.includes('--project'), 'validator 인자 규약 = --project');
+		assert.ok(args.includes('--allow-execute'), 'GREEN reconciliation 실 RUN (no-simulation/i-strict)');
+		assert.ok(!args.includes('--target'), '--target = 이전 usage-error 유발 default 아님');
+		assert.ok(args.includes('/p'), '--project 값 = projectDir');
+	});
+});
+
+// F-R2-35 — 비-analysis stage scope-aware overlay (scopeCtx 주입 시 per-scope / null 시 평면 무회귀)
+describe('buildValidatorArgs — scope-aware overlay (F-R2-35)', () => {
+	const tail2 = (args) => args.map((a) => a.split('/').slice(-2).join('/'));
+	it('scopeCtx=null → 평면 .ai-context/output 경로 (backward-compat byte-identical)', () => {
+		const args = buildValidatorArgs('chain-coverage-validator', '/p', 'spec', null);
+		assert.ok(args.some((a) => a.endsWith('.ai-context/output/discovery-spec.json')), 'flat 경로 유지');
+		assert.ok(args.some((a) => a.endsWith('.ai-context/output/behavior-spec.json')));
+	});
+	it('scopeCtx 주입 + per-scope 파일 부재 → flat fallback (graceful)', () => {
+		// /p 에 .ai-context/event/spec/behavior-spec.json 실재 ❌ → existsSync false → flat fallback.
+		const args = buildValidatorArgs('chain-coverage-validator', '/p', 'spec', { scope: 'event' });
+		assert.ok(
+			args.some((a) => a.endsWith('.ai-context/output/behavior-spec.json')),
+			'per-scope 파일 부재 시 flat output/ 으로 graceful fallback (fail-closed 아닌 정직 해석)',
+		);
+	});
+	it('br-cross scopeCtx=null → legacy input/business-rules.json (무회귀)', () => {
+		const args = buildValidatorArgs('br-cross-consistency-validator', '/p', 'discovery', null);
+		assert.ok(args.some((a) => a.endsWith('input/business-rules.json')), 'null 시 legacy 경로 보존');
+	});
+});
+
 // F-DOGFOOD-014 — analysis-extraction-validator evidence-scan 배선 (analysis stage)
 describe('buildAnalysisArgs — analysis-extraction-validator evidence-scan', () => {
 	it('REQUIRED.analysis 에 analysis-extraction-validator 포함 + evidence-scan args 형태', async () => {
