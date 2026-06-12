@@ -43,6 +43,7 @@ export function buildHtml(graph, freshness, opts = {}) {
 		read(join(CHAIN_SRC, 'impact-analyzer.js')),
 		read(join(CHAIN_SRC, 'centrality.js')),
 		read(join(__dirname, 'layout.js')),
+		read(join(__dirname, 'explore.js')),
 	].join('\n');
 
 	const graphJson = scriptSafe(JSON.stringify(graph));

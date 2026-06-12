@@ -53,8 +53,15 @@ body { display: flex; flex-direction: column; height: 100vh; color: #1f2937; bac
 .node.state-deprecated { opacity: .5; }
 .node text { font-size: 10px; fill: #374151; pointer-events: none; paint-order: stroke; stroke: #fafafa; stroke-width: 3px; stroke-linejoin: round; }
 .node.dim { opacity: .12; }
-.node.origin circle { stroke: #2563eb; stroke-width: 3.5px; }
+/* 탐색 모드 — 펼칠 자식이 있는(아직 안 펼친) 노드: 굵은 청록 링 + 펼침 힌트 */
+.node.expandable circle { stroke: #0891b2; stroke-width: 3px; r: 9px; }
+/* 선택 경로/서브트리 노드 — 노랑 링 (강조 라인과 통일) */
+.node.online circle { stroke: #eab308; stroke-width: 2.5px; }
+/* 선택(origin) — expandable/online 뒤에 둬서 선택 시 우선 적용 (진한 노랑/호박 굵은 링) */
+.node.origin circle { stroke: #a16207; stroke-width: 4px; }
 .edge { fill: none; stroke: #c7cdd6; stroke-width: 1.2px; }
 .edge.soft { stroke-dasharray: 4 3; }
 .edge.dim { opacity: .06; }
 .edge.impact { stroke-width: 2px; }
+/* 선택 노드의 경로/서브트리 라인 강조 — 노랑 */
+.edge.sel { stroke: #eab308; stroke-width: 3px; opacity: 1; }

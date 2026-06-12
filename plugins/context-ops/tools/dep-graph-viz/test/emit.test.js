@@ -25,6 +25,8 @@ test('재사용 결정론 알고리즘이 인라인된다', () => {
 	assert.ok(html.includes('function analyzeImpact'), 'impact-analyzer 인라인');
 	assert.ok(html.includes('function topKImpactRoot') || html.includes('topKImpactRoot'), 'centrality 인라인');
 	assert.ok(html.includes('function computeLayout'), 'layout 인라인');
+	assert.ok(html.includes('function tidyTreeRows'), 'explore 인라인 (드릴다운/색상)');
+	assert.ok(html.includes('function colorOf'), 'explore colorOf 인라인');
 });
 
 test('그래프 데이터 + 합성 노드가 embed 된다', () => {

@@ -11,11 +11,13 @@ test('chain subkind → stage column 순서', () => {
 	assert.equal(columnOf({ artifact_kind: 'chain', artifact_subkind: 'IMPL' }), 5);
 });
 
-test('code/contract leaf → column 6, symbol → column 7', () => {
+test('code→6, contract(API)→7(분리), symbol→8', () => {
 	assert.equal(columnOf({ artifact_kind: 'code', artifact_subkind: 'code' }), 6);
-	assert.equal(columnOf({ artifact_kind: 'contract', artifact_subkind: 'contract' }), 6);
-	assert.equal(columnOf({ artifact_kind: 'symbol', artifact_subkind: 'method' }), 7);
-	assert.equal(COLUMN_LABELS.length, 8);
+	assert.equal(columnOf({ artifact_kind: 'contract', artifact_subkind: 'contract' }), 7); // API/계약 전용 컬럼
+	assert.equal(columnOf({ artifact_kind: 'symbol', artifact_subkind: 'method' }), 8);
+	assert.equal(COLUMN_LABELS.length, 9);
+	assert.equal(COLUMN_LABELS[6], 'code');
+	assert.equal(COLUMN_LABELS[7], 'contract');
 });
 
 test('lane 분리 — plan/main/analysis/aspect', () => {
