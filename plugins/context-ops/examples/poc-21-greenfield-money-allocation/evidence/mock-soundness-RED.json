@@ -1,0 +1,28 @@
+{
+  "phase": "RED",
+  "scenario": "greenfield",
+  "provenance": "designed_from_spec",
+  "tool": "spec-test-link-validator/validateMockSoundness (real / no-simulation)",
+  "collaborators_checked": [
+    "UNIT-ALLOC-001",
+    "UNIT-FORMAT-001"
+  ],
+  "waived_exempt": [
+    "UNIT-RECEIPT-DTO-001"
+  ],
+  "findings": [
+    {
+      "kind": "unit.mock.unsound",
+      "severity": "high",
+      "tc_id": "TC-RECEIPT-COMP-001",
+      "collaborator_unit_ref": "UNIT-FORMAT-001",
+      "message": "TC TC-RECEIPT-COMP-001 mocks UNIT-FORMAT-001 but UNIT-FORMAT-001 has no test_layer=unit TC — mock = unverified assumption (propose-only / soft / DEC-2026-06-11)"
+    }
+  ],
+  "summary": {
+    "total_findings": 1,
+    "high": 1
+  },
+  "simulated_evidence_count": 0,
+  "note": "UNIT-FORMAT-001 unit TC 부재 → composition FORMAT mock = unsound(1 high). ALLOC=sound(unit TC 보유) / DTO=waived 면제."
+}

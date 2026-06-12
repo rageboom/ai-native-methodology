@@ -1,0 +1,20 @@
+{
+  "phase": "GREEN",
+  "scenario": "greenfield",
+  "provenance": "designed_from_spec",
+  "tool": "spec-test-link-validator/validateMockSoundness (real / no-simulation)",
+  "collaborators_checked": [
+    "UNIT-ALLOC-001",
+    "UNIT-FORMAT-001"
+  ],
+  "waived_exempt": [
+    "UNIT-RECEIPT-DTO-001"
+  ],
+  "findings": [],
+  "summary": {
+    "total_findings": 0,
+    "high": 0
+  },
+  "simulated_evidence_count": 0,
+  "note": "UNIT-FORMAT-001 unit TC 추가 → 0 findings(sound). ≥2 협력자(ALLOC·FORMAT) 핀 + ≥1 waived(DTO) 면제 = 조건④ breadth."
+}

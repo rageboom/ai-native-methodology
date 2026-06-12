@@ -33,7 +33,7 @@ evidence = `evidence/test-impl-{red,green}.json`. **동일 test 파일 불변**(
 - ✅ **①** designed_from_spec greenfield RED→GREEN 실코드 E2E (위 증거).
 - ✅ **②** in-repo 재현가능 2nd 도메인 (본 committed PoC = ep-be-gea 외부·재현0 다리를 끊음).
 - ⏸ **③** mutation_score(Stryker) — 후속 증분(senior fix #3 = ① 희석 회피로 분리).
-- ⏸ **④** mock-soundness ≥2 collaborator + waived breadth — 후속.
+- ✅ **④** mock-soundness breadth — 실 `validateMockSoundness`(no-simulation)로 **≥2 협력자**(UNIT-ALLOC-001 sound + UNIT-FORMAT-001 RED→GREEN) + **1 waived**(UNIT-RECEIPT-DTO-001 면제) 실증. composition `allocateReceipt` 가 DI 로 3 협력자 mock. evidence = `evidence/mock-soundness-{RED,GREEN}.json` / 재현기 `evidence/run-mock-soundness.mjs`. ※ full UC→BHV→AC SDLC chain 은 unit-layer scope 밖(fixture=mock-soundness 입력 test_layer/class_ref/mocks 만).
 - ⏸ **⑤** promotion DEC + criteria_total 42→43 + HARD flip 시행 — PoC 외부 본체 작업.
 
 ## 산출물 / 검증
@@ -49,5 +49,8 @@ evidence = `evidence/test-impl-{red,green}.json`. **동일 test 파일 불변**(
 ## 재현
 
 ```sh
-cd target && node --test    # GREEN: 7 pass / 0 fail
+cd target && node --test                 # GREEN: 12 pass / 0 fail (7 allocate + 3 formatMoney + 2 composition)
+node ../evidence/run-mock-soundness.mjs   # 조건④: RED 1 unsound → GREEN 0 (sound)
 ```
+
+> UNIT: UNIT-ALLOC-001(required)·UNIT-FORMAT-001(required)·UNIT-RECEIPT-DTO-001(waived) — 전부 `designed_from_spec`. composition `allocateReceipt` = 빌딩블록 조합(UNIT 아님).

@@ -25,6 +25,25 @@
       "bc_ref": "BC-ALLOC",
       "invariant_refs": ["BR-ALLOC-CONSERVATION-001", "BR-ALLOC-REMAINDER-002", "BR-ALLOC-VALIDATION-003", "BR-ALLOC-PROPORTION-004"],
       "unit_test_obligation": "required"
+    },
+    {
+      "id": "UNIT-FORMAT-001",
+      "name": "formatMoney (정수 cents → 표시 문자열 $D.CC)",
+      "provenance": "designed_from_spec",
+      "kind": "function",
+      "code_pointer": { "path": "target/src/formatMoney.mjs", "anchor_type": "ast_symbol", "symbol": "formatMoney", "stale": false },
+      "bc_ref": "BC-ALLOC",
+      "unit_test_obligation": "required"
+    },
+    {
+      "id": "UNIT-RECEIPT-DTO-001",
+      "name": "makeReceiptLine (순수 데이터 홀더 {label, money})",
+      "provenance": "designed_from_spec",
+      "kind": "function",
+      "code_pointer": { "path": "target/src/receiptLine.mjs", "anchor_type": "ast_symbol", "symbol": "makeReceiptLine", "stale": false },
+      "bc_ref": "BC-ALLOC",
+      "unit_test_obligation": "waived",
+      "waiver_reason": "pure data holder / no branch logic (mock-soundness 면제)"
     }
   ],
   "coverage": {
