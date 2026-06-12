@@ -262,11 +262,25 @@ export function validateCodePointers(
 				artifact_id: node.id,
 				message: `${node.id} 는 code_pointers_na=true 이면서 code_pointers ${pointers.length} 개 보유 — 의도 모호`,
 			});
+			// na=true 라도 stray pointer 의 존재성은 검증한다 (F-EVENT-CARRY-DANGLING).
+			//   기존엔 아래 `if (na) continue` 가 검증을 통째 skip → dangling strict_path
+			//   (RED 단계 `.pending` placeholder 등)가 na_conflict(low) 로만 흘러 path_missing gate 를 우회했음.
+			//   coverage 는 여전히 explicitNA 로 집계(아래 분기) — '검증' 과 'coverage' 를 분리.
+			for (const pointer of pointers) {
+				pointersChecked++;
+				const pointerFindings = validateOnePointer(pointer, {
+					repoRoot,
+					opts,
+				});
+				for (const f of pointerFindings) {
+					findings.push({ ...f, artifact_id: node.id });
+				}
+			}
 		}
 
 		if (na) {
 			explicitNA++;
-			continue; // pointer 검증 skip
+			continue; // coverage = explicitNA. pointer 존재검증은 위 na_conflict 분기에서 수행.
 		}
 
 		covered++;

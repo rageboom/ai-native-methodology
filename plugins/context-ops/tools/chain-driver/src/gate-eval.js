@@ -52,6 +52,12 @@ const REQUIRED_VALIDATORS_PER_STAGE = {
 		//   release-readiness #15 와 동일 검사이나 그건 최종 release 시점뿐이라 단계 gate 에서 orphan 이 silent 통과했음
 		//   (STORY 전수 고립 + pending TC 미연결). implement 에서만 = full chain(6 layer) 완성 시점이라 orphan 오탐 없음.
 		'graph-integrity-validator',
+		// F-EVENT-CARRY-DANGLING — code_pointer.path_missing(strict_path 실재성) blocking 을 implement gate 로 승격.
+		//   graph-integrity(#15) 와 동일 구조: release-readiness #12 검사였으나 release 시점뿐이라 단계 gate 에서
+		//   dangling code_pointer(plan 단계 src/main/java↔resources 소스루트 오타 + RED `.pending` placeholder 미재앵커)가
+		//   silent 통과했음. implement = full chain 완성 + 실 코드 존재 시점 → strict 모드로 path_missing→high(gating).
+		//   (caller findings-aggregator 가 --strict 로 실행 / transformGeneric summary.high 매핑.)
+		'code-pointer-validator',
 	],
 };
 // v2.4.0 — discovery(planning) stage 안 br-cross-consistency-validator 추가 (ADR-CHAIN-011 §5.6 정합).

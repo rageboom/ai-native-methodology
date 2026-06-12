@@ -467,9 +467,10 @@ export function validateSpConversions(taskPlan) {
 
 // ──────────────────────────────────────────────────────────────────────
 // 8. v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — TDD/unit 층 obligation.
-//   task 가 unit_refs(빌딩블록 바인딩) 보유인데 unit_test_obligation 미선언 시 medium finding.
-//   ★ SOFT — medium = cli exit-code 비차단(blocking = critical|high only). §8.1 ratchet —
-//     ≥2 distinct 도메인 PoC 후 layer-keyed 하드게이트 격상(별도 DEC).
+//   task 가 unit_refs(빌딩블록 바인딩) 보유인데 unit_test_obligation 미선언 시 high finding.
+//   ★ HARD (v0.40.0 / DEC-2026-06-12-unit-layer-hard-flip 조건⑤) — high = cli exit-code 차단(blocking = critical|high).
+//     §8.1 ratchet 충족(ep-be-gea S2 + poc-18 S2 + poc-21 greenfield = 3 distinct 도메인) → SOFT→HARD 격상.
+//     provenance-무관 hygiene 검사(의무 선언 완전성 / designed_from_spec·characterized_from_code 무관).
 // ──────────────────────────────────────────────────────────────────────
 export function validateUnitTestObligation(taskPlan) {
 	const findings = [];
@@ -479,10 +480,10 @@ export function validateUnitTestObligation(taskPlan) {
 		if (unitRefs.length > 0 && !t.unit_test_obligation) {
 			findings.push({
 				kind: 'plan.task.unit_obligation_missing',
-				severity: 'medium',
+				severity: 'high',
 				task_id: t.id,
 				unit_count: unitRefs.length,
-				message: `TASK ${t.id} binds ${unitRefs.length} UNIT-* (unit_refs) but unit_test_obligation 미선언 (TDD/unit 층 propose-only / soft / DEC-2026-06-11 §8.1)`,
+				message: `TASK ${t.id} binds ${unitRefs.length} UNIT-* (unit_refs) but unit_test_obligation 미선언 (TDD/unit 층 HARD / blocking / DEC-2026-06-12-unit-layer-hard-flip 조건⑤)`,
 			});
 		}
 	}

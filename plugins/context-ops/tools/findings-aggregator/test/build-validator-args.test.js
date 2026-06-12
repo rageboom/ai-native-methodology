@@ -21,6 +21,29 @@ describe('buildValidatorArgs (F2 fix — plan-coverage wiring)', () => {
 		const args = buildValidatorArgs('some-unknown-validator', '/proj');
 		assert.deepEqual(args, ['--target', '/proj', '--json']);
 	});
+
+	// F-EVENT-CARRY-DANGLING — code-pointer-validator 는 positional <graph> + --repo-root + --strict 계약 (NOT default --target).
+	it('code-pointer-validator → positional graph + --repo-root + --strict (NOT default --target)', () => {
+		const args = buildValidatorArgs('code-pointer-validator', '/proj');
+		assert.ok(
+			args[0].endsWith('artifact-graph.json'),
+			'positional 첫 인자 = artifact-graph.json',
+		);
+		assert.ok(args.includes('--repo-root'), 'has --repo-root');
+		assert.equal(args[args.indexOf('--repo-root') + 1], '/proj', '--repo-root <projectDir>');
+		assert.ok(args.includes('--strict'), 'strict 모드 — path_missing→high(gating)');
+		assert.deepEqual(args.slice(-2), ['--format', 'json'], '--format json');
+		assert.ok(!args.includes('--target'), 'no generic --target (graph-integrity 와 상이 — 명시 케이스)');
+	});
+
+	// scope-aware: scopeCtx 주입 시 per-scope impl/ 경로로 graph 해석 (F-R2-35 정합).
+	it('code-pointer-validator — scopeCtx 주입 시 per-scope impl/artifact-graph.json (존재 시)', () => {
+		// scopeCtx 경로가 디스크에 없으면 flat output/ fallback → 최소한 artifact-graph.json 로 끝남을 보장.
+		const args = buildValidatorArgs('code-pointer-validator', '/proj', 'implement', {
+			scope: 'event',
+		});
+		assert.ok(args[0].endsWith('artifact-graph.json'));
+	});
 });
 
 // stage-aware schema args (surfaced fix): schema-validator 는 stage 별 산출물을 검증해야 함
@@ -57,6 +80,8 @@ describe('buildValidatorArgs — non-analysis wiring completeness', () => {
 		const args = buildValidatorArgs('spec-test-link-validator', '/p', 'test');
 		assert.ok(args.includes('--behavior'), '--behavior 동반');
 		assert.ok(args.some((a) => a.endsWith('behavior-spec.json')));
+		assert.ok(args.includes('--unit-spec'), '--unit-spec 동반 (v0.40.0 mock-soundness HARD flip)');
+		assert.ok(args.some((a) => a.endsWith('unit-spec.json')), 'unit-spec.json 경로 해석');
 	});
 	it('traceability-matrix-builder → full chain + --json (이전 default --target = errored skip)', () => {
 		const args = buildValidatorArgs('traceability-matrix-builder', '/p', 'implement');

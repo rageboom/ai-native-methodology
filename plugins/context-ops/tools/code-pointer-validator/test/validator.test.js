@@ -121,6 +121,34 @@ describe('coverage — code_pointers OR code_pointers_na 의무', () => {
 		assert.ok(conflict);
 		assert.equal(conflict.severity, 'low');
 	});
+
+	it('NA + dangling strict_path → na_conflict 와 별개로 path_missing 도 emit (F-EVENT-CARRY-DANGLING)', () => {
+		// 회귀: 기존엔 na=true 가 pointer 검증을 통째 skip → dangling 경로가 na_conflict(low) 로만 흘러 gate 우회.
+		const graph = {
+			nodes: [
+				node('TC-001', {
+					code_pointers_na: true,
+					code_pointers: [
+						{ path: 'does/not/exist.pending.java', anchor_type: 'strict_path' },
+					],
+				}),
+			],
+		};
+		const r = validateCodePointers(graph);
+		assert.ok(
+			r.findings.find((f) => f.kind === 'code_pointer.na_conflict'),
+			'na_conflict 유지',
+		);
+		const pm = r.findings.find((f) => f.kind === 'code_pointer.path_missing');
+		assert.ok(pm, 'dangling strict_path 가 path_missing 으로 표면화되어야 함');
+		assert.equal(pm.artifact_id, 'TC-001');
+		// --strict 에서 gating(high) 으로 격상
+		const rs = validateCodePointers(graph, { opts: { strict: true } });
+		const pmStrict = rs.findings.find(
+			(f) => f.kind === 'code_pointer.path_missing',
+		);
+		assert.equal(pmStrict.severity, 'high');
+	});
 });
 
 // ============================================================================

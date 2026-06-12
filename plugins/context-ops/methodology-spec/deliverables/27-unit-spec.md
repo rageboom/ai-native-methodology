@@ -38,19 +38,19 @@
 | 도구 | 검증 |
 | --- | --- |
 | schema-validator | unit-spec.schema.json (waived → waiver_reason 의무 if/then) |
-| **spec-test-link-validator** `validateMockSoundness` | composition TC mock → collaborator UNIT 의 test_layer=unit TC 존재 (soft / 현 비차단) |
-| **plan-coverage-validator** `validateUnitTestObligation` | layer∈{domain,application,be(non-API)} task unit_refs → obligation (soft) |
+| **spec-test-link-validator** `validateMockSoundness` | composition TC mock → collaborator UNIT 의 test_layer=unit TC 존재 (**v0.40.0 HARD / 차단** / DEC-2026-06-12-unit-layer-hard-flip) |
+| **plan-coverage-validator** `validateUnitTestObligation` | layer∈{domain,application,be(non-API)} task unit_refs → obligation (**v0.40.0 HARD / 차단**) |
 | traceability-matrix-builder | UNIT join → matrix `unit_id`/`unit_test_id` + coverage_summary.unit_coverage |
 | codegraph-coverage `buildMethodAxis` | method-axis 보강 (**reference-lens / propose-only / 게이트 ❌** / DEC-2026-05-28 불변) |
 
 ## 5. 신뢰 분리 (결정 1)
 
-- **spec 파생 UNIT** (domain/formal-spec = 결정론) = chain-internal 게이트 후보 (단 §8.1 ratchet — 현 soft).
+- **spec 파생 UNIT** (domain/formal-spec = 결정론) = chain-internal 게이트 (obligation·mock = **v0.40.0 HARD** / DEC-2026-06-12-unit-layer-hard-flip / §8.1 3-도메인 충족).
 - **code-graph method-axis** = reference-lens·propose-only / 게이트 주입 영구 ❌. `coverage.method_axis_corroboration.reference_lens=const true` 로 구조적 차단.
 
 ## 6. §8.1 ratchet
 
-ep-be-gea = PoC #1. 스캐폴딩(스키마/필드/노드) now / 강제(mock-soundness·unit-coverage 하드게이트)는 ≥2 distinct 도메인 PoC 후 별도 DEC. 현 검증기 = soft finding (`REQUIRED_VALIDATORS_PER_STAGE` 미편입 = 비차단).
+§8.1 ≥2 distinct 도메인 충족(ep-be-gea S2/Java + poc-18 S2/TS + poc-21 greenfield/JS = 3 도메인) → **obligation(plan gate#3)·mock-soundness(test gate#4) HARD 차단 격상**(v0.40.0 / DEC-2026-06-12-unit-layer-hard-flip). unit-coverage(matrix `obligation_satisfied_ratio` advisory)·method-axis·mutation_score = **reference-lens 유지**(비차단 / 영구 propose-only / DEC-2026-05-28).
 
 ## 7. additive / 무회귀
 

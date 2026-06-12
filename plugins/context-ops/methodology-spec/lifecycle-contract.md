@@ -218,7 +218,7 @@ input (test stage 가 받음):
 
 spec-test-link-validator = AC→TC 1:N 정합 + framework match (analysis-source-inventory) + coverage ≥ 0.85.
 
-> **TDD/unit 층**: behavior 스레드와 나란히 **unit-spec.json** (deliverable 27 / `schemas/unit-spec.schema.json` / `UNIT-*`) 운반. **emit 단계 = provenance 별**: S2(레거시)=**analysis** 단계에서 `code-graph ∩ domain.behaviors` 발견(characterized_from_code) / greenfield·S1=**spec** 단계에서 `formal-spec.invariants` 설계(designed_from_spec). test 단계는 `test_layer=unit` TC 로 UNIT 을 검증(class_ref) + composition TC 의 `mocks[]` 로 mocking-soundness. 검증기 = `validateMockSoundness`(spec-test-link) + `validateUnitTestObligation`(plan-coverage) = **현 soft/비차단** (≥2 PoC 후 하드게이트). 신뢰 분리: spec 파생 UNIT=게이트 후보 / code-graph method-axis=reference-lens·propose-only(영구 비-게이트). SSOT = `methodology-spec/policies/test-layering.md`.
+> **TDD/unit 층**: behavior 스레드와 나란히 **unit-spec.json** (deliverable 27 / `schemas/unit-spec.schema.json` / `UNIT-*`) 운반. **emit 단계 = provenance 별**: S2(레거시)=**analysis** 단계에서 `code-graph ∩ domain.behaviors` 발견(characterized_from_code) / greenfield·S1=**spec** 단계에서 `formal-spec.invariants` 설계(designed_from_spec). test 단계는 `test_layer=unit` TC 로 UNIT 을 검증(class_ref) + composition TC 의 `mocks[]` 로 mocking-soundness. 검증기 = `validateMockSoundness`(spec-test-link / test gate#4) + `validateUnitTestObligation`(plan-coverage / plan gate#3) = **v0.40.0 HARD 차단**(§8.1 3-도메인 충족 / provenance-무관 hygiene). 신뢰 분리: spec 파생 UNIT obligation·mock=게이트(HARD) / unit-coverage matrix ratio·code-graph method-axis·mutation=reference-lens·propose-only(영구 비-게이트). SSOT = `methodology-spec/policies/test-layering.md`.
 
 ### chain 5 (구현) — implement stage (i-strict / chain harness 안에서 round-trip 정식 허용)
 

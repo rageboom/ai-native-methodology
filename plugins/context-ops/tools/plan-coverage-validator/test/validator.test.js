@@ -959,12 +959,12 @@ describe('validateSpConversions (v11.3.0)', () => {
 import { validateUnitTestObligation } from '../src/validator.js';
 
 describe('v0.36.0 validateUnitTestObligation', () => {
-	it('unit_refs 보유 + obligation 미선언 → medium finding (soft)', () => {
+	it('unit_refs 보유 + obligation 미선언 → high finding (blocking / v0.40.0 HARD flip)', () => {
 		const tp = { tasks: [{ id: 'TASK-X-001', unit_refs: ['UNIT-X-001'] }] };
 		const r = validateUnitTestObligation(tp);
 		assert.equal(r.findings.length, 1);
 		assert.equal(r.findings[0].kind, 'plan.task.unit_obligation_missing');
-		assert.equal(r.findings[0].severity, 'medium');
+		assert.equal(r.findings[0].severity, 'high');
 	});
 	it('obligation 선언 시 finding 0', () => {
 		const tp = { tasks: [{ id: 'TASK-X-001', unit_refs: ['UNIT-X-001'], unit_test_obligation: 'required' }] };

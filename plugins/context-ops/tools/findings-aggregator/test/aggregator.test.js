@@ -61,6 +61,8 @@ describe('REQUIRED_VALIDATORS_PER_STAGE', () => {
 			'static-runner',
 			'traceability-matrix-builder',
 			'graph-integrity-validator',
+			// F-EVENT-CARRY-DANGLING — code_pointer.path_missing(strict_path 실재성) gate 승격.
+			'code-pointer-validator',
 		]);
 	});
 });

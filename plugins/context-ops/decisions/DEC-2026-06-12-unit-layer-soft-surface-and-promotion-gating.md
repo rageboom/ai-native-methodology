@@ -54,6 +54,7 @@ corroboration DEC 가 §8.1 precondition(≥2 distinct 도메인 = ep-be-gea + p
 
 ## carry
 
+- ✅ **SHIPPED (v0.40.0 / `DEC-2026-06-12-unit-layer-hard-flip`)**: 5조건 ①②③④ 충족(poc-21) 후 ⑤ 시행 = HARD flip 완료. 단 ⑤의 "criteria_total 42→43 + 신규 unit-mock reference-lens trust check" 하위조건은 raw-source 분석이 전제(trust 충돌)를 반증 → **42 유지로 supersede**(mock-soundness=spec-side 의도된 게이트 / method-axis·mutation 은 allowlist 밖 구조적 제외). 상세 = hard-flip DEC §count-coupling.
 - HARD flip(LEVER B + LEVER A step[A][B][C]) = 위 5조건 충족 후 후속 promotion DEC.
 - trust 불변식 보존: spec 파생 UNIT 만 게이트 후보 / code-graph method-axis·mutation = 영구 reference-lens(DEC-2026-05-28 / check34/36/37/39 무수정).
 - 버전 bump + CHANGELOG = release 시(LEVER C 본체 tool additive behavior = MINOR 후보 / 미커밋).

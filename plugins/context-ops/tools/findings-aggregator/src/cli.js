@@ -105,6 +105,7 @@ const STAGE_SUBDIR = {
 	'impl-spec.json': 'impl',
 	'traceability-matrix.json': 'impl',
 	'matrix.json': 'impl',
+	'artifact-graph.json': 'impl', // F-EVENT-CARRY-DANGLING — code-pointer-validator/graph 입력 (per-scope impl/)
 };
 
 // state.json.current_scope → scopeCtx (analysis loadAnalysisRefs 대칭 / 비-analysis runtime 용).
@@ -204,6 +205,8 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 			}
 		case 'spec-test-link-validator':
 			// --behavior 누락 시 bhv_ref 미해석 → TC 당 false critical (hard block). behavior-spec 동반 필수.
+			// --unit-spec (v0.40.0 / DEC-2026-06-12-unit-layer-hard-flip 조건⑤): mock-soundness(unit.mock.unsound / high)를
+			//   result.findings 로 병합 → gate-eval validator_high HARD_BLOCK 합류. unit-spec 부재 PoC = loadJson null → 0 findings(무영향).
 			return [
 				'--acceptance',
 				O('acceptance-criteria.json'),
@@ -211,6 +214,8 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 				O('test-spec.json'),
 				'--behavior',
 				O('behavior-spec.json'),
+				'--unit-spec',
+				O('unit-spec.json'),
 				'--json',
 			];
 		// F2 fix (dogfood): plan-coverage-validator case 부재 → default '--target' 인자로 호출되어
@@ -246,6 +251,18 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 			return ['--target', projectDir, '--json'];
 		case 'formal-spec-link-validator':
 			return ['--target', projectDir, '--json'];
+		// F-EVENT-CARRY-DANGLING — code_pointer strict_path 실재성 gate (implement).
+		//   positional <artifact-graph.json> + --repo-root <projectDir> 계약 (graph-integrity 의 --target 와 상이 → 명시 케이스 필수).
+		//   --strict: path_missing/glob_no_match/coverage_missing 을 high 로 격상 → transformGeneric summary.high → gate-eval validator_high(block).
+		case 'code-pointer-validator':
+			return [
+				O('artifact-graph.json'),
+				'--repo-root',
+				projectDir,
+				'--strict',
+				'--format',
+				'json',
+			];
 		default:
 			return ['--target', projectDir, '--json'];
 	}

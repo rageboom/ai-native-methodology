@@ -208,9 +208,9 @@ export function validateSpecTestLink(
 // v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread) — mocking-soundness 계약.
 //   composition TC 가 mock 한 협력자 UNIT 은 자기 test_layer=unit TC 로 핀될 때만 건전.
 //   = Fowler "Mocks Aren't Stubs"의 위험('green but mask inherent errors') 형식화 + CDC 합성.
-//   ★ SOFT / propose-only — 별도 함수 + cli --unit-spec opt-in 경로로만 호출.
-//     gate #4 의 validateSpecTestLink 결과(exit-code 결정)에는 미포함 → 비차단(§8.1 ratchet).
-//     ≥2 distinct 도메인 PoC corroboration 후 하드게이트 격상(별도 DEC).
+//   ★ HARD (v0.40.0 / DEC-2026-06-12-unit-layer-hard-flip 조건⑤) — cli --unit-spec 시 result.findings 로 병합 →
+//     gate #4 validateSpecTestLink exit-code(critical|high 차단) + gate-eval validator_high HARD_BLOCK 합류.
+//     §8.1 ratchet 충족(ep-be-gea S2 + poc-18 S2 + poc-21 greenfield = 3 도메인) → SOFT→HARD. provenance-무관 hygiene(mock 건전성 / waived 면제 존중).
 // ──────────────────────────────────────────────────────────────────────
 export function validateMockSoundness(testSpec, unitSpec) {
 	const findings = [];

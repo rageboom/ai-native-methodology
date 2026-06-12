@@ -42,6 +42,8 @@ export const REQUIRED_VALIDATORS_PER_STAGE = {
 		'traceability-matrix-builder',
 		// F-DOGFOOD-STORY-ORPHAN — gate-eval REQUIRED.implement 와 sync 의무 (dep-graph cycle/orphan/unknown blocking).
 		'graph-integrity-validator',
+		// F-EVENT-CARRY-DANGLING — gate-eval REQUIRED.implement 와 sync 의무 (code_pointer.path_missing strict_path 실재성 blocking).
+		'code-pointer-validator',
 	],
 };
 

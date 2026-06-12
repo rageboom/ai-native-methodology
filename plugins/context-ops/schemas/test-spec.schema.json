@@ -106,7 +106,7 @@
           },
           "mocks": {
             "type": "array",
-            "description": "v0.36.0 신설 — 본 TC(주로 composition)가 mock 하는 협력자 UNIT-* 목록. mocking-soundness 계약: mock 한 collaborator 는 자기 test_layer=unit TC 로 핀될 때만 건전(spec-test-link validateMockSoundness / 현 soft). 그 협력자가 unit_test_obligation=waived 면 면제. Fowler 'Mocks Aren't Stubs'의 위험('green but mask inherent errors') + Consumer-Driven Contracts 정신의 본 방법론 합성.",
+            "description": "v0.36.0 신설 — 본 TC(주로 composition)가 mock 하는 협력자 UNIT-* 목록. mocking-soundness 계약: mock 한 collaborator 는 자기 test_layer=unit TC 로 핀될 때만 건전(spec-test-link validateMockSoundness / v0.40.0 HARD 차단 / DEC-2026-06-12-unit-layer-hard-flip). 그 협력자가 unit_test_obligation=waived 면 면제. Fowler 'Mocks Aren't Stubs'의 위험('green but mask inherent errors') + Consumer-Driven Contracts 정신의 본 방법론 합성.",
             "items": {
               "type": "object",
               "required": ["collaborator_unit_ref"],

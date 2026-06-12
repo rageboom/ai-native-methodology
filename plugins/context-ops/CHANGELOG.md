@@ -10,6 +10,32 @@
 
 ---
 
+## [0.40.0] — 2026-06-12 MINOR — unit 층 HARD flip (SOFT→HARD 게이트 격상 / LEVER A·B)
+
+GATED 5조건 중 ①②③④(poc-21 greenfield designed_from_spec) 충족 후 조건⑤ 시행. unit 층 두 게이트를 SOFT→HARD 차단으로 격상. DEC-2026-06-12-unit-layer-hard-flip. workflow(senior GO + trust/count + change-spec) raw-source 실측 기반.
+
+### LEVER B — plan-coverage `validateUnitTestObligation` (plan gate #3)
+
+- `tools/plan-coverage-validator/src/validator.js:482` severity `medium`→`high`. `unit_refs` 보유 task 가 `unit_test_obligation` 미선언 시 high finding → cli exit 1 → gate-eval `validator_high` HARD_BLOCK. test:967 `'medium'`→`'high'`.
+
+### LEVER A — spec-test-link `validateMockSoundness` (test gate #4)
+
+- 4-layer isolation 해제: step[A] `findings-aggregator/src/cli.js` spec-test-link case 에 `--unit-spec` 배선 / step[B] `spec-test-link-validator/src/cli.js` ms.findings → result.findings **단일 병합** + summary recompute (구 advisory 2-객체 stdout 폐기 — aggregator default-catch 가 2-객체 JSON.parse throw 를 silent-swallow[mock high 무신호 drop]하던 함정 차단) / step[C] severity 이미 high(무변경)·exit-code 자동 합류. LAYER4 = spec-test-link 이미 test gate REQUIRED.
+- **회귀 가드**: spec-test-link 가 **unit-spec 실로드(non-null) 시에만** mock-soundness 실행 — unit-spec 부재 PoC = unit 층 미opt-in = skip(무회귀). (`validateMockSoundness` 는 waived 셋을 unit-spec 에서 뽑으므로 null 이면 거짓 unsound = 회귀였음 / empirical test 로 포착·수정.)
+
+### §8.1 / over-claim 가드
+
+- 두 게이트 = **provenance-무관 test-layer hygiene**(validator grep `provenance`=0 hit). corroboration = 3 distinct 도메인(ep-be-gea S2 + poc-18 S2 + poc-21 greenfield) ≥2. flip 정당화 = 게이트가 hygiene-키 → designed_from_spec 단일 datapoint 한계와 직교(hygiene 규율이지 paradigm 일반화 아님).
+- over-claim 가드 5항: designed_from_spec paradigm 미검증 / RED→GREEN 순서=human-carry / legacy·stateful 일반화 ❌ / method-axis·mutation=영구 reference-lens(DEC-2026-05-28) / designed_from_spec≠flip 전제.
+
+### count-coupling — criteria_total 42 유지 (GATED DEC 의 42→43 supersede)
+
+- raw-source 분석: mock-soundness=spec-side 의도된 게이트(reference-lens 아님 / check34~39 토큰 0 hit) + method-axis·mutation 은 `mergeFindings` allowlist 밖 구조적 gate-제외 → 신규 reference-lens trust check 불요. GATED DEC 의 "42→43" 전제(trust 충돌) 반증 → 42 유지(release-readiness 무회귀).
+
+### 검증
+
+- flip empirical(poc-21 fixture): LEVER A unsound mock → exit 1 + 단일 JSON(unit.mock.unsound) / unit-spec 부재 → 0(무회귀). LEVER B obligation 미선언 → exit 0→1. 도구 plan-coverage 47·spec-test-link 11·aggregator 66·chain-driver 523 GREEN · **release-readiness 42/42** · schema 3종 valid. doc(test-layering 정책 SSOT + 27-unit-spec + lifecycle-contract + 3 schema desc) obligation/mock "soft"→"HARD" reword(unit-coverage matrix·method-axis·mutation = reference-lens 유지).
+
 ## [0.39.0] — 2026-06-12 MINOR — unit 층 LEVER C soft-surface + HARD flip 5조건 게이팅 + charter R21 정합
 
 추천 일감 산출 워크플로우(8표면 75후보→dedup 19→상위5 repo 실측 검증) → 1위 = unit 층 하드게이트 promotion. 위임받은 GAP-aware 결단을 plan workflow(7 agents: LEVER A/B/C 정밀분석 + GAP-4 실측 + Senior + 업계 4사)로 수행 → **3-입력 전부 CONDITIONAL-GO 수렴** → 전면 HARD flip ❌ / NOW+GATED 2단 분리. DEC-2026-06-12-unit-layer-soft-surface-and-promotion-gating.

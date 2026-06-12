@@ -133,12 +133,12 @@
             "type": "array",
             "items": {"type": "string", "pattern": "^UNIT-[A-Z0-9_-]+-[0-9]{3}$"},
             "uniqueItems": true,
-            "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). 본 TASK 가 생성/수정하는 빌딩블록 UNIT-* (unit-spec.json) — task→class 바인딩. optional/additive. layer∈{domain,application,be(non-API)} task 가 unit_refs 보유 시 unit_test_obligation 권고(plan-coverage validateUnitTestObligation / 현 soft)."
+            "description": "v0.36.0 신설 (DEC-2026-06-11-tdd-unit-layer-thread). 본 TASK 가 생성/수정하는 빌딩블록 UNIT-* (unit-spec.json) — task→class 바인딩. optional/additive. layer∈{domain,application,be(non-API)} task 가 unit_refs 보유 시 unit_test_obligation 권고(plan-coverage validateUnitTestObligation / v0.40.0 HARD 차단 / DEC-2026-06-12-unit-layer-hard-flip)."
           },
           "unit_test_obligation": {
             "type": "string",
             "enum": ["required", "characterization_only", "waived"],
-            "description": "v0.36.0 신설 — 본 TASK 가 touch 하는 UNIT 의 유닛테스트 의무 수준 선언 (unit-spec.units[].unit_test_obligation 정합). optional/additive. 누락 + unit_refs 보유 + 순수로직 layer = soft finding(비차단 / ≥2 PoC 후 격상)."
+            "description": "v0.36.0 신설 — 본 TASK 가 touch 하는 UNIT 의 유닛테스트 의무 수준 선언 (unit-spec.units[].unit_test_obligation 정합). optional/additive. 누락 + unit_refs 보유 = high finding(차단 / v0.40.0 HARD flip / §8.1 3-도메인 충족)."
           },
           "story_ref": {
             "type": "string",

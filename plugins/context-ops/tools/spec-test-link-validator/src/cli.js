@@ -34,6 +34,21 @@ const inventory = args.inventory ? loadJson(args.inventory) : null;
 
 const result = validateSpecTestLink(behavior, acceptance, testSpec, inventory, args.threshold);
 
+// v0.40.0 — mocking-soundness HARD flip (DEC-2026-06-12-unit-layer-hard-flip / 조건⑤).
+//   --unit-spec opt-in 시 unsound mock(unit.mock.unsound / high)을 result.findings 로 **단일 병합** →
+//   exit-code(critical|high 차단) + aggregator transformGeneric(summary.high) → gate-eval validator_high HARD_BLOCK 합류.
+//   구 advisory 2-객체 stdout 폐기: 2-객체 concat 은 aggregator default-case JSON.parse 가 throw → 내부 catch silent-swallow
+//   (mock high 무신호 drop)였음. 단일 JSON + summary recompute 가 load-bearing (transformGeneric 는 summary.high 만 read).
+// ★ unit-spec 이 실제 로드된 경우(non-null)에만 — 부재 PoC = unit 층 미opt-in = mock-soundness skip(무회귀).
+//   (validateMockSoundness 는 waived 셋을 unit-spec 에서 뽑으므로 unitSpec=null 이면 모든 mock 협력자가 거짓 unsound = 회귀. loadJson(missing)=null graceful.)
+const unitSpec = args.unitSpec ? loadJson(args.unitSpec) : null;
+if (unitSpec) {
+  const ms = validateMockSoundness(testSpec, unitSpec);
+  result.findings.push(...ms.findings);
+  result.summary.high += ms.summary.high;
+  result.summary.total_findings += ms.summary.total_findings;
+}
+
 if (args.json) {
   console.log(JSON.stringify(result, null, 2));
 } else {
@@ -41,19 +56,6 @@ if (args.json) {
   console.log(`coverage AC→TC: ${(result.coverage.ac_to_tc * 100).toFixed(1)}% (threshold ${args.threshold})`);
   for (const f of result.findings) {
     console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
-  }
-}
-
-// v0.36.0 — mocking-soundness (SOFT / propose-only / 비차단 / exit code 미영향).
-//   --unit-spec opt-in 시에만. findings 는 advisory 출력 / gate-결정(result.findings)에 미포함.
-if (args.unitSpec) {
-  const unitSpec = loadJson(args.unitSpec);
-  const ms = validateMockSoundness(testSpec, unitSpec);
-  if (args.json) {
-    console.log(JSON.stringify({ mock_soundness_advisory: ms }, null, 2));
-  } else {
-    console.log(`[unit-layer / propose-only / advisory / 비차단] mock-soundness: ${ms.summary.total_findings} findings (high: ${ms.summary.high})`);
-    for (const f of ms.findings) console.log(`  (advisory) ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
   }
 }
 
