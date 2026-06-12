@@ -48,6 +48,10 @@ const REQUIRED_VALIDATORS_PER_STAGE = {
 		'test-impl-pass-validator',
 		'static-runner',
 		'traceability-matrix-builder',
+		// F-DOGFOOD-STORY-ORPHAN — dep-graph 무결성(cycle/orphan/unknown) blocking 을 implement gate 로 승격.
+		//   release-readiness #15 와 동일 검사이나 그건 최종 release 시점뿐이라 단계 gate 에서 orphan 이 silent 통과했음
+		//   (STORY 전수 고립 + pending TC 미연결). implement 에서만 = full chain(6 layer) 완성 시점이라 orphan 오탐 없음.
+		'graph-integrity-validator',
 	],
 };
 // v2.4.0 — discovery(planning) stage 안 br-cross-consistency-validator 추가 (ADR-CHAIN-011 §5.6 정합).

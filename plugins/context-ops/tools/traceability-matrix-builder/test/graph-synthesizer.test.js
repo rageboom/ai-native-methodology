@@ -884,6 +884,100 @@ describe('synthesizeGraph — v11.0.0 6-layer chain + plan 조직 + contract', (
 		);
 	});
 
+	// --- F-DOGFOOD-STORY-ORPHAN 회귀 ---
+	// 실데이터의 task.story_ref 는 파생 노드 id(STORY-<BHV suffix>)와 문자 그대로 일치하지 않는다
+	// (schema: Jira Story ID | BHV-* | 의미명 자유 string). 기존 fixture 는 story_ref 를 노드 id 로
+	// 미리 맞춰 두어 resolve 갭을 가렸다 → STORY 전수 고립 버그가 테스트를 통과해버림. 아래는 각 형태를 회귀.
+	it('groups Story→TASK: story_ref 가 의미명(title-prefix)이어도 canonical STORY 노드로 해소', () => {
+		const semantic = {
+			...v11Input,
+			taskPlan: {
+				...v11Input.taskPlan,
+				story_refs: [
+					{
+						behavior_ref: 'BHV-USER-001',
+						epic_ref: 'SCREEN-REGISTER',
+						title: 'STORY-USER-MASTER — 회원 마스터 생명주기 가드',
+					},
+				],
+				tasks: [{ ...v11Input.taskPlan.tasks[0], story_ref: 'STORY-USER-MASTER' }],
+			},
+		};
+		const g = synthesizeGraph(semantic);
+		const grp = g.edges
+			.filter((e) => e.edge_type === 'groups')
+			.map((e) => `${e.source}->${e.target}`);
+		assert.ok(
+			grp.includes('STORY-USER-001->TASK-USER-001'),
+			'의미명 story_ref → STORY-USER-001 해소',
+		);
+		assert.ok(
+			!grp.some((p) => p.includes('STORY-USER-MASTER')),
+			'raw 의미명이 엣지 source 로 남지 않음 (해소됨)',
+		);
+		assert.ok(
+			g.edges.some((e) => e.source === 'STORY-USER-001' || e.target === 'STORY-USER-001'),
+			'STORY 노드 비고립 (in/out 엣지 존재)',
+		);
+	});
+
+	it('groups Story→TASK: story_ref 가 BHV-* anchor 여도 해소 (schema sanctioned)', () => {
+		const bhv = {
+			...v11Input,
+			taskPlan: {
+				...v11Input.taskPlan,
+				tasks: [{ ...v11Input.taskPlan.tasks[0], story_ref: 'BHV-USER-001' }],
+			},
+		};
+		const g = synthesizeGraph(bhv);
+		const grp = g.edges
+			.filter((e) => e.edge_type === 'groups')
+			.map((e) => `${e.source}->${e.target}`);
+		assert.ok(grp.includes('STORY-USER-001->TASK-USER-001'), 'BHV-* story_ref → STORY-USER-001');
+	});
+
+	it('groups Story→TASK: story_ref 가 jira_id 여도 해소', () => {
+		const jira = {
+			...v11Input,
+			taskPlan: {
+				...v11Input.taskPlan,
+				story_refs: [
+					{
+						behavior_ref: 'BHV-USER-001',
+						jira_id: 'PROJ-101',
+						epic_ref: 'SCREEN-REGISTER',
+						title: '가입 스토리',
+					},
+				],
+				tasks: [{ ...v11Input.taskPlan.tasks[0], story_ref: 'PROJ-101' }],
+			},
+		};
+		const g = synthesizeGraph(jira);
+		const grp = g.edges
+			.filter((e) => e.edge_type === 'groups')
+			.map((e) => `${e.source}->${e.target}`);
+		assert.ok(grp.includes('STORY-USER-001->TASK-USER-001'), 'jira_id story_ref → STORY-USER-001');
+	});
+
+	it('groups Epic→Story: epic_ref 가 jira_id(비-canonical)여도 screen_id 노드로 해소', () => {
+		const epicJira = {
+			...v11Input,
+			taskPlan: {
+				...v11Input.taskPlan,
+				epic_refs: [{ screen_id: 'SCREEN-REGISTER', jira_id: 'PROJ-10', title: '회원가입 화면' }],
+				story_refs: [{ behavior_ref: 'BHV-USER-001', epic_ref: 'PROJ-10', title: '가입 스토리' }],
+			},
+		};
+		const g = synthesizeGraph(epicJira);
+		const grp = g.edges
+			.filter((e) => e.edge_type === 'groups')
+			.map((e) => `${e.source}->${e.target}`);
+		assert.ok(
+			grp.includes('SCREEN-REGISTER->STORY-USER-001'),
+			'jira_id epic_ref → SCREEN-REGISTER 해소',
+		);
+	});
+
 	it('conforms_to 엣지 (hard leaf): TASK→openapi contract + TC→openapi contract', () => {
 		const g = synthesizeGraph(v11Input);
 		const cf = g.edges.filter((e) => e.edge_type === 'conforms_to');

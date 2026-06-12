@@ -148,7 +148,7 @@
     {
       "id": "#5",
       "stage": "implement",
-      "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
+      "validators": ["test-impl-pass-validator (expected: all_pass / fail_count: 0)", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator", "graph-integrity-validator"],
       "scenario_expected": { "S1": "all_pass", "greenfield": "all_pass", "S2": "all_pass", "S3": "all_pass" },
       "skill": "skills/_base-invoke-go-stop-gate"
     }

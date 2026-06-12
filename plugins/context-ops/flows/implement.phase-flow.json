@@ -77,7 +77,7 @@
     }
   ],
   "cross_cutting": {
-    "validators": ["test-impl-pass-validator", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator"],
+    "validators": ["test-impl-pass-validator", "static-runner (6 plugin)", "lint-no-simulation (chain-strict)", "schema-validator", "traceability-matrix-builder", "chain-coverage-validator", "spec-test-link-validator", "graph-integrity-validator"],
     "ratchet_threshold": 0.85,
     "test_pass_rate_required": 1.0,
     "expected_outcome_chain5": "all_pass (GREEN 의무)",

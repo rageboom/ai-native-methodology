@@ -40,6 +40,8 @@ export const REQUIRED_VALIDATORS_PER_STAGE = {
 		'test-impl-pass-validator',
 		'static-runner',
 		'traceability-matrix-builder',
+		// F-DOGFOOD-STORY-ORPHAN — gate-eval REQUIRED.implement 와 sync 의무 (dep-graph cycle/orphan/unknown blocking).
+		'graph-integrity-validator',
 	],
 };
 
@@ -269,8 +271,28 @@ export function transformTraceabilityMatrix(json) {
 	};
 }
 
+// graph-integrity-validator JSON ({ passed, summary:{cycle_count, orphan_count, unknown_edge_count} }) → findings.
+//   cycle/unknown = critical (topological sort 불가 → 자동 cascade 차단 / release-readiness #15 동형) /
+//   orphan = high (artifact 단절 — chain 도달 불가). passed=true 면 전부 0 (F-DOGFOOD-STORY-ORPHAN).
+export function transformGraphIntegrity(json) {
+	const s = json.summary ?? json ?? {};
+	const cycle = s.cycle_count ?? 0;
+	const unknown = s.unknown_edge_count ?? 0;
+	const orphan = s.orphan_count ?? 0;
+	return {
+		critical: cycle + unknown,
+		high: orphan,
+		medium: 0,
+		low: 0,
+		info: 0,
+		graph_integrity_passed: json.passed === true,
+	};
+}
+
 export function dispatchValidator(validatorName, output) {
 	switch (validatorName) {
+		case 'graph-integrity-validator':
+			return transformGraphIntegrity(JSON.parse(output));
 		case 'discovery-extraction-validator':
 			return transformDiscoveryExtraction(JSON.parse(output));
 		case 'chain-coverage-validator':

@@ -190,6 +190,25 @@ function storyIdFromBehaviorRef(behaviorRef) {
   return m ? `STORY-${m[1]}` : null;
 }
 
+// ★ groups ref 해소 (F-DOGFOOD-STORY-ORPHAN) — task.story_ref / story.epic_ref 는
+//   task-plan.schema 상 "Jira Story ID | BHV-* | 자유 string" 이라 조직 노드 id(STORY-<BHV suffix> 등)와
+//   문자 그대로 일치할 보장이 없다. 조직 노드 생성 시 alias(노드 id | behavior_ref | jira_id | title-prefix)를
+//   canonical 노드 id 로 등록해 두고, groups 엣지 source 를 해소한다. 해소 실패 시 raw 보존 → 이후
+//   dangling prune 이 '진짜 부재' 만 제거 (groups 자유 string 계약 유지 / DEC-2026-05-26-ticket-plan-단일).
+function titlePrefix(title) {
+  if (typeof title !== 'string') return null;
+  // id-prefix 는 em/en-dash(— –) 로 설명과 구분된다 — 일반 hyphen(-) 은 id 내부 문자이므로 split 금지.
+  const head = title.split(/\s*[—–]\s*/)[0]?.trim();
+  return head && head.length ? head : null;
+}
+function registerAlias(map, alias, canonicalId) {
+  if (typeof alias !== 'string' || alias.length === 0) return;
+  if (!map.has(alias)) map.set(alias, canonicalId); // first-wins = synthesize-twice 결정성 (F-m2)
+}
+function resolveRef(map, ref) {
+  return (typeof ref === 'string' && map.has(ref)) ? map.get(ref) : ref;
+}
+
 // ★ v11.0.0 — contract leaf target id 합성 (conforms_to 의 leaf target / IMPL→코드 implements 와 동형).
 function openapiContractLeafId(ref) {
   if (!ref || typeof ref !== 'object') return null;
@@ -606,6 +625,9 @@ export function synthesizeGraph(input) {
   // 노드 id 규약: Epic = screen_id||jira_id / Story = STORY-<BHV suffix> / OP = op_task_id.
   // groups (soft): Epic→Story (story.epic_ref) / Story→TASK (task.story_ref) / OP→TASK (task.op_task_ref).
   const taskPlanPath = sourcePaths.taskPlan ?? '(task-plan)';
+  // alias → canonical 노드 id. groups ref(자유 string)를 조직 노드 id 로 해소하기 위해 노드 생성과 함께 적재.
+  const epicAliases = new Map();
+  const storyAliases = new Map();
   for (const ep of taskPlan?.epic_refs ?? []) {
     const id = ep.screen_id ?? ep.jira_id;
     if (!id) continue;
@@ -614,6 +636,10 @@ export function synthesizeGraph(input) {
       source_path: taskPlanPath, state: 'active',
       ...(ep.title ? { title: ep.title } : {}),
     });
+    registerAlias(epicAliases, id, id);
+    registerAlias(epicAliases, ep.screen_id, id);
+    registerAlias(epicAliases, ep.jira_id, id);
+    registerAlias(epicAliases, titlePrefix(ep.title), id);
   }
   for (const st of taskPlan?.story_refs ?? []) {
     const id = storyIdFromBehaviorRef(st.behavior_ref) ?? st.jira_id;
@@ -623,8 +649,12 @@ export function synthesizeGraph(input) {
       source_path: taskPlanPath, state: 'active',
       ...(st.title ? { title: st.title } : {}),
     });
-    // Epic → Story (조직 포함). 양 끝 노드 존재 시만 (dangling 방지는 합성 후 일괄 — 여기선 source 존재만 보장).
-    if (st.epic_ref) edges.push(makeEdge(st.epic_ref, id, 'groups'));
+    registerAlias(storyAliases, id, id);
+    registerAlias(storyAliases, st.behavior_ref, id); // schema: story_ref = BHV-* 허용
+    registerAlias(storyAliases, st.jira_id, id);
+    registerAlias(storyAliases, titlePrefix(st.title), id); // 의미명(STORY-<scope>-<NAME>) → canonical
+    // Epic → Story (조직 포함). epic_ref(자유 string)를 epic 노드 id 로 해소. 양 끝 노드 존재 시만 (dangling 은 합성 후 일괄 prune).
+    if (st.epic_ref) edges.push(makeEdge(resolveRef(epicAliases, st.epic_ref), id, 'groups'));
   }
   // OP 노드 — task-plan.op_task_refs[] + (선택) operational-task.op_tasks[]
   for (const op of taskPlan?.op_task_refs ?? []) {
@@ -646,7 +676,8 @@ export function synthesizeGraph(input) {
   }
   // Story→TASK / OP→TASK (조직 포함) + TASK contract conforms_to (leaf hard).
   for (const task of tasks) {
-    if (task.story_ref) edges.push(makeEdge(task.story_ref, task.id, 'groups'));
+    // Story→TASK (조직). story_ref(자유 string: id|BHV-*|jira_id|의미명)를 STORY 노드 id 로 해소.
+    if (task.story_ref) edges.push(makeEdge(resolveRef(storyAliases, task.story_ref), task.id, 'groups'));
     if (task.op_task_ref) edges.push(makeEdge(task.op_task_ref, task.id, 'groups'));
     // ★ contract 강제 양 axis (DEC #8) — TASK → contract leaf (BE openapi / FE component).
     const beLeaf = openapiContractLeafId(task.openapi_endpoint_ref);

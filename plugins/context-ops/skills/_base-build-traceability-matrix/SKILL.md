@@ -44,6 +44,30 @@ chain harness 의 **cross-gate matrix builder skill** (forward+backward bidirect
 
 5. **finding 등록** (필요 시) — `_base-log-finding` skill 호출. severity = critical (red_count > 0) / high (forward_coverage < 0.85).
 
+6. **dep-graph 무결성 검사 (implement gate 전용 / F-DOGFOOD-STORY-ORPHAN)** — `impl-spec.json` 이 존재할 때(= full chain 6 layer 완성 = implement gate #5)만 수행. 이전 gate(#1~#4)는 하위 layer 부재로 orphan 오탐이라 **skip**.
+
+   ```bash
+   # (a) artifact-graph.json 합성 — matrix 와 동일 source + --graph
+   node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
+     --discovery  <project>/.ai-context/output/discovery-spec.json \
+     --behavior   <project>/.ai-context/output/behavior-spec.json \
+     --acceptance <project>/.ai-context/output/acceptance-criteria.json \
+     --task-plan  <project>/.ai-context/output/task-plan.json \
+     --test-spec  <project>/.ai-context/output/test-spec.json \
+     --impl-spec  <project>/.ai-context/output/impl-spec.json \
+     --analysis-dir <project>/.ai-context/output \
+     --scope-id <scope> --repo-root <project> \
+     --out-dir <project>/.ai-context/output/ --graph
+
+   # (b) graph-integrity-validator — cycle/orphan/unknown 검사 (gate-eval REQUIRED.implement)
+   node ${CLAUDE_PLUGIN_ROOT}/tools/graph-integrity-validator/src/cli.js \
+     <project>/.ai-context/output/artifact-graph.json --format json
+   ```
+
+   - `passed: false` (cycle/orphan/unknown ≥ 1) → **blocking finding**: severity = critical (cycle/unknown — topological sort 불가) / high (orphan — artifact chain 단절). `_base-log-finding` 등록 후 go-stop-gate 가 차단.
+   - findings-aggregator 사용 시 `graph-integrity-validator` 가 REQUIRED.implement 에 등재돼 있으므로 `transformGraphIntegrity` 가 cycle/unknown→critical · orphan→high 로 매핑 (gate-eval 정합).
+   - orphan 예: 의도된 미연결(pending TC 등)이면 source artifact 에 명시 마킹 후 재산출 (silent false-health 차단 / no-simulation).
+
 ## S5 — header schema 의무
 
 `matrix.json` header 의무 필드 (traceability-matrix.schema.json 강제):

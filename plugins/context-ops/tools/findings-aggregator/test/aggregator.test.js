@@ -15,6 +15,7 @@ import {
 	transformBrCrossConsistency,
 	transformDecisionTable,
 	transformFormalSpecLink,
+	transformGraphIntegrity,
 	dispatchValidator,
 	aggregateForStage,
 	REQUIRED_VALIDATORS_PER_STAGE,
@@ -59,6 +60,7 @@ describe('REQUIRED_VALIDATORS_PER_STAGE', () => {
 			'test-impl-pass-validator',
 			'static-runner',
 			'traceability-matrix-builder',
+			'graph-integrity-validator',
 		]);
 	});
 });
@@ -325,7 +327,44 @@ describe('transformBrCrossConsistency (v2.4.0)', () => {
 	});
 });
 
+describe('transformGraphIntegrity (F-DOGFOOD-STORY-ORPHAN)', () => {
+	it('orphan → high / cycle·unknown → critical', () => {
+		const json = {
+			passed: false,
+			summary: { cycle_count: 1, orphan_count: 4, unknown_edge_count: 2 },
+		};
+		const f = transformGraphIntegrity(json);
+		assert.equal(f.critical, 3); // cycle 1 + unknown 2
+		assert.equal(f.high, 4); // orphan 4
+		assert.equal(f.graph_integrity_passed, false);
+	});
+	it('passed=true → all zero (clean graph)', () => {
+		const json = {
+			passed: true,
+			summary: { cycle_count: 0, orphan_count: 0, unknown_edge_count: 0 },
+		};
+		const f = transformGraphIntegrity(json);
+		assert.equal(f.critical, 0);
+		assert.equal(f.high, 0);
+		assert.equal(f.graph_integrity_passed, true);
+	});
+	it('summary 부재 fallback = all zero (blind 0 차단 — 명시 0)', () => {
+		const f = transformGraphIntegrity({ passed: true });
+		assert.equal(f.critical, 0);
+		assert.equal(f.high, 0);
+	});
+});
+
 describe('dispatchValidator', () => {
+	it('graph-integrity-validator → orphan high 매핑', () => {
+		const output = JSON.stringify({
+			passed: false,
+			summary: { cycle_count: 0, orphan_count: 4, unknown_edge_count: 0 },
+		});
+		const f = dispatchValidator('graph-integrity-validator', output);
+		assert.equal(f.high, 4);
+		assert.equal(f.critical, 0);
+	});
 	it('discovery-extraction-validator → JSON parse + transform', () => {
 		const output = JSON.stringify({ summary: { critical: 0, high: 1 } });
 		const f = dispatchValidator('discovery-extraction-validator', output);
