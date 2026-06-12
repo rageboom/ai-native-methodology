@@ -1,6 +1,6 @@
 # DEC-2026-06-12-parallel-bc-accumulator-rollup
 
-> **상태: 시행됨 — option ② 채택 / `tools/bc-accumulator-rollup` 도구+테스트+dogfood 완료 (2026-06-12 / 사용자 "권고대로 구현"). 단 diagnose-before-design 정정으로 scope 축소(아래 §시행). 본체 격상(lifecycle-contract 규약 명문·MANDATORY 배선·plugin.json bump·workspace 등록)은 §8.1 deferred.** DEC-2026-06-12-artifact-zone 의 follow-on. ep-be-gea BC-REQMNG 병렬-worktree dogfood 에서 발견한 **잔여 병렬-충돌 갭** + zone §8.1 이 기다리던 **≥2 도메인 corroboration** 제공.
+> **상태: 본체 격상됨 (v0.43.0 / 2026-06-13). 시행됨 — option ② 채택 / `tools/bc-accumulator-rollup` 도구+테스트+dogfood (2026-06-12 / 사용자 "권고대로 구현"). lifecycle-contract 규약 명문(병렬 worktree→fragment→post-merge 직렬 rollup MANDATORY)·plugin.json bump·workspace(pnpm glob auto) 완료 — §8.1 ≥2 도메인 corroboration(REQMNG + WLFR 2 dogfood) 충족 후 격상. findings 누적기 append-catalog 승격·bc_scope auto-split 은 여전히 deferred.** DEC-2026-06-12-artifact-zone 의 follow-on. ep-be-gea BC-REQMNG 병렬-worktree dogfood 에서 발견한 **잔여 병렬-충돌 갭** + zone §8.1 이 기다리던 **≥2 도메인 corroboration** 제공.
 
 **결단(제안)**: artifact-zone 의 "도메인마다 자기 `domains/<BC>/` 만 write" 목표를 **완성**하려면, 아직 shared top-level 누적기로 남은 4종(`output/migration-cautions.json`·findings·`domain.json#bounded_contexts[]`·`output/business-rules.json` index)도 **per-BC leaf 로 일반화**하고 **직렬 post-merge rollup 단계**를 정의해야 한다. 현재는 business-rules 만 샤딩되어 있어, 병렬 CLI/worktree 가 나머지 누적기에서 여전히 write-conflict 한다.
 
@@ -45,7 +45,7 @@ artifact-zone §8.1: *"디렉토리 zone = 1-domain(BC-EVENT) exercised(degenera
 ## §8.1 (정직)
 
 - **도구 시행됨 / 본체 격상 deferred** — 사용자 "권고대로 구현" 승인으로 `tools/bc-accumulator-rollup` 작성·테스트·dogfood 완료. lifecycle-contract 규약 명문·MANDATORY 배선·plugin.json bump 은 ≥2 도메인 corroboration 후(§시행 잔여). **fragment-vs-top-level 긴장 해소**: option ② 채택으로 내 BC-REQMNG `domains/<BC>/migration-cautions.json`·findings 의 물리 배치 = **정당한 fragment**(artifact-zone "top-level 유지" 와 모순 ❌ — 도구가 fragment→shared top-level 로 rollup). 즉 "승격 vs 정정" 분기는 **승격(fragment 정당화)** 로 결착.
-- corroboration: zone 디렉토리 = 이제 3 도메인(EVENT/RESV-GOLF/REQMNG) exercised = §8.1 의 ≥2 충족 → zone paradigm SOFT→**corroborated 격상 후보**. 단 cautions/findings per-BC = 본 결단 승인 후에야 datapoint.
+- corroboration: zone 디렉토리 = 이제 4 도메인(EVENT/RESV-GOLF/REQMNG/WLFR) exercised. **rollup 도구 = 2 dogfood corroborated → SOFT→격상 시행(v0.43.0 / 2026-06-13)**: BC-REQMNG(total_rules 60→96 / findings +25→26 버킷 재계산) + **BC-WLFR**(EVENT+GOLF 60 선재 → 60→185 · cautions 13→14 group · findings 0→40 버킷[critical 1/high 9/medium 18/low 12] 재계산 · 멱등 RUN2 전부 replaced · sibling 보존 · `--dry-run`==real · live shared 무접촉[/tmp 합성]). `lifecycle-contract.md` zone 규약에 "병렬 worktree→fragment-only→post-merge 직렬 1회" MANDATORY bullet 명문 + §8.1 격상. cautions/findings per-BC = 2 도메인 실 fragment(REQMNG·WLFR) datapoint 확보. **잔여 deferred**: findings 누적기 → append-catalog 승격(현 도구 로컬) / bc_scope auto-split·HARD gate(F14 불변).
 - 비용/리스크 미측정(loader 확장 범위·rollup 도구 stmt 수) — plan 단계 선행.
 
 ## relates to

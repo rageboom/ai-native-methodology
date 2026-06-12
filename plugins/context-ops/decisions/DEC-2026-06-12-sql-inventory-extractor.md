@@ -1,6 +1,6 @@
 # DEC-2026-06-12-sql-inventory-extractor
 
-> **상태: 시행됨 — option ① 채택 / 도구+테스트+dogfood 완료 (2026-06-12 / 사용자 "권고대로 구현"). 본체 격상(MANDATORY chain 배선·skill §1–4 reword·plugin.json bump·workspace 등록)은 §8.1 ≥2 도메인 corroboration 후로 deferred.** `DEC-2026-06-12-parallel-bc-accumulator-rollup` §부수 의 독립 follow-on bullet 을 자체 ADR 로 승격. ep-be-gea BC-REQMNG dogfood 에서 노출된 **결정론-추출기 부재** 갭 해소.
+> **상태: 본체 격상됨 (v0.43.0 / 2026-06-13). 시행됨 — option ① 채택 / 도구+테스트+dogfood (2026-06-12 / 사용자 "권고대로 구현"). MANDATORY chain 배선·skill §0 신설·plugin.json bump·workspace(pnpm glob auto) 완료 — §8.1 ≥2 도메인 corroboration(REQMNG 163 + WLFR 536 = MyBatis 2-domain) 충족 후 격상. 단 stack 다양성(비-XML jdbcTemplate/@Query/Prisma) 은 여전히 미충족 = XML mapper 전용 격상 / 비-XML 경로 수동 grep carry.** `DEC-2026-06-12-parallel-bc-accumulator-rollup` §부수 의 독립 follow-on bullet 을 자체 ADR 로 승격. ep-be-gea BC-REQMNG dogfood 에서 노출된 **결정론-추출기 부재** 갭 해소.
 
 **결단(제안)**: `analysis-sql-inventory` 스킬은 5/11 컬럼을 "자동 추출(✅)"로 명시하고 §1–4 에 **정확한 grep -E 레시피**까지 박제하지만, 그 레시피를 **실행하는 결정론 도구가 tools/ 에 없다**(`sql-inventory-validator` = 검증만 / 추출기 없음). 따라서 매 adopter 런이 grep 5종을 **LLM 에이전트가 손으로 재발행** = 비결정·고비용. 스킬에 이미 SSOT 로 존재하는 그 레시피를 그대로 실행하는 `tools/sql-inventory-extractor` 를 신설해 **5 auto 컬럼 + `raw-grep.txt` 를 결정론으로 산출**하고, LLM 은 판단 6 컬럼만 채우게 한다.
 
@@ -33,7 +33,7 @@
 - **statement_type** = `statementType="..."` 속성 직추출만 결정론. 속성 부재 시 PREPARED 기본값은 MyBatis 규약 **추론(heuristic)** → confidence 하향 마킹.
 - **dynamic_branch** = 태그 enum grep(`<if|choose|foreach|where|set|trim|bind>` 등) 카운트는 결정론이나 **분기 의미**는 LLM.
 - **no-simulation**: 도구는 실제 grep 만 실행 / 0건 시 빈 산출+정직, 날조 ❌. grep 불가 환경(파일 부재)=NOT_CERTIFIED 마킹(`DEC-2026-06-12-parallel-bc-accumulator-rollup` §부수 validator-absent fallback 동형).
-- **1 datapoint(REQMNG)** — propose-only. MANDATORY chain 배선·plugin.json bump = **≥2 도메인 corroboration 후**(stack 다양성: MyBatis XML 외 jdbcTemplate/@Query/Prisma `$queryRaw` 도 §1 grep 대상이나 REQMNG 는 MyBatis 단일 = iBATIS/MyBatis 만 실증).
+- **~~1 datapoint(REQMNG)~~ → 2 datapoint(REQMNG 163 + WLFR 536) corroborated (2026-06-13)** — MANDATORY chain 배선·plugin.json bump = **시행됨(v0.43.0)**: `analysis-sql-inventory` §0 결정론 추출 MANDATORY 선행 + phase-flow 4.8 `tool_precursor`·outputs. **단 두 도메인 모두 MyBatis 3+MSSQL = 단일 스택** — stack 다양성(jdbcTemplate/@Query/Prisma/TypeORM `.query`/`$queryRaw` = §1 grep 대상이나 도구 미커버)은 미충족 → 격상 범위 = **MyBatis/iBATIS XML mapper 전용**, 비-XML 경로는 §1 수동 grep 유지(결정론 격상 carry / 정직 한계 명문). 격상 시 release-readiness 42/42 유지·skill-citation 0 stale.
 
 ## relates to
 

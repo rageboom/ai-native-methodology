@@ -10,6 +10,21 @@
 
 ---
 
+## [0.43.0] — 2026-06-13 MINOR — 방법론 본체 격상: sql-inventory-extractor §0 MANDATORY 배선 + bc-accumulator-rollup post-merge rollup 규약 (≥2 도메인 corroboration 충족)
+
+**SSOT**: `decisions/DEC-2026-06-12-sql-inventory-extractor.md` · `decisions/DEC-2026-06-12-parallel-bc-accumulator-rollup.md`.
+
+ep-be-gea campaign 복지 메뉴그룹 **BC-WLFR**(7 서브도메인 cafe·copn·grpins·inloan·lcadn·ovrtm-taxi·point / 731 java / controller 26·RestService 28·mapper XML 25)를 별도 worktree `feature/context-ops-wlfr` 에서 풀 analysis chain(business-rules 125·characterization 42snap/99scn/25 @bug·sql-inventory 536·openapi 237op/195schema·findings 40) 완주. 이 run 이 v0.42.x 에서 **도구는 시행·본체 격상은 deferred** 였던 두 도구(`DEC-2026-06-12-{sql-inventory-extractor,parallel-bc-accumulator-rollup}` §8.1)의 **≥2 도메인 in-repo corroboration** 을 충족시켜 격상을 시행(additive / breaking 0).
+
+- **F-1 — sql-inventory-extractor §0 MANDATORY 배선**: `analysis-sql-inventory` 스킬이 5/11 auto 컬럼의 grep 레시피(§1–4)를 박제하나 실행 도구가 없어 매 런 LLM 이 grep 을 손으로 재발행(비결정·고비용)하던 갭을, REQMNG 163 + WLFR 536 stmt(둘 다 MyBatis 3+MSSQL = **2-domain**) 입증 후 격상. SKILL 에 **§0 결정론 추출(MANDATORY 선행)** 신설 — `${CLAUDE_PLUGIN_ROOT}/tools/sql-inventory-extractor/src/cli.js` 가 §1–4 레시피의 실행 SSOT(`sql-inventory.auto.json`+`raw-grep.txt` 5 auto 컬럼 결정론 / LLM 은 판단 6 컬럼만 → `sql-inventory.json` 승격). phase-flow 4.8 outputs +`sql-inventory.auto.json`·`tool_precursor` 명시 + 인용 추가. **정직 한계(carry)**: 도구 = MyBatis/iBATIS **XML mapper 전용** — §1 의 비-XML 경로(Spring JDBC `jdbcTemplate`·JPA `@NativeQuery`·TypeORM `.query`·Prisma `$queryRaw`)는 미커버·수동 grep 유지(2 도메인 모두 단일 스택이라 stack 다양성 corroboration 미충족).
+- **F-2 — bc-accumulator-rollup post-merge 직렬 rollup 규약 격상**: 병렬 worktree 가 shared 누적기 4종(`business-rules.json` index·`migration-cautions.json`·findings·`domain.json#bounded_contexts[]`)을 동시 append 시 충돌하는 갭을, 충돌-0 이 **작업자 규율**(memory `resve-analysis-zone-discipline`)에만 의존하던 것을 결정론 단계로 격상. `methodology-spec/lifecycle-contract.md` zone 규약에 **"병렬 worktree → 자기 fragment 만 write → 머지 후 `bc-accumulator-rollup` 직렬 1회"** MANDATORY bullet + §8.1 격상. **2 dogfood corroborated**: BC-REQMNG(total_rules 60→96 / findings +25→26 버킷 재계산) + **BC-WLFR**(EVENT+GOLF 60 선재 → total_rules 60→185 · cautions 13→14 group · findings 0→40 버킷 critical 1/high 9/medium 18/low 12 재계산 · 멱등 RUN2 전부 replaced·total 불변 · sibling 보존[EVENT 36+GOLF 24+WLFR 125] · `--dry-run`==real · **live shared 무접촉**[/tmp 합성]).
+
+**검증**: release-readiness **42/42** 유지(baseline green 위 additive) · 두 도구 자체 테스트 GREEN(extract 7 / rollup 7) · skill-citation 0 stale(신규 인용 `tools/sql-inventory-extractor/`·DEC 실존) · phase-flow JSON valid. BC-WLFR 산출물 전건 schema-valid(business-rules-bc·characterization-spec·sql-inventory[+ sql-inventory-validator 0 findings]·migration-cautions).
+
+**carry**: ⓐ sql-inventory-extractor 비-XML 스택(jdbcTemplate/@Query/Prisma/TypeORM) 결정론 격상 = stack 다양성 corroboration 후. ⓑ bc-accumulator-rollup findings 누적기 → `_shared/append-catalog.js` 승격(현 도구 로컬) + `bc_scope` auto-split·HARD gate = 여전히 deferred(F14 불변). ⓒ domain fragment 표준 산출 경로(per-BC domain.json 미생산 = honest skip).
+
+---
+
 ## [0.42.2] — 2026-06-13 PATCH — append-catalog rule_count = rule_ids.length SSOT 강제 (F-3) — biztrip corroboration
 
 ### Fixed
@@ -17,7 +32,6 @@
 - **`tools/_shared/append-catalog.js` `upsertBcFile` — rule_count drift 차단 (F-3 / F-1·F-2 후속, 동일 헬퍼).** `rule_ids[]` 를 SSOT 로 계약 명문화하고, upsert 시 `rule_count := rule_ids.length` 강제 + `total_rules` 합산도 entry 별 `rule_ids.length` 우선(없으면 `rule_count` fallback). biztrip 6 BC 워크플로우 팬아웃에서 LLM 이 `rule_count` 를 잘못 기재한 사례 재현(`BC-BIZTRIP-REQUEST` 21 vs rule_ids 23 · `BC-BIZTRIP-EXECUTIVE` 16 vs 18 → `total_rules` 과소집계 257 vs 261)을 결정론적으로 원천 차단. caller 가 준 틀린 정수를 더는 신뢰하지 않음. `rule_ids` 부재 레거시 entry 는 `rule_count` fallback = **하위호환 유지(breaking 0)**. 회귀 `tools/chain-driver/test/append-catalog.test.js` **12 → 14**(drift 교정 + fallback 2건 추가, `appendBcFileToIndex` 테스트 invariant-일관 갱신). DEC-2026-06-13-append-catalog-rulecount-ssot. (검증 = `ep-be-gea` biztrip 분석 2nd 도메인 패밀리 corroboration, resve 6 BC 후속.)
 
 ---
-
 ## [0.42.1] — 2026-06-12 PATCH — append-catalog writer 헬퍼(F-1) + analysis exit-gate 명문화(F-2) — resve 다중도메인 corroboration
 
 **SSOT**: `decisions/DEC-2026-06-12-resve-multidomain-corroboration.md`.

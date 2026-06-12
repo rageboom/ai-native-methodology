@@ -90,6 +90,7 @@
       "depends_on": ["discovery", "business-logic", "characterization"],
       "inputs": ["inventory.json", "business-rules.json", "antipatterns.json", "characterization-spec.json"],
       "outputs": ["sql-inventory.json", "raw-grep.txt"],
+      "tool_precursor": "sql-inventory-extractor (§0 결정론 5컬럼 → sql-inventory.auto.json 중간산출 → sql-inventory.json 승격 / MyBatis·iBATIS XML / 비-XML 스택 수동)",
       "automated_validation": ["sql-inventory-validator", "schema-validator"],
       "introduced": "v2.2.0-rc1",
       "rdb_only": true,

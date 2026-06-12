@@ -24,10 +24,26 @@ baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = 신
 
 ## 절차 (단일 prompt 양 spectrum / Cursor/Cline/Aider 표준 정합)
 
-### 1. mapper XML grep (자동 ✅)
+### 0. sql-inventory-extractor 결정론 추출 (MyBatis/iBATIS XML — MANDATORY 선행)
+
+RDB 가 **MyBatis 3 / iBATIS 2 XML mapper** 면 §1–4 의 5 auto 컬럼(`sql_id`·`mapper_xml`·`statement_type`·`dynamic_branch`·`dependent_tables`)은 LLM 이 grep 을 손으로 재발행하지 말고 **결정론 도구로 1패스 산출**한다(비결정·고비용 회피 / `raw-grep.txt`+`sql-inventory.auto.json` = 1차 산출). 이 도구가 §1–4 grep 레시피의 **실행 SSOT**(레시피는 도구 spec 으로 코드화 — no-simulation / 실 grep only):
 
 ```bash
-# iBATIS 2 / MyBatis 공통
+node ${CLAUDE_PLUGIN_ROOT}/tools/sql-inventory-extractor/src/cli.js \
+  --src <src> [--glob "**/*.xml"] [--rel-root <repo-root>] \
+  --output .ai-context/output/domains/<BC>/sql-inventory/
+# 산출: sql-inventory.auto.json (5 auto 컬럼 / 판단 6 컬럼 null = PARTIAL) + raw-grep.txt
+# 이후 LLM 은 판단 6 컬럼(§6·§7)만 보강 → sql-inventory.json 승격 → §10·§11 검증
+```
+
+**결정론 경계 / 정직 한계**(과대주장 가드): `dependent_tables`(FROM/JOIN regex)=**후보(candidate)** 마킹·exhaustive ❌ / `statement_type` 속성부재 시 PREPARED=heuristic·confidence 하향 / `dynamic_branch` 카운트는 결정론이나 **분기 의미**는 LLM.
+
+**스택 적용 범위(corroboration 정직)**: 도구 = **MyBatis/iBATIS XML mapper 전용**(REQMNG 163 + WLFR 536 = 2 도메인 in-repo 입증 / **둘 다 MyBatis 3+MSSQL = 단일 스택**). **§1 의 비-XML 경로(Spring JDBC `jdbcTemplate`·JPA `@NativeQuery`·TypeORM `.query`·Prisma `$queryRaw`)는 도구 미커버 = 아래 §1 수동 grep 유지**(stack 다양성 corroboration 미충족 → 결정론 격상 carry).
+
+### 1. mapper XML grep (XML = §0 도구가 자동 ✅ / 비-XML 스택은 수동)
+
+```bash
+# iBATIS 2 / MyBatis 공통 — XML 은 §0 sql-inventory-extractor 가 결정론 수행 (아래는 도구 spec/검수 참조)
 grep -rn -E '<(select|update|insert|delete|procedure)\b' <src>/sqlmap/ <src>/mapper/ \
   --include="*.xml"
 
@@ -199,11 +215,12 @@ phase 4.8 산출물 = chain 1 (discovery-spec) 입력 핵심:
 
 - 정책: `methodology-spec/deliverables/24-sql-inventory.md`
 - schema: `schemas/sql-inventory.schema.json`
-- 도구: `tools/sql-inventory-validator/`
+- 도구: `tools/sql-inventory-extractor/` (생산/결정론 5컬럼 — phase 4.8 §0 선행 / MyBatis·iBATIS XML) · `tools/sql-inventory-validator/` (검증)
 - flow: `flows/analysis.phase-flow.json` (phase 4.8 entry)
 - ADR: ADR-CHAIN-007 (phase 4.8 도입)
 - ADR: ADR-011 (json 단독 / .md 미산출)
 - ADR: ADR-009 (5단계 신뢰도 모델)
 - 결단: DEC-2026-05-08-poc-06-sql-inventory-retrofit (corroboration #1)
 - 결단: DEC-2026-05-08-poc-07-종결 (corroboration #2)
+- 결단: DEC-2026-06-12-sql-inventory-extractor (§0 결정론 추출기 신설·격상 / REQMNG+WLFR 2-domain MyBatis corroboration)
 
