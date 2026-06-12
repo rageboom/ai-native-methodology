@@ -9,7 +9,16 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-12 / charter R21 정합 + unit-layer LEVER C soft-surface / **미커밋** — 사용자 push·release 결단 대기)
+### ★ 다음 세션 인계 (2026-06-13 / resve 나머지 4 BC 풀체인 dogfood + 방법론 findings / **버전 bump 없음** — ep-be-gea·methodology 미커밋)
+
+**이번 세션 성과 (사용자 "나머지 진행 안했던 체인 다 진행 + 방법론 findings 모아서 마지막" / `DEC-2026-06-13-resve-4bc-fullchain-corroboration` / 본체 코드 무변경)**:
+- **resve 4 BC(mtrm/healing/helium/hlum) chain 1~5 풀체인 완주** — golf(resv-golf) 미러. Phase A(Workflow 4 병렬 author=chain1~4+draft impl+draft JUnit / 무충돌) → Phase B(inline=gradle 통합1회 → 실 evidence backfill → matrix/graph → aggregator gate 4×5). 산출 = 4×14 json + 4 JUnit char 클래스(20 method). **위치 = `ep-be-gea-resve-domains` 워크트리 `.ai-context/resv-{mtrm,healing,helium,hlum}/` (GHE only)**.
+- **결과**: 4 BC × 5 stage gate **전부 critical/high=0 GO** + **20 real JUnit GREEN(fail 0)** = aggregator test-impl-pass 가 test-cmd 로 gate 레벨 실 gradle 실행(20/20) + graph 4 BC orphan 0 + matrix fwd·bwd 100%. (static-runner=evidence_missing/semgrep 미설치 R19 soft).
+- **방법론 finding**: ①**§8.1 corroboration** — v0.42.x 본체 + golf BC-1/3/5 픽스가 4 추가 BC 새 본체 결함 0(6 BC datapoint=과적합 아님). ②**body-candidate 4건 평가 → 본체 코드 수정 0 확정**: #1 golf behavior-spec "stale"=실측 valid **hallucination 반증**(self-recorded-fact-validation 차단) / #2 result_hash placeholder=비-본체 / #3 manifest dead-pointer=실재 **반증** / #4 HLUM read-only SQL-embedded=reframe datapoint. ③천장 일관(real-tested AC mtrm 2/20·healing 3/20·helium 3/16·hlum 3/11).
+- **본체 무변경(버전 bump·CHANGELOG·schema 없음)** — 검증된 결함 0 → 날조 fix 금지(quality 1순위). DEC+INDEX+STATUS 기록만.
+- **carry / 다음**: ① 양 remote push 사용자 결단(ep-be-gea→GHE / methodology→rageboom+GHE / GHE VPN 의존). ② 예약 외 메뉴그룹(biztrip/welfare 등) 미분석. ③ 핸드오프 doc(private) result_hash placeholder 문구 정정.
+
+### ★ (직전) 다음 세션 인계 (2026-06-12 / charter R21 정합 + unit-layer LEVER C soft-surface / **미커밋** — 사용자 push·release 결단 대기)
 
 **이번 세션 성과 (추천 일감 워크플로우 → B(charter 정합) + A(unit-layer LEVER C) / 버전 bump 보류 / 미커밋)**:
 - **추천 일감 산출**: 워크플로우(8 표면 수집 75후보→dedup 19→상위7→상위5 검증). 검증이 rank2(Layer 2 LLM mandatory) **drop**(의도된 Senior 승인 설계 / 액면 시행 시 §8.1 위반+회귀) + rank1·4 대폭 축소(honesty 이미 fix / 핵심 가드 evidence-scan 자동화 완료). 최종 추천 = A(unit 층 하드게이트) 1위.
