@@ -29,6 +29,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - **index**: `<user-project>/.ai-context/output/business-rules.json` — `bc_files[]`(per-BC 파일 명단/통계) + `total_rules`. schema = `schemas/business-rules-index.schema.json`. 인스턴스에 `"$schema_ref": "schemas/business-rules-index.schema.json"` 명시 **필수**(basename 이 business-rules.json 이라 명시 없으면 옛 단일파일 schema 로 오라우팅).
    - BC 미정 rule = `domains/_uncategorized/business-rules.json` 버킷(단 `bounded_context` required 라 실무상 미발생 / 안전망).
    - loader(`loadBusinessRules`)가 index 를 감지해 per-BC sibling 을 재조립 → 소비자(br-cross / federator / traceability / graph)는 전체 rule 전수 로드(분할 투명).
+   - **writer (multi-BC append / F-1)**: 여러 BC 가 같은 index 에 누적될 때 index 를 **통째 재작성 ❌**(BC#2 가 BC#1 엔트리 덮음). `tools/_shared/append-catalog.js` 의 `appendBcFileToIndex(indexPath, {bounded_context, file, rule_count, rule_ids})` 사용 = upsert-by-`bounded_context`(sibling BC 보존) + `total_rules` 재계산 + 기존 indent 보존(reformat 가짜 diff 차단). loader 의 writer 짝.
    ```json
    // .ai-context/output/business-rules.json  (index)
    {
@@ -92,12 +93,13 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 다음
 
+- **산출 후 exit-gate (F-2)**: `schema-validator` 는 `REQUIRED_VALIDATORS_PER_STAGE.analysis`(gate#0)에 등재돼 있으나 **skill-direct / multi-agent 병렬 분석** 경로에선 chain-driver 를 안 거쳐 자동으로 안 돈다. 직접 `node ../../tools/schema-validator/src/cli.js .ai-context/output` 실행 → leaf+index RED 0 확인(validate→repair = per-BC 완료 정의 / §schema enum 주의).
 - `analysis-formal-spec-validation` 호출 권장 (도메인 ↔ 규칙 ↔ 인벤토리 정합)
 
 ## 인용
 
 - 결단: DEC-2026-05-30-use-scenario-taxonomy §2.4 (greenfield 옵션 A)
-- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4 (schema enum 주의 절 근거)
+- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4·§F-1·§F-2 (schema enum 주의 + 카탈로그 writer append-catalog + analysis exit-gate 근거)
 - 정책: `methodology-spec/workflow/business-logic.md` §5 (4영역 병렬 추출 / rules 매핑 = §5.A SQL CASE/WHERE + §5.B FE validation + §5.C 매직 넘버)
 - 정책: `methodology-spec/deliverables/5-business-rules.md`
 - schema: `schemas/business-rules-index.schema.json` (index) + `schemas/business-rules-bc.schema.json` (per-BC leaf / `$defs.businessRule` 는 `schemas/business-rules.schema.json` 재사용)

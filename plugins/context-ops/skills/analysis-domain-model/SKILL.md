@@ -36,6 +36,8 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 `<user-project>/.ai-context/output/shared/domain.json`
 
+**multi-BC append (F-1)**: domain.json 은 repo-wide BC 카탈로그(shared/). 여러 BC 가 누적될 때 domain.json 을 **통째 재생성 ❌**(BC#2 가 BC#1·event·golf 덮음). `tools/_shared/append-catalog.js` 의 `appendBoundedContext(domainPath, bcEntry, ulAdditions)` 사용 = `bounded_contexts[]` upsert-by-`id`(sibling BC 보존) + `ubiquitous_language` term dedup 병합 + 기존 indent 보존.
+
 ## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / use-scenario-taxonomy §2.4 옵션 A) 일 때 — `@Entity`/ORM 스캔 대신 **입력어댑터 extract** 에서 산출:
@@ -57,6 +59,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 ## 다음
 
+- **산출 후 (F-2)**: `node ../../tools/schema-validator/src/cli.js .ai-context/output/shared/domain.json` 으로 enum/type RED 0 확인(skill-direct/multi-agent 경로는 gate#0 자동 미실행 / validate→repair).
 - `analysis-business-rules` 호출 권장
 
 ## 인용
@@ -65,6 +68,6 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 - 정책: methodology-spec/deliverables/2-domain.md
 - 정책: methodology-spec/use-scenario-taxonomy.md §2.4
 - 결단: DEC-2026-05-30-use-scenario-taxonomy
-- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4 (schema enum 주의 절 근거)
+- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4·§F-1·§F-2 (schema enum 주의 + 카탈로그 writer append-catalog + analysis exit-gate 근거)
 - schema: schemas/domain.schema.json
 - ADR: ADR-004 (DDD), ADR-005 (한국어)

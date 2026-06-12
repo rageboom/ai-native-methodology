@@ -67,9 +67,10 @@ bo-only 2개 모듈을 BC-vs-cross-cutting 판정(source-grounded):
 
 ## 시행 (additive / breaking 0 / 버전 bump 없음)
 
-1. **스킬 enum 힌트 추가** (prose only): `analysis-business-rules`(category·source_evidence.type·meta.methodology_version `v`접두·reviewer_role) · `analysis-sql-inventory`(carry_flags enum + external confidence≤0.8) · `analysis-domain-model`(enforced_by enum·persisted_to=string). agent 가 템플릿에 없는 enum 값을 자유 생성하지 않도록 "schema enum 주의" 블록 명시.
-2. **append indent-match 규약**: 위 §1 — well-known 카탈로그 append 시 기존 파일 indent(2-space) 유지 의무(reformat-as-append 금지). lifecycle-contract zone 규약에 한 줄.
-3. **validate-repair 게이트 명문화**: multi-agent/worktree 분석 후 `schema-validator <domains/<BC>>` + 도메인 validator(sql-inventory/br-cross) 실행 → 위반 repair 를 **per-BC 완료 정의(DoD)** 로. (스킬 "다음" 체이닝에 반영 — carry.)
+1. **스킬 enum 힌트 추가** (prose): `analysis-business-rules`(category·source_evidence.type·meta.methodology_version `v`접두·reviewer_role) · `analysis-sql-inventory`(carry_flags enum + external confidence≤0.8 = 이미 명시·무수정) · `analysis-domain-model`(enforced_by enum·persisted_to=string). agent 가 템플릿에 없는 enum 값을 자유 생성하지 않도록 "schema enum 주의" 블록 명시.
+2. **append indent-match 규약**: well-known 카탈로그 append 시 기존 파일 indent(2-space) 유지 의무(reformat-as-append 금지) — F-1 헬퍼가 `detectIndent` 로 강제.
+3. **F-1 본체 — 다중-BC 카탈로그 writer 헬퍼 신설**: `tools/_shared/append-catalog.js`(`load-business-rules.js` reader 의 **writer 짝**). 결정론 순수함수 `upsertById`(sibling 보존)·`mergeUbiquitousLanguage`(term dedup)·`upsertBcFile`(total_rules 재계산)·`detectIndent` + path 편의 `appendBoundedContext`/`appendBcFileToIndex`/`appendCautionGroup`(read→upsert→indent 보존 write). 회귀테스트 `tools/chain-driver/test/append-catalog.test.js` **12 pass**(핵심: multi-BC no-clobber + 2-space indent 보존). 스킬(analysis-business-rules §3 writer bullet · analysis-domain-model 산출물절)에 헬퍼 사용 절차 명시 = LLM 의 "카탈로그 통째 재작성"(BC#2 가 BC#1 덮음) 차단.
+4. **F-2 본체 — analysis exit-gate 명문화**: `schema-validator` 는 `REQUIRED_VALIDATORS_PER_STAGE.analysis`(gate#0)에 정상 등재돼 있으나 **skill-direct / multi-agent fan-out** 경로는 chain-driver 미경유로 자동 미실행 → `analysis-business-rules`·`analysis-domain-model` "다음" 에 직접 `schema-validator .ai-context/output` 실행(validate→repair = per-BC DoD) 명시.
 
 ## STOP / 검증 (데이터 레포 측)
 
@@ -77,14 +78,21 @@ bo-only 2개 모듈을 BC-vs-cross-cutting 판정(source-grounded):
 - sql-inventory-validator: 3 BC 모두 0 findings
 - br-cross-consistency: 49 findings **전부 LOW**(구조 스타일 / event·golf·mtrm 동질 / HIGH·MEDIUM·CRITICAL 0)
 - zone: shared 8 repo-wide byte-identical · 기존 leaf 무변경 · diff 순수 append(raw==`-w`)
-- 데이터 커밋: `826f7c57`(mtrm) + `3937a9ad`(helium/healing/hlum + base/athrt 판정) on `feat/resve-domains-analysis`
+- 데이터 커밋: `826f7c57`(mtrm) + `3937a9ad`(helium/healing/hlum + base/athrt 판정) → `fac2c698`(메인 `feature/context-ops-test` 머지 / golf chain `e63dc613` 과 무충돌)
+
+## STOP / 검증 (방법론 레포 측 — F-1/F-2 시행)
+
+- `tools/chain-driver` 전체 스위트 **535/535 pass**(기존 523 + append-catalog 12 신규 / 무회귀)
+- `skill-citation-validator` repo-wide **0 stale citation**
+- 변경 = additive(신규 `_shared/append-catalog.js` + test + 스킬 prose) / 기존 코드·schema 무변경 / breaking 0
 
 ## carry
 
 - **shared 흡수 산출물 신설**: reservation-asset-master(base) + reservation-access-authority(athrt) 를 `output/shared/` 에 둘 스키마/슬롯 정의 + 예약 BC 의 컨슈머 매핑(§3).
-- **validate-repair 게이트 자동화**: 스킬 "다음" 체이닝 또는 chain-driver gate 에 analysis-output schema-validate 묶기(§4-3) + 회귀 테스트(explore.js 패턴 = 순수 매핑 로직 분리).
+- **append-catalog 헬퍼를 스킬이 실제 호출하도록 자동화**: F-1 은 헬퍼+절차 명시까지(시행). multi-agent fan-out 에서 오케스트레이터가 헬퍼를 호출하게 하는 강제(예: analysis-exit-gate 가 카탈로그 무결성 검사) = 후속.
+- **F-2 deeper — fan-out 자동 gate**: skill "다음" 명문화(시행)는 LLM 준수 의존. chain-driver gate#0 를 skill-direct 경로에서도 강제하는 standalone analysis-exit 러너 = 후속.
 - **bc_scope auto-split**: 수동 14-datapoint 확보 → 자동(validator) 분리 신뢰성은 여전히 미실증(deferred 유지 / F14 불변).
-- **버전 bump**: 본 DEC 의 스킬 prose 변경을 release(v0.42.1 PATCH)로 승격할지 = 사용자 결정(release-readiness ceremony 동반).
+- **버전 bump**: 본 DEC 의 신규 `_shared/append-catalog.js` + 스킬 prose 를 release(v0.42.1 PATCH)로 승격할지 = 사용자 결정(release-readiness ceremony 동반).
 
 ## 인용
 
@@ -94,3 +102,5 @@ bo-only 2개 모듈을 BC-vs-cross-cutting 판정(source-grounded):
 - `DEC-2026-06-11-unit-layer-corroboration-poc18` — corroboration DEC 선례(버전 bump 없음 형식)
 - schema: `business-rules.schema.json`($defs.businessRule category·source_evidence.type) · `sql-inventory.schema.json`(carry_flags·confidence if/then) · `domain.schema.json`(enforced_by·persisted_to) · `migration-cautions.schema.json`(affected_scope·evidence) · `meta-confidence.schema.json`(reviewer_role)
 - skills: `analysis-business-rules` · `analysis-sql-inventory` · `analysis-domain-model`
+- 신규 도구(F-1): `tools/_shared/append-catalog.js`(writer / `tools/_shared/load-business-rules.js` reader 짝) + `tools/chain-driver/test/append-catalog.test.js`(회귀 12)
+- gate(F-2): `tools/chain-driver/src/gate-eval.js` `REQUIRED_VALIDATORS_PER_STAGE.analysis`(schema-validator gate#0 / DEC-2026-06-06-analysis-exit-gate)
