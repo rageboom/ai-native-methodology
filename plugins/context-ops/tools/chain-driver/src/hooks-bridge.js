@@ -41,13 +41,15 @@ export function checkCascadeConformance({ toolName, toolInput, root, cascadePlan
 }
 
 // Claude Code hooks output contract (정식 spec 정합).
-export function buildSuggestOutput({ skillId, meta, sessionId, agentId }) {
+export function buildSuggestOutput({ skillId, meta, sessionId, agentId, hookEventName = 'UserPromptSubmit' }) {
 	// suppressOutput=true → stdout 의 plain text 가 LLM context 로 흘러가지 않음.
 	// additionalContext 에 차단 문구를 명시 동봉 (LLM 이 보더라도 invoke 금지 명령).
 	// v4.0: agentId 가 있으면 agent dispatch 권고 동봉.
+	// fix: Claude Code v2.1.172+ hookSpecificOutput 에 hookEventName 필수 (누락 시 validation 오류).
 	return {
 		suppressOutput: true,
 		hookSpecificOutput: {
+			hookEventName,
 			additionalContext: formatHookBlockContext(skillId, meta, agentId),
 		},
 		// continue=true → hook 후 통상 동작.

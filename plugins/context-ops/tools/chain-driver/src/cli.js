@@ -1476,7 +1476,7 @@ function cmdHooksBridge(args) {
 		}
 		const out = {
 			suppressOutput: true,
-			hookSpecificOutput: { additionalContext },
+			hookSpecificOutput: { hookEventName: event, additionalContext },
 			continue: true,
 		};
 		process.stdout.write(JSON.stringify(out) + '\n');
@@ -1598,7 +1598,7 @@ function cmdHooksBridge(args) {
 				`영향 분석: chain-driver impact --graph <artifact-graph.json> --origin <node-id>`;
 			const out = {
 				suppressOutput: true,
-				hookSpecificOutput: { additionalContext: note },
+				hookSpecificOutput: { hookEventName: event, additionalContext: note },
 				continue: true,
 			};
 			process.stdout.write(JSON.stringify(out) + '\n');
