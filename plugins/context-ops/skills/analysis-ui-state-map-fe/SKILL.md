@@ -10,7 +10,7 @@ FE 의 client state + server state cache shape 추출.
 
 ## 사전 조건
 
-- inventory.json / architecture.json 존재
+- output/shared/inventory.json / output/shared/architecture.json 존재 (또는 manifest.analysis_refs.artifacts 해소)
 - FE 트랙 (React/Vue/Svelte/Solid + state lib 시그널)
 
 ## 절차
@@ -26,7 +26,7 @@ FE 의 client state + server state cache shape 추출.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/state-map.json`
+`<user-project>/.ai-context/output/domains/<BC>/state-map.json`
 
 ## 인용
 

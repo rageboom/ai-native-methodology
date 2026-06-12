@@ -19,7 +19,7 @@ chain 4 + chain 5 의 **횡단 evidence skill**. test-impl-pass-validator 진짜
 - `<project>/.ai-context/output/test-spec.json` (chain 4 산출)
 - `<project>/.ai-context/output/impl-spec.json` (chain 5 진행 중) — 있으면
 - `<project>/.ai-context/config/test-cmd.json` — 있으면 우선
-- `<project>/.ai-context/output/inventory.json` (stack_signals 추론 fallback)
+- `<project>/.ai-context/output/shared/inventory.json` (stack_signals 추론 fallback)
 
 ## 산출
 
@@ -45,7 +45,7 @@ chain 4 + chain 5 의 **횡단 evidence skill**. test-impl-pass-validator 진짜
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory <project>/.ai-context/output/inventory.json \
+  --inventory <project>/.ai-context/output/shared/inventory.json \
   --out <project>/.ai-context/output/evidence/test-invocation-evidence.json \
   --allow-execute \
   --json

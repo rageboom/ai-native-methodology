@@ -102,7 +102,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/error-mapping-spec.json` (산출물 16)
+- `<user-project>/.ai-context/output/shared/error-mapping-spec.json` (산출물 16)
 - raw Semgrep 출력 (`<user-project>/.ai-context/output/tool-runs/error-mapping-*.sarif`)
 - baseline 파일 (`<user-project>/.ai-context/baseline/error-mapping-baseline.json`)
 

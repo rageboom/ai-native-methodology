@@ -21,7 +21,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 - `<project>/.ai-context/output/test-spec.json` (TC-\* + source_file path)
 - `<project>/.ai-context/output/behavior-spec.json` (BHV-\* contract)
 - `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* Gherkin)
-- `<project>/.ai-context/output/inventory.json` (stack signals)
+- `<project>/.ai-context/output/shared/inventory.json` (stack signals)
 - `<project>/package.json` (react 버전 확인 / 19.x 의무)
 
 ## 산출물

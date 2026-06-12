@@ -57,7 +57,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/recovered-adr.json` (`schemas/recovered-adr.schema.json` / analysis 산출물 #25 / evidence-grounded / rationale abstention)
+- `<user-project>/.ai-context/output/shared/recovered-adr.json` (`schemas/recovered-adr.schema.json` / analysis 산출물 #25 / evidence-grounded / rationale abstention)
 
 ## 한계 (정직)
 

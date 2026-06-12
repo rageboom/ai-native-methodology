@@ -290,27 +290,46 @@ test-impl-pass-validator = 진짜 runner 호출 / 100% pass / 5종 물증 7 필�
 │   ├── input.json           # analysis-input-collection skill 메타 (user project file 명 = manifest phase ID axis / 짧음 형식)
 │   ├── baseline-<date>.json         # baseline+ratchet
 │   ├── findings.md                  # finding 누적
-│   └── output/                      # 분석 stage 산출물 (15종 중 해당분)
-│       ├── inventory.json
-│       ├── architecture.json
-│       ├── domain.json
-│       ├── business-rules.json      # 분할 index (bc_files[] / well-known 진입점)
-│       ├── business-rules/          # per-BC leaf (BR-split STEP 3) — <BC-slug>.json
-│       ├── openapi.yaml             # BE
-│       ├── schema.json              # DB
-│       ├── state-map.json           # FE
-│       ├── visual-manifest.json     # FE
-│       ├── a11y-spec.json           # FE
-│       ├── i18n-spec.json           # FE
-│       ├── static-security-spec.json # BE+FE
-│       ├── legacy-spectrum.json     # 공통
-│       ├── form-validation-spec.json # FE
-│       ├── type-spec.json           # FE (TS)
-│       ├── run-manifest.json        # 공통 (build/run/env 운영 컨텍스트 / official·opt-in / runnable 한정)
-│       ├── antipatterns.json        # 공통
-│       ├── migration-cautions.json   # 공통
-│       └── tool-runs/               # 진짜 도구 raw 출력 보존
+│   └── output/                      # canonical-global 1 세트 (read model 불변 / zone = storage-layout / v0.41.0)
+│       │                            #   ── 진입점(well-known basename / 디렉토리 이동만·rename ❌) ──
+│       ├── business-rules.json      # 분할 index (bc_files[] → domains/<BC>/business-rules.json)
+│       ├── antipatterns.json        # 카탈로그 (item.bc_scope: BC-id|cross_cutting / SOFT logical split)
+│       ├── migration-cautions.json  # 카탈로그 (caution.bc_scope 동형)
+│       ├── shared/                  # ZONE 1 — repo-wide + cross-cutting (각 1벌 / analysis 1회 / read-only / 병렬 = read-only 공유)
+│       │   ├── inventory.json
+│       │   ├── architecture.json
+│       │   ├── schema.json          # DB (단일 물리 스키마 / DB-always-on)
+│       │   ├── scope-carve.json     # reference-lens (도메인 후보 산출 → 도메인으로 못 쪼갬 / gate-inject ❌)
+│       │   ├── code-graph.json      # reference-lens (applies_to:all / gate-inject ❌)
+│       │   ├── recovered-adr.json   # repo-wide arch 결정 (legacy·brownfield / official·opt-in)
+│       │   ├── run-manifest.json    # build/run/env 운영 컨텍스트 (official·opt-in / runnable 한정)
+│       │   ├── error-mapping-spec.json   # app-wide HTTP 에러 계약
+│       │   ├── legacy-spectrum.json      # 공통
+│       │   ├── static-security-spec.json # BE+FE cross-cutting
+│       │   └── domain.json          # BC 카탈로그(repo-wide) — stakeholders/business_intent/ubiquitous_language + bounded_contexts[]
+│       │                            #   (≥2 BC + 병렬 압력 시 per-BC 블록 샤딩 = 차기 / 현 1-BC = whole)
+│       ├── domains/                 # ZONE 2 — per-BC 샤드 (각 도메인이 자기 폴더만 write → 병렬·누적 무충돌)
+│       │   └── <BC>/                #   예: BC-EVENT (BC id = architecture.json source)
+│       │       ├── business-rules.json   # leaf (top-level index 가 가리킴)
+│       │       ├── openapi.yaml          # BC-scoped paths (tag-grouped) / BE
+│       │       ├── formal-spec.json
+│       │       ├── characterization/     # spec + coverage + snapshots/ + evidence/ (디렉토리 통째 이동)
+│       │       ├── sql-inventory/        # json + legacy-xml-staging/ + evidence/ (디렉토리 통째 이동)
+│       │       ├── state-map.json        # FE per-BC (visual-manifest/a11y/i18n/form-validation/type-spec 동형)
+│       │       ├── antipatterns.json     # 도메인-local AP (bc_scope=<BC> / cross_cutting 은 top-level 카탈로그 유지)
+│       │       └── migration-cautions.json  # 도메인-local MC (동형)
+│       └── tool-runs/               # 진짜 도구 raw 출력 보존 (shared / per-BC companion 은 domains/<BC>/ 동거 가능)
 ```
+
+**zone 규약 (v0.41.0 / SOFT·opt-in)**:
+
+- **read model 불변**: zone = **storage-layout** 변경일 뿐. canonical-global READ model(논리적으로 1 세트 / scope 는 참조·무복사 / DEC-2026-06-07)은 그대로. 샤드는 합쳐서 1 세트(business-rules index+leaf 선례 동형 / `sharding_contradicts_canonical=false`). per-scope 복사본 ❌(= 폐기된 `*.subset.json` anti-pattern 부활 금지).
+- **공통(shared/)** = repo-wide + cross-cutting 구조 사실 → analysis 1회 산출·read-only. 병렬 분석 시 **읽기만** = 무충돌.
+- **도메인(domains/<BC>/)** = per-BC 샤드 → 각 도메인이 **자기 폴더만 write** = 도메인 간·병렬(worktree) 무충돌. 도메인 추가 = 디렉토리 add(머지 깔끔).
+- **진입점 basename 불변**: `business-rules.json`(index) / `antipatterns.json` / `migration-cautions.json` 은 top-level 유지. **디렉토리 이동만, 파일명 rename ❌**(drift-validator baseline / traceability ANALYSIS_FILENAMES / sync CANONICAL_ANALYSIS_FILES 연쇄 churn 회피).
+- **set-level 인덱스 = `work-unit-manifest.analysis_refs.artifacts`** (name→repo-rel-path 맵 / findings-aggregator gate#0 가 결정론 resolve). 산출물이 shared/ 든 domains/<BC>/ 든 manifest 가 가리키는 경로로 검증기 fleet 자동 추종.
+- **backward-compat**: 평면 레이아웃(`output/<artifact>.json`)도 **계속 valid**. 로더·경로해석은 manifest 우선 → 없으면 평면 fallback. 마이그레이션은 점진(opt-in). 검증 스키마 무변경 / 신규는 additive only.
+- **§8.1**: 디렉토리 zone = **1-domain(BC-EVENT) exercised**(degenerate) / `bc_scope` 필드 = **0-datapoint**(미populate / 물리 per-BC AP split deferred) → HARD gate·auto-split ❌ / ≥2 도메인 corroboration 전까지 "검증됨"·paradigm 주장 ❌. **FE-track per-BC 배치(state-map/visual-manifest/a11y/i18n/form-validation/type-spec → domains/<BC>/)는 미검증 carry**(검증 dogfood = ep-be-gea BE-only / FE PoC 부재 → BE 동형 원칙 적용일 뿐).
 
 **G3 — 작업 단위 (scope) 폴더 + manifest 자동 생성**:
 

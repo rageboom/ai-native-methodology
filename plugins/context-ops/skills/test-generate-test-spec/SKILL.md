@@ -17,7 +17,7 @@ chain 4 (test) 의 **진입 skill**. AC → TC 1:N forward link / 실 test 코�
 
 - `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* 목록)
 - `<project>/.ai-context/output/behavior-spec.json` (BHV-\* + property_tests)
-- `<project>/.ai-context/output/inventory.json` (stack_signals → framework match)
+- `<project>/.ai-context/output/shared/inventory.json` (stack_signals → framework match)
 - `<project>/.ai-context/config/test-cmd.json` (있으면 framework 명시)
 
 ## 산출물
@@ -115,7 +115,7 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
      --behavior   .ai-context/output/behavior-spec.json \
      --acceptance .ai-context/output/acceptance-criteria.json \
      --test-spec  .ai-context/output/test-spec.json \
-     --inventory  .ai-context/output/inventory.json \
+     --inventory  .ai-context/output/shared/inventory.json \
      --unit-spec  .ai-context/output/unit-spec.json   # v0.36.0 — mock-soundness advisory (SOFT/propose-only/비차단 / unit-spec 있을 때만)
    ```
 
@@ -124,7 +124,7 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
      --project <project> \
-     --inventory <project>/.ai-context/output/inventory.json \
+     --inventory <project>/.ai-context/output/shared/inventory.json \
      --dry-run --json
    ```
 

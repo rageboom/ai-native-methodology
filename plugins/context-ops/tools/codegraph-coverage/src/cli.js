@@ -13,7 +13,7 @@
 //
 //   exit: 0=ok / 2=invariant-violation / 3=codegraph DB 부재 또는 usage-error.
 
-import { existsSync, readFileSync, writeFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, statSync, readdirSync } from 'node:fs';
 import { join, resolve, isAbsolute, dirname } from 'node:path';
 import {
 	enumerateNodes,
@@ -53,6 +53,32 @@ const DELIVERABLE_FILES = {
 	'impl-spec': 'impl-spec.json',
 	'test-spec': 'test-spec.json',
 };
+
+// v0.41.0 (DEC-2026-06-12-artifact-zone) — canonical 산출물이 output/shared/ 또는 output/domains/<BC>/ 로 이동 가능 →
+//   delivDir 평면 읽기(구)가 zone 파일 silent-miss. 평면 → shared/ → domains/<BC>/ 순 첫-존재 채택(backward-compat).
+function zoneBases(delivDir) {
+	const bases = [delivDir, join(delivDir, 'shared')];
+	const dd = join(delivDir, 'domains');
+	if (existsSync(dd)) {
+		try {
+			for (const e of readdirSync(dd, { withFileTypes: true }))
+				if (e.isDirectory()) bases.push(join(dd, e.name));
+		} catch {
+			/* unreadable domains/ → 평면+shared 만 */
+		}
+	}
+	return bases;
+}
+// rels: 상대경로(문자열 또는 ['sub','f'] 배열) 목록. 각 zone base × 각 rel 첫 존재 반환(없으면 null).
+function zoneFind(delivDir, rels) {
+	for (const base of zoneBases(delivDir)) {
+		for (const rel of rels) {
+			const p = join(base, ...(Array.isArray(rel) ? rel : [rel]));
+			if (existsSync(p)) return p;
+		}
+	}
+	return null;
+}
 
 function usage(code = 3) {
 	console.error(
@@ -123,10 +149,10 @@ function main() {
 		delivDir = join(resolve(args.target), '.ai-context', 'output');
 	if (!delivDir || !existsSync(delivDir)) usage(3);
 
-	// inventory (stack 감지).
+	// inventory (stack 감지) — zone-aware (shared/inventory.json 우선 흡수).
 	const invPath = args.inventory
 		? resolve(args.inventory)
-		: join(delivDir, 'inventory.json');
+		: zoneFind(delivDir, ['inventory.json']) || join(delivDir, 'inventory.json');
 	const inventory = existsSync(invPath) ? readJson(invPath) : null;
 	const detect = classifyStack(inventory || {});
 
@@ -221,12 +247,14 @@ function main() {
 	//   openapi-extension controller_method ∖ codegraph 심볼(controller-anchor / STEP4 역방향 set-diff 재사용) + auth-grounding reading-aid.
 	//   coverage(STEP1/3)와 분리된 self-contained 모드 (early-exit / 비차단 exit 0). route 0 = verb-diff unverified note.
 	if (args.openapiCoverage) {
-		// api-extension.json 해소 (--api-extension > delivDir 관용 위치).
+		// api-extension.json 해소 (--api-extension > delivDir 관용 위치 / zone-aware: domains/<BC>/ 흡수).
 		const apiExtCandidates = [
 			args.apiExtension ? resolve(args.apiExtension) : null,
-			join(delivDir, 'api-extension.json'),
-			join(delivDir, 'api', 'api-extension.json'),
-			join(delivDir, 'openapi-extension.json'),
+			zoneFind(delivDir, [
+				'api-extension.json',
+				['api', 'api-extension.json'],
+				'openapi-extension.json',
+			]),
 		].filter(Boolean);
 		const apiExtPath = apiExtCandidates.find((p) => existsSync(p)) || null;
 		const apiExt = apiExtPath ? readJson(apiExtPath) : null;
@@ -234,16 +262,18 @@ function main() {
 			? apiExt.operations
 			: [];
 
-		// openapi.yaml 해소 (--openapi > api-extension.openapi_file > delivDir 관용 위치).
+		// openapi.yaml 해소 (--openapi > api-extension.openapi_file > delivDir 관용 위치 / zone-aware: domains/<BC>/openapi.yaml 흡수).
 		const openapiCandidates = [
 			args.openapi ? resolve(args.openapi) : null,
 			apiExt?.openapi_file && apiExtPath
 				? resolve(dirname(apiExtPath), apiExt.openapi_file)
 				: null,
-			join(delivDir, 'api', 'openapi.yaml'),
-			join(delivDir, 'api', 'openapi.yml'),
-			join(delivDir, 'openapi.yaml'),
-			join(delivDir, 'openapi.yml'),
+			zoneFind(delivDir, [
+				['api', 'openapi.yaml'],
+				['api', 'openapi.yml'],
+				'openapi.yaml',
+				'openapi.yml',
+			]),
 		].filter(Boolean);
 		const openapiPath = openapiCandidates.find((p) => existsSync(p)) || null;
 		const yamlText = openapiPath ? readFileSync(openapiPath, 'utf-8') : '';
@@ -312,8 +342,8 @@ function main() {
 	// v12.11.0 STEP 3 — module axis 입력: architecture.json(modules[]+dependencies[]) + cross-file edge 전수 열거.
 	//   arch.json 부재 = module axis unverified (graceful / buildCoverage 가 note). edges 부재 = undetectable note.
 	const arch = (() => {
-		const fp = join(delivDir, 'architecture.json');
-		return existsSync(fp) ? readJson(fp) : null;
+		const fp = zoneFind(delivDir, ['architecture.json']); // zone-aware (shared/architecture.json)
+		return fp ? readJson(fp) : null;
 	})();
 	let moduleEdgesByKind = null;
 	if (args.axes.includes('module')) {

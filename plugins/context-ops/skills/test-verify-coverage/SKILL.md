@@ -53,7 +53,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
   --behavior   .ai-context/output/behavior-spec.json \
   --acceptance .ai-context/output/acceptance-criteria.json \
   --test-spec  .ai-context/output/test-spec.json \
-  --inventory  .ai-context/output/inventory.json \
+  --inventory  .ai-context/output/shared/inventory.json \
   --threshold 0.85 \
   --json
 ```
@@ -65,7 +65,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory .ai-context/output/inventory.json \
+  --inventory .ai-context/output/shared/inventory.json \
   --allow-execute --json
 ```
 

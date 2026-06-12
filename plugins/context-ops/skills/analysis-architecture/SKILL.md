@@ -10,7 +10,7 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
 
 ## 사전 조건
 
-- `<user-project>/.ai-context/output/inventory.json` 존재 (analysis-source-inventory 완료)
+- `<user-project>/.ai-context/output/shared/inventory.json` 존재 (analysis-source-inventory 완료 / 또는 manifest.analysis_refs.artifacts 해소)
 
 ## 절차
 
@@ -36,7 +36,7 @@ inventory 기반으로 layered architecture / hexagonal / clean / micro / monoli
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/architecture.json` (json 단독 SSOT — .mermaid·.md 미산출)
+- `<user-project>/.ai-context/output/shared/architecture.json` (json 단독 SSOT — .mermaid·.md 미산출)
 
 ## greenfield (code-optional) mode
 

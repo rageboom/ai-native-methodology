@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- `<user-project>/.ai-context/output/domain.json` 존재 (analysis-domain-model 완료)
+- `<user-project>/.ai-context/output/shared/domain.json` 존재 (analysis-domain-model 완료 / 또는 manifest.analysis_refs.artifacts 해소)
 
 ## 절차
 
@@ -25,20 +25,20 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    }
    ```
 3. **business-rules 산출 (분할 / BR-split STEP 3 / v0.24.0)** — BC 그룹핑 후 **per-BC leaf 파일 + index** 로 산출(단일 파일 ❌):
-   - **per-BC leaf**: `<user-project>/.ai-context/output/business-rules/<BC-slug>.json` — 해당 BC 의 `business_rules[]` 만. schema = `schemas/business-rules-bc.schema.json` (`required:["bounded_context","business_rules"]`). 인스턴스에 `"$schema_ref": "schemas/business-rules-bc.schema.json"` 명시(파일명 fallback 부정합 → 라우팅 명시 필수).
+   - **per-BC leaf**: `<user-project>/.ai-context/output/domains/<BC-slug>/business-rules.json` — 해당 BC 의 `business_rules[]` 만. schema = `schemas/business-rules-bc.schema.json` (`required:["bounded_context","business_rules"]`). 인스턴스에 `"$schema_ref": "schemas/business-rules-bc.schema.json"` 명시(파일명 fallback 부정합 → 라우팅 명시 필수).
    - **index**: `<user-project>/.ai-context/output/business-rules.json` — `bc_files[]`(per-BC 파일 명단/통계) + `total_rules`. schema = `schemas/business-rules-index.schema.json`. 인스턴스에 `"$schema_ref": "schemas/business-rules-index.schema.json"` 명시 **필수**(basename 이 business-rules.json 이라 명시 없으면 옛 단일파일 schema 로 오라우팅).
-   - BC 미정 rule = `business-rules/_uncategorized.json` 버킷(단 `bounded_context` required 라 실무상 미발생 / 안전망).
+   - BC 미정 rule = `domains/_uncategorized/business-rules.json` 버킷(단 `bounded_context` required 라 실무상 미발생 / 안전망).
    - loader(`loadBusinessRules`)가 index 를 감지해 per-BC sibling 을 재조립 → 소비자(br-cross / federator / traceability / graph)는 전체 rule 전수 로드(분할 투명).
    ```json
    // .ai-context/output/business-rules.json  (index)
    {
    	"$schema_ref": "schemas/business-rules-index.schema.json",
    	"bc_files": [
-   		{ "bounded_context": "BC-USER", "file": "business-rules/BC-USER.json", "rule_count": 1, "rule_ids": ["BR-USER-VERIFY-001"] }
+   		{ "bounded_context": "BC-USER", "file": "domains/BC-USER/business-rules.json", "rule_count": 1, "rule_ids": ["BR-USER-VERIFY-001"] }
    	],
    	"total_rules": 1
    }
-   // .ai-context/output/business-rules/BC-USER.json  (per-BC leaf)
+   // .ai-context/output/domains/BC-USER/business-rules.json  (per-BC leaf)
    {
    	"$schema_ref": "schemas/business-rules-bc.schema.json",
    	"bounded_context": "BC-USER",
@@ -66,7 +66,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.ai-context/output/business-rules.json` (분할 **index**) + `<user-project>/.ai-context/output/business-rules/<BC-slug>.json` (per-BC leaf 1개 이상).
+`<user-project>/.ai-context/output/business-rules.json` (분할 **index** — top-level 유지) + `<user-project>/.ai-context/output/domains/<BC-slug>/business-rules.json` (per-BC leaf 1개 이상).
 
 ## greenfield (code-optional) mode
 

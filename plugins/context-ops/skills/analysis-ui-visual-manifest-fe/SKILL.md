@@ -34,7 +34,7 @@ DTCG token / 시각 시스템 / 컴포넌트 카탈로그.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/visual-manifest.json`
+`<user-project>/.ai-context/output/domains/<BC>/visual-manifest.json`
 
 ## 인용
 

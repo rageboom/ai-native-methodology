@@ -40,7 +40,7 @@ Strangler Pattern 적용 가능성 / migration debt 식별.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/legacy-spectrum.json`
+`<user-project>/.ai-context/output/shared/legacy-spectrum.json`
 
 ## 인용
 

@@ -133,27 +133,31 @@ function resolveChainArtifact(projectDir, f, scopeCtx) {
 	return join(projectDir, '.ai-context/output', f);
 }
 
-// business-rules: scopeCtx 주입 시 BR-split leaf(output/business-rules/BC-<SCOPE>.json) → canonical output/business-rules.json existsSync 우선.
+// business-rules: scopeCtx 주입 시 BR-split leaf → canonical index(output/business-rules.json) existsSync 우선.
+//   v0.41.0 zone: index 는 top-level 유지(loadBusinessRules 가 domains/<BC>/ leaf 재조립) → canonical 반환이 정답.
+//   leaf 후보 = zone(output/domains/BC-<SCOPE>/business-rules.json) → 평면(output/business-rules/BC-<SCOPE>.json) 순.
 //   scopeCtx=null → legacy input/business-rules.json (현 동작 무회귀).
 function resolveBusinessRules(projectDir, scopeCtx) {
 	if (scopeCtx?.scope) {
-		const leaf = join(
-			projectDir,
-			'.ai-context/output/business-rules',
-			`BC-${scopeCtx.scope.toUpperCase()}.json`,
-		);
-		if (existsSync(leaf)) return leaf;
+		const bc = `BC-${scopeCtx.scope.toUpperCase()}`;
+		const zoneLeaf = join(projectDir, '.ai-context/output/domains', bc, 'business-rules.json');
+		if (existsSync(zoneLeaf)) return zoneLeaf;
+		const flatLeaf = join(projectDir, '.ai-context/output/business-rules', `${bc}.json`);
+		if (existsSync(flatLeaf)) return flatLeaf;
 		const canonical = join(projectDir, '.ai-context/output/business-rules.json');
 		if (existsSync(canonical)) return canonical;
 	}
 	return join(projectDir, 'input/business-rules.json');
 }
 
-// domain: scopeCtx 주입 시 canonical output/domain.json existsSync 우선 → scopeCtx=null → legacy input/domain.json (현 동작 무회귀).
+// domain: scopeCtx 주입 시 canonical existsSync 우선 → scopeCtx=null → legacy input/domain.json (현 동작 무회귀).
+//   v0.41.0 zone: shared/domain.json(zone) → output/domain.json(평면 backward-compat) 순.
 function resolveDomain(projectDir, scopeCtx) {
 	if (scopeCtx?.scope) {
-		const canonical = join(projectDir, '.ai-context/output/domain.json');
-		if (existsSync(canonical)) return canonical;
+		const zoned = join(projectDir, '.ai-context/output/shared/domain.json');
+		if (existsSync(zoned)) return zoned;
+		const flat = join(projectDir, '.ai-context/output/domain.json');
+		if (existsSync(flat)) return flat;
 	}
 	return join(projectDir, 'input/domain.json');
 }

@@ -59,6 +59,11 @@
                   "enum": ["critical", "high", "medium", "low"],
                   "default": "medium"
                 },
+                "bc_scope": {
+                  "type": "string",
+                  "pattern": "^(BC-[A-Z0-9][A-Z0-9-]*|cross_cutting)$",
+                  "description": "v0.41.0 (DEC-2026-06-12-artifact-zone) — bounded-context 귀속. BC id = 도메인-local(물리 split deferred = 현재 top-level 카탈로그 안 논리 표시) / 'cross_cutting' = 전역(모든 scope 가시). optional·additive — 미지정 = cross_cutting 취급(안전 기본값). affected_scope(영향 영역 enum)와 별개 축(이건 BC 귀속). SOFT: validator HARD-gate ❌ / DEC-2026-06-10 F14 narrow / 현 0-datapoint → ≥2 도메인 재검토."
+                },
                 "related_antipatterns": {
                   "type": "array",
                   "items": { "type": "string", "pattern": "^AP-[A-Z0-9_-]+$" },

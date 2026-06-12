@@ -18,10 +18,10 @@ chain 5 (impl) 의 **진입 skill / i-strict 정통**. test-spec → impl 코드
 - `<project>/.ai-context/output/test-spec.json` (TC-\* 목록 / source_file path)
 - `<project>/.ai-context/output/behavior-spec.json` (BHV-\* contract / preconditions / postconditions / invariants)
 - `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* / Gherkin reasoning)
-- `<project>/.ai-context/output/architecture.json` (7대 / layered architecture)
-- `<project>/.ai-context/output/schema.json` (7대 / DB schema)
+- `<project>/.ai-context/output/shared/architecture.json` (7대 / layered architecture)
+- `<project>/.ai-context/output/shared/schema.json` (7대 / DB schema)
 - `<project>/.ai-context/output/api-extension.json` (7대 / endpoint 정합)
-- `<project>/.ai-context/output/inventory.json` (stack_signals / framework match)
+- `<project>/.ai-context/output/shared/inventory.json` (stack_signals / framework match)
 - `<project>/.ai-context/config/test-cmd.json` (test 실행 커맨드 설정)
 
 ## 산출물
@@ -140,7 +140,7 @@ commit_hash 부재 = static-runner lint-no-simulation chain-strict 자동 차단
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory <project>/.ai-context/output/inventory.json \
+  --inventory <project>/.ai-context/output/shared/inventory.json \
   --allow-execute --json
 ```
 

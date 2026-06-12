@@ -21,7 +21,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Edit
 - `<project>/.ai-context/output/test-spec.json`
 - `<project>/.ai-context/output/behavior-spec.json`
 - `<project>/.ai-context/output/acceptance-criteria.json`
-- `<project>/.ai-context/output/inventory.json`
+- `<project>/.ai-context/output/shared/inventory.json`
 - `<project>/package.json` (vue 버전 확인 / 3.x 의무)
 
 ## 산출물

@@ -29,7 +29,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (no-simula
 
 ## 산출물
 
-`<user-project>/.ai-context/output/a11y-spec.json`
+`<user-project>/.ai-context/output/domains/<BC>/a11y-spec.json`
 
 ## 인용
 

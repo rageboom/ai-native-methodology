@@ -10,7 +10,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 ## 사전 조건
 
-- `<user-project>/.ai-context/output/architecture.json` 존재
+- `<user-project>/.ai-context/output/shared/architecture.json` 존재 (또는 manifest.analysis_refs.artifacts 해소)
 - 가급적 `business-logic` phase (§8.1 단일 PoC 과적합 회피) — 같은 도메인이 여러 PoC / module 에서 일관 식별되는지 cross-check 권장
 
 ## 절차
@@ -34,7 +34,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/domain.json`
+`<user-project>/.ai-context/output/shared/domain.json`
 
 ## greenfield (code-optional) mode
 

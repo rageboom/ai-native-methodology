@@ -52,7 +52,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/code-graph.json` (`schemas/code-graph.schema.json` / reference-lens / NOT gate-injected)
+- `<user-project>/.ai-context/output/shared/code-graph.json` (`schemas/code-graph.schema.json` / reference-lens / NOT gate-injected)
 - codegraph raw 출력 (`codegraph.stdout.log` / `codegraph.stderr.log`)
 - codegraph index store (`<project-dir>/.codegraph/` — `.ai-context/` 와 동급 도구 인덱스 / `.gitignore` 권고)
 

@@ -119,7 +119,7 @@ ambiguous > 0 시:
 `schemas/characterization-spec.schema.json` 정합. 4 sub-section (meta_confidence + snapshots + intent_vs_bug + coverage).
 
 ```bash
-node ../../tools/schema-validator/src/cli.js .ai-context/output/characterization/
+node ../../tools/schema-validator/src/cli.js .ai-context/output/domains/<BC>/characterization/
 # Expect: characterization-spec.json valid + ratchet if/then + ambiguous if/then 모두 통과
 ```
 
@@ -128,12 +128,12 @@ node ../../tools/schema-validator/src/cli.js .ai-context/output/characterization
 ```bash
 # 기본 (absolute 또는 ratchet 첫 측정)
 node ../../tools/characterization-coverage-validator/src/cli.js \
-  --target .ai-context/output/characterization/ \
+  --target .ai-context/output/domains/<BC>/characterization/ \
   --threshold 0.80
 
 # ratchet trend 자동 검증 (coverage_strategy=ratchet + trend_required=true 인 경우)
 node ../../tools/characterization-coverage-validator/src/cli.js \
-  --target .ai-context/output/characterization/ \
+  --target .ai-context/output/domains/<BC>/characterization/ \
   --coverage-baseline .ai-context/baseline/characterization-coverage.json \
   [--write-coverage-baseline]    # legacy 첫 진입 시 / trend pass 후 갱신 시
 # Expect: snapshot 4 필수 필드 / intent_classification.type enum / named_classified_ratio ≥ 0.80 / coverage strategy 검증 통과 / ratchet trend ≥ baseline (regression 차단)
@@ -141,9 +141,9 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/characterization/characterization-spec.json` (산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지)
-- `<user-project>/.ai-context/output/characterization/coverage.json`
-- `<user-project>/.ai-context/output/characterization/snapshots/UC-*.json`
+- `<user-project>/.ai-context/output/domains/<BC>/characterization/characterization-spec.json` (산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지)
+- `<user-project>/.ai-context/output/domains/<BC>/characterization/coverage.json`
+- `<user-project>/.ai-context/output/domains/<BC>/characterization/snapshots/UC-*.json`
 
 ## chain 1 입력 보강
 

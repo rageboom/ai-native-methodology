@@ -36,7 +36,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/scope-carve/src/cli.js \
-     --architecture <user-project>/.ai-context/output/architecture.json \
+     --architecture <user-project>/.ai-context/output/shared/architecture.json \
      --repo <target-project-dir> \
      --output <user-project>/.ai-context/output \
      [--min-support N] [--min-confidence F] [--window N] [--max-transaction-size N] \
@@ -63,7 +63,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/scope-carve.json` (`schemas/scope-carve.schema.json` / reference-lens / NOT gate-injected / soft gate #0 evidence)
+- `<user-project>/.ai-context/output/shared/scope-carve.json` (`schemas/scope-carve.schema.json` / reference-lens / NOT gate-injected / soft gate #0 evidence)
 
 ## 한계 (정직)
 

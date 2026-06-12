@@ -106,9 +106,9 @@ chain 1+ (discovery / spec / plan / test / implement) skill ❌ — `discovery-a
 
 ## 산출 자산 (chain 1 sub / analysis stage)
 
-- `.ai-context/output/inventory.json` / `architecture.json` / `domain.json` / `rules.json` / `schema.json` (json 단독 SSOT) / `openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT)
-- `.ai-context/output/ui-spec.json` / `state-map.json` / `visual-manifest.json` / `a11y-spec.json` / `i18n-spec.json` / `static-security-spec.json` / `form-validation-spec.json` / `type-spec.json` / `legacy-spectrum.json`
-- `.ai-context/output/state-machines.json` (json 단독 SSOT / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `characterization-spec.json` / `sql-inventory.json` / `error-mapping-spec.json`
+- `.ai-context/output/shared/inventory.json` / `shared/architecture.json` / `shared/domain.json` / `rules.json` / `shared/schema.json` (json 단독 SSOT) / `domains/<BC>/openapi.yaml` / `antipatterns.json` / `migration-cautions.json` (json 단독 SSOT)
+- `.ai-context/output/domains/<BC>/ui-spec.json` / `domains/<BC>/state-map.json` / `domains/<BC>/visual-manifest.json` / `domains/<BC>/a11y-spec.json` / `domains/<BC>/i18n-spec.json` / `shared/static-security-spec.json` / `domains/<BC>/form-validation-spec.json` / `domains/<BC>/type-spec.json` / `shared/legacy-spectrum.json`
+- `.ai-context/output/state-machines.json` (json 단독 SSOT / sequence 는 formal-spec.json sequences) / `decision-tables.json` / `invariants.json` / `domains/<BC>/characterization/characterization-spec.json` / `domains/<BC>/sql-inventory.json` / `shared/error-mapping-spec.json`
 - `.ai-context/output/findings.md`
 
 ## When NOT to invoke

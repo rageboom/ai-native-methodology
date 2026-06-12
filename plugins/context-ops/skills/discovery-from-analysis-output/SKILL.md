@@ -57,7 +57,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
    node ${CLAUDE_PLUGIN_ROOT}/tools/discovery-extraction-validator/src/cli.js \
      --discovery .ai-context/output/discovery-spec.json \
      --rules     .ai-context/output/business-rules.json \
-     --domain    .ai-context/output/domain.json \
+     --domain    .ai-context/output/shared/domain.json \
      --json
    ```
 

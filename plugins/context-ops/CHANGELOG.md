@@ -10,6 +10,42 @@
 
 ---
 
+## [0.41.0] — 2026-06-12 MINOR — canonical 산출물 2-zone 재구조화 (shared/ + domains/<BC>/)
+
+**SSOT**: `decisions/DEC-2026-06-12-artifact-zone.md` / plan `~/.claude/plans/plan-artifact-zone-restructure.md`.
+
+canonical 분석 산출물의 물리 저장 레이아웃을 평면(`.ai-context/output/<f>`)에서 **2-zone** 으로 분리. 공통(repo-wide+cross-cutting)과 도메인별(per-BC) 산출물이 서로 안 겹치게 — 특히 병렬 CLI / git worktree 에서 도메인마다 자기 `domains/<BC>/` 만 write, `shared/` 는 analysis 1회·read-only. SOFT·opt-in·backward-compat(평면 계속 valid).
+
+### 핵심 (canonical-global 보존)
+
+- **read model ⊥ storage layout**: DEC-2026-06-07-subset-retire 가 보호하는 read model(논리 1 세트 / scope 참조·무복사)은 불변. 본 변경은 물리 레이아웃만 — 샤드는 합쳐서 여전히 1 세트(loader 재조립). `sharding_contradicts_canonical=false`.
+- DEC-2026-06-09-br-split-step3(business-rules index+per-BC leaf 선례) 일반화. loader(`_shared/load-business-rules.js`)는 indexDir 기준 상대 resolve → **무수정 투명**(실증 36 rule 재조립).
+
+### zone 배치
+
+- **공통(`output/shared/`)**: inventory · architecture · schema · scope-carve · code-graph · recovered-adr · run-manifest · error-mapping-spec · legacy-spectrum · static-security-spec · domain.json(BC 카탈로그=repo-wide).
+- **도메인(`output/domains/<BC>/`)**: business-rules leaf · openapi · formal-spec · characterization/ · sql-inventory/ · FE(state-map·visual-manifest·a11y·i18n·form-validation·type-spec).
+- **top-level 유지**: business-rules.json(index) · antipatterns.json · migration-cautions.json · tool-runs/. **basename 불변 = 디렉토리 이동만·rename ❌**(G2).
+
+### 변경
+
+- **lifecycle-contract.md**: output/ tree 를 진입점 + shared/ + domains/<BC>/ 로 재작성 + zone 규약 문단(read-model 불변·basename 불변·manifest 인덱스·SOFT·§8.1).
+- **schemas(additive)**: antipatterns + migration-cautions `bc_scope`(BC-id|cross_cutting / optional / 미지정=cross_cutting 안전기본 / **어떤 validator 도 HARD-gate ❌**) — DEC-2026-06-10 F14 **narrow**(필드 금지→SOFT 허용 / 물리 per-BC AP split 여전히 deferred / 0-datapoint). business-rules-index `file` desc = domains/<BC>/business-rules.json.
+- **path 해석 manifest-aware/zone-aware**: findings-aggregator(resolveDomain shared/ · resolveBusinessRules domains leaf) + chain-driver sync.js(registerCanonicalSources manifest.analysis_refs basename 추종 / detectDrift 저장 s.path 추종).
+- **적대 리뷰(wf_bf7140f5)가 자기검토 편향 적발 → 고침**: ① **R-HIGH** traceability-matrix-builder `--graph` ANALYSIS_FILENAMES zone-aware(평면→shared/→domains/<BC>/ +nested / analysis 노드 39→46 복원) + resync-graph 추종 ② **R-MED** codegraph-coverage `zoneFind`(inventory/architecture/openapi) ③ **R-MED** skill EMIT 경로 sweep(analysis-* SKILL.md + agent 산출물 경로 zone 화 / 53 path + 3 miss fix / regression 0 — 다음 도메인 분석이 평면 재생성 방지).
+
+### STOP / 검증
+
+- ep-be-gea event 라이브 dogfood: analysis gate **7/7 validator ok**(새 zone 경로) / schema-validator output/ 재귀 15 valid / spec·implement gate critical0·high0·coverage1.0 / sync --register manifest-aware 추종 실증 / read-model 위반0·stale 중복0.
+- 방법론 테스트 무회귀: schema-validator 42 · drift 49 · br-cross 32 · chain-driver 523 · aggregator 66 · plan-coverage 47 · spec-test-link 11 · traceability 179 · codegraph-coverage 121 · **release-readiness 42/42**. (zone 작업 원인 회귀 **0** / readme_version_sync·shipped_provenance_leak 는 버전 bump·DEC 인용분 정정.)
+- **동반 보완(선재)**: `shipped_identity_leak` — skills/ticket-sync/env-config-reference.md 의 `jira.smilegate.net` 사내 도메인 노출 2건(:71 prose / curl 예제)이 allow-identity 마커 누락 = **선재**(직전 "42/42" 기록이 이 누락분 미반영이었음 = self-recorded-fact 정정). prose=인라인 `<!-- allow-identity -->` / curl=`JIRA_HOST` 변수 추출 + `# allow-identity` 주석(파일 내 기존 2 마커 컨벤션 정합 / 예제 가독성 개선). ticket-sync=본질상 SG-MIS 사내 전용 스킬 → 노출 의도 인정. zone 작업과 독립.
+
+### §8.1
+
+- 디렉토리 zone = **1-domain(BC-EVENT) exercised**(degenerate) / `bc_scope` = **0-datapoint**(미populate / 물리 per-BC AP split deferred) / FE-track per-BC = 미검증 carry(BE-only dogfood). → SOFT/opt-in / HARD gate·auto-split ❌ / ≥2 도메인(reservation-golf 등) corroboration 전까지 paradigm·"검증됨" 주장 ❌ / 평면 backward-compat = zero-breakage.
+
+---
+
 ## [0.40.0] — 2026-06-12 MINOR — unit 층 HARD flip (SOFT→HARD 게이트 격상 / LEVER A·B)
 
 GATED 5조건 중 ①②③④(poc-21 greenfield designed_from_spec) 충족 후 조건⑤ 시행. unit 층 두 게이트를 SOFT→HARD 차단으로 격상. DEC-2026-06-12-unit-layer-hard-flip. workflow(senior GO + trust/count + change-spec) raw-source 실측 기반.

@@ -18,7 +18,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) figma 디자인이 
 ## 입력
 
 - Figma file URL + selected frame
-- (선택) `.ai-context/output/visual-manifest.json` (`analysis-from-figma` baseline 산출 — design tokens / layouts 참조 cross-check)
+- (선택) `.ai-context/output/domains/<BC>/visual-manifest.json` (`analysis-from-figma` baseline 산출 — design tokens / layouts 참조 cross-check / 또는 manifest.analysis_refs.artifacts 해소)
 - discovery context: `intent` (new feature / modify / bug-fix) — orchestrator inject
 
 ## 산출

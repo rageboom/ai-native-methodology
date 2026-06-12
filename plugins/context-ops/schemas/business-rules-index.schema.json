@@ -29,7 +29,7 @@
     },
     "bc_files": {
       "type": "array",
-      "description": "per-BC leaf 파일 명단. file = index 파일 dir 기준 상대경로(예: business-rules/BC-AUTH.json). rule_count/rule_ids = 무결성 계약(loader 재조립 결과와 대조 가능).",
+      "description": "per-BC leaf 파일 명단. file = index 파일 dir 기준 상대경로(v0.41.0 zone = domains/<BC>/business-rules.json / 평면 backward-compat = business-rules/<BC>.json). rule_count/rule_ids = 무결성 계약(loader 재조립 결과와 대조 가능).",
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -43,7 +43,7 @@
           "file": {
             "type": "string",
             "minLength": 1,
-            "description": "index 파일 dir 기준 상대경로 (예: business-rules/BC-AUTH.json)."
+            "description": "index 파일 dir 기준 상대경로. v0.41.0 zone 레이아웃 = `domains/<BC>/business-rules.json` (예: domains/BC-EVENT/business-rules.json) / 평면 backward-compat = `business-rules/<BC>.json`. 로더(loadBusinessRules)는 indexDir 기준 join 이라 둘 다 투명."
           },
           "rule_count": {
             "type": "integer",

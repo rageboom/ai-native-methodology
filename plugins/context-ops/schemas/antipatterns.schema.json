@@ -51,6 +51,11 @@
             "enum": ["critical", "high", "medium", "low", "info"],
             "description": "심각도"
           },
+          "bc_scope": {
+            "type": "string",
+            "pattern": "^(BC-[A-Z0-9][A-Z0-9-]*|cross_cutting)$",
+            "description": "v0.41.0 (DEC-2026-06-12-artifact-zone) — bounded-context 귀속. BC id(예: BC-EVENT) = 도메인-local(개념상 domains/<BC>/antipatterns.json / 물리 split 은 deferred = 현재 antipatterns.json top-level 카탈로그 안에서 bc_scope 로 논리 표시) / 'cross_cutting' = 전역(모든 scope 가시). optional·additive — 미지정 = cross_cutting 취급(silent-omission 방지 안전 기본값). ⚠️ id-prefix(카테고리: DB/SECURITY/…)는 scope 가 아님(F14 / AP-SECURITY-001 이 event-local 가능) — 실판단으로 작성. SOFT: 어떤 validator 도 본 필드로 HARD-gate ❌ / DEC-2026-06-10 F14 narrow(필드 금지→SOFT 허용) / 현 0-datapoint(미populate) → ≥2 도메인 mis-attribution 입증까지 over-claim ❌."
+          },
           "why_avoid": {
             "type": "string",
             "description": "왜 회피해야 하는가 (재구현 관점)"

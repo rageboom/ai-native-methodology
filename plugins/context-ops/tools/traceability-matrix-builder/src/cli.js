@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { writeFileSync, existsSync } from 'node:fs';
+import { writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { buildMatrix, loadJson } from './builder.js';
@@ -55,6 +55,40 @@ const ASPECT_FILENAMES = {
 	'static-security': 'static-security-spec.json',
 	'legacy-spectrum': 'legacy-spectrum.json',
 };
+
+// v0.41.0 (DEC-2026-06-12-artifact-zone) — canonical 산출물이 output/shared/ (공통) 또는 output/domains/<BC>/ (도메인별) 로
+//   이동 가능 → 평면 단일 dir 스캔(구)이 zone 파일을 조용히 누락(R-HIGH-1). 평면 backward-compat 유지하며 zone 후보 보강.
+//   nested = characterization-spec/sql-inventory 는 named 서브디렉토리 안에 거주(평면/zone 양쪽).
+const NESTED_SUBDIR = {
+	'characterization-spec': 'characterization',
+	'sql-inventory': 'sql-inventory',
+};
+function listDomainBcDirs(analysisDir) {
+	const domainsDir = join(analysisDir, 'domains');
+	if (!existsSync(domainsDir)) return [];
+	try {
+		return readdirSync(domainsDir, { withFileTypes: true })
+			.filter((e) => e.isDirectory())
+			.map((e) => e.name);
+	} catch {
+		return [];
+	}
+}
+// kind+fname → 우선순위 후보 경로 목록 (첫 존재 채택). 평면 → shared/ → domains/<BC>/ 순 + nested 변형.
+function analysisCandidatePaths(analysisDir, kind, fname) {
+	const sub = NESTED_SUBDIR[kind];
+	const bases = [
+		analysisDir,
+		join(analysisDir, 'shared'),
+		...listDomainBcDirs(analysisDir).map((bc) => join(analysisDir, 'domains', bc)),
+	];
+	const paths = [];
+	for (const base of bases) {
+		paths.push(join(base, fname));
+		if (sub) paths.push(join(base, sub, fname));
+	}
+	return paths;
+}
 
 function parseArgs(argv) {
 	const out = { dryRun: false, graph: false, json: false };
@@ -158,22 +192,27 @@ if (args.graph) {
 	if (args.analysisDir) {
 		for (const [kind, fnameOrList] of Object.entries(ANALYSIS_FILENAMES)) {
 			// v11.24.0 — filename 은 string 또는 후보 배열 (db-schema multi-candidate). 첫 존재 채택.
-			const candidates = Array.isArray(fnameOrList)
-				? fnameOrList
-				: [fnameOrList];
-			for (const fname of candidates) {
-				const p = join(args.analysisDir, fname);
-				if (existsSync(p)) {
-					// v0.4.0 (BR-split STEP 2): business-rules 는 _shared loader 경유로 정규화 →
-					//   graph-synthesizer 의 `.business_rules` accessor 무변경 + STEP 3(index+per-BC)
-					//   분할 시 본 cli 무수정(loader 내부만 확장) single-point.
-					analysis[kind] =
-						kind === 'business-rules'
-							? { business_rules: loadBusinessRules(p) }
-							: loadJson(p);
-					analysisPaths[kind] = p;
-					break; // 첫 존재 후보 채택 (canonical 우선 순서)
+			// v0.41.0 — 각 fname 을 zone-aware 후보경로(평면→shared/→domains/<BC>/ +nested)로 확장. 첫 존재 채택.
+			const fnames = Array.isArray(fnameOrList) ? fnameOrList : [fnameOrList];
+			let matched = null;
+			for (const fname of fnames) {
+				for (const p of analysisCandidatePaths(args.analysisDir, kind, fname)) {
+					if (existsSync(p)) {
+						matched = p;
+						break;
+					}
 				}
+				if (matched) break;
+			}
+			if (matched) {
+				// v0.4.0 (BR-split STEP 2): business-rules 는 _shared loader 경유로 정규화 →
+				//   graph-synthesizer 의 `.business_rules` accessor 무변경 + STEP 3(index+per-BC)
+				//   분할 시 본 cli 무수정(loader 내부만 확장) single-point.
+				analysis[kind] =
+					kind === 'business-rules'
+						? { business_rules: loadBusinessRules(matched) }
+						: loadJson(matched);
+				analysisPaths[kind] = matched;
 			}
 		}
 	}

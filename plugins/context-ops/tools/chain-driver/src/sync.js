@@ -94,15 +94,23 @@ export function registerCanonicalSources(projectRoot, scope, opts = {}) {
   const registered = [];
   const subsets = [];
   const skipped = [];
+  // v0.41.0 zone (DEC-2026-06-12-artifact-zone): canonical 파일이 shared/ 또는 domains/<BC>/ 로 이동 가능.
+  //   manifest.analysis_refs.artifacts(name→repo-rel path) 의 basename 매칭으로 실제 위치 resolve → 없으면 평면 output/<name> fallback.
+  //   detectDrift 는 저장된 s.path 를 따라가므로 등록 시점만 location-aware 면 충분.
+  const artifactPaths = (m.analysis_refs && m.analysis_refs.artifacts) || {};
+  const byBasename = new Map();
+  for (const v of Object.values(artifactPaths)) {
+    if (typeof v === 'string' && v.length > 0) byBasename.set(v.split('/').pop(), v);
+  }
   for (const name of files) {
-    const rel = join('.ai-context', 'output', name);
+    const rel = (byBasename.get(name) || join('.ai-context', 'output', name)).split('\\').join('/');
     const abs = join(projectRoot, rel);
     if (!existsSync(abs)) {
       skipped.push(name);
       continue;
     }
     // path 는 posix-style repo-rel 로 정규화 (detectDrift 가 join(projectRoot, s.path) 로 해소).
-    const path = rel.split('\\').join('/');
+    const path = rel;
     if (name === BR_CANONICAL && bcs.length > 0) {
       // S2: BR-한정 BC-subset hash + bounded_contexts 표기 (non-empty 일 때만 / idempotency 보호 / Senior minor-5).
       const count = subsetRules(abs, bcs).length;
