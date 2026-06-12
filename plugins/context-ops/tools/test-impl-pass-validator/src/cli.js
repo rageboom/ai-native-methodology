@@ -19,7 +19,7 @@
 //   2 — usage error / config parse error / --allow-execute 부재 + --dry-run 부재
 
 import { spawnSync } from 'node:child_process';
-import { readFileSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
+import { readFileSync, existsSync, writeFileSync, mkdirSync, statSync, readdirSync } from 'node:fs';
 import { dirname, resolve, join, isAbsolute } from 'node:path';
 import { loadTestCmd } from './load-test-cmd.js';
 import { computeResultHash } from './result-hash.js';
@@ -179,6 +179,37 @@ function executeWithRetry(testCmd, projectDir, retryCap) {
 	return last;
 }
 
+// F-R2-41 — junit-xml report_path 디렉토리 재귀 집계 (JVM 멀티모듈/클래스별 XML 다수 → 결정론 합산).
+//   각 *.xml 를 parseJunitXml 로 개별 파싱 후 count 합산 + test_names/tests concat. 표준 <testsuites> 다중파일 패턴.
+function aggregateJunitXmlDir(dir) {
+	const xmls = [];
+	const stack = [dir];
+	while (stack.length) {
+		const cur = stack.pop();
+		let entries;
+		try { entries = readdirSync(cur, { withFileTypes: true }); } catch { continue; }
+		for (const e of entries) {
+			const full = join(cur, e.name);
+			if (e.isDirectory()) stack.push(full);
+			else if (e.isFile() && e.name.endsWith('.xml')) xmls.push(full);
+		}
+	}
+	xmls.sort(); // 결정성 (parse-twice 동일 순서)
+	const agg = { framework: 'junit5', pass_count: 0, fail_count: 0, skip_count: 0, total: 0, test_names: [], tests: [], success: true };
+	for (const x of xmls) {
+		let r;
+		try { r = parseJunitXml(readFileSync(x, 'utf-8')); } catch { continue; }
+		agg.pass_count += r.pass_count ?? 0;
+		agg.fail_count += r.fail_count ?? 0;
+		agg.skip_count += r.skip_count ?? 0;
+		agg.total += r.total ?? 0;
+		if (Array.isArray(r.test_names)) agg.test_names.push(...r.test_names);
+		if (Array.isArray(r.tests)) agg.tests.push(...r.tests);
+	}
+	agg.success = agg.fail_count === 0 && agg.total > 0;
+	return agg;
+}
+
 function parseRunnerOutput(testCmd, runResult, framework, projectDir) {
 	const adapter = selectAdapter(framework);
 
@@ -186,6 +217,12 @@ function parseRunnerOutput(testCmd, runResult, framework, projectDir) {
 	if (testCmd.report_path) {
 		const rp = resolvePath(testCmd.report_path, projectDir);
 		if (existsSync(rp)) {
+			// F-R2-41: report_path 가 디렉토리(gradle/JUnit5 클래스별·멀티모듈 XML)면 단일 readFileSync 가 EISDIR.
+			//   junit-xml 한정 디렉토리 재귀 → 모든 *.xml 파싱 후 결정론 합산 (jest/vitest/pytest 등 단일 JSON 리포트는 단일파일 가정 유지).
+			//   단일파일 = 기존 동작 byte-identical (무회귀).
+			if (testCmd.report_format === 'junit-xml' && statSync(rp).isDirectory()) {
+				return aggregateJunitXmlDir(rp);
+			}
 			const content = readFileSync(rp, 'utf-8');
 			if (testCmd.report_format === 'junit-xml') return parseJunitXml(content);
 			if (framework === 'pytest') return parsePytestJson(content);

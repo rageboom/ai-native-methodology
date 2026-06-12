@@ -520,6 +520,7 @@ export function synthesizeGraph(input) {
     operationalTask = null,
     testSpec = null,
     implSpec = null,
+    unitSpec = null,
     analysis = {},
     aspect = {},
     sourcePaths = {},
@@ -617,6 +618,37 @@ export function synthesizeGraph(input) {
       const extra = {};
       if (ptr.commit_hash) extra.commit_hash = ptr.commit_hash;
       edges.push(makeEdge(impl.id, ptr.path, 'implements', extra));
+    }
+  }
+
+  // --- ★ v0.36.0 TDD/unit 층 — UNIT 노드 + edge (F-R2-44 / DEC-2026-06-12-graph-unit-layer-wiring) ---
+  //   UNIT = 클래스/순수함수 빌딩블록 (behavior BDD 스레드에 나란히 도는 TDD/unit 층 / DEC-2026-06-11-tdd-unit-layer-thread).
+  //   cli 가 unitSpec 을 넘기나 synthesizeGraph 가 destructure·미사용이던 반쪽 배선 완성 → unit-layer TC(class_ref=UNIT)가
+  //   ac_ref 부재로 orphan 되던 것 해소(graph-integrity implement gate blocking 정합 / F-DOGFOOD-STORY-ORPHAN 동근).
+  //   additive: unitSpec 부재 = UNIT 노드 0 = zero-change (backward-compat).
+  const unitIds = new Set();
+  for (const u of unitSpec?.units ?? []) {
+    if (!u.id) continue;
+    pushNode(chainNodeFromItem(u, 'UNIT', sourcePaths.unitSpec ?? '(unit-spec)'));
+    unitIds.add(u.id);
+  }
+  if (unitIds.size > 0) {
+    // BHV/AC → UNIT (item.unit_refs): spec 가 선언한 빌딩블록 의존 (derived_from).
+    for (const b of behavior?.behaviors ?? []) {
+      for (const ur of b.unit_refs ?? []) {
+        if (unitIds.has(ur)) edges.push(makeEdge(b.id, ur, 'derived_from'));
+      }
+    }
+    for (const ac of acceptance?.criteria ?? []) {
+      for (const ur of ac.unit_refs ?? []) {
+        if (unitIds.has(ur)) edges.push(makeEdge(ac.id, ur, 'derived_from'));
+      }
+    }
+    // unit-layer TC → UNIT (tests). class_ref = UNIT id (composition TC 는 ac_ref 로 이미 연결).
+    for (const tc of testSpec?.test_cases ?? []) {
+      if (tc.test_layer === 'unit' && tc.class_ref && unitIds.has(tc.class_ref)) {
+        edges.push(makeEdge(tc.id, tc.class_ref, 'tests'));
+      }
     }
   }
 

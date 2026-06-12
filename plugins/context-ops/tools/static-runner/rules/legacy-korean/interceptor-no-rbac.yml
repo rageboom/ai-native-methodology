@@ -15,18 +15,32 @@ rules:
                 ...
                 return true;
               }
-          - pattern-not: |
-              public boolean preHandle(...) {
-                ...
-                if (...AUTH...) { ... }
-                ...
-              }
-          - pattern-not: |
-              public boolean preHandle(...) {
-                ...
-                $X.select$Y(...);
-                ...
-              }
+          # F-R2-07: 구 `if (...AUTH...)` = 식 위치 ellipsis-identifier → Java PatternParseError.
+          #   metavariable-regex 로 "AUTH 포함 조건 검사" 의도 보존하며 파싱 가능하게 교정.
+          - pattern-not:
+              patterns:
+                - pattern: |
+                    public boolean preHandle(...) {
+                      ...
+                      if ($COND) { ... }
+                      ...
+                    }
+                - metavariable-regex:
+                    metavariable: $COND
+                    regex: AUTH
+          # F-R2-07: 구 `$X.select$Y(...)` = 리터럴+메타변수 접합 → Java PatternParseError (semgrep exit 2 / baseline 항상 실패).
+          #   metavariable-regex 로 "select* 메서드 호출" 의도 보존하며 파싱 가능하게 교정.
+          - pattern-not:
+              patterns:
+                - pattern: |
+                    public boolean preHandle(...) {
+                      ...
+                      $X.$SEL(...);
+                      ...
+                    }
+                - metavariable-regex:
+                    metavariable: $SEL
+                    regex: ^select
           - pattern-inside: |
               class $C extends HandlerInterceptorAdapter {
                 ...

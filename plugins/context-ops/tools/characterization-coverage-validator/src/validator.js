@@ -334,17 +334,14 @@ export function validateCharacterization(
 		}
 	}
 
-	// 4. intent-vs-bug.md ambiguous_carry grep
+	// 4. intent-vs-bug.md ambiguous_carry grep (backward-compat OR 분기 / md 존재 시만).
+	//   F-R2-29 (DEC-2026-06-12): 구 'intent-vs-bug.md not found → high' 무조건 발화 제거.
+	//   ADR-011(json 단독 SSOT) + SKILL "intent-vs-bug.md twin 폐지" 정합 — SSOT = characterization-spec.json `intent_vs_bug` 객체.
+	//   md 강제 = ADR-011 위반 + skill↔validator drift 였음. SSOT 부재(entry+md 둘 다 없음)는 §5 후 medium(entry_absent)으로 강등 발화.
 	const intentVsBugPath = join(targetDir, 'intent-vs-bug.md');
 	let intentVsBugContent = '';
 	if (existsSync(intentVsBugPath)) {
 		intentVsBugContent = readFileSync(intentVsBugPath, 'utf8');
-	} else {
-		findings.push({
-			kind: 'intent_vs_bug.missing',
-			severity: 'high',
-			message: `${intentVsBugPath} not found`,
-		});
 	}
 
 	// 5. characterization-spec.json read (선택 / entry file / 통합 검증용)
@@ -360,6 +357,17 @@ export function validateCharacterization(
 				message: `characterization-spec.json: ${e.message}`,
 			});
 		}
+	}
+
+	// F-R2-29 (DEC-2026-06-12): intent_vs_bug SSOT 부재 = medium (md 강제 high 대체).
+	//   entry.intent_vs_bug 객체(=json SSOT) 도 없고 intent-vs-bug.md(legacy twin) 도 없으면 intent/bug 분류 신호 전무 → 정직 medium.
+	//   high→md 강제 ❌ / medium→json SSOT 부재 ⭕ (ADR-011 정합 / Senior GO@0.92).
+	if (!entry?.intent_vs_bug && !intentVsBugContent) {
+		findings.push({
+			kind: 'intent_vs_bug.entry_absent',
+			severity: 'medium',
+			message: `intent_vs_bug SSOT 부재 — characterization-spec.json 의 intent_vs_bug 객체(권장 SSOT) 와 intent-vs-bug.md(legacy twin) 둘 다 없음. characterization-spec.json 에 intent_vs_bug 객체 산출 권장 (ADR-011 json 단독 SSOT).`,
+		});
 	}
 
 	// 6. named_classified_ratio 계산 + threshold 검증

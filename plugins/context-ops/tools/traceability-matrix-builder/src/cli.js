@@ -201,6 +201,7 @@ if (args.graph) {
 		operationalTask: operationalTaskData,
 		testSpec: chain.testSpec,
 		implSpec: chain.implSpec,
+		unitSpec: chain.unitSpec,
 		analysis,
 		aspect,
 		sourcePaths: {
@@ -211,6 +212,7 @@ if (args.graph) {
 			operationalTask: args.operationalTask,
 			testSpec: args.testSpec,
 			implSpec: args.implSpec,
+			unitSpec: args.unitSpec,
 			analysis: analysisPaths,
 			aspect: aspectPaths,
 		},

@@ -10,6 +10,24 @@
 
 ---
 
+## [0.38.0] — 2026-06-12 MINOR — ep-be-gea run #2 backlog 본체 결함 6건 + F-DOGFOOD-STORY-ORPHAN governance
+
+run #2 high 3건(v0.37.0) 처리 후 나머지 backlog 6건(F-R2-07/01/28/29/41/44) 수정. behavior fix / schema additive·pattern 확장 / backward-compat. diagnose-before-design(6 병렬 진단 workflow 전부 still_present) + senior(F-R2-01/29). DEC-2026-06-12-run2-backlog-6-defects.
+
+- **F-R2-07 (medium)**: legacy-korean `interceptor-no-rbac.yml` 의 `$X.select$Y(...)`(리터럴+메타변수 접합)·`if (...AUTH...)`(식 ellipsis) Java PatternParseError → semgrep exit 2 → static-runner baseline 항상 실패. metavariable-regex(`$SEL`^select / `$COND` AUTH)로 의도 보존 교정 → ruleset 5룰 exit 0 / static-runner 48.
+- **F-R2-01 (medium / senior GO@0.9)**: `state-store.js` DEFAULT `current_phase:'input.0'` ↔ `state.schema` `^P\d+(\.\d+)*$` = phase-flow semantic id 전부 FAIL 하는 orphan pattern → chain-driver init/CAS 항상 schema-invalid. pattern → `^[A-Za-z][A-Za-z0-9-]*(\.\d+)*$`(kebab+.N / 구 P-style 수용). init schema-valid 실증 / chain-driver 523. (default 'P0' 변경=첫 next write 재위반=기각.) carry: current_phase runtime ajv 미검증.
+- **F-R2-28 (low)**: `work-unit-manifest.schema` stage/current_stage/dependents.stage enum 3곳 +`analysis`(additive). analysis stage work-unit 정직 표기.
+- **F-R2-29 (medium / senior GO@0.92)**: char-cov-validator `intent-vs-bug.md` 부재 시 무조건 high = ADR-011(json 단독) 위반 + SKILL "twin 폐지" drift. §4 unconditional high 제거(md 존재 시 OR 분기 보존) + entry.intent_vs_bug + md 둘 다 부재 시 medium `intent_vs_bug.entry_absent`. spec 내장 intent_vs_bug=SSOT(ambiguous_carry 약화 0) + positive 테스트 2 / char-cov 22→24.
+- **F-R2-41 (medium)**: test-impl-pass `report_path` 디렉토리(gradle 멀티모듈 XML)면 readFileSync EISDIR → junit-xml+디렉토리 감지 시 `aggregateJunitXmlDir`(재귀 *.xml 결정론 합산). 단일파일=byte-identical 무회귀 / 2 XML→pass 5 실증 / test-impl-pass 59.
+- **F-R2-44 (medium)**: cli 가 `chain.unitSpec` 로드하나 synthesizeGraph 호출에 미전달 + synthesizeGraph 미사용 = 반쪽 배선 → unit-layer TC(class_ref=UNIT) orphan. cli 호출+sourcePaths 배선 + graph-synth UNIT 노드(chain/UNIT) + edge(BHV·AC→UNIT derived_from / unit-TC→UNIT tests). additive(unitSpec 부재=zero-change) / event 재합성 **orphan 11→0**·nodes 152→160·edges 258→295 / graph-synth 179.
+- **B governance**: graph-integrity-validator 를 implement gate blocking 으로 승격(직전 9b8d5238 코드만 / dep-graph cycle·orphan·unknown = full chain 완성 시점 검사 / 단계 gate silent 통과 갭)을 DEC 로 governance 기록. F-R2-44 + STORY 해소로 정합 완성.
+
+### §8.1 + 검증
+- 6건 모두 구조적 결함(룰 문법 / schema orphan pattern / enum 누락 / 반쪽 배선 / 단일파일 가정 / md-twin ADR-011 위반) = 코드 증명+1 PoC 정당.
+- static-runner 48 · traceability-matrix-builder 179 · test-impl-pass 59 · characterization-coverage 24 · findings-aggregator 61 · chain-driver 523 GREEN · release-readiness 42/42.
+
+---
+
 ## [0.37.0] — 2026-06-11 MINOR — findings-aggregator 비-analysis scope-aware + test-impl-pass 인자 정정 + code_only severity 재배치
 
 **ep-be-gea event 모듈 full chain 재실행(run #2 / S2 / 외부격리·commit❌)** dogfood 가 노출한 chain harness 자동화 axis 직결 본체 결함 3건 수정. behavior fix only — schema·gate 의미 무변경 / backward-compat. DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate.

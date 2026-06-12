@@ -28,8 +28,8 @@
     },
     "current_phase": {
       "type": "string",
-      "pattern": "^P\\d+(\\.\\d+)*$",
-      "description": "현 chain 내부의 phase ID (P*.* 형식)."
+      "pattern": "^[A-Za-z][A-Za-z0-9-]*(\\.\\d+)*$",
+      "description": "현 chain 내부의 phase ID. phase-flow node id 체계(kebab + optional .N 인덱스 / 예: input.0 · db-schema.0 · discovery.1 · input-integrate). 구 P*.* 형식도 backward-compat 수용 (F-R2-01: 구 ^P\\d+ pattern 은 phase-flow semantic id 전체와 불일치한 orphan = chain-driver init/CAS write 가 항상 schema-invalid 였음 / DEC-2026-06-12-state-phase-pattern-align)."
     },
     "current_scope": {
       "anyOf": [

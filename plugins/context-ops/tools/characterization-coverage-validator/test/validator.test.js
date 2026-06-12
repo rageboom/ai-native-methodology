@@ -421,3 +421,53 @@ test('test-recovery R15 — existing_test_file + 실 테스트 러너 invocation
 		rmSync(tmpDir, { recursive: true, force: true });
 	}
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// F-R2-29 (DEC-2026-06-12): intent-vs-bug.md(legacy twin) 강제 폐지 → SSOT = characterization-spec.json intent_vs_bug 객체.
+//   ADR-011(json 단독) + SKILL "twin 폐지" 정합. md 부재 high 발화 ❌ / SSOT 둘 다 부재만 medium(entry_absent).
+// ─────────────────────────────────────────────────────────────────────
+function buildIntentFixture(tmpDir, { withEntry, withMd }) {
+	mkdirSync(join(tmpDir, 'snapshots'), { recursive: true });
+	writeFileSync(
+		join(tmpDir, 'snapshots', 'UC-X-001.json'),
+		JSON.stringify({
+			snapshot_id: 'SNAP-UC-X-001', use_case: 'UC-X-001', endpoint: 'GET /api/x',
+			data_source_status: 'code_only',
+			scenarios: [{ id: 'SCN-X-001', name: 'happy', given: { request_body: {} }, when: 'GET /api/x', then: { expected_response: { status: 200 } }, intent_classification: [{ rule: 'BR-X-001', type: 'intent' }] }],
+		}),
+	);
+	writeFileSync(
+		join(tmpDir, 'coverage.json'),
+		JSON.stringify({ matrix: [{ uc: 'UC-X-001', snapshot: '✅', covered_by: ['SNAP-UC-X-001'], scope_decision: 'covered' }], coverage_summary: { ucs_total: 1, ucs_covered: 1, uc_coverage_ratio: 1.0 }, coverage_target: 0.8, coverage_strategy: 'absolute', coverage_minimum_legacy: 0.4, trend_required: false }),
+	);
+	if (withEntry) {
+		writeFileSync(join(tmpDir, 'characterization-spec.json'), JSON.stringify({ intent_vs_bug: { br_total: 1, br_intent: 1, br_bug: 0, br_ambiguous: 0, br_self_recognized: 0, ap_total: 0, ap_intent: 0, ap_bug: 0, ap_ambiguous: 0, ap_self_recognized: 0, named_classified_ratio: 1.0, ambiguous_carry: [] } }));
+	}
+	if (withMd) writeFileSync(join(tmpDir, 'intent-vs-bug.md'), '# intent-vs-bug\nBR-X-001 = intent\n');
+}
+
+test('F-R2-29 — intent-vs-bug.md 부재 + characterization-spec.json intent_vs_bug 보유 → missing/entry_absent finding 0 (ADR-011 json SSOT)', () => {
+	const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-f29a-'));
+	try {
+		buildIntentFixture(tmpDir, { withEntry: true, withMd: false });
+		const r = validateCharacterization(tmpDir, 0.8);
+		assert.equal(r.findings.filter((f) => f.kind === 'intent_vs_bug.missing').length, 0, 'md 강제 high 폐지 (ADR-011)');
+		assert.equal(r.findings.filter((f) => f.kind === 'intent_vs_bug.entry_absent').length, 0, 'entry SSOT 존재 시 entry_absent 미발화');
+	} finally {
+		rmSync(tmpDir, { recursive: true, force: true });
+	}
+});
+
+test('F-R2-29 — intent-vs-bug.md + characterization-spec.json intent_vs_bug 둘 다 부재 → entry_absent MEDIUM (구 missing high 대체)', () => {
+	const tmpDir = mkdtempSync(join(tmpdir(), 'cccov-f29b-'));
+	try {
+		buildIntentFixture(tmpDir, { withEntry: false, withMd: false });
+		const r = validateCharacterization(tmpDir, 0.8);
+		const ea = r.findings.filter((f) => f.kind === 'intent_vs_bug.entry_absent');
+		assert.equal(ea.length, 1, 'SSOT 둘 다 부재 → entry_absent 1건');
+		assert.equal(ea[0].severity, 'medium', 'high→medium 강등 (md 강제 폐지)');
+		assert.equal(r.findings.filter((f) => f.kind === 'intent_vs_bug.missing').length, 0, '구 high missing 미발화');
+	} finally {
+		rmSync(tmpDir, { recursive: true, force: true });
+	}
+});

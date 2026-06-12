@@ -17,12 +17,12 @@
     },
     "stage": {
       "type": "string",
-      "enum": ["discovery", "planning", "spec", "plan", "test", "impl", "implement"],
+      "enum": ["analysis", "discovery", "planning", "spec", "plan", "test", "impl", "implement"],
       "description": "stage manifest 시만 (scope manifest 는 미사용)."
     },
     "current_stage": {
       "type": "string",
-      "enum": ["discovery", "planning", "spec", "plan", "test", "impl", "implement"],
+      "enum": ["analysis", "discovery", "planning", "spec", "plan", "test", "impl", "implement"],
       "description": "scope manifest 시만 — 현 진행 stage."
     },
     "status": {
@@ -166,7 +166,7 @@
               },
               "stage": {
                 "type": "string",
-                "enum": ["discovery", "planning", "spec", "plan", "test", "impl", "implement"]
+                "enum": ["analysis", "discovery", "planning", "spec", "plan", "test", "impl", "implement"]
               }
             }
           }

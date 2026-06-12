@@ -9,7 +9,21 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-11 / aggregator scope-aware + code_only 재배치 v0.37.0 / **✅ 커밋·push 완료** — `b8635fd9` 양원격)
+### ★ 다음 세션 인계 (2026-06-12 / run #2 backlog 6 결함 v0.38.0 / **미커밋** — 사용자 push 결단 대기)
+
+**이번 세션 성과 (plugin.json v0.37.0 → v0.38.0 MINOR / behavior fix 6건 / DEC-2026-06-12-run2-backlog-6-defects / 미커밋)**:
+- **ep-be-gea run #2 backlog 본체 결함 6건 수정** (사용자 "A. 나머지 6건 처리" 결단 / diagnose-before-design 6 병렬 진단 workflow 전부 still_present + senior F-R2-01/29):
+  - **F-R2-07**: legacy-korean interceptor-no-rbac.yml `$X.select$Y`·`if(...AUTH...)` Java 파싱불가 → metavariable-regex 교정 (ruleset exit0 / static-runner 48).
+  - **F-R2-01(senior 0.9)**: state.schema current_phase `^P\d+` orphan pattern → `^[A-Za-z][A-Za-z0-9-]*(\.\d+)*$` 확장 (init schema-valid / carry: runtime 미검증).
+  - **F-R2-28**: work-unit-manifest stage enum +analysis (additive 3곳).
+  - **F-R2-29(senior 0.92)**: char-cov intent-vs-bug.md 강제 high=ADR-011 위반 → §4 제거 + entry+md 둘 다 부재 medium entry_absent (char-cov 22→24).
+  - **F-R2-41**: test-impl-pass junit-xml report_path 디렉토리 EISDIR → aggregateJunitXmlDir 재귀합산 (단일파일 무회귀 / test-impl-pass 59).
+  - **F-R2-44**: cli 가 unitSpec 을 synthesizeGraph 에 미전달=반쪽배선 → cli+graph-synth UNIT 노드/edge 배선 (event orphan 11→0 / graph-synth 179).
+  - **B governance**: graph-integrity implement gate blocking 승격(직전 `9b8d5238` 코드만) DEC 기록.
+- **검증**: static 48·matrix 179·test-impl-pass 59·char-cov 24·aggregator 61·chain-driver 523 GREEN / release-readiness 42/42.
+- **carry / 다음**: ① **양 remote push 사용자 결단**(미커밋). ② F-R2-01 carry(current_phase runtime ajv 미검증 = release-readiness state parity check 별도 판단). ③ ep-be-gea event 외 scope(biztrip/welfare) / real-DB 천장 / human-review 2. ④ unit 층 하드게이트 promotion(§8.1 2도메인 충족 / 별도 DEC).
+
+### ★ (직전) 다음 세션 인계 (2026-06-11 / aggregator scope-aware + code_only 재배치 v0.37.0 / **✅ 커밋·push 완료** — `b8635fd9` 양원격)
 
 **이번 세션 성과 (plugin.json v0.36.0 → v0.37.0 MINOR / behavior fix 3건 / DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate / ✅ 커밋·push 완료)**:
 - **커밋 4개 분리 push (`8cba0d76..b8635fd9` origin[rageboom]+origin-smilegate[GHE])**: ① `1c315c16` session-handoff(직전 세션 미커밋) ② `cfa61589` v0.37.0 본체 fix 3건 ③ `9b8d5238` F-DOGFOOD-STORY-ORPHAN(graph-synth STORY orphan + graph-integrity implement gate blocking / 직전 세션 미커밋) ④ `b8635fd9` poc-01·16 archive 이동. ⚠️ **트리에 직전 세션 미커밋 3덩어리가 누적**돼 있던 것 발견·분리 정리(STATUS "session-handoff 커밋완료" 주장이 실제 미커밋이던 self-recorded-fact 불일치 교정).
