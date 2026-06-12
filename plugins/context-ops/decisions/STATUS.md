@@ -9,9 +9,10 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-11 / aggregator scope-aware + code_only 재배치 v0.37.0 / **미커밋** — 사용자 push 결단 대기)
+### ★ 다음 세션 인계 (2026-06-11 / aggregator scope-aware + code_only 재배치 v0.37.0 / **✅ 커밋·push 완료** — `b8635fd9` 양원격)
 
-**이번 세션 성과 (plugin.json v0.36.0 → v0.37.0 MINOR / behavior fix 3건 / DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate / 미커밋)**:
+**이번 세션 성과 (plugin.json v0.36.0 → v0.37.0 MINOR / behavior fix 3건 / DEC-2026-06-11-aggregator-scope-aware-and-codeonly-relocate / ✅ 커밋·push 완료)**:
+- **커밋 4개 분리 push (`8cba0d76..b8635fd9` origin[rageboom]+origin-smilegate[GHE])**: ① `1c315c16` session-handoff(직전 세션 미커밋) ② `cfa61589` v0.37.0 본체 fix 3건 ③ `9b8d5238` F-DOGFOOD-STORY-ORPHAN(graph-synth STORY orphan + graph-integrity implement gate blocking / 직전 세션 미커밋) ④ `b8635fd9` poc-01·16 archive 이동. ⚠️ **트리에 직전 세션 미커밋 3덩어리가 누적**돼 있던 것 발견·분리 정리(STATUS "session-handoff 커밋완료" 주장이 실제 미커밋이던 self-recorded-fact 불일치 교정).
 - **ep-be-gea event 모듈 full chain 재실행(run #2 / S2 / 외부격리·commit❌)**: 개선 플러그인 v0.36.0 으로 analysis→implement 6 stage + gate #0~#5 fresh 완주(terminal). DB 입력 = `docs/databases/*.sql` 5종(516 table·FK 11 / 직전 155·FK0 대비 입력 갱신·FK relationship_label 첫 산출). UNIT 층 1급화 검증(DrawNumberGenerator·MaskingUtils 핀 / mock-soundness sound) + test-recovery 가드 2회차 corroboration(stale EventRestServiceTest 3-fail 증거 부적격). artifact-graph 152 node/258 edge·cycle 0. forward 0.417(23 AC 중 13 GREEN / real-DB 4+human-review 2+augmentation carry = 정직 천장). finding 45건(F-R2-01~44) 한 파일 누적 + 6분류 일괄 처리.
 - **본체 결함 3건 수정 (사용자 "지금 수정" 승인 / F-R2-35+40+32)**:
   - **F-R2-35(high)**: findings-aggregator 비-analysis 5 stage(discovery~implement) 경로 per-scope/canonical-global 미인지(analysis 만 DEC-2026-06-06 scope-aware) → optional `scopeCtx` overlay(null=평면 byte-identical 무회귀 / 주입=per-scope→canonical→legacy existsSync) + loadScopeCtx + runValidator/main 배선. 실증 discovery 3/3·plan 2/2 ok 복구. F13·F15 family.
