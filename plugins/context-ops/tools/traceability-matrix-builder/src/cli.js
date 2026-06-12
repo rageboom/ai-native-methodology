@@ -75,12 +75,18 @@ function listDomainBcDirs(analysisDir) {
 	}
 }
 // kind+fname → 우선순위 후보 경로 목록 (첫 존재 채택). 평면 → shared/ → domains/<BC>/ 순 + nested 변형.
-function analysisCandidatePaths(analysisDir, kind, fname) {
+// BC-5 (golf chain5 dogfood / DEC-2026-06-12) — scopeBc 주어지면 domains/ 후보를 해당 BC 로만 제한.
+//   다중 BC 누적(zone) 시 scope 필터 없으면 타 BC 산출물(예: 자기 scope 엔 없는 formal-spec)을 cross-BC 누출 →
+//   graph-synth 가 타 BC 노드를 자기 graph 에 합성 → graph-integrity orphan(high). scopeBc 미지정 = 전 BC(무회귀).
+function analysisCandidatePaths(analysisDir, kind, fname, scopeBc = null) {
 	const sub = NESTED_SUBDIR[kind];
+	const bcDirs = scopeBc
+		? listDomainBcDirs(analysisDir).filter((bc) => bc === scopeBc)
+		: listDomainBcDirs(analysisDir);
 	const bases = [
 		analysisDir,
 		join(analysisDir, 'shared'),
-		...listDomainBcDirs(analysisDir).map((bc) => join(analysisDir, 'domains', bc)),
+		...bcDirs.map((bc) => join(analysisDir, 'domains', bc)),
 	];
 	const paths = [];
 	for (const base of bases) {
@@ -189,6 +195,9 @@ if (args.outDir) {
 if (args.graph) {
 	const analysis = {};
 	const analysisPaths = {};
+	// BC-5 — scope-id → BC 매핑(BC-${scopeId.toUpperCase()}). domains/ 후보를 자기 BC 로 제한해 cross-BC 누출 차단.
+	//   scope-id 미지정 = scopeBc null = 전 BC 스캔(무회귀).
+	const scopeBc = args.scopeId ? `BC-${String(args.scopeId).toUpperCase()}` : null;
 	if (args.analysisDir) {
 		for (const [kind, fnameOrList] of Object.entries(ANALYSIS_FILENAMES)) {
 			// v11.24.0 — filename 은 string 또는 후보 배열 (db-schema multi-candidate). 첫 존재 채택.
@@ -196,7 +205,7 @@ if (args.graph) {
 			const fnames = Array.isArray(fnameOrList) ? fnameOrList : [fnameOrList];
 			let matched = null;
 			for (const fname of fnames) {
-				for (const p of analysisCandidatePaths(args.analysisDir, kind, fname)) {
+				for (const p of analysisCandidatePaths(args.analysisDir, kind, fname, scopeBc)) {
 					if (existsSync(p)) {
 						matched = p;
 						break;

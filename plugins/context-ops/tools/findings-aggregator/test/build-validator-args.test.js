@@ -44,6 +44,18 @@ describe('buildValidatorArgs (F2 fix — plan-coverage wiring)', () => {
 		});
 		assert.ok(args[0].endsWith('artifact-graph.json'));
 	});
+
+	// BC-3 (golf chain5 dogfood / DEC-2026-06-12) — graph-integrity-validator 는 positional <artifact-graph.json>
+	//   계약. 명시 case 부재 시 default '--target' 로 떨어져 항상 evidence_missing(REQUIRED.implement 인데 미작동).
+	it('graph-integrity-validator → positional artifact-graph.json + --format json (NOT default --target)', () => {
+		const args = buildValidatorArgs('graph-integrity-validator', '/proj', 'implement');
+		assert.ok(
+			args[0].endsWith('artifact-graph.json'),
+			'positional 첫 인자 = artifact-graph.json (graph-integrity 계약)',
+		);
+		assert.deepEqual(args.slice(-2), ['--format', 'json'], '--format json');
+		assert.ok(!args.includes('--target'), 'no generic --target (default fallthrough = evidence_missing 였음)');
+	});
 });
 
 // stage-aware schema args (surfaced fix): schema-validator 는 stage 별 산출물을 검증해야 함

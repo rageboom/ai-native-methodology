@@ -3,6 +3,7 @@
 // usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]
 
 import { validateDiscoveryExtraction, loadJson } from './validator.js';
+import { loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 function parseArgs(argv) {
   const out = { dryRun: false, json: false };
@@ -32,8 +33,12 @@ if (!discovery) {
   console.error(`error: discovery-spec not found at ${args.discovery}`);
   process.exit(2);
 }
+// BC-1 (golf chain1 dogfood / DEC-2026-06-12) — --rules 는 index-aware loadBusinessRules 로 로드.
+//   raw loadJson 은 BR-split index(`{bc_files:[...]}`)를 재조립 못 해 0건 추출 → false HIGH `shape_unrecognized`.
+//   br-cross-consistency-validator cli.js 와 동일 패턴: loadBusinessRules 가 index→per-BC leaf 재조립 / 옛 flat 도 투명 수용.
+//   normalizeAnalysisBusinessRules 가 analysis.rules.business_rules 를 집어가도록 {business_rules:[...]} shape 로 정규화.
 const analysis = {
-  rules: args.rules ? loadJson(args.rules) : null,
+  rules: args.rules ? { business_rules: loadBusinessRules(args.rules) } : null,
   domain: args.domain ? loadJson(args.domain) : null,
 };
 

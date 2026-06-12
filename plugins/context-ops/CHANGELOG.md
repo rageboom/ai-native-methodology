@@ -10,6 +10,20 @@
 
 ---
 
+## [0.42.0] — 2026-06-12 MINOR — golf chain 풀런 dogfood → 결정론 검증기 wiring 3 fix (discovery-ext index / graph-integrity arg / synth cross-BC)
+
+**SSOT**: `decisions/DEC-2026-06-12-golf-chain-validator-wiring.md` / plan `~/.claude/plans/plan-golf-chain-body-candidates.md`.
+
+ep-be-gea campaign(예약 메뉴그룹) golf(BC-RESV-GOLF) 를 analysis→discovery→spec→plan→test→implement **5 chain 풀런** dogfooding(fresh 분석 / 구 b5538d83·.bak 미복구) 하며 노출된 **본체 결정론 검증기 wiring 결함 3건**을 일괄 적용. 전부 **event·golf 2 도메인 동일 = 구조적**(§8.1 과적합 아님 / BR-split·2-zone 도입의 검증기 미스윕).
+
+- **BC-1 — discovery-extraction-validator CLI 가 BR-split index 미재조립**: `--rules <index>`(`{bc_files:[...]}`) 전달 시 raw `loadJson` → 0건 추출 → false HIGH `shape_unrecognized`. → `_shared/loadBusinessRules`(index-aware) 로 교체 + `{business_rules:[...]}` 정규화(br-cross-validator 동일 패턴 / index→leaf 재조립 / 옛 flat 투명). golf index 입력 high 0(was HIGH) / event leaf 무회귀.
+- **BC-3 — findings-aggregator 가 graph-integrity-validator arg case 누락**: buildValidatorArgs default `--target` 로 떨어져 graph-integrity(positional `<artifact-graph.json>` 계약)가 **항상 evidence_missing**(REQUIRED.implement 등재인데 미작동 = 조용한 공백). → `case 'graph-integrity-validator': [O('artifact-graph.json'), '--format', 'json']`(code-pointer 동일 resolver). gate#5 graph-integrity **evidence_missing→ok**(event·golf) + 단위테스트 신설. **작동 즉시 golf graph orphan 5 적발 → BC-5 발견**.
+- **BC-5 — graph-synthesizer analysisCandidatePaths cross-BC 누출**: 모든 `domains/<BC>` 를 후보로 스캔 → golf 가 없는 formal-spec/characterization 을 찾으며 `domains/BC-EVENT/` 채택. → `analysisCandidatePaths(..., scopeBc)` scope 필터(scopeBc 주어지면 자기 BC domains/ 만 / 미지정=전 BC 무회귀) + golf discovery cross_links 에 shared 입력(architecture·schema·error-mapping) 추가. golf graph **orphan 5→0**(passed) / event 무회귀.
+
+**carry**: BC-2(drift-validator = workspace-internal 검증기 / user-project evidence_missing 사실상 N/A / REQUIRED 제외=설계결정 deferred) · BC-4(static-runner --plugin 부재 = R19 Tier-2 정직 carry / no-fix).
+
+**golf dogfood 결과**(외부 격리 / ep-be-gea repo commit): 5 chain 전부 critical 0/high 0. discovery 7 UC·24 BR-intent / spec 7 BHV·25 AC(chain-coverage 100%) / plan 13 TASK(plan-coverage 0) / test 실 JUnit **8 method GREEN**(6 AC characterization + 19 operability 천장 carry / god-method+SQL-embedded) / implement matrix 25 green·artifact-graph 153 node 0 orphan·real_integration 0(Mockito honest). 검증: discovery-ext 43 / aggregator 67(+1) / traceability 179 / chain-driver 523 무회귀 + **release-readiness 42/42**.
+
 ## [0.41.0] — 2026-06-12 MINOR — canonical 산출물 2-zone 재구조화 (shared/ + domains/<BC>/)
 
 **SSOT**: `decisions/DEC-2026-06-12-artifact-zone.md` / plan `~/.claude/plans/plan-artifact-zone-restructure.md`.

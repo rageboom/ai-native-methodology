@@ -267,6 +267,12 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 				'--format',
 				'json',
 			];
+		// BC-3 (golf chain5 dogfood / DEC-2026-06-12) — graph-integrity-validator 는 positional <artifact-graph.json>
+		//   계약(--target 아님). 명시 case 부재 시 default '--target' 로 떨어져 항상 evidence_missing
+		//   (REQUIRED.implement 등재인데 미작동 = 조용한 공백). code-pointer 와 동일 O('artifact-graph.json')
+		//   resolver 재사용 (graph-integrity 는 --repo-root 불요).
+		case 'graph-integrity-validator':
+			return [O('artifact-graph.json'), '--format', 'json'];
 		default:
 			return ['--target', projectDir, '--json'];
 	}
