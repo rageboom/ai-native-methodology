@@ -1,0 +1,10 @@
+{
+  "name": "@mis-plugins/sql-inventory-extractor",
+  "version": "0.1.0",
+  "description": "analysis-sql-inventory SKILL §1–4 grep -E 레시피의 결정론 추출기 (DEC-2026-06-12-sql-inventory-extractor). MyBatis/iBATIS mapper XML → auto 5 컬럼(sql_id/mapper_xml/statement_type/dynamic_branch/dependent_tables) + raw-grep.txt. 판단 6 컬럼(business_meaning/intent_vs_bug 등)=null placeholder → LLM/human 보강. sql-inventory-validator(검증)의 자매(생산). no-simulation: real 파싱만 (--src 부재 시 exit 3).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "sql-inventory-extractor": "./src/cli.js" },
+  "scripts": { "test": "node --test test/extract.test.js" },
+  "license": "UNLICENSED"
+}

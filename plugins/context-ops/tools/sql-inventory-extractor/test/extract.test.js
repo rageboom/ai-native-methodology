@@ -1,0 +1,134 @@
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { buildInventory, extractFromXml, PENDING_JUDGMENT_COLUMNS } from '../src/extract.js';
+
+// iBATIS 2 혼합 fixture (5 stmt 종류 / sql-inventory-validator fixture 동형).
+const MIXED = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN" "http://www.ibatis.com/dtd/sql-map-2.dtd">
+<sqlMap namespace="TestMixedDAO">
+  <select id="findById" parameterClass="java.lang.Long" resultClass="HashMap">
+    SELECT * FROM users WHERE id = #id#
+  </select>
+  <insert id="insertUser" parameterClass="HashMap">
+    INSERT INTO users (name, email) VALUES (#name#, #email#)
+  </insert>
+  <update id="updateUser" parameterClass="HashMap">
+    UPDATE users SET name = #name# WHERE id = #id#
+  </update>
+  <delete id="deleteUser" parameterClass="java.lang.Long">
+    DELETE FROM users WHERE id = #id#
+  </delete>
+  <procedure id="callRefreshUser" parameterClass="HashMap">
+    EXEC MDI.dbo.REFRESH_USER ?
+  </procedure>
+</sqlMap>`;
+
+// MyBatis 3 fixture (reqmng 동형 — dynamic tags + sql fragment + include).
+const MYBATIS3 = `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.foo.BoSampleRepository">
+  <sql id="baseWhere">
+    <if test="name != null">AND name = #{name}</if>
+  </sql>
+  <select id="search" parameterType="Foo" resultType="Foo">
+    SELECT * FROM TB_FOO f JOIN TB_BAR b ON f.id = b.fid
+    <where>
+      <if test="status != null">AND status = #{status}</if>
+      <foreach collection="ids" item="i" open="AND id IN (" close=")" separator=",">#{i}</foreach>
+    </where>
+    <include refid="baseWhere"/>
+  </select>
+  <insert id="create" parameterType="Foo">
+    INSERT INTO TB_FOO (name) VALUES (#{name})
+  </insert>
+</mapper>`;
+
+test('iBATIS 2 mixed — 5 statement, types, procedure→CALLABLE', () => {
+	const { records, fragments } = extractFromXml(MIXED, 'TestMixed.xml');
+	assert.equal(records.length, 5);
+	assert.equal(fragments.length, 0);
+	const byId = Object.fromEntries(records.map((r) => [r.sql_id, r]));
+	assert.equal(byId['TestMixedDAO.findById'].operation, 'select');
+	assert.equal(byId['TestMixedDAO.callRefreshUser'].statement_type, 'CALLABLE');
+	assert.equal(byId['TestMixedDAO.insertUser'].statement_type, 'PREPARED');
+	// 전 record 동일 테이블 'users'
+	for (const r of records) {
+		if (r.operation === 'procedure') continue; // EXEC = FROM/JOIN 없음
+		assert.deepEqual(r.dependent_tables, ['users']);
+		assert.equal(r.dependent_tables_are_candidates, true);
+	}
+});
+
+test('판단 6 컬럼 = null placeholder (도구가 채우지 않음)', () => {
+	const { records } = extractFromXml(MIXED, 'TestMixed.xml');
+	for (const r of records) {
+		for (const col of PENDING_JUDGMENT_COLUMNS) {
+			assert.equal(r[col], null, `${col} must be null`);
+		}
+	}
+});
+
+test('MyBatis 3 — sql fragment 제외 / include 추적 / dynamic branch / table 후보', () => {
+	const { records, fragments } = extractFromXml(MYBATIS3, 'BoSample.xml');
+	assert.equal(fragments.length, 1); // <sql id="baseWhere"> 제외
+	assert.deepEqual(fragments, ['baseWhere']);
+	assert.equal(records.length, 2); // search + create (sql fragment 미포함)
+
+	const search = records.find((r) => r.sql_id === 'BoSampleRepository.search');
+	assert.ok(search);
+	assert.deepEqual(search.dependent_tables, ['TB_BAR', 'TB_FOO']); // 정렬
+	assert.deepEqual(search.includes_fragments, ['baseWhere']);
+	assert.ok(search.tables_note.includes('include'));
+	// dynamic_branch: mybatis3:foreach 1 / mybatis3:if 1 / mybatis3:where 1 (정렬 by tag_type)
+	const bt = Object.fromEntries(search.dynamic_branch.map((d) => [d.tag_type, d.branch_count]));
+	assert.equal(bt['mybatis3:if'], 1);
+	assert.equal(bt['mybatis3:foreach'], 1);
+	assert.equal(bt['mybatis3:where'], 1);
+
+	const create = records.find((r) => r.sql_id === 'BoSampleRepository.create');
+	assert.equal(create.statement_type, 'PREPARED');
+	assert.deepEqual(create.dependent_tables, ['TB_FOO']);
+	assert.equal(create.dynamic_branch.length, 0);
+});
+
+test('buildInventory — summary / extraction_automation / evidence', () => {
+	const r = buildInventory({
+		files: [
+			{ relPath: 'a/TestMixed.xml', content: MIXED },
+			{ relPath: 'b/BoSample.xml', content: MYBATIS3 },
+		],
+		nowIso: '2026-06-12T00:00:00.000Z',
+	});
+	assert.equal(r.meta_status, 'auto_extracted_pending_enrichment');
+	assert.equal(r.summary.total_sql_operations, 7); // 5 + 2
+	assert.equal(r.summary.excluded_fragment_count, 1);
+	assert.equal(r.summary.callable_count, 1);
+	assert.equal(r.summary.by_type.select, 2);
+	assert.ok(r.summary.dependent_tables_unique.includes('users'));
+	assert.ok(r.summary.dependent_tables_unique.includes('TB_FOO'));
+	assert.equal(r.extraction_automation.auto_extracted_columns.length, 5);
+	assert.match(r.extraction_automation.auto_ratio_external_6, /^\d+\/6 = /);
+	assert.equal(r.evidence.evidence_trust, 'real_tool');
+	assert.match(r.evidence.result_hash, /^[a-f0-9]{64}$/);
+	assert.match(r.evidence.inputs_hash, /^[a-f0-9]{64}$/);
+	assert.ok(Array.isArray(r.raw_grep_lines) && r.raw_grep_lines.length === 7);
+});
+
+test('result_hash 결정론 — timestamp 독립', () => {
+	const a = buildInventory({ files: [{ relPath: 'x.xml', content: MIXED }], nowIso: '2026-06-12T00:00:00.000Z' });
+	const b = buildInventory({ files: [{ relPath: 'x.xml', content: MIXED }], nowIso: '2030-01-01T12:34:56.000Z' });
+	assert.equal(a.evidence.result_hash, b.evidence.result_hash);
+});
+
+test('result_hash 입력 변하면 변함', () => {
+	const a = buildInventory({ files: [{ relPath: 'x.xml', content: MIXED }], nowIso: '2026-06-12T00:00:00.000Z' });
+	const b = buildInventory({ files: [{ relPath: 'x.xml', content: MYBATIS3 }], nowIso: '2026-06-12T00:00:00.000Z' });
+	assert.notEqual(a.evidence.result_hash, b.evidence.result_hash);
+});
+
+test('빈 입력 — 0건 정직 산출(throw ❌)', () => {
+	const r = buildInventory({ files: [], nowIso: '2026-06-12T00:00:00.000Z' });
+	assert.equal(r.summary.total_sql_operations, 0);
+	assert.deepEqual(r.inventory, []);
+	assert.equal(r.evidence.files_scanned, 0);
+});

@@ -1,0 +1,10 @@
+{
+  "name": "@mis-plugins/bc-accumulator-rollup",
+  "version": "0.1.0",
+  "description": "per-BC fragment(domains/<BC>/) → shared 누적기 직렬 post-merge rollup 오케스트레이터 (DEC-2026-06-12-parallel-bc-accumulator-rollup ②). _shared/append-catalog.js upsert primitive 위에 ① 전체 멱등 rollup 오케스트레이션 + ② findings 누적기 추가. business-rules index·migration-cautions·findings·domain bounded_contexts[] 4종. 병렬 worktree 충돌 회피(머지 후 직렬 1회). 멱등 / sibling BC 보존 / --dry-run.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "bc-accumulator-rollup": "./src/cli.js" },
+  "scripts": { "test": "node --test test/rollup.test.js" },
+  "license": "UNLICENSED"
+}
