@@ -6,5 +6,8 @@
   "description": "greenfield designed_from_spec PoC — money allocation (Fowler Money). DB-free 순수함수 / node --test zero-install.",
   "scripts": {
     "test": "node --test"
+  },
+  "devDependencies": {
+    "@stryker-mutator/core": "^9.6.1"
   }
 }

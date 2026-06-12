@@ -1,0 +1,19 @@
+{
+  "phase": "mutation",
+  "condition": "GATED ③ (mutation_score / 강력권장)",
+  "scenario": "greenfield",
+  "provenance": "designed_from_spec",
+  "tool": "Stryker @stryker-mutator/core ^9.6.1 (real / no-simulation)",
+  "runner": "command (node --test / 종료코드 0=survived·≠0=killed)",
+  "mutate": ["src/allocate.mjs", "src/formatMoney.mjs"],
+  "total_mutants": 63,
+  "killed": 57,
+  "timeout": 2,
+  "survived": 4,
+  "no_coverage": 0,
+  "mutation_score": 0.9365,
+  "survived_class": "StringLiteral (전부 RangeError 메시지 텍스트) — 테스트가 에러 *타입*(RangeError)만 단언하고 메시지 문자열은 의도적으로 안 핀 = 설계 선택(공허 테스트 아님). 동작 분기(<, +, floor, 잔돈 루프 등) mutant 는 전부 killed.",
+  "interpretation": "designed_from_spec unit 테스트가 93.7% mutant 를 잡음 = 동작을 실제 단언(non-vacuous) 입증. characterization-핀-버그-박제(green-but-mask) 위험 보강. ★ reference-lens 신호 — gate 주입 ❌(unit-spec.coverage.mutation_score / schema:147).",
+  "simulated_evidence_count": 0,
+  "reproduce": "cd target && npm install && node_modules/.bin/stryker run (stryker.conf.json)"
+}

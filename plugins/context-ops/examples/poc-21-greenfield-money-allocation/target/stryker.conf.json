@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "조건③ — node:test 는 Stryker 전용 runner 가 없어 command runner(node --test 종료코드: 0=survived / ≠0=killed). DB-free 순수함수라 결정론.",
+  "testRunner": "command",
+  "commandRunner": { "command": "node --test" },
+  "mutate": ["src/allocate.mjs", "src/formatMoney.mjs"],
+  "reporters": ["json", "clear-text"],
+  "coverageAnalysis": "off",
+  "jsonReporter": { "fileName": "reports/mutation/mutation.json" }
+}
