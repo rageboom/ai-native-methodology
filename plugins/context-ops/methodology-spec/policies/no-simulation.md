@@ -23,6 +23,8 @@
 
 환경 부재 시 Tier 분류대로 정직 carry (사용자 환경 준비 / CI 위임 명시). Tier 2/3 혼동 금지. LLM 추론으로 도구 결과를 대체하지 않는다.
 
+**residual(미해소 잔여) 2종 구분** (DEC-2026-06-12 / **soft·서술 정책 — `REQUIRED_VALIDATORS_PER_STAGE` 미편입 / reference-lens 경계**): 정직 carry 라도 해소 경로가 다르다. **(a) 도구-환경 부재 carry** (R19 Tier 2 environment-dependent — Semgrep/PMD 등 바이너리 부재) → 사용자 CI/환경에서 도구 실행 시 해소. **(b) 산출물-본질 carry** (AC 행위가 **SQL-embedded** 등이라 런타임 GREEN 이 정적으로 불가) → SQL 술어는 `data_source_status=code_only`+`sql_id` 로 정적 특성화하되(`23-characterization-spec.md §11.1`), **런타임 정합은 QA·통합 테스트에서 실데이터로만** 확인 = `real_integration_score=0` 이 그 정직 신호. 두 경로 모두 **DB 접속/컨테이너를 방법론이 요구하지 않으며**, (b) 를 "검증완료/GREEN" 으로 승격하면 즉시 no-simulation 위반. 본 구분은 **결정론 게이트가 아니라 서술 정책**이다 — SQL-embedded 전용 enum/layer 의 schema 박제는 §8.1 상 ≥2 distinct 도메인 corroboration 전까지 **propose-only**(현재 `layer=integration`+`sql_id` 로 표현 충분).
+
 ## 인용
 
 - ADR: `docs/adr/ADR-009-다이어그램-신뢰-모델.md` §2.2 / §2.5 (신뢰 모델 단계 4·5)
@@ -30,3 +32,4 @@
 - 결단: DEC-2026-05-18-runtime-tool-exclusion
 - 결단: DEC-2026-06-06-tool-allowlist-pmd-only (Tier 2 import allowlist=PMD 축소 / 실행 이력 0 도구 제거)
 - 결단: DEC-2026-06-07-pmd-tier1-promotion (Tier 분류 축 = 실행 locus 명문화 / PMD Tier 1 in-plugin 자동실행 편입 / import 경로 orthogonal 보존)
+- 결단: DEC-2026-06-12-sql-embedded-static-residual-reframe (residual 2종 구분[도구-환경부재 vs 산출물-본질 SQL-embedded] / "real-DB 천장" → code_only+sql_id 정적특성화 + 런타임 QA carry reframe / DB·testcontainer 미요구 / reference-lens soft 정책)

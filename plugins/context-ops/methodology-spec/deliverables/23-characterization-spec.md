@@ -225,6 +225,7 @@ cross_links:
 - 증상: 실 DB 접속 ❌ → snapshot.then.state_after 추정만
 - 대응: `data_source_status: "code_only"` 명시 + 도메인 expert 검증 carry 의무
 - **역공학 test-recovery** (R15 / 근거 ## 인용): 기존 테스트가 행위를 증명하면 `data_source_status: "existing_test_file"` — **단 그 테스트를 실제 실행(real_tool invocation 5종 물증)했을 때만**. REAL_SOURCE_STATUS → Layer 3 evidence cross-check 대상(claim ≤ evidence_tool_count). 테스트 파일을 읽기만 하고 안 돌렸으면 `code_only`(stale/skip 테스트의 증거 주장 차단).
+- **SQL-embedded 술어** (MyBatis/iBATIS XML 등 ORM 매퍼에 박힌 결정 로직 / DEC-2026-06-12): 규칙이 Java 분기가 아니라 SQL(`<if>`/`<choose>` 동적태그 · `CASE WHEN` · `NOT EXISTS` · `SUM(CASE..) HAVING` · `LIKE '%x%'` 등)에 있으면 — SQL 술어의 **구조 · 동적분기 · formal predicate · 엔진종속 위험**(부분문자열 오매칭 · `GETDATE()` 시각의존 · NULL 3치논리 · collation)은 `data_source_status: "code_only"` + `snapshot.sql_id`(매퍼 statement id) + `behavior_to_preserve`/`behavior_likely_bug` 로 **소스만으로** 정적 추출한다(**DB 접속 ❌ / testcontainer ❌**). ⚠️ 이때 산출물은 실행된 characterization 이 아니라 **"static-annotated intent spec / specified oracle (pre-execution)"** 이다 — characterization(Feathers §13)은 관측된 input→output **실행**을 요구하므로 **"정적 characterization 완료/종결" 어휘 금지**(가짜 GREEN 오독 차단). **런타임 정합**(이 술어가 실데이터에서 의도한 행 집합을 실제로 반환하는지)은 **같은 항목에 반드시 병기**: `real_integration_score=0` 의 **QA·통합 carry**(방법론 deliverable 밖). 정적 SQL 신호는 코드/XML 만 본 산물이므로 **reference-lens**(게이트 inject ❌ / DEC-2026-05-28 codegraph method-axis 동형 / `no-simulation.md §4` residual (b)). repository 를 mock 하면 SQL 술어를 자기-모방하므로 여기서 `real_integration_score=0` = "순수로직이라 정상 0" 이 아니라 **"SQL-embedded 미통합" 신호**임을 prose 로 분리 명시.
 
 ### 11.2 ambiguous 분류 회피
 
