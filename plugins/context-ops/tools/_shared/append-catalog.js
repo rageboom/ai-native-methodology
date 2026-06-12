@@ -72,13 +72,27 @@ export function mergeUbiquitousLanguage(domainObj, additions = []) {
 
 /**
  * index(business-rules.json) 의 bc_files[] 에 entry(bounded_context 키) upsert + total_rules 재계산.
+ *
+ * F-finding(rule_count drift): rule_ids[] 가 SSOT 이고 rule_count 는 그 length 의 비정규화 캐시다.
+ *   다중 BC 팬아웃에서 LLM 이 rule_count 정수를 손으로 적다 rule_ids.length 와 어긋나는 사례가 반복
+ *   관측됨(예: rule_ids 23개인데 rule_count 21 기재 → total_rules 과소집계). 따라서 caller 가 준
+ *   rule_count 를 신뢰하지 않고 rule_ids 가 있으면 rule_count := rule_ids.length 로 강제하고,
+ *   total_rules 도 entry 별 rule_ids.length 우선(없으면 rule_count fallback)으로 합산해 drift 를
+ *   원천 차단한다. rule_ids 부재 entry(레거시/카운트만 가진 entry)는 rule_count 그대로 사용.
  * @returns {{action:string, index:number, total_rules:number}}
  */
 export function upsertBcFile(indexObj, entry) {
 	indexObj.bc_files ??= [];
+	if (entry && Array.isArray(entry.rule_ids)) entry.rule_count = entry.rule_ids.length;
 	const r = upsertById(indexObj.bc_files, entry, 'bounded_context');
 	indexObj.total_rules = indexObj.bc_files.reduce(
-		(s, f) => s + (Number.isFinite(f && f.rule_count) ? f.rule_count : 0),
+		(s, f) =>
+			s +
+			(Array.isArray(f && f.rule_ids)
+				? f.rule_ids.length
+				: Number.isFinite(f && f.rule_count)
+					? f.rule_count
+					: 0),
 		0,
 	);
 	return { ...r, total_rules: indexObj.total_rules };

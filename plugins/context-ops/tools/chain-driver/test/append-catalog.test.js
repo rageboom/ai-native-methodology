@@ -77,6 +77,26 @@ describe('upsertBcFile — total_rules 재계산', () => {
 		assert.equal(idx.bc_files.length, 1);
 		assert.equal(idx.total_rules, 10);
 	});
+	test('F-finding: rule_ids 가 SSOT — 틀린 rule_count 를 rule_ids.length 로 교정', () => {
+		// 레거시(rule_ids 없는) BC-A 는 rule_count 그대로 사용
+		const idx = { bc_files: [{ bounded_context: 'BC-A', rule_count: 36 }], total_rules: 36 };
+		// caller 가 rule_count 21 로 잘못 기재(실제 rule_ids 는 23개) — LLM 팬아웃 drift 재현
+		const r = upsertBcFile(idx, {
+			bounded_context: 'BC-B',
+			rule_count: 21,
+			rule_ids: Array.from({ length: 23 }, (_, i) => `BR-B-${i + 1}`),
+		});
+		assert.equal(r.action, 'appended');
+		assert.equal(idx.bc_files[1].rule_count, 23, 'rule_count 가 rule_ids.length(23) 로 교정');
+		assert.equal(idx.total_rules, 59, 'total = 36 + 23 (과소집계 57 아님)');
+		assert.equal(r.total_rules, 59);
+	});
+	test('F-finding: rule_ids 부재 entry 는 rule_count fallback(하위호환)', () => {
+		const idx = { bc_files: [], total_rules: 0 };
+		upsertBcFile(idx, { bounded_context: 'BC-LEGACY', rule_count: 7 });
+		assert.equal(idx.total_rules, 7);
+		assert.equal(idx.bc_files[0].rule_count, 7);
+	});
 });
 
 describe('upsertCautionGroup — title 키', () => {
@@ -131,9 +151,15 @@ describe('path-based — multi-BC no-clobber + indent 보존 (핵심 회귀)', (
 			p,
 			JSON.stringify({ bc_files: [{ bounded_context: 'BC-EVENT', rule_count: 36 }], total_rules: 36 }, null, 2) + '\n',
 		);
-		appendBcFileToIndex(p, { bounded_context: 'BC-RESV-MTRM', rule_count: 20, rule_ids: ['BR-RESVMTRM-X-001'] });
+		// caller 가 rule_count 99 로 잘못 기재 — rule_ids(20개) 가 SSOT 이므로 20 으로 교정되어야 함
+		appendBcFileToIndex(p, {
+			bounded_context: 'BC-RESV-MTRM',
+			rule_count: 99,
+			rule_ids: Array.from({ length: 20 }, (_, i) => `BR-RESVMTRM-X-${String(i + 1).padStart(3, '0')}`),
+		});
 		const obj = JSON.parse(readFileSync(p, 'utf8'));
 		assert.deepEqual(obj.bc_files.map((f) => f.bounded_context), ['BC-EVENT', 'BC-RESV-MTRM']);
-		assert.equal(obj.total_rules, 56);
+		assert.equal(obj.bc_files[1].rule_count, 20, 'rule_count 가 rule_ids.length 로 교정(99 무시)');
+		assert.equal(obj.total_rules, 56, 'total = 36 + 20');
 	});
 });

@@ -10,6 +10,14 @@
 
 ---
 
+## [0.42.2] — 2026-06-13 PATCH — append-catalog rule_count = rule_ids.length SSOT 강제 (F-3) — biztrip corroboration
+
+### Fixed
+
+- **`tools/_shared/append-catalog.js` `upsertBcFile` — rule_count drift 차단 (F-3 / F-1·F-2 후속, 동일 헬퍼).** `rule_ids[]` 를 SSOT 로 계약 명문화하고, upsert 시 `rule_count := rule_ids.length` 강제 + `total_rules` 합산도 entry 별 `rule_ids.length` 우선(없으면 `rule_count` fallback). biztrip 6 BC 워크플로우 팬아웃에서 LLM 이 `rule_count` 를 잘못 기재한 사례 재현(`BC-BIZTRIP-REQUEST` 21 vs rule_ids 23 · `BC-BIZTRIP-EXECUTIVE` 16 vs 18 → `total_rules` 과소집계 257 vs 261)을 결정론적으로 원천 차단. caller 가 준 틀린 정수를 더는 신뢰하지 않음. `rule_ids` 부재 레거시 entry 는 `rule_count` fallback = **하위호환 유지(breaking 0)**. 회귀 `tools/chain-driver/test/append-catalog.test.js` **12 → 14**(drift 교정 + fallback 2건 추가, `appendBcFileToIndex` 테스트 invariant-일관 갱신). DEC-2026-06-13-append-catalog-rulecount-ssot. (검증 = `ep-be-gea` biztrip 분석 2nd 도메인 패밀리 corroboration, resve 6 BC 후속.)
+
+---
+
 ## [0.42.1] — 2026-06-12 PATCH — append-catalog writer 헬퍼(F-1) + analysis exit-gate 명문화(F-2) — resve 다중도메인 corroboration
 
 **SSOT**: `decisions/DEC-2026-06-12-resve-multidomain-corroboration.md`.
