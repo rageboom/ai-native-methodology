@@ -1,0 +1,10 @@
+{
+  "name": "poc-21-greenfield-money-allocation",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "greenfield designed_from_spec PoC — money allocation (Fowler Money). DB-free 순수함수 / node --test zero-install.",
+  "scripts": {
+    "test": "node --test"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "phase": "RED",
+  "scenario": "greenfield",
+  "provenance": "designed_from_spec",
+  "unit_ref": "UNIT-ALLOCATE-001",
+  "runner": "node:test (built-in / zero-install)",
+  "impl_state": "stub-not-implemented (코드 from-zero / 원본 비움 아님)",
+  "tests_total": 7,
+  "tests_passed": 0,
+  "tests_failed": 7,
+  "exit_code": 1,
+  "result_hash": "7cea62db71e5656b737d4bac36070fa7d63a24f70c246c78d9b30eb6cf4fd2e3",
+  "simulated_evidence_count": 0,
+  "note": "test-first / src/allocate.mjs = throw stub → 전 test FAIL = genuine RED. result_hash = ok/not-ok outcome 라인(duration 제외) sha256 = 결정론."
+}

@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "generated_at": "2026-06-12T00:00:00Z",
+    "methodology_version": "v0.39.0",
+    "inputs_used": ["planning_docs"],
+    "confidence": 0.9,
+    "$comment": "greenfield(PRD only) 최소 domain — money allocation. designed_from_spec UNIT 의 의미계층 anchor(domain_path). 코드-고고학 N/A."
+  },
+  "bounded_contexts": [
+    {
+      "id": "BC-ALLOC",
+      "name": "Money Allocation",
+      "description": "정수 cents 를 비율로 합 보존 분배(Fowler Money). 순수 도메인 / DB·외부 의존 0."
+    }
+  ]
+}

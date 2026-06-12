@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "generated_at": "2026-06-12T00:00:00Z",
+    "methodology_version": "v0.39.0",
+    "inputs_used": ["planning_docs", "test_code"],
+    "confidence": 0.9,
+    "$comment": "★ designed_from_spec 첫 실 인스턴스(레포 0건이던 provenance / GATED 조건① 실증). greenfield money-allocation = 코드 from-zero → PRD/formal-spec invariant 로부터 설계 → genuine RED(7/0/7 hash 7cea62db…)→GREEN(7/7/0 hash 85f0cbe9…) = result_hash DIVERGENT + test 파일 i-strict 불변(evidence/test-impl-{red,green}.json). code_pointer 추이: spec 단계 doc_link/stale(코드 미존재) → implement 후 ast_symbol(symbol=allocate). ★§8.1 가드: 단일 datapoint = designed_from_spec 'paradigm 검증' 주장 ❌ — 좁은 DB-free 순수함수 best-case 에서 조건① 충족만. HARD flip 은 여전히 별도 promotion DEC + ≥2 도메인 필요. RED→GREEN 순서의 tool-결정론 증거 = result_hash 차이 + i-strict 뿐 / git commit 순서·prose = human-review carry(README)."
+  },
+  "derivation_source": {
+    "domain_path": ".ai-context/output/domain.json",
+    "formal_spec_path": ".ai-context/output/formal-spec.json"
+  },
+  "units": [
+    {
+      "id": "UNIT-ALLOC-001",
+      "name": "allocate (정수 금액을 비율로 합 보존 분배)",
+      "provenance": "designed_from_spec",
+      "kind": "function",
+      "code_pointer": {
+        "path": "target/src/allocate.mjs",
+        "anchor_type": "ast_symbol",
+        "symbol": "allocate",
+        "stale": false
+      },
+      "bc_ref": "BC-ALLOC",
+      "invariant_refs": ["BR-ALLOC-CONSERVATION-001", "BR-ALLOC-REMAINDER-002", "BR-ALLOC-VALIDATION-003", "BR-ALLOC-PROPORTION-004"],
+      "unit_test_obligation": "required"
+    }
+  ],
+  "coverage": {
+    "obligation_satisfied_ratio": 1.0,
+    "threshold": 0.85,
+    "coverage_strategy": "absolute"
+  }
+}

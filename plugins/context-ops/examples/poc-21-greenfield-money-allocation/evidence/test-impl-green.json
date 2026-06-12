@@ -1,0 +1,19 @@
+{
+  "phase": "GREEN",
+  "scenario": "greenfield",
+  "provenance": "designed_from_spec",
+  "unit_ref": "UNIT-ALLOCATE-001",
+  "runner": "node:test (built-in / zero-install)",
+  "impl_state": "implemented (spec invariant INV-1~4 로부터 설계 / 원본 베끼기 아님)",
+  "tests_total": 7,
+  "tests_passed": 7,
+  "tests_failed": 0,
+  "exit_code": 0,
+  "result_hash": "85f0cbe9d8a73fd858bfea716d956c4e18ca593040e32a7e1d1e99b2bce705b0",
+  "red_result_hash": "7cea62db71e5656b737d4bac36070fa7d63a24f70c246c78d9b30eb6cf4fd2e3",
+  "result_hash_divergent": true,
+  "test_file_sha256": "502278e76a3960c2003c3f8379b2e9ba9beae46a9c1a1ce21cf41a5940b48088",
+  "simulated_evidence_count": 0,
+  "tool_deterministic_proof": "RED↔GREEN result_hash 차이 + 동일 test 파일(i-strict 불변) = impl 만 RED→GREEN 전이. (git commit 순서·README = human-review carry / 결정론 게이트 아님)",
+  "note": "designed_from_spec RED→GREEN E2E. 동일 7 test 셋 불변, src/allocate.mjs stub→impl 만 변경."
+}

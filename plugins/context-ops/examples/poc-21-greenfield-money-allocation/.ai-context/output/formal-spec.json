@@ -1,0 +1,14 @@
+{
+  "meta": {
+    "generated_at": "2026-06-12T00:00:00Z",
+    "methodology_version": "v0.39.0",
+    "inputs_used": ["planning_docs", "test_code"],
+    "confidence": 0.9,
+    "$comment": "greenfield designed_from_spec — money allocation. ★invariants/property_tests 배열이 빈 이유 = 본체 enum gap(finding F-POC21-001): formal-spec.schema 의 invariants/property_tests.language enum=[typescript,java] + property_tests.framework enum=[fast-check,jqwik,hypothesis,scalacheck] 가 JavaScript/node:test(및 Python)를 배제 → 본 JS greenfield PoC 는 schema-valid 하게 못 채움. 실 invariants 는 PRD(BR-ALLOC-CONSERVATION-001~004 / INV-1~4)에 명세되고 target/test/allocate.unit.test.mjs 로 실행됨(RED→GREEN evidence). 본 PoC 는 이 gap 을 고치지 않음(carry / 본체 결함 후보). state_machine/sequence/decision_table = 순수함수라 N/A."
+  },
+  "state_machines": [],
+  "sequences": [],
+  "decision_tables": [],
+  "invariants": [],
+  "property_tests": []
+}
