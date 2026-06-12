@@ -80,7 +80,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - intent_certainty = `inferred-consequence`/`unverified-intent` (설계 의도 / 코드 반증 불가).
 - 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy 코드 rule 추출 경로 그대로).
 
-## schema enum 주의 (산출 전 필독 / DEC-2026-06-12-resve-multidomain-corroboration §4)
+## schema enum 주의 (산출 전 필독)
 
 골프/이벤트 등 **템플릿 미러만으로는 enum 위반**이 자주 난다(LLM-agent 가 템플릿에 안 나타난 자유값 생성). 아래 enum 외 값 = schema-validator RED:
 
@@ -97,6 +97,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 ## 인용
 
 - 결단: DEC-2026-05-30-use-scenario-taxonomy §2.4 (greenfield 옵션 A)
+- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4 (schema enum 주의 절 근거)
 - 정책: `methodology-spec/workflow/business-logic.md` §5 (4영역 병렬 추출 / rules 매핑 = §5.A SQL CASE/WHERE + §5.B FE validation + §5.C 매직 넘버)
 - 정책: `methodology-spec/deliverables/5-business-rules.md`
 - schema: `schemas/business-rules-index.schema.json` (index) + `schemas/business-rules-bc.schema.json` (per-BC leaf / `$defs.businessRule` 는 `schemas/business-rules.schema.json` 재사용)

@@ -47,7 +47,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 - intent_certainty 강조 = `inferred`/`intent` (설계 의도 / S2 의 verified intent 와 대비 / use-scenario-taxonomy §2).
 - 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy ORM/Entity 추출 경로 그대로).
 
-## schema enum 주의 (산출 전 필독 / DEC-2026-06-12-resve-multidomain-corroboration §4)
+## schema enum 주의 (산출 전 필독)
 
 병렬 추출 시 자주 나는 위반(schema-validator RED):
 
@@ -65,5 +65,6 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 - 정책: methodology-spec/deliverables/2-domain.md
 - 정책: methodology-spec/use-scenario-taxonomy.md §2.4
 - 결단: DEC-2026-05-30-use-scenario-taxonomy
+- 결단: DEC-2026-06-12-resve-multidomain-corroboration §4 (schema enum 주의 절 근거)
 - schema: schemas/domain.schema.json
 - ADR: ADR-004 (DDD), ADR-005 (한국어)
