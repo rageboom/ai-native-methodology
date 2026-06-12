@@ -21,12 +21,12 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "(분석|검토|legacy|레거시|analysis|discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현)",
+        "matcher": "(분석|검토|legacy|레거시|analysis|discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현|세션|session|인계|handoff)",
         "hooks": [
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge",
-            "$comment": "D21' 정합 — suppressOutput=true 응답 + stderr 만 사용자 콘솔 노출. additionalContext 에 'LLM SHALL NOT auto-invoke' 차단 문구 동봉. LLM 양심 의존 회피."
+            "$comment": "D21' 정합 — suppressOutput=true 응답 + stderr 만 사용자 콘솔 노출. additionalContext 에 'LLM SHALL NOT auto-invoke' 차단 문구 동봉. LLM 양심 의존 회피. v0.37+ session-handoff 키워드(세션/인계/handoff) 추가 (DEC-2026-06-11-session-handoff-convention)."
           }
         ]
       }

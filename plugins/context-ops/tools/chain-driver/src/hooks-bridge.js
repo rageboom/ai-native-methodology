@@ -124,6 +124,14 @@ const TRIGGER_PATTERNS = [
 		skillId: 'implement-generate-impl-spec',
 		agentId: 'implement-agent',
 	},
+	// session-handoff (DEC-2026-06-11-session-handoff-convention) — 세션 종료/인계 발화 →
+	//   .ai-context/HANDOFF.md 갱신 스킬 라우팅. cross-cutting = stage agent 무관 (agentId null).
+	{
+		regex:
+			/((세션|session)\s*(정리|마무리|인계|종료|wrap[- ]?up))|handoff|인계\s*(문서|갱신|작성)/i,
+		skillId: 'session-handoff',
+		agentId: null,
+	},
 ];
 
 export function suggestSkillForPrompt(prompt) {

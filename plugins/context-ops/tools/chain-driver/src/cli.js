@@ -1413,11 +1413,23 @@ function cmdHooksBridge(args) {
 	if (event === 'SessionStart') {
 		// G3 R5/R7 — recover .tmp + drift 자동 감지 + 사용자 안내 (M4).
 		const root = payload.cwd || process.cwd();
+		// session-handoff (DEC-2026-06-11-session-handoff-convention) — HANDOFF.md 존재 표면화.
+		//   대화·태스크는 세션 휘발 → 인계 문서를 시작 시점에 LLM context 로 주입 (스킬이 읽기/갱신 본체).
+		const handoffNudge = existsSync(join(root, '.ai-context', 'HANDOFF.md'))
+			? '📋 세션 인계 문서 존재 — .ai-context/HANDOFF.md 를 먼저 읽고 §3 "다음 작업"부터 이어서 진행 (§4 휘발성 상태는 실제와 대조 / skill: session-handoff).'
+			: null;
 		if (!existsSync(join(root, '.ai-context', 'state.json'))) {
-			// user project not yet initialized — pass-through.
-			process.stdout.write(
-				JSON.stringify({ suppressOutput: true, continue: true }) + '\n',
-			);
+			// user project not yet initialized — HANDOFF 만 있으면 그것만 표면화 / 둘 다 없으면 pass-through.
+			const out = handoffNudge
+				? {
+						suppressOutput: true,
+						hookSpecificOutput: {
+							additionalContext: `[ai-native-methodology] ${handoffNudge}`,
+						},
+						continue: true,
+					}
+				: { suppressOutput: true, continue: true };
+			process.stdout.write(JSON.stringify(out) + '\n');
 			process.exit(0);
 		}
 		try {
@@ -1452,6 +1464,9 @@ function cmdHooksBridge(args) {
 		let additionalContext = parts.length
 			? `[ai-native-methodology] ${parts.join(' ')}`
 			: '[ai-native-methodology] chain harness ready. M4 sync = drift auto-detect + manual cascade.';
+		// session-handoff nudge 는 ready/경고 메시지와 직교 — 별도 line 으로 prepend (ready 신호 보존).
+		if (handoffNudge)
+			additionalContext = `[ai-native-methodology] ${handoffNudge}\n${additionalContext}`;
 		// dep-graph P4 (operation.md 결정 7) — artifact-graph.json 있으면 dirty 노드 수 + top-3 impact root 주입.
 		try {
 			const graphInjection = buildGraphSessionContext(root);

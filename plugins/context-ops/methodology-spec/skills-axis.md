@@ -148,9 +148,9 @@ paradigm:
 | test          | `test-`        | 4                                                          | `test-generate-test-spec`, `test-playwright`, ...                                                                                                                                                                  |
 | implement     | `implement-`   | 4                                                          | `implement-generate-impl-spec`, `implement-react`, `implement-vue`, ...                                                                                                                                            |
 | design        | (placeholder)  | 0                                                          | —                                                                                                                                                                                                                  |
-| (standalone)  | —              | 2                                                          | `dep-graph-navigator`, `ticket-sync`                                                                                                                                                                               |
+| (standalone)  | —              | 3                                                          | `dep-graph-navigator`, `ticket-sync`, `session-handoff`                                                                                                                                                                               |
 
-총 **55 skill** (Claude Code plugin 표준 1-depth 호환 ✅).
+총 **61 skill** (Claude Code plugin 표준 1-depth 호환 ✅).
 
 ### 7.3 frontmatter `name:` SSOT 정합
 

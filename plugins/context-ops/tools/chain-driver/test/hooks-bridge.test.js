@@ -229,3 +229,21 @@ describe('hooks-bridge', () => {
 		assert.equal(reason, null);
 	});
 });
+
+// session-handoff TRIGGER_PATTERNS (DEC-2026-06-11-session-handoff-convention)
+describe('suggestSkillForPrompt — session-handoff', () => {
+	it('세션 정리/마무리/인계/handoff 발화 → session-handoff', () => {
+		assert.equal(suggestSkillForPrompt('세션 정리해줘'), 'session-handoff');
+		assert.equal(suggestSkillForPrompt('이제 세션 마무리하자'), 'session-handoff');
+		assert.equal(suggestSkillForPrompt('session wrap-up please'), 'session-handoff');
+		assert.equal(suggestSkillForPrompt('인계 문서 갱신해줘'), 'session-handoff');
+		assert.equal(suggestSkillForPrompt('HANDOFF 갱신'), 'session-handoff');
+	});
+	it('무관 발화 미발화 (과잉 트리거 가드)', () => {
+		assert.equal(suggestSkillForPrompt('세션스토리지 버그 고쳐줘'), null);
+		assert.equal(suggestSkillForPrompt('업무 인계 받았어'), null);
+	});
+	it('stage 트리거와 충돌 없음 — 기존 라우팅 무회귀', () => {
+		assert.equal(suggestSkillForPrompt('구현 시작'), 'implement-generate-impl-spec');
+	});
+});

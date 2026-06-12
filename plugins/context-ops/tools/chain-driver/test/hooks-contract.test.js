@@ -154,3 +154,67 @@ describe('hooks-contract — SessionStart unbaselined surface (② honest)', () 
 		rmSync(root, { recursive: true, force: true });
 	});
 });
+
+// session-handoff (DEC-2026-06-11-session-handoff-convention) — SessionStart HANDOFF 표면화 + 라우팅 e2e.
+describe('hooks-contract — session-handoff', () => {
+	it('SessionStart: HANDOFF.md 존재 + state.json 부재(pre-init) → handoff nudge 만 표면화', () => {
+		const root = mkdtempSync(join(tmpdir(), 'handoff-preinit-'));
+		try {
+			mkdirSync(join(root, '.ai-context'), { recursive: true });
+			writeFileSync(join(root, '.ai-context', 'HANDOFF.md'), '# HANDOFF\n');
+			const r = sessionStart(root);
+			assert.equal(r.status, 0);
+			const out = JSON.parse(r.stdout);
+			assert.match(
+				out.hookSpecificOutput.additionalContext,
+				/HANDOFF\.md 를 먼저 읽고/,
+			);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('SessionStart: HANDOFF.md 부재 + state.json 부재 → 기존 pass-through 무회귀', () => {
+		const root = mkdtempSync(join(tmpdir(), 'handoff-none-'));
+		try {
+			const r = sessionStart(root);
+			assert.equal(r.status, 0);
+			const out = JSON.parse(r.stdout);
+			assert.equal(out.suppressOutput, true);
+			assert.equal(out.hookSpecificOutput, undefined);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('SessionStart: HANDOFF.md + state.json 양존 → nudge 별도 line prepend + ready 신호 보존', () => {
+		const root = mkdtempSync(join(tmpdir(), 'handoff-init-'));
+		try {
+			const init = runCli(['init', root]);
+			assert.equal(init.status, 0);
+			writeFileSync(join(root, '.ai-context', 'HANDOFF.md'), '# HANDOFF\n');
+			const r = sessionStart(root);
+			assert.equal(r.status, 0);
+			const ctx = JSON.parse(r.stdout).hookSpecificOutput.additionalContext;
+			assert.match(ctx, /HANDOFF\.md 를 먼저 읽고/);
+			assert.match(ctx, /chain harness ready/); // handoff 가 ready 신호를 대체하지 않음
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('UserPromptSubmit: "세션 정리해줘" → session-handoff 라우팅 (agent dispatch 권고 없음)', () => {
+		const r = runHooksBridge(
+			JSON.stringify({
+				hook_event_name: 'UserPromptSubmit',
+				prompt: '오늘은 세션 정리해줘',
+				session_id: 's1',
+				cwd: process.cwd(),
+			}),
+		);
+		assert.equal(r.status, 0);
+		const ctx = JSON.parse(r.stdout).hookSpecificOutput.additionalContext;
+		assert.match(ctx, /session-handoff/);
+		assert.doesNotMatch(ctx, /dispatch agent/); // cross-cutting = agentId null
+	});
+});
