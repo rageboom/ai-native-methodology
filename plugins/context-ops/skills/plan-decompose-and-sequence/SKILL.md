@@ -46,6 +46,12 @@ task 안 ac_refs.length 1~3 imperative:
 
 본 skill = Sub-task (TASK-\*) 책임 + Epic/Story 식별. ticket 생성/매핑은 ticket-sync skill 책임.
 
+### summary 네이밍 규칙
+
+- **Epic·Story** = 메뉴명·기능명만 — `[Epic]`, `[BHV-*]` 등 브래킷 **절대 금지** (ticket-cascade-builder `validateNoLeadingBracket` 가 빌드 시 throw).
+  - `title` 이 비어 있으면 `screen_id` / `behavior_ref` 를 브래킷 없이 그대로 사용 (예: `BHV-CAR-001`).
+- **OP-\* / TASK-\*** = `[OP-xxx]` / `[TASK-xxx]` 브래킷 유지.
+
 ### jira_id 델타 규칙
 
 `epic_refs/story_refs/op_task_refs` 의 `jira_id` 는 **기존 Jira 티켓 키이면 기입**, 아니면 **빈 값 (ticket-sync 가 신규 생성 후 채움)**.

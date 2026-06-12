@@ -103,11 +103,19 @@ export function buildBody(role, ctx = {}) {
 }
 
 // summary 네이밍 규칙 (구 SKILL.md §Summary 네이밍).
+// Epic·Story = 브래킷 ❌ (메뉴명·기능명만). OP·Sub-task = 브래킷 유지.
 function epicSummary(e) { return e.title || e.screen_id || e.route || '(Epic)'; }
-function storySummary(s) { return s.title || `[${s.behavior_ref}] Story`; }
+function storySummary(s) { return s.title || s.behavior_ref || '(Story)'; }
 function opSummary(op) { return `[OP-${stripPrefix(op.op_task_id || op.id)}] ${op.title || ''}`.trim(); }
 function subSummary(t) { return `[${t.id}] ${t.layer ? t.layer + ' ' : ''}${t.title || ''}`.trim(); }
 function stripPrefix(id) { return String(id || '').replace(/^OP-/, ''); }
+
+// validation guard — Epic·Story summary 에 브래킷 시작 ❌.
+export function validateNoLeadingBracket(role, summary) {
+	if ((role === 'epic' || role === 'story') && /^\[/.test(summary)) {
+		throw new Error(`F-TICKETSYNC-019 bracket_in_summary: role=${role} summary="${summary}" — Epic·Story summary 브래킷 시작 금지`);
+	}
+}
 
 // 메인 — cascade-plan object 산출.
 export function buildCascadePlan(inputs) {
@@ -154,8 +162,10 @@ export function buildCascadePlan(inputs) {
 	for (const e of taskPlan.epic_refs || []) {
 		const key = e.screen_id || e.jira_id || e.title;
 		const action = deltaAction(e);
+		const eSum = epicSummary(e);
+		validateNoLeadingBracket('epic', eSum);
 		evidence_skeleton.epic_id_map[key] = e.jira_id || null;
-		push({ role: 'epic', issue_type: resolveIssueType('epic', config), summary: epicSummary(e),
+		push({ role: 'epic', issue_type: resolveIssueType('epic', config), summary: eSum,
 			body: buildBody('epic', { description: e.title, route: e.route }),
 			parent_spec: resolveParentSpec('epic', config, initiativeKey), labels: ['epic'],
 			delta_action: action, prebound_jira_id: e.jira_id, source_ref: key });
@@ -165,8 +175,10 @@ export function buildCascadePlan(inputs) {
 	for (const s of taskPlan.story_refs || []) {
 		const key = s.behavior_ref || s.jira_id;
 		const action = deltaAction(s);
+		const sSum = storySummary(s);
+		validateNoLeadingBracket('story', sSum);
 		evidence_skeleton.story_id_map[key] = s.jira_id || null;
-		push({ role: 'story', issue_type: resolveIssueType('story', config), summary: storySummary(s),
+		push({ role: 'story', issue_type: resolveIssueType('story', config), summary: sSum,
 			body: buildBody('story', { title: s.title, bhv_detail: bhvDetail(behaviorSpec, s.behavior_ref), ac_items: acItems(acceptanceCriteria, s.ac_refs) }),
 			parent_spec: resolveParentSpec('story', config, s.epic_ref || null), labels: [],
 			delta_action: action, prebound_jira_id: s.jira_id, source_ref: key });

@@ -197,12 +197,26 @@ Auto Mode 활성 시 — 이전 iter test 가 살아있으면 `generation_mode: 
 
 ### jest (nodejs)
 
+**금지 사항:**
+- `jest.mock()` 은 **반드시 모듈 top-level** 에 위치 (함수·블록·조건문 내부 동적 호출 ❌). babel-jest 가 hoisting 처리하므로 동적 위치는 ES module 환경에서 무시됨.
+- `require()` 를 테스트 함수 내부에서 동적으로 호출 ❌ (mock hoisting 파괴).
+
+**mock isolation 의무:** `describe` 블록 상단 `beforeEach` 에서 `jest.clearAllMocks()` 또는 `jest.resetAllMocks()` 호출. 미작성 시 테스트 간 mock 상태 오염 발생.
+
 ```ts
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, jest, beforeEach } from '@jest/globals';
+
+// jest.mock() 은 반드시 top-level (동적 import ❌)
+jest.mock('../services/authService');
+
 describe('UC-USER-001 / BHV-USER-001', () => {
-	test('AC-USER-001 — login happy path', async () => {
-		// arrange / act / assert (Gherkin Given/When/Then)
-	});
+  beforeEach(() => {
+    jest.clearAllMocks(); // mock isolation — 각 테스트 간 호출 기록 초기화
+  });
+
+  test('AC-USER-001 — login happy path', async () => {
+    // arrange / act / assert (Gherkin Given/When/Then)
+  });
 });
 ```
 

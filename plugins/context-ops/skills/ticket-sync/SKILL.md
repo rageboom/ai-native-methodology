@@ -184,8 +184,13 @@ for call in cascade-plan.calls (order asc):
   # 3) 발사 + runtime fallback (live 응답 의존 / 스킬 책임 / 도구 밖)
   res = {_mcp_prefix}jira_create(payload)
   on 400/403 (parent linking drift):
-    epic         : parent_link → parent_key 재시도 → 실패 시 jira_link(Relates)   (F-TICKETSYNC-013)
-    story/task   : epic_link → parent_key → jira_link(Relates)                     (F-TICKETSYNC-010 / 008)
+    epic         : B16 customfield_10007 누락 400 → extra_fields.customfield_10007=summary 추가 재시도
+                   (재시도 후) parent_link → parent_key → jira_link(Relates)         (F-TICKETSYNC-013)
+    story/task   : epic_link → parent_key → jira_link(Relates)                       (F-TICKETSYNC-010 / 008)
+    subtask      : parent_key 응답 후 parent=null 확인 → REST API fallback (B17)
+                   PUT /rest/api/2/issue/{key} {"fields":{"parent":{"key":parent_key}}}
+                   200 OK → evidence.parent_linked_via="rest_api_fallback" (F-TICKETSYNC-017)
+                   PUT 실패 → jira_link(type=subtask) 최종 fallback (F-TICKETSYNC-018)
     evidence: environment_drift finding 누적
   keymap[call.source_ref] = res.ticket_id_created
   evidence.mcp_invocations += 7-field (call별 / Bash 로 stdout·stderr·duration·result_hash 캡쳐)

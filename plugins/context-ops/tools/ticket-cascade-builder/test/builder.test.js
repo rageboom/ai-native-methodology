@@ -6,6 +6,7 @@ import {
 	resolveIssueType,
 	resolveParentSpec,
 	deltaAction,
+	validateNoLeadingBracket,
 	DEFAULT_ISSUETYPE_MAP,
 } from '../src/builder.js';
 
@@ -142,4 +143,40 @@ test('buildCascadePlan — counts + preview_md 산출', () => {
 	const plan = buildCascadePlan({ scope: 'car', taskPlan: baseTaskPlan(), config: SG_MIS });
 	assert.equal(plan.counts.create + (plan.counts.skip_prebound || 0), plan.calls.length);
 	assert.match(plan.preview_md, /Preview — ticket cascade/);
+});
+
+// ─── 이슈 #5: Epic·Story summary 브래킷 금지 ──────────────────────────────
+
+test('storySummary — title 없을 때 behavior_ref 를 브래킷 없이 fallback (브래킷 ❌)', () => {
+	const tp = baseTaskPlan({
+		story_refs: [{ behavior_ref: 'BHV-CAR-001', epic_ref: 'SCR-CAR-DASH', ac_refs: ['AC-CAR-001'] }],
+	});
+	const plan = buildCascadePlan({ scope: 'car', taskPlan: tp, config: SG_MIS });
+	const story = plan.calls.find((c) => c.role === 'story');
+	assert.equal(story.summary, 'BHV-CAR-001'); // 브래킷 없이 behavior_ref 그대로
+	assert.ok(!story.summary.startsWith('['), 'Story summary must not start with [');
+});
+
+test('validateNoLeadingBracket — Epic/Story 브래킷 시작 → throw (F-TICKETSYNC-019)', () => {
+	assert.throws(() => validateNoLeadingBracket('epic', '[Epic] 대시보드'), /F-TICKETSYNC-019/);
+	assert.throws(() => validateNoLeadingBracket('story', '[BHV-CAR-001] Story'), /F-TICKETSYNC-019/);
+});
+
+test('validateNoLeadingBracket — OP/subtask 브래킷 허용', () => {
+	assert.doesNotThrow(() => validateNoLeadingBracket('task', '[OP-CAR-001] 인프라 작업'));
+	assert.doesNotThrow(() => validateNoLeadingBracket('subtask', '[TASK-CAR-001] be 구현'));
+});
+
+test('buildCascadePlan — Epic title 있으면 브래킷 없는 title 그대로 사용', () => {
+	const plan = buildCascadePlan({ scope: 'car', taskPlan: baseTaskPlan(), config: SG_MIS });
+	const epic = plan.calls.find((c) => c.role === 'epic');
+	assert.equal(epic.summary, '차량 대시보드');
+	assert.ok(!epic.summary.startsWith('['));
+});
+
+test('buildCascadePlan — Story title 있으면 브래킷 없는 title 그대로 사용', () => {
+	const plan = buildCascadePlan({ scope: 'car', taskPlan: baseTaskPlan(), config: SG_MIS });
+	const story = plan.calls.find((c) => c.role === 'story');
+	assert.equal(story.summary, '차량 등록');
+	assert.ok(!story.summary.startsWith('['));
 });
