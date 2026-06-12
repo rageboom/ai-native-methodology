@@ -10,6 +10,29 @@
 
 ---
 
+## [0.39.0] — 2026-06-12 MINOR — unit 층 LEVER C soft-surface + HARD flip 5조건 게이팅 + charter R21 정합
+
+추천 일감 산출 워크플로우(8표면 75후보→dedup 19→상위5 repo 실측 검증) → 1위 = unit 층 하드게이트 promotion. 위임받은 GAP-aware 결단을 plan workflow(7 agents: LEVER A/B/C 정밀분석 + GAP-4 실측 + Senior + 업계 4사)로 수행 → **3-입력 전부 CONDITIONAL-GO 수렴** → 전면 HARD flip ❌ / NOW+GATED 2단 분리. DEC-2026-06-12-unit-layer-soft-surface-and-promotion-gating.
+
+### NOW (시행 / behavior additive·non-blocking 무회귀)
+
+- **LEVER C — findings-aggregator `transformTraceabilityMatrix` 에 `unit_coverage` axis 배선**: `coverage_summary.unit_coverage`(v0.36.0 schema 신설 / builder 가 산출하나 aggregator 가 buried) 를 읽도록 확장.
+  - **reference-lens pass-through 5필드** (`traceability_unit_obligation_ratio`/`unit_total`/`unit_tested`/`method_axis_corroboration`/`mutation_score`) — `mergeFindings` allowlist 밖 = `sources[].findings` 에만 잔류 = **gate 무진입**(`traceability_forward_coverage` 와 동형). `method_axis_corroboration`·`mutation_score` = 영구 reference-lens(DEC-2026-05-28 code-graph/mutation 게이트 주입 금지 불변).
+  - **obligation gap → medium advisory**: `obligation_satisfied_ratio < unit_coverage.threshold` → `medium += 1`(forward_coverage gap 과 동형 / gate-eval medium=non-blocking / schema:236 "게이트 후보 / 현 soft"). critical/high 미승격(HARD flip 은 별도 promotion DEC).
+  - 검증: findings-aggregator **64/64**(61→64 / +3 LEVER C 케이스: ratio≥threshold→medium 무증가+필드 채움 / ratio<threshold→medium+1·critical=high=0 / unit_coverage 부재→필드 null·medium 무회귀). poc-18 medium 무회귀(obligation_satisfied_ratio=1 ≥ 0.85 → gap=0).
+
+### GATED (보류 — 5조건 + 후속 promotion DEC 전 금지)
+
+- **HARD flip** = LEVER B(`plan-coverage-validator validator.js:482` severity medium→high) + LEVER A step[C](mock-soundness `validator_high` HARD_BLOCK 합류) + LEVER A step[A][B] 배선(severity high→medium→high churn·spec-test-link 2-객체 stdout silent-regression 함정 회피로 일괄 이월). **5조건**: ①designed_from_spec greenfield/S1 PoC RED→GREEN 실코드 E2E ②in-repo 재현가능 2nd 도메인 ③mutation_score 1회(PIT/Stryker) ④mock-soundness ≥2 협력자+≥1 waived breadth ⑤후속 promotion DEC + release-readiness count coupling(criteria_total 42→43 / unit-mock reference-lens trust check). 근거: 두 corroboration PoC(ep-be-gea·poc-18) 모두 `characterized_from_code` 단일 provenance → 하드게이트가 차단 강제할 `designed_from_spec`(RED→GREEN) 경로 미실증 → 미실증 경로 prod 차단 = 품질1·재작업2 위반. 업계 4사(Google/Uber/Stryker/Meta) = advisory-default·조건부 blocking 수렴.
+
+### B — plugin-charter R21 정합 (governance)
+
+- `methodology-spec/plugin-charter.md` R21 `◐ 설계 SSOT`→`✅`: named carry `C-use-scenario-taxonomy-impl`(work-unit.js `SCENARIOS`·gate-eval `SCENARIO_EXPECTED`·work-unit-manifest enum·greenfield-bootstrap) + `C-codegraph-essential-impl`(codegraph-runner/coverage) 둘 다 시행 실측 → ✅. **phantom ⚠️ 정정**(요약 "✅17/⚠️1/◐1"→"✅19/⚠️0/◐0" — §2 매핑표에 ⚠️ 행 부재였음). greenfield `designed_from_spec` E2E 미실증 = 잔여 corroboration carry(§155 포인터). provenance-leak check 회귀(poc-NN 토큰) 자가 검출·교정.
+
+### 검증
+
+- findings-aggregator 64/64 · chain-driver 523/523(최대 소비자 무회귀) · **release-readiness 42/42**(criteria_total 불변 / README·version·CHANGELOG lockstep sync). sub-agent narrative 액면 수용 ❌ → 실코드 직접 재검증(diagnose-before-design / self-recorded-fact). DEC-2026-06-12-unit-layer-soft-surface-and-promotion-gating + DEC-2026-06-11-unit-layer-corroboration-poc18 §carry(line48) 후속.
+
 ## [0.38.0] — 2026-06-12 MINOR — ep-be-gea run #2 backlog 본체 결함 6건 + F-DOGFOOD-STORY-ORPHAN governance
 
 run #2 high 3건(v0.37.0) 처리 후 나머지 backlog 6건(F-R2-07/01/28/29/41/44) 수정. behavior fix / schema additive·pattern 확장 / backward-compat. diagnose-before-design(6 병렬 진단 workflow 전부 still_present) + senior(F-R2-01/29). DEC-2026-06-12-run2-backlog-6-defects.

@@ -250,6 +250,9 @@ export function mergeFindings(a, b) {
 // traceability-matrix-builder --json (coverage_summary) → findings (poc-18 dogfood gate wiring / DEC-2026-06-06-non-analysis-gate-fail-closed).
 //   builder 가 summary.{critical,high} 가 아니라 coverage_summary 를 emit → generic transform 이 0(blind) 였음.
 //   red_count(broken trace)→critical / forward_coverage<threshold(coverage gap)→medium(advisory — 부분 slice 정당 / hard-block ❌) / yellow→low.
+//   unit_coverage(LEVER C / DEC-2026-06-12 soft-surface): reference-lens pass-through 5필드(traceability_unit_*) = mergeFindings allowlist 밖(gate 무진입) +
+//     obligation_satisfied_ratio<threshold → medium advisory(forward_coverage gap 과 동형 / non-blocking / schema:236 "게이트 후보/현 soft").
+//     method_axis_corroboration·mutation_score = code-graph/mutation 신호 reference-lens only(DEC-2026-05-28 게이트 주입 영구 ❌). HARD flip(validator_high)은 별도 promotion DEC.
 export function transformTraceabilityMatrix(json) {
 	const cs = json.coverage_summary ?? json ?? {};
 	const red = cs.red_count ?? 0;
@@ -260,14 +263,30 @@ export function transformTraceabilityMatrix(json) {
 			? 1
 			: 0;
 	const yellow = cs.yellow_count ?? 0;
+	// LEVER C — TDD/unit 층 axis. obligation_satisfied_ratio<threshold → medium advisory (non-blocking).
+	const uc = cs.unit_coverage ?? null;
+	const unitObligationGap =
+		uc != null &&
+		uc.obligation_satisfied_ratio != null &&
+		uc.threshold != null &&
+		uc.obligation_satisfied_ratio < uc.threshold
+			? 1
+			: 0;
 	return {
 		critical: red,
 		high: 0,
-		medium: forwardGap,
+		medium: forwardGap + unitObligationGap,
 		low: yellow,
 		info: 0,
 		traceability_forward_coverage: cs.forward_coverage ?? null,
 		traceability_threshold: cs.threshold ?? null,
+		// reference-lens pass-through — mergeFindings allowlist 밖 = sources[].findings 에만 (gate 무진입).
+		traceability_unit_obligation_ratio: uc?.obligation_satisfied_ratio ?? null,
+		traceability_unit_total: uc?.unit_total ?? null,
+		traceability_unit_tested: uc?.unit_tested ?? null,
+		traceability_unit_method_axis_corroboration:
+			uc?.method_axis_corroboration ?? null,
+		traceability_unit_mutation_score: uc?.mutation_score ?? null,
 	};
 }
 
