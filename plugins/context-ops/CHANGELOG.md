@@ -10,6 +10,19 @@
 
 ---
 
+## [0.42.1] — 2026-06-12 PATCH — append-catalog writer 헬퍼(F-1) + analysis exit-gate 명문화(F-2) — resve 다중도메인 corroboration
+
+**SSOT**: `decisions/DEC-2026-06-12-resve-multidomain-corroboration.md`.
+
+ep-be-gea campaign 예약 메뉴그룹의 resve 하위 4 BC(mtrm 인라인 + helium/healing/hlum 워크플로우 11-agent 팬아웃) 분석 + base/athrt cross_cutting 판정. `DEC-2026-06-12-artifact-zone` 의 "0-datapoint / 1-domain degenerate" GAP 를 **≥2 도메인 corroboration** 으로 갱신하며 노출된 **본체 결함 2건** 시행(additive / breaking 0 / golf-chain-validator-wiring 의 "1→N 도메인 미스윕" 직계).
+
+- **F-1 — 다중-BC 카탈로그 writer 비대칭**: `_shared/load-business-rules.js`(reader / index→per-BC leaf 재조립) 는 multi-BC aware 인데 **writer 짝 부재** → 분석 스킬이 index·`domain.json`·`migration-cautions.json` 을 통째 재작성하면 BC#2 가 BC#1 엔트리 덮음(1-domain[event·golf] 에선 미발현 / multi-BC 누적서 처음 노출). → `tools/_shared/append-catalog.js` 신설: 결정론 순수함수 `upsertById`(sibling 보존)·`mergeUbiquitousLanguage`(term dedup)·`upsertBcFile`(`total_rules` 재계산)·`detectIndent`(reformat 가짜 diff 차단 = append-only 머지 보존) + path 편의 `appendBoundedContext`/`appendBcFileToIndex`/`appendCautionGroup`. 회귀테스트 `chain-driver/test/append-catalog.test.js` **12 pass**(핵심: multi-BC no-clobber + 2-space indent 보존). 스킬(analysis-business-rules §3 writer bullet · analysis-domain-model 산출물절)에 헬퍼 사용 절차 명시.
+- **F-2 — analysis exit-gate fan-out 미강제**: `schema-validator` 는 `REQUIRED_VALIDATORS_PER_STAGE.analysis`(gate#0)에 정상 등재돼 있으나 **skill-direct·multi-agent fan-out** 경로는 chain-driver 미경유로 자동 미실행(분석 산출물 schema-invalid 가 chain 진입 전까지 미검출 — 본 run 서 수동 schema-validator 로 9건 적발·repair). → `analysis-business-rules`·`analysis-domain-model` "다음" 에 직접 `schema-validator .ai-context/output` 실행(validate→repair = per-BC DoD) 명시 + schema enum 힌트(category·source_evidence.type·methodology_version `v`접두·reviewer_role·enforced_by·persisted_to) 블록 추가.
+
+**부수 corroboration**: 2-zone 무충돌 **≥2 도메인 검증됨**(shared 8 repo-wide byte-identical·기존 leaf 무변경·diff 순수 append raw==`-w`) / bc_scope **0→14 datapoint**(수동 부여 / auto-split·HARD-gate 여전히 deferred / F14 불변) / base·athrt=**cross_cutting** 판정(독립 `domains/<BC>` 미생성 / shared 흡수 carry).
+
+**검증**: chain-driver **535/535**(523 + append-catalog 12) · skill-citation 0 stale · shipped_provenance_leak pass. **carry**: append-catalog 호출 자동 강제(analysis-exit-gate 카탈로그 무결성) · standalone analysis-exit 러너 · shared 흡수 산출물(reservation-asset-master·reservation-access-authority).
+
 ## [0.42.0] — 2026-06-12 MINOR — golf chain 풀런 dogfood → 결정론 검증기 wiring 3 fix (discovery-ext index / graph-integrity arg / synth cross-BC)
 
 **SSOT**: `decisions/DEC-2026-06-12-golf-chain-validator-wiring.md` / plan `~/.claude/plans/plan-golf-chain-body-candidates.md`.
