@@ -66,6 +66,13 @@ flowchart LR
 
 > **UNIT-\*** = behavior(BDD) 스레드(UC→BHV→AC→TC→IMPL)와 **나란히 도는 TDD/unit 층**의 1급 노드 = 격리 테스트 단위(클래스/순수함수/컴포넌트) = composition TC 가 조합·mock 하는 빌딩블록. DO-178C 사다리의 **LLR(Low-Level Requirement) rung**. behavior 스레드와의 join = `behavior-spec.behaviors[].unit_refs` / `task-plan.tasks[].unit_refs` / `test-spec.test_cases[].class_ref`(test_layer=unit) / matrix `unit_id`. 상세 = `methodology-spec/policies/test-layering.md`.
 
+> **산출물 파일명 규약 — `-spec` 의 의미**: 접미사 `-spec` 은 "**단계 구조화 산출물(structured stage artifact)**" 을 뜻하며 "요구 명세(requirement spec)" 와 동의어가 **아니다**. 추적성의 권위(SSOT)는 위 표의 **노드 ID prefix**(UC/BHV/AC/UNIT/TASK/TC/IMPL)이고 파일명은 보조 라벨이다.
+>
+> - **요구·계약 쪽** ("무엇을 검증/만들지"): `discovery-spec`(UC) · `behavior-spec`(BHV) · `acceptance-criteria`(AC) · `unit-spec`(UNIT)
+> - **하류 산출물** ("어떻게"): `task-plan`(TASK = 계획) · `test-spec`(TC = **테스트 케이스 명세** / 요구 ❌) · `impl-spec`(IMPL = 구현 모듈 명세)
+>
+> 즉 `test-spec`·`impl-spec` 의 "spec" 은 "테스트/구현의 명세" 이지 요구가 아니다. 하류를 본질명(`test-cases` / `impl-modules`)으로 풀개명하는 안은 검토했으나 **7개 도구 CLI 플래그 + adopter `.ai-context` codemod 비용 > 명확성 이득** 으로 **보류**(본 규약 명문화로 갈음). `acceptance-criteria` 는 BDD 표준어이므로 개명 ❌. 노드 ID 가 권위이므로 파일명은 안정 유지한다.
+
 ### G3 운영 자산 ID
 
 | 산출물         | ID 형식                                                                         | 예시                                            | schema                    |
