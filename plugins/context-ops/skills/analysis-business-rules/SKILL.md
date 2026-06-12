@@ -80,6 +80,16 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - intent_certainty = `inferred-consequence`/`unverified-intent` (설계 의도 / 코드 반증 불가).
 - 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy 코드 rule 추출 경로 그대로).
 
+## schema enum 주의 (산출 전 필독 / DEC-2026-06-12-resve-multidomain-corroboration §4)
+
+골프/이벤트 등 **템플릿 미러만으로는 enum 위반**이 자주 난다(LLM-agent 가 템플릿에 안 나타난 자유값 생성). 아래 enum 외 값 = schema-validator RED:
+
+- **`business_rules[].category`** ∈ `validation` / `policy` / `calculation` / `authorization` / `workflow` / `integration` / `fe_validation` / `fe_authorization` / `fe_a11y` / `fe_i18n`. (예: "process"→`workflow` / "concurrency"→`policy` / "transformation"→`calculation` 로 환원 — 자유 카테고리 ❌)
+- **`source_evidence[].type`** ∈ `code_validation` / `code_condition` / `orm_constraint` / `sql_case` / `sql_where` / `stored_procedure` / `db_check_constraint` / `config_value` / `fe_validation_schema` / `fe_permission_branch` / `auth_expression` / `auth_expression_websec_ignoring` / `external_call` / `comment` / `test_assertion` / `missing_explicit_policy` / `missing_negative_test`. (예: UPDATE 문 안 조건 = "sql_update" ❌ → `sql_where`)
+- **`meta.methodology_version`** = `^v\d+\.\d+...` — **앞 `v` 필수**("0.41.0" ❌ / "v0.41.0" ✅).
+- **`meta.human_review_required[].reviewer_role`** ∈ `domain_expert` / `tech_lead` / `designer` / `planner` / `any` ("security_reviewer" ❌ → `tech_lead`).
+- 산출 직후 `node ../../tools/schema-validator/src/cli.js <leaf-or-index>` 실행 → RED 면 enum 환원 후 GREEN 확인(validate→repair = per-BC 완료 정의).
+
 ## 다음
 
 - `analysis-formal-spec-validation` 호출 권장 (도메인 ↔ 규칙 ↔ 인벤토리 정합)

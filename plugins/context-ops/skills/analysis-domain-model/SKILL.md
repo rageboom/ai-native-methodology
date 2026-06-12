@@ -47,6 +47,14 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 - intent_certainty 강조 = `inferred`/`intent` (설계 의도 / S2 의 verified intent 와 대비 / use-scenario-taxonomy §2).
 - 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy ORM/Entity 추출 경로 그대로).
 
+## schema enum 주의 (산출 전 필독 / DEC-2026-06-12-resve-multidomain-corroboration §4)
+
+병렬 추출 시 자주 나는 위반(schema-validator RED):
+
+- **`aggregates[].invariants[].enforced_by`** ∈ `entity_method` / `orm_constraint` / `db_constraint` / `service_check` / `unknown`. (예: SQL predicate 로 거르는 규칙 = "sql_predicate" ❌ → `service_check`)
+- **`entities[].persisted_to`** = **string**(테이블 1개 이름). 다중 테이블이면 배열 ❌ → `"USR_A, USR_B"` 처럼 단일 문자열로.
+- 산출 직후 `node ../../tools/schema-validator/src/cli.js .ai-context/output/shared/domain.json` 으로 enum/type 확인(validate→repair).
+
 ## 다음
 
 - `analysis-business-rules` 호출 권장
