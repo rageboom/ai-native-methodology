@@ -10,6 +10,22 @@
 
 ---
 
+## [0.46.2] — 2026-06-13 PATCH — sql-inventory-extractor TVF + SQL 키워드 noise 제외 (dogfood-found / candidate 정확성)
+
+**SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §7. carry ④ ep-be-gea WLFR §8.1 corroboration 이 노출한 bare candidate noise.
+
+### Fixed
+- **table-valued function 오탐** (OPENJSON·STRING_SPLIT 등 / 81 occ): `FROM|JOIN` 뒤 식별자 **바로 뒤(공백 없이) `(`** = 함수 호출 → `dependent_tables` 제외. **list 무관 범용 규칙**. ⚠ **FROM/JOIN 한정** — `INSERT INTO t(col,col)` 컬럼리스트는 실테이블이라 INTO/UPDATE 는 미적용(가드 테스트).
+- **SQL 키워드 오탐**: `SET`(MERGE `UPDATE SET`)·`FROM`(`JOIN FROM`) TABLE_STOPWORDS 추가.
+
+### Notes
+- **실테이블 누락 0 (증명+실측)**: TVF 규칙=즉시 `(` 만(실테이블 hint `FROM t (NOLOCK)`=공백 → 미해당) + FROM/JOIN 한정. 전 core 재추출 **실테이블 417=417 (0 loss)** + OPENJSON/STRING_SPLIT/SET/FROM 전부 제거.
+- **§8.1 corroboration**: TVF = **7 도메인**(wlfr/cal/resve/issue/reqmng/event/biztrip) = paradigm-grounded(SQL TVF·키워드) / 단일 과적합 아님.
+- 검증: sql-inventory-extractor **15 test**(TVF 4 신규 incl INSERT-컬럼리스트 가드·공백-hint 가드·UPDATE SET 키워드) / RR **42/42** / backward-compat·schema·exit-code 무변경. issue-acm 무영향(잔존 emp_distinct·EP_BE_COMMON=TVF 아님) → ep-be-gea regen 불요.
+- carry: table alias(T1/A/CAL 등 = UPDATE-alias / 실테이블 독립 캡처) · DB-name under-capture(EP_BE_COMMON/EP_BE_GEA_USER = cross-DB 줄바꿈 분할) · ambiguous(emp_distinct/BASE_KEY/dbo) — 전부 후보 플래그 정직 표기.
+
+---
+
 ## [0.46.1] — 2026-06-13 PATCH — sql-inventory-extractor CTE 오탐 제외 (dogfood-found / 결정론 tool 정확성)
 
 **SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md`. carry ④ ep-be-gea BC-ISSUE-ACM(출입통제) analysis dogfood 발견 F1.

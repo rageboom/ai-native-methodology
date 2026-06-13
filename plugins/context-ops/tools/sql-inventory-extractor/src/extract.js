@@ -58,8 +58,9 @@ const TAG_TYPE_MAP = {
 const DYNAMIC_TAGS = Object.keys(TAG_TYPE_MAP);
 
 // SQL 예약어/잡음 — dependent_tables 후보에서 제외(FROM/JOIN 뒤 식별자 휴리스틱).
+//   SET = `UPDATE SET`(MERGE WHEN MATCHED THEN UPDATE SET) 캡처 / FROM = `JOIN FROM`(서브쿼리 경계 등) 캡처 = 키워드 (DEC-2026-06-13-sql-inventory-cte-exclusion §7 / ep-be-gea dogfood)
 const TABLE_STOPWORDS = new Set([
-	'SELECT', 'DUAL', '(', 'LATERAL', 'TABLE', 'VALUES', 'ONLY',
+	'SELECT', 'DUAL', '(', 'LATERAL', 'TABLE', 'VALUES', 'ONLY', 'SET', 'FROM',
 ]);
 
 function sha256(s) {
@@ -122,11 +123,16 @@ function collectCteNames(body) {
 //   → per-statement/include 해소로 불충분 → 파일 단위 CTE 이름 제외(실테이블은 schema-qualified=점 포함이라 bare CTE 명과 충돌 무시 가능).
 function extractTables(body, cteNames = new Set()) {
 	const tables = new Set();
-	const re = /\b(?:FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.]*\]?)/gi;
+	const re = /\b(FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.]*\]?)/gi;
 	let m;
 	while ((m = re.exec(body)) !== null) {
-		let t = m[1].replace(/[[\]]/g, '');
+		const kw = m[1].toUpperCase();
+		let t = m[2].replace(/[[\]]/g, '');
 		if (t.startsWith('${') || t.startsWith('#{')) continue; // 동적 테이블명 → skip
+		// table-valued function(OPENJSON/STRING_SPLIT 등): FROM|JOIN 뒤 식별자 **바로 뒤(공백 없이)** '(' = 함수 호출 = 테이블 아님.
+		//   ⚠ FROM|JOIN 한정 — `INSERT INTO t(col1,col2)` 의 컬럼리스트는 실테이블이므로 INTO/UPDATE 는 제외 안 함.
+		//   실테이블 hint(`FROM t (NOLOCK)`/`FROM t WITH(`)는 공백 있어 미해당 → 실테이블 누락 0. (DEC §7 / ep-be-gea dogfood)
+		if ((kw === 'FROM' || kw === 'JOIN') && body.charAt(m.index + m[0].length) === '(') continue;
 		const up = t.toUpperCase();
 		if (TABLE_STOPWORDS.has(up)) continue;
 		if (cteNames.has(t.toLowerCase())) continue; // CTE 참조(WITH…AS 로 정의된 별칭) → 실테이블 아님 → 제외

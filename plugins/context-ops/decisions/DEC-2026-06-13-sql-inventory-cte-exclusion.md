@@ -39,7 +39,24 @@ agent 자기보고를 액면 수용 ❌ → 실측:
 ## 6. carry / 비범위
 
 - **emp_distinct·EP_BE_COMMON** (issue-acm 잔존 2 bare) = **비-CTE candidate noise**(file-wide col-list-aware 수집이 CTE 아님 확인) → 별도 / `dependent_tables_are_candidates:true` 플래그 유지.
-- **TVF·table alias·키워드 noise**(WLFR 실측: OPENJSON·STRING_SPLIT[SQL Server TVF]·A1/B1[alias]·SET[MERGE UPDATE SET 키워드]·dbo) = **별개 candidate-noise 클래스**(F1=CTE 한정 / 향후 별도 — TABLE_STOPWORDS·TVF 인지 확장 후보 / 현재도 후보 플래그로 정직 표기).
+- ~~TVF·키워드 noise~~ → **v0.46.2 해소 (§7)**.
+- **table alias·DB-name·ambiguous noise** = 잔존 carry (§7 분류 참조).
 - fragment 내 실테이블 미해석(`<include>` carry) = 기존 한계 유지(본 수정은 CTE 이름 제외만 / fragment 테이블 추출 별개).
 
-> **보안**: 본 DEC = 본체 tool 기술만 / 사내 식별자 0(BC-ISSUE-ACM·base_range 등 = 마스킹 codename·SQL 일반어). 노출 컨텍스트 산출물 = ep-be-gea GHE only.
+## 7. v0.46.2 — TVF + SQL 키워드 noise 제외 (PATCH / 2026-06-13)
+
+§6 carry "TVF·키워드 noise" 시행. 전 core mapper(2629 stmt) bare candidate **전수 분류**(diagnose / 자기보고 액면 수용 ❌):
+
+| class | items | occ | 처분 |
+|---|---|---|---|
+| **TVF** (`FROM\|JOIN name(`) | OPENJSON(74)·STRING_SPLIT(7) | 81 | **제외** — 식별자 **바로 뒤(공백 없이) `(`** = 함수 호출(table-valued function) = 테이블 아님. **FROM/JOIN 한정**(⚠ `INSERT INTO t(col,col)` 컬럼리스트는 실테이블 → INTO/UPDATE 미적용). list 무관 범용 규칙. |
+| **SQL 키워드** | SET(9 / `UPDATE SET`=MERGE)·FROM(1 / `JOIN FROM`) | 10 | **제외** — TABLE_STOPWORDS 추가. |
+| table alias | T1·A·CAL·SCTB·RES·R·A1·B1·SAL | ~13 | **carry** — SQL Server `UPDATE <alias> SET … FROM <table> <alias>` 의 alias. 실테이블은 FROM 으로 독립 캡처됨(noise 영향 작음) / 안전 제외엔 per-stmt alias 검출 필요 → 별도. |
+| DB-name under-capture | EP_BE_COMMON·EP_BE_GEA_USER | 7 | **carry** — cross-DB 참조(`DB\n.dbo.TABLE`)가 줄바꿈으로 분할돼 DB명만 캡처 = under-capture(noise 아닌 불완전 / 별도 fix). |
+| ambiguous | emp_distinct·BASE_KEY·dbo | 7 | **carry** — 실테이블/CTE/derived 판별 불가 → no-false-positive 보수 유지(후보 플래그). |
+
+- **실테이블 누락 0 (증명+실측)**: TVF 규칙=즉시 `(` 만(실테이블 hint `FROM t (NOLOCK)`=공백 있어 미해당) + FROM/JOIN 한정(INSERT 컬럼리스트 보호). 전 core 재추출 **실테이블 417=417 (0 loss)** + OPENJSON/STRING_SPLIT/SET/FROM 전부 제거.
+- **§8.1 corroboration**: TVF = **7 도메인**(wlfr/cal/resve/issue/reqmng/event/biztrip) 분포 = 단일 과적합 아님 / paradigm-grounded(SQL: `FROM func()`=TVF·SET/FROM=키워드).
+- 검증: sql-inventory-extractor **15 test**(TVF 4 신규: OPENJSON·STRING_SPLIT 제외 / INSERT INTO t(col) 가드 / FROM t (NOLOCK) 공백 hint 가드 / UPDATE SET 키워드) / RR 42/42 / backward-compat. issue-acm 무영향(잔존 emp_distinct·EP_BE_COMMON=TVF 아님)=ep-be-gea regen 불요.
+
+> **보안**: 본 DEC = 본체 tool 기술만 / 사내 식별자 0(BC-ISSUE-ACM·base_range·OPENJSON 등 = 마스킹 codename·SQL 일반어). 노출 컨텍스트 산출물 = ep-be-gea GHE only.

@@ -190,6 +190,41 @@ test('CTE — <sql> fragment 정의 + <include> 참조 CTE 도 제외 (fragment-
 	assert.deepEqual(r.dependent_tables, []); // CTE 참조뿐 — fragment 내 실테이블은 미해석(include carry)
 });
 
+// TVF/키워드 noise — ep-be-gea dogfood (DEC-2026-06-13-sql-inventory-cte-exclusion §7)
+test('TVF — FROM/JOIN name( (OPENJSON·STRING_SPLIT)은 dependent_tables 제외, 실테이블만', () => {
+	const xml = `<mapper namespace="X"><select id="q" resultType="map">
+SELECT * FROM EP.dbo.ORDERS o
+CROSS APPLY OPENJSON(o.payload) j
+JOIN STRING_SPLIT(o.csv, ',') s ON 1=1</select></mapper>`;
+	const { records } = extractFromXml(xml, 'X.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.ORDERS']);
+	assert.ok(!records[0].dependent_tables.includes('OPENJSON'));
+	assert.ok(!records[0].dependent_tables.includes('STRING_SPLIT'));
+});
+
+test('TVF 가드 — INSERT INTO t(col,col) 의 컬럼리스트는 실테이블 누락 ❌ (FROM/JOIN 한정)', () => {
+	const xml = `<mapper namespace="Y"><insert id="ins">
+INSERT INTO EP.dbo.ORDERS(id, name) VALUES (#{id}, #{name})</insert></mapper>`;
+	const { records } = extractFromXml(xml, 'Y.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.ORDERS']); // 컬럼리스트 '(' 에도 실테이블 유지
+});
+
+test('TVF 가드 — FROM t (NOLOCK) 공백 hint 는 실테이블 유지 (즉시 ( 만 함수)', () => {
+	const xml = `<mapper namespace="Z"><select id="q">SELECT * FROM EP.dbo.LEDGER (NOLOCK) WHERE id=#{id}</select></mapper>`;
+	const { records } = extractFromXml(xml, 'Z.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.LEDGER']);
+});
+
+test('키워드 — UPDATE SET (MERGE) 의 SET / JOIN FROM 의 FROM 은 제외', () => {
+	const xml = `<mapper namespace="W"><update id="mrg">
+MERGE INTO EP.dbo.ACCT t USING EP.dbo.STG s ON t.id=s.id
+WHEN MATCHED THEN UPDATE SET t.amt = s.amt</update></mapper>`;
+	const { records } = extractFromXml(xml, 'W.xml');
+	assert.ok(!records[0].dependent_tables.includes('SET')); // UPDATE SET 키워드 제외
+	assert.ok(records[0].dependent_tables.includes('EP.dbo.ACCT')); // MERGE INTO target 유지
+	// 주: USING 절(EP.dbo.STG)은 추출기가 FROM|JOIN|INTO|UPDATE 만 캡처 → 미포착 = 별개 한계(본 fix 범위 아님)
+});
+
 test('CTE — 비-CTE SQL(컬럼 alias·CAST AS)은 오제외 0 (false-positive 가드)', () => {
 	const xml = `<mapper namespace="Y"><select id="q" resultType="map">
 SELECT a.id, CAST(a.amt AS INT) AS amt2, (SELECT 1) AS one FROM EP.dbo.ACCOUNT a JOIN EP.dbo.LEDGER l ON a.id = l.aid</select></mapper>`;
