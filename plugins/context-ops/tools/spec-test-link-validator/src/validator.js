@@ -262,7 +262,8 @@ export function validateMockSoundness(testSpec, unitSpec) {
 //     C. intra-label: 한 @DisplayName 이 AC+TC 동시 보유 시 라벨 AC == 라벨-TC 의 spec ac_ref (high).
 //   ※ "실재 id·오의미"(event 식 drift)는 의미 판단 필요 = 본 결정론 lint 비대상(semantic 영역 / 정직 표기). SOFT=cli 가 별도 키로만 attach.
 //   §8.1: 1 datapoint(단일 마스킹 Java 프로젝트) = SOFT only. HARD flip 은 ≥2 distinct 도메인 후.
-//   다언어: per-framework extractor — Java/JUnit5 @DisplayName + JS/TS jest·vitest describe·it/test(v0.45.0). React(.tsx jest/vitest)=동일 extractor 커버. JS 는 describe 독립 식별자명 부재 → check B(join) skip / A·C 만(정직 한계).
+//   다언어: per-framework extractor — Java/JUnit5 @DisplayName + JS/TS jest·vitest describe·it/test(v0.45.0) + Python/pytest docstring·주석(v0.46.0). React(.tsx jest/vitest)=동일 extractor 커버.
+//   JS 는 describe 독립 식별자명 부재 → check B(join) skip / A·C 만(정직 한계). pytest 는 `def test_*` 함수명 = 독립 식별자 → check B(join) 가능(JS 대비 capability gain).
 // ──────────────────────────────────────────────────────────────────────
 const LABEL_TOKEN_RE = /\b(BR|AC|BHV|UC|TC)-[A-Z0-9-]*\d{3}\b/g;
 const DISPLAYNAME_RE = /@DisplayName\(\s*"((?:[^"\\]|\\.)*)"\s*\)/g;
@@ -286,7 +287,11 @@ function tokensIn(text) {
 	const out = { BR: [], AC: [], BHV: [], UC: [], TC: [] };
 	let m;
 	LABEL_TOKEN_RE.lastIndex = 0;
-	while ((m = LABEL_TOKEN_RE.exec(text)) !== null) out[m[1]].push(m[0]);
+	// dedupe — 한 라벨이 같은 토큰을 2회(예: pytest 주석+docstring 동시 표기) 가져도 중복 없이 1개로 수렴.
+	//   check C(`length === 1`) 견고화: 동일 TC/AC 반복이 length 를 부풀려 검사 skip 되는 것 방지. (Java/JS 단일표기 = 영향 없음)
+	while ((m = LABEL_TOKEN_RE.exec(text)) !== null) {
+		if (!out[m[1]].includes(m[0])) out[m[1]].push(m[0]);
+	}
 	return out;
 }
 
@@ -331,10 +336,76 @@ export function extractJsDisplayNames(content) {
 	return labels;
 }
 
-// 확장자 → extractor dispatch (v0.45.0 — Java + JS/TS / 그 외 carry).
+// Python/pytest extractor — v0.46.0 (DEC-2026-06-13-displayname-label-lint-soft §8 / poc-14 docstring·poc-19 주석 dogfood).
+//   라벨 단위 = `def test_*` 함수. 토큰 출처 2 idiom union: (a) 함수 직전 **인접** `#` 주석(poc-19 `# TC-X <- AC-X / BR-X`) + (b) 함수 본문 첫 docstring(poc-14 `"""TC-X / AC-X."""`).
+//   pytest 함수명 = 독립 식별자 → JS describe 와 달리 **check B(join) 가능**(name=함수명 / kind='test'). 메커니즘(tokensIn/normalize/check A·C)은 Java·JS 와 100% 공유.
+//   `async def test_*`(pytest-asyncio/httpx 주류 idiom) 포함. regex 기반(ast 비의존 / 엄격 인접 = 빈 줄·데코레이터·멀티라인 sig 사이 주석은 정직 미바인딩 = 오탐 회피 우선 / caveat). 모듈 docstring 은 def 선행 아님 → 미캡처.
+export function extractPyDisplayNames(content) {
+	const lines = content.split('\n');
+	const labels = []; // {label, kind:'test', name, tokens, conflict}
+	let commentBuf = []; // 직전 **인접** 주석 라인 (빈 줄/코드 만나면 리셋)
+	for (let i = 0; i < lines.length; i++) {
+		const line = lines[i];
+		const cm = /^\s*#(.*)$/.exec(line);
+		if (cm) { commentBuf.push(cm[1]); continue; }
+		const dm = /^\s*(?:async\s+)?def\s+(test_[A-Za-z0-9_]*)\s*\(/.exec(line);
+		if (dm) {
+			const name = dm[1];
+			const ds = captureDocstring(lines, i + 1);
+			const commentText = commentBuf.join(' ');
+			// cross-idiom conflict: 주석 idiom 과 docstring idiom 이 같은 fn 에 공존하며 TC/AC 가 불일치 → drift 은폐 차단.
+			//   두 idiom 모두 토큰 보유 + 집합 상이일 때만(composite=한 idiom 내 다중 TC 는 미플래그 = 오탐 회피).
+			const cTok = tokensIn(commentText);
+			const dTok = ds ? tokensIn(ds) : { BR: [], AC: [], BHV: [], UC: [], TC: [] };
+			const conflict =
+				(cTok.TC.length > 0 && dTok.TC.length > 0 && !setEq(cTok.TC, dTok.TC)) ||
+				(cTok.AC.length > 0 && dTok.AC.length > 0 && !setEq(cTok.AC, dTok.AC));
+			const parts = [...commentBuf];
+			if (ds) parts.push(ds);
+			const label = (ds || commentText).trim();
+			labels.push({ label, kind: 'test', name, tokens: tokensIn(parts.join(' ')), conflict });
+			commentBuf = [];
+			continue;
+		}
+		commentBuf = []; // 비주석·비-def 라인(빈 줄 포함) → 인접 끊김
+	}
+	return labels;
+}
+
+// 두 토큰 리스트 동치(순서 무관 / dedup 된 입력 가정).
+function setEq(a, b) {
+	if (a.length !== b.length) return false;
+	const sb = new Set(b);
+	return a.every((x) => sb.has(x));
+}
+
+// def 다음 첫 비빈 줄이 triple-quote docstring 이면 본문 추출(single/multi-line). 아니면 null.
+function captureDocstring(lines, start) {
+	for (let j = start; j <= Math.min(start + 4, lines.length - 1); j++) {
+		const t = lines[j].trim();
+		if (t === '') continue;
+		const q = /^[rRbBuU]{0,2}("""|''')/.exec(t);
+		if (!q) return null; // 첫 비빈 줄이 docstring 아님
+		const quote = q[1];
+		const after = t.slice(t.indexOf(quote) + 3);
+		const closeIdx = after.indexOf(quote);
+		if (closeIdx >= 0) return after.slice(0, closeIdx); // single-line
+		const buf = [after];
+		for (let k = j + 1; k <= Math.min(j + 30, lines.length - 1); k++) {
+			const ci = lines[k].indexOf(quote);
+			if (ci >= 0) { buf.push(lines[k].slice(0, ci)); break; }
+			buf.push(lines[k]);
+		}
+		return buf.join(' ');
+	}
+	return null;
+}
+
+// 확장자 → extractor dispatch (v0.46.0 — Java + JS/TS + Python / 그 외 carry).
 function extractorFor(path) {
 	if (/\.java$/.test(path)) return extractJavaDisplayNames;
 	if (/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(path)) return extractJsDisplayNames;
+	if (/\.py$/.test(path)) return extractPyDisplayNames;
 	return null;
 }
 
@@ -356,6 +427,9 @@ function joinIdentifiers(tc) {
 	if (nested) ids.classes.push(nested[1]);
 	const meth = /(?:void\s+|#)([A-Za-z_]\w*)\s*\(?/.exec(se);
 	if (meth) ids.methods.push(meth[1]);
+	// pytest: source_evidence 의 bare `test_*` 함수명(접두 void/# 없음 / poc-14·19) → 안정 join anchor.
+	const pyFns = se.match(/\btest_[A-Za-z0-9_]+/g);
+	if (pyFns) ids.methods.push(...pyFns);
 	return ids;
 }
 
@@ -369,7 +443,7 @@ export function validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds
 	let checked = 0;
 	const skipped = [];
 
-	// 파일별 @DisplayName 라벨 추출 (Java only — .java 만)
+	// 파일별 라벨 추출 (extractorFor dispatch — Java @DisplayName / JS·React describe·it / Python docstring·주석 / 그 외 carry)
 	const byFileLabels = new Map();
 	for (const f of sourceFiles ?? []) {
 		if (!f || !f.content) { skipped.push({ path: f?.path, reason: 'unreadable' }); continue; }
@@ -402,6 +476,10 @@ export function validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds
 					findings.push({ kind: 'code_label.tc_unknown', severity: 'high', source_file: path, label: L.label, token: raw, message: `@DisplayName TC ${raw} not in test-spec` });
 				}
 			}
+			// cross-idiom conflict (pytest 전용 — extractor 가 표식): 주석↔docstring TC/AC 불일치.
+			if (L.conflict) {
+				findings.push({ kind: 'code_label.py_idiom_conflict', severity: 'high', source_file: path, label: L.label, message: `pytest comment idiom and docstring idiom disagree on TC/AC for ${L.name || 'a test'}` });
+			}
 			// C. intra-label: AC+TC 동시 보유 시 라벨 AC == 라벨-TC 의 spec ac_ref
 			if (L.tokens.TC.length === 1 && L.tokens.AC.length === 1) {
 				const nTC = normalizeLabelId(L.tokens.TC[0], scope);
@@ -420,17 +498,20 @@ export function validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds
 		const labels = byFileLabels.get(tc.source_file);
 		if (!labels) { continue; }
 		const ids = joinIdentifiers(tc);
-		const cand = labels.find(
-			(L) => (L.kind === 'class' && ids.classes.includes(L.name)) || (L.kind === 'method' && ids.methods.includes(L.name)),
+		// source_evidence 가 2+ fn 명을 나열하면 모두 검사(find 의 첫-매치 의존 = 비-첫 fn drift 은폐 차단).
+		const cands = labels.filter(
+			(L) => (L.kind === 'class' && ids.classes.includes(L.name)) || ((L.kind === 'method' || L.kind === 'test') && ids.methods.includes(L.name)),
 		);
-		if (!cand) { skipped.push({ tc_id: tc.id, reason: 'join_anchor_absent' }); continue; }
-		const labTC = cand.tokens.TC.map((t) => normalizeLabelId(t, scope));
-		const labAC = cand.tokens.AC.map((t) => normalizeLabelId(t, scope));
-		if (labTC.length && !labTC.includes(tc.id)) {
-			findings.push({ kind: 'code_label.tc_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName TC=${cand.tokens.TC.join(',')} but test-spec binds it to ${tc.id}` });
-		}
-		if (tc.ac_ref && labAC.length && !labAC.includes(tc.ac_ref)) {
-			findings.push({ kind: 'code_label.ac_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName AC=${cand.tokens.AC.join(',')} but test-spec ${tc.id}.ac_ref=${tc.ac_ref}` });
+		if (!cands.length) { skipped.push({ tc_id: tc.id, reason: 'join_anchor_absent' }); continue; }
+		for (const cand of cands) {
+			const labTC = cand.tokens.TC.map((t) => normalizeLabelId(t, scope));
+			const labAC = cand.tokens.AC.map((t) => normalizeLabelId(t, scope));
+			if (labTC.length && !labTC.includes(tc.id)) {
+				findings.push({ kind: 'code_label.tc_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName TC=${cand.tokens.TC.join(',')} but test-spec binds it to ${tc.id}` });
+			}
+			if (tc.ac_ref && labAC.length && !labAC.includes(tc.ac_ref)) {
+				findings.push({ kind: 'code_label.ac_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName AC=${cand.tokens.AC.join(',')} but test-spec ${tc.id}.ac_ref=${tc.ac_ref}` });
+			}
 		}
 	}
 

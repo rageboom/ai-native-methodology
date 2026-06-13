@@ -6,6 +6,7 @@ import {
 	normalizeLabelId,
 	extractJavaDisplayNames,
 	extractJsDisplayNames,
+	extractPyDisplayNames,
 } from '../src/validator.js';
 
 const validBehavior = { behaviors: [{ id: 'BHV-USER-001' }] };
@@ -271,9 +272,10 @@ describe('validateCodeLabelConsistency (code @DisplayName ↔ test-spec)', () =>
 		assert.ok(r.skipped.some((s) => s.reason === 'join_anchor_absent'));
 	});
 
-	it('unsupported-language source carried (pytest .py = carry / not flagged)', () => {
-		const ts = { test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'test_x.py' }] };
-		const r = validateCodeLabelConsistency(ts, [{ path: 'test_x.py', content: 'def test_x_TC_FAKE_999(): pass  # (TC-FAKE-999)' }], brIds, acIds);
+	it('unsupported-language source carried (ruby .rb = carry / not flagged)', () => {
+		// .py 는 v0.46.0 부터 지원 → 미지원 언어 carry 검증은 genuinely-unsupported ext(.rb)로.
+		const ts = { test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'signup_spec.rb' }] };
+		const r = validateCodeLabelConsistency(ts, [{ path: 'signup_spec.rb', content: 'it "x (TC-FAKE-999)" do\nend\n' }], brIds, acIds);
 		assert.equal(r.summary.total_findings, 0);
 		assert.ok(r.skipped.some((s) => s.reason === 'unsupported_extractor_carry'));
 	});
@@ -324,5 +326,102 @@ describe('validateCodeLabelConsistency — JS/TS extractor (describe·it)', () =
 	it('JS flags intra-label AC↔TC mismatch in describe (high)', () => {
 		const r = validateCodeLabelConsistency(ts, jsSrc(`describe('TC-USER-001 — register (AC-USER-099)', () => {\n  it('x', () => {});\n});`), brIds, acIds);
 		assert.ok(r.findings.some((f) => f.kind === 'code_label.ac_tc_mismatch' && f.severity === 'high'));
+	});
+});
+
+// v0.46.0 — Python/pytest extractor (docstring + 인접 주석 idiom / poc-14·poc-19 dogfood).
+//   pytest 함수명 = 독립 식별자 → JS 와 달리 check B(join) 가능(capability gain).
+describe('validateCodeLabelConsistency — Python/pytest extractor (docstring·comment)', () => {
+	const ts = {
+		test_cases: [
+			{ id: 'TC-PMT-001', ac_ref: 'AC-PMT-001', source_file: 'test_amort.py', source_evidence: 'test_pmt_tvm_equation' },
+			{ id: 'TC-PMT-002', ac_ref: 'AC-PMT-002', source_file: 'test_amort.py', source_evidence: 'test_pmt_zero_rate' },
+		],
+	};
+	const brIds = new Set(['BR-PMT-EQUATION-001']);
+	const acIds = new Set(['AC-PMT-001', 'AC-PMT-002']);
+	const pySrc = (body) => [{ path: 'test_amort.py', content: body }];
+
+	it('extractPyDisplayNames captures comment+docstring tokens (deduped), binds to fn name', () => {
+		const labels = extractPyDisplayNames(
+			`# TC-PMT-001  <-  AC-PMT-001 / BR-PMT-EQUATION-001\ndef test_pmt_tvm_equation():\n    """TC-PMT-001 / AC-PMT-001 — pmt eq."""\n    assert True\n`,
+		);
+		assert.equal(labels.length, 1);
+		assert.equal(labels[0].kind, 'test');
+		assert.equal(labels[0].name, 'test_pmt_tvm_equation');
+		assert.deepEqual(labels[0].tokens.TC, ['TC-PMT-001']); // dedupe: 주석+docstring 둘 다 TC-PMT-001 이지만 1개
+		assert.deepEqual(labels[0].tokens.BR, ['BR-PMT-EQUATION-001']);
+	});
+
+	it('does not capture module-level docstring as a label', () => {
+		const labels = extractPyDisplayNames(
+			`"""module TC-PMT-999 / AC-PMT-999 — header."""\nimport pytest\n\ndef test_pmt_tvm_equation():\n    """TC-PMT-001."""\n    assert True\n`,
+		);
+		assert.equal(labels.length, 1);
+		assert.deepEqual(labels[0].tokens.TC, ['TC-PMT-001']); // 모듈 docstring 의 TC-PMT-999 미혼입
+	});
+
+	it('Python passes clean — comment idiom (poc-19-like) / join works', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`# TC-PMT-001  <-  AC-PMT-001 / BR-PMT-EQUATION-001\ndef test_pmt_tvm_equation():\n    assert True\n`), brIds, acIds);
+		assert.equal(r.summary.total_findings, 0);
+		assert.ok(r.checked >= 1);
+		assert.ok(!r.skipped.some((s) => s.tc_id === 'TC-PMT-001' && s.reason === 'join_anchor_absent')); // join 성립(skip 아님)
+	});
+
+	it('Python passes clean — docstring idiom (poc-14-like)', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`def test_pmt_tvm_equation():\n    """TC-PMT-001 / AC-PMT-001 — pmt eq (BR-PMT-EQUATION-001)."""\n    assert True\n`), brIds, acIds);
+		assert.equal(r.summary.total_findings, 0);
+	});
+
+	it('Python flags fabricated BR id in docstring (critical / no-simulation)', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`def test_pmt_tvm_equation():\n    """TC-PMT-001 / AC-PMT-001 (BR-PMT-FAKE-099)."""\n    assert True\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.br_fabricated' && f.severity === 'critical'));
+	});
+
+	it('Python flags TC join mismatch (real-but-wrong-bound) — fn name independent identifier (JS-impossible)', () => {
+		// test_pmt_tvm_equation 은 test-spec 상 TC-PMT-001 에 바인딩되는데 라벨이 TC-PMT-002(실재하나 오바인딩) 주장
+		const r = validateCodeLabelConsistency(ts, pySrc(`def test_pmt_tvm_equation():\n    """TC-PMT-002."""\n    assert True\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.tc_join_mismatch' && f.severity === 'high'));
+	});
+
+	it('Python flags intra-label AC↔TC mismatch (high)', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`def test_pmt_tvm_equation():\n    """TC-PMT-001 / AC-PMT-002."""\n    assert True\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.ac_tc_mismatch' && f.severity === 'high'));
+	});
+
+	// --- adversarial-verify false-negative 보강 (wf_f649f1d7-f9a) ---
+	it('extractPyDisplayNames parses `async def test_*` (pytest-asyncio)', () => {
+		const labels = extractPyDisplayNames(`async def test_x():\n    """TC-PMT-001."""\n    pass\n`);
+		assert.equal(labels.length, 1);
+		assert.equal(labels[0].name, 'test_x');
+		assert.deepEqual(labels[0].tokens.TC, ['TC-PMT-001']);
+	});
+
+	it('async def drift is caught (not silently missed)', () => {
+		// test_pmt_tvm_equation 은 TC-PMT-001 에 바인딩되는데 async fn 라벨이 TC-PMT-002 주장
+		const r = validateCodeLabelConsistency(ts, pySrc(`async def test_pmt_tvm_equation():\n    """TC-PMT-002."""\n    assert True\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.tc_join_mismatch' && f.severity === 'high'));
+	});
+
+	it('flags cross-idiom conflict — comment TC != docstring TC on same fn (high / drift 은폐 차단)', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`# TC-PMT-001\ndef test_pmt_tvm_equation():\n    """TC-PMT-002."""\n    assert True\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.py_idiom_conflict' && f.severity === 'high'));
+	});
+
+	it('no conflict when comment and docstring agree (same TC) — composite/dual-idiom clean', () => {
+		const r = validateCodeLabelConsistency(ts, pySrc(`# TC-PMT-001 / AC-PMT-001\ndef test_pmt_tvm_equation():\n    """TC-PMT-001 / AC-PMT-001."""\n    assert True\n`), brIds, acIds);
+		assert.ok(!r.findings.some((f) => f.kind === 'code_label.py_idiom_conflict'));
+	});
+
+	it('multi-fn source_evidence — drift on the 2nd (non-first) fn is caught (exhaustive join)', () => {
+		const ts3 = {
+			test_cases: [
+				{ id: 'TC-PMT-001', ac_ref: 'AC-PMT-001', source_file: 'test_amort.py', source_evidence: 'test_a + test_b' },
+				{ id: 'TC-PMT-002', ac_ref: 'AC-PMT-002', source_file: 'test_amort.py', source_evidence: 'test_c' },
+			],
+		};
+		// test_a correct(TC-PMT-001) 먼저, test_b 가 TC-PMT-002(실재하나 오바인딩)로 drift — 2nd fn
+		const r = validateCodeLabelConsistency(ts3, pySrc(`def test_a():\n    """TC-PMT-001."""\n    pass\ndef test_b():\n    """TC-PMT-002."""\n    pass\n`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.tc_join_mismatch' && f.bound === 'test_b'));
 	});
 });

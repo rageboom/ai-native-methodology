@@ -10,6 +10,27 @@
 
 ---
 
+## [0.46.0] — 2026-06-13 MINOR — label-lint Python/pytest extractor (docstring·주석) — carry pytest 해소 + join capability gain
+
+**SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md` §8 (v0.44.0 SOFT lint 의 per-framework extractor 3번째 언어). 적대검증 패널 `wf_f649f1d7-f9a` (false-pos/neg + governance + 독립 재도출 / go·blocker 0).
+
+### Added
+- **`validateCodeLabelConsistency` Python/pytest extractor** (`extractPyDisplayNames` + `captureDocstring` + `extractorFor` `.py` dispatch): pytest 테스트 함수 라벨의 BR/AC/TC 토큰 검사. 토큰 출처 2 idiom union — **docstring**(`def test_x():\n  """TC-X / AC-X."""` / poc-14) + 직전 **인접 주석**(`# TC-X <- AC-X / BR-X\ndef test_x():` / poc-19). `async def test_*`(pytest-asyncio) 포함. 모듈 docstring 미캡처(def 선행 아님). 메커니즘(check A·C / tokensIn 정규화·dedup) Java·JS 와 100% 공유, parser 만 언어별.
+- **join capability gain (JS 대비)**: pytest `def test_*` 함수명 = **독립 식별자** → JS `describe`(name 부재 → check B skip)와 달리 **check B(join) 가능**. `joinIdentifiers` 가 source_evidence 의 bare `test_*` 명을 안정 anchor 로 추출(class_ref·code_pointers 미populated 현실 = ep-be-gea·poc-14 공통). 실측 poc-14 checked 7·**skipped 0** / poc-19 checked 5·**skipped 0** = 모든 TC fn-명 join 성립.
+- **`code_label.py_idiom_conflict`** (high): 한 fn 의 주석 idiom ↔ docstring idiom 이 TC/AC 불일치(공존+상이) 시 — dedup+OR-semantics 가 은폐하던 drift 차단. **composite(한 idiom 내 다중 TC)는 미플래그 = 오탐 회피**.
+- **cli brIds union**: flat `business_rules[].id`(poc-14) + split `bc_files[].rule_ids[]`(poc-19 / v0.43.0 bc-accumulator-rollup canonical) — split-form BR 프로젝트 check A 침묵 강등 방지.
+
+### Changed
+- check B join `find`(첫-매치)→`filter`(전수) — source_evidence 2+ fn 나열 시 비-첫 fn drift 은폐 차단(poc-14 TC-USER-FSIM-001 = 2 fn 실사례 / 무회귀 0).
+
+### Notes
+- **실 dogfood 2 distinct Python 도메인 (committed)**: poc-14(FastAPI web-CRUD) + poc-19(numpy-financial 대출상환) = **0 finding / no-false-positive**. 둘 다 clean → drift-catching 은 synthetic unit-test(적대검증 독립 mutation A/B/C 전부 discriminate = 비-vacuous 입증).
+- 적대검증 패널이 적발한 false-**negative** 3건(async def·cross-idiom conflict·multi-fn join) **선반영**(품질 1순위·재작업 최소화 2순위 / 전부 결정론·FP-safe).
+- 검증: spec-test-link **35 test**(pytest 12 / 기존 carry 테스트 `.py`→`.rb` Ruby=genuinely-unsupported 이전) / 4 PoC 무회귀 / release-readiness **42/42**.
+- **§8.1 불변 / SOFT 유지**: poc-14·19 = 2 distinct Python 도메인이나 **둘 다 clean(실 drift 부재)**. multi-language 커버(Java+JS/TS+Python)는 HARD flip 전제(≥2 distinct **도메인 실 drift**) 충족 아님(실 drift = ep-be-gea 1 프로젝트). carry: pytest 외 extractor · HARD flip · codegen · same-idiom 다중-TC 의미판정(semantic).
+
+---
+
 ## [0.45.0] — 2026-06-13 MINOR — label-lint JS/TS extractor (jest/vitest describe·it) — carry TS/React 해소
 
 **SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md` §7 (v0.44.0 SOFT lint 의 per-framework extractor 확장).

@@ -72,7 +72,12 @@ if (args.testSource) {
     sourceFiles.push({ path: tc.source_file, content: existsSync(full) ? readFileSync(full, 'utf-8') : null });
   }
   const brDoc = args.businessRules ? loadJson(args.businessRules) : null;
-  const brIds = new Set((brDoc?.business_rules ?? []).map((b) => b.id));
+  // BR id 집합 — 두 표현 union: flat `business_rules[].id`(poc-14/ep-be-gea) + split index `bc_files[].rule_ids[]`
+  //   (v0.43.0 bc-accumulator-rollup canonical / poc-19). 한쪽만 읽으면 split BR 프로젝트의 check A 가 침묵 강등됨.
+  const brIds = new Set();
+  for (const b of brDoc?.business_rules ?? []) if (b?.id) brIds.add(b.id);
+  for (const b of brDoc?.rules ?? []) if (b?.id) brIds.add(b.id); // 구 flat form 방어
+  for (const bc of brDoc?.bc_files ?? []) for (const id of bc?.rule_ids ?? []) brIds.add(id);
   const acIds = new Set((acceptance?.criteria ?? []).map((a) => a.id));
   result.code_label_consistency = validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds);
 }

@@ -31,6 +31,8 @@ importers:
 
   plugins/context-ops/tools/analysis-extraction-validator: {}
 
+  plugins/context-ops/tools/bc-accumulator-rollup: {}
+
   plugins/context-ops/tools/br-cross-consistency-validator: {}
 
   plugins/context-ops/tools/chain-coverage-validator: {}
@@ -96,6 +98,8 @@ importers:
       '@stoplight/spectral-cli':
         specifier: ^6.15.1
         version: 6.16.0
+
+  plugins/context-ops/tools/sql-inventory-extractor: {}
 
   plugins/context-ops/tools/sql-inventory-validator:
     dependencies:
