@@ -10,6 +10,29 @@
 
 ---
 
+## [0.46.3] — 2026-06-13 PATCH — sql-inventory 잔여 noise 4-fix + char-spec description 명료화 + 잔여 findings triage (dogfood)
+
+**SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §8 (sql-inventory) + `decisions/DEC-2026-06-13-residual-findings-triage.md` (F2b~F5). 병렬 검증 패널 `wf_ef3688c0-926` (7-agent diagnose-before-design).
+
+### Fixed (sql-inventory-extractor — 잔여 bare candidate 4종, 병렬 검증 후 safe)
+- **UPDATE-alias**: SQL Server `UPDATE <alias> SET … FROM <table> <alias>` 의 alias(T1·SCTB 등)가 fake table 캡처 → `collectTrailingAliases`(keyword-guard) 로 `UPDATE` 뒤 dotless trailing-alias 만 제외. 실테이블은 FROM 으로 독립 캡처 → 누락 0.
+- **bracket-quoted under-capture**: `[EP_BE_COMMON].[dbo].[TB]`(charclass `]` 제외로 DB명만 캡처) → charclass 에 `[ ]` 추가, bracket strip 후 full 복원(monotonic recovery / 실 cross-DB 테이블 회복).
+- **SQL 주석 끊긴 CTE**: `blankComments` 가 XML 주석만 blank → SQL `/* */` 도 blank → `,/* */ name AS (` 끊김 해소(emp_distinct·BASE_KEY CTE 포착·제외).
+- **mid-token 동적**: `db.dbo.${t}` → `db.dbo.$` 누출 → 캡처 끝 직후 `{` skip.
+
+### Fixed (characterization-spec — F3 / description-only)
+- `when`(STRING / given·then 과 비대칭 의도), `behavior_likely_bug`(복수 ARRAY / 단수명), `ambiguous_carry`(구조화 ARRAY+enum) **description 명료화**. **rename ❌**(poc-03·16 2 paradigm corroborate / 검증 불변=ajv description 무시).
+
+### Triage (무코드 / DEC-2026-06-13-residual-findings-triage)
+- **F2b/c**(migration-cautions enum) = **carry**(additive-safe·1 datapoint·기존값 흡수). **F2d**(schema per-BC provenance)·**F4**(rollup coverage)·**F5**(AP id pattern) = **dissolve**(전부 by-design: canonical-global artifact-zone / 4-catalog rollup / category≠BC[bc_scope 별도 필드]).
+
+### Notes
+- **실테이블 누락 0 (rigorous before/after 실측)**: 전 core 431→416 / LOST 16=전부 noise(alias 9·CTE 2·DB-name 3·동적 1·trailing-dot 1) / 진짜 실테이블 손실 **0** / GAINED 1=실테이블 복원. bare candidate **18→0**.
+- 검증: sql-inventory-extractor **20 test** / RR **42/42** / backward-compat·schema·exit-code 무변경. issue-acm regen(23→22·bare0·EP_BE_COMMON.dbo.TB_BASE_USER 복원 / ep-be-gea `f03be96d03`).
+- **§8.1**: bracket·SQL주석·T-SQL UPDATE…FROM = paradigm-grounded(표준 구문) / 실 drift=ep-be-gea 단일 repo = deterministic 정확성 fix(HARD-gate 아님).
+
+---
+
 ## [0.46.2] — 2026-06-13 PATCH — sql-inventory-extractor TVF + SQL 키워드 noise 제외 (dogfood-found / candidate 정확성)
 
 **SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §7. carry ④ ep-be-gea WLFR §8.1 corroboration 이 노출한 bare candidate noise.

@@ -59,4 +59,17 @@ agent 자기보고를 액면 수용 ❌ → 실측:
 - **§8.1 corroboration**: TVF = **7 도메인**(wlfr/cal/resve/issue/reqmng/event/biztrip) 분포 = 단일 과적합 아님 / paradigm-grounded(SQL: `FROM func()`=TVF·SET/FROM=키워드).
 - 검증: sql-inventory-extractor **15 test**(TVF 4 신규: OPENJSON·STRING_SPLIT 제외 / INSERT INTO t(col) 가드 / FROM t (NOLOCK) 공백 hint 가드 / UPDATE SET 키워드) / RR 42/42 / backward-compat. issue-acm 무영향(잔존 emp_distinct·EP_BE_COMMON=TVF 아님)=ep-be-gea regen 불요.
 
+## 8. v0.46.3 — 잔여 bare candidate 4 fix (UPDATE-alias·bracket·SQL주석 CTE·mid-token / PATCH / 2026-06-13)
+
+§7 carry "table alias·DB-name·ambiguous" 시행. **병렬 검증 패널 `wf_ef3688c0-926`**(7 finding diagnose-before-design / self-recorded-fact-validation)이 §7 의 carry 3종을 **전부 safe-fix 가능**으로 판정(+ 내 가설 1건 교정). 4 fix:
+
+1. **UPDATE-alias** (real / T1·A·CAL·SCTB·RES·R·A1·B1·SAL): SQL Server `UPDATE <alias> SET … FROM <table> <alias>` 의 alias 가 fake table 캡처. `collectTrailingAliases`(FROM/JOIN 뒤 trailing alias / SQL_RESERVED keyword-guard) → `kw==='UPDATE' && dotless && aliasSet.has` 만 제외. **실테이블은 FROM 으로 독립 캡처 / 점 포함·non-alias bare 무관 → 누락 0**.
+2. **bracket-quoted under-capture** (내 가설 교정): EP_BE_COMMON 등은 ~~줄바꿈 분할~~ 이 아니라 **`[EP_BE_COMMON].[dbo].[TB]`**(charclass 가 `]` 제외라 DB명만 캡처). 캡처 charclass 에 `[ ]` 추가 → bracket strip 후 full 복원 = **monotonic recovery**(실테이블 늘기만).
+3. **SQL 주석 끊긴 CTE** (emp_distinct·BASE_KEY): `,/* 주석 */ name AS (` 의 SQL `/* */` 주석이 CTE 체인 끊음 → `blankComments` 가 XML 주석만 blank 했던 것 → SQL `/* */` 도 blank → collectCteNames 가 포착.
+4. **mid-token 동적** (`EP_BE_COMMON.dbo.${t}` → `EP_BE_COMMON.dbo.$` 누출): 캡처 끝 직후 `{` → skip.
+
+- **실테이블 누락 0 (rigorous before/after 실측 / self-recorded-fact-validation)**: 전 core 431→416. **LOST 16 = 전부 noise**(alias 9 + CTE 2 + DB-name 3 + `.dbo.$` 동적 1 + trailing-dot artifact 1) / **진짜 실테이블 손실 0** / **GAINED 1 = 실테이블 복원**(`dbo.ADM_INLOAN_REPAY_REQ_LIST`). bare candidate **18→0**.
+- 검증: sql-inventory-extractor **20 test**(4 신규: bracket 복원 / SQL주석 CTE / mid-token skip / UPDATE-alias + 평범 UPDATE bare-realtable 유지 가드) / RR 42/42 / backward-compat. issue-acm regen(후보 23→22·bare0·EP_BE_COMMON.dbo.TB_BASE_USER 복원 / ep-be-gea `f03be96d03`).
+- **§8.1**: bracket-quoted `[x].[y]`·SQL `/* */`·T-SQL UPDATE…FROM = paradigm-grounded(표준 T-SQL/ANSI 구문) / 단, 실 drift sample 은 ep-be-gea 단일 repo = deterministic 정확성 fix(HARD-gate flip 아님 / CTE 선례 동형).
+
 > **보안**: 본 DEC = 본체 tool 기술만 / 사내 식별자 0(BC-ISSUE-ACM·base_range·OPENJSON 등 = 마스킹 codename·SQL 일반어). 노출 컨텍스트 산출물 = ep-be-gea GHE only.

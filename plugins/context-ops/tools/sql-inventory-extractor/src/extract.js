@@ -75,9 +75,12 @@ export function stableStringify(value) {
 	return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(',')}}`;
 }
 
-// XML 주석 blank 처리 — 내용은 지우되 newline/길이 보존(라인번호·인덱스 불변).
+// XML 주석(`<!-- -->`) + SQL 블록 주석(`/* */`) blank 처리 — 내용은 지우되 newline/길이 보존(라인번호·인덱스 불변).
+//   SQL `/* */` 도 blank: 주석이 CTE 체인(`,/* */ name AS (`)·FROM/JOIN 을 끊거나 위장하던 것 제거 (DEC §8 / ep-be-gea emp_distinct·BASE_KEY CTE 누락 사례).
 function blankComments(xml) {
-	return xml.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '));
+	return xml
+		.replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
+		.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
 }
 
 function lineOf(text, index) {
@@ -116,26 +119,50 @@ function collectCteNames(body) {
 	return names;
 }
 
+// SQL 예약어 — trailing-alias slot 에 와도 별칭 아님(`FROM t WHERE`/`GROUP BY` 등 / DEC §8 keyword-guard).
+const SQL_RESERVED = new Set([
+	'WHERE', 'ON', 'SET', 'INNER', 'LEFT', 'RIGHT', 'FULL', 'JOIN', 'GROUP', 'ORDER', 'HAVING', 'UNION', 'WITH',
+	'AND', 'OR', 'OPTION', 'FOR', 'OUTER', 'CROSS', 'APPLY', 'PIVOT', 'UNPIVOT', 'EXCEPT', 'INTERSECT',
+	'WHEN', 'THEN', 'ELSE', 'END', 'AS', 'OUTPUT', 'VALUES', 'SELECT', 'UPDATE', 'INSERT', 'DELETE', 'MERGE', 'USING', 'BY',
+]);
+
+// FROM/JOIN 뒤 trailing table alias 수집(per-statement) — `FROM|JOIN <qualified-table> [AS] <alias>`. 예약어는 별칭 아님(guard).
+//   SQL Server `UPDATE <alias> SET … FROM <table> <alias>` 의 alias 식별용 (DEC §8 / ep-be-gea T1·SCTB 등).
+function collectTrailingAliases(body) {
+	const set = new Set();
+	const re = /\b(?:FROM|JOIN)\s+\[?[A-Za-z_#$][A-Za-z0-9_#$.[\]]*\s+(?:AS\s+)?([A-Za-z_#$][A-Za-z0-9_#$]*)\b/gi;
+	let m;
+	while ((m = re.exec(body)) !== null) {
+		const a = m[1].toUpperCase();
+		if (!SQL_RESERVED.has(a)) set.add(a);
+	}
+	return set;
+}
+
 // dependent_tables 후보 추출(SKILL §4 FROM/JOIN regex). exhaustive ❌ = 후보 마킹.
-// subquery·동적 테이블명(${...}) 은 regex 한계 → 누락 가능. CTE 별칭은 cteNames(파일 단위 사전수집)로 제외(오탐 제거).
-//   cteNames = 파일 전체에서 collectCteNames 로 수집한 CTE 이름 Set. MyBatis 는 <sql> fragment 의 WITH 절을
-//   직접 <include> 하지 않는 statement 도 런타임 조합으로 참조(ep-be-gea 출입통제 searchBoEntranceAuthorityRequestChipsCount 실사례)
-//   → per-statement/include 해소로 불충분 → 파일 단위 CTE 이름 제외(실테이블은 schema-qualified=점 포함이라 bare CTE 명과 충돌 무시 가능).
+// subquery 는 regex 한계 → 누락 가능. CTE 별칭은 cteNames(파일 단위)로, TVF·동적·UPDATE-alias 는 아래 가드로 제외.
+//   cteNames = 파일 전체 collectCteNames Set(MyBatis <sql> fragment WITH 절을 비-include statement 가 런타임 조합 참조 / per-statement 불충분).
 function extractTables(body, cteNames = new Set()) {
 	const tables = new Set();
-	const re = /\b(FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.]*\]?)/gi;
+	const aliasSet = collectTrailingAliases(body); // UPDATE-alias 식별
+	// charclass 에 `[ ]` 포함 → bracket-quoted qualified name `[db].[dbo].[T]` 전체 캡처(이후 bracket strip / DEC §8 under-capture 복원).
+	const re = /\b(FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.[\]]*)/gi;
 	let m;
 	while ((m = re.exec(body)) !== null) {
 		const kw = m[1].toUpperCase();
-		let t = m[2].replace(/[[\]]/g, '');
-		if (t.startsWith('${') || t.startsWith('#{')) continue; // 동적 테이블명 → skip
-		// table-valued function(OPENJSON/STRING_SPLIT 등): FROM|JOIN 뒤 식별자 **바로 뒤(공백 없이)** '(' = 함수 호출 = 테이블 아님.
-		//   ⚠ FROM|JOIN 한정 — `INSERT INTO t(col1,col2)` 의 컬럼리스트는 실테이블이므로 INTO/UPDATE 는 제외 안 함.
-		//   실테이블 hint(`FROM t (NOLOCK)`/`FROM t WITH(`)는 공백 있어 미해당 → 실테이블 누락 0. (DEC §7 / ep-be-gea dogfood)
-		if ((kw === 'FROM' || kw === 'JOIN') && body.charAt(m.index + m[0].length) === '(') continue;
+		const after = body.charAt(m.index + m[0].length);
+		let t = m[2].replace(/[[\]]/g, ''); // `[db].[dbo].[T]` → `db.dbo.T`
+		// 동적 테이블명(${…}/#{…}) — full(`FROM ${t}`) 및 mid-token(`FROM db.dbo.${t}` = 캡처 끝 직후 `{`) 모두 skip.
+		if (t.startsWith('${') || t.startsWith('#{') || after === '{') continue;
+		// table-valued function(OPENJSON/STRING_SPLIT 등): FROM|JOIN 뒤 식별자 바로 뒤(공백 없이) '(' = 함수 호출.
+		//   ⚠ FROM|JOIN 한정 — `INSERT INTO t(col,col)` 컬럼리스트는 실테이블 / hint `FROM t (NOLOCK)`=공백 미해당 → 실테이블 누락 0. (DEC §7)
+		if ((kw === 'FROM' || kw === 'JOIN') && after === '(') continue;
 		const up = t.toUpperCase();
 		if (TABLE_STOPWORDS.has(up)) continue;
-		if (cteNames.has(t.toLowerCase())) continue; // CTE 참조(WITH…AS 로 정의된 별칭) → 실테이블 아님 → 제외
+		if (cteNames.has(t.toLowerCase())) continue; // CTE(WITH…AS) → 실테이블 아님
+		// SQL Server `UPDATE <alias> SET … FROM <table> <alias>`: UPDATE 뒤 dotless 토큰이 trailing-alias 면 별칭(실테이블은 FROM 으로 독립 캡처).
+		//   점 포함 실테이블(schema.dbo.X)·alias 아닌 bare 테이블은 무관 → 실테이블 누락 0. (DEC §8)
+		if (kw === 'UPDATE' && !t.includes('.') && aliasSet.has(up)) continue;
 		tables.add(t);
 	}
 	return [...tables].sort();

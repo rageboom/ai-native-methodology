@@ -104,7 +104,7 @@
         },
         "when": {
           "type": "string",
-          "description": "행위 — endpoint / method 호출 흐름."
+          "description": "행위 — endpoint / method 호출 흐름. **자유 서술 STRING** (given/then 은 object 이나 when 만 단일 문자열 = 의도된 비대칭). 예: 'POST /api/users → ValidationPipe → UserService.create'."
         },
         "then": {
           "type": "object",
@@ -142,7 +142,7 @@
         "behavior_likely_bug": {
           "type": "array",
           "items": { "type": "string" },
-          "description": "새 시스템에서 의도적 다른 결과 (modern_alternative)."
+          "description": "(**복수 항목 ARRAY of string** — 이름은 단수형이나 배열) 새 시스템에서 의도적 다른 결과 (modern_alternative)."
         }
       },
       "if": {
@@ -187,7 +187,7 @@
         },
         "ambiguous_carry": {
           "type": "array",
-          "description": "ambiguous 분류 항목의 도메인 expert carry 명시 의무.",
+          "description": "ambiguous 분류 항목의 도메인 expert carry 명시 의무. **구조화 ARRAY of {rule_id, carry_owner(enum), carry_reason}** — 자유 텍스트 ❌. carry_owner ∈ {domain_expert, tech_lead, dba, planner, qa, any}.",
           "items": {
             "type": "object",
             "required": ["rule_id", "carry_owner", "carry_reason"],

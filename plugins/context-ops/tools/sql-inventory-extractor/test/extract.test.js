@@ -225,6 +225,52 @@ WHEN MATCHED THEN UPDATE SET t.amt = s.amt</update></mapper>`;
 	// 주: USING 절(EP.dbo.STG)은 추출기가 FROM|JOIN|INTO|UPDATE 만 캡처 → 미포착 = 별개 한계(본 fix 범위 아님)
 });
 
+// DEC §8 — bracket-quoted qualified name 복원 / SQL 주석 끊긴 CTE / mid-token 동적 / UPDATE-alias
+test('bracket-quoted [db].[dbo].[T] 는 전체 복원(점 형태), bare DB명 누출 0', () => {
+	const xml = `<mapper namespace="X"><select id="q">
+SELECT * FROM [EP_BE_COMMON].[dbo].[TB_BASE_USER] u
+JOIN EP_BE_GEA_ADMIN.[dbo].[ADM_X] a ON 1=1
+WHERE EXISTS (SELECT 1 FROM [dbo].[ADM_Y])</select></mapper>`;
+	const { records } = extractFromXml(xml, 'X.xml');
+	const t = records[0].dependent_tables;
+	assert.ok(t.includes('EP_BE_COMMON.dbo.TB_BASE_USER'));
+	assert.ok(t.includes('EP_BE_GEA_ADMIN.dbo.ADM_X'));
+	assert.ok(t.includes('dbo.ADM_Y'));
+	assert.ok(!t.includes('EP_BE_COMMON')); // bare DB명 누출 0
+});
+
+test('SQL /* */ 주석으로 끊긴 CTE 체인도 포착 → 제외 (emp_distinct-식)', () => {
+	const xml = `<mapper namespace="Y"><select id="q">
+WITH base AS (SELECT 1 id FROM EP.dbo.A),
+/* 집계 CTE */
+emp_distinct AS (SELECT id FROM EP.dbo.B)
+SELECT * FROM base b INNER JOIN emp_distinct e ON b.id=e.id</select></mapper>`;
+	const { records } = extractFromXml(xml, 'Y.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.A', 'EP.dbo.B']); // CTE(base/emp_distinct) 제외, 실테이블만
+});
+
+test('동적 테이블 mid-token (db.dbo.${t})는 skip — db.dbo.$ 누출 0', () => {
+	const xml = `<mapper namespace="Z"><select id="q">SELECT * FROM EP_BE_COMMON.dbo.\${userTableName} u WHERE id=#{id}</select></mapper>`;
+	const { records } = extractFromXml(xml, 'Z.xml');
+	assert.ok(!records[0].dependent_tables.some((t) => t.includes('$')));
+	assert.equal(records[0].dependent_tables.length, 0); // 동적 → 정직 캡처 0
+});
+
+test('UPDATE <alias> SET … FROM <table> <alias>: 별칭 제외, 실테이블(FROM) 유지', () => {
+	const xml = `<mapper namespace="W"><update id="u">
+UPDATE T1 SET T1.X = 'Y' FROM EP_BE_GEA_ADMIN.dbo.ADM_LIST T1 INNER JOIN EP.dbo.OTHER o ON 1=1</update></mapper>`;
+	const { records } = extractFromXml(xml, 'W.xml');
+	const t = records[0].dependent_tables;
+	assert.ok(!t.includes('T1')); // UPDATE-alias 제외
+	assert.ok(t.includes('EP_BE_GEA_ADMIN.dbo.ADM_LIST') && t.includes('EP.dbo.OTHER')); // 실테이블 유지
+});
+
+test('UPDATE 가드 — 평범한 UPDATE <bare-realtable> SET (FROM-alias 아님)은 유지', () => {
+	const xml = `<mapper namespace="V"><update id="u">UPDATE MY_BARE_TABLE SET x=1 WHERE id=#{id}</update></mapper>`;
+	const { records } = extractFromXml(xml, 'V.xml');
+	assert.ok(records[0].dependent_tables.includes('MY_BARE_TABLE')); // alias 집합에 없음 → 실테이블 유지
+});
+
 test('CTE — 비-CTE SQL(컬럼 alias·CAST AS)은 오제외 0 (false-positive 가드)', () => {
 	const xml = `<mapper namespace="Y"><select id="q" resultType="map">
 SELECT a.id, CAST(a.amt AS INT) AS amt2, (SELECT 1) AS one FROM EP.dbo.ACCOUNT a JOIN EP.dbo.LEDGER l ON a.id = l.aid</select></mapper>`;
