@@ -9,6 +9,16 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-13 / reqmng(신청관리) shared 카탈로그 통합 = 다른 워크트리 deferred rollup 완료 + domain 저작 / **버전 bump 없음** — ep-be-gea `1de6fe225b`(GHE) 커밋 / methodology 미커밋)
+
+**이번 세션 성과 (사용자 "reqmng부터 진행" / `DEC-2026-06-13-reqmng-shared-rollup-integration` / 본체 코드 무변경)**:
+- **reqmng = 다른 워크트리(`feature/context-ops-reqmng`)의 미완 통합 완성**. per-BC leaf(36 BR/openapi/sql-inventory/characterization/cautions·findings fragment)는 완료돼 있었고 `bc-scope.json#deferred_shared_rollups`(domain/BR-index/migration-cautions)만 "병렬충돌 회피→post-merge 1회" 명시 deferred → 그 의도된 통합을 현 base(`feature/context-ops-test` 328 rules)로 완성. **60-baseline 도구 dogfood ≠ production 통합**.
+- **시행**: ① domain bounded_context **저작**(Workflow 병렬 author hncaf 17 BR/resort 19 BR → BR leaf `source_evidence` grounding 8 aggregate/36 invariant(36 BR 1:1)/31 UC(UC-REQMNG-001..031)/19 UL / aggregate별 **적대적 검증 7 clean+1 minor**=BR 과진술 전사 정확화·날조 아님 / evidence file_missing 0) ② bc-accumulator-rollup 멱등 직렬 rollup(total_rules 328→**364**·caution_groups 27→29·bounded_contexts 16→**17** / findings shared skip·antipatterns 미저작) ③ cross-version leaf conformance.
+- **결과**: schema-validator **트리 전체 0 invalid** + br-cross pass(0.935) + formal-spec 0. 통합 산출물 attributable 결함 0(evidence-verified).
+- **방법론 finding**: ①**§8.1** 본체 결함 0 / 도구 첫 production-base 통합. **정밀**: reqmng=analysis-integration(full-chain 아님) → full-chain §8.1 datapoint **9 유지** / reqmng=rollup·domain-authoring·cross-version 별도 축(AX-context BC 누적 10). ②**F2 cross-version 드리프트(PRIMARY/신규 / `feedback_strict_exposes_drift`)**: v0.41 leaf↔v0.43 strict = 수정 vs carry 경계 = "JSON Schema 계약 위반 결정론 수정"(inputs_used×3·confidence cap×22 ADR-CHAIN-007·tag_type 정규화×156 `tag` 보존·carry_flags×3) / "semantic content-validator 포맷 진화 carry"(intent_vs_bug 서술형 39=레코드별 재분류=세션 몫) = wlfr 재발 예상 재사용 규약. ③**F3 domain-authoring-from-leaf**(fresh 분석 없이 BR leaf source_evidence 만으로 도출 + source_br 의무 + 적대적 verifier).
+- **본체 무변경(bump 없음)** — leaf 데이터 정규화만(도구·스키마 무변). DEC+INDEX+STATUS+memory 기록만.
+- **carry / 다음**: ① **wlfr 통합**(동일 cross-version 정합 예상 / 7 서브도메인 125 BR = reqmng 보다 큼 / 본 F2 경계 규약 재사용). ② reqmng leaf 재작업(sql intent 39 키워드·FIP ambiguous = 원 세션 몫). ③ 선재 biztrip/eaprv `_catalog-fragment` base 부채(reqmng 무관 / leaf 복원 or fragment 정리). ④ ep-be-gea→GHE push(blocked) + methodology→rageboom/GHE push 사용자 결단.
+
 ### ★ 다음 세션 인계 (2026-06-13 / cal(정산) 메뉴그룹 3 BC analysis+풀체인 dogfood + 방법론 findings / **버전 bump 없음** — ep-be-gea-cal·methodology 미커밋)
 
 **이번 세션 성과 (사용자 "cal 새 워크트리로 잡아서 풀체인 진행 + 방법론 파인딩 가장 마지막" / `DEC-2026-06-13-cal-3bc-fullchain-corroboration` / 본체 코드 무변경)**:
