@@ -10,6 +10,23 @@
 
 ---
 
+## [0.44.0] — 2026-06-13 MINOR — code @DisplayName ↔ test-spec 라벨 정합 lint (SOFT / opt-in) + canonical 라벨 grammar
+
+**SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md`. 연구 패널 `wf_40ab04b1-fda` (4원칙 §2).
+
+### Added
+- **`spec-test-link-validator` opt-in `--test-source <root>` SOFT 모드** + sibling export `validateCodeLabelConsistency` (validateMockSoundness 선례). dogfood(ep-be-gea golf/event/resv)가 노출한 갭 해소 — 테스트 `@DisplayName` 의 BR/AC/TC 토큰이 test-spec SSOT 와 drift + 날조 BR id 인데 기존 검증기(spec-test-link=JSON↔JSON / test-impl-pass=runner XML / code-pointer=ast warn) 어느 것도 코드 라벨 미검사.
+  - 결정론 검사(LLM 판단 0 / STRONG-STOP 준수): **A** 날조 id(BR ∉ business-rules=critical / AC ∉ acceptance·TC ∉ test-spec=high), **B** join mismatch(source_evidence·code_pointers 의 class/method 명으로 그 @DisplayName 토큰 ↔ TC.id/ac_ref / anchor 부재 시 `join_anchor_absent` 정직 skip), **C** intra-label(라벨 AC == 라벨-TC 의 ac_ref). short(`AC-007`)↔full 정규화. Java/JUnit5 extractor(TS/React carry / non-Java skip).
+  - **SOFT 보장**: cli 가 결과를 별도 키 `result.code_label_consistency` 로만 attach — `result.findings`/`summary` 병합 ❌ → exit-code·aggregator·gate #4 **무영향** = advisory. `--test-source` 부재 시 기존 JSON-only 동작 **100% 불변**. REQUIRED-validator map 무변경(count coupling 회피).
+- **canonical 라벨 grammar 문서화** (`skills/test-generate-test-spec/SKILL.md`): `(BR-<full> / AC-<id> / TC-<id>)` 정규문법 + 일관성 3조건(TC=구현 TC / AC=ac_ref / BR=실재) + class_ref·code_pointers populate 권장.
+
+### Notes
+- **§8.1 ratchet**: golf/event/resv = 단일 마스킹 Java 프로젝트 = **1 datapoint** → **SOFT only**. HARD flip(findings 병합 + gate #4 차단)은 ≥2 distinct 도메인 corroboration 후 별도 DEC.
+- 검증: `spec-test-link-validator` **19 tests pass**(신규 code-label 8) + 수정된 golf 실 dogfood **0 findings**(checked 6 / skipped 19 join_anchor_absent). release-readiness **42/42**(신 check 무 / criteria_total 무변).
+- carry: TS/React extractor · HARD flip · codegen(@DisplayName 자동생성) · class_ref/code_pointers 강제 · "실재 id·오의미" drift(의미 영역 = 결정론 비대상).
+
+---
+
 ## [0.43.1] — 2026-06-13 PATCH — validator stdout truncation 수정 (대형 레거시 게이트 침묵 차단 해소 / WLFR 489-rule dogfood)
 
 **SSOT**: `decisions/DEC-2026-06-13-validator-stdout-truncation-fix.md`.

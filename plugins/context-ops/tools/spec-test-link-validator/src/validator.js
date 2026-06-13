@@ -251,6 +251,176 @@ export function validateMockSoundness(testSpec, unitSpec) {
 	};
 }
 
+// ──────────────────────────────────────────────────────────────────────
+// v0.44.0 (DEC-2026-06-13-displayname-label-lint-soft) — code @DisplayName ↔ test-spec 라벨 정합 (SOFT / opt-in --test-source).
+//   dogfood(ep-be-gea golf/event/resv) 가 노출: 테스트 @DisplayName 의 BR/AC/TC 토큰이 test-spec SSOT 와 drift + 날조 BR id.
+//   기존 검증기 어느 것도 코드 라벨을 안 봄(spec-test-link=JSON↔JSON / test-impl-pass=runner XML / code-pointer=ast warn).
+//   ★ 결정론 범위(STRONG-STOP 준수 / LLM 판단 0) = 구조적 subset 만:
+//     A. 날조 id — 라벨의 BR ∉ business-rules(critical) / AC ∉ acceptance(high) / TC ∉ test-spec(high).
+//     B. join(source_evidence 의 nested-class/method 명 = 라벨 아닌 안정 식별자)로 그 클래스 @DisplayName 의 TC/AC 토큰을
+//        해당 TC.id/ac_ref 와 대조(high mismatch). code_pointers/class_ref 가 있으면 우선 사용. 없으면 best-effort.
+//     C. intra-label: 한 @DisplayName 이 AC+TC 동시 보유 시 라벨 AC == 라벨-TC 의 spec ac_ref (high).
+//   ※ "실재 id·오의미"(event 식 drift)는 의미 판단 필요 = 본 결정론 lint 비대상(semantic 영역 / 정직 표기). SOFT=cli 가 별도 키로만 attach.
+//   §8.1: 1 datapoint(단일 마스킹 Java 프로젝트) = SOFT only. HARD flip 은 ≥2 distinct 도메인 후.
+//   다언어: @DisplayName=Java/JUnit5 전용 extractor(아래). TS/React = carry.
+// ──────────────────────────────────────────────────────────────────────
+const LABEL_TOKEN_RE = /\b(BR|AC|BHV|UC|TC)-[A-Z0-9-]*\d{3}\b/g;
+const DISPLAYNAME_RE = /@DisplayName\(\s*"((?:[^"\\]|\\.)*)"\s*\)/g;
+
+export function deriveScope(testSpec) {
+	for (const tc of testSpec?.test_cases ?? []) {
+		const m = /^TC-(.+)-\d{3}$/.exec(tc.id || '');
+		if (m) return m[1];
+	}
+	return null;
+}
+
+// short form(AC-007) → full(AC-<scope>-007). 이미 full 이면 그대로.
+export function normalizeLabelId(token, scope) {
+	const m = /^(BR|AC|BHV|UC|TC)-(\d{3})$/.exec(token);
+	if (m && scope) return `${m[1]}-${scope}-${m[2]}`;
+	return token;
+}
+
+function tokensIn(text) {
+	const out = { BR: [], AC: [], BHV: [], UC: [], TC: [] };
+	let m;
+	LABEL_TOKEN_RE.lastIndex = 0;
+	while ((m = LABEL_TOKEN_RE.exec(text)) !== null) out[m[1]].push(m[0]);
+	return out;
+}
+
+// Java/JUnit5 extractor — @DisplayName 을 인접한 `class X` 또는 `void y(` 에 바인딩(±3 line).
+//   regex 기반(JavaParser 비의존) — exotic 포맷 미스 가능(exhaustive-no / sql-inventory-extractor 선례 caveat).
+export function extractJavaDisplayNames(content) {
+	const lines = content.split('\n');
+	const labels = []; // {label, kind, name, tokens}
+	for (let i = 0; i < lines.length; i++) {
+		const dm = /@DisplayName\(\s*"((?:[^"\\]|\\.)*)"\s*\)/.exec(lines[i]);
+		if (!dm) continue;
+		const label = dm[1];
+		// 다음 1~3 줄에서 class/method 선언 탐색
+		let kind = null,
+			name = null;
+		for (let j = i + 1; j <= Math.min(i + 3, lines.length - 1); j++) {
+			const cm = /\bclass\s+([A-Za-z_]\w*)/.exec(lines[j]);
+			const mm = /\b(?:void|[A-Za-z_][\w<>,\s]*?)\s+([A-Za-z_]\w*)\s*\(/.exec(lines[j]);
+			if (cm) { kind = 'class'; name = cm[1]; break; }
+			if (mm && /\bvoid\b|@Test/.test(lines[j] + lines[j - 1])) { kind = 'method'; name = mm[1]; break; }
+		}
+		labels.push({ label, kind, name, tokens: tokensIn(label) });
+	}
+	return labels;
+}
+
+// source_evidence / code_pointers / class_ref 에서 안정 식별자(nested class · method 명) 추출 (라벨 아님).
+function joinIdentifiers(tc) {
+	const ids = { classes: [], methods: [] };
+	for (const cp of tc.code_pointers ?? []) {
+		if (cp.symbol) {
+			const seg = String(cp.symbol).split(/[.#]/).pop();
+			if (seg) ids.methods.push(seg);
+			const cls = String(cp.symbol).split(/[.#]/).slice(-2, -1)[0];
+			if (cls) ids.classes.push(cls);
+		}
+	}
+	if (tc.class_ref) ids.classes.push(String(tc.class_ref).split(/[.$]/).pop());
+	const se = tc.source_evidence || '';
+	// `Main$Nested (real JUnit...)` / `void methodName(` / `Class#method`
+	const nested = /\$([A-Za-z_]\w*)/.exec(se);
+	if (nested) ids.classes.push(nested[1]);
+	const meth = /(?:void\s+|#)([A-Za-z_]\w*)\s*\(?/.exec(se);
+	if (meth) ids.methods.push(meth[1]);
+	return ids;
+}
+
+export function validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds) {
+	// sourceFiles: [{ path, content }] (cli 가 source_file 들을 disk read). brIds/acIds: Set (business-rules / acceptance).
+	const findings = [];
+	const scope = deriveScope(testSpec);
+	const tcs = testSpec?.test_cases ?? [];
+	const tcIds = new Set(tcs.map((t) => t.id));
+	const tcToAc = new Map(tcs.map((t) => [t.id, t.ac_ref]));
+	let checked = 0;
+	const skipped = [];
+
+	// 파일별 @DisplayName 라벨 추출 (Java only — .java 만)
+	const byFileLabels = new Map();
+	for (const f of sourceFiles ?? []) {
+		if (!f || !f.content) { skipped.push({ path: f?.path, reason: 'unreadable' }); continue; }
+		if (!/\.java$/.test(f.path || '')) { skipped.push({ path: f.path, reason: 'non_java_extractor_carry' }); continue; }
+		byFileLabels.set(f.path, extractJavaDisplayNames(f.content));
+	}
+
+	// A. 모든 라벨의 토큰 날조/미존재 검사
+	for (const [path, labels] of byFileLabels) {
+		for (const L of labels) {
+			const hasTok = L.tokens.BR.length || L.tokens.AC.length || L.tokens.TC.length;
+			if (!hasTok) continue;
+			checked++;
+			for (const raw of L.tokens.BR) {
+				const id = normalizeLabelId(raw, scope);
+				if (brIds && brIds.size && !brIds.has(id) && !brIds.has(raw)) {
+					findings.push({ kind: 'code_label.br_fabricated', severity: 'critical', source_file: path, label: L.label, token: raw, message: `@DisplayName BR ${raw} not in business-rules (fabricated / no-simulation)` });
+				}
+			}
+			for (const raw of L.tokens.AC) {
+				const id = normalizeLabelId(raw, scope);
+				if (acIds && acIds.size && !acIds.has(id) && !acIds.has(raw)) {
+					findings.push({ kind: 'code_label.ac_unknown', severity: 'high', source_file: path, label: L.label, token: raw, message: `@DisplayName AC ${raw} not in acceptance-criteria` });
+				}
+			}
+			for (const raw of L.tokens.TC) {
+				const id = normalizeLabelId(raw, scope);
+				if (!tcIds.has(id) && !tcIds.has(raw)) {
+					findings.push({ kind: 'code_label.tc_unknown', severity: 'high', source_file: path, label: L.label, token: raw, message: `@DisplayName TC ${raw} not in test-spec` });
+				}
+			}
+			// C. intra-label: AC+TC 동시 보유 시 라벨 AC == 라벨-TC 의 spec ac_ref
+			if (L.tokens.TC.length === 1 && L.tokens.AC.length === 1) {
+				const nTC = normalizeLabelId(L.tokens.TC[0], scope);
+				const nAC = normalizeLabelId(L.tokens.AC[0], scope);
+				const expected = tcToAc.get(nTC) ?? tcToAc.get(L.tokens.TC[0]);
+				if (expected && expected !== nAC && expected !== L.tokens.AC[0]) {
+					findings.push({ kind: 'code_label.ac_tc_mismatch', severity: 'high', source_file: path, label: L.label, message: `@DisplayName pairs ${L.tokens.AC[0]} with ${L.tokens.TC[0]}, but test-spec ${nTC}.ac_ref=${expected}` });
+				}
+			}
+		}
+	}
+
+	// B. join — source_evidence/code_pointers 의 class/method 명으로 그 라벨의 TC/AC 가 해당 TC 와 맞는지
+	for (const tc of tcs) {
+		if (!tc.source_file) continue;
+		const labels = byFileLabels.get(tc.source_file);
+		if (!labels) { continue; }
+		const ids = joinIdentifiers(tc);
+		const cand = labels.find(
+			(L) => (L.kind === 'class' && ids.classes.includes(L.name)) || (L.kind === 'method' && ids.methods.includes(L.name)),
+		);
+		if (!cand) { skipped.push({ tc_id: tc.id, reason: 'join_anchor_absent' }); continue; }
+		const labTC = cand.tokens.TC.map((t) => normalizeLabelId(t, scope));
+		const labAC = cand.tokens.AC.map((t) => normalizeLabelId(t, scope));
+		if (labTC.length && !labTC.includes(tc.id)) {
+			findings.push({ kind: 'code_label.tc_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName TC=${cand.tokens.TC.join(',')} but test-spec binds it to ${tc.id}` });
+		}
+		if (tc.ac_ref && labAC.length && !labAC.includes(tc.ac_ref)) {
+			findings.push({ kind: 'code_label.ac_join_mismatch', severity: 'high', source_file: tc.source_file, tc_id: tc.id, bound: cand.name, label: cand.label, message: `${cand.name} @DisplayName AC=${cand.tokens.AC.join(',')} but test-spec ${tc.id}.ac_ref=${tc.ac_ref}` });
+		}
+	}
+
+	return {
+		findings,
+		summary: {
+			total_findings: findings.length,
+			critical: findings.filter((f) => f.severity === 'critical').length,
+			high: findings.filter((f) => f.severity === 'high').length,
+			medium: findings.filter((f) => f.severity === 'medium').length,
+		},
+		checked,
+		skipped,
+	};
+}
+
 function inferStackHints(inventory) {
 	const hints = new Set();
 	if (!inventory) return hints;

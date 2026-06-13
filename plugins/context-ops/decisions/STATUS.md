@@ -9,6 +9,12 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-13 / **code @DisplayName ↔ test-spec 라벨 정합 lint v0.44.0 (SOFT/opt-in)** + golf/event/resv 라벨 drift 감사·수정 — methodology 미커밋 / ep-be-gea 라벨 fix `cf9e0c20a9`·`9a60e35537`·`2b6d7ab014`(GHE pending))
+
+- **dogfood 라벨 감사 (다른것들도 감사)**: 9 scope characterization 테스트 @DisplayName 토큰 ↔ test-spec SSOT 전수 감사(워크플로우 `wf_2a869020-2bc` / 적대적 재검증). **5 clean**(cal-corpt/salary/taxi·resv-helium/hlum) / 수정: golf 6(`cf9e0c20a9` — 날조 BR DUR/FEE→실재 + AC/TC 정정)·resv-healing+mtrm 5(`9a60e35537` — AC 토큰 보강)·**event 13**(`2b6d7ab014` — 초안 AC 번호 drift / 전 23 AC 의미 대조로 부분 drift 확정 / AC-001·002 정상 무접촉). 전부 실 JUnit GREEN 재확인(라벨=주석/동작 무영향).
+- **본체 v0.44.0 (MINOR / `DEC-2026-06-13-displayname-label-lint-soft`)**: 위 drift 가 노출한 갭(코드 라벨 무검사) → `spec-test-link-validator` opt-in `--test-source` + sibling `validateCodeLabelConsistency`. 결정론 subset(날조 id critical / AC·TC join mismatch high / intra-label) · source_evidence·code_pointers join(부재 시 정직 skip) · Java extractor. **SOFT**(별도 키 attach=exit-code·gate#4 무영향 / 기본 동작 100% 불변). canonical 라벨 grammar test SKILL 문서화. **§8.1 1 datapoint=SOFT only**(HARD=≥2 distinct 도메인). 연구 패널 `wf_40ab04b1-fda`(4원칙 §2). 검증 spec-test-link 19 test+golf 0-finding dogfood / **release 42/42**.
+- **carry / 다음**: ① TS/React extractor + HARD flip(≥2 distinct 도메인 후) ② "실재 id·오의미" drift(event 식)=의미 영역 결정론 비대상 ③ methodology v0.44.0 커밋+push(rageboom) / ep-be-gea 라벨 3커밋 GHE pending ④ req/issue 잔여 미분석.
+
 ### ★ 다음 세션 인계 (2026-06-13 / wlfr(복지) shared 카탈로그 통합 + **validator stdout-truncation 본체 버그 수정 v0.43.1** — ep-be-gea `15295bcbaa`(GHE) / methodology 미커밋)
 
 **이번 세션 성과 (사용자 "wlfr 통합 진행" → 노출된 본체 버그 "지금 fix" / `DEC-2026-06-13-wlfr-shared-rollup-integration` + `DEC-2026-06-13-validator-stdout-truncation-fix`)**:

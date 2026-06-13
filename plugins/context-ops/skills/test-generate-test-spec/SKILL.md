@@ -100,6 +100,8 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
 
    > **TC-id-in-name 규약**: test 의 **display name 또는 메서드명에 TC-id 를 포함**하라. S2(AX전환) per_tc_outcome gate 는 실 runner 결과(JUnit/pytest XML 의 `name`)를 TC-id 로 상관(`test-impl-pass-validator correlateByTcId`)해 characterization(GREEN) ↔ augmentation(RED) 을 per-TC 대조한다. TC-id 가 주석에만 있으면 XML `name` 에 안 실려 상관 실패(missing_actual). JUnit5+Gradle 은 XML `name`=@DisplayName 이므로 **@DisplayName 에 TC-id 가 가장 안전** (메서드명은 하이픈 불가 — correlateByTcId 가 하이픈/언더스코어 정규화로 양쪽 허용). 풀-컨텍스트 통합 test(@SpringBootTest 등)는 격리 DB profile(@ActiveProfiles 등) 명시.
 
+   > **라벨 grammar 규약 (canonical)**: TC-id 외에 추적 라벨을 더 실으면 **정규 문법**을 따르라 — `@DisplayName("<설명> (BR-<full-id> / AC-<id> / TC-<id>)")` (class-level 은 `(UC-... / BHV-...)`). 구분자 ` / `, 괄호. **일관성 의무**: ① 라벨의 TC-id = 이 테스트가 구현하는 test-spec TC, ② 라벨의 AC-id = 그 TC 의 `ac_ref`, ③ 라벨의 BR-id = business-rules.json 에 **실재하는** id (날조 ❌ / no-simulation). short(`AC-007`)·full(`AC-<scope>-007`) 양형 허용(정규화). join 강화: tested TC 는 `class_ref`/`code_pointers.symbol` populate 권장(source_evidence free-text 보다 안정). 검증 = `spec-test-link-validator --test-source <root> [--business-rules <p>]` (**SOFT / opt-in / 비차단** — 결정론 subset: 날조 id·intra-label AC↔TC·join mismatch 만. "실재 id·오의미" drift 는 의미 영역 = 비대상). §8.1: 1 datapoint = SOFT, HARD flip 은 ≥2 distinct 도메인 후.
+
 5. **property_tests 코드 generate** — behavior-spec.behaviors[].property_tests[].arbitrary_stub → fast-check / Hypothesis / jqwik 코드 채움.
 
 6. **test-spec.json 채움** — TC-\* 목록 + 각 TC 의 ac_ref / bhv_ref / type / framework / source_file / expected_outcome.
@@ -310,4 +312,5 @@ class TestUcUser001:
 - 결단: DEC-2026-05-26-contract-강제-양-axis §1 (contract test hard gate)
 - 결단: DEC-2026-05-30-s2-augmentation-green-roundtrip (augmentation 재동기화)
 - 결단: DEC-2026-05-30-s2-exec-corroboration (TC-id-in-name 규약)
+- 결단: DEC-2026-06-13-displayname-label-lint-soft (canonical 라벨 grammar + code @DisplayName ↔ test-spec SOFT lint)
 - master plan §B chain 4

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
-import { validateSpecTestLink, validateMockSoundness, loadJson } from './validator.js';
+import { readFileSync, existsSync } from 'node:fs';
+import { join, isAbsolute } from 'node:path';
+import { validateSpecTestLink, validateMockSoundness, validateCodeLabelConsistency, loadJson } from './validator.js';
 
 import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 function parseArgs(argv) {
@@ -11,12 +13,16 @@ function parseArgs(argv) {
     else if (a === '--test-spec') out.testSpec = argv[++i];
     else if (a === '--inventory') out.inventory = argv[++i];
     else if (a === '--unit-spec') out.unitSpec = argv[++i];
+    else if (a === '--test-source') out.testSource = argv[++i];
+    else if (a === '--business-rules') out.businessRules = argv[++i];
     else if (a === '--threshold') out.threshold = parseFloat(argv[++i]);
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: spec-test-link-validator --acceptance <path> --test-spec <path> [--behavior <path>] [--inventory <path>] [--unit-spec <path>] [--threshold 0.85] [--dry-run] [--json]
-  --unit-spec <path>  v0.36.0 — mocking-soundness 계약 검사 (SOFT / propose-only / 비차단 / exit code 미영향). composition TC 의 mock 협력자가 test_layer=unit TC 로 핀됐는지.`);
+      console.log(`usage: spec-test-link-validator --acceptance <path> --test-spec <path> [--behavior <path>] [--inventory <path>] [--unit-spec <path>] [--test-source <root> [--business-rules <path>]] [--threshold 0.85] [--dry-run] [--json]
+  --unit-spec <path>     v0.36.0 — mocking-soundness 계약 검사 (HARD / --unit-spec 시 result.findings 병합). composition TC 의 mock 협력자가 test_layer=unit TC 로 핀됐는지.
+  --test-source <root>   v0.44.0 — code @DisplayName ↔ test-spec 라벨 정합 (SOFT / opt-in / 비차단 / exit code·gate 미영향). test_case.source_file 들을 <root> 기준 read.
+  --business-rules <p>   --test-source 동반: 라벨의 BR 토큰 날조 검사용 business-rules.json (없으면 BR-id 검사 skip).`);
       process.exit(0);
     }
   }
@@ -50,6 +56,27 @@ if (unitSpec) {
   result.summary.total_findings += ms.summary.total_findings;
 }
 
+// v0.44.0 — code @DisplayName ↔ test-spec 라벨 정합 (SOFT / DEC-2026-06-13-displayname-label-lint-soft).
+//   --test-source opt-in. 결과는 **별도 키** result.code_label_consistency 로만 attach — result.findings/summary 에 병합 ❌
+//   → exit-code(아래 fail) + aggregator transformGeneric(summary.high) + gate 무영향 = 진짜 advisory. 부재 시 동작 100% 불변.
+//   §8.1: 1 datapoint = SOFT only. HARD flip(병합)은 ≥2 distinct 도메인 후 별도 결정.
+if (args.testSource) {
+  const root = args.testSource;
+  const resolve = (p) => (isAbsolute(p) ? p : join(root, p));
+  const seen = new Set();
+  const sourceFiles = [];
+  for (const tc of testSpec?.test_cases ?? []) {
+    if (!tc.source_file || seen.has(tc.source_file)) continue;
+    seen.add(tc.source_file);
+    const full = resolve(tc.source_file);
+    sourceFiles.push({ path: tc.source_file, content: existsSync(full) ? readFileSync(full, 'utf-8') : null });
+  }
+  const brDoc = args.businessRules ? loadJson(args.businessRules) : null;
+  const brIds = new Set((brDoc?.business_rules ?? []).map((b) => b.id));
+  const acIds = new Set((acceptance?.criteria ?? []).map((a) => a.id));
+  result.code_label_consistency = validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds);
+}
+
 if (args.json) {
   writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
@@ -57,6 +84,11 @@ if (args.json) {
   console.log(`coverage AC→TC: ${(result.coverage.ac_to_tc * 100).toFixed(1)}% (threshold ${args.threshold})`);
   for (const f of result.findings) {
     console.log(`  ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
+  }
+  if (result.code_label_consistency) {
+    const c = result.code_label_consistency;
+    console.log(`[code-label SOFT/advisory] ${c.summary.total_findings} findings (critical ${c.summary.critical}, high ${c.summary.high}) / checked ${c.checked} labels / skipped ${c.skipped.length}`);
+    for (const f of c.findings) console.log(`  (soft) ${f.severity.toUpperCase()} [${f.kind}] ${f.message}`);
   }
 }
 
