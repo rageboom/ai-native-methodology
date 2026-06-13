@@ -10,6 +10,10 @@
 //     (`{bc_files:[...]}`)를 감지해 per-BC sibling 을 재조립 = single-point. index 는
 //     파일명 business-rules.json 유지(plan §2.1)이므로 기존 existsSync/basename 매핑 무영향.
 //     옛 단일파일 `{business_rules:[...]}` 은 backward-compat 으로 계속 수용(시점기록 예제).
+//   ★ 소비 규약 (DEC-2026-06-13-wlfr-orphaned-br-subdir): BR 은 **반드시 index→`bc_files[].file` 경로
+//     (= 본 loader)** 로만 소비. per-BC `business-rules/` 서브디렉토리를 index 우회 직접 글롭 ❌
+//     (그 서브디렉토리는 index 미참조 시 inert / stale divergent 가능 = WLFR vocab-정정 전 잔존 실사례).
+//     per-BC 내부 sub-domain breakdown 서브디렉토리는 indexed 파일과 consistent 하거나 부재여야 함.
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
